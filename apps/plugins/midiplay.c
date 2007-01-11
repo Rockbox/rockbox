@@ -78,13 +78,26 @@ PLUGIN_IRAM_DECLARE
 
 
 #define FRACTSIZE 10
-#define SAMPLE_RATE 22050  // 44100 22050 11025
-#define MAX_VOICES 14   // Note: 24 midi channels is the minimum general midi
+
+#ifndef SIMULATOR
+	#define SAMPLE_RATE 22050  // 44100 22050 11025
+	#define MAX_VOICES 14   // Note: 24 midi channels is the minimum general midi
                          // spec implementation
+#else	// Simulator requires 44100, and we can afford to use more voices
+	#define SAMPLE_RATE 44100
+	#define MAX_VOICES 48
+#endif
+
+
 #define BUF_SIZE 512
 #define NBUF   2
 
 #undef SYNC
+
+#ifdef SIMULATOR
+	#define SYNC
+#endif
+
 struct MIDIfile * mf IBSS_ATTR;
 
 int numberOfSamples IBSS_ATTR;
@@ -133,10 +146,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->profstop();
 #endif
 
-#ifndef SIMULATOR
+//#ifndef SIMULATOR
     rb->pcm_play_stop();
-    rb->pcm_set_frequency(44100); // 44100
-#endif
+    rb->pcm_set_frequency(SAMPLE_RATE); // 44100
+//#endif
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
     rb->cpu_boost(false);
@@ -221,10 +234,10 @@ int midimain(void * filename)
     if (initSynth(mf, "/.rockbox/patchset/patchset.cfg", "/.rockbox/patchset/drums.cfg") == -1)
         return -1;
 
-#ifndef SIMULATOR
+//#ifndef SIMULATOR
     rb->pcm_play_stop();
     rb->pcm_set_frequency(SAMPLE_RATE); // 44100 22050 11025
-#endif
+//#endif
 
     /*
         * tick() will do one MIDI clock tick. Then, there's a loop here that
@@ -255,9 +268,9 @@ int midimain(void * filename)
     } while(notesUsed == 0);
 
     synthbuf();
-#ifndef SIMULATOR
+//#ifndef SIMULATOR
     rb->pcm_play_data(&get_more, NULL, 0);
-#endif
+//#endif
 
     int vol=0;
 
