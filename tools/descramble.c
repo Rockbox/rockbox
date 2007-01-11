@@ -32,7 +32,7 @@ void usage(void)
     printf("options:\n"
            "\t-fm     Archos FM recorder format\n"
            "\t-v2     Archos V2 recorder format\n"
-           "\t-mm=X   Archos Multimedia format (X values: A=JBMM, B=AV1xx, C=AV3xx)\n"
+           "\t-mm     Archos Multimedia format\n"
            "\t-iriver iRiver format\n"
            "\t-gigabeat Toshiba Gigabeat format\n"
            "\t-iaudio iAudio format\n"
@@ -91,7 +91,7 @@ int main (int argc, char** argv)
     /* open file and check size */
     file = fopen(iname,"rb");
     if (!file) {
-       perror(oname);
+       perror(iname);
        return -1;
     }
     fseek(file,0,SEEK_END);
