@@ -2291,7 +2291,7 @@ bool debug_menu(void)
 #endif
 #ifdef HAVE_LCD_BITMAP
 #ifdef HAVE_TAGCACHE
-        { "View tagcache info", dbg_tagcache_info },
+        { "View database info", dbg_tagcache_info },
 #endif
 #if CONFIG_CODEC == SWCODEC || !defined(SIMULATOR)
         { "View audio thread", dbg_audio_thread },
