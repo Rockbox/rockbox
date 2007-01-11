@@ -36,8 +36,8 @@ static unsigned short backlight_current;
 static unsigned short backlight_target;
 static unsigned short time_til_fade;
 static unsigned short fade_interval;
-static unsigned char backlight_leds; 
-
+static unsigned short initial_tick_delay;
+static unsigned char backlight_leds;
 
 static enum backlight_states
 {
@@ -79,7 +79,7 @@ enum buttonlight_states
     BUTTONLIGHT_MODE_CHARGING_ENTRY,
     BUTTONLIGHT_MODE_CHARGING,
     BUTTONLIGHT_MODE_CHARGING_WAIT,
-    
+
     /* internal use only */
     BUTTONLIGHT_HELPER_SET,
     BUTTONLIGHT_HELPER_SET_FINAL,
@@ -92,7 +92,7 @@ enum buttonlight_states
 
 
 
-static char buttonlight_leds; 
+static char buttonlight_leds;
 static unsigned short buttonlight_setting;
 static unsigned short buttonlight_current;
 static unsigned char buttonlight_selected;
@@ -122,7 +122,9 @@ void __backlight_init(void)
     buttonlight_state = BUTTONLIGHT_MODE_OFF;
 
     buttonlight_selected = 0x04;
-    
+
+	/* delay 5 seconds before any fading */
+	initial_tick_delay = 5000;
     /* put the led control on the tick list */
     tick_add_task(led_control_service);
 }
@@ -167,24 +169,24 @@ void __buttonlight_trigger(void)
     buttonlight_trigger_now = 1;
 }
 
-   
+
 
 
 /* map the mode from the command into the state machine entries */
-void __buttonlight_mode(enum buttonlight_mode mode, 
+void __buttonlight_mode(enum buttonlight_mode mode,
                         enum buttonlight_selection selection,
                         unsigned short brightness)
 {
     /* choose stop to setup mode */
     buttonlight_state = BUTTONLIGHT_MODE_STOP;
 
-    
+
     /* clip brightness */
     if (brightness > MAX_BRIGHTNESS_SETTING)
     {
         brightness = MAX_BRIGHTNESS_SETTING;
     }
-    
+
     brightness++;
 
     /* Select which LEDs to use */
@@ -193,7 +195,7 @@ void __buttonlight_mode(enum buttonlight_mode mode,
         case BUTTONLIGHT_LED_ALL:
         buttonlight_selected = BUTTONLIGHT_ALL;
         break;
-        
+
         case BUTTONLIGHT_LED_MENU:
         buttonlight_selected = BUTTONLIGHT_MENU;
         break;
@@ -216,7 +218,7 @@ void __buttonlight_mode(enum buttonlight_mode mode,
         buttonlight_trigger_brightness = 1;
         buttonlight_state = BUTTONLIGHT_MODE_ON_ENTRY;
         break;
-        
+
         case BUTTONLIGHT_FLICKER:
         buttonlight_trigger_brightness = brightness;
         buttonlight_state = BUTTONLIGHT_MODE_FLICKER_ENTRY;
@@ -239,21 +241,21 @@ void __buttonlight_mode(enum buttonlight_mode mode,
         return; /* unknown mode */
     }
 
-   
+
 }
 
 
 
-/* 
+/*
  * The button lights have 'modes' of operation. Each mode must setup and
  * execute its own operation - taking care that this is all done in an ISR.
- * 
+ *
  */
 
 
 
-/* led_control_service runs in interrupt context - be brief! 
- * This service is called once per interrupt timer tick - 100 times a second. 
+/* led_control_service runs in interrupt context - be brief!
+ * This service is called once per interrupt timer tick - 100 times a second.
  *
  * There should be at most only one i2c operation per call - if more are need
  *  the calls should be spread across calls.
@@ -268,25 +270,29 @@ void __buttonlight_mode(enum buttonlight_mode mode,
  */
 static void led_control_service(void)
 {
+	if(initial_tick_delay) {
+		initial_tick_delay--;
+		return;
+	}
     switch (backlight_control)
     {
-        case BACKLIGHT_CONTROL_IDLE: 
+        case BACKLIGHT_CONTROL_IDLE:
         switch (buttonlight_state)
         {
             case BUTTONLIGHT_MODE_STOP: break;
-            
+
             /* Buttonlight mode: OFF */
-            case BUTTONLIGHT_MODE_OFF_ENTRY: 
+            case BUTTONLIGHT_MODE_OFF_ENTRY:
             if (buttonlight_current)
             {
                 buttonlight_leds = 0x00;
                 sc606_write(SC606_REG_CONF, backlight_leds);
                 buttonlight_current = 0;
-            }                
+            }
             buttonlight_state = BUTTONLIGHT_MODE_OFF;
             break;
 
-            case BUTTONLIGHT_MODE_OFF: 
+            case BUTTONLIGHT_MODE_OFF:
             break;
 
 
@@ -301,8 +307,8 @@ static void led_control_service(void)
             buttonlight_setting = DEFAULT_BRIGHTNESS_SETTING;
             buttonlight_saved_state = BUTTONLIGHT_MODE_CHARGING_WAIT;
             buttonlight_state = BUTTONLIGHT_HELPER_SET;
-            break;            
-                
+            break;
+
 
             case BUTTONLIGHT_MODE_CHARGING:
             if (--buttonlight_charging_counter == 0)
@@ -318,7 +324,7 @@ static void led_control_service(void)
                     sc606_write(SC606_REG_CONF, backlight_leds | buttonlight_leds);
                     buttonlight_charging_counter = CHARGING_LED_COUNT;
                 }
-                else 
+                else
                 {
                     buttonlight_state = BUTTONLIGHT_MODE_CHARGING_ENTRY;
                 }
@@ -334,11 +340,11 @@ static void led_control_service(void)
                 buttonlight_state = BUTTONLIGHT_MODE_CHARGING;
             }
             break;
-            
-                
-            /* Buttonlight mode: FOLLOW - try to stay current with backlight 
+
+
+            /* Buttonlight mode: FOLLOW - try to stay current with backlight
              * since this runs in the idle of the backlight it will not really
-             * follow in real time 
+             * follow in real time
              */
             case BUTTONLIGHT_MODE_FOLLOW_ENTRY:
             /* case 1 - backlight on, but buttonlight is off */
@@ -347,23 +353,23 @@ static void led_control_service(void)
                 /* Turn the buttonlights on */
                 buttonlight_leds = buttonlight_selected;
                 sc606_write(SC606_REG_CONF, backlight_leds | buttonlight_leds);
-                
+
                 /* temporary save for the next mode - then to do settings */
                 buttonlight_setting = backlight_current;
                 buttonlight_saved_state = BUTTONLIGHT_MODE_FOLLOW;
                 buttonlight_state = BUTTONLIGHT_HELPER_SET;
             }
             /* case 2 - backlight off, but buttonlight is on */
-            else 
+            else
             {
                 buttonlight_current = 0;
                 buttonlight_leds = 0x00;
                 sc606_write(SC606_REG_CONF, backlight_leds);
                 buttonlight_state = BUTTONLIGHT_MODE_FOLLOW;
             }
-            break;            
+            break;
 
-            case BUTTONLIGHT_MODE_FOLLOW: 
+            case BUTTONLIGHT_MODE_FOLLOW:
             if (buttonlight_current != backlight_current)
             {
                 /* case 1 - backlight on, but buttonlight is off */
@@ -375,27 +381,27 @@ static void led_control_service(void)
                         buttonlight_leds = buttonlight_selected;
                         sc606_write(SC606_REG_CONF, backlight_leds | buttonlight_leds);
                     }
-                    
+
                     /* temporary save for the next mode - then to do settings */
                     buttonlight_setting = backlight_current;
                     buttonlight_saved_state = BUTTONLIGHT_MODE_FOLLOW;
                     buttonlight_state = BUTTONLIGHT_HELPER_SET;
                 }
-                
+
                 /* case 2 - backlight off, but buttonlight is on */
-                else 
+                else
                 {
                     buttonlight_current = 0;
                     buttonlight_leds = 0x00;
                     sc606_write(SC606_REG_CONF, backlight_leds);
                 }
-                
+
             }
-            break;            
+            break;
 
 
 
-            /* Buttonlight mode: ON - stays at the set brightness */            
+            /* Buttonlight mode: ON - stays at the set brightness */
             case BUTTONLIGHT_MODE_ON_ENTRY:
             buttonlight_leds = buttonlight_selected;
             sc606_write(SC606_REG_CONF, backlight_leds | buttonlight_leds);
@@ -406,22 +412,22 @@ static void led_control_service(void)
             buttonlight_state = BUTTONLIGHT_HELPER_SET;
             break;
 
-            case BUTTONLIGHT_MODE_ON: 
+            case BUTTONLIGHT_MODE_ON:
             break;
 
 
 
-            /* Buttonlight mode: FLICKER */            
+            /* Buttonlight mode: FLICKER */
             case BUTTONLIGHT_MODE_FLICKER_ENTRY:
             /* already on? turn it off */
-            if (buttonlight_current) 
+            if (buttonlight_current)
             {
                 buttonlight_leds = 0x00;
                 sc606_write(SC606_REG_CONF, backlight_leds);
                 buttonlight_current = 0;
-            }                
+            }
 
-            /* set the brightness if not already set */            
+            /* set the brightness if not already set */
             if (buttonlight_current != buttonlight_trigger_brightness)
             {
                 /* temporary save for the next mode - then to do settings */
@@ -448,7 +454,7 @@ static void led_control_service(void)
                 buttonlight_state = BUTTONLIGHT_MODE_FLICKERING;
             }
             break;
-            
+
 
             case BUTTONLIGHT_MODE_FLICKERING:
             /* flicker the LEDs for as long as we get triggered */
@@ -477,7 +483,7 @@ static void led_control_service(void)
                     /* reset flickering */
                     buttonlight_trigger_now = 0;
                     buttonlight_flickering = FLICKER_PERIOD;
-                    
+
                     /* turn buttonlights on */
                     buttonlight_leds = buttonlight_selected;
                     buttonlight_current = buttonlight_setting;
@@ -487,17 +493,17 @@ static void led_control_service(void)
             break;
 
 
-            /* Buttonlight mode: SIGNAL / SOLID */            
+            /* Buttonlight mode: SIGNAL / SOLID */
             case BUTTONLIGHT_MODE_SOLID_ENTRY:
             /* already on? turn it off */
-            if (buttonlight_current) 
+            if (buttonlight_current)
             {
                 buttonlight_leds = 0x00;
                 sc606_write(SC606_REG_CONF, backlight_leds);
                 buttonlight_current = 0;
-            }                
-                
-            /* set the brightness if not already set */            
+            }
+
+            /* set the brightness if not already set */
             /* temporary save for the next mode - then to do settings */
             buttonlight_setting = buttonlight_trigger_brightness;
             buttonlight_saved_state = BUTTONLIGHT_MODE_SOLID;
@@ -527,10 +533,10 @@ static void led_control_service(void)
                     buttonlight_leds = 0x00;
                     sc606_write(SC606_REG_CONF, backlight_leds);
                     buttonlight_current = 0;
-                }                
+                }
             }
             break;
-            
+
 
             /* set the brightness for the buttonlights - takes 2 passes */
             case BUTTONLIGHT_HELPER_SET:
@@ -546,7 +552,7 @@ static void led_control_service(void)
 
             default:
             break;
-            
+
         }
         break;
 
@@ -568,7 +574,7 @@ static void led_control_service(void)
         lcd_enable(false);
         break;
 
-           
+
         case BACKLIGHT_CONTROL_ON:
         backlight_leds = 0x03;
         sc606_write(SC606_REG_CONF, 0x03 | buttonlight_leds);
@@ -582,7 +588,7 @@ static void led_control_service(void)
         sc606_write(SC606_REG_A, backlight_brightness-1);
 
         /* if we were turned off - turn the backlight on */
-        if (backlight_current) 
+        if (backlight_current)
         {
             backlight_current = backlight_brightness;
             backlight_control = BACKLIGHT_CONTROL_IDLE;
@@ -592,11 +598,11 @@ static void led_control_service(void)
             backlight_control = BACKLIGHT_CONTROL_ON;
         }
         break;
-        
+
 
         case BACKLIGHT_CONTROL_FADE_ON:
         if (--time_til_fade) return;
-            
+
         /* The SC606 LED driver can set the brightness in 64 steps */
         sc606_write(SC606_REG_A, backlight_current++);
 
@@ -610,11 +616,11 @@ static void led_control_service(void)
             time_til_fade = fade_interval;
         }
         break;
-        
+
 
         case BACKLIGHT_CONTROL_FADE_OFF:
         if (--time_til_fade) return;
-            
+
         /* The SC606 LED driver can set the brightness in 64 steps */
         sc606_write(SC606_REG_A, --backlight_current);
 
@@ -629,7 +635,7 @@ static void led_control_service(void)
             {
                 backlight_control = BACKLIGHT_CONTROL_OFF;
             }
-                
+
         }
         else
         {
@@ -638,6 +644,10 @@ static void led_control_service(void)
         break;
     }
 
+    if(backlight_current)
+        lcd_enable(true);
+    else
+        lcd_enable(false);
 }
 
 
@@ -647,18 +657,18 @@ static void led_control_service(void)
 void __backlight_dim(bool dim_now)
 {
     unsigned short target;
-    
+
     /* dont let the interrupt tick happen */
     backlight_control = BACKLIGHT_CONTROL_IDLE;
 
     target = (dim_now == true) ? 0 : backlight_brightness;
-    
+
     /* only try and fade if the target is different */
     if (backlight_current != target)
     {
         backlight_target = target;
-        
-        if (backlight_current > backlight_target) 
+
+        if (backlight_current > backlight_target)
         {
             time_til_fade = fade_interval = 4;
             backlight_control = BACKLIGHT_CONTROL_FADE_OFF;
@@ -676,7 +686,7 @@ void __backlight_dim(bool dim_now)
             }
         }
     }
-            
+
 }
 
 

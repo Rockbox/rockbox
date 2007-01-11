@@ -16,29 +16,45 @@ unsigned long fg_pattern_blit[4];
 unsigned long bg_pattern_blit[4];
 
 volatile bool use_dma_blit = false;
-volatile bool lcd_on = true;
-volatile bool lcd_poweroff = true;
+static volatile bool lcd_on = true;
+volatile bool lcd_poweroff = false;
 /*
 ** These are imported from lcd-16bit.c
 */
 extern unsigned fg_pattern;
 extern unsigned bg_pattern;
 
-extern volatile bool lcd_on;
+static struct mutex lcd_update_mtx;
+static struct mutex lcd_clear_mtx;
+static struct mutex lcd_enable_mtx;
+
+
+bool lcd_enabled()
+{
+    return lcd_on;
+}
 
 /* LCD init */
 void lcd_init_device(void)
 {
+    mutex_init(&lcd_update_mtx);
+    mutex_init(&lcd_clear_mtx);
+    mutex_init(&lcd_enable_mtx);
+
     memset16(fg_pattern_blit, fg_pattern, sizeof(fg_pattern_blit)/2);
     memset16(bg_pattern_blit, bg_pattern, sizeof(bg_pattern_blit)/2);
     clean_dcache_range((void *)fg_pattern_blit, sizeof(fg_pattern_blit));
     clean_dcache_range((void *)bg_pattern_blit, sizeof(bg_pattern_blit));
 
-    /* Switch from 555I mode to 565 mode */
-    LCDCON5 |= 1 << 11;
+    LCDSADDR1 = 0x18F00000; /* These values are pulled from an F40  */
+    LCDSADDR2 = 0x00112C00; /* They should move FRAME to the correct location */
+    LCDSADDR3 = 0x000000F0; /* TODO: Move FRAME to where we want it */
+
+    LCDCON5 |= 1 << 11;     /* Switch from 555I mode to 565 mode */
 
 #if !defined(BOOTLOADER)
     use_dma_blit = true;
+    lcd_poweroff = true;
 #endif
 }
 
@@ -52,15 +68,16 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     if(!lcd_on)
     {
-        for(x=0; x < 2; x++)
-            yield();
+        sleep(200);
         return;
     }
     if (use_dma_blit)
     {
+//        mutex_lock(&lcd_update_mtx);
+
         /* Wait for this controller to stop pending transfer */
         while((DSTAT1 & 0x000fffff))
-            yield();
+            CLKCON |= (1 << 2); /* set IDLE bit */
 
         /* Flush DCache */
         invalidate_dcache_range((void *)(((int) &lcd_framebuffer)+(y * sizeof(fb_data) * LCD_WIDTH)), (height * sizeof(fb_data) * LCD_WIDTH));
@@ -86,7 +103,8 @@ void lcd_update_rect(int x, int y, int width, int height)
 
         /* Wait for transfer to complete */
         while((DSTAT1 & 0x000fffff))
-            yield();
+            CLKCON |= (1 << 2); /* set IDLE bit */
+//        mutex_unlock(&lcd_update_mtx);
     }
     else
         memcpy(((char*)FRAME) + (y * sizeof(fb_data) * LCD_WIDTH), ((char *)&lcd_framebuffer) + (y * sizeof(fb_data) * LCD_WIDTH), ((height * sizeof(fb_data) * LCD_WIDTH)));
@@ -95,19 +113,23 @@ void lcd_update_rect(int x, int y, int width, int height)
 
 void lcd_enable(bool state)
 {
+    if(!lcd_poweroff)
+        return;
+    mutex_lock(&lcd_enable_mtx);
     if(state) {
-        if(lcd_poweroff && !lcd_on) {
-            memcpy(FRAME, lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT*2);
+        if(!lcd_on) {
             lcd_on = true;
+            memcpy(FRAME, lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT*2);
             LCDCON1 |= 1;
         }
     }
     else {
-        if(lcd_poweroff && lcd_on) {
+        if(lcd_on) {
             lcd_on = false;
             LCDCON1 &= ~1;
         }
     }
+    mutex_unlock(&lcd_enable_mtx);
 }
 
 void lcd_set_foreground(unsigned color)
@@ -115,19 +137,19 @@ void lcd_set_foreground(unsigned color)
     fg_pattern = color;
 
     memset16(fg_pattern_blit, fg_pattern, sizeof(fg_pattern_blit)/2);
-    clean_dcache_range((void *)fg_pattern_blit, sizeof(fg_pattern_blit));
+    invalidate_dcache_range((void *)fg_pattern_blit, sizeof(fg_pattern_blit));
 }
 
 void lcd_set_background(unsigned color)
 {
     bg_pattern = color;
     memset16(bg_pattern_blit, bg_pattern, sizeof(bg_pattern_blit)/2);
-    clean_dcache_range((void *)bg_pattern_blit, sizeof(bg_pattern_blit));
+    invalidate_dcache_range((void *)bg_pattern_blit, sizeof(bg_pattern_blit));
 }
 
 void lcd_device_prepare_backdrop(fb_data* backdrop)
 {
-    clean_dcache_range((void *)backdrop, (LCD_HEIGHT * sizeof(fb_data) * LCD_WIDTH));
+    invalidate_dcache_range((void *)backdrop, (LCD_HEIGHT * sizeof(fb_data) * LCD_WIDTH));
 }
 
 void lcd_clear_display_dma(void)
@@ -136,10 +158,8 @@ void lcd_clear_display_dma(void)
     bool inc = false;
 
     if(!lcd_on) {
-        yield();
-        yield();
+        sleep(200);
     }
-
     if (lcd_get_drawmode() & DRMODE_INVERSEVID)
         src = fg_pattern_blit;
     else
@@ -154,9 +174,10 @@ void lcd_clear_display_dma(void)
             inc = true;
         }
     }
+//    mutex_lock(&lcd_clear_mtx);
     /* Wait for any pending transfer to complete */
     while((DSTAT3 & 0x000fffff))
-        yield();
+        CLKCON |= (1 << 2); /* set IDLE bit */
     DMASKTRIG3 |= 0x4; /* Stop controller */
     DIDST3 = ((int) lcd_framebuffer) + 0x30000000; /* set DMA dest, physical address */
     DIDSTC3 = 0; /* Dest on AHB, increment */
@@ -165,10 +186,10 @@ void lcd_clear_display_dma(void)
     DISRCC3 = inc ? 0x00 : 0x01;  /* memory is on AHB bus, increment addresses based on backdrop */
 
     /* Handshake on AHB, Burst mode, whole service mode, no reload, move 32-bits */
-    DCON3 = ((1<<30) | (1<<28) | (1<<27) | (1<<22) | (2<<20)) | ((LCD_HEIGHT * sizeof(fb_data) * LCD_WIDTH) >> 4);
+    DCON3 = ((1<<30) | (1<<28) | (1<<27) | (1<<22) | (2<<20)) | (sizeof(lcd_framebuffer) >> 4);
 
     /* Dump DCache for dest, we are about to overwrite it with DMA */
-    dump_dcache_range((void *)lcd_framebuffer, (LCD_HEIGHT * sizeof(fb_data) * LCD_WIDTH));
+    invalidate_dcache_range((void *)lcd_framebuffer, sizeof(lcd_framebuffer));
     /* Activate the channel */
     DMASKTRIG3 = 2;
     /* Start DMA */
@@ -176,11 +197,14 @@ void lcd_clear_display_dma(void)
 
     /* Wait for transfer to complete */
     while((DSTAT3 & 0x000fffff))
-        yield();
+        CLKCON |= (1 << 2); /* set IDLE bit */
+//    mutex_unlock(&lcd_update_mtx);
 }
 
 void lcd_clear_display(void)
 {
+    lcd_stop_scroll();
+
     if(use_dma_blit)
     {
         lcd_clear_display_dma();
@@ -201,7 +225,6 @@ void lcd_clear_display(void)
         else
             memcpy(dst, lcd_backdrop, sizeof(lcd_framebuffer));
     }
-    lcd_stop_scroll();
 }
 
 
