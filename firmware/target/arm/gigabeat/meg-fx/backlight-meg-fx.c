@@ -123,8 +123,8 @@ void __backlight_init(void)
 
     buttonlight_selected = 0x04;
 
-	/* delay 5 seconds before any fading */
-	initial_tick_delay = 5000;
+	/* delay 2 seconds before any fading */
+	initial_tick_delay = 2000;
     /* put the led control on the tick list */
     tick_add_task(led_control_service);
 }
@@ -570,8 +570,6 @@ static void led_control_service(void)
         sc606_write(SC606_REG_CONF, buttonlight_leds);
         backlight_control = BACKLIGHT_CONTROL_IDLE;
 
-        /* turn the lcd completely off after the fade or off command */
-        lcd_enable(false);
         break;
 
 

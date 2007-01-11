@@ -24,11 +24,6 @@ volatile bool lcd_poweroff = false;
 extern unsigned fg_pattern;
 extern unsigned bg_pattern;
 
-static struct mutex lcd_update_mtx;
-static struct mutex lcd_clear_mtx;
-static struct mutex lcd_enable_mtx;
-
-
 bool lcd_enabled()
 {
     return lcd_on;
@@ -37,10 +32,6 @@ bool lcd_enabled()
 /* LCD init */
 void lcd_init_device(void)
 {
-    mutex_init(&lcd_update_mtx);
-    mutex_init(&lcd_clear_mtx);
-    mutex_init(&lcd_enable_mtx);
-
     memset16(fg_pattern_blit, fg_pattern, sizeof(fg_pattern_blit)/2);
     memset16(bg_pattern_blit, bg_pattern, sizeof(bg_pattern_blit)/2);
     clean_dcache_range((void *)fg_pattern_blit, sizeof(fg_pattern_blit));
@@ -73,8 +64,6 @@ void lcd_update_rect(int x, int y, int width, int height)
     }
     if (use_dma_blit)
     {
-//        mutex_lock(&lcd_update_mtx);
-
         /* Wait for this controller to stop pending transfer */
         while((DSTAT1 & 0x000fffff))
             CLKCON |= (1 << 2); /* set IDLE bit */
@@ -104,7 +93,6 @@ void lcd_update_rect(int x, int y, int width, int height)
         /* Wait for transfer to complete */
         while((DSTAT1 & 0x000fffff))
             CLKCON |= (1 << 2); /* set IDLE bit */
-//        mutex_unlock(&lcd_update_mtx);
     }
     else
         memcpy(((char*)FRAME) + (y * sizeof(fb_data) * LCD_WIDTH), ((char *)&lcd_framebuffer) + (y * sizeof(fb_data) * LCD_WIDTH), ((height * sizeof(fb_data) * LCD_WIDTH)));
@@ -115,7 +103,6 @@ void lcd_enable(bool state)
 {
     if(!lcd_poweroff)
         return;
-    mutex_lock(&lcd_enable_mtx);
     if(state) {
         if(!lcd_on) {
             lcd_on = true;
@@ -129,7 +116,6 @@ void lcd_enable(bool state)
             LCDCON1 &= ~1;
         }
     }
-    mutex_unlock(&lcd_enable_mtx);
 }
 
 void lcd_set_foreground(unsigned color)
@@ -174,7 +160,6 @@ void lcd_clear_display_dma(void)
             inc = true;
         }
     }
-//    mutex_lock(&lcd_clear_mtx);
     /* Wait for any pending transfer to complete */
     while((DSTAT3 & 0x000fffff))
         CLKCON |= (1 << 2); /* set IDLE bit */
@@ -198,7 +183,6 @@ void lcd_clear_display_dma(void)
     /* Wait for transfer to complete */
     while((DSTAT3 & 0x000fffff))
         CLKCON |= (1 << 2); /* set IDLE bit */
-//    mutex_unlock(&lcd_update_mtx);
 }
 
 void lcd_clear_display(void)
