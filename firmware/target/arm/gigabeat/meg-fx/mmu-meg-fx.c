@@ -87,14 +87,14 @@ static void enable_mmu(void) {
 /* Invalidate DCache for this range  */
 /* Will do write back */
 void invalidate_dcache_range(const void *base, unsigned int size) {
-    unsigned int addr = ((int) base) & ~31;
-    unsigned int end = addr+size+32;
+    unsigned int addr = (((int) base) & ~31);    /* Align start to cache line*/
+    unsigned int end = ((addr+size) & ~31)+64;  /* Align end to cache line, pad */
     asm volatile(
 "inv_start: \n"
     "mcr p15, 0, %0, c7, c14, 1 \n" /* Clean and invalidate this line */
     "add %0, %0, #32 \n"
     "cmp %0, %1 \n"
-    "ble inv_start \n"
+    "bne inv_start \n"
     "mov %0, #0\n"
     "mcr p15,0,%0,c7,c10,4\n"    /* Drain write buffer */
         : : "r" (addr), "r" (end));
@@ -105,7 +105,7 @@ void invalidate_dcache_range(const void *base, unsigned int size) {
 void clean_dcache_range(const void *base, unsigned int size) {
     unsigned int addr = (int) base;
     unsigned int end = addr+size+32;
-    asm volatile(
+    asm      volatile(
     "bic %0, %0, #31 \n"
 "clean_start: \n"
     "mcr p15, 0, %0, c7, c10, 1 \n" /* Clean this line */
@@ -123,18 +123,16 @@ void dump_dcache_range(const void *base, unsigned int size) {
     unsigned int addr = (int) base;
     unsigned int end = addr+size;
     asm volatile(
-    "tst %0, #31 \n"
-    "bic %0, %0, #31 \n"
-    "mcr p15, 0, %0, c7, c14, 1 \n" /* Clean and invalidate this line */
-    "add %0, %0, #32 \n"
-    "tst %1, #31 \n"
-    "bic %1, %1, #31 \n"
-    "mcrne p15, 0, %1, c7, c14, 1 \n" /* Clean and invalidate this line, if not cache aligned */
-    "cmp %0, %1 \n"
-    "beq dump_end \n"
+    "tst %0, #31 \n"                    /* Check to see if low five bits are set */
+    "bic %0, %0, #31 \n"                /* Clear them */
+    "mcrne p15, 0, %0, c7, c14, 1 \n"     /* Clean and invalidate this line, if those bits were set */
+    "add %0, %0, #32 \n"                /* Move to the next cache line */
+    "tst %1, #31 \n"                    /* Check last line for bits set */
+    "bic %1, %1, #31 \n"                /* Clear those bits */
+    "mcrne p15, 0, %1, c7, c14, 1 \n"     /* Clean and invalidate this line, if not cache aligned */
 "dump_start: \n"
-    "mcr p15, 0, %0, c7, c6, 1 \n" /* Invalidate this line */
-    "add %0, %0, #32 \n"
+    "mcr p15, 0, %0, c7, c6, 1 \n"         /* Invalidate this line */
+    "add %0, %0, #32 \n"                /* Next cache line */
     "cmp %0, %1 \n"
     "bne dump_start \n"
 "dump_end: \n"
