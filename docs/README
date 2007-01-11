@@ -7,18 +7,13 @@
 
 Build Your Own Rockbox
 
-1. Check out 'rockbox' from CVS (or extract a downloaded archive). You
-   want to check out 'rockbox-devel' instead if you want the simulator
-   code too (for trying out things on host before making target tests).
+1. Check out 'rockbox' from SVN (or extract a downloaded archive).
 
-   (For more information about the simulator, read UISIMULATOR.)
-
-   $ cvs -d:pserver:anonymous@www.rockbox.org:/cvsroot/rockbox login 
-   $ cvs -z3 -d:pserver:anonymous@www.rockbox.org:/cvsroot/rockbox co rockbox
+   $ svn co svn://svn.rockbox.org/rockbox/trunk rockbox
 
      or
 
-   $ tar xzf rockbox.tar.gz
+   $ tar xjf rockbox.tar.bz2
 
 2. Create a build directory, preferably in the same directory as the firmware/
    and apps/ directories. This is where all generated files will be written.
@@ -37,8 +32,8 @@ Build Your Own Rockbox
 
 5. *ploink*. Now you have got a Makefile generated for you.
 
-6. Make sure you have sh-elf-gcc and siblings in the PATH. Make sure that you
-   have 'perl' in your PATH too.
+6. Make sure you have sh/arm/m68k-elf-gcc and siblings in the PATH. Make sure
+   that you have 'perl' in your PATH too.
 
    $ which sh-elf-gcc
    $ which perl
@@ -47,14 +42,10 @@ Build Your Own Rockbox
    directories have been compiled, linked and scrambled for you.
 
    $ make
+   $ make zip
 
-8. Copy the archos.mod or ajbrec.ajz file to your archos, reboot it and
-   *smile*.  Recent Rockbox versions need no reboots, just PLAY a new rockbox
-   version and that'll be loaded and replace the currently running version.
-
-   $ mount /dev/sda1 /mnt/archos
-   $ cp ajbrec.ajz /mnt/archos
-   $ umount /mnt/archos
+8. unzip the rockbox.zip on your music player, reboot it and
+   *smile*.
 
 Whenever the tools/configure script gets updated, you can make your makefile
 updated too by running 'tools/configure update'.
