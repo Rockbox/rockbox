@@ -531,8 +531,8 @@ static int dircache_do_rebuild(void)
     
     /* Measure how long it takes build the cache. */
     start_tick = current_tick;
-    dircache_initializing = true;
     remove(DIRCACHE_FILE);
+    dircache_initializing = true;
     
 #ifdef SIMULATOR
     pdir = opendir("/");
