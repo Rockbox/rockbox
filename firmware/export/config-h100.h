@@ -99,7 +99,8 @@
 #define CONFIG_I2C I2C_COLDFIRE
 
 /* Define this if you can run rockbox from flash memory */
-#define HAVE_FLASHED_ROCKBOX
+/* In theory we can, but somebody needs to verify there are no issues. */
+// #define HAVE_FLASHED_ROCKBOX
 
 /* Define if we have a hardware defect that causes ticking on the audio line */
 #define HAVE_REMOTE_LCD_TICKING
@@ -145,12 +146,14 @@
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 
 #define BOOTLOADER_ENTRYPOINT  0x001F0000
-#define FLASH_ENTRYPOINT       0x00001000
-#define FLASH_MAGIC            0xfbfbfbf1
+#define FLASH_RAMIMAGE_ENTRY   0x00001000
+#define FLASH_ROMIMAGE_ENTRY   0x00100000
+#define FLASH_MAGIC            0xfbfbfbf2
 
 /* Define this if there is an EEPROM chip */
-/* Someone with H100 and BDM, please verify if this works. */
-/* #define HAVE_EEPROM */
+/* Someone with H100 and BDM, please verify if this works and remove these
+   ugly comments then. */
+// #define HAVE_EEPROM
 
 #endif /* !SIMULATOR */
 

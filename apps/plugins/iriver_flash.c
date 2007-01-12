@@ -344,7 +344,7 @@ int load_firmware_file(const char *filename, uint32_t *checksum)
 
 unsigned long valid_bootloaders[][2] = { 
     /* Size-8   CRC32 */
-    { 63844, 0x98c5027a }, /* 7-pre3, improved failsafe functions */
+    { 63788, 0x08ff01a9 }, /* 7-pre3, improved failsafe functions */
     { 0,     0 }
 };
 
