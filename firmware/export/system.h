@@ -52,7 +52,9 @@ struct flash_header {
     char version[32];
 };
 
-bool detect_flashed_rockbox(void);
+bool detect_flashed_romimage(void);
+bool detect_flashed_ramimage(void);
+bool detect_original_firmware(void);
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 #define FREQ cpu_frequency

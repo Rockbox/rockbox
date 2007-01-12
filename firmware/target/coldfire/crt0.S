@@ -89,28 +89,40 @@ start:
 #endif
 
 #ifdef BOOTLOADER
-    /* Check if original firmware is still present */
+    /* Check if we have a Rockbox ROM image */
+    lea     0x00100000,%a2
+    move.l  (%a2),%d0
+    move.l  #FLASH_MAGIC,%d1
+    cmp.l   %d0,%d1
+    beq.b   .imagefound
+    
+    /* Check for RAM image */
     lea     0x00001000,%a2
     move.l  (%a2),%d0
-    move.l  #0xfbfbfbf1,%d1
+    move.l  #FLASH_MAGIC,%d1
     cmp.l   %d0,%d1
-    beq.b   .ignorecookie
+    beq.b   .imagefound
     
-    /* The cookie is not reset. This must mean that the boot loader
-       has crashed. Let's start the original firmware immediately. */
+    /* Not either ROM or RAM image was found, so original firmware
+       should be still present. */
+
+    /* Check if the cookie is present. */
     lea     0x10017ffc,%a2
     move.l  (%a2),%d0
     move.l  #0xc0015a17,%d1
     cmp.l   %d0,%d1
     bne.b   .nocookie
-    /* Clear the cookie again */
+    
+    /* The cookie is not reset. This must mean that the boot loader
+       has crashed. Let's start the original firmware immediately. */
+    lea     0x10017ffc,%a2
     clr.l   (%a2)
     jmp     8
         
 .nocookie:
     /* Set the cookie */
     move.l  %d1,(%a2)
-.ignorecookie:
+.imagefound:
 
     /* Set up the DRAM controller. The refresh is based on the 11.2896MHz
        clock (5.6448MHz bus frequency). We haven't yet started the PLL */
@@ -168,6 +180,38 @@ start:
     move.l  %d0,0x31000800  /* A12=1 means CASL=1 (a0 is not connected) */
 
     /* DACR0[IMRS] gets deactivated by the SDRAM controller */
+    
+    /* Check if we have a Rockbox ROM image. For RAM image only cookie is
+       not set at all. But we could support also RAM images loading. */
+    lea     0x00100000,%a2
+    move.l  (%a2),%d0
+    move.l  #FLASH_MAGIC,%d1
+    cmp.l   %d0,%d1
+    bne.b   .noromimage
+    
+    /* Check again if the cookie is present. */
+    lea     0x10017ffc,%a2
+    move.l  (%a2),%d0
+    move.l  #0xc0015a17,%d1
+    cmp.l   %d0,%d1
+    bne.b   .nocookie2
+    
+    /* We have found Rockbox in ROM!
+       Clear the cookie and load the ROM image */
+    lea     0x10017ffc,%a2
+    clr.l   (%a2)
+    lea     0x00100028+4,%a2
+    move.l  (%a2),%sp
+    lea     0x00100028+8,%a2
+    move.l  (%a2),%d0
+    move.l  %d0,%a2
+    jmp     (%a2)
+    
+.nocookie2:
+    /* Set the cookie */
+    move.l  %d1,(%a2)
+.noromimage:
+
 #endif /* BOOTLOADER */
 
     /* Invalicate cache */

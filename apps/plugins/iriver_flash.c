@@ -59,6 +59,10 @@ static struct plugin_api* rb; /* here is a global api struct pointer */
 #ifdef IRIVER_H100_SERIES
 #define SEC_SIZE 4096
 #define BOOTLOADER_ERASEGUARD  (BOOTLOADER_ENTRYPOINT / SEC_SIZE)
+enum sections {
+    SECT_RAMIMAGE = 1,
+    SECT_ROMIMAGE = 2,
+};
 
 static volatile uint16_t* FB = (uint16_t*)0x00000000; /* Flash base address */
 #endif
@@ -338,23 +342,9 @@ int load_firmware_file(const char *filename, uint32_t *checksum)
     return len;
 }
 
-bool detect_flashed_rockbox(void)
-{
-    struct flash_header hdr;
-    uint8_t *src = (uint8_t *)FLASH_ENTRYPOINT;
-    
-    rb->memcpy(&hdr, src, sizeof(struct flash_header));
-    
-    if (hdr.magic != FLASH_MAGIC)
-        return false;
-    
-    return true;
-}
-
 unsigned long valid_bootloaders[][2] = { 
     /* Size-8   CRC32 */
-    { 62332, 0x77395351 }, /* Pre-release v7 */
-    { 63340, 0xc41857b6 }, /* Pre-release v7, fixed crash unless firmware found. */
+    { 63844, 0x98c5027a }, /* 7-pre3, improved failsafe functions */
     { 0,     0 }
 };
 
@@ -378,14 +368,27 @@ bool detect_valid_bootloader(const unsigned char *addr, int len)
     return false;
 }
 
-int flash_rockbox(const char *filename)
+static int get_section_address(int section)
+{
+    if (section == SECT_RAMIMAGE)
+        return FLASH_RAMIMAGE_ENTRY;
+    else if (section == SECT_ROMIMAGE)
+        return FLASH_ROMIMAGE_ENTRY;
+    else
+        return -1;
+}
+
+int flash_rockbox(const char *filename, int section)
 {
     struct flash_header hdr;
-    char buf[32];
+    char buf[64];
     int pos, i, len, rc;
     unsigned long checksum, sum;
     unsigned char *p8;
     uint16_t *p16;
+    
+    if (get_section_address(section) < 0)
+        return -1;
     
     p8 = (char *)BOOTLOADER_ENTRYPOINT;
     if (!detect_valid_bootloader(p8, 0))
@@ -394,7 +397,7 @@ int flash_rockbox(const char *filename)
         return -1;
     }
 
-    if (detect_flashed_rockbox())
+    if (!rb->detect_original_firmware())
     {
         if (!confirm("Update Rockbox flash image?"))
             return -2;
@@ -409,13 +412,36 @@ int flash_rockbox(const char *filename)
     if (len <= 0)
         return len * 10;
     
-    /* Erase the program flash. */
-    for (i = 1; i < BOOTLOADER_ERASEGUARD && (i-1)*4096 < len + 32; i++)
+    pos = get_section_address(section);
+    
+    /* Check if image relocation seems to be sane. */
+    if (section == SECT_ROMIMAGE)
     {
-        rc = cfi_erase_sector(FB + (SEC_SIZE/2) * i);
-        rb->snprintf(buf, sizeof(buf), "Erase: 0x%03x  (%d)", i, rc);
+        uint32_t *p32 = (uint32_t *)audiobuf;
+        
+        if (pos+sizeof(struct flash_header) != *p32)
+        {
+            rb->snprintf(buf, sizeof(buf), "Incorrect relocation: 0x%08x/0x%08x",
+                         *p32, pos+sizeof(struct flash_header));
+            rb->splash(HZ*10, true, buf);
+            return -1;
+        }
+        
+    }
+    
+    /* Erase the program flash. */
+    for (i = 0; i + pos < BOOTLOADER_ENTRYPOINT && i < len + 32; i += SEC_SIZE)
+    {
+        /* Additional safety check. */
+        if (i + pos < SEC_SIZE)
+            return -1;
+        
+        rb->snprintf(buf, sizeof(buf), "Erasing...  %d%%", 
+                     (i+SEC_SIZE)*100/len);
         rb->lcd_puts(0, 3, buf);
         rb->lcd_update();
+        
+        rc = cfi_erase_sector(FB + (i + pos)/2);
     }
     
     /* Write the magic and size. */
@@ -425,11 +451,11 @@ int flash_rockbox(const char *filename)
     // rb->strncpy(hdr.version, APPSVERSION, sizeof(hdr.version)-1);
     p16 = (uint16_t *)&hdr;
     
-    rb->snprintf(buf, sizeof(buf), "Programming");
+    rb->snprintf(buf, sizeof(buf), "Programming...");
     rb->lcd_puts(0, 4, buf);
     rb->lcd_update();
     
-    pos = FLASH_ENTRYPOINT/2;
+    pos = get_section_address(section)/2;
     for (i = 0; i < (long)sizeof(struct flash_header)/2; i++)
     {
         cfi_program_word(FB + pos, p16[i]);
@@ -438,14 +464,24 @@ int flash_rockbox(const char *filename)
     
     p16 = (uint16_t *)audiobuf;
     for (i = 0; i < len/2 && pos + i < (BOOTLOADER_ENTRYPOINT/2); i++)
+    {
+        if (i % SEC_SIZE == 0)
+        {
+            rb->snprintf(buf, sizeof(buf), "Programming...  %d%%",
+                         (i+1)*100/(len/2));
+            rb->lcd_puts(0, 4, buf);
+            rb->lcd_update();
+        }
+        
         cfi_program_word(FB + pos + i, p16[i]);
+    }
     
     /* Verify */
     rb->snprintf(buf, sizeof(buf), "Verifying");
     rb->lcd_puts(0, 5, buf);
     rb->lcd_update();
     
-    p8 = (char *)FLASH_ENTRYPOINT;
+    p8 = (char *)get_section_address(section);
     p8 += sizeof(struct flash_header);
     sum = 0;
     for (i = 0; i < len; i++)
@@ -456,7 +492,10 @@ int flash_rockbox(const char *filename)
         rb->splash(HZ*3, true, "Verify failed!");
         /* Erase the magic sector so bootloader does not try to load
          * rockbox from flash and crash. */
-        cfi_erase_sector(FB + SEC_SIZE/2);
+        if (section == SECT_RAMIMAGE)
+            cfi_erase_sector(FB + FLASH_RAMIMAGE_ENTRY/2);
+        else
+            cfi_erase_sector(FB + FLASH_ROMIMAGE_ENTRY/2);
         return -5;
     }
     
@@ -741,7 +780,9 @@ void DoUserDialog(char* filename)
     audiobuf = rb->plugin_get_audio_buffer(&audiobuf_size);
     
     if (rb->strcasestr(filename, "/rockbox.iriver"))
-        flash_rockbox(filename);
+        flash_rockbox(filename, SECT_RAMIMAGE);
+    else if (rb->strcasestr(filename, "/rombox.iriver"))
+        flash_rockbox(filename, SECT_ROMIMAGE);
     else if (rb->strcasestr(filename, "/bootloader.iriver"))
         flash_bootloader(filename);
     else if (rb->strcasestr(filename, "/ihp_120.bin"))

@@ -602,11 +602,18 @@ struct plugin_api {
     int (*sound_default)(int setting);
     void (*pcm_record_more)(void *start, size_t size);
 #endif
-
+    
     struct thread_entry*(*create_thread_on_core)(
                           unsigned int core, void (*function)(void), 
                           void* stack, int stack_size,
                           const char *name IF_PRIO(, int priority));
+    
+#ifdef IRIVER_H100_SERIES
+    /* Routines for the iriver_flash -plugin. */
+    bool (*detect_original_firmware)(void);
+    bool (*detect_flashed_ramimage)(void);
+    bool (*detect_flashed_romimage)(void);
+#endif
 };
 
 /* plugin header */

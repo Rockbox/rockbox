@@ -82,29 +82,42 @@ void cpu_idle_mode(bool on_off)
 #endif /* HAVE_ADJUSTABLE_CPU_FREQ */
 
 
-bool detect_flashed_rockbox(void)
-{
 #ifdef HAVE_FLASHED_ROCKBOX
-    struct flash_header hdr;
-    uint8_t *src = (uint8_t *)FLASH_ENTRYPOINT;
-
+static bool detect_flash_header(uint8_t *addr)
+{
 #ifndef BOOTLOADER
     int oldmode = system_memory_guard(MEMGUARD_NONE);
 #endif
-
-    memcpy(&hdr, src, sizeof(struct flash_header));
-
+    struct flash_header hdr;
+    memcpy(&hdr, addr, sizeof(struct flash_header));
 #ifndef BOOTLOADER
     system_memory_guard(oldmode);
 #endif
+    return hdr.magic == FLASH_MAGIC;
+}
+#endif
 
-    if (hdr.magic != FLASH_MAGIC)
-        return false;
-
-    return true;
+bool detect_flashed_romimage(void)
+{
+#ifdef HAVE_FLASHED_ROCKBOX
+    return detect_flash_header((uint8_t *)FLASH_ROMIMAGE_ENTRY);
 #else
     return false;
 #endif /* HAVE_FLASHED_ROCKBOX */
+}
+
+bool detect_flashed_ramimage(void)
+{
+#ifdef HAVE_FLASHED_ROCKBOX
+    return detect_flash_header((uint8_t *)FLASH_RAMIMAGE_ENTRY);
+#else
+    return false;
+#endif /* HAVE_FLASHED_ROCKBOX */
+}
+
+bool detect_original_firmware(void)
+{
+    return !(detect_flashed_ramimage() || detect_flashed_romimage());
 }
 
 #if CONFIG_CPU == SH7034

@@ -487,6 +487,13 @@ static const struct plugin_api rockbox_api = {
     pcm_record_more,
 #endif
     create_thread_on_core,
+
+#ifdef IRIVER_H100_SERIES
+    /* Routines for the iriver_flash -plugin. */
+    detect_original_firmware,
+    detect_flashed_ramimage,
+    detect_flashed_romimage,
+#endif
 };
 
 int plugin_load(const char* plugin, void* parameter)

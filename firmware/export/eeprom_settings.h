@@ -23,16 +23,25 @@
 #include <stdbool.h>
 #include "inttypes.h"
 
-#define EEPROM_SETTINGS_VERSION   0x24c01001
+#define EEPROM_SETTINGS_VERSION   0x24c01002
 #define EEPROM_SETTINGS_BL_MINVER 7
+
+enum boot_methods {
+    BOOT_DISK = 0,
+    BOOT_RAM,
+    BOOT_ROM,
+    BOOT_RECOVERY,
+};
 
 struct eeprom_settings
 {
     long version;       /* Settings version number */
     bool initialized;   /* Is eeprom_settings ready to be used */
     bool disk_clean;    /* Is disk intact from last reboot */
-    bool boot_disk;     /* Load firmware from disk (default=FLASH) */
+    uint8_t bootmethod; /* The default boot method. */
     uint8_t bl_version; /* Installed bootloader version */
+    
+    long reserved;      /* A few reserved bits for the future. */
     
     /* This must be the last entry */
     uint32_t checksum;  /* Checksum of this structure */

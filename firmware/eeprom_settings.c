@@ -36,7 +36,7 @@ static bool reset_config(void)
 #else
     firmware_settings.version = EEPROM_SETTINGS_VERSION;
     firmware_settings.initialized = true;
-    firmware_settings.boot_disk = false;
+    firmware_settings.bootmethod = BOOT_RECOVERY;
     firmware_settings.bl_version = 0;
 #endif
     
@@ -51,7 +51,7 @@ bool eeprom_settings_init(void)
     eeprom_24cxx_init();
     
     /* Check if player has been flashed. */
-    if (!detect_flashed_rockbox())
+    if (detect_original_firmware())
     {
         memset(&firmware_settings, 0, sizeof(struct eeprom_settings));
         firmware_settings.initialized = false;
@@ -61,7 +61,7 @@ bool eeprom_settings_init(void)
     
     ret = eeprom_24cxx_read(0, &firmware_settings, 
                             sizeof(struct eeprom_settings));
-    
+
     if (ret < 0)
     {
         memset(&firmware_settings, 0, sizeof(struct eeprom_settings));
@@ -101,7 +101,7 @@ bool eeprom_settings_store(void)
     int ret;
     uint32_t sum;
     
-    if (!firmware_settings.initialized || !detect_flashed_rockbox())
+    if (!firmware_settings.initialized || detect_original_firmware())
     {
         logf("Rockbox in flash is required");
         return false;
