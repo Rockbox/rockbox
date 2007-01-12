@@ -306,6 +306,8 @@ static void init(void)
     cpu_boost(true);
 #endif
     
+    backlight_init();
+
     buffer_init();
 
     settings_reset();
@@ -346,8 +348,6 @@ static void init(void)
 #elif CONFIG_USBOTG == USBOTG_M5636
     m5636_init();
 #endif
-
-    backlight_init();
 
     button_init();
 

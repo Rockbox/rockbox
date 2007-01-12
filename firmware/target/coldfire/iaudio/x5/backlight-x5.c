@@ -24,10 +24,12 @@
 #include "pcf50606.h"
 #include "lcd.h"
 
-void __backlight_init(void)
+bool __backlight_init(void)
 {
     __backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
     __backlight_on();
+    
+    return true; /* Backlight always ON after boot. */
 }
 
 void __backlight_on(void)

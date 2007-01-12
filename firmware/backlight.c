@@ -152,8 +152,8 @@ static int fade_in_count = 1;
 static int fade_out_count = 4;
 
 static bool bl_timer_active = false;
-static int bl_dim_current = BL_PWM_COUNT;
-static int bl_dim_target  = BL_PWM_COUNT;
+static int bl_dim_current = 0;
+static int bl_dim_target  = 0;
 static int bl_pwm_counter = 0;
 static volatile int bl_cycle_counter = 0;
 static enum {DIM_STATE_START, DIM_STATE_MAIN} bl_dim_state = DIM_STATE_START;
@@ -556,17 +556,21 @@ static void backlight_tick(void)
 void backlight_init(void)
 {
     queue_init(&backlight_queue, true);
-    create_thread(backlight_thread, backlight_stack,
-                  sizeof(backlight_stack), backlight_thread_name 
-                  IF_PRIO(, PRIORITY_SYSTEM));
-    tick_add_task(backlight_tick);
+
 #ifdef SIMULATOR
     /* do nothing */
 #elif defined(__BACKLIGHT_INIT)
     /* Remove the __BACKLIGHT_INIT references when __backlight_init is
        available on all backlighted targets. Take them out of the
        backlight-target.h files as well */
-    __backlight_init();
+    if (__backlight_init())
+    {
+# if defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)
+        /* If backlight is already on, don't fade in. */
+        bl_dim_current = BL_PWM_COUNT;
+        bl_dim_target = BL_PWM_COUNT;
+# endif
+    }
 #elif CONFIG_BACKLIGHT == BL_PA14_LO || CONFIG_BACKLIGHT == BL_PA14_HI
     PACR1 &= ~0x3000;    /* Set PA14 (backlight control) to GPIO */
     or_b(0x40, &PAIORH); /* ..and output */
@@ -575,6 +579,11 @@ void backlight_init(void)
 #ifdef HAVE_REMOTE_LCD
     remote_backlight_on();
 #endif
+    
+    create_thread(backlight_thread, backlight_stack,
+                  sizeof(backlight_stack), backlight_thread_name 
+                  IF_PRIO(, PRIORITY_SYSTEM));
+    tick_add_task(backlight_tick);
 }
 
 #ifdef X5_BACKLIGHT_SHUTDOWN
@@ -803,6 +812,7 @@ void backlight_init(void)
 {
 #ifdef __BACKLIGHT_INIT
     __backlight_init();
+    __backlight_on();
 #endif
 }
 #endif

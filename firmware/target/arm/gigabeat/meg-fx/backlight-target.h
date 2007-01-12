@@ -76,7 +76,7 @@ void __buttonlight_mode(enum buttonlight_mode mode,
                         unsigned short brightness);
 
 
-void __backlight_init(void);
+bool __backlight_init(void);
 void __backlight_on(void);
 void __backlight_off(void);
 void __backlight_set_brightness(int val);

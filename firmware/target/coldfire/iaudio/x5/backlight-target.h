@@ -20,7 +20,7 @@
 #define BACKLIGHT_TARGET_H
 
 #define __BACKLIGHT_INIT
-void __backlight_init(void);
+bool __backlight_init(void);
 void __backlight_on(void);
 void __backlight_off(void);
 void __backlight_set_brightness(int val);

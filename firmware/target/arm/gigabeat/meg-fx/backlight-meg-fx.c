@@ -113,7 +113,7 @@ unsigned char charging_leds[] = { 0x00, 0x20, 0x38, 0x3C };
 
 
 
-void __backlight_init(void)
+bool __backlight_init(void)
 {
     backlight_control = BACKLIGHT_CONTROL_IDLE;
 
@@ -127,6 +127,8 @@ void __backlight_init(void)
 	initial_tick_delay = 2000;
     /* put the led control on the tick list */
     tick_add_task(led_control_service);
+    
+    return true;
 }
 
 

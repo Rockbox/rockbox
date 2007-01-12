@@ -25,11 +25,13 @@
 #include "pcf50606.h"
 #include "lcd.h"
 
-void __backlight_init(void)
+bool __backlight_init(void)
 {
     or_l(0x00020000, &GPIO1_ENABLE);
     or_l(0x00020000, &GPIO1_FUNCTION);
     or_l(0x00020000, &GPIO1_OUT);  /* Start with the backlight ON */
+    
+    return true; /* Backlight always ON after boot. */
 }
 
 void __backlight_on(void)
