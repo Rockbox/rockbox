@@ -59,6 +59,7 @@ void system_init(void)
 
     /* Turn off AC97 and Camera */
     CLKCON &= ~( (1<<19) | (1<<20) );
+
 }
 
 

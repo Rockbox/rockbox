@@ -70,8 +70,8 @@ void memdump(void)
 
             data = *(volatile int *)memlocations[i].address;
 
-            snprintf(tmp, sizeof(tmp), "%s %s 0x%08X", 
-                 (i==current) ? "*" : " ", 
+            snprintf(tmp, sizeof(tmp), "%s %s 0x%08X",
+                 (i==current) ? "*" : " ",
                  memlocations[i].desc,
                  data);
             lcd_puts(0, i*2+5, tmp);
@@ -323,6 +323,9 @@ void * main(void)
     lcd_puts(0, line++, "Hold MENU when booting for rescue mode.");
     lcd_puts(0, line++, "  \"VOL+\" button to restore original kernel");
     lcd_puts(0, line++, "  \"A\" button to load original firmware");
+    line++;
+    snprintf(buf, sizeof(buf), "FRAME %x TTB %x", FRAME, TTB_BASE);
+    lcd_puts(0, line++, buf);
     lcd_update();
     sleep(1*HZ);
 
@@ -334,7 +337,7 @@ void * main(void)
         while(1);
     }
 
-    sleep(5*HZ);
+    sleep(1*HZ);
 
     if(GPGDAT & 0x10) {
         load_original = true;
@@ -434,7 +437,7 @@ load_rockbox:
     map_memory();
     lcd_puts(0, line, "Loading Rockbox...");
     lcd_update();
-    sleep(HZ*4);
+    /* sleep(HZ*4); */
 
     // TODO: read those values from somwhere
     loadbuffer = (unsigned char*) 0x100;
@@ -447,7 +450,7 @@ load_rockbox:
     } else {
         lcd_puts(0, line++, "Rockbox loaded.");
         lcd_update();
-        kernel_entry = (void*)0x100;
+        kernel_entry = (void*) loadbuffer;
         rc = kernel_entry();
         snprintf(buf, sizeof(buf), "Woops, should not return from firmware: %d", rc);
         lcd_puts(0, line++, buf);

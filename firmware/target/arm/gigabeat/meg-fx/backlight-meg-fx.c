@@ -123,8 +123,8 @@ bool __backlight_init(void)
 
     buttonlight_selected = 0x04;
 
-	/* delay 2 seconds before any fading */
-	initial_tick_delay = 2000;
+    /* delay 4 seconds before any fading */
+    initial_tick_delay = 400;
     /* put the led control on the tick list */
     tick_add_task(led_control_service);
     
@@ -272,10 +272,10 @@ void __buttonlight_mode(enum buttonlight_mode mode,
  */
 static void led_control_service(void)
 {
-	if(initial_tick_delay) {
-		initial_tick_delay--;
-		return;
-	}
+    if(initial_tick_delay) {
+        initial_tick_delay--;
+        return;
+    }
     switch (backlight_control)
     {
         case BACKLIGHT_CONTROL_IDLE:

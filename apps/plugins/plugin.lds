@@ -37,6 +37,8 @@ OUTPUT_FORMAT(elf32-sh)
 #define IRAMORIG 0x407000
 #define IRAMSIZE 0x9000
 #elif CONFIG_CPU == S3C2440
+#include "s3c2440.h"
+#define DRAMSIZE (MEMORYSIZE * 0x100000) - 0x100 - STUBOFFSET - LCD_BUFFER_SIZE - TTB_SIZE - PLUGIN_BUFFER_SIZE - CODEC_SIZE
 #define DRAMORIG 0x100 + STUBOFFSET
 #define IRAMORIG DRAMORIG
 #define IRAMSIZE 4K
@@ -46,10 +48,12 @@ OUTPUT_FORMAT(elf32-sh)
 #endif
 
 #define PLUGIN_LENGTH PLUGIN_BUFFER_SIZE
+
+#if CONFIG_CPU != S3C2440
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGIN_LENGTH - CODEC_SIZE
+#endif
 #define CODEC_ORIGIN (DRAMORIG + (DRAMSIZE))
 #define PLUGIN_ORIGIN (CODEC_ORIGIN + CODEC_SIZE)
-
 
 #ifdef CODEC
 #define THIS_LENGTH CODEC_SIZE
@@ -84,7 +88,7 @@ SECTIONS
 #endif
     } > PLUGIN_RAM
 
-    .rodata : 
+    .rodata :
     {
         *(.rodata*)
         . = ALIGN(0x4);
@@ -98,7 +102,7 @@ SECTIONS
 #endif
     } > PLUGIN_RAM
 
-    /DISCARD/ : 
+    /DISCARD/ :
     {
         *(.eh_frame)
     }
@@ -124,7 +128,7 @@ SECTIONS
 
     .bss (NOLOAD) :
     {
-	plugin_bss_start = .;
+    plugin_bss_start = .;
         *(.bss*)
         *(COMMON)
         . = ALIGN(0x4);
@@ -134,7 +138,7 @@ SECTIONS
 
     /* Special trick to avoid a linker error when no other sections are
        left after garbage collection (plugin not for this platform) */
-    .comment 0 : 
+    .comment 0 :
     {
         KEEP(*(.comment))
     }

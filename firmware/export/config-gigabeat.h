@@ -86,7 +86,7 @@
 #define BATTERY_TYPES_COUNT  1          /* only one type */
 
 /* ADC[0] is (530) at discharge and 625 at full charge */
-#define BATTERY_SCALE_FACTOR 6450 
+#define BATTERY_SCALE_FACTOR 6450
 
 /* Hardware controlled charging with monitoring */
 #define CONFIG_CHARGING CHARGING_MONITOR
@@ -132,5 +132,5 @@
 #define BOOTFILE_EXT "gigabeat"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 
- 
+
 #endif

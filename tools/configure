@@ -167,7 +167,7 @@ simcc () {
    exit
    ;;
  esac
- 
+
  if [ "`uname -m`" = "x86_64" ]; then
    GCCOPTS="$GCCOPTS -fPIC"  # needed to make shared objects link
  fi
@@ -284,7 +284,7 @@ whichdevel () {
         echo "done"
         cont=0
         ;;
-    esac 
+    esac
   done
 
   if [ "yes" = "$use_debug" ]; then
@@ -402,7 +402,7 @@ voiceconfig () {
         NOISEFLOOR=$DEFAULT_NOISEFLOOR
     esac
     echo "Using $TTS_ENGINE for TTS"
-    
+
     echo ""
 
     if [ `which oggenc` ]; then
@@ -416,7 +416,7 @@ voiceconfig () {
         SPEEXENC="(S)peexenc "
         DEFAULT_ENC="speexenc"
         SPEEX_OPTS="" # TODO: find appropriate options for speex
-        DEFAULT_ENC_OPTS=$SPEEX_OPTS 
+        DEFAULT_ENC_OPTS=$SPEEX_OPTS
         DEFAULT_CHOICE="S"
     fi
     if [ `which lame` ]; then
@@ -464,32 +464,32 @@ ${ENC_OPTS}
 EOF
 }
 
-picklang() {     
-    # figure out which languages that are around    
-    for file in $rootdir/apps/lang/*.lang; do      
-        clean=`echo $file | sed -e 's:.*/::g' | cut "-d." -f1`    
-        langs="$langs $clean"    
-    done    
+picklang() {
+    # figure out which languages that are around
+    for file in $rootdir/apps/lang/*.lang; do
+        clean=`echo $file | sed -e 's:.*/::g' | cut "-d." -f1`
+        langs="$langs $clean"
+    done
 
-    num=1      
-    for one in $langs; do     
-        echo "$num. $one"    
-        num=`expr $num + 1`     
-    done   
+    num=1
+    for one in $langs; do
+        echo "$num. $one"
+        num=`expr $num + 1`
+    done
 
-    read pick     
-    return $pick;    
-}   
+    read pick
+    return $pick;
+}
 
-whichlang() {      
-    num=1     
-    for one in $langs; do    
-        if [ "$num" = "$pick" ]; then   
-            echo $one      
-            return    
-        fi   
-        num=`expr $num + 1`     
-    done   
+whichlang() {
+    num=1
+    for one in $langs; do
+        if [ "$num" = "$pick" ]; then
+            echo $one
+            return
+        fi
+        num=`expr $num + 1`
+    done
 }
 
 target=$1
@@ -553,17 +553,17 @@ toolsdir='\$(ROOTDIR)/tools'
 
   echo "Enter target platform:"
 cat <<EOF
- ==Archos==            ==iriver==             ==Apple iPod==   
-  0) Player/Studio     10) H120/H140          20) Color/Photo  
-  1) Recorder          11) H320/H340          21) Nano         
-  2) FM Recorder       12) iHP-100/110/115    22) Video        
-  3) Recorder v2       13) iFP-790            23) 3G           
-  4) Ondio SP          14) H10 20Gb           24) 4G Grayscale 
-  5) Ondio FM          15) H10 5/6Gb          25) Mini 1G      
-                                              26) Mini 2G      
+ ==Archos==            ==iriver==             ==Apple iPod==
+  0) Player/Studio     10) H120/H140          20) Color/Photo
+  1) Recorder          11) H320/H340          21) Nano
+  2) FM Recorder       12) iHP-100/110/115    22) Video
+  3) Recorder v2       13) iFP-790            23) 3G
+  4) Ondio SP          14) H10 20Gb           24) 4G Grayscale
+  5) Ondio FM          15) H10 5/6Gb          25) Mini 1G
+                                              26) Mini 2G
 
- ==iAudio==            ==Toshiba==            ==SanDisk==      
- 30) X5/X5V/X5L        40) Gigabeat F         50) Sansa e200   
+ ==iAudio==            ==Toshiba==            ==SanDisk==
+ 30) X5/X5V/X5L        40) Gigabeat F         50) Sansa e200
 
  ==Tatung==
  60) Elio TPJ-1022
@@ -598,7 +598,7 @@ EOF
   # output:    the final output file name
   # boottool:  the tool that takes a plain binary and generates a bootloader
   #            file for your target (or blank to use $tool)
-  # bootoutput:the final output file name for the bootloader (or blank to use 
+  # bootoutput:the final output file name for the bootloader (or blank to use
   #            $output)
   # appextra:  passed to the APPEXTRA variable in the Makefiles.
   #            TODO: add proper explanation
@@ -953,7 +953,7 @@ EOF
     t_manufacturer="ipod"
     t_model="3g"
     ;;
-    
+
    24|ipod4g)
     target_id=17
     archos="ipod4g"
@@ -978,7 +978,7 @@ EOF
     t_manufacturer="ipod"
     t_model="4g"
     ;;
-    
+
    25|ipodmini)
     target_id=18
     archos="ipodmini"
@@ -1003,7 +1003,7 @@ EOF
     t_manufacturer="ipod"
     t_model="mini"
     ;;
-    
+
    13|ifp7xx)
     target_id=19
     archos="ifp7xx"
@@ -1031,7 +1031,7 @@ EOF
     target_id=20
     archos="gigabeatf"
     target="-DGIGABEAT_F"
-    memory=30 # always
+    memory=32 # always
     arm9tdmicc
     tool="cp"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -1286,7 +1286,7 @@ fi
       toolset='';
       apps="manual"
       echo "Manual build selected"
-      ;; 
+      ;;
     [Vv])
       echo "Voice build selected"
       voiceconfig
@@ -1312,7 +1312,7 @@ fi
           ;;
       ipodmini2g)
           manualdev="ipodmini"
-          ;;        
+          ;;
       *)
           manualdev=$archos
           ;;
@@ -1329,15 +1329,15 @@ language="english"
 
 # Ask about language if building voice
 if [ "yes" = "$voice" ]; then
-    echo "Select a number for the language to use (default is english)"     
+    echo "Select a number for the language to use (default is english)"
 
-    picklang   
-    language=`whichlang`      
+    picklang
+    language=`whichlang`
 
-    if [ -z "$language" ]; then      
-        # pick a default    
+    if [ -z "$language" ]; then
+        # pick a default
         language="english"
-    fi    
+    fi
     echo "Language set to $language"
 fi
 
@@ -1378,14 +1378,14 @@ else
 
  echo "Using $CC $gccver ($gccnum)"
 
- if test "$gccnum" -ge "400"; then 
+ if test "$gccnum" -ge "400"; then
    # gcc 4.0 is just *so* much pickier on arguments that differ in signedness
    # so we ignore that warnings for now
    # -Wno-pointer-sign
    GCCOPTS="$GCCOPTS -Wno-pointer-sign"
  fi
 
- if test "$gccnum" -ge "401"; then 
+ if test "$gccnum" -ge "401"; then
    # this is a lame hack to avoid "warning: dereferencing type-punned pointer
    # will break strict-aliasing rules"
 
@@ -1396,7 +1396,7 @@ fi
 
 # check the compiler for SH platforms
 if test "$CC" = "sh-elf-gcc"; then
-  if test "$gccnum" -lt "400"; then 
+  if test "$gccnum" -lt "400"; then
     echo "WARNING: Consider upgrading your compiler to the 4.0.X series!"
     echo "WARNING: http://www.rockbox.org/twiki/bin/view/Main/CrossCompiler"
   else
@@ -1689,7 +1689,7 @@ help:
 	@echo "fontzip     - creates rockbox-fonts.zip"
 	@echo "mapzip      - creates rockbox-maps.zip with all .map files"
 	@echo "tools       - builds the tools only"
-	@echo "install     - installs your build (for simulator builds only)" 
+	@echo "install     - installs your build (for simulator builds only)"
 
 EOF
 

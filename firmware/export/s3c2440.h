@@ -143,9 +143,12 @@
 #define LCDINTMSK (*(volatile int *)0x4D00005C) /* LCD interrupt mask */
 #define TCONSEL (*(volatile int *)0x4D000060) /* TCON(LPC3600/LCC3600) control */
 
-/* The following should be computed but for now, we cheat. */
-#define FRAME   ( (short *) 0x31E00000  ) /* LCD Frame buffer */
-
+#define LCD_BUFFER_SIZE ((320*240*2))
+#define TTB_SIZE (0x4000)
+/*#define FRAME   ( (short *) 0x31E00000  ) */ /* LCD Frame buffer - Firmware Address */
+/* must be 16Kb (0x4000) aligned */
+#define TTB_BASE   (0x30000000 + (32*1024*1024) - TTB_SIZE) /* End of memory */
+#define FRAME   ((short *) (TTB_BASE - LCD_BUFFER_SIZE))  /* Right before TTB */
 /* NAND Flash */
 
 #define NFCONF (*(volatile int *)0x4E000000) /* NAND flash configuration */

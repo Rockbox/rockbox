@@ -26,8 +26,9 @@ INPUT(target/sh/crt0.o)
 #define STUBOFFSET 0
 #endif
 
+#if CONFIG_CPU!=S3C2440
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGINSIZE - STUBOFFSET - CODECSIZE
-
+#endif
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300)
 #define DRAMORIG 0x31000000 + STUBOFFSET
 #define IRAMORIG 0x10000000
@@ -45,7 +46,9 @@ INPUT(target/sh/crt0.o)
 #define IRAMORIG 0x400000
 #define IRAMSIZE 0x7000
 #elif CONFIG_CPU==S3C2440
-#define DRAMORIG 0x100 + STUBOFFSET
+#include "s3c2440.h"
+#define DRAMORIG (0x100 + STUBOFFSET)
+#define DRAMSIZE (MEMORYSIZE * 0x100000) - 0x100 - STUBOFFSET - LCD_BUFFER_SIZE - TTB_SIZE - PLUGINSIZE - CODECSIZE
 #define IRAMORIG DRAMORIG
 #define IRAMSIZE 4K
 #define IRAM DRAM
@@ -126,7 +129,7 @@ SECTIONS
         _dataend  = .;
     } > DRAM
 
-    /DISCARD/ : 
+    /DISCARD/ :
     {
         *(.eh_frame)
     }
@@ -163,7 +166,7 @@ SECTIONS
     } > IRAM AT> DRAM
 
     _iramcopy = LOADADDR(.iram);
-    
+
     .ibss (NOLOAD) :
     {
         _iedata = .;
@@ -180,7 +183,7 @@ SECTIONS
        . += 0x2000;
        stackend = .;
     } > IRAM
-    
+
 #ifdef CPU_PP
     .cop_stack :
     {

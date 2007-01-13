@@ -29,21 +29,37 @@ bool lcd_enabled()
     return lcd_on;
 }
 
+unsigned int LCDBANK(unsigned int address)
+{
+    return ((address >> 22) & 0xff);
+}
+
+unsigned int LCDBASEU(unsigned int address)
+{
+    return (address & ((1 << 22)-1)) >> 1;
+}
+
+unsigned int LCDBASEL(unsigned int address)
+{
+    address += 320*240*2;
+    return (address & ((1 << 22)-1)) >> 1;
+}
+
+
 /* LCD init */
 void lcd_init_device(void)
 {
-    memset16(fg_pattern_blit, fg_pattern, sizeof(fg_pattern_blit)/2);
-    memset16(bg_pattern_blit, bg_pattern, sizeof(bg_pattern_blit)/2);
-    clean_dcache_range((void *)fg_pattern_blit, sizeof(fg_pattern_blit));
-    clean_dcache_range((void *)bg_pattern_blit, sizeof(bg_pattern_blit));
-
-    LCDSADDR1 = 0x18F00000; /* These values are pulled from an F40  */
-    LCDSADDR2 = 0x00112C00; /* They should move FRAME to the correct location */
-    LCDSADDR3 = 0x000000F0; /* TODO: Move FRAME to where we want it */
+    LCDSADDR1 = (LCDBANK((unsigned)FRAME) << 21) | (LCDBASEU((unsigned)FRAME));
+    LCDSADDR2 = LCDBASEL((unsigned)FRAME);
+    LCDSADDR3 = 0x000000F0;
 
     LCDCON5 |= 1 << 11;     /* Switch from 555I mode to 565 mode */
 
 #if !defined(BOOTLOADER)
+    memset16(fg_pattern_blit, fg_pattern, sizeof(fg_pattern_blit)/2);
+    memset16(bg_pattern_blit, bg_pattern, sizeof(bg_pattern_blit)/2);
+    clean_dcache_range((void *)fg_pattern_blit, sizeof(fg_pattern_blit));
+    clean_dcache_range((void *)bg_pattern_blit, sizeof(bg_pattern_blit));
     use_dma_blit = true;
     lcd_poweroff = true;
 #endif
@@ -66,7 +82,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     {
         /* Wait for this controller to stop pending transfer */
         while((DSTAT1 & 0x000fffff))
-            CLKCON |= (1 << 2); /* set IDLE bit */
+            yield();
 
         /* Flush DCache */
         invalidate_dcache_range((void *)(((int) &lcd_framebuffer)+(y * sizeof(fb_data) * LCD_WIDTH)), (height * sizeof(fb_data) * LCD_WIDTH));
@@ -92,7 +108,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 
         /* Wait for transfer to complete */
         while((DSTAT1 & 0x000fffff))
-            CLKCON |= (1 << 2); /* set IDLE bit */
+            yield();
     }
     else
         memcpy(((char*)FRAME) + (y * sizeof(fb_data) * LCD_WIDTH), ((char *)&lcd_framebuffer) + (y * sizeof(fb_data) * LCD_WIDTH), ((height * sizeof(fb_data) * LCD_WIDTH)));
@@ -143,9 +159,8 @@ void lcd_clear_display_dma(void)
     void *src;
     bool inc = false;
 
-    if(!lcd_on) {
-        sleep(200);
-    }
+    if(!lcd_on)
+        yield();
     if (lcd_get_drawmode() & DRMODE_INVERSEVID)
         src = fg_pattern_blit;
     else
@@ -162,7 +177,7 @@ void lcd_clear_display_dma(void)
     }
     /* Wait for any pending transfer to complete */
     while((DSTAT3 & 0x000fffff))
-        CLKCON |= (1 << 2); /* set IDLE bit */
+        yield();
     DMASKTRIG3 |= 0x4; /* Stop controller */
     DIDST3 = ((int) lcd_framebuffer) + 0x30000000; /* set DMA dest, physical address */
     DIDSTC3 = 0; /* Dest on AHB, increment */
@@ -182,7 +197,7 @@ void lcd_clear_display_dma(void)
 
     /* Wait for transfer to complete */
     while((DSTAT3 & 0x000fffff))
-        CLKCON |= (1 << 2); /* set IDLE bit */
+        yield();
 }
 
 void lcd_clear_display(void)

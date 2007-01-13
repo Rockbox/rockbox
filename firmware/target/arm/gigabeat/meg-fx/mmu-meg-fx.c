@@ -1,6 +1,7 @@
 #include <string.h>
 #include "s3c2440.h"
 #include "mmu-meg-fx.h"
+#include "panic.h"
 
 void map_memory(void);
 static void enable_mmu(void);
@@ -20,7 +21,7 @@ void map_memory(void) {
     enable_mmu();
 }
 
-unsigned int* ttb_base;
+unsigned int* ttb_base = (unsigned int *) TTB_BASE;
 const int ttb_size = 4096;
 
 void set_ttb() {
@@ -29,7 +30,7 @@ void set_ttb() {
     int domain_access;
 
     /* must be 16Kb (0x4000) aligned */
-    ttb_base = (int*)0x31F00000;
+    ttb_base = (int*) TTB_BASE;
     for (i=0; i<ttb_size; i++,ttbPtr++)
     ttbPtr = 0;
     asm volatile("mcr p15, 0, %0, c2, c0, 0" : : "r" (ttb_base));
@@ -47,8 +48,8 @@ void set_page_tables() {
 
     map_section(0x30000000, 0, 32, CACHE_NONE); /* map RAM to 0 */
 
-    map_section(0x30000000, 0, 30, CACHE_ALL); /* cache the first 30 MB or RAM */
-    map_section(0x31E00000, 0x31E00000, 1, BUFFERED); /* enable buffered writing for the framebuffer */
+    map_section(0x30000000, 0, 32, CACHE_ALL); /* cache the first 31 MB or RAM */
+    map_section((int)FRAME, (int)FRAME, 1, BUFFERED); /* enable buffered writing for the framebuffer */
 }
 
 void map_section(unsigned int pa, unsigned int va, int mb, int cache_flags) {

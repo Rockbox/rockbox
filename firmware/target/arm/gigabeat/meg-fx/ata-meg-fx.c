@@ -53,10 +53,11 @@ void ata_device_init(void)
 {
 }
 
+#if !defined(BOOTLOADER)
 void copy_read_sectors(unsigned char* buf, int wordcount)
 {
     __buttonlight_trigger();
-    
+
     /* Unaligned transfer - slow copy */
     if ( (unsigned long)buf & 1)
     {   /* not 16-bit aligned, copy byte by byte */
@@ -94,7 +95,9 @@ void copy_read_sectors(unsigned char* buf, int wordcount)
     DISRC0 = (int) 0x18000000;
     DISRCC0 = 0x1;
     /* Dest mapped to physical address, on AHB bus, increment */
-    DIDST0 = (int) (buf + 0x30000000);
+    DIDST0 = (int) buf;
+	if(DIDST0 < 0x30000000)
+		DIDST0 += 0x30000000;
     DIDSTC0 = 0;
 
     /* DACK/DREQ Sync to AHB, Int on Transfer complete, Whole service, No reload, 16-bit transfers */
@@ -112,10 +115,10 @@ void copy_read_sectors(unsigned char* buf, int wordcount)
 
     /* Wait for transfer to complete */
     while((DSTAT0 & 0x000fffff))
-        CLKCON |= (1 << 2); /* set IDLE bit */
+        yield();
     /* Dump cache for the buffer  */
 }
-
+#endif
 void dma0(void)
 {
 }
