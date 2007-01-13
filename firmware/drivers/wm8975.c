@@ -41,6 +41,11 @@
 #include "wm8975.h"
 #include "i2s.h"
 
+/* use zero crossing to reduce clicks during volume changes */
+#define VOLUME_ZC_WAIT (1<<7)
+
+
+
 /* convert tenth of dB volume (-730..60) to master volume register value */
 int tenthdb2master(int db)
 {
@@ -96,6 +101,9 @@ void audiohw_enable_output(bool enable)
     
          /* 2. Enable Vmid and VREF. */
         wmcodec_write(PWRMGMT1, 0xc0);    /*Pwr Mgmt(1)*/
+
+        /* From app notes: allow Vref to stabilize to reduce clicks */
+        sleep(HZ/4);
     
          /* 3. Enable DACs as required. */
         wmcodec_write(PWRMGMT2, 0x180);    /*Pwr Mgmt(2)*/
@@ -111,10 +119,8 @@ void audiohw_enable_output(bool enable)
         audiohw_set_sample_rate(WM8975_44100HZ);
     
         /* set the volume to -6dB */
-        wmcodec_write(LOUT1VOL, IPOD_PCM_LEVEL);
-        wmcodec_write(ROUT1VOL,0x100 | IPOD_PCM_LEVEL);
-        wmcodec_write(LOUT1VOL, IPOD_PCM_LEVEL);
-        wmcodec_write(ROUT1VOL,0x100 | IPOD_PCM_LEVEL);
+        wmcodec_write(LOUT1VOL, VOLUME_ZC_WAIT | IPOD_PCM_LEVEL);
+        wmcodec_write(ROUT1VOL, VOLUME_ZC_WAIT | 0x100 | IPOD_PCM_LEVEL);
 
         wmcodec_write(LOUTMIX1, 0x150);    /* Left out Mix(def) */
         wmcodec_write(LOUTMIX2, 0x50);
@@ -131,6 +137,8 @@ void audiohw_enable_output(bool enable)
     }
 }
 
+
+
 int audiohw_set_master_vol(int vol_l, int vol_r)
 {
     /* +6 to -73dB 1dB steps (plus mute == 80levels) 7bits */
@@ -140,8 +148,8 @@ int audiohw_set_master_vol(int vol_l, int vol_r)
     /* 0101111 == mute (0x2f) */
 
     /* OUT1 */
-    wmcodec_write(LOUT1VOL, vol_l);
-    wmcodec_write(ROUT1VOL, 0x100 | vol_r);
+    wmcodec_write(LOUT1VOL, VOLUME_ZC_WAIT | vol_l);
+    wmcodec_write(ROUT1VOL, VOLUME_ZC_WAIT | 0x100 | vol_r);
 
     return 0;
 }
@@ -149,8 +157,8 @@ int audiohw_set_master_vol(int vol_l, int vol_r)
 int audiohw_set_lineout_vol(int vol_l, int vol_r)
 {
     /* OUT2 */
-    wmcodec_write(LOUT2VOL, vol_l);
-    wmcodec_write(ROUT2VOL, 0x100 | vol_r);
+    wmcodec_write(LOUT2VOL, VOLUME_ZC_WAIT | vol_l);
+    wmcodec_write(ROUT2VOL, VOLUME_ZC_WAIT | 0x100 | vol_r);
 
     return 0;
 }
@@ -267,7 +275,7 @@ void audiohw_enable_recording(bool source_mic)
 
     if (source_mic) {
         /* VSEL=10(def) DATSEL=10 (use right ADC only) */
-        wmcodec_write(0x17, 0xc8);                 /* Additional control(1) */
+        wmcodec_write(0x17, 0xc9);                 /* Additional control(1) */
 
         /* VROI=1 (sets output resistance to 40kohms) */
         wmcodec_write(0x1b, 0x40);                 /* Additional control(3) */
@@ -277,7 +285,7 @@ void audiohw_enable_recording(bool source_mic)
         wmcodec_write(0x21, 0x60);               /* ADCR signal path */
     } else {
         /* VSEL=10(def) DATSEL=00 (left->left, right->right) */
-        wmcodec_write(0x17, 0xc0);                 /* Additional control(1) */
+        wmcodec_write(0x17, 0xc1);                 /* Additional control(1) */
 
         /* VROI=1 (sets output resistance to 40kohms) */
         wmcodec_write(0x1b, 0x40);                 /* Additional control(3) */
