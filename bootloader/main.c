@@ -589,13 +589,19 @@ void main(void)
     /* Power on the hard drive early, to speed up the loading.
        Some H300 don't like this, so we only do it for the H100 */
 #ifndef IRIVER_H300_SERIES
-    if (!hold_status && !recovery_mode)
+    if (!hold_status
+# ifdef HAVE_EEPROM_SETTINGS
+        && !recovery_mode
+# endif
+        )
     {
         ide_power_enable(true);
     }
     
+# ifdef EEPROM_SETTINGS
     if (!hold_status && !usb_detect() && !recovery_mode)
         try_flashboot();
+# endif
 #endif
 
     backlight_init();
@@ -622,7 +628,11 @@ void main(void)
 
     /* Don't start if the Hold button is active on the device you
        are starting with */
-    if (!usb_detect() && (hold_status || recovery_mode))
+    if (!usb_detect() && (hold_status
+#ifdef HAVE_EEPROM_SETTINGS
+                          || recovery_mode
+#endif
+                          ))
     {
         if (detect_original_firmware())
         {
@@ -630,7 +640,7 @@ void main(void)
             shutdown();
         }
         
-#ifdef IRIVER_H100_SERIES
+#ifdef HAVE_EEPROM_SETTINGS
         failsafe_menu();
 #endif
     }
