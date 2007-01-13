@@ -19,12 +19,12 @@ visit\\
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
       {\ButtonUp/\ButtonDown}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd/\ButtonScrollBack}
-    \opt{IRIVER_H10_PAD}{\ButtonScrollUp/\ButtonScrollDown}
+    \opt{IRIVER_H10_PAD,SANSA_E200_PAD}{\ButtonScrollUp/\ButtonScrollDown}
       & Move Cursor around.\\
     %
     \opt{RECORDER_PAD}{\ButtonOn}
     \opt{ONDIO_PAD}{\ButtonMenu}
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD}{\ButtonSelect}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD}{\ButtonSelect}
     \opt{IRIVER_H10_PAD}{\ButtonPlay}
       & Select cards, move cards, reveal hidden cards...\\
     %
@@ -34,6 +34,7 @@ visit\\
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
     \opt{IAUDIO_X5_PAD}{\ButtonPlay}
     \opt{IRIVER_H10_PAD}{Hold \ButtonLeft}
+    \opt{SANSA_E200_PAD}{\ButtonRec}
       & If a card was selected -- unselect it, else\\
       & Draw 3 new cards from the remains stack\\
     %
@@ -42,6 +43,7 @@ visit\\
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn + \ButtonLeft}
     \opt{IAUDIO_X5_PAD}{Hold \ButtonPlay}
     \opt{IRIVER_H10_PAD}{\ButtonFF}
+    \opt{SANSA_E200_PAD}{\ButtonLeft}
       & Put the card from the top of the remains stack on top of the cursor\\
     %
     \opt{RECORDER_PAD}{\ButtonFTwo}
@@ -50,17 +52,19 @@ visit\\
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{Hold \ButtonMenu}
     \opt{IAUDIO_X5_PAD}{Hold \ButtonSelect}
     \opt{IRIVER_H10_PAD}{\ButtonRew}
+    \opt{SANSA_E200_PAD}{\ButtonRec+\ButtonRight}
       & Put the card under the cursor on one of the 4 final colour stacks.\\
     %
     \opt{RECORDER_PAD}{\ButtonFThree}
     \opt{IRIVER_H10_PAD,ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD}{Hold \ButtonRight}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn + \ButtonRight}
     \opt{IAUDIO_X5_PAD}{\ButtonRec}
+    \opt{SANSA_E200_PAD}{\ButtonRight}
       & Put the card on top of the remains stack on one of the final colour stacks.\\
     %
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H300_PAD,IRIVER_H100_PAD}{\ButtonOff}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu+\ButtonSelect}
-    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPower}
+    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD}{\ButtonPower}
       & Show menu\\
    \end{btnmap}
   \end{table}
