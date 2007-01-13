@@ -48,8 +48,9 @@
 
 #define DRAM_START 0x31000000
 
-
+#ifdef HAVE_EEPROM_SETTINGS
 static bool recovery_mode = false;
+#endif
 
 int line = 0;
 #ifdef HAVE_REMOTE_LCD
@@ -471,6 +472,7 @@ void main(void)
     (void)rc_on_button;
     (void)on_button;
     (void)rec_button;
+    (void)hold_status;
     (void)data;
     power_init();
 
@@ -492,14 +494,8 @@ void main(void)
 
     printf("Rockbox boot loader");
     printf("Version %s", version);
-
-    adc_battery = adc_read(ADC_BATTERY);
-
-    battery_voltage = (adc_battery * BATTERY_SCALE_FACTOR) / 10000;
-    batt_int = battery_voltage / 100;
-    batt_frac = battery_voltage % 100;
-
-    printf("Batt: %d.%02dV", batt_int, batt_frac);
+    
+    check_battery();
 
     rc = ata_init();
     if(rc)
