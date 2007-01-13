@@ -89,7 +89,7 @@ char *my_strtok( char * s, const char * delim );
 inline void* memcpy(void* dst, const void* src, size_t size);
 
 #define PACKEDATTR __attribute__((packed)) // Needed for a few things
-#define GAMEBASE "/games/doom/"
+#define GAMEBASE ROCKBOX_DIR "/doom/"
 //#define SIMPLECHECKS
 #define NO_PREDEFINED_LUMPS
 #define TABLES_AS_LUMPS // This frees up alot of space in the plugin buffer

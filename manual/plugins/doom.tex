@@ -5,18 +5,19 @@ This is the famous Doom game.
 
 \subsubsection{Getting started}
 For the game to run you need \fname{.wad} game files located in
-\fname{/games/doom/} on your player. Create the directory and save the
+\fname{/.rockbox/doom/} on your player. Create the directory and save the
 following files there:
 \begin{description}
-\item[rockdoom.wad] The Rockbox \fname{.wad}, based on \fname{prboom.wad}
+\item[rockdoom.wad.] The Rockbox \fname{.wad}, based on \fname{prboom.wad}
 from prboom-2.2.6
-\item[Your wad files] Copy all Doom wads you wish to play into that directory.
+\item[Your wad files.] Copy all Doom wads you wish to play into that directory.
 \end{description}
 The needed files can be found at
 \wikilink{PluginDoom}
 
-To play addon wads create the \fname{addons} directory within doom. 
-Place wad files in this directory. Currently doom only supports 10 addons 
+To play addon wads create the \fname{addons} directory within the doom folder.
+Place \fname{wad} files in this directory. Currently doom only supports 
+a maximum number of 10 addons 
 in the directory.
 
 A free alternative for Doom 2 is FreeDoom (\url{http://freedoom.sourceforge.net}).
@@ -25,49 +26,50 @@ Doom, by placing it in the \fname{addons} directory.
 
 \subsubsection{Menus}
 \begin{description}
-  \item[Rockdoom Menu: ] The Rockdoom menu is shown when Doom is first launched.  
+  \item[Rockdoom Menu. ] The Rockdoom menu is shown when Doom is first launched.  
 This is the only time it can be accessed (before starting the game).  To re-adjust 
 Rockdoom options, you will need to quit your current game and restart the plugin.
-  \item[Main Menu: ]
+  \item[Main Menu. ]
   The Doom plugin has a main menu, which is brought up before a game is started. It 
   has the following entries:
   
-  \emph{Game } Select which (official) wad to launch\\
-  \emph{Addon } Select which unofficial addon wad to launch (From /games/doom/addons directory)\\
-  \emph{Demos } Select which demo file to play on game start\\
-  \emph{Options } Configure low-level Doom options\\
-  \emph{Play Game } Launch the wad/addon/Demo chosen%\\
+  \emph{Game. } Select which (official) wad to launch\\
+  \emph{Addon. } Select which unofficial addon wad to launch (From 
+  \fname{/.rockbox/doom/addons} directory)\\
+  \emph{Demos. } Select which demo file to play on game start\\
+  \emph{Options. } Configure low-level Doom options\\
+  \emph{Play Game. } Launch the wad/addon/Demo chosen%\\
   
-  \item[Options Menu: ]This menu has the following options:
+  \item[Options Menu. ]This menu has the following options:
   
-  \emph{Sound } Enable or Disable sound in Doom\\
-  \emph{Set Keys }  Change the game key configuration\\
-  \emph{Time Demo } Run a timed demo, to test game speed on a player (Only runs on Doom Shareware)\\
-  \emph{Player Bobbing } Enable or Disable player up/Down movement\\
-  \emph{Translucency } Enable or Disable sprite translucency (Fireballs, Plasma...)\\
-  \emph{Fake Contrast} Enable or Disable modified game lighting\\
-  \emph{Always Run} Make the player always run\\
-  \emph{Headsup Display} Show the player status when in fullscreen\\
-  \emph{Statusbar Always Red} Disable color response statusbar%\\
+  \emph{Sound. } Enable or Disable sound in Doom\\
+  \emph{Set Keys. }  Change the game key configuration\\
+  \emph{Time Demo. } Run a timed demo, to test game speed on a player (Only runs on Doom Shareware)\\
+  \emph{Player Bobbing. } Enable or Disable player up/Down movement\\
+  \emph{Translucency. } Enable or Disable sprite translucency (Fireballs, Plasma...)\\
+  \emph{Fake Contrast.} Enable or Disable modified game lighting\\
+  \emph{Always Run.} Make the player always run\\
+  \emph{Headsup Display.} Show the player status when in fullscreen\\
+  \emph{Statusbar Always Red.} Disable color response statusbar%\\
 
-  \item[InGame Main Menu: ]This menu can only be accessed from within a running game, and is displayed by
+  \item[InGame Main Menu. ]This menu can only be accessed from within a running game, and is displayed by
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{pressing \ButtonOff}
     \opt{IPOD_3G_PAD,IPOD_4G_PAD}{flipping your hold switch a couple of times}
     \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD}{pressing \ButtonPower}
 
-  \emph{New Game } Start a new game\\
-  \emph{Options } In game options\\
-  \emph{Load Game } Load a saved game\\
-  \emph{Save Game } Save the current game\\
-  \emph{Quit } Quit the game%\\
+  \emph{New Game. } Start a new game\\
+  \emph{Options. } In game options\\
+  \emph{Load Game. } Load a saved game\\
+  \emph{Save Game. } Save the current game\\
+  \emph{Quit. } Quit the game%\\
 
-  \item[InGame Options Menu: ]This menu has the folloing options:
+  \item[InGame Options Menu. ]This menu has the folloing options:
   
-  \emph{End Game } Ends the current game\\
-  \emph{Messages }  Enable or Disable in game messages\\
-  \emph{Screen Size } Shrink or Enlarge the displayed portion of the game\\
-  \emph{Gamma } Change the brightness (Gamma) of the game\\
-  \emph{Sound Volume } Change the sound, music and system volume%\\
+  \emph{End Game. } Ends the current game\\
+  \emph{Messages. }  Enable or Disable in game messages\\
+  \emph{Screen Size. } Shrink or Enlarge the displayed portion of the game\\
+  \emph{Gamma. } Change the brightness (Gamma) of the game\\
+  \emph{Sound Volume. } Change the sound, music and system volume%\\
   \note{In game music is not currently supported}
 
 \end{description}
