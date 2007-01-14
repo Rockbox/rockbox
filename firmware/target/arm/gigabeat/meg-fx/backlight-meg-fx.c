@@ -127,7 +127,7 @@ bool __backlight_init(void)
     initial_tick_delay = 400;
     /* put the led control on the tick list */
     tick_add_task(led_control_service);
-    
+
     return true;
 }
 

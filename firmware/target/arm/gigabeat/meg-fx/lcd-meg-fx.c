@@ -82,10 +82,10 @@ void lcd_update_rect(int x, int y, int width, int height)
     {
         /* Wait for this controller to stop pending transfer */
         while((DSTAT1 & 0x000fffff))
-            yield();
+            CLKCON |= (1 << 2); /* set IDLE bit */
 
         /* Flush DCache */
-        invalidate_dcache_range((void *)(((int) &lcd_framebuffer)+(y * sizeof(fb_data) * LCD_WIDTH)), (height * sizeof(fb_data) * LCD_WIDTH));
+        invalidate_dcache_range((void *)(((int) &lcd_framebuffer[0][0])+(y * sizeof(fb_data) * LCD_WIDTH)), (height * sizeof(fb_data) * LCD_WIDTH));
 
         /* set DMA dest */
         DIDST1 = ((int) FRAME) + (y * sizeof(fb_data) * LCD_WIDTH);
@@ -96,7 +96,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         DCON1 = ((1<<30) | (1<<28) |  (1<<27) | (1<<22) | (2<<20)) | ((height * sizeof(fb_data) * LCD_WIDTH) >> 4);
 
         /* set DMA source  */
-        DISRC1 = ((int) &lcd_framebuffer) + (y * sizeof(fb_data) * LCD_WIDTH) + 0x30000000;
+        DISRC1 = ((int) &lcd_framebuffer[0][0]) + (y * sizeof(fb_data) * LCD_WIDTH) + 0x30000000;
         /* memory is on AHB bus, increment addresses */
         DISRCC1 = 0x00;
 
@@ -108,7 +108,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 
         /* Wait for transfer to complete */
         while((DSTAT1 & 0x000fffff))
-            yield();
+            CLKCON |= (1 << 2); /* set IDLE bit */
     }
     else
         memcpy(((char*)FRAME) + (y * sizeof(fb_data) * LCD_WIDTH), ((char *)&lcd_framebuffer) + (y * sizeof(fb_data) * LCD_WIDTH), ((height * sizeof(fb_data) * LCD_WIDTH)));
@@ -159,8 +159,9 @@ void lcd_clear_display_dma(void)
     void *src;
     bool inc = false;
 
-    if(!lcd_on)
-        yield();
+    if(!lcd_on) {
+        sleep(200);
+    }
     if (lcd_get_drawmode() & DRMODE_INVERSEVID)
         src = fg_pattern_blit;
     else
@@ -177,16 +178,16 @@ void lcd_clear_display_dma(void)
     }
     /* Wait for any pending transfer to complete */
     while((DSTAT3 & 0x000fffff))
-        yield();
+        CLKCON |= (1 << 2); /* set IDLE bit */
     DMASKTRIG3 |= 0x4; /* Stop controller */
-    DIDST3 = ((int) lcd_framebuffer) + 0x30000000; /* set DMA dest, physical address */
+    DIDST3 = ((int) &lcd_framebuffer[0][0]) + 0x30000000; /* set DMA dest, physical address */
     DIDSTC3 = 0; /* Dest on AHB, increment */
 
     DISRC3 = ((int) src) + 0x30000000; /* Set source, in physical space */
     DISRCC3 = inc ? 0x00 : 0x01;  /* memory is on AHB bus, increment addresses based on backdrop */
 
     /* Handshake on AHB, Burst mode, whole service mode, no reload, move 32-bits */
-    DCON3 = ((1<<30) | (1<<28) | (1<<27) | (1<<22) | (2<<20)) | (sizeof(lcd_framebuffer) >> 4);
+    DCON3 = ((1<<30) | (1<<28) | (1<<27) | (1<<22) | (2<<20)) | ((LCD_WIDTH*LCD_HEIGHT*sizeof(fb_data)) >> 4);
 
     /* Dump DCache for dest, we are about to overwrite it with DMA */
     invalidate_dcache_range((void *)lcd_framebuffer, sizeof(lcd_framebuffer));
@@ -197,7 +198,7 @@ void lcd_clear_display_dma(void)
 
     /* Wait for transfer to complete */
     while((DSTAT3 & 0x000fffff))
-        yield();
+        CLKCON |= (1 << 2); /* set IDLE bit */
 }
 
 void lcd_clear_display(void)
