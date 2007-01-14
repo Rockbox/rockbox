@@ -43,6 +43,9 @@
 
 #define IPOD_PCM_LEVEL 0x65       /* -6dB */
 
+/* use zero crossing to reduce clicks during volume changes */
+#define VOLUME_ZC_WAIT (1<<7)
+
 /* convert tenth of dB volume (-730..60) to master volume register value */
 int tenthdb2master(int db)
 {
@@ -159,8 +162,8 @@ int audiohw_set_master_vol(int vol_l, int vol_r)
     /* 0110000 == -73dB */
     /* 0101111 == mute (0x2f) */
 
-    wmcodec_write(LOUTVOL, vol_l);
-    wmcodec_write(ROUTVOL, vol_r);
+    wmcodec_write(LOUTVOL, VOLUME_ZC_WAIT | vol_l);
+    wmcodec_write(ROUTVOL, VOLUME_ZC_WAIT | vol_r);
  
     return 0;
 }
