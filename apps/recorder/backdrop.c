@@ -23,8 +23,8 @@
 #include "backdrop.h"
 
 #if LCD_DEPTH >= 8
-static fb_data main_backdrop[LCD_HEIGHT][LCD_WIDTH];
-static fb_data wps_backdrop[LCD_HEIGHT][LCD_WIDTH];
+static fb_data main_backdrop[LCD_HEIGHT][LCD_WIDTH]  __attribute__ ((aligned (16)));
+static fb_data wps_backdrop[LCD_HEIGHT][LCD_WIDTH]  __attribute__ ((aligned (16)));
 #elif LCD_DEPTH == 2
 #if LCD_PIXELFORMAT == VERTICAL_PACKING
 static fb_data main_backdrop[(LCD_HEIGHT+3)/4][LCD_WIDTH];
