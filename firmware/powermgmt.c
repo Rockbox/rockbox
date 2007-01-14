@@ -192,7 +192,7 @@ static const unsigned int battery_level_dangerous[BATTERY_TYPES_COUNT] =
 #elif CONFIG_BATTERY == BATT_LIPOL1300  /* iRiver H1x0: LiPolymer */
     338
 #elif CONFIG_BATTERY == BATT_LIION830   /* Gigabeat F */
-    340
+    345
 #elif CONFIG_BATTERY == BATT_IAUDIO_X5  /* iAudio X5 */
     354
 #elif CONFIG_BATTERY == BATT_LPCS355385 /* iriver H10 20GB: LiPolymer*/
@@ -213,7 +213,7 @@ static const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 #elif CONFIG_BATTERY == BATT_LIPOL1300  /* iRiver Hxxx */
     302
 #elif CONFIG_BATTERY == BATT_LIION830   /* Gigabeat F */
-    338
+    340
 #elif CONFIG_BATTERY == BATT_IAUDIO_X5  /* iAudio X5 */
     350
 #elif CONFIG_BATTERY == BATT_LPCS355385 /* iriver H10 20GB */
@@ -258,7 +258,7 @@ static const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
     { 103, 118, 121, 123, 124, 125, 126, 127, 128, 129, 135 }  /* NiMH */
 #elif CONFIG_BATTERY == BATT_LIION830
     /* Toshiba Gigabeat Li Ion 830mAH figured from discharge curve */
-    { 342, 358, 361, 368, 371, 374, 377, 381, 387, 390, 397 }
+    { 354, 357, 359, 361, 364, 366, 372, 381, 377, 381, 394 },
 #else /* NiMH */
     /* original values were taken directly after charging, but it should show
        100% after turning off the device for some hours, too */
@@ -279,7 +279,7 @@ static const unsigned short percent_to_volt_charge[11] =
     354, 386, 393, 398, 400, 402, 404, 408, 413, 418, 423 /* LiPo */
 #elif CONFIG_BATTERY == BATT_LIION830
     /* Toshiba Gigabeat Li Ion 830mAH */
-    347, 363, 366, 373, 376, 379, 382, 386, 393, 403, 411
+    354, 357, 359, 361, 364, 366, 372, 381, 377, 381, 394
 #elif CONFIG_BATTERY == BATT_LPCS355385
     /* iriver H10 20GB */
     399, 403, 406, 408, 410, 412, 415, 418, 422, 426, 431
@@ -862,7 +862,7 @@ static void power_thread_sleep(int ticks)
              * battery_centivolts is the centivolt-scaled filtered battery value.
              */
             battery_centivolts = (avgbat / BATT_AVE_SAMPLES + 5000) / 10000;
-            
+
             /* update battery status every time an update is available */
             battery_status_update();
         }
@@ -876,7 +876,7 @@ static void power_thread_sleep(int ticks)
 
             /* update battery status every time an update is available */
             battery_status_update();
-            
+
 #if (CONFIG_BATTERY!=BATT_4AA_NIMH) && (CONFIG_BATTERY!=BATT_3AAA)&& \
     (CONFIG_BATTERY!=BATT_1AA)
             if (!shutdown_timeout &&
@@ -1346,7 +1346,7 @@ void shutdown_hw(void)
     audiohw_close();
 #endif
     /* If HD is still active we try to wait for spindown, otherwise the
-       shutdown_timeout in power_thread_sleep will force a power off */ 
+       shutdown_timeout in power_thread_sleep will force a power off */
     while(ata_disk_is_active())
         sleep(HZ/10);
 #ifndef IAUDIO_X5
@@ -1355,7 +1355,7 @@ void shutdown_hw(void)
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_set_contrast(0);
 #endif
-    
+
     /* Small delay to make sure all HW gets time to flush. Especially
        eeprom chips are quite slow and might be still writing the last
        byte. */

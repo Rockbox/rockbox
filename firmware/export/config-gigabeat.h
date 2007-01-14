@@ -65,7 +65,7 @@
 /* Define this if you have the WM8975 audio codec */
 #define HAVE_WM8751
 
-#define BATTERY_CAPACITY_DEFAULT 830 /* default battery capacity */
+#define BATTERY_CAPACITY_DEFAULT 2000 /* default battery capacity */
 
 #ifndef SIMULATOR
 
@@ -80,8 +80,8 @@
 
 /* Type of mobile power - check this out */
 #define CONFIG_BATTERY BATT_LIION830    /* could change this later */
-#define BATTERY_CAPACITY_MIN 750        /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 850        /* max. capacity selectable */
+#define BATTERY_CAPACITY_MIN 1500        /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 2500        /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 25         /* capacity increment */
 #define BATTERY_TYPES_COUNT  1          /* only one type */
 
