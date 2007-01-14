@@ -22,7 +22,7 @@ change to customise your listening experience.
   \opt{ipodnano}{minimum of -72 dB to a maximum of +6 dB.}
   \opt{ipodvideo}{minimum of -57 dB to a maximum of +6 dB.}
   \opt{ipodcolor,x5}{minimum of -\fixme{??} dB to a maximum of +\fixme{??} dB.}
-  \opt{h10,h10_5gb}{minimum of -74 dB to a maximum of +6 db.}
+  \opt{h10,h10_5gb,sansa}{minimum of -74 dB to a maximum of +6 db.}
   
 \section{Bass}
   \opt{player,recorder,recorderv2fm,ondio}{This emphasises or suppresses the 
@@ -35,7 +35,7 @@ change to customise your listening experience.
   \opt{ipodnano,ipodcolor,ipodvideo}{This emphasises or suppresses the
   lower (bass) sounds in the track. 0dB means that bass in unaltered
   (flat response). The minimum setting is -6dB and the maximum is 9dB.}
-  \opt{x5}{\fixme{add platform specific information here}}
+  \opt{x5,sansa}{\fixme{add platform specific information here}}
 
 \section{Treble}
   \opt{player,recorder,recorderv2fm,ondio}{This emphasises or suppresses the
@@ -48,7 +48,7 @@ change to customise your listening experience.
   \opt{ipodnano,ipodcolor,ipodvideo}{This setting emphasises or suppresses
   the higher (treble) sounds in the track. 0dB means that treble is unaltered
   (flat response). The minimum setting -6dB and the maximum is 9dB.}
-  \opt{x5}{\fixme{add platform specific information here}}
+  \opt{x5,sansa}{\fixme{add platform specific information here}}
 
 \section{Balance}
   This setting controls the balance between the left and right channels.  The 
@@ -316,27 +316,32 @@ change to customise your listening experience.
     \begin{btnmap}{}{}
       \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD}{\ButtonScrollFwd}
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonUp} 
+      \opt{SANSA_E200_PAD}{\ButtonScrollUp}
       & Raises the highlighted parameter.\\
       %
       \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD}{\ButtonScrollBack}
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonDown} 
+      \opt{SANSA_E200_PAD}{\ButtonScrollDown}
       & Lowers the highlighted parameter.\\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonLeft}
       \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD}{\ButtonLeft} 
+      \opt{SANSA_E200_PAD}{\ButtonUp}
       & Moves to the previous EQ band. \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonRight}
       \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD}{\ButtonRight} 
+      \opt{SANSA_E200_PAD}{\ButtonDown}
       & Moves to the next EQ band. \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
-      \opt{IAUDIO_X5_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD}{\ButtonSelect} 
+      \opt{IAUDIO_X5_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD,SANSA_E200_PAD}{\ButtonSelect} 
       & Toggles the cursor among the three parameters (gain, center frequency, 
       Q) for the selected EQ band.\\  
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
       \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD}{\ButtonMenu} 
+      \opt{SANSA_E200_PAD}{\ButtonPower/\ButtonRight}
       & Exits the graphic EQ screen.\\  
     \end{btnmap}
   \end{table}
