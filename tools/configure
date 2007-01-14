@@ -1579,8 +1579,8 @@ export OBJDIR=@PWD@
 export BUILDDIR=@PWD@
 export LANGUAGE=@LANGUAGE@
 export MEMORYSIZE=@MEMORY@
-export VERSION=\$(shell date +%y%m%d-%H%M)
-export BUILDDATE=\$(shell date +'-DYEAR=%Y -DMONTH=%m -DDAY=%d')
+export VERSION=\$(shell date -u +%y%m%d-%H%M)
+export BUILDDATE=\$(shell date -u +'-DYEAR=%Y -DMONTH=%m -DDAY=%d')
 export MKFIRMWARE=@TOOL@
 export BMP2RB_MONO=@BMP2RB_MONO@
 export BMP2RB_NATIVE=@BMP2RB_NATIVE@
