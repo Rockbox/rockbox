@@ -81,10 +81,10 @@ static const char scroll_tick_table[16] = {
 /* LCD init */
 void lcd_init(void)
 {
-	lcd_clear_display();
+    lcd_clear_display();
 
-	/* Call device specific init */
-	lcd_init_device();
+    /* Call device specific init */
+    lcd_init_device();
 
 
     create_thread(scroll_thread, scroll_stack,
@@ -220,7 +220,7 @@ void lcd_set_backdrop(fb_data* backdrop)
         lcd_backdrop_offset = 0;
         lcd_fastpixelfuncs = lcd_fastpixelfuncs_bgcolor;
     }
-	lcd_device_prepare_backdrop(backdrop);
+    lcd_device_prepare_backdrop(backdrop);
 }
 
 fb_data* lcd_get_backdrop(void)
@@ -938,6 +938,10 @@ static void scroll_thread(void)
     scrolling_lines = 0;
 
     while ( 1 ) {
+        if(!lcd_enabled()) {
+            sleep(scroll_ticks);
+            continue;
+        }
         for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
             /* really scroll? */
             if ( !(scrolling_lines&(1<<index)) )
