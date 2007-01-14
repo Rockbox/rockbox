@@ -37,14 +37,15 @@
 #define SWCODEC  1    /* if codec is done by SW */
 
 /* CONFIG_CPU */
-#define SH7034  7034
-#define MCF5249 5249
-#define MCF5250 5250
-#define PP5002  5002
-#define PP5020  5020
-#define PNX0101  101
-#define S3C2440 2440
-#define PP5024  5024
+#define SH7034       7034
+#define MCF5249      5249
+#define MCF5250      5250
+#define PP5002       5002
+#define PP5020       5020
+#define PNX0101       101
+#define S3C2440      2440
+#define PP5024       5024
+#define TMS320DSC25    25
 
 /* CONFIG_KEYPAD */
 #define PLAYER_PAD          1
@@ -60,6 +61,7 @@
 #define IRIVER_H10_PAD     11
 #define SANSA_E200_PAD     12
 #define ELIO_TPJ1022_PAD   13
+#define ARCHOS_AV300_PAD   14
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -99,6 +101,7 @@
 #define LCD_H10      13 /* as used by iriver H10 20Gb */
 #define LCD_H10_5GB  14 /* as used by iriver H10 5Gb */
 #define LCD_TPJ1022  15 /* as used by Tatung Elio TPJ-1022 */
+#define LCD_DSC25    16 /* as used by Archos AV300 */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -170,6 +173,8 @@
 #include "config-ondiosp.h"
 #elif defined(ARCHOS_ONDIOFM)
 #include "config-ondiofm.h"
+#elif defined(ARCHOS_AV300)
+#include "config-av300.h"
 #elif defined(IRIVER_H100)
 #include "config-h100.h"
 #elif defined(IRIVER_H120)
@@ -255,7 +260,8 @@
 #endif
 
 /* define for all cpus from ARM family */
-#if defined(CPU_PP) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == S3C2440)
+#if defined(CPU_PP) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == S3C2440) \
+    || (CONFIG_CPU == TMS320DSC25)
 #define CPU_ARM
 #endif
 

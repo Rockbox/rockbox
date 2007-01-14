@@ -64,6 +64,19 @@ PLUGIN_HEADER
 #define SCROLL_FWD(x) (0)
 #define SCROLL_BACK(x) (0)
 
+#elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
+
+#define QUIT BUTTON_OFF
+#define LEFT BUTTON_LEFT
+#define RIGHT BUTTON_RIGHT
+#define SELECT BUTTON_SELECT
+#define UP BUTTON_UP
+#define DOWN BUTTON_DOWN
+
+/* Only iPod have scroll events */
+#define SCROLL_FWD(x) (0)
+#define SCROLL_BACK(x) (0)
+
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_4G_PAD)
 

@@ -37,7 +37,7 @@ int mmc_remove_request(void);
 bool pitch_screen(void);
 #endif
 
-#if CONFIG_KEYPAD == RECORDER_PAD
+#ifdef BUTTON_F3
 extern bool quick_screen_f3(int button_enter);
 #endif
 extern bool quick_screen_quick(int button_enter);

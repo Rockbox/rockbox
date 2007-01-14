@@ -45,6 +45,12 @@ enum tidy_system
 #define TIDY_LEFT BUTTON_LEFT
 #define TIDY_RIGHT BUTTON_RIGHT
 
+#elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
+#define TIDY_DO BUTTON_ON
+#define TIDY_STOP BUTTON_OFF
+#define TIDY_LEFT BUTTON_LEFT
+#define TIDY_RIGHT BUTTON_RIGHT
+
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define TIDY_DO BUTTON_MENU
 #define TIDY_STOP BUTTON_OFF
@@ -367,6 +373,9 @@ void tidy_lcd_menu(enum tidy_system system)
     
    /* show keys */
 #if CONFIG_KEYPAD == RECORDER_PAD
+    rb->lcd_puts(0, 0, "[On] to clean up");
+    rb->lcd_puts(0, 1, "[Off] to exit/abort");
+#elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
     rb->lcd_puts(0, 0, "[On] to clean up");
     rb->lcd_puts(0, 1, "[Off] to exit/abort");
 #elif CONFIG_KEYPAD == ONDIO_PAD

@@ -9,6 +9,8 @@ rockboxlogo.128x40x16.bmp
 rockboxlogo.138x46x2.bmp
 #elif (LCD_WIDTH == 160) && (LCD_DEPTH == 2)
 rockboxlogo.160x53x2.bmp
+#elif (LCD_WIDTH == 320) && (LCD_DEPTH == 2)
+rockboxlogo.160x53x2.bmp
 #elif (LCD_WIDTH == 160) && (LCD_DEPTH == 16)
 rockboxlogo.160x50x16.bmp
 #elif (LCD_WIDTH == 176) && (LCD_DEPTH == 16)

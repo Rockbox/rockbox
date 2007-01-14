@@ -241,6 +241,19 @@
 #define UI_LCD_WIDTH                LCD_WIDTH /* * 1.5 */
 #define UI_LCD_HEIGHT               LCD_HEIGHT  /* * 1.5 */
     
+#elif defined(ARCHOS_AV300)
+#define UI_TITLE                    "Archos AV300"
+/* We are temporarily using a 2bpp LCD driver and dummy bitmap */
+#define UI_WIDTH                    420 /* width of GUI window */
+#define UI_HEIGHT                   340 /* height of GUI window */
+#define UI_LCD_POSX                 50 /* x position of lcd */
+#define UI_LCD_POSY                 50 /* y position of lcd */
+#define UI_LCD_WIDTH                320
+#define UI_LCD_HEIGHT               240
+#define UI_LCD_BGCOLOR              90, 145, 90 /* bkgnd color of LCD (no backlight) */
+#define UI_LCD_BGCOLORLIGHT         173, 216, 230 /* bkgnd color of LCD (backlight) */
+#define UI_LCD_BLACK                0, 0, 0 /* black */
+
 #endif
 extern SDL_Surface *gui_surface;
 extern bool background;  /* True if the background image is enabled */

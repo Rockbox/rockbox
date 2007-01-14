@@ -41,6 +41,18 @@ PLUGIN_HEADER
 #define CUBE_PAUSE         BUTTON_PLAY
 #define CUBE_HIGHSPEED     BUTTON_ON
 
+#elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
+#define CUBE_QUIT          BUTTON_OFF
+#define CUBE_X_INC         BUTTON_RIGHT
+#define CUBE_X_DEC         BUTTON_LEFT
+#define CUBE_Y_INC         BUTTON_UP
+#define CUBE_Y_DEC         BUTTON_DOWN
+#define CUBE_Z_INC         BUTTON_F2
+#define CUBE_Z_DEC         BUTTON_F1
+#define CUBE_MODE          BUTTON_F3
+#define CUBE_PAUSE         BUTTON_SELECT
+#define CUBE_HIGHSPEED     BUTTON_ON
+
 #elif CONFIG_KEYPAD == PLAYER_PAD
 #define CUBE_QUIT          BUTTON_STOP
 #define CUBE_X_INC         BUTTON_RIGHT

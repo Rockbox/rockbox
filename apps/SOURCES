@@ -113,4 +113,6 @@ keymaps/keymap-h10.c
 keymaps/keymap-ifp7xx.c
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
 keymaps/keymap-e200.c
+#elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
+keymaps/keymap-av300.c
 #endif

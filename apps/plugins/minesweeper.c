@@ -45,6 +45,19 @@ enum minesweeper_status {
 #   define MINESWP_RIGHT    (BUTTON_F1 | BUTTON_RIGHT)
 #   define MINESWP_LEFT     (BUTTON_F1 | BUTTON_LEFT)
 
+#elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
+#   define MINESWP_UP       BUTTON_UP
+#   define MINESWP_DOWN     BUTTON_DOWN
+#   define MINESWP_QUIT     BUTTON_OFF
+#   define MINESWP_START    BUTTON_ON
+#   define MINESWP_TOGGLE   BUTTON_SELECT
+#   define MINESWP_TOGGLE2  BUTTON_F1
+#   define MINESWP_DISCOVER BUTTON_ON
+#   define MINESWP_DISCOVER2 BUTTON_F2
+#   define MINESWP_INFO     BUTTON_F3
+#   define MINESWP_RIGHT    (BUTTON_F1 | BUTTON_RIGHT)
+#   define MINESWP_LEFT     (BUTTON_F1 | BUTTON_LEFT)
+
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #   define MINESWP_UP       BUTTON_UP
 #   define MINESWP_DOWN     BUTTON_DOWN
@@ -422,6 +435,8 @@ enum minesweeper_status menu( void )
         rb->lcd_puts( 0, 5, "left x right" );
         rb->lcd_puts( 0, 6,
 #if CONFIG_KEYPAD == RECORDER_PAD
+            "ON to start"
+#elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
             "ON to start"
 #elif CONFIG_KEYPAD == ONDIO_PAD
             "MODE to start"

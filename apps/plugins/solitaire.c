@@ -64,6 +64,23 @@ static struct plugin_api* rb;
 #   define HK_CUR2STACK    "F2"
 #   define HK_REM2STACK    "F3"
 
+#elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
+#   define SOL_QUIT         BUTTON_OFF
+#   define SOL_UP           BUTTON_UP
+#   define SOL_DOWN         BUTTON_DOWN
+#   define SOL_LEFT         BUTTON_LEFT
+#   define SOL_RIGHT        BUTTON_RIGHT
+#   define SOL_MOVE         BUTTON_ON
+#   define SOL_DRAW         BUTTON_F1
+#   define SOL_REM2CUR      BUTTON_SELECT
+#   define SOL_CUR2STACK    BUTTON_F2
+#   define SOL_REM2STACK    BUTTON_F3
+#   define HK_MOVE         "ON"
+#   define HK_DRAW         "F1"
+#   define HK_REM2CUR      "SELECT"
+#   define HK_CUR2STACK    "F2"
+#   define HK_REM2STACK    "F3"
+
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #   define SOL_QUIT         BUTTON_OFF
 #   define SOL_UP_PRE       BUTTON_UP

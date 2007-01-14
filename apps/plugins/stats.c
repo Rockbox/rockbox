@@ -32,7 +32,8 @@ static int fontwidth, fontheight;
 #define STATS_STOP BUTTON_STOP
 
 #elif (CONFIG_KEYPAD == RECORDER_PAD) \
-   || (CONFIG_KEYPAD == ONDIO_PAD)
+   || (CONFIG_KEYPAD == ONDIO_PAD) \
+   || (CONFIG_KEYPAD == ARCHOS_AV300_PAD)
 #define STATS_STOP BUTTON_OFF
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) \

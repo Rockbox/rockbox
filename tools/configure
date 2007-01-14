@@ -560,7 +560,7 @@ cat <<EOF
   3) Recorder v2       13) iFP-790            23) 3G
   4) Ondio SP          14) H10 20Gb           24) 4G Grayscale
   5) Ondio FM          15) H10 5/6Gb          25) Mini 1G
-                                              26) Mini 2G
+  6) AV300                                    26) Mini 2G
 
  ==iAudio==            ==Toshiba==            ==SanDisk==
  30) X5/X5V/X5L        40) Gigabeat F         50) Sansa e200
@@ -751,6 +751,30 @@ EOF
     t_cpu="sh"
     t_manufacturer="archos"
     t_model="ondio"
+    ;;
+
+   6|av300)
+    target_id=26
+    archos="av300"
+    target="-DARCHOS_AV300"
+    memory=16 # always
+    arm7tdmicc
+    tool="$rootdir/tools/scramble -mm=C"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 6"
+    output="cjbm.ajz"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins="yes"
+    codecs=""
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$toolset scramble descramble bmp2rb codepages"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="archos"
+    t_model="av300"
     ;;
 
   10|h120)

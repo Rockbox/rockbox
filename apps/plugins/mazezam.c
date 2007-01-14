@@ -38,6 +38,18 @@ static struct plugin_api* rb;
 #define MAZEZAM_QUIT                BUTTON_OFF
 #define MAZEZAM_QUIT_KEYNAME        "[OFF]"
 
+#elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
+#define MAZEZAM_UP                  BUTTON_UP
+#define MAZEZAM_DOWN                BUTTON_DOWN
+#define MAZEZAM_LEFT                BUTTON_LEFT
+#define MAZEZAM_RIGHT               BUTTON_RIGHT
+#define MAZEZAM_SELECT              BUTTON_SELECT
+
+#define MAZEZAM_RETRY               BUTTON_F1
+#define MAZEZAM_RETRY_KEYNAME       "[F1]"
+#define MAZEZAM_QUIT                BUTTON_OFF
+#define MAZEZAM_QUIT_KEYNAME        "[OFF]"
+
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define MAZEZAM_UP                  BUTTON_UP
 #define MAZEZAM_DOWN                BUTTON_DOWN

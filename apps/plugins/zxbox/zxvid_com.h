@@ -13,6 +13,10 @@
 #if LCD_HEIGHT >= ZX_HEIGHT && LCD_WIDTH >= ZX_WIDTH
 #define WIDTH   LCD_WIDTH
 #define HEIGHT  LCD_HEIGHT
+#define X_OFF   0
+#define Y_OFF   0
+#define X_STEP  1
+#define Y_STEP  1
 #else
 #define WIDTH      320 /* 256 */
 #define HEIGHT     200 /* 192 */
