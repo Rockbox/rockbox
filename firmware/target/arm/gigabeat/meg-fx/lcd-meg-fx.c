@@ -8,7 +8,11 @@
 #include <stdlib.h>
 #include "memory.h"
 #include "lcd-target.h"
+#include "font.h"
+#include "rbunicode.h"
+#include "bidi.h"
 
+#define LCDADDR(x, y) (&lcd_framebuffer[(y)][(x)])
 /*
 ** We prepare foreground and background fills ahead of time - DMA fills in 16 byte groups
 */
@@ -234,6 +238,159 @@ void lcd_update(void)
 {
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
 }
+
+void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
+                                 int stride, int x, int y, int width,
+                                 int height)
+{
+    fb_data *dst, *dst_end;
+    unsigned int transcolor;
+
+    /* nothing to draw? */
+    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
+        || (x + width <= 0) || (y + height <= 0))
+        return;
+
+    /* clipping */
+    if (x < 0)
+    {
+        width += x;
+        src_x -= x;
+        x = 0;
+    }
+    if (y < 0)
+    {
+        height += y;
+        src_y -= y;
+        y = 0;
+    }
+    if (x + width > LCD_WIDTH)
+        width = LCD_WIDTH - x;
+    if (y + height > LCD_HEIGHT)
+        height = LCD_HEIGHT - y;
+
+    src += stride * src_y + src_x; /* move starting point */
+    dst = &lcd_framebuffer[(y)][(x)];
+    dst_end = dst + height * LCD_WIDTH;
+    width *= 2;
+    stride *= 2;
+    transcolor = TRANSPARENT_COLOR;
+    asm volatile(
+    "rowstart:  \n"
+        "mov    r0, #0  \n"
+    "nextpixel:  \n"
+        "ldrh   r1, [%0, r0]   \n"  /* Load word src+r0 */
+        "cmp    r1, %5 \n"             /* Compare to transparent color */
+        "strneh r1, [%1, r0]   \n"  /* Store dst+r0 if not transparent */
+        "add    r0, r0, #2  \n"
+        "cmp    r0, %2 \n"             /* r0 == width? */         
+        "bne    nextpixel \n"        /* More in this row? */
+        "add    %0, %0, %4  \n"     /* src += stride */
+        "add    %1, %1, #480 \n"    /* dst += LCD_WIDTH (x2) */
+        "cmp    %1, %3 \n"             
+        "bne    rowstart \n"        /* if(dst != dst_end), keep going */
+        : : "r" (src), "r" (dst), "r" (width), "r" (dst_end), "r" (stride), "r" (transcolor) : "r0", "r1" );
+}
+
+void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
+                          int stride, int x, int y, int width, int height)
+                          ICODE_ATTR;
+void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
+                          int stride, int x, int y, int width, int height)
+{
+    const unsigned char *src_end;
+    fb_data *dst, *dst_end;
+
+    /* nothing to draw? */
+    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
+        || (x + width <= 0) || (y + height <= 0))
+        return;
+
+    /* clipping */
+    if (x < 0)
+    {
+        width += x;
+        src_x -= x;
+        x = 0;
+    }
+    if (y < 0)
+    {
+        height += y;
+        src_y -= y;
+        y = 0;
+    }
+    if (x + width > LCD_WIDTH)
+        width = LCD_WIDTH - x;
+    if (y + height > LCD_HEIGHT)
+        height = LCD_HEIGHT - y;
+
+    src += stride * (src_y >> 3) + src_x; /* move starting point */
+    src_y  &= 7;
+    src_end = src + width;
+
+    dst = LCDADDR(x, y);
+    int drawmode = lcd_get_drawmode();
+    if(drawmode == DRMODE_SOLID) {
+        do
+        {
+            const unsigned char *src_col = src++;
+            unsigned data = *src_col >> src_y;
+            fb_data *dst_col = dst++;
+            int numbits = 8 - src_y;
+            
+            dst_end = dst_col + height * LCD_WIDTH;
+            asm volatile(
+            "transrowstart: \n"
+                "tst         %0, #1        \n"     /* Test data bit 1 */
+                "strneh     %6, [%1]     \n"        /* If it is set, set pixel */
+                "add         %1, %1, #480 \n"    /* dst_col += LCD_WIDTH (x2) */
+                "sub        %7, %7, #1 \n"        /* numbits-- */
+                "cmp        %7, #0 \n"
+                "movne        %0, %0, LSR #1    \n"    /* Shift data */
+                "bne         transrowstart \n"    /* if(numbits != 0) goto transrowstart */                
+                "add        %5, %5, %4    \n"        /* src_col += stride */
+                "ldrb        %0, [%5]    \n"      /* data = *srccol */
+                "mov        %7, #8 \n"          /* numbits = 8; */
+                "cmp         %1, %3     \n"            /* if(dst_col < dst_end */
+                "blt        transrowstart \n"    /* Keep going */
+                : : "r" (data), "r" (dst_col), "r" (numbits), "r" (dst_end), "r" (stride), "r" (src_col), "r" (fg_pattern), "r" (numbits) );
+        }
+        while (src < src_end);
+    } 
+    else {                              
+        lcd_fastpixelfunc_type *fgfunc = lcd_fastpixelfuncs[drawmode];;
+        lcd_fastpixelfunc_type *bgfunc = lcd_fastpixelfuncs[drawmode ^ DRMODE_INVERSEVID];;
+        do
+        {
+            const unsigned char *src_col = src++;
+            unsigned data = *src_col >> src_y;
+            fb_data *dst_col = dst++;
+            int numbits = 8 - src_y;
+
+            dst_end = dst_col + height * LCD_WIDTH;
+            do
+            {
+                if (data & 0x01)
+                    fgfunc(dst_col);
+                else
+                    bgfunc(dst_col);
+
+                dst_col += LCD_WIDTH;
+
+                data >>= 1;
+                if (--numbits == 0)
+                {
+                    src_col += stride;
+                    data = *src_col;
+                    numbits = 8;
+                }
+            }
+            while (dst_col < dst_end);
+        }
+        while (src < src_end);
+    }
+}
+
 
 #define CSUB_X 2
 #define CSUB_Y 2

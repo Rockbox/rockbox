@@ -545,6 +545,10 @@ void lcd_fillrect(int x, int y, int width, int height)
  * pixel packing doesn't really matter on a 8bit+ target. */
 
 /* Draw a partial monochrome bitmap */
+
+#if !defined(TOSHIBA_GIGABEAT_F) || defined(SIMULATOR)
+static int fh = -1;
+static int callcount = 0;
 void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
                           int stride, int x, int y, int width, int height)
                           ICODE_ATTR;
@@ -616,7 +620,7 @@ void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
     }
     while (src < src_end);
 }
-
+#endif
 /* Draw a full monochrome bitmap */
 void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width, int height)
 {
@@ -674,6 +678,7 @@ void lcd_bitmap(const fb_data *src, int x, int y, int width, int height)
     lcd_bitmap_part(src, 0, 0, width, x, y, width, height);
 }
 
+#if !defined(TOSHIBA_GIGABEAT_F) || defined(SIMULATOR)
 /* Draw a partial native bitmap */
 void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
                                  int stride, int x, int y, int width,
@@ -724,6 +729,7 @@ void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
     }
     while (dst < dst_end);
 }
+#endif /* !defined(TOSHIBA_GIGABEAT_F) || defined(SIMULATOR) */
 
 /* Draw a full native bitmap with a transparent color */
 void lcd_bitmap_transparent(const fb_data *src, int x, int y,
