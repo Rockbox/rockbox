@@ -120,17 +120,17 @@ static struct plugin_api* rb; /* global api struct pointer */
 #define AST_FIRE_REP BUTTON_SELECT | BUTTON_REPEAT
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD)
-#define AST_PAUSE BUTTON_SELECT
+#define AST_PAUSE BUTTON_REC
 #define AST_QUIT BUTTON_POWER
-#define AST_THRUST_REP BUTTON_UP | BUTTON_RIGHT
+#define AST_THRUST_REP (BUTTON_UP | BUTTON_REPEAT)
 #define AST_THRUST BUTTON_UP
 #define AST_HYPERSPACE BUTTON_DOWN
 #define AST_LEFT BUTTON_LEFT 
-#define AST_LEFT_REP BUTTON_LEFT | BUTTON_RIGHT
+#define AST_LEFT_REP (BUTTON_LEFT | BUTTON_REPEAT)
 #define AST_RIGHT BUTTON_RIGHT
-#define AST_RIGHT_REP (BUTTON_RIGHT | BUTTON_RIGHT)
+#define AST_RIGHT_REP (BUTTON_RIGHT | BUTTON_REPEAT)
 #define AST_FIRE BUTTON_SELECT
-#define AST_FIRE_REP BUTTON_SELECT | BUTTON_RIGHT
+#define AST_FIRE_REP (BUTTON_SELECT | BUTTON_REPEAT)
 
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
 #define AST_PAUSE BUTTON_PLAY
@@ -161,7 +161,8 @@ static struct plugin_api* rb; /* global api struct pointer */
       (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == GIGABEAT_PAD)|| \
       (CONFIG_KEYPAD == ARCHOS_AV300_PAD)|| \
-      (CONFIG_KEYPAD == IRIVER_H10_PAD)
+      (CONFIG_KEYPAD == IRIVER_H10_PAD)|| \
+      (CONFIG_KEYPAD == SANSA_E200_PAD)
   #define ENEMY_MISSILE_SURVIVAL_LENGTH 140
   #define MISSILE_SURVIVAL_LENGTH 40
   #define ASTEROID_SPEED 15
@@ -595,7 +596,7 @@ void create_trail_blaze(int colour, struct Point* position)
     yadd = ship.position.y;
   }
 
-  //give the point a random countdown timer, so they dissapears at different times
+  /* give the point a random countdown timer, so they dissapears at different times */
   tpoint = trailPoints;
   n = NUM_TRAIL_POINTS;
   while(--n)
@@ -603,9 +604,9 @@ void create_trail_blaze(int colour, struct Point* position)
     if(tpoint->alive <= 0 && numtoadd)
     {
       numtoadd--;
-      //take a random x point anywhere between
-      //bottom two points of ship.
-      tpoint->position.x = (ship.vertices[2].x + (rb->rand()%18000)-9000) + position->x; //ship.position.x;
+      /* take a random x point anywhere between bottom two points of ship. */
+      /* ship.position.x; */
+      tpoint->position.x = (ship.vertices[2].x + (rb->rand()%18000)-9000) + position->x;
       tpoint->position.y = (ship.vertices[2].y + (rb->rand()%18000)-9000) + position->y;
 
       switch(colour)
@@ -643,9 +644,9 @@ void create_trail_blaze(int colour, struct Point* position)
          tpoint->dec = 4;
         break;
       }
-      //add a proportional bit to the x and y based on dx and dy
+      /* add a proportional bit to the x and y based on dx and dy */
   
-      //give the points a speed based on direction of travel - i.e. opposite
+      /* give the points a speed based on direction of travel - i.e. opposite */
       tpoint->position.dx += position->dx;
       tpoint->position.dy += position->dy;
 
@@ -653,17 +654,17 @@ void create_trail_blaze(int colour, struct Point* position)
     }
     tpoint++;
   }
-  //find a space in the array of trail_points that is NULL or DEAD or whatever.
-  //and place this one here.
+  /* find a space in the array of trail_points that is NULL or DEAD or whatever.
+     and place this one here. */
   
 }
 
 void draw_trail_blaze(void)
 {
   struct TrailPoint* tpoint;
-  //loop through, if alive then move and draw.
-  //when drawn, countdown it's timer.
-  //if zero kill it!
+  /* loop through, if alive then move and draw.
+     when drawn, countdown it's timer.
+     if zero kill it! */
   tpoint = trailPoints;
   int n = NUM_TRAIL_POINTS;
 
@@ -677,7 +678,7 @@ void draw_trail_blaze(void)
         move_point(&(tpoint->position));
       }
       #ifdef HAVE_LCD_COLOR
-      //intensity = tpoint->alive/2;
+      /* intensity = tpoint->alive/2; */
       if(tpoint->r>0)tpoint->r-=tpoint->dec;
       if(tpoint->g>0)tpoint->g-=tpoint->dec;
       if(tpoint->b>0)tpoint->b-=tpoint->dec;
@@ -875,8 +876,8 @@ void draw_and_move_enemy(void)
         else
         {
             
-            //animate_and_draw_explosion(enemy.vertices, NUM_ENEMY_VERTICES,
-            //                           enemy_x, enemy.position.y/SCALE);
+            /* animate_and_draw_explosion(enemy.vertices, NUM_ENEMY_VERTICES,
+                                         enemy_x, enemy.position.y/SCALE); */
             if(game_state != PAUSE_MODE)
             {
                 enemy.explode_countdown--;
@@ -1002,7 +1003,7 @@ bool is_point_within_enemy(struct Point* point)
         current_score += 5;
         /*enemy_missile.survived = 0;*/
         enemy.explode_countdown = EXPLOSION_LENGTH;
-       // initialise_explosion(enemy.vertices, NUM_ENEMY_VERTICES);
+        /* initialise_explosion(enemy.vertices, NUM_ENEMY_VERTICES); */
         create_trail_blaze(ENEMY_EXPLOSION_COLOUR, &enemy.position);
         return true;
     }
@@ -1092,7 +1093,7 @@ void check_collisions(void)
                 {
                     /*blow up ship*/
                     ship.explode_countdown = EXPLOSION_LENGTH;
-                   // initialise_explosion(ship.vertices, NUM_SHIP_VERTICES);
+                    /* initialise_explosion(ship.vertices, NUM_SHIP_VERTICES); */
                     create_trail_blaze(SHIP_EXPLOSION_COLOUR, &ship.position);
                 }
                 
@@ -1130,7 +1131,7 @@ void check_collisions(void)
         if(is_point_within_enemy(&ship.position))
         {
             ship.explode_countdown = EXPLOSION_LENGTH;
-            //initialise_explosion(ship.vertices, NUM_SHIP_VERTICES);
+            /* initialise_explosion(ship.vertices, NUM_SHIP_VERTICES); */
             create_trail_blaze(SHIP_EXPLOSION_COLOUR, &ship.position);
             create_trail_blaze(ENEMY_EXPLOSION_COLOUR, &enemy.position);
         }
@@ -1157,7 +1158,7 @@ void check_collisions(void)
                      enemy_missile.position.y - ship.position.y))
     {
         ship.explode_countdown = EXPLOSION_LENGTH;
-       //initialise_explosion(ship.vertices, NUM_SHIP_VERTICES);
+        /* initialise_explosion(ship.vertices, NUM_SHIP_VERTICES); */
         create_trail_blaze(SHIP_EXPLOSION_COLOUR, &ship.position);
         enemy_missile.survived = 0;
         enemy_missile.position.x = enemy_missile.position.y = 0;
@@ -1304,7 +1305,11 @@ void draw_lives(void)
 {
     int n;
     int px = (LCD_WIDTH - num_lives*4 - 1);
+    #if(LARGE_LCD)
+    int py = (LCD_HEIGHT-6);
+    #else
     int py = (LCD_HEIGHT-4);
+    #endif
     
     SET_FG(COL_PLAYER);
 
@@ -1312,7 +1317,11 @@ void draw_lives(void)
     while(--n)
     {
         draw_polygon(lives_points, px, py, NUM_SHIP_VERTICES);
+        #if(LARGE_LCD)
+        px += 8;
+        #else
         px += 6;
+        #endif
     }
 }
 
@@ -1402,9 +1411,9 @@ void initialise_asteroid(struct Asteroid* asteroid, enum asteroid_type type)
     
     asteroid->radius += 6*SCALE;
     if(asteroid->type == SMALL)
-        asteroid->radius /= 3;//2
+        asteroid->radius /= 3;/*2*/
     else if(asteroid->type == LARGE)
-        asteroid->radius += 3*SCALE;//2
+        asteroid->radius += 3*SCALE;/*2*/
     b = true;
     while(b)
     {
@@ -1520,9 +1529,9 @@ void draw_and_move_ship(void)
     }
     else
     {
-       // animate_and_draw_explosion(ship.vertices, NUM_SHIP_VERTICES,
-         //                          ship.position.x/SCALE,
-           //                        ship.position.y/SCALE);
+       /* animate_and_draw_explosion(ship.vertices, NUM_SHIP_VERTICES,
+                                     ship.position.x/SCALE,
+                                     ship.position.y/SCALE); */
         if(game_state != PAUSE_MODE)
         {
             ship.explode_countdown--;
@@ -1550,8 +1559,9 @@ void thrust_ship(void)
     {
         ship.position.dx += ( ship.vertices[0].x - ship.vertices[2].x )/20;
         ship.position.dy += ( ship.vertices[0].y - ship.vertices[2].y )/20;
-        /*if dx and dy are below a certain threshold, then set 'em to 0*/
-        //but to do this we need to ascertain if the spacehip as moved on screen for more than a certain amount.
+        /*if dx and dy are below a certain threshold, then set 'em to 0
+          but to do this we need to ascertain if the spacehip as moved on screen
+          for more than a certain amount. */
 
 	create_trail_blaze(THRUST_COLOUR, &ship.position);
     }
@@ -1620,10 +1630,10 @@ void draw_and_move_asteroids(void)
             }
             else if(asteroid->explode_countdown)
             {
-               // animate_and_draw_explosion(asteroid->vertices,
-               //                            NUM_ASTEROID_VERTICES,
-                //                           asteroid->position.x/SCALE,
-                  //                         asteroid->position.y/SCALE);
+               /* animate_and_draw_explosion(asteroid->vertices,
+                                             NUM_ASTEROID_VERTICES,
+                                             asteroid->position.x/SCALE,
+                                             asteroid->position.y/SCALE); */
               asteroid->explode_countdown--;
             }
         }
@@ -1655,7 +1665,8 @@ void create_stars(void)
     }
 
 
-  //give the point a random countdown timer, so they dissapears at different times
+  /* give the point a random countdown timer, so they dissapears at different 
+     times */
   tpoint = trailPoints;
   n = NUM_TRAIL_POINTS;
   while(--n)

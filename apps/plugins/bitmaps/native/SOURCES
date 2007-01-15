@@ -66,6 +66,8 @@ jewels.160x128x16.bmp
 jewels.160x128x16.bmp
 #elif (LCD_WIDTH == 220) && (LCD_HEIGHT == 176)
 jewels.220x176x16.bmp
+#elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 220)
+jewels.220x176x16.bmp
 #elif (LCD_WIDTH == 240) && (LCD_HEIGHT == 320)
 jewels.320x240x16.bmp
 #elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
@@ -254,7 +256,11 @@ sudoku_normal.320x240x16.bmp
 sudoku_inverse.320x240x16.bmp
 #endif
 #else
-#if (LCD_WIDTH >= 240) && (LCD_HEIGHT >= 320) && (LCD_DEPTH == 16)
+#if ((LCD_WIDTH == 176) && (LCD_HEIGHT == 220) && (LCD_DEPTH == 16))
+sudoku_start.220x176x16.bmp
+sudoku_normal.220x176x16.bmp
+sudoku_inverse.220x176x16.bmp
+#elif (LCD_WIDTH >= 240) && (LCD_HEIGHT >= 320) && (LCD_DEPTH == 16)
 sudoku_start.320x240x16.bmp
 sudoku_normal.320x240x16.bmp
 sudoku_inverse.320x240x16.bmp

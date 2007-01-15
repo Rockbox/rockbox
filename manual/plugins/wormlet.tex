@@ -66,16 +66,16 @@ Game controls:}
 \renewcommand{\arraystretch}{1.0}
 }
 
-\opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD}{
+\opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD,SANSA_E200_PAD}{
 \begin{table}
     \begin{btnmap}{}{}
-    \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}
+    \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD}
         {\ButtonLeft} & Turn left\\
-    \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}
+    \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD}
         {\ButtonRight} & Turn right\\
-    \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonUp}
+    \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD}{\ButtonUp}
         \opt{IPOD_4G_PAD}{\ButtonMenu} & Turn Up\\
-    \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonLeft}
+    \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD}{\ButtonLeft}
         \opt{IPOD_4G_PAD}{\ButtonPlay} & Turn Down\\
     \end{btnmap}
 \end{table}
@@ -115,11 +115,13 @@ The game is over when all worms are dead. The longest worm wins the
 game. 
 \item [Pause the game.]
 Press
-\opt{RECORDER_PAD}{\ButtonPlay}\opt{ONDIO_PAD}{\ButtonMenu}
-\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD}{\ButtonSelect}
+\opt{RECORDER_PAD,IAUDIO_X5_PAD}{\ButtonPlay}
+\opt{ONDIO_PAD}{\ButtonMenu}
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,SANSA_E200_PAD}{\ButtonSelect}
 to pause the game. Press
-\opt{RECORDER_PAD}{\ButtonPlay}\opt{ONDIO_PAD}{\ButtonMenu}
-\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD}{\ButtonSelect}
+\opt{RECORDER_PAD,IAUDIO_X5_PAD}{\ButtonPlay}
+\opt{ONDIO_PAD}{\ButtonMenu}
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,SANSA_E200_PAD}{\ButtonSelect}
 again to resume the game.
 
 \item[Stop the game.]
@@ -128,20 +130,24 @@ There are two ways to stop a running game.
 \begin{itemize}
 \item If you want to quit Wormlet entirely simply hit
 \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
-\opt{IPOD_4G_PAD}{\ButtonMenu+\ButtonSelect}.
+\opt{IPOD_4G_PAD}{\ButtonMenu+\ButtonSelect}
+\opt{IAUDIO_X5_PAD,SANSA_E200_PAD}{\ButtonPower}.
 The game will stop immediately and you will return to the game menu. 
 \item If you want to stop the game and still see the screen hit 
 \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
 \opt{ONDIO_PAD}{\ButtonOff+\ButtonMenu}
-\opt{IPOD_4G_PAD}{\ButtonSelect+ButtonPlay}.
+\opt{IPOD_4G_PAD}{\ButtonSelect+ButtonPlay}
+\opt{IAUDIO_X5_PAD,SANSA_E200_PAD}{\ButtonRec}.
 This freezes the game. If you hit
 \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
 \opt{ONDIO_PAD}{\ButtonOff+\ButtonMenu}
-\opt{IPOD_4G_PAD}{\ButtonSelect+ButtonPlay}.
+\opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonPlay}
+\opt{IAUDIO_X5_PAD,SANSA_E200_PAD}{\ButtonRec}
 button again a new game starts with the same configuration. To return to the
 games menu you can hit
 \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
-\opt{IPOD_4G_PAD}{\ButtonMenu+\ButtonSelect}. A stopped game can not be resumed. 
+\opt{IPOD_4G_PAD}{\ButtonMenu+\ButtonSelect}
+\opt{IAUDIO_X5_PAD,SANSA_E200_PAD}{\ButtonPower}. A stopped game can not be resumed. 
 \end{itemize}
 \end{description}
 

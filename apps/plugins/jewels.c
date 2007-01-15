@@ -123,7 +123,8 @@ PLUGIN_HEADER
 #define NUM_SCORES 10
 
 /* use 22x22 tiles (H300, iPod Color) */
-#elif ((LCD_HEIGHT == 176) && (LCD_WIDTH == 220))
+#elif ((LCD_HEIGHT == 176) && (LCD_WIDTH == 220)) || \
+      ((LCD_HEIGHT == 220) && (LCD_WIDTH == 176))
 #define TILE_WIDTH  22
 #define TILE_HEIGHT 22
 #define YOFS 0
@@ -1306,6 +1307,29 @@ static int jewels_main(struct game_context* bj) {
                 rb->lcd_puts(0, 9, "SELECT to select");
                 rb->lcd_puts(0, 10, "Long SELECT to show menu");
                 rb->lcd_puts(0, 11, "A to cancel");
+#elif CONFIG_KEYPAD == SANSA_E200_PAD
+                rb->lcd_puts(0, 2, "Swap pairs of jewels to");
+                rb->lcd_puts(0, 3, "form connected segments");
+                rb->lcd_puts(0, 4, "of three or more of the");
+                rb->lcd_puts(0, 5, "same type.");
+                rb->lcd_puts(0, 7, "Controls:");
+                rb->lcd_puts(0, 8, "Directions to move");
+                rb->lcd_puts(0, 9, "SELECT to select");
+                rb->lcd_puts(0, 10, "Long SELECT to show menu");
+                rb->lcd_puts(0, 11, "POWER to cancel");
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+                rb->lcd_puts(0, 2, "Swap pairs of jewels");
+                rb->lcd_puts(0, 3, "to form connected");
+                rb->lcd_puts(0, 4, "segments of three or ");
+                rb->lcd_puts(0, 5, "more of the");
+                rb->lcd_puts(0, 6, "same type.");
+                rb->lcd_puts(0, 8, "Controls:");
+                rb->lcd_puts(0, 9, "Directions or scroll to move");
+                rb->lcd_puts(0, 10, "PLAY to select");
+                rb->lcd_puts(0, 11, "Long PLAY for menu");
+                rb->lcd_puts(0, 12, "POWER to cancel");
+#else
+    #warning: missing help text.
 #endif
                 rb->lcd_update();
                 while(true) {

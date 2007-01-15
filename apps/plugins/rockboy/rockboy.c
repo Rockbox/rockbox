@@ -129,6 +129,13 @@ void setoptions (void)
       options.START=BUTTON_POWER;
       options.SELECT=BUTTON_SELECT;
       options.MENU=BUTTON_MENU;
+      
+#elif CONFIG_KEYPAD == SANSA_E200_PAD
+      options.A=BUTTON_SELECT;
+      options.B=BUTTON_REC;
+      options.START=BUTTON_SCROLL_UP;
+      options.SELECT=BUTTON_SCROLL_DOWN;
+      options.MENU=BUTTON_POWER;
 #endif
 
       options.maxskip=4;

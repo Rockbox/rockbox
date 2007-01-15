@@ -55,9 +55,7 @@ brickmania.c
 calculator.c
 chip8.c
 demystify.c
-#ifndef SANSA_E200
 jewels.c
-#endif
 minesweeper.c
 oscilloscope.c
 pong.c
@@ -72,7 +70,7 @@ starfield.c
 video.c
 #endif
 vu_meter.c
-#if !defined(IRIVER_H10_5GB) && !defined(SANSA_E200)
+#if !defined(IRIVER_H10_5GB)
 wormlet.c
 #endif
 
@@ -95,9 +93,7 @@ rockboy.c
 fireworks.c
 xobox.c
 #endif
-#if !defined(SANSA_E200)
 spacerocks.c
-#endif
 #if LCD_DEPTH >= 16
 rockpaint.c
 #endif
