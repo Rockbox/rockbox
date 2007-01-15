@@ -547,8 +547,6 @@ void lcd_fillrect(int x, int y, int width, int height)
 /* Draw a partial monochrome bitmap */
 
 #if !defined(TOSHIBA_GIGABEAT_F) || defined(SIMULATOR)
-static int fh = -1;
-static int callcount = 0;
 void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
                           int stride, int x, int y, int width, int height)
                           ICODE_ATTR;
