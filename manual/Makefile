@@ -4,7 +4,7 @@
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
-# $Id:$
+# $Id$
 #
 
 .PHONY: all buildmanual clean
@@ -14,8 +14,8 @@ all: manual-pdf
 manual-prep: rockbox.tex
 	@if [ "$(OBJDIR)" = "" ]; then echo Run make in you build directory!; false; fi
 	@mkdir -p $(OBJDIR)
-	@find * -type d \! -regex '.*\.svn.*' | xargs -i mkdir -p $(OBJDIR)/{}
-	@find * -type f \! -regex '.*\.svn.*' | xargs -i cp {} $(OBJDIR)/{}
+	@find * -type d \! -regex '.*\.svn.*' | xargs -I {} mkdir -p $(OBJDIR)/{}
+	@find * -type f \! -regex '.*\.svn.*' | xargs -I {} cp {} $(OBJDIR)/{}
 	@perl credits.pl < ../docs/CREDITS | iconv -f utf-8 -t iso-8859-1 > $(OBJDIR)/CREDITS.tex
 	@echo "\newcommand{\platform}{${MANUALDEV}}" > $(OBJDIR)/rockbox-build.tex
 	@echo "\newcommand{\buildversion}{$(VERSION)}" >> $(OBJDIR)/rockbox-build.tex
