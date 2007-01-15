@@ -33,8 +33,8 @@ void irq(void)
     /* Timer 4 */
     if ((intpending & TIMER4_MASK) != 0)
         timer4();
-	else if ((intpending & DMA0_MASK) != 0)
-		dma0();
+    else if ((intpending & DMA0_MASK) != 0)
+        dma0();
     else
     {
         /* unexpected interrupt */
@@ -43,7 +43,7 @@ void irq(void)
 
 void system_reboot(void)
 {
-	WTCON = 0;
+    WTCON = 0;
     WTCNT = WTDAT = 1 ;
     WTCON = 0x21;
     for(;;)
@@ -60,6 +60,12 @@ void system_init(void)
     /* Turn off AC97 and Camera */
     CLKCON &= ~( (1<<19) | (1<<20) );
 
+    /* Turn off USB host */
+    CLKCON &= ~(1 << 6);
+
+    /* Turn off NAND flash controller */
+    CLKCON &= ~(1 << 4);
+    
 }
 
 
