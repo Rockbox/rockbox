@@ -12,7 +12,8 @@ if(!-f "apps/version.h") {
     exit;
 }
 
-@files=`find . -name FILES`;
+# -L allows find to follow symbolic links
+@files=`find -L . -name FILES`;
 
 my @entries;
 
