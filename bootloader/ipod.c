@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 #include "cpu.h"
 #include "system.h"
 #include "lcd.h"
@@ -156,6 +157,31 @@ int opto_keypad_read(void)
 }
 #endif
 
+char printfbuf[256];
+
+void reset_screen(void)
+{
+    lcd_clear_display();
+    line = 0;
+}
+
+void printf(const char *format, ...)
+{
+    int len;
+    unsigned char *ptr;
+    va_list ap;
+    va_start(ap, format);
+
+    ptr = printfbuf;
+    len = vsnprintf(ptr, sizeof(printfbuf), format, ap);
+    va_end(ap);
+
+    lcd_puts(0, line++, ptr);
+    lcd_update();
+    if(line >= 30)
+        line = 0;
+}
+
 static int key_pressed(void)
 {
     unsigned char state;
@@ -200,7 +226,6 @@ int load_rockbox(unsigned char* buf, char* firmware)
     char model[5];
     unsigned long sum;
     int i;
-    char str[80];
     char filename[MAX_PATH];
 
     snprintf(filename,sizeof(filename),"/.rockbox/%s",firmware);
@@ -231,13 +256,9 @@ int load_rockbox(unsigned char* buf, char* firmware)
 
     model[4] = 0;
     
-    snprintf(str, 80, "Model: %s", model);
-    lcd_puts(0, line++, str);
-    snprintf(str, 80, "Checksum: %x", chksum);
-    lcd_puts(0, line++, str);
-    snprintf(str, 80, "Loading %s", firmware);
-    lcd_puts(0, line++, str);
-    lcd_update();
+    printf("Model: %s", model);
+    printf("Checksum: %x", chksum);
+    printf("Loading %s", firmware);
 
     lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
 
@@ -253,12 +274,10 @@ int load_rockbox(unsigned char* buf, char* firmware)
         sum += buf[i];
     }
 
-    snprintf(str, 80, "Sum: %x", sum);
-    lcd_puts(0, line++, str);
-    lcd_update();
+    printf("Sum: %x", sum);
 
     if(sum != chksum)
-    return -5;
+        return -5;
 
     return len;
 }
@@ -268,7 +287,6 @@ int load_linux(unsigned char* buf) {
     int fd;
     int rc;
     int len;
-    char str[80];
 
     fd=open("/linux.bin",O_RDONLY);
     if (fd < 0)
@@ -283,9 +301,7 @@ int load_linux(unsigned char* buf) {
     if (rc < len)
         return -4;
 
-    snprintf(str, 80, "Loaded Linux: %d bytes", len);
-    lcd_puts(0, line++, str);
-    lcd_update();
+    printf("Loaded Linux: %d bytes", len);
 
     return len;
 }
@@ -300,14 +316,13 @@ void fatal_error(void)
 
     /* System font is 6 pixels wide */
 #if LCD_WIDTH >= (30*6)
-    lcd_puts(0, line++, "Press MENU+SELECT to reboot");
-    lcd_puts(0, line++, "then SELECT+PLAY for disk mode");
+    printf("Press MENU+SELECT to reboot");
+    printf("then SELECT+PLAY for disk mode");
 #else
-    lcd_puts(0, line++, "Press MENU+SELECT to");
-    lcd_puts(0, line++, "reboot then SELECT+PLAY");
-    lcd_puts(0, line++, "for disk mode");
+    printf("Press MENU+SELECT to");
+    printf("reboot then SELECT+PLAY");
+    printf("for disk mode");
 #endif
-    lcd_update();
 
     while (1) {
         if (button_hold() != holdstatus) {
@@ -389,12 +404,9 @@ void* main(void)
 
     lcd_setfont(FONT_SYSFIXED);
 
-    lcd_puts(0, line++, "Rockbox boot loader");
-    snprintf(buf, sizeof(buf), "Version: 20%s", version);
-    lcd_puts(0, line++, buf);
-    snprintf(buf, sizeof(buf), "IPOD version: 0x%08x", IPOD_HW_REVISION);
-    lcd_puts(0, line++, buf);
-    lcd_update();
+    printf("Rockbox boot loader");
+    printf("Version: 20%s", version);
+    printf("IPOD version: 0x%08x", IPOD_HW_REVISION);
 
     i=ata_init();
     if (i==0) {
@@ -407,27 +419,22 @@ void* main(void)
       for (i=39; i && buf[i]==' '; i--) {
         buf[i]=0;
       }
-      lcd_puts(0, line++, buf);
-      lcd_update();
+      printf(buf);
     } else {
-      snprintf(buf, sizeof(buf), "ATA: %d", i);
-      lcd_puts(0, line++, buf);
-      lcd_update();
+      printf("ATA: %d", i);
     }
 
     disk_init();
     rc = disk_mount_all();
     if (rc<=0)
     {
-        lcd_puts(0, line++, "No partition found");
+        printf("No partition found");
         fatal_error();
     }
 
     pinfo = disk_partinfo(1);
-    snprintf(buf, sizeof(buf), "Partition 1: 0x%02x %ld MB", 
-                  pinfo->type, pinfo->size / 2048);
-    lcd_puts(0, line++, buf);
-    lcd_update();
+    printf("Partition 1: 0x%02x %ld MB", 
+           pinfo->type, pinfo->size / 2048);
 
     /* See if there is an Apple firmware image in RAM */
     haveretailos = (memcmp((void*)(DRAM_START+0x20),"portalplayer",12)==0);
@@ -438,29 +445,22 @@ void* main(void)
         i=key_pressed();
 
         if ((i!=BUTTON_MENU) && (i!=BUTTON_PLAY)) {
-            lcd_puts(0, line, "Loading Rockbox...");
-            lcd_update();
+            printf("Loading Rockbox...");
             rc=load_rockbox(loadbuffer, BOOTFILE);
             if (rc < 0) {
-                snprintf(buf, sizeof(buf), "Rockbox error: %d",rc);
-                lcd_puts(0, line++, buf);
-                lcd_update();
+                printf("Rockbox error: %d",rc);
             } else {
-                lcd_puts(0, line++, "Rockbox loaded.");
-                lcd_update();
+                printf("Rockbox loaded.");
                 memcpy((void*)DRAM_START,loadbuffer,rc);
                 return (void*)DRAM_START;
             }
         }
 
         if (i==BUTTON_PLAY) {
-            lcd_puts(0, line, "Loading Linux...");
-            lcd_update();
+            printf("Loading Linux...");
             rc=load_linux(loadbuffer);
             if (rc < 0) {
-                snprintf(buf, sizeof(buf), "Linux error: %d",rc);
-                lcd_puts(0, line++, buf);
-                lcd_update();
+                printf("Linux error: %d",rc);
             } else {
                 memcpy((void*)DRAM_START,loadbuffer,rc);
                 return (void*)DRAM_START;
@@ -472,8 +472,7 @@ void* main(void)
     /* If either the hold switch was on, or loading Rockbox/IPL
        failed, then try the Apple firmware */
 
-    lcd_puts(0, line, "Loading original firmware...");
-    lcd_update();
+    printf("Loading original firmware...");
 
     /* First try an apple_os.ipod file on the FAT32 partition
        (either in .rockbox or the root) 
@@ -483,12 +482,9 @@ void* main(void)
 
     /* Only report errors if the file was found */
     if (rc < -1) {
-        snprintf(buf, sizeof(buf), "apple_os.ipod error: %d",rc);
-        lcd_puts(0, line++, buf);
-        lcd_update();
+        printf("apple_os.ipod error: %d",rc);
     } else if (rc > 0) {
-        lcd_puts(0, line++, "apple_os.ipod loaded.");
-        lcd_update();
+        printf("apple_os.ipod loaded.");
         memcpy((void*)DRAM_START,loadbuffer,rc);
         return (void*)DRAM_START;
     }
@@ -499,7 +495,7 @@ void* main(void)
     }
 
     /* Everything failed - just loop forever */
-    lcd_puts(0, line++, "No RetailOS detected");
+    printf("No RetailOS detected");
 
     fatal_error();
 
