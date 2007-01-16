@@ -82,9 +82,9 @@ void set_cpu_frequency(long frequency)
     }
     else
     {
-        /* FCLK: 200MHz, HCLK: 100MHz, PCLK: 50MHz */
-        /* MDIV: 62, PDIV: 1, SDIV: 2 */
-        /* HDIV: 1, PDIV: 1 */
+        /* FCLK: 100MHz, HCLK: 100MHz, PCLK: 50MHz */
+        /* MDIV: 62, PDIV: 1, SDIV: 3 */
+        /* HDIV: 0, PDIV: 1 */
 
         MPLLCON = (62 << 12) | (1 << 4) | 3;
         CLKDIVN = (0 << 1) | 1;
