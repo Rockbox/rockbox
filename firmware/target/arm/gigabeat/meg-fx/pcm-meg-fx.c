@@ -90,18 +90,17 @@ void pcm_init(void)
 
     audiohw_init();
     audiohw_enable_output(true);
-    audiohw_mute(true);
 
     /* cannot use the WM8975 defaults since our clock is not the same */
     /* the input master clock is 16.9344MHz - we can divide exact for that */
-    audiohw_set_sample_rate( (0<<6) | (0x11 << 1) | (0<<0));
+    pcm_set_frequency(SAMPR_44);
 
     /* init GPIO */
     GPCCON = (GPCCON & ~(3<<14)) | (1<<14);
     GPCDAT |= 1<<7;
     GPECON |= 0x2aa;
 
-    /* Do no service DMA0 requests, yet */
+    /* Do not service DMA requests, yet */
     /* clear any pending int and mask it */
     INTMSK |= (1<<19);      /* mask the interrupt */
     SRCPND = (1<<19);       /* clear any pending interrupts */
@@ -113,12 +112,13 @@ void pcm_init(void)
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
+    static short value;
+    
     /* sanity check: bad pointer or too small file */
-    if ((NULL == addr) || (size & ~1) <= IIS_FIFO_SIZE) return;
+    if (NULL == addr || size <= IIS_FIFO_SIZE) return;
 
     p = (unsigned short *)addr;
     p_size = size;
-
 
     /* Enable the IIS clock */
     CLKCON |= (1<<17);
@@ -177,23 +177,23 @@ void pcm_play_dma_start(const void *addr, size_t size)
 /* Disconnect the DMA and wait for the FIFO to clear */
 void pcm_play_dma_stop(void)
 {
-    pcm_playing = false;
-
     /* mask the DMA interrupt */
     INTMSK |= (1<<19);
 
-    /* De-Activate the channel */
+    /* are we playing? wait for the chunk to finish */
+    if (pcm_playing)
+    {
+        /* wait for the FIFO to empty before turning things off */
+        while (IISCON & (1<<7))  ;
+
+        pcm_playing = false;
+    }
+
+    /* De-Activate the DMA channel */
     DMASKTRIG2 = 0x4;
 
-    /* idle the IIS transmit */
-    IISCON |= (1<<3);
-
-    /* stop the IIS interface */
-    IISCON &= ~(1<<0);
-
-    /* Disconnect the IIS IIS clock */
+    /* Disconnect the IIS clock */
     CLKCON &= ~(1<<17);
-
 
     disable_fiq();
 
@@ -203,16 +203,16 @@ void pcm_play_dma_stop(void)
 
 void pcm_play_pause_pause(void)
 {
-    /* idle */
-    IISCON |= (1<<3);
+    /* stop servicing refills */
+    INTMSK |= (1<<19);
 }
 
 
 
 void pcm_play_pause_unpause(void)
 {
-    /* no idle */
-    IISCON &= ~(1<<3);
+    /* refill buffer and keep going */
+    INTMSK &= ~(1<<19);
 }
 
 
