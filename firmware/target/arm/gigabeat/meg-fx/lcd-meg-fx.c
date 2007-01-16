@@ -155,7 +155,8 @@ void lcd_set_background(unsigned color)
 
 void lcd_device_prepare_backdrop(fb_data* backdrop)
 {
-    invalidate_dcache_range((void *)backdrop, (LCD_HEIGHT * sizeof(fb_data) * LCD_WIDTH));
+    if(backdrop)
+        invalidate_dcache_range((void *)backdrop, (LCD_HEIGHT * sizeof(fb_data) * LCD_WIDTH));
 }
 
 void lcd_clear_display_dma(void)
@@ -330,65 +331,53 @@ void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
 
     dst = LCDADDR(x, y);
     int drawmode = lcd_get_drawmode();
-    if(drawmode == DRMODE_SOLID) {
-        do
-        {
-            const unsigned char *src_col = src++;
-            unsigned data = *src_col >> src_y;
-            fb_data *dst_col = dst++;
-            int numbits = 8 - src_y;
-            
-            dst_end = dst_col + height * LCD_WIDTH;
-            asm volatile(
-            "transrowstart: \n"
-                "tst         %0, #1        \n"     /* Test data bit 1 */
-                "strneh     %6, [%1]     \n"        /* If it is set, set pixel */
-                "add         %1, %1, #480 \n"    /* dst_col += LCD_WIDTH (x2) */
-                "sub        %7, %7, #1 \n"        /* numbits-- */
-                "cmp        %7, #0 \n"
-                "movne        %0, %0, LSR #1    \n"    /* Shift data */
-                "bne         transrowstart \n"    /* if(numbits != 0) goto transrowstart */                
-                "add        %5, %5, %4    \n"        /* src_col += stride */
-                "ldrb        %0, [%5]    \n"      /* data = *srccol */
-                "mov        %7, #8 \n"          /* numbits = 8; */
-                "cmp         %1, %3     \n"            /* if(dst_col < dst_end */
-                "blt        transrowstart \n"    /* Keep going */
-                : : "r" (data), "r" (dst_col), "r" (numbits), "r" (dst_end), "r" (stride), "r" (src_col), "r" (fg_pattern), "r" (numbits) );
-        }
-        while (src < src_end);
-    } 
-    else {                              
-        lcd_fastpixelfunc_type *fgfunc = lcd_fastpixelfuncs[drawmode];;
-        lcd_fastpixelfunc_type *bgfunc = lcd_fastpixelfuncs[drawmode ^ DRMODE_INVERSEVID];;
-        do
-        {
-            const unsigned char *src_col = src++;
-            unsigned data = *src_col >> src_y;
-            fb_data *dst_col = dst++;
-            int numbits = 8 - src_y;
-
-            dst_end = dst_col + height * LCD_WIDTH;
-            do
-            {
-                if (data & 0x01)
-                    fgfunc(dst_col);
-                else
-                    bgfunc(dst_col);
-
-                dst_col += LCD_WIDTH;
-
-                data >>= 1;
-                if (--numbits == 0)
-                {
-                    src_col += stride;
-                    data = *src_col;
-                    numbits = 8;
-                }
+    fb_data *backdrop = lcd_get_backdrop();
+    bool has_backdrop = backdrop ? true : false;
+    backdrop = backdrop + y * LCD_WIDTH + x;
+    lcd_fastpixelfunc_type *fgfunc = lcd_fastpixelfuncs[drawmode];;
+    lcd_fastpixelfunc_type *bgfunc = lcd_fastpixelfuncs[drawmode ^ DRMODE_INVERSEVID];;
+    do {
+        const unsigned char *src_col = src++;
+        unsigned data = *src_col >> src_y;
+        fb_data *dst_col = dst++;
+        int numbits = 8 - src_y;
+        fb_data *backdrop_col = backdrop++;
+        dst_end = dst_col + height * LCD_WIDTH;
+        do {
+            switch(drawmode) {
+                case DRMODE_SOLID:
+                    if (data & 0x01)
+                        *dst_col = fg_pattern;
+                    else
+                        *dst_col = has_backdrop ? *backdrop_col : bg_pattern;
+                    break;
+                case DRMODE_FG:
+                    if (data & 0x01)
+                        *dst_col = fg_pattern;
+                    break;
+                case DRMODE_INVERSEVID:
+                    if(!(data & 0x01))
+                        *dst_col = has_backdrop ? *backdrop_col : bg_pattern;
+                    else
+                        *dst_col = fg_pattern;
+                    break;
+                default:
+                    if (data & 0x01)
+                        fgfunc(dst_col);
+                    else
+                        bgfunc(dst_col);
+                    break;
+            };
+            dst_col += LCD_WIDTH;
+            backdrop_col += LCD_WIDTH;
+            data >>= 1;
+            if (--numbits == 0) {
+                src_col += stride;
+                data = *src_col;
+                numbits = 8;
             }
-            while (dst_col < dst_end);
-        }
-        while (src < src_end);
-    }
+        } while (dst_col < dst_end);
+    } while (src < src_end);
 }
 
 
