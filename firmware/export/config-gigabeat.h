@@ -124,10 +124,9 @@
 #define USB_GIGABEAT_STYLE
 
 #define HAVE_HEADPHONE_DETECTION
+
 /* Define this if you have adjustable CPU frequency */
-#if 0 /* TODO */
 #define HAVE_ADJUSTABLE_CPU_FREQ
-#endif
 
 #define BOOTFILE_EXT "gigabeat"
 #define BOOTFILE "rockbox." BOOTFILE_EXT

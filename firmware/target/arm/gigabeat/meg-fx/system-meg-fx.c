@@ -68,4 +68,26 @@ void system_init(void)
     
 }
 
+void set_cpu_frequency(long frequency)
+{
+    if (frequency == CPUFREQ_MAX)
+    {
+        /* FCLK: 300MHz, HCLK: 100MHz, PCLK: 50MHz */
+        /* MDIV: 97, PDIV: 1, SDIV: 2 */
+        /* HDIV: 3, PDIV: 1 */
 
+        MPLLCON = (97 << 12) | (1 << 4) | 2;
+        CLKDIVN = (3 << 1) | 1;
+        FREQ = CPUFREQ_MAX;
+    }
+    else
+    {
+        /* FCLK: 200MHz, HCLK: 100MHz, PCLK: 50MHz */
+        /* MDIV: 62, PDIV: 1, SDIV: 2 */
+        /* HDIV: 1, PDIV: 1 */
+
+        MPLLCON = (62 << 12) | (1 << 4) | 3;
+        CLKDIVN = (0 << 1) | 1;
+        FREQ = CPUFREQ_NORMAL;
+    }
+}

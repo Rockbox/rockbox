@@ -273,12 +273,22 @@ static inline unsigned long swap32(unsigned long value)
 
 /* TODO: Implement set_irq_level and check CPU frequencies */
 
+#if CONFIG_CPU == S3C2440
+
+#define CPUFREQ_DEFAULT 98784000
+#define CPUFREQ_NORMAL  98784000
+#define CPUFREQ_MAX    296352000
+
+#else
+
 #define CPUFREQ_DEFAULT_MULT 8
 #define CPUFREQ_DEFAULT 24000000
 #define CPUFREQ_NORMAL_MULT 10
 #define CPUFREQ_NORMAL 30000000
 #define CPUFREQ_MAX_MULT 25
 #define CPUFREQ_MAX 75000000
+
+#endif
 
 static inline unsigned short swap16(unsigned short value)
     /*
