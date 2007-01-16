@@ -355,8 +355,8 @@ void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
                     if (data & 0x01)
                         *dst_col = fg_pattern;
                     break;
-                case DRMODE_INVERSEVID:
-                    if(!(data & 0x01))
+                case (DRMODE_SOLID|DRMODE_INVERSEVID):
+                    if(data & 0x01)
                         *dst_col = has_backdrop ? *backdrop_col : bg_pattern;
                     else
                         *dst_col = fg_pattern;
