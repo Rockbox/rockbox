@@ -43,6 +43,7 @@ jpeg.c
 mandelbrot.c
 plasma.c
 
+blackjack.c
 bounce.c
 #ifndef SANSA_E200
 bubbles.c
