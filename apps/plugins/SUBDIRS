@@ -29,8 +29,8 @@ zxbox
 pacbox
 #endif
 
-/* For all the color targets apart from the Gigabeat */
-#if (defined(HAVE_LCD_COLOR) && !defined(TOSHIBA_GIGABEAT_F)) || \
+/* For all the color targets */
+#if defined(HAVE_LCD_COLOR) || \
     (LCD_DEPTH == 2) && !defined(ARCHOS_AV300)
 doom
 #endif
