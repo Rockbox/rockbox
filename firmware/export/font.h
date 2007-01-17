@@ -23,9 +23,9 @@
  * Incore font and image definitions
  */
 #include "config.h"
-#include "sysfont.h"
 
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
+#include "sysfont.h"
 
 /* max static loadable font buffer size */
 #ifndef MAX_FONT_SIZE
