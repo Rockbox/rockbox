@@ -29,6 +29,7 @@
 #include "backlight-target.h"
 
 static bool headphones_detect;
+static bool hold_button        = false;
 
 static int const remote_buttons[] =
 {
@@ -68,6 +69,17 @@ int button_read_device(void)
     static int lastbutton;
     unsigned short remote_adc;
     int btn = BUTTON_NONE;
+    bool hold_button_old;
+
+    /* normal buttons */
+    hold_button_old = hold_button;
+    hold_button = button_hold();
+
+#ifndef BOOTLOADER
+    /* give BL notice if HB state chaged */
+    if (hold_button != hold_button_old)
+        backlight_hold_changed(hold_button);
+#endif
 
     /* See header for ADC values when remote control buttons are pressed */
     /* Only one button can be sensed at a time on the remote. */
@@ -82,7 +94,7 @@ int button_read_device(void)
     }
 
     /* Check for hold first - exit if asserted with no button pressed */
-    if (button_hold())
+    if (hold_button)
         return btn;
 
     /* the side buttons - Check before doing all of the work on each bit */
