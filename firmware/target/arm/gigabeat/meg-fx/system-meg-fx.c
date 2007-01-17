@@ -75,22 +75,20 @@ void set_cpu_frequency(long frequency)
 {
     if (frequency == CPUFREQ_MAX)
     {
-        /* FCLK: 300MHz, HCLK: 100MHz, PCLK: 50MHz */
-        /* MDIV: 97, PDIV: 1, SDIV: 2 */
-        /* HDIV: 3, PDIV: 1 */
+        asm volatile("mov r0, #0\n"
+            "mrc p15, 0, r0, c1, c0, 0\n"
+            "orr r0, r0, #3<<30\n" /* set to Asynchronous mode*/
+            "mcr p15, 0, r0, c1, c0, 0" : : : "r0");
 
-        MPLLCON = (97 << 12) | (1 << 4) | 2;
-        CLKDIVN = (3 << 1) | 1;
         FREQ = CPUFREQ_MAX;
     }
     else
     {
-        /* FCLK: 200MHz, HCLK: 100MHz, PCLK: 50MHz */
-        /* MDIV: 62, PDIV: 1, SDIV: 2 */
-        /* HDIV: 1, PDIV: 1 */
+        asm volatile("mov r0, #0\n"
+            "mrc p15, 0, r0, c1, c0, 0\n"
+            "bic r0, r0, #3<<30\n" /* set to FastBus mode*/
+            "mcr p15, 0, r0, c1, c0, 0" : : : "r0");
 
-        MPLLCON = (62 << 12) | (1 << 4) | 2;
-        CLKDIVN = (1 << 1) | 1;
         FREQ = CPUFREQ_NORMAL;
     }
 }
