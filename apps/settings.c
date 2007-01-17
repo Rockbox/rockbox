@@ -1238,10 +1238,7 @@ void settings_apply(void)
     } else {
         unload_main_backdrop();
     }
-/* Gigabeat displays a bootsplash - keep it up as long as we can */
-#if !defined(TOSHIBA_GIGABEAT_F) || defined(SIMULATOR)
     show_main_backdrop();
-#endif
 
 #endif
 
