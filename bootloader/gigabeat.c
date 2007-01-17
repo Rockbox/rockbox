@@ -18,7 +18,6 @@
 #include "power.h"
 #include "file.h"
 #include "button-target.h"
-#include "bootsplash-gigabeat.h"
 
 extern void map_memory(void);
 
@@ -143,11 +142,23 @@ int load_rockbox(const char* file_name, unsigned char* buf, int buffer_size)
     return len;
 }
 
+char buf[256];
+
+void display_instructions(void)
+{
+    lcd_setfont(FONT_SYSFIXED);
+    lcd_puts(0, line++, "Hold MENU when booting for rescue mode.");
+    lcd_puts(0, line++, "  \"VOL+\" button to restore original kernel");
+    lcd_puts(0, line++, "  \"A\" button to load original firmware");
+    line++;
+    snprintf(buf, sizeof(buf), "FRAME %x TTB %x", FRAME, TTB_BASE);
+    lcd_puts(0, line++, buf);
+    lcd_update();
+}
 
 void * main(void)
 {
     int i;
-    char buf[256];
     struct partinfo* pinfo;
     unsigned short* identify_info;
     unsigned char* loadbuffer;
@@ -156,31 +167,25 @@ void * main(void)
     int rc;
     int(*kernel_entry)(void);
 
-    lcd_init();
     bool show_bootsplash = true;
 
     if(GPGDAT & 2)
         show_bootsplash = false;
 
     if(!show_bootsplash) {
-		lcd_setfont(FONT_SYSFIXED);
-        lcd_puts(0, line++, "Hold MENU when booting for rescue mode.");
-        lcd_puts(0, line++, "  \"VOL+\" button to restore original kernel");
-        lcd_puts(0, line++, "  \"A\" button to load original firmware");
-        line++;
-        snprintf(buf, sizeof(buf), "FRAME %x TTB %x", FRAME, TTB_BASE);
-        lcd_puts(0, line++, buf);
-        lcd_update();
+        lcd_init();
+        display_instructions();
         sleep(2*HZ);
-    } else
-        memcpy(FRAME, bootsplash, LCD_WIDTH*LCD_HEIGHT*2);
+    }
     if(GPGDAT & 2) {
+        lcd_init();
         lcd_puts(0, line++, "Entering rescue mode..");
         lcd_update();
         go_usb_mode();
         while(1);
     }
     if(GPGDAT & 0x10) {
+        lcd_init();
         load_original = true;
         lcd_puts(0, line++, "Loading original firmware...");
         lcd_update();
@@ -192,6 +197,20 @@ void * main(void)
         snprintf(buf, sizeof(buf), "disk_mount_all: %d", i);
         lcd_puts(0, line++, buf);
     }
+    if(show_bootsplash) {
+        int fd = open("/bootsplash.raw", O_RDONLY);
+        if(fd < 0)  {
+            show_bootsplash = false;
+            lcd_init();
+            display_instructions();
+        }
+        else {
+            read(fd, lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT*2);
+            close(fd);
+            lcd_update();
+            lcd_init();
+        }
+    } 
     /* hold VOL+ to enter rescue mode to copy old image */
     /* needs to be after ata_init and disk_mount_all    */
     if(GPGDAT & 4) {
