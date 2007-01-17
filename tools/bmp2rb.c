@@ -497,6 +497,27 @@ void generate_c_source(char *id, char* header_dir, int width, int height,
     fprintf(f, "\n};\n");
 }
 
+void generate_raw_file(char *id, char* header_dir, int width, int height,
+                       const unsigned short *t_bitmap, int t_width,
+                       int t_height, int t_depth)
+{
+    FILE *f;
+    int i, a;
+
+    f = stdout;
+
+    for (i = 0; i < t_height; i++)
+    {
+        for (a = 0; a < t_width; a++)
+        {
+            if (t_depth <= 8)
+                fwrite(&t_bitmap[i * t_width + a], 1, 1, f);
+            else
+                fwrite(&t_bitmap[i * t_width + a], 2, 1, f);
+        }
+    }
+}
+
 /****************************************************************************
  * generate_ascii()
  *
@@ -527,6 +548,7 @@ void print_usage(void)
            "\t-i <id>  Bitmap name (default is filename without extension)\n"
            "\t-h <dir> Create header file in <dir>/<id>.h\n"
            "\t-a       Show ascii picture of bitmap\n"
+           "\t-r       Generate RAW file\n"
            "\t-f <n>   Generate destination format n, default = 0\n"
            "\t         0  Archos recorder, Ondio, Iriver H1x0 mono\n"
            "\t         1  Archos player graphics library\n"
@@ -552,6 +574,7 @@ int main(int argc, char **argv)
     unsigned short *t_bitmap = NULL;
     int width, height;
     int t_width, t_height, t_depth;
+    bool raw = false;
 
 
     for (i = 1;i < argc;i++)
@@ -596,6 +619,10 @@ int main(int argc, char **argv)
 
               case 'a':   /* Ascii art */
                 ascii = true;
+                break;
+                
+              case 'r':   /* Ascii art */
+                raw = true;
                 break;
                 
               case 'f':
@@ -664,11 +691,12 @@ int main(int argc, char **argv)
     }
     else
     {
-        if (transform_bitmap(bitmap, width, height, format, &t_bitmap,
-                             &t_width, &t_height, &t_depth))
+        if (transform_bitmap(bitmap, width, height, format, &t_bitmap, &t_width, &t_height, &t_depth))
             exit(1);
-        generate_c_source(id, header_dir, width, height, t_bitmap, 
-                          t_width, t_height, t_depth);
+        if(raw)
+            generate_raw_file(id, header_dir, width, height, t_bitmap, t_width, t_height, t_depth);
+        else
+            generate_c_source(id, header_dir, width, height, t_bitmap, t_width, t_height, t_depth);
     }
 
     return 0;
