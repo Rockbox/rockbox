@@ -1641,7 +1641,7 @@ clean:
 	\$(SILENT)rm -rf rockbox.zip TAGS @APPS@ firmware comsim sim lang.[ch]\
                   manual *.pdf *.a credits.raw @OUTPUT@ bitmaps pluginbitmaps \
                   @ARCHOSROM@ @FLASHFILE@ UI256.bmp rockbox-full.zip \
-	          html txt rockbox-manual*.zip
+	          html txt rockbox-manual*.zip sysfont.h
 
 voice: tools
 	\$(TOOLSDIR)/genvoice.sh \$(ROOTDIR) \$(LANGUAGE) \$(ARCHOS) voicesettings.sh
