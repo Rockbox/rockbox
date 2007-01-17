@@ -126,7 +126,8 @@
 #define HAVE_HEADPHONE_DETECTION
 
 /* Define this if you have adjustable CPU frequency */
-#define HAVE_ADJUSTABLE_CPU_FREQ
+/* Not ready for prime-time */
+/* #define HAVE_ADJUSTABLE_CPU_FREQ */
 
 #define BOOTFILE_EXT "gigabeat"
 #define BOOTFILE "rockbox." BOOTFILE_EXT

@@ -68,6 +68,9 @@ void system_init(void)
 
 }
 
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+
 void set_cpu_frequency(long frequency)
 {
     if (frequency == CPUFREQ_MAX)
@@ -91,3 +94,5 @@ void set_cpu_frequency(long frequency)
         FREQ = CPUFREQ_NORMAL;
     }
 }
+
+#endif
