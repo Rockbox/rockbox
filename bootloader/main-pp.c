@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 #include "cpu.h"
 #include "system.h"
 #include "lcd.h"
@@ -51,6 +52,31 @@ char version[] = APPSVERSION;
 #define DRAM_START              0x10000000
 
 int line=0;
+char printfbuf[256];
+
+void reset_screen(void)
+{
+    lcd_clear_display();
+    line = 0;
+}
+
+void printf(const char *format, ...)
+{
+    int len;
+    unsigned char *ptr;
+    va_list ap;
+    va_start(ap, format);
+
+    
+    ptr = printfbuf;
+    len = vsnprintf(ptr, sizeof(printfbuf), format, ap);
+    va_end(ap);
+
+    lcd_puts(0, line++, ptr);
+    lcd_update();
+    if(line >= (LCD_HEIGHT/SYSFONT_HEIGHT))
+        line = 0;
+}
 
 /* Load original mi4 firmware. This function expects a file called
    "/System/OF.bin" on the player. It should be a mi4 firmware decrypted 
@@ -100,9 +126,7 @@ int load_rockbox(unsigned char* buf)
 
     len = filesize(fd) - 8;
 
-    snprintf(str, sizeof(str), "Length: %x", len);
-    lcd_puts(0, line++ ,str);
-    lcd_update();
+    printf("Length: %x", len);
     
     if (len > MAX_LOADSIZE)
         return -6;
@@ -114,9 +138,7 @@ int load_rockbox(unsigned char* buf)
     if(rc < 4)
         return -2;
 
-    snprintf(str, sizeof(str), "Checksum: %x", chksum);
-    lcd_puts(0, line++ ,str);
-    lcd_update();
+    printf("Checksum: %x", chksum);
 
     rc = read(fd, model, 4);
     if(rc < 4)
@@ -124,9 +146,7 @@ int load_rockbox(unsigned char* buf)
 
     model[4] = 0;
     
-    snprintf(str, sizeof(str), "Model name: %s", model);
-    lcd_puts(0, line++ ,str);
-    lcd_update();
+    printf("Model name: %s", model);
 
     lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
 
@@ -142,10 +162,8 @@ int load_rockbox(unsigned char* buf)
         sum += buf[i];
     }
 
-    snprintf(str, sizeof(str), "Sum: %x", sum);
-    lcd_puts(0, line++ ,str);
-    lcd_update();
-
+    printf("Sum: %x", sum);
+    
     if(sum != chksum)
         return -5;
 
@@ -170,12 +188,9 @@ void* main(void)
 
     lcd_setfont(FONT_SYSFIXED);
 
-    lcd_puts(0, line++, "Rockbox boot loader");
-    snprintf(buf, sizeof(buf), "Version: 20%s", version);
-    lcd_puts(0, line++, buf);
-    snprintf(buf, sizeof(buf), MODEL_NAME);
-    lcd_puts(0, line++, buf);
-    lcd_update();
+    printf("Rockbox boot loader");
+    printf("Version: 20%s", version);
+    printf(MODEL_NAME);
 
     i=ata_init();
     if (i==0) {
@@ -188,44 +203,33 @@ void* main(void)
       for (i=39; i && buf[i]==' '; i--) {
         buf[i]=0;
       }
-      lcd_puts(0, line++, buf);
-      lcd_update();
+      printf(buf);
     } else {
-      snprintf(buf, sizeof(buf), "ATA: %d", i);
-      lcd_puts(0, line++, buf);
-      lcd_update();
+      printf("ATA: %d", i);
     }
 
     disk_init();
     rc = disk_mount_all();
     if (rc<=0)
     {
-        lcd_puts(0, line++, "No partition found");
-        lcd_update();
+        printf("No partition found");
     }
 
     pinfo = disk_partinfo(0);
-    snprintf(buf, sizeof(buf), "Partition 0: 0x%02x %ld MB", 
-                  pinfo->type, pinfo->size / 2048);
-    lcd_puts(0, line++, buf);
-    lcd_update();
+    printf("Partition 0: 0x%02x %ld MB", pinfo->type, pinfo->size / 2048);
 
     i=button_read_device();
     if(i==BUTTON_LEFT)
     {
-        lcd_puts(0, line++, "Loading original firmware...");
-        lcd_update();
+        printf("Loading original firmware...");
         rc=load_original_firmware(loadbuffer);
     } else {
-        lcd_puts(0, line++, "Loading Rockbox...");
-        lcd_update();
+        printf("Loading Rockbox...");
         rc=load_rockbox(loadbuffer);
     }
 
     if (rc < 0) {
-            snprintf(buf, sizeof(buf), "Rockbox error: %d",rc);
-            lcd_puts(0, line++, buf);
-            lcd_update();
+            printf("Rockbox error: %d",rc);
             while(1) {}
     }
     

@@ -178,7 +178,7 @@ void printf(const char *format, ...)
 
     lcd_puts(0, line++, ptr);
     lcd_update();
-    if(line >= 30)
+    if(line >= (LCD_HEIGHT/SYSFONT_HEIGHT))
         line = 0;
 }
 

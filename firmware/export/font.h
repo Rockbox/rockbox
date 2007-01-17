@@ -23,6 +23,7 @@
  * Incore font and image definitions
  */
 #include "config.h"
+#include "sysfont.h"
 
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
 
