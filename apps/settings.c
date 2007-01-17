@@ -370,7 +370,7 @@ static const struct bit_entry hd_bits[] =
     {4, S_O(scroll_speed), 9, "scroll speed", NULL }, /* 0...15 */
     {8, S_O(scroll_delay), 100, "scroll delay", NULL }, /* 0...250 */
     {8, S_O(bidir_limit), 50, "bidir limit", NULL }, /* 0...200 */
-    
+
 #ifdef HAVE_REMOTE_LCD
     {4, S_O(remote_scroll_speed), 9, "remote scroll speed", NULL }, /* 0...15 */
     {8, S_O(remote_scroll_step), 6, "remote scroll step", NULL }, /* 1...160 */
@@ -426,7 +426,7 @@ static const struct bit_entry hd_bits[] =
     {3, S_O(dirfilter), SHOW_SUPPORTED,
         "show files", "all,supported,music,playlists"
 #ifdef HAVE_TAGCACHE
-        ",id3 database" 
+        ",id3 database"
 #endif
         },
     {1, S_O(sort_case), false, "sort case", off_on },
@@ -508,7 +508,7 @@ static const struct bit_entry hd_bits[] =
         "rec directory", REC_BASE_DIR ",current" },
 #ifdef CONFIG_BACKLIGHT
     {2, S_O(cliplight), 0, "cliplight", "off,main,both,remote" },
-#endif 
+#endif
 #if CONFIG_CODEC == MAS3587F
     {4, S_O(rec_mic_gain), 8, "rec mic gain", NULL },
     {4, S_O(rec_left_gain), 2 /* 0dB */, "rec left gain", NULL }, /* 0...15 */
@@ -653,7 +653,7 @@ static const struct bit_entry hd_bits[] =
 
 #ifdef HAVE_WM8758
     {1, S_O(eq_hw_enabled), false, "eq hardware enabled", off_on },
-    
+
     {2, S_O(eq_hw_band0_cutoff), 1, "eq hardware band 0 cutoff", "80Hz,105Hz,135Hz,175Hz" },
     {5|SIGNED, S_O(eq_hw_band0_gain), 0, "eq hardware band 0 gain", NULL },
 
@@ -1207,7 +1207,8 @@ void settings_apply(void)
     lcd_set_invert_display(global_settings.invert);
     lcd_set_flip(global_settings.flip_display);
     button_set_flip(global_settings.flip_display);
-    lcd_update(); /* refresh after flipping the screen */
+    if(global_settings.invert || global_settings.flip_display)
+        lcd_update(); /* refresh after flipping the screen */
     settings_apply_pm_range();
     peak_meter_init_times(
         global_settings.peak_meter_release, global_settings.peak_meter_hold,
@@ -1237,7 +1238,11 @@ void settings_apply(void)
     } else {
         unload_main_backdrop();
     }
+/* Gigabeat displays a bootsplash - keep it up as long as we can */
+#if !defined(TOSHIBA_GIGABEAT_F) || defined(SIMULATOR)
     show_main_backdrop();
+#endif
+
 #endif
 
 #ifdef HAVE_LCD_COLOR
@@ -1900,7 +1905,7 @@ void settings_reset(void) {
     global_settings.mdb_enable = sound_default(SOUND_MDB_ENABLE);
     global_settings.superbass = sound_default(SOUND_SUPERBASS);
 #endif
-#ifdef HAVE_LCD_CONTRAST 
+#ifdef HAVE_LCD_CONTRAST
     global_settings.contrast = lcd_default_contrast();
 #endif
 #ifdef HAVE_LCD_REMOTE
@@ -1994,12 +1999,12 @@ struct value_setting_data {
     void (*formatter)(char* dest, int dest_length,
                           int variable, const char* unit);
     /* used for BOOL and "choice" settings */
-    struct opt_items* options;    
+    struct opt_items* options;
 };
-    
+
 static char * value_setting_get_name_cb(int selected_item,void * data, char *buffer)
 {
-    struct value_setting_data* cb_data = 
+    struct value_setting_data* cb_data =
             (struct value_setting_data*)data;
     if (cb_data->type == INT && !cb_data->options)
     {
@@ -2011,7 +2016,7 @@ static char * value_setting_get_name_cb(int selected_item,void * data, char *buf
     }
     else strcpy(buffer,P2STR(cb_data->options[selected_item].string));
     return buffer;
-} 
+}
 #define type_fromvoidptr(type, value) \
     (type == INT)? \
         (int)(*(int*)(value)) \
@@ -2027,7 +2032,7 @@ static bool do_set_setting(const unsigned char* string, void *variable,
     struct gui_synclist lists;
     int oldvalue;
     bool allow_wrap = true;
-    
+
     if (cb_data->type == INT)
     {
          oldvalue = *(int*)variable;
@@ -2035,26 +2040,26 @@ static bool do_set_setting(const unsigned char* string, void *variable,
              allow_wrap = false;
     }
     else oldvalue = *(bool*)variable;
-    
+
     gui_synclist_init(&lists,value_setting_get_name_cb,(void*)cb_data,false,1);
     gui_synclist_set_title(&lists, (char*)string, NOICON);
     gui_synclist_set_icon_callback(&lists,NULL);
     gui_synclist_set_nb_items(&lists,nb_items);
     gui_synclist_limit_scroll(&lists,true);
     gui_synclist_select_item(&lists, selected);
-    
+
     if (global_settings.talk_menu)
     {
         if (cb_data->type == INT && !cb_data->options)
             talk_unit(cb_data->voice_unit, *(int*)variable);
         else talk_id(cb_data->options[selected].voice_id, false);
     }
-    
+
     gui_synclist_draw(&lists);
     while (!done)
     {
-        
-        action = get_action(CONTEXT_LIST,TIMEOUT_BLOCK); 
+
+        action = get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
         if (action == ACTION_NONE)
             continue;
         if (gui_synclist_do_button(&lists,action,
@@ -2065,23 +2070,23 @@ static bool do_set_setting(const unsigned char* string, void *variable,
                 int value;
                 if (cb_data->type == INT && !cb_data->options)
                 {
-                    value = cb_data->max - 
+                    value = cb_data->max -
                             gui_synclist_get_sel_pos(&lists)*cb_data->step;
                     talk_unit(cb_data->voice_unit, value);
                 }
-                else 
+                else
                 {
                     value = gui_synclist_get_sel_pos(&lists);
                     talk_id(cb_data->options[value].voice_id, false);
                 }
             }
             if (cb_data->type == INT && !cb_data->options)
-                *(int*)variable = cb_data->max - 
+                *(int*)variable = cb_data->max -
                         gui_synclist_get_sel_pos(&lists)*cb_data->step;
             else if (cb_data->type == BOOL)
                 *(bool*)variable = gui_synclist_get_sel_pos(&lists) ? true : false;
             else *(int*)variable = gui_synclist_get_sel_pos(&lists);
-        }  
+        }
         else if (action == ACTION_STD_CANCEL)
         {
             gui_syncsplash(HZ/2,true,str(LANG_MENU_SETTING_CANCEL));
@@ -2140,7 +2145,7 @@ bool set_int(const unsigned char* string,
 
    The type separation is necessary since int and bool are fundamentally
    different and bit-incompatible types and can not share the same access
-   code. */ 
+   code. */
 bool set_option(const char* string, void* variable, enum optiontype type,
                 const struct opt_items* options, int numoptions, void (*function)(int))
 {
