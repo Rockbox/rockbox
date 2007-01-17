@@ -324,7 +324,7 @@ static void init(void)
 #if !defined(TOSHIBA_GIGABEAT_F) || defined(SIMULATOR)
     show_logo();
 #else
-    sleep(1);  //@@@ Weird.  We crash w/o this tiny delay.
+    sleep(1);  /* Weird.  We crash w/o this tiny delay. */
 #endif    
     lang_init();
 
