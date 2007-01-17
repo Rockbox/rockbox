@@ -135,7 +135,7 @@ int read_bmp_file(char* filename,
         close(fd);
         return 2;
     }
-    
+
     compression = readint(&fh.Compression);
 
     if (compression != 0)
@@ -210,7 +210,7 @@ int read_bmp_file(char* filename,
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
-                data = (bmp[(height - 1 - row) * padded_width + col / 2] 
+                data = (bmp[(height - 1 - row) * padded_width + col / 2]
                         >> (4 * (~col & 1))) & 0x0F;
                 (*bitmap)[row * width + col] = palette[data];
             }
@@ -224,7 +224,7 @@ int read_bmp_file(char* filename,
                 (*bitmap)[row * width + col] = palette[data];
             }
         break;
-        
+
       case 16:
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
@@ -255,7 +255,7 @@ int read_bmp_file(char* filename,
       case 32:
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
-            {            
+            {
                 i = (height - 1 - row) * padded_width + 4 * col;
                 (*bitmap)[row * width + col].rgbRed = bmp[i+2];
                 (*bitmap)[row * width + col].rgbGreen = bmp[i+1];
@@ -270,7 +270,7 @@ int read_bmp_file(char* filename,
     }
 
     free(bmp);
-    
+
     return 0; /* success */
 }
 
@@ -326,7 +326,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
         dst_h = height;
         dst_d = 8;
         break;
-        
+
       case 7: /* greyscale X5 remote 4-grey */
         dst_w = width;
         dst_h = (height + 7) / 8;
@@ -337,7 +337,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
         debugf("error - Undefined destination format\n");
         return 1;
     }
-    
+
     *dest = (unsigned short *)malloc(dst_w * dst_h * sizeof(short));
     if (*dest == NULL)
     {
@@ -355,7 +355,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
-                (*dest)[(row/8) * dst_w + col] |= 
+                (*dest)[(row/8) * dst_w + col] |=
                        (~brightness(src[row * width + col]) & 0x80) >> (~row & 7);
             }
         break;
@@ -364,7 +364,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
-                (*dest)[row * dst_w + (col/8)] |= 
+                (*dest)[row * dst_w + (col/8)] |=
                        (~brightness(src[row * width + col]) & 0x80) >> (col & 7);
             }
         break;
@@ -402,7 +402,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
                     (*dest)[row * dst_w + col] = ((rgb&0xff00)>>8)|((rgb&0x00ff)<<8);
             }
         break;
-        
+
       case 6: /* greyscale iPods 4-grey */
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
@@ -411,19 +411,19 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
                        (~brightness(src[row * width + col]) & 0xC0) >> (2 * (col & 3));
             }
         break;
-        
+
       case 7: /* greyscale X5 remote 4-grey */
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
                 unsigned short data = (~brightness(src[row * width + col]) & 0xC0) >> 6;
-                
+
                 data = (data | (data << 7)) & 0x0101;
                 (*dest)[(row/8) * dst_w + col] |= data << (row & 7);
             }
         break;
     }
-    
+
     return 0;
 }
 
@@ -620,11 +620,11 @@ int main(int argc, char **argv)
               case 'a':   /* Ascii art */
                 ascii = true;
                 break;
-                
-              case 'r':   /* Ascii art */
+
+              case 'r':   /* Raw File */
                 raw = true;
                 break;
-                
+
               case 'f':
                 if (argv[i][2])
                 {
@@ -683,7 +683,7 @@ int main(int argc, char **argv)
 
     if (read_bmp_file(bmp_filename, &width, &height, &bitmap))
         exit(1);
-        
+
 
     if (ascii)
     {
