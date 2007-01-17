@@ -115,7 +115,8 @@ static void Z_PrintStats(void)            // Print allocation statistics
    unsigned long total_memory = free_memory + active_memory +
                                 purgable_memory + inactive_memory +
                                 virtual_memory;
-   double s = 100.0 / total_memory;
+//   double s = 100.0 / total_memory;
+   int s = 100/total_memory;
 
    doom_printf("%-5u\t%6.01f%%\tstatic\n"
                "%-5u\t%6.01f%%\tpurgable\n"

@@ -100,5 +100,5 @@ int doom_weapon_toggles; // killough 10/98
 
 int monkeys IBSS_ATTR, default_monkeys;
 
-boolean nosfxparm=0;
+boolean enable_sound=1;
 boolean rockblock=1;

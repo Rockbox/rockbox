@@ -115,7 +115,7 @@ enum {
 
 extern int comp[COMP_TOTAL], default_comp[COMP_TOTAL];
 
-extern boolean nosfxparm;
+extern boolean enable_sound;
 extern boolean rockblock;
 
 // -------------------------------------------

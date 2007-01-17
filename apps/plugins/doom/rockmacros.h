@@ -100,6 +100,6 @@ inline void* memcpy(void* dst, const void* src, size_t size);
    structure changes.
  */
 #define DOOM_CONFIG_MAGIC     MAKE_FOURCC('D','O','O','M')
-#define DOOM_CONFIG_VERSION   2
+#define DOOM_CONFIG_VERSION   3
 
 #endif

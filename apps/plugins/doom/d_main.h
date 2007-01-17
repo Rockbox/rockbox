@@ -49,7 +49,7 @@ extern boolean clrespawnparm;  // checkparm of -respawn
 extern boolean clfastparm; // checkparm of -fast
 //jff end of external declaration of command line playmode
 
-extern boolean nosfxparm;
+extern boolean enable_sound;
 extern boolean nomusicparm;
 extern int ffmap;
 

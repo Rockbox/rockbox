@@ -485,7 +485,7 @@ void W_Init(void)
 int W_LumpLength (int lump)
 {
    if (lump >= numlumps)
-      I_Error ("W_LumpLength: %i >= numlumps",lump);
+      I_Error ("W_LumpLength: %d >= numlumps",lump);
    return lumpinfo[lump].size;
 }
 
@@ -501,7 +501,7 @@ void W_ReadLump(int lump, void *dest)
 
 #ifdef RANGECHECK
    if (lump >= numlumps)
-      I_Error ("W_ReadLump: %i >= numlumps",lump);
+      I_Error ("W_ReadLump: %d >= numlumps",lump);
 #endif
 
 #ifndef NO_PREDEFINED_LUMPS
@@ -522,7 +522,7 @@ void W_ReadLump(int lump, void *dest)
       lseek(l->handle, l->position, SEEK_SET);
       c = read(l->handle, dest, l->size);
       if (c < l->size)
-         I_Error("W_ReadLump: only read %i of %i on lump %i", c, l->size, lump);
+         I_Error("W_ReadLump: only read %d of %d on lump %d", c, l->size, lump);
    }
 }
 
@@ -538,7 +538,7 @@ void * (W_CacheLumpNum)(int lump, unsigned short locks)
 {
 #ifdef RANGECHECK
    if ((unsigned)lump >= (unsigned)numlumps)
-      I_Error ("W_CacheLumpNum: %i >= numlumps",lump);
+      I_Error ("W_CacheLumpNum: %d >= numlumps",lump);
 #endif
 
    if (!lumpcache[lump])      // read the lump in
@@ -578,7 +578,7 @@ void * W_CacheLumpNumPadded(int lump, size_t len, unsigned char pad)
    const int locks = 1;
 #ifdef RANGECHECK
    if ((unsigned)lump >= (unsigned)numlumps)
-      I_Error ("W_CacheLumpNum: %i >= numlumps",lump);
+      I_Error ("W_CacheLumpNum: %d >= numlumps",lump);
 #endif
 
    if (!lumpcache[lump]) {     /* read the lump in */

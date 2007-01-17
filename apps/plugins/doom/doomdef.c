@@ -33,7 +33,9 @@
 #include "doomdef.h"
 
 // Location for any defines turned variables.
-
-// None.
-
+#if(LCD_HEIGHT>LCD_WIDTH)
+bool rotate_screen=0;
+int SCREENWIDTH;
+int SCREENHEIGHT;
+#endif
 

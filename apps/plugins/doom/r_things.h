@@ -38,8 +38,8 @@
 
 /* Constant arrays used for psprite clipping and initializing clipping. */
 
-extern short negonearray[SCREENWIDTH];
-extern short screenheightarray[SCREENWIDTH];
+extern short negonearray[MAX_SCREENWIDTH];
+extern short screenheightarray[MAX_SCREENWIDTH];
 
 /* Vars for R_DrawMaskedColumn */
 

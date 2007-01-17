@@ -472,7 +472,7 @@ void get_more(unsigned char** start, size_t* size)
 
 void I_SubmitSound(void)
 {
-   if (nosfxparm)
+   if (!enable_sound)
       return;
 
    rb->pcm_play_data(&get_more, NULL, 0);

@@ -108,6 +108,7 @@ int printf(const char *fmt, ...)
    static int p_xtpt;
    char p_buf[50];
    bool ok;
+   rb->yield();
    va_list ap;
 
    va_start(ap, fmt);
@@ -293,76 +294,29 @@ int Dbuild_base (struct opt_items *names)
 
    D_AddFile (GAMEBASE"rockdoom.wad", source_pwad);
 
-   int i=0;
+   int i=0, j;
    /* Doom Shareware */
-   if ( !fileexists (wads_builtin[0]) )
-   {
-      names[i].string=versions_builtin[0];
-      names[i].voice_id=0;
-      namemap[i]=0;
-      i++;
-   }
-
    /* Doom registered */
-   if ( !fileexists (wads_builtin[1]) )
-   {
-      names[i].string=versions_builtin[1];
-      names[i].voice_id=0;
-      namemap[i]=1;
-      i++;
-   }
-
    /* Ultimate Doom */
-   if ( !fileexists (wads_builtin[2]) )
-   {
-      names[i].string=versions_builtin[2];
-      names[i].voice_id=0;
-      namemap[i]=2;
-      i++;
-   }
-
    /* Doom2 */
-   if ( !fileexists (wads_builtin[3]) )
-   {
-      names[i].string=versions_builtin[3];
-      names[i].voice_id=0;
-      namemap[i]=3;
-      i++;
-   }
-
    /* Doom2f */
-   if ( !fileexists (wads_builtin[4]) )
-   {
-      names[i].string=versions_builtin[4];
-      names[i].voice_id=0;
-      namemap[i]=4;
-      i++;
-   }
-
    /* Plutonia */
-   if ( !fileexists (wads_builtin[5]) )
-   {
-      names[i].string=versions_builtin[5];
-      names[i].voice_id=0;
-      namemap[i]=5;
-      i++;
-   }
-
    /* TNT */
-   if ( !fileexists (wads_builtin[6]) )
-   {
-      names[i].string=versions_builtin[6];
-      names[i].voice_id=0;
-      namemap[i]=6;
-      i++;
-   }
+    for(j=0;j<7;j++)
+        if ( !fileexists (wads_builtin[j]) )
+        {
+            names[i].string=versions_builtin[j];
+            names[i].voice_id=0;
+            namemap[i]=j;
+            i++;
+        }
    // Set argvlist defaults
    argvlist.timedemo=0;
 
    return i;
 }
 
-// This is a general function that takes in an menu_item structure and makes a list
+// This is a general function that takes in a menu_item structure and makes a list
 // of files within it based on matching the string stringmatch to the files.
 int Dbuild_filelistm(struct menu_item **names, char *firstentry, char *directory, char *stringmatch)
 {
@@ -413,8 +367,10 @@ int Dbuild_filelistm(struct menu_item **names, char *firstentry, char *directory
    return i;
 }
 
+static int translatekey(int key) __attribute__ ((noinline));
+
 // This key configuration code is not the cleanest or the most efficient, but it works
-int translatekey(int key)
+static int translatekey(int key)
 {
    if (key<31)
    {
@@ -431,16 +387,17 @@ int translatekey(int key)
          case 4:
             return KEY_DOWNARROW;
          case 5:
-            return KEY_RCTRL;
-         case 6:
-            return ' ';
-         case 7:
-            return KEY_ESCAPE;
-         case 8:
-            return 'w';
-         case 9:
             return KEY_ENTER;
+         case 6:
+            return KEY_RCTRL;
+         case 7:
+            return ' ';
+         case 8:
+            return KEY_ESCAPE;
+         case 9:
+            return 'w';
          case 10:
+            return KEY_TAB;
          default:
             return 0;
       }
@@ -459,17 +416,18 @@ int translatekey(int key)
             return 3;
          case KEY_DOWNARROW:
             return 4;
-         case KEY_RCTRL:
-            return 5;
-         case ' ':
-            return 6;
-         case KEY_ESCAPE:
-            return 7;
-         case 'w':
-            return 8;
          case KEY_ENTER:
+            return 5;
+         case KEY_RCTRL:
+            return 6;
+         case ' ':
+            return 7;
+         case KEY_ESCAPE:
+            return 8;
+         case 'w':
             return 9;
-         case KEY_F9:
+         case KEY_TAB:
+            return 10;
          default:
             return 0;
       }
@@ -484,18 +442,40 @@ int Oset_keys()
    int m, result;
    int menuquit=0;
 
+
    static const struct opt_items doomkeys[] = {
       { "Unmapped", NULL },
       { "Key Right", NULL },
       { "Key Left", NULL },
       { "Key Up", NULL },
       { "Key Down", NULL },
+      { "Key Select", NULL },
+#if defined(TOSHIBA_GIGABEAT_F)
+      { "Key A", NULL },
+      { "Key Menu", NULL },
+      { "Key Power", NULL },
+      { "Key Volume Down", NULL },
+      { "Key Volume Up", NULL },
+#else
       { "Key Record", NULL },
       { "Key Mode", NULL },
       { "Key Off", NULL },
       { "Key On", NULL },
-      { "Key Select", NULL },
+#endif
    };
+   
+    int *keys[]={
+        &key_right,
+        &key_left,
+        &key_up,
+        &key_down,
+        &key_fire,
+        &key_use,
+        &key_strafe,
+        &key_weapon,
+        &key_map
+    };
+
    int numdoomkeys=sizeof(doomkeys) / sizeof(*doomkeys);
 
    static const struct menu_item items[] = {
@@ -513,69 +493,17 @@ int Oset_keys()
    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
                 NULL, NULL, NULL, NULL);
 
-   while(!menuquit)
-   {
-      result=rb->menu_show(m);
-      switch (result)
-      {
-         case 0:
-            key_right=translatekey(key_right);
-            rb->set_option(items[0].desc, &key_right, INT, doomkeys, numdoomkeys, NULL );
-            key_right=translatekey(key_right);
-            break;
-
-         case 1:
-            key_left=translatekey(key_left);
-            rb->set_option(items[1].desc, &key_left, INT, doomkeys, numdoomkeys, NULL );
-            key_left=translatekey(key_left);
-            break;
-
-         case 2:
-            key_up=translatekey(key_up);
-            rb->set_option(items[2].desc, &key_up, INT, doomkeys, numdoomkeys, NULL );
-            key_up=translatekey(key_up);
-            break;
-
-         case 3:
-            key_down=translatekey(key_down);
-            rb->set_option(items[3].desc, &key_down, INT, doomkeys, numdoomkeys, NULL );
-            key_down=translatekey(key_down);
-            break;
-
-         case 4:
-            key_fire=translatekey(key_fire);
-            rb->set_option(items[4].desc, &key_fire, INT, doomkeys, numdoomkeys, NULL );
-            key_fire=translatekey(key_fire);
-            break;
-
-         case 5:
-            key_use=translatekey(key_use);
-            rb->set_option(items[5].desc, &key_use, INT, doomkeys, numdoomkeys, NULL );
-            key_use=translatekey(key_use);
-            break;
-
-         case 6:
-            key_strafe=translatekey(key_strafe);
-            rb->set_option(items[6].desc, &key_strafe, INT, doomkeys, numdoomkeys, NULL );
-            key_strafe=translatekey(key_strafe);
-            break;
-
-         case 7:
-            key_weapon=translatekey(key_weapon);
-            rb->set_option(items[7].desc, &key_weapon, INT, doomkeys, numdoomkeys, NULL );
-            key_weapon=translatekey(key_weapon);
-            break;
-
-         case 8:
-            key_map=translatekey(key_map);
-            rb->set_option(items[8].desc, &key_map, INT, doomkeys, numdoomkeys, NULL );
-            key_map=translatekey(key_map);
-            break;
-
-         default:
+    while(!menuquit)
+    {
+        result=rb->menu_show(m);
+        if(result<0)
             menuquit=1;
-            break;
-      }
+        else
+        {
+            *keys[result]=translatekey(*keys[result]);
+            rb->set_option(items[result].desc, keys[result], INT, doomkeys, numdoomkeys, NULL );
+            *keys[result]=translatekey(*keys[result]);
+        }
    }
 
    rb->menu_exit(m);
@@ -596,8 +524,8 @@ static bool Doptions()
    int menuquit=0;
 
    static const struct menu_item items[] = {
-      { "Sound", NULL },
       { "Set Keys", NULL },
+      { "Sound", NULL },
       { "Timedemo", NULL },
       { "Player Bobbing", NULL },
       { "Weapon Recoil", NULL },
@@ -606,67 +534,43 @@ static bool Doptions()
       { "Always Run", NULL },
       { "Headsup Display", NULL },
       { "Statusbar Always Red", NULL },
+#if(LCD_HEIGHT>LCD_WIDTH)
+      { "Rotate Screen 90 deg", NULL },
+#endif
    };
+   
+   void *options[]={
+        &enable_sound,
+        &argvlist.timedemo,
+        &default_player_bobbing,
+        &default_weapon_recoil,
+        &default_translucency,
+        &fake_contrast,
+        &autorun,
+        &hud_displayed,
+        &sts_always_red,
+#if(LCD_HEIGHT>LCD_WIDTH)
+        &rotate_screen,
+#endif
+    };
 
-   m = rb->menu_init(items, sizeof(items) / sizeof(*items),
-                NULL, NULL, NULL, NULL);
+    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+        NULL, NULL, NULL, NULL);
 
-   while(!menuquit)
-   {
-      result=rb->menu_show(m);
-      switch (result)
-      {
-         case 0: /* Sound */
-            nosfxparm=!nosfxparm; // Have to invert it before setting
-            rb->set_option(items[0].desc, &nosfxparm, INT, onoff, 2, NULL );
-            nosfxparm=!nosfxparm;
-            break;
-
-         case 1: /* Keys */
+    while(!menuquit)
+    {
+        result=rb->menu_show(m);
+        if(result==0) 
             Oset_keys();
-            break;
-
-         case 2: /* Timedemo */
-            rb->set_option(items[2].desc, &argvlist.timedemo, INT, onoff, 2, NULL );
-            break;
-
-         case 3: /* Player Bobbing */
-            rb->set_option(items[3].desc, &default_player_bobbing, INT, onoff, 2, NULL );
-            break;
-
-         case 4: /* Weapon Recoil */
-            rb->set_option(items[4].desc, &default_weapon_recoil, INT, onoff, 2, NULL );
-            break;
-
-         case 5: /* Translucency */
-            rb->set_option(items[5].desc, &default_translucency, INT, onoff, 2, NULL );
-            break;
-
-         case 6: /* Fake Contrast */
-            rb->set_option(items[6].desc, &fake_contrast, INT, onoff, 2, NULL );
-            break;
-
-         case 7: /* Always Run */
-            rb->set_option(items[7].desc, &autorun, INT, onoff, 2, NULL );
-            break;
-
-         case 8: /* Headsup Display */
-            rb->set_option(items[8].desc, &hud_displayed, INT, onoff, 2, NULL );
-            break;
-
-         case 9: /* Statusbar always red */
-            rb->set_option(items[9].desc, &sts_always_red, INT, onoff, 2, NULL );
-            break;
-
-         default:
+        else if (result > 0)
+            rb->set_option(items[result].desc, options[result-1], INT, onoff, 2, NULL );
+        else
             menuquit=1;
-            break;
-      }
-   }
+    }
 
-   rb->menu_exit(m);
+    rb->menu_exit(m);
 
-   return (1);
+    return (1);
 }
 
 int menuchoice(struct menu_item *menu, int items)
@@ -806,6 +710,19 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
        if( result == -1 ) return PLUGIN_OK; // Quit was selected
        else if( result == -2 ) return PLUGIN_ERROR; // Missing base wads
    }
+
+#if(LCD_HEIGHT>LCD_WIDTH)
+    if(rotate_screen)
+    {
+        SCREENHEIGHT=LCD_WIDTH;
+        SCREENWIDTH=LCD_HEIGHT;
+    }
+    else
+    {
+        SCREENHEIGHT=LCD_HEIGHT;
+        SCREENWIDTH=LCD_WIDTH;
+    }
+#endif
 
    Dhandle_ver( namemap[ result ] );
 

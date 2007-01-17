@@ -15,8 +15,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * $Log$
- * Revision 1.26  2006/12/13 04:44:17  kkurbjun
+ * $Log: i_video.c,v $
+ * Revision 1.26  2006-12-13 04:44:17  kkurbjun
  * Dehacked and BEX support for Doom - currently only supports a DEHACKED file in a WAD (not as a standalone file yet).
  *
  * Revision 1.25  2006-10-26 13:38:04  barrywardell
@@ -127,14 +127,15 @@ static unsigned char *gbuf;
 #endif
 #endif
 
-#if defined(CPU_COLDFIRE) 
-static char fastscreen[(LCD_WIDTH)*LCD_HEIGHT] IBSS_ATTR;
+#if defined(CPU_COLDFIRE)
+static char fastscreen[LCD_WIDTH*LCD_HEIGHT] IBSS_ATTR;
 #endif
+
 static fb_data palette[256] IBSS_ATTR;
 static fb_data *paldata=NULL;
 
 //
-// I_ShutdownGraphics (NOT USED)
+// I_ShutdownGraphics
 //
 void I_ShutdownGraphics(void)
 {
@@ -187,6 +188,17 @@ void I_ShutdownGraphics(void)
 #define DOOMBUTTON_ESC     BUTTON_POWER
 #define DOOMBUTTON_ENTER   BUTTON_SCROLL_UP
 #define DOOMBUTTON_WEAPON  BUTTON_SCROLL_DOWN
+#elif CONFIG_KEYPAD == GIGABEAT_PAD
+#define DOOMBUTTON_UP      BUTTON_UP
+#define DOOMBUTTON_DOWN    BUTTON_DOWN
+#define DOOMBUTTON_LEFT    BUTTON_LEFT
+#define DOOMBUTTON_RIGHT   BUTTON_RIGHT
+#define DOOMBUTTON_SHOOT   BUTTON_A
+#define DOOMBUTTON_OPEN    BUTTON_MENU
+#define DOOMBUTTON_ESC     BUTTON_POWER
+#define DOOMBUTTON_ENTER   BUTTON_SELECT
+#define DOOMBUTTON_WEAPON  BUTTON_VOL_DOWN
+#define DOOMBUTTON_MAP     BUTTON_VOL_UP
 #else
 #define DOOMBUTTON_UP      BUTTON_UP
 #define DOOMBUTTON_DOWN    BUTTON_DOWN
@@ -282,17 +294,22 @@ inline void getkey()
          D_PostEvent(&event);
       }
 #endif
-#ifdef DOOMBUTTON_ENTER
       if(released & DOOMBUTTON_ENTER)
       {
          event.data1=KEY_ENTER;
          D_PostEvent(&event);
       }
-#endif
 #ifdef DOOMBUTTON_WEAPON
       if(released & DOOMBUTTON_WEAPON)
       {
          event.data1 ='w';
+         D_PostEvent(&event);
+      }
+#endif
+#ifdef DOOMBUTTON_MAP
+      if(released & DOOMBUTTON_MAP)
+      {
+         event.data1 =KEY_TAB;
          D_PostEvent(&event);
       }
 #endif
@@ -350,6 +367,13 @@ inline void getkey()
       if(pressed & DOOMBUTTON_WEAPON)
       {
          event.data1='w';
+         D_PostEvent(&event);
+      }
+#endif
+#ifdef DOOMBUTTON_MAP
+      if(pressed & DOOMBUTTON_MAP)
+      {
+         event.data1 =KEY_TAB;
          D_PostEvent(&event);
       }
 #endif
@@ -481,31 +505,45 @@ void I_FinishUpdate (void)
    int y;
 
 #ifdef HAVE_LCD_COLOR
-
-   for (y = 0; y < LCD_HEIGHT*LCD_WIDTH; y++)
-   {
-         paletteIndex = d_screens[0][y];
-         rb->lcd_framebuffer[y] = palette[paletteIndex];
-   }
-   rb->lcd_update();
+#if(LCD_HEIGHT>LCD_WIDTH)
+    if(rotate_screen)
+    {
+        int x;
+        for (y=0; y<LCD_HEIGHT; y++)
+        {
+            for (x=0; x < LCD_WIDTH; x++)
+            {
+                paletteIndex = d_screens[0][SCREENWIDTH*(SCREENHEIGHT-1-x) + y];
+                rb->lcd_framebuffer[y*LCD_WIDTH + x] = palette[paletteIndex];
+            }
+        }
+    }
+    else
+#endif
+    for (y = 0; y < LCD_HEIGHT *LCD_WIDTH; y++)
+    {
+        paletteIndex = d_screens[0][y];
+        rb->lcd_framebuffer[y] = palette[paletteIndex];
+    }
+    rb->lcd_update();
 #else /* !HAVE_LCD_COLOR */
    int x, yd = 0;
 
-   for (y = 0; y < LCD_HEIGHT; y++)
+   for (y = 0; y < SCREENHEIGHT; y++)
    {
-      for (x = 0; x < LCD_WIDTH; x++)
+      for (x = 0; x < SCREENWIDTH; x++)
       {
          paletteIndex = d_screens[0][y*SCREENWIDTH + x];
-         graybuffer[yd * LCD_WIDTH + x]=palette[paletteIndex];
+         graybuffer[yd * SCREENWIDTH + x]=palette[paletteIndex];
       }
       if (++yd == 8)
       {
-         gray_ub_gray_bitmap(graybuffer, 0, y & ~7, LCD_WIDTH, 8);
+         gray_ub_gray_bitmap(graybuffer, 0, y & ~7, SCREENWIDTH, 8);
          yd = 0;
       }
    }
    if (yd > 0)
-       gray_ub_gray_bitmap(graybuffer, 0, y & ~7, LCD_WIDTH, yd);
+       gray_ub_gray_bitmap(graybuffer, 0, y & ~7, SCREENWIDTH, yd);
 #endif /* !HAVE_LCD_COLOR */
 #endif
 }
@@ -515,7 +553,7 @@ void I_FinishUpdate (void)
 //
 void I_ReadScreen (byte* scr)
 {
-   memcpy (scr, d_screens[0], SCREENWIDTH*SCREENHEIGHT);
+   memcpy (scr, d_screens[0], LCD_WIDTH*LCD_HEIGHT);
 }
 
 //
@@ -550,6 +588,6 @@ void I_InitGraphics(void)
    d_screens[0] = fastscreen;
 #else
    // Don't know if this will fit in other IRAMs
-   d_screens[0] = malloc ((SCREENWIDTH) * SCREENHEIGHT * sizeof(unsigned char));
+   d_screens[0] = malloc (LCD_WIDTH * LCD_HEIGHT * sizeof(unsigned char));
 #endif
 }

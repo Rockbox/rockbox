@@ -33,6 +33,8 @@
 #ifndef __DOOMDEF__
 #define __DOOMDEF__
 
+#include "rockmacros.h"
+
 // killough 4/25/98: Make gcc extensions mean nothing on other compilers
 #ifndef __GNUC__
 #define __attribute__(x)
@@ -88,14 +90,20 @@ typedef enum {
 // allows us to avoid the overhead of dynamic allocation
 // when multiple screen sizes are supported
 
+#if(LCD_HEIGHT>LCD_WIDTH)
+extern bool rotate_screen;
 // proff 08/17/98: Changed for high-res
-#define MAX_SCREENWIDTH  1600
-#define MAX_SCREENHEIGHT 1200
-
+#define MAX_SCREENWIDTH  LCD_HEIGHT
+#define MAX_SCREENHEIGHT LCD_HEIGHT
+extern int SCREENWIDTH;
+extern int SCREENHEIGHT;
+#else
+// proff 08/17/98: Changed for high-res
+#define MAX_SCREENWIDTH  LCD_WIDTH
+#define MAX_SCREENHEIGHT LCD_HEIGHT
 #define SCREENWIDTH  LCD_WIDTH
-//#define SCREENWIDTH  320
-//#define SCREENHEIGHT 200
 #define SCREENHEIGHT LCD_HEIGHT
+#endif
 
 // The maximum number of players, multiplayer/networking.
 #define MAXPLAYERS       4

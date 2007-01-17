@@ -117,7 +117,7 @@ void S_Init(int sfxVolume,int musicVolume )
 {
    //jff 1/22/98 skip sound init if sound not enabled
    numChannels = default_numChannels;
-   if (!nosfxparm)
+   if (enable_sound)
    {
       int  i;
 
@@ -154,7 +154,7 @@ void S_Start(void)
 {
    int cnum, mnum;
 
-   if (!nosfxparm)
+   if (enable_sound)
    {
       // kill all playing sounds at start of level
       //  (trust me - a good idea)
@@ -198,7 +198,7 @@ void S_StartSoundAtVolume(void *origin_p, int sfx_id, int volume)
    sfxinfo_t* sfx;
    mobj_t* origin = (mobj_t *) origin_p;
 
-   if (nosfxparm)
+   if (!enable_sound)
       return;
 
    is_pickup = sfx_id & PICKUP_SOUND || sfx_id == sfx_oof || (compatibility_level >= prboom_2_compatibility && sfx_id == sfx_noway); // killough 4/25/98
@@ -295,7 +295,7 @@ void S_StopSound(void *origin)
 {
    int cnum;
 
-   if (nosfxparm)
+   if (!enable_sound)
       return;
   
    for (cnum=0 ; cnum<numChannels ; cnum++)
@@ -311,7 +311,7 @@ void S_StopSound(void *origin)
 //
 void S_PauseSound(void)
 {
-  if (nosfxparm)
+  if (!enable_sound)
       return;
 
    if (mus_playing && !mus_paused)
@@ -323,7 +323,7 @@ void S_PauseSound(void)
 
 void S_ResumeSound(void)
 {
-   if (nosfxparm)
+   if (!enable_sound)
       return;
 
    if (mus_playing && mus_paused)
@@ -342,7 +342,7 @@ void S_UpdateSounds(void* listener_p)
 
    mobj_t* listener = (mobj_t*)listener_p;
 
-   if (nosfxparm)
+   if (!enable_sound)
       return;
 
    for (cnum=0 ; cnum<numChannels ; cnum++)
@@ -392,7 +392,7 @@ void S_UpdateSounds(void* listener_p)
 
 void S_SetMusicVolume(int volume)
 {
-   if (nosfxparm)
+   if (!enable_sound)
       return;
 
    if (volume < 0 || volume > 15)
@@ -403,7 +403,7 @@ void S_SetMusicVolume(int volume)
 
 void S_SetSfxVolume(int volume)
 {
-   if (nosfxparm)
+   if (!enable_sound)
       return;
 
    if (volume < 0 || volume > 127)
@@ -416,7 +416,7 @@ void S_SetSfxVolume(int volume)
 //
 void S_StartMusic(int m_id)
 {
-   if (nosfxparm)
+   if (!enable_sound)
       return;
    S_ChangeMusic(m_id, false);
 }
@@ -425,7 +425,7 @@ void S_ChangeMusic(int musicnum, int looping)
 {
    musicinfo_t *music;
 
-   if (nosfxparm)
+   if (!enable_sound)
       return;
 
    if (musicnum <= mus_None || musicnum >= NUMMUSIC)
@@ -464,7 +464,7 @@ void S_ChangeMusic(int musicnum, int looping)
 
 void S_StopMusic(void)
 {
-   if (nosfxparm)
+   if (!enable_sound)
       return;
 
    if (mus_playing)
@@ -487,7 +487,7 @@ void S_StopChannel(int cnum)
    int  i;
    channel_t* c = &channels[cnum];
 
-   if (nosfxparm)
+   if (!enable_sound)
       return;
 
    if (c->sfxinfo)
@@ -521,7 +521,7 @@ int S_AdjustSoundParams(mobj_t *listener, mobj_t *source,
    fixed_t adx, ady, approx_dist;
    angle_t angle;
 
-   if (nosfxparm)
+   if (!enable_sound)
       return 0;
 
    // calculate the distance to sound origin
@@ -576,7 +576,7 @@ static int S_getChannel(void *origin, sfxinfo_t *sfxinfo, int is_pickup)
    int  cnum;
    channel_t* c;
 
-   if (nosfxparm)
+   if (!enable_sound)
       return -1;
 
    // Find an open channel

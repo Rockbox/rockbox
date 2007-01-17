@@ -73,11 +73,11 @@ short *openings,*lastopening;
 //  floorclip starts out SCREENHEIGHT
 //  ceilingclip starts out -1
 
-short floorclip[SCREENWIDTH], ceilingclip[SCREENWIDTH];
+short floorclip[MAX_SCREENWIDTH], ceilingclip[MAX_SCREENWIDTH];
 
 // spanstart holds the start of a plane span; initialized to 0 at start
 
-static int spanstart[SCREENHEIGHT];                // killough 2/8/98
+static int spanstart[MAX_SCREENHEIGHT];                // killough 2/8/98
 
 //
 // texture mapping
@@ -89,13 +89,13 @@ static fixed_t planeheight;
 // killough 2/8/98: make variables static
 
 static fixed_t basexscale, baseyscale;
-static fixed_t cachedheight[SCREENHEIGHT];
-static fixed_t cacheddistance[SCREENHEIGHT];
-static fixed_t cachedxstep[SCREENHEIGHT];
-static fixed_t cachedystep[SCREENHEIGHT];
+static fixed_t cachedheight[MAX_SCREENHEIGHT];
+static fixed_t cacheddistance[MAX_SCREENHEIGHT];
+static fixed_t cachedxstep[MAX_SCREENHEIGHT];
+static fixed_t cachedystep[MAX_SCREENHEIGHT];
 static fixed_t xoffs, yoffs;    // killough 2/28/98: flat offsets
 
-fixed_t yslope[SCREENHEIGHT], distscale[SCREENWIDTH];
+fixed_t yslope[MAX_SCREENHEIGHT], distscale[MAX_SCREENWIDTH];
 
 //
 // R_InitPlanes

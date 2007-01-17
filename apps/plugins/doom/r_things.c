@@ -71,8 +71,8 @@ static lighttable_t** spritelights;
 
 // constant arrays
 //  used for psprite clipping and initializing clipping
-short  negonearray[SCREENWIDTH];
-short  screenheightarray[SCREENWIDTH];
+short  negonearray[MAX_SCREENWIDTH];
+short  screenheightarray[MAX_SCREENWIDTH];
 
 
 //
@@ -282,7 +282,7 @@ void R_InitSprites(const char * const *namelist)
 {
    int  i;
 
-   for (i=0 ; i<SCREENWIDTH ; i++)
+   for (i=0 ; i<MAX_SCREENWIDTH ; i++)
       negonearray[i] = -1;
    R_InitSpriteDefs (namelist);
 }
@@ -835,8 +835,8 @@ void R_SortVisSprites (void)
 void R_DrawSprite (vissprite_t* spr)
 {
    drawseg_t *ds;
-   short   clipbot[SCREENWIDTH];       // killough 2/8/98:
-   short   cliptop[SCREENWIDTH];       // change to MAX_*
+   short   clipbot[MAX_SCREENWIDTH];       // killough 2/8/98:
+   short   cliptop[MAX_SCREENWIDTH];       // change to MAX_*
    int     x;
    int     r1;
    int     r2;

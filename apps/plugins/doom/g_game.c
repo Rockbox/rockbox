@@ -2773,11 +2773,11 @@ boolean G_CheckDemoStatus (void)
       int fd=open(GAMEBASE "timedemo.txt",O_WRONLY | O_CREAT);
       fdprintf (fd,"Timed %d gametics in %d realtics = %d frames per second",
                (unsigned) gametic, realtics,
-               (unsigned) gametic * (double) TICRATE / realtics);
+               (unsigned) gametic * TICRATE/ realtics);
       close(fd);
       I_Error ("%d gametics in %d realtics",
                (unsigned) gametic,realtics,
-               (unsigned) gametic * (double) TICRATE / realtics);
+               (unsigned) gametic * TICRATE / realtics);
       return false;
    }
 
