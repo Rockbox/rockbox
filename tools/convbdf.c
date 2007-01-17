@@ -1000,7 +1000,7 @@ int gen_h_header(struct font* pf, char *path)
         "#define SYSFONT_FIRST_CHAR     %d\n"
         "#define SYSFONT_LAST_CHAR      %d\n"
         "#define SYSFONT_DEFAULT_CHAR   %d\n"
-        "#define SYSFONT_PROPORTIONAL   %s\n"
+        "#define SYSFONT_PROPORTIONAL   %d\n"
         "#define SYSFONT_COPYRIGHT      %s\n"
         "#define SYSFONT_BITS_SIZE      %d\n"
         "\n"
@@ -1019,14 +1019,17 @@ int gen_h_header(struct font* pf, char *path)
     fprintf(ofp, hdr1, buf, 
             pf->name,
             pf->facename? pf->facename: "",
-            pf->maxwidth, pf->height,
+            pf->maxwidth,
+            pf->height,
             pf->size,
-            pf->ascent, pf->descent,
+            pf->ascent,
+            pf->descent,
             pf->firstchar,
             pf->firstchar+pf->size-1,
             pf->defaultchar,
             pf->width? 1: 0,
-            pf->copyright? pf->copyright: "");
+            pf->copyright? pf->copyright: "",
+            pf->bits_size);
 
     return 0;
 }
