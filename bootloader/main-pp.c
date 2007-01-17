@@ -114,7 +114,6 @@ int load_rockbox(unsigned char* buf)
     char model[5];
     unsigned long sum;
     int i;
-    char str[80];
     
     fd = open("/.rockbox/" BOOTFILE, O_RDONLY);
     if(fd < 0)
