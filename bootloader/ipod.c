@@ -157,6 +157,29 @@ int opto_keypad_read(void)
 }
 #endif
 
+char *strerror(int error)
+{
+    switch(error)
+    {
+    case 0:
+        return "OK";
+    case -1:
+        return "File not found";
+    case -2:
+        return "Read failed (chksum)";
+    case -3:
+        return "Read failed (model)";
+    case -4:
+        return "Read failed (image)";
+    case -5:
+        return "Bad checksum";
+    case -6:
+        return "File too big";
+    default:
+        return "Unknown";
+    }
+}
+
 char printfbuf[256];
 
 void reset_screen(void)
@@ -448,7 +471,9 @@ void* main(void)
             printf("Loading Rockbox...");
             rc=load_rockbox(loadbuffer, BOOTFILE);
             if (rc < 0) {
-                printf("Rockbox error: %d",rc);
+                printf("Error!");
+                printf("Can't load rockbox.ipod:");
+                printf(strerror(rc));
             } else {
                 printf("Rockbox loaded.");
                 memcpy((void*)DRAM_START,loadbuffer,rc);
@@ -460,7 +485,9 @@ void* main(void)
             printf("Loading Linux...");
             rc=load_linux(loadbuffer);
             if (rc < 0) {
-                printf("Linux error: %d",rc);
+                printf("Error!");
+                printf("Can't load linux.bin:");
+                printf(strerror(rc));
             } else {
                 memcpy((void*)DRAM_START,loadbuffer,rc);
                 return (void*)DRAM_START;
@@ -482,7 +509,9 @@ void* main(void)
 
     /* Only report errors if the file was found */
     if (rc < -1) {
-        printf("apple_os.ipod error: %d",rc);
+        printf("Error!");
+        printf("Can't load apple_os.ipod:");
+        printf(strerror(rc));
     } else if (rc > 0) {
         printf("apple_os.ipod loaded.");
         memcpy((void*)DRAM_START,loadbuffer,rc);
