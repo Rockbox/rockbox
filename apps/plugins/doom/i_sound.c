@@ -55,7 +55,7 @@
 #define BUFMUL          2
 #define MIXBUFFERSIZE  (SAMPLECOUNT*BUFMUL)
 
-#if defined(HAVE_TLV320) || defined(HAVE_UDA1380)
+#ifdef HW_HAVE_11
 #define SAMPLERATE  11025  // 44100 22050 11025
 #else
 #define SAMPLERATE  44100  // 44100 22050 11025
