@@ -340,12 +340,13 @@ enum plugin_status tidy_do(enum tidy_system system)
 
 int tidy_lcd_menu(void)
 {
-    int loc, ret;
+    int loc, ret = 2;
+    bool menu_quit = false;
     
     static const struct menu_item items[] = 
     {
         { "Start Cleaning", NULL },
-        { "Files to Clean", NULL},
+        { "Files to Clean", NULL },
         { "Quit", NULL }
     };
     
@@ -353,33 +354,38 @@ int tidy_lcd_menu(void)
     {
         { "Mac", -1 },
         { "Windows", -1 },
-        { "Both", -1}
+        { "Both", -1 }
     };
 
     loc = rb->menu_init(items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
                       
-    while (true)
+    while (!menu_quit)
     {    
         switch(rb->menu_show(loc))
         {
          
             case 0:
-                return ret;
+                menu_quit = true;   /* start cleaning */
+                break;
                 
             case 1:
                 rb->set_option("Files to Clean", &ret, INT, system_option, 3, NULL);
-            break;
+                break;
         
             case 2:
-                return 99;
+                ret = 99;
+                menu_quit = true;
+                break;
                 
             default:
-                return 99;
+                ret = 99;    /* exit plugin */
+                menu_quit = true;
+                break;
         }
     }
-
     rb->menu_exit(loc);
+    return ret;
 }
 
 /* this is the plugin entry point */
