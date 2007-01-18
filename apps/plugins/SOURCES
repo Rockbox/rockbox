@@ -71,9 +71,7 @@ starfield.c
 video.c
 #endif
 vu_meter.c
-#if !defined(IRIVER_H10_5GB)
 wormlet.c
-#endif
 
 #ifdef CONFIG_RTC 
 clock.c
