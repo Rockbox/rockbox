@@ -26,6 +26,18 @@
 
 static int pcm_freq = HW_SAMPR_DEFAULT; /* 44.1 is default */
 
+#define GIGABEAT_8000HZ      0x4d
+#define GIGABEAT_11025HZ     0x32
+#define GIGABEAT_12000HZ     0x61
+#define GIGABEAT_16000HZ     0x55
+#define GIGABEAT_22050HZ     0x36
+#define GIGABEAT_24000HZ     0x79
+#define GIGABEAT_32000HZ     0x59
+#define GIGABEAT_44100HZ     0x22
+#define GIGABEAT_48000HZ     0x41
+#define GIGABEAT_88200HZ     0x3e
+#define GIGABEAT_96000HZ     0x5d
+
 #define FIFO_COUNT ((IISFCON >> 6) & 0x01F)
 
 /* number of bytes in FIFO */
@@ -213,28 +225,49 @@ void pcm_play_pause_unpause(void)
     INTMSK &= ~(1<<19);
 }
 
-
-
 void pcm_set_frequency(unsigned int frequency)
 {
     int sr_ctrl;
 
     switch(frequency)
     {
+        case SAMPR_8:
+            sr_ctrl = GIGABEAT_8000HZ;
+            break;
         case SAMPR_11:
-            sr_ctrl = 0x19 << 1;
+            sr_ctrl = GIGABEAT_11025HZ;
+            break;
+        case SAMPR_12:
+            sr_ctrl = GIGABEAT_12000HZ;
+            break;
+        case SAMPR_16:
+            sr_ctrl = GIGABEAT_16000HZ;
             break;
         case SAMPR_22:
-            sr_ctrl = 0x1B << 1;
+            sr_ctrl = GIGABEAT_22050HZ;
+            break;
+        case SAMPR_24:
+            sr_ctrl = GIGABEAT_24000HZ;
+            break;
+        case SAMPR_32:
+            sr_ctrl = GIGABEAT_32000HZ;
             break;
         default:
+            frequency = SAMPR_44;
         case SAMPR_44:
-            sr_ctrl = 0x11 << 1;
+            sr_ctrl = GIGABEAT_44100HZ;
+            break;
+        case SAMPR_48:
+            sr_ctrl = GIGABEAT_48000HZ;
             break;
         case SAMPR_88:
-            sr_ctrl = 0x1F << 1;
+            sr_ctrl = GIGABEAT_88200HZ;
+            break;
+        case SAMPR_96:
+            sr_ctrl = GIGABEAT_96000HZ;
             break;
     }
+
     audiohw_set_sample_rate(sr_ctrl);
     pcm_freq = frequency;
 }
