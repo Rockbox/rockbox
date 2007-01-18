@@ -24,6 +24,8 @@ DEPFILE = $(OBJDIR)/dep-firmware
 
 all: $(OUTPUT) $(EXTRA_TARGETS)
 
+$(DEPFILE): $(BUILDDIR)/sysfont.h
+
 dep: $(DEPFILE)
 
 $(OUTPUT): $(OBJS) $(DEPFILE)
@@ -40,8 +42,8 @@ clean:
 $(OBJDIR)/thread.o: thread.c export/thread.h
 	$(call PRINTS,CC thread.c)$(CC) -c -O -fomit-frame-pointer $(CFLAGS) $< -o $@
 
-sysfont.h: ../fonts/rockbox_default.bdf
-	$(call PRINTS,Create sysfont.h)$(TOOLSDIR)/convbdf -h -o $(BUILDDIR)/sysfont.h $<
+$(BUILDDIR)/sysfont.h: ../fonts/rockbox_default.bdf
+	$(call PRINTS,Create sysfont.h)$(TOOLSDIR)/convbdf -h -o $@ $<
 
 $(OBJDIR)/sysfont.o: ../fonts/rockbox_default.bdf
 	$(call PRINTS,CONVBDF)$(TOOLSDIR)/convbdf -c -o $(OBJDIR)/sysfont.c $<
