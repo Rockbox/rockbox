@@ -387,7 +387,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     enum tidy_system system = TIDY_BOTH;
     enum tidy_return status;
-    int button;
 
     (void)parameter;
 
@@ -410,9 +409,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             system = TIDY_BOTH;
     }
 
-    while (rb->button_get(false) != TIDY_STOP)
+    while (true)
     {
-        
             status = tidy_do(system);
 
             switch (status)
@@ -428,10 +426,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             }
     }
         
-    if (button == TIDY_STOP)
-        return PLUGIN_OK;
-        
-    if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+    if (rb->default_event_handler(rb->button_get(false)) == SYS_USB_CONNECTED)
         return PLUGIN_USB_CONNECTED;
         
     rb->yield();
