@@ -39,67 +39,37 @@ enum tidy_system
 };
 
 /* variable button definitions */
-#if CONFIG_KEYPAD == RECORDER_PAD
-#define TIDY_DO BUTTON_ON
+#if CONFIG_KEYPAD == PLAYER_PAD
+#define TIDY_STOP BUTTON_STOP
+
+#elif CONFIG_KEYPAD == RECORDER_PAD
 #define TIDY_STOP BUTTON_OFF
-#define TIDY_LEFT BUTTON_LEFT
-#define TIDY_RIGHT BUTTON_RIGHT
 
 #elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
-#define TIDY_DO BUTTON_ON
 #define TIDY_STOP BUTTON_OFF
-#define TIDY_LEFT BUTTON_LEFT
-#define TIDY_RIGHT BUTTON_RIGHT
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
-#define TIDY_DO BUTTON_MENU
 #define TIDY_STOP BUTTON_OFF
-#define TIDY_LEFT BUTTON_LEFT
-#define TIDY_RIGHT BUTTON_RIGHT
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define TIDY_DO BUTTON_SELECT
 #define TIDY_STOP BUTTON_OFF
-#define TIDY_LEFT BUTTON_LEFT
-#define TIDY_RIGHT BUTTON_RIGHT
 
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_4G_PAD)
-#define TIDY_DO BUTTON_SELECT
 #define TIDY_STOP BUTTON_MENU
-#define TIDY_LEFT BUTTON_LEFT
-#define TIDY_RIGHT BUTTON_RIGHT
 
-#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
-#define TIDY_DO BUTTON_PLAY
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
 #define TIDY_STOP BUTTON_POWER
-#define TIDY_LEFT BUTTON_LEFT
-#define TIDY_RIGHT BUTTON_RIGHT
 
-#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
-#define TIDY_DO BUTTON_PLAY
-#define TIDY_STOP BUTTON_POWER
-#define TIDY_LEFT BUTTON_LEFT
-#define TIDY_RIGHT BUTTON_RIGHT
-
-#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
-#define TIDY_DO BUTTON_SELECT
+#elif CONFIG_KEYPAD == GIGABEAT_PAD
 #define TIDY_STOP BUTTON_A
-#define TIDY_LEFT BUTTON_LEFT
-#define TIDY_RIGHT BUTTON_RIGHT
 
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD)
-#define TIDY_DO BUTTON_SELECT
+#elif CONFIG_KEYPAD == SANSA_E200_PAD
 #define TIDY_STOP BUTTON_POWER
-#define TIDY_LEFT BUTTON_LEFT
-#define TIDY_RIGHT BUTTON_RIGHT
 
-#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
-#define TIDY_DO BUTTON_PLAY
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #define TIDY_STOP BUTTON_POWER
-#define TIDY_LEFT BUTTON_LEFT
-#define TIDY_RIGHT BUTTON_RIGHT
 
 #else
   #error DISKTIDY: Unsupported keypad
@@ -115,8 +85,10 @@ void tidy_lcd_status(const char *name, int *removed)
     rb->lcd_puts(0, 0, "Working ...");
     rb->lcd_puts(0, 1, name);
     rb->snprintf(text, 24, "Cleaned up %d items", *removed);
+#ifdef HAVE_LCD_BITMAP
     rb->lcd_puts(0, 2, text);
     rb->lcd_update();
+#endif
 }
 
 void tidy_get_absolute_path(struct dirent *entry, char *fullname, 
@@ -366,113 +338,80 @@ enum plugin_status tidy_do(enum tidy_system system)
     return status;
 }
 
-void tidy_lcd_menu(enum tidy_system system)
+int tidy_lcd_menu(void)
 {
-    /* show menu text */
-    rb->lcd_clear_display();
+    int loc, ret;
     
-   /* show keys */
-#if CONFIG_KEYPAD == RECORDER_PAD
-    rb->lcd_puts(0, 0, "[On] to clean up");
-    rb->lcd_puts(0, 1, "[Off] to exit/abort");
-#elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
-    rb->lcd_puts(0, 0, "[On] to clean up");
-    rb->lcd_puts(0, 1, "[Off] to exit/abort");
-#elif CONFIG_KEYPAD == ONDIO_PAD
-    rb->lcd_puts(0, 0, "[Menu] to clean up");
-    rb->lcd_puts(0, 1, "[Off] to exit/abort");
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
-      (CONFIG_KEYPAD == IRIVER_H300_PAD)
-    rb->lcd_puts(0, 0, "[Navi] to clean up");
-    rb->lcd_puts(0, 1, "[Off] to exit/abort");
-#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_4G_PAD)
-    rb->lcd_puts(0, 0, "[Select] to clean up");
-    rb->lcd_puts(0, 1, "[Menu] to exit/abort");
-#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
-    rb->lcd_puts(0, 0, "[Play] to clean up");
-    rb->lcd_puts(0, 1, "[Power] to exit/abort");
-#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
-    rb->lcd_puts(0, 0, "[Select] to clean up");
-    rb->lcd_puts(0, 1, "[A] to exit/abort");
-#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
-    rb->lcd_puts(0, 0, "[Play] to clean up");
-    rb->lcd_puts(0, 1, "[Power] to exit/abort");
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD)
-    rb->lcd_puts(0, 0, "[Select] to clean up");
-    rb->lcd_puts(0, 1, "[Power] to exit/abort");
-#else
-    #error DISKTIDY: Unsupported model
-#endif
-    
-    /* show selcted system */
-    switch (system)
+    static const struct menu_item items[] = 
     {
-        case TIDY_MAC:
-            rb->lcd_puts(0, 2, "< Mac >");
-            rb->lcd_puts(0, 3, "Deletes");
-            rb->lcd_puts(0, 4, "._*  .DS_Store");
-            rb->lcd_puts(0, 5, "/.Trashes/");
+        { "Start Cleaning", NULL },
+        { "Files to Clean", NULL},
+        { "Quit", NULL }
+    };
+    
+    static const struct opt_items system_option[3] = 
+    {
+        { "Mac", -1 },
+        { "Windows", -1 },
+        { "Both", -1}
+    };
+
+    loc = rb->menu_init(items, sizeof(items) / sizeof(*items),
+                      NULL, NULL, NULL, NULL);
+                      
+    while (true)
+    {    
+        switch(rb->menu_show(loc))
+        {
+         
+            case 0:
+                return ret;
+                
+            case 1:
+                rb->set_option("Files to Clean", &ret, INT, system_option, 3, NULL);
             break;
-        case TIDY_WIN:
-            rb->lcd_puts(0, 2, "< Win >");
-            rb->lcd_puts(0, 3, "Deletes");
-            rb->lcd_puts(0, 4, "Thumbs.db  /Recycled/");
-            rb->lcd_puts(0, 5, "/System Volume Information/");
-            break;
-        case TIDY_BOTH:
-            rb->lcd_puts(0, 2, "< Both >");
-            break;
-       
+        
+            case 2:
+                return 99;
+                
+            default:
+                return 99;
+        }
     }
-    rb->lcd_update();
+
+    rb->menu_exit(loc);
 }
 
 /* this is the plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    enum tidy_system system = TIDY_MAC;
+    enum tidy_system system = TIDY_BOTH;
     enum tidy_return status;
     int button;
 
     (void)parameter;
 
     rb = api;
-
-    tidy_lcd_menu(system);
-    
-    while (1)
+       
+    switch(tidy_lcd_menu())
     {
-        button = rb->button_get(false);
-        
-        if (button == TIDY_LEFT)
-        {
-            if (system == 0)
-            {
-                system = 2;
-            }
-            else
-            {
-                system --;
-            }
-            tidy_lcd_menu(system);
-        }
-        
-        if (button == TIDY_RIGHT)
-        {
-            if (system == 2)
-            {
-                system = 0;
-            }
-            else
-            {
-                system ++;
-            }
-            tidy_lcd_menu(system);
-        }
-        
-        if (button == TIDY_DO)
-        {
+        case 0:
+            system = TIDY_MAC;
+            break;
+        case 1:
+            system = TIDY_WIN;
+            break;
+        case 2:
+            system = TIDY_BOTH;
+            break;
+        case 99:
+            return PLUGIN_OK;
+        default:
+            system = TIDY_BOTH;
+    }
+
+    while (rb->button_get(false) != TIDY_STOP)
+    {
         
             status = tidy_do(system);
 
@@ -487,20 +426,16 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 case TIDY_RETURN_ABORT:
                     return PLUGIN_OK;                
             }
-        }
-        
-        if (button == TIDY_STOP)
-        {
-            return PLUGIN_OK;
-        }
-        
-        if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
-        {
-            return PLUGIN_USB_CONNECTED;
-        }
-        
-        rb->yield();
     }
+        
+    if (button == TIDY_STOP)
+        return PLUGIN_OK;
+        
+    if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+        return PLUGIN_USB_CONNECTED;
+        
+    rb->yield();
+
     
     return PLUGIN_OK;
 }
