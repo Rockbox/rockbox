@@ -114,6 +114,7 @@ static inline int ipod_4g_button_read(void)
                 int new_wheel_value = (status << 9) >> 25;
                 whl = new_wheel_value;
                 backlight_on();
+                reset_poweroff_timer();
                 /* The queue should have no other events when scrolling */
                 if (queue_empty(&button_queue) && old_wheel_value >= 0) {
 
@@ -137,9 +138,9 @@ static inline int ipod_4g_button_read(void)
                     if (send_events)
 #endif
                     {
-                    data = (wheel_delta << 16) | new_wheel_value;
-                    queue_post(&button_queue, wheel_keycode | wheel_repeat,
-                               data);
+                        data = (wheel_delta << 16) | new_wheel_value;
+                        queue_post(&button_queue, wheel_keycode | wheel_repeat,
+                                   data);
                     }
 
                     if (!wheel_repeat) wheel_repeat = BUTTON_REPEAT;
