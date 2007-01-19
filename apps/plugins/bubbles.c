@@ -126,7 +126,7 @@ PLUGIN_HEADER
 #define ROW_INDENT     8
 #define MAX_FPS       30
 
-/* 12x12 bubbles (iPod Nano, Sansa E200) */
+/* 12x12 bubbles (iPod Nano) */
 #elif (LCD_HEIGHT == 132) && (LCD_WIDTH == 176)
 #define BUBBLE_WIDTH  12
 #define BUBBLE_HEIGHT 12
