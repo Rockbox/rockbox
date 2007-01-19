@@ -5,34 +5,32 @@ A simple stopwatch program with support for saving times.
 
 \begin{table}
 \begin{btnmap}{}{}
-\opt{player}{\ButtonMenu}
-\opt{recorder,recorderv2fm,h1xx,h300}{\ButtonOff}
-\opt{ondio}{\ButtonOff}
-\opt{ipodcolor,ipodnano}{\ButtonMenu}
-\opt{SANSA_E200_PAD}{\ButtonPower}
+\opt{PLAYER_PAD}{\ButtonMenu}
+\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+\opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
+\opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD}{\ButtonPower}
 & Quit Plugin \\
-\opt{player,recorder,recorderv2fm}{\ButtonPlay}
-\opt{ondio}{\ButtonRight}
-\opt{h1xx,h300}{\ButtonSelect}
-\opt{ipodcolor,ipodnano}{\ButtonPlay}
+\opt{PLAYER_PAD,RECORDER_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPlay}
+\opt{ONDIO_PAD}{\ButtonRight}
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
 \opt{SANSA_E200_PAD}{\ButtonLeft}
 & Start / stop \\
-\opt{player}{\ButtonStop}
-\opt{recorder,recorderv2fm,ondio}{\ButtonLeft}
-\opt{h1xx,h300}{\ButtonDown}
-\opt{ipodcolor,ipodnano}{\fixme{Unknown}} 
-\opt{SANSA_E200_PAD}{\ButtonRec}
+\opt{PLAYER_PAD}{\ButtonStop}
+\opt{RECORDER_PAD,ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonLeft}
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonDown}
+\opt{IRIVER_H10_PAD}{\ButtonRew}
+\opt{IAUDIO_X5_PAD,SANSA_E200_PAD}{\ButtonRec}
 & Reset timer (only when timer is stopped)\\
-\opt{player,recorder,recorderv2fm}{\ButtonOn}
-\opt{ondio}{\ButtonMenu}
-\opt{h1xx,h300}{\ButtonOn}
-\opt{ipodcolor,ipodnano}{\fixme{Unknown}} 
-\opt{SANSA_E200_PAD}{\ButtonSelect}
+\opt{PLAYER_PAD,RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+\opt{ONDIO_PAD}{\ButtonMenu}
+\opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonRight} 
+\opt{IRIVER_H10_PAD}{\ButtonFF}
+\opt{IAUDIO_X5_PAD,SANSA_E200_PAD}{\ButtonSelect}
 & Take lap time \\
-\opt{player,h1xx,h300,ipodcolor,ipodnano}{\ButtonLeft/\ButtonRight}
-\opt{recorder,recorderv2fm}{\ButtonDown/\ButtonUp}
-\opt{ondio}{\ButtonUp/\ButtonDown}
-\opt{SANSA_E200_PAD}{\ButtonScrollUp/\ButtonScrollDown}
+\opt{PLAYER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonLeft/\ButtonRight}
+\opt{RECORDER_PAD,ONDIO_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD}{\ButtonUp/\ButtonDown}
+\opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd/\ButtonScrollBack}
+\opt{IRIVER_H10_PAD}{\ButtonScrollUp/\ButtonScrollDown}
 & Scroll through lap times \\
 \end{btnmap}
 \end{table}
