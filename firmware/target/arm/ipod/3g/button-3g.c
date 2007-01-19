@@ -63,6 +63,7 @@ void handle_scroll_wheel(int new_scroll, int was_hold, int reverse)
     }
     else if (!was_hold) {
         backlight_on();
+        reset_poweroff_timer();
         if (++count == 6) { /* reduce sensitivity */
             count = 0;
             switch (direction) {
