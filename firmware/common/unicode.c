@@ -45,7 +45,7 @@ static const char cp_2_table[NUM_CODEPAGES] =
 };
 
 /* Load codepage file into memory */
-int load_cp_table(int cp)
+static int load_cp_table(int cp)
 {
     int i=0;
     int table = cp_2_table[cp];
@@ -213,6 +213,7 @@ unsigned char* utf16BEdecode(const unsigned char *utf16, unsigned char *utf8,
     return utf8;
 }
 
+#if 0 /* currently unused */
 /* Recode any UTF-16 string to UTF-8 */
 unsigned char* utf16decode(const unsigned char *utf16, unsigned char *utf8,
         unsigned int count)
@@ -231,6 +232,7 @@ unsigned char* utf16decode(const unsigned char *utf16, unsigned char *utf8,
         return utf16BEdecode(utf16, utf8, count);
     }
 }
+#endif
 
 /* Return the number of UTF-8 chars in a string */
 unsigned long utf8length(const unsigned char *utf8)
