@@ -59,10 +59,10 @@ PLUGIN_HEADER
 #define BUBBLES_LEFT_REP    PLA_LEFT_REPEAT
 #define BUBBLES_RIGHT       PLA_RIGHT
 #define BUBBLES_RIGHT_REP   PLA_RIGHT_REPEAT
-#define BUBBLES_QUIT    PLA_QUIT
-#define BUBBLES_START   PLA_START
-#define BUBBLES_SELECT  PLA_FIRE
-#define BUBBLES_RESUME  PLA_MENU
+#define BUBBLES_QUIT        PLA_QUIT
+#define BUBBLES_START       PLA_START
+#define BUBBLES_SELECT      PLA_FIRE
+#define BUBBLES_RESUME      PLA_MENU
 
 #if CONFIG_KEYPAD != ONDIO_PAD
 
@@ -81,8 +81,8 @@ PLUGIN_HEADER
 #endif
 
 
-/* bubbles will consume height of 10*ROW_HEIGHT+2*(BUBBLE_HEIGHT-1)+BUBBLE_HEIGHT/2 */
-/* 24x24 bubbles (iPod Video) */
+/* bubbles will consume height of ROW_HEIGHT*(BB_HEIGHT-1)+BUBBLE_HEIGHT*3/2 */
+/* 22x22 bubbles (iPod Video) */
 #if (LCD_HEIGHT == 240) && (LCD_WIDTH == 320)
 #define BUBBLE_WIDTH  22
 #define BUBBLE_HEIGHT 22
@@ -92,6 +92,17 @@ PLUGIN_HEADER
 #define ROW_HEIGHT    18
 #define ROW_INDENT    11
 #define MAX_FPS       40
+
+/* 22x22 bubbles (Gigabeat) */
+#elif (LCD_HEIGHT == 320) && (LCD_WIDTH == 240)
+#define BUBBLE_WIDTH  22
+#define BUBBLE_HEIGHT 22
+#define EMBLEM_WIDTH  16
+#define EMBLEM_HEIGHT 16
+#define XOFS          64
+#define ROW_HEIGHT    18
+#define ROW_INDENT    11
+#define MAX_FPS       20
 
 /* 16x16 bubbles (H300, iPod Color) */
 #elif (LCD_HEIGHT == 176) && (LCD_WIDTH == 220)
@@ -104,18 +115,18 @@ PLUGIN_HEADER
 #define ROW_INDENT     8
 #define MAX_FPS       30
 
-/* 16x16 bubbles (Gigabeat) */
-#elif (LCD_HEIGHT == 320) && (LCD_WIDTH == 240)
+/* 16x16 bubbles (Sansa E200) */
+#elif (LCD_HEIGHT == 220) && (LCD_WIDTH == 176)
 #define BUBBLE_WIDTH  16
 #define BUBBLE_HEIGHT 16
 #define EMBLEM_WIDTH  12
 #define EMBLEM_HEIGHT 12
-#define XOFS          56
+#define XOFS          48
 #define ROW_HEIGHT    14
 #define ROW_INDENT     8
-#define MAX_FPS       20
+#define MAX_FPS       30
 
-/* 12x12 bubbles (iPod Nano) */
+/* 12x12 bubbles (iPod Nano, Sansa E200) */
 #elif (LCD_HEIGHT == 132) && (LCD_WIDTH == 176)
 #define BUBBLE_WIDTH  12
 #define BUBBLE_HEIGHT 12
@@ -2491,6 +2502,14 @@ static int bubbles(struct game_context* bb) {
             rb->lcd_puts(0, 6, " and show high scores");
             rb->lcd_puts(0, 7, "LEFT/RIGHT to aim");
             rb->lcd_puts(0, 8, "UP/DOWN to change level");
+#elif CONFIG_KEYPAD == SANSA_E200_PAD
+            rb->lcd_puts(0, 2, "PLAY to start/pause");
+            rb->lcd_puts(0, 3, "SUBMENU to save/resume");
+            rb->lcd_puts(0, 4, "POWER to exit");
+            rb->lcd_puts(0, 5, "SELECT to fire");
+            rb->lcd_puts(0, 6, " and show high scores");
+            rb->lcd_puts(0, 7, "LEFT/RIGHT to aim");
+            rb->lcd_puts(0, 8, "SCROLL to change level");
 #endif
 #if LCD_WIDTH >= 138
             rb->snprintf(str, 28, "Start on level %d of %d", startlevel+1,

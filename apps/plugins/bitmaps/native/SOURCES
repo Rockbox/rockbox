@@ -22,14 +22,16 @@ bubbles_right.176x132x16.bmp
 bubbles_emblem.220x176x16.bmp
 bubbles_left.220x176x16.bmp
 bubbles_right.220x176x16.bmp
-#elif (LCD_WIDTH == 240) && (LCD_HEIGHT == 320)
+#elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 220)
 bubbles_emblem.220x176x16.bmp
-bubbles_left.240x320x16.bmp
-bubbles_right.240x320x16.bmp
+bubbles_left.176x220x16.bmp
 #elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
 bubbles_emblem.320x240x16.bmp
 bubbles_left.320x240x16.bmp
 bubbles_right.320x240x16.bmp
+#elif (LCD_WIDTH == 240) && (LCD_HEIGHT == 320)
+bubbles_emblem.320x240x16.bmp
+bubbles_left.240x320x16.bmp
 #endif
 
 /* ChessBox */
