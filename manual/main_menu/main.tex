@@ -179,12 +179,12 @@ pages of information.}
 
 \begin{description}
 \item[Rockbox Info:]
-  Displays some basic system information.  This is, from top to bottom, 
-the amount of memory Rockbox has available for storing music (the buffer). The
-battery status. %
+  Displays some basic system information. This is, from top to bottom,
+  the amount of memory Rockbox has available for storing music (the buffer).
+  The battery status.
 \opt{ondio}{%
-Memory size and amount of free space on the two data volumes, this info is
-given seperately for internal memory (\emph{Int}) and for a plugged in MMC
+  Memory size and amount of free space on the two data volumes, this info is
+  given seperately for internal memory (\emph{Int}) and for a plugged in MMC
 (\emph{MMC}).
 }%
 \nopt{ondio}{Hard disk size and the amount of free space on the disk.}
@@ -203,25 +203,22 @@ given seperately for internal memory (\emph{Int}) and for a plugged in MMC
 
 \opt{player}{
   \section{Shutdown}
-  This menu option saves the Rockbox configuration and turns off the hard 
-  drive before shutting down the machine. For maximum safety this procedure 
+  This menu option saves the Rockbox configuration and turns off the hard
+  drive before shutting down the machine. For maximum safety this procedure
   is recommended when turning off the \dap. (There is a very small risk
   of hard disk corruption otherwise.) See \reference{ref:Safeshutdown}
   for more details.
 }
 
-\opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD}
+\nopt{PLAYER_PAD,ONDIO_PAD}
 {
 \section{Quick Menu}
-  Whilst not strictly part of the \setting{Main Menu}, it is worth noting that a few
-  of the more commonly used settings are available from the \setting{Quick Menu}.
-  The \setting{Quick Menu} screen is accessed by holding the 
-    \opt{RECORDER_PAD}{\ButtonFTwo}%
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}%
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD}{\ButtonMenu}%
-    \opt{IAUDIO_X5_PAD}{\ButtonRec}%
-    \opt{IRIVER_H10_PAD}{\ButtonLeft}%
-  {} key, and it allows rapid access to the \setting{Shuffle} and \setting{Repeat} modes 
-  (\reference{ref:PlaybackOptions})
-  and the \setting{Show Files} option (\reference{ref:ShowFiles}).
+  Whilst not strictly part of the \setting{Main Menu}, it is worth noting that
+  a few of the more commonly used settings are available from the
+  \setting{Quick Menu}.
+  The \setting{Quick Menu} screen is accessed with \ActionStdQuickScreen
+  and exited with the same button.
+  It allows rapid access to the \setting{Shuffle} and \setting{Repeat}
+  modes (\reference{ref:PlaybackOptions}) and the \setting{Show Files}
+  option (\reference{ref:ShowFiles}).
 }
