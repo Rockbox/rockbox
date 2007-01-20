@@ -81,17 +81,23 @@ static void i2c_scl_hi(void)
 }
 
 
+
 static void i2c_delay(void)
 {
-    volatile int _x; 
+     unsigned _x;
 
     /* The i2c can clock at 500KHz: 2uS period -> 1uS half period */
-    /* At 300Mhz - if loop takes 10 cycles @ 3.3nS each -> 1uS / 33nS -> 30 */
-    for (_x=0; _x<30; _x++)
+    /* about 30 cycles overhead + X * 7 */
+    /* 300MHz: 1000nS @3.36nS/cyc = 297cyc: X = 38*/
+    /* 100MHz: 1000nS @10nS/cyc = 100cyc : X = 10 */
+    for (_x = get_cpu_boost_counter() ? 38 : 10; _x; _x--)
     {
         /* burn CPU cycles */
+        /* gcc makes it an inc loop - check with objdump for asm timing */
     }
 }
+
+
 
 struct i2c_interface s3c2440_i2c = {
     0x34, /* Address */

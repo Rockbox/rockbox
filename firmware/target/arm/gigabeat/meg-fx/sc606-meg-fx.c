@@ -24,12 +24,15 @@
 
 #define SCL_SDA_HI (GPHDAT |= (3 << 9))
 
-/* The SC606 can clock at 400KHz: 2.5uS period -> 1.25uS half period */
+/* The SC606 can clock at 400KHz: */
+/* Clock period high is 600nS and low is 1300nS */
 /* The high and low times are different enough to need different timings */
-/* At 300Mhz - one loop takes about 10 cycles */
-#define DELAY_LO   do { volatile int _x; for(_x=0;_x<20;_x++);} while (0)
-#define DELAY      do { volatile int _x; for(_x=0;_x<15;_x++);} while (0)
-#define DELAY_HI   do { volatile int _x; for(_x=0;_x<10;_x++);} while (0)
+/* cycles delayed = 30 + 7 * loops */
+/* 100MHz = 10nS per cycle: LO:1300nS=130:14  HI:600nS=60:9 */
+/* 300MHz = 3.36nS per cycle: LO:1300nS=387:51  HI:600nS=179:21 */
+#define DELAY_LO do{int x;for(x=get_cpu_boost_counter()?51:14;x;x--);} while (0)
+#define DELAY    do{int x;for(x=get_cpu_boost_counter()?35:10;x;x--);} while (0)
+#define DELAY_HI do{int x;for(x=get_cpu_boost_counter()?21: 9;x;x--);} while (0)
 
 
 
@@ -99,13 +102,13 @@ static void sc606_i2c_outb(unsigned char byte)
     int i;
 
     /* clock out each bit, MSB first */
-    for (i = 0x80; i; i >>= 1) 
+    for (i = 0x80; i; i >>= 1)
     {
-        if (i & byte) 
+        if (i & byte)
         {
             SDA_HI;
-        } 
-        else 
+        }
+        else
         {
             SDA_LO;
         }
@@ -154,10 +157,10 @@ int sc606_write(unsigned char reg, unsigned char data)
     int x;
 
     sc606_i2c_start();
-    
+
     sc606_i2c_outb(SLAVE_ADDRESS);
     x = sc606_i2c_getack();
-    
+
     sc606_i2c_outb(reg);
     x += sc606_i2c_getack();
 
@@ -168,7 +171,7 @@ int sc606_write(unsigned char reg, unsigned char data)
 
     sc606_i2c_outb(data);
     x += sc606_i2c_getack();
-    
+
     sc606_i2c_stop();
 
     return x;
@@ -183,10 +186,10 @@ int sc606_read(unsigned char reg, unsigned char* data)
     sc606_i2c_start();
     sc606_i2c_outb(SLAVE_ADDRESS);
     x = sc606_i2c_getack();
-    
+
     sc606_i2c_outb(reg);
     x += sc606_i2c_getack();
-    
+
     sc606_i2c_restart();
     sc606_i2c_outb(SLAVE_ADDRESS | 1);
     x += sc606_i2c_getack();
@@ -202,7 +205,7 @@ int sc606_read(unsigned char reg, unsigned char* data)
 void sc606_init(void)
 {
     volatile int i;
-    
+
     /* Set GPB2 (EN) to 1 */
     GPBCON = (GPBCON & ~(3<<4)) | 1<<4;
 
