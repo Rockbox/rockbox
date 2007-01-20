@@ -78,6 +78,7 @@ void ide_power_enable(bool on)
 {
     if(on){
         GPIOF_OUTPUT_VAL &=~ 0x1;
+        sleep(1);
     } else {
         GPIOF_OUTPUT_VAL |= 0x1;
     }
