@@ -374,11 +374,6 @@ int tidy_lcd_menu(void)
                 break;
         
             case 2:
-                ret = 99;
-                menu_quit = true;
-                break;
-                
-            default:
                 ret = 99;    /* exit plugin */
                 menu_quit = true;
                 break;
