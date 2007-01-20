@@ -1473,10 +1473,6 @@ void initialise_ship(void)
     ship.position.dy = 0;
     ship.explode_countdown  = 0;
     
-    /*hack-o-rama-city-arizona, take it out to see what happens:*/
-    for(n=30;--n;)
-        rotate_ship(SHIP_ROT_ACW_COS, SHIP_ROT_ACW_SIN);
-    
     /*grab a copy of the ships points for the lives display:*/
     point = ship.vertices;
     lives_point = lives_points;
