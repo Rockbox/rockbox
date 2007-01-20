@@ -8,8 +8,8 @@ contained in the tags (ID3v1, ID3v2%
 ) in your audio files, Rockbox builds and maintains a database of the music
 files on your player and allows you to browse them by Artist, Album and Genre.
 
-\subsection{Initialising the database}
-Before you use the database for the first time, you must initialise it by using
+\subsection{Initializing the database}
+Before you use the database for the first time, you must initialize it by using
 the \setting{Initialize Now} function in the \setting{Database Menu}
 (\setting{General Settings $\rightarrow$ File View $\rightarrow$ Database})
 , which is described in the following section.
@@ -49,15 +49,14 @@ the \setting{Initialize Now} function in the \setting{Database Menu}
     Menu}.
   \warn{\setting{Initialize Now} removes all database files (removing
     runtimedb data also) and rebuilds the database from scratch.}
-  This can take quite a while depending on the number of music files on your
-  \dap{}, and may require a restart to allow the files to be committed to the
-  database.
 
-  The database initialisation happens in the background, so you can continue
-  to listen to music while the database is being initialised. If you shut
-  down your player during initialisation, the database building process will
-  continue next time you turn it on.
-  
+  This can take quite a while depending on the number of music files on your
+  \dap{}. The database initialization happens in the background, so you can
+  continue to listen to music while the database is being initialized. If you
+  shut down your player during initialisation, the database building process
+  will continue next time you turn it on. After initialization is finished you
+  \emph{have to restart} your \dap{} before you can use the database.
+
 \item[Update Now.]
   \setting{Update now} causes the database to detect new and deleted files
   \opt{SWCODEC}{
