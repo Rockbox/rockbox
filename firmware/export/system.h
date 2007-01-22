@@ -56,20 +56,36 @@ bool detect_flashed_romimage(void);
 bool detect_flashed_ramimage(void);
 bool detect_original_firmware(void);
 
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ) \
+        && defined(ROCKBOX_HAS_LOGF)
+#define CPU_BOOST_LOGGING
+#endif
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 #define FREQ cpu_frequency
 void set_cpu_frequency(long frequency);
+#ifdef CPU_BOOST_LOGGING
+char * cpu_boost_log_getlog_first(void);
+char * cpu_boost_log_getlog_next(void);
+int cpu_boost_log_getcount(void);
+void cpu_boost_(bool on_off, char* location, int line);
+#else
 void cpu_boost(bool on_off);
+#endif
 void cpu_idle_mode(bool on_off);
 int get_cpu_boost_counter(void);
 #else
 #define FREQ CPU_FREQ
 #define set_cpu_frequency(frequency)
-#define cpu_boost(on_off)
+#define cpu_boost(on_off,location)
 #define cpu_boost_id(on_off, id)
 #define cpu_idle_mode(on_off)
 #define get_cpu_boost_counter()
 #define get_cpu_boost_tracker()
+#endif
+
+#ifdef CPU_BOOST_LOGGING
+#define cpu_boost(on_off) cpu_boost_(on_off,__FILE__,  __LINE__)
 #endif
 
 #define BAUDRATE 9600

@@ -2237,7 +2237,55 @@ static bool dbg_write_eeprom(void)
     return false;
 }
 #endif /* defined(HAVE_EEPROM) && !defined(HAVE_EEPROM_SETTINGS) */
-
+#ifdef CPU_BOOST_LOGGING
+static bool cpu_boost_log(void)
+{
+    int i = 0,j=0;
+    int count = cpu_boost_log_getcount();
+    int lines = LCD_HEIGHT/SYSFONT_HEIGHT;
+    char *str;
+    bool done;
+    lcd_setmargins(0, 0);
+    lcd_setfont(FONT_SYSFIXED);
+    str = cpu_boost_log_getlog_first();
+    while (i < count)
+    {
+        lcd_clear_display();
+        for(j=0; j<lines; j++,i++)
+        {
+            if (!str)
+                str = cpu_boost_log_getlog_next();
+            if (str)
+            {
+                lcd_puts(0, j,str);
+            }
+            str = NULL;
+        }
+        lcd_update();
+        done = false;
+        action_signalscreenchange();
+        while (!done)
+        {
+            switch(get_action(CONTEXT_STD,TIMEOUT_BLOCK))
+            {
+                case ACTION_STD_OK:
+                case ACTION_STD_PREV:
+                case ACTION_STD_NEXT:
+                    done = true;
+                break;
+                case ACTION_STD_CANCEL:
+                    i = count;
+                    done = true;
+                break;
+            }
+        }
+    }
+    get_action(CONTEXT_STD,TIMEOUT_BLOCK);
+    lcd_setfont(FONT_UI);
+    action_signalscreenchange();
+    return false;
+}
+#endif
 bool debug_menu(void)
 {
     int m;
@@ -2311,6 +2359,9 @@ bool debug_menu(void)
 #ifdef ROCKBOX_HAS_LOGF
         {"logf", logfdisplay },
         {"logfdump", logfdump },
+#endif
+#ifdef CPU_BOOST_LOGGING
+        {"cpu_boost log",cpu_boost_log},
 #endif
     };
 

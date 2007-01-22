@@ -209,7 +209,11 @@ struct codec_api {
     int (*system_memory_guard)(int newmode);
     long *cpu_frequency;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
+#ifdef CPU_BOOST_LOGGING
+    void (*cpu_boost_)(bool on_off,char*location,int line);
+#else
     void (*cpu_boost)(bool on_off);
+#endif
 #endif
 #endif
 

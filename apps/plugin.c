@@ -250,8 +250,13 @@ static const struct plugin_api rockbox_api = {
 #ifndef SIMULATOR
     system_memory_guard,
     &cpu_frequency,
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
+#ifdef CPU_BOOST_LOGGING
+    cpu_boost_,
+#else
     cpu_boost,
+#endif
 #endif
     timer_register,
     timer_unregister,
