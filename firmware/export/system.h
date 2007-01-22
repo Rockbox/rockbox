@@ -57,7 +57,7 @@ bool detect_flashed_ramimage(void);
 bool detect_original_firmware(void);
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ) \
-        && defined(ROCKBOX_HAS_LOGF)
+        && defined(ROCKBOX_HAS_LOGF) 
 #define CPU_BOOST_LOGGING
 #endif
 
@@ -77,7 +77,7 @@ int get_cpu_boost_counter(void);
 #else
 #define FREQ CPU_FREQ
 #define set_cpu_frequency(frequency)
-#define cpu_boost(on_off,location)
+#define cpu_boost(on_off)
 #define cpu_boost_id(on_off, id)
 #define cpu_idle_mode(on_off)
 #define get_cpu_boost_counter()
