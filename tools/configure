@@ -1579,7 +1579,7 @@ export OBJDIR=@PWD@
 export BUILDDIR=@PWD@
 export LANGUAGE=@LANGUAGE@
 export MEMORYSIZE=@MEMORY@
-export VERSION=\$(shell date -u +%y%m%d-%H%M)
+export VERSION=\$(shell \$(TOOLSDIR)/svnversion.sh \$(ROOTDIR))
 export BUILDDATE=\$(shell date -u +'-DYEAR=%Y -DMONTH=%m -DDAY=%d')
 export MKFIRMWARE=@TOOL@
 export BMP2RB_MONO=@BMP2RB_MONO@

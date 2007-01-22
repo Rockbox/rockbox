@@ -16,6 +16,7 @@ manual-prep: rockbox.tex
 	@mkdir -p $(OBJDIR)
 	@find * -type d \! -regex '.*\.svn.*' -exec mkdir -p $(OBJDIR)/{} \;
 	@find * -type f \! -regex '.*\.svn.*' -exec cp {} $(OBJDIR)/{} \;
+	@../tools/svnversion.sh > version.tex 
 	@perl credits.pl < ../docs/CREDITS | iconv -f utf-8 -t iso-8859-1 > $(OBJDIR)/CREDITS.tex
 	@echo "\newcommand{\platform}{${MANUALDEV}}" > $(OBJDIR)/rockbox-build.tex
 	@echo "\newcommand{\buildversion}{$(VERSION)}" >> $(OBJDIR)/rockbox-build.tex

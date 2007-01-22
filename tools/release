@@ -11,6 +11,10 @@ if(!-f "apps/version.h") {
     print "run this script in the root dir\n";
     exit;
 }
+# save the complete version string for VERSION file,
+# strip everything after space / hyphen for filename
+$longversion = $ARGV[0];
+$version =~ s/[ -].+//;
 
 # -L allows find to follow symbolic links
 @files=`find -L . -name FILES`;
@@ -84,7 +88,6 @@ for(@entries) {
     `cp -p $_ $dir 2>/dev/null`;
 }
 
-
 if(!open(VERSION, "<apps/version.h")) {
     print "Can't read version.h\n";
     exit;
@@ -100,6 +103,13 @@ while(<VERSION>) {
 }
 close(VERSION);
 close(THIS);
+
+if(!open(VER, ">rockbox-$version/docs/VERSION")) {
+    print "Can't create new docs/VERSION file\n";
+    exit;
+}
+print VER $version;
+close(VER);
 
 `tar -cjf rockbox-$version.tar.bz2 rockbox-$version`;
 `rm -rf rockbox-$version`;

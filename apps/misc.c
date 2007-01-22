@@ -815,7 +815,7 @@ int show_logo( void )
     lcd_clear_display();
     lcd_double_height(true);
     lcd_puts(0, 0, rockbox);
-    lcd_puts(0, 1, appsversion);
+    lcd_puts_scroll(0, 1, appsversion);
 #endif
 
     return 0;
