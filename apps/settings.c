@@ -262,7 +262,7 @@ bool settings_write_config(char* filename)
 {
     int i;
     int fd;
-    char value[MAX_PATH];
+    char value[MAX_FILENAME * 3];	/* More than enough for all current values */
     fd = open(filename,O_CREAT|O_TRUNC|O_WRONLY);
     if (fd < 0)
         return false;
@@ -287,27 +287,38 @@ bool settings_write_config(char* filename)
                 }
                 else 
 #endif
-                    if (settings[i].cfg_vals == NULL)
+                if (settings[i].cfg_vals == NULL)
                 {
                     snprintf(value,MAX_PATH,"%d",*(int*)settings[i].setting);
                 }
                 else
                 {
-                    char *s,*end;
-                    char vals[MAX_PATH];
+                    const char *s;
+                    const char *end;
                     int val = 0;
-                    strncpy(vals,settings[i].cfg_vals,MAX_PATH);
-                    s = strtok_r(vals,",",&end);
-                    while (s)
+                    
+                    end = s = settings[i].cfg_vals;
+                    
+                    do
                     {
+                        while (*end != 0 && *end != ',')
+                        {
+                            end++;
+                        }
+                        
                         if (val == *(int*)settings[i].setting)
                         {
-                            strncpy(value,s,MAX_PATH);
+                            strncpy(value, s, end - s);
+                            value[end - s] = 0;
                             break;
                         }
-                        val++;
-                        s = strtok_r(NULL,",",&end);
+                        else
+                        {
+                            s = end + 1;
+                            val++;
+                        }
                     }
+                    while (*end++);
                 }
                 break;
             case F_T_BOOL:
