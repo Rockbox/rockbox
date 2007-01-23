@@ -54,6 +54,9 @@
 #define REC_BASE_DIR "/recordings"
 #define EQS_DIR     ROCKBOX_DIR "/eqs"
 #define CODECS_DIR  ROCKBOX_DIR"/codecs"
+#define FMPRESET_PATH ROCKBOX_DIR "/fmpresets"
+
+#define CONFIGFILE  ROCKBOX_DIR "/config.cfg"
 
 #define MAX_FILENAME 20
 
@@ -547,7 +550,6 @@ struct opt_items {
 
 /* prototypes */
 
-void settings_calc_config_sector(void);
 int settings_save(void);
 void settings_load(int which);
 void settings_reset(void);
@@ -556,7 +558,7 @@ void settings_apply(void);
 void settings_apply_pm_range(void);
 void settings_display(void);
 
-bool settings_load_config(const char* file);
+bool settings_load_config(const char* file, bool apply);
 bool settings_save_config(void);
 bool set_bool_options(const char* string, bool* variable,
                       const char* yes_str, int yes_voice,

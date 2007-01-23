@@ -1844,6 +1844,7 @@ static bool reset_settings(void)
         case YESNO_YES:
             settings_reset();
             settings_apply();
+            settings_save();
             break;
         case YESNO_NO:
             break;

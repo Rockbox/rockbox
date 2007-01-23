@@ -92,9 +92,9 @@ static struct mutex mmc_mutex;
 
 #ifdef HAVE_HOTSWAP
 static bool mmc_monitor_enabled = true;
-static long mmc_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
+static long mmc_stack[((DEFAULT_STACK_SIZE*2) + 0x800)/sizeof(long)];
 #else
-static long mmc_stack[DEFAULT_STACK_SIZE/sizeof(long)];
+static long mmc_stack[(DEFAULT_STACK_SIZE*2)/sizeof(long)];
 #endif
 static const char mmc_thread_name[] = "mmc";
 static struct event_queue mmc_queue;

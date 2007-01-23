@@ -18,7 +18,6 @@
  ****************************************************************************/
 #ifndef RADIO_H
 #define RADIO_H
-#define FMPRESET_PATH ROCKBOX_DIR "/fmpresets"
 
 #ifndef FMRADIO_H
 #include "fmradio.h"

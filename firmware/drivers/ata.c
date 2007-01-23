@@ -81,7 +81,7 @@ static int poweroff_timeout = 2*HZ;
 #ifdef HAVE_LBA48
 static bool lba48 = false; /* set for 48 bit addressing */
 #endif
-static long ata_stack[DEFAULT_STACK_SIZE/sizeof(long)];
+static long ata_stack[(DEFAULT_STACK_SIZE*3)/sizeof(long)];
 static const char ata_thread_name[] = "ata";
 static struct event_queue ata_queue;
 static bool initialized = false;

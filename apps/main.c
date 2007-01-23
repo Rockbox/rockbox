@@ -247,7 +247,6 @@ static void init(void)
     screen_access_init();
     gui_syncstatusbar_init(&statusbars);
     settings_reset();
-    settings_calc_config_sector();
     settings_load(SETTINGS_ALL);
     gui_sync_wps_init();
     settings_apply();
@@ -447,8 +446,6 @@ static void init(void)
         }
     }
 
-    settings_calc_config_sector();
-    
 #if defined(SETTINGS_RESET) || (CONFIG_KEYPAD == IPOD_4G_PAD) || \
     (CONFIG_KEYPAD == IRIVER_H10_PAD) || (CONFIG_KEYPAD == GIGABEAT_PAD)
 #ifdef SETTINGS_RESET

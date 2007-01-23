@@ -486,7 +486,7 @@ int ft_enter(struct tree_context* c)
 
             case TREE_ATTR_CFG:
                 gui_syncsplash(0, true, str(LANG_WAIT));
-                if (!settings_load_config(buf))
+                if (!settings_load_config(buf,true))
                     break;
                 gui_syncsplash(HZ, true, str(LANG_SETTINGS_LOADED));
                 break;
