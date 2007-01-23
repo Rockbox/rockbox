@@ -38,7 +38,6 @@
 
 extern void ata_enable(bool on);
 extern void ata_spindown(int seconds);
-extern void ata_poweroff(bool enable);
 extern void ata_sleep(void);
 extern void ata_sleepnow(void);
 extern bool ata_disk_is_active(void);

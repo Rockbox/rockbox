@@ -3850,16 +3850,16 @@
 </phrase>
 <phrase>
   id: LANG_POWEROFF
-  desc: disk poweroff flag
+  desc: DEPRECATED
   user:
   <source>
-    *: "Disk Poweroff"
+    *: ""
   </source>
   <dest>
-    *: "Disk Poweroff"
+    *: deprecated
   </dest>
   <voice>
-    *: "Disk Poweroff"
+    *: ""
   </voice>
 </phrase>
 <phrase>

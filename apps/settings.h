@@ -281,7 +281,6 @@ struct user_settings
     int ff_rewind_min_step; /* FF/Rewind minimum step size */
     int ff_rewind_accel; /* FF/Rewind acceleration (in seconds per doubling) */
     int disk_spindown; /* time until disk spindown, in seconds (0=off) */
-    bool disk_poweroff; /* whether to cut disk power after spindown or not */
     int buffer_margin; /* MP3 buffer watermark margin, in seconds */
 
     int peak_meter_release;   /* units per read out */

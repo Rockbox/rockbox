@@ -489,9 +489,6 @@ void settings_apply(void)
     dac_line_in(global_settings.line_in);
 #endif
     mpeg_id3_options(global_settings.id3_v1_first);
-#ifdef HAVE_ATA_POWER_OFF
-    ata_poweroff(global_settings.disk_poweroff);
-#endif
 
     set_poweroff_timeout(global_settings.poweroff);
 

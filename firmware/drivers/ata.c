@@ -63,6 +63,10 @@
 
 #define READ_TIMEOUT 5*HZ
 
+#ifdef HAVE_ATA_POWER_OFF
+#define ATA_POWER_OFF_TIMEOUT 2*HZ
+#endif
+
 static struct mutex ata_mtx;
 int ata_device; /* device 0 (master) or 1 (slave) */
 
@@ -75,9 +79,6 @@ static bool spinup = false;
 static bool sleeping = true;
 static bool poweroff = false;
 static long sleep_timeout = 5*HZ;
-#ifdef HAVE_ATA_POWER_OFF
-static int poweroff_timeout = 2*HZ;
-#endif
 #ifdef HAVE_LBA48
 static bool lba48 = false; /* set for 48 bit addressing */
 #endif
@@ -561,16 +562,6 @@ void ata_spindown(int seconds)
     sleep_timeout = seconds * HZ;
 }
 
-#ifdef HAVE_ATA_POWER_OFF
-void ata_poweroff(bool enable)
-{
-    if (enable)
-        poweroff_timeout = 2*HZ;
-    else
-        poweroff_timeout = 0;
-}
-#endif
-
 bool ata_disk_is_active(void)
 {
     return !sleeping;
@@ -654,8 +645,8 @@ static void ata_thread(void)
                 }
             }
 #ifdef HAVE_ATA_POWER_OFF
-            if ( !spinup && sleeping && poweroff_timeout && !poweroff &&
-                 TIME_AFTER( current_tick, last_sleep + poweroff_timeout ))
+            if ( !spinup && sleeping && !poweroff &&
+                 TIME_AFTER( current_tick, last_sleep + ATA_POWER_OFF_TIMEOUT ))
             {
                 mutex_lock(&ata_mtx);
                 ide_power_enable(false);

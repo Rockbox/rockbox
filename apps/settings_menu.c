@@ -1104,14 +1104,6 @@ static bool spindown(void)
                    ata_spindown, 1, 3, 254, NULL );
 }
 
-#ifdef HAVE_ATA_POWER_OFF
-static bool poweroff(void)
-{
-    bool rc = set_bool(str(LANG_POWEROFF), &global_settings.disk_poweroff);
-    ata_poweroff(global_settings.disk_poweroff);
-    return rc;
-}
-#endif /* HAVE_ATA_POWEROFF */
 #endif /* !HAVE_MMC */
 
 #if CONFIG_CODEC == MAS3507D
@@ -2116,9 +2108,6 @@ static bool disk_settings_menu(void)
 
     static const struct menu_item items[] = {
         { ID2P(LANG_SPINDOWN),    spindown        },
-#ifdef HAVE_ATA_POWER_OFF
-        { ID2P(LANG_POWEROFF),    poweroff        },
-#endif
 #ifdef HAVE_DIRCACHE
         { ID2P(LANG_DIRCACHE_ENABLE),  dircache },
 #endif

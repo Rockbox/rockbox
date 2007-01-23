@@ -268,9 +268,6 @@ const struct settings_list settings[] = {
 #endif
     /* disk */
 #ifndef HAVE_MMC
-#ifdef HAVE_ATA_POWER_OFF
-    OFFON_SETTING(0,disk_poweroff,false,"disk poweroff",NULL),
-#endif
     {F_T_INT,GS(disk_spindown),INT(5),"disk spindown",NULL,UNUSED},
 #endif /* HAVE_MMC */
     /* browser */

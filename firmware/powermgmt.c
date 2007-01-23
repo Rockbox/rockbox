@@ -30,7 +30,6 @@
 #include "ata.h"
 #include "power.h"
 #include "button.h"
-#include "ata.h"
 #include "audio.h"
 #include "mp3_playback.h"
 #include "usb.h"
@@ -638,9 +637,6 @@ static void handle_auto_poweroff(void)
         remote_backlight_set_timeout(2);
 #endif
         ata_spindown(3);
-#ifdef HAVE_ATA_POWER_OFF
-        ata_poweroff(true);
-#endif
         low_battery = true;
     } else if (low_battery && (battery_percent > 11)) {
         backlight_set_timeout(10);
