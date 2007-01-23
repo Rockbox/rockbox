@@ -2072,11 +2072,6 @@ static bool display_settings_menu(void)
 }
 
 
-static bool firmware_browse(void)
-{
-    return rockbox_browse(ROCKBOX_DIR, SHOW_MOD);
-}
-
 static bool battery_settings_menu(void)
 {
     int m;
@@ -2147,7 +2142,6 @@ bool manage_settings_menu(void)
 
     static const struct menu_item items[] = {
         { ID2P(LANG_CUSTOM_CFG),      custom_cfg_browse },
-        { ID2P(LANG_FIRMWARE),        firmware_browse },
         { ID2P(LANG_RESET),           reset_settings },
         { ID2P(LANG_SAVE_SETTINGS),   settings_save_config },
     };

@@ -815,16 +815,16 @@
 </phrase>
 <phrase>
   id: LANG_FIRMWARE
-  desc: in the main menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Browse Firmwares"
+    *: ""
   </source>
   <dest>
-    *: "Browse Firmwares"
+    *: deprecated
   </dest>
   <voice>
-    *: "Browse Firmwares"
+    *: ""
   </voice>
 </phrase>
 <phrase>
