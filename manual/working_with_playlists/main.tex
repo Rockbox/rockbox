@@ -38,20 +38,23 @@ playlists:
 
 Rockbox can create playlists in four different ways.
 
-\subsubsection{By playing a song}
+\subsubsection{By selecting (``playing'') a song from the File Browser}
 Whenever a song is selected from the \setting{File Browser} with
 \ActionTreeEnter, Rockbox will automatically create a playlist containing
-all of the songs in the directory in which that song is located.
+all of the songs in that directory and start playback with the selected
+song.
 
-\note{If you already have already created a dynamic playlist, playing a new
-  song will \emph{erase} the current playlist and create a new one. If you
-  want to add a song to the current playlist rather than erasing the current
-  playlist, see the section below on ``Adding music to playlists.''}
+\note{If you already have created a dynamic playlist, playing a new
+  song will \emph{erase} the current dynamic playlist and create a new one.
+  If you want to add a song to the current playlist
+  rather than erasing the current
+  playlist, see the section below on how to add music to a playlist.}
 
 \subsubsection{By using Insert and Queue functions}
 If playback is stopped, the \setting{Insert} and \setting{Queue} functions
-can be used as described in the next section to create a new playlist instead
-of adding to an existing one.
+can be used as described in \ref{ref:playlist_submenu}
+to create a new playlist instead of adding to an existing one.
+This will \emph{erase} any dynamic playlist.
 
 \subsubsection{By using the Playlist catalog}
 The \setting{Playlist catalog} makes it possible to modify and create playlists
@@ -62,7 +65,7 @@ playlist and \setting{Add to a new playlist} creates a new playlist containing
 the selected track or directory.
 
 \note{All playlists in the \setting{Playlist catalog} are stored in the
-  \fname{Playlists} directory in the root of your \daps{} harddisk and
+  \fname{/Playlists} directory in the root of your \daps{} harddisk and
   playlists stored in other locations are not included in the catalog. It is
   however possible to move existing playlists there (see
   \reference{ref:Filemenu}).}
@@ -79,8 +82,8 @@ in the \setting{Main Menu}. The created playlist will be named
 \screenshot{rockbox_interface/images/ss-playlist-menu}{The Playlist Submenu}{}
 The \setting{Playlist Submenu} allows you to put tracks into a
 ``dynamic playlist''. If there is no music currently playing, Rockbox will
-create a new dynamic playlist and put the selected track(s) into the
-playlist. If there is music currently playing, Rockbox will put the
+create a new dynamic playlist and put the selected track(s) into it.
+If there is music currently playing, Rockbox will put the
 selected track(s) into the current playlist. The place in which the newly
 selected tracks are added to the playlist is determined by the following
 options:
@@ -89,7 +92,8 @@ options:
 \item [Insert.] Add track(s) immediately after any tracks added via the most
   recent \setting{Insert} operation. If no tracks have yet been added via an
   \setting{Insert}, new tracks will be added immediately after the current
-  playing track.
+  playing track. If playback is stopped a new dynamic playlist will get
+  created with the selected tracks.
   
 \item [Insert next.] Add track(s) immediately after current playing
   track, no matter what else has been inserted.
@@ -113,8 +117,18 @@ On the other hand, if the \setting{Playlist Submenu} is invoked on a
 directory, Rockbox adds all of the tracks in that directory to the
 playlist.
 
+\note{You can control whether or not Rockbox includes the contents of 
+  sub-directories when adding an entire directory to a playlists. Set the 
+  \setting{Main Menu $\rightarrow$ Playlist Options $\rightarrow$ Recursively
+    Insert Directories} setting to \setting{Yes} if you would like Rockbox to 
+  include tracks in sub-directories as well as tracks in the currently-selected 
+  directory.}
+
 Dynamic playlists are saved so resume will restore them exactly as they
 were before shutdown.
+
+\note{To view, save or reshuffle the current dynamic playlist use the
+  \setting{Playlist Options} in the WPS context menu.}
 
 \subsection{Saving playlists}
 To save the current playlist either enter the \setting{Playlist} submenu
@@ -127,6 +141,15 @@ Either method will bring you to the \setting{Virtual Keyboard} (see
 accept it and you're done.
 
 \subsection{Loading saved playlists}
+\subsubsection{Through the \setting{File Browser}}
+Playlist files, like regular music tracks, can be selected through the 
+\setting{File Browser}. When loading a playlist from disk it will replace
+the current dynamic playlist.
+
+\subsubsection{Through the \setting{Playlist catalog}}
+The \setting{Playlist catalog} offers a shortcut to all playlists in your
+\daps{} harddisk root folder called \fname{/Playlists}.
+It can be used like the \setting{File Browser}.
 
 \subsection{Helpful Hints}
 

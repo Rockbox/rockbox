@@ -98,7 +98,7 @@ each option pertains both to files and directories):
 
 \begin{description}
 \item [Playlist.]
-  Enters the \setting{Playlist Submenu} (see below).
+  Enters the \setting{Playlist Submenu} (see \reference{ref:playlist_submenu}).
 \item [Rename.]
   This function lets the user modify the name of a file or directory.
 \item [Cut.]
@@ -135,63 +135,6 @@ each option pertains both to files and directories):
   for the selected file. If used on a directory, the number of files and sub
   directories in that directory will be shown, as well as the total size.
 \end{description}
-
-\subsection{\label{ref:Playlistsubmenu}Playlist Submenu}
-\screenshot{rockbox_interface/images/ss-playlist-menu}{The Playlist Submenu}{}
-The \setting{Playlist Submenu} allows you to put tracks into a ``dynamic
-playlist''. If there is no music currently playing, Rockbox will create a
-new dynamic playlist and put the selected track(s) into the playlist.
-If there is music currently playing, Rockbox will put the selected track(s)
-into the current playlist. The place in which
-the newly selected tracks are added to the playlist is determined by
-the following options:
-
-\begin{description}
-\item [Insert.]
-  Add track(s) to playlist. If no other tracks have been inserted then the
-  selected track will be added immediately after current playing track,
-  otherwise they will be added to end of insertion list.
-\item [Insert next.]
-  Add track(s) immediately after current playing track, no matter what else has
-  been inserted.
-\item [Insert last.]
-  Add track(s) to end of playlist.
-\item [Queue.]
-  Queue is the same as Insert except queued tracks are deleted immediately from
-  the playlist after they've been played. Also, queued tracks are not saved to
-  the playlist file (see \reference{ref:playlistoptions}).
-\item [Queue next.]
-  Queue track(s) immediately after current playing track.
-\item [Queue last.]
-  Queue track(s) at end of playlist.
-\end{description}
-
-The \setting{Playlist Submenu} can be used to add either single tracks or
-entire directories to a playlist. If the \setting{Playlist Submenu} is
-invoked on a single track, it will put only that track into the playlist.
-On the other hand, if the \setting{Playlist Submenu} is invoked on a
-directory, Rockbox adds all of the tracks in that directory to the playlist.
-
-\note{You can control whether or not Rockbox includes the contents of 
-  sub-directories when adding an entire directory to a playlists. Set the 
-  \setting{Main Menu $\rightarrow$ Playlist Options $\rightarrow$ Recursively
-    Insert Directories} setting to \setting{Yes} if you would like Rockbox to 
-  include tracks in sub-directories as well as tracks in the currently-selected 
-  directory.}
-
-If you want to have Rockbox create a playlist of a whole folder (to play an 
-entire album, for example), use the \setting{File Browser} to select the song. 
-When a single song is selected from the \setting{File Browser}, Rockbox will 
-automatically create a playlist with all songs in the current folder. However, 
-if you want to play only a single song and then stop, stop playback, navigate 
-to the song you want to play, and use the 
-\setting{Playlist $\rightarrow$ Insert} function to select the song.
-
-Dynamic playlists are saved so resume will restore them exactly as they were 
-before shutdown.
-
-\note{To view, save or reshuffle the current dynamic playlist, use the 
-\setting{Playlist Options} setting in the WPS Context Menu.}
 
 \subsection{\label{sec:virtual_keyboard}Virtual Keyboard}
 \screenshot{rockbox_interface/images/ss-virtual-keyboard}{The virtual keyboard}{}
