@@ -259,11 +259,20 @@ static int hex_to_rgb(const char* hex)
     return 0;
 }
 #endif
+#define MAX_PERSISTANT_VARS 8
+struct persistant_vars {
+    char setting[MAX_FILENAME];
+    char value[MAX_FILENAME];
+};
+static struct persistant_vars persistant_vars[MAX_PERSISTANT_VARS];
+static int persistant_vars_count = 0;
 bool settings_write_config(char* filename)
 {
     int i;
     int fd;
-    char value[MAX_FILENAME * 3];	/* More than enough for all current values */
+    bool check_persistant = !strcmp(filename, CONFIGFILE) && 
+                            persistant_vars_count;
+    char value[MAX_PATH];
     fd = open(filename,O_CREAT|O_TRUNC|O_WRONLY);
     if (fd < 0)
         return false;
@@ -273,6 +282,23 @@ bool settings_write_config(char* filename)
     {
         if (settings[i].cfg_name == NULL)
             continue;
+        if (check_persistant)
+        {
+            int j;
+            bool found = false;
+            for(j=0; j<persistant_vars_count; j++)
+            {
+                if (!strcmp(persistant_vars[j].setting, settings[i].cfg_name))
+                {
+                    fdprintf(fd,"~%s: %s\r\n", settings[i].cfg_name,
+                                              persistant_vars[j].value);
+                    found = true;
+                    break;
+                }
+            }
+            if (found)
+                continue;
+        }
         switch (settings[i].flags&F_T_MASK)
         {
             case F_T_INT:
@@ -721,7 +747,7 @@ bool settings_load_config(const char* file, bool apply)
     char* name;
     char* value;
     int i;
-
+    bool check_persistant = !strcmp(file, CONFIGFILE);
     fd = open(file, O_RDONLY);
     if (fd < 0)
         return false;
@@ -730,7 +756,14 @@ bool settings_load_config(const char* file, bool apply)
     {
         if (!settings_parseline(line, &name, &value))
             continue;
-
+        if (check_persistant && (name[0] == '~')
+             && (persistant_vars_count<MAX_PERSISTANT_VARS))
+        {
+            name++;
+            strcpy(persistant_vars[persistant_vars_count].setting, name);
+            strcpy(persistant_vars[persistant_vars_count].value, value);
+            persistant_vars_count++;
+        }
         for(i=0; i<nb_settings; i++)
         {
             if (settings[i].cfg_name == NULL)
