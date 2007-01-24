@@ -2483,7 +2483,7 @@ bool gui_wps_display(void)
     int i;
     if (!wps_state.id3 && !(audio_status() & AUDIO_STATUS_PLAY))
     {
-        global_settings.resume_index = -1;
+        global_status.resume_index = -1;
 #ifdef HAVE_LCD_CHARCELLS
         gui_syncsplash(HZ, true, str(LANG_END_PLAYLIST_PLAYER));
 #else

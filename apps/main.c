@@ -140,7 +140,7 @@ static int init_dircache(bool preinit)
         if (result < 0)
         {
             firmware_settings.disk_clean = false;
-            if (global_settings.dircache_size <= 0)
+            if (global_status.dircache_size <= 0)
             {
                 /* This will be in default language, settings are not
                    applied yet. Not really any easy way to fix that. */
@@ -148,7 +148,7 @@ static int init_dircache(bool preinit)
                 clear = true;
             }
             
-            dircache_build(global_settings.dircache_size);
+            dircache_build(global_status.dircache_size);
         }
     }
     else
@@ -160,12 +160,12 @@ static int init_dircache(bool preinit)
         if (!dircache_is_enabled()
             && !dircache_is_initializing())
         {
-            if (global_settings.dircache_size <= 0)
+            if (global_status.dircache_size <= 0)
             {
                 gui_syncsplash(0, true, str(LANG_DIRCACHE_BUILDING));
                 clear = true;
             }
-            result = dircache_build(global_settings.dircache_size);
+            result = dircache_build(global_status.dircache_size);
         }
         
         if (result < 0)
@@ -176,8 +176,8 @@ static int init_dircache(bool preinit)
     {
         backlight_on();
         show_logo();
-        global_settings.dircache_size = dircache_get_cache_size();
-        settings_save();
+        global_status.dircache_size = dircache_get_cache_size();
+        status_save();
     }
     
     return result;

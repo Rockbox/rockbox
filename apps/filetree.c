@@ -572,9 +572,9 @@ int ft_enter(struct tree_context* c)
         if ( play ) {
             /* the resume_index must always be the index in the
                shuffled list in case shuffle is enabled */
-            global_settings.resume_index = start_index;
-            global_settings.resume_offset = 0;
-            settings_save();
+            global_status.resume_index = start_index;
+            global_status.resume_offset = 0;
+            status_save();
 
             start_wps = true;
         }

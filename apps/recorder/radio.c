@@ -212,7 +212,7 @@ void radio_start(void)
     if(radio_status == FMRADIO_OFF)
         radio_power(true);
 
-    curr_freq = global_settings.last_frequency 
+    curr_freq = global_status.last_frequency 
         * fm_region[global_settings.fm_region].freq_step 
         + fm_region[global_settings.fm_region].freq_min;
 
@@ -332,10 +332,10 @@ static int find_closest_preset(int freq)
 
 static void remember_frequency(void)
 {
-    global_settings.last_frequency = (curr_freq 
+    global_status.last_frequency = (curr_freq 
         - fm_region[global_settings.fm_region].freq_min) 
         / fm_region[global_settings.fm_region].freq_step;
-    settings_save();
+    status_save();
 }
 
 static void next_preset(int direction)

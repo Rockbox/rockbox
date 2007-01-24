@@ -1830,7 +1830,7 @@ static bool dbg_dircache_info(void)
         lcd_puts(0, line++, buf);
 
         snprintf(buf, sizeof(buf), "Last size: %d B",
-                 global_settings.dircache_size);
+                 global_status.dircache_size);
         lcd_puts(0, line++, buf);
 
         snprintf(buf, sizeof(buf), "Limit: %d B", DIRCACHE_LIMIT);

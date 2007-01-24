@@ -1337,21 +1337,21 @@ bool view_runtime(void)
 #endif
                     )
             {
-                global_settings.runtime = 0;
+                global_status.runtime = 0;
             }
             else
 #endif
             {
-                global_settings.runtime += ((current_tick - lasttime) / HZ);
+                global_status.runtime += ((current_tick - lasttime) / HZ);
             }
             lasttime = current_tick;
 
-            t = global_settings.runtime;
+            t = global_status.runtime;
             FOR_NB_SCREENS(i)
                 screens[i].puts(0, y[i]++, str(LANG_CURRENT_TIME));
         }
         else {
-            t = global_settings.topruntime;
+            t = global_status.topruntime;
             FOR_NB_SCREENS(i)
                 screens[i].puts(0, y[i]++, str(LANG_TOP_TIME));
         }
@@ -1382,9 +1382,9 @@ bool view_runtime(void)
                 if(gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
                 {
                     if ( state == 1 )
-                        global_settings.runtime = 0;
+                        global_status.runtime = 0;
                     else
-                        global_settings.topruntime = 0;
+                        global_status.topruntime = 0;
                 }
                 break;
             default:

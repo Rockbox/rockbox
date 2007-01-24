@@ -128,7 +128,23 @@ extern unsigned char vp_dummy[VIRT_SIZE];
 #if !defined(HAVE_LCD_COLOR)
 #define HAVE_LCD_CONTRAST
 #endif
-
+struct system_status
+{
+    int resume_index;  /* index in playlist (-1 for no active resume) */
+    int resume_first_index;  /* index of first track in playlist */
+    uint32_t resume_offset; /* byte offset in mp3 file */
+    int resume_seed;   /* shuffle seed (-1=no resume shuffle 0=sorted
+                          >0=shuffled) */
+    int runtime;       /* current runtime since last charge */
+    int topruntime;    /* top known runtime */
+#ifdef HAVE_DIRCACHE
+    int dircache_size;      /* directory cache structure last size, 22 bits */
+#endif
+#ifdef CONFIG_TUNER
+    int last_frequency;  /* Last frequency for resuming, in FREQ_STEP units,
+                            relative to MIN_FREQ */
+#endif
+};
 struct user_settings
 {
     /* audio settings */
@@ -254,11 +270,6 @@ struct user_settings
     /* resume settings */
 
     bool resume;        /* resume option: 0=off, 1=on */
-    int resume_index;  /* index in playlist (-1 for no active resume) */
-    int resume_first_index;  /* index of first track in playlist */
-    uint32_t resume_offset; /* byte offset in mp3 file */
-    int resume_seed;   /* shuffle seed (-1=no resume shuffle 0=sorted
-                          >0=shuffled) */
 
 #ifdef CONFIG_TUNER
     unsigned char fmr_file[MAX_FILENAME+1]; /* last fmr preset */
@@ -304,8 +315,6 @@ struct user_settings
     bool browse_current; /* 1=goto current song,
                             0=goto previous location */
 
-    int runtime;       /* current runtime since last charge */
-    int topruntime;    /* top known runtime */
 
     int scroll_speed;  /* long texts scrolling speed: 1-30 */
     int bidir_limit;   /* bidir scroll length limit */
@@ -339,8 +348,6 @@ struct user_settings
     bool fm_force_mono;  /* Forces Mono mode if true */
     bool fm_full_range;  /* Enables full 10MHz-160MHz range if true, else
                             only 88MHz-108MHz */
-    int last_frequency;  /* Last frequency for resuming, in FREQ_STEP units,
-                            relative to MIN_FREQ */
 #endif
 
     int max_files_in_dir; /* Max entries in directory (file browser) */
@@ -406,7 +413,6 @@ struct user_settings
 #endif
 #ifdef HAVE_DIRCACHE
     bool dircache;          /* enable directory cache */
-    int dircache_size;      /* directory cache structure last size, 22 bits */
 #endif
 #ifdef HAVE_TAGCACHE
 #ifdef HAVE_TC_RAMCACHE
@@ -548,7 +554,7 @@ struct opt_items {
 };
 
 /* prototypes */
-
+void status_save( void );
 int settings_save(void);
 void settings_load(int which);
 void settings_reset(void);
@@ -581,6 +587,8 @@ void settings_apply_trigger(void);
 
 /* global settings */
 extern struct user_settings global_settings;
+/* global status */
+extern struct system_status global_status;
 /* name of directory where configuration, fonts and other data
  * files are stored */
 extern long lasttime;

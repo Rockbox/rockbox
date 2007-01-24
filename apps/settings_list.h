@@ -61,7 +61,7 @@ struct int_setting {
 };
 #define F_NVRAM_BYTES_MASK     0xE00 /*0-4 bytes can be stored */
 #define F_NVRAM_MASK_SHIFT     9
-#define NVRAM_CONFIG_VERSION 1
+#define NVRAM_CONFIG_VERSION 2
 /* Above define should be bumped if
 - a new NVRAM setting is added between 2 other NVRAM settings
 - number of bytes for a NVRAM setting is changed

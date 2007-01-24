@@ -474,10 +474,10 @@ void reload_directory(void)
 static void start_resume(bool just_powered_on)
 {
     bool do_resume = false;
-    if ( global_settings.resume_index != -1 ) {
+    if ( global_status.resume_index != -1 ) {
         DEBUGF("Resume index %X offset %X\n",
-               global_settings.resume_index,
-               global_settings.resume_offset);
+               global_status.resume_index,
+               global_status.resume_offset);
 
 #ifdef HAVE_ALARM_MOD
         if ( rtc_check_alarm_started(true) ) {
@@ -507,8 +507,8 @@ static void start_resume(bool just_powered_on)
 
         if (playlist_resume() != -1)
         {
-            playlist_start(global_settings.resume_index,
-                global_settings.resume_offset);
+            playlist_start(global_status.resume_index,
+                global_status.resume_offset);
 
             start_wps = true;
         }
@@ -1439,10 +1439,10 @@ void tree_flush(void)
 
 #ifdef HAVE_DIRCACHE
     {
-        int old_val = global_settings.dircache_size;
+        int old_val = global_status.dircache_size;
         if (global_settings.dircache)
         {
-            global_settings.dircache_size = dircache_get_cache_size();
+            global_status.dircache_size = dircache_get_cache_size();
 # ifdef HAVE_EEPROM_SETTINGS
             dircache_save();
 # endif
@@ -1450,10 +1450,10 @@ void tree_flush(void)
         }
         else
         {
-            global_settings.dircache_size = 0;
+            global_status.dircache_size = 0;
         }
-        if (old_val != global_settings.dircache_size)
-            settings_save();
+        if (old_val != global_status.dircache_size)
+            status_save();
     }
 #endif
 }
@@ -1484,7 +1484,7 @@ void tree_restore(void)
             gui_textarea_update(&screens[i]);
         }
 
-        dircache_build(global_settings.dircache_size);
+        dircache_build(global_status.dircache_size);
 
         /* Clean the text when we are done. */
         FOR_NB_SCREENS(i)

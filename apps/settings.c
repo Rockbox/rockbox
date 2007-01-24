@@ -86,6 +86,7 @@
 void dac_line_in(bool enable);
 #endif
 struct user_settings global_settings;
+struct system_status global_status;
 #ifdef HAVE_RECORDING
 const char rec_base_directory[] = REC_BASE_DIR;
 #endif
@@ -346,6 +347,12 @@ bool settings_write_config(char* filename)
     close(fd);
     return true;
 }
+#ifndef HAVE_RTC_RAM
+static bool flush_global_status_callback(void)
+{
+    return write_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
+}
+#endif
 static bool flush_config_block_callback(void)
 {
     bool r1, r2;
@@ -357,16 +364,33 @@ static bool flush_config_block_callback(void)
 /*
  * persist all runtime user settings to disk or RTC RAM
  */
-int settings_save( void )
+static void update_runtime(void)
 {
     int elapsed_secs;
 
     elapsed_secs = (current_tick - lasttime) / HZ;
-    global_settings.runtime += elapsed_secs;
+    global_status.runtime += elapsed_secs;
     lasttime += (elapsed_secs * HZ);
 
-    if ( global_settings.runtime > global_settings.topruntime )
-        global_settings.topruntime = global_settings.runtime;
+    if ( global_status.runtime > global_status.topruntime )
+        global_status.topruntime = global_status.runtime;
+}
+
+void status_save( void )
+{
+    update_runtime();
+#ifdef HAVE_RTC_RAM
+    /* this will be done in the ata_callback if
+       target doesnt have rtc ram */
+    write_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
+#else
+    register_ata_idle_func(flush_global_status_callback);
+#endif
+}
+
+int settings_save( void )
+{
+    update_runtime();
 #ifdef HAVE_RTC_RAM
     /* this will be done in the ata_callback if
        target doesnt have rtc ram */

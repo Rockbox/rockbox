@@ -104,7 +104,7 @@ static const char backlight_times_conf [] =
             {{cb,LANG_SET_BOOL_YES,LANG_SET_BOOL_NO}}} }
 
 #define SYSTEM_SETTING(flags,var,default) \
-        {flags|F_T_INT, GS(var), INT(default), NULL, NULL, UNUSED}
+        {flags|F_T_INT, &global_status.var, INT(default), NULL, NULL, UNUSED}
         
 #define FILENAME_SETTING(flags,var,name,default,prefix,suffix,len) \
         {flags|F_T_UCHARPTR, GS(var), CHARPTR(default),name,NULL,\
@@ -179,7 +179,7 @@ const struct settings_list settings[] = {
     {F_T_INT,GS(battery_capacity),INT(BATTERY_CAPACITY_DEFAULT),
         "battery capacity",NULL,UNUSED},
 #ifdef CONFIG_CHARGING
-    OFFON_SETTING(0,car_adapter_mode,false,"car adapter mode", NULL),
+    OFFON_SETTING(NVRAM(1),car_adapter_mode,false,"car adapter mode", NULL),
 #endif
     /* tuner */
 #ifdef CONFIG_TUNER

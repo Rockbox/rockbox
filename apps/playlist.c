@@ -243,8 +243,8 @@ static void empty_playlist(struct playlist_info* playlist, bool resume)
         create_control(playlist);
 
         /* Reset resume settings */
-        global_settings.resume_first_index = 0;
-        global_settings.resume_seed = -1;
+        global_status.resume_first_index = 0;
+        global_status.resume_seed = -1;
     }
 }
 
@@ -386,8 +386,8 @@ static int recreate_control(struct playlist_info* playlist)
 
     if (playlist->current)
     {
-        global_settings.resume_seed = -1;
-        settings_save();
+        global_status.resume_seed = -1;
+        status_save();
     }
 
     for (i=0; i<playlist->amount; i++)
@@ -710,8 +710,8 @@ static int add_track_to_playlist(struct playlist_info* playlist,
 
         if (seek_pos < 0 && playlist->current)
         {
-            global_settings.resume_first_index = playlist->first_index;
-            settings_save();
+            global_status.resume_first_index = playlist->first_index;
+            status_save();
         }
     }
 
@@ -826,8 +826,8 @@ static int remove_track_from_playlist(struct playlist_info* playlist,
 
         if (write)
         {
-            global_settings.resume_first_index = playlist->first_index;
-            settings_save();
+            global_status.resume_first_index = playlist->first_index;
+            status_save();
         }
     }
 
@@ -902,8 +902,8 @@ static int randomise_playlist(struct playlist_info* playlist,
     {
         update_control(playlist, PLAYLIST_COMMAND_SHUFFLE, seed,
             playlist->first_index, NULL, NULL, NULL);
-        global_settings.resume_seed = seed;
-        settings_save();
+        global_status.resume_seed = seed;
+        status_save();
     }
 
     return 0;
@@ -942,8 +942,8 @@ static int sort_playlist(struct playlist_info* playlist, bool start_current,
     {
         update_control(playlist, PLAYLIST_COMMAND_UNSHUFFLE,
             playlist->first_index, -1, NULL, NULL, NULL);
-        global_settings.resume_seed = 0;
-        settings_save();
+        global_status.resume_seed = 0;
+        status_save();
     }
 
     return 0;
@@ -1117,8 +1117,8 @@ static void find_and_set_playlist_index(struct playlist_info* playlist,
 
             if (playlist->current)
             {
-                global_settings.resume_first_index = i;
-                settings_save();
+                global_status.resume_first_index = i;
+                status_save();
             }
 
             break;
@@ -1742,10 +1742,10 @@ static int flush_cached_control(struct playlist_info* playlist)
 
     if (result > 0)
     {
-        if (global_settings.resume_seed >= 0)
+        if (global_status.resume_seed >= 0)
         {
-            global_settings.resume_seed = -1;
-            settings_save();
+            global_status.resume_seed = -1;
+            status_save();
         }
 
         playlist->num_cached = 0;
@@ -2294,22 +2294,22 @@ int playlist_resume(void)
         /* Terminate on EOF */
         if(nread <= 0)
         {
-            if (global_settings.resume_seed >= 0)
+            if (global_status.resume_seed >= 0)
             {
                 /* Apply shuffle command saved in settings */
-                if (global_settings.resume_seed == 0)
+                if (global_status.resume_seed == 0)
                     sort_playlist(playlist, false, true);
                 else
                 {
                     if (!sorted)
                         sort_playlist(playlist, false, false);
 
-                    randomise_playlist(playlist, global_settings.resume_seed,
+                    randomise_playlist(playlist, global_status.resume_seed,
                         false, true);
                 }
             }
 
-            playlist->first_index = global_settings.resume_first_index;
+            playlist->first_index = global_status.resume_first_index;
             break;
         }
     }
@@ -2361,7 +2361,7 @@ int playlist_shuffle(int random_seed, int start_index)
     {
         /* store the seek position before the shuffle */
         seek_pos = playlist->indices[start_index];
-        playlist->index = global_settings.resume_first_index =
+        playlist->index = global_status.resume_first_index =
             playlist->first_index = start_index;
         start_current = true;
     }
@@ -2508,7 +2508,7 @@ int playlist_next(int steps)
             playlist->amount > 1)
         {
             /* Repeat shuffle mode.  Re-shuffle playlist and resume play */
-            playlist->first_index = global_settings.resume_first_index = 0;
+            playlist->first_index = global_status.resume_first_index = 0;
             sort_playlist(playlist, false, false);
             randomise_playlist(playlist, current_tick, false, true);
 #if CONFIG_CODEC != SWCODEC
@@ -2651,19 +2651,19 @@ int playlist_update_resume_info(const struct mp3entry* id3)
 
     if (id3)
     {
-        if (global_settings.resume_index != playlist->index ||
-            global_settings.resume_offset != id3->offset)
+        if (global_status.resume_index != playlist->index ||
+            global_status.resume_offset != id3->offset)
         {
-            global_settings.resume_index = playlist->index;
-            global_settings.resume_offset = id3->offset;
-            settings_save();
+            global_status.resume_index = playlist->index;
+            global_status.resume_offset = id3->offset;
+            status_save();
         }
     }
     else
     {
-        global_settings.resume_index = -1;
-        global_settings.resume_offset = -1;
-        settings_save();
+        global_status.resume_index = -1;
+        global_status.resume_offset = -1;
+        status_save();
     }
 
     return 0;
