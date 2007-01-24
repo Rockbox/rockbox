@@ -410,6 +410,7 @@ target/coldfire/iriver/h100/usb-h100.c
 
 #ifdef IRIVER_H10
 #ifndef SIMULATOR
+target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
@@ -424,6 +425,7 @@ target/arm/usb-pp.c
 
 #ifdef IRIVER_H10_5GB
 #ifndef SIMULATOR
+target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
@@ -460,6 +462,7 @@ target/arm/gigabeat/meg-fx/pcm-meg-fx.c
 
 #ifdef ELIO_TPJ1022
 #ifndef SIMULATOR
+target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
@@ -478,6 +481,7 @@ drivers/lcd-ipod.c
 drivers/pcf50605.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
+target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/ipod/adc-ipod.c
 target/arm/ipod/backlight-4g_color.c
@@ -491,6 +495,7 @@ target/arm/usb-pp.c
 #ifndef SIMULATOR
 drivers/lcd-ipod.c
 drivers/pcf50605.c
+target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
@@ -506,6 +511,7 @@ target/arm/usb-pp.c
 #ifndef SIMULATOR
 drivers/lcd-ipod.c
 drivers/pcf50605.c
+target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
@@ -521,6 +527,7 @@ target/arm/usb-pp.c
 #ifndef SIMULATOR
 drivers/lcd-ipodvideo.c
 drivers/pcf50605.c
+target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
@@ -551,6 +558,7 @@ target/arm/usb-pp.c
 #ifndef SIMULATOR
 drivers/lcd-ipod.c
 drivers/pcf50605.c
+target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
@@ -566,6 +574,7 @@ target/arm/usb-pp.c
 #ifndef SIMULATOR
 drivers/lcd-ipod.c
 drivers/pcf50605.c
+target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c

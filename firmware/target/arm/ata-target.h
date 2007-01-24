@@ -19,15 +19,25 @@
 
 #if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
 
-/* Plain C read & write loops */
-
 #if (CONFIG_CPU == PP5002)
+
+/* Plain C reading and writing. See comment in ata-as-arm.S */
+
 #define ATA_IOBASE      0xc00031e0
 #define ATA_CONTROL     (*((volatile unsigned char*)(0xc00033f8)))
+
 #elif (CONFIG_CPU == PP5020)
+
+/* asm optimized reading and writing */
+#define ATA_OPTIMIZED_READING
+#define ATA_OPTIMIZED_WRITING
+void copy_read_sectors(unsigned char* buf, int wordcount);
+void copy_write_sectors(const unsigned char* buf, int wordcount);
+
 #define ATA_IOBASE      0xc30001e0
 #define ATA_CONTROL     (*((volatile unsigned char*)(0xc30003f8)))
-#endif
+
+#endif /* CONFIG_CPU */
 
 #define ATA_DATA        (*((volatile unsigned short*)(ATA_IOBASE)))
 #define ATA_ERROR       (*((volatile unsigned char*)(ATA_IOBASE + 0x04)))
