@@ -9,7 +9,7 @@
 ;;
 ;;   /* -----------------------------------------------------------------
 ;;    * local variables:
-;;    * eval: (set c-file-style "rockbox")
+;;    * eval: (c-set-style "rockbox")
 ;;    * end:
 ;;    */
 ;;
