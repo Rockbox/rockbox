@@ -24,12 +24,15 @@
 #include <limits.h>
 #include "inttypes.h"
 
+typedef int (*_isfunc_type)(void);
+
 union storage_type {
     int int_;
     unsigned int uint_;
     bool bool_;
     char *charptr;
     unsigned char *ucharptr;
+    _isfunc_type func;
 };
 /* the variable type for the setting */
 #define F_T_INT      1
@@ -53,12 +56,25 @@ struct bool_setting {
 #define F_BOOL_SETTING F_T_BOOL|0x10
 #define F_RGB 0x20
 
+struct filename_setting {
+    const char* prefix;
+    const char* suffix;
+    int max_len;
+};
+#define F_FILENAME 0x40
+
 struct int_setting {
     void (*option_callback)(int);
     int min;
     int max;
     int step;
 };
+/* these use the _isfunc_type type for the function */
+/* typedef int (*_isfunc_type)(void); */
+#define F_MIN_ISFUNC    0x100000 /* min(above) is function pointer to above type */
+#define F_MAX_ISFUNC    0x200000 /* max(above) is function pointer to above type */
+#define F_DEF_ISFUNC    0x400000 /* default_val is function pointer to above type */
+
 #define F_NVRAM_BYTES_MASK     0xE00 /*0-4 bytes can be stored */
 #define F_NVRAM_MASK_SHIFT     9
 #define NVRAM_CONFIG_VERSION 2
@@ -68,14 +84,9 @@ struct int_setting {
 - a NVRAM setting is removed
 */
 
-struct filename_setting {
-    const char* prefix;
-    const char* suffix;
-    int max_len;
-};
-#define F_FILENAME 0x40
+
 struct settings_list {
-    uint32_t             flags;   /* ____ ____ ____ ____ ____ NNN_ _FRB STTT */
+    uint32_t             flags;   /* ____ ____ _FFF ____ ____ NNN_ IFRB STTT */
     void                *setting;
     union storage_type   default_val;
     const char          *cfg_name; /* this settings name in the cfg file   */

@@ -851,7 +851,9 @@ void settings_reset(void) {
         {
             case F_T_INT:
             case F_T_UINT:
-                if (settings[i].flags&F_T_SOUND)
+                if (settings[i].flags&F_DEF_ISFUNC)
+                    *(int*)settings[i].setting = settings[i].default_val.func();
+                else if (settings[i].flags&F_T_SOUND)
                     *(int*)settings[i].setting = 
                             sound_default(settings[i].sound_setting->setting);
                 else *(int*)settings[i].setting = settings[i].default_val.int_;

@@ -88,6 +88,7 @@ static const char backlight_times_conf [] =
 #define BOOL(a) {.bool_ = a}
 #define CHARPTR(a) {.charptr = a}
 #define UCHARPTR(a) {.ucharptr = a}
+#define FUNCTYPE(a) {.func = a}
 #define NODEFAULT INT(0)
 
 #define SOUND_SETTING(flags,var,setting) \
@@ -134,7 +135,7 @@ const struct settings_list settings[] = {
          "off,all,one,shuffle,ab" , UNUSED},
     /* LCD */
 #ifdef HAVE_LCD_CONTRAST
-    {F_T_INT, GS(contrast), INT(DEFAULT_CONTRAST_SETTING),
+    {F_T_INT|F_DEF_ISFUNC, GS(contrast), FUNCTYPE(lcd_default_contrast),
          "contrast", NULL , UNUSED},
 #endif
 #ifdef CONFIG_BACKLIGHT
