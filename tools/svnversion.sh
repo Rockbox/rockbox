@@ -16,7 +16,15 @@ if [ -r $TOP/$VERSIONFILE ]; then SVNVER=`cat $TOP/$VERSIONFILE`;
 else if [ `which svnversion 2>/dev/null` ]; 
     then SVNVER=r`svnversion $1`;
     if [ $SVNVER = "rexported" ]; then 
-        SVNVER=unknown;
+        # try getting it from a subdir to test if perhaps they are symlinked
+        # from the root
+        SVNALT=`svnversion $1/tools`
+        if [ $SVNALT != exported ]; then
+            # yeah, it is there so we use this
+            SVNVER="r$SVNALT"
+        else
+            SVNVER=unknown;
+        fi
     fi
 else SVNVER="unknown"; fi
 fi
