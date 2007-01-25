@@ -98,6 +98,9 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* ADX File Format */
     [AFMT_ADX] =
         AFMT_ENTRY("ADX",  "adx",     NULL,          "adx\0"      ),
+    /* NESM (NES Sound Format) */
+    [AFMT_NSF] =
+        AFMT_ENTRY("NSF",  "nsf",     NULL,          "nsf\0nsfe\0"      ),
 #endif
 };
 

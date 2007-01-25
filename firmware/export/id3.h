@@ -47,6 +47,7 @@ enum
     AFMT_SHN,          /* Shorten */
     AFMT_SID,          /* SID File Format */
     AFMT_ADX,          /* ADX File Format */
+    AFMT_NSF,          /* NESM (NES Sound Format) */
 #endif
 
     /* add new formats at any index above this line to have a sensible order -

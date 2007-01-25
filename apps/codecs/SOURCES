@@ -15,6 +15,7 @@ shorten.c
 aiff.c
 sid.c
 adx.c
+nsf.c
 #if defined(HAVE_RECORDING) && !defined(SIMULATOR)
 /* encoders */
 aiff_enc.c

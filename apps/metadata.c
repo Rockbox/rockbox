@@ -2012,6 +2012,17 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         }
 
         break;
+    case AFMT_NSF:
+        buf = track->id3.path;
+        if ((lseek(fd, 0, SEEK_SET) < 0) || ((read(fd, buf, 8)) < 8))
+        {
+            DEBUGF("lseek or read failed\n");
+            return false;
+        }
+        track->id3.vbr = false;
+        track->id3.filesize = filesize(fd);
+        if (memcmp(buf,"NESM",4) && memcmp(buf,"NSFE",4)) return false;
+	break;
 
     case AFMT_AIFF:
         if (!get_aiff_metadata(fd, &(track->id3)))
