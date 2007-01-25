@@ -57,6 +57,7 @@
 #define FMPRESET_PATH ROCKBOX_DIR "/fmpresets"
 
 #define CONFIGFILE  ROCKBOX_DIR "/config.cfg"
+#define FIXEDSETTINGSFILE  ROCKBOX_DIR "/fixed.cfg"
 
 #define MAX_FILENAME 20
 
