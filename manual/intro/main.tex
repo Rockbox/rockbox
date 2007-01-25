@@ -18,6 +18,9 @@
 % Contributors are listed in the file docs/CREDITS-MANUAL
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ifpdfoutput{
+\newcommand{\latexbuild}{pdf\LaTeX}}
+{\newcommand{\latexbuild}{\TeX4ht}}
 
 \ifpdfoutput{\chapter*{\centering{Rockbox}}}%
 {\begin{center}{\Large{Rockbox}}\end{center}}
@@ -43,7 +46,7 @@ contributors.
 \end{quote}
 \vspace{3mm}
 \begin{center}
-\IfFileExists{version.tex}{Built with \LaTeX{} from version \input{version.tex}}{}
+\IfFileExists{version.tex}{Version \input{version.tex}. Built using \latexbuild{}.}{}
 \end{center}
 
 \vspace{\fill}
