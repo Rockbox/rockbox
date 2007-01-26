@@ -88,6 +88,7 @@ struct int_setting {
 struct settings_list {
     uint32_t             flags;   /* ____ ____ _FFF ____ ____ NNN_ IFRB STTT */
     void                *setting;
+    int                  lang_id; /* -1 for none */
     union storage_type   default_val;
     const char          *cfg_name; /* this settings name in the cfg file   */
     const char          *cfg_vals; /*comma seperated legal values, or NULL */
