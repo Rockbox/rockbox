@@ -154,7 +154,7 @@ enum menu_items {
     BM_QUIT,
     BM_SEL_QUIT,
 };
-    
+
 /* External bitmaps */
 #if (LCD_WIDTH != 112) && (LCD_HEIGHT != 64)
 extern const fb_data brickmania_menu_bg[];
@@ -175,10 +175,50 @@ extern const fb_data brickmania_powerups[];
 /* purple, red, blue, pink, green, yellow orange */
 extern const fb_data brickmania_bricks[];
 
+#if (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
 
+/* The time (in ms) for one iteration through the game loop - decrease this
+   to speed up the game - note that current_tick is (currently) only accurate
+   to 10ms.
+*/
+#define CYCLETIME 30
 
-/* TO DO: This needs adjusting correctly for larger than 220x176 LCDS */
-#if (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176)
+#define PAD_WIDTH 40
+#define PAD_HEIGHT 5
+#define PAD_POS_Y LCD_HEIGHT - 7
+#define BRICK_HEIGHT 12
+#define BRICK_WIDTH 32
+#define BALL 5
+#define HALFBALL 3
+#define LEFTMARGIN 5
+#define TOPMARGIN 30
+
+#define MENU_BMPHEIGHT 20
+#define MENU_BMPWIDTH 112
+
+#define BMPHEIGHT_powerup 6
+#define BMPWIDTH_powerup 10
+
+#define BMPHEIGHT_menu LCD_HEIGHT
+#define BMPWIDTH_menu LCD_WIDTH
+
+#define BMPXOFS_start 105
+#define BMPYOFS_start 110
+#define BMPXOFS_resume 112
+#define BMPYOFS_resume 132
+#define BMPXOFS_help 142
+#define BMPYOFS_help 150
+#define BMPXOFS_quit 143
+#define BMPYOFS_quit 170
+#define HIGHSCORE_XPOS 57
+#define HIGHSCORE_YPOS 88
+
+#define STRINGPOS_finsh 140
+#define STRINGPOS_congrats 157
+#define STRINGPOS_navi 150
+#define STRINGPOS_flipsides 150
+
+#elif (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176)
 
 /* The time (in ms) for one iteration through the game loop - decrease this
    to speed up the game - note that current_tick is (currently) only accurate
@@ -863,18 +903,18 @@ int game_menu(int when)
 
             if (when==1) {
                 if (cur==1)
-                    rb->lcd_bitmap_transparent_part(brickmania_menu_items, 0, 
+                    rb->lcd_bitmap_transparent_part(brickmania_menu_items, 0,
                                MENU_BMPHEIGHT * BM_SEL_RESUME, MENU_BMPWIDTH,
                                BMPXOFS_resume, BMPYOFS_resume, MENU_BMPWIDTH,
                                MENU_BMPHEIGHT);
                 else
-                    rb->lcd_bitmap_transparent_part(brickmania_menu_items, 0, 
+                    rb->lcd_bitmap_transparent_part(brickmania_menu_items, 0,
                                MENU_BMPHEIGHT * BM_RESUME, MENU_BMPWIDTH,
                                BMPXOFS_resume, BMPYOFS_resume, MENU_BMPWIDTH,
                                MENU_BMPHEIGHT);
 
             } else {
-                rb->lcd_bitmap_transparent_part(brickmania_menu_items, 0, 
+                rb->lcd_bitmap_transparent_part(brickmania_menu_items, 0,
                                MENU_BMPHEIGHT * BM_NO_RESUME, MENU_BMPWIDTH,
                                BMPXOFS_resume, BMPYOFS_resume, MENU_BMPWIDTH,
                                MENU_BMPHEIGHT);
@@ -882,23 +922,23 @@ int game_menu(int when)
 
 
             if (cur==2)
-                rb->lcd_bitmap_transparent_part(brickmania_menu_items, 0, 
+                rb->lcd_bitmap_transparent_part(brickmania_menu_items, 0,
                                MENU_BMPHEIGHT * BM_SEL_HELP, MENU_BMPWIDTH,
                                BMPXOFS_help, BMPYOFS_help, MENU_BMPWIDTH,
                                MENU_BMPHEIGHT);
             else
-                rb->lcd_bitmap_transparent_part(brickmania_menu_items, 0, 
+                rb->lcd_bitmap_transparent_part(brickmania_menu_items, 0,
                                MENU_BMPHEIGHT * BM_HELP, MENU_BMPWIDTH,
                                BMPXOFS_help, BMPYOFS_help, MENU_BMPWIDTH,
                                MENU_BMPHEIGHT);
 
             if (cur==3)
-                rb->lcd_bitmap_transparent_part(brickmania_menu_items, 0, 
+                rb->lcd_bitmap_transparent_part(brickmania_menu_items, 0,
                                MENU_BMPHEIGHT * BM_SEL_QUIT, MENU_BMPWIDTH,
                                BMPXOFS_quit, BMPYOFS_quit, MENU_BMPWIDTH,
                                MENU_BMPHEIGHT);
             else
-                rb->lcd_bitmap_transparent_part(brickmania_menu_items, 0, 
+                rb->lcd_bitmap_transparent_part(brickmania_menu_items, 0,
                                MENU_BMPHEIGHT * BM_QUIT, MENU_BMPWIDTH,
                                BMPXOFS_quit, BMPYOFS_quit, MENU_BMPWIDTH,
                                MENU_BMPHEIGHT);
@@ -916,18 +956,18 @@ int game_menu(int when)
 
             if (when==1) {
                 if (cur==1)
-                    rb->lcd_bitmap_part(brickmania_menu_items, 0, 
+                    rb->lcd_bitmap_part(brickmania_menu_items, 0,
                                MENU_BMPHEIGHT * BM_SEL_RESUME, MENU_BMPWIDTH,
                                BMPXOFS_resume, BMPYOFS_resume, MENU_BMPWIDTH,
                                MENU_BMPHEIGHT);
                 else
-                    rb->lcd_bitmap_part(brickmania_menu_items, 0, 
+                    rb->lcd_bitmap_part(brickmania_menu_items, 0,
                                MENU_BMPHEIGHT * BM_RESUME, MENU_BMPWIDTH,
                                BMPXOFS_resume, BMPYOFS_resume, MENU_BMPWIDTH,
                                MENU_BMPHEIGHT);
 
             } else {
-                rb->lcd_bitmap_part(brickmania_menu_items, 0, 
+                rb->lcd_bitmap_part(brickmania_menu_items, 0,
                                MENU_BMPHEIGHT * BM_NO_RESUME, MENU_BMPWIDTH,
                                BMPXOFS_resume, BMPYOFS_resume, MENU_BMPWIDTH,
                                MENU_BMPHEIGHT);
@@ -935,23 +975,23 @@ int game_menu(int when)
 
 
             if (cur==2)
-                rb->lcd_bitmap_part(brickmania_menu_items, 0, 
+                rb->lcd_bitmap_part(brickmania_menu_items, 0,
                                MENU_BMPHEIGHT * BM_SEL_HELP, MENU_BMPWIDTH,
                                BMPXOFS_help, BMPYOFS_help, MENU_BMPWIDTH,
                                MENU_BMPHEIGHT);
             else
-                rb->lcd_bitmap_part(brickmania_menu_items, 0, 
+                rb->lcd_bitmap_part(brickmania_menu_items, 0,
                                MENU_BMPHEIGHT * BM_HELP, MENU_BMPWIDTH,
                                BMPXOFS_help, BMPYOFS_help, MENU_BMPWIDTH,
                                MENU_BMPHEIGHT);
 
             if (cur==3)
-                rb->lcd_bitmap_part(brickmania_menu_items, 0, 
+                rb->lcd_bitmap_part(brickmania_menu_items, 0,
                                MENU_BMPHEIGHT * BM_SEL_QUIT, MENU_BMPWIDTH,
                                BMPXOFS_quit, BMPYOFS_quit, MENU_BMPWIDTH,
                                MENU_BMPHEIGHT);
             else
-                rb->lcd_bitmap_part(brickmania_menu_items, 0, 
+                rb->lcd_bitmap_part(brickmania_menu_items, 0,
                                MENU_BMPHEIGHT * BM_QUIT, MENU_BMPWIDTH,
                                BMPXOFS_quit, BMPYOFS_quit, MENU_BMPWIDTH,
                                MENU_BMPHEIGHT);
@@ -1147,7 +1187,7 @@ int help(int when)
                 if(yoffset+maxY > LCD_HEIGHT)
                     yoffset-=2;
                 break;
-                
+
             default:
                 if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
                     return 1;
@@ -1373,7 +1413,7 @@ int game_loop(void)
 
                     if (brick[i*10+j].powertop>PAD_POS_Y)
                         brick[i*10+j].poweruse=1;
-                    
+
                     brickx=LEFTMARGIN+j*BRICK_WIDTH;
                     bricky=TOPMARGIN+i*BRICK_HEIGHT;
                     if (pad_type==2) {
@@ -1400,7 +1440,7 @@ int game_loop(void)
                             }
                         }
                     }
-                    
+
                     if (brick[i*10+j].used==1) {
                         rb->lcd_bitmap_part(brickmania_bricks,0,
                                             BRICK_HEIGHT*brick[i*10+j].color,
@@ -1422,7 +1462,7 @@ int game_loop(void)
                     }
 
                     for(k=0;k<used_balls;k++) {
-                        if (ball[k].pos_y <100) {
+                        if (ball[k].pos_y <160) {
                             if (brick[i*10+j].used==1) {
                                 if ((ball[k].pos_x+ball[k].x+HALFBALL >=
                                      brickx &&
@@ -1641,7 +1681,7 @@ int game_loop(void)
                         (ball[k].pos_x +HALFBALL>=
                          pad_pos_x+(PAD_WIDTH-(PAD_WIDTH/2/4)) &&
                          ball[k].pos_x+HALFBALL <= pad_pos_x+PAD_WIDTH)) {
-                        
+
                         ball[k].y = -2;
                         if (ball[k].pos_x != 0 &&
                             ball[k].pos_x+BALL!=LCD_WIDTH)
@@ -1691,7 +1731,7 @@ int game_loop(void)
                              (ball[k].pos_x+2 >= pad_pos_x+(PAD_WIDTH/2+2) &&
                               ball[k].pos_x+2 <=
                               pad_pos_x+(PAD_WIDTH-3*(PAD_WIDTH/2/4)) )) {
-                        
+
                         ball[k].y = -4;
                         if (ball[k].pos_x != 0 &&
                             ball[k].pos_x+BALL!=LCD_WIDTH)
@@ -1720,7 +1760,7 @@ int game_loop(void)
                     ball[k].glue=true;
                 }
             } /* for k */
-            
+
             rb->lcd_update();
 
             if (brick_on_board < 0) {
@@ -1820,7 +1860,7 @@ int game_loop(void)
                 }
             }
 
-            
+
             switch(button) {
                 case UP:
                 case SELECT:
@@ -1894,7 +1934,7 @@ int game_loop(void)
                             y[k]=ball[k].y;
                         ball[k].y=0;
                     }
-                    
+
                     break;
 
                 default:
