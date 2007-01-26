@@ -197,68 +197,87 @@ static bool audio_is_initialized = false;
 /* TBD: Split out "audio" and "playback" (ie. calling) threads */
 
 /* Main state control */
-static volatile bool audio_codec_loaded;        /* Is codec loaded? (C/A-) */
-static volatile bool playing;                   /* Is audio playing? (A) */
-static volatile bool paused;                    /* Is audio paused? (A/C-) */
-static volatile bool filling IDATA_ATTR;        /* Is file buffer currently being refilled? (A/C-) */
+static volatile bool audio_codec_loaded; /* Is codec loaded? (C/A-) */
+static volatile bool playing;            /* Is audio playing? (A) */
+static volatile bool paused;             /* Is audio paused? (A/C-) */
+static volatile bool filling IDATA_ATTR; /* Is file buffer refilling? (A/C-) */
 
-/* Ring buffer where tracks and codecs are loaded */
-static unsigned char *filebuf;                  /* Pointer to start of ring buffer (A/C-) */
-size_t filebuflen;                              /* Total size of the ring buffer FIXME: make static (A/C-)*/
-static volatile size_t buf_ridx IDATA_ATTR;     /* Ring buffer read position (A/C) FIXME? should be (C/A-) */
-static volatile size_t buf_widx IDATA_ATTR;     /* Ring buffer read position (A/C-) */
+/* Ring buffer where compressed audio and codecs are loaded */
+static unsigned char *filebuf;              /* Start of buffer (A/C-) */
+/* FIXME: make filebuflen static */
+size_t filebuflen;                          /* Size of buffer (A/C-) */
+/* FIXME: make buf_ridx (C/A-) */
+static volatile size_t buf_ridx IDATA_ATTR; /* Buffer read position (A/C)*/
+static volatile size_t buf_widx IDATA_ATTR; /* Buffer write position (A/C-) */
 
-#define BUFFER_STATE_TRASHED        -1          /* Buffer is in a trashed state and must be reset */
-#define BUFFER_STATE_NORMAL          0          /* Buffer is arranged for voice and audio         */
-#define BUFFER_STATE_VOICED_ONLY     1          /* Buffer is arranged for voice-only use          */
+/* Possible arrangements of the buffer */
+#define BUFFER_STATE_TRASHED        -1          /* trashed; must be reset */
+#define BUFFER_STATE_NORMAL          0          /* voice+audio OR audio-only */
+#define BUFFER_STATE_VOICED_ONLY     1          /* voice-only */
 static int buffer_state = BUFFER_STATE_TRASHED; /* Buffer state */
 
+/* Compressed ring buffer helper macros */
+/* Buffer pointer (p) plus value (v), wrapped if necessary */
 #define RINGBUF_ADD(p,v) ((p+v)<filebuflen ? p+v : p+v-filebuflen)
+/* Buffer pointer (p) minus value (v), wrapped if necessary */
 #define RINGBUF_SUB(p,v) ((p>=v) ? p-v : p+filebuflen-v)
-#define RINGBUF_ADD_CROSS(p1,v,p2) ((p1<p2)?(int)(p1+v)-(int)p2:(int)(p1+v-p2)-(int)filebuflen)
-#define FILEBUFUSED RINGBUF_SUB(buf_widx, buf_ridx) /* Bytes available in the buffer */
+/* How far value (v) plus buffer pointer (p1) will cross buffer pointer (p2) */
+#define RINGBUF_ADD_CROSS(p1,v,p2) \
+    ((p1<p2)?(int)(p1+v)-(int)p2:(int)(p1+v-p2)-(int)filebuflen)
+/* Bytes available in the buffer */
+#define FILEBUFUSED RINGBUF_SUB(buf_widx, buf_ridx)
 
-/* Track info buffer */
-static struct track_info tracks[MAX_TRACK];     /* Track info structure about songs in the file buffer (A/C-) */
-static volatile int track_ridx;                 /* Track being decoded (A/C-) */
-static int track_widx;                          /* Track being buffered (A) */
-static bool track_changed;                      /* Set to indicate track has changed (A) */
-static struct track_info *prev_ti;              /* Pointer to previous track played info (A/C-) */
+/* Track info structure about songs in the file buffer (A/C-) */
+static struct track_info tracks[MAX_TRACK];
+static volatile int track_ridx;      /* Track being decoded (A/C-) */
+static int track_widx;               /* Track being buffered (A) */
 
-#define CUR_TI (&tracks[track_ridx])            /* Pointer to current track playing info (A/C-) */
+static struct track_info *prev_ti;   /* Previous track info pointer (A/C-) */
+#define CUR_TI (&tracks[track_ridx]) /* Playing track info pointer (A/C-) */
 
-/* Audio buffering controls */
-static int last_peek_offset;                    /* Step count to the next unbuffered track (A) */
-static int current_fd;                          /* Partially loaded track file handle to continue buffering (A) */
+/* Set by the audio thread when the current track information has updated
+ * and the WPS may need to update its cached information */
+static bool track_changed;
+
+/* Information used only for filling the buffer */
+/* Playlist steps from playing track to next track to be buffered (A) */
+static int last_peek_offset;
+/* Partially loaded track file handle to continue buffering (A) */
+static int current_fd;
 
 /* Scrobbler support */
-static unsigned long prev_track_elapsed;        /* Previous track elapsed time (C/A-) */
+static unsigned long prev_track_elapsed; /* Previous track elapsed time (C/A-)*/
 
 /* Track change controls */
-static bool automatic_skip = false;             /* Was the skip being executed manual or automatic? (C/A-) */
-static bool playlist_end = false;               /* Have we reached end of the current playlist? (A) */
-static bool dir_skip = false;                   /* Is a directory skip pending? (A) */
-static bool new_playlist = false;               /* Are we starting a new playlist? (A) */
-static int wps_offset = 0;                      /* Pending track change offset, to keep WPS responsive (A) */
+static bool automatic_skip = false; /* Who initiated in-progress skip? (C/A-) */
+static bool playlist_end = false;   /* Has the current playlist ended? (A) */
+static bool dir_skip = false;       /* Is a directory skip pending? (A) */
+static bool new_playlist = false;   /* Are we starting a new playlist? (A) */
+/* Pending track change offset, to keep WPS responsive (A) */
+static int wps_offset = 0;
 
-/* Callbacks..  */
-void (*track_changed_callback)(struct mp3entry *id3); /* ...when current track has really changed */
-void (*track_buffer_callback)(struct mp3entry *id3, bool last_track); /* ...when track has been buffered */
-void (*track_unbuffer_callback)(struct mp3entry *id3, bool last_track); /* ...when track is being unbuffered */
+/* Callbacks which applications or plugins may set */
+/* When the playing track has changed from the user's perspective */
+void (*track_changed_callback)(struct mp3entry *id3);
+/* When a track has been buffered */
+void (*track_buffer_callback)(struct mp3entry *id3, bool last_track);
+/* When a track's buffer has been overwritten or cleared */
+void (*track_unbuffer_callback)(struct mp3entry *id3, bool last_track);
 
 /* Configuration */
-static size_t conf_watermark;                   /* Low water mark (A/C) FIXME */
-static size_t conf_filechunk;                   /* Largest chunk the codec accepts (A/C) FIXME */
-static size_t conf_preseek;                     /* Codec pre-seek margin (A/C) FIXME */
-static size_t buffer_margin;                    /* Buffer margin aka anti-skip buffer (A/C-) */
-static bool v1first = false;                    /* ID3 data control, true if V1 then V2 (A) */
+static size_t conf_watermark; /* Level to trigger filebuf fill (A/C) FIXME */
+static size_t conf_filechunk; /* Largest chunk the codec accepts (A/C) FIXME */
+static size_t conf_preseek;   /* Codec pre-seek margin (A/C) FIXME */
+static size_t buffer_margin;  /* Buffer margin aka anti-skip buffer (A/C-) */
+static bool v1first = false;  /* ID3 data control, true if V1 then V2 (A) */
 #if MEM > 8
-static size_t high_watermark;                   /* High watermark for rebuffer (A/V/other) */
+static size_t high_watermark; /* High watermark for rebuffer (A/V/other) */
 #endif
 
 /* Multiple threads */
-static const char *get_codec_filename(int enc_spec); /* Returns codec filename (A-/C-/V-) */
-static void set_filebuf_watermark(int seconds); /* Set low watermark (A/C) FIXME */
+static const char *get_codec_filename(int enc_spec); /* (A-/C-/V-) */
+/* Set the watermark to trigger buffer fill (A/C) FIXME */
+static void set_filebuf_watermark(int seconds);
 
 /* Audio thread */
 static struct event_queue       audio_queue;
@@ -277,9 +296,9 @@ static struct event_queue codec_queue;
 static long codec_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)]
 IBSS_ATTR;
 static const char codec_thread_name[] = "codec";
-struct thread_entry *codec_thread_p;            /* For modifying thread priority later. */
+struct thread_entry *codec_thread_p; /* For modifying thread priority later. */
 
-volatile int current_codec IDATA_ATTR;          /* Current codec (normal/voice) */
+volatile int current_codec IDATA_ATTR; /* Current codec (normal/voice) */
 
 /* Voice thread */
 #ifdef PLAYBACK_VOICE
@@ -296,24 +315,29 @@ static const char voice_thread_name[] = "voice codec";
 extern unsigned char codecbuf[];                /* DRAM codec swap buffer */
 
 #ifdef SIMULATOR
-static unsigned char sim_iram[CODEC_IRAM_SIZE]; /* IRAM codec swap buffer for sim*/
+/* IRAM codec swap buffer for sim*/
+static unsigned char sim_iram[CODEC_IRAM_SIZE];
 #undef CODEC_IRAM_ORIGIN
 #define CODEC_IRAM_ORIGIN sim_iram
 #endif
 
-static unsigned char *iram_buf[2] = { NULL, NULL }; /* Ptr to IRAM buffers for normal/voice codecs */
-static unsigned char *dram_buf[2] = { NULL, NULL }; /* Ptr to DRAM buffers for normal/voice codecs */
-static struct mutex mutex_codecthread;          /* Mutex to control which codec (normal/voice) is running */
+/* Pointer to IRAM buffers for normal/voice codecs */
+static unsigned char *iram_buf[2] = { NULL, NULL };
+/* Pointer to DRAM buffers for normal/voice codecs */
+static unsigned char *dram_buf[2] = { NULL, NULL };
+/* Mutex to control which codec (normal/voice) is running */
+static struct mutex mutex_codecthread;
 
 /* Voice state */
-static volatile bool voice_thread_start;    /* Set to trigger voice playback (A/V) */
-static volatile bool voice_is_playing;      /* Is voice currently playing? (V) */
-static volatile bool voice_codec_loaded;    /* Is voice codec loaded (V/A-) */
+static volatile bool voice_thread_start; /* Triggers voice playback (A/V) */
+static volatile bool voice_is_playing;   /* Is voice currently playing? (V) */
+static volatile bool voice_codec_loaded; /* Is voice codec loaded (V/A-) */
 static char *voicebuf;
 static size_t voice_remaining;
 
 #ifdef IRAM_STEAL
-static bool voice_iram_stolen = false;      /* Voice IRAM has been stolen for other use */
+/* Voice IRAM has been stolen for other use */
+static bool voice_iram_stolen = false;
 #endif
 
 static void (*voice_getmore)(unsigned char** start, int* size);
@@ -655,7 +679,7 @@ void audio_next(void)
 
         LOGFQUEUE("audio > audio Q_AUDIO_SKIP 1");
         queue_post(&audio_queue, Q_AUDIO_SKIP, 1);
-        /* Keep wps fast while our message travels inside deep playback queues. */
+        /* Update wps while our message travels inside deep playback queues. */
         wps_offset++;
         track_changed = true;
     }
@@ -676,7 +700,7 @@ void audio_prev(void)
 
         LOGFQUEUE("audio > audio Q_AUDIO_SKIP -1");
         queue_post(&audio_queue, Q_AUDIO_SKIP, -1);
-        /* Keep wps fast while our message travels inside deep playback queues. */
+        /* Update wps while our message travels inside deep playback queues. */
         wps_offset--;
         track_changed = true;
     }
@@ -1047,7 +1071,8 @@ static bool voice_pcmbuf_insert_split_callback(
         if (playing)
         {
             pcmbuf_mix_voice(output_size);
-            if ((pcmbuf_usage() < 10 || pcmbuf_mix_free() < 30) && audio_codec_loaded)
+            if ((pcmbuf_usage() < 10 || pcmbuf_mix_free() < 30) &&
+                    audio_codec_loaded)
                 swap_codec();
         }
         else
@@ -1807,8 +1832,24 @@ static void codec_discard_codec_callback(void)
 #endif
 }
 
+static inline void codec_gapless_track_change(void) {
+    /* callback keeps the progress bar moving while the pcmbuf empties */
+    pcmbuf_set_position_callback(codec_pcmbuf_position_callback);
+    /* set the pcmbuf callback for when the track really changes */
+    pcmbuf_set_event_handler(codec_pcmbuf_track_changed_callback);
+}
+
+static inline void codec_crossfade_track_change(void) {
+    /* Initiate automatic crossfade mode */
+    pcmbuf_crossfade_init(false);
+    /* Notify the wps that the track change starts now */
+    codec_track_changed();
+}
+
 static void codec_track_skip_done(bool was_manual)
 {
+    int crossfade_mode = global_settings.crossfade;
+
     /* Manual track change (always crossfade or flush audio). */
     if (was_manual)
     {
@@ -1818,34 +1859,24 @@ static void codec_track_skip_done(bool was_manual)
     }
     /* Automatic track change w/crossfade, if not in "Track Skip Only" mode. */
     else if (pcmbuf_is_crossfade_enabled() && !pcmbuf_is_crossfade_active()
-             && global_settings.crossfade != CROSSFADE_ENABLE_TRACKSKIP )
+             && crossfade_mode != CROSSFADE_ENABLE_TRACKSKIP)
     {
-        if ( global_settings.crossfade 
-                == CROSSFADE_ENABLE_SHUFFLE_AND_TRACKSKIP )
+        if (crossfade_mode == CROSSFADE_ENABLE_SHUFFLE_AND_TRACKSKIP)
         {
-            if (global_settings.playlist_shuffle)  /* shuffle mode is on, so crossfade: */
-            {
-                pcmbuf_crossfade_init(false);
-                codec_track_changed();
-            }
-            else  /* shuffle mode is off, so do a gapless track change */
-            {
-                pcmbuf_set_position_callback(codec_pcmbuf_position_callback);    /* Gapless playback  */
-                pcmbuf_set_event_handler(codec_pcmbuf_track_changed_callback);   /* copied from below */
-            }
+            if (global_settings.playlist_shuffle)
+                /* shuffle mode is on, so crossfade: */
+                codec_crossfade_track_change();
+            else
+                /* shuffle mode is off, so do a gapless track change */
+                codec_gapless_track_change();
         }
-        else  /* normal crossfade:  */
-        {
-            pcmbuf_crossfade_init(false);
-            codec_track_changed();
-         }
+        else
+            /* normal crossfade:  */
+            codec_crossfade_track_change();
     }
-    /* Gapless playback. */
     else
-    {
-        pcmbuf_set_position_callback(codec_pcmbuf_position_callback);
-        pcmbuf_set_event_handler(codec_pcmbuf_track_changed_callback);
-    }
+        /* normal gapless playback. */
+        codec_gapless_track_change();
 }
 
 static bool codec_load_next_track(void) 
@@ -2076,7 +2107,8 @@ static void codec_thread(void)
                              * triggering the WPS exit */
                             while(pcm_is_playing())
                             {
-                                CUR_TI->id3.elapsed = CUR_TI->id3.length - pcmbuf_get_latency();
+                                CUR_TI->id3.elapsed =
+                                    CUR_TI->id3.length - pcmbuf_get_latency();
                                 sleep(1);
                             }
                             LOGFQUEUE("codec > audio Q_AUDIO_STOP");
@@ -2092,7 +2124,8 @@ static void codec_thread(void)
                     }
                     else
                     {
-                        const char *codec_fn = get_codec_filename(CUR_TI->id3.codectype);
+                        const char *codec_fn =
+                            get_codec_filename(CUR_TI->id3.codectype);
                         LOGFQUEUE("codec > codec Q_CODEC_LOAD_DISK");
                         queue_post(&codec_queue, Q_CODEC_LOAD_DISK,
                             (intptr_t)codec_fn);
@@ -2516,7 +2549,8 @@ static bool audio_loadcodec(bool start_play)
     int prev_track;
     char codec_path[MAX_PATH]; /* Full path to codec */
 
-    const char * codec_fn = get_codec_filename(tracks[track_widx].id3.codectype);
+    const char * codec_fn =
+        get_codec_filename(tracks[track_widx].id3.codectype);
     if (codec_fn == NULL)
         return false;
 
@@ -3520,9 +3554,9 @@ static void audio_playback_init(void)
     id3_voice.length = 1000000L;
 #endif
 
-    codec_thread_p = create_thread(codec_thread, codec_stack, 
-                                   sizeof(codec_stack),
-                                   codec_thread_name IF_PRIO(, PRIORITY_PLAYBACK));
+    codec_thread_p = create_thread(
+            codec_thread, codec_stack, sizeof(codec_stack),
+            codec_thread_name IF_PRIO(, PRIORITY_PLAYBACK));
 
     while (1)
     {
