@@ -602,8 +602,8 @@ const struct settings_list settings[] = {
         "230Hz,300Hz,385Hz,500Hz",UNUSED},
     {F_T_INT,GS(eq_hw_band1_bandwidth),LANG_EQUALIZER_BANDWIDTH,INT(0),
         "eq hardware band 1 bandwidth","narrow,wide",UNUSED},
-    {F_T_INT,GS(eq_hw_band1_gain),INT(0),
-        "eq hardware band 1 gain",LANG_EQUALIZER_BAND_GAIN,NULL,UNUSED},
+    {F_T_INT,GS(eq_hw_band1_gain),LANG_EQUALIZER_BAND_GAIN,INT(0),
+        "eq hardware band 1 gain",NULL,UNUSED},
 
     {F_T_INT,GS(eq_hw_band2_center),LANG_EQUALIZER_BAND_CENTER,INT(1),
         "eq hardware band 2 center",
