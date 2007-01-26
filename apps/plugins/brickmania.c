@@ -183,21 +183,21 @@ extern const fb_data brickmania_bricks[];
 */
 #define CYCLETIME 30
 
-#define PAD_WIDTH 40
-#define PAD_HEIGHT 5
+#define PAD_WIDTH 56
+#define PAD_HEIGHT 7
 #define PAD_POS_Y LCD_HEIGHT - 7
 #define BRICK_HEIGHT 12
 #define BRICK_WIDTH 32
 #define BALL 5
 #define HALFBALL 3
-#define LEFTMARGIN 5
+#define LEFTMARGIN 0
 #define TOPMARGIN 30
 
 #define MENU_BMPHEIGHT 20
 #define MENU_BMPWIDTH 112
 
-#define BMPHEIGHT_powerup 6
-#define BMPWIDTH_powerup 10
+#define BMPHEIGHT_powerup 10
+#define BMPWIDTH_powerup 16
 
 #define BMPHEIGHT_menu LCD_HEIGHT
 #define BMPWIDTH_menu LCD_WIDTH
