@@ -175,7 +175,7 @@ void save_changes(int overwrite)
         rb->kbd_input(filename,MAX_PATH);
     }
 
-    fd = rb->open(filename,O_WRONLY|O_CREAT);
+    fd = rb->open(filename,O_WRONLY|O_CREAT|O_TRUNC);
     if (fd < 0)
     {
         rb->splash(HZ*2,1,"Changes NOT saved");
