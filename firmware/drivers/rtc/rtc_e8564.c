@@ -21,7 +21,7 @@
 #include "rtc.h"
 #include "kernel.h"
 #include "system.h"
-#include "i2c-pp5020.h"
+#include "i2c-pp.h"
 #include <stdbool.h>
 
 void rtc_init(void)
