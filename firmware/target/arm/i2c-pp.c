@@ -7,10 +7,10 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * PP5002 I2C driver
+ * PP502X and PP5002 I2C driver
  *
  * Based on code from the ipodlinux project - http://ipodlinux.org/
- * Adapted for Rockbox in January 2006
+ * Adapted for Rockbox in November 2005
  *
  * Original file: linux/arch/armnommu/mach-ipod/hardware.c
  *
@@ -28,7 +28,11 @@
 #include "kernel.h"
 #include "logf.h"
 #include "system.h"
+#if CONFIG_I2C == I2C_PP5002
 #include "i2c-pp5002.h"
+#else
+#include "i2c-pp5020.h"
+#endif
 
 /* Local functions definitions */
 
@@ -48,37 +52,43 @@ static int pp_i2c_wait_not_busy(void)
     return -1;
 }
 
-
-/* Public functions */
-
-int pp_i2c_read_byte(unsigned int addr, unsigned int *data)
+static int pp_i2c_read_byte(unsigned int addr, unsigned int *data)
 {
     if (pp_i2c_wait_not_busy() < 0)
     {
         return -1;
     }
 
-    /* clear top 15 bits, left shift 1, or in 0x1 for a read */
-    I2C_ADDR = ((addr << 17) >> 16) | 0x1 ;
-
-    I2C_CTRL |= 0x20;
-
-    I2C_CTRL |= I2C_SEND;
-
-    if (pp_i2c_wait_not_busy() < 0)
     {
-        return -1;
-    }
+        unsigned int byte;
+        int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
 
-    if (data)
-    {
-        *data = I2C_DATA(0);
+        /* clear top 15 bits, left shift 1, or in 0x1 for a read */
+        I2C_ADDR = ((addr << 17) >> 16) | 0x1 ;
+
+        I2C_CTRL |= 0x20;
+
+        I2C_CTRL |= I2C_SEND;
+
+        set_irq_level(old_irq_level);
+        if (pp_i2c_wait_not_busy() < 0)
+        {
+            return -1;
+        }
+        old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
+
+        byte = I2C_DATA(0);
+
+        if (data)
+            *data = byte;
+
+        set_irq_level(old_irq_level);
     }
 
     return 0;
 }
 
-int pp_i2c_send_bytes(unsigned int addr, unsigned int len, unsigned char *data)
+static int pp_i2c_send_bytes(unsigned int addr, unsigned int len, unsigned char *data)
 {
     unsigned int i;
 
@@ -92,24 +102,30 @@ int pp_i2c_send_bytes(unsigned int addr, unsigned int len, unsigned char *data)
         return -2;
     }
 
-    /* clear top 15 bits, left shift 1 */
-    I2C_ADDR = (addr << 17) >> 16;
-
-    I2C_CTRL &= ~0x20;
-
-    for ( i = 0; i < len; i++ )
     {
-        I2C_DATA(i) = *data++;
+        int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
+
+        /* clear top 15 bits, left shift 1 */
+        I2C_ADDR = (addr << 17) >> 16;
+
+        I2C_CTRL &= ~0x20;
+
+        for ( i = 0; i < len; i++ )
+        {
+            I2C_DATA(i) = *data++;
+        }
+
+        I2C_CTRL = (I2C_CTRL & ~0x26) | ((len-1) << 1);
+
+        I2C_CTRL |= I2C_SEND;
+
+        set_irq_level(old_irq_level);
     }
-
-    I2C_CTRL = (I2C_CTRL & ~0x26) | ((len-1) << 1);
-
-    I2C_CTRL |= I2C_SEND;
 
     return 0x0;
 }
 
-int pp_i2c_send_byte(unsigned int addr, int data0)
+static int pp_i2c_send_byte(unsigned int addr, int data0)
 {
     unsigned char data[1];
 
@@ -118,14 +134,19 @@ int pp_i2c_send_byte(unsigned int addr, int data0)
     return pp_i2c_send_bytes(addr, 1, data);
 }
 
+/* Public functions */
+static struct mutex i2c_mutex;
+
 int i2c_readbytes(unsigned int dev_addr, int addr, int len, unsigned char *data) {
     unsigned int temp;
     int i;
+    mutex_lock(&i2c_mutex);
     pp_i2c_send_byte(dev_addr, addr);
     for (i = 0; i < len; i++) {
         pp_i2c_read_byte(dev_addr, &temp);
         data[i] = temp;
     }
+    mutex_unlock(&i2c_mutex);
     return i;
 }
 
@@ -133,25 +154,55 @@ int i2c_readbyte(unsigned int dev_addr, int addr)
 {
     int data;
 
+    mutex_lock(&i2c_mutex);
     pp_i2c_send_byte(dev_addr, addr);
     pp_i2c_read_byte(dev_addr, &data);
+    mutex_unlock(&i2c_mutex);
 
     return data;
 }
 
 int pp_i2c_send(unsigned int addr, int data0, int data1)
 {
+    int retval;
     unsigned char data[2];
 
     data[0] = data0;
     data[1] = data1;
 
-    return pp_i2c_send_bytes(addr, 2, data);
+    mutex_lock(&i2c_mutex);
+    retval = pp_i2c_send_bytes(addr, 2, data);
+    mutex_unlock(&i2c_mutex);
+
+    return retval;
 }
 
 void i2c_init(void)
 {
-    DEV_EN |= 0x2;      /* Enable I2C-should this be DEV_I2C rather than 0x2? */
+    /* From ipodlinux */
+
+#ifdef IPOD_MINI
+    /* GPIO port C disable port 0x10 */
+    GPIOC_ENABLE &= ~0x10;
+
+    /* GPIO port C disable port 0x20 */
+    GPIOC_ENABLE &= ~0x20;
+#endif
+
+#if CONFIG_I2C == I2C_PP5002
+    DEV_EN |= 0x2;
+#else
+    DEV_EN |= DEV_I2C;  /* Enable I2C */
+#endif
     DEV_RS |= DEV_I2C;  /* Start I2C Reset */
     DEV_RS &=~DEV_I2C;  /* End I2C Reset */
+
+#if CONFIG_I2C == I2C_PP5020
+    outl(0x0, 0x600060a4);
+    outl(0x80 | (0 << 8), 0x600060a4);
+#endif
+
+    mutex_init(&i2c_mutex);
+
+    i2c_readbyte(0x8, 0);
 }
