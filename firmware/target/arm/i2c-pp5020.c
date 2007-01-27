@@ -185,9 +185,9 @@ void i2c_init(void)
     GPIOC_ENABLE &= ~0x20;
 #endif
 
-    DEV_EN |= DEV_I2C;
-    DEV_RS |= DEV_I2C;
-    DEV_RS &=~DEV_I2C;
+    DEV_EN |= DEV_I2C;  /* Enable I2C */
+    DEV_RS |= DEV_I2C;  /* Start I2C Reset */
+    DEV_RS &=~DEV_I2C;  /* End I2C Reset */
 
     outl(0x0, 0x600060a4);
     outl(0x80 | (0 << 8), 0x600060a4);

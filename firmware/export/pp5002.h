@@ -59,6 +59,7 @@
 #define DEV_RS (*(volatile unsigned long *)( 0xcf005030))
 #define DEV_EN (*(volatile unsigned long *)( 0xcf005000))
 
+#define DEV_I2C     (1<<8)
 #define DEV_USB     0x400000
 
 #define DEV_INIT    (*(volatile unsigned long *)(0x70000020))
@@ -77,6 +78,8 @@
 #define IISFIFO_CFG         (*(volatile unsigned long*)(0xc000251c))
 #define IISFIFO_WR          (*(volatile unsigned long*)(0xc0002540))
 #define IISFIFO_RD          (*(volatile unsigned long*)(0xc0002580))
+
+#define I2C_BASE     0xc0008000
 
 #define TIMER1_CFG   (*(volatile unsigned long *)(0xcf001100))
 #define TIMER1_VAL   (*(volatile unsigned long *)(0xcf001104))

@@ -32,21 +32,6 @@
 
 /* Local functions definitions */
 
-#define IPOD_I2C_BASE   0xc0008000
-#define IPOD_I2C_CTRL   (IPOD_I2C_BASE+0x00)
-#define IPOD_I2C_ADDR   (IPOD_I2C_BASE+0x04)
-#define IPOD_I2C_DATA0  (IPOD_I2C_BASE+0x0c)
-#define IPOD_I2C_DATA1  (IPOD_I2C_BASE+0x10)
-#define IPOD_I2C_DATA2  (IPOD_I2C_BASE+0x14)
-#define IPOD_I2C_DATA3  (IPOD_I2C_BASE+0x18)
-#define IPOD_I2C_STATUS (IPOD_I2C_BASE+0x1c)
-
-/* IPOD_I2C_CTRL bit definitions */
-#define IPOD_I2C_SEND   0x80
-
-/* IPOD_I2C_STATUS bit definitions */
-#define IPOD_I2C_BUSY   (1<<6)
-
 #define POLL_TIMEOUT (HZ)
 
 static int pp_i2c_wait_not_busy(void)
@@ -54,7 +39,7 @@ static int pp_i2c_wait_not_busy(void)
     unsigned long timeout;
     timeout = current_tick + POLL_TIMEOUT;
     while (TIME_BEFORE(current_tick, timeout)) {
-         if (!(inb(IPOD_I2C_STATUS) & IPOD_I2C_BUSY)) {
+         if (!(I2C_STATUS & I2C_BUSY)) {
             return 0;
          }
          yield();
@@ -74,11 +59,11 @@ int pp_i2c_read_byte(unsigned int addr, unsigned int *data)
     }
 
     /* clear top 15 bits, left shift 1, or in 0x1 for a read */
-    outb(((addr << 17) >> 16) | 0x1, IPOD_I2C_ADDR);
+    I2C_ADDR = ((addr << 17) >> 16) | 0x1 ;
 
-    outb(inb(IPOD_I2C_CTRL) | 0x20, IPOD_I2C_CTRL);
+    I2C_CTRL |= 0x20;
 
-    outb(inb(IPOD_I2C_CTRL) | IPOD_I2C_SEND, IPOD_I2C_CTRL);
+    I2C_CTRL |= I2C_SEND;
 
     if (pp_i2c_wait_not_busy() < 0)
     {
@@ -87,7 +72,7 @@ int pp_i2c_read_byte(unsigned int addr, unsigned int *data)
 
     if (data)
     {
-        *data = inb(IPOD_I2C_DATA0);
+        *data = I2C_DATA(0);
     }
 
     return 0;
@@ -95,7 +80,6 @@ int pp_i2c_read_byte(unsigned int addr, unsigned int *data)
 
 int pp_i2c_send_bytes(unsigned int addr, unsigned int len, unsigned char *data)
 {
-    int data_addr;
     unsigned int i;
 
     if (len < 1 || len > 4)
@@ -109,20 +93,18 @@ int pp_i2c_send_bytes(unsigned int addr, unsigned int len, unsigned char *data)
     }
 
     /* clear top 15 bits, left shift 1 */
-    outb((addr << 17) >> 16, IPOD_I2C_ADDR);
+    I2C_ADDR = (addr << 17) >> 16;
 
-    outb(inb(IPOD_I2C_CTRL) & ~0x20, IPOD_I2C_CTRL);
+    I2C_CTRL &= ~0x20;
 
-    data_addr = IPOD_I2C_DATA0;
     for ( i = 0; i < len; i++ )
     {
-        outb(*data++, data_addr);
-        data_addr += 4;
+        I2C_DATA(i) = *data++;
     }
 
-    outb((inb(IPOD_I2C_CTRL) & ~0x26) | ((len-1) << 1), IPOD_I2C_CTRL);
+    I2C_CTRL = (I2C_CTRL & ~0x26) | ((len-1) << 1);
 
-    outb(inb(IPOD_I2C_CTRL) | IPOD_I2C_SEND, IPOD_I2C_CTRL);
+    I2C_CTRL |= I2C_SEND;
 
     return 0x0;
 }
@@ -169,10 +151,7 @@ int pp_i2c_send(unsigned int addr, int data0, int data1)
 
 void i2c_init(void)
 {
-   /* From ipodlinux */
-
-   outl(inl(0xcf005000) | 0x2, 0xcf005000);
-	
-   outl(inl(0xcf005030) | (1<<8), 0xcf005030);
-   outl(inl(0xcf005030) & ~(1<<8), 0xcf005030);
+    DEV_EN |= 0x2;      /* Enable I2C-should this be DEV_I2C rather than 0x2? */
+    DEV_RS |= DEV_I2C;  /* Start I2C Reset */
+    DEV_RS &=~DEV_I2C;  /* End I2C Reset */
 }
