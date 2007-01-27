@@ -25,12 +25,7 @@
  ****************************************************************************/
 
 #include "system.h"
-
-#if CONFIG_CPU == PP5020
-#include "i2c-pp5020.h"
-#elif CONFIG_CPU == PP5002
-#include "i2c-pp5002.h"
-#endif
+#include "i2c-pp.h"
 
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
 /* The H10's audio codec uses an I2C address of 0x1b */

@@ -25,10 +25,8 @@
  ****************************************************************************/
 #include "system.h"
 #include "config.h"
-#if CONFIG_I2C == I2C_PP5020
-#include "i2c-pp5020.h"
-#elif CONFIG_I2C == I2C_PP5002
-#include "i2c-pp5002.h"
+#if CONFIG_I2C == I2C_PP5020 || CONFIG_I2C == I2C_PP5002
+#include "i2c-pp.h"
 #endif
 #include "rtc.h"
 
