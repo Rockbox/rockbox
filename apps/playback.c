@@ -3447,7 +3447,14 @@ static void audio_reset_buffer(size_t pcmbufsize)
 #ifdef IRAM_STEAL
         /* Allocate voice IRAM swap buffer once */
         if (iram_buf[CODEC_IDX_VOICE] == NULL)
+        {
             iram_buf[CODEC_IDX_VOICE] = buffer_alloc(CODEC_IRAM_SIZE);
+            /* buffer_alloc moves audiobuf; this is safe because only the end
+             * has been touched so far in this function and the address of
+             * filebuf + filebuflen is not changed */
+            filebuf += CODEC_IRAM_SIZE;
+            filebuflen -= CODEC_IRAM_SIZE;
+        }
         dram_buf[CODEC_IDX_VOICE] = dram_buf[CODEC_IDX_AUDIO] + CODEC_SIZE;
 #else
         iram_buf[CODEC_IDX_VOICE] = dram_buf[CODEC_IDX_AUDIO] + CODEC_SIZE;
