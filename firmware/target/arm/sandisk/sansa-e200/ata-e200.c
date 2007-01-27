@@ -284,8 +284,8 @@ static void copy_write_sectors(const unsigned char* buf, int wordcount)
         unsigned short* wbufend = wbuf + wordcount;
         do
         {
-            lcd_update();
             DATA_REG = *wbuf;
+            asm volatile("nop\n\t");
         } while (++wbuf < wbufend); /* tail loop is faster */
     }
 }
