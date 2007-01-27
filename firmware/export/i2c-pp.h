@@ -18,12 +18,12 @@
  ****************************************************************************/
 
 /*
- * PP5002 i2c driver
+ * PortalPlayer i2c driver
  *
  */
  
-#ifndef _I2C_PP5002_H
-#define _I2C_PP5002_H
+#ifndef _I2C_PP_H
+#define _I2C_PP_H
 
 #define I2C_CTRL    (*(volatile unsigned char*)(I2C_BASE+0x00))
 #define I2C_ADDR    (*(volatile unsigned char*)(I2C_BASE+0x04))

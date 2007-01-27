@@ -28,11 +28,7 @@
 #include "kernel.h"
 #include "logf.h"
 #include "system.h"
-#if CONFIG_I2C == I2C_PP5002
-#include "i2c-pp5002.h"
-#else
-#include "i2c-pp5020.h"
-#endif
+#include "i2c-pp.h"
 
 /* Local functions definitions */
 
