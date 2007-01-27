@@ -126,6 +126,7 @@
 #define DEV_EN (*(volatile unsigned long *)(0x6000600c))
 
 #define DEV_SYSTEM  0x4
+#define DEV_I2C     0x1000
 #define DEV_USB     0x400000
 
 #define DEV_INIT    (*(volatile unsigned long *)(0x70000020))
@@ -162,6 +163,8 @@
 #define SER0_MASK    (1 << (SER0_IRQ-32))
 #define SER1_MASK    (1 << (SER1_IRQ-32))
 #define I2C_MASK     (1 << (I2C_IRQ-32))
+
+#define I2C_BASE    0x7000c000
 
 #define IISCONFIG           (*(volatile unsigned long*)(0x70002800))
 

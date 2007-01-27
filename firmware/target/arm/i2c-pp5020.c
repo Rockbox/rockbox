@@ -32,21 +32,6 @@
 
 /* Local functions definitions */
 
-#define IPOD_I2C_BASE   0x7000c000
-#define IPOD_I2C_CTRL   (IPOD_I2C_BASE+0x00)
-#define IPOD_I2C_ADDR   (IPOD_I2C_BASE+0x04)
-#define IPOD_I2C_DATA0  (IPOD_I2C_BASE+0x0c)
-#define IPOD_I2C_DATA1  (IPOD_I2C_BASE+0x10)
-#define IPOD_I2C_DATA2  (IPOD_I2C_BASE+0x14)
-#define IPOD_I2C_DATA3  (IPOD_I2C_BASE+0x18)
-#define IPOD_I2C_STATUS (IPOD_I2C_BASE+0x1c)
-
-/* IPOD_I2C_CTRL bit definitions */
-#define IPOD_I2C_SEND   0x80
-
-/* IPOD_I2C_STATUS bit definitions */
-#define IPOD_I2C_BUSY   (1<<6)
-
 #define POLL_TIMEOUT (HZ)
 
 static int pp_i2c_wait_not_busy(void)
@@ -54,7 +39,7 @@ static int pp_i2c_wait_not_busy(void)
     unsigned long timeout;
     timeout = current_tick + POLL_TIMEOUT;
     while (TIME_BEFORE(current_tick, timeout)) {
-         if (!(inb(IPOD_I2C_STATUS) & IPOD_I2C_BUSY)) {
+         if (!(I2C_STATUS & I2C_BUSY)) {
             return 0;
          }
          yield();
@@ -75,11 +60,11 @@ static int pp_i2c_read_byte(unsigned int addr, unsigned int *data)
         int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
 
         /* clear top 15 bits, left shift 1, or in 0x1 for a read */
-        outb(((addr << 17) >> 16) | 0x1, IPOD_I2C_ADDR);
+        I2C_ADDR = ((addr << 17) >> 16) | 0x1 ;
 
-        outb(inb(IPOD_I2C_CTRL) | 0x20, IPOD_I2C_CTRL);
+        I2C_CTRL |= 0x20;
 
-        outb(inb(IPOD_I2C_CTRL) | IPOD_I2C_SEND, IPOD_I2C_CTRL);
+        I2C_CTRL |= I2C_SEND;
 
         set_irq_level(old_irq_level);
         if (pp_i2c_wait_not_busy() < 0)
@@ -88,7 +73,7 @@ static int pp_i2c_read_byte(unsigned int addr, unsigned int *data)
         }
         old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
 
-        byte = inb(IPOD_I2C_DATA0);
+        byte = I2C_DATA(0);
 
         if (data)
             *data = byte;
@@ -101,7 +86,6 @@ static int pp_i2c_read_byte(unsigned int addr, unsigned int *data)
 
 static int pp_i2c_send_bytes(unsigned int addr, unsigned int len, unsigned char *data)
 {
-    int data_addr;
     unsigned int i;
 
     if (len < 1 || len > 4)
@@ -118,20 +102,18 @@ static int pp_i2c_send_bytes(unsigned int addr, unsigned int len, unsigned char 
         int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
 
         /* clear top 15 bits, left shift 1 */
-        outb((addr << 17) >> 16, IPOD_I2C_ADDR);
+        I2C_ADDR = (addr << 17) >> 16;
 
-        outb(inb(IPOD_I2C_CTRL) & ~0x20, IPOD_I2C_CTRL);
+        I2C_CTRL &= ~0x20;
 
-        data_addr = IPOD_I2C_DATA0;
         for ( i = 0; i < len; i++ )
         {
-            outb(*data++, data_addr);
-            data_addr += 4;
+            I2C_DATA(i) = *data++;
         }
 
-        outb((inb(IPOD_I2C_CTRL) & ~0x26) | ((len-1) << 1), IPOD_I2C_CTRL);
+        I2C_CTRL = (I2C_CTRL & ~0x26) | ((len-1) << 1);
 
-        outb(inb(IPOD_I2C_CTRL) | IPOD_I2C_SEND, IPOD_I2C_CTRL);
+        I2C_CTRL |= I2C_SEND;
 
         set_irq_level(old_irq_level);
     }
@@ -178,39 +160,39 @@ int i2c_readbyte(unsigned int dev_addr, int addr)
 
 int pp_i2c_send(unsigned int addr, int data0, int data1)
 {
-        int retval;
-        unsigned char data[2];
+    int retval;
+    unsigned char data[2];
 
-        data[0] = data0;
-        data[1] = data1;
+    data[0] = data0;
+    data[1] = data1;
 
-        mutex_lock(&i2c_mutex);
-        retval = pp_i2c_send_bytes(addr, 2, data);
-        mutex_unlock(&i2c_mutex);
+    mutex_lock(&i2c_mutex);
+    retval = pp_i2c_send_bytes(addr, 2, data);
+    mutex_unlock(&i2c_mutex);
 
-        return retval;
+    return retval;
 }
 
 void i2c_init(void)
 {
-   /* From ipodlinux */
+    /* From ipodlinux */
 
 #ifdef IPOD_MINI
-   /* GPIO port C disable port 0x10 */
-   GPIOC_ENABLE &= ~0x10;
+    /* GPIO port C disable port 0x10 */
+    GPIOC_ENABLE &= ~0x10;
 
-   /* GPIO port C disable port 0x20 */
-   GPIOC_ENABLE &= ~0x20;
+    /* GPIO port C disable port 0x20 */
+    GPIOC_ENABLE &= ~0x20;
 #endif
 
-   outl(inl(0x6000600c) | 0x1000, 0x6000600c);     /* enable 12 */
-   outl(inl(0x60006004) | 0x1000, 0x60006004);     /* start reset 12 */
-   outl(inl(0x60006004) & ~0x1000, 0x60006004);    /* end reset 12 */
+    DEV_EN |= DEV_I2C;
+    DEV_RS |= DEV_I2C;
+    DEV_RS &=~DEV_I2C;
 
-   outl(0x0, 0x600060a4);
-   outl(0x80 | (0 << 8), 0x600060a4);
+    outl(0x0, 0x600060a4);
+    outl(0x80 | (0 << 8), 0x600060a4);
 
-   mutex_init(&i2c_mutex);
-   
-   i2c_readbyte(0x8, 0);
+    mutex_init(&i2c_mutex);
+
+    i2c_readbyte(0x8, 0);
 }
