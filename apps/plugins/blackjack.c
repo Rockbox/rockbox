@@ -5,9 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: blackjack.c,v 1.6 2006/11/21 20:528:13 midgey34 Exp $
+ * $Id: $
  *
- * Copyright (C) 2006 Tom Ross (midgey34@gmail.com)
+ * Copyright (C) 2006 Tom Ross
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -1399,6 +1399,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
 
     (void)parameter;
     rb = api;
+    
+#if LCD_DEPTH > 1
+    rb->lcd_set_backdrop(NULL);
+#endif
 
     /* load high scores */
     blackjack_loadscores(&bj);
