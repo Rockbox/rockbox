@@ -688,7 +688,7 @@ const struct settings_list settings[] = {
     FILENAME_SETTING(0,backdrop_file,"backdrop","",BACKDROP_DIR "/",".bmp",MAX_FILENAME+1),
 #endif
 #ifdef HAVE_LCD_BITMAP
-    FILENAME_SETTING(0,lang_file,"kbd","",ROCKBOX_DIR "/",".kbd",MAX_FILENAME+1),
+    FILENAME_SETTING(0,kbd_file,"kbd","",ROCKBOX_DIR "/",".kbd",MAX_FILENAME+1),
 #endif
 
 };
