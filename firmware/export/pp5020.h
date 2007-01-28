@@ -20,6 +20,8 @@
 #define __PP5020_H__
 
 /* All info gleaned and/or copied from the iPodLinux project. */
+#define DRAM_START       0x10000000
+
 #define CPU_CTL          (*(volatile unsigned long *)(0x60007000))
 #define COP_CTL          (*(volatile unsigned long *)(0x60007004))
 

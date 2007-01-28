@@ -20,6 +20,10 @@
 #define __PP5002_H__
 
 /* All info gleaned and/or copied from the iPodLinux project. */
+#define DRAM_START       0x28000000
+
+#define IPOD_LCD_BASE    0xc0001000
+
 #define CPU_CTL          (*(volatile unsigned char *)(0xcf004054))
 #define COP_CTL          (*(volatile unsigned char *)(0xcf004058))
 

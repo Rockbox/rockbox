@@ -39,16 +39,22 @@
 #include "panic.h"
 #include "power.h"
 #include "file.h"
+#include "common.h"
 
 #define XSC(X) #X
 #define SC(X) XSC(X)
 
-#if (CONFIG_CPU == PP5020)
-#define DRAM_START              0x10000000
-#else
-#define IPOD_LCD_BASE           0xc0001000
-#define DRAM_START              0x28000000
-#endif
+/* Maximum allowed firmware image size. The largest known current 
+   (December 2006) firmware is about 7.5MB (Apple's firmware for the ipod video)
+   so we set this to 8MB. */
+#define MAX_LOADSIZE (8*1024*1024)
+
+/* A buffer to load the Linux kernel or Rockbox into */
+unsigned char *loadbuffer = (unsigned char *)DRAM_START;
+
+/* Bootloader version */
+char version[] = APPSVERSION;
+
 #define IPOD_HW_REVISION (*((volatile unsigned long*)(0x00002084)))
 
 /* We copy the hardware revision to the last four bytes of SDRAM and then
@@ -60,17 +66,6 @@
 #define BUTTON_RIGHT 3
 #define BUTTON_PLAY  4
 #define BUTTON_HOLD  5
-
-/* Size of the buffer to store the loaded Rockbox/Linux/AppleOS image */
-
-/* The largest known current (December 2006) firmware is about 7.5MB
-   (Apple's firmware for the ipod video) so we set this to 8MB. */
-
-#define MAX_LOADSIZE (8*1024*1024)
-
-char version[] = APPSVERSION;
-
-int line=0;
 
 #if CONFIG_KEYPAD == IPOD_4G_PAD && !defined(IPOD_MINI)
 /* check if number of seconds has past */
@@ -157,54 +152,6 @@ int opto_keypad_read(void)
 }
 #endif
 
-char *strerror(int error)
-{
-    switch(error)
-    {
-    case 0:
-        return "OK";
-    case -1:
-        return "File not found";
-    case -2:
-        return "Read failed (chksum)";
-    case -3:
-        return "Read failed (model)";
-    case -4:
-        return "Read failed (image)";
-    case -5:
-        return "Bad checksum";
-    case -6:
-        return "File too big";
-    default:
-        return "Unknown";
-    }
-}
-
-char printfbuf[256];
-
-void reset_screen(void)
-{
-    lcd_clear_display();
-    line = 0;
-}
-
-void printf(const char *format, ...)
-{
-    int len;
-    unsigned char *ptr;
-    va_list ap;
-    va_start(ap, format);
-
-    ptr = printfbuf;
-    len = vsnprintf(ptr, sizeof(printfbuf), format, ap);
-    va_end(ap);
-
-    lcd_puts(0, line++, ptr);
-    lcd_update();
-    if(line >= (LCD_HEIGHT/SYSFONT_HEIGHT))
-        line = 0;
-}
-
 static int key_pressed(void)
 {
     unsigned char state;
@@ -240,101 +187,9 @@ bool button_hold(void)
     return (GPIOA_INPUT_VAL & 0x20)?false:true;
 }
 
-int load_rockbox(unsigned char* buf, char* firmware)
-{
-    int fd;
-    int rc;
-    int len;
-    unsigned long chksum;
-    char model[5];
-    unsigned long sum;
-    int i;
-    char filename[MAX_PATH];
-
-    snprintf(filename,sizeof(filename),"/.rockbox/%s",firmware);
-    fd = open(filename, O_RDONLY);
-    if(fd < 0)
-    {
-        snprintf(filename,sizeof(filename),"/%s",firmware);
-        fd = open(filename, O_RDONLY);
-        if(fd < 0)
-            return -1;
-    }
-
-    len = filesize(fd) - 8;
-
-    if (len > MAX_LOADSIZE)
-        return -6;
-
-    lseek(fd, FIRMWARE_OFFSET_FILE_CRC, SEEK_SET);
-    
-    rc = read(fd, &chksum, 4);
-    chksum=betoh32(chksum); /* Rockbox checksums are big-endian */
-    if(rc < 4)
-        return -2;
-
-    rc = read(fd, model, 4);
-    if(rc < 4)
-        return -3;
-
-    model[4] = 0;
-    
-    printf("Model: %s", model);
-    printf("Checksum: %x", chksum);
-    printf("Loading %s", firmware);
-
-    lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
-
-    rc = read(fd, buf, len);
-    if(rc < len)
-        return -4;
-
-    close(fd);
-
-    sum = MODEL_NUMBER;
-    
-    for(i = 0;i < len;i++) {
-        sum += buf[i];
-    }
-
-    printf("Sum: %x", sum);
-
-    if(sum != chksum)
-        return -5;
-
-    return len;
-}
-
-
-int load_linux(unsigned char* buf) {
-    int fd;
-    int rc;
-    int len;
-
-    fd=open("/linux.bin",O_RDONLY);
-    if (fd < 0)
-        return -1;
-
-    len=filesize(fd);
-    if (len > MAX_LOADSIZE)
-        return -6;
-
-    rc=read(fd,buf,len);
-
-    if (rc < len)
-        return -4;
-
-    printf("Loaded Linux: %d bytes", len);
-
-    return len;
-}
-
-
-/* A buffer to load the Linux kernel or Rockbox into */
-unsigned char loadbuffer[MAX_LOADSIZE];
-
 void fatal_error(void)
 {
+    extern int line;
     bool holdstatus=false;
 
     /* System font is 6 pixels wide */
@@ -423,7 +278,6 @@ void* main(void)
     button_init();
 #endif
 
-    line=0;
 
     lcd_setfont(FONT_SYSFIXED);
 
@@ -459,103 +313,78 @@ void* main(void)
     printf("Partition 1: 0x%02x %ld MB", 
            pinfo->type, pinfo->size / 2048);
 
-    /* See if there is an Apple firmware image in RAM */
-    haveretailos = (memcmp((void*)(DRAM_START+0x20),"portalplayer",12)==0);
+    
+    /* Check for a keypress */
+    i=key_pressed();
 
-    /* We don't load Rockbox if the hold button is enabled. */
-    if (!button_was_held) {
-        /* Check for a keypress */
-        i=key_pressed();
+    if (button_was_held || (i==BUTTON_MENU)) {
+        /* If either the hold switch was on, or the Menu button was held, then 
+           try the Apple firmware */
 
-        if ((i!=BUTTON_MENU) && (i!=BUTTON_PLAY)) {
-            printf("Loading Rockbox...");
-            rc=load_rockbox(loadbuffer, BOOTFILE);
-            if (rc < 0) {
-                printf("Error!");
-                printf("Can't load rockbox.ipod:");
-                printf(strerror(rc));
-            } else {
-                printf("Rockbox loaded.");
-                memcpy((void*)DRAM_START,loadbuffer,rc);
+        printf("Loading original firmware...");
+    
+        /* First try an apple_os.ipod file on the FAT32 partition
+           (either in .rockbox or the root) 
+         */
+    
+        rc=load_firmware(loadbuffer, "apple_os.ipod", MAX_LOADSIZE);
+    
+        if(rc==EFILE_NOT_FOUND) {
+            /* If apple_os.ipod doesn't exist, then check if there is an Apple 
+               firmware image in RAM  */
+            haveretailos = (memcmp((void*)(DRAM_START+0x20),"portalplayer",12)==0);
+            if (haveretailos) {
+                /* We have a copy of the retailos in RAM, lets just run it. */
                 return (void*)DRAM_START;
             }
+        } else if (rc < EFILE_NOT_FOUND) {
+            printf("Error!");
+            printf("Can't load apple_os.ipod:");
+            printf(strerror(rc));
+        } else if (rc > 0) {
+            printf("apple_os.ipod loaded.");
+            return (void*)DRAM_START;
         }
-
-        if (i==BUTTON_PLAY) {
-            printf("Loading Linux...");
-            rc=load_linux(loadbuffer);
-            if (rc < 0) {
-                printf("Error!");
-                printf("Can't load linux.bin:");
-                printf(strerror(rc));
-            } else {
-                memcpy((void*)DRAM_START,loadbuffer,rc);
-                return (void*)DRAM_START;
-            }
+        
+        /* Everything failed - just loop forever */
+        printf("No RetailOS detected");
+        
+    } else if (i==BUTTON_PLAY) {
+        printf("Loading Linux...");
+        rc=load_raw_firmware(loadbuffer, "/linux.bin", MAX_LOADSIZE);
+        if (rc < EOK) {
+            printf("Error!");
+            printf("Can't load linux.bin:");
+            printf(strerror(rc));
+        } else {
+            return (void*)DRAM_START;
+        }
+    } else {
+        printf("Loading Rockbox...");
+        rc=load_firmware(loadbuffer, BOOTFILE, MAX_LOADSIZE);
+        if (rc < EOK) {
+            printf("Error!");
+            printf("Can't load rockbox.ipod:");
+            printf(strerror(rc));
+        } else {
+            printf("Rockbox loaded.");
+            return (void*)DRAM_START;
         }
     }
-
-
-    /* If either the hold switch was on, or loading Rockbox/IPL
-       failed, then try the Apple firmware */
-
-    printf("Loading original firmware...");
-
-    /* First try an apple_os.ipod file on the FAT32 partition
-       (either in .rockbox or the root) 
-     */
-
-    rc=load_rockbox(loadbuffer, "apple_os.ipod");
-
-    /* Only report errors if the file was found */
-    if (rc < -1) {
-        printf("Error!");
-        printf("Can't load apple_os.ipod:");
-        printf(strerror(rc));
-    } else if (rc > 0) {
-        printf("apple_os.ipod loaded.");
-        memcpy((void*)DRAM_START,loadbuffer,rc);
-        return (void*)DRAM_START;
-    }
-
-    if (haveretailos) {
-        /* We have a copy of the retailos in RAM, lets just run it. */
-        return (void*)DRAM_START;
-    }
-
-    /* Everything failed - just loop forever */
-    printf("No RetailOS detected");
-
+    
+    /* If we get to here, then we haven't been able to load any firmware */
     fatal_error();
-
+    
     /* We never get here, but keep gcc happy */
     return (void*)0;
 }
 
 /* These functions are present in the firmware library, but we reimplement
    them here because the originals do a lot more than we want */
-
-void reset_poweroff_timer(void)
-{
-}
-
-int dbg_ports(void)
-{
-   return 0;
-}
-
-void mpeg_stop(void)
-{
-}
-
 void usb_acknowledge(void)
 {
 }
 
 void usb_wait_for_disconnect(void)
-{
-}
-
-void sys_poweroff(void)
 {
 }
