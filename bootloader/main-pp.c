@@ -74,7 +74,7 @@ void* main(void)
         printf(buf);
     } else {
         printf("ATA error: %d", i);
-        sleep(HZ*5);
+        udelay(5000000);
         power_off();
     }
 
@@ -83,7 +83,7 @@ void* main(void)
     if (rc<=0)
     {
         printf("No partition found");
-        sleep(HZ*5);
+        udelay(5000000);
         power_off();
     }
 
@@ -104,7 +104,7 @@ void* main(void)
             printf("Error!");
             printf("Can't load /System/OF.bin:");
             printf(strerror(rc));
-            sleep(HZ*5);
+            udelay(5000000);
             power_off();
         }
     } else {
@@ -114,7 +114,7 @@ void* main(void)
             printf("Error!");
             printf("Can't load %s:", BOOTFILE);
             printf(strerror(rc));
-            sleep(HZ*5);
+            udelay(5000000);
             power_off();
         }
     }
