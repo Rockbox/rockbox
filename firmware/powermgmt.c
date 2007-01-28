@@ -347,7 +347,6 @@ static const char power_thread_name[] = "power";
 
 static int poweroff_timeout = 0;
 static int powermgmt_est_runningtime_min = -1;
-static bool low_battery = false;
 
 static bool sleeptimer_active = false;
 static long sleeptimer_endtick;
@@ -622,27 +621,6 @@ static void handle_auto_poweroff(void)
         last_event_tick = current_tick;
     }
 #endif
-
-    /* For low battery condition do some power-saving stuff */
-    if (!low_battery && battery_level_critical()) {
-#if CONFIG_BACKLIGHT == BL_IRIVER_H100
-        backlight_set_fade_in(0);
-        backlight_set_fade_out(0);
-#endif
-#if defined(CONFIG_BACKLIGHT) && !defined(BOOTLOADER)
-        if (backlight_get_current_timeout() > 2)
-#endif
-            backlight_set_timeout(2);
-#ifdef HAVE_REMOTE_LCD
-        remote_backlight_set_timeout(2);
-#endif
-        ata_spindown(3);
-        low_battery = true;
-    } else if (low_battery && (battery_percent > 11)) {
-        backlight_set_timeout(10);
-        ata_spindown(10);
-        low_battery = false;
-    }
 
     /* switch off unit if battery level is too low for reliable operation */
 #if (CONFIG_BATTERY!=BATT_4AA_NIMH) && (CONFIG_BATTERY!=BATT_3AAA)&& \
