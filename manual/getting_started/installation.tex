@@ -143,55 +143,57 @@ software.
 
 There are three different types of firmware binaries from Rockbox website:
 \label{Version}
-current version, daily build and SVN build. You need to decide which one
+Release version, current build and daily build. You need to decide which one
 you want to install and get the version for your \dap{}.
 
 \begin{description}
 
-\item[Current Version.] The current version is the latest stable release, free
+\item[Release.] The release version is the latest stable release, free
   of known critical bugs. The current stable release of Rockbox, version 2.5,
   is available at \url{http://www.rockbox.org/download/}.
   \opt{SWCODEC}{
-    \note{The current stable release is available only for Archos jukeboxes.
+    \note{The current release is only available for Archos jukeboxes, recorders
+      and ondios.
       There has not yet been a stable release for the \playername{}. Until
-      there is a stable release for \playername{}, use a daily build or SVN
+      there is a stable release for \playername{}, use a current build or daily
       build.
     }
   }
 
-\item[Daily Build.] The daily build is a development version of Rockbox. It
-  contains features and patches developed since last stable version. It
-  may also contain bugs! This daily build is generated automatically every day
-  and can be found at \url{http://www.rockbox.org/daily.shtml}.
+\item[Current Build.] The current build is built at each source code change to
+  the Rockbox SVN repository, and represent the current state of Rockbox
+  development. This means that the build could contain bugs, but is most of
+  the time safe to use. You can download the current build from  
+  \url{http://build.rockbox.org/}.
 
-\item[SVN Build] SVN stands for
-  ``Subversion.'' SVN is the system that Rockbox
-  developers use to keep track of changes to the Rockbox source code. SVN
-  builds are made automatically every time there is a change to the
-  Rockbox source. These builds are for people who want to test the code
-  that developers just checked in.
+\item[Daily Build.] In addition to the release version and the current build,
+  there is also an archive of daily builds available for download. These are
+  built once a day from the latest source code in the SVN repository. You can
+  download the daily builds from \url{http://www.rockbox.org/daily.shtml}.
+
 
 \end{description}
 
 \nopt{player}{
   \note{\index{Installation!Fonts}
     Rockbox has a fonts package that is available at
-    \url{http://www.rockbox.org/daily.shtml}. While the daily builds and SVN
-    builds change frequently, the fonts package rarely changes.  Thus, the
-    fonts package is not included in the daily builds and SVN builds. (The
-    stable release, on the other hand, does not change, so fonts are
-    included with the stable release.) When installing Rockbox for the
-    first time, you should install the fonts package.
+    \url{http://www.rockbox.org/daily.shtml} or from the \emph{extras} link in
+    the menu on the Rockbox website. While the current builds and
+    daily builds change frequently, the fonts package rarely changes.  Thus, 
+    the fonts package is not included in these builds. (The release version, on
+    the other hand, does not change, so fonts are included when you download a
+    release.) When installing Rockbox for the first time, you should install 
+    the fonts package.
   }
 }
 
-Because daily builds and SVN builds are development versions which change
+Because current builds and daily builds are development versions which change
 frequently, they may behave differently than described in this manual, or
 they may introduce new (and maybe annoying) bugs. If you do not want to get
 undefined behaviour from your \dap{} you should really stick to the current
 stable release, if there is one for your \dap{}. If you want to help the
 project development, you can try development builds and help by reporting
-bugs. Just be aware that these are development builds that are  highly
+bugs. Just be aware that these are development builds that are highly
 functional, but not perfect!
 
 After downloading the Rockbox package connect your \dap{} to the computer via
