@@ -33,6 +33,7 @@
 #include "talk.h"
 #include "string.h"
 #include "rtc.h"
+#include "power.h"
 #include "ata_idle_notify.h"
 #include "atoi.h"
 #include "screens.h"
