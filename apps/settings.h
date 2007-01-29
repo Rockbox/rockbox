@@ -37,6 +37,10 @@
 #include "backlight.h" /* for [MIN|MAX]_BRIGHTNESS_SETTING */
 #endif
 
+/** Setting values defines **/
+
+/* name of directory where configuration, fonts and other data
+ * files are stored */
 #ifdef __PCTOOL__
 #define ROCKBOX_DIR "."
 #define ROCKBOX_DIR_LEN 1
@@ -61,7 +65,6 @@
 
 #define MAX_FILENAME 20
 
-/* data structures */
 
 #define BOOKMARK_NO  0
 #define BOOKMARK_YES 1
@@ -100,6 +103,69 @@ extern const char * const trig_durations[TRIG_DURATION_COUNT];
 #define FOLDER_ADVANCE_NEXT 1
 #define FOLDER_ADVANCE_RANDOM 2
 
+/* system defines */
+#ifndef TARGET_TREE
+
+#ifndef HAVE_LCD_COLOR
+#define DEFAULT_CONTRAST_SETTING    40
+#endif
+
+#if defined HAVE_LCD_CHARCELLS
+#define MIN_CONTRAST_SETTING        5
+#define MAX_CONTRAST_SETTING        31
+#else
+#define MIN_CONTRAST_SETTING        5
+#define MAX_CONTRAST_SETTING        63
+#endif
+
+/* As it was */
+#ifdef HAVE_REMOTE_LCD
+#ifndef DEFAULT_REMOTE_CONTRAST_SETTING
+/* May be defined in config file if driver code needs the value */
+#define DEFAULT_REMOTE_CONTRAST_SETTING 42
+#endif
+#define MIN_REMOTE_CONTRAST_SETTING MIN_CONTRAST_SETTING
+#define MAX_REMOTE_CONTRAST_SETTING MAX_CONTRAST_SETTING
+#endif
+
+#endif /* !TARGET_TREE */
+
+#if !defined(HAVE_LCD_COLOR)
+#define HAVE_LCD_CONTRAST
+#endif
+
+/* repeat mode options */
+enum
+{
+    REPEAT_OFF,
+    REPEAT_ALL,
+    REPEAT_ONE,
+    REPEAT_SHUFFLE,
+#if (AB_REPEAT_ENABLE == 1)
+    REPEAT_AB,
+#endif
+    NUM_REPEAT_MODES
+};
+
+/* dir filter options */
+/* Note: Any new filter modes need to be added before NUM_FILTER_MODES.
+ *       Any new rockbox browse filter modes (accessible through the menu)
+ *       must be added after NUM_FILTER_MODES. */
+enum { SHOW_ALL, SHOW_SUPPORTED, SHOW_MUSIC, SHOW_PLAYLIST, SHOW_ID3DB,
+       NUM_FILTER_MODES,
+       SHOW_WPS, SHOW_RWPS, SHOW_FMR, SHOW_CFG, SHOW_LNG, SHOW_MOD, SHOW_FONT, SHOW_PLUGINS};
+
+/* recursive dir insert options */
+enum { RECURSE_OFF, RECURSE_ON, RECURSE_ASK };
+
+/* replaygain types */
+enum { REPLAYGAIN_TRACK = 0, REPLAYGAIN_ALBUM, REPLAYGAIN_SHUFFLE };
+
+/* show path types */
+enum { SHOW_PATH_OFF = 0, SHOW_PATH_CURRENT, SHOW_PATH_FULL };
+
+
+/** virtual pointer stuff.. move to another .h maybe? **/
 /* These define "virtual pointers", which could either be a literal string,
    or a mean a string ID if the pointer is in a certain range.
    This helps to save space for menus and options. */
@@ -126,9 +192,58 @@ extern unsigned char vp_dummy[VIRT_SIZE];
 /* !defined(HAVE_LCD_COLOR) implies HAVE_LCD_CONTRAST with default 40.
    Explicitly define HAVE_LCD_CONTRAST in config file for newer ports for
    simplicity. */
-#if !defined(HAVE_LCD_COLOR)
-#define HAVE_LCD_CONTRAST
-#endif
+
+
+
+/** function prototypes **/
+
+/* argument bits for settings_load() */
+#define SETTINGS_RTC 1 /* only the settings from the RTC nonvolatile RAM */
+#define SETTINGS_HD  2 /* only the settings from the disk sector */
+#define SETTINGS_ALL 3 /* both */
+void settings_load(int which);
+bool settings_load_config(const char* file, bool apply);
+
+void status_save( void );
+int settings_save(void);
+bool settings_save_config(void);
+
+void settings_reset(void);
+void sound_settings_apply(void);
+void settings_apply(void);
+void settings_apply_pm_range(void);
+void settings_display(void);
+
+enum optiontype { INT, BOOL };
+
+struct opt_items {
+    unsigned const char* string;
+    long voice_id;
+};
+bool set_bool_options(const char* string, bool* variable,
+                      const char* yes_str, int yes_voice,
+                      const char* no_str, int no_voice,
+                      void (*function)(bool));
+
+bool set_bool(const char* string, bool* variable );
+bool set_option(const char* string, void* variable, enum optiontype type,
+                const struct opt_items* options, int numoptions, void (*function)(int));
+bool set_int(const unsigned char* string, const char* unit, int voice_unit,
+             int* variable,
+             void (*function)(int), int step, int min, int max, 
+             void (*formatter)(char*, int, int, const char*) );
+
+/* the following are either not in setting.c or shouldnt be */
+bool set_time_screen(const char* string, struct tm *tm);
+int read_line(int fd, char* buffer, int buffer_size);
+void set_file(char* filename, char* setting, int maxlen);
+unsigned int rec_timesplit_seconds(void);
+unsigned long rec_sizesplit_bytes(void);
+void settings_apply_trigger(void);
+
+
+/** global_settings and global_status struct definitions **/
+
 struct system_status
 {
     int resume_index;  /* index in playlist (-1 for no active resume) */
@@ -547,116 +662,13 @@ struct user_settings
 #endif /* CONFIG_CODEC == SWCODEC */
 };
 
-enum optiontype { INT, BOOL };
-
-struct opt_items {
-    unsigned const char* string;
-    long voice_id;
-};
-
-/* prototypes */
-void status_save( void );
-int settings_save(void);
-void settings_load(int which);
-void settings_reset(void);
-void sound_settings_apply(void);
-void settings_apply(void);
-void settings_apply_pm_range(void);
-void settings_display(void);
-
-bool settings_load_config(const char* file, bool apply);
-bool settings_save_config(void);
-bool set_bool_options(const char* string, bool* variable,
-                      const char* yes_str, int yes_voice,
-                      const char* no_str, int no_voice,
-                      void (*function)(bool));
-
-bool set_bool(const char* string, bool* variable );
-bool set_option(const char* string, void* variable, enum optiontype type,
-                const struct opt_items* options, int numoptions, void (*function)(int));
-bool set_int(const unsigned char* string, const char* unit, int voice_unit,
-             int* variable,
-             void (*function)(int), int step, int min, int max, 
-             void (*formatter)(char*, int, int, const char*) );
-bool set_time_screen(const char* string, struct tm *tm);
-int read_line(int fd, char* buffer, int buffer_size);
-void set_file(char* filename, char* setting, int maxlen);
-
-unsigned int rec_timesplit_seconds(void);
-unsigned long rec_sizesplit_bytes(void);
-void settings_apply_trigger(void);
-
+/** global variables **/
+extern long lasttime;
+/* Recording base directory */
+extern const char rec_base_directory[];
 /* global settings */
 extern struct user_settings global_settings;
 /* global status */
 extern struct system_status global_status;
-/* name of directory where configuration, fonts and other data
- * files are stored */
-extern long lasttime;
-
-/* Recording base directory */
-extern const char rec_base_directory[];
-
-/* system defines */
-#ifndef TARGET_TREE
-
-#ifndef HAVE_LCD_COLOR
-#define DEFAULT_CONTRAST_SETTING    40
-#endif
-
-#if defined HAVE_LCD_CHARCELLS
-#define MIN_CONTRAST_SETTING        5
-#define MAX_CONTRAST_SETTING        31
-#else
-#define MIN_CONTRAST_SETTING        5
-#define MAX_CONTRAST_SETTING        63
-#endif
-
-/* As it was */
-#ifdef HAVE_REMOTE_LCD
-#ifndef DEFAULT_REMOTE_CONTRAST_SETTING
-/* May be defined in config file if driver code needs the value */
-#define DEFAULT_REMOTE_CONTRAST_SETTING 42
-#endif
-#define MIN_REMOTE_CONTRAST_SETTING MIN_CONTRAST_SETTING
-#define MAX_REMOTE_CONTRAST_SETTING MAX_CONTRAST_SETTING
-#endif
-
-#endif /* !TARGET_TREE */
-
-/* argument bits for settings_load() */
-#define SETTINGS_RTC 1 /* only the settings from the RTC nonvolatile RAM */
-#define SETTINGS_HD  2 /* only the settings from the disk sector */
-#define SETTINGS_ALL 3 /* both */
-
-/* repeat mode options */
-enum
-{
-    REPEAT_OFF,
-    REPEAT_ALL,
-    REPEAT_ONE,
-    REPEAT_SHUFFLE,
-#if (AB_REPEAT_ENABLE == 1)
-    REPEAT_AB,
-#endif
-    NUM_REPEAT_MODES
-};
-
-/* dir filter options */
-/* Note: Any new filter modes need to be added before NUM_FILTER_MODES.
- *       Any new rockbox browse filter modes (accessible through the menu)
- *       must be added after NUM_FILTER_MODES. */
-enum { SHOW_ALL, SHOW_SUPPORTED, SHOW_MUSIC, SHOW_PLAYLIST, SHOW_ID3DB,
-       NUM_FILTER_MODES,
-       SHOW_WPS, SHOW_RWPS, SHOW_FMR, SHOW_CFG, SHOW_LNG, SHOW_MOD, SHOW_FONT, SHOW_PLUGINS};
-
-/* recursive dir insert options */
-enum { RECURSE_OFF, RECURSE_ON, RECURSE_ASK };
-
-/* replaygain types */
-enum { REPLAYGAIN_TRACK = 0, REPLAYGAIN_ALBUM, REPLAYGAIN_SHUFFLE };
-
-/* show path types */
-enum { SHOW_PATH_OFF = 0, SHOW_PATH_CURRENT, SHOW_PATH_FULL };
 
 #endif /* __SETTINGS_H__ */

@@ -22,36 +22,23 @@
 #include <limits.h>
 #include "inttypes.h"
 #include "config.h"
-#include "kernel.h"
-#include "thread.h"
 #include "action.h"
 #include "crc32.h"
 #include "settings.h"
-#include "disk.h"
-#include "panic.h"
 #include "debug.h"
 #include "usb.h"
 #include "backlight.h"
-#include "lcd.h"
 #include "audio.h"
-#include "mp3_playback.h"
 #include "mpeg.h"
 #include "talk.h"
 #include "string.h"
-#include "ata.h"
 #include "ata_idle_notify.h"
-#include "fat.h"
-#include "power.h"
-#include "powermgmt.h"
-#include "status.h"
 #include "atoi.h"
 #include "screens.h"
 #include "ctype.h"
 #include "file.h"
-#include "errno.h"
 #include "system.h"
 #include "misc.h"
-#include "timefuncs.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "font.h"
@@ -62,11 +49,9 @@
 #include "language.h"
 #include "gwps.h"
 #include "powermgmt.h"
-#include "bookmark.h"
 #include "sprintf.h"
 #include "keyboard.h"
 #include "version.h"
-#include "rtc.h"
 #include "sound.h"
 #include "rbunicode.h"
 #include "dircache.h"
@@ -117,7 +102,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 
 long lasttime = 0;
 
-/* NVRAM stuff, if the target doesnt have NVRAM it is saved in ROCKBOX_DIR /nvram.bin */
+/** NVRAM stuff, if the target doesnt have NVRAM it is saved in ROCKBOX_DIR /nvram.bin **/
 /* NVRAM is set out as
 [0] 'R'
 [1] 'b'
@@ -227,6 +212,139 @@ static bool write_nvram_data(char* buf, int max_len)
     return true;
 }
 
+/** Reading from a config file **/
+/*
+ * load settings from disk or RTC RAM
+ */
+void settings_load(int which)
+{
+    DEBUGF( "reload_all_settings()\n" );
+    if (which&SETTINGS_RTC)
+        read_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
+    if (which&SETTINGS_HD)
+    {
+        settings_load_config(CONFIGFILE,false);
+        settings_load_config(FIXEDSETTINGSFILE,false);
+    }
+}
+
+
+static bool cfg_string_to_int(int setting_id, int* out, char* str)
+{
+    const char* start = settings[setting_id].cfg_vals;
+    char* end = NULL;
+    char temp[MAX_PATH];
+    int count = 0;
+    while (1)
+    {
+        end = strchr(start, ',');
+        if (!end)
+        {
+            if (!strcmp(str, start))
+            {
+                *out = count;
+                return true;
+            }
+            else return false;
+        }
+        strncpy(temp, start, end-start);
+        temp[end-start] = '\0';
+        if (!strcmp(str, temp))
+        {
+            *out = count;
+            return true;
+        }
+        start = end +1;
+        count++;
+    }
+    return false;
+}
+
+bool settings_load_config(const char* file, bool apply)
+{
+    int fd;
+    char line[128];
+    char* name;
+    char* value;
+    int i;
+    fd = open(file, O_RDONLY);
+    if (fd < 0)
+        return false;
+
+    while (read_line(fd, line, sizeof line) > 0)
+    {
+        if (!settings_parseline(line, &name, &value))
+            continue;
+        for(i=0; i<nb_settings; i++)
+        {
+            if (settings[i].cfg_name == NULL)
+                continue;
+            if (!strcasecmp(name,settings[i].cfg_name))
+            {
+                switch (settings[i].flags&F_T_MASK)
+                {
+                    case F_T_INT:
+                    case F_T_UINT:
+#ifdef HAVE_LCD_COLOR
+                        if (settings[i].flags&F_RGB)
+                            *(int*)settings[i].setting = hex_to_rgb(value);
+                        else 
+#endif 
+                            if (settings[i].cfg_vals == NULL)
+                        {
+                            *(int*)settings[i].setting = atoi(value);
+                        }
+                        else
+                        {
+                            cfg_string_to_int(i,(int*)settings[i].setting,value);
+                        }
+                        break;
+                    case F_T_BOOL:
+                    {
+                        int temp;
+                        if (cfg_string_to_int(i,&temp,value))
+                            *(bool*)settings[i].setting = (temp==0?false:true);
+                        break;
+                    }
+                    case F_T_CHARPTR:
+                    case F_T_UCHARPTR:
+                    {
+                        char storage[MAX_PATH];
+                        if (settings[i].filename_setting->prefix)
+                        {
+                            int len = strlen(settings[i].filename_setting->prefix);
+                            if (!strncmp(value,settings[i].filename_setting->prefix,len))
+                            {
+                                strncpy(storage,&value[len],MAX_PATH);
+                            }
+                            else strncpy(storage,value,MAX_PATH);
+                        }
+                        else strncpy(storage,value,MAX_PATH);
+                        if (settings[i].filename_setting->suffix)
+                        {
+                            char *s = strcasestr(storage,settings[i].filename_setting->suffix);
+                            if (s) *s = '\0';
+                        }
+                        strncpy((char*)settings[i].setting,storage,
+                                settings[i].filename_setting->max_len);
+                        ((char*)settings[i].setting)
+                            [settings[i].filename_setting->max_len-1] = '\0';
+                        break;
+                    }
+                }
+                break;
+            } /* if (!strcmp(name,settings[i].cfg_name)) */
+        } /* for(...) */
+    } /* while(...) */
+
+    close(fd);
+    settings_save();
+    if (apply)
+        settings_apply();
+    return true;
+}
+
+/** Writing to a config file and saving settings **/
 #ifdef HAVE_LCD_COLOR
 /*
  * Helper function to convert a string of 6 hex digits to a native colour
@@ -258,7 +376,7 @@ static int hex_to_rgb(const char* hex)
 
     return 0;
 }
-#endif
+#endif /* HAVE_LCD_COLOR */
 static bool cfg_int_to_string(int setting_id, int val, char* buf)
 {
     const char* start = settings[setting_id].cfg_vals;
@@ -416,9 +534,35 @@ int settings_save( void )
     }
     return 0;
 }
+bool settings_save_config(void)
+{
+    char filename[MAX_PATH];
+
+    create_numbered_filename(filename, ROCKBOX_DIR, "config", ".cfg", 2
+                             IF_CNFN_NUM_(, NULL));
+
+    /* allow user to modify filename */
+    while (true) {
+        if (!kbd_input(filename, sizeof filename)) {
+            break;
+        }
+        else {
+            gui_syncsplash(HZ, true, str(LANG_MENU_SETTING_CANCEL));
+            return false;
+        }
+    }
+
+    if (settings_write_config(filename))
+        gui_syncsplash(HZ, true, str(LANG_SETTINGS_SAVED));
+    else gui_syncsplash(HZ, true, str(LANG_FAILED));
+    return true;
+}
+
+/** Apply and Reset settings **/
+
 
 #ifdef HAVE_LCD_BITMAP
-/**
+/*
  * Applies the range infos stored in global_settings to
  * the peak meter.
  */
@@ -671,189 +815,6 @@ void settings_apply(void)
 #endif
 }
 
-/*
- * load settings from disk or RTC RAM
- */
-void settings_load(int which)
-{
-    DEBUGF( "reload_all_settings()\n" );
-    if (which&SETTINGS_RTC)
-        read_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
-    if (which&SETTINGS_HD)
-    {
-        settings_load_config(CONFIGFILE,false);
-        settings_load_config(FIXEDSETTINGSFILE,false);
-    }
-}
-
-void set_file(char* filename, char* setting, int maxlen)
-{
-    char* fptr = strrchr(filename,'/');
-    int len;
-    int extlen = 0;
-    char* ptr;
-
-    if (!fptr)
-        return;
-
-    *fptr = 0;
-    fptr++;
-
-    len = strlen(fptr);
-    ptr = fptr + len;
-    while ((*ptr != '.') && (ptr != fptr)) {
-        extlen++;
-        ptr--;
-    }
-    if(ptr == fptr) extlen = 0;
-
-    if (strncasecmp(ROCKBOX_DIR, filename ,strlen(ROCKBOX_DIR)) ||
-        (len-extlen > maxlen))
-        return;
-
-    strncpy(setting, fptr, len-extlen);
-    setting[len-extlen]=0;
-
-    settings_save();
-}
-static bool cfg_string_to_int(int setting_id, int* out, char* str)
-{
-    const char* start = settings[setting_id].cfg_vals;
-    char* end = NULL;
-    char temp[MAX_PATH];
-    int count = 0;
-    while (1)
-    {
-        end = strchr(start, ',');
-        if (!end)
-        {
-            if (!strcmp(str, start))
-            {
-                *out = count;
-                return true;
-            }
-            else return false;
-        }
-        strncpy(temp, start, end-start);
-        temp[end-start] = '\0';
-        if (!strcmp(str, temp))
-        {
-            *out = count;
-            return true;
-        }
-        start = end +1;
-        count++;
-    }
-    return false;
-}
-
-bool settings_load_config(const char* file, bool apply)
-{
-    int fd;
-    char line[128];
-    char* name;
-    char* value;
-    int i;
-    fd = open(file, O_RDONLY);
-    if (fd < 0)
-        return false;
-
-    while (read_line(fd, line, sizeof line) > 0)
-    {
-        if (!settings_parseline(line, &name, &value))
-            continue;
-        for(i=0; i<nb_settings; i++)
-        {
-            if (settings[i].cfg_name == NULL)
-                continue;
-            if (!strcasecmp(name,settings[i].cfg_name))
-            {
-                switch (settings[i].flags&F_T_MASK)
-                {
-                    case F_T_INT:
-                    case F_T_UINT:
-#ifdef HAVE_LCD_COLOR
-                        if (settings[i].flags&F_RGB)
-                            *(int*)settings[i].setting = hex_to_rgb(value);
-                        else 
-#endif 
-                            if (settings[i].cfg_vals == NULL)
-                        {
-                            *(int*)settings[i].setting = atoi(value);
-                        }
-                        else
-                        {
-                            cfg_string_to_int(i,(int*)settings[i].setting,value);
-                        }
-                        break;
-                    case F_T_BOOL:
-                    {
-                        int temp;
-                        if (cfg_string_to_int(i,&temp,value))
-                            *(bool*)settings[i].setting = (temp==0?false:true);
-                        break;
-                    }
-                    case F_T_CHARPTR:
-                    case F_T_UCHARPTR:
-                    {
-                        char storage[MAX_PATH];
-                        if (settings[i].filename_setting->prefix)
-                        {
-                            int len = strlen(settings[i].filename_setting->prefix);
-                            if (!strncmp(value,settings[i].filename_setting->prefix,len))
-                            {
-                                strncpy(storage,&value[len],MAX_PATH);
-                            }
-                            else strncpy(storage,value,MAX_PATH);
-                        }
-                        else strncpy(storage,value,MAX_PATH);
-                        if (settings[i].filename_setting->suffix)
-                        {
-                            char *s = strcasestr(storage,settings[i].filename_setting->suffix);
-                            if (s) *s = '\0';
-                        }
-                        strncpy((char*)settings[i].setting,storage,
-                                settings[i].filename_setting->max_len);
-                        ((char*)settings[i].setting)
-                            [settings[i].filename_setting->max_len-1] = '\0';
-                        break;
-                    }
-                }
-                break;
-            } /* if (!strcmp(name,settings[i].cfg_name)) */
-        } /* for(...) */
-    } /* while(...) */
-
-    close(fd);
-    settings_save();
-    if (apply)
-        settings_apply();
-    return true;
-}
-
-bool settings_save_config(void)
-{
-    char filename[MAX_PATH];
-
-    create_numbered_filename(filename, ROCKBOX_DIR, "config", ".cfg", 2
-                             IF_CNFN_NUM_(, NULL));
-
-    /* allow user to modify filename */
-    while (true) {
-        if (!kbd_input(filename, sizeof filename)) {
-            break;
-        }
-        else {
-            gui_syncsplash(HZ, true, str(LANG_MENU_SETTING_CANCEL));
-            return false;
-        }
-    }
-
-    if (settings_write_config(filename))
-        gui_syncsplash(HZ, true, str(LANG_SETTINGS_SAVED));
-    else gui_syncsplash(HZ, true, str(LANG_FAILED));
-    return true;
-}
 
 
 
@@ -892,6 +853,8 @@ void settings_reset(void) {
     enc_global_settings_reset();
 #endif
 }
+
+/** Changing setting values **/
 
 bool set_bool(const char* string, bool* variable )
 {
@@ -1112,6 +1075,39 @@ bool set_option(const char* string, void* variable, enum optiontype type,
     else selected = *(int*)variable;
     return do_set_setting(string,variable,numoptions,
                           selected, &data,function);
+}
+
+/** extra stuff which is probably misplaced **/
+
+void set_file(char* filename, char* setting, int maxlen)
+{
+    char* fptr = strrchr(filename,'/');
+    int len;
+    int extlen = 0;
+    char* ptr;
+
+    if (!fptr)
+        return;
+
+    *fptr = 0;
+    fptr++;
+
+    len = strlen(fptr);
+    ptr = fptr + len;
+    while ((*ptr != '.') && (ptr != fptr)) {
+        extlen++;
+        ptr--;
+    }
+    if(ptr == fptr) extlen = 0;
+
+    if (strncasecmp(ROCKBOX_DIR, filename ,strlen(ROCKBOX_DIR)) ||
+        (len-extlen > maxlen))
+        return;
+
+    strncpy(setting, fptr, len-extlen);
+    setting[len-extlen]=0;
+
+    settings_save();
 }
 
 #ifdef HAVE_RECORDING
