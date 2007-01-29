@@ -1388,7 +1388,7 @@ int main(int argc, char* argv[])
             fprintf(stderr,"[ERR]  --read-firmware failed.\n");
         }
     } else if (action==READ_PARTITION) {
-        outfile = open(filename,O_CREAT|O_WRONLY|O_BINARY,S_IREAD|S_IWRITE);
+        outfile = open(filename,O_CREAT|O_TRUNC|O_WRONLY|O_BINARY,S_IREAD|S_IWRITE);
         if (outfile < 0) {
            perror(filename);
            return 4;
