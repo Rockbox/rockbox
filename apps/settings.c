@@ -32,6 +32,7 @@
 #include "mpeg.h"
 #include "talk.h"
 #include "string.h"
+#include "rtc.h"
 #include "ata_idle_notify.h"
 #include "atoi.h"
 #include "screens.h"
