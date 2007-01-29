@@ -259,6 +259,29 @@ static int hex_to_rgb(const char* hex)
     return 0;
 }
 #endif
+static bool cfg_int_to_string(int setting_id, int val, char* buf)
+{
+    const char* start = settings[setting_id].cfg_vals;
+    char* end = NULL;
+    int count = 0;
+    while (count < val)
+    {
+        start = strchr(start,',');
+        if (!start)
+            return false;
+        count++;
+        start++;
+    }
+    end = strchr(start,',');
+    if (end == NULL)
+        strcpy(buf,start);
+    else 
+    {
+        strncpy(buf, start, end-start);
+        buf[end-start] = '\0';
+    }
+    return true;
+}
 
 bool settings_write_config(char* filename)
 {
@@ -274,6 +297,7 @@ bool settings_write_config(char* filename)
     {
         if (settings[i].cfg_name == NULL)
             continue;
+        value[0] = '\0';
         switch (settings[i].flags&F_T_MASK)
         {
             case F_T_INT:
@@ -295,36 +319,12 @@ bool settings_write_config(char* filename)
                 }
                 else
                 {
-                    const char *s;
-                    const char *end;
-                    int val = 0;
-                    
-                    end = s = settings[i].cfg_vals;
-                    
-                    do
-                    {
-                        while (*end != 0 && *end != ',')
-                        {
-                            end++;
-                        }
-                        
-                        if (val == *(int*)settings[i].setting)
-                        {
-                            strncpy(value, s, end - s);
-                            value[end - s] = 0;
-                            break;
-                        }
-                        else
-                        {
-                            s = end + 1;
-                            val++;
-                        }
-                    }
-                    while (*end++);
+                    cfg_int_to_string(i,*(int*)settings[i].setting,value);
                 }
                 break;
             case F_T_BOOL:
-                strcpy(value,*(bool*)settings[i].setting == true?"on":"off");
+                cfg_int_to_string(i,
+                        *(bool*)settings[i].setting==false?0:1,value);
                 break;
             case F_T_CHARPTR:
             case F_T_UCHARPTR:
@@ -343,7 +343,6 @@ bool settings_write_config(char* filename)
         } /* switch () */
         if (value[0])
             fdprintf(fd,"%s: %s\r\n",settings[i].cfg_name,value);
-        value[0] = '\0';
     } /* for(...) */
     close(fd);
     return true;
@@ -717,6 +716,36 @@ void set_file(char* filename, char* setting, int maxlen)
 
     settings_save();
 }
+static bool cfg_string_to_int(int setting_id, int* out, char* str)
+{
+    const char* start = settings[setting_id].cfg_vals;
+    char* end = NULL;
+    char temp[MAX_PATH];
+    int count = 0;
+    while (1)
+    {
+        end = strchr(start, ',');
+        if (!end)
+        {
+            if (!strcmp(str, start))
+            {
+                *out = count;
+                return true;
+            }
+            else return false;
+        }
+        strncpy(temp, start, end-start);
+        temp[end-start] = '\0';
+        if (!strcmp(str, temp))
+        {
+            *out = count;
+            return true;
+        }
+        start = end +1;
+        count++;
+    }
+    return false;
+}
 
 bool settings_load_config(const char* file, bool apply)
 {
@@ -754,27 +783,16 @@ bool settings_load_config(const char* file, bool apply)
                         }
                         else
                         {
-                            char *s,*end;
-                            char vals[MAX_PATH];
-                            int val = 0;
-                            strncpy(vals,settings[i].cfg_vals,MAX_PATH);
-                            s = strtok_r(vals,",",&end);
-                            while (s)
-                            {
-                                if (!strcmp(value,s))
-                                {
-                                    *(int*)settings[i].setting = val;
-                                    break;
-                                }
-                                val++;
-                                s = strtok_r(NULL,",",&end);
-                            }
+                            cfg_string_to_int(i,(int*)settings[i].setting,value);
                         }
                         break;
                     case F_T_BOOL:
-                        *(bool*)settings[i].setting = 
-                                !strncmp(value,"off",3)?false:true;
+                    {
+                        int temp;
+                        if (cfg_string_to_int(i,&temp,value))
+                            *(bool*)settings[i].setting = (temp==0?false:true);
                         break;
+                    }
                     case F_T_CHARPTR:
                     case F_T_UCHARPTR:
                     {
