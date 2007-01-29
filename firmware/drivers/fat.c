@@ -16,6 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -2158,6 +2159,7 @@ int fat_opendir(IF_MV2(int volume,)
 
     dir->entry = 0;
     dir->sector = 0;
+    dir->bufindex = 0;
 
     if (startcluster == 0)
         startcluster = fat_bpb->bpb_rootclus;
@@ -2213,15 +2215,19 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
     int longarray[20];
     int longs=0;
     int sectoridx=0;
-    unsigned char* cached_buf = dir->sectorcache[0];
+    /* Set the cache pointer to the sector buffer we are currently using */
+    unsigned char* cached_buf = dir->sectorcache[dir->bufindex];
 
     dir->entrycount = 0;
 
     while(!done)
     {
-        if ( !(dir->entry % DIR_ENTRIES_PER_SECTOR) || !dir->sector )
+        if ( !(dir->entry % (DIR_ENTRIES_PER_SECTOR*FAT_DIR_BUFSECTORS)) ||
+             !dir->sector )
         {
-            rc = fat_readwrite(&dir->file, 1, cached_buf, false);
+            /* Always read 2 sectors at a time */
+            rc = fat_readwrite(&dir->file, FAT_DIR_BUFSECTORS, cached_buf,
+                               false);
             if (rc == 0) {
                 /* eof */
                 entry->name[0] = 0;
@@ -2235,8 +2241,8 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
             dir->sector = dir->file.lastsector;
         }
 
-        for (i = dir->entry % DIR_ENTRIES_PER_SECTOR;
-             i < DIR_ENTRIES_PER_SECTOR; i++)
+        for (i = dir->entry % (DIR_ENTRIES_PER_SECTOR*FAT_DIR_BUFSECTORS);
+             i < (DIR_ENTRIES_PER_SECTOR*FAT_DIR_BUFSECTORS); i++)
         {
             unsigned int entrypos = i * DIR_ENTRY_SIZE;
 
@@ -2277,40 +2283,44 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
                     /* replace shortname with longname? */
                     if ( longs ) {
                         int j;
-                        /* This should be enough to hold any name segment utf8-encoded */
+                        /* This should be enough to hold any name segment
+                           utf8-encoded */
                         unsigned char shortname[13]; /* 8+3+dot+\0 */
-                        unsigned char longname_utf8segm[6*4 + 1]; /* Add 1 for trailing \0 */
+                        /* Add 1 for trailing \0 */
+                        unsigned char longname_utf8segm[6*4 + 1];
                         int longname_utf8len = 0;
-                        
-                        strcpy(shortname, entry->name); /* Temporarily store it */
+
+                        /* Store it temporarily */
+                        strcpy(shortname, entry->name);
                         entry->name[0] = 0;
                         
                         /* iterate backwards through the dir entries */
                         for (j=longs-1; j>=0; j--) {
-                            unsigned char* ptr = cached_buf;
                             int index = longarray[j];
-                            /* current or cached sector? */
-                            if ( sectoridx >= SECTOR_SIZE ) {
-                                if ( sectoridx >= SECTOR_SIZE*2 ) {
-                                    if ( ( index >= SECTOR_SIZE ) &&
-                                         ( index < SECTOR_SIZE*2 ))
-                                        ptr = dir->sectorcache[1];
-                                    else
-                                        ptr = dir->sectorcache[2];
-                                }
-                                else {
-                                    if ( index < SECTOR_SIZE )
-                                        ptr = dir->sectorcache[1];
-                                }
+                            unsigned char* ptr;
 
-                                index &= SECTOR_SIZE-1;
+                            /* If we have spanned over 3 sectors, the current
+                               buffer holds the last part and the other one
+                               the first part. */
+                            if(sectoridx >= FAT_DIR_BUFSIZE) {
+                                if(index / FAT_DIR_BUFSIZE > 0)
+                                    ptr = dir->sectorcache[dir->bufindex];
+                                else
+                                    ptr = dir->sectorcache[1 - dir->bufindex];
+                            } else {
+                                ptr = dir->sectorcache[dir->bufindex];
                             }
 
-                            /* Try to append each segment of the long name. Check if we'd
-                               exceed the buffer. Also check for FAT padding characters 0xFFFF. */
+                            /* Let the index point into the selected
+                               buffer */
+                            index &= FAT_DIR_BUFSIZE-1;
+
+                            /* Try to append each segment of the long name.
+                               Check if we'd exceed the buffer. Also check for
+                               FAT padding characters 0xFFFF. */
                             if (fat_copy_long_name_segment(ptr + index + 1, 5,
-                                    longname_utf8segm) == 0) break;
-                            // logf("SG: %s, EN: %s", longname_utf8segm, entry->name);
+                                    longname_utf8segm) == 0)
+                                break;
                             longname_utf8len += strlen(longname_utf8segm);
                             if (longname_utf8len < FAT_FILENAME_BYTES)
                                 strcat(entry->name, longname_utf8segm);
@@ -2318,8 +2328,8 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
                                 break;
 
                             if (fat_copy_long_name_segment(ptr + index + 14, 6,
-                                    longname_utf8segm) == 0) break;
-                            // logf("SG: %s, EN: %s", longname_utf8segm, entry->name);
+                                    longname_utf8segm) == 0)
+                                break;
                             longname_utf8len += strlen(longname_utf8segm);
                             if (longname_utf8len < FAT_FILENAME_BYTES)
                                 strcat(entry->name, longname_utf8segm);
@@ -2327,8 +2337,8 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
                                 break;
 
                             if (fat_copy_long_name_segment(ptr + index + 28, 2,
-                                    longname_utf8segm) == 0) break;
-                            // logf("SG: %s, EN: %s", longname_utf8segm, entry->name);
+                                    longname_utf8segm) == 0)
+                                break;
                             longname_utf8len += strlen(longname_utf8segm);
                             if (longname_utf8len < FAT_FILENAME_BYTES)
                                 strcat(entry->name, longname_utf8segm);
@@ -2338,19 +2348,18 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
 
                         /* Does the utf8-encoded name fit into the entry? */
                         if (longname_utf8len >= FAT_FILENAME_BYTES) {
-                            /* Take the short DOS name. Need to utf8-encode it since
-                               it may contain chars from the upper half of the OEM
-                               code page which wouldn't be a valid utf8. Beware: this
-                               file will be shown with strange glyphs in file browser
-                               since unicode 0x80 to 0x9F are control characters. */
+                            /* Take the short DOS name. Need to utf8-encode it
+                               since it may contain chars from the upper half
+                               of the OEM code page which wouldn't be a valid
+                               utf8. Beware: this file will be shown with
+                               strange glyphs in file browser since unicode
+                               0x80 to 0x9F are control characters. */
                             logf("SN-DOS: %s", shortname);
                             unsigned char *utf8;
-                            utf8 = iso_decode(shortname, entry->name, -1, strlen(shortname));
-                        *utf8 = 0;
+                            utf8 = iso_decode(shortname, entry->name, -1,
+                                              strlen(shortname));
+                            *utf8 = 0;
                             logf("SN: %s", entry->name);
-                        } else {
-                            // logf("LN: %s", entry->name);
-                            // logf("LNLen: %d (%c)", longname_utf8len, entry->name[0]);
                         }
                     }
                     done = true;
@@ -2361,13 +2370,14 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
             }
         }
 
-        /* save this sector, for longname use */
-        if ( sectoridx )
-            memcpy( dir->sectorcache[2], dir->sectorcache[0], SECTOR_SIZE );
-        else
-            memcpy( dir->sectorcache[1], dir->sectorcache[0], SECTOR_SIZE );
-        sectoridx += SECTOR_SIZE;
+        /* Did the name span across a buffer boundary?
+           Then we need to fill the second buffer as well and continue. */
+        if(!done) {
+            sectoridx += FAT_DIR_BUFSIZE;
 
+            dir->bufindex = 1 - dir->bufindex;
+            cached_buf = dir->sectorcache[dir->bufindex];
+        }
     }
     return 0;
 }
