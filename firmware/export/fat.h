@@ -73,19 +73,13 @@ struct fat_file
 #endif
 };
 
-#define FAT_DIR_BUFSECTORS 2 /* Needs to be an even number, at least 2 */
-#define FAT_DIR_BUFSIZE (SECTOR_SIZE*FAT_DIR_BUFSECTORS)
-
 struct fat_dir
 {
     unsigned int entry;
     unsigned int entrycount;
     long sector;
     struct fat_file file;
-    /* The buffer needs to be at least 3 sectors, so we make it 2*2 and
-       alternate between them */
-    unsigned char sectorcache[2][FAT_DIR_BUFSIZE];
-    unsigned int bufindex;  /* Which buffer to be loaded next */
+    unsigned char sectorcache[3][SECTOR_SIZE];
 };
 
 
