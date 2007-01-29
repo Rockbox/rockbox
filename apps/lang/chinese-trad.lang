@@ -1,12 +1,3 @@
-#             __________               __   ___.
-#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
-#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
-#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
-#   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
-#                     \/            \/     \/    \/            \/
-# Traditional Chinese language file translated from the following
-# $Id$
-# file.
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -43,7 +34,7 @@
     *: "On"
   </source>
   <dest>
-    *: "On"
+    *: "開啟"
   </dest>
   <voice>
     *: "On"
@@ -57,7 +48,7 @@
     *: "Off"
   </source>
   <dest>
-    *: "Off"
+    *: "關閉"
   </dest>
   <voice>
     *: "Off"
@@ -365,7 +356,7 @@
     *: "Bass"
   </source>
   <dest>
-    *: "低音音量"
+    *: "低頻音量"
   </dest>
   <voice>
     *: "Bass"
@@ -379,7 +370,7 @@
     *: "Treble"
   </source>
   <dest>
-    *: "高音音量"
+    *: "高頻音量"
   </dest>
   <voice>
     *: "Treble"
@@ -793,13 +784,13 @@
 </phrase>
 <phrase>
   id: LANG_FIRMWARE
-  desc: in the main menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Browse Firmwares"
+    *: ""
   </source>
   <dest>
-    *: "瀏覽韌體"
+    *: deprecated
   </dest>
   <voice>
     *: "Browse Firmwares"
@@ -839,10 +830,17 @@
   user:
   <source>
     *: "PLAY = Yes"
+    h100,h120,h300: "NAVI = Yes"
+    ipod*: "SELECT = Yes"
+    x5: "SELECT = Yes"
+    h10: "NEXT = Yes"
   </source>
   <dest>
     *: "PLAY = 是"
     h100,h120,h300: "NAVI = 是"
+    ipod*: "SELECT = 是"
+    x5: "SELECT = 是"
+    h10: "NEXT = 是"
   </dest>
   <voice>
     *: ""
@@ -1066,7 +1064,7 @@
     *: "Advanced EQ Settings"
   </source>
   <dest>
-    *: "詳細等化器設定"
+    *: "進階等化器設定"
   </dest>
   <voice>
     *: "Advanced equalizer settings"
@@ -1293,7 +1291,7 @@
     *: "消除動態播放清單時警示"
   </dest>
   <voice>
-    *: ""
+    *: "Warn When Erasing Dynamic Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -1472,7 +1470,7 @@
     *: "Anti-Skip Buffer"
   </source>
   <dest>
-    *: "Anti-Skip Buffer"
+    *: "防止中斷緩衝區"
   </dest>
   <voice>
     *: "Anti-Skip Buffer"
@@ -1662,21 +1660,21 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE
-  desc: in tag cache settings
+  desc: in settings menu
   user:
   <source>
-    *: "Tag Cache"
+    *: "Database"
   </source>
   <dest>
-    *: "標籤快取"
+    *: "資料庫"
   </dest>
   <voice>
-    *: "Tag Cache"
+    *: "Database"
   </voice>
 </phrase>
 <phrase>
   id: LANG_TAGCACHE_DISK
-  desc: 
+  desc:
   user:
   <source>
     *: ""
@@ -1735,10 +1733,10 @@
   desc: while initializing tagcache on boot
   user:
   <source>
-    *: "Committing tagcache"
+    *: "Committing database"
   </source>
   <dest>
-    *: "處理標籤快取"
+    *: "處理資料庫"
   </dest>
   <voice>
     *: ""
@@ -1931,13 +1929,13 @@
   desc: show ID3 Database
   user:
   <source>
-    *: "ID3 Database"
+    *: "Database"
   </source>
   <dest>
-    *: "ID3資料庫"
+    *: "資料庫"
   </dest>
   <voice>
-    *: "ID3 Database"
+    *: "Database"
   </voice>
 </phrase>
 <phrase>
@@ -2214,7 +2212,7 @@
     *: "Japanese (SJIS)"
   </source>
   <dest>
-    *: "Japanese (SJIS)"
+    *: "日文(SJIS)"
   </dest>
   <voice>
     *: "Japanese"
@@ -2228,7 +2226,7 @@
     *: "Simp. Chinese (GB2312)"
   </source>
   <dest>
-    *: "Simp. Chinese (GB2312)"
+    *: "簡體中文(GB2312)"
   </dest>
   <voice>
     *: "Simplified Chinese"
@@ -2242,7 +2240,7 @@
     *: "Korean (KSX1001)"
   </source>
   <dest>
-    *: "Korean (KSX1001)"
+    *: "韓文(KSX1001)"
   </dest>
   <voice>
     *: "Korean"
@@ -2256,7 +2254,7 @@
     *: "Trad. Chinese (BIG5)"
   </source>
   <dest>
-    *: "Trad. Chinese (BIG5)"
+    *: "正體中文(BIG5)"
   </dest>
   <voice>
     *: "Traditional Chinese"
@@ -2270,7 +2268,7 @@
     *: "Unicode (UTF-8)"
   </source>
   <dest>
-    *: "Unicode (UTF-8)"
+    *: "萬國碼(UTF-8)"
   </dest>
   <voice>
     *: "Unicode"
@@ -2618,12 +2616,15 @@
   user:
   <source>
     *: "Mic"
+    h100,h120,h300: "Internal Mic"
   </source>
   <dest>
     *: "麥克風"
+    h100,h120,h300: "內建麥克風"
   </dest>
   <voice>
-    *: "Microphone"
+    *: "Mic"
+    h100,h120,h300: "Internal Mic"
   </voice>
 </phrase>
 <phrase>
@@ -2872,7 +2873,7 @@
     *: "Track Skip Only"
   </source>
   <dest>
-    *: "Track Skip Only"
+    *: "只在跳到另一首時"
   </dest>
   <voice>
     *: "Track Skip Only"
@@ -3642,7 +3643,7 @@
     *: "Peak Hold Time"
   </source>
   <dest>
-    *: "Peak Hold Time"
+    *: "高峰記號停留時間"
   </dest>
   <voice>
     *: "Peak Hold Time"
@@ -3656,7 +3657,7 @@
     *: "Clip Hold Time"
   </source>
   <dest>
-    *: "Clip Hold Time"
+    *: "削波記號停留時間"
   </dest>
   <voice>
     *: "Clip Hold Time"
@@ -3670,7 +3671,7 @@
     *: "Eternal"
   </source>
   <dest>
-    *: "Eternal"
+    *: "永久"
   </dest>
   <voice>
     *: "Eternal"
@@ -3796,7 +3797,7 @@
     *: "NiMH"
   </source>
   <dest>
-    *: "NiMH"
+    *: "鎳氫"
   </dest>
   <voice>
     *: "Nickel metal hydride"
@@ -3818,16 +3819,16 @@
 </phrase>
 <phrase>
   id: LANG_POWEROFF
-  desc: disk poweroff flag
+  desc: DEPRECATED
   user:
   <source>
-    *: "Disk Poweroff"
+    *: ""
   </source>
   <dest>
-    *: "硬碟電源關閉"
+    *: deprecated
   </dest>
   <voice>
-    *: "Disk Poweroff"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3846,13 +3847,13 @@
 </phrase>
 <phrase>
   id: LANG_DIRCACHE_REBOOT
-  desc: when activating directory cache
+  desc: DEPRECATED
   user:
   <source>
-    *: "Please reboot to enable the cache"
+    *: ""
   </source>
   <dest>
-    *: "請重新開機以啟用快取"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -4090,7 +4091,7 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "檔案/目錄已存在。覆寫？"
+    *: "檔案/目錄已存在。覆寫?"
   </dest>
   <voice>
     *: ""
@@ -4146,7 +4147,7 @@
     *: "Delete?"
   </source>
   <dest>
-    *: "確認刪除?"
+    *: "刪除?"
   </dest>
   <voice>
     *: ""
@@ -4367,10 +4368,10 @@
   desc: splash number of tracks inserted
   user:
   <source>
-    *: "搜尋中... %d 件 (%s)"
+    *: "Searching... %d found (%s)"
   </source>
   <dest>
-    *: "Searching... %d found (%s)"
+    *: "搜尋中... 找到%d件 (%s)"
   </dest>
   <voice>
     *: ""
@@ -4457,7 +4458,7 @@
     *: "電池: 充電中"
   </dest>
   <voice>
-    *: ""
+    *: "Charging"
   </voice>
 </phrase>
 <phrase>
@@ -4471,7 +4472,7 @@
     *: "電池: 完成充電"
   </dest>
   <voice>
-    *: ""
+    *: "Top off charge"
   </voice>
 </phrase>
 <phrase>
@@ -4485,7 +4486,7 @@
     *: "電池: 涓流充電"
   </dest>
   <voice>
-    *: ""
+    *: "Trickle charge"
   </voice>
 </phrase>
 <phrase>
@@ -4496,7 +4497,7 @@
     *: "%d%% %dh %dm"
   </source>
   <dest>
-    *: "%d%% %dh %dm"
+    *: "%d%% %d小時%d分"
   </dest>
   <voice>
     *: "Battery level"
@@ -4664,7 +4665,7 @@
     *: "Bar"
   </source>
   <dest>
-    *: "Bar"
+    *: "條"
   </dest>
   <voice>
     *: ""
@@ -4678,7 +4679,7 @@
     *: "Down = List"
   </source>
   <dest>
-    *: "Down = 清單"
+    *: "下 = 清單"
   </dest>
   <voice>
     *: ""
@@ -4690,9 +4691,17 @@
   user:
   <source>
     *: "OFF = Exit"
+    h100,h120,h300: "STOP = Exit"
+    ipod*: "PLAY/PAUSE = Exit"
+    x5: "RECORD = Exit"
+    h10: "PREV = Exit"
   </source>
   <dest>
     *: "OFF = 離開"
+     h100,h120,h300: "停止 = 離開"
+    ipod*: "PLAY/PAUSE = 離開"
+    x5: "RECORD = 離開"
+    h10: "PREV = 離開"
   </dest>
   <voice>
     *: ""
@@ -4746,10 +4755,17 @@
   user:
   <source>
     *: "PLAY = Select"
+    h100,h120,h300: "NAVI = Select"
+    ipod*: "SELECT = Select"
+    x5: "SELECT = Select"
+    h10: "NEXT = Select"
   </source>
   <dest>
     *: "PLAY = 選擇"
     h100,h120,h300: "NAVI = 選擇"
+    ipod*: "SELECT = 選擇"
+    x5: "SELECT = 選擇"
+    h10: "NEXT = 選擇"
   </dest>
   <voice>
     *: ""
@@ -4761,10 +4777,17 @@
   user:
   <source>
     *: "ON+Play = Delete"
+    h100,h120,h300: "RECORD = Delete"
+    ipod*: "Long MENU = Delete"
+    x5: "Long RECORD = Delete"
+    h10: "REWIND = Delete"
   </source>
   <dest>
     *: "ON+Play = 刪除"
-    h100,h120,h300: "RECORD = 刪除"
+    h100,h120,h300: "錄音 = 刪除"
+    ipod*: "Long MENU = 刪除"
+    x5: "Long RECORD = 刪除"
+    h10: "REWIND = 刪除"
   </dest>
   <voice>
     *: ""
@@ -4846,9 +4869,17 @@
   user:
   <source>
     *: "ON To Set"
+    h100,h120,h300: "NAVI = Set"
+    ipod*: "SELECT = Set"
+    x5: "SELECT = Set"
+    h10: "NEXT = Set"
   </source>
   <dest>
     *: "ON: 設定"
+    h100,h120,h300: "NAVI = 設定"
+    ipod*: "SELECT = 設定"
+    x5: "SELECT = 設定"
+    h10: "NEXT = 設定"
   </dest>
   <voice>
     *: ""
@@ -4860,9 +4891,17 @@
   user:
   <source>
     *: "OFF To Revert"
+    h100,h120,h300: "STOP = Revert"
+    ipod*: "MENU = Revert"
+    x5: "RECORD = Revert"
+    h10: "PREV = Revert"
   </source>
   <dest>
     *: "OFF: 回復"
+    h100,h120,h300: "停止 = 回復"
+    ipod*: "MENU = 回復"
+    x5: "RECORD = 回復"
+    h10: "PREV = 回復"
   </dest>
   <voice>
     *: ""
@@ -5056,9 +5095,11 @@
   user:
   <source>
     *: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
   </source>
   <dest>
     *: "硬碟已滿，按下OFF繼續。"
+    h100,h120,h300: "硬碟已滿，按下停止繼續。"
   </dest>
   <voice>
     *: ""
@@ -5206,7 +5247,7 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_TRIGGER_ACTIVE
-  desc: 
+  desc:
   user:
   <source>
     *: "Trigger Active"
@@ -5282,7 +5323,7 @@
     *: "PLAY=Set OFF=Cancel"
   </source>
   <dest>
-    *: "PLAY=設定 OFF=取消"
+    *: "播放=設定 關閉=取消"
   </dest>
   <voice>
     *: ""
@@ -5352,7 +5393,7 @@
     *: "[Title]"
   </source>
   <dest>
-    *: "[Title]"
+    *: "[標題]"
   </dest>
   <voice>
     *: ""
@@ -5366,7 +5407,7 @@
     *: "[Artist]"
   </source>
   <dest>
-    *: "[Artist]"
+    *: "[作者]"
   </dest>
   <voice>
     *: ""
@@ -5380,7 +5421,7 @@
     *: "[Album]"
   </source>
   <dest>
-    *: "[Album]"
+    *: "[專輯]"
   </dest>
   <voice>
     *: ""
@@ -5394,7 +5435,7 @@
     *: "[Tracknum]"
   </source>
   <dest>
-    *: "[Tracknum]"
+    *: "[曲目編號]"
   </dest>
   <voice>
     *: ""
@@ -5408,7 +5449,7 @@
     *: "[Genre]"
   </source>
   <dest>
-    *: "[Genre]"
+    *: "[類別]"
   </dest>
   <voice>
     *: ""
@@ -5422,7 +5463,7 @@
     *: "[Year]"
   </source>
   <dest>
-    *: "[Year]"
+    *: "[年份]"
   </dest>
   <voice>
     *: ""
@@ -5436,7 +5477,7 @@
     *: "[Length]"
   </source>
   <dest>
-    *: "[Length]"
+    *: "[長度]"
   </dest>
   <voice>
     *: ""
@@ -5450,7 +5491,7 @@
     *: "[Playlist]"
   </source>
   <dest>
-    *: "[Playlist]"
+    *: "[播放清單]"
   </dest>
   <voice>
     *: ""
@@ -5464,7 +5505,7 @@
     *: "[Bitrate]"
   </source>
   <dest>
-    *: "[Bitrate]"
+    *: "[位元率]"
   </dest>
   <voice>
     *: ""
@@ -5492,7 +5533,7 @@
     *: " (VBR)"
   </source>
   <dest>
-    *: " (VBR)"
+    *: " (變動位元率)"
   </dest>
   <voice>
     *: ""
@@ -5506,7 +5547,7 @@
     *: "[Frequency]"
   </source>
   <dest>
-    *: "[Frequency]"
+    *: "[頻率]"
   </dest>
   <voice>
     *: ""
@@ -5548,7 +5589,7 @@
     *: "[Path]"
   </source>
   <dest>
-    *: "[Path]"
+    *: "[路徑]"
   </dest>
   <voice>
     *: ""
@@ -5562,7 +5603,7 @@
     *: "<No Info>"
   </source>
   <dest>
-    *: "<No Info>"
+    *: "<無資訊>"
   </dest>
   <voice>
     *: ""
@@ -7441,7 +7482,7 @@
     *: "編輯預設"
   </dest>
   <voice>
-    *: ""
+    *: "Edit Preset"
   </voice>
 </phrase>
 <phrase>
@@ -7455,7 +7496,7 @@
     *: "移除預設"
   </dest>
   <voice>
-    *: ""
+    *: "Remove Preset"
   </voice>
 </phrase>
 <phrase>
@@ -7828,9 +7869,17 @@
   user:
   <source>
     *: "OFF to abort"
+    h100,h120,h300: "STOP to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    x5: "Long PLAY to abort"
+    h10: "PREV to abort"
   </source>
   <dest>
     *: "OFF: 離開"
+    h100,h120,h300: "停止: 離開"
+    ipod*: "PLAY/PAUSE: 離開"
+    x5: "長按PLAY: 離開"
+    h10: "PREV: 離開"
   </dest>
   <voice>
     *: ""
@@ -7844,7 +7893,7 @@
     *: "STOP to abort"
   </source>
   <dest>
-    *: "STOP: 離開"
+    *: "停止: 離開"
   </dest>
   <voice>
     *: ""
@@ -8292,7 +8341,7 @@
     *: "(PLAY/STOP)"
   </source>
   <dest>
-    *: "(PLAY/STOP)"
+    *: "(播放/停止)"
   </dest>
   <voice>
     *: ""
@@ -8359,7 +8408,7 @@
   desc: When you run the radio without an fmr file in settings
   user:
   <source>
-    *: "No Settings found, AutoScan?"
+    *: "No settings found. Autoscan?"
   </source>
   <dest>
     *: "找不到設定，自動掃描?"
@@ -8409,17 +8458,17 @@
   <voice>
     *: "Direct gain"
   </voice>
-</phrase>   
+</phrase>
 <phrase>
   id: LANG_CROSSFEED_CROSS_GAIN
   desc: in crossfeed settings
-  <source>  
+  <source>
     *: "Cross Gain"
   </source>
-  <dest>  
+  <dest>
     *: "Cross Gain"
   </dest>
-  <voice>  
+  <voice>
     *: "Cross gain"
   </voice>
 </phrase>
@@ -8430,7 +8479,7 @@
     *: "High-Frequency Attenuation"
   </source>
   <dest>
-    *: "High-Frequency Attenuation"
+    *: "高頻衰減"
   </dest>
   <voice>
     *: "High-frequency attenuation"
@@ -8443,7 +8492,7 @@
     *: "High-Frequency Cutoff"
   </source>
   <dest>
-    *: "High-Frequency Cutoff"
+    *: "高頻截斷"
   </dest>
   <voice>
     *: "High-frequency cutoff"
@@ -8466,10 +8515,10 @@
   id: LANG_TAGCACHE_BUSY
   desc: when trying to shutdown and tagcache is committing
   <source>
-    *: "Tagcache is not ready"
+    *: "Database is not ready"
   </source>
   <dest>
-    *: "標籤快取尚未準備好"
+    *: "標籤資料庫尚未準備好"
   </dest>
   <voice>
     *: "Tagcache is not ready"
@@ -8522,7 +8571,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Update now"
+    *: "Update Now"
   </source>
   <dest>
     *: "即刻更新"
@@ -8536,7 +8585,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Auto update"
+    *: "Auto Update"
   </source>
   <dest>
     *: "自動更新"
@@ -8550,13 +8599,303 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Export modifications"
+    *: "Export Modifications"
   </source>
   <dest>
     *: "匯出更動"
   </dest>
   <voice>
     *: "Export modifications"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG
+  desc: in onplay menu
+  user:
+  <source>
+    *: "Playlist Catalog"
+  </source>
+  <dest>
+    *: "播放清單目錄"
+  </dest>
+  <voice>
+    *: "Playlist catalog"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "Add to Playlist"
+  </source>
+  <dest>
+    *: "增加到播放清單"
+  </dest>
+  <voice>
+    *: "Add to playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO_NEW
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "Add to New Playlist"
+  </source>
+  <dest>
+    *: "增加到新的播放清單"
+  </dest>
+  <voice>
+    *: "Add to new playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_VIEW
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "View Catalog"
+  </source>
+  <dest>
+    *: "檢視播放清單目錄"
+  </dest>
+  <voice>
+    *: "View catalog"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_DIRECTORY
+  desc: error message when playlist catalog directory doesn't exist
+  user:
+  <source>
+    *: "%s doesn't exist"
+  </source>
+  <dest>
+    *: "%s 不存在"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_PLAYLISTS
+  desc: error message when no playlists for playlist catalog
+  user:
+  <source>
+    *: "No Playlists"
+  </source>
+  <dest>
+    *: "沒有播放清單"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_IMPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Import Modifications"
+  </source>
+  <dest>
+    *: "匯入更動"
+  </dest>
+  <voice>
+    *: "Import modifications"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_MEASURE
+  desc: in record timesplit options
+  <source>
+    *: "Split Measure"
+  </source>
+  <dest>
+    *: "分割依據"
+  </dest>
+  <voice>
+    *: "Split Measure"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TYPE
+  desc: in record timesplit options
+  <source>
+    *: "What to do when Splitting"
+  </source>
+  <dest>
+    *: "分割時行為"
+  </dest>
+  <voice>
+    *: "What to do when Splitting"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TIME
+  desc: in record timesplit options
+  <source>
+    *: "Split Time"
+  </source>
+  <dest>
+    *: "分割時間"
+  </dest>
+  <voice>
+    *: "Split Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_SIZE
+  desc: in record timesplit options
+  <source>
+    *: "Split Filesize"
+  </source>
+  <dest>
+    *: "分割檔案大小"
+  </dest>
+  <voice>
+    *: "Split Filesize"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_TIME
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Time"
+  </source>
+  <dest>
+    *: "時間"
+  </dest>
+  <voice>
+    *: "Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_SIZE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Filesize"
+  </source>
+  <dest>
+    *: "檔案大小"
+  </dest>
+  <voice>
+    *: "Filesize"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_NEW_FILE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Start new file"
+  </source>
+  <dest>
+    *: "開新檔案"
+  </dest>
+  <voice>
+    *: "Start new file"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_RECORDING
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Stop recording"
+  </source>
+  <dest>
+    *: "停止錄音"
+  </dest>
+  <voice>
+    *: "Stop recording"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_OFF
+  desc: Remote lcd off splash
+  user:
+  <source>
+    *: "Remote Display OFF"
+  </source>
+  <dest>
+    *: "線控顯示關閉"
+  </dest>
+  <voice>
+    *: "Remote Display OFF"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_ON
+  desc: Remote lcd off splash
+  user:
+  <source>
+    *: "(Vol- : Re-enable)"
+  </source>
+  <dest>
+    *: "(Vol- : 重新開啟)"
+  </dest>
+  <voice>
+    *: "(Vol- : Re-enable)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_BUTTON_HOLD_NORMAL
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Normal"
+  </source>
+  <dest>
+    *: "一般"
+  </dest>
+  <voice>
+    *: "Normal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_BUTTON_HOLD
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Backlight (On Hold Key)"
+  </source>
+  <dest>
+    *: "背光(Hold時)"
+  </dest>
+  <voice>
+    *: "Backlight on hold key"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEVER
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Never"
+  </source>
+  <dest>
+    *: "永不"
+  </dest>
+  <voice>
+    *: "Never"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LCD_SLEEP_AFTER_BACKLIGHT_OFF
+  desc: In display settings, time to switch LCD chip into power saving state
+  user:
+  <source>
+    *: "Sleep (After Backlight Off)"
+  </source>
+  <dest>
+    *: "睡眠(在背光關閉後)"
+  </dest>
+  <voice>
+    *: "Sleep after backlight off"
   </voice>
 </phrase>
 <phrase>
@@ -8844,13 +9183,13 @@
   desc: show ID3 Database
   user:
   <source>
-    *: "ID3 Database"
+    *: "Database"
   </source>
   <dest>
-    *: "ID3 Database"
+    *: "Database"
   </dest>
   <voice>
-    *: "ID3 Database"
+    *: "Database"
   </voice>
 </phrase>
 <phrase>
@@ -8900,10 +9239,10 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Mic"
+    *: "Int. Mic"
   </source>
   <dest>
-    *: "Mic"
+    *: "Int. Mic"
   </dest>
   <voice>
     *: "Microphone"
@@ -9167,9 +9506,11 @@
   user:
   <source>
     *: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
   </source>
   <dest>
     *: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
   </dest>
   <voice>
     *: ""
@@ -9217,8 +9558,700 @@
     *: ""
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_SYSFONT_SPLIT_SIZE
+  desc: in record timesplit options
+  <source>
+    *: "Split Filesize"
+  </source>
+  <dest>
+    *: "Split Filesize"
+  </dest>
+  <voice>
+    *: "Split Filesize"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOADING_PERCENT
+  desc: splash number of percents loaded
+  user:
+  <source>
+    *: "Loading... %d%% done (%s)"
+  </source>
+  <dest>
+    *: "載入中... 完成%d%%  (%s)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE
+  desc: in the sound settings menu
+  user:
+  <source>
+    *: "Hardware Equalizer"
+  </source>
+  <dest>
+    *: "硬體等化器"
+  </dest>
+  <voice>
+    *: "Hardware equalizer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_ENABLED
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Enable Hardware EQ"
+  </source>
+  <dest>
+    *: "啟用硬體等化器"
+  </dest>
+  <voice>
+    *: "Enable hardware equalizer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BANDWIDTH
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Bandwidth"
+  </source>
+  <dest>
+    *: "頻寬"
+  </dest>
+  <voice>
+    *: "Bandwidth"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Narrow"
+  </source>
+  <dest>
+    *: "窄"
+  </dest>
+  <voice>
+    *: "Narrow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Wide"
+  </source>
+  <dest>
+    *: "寬"
+  </dest>
+  <voice>
+    *: "Wide"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Show Path"
+  </source>
+  <dest>
+    *: "顯示路徑"
+  </dest>
+  <voice>
+    *: "Show Path"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH_CURRENT
+  desc: in show path menu
+  user:
+  <source>
+    *: "Current Directory Only"
+  </source>
+  <dest>
+    *: "只有目前目錄"
+  </dest>
+  <voice>
+    *: "Current Directory Only"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH_FULL
+  desc: in show path menu
+  user:
+  <source>
+    *: "Full Path"
+  </source>
+  <dest>
+    *: "完整路徑"
+  </dest>
+  <voice>
+    *: "Full Path"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_AGC_PRESET
+  desc: automatic gain control in record settings
+  <source>
+    *: "Automatic Gain Control"
+  </source>
+  <dest>
+    *: "自動增益控制"
+  </dest>
+  <voice>
+    *: "Automatic gain control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_SAFETY
+  desc: AGC preset
+  <source>
+    *: "Safety (clip)"
+  </source>
+  <dest>
+    *: "安全(clip)"
+  </dest>
+  <voice>
+    *: "Safety (clip)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_LIVE
+  desc: AGC preset
+  <source>
+    *: "Live (slow)"
+  </source>
+  <dest>
+    *: "現場(慢)"
+  </dest>
+  <voice>
+    *: "Live (slow)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_DJSET
+  desc: AGC preset
+  <source>
+    *: "DJ-Set (slow)"
+  </source>
+  <dest>
+    *: "DJ設定(慢)"
+  </dest>
+  <voice>
+    *: "DJ set (slow)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_MEDIUM
+  desc: AGC preset
+  <source>
+    *: "Medium"
+  </source>
+  <dest>
+    *: "中等"
+  </dest>
+  <voice>
+    *: "Medium"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_VOICE
+  desc: AGC preset
+  <source>
+    *: "Voice (fast)"
+  </source>
+  <dest>
+    *: "語音(快)"
+  </dest>
+  <voice>
+    *: "Voice (fast)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_AGC_CLIPTIME
+  desc: in record settings
+  <source>
+    *: "AGC clip time"
+  </source>
+  <dest>
+    *: "自動增益控制clip時間"
+  </dest>
+  <voice>
+    *: "AGC clip time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_AGC_PRESET
+  desc: automatic gain control in recording screen
+  <source>
+    *: "AGC"
+  </source>
+  <dest>
+    *: "AGC"
+  </dest>
+  <voice>
+    *: "AGC"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_MAXGAIN
+  desc: AGC maximum gain in recording screen
+  <source>
+    *: "AGC max. gain"
+  </source>
+  <dest>
+    *: "AGC max. gain"
+  </dest>
+  <voice>
+    *: "AGC maximum gain"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KBIT_PER_SEC
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "kilobits per second"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_FILENAME
+  desc: Filename header in recording screen
+  user:
+  <source>
+    *: "Filename:"
+  </source>
+  <dest>
+    *: "Filename:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG
+  desc: in settings_menu.
+  user:
+  <source>
+    *: "Pause on Headphone Unplug"
+  </source>
+  <dest>
+    *: "移除耳機時暫停"
+  </dest>
+  <voice>
+    *: "Pause on Headphone Unplug
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_RESUME
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Pause and Resume"
+  </source>
+  <dest>
+    *: "暫停與繼續"
+  </dest>
+  <voice>
+    *: "Pause and Resume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_RW
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Duration to Rewind"
+  </source>
+  <dest>
+    *: "倒轉時間"
+  </dest>
+  <voice>
+    *: "Duration to rewind"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_DISABLE_AUTORESUME
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Disable resume on startup if phones unplugged"
+  </source>
+  <dest>
+    *: "如果耳機未插入則關閉回復播放"
+  </dest>
+  <voice>
+    *: "Disable resume on startup if phones unplugged"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_REGION
+  desc: fm tuner region setting
+  <source>
+    *: "Region"
+  </source>
+  <dest>
+    *: "區域"
+  </dest>
+  <voice>
+    *: "Region"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_EUROPE
+  desc: fm tuner region europe
+  <source>
+    *: "Europe"
+  </source>
+  <dest>
+    *: "歐洲"
+  </dest>
+  <voice>
+    *: "Europe"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_US
+  desc: fm region us / canada
+  <source>
+    *: "US / Canada"
+  </source>
+  <dest>
+    *: "美國/加拿大"
+  </dest>
+  <voice>
+    *: "US / Canada"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_JAPAN
+  desc: fm region japan
+  <source>
+    *: "Japan"
+  </source>
+  <dest>
+    *: "日本"
+  </dest>
+  <voice>
+    *: "Japan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_KOREA
+  desc: fm region korea
+  <source>
+    *: "Korea"
+  </source>
+  <dest>
+    *: "韓國"
+  </dest>
+  <voice>
+    *: "Korea"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RANDOM
+  desc: random folder
+  <source>
+    *: "Random"
+  </source>
+  <dest>
+    *: "亂數"
+  </dest>
+  <voice>
+    *: "Random"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUDIOSCROBBLER
+  desc: "Last.fm Log" in the playback menu
+  user:
+  <source>
+    *: "Last.fm Log"
+  </source>
+  <dest>
+    *: "Last.fm紀錄"
+  </dest>
+  <voice>
+    *: "Last.fm Log"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLEASE_REBOOT
+  desc: when activating an option that requires a reboot
+  user:
+  <source>
+    *: "Please reboot to enable"
+  </source>
+  <dest>
+    *: "請重開機以啟用"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DITHERING
+  desc: in the sound settings menu
+  user:
+  <source>
+    *: "Dithering"
+  </source>
+  <dest>
+    *: "Dithering"
+  </dest>
+  <voice>
+    *: "Dithering"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PITCH_UP_SEMITONE
+  desc: in wps
+  user:
+  <source>
+    *: "Semitone Up"
+  </source>
+  <dest>
+    *: "Semitone Up"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PITCH_DOWN_SEMITONE
+  desc: in wps
+  user:
+  <source>
+    *: "Semitone Down"
+  </source>
+  <dest>
+    *: "Semitone Down"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_FORMAT
+  desc: audio format item in recording menu
+  user:
+  <source>
+    *: "Format"
+  </source>
+  <dest>
+    *: "格式"
+  </dest>
+  <voice>
+    *: "Format"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_MPA_L3
+  desc: audio format description
+  user:
+  <source>
+    *: "MPEG Layer 3"
+  </source>
+  <dest>
+    *: "MPEG Layer 3"
+  </dest>
+  <voice>
+    *: "MPEG Layer 3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_PCM_WAV
+  desc: audio format description
+  user:
+  <source>
+    *: "PCM Wave"
+  </source>
+  <dest>
+    *: "PCM Wave"
+  </dest>
+  <voice>
+    *: "PCM Wave"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_WAVPACK
+  desc: audio format description
+  user:
+  <source>
+    *: "WavPack"
+  </source>
+  <dest>
+    *: "WavPack"
+  </dest>
+  <voice>
+    *: "WavPack"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENCODER_SETTINGS
+  desc: encoder settings
+  user:
+  <source>
+    *: "Encoder Settings"
+  </source>
+  <dest>
+    *: "編碼設定"
+  </dest>
+  <voice>
+    *: "Encoder Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_SETTINGS
+  desc: when something has settings in a certain context
+  user:
+  <source>
+    *: "(No Settings)"
+  </source>
+  <dest>
+    *: "(無設定)"
+  </dest>
+  <voice>
+    *: "No settings available"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOURCE_FREQUENCY
+  desc: when recording source frequency setting must follow source
+  user:
+  <source>
+    *: "(Same As Source)"
+  </source>
+  <dest>
+    *: "(與來源相同)"
+  </dest>
+  <voice>
+    *: "Same As Source"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BITRATE
+  desc: bits-kilobits per unit time
+  user:
+  <source>
+    *: "Bitrate"
+  </source>
+  <dest>
+    *: "位元率"
+  </dest>
+  <voice>
+    *: "Bitrate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_TYPE
+  desc: in recording trigger menu
+  <source>
+    *: "Trigtype"
+  </source>
+  <dest>
+    *: "Trigtype"
+  </dest>
+  <voice>
+    *: "Trigtype"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_STOP
+  desc: trigger types
+  <source>
+    *: "Stop"
+  </source>
+  <dest>
+    *: "停止"
+  </dest>
+  <voice>
+    *: "Stop"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_PAUSE
+  desc: trigger types
+  <source>
+    *: "Pause"
+  </source>
+  <dest>
+    *: "暫停"
+  </dest>
+  <voice>
+    *: "Pause"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_NEWFILESTP
+  desc: trigger types
+  <source>
+    *: "New file"
+  </source>
+  <dest>
+    *: "新檔案"
+  </dest>
+  <voice>
+    *: "New file"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARNING_BATTERY_LOW
+  desc: general warning
+  user:
+  <source>
+    *: "WARNING! Low Battery!"
+  </source>
+  <dest>
+    *: "警告! 電池電量低!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARNING_BATTERY_EMPTY
+  desc: general warning
+  user:
+  <source>
+    *: "Battery empty! RECHARGE!"
+  </source>
+  <dest>
+    *: "電池已空! 充電!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_AIFF
+  desc: audio format description
+  user:
+  <source>
+    *: "AIFF"
+  </source>
+  <dest>
+    *: "AIFF"
+  </dest>
+  <voice>
+    *: "AIFF"
+  </voice>
+</phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_SAFETY
   desc: AGC preset
@@ -9232,38 +10265,6 @@
     *: "Safety (clip)"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
-<phrase>
-  id: LANG_SYSFONT_AGC_VOICE
-  desc: AGC preset
-  <source>
-    *: "Voice (fast)"
-  </source>
-  <dest>
-    *: "Voice (fast)"
-  </dest>
-  <voice>
-    *: "Voice (fast)"
-  </voice>
-</phrase>
-###
-### This phrase below was not present in the translated file
-<phrase>
-  id: LANG_SYSFONT_AGC_MEDIUM
-  desc: AGC preset
-  <source>
-    *: "Medium"
-  </source>
-  <dest>
-    *: "Medium"
-  </dest>
-  <voice>
-    *: "Medium"
-  </voice>
-</phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SYSFONT_AGC_LIVE
   desc: AGC preset
@@ -9277,8 +10278,6 @@
     *: "Live (slow)"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SYSFONT_AGC_DJSET
   desc: AGC preset
@@ -9292,8 +10291,32 @@
     *: "DJ set (slow)"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_SYSFONT_AGC_MEDIUM
+  desc: AGC preset
+  <source>
+    *: "Medium"
+  </source>
+  <dest>
+    *: "Medium"
+  </dest>
+  <voice>
+    *: "Medium"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_VOICE
+  desc: AGC preset
+  <source>
+    *: "Voice (fast)"
+  </source>
+  <dest>
+    *: "Voice (fast)"
+  </dest>
+  <voice>
+    *: "Voice (fast)"
+  </voice>
+</phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
   desc: AGC maximum gain in recording screen
@@ -9305,5 +10328,103 @@
   </dest>
   <voice>
     *: "AGC maximum gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_TRACKSKIP
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Shuffle and Track Skip"
+  </source>
+  <dest>
+    *: "亂續播放與跳過曲目"
+  </dest>
+  <voice>
+    *: "Shuffle and Track Skip"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Top Time"
+  </source>
+  <dest>
+    *: "最高時間"
+  </dest>
+  <voice>
+    *: "Top Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLACE
+  desc: in onplay menu.  Replace the current playlist with a new one.
+  user:
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "播放下一首"
+  </dest>
+  <voice>
+    *: "Play Next"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUNNING_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Running Time"
+  </source>
+  <dest>
+    *: "運作時間"
+  </dest>
+  <voice>
+    *: "Running Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES
+  desc: browser file/dir properties
+  user:
+  <source>
+    *: "Properties"
+  </source>
+  <dest>
+    *: "屬性"
+  </dest>
+  <voice>
+    *: "Properties"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Current Time"
+  </source>
+  <dest>
+    *: "現在時間"
+  </dest>
+  <voice>
+    *: "Current Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Clear Time?"
+  </source>
+  <dest>
+    *: "清除時間?"
+  </dest>
+  <voice>
+    *: "Clear Time?"
   </voice>
 </phrase>
