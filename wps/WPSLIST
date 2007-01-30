@@ -104,14 +104,14 @@ Statusbar: on
 Name: marquee.wps
 RWPS: marquee.rwps
 Author: Mike Sobel
-Font: chicago12.fnt
+Font: nimbus-12.fnt
 Statusbar: on
 </wps>
 
 <rwps>
 Name: marquee.rwps
 Author: Mike Sobel
-Font: chicago12.fnt
+Font: nimbus-12.fnt
 Statusbar: on
 </rwps>
 
@@ -119,14 +119,14 @@ Statusbar: on
 Name: DancePuffDuo.wps
 RWPS: DancePuffDuo.rwps
 Author: Chris Oxtoby
-Font: chicago12.fnt
+Font: nimbus-12.fnt
 Statusbar: on
 </wps>
 
 <rwps>
 Name: DancePuffDuo.rwps
 Author: Chris Oxtoby
-Font: chicago12.fnt
+Font: nimbus-12.fnt
 Statusbar: on
 </rwps>
 
