@@ -1,3 +1,34 @@
+#             __________               __   ___.
+#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+#   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+#                     \/            \/     \/    \/            \/
+# $Id$
+#
+# This is the master of the language files. This is the original, the one with
+# all the existing strings Rockbox features.
+#
+# The target names used for target-specific strings are set in the ARCHOS
+# variable in the root Makefile
+#
+# *WARNING*
+#
+# If you want to add a new string, add it to the end of this file!
+# If you want to remove a string, just blank it, don't actually remove it!
+#
+# If you re-order things or remove entries, you must bump the binary language
+# file version number in both the 'genlang' tool and the language loader code.
+#
+# The "voice' entry contains how we want the speech UI to pronounce the phrase.
+#
+# Since this file is both the master for the language system, as well as the
+# source for generating english strings, make sure that all <source> strings
+# are *identical* to the <dest> strings within the english.lang file. The
+# <source> strings are the ones that'll be exposed and used by other languages
+# when doing updates etc, while the <dest> ones are used when this file is
+# used to simply get the full set of english strings for a particular target.
+#
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -80,6 +111,20 @@
   </dest>
   <voice>
     *: "Vždy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WAIT
+  desc: general please wait splash
+  user:
+  <source>
+    *: "Loading..."
+  </source>
+  <dest>
+    *: "Nahrávám..."
+  </dest>
+  <voice>
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -220,6 +265,20 @@
   </dest>
   <voice>
     *: "Změnit nastavení"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_THEME
+  desc: in the main menu
+  user:
+  <source>
+    *: "Browse Themes"
+  </source>
+  <dest>
+    *: "Procházet témata"
+  </dest>
+  <voice>
+    *: "Procházet témata"
   </voice>
 </phrase>
 <phrase>
@@ -615,6 +674,34 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_CROSSFEED
+  desc: in sound settings
+  user:
+  <source>
+    *: "Crossfeed"
+  </source>
+  <dest>
+    *: "Křížení kanálů"
+  </dest>
+  <voice>
+    *: "Křížení kanálů"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER
+  desc: in the sound settings menu
+  user:
+  <source>
+    *: "Equalizer"
+  </source>
+  <dest>
+    *: "Ekvalizér"
+  </dest>
+  <voice>
+    *: "Ekvalizér"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_PLAYBACK
   desc: in settings_menu()
   user:
@@ -773,10 +860,11 @@
   desc: Generic recorder string to use to confirm
   user:
   <source>
-    *: "PLAY = Yes"
+    *: "PLAY = Ano"
+    h100,h120,h300: "NAVI = Ano"
   </source>
   <dest>
-    *: "Play = Ano"
+    *: "PLAY = Ano"
     h100,h120,h300: "NAVI = Ano"
   </dest>
   <voice>
@@ -938,6 +1026,230 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_EQUALIZER_ENABLED
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Enable EQ"
+  </source>
+  <dest>
+    *: "Zapnout EQ"
+  </dest>
+  <voice>
+    *: "Zapnout ekvalizér"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_GRAPHICAL
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Graphical EQ"
+  </source>
+  <dest>
+    *: "Grafický EQ"
+  </dest>
+  <voice>
+    *: "Grafický ekvalizér"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_PRECUT
+  desc: in eq settings
+  user:
+  <source>
+    *: "Precut"
+  </source>
+  <dest>
+    *: "Před-oříznutí"
+  </dest>
+  <voice>
+    *: "Předoříznutí"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_GAIN
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Simple EQ Settings"
+  </source>
+  <dest>
+    *: "Základní nastavení EQ"
+  </dest>
+  <voice>
+    *: "Základní nastavení ekvalizéru"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_ADVANCED
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Advanced EQ Settings"
+  </source>
+  <dest>
+    *: "Pokročilé nastavení EQ"
+  </dest>
+  <voice>
+    *: "Pokročilé nastavení ekvalizéru"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_SAVE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Save EQ Preset"
+  </source>
+  <dest>
+    *: "Uložit nastavené EQ"
+  </dest>
+  <voice>
+    *: "Uložit nastavené ekvalizéru"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BROWSE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Browse EQ Presets"
+  </source>
+  <dest>
+    *: "Procházet nastavení EQ"
+  </dest>
+  <voice>
+    *: "Procházet nastavení ekvalizéru"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_EDIT_MODE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Edit mode: %s"
+  </source>
+  <dest>
+    *: "Editační mód: %s"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_GAIN_ITEM
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "%d Hz Band Gain"
+  </source>
+  <dest>
+    *: "Zesílení %d Hz pásma"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_LOW_SHELF
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Low Shelf Filter"
+  </source>
+  <dest>
+    *: "Filtr nižších frekvencí"
+  </dest>
+  <voice>
+    *: "Filtr nižších frekvencí"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_PEAK
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Peak Filter %d"
+  </source>
+  <dest>
+    *: "Filtr špiček %d"
+  </dest>
+  <voice>
+    *: "Filtr špiček"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_HIGH_SHELF
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "High Shelf Filter"
+  </source>
+  <dest>
+    *: "Filtr vyšších frekvencí"
+  </dest>
+  <voice>
+    *: "Filtr vyšších frekvencí"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_CUTOFF
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Cutoff Frequency"
+  </source>
+  <dest>
+    *: "Ořezová frekvence"
+  </dest>
+  <voice>
+    *: "Ořezová frekvence"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_CENTER
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Center Frequency"
+  </source>
+  <dest>
+    *: "Centrální frekvence"
+  </dest>
+  <voice>
+    *: "Centrální frekvence"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_Q
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Q"
+  </source>
+  <dest>
+    *: "Q"
+  </dest>
+  <voice>
+    *: "Q"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_GAIN
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Gain"
+  </source>
+  <dest>
+    *: "Zesílení"
+  </dest>
+  <voice>
+    *: "Zesílení"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_CREATE_PLAYLIST
   desc: Menu option for creating a playlist
   user:
@@ -991,6 +1303,20 @@
   </dest>
   <voice>
     *: "Vkládat adresáře rekurzivně"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARN_ERASEDYNPLAYLIST_MENU
+  desc: in playlist options menu, option to warn when erasing dynamic playlist
+  user:
+  <source>
+    *: "Warn When Erasing Dynamic Playlist"
+  </source>
+  <dest>
+    *: "Varovat při mazání dynamického playlistu"
+  </dest>
+  <voice>
+    *: 
   </voice>
 </phrase>
 <phrase>
@@ -1190,6 +1516,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_PARTY_MODE
+  desc: party mode
+  user:
+  <source>
+    *: "Party Mode"
+  </source>
+  <dest>
+    *: "Párty mód"
+  </dest>
+  <voice>
+    *: "Párty mód"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_CROSSFADE
   desc: in playback settings
   user:
@@ -1341,6 +1681,90 @@
   </dest>
   <voice>
     *: "Po přehrání pokračovat další složkou"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Tag Cache"
+  </source>
+  <dest>
+    *: "Mezipaměť popisů"
+  </dest>
+  <voice>
+    *: "Mezipaměť popisů"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_DISK
+  desc:
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_RAM
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Load to RAM"
+  </source>
+  <dest>
+    *: "Nahrát do paměti"
+  </dest>
+  <voice>
+    *: "Nahrát do paměti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_FORCE_UPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Initialize now"
+  </source>
+  <dest>
+    *: "Vynutit obnovení mezipaměti popisků"
+  </dest>
+  <voice>
+    *: "Vynutit obnovení mezipaměti popisků"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_FORCE_UPDATE_SPLASH
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Updating in background"
+  </source>
+  <dest>
+    *: "Obnovovat na pozadí"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_INIT
+  desc: while initializing tagcache on boot
+  user:
+  <source>
+    *: "Committing tagcache"
+  </source>
+  <dest>
+    *: "Ukládám mezipaměť popisů"
+  </dest>
+  <voice>
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1596,6 +2020,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_REMOTE_WHILE_PLAYING
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "Browse .rwps files"
+  </source>
+  <dest>
+    *: "Procházet soubory .rwps"
+  </dest>
+  <voice>
+    *: "Procházet soubory definic přehrávacích obrazovek pro dálkové ovládání"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_LCD_MENU
   desc: in the display sub menu
   user:
@@ -1663,6 +2101,202 @@
   </dest>
   <voice>
     *: "Grafický ekvalizér"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEFAULT_CODEPAGE
+  desc: default encoding used with id3 tags
+  user:
+  <source>
+    *: "Default Codepage"
+  </source>
+  <dest>
+    *: "Předvolená kódovací stránka"
+  </dest>
+  <voice>
+    *: "Předvolená kódovací stránka"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_LATIN1
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Latin1 (ISO-8859-1)"
+  </source>
+  <dest>
+    *: "Latin1 (ISO-8859-1)"
+  </dest>
+  <voice>
+    *: "Latin1 ISO 8859 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_GREEK
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Greek (ISO-8859-7)"
+  </source>
+  <dest>
+    *: "Řečtina (ISO-8859-7)"
+  </dest>
+  <voice>
+    *: "Řečtina"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_HEBREW
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Hebrew (ISO-8859-8)"
+  </source>
+  <dest>
+    *: "Hebrejština (ISO-8859-8)"
+  </dest>
+  <voice>
+    *: "Hebrejština"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_CYRILLIC
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Cyrillic (CP1251)"
+  </source>
+  <dest>
+    *: "Azbuka (CP1251)"
+  </dest>
+  <voice>
+    *: "Azbuka"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_THAI
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Thai (ISO-8859-11)"
+  </source>
+  <dest>
+    *: "Thajština (ISO-8859-11)"
+  </dest>
+  <voice>
+    *: "Thajština"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_ARABIC
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Arabic (CP1256)"
+  </source>
+  <dest>
+    *: "Arabština (CP1256)"
+  </dest>
+  <voice>
+    *: "Arabština"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_TURKISH
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Turkish (ISO-8859-9)"
+  </source>
+  <dest>
+    *: "Turečtina (ISO-8859-9)"
+  </dest>
+  <voice>
+    *: "Turečtina"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_LATIN_EXTENDED
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Latin Extended (ISO-8859-2)"
+  </source>
+  <dest>
+    *: "Rozšířená latinka (ISO-8859-2)"
+  </dest>
+  <voice>
+    *: "Rozšířená latinka ISO 8859 2"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_JAPANESE
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Japanese (SJIS)"
+  </source>
+  <dest>
+    *: "Japonština (SJIS)"
+  </dest>
+  <voice>
+    *: "Japonština"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_SIMPLIFIED
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Simp. Chinese (GB2312)"
+  </source>
+  <dest>
+    *: "Zjedn. čínština (GB2312)"
+  </dest>
+  <voice>
+    *: "Zjednodušená čínština"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_KOREAN
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Korean (KSX1001)"
+  </source>
+  <dest>
+    *: "Korejština (KSX1001)"
+  </dest>
+  <voice>
+    *: "Korejština"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_TRADITIONAL
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Trad. Chinese (BIG5)"
+  </source>
+  <dest>
+    *: "Trad. čínština (BIG5)"
+  </dest>
+  <voice>
+    *: "Tradiční čínština"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_UTF8
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Unicode (UTF-8)"
+  </source>
+  <dest>
+    *: "Unicode (UTF-8)"
+  </dest>
+  <voice>
+    *: "junykód u. t. f. 8 "
   </voice>
 </phrase>
 <phrase>
@@ -1799,10 +2433,10 @@
     *: "Bookmark on Stop"
   </source>
   <dest>
-    *: "Vytvořit při zastavení"
+    *: "Vytvořit záložku při zastavení"
   </dest>
   <voice>
-    *: "Vytvořit při zastavení"
+    *: "Vytvořit záložku při zastavení"
   </voice>
 </phrase>
 <phrase>
@@ -2073,10 +2707,10 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_TIMESPLIT
-  desc: Prompt for record timer interval setting, in the record settings menu
+  desc: Record split menu
   user:
   <source>
-    *: "Time Split"
+    *: "File Split Options"
   </source>
   <dest>
     *: "Interval rozdělení"
@@ -2156,6 +2790,62 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_CLIP_LIGHT
+  desc: in record settings menu.
+  user:
+  <source>
+    *: "Clipping Light"
+  </source>
+  <dest>
+    *: "Indikace oříznutí špiček podsvětlením"
+  </dest>
+  <voice>
+    *: "Indikace oříznutí špiček podsvětlením"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_UNIT
+  desc: in record settings menu.
+  user:
+  <source>
+    *: "Main Unit Only"
+  </source>
+  <dest>
+    *: "Pouze na přehrávači"
+  </dest>
+  <voice>
+    *: "Pouze na přehrávači"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_UNIT
+  desc: in record settings menu.
+  user:
+  <source>
+    *: "Remote Unit Only"
+  </source>
+  <dest>
+    *: "Pouze na dálkovém ovládání"
+  </dest>
+  <voice>
+    *: "Pouze na dálkovém ovládání"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_MAIN
+  desc: in record settings menu.
+  user:
+  <source>
+    *: "Main and Remote Unit"
+  </source>
+  <dest>
+    *: "Na přehrávači i dálkovém ovládání"
+  </dest>
+  <voice>
+    *: "Na přehrávači i dálkovém ovládání"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_FFRW_STEP
   desc: in settings_menu
   user:
@@ -2181,6 +2871,104 @@
   </dest>
   <voice>
     *: "Urychlené převíjení"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_ENABLE
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: "Enable Crossfade"
+  </source>
+  <dest>
+    *: "Zapnout prolínání skladeb"
+  </dest>
+  <voice>
+    *: "Zapnout prolínání skladeb"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKSKIP
+  desc: in crossfade settings
+  user:
+  <source>
+    *: "Track Skip Only"
+  </source>
+  <dest>
+    *: "Pouze při přeskočení skladby"
+  </dest>
+  <voice>
+    *: "Pouze při přeskočení skladby"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_IN_DELAY
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: "Fade-In Delay"
+  </source>
+  <dest>
+    *: "Prodleva při zesílení"
+  </dest>
+  <voice>
+    *: "Prodleva při zesílení"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_IN_DURATION
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: "Fade-In Duration"
+  </source>
+  <dest>
+    *: "Délka zesílení"
+  </dest>
+  <voice>
+    *: "Délka zesílení"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_OUT_DELAY
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: "Fade-Out Delay"
+  </source>
+  <dest>
+    *: "Prodleva při zeslabení"
+  </dest>
+  <voice>
+    *: "Prodleva při zeslabení"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_OUT_DURATION
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: "Fade-Out Duration"
+  </source>
+  <dest>
+    *: "Délka zeslabení"
+  </dest>
+  <voice>
+    *: "Délka zeslabení"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_OUT_MODE
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: "Fade-Out Mode"
+  </source>
+  <dest>
+    *: "Mód zeslabení"
+  </dest>
+  <voice>
+    *: "Mód zeslabení"
   </voice>
 </phrase>
 <phrase>
@@ -2268,6 +3056,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_SHUFFLE_GAIN
+  desc: use track gain if shuffle mode is on, album gain otherwise
+  user:
+  <source>
+    *: "Track Gain if Shuffling"
+  </source>
+  <dest>
+    *: "Zohlednit zesílení při náh. přehrávání"
+  </dest>
+  <voice>
+    *: "Zohlednit zesílení při náhodném přehrávání"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_REPLAYGAIN_PREAMP
   desc: in replaygain settings
   user:
@@ -2352,6 +3154,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_BRIGHTNESS
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Brightness"
+  </source>
+  <dest>
+    *: "Jas"
+  </dest>
+  <voice>
+    *: "Jas"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_CONTRAST
   desc: in settings_menu
   user:
@@ -2363,6 +3179,20 @@
   </dest>
   <voice>
     *: "Kontrast"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS
+  desc: Backlight behaviour setting
+  user:
+  <source>
+    *: "First Keypress Enables Backlight Only"
+  </source>
+  <dest>
+    *: "První stisk klávesy pouze zapne podsvícení"
+  </dest>
+  <voice>
+    *: "První stisk klávesy pouze zapne podsvícení"
   </voice>
 </phrase>
 <phrase>
@@ -2461,6 +3291,76 @@
   </dest>
   <voice>
     *: "Inverzní kurzor"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_BACKDROP
+  desc: text for LCD settings menu
+  user:
+  <source>
+    *: "Clear Backdrop"
+  </source>
+  <dest>
+    *: "Odstanit obrázek na pozadí"
+  </dest>
+  <voice>
+    *: "Odstanit obrázek na pozadí"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKGROUND_COLOR
+  desc: menu entry to set the background color
+  user:
+  <source>
+    *: "Background Colour"
+  </source>
+  <dest>
+    *: "Barva pozadí"
+  </dest>
+  <voice>
+    *: "Barva pozadí"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FOREGROUND_COLOR
+  desc: menu entry to set the foreground color
+  user:
+  <source>
+    *: "Foreground Colour"
+  </source>
+  <dest>
+    *: "Barva popředí"
+  </dest>
+  <voice>
+    *: "Barva popředí"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_COLORS
+  desc: menu
+  user:
+  <source>
+    *: "Reset Colours"
+  </source>
+  <dest>
+    *: "Vynulovat nastavení barev"
+  </dest>
+  <voice>
+    *: "Vynulovat nastavení barev"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REDUCE_TICKING
+  desc: in remote lcd settings menu
+  user:
+  <source>
+    *: "Reduce Ticking"
+  </source>
+  <dest>
+    *: "Omezit tikání"
+  </dest>
+  <voice>
+    *: "Omezit tikání"
   </voice>
 </phrase>
 <phrase>
@@ -2587,6 +3487,48 @@
   </dest>
   <voice>
     *: "Uvodní prodleva"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCREEN_SCROLL_VIEW
+  desc: should lines scroll out of the screen
+  user:
+  <source>
+    *: "Screen Scrolls Out Of View"
+  </source>
+  <dest>
+    *: "Rolovat obrazovku mimo výhled"
+  </dest>
+  <voice>
+    *: "Rolovat obrazovku mimo výhled"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCREEN_SCROLL_STEP
+  desc: Pixels to advance per Screen scroll
+  user:
+  <source>
+    *: "Screen Scroll Step Size"
+  </source>
+  <dest>
+    *: "Krok rolování obrazovky"
+  </dest>
+  <voice>
+    *: "Velikost kroku rolování obrazovky"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_PAGINATED
+  desc: jump to new page when scrolling
+  user:
+  <source>
+    *: "Paged Scrolling"
+  </source>
+  <dest>
+    *: "Rolovat po celých stránkách"
+  </dest>
+  <voice>
+    *: "Rolovat po celých stránkách"
   </voice>
 </phrase>
 <phrase>
@@ -2912,6 +3854,48 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_DIRCACHE_ENABLE
+  desc: in directory cache settings
+  user:
+  <source>
+    *: "Directory Cache"
+  </source>
+  <dest>
+    *: "Mezipaměť adresáře"
+  </dest>
+  <voice>
+    *: "Mezipaměť adresáře"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRCACHE_REBOOT
+  desc: DEPRECATED
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRCACHE_BUILDING
+  desc: when booting up and rebuilding the cache
+  user:
+  <source>
+    *: "Scanning disk..."
+  </source>
+  <dest>
+    *: "Procházím disk..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
   id: LANG_TIME
   desc: in settings_menu
   user:
@@ -3080,6 +4064,62 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_CUT
+  desc: The verb/action Cut
+  user:
+  <source>
+    *: "Cut"
+  </source>
+  <dest>
+    *: "Vyjmout"
+  </dest>
+  <voice>
+    *: "Vyjmout"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COPY
+  desc: The verb/action Copy
+  user:
+  <source>
+    *: "Copy"
+  </source>
+  <dest>
+    *: "Kopírovat"
+  </dest>
+  <voice>
+    *: "Kopírovat"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PASTE
+  desc: The verb/action Paste
+  user:
+  <source>
+    *: "Paste"
+  </source>
+  <dest>
+    *: "Vložit"
+  </dest>
+  <voice>
+    *: "Vložit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REALLY_OVERWRITE
+  desc: The verb/action Paste
+  user:
+  <source>
+    *: "File/directory exists. Overwrite?"
+  </source>
+  <dest>
+    *: "Soubor nebo adresář již existuje. Přepsat?"
+  </dest>
+  <voice>
+    *: "Soubor nebo adresář již existuje. Přepsat?"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_DELETE
   desc: The verb/action Delete
   user:
@@ -3091,6 +4131,20 @@
   </dest>
   <voice>
     *: "Smazat"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_BACKDROP
+  desc: text for onplay menu entry
+  user:
+  <source>
+    *: "Set As Backdrop"
+  </source>
+  <dest>
+    *: "Nastavit jako obrázek na pozadí"
+  </dest>
+  <voice>
+    *: "Nastavit jako obrázek na pozadí"
   </voice>
 </phrase>
 <phrase>
@@ -3161,6 +4215,20 @@
   </dest>
   <voice>
     *: "Vytvořit adresář"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH
+  desc: "pitch" in the pitch screen
+  user:
+  <source>
+    *: "Pitch"
+  </source>
+  <dest>
+    *: "Rychlost"
+  </dest>
+  <voice>
+    *: "Rychlost"
   </voice>
 </phrase>
 <phrase>
@@ -3290,6 +4358,48 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_QUEUE_SHUFFLED
+  desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
+  user:
+  <source>
+    *: "Queue shuffled"
+  </source>
+  <dest>
+    *: "Fronta promíchána"
+  </dest>
+  <voice>
+    *: "Fronta promíchána"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_IN_PLAYLIST
+  desc: in playlist menu.
+  user:
+  <source>
+    *: "Search In Playlist"
+  </source>
+  <dest>
+    *: "Hledat v palylistu"
+  </dest>
+  <voice>
+    *: "Hledat v palylistu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_SEARCH_MSG
+  desc: splash number of tracks inserted
+  user:
+  <source>
+    *: "Searching... %d found (%s)"
+  </source>
+  <dest>
+    *: "Vyhledávám... %d nalezeno (%s)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
   id: LANG_BOOKMARK_MENU_CREATE
   desc: Used off of the bookmark menu to create a bookmark
   user:
@@ -3353,7 +4463,7 @@
     *: "Buffer: %d.%03dMB"
   </source>
   <dest>
-    *: "Buffer : %d.%03dMB"
+    *: "Buffer: %d.%03dMB"
   </dest>
   <voice>
     *: ""
@@ -3370,7 +4480,7 @@
     *: "Baterie: Nabíjení"
   </dest>
   <voice>
-    *: ""
+    *: "Nabíjení"
   </voice>
 </phrase>
 <phrase>
@@ -3384,7 +4494,7 @@
     *: "Baterie: Donabíjení"
   </dest>
   <voice>
-    *: ""
+    *: "Donabíjení"
   </voice>
 </phrase>
 <phrase>
@@ -3398,7 +4508,7 @@
     *: "Baterie: Přerušov.nab."
   </dest>
   <voice>
-    *: ""
+    *: "Přerušované nabíjení"
   </voice>
 </phrase>
 <phrase>
@@ -3603,9 +4713,11 @@
   user:
   <source>
     *: "OFF = Exit"
+    h100,h120,h300: "STOP = Exit"
   </source>
   <dest>
     *: "OFF = Zpět"
+    h100,h120,h300: "STOP = Zpět"
   </dest>
   <voice>
     *: ""
@@ -3659,6 +4771,7 @@
   user:
   <source>
     *: "PLAY = Select"
+    h100,h120,h300: "NAVI = Select"
   </source>
   <dest>
     *: "PLAY = Vybrat"
@@ -3674,6 +4787,7 @@
   user:
   <source>
     *: "ON+Play = Delete"
+    h100,h120,h300: "RECORD = Delete"
   </source>
   <dest>
     *: "ON+Play = Vymaž"
@@ -3759,9 +4873,11 @@
   user:
   <source>
     *: "ON To Set"
+    h100,h120,h300: "NAVI = Set"
   </source>
   <dest>
     *: "ON  - Nastavit"
+    h100,h120,h300: "NAVI = Set"
   </dest>
   <voice>
     *: ""
@@ -3773,9 +4889,11 @@
   user:
   <source>
     *: "OFF To Revert"
+    h100,h120,h300: "STOP = Revert"
   </source>
   <dest>
     *: "OFF - Storno"
+    h100,h120,h300: "STOP = Revert"
   </dest>
   <voice>
     *: ""
@@ -3936,14 +5054,44 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_RECORDING_GAIN_ANALOG
+  desc: in the recording screen
+  user:
+  <source>
+    *: "A"
+  </source>
+  <dest>
+    *: "A"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_GAIN_DIGITAL
+  desc: in the recording screen
+  user:
+  <source>
+    *: "D"
+  </source>
+  <dest>
+    *: "D"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
   id: LANG_DISK_FULL
   desc: in recording screen
   user:
   <source>
     *: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
   </source>
   <dest>
     *: "Disk je plný. Pro pokračování stiskněte OFF."
+    h100,h120,h300: "Disk je plný. Pro pokračování stiskněte STOP."
   </dest>
   <voice>
     *: ""
@@ -3971,7 +5119,7 @@
     *: "Once"
   </source>
   <dest>
-    *: "Jenou"
+    *: "Jednou"
   </dest>
   <voice>
     *: ""
@@ -4091,7 +5239,7 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_TRIGGER_ACTIVE
-  desc: 
+  desc:
   user:
   <source>
     *: "Trigger Active"
@@ -4188,6 +5336,48 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_COLOR_RGB_LABELS
+  desc: what to show for the 'R' 'G' 'B' ONE LETTER EACH
+  user:
+  <source>
+    *: "RGB"
+  </source>
+  <dest>
+    *: "RGB"
+  </dest>
+  <voice>
+    *: 
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLOR_RGB_VALUE
+  desc: in color screen
+  user:
+  <source>
+    *: "RGB: %02X%02X%02X"
+  </source>
+  <dest>
+    *: "RGB: %02X%02X%02X"
+  </dest>
+  <voice>
+    *: 
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLOR_UNACCEPTABLE
+  desc: splash when user selects an invalid colour
+  user:
+  <source>
+    *: "Invalid colour"
+  </source>
+  <dest>
+    *: "Neplatná barva"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
   id: LANG_ID3_TITLE
   desc: in tag viewer
   user:
@@ -4266,6 +5456,20 @@
   </source>
   <dest>
     *: "[Rok]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_LENGTH
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Length]"
+  </source>
+  <dest>
+    *: "[Délka]"
   </dest>
   <voice>
     *: ""
@@ -5952,6 +7156,34 @@
   </voice>
 </phrase>
 <phrase>
+  id: VOICE_EXT_RWPS
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "definice přehrávacích obrazovek pro dálkové ovládání"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_KBD
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "klávesy"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_PLAYLIST_LOAD
   desc: displayed on screen while loading a playlist
   user:
@@ -6092,6 +7324,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_WARN_ERASEDYNPLAYLIST_PROMPT
+  desc: prompt shown when about to erase a modified dynamic playlist
+  user:
+  <source>
+    *: "Erase dynamic playlist?"
+  </source>
+  <dest>
+    *: "Smazat dymanický playlist?"
+  </dest>
+  <voice>
+    *: 
+  </voice>
+</phrase>
+<phrase>
   id: LANG_NOTHING_TO_RESUME
   desc: Error message displayed when resume button pressed but no playlist
   user:
@@ -6201,6 +7447,20 @@
   </dest>
   <voice>
     *: "Žádné uložené stanice"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_ADD_PRESET
+  desc: in radio menu
+  user:
+  <source>
+    *: "Add Preset"
+  </source>
+  <dest>
+    *: "Přidat stanici"
+  </dest>
+  <voice>
+    *: "Přidat stanici"
   </voice>
 </phrase>
 <phrase>
@@ -6358,6 +7618,118 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_FM_FREEZE
+  desc: splash screen during freeze in radio mode
+  user:
+  <source>
+    *: "Screen frozen!"
+  </source>
+  <dest>
+    *: "Obrazovka zmrazena!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SCAN_PRESETS
+  desc: in radio menu
+  user:
+  <source>
+    *: "Auto-Scan Presets"
+  </source>
+  <dest>
+    *: "Automatické vyhledání stanic"
+  </dest>
+  <voice>
+    *: "Automatické vyhledání stanic"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_CLEAR_PRESETS
+  desc: confirmation if presets can be cleared
+  user:
+  <source>
+    *: "Clear Current Presets?"
+  </source>
+  <dest>
+    *: "Vymazat uložené stanice?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SCANNING
+  desc: during auto scan
+  user:
+  <source>
+    *: "Scanning %d.%02d MHz"
+  </source>
+  <dest>
+    *: "Vyhledávám %d.%02d MHz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_DEFAULT_PRESET_NAME
+  desc: default preset name for auto scan mode
+  user:
+  <source>
+    *: "%d.%02d MHz"
+  </source>
+  <dest>
+    *: "%d.%02d MHz"
+  </dest>
+  <voice>
+    *: 
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_TUNE_MODE
+  desc: in radio screen / menu
+  user:
+  <source>
+    *: "Mode:"
+  </source>
+  <dest>
+    *: "Mód:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIO_SCAN_MODE
+  desc: in radio screen / menu
+  user:
+  <source>
+    *: "Scan"
+  </source>
+  <dest>
+    *: "Vyhledávat"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIO_PRESET_MODE
+  desc: in radio screen / menu
+  user:
+  <source>
+    *: "Preset"
+  </source>
+  <dest>
+    *: "Předvolby"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
   id: LANG_DIRBROWSE_F1
   desc: in dir browser, F1 button bar text
   user:
@@ -6489,9 +7861,11 @@
   user:
   <source>
     *: "OFF to abort"
+    h100,h120,h300: "STOP to abort"
   </source>
   <dest>
     *: "OFF zrušit"
+    h100,h120,h300: "STOP zrušit"
   </dest>
   <voice>
     *: ""
@@ -6520,6 +7894,48 @@
   </source>
   <dest>
     *: "Žádné soubory"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKDROP_LOADED
+  desc: text for splash to indicate a new backdrop has been loaded successfully
+  user:
+  <source>
+    *: "Backdrop Loaded"
+  </source>
+  <dest>
+    *: "Obrázek na pozadí byl načten"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKDROP_FAILED
+  desc: text for splash to indicate a failure to load a bitmap as backdrop
+  user:
+  <source>
+    *: "Backdrop Failed"
+  </source>
+  <dest>
+    *: "Načítání obrázku na pozadí selhalo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYBOARD_LOADED
+  desc: shown when a keyboard has been loaded from the dir browser
+  user:
+  <source>
+    *: "New Keyboard"
+  </source>
+  <dest>
+    *: "Nové klávesy načteny"
   </dest>
   <voice>
     *: ""
@@ -6562,6 +7978,20 @@
   </source>
   <dest>
     *: "Skladby"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3DB_GENRES
+  desc: in tag cache
+  user:
+  <source>
+    *: "Genres"
+  </source>
+  <dest>
+    *: "Žánry"
   </dest>
   <voice>
     *: ""
@@ -6904,1392 +8334,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_WAIT
-  desc: general please wait splash
-  user:
-  <source>
-    *: "Loading..."
-  </source>
-  <dest>
-    *: "Nahrávám..."
-  </dest>
-  <voice>
-    *: 
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CUSTOM_THEME
-  desc: in the main menu
-  user:
-  <source>
-    *: "Browse Themes"
-  </source>
-  <dest>
-    *: "Procházet témata"
-  </dest>
-  <voice>
-    *: "Procházet témata"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CROSSFEED
-  desc: in sound settings
-  user:
-  <source>
-    *: "Crossfeed"
-  </source>
-  <dest>
-    *: "Crossfeed"
-  </dest>
-  <voice>
-    *: "Krosfíd"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER
-  desc: in the sound settings menu
-  user:
-  <source>
-    *: "Equalizer"
-  </source>
-  <dest>
-    *: "Ekvalizér"
-  </dest>
-  <voice>
-    *: "Ekvalizér"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_ENABLED
-  desc: in the equalizer settings menu
-  user:
-  <source>
-    *: "Enable EQ"
-  </source>
-  <dest>
-    *: "Zapnout EQ"
-  </dest>
-  <voice>
-    *: "Zapnout ekvalizér"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_GRAPHICAL
-  desc: in the equalizer settings menu
-  user:
-  <source>
-    *: "Graphical EQ"
-  </source>
-  <dest>
-    *: "Grafický EQ"
-  </dest>
-  <voice>
-    *: "Grafický ekvalizér"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_PRECUT
-  desc: in eq settings
-  user:
-  <source>
-    *: "Precut"
-  </source>
-  <dest>
-    *: "Před-oříznutí"
-  </dest>
-  <voice>
-    *: "Předoříznutí"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_GAIN
-  desc: in the equalizer settings menu
-  user:
-  <source>
-    *: "Simple EQ Settings"
-  </source>
-  <dest>
-    *: "Základní nastavení EQ"
-  </dest>
-  <voice>
-    *: "Základní nastavení ekvalizéru"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_ADVANCED
-  desc: in the equalizer settings menu
-  user:
-  <source>
-    *: "Advanced EQ Settings"
-  </source>
-  <dest>
-    *: "Pokročilé nastavení EQ"
-  </dest>
-  <voice>
-    *: "Pokročilé nastavení ekvalizéru"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_SAVE
-  desc: in the equalizer settings menu
-  user:
-  <source>
-    *: "Save EQ Preset"
-  </source>
-  <dest>
-    *: "Uložit nastavené EQ"
-  </dest>
-  <voice>
-    *: "Uložit nastavené ekvalizéru"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_BROWSE
-  desc: in the equalizer settings menu
-  user:
-  <source>
-    *: "Browse EQ Presets"
-  </source>
-  <dest>
-    *: "Procházet nastavení EQ"
-  </dest>
-  <voice>
-    *: "Procházet nastavení ekvalizéru"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_EDIT_MODE
-  desc: in the equalizer settings menu
-  user:
-  <source>
-    *: "Edit mode: %s"
-  </source>
-  <dest>
-    *: "Editační mód: %s"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_GAIN_ITEM
-  desc: in the equalizer settings menu
-  user:
-  <source>
-    *: "%d Hz Band Gain"
-  </source>
-  <dest>
-    *: "Zesílení %d Hz pásma"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_BAND_LOW_SHELF
-  desc: in the equalizer settings menu
-  user:
-  <source>
-    *: "Low Shelf Filter"
-  </source>
-  <dest>
-    *: "Filtr nižších frekvencí"
-  </dest>
-  <voice>
-    *: "Filtr nižších frekvencí"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_BAND_PEAK
-  desc: in the equalizer settings menu
-  user:
-  <source>
-    *: "Peak Filter %d"
-  </source>
-  <dest>
-    *: "Filtr špiček %d"
-  </dest>
-  <voice>
-    *: "Filtr špiček"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_BAND_HIGH_SHELF
-  desc: in the equalizer settings menu
-  user:
-  <source>
-    *: "High Shelf Filter"
-  </source>
-  <dest>
-    *: "Filtr vyšších frekvencí"
-  </dest>
-  <voice>
-    *: "Filtr vyšších frekvencí"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_BAND_CUTOFF
-  desc: in the equalizer settings menu
-  user:
-  <source>
-    *: "Cutoff Frequency"
-  </source>
-  <dest>
-    *: "Ořezová frekvence"
-  </dest>
-  <voice>
-    *: "Ořezová frekvence"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_BAND_CENTER
-  desc: in the equalizer settings menu
-  user:
-  <source>
-    *: "Center Frequency"
-  </source>
-  <dest>
-    *: "Centrální frekvence"
-  </dest>
-  <voice>
-    *: "Centrální frekvence"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_BAND_Q
-  desc: in the equalizer settings menu
-  user:
-  <source>
-    *: "Q"
-  </source>
-  <dest>
-    *: "Q"
-  </dest>
-  <voice>
-    *: "Q"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_BAND_GAIN
-  desc: in the equalizer settings menu
-  user:
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Zesílení"
-  </dest>
-  <voice>
-    *: "Zesílení"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_WARN_ERASEDYNPLAYLIST_MENU
-  desc: in playlist options menu, option to warn when erasing dynamic playlist
-  user:
-  <source>
-    *: "Warn When Erasing Dynamic Playlist"
-  </source>
-  <dest>
-    *: "Varovat při mazání dynamického playlistu"
-  </dest>
-  <voice>
-    *: 
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PARTY_MODE
-  desc: party mode
-  user:
-  <source>
-    *: "Party Mode"
-  </source>
-  <dest>
-    *: "Párty mód"
-  </dest>
-  <voice>
-    *: "Párty mód"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_TAGCACHE
-  desc: in tag cache settings
-  user:
-  <source>
-    *: "Tag Cache"
-  </source>
-  <dest>
-    *: "Mezipaměť popisů"
-  </dest>
-  <voice>
-    *: "Mezipaměť popisů"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_TAGCACHE_DISK
-  desc: in tag cache settings
-  user:
-  <source>
-    *: "Keep on Disk"
-  </source>
-  <dest>
-    *: "Nechat na disku"
-  </dest>
-  <voice>
-    *: "Nechat na disku"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_TAGCACHE_RAM
-  desc: in tag cache settings
-  user:
-  <source>
-    *: "Load to RAM"
-  </source>
-  <dest>
-    *: "Nahrát do paměti"
-  </dest>
-  <voice>
-    *: "Nahrát do paměti"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_TAGCACHE_FORCE_UPDATE
-  desc: in tag cache settings
-  user:
-  <source>
-    *: "Force Tag Cache Update"
-  </source>
-  <dest>
-    *: "Vynutit obnovení mezipaměti popisků"
-  </dest>
-  <voice>
-    *: "Vynutit obnovení mezipaměti popisků"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_TAGCACHE_FORCE_UPDATE_SPLASH
-  desc: in tag cache settings
-  user:
-  <source>
-    *: "Updating in background"
-  </source>
-  <dest>
-    *: "Obnovovat na pozadí"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_TAGCACHE_INIT
-  desc: while initializing tagcache on boot
-  user:
-  <source>
-    *: "Committing tagcache"
-  </source>
-  <dest>
-    *: "Ukládám mezipaměť popisů"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REMOTE_WHILE_PLAYING
-  desc: in settings_menu()
-  user:
-  <source>
-    *: "Browse .rwps files"
-  </source>
-  <dest>
-    *: "Procházet soubory .rwps"
-  </dest>
-  <voice>
-    *: "Procházet soubory definic přehrávacích obrazovek pro dálkové ovládání"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DEFAULT_CODEPAGE
-  desc: default encoding used with id3 tags
-  user:
-  <source>
-    *: "Default Codepage"
-  </source>
-  <dest>
-    *: "Předvolená kódovací stránka"
-  </dest>
-  <voice>
-    *: "Předvolená kódovací stránka"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CODEPAGE_LATIN1
-  desc: in codepage setting menu
-  user:
-  <source>
-    *: "Latin1 (ISO-8859-1)"
-  </source>
-  <dest>
-    *: "Latin1 (ISO-8859-1)"
-  </dest>
-  <voice>
-    *: "Latin1 ISO 8859 1"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CODEPAGE_GREEK
-  desc: in codepage setting menu
-  user:
-  <source>
-    *: "Greek (ISO-8859-7)"
-  </source>
-  <dest>
-    *: "Řečtina (ISO-8859-7)"
-  </dest>
-  <voice>
-    *: "Řečtina"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CODEPAGE_HEBREW
-  desc: in codepage setting menu
-  user:
-  <source>
-    *: "Hebrew (ISO-8859-8)"
-  </source>
-  <dest>
-    *: "Hebrejština (ISO-8859-8)"
-  </dest>
-  <voice>
-    *: "Hebrejština"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CODEPAGE_RUSSIAN
-  desc: in codepage setting menu
-  user:
-  <source>
-    *: "Russian (CP1251)"
-  </source>
-  <dest>
-    *: "Ruština (CP1251)"
-  </dest>
-  <voice>
-    *: "Ruština"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CODEPAGE_THAI
-  desc: in codepage setting menu
-  user:
-  <source>
-    *: "Thai (ISO-8859-11)"
-  </source>
-  <dest>
-    *: "Thajština (ISO-8859-11)"
-  </dest>
-  <voice>
-    *: "Thajština"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CODEPAGE_ARABIC
-  desc: in codepage setting menu
-  user:
-  <source>
-    *: "Arabic (CP1256)"
-  </source>
-  <dest>
-    *: "Arabština (CP1256)"
-  </dest>
-  <voice>
-    *: "Arabština"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CODEPAGE_TURKISH
-  desc: in codepage setting menu
-  user:
-  <source>
-    *: "Turkish (ISO-8859-9)"
-  </source>
-  <dest>
-    *: "Turečtina (ISO-8859-9)"
-  </dest>
-  <voice>
-    *: "Turečtina"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CODEPAGE_LATIN_EXTENDED
-  desc: in codepage setting menu
-  user:
-  <source>
-    *: "Latin Extended (ISO-8859-2)"
-  </source>
-  <dest>
-    *: "Rozšířená latinka (ISO-8859-2)"
-  </dest>
-  <voice>
-    *: "Rozšířená latinka ISO 8859 2"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CODEPAGE_JAPANESE
-  desc: in codepage setting menu
-  user:
-  <source>
-    *: "Japanese (SJIS)"
-  </source>
-  <dest>
-    *: "Japonština (SJIS)"
-  </dest>
-  <voice>
-    *: "Japonština"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CODEPAGE_SIMPLIFIED
-  desc: in codepage setting menu
-  user:
-  <source>
-    *: "Simp. Chinese (GB2312)"
-  </source>
-  <dest>
-    *: "Zjedn. čínština (GB2312)"
-  </dest>
-  <voice>
-    *: "Zjednodušená čínština"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CODEPAGE_KOREAN
-  desc: in codepage setting menu
-  user:
-  <source>
-    *: "Korean (KSX1001)"
-  </source>
-  <dest>
-    *: "Korejština (KSX1001)"
-  </dest>
-  <voice>
-    *: "Korejština"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CODEPAGE_TRADITIONAL
-  desc: in codepage setting menu
-  user:
-  <source>
-    *: "Trad. Chinese (BIG5)"
-  </source>
-  <dest>
-    *: "Trad. čínština (BIG5)"
-  </dest>
-  <voice>
-    *: "Tradiční čínština"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CODEPAGE_UTF8
-  desc: 
-  user:
-  <source>
-    *: "Unicode (UTF-8)"
-  </source>
-  <dest>
-    *: "Unicode (UTF-8)"
-  </dest>
-  <voice>
-    *: "junykód u. t. f. 8 "
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CLIP_LIGHT
-  desc: in record settings menu.
-  user:
-  <source>
-    *: "Clipping Light"
-  </source>
-  <dest>
-    *: "Indikace oříznutí špiček podsvětlením"
-  </dest>
-  <voice>
-    *: "Indikace oříznutí špiček podsvětlením"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MAIN_UNIT
-  desc: in record settings menu.
-  user:
-  <source>
-    *: "Main Unit Only"
-  </source>
-  <dest>
-    *: "Pouze na přehrávači"
-  </dest>
-  <voice>
-    *: "Pouze na přehrávači"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REMOTE_UNIT
-  desc: in record settings menu.
-  user:
-  <source>
-    *: "Remote Unit Only"
-  </source>
-  <dest>
-    *: "Pouze na dálkovém ovládání"
-  </dest>
-  <voice>
-    *: "Pouze na dálkovém ovládání"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REMOTE_MAIN
-  desc: in record settings menu.
-  user:
-  <source>
-    *: "Main and Remote Unit"
-  </source>
-  <dest>
-    *: "Na přehrávači i dálkovém ovládání"
-  </dest>
-  <voice>
-    *: "Na přehrávači i dálkovém ovládání"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CROSSFADE_ENABLE
-  desc: in crossfade settings menu
-  user:
-  <source>
-    *: "Enable Crossfade"
-  </source>
-  <dest>
-    *: "Zapnout prolínání skladeb"
-  </dest>
-  <voice>
-    *: "Zapnout prolínání skladeb"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_TRACKSKIP
-  desc: in crossfade settings
-  user:
-  <source>
-    *: "Track Skip Only"
-  </source>
-  <dest>
-    *: "Pouze při přeskočení skladby"
-  </dest>
-  <voice>
-    *: "Pouze při přeskočení skladby"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CROSSFADE_FADE_IN_DELAY
-  desc: in crossfade settings menu
-  user:
-  <source>
-    *: "Fade-In Delay"
-  </source>
-  <dest>
-    *: "Prodleva při zesílení"
-  </dest>
-  <voice>
-    *: "Prodleva při zesílení"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CROSSFADE_FADE_IN_DURATION
-  desc: in crossfade settings menu
-  user:
-  <source>
-    *: "Fade-In Duration"
-  </source>
-  <dest>
-    *: "Délka zesílení"
-  </dest>
-  <voice>
-    *: "Délka zesílení"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CROSSFADE_FADE_OUT_DELAY
-  desc: in crossfade settings menu
-  user:
-  <source>
-    *: "Fade-Out Delay"
-  </source>
-  <dest>
-    *: "Prodleva při zeslabení"
-  </dest>
-  <voice>
-    *: "Prodleva při zeslabení"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CROSSFADE_FADE_OUT_DURATION
-  desc: in crossfade settings menu
-  user:
-  <source>
-    *: "Fade-Out Duration"
-  </source>
-  <dest>
-    *: "Délka zeslabení"
-  </dest>
-  <voice>
-    *: "Délka zeslabení"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CROSSFADE_FADE_OUT_MODE
-  desc: in crossfade settings menu
-  user:
-  <source>
-    *: "Fade-Out Mode"
-  </source>
-  <dest>
-    *: "Mód zeslabení"
-  </dest>
-  <voice>
-    *: "Mód zeslabení"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SHUFFLE_GAIN
-  desc: use track gain if shuffle mode is on, album gain otherwise
-  user:
-  <source>
-    *: "Track Gain if Shuffling"
-  </source>
-  <dest>
-    *: "Zohlednit zesílení při náh. přehrávání"
-  </dest>
-  <voice>
-    *: "Zohlednit zesílení při náhodném přehrávání"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BRIGHTNESS
-  desc: in settings_menu
-  user:
-  <source>
-    *: "Brightness"
-  </source>
-  <dest>
-    *: "Jas"
-  </dest>
-  <voice>
-    *: "Jas"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS
-  desc: Backlight behaviour setting
-  user:
-  <source>
-    *: "First Keypress Enables Backlight Only"
-  </source>
-  <dest>
-    *: "První stisk klávesy pouze zapne podsvícení"
-  </dest>
-  <voice>
-    *: "První stisk klávesy pouze zapne podsvícení"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CLEAR_BACKDROP
-  desc: text for LCD settings menu
-  user:
-  <source>
-    *: "Clear Backdrop"
-  </source>
-  <dest>
-    *: "Odstanit obrázek na pozadí"
-  </dest>
-  <voice>
-    *: "Odstanit obrázek na pozadí"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BACKGROUND_COLOR
-  desc: menu entry to set the background color
-  user:
-  <source>
-    *: "Background Colour"
-  </source>
-  <dest>
-    *: "Barva pozadí"
-  </dest>
-  <voice>
-    *: "Barva pozadí"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FOREGROUND_COLOR
-  desc: menu entry to set the foreground color
-  user:
-  <source>
-    *: "Foreground Colour"
-  </source>
-  <dest>
-    *: "Barva popředí"
-  </dest>
-  <voice>
-    *: "Barva popředí"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESET_COLORS
-  desc: menu
-  user:
-  <source>
-    *: "Reset Colours"
-  </source>
-  <dest>
-    *: "Vynulovat nastavení barev"
-  </dest>
-  <voice>
-    *: "Vynulovat nastavení barev"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REDUCE_TICKING
-  desc: in remote lcd settings menu
-  user:
-  <source>
-    *: "Reduce Ticking"
-  </source>
-  <dest>
-    *: "Omezit tikání"
-  </dest>
-  <voice>
-    *: "Omezit tikání"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SCREEN_SCROLL_VIEW
-  desc: should lines scroll out of the screen
-  user:
-  <source>
-    *: "Screen Scrolls Out Of View"
-  </source>
-  <dest>
-    *: "Rolovat obrazovku mimo výhled"
-  </dest>
-  <voice>
-    *: "Rolovat obrazovku mimo výhled"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SCREEN_SCROLL_STEP
-  desc: Pixels to advance per Screen scroll
-  user:
-  <source>
-    *: "Screen Scroll Step Size"
-  </source>
-  <dest>
-    *: "Krok rolování obrazovky"
-  </dest>
-  <voice>
-    *: "Velikost kroku rolování obrazovky"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SCROLL_PAGINATED
-  desc: jump to new page when scrolling
-  user:
-  <source>
-    *: "Paged Scrolling"
-  </source>
-  <dest>
-    *: "Rolovat po celých stránkách"
-  </dest>
-  <voice>
-    *: "Rolovat po celých stránkách"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRCACHE_ENABLE
-  desc: in directory cache settings
-  user:
-  <source>
-    *: "Directory Cache"
-  </source>
-  <dest>
-    *: "Mezipaměť adresáře"
-  </dest>
-  <voice>
-    *: "Mezipaměť adresáře"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRCACHE_REBOOT
-  desc: when activating directory cache
-  user:
-  <source>
-    *: "Please reboot to enable the cache"
-  </source>
-  <dest>
-    *: "Pro zapnutí mezipaměti je nutný restart"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRCACHE_BUILDING
-  desc: when booting up and rebuilding the cache
-  user:
-  <source>
-    *: "Scanning disk..."
-  </source>
-  <dest>
-    *: "Procházím disk..."
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CUT
-  desc: The verb/action Cut
-  user:
-  <source>
-    *: "Cut"
-  </source>
-  <dest>
-    *: "Vyjmout"
-  </dest>
-  <voice>
-    *: "Vyjmout"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_COPY
-  desc: The verb/action Copy
-  user:
-  <source>
-    *: "Copy"
-  </source>
-  <dest>
-    *: "Kopírovat"
-  </dest>
-  <voice>
-    *: "Kopírovat"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PASTE
-  desc: The verb/action Paste
-  user:
-  <source>
-    *: "Paste"
-  </source>
-  <dest>
-    *: "Vložit"
-  </dest>
-  <voice>
-    *: "Vložit"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REALLY_OVERWRITE
-  desc: The verb/action Paste
-  user:
-  <source>
-    *: "File/directory exists. Overwrite?"
-  </source>
-  <dest>
-    *: "Soubor nebo adresář již existuje. Přepsat?"
-  </dest>
-  <voice>
-    *: "Soubor nebo adresář již existuje. Přepsat?"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SET_AS_BACKDROP
-  desc: text for onplay menu entry
-  user:
-  <source>
-    *: "Set As Backdrop"
-  </source>
-  <dest>
-    *: "Nastavit jako obrázek na pozadí"
-  </dest>
-  <voice>
-    *: "Nastavit jako obrázek na pozadí"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PITCH
-  desc: "pitch" in the pitch screen
-  user:
-  <source>
-    *: "Pitch"
-  </source>
-  <dest>
-    *: "Rychlost"
-  </dest>
-  <voice>
-    *: "Rychlost"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_QUEUE_SHUFFLED
-  desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
-  user:
-  <source>
-    *: "Queue shuffled"
-  </source>
-  <dest>
-    *: "Fronta promíchána"
-  </dest>
-  <voice>
-    *: "Fronta promíchána"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SEARCH_IN_PLAYLIST
-  desc: in playlist menu.
-  user:
-  <source>
-    *: "Search In Playlist"
-  </source>
-  <dest>
-    *: "Hledat v palylistu"
-  </dest>
-  <voice>
-    *: "Hledat v palylistu"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYLIST_SEARCH_MSG
-  desc: splash number of tracks inserted
-  user:
-  <source>
-    *: "Searching... %d found (%s)"
-  </source>
-  <dest>
-    *: "Vyhledávám... %d nalezeno (%s)"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_GAIN_ANALOG
-  desc: in the recording screen
-  user:
-  <source>
-    *: "A"
-  </source>
-  <dest>
-    *: "A"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_GAIN_DIGITAL
-  desc: in the recording screen
-  user:
-  <source>
-    *: "D"
-  </source>
-  <dest>
-    *: "D"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_COLOR_RGB_LABELS
-  desc: what to show for the 'R' 'G' 'B' ONE LETTER EACH
-  user:
-  <source>
-    *: "RGB"
-  </source>
-  <dest>
-    *: "RGB"
-  </dest>
-  <voice>
-    *: 
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_COLOR_RGB_VALUE
-  desc: in color screen
-  user:
-  <source>
-    *: "RGB: %02X%02X%02X"
-  </source>
-  <dest>
-    *: "RGB: %02X%02X%02X"
-  </dest>
-  <voice>
-    *: 
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_COLOR_UNACCEPTABLE
-  desc: splash when user selects an invalid colour
-  user:
-  <source>
-    *: "Invalid colour"
-  </source>
-  <dest>
-    *: "Neplatná barva"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3_LENGTH
-  desc: in tag viewer
-  user:
-  <source>
-    *: "[Length]"
-  </source>
-  <dest>
-    *: "[Délka]"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_EXT_RWPS
-  desc: spoken only, for file extension
-  user:
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "definice přehrávacích obrazovek pro dálkové ovládání"
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_EXT_KBD
-  desc: spoken only, for file extension
-  user:
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "klávesy"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_WARN_ERASEDYNPLAYLIST_PROMPT
-  desc: prompt shown when about to erase a modified dynamic playlist
-  user:
-  <source>
-    *: "Erase dynamic playlist?"
-  </source>
-  <dest>
-    *: "Smazat dymanický playlist?"
-  </dest>
-  <voice>
-    *: 
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_ADD_PRESET
-  desc: in radio menu
-  user:
-  <source>
-    *: "Add Preset"
-  </source>
-  <dest>
-    *: "Přidat stanici"
-  </dest>
-  <voice>
-    *: "Přidat stanici"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_FREEZE
-  desc: splash screen during freeze in radio mode
-  user:
-  <source>
-    *: "Screen frozen!"
-  </source>
-  <dest>
-    *: "Obrazovka zmrazena!"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_SCAN_PRESETS
-  desc: in radio menu
-  user:
-  <source>
-    *: "Auto-Scan Presets"
-  </source>
-  <dest>
-    *: "Automatické vyhledání stanic"
-  </dest>
-  <voice>
-    *: "Automatické vyhledání stanic"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_CLEAR_PRESETS
-  desc: confirmation if presets can be cleared
-  user:
-  <source>
-    *: "Clear Current Presets?"
-  </source>
-  <dest>
-    *: "Vymazat uložené stanice?"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_SCANNING
-  desc: during auto scan
-  user:
-  <source>
-    *: "Scanning %d.%02d MHz"
-  </source>
-  <dest>
-    *: "Vyhledávám %d.%02d MHz"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_DEFAULT_PRESET_NAME
-  desc: default preset name for auto scan mode
-  user:
-  <source>
-    *: "%d.%02d MHz"
-  </source>
-  <dest>
-    *: "%d.%02d MHz"
-  </dest>
-  <voice>
-    *: 
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_TUNE_MODE
-  desc: in radio screen / menu
-  user:
-  <source>
-    *: "Mode:"
-  </source>
-  <dest>
-    *: "Mód:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RADIO_SCAN_MODE
-  desc: in radio screen / menu
-  user:
-  <source>
-    *: "Scan"
-  </source>
-  <dest>
-    *: "Vyhledávat"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RADIO_PRESET_MODE
-  desc: in radio screen / menu
-  user:
-  <source>
-    *: "Preset"
-  </source>
-  <dest>
-    *: "Předvolby"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BACKDROP_LOADED
-  desc: text for splash to indicate a new backdrop has been loaded successfully
-  user:
-  <source>
-    *: "Backdrop Loaded"
-  </source>
-  <dest>
-    *: "Obrázek na pozadí byl načten"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BACKDROP_FAILED
-  desc: text for splash to indicate a failure to load a bitmap as backdrop
-  user:
-  <source>
-    *: "Backdrop Failed"
-  </source>
-  <dest>
-    *: "Načítání obrázku na pozadí selhalo"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYBOARD_LOADED
-  desc: shown when a keyboard has been loaded from the dir browser
-  user:
-  <source>
-    *: "New Keyboard"
-  </source>
-  <dest>
-    *: "Nové klávesy načteny"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_GENRES
-  desc: in tag cache
-  user:
-  <source>
-    *: "Genres"
-  </source>
-  <dest>
-    *: "Žánry"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FM_PRESET_LOAD
   desc: load preset list in fm radio
   user:
@@ -8370,7 +8414,474 @@
     *: "Uložit změny?"
   </dest>
   <voice>
-    *: "Uložit změny?"
+    *: "Uložit změny"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PIXELS
+  desc: In the settings menu
+  user:
+  <source>
+    *: "pixels"
+  </source>
+  <dest>
+    *: "pixelů"
+  </dest>
+  <voice>
+    *: "pixelů"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_DIRECT_GAIN
+  desc: in crossfeed settings
+  user:
+  <source>
+    *: "Direct Gain"
+  </source>
+  <dest>
+    *: "Přímé zesílení"
+  </dest>
+  <voice>
+    *: "Přímé zesílení"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CROSS_GAIN
+  desc: in crossfeed settings
+  <source>
+    *: "Cross Gain"
+  </source>
+  <dest>
+    *: "Překřížené zesílení"
+  </dest>
+  <voice>
+    *: "Překřížené zesílení"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_ATTENUATION
+  desc: in crossfeed settings
+  <source>
+    *: "High-Frequency Attenuation"
+  </source>
+  <dest>
+    *: "Zeslabení výšek"
+  </dest>
+  <voice>
+    *: "Zeslabení výšek"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_CUTOFF
+  desc: in crossfeed settings
+  <source>
+    *: "High-Frequency Cutoff"
+  </source>
+  <dest>
+    *: "Odesknutí výšek"
+  </dest>
+  <voice>
+    *: "Odseknutí výšek"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNIT_HERTZ
+  desc: in sound settings
+  <source>
+    *: "Hz"
+  </source>
+  <dest>
+    *: "Hz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_BUSY
+  desc: when trying to shutdown and tagcache is committing
+  <source>
+    *: "Tagcache is not ready"
+  </source>
+  <dest>
+    *: "Tagcache není připavená"
+  </dest>
+  <voice>
+    *: "Tagcache není připavená"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS
+  desc: "<All tracks>" entry in tag browser
+  user:
+  <source>
+    *: "<All tracks>"
+  </source>
+  <dest>
+    *: "<Všechny skladby>"
+  </dest>
+  <voice>
+    *: "Všechny skladby"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVALID_FILENAME
+  desc: "invalid filename entered" error message
+  user:
+  <source>
+    *: "Invalid Filename!"
+  </source>
+  <dest>
+    *: "Neplatné jméno souboru!"
+  </dest>
+  <voice>
+    *: "Neplatné jméno souboru!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCROLL_SETS
+  desc: "Remote Scrolling Options" Submenu in "Scrolling Options" menu
+  user:
+  <source>
+    *: "Remote Scrolling Options"
+  </source>
+  <dest>
+    *: "Rolování na dálkovém ovládání"
+  </dest>
+  <voice>
+    *: "Rolování na dálkovém ovládání"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_UPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Update now"
+  </source>
+  <dest>
+    *: "Aktualizovat teď"
+  </dest>
+  <voice>
+    *: "Aktualizovat teď"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_AUTOUPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Auto update"
+  </source>
+  <dest>
+    *: "Automaticky aktualizovat"
+  </dest>
+  <voice>
+    *: "Automaticky aktualizovat"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_EXPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Export modifications"
+  </source>
+  <dest>
+    *: "Exportovat modifikace"
+  </dest>
+  <voice>
+    *: "Exportovat modifikace"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG
+  desc: in onplay menu
+  user:
+  <source>
+    *: "Playlist catalog"
+  </source>
+  <dest>
+    *: "Katalog playlistů"
+  </dest>
+  <voice>
+    *: "Katalog playlistů"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "Add to playlist"
+  </source>
+  <dest>
+    *: "Přidat do playlistu"
+  </dest>
+  <voice>
+    *: "Přidat do playlistu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO_NEW
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "Add to new playlist"
+  </source>
+  <dest>
+    *: "Přidat do nového playlistu"
+  </dest>
+  <voice>
+    *: "Přidat do nového playlistu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_VIEW
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "View catalog"
+  </source>
+  <dest>
+    *: "Zobrazit katalog"
+  </dest>
+  <voice>
+    *: "Zobrazit katalog"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_DIRECTORY
+  desc: error message when playlist catalog directory doesn't exist
+  user:
+  <source>
+    *: "%s doesn't exist"
+  </source>
+  <dest>
+    *: "%s neexistuje"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_PLAYLISTS
+  desc: error message when no playlists for playlist catalog
+  user:
+  <source>
+    *: "No playlists"
+  </source>
+  <dest>
+    *: "Žádné playlisty"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_IMPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Import modifications"
+  </source>
+  <dest>
+    *: "Importovat modifikace"
+  </dest>
+  <voice>
+    *: "Importovat modifikace"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_MEASURE
+  desc: in record timesplit options
+  <source>
+    *: "Split Measure"
+  </source>
+  <dest>
+    *: "Měřítko rozdělení"
+  </dest>
+  <voice>
+    *: "Měřítko rozdělení"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TYPE
+  desc: in record timesplit options
+  <source>
+    *: "What to do when Splitting"
+  </source>
+  <dest>
+    *: "Co udělat při rozdělování"
+  </dest>
+  <voice>
+    *: "Co udělat při rozdělování"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TIME
+  desc: in record timesplit options
+  <source>
+    *: "Split Time"
+  </source>
+  <dest>
+    *: "Čas rozdělení"
+  </dest>
+  <voice>
+    *: "Čas rozdělení"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_SIZE
+  desc: in record timesplit options
+  <source>
+    *: "Split Filesize"
+  </source>
+  <dest>
+    *: "Velikost rozdělení"
+  </dest>
+  <voice>
+    *: "Velikost rozdělení"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_TIME
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Time"
+  </source>
+  <dest>
+    *: "Čas"
+  </dest>
+  <voice>
+    *: "Čas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_SIZE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Filesize"
+  </source>
+  <dest>
+    *: "Velikost"
+  </dest>
+  <voice>
+    *: "Velikost"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_NEW_FILE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Start new file"
+  </source>
+  <dest>
+    *: "Vytvořit nový soubor"
+  </dest>
+  <voice>
+    *: "Vytvořit nový soubor"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_RECORDING
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Stop recording"
+  </source>
+  <dest>
+    *: "Ukončit nahrávání"
+  </dest>
+  <voice>
+    *: "Ukončit nahrávání"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_OFF
+  desc: Remote lcd off splash
+  user:
+  <source>
+    *: "Remote Display OFF"
+  </source>
+  <dest>
+    *: "Vypnout dálkové ovládání"
+  </dest>
+  <voice>
+    *: "Vypnout dálkové ovládání"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_ON
+  desc: Remote lcd off splash
+  user:
+  <source>
+    *: "(Vol- : Re-enable)"
+  </source>
+  <dest>
+    *: "(Hlas- : Znovu zapnout)"
+  </dest>
+  <voice>
+    *: "(Hlas- : Znovu zapnout)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_BUTTON_HOLD_NORMAL
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Normal"
+  </source>
+  <dest>
+    *: "Normalní"
+  </dest>
+  <voice>
+    *: "Normalní"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_BUTTON_HOLD
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Backlight (On Hold Key)"
+  </source>
+  <dest>
+    *: "Podsvícení (Při zamčení)"
+  </dest>
+  <voice>
+    *: "Podsvícení při zamčení"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEVER
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Never"
+  </source>
+  <dest>
+    *: "Nikdy"
+  </dest>
+  <voice>
+    *: "Nikdy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LCD_SLEEP_AFTER_BACKLIGHT_OFF
+  desc: In display settings, time to switch LCD chip into power saving state
+  user:
+  <source>
+    *: "Sleep (After Backlight Off)"
+  </source>
+  <dest>
+    *: "Uspat (Po zhasnutí podsvícení)"
+  </dest>
+  <voice>
+    *: "Uspat po zhasnutí podsvícení"
   </voice>
 </phrase>
 <phrase>
@@ -8469,6 +8980,48 @@
   </dest>
   <voice>
     *: "Mono"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_EDIT_MODE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Edit mode: %s"
+  </source>
+  <dest>
+    *: "Editační mód: %s"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_BAND_CUTOFF
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Cutoff Frequency"
+  </source>
+  <dest>
+    *: "Ořezová frekvence"
+  </dest>
+  <voice>
+    *: "Ořezová frekvence"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_BAND_GAIN
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Gain"
+  </source>
+  <dest>
+    *: "Zesílení"
+  </dest>
+  <voice>
+    *: "Zesílení"
   </voice>
 </phrase>
 <phrase>
@@ -8780,6 +9333,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_SYSFONT_PITCH
+  desc: "pitch" in the pitch screen
+  user:
+  <source>
+    *: "Pitch"
+  </source>
+  <dest>
+    *: "Rychlost"
+  </dest>
+  <voice>
+    *: "Rychlost"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_SYSFONT_PITCH_UP
   desc: in wps
   user:
@@ -8925,9 +9492,11 @@
   user:
   <source>
     *: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
   </source>
   <dest>
     *: "Disk je plný. Pro pokračování stiskněte OFF."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
   </dest>
   <voice>
     *: ""
@@ -8976,148 +9545,682 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_EQUALIZER_EDIT_MODE
-  desc: in the equalizer settings menu
-  user:
+  id: LANG_SYSFONT_SPLIT_SIZE
+  desc: in record timesplit options
   <source>
-    *: "Edit mode: %s"
+    *: "Split Filesize"
   </source>
   <dest>
-    *: "Editační mód: %s"
+    *: "Velikost rozdělení"
+  </dest>
+  <voice>
+    *: "Velikost rozdělení"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOADING_PERCENT
+  desc: splash number of percents loaded
+  user:
+  <source>
+    *: "Loading... %d%% done (%s)"
+  </source>
+  <dest>
+    *: "Nahrávám... %d%% hotovo (%s)"
   </dest>
   <voice>
     *: ""
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_EQUALIZER_BAND_CUTOFF
+  id: LANG_EQUALIZER_HARDWARE
+  desc: in the sound settings menu
+  user:
+  <source>
+    *: "Hardware Equalizer"
+  </source>
+  <dest>
+    *: "Hardwarový ekvalizér"
+  </dest>
+  <voice>
+    *: "Hardwarový ekvalizér"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_ENABLED
   desc: in the equalizer settings menu
   user:
   <source>
-    *: "Cutoff Frequency"
+    *: "Enable Hardware EQ"
   </source>
   <dest>
-    *: "Ořezová frekvence"
+    *: "Zapnout hardwarový ekvalizér"
   </dest>
   <voice>
-    *: "Ořezová frekvence"
+    *: "Zapnout hardwarový ekvalizér"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_EQUALIZER_BAND_GAIN
+  id: LANG_EQUALIZER_BANDWIDTH
   desc: in the equalizer settings menu
   user:
   <source>
-    *: "Gain"
+    *: "Bandwidth"
   </source>
   <dest>
-    *: "Zesílení"
+    *: "Šířka pásma"
   </dest>
   <voice>
-    *: "Zesílení"
+    *: "Šířka pásma"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_PITCH
-  desc: "pitch" in the pitch screen
+  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
+  desc: in the equalizer settings menu
   user:
   <source>
-    *: "Pitch"
+    *: "Narrow"
   </source>
   <dest>
-    *: "Rychlost"
+    *: "Úzká"
   </dest>
   <voice>
-    *: "Rychlost"
+    *: "Úzká"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
-  id: LANG_SYSFONT_AGC_SAFETY
+  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Wide"
+  </source>
+  <dest>
+    *: "Široká"
+  </dest>
+  <voice>
+    *: "Široká"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Show Path"
+  </source>
+  <dest>
+    *: "Zobrazit cestu"
+  </dest>
+  <voice>
+    *: "Zobrazit cestu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH_CURRENT
+  desc: in show path menu
+  user:
+  <source>
+    *: "Current Directory Only"
+  </source>
+  <dest>
+    *: "Pouze aktuální adresář"
+  </dest>
+  <voice>
+    *: "Pouze aktuální adresář"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH_FULL
+  desc: in show path menu
+  user:
+  <source>
+    *: "Full Path"
+  </source>
+  <dest>
+    *: "Celou cestu"
+  </dest>
+  <voice>
+    *: "Celou cestu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_AGC_PRESET
+  desc: automatic gain control in record settings
+  <source>
+    *: "Automatic Gain Control"
+  </source>
+  <dest>
+    *: "Automatická kontrola zesílení"
+  </dest>
+  <voice>
+    *: "Automatická kontrola zesílení"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_SAFETY
   desc: AGC preset
   <source>
     *: "Safety (clip)"
   </source>
   <dest>
-    *: "Safety (clip)"
+    *: "Bezpečne (skok)"
   </dest>
   <voice>
-    *: "Safety (clip)"
+    *: "Bezpečně (skok)"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
-  id: LANG_SYSFONT_AGC_VOICE
-  desc: AGC preset
-  <source>
-    *: "Voice (fast)"
-  </source>
-  <dest>
-    *: "Voice (fast)"
-  </dest>
-  <voice>
-    *: "Voice (fast)"
-  </voice>
-</phrase>
-###
-### This phrase below was not present in the translated file
-<phrase>
-  id: LANG_SYSFONT_AGC_MEDIUM
-  desc: AGC preset
-  <source>
-    *: "Medium"
-  </source>
-  <dest>
-    *: "Medium"
-  </dest>
-  <voice>
-    *: "Medium"
-  </voice>
-</phrase>
-###
-### This phrase below was not present in the translated file
-<phrase>
-  id: LANG_SYSFONT_AGC_LIVE
+  id: LANG_AGC_LIVE
   desc: AGC preset
   <source>
     *: "Live (slow)"
   </source>
   <dest>
-    *: "Live (slow)"
+    *: "Živě (pomalé)"
   </dest>
   <voice>
-    *: "Live (slow)"
+    *: "Živě (pomalé)"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
-  id: LANG_SYSFONT_AGC_DJSET
+  id: LANG_AGC_DJSET
   desc: AGC preset
   <source>
     *: "DJ-Set (slow)"
   </source>
   <dest>
-    *: "DJ-Set (slow)"
+    *: "DJ-Set (pomalé)"
   </dest>
   <voice>
-    *: "DJ set (slow)"
+    *: "DJ set (pomalé)"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
-  id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
+  id: LANG_AGC_MEDIUM
+  desc: AGC preset
+  <source>
+    *: "Medium"
+  </source>
+  <dest>
+    *: "Středně"
+  </dest>
+  <voice>
+    *: "Středně"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_VOICE
+  desc: AGC preset
+  <source>
+    *: "Voice (fast)"
+  </source>
+  <dest>
+    *: "Hlas (rychle)"
+  </dest>
+  <voice>
+    *: "Hlas (rychle)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_AGC_CLIPTIME
+  desc: in record settings
+  <source>
+    *: "AGC clip time"
+  </source>
+  <dest>
+    *: "Čas skoku AGC"
+  </dest>
+  <voice>
+    *: "Čas skoku AGC"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_PRESET
+  desc: automatic gain control in recording screen
+  <source>
+    *: "AGC"
+  </source>
+  <dest>
+    *: "AGC"
+  </dest>
+  <voice>
+    *: "AGC"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_MAXGAIN
   desc: AGC maximum gain in recording screen
   <source>
     *: "AGC max. gain"
   </source>
   <dest>
-    *: "AGC max. gain"
+    *: "Maximální zesílení AGC"
   </dest>
   <voice>
-    *: "AGC maximum gain"
+    *: "Maximální zesílení AGC"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KBIT_PER_SEC
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "kilobitů za sekundu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_FILENAME
+  desc: Filename header in recording screen
+  user:
+  <source>
+    *: "Filename:"
+  </source>
+  <dest>
+    *: "Soubor:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG
+  desc: in settings_menu.
+  user:
+  <source>
+    *: "Pause on headphone unplug"
+  </source>
+  <dest>
+    *: "Pauza při odpojení sluchátek"
+  </dest>
+  <voice>
+    *: "Pauza při odpojení sluchátek"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_RESUME
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Pause and Resume"
+  </source>
+  <dest>
+    *: "Pauza a pokračování"
+  </dest>
+  <voice>
+    *: "Pauza a pokračování"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_RW
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Duration to rewind"
+  </source>
+  <dest>
+    *: "Délka přetočení"
+  </dest>
+  <voice>
+    *: "Délka přetočení"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_DISABLE_AUTORESUME
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Disable auto-resume if phones not present"
+  </source>
+  <dest>
+    *: "Vypnout automatické pokračování bez sluchátek"
+  </dest>
+  <voice>
+    *: "Vypnout automatické pokračování bez sluchátek"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_REGION
+  desc: fm tuner region setting
+  <source>
+    *: "Region"
+  </source>
+  <dest>
+    *: "Region"
+  </dest>
+  <voice>
+    *: "Region"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_EUROPE
+  desc: fm tuner region europe
+  <source>
+    *: "Europe"
+  </source>
+  <dest>
+    *: "Evropa"
+  </dest>
+  <voice>
+    *: "Evropa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_US
+  desc: fm region us / canada
+  <source>
+    *: "US / Canada"
+  </source>
+  <dest>
+    *: "USA / Kanada"
+  </dest>
+  <voice>
+    *: "USA / Kanada"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_JAPAN
+  desc: fm region japan
+  <source>
+    *: "Japan"
+  </source>
+  <dest>
+    *: "Japonsko"
+  </dest>
+  <voice>
+    *: "Japonsko"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_KOREA
+  desc: fm region korea
+  <source>
+    *: "Korea"
+  </source>
+  <dest>
+    *: "Korea"
+  </dest>
+  <voice>
+    *: "Korea"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RANDOM
+  desc: random folder
+  <source>
+    *: "Random"
+  </source>
+  <dest>
+    *: "Náhodný"
+  </dest>
+  <voice>
+    *: "Náhodný"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUDIOSCROBBLER
+  desc: "Last.fm Log" in the playback menu
+  user:
+  <source>
+    *: "Last.fm Log"
+  </source>
+  <dest>
+    *: "Last.fm záznam"
+  </dest>
+  <voice>
+    *: "Last.fm záznam"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLEASE_REBOOT
+  desc: when activating an option that requires a reboot
+  user:
+  <source>
+    *: "Please reboot to enable"
+  </source>
+  <dest>
+    *: "Restartujte pro zapnutí"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DITHERING
+  desc: in the sound settings menu
+  user:
+  <source>
+    *: "Dithering"
+  </source>
+  <dest>
+    *: "?? Chvění ??"
+  </dest>
+  <voice>
+    *: "?? Chvění ??"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PITCH_UP_SEMITONE
+  desc: in wps
+  user:
+  <source>
+    *: "Semitone Up"
+  </source>
+  <dest>
+    *: "O půl tónu výš"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PITCH_DOWN_SEMITONE
+  desc: in wps
+  user:
+  <source>
+    *: "Semitone Down"
+  </source>
+  <dest>
+    *: "O půl tónu níž"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_FORMAT
+  desc: audio format item in recording menu
+  user:
+  <source>
+    *: "Format"
+  </source>
+  <dest>
+    *: "Formát"
+  </dest>
+  <voice>
+    *: "Formát"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_MPA_L3
+  desc: audio format description
+  user:
+  <source>
+    *: "MPEG Layer 3"
+  </source>
+  <dest>
+    *: "MPEG3"
+  </dest>
+  <voice>
+    *: "MPEG3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_PCM_WAV
+  desc: audio format description
+  user:
+  <source>
+    *: "PCM Wave"
+  </source>
+  <dest>
+    *: "PCM Wave"
+  </dest>
+  <voice>
+    *: "PCM Wave"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_WAVPACK
+  desc: audio format description
+  user:
+  <source>
+    *: "WavPack"
+  </source>
+  <dest>
+    *: "WavPack"
+  </dest>
+  <voice>
+    *: "WavPack"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENCODER_SETTINGS
+  desc: encoder settings
+  user:
+  <source>
+    *: "Encoder Settings"
+  </source>
+  <dest>
+    *: "Nastavení enkóderu"
+  </dest>
+  <voice>
+    *: "Nastavení enkóderu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_SETTINGS
+  desc: when something has settings in a certain context
+  user:
+  <source>
+    *: "(No Settings)"
+  </source>
+  <dest>
+    *: "(Žádné nastavení)"
+  </dest>
+  <voice>
+    *: "Žádné nastavení není k dispozici"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOURCE_FREQUENCY
+  desc: when recording source frequency setting must follow source
+  user:
+  <source>
+    *: "(Same As Source)"
+  </source>
+  <dest>
+    *: "(Jako zdroj)"
+  </dest>
+  <voice>
+    *: "Jako zdroj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BITRATE
+  desc: bits-kilobits per unit time
+  user:
+  <source>
+    *: "Bitrate"
+  </source>
+  <dest>
+    *: "Datový tok"
+  </dest>
+  <voice>
+    *: "Datový tok"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_TYPE
+  desc: in recording trigger menu
+  <source>
+    *: "Trigtype"
+  </source>
+  <dest>
+    *: "Typ spouště"
+  </dest>
+  <voice>
+    *: "Typ spouště"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_STOP
+  desc: trigger types
+  <source>
+    *: "Stop"
+  </source>
+  <dest>
+    *: "Zastavení"
+  </dest>
+  <voice>
+    *: "Zastavení"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_PAUSE
+  desc: trigger types
+  <source>
+    *: "Pause"
+  </source>
+  <dest>
+    *: "Pauza"
+  </dest>
+  <voice>
+    *: "Pauza"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_NEWFILESTP
+  desc: trigger types
+  <source>
+    *: "New file"
+  </source>
+  <dest>
+    *: "Nový Soubor"
+  </dest>
+  <voice>
+    *: "Nový soubor"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARNING_BATTERY_LOW
+  desc: general warning
+  user:
+  <source>
+    *: "WARNING! Low Battery!"
+  </source>
+  <dest>
+    *: "VAROVÁNÍ! Slabá baterie!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARNING_BATTERY_EMPTY
+  desc: general warning
+  user:
+  <source>
+    *: "Battery empty! RECHARGE!"
+  </source>
+  <dest>
+    *: "VAROVÁNÍ! Prázdná baterie!"
+  </dest>
+  <voice>
+    *: ""
   </voice>
 </phrase>
