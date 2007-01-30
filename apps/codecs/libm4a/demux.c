@@ -762,7 +762,11 @@ int qtmovie_read(stream_t *file, demux_res_t *demux_res)
             read_chunk_mdat(&qtmovie, chunk_len);
             /* Keep track of start of stream in file - used for seeking */
             qtmovie.res->mdat_offset=stream_tell(qtmovie.stream);
-            return 1;
+            /* There can be empty mdats before the real one. If so, skip them */
+            if (qtmovie.res->mdat_len > 0) {
+                return 1;
+            }
+            break;
 
             /*  these following atoms can be skipped !!!! */
         case MAKEFOURCC('f','r','e','e'):

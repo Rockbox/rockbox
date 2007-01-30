@@ -157,6 +157,12 @@ next_track:
         {
             ci->advance_buffer(file_offset - ci->curpos);
         }
+        else if (file_offset == 0)
+        {
+            LOGF("AAC: get_sample_offset error\n");
+            err = CODEC_ERROR;
+            goto done;
+        }
         
         /* Request the required number of bytes from the input buffer */
         buffer=ci->request_buffer(&n,sample_byte_size);
