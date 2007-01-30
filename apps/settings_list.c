@@ -514,7 +514,7 @@ const struct settings_list settings[] = {
     {F_T_INT,GS(eq_precut),LANG_EQUALIZER_PRECUT,INT(0),
         "eq precut",NULL,UNUSED},
     /* 0..32768 Hz */
-    {F_T_INT,GS(eq_band0_cutoff),LANG_EQUALIZER_BAND_CUTOFF,INT(0),
+    {F_T_INT,GS(eq_band0_cutoff),LANG_EQUALIZER_BAND_CUTOFF,INT(60),
         "eq band 0 cutoff",NULL,UNUSED},
     {F_T_INT,GS(eq_band1_cutoff),LANG_EQUALIZER_BAND_CUTOFF,INT(200),
         "eq band 1 cutoff",NULL,UNUSED},
