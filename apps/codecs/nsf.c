@@ -608,7 +608,7 @@ struct FME07Wave
     int32_t     nMixL;
 };
 
-int16_t     FME07_nOutputTable_L[3][0x10] IDATA_ATTR;
+int16_t     FME07_nOutputTable_L[0x10] IDATA_ATTR;
 
 struct N106Wave
 {
@@ -618,15 +618,15 @@ struct N106Wave
     uint8_t     bAutoIncrement;
     uint8_t     nCurrentAddress;
     uint8_t     nRAM[0x100];      /* internal memory for registers/wave data */
-    float       fFrequencyLookupTable[8]; /* lookup tbl for freq conversions */
+    int32_t     nFrequencyLookupTable[8]; /* lookup tbl for freq conversions */
 
     /*
      *  Individual channel stuff
      */
     /*  Wavelength / Frequency */
     union QUAD  nFreqReg[8];
-    float       fFreqTimer[8];
-    float       fFreqCount[8];
+    int32_t     nFreqTimer[8];
+    int32_t     nFreqCount[8];
 
     /*  Wave data length / remaining */
     uint8_t     nWaveSize[8];
@@ -648,7 +648,7 @@ struct N106Wave
     int32_t     nMixL[8];
 };
 
-int16_t     N106_nOutputTable_L[8][0x10][0x10];
+int16_t     N106_nOutputTable_L[0x10][0x10];
 
 struct VRC6PulseWave
 {
@@ -673,7 +673,7 @@ struct VRC6PulseWave
     
 };
 
-int16_t     VRC6Pulse_nOutputTable_L[2][0x10] IDATA_ATTR;
+int16_t     VRC6Pulse_nOutputTable_L[0x10] IDATA_ATTR;
 
 struct VRC6SawWave
 {
@@ -733,7 +733,7 @@ struct Wave_Squares
     int32_t         nMixL;
 };
 
-int16_t     Squares_nOutputTable_L[0x100] IDATA_ATTR;
+int16_t     Squares_nOutputTable_L[0x10][0x10] IDATA_ATTR;
 
 struct Wave_TND
 {
@@ -828,7 +828,7 @@ struct Wave_Squares mWave_Squares IDATA_ATTR; /* Square channels 1 and 2 */
 struct Wave_TND     mWave_TND IDATA_ATTR;     /* Triangle/Noise/DMC channels */
 struct VRC6PulseWave    mWave_VRC6Pulse[2] IDATA_ATTR;
 struct VRC6SawWave  mWave_VRC6Saw IDATA_ATTR;
-struct N106Wave     mWave_N106;
+struct N106Wave     mWave_N106 IDATA_ATTR;
 struct FDSWave      mWave_FDS IDATA_ATTR;
 struct FME07Wave    mWave_FME07[3] IDATA_ATTR; /* FME-07's 3 pulse channels */
 
@@ -861,20 +861,20 @@ inline void Wave_N106_DoTicks(const int32_t ticks)
 
         {
             mWave_N106.nMixL[i] = 
-                N106_nOutputTable_L[i][mWave_N106.nVolume[i]]
+                N106_nOutputTable_L[mWave_N106.nVolume[i]]
                                       [mWave_N106.nOutput[i]];
             
-            if(mWave_N106.fFreqTimer[i] < 0)
-                mWave_N106.fFreqTimer[i] =
-                 (mWave_N106.fFrequencyLookupTable[mWave_N106.nActiveChannels] /
+            if(mWave_N106.nFreqTimer[i] < 0)
+                mWave_N106.nFreqTimer[i] =
+                 (mWave_N106.nFrequencyLookupTable[mWave_N106.nActiveChannels] /
                  mWave_N106.nFreqReg[i].D);
-            if(mWave_N106.fFreqCount[i] > mWave_N106.fFreqTimer[i])
-                mWave_N106.fFreqCount[i] = mWave_N106.fFreqTimer[i];
+            if(mWave_N106.nFreqCount[i] > mWave_N106.nFreqTimer[i])
+                mWave_N106.nFreqCount[i] = mWave_N106.nFreqTimer[i];
 
-            mWave_N106.fFreqCount[i] -= ticks;
-            while(mWave_N106.fFreqCount[i] <= 0)
+            mWave_N106.nFreqCount[i] -= ticks << 8;
+            while(mWave_N106.nFreqCount[i] <= 0)
             {
-                mWave_N106.fFreqCount[i] += mWave_N106.fFreqTimer[i];
+                mWave_N106.nFreqCount[i] += mWave_N106.nFreqTimer[i];
                 if(mWave_N106.nWaveRemaining[i])
                 {
                     mWave_N106.nWaveRemaining[i]--;
@@ -1094,13 +1094,6 @@ inline void Wave_TND_ClockMinor()
 /****************** NSF Core ******************/
 
 /* start globals */
-/*
- *  Initialization flags (TODO: make extinct)
- */
-uint8_t     bMemoryOK;             /* did memory get allocated ok? */
-uint8_t     bFileLoaded;           /* is a file loaded? */
-uint8_t     bTrackSelected;        /* did they select a track? */
-uint8_t     bIsGeneratingSamples;  /* currently generating samples... */
 
 /*
  *  Memory
@@ -1926,15 +1919,15 @@ void  WriteMemory_N106(uint16_t a,uint8_t v)
 #define N106REGWRITE(ch,r0,r1,r2,r3,r4)                         \
     case r0:    if(mWave_N106.nFreqReg[ch].B.l == v) break;     \
                 mWave_N106.nFreqReg[ch].B.l = v;                \
-                mWave_N106.fFreqTimer[ch] = -1.0f;              \
+                mWave_N106.nFreqTimer[ch] = -1;              \
                 break;                                          \
     case r1:    if(mWave_N106.nFreqReg[ch].B.h == v) break;     \
                 mWave_N106.nFreqReg[ch].B.h = v;                \
-                mWave_N106.fFreqTimer[ch] = -1.0f;              \
+                mWave_N106.nFreqTimer[ch] = -1;              \
                 break;                                          \
     case r2:    if(mWave_N106.nFreqReg[ch].B.w != (v & 3)){     \
                     mWave_N106.nFreqReg[ch].B.w = v & 0x03;     \
-                    mWave_N106.fFreqTimer[ch] = -1.0f;}         \
+                    mWave_N106.nFreqTimer[ch] = -1;}         \
                 mWave_N106.nWaveSize[ch] = 0x20 - (v & 0x1C);   \
                 break;                                          \
     case r3:    mWave_N106.nWavePosStart[ch] = v;               \
@@ -1956,14 +1949,14 @@ void  WriteMemory_N106(uint16_t a,uint8_t v)
                 v = (v >> 4) & 7;
                 if(mWave_N106.nActiveChannels == v) break;
                 mWave_N106.nActiveChannels = v;
-                mWave_N106.fFreqTimer[0] = -1.0f;
-                mWave_N106.fFreqTimer[1] = -1.0f;
-                mWave_N106.fFreqTimer[2] = -1.0f;
-                mWave_N106.fFreqTimer[3] = -1.0f;
-                mWave_N106.fFreqTimer[4] = -1.0f;
-                mWave_N106.fFreqTimer[5] = -1.0f;
-                mWave_N106.fFreqTimer[6] = -1.0f;
-                mWave_N106.fFreqTimer[7] = -1.0f;
+                mWave_N106.nFreqTimer[0] = -1;
+                mWave_N106.nFreqTimer[1] = -1;
+                mWave_N106.nFreqTimer[2] = -1;
+                mWave_N106.nFreqTimer[3] = -1;
+                mWave_N106.nFreqTimer[4] = -1;
+                mWave_N106.nFreqTimer[5] = -1;
+                mWave_N106.nFreqTimer[6] = -1;
+                mWave_N106.nFreqTimer[7] = -1;
                 break;
         }
 #undef N106REGWRITE
@@ -2010,7 +2003,8 @@ void EmulateAPU(uint8_t bBurnCPUCycles)
     int64_t diff;
     
     int32_t tnd_out;
-    uint8_t square_out;
+    int square_out1;
+    int square_out2;
     
     ENTER_TIMER(apu);
     
@@ -2041,16 +2035,18 @@ void EmulateAPU(uint8_t bBurnCPUCycles)
         if((mWave_Squares.nDutyCount[0] < mWave_Squares.nDutyCycle[0]) &&
             mWave_Squares.nLengthCount[0] &&
             !mWave_Squares.bSweepForceSilence[0])
-            square_out = (mWave_Squares.nVolume[0] << 4);
+            square_out1 = mWave_Squares.nVolume[0];
         else
-            square_out = 0;
+            square_out1 = 0;
 
         if((mWave_Squares.nDutyCount[1] < mWave_Squares.nDutyCycle[1]) &&
             mWave_Squares.nLengthCount[1] &&
             !mWave_Squares.bSweepForceSilence[1])
-            square_out |= mWave_Squares.nVolume[1];
+            square_out2 = mWave_Squares.nVolume[1];
+        else
+            square_out2 = 0;
 
-        mWave_Squares.nMixL = Squares_nOutputTable_L[square_out];
+        mWave_Squares.nMixL = Squares_nOutputTable_L[square_out1][square_out2];
 
         if(mWave_Squares.nFreqCount[0]<=0)
         {
@@ -2233,7 +2229,7 @@ void EmulateAPU(uint8_t bBurnCPUCycles)
                        mWave_VRC6Pulse[0].nDutyCycle)
                     {
                         mWave_VRC6Pulse[0].nMixL =
-                            VRC6Pulse_nOutputTable_L[0]
+                            VRC6Pulse_nOutputTable_L
                                 [mWave_VRC6Pulse[0].nVolume];
                     } else mWave_VRC6Pulse[0].nMixL = 0;
 
@@ -2255,7 +2251,7 @@ void EmulateAPU(uint8_t bBurnCPUCycles)
                        mWave_VRC6Pulse[1].nDutyCycle)
                     {
                         mWave_VRC6Pulse[1].nMixL =
-                            VRC6Pulse_nOutputTable_L[1]
+                            VRC6Pulse_nOutputTable_L
                                 [mWave_VRC6Pulse[1].nVolume];
                     } else mWave_VRC6Pulse[1].nMixL = 0;
 
@@ -2300,7 +2296,7 @@ void EmulateAPU(uint8_t bBurnCPUCycles)
                     if(mWave_FME07[0].nDutyCount < 16)
                     {
                         mWave_FME07[0].nMixL =
-                            FME07_nOutputTable_L[0][mWave_FME07[0].nVolume];
+                            FME07_nOutputTable_L[mWave_FME07[0].nVolume];
                     } else mWave_FME07[0].nMixL = 0;
                     while(mWave_FME07[0].nFreqCount <= 0) {
                         mWave_FME07[0].nFreqCount +=
@@ -2318,7 +2314,7 @@ void EmulateAPU(uint8_t bBurnCPUCycles)
                     if(mWave_FME07[1].nDutyCount < 16)
                     {
                         mWave_FME07[1].nMixL =
-                            FME07_nOutputTable_L[1][mWave_FME07[1].nVolume];
+                            FME07_nOutputTable_L[mWave_FME07[1].nVolume];
                     } else mWave_FME07[1].nMixL = 0;
                     while(mWave_FME07[1].nFreqCount <= 0) {
                         mWave_FME07[1].nFreqCount +=
@@ -2336,7 +2332,7 @@ void EmulateAPU(uint8_t bBurnCPUCycles)
                     if(mWave_FME07[2].nDutyCount < 16)
                     {
                         mWave_FME07[2].nMixL =
-                            FME07_nOutputTable_L[2][mWave_FME07[2].nVolume];
+                            FME07_nOutputTable_L[mWave_FME07[2].nVolume];
                     } else mWave_FME07[2].nMixL = 0;
                     while(mWave_FME07[2].nFreqCount <= 0) {
                         mWave_FME07[2].nFreqCount +=
@@ -2589,12 +2585,6 @@ int NSFCore_Initialize()
     int32_t i;
     /* clear globals */
     /* why, yes, this was easier when they were in a struct */
-    
-    /* Initialization flags */
-    bMemoryOK=0;
-    bFileLoaded=0;
-    bTrackSelected=0;
-    bIsGeneratingSamples=0;
 
     /*
      *  Memory
@@ -2734,17 +2724,14 @@ int NSFCore_Initialize()
     SetPlaybackOptions(nSampleRate);
 
     for(i = 0; i < 8; i++)
-        mWave_N106.fFrequencyLookupTable[i] =
-            (((i + 1) * 45 * 0x40000) / (float)NES_FREQUENCY) *
-            (float)NTSC_FREQUENCY;
+        mWave_N106.nFrequencyLookupTable[i] =
+            ((((i + 1) * 45 * 0x40000) / (float)NES_FREQUENCY) *
+            (float)NTSC_FREQUENCY) * 256.0;
 
-    if(bMemoryOK)       return 1;
-    
     ZEROMEMORY(pRAM,0x800);
     ZEROMEMORY(pSRAM,0x2000);
     ZEROMEMORY(pExRAM,0x1000);
     pStack = pRAM + 0x100;
-    bMemoryOK = 1;
     return 1;
 }
 
@@ -2754,14 +2741,10 @@ int NSFCore_Initialize()
 
 int LoadNSF(int32_t datasize)
 {
-    if(!bMemoryOK)  return 0;
-
     if(!pDataBuffer)                return 0;
 
     int32_t i;
 
-    bFileLoaded = 0;
-    bTrackSelected = 0;
     nExternalSound = nChipExtensions;
     if(nIsPal & 2)
         bPALMode = bPALPreference;
@@ -2838,8 +2821,6 @@ int LoadNSF(int32_t datasize)
     nExternalSound = nChipExtensions;
     fNSFPlaybackSpeed = (bPALMode ? PAL_NMIRATE : NTSC_NMIRATE);
     
-    bFileLoaded = 1;
-
     SetPlaybackSpeed(0);
 
     nPlayAddress = nfilePlayAddress;
@@ -2935,9 +2916,7 @@ int LoadNSF(int32_t datasize)
 void SetTrack(uint8_t track)
 {
     int32_t i;
-    if(!bFileLoaded)        return;
     
-    bTrackSelected = 1;
     nCurTrack = track;
 
     regPC = 0x5000;
@@ -3086,7 +3065,6 @@ void SetPlaybackSpeed(float playspersec)
 {
     if(playspersec < 1)
     {
-        if(!bFileLoaded)    return;
         playspersec = fNSFPlaybackSpeed;
     }
 
@@ -3137,7 +3115,6 @@ void RecalcSilenceTracker()
 void RebuildOutputTables(void) {
     int32_t i,j;
     float l[3];
-    int32_t v;
     int32_t temp;
     float ftemp;
     
@@ -3166,60 +3143,49 @@ void RebuildOutputTables(void) {
         l[i] = 255;
     }
 
-    for(i = 0; i < 0x100; i++)
+    for(j = 0; j < 0x10; j++)
     {
-        temp = (int32_t)(l[0] * (i >> 4));
-        temp += (int32_t)(l[1] * (i & 0x0F));
+        for(i = 0; i < 0x10; i++)
+        {
+            temp = (int32_t)(l[0] * j);
+            temp += (int32_t)(l[1] * i);
 
-        if(!temp)
-            Squares_nOutputTable_L[i] = 0;
-        else
-            Squares_nOutputTable_L[i] = 1438200 / ((2072640 / temp) + 100);
-            
+            if(!temp)
+                Squares_nOutputTable_L[j][i] = 0;
+            else
+                Squares_nOutputTable_L[j][i] = 1438200 / ((2072640 / temp) + 100);
+        }
     }
-    
-    /* TODO: only one table needed for both */
+
     /* VRC6 Pulse 1,2 */
-    /*CalculateChannelVolume(1875,&tl,255);*/
     for(i = 0; i < 0x10; i++)
     {
-        VRC6Pulse_nOutputTable_L[0][i] = VRC6Pulse_nOutputTable_L[1][i] =
+        VRC6Pulse_nOutputTable_L[i] =
             1875 * i / 0x0F;
     }
     /* VRC6 Saw */
-    /*CalculateChannelVolume(3750,&tl,255);*/
     for(i = 0; i < 0x20; i++)
     {
         VRC6Saw_nOutputTable_L[i] = 3750 * i / 0x1F;
     }
 
-    /* TODO: only one table needed for all 8 */
     /* N106 channels */
-    for(v = 0; v < 8; v++)
-    {
-        /*CalculateChannelVolume(3000,&tl,255);
-         this amplitude is just a guess */
+    /* this amplitude is just a guess */
 
-        for(i = 0; i < 0x10; i++)
+    for(i = 0; i < 0x10; i++)
+    {
+        for(j = 0; j < 0x10; j++)
         {
-            for(j = 0; j < 0x10; j++)
-            {
-                N106_nOutputTable_L[v][i][j] = (3000 * i * j) / 0xE1;
-            }
+            N106_nOutputTable_L[i][j] = (3000 * i * j) / 0xE1;
         }
     }
     
-    /* TODO: only one table needed for all 3 */ 
     /* FME-07 Square A,B,C */
-    /*CalculateChannelVolume(3000,&tl,255);*/
-    FME07_nOutputTable_L[0][15] = FME07_nOutputTable_L[1][15] =
-        FME07_nOutputTable_L[2][15] = 3000;
-    FME07_nOutputTable_L[0][0] = FME07_nOutputTable_L[1][0] =
-        FME07_nOutputTable_L[2][0] = 0;
+    FME07_nOutputTable_L[15] = 3000;
+    FME07_nOutputTable_L[0] = 0;
     for(i = 14; i > 0; i--)
     {
-        FME07_nOutputTable_L[0][i] = FME07_nOutputTable_L[1][i] =
-        FME07_nOutputTable_L[2][i] = FME07_nOutputTable_L[0][i + 1] * 80 / 100;
+        FME07_nOutputTable_L[i] = FME07_nOutputTable_L[i + 1] * 80 / 100;
     }
 
     /*
@@ -3229,7 +3195,6 @@ void RebuildOutputTables(void) {
      *  Given the number of steps available in an FDS wave... it seems like
      *  it should be much much more... but then it's TOO loud.
      */
-    /*CalculateChannelVolume(4000,&tl,255);*/
     for(i = 0; i < 0x21; i++)
     {
         for(j = 0; j < 0x40; j++)
@@ -3369,12 +3334,7 @@ int32_t GetSamples(uint8_t* buffer,int32_t buffersize)
 {
     if(!buffer)                             return 0;
     if(buffersize < 16)                     return 0;
-    if(!bTrackSelected)                     return 0;
     if(bFade && (nTotalPlays >= nEndFade))  return 0;
-    if(bIsGeneratingSamples)                return 0;
-    
-    bIsGeneratingSamples = 1;
-
     
     pOutput = buffer;
     uint32_t runtocycle =
@@ -3430,7 +3390,6 @@ int32_t GetSamples(uint8_t* buffer,int32_t buffersize)
     }
 
     nCPUCycle = nAPUCycle = 0;
-    bIsGeneratingSamples = 0;
 
     if(nSilentSampleMax && bFade)
     {
