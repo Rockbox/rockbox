@@ -189,8 +189,10 @@ static bool           wav_queue_empty; /* all wav chunks processed?        */
  
 /** file flushing **/
 static int            write_threshold; /* max chunk limit for data flush   */
-static int            panic_threshold; /* boost thread prio when here      */
 static int            spinup_time = -1;/* last ata_spinup_time             */
+#ifdef HAVE_PRIORITY_SCHEDULING
+static int            panic_threshold; /* boost thread prio when here      */
+#endif
 
 /** encoder events **/
 static void (*enc_events_callback)(enum enc_events event, void *data);
@@ -798,19 +800,22 @@ static void pcmrec_end_file(void)
  */
 static void pcmrec_flush(unsigned flush_num)
 {
+#ifdef HAVE_PRIORITY_SCHEDULING
     static unsigned long last_flush_tick = 0;
     unsigned long start_tick;
-    int num_ready, num;
-#ifdef HAVE_PRIORITY_SCHEDULING
+    int num;
     int prio;
 #endif
+    int num_ready;
     int i;
 
     num_ready = enc_wr_index - enc_rd_index;
     if (num_ready < 0)
         num_ready += enc_num_chunks;
 
+#ifdef HAVE_PRIORITY_SCHEDULING
     num = num_ready;
+#endif
 
     if (flush_num == 0)
     {
@@ -835,23 +840,26 @@ static void pcmrec_flush(unsigned flush_num)
 
             if (write_threshold < 0)
                 write_threshold = 0;
+#ifdef HAVE_PRIORITY_SCHEDULING
             else if (write_threshold > panic_threshold)
                 write_threshold = panic_threshold;
-
+#endif
             logf("new wr thresh: %d", write_threshold);
         }
 
         if (num_ready < write_threshold)
             return;
 
+#ifdef HAVE_PRIORITY_SCHEDULING
         /* if we're getting called too much and this isn't forced,
            boost stat */
         if (current_tick - last_flush_tick < HZ/2)
             num = panic_threshold;
+#endif
     }
 
-    start_tick = current_tick;
 #ifdef HAVE_PRIORITY_SCHEDULING
+    start_tick = current_tick;
     prio = -1;
 #endif
 
@@ -897,17 +905,16 @@ static void pcmrec_flush(unsigned flush_num)
 
 #ifdef HAVE_PRIORITY_SCHEDULING
         if (prio == -1)
-#endif
         {
             num = enc_wr_index - enc_rd_index;
             if (num < 0)
                 num += enc_num_chunks;
         }
-
+#endif
         /* no yielding, the file apis called in the codecs do that */
     } /* end for */
 
-        /* sync file */
+    /* sync file */
     if (rec_fdata.rec_file >= 0)
         fsync(rec_fdata.rec_file);
 
@@ -920,9 +927,10 @@ static void pcmrec_flush(unsigned flush_num)
         logf("pcmrec: unboost priority");
         thread_set_priority(NULL, prio);
     }
-#endif
 
     last_flush_tick = current_tick; /* save tick when we left */
+#endif
+
     logf("done");
 } /* pcmrec_flush */
 
@@ -1560,6 +1568,7 @@ void enc_set_parameters(struct enc_parameters *params)
     *wrap_id_p = ENC_CHUNK_MAGIC;
 #endif /* PCMREC_PARANOID */
 
+#ifdef HAVE_PRIORITY_SCHEDULING
     /* panic boost thread priority at 1 second remaining */
     panic_threshold = enc_num_chunks -
                       (4*sample_rate + (enc_chunk_size-1)) / enc_chunk_size;
@@ -1567,6 +1576,7 @@ void enc_set_parameters(struct enc_parameters *params)
         panic_threshold = 0;
 
     logf("panic thr:%d", panic_threshold);
+#endif
 
     /** set OUT parameters **/
     params->enc_buffer     = enc_buffer;
