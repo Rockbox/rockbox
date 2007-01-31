@@ -27,7 +27,10 @@ void power_init(void)
 
 void power_off(void)
 {
-    pp_i2c_send(0x46, 0x20, 0x20);
+    char byte;
+    byte = i2c_readbyte(0x46, 0x20);
+    byte &= ~0x1;   
+    pp_i2c_send(0x46, 0x20, byte);
 }
 
 bool charger_inserted(void)
