@@ -47,6 +47,10 @@ blackjack.c
 bounce.c
 bubbles.c
 
+#if (LCD_DEPTH >= 2) && !defined(IPOD_MINI) && !defined(IPOD_MINI2G) && !defined(IRIVER_H10_5GB)
+invadrox.c
+#endif
+
 #if LCD_WIDTH != 128  && !defined(SANSA_E200)
 /* These need adjusting for the iRiver if'p screen */
 brickmania.c

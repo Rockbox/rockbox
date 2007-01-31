@@ -1,5 +1,57 @@
 #ifdef HAVE_LCD_BITMAP
 
+/* Brickmania */
+#if (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176) && (LCD_DEPTH == 16)
+#if (LCD_WIDTH == 320)
+brickmania_menu_bg.320x240x16.bmp
+brickmania_bricks.320x240x16.bmp
+brickmania_pads.320x240x16.bmp
+brickmania_break.320x240x16.bmp
+brickmania_powerups.320x240x16.bmp
+#else
+brickmania_menu_bg.220x176x16.bmp
+brickmania_bricks.220x176x16.bmp
+brickmania_pads.220x176x16.bmp
+brickmania_break.220x176x16.bmp
+brickmania_powerups.220x176x16.bmp
+#endif
+brickmania_ball.220x176x16.bmp
+brickmania_menu_items.220x176x16.bmp
+brickmania_gameover.220x176x16.bmp
+#elif (((LCD_WIDTH == 160) && (LCD_HEIGHT == 128)) || \
+       ((LCD_WIDTH == 138) && (LCD_HEIGHT == 110))) && (LCD_DEPTH == 2)
+brickmania_menu_items.160x128x2.bmp
+brickmania_ball.160x128x2.bmp
+#if (LCD_WIDTH == 160)
+brickmania_bricks.160x128x2.bmp
+#else
+brickmania_bricks.138x110x2.bmp
+#endif
+brickmania_gameover.160x128x2.bmp
+brickmania_menu_bg.160x128x2.bmp
+brickmania_pads.160x128x2.bmp
+brickmania_powerups.160x128x2.bmp
+brickmania_break.160x128x2.bmp
+#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 16)
+brickmania_menu_items.160x128x16.bmp
+brickmania_ball.160x128x16.bmp
+brickmania_bricks.160x128x16.bmp
+brickmania_gameover.160x128x16.bmp
+brickmania_menu_bg.160x128x16.bmp
+brickmania_pads.160x128x16.bmp
+brickmania_powerups.160x128x16.bmp
+brickmania_break.160x128x16.bmp
+#elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 132) && (LCD_DEPTH == 16)
+brickmania_menu_items.176x132x16.bmp
+brickmania_ball.176x132x16.bmp
+brickmania_bricks.176x132x16.bmp
+brickmania_gameover.176x132x16.bmp
+brickmania_menu_bg.176x132x16.bmp
+brickmania_pads.176x132x16.bmp
+brickmania_powerups.176x132x16.bmp
+brickmania_break.176x132x16.bmp
+#endif
+
 /* Bubbles */
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
 bubbles_emblem.112x64x1.bmp
@@ -51,6 +103,59 @@ chessbox_pieces.80x64x1.bmp
 chessbox_pieces.64x64x1.bmp
 #endif
 
+/* Flipit */
+#ifdef HAVE_LCD_COLOR
+#if LCD_WIDTH >= 280 && LCD_HEIGHT >= 234
+flipit_cursor.56x56x16.bmp
+flipit_tokens.56x112x16.bmp
+#elif LCD_WIDTH >= 200 && LCD_HEIGHT >= 170
+flipit_cursor.40x40x16.bmp
+flipit_tokens.40x80x16.bmp
+#elif LCD_WIDTH >= 140 && LCD_HEIGHT >= 122
+flipit_cursor.28x28x16.bmp
+flipit_tokens.28x56x16.bmp
+#elif LCD_WIDTH >= 125 && LCD_HEIGHT >= 110
+flipit_cursor.25x25x16.bmp
+flipit_tokens.25x50x16.bmp
+#endif
+#elif LCD_DEPTH > 1 /* greyscale */
+#if LCD_WIDTH >= 140 && LCD_HEIGHT >= 122
+flipit_tokens.28x56x2.bmp
+#elif LCD_WIDTH >= 125 && LCD_HEIGHT >= 110
+flipit_tokens.25x50x2.bmp
+#endif
+#else /* monochrome */
+#if LCD_WIDTH >= 80 && LCD_HEIGHT >= 62
+flipit_tokens.16x26x1.bmp
+#endif
+#endif
+
+/* Invadrox */
+#if (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
+invadrox.320x240x16.bmp
+invadrox_left.320x240x16.bmp
+invadrox_right.320x240x16.bmp
+#elif (LCD_WIDTH == 220) && (LCD_HEIGHT == 176)
+/* Use iPod Video character bitmap */
+invadrox.320x240x16.bmp
+#elif (LCD_WIDTH == 240) && (LCD_HEIGHT == 320)
+/* Use iPod Video character bitmap */
+invadrox.320x240x16.bmp
+invadrox_logo.240x320x16.bmp
+#elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 132)
+invadrox.176x132x16.bmp
+#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH >= 8)
+/* Use iPod Nano character bitmap */
+invadrox.176x132x16.bmp
+#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 2)
+/* Grayscale */
+invadrox.160x128x2.bmp
+#elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 220)
+/* Use iPod Nano character bitmap */
+invadrox.176x132x16.bmp
+invadrox_logo.176x220x16.bmp
+#endif
+
 /* Jewels */
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
 jewels.112x64x1.bmp
@@ -74,6 +179,46 @@ jewels.220x176x16.bmp
 jewels.320x240x16.bmp
 #elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
 jewels.320x240x16.bmp
+#endif
+
+/* Minesweeper */
+#ifdef HAVE_LCD_COLOR
+#if ( LCD_HEIGHT * LCD_WIDTH ) / ( 16 * 16 ) >= 130
+minesweeper_tiles.16x16x24.bmp
+#else
+minesweeper_tiles.12x12x24.bmp
+#endif
+#elif LCD_DEPTH > 1
+minesweeper_tiles.12x12x2.bmp
+#else
+minesweeper_tiles.8x8x1.bmp
+#endif
+
+/* Rockblox */
+#if (LCD_WIDTH == 320) && (LCD_HEIGHT == 240) && (LCD_DEPTH == 16)
+rockblox_background.320x240x16.bmp
+#elif (LCD_WIDTH == 240) && (LCD_HEIGHT == 320) && (LCD_DEPTH == 16)
+rockblox_background.240x320x16.bmp
+#elif (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176) && (LCD_DEPTH == 16)
+rockblox_background.220x176x16.bmp
+#elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 132) && (LCD_DEPTH == 16)
+rockblox_background.176x132x16.bmp
+#elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 220) && (LCD_DEPTH == 16)
+rockblox_background.176x220x16.bmp
+#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH >= 16)
+rockblox_background.160x128x16.bmp
+#elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 16)
+rockblox_background.128x128x16.bmp
+#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 2)
+rockblox_background.160x128x2.bmp
+#elif (LCD_WIDTH == 138) && (LCD_HEIGHT == 110) && (LCD_DEPTH == 2)
+rockblox_background.138x110x2.bmp
+#endif
+
+/* Rockpaint */
+#ifdef HAVE_LCD_COLOR
+rockpaint.8x8x24.bmp
+rockpaint_hsvrgb.8x10x24.bmp
 #endif
 
 /* Snake2 */
@@ -129,60 +274,6 @@ sokoban_tiles.6x6.bmp
 sokoban_tiles.6x6x2.bmp
 #endif
 
-/* Flip it */
-#ifdef HAVE_LCD_COLOR
-#if LCD_WIDTH >= 280 && LCD_HEIGHT >= 234
-flipit_cursor.56x56x16.bmp
-flipit_tokens.56x112x16.bmp
-#elif LCD_WIDTH >= 200 && LCD_HEIGHT >= 170
-flipit_cursor.40x40x16.bmp
-flipit_tokens.40x80x16.bmp
-#elif LCD_WIDTH >= 140 && LCD_HEIGHT >= 122
-flipit_cursor.28x28x16.bmp
-flipit_tokens.28x56x16.bmp
-#elif LCD_WIDTH >= 125 && LCD_HEIGHT >= 110
-flipit_cursor.25x25x16.bmp
-flipit_tokens.25x50x16.bmp
-#endif
-#elif LCD_DEPTH > 1 /* greyscale */
-#if LCD_WIDTH >= 140 && LCD_HEIGHT >= 122
-flipit_tokens.28x56x2.bmp
-#elif LCD_WIDTH >= 125 && LCD_HEIGHT >= 110
-flipit_tokens.25x50x2.bmp
-#endif
-#else /* monochrome */
-#if LCD_WIDTH >= 80 && LCD_HEIGHT >= 62
-flipit_tokens.16x26x1.bmp
-#endif
-#endif
-
-/* Star */
-#ifdef HAVE_LCD_COLOR
-#if LCD_WIDTH >= 320 && LCD_HEIGHT >= 188
-star_tiles.20x20.bmp
-#elif LCD_WIDTH >= 240 && LCD_HEIGHT >= 143
-star_tiles.15x15.bmp
-#elif LCD_WIDTH >= 208 && LCD_HEIGHT >= 125
-star_tiles.13x13.bmp
-#elif LCD_WIDTH >= 176 && LCD_HEIGHT >= 107
-star_tiles.11x11.bmp
-#elif LCD_WIDTH >= 160 && LCD_HEIGHT >= 98
-star_tiles.10x10.bmp
-#elif LCD_WIDTH >= 128 && LCD_HEIGHT >= 80
-star_tiles.8x8.bmp
-#endif
-#elif LCD_DEPTH > 1 /* grey */
-#if LCD_WIDTH >= 160 && LCD_HEIGHT >= 98
-star_tiles.10x10.grey.bmp
-#elif LCD_WIDTH >= 128 && LCD_HEIGHT >= 80
-star_tiles.8x8.grey.bmp
-#endif
-#else /* monochrome */
-#if LCD_WIDTH >= 112 && LCD_HEIGHT >= 62
-star_tiles.6x7.mono.bmp
-#endif
-#endif
-
 /* Solitaire */
 #ifdef HAVE_LCD_COLOR
 #if LCD_WIDTH >= 320
@@ -217,6 +308,33 @@ solitaire_suitsi.15x80x2.bmp
 solitaire_cardback.13x13x1.bmp
 solitaire_deck.169x52x1.bmp
 solitaire_suitsi.13x52x1.bmp
+#endif
+#endif
+
+/* Star */
+#ifdef HAVE_LCD_COLOR
+#if LCD_WIDTH >= 320 && LCD_HEIGHT >= 188
+star_tiles.20x20.bmp
+#elif LCD_WIDTH >= 240 && LCD_HEIGHT >= 143
+star_tiles.15x15.bmp
+#elif LCD_WIDTH >= 208 && LCD_HEIGHT >= 125
+star_tiles.13x13.bmp
+#elif LCD_WIDTH >= 176 && LCD_HEIGHT >= 107
+star_tiles.11x11.bmp
+#elif LCD_WIDTH >= 160 && LCD_HEIGHT >= 98
+star_tiles.10x10.bmp
+#elif LCD_WIDTH >= 128 && LCD_HEIGHT >= 80
+star_tiles.8x8.bmp
+#endif
+#elif LCD_DEPTH > 1 /* grey */
+#if LCD_WIDTH >= 160 && LCD_HEIGHT >= 98
+star_tiles.10x10.grey.bmp
+#elif LCD_WIDTH >= 128 && LCD_HEIGHT >= 80
+star_tiles.8x8.grey.bmp
+#endif
+#else /* monochrome */
+#if LCD_WIDTH >= 112 && LCD_HEIGHT >= 62
+star_tiles.6x7.mono.bmp
 #endif
 #endif
 
@@ -267,102 +385,6 @@ sudoku_start.320x240x16.bmp
 sudoku_normal.320x240x16.bmp
 sudoku_inverse.320x240x16.bmp
 #endif
-#endif
-
-/* Brickmania */
-
-#if (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176) && (LCD_DEPTH == 16)
-#if (LCD_WIDTH == 320)
-brickmania_menu_bg.320x240x16.bmp
-brickmania_bricks.320x240x16.bmp
-brickmania_pads.320x240x16.bmp
-brickmania_break.320x240x16.bmp
-brickmania_powerups.320x240x16.bmp
-#else
-brickmania_menu_bg.220x176x16.bmp
-brickmania_bricks.220x176x16.bmp
-brickmania_pads.220x176x16.bmp
-brickmania_break.220x176x16.bmp
-brickmania_powerups.220x176x16.bmp
-#endif
-brickmania_ball.220x176x16.bmp
-brickmania_menu_items.220x176x16.bmp
-brickmania_gameover.220x176x16.bmp
-
-#elif (((LCD_WIDTH == 160) && (LCD_HEIGHT == 128)) || \
-       ((LCD_WIDTH == 138) && (LCD_HEIGHT == 110))) && (LCD_DEPTH == 2)
-brickmania_menu_items.160x128x2.bmp
-brickmania_ball.160x128x2.bmp
-#if (LCD_WIDTH == 160)
-brickmania_bricks.160x128x2.bmp
-#else
-brickmania_bricks.138x110x2.bmp
-#endif
-brickmania_gameover.160x128x2.bmp
-brickmania_menu_bg.160x128x2.bmp
-brickmania_pads.160x128x2.bmp
-brickmania_powerups.160x128x2.bmp
-brickmania_break.160x128x2.bmp
-
-#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 16)
-brickmania_menu_items.160x128x16.bmp
-brickmania_ball.160x128x16.bmp
-brickmania_bricks.160x128x16.bmp
-brickmania_gameover.160x128x16.bmp
-brickmania_menu_bg.160x128x16.bmp
-brickmania_pads.160x128x16.bmp
-brickmania_powerups.160x128x16.bmp
-brickmania_break.160x128x16.bmp
-
-#elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 132) && (LCD_DEPTH == 16)
-brickmania_menu_items.176x132x16.bmp
-brickmania_ball.176x132x16.bmp
-brickmania_bricks.176x132x16.bmp
-brickmania_gameover.176x132x16.bmp
-brickmania_menu_bg.176x132x16.bmp
-brickmania_pads.176x132x16.bmp
-brickmania_powerups.176x132x16.bmp
-brickmania_break.176x132x16.bmp
-
-#endif
-
-/* Rockblox */
-#if (LCD_WIDTH == 320) && (LCD_HEIGHT == 240) && (LCD_DEPTH == 16)
-rockblox_background.320x240x16.bmp
-#elif (LCD_WIDTH == 240) && (LCD_HEIGHT == 320) && (LCD_DEPTH == 16)
-rockblox_background.240x320x16.bmp
-#elif (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176) && (LCD_DEPTH == 16)
-rockblox_background.220x176x16.bmp
-#elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 132) && (LCD_DEPTH == 16)
-rockblox_background.176x132x16.bmp
-#elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 220) && (LCD_DEPTH == 16)
-rockblox_background.176x220x16.bmp
-#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH >= 16)
-rockblox_background.160x128x16.bmp
-#elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 16)
-rockblox_background.128x128x16.bmp
-#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 2)
-rockblox_background.160x128x2.bmp
-#elif (LCD_WIDTH == 138) && (LCD_HEIGHT == 110) && (LCD_DEPTH == 2)
-rockblox_background.138x110x2.bmp
-#endif
-
-#ifdef HAVE_LCD_COLOR
-/* Rockpaint */
-rockpaint.8x8x24.bmp
-rockpaint_hsvrgb.8x10x24.bmp
-#endif
-
-#if defined( HAVE_LCD_COLOR )
-#if ( LCD_HEIGHT * LCD_WIDTH ) / ( 16 * 16 ) >= 130
-minesweeper_tiles.16x16x24.bmp
-#else
-minesweeper_tiles.12x12x24.bmp
-#endif
-#elif LCD_DEPTH > 1
-minesweeper_tiles.12x12x2.bmp
-#else
-minesweeper_tiles.8x8x1.bmp
 #endif
 
 #endif /* HAVE_LCD_BITMAP */
