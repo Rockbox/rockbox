@@ -611,7 +611,7 @@ const struct settings_list settings[] = {
     {F_T_INT,GS(eq_hw_band2_bandwidth),LANG_EQUALIZER_BANDWIDTH,INT(0),
         "eq hardware band 2 bandwidth","narrow,wide",UNUSED},
     {F_T_INT,GS(eq_hw_band2_gain),LANG_EQUALIZER_BAND_GAIN,INT(0),
-        "eq hardware band 1 gain",NULL,UNUSED},
+        "eq hardware band 2 gain",NULL,UNUSED},
 
     {F_T_INT,GS(eq_hw_band3_center),LANG_EQUALIZER_BAND_CENTER,INT(1),
         "eq hardware band 3 center",
@@ -625,7 +625,7 @@ const struct settings_list settings[] = {
         "eq hardware band 4 cutoff",
         "5.3kHz,6.9kHz,9kHz,11.7kHz",UNUSED},
     {F_T_INT,GS(eq_hw_band4_gain),LANG_EQUALIZER_BAND_GAIN,INT(0),
-        "eq hardware band 0 gain",NULL,UNUSED},
+        "eq hardware band 4 gain",NULL,UNUSED},
 #endif
 
     OFFON_SETTING(0,hold_lr_for_scroll_in_list,-1,true,
