@@ -19,6 +19,7 @@
 
 #include <stdbool.h>
 #include "cpu.h"
+#include "i2c-pp.h"
 
 void power_init(void)
 {
@@ -26,6 +27,7 @@ void power_init(void)
 
 void power_off(void)
 {
+    pp_i2c_send(0x46, 0x20, 0x20);
 }
 
 bool charger_inserted(void)
