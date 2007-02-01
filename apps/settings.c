@@ -615,6 +615,12 @@ void sound_settings_apply(void)
     sound_set(SOUND_MDB_ENABLE, global_settings.mdb_enable);
     sound_set(SOUND_SUPERBASS, global_settings.superbass);
 #endif
+
+#ifdef HAVE_USB_POWER
+#ifdef CONFIG_CHARGING
+    usb_charging_enable(global_settings.usb_charging);
+#endif
+#endif
 }
 
 void settings_apply(void)
