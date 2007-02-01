@@ -1254,7 +1254,7 @@ bool browse_id3(void)
     }
 }
 
-
+#if 0 /* Currently unused */
 bool set_rating(void)
 {
     struct mp3entry* id3 = audio_current_track();
@@ -1301,7 +1301,7 @@ bool set_rating(void)
     action_signalscreenchange();
     return false;
 }
-
+#endif
 
 bool view_runtime(void)
 {
