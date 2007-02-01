@@ -178,7 +178,7 @@ static int dircache_scan(struct travel_data *td)
         }
         
         td->ce->attribute = td->entry->attribute;
-        td->ce->name_len = strlen(td->entry->d_name);
+        td->ce->name_len = strlen(td->entry->d_name) + 1;
         td->ce->d_name = ((char *)dircache_root+dircache_size);
         td->ce->size = td->entry->size;
         td->ce->wrtdate = td->entry->wrtdate;
