@@ -402,8 +402,41 @@ static bool cfg_int_to_string(int setting_id, int val, char* buf)
     }
     return true;
 }
+static bool is_changed(int setting_id)
+{
+	const struct settings_list *setting = &settings[setting_id];
+	switch (setting->flags&F_T_MASK)
+	{
+		case F_T_INT:
+		case F_T_UINT:
+			if (setting->flags&F_DEF_ISFUNC)
+			{
+				if (*(int*)setting->setting == setting->default_val.func())
+					return false;
+			}
+			else if (setting->flags&F_T_SOUND)
+			{
+				if (*(int*)setting->setting ==
+					sound_default(setting->sound_setting->setting))
+					return false;
+			}
+			else if (*(int*)setting->setting == setting->default_val.int_)
+				return false;
+			break;
+		case F_T_BOOL:
+			if (*(bool*)setting->setting == setting->default_val.bool_)
+				return false;
+			break;
+		case F_T_CHARPTR:
+		case F_T_UCHARPTR:
+			if (!strcmp((char*)setting->setting, setting->default_val.charptr))
+				return false;
+			break;
+	}
+	return true;
+}
 
-bool settings_write_config(char* filename)
+static bool settings_write_config(char* filename, int options)
 {
     int i;
     int fd;
@@ -418,6 +451,14 @@ bool settings_write_config(char* filename)
         if (settings[i].cfg_name == NULL)
             continue;
         value[0] = '\0';
+		
+		if ((options == SETTINGS_SAVE_CHANGED) &&
+			!is_changed(i))
+			continue;
+		else if ((options == SETTINGS_SAVE_THEME) &&
+			((settings[i].flags&F_THEMESETTING) == 0))
+			continue;
+		
         switch (settings[i].flags&F_T_MASK)
         {
             case F_T_INT:
@@ -477,7 +518,7 @@ static bool flush_config_block_callback(void)
 {
     bool r1, r2;
     r1 = write_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
-    r2 = settings_write_config(CONFIGFILE);
+    r2 = settings_write_config(CONFIGFILE, SETTINGS_SAVE_CHANGED);
     return r1 || r2;
 }
 
@@ -536,7 +577,7 @@ int settings_save( void )
     }
     return 0;
 }
-bool settings_save_config(void)
+bool settings_save_config(int options)
 {
     char filename[MAX_PATH];
 
@@ -554,7 +595,7 @@ bool settings_save_config(void)
         }
     }
 
-    if (settings_write_config(filename))
+    if (settings_write_config(filename, options))
         gui_syncsplash(HZ, true, str(LANG_SETTINGS_SAVED));
     else gui_syncsplash(HZ, true, str(LANG_FAILED));
     return true;

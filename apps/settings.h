@@ -206,7 +206,11 @@ bool settings_load_config(const char* file, bool apply);
 
 void status_save( void );
 int settings_save(void);
-bool settings_save_config(void);
+/* defines for the options paramater */
+#define SETTINGS_SAVE_CHANGED 0
+#define SETTINGS_SAVE_ALL 1
+#define SETTINGS_SAVE_THEME 2
+bool settings_save_config(int options);
 
 void settings_reset(void);
 void sound_settings_apply(void);

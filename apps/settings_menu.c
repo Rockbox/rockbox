@@ -2161,6 +2161,14 @@ static bool time_settings_menu(void)
     return result;
 }
 #endif
+static bool manage_settings_write_config(void)
+{
+	return settings_save_config(SETTINGS_SAVE_ALL);
+}
+static bool manage_settings_write_theme(void)
+{
+	return settings_save_config(SETTINGS_SAVE_THEME);
+}
 
 bool manage_settings_menu(void)
 {
@@ -2170,7 +2178,8 @@ bool manage_settings_menu(void)
     static const struct menu_item items[] = {
         { ID2P(LANG_CUSTOM_CFG),      custom_cfg_browse },
         { ID2P(LANG_RESET),           reset_settings },
-        { ID2P(LANG_SAVE_SETTINGS),   settings_save_config },
+        { ID2P(LANG_SAVE_SETTINGS),   manage_settings_write_config},
+        { ID2P(LANG_SAVE_THEME),      manage_settings_write_theme},
     };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL,

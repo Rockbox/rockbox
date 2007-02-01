@@ -83,10 +83,10 @@ struct int_setting {
 - number of bytes for a NVRAM setting is changed
 - a NVRAM setting is removed
 */
-
+#define F_THEMESETTING	0x800000
 
 struct settings_list {
-    uint32_t             flags;   /* ____ ____ _FFF ____ ____ NNN_ IFRB STTT */
+    uint32_t             flags;   /* ____ ____ TFFF ____ ____ NNN_ IFRB STTT */
     void                *setting;
     int                  lang_id; /* -1 for none */
     union storage_type   default_val;

@@ -155,7 +155,7 @@ const struct settings_list settings[] = {
     /* display */
     OFFON_SETTING(0,invert_cursor, LANG_INVERT_CURSOR,
         true,"invert cursor", NULL),
-    OFFON_SETTING(0,statusbar, LANG_STATUS_BAR, true,"statusbar", NULL),
+    OFFON_SETTING(F_THEMESETTING,statusbar, LANG_STATUS_BAR, true,"statusbar", NULL),
     OFFON_SETTING(0,scrollbar, LANG_SCROLL_BAR, true,"scrollbar", NULL),
 #if CONFIG_KEYPAD == RECORDER_PAD
     OFFON_SETTING(0,buttonbar, LANG_BUTTON_BAR ,true,"buttonbar", NULL),
@@ -287,9 +287,9 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0,scroll_paginated,LANG_SCROLL_PAGINATED,
         false,"scroll paginated",NULL),
 #ifdef HAVE_LCD_COLOR
-    {F_T_INT|F_RGB,GS(fg_color),-1,INT(LCD_DEFAULT_FG),
+    {F_T_INT|F_RGB|F_THEMESETTING ,GS(fg_color),-1,INT(LCD_DEFAULT_FG),
         "foreground color",NULL,UNUSED},
-    {F_T_INT|F_RGB,GS(bg_color),-1,INT(LCD_DEFAULT_BG),
+    {F_T_INT|F_RGB|F_THEMESETTING ,GS(bg_color),-1,INT(LCD_DEFAULT_BG),
         "background color",NULL,UNUSED},
 #endif
     /* more playback */
@@ -676,16 +676,21 @@ const struct settings_list settings[] = {
 
     /** settings not in the old config blocks **/
 #ifdef CONFIG_TUNER
-    FILENAME_SETTING(0,fmr_file,"fmr","",FMPRESET_PATH "/",".fmr",MAX_FILENAME+1),
+    FILENAME_SETTING(F_THEMESETTING, fmr_file, "fmr",
+		"", FMPRESET_PATH "/", ".fmr", MAX_FILENAME+1),
 #endif
-    FILENAME_SETTING(0,font_file,"font","",FONT_DIR "/",".fnt",MAX_FILENAME+1),
-    FILENAME_SETTING(0,wps_file, "wps","",WPS_DIR "/",".wps",MAX_FILENAME+1),
+    FILENAME_SETTING(F_THEMESETTING, font_file, "font",
+		"", FONT_DIR "/", ".fnt", MAX_FILENAME+1),
+    FILENAME_SETTING(F_THEMESETTING,wps_file, "wps",
+		"", WPS_DIR "/", ".wps", MAX_FILENAME+1),
     FILENAME_SETTING(0,lang_file,"lang","",LANG_DIR "/",".lng",MAX_FILENAME+1),
 #ifdef HAVE_REMOTE_LCD
-    FILENAME_SETTING(0,rwps_file,"rwps","",WPS_DIR "/",".rwps",MAX_FILENAME+1),
+    FILENAME_SETTING(F_THEMESETTING,rwps_file,"rwps",
+		"", WPS_DIR "/", ".rwps", MAX_FILENAME+1),
 #endif
 #if LCD_DEPTH > 1
-    FILENAME_SETTING(0,backdrop_file,"backdrop","",BACKDROP_DIR "/",".bmp",MAX_FILENAME+1),
+    FILENAME_SETTING(F_THEMESETTING,backdrop_file,"backdrop",
+		"", BACKDROP_DIR "/", ".bmp", MAX_FILENAME+1),
 #endif
 #ifdef HAVE_LCD_BITMAP
     FILENAME_SETTING(0,kbd_file,"kbd","",ROCKBOX_DIR "/",".kbd",MAX_FILENAME+1),

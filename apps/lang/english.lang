@@ -10473,3 +10473,17 @@
     *: "Play Next"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SAVE_THEME
+  desc: save a theme file
+  user:
+  <source>
+    *: "Save Theme Settings"
+  </source>
+  <dest>
+    *: "Save Theme Settings"
+  </dest>
+  <voice>
+    *: "Save Theme Settings"
+  </voice>
+</phrase>
