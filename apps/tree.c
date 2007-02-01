@@ -1226,7 +1226,7 @@ bool create_playlist(void)
         gui_textarea_update(&screens[i]);
 #endif
     }
-    fd = creat(filename, O_WRONLY);
+    fd = creat(filename);
     if (fd < 0)
         return false;
 

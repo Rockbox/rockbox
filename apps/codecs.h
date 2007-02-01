@@ -90,12 +90,12 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 10
+#define CODEC_API_VERSION 11
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 10
+#define CODEC_MIN_API_VERSION 11
 
 /* codec return codes */
 enum codec_status {
@@ -174,7 +174,7 @@ struct codec_api {
     int (*close)(int fd);
     ssize_t (*read)(int fd, void* buf, size_t count);
     off_t (*PREFIX(lseek))(int fd, off_t offset, int whence);
-    int (*PREFIX(creat))(const char *pathname, mode_t mode);
+    int (*PREFIX(creat))(const char *pathname);
     ssize_t (*write)(int fd, const void* buf, size_t count);
     int (*PREFIX(remove))(const char* pathname);
     int (*PREFIX(rename))(const char* path, const char* newname);

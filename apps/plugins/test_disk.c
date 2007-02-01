@@ -102,7 +102,7 @@ static bool test_fs(void)
     rb->snprintf(text_buf, sizeof text_buf, "FS stress test: %dKB", (TEST_SIZE>>10));
     log_lcd(text_buf, true);
 
-    fd = rb->creat(TEST_FILE, 0);
+    fd = rb->creat(TEST_FILE);
     if (fd < 0)
     {
         rb->splash(0, true, "Couldn't create testfile.");
@@ -193,7 +193,7 @@ static bool test_speed(void)
     log_init();
     log_lcd("Disk speed test", true);
 
-    fd = rb->creat(TEST_FILE, 0);
+    fd = rb->creat(TEST_FILE);
     if (fd < 0)
     {
         rb->splash(0, true, "Couldn't create testfile.");

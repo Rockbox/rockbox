@@ -52,9 +52,8 @@ static struct filedesc openfiles[MAX_OPEN_FILES];
 
 static int flush_cache(int fd);
 
-int creat(const char *pathname, mode_t mode)
+int creat(const char *pathname)
 {
-    (void)mode;
     return open(pathname, O_WRONLY|O_CREAT|O_TRUNC);
 }
 

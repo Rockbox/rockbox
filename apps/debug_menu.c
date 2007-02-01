@@ -1933,14 +1933,14 @@ static bool dbg_save_roms(void)
     int fd;
     int oldmode = system_memory_guard(MEMGUARD_NONE);
 
-    fd = creat("/internal_rom_0000-FFFF.bin", O_WRONLY);
+    fd = creat("/internal_rom_0000-FFFF.bin");
     if(fd >= 0)
     {
         write(fd, (void *)0, 0x10000);
         close(fd);
     }
 
-    fd = creat("/internal_rom_2000000-203FFFF.bin", O_WRONLY);
+    fd = creat("/internal_rom_2000000-203FFFF.bin");
     if(fd >= 0)
     {
         write(fd, (void *)0x2000000, 0x40000);
@@ -1957,11 +1957,11 @@ static bool dbg_save_roms(void)
     int oldmode = system_memory_guard(MEMGUARD_NONE);
 
 #if defined(IRIVER_H100_SERIES)
-    fd = creat("/internal_rom_000000-1FFFFF.bin", O_WRONLY);
+    fd = creat("/internal_rom_000000-1FFFFF.bin");
 #elif defined(IRIVER_H300_SERIES)
-    fd = creat("/internal_rom_000000-3FFFFF.bin", O_WRONLY);
+    fd = creat("/internal_rom_000000-3FFFFF.bin");
 #elif defined(IAUDIO_X5)
-    fd = creat("/internal_rom_000000-3FFFFF.bin", O_WRONLY);
+    fd = creat("/internal_rom_000000-3FFFFF.bin");
 #endif
     if(fd >= 0)
     {
@@ -1971,7 +1971,7 @@ static bool dbg_save_roms(void)
     system_memory_guard(oldmode);
 
 #ifdef HAVE_EEPROM
-    fd = creat("/internal_eeprom.bin", O_WRONLY);
+    fd = creat("/internal_eeprom.bin");
     if (fd >= 0)
     {
         int old_irq_level;

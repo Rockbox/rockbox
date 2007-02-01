@@ -716,7 +716,7 @@ static bool eq_save_preset(void)
     /* allow user to modify filename */
     while (true) {
         if (!kbd_input(filename, sizeof filename)) {
-            fd = creat(filename, O_WRONLY);
+            fd = creat(filename);
             if (fd < 0)
                 gui_syncsplash(HZ, true, str(LANG_FAILED));
             else

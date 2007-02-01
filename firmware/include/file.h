@@ -48,7 +48,7 @@
 
 #ifdef SIMULATOR
 #define open(x,y) sim_open(x,y)
-#define creat(x,y) sim_creat(x,y)
+#define creat(x) sim_creat(x)
 #define remove(x) sim_remove(x)
 #define rename(x,y) sim_rename(x,y)
 #define filesize(x) sim_filesize(x)
@@ -59,7 +59,7 @@
 
 typedef int (*open_func)(const char* pathname, int flags);
 typedef ssize_t (*read_func)(int fd, void *buf, size_t count);
-typedef int (*creat_func)(const char *pathname, mode_t mode);
+typedef int (*creat_func)(const char *pathname);
 typedef ssize_t (*write_func)(int fd, const void *buf, size_t count);
 typedef void (*qsort_func)(void *base, size_t nmemb,  size_t size,
                            int(*_compar)(const void *, const void *));
@@ -69,7 +69,7 @@ extern int close(int fd);
 extern int fsync(int fd);
 extern ssize_t read(int fd, void *buf, size_t count);
 extern off_t lseek(int fildes, off_t offset, int whence);
-extern int creat(const char *pathname, mode_t mode);
+extern int creat(const char *pathname);
 extern ssize_t write(int fd, const void *buf, size_t count);
 extern int remove(const char* pathname);
 extern int rename(const char* path, const char* newname);

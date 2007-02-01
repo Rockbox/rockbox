@@ -50,6 +50,12 @@
 #include "debug.h"
 #include "config.h"
 
+/* Windows (and potentially other OSes) distinguish binary and text files.
+ * Define a dummy for the others. */
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
+
 #ifdef HAVE_DIRCACHE
 void dircache_remove(const char *name);
 void dircache_rename(const char *oldpath, const char *newpath);
@@ -81,11 +87,8 @@ typedef struct mydir MYDIR;
 #if 1 /* maybe this needs disabling for MSVC... */
 static unsigned int rockbox2sim(int opt)
 {
-#ifdef WIN32
     int newopt = O_BINARY;
-#else
-    int newopt = 0;
-#endif
+
     if(opt & 1)
         newopt |= O_WRONLY;
     if(opt & 2)
@@ -189,24 +192,22 @@ int sim_open(const char *name, int o)
     
 }
 
-int sim_creat(const char *name, mode_t mode)
+int sim_creat(const char *name)
 {
-    int opts = rockbox2sim(mode);
-    
 #ifndef __PCTOOL__
     char buffer[256]; /* sufficiently big */
-    if(name[0] == '/') 
+    if(name[0] == '/')
     {
         sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
         
         debugf("We create the real file '%s'\n", buffer);
-        return open(buffer, opts | O_CREAT | O_TRUNC, 0666);
+        return open(buffer, O_BINARY | O_WRONLY | O_CREAT | O_TRUNC, 0666);
     }
     fprintf(stderr, "WARNING, bad file name lacks slash: %s\n",
             name);
     return -1;
 #else
-    return open(name, opts | O_CREAT | O_TRUNC, 0666);
+    return open(name, O_BINARY | O_WRONLY | O_CREAT | O_TRUNC, 0666);
 #endif
 }      
 
@@ -390,15 +391,11 @@ void *sim_codec_load_ram(char* codecptr, int size,
     {
         sprintf(path, TEMP_CODEC_FILE, codec_count);
 
-    #ifdef WIN32
         fd = open(path, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRWXU);
-    #else
-        fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
-    #endif
         if (fd >= 0)
             break;  /* Created a file ok */
     }
-    if (fd < 0)        
+    if (fd < 0)
     {
         DEBUGF("failed to open for write: %s\n", path);
         return NULL;

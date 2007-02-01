@@ -586,7 +586,7 @@ static void save_snapshot_file_type(char *name, int type)
   int snsh;
   snsh = rb->open(name, O_WRONLY);
   if(snsh < 0) {
-      snsh = rb->creat(name, O_WRONLY);
+      snsh = rb->creat(name);
       if(snsh < 0) {
         put_msg("Could not create snapshot file");
         return;

@@ -34,7 +34,7 @@ int configfile_save(const char *filename, struct configdata *cfg,
     char buf[MAX_PATH];
 
     cfg_rb->snprintf(buf, MAX_PATH, "/.rockbox/rocks/%s", filename);
-    fd = cfg_rb->creat(buf, O_WRONLY);
+    fd = cfg_rb->creat(buf);
     if(fd < 0)
         return fd*10 - 1;
 

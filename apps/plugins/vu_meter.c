@@ -335,7 +335,7 @@ void load_settings(void) {
 }
 
 void save_settings(void) {
-    int fp = rb->creat("/.rockbox/rocks/.vu_meter", O_WRONLY);
+    int fp = rb->creat("/.rockbox/rocks/.vu_meter");
     if(fp >= 0) {
         rb->write (fp, &settings, sizeof(struct saved_settings));
         rb->close(fp);

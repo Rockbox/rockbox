@@ -56,7 +56,7 @@ int save_bmp_file( char* filename, struct bitmap *bm, struct plugin_api* rb )
     int fh;
     int x,y;
     if( bm->format != FORMAT_NATIVE ) return -1;
-    fh = rb->PREFIX(creat)( filename, O_WRONLY );
+    fh = rb->creat( filename );
     if( fh < 0 ) return -1;
 
     rb->write( fh, header, sizeof( header ) );

@@ -126,7 +126,7 @@ static bool search_init(char* file)
         if (fd==-1)
             return false;
 
-        fdw = rb->creat(resultfile, O_WRONLY);
+        fdw = rb->creat(resultfile);
 
         if (fdw < 0) {
 #ifdef HAVE_LCD_BITMAP

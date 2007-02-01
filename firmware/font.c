@@ -522,7 +522,7 @@ void glyph_cache_save(void)
 
     if (fnt_file >= 0) {
 
-        glyph_file = creat(GLYPH_CACHE_FILE, O_WRONLY);
+        glyph_file = creat(GLYPH_CACHE_FILE);
 
         if (glyph_file < 0) return;
 

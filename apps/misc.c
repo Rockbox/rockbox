@@ -399,7 +399,7 @@ void screen_dump(void)
                              IF_CNFN_NUM_(, NULL));
 #endif
 
-    fh = creat(filename, O_WRONLY);
+    fh = creat(filename);
     if (fh < 0)
         return;
 

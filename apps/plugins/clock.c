@@ -903,7 +903,7 @@ void save_settings(bool interface)
         rb->lcd_update();
     }
 
-    fd = rb->creat(default_filename, O_WRONLY); /* create the settings file */
+    fd = rb->creat(default_filename); /* create the settings file */
 
     if(fd >= 0) /* file exists, save successful */
     {

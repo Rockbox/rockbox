@@ -1074,7 +1074,7 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
         if (i < data->bookmarked_files_count)
         {
             /* it is in the list, write everything back in the correct order, and reload the file correctly */
-            settings_fd = rb->creat(BOOKMARKS_FILE, O_WRONLY);
+            settings_fd = rb->creat(BOOKMARKS_FILE);
             if (settings_fd >=0 )
             {
                 if (data->bookmarked_files_count > MAX_BOOKMARKED_FILES)
@@ -1092,7 +1092,7 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
         }
         else /* not in list, write the list to the file */
         {
-            settings_fd = rb->creat(BOOKMARKS_FILE, O_WRONLY);
+            settings_fd = rb->creat(BOOKMARKS_FILE);
             if (settings_fd >=0 )
             {
                 if (++(data->bookmarked_files_count) > MAX_BOOKMARKED_FILES)
@@ -1120,7 +1120,7 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
 static void viewer_save_settings(void)/* same name as global, but not the same file.. */
 {
     int settings_fd;
-    settings_fd = rb->creat(SETTINGS_FILE, O_WRONLY); /* create the settings file */
+    settings_fd = rb->creat(SETTINGS_FILE); /* create the settings file */
     
     rb->write (settings_fd, &prefs, sizeof(struct preferences));
     rb->close(settings_fd);

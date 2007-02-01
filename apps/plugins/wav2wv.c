@@ -174,7 +174,7 @@ static int wav2wv (char *filename)
     extension [1] = extension [2];
     extension [2] = 0;
 
-    out_fd = rb->creat (filename, O_WRONLY);
+    out_fd = rb->creat (filename);
 
     extension [2] = extension [1];
     extension [1] = save_a;

@@ -110,12 +110,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 41
+#define PLUGIN_API_VERSION 42
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 41
+#define PLUGIN_MIN_API_VERSION 42
 
 /* plugin return codes */
 enum plugin_status {
@@ -300,7 +300,7 @@ struct plugin_api {
     int (*close)(int fd);
     ssize_t (*read)(int fd, void* buf, size_t count);
     off_t (*PREFIX(lseek))(int fd, off_t offset, int whence);
-    int (*PREFIX(creat))(const char *pathname, mode_t mode);
+    int (*PREFIX(creat))(const char *pathname);
     ssize_t (*write)(int fd, const void* buf, size_t count);
     int (*PREFIX(remove))(const char* pathname);
     int (*PREFIX(rename))(const char* path, const char* newname);

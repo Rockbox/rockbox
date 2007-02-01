@@ -29,7 +29,7 @@
 #include "lcd-sdl.h"
 
 /* extern functions, needed for screendump() */
-extern int sim_creat(const char *name, mode_t mode);
+extern int sim_creat(const char *name);
 
 SDL_Surface* lcd_surface;
 SDL_Color lcd_color_zero = {UI_LCD_BGCOLOR, 0};
@@ -185,7 +185,7 @@ void screen_dump(void)
         IF_CNFN_NUM_(, NULL));
     DEBUGF("screen_dump\n");
 
-    fd = sim_creat(filename, O_WRONLY);
+    fd = sim_creat(filename);
     if (fd < 0)
         return;
 
