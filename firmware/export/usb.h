@@ -31,6 +31,10 @@ bool usb_inserted(void); /* return the official value, what's been reported to t
 bool usb_detect(void); /* return the raw hardware value */
 #ifdef HAVE_USB_POWER
 bool usb_powered(void);
+#ifdef CONFIG_CHARGING
+bool usb_charging_enable(bool on);
+bool usb_charging_enabled(void);
+#endif
 #endif
 
 #endif

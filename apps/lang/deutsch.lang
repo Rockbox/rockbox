@@ -3570,6 +3570,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_USB_CHARGING
+  desc: in Battery menu
+  user:
+  <source>
+    *: "Charge During USB Connection"
+  </source>
+  <dest>
+    *: "Laden bei USB-Verbindung"
+  </dest>
+  <voice>
+    *: "Laden bei U S B Verbindung"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_DISPLAY_GRAPHIC
   desc: Label for type of icon display
   user:

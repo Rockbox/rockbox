@@ -21,6 +21,9 @@
 #include "kernel.h"
 #include "pcf50606.h"
 #include "button-target.h"
+#include "logf.h"
+
+static bool usb_ch_enabled = false;
 
 /* These voltages were determined by measuring the output of the PCF50606
    on a running H300, and verified by disassembling the original firmware */
@@ -70,6 +73,27 @@ static inline void enable_pmu_interrupts(void)
     or_l(0x03000000, &INTPRI5); /* INT38 - Priority 3 */
 }
 
+/* enables/disables USB charging
+ * ATTENTION: make sure to set the irq level
+ *   to highest before calling this function! */
+void pcf50606_set_usb_charging(bool on)
+{
+    if (on)
+        pcf50606_write(0x39, 0x00); /* Set GPOOD2 to High-Z for USB Charge Enable */
+    else
+        pcf50606_write(0x39, 0x07); /* Set GPOOD2 to pulled down to disable USB charging */
+
+    usb_ch_enabled = on;
+
+    logf("pcf50606_set_usb_charging(%s)\n", on ? "on" : "off" );
+}
+
+bool pcf50606_usb_charging_enabled(void)
+{
+    /* TODO: read the state of the GPOOD2 register... */
+    return usb_ch_enabled;
+}
+
 void pcf50606_init(void)
 {
     pcf50606_i2c_init();
@@ -81,6 +105,8 @@ void pcf50606_init(void)
     pcf50606_write(0x08, 0x60); /* Wake on USB and charger insertion */
     pcf50606_write(0x09, 0x05); /* USB and ON key debounce: 14ms */
     pcf50606_write(0x29, 0x1C); /* Disable the unused MBC module */
+
+    pcf50606_set_usb_charging(false); /* Disable USB charging atm. */
 
     pcf50606_write(0x35, 0x13); /* Backlight PWM = 512Hz 50/50 */
     pcf50606_write(0x3a, 0x3b); /* PWM output on GPOOD1 */

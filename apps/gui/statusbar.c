@@ -143,7 +143,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 
     bar->info.battlevel = battery_level();
 #ifdef HAVE_USB_POWER
-    bar->info.usb_power = usb_powered();
+    bar->info.usb_inserted = usb_inserted();
 #endif
 #ifdef CONFIG_CHARGING
     bar->info.inserted = (charger_input_state == CHARGER);
@@ -238,7 +238,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
             gui_statusbar_icon_battery(display, bar->info.battlevel, 
                                        bar->info.batt_charge_step);
 #ifdef HAVE_USB_POWER
-        if (bar->info.usb_power)
+        if (bar->info.usb_inserted)
             display->mono_bitmap(bitmap_icons_7x8[Icon_USBPlug],
                                  STATUSBAR_PLUG_X_POS,
                                  STATUSBAR_Y_POS, STATUSBAR_PLUG_WIDTH,

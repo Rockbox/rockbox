@@ -78,6 +78,9 @@
 #include "spdif.h"
 #endif
 #endif
+#ifdef IRIVER_H300_SERIES
+#include "pcf50606.h"   /* for pcf50606_read */
+#endif
 
 #ifdef IAUDIO_X5
 #include "lcd-remote-target.h"
@@ -1059,6 +1062,16 @@ bool dbg_ports(void)
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "GPIO1_ENABLE:   %08x", gpio1_enable);
         lcd_puts(0, line++, buf);
+#if defined(IRIVER_H300_SERIES)
+        snprintf(buf, sizeof(buf), "GPOOD0:         %08x", (unsigned int)pcf50606_read(0x37));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPOOD1:         %08x", (unsigned int)pcf50606_read(0x38));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPOOD2:         %08x", (unsigned int)pcf50606_read(0x39));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPOOD3:         %08x", (unsigned int)pcf50606_read(0x3A));
+        lcd_puts(0, line++, buf);
+#endif
 
         adc_buttons = adc_read(ADC_BUTTONS);
         adc_remote  = adc_read(ADC_REMOTE);
@@ -1422,6 +1435,14 @@ static bool view_battery(void)
                 snprintf(buf, 30, "long delta: %d", long_delta);
                 lcd_puts(0, 6, buf);
                 lcd_puts(0, 7, power_message);
+                snprintf(buf, 30, "USB Inserted: %s",
+                         usb_inserted() ? "yes" : "no");
+                lcd_puts(0, 8, buf);
+#if defined IRIVER_H300_SERIES
+                snprintf(buf, 30, "USB Charging Enabled: %s",
+                         usb_charging_enabled() ? "yes" : "no");
+                lcd_puts(0, 9, buf);
+#endif
 #else /* CONFIG_CHARGING != CHARGING_CONTROL */
 #if defined IPOD_NANO || defined IPOD_VIDEO
                 int usb_pwr  = (GPIOL_INPUT_VAL & 0x10)?true:false;

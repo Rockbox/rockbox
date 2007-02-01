@@ -44,6 +44,10 @@
 #ifdef TARGET_TREE
 #include "usb-target.h"
 #endif
+#ifdef IRIVER_H300_SERIES
+#include "pcf50606.h"        /* for pcf50606_usb_charging_... */
+#endif
+#include "logf.h"
 
 extern void dbg_ports(void); /* NASTY! defined in apps/ */
 
@@ -487,6 +491,40 @@ bool usb_powered(void)
 {
     return usb_state == USB_POWERED;
 }
+
+#ifdef CONFIG_CHARGING
+bool usb_charging_enable(bool on)
+{
+    bool rc = false;
+#ifdef IRIVER_H300_SERIES
+    int irqlevel;
+    logf("usb_charging_enable(%s)\n", on ? "on" : "off" );
+    irqlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    pcf50606_set_usb_charging(on);
+    rc = on;
+    (void)set_irq_level(irqlevel);
+#else
+    /* TODO: implement it for other targets... */
+    (void)on;
+#endif
+    return rc;
+}
+
+bool usb_charging_enabled(void)
+{
+    bool rc = false;
+#ifdef IRIVER_H300_SERIES
+    /* TODO: read the state of the GPOOD2 register...
+     * (this also means to set the irq level here) */
+    rc = pcf50606_usb_charging_enabled();
+#else
+    /* TODO: implement it for other targets... */
+#endif
+
+    logf("usb_charging_enabled: %s\n", rc ? "true" : "false" );
+    return rc;
+}
+#endif
 #endif
 
 #else

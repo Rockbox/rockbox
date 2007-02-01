@@ -690,7 +690,11 @@ const struct settings_list settings[] = {
 #ifdef HAVE_LCD_BITMAP
     FILENAME_SETTING(0,kbd_file,"kbd","",ROCKBOX_DIR "/",".kbd",MAX_FILENAME+1),
 #endif
-
+#ifdef HAVE_USB_POWER
+#ifdef CONFIG_CHARGING
+    OFFON_SETTING(0,usb_charging,LANG_USB_CHARGING,false,"usb charging",NULL),
+#endif
+#endif
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

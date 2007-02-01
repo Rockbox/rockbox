@@ -405,6 +405,12 @@ static bool clear_main_backdrop(void)
 }
 #endif
 
+#ifdef HAVE_USB_POWER
+#ifdef CONFIG_CHARGING
+#include "usb.h"
+#endif
+#endif
+
 #ifdef HAVE_LCD_COLOR
 /**
  * Menu for fore/back colors
@@ -442,6 +448,22 @@ static bool reset_color(void)
     screens[SCREEN_MAIN].set_background(global_settings.bg_color);
     return false;
 }
+#endif
+
+#ifdef HAVE_USB_POWER
+#ifdef CONFIG_CHARGING
+/**
+ * Menu to switch the USB charging on or off
+ */
+static bool usb_charging(void)
+{
+    bool rc = set_bool(str(LANG_USB_CHARGING),
+                       &global_settings.usb_charging);
+    /* if (usb_charging_enabled() != global_settings.usb_charging) */
+    usb_charging_enable(global_settings.usb_charging);
+    return rc;
+}
+#endif
 #endif
 
 /**
@@ -2082,6 +2104,11 @@ static bool battery_settings_menu(void)
         { ID2P(LANG_BATTERY_CAPACITY), battery_capacity },
 #if BATTERY_TYPES_COUNT > 1
         { ID2P(LANG_BATTERY_TYPE),     battery_type },
+#endif
+#ifdef HAVE_USB_POWER
+#ifdef CONFIG_CHARGING
+        { ID2P(LANG_USB_CHARGING),    usb_charging },
+#endif
 #endif
 #else
         { "Dummy", NULL }, /* to have an entry at all, in the simulator */

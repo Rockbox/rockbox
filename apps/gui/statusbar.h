@@ -44,7 +44,7 @@ struct status_info {
     bool inserted;
 #endif
 #ifdef HAVE_USB_POWER
-    bool usb_power;
+    bool usb_inserted;
 #endif
     bool battery_state;
     bool shuffle;

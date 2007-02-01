@@ -759,8 +759,11 @@ static void power_thread_sleep(int ticks)
          * transition to the appropriate steady state charger on/off state.
          */
         if(charger_inserted()
-#ifdef HAVE_USB_POWER
+#ifdef HAVE_USB_POWER /* USB powered or USB inserted both provide power */
                 || usb_powered()
+#ifdef CONFIG_CHARGING
+                || (usb_inserted() && usb_charging_enabled())
+#endif
 #endif
                 ) {
             switch(charger_input_state) {

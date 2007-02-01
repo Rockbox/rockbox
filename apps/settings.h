@@ -611,6 +611,12 @@ struct user_settings
     unsigned char kbd_file[MAX_FILENAME+1]; /* last keyboard */
 #endif
 
+#ifdef HAVE_USB_POWER
+#ifdef CONFIG_CHARGING
+    bool usb_charging;
+#endif
+#endif
+
 #ifdef HAVE_WM8758
     bool eq_hw_enabled;            /* Enable hardware equalizer */
     

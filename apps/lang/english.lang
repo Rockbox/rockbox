@@ -3611,6 +3611,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_USB_CHARGING
+  desc: in Battery menu
+  user:
+  <source>
+    *: "Charge During USB Connection"
+  </source>
+  <dest>
+    *: "Charge During USB Connection"
+  </dest>
+  <voice>
+    *: "Charge During U S B Connection"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_DISPLAY_GRAPHIC
   desc: Label for type of icon display
   user:
