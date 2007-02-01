@@ -784,16 +784,16 @@
 </phrase>
 <phrase>
   id: LANG_FIRMWARE
-  desc: in the main menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Browse Firmwares"
+    *: ""
   </source>
   <dest>
-    *: "Lista startfiler"
+    *: ""
   </dest>
   <voice>
-    *: "Browse Firmwares"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -831,10 +831,16 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
+    ipod*: "SELECT = Yes"
+    x5: "SELECT = Yes"
+    h10: "NEXT = Yes"
   </source>
   <dest>
     *: "SPELA = Ja"
     h100,h120,h300: "VÄLJ = Ja"
+    ipod*: "VÄLJ = Yes"
+    x5: "VÄLJ = Yes"
+    h10: "NÄSTA = Yes"
   </dest>
   <voice>
     *: ""
@@ -1657,13 +1663,13 @@
   desc: in settings menu
   user:
   <source>
-    *: "Tag Cache"
+    *: "Database"
   </source>
   <dest>
-    *: "Taggcache"
+    *: "Databas"
   </dest>
   <voice>
-    *: "Tag Cache"
+    *: "Database"
   </voice>
 </phrase>
 <phrase>
@@ -1727,10 +1733,10 @@
   desc: while initializing tagcache on boot
   user:
   <source>
-    *: "Committing tagcache"
+    *: "Committing database"
   </source>
   <dest>
-    *: "Sparar taggcache"
+    *: "Sparar databas"
   </dest>
   <voice>
     *: ""
@@ -1923,13 +1929,13 @@
   desc: show ID3 Database
   user:
   <source>
-    *: "ID3 Database"
+    *: "Database"
   </source>
   <dest>
-    *: "ID3-databas"
+    *: "Databas"
   </dest>
   <voice>
-    *: "ID3 Database"
+    *: "Database"
   </voice>
 </phrase>
 <phrase>
@@ -2610,12 +2616,15 @@
   user:
   <source>
     *: "Mic"
+    h100,h120,h300: "Internal Mic"
   </source>
   <dest>
     *: "Mikrofon"
+    h100,h120,h300: "Intern mikrofon"
   </dest>
   <voice>
     *: "Microphone"
+    h100,h120,h300: "Internal Microphone"
   </voice>
 </phrase>
 <phrase>
@@ -2864,7 +2873,7 @@
     *: "Track Skip Only"
   </source>
   <dest>
-    *: "Vid manuellt byte"
+    *: "Manuellt byte"
   </dest>
   <voice>
     *: "Track Skip Only"
@@ -3810,16 +3819,16 @@
 </phrase>
 <phrase>
   id: LANG_POWEROFF
-  desc: disk poweroff flag
+  desc: DEPRECATED
   user:
   <source>
-    *: "Disk Poweroff"
+    *: ""
   </source>
   <dest>
-    *: "Stäng av disk"
+    *: ""
   </dest>
   <voice>
-    *: "Disk Poweroff"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4683,10 +4692,16 @@
   <source>
     *: "OFF = Exit"
     h100,h120,h300: "STOP = Exit"
+    ipod*: "PLAY/PAUSE = Exit"
+    x5: "RECORD = Exit"
+    h10: "PREV = Exit"
   </source>
   <dest>
     *: "AV = Avsluta"
     h100,h120,h300: "STOPP = Avsluta"
+    ipod*: "SPELA/PAUSA = Avsluta"
+    x5: "SPELA IN = Avsluta"
+    h10: "FÖREGÅENDE = Avsluta"
   </dest>
   <voice>
     *: ""
@@ -4741,10 +4756,16 @@
   <source>
     *: "PLAY = Select"
     h100,h120,h300: "NAVI = Select"
+    ipod*: "SELECT = Select"
+    x5: "SELECT = Select"
+    h10: "NEXT = Select"
   </source>
   <dest>
     *: "SPELA = Välj"
     h100,h120,h300: "VÄLJ = Välj"
+    ipod*: "VÄLJ = Välj"
+    x5: "VÄLJ = Välj"
+    h10: "NÄSTA = Välj"
   </dest>
   <voice>
     *: ""
@@ -4757,10 +4778,16 @@
   <source>
     *: "ON+Play = Delete"
     h100,h120,h300: "RECORD = Delete"
+    ipod*: "Long MENU = Delete"
+    x5: "Long RECORD = Delete"
+    h10: "REWIND = Delete"
   </source>
   <dest>
     *: "PÅ+SPELA = Ta bort"
     h100,h120,h300: "SPELA IN = Ta bort"
+    ipod*: "Lång MENY = Ta bort"
+    x5: "Lång SPELA IN = Ta bort"
+    h10: "SPOLA BAK = Ta bort"
   </dest>
   <voice>
     *: ""
@@ -4843,10 +4870,16 @@
   <source>
     *: "ON To Set"
     h100,h120,h300: "NAVI = Set"
+    ipod*: "SELECT = Set"
+    x5: "SELECT = Set"
+    h10: "NEXT = Set"
   </source>
   <dest>
     *: "PÅ = Ställ klocka"
     h100,h120,h300: "VÄLJ = Ställ klocka"
+    ipod*: "VÄLJ = Ställ klocka"
+    x5: "VÄLJ = Ställ klocka"
+    h10: "NÄSTA = Ställ klocka"
   </dest>
   <voice>
     *: ""
@@ -4859,10 +4892,16 @@
   <source>
     *: "OFF To Revert"
     h100,h120,h300: "STOP = Revert"
+    ipod*: "MENU = Revert"
+    x5: "RECORD = Revert"
+    h10: "PREV = Revert"
   </source>
   <dest>
     *: "AV = Avbryt"
     h100,h120,h300: "STOPP = Avbryt"
+    ipod*: "MENY = Avbryt"
+    x5: "SPELA IN = Avbryt"
+    h10: "FÖREGÅENDE = Avbryt"
   </dest>
   <voice>
     *: ""
@@ -7831,10 +7870,16 @@
   <source>
     *: "OFF to abort"
     h100,h120,h300: "STOP to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    x5: "Long PLAY to abort"
+    h10: "PREV to abort"
   </source>
   <dest>
     *: "AV = avbryt"
     h100,h120,h300: "STOPP = Avbryt"
+    ipod*: "SPELA/PAUSA = Avbryt"
+    x5: "Lång SPELA = Avbryt"
+    h10: "FÖREGÅENDE = Avbryt"
   </dest>
   <voice>
     *: ""
@@ -8363,7 +8408,7 @@
   desc: When you run the radio without an fmr file in settings
   user:
   <source>
-    *: "No Settings found, AutoScan?"
+    *: "No settings found. Autoscan?"
   </source>
   <dest>
     *: "Inga kanaler hittades. Starta sökning?"
@@ -8470,13 +8515,13 @@
   id: LANG_TAGCACHE_BUSY
   desc: when trying to shutdown and tagcache is committing
   <source>
-    *: "Tagcache is not ready"
+    *: "Database is not ready"
   </source>
   <dest>
-    *: "Taggcachen är inte klar"
+    *: "Databasen är inte klar"
   </dest>
   <voice>
-    *: "Tagcache is not ready"
+    *: "Database is not ready"
   </voice>
 </phrase>
 <phrase>
@@ -8526,13 +8571,13 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Update now"
+    *: "Update Now"
   </source>
   <dest>
     *: "Uppdatera nu"
   </dest>
   <voice>
-    *: "Update now"
+    *: "Update Now"
   </voice>
 </phrase>
 <phrase>
@@ -8540,13 +8585,13 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Auto update"
+    *: "Auto Update"
   </source>
   <dest>
     *: "Uppdatera automatiskt"
   </dest>
   <voice>
-    *: "Auto update"
+    *: "Auto Update"
   </voice>
 </phrase>
 <phrase>
@@ -8554,13 +8599,13 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Export modifications"
+    *: "Export Modifications"
   </source>
   <dest>
     *: "Exportera ändringar"
   </dest>
   <voice>
-    *: "Export modifications"
+    *: "Export Modifications"
   </voice>
 </phrase>
 <phrase>
@@ -8568,13 +8613,13 @@
   desc: in onplay menu
   user:
   <source>
-    *: "Playlist catalog"
+    *: "Playlist Catalog"
   </source>
   <dest>
     *: "Spellistekatalog"
   </dest>
   <voice>
-    *: "Playlist catalog"
+    *: "Playlist Catalog"
   </voice>
 </phrase>
 <phrase>
@@ -8582,13 +8627,13 @@
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "Add to playlist"
+    *: "Add to Playlist"
   </source>
   <dest>
     *: "Lägg till till spellista"
   </dest>
   <voice>
-    *: "Add to playlist"
+    *: "Add to Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -8596,13 +8641,13 @@
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "Add to new playlist"
+    *: "Add to New Playlist"
   </source>
   <dest>
     *: "Lägg till till ny spellista"
   </dest>
   <voice>
-    *: "Add to new playlist"
+    *: "Add to New Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -8610,13 +8655,13 @@
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "View catalog"
+    *: "View Catalog"
   </source>
   <dest>
     *: "Visa katalog"
   </dest>
   <voice>
-    *: "View catalog"
+    *: "View Catalog"
   </voice>
 </phrase>
 <phrase>
@@ -8638,7 +8683,7 @@
   desc: error message when no playlists for playlist catalog
   user:
   <source>
-    *: "No playlists"
+    *: "No Playlists"
   </source>
   <dest>
     *: "Inga spellistor"
@@ -8652,13 +8697,13 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Import modifications"
+    *: "Import Modifications"
   </source>
   <dest>
     *: "Importera ändringar"
   </dest>
   <voice>
-    *: "Import modifications"
+    *: "Import Modifications"
   </voice>
 </phrase>
 <phrase>
@@ -9138,13 +9183,13 @@
   desc: show ID3 Database
   user:
   <source>
-    *: "ID3 Database"
+    *: "Database"
   </source>
   <dest>
-    *: "ID3-databas"
+    *: "Databas"
   </dest>
   <voice>
-    *: "ID3 Database"
+    *: "Database"
   </voice>
 </phrase>
 <phrase>
@@ -9194,13 +9239,13 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Mic"
+    *: "Int. Mic"
   </source>
   <dest>
-    *: "Mikrofon"
+    *: "Int. mik."
   </dest>
   <voice>
-    *: "Microphone"
+    *: "Internal Microphone"
   </voice>
 </phrase>
 <phrase>
@@ -9771,7 +9816,7 @@
 </phrase>
 <phrase>
   id: VOICE_KBIT_PER_SEC
-  desc: spoken only, for file extension
+  desc: spoken only, a unit postfix
   user:
   <source>
     *: ""
@@ -9802,13 +9847,13 @@
   desc: in settings_menu.
   user:
   <source>
-    *: "Pause on headphone unplug"
+    *: "Pause on Headphone Unplug"
   </source>
   <dest>
     *: "Paus när hörlurar kopplas ur"
   </dest>
   <voice>
-    *: "Pause on headphone unplug"
+    *: "Pause on Headphone Unplug"
   </voice>
 </phrase>
 <phrase>
@@ -9830,13 +9875,13 @@
   desc: in pause_phones_menu.
   user:
   <source>
-    *: "Duration to rewind"
+    *: "Duration to Rewind"
   </source>
   <dest>
     *: "Tid att spola bakåt"
   </dest>
   <voice>
-    *: "Duration to rewind"
+    *: "Duration to Rewind"
   </voice>
 </phrase>
 <phrase>
@@ -9844,13 +9889,13 @@
   desc: in pause_phones_menu.
   user:
   <source>
-    *: "Disable auto-resume if phones not present"
+    *: "Disable resume on startup if phones unplugged"
   </source>
   <dest>
     *: "Återuppta inte vid start om hörlurar ej inkopplade"
   </dest>
   <voice>
-    *: "Disable auto-resume if phones not present"
+    *: "Disable resume on startup if phones unplugged"
   </voice>
 </phrase>
 <phrase>
@@ -9974,6 +10019,240 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_SYSFONT_PITCH_UP_SEMITONE
+  desc: in wps
+  user:
+  <source>
+    *: "Semitone Up"
+  </source>
+  <dest>
+    *: "Halvton upp"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PITCH_DOWN_SEMITONE
+  desc: in wps
+  user:
+  <source>
+    *: "Semitone Down"
+  </source>
+  <dest>
+    *: "Halvton ner"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_FORMAT
+  desc: audio format item in recording menu
+  user:
+  <source>
+    *: "Format"
+  </source>
+  <dest>
+    *: "Format"
+  </dest>
+  <voice>
+    *: "Format"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_MPA_L3
+  desc: audio format description
+  user:
+  <source>
+    *: "MPEG Layer 3"
+  </source>
+  <dest>
+    *: "MPEG lager 3"
+  </dest>
+  <voice>
+    *: "MPEG Layer 3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_PCM_WAV
+  desc: audio format description
+  user:
+  <source>
+    *: "PCM Wave"
+  </source>
+  <dest>
+    *: "PCM-vågform"
+  </dest>
+  <voice>
+    *: "PCM Wave"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_WAVPACK
+  desc: audio format description
+  user:
+  <source>
+    *: "WavPack"
+  </source>
+  <dest>
+    *: "WavPack"
+  </dest>
+  <voice>
+    *: "WavPack"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENCODER_SETTINGS
+  desc: encoder settings
+  user:
+  <source>
+    *: "Encoder Settings"
+  </source>
+  <dest>
+    *: "Kodarinställningar"
+  </dest>
+  <voice>
+    *: "Encoder Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_SETTINGS
+  desc: when something has settings in a certain context
+  user:
+  <source>
+    *: "(No Settings)"
+  </source>
+  <dest>
+    *: "(Inga inställningar)"
+  </dest>
+  <voice>
+    *: "No settings available"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOURCE_FREQUENCY
+  desc: when recording source frequency setting must follow source
+  user:
+  <source>
+    *: "(Same As Source)"
+  </source>
+  <dest>
+    *: "(Samma som källan)"
+  </dest>
+  <voice>
+    *: "Same As Source"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BITRATE
+  desc: bits-kilobits per unit time
+  user:
+  <source>
+    *: "Bitrate"
+  </source>
+  <dest>
+    *: "Datahastighet"
+  </dest>
+  <voice>
+    *: "Bitrate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_TYPE
+  desc: in recording trigger menu
+  <source>
+    *: "Trigtype"
+  </source>
+  <dest>
+    *: "Startlägestyp"
+  </dest>
+  <voice>
+    *: "Trigtype"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_STOP
+  desc: trigger types
+  <source>
+    *: "Stop"
+  </source>
+  <dest>
+    *: "Stoppa"
+  </dest>
+  <voice>
+    *: "Stop"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_PAUSE
+  desc: trigger types
+  <source>
+    *: "Pause"
+  </source>
+  <dest>
+    *: "Pausa"
+  </dest>
+  <voice>
+    *: "Pause"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_NEWFILESTP
+  desc: trigger types
+  <source>
+    *: "New file"
+  </source>
+  <dest>
+    *: "Ny fil"
+  </dest>
+  <voice>
+    *: "New file"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARNING_BATTERY_LOW
+  desc: general warning
+  user:
+  <source>
+    *: "WARNING! Low Battery!"
+  </source>
+  <dest>
+    *: "VARNING! Låg batterinivå!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARNING_BATTERY_EMPTY
+  desc: general warning
+  user:
+  <source>
+    *: "Battery empty! RECHARGE!"
+  </source>
+  <dest>
+    *: "Batteri tomt! LADDA!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_AIFF
+  desc: audio format description
+  user:
+  <source>
+    *: "AIFF"
+  </source>
+  <dest>
+    *: "AIFF"
+  </dest>
+  <voice>
+    *: "AIFF"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_SYSFONT_AGC_SAFETY
   desc: AGC preset
   <source>
@@ -10049,5 +10328,131 @@
   </dest>
   <voice>
     *: "AGC maximum gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES
+  desc: browser file/dir properties
+  user:
+  <source>
+    *: "Properties"
+  </source>
+  <dest>
+    *: "Egenskaper"
+  </dest>
+  <voice>
+    *: "Properties"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_TRACKSKIP
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Shuffle and Track Skip"
+  </source>
+  <dest>
+    *: "Blanda och manuellt byte"
+  </dest>
+  <voice>
+    *: "Shuffle and Track Skip"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUNNING_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Running Time"
+  </source>
+  <dest>
+    *: "Körtid"
+  </dest>
+  <voice>
+    *: "Running Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Current Time"
+  </source>
+  <dest>
+    *: "Aktuell tid"
+  </dest>
+  <voice>
+    *: "Current Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Top Time"
+  </source>
+  <dest>
+    *: "Längsta tid"
+  </dest>
+  <voice>
+    *: "Top Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Clear Time?"
+  </source>
+  <dest>
+    *: "Nollställ tid?"
+  </dest>
+  <voice>
+    *: "Clear Time?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLACE
+  desc: in onplay menu.  Replace the current playlist with a new one.
+  user:
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "Spela nästa"
+  </dest>
+  <voice>
+    *: "Play Next"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_THEME
+  desc: save a theme file
+  user:
+  <source>
+    *: "Save Theme Settings"
+  </source>
+  <dest>
+    *: "Skriv temainställningar"
+  </dest>
+  <voice>
+    *: "Save Theme Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_CHARGING
+  desc: in Battery menu
+  user:
+  <source>
+    *: "Charge During USB Connection"
+  </source>
+  <dest>
+    *: "Ladda via USB"
+  </dest>
+  <voice>
+    *: "Charge During U S B Connection"
   </voice>
 </phrase>
