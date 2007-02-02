@@ -78,10 +78,14 @@ static inline void enable_pmu_interrupts(void)
  *   to highest before calling this function! */
 void pcf50606_set_usb_charging(bool on)
 {
+    /* USB charging is controlled by GPOOD0:
+       High-Z: Charge enable
+       Pulled down: Charge disable
+    */
     if (on)
-        pcf50606_write(0x39, 0x00); /* Set GPOOD2 to High-Z for USB Charge Enable */
+        pcf50606_write(0x39, 0x00);
     else
-        pcf50606_write(0x39, 0x07); /* Set GPOOD2 to pulled down to disable USB charging */
+        pcf50606_write(0x39, 0x07);
 
     usb_ch_enabled = on;
 
