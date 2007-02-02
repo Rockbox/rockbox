@@ -676,7 +676,7 @@ const struct settings_list settings[] = {
 
     /** settings not in the old config blocks **/
 #ifdef CONFIG_TUNER
-    FILENAME_SETTING(F_THEMESETTING, fmr_file, "fmr",
+    FILENAME_SETTING(0, fmr_file, "fmr",
 		"", FMPRESET_PATH "/", ".fmr", MAX_FILENAME+1),
 #endif
     FILENAME_SETTING(F_THEMESETTING, font_file, "font",
