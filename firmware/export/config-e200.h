@@ -16,6 +16,12 @@
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR 1
 
+#define HAVE_BACKLIGHT_BRIGHTNESS
+/* Main LCD backlight brightness range and defaults */
+#define MIN_BRIGHTNESS_SETTING           1
+#define MAX_BRIGHTNESS_SETTING           12
+#define DEFAULT_BRIGHTNESS_SETTING       6
+
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN
 

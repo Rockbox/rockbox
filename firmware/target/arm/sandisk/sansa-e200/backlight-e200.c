@@ -16,10 +16,26 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
+#include "backlight-target.h"
+#include "system.h"
+#include "backlight.h"
+#include "i2c-pp.h"
+
+static unsigned short backlight_brightness;
+
+void __backlight_set_brightness(int brightness)
+{
+    backlight_brightness = brightness;
+    pp_i2c_send( 0x46, 0x23, backlight_brightness);
+}
+
 void __backlight_on(void)
 {
+    pp_i2c_send( 0x46, 0x23, backlight_brightness);
 }
 
 void __backlight_off(void)
 {
+    pp_i2c_send( 0x46, 0x23, 0x0);
 }
