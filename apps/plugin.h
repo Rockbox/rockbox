@@ -110,12 +110,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 42
+#define PLUGIN_API_VERSION 43
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 42
+#define PLUGIN_MIN_API_VERSION 43
 
 /* plugin return codes */
 enum plugin_status {
@@ -320,7 +320,7 @@ struct plugin_api {
     DIR* (*PREFIX(opendir))(const char* name);
     int (*PREFIX(closedir))(DIR* dir);
     struct dirent* (*PREFIX(readdir))(DIR* dir);
-    int (*PREFIX(mkdir))(const char *name, int mode);
+    int (*PREFIX(mkdir))(const char *name);
     int (*PREFIX(rmdir))(const char *name);
     /* dir, cached */
 #ifdef HAVE_DIRCACHE

@@ -65,7 +65,7 @@ void setvidmode(int mode);
 #undef closedir
 #define closedir(a)     rb->sim_closedir((a))
 #undef mkdir
-#define mkdir(a,b)      rb->sim_mkdir((a),(b))
+#define mkdir(a)        rb->sim_mkdir((a))
 #undef open
 #define open(a,b)       rb->sim_open((a),(b))
 #undef close
@@ -75,7 +75,7 @@ void setvidmode(int mode);
 #else /* !SIMULATOR */
 #define opendir(a)      rb->opendir((a))
 #define closedir(a)     rb->closedir((a))
-#define mkdir(a,b)      rb->mkdir((a),(b))
+#define mkdir(a)        rb->mkdir((a))
 #define open(a,b)       rb->open((a),(b))
 #define lseek(a,b,c)    rb->lseek((a),(b),(c))
 #define close(a)        rb->close((a))

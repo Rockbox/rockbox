@@ -36,7 +36,7 @@
 #define opendir(x) sim_opendir(x)
 #define readdir(x) sim_readdir(x)
 #define closedir(x) sim_closedir(x)
-#define mkdir(x, y) sim_mkdir(x, y)
+#define mkdir(x) sim_mkdir(x)
 #define rmdir(x) sim_rmdir(x)
 #endif
 
@@ -75,7 +75,7 @@ typedef struct {
 
 extern DIR* opendir(const char* name);
 extern int closedir(DIR* dir);
-extern int mkdir(const char* name, int mode);
+extern int mkdir(const char* name);
 extern int rmdir(const char* name);
 
 extern struct dirent* readdir(DIR* dir);

@@ -219,7 +219,7 @@ struct dirent* readdir(DIR* dir)
     return theent;
 }
 
-int mkdir(const char *name, int mode)
+int mkdir(const char *name)
 {
     DIR *dir;
     char namecopy[MAX_PATH];
@@ -229,8 +229,6 @@ int mkdir(const char *name, int mode)
     struct dirent *entry;
     struct fat_dir newdir;
     int rc;
-
-    (void)mode;
 
     if ( name[0] != '/' ) {
         DEBUGF("mkdir: Only absolute paths supported right now\n");

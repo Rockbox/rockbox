@@ -573,7 +573,7 @@ static bool create_dir(void)
     if (rc < 0)
         return false;
 
-    rc = mkdir(dirname, 0);
+    rc = mkdir(dirname);
     if (rc < 0) {
         gui_syncsplash(HZ, true, (unsigned char *)"%s %s",
                        str(LANG_CREATE_DIR), str(LANG_FAILED));
@@ -733,7 +733,7 @@ static bool clipboard_pastedirectory(char *src, int srclen, char *target, int ta
             return result;
         } else {
             /* Make a directory to copy things to */
-            result = mkdir(target, 0) == 0;
+            result = mkdir(target) == 0;
         }
     }
 

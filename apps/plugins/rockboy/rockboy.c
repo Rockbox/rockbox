@@ -79,7 +79,7 @@ void setoptions (void)
 
     dir=opendir(savedir);
     if(!dir)
-      mkdir(savedir,0);
+      mkdir(savedir);
     else
       closedir(dir);
 

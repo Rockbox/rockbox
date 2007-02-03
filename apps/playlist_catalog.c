@@ -111,7 +111,7 @@ static int initialize_catalog(void)
 
     if (!playlist_dir_exists)
     {
-        if (mkdir(playlist_dir, 0) < 0) {
+        if (mkdir(playlist_dir) < 0) {
             gui_syncsplash(HZ*2, true, str(LANG_CATALOG_NO_DIRECTORY),
                 playlist_dir);
             return -1;

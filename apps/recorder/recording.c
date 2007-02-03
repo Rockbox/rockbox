@@ -526,7 +526,7 @@ int rec_create_directory(void)
     /* Try to create the base directory if needed */
     if(global_settings.rec_directory == 0)
     {
-        rc = mkdir(rec_base_directory, 0);
+        rc = mkdir(rec_base_directory);
         if(rc < 0 && errno != EEXIST)
         {
             gui_syncsplash(HZ * 2, true,

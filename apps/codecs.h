@@ -90,12 +90,12 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 11
+#define CODEC_API_VERSION 12
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 11
+#define CODEC_MIN_API_VERSION 12
 
 /* codec return codes */
 enum codec_status {
@@ -192,7 +192,7 @@ struct codec_api {
     DIR* (*PREFIX(opendir))(const char* name);
     int (*PREFIX(closedir))(DIR* dir);
     struct dirent* (*PREFIX(readdir))(DIR* dir);
-    int (*PREFIX(mkdir))(const char *name, int mode);
+    int (*PREFIX(mkdir))(const char *name);
 
     /* kernel/ system */
     void (*PREFIX(sleep))(int ticks);

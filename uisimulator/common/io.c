@@ -211,9 +211,8 @@ int sim_creat(const char *name)
 #endif
 }      
 
-int sim_mkdir(const char *name, mode_t mode)
+int sim_mkdir(const char *name)
 {
-    (void)mode;
 #ifdef __PCTOOL__
 # ifdef WIN32
     return mkdir(name);

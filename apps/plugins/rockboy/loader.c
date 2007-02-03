@@ -336,7 +336,7 @@ void loader_init(char *s)
 //	sys_checkdir(savedir, 1); /* needs to be writable */
 /*	dir=opendir(savedir); // should be handled when the program opens
 	if(!dir)
-	  mkdir(savedir,0);
+	  mkdir(savedir);
 	else
 	  closedir(dir);*/
 
