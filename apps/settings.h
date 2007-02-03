@@ -63,7 +63,7 @@
 #define CONFIGFILE  ROCKBOX_DIR "/config.cfg"
 #define FIXEDSETTINGSFILE  ROCKBOX_DIR "/fixed.cfg"
 
-#define MAX_FILENAME 20
+#define MAX_FILENAME 32
 
 
 #define BOOKMARK_NO  0
