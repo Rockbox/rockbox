@@ -138,6 +138,8 @@ drivers/rtc/rtc_pcf50605.c
 drivers/rtc/rtc_e8564.c
 #elif (CONFIG_RTC == RTC_S3C2440)
 drivers/rtc/rtc_s3c2440.c
+#elif (CONFIG_RTC == RTC_AS3514)
+drivers/rtc/rtc_as3514.c
 #endif /* (CONFIG_RTC == RTC_) */
 #endif /* SIMULATOR */
 
