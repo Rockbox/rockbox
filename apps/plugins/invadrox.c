@@ -1605,7 +1605,7 @@ void init_invadrox(void)
 
 inline bool handle_buttons(void)
 {
-    static unsigned int oldbuttonstate IDATA_ATTR = 0;
+    static unsigned int oldbuttonstate = 0;
 
     unsigned int released, pressed, newbuttonstate;
 
