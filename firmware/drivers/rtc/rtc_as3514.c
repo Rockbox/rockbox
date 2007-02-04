@@ -152,7 +152,7 @@ int rtc_write_datetime(unsigned char* buf)
     seconds = buf[0]
             + buf[1]*MINUTE_SECONDS
             + buf[2]*HOUR_SECONDS
-            + buf[4]*DAY_SECONDS
+            + (buf[4]-1)*DAY_SECONDS
             + month_days*DAY_SECONDS
             + year_days*DAY_SECONDS;
 
