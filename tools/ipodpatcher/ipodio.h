@@ -20,6 +20,8 @@
 #ifndef __IPODIO_H
 #define __IPODIO_H
 
+#include <stdint.h>
+
 #ifdef __WIN32__
 #include <windows.h>
 #else
@@ -27,13 +29,56 @@
 #define O_BINARY 0
 #endif
 
+/* The maximum number of images in a firmware partition - a guess... */
+#define MAX_IMAGES 10
+
+enum firmwaretype_t {
+   FTYPE_OSOS = 0,
+   FTYPE_RSRC,
+   FTYPE_AUPD,
+   FTYPE_HIBE
+};
+
+struct ipod_directory_t {
+  enum firmwaretype_t ftype;
+  int id;
+  uint32_t devOffset; /* Offset of image relative to one sector into bootpart*/
+  uint32_t len;
+  uint32_t addr;
+  uint32_t entryOffset;
+  uint32_t chksum;
+  uint32_t vers;
+  uint32_t loadAddr;
+};
+
+struct partinfo_t {
+  unsigned long start; /* first sector (LBA) */
+  unsigned long size;  /* number of sectors */
+  unsigned char type;
+};
+
+struct ipod_t {
+    HANDLE dh;
+    char diskname[4096];
+    int sector_size;
+    struct ipod_directory_t ipod_directory[MAX_IMAGES];
+    int nimages;
+    off_t diroffset;
+    off_t start;  /* Offset in bytes of firmware partition from start of disk */
+    off_t fwoffset; /* Offset in bytes of start of firmware images from start of disk */
+    struct partinfo_t pinfo[4];
+    int modelnum;
+    char* modelname;
+    char* modelstr;
+};
+
 void print_error(char* msg);
-int ipod_open(HANDLE* dh, char* diskname, int* sector_size, int silent);
-int ipod_reopen_rw(HANDLE* dh, char* diskname);
-int ipod_close(HANDLE dh);
-int ipod_seek(HANDLE dh, unsigned long pos);
-int ipod_read(HANDLE dh, unsigned char* buf, int nbytes);
-int ipod_write(HANDLE dh, unsigned char* buf, int nbytes);
+int ipod_open(struct ipod_t* ipod, int silent);
+int ipod_reopen_rw(struct ipod_t* ipod);
+int ipod_close(struct ipod_t* ipod);
+int ipod_seek(struct ipod_t* ipod, unsigned long pos);
+int ipod_read(struct ipod_t* ipod, unsigned char* buf, int nbytes);
+int ipod_write(struct ipod_t* ipod, unsigned char* buf, int nbytes);
 int ipod_alloc_buffer(unsigned char** sectorbuf, int bufsize);
 
 #endif

@@ -47,36 +47,39 @@ void print_error(char* msg)
     perror(msg);
 }
 
-int ipod_open(HANDLE* dh, char* diskname, int* sector_size, int silent)
+int ipod_open(struct ipod_t* ipod, int silent)
 {
-    *dh=open(diskname,O_RDONLY);
-    if (*dh < 0) {
-        if (!silent) perror(diskname);
+    ipod->dh=open(ipod->diskname,O_RDONLY);
+    if (ipod->dh < 0) {
+        if (!silent) perror(ipod->diskname);
         return -1;
     }
 
-    if(ioctl(*dh,IPOD_SECTORSIZE_IOCTL,sector_size) < 0) {
-        *sector_size=512;
-        if (!silent) fprintf(stderr,"[ERR] ioctl() call to get sector size failed, defaulting to %d\n",*sector_size);
+    if(ioctl(ipod->dh,IPOD_SECTORSIZE_IOCTL,&ipod->sector_size) < 0) {
+        ipod->sector_size=512;
+        if (!silent) {
+            fprintf(stderr,"[ERR] ioctl() call to get sector size failed, defaulting to %d\n"
+                   ,ipod->sector_size);
+	}
     }
     return 0;
 }
 
 
-int ipod_reopen_rw(HANDLE* dh, char* diskname)
+int ipod_reopen_rw(struct ipod_t* ipod)
 {
-    close(*dh);
-    *dh=open(diskname,O_RDWR);
-    if (*dh < 0) {
-        perror(diskname);
+    close(ipod->dh);
+    ipod->dh=open(ipod->diskname,O_RDWR);
+    if (ipod->dh < 0) {
+        perror(ipod->diskname);
         return -1;
     }
     return 0;
 }
 
-int ipod_close(HANDLE dh)
+int ipod_close(struct ipod_t* ipod)
 {
-    close(dh);
+    close(ipod->dh);
     return 0;
 }
 
@@ -89,11 +92,11 @@ int ipod_alloc_buffer(unsigned char** sectorbuf, int bufsize)
     return 0;
 }
 
-int ipod_seek(HANDLE dh, unsigned long pos)
+int ipod_seek(struct ipod_t* ipod, unsigned long pos)
 {
     off_t res;
 
-    res = lseek(dh, pos, SEEK_SET);
+    res = lseek(ipod->dh, pos, SEEK_SET);
 
     if (res == -1) {
        return -1;
@@ -101,12 +104,12 @@ int ipod_seek(HANDLE dh, unsigned long pos)
     return 0;
 }
 
-int ipod_read(HANDLE dh, unsigned char* buf, int nbytes)
+int ipod_read(struct ipod_t* ipod, unsigned char* buf, int nbytes)
 {
-    return read(dh, buf, nbytes);
+    return read(ipod->dh, buf, nbytes);
 }
 
-int ipod_write(HANDLE dh, unsigned char* buf, int nbytes)
+int ipod_write(struct ipod_t* ipod, unsigned char* buf, int nbytes)
 {
-    return write(dh, buf, nbytes);
+    return write(ipod->dh, buf, nbytes);
 }

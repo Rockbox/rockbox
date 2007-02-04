@@ -66,27 +66,27 @@ void print_error(char* msg)
     LocalFree(pMsgBuf);
 }
 
-int ipod_open(HANDLE* dh, char* diskname, int* sector_size, int silent)
+int ipod_open(struct ipod_t* ipod, int silent)
 {
     DISK_GEOMETRY_EX diskgeometry_ex;
     DISK_GEOMETRY diskgeometry;
     unsigned long n;
 
-    *dh = CreateFile(diskname, GENERIC_READ,
+    ipod->dh = CreateFile(ipod->diskname, GENERIC_READ,
                     FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
                     FILE_FLAG_WRITE_THROUGH | FILE_FLAG_NO_BUFFERING, NULL);
 
-    if (*dh == INVALID_HANDLE_VALUE) {
+    if (ipod->dh == INVALID_HANDLE_VALUE) {
         if (!silent) print_error(" Error opening disk: ");
         return -1;
     }
 
-    if (!lock_volume(*dh)) {
+    if (!lock_volume(ipod->dh)) {
         if (!silent) print_error(" Error locking disk: ");
         return -1;
     }
 
-    if (!DeviceIoControl(*dh,
+    if (!DeviceIoControl(ipod->dh,
                          IOCTL_DISK_GET_DRIVE_GEOMETRY_EX,
                          NULL,
                          0,
@@ -94,7 +94,7 @@ int ipod_open(HANDLE* dh, char* diskname, int* sector_size, int silent)
                          sizeof(diskgeometry_ex),
                          &n,
                          NULL)) {
-        if (!DeviceIoControl(*dh,
+        if (!DeviceIoControl(ipod->dh,
                              IOCTL_DISK_GET_DRIVE_GEOMETRY,
                              NULL,
                              0,
@@ -105,31 +105,31 @@ int ipod_open(HANDLE* dh, char* diskname, int* sector_size, int silent)
             if (!silent) print_error(" Error reading disk geometry: ");
             return -1;
         } else {
-            *sector_size=diskgeometry.BytesPerSector;
+            ipod->sector_size=diskgeometry.BytesPerSector;
         }
     } else {
-        *sector_size=diskgeometry_ex.Geometry.BytesPerSector;
+        ipod->sector_size=diskgeometry_ex.Geometry.BytesPerSector;
     }
 
     return 0;
 }
 
-int ipod_reopen_rw(HANDLE* dh, char* diskname)
+int ipod_reopen_rw(struct ipod_t* ipod)
 {
     /* Close existing file and re-open for writing */
-    unlock_volume(*dh);
-    CloseHandle(*dh);
+    unlock_volume(ipod->dh);
+    CloseHandle(ipod->dh);
 
-    *dh = CreateFile(diskname, GENERIC_READ | GENERIC_WRITE,
+    ipod->dh = CreateFile(ipod->diskname, GENERIC_READ | GENERIC_WRITE,
                      FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
                      FILE_FLAG_WRITE_THROUGH | FILE_FLAG_NO_BUFFERING, NULL);
 
-    if (*dh == INVALID_HANDLE_VALUE) {
+    if (ipod->dh == INVALID_HANDLE_VALUE) {
         print_error(" Error opening disk: ");
         return -1;
     }
 
-    if (!lock_volume(*dh)) {
+    if (!lock_volume(ipod->dh)) {
         print_error(" Error locking disk: ");
         return -1;
     }
@@ -137,10 +137,10 @@ int ipod_reopen_rw(HANDLE* dh, char* diskname)
     return 0;
 }
 
-int ipod_close(HANDLE dh)
+int ipod_close(struct ipod_t* ipod)
 {
-    unlock_volume(dh);
-    CloseHandle(dh);
+    unlock_volume(ipod->dh);
+    CloseHandle(ipod->dh);
     return 0;
 }
 
@@ -156,20 +156,20 @@ int ipod_alloc_buffer(unsigned char** sectorbuf, int bufsize)
     return 0;
 }
 
-int ipod_seek(HANDLE dh, unsigned long pos)
+int ipod_seek(struct ipod_t* ipod, unsigned long pos)
 {
-    if (SetFilePointer(dh, pos, NULL, FILE_BEGIN)==0xffffffff) {
+    if (SetFilePointer(ipod->dh, pos, NULL, FILE_BEGIN)==0xffffffff) {
         print_error(" Seek error ");
         return -1;
     }
     return 0;
 }
 
-int ipod_read(HANDLE dh, unsigned char* buf, int nbytes)
+int ipod_read(struct ipod_t* ipod, unsigned char* buf, int nbytes)
 {
     unsigned long count;
 
-    if (!ReadFile(dh, buf, nbytes, &count, NULL)) {
+    if (!ReadFile(ipod->dh, buf, nbytes, &count, NULL)) {
         print_error(" Error reading from disk: ");
         return -1;
     }
@@ -177,11 +177,11 @@ int ipod_read(HANDLE dh, unsigned char* buf, int nbytes)
     return count;
 }
 
-int ipod_write(HANDLE dh, unsigned char* buf, int nbytes)
+int ipod_write(struct ipod_t* ipod, unsigned char* buf, int nbytes)
 {
     unsigned long count;
 
-    if (!WriteFile(dh, buf, nbytes, &count, NULL)) {
+    if (!WriteFile(ipod->dh, buf, nbytes, &count, NULL)) {
         print_error(" Error writing to disk: ");
         return -1;
     }
