@@ -548,7 +548,8 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
     /* Check if we have enough space */
     /* TODO: Check the size of the partition. */
     if (ipod->nimages > 1) {
-        if ((entryOffset+paddedlength) >= ipod->ipod_directory[1].devOffset) {
+        if ((ipod->ipod_directory[0].devOffset+entryOffset+paddedlength) >= 
+             ipod->ipod_directory[1].devOffset) {
             fprintf(stderr,"[INFO] Moving images to create room for new firmware...\n");
             delta = ipod->ipod_directory[0].devOffset + entryOffset+paddedlength
                     - ipod->ipod_directory[1].devOffset;
