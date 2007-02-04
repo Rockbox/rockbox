@@ -428,7 +428,6 @@ enum codec_status codec_main(void)
     ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*128));
 
-    ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_NONINTERLEAVED);
     ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(FLAC_OUTPUT_DEPTH-1));
 
     next_track:
@@ -452,6 +451,8 @@ enum codec_status codec_main(void)
         ci->sleep(1);
     
     ci->configure(DSP_SWITCH_FREQUENCY, (long *)(ci->id3->frequency));
+    ci->configure(DSP_SET_STEREO_MODE, (long *) (fc.channels == 1 
+        ? STEREO_MONO : STEREO_NONINTERLEAVED));
     codec_set_replaygain(ci->id3);
 
     if (samplesdone) {
