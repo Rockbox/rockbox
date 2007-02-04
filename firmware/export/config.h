@@ -154,8 +154,9 @@
 #define RTC_AS3514   6 /* Sandisk Sansa e200 series */
 
 /* USB On-the-go */
-#define USBOTG_ISP1362 1362
-#define USBOTG_M5636 5636
+#define USBOTG_ISP1362 1362 /* iriver H300 */
+#define USBOTG_M5636   5636 /* iAudio X5 */
+#define USBOTG_ARC     5020 /* PortalPlayer 502x */
 
 /* Multiple cores */
 #define CPU 0

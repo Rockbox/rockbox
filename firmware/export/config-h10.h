@@ -142,6 +142,9 @@
 
 /* #define USB_IPODSTYLE */
 
+/* USB On-the-go */
+#define CONFIG_USBOTG USBOTG_ARC
+
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
 
