@@ -29,7 +29,7 @@
 #include "parttypes.h"
 #include "ipodio.h"
 
-#define VERSION "0.6cvs"
+#define VERSION "0.6"
 
 int verbose = 0;
 
