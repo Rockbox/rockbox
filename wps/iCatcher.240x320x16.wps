@@ -3,8 +3,7 @@
 
 
 %t1 %?mp<%al Stopped%ar-:--/-:-- |%al %pv dB%ar%pc/%pt |%al Paused%ar%pc/%pt |%al Seeking%ar%pc/%pt |%al Seeking%ar%pc/%pt >;%t1 %?mp<%al Stopped-:--/-:-- |%al %pv dB%ar%pc/%pt |%al Paused|%al Seeking%ar%pc/%pt |%al Seeking%ar%pc/%pt >
-%al  %bl%%%ar%pp/%pe 
-
+%al   %bl%%%ar%pp/%pe 
 
 
 %s%ac%?ia<%ia|%?d2<%d2|Unknown Artist>>
@@ -61,18 +60,18 @@
 %xl|p|ani7-b.bmp|34|5|
 %xl|q|ani8-b.bmp|34|5|
 %t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdj|%xdj|%xdj>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdk|%xdk|%xdk>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdl|%xdl|%xdl>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdm|%xdm|%xdm>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdn|%xdn|%xdn>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdo|%xdo|%xdo>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdp|%xdp|%xdp>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdq|%xdq|%xdq>
-%xl|r|codec-mp1-b.bmp|168|232|
-%xl|s|codec-mp2-b.bmp|168|232|
-%xl|t|codec-mp3-b.bmp|168|232|
-%xl|u|codec-aiff-b.bmp|168|232|
-%xl|v|codec-wav-b.bmp|168|232|
-%xl|w|codec-ogg-b.bmp|168|232|
-%xl|x|codec-flac-b.bmp|168|232|
-%xl|y|codec-mpc-b.bmp|168|232|
-%xl|z|codec-ac3-b.bmp|168|232|
-%xl|V|codec-wavpack-b.bmp|168|232|
-%xl|W|codec-alac-b.bmp|168|232|
-%xl|X|codec-aac-b.bmp|168|232|
-%xl|Y|codec-shorten-b.bmp|168|232|
-%xl|Z|codec-unknown-b.bmp|168|232|
+%xl|r|codec-mp1-b.bmp|168|229|
+%xl|s|codec-mp2-b.bmp|168|229|
+%xl|t|codec-mp3-b.bmp|168|229|
+%xl|u|codec-aiff-b.bmp|168|229|
+%xl|v|codec-wav-b.bmp|168|229|
+%xl|w|codec-ogg-b.bmp|168|229|
+%xl|x|codec-flac-b.bmp|168|229|
+%xl|y|codec-mpc-b.bmp|168|229|
+%xl|z|codec-ac3-b.bmp|168|229|
+%xl|V|codec-wavpack-b.bmp|168|229|
+%xl|W|codec-alac-b.bmp|168|229|
+%xl|X|codec-aac-b.bmp|168|229|
+%xl|Y|codec-shorten-b.bmp|168|229|
+%xl|Z|codec-unknown-b.bmp|168|229|
 %?fc<%xdr|%xds|%xdt|%xdu|%xdv|%xdw|%xdx|%xdy|%xdz|%xdV|%xdW|%xdX|%xdY|%xdZ>
