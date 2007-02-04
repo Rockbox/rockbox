@@ -450,8 +450,8 @@ enum codec_status codec_main(void)
     while (!*ci->taginfo_ready && !ci->stop_codec)
         ci->sleep(1);
     
-    ci->configure(DSP_SWITCH_FREQUENCY, (long *)(ci->id3->frequency));
-    ci->configure(DSP_SET_STEREO_MODE, (long *) (fc.channels == 1 
+    ci->configure(DSP_SWITCH_FREQUENCY, (int *)(ci->id3->frequency));
+    ci->configure(DSP_SET_STEREO_MODE, (int *) (fc.channels == 1 
         ? STEREO_MONO : STEREO_NONINTERLEAVED));
     codec_set_replaygain(ci->id3);
 
