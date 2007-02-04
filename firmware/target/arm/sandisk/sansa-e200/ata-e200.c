@@ -267,27 +267,14 @@ static void copy_write_sectors(const unsigned char* buf, int wordcount)
 
 static void copy_write_sectors(const unsigned char* buf, int wordcount)
 {
-    if ( (unsigned long)buf & 1)
-    {   /* not 16-bit aligned, copy byte by byte */
-        unsigned short tmp = 0;
-        const unsigned char* bufend = buf + wordcount*2;
-        do
-        {
-            tmp = (unsigned short) *buf++;
-            tmp |= (unsigned short) *buf++ << 8;
-            DATA_REG = tmp;
-        } while (buf < bufend); /* tail loop is faster */
-    }
-    else
-    {   /* 16-bit aligned, can do faster copy */
-        unsigned short* wbuf = (unsigned short*)buf;
-        unsigned short* wbufend = wbuf + wordcount;
-        do
-        {
-            DATA_REG = *wbuf;
-            asm volatile("nop\n\t");
-        } while (++wbuf < wbufend); /* tail loop is faster */
-    }
+    unsigned short tmp = 0;
+    const unsigned char* bufend = buf + wordcount*2;
+    do
+    {
+        tmp = (unsigned short) *buf++;
+        tmp |= (unsigned short) *buf++ << 8;
+        DATA_REG = tmp;
+    } while (buf < bufend); /* tail loop is faster */
 }
 
 
