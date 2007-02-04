@@ -351,7 +351,7 @@ void print_usage(void) {
 #else
 #if defined(linux) || defined (__linux)
     fprintf(stderr,"\"device\" is the device node (e.g. /dev/sda) assigned to your ipod.\n");
-#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) \
+#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     fprintf(stderr,"\"device\" is the device node (e.g. /dev/da1) assigned to your ipod.\n");
 #elif defined(__APPLE__) && defined(__MACH__)
     fprintf(stderr,"\"device\" is the device node (e.g. /dev/disk1) assigned to your ipod.\n");
@@ -649,7 +649,7 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
 
     /* Write directory */    
     if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) { 
-        fprintf(stderr,"[ERR]  Seek to %ld failed\n", ipod->start+ipod->diroffset-x);
+        fprintf(stderr,"[ERR]  Seek to %d failed\n", (int)(ipod->start+ipod->diroffset-x));
         return -1;
     }
     n=ipod_write(ipod, sectorbuf, ipod->sector_size);
