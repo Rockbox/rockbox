@@ -131,7 +131,7 @@ long fsqrt(long a, unsigned int fracbits)
     const unsigned iterations = 4;
     
     for (n = 0; n < iterations; ++n)
-        b = (b + DIV64(a, b, fracbits))/2;
+        b = (b + (long)(((long long)(a) << fracbits)/b))/2;
 
     return b;
 }
