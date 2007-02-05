@@ -1095,13 +1095,14 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
             settings_fd = rb->creat(BOOKMARKS_FILE);
             if (settings_fd >=0 )
             {
-                if (++(data->bookmarked_files_count) > MAX_BOOKMARKED_FILES)
+                if ((data->bookmarked_files_count + 1) > MAX_BOOKMARKED_FILES)
                     data->bookmarked_files_count = MAX_BOOKMARKED_FILES; /* dump the older files */
+				else data->bookmarked_files_count++;
                 rb->write (settings_fd, &data->bookmarked_files_count, sizeof(signed int));
                 rb->PREFIX(lseek)(settings_fd,sizeof(struct bookmarked_file_info),SEEK_CUR);
                 //   rb->memset(&dummy,0,sizeof(struct bookmarked_file_info)); /* the actual info will be written on exit */
                 //rb->write (settings_fd, &dummy, sizeof(struct bookmarked_file_info));
-                rb->write (settings_fd, data->bookmarks, sizeof(struct bookmarked_file_info)*(data->bookmarked_files_count-1));
+                rb->write (settings_fd, data->bookmarks, sizeof(struct bookmarked_file_info)*(data->bookmarked_files_count));
                 rb->close(settings_fd);
             }
         }
