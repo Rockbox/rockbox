@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 Dave Chapman
+ * Copyright (C) 2006-2007 Dave Chapman
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -1198,7 +1198,7 @@ int main(int argc, char* argv[])
     int type;
     struct ipod_t ipod;
 
-    fprintf(stderr,"ipodpatcher v" VERSION " - (C) Dave Chapman 2006\n");
+    fprintf(stderr,"ipodpatcher v" VERSION " - (C) Dave Chapman 2006-2007\n");
     fprintf(stderr,"This is free software; see the source for copying conditions.  There is NO\n");
     fprintf(stderr,"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
 

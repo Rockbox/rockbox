@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 Dave Chapman
+ * Copyright (C) 2006-2007 Dave Chapman
  *
  * error(), lock_volume() and unlock_volume() functions and inspiration taken
  * from:
