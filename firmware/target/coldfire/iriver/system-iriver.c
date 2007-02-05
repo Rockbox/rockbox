@@ -25,6 +25,7 @@
 #include "pcf50606.h"
 
 /* Settings for all possible clock frequencies (with properly working timers)
+ * NOTE: Some 5249 chips don't like having PLLDIV set to 0. We must avoid that!
  *
  *                        xxx_REFRESH_TIMER below
  * system.h, CPUFREQ_xxx_MULT        |
@@ -34,16 +35,16 @@
  * CPUCLK/Hz  MULT    PLLCR     16MB  32MB  CSCR0   CSCR1   CSCR3   CS2Pre CS2Post CS2Wait
  * ---------------------------------------------------------------------------------------
  *  11289600    1   0x10c00200    4     1   0x0180  0x0180  0x0180     1      0       0
- *  22579200    2   0x15c4e005   10     4   0x0180  0x0180  0x0180     1      0       0
- *  33868800    3   0x13c46005   15     7   0x0180  0x0180  0x0180     1      0       0
- *  45158400    4   0x15c4e001   21    10   0x0580  0x0180  0x0580     1      0       0
- *  56448000    5   0x12c4e005   26    12   0x0580          0x0980
- *  67737600    6   0x13c46001   32    15   0x0980          0x0d80
- *  79027200    7   0x13c52001   37    18   0x0980          0x1180
- *  90316800    8   0x13c5e001   43    21   0x0d80          0x1580
- * 101606400    9   0x11c48005   48    23   0x0d80          0x1980
- * 112896000   10   0x11c4e005   54    26   0x1180          0x1d80
- * 124185600   11   0x11c56005   59    29   0x1180  0x1180  0x2180     2      1       2
+ *  22579200    2   0x15c9e025   10     4   0x0180  0x0180  0x0180     1      0       0
+ *  33868800    3   0x13c8e025   15     7   0x0180  0x0180  0x0180     1      0       0
+ *  45158400    4   0x15c9e021   21    10   0x0580  0x0180  0x0580     1      0       0
+ *  56448000    5   0x12c9e025   26    12   0x0580          0x0980
+ *  67737600    6   0x13c8e021   32    15   0x0980          0x0d80
+ *  79027200    7   0x13ca6021   37    18   0x0980          0x1180
+ *  90316800    8   0x13cbe021   43    21   0x0d80          0x1580
+ * 101606400    9   0x11c92025   48    23   0x0d80          0x1980
+ * 112896000   10   0x11c9e025   54    26   0x1180          0x1d80
+ * 124185600   11   0x11cae025   59    29   0x1180  0x1180  0x2180     2      1       2
  */
 
 #if MEM < 32
@@ -81,7 +82,7 @@ void set_cpu_frequency(long frequency)
         PLLCR &= ~1;  /* Bypass mode */
         timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, false);
         RECALC_DELAYS(CPUFREQ_MAX);
-        PLLCR = 0x01856005 | (PLLCR & 0x70400000);
+        PLLCR = 0x018ae025 | (PLLCR & 0x70400000);
         CSCR0 = 0x00001180; /* Flash: 4 wait states */
         CSCR1 = 0x00001580; /* LCD: 5 wait states */
 #if CONFIG_USBOTG == USBOTG_ISP1362
@@ -108,7 +109,7 @@ void set_cpu_frequency(long frequency)
         PLLCR &= ~1;  /* Bypass mode */
         timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, false);
         RECALC_DELAYS(CPUFREQ_NORMAL);
-        PLLCR = 0x0385e005 | (PLLCR & 0x70400000);
+        PLLCR = 0x038be025 | (PLLCR & 0x70400000);
         CSCR0 = 0x00000580; /* Flash: 1 wait state */
         CSCR1 = 0x00000180; /* LCD: 0 wait states */
 #if CONFIG_USBOTG == USBOTG_ISP1362
