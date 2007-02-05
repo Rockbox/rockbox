@@ -54,7 +54,7 @@ struct ipod_directory_t {
 struct partinfo_t {
   unsigned long start; /* first sector (LBA) */
   unsigned long size;  /* number of sectors */
-  unsigned char type;
+  int type;
 };
 
 struct ipod_t {
@@ -70,6 +70,7 @@ struct ipod_t {
     int modelnum;
     char* modelname;
     char* modelstr;
+    int macpod;
 };
 
 void print_error(char* msg);

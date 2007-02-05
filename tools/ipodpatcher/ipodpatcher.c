@@ -29,7 +29,7 @@
 #include "parttypes.h"
 #include "ipodio.h"
 
-#define VERSION "0.6"
+#define VERSION "0.7svn"
 
 int verbose = 0;
 
@@ -65,6 +65,10 @@ char* get_parttype(int pt)
 {
     int i;
     static char unknown[]="Unknown";
+
+    if (pt == -1) {
+        return "HFS/HFS+";
+    }
 
     i=0;
     while (parttypes[i].name != NULL) {
@@ -167,7 +171,6 @@ void display_partinfo(struct ipod_t* ipod)
     }
 }
 
-
 int read_partinfo(struct ipod_t* ipod, int silent)
 {
     int i;
@@ -180,30 +183,93 @@ int read_partinfo(struct ipod_t* ipod, int silent)
         return -1;
     }
 
-    /* check that the boot sector is initialized */
-    if ( (sectorbuf[510] != 0x55) ||
-         (sectorbuf[511] != 0xaa)) {
+    if ((sectorbuf[510] == 0x55) && (sectorbuf[511] == 0xaa)) {
+        /* DOS partition table */
+        if ((memcmp(&sectorbuf[71],"iPod",4) != 0) &&
+            (memcmp(&sectorbuf[0x40],"This is your Apple iPod. You probably do not want to boot from it!",66) != 0) ) {
+            if (!silent) fprintf(stderr,"[ERR]  Drive is not an iPod, aborting\n");
+            return -1;
+        }
+
+        ipod->macpod = 0;
+        /* parse partitions */
+        for ( i = 0; i < 4; i++ ) {
+            unsigned char* ptr = sectorbuf + 0x1be + 16*i;
+            ipod->pinfo[i].type  = ptr[4];
+            ipod->pinfo[i].start = BYTES2INT32(ptr, 8);
+            ipod->pinfo[i].size  = BYTES2INT32(ptr, 12);
+
+            /* extended? */
+            if ( ipod->pinfo[i].type == 5 ) {
+                /* not handled yet */
+            }
+        }
+    } else if ((sectorbuf[0] == 'E') && (sectorbuf[1] == 'R')) {
+        /* Apple Partition Map */
+
+        /* APM parsing code based on the check_mac_partitions() function in
+           ipodloader2 - written by Thomas Tempelmann and released
+           under the GPL. */
+
+        int blkNo = 1;
+        int partBlkCount = 1;
+        int partBlkSizMul = sectorbuf[2] / 2;
+
+        int pmMapBlkCnt;      /* # of blks in partition map */
+        int pmPyPartStart;    /* physical start blk of partition */
+        int pmPartBlkCnt;     /* # of blks in this partition */
+        int i = 0;
+
+        ipod->macpod = 1;
+
+        memset(ipod->pinfo,0,sizeof(ipod->pinfo));
+
+        while (blkNo <= partBlkCount) {
+            if (ipod_seek(ipod, blkNo * partBlkSizMul * 512) < 0) {
+                fprintf(stderr,"[ERR]  Seek failed whilst reading APM\n");
+                return -1;
+            }
+
+            count = ipod_read(ipod, sectorbuf, ipod->sector_size);
+
+            if (count <= 0) {
+                print_error(" Error reading from disk: ");
+                return -1;
+            }
+
+            /* see if it's a partition entry */
+            if ((sectorbuf[0] != 'P') || (sectorbuf[1] != 'M')) {
+                /* end of partition table -> leave the loop */
+                break;  
+            }
+
+            /* Extract the interesting entries */
+            pmMapBlkCnt = be2int(sectorbuf + 4);
+            pmPyPartStart = be2int(sectorbuf + 8);
+            pmPartBlkCnt = be2int(sectorbuf + 12);
+
+            /* update the number of part map blocks */
+            partBlkCount = pmMapBlkCnt;
+
+            if (strncmp((char*)(sectorbuf + 48), "Apple_MDFW", 32)==0) {
+                 /* A Firmware partition */
+                 ipod->pinfo[i].start = pmPyPartStart;
+                 ipod->pinfo[i].size = pmPartBlkCnt;
+                 ipod->pinfo[i].type = 0;
+                 i++;
+            } else if (strncmp((char*)(sectorbuf + 48), "Apple_HFS", 32)==0) {
+                 /* A HFS partition */
+                 ipod->pinfo[i].start = pmPyPartStart;
+                 ipod->pinfo[i].size = pmPartBlkCnt;
+                 ipod->pinfo[i].type = -1;
+                 i++;
+            }
+
+            blkNo++; /* read next partition map entry */
+        }
+    } else {
         if (!silent) fprintf(stderr,"[ERR]  Bad boot sector signature\n");
         return -1;
-    }
-
-    if ((memcmp(&sectorbuf[71],"iPod",4) != 0) &&
-        (memcmp(&sectorbuf[0x40],"This is your Apple iPod. You probably do not want to boot from it!",66) != 0) ) {
-        if (!silent) fprintf(stderr,"[ERR]  Drive is not an iPod, aborting\n");
-        return -1;
-    }
-
-    /* parse partitions */
-    for ( i = 0; i < 4; i++ ) {
-        unsigned char* ptr = sectorbuf + 0x1be + 16*i;
-        ipod->pinfo[i].type  = ptr[4];
-        ipod->pinfo[i].start = BYTES2INT32(ptr, 8);
-        ipod->pinfo[i].size  = BYTES2INT32(ptr, 12);
-
-        /* extended? */
-        if ( ipod->pinfo[i].type == 5 ) {
-            /* not handled yet */
-        }
     }
 
     ipod->start = ipod->pinfo[0].start*ipod->sector_size;
@@ -321,8 +387,18 @@ int write_partition(struct ipod_t* ipod, int infile)
     return 0;
 }
 
+void print_macpod_warning(void)
+{
+    printf("[INFO] ************************************************************************\n");
+    printf("[INFO] *** WARNING FOR ROCKBOX USERS\n");
+    printf("[INFO] *** You must convert this ipod to FAT32 format (aka a \"winpod\")\n");
+    printf("[INFO] *** if you want to run Rockbox.  Rockbox WILL NOT work on this ipod.\n");
+    printf("[INFO] *** See http://www.rockbox.org/twiki/bin/view/Main/IpodConversionToFAT32\n");
+    printf("[INFO] ************************************************************************\n");
+}
 
-void print_usage(void) {
+void print_usage(void)
+{
     fprintf(stderr,"Usage: ipodpatcher --scan\n");
 #ifdef __WIN32__
     fprintf(stderr,"    or ipodpatcher DISKNO [action]\n");
@@ -1140,7 +1216,7 @@ int ipod_scan(struct ipod_t* ipod)
 
     printf("[INFO] Scanning disk devices...\n");
 
-    for (i = 0; i < 25 ; i++) {
+    for (i = 0; i <= 25 ; i++) {
 #ifdef __WIN32__
          sprintf(ipod->diskname,"\\\\.\\PhysicalDrive%d",i);
 #elif defined(linux) || defined (__linux)
@@ -1175,10 +1251,15 @@ int ipod_scan(struct ipod_t* ipod)
          }
 
 #ifdef __WIN32__
-         printf("[INFO] Ipod found - %s - disk device %d\n", ipod->modelstr,i);
+         printf("[INFO] Ipod found - %s (\"%s\") - disk device %d\n", 
+             ipod->modelstr,ipod->macpod ? "macpod" : "winpod",i);
 #else
-         printf("[INFO] Ipod found - %s - %s\n", ipod->modelstr, ipod->diskname);
+         printf("[INFO] Ipod found - %s (\"%s\") - %s\n",
+             ipod->modelstr,ipod->macpod ? "macpod" : "winpod",ipod->diskname);
 #endif
+         if (ipod->macpod) {
+             print_macpod_warning();
+         }
          n++;
     }
 
@@ -1334,8 +1415,13 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    printf("[INFO] Ipod model: %s\n",ipod.modelstr);
+    printf("[INFO] Ipod model: %s (\"%s\")\n",ipod.modelstr,
+           ipod.macpod ? "macpod" : "winpod");
 
+    if (ipod.macpod) {
+        print_macpod_warning();
+    }
+  
     if (action==LIST_IMAGES) {
         list_images(&ipod);
     } else if (action==DELETE_BOOTLOADER) {
