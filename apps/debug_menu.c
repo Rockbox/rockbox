@@ -1062,16 +1062,6 @@ bool dbg_ports(void)
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "GPIO1_ENABLE:   %08x", gpio1_enable);
         lcd_puts(0, line++, buf);
-#if defined(IRIVER_H300_SERIES)
-        snprintf(buf, sizeof(buf), "GPOOD0:         %08x", (unsigned int)pcf50606_read(0x37));
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPOOD1:         %08x", (unsigned int)pcf50606_read(0x38));
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPOOD2:         %08x", (unsigned int)pcf50606_read(0x39));
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPOOD3:         %08x", (unsigned int)pcf50606_read(0x3A));
-        lcd_puts(0, line++, buf);
-#endif
 
         adc_buttons = adc_read(ADC_BUTTONS);
         adc_remote  = adc_read(ADC_REMOTE);
