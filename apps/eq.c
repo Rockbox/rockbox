@@ -19,39 +19,9 @@
 
 #include <inttypes.h>
 #include "config.h"
+#include "dsp.h"
 #include "eq.h"
-
-/* Coef calculation taken from Audio-EQ-Cookbook.txt by Robert Bristow-Johnson.
-   Slightly faster calculation can be done by deriving forms which use tan()
-   instead of cos() and sin(), but the latter are far easier to use when doing
-   fixed point math, and performance is not a big point in the calculation part.
-   All the 'a' filter coefficients are negated so we can use only additions
-   in the filtering equation.
-   We realise the filters as a second order direct form 1 structure. Direct
-   form 1 was chosen because of better numerical properties for fixed point
-   implementations.
- */
-
-#define DIV64(x, y, z) (long)(((long long)(x) << (z))/(y))
-/* This macro requires the EMAC unit to be in fractional mode
-   when the coef generator routines are called. If this can't be guaranteed,
-   then add "&& 0" below. This will use a slower coef calculation on Coldfire.
- */
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
-#define FRACMUL(x, y) \
-({ \
-    long t; \
-    asm volatile ("mac.l    %[a], %[b], %%acc0\n\t" \
-                  "movclr.l %%acc0, %[t]\n\t" \
-                  : [t] "=r" (t) : [a] "r" (x), [b] "r" (y)); \
-    t; \
-})
-#else
-#define FRACMUL(x, y) ((long)(((((long long) (x)) * ((long long) (y))) >> 31)))
-#endif
-
-/* TODO: replaygain.c has some fixed point routines. perhaps we could reuse
-   them? */
+#include "replaygain.h"
 
 /* Inverse gain of circular cordic rotation in s0.31 format. */
 static const long cordic_circular_gain = 0xb2458939; /* 0.607252929 */
@@ -148,46 +118,8 @@ static long fsincos(unsigned long phase, long *cos) {
     return y;
 }
 
-/* Fixed point square root via Newton-Raphson.
- * Output is in same fixed point format as input. 
- * fracbits specifies number of fractional bits in argument.
- */
-static long fsqrt(long a, unsigned int fracbits)
-{
-    long b = a/2 + (1 << fracbits); /* initial approximation */
-    unsigned n;
-    const unsigned iterations = 4;
-    
-    for (n = 0; n < iterations; ++n)
-        b = (b + DIV64(a, b, fracbits))/2;
-
-    return b;
-}
-
-static const short dbtoatab[49] = {
-    2058, 2180, 2309, 2446, 2591, 2744, 2907, 3079, 3261, 3455, 3659, 3876,
-    4106, 4349, 4607, 4880, 5169, 5475, 5799, 6143, 6507, 6893, 7301, 7734,
-    8192, 8677, 9192, 9736, 10313, 10924, 11572, 12257, 12983, 13753, 14568,
-    15431, 16345, 17314, 18340, 19426, 20577, 21797, 23088, 24456, 25905, 27440,
-    29066, 30789, 32613
-};
-
-/* Function for converting dB to squared amplitude factor (A = 10^(dB/40)).
-   Range is -24 to 24 dB. If gain values outside of this is needed, the above
-   table needs to be extended.
-   Parameter format is s15.16 fixed point. Return format is s2.29 fixed point.
- */
-static long dbtoA(long db)
-{
-    const unsigned long bias = 24 << 16;
-    unsigned short frac = (db + bias) & 0x0000ffff;
-    unsigned short pos = (db + bias) >> 16;
-    short diff = dbtoatab[pos + 1] - dbtoatab[pos];
-    
-    return (dbtoatab[pos] << 16) + frac*diff;
-}
-
-/* Calculate first order shelving filter coefficients.
+/**
+ * Calculate first order shelving filter coefficients.
  * Note that the filter is not compatible with the eq_filter routine.
  * @param cutoff a value from 0 to 0x80000000, where 0 represents 0 Hz and
  * 0x80000000 represents the Nyquist frequency (samplerate/2).
@@ -205,8 +137,8 @@ void filter_bishelf_coefs(unsigned long cutoff, long ad, long an, int32_t *c)
     cs = one + (cs >> 4);
 
     /* For max A = 4 (24 dB) */
-    b0 = (FRACMUL(an, cs) << 4) + (FRACMUL(ad, s) << 4);
-    b1 = (FRACMUL(ad, s) << 4) - (FRACMUL(an, cs) << 4);
+    b0 = FRACMUL_SHL(an, cs, 4) + FRACMUL_SHL(ad, s, 4);
+    b1 = FRACMUL_SHL(ad, s, 4) - FRACMUL_SHL(an, cs, 4);
     a0 = s + cs;
     a1 = s - cs;
 
@@ -215,36 +147,48 @@ void filter_bishelf_coefs(unsigned long cutoff, long ad, long an, int32_t *c)
     c[2] = -DIV64(a1, a0, 31);
 }
 
+/* Coef calculation taken from Audio-EQ-Cookbook.txt by Robert Bristow-Johnson.
+ * Slightly faster calculation can be done by deriving forms which use tan()
+ * instead of cos() and sin(), but the latter are far easier to use when doing
+ * fixed point math, and performance is not a big point in the calculation part.
+ * All the 'a' filter coefficients are negated so we can use only additions
+ * in the filtering equation.
+ */
+
 /** 
  * Calculate second order section peaking filter coefficients.
  * @param cutoff a value from 0 to 0x80000000, where 0 represents 0 Hz and
  * 0x80000000 represents the Nyquist frequency (samplerate/2).
- * @param Q 16.16 fixed point value describing Q factor. Lower bound
- * is artificially set at 0.5.
- * @param db s15.16 fixed point value describing gain/attenuation at peak freq.
+ * @param Q Q factor value multiplied by ten. Lower bound is artificially set
+ * at 0.5.
+ * @param db decibel value multiplied by ten, describing gain/attenuation at
+ * peak freq.
  * @param c pointer to coefficient storage. Coefficients are s3.28 format.
  */
 void eq_pk_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
 {
-    long cc;
+    long cs;
     const long one = 1 << 28; /* s3.28 */
-    const long A = dbtoA(db);
-    const long alpha = DIV64(fsincos(cutoff, &cc), 2*Q, 15); /* s1.30 */
+    const long A = get_replaygain_int(db*5) << 5; /* 10^(db/40), s2.29 */
+    const long alpha = fsincos(cutoff, &cs)/(2*Q)*10 >> 1; /* s1.30 */
     int32_t a0, a1, a2; /* these are all s3.28 format */
     int32_t b0, b1, b2;
+    const long alphadivA = DIV64(alpha, A, 27);
 
     /* possible numerical ranges are in comments by each coef */
     b0 = one + FRACMUL(alpha, A);     /* [1 .. 5] */
-    b1 = a1 = -2*(cc >> 3);           /* [-2 .. 2] */
+    b1 = a1 = -2*(cs >> 3);           /* [-2 .. 2] */
     b2 = one - FRACMUL(alpha, A);     /* [-3 .. 1] */
-    a0 = one + DIV64(alpha, A, 27);   /* [1 .. 5] */
-    a2 = one - DIV64(alpha, A, 27);   /* [-3 .. 1] */
+    a0 = one + alphadivA;             /* [1 .. 5] */
+    a2 = one - alphadivA;             /* [-3 .. 1] */
 
-    c[0] = DIV64(b0, a0, 28);         /* [0.25 .. 4] */
-    c[1] = DIV64(b1, a0, 28);         /* [-2 .. 2] */
-    c[2] = DIV64(b2, a0, 28);         /* [-2.4 .. 1] */
-    c[3] = DIV64(-a1, a0, 28);        /* [-2 .. 2] */
-    c[4] = DIV64(-a2, a0, 28);        /* [-0.6 .. 1] */
+    /* range of this is roughly [0.2 .. 1], but we'll never hit 1 completely */
+    const long rcp_a0 = DIV64(1, a0, 59); /* s0.31 */
+    *c++ = FRACMUL(b0, rcp_a0);         /* [0.25 .. 4] */
+    *c++ = FRACMUL(b1, rcp_a0);         /* [-2 .. 2] */
+    *c++ = FRACMUL(b2, rcp_a0);         /* [-2.4 .. 1] */
+    *c++ = FRACMUL(-a1, rcp_a0);        /* [-2 .. 2] */
+    *c++ = FRACMUL(-a2, rcp_a0);        /* [-0.6 .. 1] */
 }
 
 /**
@@ -255,20 +199,21 @@ void eq_ls_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
 {
     long cs;
     const long one = 1 << 25; /* s6.25 */
-    const long A = dbtoA(db);
-    const long alpha = DIV64(fsincos(cutoff, &cs), 2*Q, 15); /* s1.30 */
+    const long sqrtA = get_replaygain_int(db*5/2) << 2; /* 10^(db/80), s5.26 */
+    const long A = FRACMUL_SHL(sqrtA, sqrtA, 8); /* s2.29 */
+    const long alpha = fsincos(cutoff, &cs)/(2*Q)*10 >> 1; /* s1.30 */
     const long ap1 = (A >> 4) + one;
     const long am1 = (A >> 4) - one;
-    const long twosqrtalpha = 2*FRACMUL(fsqrt(A >> 3, 26), alpha);
+    const long twosqrtalpha = 2*FRACMUL(sqrtA, alpha);
     int32_t a0, a1, a2; /* these are all s6.25 format */
     int32_t b0, b1, b2;
     
     /* [0.1 .. 40] */
-    b0 = FRACMUL(A, ap1 - FRACMUL(am1, cs) + twosqrtalpha) << 2;
+    b0 = FRACMUL_SHL(A, ap1 - FRACMUL(am1, cs) + twosqrtalpha, 2);
     /* [-16 .. 63.4] */
-    b1 = FRACMUL(A, am1 - FRACMUL(ap1, cs)) << 3;
+    b1 = FRACMUL_SHL(A, am1 - FRACMUL(ap1, cs), 3);
     /* [0 .. 31.7] */
-    b2 = FRACMUL(A, ap1 - FRACMUL(am1, cs) - twosqrtalpha) << 2;
+    b2 = FRACMUL_SHL(A, ap1 - FRACMUL(am1, cs) - twosqrtalpha, 2);
     /* [0.5 .. 10] */
     a0 = ap1 + FRACMUL(am1, cs) + twosqrtalpha;
     /* [-16 .. 4] */
@@ -276,11 +221,13 @@ void eq_ls_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
     /* [0 .. 8] */
     a2 = ap1 + FRACMUL(am1, cs) - twosqrtalpha;
 
-    c[0] = DIV64(b0, a0, 26);       /* [0.06 .. 15.9] */
-    c[1] = DIV64(b1, a0, 26);       /* [-2 .. 31.7] */
-    c[2] = DIV64(b2, a0, 26);       /* [0 .. 15.9] */
-    c[3] = DIV64(-a1, a0, 26);      /* [-2 .. 2] */
-    c[4] = DIV64(-a2, a0, 26);      /* [0 .. 1] */
+    /* [0.1 .. 1.99] */
+    const long rcp_a0 = DIV64(1, a0, 55); /* s1.30 */
+    *c++ = FRACMUL_SHL(b0, rcp_a0, 2);       /* [0.06 .. 15.9] */
+    *c++ = FRACMUL_SHL(b1, rcp_a0, 2);       /* [-2 .. 31.7] */
+    *c++ = FRACMUL_SHL(b2, rcp_a0, 2);       /* [0 .. 15.9] */
+    *c++ = FRACMUL_SHL(-a1, rcp_a0, 2);      /* [-2 .. 2] */
+    *c++ = FRACMUL_SHL(-a2, rcp_a0, 2);      /* [0 .. 1] */
 }
 
 /**
@@ -290,21 +237,22 @@ void eq_ls_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
 void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
 {
     long cs;
-    const int one = 1 << 25; /* s6.25 */
-    const int A = dbtoA(db);
-    const int alpha = DIV64(fsincos(cutoff, &cs), 2*Q, 15); /* s1.30 */
-    const int ap1 = (A >> 4) + one;
-    const int am1 = (A >> 4) - one;
-    const int twosqrtalpha = 2*FRACMUL(fsqrt(A >> 3, 26), alpha);
+    const long one = 1 << 25; /* s6.25 */
+    const long sqrtA = get_replaygain_int(db*5/2) << 2; /* 10^(db/80), s5.26 */
+    const long A = FRACMUL_SHL(sqrtA, sqrtA, 8); /* s2.29 */
+    const long alpha = fsincos(cutoff, &cs)/(2*Q)*10 >> 1; /* s1.30 */
+    const long ap1 = (A >> 4) + one;
+    const long am1 = (A >> 4) - one;
+    const long twosqrtalpha = 2*FRACMUL(sqrtA, alpha);
     int32_t a0, a1, a2; /* these are all s6.25 format */
     int32_t b0, b1, b2;
 
     /* [0.1 .. 40] */
-    b0 = FRACMUL(A, ap1 + FRACMUL(am1, cs) + twosqrtalpha) << 2;
+    b0 = FRACMUL_SHL(A, ap1 + FRACMUL(am1, cs) + twosqrtalpha, 2);
     /* [-63.5 .. 16] */
-    b1 = -FRACMUL(A, am1 + FRACMUL(ap1, cs)) << 3;
+    b1 = -FRACMUL_SHL(A, am1 + FRACMUL(ap1, cs), 3);
     /* [0 .. 32] */
-    b2 = FRACMUL(A, ap1 + FRACMUL(am1, cs) - twosqrtalpha) << 2;
+    b2 = FRACMUL_SHL(A, ap1 + FRACMUL(am1, cs) - twosqrtalpha, 2);
     /* [0.5 .. 10] */
     a0 = ap1 - FRACMUL(am1, cs) + twosqrtalpha;
     /* [-4 .. 16] */
@@ -312,12 +260,19 @@ void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
     /* [0 .. 8] */
     a2 = ap1 - FRACMUL(am1, cs) - twosqrtalpha;
 
-    c[0] = DIV64(b0, a0, 26);       /* [0 .. 16] */
-    c[1] = DIV64(b1, a0, 26);       /* [-31.7 .. 2] */
-    c[2] = DIV64(b2, a0, 26);       /* [0 .. 16] */
-    c[3] = DIV64(-a1, a0, 26);      /* [-2 .. 2] */
-    c[4] = DIV64(-a2, a0, 26);      /* [0 .. 1] */
+    /* [0.1 .. 1.99] */
+    const long rcp_a0 = DIV64(1, a0, 55); /* s1.30 */
+    *c++ = FRACMUL_SHL(b0, rcp_a0, 2);       /* [0 .. 16] */
+    *c++ = FRACMUL_SHL(b1, rcp_a0, 2);       /* [-31.7 .. 2] */
+    *c++ = FRACMUL_SHL(b2, rcp_a0, 2);       /* [0 .. 16] */
+    *c++ = FRACMUL_SHL(-a1, rcp_a0, 2);      /* [-2 .. 2] */
+    *c++ = FRACMUL_SHL(-a2, rcp_a0, 2);      /* [0 .. 1] */
 }
+
+/* We realise the filters as a second order direct form 1 structure. Direct
+ * form 1 was chosen because of better numerical properties for fixed point
+ * implementations.
+ */
 
 #if (!defined(CPU_COLDFIRE) && !defined(CPU_ARM)) || defined(SIMULATOR)
 void eq_filter(int32_t **x, struct eqfilter *f, unsigned num,

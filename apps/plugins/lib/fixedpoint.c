@@ -117,3 +117,22 @@ long fsincos(unsigned long phase, long *cos)
 
     return y;
 }
+
+/**
+ * Fixed point square root via Newton-Raphson.
+ * @param a square root argument.
+ * @param fracbits specifies number of fractional bits in argument.
+ * @return Square root of argument in same fixed point format as input. 
+ */
+long fsqrt(long a, unsigned int fracbits)
+{
+    long b = a/2 + (1 << fracbits); /* initial approximation */
+    unsigned n;
+    const unsigned iterations = 4;
+    
+    for (n = 0; n < iterations; ++n)
+        b = (b + DIV64(a, b, fracbits))/2;
+
+    return b;
+}
+

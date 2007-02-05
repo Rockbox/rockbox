@@ -44,123 +44,6 @@
 #define RESAMPLE_BUF_SIZE   (256 * 4)   /* Enough for 11,025 Hz -> 44,100 Hz*/
 #define DEFAULT_GAIN        0x01000000
 
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
-
-/* Multiply two S.31 fractional integers and return the sign bit and the
- * 31 most significant bits of the result.
- */
-#define FRACMUL(x, y) \
-({ \
-    long t; \
-    asm volatile ("mac.l    %[a], %[b], %%acc0\n\t" \
-                  "movclr.l %%acc0, %[t]\n\t" \
-                  : [t] "=r" (t) : [a] "r" (x), [b] "r" (y)); \
-    t; \
-})
-
-/* Multiply one S.31-bit and one S8.23 fractional integer and return the
- * sign bit and the 31 most significant bits of the result.
- */
-#define FRACMUL_8(x, y) \
-({ \
-    long t; \
-    long u; \
-    asm volatile ("mac.l    %[a], %[b], %%acc0\n\t" \
-                  "move.l   %%accext01, %[u]\n\t" \
-                  "movclr.l %%acc0, %[t]\n\t" \
-                  : [t] "=r" (t), [u] "=r" (u) : [a] "r" (x), [b] "r" (y)); \
-    (t << 8) | (u & 0xff); \
-})
-
-/* Multiply one S.31-bit and one S8.23 fractional integer and return the
- * sign bit and the 31 most significant bits of the result. Load next value
- * to multiply with into x from s (and increase s); x must contain the
- * initial value.
- */
-#define FRACMUL_8_LOOP_PART(x, s, d, y) \
-{ \
-    long u; \
-    asm volatile ("mac.l    %[a], %[b], (%[c])+, %[a], %%acc0\n\t" \
-                  "move.l   %%accext01, %[u]\n\t" \
-                  "movclr.l %%acc0, %[t]" \
-                  : [a] "+r" (x), [c] "+a" (s), [t] "=r" (d), [u] "=r" (u) \
-                  : [b] "r" (y)); \
-    d = (d << 8) | (u & 0xff); \
-}
-
-#define FRACMUL_8_LOOP(x, y, s, d) \
-{ \
-    long t; \
-    FRACMUL_8_LOOP_PART(x, s, t, y); \
-    asm volatile ("move.l   %[t],(%[d])+" \
-                  : [d] "+a" (d)\
-                  : [t] "r" (t)); \
-}
-
-#define ACC(acc, x, y) \
-    (void)acc; \
-    asm volatile ("mac.l %[a], %[b], %%acc0" \
-                  : : [a] "i,r" (x), [b] "i,r" (y));
-#define GET_ACC(acc) \
-({ \
-    long t; \
-    (void)acc; \
-    asm volatile ("movclr.l %%acc0, %[t]" \
-                  : [t] "=r" (t)); \
-    t; \
-})
-
-#define ACC_INIT(acc, x, y) ACC(acc, x, y)
-
-#elif defined(CPU_ARM) && !defined(SIMULATOR)
-
-/* Multiply two S.31 fractional integers and return the sign bit and the
- * 31 most significant bits of the result.
- */
-#define FRACMUL(x, y) \
-({ \
-    long t; \
-    asm volatile ("smull    r0, r1, %[a], %[b]\n\t" \
-                  "mov      %[t], r1, asl #1\n\t" \
-                  "orr      %[t], %[t], r0, lsr #31\n\t" \
-                  : [t] "=r" (t) : [a] "r" (x), [b] "r" (y) : "r0", "r1"); \
-    t; \
-})
-
-#define ACC_INIT(acc, x, y) acc = FRACMUL(x, y)
-#define ACC(acc, x, y) acc += FRACMUL(x, y)
-#define GET_ACC(acc) acc
-
-/* Multiply one S.31-bit and one S8.23 fractional integer and store the
- * sign bit and the 31 most significant bits of the result to d (and
- * increase d). Load next value to multiply with into x from s (and
- * increase s); x must contain the initial value.
- */
-#define FRACMUL_8_LOOP(x, y, s, d) \
-({ \
-    asm volatile ("smull    r0, r1, %[a], %[b]\n\t" \
-                  "mov      %[t], r1, asl #9\n\t" \
-                  "orr      %[t], %[t], r0, lsr #23\n\t" \
-                  : [t] "=r" (*(d)++) : [a] "r" (x), [b] "r" (y) : "r0", "r1"); \
-    x = *(s)++; \
-})
-
-#else
-
-#define ACC_INIT(acc, x, y) acc = FRACMUL(x, y)
-#define ACC(acc, x, y) acc += FRACMUL(x, y)
-#define GET_ACC(acc) acc
-#define FRACMUL(x, y) (long) (((((long long) (x)) * ((long long) (y))) >> 31))
-#define FRACMUL_8(x, y) (long) (((((long long) (x)) * ((long long) (y))) >> 23))
-#define FRACMUL_8_LOOP(x, y, s, d) \
-({ \
-    long t = x; \
-    x = *(s)++; \
-    *(d)++ = (long) (((((long long) (t)) * ((long long) (y))) >> 23)); \
-})
-
-#endif
-
 struct dsp_config
 {
     long codec_frequency; /* Sample rate of data coming from the codec */
@@ -671,8 +554,8 @@ void dsp_set_eq_coefs(int band)
 
     /* Convert user settings to format required by coef generator functions */
     cutoff = 0xffffffff / NATIVE_FREQUENCY * (*setting++);
-    q = ((*setting++) << 16) / 10;        /* 16.16 */
-    gain = ((*setting++) << 16) / 10;     /* s15.16 */
+    q = *setting++;
+    gain = *setting++;
     
     if (q == 0)
         q = 1;

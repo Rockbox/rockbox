@@ -240,10 +240,10 @@ void system_init(void)
                   "movclr.l %%acc2, %%d0\n\t"
                   "movclr.l %%acc3, %%d0\n\t"
                   : : : "d0");
-    /* Set EMAC unit to saturating and rounding fractional mode, since that's
+    /* Set EMAC unit to fractional mode with saturation, since that's
        what'll be the most useful for most things which the main thread
        will do. */
-    coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE | EMAC_ROUND);
+    coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
 
     /* Set INTBASE and SPURVEC */
     INTBASE = 64;

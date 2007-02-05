@@ -20,3 +20,5 @@
  ****************************************************************************/
 
 long fsincos(unsigned long phase, long *cos);
+long fsqrt(long a, unsigned int fracbits);
+
