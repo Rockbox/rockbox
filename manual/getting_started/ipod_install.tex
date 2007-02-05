@@ -29,7 +29,7 @@ your Ipod.
 \begin{enumerate} 
 
   \item First, download the \fname{ipodpatcher} tool to your installation 
-  folder.  You can download the \fname{ipodpatcher} tool for your operating 
+  folder.  You can download the \fname{ipodpatcher} tool for your operating
   system at \download{bootloader/ipod/ipodpatcher/}.
   
   \item Next, download the following file to the installation folder: 
@@ -62,27 +62,30 @@ your Ipod.
   
   \item Connect your Ipod to your computer.
 
-    If you haven't already done so, you should now plug your Ipod into your 
+    If you haven't already done so, you should now plug your Ipod into your
     computer (via either the USB or Firewire cable).
 
-    \fixme{Notes about closing itunes, enabling the ``show ipod as disk'' option 
+    \fixme{Notes about closing itunes, enabling the ``show ipod as disk'' option
     in ipod, anything else?}
 
-  \item Find your Ipod with ipodpatcher (Windows users only)
+  \item Find your Ipod with ipodpatcher (Windows and Linux users only)
 
-    Windows users:  Type the following command to search for Ipods attached to 
-    your computer: 
-      \begin{code} 
-        ipodpatcher --scan 
+    Type the following command to search for Ipods attached to
+    your computer:
+      \begin{code}
+        ipodpatcher --scan
       \end{code}
-    
-    When ipodpatcher finds your Ipod, remember the number it displays after the 
-    words ``disk device''- this will  be the number you use to access your Ipod 
-    in the following steps.  So, for example, if ipodpatcher displays ``disk 
+
+    Windows users: when ipodpatcher finds your Ipod, remember the number it displays after the
+    words ``disk device''- this will  be the number you use to access your Ipod
+    in the following steps.  So, for example, if ipodpatcher displays ``disk
     device 1'' you will use the number 1 in the commands described below.
 
-    \note{Windows users require administrator rights for running ipodpatcher. 
-    Either re-login as administrator, or open a command prompt running under an 
+    Linux users: you will receive something similar to /dev/sda, and will use that
+    in the commands described below.
+
+    \note{Windows users require administrator rights for running ipodpatcher.
+    Either re-login as administrator, or open a command prompt running under an
     administrator account by using one of the "Run as" features of Windows XP.}
 
   \item Find your Ipod (Mac OS X users only)
