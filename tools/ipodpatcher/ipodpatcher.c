@@ -29,7 +29,7 @@
 #include "parttypes.h"
 #include "ipodio.h"
 
-#define VERSION "0.7"
+#define VERSION "0.8svn"
 
 int verbose = 0;
 
@@ -1012,6 +1012,8 @@ int read_directory(struct ipod_t* ipod)
     unsigned char* p;
     unsigned short version;
 
+    ipod->nimages=0;
+
     /* Read firmware partition header (first 512 bytes of disk - but 
        let's read a whole sector) */
 
@@ -1028,7 +1030,7 @@ int read_directory(struct ipod_t* ipod)
     }
 
     if (memcmp(sectorbuf,apple_stop_sign,sizeof(apple_stop_sign))!=0) {
-        fprintf(stderr,"[ERR]  Firmware partition doesn't contain Apple copyright, aborting.");
+        fprintf(stderr,"[ERR]  Firmware partition doesn't contain Apple copyright, aborting.\n");
         return -1;
     }
 
@@ -1059,7 +1061,6 @@ int read_directory(struct ipod_t* ipod)
         return -1;
     }
 
-    ipod->nimages=0;
     p = sectorbuf + x;
     
     while ((ipod->nimages < MAX_IMAGES) && (p < (sectorbuf + x + 400)) && 
@@ -1213,6 +1214,7 @@ int ipod_scan(struct ipod_t* ipod)
     int i;
     int n = 0;
     int ipod_version;
+    char last_ipod[4096];
 
     printf("[INFO] Scanning disk devices...\n");
 
@@ -1257,21 +1259,27 @@ int ipod_scan(struct ipod_t* ipod)
          printf("[INFO] Ipod found - %s (\"%s\") - %s\n",
              ipod->modelstr,ipod->macpod ? "macpod" : "winpod",ipod->diskname);
 #endif
+
          if (ipod->macpod) {
              print_macpod_warning();
          }
          n++;
+         strcpy(last_ipod,ipod->diskname);
     }
 
     if (n==0) {
         fprintf(stderr,"[ERR]  No ipods found.\n");
+    } else if (n==1) {
+        /* Remember the disk name */
+        strcpy(ipod->diskname,last_ipod);
     }
-    return 0;
+    return n;
 }
 
 int main(int argc, char* argv[])
 {
     int i;
+    int n;
     int infile, outfile;
     unsigned int inputsize;
     char* filename;
@@ -1283,8 +1291,7 @@ int main(int argc, char* argv[])
     fprintf(stderr,"This is free software; see the source for copying conditions.  There is NO\n");
     fprintf(stderr,"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
 
-    if ((argc < 2) || (strcmp(argv[1],"-h")==0) || 
-                      (strcmp(argv[1],"--help")==0)) {
+    if ((argc > 1) && ((strcmp(argv[1],"-h")==0) || (strcmp(argv[1],"--help")==0))) {
         print_usage();
         return 1;
     }
@@ -1293,21 +1300,33 @@ int main(int argc, char* argv[])
         fprintf(stderr,"Failed to allocate memory buffer\n");
     }
 
-    if (strcmp(argv[1],"--scan")==0) {
+    if ((argc > 1) && (strcmp(argv[1],"--scan")==0)) {
         ipod_scan(&ipod);
         return 0;
     }
 
-    i = 1;
-    ipod.diskname[0]=0;
-
+    /* If the first parameter doesn't start with -, then we interpret it as a device */
+    if ((argc > 1) && (argv[1][0] != '-')) {
+        ipod.diskname[0]=0;
 #ifdef __WIN32__
-     snprintf(ipod.diskname,sizeof(ipod.diskname),"\\\\.\\PhysicalDrive%s",argv[1]);
+        snprintf(ipod.diskname,sizeof(ipod.diskname),"\\\\.\\PhysicalDrive%s",argv[1]);
 #else
-     strncpy(ipod.diskname,argv[1],sizeof(ipod.diskname));
+        strncpy(ipod.diskname,argv[1],sizeof(ipod.diskname));
 #endif
+        i = 2;
+    } else {
+        /* Autoscan for ipods */
+        n = ipod_scan(&ipod);
+        if (n==0) {
+            fprintf(stderr,"[ERR]  No ipods found, aborting\n");
+            return 0;
+        } else if (n > 1) {
+            fprintf(stderr,"[ERR]  %d ipods found, aborting\n",n);
+            return 0;
+        }
+        i = 1;
+    }
 
-    i = 2;
     while (i < argc) {
         if ((strcmp(argv[i],"-l")==0) || (strcmp(argv[i],"--list")==0)) {
             action = LIST_IMAGES;
