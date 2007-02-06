@@ -149,7 +149,9 @@ bool boot_changed = false;
 
 char lastfile[MAX_PATH];
 static char lastdir[MAX_PATH];
+#ifdef HAVE_TAGCACHE
 static int lasttable, lastextra, lastfirstpos;
+#endif
 static int max_files = 0;
 
 static bool reload_dir = false;
@@ -624,10 +626,12 @@ static bool dirbrowse(void)
         curr_context=CONTEXT_TREE;
     tc.selected_item = 0;
     tc.dirlevel=0;
+#ifdef HAVE_TAGCACHE
     tc.firstpos=0;
     lasttable = -1;
     lastextra = -1;
     lastfirstpos = 0;
+#endif
 
     if (*tc.dirfilter < NUM_FILTER_MODES) {
 #ifdef HAVE_RECORDING
@@ -986,10 +990,12 @@ static bool dirbrowse(void)
             if ( reload_root ) {
                 strcpy(currdir, "/");
                 tc.dirlevel = 0;
+#ifdef HAVE_TAGCACHE
                 tc.currtable = 0;
                 tc.currextra = 0;
                 lasttable = -1;
                 lastextra = -1;
+#endif
                 reload_root = false;
             }
 

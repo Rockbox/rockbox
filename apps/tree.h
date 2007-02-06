@@ -58,11 +58,13 @@ struct tree_context {
     int filesindir; /* The number of files in the dircache */
     int dirsindir; /* file use */
     int dirlength; /* total number of entries in dir, incl. those not loaded */
+#ifdef HAVE_TAGCACHE
     int table_history[MAX_DIR_LEVELS]; /* db use */
     int extra_history[MAX_DIR_LEVELS]; /* db use */
     int currtable; /* db use */
     int currextra; /* db use */
     int currextra2; /* db use */
+#endif
     /* A big buffer with plenty of entry structs,
      * contains all files and dirs in the current
      * dir (with filters applied) */
