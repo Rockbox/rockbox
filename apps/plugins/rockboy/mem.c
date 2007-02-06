@@ -12,7 +12,7 @@
 #include "sound.h"
 
 struct mbc mbc IBSS_ATTR;
-struct rom rom;
+struct rom rom IBSS_ATTR;
 struct ram ram;
 
 
@@ -31,7 +31,7 @@ struct ram ram;
 void mem_updatemap()
 {
     int n;
-    byte **map;
+    static byte **map;
 
     map = mbc.rmap;
     map[0x0] = rom.bank[0];
@@ -46,16 +46,17 @@ void mem_updatemap()
         map[0x7] = rom.bank[mbc.rombank] - 0x4000;
     }
     else map[0x4] = map[0x5] = map[0x6] = map[0x7] = NULL;
-    if (0 && (R_STAT & 0x03) == 0x03)
-    {
-        map[0x8] = NULL;
-        map[0x9] = NULL;
-    }
-    else
-    {
-        map[0x8] = lcd.vbank[R_VBK & 1] - 0x8000;
-        map[0x9] = lcd.vbank[R_VBK & 1] - 0x8000;
-    }
+	if (R_VBK & 1)
+	{
+		map[0x8] = lcd.vbank[1] - 0x8000;
+		map[0x9] = lcd.vbank[1] - 0x8000;
+	}
+	else
+	{
+		map[0x8] = lcd.vbank[0]/*[R_VBK & 1]*/ - 0x8000;
+		map[0x9] = lcd.vbank[0]/*[R_VBK & 1]*/ - 0x8000;
+
+	}
     if (mbc.enableram && !(rtc.sel&8))
     {
         map[0xA] = ram.sbank[mbc.rambank] - 0xA000;
@@ -127,18 +128,18 @@ void ioreg_write(byte r, byte b)
         break;
     case RI_BGP:
         if (R_BGP == b) break;
-        pal_write_dmg(0, 0, b);
-        pal_write_dmg(8, 1, b);
+        /* pal_write_dmg(0, 0, b); */ /*Disabled in iBoy and WAC-gnuboyCE */
+        /* pal_write_dmg(8, 1, b); */ /*Disabled in iBoy and WAC-gnuboyCE */
         R_BGP = b;
         break;
     case RI_OBP0:
         if (R_OBP0 == b) break;
-        pal_write_dmg(64, 2, b);
+        /* pal_write_dmg(64, 2, b); */ /*Disabled in iBoy and WAC-gnuboyCE */
         R_OBP0 = b;
         break;
     case RI_OBP1:
         if (R_OBP1 == b) break;
-        pal_write_dmg(72, 3, b);
+        /* pal_write_dmg(72, 3, b); */ /*Disabled in iBoy and WAC-gnuboyCE */
         R_OBP1 = b;
         break;
     case RI_IF:
@@ -166,7 +167,8 @@ void ioreg_write(byte r, byte b)
         lcdc_change(b);
         break;
     case RI_STAT:
-        stat_write(b);
+		REG(r) = (REG(r) & 0x07) | (b & 0x78);
+		stat_trigger();
         break;
     case RI_LYC:
         REG(r) = b;
@@ -220,21 +222,6 @@ void ioreg_write(byte r, byte b)
         hw_hdma_cmd(b);
         break;
     }
-    switch (r)
-    {
-    case RI_BGP:
-    case RI_OBP0:
-    case RI_OBP1:
-        /* printf("palette reg %02X write %02X at LY=%02X\n", r, b, R_LY); */
-    case RI_HDMA1:
-    case RI_HDMA2:
-    case RI_HDMA3:
-    case RI_HDMA4:
-    case RI_HDMA5:
-        /* printf("HDMA %d: %02X\n", r - RI_HDMA1 + 1, b); */
-        break;
-    }
-    /* printf("reg %02X => %02X (%02X)\n", r, REG(r), b); */
 }
 
 
@@ -410,29 +397,31 @@ void mbc_write(int a, byte b)
             break;
         }
         break;
-    case MBC_HUC3:
-        switch (ha & 0xE)
-        {
-        case 0x0:
-            mbc.enableram = ((b & 0x0F) == 0x0A);
-            break;
-        case 0x2:
-            b &= 0x7F;
-            mbc.rombank = b ? b : 1;
-            break;
-        case 0x4:
-            rtc.sel = b & 0x0f;
-            mbc.rambank = b & 0x03;
-            break;
-        case 0x6:
-            rtc_latch(b);
-            break;
-        }
-        break;
-    }
+	case MBC_HUC3: /* FIXME - this is all guesswork -- is it right??? */
+		switch (ha & 0xE)
+		{
+		case 0x0:
+			mbc.enableram = ((b & 0x0F) == 0x0A);
+			break;
+		case 0x2:
+			if (!b) b = 1;
+			mbc.rombank = b;
+			break;
+		case 0x4:
+			if (mbc.model)
+			{
+				mbc.rambank = b & 0x03;
+				break;
+			}
+			break;
+		case 0x6:
+			mbc.model = b & 1;
+			break;
+		}
+		break;
+	}
     mbc.rombank &= (mbc.romsize - 1);
     mbc.rambank &= (mbc.ramsize - 1);
-    /* printf("%02X\n", mbc.rombank); */
     mem_updatemap();
 }
 
@@ -494,7 +483,8 @@ void mem_write(int a, byte b)
         /* return writehi(a & 0xFF, b); */
         if (a >= 0xFF10 && a <= 0xFF3F)
         {
-            sound_write(a & 0xFF, b);
+            if(options.sound)
+                sound_write(a & 0xFF, b);
             break;
         }
         if ((a & 0xFF80) == 0xFF80 && a != 0xFFFF)
@@ -530,14 +520,12 @@ byte mem_read(int a)
     case 0x8:
         /* if ((R_STAT & 0x03) == 0x03) return 0xFF; */
         return lcd.vbank[R_VBK&1][a & 0x1FFF];
-    case 0xA:
-        if (!mbc.enableram && mbc.type == MBC_HUC3)
-            return 0x01;
-        if (!mbc.enableram)
-            return 0xFF;
-        if (rtc.sel&8)
-            return rtc.regs[rtc.sel&7];
-        return ram.sbank[mbc.rambank][a & 0x1FFF];
+	case 0xA:
+		if (!mbc.enableram)
+			return 0xFF;
+		if (rtc.sel&8)
+			return rtc.regs[rtc.sel&7];
+		return ram.sbank[mbc.rambank][a & 0x1FFF];
     case 0xC:
         if ((a & 0xF000) == 0xC000)
             return ram.ibank[0][a & 0x0FFF];
@@ -554,7 +542,12 @@ byte mem_read(int a)
         /* return readhi(a & 0xFF); */
         if (a == 0xFFFF) return REG(0xFF);
         if (a >= 0xFF10 && a <= 0xFF3F)
-            return sound_read(a & 0xFF);
+        {
+            if(options.sound)
+                return sound_read(a & 0xFF);
+            else
+                return 1;
+        }
         if ((a & 0xFF80) == 0xFF80)
             return ram.hi[a & 0xFF];
         return ioreg_read(a & 0xFF);

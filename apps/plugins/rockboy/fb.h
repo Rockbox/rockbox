@@ -10,19 +10,15 @@
 
 struct fb
 {
-	fb_data *ptr;
-	int w, h;
-	int pelsize;
-	int pitch;
-	int indexed;
-	struct
-	{
-		int l, r;
-	} cc[4];
-	int yuv;
-	int enabled;
-	int dirty;
-	int mode;
+    fb_data *ptr;
+    struct
+    {
+        int l, r;
+    } cc[3];
+    int enabled;
+#if !defined(HAVE_LCD_COLOR)
+    int mode;
+#endif
 };
 
 

@@ -6,11 +6,11 @@
 
 typedef struct loader_s
 {
-	char *rom;
-	char *base;
-	char *sram;
-	char *state;
-	int ramloaded;
+    char *rom;
+    char *base;
+    char *sram;
+    char *state;
+    int ramloaded;
 } loader_t;
 
 

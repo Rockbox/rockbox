@@ -1,11 +1,13 @@
 #include "rockmacros.h"
 #include "defs.h"
 #include "pcm.h"
-#include "rc.h"
 
-//#define ONEBUF    // Note: I think the single buffer implementation is more responsive with sound(less lag)
-                  // but it creates more choppyness overall to the sound.  2 buffer's don't seem to make
-                  // a difference, but 4 buffers is definately noticable
+/*#define ONEBUF*/    
+                  /* Note: I think the single buffer implementation is more 
+                   * responsive with sound(less lag) but it creates more 
+                   * choppyness overall to the sound.  2 buffer's don't seem to 
+                   * make a difference, but 4 buffers is definately noticable
+                   */
 
 struct pcm pcm IBSS_ATTR;
 
@@ -16,11 +18,6 @@ bool sound = 1;
 #define N_BUFS 4
 #endif
 #define BUF_SIZE 1024
-
-rcvar_t pcm_exports[] =
-{
-	    RCV_END
-};
 
 #if CONFIG_CODEC == SWCODEC && !defined(SIMULATOR)
 
@@ -48,46 +45,45 @@ void get_more(unsigned char** start, size_t* size)
 
 void pcm_init(void)
 {
-	if(!sound) return;
-
-   newly_started = true;
+    newly_started = true;
     
-   pcm.hz = 11025;
-   pcm.stereo = 1;
+    pcm.hz = 11025;
+    pcm.stereo = 1;
 
-	pcm.len = BUF_SIZE;
-	if(!buf){
+    pcm.len = BUF_SIZE;
+    if(!buf){
       buf = my_malloc(pcm.len * N_BUFS);
-	   gmbuf = my_malloc(pcm.len * N_BUFS*sizeof (short));
-	   pcm.buf = buf;
-	   pcm.pos = 0;
+       gmbuf = my_malloc(pcm.len * N_BUFS*sizeof (short));
+       pcm.buf = buf;
+       pcm.pos = 0;
 #ifndef ONEBUF
       curbuf = gmcurbuf= 0;
 #endif
       memset(gmbuf, 0, pcm.len * N_BUFS *sizeof(short));
       memset(buf, 0,  pcm.len * N_BUFS);
-	}
+    }
 
-   rb->pcm_play_stop();
+    rb->pcm_play_stop();
    
-   rb->pcm_set_frequency(11025); // 44100 22050 11025
+    rb->pcm_set_frequency(11025); /* 44100 22050 11025 */
 }
 
 void pcm_close(void)
 {
-   memset(&pcm, 0, sizeof pcm);    
-   newly_started = true;   
-   rb->pcm_play_stop();	
-	rb->pcm_set_frequency(44100);
+    memset(&pcm, 0, sizeof pcm);    
+    newly_started = true;   
+    rb->pcm_play_stop();    
+    rb->pcm_set_frequency(44100);
 }
             
 int pcm_submit(void)
 {
-	register int i;
+    if (!options.sound) return 1;
+    register int i;
 
-	if (!sound) {
-		pcm.pos = 0;
-		return 0;
+    if (!sound) {
+        pcm.pos = 0;
+        return 0;
    }
 
    if (pcm.pos < pcm.len) return 1;
@@ -98,7 +94,7 @@ int pcm_submit(void)
 #endif
    pcm.pos = 0;
 
-   // gotta convert the 8 bit buffer to 16
+   /* gotta convert the 8 bit buffer to 16 */
    for(i=0; i<pcm.len;i++)
 #ifdef ONEBUF
       gmbuf[i] = (pcm.buf[i]<<8)-0x8000;
@@ -112,7 +108,9 @@ int pcm_submit(void)
       newly_started = false;
    }    
    
-   // this while loop and done play are in place to make sure the sound timing is correct(although it's not)
+   /* this while loop and done play are in place to make sure the sound timing 
+    * is correct(although it's not)
+    */
 #ifdef ONEBUF
    while(doneplay==0) rb->yield();
    doneplay=0;
@@ -120,7 +118,7 @@ int pcm_submit(void)
    return 1;
 }
 #else
-static byte buf1_unal[(BUF_SIZE / sizeof(short)) + 2]; // to make sure 4 byte aligned
+static byte buf1_unal[(BUF_SIZE / sizeof(short)) + 2]; /* 4 byte aligned */
 void pcm_init(void)
 {
     pcm.hz = 11025;

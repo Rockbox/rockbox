@@ -20,7 +20,6 @@
 #include "rockmacros.h"
 #include "fb.h"
 #include "input.h"
-#include "rc.h"
 #include "lcd-gb.h"
 #include "hw.h"
 #include "config.h"
@@ -32,6 +31,13 @@
 #define ROCKBOY_PAD_UP BUTTON_MENU
 #define ROCKBOY_PAD_DOWN BUTTON_PLAY
 
+#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
+
+#define ROCKBOY_PAD_LEFT BUTTON_LEFT
+#define ROCKBOY_PAD_RIGHT BUTTON_RIGHT
+#define ROCKBOY_PAD_UP BUTTON_SCROLL_UP
+#define ROCKBOY_PAD_DOWN BUTTON_SCROLL_DOWN
+
 #else
 
 #define ROCKBOY_PAD_LEFT BUTTON_LEFT
@@ -41,32 +47,9 @@
 
 #endif
 
-rcvar_t joy_exports[] =
-{
-            RCV_END
-};
-
-rcvar_t vid_exports[] =
-{
-            RCV_END
-};
-
-struct fb fb;
+struct fb fb IBSS_ATTR;
 
 extern int debug_trace;
-
-void vid_settitle(char *title)
-{
-    rb->splash(HZ/2, true, title);
-}
-
-void joy_init(void)
-{
-}
-
-void joy_close(void)
-{
-}
 
 unsigned int oldbuttonstate = 0, newbuttonstate,holdbutton;
 #ifdef HAVE_WHEEL_POSITION
@@ -179,10 +162,7 @@ void ev_poll(void)
         if(pressed & options.MENU) {
 #endif
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
-    (CONFIG_KEYPAD == IRIVER_H300_PAD) || \
-    (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-    (CONFIG_KEYPAD == GIGABEAT_PAD) || \
-    (CONFIG_KEYPAD == SANSA_E200_PAD)
+    defined(HAVE_LCD_COLOR)
 #ifdef HAVE_WHEEL_POSITION
             rb->wheel_send_events(true);
 #endif
@@ -202,53 +182,36 @@ void ev_poll(void)
 #endif    
 }
 
-void vid_setpal(int i, int r, int g, int b)
+/* New frameskip, makes more sense to me and performs as well */
+inline void vid_begin(void)
 {
-    (void)i;
-    (void)r;
-    (void)g;
-    (void)b;
-}
-
-inline void vid_begin(void) // New frameskip, makes more sense to me and performs as well
-{
-	static int skip = 0;
-   if (skip<options.frameskip) {
-      skip++;
-      fb.enabled=0;
-   }
-   else {
-      skip=0;
-      fb.enabled=1;
-   }
+    static int skip = 0;
+    if (skip<options.frameskip)
+    {
+        skip++;
+        fb.enabled=0;
+    }
+    else
+    {
+        skip=0;
+        fb.enabled=1;
+    }
 }
 
 void vid_init(void)
 {
-    fb.h=144;
-    fb.w=160;
-    fb.pitch=160;
     fb.enabled=1;
-    fb.dirty=0;
-    fb.mode=3;
-
-   fb.ptr=rb->lcd_framebuffer;
+    fb.ptr=rb->lcd_framebuffer;
 
 #if defined(HAVE_LCD_COLOR)
-    fb.pelsize=2; // 16 bit framebuffer
-
-	fb.indexed = 0; // no palette on lcd
-	fb.cc[0].r = 3;  // 8-5 (wasted bits on red)
-	fb.cc[0].l = 11;  //this is the offset to the R bits (16-5)
-	fb.cc[1].r = 2;  // 8-6 (wasted bits on green)
-	fb.cc[1].l = 5;  // This is the offset to the G bits (16-5-6)
-	fb.cc[2].r = 3;  // 8-5 (wasted bits on red)
-	fb.cc[2].l = 0;  // This is the offset to the B bits (16-5-6-5)
-	fb.cc[3].r = 0;  // no alpha
-	fb.cc[3].l = 0;
-	fb.yuv = 0;		// not in yuv format
-#else // ***** NEED TO LOOK INTO THIS MORE FOR THE H100 (Should be able to get rid of some IFDEF's elsewhere)
-    fb.pelsize=1; // 8 bit framebuffer.. (too much.. but lowest gnuboy will support.. so yea...
+    fb.cc[0].r = 3;  /* 8-5 (wasted bits on red) */
+    fb.cc[0].l = 11; /* this is the offset to the R bits (16-5) */
+    fb.cc[1].r = 2;  /* 8-6 (wasted bits on green) */
+    fb.cc[1].l = 5;  /* This is the offset to the G bits (16-5-6) */
+    fb.cc[2].r = 3;  /* 8-5 (wasted bits on red) */
+    fb.cc[2].l = 0;  /* This is the offset to the B bits (16-5-6-5) */
+#else
+    fb.mode=3;
 #endif
 }
 
@@ -350,43 +313,29 @@ void vid_update(int scanline)
         cnt++;
     }
     rb->lcd_update_rect(0, scanline & ~3, LCD_WIDTH, 4);
-#elif defined(HAVE_LCD_COLOR) /* iriver H3x0, colour iPod */
-    // handled in lcd.c now
+#elif defined(HAVE_LCD_COLOR)
+    /* handled in lcd.c now */
 #endif /* LCD_HEIGHT */
 }
 #endif
 
-void vid_end(void)
-{
-}
-
 long timerresult;
 
 void *sys_timer(void) 
-{/*
-   timerresult=*rb->current_tick;
+{
+   /*timerresult=*rb->current_tick;
    return &timerresult;*/
    return 0;
 }
 
-// returns microseconds passed since sys_timer
+/* returns microseconds passed since sys_timer */
 int sys_elapsed(long *oldtick) 
 {
-/*
-   int elap,mytime=microtick;
+   /* int elap,mytime=microtick;
 
    elap=mytime-*oldtick;
    *oldtick=mytime;
-   return elap;*/
-//   return ((*rb->current_tick-(*oldtick))*1000000)/HZ;
+   return elap; */
+   /* return ((*rb->current_tick-(*oldtick))*1000000)/HZ; */
    return *oldtick;
-}
-
-void sys_sleep(int us)
-{
-   if(us<=0) return;
-   int i=0;
-   while(i< us*11)
-      i++;
-//  if (us <= 0) return;
 }

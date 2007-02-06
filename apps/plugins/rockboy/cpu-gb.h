@@ -10,24 +10,24 @@
 
 union reg
 {
-	byte b[2][2];
-	word w[2];
-	un32 d; /* padding for alignment, carry */
+    byte b[2][2];
+    word w[2];
+    un32 d; /* padding for alignment, carry */
 };
 
 struct cpu
 {
 #ifdef DYNAREC
-	union reg a,b,c,d,e,hl,f,sp,pc;
+    union reg a,b,c,d,e,hl,f,sp,pc;
 #else
-	union reg pc, sp, bc, de, hl, af;
+    union reg pc, sp, bc, de, hl, af;
 #endif
-	int ime, ima;
-	int speed;
-	int halt;
-	int div, tim;
-	int lcdc;
-	int snd;
+    int ime, ima;
+    int speed;
+    int halt;
+    int div, tim;
+    int lcdc;
+    int snd;
 };
 
 extern struct cpu cpu;
@@ -54,6 +54,6 @@ void lcdc_advance(int cnt) ICODE_ATTR;
 void sound_advance(int cnt) ICODE_ATTR;
 void cpu_timers(int cnt) ICODE_ATTR;
 int cpu_emulate(int cycles) ICODE_ATTR;
-inline int cpu_step(int max);
+inline int cpu_step(int max) ICODE_ATTR;
 
 #endif

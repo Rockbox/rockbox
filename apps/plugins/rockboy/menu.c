@@ -13,6 +13,13 @@
 #define MENU_BUTTON_DOWN BUTTON_SCROLL_FWD
 #define MENU_BUTTON_LEFT BUTTON_LEFT
 #define MENU_BUTTON_RIGHT BUTTON_RIGHT
+
+#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
+#define MENU_BUTTON_UP BUTTON_SCROLL_UP
+#define MENU_BUTTON_DOWN BUTTON_SCROLL_DOWN
+#define MENU_BUTTON_LEFT BUTTON_LEFT
+#define MENU_BUTTON_RIGHT BUTTON_RIGHT
+
 #else
 #define MENU_BUTTON_UP BUTTON_UP
 #define MENU_BUTTON_DOWN BUTTON_DOWN
@@ -322,9 +329,9 @@ static void do_opt_menu(void)
     };
 
     static const struct opt_items fullscreen[]= {
-        { "Off", -1 },
-        { "Fullscreen", -1 },
-        { "Full - Maintain Ratio", -1 },
+        { "Unscaled", -1 },
+        { "Scaled", -1 },
+        { "Scaled - Maintain Ratio", -1 },
     };
 
     static const struct opt_items frameskip[]= {
@@ -333,13 +340,38 @@ static void do_opt_menu(void)
         { "5 Max", -1 },
         { "6 Max", -1 },
     };
+    
+#ifdef HAVE_LCD_COLOR    
+    static const struct opt_items palette[]= {
+        { "Brown (Default)", -1 },
+        { "Gray", -1 },
+        { "Light Gray", -1 },
+        { "Multi-Color 1", -1 },
+        { "Multi-Color 2", -1 },
+        { "Adventure Island", -1 },
+        { "Adventure Island 2", -1 },
+        { "Balloon Kid", -1 },
+        { "Batman", -1 },
+        { "Batman: Return of Joker", -1 },
+        { "Bionic Commando", -1 },
+        { "Castlvania Adventure", -1 },
+        { "Donkey Kong Land", -1 },
+        { "Dr. Mario", -1 },
+        { "Kirby", -1 },
+        { "Metroid", -1 },
+        { "Zelda", -1 },
+    };
+#endif
 
     static const struct menu_item items[] = {
         { "Max Frameskip", NULL },
         { "Sound"        , NULL },
         { "Stats"        , NULL },
-        { "Fullscreen"   , NULL },
+        { "Screen Options"  , NULL },
         { "Set Keys (Buggy)", NULL },
+#ifdef HAVE_LCD_COLOR
+        { "Set Palette"  , NULL },
+#endif
     };
 
     m = rb->menu_init(items, sizeof(items) / sizeof(*items), NULL, NULL, NULL, NULL);
@@ -359,6 +391,7 @@ static void do_opt_menu(void)
             case 1: /* Sound */
                 if(options.sound>1) options.sound=1;
                 rb->set_option(items[1].desc, &options.sound, INT, onoff, 2, NULL );
+                if(options.sound) sound_dirty();
                 break;
             case 2: /* Stats */
                 rb->set_option(items[2].desc, &options.showstats, INT, onoff, 2, NULL );
@@ -370,6 +403,12 @@ static void do_opt_menu(void)
             case 4: /* Keys */
                 setupkeys();
                 break;
+#ifdef HAVE_LCD_COLOR                
+            case 5: /* Palette */
+                rb->set_option(items[5].desc, &options.pal, INT, palette, 17, NULL );
+                set_pal();
+                break;
+#endif                
             default:
                 done=true;
                 break;

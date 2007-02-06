@@ -5,20 +5,18 @@
 
 struct sndchan
 {
-	int on;
-	unsigned pos;
-	int cnt, encnt, swcnt;
-	int len, enlen, swlen;
-	int swfreq;
-	int freq;
-	int envol, endir;
+    int on;
+    unsigned pos;
+    int cnt, encnt, swcnt;
+    int len, enlen, swlen;
+    int freq;
+    int envol, endir;
 };
 
 struct snd
 {
-	int rate;
-	struct sndchan ch[4];
-	byte wave[16];
+    int rate;
+    struct sndchan ch[4];
 };
 
 extern struct snd snd;
@@ -31,7 +29,6 @@ extern struct snd snd;
 byte sound_read(byte r) ICODE_ATTR;
 void sound_write(byte r, byte b) ICODE_ATTR;
 void sound_dirty(void) ICODE_ATTR;
-void sound_off(void);
 void sound_reset(void);
 void sound_mix(void) ICODE_ATTR;
 void s1_init(void);

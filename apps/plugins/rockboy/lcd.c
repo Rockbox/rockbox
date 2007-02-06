@@ -4,9 +4,8 @@
 #include "hw.h"
 #include "mem.h"
 #include "lcd-gb.h"
-#include "rc.h"
 #include "fb.h"
-#include "palette.h"
+#include "palette-presets.h"
 #ifdef USE_ASM
 #include "asm.h"
 #endif
@@ -26,9 +25,7 @@ struct scan scan IBSS_ATTR;
 
 #define PRI (scan.pri)
 
-#define PAL1 (scan.pal1)
-#define PAL2 (scan.pal2)
-#define PAL4 (scan.pal4)
+#define PAL (scan.pal)
 
 #define VS (scan.vs) /* vissprites */
 #define NS (scan.ns)
@@ -53,52 +50,13 @@ byte patpix[4096][8][8]
 byte patdirty[1024];
 byte anydirty;
 
-// static int scale = 1;
-
-static int rgb332;
-
-static int sprsort = 1;
-static int sprdebug;
-static int insync=0;
 #if LCD_DEPTH < 16
 static int scanline_ind=0;
 #endif
 
-#define DEF_PAL { 0x98d0e0, 0x68a0b0, 0x60707C, 0x2C3C3C }
-
-static int dmg_pal[4][4] = { DEF_PAL, DEF_PAL, DEF_PAL, DEF_PAL };
-
-static int usefilter, filterdmg;
-static int filter[3][4] = {
-                              { 195,  25,   0,  35 },
-                              {  25, 170,  25,  35 },
-                              {  25,  60, 125,  40 }
-                          };
-
-rcvar_t lcd_exports[] =
-    {
-        RCV_BOOL("rgb332", &rgb332),
-        RCV_VECTOR("dmg_bgp", dmg_pal[0], 4),
-        RCV_VECTOR("dmg_wndp", dmg_pal[1], 4),
-        RCV_VECTOR("dmg_obp0", dmg_pal[2], 4),
-        RCV_VECTOR("dmg_obp1", dmg_pal[3], 4),
-        RCV_BOOL("sprsort", &sprsort),
-        RCV_BOOL("sprdebug", &sprdebug),
-        RCV_BOOL("colorfilter", &usefilter),
-        RCV_BOOL("filterdmg", &filterdmg),
-        RCV_VECTOR("red", filter[0], 4),
-        RCV_VECTOR("green", filter[1], 4),
-        RCV_VECTOR("blue", filter[2], 4),
-        RCV_END
-    };
+static int dmg_pal[4][4];
 
 fb_data *vdest;
-
-#ifdef ALLOW_UNALIGNED_IO /* long long is ok since this is i386-only anyway? */
-#define MEMCPY8(d, s) ((*(long long *)(d)) = (*(long long *)(s)))
-#else
-#define MEMCPY8(d, s) memcpy((d), (s), 8)
-#endif
 
 #ifndef ASM_UPDATEPATPIX
 void updatepatpix(void)
@@ -506,9 +464,10 @@ void tilebuf(void)
 }
 
 
-// V = vertical line
-// WX = WND start (if 0, no need to do anything) -> WY
-// U = start...something...thingy... 7 at most
+/* V = vertical line
+ * WX = WND start (if 0, no need to do anything) -> WY
+ * U = start...something...thingy... 7 at most
+ */
 void bg_scan(void)
 {
     int cnt;
@@ -539,7 +498,7 @@ void bg_scan(void)
       );
 #else
         src = patpix[*(tile++)][V];
-        MEMCPY8(dest, src);
+        memcpy(dest,src,8);
         dest += 8;
 #endif
         cnt -= 8;
@@ -574,7 +533,7 @@ void wnd_scan(void)
       );
 #else
         src = patpix[*(tile++)][WV];
-        MEMCPY8(dest, src);
+        memcpy(dest,src,8);
         dest += 8;
 #endif
         cnt -= 8;
@@ -752,33 +711,12 @@ static void recolor(byte *buf, byte fill, int cnt)
     while (cnt--) *(buf++) |= fill;
 }
 
-void spr_count(void)
-{
-    int i;
-    struct obj *o;
-
-    NS = 0;
-    if (!(R_LCDC & 0x02)) return;
-
-    o = lcd.oam.obj;
-
-    for (i = 40; i; i--, o++)
-    {
-        if (L >= o->y || L + 16 < o->y)
-            continue;
-        if (L + 8 >= o->y && !(R_LCDC & 0x04))
-            continue;
-        if (++NS == 10) break;
-    }
-}
-
 void spr_enum(void)
 {
     int i, j;
     struct obj *o;
-    struct vissprite ts[10];
+    struct vissprite ts;
     int v, pat;
-    int l, x;
 
     NS = 0;
     if (!(R_LCDC & 0x02)) return;
@@ -818,24 +756,19 @@ void spr_enum(void)
         VS[NS].buf = patpix[pat][v];
         if (++NS == 10) break;
     }
-    if (!sprsort||hw.cgb) return;
-    /* not quite optimal but it finally works! */
+    if (hw.cgb) return;
     for (i = 0; i < NS; i++)
     {
-        l = 0;
-        x = VS[0].x;
-        for (j = 1; j < NS; j++)
+        for (j = i + 1; j < NS; j++)
         {
-            if (VS[j].x < x)
+            if (VS[i].x > VS[j].x)
             {
-                l = j;
-                x = VS[j].x;
+                ts = VS[i];
+				VS[i] = VS[j];
+				VS[j] = ts;
             }
         }
-        ts[i] = VS[l];
-        VS[l].x = 160;
     }
-    memcpy(VS, ts, sizeof VS);
 }
 
 void spr_scan(void)
@@ -854,8 +787,8 @@ void spr_scan(void)
     for (; ns; ns--, vs--)
     {
         x = vs->x;
-        if (x >= 160) continue;
-        if (x <= -8) continue;
+        if (x > 159) continue;
+        if (x < -7) continue;
         if (x < 0)
         {
             src = vs->buf - x;
@@ -891,12 +824,10 @@ void spr_scan(void)
             }
         }
         else while (i--) if (src[i]) dest[i] = pal|src[i];
-        /* else while (i--) if (src[i]) dest[i] = 31 + ns; */
     }
-//    if (sprdebug) for (i = 0; i < NS; i++) BUF[i<<1] = 36;
 }
 
-// Scaling defines
+/* Scaling defines */
 #define DX  ((LCD_WIDTH<<16)    /   160)
 #define DXI ((160<<16)          /   LCD_WIDTH)
 #define DY  ((LCD_HEIGHT<<16)   /   144)
@@ -904,18 +835,38 @@ void spr_scan(void)
 
 void lcd_begin(void)
 {
-/*    if (fb.indexed)
-    {
-        if (rgb332) pal_set332();
-        else pal_expire();
-    }
-*/
 
-    if(options.fullscreen)
-        vdest = fb.ptr;
+#if (LCD_WIDTH>=160) && (LCD_HEIGHT>=144)
+#define S1  ((LCD_HEIGHT-144)/2)*LCD_WIDTH + ((LCD_WIDTH-160)/2)
+#define S2  0
+
+#elif (LCD_WIDTH>=160) && (LCD_HEIGHT<=144)
+#define S1  ((LCD_WIDTH-160)/2)
+#define S2  ((LCD_WIDTH-160)/2)
+
+#elif (LCD_WIDTH<=160) && (LCD_HEIGHT>=144)
+#define S1  ((LCD_HEIGHT-144)/2)*LCD_WIDTH
+#define S2  ((LCD_HEIGHT-144)/2)*LCD_WIDTH
+
+#else
+#define S1  0
+#define S2  0
+#endif
+
+#if (LCD_WIDTH>LCD_HEIGHT)
+#define S3  ((LCD_WIDTH-(160*LCD_HEIGHT/144))/2)
+#else
+#define S3  ((LCD_HEIGHT-(144*LCD_WIDTH/160))/2)*LCD_WIDTH
+#endif
+    
+    set_pal();
+
+    if(options.fullscreen == 0)
+        vdest=fb.ptr+S1;
+    else if (options.fullscreen == 1)
+        vdest=fb.ptr+S2;
     else
-        vdest=fb.ptr+((LCD_HEIGHT-144)/2)*LCD_WIDTH + ((LCD_WIDTH-160)/2);
-
+        vdest=fb.ptr+S3;
     WY = R_WY;
 }
 
@@ -930,11 +881,28 @@ void setvidmode(int mode)
 {
     switch(mode)
     {
-        case 1: /* Full screen scale */
+        case 1:
+#if (LCD_WIDTH>=160) && (LCD_HEIGHT>=144) /* Full screen scale */
             SCALEWL=DX;
             SCALEWS=DXI;
             SCALEHL=DY;
             SCALEHS=DYI;
+#elif (LCD_WIDTH>=160) && (LCD_HEIGHT<144) /* scale the height */
+            SCALEWL=1<<16;
+            SCALEWS=1<<16;
+            SCALEHL=DY;
+            SCALEHS=DYI;
+#elif (LCD_WIDTH<160) && (LCD_HEIGHT>=144) /* scale the width */
+            SCALEWL=DX;
+            SCALEWS=DXI;
+            SCALEHL=1<<16;
+            SCALEHS=1<<16;            
+#else
+            SCALEWL=DX;
+            SCALEWS=DXI;
+            SCALEHL=DY;
+            SCALEHS=DYI;
+#endif
             break;
         case 2: /* Maintain Ratio */
             if (DY<DX)
@@ -952,37 +920,26 @@ void setvidmode(int mode)
                 SCALEHS=DXI;
             }
             break;
-        default: /* No Scaling (or fullscreen for smaller screens) */
-#if LCD_WIDTH>160 
+        default:
             SCALEWL=1<<16;
             SCALEWS=1<<16;
             SCALEHL=1<<16;
             SCALEHS=1<<16;
-#else
-            SCALEWL=DX;
-            SCALEWS=DXI;
-            SCALEHL=DY;
-            SCALEHS=DYI;
-#endif
     }
     swidth=(160*SCALEWL)>>16;
     sremain=LCD_WIDTH-swidth;
 }
 
-char frameout[30];
 void lcd_refreshline(void)
 {
-    if(!insync) {
-        if(R_LY!=0)
-            return;
-        else
-           insync=1;
-    }
+#ifdef HAVE_LCD_COLOR
+    char frameout[30];
+#endif
 
     if (!(R_LCDC & 0x80))
         return; /* should not happen... */
 
-#if LCD_HEIGHT < 144
+#if (LCD_HEIGHT <= 128) && !defined(HAVE_LCD_COLOR)
     if ( (fb.mode==0&&(R_LY >= 128)) ||
          (fb.mode==1&&(R_LY < 16)) ||
          (fb.mode==2&&(R_LY<8||R_LY>=136)) ||
@@ -1046,8 +1003,7 @@ void lcd_refreshline(void)
             vid_update(L-((int)(L/9)));
 #else
     {
-    /*  Universial Scaling pulled from PrBoom and modified for rockboy  */
-    /*  Needs some thought for screens smaller than the gameboy though */
+    /*  Universal Scaling pulled from PrBoom and modified for rockboy  */
 
     static int hpt IDATA_ATTR=0x8000;
 
@@ -1059,9 +1015,24 @@ void lcd_refreshline(void)
         register unsigned int remain=sremain;
         while(wcount--)
         {
-            *vdest++ = scan.pal2[scan.buf[srcpt>>16]];
+#if LCD_HEIGHT<144  /* cut off the bottom part of the screen that won't fit */
+            if (options.fullscreen==0 && (hpt>>16)>LCD_HEIGHT)
+                break;
+#endif
+
+#if LCD_WIDTH<160 /* cut off the right part of the screen that won't fit */
+            if(options.fullscreen==0 && wcount<(160-LCD_WIDTH)) {
+                vdest+=wcount;
+                wcount = 0;
+            }
+#endif
+                
+            *vdest++ = PAL[BUF[srcpt>>16]];
             srcpt+=SCALEWS;
         }
+#if LCD_HEIGHT<144
+        if (options.fullscreen!=0 || (hpt>>16)<(LCD_HEIGHT))
+#endif
         vdest+=remain;
     }
 
@@ -1086,15 +1057,16 @@ void lcd_refreshline(void)
 #endif
 }
 
-
-
-
-
+void set_pal(void)
+{
+    memcpy(dmg_pal,palettes[options.pal], sizeof dmg_pal);
+    pal_dirty();
+}
 
 #if HAVE_LCD_COLOR
 static void updatepalette(int i)
 {
-    int c, r, g, b, y, u, v, rr, gg;
+    int c, r, g, b;
 
     c = (lcd.pal[i<<1] | ((int)lcd.pal[(i<<1)|1] << 8)) & 0x7FFF;
     r = (c & 0x001F) << 3;
@@ -1103,38 +1075,6 @@ static void updatepalette(int i)
     r |= (r >> 5);
     g |= (g >> 5);
     b |= (b >> 5);
-
-    if (usefilter && (filterdmg||hw.cgb))
-    {
-        rr = ((r * filter[0][0] + g * filter[0][1] + b * filter[0][2]) >> 8) + filter[0][3];
-        gg = ((r * filter[1][0] + g * filter[1][1] + b * filter[1][2]) >> 8) + filter[1][3];
-        b = ((r * filter[2][0] + g * filter[2][1] + b * filter[2][2]) >> 8) + filter[2][3];
-        r = rr;
-        g = gg;
-    }
-
-    if (fb.yuv)
-    {
-        y = (((r *  263) + (g * 516) + (b * 100)) >> 10) + 16;
-        u = (((r *  450) - (g * 377) - (b *  73)) >> 10) + 128;
-        v = (((r * -152) - (g * 298) + (b * 450)) >> 10) + 128;
-        if (y < 0) y = 0; if (y > 255) y = 255;
-        if (u < 0) u = 0; if (u > 255) u = 255;
-        if (v < 0) v = 0; if (v > 255) v = 255;
-        PAL4[i] = (y<<fb.cc[0].l) | (y<<fb.cc[3].l)
-                  | (u<<fb.cc[1].l) | (v<<fb.cc[2].l);
-        return;
-    }
-/*
-    if (fb.indexed)
-    {
-        pal_release(PAL1[i]);
-        c = pal_getcolor(c, r, g, b);
-        PAL1[i] = c;
-        PAL2[i] = (c<<8) | c;
-        PAL4[i] = (c<<24) | (c<<16) | (c<<8) | c;
-        return;
-    }*/
 
     r = (r >> fb.cc[0].r) << fb.cc[0].l;
     g = (g >> fb.cc[1].r) << fb.cc[1].l;
@@ -1145,24 +1085,7 @@ static void updatepalette(int i)
 #elif LCD_PIXELFORMAT == RGB565SWAPPED
     c = swap16(r|g|b);
 #endif
-
-
-    switch (fb.pelsize)
-    {
-    case 1:
-        PAL1[i] = c;
-        PAL2[i] = (c<<8) | c;
-        PAL4[i] = (c<<24) | (c<<16) | (c<<8) | c;
-        break;
-    case 2:
-        PAL2[i] = c;
-        PAL4[i] = (c<<16) | c;
-        break;
-    case 3:
-    case 4:
-        PAL4[i] = c;
-        break;
-    }
+    PAL[i] = c;
 }
 #endif
 
@@ -1183,7 +1106,6 @@ void pal_write_dmg(int i, int mapnum, byte d)
 
     if (hw.cgb) return;
 
-    /* if (mapnum >= 2) d = 0xe4; */
     for (j = 0; j < 8; j += 2)
     {
         c = cmap[(d >> j) & 3];
@@ -1197,7 +1119,7 @@ void pal_write_dmg(int i, int mapnum, byte d)
     }
 }
 
-void vram_write(int a, byte b)
+void vram_write(addr a, byte b)
 {
     lcd.vbank[R_VBK&1][a] = b;
     if (a >= 0x1800) return;
@@ -1235,7 +1157,6 @@ void lcd_reset(void)
     memset(&lcd, 0, sizeof lcd);
     lcd_begin();
     vram_dirty();
-    pal_dirty();
 }
 
 

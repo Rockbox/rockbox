@@ -17,29 +17,29 @@
 
 struct mbc
 {
-	int type;
-	int model;
-	int rombank;
-	int rambank;
-	int romsize;
-	int ramsize;
-	int enableram;
-	int batt;
-	byte *rmap[0x10], *wmap[0x10];
+    int type;
+    int model;
+    int rombank;
+    int rambank;
+    int romsize;
+    int ramsize;
+    int enableram;
+    int batt;
+    byte *rmap[0x10], *wmap[0x10];
 };
 
 struct rom
 {
-	byte (*bank)[16384];
-	char name[20];
+    byte (*bank)[16384];
+    char name[20];
 };
 
 struct ram
 {
-	byte hi[256];
-	byte ibank[8][4096];
-	byte (*sbank)[8192];
-	int loaded;
+    byte hi[256];
+    byte ibank[8][4096];
+    byte (*sbank)[8192];
+    int loaded;
 };
 
 

@@ -86,7 +86,7 @@ void setoptions (void)
    snprintf(optionsave, sizeof(optionsave), "%s/%s", savedir, optionname);
 
    fd = open(optionsave, O_RDONLY);
-   if(fd < 0) // no options to read, set defaults
+   if(fd < 0) /* no options to read, set defaults */
    {
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD)
       options.A=BUTTON_ON;
@@ -136,13 +136,31 @@ void setoptions (void)
       options.START=BUTTON_SCROLL_UP;
       options.SELECT=BUTTON_SCROLL_DOWN;
       options.MENU=BUTTON_POWER;
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+      options.A=BUTTON_PLAY;
+      options.B=BUTTON_REC;
+      options.START=BUTTON_SELECT;
+      options.SELECT=BUTTON_NONE;
+      options.MENU=BUTTON_POWER;  
+      
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+      options.A=BUTTON_PLAY;
+      options.B=BUTTON_FF;
+      options.START=BUTTON_REW;
+      options.SELECT=BUTTON_NONE;
+      options.MENU=BUTTON_POWER;
 #endif
 
       options.maxskip=4;
       options.fps=0;
       options.showstats=0;
+#if (LCD_WIDTH>=160) && (LCD_HEIGHT>=144)
       options.fullscreen=0;
+#else
+      options.fullscreen=1;
+#endif
       options.sound=1;
+      options.pal=0;
    }
    else
       read(fd,&options, sizeof(options));
@@ -197,9 +215,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->wheel_send_events(false);
 #endif
 
-    /* now go ahead and have fun! */
-    /* rb->splash(HZ*2, true, "Rockboy v0.3"); */
-    /* rb->lcd_clear_display(); */
     gnuboy_main(parameter);
 
 #ifdef HAVE_WHEEL_POSITION

@@ -25,10 +25,10 @@
 
 struct hw
 {
-	byte ilines;
-	byte pad;
-	int hdma;
-	int cgb,gba;
+    byte ilines;
+    byte pad;
+    int hdma;
+    int cgb;
 };
 
 

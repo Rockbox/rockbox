@@ -28,30 +28,42 @@ void *my_malloc(size_t size);
 
 extern struct plugin_api* rb;
 extern int shut,cleanshut;
-void vid_update(int scanline);
 void vid_init(void);
 inline void vid_begin(void);
-void vid_end(void);
 void die(char *message, ...);
 void setmallocpos(void *pointer);
-void vid_settitle(char *title);
 void *sys_timer(void);
 int  sys_elapsed(long *oldtick);
-void sys_sleep(int us);
 int  pcm_submit(void);
 void pcm_init(void);
+void sound_dirty(void);
 void doevents(void) ICODE_ATTR;
 void ev_poll(void);
 int do_user_menu(void);
 void loadstate(int fd);
 void savestate(int fd);
 void setvidmode(int mode);
+void set_pal(void);
+#if !defined(HAVE_LCD_COLOR)
+void vid_update(int scanline);
+#endif
+#ifdef DYNAREC
+extern struct dynarec_block newblock;
+void dynamic_recompile (struct dynarec_block *newblock);
+#endif
+
 #define USER_MENU_QUIT -2
 
 /* Disable ICODE for the ARMs */
 #ifdef CPU_ARM
 #undef ICODE_ATTR
 #define ICODE_ATTR
+#endif
+
+/* Disable IBSS when using dynarec since it won't fit */
+#ifdef DYNAREC
+#undef IBSS_ATTR
+#define IBSS_ATTR
 #endif
 
 /* libc functions */
@@ -101,12 +113,13 @@ void setvidmode(int mode);
 #define tolower(_A_)    (isupper(_A_) ? (_A_ - 'A' + 'a') : _A_)
 
 /* Using #define isn't enough with GCC 4.0.1 */
-void* memcpy(void* dst, const void* src, size_t size);
+void* memcpy(void* dst, const void* src, size_t size) ICODE_ATTR;
 
 struct options {
    int A, B, START, SELECT, MENU;
    int frameskip, fps, maxskip;
    int sound, fullscreen, showstats;
+   int pal;
 };
 
 extern struct options options;
