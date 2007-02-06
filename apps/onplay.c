@@ -886,9 +886,9 @@ int onplay(char* file, int attr, int from)
         i++;
     }
 
-    if (context == CONTEXT_WPS ||
+    if (file && (context == CONTEXT_WPS ||
         context == CONTEXT_TREE ||
-        context == CONTEXT_ID3DB)
+        context == CONTEXT_ID3DB))
     {
         items[i].desc = ID2P(LANG_PLAYLIST);
         items[i].function = playlist_options;
@@ -998,10 +998,12 @@ int onplay(char* file, int attr, int from)
         items[i].desc = ID2P(LANG_CREATE_DIR);
         items[i].function = create_dir;
         i++;
-
-        items[i].desc = ID2P(LANG_PROPERTIES);
-        items[i].function = properties;
-        i++;
+        if (file)
+        {
+            items[i].desc = ID2P(LANG_PROPERTIES);
+            items[i].function = properties;
+            i++;
+        }
     }
 
     if (context == CONTEXT_WPS)
