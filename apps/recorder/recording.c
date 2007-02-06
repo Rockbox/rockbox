@@ -80,7 +80,9 @@ static bool f3_rec_screen(void);
 #define MAX_FILE_SIZE 0x7F800000 /* 2 GB - 4 MB */
 
 static int screen_update = NB_SCREENS;
+#ifdef HAVE_REMOTE_LCD
 static bool remote_display_on = true;
+#endif
 
 /** File name creation **/
 #if CONFIG_CODEC == SWCODEC
@@ -851,7 +853,7 @@ bool recording_screen(bool no_source)
     
     if(rec_create_directory() > 0)
         have_recorded = true;
-        
+#ifdef HAVE_REMOTE_LCD
     if (!remote_display_on)
     {
         screens[1].clear_display();
@@ -861,6 +863,7 @@ bool recording_screen(bool no_source)
         screens[1].update();
         gui_syncsplash(0, true, str(LANG_REMOTE_LCD_OFF));
     }
+#endif
 
     while(!done)
     {
@@ -927,6 +930,7 @@ bool recording_screen(bool no_source)
 
         switch(button)
         {
+#ifdef HAVE_REMOTE_LCD
             case ACTION_REC_LCD:
                 if (remote_display_on)
                 {
@@ -945,7 +949,7 @@ bool recording_screen(bool no_source)
                     screen_update = NB_SCREENS;
                 }
                 break;
-
+#endif
             case ACTION_STD_CANCEL:
                 /* turn off the trigger */
                 peak_meter_trigger(false);
