@@ -1265,6 +1265,7 @@ int ipod_scan(struct ipod_t* ipod)
          }
          n++;
          strcpy(last_ipod,ipod->diskname);
+         ipod_close(ipod);
     }
 
     if (n==0) {
