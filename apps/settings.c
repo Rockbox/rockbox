@@ -76,9 +76,10 @@ struct user_settings global_settings;
 
 /* Initial values for globally needed state data that shouldn't be saved
    or reset should be defined here and not in settings_list */
+
 struct system_status global_status =
 {
-    .__dummy = 0,
+    .runtime = 0, /* this will be overwritten when nvram settings are loaded */
 #ifdef CONFIG_TUNER
     .in_radio_screen     = false,
     .radio_status        = FMRADIO_OFF,

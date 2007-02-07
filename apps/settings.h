@@ -250,9 +250,6 @@ void settings_apply_trigger(void);
 
 struct system_status
 {
-    int __dummy;       /* dummy member needed until at least one statically
-                          initialized member is guaranteed to be in
-                          global_status */
     int resume_index;  /* index in playlist (-1 for no active resume) */
     int resume_first_index;  /* index of first track in playlist */
     uint32_t resume_offset; /* byte offset in mp3 file */
