@@ -916,6 +916,7 @@ void settings_reset(void) {
 #if defined (HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
     enc_global_settings_reset();
 #endif
+    global_status.in_recording_screen = false;
 }
 
 /** Changing setting values **/
