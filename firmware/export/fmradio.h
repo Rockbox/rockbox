@@ -29,11 +29,6 @@
 #define FMRADIO_PLAYING     0x1
 #define FMRADIO_PAUSED      0x2
 
-/* returns the IN flag */
-#define FMRADIO_IN_SCREEN(s)        ((s) & FMRADIO_IN_FLAG)
-#define FMRADIO_STATUS_PLAYING(s)   ((s) & FMRADIO_PLAYING_OUT)
-#define FMRADIO_STATUS_PAUSED(s)    ((s) & FMRADIO_PAUSED_OUT)
-
 extern int  get_radio_status(void);
 
 extern int fmradio_read(int addr);

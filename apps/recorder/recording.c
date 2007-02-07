@@ -70,13 +70,6 @@
 #include "radio.h"
 #ifdef HAVE_RECORDING
 
-static bool in_screen = false;
-
-bool in_recording_screen(void)
-{
-    return in_screen;
-}
-
 #define PM_HEIGHT ((LCD_HEIGHT >= 72) ? 2 : 1)
 
 #if CONFIG_KEYPAD == RECORDER_PAD
@@ -801,7 +794,7 @@ bool recording_screen(bool no_source)
 
     struct audio_recording_options rec_options;
 
-    in_screen = true;
+    global_status.in_recording_screen = true;
     cursor = 0;
 #if (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)
     ata_set_led_enabled(false);
@@ -1771,7 +1764,7 @@ bool recording_screen(bool no_source)
     peak_meter_trigger(false);
     peak_meter_set_trigger_listener(NULL);
 
-    in_screen = false;
+    global_status.in_recording_screen = false;
     sound_settings_apply();
 
     FOR_NB_SCREENS(i)

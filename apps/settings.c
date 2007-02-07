@@ -73,7 +73,20 @@
 void dac_line_in(bool enable);
 #endif
 struct user_settings global_settings;
-struct system_status global_status;
+
+/* Initial values for globally needed state data that shouldn't be saved
+   or reset should be defined here and not in settings_list */
+struct system_status global_status =
+{
+#ifdef CONFIG_TUNER
+    .in_radio_screen     = false,
+    .radio_status        = FMRADIO_OFF,
+#endif
+#ifdef HAVE_RECORDING
+    .in_recording_screen = false,
+#endif
+};
+
 #ifdef HAVE_RECORDING
 const char rec_base_directory[] = REC_BASE_DIR;
 #endif
