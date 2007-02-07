@@ -37,6 +37,7 @@ static uint8_t buf[3840] IBSS_ATTR;
 
 static inline void output_audio(sample_t *samples)
 {
+    ci->yield();
     ci->pcmbuf_insert(&samples[0], &samples[256], 256);
 }
 
