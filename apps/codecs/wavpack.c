@@ -118,8 +118,7 @@ enum codec_status codec_main(void)
         if (ci->stop_codec || ci->new_track)
             break;
 
-        while (!ci->pcmbuf_insert ((char *) temp_buffer, nsamples * nchans * 4))
-            ci->sleep (1);
+        ci->pcmbuf_insert (temp_buffer, NULL, nsamples);
 
         ci->set_elapsed (WavpackGetSampleIndex (wpc) / sr_100 * 10);
         ci->yield ();

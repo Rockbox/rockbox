@@ -320,9 +320,10 @@ next_track:
             }
         }
 
-        /* 2 bytes per sample */
-        while (!ci->pcmbuf_insert((char *)samples, sampleswritten*2))
-            ci->yield();
+        if (channels == 2)
+            sampleswritten >>= 1; /* make samples/channel */
+
+        ci->pcmbuf_insert(samples, NULL, sampleswritten);
             
         ci->set_elapsed(
            ((end_adr-start_adr)*loop_count + bufoff-chanstart)*

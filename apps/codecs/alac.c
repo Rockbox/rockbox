@@ -121,10 +121,7 @@ enum codec_status codec_main(void)
 
     /* Output the audio */
     ci->yield();
-    while(!ci->pcmbuf_insert_split(outputbuffer[0],
-                                   outputbuffer[1],
-                                   samplesdecoded*sizeof(int32_t)))
-      ci->yield();
+    ci->pcmbuf_insert(outputbuffer[0], outputbuffer[1], samplesdecoded);
 
     /* Update the elapsed-time indicator */
     samplesdone+=sample_duration;

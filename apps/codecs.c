@@ -78,7 +78,6 @@ struct codec_api ci = {
     0, /* seek_time */
     NULL, /* get_codec_memory */
     NULL, /* pcmbuf_insert */
-    NULL, /* pcmbuf_insert_split */
     NULL, /* set_elapsed */
     NULL, /* read_filebuf */
     NULL, /* request_buffer */

@@ -489,11 +489,8 @@ enum codec_status codec_main(void)
         frame++;
 
         ci->yield();
-        while(!ci->pcmbuf_insert_split((char*)&decoded0[fc.sample_skip],
-              (char*)&decoded1[fc.sample_skip],
-              (fc.blocksize-fc.sample_skip)*4)) {
-            ci->yield();
-        }
+        ci->pcmbuf_insert(&decoded0[fc.sample_skip], &decoded1[fc.sample_skip],
+                          fc.blocksize - fc.sample_skip);
         
         fc.sample_skip = 0;
 

@@ -134,11 +134,8 @@ seek_start:
             /* Insert decoded samples in pcmbuf */
             if (nsamples) {
                 ci->yield();
-                while (!ci->pcmbuf_insert_split((char*)(decoded0 + sc.nwrap),
-                                                (char*)(decoded1 + sc.nwrap),
-                                                4*nsamples)) {
-                    ci->yield();
-                }
+                ci->pcmbuf_insert(decoded0 + sc.nwrap, decoded1 + sc.nwrap,
+                                  nsamples);
 
                 /* Update the elapsed-time indicator */
                 samplesdone += nsamples;

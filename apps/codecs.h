@@ -90,12 +90,12 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 12
+#define CODEC_API_VERSION 13
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 12
+#define CODEC_MIN_API_VERSION 13
 
 /* codec return codes */
 enum codec_status {
@@ -133,8 +133,7 @@ struct codec_api {
     void* (*get_codec_memory)(size_t *size);
     /* Insert PCM data into audio buffer for playback. Playback will start
        automatically. */
-    bool (*pcmbuf_insert)(const char *data, size_t length);
-    bool (*pcmbuf_insert_split)(const void *ch1, const void *ch2, size_t length);
+    bool (*pcmbuf_insert)(const void *ch1, const void *ch2, int count);
     /* Set song position in WPS (value in ms). */
     void (*set_elapsed)(unsigned int value);
     

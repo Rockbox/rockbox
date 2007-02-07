@@ -51,7 +51,8 @@ enum codec_status codec_main(void)
     uint16_t sample_size = 0;
     uint32_t sample_rate = 0;
     uint32_t i;
-    size_t n, bufsize;
+    size_t n;
+    int bufcount;
     int endofstream;
     unsigned char *buf;
     uint8_t *aifbuf;
@@ -229,25 +230,27 @@ next_track:
                 samples[i/4] = (SE(aifbuf[i])<<21)|(aifbuf[i + 1]<<13)
                                |(aifbuf[i + 2]<<5)|(aifbuf[i + 3]>>3);
             }
-            bufsize = n;
+            bufcount = n >> 2;
         } else if (sample_size > 16) {
             for (i = 0; i < n; i += 3) {
                 samples[i/3] = (SE(aifbuf[i])<<21)|(aifbuf[i + 1]<<13)
                                |(aifbuf[i + 2]<<5);
             }
-            bufsize = n*4/3;
+            bufcount = n/3;
         } else if (sample_size > 8) {
             for (i = 0; i < n; i += 2)
                 samples[i/2] = (SE(aifbuf[i])<<21)|(aifbuf[i + 1]<<13);
-            bufsize = n*2;
+            bufcount = n >> 1;
         } else {
             for (i = 0; i < n; i++)
                 samples[i] = SE(aifbuf[i]) << 21;
-            bufsize = n*4;
+            bufcount = n;
         }
 
-        while (!ci->pcmbuf_insert((char *)samples, bufsize))
-            ci->yield();
+        if (num_channels == 2)
+            bufcount >>= 1;
+
+        ci->pcmbuf_insert(samples, NULL, bufcount);
 
         ci->advance_buffer(n);
         bytesdone += n;

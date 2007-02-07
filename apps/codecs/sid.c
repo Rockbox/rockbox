@@ -1309,8 +1309,7 @@ next_track:
             } 
         }
         
-        while (!ci->pcmbuf_insert((char *)samples, CHUNK_SIZE*4))
-            ci->yield();
+        ci->pcmbuf_insert(samples, NULL, CHUNK_SIZE);
     }
 
     if (ci->request_next_track())

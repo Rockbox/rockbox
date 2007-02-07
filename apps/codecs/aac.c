@@ -183,12 +183,8 @@ next_track:
 
         /* Output the audio */
         ci->yield();
-        while (!ci->pcmbuf_insert_split(decoder->time_out[0],
-                                        decoder->time_out[1],
-                                        frame_info.samples * 2))
-        {
-            ci->sleep(1);
-        }
+        ci->pcmbuf_insert(decoder->time_out[0], decoder->time_out[1],
+                          frame_info.samples >> 1);
 
         /* Update the elapsed-time indicator */
         sound_samples_done += sample_duration;

@@ -212,7 +212,8 @@ enum codec_status codec_main(void)
     int bytespersample = 0;
     uint16_t bitspersample;
     uint32_t i;
-    size_t n, bufsize;
+    size_t n;
+    int bufcount;
     int endofstream;
     unsigned char *buf;
     uint8_t *wavbuf;
@@ -466,34 +467,39 @@ next_track:
                         (wavbuf[i + 1]<<5)|(wavbuf[i + 2]<<13)|
                         (SE(wavbuf[i + 3])<<21);
                 }
-                bufsize = n;
+                bufcount = n >> 2;
             } else if (bitspersample > 16) {
                 for (i = 0; i < n; i += 3) {
                     samples[i/3] = (wavbuf[i]<<5)|
                         (wavbuf[i + 1]<<13)|(SE(wavbuf[i + 2])<<21);
                 }
-                bufsize = n*4/3;
+                bufcount = n/3;
             } else if (bitspersample > 8) {
                 for (i = 0; i < n; i += 2) {
                     samples[i/2] = (wavbuf[i]<<13)|(SE(wavbuf[i + 1])<<21);
                 }
-                bufsize = n*2;
+                bufcount = n >> 1;
             } else {
                 for (i = 0; i < n; i++) {
                     samples[i] = (wavbuf[i] - 0x80)<<21;
                 }
-                bufsize = n*4;
+                bufcount = n;
             }
+
+            if (channels == 2)
+                bufcount >>= 1;
         } else if (formattag == WAVE_FORMAT_ALAW 
                    || formattag == IBM_FORMAT_ALAW) {
             for (i = 0; i < n; i++)
                 samples[i] = alaw2linear16[wavbuf[i]] << 13;
-            bufsize = n*4;
+
+            bufcount = (channels == 2) ? (n >> 1) : n;
         } else if (formattag == WAVE_FORMAT_MULAW
                    || formattag == IBM_FORMAT_MULAW) {
             for (i = 0; i < n; i++)
                 samples[i] = ulaw2linear16[wavbuf[i]] << 13;
-            bufsize = n*4;
+
+            bufcount = (channels == 2) ? (n >> 1) : n;
         }
         else if (formattag == WAVE_FORMAT_DVI_ADPCM) {
             unsigned int nblocks = chunksize/blockalign;
@@ -508,15 +514,14 @@ next_track:
                     goto done;
                 }
             }
-            bufsize = nblocks*samplesperblock*channels*4;
+            bufcount = nblocks*samplesperblock;
         } else {
             DEBUGF("CODEC_ERROR: unsupported format %x\n", formattag);
             i = CODEC_ERROR;
             goto done;
         }
 
-        while (!ci->pcmbuf_insert((char *)samples, bufsize))
-            ci->yield();
+        ci->pcmbuf_insert(samples, NULL, bufcount);
 
         ci->advance_buffer(n);
         bytesdone += n;

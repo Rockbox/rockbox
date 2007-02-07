@@ -1022,81 +1022,60 @@ static const char * get_codec_filename(int cod_spec)
 
 #ifdef PLAYBACK_VOICE
 
-static bool voice_pcmbuf_insert_split_callback(
-        const void *ch1, const void *ch2, size_t length)
+static bool voice_pcmbuf_insert_callback(
+        const void *ch1, const void *ch2, int count)
 {
-    const char* src[2];
-    char *dest;
-    long input_size;
-    size_t output_size;
+    const char *src[2] = { ch1, ch2 };
 
-    src[0] = ch1;
-    src[1] = ch2;
-
-    if (dsp_stereo_mode() == STEREO_NONINTERLEAVED)
-        length *= 2;    /* Length is per channel */
-
-    while (length)
+    while (count > 0)
     {
-        long est_output_size = dsp_output_size(length);
-        
-        while ((dest = pcmbuf_request_voice_buffer(est_output_size,
-                        &output_size, playing)) == NULL)
+        int out_count = dsp_output_count(count);
+        int inp_count;
+        char *dest;
+
+        while ((dest = pcmbuf_request_voice_buffer(
+                        &out_count, playing)) == NULL)
         {
             if (playing && audio_codec_loaded)
                 swap_codec();
             else
                 yield();
         }
-        
+
         /* Get the real input_size for output_size bytes, guarding
          * against resampling buffer overflows. */
-        input_size = dsp_input_size(output_size);
+        inp_count = dsp_input_count(out_count);
 
-        if (input_size <= 0) 
+        if (inp_count <= 0) 
         {
-            DEBUGF("Error: dsp_input_size(%ld=dsp_output_size(%ld))=%ld<=0\n",
-                    output_size, length, input_size);
+            DEBUGF("Error: dsp_input_count(%ld=dsp_output_count(%ld))=%ld<=0\n",
+                    out_count, count, inp_count);
             /* If this happens, there are samples of codec data that don't
              * become a number of pcm samples, and something is broken */
             return false;
         }
 
         /* Input size has grown, no error, just don't write more than length */
-        if ((size_t)input_size > length)
-            input_size = length;
+        if (inp_count > count)
+            inp_count = count;
 
-        output_size = dsp_process(dest, src, input_size);
+        out_count = dsp_process(dest, src, inp_count);
 
         if (playing)
         {
-            pcmbuf_mix_voice(output_size);
+            pcmbuf_mix_voice(out_count);
             if ((pcmbuf_usage() < 10 || pcmbuf_mix_free() < 30) &&
                     audio_codec_loaded)
                 swap_codec();
         }
         else
-            pcmbuf_write_complete(output_size);
+            pcmbuf_write_complete(out_count);
 
-        length -= input_size;
+        count -= inp_count;
     }
 
     return true;
-} /* voice_pcmbuf_insert_split_callback */
-
-static bool voice_pcmbuf_insert_callback(const char *buf, size_t length)
-{
-    /* TODO: The audiobuffer API should probably be updated, and be based on
-     *       pcmbuf_insert_split().  */
-    long real_length = length;
-
-    if (dsp_stereo_mode() == STEREO_NONINTERLEAVED)
-        length /= 2;    /* Length is per channel */
-
-    /* Second channel is only used for non-interleaved stereo. */
-    return voice_pcmbuf_insert_split_callback(buf, buf + (real_length / 2),
-        length);
-}
+} /* voice_pcmbuf_insert_callback */
 
 static void* voice_get_memory_callback(size_t *size)
 {
@@ -1321,30 +1300,22 @@ static void voice_thread(void)
 #endif /* PLAYBACK_VOICE */
 
 /* --- Codec thread --- */
-
-static bool codec_pcmbuf_insert_split_callback(
-        const void *ch1, const void *ch2, size_t length)
+static bool codec_pcmbuf_insert_callback(
+        const void *ch1, const void *ch2, int count)
 {
-    const char* src[2];
-    char *dest;
-    long input_size;
-    size_t output_size;
+    const char *src[2] = { ch1, ch2 };
 
-    src[0] = ch1;
-    src[1] = ch2;
-
-    if (dsp_stereo_mode() == STEREO_NONINTERLEAVED)
-        length *= 2;    /* Length is per channel */
-
-    while (length)
+    while (count > 0)
     {
-        long est_output_size = dsp_output_size(length);
+        int out_count = dsp_output_count(count);
+        int inp_count;
+        char *dest;
+
         /* Prevent audio from a previous track from playing */
         if (ci.new_track || ci.stop_codec)
             return true;
 
-        while ((dest = pcmbuf_request_buffer(est_output_size,
-                        &output_size)) == NULL) 
+        while ((dest = pcmbuf_request_buffer(&out_count)) == NULL) 
         {
             sleep(1);
             if (ci.seek_time || ci.new_track || ci.stop_codec)
@@ -1353,24 +1324,24 @@ static bool codec_pcmbuf_insert_split_callback(
 
         /* Get the real input_size for output_size bytes, guarding
          * against resampling buffer overflows. */
-        input_size = dsp_input_size(output_size);
+        inp_count = dsp_input_count(out_count);
 
-        if (input_size <= 0) 
+        if (inp_count <= 0) 
         {
-            DEBUGF("Error: dsp_input_size(%ld=dsp_output_size(%ld))=%ld<=0\n",
-                    output_size, length, input_size);
+            DEBUGF("Error: dsp_input_count(%ld=dsp_output_count(%ld))=%ld<=0\n",
+                    out_count, count, inp_count);
             /* If this happens, there are samples of codec data that don't
              * become a number of pcm samples, and something is broken */
             return false;
         }
 
         /* Input size has grown, no error, just don't write more than length */
-        if ((size_t)input_size > length)
-            input_size = length;
+        if (inp_count > count)
+            inp_count = count;
 
-        output_size = dsp_process(dest, src, input_size);
+        out_count = dsp_process(dest, src, inp_count);
 
-        pcmbuf_write_complete(output_size);
+        pcmbuf_write_complete(out_count);
 
 #ifdef PLAYBACK_VOICE
         if ((voice_is_playing || voice_thread_start) 
@@ -1381,26 +1352,12 @@ static bool codec_pcmbuf_insert_split_callback(
             swap_codec();
         }
 #endif
-        
-        length -= input_size;
+
+        count -= inp_count;
     }
 
     return true;
-} /* codec_pcmbuf_insert_split_callback */
-
-static bool codec_pcmbuf_insert_callback(const char *buf, size_t length)
-{
-    /* TODO: The audiobuffer API should probably be updated, and be based on
-     *       pcmbuf_insert_split().  */
-    long real_length = length;
-
-    if (dsp_stereo_mode() == STEREO_NONINTERLEAVED)
-        length /= 2;    /* Length is per channel */
-
-    /* Second channel is only used for non-interleaved stereo. */
-    return codec_pcmbuf_insert_split_callback(buf, buf + (real_length / 2),
-        length);
-}
+} /* codec_pcmbuf_insert_callback */
 
 static void* codec_get_memory_callback(size_t *size)
 {
@@ -3523,7 +3480,6 @@ static void audio_playback_init(void)
     /* Initialize codec api. */
     ci.read_filebuf = codec_filebuf_callback;
     ci.pcmbuf_insert = codec_pcmbuf_insert_callback;
-    ci.pcmbuf_insert_split = codec_pcmbuf_insert_split_callback;
     ci.get_codec_memory = codec_get_memory_callback;
     ci.request_buffer = codec_request_buffer_callback;
     ci.advance_buffer = codec_advance_buffer_callback;
@@ -3543,7 +3499,6 @@ static void audio_playback_init(void)
     memset(&id3_voice, 0, sizeof(struct mp3entry));
     ci_voice.read_filebuf = voice_filebuf_callback;
     ci_voice.pcmbuf_insert = voice_pcmbuf_insert_callback;
-    ci_voice.pcmbuf_insert_split = voice_pcmbuf_insert_split_callback;
     ci_voice.get_codec_memory = voice_get_memory_callback;
     ci_voice.request_buffer = voice_request_buffer_callback;
     ci_voice.advance_buffer = voice_advance_buffer_callback;

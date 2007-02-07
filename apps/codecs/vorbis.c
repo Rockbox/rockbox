@@ -217,10 +217,7 @@ next_track:
         } else if (n < 0) {
             DEBUGF("Error decoding frame\n");
         } else {
-            while (!ci->pcmbuf_insert_split(pcm[0], pcm[1], 
-                   n*sizeof(ogg_int32_t))) {
-                ci->sleep(1);
-            }
+            ci->pcmbuf_insert(pcm[0], pcm[1], n);
             ci->set_offset(ov_raw_tell(&vf));
             ci->set_elapsed(ov_time_tell(&vf));
         }

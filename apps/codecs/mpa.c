@@ -199,9 +199,9 @@ next_track:
            loop we will need to process the final frame that was decoded. */
         if (framelength > 0) {
             /* In case of a mono file, the second array will be ignored. */
-            ci->pcmbuf_insert_split(&synth.pcm.samples[0][samples_to_skip],
-                                    &synth.pcm.samples[1][samples_to_skip],
-                                    framelength * 4);
+            ci->pcmbuf_insert(&synth.pcm.samples[0][samples_to_skip],
+                              &synth.pcm.samples[1][samples_to_skip],
+                              framelength);
 
             /* Only skip samples for the first frame added. */
             samples_to_skip = 0;
@@ -244,8 +244,8 @@ next_track:
     /* Finish the remaining decoded frame.
        Cut the required samples from the end. */
     if (framelength > stop_skip)
-        ci->pcmbuf_insert_split(synth.pcm.samples[0], synth.pcm.samples[1],
-                                (framelength - stop_skip) * 4);
+        ci->pcmbuf_insert(synth.pcm.samples[0], synth.pcm.samples[1],
+                          framelength - stop_skip);
 
     stream.error = 0;
 

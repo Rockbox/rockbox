@@ -4445,9 +4445,7 @@ init_nsf:
             goto init_nsf;
         }
 
-        while (!ci->pcmbuf_insert((char *)samples, written))
-            ci->yield();
-
+        ci->pcmbuf_insert(samples, NULL, written >> 1);
     }
     
     print_timers(last_path,track);

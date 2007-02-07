@@ -35,12 +35,9 @@ unsigned long frequency;
 /* used outside liba52 */
 static uint8_t buf[3840] IBSS_ATTR;
 
-void output_audio(sample_t *samples)
+static inline void output_audio(sample_t *samples)
 {
-    do {
-        ci->yield();
-    } while (!ci->pcmbuf_insert_split(&samples[0], &samples[256], 
-                                      256*sizeof(sample_t)));
+    ci->pcmbuf_insert(&samples[0], &samples[256], 256);
 }
 
 void a52_decode_data(uint8_t *start, uint8_t *end)

@@ -40,8 +40,8 @@
 #define WORD_FRACBITS       27
 
 #define NATIVE_DEPTH        16
-#define SAMPLE_BUF_SIZE     256
-#define RESAMPLE_BUF_SIZE   (256 * 4)   /* Enough for 11,025 Hz -> 44,100 Hz*/
+#define SAMPLE_BUF_COUNT    256
+#define RESAMPLE_BUF_COUNT  (256 * 4)   /* Enough for 11,025 Hz -> 44,100 Hz*/
 #define DEFAULT_GAIN        0x01000000
 
 struct dsp_config
@@ -116,8 +116,8 @@ static struct dsp_config *dsp;
  * of copying needed is minimized for that case.
  */
 
-static int32_t sample_buf[SAMPLE_BUF_SIZE] IBSS_ATTR;
-static int32_t resample_buf[RESAMPLE_BUF_SIZE] IBSS_ATTR;
+static int32_t sample_buf[SAMPLE_BUF_COUNT] IBSS_ATTR;
+static int32_t resample_buf[RESAMPLE_BUF_COUNT] IBSS_ATTR;
 
 int sound_get_pitch(void)
 {
@@ -139,14 +139,14 @@ void sound_set_pitch(int permille)
  */
 static int convert_to_internal(const char* src[], int count, int32_t* dst[])
 {
-    count = MIN(SAMPLE_BUF_SIZE / 2, count);
+    count = MIN(SAMPLE_BUF_COUNT / 2, count);
 
     if ((dsp->sample_depth <= NATIVE_DEPTH)
         || (dsp->stereo_mode == STEREO_INTERLEAVED))
     {
         dst[0] = &sample_buf[0];
         dst[1] = (dsp->stereo_mode == STEREO_MONO)
-            ? dst[0] : &sample_buf[SAMPLE_BUF_SIZE / 2];
+            ? dst[0] : &sample_buf[SAMPLE_BUF_COUNT / 2];
     }
     else
     {
@@ -231,7 +231,7 @@ static void resampler_set_delta(int frequency)
 
 /* TODO: we really should have a separate set of resample functions for both
    mono and stereo to avoid all this internal branching and looping. */
-static long downsample(int32_t **dst, int32_t **src, int count,
+static int downsample(int32_t **dst, int32_t **src, int count,
     struct resample_data *r)
 {
     long phase = r->phase;
@@ -246,11 +246,14 @@ static long downsample(int32_t **dst, int32_t **src, int count,
         last_sample = r->last_sample[j];
         /* Do we need last sample of previous frame for interpolation? */
         if (pos > 0)
-        {
             last_sample = src[j][pos - 1];
-        }
-        *d[j]++ = last_sample + FRACMUL((phase & 0xffff) << 15,
-            src[j][pos] - last_sample);
+
+        /* Be sure starting position isn't passed the available data */
+        if (pos < count)
+            *d[j]++ = last_sample + FRACMUL((phase & 0xffff) << 15,
+                src[j][pos] - last_sample);
+        else  /* This is kinda nasty but works somewhat well for now */
+            *d[j]++ = src[j][count - 1];
     }
     phase += delta;
  
@@ -316,7 +319,7 @@ static inline int resample(int32_t* src[], int count)
 
     if (dsp->frequency != NATIVE_FREQUENCY)
     {
-        int32_t* dst[2] = {&resample_buf[0], &resample_buf[RESAMPLE_BUF_SIZE / 2]};
+        int32_t* dst[2] = {&resample_buf[0], &resample_buf[RESAMPLE_BUF_COUNT / 2]};
 
         if (dsp->frequency < NATIVE_FREQUENCY)
         {
@@ -619,7 +622,7 @@ static void apply_gain(int32_t* _src[], int _count)
     
         if (s0 != s1)
         {
-            d = &sample_buf[SAMPLE_BUF_SIZE / 2];
+            d = &sample_buf[SAMPLE_BUF_COUNT / 2];
             src[1] = d;
             s = *s1++;
     
@@ -736,18 +739,17 @@ static void write_samples(short* dst, int32_t* src[], int count)
 }
 
 /* Process and convert src audio to dst based on the DSP configuration,
- * reading size bytes of audio data. dst is assumed to be large enough; use
- * dst_get_dest_size() to get the required size. src is an array of
- * pointers; for mono and interleaved stereo, it contains one pointer to the
- * start of the audio data; for non-interleaved stereo, it contains two
- * pointers, one for each audio channel. Returns number of bytes written to
- * dest.
+ * reading count number of audio samples. dst is assumed to be large
+ * enough; use dsp_output_count() to get the required number. src is an
+ * array of pointers; for mono and interleaved stereo, it contains one
+ * pointer to the start of the audio data and the other is ignored; for
+ * non-interleaved stereo, it contains two pointers, one for each audio
+ * channel. Returns number of bytes written to dst.
  */
-long dsp_process(char* dst, const char* src[], long size)
+int dsp_process(char *dst, const char *src[], int count)
 {
     int32_t* tmp[2];
-    long written = 0;
-    long factor;
+    int written = 0;
     int samples;
 
     #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
@@ -759,14 +761,12 @@ long dsp_process(char* dst, const char* src[], long size)
 
     dsp = &dsp_conf[current_codec];
 
-    factor = (dsp->stereo_mode != STEREO_MONO) ? 2 : 1;
-    size /= dsp->sample_bytes * factor;
     dsp_set_replaygain(false);
 
-    while (size > 0)
+    while (count > 0)
     {
-        samples = convert_to_internal(src, size, tmp);
-        size -= samples;
+        samples = convert_to_internal(src, count, tmp);
+        count -= samples;
         apply_gain(tmp, samples);
         samples = resample(tmp, samples);
         if (dsp->crossfeed_enabled && dsp->stereo_mode != STEREO_MONO)
@@ -780,85 +780,61 @@ long dsp_process(char* dst, const char* src[], long size)
         dst += samples * sizeof(short) * 2;
         yield();
     }
+
     #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
     /* set old macsr again */
     coldfire_set_macsr(old_macsr);
     #endif
-    return written * sizeof(short) * 2;
+    return written;
 }
 
-/* Given size bytes of input data, calculate the maximum number of bytes of
- * output data that would be generated (the calculation is not entirely
- * exact and rounds upwards to be on the safe side; during resampling,
- * the number of samples generated depends on the current state of the
- * resampler).
+/* Given count number of input samples, calculate the maximum number of
+ * samples of output data that would be generated (the calculation is not
+ * entirely exact and rounds upwards to be on the safe side; during
+ * resampling, the number of samples generated depends on the current state
+ * of the resampler).
  */
 /* dsp_input_size MUST be called afterwards */
-long dsp_output_size(long size)
+int dsp_output_count(int count)
 {
     dsp = &dsp_conf[current_codec];
     
-    if (dsp->sample_depth > NATIVE_DEPTH)
-    {
-        size /= 2;
-    }
-
     if (dsp->frequency != NATIVE_FREQUENCY)
     {
-        size = (long) ((((unsigned long) size * NATIVE_FREQUENCY)
-            + (dsp->frequency - 1)) / dsp->frequency);
+        count = (int)(((unsigned long)count * NATIVE_FREQUENCY
+                    + (dsp->frequency - 1)) / dsp->frequency);
     }
 
-    /* round to the next multiple of 2 (these are shorts) */
-    size = (size + 1) & ~1;
+    /* Now we have the resampled sample count which must not exceed
+     * RESAMPLE_BUF_COUNT/2 to avoid resample buffer overflow. One
+     * must call dsp_input_count() to get the correct input sample
+     * count.
+     */
+    if (count > RESAMPLE_BUF_COUNT/2)
+        count = RESAMPLE_BUF_COUNT/2;
 
-    if (dsp->stereo_mode == STEREO_MONO)
-    {
-        size *= 2;
-    }
-
-    /* now we have the size in bytes for two resampled channels,
-     * and the size in (short) must not exceed RESAMPLE_BUF_SIZE to
-     * avoid resample buffer overflow. One must call dsp_input_size()
-     * to get the correct input buffer size. */
-    if (size > RESAMPLE_BUF_SIZE*2)
-        size = RESAMPLE_BUF_SIZE*2;
-
-    return size;
+    return count;
 }
 
-/* Given size bytes of output buffer, calculate number of bytes of input
- * data that would be consumed in order to fill the output buffer.
+/* Given count output samples, calculate number of input samples
+ * that would be consumed in order to fill the output buffer.
  */
-long dsp_input_size(long size)
+int dsp_input_count(int count)
 {
     dsp = &dsp_conf[current_codec];
-    
-    /* convert to number of output stereo samples. */
-    size /= 2;
 
-    /* Mono means we need half input samples to fill the output buffer */
-    if (dsp->stereo_mode == STEREO_MONO)
-        size /= 2;
-
-    /* size is now the number of resampled input samples. Convert to
+    /* count is now the number of resampled input samples. Convert to
        original input samples. */
     if (dsp->frequency != NATIVE_FREQUENCY)
     {
         /* Use the real resampling delta =
-         *  (unsigned long) dsp->frequency * 65536 / NATIVE_FREQUENCY, and
+         * dsp->frequency * 65536 / NATIVE_FREQUENCY, and
          * round towards zero to avoid buffer overflows. */
-        size = ((unsigned long)size *
-            resample_data[current_codec].delta) >> 16;
+        count = (int)(((unsigned long)count *
+                      resample_data[current_codec].delta) >> 16);
     }
 
-    /* Convert back to bytes. */
-    if (dsp->sample_depth > NATIVE_DEPTH)
-        size *= 4;
-    else
-        size *= 2;
-
-    return size;
+    return count;
 }
 
 int dsp_stereo_mode(void)

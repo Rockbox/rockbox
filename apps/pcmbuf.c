@@ -791,21 +791,20 @@ static bool prepare_insert(size_t length)
     return true;
 }
 
-void* pcmbuf_request_buffer(size_t length, size_t *realsize)
+void* pcmbuf_request_buffer(int *count)
 {
     if (crossfade_init)
         crossfade_start();
 
     if (crossfade_active) {
-        *realsize = MIN(length, PCMBUF_MIX_CHUNK);
+        *count = MIN(*count, PCMBUF_MIX_CHUNK/4);
         return fadebuf;
     }
     else
     {
-        if(prepare_insert(length))
+        if(prepare_insert(*count << 2))
         {
             size_t audiobuffer_index = audiobuffer_pos + audiobuffer_fillpos;
-            *realsize = length;
             if (pcmbuf_size - audiobuffer_index >= PCMBUF_MIN_CHUNK)
             {
                 /* Usual case, there's space here */
@@ -821,34 +820,31 @@ void* pcmbuf_request_buffer(size_t length, size_t *realsize)
         }
         else
         {
-            *realsize = 0;
             return NULL;
         }
     }
 }
 
-void* pcmbuf_request_voice_buffer(size_t length, size_t *realsize, bool mix)
+void* pcmbuf_request_voice_buffer(int *count, bool mix)
 {
     if (mix)
     {
         if (pcmbuf_read ==  NULL)
         {
-            *realsize = 0;
             return NULL;
         }
         else if (pcmbuf_mix_chunk || pcmbuf_read->link)
         {
-            *realsize = MIN(length, PCMBUF_MIX_CHUNK);
+            *count = MIN(*count, PCMBUF_MIX_CHUNK/4);
             return voicebuf;
         }
         else
         {
-            *realsize = 0;
             return NULL;
         }
     }
     else
-        return pcmbuf_request_buffer(length, realsize);
+        return pcmbuf_request_buffer(count);
 }
 
 bool pcmbuf_is_crossfade_active(void)
@@ -856,8 +852,10 @@ bool pcmbuf_is_crossfade_active(void)
     return crossfade_active || crossfade_init;
 }
 
-void pcmbuf_write_complete(size_t length)
+void pcmbuf_write_complete(int count)
 {
+    size_t length = (size_t)(unsigned int)count << 2;
+
     if (crossfade_active)
     {
         flush_crossfade(fadebuf, length);
@@ -874,8 +872,10 @@ void pcmbuf_write_complete(size_t length)
 }
 
 #if 0
-bool pcmbuf_insert_buffer(char *buf, size_t length)
+bool pcmbuf_insert_buffer(char *buf, int count)
 {
+    size_t length = (size_t)(unsigned int)count << 2;
+
     if (crossfade_active)
     {
         flush_crossfade(buf, length);
@@ -980,7 +980,7 @@ int pcmbuf_mix_free(void)
     return 100;
 }
 
-void pcmbuf_mix_voice(size_t length)
+void pcmbuf_mix_voice(int count)
 {
     short *ibuf = (short *)voicebuf;
     short *obuf;
@@ -998,9 +998,9 @@ void pcmbuf_mix_voice(size_t length)
     obuf = (short *)pcmbuf_mix_chunk->addr;
     chunk_samples = pcmbuf_mix_chunk->size / 2;
 
-    length /= 2;
+    count <<= 1;
 
-    while (length-- > 0) {
+    while (count-- > 0) {
         int sample = *ibuf++;
         if (pcmbuf_mix_sample >= chunk_samples)
         {

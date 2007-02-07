@@ -168,10 +168,9 @@ next_track:
             retval = CODEC_ERROR;
             goto done;
         } else {
-            while (!ci->pcmbuf_insert_split(sample_buffer,
-                                            sample_buffer + MPC_FRAME_LENGTH,
-                                            status*sizeof(MPC_SAMPLE_FORMAT)))
-                ci->yield();
+            ci->pcmbuf_insert(sample_buffer,
+                              sample_buffer + MPC_FRAME_LENGTH,
+                              status);
             samplesdone += status;
             ci->set_elapsed(samplesdone/frequency);
         }

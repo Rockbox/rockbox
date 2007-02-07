@@ -206,9 +206,9 @@ enum {
 
 #define DIV64(x, y, z) (long)(((long long)(x) << (z))/(y))
 
-long dsp_process(char *dest, const char *src[], long size);
-long dsp_input_size(long size);
-long dsp_output_size(long size);
+int dsp_process(char *dest, const char *src[], int count);
+int dsp_input_count(int count);
+int dsp_output_count(int count);
 int dsp_stereo_mode(void);
 bool dsp_configure(int setting, void *value);
 void dsp_set_replaygain(bool always);
