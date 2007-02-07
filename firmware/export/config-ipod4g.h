@@ -1,5 +1,5 @@
 /*
- * This config file is for the Apple iPod Color/Photo
+ * This config file is for the Apple iPod 4g Grayscale
  */
 #define TARGET_TREE /* this target is using the target tree system */
 
