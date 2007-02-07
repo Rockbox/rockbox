@@ -382,7 +382,6 @@ const struct settings_list settings[] = {
 
 #ifdef HAVE_RECORDING
     /* recording */
-    OFFON_SETTING(0,recscreen_on,-1,false,"recscreen on",NULL),
     OFFON_SETTING(0,rec_startup,LANG_RECORD_STARTUP,false,
         "rec screen on startup",NULL),
     {F_T_INT,GS(rec_timesplit), LANG_SPLIT_TIME, INT(0),"rec timesplit",

@@ -310,7 +310,6 @@ struct user_settings
     int rec_left_gain;  /* depends on target */
     int rec_right_gain; /* depands on target */
     bool rec_editable; /* true means that the bit reservoir is off */
-    bool recscreen_on; /* true if using the recording screen */
 
     /* note: timesplit setting is not saved */
     int rec_timesplit; /* 0 = off,

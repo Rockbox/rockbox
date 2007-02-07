@@ -38,6 +38,7 @@
 #include "statusbar.h"
 #ifdef HAVE_RECORDING
 #include "audio.h"
+#include "recording.h"
 #endif
 
 /* FIXME: should be removed from icon.h to avoid redefinition,
@@ -257,7 +258,8 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 #endif
 #ifdef HAVE_RECORDING
         /* turn off volume display in recording screen */
-        if (!global_settings.recscreen_on)
+        bool recscreen_on = in_recording_screen();
+        if (!recscreen_on)
 #endif
             bar->redraw_volume = gui_statusbar_icon_volume(bar, bar->info.volume);
         gui_statusbar_icon_play_state(display, current_playmode() + Icon_Play);
@@ -265,7 +267,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 #ifdef HAVE_RECORDING
         /* If in recording screen, replace repeat mode, volume
            and shuffle icons with recording info */
-        if (global_settings.recscreen_on)
+        if (recscreen_on)
             gui_statusbar_icon_recording_info(display);
         else
 #endif

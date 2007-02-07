@@ -19,6 +19,7 @@
 #ifndef RECORDING_H
 #define RECORDING_H
 
+bool in_recording_screen(void);
 bool recording_screen(bool no_source);
 char *rec_create_filename(char *buf);
 int rec_create_directory(void);
