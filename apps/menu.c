@@ -43,6 +43,7 @@
 #include "misc.h"
 #include "action.h"
 #include "menus/exported_menus.h"
+#include "string.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
@@ -370,11 +371,12 @@ static int current_subitems[MAX_MENU_SUBITEMS];
 static int current_subitems_count = 0;
 
 void get_menu_callback(const struct menu_item_ex *m,
-                        menu_callback_type menu_callback) 
+                        menu_callback_type *menu_callback) 
 {
     if (m->flags&MENU_HAS_DESC)
-        menu_callback= m->callback_and_desc->menu_callback;
-    else menu_callback = m->menu_callback;
+        *menu_callback= m->callback_and_desc->menu_callback;
+    else 
+        *menu_callback = m->menu_callback;
 }
 
 static int get_menu_selection(int selected_item, const struct menu_item_ex *menu)
@@ -403,7 +405,7 @@ static char * get_menu_item_name(int selected_item,void * data, char *buffer)
     if (type == MT_SETTING)
     {
         const struct settings_list *v
-                = find_setting(menu->variable);
+                = find_setting(menu->variable, NULL);
         if (v)
             return str(v->lang_id);
         else return "Not Done yet!";
@@ -419,7 +421,7 @@ static void init_menu_lists(const struct menu_item_ex *menu,
     current_subitems_count = 0;
     for (i=0; i<count; i++)
     {
-        get_menu_callback(menu->submenus[i],menu_callback);
+        get_menu_callback(menu->submenus[i],&menu_callback);
         if (menu_callback)
         {
             if (menu_callback(ACTION_REQUEST_MENUITEM,menu->submenus[i])
@@ -443,7 +445,7 @@ static void init_menu_lists(const struct menu_item_ex *menu,
     gui_synclist_limit_scroll(lists,true);
     gui_synclist_select_item(lists, selected);
     
-    get_menu_callback(menu,menu_callback);
+    get_menu_callback(menu,&menu_callback);
     if (callback && menu_callback)
         menu_callback(ACTION_ENTER_MENUITEM,menu);
 }
@@ -505,7 +507,7 @@ int do_menu(const struct menu_item_ex *start_menu)
             continue;
         }
 
-        get_menu_callback(menu,menu_callback);
+        get_menu_callback(menu,&menu_callback);
         if (menu_callback)
         {
             action = menu_callback(action,menu);
@@ -526,7 +528,7 @@ int do_menu(const struct menu_item_ex *start_menu)
                 in_stringlist = false;
             if (stack_top > 0)
             {
-                get_menu_callback(menu,menu_callback);
+                get_menu_callback(menu,&menu_callback);
                 if (menu_callback)
                 {
                     if (menu_callback(action,menu) ==
@@ -551,8 +553,9 @@ int do_menu(const struct menu_item_ex *start_menu)
             temp = menu->submenus[selected];
             if (in_stringlist)
                 type = (menu->flags&MENU_TYPE_MASK);
-            else type = (temp->flags&MENU_TYPE_MASK);
-            get_menu_callback(temp,menu_callback);
+            else 
+                type = (temp->flags&MENU_TYPE_MASK);
+            get_menu_callback(temp, &menu_callback);
             if (menu_callback)
             {
                 action = menu_callback(ACTION_ENTER_MENUITEM,temp);
@@ -584,8 +587,10 @@ int do_menu(const struct menu_item_ex *start_menu)
                     break;
                 case MT_SETTING:
                 {
+                    int setting_id;
                     const struct settings_list *setting = find_setting(
-                                                               temp->variable);
+                                                               temp->variable,
+                                                               &setting_id);
                     if (setting)
                     {
                         if ((setting->flags&F_BOOL_SETTING) == F_BOOL_SETTING)
@@ -624,11 +629,10 @@ int do_menu(const struct menu_item_ex *start_menu)
                             {
                                 var = (int*)setting->setting;
                             }
-                            DEBUGF("%x\n",setting->flags);
                             if (setting->flags&F_INT_SETTING)
-                            {DEBUGF("boo");
+                            {
                                 set_int(str(setting->lang_id),
-                                        str(setting->int_setting->unit),
+                                        NULL,
                                         setting->int_setting->unit,var,
                                         setting->int_setting->option_callback,
                                         setting->int_setting->step,
@@ -639,18 +643,41 @@ int do_menu(const struct menu_item_ex *start_menu)
                             else if (setting->flags&F_CHOICE_SETTING)
                             {
                                 static struct opt_items options[MAX_OPTIONS];
+                                static char buffer[1024];
+                                char *buf_start = buffer;
+                                int buf_free = 1024;
                                 int i,j, count = setting->choice_setting->count;
                                 for (i=0, j=0; i<count && i<MAX_OPTIONS; i++)
                                 {
-                                    options[j].string =
-                                        P2STR(setting->choice_setting->desc[i]);
-                                    options[j].voice_id = 
-                                        P2ID(setting->choice_setting->desc[i]);
-                                    j++;
+                                    if (setting->flags&F_CHOICETALKS)
+                                    {
+                                        if (cfg_int_to_string(setting_id, i,
+                                                            buf_start, buf_free))
+                                        {
+                                            int len = strlen(buf_start) +1;
+                                            options[j].string = buf_start;
+                                            buf_start += len;
+                                            buf_free -= len;
+                                            options[j].voice_id = 
+                                                setting->choice_setting->talks[i];
+                                            j++;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        options[j].string =
+                                            P2STR(setting->
+                                                  choice_setting->desc[i]);
+                                        options[j].voice_id = 
+                                            P2ID(setting->
+                                                  choice_setting->desc[i]);
+                                        j++;
+                                    }
                                 }
                                 set_option(str(setting->lang_id), var, INT,
-                                            options,count,
-                                            setting->choice_setting->option_callback);
+                                            options,j,
+                                            setting->
+                                               choice_setting->option_callback);
                             }
                             if (setting->flags&F_TEMPVAR)
                                 *(int*)setting->setting = temp_var;
@@ -675,7 +702,7 @@ int do_menu(const struct menu_item_ex *start_menu)
                     }
                     break;
             }
-            get_menu_callback(temp,menu_callback);
+            get_menu_callback(temp,&menu_callback);
             if (type != MT_MENU && menu_callback)
                 menu_callback(ACTION_EXIT_MENUITEM,temp);
         }

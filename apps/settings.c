@@ -395,7 +395,7 @@ bool settings_load_config(const char* file, bool apply)
 
 /** Writing to a config file and saving settings **/
 
-static bool cfg_int_to_string(int setting_id, int val, char* buf)
+bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len)
 {
     const char* start = settings[setting_id].cfg_vals;
     char* end = NULL;
@@ -410,11 +410,12 @@ static bool cfg_int_to_string(int setting_id, int val, char* buf)
     }
     end = strchr(start,',');
     if (end == NULL)
-        strcpy(buf,start);
+        strncpy(buf, start, buf_len);
     else 
     {
-        strncpy(buf, start, end-start);
-        buf[end-start] = '\0';
+        int len = (buf_len > (end-start))? end-start: buf_len;
+        strncpy(buf, start, len);
+        buf[len] = '\0';
     }
     return true;
 }
@@ -496,12 +497,13 @@ static bool settings_write_config(char* filename, int options)
                 }
                 else
                 {
-                    cfg_int_to_string(i,*(int*)settings[i].setting,value);
+                    cfg_int_to_string(i, *(int*)settings[i].setting,
+                                        value, MAX_PATH);
                 }
                 break;
             case F_T_BOOL:
                 cfg_int_to_string(i,
-                        *(bool*)settings[i].setting==false?0:1,value);
+                        *(bool*)settings[i].setting==false?0:1, value, MAX_PATH);
                 break;
             case F_T_CHARPTR:
             case F_T_UCHARPTR:
@@ -923,13 +925,17 @@ void settings_reset(void) {
 }
 
 /** Changing setting values **/
-const struct settings_list* find_setting(void* variable)
+const struct settings_list* find_setting(void* variable, int *id)
 {
     int i;
     for(i=0;i<nb_settings;i++)
     {
         if (settings[i].setting == variable)
+        {
+            if (id)
+                *id = i;
             return &settings[i];
+        }
     }
     return NULL;
 }
@@ -939,7 +945,7 @@ void talk_setting(void *global_settings_variable)
     const struct settings_list *setting;
     if (global_settings.talk_menu == 0)
         return;
-    setting = find_setting(global_settings_variable);
+    setting = find_setting(global_settings_variable, NULL);
     if (setting == NULL)
         return;
     if (setting->lang_id)
@@ -1173,6 +1179,37 @@ static bool do_set_setting(const unsigned char* string, void *variable,
 
     return false;
 }
+static const char *unit_strings[] = 
+{   
+    [UNIT_INT]
+        = "",
+    [UNIT_MS]
+        = "ms",
+    [UNIT_SEC]
+        = "s", 
+    [UNIT_MIN]
+        = "min", 
+    [UNIT_HOUR]
+        = "hr", 
+    [UNIT_KHZ]
+        = "KHz", 
+    [UNIT_DB]
+        = "dB", 
+    [UNIT_PERCENT]
+        = "%",
+    [UNIT_MAH]
+        = "mAh",
+    [UNIT_PIXEL]
+        = "px",
+    [UNIT_PER_SEC]
+        = "per sec",
+    [UNIT_HERTZ]
+        = "Hz",
+    [UNIT_MB]
+        = "MB",
+    [UNIT_KBIT]
+        = "kb/s",
+};
 bool set_int(const unsigned char* string,
              const char* unit,
              int voice_unit,
@@ -1186,12 +1223,16 @@ bool set_int(const unsigned char* string,
 #if CONFIG_KEYPAD != PLAYER_PAD
     struct value_setting_data data = {
         INT,max, step, voice_unit,unit,formatter,NULL };
+    if (unit == NULL)
+        data.unit = unit_strings[voice_unit];
     return do_set_setting(string,variable,(max-min)/step + 1,
                           (max-*variable)/step, &data,function);
 #else
     int count = (max-min)/step + 1;
     struct value_setting_data data = {
         INT,min, -step, voice_unit,unit,formatter,NULL };
+    if (unit == NULL)
+        data.unit = unit_strings[voice_unit];
     return do_set_setting(string,variable,count,
                           count - ((max-*variable)/step), &data,function);
 #endif

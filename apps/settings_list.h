@@ -64,22 +64,26 @@ struct filename_setting {
 #define F_FILENAME 0x40
 
 struct int_setting {
-  void (*option_callback)(int);
-  int unit;
-  int min;
-  int max;
-  int step;
-  void (*formatter)(char*, int, int, const char*);
+    void (*option_callback)(int);
+    int unit;
+    int min;
+    int max;
+    int step;
+    void (*formatter)(char*, int, int, const char*);
 };
 #define F_INT_SETTING 0x80
 
 struct choice_setting {
-  void (*option_callback)(int);
-  int count;
-  unsigned char **desc;
+    void (*option_callback)(int);
+    int count;
+    union {
+        unsigned char **desc;
+        int           *talks;
+    };
 };
 #define F_CHOICE_SETTING 0x100
-
+#define F_CHOICETALKS    0x200 /* uses .talks in the above struct for the talks */
+                               /* and cfg_vals for the strings to display */
 /* these use the _isfunc_type type for the function */
 /* typedef int (*_isfunc_type)(void); */
 #define F_MIN_ISFUNC    0x100000 /* min(above) is function pointer to above type */
@@ -96,10 +100,10 @@ struct choice_setting {
 - number of bytes for a NVRAM setting is changed
 - a NVRAM setting is removed
 */
-#define F_TEMPVAR    0x200 /* used if the setting should be set using a temp var */
+#define F_TEMPVAR    0x400 /* used if the setting should be set using a temp var */
 
 struct settings_list {
-    uint32_t             flags;   /* ____ ____ TFFF ____ NNN_ __TC IFRB STTT */
+    uint32_t             flags;   /* ____ ____ TFFF ____ NNN_ _TVC IFRB STTT */
     void                *setting;
     int                  lang_id; /* -1 for none */
     union storage_type   default_val;

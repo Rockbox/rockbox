@@ -224,7 +224,8 @@ struct opt_items {
     unsigned const char* string;
     long voice_id;
 };
-const struct settings_list* find_setting(void* variable);
+const struct settings_list* find_setting(void* variable, int *id);
+bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len);
 void talk_setting(void *global_settings_variable);
 bool set_sound(const unsigned char * string,
                int* variable, int setting);

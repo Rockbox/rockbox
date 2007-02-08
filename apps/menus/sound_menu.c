@@ -27,6 +27,102 @@
 #include "settings.h"
 #include "menu.h"
 #include "sound_menu.h"
+#include "eq_menu.h"
+#if CONFIG_CODEC == SWCODEC
+#include "pcmbuf.h"
+#endif
 
-MENUITEM_FUNCTION(sound_settings, ID2P(LANG_SOUND_SETTINGS), (menu_function)sound_menu, NULL);
+/***********************************/
+/*    SOUND MENU                   */
+#if CONFIG_CODEC == SWCODEC
+int soundmenu_callback(int action,const struct menu_item_ex *this_item)
+{
+    (void)this_item;
+    switch (action)
+    {
+        case ACTION_ENTER_MENUITEM: /* on entering an item */
+            pcmbuf_set_low_latency(true);
+            break;
+        case ACTION_EXIT_MENUITEM: /* on exit */
+            pcmbuf_set_low_latency(false);
+            break;
+    }
+    return action;
+}
+#else
+#define soundmenu_callback NULL
+#endif
 
+MENUITEM_SETTING(volume, &global_settings.volume, soundmenu_callback);
+
+#ifndef HAVE_TLV320
+    MENUITEM_SETTING(bass, &global_settings.bass, soundmenu_callback);
+    MENUITEM_SETTING(treble, &global_settings.treble, soundmenu_callback);
+#endif
+
+MENUITEM_SETTING(balance, &global_settings.balance, soundmenu_callback);
+MENUITEM_SETTING(channel_config, &global_settings.channel_config, soundmenu_callback);
+MENUITEM_SETTING(stereo_width, &global_settings.stereo_width, soundmenu_callback);
+
+#if CONFIG_CODEC == SWCODEC
+    /* Crossfeed Submenu */
+    MENUITEM_SETTING(crossfeed, &global_settings.crossfeed, soundmenu_callback);
+    MENUITEM_SETTING(crossfeed_direct_gain,
+                     &global_settings.crossfeed_direct_gain, soundmenu_callback);
+    MENUITEM_SETTING(crossfeed_cross_gain,
+                     &global_settings.crossfeed_cross_gain, soundmenu_callback);
+    MENUITEM_SETTING(crossfeed_hf_attenuation,
+                     &global_settings.crossfeed_hf_attenuation, soundmenu_callback);
+    MENUITEM_SETTING(crossfeed_hf_cutoff,
+                     &global_settings.crossfeed_hf_cutoff, soundmenu_callback);
+    MAKE_MENU(crossfeed_menu,ID2P(LANG_CROSSFEED),soundmenu_callback,
+              &crossfeed, &crossfeed_direct_gain, &crossfeed_cross_gain,
+              &crossfeed_hf_attenuation, &crossfeed_hf_cutoff);
+              
+    MENUITEM_FUNCTION(equalizer_menu, ID2P(LANG_EQUALIZER),
+                      (int(*)(void))eq_menu, NULL);
+    MENUITEM_SETTING(dithering_enabled,
+                     &global_settings.dithering_enabled, soundmenu_callback);
+#ifdef HAVE_WM8758
+    MENUITEM_FUNCTION(hw_equalizer_menu, ID2P(LANG_EQUALIZER_HARDWARE),
+                      (int(*)(void))eq_hw_menu, NULL);
+#endif
+#endif
+
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+    MENUITEM_SETTING(loudness, &global_settings.loudness, NULL);
+    MENUITEM_SETTING(avc, &global_settings.avc, NULL);
+    MENUITEM_SETTING(superbass, &global_settings.superbass, NULL);
+    MENUITEM_SETTING(mdb_enable, &global_settings.mdb_enable, NULL);
+    MENUITEM_SETTING(mdb_strength, &global_settings.mdb_strength, NULL);
+    MENUITEM_SETTING(mdb_harmonics, &global_settings.mdb_harmonics, NULL);
+    MENUITEM_SETTING(mdb_center, &global_settings.mdb_center, NULL);
+    MENUITEM_SETTING(mdb_shape, &global_settings.mdb_shape, NULL);
+#endif
+
+
+
+MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL,
+          &volume,
+#ifndef HAVE_TLV320
+          &bass,&treble,
+#endif
+          &balance,&channel_config,&stereo_width
+#if CONFIG_CODEC == SWCODEC
+         ,&crossfeed_menu, &equalizer_menu,&dithering_enabled
+#endif
+#ifdef HAVE_WM8758
+         ,&hw_equalizer_menu
+#endif
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+         ,&loudness,&avc,&superbass,&mdb_enable,&mdb_strength
+         ,&mdb_harmonics,&mdb_center,&mdb_shape
+#endif
+         );
+/*    SOUND MENU                   */
+/***********************************/
+
+bool sound_menu(void)
+{
+    return do_menu(&sound_settings);
+}

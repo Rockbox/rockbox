@@ -93,8 +93,8 @@ static const char backlight_times_conf [] =
 #define FUNCTYPE(a) {.func = a}
 #define NODEFAULT INT(0)
 
-#define SOUND_SETTING(flags,var,lang_id,setting) \
-            {flags|F_T_INT|F_T_SOUND, GS(var),lang_id, NODEFAULT,#var,NULL,\
+#define SOUND_SETTING(flags,var,lang_id,name,setting) \
+            {flags|F_T_INT|F_T_SOUND, GS(var),lang_id, NODEFAULT,name,NULL,\
                 {.sound_setting=(struct sound_setting[]){{setting}}} }
 
 #define BOOL_SETTING(flags,var,lang_id,default,name,cfgvals,yes,no,opt_cb) \
@@ -119,26 +119,73 @@ static const char backlight_times_conf [] =
             {flags|F_CHOICE_SETTING|F_T_INT,  GS(var), lang_id,   \
                 INT(default), name, cfg_vals,                     \
                 {.choice_setting = (struct choice_setting[]){    \
-                    {cb,count,(unsigned char*[]){__VA_ARGS__}}}}}
-
+                    {cb, count, {.desc = (unsigned char*[]){__VA_ARGS__}}}}}}
+                    
+#define STRINGCHOICE_SETTING(flags,var,lang_id,default,name,cfg_vals,cb,count,...)  \
+            {flags|F_CHOICE_SETTING|F_T_INT|F_CHOICETALKS,  GS(var), lang_id,   \
+                INT(default), name, cfg_vals,                     \
+                {.choice_setting = (struct choice_setting[]){    \
+                    {cb, count, {.talks = (int[]){__VA_ARGS__}}}}}}
+                    
 #define INT_SETTING(flags, var, lang_id, default, name, cfg_vals, \
                     unit, min, max, step, formatter, cb)  \
             {flags|F_INT_SETTING|F_T_INT, GS(var), lang_id, INT(default),   \
                 name, cfg_vals, {.int_setting = (struct int_setting[]){    \
                     {cb, unit, min, max, step, formatter}}}}
                     
+#if CONFIG_CODEC == SWCODEC
+static void crossfeed_format(char* buffer, int buffer_size, int value,
+    const char* unit)
+{
+    snprintf(buffer, buffer_size, "%s%d.%d %s", value == 0 ? " " : "-",
+        value / 10, value % 10, unit);
+}
+static void crossfeed_cross_gain_helper(int val)
+{
+    dsp_set_crossfeed_cross_params(val,
+        val + global_settings.crossfeed_hf_attenuation,
+        global_settings.crossfeed_hf_cutoff);
+}
+static void crossfeed_hf_att_helper(int val)
+{
+    dsp_set_crossfeed_cross_params(global_settings.crossfeed_cross_gain,
+        global_settings.crossfeed_cross_gain + val,
+        global_settings.crossfeed_hf_cutoff);
+}
+static void crossfeed_hf_cutoff_helper(int val)
+{
+    dsp_set_crossfeed_cross_params(global_settings.crossfeed_cross_gain,
+        global_settings.crossfeed_cross_gain
+            + global_settings.crossfeed_hf_attenuation, val);
+}
+#endif
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+static void set_mdb_enable(bool value)
+{
+    sound_set_mdb_enable((int)value);
+}
+static void set_superbass(bool value)
+{
+    sound_set_superbass((int)value);
+}
+#endif
+                    
 const struct settings_list settings[] = {
     /* sound settings */
-    SOUND_SETTING(0,volume, LANG_VOLUME, SOUND_VOLUME),
-    SOUND_SETTING(0,balance, LANG_BALANCE, SOUND_BALANCE),
-    SOUND_SETTING(0,bass, LANG_BASS, SOUND_BASS),
-    SOUND_SETTING(0,treble, LANG_TREBLE, SOUND_TREBLE),
+    SOUND_SETTING(0,volume, LANG_VOLUME, "volume", SOUND_VOLUME),
+    SOUND_SETTING(0,balance, LANG_BALANCE, "balance", SOUND_BALANCE),
+    SOUND_SETTING(0,bass, LANG_BASS, "bass", SOUND_BASS),
+    SOUND_SETTING(0,treble, LANG_TREBLE, "treble", SOUND_TREBLE),
+    
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    { F_T_INT, GS(loudness), LANG_LOUDNESS, INT(0), "loudness", NULL, UNUSED },
-    { F_T_INT, GS(avc), LANG_AUTOVOL, INT(0), "auto volume",
-         "off,20ms,2,4,8", UNUSED },
-    OFFON_SETTING(0,superbass,LANG_SUPERBASS,false,"superbass",NULL),
+    SOUND_SETTING(0,loudness, LANG_LOUDNESS, "loudness", SOUND_LOUDNESS),
+    STRINGCHOICE_SETTING(0,avc,LANG_AUTOVOL,0,"auto volume",
+            "off,20ms,4,4,8,", sound_set_avc, 5,
+            LANG_OFF,TALK_ID(20, UNIT_MS),TALK_ID(2, UNIT_SEC),
+            TALK_ID(4, UNIT_SEC),TALK_ID(8, UNIT_SEC)), 
+    OFFON_SETTING(0, superbass, LANG_SUPERBASS, false, "superbass", set_superbass),
 #endif
+         
     CHOICE_SETTING(0,channel_config,LANG_CHANNEL,0,"channels",
          "stereo,mono,custom,mono left,mono right,karaoke", 
 #if CONFIG_CODEC == SWCODEC
@@ -149,7 +196,8 @@ const struct settings_list settings[] = {
          6, ID2P(LANG_CHANNEL_STEREO), ID2P(LANG_CHANNEL_MONO),
             ID2P(LANG_CHANNEL_CUSTOM), ID2P(LANG_CHANNEL_LEFT),
             ID2P(LANG_CHANNEL_RIGHT), ID2P(LANG_CHANNEL_KARAOKE)),
-    SOUND_SETTING(0,stereo_width, LANG_STEREO_WIDTH, SOUND_STEREO_WIDTH),
+    SOUND_SETTING(0,stereo_width, LANG_STEREO_WIDTH,
+            "stereo_width", SOUND_STEREO_WIDTH),
     /* playback */
     OFFON_SETTING(0, resume, LANG_RESUME, false, "resume", NULL),
     OFFON_SETTING(0, playlist_shuffle, LANG_SHUFFLE, false, "shuffle", NULL),
@@ -377,13 +425,16 @@ const struct settings_list settings[] = {
     {F_T_INT,GS(peak_meter_max),LANG_PM_MAX,INT(0),"peak meter max",NULL,UNUSED},
 #endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    {F_T_INT,GS(mdb_strength),LANG_MDB_STRENGTH,INT(0),
-        "mdb strength",NULL,UNUSED},
-    {F_T_INT,GS(mdb_harmonics),LANG_MDB_HARMONICS,INT(0),
-        "mdb harmonics",NULL,UNUSED},
-    {F_T_INT,GS(mdb_center),LANG_MDB_CENTER,INT(0),"mdb center",NULL,UNUSED},
-    {F_T_INT,GS(mdb_shape),LANG_MDB_SHAPE,INT(0),"mdb shape",NULL,UNUSED},
-    OFFON_SETTING(0,mdb_enable,LANG_MDB_ENABLE,false,"mdb enable",NULL),
+    SOUND_SETTING(0, mdb_strength, LANG_MDB_STRENGTH,
+        "mdb strength", SOUND_MDB_STRENGTH),
+    SOUND_SETTING(0, mdb_harmonics, LANG_MDB_HARMONICS,
+        "mdb harmonics", SOUND_MDB_HARMONICS),
+    SOUND_SETTING(0, mdb_center, LANG_MDB_CENTER,
+        "mdb center", SOUND_MDB_CENTER),
+    SOUND_SETTING(0, mdb_shape, LANG_MDB_SHAPE,
+        "mdb shape", SOUND_MDB_SHAPE),
+    OFFON_SETTING(0, mdb_enable, LANG_MDB_ENABLE,
+        false, "mdb enable", set_mdb_enable),
 #endif
 #if CONFIG_CODEC == MAS3507D
     OFFON_SETTING(0,line_in,LANG_LINE_IN,false,"line in",NULL),
@@ -520,18 +571,22 @@ const struct settings_list settings[] = {
     {F_T_INT,GS(crossfade_fade_out_mixmode),
         LANG_CROSSFADE_FADE_OUT_MODE,INT(0),
         "crossfade fade out mode","crossfade,mix",UNUSED},
-
+        
     /* crossfeed */
-    OFFON_SETTING(0,crossfeed,LANG_CROSSFEED,false,"crossfeed",NULL),
-    {F_T_INT,GS(crossfeed_direct_gain),LANG_CROSSFEED_DIRECT_GAIN,INT(15),
-        "crossfeed direct gain",NULL,UNUSED},
-    {F_T_INT,GS(crossfeed_cross_gain),LANG_CROSSFEED_CROSS_GAIN,INT(60),
-        "crossfeed cross gain",NULL,UNUSED},
-    {F_T_INT,GS(crossfeed_hf_attenuation),LANG_CROSSFEED_HF_ATTENUATION,INT(160),
-        "crossfeed hf attenuation",NULL,UNUSED},
-    {F_T_INT,GS(crossfeed_hf_cutoff),LANG_CROSSFEED_HF_CUTOFF,INT(700),
-        "crossfeed hf cutoff",NULL,UNUSED},
-
+    OFFON_SETTING(0,crossfeed, LANG_CROSSFEED, false,
+                    "crossfeed", dsp_set_crossfeed),
+    INT_SETTING(0, crossfeed_direct_gain, LANG_CROSSFEED_DIRECT_GAIN, 15,
+                    "crossfeed direct gain", NULL, UNIT_DB, 0, 60, 5,
+                    crossfeed_format, dsp_set_crossfeed_direct_gain),
+    INT_SETTING(0, crossfeed_cross_gain, LANG_CROSSFEED_CROSS_GAIN, 60,
+                    "crossfeed cross gain", NULL, UNIT_DB, 30, 120, 5,
+                    crossfeed_format, crossfeed_cross_gain_helper),
+    INT_SETTING(0, crossfeed_hf_attenuation, LANG_CROSSFEED_HF_ATTENUATION, 160,
+                    "crossfeed hf attenuation", NULL, UNIT_DB, 60, 240, 5,
+                    crossfeed_format, crossfeed_hf_att_helper),
+    INT_SETTING(0, crossfeed_hf_cutoff, LANG_CROSSFEED_HF_CUTOFF,700,
+                    "crossfeed hf cutoff", NULL, UNIT_HERTZ, 500, 2000, 100,
+                    crossfeed_format, crossfeed_hf_cutoff_helper),
     /* equalizer */
     OFFON_SETTING(0,eq_enabled,LANG_EQUALIZER_ENABLED,false,"eq enabled",NULL),
     {F_T_INT,GS(eq_precut),LANG_EQUALIZER_PRECUT,INT(0),
@@ -571,8 +626,8 @@ const struct settings_list settings[] = {
         "eq band 4 gain",NULL,UNUSED},
 
     /* dithering */
-    OFFON_SETTING(0,dithering_enabled,LANG_DITHERING,
-        false,"dithering enabled",NULL),
+    OFFON_SETTING(0, dithering_enabled, LANG_DITHERING,
+        false, "dithering enabled", dsp_dither_enable),
 #endif
 #ifdef HAVE_DIRCACHE
     OFFON_SETTING(0,dircache,LANG_DIRCACHE_ENABLE,false,"dircache",NULL),
