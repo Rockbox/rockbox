@@ -643,9 +643,9 @@ int do_menu(const struct menu_item_ex *start_menu)
                             else if (setting->flags&F_CHOICE_SETTING)
                             {
                                 static struct opt_items options[MAX_OPTIONS];
-                                static char buffer[1024];
+                                static char buffer[256];
                                 char *buf_start = buffer;
-                                int buf_free = 1024;
+                                int buf_free = 256;
                                 int i,j, count = setting->choice_setting->count;
                                 for (i=0, j=0; i<count && i<MAX_OPTIONS; i++)
                                 {
