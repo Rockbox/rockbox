@@ -29,6 +29,16 @@
 #include "parttypes.h"
 #include "ipodio.h"
 
+#ifdef WITH_BOOTOBJS
+#include "ipod3g.h"
+#include "ipod4g.h"
+#include "ipodmini.h"
+#include "ipodmini2g.h"
+#include "ipodcolor.h"
+#include "ipodnano.h"
+#include "ipodvideo.h"
+#endif
+
 #define VERSION "0.8svn"
 
 int verbose = 0;
@@ -401,12 +411,15 @@ void print_usage(void)
 {
     fprintf(stderr,"Usage: ipodpatcher --scan\n");
 #ifdef __WIN32__
-    fprintf(stderr,"    or ipodpatcher DISKNO [action]\n");
+    fprintf(stderr,"    or ipodpatcher [DISKNO] [action]\n");
 #else
-    fprintf(stderr,"    or ipodpatcher device [action]\n");
+    fprintf(stderr,"    or ipodpatcher [device] [action]\n");
 #endif
     fprintf(stderr,"\n");
     fprintf(stderr,"Where [action] is one of the following options:\n");
+#ifdef WITH_BOOTOBJS
+    fprintf(stderr,"        --install\n");
+#endif
     fprintf(stderr,"  -l,   --list\n");
     fprintf(stderr,"  -r,   --read-partition     bootpartition.bin\n");
     fprintf(stderr,"  -w,   --write-partition    bootpartition.bin\n");
@@ -439,6 +452,10 @@ void print_usage(void)
 
 enum {
    NONE,
+#ifdef WITH_BOOTOBJS
+   INSTALL,
+#endif
+   INTERACTIVE,
    SHOW_INFO,
    LIST_IMAGES,
    DELETE_BOOTLOADER,
@@ -449,8 +466,11 @@ enum {
    WRITE_PARTITION
 };
 
-#define DOT_IPOD 0
-#define DOT_BIN  1
+#define FILETYPE_DOT_IPOD 0
+#define FILETYPE_DOT_BIN  1
+#ifdef WITH_BOOTOBJS
+  #define FILETYPE_INTERNAL 2
+#endif
 
 char* ftypename[] = { "OSOS", "RSRC", "AUPD", "HIBE" };
 
@@ -548,60 +568,7 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
     unsigned long filechksum=0;
     unsigned char header[8];  /* Header for .ipod file */
 
-    infile=open(filename,O_RDONLY);
-    if (infile < 0) {
-        fprintf(stderr,"[ERR]  Couldn't open input file %s\n",filename);
-        return -1;
-    }
-
-    if (type==DOT_IPOD) {
-        /* First check that the input file is the correct type for this ipod. */
-        n = read(infile,header,8);
-        if (n < 8) {
-            fprintf(stderr,"[ERR]  Failed to read header from %s\n",filename);
-            close(infile);
-            return -1;
-        }
-
-        if (memcmp(header+4, ipod->modelname,4)!=0) {
-            fprintf(stderr,"[ERR]  Model name in input file (%c%c%c%c) doesn't match ipod model (%s)\n",
-                    header[4],header[5],header[6],header[7], ipod->modelname);
-            close(infile);
-            return -1;
-        }
-
-        filechksum = be2int(header);
-
-        length=filesize(infile)-8;
-    } else {
-        length=filesize(infile);
-    }
-    paddedlength=(length+ipod->sector_size-1)&~(ipod->sector_size-1);
-
-    /* Now read our bootloader - we need to check it before modifying the partition*/
-    n = read(infile,sectorbuf,length);
-    if (n < 0) {
-        fprintf(stderr,"[ERR]  Couldn't read input file\n");
-        close(infile);
-        return -1;
-    }
-
-    if (type==DOT_IPOD) {
-        /* Calculate and confirm bootloader checksum */
-        chksum = ipod->modelnum;
-        for (i = 0; i < length; i++) {
-             /* add 8 unsigned bits but keep a 32 bit sum */
-             chksum += sectorbuf[i];
-        }
-
-        if (chksum == filechksum) {
-            fprintf(stderr,"[INFO] Checksum OK in %s\n",filename);
-        } else {
-            fprintf(stderr,"[ERR]  Checksum in %s failed check\n",filename);
-            return -1;
-        }
-    }
-
+    /* Calculate the position in the OSOS image where our bootloader will go. */
     if (ipod->ipod_directory[0].entryOffset>0) {
         /* Keep the same entryOffset */
         entryOffset = ipod->ipod_directory[0].entryOffset;
@@ -609,9 +576,74 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
         entryOffset = (ipod->ipod_directory[0].len+ipod->sector_size-1)&~(ipod->sector_size-1);
     }
 
+#ifdef WITH_BOOTOBJS
+    if (type == FILETYPE_INTERNAL) {
+        fprintf(stderr,"[INFO] Using internal bootloader - %d bytes\n",ipod->bootloader_len);
+        memcpy(sectorbuf+entryOffset,ipod->bootloader,ipod->bootloader_len);
+        length = ipod->bootloader_len;
+        paddedlength=(ipod->bootloader_len+ipod->sector_size-1)&~(ipod->sector_size-1);
+    } 
+    else 
+#endif
+    {
+        infile=open(filename,O_RDONLY);
+        if (infile < 0) {
+            fprintf(stderr,"[ERR]  Couldn't open input file %s\n",filename);
+            return -1;
+        }
+
+        if (type==FILETYPE_DOT_IPOD) {
+            /* First check that the input file is the correct type for this ipod. */
+            n = read(infile,header,8);
+            if (n < 8) {
+                fprintf(stderr,"[ERR]  Failed to read header from %s\n",filename);
+                close(infile);
+                return -1;
+            }
+    
+            if (memcmp(header+4, ipod->modelname,4)!=0) {
+                fprintf(stderr,"[ERR]  Model name in input file (%c%c%c%c) doesn't match ipod model (%s)\n",
+                        header[4],header[5],header[6],header[7], ipod->modelname);
+                close(infile);
+                return -1;
+            }
+    
+            filechksum = be2int(header);
+    
+            length=filesize(infile)-8;
+        } else {
+            length=filesize(infile);
+        }
+        paddedlength=(length+ipod->sector_size-1)&~(ipod->sector_size-1);
+    
+        /* Now read our bootloader - we need to check it before modifying the partition*/
+        n = read(infile,sectorbuf+entryOffset,length);
+        close(infile);
+
+        if (n < 0) {
+            fprintf(stderr,"[ERR]  Couldn't read input file\n");
+            return -1;
+        }
+    
+        if (type==FILETYPE_DOT_IPOD) {
+            /* Calculate and confirm bootloader checksum */
+            chksum = ipod->modelnum;
+            for (i = entryOffset; i < entryOffset+length; i++) {
+                 /* add 8 unsigned bits but keep a 32 bit sum */
+                 chksum += sectorbuf[i];
+            }
+    
+            if (chksum == filechksum) {
+                fprintf(stderr,"[INFO] Checksum OK in %s\n",filename);
+            } else {
+                fprintf(stderr,"[ERR]  Checksum in %s failed check\n",filename);
+                return -1;
+            }
+        }
+    }
+
     if (entryOffset+paddedlength > BUFFER_SIZE) {
         fprintf(stderr,"[ERR]  Input file too big for buffer\n");
-        close(infile);
         return -1;
     }
 
@@ -624,14 +656,13 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
     /* Check if we have enough space */
     /* TODO: Check the size of the partition. */
     if (ipod->nimages > 1) {
-        if ((ipod->ipod_directory[0].devOffset+entryOffset+paddedlength) >= 
+        if ((ipod->ipod_directory[0].devOffset+entryOffset+paddedlength) >
              ipod->ipod_directory[1].devOffset) {
             fprintf(stderr,"[INFO] Moving images to create room for new firmware...\n");
             delta = ipod->ipod_directory[0].devOffset + entryOffset+paddedlength
                     - ipod->ipod_directory[1].devOffset;
 
             if (diskmove(ipod, delta) < 0) {
-                close(infile);
                 fprintf(stderr,"[ERR]  Image movement failed.\n");
                 return -1;
             }
@@ -643,7 +674,6 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
 
     /* Firstly read the original firmware into sectorbuf */
     fprintf(stderr,"[INFO] Reading original firmware...\n");
-
     if (ipod_seek(ipod, ipod->fwoffset+ipod->ipod_directory[0].devOffset) < 0) {
         fprintf(stderr,"[ERR]  Seek failed\n");
         return -1;
@@ -659,16 +689,6 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
                       ,i,n);
         return -1;
     }
-
-    /* Now read our bootloader - we need to seek back to the start */
-    lseek(infile,(type == DOT_IPOD ? 8 : 0),SEEK_SET);
-    n = read(infile,sectorbuf+entryOffset,length);
-    if (n < 0) {
-        fprintf(stderr,"[ERR]  Couldn't read input file\n");
-        close(infile);
-        return -1;
-    }
-    close(infile);
 
     /* Calculate new checksum for combined image */
     chksum = 0;
@@ -830,7 +850,7 @@ int write_firmware(struct ipod_t* ipod, char* filename, int type)
         return -1;
     }
 
-    if (type==DOT_IPOD) {
+    if (type==FILETYPE_DOT_IPOD) {
         n = read(infile,header,8);
         if (n < 8) {
             fprintf(stderr,"[ERR]  Failed to read header from %s\n",filename);
@@ -887,7 +907,7 @@ int write_firmware(struct ipod_t* ipod, char* filename, int type)
     }
     close(infile);
 
-    if (type==DOT_IPOD) {
+    if (type==FILETYPE_DOT_IPOD) {
         chksum = ipod->modelnum;
         for (i = 0; i < length; i++) {
             /* add 8 unsigned bits but keep a 32 bit sum */
@@ -1170,40 +1190,72 @@ int getmodel(struct ipod_t* ipod, int ipod_version)
             ipod->modelstr="3rd Generation";
             ipod->modelnum = 7;
             ipod->modelname = "ip3g";
+#ifdef WITH_BOOTOBJS
+            ipod->bootloader = ipod3g;
+            ipod->bootloader_len = LEN_ipod3g;
+#endif
             break;
         case 0x40:
             ipod->modelstr="1st Generation Mini";
             ipod->modelnum = 9;
             ipod->modelname = "mini";
+#ifdef WITH_BOOTOBJS
+            ipod->bootloader = ipodmini;
+            ipod->bootloader_len = LEN_ipodmini;
+#endif
             break;
         case 0x50:
             ipod->modelstr="4th Generation";
             ipod->modelnum = 8;
             ipod->modelname = "ip4g";
+#ifdef WITH_BOOTOBJS
+            ipod->bootloader = ipod4g;
+            ipod->bootloader_len = LEN_ipod4g;
+#endif
             break;
         case 0x60:
             ipod->modelstr="Photo/Color";
             ipod->modelnum = 3;
             ipod->modelname = "ipco";
+#ifdef WITH_BOOTOBJS
+            ipod->bootloader = ipodcolor;
+            ipod->bootloader_len = LEN_ipodcolor;
+#endif
             break;
         case 0x70:
             ipod->modelstr="2nd Generation Mini";
             ipod->modelnum = 11;
             ipod->modelname = "mn2g";
+#ifdef WITH_BOOTOBJS
+            ipod->bootloader = ipodmini2g;
+            ipod->bootloader_len = LEN_ipodmini2g;
+#endif
             break;
         case 0xc0:
             ipod->modelstr="1st Generation Nano";
             ipod->modelnum = 4;
             ipod->modelname = "nano";
+#ifdef WITH_BOOTOBJS
+            ipod->bootloader = ipodnano;
+            ipod->bootloader_len = LEN_ipodnano;
+#endif
             break;
         case 0xb0:
             ipod->modelstr="Video (aka 5th Generation)";
             ipod->modelnum = 5;
             ipod->modelname = "ipvd";
+#ifdef WITH_BOOTOBJS
+            ipod->bootloader = ipodvideo;
+            ipod->bootloader_len = LEN_ipodvideo;
+#endif
             break;
         default:
             ipod->modelname = NULL;
             ipod->modelnum = 0;
+#ifdef WITH_BOOTOBJS
+            ipod->bootloader = NULL;
+            ipod->bootloader_len = 0;
+#endif
             return -1;
     }
     return 0;
@@ -1279,6 +1331,9 @@ int ipod_scan(struct ipod_t* ipod)
 
 int main(int argc, char* argv[])
 {
+#ifdef WITH_BOOTOBJS
+    char yesno[4];
+#endif
     int i;
     int n;
     int infile, outfile;
@@ -1320,18 +1375,40 @@ int main(int argc, char* argv[])
         n = ipod_scan(&ipod);
         if (n==0) {
             fprintf(stderr,"[ERR]  No ipods found, aborting\n");
-            return 0;
+            fprintf(stderr,"[ERR]  Please connect your ipod and ensure it is in disk mode\n");
         } else if (n > 1) {
             fprintf(stderr,"[ERR]  %d ipods found, aborting\n",n);
+            fprintf(stderr,"[ERR]  Please connect only one ipod.\n");
+        }
+
+        if (n != 1) {
+#ifdef WITH_BOOTOBJS
+            if (argc==1) {
+                printf("\nPress ENTER to exit ipodpatcher :");
+                fgets(yesno,4,stdin);
+            }
+#endif
             return 0;
         }
+
         i = 1;
     }
+
+#ifdef WITH_BOOTOBJS
+    action = INTERACTIVE;
+#else
+    action = NONE;
+#endif
 
     while (i < argc) {
         if ((strcmp(argv[i],"-l")==0) || (strcmp(argv[i],"--list")==0)) {
             action = LIST_IMAGES;
             i++;
+#ifdef WITH_BOOTOBJS
+        } else if (strcmp(argv[i],"--install")==0) {
+            action = INSTALL;
+            i++;
+#endif
         } else if ((strcmp(argv[i],"-d")==0) || 
                    (strcmp(argv[i],"--delete-bootloader")==0)) {
             action = DELETE_BOOTLOADER;
@@ -1339,7 +1416,7 @@ int main(int argc, char* argv[])
         } else if ((strcmp(argv[i],"-a")==0) || 
                    (strcmp(argv[i],"--add-bootloader")==0)) {
             action = ADD_BOOTLOADER;
-            type = DOT_IPOD;
+            type = FILETYPE_DOT_IPOD;
             i++;
             if (i == argc) { print_usage(); return 1; }
             filename=argv[i];
@@ -1347,7 +1424,7 @@ int main(int argc, char* argv[])
         } else if ((strcmp(argv[i],"-ab")==0) || 
                    (strcmp(argv[i],"--add-bootloader-bin")==0)) {
             action = ADD_BOOTLOADER;
-            type = DOT_BIN;
+            type = FILETYPE_DOT_BIN;
             i++;
             if (i == argc) { print_usage(); return 1; }
             filename=argv[i];
@@ -1362,7 +1439,7 @@ int main(int argc, char* argv[])
         } else if ((strcmp(argv[i],"-wf")==0) || 
                    (strcmp(argv[i],"--write-firmware")==0)) {
             action = WRITE_FIRMWARE;
-            type = DOT_IPOD;
+            type = FILETYPE_DOT_IPOD;
             i++;
             if (i == argc) { print_usage(); return 1; }
             filename=argv[i];
@@ -1370,7 +1447,7 @@ int main(int argc, char* argv[])
         } else if ((strcmp(argv[i],"-wfb")==0) || 
                    (strcmp(argv[i],"--write-firmware-bin")==0)) {
             action = WRITE_FIRMWARE;
-            type = DOT_BIN;
+            type = FILETYPE_DOT_BIN;
             i++;
             if (i == argc) { print_usage(); return 1; }
             filename=argv[i];
@@ -1444,6 +1521,26 @@ int main(int argc, char* argv[])
   
     if (action==LIST_IMAGES) {
         list_images(&ipod);
+#ifdef WITH_BOOTOBJS
+    } else if (action==INTERACTIVE) {
+
+        printf("Do you wish to install the rockbox bootloader? (y/n) :");
+        if (fgets(yesno,4,stdin)) {
+            if (yesno[0]=='y') {
+                if (ipod_reopen_rw(&ipod) < 0) {
+                    return 5;
+                }
+
+                if (add_bootloader(&ipod, NULL, FILETYPE_INTERNAL)==0) {
+                    fprintf(stderr,"[INFO] Bootloader installed successfully.\n");
+                } else {
+                    fprintf(stderr,"[ERR]  --install failed.\n");
+                }
+                printf("Press ENTER to exit ipodpatcher :");
+                fgets(yesno,4,stdin);
+            }
+        }
+#endif
     } else if (action==DELETE_BOOTLOADER) {
         if (ipod_reopen_rw(&ipod) < 0) {
             return 5;
@@ -1468,6 +1565,18 @@ int main(int argc, char* argv[])
         } else {
             fprintf(stderr,"[ERR]  --add-bootloader failed.\n");
         }
+#ifdef WITH_BOOTOBJS
+    } else if (action==INSTALL) {
+        if (ipod_reopen_rw(&ipod) < 0) {
+            return 5;
+        }
+
+        if (add_bootloader(&ipod, NULL, FILETYPE_INTERNAL)==0) {
+            fprintf(stderr,"[INFO] Bootloader installed successfully.\n");
+        } else {
+            fprintf(stderr,"[ERR]  --install failed.\n");
+        }
+#endif
     } else if (action==WRITE_FIRMWARE) {
         if (ipod_reopen_rw(&ipod) < 0) {
             return 5;

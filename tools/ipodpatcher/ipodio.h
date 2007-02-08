@@ -71,6 +71,10 @@ struct ipod_t {
     char* modelname;
     char* modelstr;
     int macpod;
+#ifdef WITH_BOOTOBJS
+    unsigned char* bootloader;
+    int bootloader_len;
+#endif
 };
 
 void print_error(char* msg);
