@@ -268,14 +268,6 @@ struct system_status
 #ifdef CONFIG_TUNER
     int last_frequency;  /* Last frequency for resuming, in FREQ_STEP units,
                             relative to MIN_FREQ */
-    bool in_radio_screen; /* Currently in radio screen?
-                             Set by radio_screen. */
-    int  radio_status;    /* Current radio status (off, playing, paused)
-                             Set by radio control functions. */
-#endif
-#ifdef HAVE_RECORDING
-    bool in_recording_screen; /* Currently in recording screen?
-                                 Set by recording_screen. */
 #endif
 };
 

@@ -31,6 +31,7 @@ void radio_start(void);
 void radio_pause(void);
 void radio_stop(void);
 bool radio_hardware_present(void);
+bool in_radio_screen(void);
 
 #define MAX_FMPRESET_LEN 27
 

@@ -445,7 +445,7 @@ int ft_enter(struct tree_context* c)
                 {
                     set_file(buf, global_settings.fmr_file, MAX_FILENAME);
                     radio_load_presets(global_settings.fmr_file);
-                    if(!global_status.in_radio_screen)
+                    if(!in_radio_screen())
                         radio_screen();
                 }
                 /*

@@ -74,21 +74,7 @@
 void dac_line_in(bool enable);
 #endif
 struct user_settings global_settings;
-
-/* Initial values for globally needed state data that shouldn't be saved
-   or reset should be defined here and not in settings_list */
-
-struct system_status global_status =
-{
-    .runtime = 0, /* this will be overwritten when nvram settings are loaded */
-#ifdef CONFIG_TUNER
-    .in_radio_screen     = false,
-    .radio_status        = FMRADIO_OFF,
-#endif
-#ifdef HAVE_RECORDING
-    .in_recording_screen = false,
-#endif
-};
+struct system_status global_status;
 
 #ifdef HAVE_RECORDING
 const char rec_base_directory[] = REC_BASE_DIR;
@@ -918,9 +904,6 @@ void settings_reset(void) {
     } /* for(...) */
 #if defined (HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
     enc_global_settings_reset();
-#endif
-#ifdef HAVE_RECORDING
-    global_status.in_recording_screen = false;
 #endif
 }
 

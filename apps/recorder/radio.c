@@ -114,6 +114,9 @@ static int curr_preset = -1;
 static int curr_freq;
 static int radio_mode = RADIO_SCAN_MODE;
 
+static int radio_status = FMRADIO_OFF;
+static bool in_screen = false; 
+
 #define MAX_PRESETS 64
 static bool presets_loaded = false, presets_changed = false;
 static struct fmstation presets[MAX_PRESETS];
@@ -186,8 +189,13 @@ void radio_init(void)
    the global_status structure directly. */
 int get_radio_status(void)
 {
-    return global_status.radio_status;
+    return radio_status;
 }
+
+bool in_radio_screen(void)   
+{   
+    return in_screen;   
+} 
 
 /* secret flag for starting paused - prevents unmute */
 #define FMRADIO_START_PAUSED 0x8000
@@ -196,14 +204,14 @@ void radio_start(void)
     bool start_paused;
     int mute_timeout;
 
-    if(global_status.radio_status == FMRADIO_PLAYING)
+    if(radio_status == FMRADIO_PLAYING)
         return;
 
-    start_paused = global_status.radio_status & FMRADIO_START_PAUSED;
+    start_paused = radio_status & FMRADIO_START_PAUSED;
     /* clear flag before any yielding */
-    global_status.radio_status &= ~FMRADIO_START_PAUSED;
+    radio_status &= ~FMRADIO_START_PAUSED;
 
-    if(global_status.radio_status == FMRADIO_OFF)
+    if(radio_status == FMRADIO_OFF)
         radio_power(true);
 
     curr_freq = global_status.last_frequency 
@@ -213,7 +221,7 @@ void radio_start(void)
     radio_set(RADIO_SLEEP, 0); /* wake up the tuner */
     radio_set(RADIO_FREQUENCY, curr_freq);
 
-    if(global_status.radio_status == FMRADIO_OFF)
+    if(radio_status == FMRADIO_OFF)
     {
         radio_set(RADIO_IF_MEASUREMENT, 0);
         radio_set(RADIO_SENSITIVITY, 0);
@@ -242,34 +250,34 @@ void radio_start(void)
     if(!start_paused)
         radio_set(RADIO_MUTE, 0);
 
-    global_status.radio_status = FMRADIO_PLAYING;
+    radio_status = FMRADIO_PLAYING;
 } /* radio_start */
 
 void radio_pause(void)
 {
-    if(global_status.radio_status == FMRADIO_PAUSED)
+    if(radio_status == FMRADIO_PAUSED)
         return;
 
-    if(global_status.radio_status == FMRADIO_OFF)
+    if(radio_status == FMRADIO_OFF)
     {
-        global_status.radio_status |= FMRADIO_START_PAUSED;    
+        radio_status |= FMRADIO_START_PAUSED;    
         radio_start();
     }
 
     radio_set(RADIO_MUTE, 1);
     radio_set(RADIO_SLEEP, 1);
 
-    global_status.radio_status = FMRADIO_PAUSED;
+    radio_status = FMRADIO_PAUSED;
 } /* radio_pause */
 
 void radio_stop(void)
 {
-    if(global_status.radio_status == FMRADIO_OFF)
+    if(radio_status == FMRADIO_OFF)
         return;
 
     radio_set(RADIO_MUTE, 1);
     radio_set(RADIO_SLEEP, 1); /* low power mode, if available */
-    global_status.radio_status = FMRADIO_OFF;
+    radio_status = FMRADIO_OFF;
     radio_power(false); /* status update, power off if avail. */
 } /* radio_stop */
 
@@ -391,7 +399,7 @@ bool radio_screen(void)
     gui_buttonbar_set_display(&buttonbar, &(screens[SCREEN_MAIN]) );
 #endif
     /* change status to "in screen" */
-    global_status.in_radio_screen = true;
+    in_screen = true;
 
     /* always display status bar in radio screen for now */
     global_settings.statusbar = true;
@@ -416,7 +424,7 @@ bool radio_screen(void)
     }
                                        
 #ifndef SIMULATOR
-    if(global_status.radio_status == FMRADIO_OFF)    
+    if(radio_status == FMRADIO_OFF)    
         audio_stop();
 
 #if CONFIG_CODEC != SWCODEC
@@ -444,10 +452,10 @@ bool radio_screen(void)
     /* turn on radio */
 #if CONFIG_CODEC == SWCODEC
     rec_set_source(AUDIO_SRC_FMRADIO,
-                   (global_status.radio_status == FMRADIO_PAUSED) ?
+                   (radio_status == FMRADIO_PAUSED) ?
                        SRCF_FMRADIO_PAUSED : SRCF_FMRADIO_PLAYING);
 #else
-    if (global_status.radio_status == FMRADIO_OFF)
+    if (radio_status == FMRADIO_OFF)
         radio_start();
 #endif
 
@@ -671,7 +679,7 @@ bool radio_screen(void)
                 break;
 
             case ACTION_FM_PLAY:
-                if (global_status.radio_status == FMRADIO_PLAYING)
+                if (radio_status == FMRADIO_PLAYING)
                     radio_pause();
                 else
                     radio_start();
@@ -814,7 +822,7 @@ bool radio_screen(void)
                 timeout = current_tick + HZ;
 
                 /* keep "mono" from always being displayed when paused */
-                if (global_status.radio_status != FMRADIO_PAUSED)
+                if (radio_status != FMRADIO_PAUSED)
                 {
                     stereo = radio_get(RADIO_STEREO) &&
                         !global_settings.fm_force_mono;
@@ -957,7 +965,7 @@ bool radio_screen(void)
     /* restore status bar settings */
     global_settings.statusbar = statusbar;
 
-    global_status.in_radio_screen = false;
+    in_screen = false;
     
     return have_recorded;
 } /* radio_screen */
