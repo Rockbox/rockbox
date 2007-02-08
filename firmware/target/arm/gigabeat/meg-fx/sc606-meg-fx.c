@@ -30,9 +30,9 @@
 /* cycles delayed = 30 + 7 * loops */
 /* 100MHz = 10nS per cycle: LO:1300nS=130:14  HI:600nS=60:9 */
 /* 300MHz = 3.36nS per cycle: LO:1300nS=387:51  HI:600nS=179:21 */
-#define DELAY_LO do{int x;for(x=get_cpu_boost_counter()?51:14;x;x--);} while (0)
-#define DELAY    do{int x;for(x=get_cpu_boost_counter()?35:10;x;x--);} while (0)
-#define DELAY_HI do{int x;for(x=get_cpu_boost_counter()?21: 9;x;x--);} while (0)
+#define DELAY_LO do{int x;for(x=51;x;x--);} while (0)
+#define DELAY    do{int x;for(x=35;x;x--);} while (0)
+#define DELAY_HI do{int x;for(x=21;x;x--);} while (0)
 
 
 

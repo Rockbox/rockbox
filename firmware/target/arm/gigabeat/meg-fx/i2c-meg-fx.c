@@ -90,7 +90,7 @@ static void i2c_delay(void)
     /* about 30 cycles overhead + X * 7 */
     /* 300MHz: 1000nS @3.36nS/cyc = 297cyc: X = 38*/
     /* 100MHz: 1000nS @10nS/cyc = 100cyc : X = 10 */
-    for (_x = get_cpu_boost_counter() ? 38 : 10; _x; _x--)
+    for (_x = 38; _x; _x--)
     {
         /* burn CPU cycles */
         /* gcc makes it an inc loop - check with objdump for asm timing */
