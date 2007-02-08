@@ -24,12 +24,12 @@ CC = $(CROSS)gcc
 
 all: $(OUTPUT)
 
-ipodpatcher: ipodpatcher.c ipodio-posix.c parttypes.h $(BOOTSRC)
-	gcc $(CFLAGS) -o ipodpatcher ipodpatcher.c ipodio-posix.c $(BOOTSRC)
+ipodpatcher: main.c ipodpatcher.c ipodio-posix.c parttypes.h $(BOOTSRC)
+	gcc $(CFLAGS) -o ipodpatcher main.c ipodpatcher.c ipodio-posix.c $(BOOTSRC)
 	strip ipodpatcher
 
-ipodpatcher.exe: ipodpatcher.c ipodio-win32.c parttypes.h $(BOOTSRC)
-	$(CC) $(CFLAGS) -o ipodpatcher.exe ipodpatcher.c ipodio-win32.c $(BOOTSRC)
+ipodpatcher.exe: main.c ipodpatcher.c ipodio-win32.c parttypes.h $(BOOTSRC)
+	$(CC) $(CFLAGS) -o ipodpatcher.exe main.c ipodpatcher.c ipodio-win32.c $(BOOTSRC)
 	$(CROSS)strip ipodpatcher.exe
 
 ipod2c: ipod2c.c
