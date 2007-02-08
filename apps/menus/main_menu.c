@@ -87,7 +87,7 @@ MENUITEM_FUNCTION(do_shutdown_item, ID2P(LANG_SHUTDOWN), do_shutdown, NULL);
 
 /* NOTE: This title will be translatable once we decide what to call this menu
          when the root menu comes in... hopefully in the next few days */
-MAKE_MENU(main_menu_, "ROCKbox Main Menu", NULL,
+MAKE_MENU(main_menu_, "Rockbox Main Menu", NULL,
         &mrb_bookmarks, &sound_settings,
         &settings_menu_item, &manage_settings_menu_item, &browse_themes,
 #ifdef CONFIG_TUNER

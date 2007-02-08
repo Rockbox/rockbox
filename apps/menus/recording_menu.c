@@ -33,7 +33,7 @@ MENUITEM_FUNCTION(rec_menu_recording_screen_item, ID2P(LANG_RECORDING_MENU),
                    (menu_function)recording_screen, NULL);
 /* TEMP */
 bool recording_menu(bool no_source); /* from apps/sound_menu.h */
-MENUITEM_FUNCTION_WPARAM(recording_settings, ID2P(LANG_RECORDING_MENU),
+MENUITEM_FUNCTION_WPARAM(recording_settings, ID2P(LANG_RECORDING_SETTINGS),
                           (int (*)(void*))recording_menu,0, NULL);
 
 MAKE_MENU(recording_settings_menu,ID2P(LANG_RECORDING),0,
