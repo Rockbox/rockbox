@@ -1767,7 +1767,7 @@ static bool unplug_menu(void)
 }
 #endif
 
-static bool playback_settings_menu(void)
+bool playback_settings_menu(void)
 {
     int m;
     bool result;
@@ -2061,7 +2061,7 @@ static bool bars_settings_menu(void)
 #endif
 
 
-static bool display_settings_menu(void)
+bool display_settings_menu(void)
 {
     int m;
     bool result;

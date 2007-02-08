@@ -11,6 +11,14 @@ language.c
 main.c
 main_menu.c
 menu.c
+menus/display_menu.c
+menus/main_menu.c
+menus/playlist_menu.c
+#ifdef HAVE_RECORDING
+menus/recording_menu.c
+#endif
+menus/settings_menu.c
+menus/sound_menu.c
 misc.c
 onplay.c
 playlist.c

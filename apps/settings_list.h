@@ -53,7 +53,7 @@ struct bool_setting {
     int lang_yes;
     int lang_no;
 };
-#define F_BOOL_SETTING F_T_BOOL|0x10
+#define F_BOOL_SETTING (F_T_BOOL|0x10)
 #define F_RGB 0x20
 
 struct filename_setting {
@@ -64,29 +64,42 @@ struct filename_setting {
 #define F_FILENAME 0x40
 
 struct int_setting {
-    void (*option_callback)(int);
-    int min;
-    int max;
-    int step;
+  void (*option_callback)(int);
+  int unit;
+  int min;
+  int max;
+  int step;
+  void (*formatter)(char*, int, int, const char*);
 };
+#define F_INT_SETTING 0x80
+
+struct choice_setting {
+  void (*option_callback)(int);
+  int count;
+  unsigned char **desc;
+};
+#define F_CHOICE_SETTING 0x100
+
 /* these use the _isfunc_type type for the function */
 /* typedef int (*_isfunc_type)(void); */
 #define F_MIN_ISFUNC    0x100000 /* min(above) is function pointer to above type */
 #define F_MAX_ISFUNC    0x200000 /* max(above) is function pointer to above type */
 #define F_DEF_ISFUNC    0x400000 /* default_val is function pointer to above type */
 
-#define F_NVRAM_BYTES_MASK     0xE00 /*0-4 bytes can be stored */
-#define F_NVRAM_MASK_SHIFT     9
+#define F_THEMESETTING  0x800000
+
+#define F_NVRAM_BYTES_MASK     0xE000 /*0-4 bytes can be stored */
+#define F_NVRAM_MASK_SHIFT     13
 #define NVRAM_CONFIG_VERSION 2
 /* Above define should be bumped if
 - a new NVRAM setting is added between 2 other NVRAM settings
 - number of bytes for a NVRAM setting is changed
 - a NVRAM setting is removed
 */
-#define F_THEMESETTING	0x800000
+#define F_TEMPVAR    0x200 /* used if the setting should be set using a temp var */
 
 struct settings_list {
-    uint32_t             flags;   /* ____ ____ TFFF ____ ____ NNN_ IFRB STTT */
+    uint32_t             flags;   /* ____ ____ TFFF ____ NNN_ __TC IFRB STTT */
     void                *setting;
     int                  lang_id; /* -1 for none */
     union storage_type   default_val;
@@ -98,6 +111,8 @@ struct settings_list {
         struct sound_setting *sound_setting; /* use F_T_SOUND for this */
         struct bool_setting  *bool_setting; /* F_BOOL_SETTING */
         struct filename_setting *filename_setting; /* use F_FILENAME */
+        struct int_setting *int_setting; /* use F_INT_SETTING */
+        struct choice_setting *choice_setting; /* F_CHOICE_SETTING */
     };
 };
 

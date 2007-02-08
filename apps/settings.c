@@ -19,6 +19,7 @@
  ****************************************************************************/
 #include <stdio.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <limits.h>
 #include "inttypes.h"
 #include "config.h"
@@ -922,6 +923,78 @@ void settings_reset(void) {
 }
 
 /** Changing setting values **/
+const struct settings_list* find_setting(void* variable)
+{
+    int i;
+    for(i=0;i<nb_settings;i++)
+    {
+        if (settings[i].setting == variable)
+            return &settings[i];
+    }
+    return NULL;
+}
+
+void talk_setting(void *global_settings_variable)
+{
+    const struct settings_list *setting;
+    if (global_settings.talk_menu == 0)
+        return;
+    setting = find_setting(global_settings_variable);
+    if (setting == NULL)
+        return;
+    if (setting->lang_id)
+        talk_id(setting->lang_id,false);
+}
+static int selected_setting; /* Used by the callback */
+static void dec_sound_formatter(char *buffer, int buffer_size, 
+        int val, const char *unit)
+{
+    val = sound_val2phys(selected_setting, val);
+    char sign = ' ';
+    if(val < 0)
+    {
+        sign = '-';
+        val = abs(val);
+    }
+    int integer = val / 10;
+    int dec = val % 10;
+    snprintf(buffer, buffer_size, "%c%d.%d %s", sign, integer, dec, unit);
+}
+bool set_sound(const unsigned char * string,
+               int* variable,
+               int setting)
+{
+    int talkunit = UNIT_INT;
+    const char* unit = sound_unit(setting);
+    int numdec = sound_numdecimals(setting);
+    int steps = sound_steps(setting);
+    int min = sound_min(setting);
+    int max = sound_max(setting);
+    sound_set_type* sound_callback = sound_get_fn(setting);
+    if (*unit == 'd') /* crude reconstruction */
+        talkunit = UNIT_DB;
+    else if (*unit == '%')
+        talkunit = UNIT_PERCENT;
+    else if (*unit == 'H')
+        talkunit = UNIT_HERTZ;
+    if(!numdec)
+#if CONFIG_CODEC == SWCODEC
+        /* We need to hijack this one and send it off to apps/dsp.c instead of
+           firmware/sound.c */
+        if (setting == SOUND_STEREO_WIDTH)
+            return set_int(string, unit, talkunit, variable, &stereo_width_set,
+                           steps, min, max, NULL );
+        else
+#endif   
+        return set_int(string, unit, talkunit,  variable, sound_callback,
+                       steps, min, max, NULL );
+    else
+    {/* Decimal number */
+        selected_setting=setting;
+        return set_int(string, unit, talkunit,  variable, sound_callback,
+                       steps, min, max, &dec_sound_formatter );
+    }
+}
 
 bool set_bool(const char* string, bool* variable )
 {

@@ -281,16 +281,6 @@ static bool show_info(void)
     return false;
 }
 
-static bool plugin_browse(void)
-{
-    return rockbox_browse(PLUGIN_DIR, SHOW_PLUGINS);
-}
-
-static bool custom_theme_browse(void)
-{
-    return rockbox_browse(THEME_DIR, SHOW_CFG);
-}
-
 #ifdef HAVE_RECORDING
 
 static bool rec_menu_recording_screen(void)
@@ -340,7 +330,7 @@ bool rec_menu(void)
 }
 #endif
 
-static bool info_menu(void)
+bool info_menu(void)
 {
     int m;
     bool result;
@@ -368,6 +358,7 @@ static bool info_menu(void)
     return result;
 }
 
+#if 0
 #ifdef HAVE_LCD_CHARCELLS
 static bool do_shutdown(void)
 {
@@ -375,7 +366,6 @@ static bool do_shutdown(void)
     return false;
 }
 #endif
-
 bool main_menu(void)
 {
     int m;
@@ -445,7 +435,7 @@ bool main_menu(void)
 
     return result;
 }
-
+#endif
 /* -----------------------------------------------------------------
  * vim: et sw=4 ts=8 sts=4 tw=78
  */

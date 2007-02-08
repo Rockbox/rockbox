@@ -18,6 +18,7 @@
  ****************************************************************************/
 #ifndef RECORDING_H
 #define RECORDING_H
+#include "audio.h"
 
 bool recording_screen(bool no_source);
 char *rec_create_filename(char *buf);

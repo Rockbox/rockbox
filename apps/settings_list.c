@@ -21,10 +21,12 @@
 #include <stdbool.h>
 
 #include "lang.h"
+#include "talk.h"
 #include "lcd.h"
 #include "settings.h"
 #include "settings_list.h"
 #include "sound.h"
+#include "dsp.h"
 
 /* some sets of values which are used more than once, to save memory */
 static const char off_on[] = "off,on";
@@ -92,24 +94,39 @@ static const char backlight_times_conf [] =
 #define NODEFAULT INT(0)
 
 #define SOUND_SETTING(flags,var,lang_id,setting) \
-        {flags|F_T_INT|F_T_SOUND, GS(var),lang_id, NODEFAULT,#var,NULL,\
-            {.sound_setting=(struct sound_setting[]){{setting}}} }
+            {flags|F_T_INT|F_T_SOUND, GS(var),lang_id, NODEFAULT,#var,NULL,\
+                {.sound_setting=(struct sound_setting[]){{setting}}} }
 
 #define BOOL_SETTING(flags,var,lang_id,default,name,cfgvals,yes,no,opt_cb) \
-        {flags|F_T_BOOL, GS(var),lang_id, BOOL(default),name,cfgvals,  \
-            {.bool_setting=(struct bool_setting[]){{opt_cb,yes,no}}} }
+            {flags|F_BOOL_SETTING, GS(var),lang_id, BOOL(default),name,cfgvals,\
+                {.bool_setting=(struct bool_setting[]){{opt_cb,yes,no}}} }
 
 #define OFFON_SETTING(flags,var,lang_id,default,name,cb) \
-        {flags|F_T_BOOL, GS(var),lang_id, BOOL(default),name,off_on,  \
-            {.bool_setting=(struct bool_setting[])             \
-            {{cb,LANG_SET_BOOL_YES,LANG_SET_BOOL_NO}}} }
+            {flags|F_BOOL_SETTING, GS(var),lang_id, BOOL(default),name,off_on, \
+                {.bool_setting=(struct bool_setting[])             \
+                {{cb,LANG_SET_BOOL_YES,LANG_SET_BOOL_NO}}} }
 
 #define SYSTEM_SETTING(flags,var,default) \
-        {flags|F_T_INT, &global_status.var,-1, INT(default), NULL, NULL, UNUSED}
+            {flags|F_T_INT, &global_status.var,-1, INT(default),    \
+                NULL, NULL, UNUSED}
         
 #define FILENAME_SETTING(flags,var,name,default,prefix,suffix,len) \
-        {flags|F_T_UCHARPTR, GS(var),-1, CHARPTR(default),name,NULL,\
-            {.filename_setting=(struct filename_setting[]){{prefix,suffix,len}}} }
+            {flags|F_T_UCHARPTR, GS(var),-1, CHARPTR(default),name,NULL,\
+                {.filename_setting=                                        \
+                    (struct filename_setting[]){{prefix,suffix,len}}} }
+                    
+#define CHOICE_SETTING(flags,var,lang_id,default,name,cfg_vals,cb,count,...)  \
+            {flags|F_CHOICE_SETTING|F_T_INT,  GS(var), lang_id,   \
+                INT(default), name, cfg_vals,                     \
+                {.choice_setting = (struct choice_setting[]){    \
+                    {cb,count,(unsigned char*[]){__VA_ARGS__}}}}}
+
+#define INT_SETTING(flags, var, lang_id, default, name, cfg_vals, \
+                    unit, min, max, step, formatter, cb)  \
+            {flags|F_INT_SETTING|F_T_INT, GS(var), lang_id, INT(default),   \
+                name, cfg_vals, {.int_setting = (struct int_setting[]){    \
+                    {cb, unit, min, max, step, formatter}}}}
+                    
 const struct settings_list settings[] = {
     /* sound settings */
     SOUND_SETTING(0,volume, LANG_VOLUME, SOUND_VOLUME),
@@ -122,10 +139,17 @@ const struct settings_list settings[] = {
          "off,20ms,2,4,8", UNUSED },
     OFFON_SETTING(0,superbass,LANG_SUPERBASS,false,"superbass",NULL),
 #endif
-    { F_T_INT, GS(channel_config), LANG_CHANNEL, INT(0), "channels",
-         "stereo,mono,custom,mono left,mono right,karaoke", UNUSED },
-    { F_T_INT, GS(stereo_width),LANG_STEREO_WIDTH,
-         INT(100), "stereo width", NULL, UNUSED },
+    CHOICE_SETTING(0,channel_config,LANG_CHANNEL,0,"channels",
+         "stereo,mono,custom,mono left,mono right,karaoke", 
+#if CONFIG_CODEC == SWCODEC
+         channels_set,
+#else
+         sound_set_channels,
+#endif
+         6, ID2P(LANG_CHANNEL_STEREO), ID2P(LANG_CHANNEL_MONO),
+            ID2P(LANG_CHANNEL_CUSTOM), ID2P(LANG_CHANNEL_LEFT),
+            ID2P(LANG_CHANNEL_RIGHT), ID2P(LANG_CHANNEL_KARAOKE)),
+    SOUND_SETTING(0,stereo_width, LANG_STEREO_WIDTH, SOUND_STEREO_WIDTH),
     /* playback */
     OFFON_SETTING(0, resume, LANG_RESUME, false, "resume", NULL),
     OFFON_SETTING(0, playlist_shuffle, LANG_SHUFFLE, false, "shuffle", NULL),
@@ -174,8 +198,8 @@ const struct settings_list settings[] = {
     SYSTEM_SETTING(NVRAM(4),runtime,0),
     SYSTEM_SETTING(NVRAM(4),topruntime,0),
 #if MEM > 1
-    {F_T_INT,GS(max_files_in_playlist),LANG_MAX_FILES_IN_PLAYLIST, 
-        INT(10000),"max files in playlist",NULL,UNUSED},
+    INT_SETTING(0,max_files_in_playlist,LANG_MAX_FILES_IN_PLAYLIST,10000,
+                "max files in playlist", NULL, UNIT_INT,1000,20000,1000,NULL,NULL),
     {F_T_INT,GS(max_files_in_dir),LANG_MAX_FILES_IN_DIR,
         INT(400),"max files in dir",NULL,UNUSED},
 #else

@@ -5,9 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id: $
  *
- * Copyright (C) 2002 Björn Stenberg
+ * Copyright (C) 2006 Jonathan Gordon
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,13 +16,25 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _SOUND_MENU_H
-#define _SOUND_MENU_H
+#ifndef _EXPORTED_MENUS_H
+#define _EXPORTED_MENUS_H
 
 #include "menu.h"
+/* not needed for plugins */
+#ifndef PLUGIN 
 
-bool sound_menu(void);
-bool recording_menu(bool no_source);
-bool rectrigger(void);
-
+extern const struct menu_item_ex 
+        main_menu_,                 /* main_menu.c      */
+        display_menu,               /* display_menu.c   */
+//        playback_settings,          /* playback_menu.c  */
+#ifdef HAVE_RECORDING
+        recording_settings_menu,    /* recording_menu.c */
 #endif
+        sound_settings,             /* sound_menu.c     */
+        settings_menu_item,         /* settings_menu.c  */
+        playlist_menu_item;         /* playlist_menu.c  */
+
+
+
+#endif /* ! PLUGIN */
+#endif /*_EXPORTED_MENUS_H */

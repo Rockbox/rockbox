@@ -61,57 +61,6 @@
 #endif
 #include "action.h"
 
-static int selected_setting; /* Used by the callback */
-static void dec_sound_formatter(char *buffer, int buffer_size, int val, const char *unit)
-{
-    val = sound_val2phys(selected_setting, val);
-    char sign = ' ';
-    if(val < 0)
-    {
-        sign = '-';
-        val = abs(val);
-    }
-    int integer = val / 10;
-    int dec = val % 10;
-    snprintf(buffer, buffer_size, "%c%d.%d %s", sign, integer, dec, unit);
-}
-
-bool set_sound(const unsigned char * string,
-               int* variable,
-               int setting)
-{
-    int talkunit = UNIT_INT;
-    const char* unit = sound_unit(setting);
-    int numdec = sound_numdecimals(setting);
-    int steps = sound_steps(setting);
-    int min = sound_min(setting);
-    int max = sound_max(setting);
-    sound_set_type* sound_callback = sound_get_fn(setting);
-    if (*unit == 'd') /* crude reconstruction */
-        talkunit = UNIT_DB;
-    else if (*unit == '%')
-        talkunit = UNIT_PERCENT;
-    else if (*unit == 'H')
-        talkunit = UNIT_HERTZ;
-    if(!numdec)
-#if CONFIG_CODEC == SWCODEC
-        /* We need to hijack this one and send it off to apps/dsp.c instead of
-           firmware/sound.c */
-        if (setting == SOUND_STEREO_WIDTH)
-            return set_int(string, unit, talkunit,  variable, &stereo_width_set,
-                           steps, min, max, NULL );
-        else
-#endif   
-        return set_int(string, unit, talkunit,  variable, sound_callback,
-                       steps, min, max, NULL );
-    else
-    {/* Decimal number */
-        selected_setting=setting;
-        return set_int(string, unit, talkunit,  variable, sound_callback,
-                       steps, min, max, &dec_sound_formatter );
-    }
-}
-
 static bool volume(void)
 {
     return set_sound(str(LANG_VOLUME), &global_settings.volume, SOUND_VOLUME);

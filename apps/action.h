@@ -154,6 +154,10 @@ enum {
     ACTION_REC_F3,
     
     /* main menu */
+    ACTION_REQUEST_MENUITEM,
+    ACTION_EXIT_MENUITEM,
+    ACTION_ENTER_MENUITEM,
+    ACTION_MENU_WPS,
     
     /* id3db */
     

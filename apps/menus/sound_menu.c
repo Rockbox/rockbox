@@ -1,3 +1,4 @@
+
 /***************************************************************************
  *             __________               __   ___.
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
@@ -5,9 +6,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id:  $
  *
- * Copyright (C) 2002 Björn Stenberg
+ * Copyright (C) 2007 Jonathan Gordon
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,13 +17,16 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _SOUND_MENU_H
-#define _SOUND_MENU_H
 
+#include <stdbool.h>
+#include <stddef.h>
+#include <limits.h>
+#include "config.h"
+#include "lang.h"
+#include "action.h"
+#include "settings.h"
 #include "menu.h"
+#include "sound_menu.h"
 
-bool sound_menu(void);
-bool recording_menu(bool no_source);
-bool rectrigger(void);
+MENUITEM_FUNCTION(sound_settings, ID2P(LANG_SOUND_SETTINGS), (menu_function)sound_menu, NULL);
 
-#endif
