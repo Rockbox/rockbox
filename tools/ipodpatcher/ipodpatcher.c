@@ -567,6 +567,7 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
     unsigned long chksum=0;
     unsigned long filechksum=0;
     unsigned char header[8];  /* Header for .ipod file */
+    unsigned char* bootloader_buf;
 
     /* Calculate the position in the OSOS image where our bootloader will go. */
     if (ipod->ipod_directory[0].entryOffset>0) {
@@ -615,9 +616,13 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
             length=filesize(infile);
         }
         paddedlength=(length+ipod->sector_size-1)&~(ipod->sector_size-1);
-    
+
+        bootloader_buf = malloc(length);
+        if (bootloader_buf == NULL) {
+            fprintf(stderr,"[ERR]  Can not allocate memory for bootlaoder\n");
+        }
         /* Now read our bootloader - we need to check it before modifying the partition*/
-        n = read(infile,sectorbuf+entryOffset,length);
+        n = read(infile,bootloader_buf,length);
         close(infile);
 
         if (n < 0) {
@@ -628,9 +633,9 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
         if (type==FILETYPE_DOT_IPOD) {
             /* Calculate and confirm bootloader checksum */
             chksum = ipod->modelnum;
-            for (i = entryOffset; i < entryOffset+length; i++) {
+            for (i = 0; i < length; i++) {
                  /* add 8 unsigned bits but keep a 32 bit sum */
-                 chksum += sectorbuf[i];
+                 chksum += bootloader_buf[i];
             }
     
             if (chksum == filechksum) {
@@ -688,6 +693,17 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
         fprintf(stderr,"[ERR]  Short read - requested %d bytes, received %d\n"
                       ,i,n);
         return -1;
+    }
+
+#ifdef WITH_BOOTOBJS
+    if (type == FILETYPE_INTERNAL) {
+        memcpy(sectorbuf+entryOffset,ipod->bootloader,ipod->bootloader_len);
+    }
+    else
+#endif
+    {
+        memcpy(sectorbuf+entryOffset,bootloader_buf,length);
+        free(bootloader_buf);
     }
 
     /* Calculate new checksum for combined image */
@@ -1320,9 +1336,7 @@ int ipod_scan(struct ipod_t* ipod)
          ipod_close(ipod);
     }
 
-    if (n==0) {
-        fprintf(stderr,"[ERR]  No ipods found.\n");
-    } else if (n==1) {
+    if (n==1) {
         /* Remember the disk name */
         strcpy(ipod->diskname,last_ipod);
     }
@@ -1357,7 +1371,8 @@ int main(int argc, char* argv[])
     }
 
     if ((argc > 1) && (strcmp(argv[1],"--scan")==0)) {
-        ipod_scan(&ipod);
+        if (ipod_scan(&ipod) == 0)
+            fprintf(stderr,"[ERR]  No ipods found.\n");
         return 0;
     }
 
