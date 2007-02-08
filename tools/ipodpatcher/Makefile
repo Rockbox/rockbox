@@ -7,8 +7,8 @@ BOOT_H = ipod3g.h ipod4g.h ipodcolor.h ipodmini.h ipodmini2g.h ipodnano.h ipodvi
 # bootloaders in this directory - download them from
 # http://download.rockbox.org/bootloader/ipod/bootloaders.zip
 
-BOOTSRC = ipod3g.c ipod4g.c ipodcolor.c ipodmini.c ipodmini2g.c ipodnano.c ipodvideo.c
-CFLAGS += -DWITH_BOOTOBJS
+#BOOTSRC = ipod3g.c ipod4g.c ipodcolor.c ipodmini.c ipodmini2g.c ipodnano.c ipodvideo.c
+#CFLAGS += -DWITH_BOOTOBJS
 
 ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
 OUTPUT=ipodpatcher.exe
