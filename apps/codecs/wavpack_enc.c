@@ -69,6 +69,7 @@ static int8_t input_buffer[PCM_CHUNK_SIZE*2]     IBSS_ATTR;
 static WavpackConfig config                      IBSS_ATTR;
 static WavpackContext *wpc;
 static int32_t data_size, input_size, input_step IBSS_ATTR;
+static int32_t err                               IBSS_ATTR;
 
 static const WavpackMetadataHeader wvpk_mdh =
 {
@@ -126,7 +127,9 @@ static void chunk_to_int32(int32_t *src)
         {
             int32_t t = *(*src)++;
             /* endianness irrelevant */
-            *(*dst)++ = ((int16_t)t + (t >> 16)) / 2;
+            t = (int16_t)t + (t >> 16) + err;
+            err = t & 1;
+            *(*dst)++ = t >> 1;
         } /* to_int32 */
 
         do
@@ -363,6 +366,8 @@ static bool init_encoder(void)
 
     if (!WavpackSetConfiguration(wpc, &config, -1))
         return false;
+
+    err = 0;
 
     /* configure the buffer system */
     params.afmt            = AFMT_WAVPACK;

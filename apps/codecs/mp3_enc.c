@@ -174,6 +174,7 @@ static unsigned samp_per_frame                   IBSS_ATTR;
 
 static config_t          cfg                     IBSS_ATTR;
 static char             *res_buffer;
+static int32_t           err                     IBSS_ATTR;
 
 static const uint8_t ht_count_const[2][2][16] =
 { { { 1,  5,  4,  5,  6,  5, 4, 4, 7, 3, 6, 0, 7, 2, 3, 1 },     /* table0 */
@@ -2055,7 +2056,9 @@ static void to_mono_mm(void)
     inline void to_mono(uint32_t **samp)
     {
         int32_t lr = **samp;
-        int32_t m  = ((int16_t)lr + (lr >> 16)) / 2;
+        int32_t m  = (int16_t)lr + (lr >> 16) + err;
+        err = m & 1;
+        m >>= 1;
         *(*samp)++ = (m << 16) | (uint16_t)m;
     } /* to_mono */
 
@@ -2433,6 +2436,8 @@ static bool enc_init(void)
 
     init_mp3_encoder_engine(inputs.sample_rate, inputs.num_channels,
                             inputs.config);
+
+    err = 0;
 
     /* configure the buffer system */
     params.afmt            = AFMT_MPA_L3;
