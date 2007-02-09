@@ -29,7 +29,7 @@
 #include "ipodpatcher.h"
 #include "ipodio.h"
 
-#define VERSION "0.8svn"
+#define VERSION "0.8 with r12194-070204 bootloaders"
 
 int verbose = 0;
 
@@ -318,8 +318,6 @@ int main(int argc, char* argv[])
                 } else {
                     fprintf(stderr,"[ERR]  --install failed.\n");
                 }
-                printf("Press ENTER to exit ipodpatcher :");
-                fgets(yesno,4,stdin);
             }
         }
 #endif
@@ -418,6 +416,14 @@ int main(int argc, char* argv[])
     }
 
     ipod_close(&ipod);
+
+#ifdef WITH_BOOTOBJS
+    if (action==INTERACTIVE) {
+        printf("Press ENTER to exit ipodpatcher :");
+        fgets(yesno,4,stdin);
+    }
+#endif
+
 
     return 0;
 }
