@@ -150,9 +150,17 @@ int main(int argc, char* argv[])
         if (n==0) {
             fprintf(stderr,"[ERR]  No ipods found, aborting\n");
             fprintf(stderr,"[ERR]  Please connect your ipod and ensure it is in disk mode\n");
+#if defined(__APPLE__) && defined(__MACH__)
+            fprintf(stderr,"[ERR]  Also ensure that itunes is closed, and that your ipod is not mounted.\n");
+#elif !defined(__WIN32__)
+            if (geteuid()!=0) {
+                fprintf(stderr,"[ERR]  You may also need to run ipodpatcher as root.\n");
+            }
+#endif
+            fprintf(stderr,"[ERR]  Please refer to the Rockbox manual if you continue to have problems.\n");
         } else if (n > 1) {
             fprintf(stderr,"[ERR]  %d ipods found, aborting\n",n);
-            fprintf(stderr,"[ERR]  Please connect only one ipod.\n");
+            fprintf(stderr,"[ERR]  Please connect only one ipod and re-run ipodpatcher.\n");
         }
 
         if (n != 1) {
