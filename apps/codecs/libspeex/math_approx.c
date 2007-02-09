@@ -417,14 +417,14 @@ float spx_exp(float xf){
 		return exp_table[(int)((xf+4.0)*4.0)];
 	} else if (-4<xf&&4>xf){
 #ifdef SIMULATOR 		
-		printf("NtbLexp:%f,%f,%f:%d,%d:%d\n",xf,flt,xf-flt,-4<xf,4>xf,abs(xf-flt));
+/*		printf("NtbLexp:%f,%f,%f:%d,%d:%d\n",xf,flt,xf-flt,-4<xf,4>xf,abs(xf-flt)); */
 #endif
 
 		return exp_table[(int)((xf+4.0)*4.0)];
 	}
 	
 #ifdef SIMULATOR 		
-	printf("NTBLexp:%f,%f,%f:%d,%d:%d\n",xf,flt,xf-flt,-4<xf,4>xf,abs(xf-flt));
+/*	printf("NTBLexp:%f,%f,%f:%d,%d:%d\n",xf,flt,xf-flt,-4<xf,4>xf,abs(xf-flt)); */
 #endif
 	return spx_expB(xf);	
 	//return exp(xf);
