@@ -2799,6 +2799,7 @@ static bool audio_load_track(int offset, bool start_play, bool rebuffer)
             break;
 
         case AFMT_OGG_VORBIS:
+        case AFMT_SPEEX:
         case AFMT_FLAC:
         case AFMT_PCM_WAV:
         case AFMT_A52:

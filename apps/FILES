@@ -74,6 +74,7 @@ codecs/libffmpegFLAC/*
 codecs/libmad/*
 codecs/libwavpack/*
 codecs/Tremor/*
+codecs/libspeex/*
 codecs/libmusepack/*
 codecs/libalac/*
 codecs/lib/*.[ch]

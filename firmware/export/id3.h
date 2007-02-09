@@ -22,6 +22,8 @@
 #include <stdbool.h>
 #include "config.h"
 #include "file.h"
+#include "lcd.h"
+#include "system.h"
 
 /* Audio file types. */
 enum
@@ -46,6 +48,7 @@ enum
     AFMT_AAC,          /* Advanced Audio Coding (AAC) in M4A container */
     AFMT_SHN,          /* Shorten */
     AFMT_SID,          /* SID File Format */
+    AFMT_SPEEX,         /* Ogg Speex speech */
     AFMT_ADX,          /* ADX File Format */
     AFMT_NSF,          /* NESM (NES Sound Format) */
 #endif
@@ -205,6 +208,15 @@ struct mp3entry {
     long album_gain;
     long track_peak;    /* 7.24 signed fixed point. 0 for no peak. */
     long album_peak;
+#endif
+
+#ifdef HAVE_LCD_BITMAP
+    /* album art support */
+    fb_data* albumart_data;
+    unsigned int albumart_width;
+    unsigned int albumart_height;
+    bool albumart_found;
+    char albumart_path[MAX_PATH];
 #endif
 };
 

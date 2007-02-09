@@ -17,7 +17,7 @@ ifdef APPEXTRA
 endif
 
 ifdef SOFTWARECODECS
-   CODECLIBS = -lmad -la52 -lffmpegFLAC -lTremor -lwavpack -lmusepack -lalac -lfaad -lm4a
+   CODECLIBS = -lmad -la52 -lffmpegFLAC -lTremor -lwavpack -lmusepack -lalac -lfaad -lm4a  -lspeex
 endif
 
 # we "borrow" the plugin LDS file
@@ -39,7 +39,7 @@ DIRS = .
 
 CODECDEPS = $(LINKCODEC) $(BUILDDIR)/libcodec.a
 
-.PHONY: libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a
+.PHONY: libmad liba52 libffmpegFLAC libTremor  libspeex libwavpack libmusepack libalac libfaad libm4a
 
 OUTPUT = $(SOFTWARECODECS)
 
@@ -57,6 +57,7 @@ $(OBJDIR)/mpa.elf : $(OBJDIR)/mpa.o $(BUILDDIR)/libmad.a
 $(OBJDIR)/a52.elf : $(OBJDIR)/a52.o $(BUILDDIR)/liba52.a
 $(OBJDIR)/flac.elf : $(OBJDIR)/flac.o $(BUILDDIR)/libffmpegFLAC.a
 $(OBJDIR)/vorbis.elf : $(OBJDIR)/vorbis.o $(BUILDDIR)/libTremor.a
+$(OBJDIR)/speex.elf : $(OBJDIR)/speex.o $(BUILDDIR)/libspeex.a
 $(OBJDIR)/mpc.elf : $(OBJDIR)/mpc.o $(BUILDDIR)/libmusepack.a
 $(OBJDIR)/wavpack.elf : $(OBJDIR)/wavpack.o $(BUILDDIR)/libwavpack.a
 $(OBJDIR)/alac.elf : $(OBJDIR)/alac.o $(BUILDDIR)/libalac.a $(BUILDDIR)/libm4a.a
@@ -159,6 +160,14 @@ libTremor:
 	$(SILENT)mkdir -p $(OBJDIR)/Tremor
 	$(call PRINTS,MAKE in Tremor)$(MAKE) -C Tremor OBJDIR=$(OBJDIR)/Tremor OUTPUT=$(BUILDDIR)/libTremor.a
 
+$(BUILDDIR)/libspeex.a: libspeex
+
+libspeex:
+	$(SILENT)mkdir -p $(OBJDIR)/libspeex
+	$(call PRINTS,MAKE in Tremor)$(MAKE) -C libspeex OBJDIR=$(OBJDIR)/libspeex OUTPUT=$(BUILDDIR)/libspeex.a
+ 
+ 
+
 $(BUILDDIR)/libwavpack.a: libwavpack
 
 libwavpack:
@@ -190,11 +199,12 @@ libfaad:
 	$(call PRINTS,MAKE in libfaad)$(MAKE) -C libfaad OBJDIR=$(OBJDIR)/libfaad OUTPUT=$(BUILDDIR)/libfaad.a
 
 clean:
-	$(call PRINTS,cleaning codecs)rm -fr $(OBJDIR)/libmad $(BUILDDIR)/libmad.a $(OBJDIR)/liba52 $(BUILDDIR)/liba52.a $(OBJDIR)/libffmpegFLAC $(BUILDDIR)/libffmpegFLAC.a $(OBJDIR)/Tremor $(BUILDDIR)/libTremor.a $(OBJDIR)/libwavpack $(BUILDDIR)/libwavpack.a $(OBJDIR)/libmusepack $(BUILDDIR)/libmusepack.a $(OBJDIR)/libalac $(BUILDDIR)/libalac.a $(OBJDIR)/libfaad $(BUILDDIR)/libfaad.a $(OBJDIR)/libm4a $(BUILDDIR)/libm4a.a
+	$(call PRINTS,cleaning codecs)rm -fr $(OBJDIR)/libmad $(BUILDDIR)/libmad.a $(OBJDIR)/liba52 $(BUILDDIR)/liba52.a $(OBJDIR)/libffmpegFLAC $(BUILDDIR)/libffmpegFLAC.a $(OBJDIR)/Tremor $(BUILDDIR)/libTremor.a $(OBJDIR)/libspeex $(BUILDDIR)/libSpeex.a $(OBJDIR)/libwavpack $(BUILDDIR)/libwavpack.a $(OBJDIR)/libmusepack $(BUILDDIR)/libmusepack.a $(OBJDIR)/libalac $(BUILDDIR)/libalac.a $(OBJDIR)/libfaad $(BUILDDIR)/libfaad.a $(OBJDIR)/libm4a $(BUILDDIR)/libm4a.a
 	$(SILENT)$(MAKE) -C libmad clean OBJDIR=$(OBJDIR)/libmad
 	$(SILENT)$(MAKE) -C liba52 clean OBJDIR=$(OBJDIR)/liba52
 	$(SILENT)$(MAKE) -C libffmpegFLAC clean OBJDIR=$(OBJDIR)/libffmpegFLAC
 	$(SILENT)$(MAKE) -C Tremor clean OBJDIR=$(OBJDIR)/Tremor
+  	$(SILENT)$(MAKE) -C libspeex clean OBJDIR=$(OBJDIR)/libspeex
 	$(SILENT)$(MAKE) -C libwavpack clean OBJDIR=$(OBJDIR)/libwavpack
 	$(SILENT)$(MAKE) -C libmusepack clean OBJDIR=$(OBJDIR)/libmusepack
 	$(SILENT)$(MAKE) -C libalac clean OBJDIR=$(OBJDIR)/libalac

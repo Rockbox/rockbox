@@ -13,6 +13,7 @@ aac.c
 #endif
 shorten.c
 aiff.c
+speex.c
 sid.c
 adx.c
 nsf.c

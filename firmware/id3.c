@@ -18,7 +18,7 @@
  ****************************************************************************/
 /*
  * Parts of this code has been stolen from the Ample project and was written
- * by David Härdeman. It has since been extended and enhanced pretty much by
+ * by David Hï¿½deman. It has since been extended and enhanced pretty much by
  * all sorts of friendly Rockbox people.
  *
  */
@@ -101,6 +101,9 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* NESM (NES Sound Format) */
     [AFMT_NSF] =
         AFMT_ENTRY("NSF",  "nsf",     NULL,          "nsf\0nsfe\0"      ),
+     /* Speex File Format */
+     [AFMT_SPEEX] =
+         AFMT_ENTRY("Speex","speex",   NULL,          "spx\0"      )
 #endif
 };
 
