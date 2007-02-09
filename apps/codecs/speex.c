@@ -326,7 +326,7 @@ extern char iend[];
 #endif
 
 /* this is the codec entry point */
-enum codec_status codec_main()
+enum codec_status codec_main(void)
 {
     SpeexBits vf;
     int error;
