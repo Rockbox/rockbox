@@ -907,6 +907,66 @@ inline void Wave_N106_DoTicks(const int32_t ticks)
         }
     }
 }
+/****************** VRC6 ******************/
+
+#ifdef ICODE_INSTEAD_OF_INLINE
+void Wave_VRC6_DoTicks(const int32_t ticks) ICODE_ATTR;
+void Wave_VRC6_DoTicks(const int32_t ticks)
+#else
+inline void Wave_VRC6_DoTicks(const int32_t ticks);
+inline void Wave_VRC6_DoTicks(const int32_t ticks)
+#endif
+{
+    register int32_t i;
+
+    for(i = 0; i < 2; i++) {
+
+        if(mWave_VRC6Pulse[i].bChannelEnabled) {
+
+            mWave_VRC6Pulse[i].nFreqCount -= ticks;
+
+            if(mWave_VRC6Pulse[i].nDutyCount <=
+               mWave_VRC6Pulse[i].nDutyCycle)
+            {
+                mWave_VRC6Pulse[i].nMixL =
+                    VRC6Pulse_nOutputTable_L[mWave_VRC6Pulse[i].nVolume];
+            }
+            else
+                mWave_VRC6Pulse[i].nMixL = 0;
+
+            while(mWave_VRC6Pulse[i].nFreqCount <= 0) {
+                mWave_VRC6Pulse[i].nFreqCount +=
+                    mWave_VRC6Pulse[i].nFreqTimer.W + 1;
+
+                if(!mWave_VRC6Pulse[i].bDigitized)
+                    mWave_VRC6Pulse[i].nDutyCount =
+                        (mWave_VRC6Pulse[i].nDutyCount + 1) & 0x0F;
+            }
+        }
+    }
+
+    if(mWave_VRC6Saw.bChannelEnabled) {
+
+        mWave_VRC6Saw.nFreqCount -= ticks;
+
+        mWave_VRC6Saw.nMixL =
+            VRC6Saw_nOutputTable_L[mWave_VRC6Saw.nAccum >> 3];
+
+        while(mWave_VRC6Saw.nFreqCount <= 0) {
+
+            mWave_VRC6Saw.nFreqCount += mWave_VRC6Saw.nFreqTimer.W + 1;
+
+            mWave_VRC6Saw.nAccumStep++;
+            if(mWave_VRC6Saw.nAccumStep == 14)
+            {
+                mWave_VRC6Saw.nAccumStep = 0;
+                mWave_VRC6Saw.nAccum = 0;
+            }
+            else if(!(mWave_VRC6Saw.nAccumStep & 1))
+                mWave_VRC6Saw.nAccum += mWave_VRC6Saw.nAccumRate;
+        }
+    }
+}
 
 /****************** Square waves ******************/
 
@@ -2219,72 +2279,7 @@ void EmulateAPU(uint8_t bBurnCPUCycles)
         if(nExternalSound && !bPALMode)
         {
             if(nExternalSound & EXTSOUND_VRC6)
-            {
-
-                if(mWave_VRC6Pulse[0].bChannelEnabled) {
-
-                    mWave_VRC6Pulse[0].nFreqCount -= tick;
-
-                    if(mWave_VRC6Pulse[0].nDutyCount <=
-                       mWave_VRC6Pulse[0].nDutyCycle)
-                    {
-                        mWave_VRC6Pulse[0].nMixL =
-                            VRC6Pulse_nOutputTable_L
-                                [mWave_VRC6Pulse[0].nVolume];
-                    } else mWave_VRC6Pulse[0].nMixL = 0;
-
-                    while(mWave_VRC6Pulse[0].nFreqCount <= 0) {
-                        mWave_VRC6Pulse[0].nFreqCount +=
-                            mWave_VRC6Pulse[0].nFreqTimer.W + 1;
-
-                        if(!mWave_VRC6Pulse[0].bDigitized)
-                            mWave_VRC6Pulse[0].nDutyCount =
-                                (mWave_VRC6Pulse[0].nDutyCount + 1) & 0x0F;
-                    }
-                }
-
-                if(mWave_VRC6Pulse[1].bChannelEnabled) {
-
-                    mWave_VRC6Pulse[1].nFreqCount -= tick;
-
-                    if(mWave_VRC6Pulse[1].nDutyCount <=
-                       mWave_VRC6Pulse[1].nDutyCycle)
-                    {
-                        mWave_VRC6Pulse[1].nMixL =
-                            VRC6Pulse_nOutputTable_L
-                                [mWave_VRC6Pulse[1].nVolume];
-                    } else mWave_VRC6Pulse[1].nMixL = 0;
-
-                    while(mWave_VRC6Pulse[1].nFreqCount <= 0) {
-                        mWave_VRC6Pulse[1].nFreqCount +=
-                            mWave_VRC6Pulse[1].nFreqTimer.W + 1;
-    
-                        if(!mWave_VRC6Pulse[1].bDigitized)
-                        mWave_VRC6Pulse[1].nDutyCount =
-                            (mWave_VRC6Pulse[1].nDutyCount + 1) & 0x0F;
-                    }
-                }
-
-                mWave_VRC6Saw.nFreqCount -= tick;
-
-                mWave_VRC6Saw.nMixL =
-                    VRC6Saw_nOutputTable_L[mWave_VRC6Saw.nAccum >> 3];
-    
-                while(mWave_VRC6Saw.nFreqCount <= 0) {
-        
-                    mWave_VRC6Saw.nFreqCount += mWave_VRC6Saw.nFreqTimer.W + 1;
-    
-                    mWave_VRC6Saw.nAccumStep++;
-                    if(mWave_VRC6Saw.nAccumStep == 14)
-                    {
-                        mWave_VRC6Saw.nAccumStep = 0;
-                        mWave_VRC6Saw.nAccum = 0;
-                    }
-                    else if(!(mWave_VRC6Saw.nAccumStep & 1))
-                        mWave_VRC6Saw.nAccum += mWave_VRC6Saw.nAccumRate;
-                }
-
-            } /* end VRC6 */
+                Wave_VRC6_DoTicks(tick);
             if(nExternalSound & EXTSOUND_N106)
                 Wave_N106_DoTicks(tick);
             if(nExternalSound & EXTSOUND_FME07)
