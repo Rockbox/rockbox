@@ -500,7 +500,7 @@ next_page:
 
                     rb->id3->vbr = true;
                     rb->id3->frequency = samplerate;
-                    rb->configure(DSP_SET_FREQUENCY, (int *)samplerate);
+                    rb->configure(DSP_SET_FREQUENCY, (int *)(rb->id3->frequency));
 
                     /* Speex header in its own page, add the whole page
                        headersize */
