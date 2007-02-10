@@ -43,8 +43,9 @@
     if (fn) fn(__VA_ARGS__)
 
 static bool enc_run_menu(int m, const struct menu_item items[],
-                         struct encoder_config *cfg);
-static bool enc_no_config_menu(struct encoder_config *cfg);
+                         struct encoder_config *cfg, bool global);
+static bool enc_no_config_menu(struct encoder_config *cfg, bool global);
+static void enc_rec_settings_changed(struct encoder_config *cfg);
 
 /** Function definitions for each codec - add these to enc_data
     list following the definitions **/
@@ -98,19 +99,19 @@ static void mp3_enc_default_config(struct encoder_config *cfg)
 } /* mp3_enc_default_config */
 
 static void mp3_enc_convert_config(struct encoder_config *cfg,
-                                   bool to_encoder)
+                                   bool global)
 {
-    if (to_encoder)
-    {
-        if ((unsigned)global_settings.mp3_enc_config.bitrate > MP3_ENC_NUM_BITR)
-            global_settings.mp3_enc_config.bitrate = MP3_ENC_BITRATE_CFG_DEFAULT;
-        cfg->mp3_enc.bitrate = mp3_enc_bitr[global_settings.mp3_enc_config.bitrate];
-    }
-    else
+    if (global)
     {
         global_settings.mp3_enc_config.bitrate =
             round_value_to_list32(cfg->mp3_enc.bitrate, mp3_enc_bitr,
                                   MP3_ENC_NUM_BITR, false);
+    }
+    else
+    {
+        if ((unsigned)global_settings.mp3_enc_config.bitrate > MP3_ENC_NUM_BITR)
+            global_settings.mp3_enc_config.bitrate = MP3_ENC_BITRATE_CFG_DEFAULT;
+        cfg->mp3_enc.bitrate = mp3_enc_bitr[global_settings.mp3_enc_config.bitrate];
     }
 } /* mp3_enc_convert_config */
 
@@ -175,7 +176,7 @@ static bool mp3_enc_bitrate(struct encoder_config *cfg)
 } /* mp3_enc_bitrate */
 
 /* mp3_enc: show the configuration menu */
-static bool mp3_enc_menu(struct encoder_config *cfg)
+static bool mp3_enc_menu(struct encoder_config *cfg, bool global)
 {
     static const struct menu_item items[] =
     {
@@ -184,7 +185,7 @@ static bool mp3_enc_menu(struct encoder_config *cfg)
 
     bool result;
     int m = menu_init(items, ARRAYLEN(items), NULL, NULL, NULL, NULL);
-    result = enc_run_menu(m, items, cfg);
+    result = enc_run_menu(m, items, cfg, global);
     menu_exit(m);
     return result;
 } /* mp3_enc_menu */
@@ -192,23 +193,23 @@ static bool mp3_enc_menu(struct encoder_config *cfg)
 /** wav_enc.codec **/
 /* wav_enc: show the configuration menu */
 #if 0
-static bool wav_enc_menu(struct encoder_config *cfg);
+static bool wav_enc_menu(struct encoder_config *cfg, bool global);
 #endif
 
 /** wavpack_enc.codec **/
 /* wavpack_enc: show the configuration menu */
 #if 0
-static bool wavpack_enc_menu(struct encoder_config *cfg);
+static bool wavpack_enc_menu(struct encoder_config *cfg, bool global);
 #endif
 
 /** config function pointers and/or data for each codec **/
 static const struct encoder_data
 {
-    void   (*get_caps)(const struct encoder_config *, struct encoder_caps *,
-                       bool);
-    void   (*default_cfg)(struct encoder_config *);
-    void   (*convert_cfg)(struct encoder_config *, bool to_encoder);
-    bool   (*menu)(struct encoder_config *);
+    void   (*get_caps)(const struct encoder_config *cfg,
+                       struct encoder_caps *caps, bool for_config);
+    void   (*default_cfg)(struct encoder_config *cfg);
+    void   (*convert_cfg)(struct encoder_config *cfg , bool global);
+    bool   (*menu)(struct encoder_config *cfg , bool global);
 } enc_data[REC_NUM_FORMATS] =
 {
     /* aiff_enc.codec */
@@ -247,12 +248,13 @@ static inline bool rec_format_ok(int rec_format)
 }
 
 static bool enc_run_menu(int m, const struct menu_item items[],
-                         struct encoder_config *cfg)
+                         struct encoder_config *cfg, bool global)
 {
-    int selected;
     while (1)
     {
-        switch (selected=menu_show(m))
+        int selected = menu_show(m);
+
+        switch (selected)
         {
         case MENU_SELECTED_EXIT:
             return false;
@@ -261,16 +263,31 @@ static bool enc_run_menu(int m, const struct menu_item items[],
             return true;
 
         default:
-            if (items[selected].function &&
-                ENC_MENU_ITEM_FN(items[selected].function)(cfg))
-                return  true;
+            if (items[selected].function == NULL)
+                break;
+
+            /* If the setting being configured is global, it must be placed
+               in global_settings before updating the status bar for the
+               change to show upon exiting the item. */
+            if (global)
+                global_to_encoder_config(cfg);
+
+            if (ENC_MENU_ITEM_FN(items[selected].function)(cfg))
+                return true;
+
+            if (global)
+            {
+                enc_rec_settings_changed(cfg);
+                encoder_config_to_global(cfg);
+            }
+
             gui_syncstatusbar_draw(&statusbars, true);
         }
     }
 } /* enc_run_menu */
 
 /* menu created when encoder has no configuration options */
-static bool enc_no_config_menu(struct encoder_config *cfg)
+static bool enc_no_config_menu(struct encoder_config *cfg, bool global)
 {
     static const struct menu_item items[] =
     {
@@ -280,11 +297,12 @@ static bool enc_no_config_menu(struct encoder_config *cfg)
     bool result;
 
     m = menu_init(items, ARRAYLEN(items), NULL, NULL, NULL, NULL);
-    result = enc_run_menu(m, items, NULL);
+    result = enc_run_menu(m, items, NULL, false);
     menu_exit(m);
 
     return result;
     (void)cfg;
+    (void)global;
 } /* enc_no_config_menu */
 
 /* update settings dependent upon encoder settings */
@@ -333,13 +351,13 @@ static void enc_rec_settings_changed(struct encoder_config *cfg)
 void global_to_encoder_config(struct encoder_config *cfg)
 {
     const struct encoder_data *data = &enc_data[cfg->rec_format];
-    CALL_FN_(data->convert_cfg, cfg, true);
+    CALL_FN_(data->convert_cfg, cfg, false);
 } /* global_to_encoder_config */
 
 void encoder_config_to_global(const struct encoder_config *cfg)
 {
     const struct encoder_data *data = &enc_data[cfg->rec_format];
-    CALL_FN_(data->convert_cfg, (struct encoder_config *)cfg, false);
+    CALL_FN_(data->convert_cfg, (struct encoder_config *)cfg, true);
 } /* encoder_config_to_global */
 
 bool enc_get_caps(const struct encoder_config *cfg,
@@ -376,12 +394,14 @@ bool enc_init_config(struct encoder_config *cfg)
 } /* enc_init_config */
 
 /** Encoder Menus **/
+#if 0
 bool enc_config_menu(struct encoder_config *cfg)
 {
     if (!rec_format_ok(cfg->rec_format))
         return false;
-    return enc_data[cfg->rec_format].menu(cfg);
+    return enc_data[cfg->rec_format].menu(cfg, false);
 } /* enc_config_menu */
+#endif
 
 /** Global Settings **/
 
@@ -421,21 +441,10 @@ bool enc_global_config_menu(void)
 {
     struct encoder_config cfg;
 
-    bool res;
-
     if (!rec_format_ok(global_settings.rec_format))
         global_settings.rec_format = REC_FORMAT_DEFAULT;
 
     cfg.rec_format = global_settings.rec_format;
 
-    global_to_encoder_config(&cfg);
-
-    res = enc_config_menu(&cfg);
-    if (!res)
-    {
-        enc_rec_settings_changed(&cfg);
-        encoder_config_to_global(&cfg);
-    }
-
-    return res;
+    return enc_data[cfg.rec_format].menu(&cfg, true);
 } /* enc_global_config_menu */
