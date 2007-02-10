@@ -40,10 +40,10 @@ int codec_init(void)
 
 void codec_set_replaygain(struct mp3entry* id3)
 {
-    ci->configure(DSP_SET_TRACK_GAIN, (long *) id3->track_gain);
-    ci->configure(DSP_SET_ALBUM_GAIN, (long *) id3->album_gain);
-    ci->configure(DSP_SET_TRACK_PEAK, (long *) id3->track_peak);
-    ci->configure(DSP_SET_ALBUM_PEAK, (long *) id3->album_peak);
+    ci->configure(DSP_SET_TRACK_GAIN, id3->track_gain);
+    ci->configure(DSP_SET_ALBUM_GAIN, id3->album_gain);
+    ci->configure(DSP_SET_TRACK_PEAK, id3->track_peak);
+    ci->configure(DSP_SET_ALBUM_PEAK, id3->album_peak);
 }
 
 /* Various "helper functions" common to all the xxx2wav decoder plugins  */
