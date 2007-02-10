@@ -544,25 +544,23 @@ next_page:
                         if (speex_bits_remaining(&vf) < 0)
                             break;
 
-                        if (channels==2)
-                            speex_decode_stereo_int(output, frame_size,&stereo);
-                        {
-                            int new_frame_size = frame_size;
+                        if (channels == 2)
+                            speex_decode_stereo_int(output, frame_size, &stereo);
 
-                            if (new_frame_size>0){  
-                                rb->pcmbuf_insert((const char*)output,
-                                                  (const char*)output,
-                                                  new_frame_size*channels);
+                        int new_frame_size = frame_size;
 
-                                /* 2 bytes/sample */
-                                cur_granule += new_frame_size / 2;
+                        if (new_frame_size>0){  
+                            rb->pcmbuf_insert((const char*)output, NULL,
+                                              new_frame_size);
 
-                                rb->set_offset((long)rb->curpos);
+                            /* 2 bytes/sample */
+                            cur_granule += new_frame_size / 2;
 
-                                rb->set_elapsed( (samplerate==0) ? 0 :
-                                                 cur_granule*1000/samplerate);
-                            }
-                        }
+                            rb->set_offset((long)rb->curpos);
+
+                            rb->set_elapsed( (samplerate==0) ? 0 :
+                                             cur_granule*1000/samplerate);
+                         }
                     }
                 }
                 packet_count++;
