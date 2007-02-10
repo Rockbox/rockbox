@@ -143,16 +143,16 @@ struct encoder_config
 };
 
 /** Encoder chunk macros and definitions **/
-#define CHUNKF_START_FILE   0x0001 /* This chunk starts a new file         */
-#define CHUNKF_END_FILE     0x0002 /* This chunk ends the current file     */
-#define CHUNKF_PRERECORD    0x0010 /* This chunk is prerecord data,
+#define CHUNKF_START_FILE 0x0001ul /* This chunk starts a new file         */
+#define CHUNKF_END_FILE   0x0002ul /* This chunk ends the current file     */
+#define CHUNKF_PRERECORD  0x0010ul /* This chunk is prerecord data,
                                       a new file could start anytime       */
-#define CHUNKF_ABORT        0x0020 /* Encoder should not finish this
+#define CHUNKF_ABORT      0x0020ul /* Encoder should not finish this
                                       chunk                                */
-#define CHUNKF_ERROR    0x80000000 /* An error has occured (passed to/
-                                      from encoder). Use the sign bit to
-                                      check (long)flags < 0.               */
-#define CHUNKF_ALLFLAGS 0x80000033
+#define CHUNKF_ERROR    (~0ul ^ (~0ul >> 1)) /* An error has occured
+                                      (passed to/from encoder). Use the
+                                      sign bit to check (long)flags < 0.   */
+#define CHUNKF_ALLFLAGS (0x0033ul | CHUNKF_ERROR)
 
 /* Header at the beginning of every encoder chunk */
 #ifdef PCMREC_PARANOID
