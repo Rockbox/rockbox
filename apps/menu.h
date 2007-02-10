@@ -112,7 +112,7 @@ int do_menu(const struct menu_item_ex *menu);
          MENU_ITEM_COUNT(sizeof( name##_)/sizeof(*name##_)),            \
             { (void*)name##_},{.callback_and_desc = & name##__}};
 
-#define MENUITEM_STRINGLIST(name, str, callback, ... )                  \
+#define MENUITEM_STRINGLIST(name, str, cb, ... )                        \
     static const char *name##_[] = {__VA_ARGS__};                       \
     static const struct menu_callback_with_desc name##__ = {cb,str};    \
     static const struct menu_item_ex name =                             \
