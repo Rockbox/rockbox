@@ -102,6 +102,26 @@ void print_usage(void)
 #endif
 }
 
+void display_partinfo(struct ipod_t* ipod)
+{
+    int i;
+    double sectors_per_MB = (1024.0*1024.0)/ipod->sector_size;
+
+    printf("[INFO] Part    Start Sector    End Sector   Size (MB)   Type\n");
+    for ( i = 0; i < 4; i++ ) {
+        if (ipod->pinfo[i].start != 0) {
+            printf("[INFO]    %d      %10ld    %10ld  %10.1f   %s (0x%02x)\n",
+                   i,
+                   ipod->pinfo[i].start,
+                   ipod->pinfo[i].start+ipod->pinfo[i].size-1,
+                   ipod->pinfo[i].size/sectors_per_MB,
+                   get_parttype(ipod->pinfo[i].type),
+                   ipod->pinfo[i].type);
+        }
+    }
+}
+
+
 int main(int argc, char* argv[])
 {
 #ifdef WITH_BOOTOBJS

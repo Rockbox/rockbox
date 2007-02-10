@@ -158,25 +158,6 @@ void int2be(unsigned int val, unsigned char* addr)
     ((long)array[pos] | ((long)array[pos+1] << 8 ) |\
     ((long)array[pos+2] << 16 ) | ((long)array[pos+3] << 24 ))
 
-void display_partinfo(struct ipod_t* ipod)
-{
-    int i;
-    double sectors_per_MB = (1024.0*1024.0)/ipod->sector_size;
-
-    printf("[INFO] Part    Start Sector    End Sector   Size (MB)   Type\n");
-    for ( i = 0; i < 4; i++ ) {
-        if (ipod->pinfo[i].start != 0) {
-            printf("[INFO]    %d      %10ld    %10ld  %10.1f   %s (0x%02x)\n",
-                   i,
-                   ipod->pinfo[i].start,
-                   ipod->pinfo[i].start+ipod->pinfo[i].size-1,
-                   ipod->pinfo[i].size/sectors_per_MB,
-                   get_parttype(ipod->pinfo[i].type),
-                   ipod->pinfo[i].type);
-        }
-    }
-}
-
 int read_partinfo(struct ipod_t* ipod, int silent)
 {
     int i;
@@ -1127,6 +1108,7 @@ int getmodel(struct ipod_t* ipod, int ipod_version)
             ipod->modelstr="3rd Generation";
             ipod->modelnum = 7;
             ipod->modelname = "ip3g";
+            ipod->targetname = "ipod3g";
 #ifdef WITH_BOOTOBJS
             ipod->bootloader = ipod3g;
             ipod->bootloader_len = LEN_ipod3g;
@@ -1136,6 +1118,7 @@ int getmodel(struct ipod_t* ipod, int ipod_version)
             ipod->modelstr="1st Generation Mini";
             ipod->modelnum = 9;
             ipod->modelname = "mini";
+            ipod->targetname = "ipodmini";
 #ifdef WITH_BOOTOBJS
             ipod->bootloader = ipodmini;
             ipod->bootloader_len = LEN_ipodmini;
@@ -1145,6 +1128,7 @@ int getmodel(struct ipod_t* ipod, int ipod_version)
             ipod->modelstr="4th Generation";
             ipod->modelnum = 8;
             ipod->modelname = "ip4g";
+            ipod->targetname = "ipod4g";
 #ifdef WITH_BOOTOBJS
             ipod->bootloader = ipod4g;
             ipod->bootloader_len = LEN_ipod4g;
@@ -1154,6 +1138,7 @@ int getmodel(struct ipod_t* ipod, int ipod_version)
             ipod->modelstr="Photo/Color";
             ipod->modelnum = 3;
             ipod->modelname = "ipco";
+            ipod->targetname = "ipodcolor";
 #ifdef WITH_BOOTOBJS
             ipod->bootloader = ipodcolor;
             ipod->bootloader_len = LEN_ipodcolor;
@@ -1163,6 +1148,7 @@ int getmodel(struct ipod_t* ipod, int ipod_version)
             ipod->modelstr="2nd Generation Mini";
             ipod->modelnum = 11;
             ipod->modelname = "mn2g";
+            ipod->targetname = "ipodmini2g";
 #ifdef WITH_BOOTOBJS
             ipod->bootloader = ipodmini2g;
             ipod->bootloader_len = LEN_ipodmini2g;
@@ -1172,6 +1158,7 @@ int getmodel(struct ipod_t* ipod, int ipod_version)
             ipod->modelstr="1st Generation Nano";
             ipod->modelnum = 4;
             ipod->modelname = "nano";
+            ipod->targetname = "ipodnano";
 #ifdef WITH_BOOTOBJS
             ipod->bootloader = ipodnano;
             ipod->bootloader_len = LEN_ipodnano;
@@ -1181,6 +1168,7 @@ int getmodel(struct ipod_t* ipod, int ipod_version)
             ipod->modelstr="Video (aka 5th Generation)";
             ipod->modelnum = 5;
             ipod->modelname = "ipvd";
+            ipod->targetname = "ipodvideo";
 #ifdef WITH_BOOTOBJS
             ipod->bootloader = ipodvideo;
             ipod->bootloader_len = LEN_ipodvideo;
@@ -1189,6 +1177,7 @@ int getmodel(struct ipod_t* ipod, int ipod_version)
         default:
             ipod->modelname = NULL;
             ipod->modelnum = 0;
+            ipod->targetname = NULL;
 #ifdef WITH_BOOTOBJS
             ipod->bootloader = NULL;
             ipod->bootloader_len = 0;

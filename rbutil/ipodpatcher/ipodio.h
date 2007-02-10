@@ -70,6 +70,7 @@ struct ipod_t {
     int modelnum;
     char* modelname;
     char* modelstr;
+    char* targetname;
     int macpod;
 #ifdef WITH_BOOTOBJS
     unsigned char* bootloader;
