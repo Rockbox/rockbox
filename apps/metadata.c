@@ -570,13 +570,15 @@ static bool get_speex_metadata(int fd, struct mp3entry* id3)
     {
         return false;
     }
+
     if ((memcmp(buf, "OggS", 4) != 0) || (memcmp(&buf[28], "Speex", 5) != 0))
     {
         return false;
     }
+
     /* We need to ensure the serial number from this page is the same as the
-    * one from the last page (since we only support a single bitstream).
-    */
+     * one from the last page (since we only support a single bitstream).
+     */
     serial = get_long_le(&buf[14]);
     if ((lseek(fd, 33, SEEK_SET) < 0)||(read(fd, buf, 58) < 4))
     {
@@ -756,13 +758,15 @@ static bool get_vorbis_metadata(int fd, struct mp3entry* id3)
     
     if ((memcmp(buf, "OggS", 4) != 0) || (memcmp(&buf[29], "vorbis", 6) != 0))
     {
- 		if ((memcmp(buf, "OggS", 4) != 0) || (memcmp(&buf[28], "Speex", 5) != 0))
- 		{        
-        return false;
- 		}else{
- 			id3->codectype=AFMT_SPEEX;
- 			return get_speex_metadata(fd,id3);
- 		}
+        if ((memcmp(buf, "OggS", 4) != 0) || (memcmp(&buf[28], "Speex", 5) != 0))
+        {        
+            return false;
+        }
+        else
+        {
+            id3->codectype = AFMT_SPEEX;
+            return get_speex_metadata(fd, id3);
+        }
     }
     
     /* We need to ensure the serial number from this page is the same as the
