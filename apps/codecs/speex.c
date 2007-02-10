@@ -23,7 +23,7 @@
 #include "libspeex/speex/speex_callbacks.h"
 #include "libspeex/speex/speex_header.h"
 #include "libspeex/speex/speex_stereo.h"
-#include "libspeex/speex/speex_types.h"
+#include "libspeex/speex/speex_config_types.h"
 #include "codeclib.h"
 
 #define MAX_FRAME_SIZE 2000
