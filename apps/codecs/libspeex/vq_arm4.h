@@ -35,12 +35,12 @@
 #define OVERRIDE_VQ_NBEST
 void vq_nbest(spx_word16_t *in, const spx_word16_t *codebook, int len, int entries, spx_word32_t *E, int N, int *nbest, spx_word32_t *best_dist, char *stack)
 {
-   int i/*,j*/;
+   int i,j;
    for (i=0;i<entries;i+=4)
    {
 #if 1
       spx_word32_t dist1, dist2, dist3, dist4;
-      int dead1, dead2, /*dead3,*/ dead4, dead5, dead6, dead7/*, dead8*/;
+      int dead1, dead2, dead3, dead4, dead5, dead6, dead7, dead8;
       __asm__ __volatile__ (
             "mov %0, #0 \n\t"
             "mov %1, #0 \n\t"

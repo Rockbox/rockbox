@@ -41,7 +41,10 @@
 #include <speex/speex.h>
 #include <speex/speex_bits.h>
 #include <speex/speex_jitter.h>
-#include <stdio.h>
+
+#ifndef NULL
+#define NULL 0
+#endif
 
 #define LATE_BINS 10
 #define MAX_MARGIN 30                     /**< Number of bins in margin histogram */
@@ -181,7 +184,7 @@ void jitter_buffer_put(JitterBuffer *jitter, const JitterBufferPacket *packet)
    
    /* Copy packet in buffer */
    jitter->buf[i]=(char*)speex_alloc(packet->len);
-   for (j=0;j<(signed int)packet->len;j++)
+   for (j=0;((unsigned)j)<packet->len;j++)
       jitter->buf[i][j]=packet->data[j];
    jitter->timestamp[i]=packet->timestamp;
    jitter->span[i]=packet->span;
@@ -378,7 +381,7 @@ int jitter_buffer_get(JitterBuffer *jitter, JitterBufferPacket *packet, spx_uint
       /* Check for potential overflow */
       packet->len = jitter->len[i];
       /* Copy packet */
-      for (j=0;j<(signed int)packet->len;j++)
+      for (j=0;((unsigned)j)<packet->len;j++)
          packet->data[j] = jitter->buf[i][j];
       /* Remove packet */
       speex_free(jitter->buf[i]);
@@ -424,7 +427,23 @@ void jitter_buffer_tick(JitterBuffer *jitter)
    jitter->current_timestamp += jitter->tick_size;
 }
 
-
+/* Used like the ioctl function to control the jitter buffer parameters */
+int jitter_buffer_ctl(JitterBuffer *jitter, int request, void *ptr)
+{
+   switch(request)
+   {
+      case JITTER_BUFFER_SET_MARGIN:
+         jitter->buffer_margin = *(spx_int32_t*)ptr;
+         break;
+      case JITTER_BUFFER_GET_MARGIN:
+         *(spx_int32_t*)ptr = jitter->buffer_margin;
+         break;
+      default:
+         speex_warning_int("Unknown jitter_buffer_ctl request: ", request);
+         return -1;
+   }
+   return 0;
+}
 
 
 

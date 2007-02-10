@@ -35,16 +35,15 @@
 #ifndef ARCH_H
 #define ARCH_H
 
-//#warning "----------------Arch.h-------------"
 #include "speex/speex_types.h"
-
 
 #define ABS(x) ((x) < 0 ? (-(x)) : (x))      /**< Absolute integer value. */
 #define ABS16(x) ((x) < 0 ? (-(x)) : (x))    /**< Absolute 16-bit value.  */
+#define MIN16(a,b) ((a) < (b) ? (a) : (b))   /**< Maximum 16-bit value.   */
 #define MAX16(a,b) ((a) > (b) ? (a) : (b))   /**< Maximum 16-bit value.   */
 #define ABS32(x) ((x) < 0 ? (-(x)) : (x))    /**< Absolute 32-bit value.  */
+#define MIN32(a,b) ((a) < (b) ? (a) : (b))   /**< Maximum 32-bit value.   */
 #define MAX32(a,b) ((a) > (b) ? (a) : (b))   /**< Maximum 32-bit value.   */
-#define FIXED_POINT
 
 #ifdef FIXED_POINT
 
@@ -71,6 +70,7 @@ typedef spx_word32_t spx_sig_t;
 #define VERY_SMALL 0
 #define VERY_LARGE32 ((spx_word32_t)2147483647)
 #define VERY_LARGE16 ((spx_word16_t)32767)
+#define Q15_ONE ((spx_word16_t)32767)
 
 
 #ifdef FIXED_DEBUG
@@ -79,7 +79,7 @@ typedef spx_word32_t spx_sig_t;
 
 #include "fixed_generic.h"
 
-#if defined (ARM5E_ASM)
+#ifdef ARM5E_ASM
 #include "fixed_arm5e.h"
 #elif defined (ARM4_ASM)
 #include "fixed_arm4.h"
@@ -116,6 +116,7 @@ typedef float spx_word32_t;
 #define VERY_SMALL 1e-15f
 #define VERY_LARGE32 1e15f
 #define VERY_LARGE16 1e15f
+#define Q15_ONE ((spx_word16_t)1.f)
 
 #define QCONST16(x,bits) (x)
 #define QCONST32(x,bits) (x)
@@ -130,6 +131,7 @@ typedef float spx_word32_t;
 #define SHL32(a,shift) (a)
 #define PSHR16(a,shift) (a)
 #define PSHR32(a,shift) (a)
+#define VSHR32(a,shift) (a)
 #define SATURATE16(x,a) (x)
 #define SATURATE32(x,a) (x)
 
@@ -150,6 +152,7 @@ typedef float spx_word32_t;
 #define MULT16_32_Q13(a,b)     ((a)*(b))
 #define MULT16_32_Q14(a,b)     ((a)*(b))
 #define MULT16_32_Q15(a,b)     ((a)*(b))
+#define MULT16_32_P15(a,b)     ((a)*(b))
 
 #define MAC16_32_Q11(c,a,b)     ((c)+(a)*(b))
 #define MAC16_32_Q15(c,a,b)     ((c)+(a)*(b))

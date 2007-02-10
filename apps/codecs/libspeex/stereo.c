@@ -36,7 +36,7 @@
 #include <speex/speex_stereo.h>
 #include <speex/speex_callbacks.h>
 #include "vq.h"
-#include <math_approx.h>
+#include <math.h>
 
 /*float e_ratio_quant[4] = {1, 1.26, 1.587, 2};*/
 static const float e_ratio_quant[4] = {.25f, .315f, .397f, .5f};
@@ -148,7 +148,7 @@ void speex_decode_stereo_int(spx_int16_t *data, int frame_size, SpeexStereoState
 {
    float balance, e_ratio;
    int i;
-   float e_tot=0.0, e_left, e_right, e_sum;
+   float e_tot=0, e_left, e_right, e_sum;
 
    balance=stereo->balance;
    e_ratio=stereo->e_ratio;
@@ -157,11 +157,11 @@ void speex_decode_stereo_int(spx_int16_t *data, int frame_size, SpeexStereoState
       e_tot += ((float)data[i])*data[i];
    }
    e_sum=e_tot/e_ratio;
-   e_left  = e_sum*balance / (1.0+balance);
+   e_left  = e_sum*balance / (1+balance);
    e_right = e_sum-e_left;
 
-   e_left  = spx_sqrtf(e_left/(e_tot+.01));
-   e_right = spx_sqrtf(e_right/(e_tot+.01));
+   e_left  = sqrt(e_left/(e_tot+.01));
+   e_right = sqrt(e_right/(e_tot+.01));
 
    for (i=frame_size-1;i>=0;i--)
    {
@@ -183,7 +183,7 @@ int speex_std_stereo_request_handler(SpeexBits *bits, void *state, void *data)
    if (speex_bits_unpack_unsigned(bits, 1))
       sign=-1;
    tmp = speex_bits_unpack_unsigned(bits, 5);
-   stereo->balance = spx_exp(sign*.25*tmp);
+   stereo->balance = exp(sign*.25*tmp);
 
    tmp = speex_bits_unpack_unsigned(bits, 2);
    stereo->e_ratio = e_ratio_quant[tmp];

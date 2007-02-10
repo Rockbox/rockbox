@@ -21,6 +21,8 @@
 extern "C" {
 #endif
 
+#include "../../codec.h"
+
 typedef short spx_ogg_int16_t;
 typedef unsigned short spx_ogg_uint16_t;
 typedef int spx_ogg_int32_t;

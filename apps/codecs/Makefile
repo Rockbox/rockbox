@@ -17,7 +17,7 @@ ifdef APPEXTRA
 endif
 
 ifdef SOFTWARECODECS
-   CODECLIBS = -lmad -la52 -lffmpegFLAC -lTremor -lwavpack -lmusepack -lalac -lfaad -lm4a  -lspeex
+   CODECLIBS = -lmad -la52 -lffmpegFLAC -lTremor -lwavpack -lmusepack -lalac -lfaad -lm4a -lspeex
 endif
 
 # we "borrow" the plugin LDS file
@@ -39,7 +39,7 @@ DIRS = .
 
 CODECDEPS = $(LINKCODEC) $(BUILDDIR)/libcodec.a
 
-.PHONY: libmad liba52 libffmpegFLAC libTremor  libspeex libwavpack libmusepack libalac libfaad libm4a
+.PHONY: libmad liba52 libffmpegFLAC libTremor libspeex libwavpack libmusepack libalac libfaad libm4a
 
 OUTPUT = $(SOFTWARECODECS)
 
@@ -164,9 +164,7 @@ $(BUILDDIR)/libspeex.a: libspeex
 
 libspeex:
 	$(SILENT)mkdir -p $(OBJDIR)/libspeex
-	$(call PRINTS,MAKE in Tremor)$(MAKE) -C libspeex OBJDIR=$(OBJDIR)/libspeex OUTPUT=$(BUILDDIR)/libspeex.a
- 
- 
+	$(call PRINTS,MAKE in libspeex)$(MAKE) -C libspeex OBJDIR=$(OBJDIR)/libspeex OUTPUT=$(BUILDDIR)/libspeex.a
 
 $(BUILDDIR)/libwavpack.a: libwavpack
 

@@ -14,7 +14,7 @@ ifdef APPEXTRA
    INCLUDES += $(patsubst %,-I$(APPSDIR)/%,$(subst :, ,$(APPEXTRA)))
 endif
 
-SPEEXOPTS = -O
+SPEEXOPTS = -O -DHAVE_CONFIG_H
 CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET_INC) $(SPEEXOPTS) $(TARGET)	\
 $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE} ${PROFILE_OPTS} -Wno-unused-parameter
 

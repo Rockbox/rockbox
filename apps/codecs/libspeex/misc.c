@@ -34,14 +34,10 @@
 #include "config.h"
 #endif
 
-#include "../codecs.h"
-
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include "misc.h"
-
-
 
 #ifdef USER_MISC
 #include "user_misc.h"
@@ -51,16 +47,14 @@
 #include "misc_bfin.h"
 #endif
 
-//static struct codec_api *rb;//defined in decoder api speex.c
-
 #ifndef RELEASE
 void print_vec(float *vec, int len, char *name)
 {
-/*   int i;
+   int i;
    printf ("%s ", name);
    for (i=0;i<len;i++)
       printf (" %f", vec[i]);
-   printf ("\n");*/
+   printf ("\n");
 }
 #endif
 
@@ -72,7 +66,7 @@ long long spx_mips=0;
 spx_uint32_t be_int(spx_uint32_t i)
 {
    spx_uint32_t ret=i;
-#ifndef ROCKBOX_BIG_ENDIAN
+#ifndef WORDS_BIGENDIAN
    ret =  i>>24;
    ret += (i>>8)&0x0000ff00;
    ret += (i<<8)&0x00ff0000;
@@ -84,7 +78,7 @@ spx_uint32_t be_int(spx_uint32_t i)
 spx_uint32_t le_int(spx_uint32_t i)
 {
    spx_uint32_t ret=i;
-#ifdef ROCKBOX_BIG_ENDIAN
+#ifdef WORDS_BIGENDIAN
    ret =  i>>24;
    ret += (i>>8)&0x0000ff00;
    ret += (i<<8)&0x00ff0000;
@@ -93,86 +87,38 @@ spx_uint32_t le_int(spx_uint32_t i)
    return ret;
 }
 
-#if BYTES_PER_CHAR == 2
-void speex_memcpy_bytes(char *dst, char *src, int nbytes)
-{
-  int i;
-  int nchars = nbytes/BYTES_PER_CHAR;
-  for (i=0;i<nchars;i++)
-    dst[i]=src[i];
-  if (nbytes & 1) {
-    /* copy in the last byte */
-    int last_i = nchars;
-    char last_dst_char = dst[last_i];
-    char last_src_char = src[last_i];
-    last_dst_char &= 0xff00;
-    last_dst_char |= (last_src_char & 0x00ff);
-    dst[last_i] = last_dst_char;
-  }
-}
-void speex_memset_bytes(char *dst, char c, int nbytes)
-{
-  int i;
-  spx_int16_t cc = ((c << 8) | c);
-  int nchars = nbytes/BYTES_PER_CHAR;
-  for (i=0;i<nchars;i++)
-    dst[i]=cc;
-  if (nbytes & 1) {
-    /* copy in the last byte */
-    int last_i = nchars;
-    char last_dst_char = dst[last_i];
-    last_dst_char &= 0xff00;
-    last_dst_char |= (c & 0x00ff);
-    dst[last_i] = last_dst_char;
-  }
-}
-#else
-void speex_memcpy_bytes(char *dst, char *src, int nbytes)
-{
-  memcpy(dst, src, nbytes);
-}
-void speex_memset_bytes(char *dst, char src, int nbytes)
-{
-  memset(dst, src, nbytes);
-}
-#endif
-
 #ifndef OVERRIDE_SPEEX_ALLOC
 void *speex_alloc (int size)
 {
-   //printf("CLC:%d\n",size);
-   return codec_calloc(size,1);
+   return calloc(size,1);
 }
 #endif
 
 #ifndef OVERRIDE_SPEEX_ALLOC_SCRATCH
 void *speex_alloc_scratch (int size)
 {
-   //printf("CLCS:%d\n",size);
-   return codec_calloc(size,1);
+   return calloc(size,1);
 }
 #endif
 
 #ifndef OVERRIDE_SPEEX_REALLOC
 void *speex_realloc (void *ptr, int size)
 {
-   //printf("CLCR:%d\n",size);
-   return codec_realloc(ptr, size);
+   return realloc(ptr, size);
 }
 #endif
 
 #ifndef OVERRIDE_SPEEX_FREE
 void speex_free (void *ptr)
 {
-   //printf("CLF:%d\n",ptr);
-   codec_free(ptr);
+   free(ptr);
 }
 #endif
 
 #ifndef OVERRIDE_SPEEX_FREE_SCRATCH
 void speex_free_scratch (void *ptr)
 {
-   codec_free(ptr);
+   free(ptr);
 }
 #endif
 
@@ -186,60 +132,50 @@ void *speex_move (void *dest, void *src, int n)
 #ifndef OVERRIDE_SPEEX_ERROR
 void speex_error(const char *str)
 {
-   //fprintf ("Fatal error: %s\n", str);
-   //exit(1);
+   fprintf (stderr, "Fatal error: %s\n", str);
+   exit(1);
 }
 #endif
 
 #ifndef OVERRIDE_SPEEX_WARNING
 void speex_warning(const char *str)
 {
-   //fprintf ("warning: %s\n", str);
+   fprintf (stderr, "warning: %s\n", str);
 }
 #endif
 
 #ifndef OVERRIDE_SPEEX_WARNING_INT
 void speex_warning_int(const char *str, int val)
 {
-   //printf ("warning: %s %d\n", str, val);
+   fprintf (stderr, "warning: %s %d\n", str, val);
 }
 #endif
 
-#define FIXED_POINT
 #ifdef FIXED_POINT
 spx_word16_t speex_rand(spx_word16_t std, spx_int32_t *seed)
 {
-//    spx_word32_t res;
-//    *seed = 1664525 * *seed + 1013904223;
-//    res = MULT16_16(EXTRACT16(SHR32(*seed,16)),std);
-//    return PSHR32(SUB32(res, SHR(res, 3)),14);
-      return 0;
+   spx_word32_t res;
+   *seed = 1664525 * *seed + 1013904223;
+   res = MULT16_16(EXTRACT16(SHR32(*seed,16)),std);
+   return EXTRACT16(PSHR32(SUB32(res, SHR32(res, 3)),14));
 }
 #else
 spx_word16_t speex_rand(spx_word16_t std, spx_int32_t *seed)
 {
-//    const unsigned int jflone = 0x3f800000;
-//    const unsigned int jflmsk = 0x007fffff;
-//    union {int i; float f;} ran;
-//    *seed = 1664525 * *seed + 1013904223;
-//    ran.i = jflone | (jflmsk & *seed);
-//    ran.f -= 1.5;
-//    return 3.4642*std*ran.f;
-      return 0;
+   const unsigned int jflone = 0x3f800000;
+   const unsigned int jflmsk = 0x007fffff;
+   union {int i; float f;} ran;
+   *seed = 1664525 * *seed + 1013904223;
+   ran.i = jflone | (jflmsk & *seed);
+   ran.f -= 1.5;
+   return 3.4642*std*ran.f;
 }
 #endif
-/*#define RAND_MAX_VEC 32767*/
-void speex_rand_vec(float std, spx_sig_t *data, int len)
-{
-/*   int i;
-   for (i=0;i<len;i++)
-      data[i]+=SIG_SCALING*3*std*((((float)(speex_rand(RAND_MAX_VEC,10)))/RAND_MAX_VEC)-.5);*/
-}
 
- #ifndef OVERRIDE_SPEEX_PUTC
- void _speex_putc(int ch, void *file)
- {
-    //FILE *f = (FILE *)file;
-    //printf("%c", ch);
- }
- #endif
+#ifndef OVERRIDE_SPEEX_PUTC
+void _speex_putc(int ch, void *file)
+{
+   FILE *f = (FILE *)file;
+   fprintf(f, "%c", ch);
+}
+#endif

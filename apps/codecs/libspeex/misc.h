@@ -40,10 +40,7 @@
 #define SPEEX_MINOR_VERSION 1         /**< Minor Speex version. */
 #define SPEEX_MICRO_VERSION 13        /**< Micro Speex version. */
 #define SPEEX_EXTRA_VERSION ""        /**< Extra Speex version. */
-#define SPEEX_VERSION "speex-1.2-beta1"  /**< Speex version string. */
-#define FIXED_POINT
-//#define EPIC_48K
-
+#define SPEEX_VERSION "speex-1.2beta1"  /**< Speex version string. */
 #endif
 
 /* A couple test to catch stupid option combinations */
@@ -65,35 +62,11 @@
 #error I suppose you can have a [ARM4/ARM5E/Blackfin] that has float instructions?
 #endif
 #ifdef FIXED_POINT_DEBUG
-#error Don't you think enabling fixed-point is a good thing to do if you want to debug that?
+#error "Don't you think enabling fixed-point is a good thing to do if you want to debug that?"
 #endif
 
 
 #endif
-
-#include "../codec.h"
-#include "../lib/codeclib.h"
-
-extern struct codec_api* rb;
-
-#if defined(DEBUG) || defined(SIMULATOR)
-#undef DEBUGF
-#define DEBUGF rb->debugf
-#else
-#define DEBUGF(...)
-#endif
-
-#ifdef ROCKBOX_HAS_LOGF
-#undef LOGF
-#define LOGF rb->logf
-#else
-#define LOGF(...)
-#endif
-
-#ifdef CPU_ARM
-#define ARM4_ASM
-#endif
-
 
 #include "arch.h"
 
@@ -124,12 +97,6 @@ void speex_free_scratch (void *ptr);
 
 /** Speex wrapper for mem_move */
 void *speex_move (void *dest, void *src, int n);
-
-/** Speex wrapper for memcpy */
-void speex_memcpy_bytes(char *dst, char *src, int nbytes);
-
-/** Speex wrapper for memset */
-void speex_memset_bytes(char *dst, char src, int nbytes);
 
 /** Print error message to stderr */
 void speex_error(const char *str);

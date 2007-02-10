@@ -35,37 +35,28 @@
 #ifndef MATH_APPROX_H
 #define MATH_APPROX_H
 
-
 #include "misc.h"
 
-#ifdef FIXED_POINT
 spx_word16_t spx_cos(spx_word16_t x);
+spx_int16_t spx_ilog2(spx_uint32_t x);
+spx_int16_t spx_ilog4(spx_uint32_t x);
+#ifdef FIXED_POINT
 spx_word16_t spx_sqrt(spx_word32_t x);
-float spx_sqrtf(float arg);
 spx_word16_t spx_acos(spx_word16_t x);
-float spx_floor(float x);
-float spx_exp(float x);
-extern const float exp_lookup_int[];
-/** Returns: Math.exp((idx-10) / 8.0) Range:0-32*/
-static inline float spx_exp_lookup(int xf){
-	return exp_lookup_int[xf];
-}
-//Placeholders:
-float pow(float a,float b);
-float log(float l);
-float fabs(float l);
-float sin(float l);
-//float floor(float l);
+spx_word32_t spx_exp(spx_word16_t x);
+spx_word16_t spx_cos_norm(spx_word32_t x);
 
-#define floor spx_floor
-#define exp spx_exp
-#define sqrt spx_sqrt
-#define acos spx_acos
-#define cos spx_cos
+/* Input in Q15, output in Q14 */
+spx_word16_t spx_atan(spx_word32_t x);
 
 #else
+
 #define spx_sqrt sqrt
 #define spx_acos acos
+#define spx_exp exp
+#define spx_cos_norm(x) (cos((.5f*M_PI)*(x)))
+#define spx_atan atan
+
 #endif
 
 #endif

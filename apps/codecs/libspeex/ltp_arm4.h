@@ -173,9 +173,9 @@ void pitch_xcorr(const spx_word16_t *_x, const spx_word16_t *_y, spx_word32_t *c
          "=r" (part1),  "=r" (part2),  "=r" (part3),  "=r" (part4),
          "=r" (x), "=r" (y), "=r" (x0),
          "=m" (sum1), "=m" (sum2), "=m" (sum3), "=m" (sum4), "=r" (dead1)
-            : "m" (y0), "m" (y1), "m" (y2), "m" (y3),
-            "m" (x), "m" (y),
-            "m" (sum1), "m" (sum2), "m" (sum3), "m" (sum4)
+            : "0" (y0), "1" (y1), "2" (y2), "3" (y3),
+            "8" (x), "9" (y),
+            "11" (sum1), "12" (sum2), "13" (sum3), "14" (sum4)
             : "cc", "memory"
                               );
       }
