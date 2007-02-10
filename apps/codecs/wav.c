@@ -225,9 +225,9 @@ enum codec_status codec_main(void)
     
  
     /* Generic codec initialisation */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)28);
-    ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
-    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*256));
+    ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
+    ci->configure(CODEC_SET_FILEBUF_WATERMARK, 1024*512);
+    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*256);
   
 next_track:
     if (codec_init()) {
@@ -379,11 +379,11 @@ next_track:
         goto done;
     }
 
-    ci->configure(DSP_SWITCH_FREQUENCY, (long *)(ci->id3->frequency));
+    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
     if (channels == 2) {
-        ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_INTERLEAVED);
+        ci->configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
     } else if (channels == 1) {
-        ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_MONO);
+        ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
     } else {
         DEBUGF("CODEC_ERROR: more than 2 channels\n");
         i = CODEC_ERROR;

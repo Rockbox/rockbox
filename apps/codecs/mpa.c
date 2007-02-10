@@ -78,10 +78,10 @@ enum codec_status codec_main(void)
 
     /* Create a decoder instance */
 
-    ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(MAD_F_FRACBITS));
-    ci->configure(DSP_SET_CLIP_MIN, (int *)-MAD_F_ONE);
-    ci->configure(DSP_SET_CLIP_MAX, (int *)(MAD_F_ONE - 1));
-    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*16));
+    ci->configure(DSP_SET_SAMPLE_DEPTH, MAD_F_FRACBITS);
+    ci->configure(DSP_SET_CLIP_MIN, -MAD_F_ONE);
+    ci->configure(DSP_SET_CLIP_MAX, MAD_F_ONE - 1);
+    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*16);
 
 next_track:
     status = CODEC_OK;
@@ -93,7 +93,7 @@ next_track:
     while (!*ci->taginfo_ready && !ci->stop_codec)
         ci->sleep(1);
 
-    ci->configure(DSP_SWITCH_FREQUENCY, (int *)ci->id3->frequency);
+    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
     current_frequency = ci->id3->frequency;
     codec_set_replaygain(ci->id3);
     
@@ -212,16 +212,16 @@ next_track:
         /* Check if sample rate and stereo settings changed in this frame. */
         if (frame.header.samplerate != current_frequency) {
             current_frequency = frame.header.samplerate;
-            ci->configure(DSP_SWITCH_FREQUENCY, (int *)current_frequency);
+            ci->configure(DSP_SWITCH_FREQUENCY, current_frequency);
         }
         if (MAD_NCHANNELS(&frame.header) == 2) {
             if (current_stereo_mode != STEREO_NONINTERLEAVED) {
-                ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_NONINTERLEAVED);
+                ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
                 current_stereo_mode = STEREO_NONINTERLEAVED;
             }
         } else {
             if (current_stereo_mode != STEREO_MONO) {
-                ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_MONO);
+                ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
                 current_stereo_mode = STEREO_MONO;
             }
         }

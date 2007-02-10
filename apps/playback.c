@@ -1663,7 +1663,7 @@ static void codec_seek_complete_callback(void)
     {
         /* If this is not a seamless seek, clear the buffer */
         pcmbuf_play_stop();
-        dsp_configure(DSP_FLUSH, NULL);
+        dsp_configure(DSP_FLUSH, 0);
 
         /* If playback was not 'deliberately' paused, unpause now */
         if (!paused)
@@ -1729,20 +1729,20 @@ static bool codec_seek_buffer_callback(size_t newpos)
     return true;
 }
 
-static void codec_configure_callback(int setting, void *value)
+static void codec_configure_callback(int setting, intptr_t value)
 {
     switch (setting) {
     case CODEC_SET_FILEBUF_WATERMARK:
-        conf_watermark = (unsigned long)value;
+        conf_watermark = value;
         set_filebuf_watermark(buffer_margin);
         break;
 
     case CODEC_SET_FILEBUF_CHUNKSIZE:
-        conf_filechunk = (unsigned long)value;
+        conf_filechunk = value;
         break;
 
     case CODEC_SET_FILEBUF_PRESEEK:
-        conf_preseek = (unsigned long)value;
+        conf_preseek = value;
         break;
 
     default:

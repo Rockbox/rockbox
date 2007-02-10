@@ -128,7 +128,7 @@ void sound_set_pitch(int permille)
 {
     pitch_ratio = permille;
     
-    dsp_configure(DSP_SWITCH_FREQUENCY, (int *)dsp->codec_frequency);
+    dsp_configure(DSP_SWITCH_FREQUENCY, dsp->codec_frequency);
 }
 
 /* Convert at most count samples to the internal format, if needed. Returns
@@ -844,7 +844,7 @@ int dsp_stereo_mode(void)
     return dsp->stereo_mode;
 }
 
-bool dsp_configure(int setting, void *value)
+bool dsp_configure(int setting, intptr_t value)
 {
     dsp = &dsp_conf[current_codec];
 
@@ -855,7 +855,7 @@ bool dsp_configure(int setting, void *value)
             sizeof(struct resample_data));
         /* Fall through!!! */
     case DSP_SWITCH_FREQUENCY:
-        dsp->codec_frequency = ((long) value == 0) ? NATIVE_FREQUENCY : (long) value;
+        dsp->codec_frequency = (value == 0) ? NATIVE_FREQUENCY : value;
         /* Account for playback speed adjustment when setting dsp->frequency
            if we're called from the main audio thread. Voice UI thread should
            not need this feature.
@@ -868,15 +868,15 @@ bool dsp_configure(int setting, void *value)
         break;
 
     case DSP_SET_CLIP_MIN:
-        dsp->clip_min = (long) value;
+        dsp->clip_min = value;
         break;
 
     case DSP_SET_CLIP_MAX:
-        dsp->clip_max = (long) value;
+        dsp->clip_max = value;
         break;
 
     case DSP_SET_SAMPLE_DEPTH:
-        dsp->sample_depth = (long) value;
+        dsp->sample_depth = value;
  
         if (dsp->sample_depth <= NATIVE_DEPTH)
         {
@@ -887,10 +887,10 @@ bool dsp_configure(int setting, void *value)
         }
         else
         {
-            dsp->frac_bits = (long) value;
+            dsp->frac_bits = value;
             dsp->sample_bytes = 4; /* samples are 32 bits */
-            dsp->clip_max = (1 << (long)value) - 1;
-            dsp->clip_min = -(1 << (long)value);
+            dsp->clip_max = (1 << value) - 1;
+            dsp->clip_min = -(1 << value);
         }
 
         dither_init(); 

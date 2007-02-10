@@ -1216,8 +1216,8 @@ enum codec_status codec_main(void)
     int nSamplesToRender = 0;
 
     /* Generic codec initialisation */
-    ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
-    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*256));
+    ci->configure(CODEC_SET_FILEBUF_WATERMARK, 1024*512);
+    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*256);
 
 next_track:
     if (codec_init()) {
@@ -1246,11 +1246,11 @@ next_track:
     
 
     /* Make use of 44.1khz */
-    ci->configure(DSP_SWITCH_FREQUENCY, (long *)44100);
+    ci->configure(DSP_SWITCH_FREQUENCY, 44100);
     /* Sample depth is 28 bit host endian */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)28);
+    ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
     /* Mono output */
-    ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_MONO);
+    ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
 
     
     /* Set the elapsed time to the current subsong (in seconds) */

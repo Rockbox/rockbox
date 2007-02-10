@@ -164,7 +164,7 @@ struct codec_api {
     
     void (*set_offset)(size_t value);
     /* Configure different codec buffer parameters. */
-    void (*configure)(int setting, void *value);
+    void (*configure)(int setting, intptr_t value);
 
     void (*splash)(int ticks, bool center, const unsigned char *fmt, ...);
 

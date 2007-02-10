@@ -51,11 +51,11 @@ enum codec_status codec_main(void)
     unsigned char c = 0;
 
     /* Generic codec initialisation */
-    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*16));
-    ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
+    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*16);
+    ci->configure(CODEC_SET_FILEBUF_WATERMARK, 1024*512);
 
-    ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_NONINTERLEAVED);
-    ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(29));
+    ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
+    ci->configure(DSP_SET_SAMPLE_DEPTH, 29);
 
 next_track:
     err = CODEC_OK;
@@ -71,7 +71,7 @@ next_track:
   
     sound_samples_done = ci->id3->offset;
 
-    ci->configure(DSP_SWITCH_FREQUENCY, (long *)(ci->id3->frequency));
+    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
     codec_set_replaygain(ci->id3);
 
     stream_create(&input_stream,ci);

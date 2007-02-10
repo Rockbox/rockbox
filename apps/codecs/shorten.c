@@ -45,11 +45,11 @@ enum codec_status codec_main(void)
     size_t bytesleft;
 
     /* Generic codec initialisation */
-    ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
-    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*128));
+    ci->configure(CODEC_SET_FILEBUF_WATERMARK, 1024*512);
+    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*128);
 
-    ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_NONINTERLEAVED);
-    ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(SHN_OUTPUT_DEPTH-1));
+    ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
+    ci->configure(DSP_SET_SAMPLE_DEPTH, SHN_OUTPUT_DEPTH-1);
     
 next_track:
     /* Codec initialization */
@@ -79,7 +79,7 @@ next_track:
     }
 
     ci->id3->frequency = sc.sample_rate;
-    ci->configure(DSP_SWITCH_FREQUENCY, (long *)(long)(sc.sample_rate));
+    ci->configure(DSP_SWITCH_FREQUENCY, sc.sample_rate);
 
     if (sc.sample_rate) {
         ci->id3->length = (sc.totalsamples / sc.sample_rate) * 1000;

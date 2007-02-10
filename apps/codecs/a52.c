@@ -122,9 +122,9 @@ enum codec_status codec_main(void)
     int retval;
 
     /* Generic codec initialisation */
-    ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_NONINTERLEAVED);
-    ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)28);
-    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (long *)(1024*128));
+    ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
+    ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
+    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*128);
 
 next_track:
     if (codec_init()) {
@@ -135,7 +135,7 @@ next_track:
     while (!ci->taginfo_ready)
         ci->yield();
     
-    ci->configure(DSP_SWITCH_FREQUENCY, (long *)(ci->id3->frequency));
+    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
     
     /* Intialise the A52 decoder and check for success */
     state = a52_init(0);

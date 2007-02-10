@@ -210,7 +210,7 @@ int dsp_process(char *dest, const char *src[], int count);
 int dsp_input_count(int count);
 int dsp_output_count(int count);
 int dsp_stereo_mode(void);
-bool dsp_configure(int setting, void *value);
+bool dsp_configure(int setting, intptr_t value);
 void dsp_set_replaygain(bool always);
 void dsp_set_crossfeed(bool enable);
 void dsp_set_crossfeed_direct_gain(int gain);

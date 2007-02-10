@@ -54,8 +54,8 @@ enum codec_status codec_main(void)
 
     /* Generic codec initialisation */
     /* we only render 16 bits */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)16);
-    /*ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*256));*/
+    ci->configure(DSP_SET_SAMPLE_DEPTH, 16);
+    /*ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*256);*/
   
 next_track:
     DEBUGF("ADX: next_track\n");
@@ -73,7 +73,7 @@ next_track:
         
     /* Read the entire file (or as much as possible) */
     DEBUGF("ADX: request initial buffer\n");
-    ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(ci->filesize));
+    ci->configure(CODEC_SET_FILEBUF_WATERMARK, ci->filesize);
     ci->seek_buffer(0);
     buf = ci->request_buffer(&n, ci->filesize);
     if (!buf || n < 0x38) {
@@ -155,11 +155,11 @@ next_track:
     bufoff = chanstart;
 
     /* setup pcm buffer format */
-    ci->configure(DSP_SWITCH_FREQUENCY, (long *)(ci->id3->frequency));
+    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
     if (channels == 2) {
-        ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_INTERLEAVED);
+        ci->configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
     } else if (channels == 1) {
-        ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_MONO);
+        ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
     } else {
         DEBUGF("ADX CODEC_ERROR: more than 2 channels\n");
         return CODEC_ERROR;

@@ -77,9 +77,9 @@ enum codec_status codec_main(void)
     mpc_streaminfo info;
     int retval = CODEC_OK;
     
-    ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)(28));
-    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (long *)(1024*16));
-    ci->configure(CODEC_SET_FILEBUF_PRESEEK, (long *)(0));
+    ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
+    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*16);
+    ci->configure(CODEC_SET_FILEBUF_PRESEEK, 0);
     
     /* Create a decoder instance */
     reader.read = read_impl;
@@ -107,15 +107,15 @@ next_track:
         goto done;
     }
     frequency = info.sample_freq / 1000;
-    ci->configure(DSP_SWITCH_FREQUENCY, (long *)(long)info.sample_freq);
+    ci->configure(DSP_SWITCH_FREQUENCY, info.sample_freq);
         
     /* set playback engine up for correct number of channels */
     /* NOTE: current musepack format only allows for stereo files
        but code is here to handle other configurations anyway */
     if (info.channels == 2)
-        ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_NONINTERLEAVED);
+        ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
     else if (info.channels == 1)
-        ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_MONO);
+        ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
     else {
        retval = CODEC_ERROR;
        goto done;
@@ -136,7 +136,7 @@ next_track:
        /* Complete seek handler. */
         if (ci->seek_time) {
             /* hack to improve seek time if filebuf goes empty */
-            ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (long *)(1024*512));
+            ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*512);
             mpc_int64_t new_offset = (ci->seek_time - 1)*frequency;
             if (mpc_decoder_seek_sample(&decoder, new_offset)) {
                 samplesdone = new_offset;
@@ -144,7 +144,7 @@ next_track:
             }
             ci->seek_complete();
             /* reset chunksize */
-            ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (long *)(1024*16));
+            ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*16);
 
         }
         #else

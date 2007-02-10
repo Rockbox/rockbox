@@ -42,10 +42,10 @@ enum codec_status codec_main(void)
     int retval;
 
     /* Generic codec initialisation */
-    ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
-    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*128));
+    ci->configure(CODEC_SET_FILEBUF_WATERMARK, 1024*512);
+    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*128);
   
-    ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(28));
+    ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
 
     next_track:
 
@@ -57,7 +57,7 @@ enum codec_status codec_main(void)
     while (!*ci->taginfo_ready && !ci->stop_codec)
         ci->sleep(1);
         
-    ci->configure(DSP_SWITCH_FREQUENCY, (long *)(ci->id3->frequency));
+    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
     codec_set_replaygain(ci->id3);
    
     /* Create a decoder instance */
@@ -70,7 +70,7 @@ enum codec_status codec_main(void)
 
     bps = WavpackGetBytesPerSample (wpc);
     nchans = WavpackGetReducedChannels (wpc);
-    ci->configure(DSP_SET_STEREO_MODE, nchans == 2 ? (int *)STEREO_INTERLEAVED : (int *)STEREO_MONO);
+    ci->configure(DSP_SET_STEREO_MODE, nchans == 2 ? STEREO_INTERLEAVED : STEREO_MONO);
     sr_100 = ci->id3->frequency / 100;
 
     ci->set_elapsed (0);

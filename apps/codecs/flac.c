@@ -425,10 +425,10 @@ enum codec_status codec_main(void)
     int retval;
 
     /* Generic codec initialisation */
-    ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
-    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*128));
+    ci->configure(CODEC_SET_FILEBUF_WATERMARK, 1024*512);
+    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*128);
 
-    ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(FLAC_OUTPUT_DEPTH-1));
+    ci->configure(DSP_SET_SAMPLE_DEPTH, FLAC_OUTPUT_DEPTH-1);
 
     next_track:
         
@@ -450,9 +450,9 @@ enum codec_status codec_main(void)
     while (!*ci->taginfo_ready && !ci->stop_codec)
         ci->sleep(1);
     
-    ci->configure(DSP_SWITCH_FREQUENCY, (int *)(ci->id3->frequency));
+    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
     ci->configure(DSP_SET_STEREO_MODE, fc.channels == 1 ?
-                  (int *)STEREO_MONO : (int *)STEREO_NONINTERLEAVED);
+                  STEREO_MONO : STEREO_NONINTERLEAVED);
     codec_set_replaygain(ci->id3);
 
     if (samplesdone) {

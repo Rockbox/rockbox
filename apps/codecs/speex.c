@@ -369,9 +369,9 @@ static void *process_header(spx_ogg_packet *op,
     *nframes = header->frames_per_packet;
 
     if (*channels == 2) {
-        rb->configure(DSP_SET_STEREO_MODE, (int *)STEREO_INTERLEAVED);
+        rb->configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
     } else if (*channels == 1) {
-        rb->configure(DSP_SET_STEREO_MODE, (int *)STEREO_MONO);
+        rb->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
     }
 
     *extra_headers = header->extra_headers;
@@ -409,9 +409,9 @@ enum codec_status codec_main(void)
     int j;
     rb = ci;
 
-    //rb->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (long *)(CHUNKSIZE*128));
-    //rb->configure(DSP_DITHER, (bool *)false);
-    rb->configure(DSP_SET_SAMPLE_DEPTH, (long *)16);
+    //rb->configure(CODEC_SET_FILEBUF_CHUNKSIZE, CHUNKSIZE*128);
+    //rb->configure(DSP_DITHER, false);
+    rb->configure(DSP_SET_SAMPLE_DEPTH, 16);
 
     /* We need to flush reserver memory every track load. */
 next_track:
@@ -501,7 +501,7 @@ next_page:
 
                     rb->id3->vbr = true;
                     rb->id3->frequency = samplerate;
-                    rb->configure(DSP_SET_FREQUENCY, (int *)(rb->id3->frequency));
+                    rb->configure(DSP_SET_FREQUENCY, rb->id3->frequency);
 
                     /* Speex header in its own page, add the whole page
                        headersize */

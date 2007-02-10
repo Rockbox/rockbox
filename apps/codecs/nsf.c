@@ -4321,10 +4321,10 @@ enum codec_status codec_main(void)
     int usingplaylist;
 
     /* we only render 16 bits */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)16);
+    ci->configure(DSP_SET_SAMPLE_DEPTH, 16);
 
-    ci->configure(DSP_SET_FREQUENCY, (long*)44100);
-    ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_MONO);
+    ci->configure(DSP_SET_FREQUENCY, 44100);
+    ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
     
     RebuildOutputTables();
 

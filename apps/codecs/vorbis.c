@@ -83,13 +83,13 @@ bool vorbis_set_codec_parameters(OggVorbis_File *vf)
         return false;
     }
 
-    ci->configure(DSP_SWITCH_FREQUENCY, (int *)ci->id3->frequency);
+    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
     codec_set_replaygain(ci->id3);
 
     if (vi->channels == 2) {
-          ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_NONINTERLEAVED);
+          ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
     } else if (vi->channels == 1) {
-          ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_MONO);
+          ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
     }
 
     return true;
@@ -112,9 +112,9 @@ enum codec_status codec_main(void)
     ogg_uint32_t vf_serialnos;
     ogg_int64_t vf_pcmlengths[2];
 
-    ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)24);
-    ci->configure(DSP_SET_CLIP_MAX, (long *)((1 << 24) - 1));
-    ci->configure(DSP_SET_CLIP_MIN, (long *)-((1 << 24) - 1));
+    ci->configure(DSP_SET_SAMPLE_DEPTH, 24);
+    ci->configure(DSP_SET_CLIP_MAX, (1 << 24) - 1);
+    ci->configure(DSP_SET_CLIP_MIN, -((1 << 24) - 1));
     /* Note: These are sane defaults for these values.  Perhaps
      * they should be set differently based on quality setting
      */
@@ -122,7 +122,7 @@ enum codec_status codec_main(void)
     /* The chunk size below is magic.  If set any lower, resume
      * doesn't work properly (ov_raw_seek() does the wrong thing).
      */
-    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (long *)(1024*256));
+    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*256);
 
 /* We need to flush reserver memory every track load. */
 next_track:
