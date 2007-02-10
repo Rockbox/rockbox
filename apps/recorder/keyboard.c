@@ -574,7 +574,7 @@ int kbd_input(char* text, int buflen)
         screens[l].update();
 
         button = get_action(CONTEXT_KEYBOARD,HZ/2);
-#ifdef KBD_MORSE_INPUT
+#if defined KBD_MORSE_INPUT && !defined KBD_MODES
         if (morse_mode)
         {
             /* Remap some buttons for morse mode. */
@@ -631,12 +631,13 @@ int kbd_input(char* text, int buflen)
 #endif
 
             case ACTION_KBD_RIGHT:
-#ifdef KBD_MORSE_INPUT
-                if (morse_mode)
-                    break;
-#endif
 #ifdef KBD_MODES
+#ifdef KBD_MORSE_INPUT
+                if (line_edit || morse_mode) /* allow cursor change in non line
+                                                edit morse mode */
+#else
                 if (line_edit) /* right doubles as cursor_right in line_edit */
+#endif
                 {
                     if (hangul)
                         hangul = false;
@@ -651,6 +652,10 @@ int kbd_input(char* text, int buflen)
                 else
 #endif
                 {
+#ifdef KBD_MORSE_INPUT
+                    if (morse_mode)
+                        break;
+#endif
                     FOR_NB_SCREENS(l)
                     {
                         if (++param[l].x == param[l].max_chars) {
@@ -668,12 +673,13 @@ int kbd_input(char* text, int buflen)
                 break;
 
             case ACTION_KBD_LEFT:
-#ifdef KBD_MORSE_INPUT
-                if (morse_mode)
-                    break;
-#endif
 #ifdef KBD_MODES
+#ifdef KBD_MORSE_INPUT
+                if (line_edit || morse_mode) /* allow cursor change in non line
+                                                edit morse mode */
+#else
                 if (line_edit) /* left doubles as cursor_left in line_edit */
+#endif
                 {
                     if (hangul)
                         hangul = false;
@@ -688,6 +694,10 @@ int kbd_input(char* text, int buflen)
                 else
 #endif
                 {
+#ifdef KBD_MORSE_INPUT
+                    if (morse_mode)
+                        break;
+#endif
                     FOR_NB_SCREENS(l)
                     {
                         if (param[l].x)
