@@ -303,6 +303,22 @@ static long parse_tag(const char* name, char* value, struct mp3entry* id3,
     {
         p = &(id3->composer);
     }
+    else if (strcasecmp(name, "comment") == 0)
+    {
+        p = &(id3->comment);
+    }
+    else if (strcasecmp(name, "albumartist") == 0)
+    {
+        p = &(id3->albumartist);
+    }
+    else if (strcasecmp(name, "album artist") == 0)
+    {
+        p = &(id3->albumartist);
+    }
+    else if (strcasecmp(name, "ensemble") == 0)
+    {
+        p = &(id3->albumartist);
+    }
     else
     {
         len = parse_replaygain(name, value, id3, buf, buf_remaining);

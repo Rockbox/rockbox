@@ -102,18 +102,22 @@ static long tempbuf_left; /* Buffer space left. */
 static long tempbuf_pos;
 
 /* Tags we want to get sorted (loaded to the tempbuf). */
-static const int sorted_tags[] = { tag_artist, tag_album, tag_genre, tag_composer, tag_title };
+static const int sorted_tags[] = { tag_artist, tag_album, tag_genre, 
+    tag_composer, tag_comment, tag_albumartist, tag_title };
 
 /* Uniqued tags (we can use these tags with filters and conditional clauses). */
-static const int unique_tags[] = { tag_artist, tag_album, tag_genre, tag_composer };
+static const int unique_tags[] = { tag_artist, tag_album, tag_genre, 
+    tag_composer, tag_comment, tag_albumartist };
 
 /* Numeric tags (we can use these tags with conditional clauses). */
-static const int numeric_tags[] = { tag_year, tag_tracknumber, tag_length, tag_bitrate,
-    tag_playcount, tag_playtime, tag_lastplayed, tag_virt_autoscore };
+static const int numeric_tags[] = { tag_year, tag_tracknumber, tag_length, 
+    tag_bitrate, tag_playcount, tag_playtime, tag_lastplayed, 
+    tag_virt_autoscore };
 
+/* String presentation of the tags defined in tagcache.h. Must be in correct order! */
 static const char *tags_str[] = { "artist", "album", "genre", "title", 
-    "filename", "composer", "year", "tracknumber", "bitrate", "length",
-    "playcount", "playtime", "lastplayed" };
+    "filename", "composer", "comment", "albumartist", "year", "tracknumber", 
+    "bitrate", "length", "playcount", "playtime", "lastplayed" };
 
 /* Status information of the tagcache. */
 static struct tagcache_stat tc_stat;
@@ -1393,6 +1397,8 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
     id3->album = get_tag(entry, tag_album)->tag_data;
     id3->genre_string = get_tag(entry, tag_genre)->tag_data;
     id3->composer = get_tag(entry, tag_composer)->tag_data;
+    id3->comment = get_tag(entry, tag_comment)->tag_data;
+    id3->albumartist = get_tag(entry, tag_albumartist)->tag_data;
     id3->year = get_tag_numeric(entry, tag_year);
     id3->tracknum = get_tag_numeric(entry, tag_tracknumber);
     id3->bitrate = get_tag_numeric(entry, tag_bitrate);
@@ -1550,6 +1556,8 @@ static void add_tagcache(char *path)
     ADD_TAG(entry, tag_album, &track.id3.album);
     ADD_TAG(entry, tag_genre, &genrestr);
     ADD_TAG(entry, tag_composer, &track.id3.composer);
+    ADD_TAG(entry, tag_comment, &track.id3.comment);
+    ADD_TAG(entry, tag_albumartist, &track.id3.albumartist);
     entry.data_length = offset;
     
     /* Write the header */
@@ -1562,6 +1570,8 @@ static void add_tagcache(char *path)
     write_item(track.id3.album);
     write_item(genrestr);
     write_item(track.id3.composer);
+    write_item(track.id3.comment);
+    write_item(track.id3.albumartist);
     total_entry_count++;    
 }
 
@@ -2880,6 +2890,10 @@ bool tagcache_create_changelog(struct tagcache_search *tcs)
         
         /* Skip until the entry found has been modified. */
         if (! (idx.flag & FLAG_DIRTYNUM) )
+            continue;
+        
+        /* Skip deleted entries too. */
+        if (idx.flag & FLAG_DELETED)
             continue;
         
         /* Now retrieve all tags. */

@@ -504,6 +504,12 @@ static char* get_tag(struct wps_data* wps_data,
                 case 'c':  /* ID3 Composer */
                     return id3->composer;
 
+                case 'C':  /* ID3 Comment */
+                    return id3->comment;
+
+                case 'A':  /* ID3 Albumartist */
+                    return id3->albumartist;
+
                 case 'y':  /* year */
                     if( id3->year_string )
                         return id3->year_string;

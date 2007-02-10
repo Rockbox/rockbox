@@ -351,6 +351,14 @@ static int parseyearnum( struct mp3entry* entry, char* tag, int bufferpos )
     return bufferpos;
 }
 
+/* parse comment */
+static int parsecomment( struct mp3entry* entry, char* tag, int bufferpos )
+{
+    
+    entry->comment = tag + 4;       // simplistic
+    return bufferpos;
+}
+
 /* parse numeric genre from string, version 2.2 and 2.3 */
 static int parsegenre( struct mp3entry* entry, char* tag, int bufferpos )
 {
@@ -448,6 +456,9 @@ static const struct tag_resolver taglist[] = {
     { "TYER", 4, offsetof(struct mp3entry, year_string), &parseyearnum, false },
     { "TYE",  3, offsetof(struct mp3entry, year_string), &parseyearnum, false },
     { "TCOM", 4, offsetof(struct mp3entry, composer), NULL, false },
+    { "TPE2", 4, offsetof(struct mp3entry, albumartist), NULL, false },
+    { "TP2", 3, offsetof(struct mp3entry, albumartist), NULL, false },
+    { "COMM", 4, offsetof(struct mp3entry, comment), &parsecomment, false },
     { "TCON", 4, offsetof(struct mp3entry, genre_string), &parsegenre, false },
     { "TCO",  3, offsetof(struct mp3entry, genre_string), &parsegenre, false },
 #if CONFIG_CODEC == SWCODEC
@@ -1151,6 +1162,10 @@ void adjust_mp3entry(struct mp3entry *entry, void *dest, void *orig)
         entry->year_string += offset;
     if (entry->composer)
         entry->composer += offset;
+    if (entry->comment)
+        entry->comment += offset;
+    if (entry->albumartist)
+        entry->albumartist += offset;
 #if CONFIG_CODEC == SWCODEC
     if (entry->track_gain_string)
         entry->track_gain_string += offset;

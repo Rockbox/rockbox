@@ -195,6 +195,9 @@ static int get_tag(int *tag)
     MATCH(tag, buf, "artist", tag_artist);
     MATCH(tag, buf, "bitrate", tag_bitrate);
     MATCH(tag, buf, "composer", tag_composer);
+    MATCH(tag, buf, "comment", tag_comment);
+    MATCH(tag, buf, "albumartist", tag_albumartist);
+    MATCH(tag, buf, "ensemble", tag_albumartist);
     MATCH(tag, buf, "genre", tag_genre);
     MATCH(tag, buf, "length", tag_length);
     MATCH(tag, buf, "title", tag_title);
