@@ -5459,20 +5459,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_ID3_ALBUMARTIST
-  desc: in tag viewer
-  user:
-  <source>
-    *: "[Album Artist]"
-  </source>
-  <dest>
-    *: "[Album Artist]"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ID3_TRACKNUM
   desc: in tag viewer
   user:
@@ -5481,20 +5467,6 @@
   </source>
   <dest>
     *: "[Tracknum]"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3_COMMENT
-  desc: in tag viewer
-  user:
-  <source>
-    *: "[Comment]"
-  </source>
-  <dest>
-    *: "[Comment]"
   </dest>
   <voice>
     *: ""
@@ -10513,5 +10485,33 @@
   </dest>
   <voice>
     *: "Charge During U S B Connection"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUMARTIST
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Album Artist]"
+  </source>
+  <dest>
+    *: "[Album Artist]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMMENT
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Comment]"
+  </source>
+  <dest>
+    *: "[Comment]"
+  </dest>
+  <voice>
+    *: ""
   </voice>
 </phrase>
