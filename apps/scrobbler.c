@@ -30,10 +30,7 @@ http://www.audioscrobbler.net/wiki/Portable_Player_Logging
 #include "audio.h"
 #include "buffer.h"
 #include "settings.h"
-
-#ifndef SIMULATOR
-#include "ata.h"
-#endif
+#include "ata_idle_notify.h"
 
 #ifdef CONFIG_RTC
 #include "time.h"
@@ -51,7 +48,6 @@ http://www.audioscrobbler.net/wiki/Portable_Player_Logging
 #endif
 
 /* increment this on any code change that effects output */
-/* replace with CVS Revision keyword? */
 #define SCROBBLER_REVISION " $Revision$"
 
 #define SCROBBLER_MAX_CACHE 32
@@ -65,6 +61,7 @@ static int cache_pos;
 static struct mp3entry scrobbler_entry;
 static bool pending = false;
 static bool scrobbler_initialised = false;
+static bool scrobbler_ata_callback = false;
 #ifdef CONFIG_RTC
 static time_t timestamp;
 #else
@@ -82,6 +79,8 @@ unsigned long audio_prev_elapsed(void)
 static void write_cache(void)
 {
     int i;
+
+    scrobbler_ata_callback = false;
 
     /* If the file doesn't exist, create it.
     Check at each write since file may be deleted at any time */
@@ -133,16 +132,16 @@ static void write_cache(void)
     scrobbler_fd = -1;
 }
 
+static bool scrobbler_flush_callback(void)
+{
+    if (scrobbler_initialised && cache_pos)
+        write_cache();
+    return true;
+}
+
 static void add_to_cache(void)
 {
-/* using HAVE_MMC to check for Ondios - anything better to use? */
-#ifndef SIMULATOR
-#if defined(IPOD_NANO) || defined(HAVE_MMC)
     if ( cache_pos >= SCROBBLER_MAX_CACHE )
-#else
-    if ( ( cache_pos >= SCROBBLER_MAX_CACHE ) || ( ata_disk_is_active() ) )
-#endif
-#endif /* !SIMULATOR */
         write_cache();
 
     int ret;
@@ -182,8 +181,12 @@ static void add_to_cache(void)
     {
         logf("SCROBBLER: entry too long:");
         logf("SCROBBLER: %s", scrobbler_entry.path);
-    } else
+    } else {
         cache_pos++;
+        if (!scrobbler_ata_callback)
+            scrobbler_ata_callback = register_ata_idle_func(scrobbler_flush_callback);
+    }
+
 }
 
 void scrobbler_change_event(struct mp3entry *id)
@@ -248,6 +251,11 @@ void scrobbler_flush_cache(void)
 
 void scrobbler_shutdown(void)
 {
+#ifndef SIMULATOR
+    if (scrobbler_ata_callback)
+        unregister_ata_idle_func(scrobbler_flush_callback, false);
+#endif
+
     scrobbler_flush_cache();
     
     if (scrobbler_initialised)
