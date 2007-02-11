@@ -24,6 +24,9 @@
 #include "file.h"
 
 /* Audio file types. */
+/* NOTE: The values of the AFMT_* items are used for the %fc tag in the WPS
+         - so new entries MUST be added to the end to maintain compatibility.
+ */
 enum
 {
     AFMT_UNKNOWN = 0,  /* Unknown file format */
@@ -46,9 +49,9 @@ enum
     AFMT_AAC,          /* Advanced Audio Coding (AAC) in M4A container */
     AFMT_SHN,          /* Shorten */
     AFMT_SID,          /* SID File Format */
-    AFMT_SPEEX,         /* Ogg Speex speech */
     AFMT_ADX,          /* ADX File Format */
     AFMT_NSF,          /* NESM (NES Sound Format) */
+    AFMT_SPEEX,        /* Ogg Speex speech */
 #endif
 
     /* add new formats at any index above this line to have a sensible order -
