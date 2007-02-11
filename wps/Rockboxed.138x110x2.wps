@@ -1,0 +1,48 @@
+# (C) 2007, Roan Horning <roan@horning.us>
+# License: GNU GPL v2 or later.
+%wd
+%X|bg-138x110x2.bmp|0|0|
+%xl|p|ply-mono-big.bmp|68|91|
+%xl|q|ps-mono-big.bmp|68|91|
+%xl|f|ff-mono-big.bmp|68|91|
+%xl|r|rw-mono-big.bmp|68|91|
+%xl|b|sl-mono-medium.bmp|35|91|
+%xl|A|v01-mono-big.bmp|15|91|
+%xl|B|v02-mono-big.bmp|17|91|
+%xl|C|v03-mono-big.bmp|19|91|
+%xl|D|v04-mono-big.bmp|21|91|
+%xl|E|v05-mono-big.bmp|23|91|
+%xl|F|v06-mono-big.bmp|25|91|
+%xl|G|v07-mono-big.bmp|27|91|
+%xl|H|v08-mono-big.bmp|29|91|
+%xl|I|v11-mono-big.bmp|31|91|
+%xl|Z|n-mono-medium.bmp|129|95|
+%xl|Y|n-mono-medium.bmp|127|95|
+%xl|X|n-mono-medium.bmp|125|95|
+%xl|W|n-mono-medium.bmp|123|95|
+%xl|V|n-mono-medium.bmp|121|95|
+%xl|U|n-mono-medium.bmp|119|95|
+%xl|T|n-mono-medium.bmp|117|95|
+%xl|S|n-mono-medium.bmp|115|95|
+%xl|R|n-mono-medium.bmp|113|95|
+%xl|Q|n-mono-medium.bmp|111|95|
+%xl|P|l-mono-medium.bmp|113|95|
+%xl|O|l-mono-medium.bmp|111|95|
+%xl|z|ra-mono-medium.bmp|51|91|
+%xl|y|ro-mono-medium.bmp|51|91|
+%xl|x|rs-mono-medium.bmp|51|91|
+%xl|w|rab-mono-medium.bmp|51|91|
+%xl|h|hd-mono-big.bmp|88|90|
+
+%al %s%ac%?ia<%ia|Artist?>%ar 
+%al %s%ac%?id<%id|Album?>%ar 
+%al %s%ac%?it<%it|Title?>%ar 
+%ac%t3%ig;%t%iy 
+%pb|5|12|125|
+%al  %pc%ac%?fc<mp1|mp2|mp3|aiff|wav|vorbis|flac|mpc|a52|wavpack|alac|aac|shn|sid|adx|unknown>%ar%pt  
+%?ps<%xdb>
+%?mp<%xdq|%xdp|%xdq|%xdf|%xdr>
+%?mm<|%xdz|%xdy|%xdx|%xdw>
+%?mh<%xdh>
+%?pv<|%xdA|%xdA%xdB|%xdA%xdB%xdC|%xdA%xdB%xdC%xdD|%xdA%xdB%xdC%xdD%xdE%|%xdA%xdB%xdC%xdD%xdE%xdF|%xdA%xdB%xdC%xdD%xdE%xdF%xdG|%xdA%xdB%xdC%xdD%xdE%xdF%xdG%xdH|%xdA%xdB%xdC%xdD%xdE%xdF%xdG%xdH%xdI>
+%?bl<|%xdO|%xdO%xdP|%xdQ%xdR|%xdQ%xdR%xdS|%xdQ%xdR%xdS%xdT|%xdQ%xdR%xdS%xdT%xdU%|%xdQ%xdR%xdS%xdT%xdU%xdV|%xdQ%xdR%xdS%xdT%xdU%xdV%xdW|%xdQ%xdR%xdS%xdT%xdU%xdV%xdW%xdX|%xdQ%xdR%xdS%xdT%xdU%xdV%xdW%xdX%xdY|%xdQ%xdR%xdS%xdT%xdU%xdV%xdW%xdX%xdY%xdZ|>
