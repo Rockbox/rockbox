@@ -171,6 +171,12 @@ MOO
     if($font) {
         push @out, "font: /.rockbox/fonts/$font\n";
     }
+    if($fgcolor) {
+        push @out, "foreground color: $fgcolor\n";
+    }
+    if($bgcolor) {
+        push @out, "background color: $bgcolor\n";
+    }
     if($statusbar) {
         push @out, "statusbar: $statusbar\n";
     }
@@ -212,6 +218,8 @@ while(<WPS>) {
         undef $width; 
         undef $height;
         undef $font;
+        undef $fgcolor;
+        undef $bgcolor;
         undef $statusbar;
         undef $author;
         undef $req_g_wps;
@@ -305,6 +313,12 @@ while(<WPS>) {
         }
         elsif($l =~ /^Font: (.*)/i) {
             $font = $1;
+        }
+        elsif($l =~ /^Foreground Color: (.*)/i) {
+            $fgcolor = $1;
+        }
+        elsif($l =~ /^Background Color: (.*)/i) {
+            $bgcolor = $1;
         }
         elsif($l =~ /^Font\.${main_width}x${main_height}x$main_depth: (.*)/i) {
             $font = $1;
