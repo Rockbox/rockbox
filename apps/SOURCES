@@ -23,7 +23,6 @@ misc.c
 onplay.c
 playlist.c
 playlist_catalog.c
-playlist_menu.c
 playlist_viewer.c
 plugin.c
 screens.c
