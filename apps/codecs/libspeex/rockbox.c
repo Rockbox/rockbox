@@ -93,29 +93,37 @@ float floor(float x) {
 
 //Placeholders (not fixed point, only used when encoding):
 float pow(float a, float b) {
-	return 0;
+    DEBUGF("pow(%f, %f)\n", a, b);
+    return 0;
 }
 
 float log(float l) {
-	return 0;
+    DEBUGF("log(%f)\n", l);
+    return 0;
 }
 
 float fabs(float a) {
-	return 0;
+    DEBUGF("fabs(%f)\n", a);
+    return 0;
 }
 
 float sin(float a) {
-	return 0;
+    DEBUGF("sin(%f)\n", a);
+    return 0;
 }
 
 float cos(float a) {
-	return 0;
+    DEBUGF("cos(%f)\n", a);
+    return 0;
 }
 
 float sqrt(float a) {
-	return 0;
+    DEBUGF("sqrt(%f)\n", a);
+    return 0;
 }
 
 float exp(float a) {
-	return 0;
+    DEBUGF("exp(%f)\n", a);
+    return 0;
 }
+
