@@ -1125,11 +1125,26 @@ bool shutdown_screen(void)
 }
 #endif
 
+static const int id3_headers[]=
+{
+    LANG_ID3_TITLE,
+    LANG_ID3_ARTIST,
+    LANG_ID3_ALBUM,
+    LANG_ID3_ALBUMARTIST,
+    LANG_ID3_TRACKNUM,
+    LANG_ID3_COMMENT,
+    LANG_ID3_GENRE,
+    LANG_ID3_YEAR,
+    LANG_ID3_LENGTH,
+    LANG_ID3_PLAYLIST,
+    LANG_ID3_BITRATE,
+    LANG_ID3_FRECUENCY,
 #if CONFIG_CODEC == SWCODEC
-#define ID3_ITEMS   13
-#else
-#define ID3_ITEMS   11
+    LANG_ID3_TRACK_GAIN,
+    LANG_ID3_ALBUM_GAIN,
 #endif
+    LANG_ID3_PATH,
+};
 
 static char * id3_get_info(int selected_item, void* data, char *buffer)
 {
@@ -1137,27 +1152,7 @@ static char * id3_get_info(int selected_item, void* data, char *buffer)
     int info_no=selected_item/2;
     if(!(selected_item%2))
     {/* header */
-        static const int headers[]=
-        {
-            LANG_ID3_TITLE,
-            LANG_ID3_ARTIST,
-            LANG_ID3_ALBUM,
-            LANG_ID3_ALBUMARTIST,
-            LANG_ID3_TRACKNUM,
-            LANG_ID3_COMMENT,
-            LANG_ID3_GENRE,
-            LANG_ID3_YEAR,
-            LANG_ID3_LENGTH,
-            LANG_ID3_PLAYLIST,
-            LANG_ID3_BITRATE,
-            LANG_ID3_FRECUENCY,
-#if CONFIG_CODEC == SWCODEC
-            LANG_ID3_TRACK_GAIN,
-            LANG_ID3_ALBUM_GAIN,
-#endif
-            LANG_ID3_PATH,
-        };
-        return( str(headers[info_no]));
+        return( str(id3_headers[info_no]));
     }
     else
     {/* data */
@@ -1246,7 +1241,8 @@ bool browse_id3(void)
     int key;
 
     gui_synclist_init(&id3_lists, &id3_get_info, id3, true, 2);
-    gui_synclist_set_nb_items(&id3_lists, ID3_ITEMS*2);
+    gui_synclist_set_nb_items(&id3_lists, 
+        sizeof(id3_headers)/sizeof(id3_headers[0])*2);
     gui_synclist_draw(&id3_lists);
     gui_syncstatusbar_draw(&statusbars, true);
     action_signalscreenchange();
