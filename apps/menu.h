@@ -99,34 +99,44 @@ typedef int (*menu_callback_type)(int action,
 int do_menu(const struct menu_item_ex *menu);
 
 #define MENU_ITEM_COUNT(c) (c<<MENU_COUNT_SHIFT)
+/* In all the following macros the argument names are as follows:
+    - name: The name for the variable (so it can be used in a MAKE_MENU()
+    - str:  the string to display for this menu item. use ID2P() for LANG_* id's
+    - callback: The callback function to call for this menu item.
+*/
 
+/*  Use this to put a setting into a menu.
+    The setting must appear in settings_list.c.
+    If the setting is not configured properly, the menu will display "Not Done yet!"
+    When the user selects this item the setting select screen will load,
+    when that screen exits the user wll be back in the menu */
 #define MENUITEM_SETTING(name,var,callback)                  \
     static const struct menu_item_ex name =                  \
         {MT_SETTING, {.variable = (void*)var},{callback}};
 
-#define MAKE_MENU( name, str, cb, ... )                                 \
-    static const struct menu_item_ex *name##_[]  = {__VA_ARGS__};       \
-    static const struct menu_callback_with_desc name##__ = {cb,str};    \
-    const struct menu_item_ex name =                                    \
-        {MT_MENU|MENU_HAS_DESC|                                         \
-         MENU_ITEM_COUNT(sizeof( name##_)/sizeof(*name##_)),            \
-            { (void*)name##_},{.callback_and_desc = & name##__}};
-
-#define MENUITEM_STRINGLIST(name, str, cb, ... )                        \
+/*  Use this To create a list of NON-XLATABLE (for the time being) Strings
+    When the user enters this list and selects one, the menu will exits
+    and its return value will be the index of the chosen item */
+#define MENUITEM_STRINGLIST(name, str, callback, ... )                  \
     static const char *name##_[] = {__VA_ARGS__};                       \
-    static const struct menu_callback_with_desc name##__ = {cb,str};    \
+    static const struct menu_callback_with_desc name##__ = {callback,str};    \
     static const struct menu_item_ex name =                             \
         {MT_RETURN_ID|MENU_HAS_DESC|                                    \
          MENU_ITEM_COUNT(sizeof( name##_)/sizeof(*name##_)),            \
             { .submenus = name##_},{.callback_and_desc = & name##__}};
+            
 /* This one should be static'ed also, 
-   but cannot be done untill sound and playlist menus are done */
-#define MENUITEM_FUNCTION(name, str, func, cb)                          \
-    static const struct menu_callback_with_desc name##_ = {cb,str};     \
+   but cannot be done untill settings menu is done */
+/*  Use this to put a function call into the menu.
+    When the user selects this item the function will be run,
+    when it exits the user will be back in the menu. return value is ignored */
+#define MENUITEM_FUNCTION(name, str, func, callback)                          \
+    static const struct menu_callback_with_desc name##_ = {callback,str};     \
     const struct menu_item_ex name   =                                  \
         { MT_FUNCTION_CALL|MENU_HAS_DESC, { .function = func},          \
         {.callback_and_desc = & name##_}};
 
+/* Same as above, except the function will be called with a (void*)param. */
 #define MENUITEM_FUNCTION_WPARAM(name, str, func, param, callback)          \
     static const struct menu_callback_with_desc name##_ = {callback,str};   \
     static const struct menu_func_with_param name##__ = {func, param};      \
@@ -135,5 +145,13 @@ int do_menu(const struct menu_item_ex *menu);
             { .func_with_param = &name##__},                                \
             {.callback_and_desc = & name##_}};
 
-
+/*  Use this to actually create a menu. the ... argument is a list of pointers 
+    to any of the above macro'd variables. (It can also have other menus in the list. */
+#define MAKE_MENU( name, str, callback, ... )                           \
+    static const struct menu_item_ex *name##_[]  = {__VA_ARGS__};       \
+    static const struct menu_callback_with_desc name##__ = {callback,str};    \
+    const struct menu_item_ex name =                                    \
+        {MT_MENU|MENU_HAS_DESC|                                         \
+         MENU_ITEM_COUNT(sizeof( name##_)/sizeof(*name##_)),            \
+            { (void*)name##_},{.callback_and_desc = & name##__}};
 #endif /* End __MENU_H__ */
