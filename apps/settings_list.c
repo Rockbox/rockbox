@@ -19,7 +19,7 @@
 
 #include "config.h"
 #include <stdbool.h>
-
+#include <string.h>
 #include "lang.h"
 #include "talk.h"
 #include "lcd.h"
@@ -27,6 +27,9 @@
 #include "settings_list.h"
 #include "sound.h"
 #include "dsp.h"
+#include "debug.h"
+#include "mpeg.h"
+#include "audio.h"
 
 /* some sets of values which are used more than once, to save memory */
 static const char off_on[] = "off,on";
@@ -76,6 +79,34 @@ static const char trig_durations_conf [] =
 static const char backlight_times_conf [] =
                   "off,on,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90";
 #endif
+/* ffwd/rewind and scan acceleration stuff */
+static int ff_rewind_min_stepvals[] = {1,2,3,4,5,6,8,10,15,20,25,30,45,60};
+static long ff_rewind_min_step_getlang(int value)
+{
+    return TALK_ID(ff_rewind_min_stepvals[value], UNIT_SEC);
+}
+static void ff_rewind_min_step_formatter(char *buffer, int buffer_size, 
+        int val, const char *unit)
+{
+    (void)unit;
+    snprintf(buffer, buffer_size, "%ds", ff_rewind_min_stepvals[val]);
+}
+static long scanaccel_getlang(int value)
+{
+    if (value == 0)
+        return LANG_OFF;
+    return TALK_ID(value, UNIT_SEC);
+}
+static void scanaccel_formatter(char *buffer, int buffer_size, 
+        int val, const char *unit)
+{
+    (void)unit;
+    if (val == 0)
+        strcpy(buffer, str(LANG_OFF));
+    else
+        snprintf(buffer, buffer_size, "2x/%ds", val);
+}
+            
 
 #define NVRAM(bytes) (bytes<<F_NVRAM_MASK_SHIFT)
 /** NOTE: NVRAM_CONFIG_VERSION is in settings_list.h
@@ -155,13 +186,21 @@ static const char backlight_times_conf [] =
                     {cb, count, {.talks = (int[]){__VA_ARGS__}}}}}}
                     
 /*  for settings which use the set_int() setting screen.
-    unit is the UNIT_ define to display/talk. */
-#define INT_SETTING(flags, var, lang_id, default, name,                 \
-                    unit, min, max, step, formatter, cb)                \
+    unit is the UNIT_ define to display/talk.
+    the first one saves a string to the config file,
+    the second one saves the variable value to the config file */    
+#define INT_SETTING_W_CFGVALS(flags, var, lang_id, default, name, cfg_vals, \
+                    unit, min, max, step, formatter, get_talk_id, cb)   \
             {flags|F_INT_SETTING|F_T_INT, &global_settings.var,         \
-                lang_id, INT(default),                                  \
-                name, NULL, {.int_setting = (struct int_setting[]){ \
-                    {cb, unit, min, max, step, formatter}}}}
+                lang_id, INT(default), name, cfg_vals,                  \
+                 {.int_setting = (struct int_setting[]){                \
+                    {cb, unit, min, max, step, formatter, get_talk_id}}}}
+#define INT_SETTING(flags, var, lang_id, default, name,                      \
+                    unit, min, max, step, formatter, get_talk_id, cb)       \
+            {flags|F_INT_SETTING|F_T_INT, &global_settings.var,         \
+                lang_id, INT(default), name, NULL,                  \
+                 {.int_setting = (struct int_setting[]){                \
+                    {cb, unit, min, max, step, formatter, get_talk_id}}}}
                     
 #if CONFIG_CODEC == SWCODEC
 static void crossfeed_format(char* buffer, int buffer_size, int value,
@@ -188,6 +227,16 @@ static void crossfeed_hf_cutoff_helper(int val)
         global_settings.crossfeed_cross_gain
             + global_settings.crossfeed_hf_attenuation, val);
 }
+
+static void replaygain_preamp_format(char* buffer, int buffer_size, int value,
+    const char* unit)
+{
+    int v = abs(value);
+
+    snprintf(buffer, buffer_size, "%s%d.%d %s", value < 0 ? "-" : "",
+        v / 10, v % 10, unit);
+}
+
 #endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 static void set_mdb_enable(bool value)
@@ -277,7 +326,7 @@ const struct settings_list settings[] = {
     SYSTEM_SETTING(NVRAM(4),topruntime,0),
 #if MEM > 1
     INT_SETTING(0,max_files_in_playlist,LANG_MAX_FILES_IN_PLAYLIST,10000,
-                "max files in playlist", UNIT_INT,1000,20000,1000,NULL,NULL),
+                "max files in playlist", UNIT_INT,1000,20000,1000,NULL,NULL,NULL),
     {F_T_INT,&global_settings.max_files_in_dir,LANG_MAX_FILES_IN_DIR,
         INT(400),"max files in dir",NULL,UNUSED},
 #else
@@ -398,16 +447,21 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0,play_selected,LANG_PLAY_SELECTED,true,"play selected",NULL),
     OFFON_SETTING(0,party_mode,LANG_PARTY_MODE,false,"party mode",NULL),
     OFFON_SETTING(0,fade_on_stop,LANG_FADE_ON_STOP,true,"volume fade",NULL),
-    {F_T_INT,&global_settings.ff_rewind_min_step,LANG_FFRW_STEP,INT(FF_REWIND_1000),
-        "scan min step","1,2,3,4,5,6,8,10,15,20,25,30,45,60",UNUSED},
-    {F_T_INT,&global_settings.ff_rewind_accel,LANG_FFRW_ACCEL,INT(3),
-        "scan accel",NULL,UNUSED},
+    INT_SETTING_W_CFGVALS(0, ff_rewind_min_step, LANG_FFRW_STEP, FF_REWIND_1000,
+        "scan min step", "1,2,3,4,5,6,8,10,15,20,25,30,45,60", UNIT_SEC,
+        13, 0, -1, ff_rewind_min_step_formatter,
+        ff_rewind_min_step_getlang, NULL),        
+    INT_SETTING(0, ff_rewind_accel, LANG_FFRW_ACCEL, 3, "scan accel",
+        UNIT_SEC, 16, 0, -1, scanaccel_formatter, scanaccel_getlang, NULL), 
 #if CONFIG_CODEC == SWCODEC
-    {F_T_INT,&global_settings.buffer_margin,LANG_MP3BUFFER_MARGIN,INT(0),"antiskip",
-        "5s,15s,30s,1min,2min,3min,5min,10min",UNUSED},
+    STRINGCHOICE_SETTING(0, buffer_margin, LANG_MP3BUFFER_MARGIN, 0,"antiskip",
+        "5s,15s,30s,1min,2min,3min,5min,10min",NULL, 8,
+        TALK_ID(5, UNIT_SEC), TALK_ID(15, UNIT_SEC),
+        TALK_ID(30, UNIT_SEC), TALK_ID(1, UNIT_MIN), TALK_ID(2, UNIT_MIN),
+        TALK_ID(3, UNIT_MIN), TALK_ID(5, UNIT_MIN), TALK_ID(10, UNIT_MIN)),
 #else
-    {F_T_INT,&global_settings.buffer_margin,LANG_MP3BUFFER_MARGIN,INT(0),
-        "antiskip",NULL,UNUSED},
+    INT_SETTING(0, buffer_margin, LANG_MP3BUFFER_MARGIN, 0, "antiskip",                      \
+                    UNIT_SEC, 0, 7, 1, NULL, NULL, audio_set_buffer_margin),
 #endif
     /* disk */
 #ifndef HAVE_MMC
@@ -482,9 +536,9 @@ const struct settings_list settings[] = {
         "sort files","alpha,oldest,newest,type",UNUSED},
     {F_T_INT,&global_settings.sort_dir,LANG_SORT_DIR,INT(0),
         "sort dirs","alpha,oldest,newest",UNUSED},
-    BOOL_SETTING(0,id3_v1_first,LANG_ID3_ORDER,false,
-        "id3 tag priority","v2-v1,v1-v2",
-        LANG_ID3_V2_FIRST,LANG_ID3_V1_FIRST,NULL),
+    BOOL_SETTING(0, id3_v1_first, LANG_ID3_ORDER, false,
+        "id3 tag priority", "v2-v1,v1-v2",
+        LANG_ID3_V2_FIRST, LANG_ID3_V1_FIRST, mpeg_id3_options),
 
 #ifdef HAVE_RECORDING
     /* recording */
@@ -567,57 +621,61 @@ const struct settings_list settings[] = {
 #endif /* HAVE_RECORDING */
 
 #ifdef HAVE_SPDIF_POWER
-    OFFON_SETTING(0,spdif_enable,LANG_SPDIF_ENABLE,false,"spdif enable",NULL),
+    OFFON_SETTING(0, spdif_enable, LANG_SPDIF_ENABLE, false,
+        "spdif enable", spdif_power_enable),
 #endif
-    {F_T_INT,&global_settings.next_folder,LANG_NEXT_FOLDER,INT(FOLDER_ADVANCE_OFF),
-        "folder navigation","off,on,random",UNUSED},
+    CHOICE_SETTING(0, next_folder, LANG_NEXT_FOLDER, FOLDER_ADVANCE_OFF,
+        "folder navigation", "off,on,random",NULL ,3,
+        ID2P(LANG_SET_BOOL_NO), ID2P(LANG_SET_BOOL_YES), ID2P(LANG_RANDOM)),
     OFFON_SETTING(0,runtimedb,LANG_RUNTIMEDB_ACTIVE,false,"gather runtime data",NULL),
 
 #if CONFIG_CODEC == SWCODEC
     /* replay gain */
-    OFFON_SETTING(0,replaygain,LANG_REPLAYGAIN,false,"replaygain",NULL),
-    {F_T_INT,&global_settings.replaygain_type,LANG_REPLAYGAIN_MODE,INT(REPLAYGAIN_ALBUM),
-        "replaygain type","track,album,track shuffle",UNUSED},
-    OFFON_SETTING(0,replaygain_noclip,LANG_REPLAYGAIN_NOCLIP,
-        false,"replaygain noclip",NULL),
-    {F_T_INT,&global_settings.replaygain_preamp,LANG_REPLAYGAIN_PREAMP,
-        INT(0),"replaygain preamp",NULL,UNUSED},
-
-    {F_T_INT,&global_settings.beep,LANG_BEEP,INT(0),"beep","off,weak,moderate,strong",UNUSED},
+    OFFON_SETTING(0, replaygain, LANG_REPLAYGAIN, false, "replaygain", NULL),
+    CHOICE_SETTING(0, replaygain_type, LANG_REPLAYGAIN_MODE, REPLAYGAIN_ALBUM,
+        "replaygain type", "track,album,track shuffle", NULL, 3,
+        ID2P(LANG_TRACK_GAIN), ID2P(LANG_ALBUM_GAIN), ID2P(LANG_SHUFFLE_GAIN)),
+    OFFON_SETTING(0, replaygain_noclip, LANG_REPLAYGAIN_NOCLIP,
+        false, "replaygain noclip", NULL),
+    INT_SETTING(0, replaygain_preamp, LANG_REPLAYGAIN_PREAMP, 0, "replaygain preamp", 
+                UNIT_DB, -120, 120, 1, replaygain_preamp_format, NULL, NULL),
+    
+    CHOICE_SETTING(0, beep, LANG_BEEP, 0,
+        "beep", "off,weak,moderate,strong", NULL, 3,
+        ID2P(LANG_OFF), ID2P(LANG_WEAK), ID2P(LANG_MODERATE), ID2P(LANG_STRONG)),
 
     /* crossfade */
-    {F_T_INT,&global_settings.crossfade,LANG_CROSSFADE_ENABLE,INT(0),"crossfade",
-        "off,shuffle,track skip,shuffle and track skip,always",UNUSED},
-    {F_T_INT,&global_settings.crossfade_fade_in_delay,LANG_CROSSFADE_FADE_IN_DELAY,INT(0),
-        "crossfade fade in delay",NULL,UNUSED},
-    {F_T_INT,&global_settings.crossfade_fade_out_delay,
-        LANG_CROSSFADE_FADE_OUT_DELAY,INT(0),
-        "crossfade fade out delay",NULL,UNUSED},
-    {F_T_INT,&global_settings.crossfade_fade_in_duration,
-        LANG_CROSSFADE_FADE_IN_DURATION,INT(0),
-        "crossfade fade in duration",NULL,UNUSED},
-    {F_T_INT,&global_settings.crossfade_fade_out_duration,
-        LANG_CROSSFADE_FADE_OUT_DURATION,INT(0),
-        "crossfade fade out duration",NULL,UNUSED},
-    {F_T_INT,&global_settings.crossfade_fade_out_mixmode,
-        LANG_CROSSFADE_FADE_OUT_MODE,INT(0),
-        "crossfade fade out mode","crossfade,mix",UNUSED},
+    CHOICE_SETTING(0, crossfade, LANG_CROSSFADE_ENABLE, 0, "crossfade",
+        "off,shuffle,track skip,shuffle and track skip,always",NULL, 5,
+        ID2P(LANG_OFF), ID2P(LANG_SHUFFLE), ID2P(LANG_TRACKSKIP),
+        ID2P(LANG_SHUFFLE_TRACKSKIP), ID2P(LANG_ALWAYS)),
+    INT_SETTING(0, crossfade_fade_in_delay, LANG_CROSSFADE_FADE_IN_DELAY, 0,
+        "crossfade fade in delay", UNIT_SEC, 0, 7, 1, NULL, NULL, NULL),
+    INT_SETTING(0, crossfade_fade_out_delay, LANG_CROSSFADE_FADE_OUT_DELAY, 0,
+        "crossfade fade out delay", UNIT_SEC, 0, 7, 1, NULL, NULL, NULL),
+    INT_SETTING(0, crossfade_fade_in_duration, LANG_CROSSFADE_FADE_IN_DURATION, 0,
+        "crossfade fade in duration", UNIT_SEC, 0, 15, 1, NULL, NULL, NULL),
+    INT_SETTING(0, crossfade_fade_out_duration, LANG_CROSSFADE_FADE_OUT_DURATION, 0,
+        "crossfade fade out duration", UNIT_SEC, 0, 15, 1, NULL, NULL, NULL),
+    CHOICE_SETTING(0, crossfade_fade_out_mixmode, LANG_CROSSFADE_FADE_OUT_MODE,
+        0, "crossfade fade out mode", "crossfade,mix" ,NULL, 2,
+        ID2P(LANG_CROSSFADE), ID2P(LANG_MIX)),
         
     /* crossfeed */
     OFFON_SETTING(0,crossfeed, LANG_CROSSFEED, false,
                     "crossfeed", dsp_set_crossfeed),
     INT_SETTING(0, crossfeed_direct_gain, LANG_CROSSFEED_DIRECT_GAIN, 15,
                     "crossfeed direct gain", UNIT_DB, 0, 60, 5,
-                    crossfeed_format, dsp_set_crossfeed_direct_gain),
+                    crossfeed_format, NULL, dsp_set_crossfeed_direct_gain),
     INT_SETTING(0, crossfeed_cross_gain, LANG_CROSSFEED_CROSS_GAIN, 60,
                     "crossfeed cross gain", UNIT_DB, 30, 120, 5,
-                    crossfeed_format, crossfeed_cross_gain_helper),
+                    crossfeed_format, NULL, crossfeed_cross_gain_helper),
     INT_SETTING(0, crossfeed_hf_attenuation, LANG_CROSSFEED_HF_ATTENUATION, 160,
                     "crossfeed hf attenuation", UNIT_DB, 60, 240, 5,
-                    crossfeed_format, crossfeed_hf_att_helper),
+                    crossfeed_format, NULL, crossfeed_hf_att_helper),
     INT_SETTING(0, crossfeed_hf_cutoff, LANG_CROSSFEED_HF_CUTOFF,700,
                     "crossfeed hf cutoff", UNIT_HERTZ, 500, 2000, 100,
-                    crossfeed_format, crossfeed_hf_cutoff_helper),
+                    crossfeed_format, NULL, crossfeed_hf_cutoff_helper),
     /* equalizer */
     OFFON_SETTING(0,eq_enabled,LANG_EQUALIZER_ENABLED,false,"eq enabled",NULL),
     {F_T_INT,&global_settings.eq_precut,LANG_EQUALIZER_PRECUT,INT(0),
@@ -763,10 +821,11 @@ const struct settings_list settings[] = {
 #endif
 #endif
 #ifdef HAVE_HEADPHONE_DETECTION
-    {F_T_INT,&global_settings.unplug_mode,LANG_UNPLUG,INT(0),
-        "pause on headphone unplug",NULL,UNUSED},
-    {F_T_INT,&global_settings.unplug_rw,LANG_UNPLUG_RW,INT(0),
-        "rewind duration on pause",NULL,UNUSED},
+    CHOICE_SETTING(0, unplug_mode, LANG_UNPLUG, 0,
+        "pause on headphone unplug", "off,pause,pause and resume", NULL, 3,
+        ID2P(LANG_OFF), ID2P(LANG_PAUSE), ID2P(LANG_UNPLUG_RESUME)),
+    INT_SETTING(0, unplug_rw, LANG_UNPLUG_RW, 0, "rewind duration on pause",                      
+                    UNIT_SEC, 0, 15, 1, NULL, NULL,NULL) ,
     OFFON_SETTING(0,unplug_autoresume,LANG_UNPLUG_DISABLE_AUTORESUME,false,
         "disable autoresume if phones not present",NULL),
 #endif

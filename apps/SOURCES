@@ -13,6 +13,7 @@ main_menu.c
 menu.c
 menus/display_menu.c
 menus/main_menu.c
+menus/playback_menu.c
 menus/playlist_menu.c
 #ifdef HAVE_RECORDING
 menus/recording_menu.c

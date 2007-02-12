@@ -1022,11 +1022,15 @@ bool set_bool_options(const char* string, bool* variable,
     return result;
 }
 
-static void talk_unit(int unit, int value)
+static void talk_unit(int unit, int value, long (*get_talk_id)(int value))
 {
     if (global_settings.talk_menu)
     {
-        if (unit < UNIT_LAST)
+        if (get_talk_id)
+        {
+            talk_id(get_talk_id(value),false);
+        }
+        else if (unit < UNIT_LAST)
         {   /* use the available unit definition */
             talk_value(value, unit, false);
         }
@@ -1046,7 +1050,8 @@ struct value_setting_data {
     int voice_unit;
     const char * unit;
     void (*formatter)(char* dest, int dest_length,
-                          int variable, const char* unit);
+                          int value, const char* unit);
+    long (*get_talk_id)(int value);
     /* used for BOOL and "choice" settings */
     struct opt_items* options;
 };
@@ -1100,7 +1105,7 @@ static bool do_set_setting(const unsigned char* string, void *variable,
     if (global_settings.talk_menu)
     {
         if (cb_data->type == INT && !cb_data->options)
-            talk_unit(cb_data->voice_unit, *(int*)variable);
+            talk_unit(cb_data->voice_unit, *(int*)variable, cb_data->get_talk_id);
         else talk_id(cb_data->options[selected].voice_id, false);
     }
 
@@ -1121,7 +1126,7 @@ static bool do_set_setting(const unsigned char* string, void *variable,
                 {
                     value = cb_data->max -
                             gui_synclist_get_sel_pos(&lists)*cb_data->step;
-                    talk_unit(cb_data->voice_unit, value);
+                    talk_unit(cb_data->voice_unit, value, cb_data->get_talk_id);
                 }
                 else
                 {
@@ -1195,6 +1200,34 @@ static const char *unit_strings[] =
     [UNIT_KBIT]
         = "kb/s",
 };
+bool set_int_ex(const unsigned char* string,
+             const char* unit,
+             int voice_unit,
+             int* variable,
+             void (*function)(int),
+             int step,
+             int min,
+             int max,
+             void (*formatter)(char*, int, int, const char*),
+             long (*get_talk_id)(int))
+{
+#if CONFIG_KEYPAD != PLAYER_PAD
+    struct value_setting_data data = {
+        INT,max, step, voice_unit,unit,formatter,get_talk_id,NULL };
+    if (unit == NULL)
+        data.unit = unit_strings[voice_unit];
+    return do_set_setting(string,variable,(max-min)/step + 1,
+                          (max-*variable)/step, &data,function);
+#else
+    int count = (max-min)/step + 1;
+    struct value_setting_data data = {
+        INT,min, -step, voice_unit,unit,formatter,get_talk_id,NULL };
+    if (unit == NULL)
+        data.unit = unit_strings[voice_unit];
+    return do_set_setting(string,variable,count,
+                          count - ((max-*variable)/step), &data,function);
+#endif
+}
 bool set_int(const unsigned char* string,
              const char* unit,
              int voice_unit,
@@ -1205,24 +1238,9 @@ bool set_int(const unsigned char* string,
              int max,
              void (*formatter)(char*, int, int, const char*) )
 {
-#if CONFIG_KEYPAD != PLAYER_PAD
-    struct value_setting_data data = {
-        INT,max, step, voice_unit,unit,formatter,NULL };
-    if (unit == NULL)
-        data.unit = unit_strings[voice_unit];
-    return do_set_setting(string,variable,(max-min)/step + 1,
-                          (max-*variable)/step, &data,function);
-#else
-    int count = (max-min)/step + 1;
-    struct value_setting_data data = {
-        INT,min, -step, voice_unit,unit,formatter,NULL };
-    if (unit == NULL)
-        data.unit = unit_strings[voice_unit];
-    return do_set_setting(string,variable,count,
-                          count - ((max-*variable)/step), &data,function);
-#endif
+    return set_int_ex(string, unit, voice_unit, variable, function,
+                      step, min, max, formatter, NULL);
 }
-
 /* NOTE: the 'type' parameter specifies the actual type of the variable
    that 'variable' points to. not the value within. Only variables with
    type 'bool' should use parameter BOOL.
@@ -1234,7 +1252,7 @@ bool set_option(const char* string, void* variable, enum optiontype type,
                 const struct opt_items* options, int numoptions, void (*function)(int))
 {
     struct value_setting_data data = {
-        type,0, 0, 0,NULL,NULL,(struct opt_items*)options };
+        type,0, 0, 0,NULL,NULL,NULL,(struct opt_items*)options };
     int selected;
     if (type == BOOL)
         selected = *(bool*)variable ? 1 : 0;

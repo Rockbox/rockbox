@@ -83,6 +83,7 @@ void dac_line_in(bool enable);
 #if LCD_DEPTH > 1
 #include "backdrop.h"
 #endif
+#include "menus/exported_menus.h"
 
 #ifdef CONFIG_CHARGING
 static bool car_adapter_mode(void)
@@ -733,40 +734,6 @@ static bool peak_meter_menu(void)
 }
 #endif /* HAVE_LCD_BITMAP */
 
-static bool shuffle(void)
-{
-    return set_bool( str(LANG_SHUFFLE), &global_settings.playlist_shuffle );
-}
-
-static bool repeat_mode(void)
-{
-    bool result;
-    static const struct opt_items names[] = {
-        { STR(LANG_OFF) },
-        { STR(LANG_REPEAT_ALL) },
-        { STR(LANG_REPEAT_ONE) },
-        { STR(LANG_SHUFFLE) },
-#if (AB_REPEAT_ENABLE == 1)
-        { STR(LANG_REPEAT_AB) }
-#endif
-    };
-    int old_repeat = global_settings.repeat_mode;
-
-    result = set_option( str(LANG_REPEAT), &global_settings.repeat_mode,
-                         INT, names, NUM_REPEAT_MODES, NULL );
-
-    if (old_repeat != global_settings.repeat_mode &&
-        (audio_status() & AUDIO_STATUS_PLAY))
-        audio_flush_and_reload_tracks();
-
-    return result;
-}
-
-static bool play_selected(void)
-{
-    return set_bool( str(LANG_PLAY_SELECTED), &global_settings.play_selected );
-}
-
 static bool dir_filter(void)
 {
     static const struct opt_items names[] = {
@@ -824,23 +791,6 @@ static bool sort_dir(void)
         reload_directory(); /* force reload if this has changed */
     return ret;
 }
-
-static bool resume(void)
-{
-    return set_bool( str(LANG_RESUME), &global_settings.resume);
-}
-
-#ifdef HAVE_SPDIF_POWER
-static bool spdif(void)
-{
-     bool rc = set_bool_options(str(LANG_SPDIF_ENABLE),
-                                &global_settings.spdif_enable,
-                                STR(LANG_ON),
-                                STR(LANG_OFF),
-                                spdif_power_enable);
-     return rc;
-}
-#endif
 
 static bool autocreatebookmark(void)
 {
@@ -1153,68 +1103,6 @@ static bool max_files_in_playlist(void)
                    NULL, 1000, 1000, 20000, NULL );
 }
 
-#if CONFIG_CODEC == SWCODEC
-static bool buffer_margin(void)
-{
-    int ret;
-    static const struct opt_items names[] = {
-        { "5s", TALK_ID(5, UNIT_SEC) },
-        { "15s", TALK_ID(15, UNIT_SEC) },
-        { "30s", TALK_ID(30, UNIT_SEC) },
-        { "1min", TALK_ID(1, UNIT_MIN) },
-        { "2min", TALK_ID(2, UNIT_MIN) },
-        { "3min", TALK_ID(3, UNIT_MIN) },
-        { "5min", TALK_ID(5, UNIT_MIN) },
-        { "10min", TALK_ID(10, UNIT_MIN) }
-    };
-
-    ret = set_option(str(LANG_MP3BUFFER_MARGIN), &global_settings.buffer_margin,
-                        INT, names, 8, NULL);
-    audio_set_buffer_margin(global_settings.buffer_margin);
-
-    return ret;
-}
-#else
-static bool buffer_margin(void)
-{
-    return set_int(str(LANG_MP3BUFFER_MARGIN), "s", UNIT_SEC,
-                   &global_settings.buffer_margin,
-                   audio_set_buffer_margin, 1, 0, 7, NULL );
-}
-#endif
-
-static bool ff_rewind_min_step(void)
-{
-    static const struct opt_items names[] = {
-        { "1s", TALK_ID(1, UNIT_SEC) },
-        { "2s", TALK_ID(2, UNIT_SEC) },
-        { "3s", TALK_ID(3, UNIT_SEC) },
-        { "4s", TALK_ID(4, UNIT_SEC) },
-        { "5s", TALK_ID(5, UNIT_SEC) },
-        { "6s", TALK_ID(6, UNIT_SEC) },
-        { "8s", TALK_ID(8, UNIT_SEC) },
-        { "10s", TALK_ID(10, UNIT_SEC) },
-        { "15s", TALK_ID(15, UNIT_SEC) },
-        { "20s", TALK_ID(20, UNIT_SEC) },
-        { "25s", TALK_ID(25, UNIT_SEC) },
-        { "30s", TALK_ID(30, UNIT_SEC) },
-        { "45s", TALK_ID(45, UNIT_SEC) },
-        { "60s", TALK_ID(60, UNIT_SEC) }
-    };
-    return set_option(str(LANG_FFRW_STEP), &global_settings.ff_rewind_min_step,
-                      INT, names, 14, NULL );
-}
-
-static bool set_fade_on_stop(void)
-{
-    return set_bool( str(LANG_FADE_ON_STOP), &global_settings.fade_on_stop );
-}
-
-static bool set_party_mode(void)
-{
-    return set_bool( str(LANG_PARTY_MODE), &global_settings.party_mode );
-}
-
 #ifdef CONFIG_BACKLIGHT
 static bool set_bl_filter_first_keypress(void)
 {
@@ -1233,30 +1121,6 @@ static bool set_remote_bl_filter_first_keypress(void)
 }
 #endif
 #endif
-
-static bool ff_rewind_accel(void)
-{
-    static const struct opt_items names[] = {
-        { STR(LANG_OFF) },
-        { "2x/1s", TALK_ID(1, UNIT_SEC) },
-        { "2x/2s", TALK_ID(2, UNIT_SEC) },
-        { "2x/3s", TALK_ID(3, UNIT_SEC) },
-        { "2x/4s", TALK_ID(4, UNIT_SEC) },
-        { "2x/5s", TALK_ID(5, UNIT_SEC) },
-        { "2x/6s", TALK_ID(6, UNIT_SEC) },
-        { "2x/7s", TALK_ID(7, UNIT_SEC) },
-        { "2x/8s", TALK_ID(8, UNIT_SEC) },
-        { "2x/9s", TALK_ID(9, UNIT_SEC) },
-        { "2x/10s", TALK_ID(10, UNIT_SEC) },
-        { "2x/11s", TALK_ID(11, UNIT_SEC) },
-        { "2x/12s", TALK_ID(12, UNIT_SEC) },
-        { "2x/13s", TALK_ID(13, UNIT_SEC) },
-        { "2x/14s", TALK_ID(14, UNIT_SEC) },
-        { "2x/15s", TALK_ID(15, UNIT_SEC) }
-    };
-    return set_option(str(LANG_FFRW_ACCEL), &global_settings.ff_rewind_accel,
-                      INT, names, 16, NULL );
-}
 
 static bool browse_current(void)
 {
@@ -1373,62 +1237,6 @@ static bool button_bar(void)
 #endif /* CONFIG_KEYPAD == RECORDER_PAD */
 #endif /* HAVE_LCD_BITMAP */
 
-static bool ff_rewind_settings_menu(void)
-{
-    int m;
-    bool result;
-
-    static const struct menu_item items[] = {
-        { ID2P(LANG_FFRW_STEP), ff_rewind_min_step },
-        { ID2P(LANG_FFRW_ACCEL), ff_rewind_accel },
-    };
-
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
-                 NULL, NULL, NULL);
-    result = menu_run(m);
-    menu_exit(m);
-
-    return result;
-}
-
-static bool id3_order(void)
-{
-    return set_bool_options( str(LANG_ID3_ORDER),
-                             &global_settings.id3_v1_first,
-                             STR(LANG_ID3_V1_FIRST),
-                             STR(LANG_ID3_V2_FIRST),
-                             mpeg_id3_options);
-}
-
-static bool next_folder(void)
-{
-    static const struct opt_items names[] = {
-        { STR(LANG_SET_BOOL_NO)          },
-        { STR(LANG_SET_BOOL_YES)         },
-        { STR(LANG_RANDOM)               },
-    };
-    return set_option(str(LANG_NEXT_FOLDER),
-                      &global_settings.next_folder,
-                      INT, names, 3, NULL );
-}
-
-static bool audioscrobbler(void)
-{
-    bool result = set_bool_options(str(LANG_AUDIOSCROBBLER),
-                                   &global_settings.audioscrobbler,
-                                   STR(LANG_ON),
-                                   STR(LANG_OFF),
-                                   NULL);
-
-    if (!scrobbler_is_enabled() && global_settings.audioscrobbler)
-        gui_syncsplash(HZ*2, true, str(LANG_PLEASE_REBOOT));
-
-    if(scrobbler_is_enabled() && !global_settings.audioscrobbler)
-        scrobbler_shutdown();
-
-    return result;
-}
-
 static bool codepage_setting(void)
 {
     static const struct opt_items names[] = {
@@ -1450,193 +1258,6 @@ static bool codepage_setting(void)
                       &global_settings.default_codepage,
                       INT, names, 13, set_codepage );
 }
-
-#if CONFIG_CODEC == SWCODEC
-static bool replaygain(void)
-{
-    bool result = set_bool(str(LANG_REPLAYGAIN_ENABLE),
-        &global_settings.replaygain);
-
-    dsp_set_replaygain(true);
-    return result;
-}
-
-static bool replaygain_mode(void)
-{
-    static const struct opt_items names[] = {
-        { STR(LANG_TRACK_GAIN) },
-        { STR(LANG_ALBUM_GAIN) },
-        { STR(LANG_SHUFFLE_GAIN) },
-    };
-    bool result = set_option(str(LANG_REPLAYGAIN_MODE),
-        &global_settings.replaygain_type, INT, names, 3, NULL);
-
-    dsp_set_replaygain(true);
-    return result;
-}
-
-static bool replaygain_noclip(void)
-{
-    bool result = set_bool(str(LANG_REPLAYGAIN_NOCLIP),
-        &global_settings.replaygain_noclip);
-
-    dsp_set_replaygain(true);
-    return result;
-}
-
-static void replaygain_preamp_format(char* buffer, int buffer_size, int value,
-    const char* unit)
-{
-    int v = abs(value);
-
-    snprintf(buffer, buffer_size, "%s%d.%d %s", value < 0 ? "-" : "",
-        v / 10, v % 10, unit);
-}
-
-static bool replaygain_preamp(void)
-{
-    bool result = set_int(str(LANG_REPLAYGAIN_PREAMP), str(LANG_UNIT_DB),
-        UNIT_DB, &global_settings.replaygain_preamp, NULL, 1, -120, 120,
-        replaygain_preamp_format);
-
-    dsp_set_replaygain(true);
-    return result;
-}
-
-static bool replaygain_settings_menu(void)
-{
-    int m;
-    bool result;
-
-    static const struct menu_item items[] = {
-        { ID2P(LANG_REPLAYGAIN_ENABLE), replaygain },
-        { ID2P(LANG_REPLAYGAIN_NOCLIP), replaygain_noclip },
-        { ID2P(LANG_REPLAYGAIN_MODE), replaygain_mode },
-        { ID2P(LANG_REPLAYGAIN_PREAMP), replaygain_preamp },
-    };
-
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
-                 NULL, NULL, NULL);
-    result = menu_run(m);
-    menu_exit(m);
-    return result;
-}
-
-static bool crossfade(void)
-{
-    static const struct opt_items names[] = {
-        { STR(LANG_OFF) },
-        { STR(LANG_SHUFFLE) },
-        { STR(LANG_TRACKSKIP) },
-        { STR(LANG_SHUFFLE_TRACKSKIP) },
-        { STR(LANG_ALWAYS) },
-    };
-
-    bool ret;
-
-    ret=set_option( str(LANG_CROSSFADE_ENABLE),
-                    &global_settings.crossfade, INT, names, 5, NULL);
-    audio_set_crossfade(global_settings.crossfade);
-    return ret;
-}
-
-static bool crossfade_fade_in_delay(void)
-{
-    bool ret;
-
-    ret = set_int(str(LANG_CROSSFADE_FADE_IN_DELAY), "s", UNIT_SEC,
-                   &global_settings.crossfade_fade_in_delay,
-                   NULL, 1, 0, 7, NULL );
-    audio_set_crossfade(global_settings.crossfade);
-    return ret;
-}
-
-static bool crossfade_fade_out_delay(void)
-{
-    bool ret;
-
-    ret = set_int(str(LANG_CROSSFADE_FADE_OUT_DELAY), "s", UNIT_SEC,
-                   &global_settings.crossfade_fade_out_delay,
-                   NULL, 1, 0, 7, NULL );
-    audio_set_crossfade(global_settings.crossfade);
-    return ret;
-}
-
-static bool crossfade_fade_in_duration(void)
-{
-    bool ret;
-
-    ret = set_int(str(LANG_CROSSFADE_FADE_IN_DURATION), "s", UNIT_SEC,
-                   &global_settings.crossfade_fade_in_duration,
-                   NULL, 1, 0, 15, NULL );
-    audio_set_crossfade(global_settings.crossfade);
-    return ret;
-}
-
-static bool crossfade_fade_out_duration(void)
-{
-    bool ret;
-
-    ret = set_int(str(LANG_CROSSFADE_FADE_OUT_DURATION), "s", UNIT_SEC,
-                   &global_settings.crossfade_fade_out_duration,
-                   NULL, 1, 0, 15, NULL );
-    audio_set_crossfade(global_settings.crossfade);
-    return ret;
-}
-
-static bool crossfade_fade_out_mixmode(void)
-{
-    static const struct opt_items names[] = {
-        { STR(LANG_CROSSFADE) },
-        { STR(LANG_MIX) },
-    };
-    bool ret;
-    ret=set_option( str(LANG_CROSSFADE_FADE_OUT_MODE),
-                    &global_settings.crossfade_fade_out_mixmode, INT, names, 2, NULL);
-
-    return ret;
-}
-
-/**
- * Menu to configure the crossfade settings.
- */
-static bool crossfade_settings_menu(void)
-{
-    int m;
-    bool result;
-
-    static const struct menu_item items[] = {
-        { ID2P(LANG_CROSSFADE_ENABLE), crossfade },
-        { ID2P(LANG_CROSSFADE_FADE_IN_DELAY), crossfade_fade_in_delay },
-        { ID2P(LANG_CROSSFADE_FADE_IN_DURATION), crossfade_fade_in_duration },
-        { ID2P(LANG_CROSSFADE_FADE_OUT_DELAY), crossfade_fade_out_delay },
-        { ID2P(LANG_CROSSFADE_FADE_OUT_DURATION), crossfade_fade_out_duration },
-        { ID2P(LANG_CROSSFADE_FADE_OUT_MODE), crossfade_fade_out_mixmode },
-    };
-
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
-                 NULL, NULL, NULL);
-    result = menu_run(m);
-    menu_exit(m);
-    return result;
-}
-
-static bool beep(void)
-{
-    static const struct opt_items names[] = {
-        { STR(LANG_OFF) },
-        { STR(LANG_WEAK) },
-        { STR(LANG_MODERATE) },
-        { STR(LANG_STRONG) },
-    };
-    bool ret;
-    ret=set_option( str(LANG_BEEP),
-                    &global_settings.beep, INT, names, 4, NULL);
-
-    return ret;
-}
-#endif
-
 
 #ifdef HAVE_DIRCACHE
 static bool dircache(void)
@@ -1716,111 +1337,9 @@ static bool tagcache_settings_menu(void)
 }
 #endif
 
-#ifdef HAVE_HEADPHONE_DETECTION
-static bool unplug_mode(void)
-{
-    static const struct opt_items names[] = {
-        { STR(LANG_OFF) },
-        { STR(LANG_PAUSE) },
-        { STR(LANG_UNPLUG_RESUME) },
-    };
-    bool ret;
-    ret=set_option( str(LANG_UNPLUG),
-                    &global_settings.unplug_mode, INT, names, 3, NULL);
-
-    return ret;
-}
-
-static bool unplug_rw(void)
-{
-    bool ret;
-
-    ret = set_int(str(LANG_UNPLUG_RW), "s", UNIT_SEC,
-                   &global_settings.unplug_rw,
-                   NULL, 1, 0, 15, NULL );
-    audio_set_crossfade(global_settings.unplug_rw);
-    return ret;
-}
-
-static bool unplug_autoresume(void)
-{
-    return set_bool( str(LANG_UNPLUG_DISABLE_AUTORESUME),
-                    &global_settings.unplug_autoresume );
-}
-
-static bool unplug_menu(void)
-{
-    int m;
-    bool result;
-
-    static const struct menu_item items[] = {
-        { ID2P(LANG_UNPLUG), unplug_mode },
-        { ID2P(LANG_UNPLUG_RW), unplug_rw },
-        { ID2P(LANG_UNPLUG_DISABLE_AUTORESUME), unplug_autoresume },
-    };
-
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
-                 NULL, NULL, NULL);
-    result = menu_run(m);
-    menu_exit(m);
-    return result;
-}
-#endif
-
 bool playback_settings_menu(void)
 {
-    int m;
-    bool result;
-
-    static const struct menu_item items[] = {
-        { ID2P(LANG_SHUFFLE), shuffle },
-        { ID2P(LANG_REPEAT), repeat_mode },
-        { ID2P(LANG_PLAY_SELECTED), play_selected },
-        { ID2P(LANG_RESUME), resume },
-        { ID2P(LANG_WIND_MENU), ff_rewind_settings_menu },
-        { ID2P(LANG_MP3BUFFER_MARGIN), buffer_margin },
-        { ID2P(LANG_FADE_ON_STOP), set_fade_on_stop },
-        { ID2P(LANG_PARTY_MODE), set_party_mode },
-#if CONFIG_CODEC == SWCODEC
-        { ID2P(LANG_CROSSFADE), crossfade_settings_menu },
-        { ID2P(LANG_REPLAYGAIN), replaygain_settings_menu },
-        { ID2P(LANG_BEEP), beep },
-#endif
-#ifdef HAVE_SPDIF_POWER
-        { ID2P(LANG_SPDIF_ENABLE), spdif },
-#endif
-        { ID2P(LANG_ID3_ORDER), id3_order },
-        { ID2P(LANG_NEXT_FOLDER), next_folder },
-#ifdef HAVE_HEADPHONE_DETECTION
-        { ID2P(LANG_UNPLUG), unplug_menu },
-#endif
-        { ID2P(LANG_AUDIOSCROBBLER), audioscrobbler}
-    };
-
-    bool old_shuffle = global_settings.playlist_shuffle;
-
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
-                 NULL, NULL, NULL);
-    result = menu_run(m);
-    menu_exit(m);
-
-    if ((old_shuffle != global_settings.playlist_shuffle)
-        && (audio_status() & AUDIO_STATUS_PLAY))
-    {
-#if CONFIG_CODEC == SWCODEC
-        dsp_set_replaygain(true);
-#endif
-
-        if (global_settings.playlist_shuffle)
-        {
-            playlist_randomise(NULL, current_tick, true);
-        }
-        else
-        {
-            playlist_sort(NULL, true);
-        }
-    }
-    return result;
+    return do_menu(&playback_menu_item);
 }
 
 static bool bookmark_settings_menu(void)

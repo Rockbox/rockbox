@@ -631,14 +631,15 @@ int do_menu(const struct menu_item_ex *start_menu)
                             }
                             if (setting->flags&F_INT_SETTING)
                             {
-                                set_int(str(setting->lang_id),
+                                set_int_ex(str(setting->lang_id),
                                         NULL,
                                         setting->int_setting->unit,var,
                                         setting->int_setting->option_callback,
                                         setting->int_setting->step,
                                         setting->int_setting->min,
                                         setting->int_setting->max,
-                                        setting->int_setting->formatter);
+                                        setting->int_setting->formatter,
+                                        setting->int_setting->get_talk_id);
                             }
                             else if (setting->flags&F_CHOICE_SETTING)
                             {
