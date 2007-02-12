@@ -90,38 +90,63 @@ static const char backlight_times_conf [] =
 #define FUNCTYPE(a) {.func = a}
 #define NODEFAULT INT(0)
 
+/* in all the following macros the args are:
+    - flags: bitwise | or the F_ bits in settings_list.h
+    - var: pointer to the variable being changed (usually in global_settings)
+    - lang_ig: LANG_* id to display in menus and setting screens for the settings
+    - default: the default value for the variable, set if settings are reset
+    - name: the name of the setting in config files
+    - cfg_vals: comma seperated list of legal values in cfg files.
+                NULL if a number is written to the file instead.
+    - cb: the callback used by the setting screen.
+*/
+
+/* Use for int settings which use the set_sound() function to set them */
 #define SOUND_SETTING(flags,var,lang_id,name,setting)                   \
             {flags|F_T_INT|F_T_SOUND, &global_settings.var,             \
                 lang_id, NODEFAULT,name,NULL,                           \
                 {.sound_setting=(struct sound_setting[]){{setting}}} }
 
-#define BOOL_SETTING(flags,var,lang_id,default,name,cfgvals,yes,no,opt_cb)  \
+/* Use for bool variables which don't use LANG_SET_BOOL_YES and LANG_SET_BOOL_NO,
+                or dont save as "off" or "on" in the cfg */
+#define BOOL_SETTING(flags,var,lang_id,default,name,cfgvals,yes,no,cb)      \
             {flags|F_BOOL_SETTING, &global_settings.var,                    \
                 lang_id, BOOL(default),name,cfgvals,                        \
-                {.bool_setting=(struct bool_setting[]){{opt_cb,yes,no}}} }
-
+                {.bool_setting=(struct bool_setting[]){{cb,yes,no}}} }
+                
+/* bool setting which does use LANG_YES and _NO and save as "off,on" */
 #define OFFON_SETTING(flags,var,lang_id,default,name,cb)                    \
             {flags|F_BOOL_SETTING, &global_settings.var,                    \
                 lang_id, BOOL(default),name,off_on,                         \
                 {.bool_setting=(struct bool_setting[])                      \
                 {{cb,LANG_SET_BOOL_YES,LANG_SET_BOOL_NO}}} }
 
+/* int variable which is NOT saved to .cfg files,
+    (Use NVRAM() in the flags to save to the nvram (or nvram.bin file) */
 #define SYSTEM_SETTING(flags,var,default) \
             {flags|F_T_INT, &global_status.var,-1, INT(default),    \
                 NULL, NULL, UNUSED}
-        
+
+/* setting which stores as a filename in the .cfgvals
+    prefix: The absolute path to not save in the variable, e.g /.rockbox/wps_file
+    suffx:  The file extention (usually...) e.g .wps_file   */
 #define FILENAME_SETTING(flags,var,name,default,prefix,suffix,len)  \
             {flags|F_T_UCHARPTR, &global_settings.var,-1,           \
                 CHARPTR(default),name,NULL,                         \
                 {.filename_setting=                                        \
                     (struct filename_setting[]){{prefix,suffix,len}}} }
-                    
+
+/*  Used for settings which use the set_option() setting screen.
+    the ... arg is a list of pointers to strings to display in the setting screen.
+    These can either be literal strings, or ID2P(LANG_*) */
 #define CHOICE_SETTING(flags,var,lang_id,default,name,cfg_vals,cb,count,...)  \
             {flags|F_CHOICE_SETTING|F_T_INT,  &global_settings.var, lang_id,   \
                 INT(default), name, cfg_vals,                     \
                 {.choice_setting = (struct choice_setting[]){    \
                     {cb, count, {.desc = (unsigned char*[]){__VA_ARGS__}}}}}}
                     
+/* Similar to above, except the strings to display are taken from cfg_vals,
+   the ... arg is a list of ID's to talk for the strings... can use TALK_ID()'s */
 #define STRINGCHOICE_SETTING(flags,var,lang_id,default,name,cfg_vals,cb,count,...)  \
             {flags|F_CHOICE_SETTING|F_T_INT|F_CHOICETALKS,                  \
                 &global_settings.var, lang_id,                  \
@@ -129,11 +154,13 @@ static const char backlight_times_conf [] =
                 {.choice_setting = (struct choice_setting[]){    \
                     {cb, count, {.talks = (int[]){__VA_ARGS__}}}}}}
                     
-#define INT_SETTING(flags, var, lang_id, default, name, cfg_vals,       \
+/*  for settings which use the set_int() setting screen.
+    unit is the UNIT_ define to display/talk. */
+#define INT_SETTING(flags, var, lang_id, default, name,                 \
                     unit, min, max, step, formatter, cb)                \
             {flags|F_INT_SETTING|F_T_INT, &global_settings.var,         \
                 lang_id, INT(default),                                  \
-                name, cfg_vals, {.int_setting = (struct int_setting[]){ \
+                name, NULL, {.int_setting = (struct int_setting[]){ \
                     {cb, unit, min, max, step, formatter}}}}
                     
 #if CONFIG_CODEC == SWCODEC
@@ -250,7 +277,7 @@ const struct settings_list settings[] = {
     SYSTEM_SETTING(NVRAM(4),topruntime,0),
 #if MEM > 1
     INT_SETTING(0,max_files_in_playlist,LANG_MAX_FILES_IN_PLAYLIST,10000,
-                "max files in playlist", NULL, UNIT_INT,1000,20000,1000,NULL,NULL),
+                "max files in playlist", UNIT_INT,1000,20000,1000,NULL,NULL),
     {F_T_INT,&global_settings.max_files_in_dir,LANG_MAX_FILES_IN_DIR,
         INT(400),"max files in dir",NULL,UNUSED},
 #else
@@ -580,16 +607,16 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0,crossfeed, LANG_CROSSFEED, false,
                     "crossfeed", dsp_set_crossfeed),
     INT_SETTING(0, crossfeed_direct_gain, LANG_CROSSFEED_DIRECT_GAIN, 15,
-                    "crossfeed direct gain", NULL, UNIT_DB, 0, 60, 5,
+                    "crossfeed direct gain", UNIT_DB, 0, 60, 5,
                     crossfeed_format, dsp_set_crossfeed_direct_gain),
     INT_SETTING(0, crossfeed_cross_gain, LANG_CROSSFEED_CROSS_GAIN, 60,
-                    "crossfeed cross gain", NULL, UNIT_DB, 30, 120, 5,
+                    "crossfeed cross gain", UNIT_DB, 30, 120, 5,
                     crossfeed_format, crossfeed_cross_gain_helper),
     INT_SETTING(0, crossfeed_hf_attenuation, LANG_CROSSFEED_HF_ATTENUATION, 160,
-                    "crossfeed hf attenuation", NULL, UNIT_DB, 60, 240, 5,
+                    "crossfeed hf attenuation", UNIT_DB, 60, 240, 5,
                     crossfeed_format, crossfeed_hf_att_helper),
     INT_SETTING(0, crossfeed_hf_cutoff, LANG_CROSSFEED_HF_CUTOFF,700,
-                    "crossfeed hf cutoff", NULL, UNIT_HERTZ, 500, 2000, 100,
+                    "crossfeed hf cutoff", UNIT_HERTZ, 500, 2000, 100,
                     crossfeed_format, crossfeed_hf_cutoff_helper),
     /* equalizer */
     OFFON_SETTING(0,eq_enabled,LANG_EQUALIZER_ENABLED,false,"eq enabled",NULL),
