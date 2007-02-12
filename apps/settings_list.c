@@ -30,6 +30,7 @@
 #include "debug.h"
 #include "mpeg.h"
 #include "audio.h"
+#include "power.h"
 
 /* some sets of values which are used more than once, to save memory */
 static const char off_on[] = "off,on";
