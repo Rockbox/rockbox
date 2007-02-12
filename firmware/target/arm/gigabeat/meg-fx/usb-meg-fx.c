@@ -31,21 +31,21 @@
 #define USB_VPLUS_PWR_ASSERT    GPBDAT |=  (1 << 6)
 #define USB_VPLUS_PWR_DEASSERT  GPBDAT &= ~(1 << 6)
 
-#define USB_IS_PRESENT  (!(GPFDAT & 1))
+#define USB_UNIT_IS_PRESENT  !(GPFDAT & 0x01)
+#define USB_CRADLE_IS_PRESENT  ((GPFDAT &0x02)&&!(GPGDAT&0x00004000))
 
-
+#define USB_CRADLE_BUS_ENABLE GPHDAT |=  (1 << 8)
+#define USB_CRADLE_BUS_DISABLE GPHDAT &= ~(1 << 8)
 
 /* The usb detect is one pin to the cpu active low */
 inline bool usb_detect(void)
 {
-    return USB_IS_PRESENT;
+    return USB_UNIT_IS_PRESENT | USB_CRADLE_IS_PRESENT;
 }
-
-
 
 void usb_init_device(void)
 {
-    USB_VPLUS_PWR_ASSERT;    
+    USB_VPLUS_PWR_ASSERT;
     sleep(HZ/20);
     
     /* Reset the usb port */
@@ -70,22 +70,22 @@ void usb_init_device(void)
     sleep(HZ/25);
 }
 
-
-
 void usb_enable(bool on)
 {
     if (on)
     {
-        /* make sure ata_en is high */    
+        /* make sure ata_en is high */
         USB_VPLUS_PWR_ASSERT;
-        USB_ATA_ENABLE;                
+        USB_ATA_ENABLE;
+        if(USB_CRADLE_IS_PRESENT) USB_CRADLE_BUS_ENABLE;
     }
     else
     {
         /* make sure ata_en is low */
+        if(USB_CRADLE_IS_PRESENT) USB_CRADLE_BUS_DISABLE;
         USB_ATA_DISABLE;
         USB_VPLUS_PWR_DEASSERT;
     }
-    
+
     sleep(HZ/20); // > 50ms for detecting the enable state change
 }
