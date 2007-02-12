@@ -572,7 +572,7 @@ static bool get_speex_metadata(int fd, struct mp3entry* id3)
      */
 
     /* Use the path name of the id3 structure as a temporary buffer. */
-    unsigned char* buf = id3->path;
+    unsigned char* buf = (unsigned char*)id3->path;
     long comment_size;
     long remaining = 0;
     long last_serial = 0;
@@ -2239,7 +2239,7 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
 
         break;
     case AFMT_NSF:
-        buf = track->id3.path;
+        buf = (unsigned char *)track->id3.path;
         if ((lseek(fd, 0, SEEK_SET) < 0) || ((read(fd, buf, 8)) < 8))
         {
             DEBUGF("lseek or read failed\n");
