@@ -274,39 +274,39 @@ sokoban_tiles.6x6.bmp
 sokoban_tiles.6x6x2.bmp
 #endif
 
-/* Solitaire */
+/* Solitaire and Blackjack */
 #ifdef HAVE_LCD_COLOR
 #if LCD_WIDTH >= 320
-solitaire_cardback.37x49x16.bmp
-solitaire_deck.481x196x16.bmp
+card_back.37x49x16.bmp
+card_deck.481x196x16.bmp
 solitaire_suitsi.37x196x16.bmp
 #elif LCD_WIDTH >= 220
-solitaire_cardback.26x33x16.bmp
-solitaire_deck.338x132x16.bmp
+card_back.26x33x16.bmp
+card_deck.338x132x16.bmp
 solitaire_suitsi.26x132x16.bmp
 #elif LCD_WIDTH >= 160
-solitaire_cardback.18x23x16.bmp
-solitaire_deck.234x92x16.bmp
+card_back.18x23x16.bmp
+card__deck.234x92x16.bmp
 solitaire_suitsi.18x92x16.bmp
 #elif LCD_WIDTH >= 128
-solitaire_cardback.15x20x16.bmp
-solitaire_deck.195x80x16.bmp
+card_back.15x20x16.bmp
+card__deck.195x80x16.bmp
 solitaire_suitsi.15x80x16.bmp
 #endif
 #elif LCD_DEPTH > 1 /* greyscale */
 #if LCD_WIDTH >= 160
-solitaire_cardback.18x23x2.bmp
-solitaire_deck.234x92x2.bmp
+card_back.18x23x2.bmp
+card_deck.234x92x2.bmp
 solitaire_suitsi.18x92x2.bmp
 #elif LCD_WIDTH >= 128
-solitaire_cardback.15x20x2.bmp
-solitaire_deck.195x80x2.bmp
+card_back.15x20x2.bmp
+card_deck.195x80x2.bmp
 solitaire_suitsi.15x80x2.bmp
 #endif
 #else /* monochrome */
 #if LCD_WIDTH >= 112
-solitaire_cardback.13x13x1.bmp
-solitaire_deck.169x52x1.bmp
+card_back.13x13x1.bmp
+card_deck.169x52x1.bmp
 solitaire_suitsi.13x52x1.bmp
 #endif
 #endif

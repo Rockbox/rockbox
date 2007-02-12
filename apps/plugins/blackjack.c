@@ -18,8 +18,8 @@
  ****************************************************************************/            
 
 #include "plugin.h"
-#include "solitaire_deck.h"
-#include "solitaire_cardback.h"
+#include "card_deck.h"
+#include "card_back.h"
 
 PLUGIN_HEADER
 
@@ -199,14 +199,14 @@ PLUGIN_HEADER
 #define FG_COLOR LCD_BLACK
 #endif
 
-#define CARD_WIDTH  BMPWIDTH_solitaire_cardback
-#define CARD_HEIGHT BMPHEIGHT_solitaire_cardback
+#define CARD_WIDTH  BMPWIDTH_card_back
+#define CARD_HEIGHT BMPHEIGHT_card_back
 
 /* This is the max amount of cards onscreen before condensing */
 #define MAX_CARDS LCD_WIDTH/(CARD_WIDTH+4)
 
-extern const fb_data solitaire_deck[];
-extern const fb_data solitaire_cardback[];
+extern const fb_data card_deck[];
+extern const fb_data card_back[];
 
 #define NEXT_CARD bj->player_cards[done][bj->num_player_cards[done]]
 
@@ -332,11 +332,11 @@ static unsigned int find_value(unsigned int number) {
 static void draw_card(struct card temp_card, bool shown, unsigned int x, 
                       unsigned int y) {
     if(shown)
-        rb->lcd_bitmap_part(solitaire_deck, CARD_WIDTH*temp_card.num, 
-                            CARD_HEIGHT*temp_card.suit, BMPWIDTH_solitaire_deck,
+        rb->lcd_bitmap_part(card_deck, CARD_WIDTH*temp_card.num, 
+                            CARD_HEIGHT*temp_card.suit, BMPWIDTH_card_deck,
                             x+1, y+1, CARD_WIDTH, CARD_HEIGHT);
     else
-        rb->lcd_bitmap(solitaire_cardback, x+1, y+1,CARD_WIDTH, CARD_HEIGHT);          
+        rb->lcd_bitmap(card_back, x+1, y+1,CARD_WIDTH, CARD_HEIGHT);          
 #if LCD_DEPTH > 1
     rb->lcd_set_foreground(LCD_BLACK);
 #endif

@@ -264,14 +264,14 @@ static char helptext[] =
  * Misc constants, graphics and other defines
  */
  
-#include "solitaire_cardback.h"
-#include "solitaire_deck.h"
+#include "card_back.h"
+#include "card_deck.h"
 #include "solitaire_suitsi.h"
 
-#define CARD_GFX_WIDTH  BMPWIDTH_solitaire_cardback
-#define CARD_GFX_HEIGHT BMPHEIGHT_solitaire_cardback
-#define CARD_WIDTH      (BMPWIDTH_solitaire_cardback+2)
-#define CARD_HEIGHT     (BMPHEIGHT_solitaire_cardback+2)
+#define CARD_GFX_WIDTH  BMPWIDTH_card_back
+#define CARD_GFX_HEIGHT BMPHEIGHT_card_back
+#define CARD_WIDTH      (BMPWIDTH_card_back+2)
+#define CARD_HEIGHT     (BMPHEIGHT_card_back+2)
 
 #if LCD_WIDTH >= 320
 #   define MARGIN 4
@@ -405,13 +405,13 @@ static void draw_card( card_t *card, int x, int y,
 {
     if( card->known )
     {
-        rb->lcd_bitmap_part( solitaire_deck, CARD_GFX_WIDTH * card->num,
-                             CARD_GFX_HEIGHT * card->suit, BMPWIDTH_solitaire_deck,
+        rb->lcd_bitmap_part( card_deck, CARD_GFX_WIDTH * card->num,
+                             CARD_GFX_HEIGHT * card->suit, BMPWIDTH_card_deck,
                              x+1, y+1, CARD_GFX_WIDTH, CARD_GFX_HEIGHT );
     }
     else
     {
-        rb->lcd_bitmap( solitaire_cardback, x+1, y+1,
+        rb->lcd_bitmap( card_back, x+1, y+1,
                         CARD_GFX_WIDTH, CARD_GFX_HEIGHT );
     }
     draw_card_ext( x, y, selected, cursor );
