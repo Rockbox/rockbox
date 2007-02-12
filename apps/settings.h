@@ -27,7 +27,9 @@
 #include "dircache.h"
 #include "timefuncs.h"
 #include "tagcache.h"
+#ifndef __PCTOOL__
 #include "button.h"
+#endif
 
 #if CONFIG_CODEC == SWCODEC
 #include "audio.h"

@@ -30,7 +30,6 @@
 #include "replaygain.h"
 #include "debug.h"
 #include "system.h"
-#include "gwps.h"
 
 enum tagtype { TAGTYPE_APE = 1, TAGTYPE_VORBIS };
 
