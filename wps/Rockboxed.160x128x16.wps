@@ -1,7 +1,7 @@
 # (C) 2007, Roan Horning <roan@horning.us>
 # License: GNU GPL v2 or later.
 %wd
-%X|bd-160x128x16.bmp|0|0|
+%X|bg-160x128x16.bmp|0|0|
 %P|pg-140.bmp|
 %x|o|pgln-140.bmp|10|76|
 %xl|p|ply-color-big.bmp|72|109|
