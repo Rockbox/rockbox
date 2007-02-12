@@ -348,7 +348,9 @@ bool settings_load_config(const char* file, bool apply)
                         if (settings[i].filename_setting->prefix)
                         {
                             int len = strlen(settings[i].filename_setting->prefix);
-                            if (!strncmp(value,settings[i].filename_setting->prefix,len))
+                            if (!strncasecmp(value,
+                                             settings[i].filename_setting->prefix,
+                                             len))
                             {
                                 strncpy(storage,&value[len],MAX_PATH);
                             }
