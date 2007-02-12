@@ -43,6 +43,7 @@
 #include "lang.h"
 
 #include "playlist_viewer.h"
+#include "playlist_catalog.h"
 #include "icon.h"
 #include "list.h"
 #include "statusbar.h"
@@ -425,7 +426,7 @@ static bool update_playlist(bool force)
    changed. */
 static int onplay_menu(int index)
 {
-    struct menu_item items[3]; /* increase this if you add entries! */
+    struct menu_item items[4]; /* increase this if you add entries! */
     int m, i=0, result, ret = 0;
     struct playlist_entry * current_track=
         playlist_buffer_get_track(&viewer.buffer, index);
@@ -437,13 +438,18 @@ static int onplay_menu(int index)
     items[i].desc = ID2P(LANG_MOVE);
     i++;
 
-    items[i].desc = ID2P(LANG_FILE_OPTIONS);
+    items[i].desc = ID2P(LANG_CATALOG_ADD_TO);
+    i++;
+    
+    items[i].desc = ID2P(LANG_CATALOG_ADD_TO_NEW);
     i++;
 
     m = menu_init(items, i, NULL, NULL, NULL, NULL);
     result = menu_show(m);
     if (result == MENU_ATTACHED_USB)
+    {
         ret = -1;
+    }
     else if (result >= 0)
     {
         /* Abort current move */
@@ -482,16 +488,13 @@ static int onplay_menu(int index)
                 viewer.move_track = current_track->index;
                 ret = 0;
                 break;
-            case 2:
-            {
-                onplay(current_track->name, TREE_ATTR_MPA, CONTEXT_TREE);
-
-                if (!viewer.playlist)
-                    ret = 1;
-                else
-                    ret = 0;
+            case 2: /* add to catalog */
+            case 3: /* add to a new one */
+                catalog_add_to_a_playlist(current_track->name,
+                                          TREE_ATTR_MPA,
+                                          result==3 );
+                ret = 0;
                 break;
-            }
         }
     }
     menu_exit(m);
