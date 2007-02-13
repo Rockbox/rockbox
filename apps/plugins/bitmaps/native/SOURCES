@@ -262,12 +262,14 @@ snake2_bottom.160x128x2.bmp
 
 /* Sokoban*/
 #ifdef HAVE_LCD_COLOR
-#if LCD_HEIGHT >= 240
+#if (LCD_HEIGHT >= 224) && (LCD_WIDTH >= 312) || \
+    (LCD_HEIGHT >= 249) && (LCD_WIDTH >= 280)
 sokoban_tiles.14x14.bmp
-#elif LCD_HEIGHT >= 176
+#elif (LCD_HEIGHT >= 144) && (LCD_WIDTH >= 212) || \
+      (LCD_HEIGHT >= 169) && (LCD_WIDTH >= 180-4)
 sokoban_tiles.9x9.bmp
 #else
-/* LCD_HEIGHT >= 128 */
+/* LCD_HEIGHT >= 96~121 && LCD_WIDTH >= 152~120 */
 sokoban_tiles.6x6.bmp
 #endif
 #elif LCD_DEPTH >= 2
