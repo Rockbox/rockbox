@@ -322,44 +322,6 @@ void menu_draw(int m)
     gui_synclist_draw(&(menus[m].synclist));
 }
 
-/* count in letter positions, NOT pixels */
-void put_cursorxy(int x, int y, bool on)
-{
-#ifdef HAVE_LCD_BITMAP
-    int fh, fw;
-    int xpos, ypos;
-
-    /* check here instead of at every call (ugly, but cheap) */
-    if (global_settings.invert_cursor)
-        return;
-
-    lcd_getstringsize((unsigned char *)"A", &fw, &fh);
-    xpos = x*6;
-    ypos = y*fh + lcd_getymargin();
-    if ( fh > 8 )
-        ypos += (fh - 8) / 2;
-#endif
-
-    /* place the cursor */
-    if(on) {
-#ifdef HAVE_LCD_BITMAP
-        lcd_mono_bitmap(bitmap_icons_6x8[Icon_Cursor], xpos, ypos, 4, 8);
-#else
-        lcd_putc(x, y, CURSOR_CHAR);
-#endif
-    }
-    else {
-#if defined(HAVE_LCD_BITMAP)
-        /* I use xy here since it needs to disregard the margins */
-        lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-        lcd_fillrect (xpos, ypos, 4, 8);
-        lcd_set_drawmode(DRMODE_SOLID);
-#else
-        lcd_putc(x, y, ' ');
-#endif
-    }
-}
-
 /******************************************************************/
 /*              New menu stuff here!!
  ******************************************************************/
