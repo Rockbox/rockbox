@@ -20,6 +20,7 @@
 #include "config.h"
 #include <stdbool.h>
 #include <string.h>
+#include "ata.h"
 #include "lang.h"
 #include "talk.h"
 #include "lcd.h"
@@ -31,6 +32,7 @@
 #include "mpeg.h"
 #include "audio.h"
 #include "power.h"
+#include "powermgmt.h"
 
 /* some sets of values which are used more than once, to save memory */
 static const char off_on[] = "off,on";
@@ -107,7 +109,23 @@ static void scanaccel_formatter(char *buffer, int buffer_size,
     else
         snprintf(buffer, buffer_size, "2x/%ds", val);
 }
-            
+
+static int poweroff_idle_timer_times[] = {0,1,2,3,4,5,6,7,8,9,10,15,30,45,60};
+static long poweroff_idle_timer_getlang(int value)
+{
+    if (value == 0)
+        return LANG_OFF;
+    return TALK_ID(poweroff_idle_timer_times[value], UNIT_MIN);
+}
+static void poweroff_idle_timer_formatter(char *buffer, int buffer_size, 
+        int val, const char *unit)
+{
+    (void)unit;
+    if (val == 0)
+        strcpy(buffer, str(LANG_OFF));
+    else
+        snprintf(buffer, buffer_size, "%dm", poweroff_idle_timer_times[val]);
+}
 
 #define NVRAM(bytes) (bytes<<F_NVRAM_MASK_SHIFT)
 /** NOTE: NVRAM_CONFIG_VERSION is in settings_list.h
@@ -316,32 +334,43 @@ const struct settings_list settings[] = {
         "volume display",graphic_numeric,UNUSED},
     {F_T_INT,&global_settings.battery_display, LANG_BATTERY_DISPLAY, INT(0),
         "battery display",graphic_numeric,UNUSED},
-    {F_T_INT,&global_settings.timeformat, LANG_TIMEFORMAT, INT(0),
-        "time format","24hour,12hour",UNUSED},
+    CHOICE_SETTING(0, timeformat, LANG_TIMEFORMAT, 0,
+        "time format", "24hour,12hour", NULL, 2,
+        ID2P(LANG_24_HOUR_CLOCK), ID2P(LANG_12_HOUR_CLOCK)),
 #endif /* HAVE_LCD_BITMAP */
     OFFON_SETTING(0,show_icons, LANG_SHOW_ICONS ,true,"show icons", NULL),
     /* system */
-    {F_T_INT,&global_settings.poweroff,LANG_POWEROFF_IDLE, INT(10),"idle poweroff",
-        "off,1,2,3,4,5,6,7,8,9,10,15,30,45,60",UNUSED},
+    INT_SETTING_W_CFGVALS(0, poweroff, LANG_POWEROFF_IDLE, 10, "idle poweroff",
+                    "off,1,2,3,4,5,6,7,8,9,10,15,30,45,60", UNIT_MIN,
+                    0, 14, 1, poweroff_idle_timer_formatter,
+                    poweroff_idle_timer_getlang, set_poweroff_timeout),
     SYSTEM_SETTING(NVRAM(4),runtime,0),
     SYSTEM_SETTING(NVRAM(4),topruntime,0),
+
+    INT_SETTING(0,max_files_in_playlist,LANG_MAX_FILES_IN_PLAYLIST,
 #if MEM > 1
-    INT_SETTING(0,max_files_in_playlist,LANG_MAX_FILES_IN_PLAYLIST,10000,
-                "max files in playlist", UNIT_INT,1000,20000,1000,NULL,NULL,NULL),
-    {F_T_INT,&global_settings.max_files_in_dir,LANG_MAX_FILES_IN_DIR,
-        INT(400),"max files in dir",NULL,UNUSED},
+        10000,
 #else
-    {F_T_INT,&global_settings.max_files_in_playlist,LANG_MAX_FILES_IN_PLAYLIST, 
-        INT(1000),"max files in playlist",NULL,UNUSED},
-    {F_T_INT,&global_settings.max_files_in_dir,LANG_MAX_FILES_IN_DIR, 
-        INT(200),"max files in dir",NULL,UNUSED},
+        400,
 #endif
-    {F_T_INT,&global_settings.battery_capacity,LANG_BATTERY_CAPACITY, 
-        INT(BATTERY_CAPACITY_DEFAULT),
-        "battery capacity",NULL,UNUSED},
+            "max files in playlist", UNIT_INT,1000,20000,1000,NULL,NULL,NULL),
+    INT_SETTING(0,max_files_in_dir,LANG_MAX_FILES_IN_DIR,
+#if MEM > 1
+        1000,
+#else
+        200,
+#endif
+            "max files in dir", UNIT_INT,50,10000,50,NULL,NULL,NULL),
+#ifndef SIMULATOR
+
+    INT_SETTING(0, battery_capacity, LANG_BATTERY_CAPACITY, BATTERY_CAPACITY_DEFAULT, 
+                "battery capacity", UNIT_MAH,
+                BATTERY_CAPACITY_MIN, BATTERY_CAPACITY_MAX, BATTERY_CAPACITY_INC,
+                NULL, NULL, NULL),
+#endif
 #ifdef CONFIG_CHARGING
     OFFON_SETTING(NVRAM(1), car_adapter_mode,
-        LANG_CAR_ADAPTER_MODE,false,"car adapter mode", NULL),
+        LANG_CAR_ADAPTER_MODE, false, "car adapter mode", NULL),
 #endif
     /* tuner */
 #ifdef CONFIG_TUNER
@@ -351,8 +380,9 @@ const struct settings_list settings[] = {
 #endif
 
 #if BATTERY_TYPES_COUNT > 1
-    {F_T_INT,&global_settings.battery_type, LANG_BATTERY_TYPE, INT(0),
-        "battery type","alkaline,nimh",UNUSED},
+    CHOICE_SETTING(0, battery_type, LANG_BATTERY_TYPE, 0,
+        "battery type","alkaline,nimh", NULL, 2,
+        ID2P(LANG_BATTERY_TYPE_ALKALINE), ID2P(LANG_BATTERY_TYPE_NIMH)),
 #endif
 #ifdef HAVE_REMOTE_LCD
     /* remote lcd */
@@ -461,20 +491,26 @@ const struct settings_list settings[] = {
         TALK_ID(30, UNIT_SEC), TALK_ID(1, UNIT_MIN), TALK_ID(2, UNIT_MIN),
         TALK_ID(3, UNIT_MIN), TALK_ID(5, UNIT_MIN), TALK_ID(10, UNIT_MIN)),
 #else
-    INT_SETTING(0, buffer_margin, LANG_MP3BUFFER_MARGIN, 0, "antiskip",                      \
+    INT_SETTING(0, buffer_margin, LANG_MP3BUFFER_MARGIN, 0, "antiskip",
                     UNIT_SEC, 0, 7, 1, NULL, NULL, audio_set_buffer_margin),
 #endif
     /* disk */
 #ifndef HAVE_MMC
+    INT_SETTING(0, disk_spindown, LANG_SPINDOWN, 5, "disk spindown",                      
+                    UNIT_SEC, 3, 254, 1, NULL, NULL, ata_spindown),
     {F_T_INT,&global_settings.disk_spindown,LANG_SPINDOWN,INT(5),"disk spindown",NULL,UNUSED},
 #endif /* HAVE_MMC */
     /* browser */
-    {F_T_INT,&global_settings.dirfilter,LANG_FILTER,INT(SHOW_SUPPORTED),"show files",
-        "all,supported,music,playlists"
-#ifdef HAVE_TAGCACHE
-        ",id3 database"
+    CHOICE_SETTING(0, dirfilter, LANG_FILTER, SHOW_SUPPORTED, "show files",
+#ifndef HAVE_TAGCACHE
+        "all,supported,music,playlists", NULL, 4, ID2P(LANG_FILTER_ALL),
+        ID2P(LANG_FILTER_SUPPORTED), ID2P(LANG_FILTER_MUSIC), ID2P(LANG_FILTER_PLAYLIST)
+#else
+        "all,supported,music,playlists,id3 database", NULL, 5, ID2P(LANG_FILTER_ALL),
+        ID2P(LANG_FILTER_SUPPORTED), ID2P(LANG_FILTER_MUSIC),
+        ID2P(LANG_FILTER_PLAYLIST), ID2P(LANG_FILTER_ID3DB)
 #endif
-       ,UNUSED},
+       ),
     OFFON_SETTING(0,sort_case,LANG_SORT_CASE,false,"sort case",NULL),
     OFFON_SETTING(0,browse_current,LANG_FOLLOW,false,"follow playlist",NULL),
     OFFON_SETTING(0,playlist_viewer_icons,LANG_SHOW_ICONS,true,
@@ -487,14 +523,19 @@ const struct settings_list settings[] = {
         "recursive directory insert", off_on_ask, NULL , 3 ,
         ID2P(LANG_OFF), ID2P(LANG_ON), ID2P(LANG_RESUME_SETTING_ASK)),
     /* bookmarks */
-    {F_T_INT,&global_settings.autocreatebookmark,LANG_BOOKMARK_SETTINGS_AUTOCREATE,
-        INT(BOOKMARK_NO),"autocreate bookmarks",
-        "off,on,ask,recent only - on,recent only - ask",UNUSED},
-    {F_T_INT,&global_settings.autoloadbookmark,LANG_BOOKMARK_SETTINGS_AUTOLOAD,
-        INT(BOOKMARK_NO), "autoload bookmarks",off_on_ask,UNUSED},
-    {F_T_INT,&global_settings.usemrb,LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS,
-        INT(BOOKMARK_NO),
-        "use most-recent-bookmarks","off,on,unique only",UNUSED},
+    CHOICE_SETTING(0, autocreatebookmark, LANG_BOOKMARK_SETTINGS_AUTOCREATE,
+        BOOKMARK_NO, "autocreate bookmarks",
+        "off,on,ask,recent only - on,recent only - ask", NULL, 5,
+        ID2P(LANG_SET_BOOL_NO), ID2P(LANG_SET_BOOL_YES),
+        ID2P(LANG_RESUME_SETTING_ASK), ID2P(LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES),
+        ID2P(LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK)),
+    CHOICE_SETTING(0, autoloadbookmark, LANG_BOOKMARK_SETTINGS_AUTOLOAD, 
+        BOOKMARK_NO, "autoload bookmarks", off_on_ask, NULL, 3,
+        ID2P(LANG_SET_BOOL_NO), ID2P(LANG_SET_BOOL_YES), ID2P(LANG_RESUME_SETTING_ASK)),
+    CHOICE_SETTING(0, usemrb, LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS,
+        BOOKMARK_NO, "use most-recent-bookmarks", "off,on,unique only", NULL, 3,
+        ID2P(LANG_SET_BOOL_NO), ID2P(LANG_SET_BOOL_YES),
+        ID2P(LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY)),
 #ifdef HAVE_LCD_BITMAP
     /* peak meter */
     {F_T_INT, &global_settings.peak_meter_clip_hold, LANG_PM_CLIP_HOLD,
@@ -526,17 +567,25 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0,line_in,LANG_LINE_IN,false,"line in",NULL),
 #endif
     /* voice */
-    {F_T_INT,&global_settings.talk_dir,LANG_VOICE_DIR,INT(0),
-        "talk dir",off_number_spell_hover,UNUSED},
-    {F_T_INT,&global_settings.talk_file,LANG_VOICE_FILE,INT(0),
-        "talk file",off_number_spell_hover,UNUSED},
-    OFFON_SETTING(0,talk_menu,LANG_VOICE_MENU,true,"talk menu",NULL),
+    CHOICE_SETTING(0, talk_dir, LANG_VOICE_DIR, 0,
+        "talk dir", off_number_spell_hover, NULL, 4,
+        ID2P(LANG_OFF), ID2P(LANG_VOICE_NUMBER),
+        ID2P(LANG_VOICE_SPELL), ID2P(LANG_VOICE_DIR_HOVER)),
+    CHOICE_SETTING(0, talk_file, LANG_VOICE_FILE, 0,
+        "talk file", off_number_spell_hover, NULL, 4,
+        ID2P(LANG_OFF), ID2P(LANG_VOICE_NUMBER),
+        ID2P(LANG_VOICE_SPELL), ID2P(LANG_VOICE_DIR_HOVER)),
+    OFFON_SETTING(F_TEMPVAR, talk_menu, LANG_VOICE_MENU, true, "talk menu", NULL),
 
     /* file sorting */
-    {F_T_INT,&global_settings.sort_file,LANG_SORT_FILE,INT(0),
-        "sort files","alpha,oldest,newest,type",UNUSED},
-    {F_T_INT,&global_settings.sort_dir,LANG_SORT_DIR,INT(0),
-        "sort dirs","alpha,oldest,newest",UNUSED},
+    CHOICE_SETTING(0, sort_file, LANG_SORT_FILE, 0 ,
+        "sort files", "alpha,oldest,newest,type", NULL, 4,
+        ID2P(LANG_SORT_ALPHA), ID2P(LANG_SORT_DATE),
+        ID2P(LANG_SORT_DATE_REVERSE) , ID2P(LANG_SORT_TYPE)),
+    CHOICE_SETTING(0, sort_dir, LANG_SORT_DIR, 0 ,
+        "sort dirs", "alpha,oldest,newest", NULL, 3,
+        ID2P(LANG_SORT_ALPHA), ID2P(LANG_SORT_DATE),
+        ID2P(LANG_SORT_DATE_REVERSE)),
     BOOL_SETTING(0, id3_v1_first, LANG_ID3_ORDER, false,
         "id3 tag priority", "v2-v1,v1-v2",
         LANG_ID3_V2_FIRST, LANG_ID3_V1_FIRST, mpeg_id3_options),
@@ -798,8 +847,9 @@ const struct settings_list settings[] = {
 
     OFFON_SETTING(0,hold_lr_for_scroll_in_list,-1,true,
         "hold_lr_for_scroll_in_list",NULL),
-    {F_T_INT,&global_settings.show_path_in_browser,LANG_SHOW_PATH,INT(SHOW_PATH_OFF),
-        "show path in browser","off,current directory,full path",UNUSED},
+    CHOICE_SETTING(0, show_path_in_browser, LANG_SHOW_PATH, SHOW_PATH_OFF,
+        "show path in browser", "off,current directory,full path", NULL, 3,
+        ID2P(LANG_OFF), ID2P(LANG_SHOW_PATH_CURRENT), ID2P(LANG_SHOW_PATH_FULL)),
 
 #ifdef HAVE_AGC
     {F_T_INT,&global_settings.rec_agc_preset_mic,LANG_RECORD_AGC_PRESET,INT(1),

@@ -66,9 +66,6 @@
 #if CONFIG_CODEC == MAS3507D
 void dac_line_in(bool enable);
 #endif
-#ifdef HAVE_ALARM_MOD
-#include "alarm_menu.h"
-#endif
 
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
@@ -85,34 +82,6 @@ void dac_line_in(bool enable);
 #endif
 #include "menus/exported_menus.h"
 
-#ifdef CONFIG_CHARGING
-static bool car_adapter_mode(void)
-{
-    return set_bool( str(LANG_CAR_ADAPTER_MODE),
-                     &global_settings.car_adapter_mode );
-}
-#endif
-
-/**
- * Menu to set icon visibility
- */
-static bool show_icons(void)
-{
-    return set_bool( (char *)str(LANG_SHOW_ICONS), &global_settings.show_icons );
-}
-
-static bool show_path(void)
-{
-    static const struct opt_items names[3] = {
-        { STR(LANG_OFF) },
-        { STR(LANG_SHOW_PATH_CURRENT) },
-        { STR(LANG_SHOW_PATH_FULL) },
-    };
-
-    return set_option(str(LANG_SHOW_PATH),
-                      &global_settings.show_path_in_browser,
-                      INT, names, 3, NULL);
-}
 
 /**
  * Menu to set the option to scroll paginated
@@ -451,22 +420,6 @@ static bool reset_color(void)
 }
 #endif
 
-#ifdef HAVE_USB_POWER
-#ifdef CONFIG_CHARGING
-/**
- * Menu to switch the USB charging on or off
- */
-static bool usb_charging(void)
-{
-    bool rc = set_bool(str(LANG_USB_CHARGING),
-                       &global_settings.usb_charging);
-    /* if (usb_charging_enabled() != global_settings.usb_charging) */
-    usb_charging_enable(global_settings.usb_charging);
-    return rc;
-}
-#endif
-#endif
-
 /**
  * Menu to configure the battery display on status bar
  */
@@ -734,164 +687,6 @@ static bool peak_meter_menu(void)
 }
 #endif /* HAVE_LCD_BITMAP */
 
-static bool dir_filter(void)
-{
-    static const struct opt_items names[] = {
-        { STR(LANG_FILTER_ALL) },
-        { STR(LANG_FILTER_SUPPORTED) },
-        { STR(LANG_FILTER_MUSIC) },
-        { STR(LANG_FILTER_PLAYLIST) },
-#ifdef HAVE_TAGCACHE
-        { STR(LANG_FILTER_ID3DB) }
-#endif
-    };
-#ifdef HAVE_TAGCACHE
-    return set_option( str(LANG_FILTER), &global_settings.dirfilter, INT,
-                       names, 5, NULL );
-#else
-    return set_option( str(LANG_FILTER), &global_settings.dirfilter, INT,
-                       names, 4, NULL );
-#endif
-}
-
-static bool sort_case(void)
-{
-    return set_bool( str(LANG_SORT_CASE), &global_settings.sort_case );
-}
-
-static bool sort_file(void)
-{
-    int oldval = global_settings.sort_file;
-    bool ret;
-    static const struct opt_items names[] = {
-        { STR(LANG_SORT_ALPHA) },
-        { STR(LANG_SORT_DATE) },
-        { STR(LANG_SORT_DATE_REVERSE) },
-        { STR(LANG_SORT_TYPE) }
-    };
-    ret = set_option( str(LANG_SORT_FILE), &global_settings.sort_file, INT,
-                       names, 4, NULL );
-    if (global_settings.sort_file != oldval)
-        reload_directory(); /* force reload if this has changed */
-    return ret;
-}
-
-static bool sort_dir(void)
-{
-    int oldval = global_settings.sort_dir;
-    bool ret;
-    static const struct opt_items names[] = {
-        { STR(LANG_SORT_ALPHA) },
-        { STR(LANG_SORT_DATE) },
-        { STR(LANG_SORT_DATE_REVERSE) }
-    };
-    ret = set_option( str(LANG_SORT_DIR), &global_settings.sort_dir, INT,
-                       names, 3, NULL );
-    if (global_settings.sort_dir != oldval)
-        reload_directory(); /* force reload if this has changed */
-    return ret;
-}
-
-static bool autocreatebookmark(void)
-{
-    bool retval = false;
-    static const struct opt_items names[] = {
-        { STR(LANG_SET_BOOL_NO) },
-        { STR(LANG_SET_BOOL_YES) },
-        { STR(LANG_RESUME_SETTING_ASK) },
-        { STR(LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES) },
-        { STR(LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK) }
-    };
-
-    retval = set_option( str(LANG_BOOKMARK_SETTINGS_AUTOCREATE),
-                       &global_settings.autocreatebookmark, INT,
-                       names, 5, NULL );
-    if(global_settings.autocreatebookmark ==  BOOKMARK_RECENT_ONLY_YES ||
-       global_settings.autocreatebookmark ==  BOOKMARK_RECENT_ONLY_ASK)
-    {
-        if(global_settings.usemrb == BOOKMARK_NO)
-            global_settings.usemrb = BOOKMARK_YES;
-
-    }
-    return retval;
-}
-
-static bool autoloadbookmark(void)
-{
-    static const struct opt_items names[] = {
-        { STR(LANG_SET_BOOL_NO) },
-        { STR(LANG_SET_BOOL_YES) },
-        { STR(LANG_RESUME_SETTING_ASK) }
-    };
-    return set_option( str(LANG_BOOKMARK_SETTINGS_AUTOLOAD),
-                       &global_settings.autoloadbookmark, INT,
-                       names, 3, NULL );
-}
-
-static bool useMRB(void)
-{
-    static const struct opt_items names[] = {
-        { STR(LANG_SET_BOOL_NO) },
-        { STR(LANG_SET_BOOL_YES) },
-        { STR(LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY) }
-    };
-    return set_option( str(LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS),
-                       &global_settings.usemrb, INT,
-                       names, 3, NULL );
-}
-
-static bool poweroff_idle_timer(void)
-{
-    static const struct opt_items names[] = {
-        { STR(LANG_OFF) },
-        { "1m ", TALK_ID(1, UNIT_MIN) },
-        { "2m ", TALK_ID(2, UNIT_MIN) },
-        { "3m ", TALK_ID(3, UNIT_MIN) },
-        { "4m ", TALK_ID(4, UNIT_MIN) },
-        { "5m ", TALK_ID(5, UNIT_MIN) },
-        { "6m ", TALK_ID(6, UNIT_MIN) },
-        { "7m ", TALK_ID(7, UNIT_MIN) },
-        { "8m ", TALK_ID(8, UNIT_MIN) },
-        { "9m ", TALK_ID(9, UNIT_MIN) },
-        { "10m", TALK_ID(10, UNIT_MIN) },
-        { "15m", TALK_ID(15, UNIT_MIN) },
-        { "30m", TALK_ID(30, UNIT_MIN) },
-        { "45m", TALK_ID(45, UNIT_MIN) },
-        { "60m", TALK_ID(60, UNIT_MIN) }
-    };
-    return set_option(str(LANG_POWEROFF_IDLE), &global_settings.poweroff,
-                      INT, names, 15, set_poweroff_timeout);
-}
-
-static void sleep_timer_formatter(char* buffer, int buffer_size, int value,
-    const char* unit)
-{
-    int minutes, hours;
-
-    (void) unit;
-
-    if (value) {
-        hours = value / 60;
-        minutes = value - (hours * 60);
-        snprintf(buffer, buffer_size, "%d:%02d", hours, minutes);
-    } else {
-        snprintf(buffer, buffer_size, "%s", str(LANG_OFF));
-    }
-}
-
-static void sleep_timer_set(int minutes)
-{
-    set_sleep_timer(minutes * 60);
-}
-
-static bool sleep_timer(void)
-{
-    int minutes = (get_sleep_timer() + 59) / 60; /* round up */
-
-    return set_int(str(LANG_SLEEP_TIMER), "", UNIT_MIN, &minutes,
-        &sleep_timer_set, 5, 0, 300, sleep_timer_formatter);
-}
-
 static bool scroll_speed(void)
 {
     return set_int(str(LANG_SCROLL), "", UNIT_INT,
@@ -1000,108 +795,6 @@ static bool jump_scroll_delay(void)
 }
 #endif
 
-#ifndef SIMULATOR
-/**
- * Menu to set the battery capacity
- */
-static bool battery_capacity(void)
-{
-    return set_int(str(LANG_BATTERY_CAPACITY), "mAh", UNIT_MAH,
-                   &global_settings.battery_capacity,
-                   &set_battery_capacity, BATTERY_CAPACITY_INC, BATTERY_CAPACITY_MIN,
-                   BATTERY_CAPACITY_MAX, NULL );
-}
-
-#if BATTERY_TYPES_COUNT > 1
-static bool battery_type(void)
-{
-    static const struct opt_items names[] = {
-        { STR(LANG_BATTERY_TYPE_ALKALINE) },
-        { STR(LANG_BATTERY_TYPE_NIMH) }
-    };
-
-    return set_option(str(LANG_BATTERY_TYPE), &global_settings.battery_type,
-                      INT, names, 2, set_battery_type);
-}
-#endif
-#endif
-
-#ifdef CONFIG_RTC
-static bool timedate_set(void)
-{
-    struct tm tm;
-    bool result;
-
-    /* Make a local copy of the time struct */
-    memcpy(&tm, get_time(), sizeof(struct tm));
-
-    /* do some range checks */
-    /* This prevents problems with time/date setting after a power loss */
-    if (!valid_time(&tm))
-    {
-        /* hour   */
-        tm.tm_hour = 0;
-        tm.tm_min = 0;
-        tm.tm_sec = 0;
-        tm.tm_mday = 1;
-        tm.tm_mon = 0;
-        tm.tm_wday = 1;
-        tm.tm_year = 100;
-    }
-
-    result = set_time_screen(str(LANG_TIME), &tm);
-
-    if(tm.tm_year != -1) {
-        set_time(&tm);
-    }
-    return result;
-}
-
-static bool timeformat_set(void)
-{
-    static const struct opt_items names[] = {
-        { STR(LANG_24_HOUR_CLOCK) },
-        { STR(LANG_12_HOUR_CLOCK) }
-    };
-    return set_option(str(LANG_TIMEFORMAT), &global_settings.timeformat,
-                      INT, names, 2, NULL);
-}
-#endif
-
-#ifndef HAVE_MMC
-static bool spindown(void)
-{
-    return set_int(str(LANG_SPINDOWN), "s", UNIT_SEC,
-                   &global_settings.disk_spindown,
-                   ata_spindown, 1, 3, 254, NULL );
-}
-
-#endif /* !HAVE_MMC */
-
-#if CONFIG_CODEC == MAS3507D
-static bool line_in(void)
-{
-    bool rc = set_bool(str(LANG_LINE_IN), &global_settings.line_in);
-#ifndef SIMULATOR
-    dac_line_in(global_settings.line_in);
-#endif
-    return rc;
-}
-#endif
-
-static bool max_files_in_dir(void)
-{
-    return set_int(str(LANG_MAX_FILES_IN_DIR), "", UNIT_INT,
-                   &global_settings.max_files_in_dir,
-                   NULL, 50, 50, 10000, NULL );
-}
-
-static bool max_files_in_playlist(void)
-{
-    return set_int(str(LANG_MAX_FILES_IN_PLAYLIST), "", UNIT_INT,
-                   &global_settings.max_files_in_playlist,
-                   NULL, 1000, 1000, 20000, NULL );
-}
 
 #ifdef CONFIG_BACKLIGHT
 static bool set_bl_filter_first_keypress(void)
@@ -1122,11 +815,6 @@ static bool set_remote_bl_filter_first_keypress(void)
 #endif
 #endif
 
-static bool browse_current(void)
-{
-    return set_bool( str(LANG_FOLLOW), &global_settings.browse_current );
-}
-
 static bool custom_wps_browse(void)
 {
     return rockbox_browse(WPS_DIR, SHOW_WPS);
@@ -1142,75 +830,6 @@ static bool custom_remote_wps_browse(void)
 static bool custom_cfg_browse(void)
 {
     return rockbox_browse(ROCKBOX_DIR, SHOW_CFG);
-}
-
-static bool language_browse(void)
-{
-    return rockbox_browse(LANG_DIR, SHOW_LNG);
-}
-
-static bool voice_menus(void)
-{
-    bool ret;
-    bool temp = global_settings.talk_menu;
-    /* work on a temp variable first, avoid "life" disabling */
-    ret = set_bool( str(LANG_VOICE_MENU), &temp );
-    global_settings.talk_menu = temp;
-    return ret;
-}
-
-/* this is used 2 times below, so it saves memory to put it in global scope */
-static const struct opt_items voice_names[] = {
-    { STR(LANG_OFF) },
-    { STR(LANG_VOICE_NUMBER) },
-    { STR(LANG_VOICE_SPELL) },
-    { STR(LANG_VOICE_DIR_HOVER) }
-};
-
-static bool voice_dirs(void)
-{
-    bool ret = set_option( str(LANG_VOICE_DIR),
-                       &global_settings.talk_dir, INT, voice_names, 4, NULL);
-#if CONFIG_CODEC == SWCODEC
-    audio_set_crossfade(global_settings.crossfade);
-#endif
-    return ret;
-}
-
-static bool voice_files(void)
-{
-    int oldval = global_settings.talk_file;
-    bool ret;
-
-    ret = set_option( str(LANG_VOICE_FILE),
-                       &global_settings.talk_file, INT, voice_names, 4, NULL);
-#if CONFIG_CODEC == SWCODEC
-    audio_set_crossfade(global_settings.crossfade);
-#endif
-    if (oldval != 3 && global_settings.talk_file == 3)
-    {   /* force reload if newly talking thumbnails,
-           because the clip presence is cached only if enabled */
-        reload_directory();
-    }
-    return ret;
-}
-
-static bool voice_menu(void)
-{
-    int m;
-    bool result;
-
-    static const struct menu_item items[] = {
-        { ID2P(LANG_VOICE_MENU), voice_menus },
-        { ID2P(LANG_VOICE_DIR),  voice_dirs  },
-        { ID2P(LANG_VOICE_FILE),  voice_files }
-    };
-
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
-                 NULL, NULL, NULL);
-    result = menu_run(m);
-    menu_exit(m);
-    return result;
 }
 
 #ifdef HAVE_LCD_BITMAP
@@ -1259,107 +878,6 @@ static bool codepage_setting(void)
                       INT, names, 13, set_codepage );
 }
 
-#ifdef HAVE_DIRCACHE
-static bool dircache(void)
-{
-    bool result = set_bool_options(str(LANG_DIRCACHE_ENABLE),
-                                   &global_settings.dircache,
-                                   STR(LANG_ON),
-                                   STR(LANG_OFF),
-                                   NULL);
-
-    if (!dircache_is_enabled() && global_settings.dircache)
-        gui_syncsplash(HZ*2, true, str(LANG_PLEASE_REBOOT));
-
-    if (!result)
-        dircache_disable();
-
-    return result;
-}
-#endif /* HAVE_DIRCACHE */
-
-#ifdef HAVE_TAGCACHE
-#ifdef HAVE_TC_RAMCACHE
-static bool tagcache_ram(void)
-{
-    bool result = set_bool_options(str(LANG_TAGCACHE_RAM),
-                                   &global_settings.tagcache_ram,
-                                   STR(LANG_SET_BOOL_YES),
-                                   STR(LANG_SET_BOOL_NO),
-                                   NULL);
-
-    return result;
-}
-#endif
-
-static bool tagcache_autoupdate(void)
-{
-     bool rc = set_bool_options(str(LANG_TAGCACHE_AUTOUPDATE),
-                                &global_settings.tagcache_autoupdate,
-                                STR(LANG_ON),
-                                STR(LANG_OFF),
-                                NULL);
-     return rc;
-}
-
-static bool tagcache_runtimedb(void)
-{
-     bool rc = set_bool_options(str(LANG_RUNTIMEDB_ACTIVE),
-                                &global_settings.runtimedb,
-                                STR(LANG_ON),
-                                STR(LANG_OFF),
-                                NULL);
-     return rc;
-}
-
-static bool tagcache_settings_menu(void)
-{
-    int m;
-    bool result;
-
-    static const struct menu_item items[] = {
-#ifdef HAVE_TC_RAMCACHE
-        { ID2P(LANG_TAGCACHE_RAM), tagcache_ram },
-#endif
-        { ID2P(LANG_TAGCACHE_AUTOUPDATE), tagcache_autoupdate },
-        { ID2P(LANG_TAGCACHE_FORCE_UPDATE), tagcache_rebuild },
-        { ID2P(LANG_TAGCACHE_UPDATE), tagcache_update },
-        { ID2P(LANG_RUNTIMEDB_ACTIVE), tagcache_runtimedb },
-        { ID2P(LANG_TAGCACHE_EXPORT), tagtree_export },
-        { ID2P(LANG_TAGCACHE_IMPORT), tagtree_import },
-    };
-
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
-                 NULL, NULL, NULL);
-    result = menu_run(m);
-    menu_exit(m);
-    return result;
-}
-#endif
-
-bool playback_settings_menu(void)
-{
-    return do_menu(&playback_menu_item);
-}
-
-static bool bookmark_settings_menu(void)
-{
-    int m;
-    bool result;
-
-    static const struct menu_item items[] = {
-        { ID2P(LANG_BOOKMARK_SETTINGS_AUTOCREATE), autocreatebookmark},
-        { ID2P(LANG_BOOKMARK_SETTINGS_AUTOLOAD), autoloadbookmark},
-        { ID2P(LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS), useMRB},
-    };
-
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
-                 NULL, NULL, NULL);
-    result = menu_run(m);
-    menu_exit(m);
-
-    return result;
-}
 static bool reset_settings(void)
 {
     unsigned char *lines[]={str(LANG_RESET_ASK_RECORDER)};
@@ -1387,30 +905,6 @@ static bool reset_settings(void)
     return false;
 }
 
-static bool fileview_settings_menu(void)
-{
-    int m;
-    bool result;
-
-    static const struct menu_item items[] = {
-        { ID2P(LANG_SORT_CASE),             sort_case             },
-        { ID2P(LANG_SORT_DIR),              sort_dir              },
-        { ID2P(LANG_SORT_FILE),             sort_file             },
-        { ID2P(LANG_FILTER),                dir_filter            },
-        { ID2P(LANG_FOLLOW),                browse_current        },
-        { ID2P(LANG_SHOW_ICONS),            show_icons            },
-        { ID2P(LANG_SHOW_PATH),             show_path             },
-#ifdef HAVE_TAGCACHE
-        { ID2P(LANG_TAGCACHE),              tagcache_settings_menu},
-#endif
-    };
-
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
-                 NULL, NULL, NULL);
-    result = menu_run(m);
-    menu_exit(m);
-    return result;
-}
 
 #ifdef HAVE_REMOTE_LCD
 static bool remote_scroll_sets(void)
@@ -1611,75 +1105,6 @@ bool display_settings_menu(void)
     menu_exit(m);
     return result;
 }
-
-
-static bool battery_settings_menu(void)
-{
-    int m;
-    bool result;
-
-    static const struct menu_item items[] = {
-#ifndef SIMULATOR
-        { ID2P(LANG_BATTERY_CAPACITY), battery_capacity },
-#if BATTERY_TYPES_COUNT > 1
-        { ID2P(LANG_BATTERY_TYPE),     battery_type },
-#endif
-#ifdef HAVE_USB_POWER
-#ifdef CONFIG_CHARGING
-        { ID2P(LANG_USB_CHARGING),    usb_charging },
-#endif
-#endif
-#else
-        { "Dummy", NULL }, /* to have an entry at all, in the simulator */
-#endif
-    };
-
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
-                 NULL, NULL, NULL);
-    result = menu_run(m);
-    menu_exit(m);
-    return result;
-}
-
-#ifndef HAVE_MMC
-static bool disk_settings_menu(void)
-{
-    int m;
-    bool result;
-
-    static const struct menu_item items[] = {
-        { ID2P(LANG_SPINDOWN),    spindown        },
-#ifdef HAVE_DIRCACHE
-        { ID2P(LANG_DIRCACHE_ENABLE),  dircache },
-#endif
-    };
-
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
-                 NULL, NULL, NULL);
-    result = menu_run(m);
-    menu_exit(m);
-    return result;
-}
-#endif /* !HAVE_MMC */
-
-#ifdef CONFIG_RTC
-static bool time_settings_menu(void)
-{
-    int m;
-    bool result;
-
-    static const struct menu_item items[] = {
-        { ID2P(LANG_TIME),        timedate_set    },
-        { ID2P(LANG_TIMEFORMAT),  timeformat_set  },
-    };
-
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
-                 NULL, NULL, NULL);
-    result = menu_run(m);
-    menu_exit(m);
-    return result;
-}
-#endif
 static bool manage_settings_write_config(void)
 {
 	return settings_save_config(SETTINGS_SAVE_ALL);
@@ -1708,76 +1133,3 @@ bool manage_settings_menu(void)
     return result;
 }
 
-static bool limits_settings_menu(void)
-{
-    int m;
-    bool result;
-
-    static const struct menu_item items[] = {
-        { ID2P(LANG_MAX_FILES_IN_DIR),    max_files_in_dir        },
-        { ID2P(LANG_MAX_FILES_IN_PLAYLIST),    max_files_in_playlist        },
-    };
-
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
-                 NULL, NULL, NULL);
-    result = menu_run(m);
-    menu_exit(m);
-    return result;
-}
-
-
-static bool system_settings_menu(void)
-{
-    int m;
-    bool result;
-
-    static const struct menu_item items[] = {
-        { ID2P(LANG_BATTERY_MENU),     battery_settings_menu },
-#ifndef HAVE_MMC
-        { ID2P(LANG_DISK_MENU),        disk_settings_menu     },
-#endif
-#ifdef CONFIG_RTC
-        { ID2P(LANG_TIME_MENU),        time_settings_menu     },
-#endif
-        { ID2P(LANG_POWEROFF_IDLE),    poweroff_idle_timer    },
-        { ID2P(LANG_SLEEP_TIMER),      sleep_timer            },
-#ifdef HAVE_ALARM_MOD
-        { ID2P(LANG_ALARM_MOD_ALARM_MENU), alarm_screen       },
-#endif
-        { ID2P(LANG_LIMITS_MENU),      limits_settings_menu   },
-#if CONFIG_CODEC == MAS3507D
-        { ID2P(LANG_LINE_IN),          line_in                },
-#endif
-#ifdef CONFIG_CHARGING
-        { ID2P(LANG_CAR_ADAPTER_MODE), car_adapter_mode       },
-#endif
-    };
-
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
-                 NULL, NULL, NULL);
-    result = menu_run(m);
-    menu_exit(m);
-    return result;
-}
-
-bool settings_menu(void)
-{
-    int m;
-    bool result;
-
-    static const struct menu_item items[] = {
-        { ID2P(LANG_PLAYBACK),         playback_settings_menu },
-        { ID2P(LANG_FILE),             fileview_settings_menu },
-        { ID2P(LANG_DISPLAY),          display_settings_menu  },
-        { ID2P(LANG_SYSTEM),           system_settings_menu   },
-        { ID2P(LANG_BOOKMARK_SETTINGS),bookmark_settings_menu },
-        { ID2P(LANG_LANGUAGE),         language_browse        },
-        { ID2P(LANG_VOICE),            voice_menu             },
-    };
-
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
-                 NULL, NULL, NULL);
-    result = menu_run(m);
-    menu_exit(m);
-    return result;
-}
