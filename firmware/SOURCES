@@ -53,6 +53,7 @@ common/strncmp.c
 common/strncpy.c
 common/strrchr.c
 common/strtok.c
+common/structec.c
 common/timefuncs.c
 common/unicode.c
 

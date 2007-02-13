@@ -88,6 +88,7 @@ struct tagcache_stat {
     bool ready;              /* Is tagcache ready to be used? */
     bool ramcache;           /* Is tagcache loaded in ram? */
     bool commit_delayed;     /* Has commit been delayed until next reboot? */
+    bool econ;               /* Is endianess correction enabled? */
     int  commit_step;        /* Commit progress */
     int  ramcache_allocated; /* Has ram been allocated for ramcache? */
     int  ramcache_used;      /* How much ram has been really used */

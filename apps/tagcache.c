@@ -69,6 +69,7 @@
 #include "misc.h"
 #include "settings.h"
 #include "dircache.h"
+#include "structec.h"
 #ifndef __PCTOOL__
 #include "atoi.h"
 #include "splash.h"
@@ -158,6 +159,12 @@ struct master_header {
     struct tagcache_header tch;
     long serial; /* Increasing counting number */
 };
+
+/* For the endianess correction */
+static const char *tagfile_entry_ec   = "ss";
+static const char *index_entry_ec     = "llllllllllllllll"; /* (1 + TAG_COUNT) * l */
+static const char *tagcache_header_ec = "lll";
+static const char *master_header_ec   = "llll";
 
 static long current_serial;
 
@@ -296,7 +303,7 @@ static int open_tag_fd(struct tagcache_header *hdr, int tag, bool write)
     }
     
     /* Check the header. */
-    rc = read(fd, hdr, sizeof(struct tagcache_header));
+    rc = ecread(fd, hdr, 1, tagcache_header_ec, tc_stat.econ);
     if (hdr->magic != TAGCACHE_MAGIC || rc != sizeof(struct tagcache_header))
     {
         logf("header error");
@@ -399,8 +406,8 @@ static long find_entry_disk(const char *filename)
             pos_history[i+1] = pos_history[i];
         pos_history[0] = pos;
 
-        if (read(fd, &tfe, sizeof(struct tagfile_entry)) !=
-            sizeof(struct tagfile_entry))
+        if (ecread(fd, &tfe, 1, tagfile_entry_ec, tc_stat.econ) 
+            != sizeof(struct tagfile_entry))
         {
             break ;
         }
@@ -512,8 +519,8 @@ static bool get_index(int masterfd, int idxid,
     
     lseek(masterfd, idxid * sizeof(struct index_entry) 
           + sizeof(struct master_header), SEEK_SET);
-    if (read(masterfd, idx, sizeof(struct index_entry)) !=
-        sizeof(struct index_entry))
+    if (ecread(masterfd, idx, 1, index_entry_ec, tc_stat.econ) 
+        != sizeof(struct index_entry))
     {
         logf("read error #3");
         return false;
@@ -543,8 +550,8 @@ static bool write_index(int masterfd, int idxid, struct index_entry *idx)
     
     lseek(masterfd, idxid * sizeof(struct index_entry) 
           + sizeof(struct master_header), SEEK_SET);
-    if (write(masterfd, idx, sizeof(struct index_entry)) !=
-        sizeof(struct index_entry))
+    if (ecwrite(masterfd, idx, 1, index_entry_ec, tc_stat.econ) 
+        != sizeof(struct index_entry))
     {
         logf("write error #3");
         logf("idxid: %d", idxid);
@@ -619,8 +626,8 @@ static bool retrieve(struct tagcache_search *tcs, struct index_entry *idx,
         return false;
     
     lseek(tcs->idxfd[tag], seek, SEEK_SET);
-    if (read(tcs->idxfd[tag], &tfe, sizeof(struct tagfile_entry)) !=
-        sizeof(struct tagfile_entry))
+    if (ecread(tcs->idxfd[tag], &tfe, 1, tagfile_entry_ec, tc_stat.econ) 
+        != sizeof(struct tagfile_entry))
     {
         logf("read error #5");
         return false;
@@ -831,7 +838,7 @@ static bool check_clauses(struct tagcache_search *tcs,
             {
                 int fd = tcs->idxfd[clause[i]->tag];
                 lseek(fd, seek, SEEK_SET);
-                read(fd, &tfe, sizeof(struct tagfile_entry));
+                ecread(fd, &tfe, 1, tagfile_entry_ec, tc_stat.econ);
                 if (tfe.tag_length >= (int)sizeof(str))
                 {
                     logf("Too long tag read!");
@@ -952,8 +959,8 @@ static bool build_lookup_list(struct tagcache_search *tcs)
     lseek(tcs->masterfd, tcs->seek_pos * sizeof(struct index_entry) +
             sizeof(struct master_header), SEEK_SET);
     
-    while (read(tcs->masterfd, &entry, sizeof(struct index_entry)) ==
-           sizeof(struct index_entry))
+    while (ecread(tcs->masterfd, &entry, 1, index_entry_ec, tc_stat.econ) 
+           == sizeof(struct index_entry))
     {
         /* Check if entry has been deleted. */
         if (entry.flag & FLAG_DELETED)
@@ -1001,6 +1008,7 @@ static void remove_files(void)
     
     tc_stat.ready = false;
     tc_stat.ramcache = false;
+    tc_stat.econ = false;
     remove(TAGCACHE_FILE_MASTER);
     for (i = 0; i < TAG_COUNT; i++)
     {
@@ -1026,8 +1034,20 @@ static int open_master_fd(struct master_header *hdr, bool write)
         return fd;
     }
     
+    tc_stat.econ = false;
+    
     /* Check the header. */
     rc = read(fd, hdr, sizeof(struct master_header));
+    if (hdr->tch.magic == TAGCACHE_MAGIC && rc == sizeof(struct master_header))
+    {
+        /* Success. */
+        return fd;
+    }
+    
+    /* Trying to read again, this time with endianess correction enabled. */
+    lseek(fd, 0, SEEK_SET);
+    
+    rc = ecread(fd, hdr, 1, master_header_ec, true);
     if (hdr->tch.magic != TAGCACHE_MAGIC || rc != sizeof(struct master_header))
     {
         logf("header error");
@@ -1035,6 +1055,8 @@ static int open_master_fd(struct master_header *hdr, bool write)
         close(fd);
         return -2;
     }
+
+    tc_stat.econ = true;
     
     return fd;
 }
@@ -1260,8 +1282,8 @@ static bool get_next(struct tagcache_search *tcs)
             return false;
         
         tcs->result_seek = lseek(tcs->idxfd[tcs->type], 0, SEEK_CUR);
-        if (read(tcs->idxfd[tcs->type], &entry, sizeof(struct tagfile_entry)) !=
-            sizeof(struct tagfile_entry))
+        if (ecread(tcs->idxfd[tcs->type], &entry, 1,
+                 tagfile_entry_ec, tc_stat.econ) != sizeof(struct tagfile_entry))
         {
             /* End of data. */
             tcs->valid = false;
@@ -1739,7 +1761,7 @@ static int tempbuf_sort(int fd)
         }
 #endif
         
-        if (write(fd, &fe, sizeof(struct tagfile_entry)) !=
+        if (ecwrite(fd, &fe, 1, tagfile_entry_ec, tc_stat.econ) !=
             sizeof(struct tagfile_entry))
         {
             logf("tempbuf_sort: write error #1");
@@ -1833,8 +1855,8 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
         {
             int loc = lseek(masterfd, 0, SEEK_CUR);
             
-            if (read(masterfd, &idx, sizeof(struct index_entry)) !=
-                sizeof(struct index_entry))
+            if (ecread(masterfd, &idx, 1, index_entry_ec, tc_stat.econ) 
+                != sizeof(struct index_entry))
             {
                 logf("read fail #2");
                 close(masterfd);
@@ -1852,8 +1874,8 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
             
             /* Write back the updated index. */
             lseek(masterfd, loc, SEEK_SET);
-            if (write(masterfd, &idx, sizeof(struct index_entry)) !=
-                sizeof(struct index_entry))
+            if (ecwrite(masterfd, &idx, 1, index_entry_ec, tc_stat.econ) 
+                != sizeof(struct index_entry))
             {
                 logf("write fail");
                 close(masterfd);
@@ -1977,7 +1999,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 int loc = lseek(fd, 0, SEEK_CUR);
                 bool ret;
                 
-                if (read(fd, &entry, sizeof(struct tagfile_entry))
+                if (ecread(fd, &entry, 1, tagfile_entry_ec, tc_stat.econ)
                     != sizeof(struct tagfile_entry))
                 {
                     logf("read error #7");
@@ -2041,8 +2063,8 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
         tch.entry_count = 0;
         tch.datasize = 0;
         
-        if (write(fd, &tch, sizeof(struct tagcache_header)) !=
-            sizeof(struct tagcache_header))
+        if (ecwrite(fd, &tch, 1, tagcache_header_ec, tc_stat.econ) 
+            != sizeof(struct tagcache_header))
         {
             logf("header write failed");
             close(fd);
@@ -2071,7 +2093,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
         tcmh.tch = *h;
         tcmh.tch.entry_count = 0;
         tcmh.tch.datasize = 0;
-        write(masterfd, &tcmh, sizeof(struct master_header));
+        ecwrite(masterfd, &tcmh, 1, master_header_ec, tc_stat.econ);
         init = true;
         masterfd_pos = lseek(masterfd, 0, SEEK_CUR);
         current_serial = 0;
@@ -2084,7 +2106,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
          */
         init = false;
 
-        if (read(masterfd, &tcmh, sizeof(struct master_header)) !=
+        if (ecread(masterfd, &tcmh, 1, master_header_ec, tc_stat.econ) !=
             sizeof(struct master_header) || tcmh.tch.magic != TAGCACHE_MAGIC)
         {
             logf("header error");
@@ -2125,7 +2147,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
             if (read(tmpfd, &entry, sizeof(struct temp_file_entry)) !=
                 sizeof(struct temp_file_entry))
             {
-                logf("read fail #1");
+                logf("read fail #3");
                 error = true;
                 goto error_exit;
             }
@@ -2142,7 +2164,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
             if (read(tmpfd, buf, entry.tag_length[index_type]) !=
                 entry.tag_length[index_type])
             {
-                logf("read fail #3");
+                logf("read fail #4");
                 error = true;
                 goto error_exit;
             }
@@ -2184,10 +2206,10 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
             
             idxbuf_pos = MIN(tcmh.tch.entry_count - i, IDX_BUF_DEPTH);
             
-            if (read(masterfd, idxbuf, sizeof(struct index_entry)*idxbuf_pos) !=
-                (int)sizeof(struct index_entry)*idxbuf_pos)
+            if (ecread(masterfd, idxbuf, idxbuf_pos, index_entry_ec, tc_stat.econ) 
+                != (int)sizeof(struct index_entry)*idxbuf_pos)
             {
-                logf("read fail #2");
+                logf("read fail #5");
                 error = true;
                 goto error_exit ;
             }
@@ -2217,7 +2239,8 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
             }
             
             /* Write back the updated index. */
-            if (write(masterfd, idxbuf, sizeof(struct index_entry)*idxbuf_pos) !=
+            if (ecwrite(masterfd, idxbuf, idxbuf_pos,
+                        index_entry_ec, tc_stat.econ) !=
                 (int)sizeof(struct index_entry)*idxbuf_pos)
             {
                 logf("write fail");
@@ -2249,10 +2272,10 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
         {
             int loc = lseek(masterfd, 0, SEEK_CUR);
             
-            if (read(masterfd, idxbuf, sizeof(struct index_entry)*idxbuf_pos) !=
-                (int)sizeof(struct index_entry)*idxbuf_pos)
+            if (ecread(masterfd, idxbuf, idxbuf_pos, index_entry_ec, tc_stat.econ) 
+                != (int)sizeof(struct index_entry)*idxbuf_pos)
             {
-                logf("read fail #2");
+                logf("read fail #6");
                 error = true;
                 break ;
             }
@@ -2270,7 +2293,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 if (read(tmpfd, &entry, sizeof(struct temp_file_entry)) !=
                     sizeof(struct temp_file_entry))
                 {
-                    logf("read fail #1");
+                    logf("read fail #7");
                     error = true;
                     break ;
                 }
@@ -2289,7 +2312,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 if (read(tmpfd, buf, entry.tag_length[index_type]) !=
                     entry.tag_length[index_type])
                 {
-                    logf("read fail #3");
+                    logf("read fail #8");
                     logf("offset=0x%02x", entry.tag_offset[index_type]);
                     logf("length=0x%02x", entry.tag_length[index_type]);
                     error = true;
@@ -2300,7 +2323,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 idxbuf[j].tag_seek[index_type] = lseek(fd, 0, SEEK_CUR);
                 fe.tag_length = entry.tag_length[index_type];
                 fe.idx_id = tcmh.tch.entry_count + i + j;
-                write(fd, &fe, sizeof(struct tagfile_entry));
+                ecwrite(fd, &fe, 1, tagfile_entry_ec, tc_stat.econ);
                 write(fd, buf, fe.tag_length);
                 tempbufidx++;
 
@@ -2322,7 +2345,8 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
         }
 
         /* Write index. */
-        if (write(masterfd, idxbuf, sizeof(struct index_entry)*idxbuf_pos) !=
+        if (ecwrite(masterfd, idxbuf, idxbuf_pos,
+                  index_entry_ec, tc_stat.econ) !=
             (int)sizeof(struct index_entry)*idxbuf_pos)
         {
             logf("tagcache: write fail #4");
@@ -2339,7 +2363,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
     tch.entry_count = tempbufidx;
     tch.datasize = lseek(fd, 0, SEEK_END) - sizeof(struct tagcache_header);
     lseek(fd, 0, SEEK_SET);
-    write(fd, &tch, sizeof(struct tagcache_header));
+    ecwrite(fd, &tch, 1, tagcache_header_ec, tc_stat.econ);
     
     if (index_type != tag_filename)
         h->datasize += tch.datasize;
@@ -2495,7 +2519,7 @@ static bool commit(void)
         + tch.datasize;
 
     lseek(masterfd, 0, SEEK_SET);
-    write(masterfd, &tcmh, sizeof(struct master_header));
+    ecwrite(masterfd, &tcmh, 1, master_header_ec, tc_stat.econ);
     close(masterfd);
     
     logf("tagcache committed");
@@ -2570,7 +2594,7 @@ static bool update_current_serial(long serial)
     
     /* Write it back */
     lseek(fd, 0, SEEK_SET);
-    write(fd, &myhdr, sizeof(struct master_header));
+    ecwrite(fd, &myhdr, 1, master_header_ec, tc_stat.econ);
     close(fd);
     
     return true;
@@ -2872,14 +2896,14 @@ bool tagcache_create_changelog(struct tagcache_search *tcs)
     else
     {
         lseek(tcs->masterfd, 0, SEEK_SET);
-        read(tcs->masterfd, &myhdr, sizeof(struct master_header));
+        ecread(tcs->masterfd, &myhdr, 1, master_header_ec, tc_stat.econ);
     }
     
     write(clfd, "## Changelog version 1\n", 23);
     
     for (i = 0; i < myhdr.tch.entry_count; i++)
     {
-        if (read(tcs->masterfd, &idx, sizeof(struct index_entry)) 
+        if (ecread(tcs->masterfd, &idx, 1, index_entry_ec, tc_stat.econ) 
             != sizeof(struct index_entry))
         {
             logf("read error #9");
@@ -2943,7 +2967,7 @@ static bool delete_entry(long idx_id)
         return false;
     
     lseek(fd, idx_id * sizeof(struct index_entry), SEEK_CUR);
-    if (read(fd, &myidx, sizeof(struct index_entry)) 
+    if (ecread(fd, &myidx, 1, index_entry_ec, tc_stat.econ)
         != sizeof(struct index_entry))
     {
         logf("delete_entry(): read error");
@@ -2953,7 +2977,7 @@ static bool delete_entry(long idx_id)
     
     myidx.flag |= FLAG_DELETED;
     lseek(fd, -sizeof(struct index_entry), SEEK_CUR);
-    if (write(fd, &myidx, sizeof(struct index_entry))
+    if (ecwrite(fd, &myidx, 1, index_entry_ec, tc_stat.econ)
         != sizeof(struct index_entry))
     {
         logf("delete_entry(): write_error");
@@ -2968,7 +2992,7 @@ static bool delete_entry(long idx_id)
     lseek(fd, sizeof(struct master_header), SEEK_SET);
     for (i = 0; i < myhdr.tch.entry_count; i++)
     {
-        if (read(fd, &idx, sizeof(struct index_entry)) 
+        if (ecread(fd, &idx, 1, index_entry_ec, tc_stat.econ)
             != sizeof(struct index_entry))
         {
             logf("delete_entry(): read error #2");
@@ -3190,7 +3214,7 @@ static bool load_tagcache(void)
         return false;
     }
     
-    if (read(fd, &hdr->h, sizeof(struct master_header))
+    if (ecread(fd, &hdr->h, 1, master_header_ec, tc_stat.econ)
         != sizeof(struct master_header)
         || hdr->h.tch.magic != TAGCACHE_MAGIC)
     {
@@ -3203,7 +3227,7 @@ static bool load_tagcache(void)
     /* Load the master index table. */
     for (i = 0; i < hdr->h.tch.entry_count; i++)
     {
-        rc = read(fd, idx, sizeof(struct index_entry));
+        rc = ecread(fd, idx, 1, index_entry_ec, tc_stat.econ);
         if (rc != sizeof(struct index_entry))
         {
             logf("read error #10");
@@ -3262,7 +3286,7 @@ static bool load_tagcache(void)
             
             fe = (struct tagfile_entry *)p;
             pos = lseek(fd, 0, SEEK_CUR);
-            rc = read(fd, fe, sizeof(struct tagfile_entry));
+            rc = ecread(fd, fe, 1, tagfile_entry_ec, tc_stat.econ);
             if (rc != sizeof(struct tagfile_entry))
             {
                 /* End of lookup table. */
@@ -3413,7 +3437,7 @@ static bool check_deleted_files(void)
     }
 
     lseek(fd, sizeof(struct tagcache_header), SEEK_SET);
-    while (read(fd, &tfe, sizeof(struct tagfile_entry))
+    while (ecread(fd, &tfe, 1, tagfile_entry_ec, tc_stat.econ)
            == sizeof(struct tagfile_entry) 
 #ifndef __PCTOOL__
            && !check_event_queue()
@@ -3443,7 +3467,7 @@ static bool check_deleted_files(void)
         if (testfd < 0)
         {
             logf("Entry no longer valid.");
-            logf("-> %s", buf);
+            logf("-> %s / %d", buf, tfe.tag_length);
             delete_entry(tfe.idx_id);
         }
         close(testfd);
