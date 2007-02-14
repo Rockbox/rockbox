@@ -9,7 +9,11 @@ brickmania_pads.320x240x16.bmp
 brickmania_break.320x240x16.bmp
 brickmania_powerups.320x240x16.bmp
 #else
+#if (LCD_WIDTH == 240) && (LCD_HEIGHT == 320)
+brickmania_menu_bg.240x320x16.bmp
+#else
 brickmania_menu_bg.220x176x16.bmp
+#endif
 brickmania_bricks.220x176x16.bmp
 brickmania_pads.220x176x16.bmp
 brickmania_break.220x176x16.bmp

@@ -183,6 +183,8 @@ extern const fb_data brickmania_bricks[];
 */
 #define CYCLETIME 30
 
+#define GAMESCREEN_HEIGHT LCD_HEIGHT
+
 #define PAD_WIDTH 56
 #define PAD_HEIGHT 7
 #define PAD_POS_Y LCD_HEIGHT - 7
@@ -227,18 +229,21 @@ extern const fb_data brickmania_bricks[];
 #define CYCLETIME 30
 
 /* Offsets for LCDS > 220x176 */
-#define XOFS ((LCD_WIDTH-220)/2)
-#define YOFS ((LCD_HEIGHT-176)/2)
+
+#define GAMESCREEN_HEIGHT 176
 
 #define PAD_WIDTH 40
 #define PAD_HEIGHT 5
-#define PAD_POS_Y LCD_HEIGHT - 7
+#define PAD_POS_Y GAMESCREEN_HEIGHT - 7
 #define BRICK_HEIGHT 8
 #define BRICK_WIDTH 21
 #define BALL 5
 #define HALFBALL 3
-#define LEFTMARGIN 5
+#define LEFTMARGIN (LCD_WIDTH-220)/2 + 5
 #define TOPMARGIN 30
+
+#define XOFS ((LCD_WIDTH-220)/BRICK_WIDTH/2)*BRICK_WIDTH
+#define YOFS ((LCD_HEIGHT-176)/BRICK_HEIGHT/2)*BRICK_HEIGHT
 
 #define MENU_BMPHEIGHT 20
 #define MENU_BMPWIDTH 112
@@ -271,6 +276,8 @@ extern const fb_data brickmania_bricks[];
    to 10ms.
 */
 #define CYCLETIME 50
+
+#define GAMESCREEN_HEIGHT LCD_HEIGHT
 
 #define PAD_WIDTH 30
 #define PAD_HEIGHT 5
@@ -330,6 +337,8 @@ extern const fb_data brickmania_bricks[];
 */
 #define CYCLETIME 50
 
+#define GAMESCREEN_HEIGHT LCD_HEIGHT
+
 #define PAD_WIDTH 30
 #define PAD_HEIGHT 5
 #define PAD_POS_Y LCD_HEIGHT - 5
@@ -373,6 +382,8 @@ extern const fb_data brickmania_bricks[];
 */
 #define CYCLETIME 75
 
+#define GAMESCREEN_HEIGHT LCD_HEIGHT
+
 #define PAD_WIDTH 30
 #define PAD_HEIGHT 3
 #define PAD_POS_Y LCD_HEIGHT - 5
@@ -411,6 +422,8 @@ extern const fb_data brickmania_bricks[];
    to 10ms.
 */
 #define CYCLETIME 30
+
+#define GAMESCREEN_HEIGHT LCD_HEIGHT
 
 #define PAD_WIDTH 40
 #define PAD_HEIGHT 5
@@ -1634,7 +1647,7 @@ int game_loop(void)
                 if (ball[k].pos_y<= 0)
                     ball[k].y = ball[k].y*-1;
                 /* bottom line */
-                else if (ball[k].pos_y+BALL >= LCD_HEIGHT) {
+                else if (ball[k].pos_y+BALL >= GAMESCREEN_HEIGHT) {
                     if (used_balls>1) {
                         used_balls--;
                         ball[k].pos_x = ball[used_balls].pos_x;
