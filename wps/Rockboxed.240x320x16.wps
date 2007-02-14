@@ -3,7 +3,7 @@
 %wd
 %X|bg-240x320x16.bmp|0|0|
 %P|pg-220.bmp|
-%x|o|pgln-220.bmp|10|255|
+%x|o|pgln-220.bmp|10|256|
 %xl|p|ply-color-big.bmp|112|300|
 %xl|q|ps-color-big.bmp|112|300|
 %xl|f|ff-color-big.bmp|112|300|
