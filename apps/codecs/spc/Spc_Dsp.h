@@ -487,9 +487,8 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
     /* (g.flags & 0x40) ? 30 : 14 */
     int const global_muting = ((this->r.g.flags & 0x40) >> 2) + 14; 
     
-    /* scaling to offset quietage */
-    int const global_vol_0 = this->r.g.volume_0 * 3;
-    int const global_vol_1 = this->r.g.volume_1 * 3;
+    int const global_vol_0 = this->r.g.volume_0;
+    int const global_vol_1 = this->r.g.volume_1;
     
     /* each rate divides exactly into 0x7800 without remainder */
     int const env_rate_init = 0x7800;
