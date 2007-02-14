@@ -67,6 +67,7 @@ plugins/zxbox/*.lds
 codecs/SOURCES
 codecs/*.[ch]
 codecs/Makefile
+codecs/spc/*
 codecs/libm4a/*
 codecs/liba52/*
 codecs/libfaad/*
@@ -76,6 +77,7 @@ codecs/libmad/*
 codecs/libwavpack/*
 codecs/Tremor/*
 codecs/libspeex/*
+codecs/libspeex/speex/*
 codecs/libmusepack/*
 codecs/libalac/*
 codecs/lib/*.[ch]
