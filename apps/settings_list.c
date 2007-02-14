@@ -919,6 +919,7 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0,usb_charging,LANG_USB_CHARGING,false,"usb charging",NULL),
 #endif
 #endif
+    OFFON_SETTING(0,cuesheet,LANG_CUESHEET_ENABLE,false,"cuesheet support", NULL),
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

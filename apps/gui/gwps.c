@@ -54,6 +54,7 @@
 #include "abrepeat.h"
 #include "playback.h"
 #include "splash.h"
+#include "cuesheet.h"
 #if LCD_DEPTH > 1
 #include "backdrop.h"
 #endif
@@ -333,7 +334,16 @@ long gui_wps_show(void)
                 if (global_settings.party_mode)
                     break;
                 if (current_tick -last_right < HZ)
-                   audio_next_dir();
+                {
+                    if (cuesheet_is_enabled() && wps_state.id3->cuesheet_type)
+                    {
+                        audio_next();
+                    }
+                    else
+                    {
+                        audio_next_dir();
+                    }
+                }
                 else ffwd_rew(ACTION_WPS_SEEKFWD);
                 last_right = 0;
                 break;
@@ -343,7 +353,22 @@ long gui_wps_show(void)
                 if (global_settings.party_mode)
                     break;
                 if (current_tick -last_left < HZ)
-                    audio_prev_dir();
+                {
+                    if (cuesheet_is_enabled() && wps_state.id3->cuesheet_type)
+                    {
+                        if (!wps_state.paused)
+#if (CONFIG_CODEC == SWCODEC)
+                            audio_pre_ff_rewind();
+#else
+                            audio_pause();
+#endif
+                        audio_ff_rewind(0);
+                    }
+                    else
+                    {
+                        audio_prev_dir();
+                    }
+                }
                 else ffwd_rew(ACTION_WPS_SEEKBACK);
                 last_left = 0;
                 break;
@@ -377,6 +402,13 @@ long gui_wps_show(void)
                     audio_prev();
                 }
                 else {
+
+                    if (cuesheet_is_enabled() && wps_state.id3->cuesheet_type)
+                    {
+                        curr_cuesheet_skip(-1, wps_state.id3->elapsed);
+                        break;
+                    }
+
                     if (!wps_state.paused)
 #if (CONFIG_CODEC == SWCODEC)
                         audio_pre_ff_rewind();
@@ -417,6 +449,18 @@ long gui_wps_show(void)
                 }
                 /* ...otherwise, do it normally */
 #endif
+
+                /* take care of if we're playing a cuesheet */
+                if (cuesheet_is_enabled() && wps_state.id3->cuesheet_type)
+                {
+                    if (curr_cuesheet_skip(1, wps_state.id3->elapsed))
+                    {
+                        /* if the result was false, then we really want
+                           to skip to the next track */
+                        break;
+                    }
+                }
+
                 audio_next();
                 break;
                 /* next / prev directories */

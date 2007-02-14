@@ -683,6 +683,7 @@ struct user_settings
 #endif
     /* Encoder Settings End */
 #endif /* CONFIG_CODEC == SWCODEC */
+    bool cuesheet;
 };
 
 /** global variables **/

@@ -1,0 +1,360 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $$
+ *
+ * Copyright (C) 2007 Nicolas Pennequin, Jonathan Gordon
+ *
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <atoi.h>
+#include <string.h>
+#include "system.h"
+#include "audio.h"
+#include "kernel.h"
+#include "logf.h"
+#include "sprintf.h"
+#include "misc.h"
+#include "screens.h"
+#include "splash.h"
+#include "list.h"
+#include "action.h"
+#include "lang.h"
+#include "debug.h"
+#include "settings.h"
+#include "buffer.h"
+#include "plugin.h"
+#include "playback.h"
+#include "cuesheet.h"
+
+
+void cuesheet_init(void)
+{
+    if (global_settings.cuesheet) {
+        curr_cue = (struct cuesheet *)buffer_alloc(MAX_TRACKS * sizeof(struct cuesheet));
+        temp_cue = (struct cuesheet *)buffer_alloc(MAX_TRACKS * sizeof(struct cuesheet));
+    } else {
+        curr_cue = NULL;
+        temp_cue = NULL;
+    }
+}
+
+bool cuesheet_is_enabled(void)
+{
+    return (curr_cue != NULL);
+}
+
+bool look_for_cuesheet_file(const char *trackpath)
+{
+    char cuepath[MAX_PATH];
+    strncpy(cuepath, trackpath, MAX_PATH);
+    char *dot = strrchr(cuepath, '.');
+    strcpy(dot, ".cue");
+
+    int fd = open(cuepath,O_RDONLY);
+    if (fd < 0)
+    {
+        return false;
+    }
+    else
+    {
+        close(fd);
+        return true;
+    }
+}
+
+char *skip_whitespace(char* buf)
+{
+    char *r = buf;
+    while (*r && (*r < 33))
+        r++;
+    return r;
+}
+
+/* parse cuesheet "file" and store the information in "cue" */
+bool parse_cuesheet(char *file, struct cuesheet *cue)
+{
+    char line[MAX_PATH];
+    char *s, *start, *end;
+    int fd = open(file,O_RDONLY);
+    if (fd < 0)
+    {
+        /* couln't open the file */
+        return false;
+    }
+
+    memset(cue, 0, sizeof(struct cuesheet));
+
+    strcpy(cue->path, file);
+
+    cue->curr_track_idx = 0;
+    cue->curr_track = cue->tracks;
+
+    cue->track_count = 0;
+    while (read_line(fd,line,MAX_PATH))
+    {
+        s = skip_whitespace(line);
+        if (!strncmp(s, "TITLE", 5))
+        {
+            start = strchr(s,'"');
+            if (!start)
+                break;
+            end = strchr(++start,'"');
+            if (!end)
+                break;
+            *end = '\0';
+            if (cue->track_count <= 0)
+                strncpy(cue->title,start,MAX_NAME);
+            else strncpy(cue->tracks[cue->track_count-1].title,
+                         start,MAX_NAME);
+        }
+        else if (!strncmp(s, "PERFORMER", 9))
+        {
+            start = strchr(s,'"');
+            if (!start)
+                break;
+            end = strchr(++start,'"');
+            if (!end)
+                break;
+            *end = '\0';
+            if (cue->track_count <= 0)
+                strncpy(cue->performer,start,MAX_NAME);
+            else strncpy(cue->tracks[cue->track_count-1].performer,
+                         start,MAX_NAME);
+        }
+        else if (!strncmp(s, "TRACK", 5))
+        {
+            if (cue->track_count >= MAX_TRACKS)
+                break; /* out of memeory! stop parsing */
+            cue->track_count++;
+        }
+        else if (!strncmp(s, "INDEX", 5))
+        {
+            s = strchr(s,' ');
+            s = skip_whitespace(s);
+            s = strchr(s,' ');
+            s = skip_whitespace(s);
+            cue->tracks[cue->track_count-1].offset = 60*1000 * atoi(s);
+            s = strchr(s,':') + 1;
+            cue->tracks[cue->track_count-1].offset += 1000 * atoi(s);
+            s = strchr(s,':') + 1;
+            cue->tracks[cue->track_count-1].offset += 13 * atoi(s);
+        }
+    }
+    close(fd);
+
+    /* If some songs don't have performer info, we copy the cuesheet performer */
+    int i;
+    for (i = 0; i < cue->track_count; i++)
+    {
+        if (*(cue->tracks[i].performer) == '\0')
+        {
+            strncpy(cue->tracks[i].performer, cue->performer, MAX_NAME);
+        }
+    }
+
+    return true;
+}
+
+/* takes care of seeking to a track in a playlist
+ * returns false if audio  isn't playing */
+bool seek(unsigned long pos)
+{
+    if (!(audio_status() & AUDIO_STATUS_PLAY))
+    {
+        return false;
+    }
+    else
+    {
+#if (CONFIG_CODEC == SWCODEC)
+        audio_pre_ff_rewind();
+#else
+        audio_pause();
+#endif
+        audio_ff_rewind(pos);
+        return true;
+    }
+}
+
+/* returns the index of the track currently being played
+   and updates the information about the current track. */
+int cue_find_current_track(struct cuesheet *cue, unsigned long curpos)
+{
+    int i=0;
+    while (i < cue->track_count-1 && cue->tracks[i+1].offset < curpos)
+    {
+        i++;
+    }
+    cue->curr_track_idx = i;
+    cue->curr_track = cue->tracks + i;
+    return i;
+}
+
+/* callback that gives list item titles for the cuesheet browser */
+char *list_get_name_cb(int selected_item,
+                             void *data,
+                             char *buffer)
+{
+    struct cuesheet *cue = (struct cuesheet *)data;
+
+    if (selected_item & 1)
+    {
+        snprintf(buffer, MAX_PATH,
+                 (selected_item+1)/2 > 9 ? "   %s" : "  %s",
+                 cue->tracks[selected_item/2].title);
+    }
+    else
+    {
+        snprintf(buffer, MAX_PATH, "%d %s", selected_item/2+1,
+                 cue->tracks[selected_item/2].performer);
+    }
+    return buffer;
+}
+
+void browse_cuesheet(struct cuesheet *cue)
+{
+    struct gui_synclist lists;
+    int action;
+    bool done = false;
+    int sel;
+    char title[MAX_PATH];
+    char cuepath[MAX_PATH];
+    char *dot;
+    struct mp3entry *id3 = audio_current_track();
+
+    snprintf(title, MAX_PATH, "%s: %s", cue->performer, cue->title);
+    gui_synclist_init(&lists, list_get_name_cb, cue, false, 2);
+    gui_synclist_set_nb_items(&lists, 2*cue->track_count);
+    gui_synclist_set_title(&lists, title, 0);
+
+    if (strcmp(id3->path, "No file!"))
+    {
+        strncpy(cuepath, id3->path, MAX_PATH);
+        dot = strrchr(cuepath, '.');
+        strcpy(dot, ".cue");
+    }
+
+    if (id3->cuesheet_type && !strcmp(cue->path, cuepath))
+    {
+        gui_synclist_select_item(&lists,
+                                 2*cue_find_current_track(cue, id3->elapsed));
+    }
+
+    while (!done)
+    {
+        gui_synclist_draw(&lists);
+        action = get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
+        if (gui_synclist_do_button(&lists,action,LIST_WRAP_UNLESS_HELD))
+            continue;
+        switch (action)
+        {
+            case ACTION_STD_OK:
+                id3 = audio_current_track();
+                if (strcmp(id3->path, "No file!"))
+                {
+                    strncpy(cuepath, id3->path, MAX_PATH);
+                    dot = strrchr(cuepath, '.');
+                    strcpy(dot, ".cue");
+                    if (id3->cuesheet_type && !strcmp(cue->path, cuepath))
+                    {
+                        sel = gui_synclist_get_sel_pos(&lists);
+                        seek(cue->tracks[sel/2].offset);
+                    }
+                }
+                break;
+            case ACTION_STD_CANCEL:
+                done = true;
+        }
+    }
+}
+
+bool display_cuesheet_content(char* filename)
+{
+    int bufsize = 0;
+    struct cuesheet *cue = (struct cuesheet *)plugin_get_buffer(&bufsize);
+    if (!cue)
+        return false;
+
+    if (!parse_cuesheet(filename, cue))
+        return false;
+
+    browse_cuesheet(cue);
+    return true;
+}
+
+/* skips backwards or forward in the current cuesheet
+ * the return value indicates whether we're still in a cusheet after skipping
+ * it also returns false if we weren't in a cuesheet.
+ * direction should be 1 or -1.
+ */
+bool curr_cuesheet_skip(int direction, unsigned long curr_pos)
+{
+    int track = cue_find_current_track(curr_cue, curr_pos);
+
+    if (direction >= 0 && track == curr_cue->track_count - 1)
+    {
+        /* we want to get out of the cuesheet */
+        return false;
+    }
+    else
+    {
+        if (!(direction <= 0 && track == 0))
+            track += direction;
+
+        seek(curr_cue->tracks[track].offset);
+        return true;
+    }
+
+}
+
+void cue_spoof_id3(struct cuesheet *cue, struct mp3entry *id3)
+{
+    if (!cue)
+        return;
+
+    int i = cue->curr_track_idx;
+
+    id3->title = cue->tracks[i].title;
+    id3->artist = cue->tracks[i].performer;
+    id3->tracknum = i+1;
+    id3->album = cue->title;
+    id3->composer = cue->performer;
+    if (id3->track_string)
+        snprintf(id3->track_string, 10, "%d/%d", i+1, cue->track_count);
+}
+
+#ifdef HAVE_LCD_BITMAP
+static inline void draw_veritcal_line_mark(struct screen * screen,
+                                           int x, int y, int h)
+{
+    screen->set_drawmode(DRMODE_COMPLEMENT);
+    screen->vline(x, y, y+h-1);
+}
+
+/* draw the cuesheet markers for a track of length "tracklen",
+   between (x1,y) and (x2,y) */
+void cue_draw_markers(struct screen *screen, unsigned long tracklen,
+                      int x1, int x2, int y, int h)
+{
+    int i,xi;
+    int w = x2 - x1;
+    for (i=1; i < curr_cue->track_count; i++)
+    {
+        xi = x1 + (w * curr_cue->tracks[i].offset)/tracklen;
+        draw_veritcal_line_mark(screen, xi, y, h);
+    }
+}
+#endif

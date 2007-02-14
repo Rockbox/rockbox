@@ -53,6 +53,7 @@
 #endif
 #include "dsp.h"
 #include "action.h"
+#include "cuesheet.h"
 
 #ifdef HAVE_LCD_CHARCELLS
 static bool draw_player_progress(struct gui_wps *gwps);
@@ -1850,6 +1851,14 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
                             data->progress_start, data->progress_end, sb_y,
                             data->progress_height);
 #endif
+
+                if (cuesheet_is_enabled() && state->id3->cuesheet_type)
+                {
+                    cue_draw_markers(display, state->id3->length,
+                                     data->progress_start, data->progress_end,
+                                     sb_y+1, data->progress_height-2);
+                }
+
                 update_line = true;
             }
             if (flags & refresh_mode & WPS_REFRESH_PEAK_METER) {
@@ -2561,6 +2570,35 @@ bool update(struct gui_wps *gwps)
     {
         gwps->display->stop_scroll();
         gwps->state->id3 = audio_current_track();
+
+        if (cuesheet_is_enabled() && gwps->state->id3->cuesheet_type
+            && strcmp(gwps->state->id3->path, curr_cue->audio_filename))
+        {
+            /* the current cuesheet isn't the right one any more */
+
+            if (!strcmp(gwps->state->id3->path, temp_cue->audio_filename)) {
+                /* We have the new cuesheet in memory (temp_cue),
+                   let's make it the current one ! */
+                memcpy(curr_cue, temp_cue, sizeof(struct cuesheet));
+            }
+            else {
+                /* We need to parse the new cuesheet */
+
+                char cuepath[MAX_PATH];
+                strncpy(cuepath, gwps->state->id3->path, MAX_PATH);
+                char *dot = strrchr(cuepath, '.');
+                strcpy(dot, ".cue");
+
+                if (parse_cuesheet(cuepath, curr_cue))
+                {
+                    gwps->state->id3->cuesheet_type = 1;
+                    strcpy(curr_cue->audio_filename, gwps->state->id3->path);
+                }
+            }
+
+            cue_spoof_id3(curr_cue, gwps->state->id3);
+        }
+
         if (gui_wps_display())
             retcode = true;
         else{
@@ -2572,12 +2610,34 @@ bool update(struct gui_wps *gwps)
                    sizeof(gwps->state->current_track_path));
     }
 
+    if (cuesheet_is_enabled() && gwps->state->id3->cuesheet_type
+        && (gwps->state->id3->elapsed < curr_cue->curr_track->offset
+            || (curr_cue->curr_track_idx < curr_cue->track_count - 1
+                && gwps->state->id3->elapsed >= (curr_cue->curr_track+1)->offset)))
+    {
+        /* We've changed tracks within the cuesheet :
+           we need to update the ID3 info and refresh the WPS */
+
+        cue_find_current_track(curr_cue, gwps->state->id3->elapsed);
+        cue_spoof_id3(curr_cue, gwps->state->id3);
+
+        gwps->display->stop_scroll();
+        if (gui_wps_display())
+            retcode = true;
+        else{
+            gui_wps_refresh(gwps, 0, WPS_REFRESH_ALL);
+        }
+        gui_wps_statusbar_draw(gwps, false);
+
+        return retcode;
+    }
+
     if (gwps->state->id3)
         gui_wps_refresh(gwps, 0, WPS_REFRESH_NON_STATIC);
 
     gui_wps_statusbar_draw(gwps, false);
-    
-    return retcode;           
+
+    return retcode;
 }
 
 

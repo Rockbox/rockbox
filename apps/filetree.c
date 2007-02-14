@@ -41,6 +41,7 @@
 #include "dircache.h"
 #include "splash.h"
 #include "yesno.h"
+#include "cuesheet.h"
 #ifdef HAVE_LCD_BITMAP
 #include "keyboard.h"
 #endif
@@ -548,6 +549,10 @@ int ft_enter(struct tree_context* c)
                     else
                         reload_dir = true;
                 }
+                break;
+
+            case TREE_ATTR_CUE:
+                display_cuesheet_content(buf);
                 break;
 
             default:

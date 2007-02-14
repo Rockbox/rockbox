@@ -94,6 +94,7 @@ struct tree_context {
 #define TREE_ATTR_BMP   0x1100 /* backdrop bmp file */
 #define TREE_ATTR_KBD   0x1200 /* keyboard file */
 #define TREE_ATTR_FMR   0x1300 /* preset file */
+#define TREE_ATTR_CUE   0x1400 /* cuesheet file */
 #define TREE_ATTR_MASK  0xFF00 /* which bits tree.c uses for file types */
 
 void tree_get_filetypes(const struct filetype**, int*);

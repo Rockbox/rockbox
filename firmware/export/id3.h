@@ -213,6 +213,9 @@ struct mp3entry {
     long track_peak;    /* 7.24 signed fixed point. 0 for no peak. */
     long album_peak;
 #endif
+
+    /* Cuesheet support */
+    int cuesheet_type;      /* 0: none, 1: external, 2: embedded */
 };
 
 enum {

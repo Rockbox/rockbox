@@ -103,6 +103,8 @@
 #include "m5636.h"
 #endif
 
+#include "cuesheet.h"
+
 /*#define AUTOROCK*/ /* define this to check for "autostart.rock" on boot */
 
 const char appsversion[]=APPSVERSION;
@@ -274,7 +276,8 @@ static void init(void)
               global_settings.superbass);
 
     scrobbler_init();
-    
+    cuesheet_init();
+
     /* audio_init must to know the size of voice buffer so init voice first */
 #if CONFIG_CODEC == SWCODEC
     talk_init();
@@ -489,6 +492,7 @@ static void init(void)
     playlist_init();
     tree_init();
     scrobbler_init();
+    cuesheet_init();
 
     /* No buffer allocation (see buffer.c) may take place after the call to
        audio_init() since the mpeg thread takes the rest of the buffer space */

@@ -32,6 +32,7 @@ settings_list.c
 settings_menu.c
 sound_menu.c
 status.c
+cuesheet.c
 #if !defined(SIMULATOR) || CONFIG_CODEC == SWCODEC
 talk.c
 #endif

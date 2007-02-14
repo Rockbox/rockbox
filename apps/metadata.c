@@ -30,6 +30,7 @@
 #include "replaygain.h"
 #include "debug.h"
 #include "system.h"
+#include "cuesheet.h"
 
 enum tagtype { TAGTYPE_APE = 1, TAGTYPE_VORBIS };
 
@@ -2271,6 +2272,11 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
     }
 
     /* We have successfully read the metadata from the file */
+
+    if (cuesheet_is_enabled() && look_for_cuesheet_file(trackname))
+    {
+        track->id3.cuesheet_type = 1;
+    }
 
     lseek(fd, 0, SEEK_SET);
     strncpy(track->id3.path, trackname, sizeof(track->id3.path));

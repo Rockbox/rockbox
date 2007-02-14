@@ -133,6 +133,7 @@ const struct filetype filetypes[] = {
     { "kbd", TREE_ATTR_KBD, Icon_Keyboard, VOICE_EXT_KBD },
 #endif
     { "bmark",TREE_ATTR_BMARK, Icon_Bookmark, VOICE_EXT_BMARK },
+    { "cue", TREE_ATTR_CUE, Icon_Bookmark, LANG_CUESHEET },
 #ifdef BOOTFILE_EXT
     { BOOTFILE_EXT, TREE_ATTR_MOD, Icon_Firmware, VOICE_EXT_AJZ },
 #endif /* #ifndef SIMULATOR */
