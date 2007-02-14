@@ -2230,9 +2230,9 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         }
         break;
     case AFMT_SPC:
-       track->id3.filesize = filesize(fd);
-       track->id3.genre = 36;
-       break;
+        track->id3.filesize = filesize(fd);
+        track->id3.genre = 36;
+        break;
     case AFMT_ADX:
         if (!get_adx_metadata(fd, &(track->id3)))
         {
