@@ -144,6 +144,8 @@ Font.176x220x16: nimbus-12.fnt
 Font.220x176x16: nimbus-14.fnt
 Font.240x320x16: nimbus-19.fnt
 Font.320x240x16: nimbus-19.fnt
+Foreground Color: 000000
+Background Color: FFFFFF
 Statusbar: on
 </wps>
 
@@ -160,6 +162,8 @@ Name: UniCatcher.wps
 RWPS: UniCatcher.rwps
 Author: Ioannis Koutoulakis
 Font: unifont.fnt
+Foreground Color: 000000
+Background Color: FFFFFF
 Statusbar: on
 </wps>
 
