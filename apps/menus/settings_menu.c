@@ -47,15 +47,15 @@ MENUITEM_SETTING(tagcache_ram, &global_settings.tagcache_ram, NULL);
 #endif
 MENUITEM_SETTING(tagcache_autoupdate, &global_settings.tagcache_autoupdate, NULL);
 MENUITEM_FUNCTION(tc_init, ID2P(LANG_TAGCACHE_FORCE_UPDATE),
-                    (int(*)(void))tagcache_rebuild, NULL);
+                    (int(*)(void))tagcache_rebuild, NULL, NOICON);
 MENUITEM_FUNCTION(tc_update, ID2P(LANG_TAGCACHE_UPDATE),
-                    (int(*)(void))tagcache_update, NULL);
+                    (int(*)(void))tagcache_update, NULL, NOICON);
 MENUITEM_SETTING(runtimedb, &global_settings.runtimedb, NULL);
 MENUITEM_FUNCTION(tc_export, ID2P(LANG_TAGCACHE_EXPORT),
-                    (int(*)(void))tagtree_export, NULL);
+                    (int(*)(void))tagtree_export, NULL, NOICON);
 MENUITEM_FUNCTION(tc_import, ID2P(LANG_TAGCACHE_IMPORT),
-                    (int(*)(void))tagtree_import, NULL);
-MAKE_MENU(tagcache_menu, ID2P(LANG_TAGCACHE), 0, 
+                    (int(*)(void))tagtree_import, NULL, NOICON);
+MAKE_MENU(tagcache_menu, ID2P(LANG_TAGCACHE), 0, NOICON,
 #ifdef HAVE_TC_RAMCACHE
                 &tagcache_ram,
 #endif
@@ -92,7 +92,8 @@ static int fileview_callback(int action,const struct menu_item_ex *this_item)
     return action;
 }
 
-MAKE_MENU(file_menu, ID2P(LANG_FILE), 0, &sort_case, &sort_dir, &sort_file,
+MAKE_MENU(file_menu, ID2P(LANG_FILE), 0, NOICON,
+                &sort_case, &sort_dir, &sort_file,
                 &dirfilter, &browse_current, &show_icons, &show_path_in_browser,
 #ifdef HAVE_TAGCACHE
                 &tagcache_menu
@@ -125,7 +126,7 @@ static int usbcharging_callback(int action,const struct menu_item_ex *this_item)
 MENUITEM_SETTING(usb_charging, &global_settings.usb_charging, usbcharging_callback);
 #endif
 #endif
-MAKE_MENU(battery_menu, ID2P(LANG_BATTERY_MENU), 0,
+MAKE_MENU(battery_menu, ID2P(LANG_BATTERY_MENU), 0, NOICON,
           &battery_capacity,
 #if BATTERY_TYPES_COUNT > 1
             &battery_type,
@@ -164,7 +165,7 @@ static int dircache_callback(int action,const struct menu_item_ex *this_item)
 }
 MENUITEM_SETTING(dircache, &global_settings.dircache, dircache_callback);
 #endif
-MAKE_MENU(disk_menu, ID2P(LANG_DISK_MENU), 0,
+MAKE_MENU(disk_menu, ID2P(LANG_DISK_MENU), 0, NOICON,
           &disk_spindown,
 #ifdef HAVE_DIRCACHE
             &dircache,
@@ -204,9 +205,9 @@ static int timedate_set(void)
     return result;
 }
 
-MENUITEM_FUNCTION(time_set, ID2P(LANG_TIME), timedate_set, NULL);
+MENUITEM_FUNCTION(time_set, ID2P(LANG_TIME), timedate_set, NULL, NOICON);
 MENUITEM_SETTING(timeformat, &global_settings.timeformat, NULL);
-MAKE_MENU(time_menu, ID2P(LANG_TIME_MENU), 0, &time_set, &timeformat);
+MAKE_MENU(time_menu, ID2P(LANG_TIME_MENU), 0, NOICON, &time_set, &timeformat);
 #endif
 
 /* System menu */
@@ -241,16 +242,16 @@ static int sleep_timer(void)
                    &sleep_timer_set, 5, 0, 300, sleep_timer_formatter);
 }
 
-MENUITEM_FUNCTION(sleep_timer_call, ID2P(LANG_SLEEP_TIMER), sleep_timer, NULL);
+MENUITEM_FUNCTION(sleep_timer_call, ID2P(LANG_SLEEP_TIMER), sleep_timer, NULL, NOICON);
 #ifdef HAVE_ALARM_MOD
 MENUITEM_FUNCTION(alarm_screen_call, ID2P(LANG_ALARM_MOD_ALARM_MENU),
-                   (menu_function)alarm_screen, NULL);
+                   (menu_function)alarm_screen, NULL, NOICON);
 #endif
 
 /* Limits menu */
 MENUITEM_SETTING(max_files_in_dir, &global_settings.max_files_in_dir, NULL);
 MENUITEM_SETTING(max_files_in_playlist, &global_settings.max_files_in_playlist, NULL);
-MAKE_MENU(limits_menu, ID2P(LANG_LIMITS_MENU), 0,
+MAKE_MENU(limits_menu, ID2P(LANG_LIMITS_MENU), 0, NOICON,
            &max_files_in_dir, &max_files_in_playlist);
 
 #if CONFIG_CODEC == MAS3507D
@@ -274,7 +275,8 @@ MENUITEM_SETTING(line_in, &global_settings.line_in, linein_callback);
 MENUITEM_SETTING(car_adapter_mode, &global_settings.car_adapter_mode, NULL);
 #endif
 
-MAKE_MENU(system_menu, ID2P(LANG_SYSTEM), 0,
+MAKE_MENU(system_menu, ID2P(LANG_SYSTEM), 
+          0, bitmap_icons_6x8[Icon_System_menu],
 #ifndef SIMULATOR
             &battery_menu,
 #endif
@@ -326,6 +328,7 @@ MENUITEM_SETTING(autocreatebookmark,
 MENUITEM_SETTING(autoloadbookmark, &global_settings.autoloadbookmark, NULL);
 MENUITEM_SETTING(usemrb, &global_settings.usemrb, NULL);
 MAKE_MENU(bookmark_settings_menu, ID2P(LANG_BOOKMARK_SETTINGS), 0,
+          bitmap_icons_6x8[Icon_Bookmark],
           &autocreatebookmark, &autoloadbookmark, &usemrb);
 /*    BOOKMARK MENU                */
 /***********************************/
@@ -359,7 +362,7 @@ static int talk_callback(int action,const struct menu_item_ex *this_item)
     }
     return action;
 }
-MAKE_MENU(voice_settings_menu, ID2P(LANG_VOICE), 0,
+MAKE_MENU(voice_settings_menu, ID2P(LANG_VOICE), 0, bitmap_icons_6x8[Icon_Voice],
           &talk_menu, &talk_dir, &talk_file_item);
 /*    VOICE MENU                   */
 /***********************************/
@@ -370,9 +373,11 @@ static int language_browse(void)
 {
     return (int)rockbox_browse(LANG_DIR, SHOW_LNG);
 }
-MENUITEM_FUNCTION(browse_langs, ID2P(LANG_LANGUAGE), language_browse, NULL);
+MENUITEM_FUNCTION(browse_langs, ID2P(LANG_LANGUAGE), language_browse,
+                    NULL, bitmap_icons_6x8[Icon_Language]);
 
 MAKE_MENU(settings_menu_item, ID2P(LANG_GENERAL_SETTINGS), 0,
+          bitmap_icons_6x8[Icon_General_settings_menu],
           &playback_menu_item, &file_menu, &display_menu, &system_menu,
           &bookmark_settings_menu, &browse_langs, &voice_settings_menu );
 /*    SETTINGS MENU                */

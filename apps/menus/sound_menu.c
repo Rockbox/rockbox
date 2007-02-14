@@ -75,17 +75,17 @@ MENUITEM_SETTING(stereo_width, &global_settings.stereo_width, soundmenu_callback
                      &global_settings.crossfeed_hf_attenuation, soundmenu_callback);
     MENUITEM_SETTING(crossfeed_hf_cutoff,
                      &global_settings.crossfeed_hf_cutoff, soundmenu_callback);
-    MAKE_MENU(crossfeed_menu,ID2P(LANG_CROSSFEED),soundmenu_callback,
+    MAKE_MENU(crossfeed_menu,ID2P(LANG_CROSSFEED),soundmenu_callback, NOICON,
               &crossfeed, &crossfeed_direct_gain, &crossfeed_cross_gain,
               &crossfeed_hf_attenuation, &crossfeed_hf_cutoff);
               
     MENUITEM_FUNCTION(equalizer_menu, ID2P(LANG_EQUALIZER),
-                      (int(*)(void))eq_menu, NULL);
+                      (int(*)(void))eq_menu, NULL, NOICON);
     MENUITEM_SETTING(dithering_enabled,
                      &global_settings.dithering_enabled, soundmenu_callback);
 #ifdef HAVE_WM8758
     MENUITEM_FUNCTION(hw_equalizer_menu, ID2P(LANG_EQUALIZER_HARDWARE),
-                      (int(*)(void))eq_hw_menu, NULL);
+                      (int(*)(void))eq_hw_menu, NULL, NOICON);
 #endif
 #endif
 
@@ -102,7 +102,7 @@ MENUITEM_SETTING(stereo_width, &global_settings.stereo_width, soundmenu_callback
 
 
 
-MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL,
+MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, bitmap_icons_6x8[Icon_Audio],
           &volume,
 #ifndef HAVE_TLV320
           &bass,&treble,

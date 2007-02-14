@@ -58,23 +58,24 @@ static int browse_folder(void *param)
     return rockbox_browse(info->dir, info->show_options);
 }
 MENUITEM_FUNCTION_WPARAM(browse_themes, ID2P(LANG_CUSTOM_THEME), 
-		browse_folder, (void*)&theme, NULL);
+		browse_folder, (void*)&theme, NULL, bitmap_icons_6x8[Icon_Folder]);
 MENUITEM_FUNCTION_WPARAM(browse_plugins, ID2P(LANG_PLUGINS),
-		browse_folder, (void*)&rocks, NULL);
+		browse_folder, (void*)&rocks, NULL, bitmap_icons_6x8[Icon_Plugin]);
 
 #ifdef CONFIG_TUNER
 MENUITEM_FUNCTION(load_radio_screen, ID2P(LANG_FM_RADIO),
-                   (menu_function)radio_screen, dynamicitem_callback);
+                   (menu_function)radio_screen, dynamicitem_callback,
+                    bitmap_icons_6x8[Icon_Radio_screen]);
 #endif
 
 #include "settings_menu.h"
 MENUITEM_FUNCTION(manage_settings_menu_item, ID2P(LANG_MANAGE_MENU),
-                (menu_function)manage_settings_menu, NULL);
+                (menu_function)manage_settings_menu, NULL, bitmap_icons_6x8[Icon_Config]);
 bool info_menu(void); /* from apps/main_menu.c TEMP*/
 MENUITEM_FUNCTION(info_menu_item, ID2P(LANG_INFO),
-                (menu_function)info_menu, NULL);
+                (menu_function)info_menu, NULL, bitmap_icons_6x8[Icon_Questionmark]);
 MENUITEM_FUNCTION(mrb_bookmarks, ID2P(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS),
-                   (menu_function)bookmark_mrb_load, NULL);
+                   (menu_function)bookmark_mrb_load, NULL, bitmap_icons_6x8[Icon_Bookmark]);
 
 #ifdef HAVE_LCD_CHARCELLS
 static int do_shutdown(void)
@@ -82,12 +83,12 @@ static int do_shutdown(void)
     sys_poweroff();
     return 0;
 }
-MENUITEM_FUNCTION(do_shutdown_item, ID2P(LANG_SHUTDOWN), do_shutdown, NULL);
+MENUITEM_FUNCTION(do_shutdown_item, ID2P(LANG_SHUTDOWN), do_shutdown, NULL, NOICON);
 #endif
 
 /* NOTE: This title will be translatable once we decide what to call this menu
          when the root menu comes in... hopefully in the next few days */
-MAKE_MENU(main_menu_, "Rockbox Main Menu", NULL,
+MAKE_MENU(main_menu_, "Rockbox Main Menu", NULL, bitmap_icons_6x8[Icon_Submenu_Entered],
         &mrb_bookmarks, &sound_settings,
         &settings_menu_item, &manage_settings_menu_item, &browse_themes,
 #ifdef CONFIG_TUNER

@@ -21,6 +21,9 @@
 #define __MENU_H__
 
 #include <stdbool.h>
+#include "icon.h"
+#include "icons.h"
+
 
 struct menu_item {
     unsigned char *desc; /* string or ID */
@@ -90,6 +93,9 @@ struct menu_item_ex {
             int (*menu_callback)(int action, 
                                  const struct menu_item_ex *this_item);
             unsigned char *desc; /* string or ID */
+#ifdef HAVE_LCD_BITMAP
+            ICON icon; /* Icon to display */
+#endif
         } *callback_and_desc;
     };
 };
@@ -119,26 +125,28 @@ int do_menu(const struct menu_item_ex *menu);
     and its return value will be the index of the chosen item */
 #define MENUITEM_STRINGLIST(name, str, callback, ... )                  \
     static const char *name##_[] = {__VA_ARGS__};                       \
-    static const struct menu_callback_with_desc name##__ = {callback,str};    \
+    static const struct menu_callback_with_desc name##__ = {callback,str, NOICON};\
     static const struct menu_item_ex name =                             \
         {MT_RETURN_ID|MENU_HAS_DESC|                                    \
          MENU_ITEM_COUNT(sizeof( name##_)/sizeof(*name##_)),            \
             { .submenus = name##_},{.callback_and_desc = & name##__}};
+
+#ifdef HAVE_LCD_BITMAP /* Kill the player port already.... PLEASE!! */
             
 /* This one should be static'ed also, 
    but cannot be done untill settings menu is done */
 /*  Use this to put a function call into the menu.
     When the user selects this item the function will be run,
     when it exits the user will be back in the menu. return value is ignored */
-#define MENUITEM_FUNCTION(name, str, func, callback)                          \
-    static const struct menu_callback_with_desc name##_ = {callback,str};     \
+#define MENUITEM_FUNCTION(name, str, func, callback, icon)                     \
+    static const struct menu_callback_with_desc name##_ = {callback,str,icon}; \
     const struct menu_item_ex name   =                                  \
         { MT_FUNCTION_CALL|MENU_HAS_DESC, { .function = func},          \
         {.callback_and_desc = & name##_}};
 
 /* Same as above, except the function will be called with a (void*)param. */
-#define MENUITEM_FUNCTION_WPARAM(name, str, func, param, callback)          \
-    static const struct menu_callback_with_desc name##_ = {callback,str};   \
+#define MENUITEM_FUNCTION_WPARAM(name, str, func, param, callback, icon)    \
+    static const struct menu_callback_with_desc name##_ = {callback,str,icon}; \
     static const struct menu_func_with_param name##__ = {func, param};      \
     static const struct menu_item_ex name   =                               \
         { MT_FUNCTION_WITH_PARAM|MENU_HAS_DESC,                             \
@@ -147,11 +155,35 @@ int do_menu(const struct menu_item_ex *menu);
 
 /*  Use this to actually create a menu. the ... argument is a list of pointers 
     to any of the above macro'd variables. (It can also have other menus in the list. */
-#define MAKE_MENU( name, str, callback, ... )                           \
+#define MAKE_MENU( name, str, callback, icon, ... )                           \
     static const struct menu_item_ex *name##_[]  = {__VA_ARGS__};       \
-    static const struct menu_callback_with_desc name##__ = {callback,str};    \
+    static const struct menu_callback_with_desc name##__ = {callback,str,icon};\
     const struct menu_item_ex name =                                    \
         {MT_MENU|MENU_HAS_DESC|                                         \
          MENU_ITEM_COUNT(sizeof( name##_)/sizeof(*name##_)),            \
             { (void*)name##_},{.callback_and_desc = & name##__}};
+
+#else /* HAVE_LCD_BITMAP */
+#define MENUITEM_FUNCTION(name, str, func, callback, icon)                     \
+    static const struct menu_callback_with_desc name##_ = {callback,str}; \
+    const struct menu_item_ex name   =                                  \
+        { MT_FUNCTION_CALL|MENU_HAS_DESC, { .function = func},          \
+        {.callback_and_desc = & name##_}};
+#define MENUITEM_FUNCTION_WPARAM(name, str, func, param, callback, icon)    \
+    static const struct menu_callback_with_desc name##_ = {callback,str}; \
+    static const struct menu_func_with_param name##__ = {func, param};      \
+    static const struct menu_item_ex name   =                               \
+        { MT_FUNCTION_WITH_PARAM|MENU_HAS_DESC,                             \
+            { .func_with_param = &name##__},                                \
+            {.callback_and_desc = & name##_}};
+#define MAKE_MENU( name, str, callback, icon, ... )                           \
+    static const struct menu_item_ex *name##_[]  = {__VA_ARGS__};       \
+    static const struct menu_callback_with_desc name##__ = {callback,str};\
+    const struct menu_item_ex name =                                    \
+        {MT_MENU|MENU_HAS_DESC|                                         \
+         MENU_ITEM_COUNT(sizeof( name##_)/sizeof(*name##_)),            \
+            { (void*)name##_},{.callback_and_desc = & name##__}};
+            
+#endif /* HAVE_LCD_BITMAP */
+            
 #endif /* End __MENU_H__ */

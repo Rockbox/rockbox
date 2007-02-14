@@ -1096,7 +1096,13 @@ static bool do_set_setting(const unsigned char* string, void *variable,
     else oldvalue = *(bool*)variable;
 
     gui_synclist_init(&lists,value_setting_get_name_cb,(void*)cb_data,false,1);
-    gui_synclist_set_title(&lists, (char*)string, NOICON);
+    gui_synclist_set_title(&lists, (char*)string,
+#ifdef HAVE_LCD_BITMAP
+        bitmap_icons_6x8[Icon_Questionmark]
+#else
+        NOICON
+#endif
+    );
     gui_synclist_set_icon_callback(&lists,NULL);
     gui_synclist_set_nb_items(&lists,nb_items);
     gui_synclist_limit_scroll(&lists,true);

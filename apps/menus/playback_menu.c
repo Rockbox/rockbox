@@ -60,7 +60,7 @@ MENUITEM_SETTING(resume, &global_settings.resume, NULL);
 
 MENUITEM_SETTING(ff_rewind_accel, &global_settings.ff_rewind_accel, NULL);
 MENUITEM_SETTING(ff_rewind_min_step, &global_settings.ff_rewind_min_step, NULL);
-MAKE_MENU(ff_rewind_settings_menu, ID2P(LANG_WIND_MENU), 0,
+MAKE_MENU(ff_rewind_settings_menu, ID2P(LANG_WIND_MENU), 0, NOICON,
           &ff_rewind_min_step, &ff_rewind_accel);
 #if CONFIG_CODEC == SWCODEC
 int buffermargin_callback(int action,const struct menu_item_ex *this_item)
@@ -95,7 +95,7 @@ MENUITEM_SETTING(crossfade_fade_out_duration,
     &global_settings.crossfade_fade_out_duration, setcrossfadeonexit_callback);
 MENUITEM_SETTING(crossfade_fade_out_mixmode,
     &global_settings.crossfade_fade_out_mixmode,NULL);
-MAKE_MENU(crossfade_settings_menu,ID2P(LANG_CROSSFADE),0,
+MAKE_MENU(crossfade_settings_menu,ID2P(LANG_CROSSFADE),0, NOICON,
           &crossfade, &crossfade_fade_in_delay, &crossfade_fade_in_duration,
           &crossfade_fade_out_delay, &crossfade_fade_out_duration,
           &crossfade_fade_out_mixmode);
@@ -117,7 +117,7 @@ MENUITEM_SETTING(replaygain, &global_settings.replaygain ,replaygain_callback);
 MENUITEM_SETTING(replaygain_noclip, &global_settings.replaygain_noclip ,replaygain_callback);
 MENUITEM_SETTING(replaygain_type, &global_settings.replaygain_type ,replaygain_callback);
 MENUITEM_SETTING(replaygain_preamp, &global_settings.replaygain_preamp ,replaygain_callback);
-MAKE_MENU(replaygain_settings_menu,ID2P(LANG_REPLAYGAIN),0,
+MAKE_MENU(replaygain_settings_menu,ID2P(LANG_REPLAYGAIN),0, NOICON,
           &replaygain,&replaygain_noclip,
           &replaygain_type,&replaygain_preamp);
           
@@ -150,11 +150,12 @@ MENUITEM_SETTING(audioscrobbler, &global_settings.audioscrobbler, audioscrobbler
 MENUITEM_SETTING(unplug_mode, &global_settings.unplug_mode, NULL);
 MENUITEM_SETTING(unplug_rw, &global_settings.unplug_rw, NULL);
 MENUITEM_SETTING(unplug_autoresume, &global_settings.unplug_autoresume, NULL);
-MAKE_MENU(unplug_menu, ID2P(LANG_UNPLUG), 0,
+MAKE_MENU(unplug_menu, ID2P(LANG_UNPLUG), 0, NOICON,
           &unplug_mode, &unplug_rw, &unplug_autoresume);
 #endif
 
 MAKE_MENU(playback_menu_item,ID2P(LANG_PLAYBACK),0,
+          bitmap_icons_6x8[Icon_Playback_menu],
           &shuffle_item, &repeat_mode, &play_selected, &resume,
           &ff_rewind_settings_menu, 
           &buffer_margin, &fade_on_stop, &party_mode,

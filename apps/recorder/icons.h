@@ -19,6 +19,8 @@
 #ifndef _ICONS_H_
 #define _ICONS_H_
 
+#ifndef PLUGIN
+
 #include <lcd.h>
 
 #ifdef HAVE_LCD_BITMAP
@@ -64,6 +66,18 @@ enum icons_6x8 {
     Icon_Moving,
     Icon_Keyboard,
     Icon_Reverse_Cursor,
+    Icon_Questionmark,
+    Icon_Menu_setting,
+    Icon_Menu_functioncall,
+    Icon_Submenu,
+    Icon_Submenu_Entered,
+    Icon_Recording,
+    Icon_Voice,
+    Icon_General_settings_menu,
+    Icon_System_menu,
+    Icon_Playback_menu,
+    Icon_Display_menu,
+    Icon_Radio_screen,
     Icon6x8Last,
 };
 
@@ -163,5 +177,5 @@ extern void statusbar_led(void);
 #endif
 
 #endif /* End HAVE_LCD_BITMAP */
-
+#endif /* PLUGIN */
 #endif /*  _ICONS_H_ */

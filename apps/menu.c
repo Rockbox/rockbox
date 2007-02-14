@@ -374,12 +374,43 @@ static char * get_menu_item_name(int selected_item,void * data, char *buffer)
     }
     return P2STR(menu->callback_and_desc->desc);
 }
+#ifdef HAVE_LCD_BITMAP
+static void menu_get_icon(int selected_item, void * data, ICON * icon)
+{
+    const struct menu_item_ex *menu = (const struct menu_item_ex *)data;
+    selected_item = get_menu_selection(selected_item, menu);
+    
+    menu = menu->submenus[selected_item];
+    switch (menu->flags&MENU_TYPE_MASK)
+    {
+        case MT_SETTING:
+            *icon = bitmap_icons_6x8[Icon_Menu_setting];
+            break;
+        case MT_MENU:
+            if (menu->callback_and_desc->icon == NOICON)
+                *icon = bitmap_icons_6x8[Icon_Submenu];
+            else 
+                *icon = menu->callback_and_desc->icon;
+            break;
+        case MT_FUNCTION_CALL:
+        case MT_FUNCTION_WITH_PARAM:
+            if (menu->callback_and_desc->icon == NOICON)
+                *icon = bitmap_icons_6x8[Icon_Menu_functioncall];
+            else 
+                *icon = menu->callback_and_desc->icon;
+            break;
+        default:
+            *icon = NOICON;
+    }
+}
+#endif
 
 static void init_menu_lists(const struct menu_item_ex *menu,
                      struct gui_synclist *lists, int selected, bool callback)
 {
     int i, count = (menu->flags&MENU_COUNT_MASK)>>MENU_COUNT_SHIFT;
     menu_callback_type menu_callback = NULL;
+    ICON icon = NOICON;
     current_subitems_count = 0;
     for (i=0; i<count; i++)
     {
@@ -401,8 +432,21 @@ static void init_menu_lists(const struct menu_item_ex *menu,
     }
     
     gui_synclist_init(lists,get_menu_item_name,(void*)menu,false,1);
-    gui_synclist_set_title(lists, P2STR(menu->callback_and_desc->desc), NOICON);
-    gui_synclist_set_icon_callback(lists,NULL);
+#ifdef HAVE_LCD_BITMAP
+    if (global_settings.show_icons == false)
+        icon = NOICON;
+    else if (menu->callback_and_desc->icon == NOICON)
+        icon = bitmap_icons_6x8[Icon_Submenu_Entered];
+    else
+        icon = menu->callback_and_desc->icon;
+#endif    
+    gui_synclist_set_title(lists, P2STR(menu->callback_and_desc->desc), icon);
+#ifdef HAVE_LCD_BITMAP    
+    if (global_settings.show_icons)
+        gui_synclist_set_icon_callback(lists, menu_get_icon);
+    else 
+#endif
+        gui_synclist_set_icon_callback(lists, NULL);
     gui_synclist_set_nb_items(lists,current_subitems_count);
     gui_synclist_limit_scroll(lists,true);
     gui_synclist_select_item(lists, selected);

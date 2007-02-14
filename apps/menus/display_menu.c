@@ -29,4 +29,5 @@
 #include "settings_menu.h"
 
 bool display_settings_menu(void); /* from ../settings_menu.c */
-MENUITEM_FUNCTION(display_menu,ID2P(LANG_DISPLAY),(menu_function)display_settings_menu,NULL);
+MENUITEM_FUNCTION(display_menu,ID2P(LANG_DISPLAY),
+    (menu_function)display_settings_menu,NULL, bitmap_icons_6x8[Icon_Display_menu]);

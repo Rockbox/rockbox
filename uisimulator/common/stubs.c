@@ -24,7 +24,6 @@
 
 #include "screens.h"
 #include "button.h"
-#include "menu.h"
 
 #include "string.h"
 #include "lcd.h"
