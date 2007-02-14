@@ -18,6 +18,7 @@
  ****************************************************************************/
 
 #include <string.h>
+#include <inttypes.h>
 #include "structec.h"
 #include "system.h"
 #include "file.h"
@@ -66,17 +67,17 @@ void structec_convert(void *structure, const char *ecinst,
             /* Swap 2 bytes. */
             case 's':
             {
-                unsigned short *data = (unsigned short *)buf;
-                *data = SWAP_16(*data);
+                uint16_t *data = (uint16_t *)buf;
+                *data = swap16(*data);
                 buf += 2;
                 break;
             }
-            
+
             /* Swap 4 bytes. */
             case 'l':
             {
-                unsigned long *data = (unsigned long *)buf;
-                *data = SWAP_32(*data);
+                uint32_t *data = (uint32_t *)buf;
+                *data = swap32(*data);
                 buf += 4;
                 break;
             }
