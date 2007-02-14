@@ -104,6 +104,9 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* Speex File Format */
     [AFMT_SPEEX] =
         AFMT_ENTRY("Speex","speex",   NULL,          "spx\0"      ),
+    /* SPC700 Save State */
+    [AFMT_SPC] =
+        AFMT_ENTRY("SPC",  "spc",     NULL,          "spc\0"      ),
 #endif
 };
 
