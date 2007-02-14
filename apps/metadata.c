@@ -31,12 +31,19 @@
 #include "debug.h"
 #include "system.h"
 #include "cuesheet.h"
+#include "structec.h"
 
 enum tagtype { TAGTYPE_APE = 1, TAGTYPE_VORBIS };
 
+#ifdef ROCKBOX_BIG_ENDIAN
+#define IS_BIG_ENDIAN 1
+#else
+#define IS_BIG_ENDIAN 0
+#endif
+
 #define APETAG_HEADER_LENGTH        32
-#define APETAG_HEADER_FORMAT        "8LLLL"
-#define APETAG_ITEM_HEADER_FORMAT   "LL"
+#define APETAG_HEADER_FORMAT        "8llll"
+#define APETAG_ITEM_HEADER_FORMAT   "ll"
 #define APETAG_ITEM_TYPE_MASK       3
 
 #define TAG_NAME_LENGTH             32
@@ -152,69 +159,6 @@ static long read_string(int fd, char* buf, long buf_size, int eos, long size)
     *buf = 0;
     return read_bytes;
 }
-
-/* Convert a little-endian structure to native format using a format string.
- * Does nothing on a little-endian machine.
- */ 
-static void convert_endian(void *data, const char *format)
-{
-#ifdef ROCKBOX_BIG_ENDIAN
-    while (*format) 
-    {
-        switch (*format) 
-        {
-        case 'L':
-            {
-                long* d = (long*) data;
-                
-                *d = letoh32(*d);
-                data = d + 1;
-            }
-            
-            break;
-
-        case 'S':
-            {
-                short* d = (short*) data;
-                
-                *d = letoh16(*d);
-                data = d + 1;
-            }
-            
-            break;
-
-        default:
-            if (isdigit(*format))
-            {
-                data = ((char*) data) + *format - '0';
-            }
-            
-            break;
-        }
-
-        format++;
-    }
-#else
-    (void) data;
-    (void) format;
-#endif
-}
-
-#if 0 /* not needed atm */
-/* Read an unsigned 16-bit integer from a big-endian file. */
-#ifdef ROCKBOX_BIG_ENDIAN
-#define read_uint16be(fd, buf) read((fd), (buf), 2)
-#else
-static int read_uint16be(int fd, unsigned short* buf)
-{
-    size_t n;
-    
-    n = read(fd, (char*) buf, 2);
-    *buf = betoh16(*buf);
-    return n;
-}
-#endif
-#endif /* if 0 */
 
 /* Read an unsigned 32-bit integer from a big-endian file. */
 #ifdef ROCKBOX_BIG_ENDIAN
@@ -354,13 +298,12 @@ static bool read_ape_tags(int fd, struct mp3entry* id3)
     struct apetag_header header;
 
     if ((lseek(fd, -APETAG_HEADER_LENGTH, SEEK_END) < 0)
-        || (read(fd, &header, APETAG_HEADER_LENGTH) != APETAG_HEADER_LENGTH)
+        || (ecread(fd, &header, 1, APETAG_HEADER_FORMAT, IS_BIG_ENDIAN) != APETAG_HEADER_LENGTH)
         || (memcmp(header.id, "APETAGEX", sizeof(header.id))))
     {
         return false;
     }
 
-    convert_endian(&header, APETAG_HEADER_FORMAT);
     id3->genre = 0xff;
 
     if ((header.version == 2000) && (header.item_count > 0)
@@ -389,12 +332,11 @@ static bool read_ape_tags(int fd, struct mp3entry* id3)
                 break;
             }
             
-            if (read(fd, &item, sizeof(item)) < (long) sizeof(item))
+            if (ecread(fd, &item, 1, APETAG_ITEM_HEADER_FORMAT, IS_BIG_ENDIAN) < (long) sizeof(item))
             {
                 return false;
             }
             
-            convert_endian(&item, APETAG_ITEM_HEADER_FORMAT);
             tag_remaining -= sizeof(item);
             r = read_string(fd, name, sizeof(name), 0, tag_remaining);
             
@@ -447,21 +389,18 @@ static bool read_vorbis_tags(int fd, struct mp3entry *id3,
 
     id3->genre = 255;
 
-    if (read(fd, &len, sizeof(len)) < (long) sizeof(len)) 
+    if (ecread(fd, &len, 1, "l", IS_BIG_ENDIAN) < (long) sizeof(len)) 
     {
         return false;
     }
     
-    convert_endian(&len, "L");
-    
     if ((lseek(fd, len, SEEK_CUR) < 0)
-        || (read(fd, &comment_count, sizeof(comment_count)) 
+        || (ecread(fd, &comment_count, 1, "l", IS_BIG_ENDIAN) 
             < (long) sizeof(comment_count)))
     {
         return false;
     }
     
-    convert_endian(&comment_count, "L");
     tag_remaining -= len + sizeof(len) + sizeof(comment_count);
 
     if (tag_remaining <= 0)
@@ -480,12 +419,11 @@ static bool read_vorbis_tags(int fd, struct mp3entry *id3,
             break;
         }
 
-        if (read(fd, &len, sizeof(len)) < (long) sizeof(len))
+        if (ecread(fd, &len, 1, "l", IS_BIG_ENDIAN) < (long) sizeof(len))
         {
             return false;
         }
 
-        convert_endian(&len, "L");
         tag_remaining -= 4;
 
         /* Quit if we've passed the end of the page */

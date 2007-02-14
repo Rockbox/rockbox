@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 
+#include <ctype.h>
 #include <string.h>
 #include <inttypes.h>
 #include "structec.h"
@@ -82,9 +83,14 @@ void structec_convert(void *structure, const char *ecinst,
                 break;
             }
             
-            /* This should be never reached. */
+            /* Skip N bytes, idea taken from metadata.c */
             default:
+            {
+                if (isdigit(*ecinst_ring))
+                    buf += (*ecinst_ring - '0');
+
                 break;
+            }
         }
         
         ecinst_ring++;
@@ -114,7 +120,9 @@ size_t structec_size(const char *ecinst)
             case 'c': size += 1; break;
             case 's': size += 2; break;
             case 'l': size += 4; break;
-            default: break;
+            default: 
+                if (isdigit(*ecinst))
+                    size += (*ecinst - '0');
         }
     } while (*(++ecinst) != '\0');
     

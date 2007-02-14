@@ -35,6 +35,7 @@
 #include "id3.h"
 #include "logf.h"
 #include "bitswap.h"
+#include "structec.h"
 #if CONFIG_CODEC == SWCODEC
 #include "playback.h"
 #endif
@@ -183,12 +184,7 @@ static void load_voicefile(void)
             
 #ifdef ROCKBOX_LITTLE_ENDIAN
     logf("Byte swapping voice file");
-    p_voicefile = (struct voicefile*)audiobuf;
-    p_voicefile->version = swap32(p_voicefile->version);
-    p_voicefile->table = swap32(p_voicefile->table);
-    p_voicefile->id1_max = swap32(p_voicefile->id1_max);
-    p_voicefile->id2_max = swap32(p_voicefile->id2_max);
-    p_voicefile = NULL;
+    structec_convert(audiobuf, "llll", 1, true);
 #endif
 
     if (((struct voicefile*)audiobuf)->table /* format check */
@@ -208,12 +204,7 @@ static void load_voicefile(void)
 
 #ifdef ROCKBOX_LITTLE_ENDIAN
     for (i = 0; i < p_voicefile->id1_max + p_voicefile->id2_max; i++)
-    {
-        struct clip_entry *ce;
-        ce = &p_voicefile->index[i];
-        ce->offset = swap32(ce->offset);
-        ce->size = swap32(ce->size);
-    }
+        structec_convert(&p_voicefile->index[i], "ll", 1, true);
 #endif
 
     /* Do a bitswap as necessary. */
