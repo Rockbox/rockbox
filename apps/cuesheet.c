@@ -44,8 +44,8 @@
 void cuesheet_init(void)
 {
     if (global_settings.cuesheet) {
-        curr_cue = (struct cuesheet *)buffer_alloc(MAX_TRACKS * sizeof(struct cuesheet));
-        temp_cue = (struct cuesheet *)buffer_alloc(MAX_TRACKS * sizeof(struct cuesheet));
+        curr_cue = (struct cuesheet *)buffer_alloc(sizeof(struct cuesheet));
+        temp_cue = (struct cuesheet *)buffer_alloc(sizeof(struct cuesheet));
     } else {
         curr_cue = NULL;
         temp_cue = NULL;
