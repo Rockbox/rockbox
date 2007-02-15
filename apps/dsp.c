@@ -19,6 +19,7 @@
 #include <inttypes.h>
 #include <string.h>
 #include <sound.h>
+#include "config.h"
 #include "dsp.h"
 #include "eq.h"
 #include "kernel.h"
@@ -268,7 +269,6 @@ static int downsample(int32_t **dst, int32_t **src, int count,
 
     /* Wrap phase accumulator back to start of next frame. */
     r->phase = phase - (count << 16);
-    r->delta = delta;
     r->last_sample[0] = src[0][count - 1];
     r->last_sample[1] = src[1][count - 1];
     return i;
@@ -282,12 +282,12 @@ static long upsample(int32_t **dst, int32_t **src, int count, struct resample_da
     int i = 0, j;
     int pos;
     int num_channels = dsp->stereo_mode == STEREO_MONO ? 1 : 2;
-      
-    while ((pos = phase >> 16) == 0)
+   
+    while ((phase >> 16) == 0)
     {
        for (j = 0; j < num_channels; j++)
            *d[j]++ = r->last_sample[j] + FRACMUL((phase & 0xffff) << 15,
-                src[j][pos] - r->last_sample[j]);
+                src[j][0] - r->last_sample[j]);
         phase += delta;
         i++;
     }
@@ -303,7 +303,6 @@ static long upsample(int32_t **dst, int32_t **src, int count, struct resample_da
 
     /* Wrap phase accumulator back to start of next frame. */
     r->phase = phase - (count << 16);
-    r->delta = delta;
     r->last_sample[0] = src[0][count - 1];
     r->last_sample[1] = src[1][count - 1];
     return i;
