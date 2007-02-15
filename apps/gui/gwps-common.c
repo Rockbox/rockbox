@@ -620,30 +620,37 @@ static char* get_tag(struct wps_data* wps_data,
                     wps_data->full_line_progressbar=0;
                     return buf;
 #else
-                    char *p=strchr(tag, '|');
-                    if (p) {
-                        wps_data->progress_height=atoi(++p);
-                        p=strchr(p, '|');
-                        if (p) {        
-                            wps_data->progress_start=atoi(++p);
-                            p=strchr(p, '|');
-                            if (p)
-                                wps_data->progress_end=atoi(++p);   
-                            else 
+                    /* default values : */
+                    wps_data->progress_top = -1;
+                    wps_data->progress_height = 6;
+                    wps_data->progress_start = 0;
+                    wps_data->progress_end = 0;
+
+                    char *prev=strchr(tag, '|');
+                    if (prev) {
+                        char *p=strchr(prev+1, '|');
+                        if (p) {
+                            wps_data->progress_height=atoi(++prev);
+                            prev=strchr(prev, '|');
+                            p=strchr(++p, '|');
+                            if (p) {
+                                wps_data->progress_start=atoi(++prev);
+                                prev=strchr(prev, '|');
+                                p=strchr(++p, '|');
+                                if (p) {
+                                    wps_data->progress_end=atoi(++prev);
+                                    prev=strchr(prev, '|');
+                                    p=strchr(++p, '|');
+                                    if(p)
+                                        wps_data->progress_top = atoi(++prev);
+                                }
+
+                            if (wps_data->progress_height<3)
+                                wps_data->progress_height=3;
+                            if (wps_data->progress_end<wps_data->progress_start+3)
                                 wps_data->progress_end=0;
-                        }else {
-                             wps_data->progress_start=0;
-                             wps_data->progress_end=0;
-                        }     
-                        
-                        if (wps_data->progress_height<3)
-                            wps_data->progress_height=3;
-                        if (wps_data->progress_end<wps_data->progress_start+3)
-                            wps_data->progress_end=0;
-                    }else {
-                        wps_data->progress_height=6;
-                        wps_data->progress_start=0;
-                        wps_data->progress_end=0; 
+                            }
+                        }
                     }
                     return "\x01";
 #endif
@@ -1824,8 +1831,12 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
             /* progress */
             if (flags & refresh_mode & WPS_REFRESH_PLAYER_PROGRESS) 
             {
-                int sb_y = i*h + offset + ((h > data->progress_height + 1)
-                    ? (h - data->progress_height) / 2 : 1);
+                int sb_y;
+                if (data->progress_top == -1)
+                    sb_y = i*h + offset + ((h > data->progress_height + 1)
+                                           ? (h - data->progress_height) / 2 : 1);
+                else
+                    sb_y = data->progress_top;
 
                 if (!data->progress_end)
                     data->progress_end=display->width;

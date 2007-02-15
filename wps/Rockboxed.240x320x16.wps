@@ -52,7 +52,7 @@
 
 %ac%t3%ig;%t%iy 
 
-%pb|15|10|220|
+%pb|5|10|220|256|
 %al %pc%ac%?fc<mp1|mp2|mp3|aiff|wav|vorbis|flac|mpc|a52|wavpack|alac|aac|shn|sid|adx|unknown>%ar%pt 
 %?ps<%xdb>
 %?mp<%xdq|%xdp|%xdq|%xdf|%xdr>

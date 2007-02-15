@@ -54,7 +54,7 @@
 
 
 
-%pb|5|10|156|
+%pb|5|10|156|171|
 %al %pc%ac%?fc<mp1|mp2|mp3|aiff|wav|vorbis|flac|mpc|a52|wavpack|alac|aac|shn|sid|adx|unknown>%ar%pt 
 %?ps<%xdb>
 %?mp<%xdq|%xdp|%xdq|%xdf|%xdr>

@@ -43,7 +43,7 @@
 %al %s%ac%?it<%it|%fn>%ar 
 
 %ac%t3%ig;%t%iy 
-%pb|10|10|108|
+%pb|5|10|108|76|
 %al %pc%ac%?fc<mp1|mp2|mp3|aiff|wav|vorbis|flac|mpc|a52|wavpack|alac|aac|shn|sid|adx|unknown>%ar%pt 
 %?ps<%xdb>
 %?mp<%xdq|%xdp|%xdq|%xdf|%xdr>
