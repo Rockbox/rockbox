@@ -44,6 +44,8 @@
 #include "plugin.h"
 #include "talk.h"
 #include "buffer.h"
+#include "splash.h"
+#include "debug_menu.h"
 
 /* lazy coders can use this function if the needed callback 
 	is just to say if the item is shown or not */
