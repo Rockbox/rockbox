@@ -46,6 +46,9 @@
 #include "buffer.h"
 #include "splash.h"
 #include "debug_menu.h"
+#if defined(SIMULATOR) && defined(ROCKBOX_HAS_LOGF)
+#include "logfdisp.h"
+#endif
 
 /* lazy coders can use this function if the needed callback 
 	is just to say if the item is shown or not */
@@ -354,8 +357,8 @@ MENUITEM_FUNCTION(debug_menu_item, ID2P(LANG_DEBUG),
 MENUITEM_FUNCTION(simulate_usb_item, ID2P(LANG_USB),
                    (menu_function)simulate_usb, NULL, NOICON);
 #ifdef ROCKBOX_HAS_LOGF
-MENUITEM_FUNCTION(logfdisplay_item, "logf",logfdisplay, NULL, NOICON);
-MENUITEM_FUNCTION(logfdump_item, "logfdump",logfdump, NULL, NOICON);
+MENUITEM_FUNCTION(logfdisplay_item, "logf",(int (*)(void)) logfdisplay, NULL, NOICON);
+MENUITEM_FUNCTION(logfdump_item, "logfdump",(int (*)(void)) logfdump, NULL, NOICON);
 #endif
 #endif
 
