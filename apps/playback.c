@@ -1117,7 +1117,9 @@ static void* voice_request_buffer_callback(size_t *realsize, size_t reqsize)
         if (voice_is_playing || playing)
             queue_wait_w_tmo(&voice_queue, &ev, 0);
         else
-            queue_wait(&voice_queue, &ev);
+            /* We must use queue_wait_w_tmo() because queue_wait() doesn't
+               unboost the CPU */
+            queue_wait_w_tmo(&voice_queue, &ev, INT_MAX);
         if (!voice_is_playing)
         {
             if (ev.id == SYS_TIMEOUT)
