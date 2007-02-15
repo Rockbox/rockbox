@@ -303,8 +303,22 @@ const struct settings_list settings[] = {
     SYSTEM_SETTING(NVRAM(4),resume_first_index,0),
     SYSTEM_SETTING(NVRAM(4),resume_offset,-1),
     SYSTEM_SETTING(NVRAM(4),resume_seed,-1),
-    {F_T_INT, &global_settings.repeat_mode, LANG_REPEAT, INT(REPEAT_ALL), "repeat",
-         "off,all,one,shuffle,ab" , UNUSED},
+    CHOICE_SETTING(0, repeat_mode, LANG_REPEAT, REPEAT_ALL, "repeat",
+         "off,all,one,shuffle"
+#if (AB_REPEAT_ENABLE == 1)
+         ",ab"
+#endif
+        , NULL,
+#if (AB_REPEAT_ENABLE == 1)
+        5,
+#else
+        4,
+#endif
+        ID2P(LANG_OFF), ID2P(LANG_REPEAT_ALL), ID2P(LANG_REPEAT_ONE), ID2P(LANG_SHUFFLE)
+#if (AB_REPEAT_ENABLE == 1) 	 
+        ,ID2P(LANG_REPEAT_AB)
+#endif
+    ), /* CHOICE_SETTING( repeat_mode ) */
     /* LCD */
 #ifdef HAVE_LCD_CONTRAST
     {F_T_INT|F_DEF_ISFUNC, &global_settings.contrast, LANG_CONTRAST,
