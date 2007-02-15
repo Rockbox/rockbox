@@ -827,11 +827,6 @@ static bool custom_remote_wps_browse(void)
 }
 #endif
 
-static bool custom_cfg_browse(void)
-{
-    return rockbox_browse(ROCKBOX_DIR, SHOW_CFG);
-}
-
 #ifdef HAVE_LCD_BITMAP
 static bool font_browse(void)
 {
@@ -876,33 +871,6 @@ static bool codepage_setting(void)
     return set_option(str(LANG_DEFAULT_CODEPAGE),
                       &global_settings.default_codepage,
                       INT, names, 13, set_codepage );
-}
-
-static bool reset_settings(void)
-{
-    unsigned char *lines[]={str(LANG_RESET_ASK_RECORDER)};
-    unsigned char *yes_lines[]={
-        str(LANG_RESET_DONE_SETTING),
-        str(LANG_RESET_DONE_CLEAR)
-    };
-    unsigned char *no_lines[]={yes_lines[0], str(LANG_RESET_DONE_CANCEL)};
-    struct text_message message={(char **)lines, 1};
-    struct text_message yes_message={(char **)yes_lines, 2};
-    struct text_message no_message={(char **)no_lines, 2};
-
-    switch(gui_syncyesno_run(&message, &yes_message, &no_message))
-    {
-        case YESNO_YES:
-            settings_reset();
-            settings_apply();
-            settings_save();
-            break;
-        case YESNO_NO:
-            break;
-        case YESNO_USB:
-            return true;
-    }
-    return false;
 }
 
 
@@ -1105,31 +1073,3 @@ bool display_settings_menu(void)
     menu_exit(m);
     return result;
 }
-static bool manage_settings_write_config(void)
-{
-	return settings_save_config(SETTINGS_SAVE_ALL);
-}
-static bool manage_settings_write_theme(void)
-{
-	return settings_save_config(SETTINGS_SAVE_THEME);
-}
-
-bool manage_settings_menu(void)
-{
-    int m;
-    bool result;
-
-    static const struct menu_item items[] = {
-        { ID2P(LANG_CUSTOM_CFG),      custom_cfg_browse },
-        { ID2P(LANG_RESET),           reset_settings },
-        { ID2P(LANG_SAVE_SETTINGS),   manage_settings_write_config},
-        { ID2P(LANG_SAVE_THEME),      manage_settings_write_theme},
-    };
-
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
-                 NULL, NULL, NULL);
-    result = menu_run(m);
-    menu_exit(m);
-    return result;
-}
-
