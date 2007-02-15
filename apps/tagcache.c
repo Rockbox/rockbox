@@ -226,19 +226,6 @@ static int processed_dir_count;
 static volatile int write_lock;
 static volatile int read_lock;
 
-int tagcache_str_to_tag(const char *str)
-{
-    int i;
-    
-    for (i = 0; i < (long)(sizeof(tags_str)/sizeof(tags_str[0])); i++)
-    {
-        if (!strcasecmp(tags_str[i], str))
-            return i;
-    }
-    
-    return -1;
-}
-
 const char* tagcache_tag_to_str(int tag)
 {
     return tags_str[tag];

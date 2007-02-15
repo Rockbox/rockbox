@@ -73,4 +73,9 @@ int create_xing_header(int fd, long startpos, long filesize,
                        unsigned long rec_time, unsigned long header_template,
                        void (*progressfunc)(int), bool generate_toc);
 
+extern unsigned long bytes2int(unsigned long b0,
+                               unsigned long b1,
+                               unsigned long b2,
+                               unsigned long b3);
+
 #endif

@@ -142,7 +142,6 @@ void build_tagcache(const char *path);
 void tagcache_reverse_scan(void);
 #endif
 
-int tagcache_str_to_tag(const char *str);
 const char* tagcache_tag_to_str(int tag);
 
 bool tagcache_is_numeric_tag(int type);

@@ -137,15 +137,16 @@ const int afmt_rec_format[AFMT_NUM_CODECS] =
 #endif /* CONFIG_CODEC == SWCODEC && defined (HAVE_RECORDING) */
 /****/
 
-#define UNSYNC(b0,b1,b2,b3) (((long)(b0 & 0x7F) << (3*7)) | \
-                             ((long)(b1 & 0x7F) << (2*7)) | \
-                             ((long)(b2 & 0x7F) << (1*7)) | \
-                             ((long)(b3 & 0x7F) << (0*7)))
-
-#define BYTES2INT(b0,b1,b2,b3) (((long)(b0 & 0xFF) << (3*8)) |  \
-                                ((long)(b1 & 0xFF) << (2*8)) |  \
-                                ((long)(b2 & 0xFF) << (1*8)) |  \
-                                ((long)(b3 & 0xFF) << (0*8)))
+unsigned long unsync(unsigned long b0,
+                     unsigned long b1,
+		     unsigned long b2,
+		     unsigned long b3)
+{
+   return (((long)(b0 & 0x7F) << (3*7)) |
+           ((long)(b1 & 0x7F) << (2*7)) |
+           ((long)(b2 & 0x7F) << (1*7)) |
+           ((long)(b3 & 0x7F) << (0*7)));
+}
 
 static const char* const genres[] = {
     "Blues", "Classic Rock", "Country", "Dance", "Disco", "Funk", "Grunge",
@@ -500,7 +501,7 @@ static int unicode_munge(char* string, char* utf8buf, int *len) {
             /* Handle frames with more than one string
                (needed for TXXX frames).*/
             do {
-                tmp = BYTES2INT(0, 0, str[0], str[1]);
+                tmp = bytes2int(0, 0, str[0], str[1]);
 
                 /* Now check if there is a BOM
                    (zero-width non-breaking space, 0xfeff)
@@ -706,9 +707,9 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             /* The 2.3 extended header size doesn't include the following
                data, so we have to find out the size by checking the flags.
                Also, it is not unsynched. */
-            framelen = BYTES2INT(header[0], header[1], header[2], header[3]) +
-                BYTES2INT(header[6], header[7], header[8], header[9]);
-            flags = BYTES2INT(0, 0, header[4], header[5]);
+            framelen = bytes2int(header[0], header[1], header[2], header[3]) +
+                bytes2int(header[6], header[7], header[8], header[9]);
+            flags = bytes2int(0, 0, header[4], header[5]);
             if(flags & 0x8000)
                 framelen += 4;   /* CRC */
 
@@ -721,7 +722,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
 
             /* The 2.4 extended header size does include the entire header,
                so here we can just skip it. This header is unsynched. */
-            framelen = UNSYNC(header[0], header[1],
+            framelen = unsync(header[0], header[1],
                               header[2], header[3]);
 
             lseek(fd, framelen - 4, SEEK_CUR);
@@ -751,15 +752,15 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             /* Adjust for the 10 bytes we read */
             size -= 10;
 
-            flags = BYTES2INT(0, 0, header[8], header[9]);
+            flags = bytes2int(0, 0, header[8], header[9]);
 
             if (version >= ID3_VER_2_4) {
-                framelen = UNSYNC(header[4], header[5],
+                framelen = unsync(header[4], header[5],
                                   header[6], header[7]);
             } else {
                 /* version .3 files don't use synchsafe ints for
                  * size */
-                framelen = BYTES2INT(header[4], header[5],
+                framelen = bytes2int(header[4], header[5],
                                      header[6], header[7]);
             }
         } else {
@@ -768,7 +769,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             /* Adjust for the 6 bytes we read */
             size -= 6;
 
-            framelen = BYTES2INT(0, header[3], header[4], header[5]);
+            framelen = bytes2int(0, header[3], header[4], header[5]);
         }
 
         /* Keep track of the total size */
@@ -818,7 +819,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                     if(4 != read(fd, tmp, 4))
                         return;
 
-                    data_length_ind = UNSYNC(tmp[0], tmp[1], tmp[2], tmp[3]);
+                    data_length_ind = unsync(tmp[0], tmp[1], tmp[2], tmp[3]);
                     framelen -= 4;
                 }
             }
@@ -963,7 +964,7 @@ int getid3v2len(int fd)
         if(read(fd, buf, 4) != 4)
             offset = 0;
         else
-            offset = UNSYNC(buf[0], buf[1], buf[2], buf[3]) + 10;
+            offset = unsync(buf[0], buf[1], buf[2], buf[3]) + 10;
 
     DEBUGF("ID3V2 Length: 0x%x\n", offset);
     return offset;
@@ -1066,8 +1067,10 @@ static int getsonglength(int fd, struct mp3entry *entry)
     entry->vbr = info.is_vbr;
     entry->has_toc = info.has_toc;
 
+#if CONFIC_CODEC==SWCODEC
     entry->lead_trim = info.enc_delay;
     entry->tail_trim = info.enc_padding;
+#endif
 
     memcpy(entry->toc, info.toc, sizeof(info.toc));
 

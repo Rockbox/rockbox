@@ -40,11 +40,6 @@
 
 #define DEBUG_VERBOSE
 
-#define BYTES2INT(b1,b2,b3,b4) (((long)(b1 & 0xFF) << (3*8)) | \
-                                ((long)(b2 & 0xFF) << (2*8)) | \
-                                ((long)(b3 & 0xFF) << (1*8)) | \
-                                ((long)(b4 & 0xFF) << (0*8)))
-
 #define SYNC_MASK (0x7ffL << 21)
 #define VERSION_MASK (3L << 19)
 #define LAYER_MASK (3L << 17)
@@ -82,12 +77,23 @@ static const short *bitrate_table[3][3] =
 };
 
 /* Sampling frequency table, indexed by version and frequency index */
-static const long freq_table[3][3] =
+static const unsigned short freq_table[3][3] =
 {
     {44100, 48000, 32000}, /* MPEG Version 1 */
     {22050, 24000, 16000}, /* MPEG version 2 */
     {11025, 12000,  8000}, /* MPEG version 2.5 */
 };
+
+unsigned long bytes2int(unsigned long b0,
+                     unsigned long b1,
+		     unsigned long b2,
+		     unsigned long b3)
+{
+   return (((long)(b0 & 0xFF) << (3*8)) |
+           ((long)(b1 & 0xFF) << (2*8)) |
+           ((long)(b2 & 0xFF) << (1*8)) |
+           ((long)(b3 & 0xFF) << (0*8)));
+}
 
 /* check if 'head' is a valid mp3 frame header */
 static bool is_mp3frameheader(unsigned long head)
@@ -357,9 +363,11 @@ int get_mp3file_info(int fd, struct mp3info *info)
         return -1;
 
     memset(info, 0, sizeof(struct mp3info));
+#if CONFIG_CODEC==SWCODEC
     /* These two are needed for proper LAME gapless MP3 playback */
     info->enc_delay = -1;
     info->enc_padding = -1;
+#endif
     if(!mp3headerinfo(info, header))
         return -2;
 
@@ -416,7 +424,7 @@ int get_mp3file_info(int fd, struct mp3info *info)
 
         if (vbrheader[7] & VBR_FRAMES_FLAG) /* Is the frame count there? */
         {
-            info->frame_count = BYTES2INT(vbrheader[i], vbrheader[i+1],
+            info->frame_count = bytes2int(vbrheader[i], vbrheader[i+1],
                                           vbrheader[i+2], vbrheader[i+3]);
             if (info->frame_count <= ULONG_MAX / info->ft_num)
                 info->file_time = info->frame_count * info->ft_num / info->ft_den;
@@ -427,7 +435,7 @@ int get_mp3file_info(int fd, struct mp3info *info)
 
         if (vbrheader[7] & VBR_BYTES_FLAG) /* Is byte count there? */
         {
-            info->byte_count = BYTES2INT(vbrheader[i], vbrheader[i+1],
+            info->byte_count = bytes2int(vbrheader[i], vbrheader[i+1],
                                          vbrheader[i+2], vbrheader[i+3]);
             i += 4;
         }
@@ -453,6 +461,7 @@ int get_mp3file_info(int fd, struct mp3info *info)
             /* We don't care about this, but need to skip it */
             i += 4;
         }
+#if CONFIG_CODEC==SWCODEC
         i += 21;
         info->enc_delay = (vbrheader[i] << 4) | (vbrheader[i + 1] >> 4);
         info->enc_padding = ((vbrheader[i + 1] & 0x0f) << 8) | vbrheader[i + 2];
@@ -465,6 +474,7 @@ int get_mp3file_info(int fd, struct mp3info *info)
            info->enc_delay = -1;
            info->enc_padding = -1;
         }
+#endif
     }
 
     if (!memcmp(vbrheader, "VBRI", 4))
@@ -500,9 +510,9 @@ int get_mp3file_info(int fd, struct mp3info *info)
         info->is_vbri_vbr = true;
         info->has_toc = false; /* We don't parse the TOC (yet) */
 
-        info->byte_count = BYTES2INT(vbrheader[10], vbrheader[11],
+        info->byte_count = bytes2int(vbrheader[10], vbrheader[11],
                                      vbrheader[12], vbrheader[13]);
-        info->frame_count = BYTES2INT(vbrheader[14], vbrheader[15],
+        info->frame_count = bytes2int(vbrheader[14], vbrheader[15],
                                       vbrheader[16], vbrheader[17]);
         if (info->frame_count <= ULONG_MAX / info->ft_num)
             info->file_time = info->frame_count * info->ft_num / info->ft_den;
@@ -515,8 +525,8 @@ int get_mp3file_info(int fd, struct mp3info *info)
             info->bitrate = info->byte_count / (info->file_time >> 3);
 
         /* We don't parse the TOC, since we don't yet know how to (FIXME) */
-        num_offsets = BYTES2INT(0, 0, vbrheader[18], vbrheader[19]);
-        frames_per_entry = BYTES2INT(0, 0, vbrheader[24], vbrheader[25]);
+        num_offsets = bytes2int(0, 0, vbrheader[18], vbrheader[19]);
+        frames_per_entry = bytes2int(0, 0, vbrheader[24], vbrheader[25]);
         DEBUGF("Frame size (%dkpbs): %d bytes (0x%x)\n",
                info->bitrate, info->frame_size, info->frame_size);
         DEBUGF("Frame count: %x\n", info->frame_count);
@@ -528,7 +538,7 @@ int get_mp3file_info(int fd, struct mp3info *info)
 
         for(i = 0;i < num_offsets;i++)
         {
-           j = BYTES2INT(0, 0, vbrheader[26+i*2], vbrheader[27+i*2]);
+           j = bytes2int(0, 0, vbrheader[26+i*2], vbrheader[27+i*2]);
            offset += j;
            DEBUGF("%03d: %x (%x)\n", i, offset - bytecount, j);
         }
