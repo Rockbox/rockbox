@@ -101,7 +101,7 @@ all: $(OUTPUT)
 
 ifndef SIMVER
 $(OBJDIR)/doom.elf: $(OBJS) $(LINKFILE)
-	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) $(LDFLAGS) -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lgcc\
+	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lgcc\
            -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/doom.map
 
 $(OUTPUT): $(OBJDIR)/doom.elf

@@ -44,7 +44,7 @@ all: $(OUTPUT)
 
 ifndef SIMVER
 $(OBJDIR)/rockboy.elf: $(OBJS) $(LINKFILE)
-	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -O2 -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -fast -lgcc \
+	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -fast -lgcc \
            -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockboy.map
 
 $(OUTPUT): $(OBJDIR)/rockboy.elf

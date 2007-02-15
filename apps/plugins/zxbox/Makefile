@@ -43,7 +43,7 @@ all: $(OUTPUT)
 
 ifndef SIMVER
 $(OBJDIR)/zxbox.elf: $(OBJS) $(LINKFILE)
-	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -O -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lgcc \
+	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lgcc \
            -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/zxbox.map
 
 $(OUTPUT): $(OBJDIR)/zxbox.elf

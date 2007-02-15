@@ -34,7 +34,7 @@ all: $(OUTPUT)
 
 ifndef SIMVER
 $(OBJDIR)/mpegplayer.elf: $(OBJS) $(LINKFILE)
-	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -O -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lmad -lgcc\
+	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lmad -lgcc\
            -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/mpegplayer.map
 
 $(OUTPUT): $(OBJDIR)/mpegplayer.elf

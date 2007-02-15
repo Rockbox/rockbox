@@ -70,7 +70,8 @@ $(OBJDIR)/wav_enc.elf: $(OBJDIR)/wav_enc.o
 $(OBJDIR)/wavpack_enc.elf: $(OBJDIR)/wavpack_enc.o $(BUILDDIR)/libwavpack.a
 
 $(OBJDIR)/%.elf: $(OBJDIR)/codec_crt0.o
-	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -O -nostdlib -o $@ $^ -L$(BUILDDIR) -lcodec -lgcc -T$(LINKCODEC) -Wl,-Map,$(OBJDIR)/$*.map
+	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) -o $@ $^ -L$(BUILDDIR) -lcodec -lgcc \
+			-T$(LINKCODEC) -Wl,-Map,$(OBJDIR)/$*.map
 
 $(OBJDIR)/%.codec : $(OBJDIR)/%.elf
 	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@
