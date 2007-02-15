@@ -242,7 +242,9 @@ static int sleep_timer(void)
                    &sleep_timer_set, 5, 0, 300, sleep_timer_formatter);
 }
 
-MENUITEM_FUNCTION(sleep_timer_call, ID2P(LANG_SLEEP_TIMER), sleep_timer, NULL, NOICON);
+MENUITEM_FUNCTION(sleep_timer_call, ID2P(LANG_SLEEP_TIMER), sleep_timer,
+                    NULL, bitmap_icons_6x8[Icon_Menu_setting]); /* make it look like a 
+                                                                setting to the user */
 #ifdef HAVE_ALARM_MOD
 MENUITEM_FUNCTION(alarm_screen_call, ID2P(LANG_ALARM_MOD_ALARM_MENU),
                    (menu_function)alarm_screen, NULL, NOICON);
