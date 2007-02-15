@@ -99,7 +99,7 @@ static int reset_settings(void)
 }
 static int write_settings_file(void* param)
 {
-    return settings_save_config((int)param);
+    return settings_save_config((intptr_t)param);
 }
 
 MENUITEM_FUNCTION_WPARAM(browse_configs, ID2P(LANG_CUSTOM_CFG), 
