@@ -42,7 +42,7 @@ enum tagtype { TAGTYPE_APE = 1, TAGTYPE_VORBIS };
 #endif
 
 #define APETAG_HEADER_LENGTH        32
-#define APETAG_HEADER_FORMAT        "8llll"
+#define APETAG_HEADER_FORMAT        "8llll8"
 #define APETAG_ITEM_HEADER_FORMAT   "ll"
 #define APETAG_ITEM_TYPE_MASK       3
 
