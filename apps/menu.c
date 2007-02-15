@@ -439,12 +439,12 @@ static void init_menu_lists(const struct menu_item_ex *menu,
         icon = bitmap_icons_6x8[Icon_Submenu_Entered];
     else
         icon = menu->callback_and_desc->icon;
-#endif    
-    gui_synclist_set_title(lists, P2STR(menu->callback_and_desc->desc), icon);
-#ifdef HAVE_LCD_BITMAP    
+    gui_synclist_set_title(lists, P2STR(menu->callback_and_desc->desc), icon);  
     if (global_settings.show_icons)
         gui_synclist_set_icon_callback(lists, menu_get_icon);
     else 
+#else
+    (void)icon;
 #endif
         gui_synclist_set_icon_callback(lists, NULL);
     gui_synclist_set_nb_items(lists,current_subitems_count);
@@ -549,6 +549,7 @@ int do_menu(const struct menu_item_ex *start_menu)
             }
             else 
             {
+                menu_callback(ACTION_EXIT_MENUITEM, menu);
                 break;
             }
         }
