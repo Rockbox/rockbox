@@ -409,36 +409,36 @@ bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len)
 }
 static bool is_changed(int setting_id)
 {
-	const struct settings_list *setting = &settings[setting_id];
-	switch (setting->flags&F_T_MASK)
-	{
-		case F_T_INT:
-		case F_T_UINT:
-			if (setting->flags&F_DEF_ISFUNC)
-			{
-				if (*(int*)setting->setting == setting->default_val.func())
-					return false;
-			}
-			else if (setting->flags&F_T_SOUND)
-			{
-				if (*(int*)setting->setting ==
-					sound_default(setting->sound_setting->setting))
-					return false;
-			}
-			else if (*(int*)setting->setting == setting->default_val.int_)
-				return false;
-			break;
-		case F_T_BOOL:
-			if (*(bool*)setting->setting == setting->default_val.bool_)
-				return false;
-			break;
-		case F_T_CHARPTR:
-		case F_T_UCHARPTR:
-			if (!strcmp((char*)setting->setting, setting->default_val.charptr))
-				return false;
-			break;
-	}
-	return true;
+    const struct settings_list *setting = &settings[setting_id];
+    switch (setting->flags&F_T_MASK)
+    {
+    case F_T_INT:
+    case F_T_UINT:
+        if (setting->flags&F_DEF_ISFUNC)
+        {
+            if (*(int*)setting->setting == setting->default_val.func())
+                return false;
+        }
+        else if (setting->flags&F_T_SOUND)
+        {
+            if (*(int*)setting->setting ==
+                sound_default(setting->sound_setting->setting))
+                return false;
+        }
+        else if (*(int*)setting->setting == setting->default_val.int_)
+            return false;
+        break;
+    case F_T_BOOL:
+        if (*(bool*)setting->setting == setting->default_val.bool_)
+            return false;
+        break;
+    case F_T_CHARPTR:
+    case F_T_UCHARPTR:
+        if (!strcmp((char*)setting->setting, setting->default_val.charptr))
+            return false;
+        break;
+    }
+    return true;
 }
 
 static bool settings_write_config(char* filename, int options)
@@ -456,14 +456,14 @@ static bool settings_write_config(char* filename, int options)
         if (settings[i].cfg_name == NULL)
             continue;
         value[0] = '\0';
-		
-		if ((options == SETTINGS_SAVE_CHANGED) &&
-			!is_changed(i))
-			continue;
-		else if ((options == SETTINGS_SAVE_THEME) &&
-			((settings[i].flags&F_THEMESETTING) == 0))
-			continue;
-		
+        
+        if ((options == SETTINGS_SAVE_CHANGED) &&
+            !is_changed(i))
+            continue;
+        else if ((options == SETTINGS_SAVE_THEME) &&
+                 ((settings[i].flags&F_THEMESETTING) == 0))
+            continue;
+        
         switch (settings[i].flags&F_T_MASK)
         {
             case F_T_INT:
@@ -603,7 +603,8 @@ bool settings_save_config(int options)
 
     if (settings_write_config(filename, options))
         gui_syncsplash(HZ, true, str(LANG_SETTINGS_SAVED));
-    else gui_syncsplash(HZ, true, str(LANG_FAILED));
+    else
+        gui_syncsplash(HZ, true, str(LANG_FAILED));
     return true;
 }
 
@@ -774,8 +775,7 @@ void settings_apply(void)
 #endif
 
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
-    if ( global_settings.rwps_file[0] &&
-         global_settings.rwps_file[0] != 0xff ) {
+    if ( global_settings.rwps_file[0]) {
         snprintf(buf, sizeof buf, WPS_DIR "/%s.rwps",
                  global_settings.rwps_file);
         wps_data_load(gui_wps[1].data, buf, true);
@@ -785,8 +785,7 @@ void settings_apply(void)
 #endif
 
 #ifdef HAVE_LCD_BITMAP
-    if ( global_settings.font_file[0] &&
-         global_settings.font_file[0] != 0xff ) {
+    if ( global_settings.font_file[0]) {
         snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
                  global_settings.font_file);
         font_load(buf);
@@ -794,8 +793,7 @@ void settings_apply(void)
     else
         font_reset();
 
-    if ( global_settings.kbd_file[0] &&
-         global_settings.kbd_file[0] != 0xff ) {
+    if ( global_settings.kbd_file[0]) {
         snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.kbd",
                  global_settings.kbd_file);
         load_kbd(buf);
@@ -813,8 +811,7 @@ void settings_apply(void)
     lcd_bidir_scroll(global_settings.bidir_limit);
     lcd_scroll_delay(global_settings.scroll_delay * (HZ/10));
 
-    if ( global_settings.lang_file[0] &&
-         global_settings.lang_file[0] != 0xff ) {
+    if ( global_settings.lang_file[0]) {
         snprintf(buf, sizeof buf, LANG_DIR "/%s.lng",
                  global_settings.lang_file);
         lang_load(buf);
@@ -936,7 +933,9 @@ void talk_setting(void *global_settings_variable)
     if (setting->lang_id)
         talk_id(setting->lang_id,false);
 }
+
 static int selected_setting; /* Used by the callback */
+
 static void dec_sound_formatter(char *buffer, int buffer_size, 
         int val, const char *unit)
 {
