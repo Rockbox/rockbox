@@ -549,7 +549,9 @@ int do_menu(const struct menu_item_ex *start_menu)
             }
             else 
             {
-                menu_callback(ACTION_EXIT_MENUITEM, menu);
+                get_menu_callback(menu, &menu_callback);
+                if (menu_callback)
+                    menu_callback(ACTION_EXIT_MENUITEM, menu);
                 break;
             }
         }
