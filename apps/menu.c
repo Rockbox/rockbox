@@ -253,51 +253,6 @@ int menu_count(int menu)
 }
 
 /*
- *  Allows a menu item at the current cursor position in "menu"
- * to be moved up the list
- */
-
-bool menu_moveup(int menu)
-{
-    struct menu_item swap;
-    int selected=menu_cursor(menu);
-    /* can't be the first item ! */
-    if( selected == 0)
-        return false;
-
-    /* use a temporary variable to do the swap */
-    swap = menus[menu].items[selected - 1];
-    menus[menu].items[selected - 1] = menus[menu].items[selected];
-    menus[menu].items[selected] = swap;
-
-    gui_synclist_select_previous(&(menus[menu].synclist));
-    return true;
-}
-
-/*
- *  Allows a menu item at the current cursor position in "menu" to be moved down the list
- */
-
-bool menu_movedown(int menu)
-{
-    struct menu_item swap;
-    int selected=menu_cursor(menu);
-    int nb_items=gui_synclist_get_nb_items(&(menus[menu].synclist));
-
-    /* can't be the last item ! */
-    if( selected == nb_items - 1)
-        return false;
-
-    /* use a temporary variable to do the swap */
-    swap = menus[menu].items[selected + 1];
-    menus[menu].items[selected + 1] = menus[menu].items[selected];
-    menus[menu].items[selected] = swap;
-
-    gui_synclist_select_next(&(menus[menu].synclist));
-    return true;
-}
-
-/*
  * Allows to set the cursor position. Doesn't redraw by itself.
  */
 
@@ -530,8 +485,8 @@ int do_menu(const struct menu_item_ex *start_menu)
         else if ((action == ACTION_STD_CANCEL) ||
                  (action == ACTION_STD_MENU))
         {
-            if (in_stringlist)
-                in_stringlist = false;
+            in_stringlist = false;
+            
             if (stack_top > 0)
             {
                 get_menu_callback(menu,&menu_callback);

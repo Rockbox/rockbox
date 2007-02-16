@@ -110,12 +110,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 43
+#define PLUGIN_API_VERSION 44
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 43
+#define PLUGIN_MIN_API_VERSION 44
 
 /* plugin return codes */
 enum plugin_status {
@@ -484,8 +484,6 @@ struct plugin_api {
     char* (*menu_description)(int menu, int position);
     void (*menu_delete)(int menu, int position);
     int (*menu_count)(int menu);
-    bool (*menu_moveup)(int menu);
-    bool (*menu_movedown)(int menu);
     void (*menu_draw)(int menu);
     void (*menu_insert)(int menu, int position, char *desc, bool (*function) (void));
     void (*menu_set_cursor)(int menu, int position);

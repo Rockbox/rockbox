@@ -386,8 +386,6 @@ static const struct plugin_api rockbox_api = {
     menu_description,
     menu_delete,
     menu_count,
-    menu_moveup,
-    menu_movedown,
     menu_draw,
     menu_insert,
     menu_set_cursor,
