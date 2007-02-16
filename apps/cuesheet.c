@@ -76,7 +76,7 @@ bool look_for_cuesheet_file(const char *trackpath)
     }
 }
 
-char *skip_whitespace(char* buf)
+static char *skip_whitespace(char* buf)
 {
     char *r = buf;
     while (*r && (*r < 33))
@@ -171,7 +171,7 @@ bool parse_cuesheet(char *file, struct cuesheet *cue)
 
 /* takes care of seeking to a track in a playlist
  * returns false if audio  isn't playing */
-bool seek(unsigned long pos)
+static bool seek(unsigned long pos)
 {
     if (!(audio_status() & AUDIO_STATUS_PLAY))
     {
@@ -204,7 +204,7 @@ int cue_find_current_track(struct cuesheet *cue, unsigned long curpos)
 }
 
 /* callback that gives list item titles for the cuesheet browser */
-char *list_get_name_cb(int selected_item,
+static char *list_get_name_cb(int selected_item,
                              void *data,
                              char *buffer)
 {
@@ -224,7 +224,7 @@ char *list_get_name_cb(int selected_item,
     return buffer;
 }
 
-void browse_cuesheet(struct cuesheet *cue)
+static void browse_cuesheet(struct cuesheet *cue)
 {
     struct gui_synclist lists;
     int action;
