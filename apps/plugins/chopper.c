@@ -474,7 +474,6 @@ static void checkHighScore(void)
 static void chopKillPlayer(void)
 {
     int w, i, button;
-    char text[25];
 
     for (i = 0; i < NUMBER_OF_PARTICLES; i++) {
         mParticles[i].bIsActive = 0;
