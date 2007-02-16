@@ -46,6 +46,7 @@
 
 /** These items may be implemented target specifically or need to
     be shared semi-privately **/
+extern struct thread_entry *codec_thread_p;
 
 /* the registered callback function for when more data is available */
 volatile pcm_more_callback_type2 pcm_callback_more_ready = NULL;
@@ -57,6 +58,14 @@ static bool is_recording;              /* We are recording                 */
 static bool is_paused;                 /* We have paused                   */
 static unsigned long errors;           /* An error has occured             */
 static unsigned long warnings;         /* Warning                          */
+static int flush_interrupts = 0;       /* Number of messages queued that
+                                          should interrupt a flush in
+                                          progress -
+                                          for a safety net and a prompt
+                                          response to stop, split and pause
+                                          requests -
+                                          only interrupts a flush initiated
+                                          by pcmrec_flush(0) */
 
 /** Stats on encoded data for current file **/
 static size_t        num_rec_bytes;      /* Num bytes recorded             */
@@ -179,30 +188,61 @@ static unsigned char *pcm_buffer;      /* circular recording buffer        */
 static unsigned char *enc_buffer;      /* circular encoding buffer         */
 static volatile int   dma_wr_pos;      /* current DMA write pos            */
 static int            pcm_rd_pos;      /* current PCM read pos             */
+static int            pcm_enc_pos;     /* position encoder is processing   */
 static volatile bool  dma_lock;        /* lock DMA write position          */
 static int            enc_wr_index;    /* encoder chunk write index        */
 static int            enc_rd_index;    /* encoder chunk read index         */
 static int            enc_num_chunks;  /* number of chunks in ringbuffer   */
 static size_t         enc_chunk_size;  /* maximum encoder chunk size       */
 static unsigned long  enc_sample_rate; /* sample rate used by encoder      */
-static bool           wav_queue_empty; /* all wav chunks processed?        */
+static bool           pcmrec_context = false;  /* called by pcmrec thread? */
+static bool           pcm_buffer_empty; /* all pcm chunks processed?       */
  
 /** file flushing **/
-static int            write_threshold; /* max chunk limit for data flush   */
-static int            spinup_time = -1;/* last ata_spinup_time             */
+static int            low_watermark;   /* Low watermark to stop flush      */
+static int            high_watermark;  /* max chunk limit for data flush   */
+static unsigned long  spinup_time = 35*HZ/10;  /* Fudged spinup time       */
+static int            last_ata_spinup_time = -1;/* previous spin time used */
 #ifdef HAVE_PRIORITY_SCHEDULING
-static int            panic_threshold; /* boost thread prio when here      */
+static int            flood_watermark; /* boost thread priority when here  */
 #endif
+
+/* Constants that control watermarks */
+#define LOW_SECONDS     1       /* low watermark time till empty           */
+#define MINI_CHUNKS    10       /* chunk count for mini flush              */
+#ifdef HAVE_PRIORITY_SCHEDULING
+#define PRIO_SECONDS   10       /* max flush time before priority boost    */
+#endif
+#if MEM <= 16
+#define PANIC_SECONDS   5       /* flood watermark time until full         */
+#define FLUSH_SECONDS   7       /* flush watermark time until full         */
+#else
+#define PANIC_SECONDS   8
+#define FLUSH_SECONDS  10
+#endif /* MEM */
 
 /** encoder events **/
 static void (*enc_events_callback)(enum enc_events event, void *data);
 
 /** Path queue for files to write **/
 #define FNQ_MIN_NUM_PATHS 16           /* minimum number of paths to hold  */
+#define FNQ_MAX_NUM_PATHS 64           /* maximum number of paths to hold  */
 static unsigned char *fn_queue;        /* pointer to first filename        */
 static ssize_t        fnq_size;        /* capacity of queue in bytes       */
 static int            fnq_rd_pos;      /* current read position            */
 static int            fnq_wr_pos;      /* current write position           */
+
+enum
+{
+    PCMREC_FLUSH_INTERRUPTABLE  = 0x8000000, /* Flush can be interrupted by
+                                                incoming messages - combine
+                                                with other constants       */
+    PCMREC_FLUSH_ALL            = 0x7ffffff, /* Flush all files            */
+    PCMREC_FLUSH_MINI           = 0x7fffffe, /* Flush a small number of
+                                                chunks                     */
+    PCMREC_FLUSH_IF_HIGH        = 0x0000000, /* Flush if high watermark
+                                                reached                    */
+};
 
 /** extra debugging info positioned away from other vars **/
 #ifdef PCMREC_PARANOID
@@ -220,6 +260,7 @@ static struct event_queue       pcmrec_queue;
 static struct queue_sender_list pcmrec_queue_send;
 static long                pcmrec_stack[3*DEFAULT_STACK_SIZE/sizeof(long)];
 static const char          pcmrec_thread_name[] = "pcmrec";
+static struct thread_entry *pcmrec_thread_p;
 
 static void pcmrec_thread(void);
 
@@ -261,8 +302,9 @@ static int pcm_rec_have_more(int status)
         /* advance write position */
         int next_pos = (dma_wr_pos + PCM_CHUNK_SIZE) & PCM_CHUNK_MASK;
 
-        /* set pcm ovf if read position is inside current write chunk */
-        if ((unsigned)(pcm_rd_pos - next_pos) < PCM_CHUNK_SIZE)
+        /* set pcm ovf if processing start position is inside current
+           write chunk */
+        if ((unsigned)(pcm_enc_pos - next_pos) < PCM_CHUNK_SIZE)
             warnings |= PCMREC_W_PCM_BUFFER_OVF;
 
 #ifdef PCMREC_PARANOID
@@ -374,15 +416,12 @@ void pcm_rec_init(void)
 {
     queue_init(&pcmrec_queue, true);
     queue_enable_queue_send(&pcmrec_queue, &pcmrec_queue_send);
-    create_thread(pcmrec_thread, pcmrec_stack, sizeof(pcmrec_stack),
-                  pcmrec_thread_name IF_PRIO(, PRIORITY_RECORDING));
+    pcmrec_thread_p =
+        create_thread(pcmrec_thread, pcmrec_stack, sizeof(pcmrec_stack),
+                      pcmrec_thread_name IF_PRIO(, PRIORITY_RECORDING));
 } /* pcm_rec_init */
 
 /** audio_* group **/
-
-/* NOTE: The following posting functions are really only single-thread safe
-         at the moment since a response to a particular message at a particular
-         position in the queue can't be distinguished */
 
 /**
  * Initializes recording - call before calling any other recording function
@@ -421,6 +460,8 @@ void audio_set_recording_options(struct audio_recording_options *options)
 void audio_record(const char *filename)
 {
     logf("audio_record: %s", filename);
+    flush_interrupts++;
+    logf("flush int: %d", flush_interrupts);
     queue_send(&pcmrec_queue, PCMREC_RECORD, (intptr_t)filename);
     logf("audio_record_done");
 } /* audio_record */
@@ -431,6 +472,8 @@ void audio_record(const char *filename)
 void audio_stop_recording(void)
 {
     logf("audio_stop_recording");
+    flush_interrupts++;
+    logf("flush int: %d", flush_interrupts);
     queue_send(&pcmrec_queue, PCMREC_STOP, 0);
     logf("audio_stop_recording done");
 } /* audio_stop_recording */
@@ -441,6 +484,8 @@ void audio_stop_recording(void)
 void audio_pause_recording(void)
 {
     logf("audio_pause_recording");
+    flush_interrupts++;
+    logf("flush int: %d", flush_interrupts);
     queue_send(&pcmrec_queue, PCMREC_PAUSE, 0);
     logf("audio_pause_recording done");
 } /* audio_pause_recording */
@@ -787,95 +832,166 @@ static void pcmrec_end_file(void)
 } /* pcmrec_end_file */
 
 /**
+ * Update buffer watermarks with spinup time compensation
+ *
+ * All this assumes reasonable data rates, chunk sizes and sufficient
+ * memory for the most part. Some dumb checks are included but perhaps
+ * are pointless since this all will break down at extreme limits that
+ * are currently not applicable to any supported device.
+ */
+static void pcmrec_refresh_watermarks(void)
+{
+    logf("ata spinup: %d", ata_spinup_time);
+
+    /* set the low mark for when flushing stops if automatic */
+    low_watermark = (LOW_SECONDS*4*sample_rate + (enc_chunk_size-1))
+                        / enc_chunk_size;
+    logf("low wmk: %d", low_watermark);
+
+#ifdef HAVE_PRIORITY_SCHEDULING
+    /* panic boost thread priority if 2 seconds of ground is lost -
+       this allows encoder to boost with just under a second of
+       pcm data (if not yet full enough to boost itself)
+       and not falsely trip the alarm. */
+    flood_watermark = enc_num_chunks -
+        (PANIC_SECONDS*4*sample_rate + (enc_chunk_size-1))
+             / enc_chunk_size;
+
+    if (flood_watermark < low_watermark)
+    {
+        logf("warning: panic < low");
+        flood_watermark = low_watermark;
+    }
+
+    logf("flood at: %d", flood_watermark);
+#endif
+    spinup_time = last_ata_spinup_time = ata_spinup_time;
+
+    /* write at 8s + st remaining in enc_buffer - range 12s to
+       20s total - default to 3.5s spinup. */
+    if (spinup_time == 0)
+        spinup_time = 35*HZ/10;  /* default - cozy                */
+    else if (spinup_time < 2*HZ)
+        spinup_time = 2*HZ;      /* ludicrous - ramdisk?          */
+    else if (spinup_time > 10*HZ)
+        spinup_time = 10*HZ;     /* do you have a functioning HD? */
+
+    /* try to start writing with 10s remaining after disk spinup */
+    high_watermark = enc_num_chunks -
+        ((FLUSH_SECONDS*HZ + spinup_time)*4*sample_rate +
+              (enc_chunk_size-1)*HZ) / (enc_chunk_size*HZ);
+
+    if (high_watermark < low_watermark)
+    {
+        high_watermark = low_watermark;
+        low_watermark /= 2;
+        logf("warning: low 'write at'");
+    }
+
+    logf("write at: %d", high_watermark);
+} /* pcmrec_refresh_watermarks */
+
+/**
  * Process the chunks
  *
  * This function is called when queue_get_w_tmo times out.
  *
- * Set flush_num to the number of files to flush to disk.
- * flush_num = -1 to flush all available chunks to disk.
- * flush_num =  0 normal write thresholding
- * flush_num =  1 or greater - all available chunks of current file plus
- *              flush_num file starts if first chunk has been processed.
- *
+ * Set flush_num to the number of files to flush to disk or to
+ * a PCMREC_FLUSH_* constant.
  */
 static void pcmrec_flush(unsigned flush_num)
 {
 #ifdef HAVE_PRIORITY_SCHEDULING
-    static unsigned long last_flush_tick = 0;
-    unsigned long start_tick;
-    int num;
-    int prio;
+    static unsigned long last_flush_tick; /* tick when function returned   */
+    unsigned long start_tick;      /* When flush started                   */
+    unsigned long prio_tick;       /* Timeout for auto boost               */
+    int           prio_pcmrec;     /* Current thread priority for pcmrec   */
+    int           prio_codec;      /* Current thread priority for codec    */
 #endif
-    int num_ready;
-    int i;
+    int           num_ready;       /* Number of chunks ready at start      */
+    unsigned      remaining;       /* Number of file starts remaining      */
+    unsigned      chunks_flushed;  /* Chunks flushed (for mini flush only) */
+    bool          interruptable;   /* Flush can be interupted              */
 
     num_ready = enc_wr_index - enc_rd_index;
     if (num_ready < 0)
         num_ready += enc_num_chunks;
 
-#ifdef HAVE_PRIORITY_SCHEDULING
-    num = num_ready;
-#endif
+    /* save interruptable flag and remove it to get the actual count */
+    interruptable = (flush_num & PCMREC_FLUSH_INTERRUPTABLE) != 0;
+    flush_num    &= ~PCMREC_FLUSH_INTERRUPTABLE;
 
     if (flush_num == 0)
     {
         if (!is_recording)
             return;
 
-        if (ata_spinup_time != spinup_time)
-        {
-            /* spinup time has changed, calculate new write threshold */
-            logf("new t spinup : %d", ata_spinup_time);
-            unsigned long st = spinup_time = ata_spinup_time;
+        if (ata_spinup_time != last_ata_spinup_time)
+            pcmrec_refresh_watermarks();
 
-            /* write at 5s + st remaining in enc_buffer */
-            if (st < 2*HZ)
-                st = 2*HZ; /* my drive is usually < 250 ticks :) */
-            else if (st > 10*HZ)
-                st = 10*HZ;
-
-            write_threshold = enc_num_chunks -
-                (int)(((5ull*HZ + st)*4ull*sample_rate + (enc_chunk_size-1)) /
-                       (enc_chunk_size*HZ));
-
-            if (write_threshold < 0)
-                write_threshold = 0;
-#ifdef HAVE_PRIORITY_SCHEDULING
-            else if (write_threshold > panic_threshold)
-                write_threshold = panic_threshold;
-#endif
-            logf("new wr thresh: %d", write_threshold);
-        }
-
-        if (num_ready < write_threshold)
+        /* enough available? no? then leave */
+        if (num_ready < high_watermark)
             return;
-
-#ifdef HAVE_PRIORITY_SCHEDULING
-        /* if we're getting called too much and this isn't forced,
-           boost stat */
-        if (current_tick - last_flush_tick < HZ/2)
-            num = panic_threshold;
-#endif
-    }
+    } /* endif (flush_num == 0) */
 
 #ifdef HAVE_PRIORITY_SCHEDULING
     start_tick = current_tick;
-    prio = -1;
+    prio_tick  = start_tick + PRIO_SECONDS*HZ + spinup_time;
+
+    if (flush_num == 0 && TIME_BEFORE(current_tick, last_flush_tick + HZ/2))
+    {
+        /* if we're getting called too much and this isn't forced,
+           boost stat by expiring timeout in advance */
+        logf("too frequent flush");
+        prio_tick = current_tick - 1;
+    }
+
+    prio_pcmrec = -1;
+    prio_codec  = -1; /* GCC is too stoopid to figure out it doesn't
+                         need init */
 #endif
 
-    logf("writing: %d (%d)", num_ready, flush_num);
+    logf("writing:%d(%d):%s%s", num_ready, flush_num,
+         interruptable ? "i" : "",
+         flush_num == PCMREC_FLUSH_MINI ? "m" : "");
         
     cpu_boost(true);
 
-    for (i = 0; i < num_ready; i++)
+    remaining      = flush_num;
+    chunks_flushed = 0;
+
+    while (num_ready > 0)
     {
-#ifdef HAVE_PRIORITY_SCHEDULING
-        if (prio == -1 && (num >= panic_threshold ||
-                           current_tick - start_tick > 10*HZ))
+        /* check current number of encoder chunks */
+        int num = enc_wr_index - enc_rd_index;
+        if (num < 0)
+            num += enc_num_chunks;
+
+        if (num <= low_watermark &&
+            (flush_num == PCMREC_FLUSH_IF_HIGH || num <= 0))
         {
-            /* losing ground - boost priority until finished */
-            logf("pcmrec: boost priority");
-            prio = thread_set_priority(NULL, thread_get_priority(NULL)-1);
+            logf("low data: %d", num);
+            break; /* data remaining is below threshold */
+        }
+
+        if (interruptable && flush_interrupts > 0)
+        {
+            logf("int at: %d", num);
+            break; /* interrupted */
+        }
+
+#ifdef HAVE_PRIORITY_SCHEDULING
+        if (prio_pcmrec == -1 && (num >= flood_watermark ||
+                                  TIME_AFTER(current_tick, prio_tick)))
+        {
+            /* losing ground or holding without progress - boost
+               priority until finished */
+            logf("pcmrec: boost (%s)",
+                 num >= flood_watermark ? "num" : "time");
+            prio_pcmrec = thread_set_priority(NULL,
+                                thread_get_priority(NULL) - 1);
+            prio_codec  = thread_set_priority(codec_thread_p,
+                                thread_get_priority(codec_thread_p) - 1);
         }
 #endif
 
@@ -888,8 +1004,8 @@ static void pcmrec_flush(unsigned flush_num)
         if (rec_fdata.chunk->flags & CHUNKF_START_FILE)
         {
             pcmrec_start_file();
-            if (--flush_num == 0)
-                i = num_ready; /* stop on next loop - must write this
+            if (--remaining == 0)
+                num_ready = 0; /* stop on next loop - must write this
                                   chunk if it has data */
         }
 
@@ -903,16 +1019,15 @@ static void pcmrec_flush(unsigned flush_num)
         if (errors != 0)
             break;
 
-#ifdef HAVE_PRIORITY_SCHEDULING
-        if (prio == -1)
+        if (flush_num == PCMREC_FLUSH_MINI &&
+                ++chunks_flushed >= MINI_CHUNKS)
         {
-            num = enc_wr_index - enc_rd_index;
-            if (num < 0)
-                num += enc_num_chunks;
+            logf("mini flush break");
+            break;
         }
-#endif
-        /* no yielding, the file apis called in the codecs do that */
-    } /* end for */
+        /* no yielding; the file apis called in the codecs do that
+           sufficiently */
+    } /* end while */
 
     /* sync file */
     if (rec_fdata.rec_file >= 0)
@@ -921,11 +1036,12 @@ static void pcmrec_flush(unsigned flush_num)
     cpu_boost(false);
 
 #ifdef HAVE_PRIORITY_SCHEDULING
-    if (prio != -1)
+    if (prio_pcmrec != -1)
     {
-        /* return to original priority */
+        /* return to original priorities */
         logf("pcmrec: unboost priority");
-        thread_set_priority(NULL, prio);
+        thread_set_priority(NULL, prio_pcmrec);
+        thread_set_priority(codec_thread_p, prio_codec);
     }
 
     last_flush_tick = current_tick; /* save tick when we left */
@@ -948,10 +1064,14 @@ static void pcmrec_new_stream(const char *filename, /* next file name */
                               int pre_index) /* index for prerecorded data */
 {
     logf("pcmrec_new_stream");
+    char path[MAX_PATH]; /* place to copy filename so sender can be released */
 
     struct enc_buffer_event_data data;
-    bool (*fnq_add_fn)(const char *) = NULL;
-    struct enc_chunk_hdr *start = NULL;
+    bool (*fnq_add_fn)(const char *) = NULL; /* function to use to add
+                                                new filename */
+    struct enc_chunk_hdr *start = NULL;      /* pointer to starting chunk of
+                                                stream */
+    bool did_flush = false;                  /* did a flush occurr? */
 
     int get_chunk_index(struct enc_chunk_hdr *chunk)
     {
@@ -966,6 +1086,10 @@ static void pcmrec_new_stream(const char *filename, /* next file name */
         DEC_ENC_INDEX(index);
         return GET_ENC_CHUNK(index);
     }
+
+    if (filename)
+        strncpy(path, filename, MAX_PATH);
+    queue_reply(&pcmrec_queue, 0); /* We have all we need */
 
     data.pre_chunk = NULL;
     data.chunk = GET_ENC_CHUNK(enc_wr_index);
@@ -1039,7 +1163,9 @@ static void pcmrec_new_stream(const char *filename, /* next file name */
     }
 
     data.flags = flags;
+    pcmrec_context = true; /* switch encoder context */
     enc_events_callback(ENC_REC_NEW_STREAM, &data);
+    pcmrec_context = false; /* switch back */
 
     if (flags & CHUNKF_END_FILE)
     {
@@ -1049,11 +1175,10 @@ static void pcmrec_new_stream(const char *filename, /* next file name */
 
     if (start)
     {
-        char buf[MAX_PATH]; /* place to copy in case we're full */
-
         if (!(flags & CHUNKF_PRERECORD))
         {
-            /* get stats on data added to start - sort of a prerecord operation */
+            /* get stats on data added to start - sort of a prerecord
+               operation */
             int i = get_chunk_index(data.chunk);
 #ifdef PCMREC_PARANOID
             int i_last = i;
@@ -1083,16 +1208,16 @@ static void pcmrec_new_stream(const char *filename, /* next file name */
         if (fnq_add_fn == pcmrec_fnq_add_filename && pcmrec_fnq_is_full())
         {
             logf("fnq full");
-            /* make a local copy of filename and let sender go as this
-               flush will hang the screen for a bit otherwise */
-            strncpy(buf, filename, MAX_PATH);
-            filename = buf;
-            queue_reply(&pcmrec_queue, 0);
-            pcmrec_flush(-1);
+            pcmrec_flush(PCMREC_FLUSH_ALL);
+            did_flush = true;
         }
    
-        fnq_add_fn(filename);
+        fnq_add_fn(path);
     }
+
+    /* Make sure to complete any interrupted high watermark */
+    if (!did_flush)
+        pcmrec_flush(PCMREC_FLUSH_IF_HIGH);
 } /* pcmrec_new_stream */
 
 /** event handlers for pcmrec thread */
@@ -1102,6 +1227,7 @@ static void pcmrec_init(void)
 {
     unsigned char *buffer;
 
+    pcmrec_close_file(&rec_fdata.rec_file);
     rec_fdata.rec_file = -1;
 
     /* warings and errors */
@@ -1112,6 +1238,7 @@ static void pcmrec_init(void)
     dma_lock          = true;
     SET_PCM_POS(pcm_rd_pos, 0);
     SET_PCM_POS(dma_wr_pos, 0);
+    pcm_enc_pos       = 0;
 
     /* encoder FIFO */
     SET_ENC_INDEX(enc_wr_index, 0);
@@ -1137,7 +1264,7 @@ static void pcmrec_init(void)
     buffer = audio_get_recording_buffer(&rec_buffer_size);
 
     /* Line align pcm_buffer 2^4=16 bytes */
-    pcm_buffer = (unsigned char *)ALIGN_UP_P2((unsigned long)buffer, 4);
+    pcm_buffer = (unsigned char *)ALIGN_UP_P2((uintptr_t)buffer, 4);
     enc_buffer = pcm_buffer + ALIGN_UP_P2(PCM_NUM_CHUNKS*PCM_CHUNK_SIZE +
                                           PCM_MAX_FEED_SIZE, 2);
     /* Adjust available buffer for possible align advancement */
@@ -1158,7 +1285,8 @@ static void pcmrec_close(void)
 } /* pcmrec_close */
 
 /* PCMREC_OPTIONS */
-static void pcmrec_set_recording_options(struct audio_recording_options *options)
+static void pcmrec_set_recording_options(
+    struct audio_recording_options *options)
 {
     /* stop DMA transfer */
     dma_lock = true;
@@ -1222,97 +1350,111 @@ static void pcmrec_record(const char *filename)
 {
     unsigned long pre_sample_ticks;
     int           rd_start;
+    unsigned long flags;
+    int           pre_index;
 
     logf("pcmrec_record: %s", filename);
 
     /* reset stats */
-    num_rec_bytes     = 0;
-    num_rec_samples   = 0;
+    num_rec_bytes   = 0;
+    num_rec_samples = 0;
 
-    if (is_recording) 
+    if (!is_recording) 
+    {
+#if 0
+        accum_rec_bytes   = 0;
+        accum_pcm_samples = 0;
+#endif
+        warnings          = 0;  /* reset warnings */
+
+        rd_start          = enc_wr_index;
+        pre_sample_ticks  = 0;
+
+        pcmrec_refresh_watermarks();
+
+        if (pre_record_ticks)
+        {
+            int i = rd_start;
+#ifdef PCMREC_PARANOID
+            int i_last = i;
+#endif
+            /* calculate number of available chunks */
+            unsigned long avail_pre_chunks = (enc_wr_index - enc_rd_index +
+                            enc_num_chunks) % enc_num_chunks;
+            /* overflow at 974 seconds of prerecording at 44.1kHz */
+            unsigned long pre_record_sample_ticks =
+                                enc_sample_rate*pre_record_ticks;
+            int pre_chunks = 0; /* Counter to limit prerecorded time to
+                                   prevent flood state at outset */
+
+            logf("pre-st: %ld", pre_record_sample_ticks);
+
+            /* Get exact measure of recorded data as number of samples aren't
+               nescessarily going to be the max for each chunk */
+            for (; avail_pre_chunks-- > 0;)
+            {
+                struct enc_chunk_hdr *chunk;
+                unsigned long chunk_sample_ticks;
+
+                DEC_ENC_INDEX(i);
+
+                chunk = GET_ENC_CHUNK(i);
+
+                /* must have data to be counted */
+                if (chunk->enc_data == NULL)
+                    continue;
+
+                chunk_sample_ticks = chunk->num_pcm*HZ;
+
+                rd_start           = i;
+                pre_sample_ticks  += chunk_sample_ticks;
+                num_rec_bytes     += chunk->enc_size;
+                num_rec_samples   += chunk->num_pcm;
+                pre_chunks++;
+
+                /* stop here if enough already */
+                if (pre_chunks >= high_watermark ||
+                    pre_sample_ticks >= pre_record_sample_ticks)
+                {
+                    logf("pre-chks: %d", pre_chunks);
+                    break;
+                }
+            }
+
+#if 0
+            accum_rec_bytes   = num_rec_bytes;
+            accum_pcm_samples = num_rec_samples;
+#endif
+        }
+
+        SET_ENC_INDEX(enc_rd_index, rd_start);
+
+        /* filename queue should be empty */
+        if (!pcmrec_fnq_is_empty())
+        {
+            logf("fnq: not empty!");
+            pcmrec_fnq_set_empty();
+        }
+
+        flags = CHUNKF_START_FILE;
+        if (pre_sample_ticks > 0)
+            flags |= CHUNKF_PRERECORD;
+
+        pre_index    = enc_rd_index;
+
+        dma_lock     = false;
+        is_paused    = false;
+        is_recording = true;
+    }
+    else
     {
         /* already recording, just split the stream */
         logf("inserting split");
-        pcmrec_new_stream(filename,
-                          CHUNKF_START_FILE | CHUNKF_END_FILE,
-                          0);
-        goto record_done;
+        flags     = CHUNKF_START_FILE | CHUNKF_END_FILE;
+        pre_index = 0;
     }
 
-#if 0
-    accum_rec_bytes   = 0;
-    accum_pcm_samples = 0;
-#endif
-    spinup_time       = -1;
-    warnings          = 0; /* reset warnings */
-
-    rd_start  = enc_wr_index;
-    pre_sample_ticks = 0;
-
-    if (pre_record_ticks)
-    {
-        int i = rd_start;
-#ifdef PCMREC_PARANOID
-        int i_last = i;
-#endif
-        /* calculate number of available chunks */
-        unsigned long avail_pre_chunks = (enc_wr_index - enc_rd_index +
-                        enc_num_chunks) % enc_num_chunks;
-        /* overflow at 974 seconds of prerecording at 44.1kHz */
-        unsigned long pre_record_sample_ticks = enc_sample_rate*pre_record_ticks;
-
-        /* Get exact measure of recorded data as number of samples aren't
-           nescessarily going to be the max for each chunk */
-        for (; avail_pre_chunks-- > 0;)
-        {
-            struct enc_chunk_hdr *chunk;
-            unsigned long chunk_sample_ticks;
-
-            DEC_ENC_INDEX(i);
-
-            chunk = GET_ENC_CHUNK(i);
-
-            /* must have data to be counted */
-            if (chunk->enc_data == NULL)
-                continue;
-
-            chunk_sample_ticks = chunk->num_pcm*HZ;
-
-            rd_start           = i;
-            pre_sample_ticks  += chunk_sample_ticks;
-            num_rec_bytes     += chunk->enc_size;
-            num_rec_samples   += chunk->num_pcm;
-
-            /* stop here if enough already */
-            if (pre_sample_ticks >= pre_record_sample_ticks)
-                break;
-        }
-
-#if 0
-        accum_rec_bytes   = num_rec_bytes;
-        accum_pcm_samples = num_rec_samples;
-#endif
-    }
-
-    SET_ENC_INDEX(enc_rd_index, rd_start);
-
-    /* filename queue should be empty */
-    if (!pcmrec_fnq_is_empty())
-    {
-        logf("fnq: not empty!");
-        pcmrec_fnq_set_empty();
-    }
-    
-    dma_lock     = false;
-    is_paused    = false;
-    is_recording = true;
-
-    pcmrec_new_stream(filename,
-                      CHUNKF_START_FILE |
-                      (pre_sample_ticks > 0 ? CHUNKF_PRERECORD : 0),
-                      enc_rd_index);
-
-record_done:
+    pcmrec_new_stream(filename, flags, pre_index);
     logf("pcmrec_record done");
 } /* pcmrec_record */
 
@@ -1321,52 +1463,52 @@ static void pcmrec_stop(void)
 {
     logf("pcmrec_stop");
    
-    if (!is_recording)
+    if (is_recording)
+    {
+        dma_lock = true;    /* lock dma write position */
+        queue_reply(&pcmrec_queue, 0);
+
+        /* flush all available data first to avoid overflow while waiting
+           for encoding to finish */
+        pcmrec_flush(PCMREC_FLUSH_ALL);
+
+        /* wait for encoder to finish remaining data */
+        while (errors == 0 && !pcm_buffer_empty)
+            yield();
+
+        /* end stream at last data */
+        pcmrec_new_stream(NULL, CHUNKF_END_FILE, 0);
+
+        /* flush anything else encoder added */
+        pcmrec_flush(PCMREC_FLUSH_ALL);
+
+        /* remove any pending file start not yet processed - should be at
+           most one at enc_wr_index */
+        pcmrec_fnq_get_filename(NULL);
+        /* encoder should abort any chunk it was in midst of processing */
+        GET_ENC_CHUNK(enc_wr_index)->flags = CHUNKF_ABORT;
+
+        /* filename queue should be empty */
+        if (!pcmrec_fnq_is_empty())
+        {
+            logf("fnq: not empty!");
+            pcmrec_fnq_set_empty();
+        }   
+
+        /* be absolutely sure the file is closed */
+        if (errors != 0)
+            pcmrec_close_file(&rec_fdata.rec_file);
+        rec_fdata.rec_file = -1;
+
+        is_recording = false;
+        is_paused    = false;
+        dma_lock     = pre_record_ticks == 0;
+    }
+    else
     {
         logf("not recording");
-        goto not_recording;
     }
 
-    dma_lock = true;    /* lock dma write position */
-    queue_reply(&pcmrec_queue, 0);
-
-    /* flush all available data first to avoid overflow while waiting
-       for encoding to finish */
-    pcmrec_flush(-1);
-    
-    /* wait for encoder to finish remaining data */
-    while (errors == 0 && !wav_queue_empty)
-        yield();
-    
-    /* end stream at last data */
-    pcmrec_new_stream(NULL, CHUNKF_END_FILE, 0);
-    
-    /* flush anything else encoder added */
-    pcmrec_flush(-1);
-
-    /* remove any pending file start not yet processed - should be at
-       most one at enc_wr_index */
-    pcmrec_fnq_get_filename(NULL);
-    /* encoder should abort any chunk it was in midst of processing */
-    GET_ENC_CHUNK(enc_wr_index)->flags = CHUNKF_ABORT;
-    
-    /* filename queue should be empty */
-    if (!pcmrec_fnq_is_empty())
-    {
-        logf("fnq: not empty!");
-        pcmrec_fnq_set_empty();
-    }   
-
-    /* be absolutely sure the file is closed */
-    if (errors != 0)
-        pcmrec_close_file(&rec_fdata.rec_file);
-    rec_fdata.rec_file = -1;
-
-    is_recording = false;
-    is_paused    = false;
-    dma_lock     = pre_record_ticks == 0;
-
-not_recording:
     logf("pcmrec_stop done");
 } /* pcmrec_stop */
 
@@ -1378,18 +1520,17 @@ static void pcmrec_pause(void)
     if (!is_recording)
     {
         logf("not recording");
-        goto not_recording_or_paused;
     }
     else if (is_paused)
     {
         logf("already paused");
-        goto not_recording_or_paused;
     }
-    
-    dma_lock  = true;   /* fix DMA write pointer at current position */
-    is_paused = true;  
-    
-not_recording_or_paused:
+    else
+    {
+        dma_lock  = true;
+        is_paused = true;
+    }
+
     logf("pcmrec_pause done");
 } /* pcmrec_pause */
 
@@ -1401,19 +1542,18 @@ static void pcmrec_resume(void)
     if (!is_recording)
     {
         logf("not recording");
-        goto not_recording_or_not_paused;
     }
     else if (!is_paused)
     {
         logf("not paused");
-        goto not_recording_or_not_paused;
     }
-    
-    is_paused    = false;
-    is_recording = true;
-    dma_lock     = false;
-    
-not_recording_or_not_paused:
+    else
+    {
+        is_paused    = false;
+        is_recording = true;
+        dma_lock     = false;
+    }
+
     logf("pcmrec_resume done");
 } /* pcmrec_resume */
 
@@ -1424,6 +1564,12 @@ static void pcmrec_thread(void)
 
     logf("thread pcmrec start");
 
+    static void clear_flush_interrupt(void)
+    {
+        if (--flush_interrupts < 0)
+            flush_interrupts = 0;
+    }
+
     while(1)
     {
         if (is_recording)
@@ -1433,7 +1579,9 @@ static void pcmrec_thread(void)
 
             if (ev.id == SYS_TIMEOUT)
             {
-                pcmrec_flush(0); /* flush if getting full */
+                /* Messages that interrupt this will complete it */
+                pcmrec_flush(PCMREC_FLUSH_IF_HIGH |
+                             PCMREC_FLUSH_INTERRUPTABLE);
                 continue;
             }
         }
@@ -1459,14 +1607,17 @@ static void pcmrec_thread(void)
                 break;
 
             case PCMREC_RECORD:
+                clear_flush_interrupt();
                 pcmrec_record((const char *)ev.data);
                 break;
 
             case PCMREC_STOP:
+                clear_flush_interrupt();
                 pcmrec_stop();
                 break;
 
             case PCMREC_PAUSE:
+                clear_flush_interrupt();
                 pcmrec_pause();
                 break;
 
@@ -1483,6 +1634,9 @@ static void pcmrec_thread(void)
                     break;
                 pcmrec_close();
                 reset_hardware();
+                /* Be sure other threads are released if waiting */
+                queue_clear(&pcmrec_queue);
+                flush_interrupts = 0;
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 usb_wait_for_disconnect(&pcmrec_queue);
                 break;
@@ -1495,6 +1649,7 @@ static void pcmrec_thread(void)
 /****************************************************************************/
 /*                                                                          */
 /*         following functions will be called by the encoder codec          */
+/*         in a free-threaded manner                                        */
 /*                                                                          */
 /****************************************************************************/
 
@@ -1527,6 +1682,7 @@ void enc_set_parameters(struct enc_parameters *params)
     logf("enc sampr:%d", enc_sample_rate);
 
     SET_PCM_POS(pcm_rd_pos, dma_wr_pos);
+    pcm_enc_pos = pcm_rd_pos;
 
     enc_config.afmt     = params->afmt;
     /* addition of the header is always implied - chunk size 4-byte aligned */
@@ -1568,16 +1724,6 @@ void enc_set_parameters(struct enc_parameters *params)
     *wrap_id_p = ENC_CHUNK_MAGIC;
 #endif /* PCMREC_PARANOID */
 
-#ifdef HAVE_PRIORITY_SCHEDULING
-    /* panic boost thread priority at 1 second remaining */
-    panic_threshold = enc_num_chunks -
-                      (4*sample_rate + (enc_chunk_size-1)) / enc_chunk_size;
-    if (panic_threshold < 0)
-        panic_threshold = 0;
-
-    logf("panic thr:%d", panic_threshold);
-#endif
-
     /** set OUT parameters **/
     params->enc_buffer     = enc_buffer;
     params->buf_chunk_size = enc_chunk_size;
@@ -1596,7 +1742,10 @@ void enc_set_parameters(struct enc_parameters *params)
     fnq_wr_pos = 0; /* reset */
     fn_queue   = enc_buffer + bufsize;
     fnq_size   = pcm_buffer + rec_buffer_size - fn_queue;
-    fnq_size   = ALIGN_DOWN(fnq_size, MAX_PATH);
+    fnq_size  /= MAX_PATH;
+    if (fnq_size > FNQ_MAX_NUM_PATHS)
+        fnq_size = FNQ_MAX_NUM_PATHS;
+    fnq_size  *= MAX_PATH;
     logf("fnq files: %d", fnq_size / MAX_PATH);
 
 #if 0
@@ -1626,7 +1775,8 @@ void enc_set_parameters(struct enc_parameters *params)
     logf("enc_set_parameters done");
 } /* enc_set_parameters */
 
-/* return encoder chunk at current write position */
+/* return encoder chunk at current write position  -
+   NOTE: can be called by pcmrec thread when splitting streams */
 struct enc_chunk_hdr * enc_get_chunk(void)
 {
     struct enc_chunk_hdr *chunk = GET_ENC_CHUNK(enc_wr_index);
@@ -1647,7 +1797,8 @@ struct enc_chunk_hdr * enc_get_chunk(void)
     return chunk;
 } /* enc_get_chunk */
 
-/* releases the current chunk into the available chunks */
+/* releases the current chunk into the available chunks - 
+   NOTE: can be called by pcmrec thread when splitting streams */
 void enc_finish_chunk(void)
 {
     struct enc_chunk_hdr *chunk = GET_ENC_CHUNK(enc_wr_index);
@@ -1675,10 +1826,19 @@ void enc_finish_chunk(void)
     }
     else if (is_recording)        /* buffer full */
     {
-        /* keep current position - but put up warning flag */
+        /* keep current position and put up warning flag */
         warnings |= PCMREC_W_ENC_BUFFER_OVF;
         logf("enc_buffer ovf");
         DEC_ENC_INDEX(enc_wr_index);
+        if (pcmrec_context)
+        {
+            /* if stream splitting, keep this out of circulation and
+               flush a small number, then readd - cannot risk losing
+               stream markers */
+            logf("mini flush");
+            pcmrec_flush(PCMREC_FLUSH_MINI);
+            INC_ENC_INDEX(enc_wr_index);
+        }
     }
     else
     {
@@ -1691,7 +1851,7 @@ void enc_finish_chunk(void)
 int enc_pcm_buf_near_empty(void)
 {
     /* less than 1sec raw data? => unboost encoder */
-    int wp       = dma_wr_pos;
+    int    wp    = dma_wr_pos;
     size_t avail = (wp - pcm_rd_pos) & PCM_CHUNK_MASK;
     return avail < (sample_rate << 2) ? 1 : 0;
 } /* enc_pcm_buf_near_empty */
@@ -1700,7 +1860,7 @@ int enc_pcm_buf_near_empty(void)
 /* TODO: this really should give the actual size returned */
 unsigned char * enc_get_pcm_data(size_t size)
 {
-    int wp       = dma_wr_pos;
+    int    wp    = dma_wr_pos;
     size_t avail = (wp - pcm_rd_pos) & PCM_CHUNK_MASK;
 
     /* limit the requested pcm data size */
@@ -1712,47 +1872,46 @@ unsigned char * enc_get_pcm_data(size_t size)
         unsigned char *ptr = pcm_buffer + pcm_rd_pos;
         int next_pos = (pcm_rd_pos + size) & PCM_CHUNK_MASK;
 
+        pcm_enc_pos = pcm_rd_pos;
+
         SET_PCM_POS(pcm_rd_pos, next_pos);
-        pcm_rd_pos = next_pos;
 
         /* ptr must point to continous data at wraparound position */
         if ((size_t)pcm_rd_pos < size)
             memcpy(pcm_buffer + PCM_NUM_CHUNKS*PCM_CHUNK_SIZE,
                    pcm_buffer, pcm_rd_pos);
 
-        wav_queue_empty = false;
+        pcm_buffer_empty = false;
         return ptr;
     }
 
     /* not enough data available - encoder should idle */
-    wav_queue_empty = true;
+    pcm_buffer_empty = true;
     return NULL;
 } /* enc_get_pcm_data */
 
 /* puts some pcm data back in the queue */
 size_t enc_unget_pcm_data(size_t size)
 {
-    /* can't let DMA advance write position when doing this */
-    int level = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int    wp        = dma_wr_pos;
+    size_t old_avail = ((pcm_rd_pos - wp) & PCM_CHUNK_MASK) -
+                            2*PCM_CHUNK_SIZE;
 
-    if (pcm_rd_pos != dma_wr_pos)
+    /* allow one interrupt to occur during this call and not have the
+       new read position inside the DMA destination chunk */
+    if ((ssize_t)old_avail > 0)
     {
-        /* disallow backing up into current DMA write chunk  */
-        size_t old_avail = (pcm_rd_pos - dma_wr_pos - PCM_CHUNK_SIZE)
-                            & PCM_CHUNK_MASK;
-        int next_pos;
-
         /* limit size to amount of old data remaining */
         if (size > old_avail)
             size = old_avail;
 
-        next_pos = (pcm_rd_pos - size) & PCM_CHUNK_MASK;
-        SET_PCM_POS(pcm_rd_pos, next_pos);
+        pcm_enc_pos = (pcm_rd_pos - size) & PCM_CHUNK_MASK;
+        SET_PCM_POS(pcm_rd_pos, pcm_enc_pos);
+
+        return size;
     }
 
-    set_irq_level(level);
-
-    return size;
+    return 0;
 } /* enc_unget_pcm_data */
 
 /** Low level pcm recording apis **/
