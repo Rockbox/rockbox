@@ -1564,7 +1564,7 @@ static void pcmrec_thread(void)
 
     logf("thread pcmrec start");
 
-    static void clear_flush_interrupt(void)
+    void clear_flush_interrupt(void)
     {
         if (--flush_interrupts < 0)
             flush_interrupts = 0;
