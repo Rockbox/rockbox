@@ -5,12 +5,12 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: $
+ * $Id$
  *
  * Copyright (C) 2007 by Barry Wardell
  *
- * i.MX31 driver based on code from the Linux Target Image Builder from
- * Freescale - http://www.bitshrine.org/ and 
+ * ARC OTG USB device driver based on code from the Linux Target Image Builder
+ * from Freescale - http://www.bitshrine.org/ and 
  * http://www.bitshrine.org/gpp/linux-2.6.16-mx31-usb-2.patch
  * Adapted for Rockbox in January 2007
  * Original file: drivers/usb/gadget/arcotg_udc.h
@@ -32,118 +32,61 @@
 /*
  * Freescale USB device/endpoint management registers
  */
-#ifndef __MX31_H
-#define __MX31_H
+#ifndef __ARCOTG_UDC_H
+#define __ARCOTG_UDC_H
 
-/* Register addresses - from Freescale i.MX31 reference manual */
-/* The PortalPlayer USB controller usec base address 0xc5000000 */
-#define USB_BASE                0xc5000000
+#include "cpu.h"
 
-/* OTG */
-#define UOG_ID                  (*(volatile unsigned int *)(USB_BASE+0x000))
-#define UOG_HWGENERAL           (*(volatile unsigned int *)(USB_BASE+0x004))
-#define UOG_HWHOST              (*(volatile unsigned int *)(USB_BASE+0x008))
-#define UOG_HWTXBUF             (*(volatile unsigned int *)(USB_BASE+0x010))
-#define UOG_HWRXBUF             (*(volatile unsigned int *)(USB_BASE+0x014))
-#define UOG_CAPLENGTH           (*(volatile unsigned char *)(USB_BASE+0x100))
-#define UOG_HCIVERSION          (*(volatile unsigned short *)(USB_BASE+0x102))
-#define UOG_HCSPARAMS           (*(volatile unsigned int *)(USB_BASE+0x104))
-#define UOG_HCCPARAMS           (*(volatile unsigned int *)(USB_BASE+0x108))
-#define UOG_DCIVERSION          (*(volatile unsigned short *)(USB_BASE+0x120))
-#define UOG_DCCPARAMS           (*(volatile unsigned int *)(USB_BASE+0x124))
-#define UOG_USBCMD              (*(volatile unsigned int *)(USB_BASE+0x140))
-#define UOG_USBSTS              (*(volatile unsigned int *)(USB_BASE+0x144))
-#define UOG_USBINTR             (*(volatile unsigned int *)(USB_BASE+0x148))
-#define UOG_FRINDEX             (*(volatile unsigned int *)(USB_BASE+0x14c))
-#define UOG_PERIODICLISTBASE    (*(volatile unsigned int *)(USB_BASE+0x154))
-#define UOG_ASYNCLISTADDR       (*(volatile unsigned int *)(USB_BASE+0x158))
-#define UOG_BURSTSIZE           (*(volatile unsigned int *)(USB_BASE+0x160))
-#define UOG_TXFILLTUNING        (*(volatile unsigned int *)(USB_BASE+0x164))
-#define UOG_ULPIVIEW            (*(volatile unsigned int *)(USB_BASE+0x170))
-#define UOG_CFGFLAG             (*(volatile unsigned int *)(USB_BASE+0x180))
-#define UOG_PORTSC1             (*(volatile unsigned int *)(USB_BASE+0x184))
-/*#define UOG_PORTSC2             (*(volatile unsigned int *)(USB_BASE+0x188))
-#define UOG_PORTSC3             (*(volatile unsigned int *)(USB_BASE+0x18c))
-#define UOG_PORTSC4             (*(volatile unsigned int *)(USB_BASE+0x190))
-#define UOG_PORTSC5             (*(volatile unsigned int *)(USB_BASE+0x194))
-#define UOG_PORTSC6             (*(volatile unsigned int *)(USB_BASE+0x198))
-#define UOG_PORTSC7             (*(volatile unsigned int *)(USB_BASE+0x19c))
-#define UOG_PORTSC8             (*(volatile unsigned int *)(USB_BASE+0x1a0))*/
-#define UOG_OTGSC               (*(volatile unsigned int *)(USB_BASE+0x1a4))
-#define UOG_USBMODE             (*(volatile unsigned int *)(USB_BASE+0x1a8))
-#define UOG_ENDPTSETUPSTAT      (*(volatile unsigned int *)(USB_BASE+0x1ac))
-#define UOG_ENDPTPRIME          (*(volatile unsigned int *)(USB_BASE+0x1b0))
-#define UOG_ENDPTFLUSH          (*(volatile unsigned int *)(USB_BASE+0x1b4))
-#define UOG_ENDPTSTAT           (*(volatile unsigned int *)(USB_BASE+0x1b8))
-#define UOG_ENDPTCOMPLETE       (*(volatile unsigned int *)(USB_BASE+0x1bc))
-#define ENDPTCRTL0              (*(volatile unsigned int *)(USB_BASE+0x1c0))
-#define ENDPTCRTL1              (*(volatile unsigned int *)(USB_BASE+0x1c4))
-#define ENDPTCRTL2              (*(volatile unsigned int *)(USB_BASE+0x1c8))
-#define ENDPTCRTL3              (*(volatile unsigned int *)(USB_BASE+0x1cc))
-#define ENDPTCRTL4              (*(volatile unsigned int *)(USB_BASE+0x1d0))
-#define ENDPTCRTL5              (*(volatile unsigned int *)(USB_BASE+0x1d4))
-#define ENDPTCRTL6              (*(volatile unsigned int *)(USB_BASE+0x1d8))
-#define ENDPTCRTL7              (*(volatile unsigned int *)(USB_BASE+0x1dc))
-/*#define ENDPTCRTL8              (*(volatile unsigned int *)(USB_BASE+0x1e0))
-#define ENDPTCRTL9              (*(volatile unsigned int *)(USB_BASE+0x1e4))
-#define ENDPTCRTL10             (*(volatile unsigned int *)(USB_BASE+0x1e8))
-#define ENDPTCRTL11             (*(volatile unsigned int *)(USB_BASE+0x1ec))
-#define ENDPTCRTL12             (*(volatile unsigned int *)(USB_BASE+0x1f0))
-#define ENDPTCRTL13             (*(volatile unsigned int *)(USB_BASE+0x1f4))
-#define ENDPTCRTL14             (*(volatile unsigned int *)(USB_BASE+0x1f8))
-#define ENDPTCRTL15             (*(volatile unsigned int *)(USB_BASE+0x1fc))*/
+#define ETIMEDOUT               1
 
-/* Host 1 */
-#define UH1_ID                  (*(volatile unsigned int *)(USB_BASE+0x200))
-#define UH1_HWGENERAL           (*(volatile unsigned int *)(USB_BASE+0x204))
-#define UH1_HWHOST              (*(volatile unsigned int *)(USB_BASE+0x208))
-#define UH1_HWTXBUF             (*(volatile unsigned int *)(USB_BASE+0x210))
-#define UH1_HWRXBUF             (*(volatile unsigned int *)(USB_BASE+0x214))
-#define UH1_CAPLENGTH           (*(volatile unsigned int *)(USB_BASE+0x300))
-#define UH1_HCIVERSION          (*(volatile unsigned int *)(USB_BASE+0x302))
-#define UH1_HCSPARAMS           (*(volatile unsigned int *)(USB_BASE+0x304))
-#define UH1_HCCPARAMS           (*(volatile unsigned int *)(USB_BASE+0x308))
-#define UH1_USBCMD              (*(volatile unsigned int *)(USB_BASE+0x340))
-#define UH1_USBSTS              (*(volatile unsigned int *)(USB_BASE+0x344))
-#define UH1_USBINTR             (*(volatile unsigned int *)(USB_BASE+0x348))
-#define UH1_FRINDEX             (*(volatile unsigned int *)(USB_BASE+0x34c))
-#define UH1_PERIODICLISTBASE    (*(volatile unsigned int *)(USB_BASE+0x354))
-#define UH1_ASYNCLISTADDR       (*(volatile unsigned int *)(USB_BASE+0x358))
-#define UH1_BURSTSIZE           (*(volatile unsigned int *)(USB_BASE+0x360))
-#define UH1_TXFILLTUNING        (*(volatile unsigned int *)(USB_BASE+0x364))
-#define UH1_PORTSC1             (*(volatile unsigned int *)(USB_BASE+0x384))
-#define UH1_USBMODE             (*(volatile unsigned int *)(USB_BASE+0x3a8))
-
-/* Host 2 */
-#define UH2_ID                  (*(volatile unsigned int *)(USB_BASE+0x400))
-#define UH2_HWGENERAL           (*(volatile unsigned int *)(USB_BASE+0x404))
-#define UH2_HWHOST              (*(volatile unsigned int *)(USB_BASE+0x408))
-#define UH2_HWTXBUF             (*(volatile unsigned int *)(USB_BASE+0x410))
-#define UH2_HWRXBUF             (*(volatile unsigned int *)(USB_BASE+0x414))
-#define UH2_CAPLENGTH           (*(volatile unsigned int *)(USB_BASE+0x500))
-#define UH2_HCIVERSION          (*(volatile unsigned int *)(USB_BASE+0x502))
-#define UH2_HCSPARAMS           (*(volatile unsigned int *)(USB_BASE+0x504))
-#define UH2_HCCPARAMS           (*(volatile unsigned int *)(USB_BASE+0x508))
-#define UH2_USBCMD              (*(volatile unsigned int *)(USB_BASE+0x540))
-#define UH2_USBSTS              (*(volatile unsigned int *)(USB_BASE+0x544))
-#define UH2_USBINTR             (*(volatile unsigned int *)(USB_BASE+0x548))
-#define UH2_FRINDEX             (*(volatile unsigned int *)(USB_BASE+0x54c))
-#define UH2_PERIODICLISTBASE    (*(volatile unsigned int *)(USB_BASE+0x554))
-#define UH2_ASYNCLISTADDR       (*(volatile unsigned int *)(USB_BASE+0x558))
-#define UH2_BURSTSIZE           (*(volatile unsigned int *)(USB_BASE+0x560))
-#define UH2_TXFILLTUNING        (*(volatile unsigned int *)(USB_BASE+0x564))
-#define UH2_ULPIVIEW            (*(volatile unsigned int *)(USB_BASE+0x570))
-#define UH2_PORTSC1             (*(volatile unsigned int *)(USB_BASE+0x584))
-#define UH2_USBMODE             (*(volatile unsigned int *)(USB_BASE+0x5a8))
-
-/* General */
-#define USB_CTRL                (*(volatile unsigned int *)(USB_BASE+0x600))
-#define USB_OTG_MIRROR          (*(volatile unsigned int *)(USB_BASE+0x604))
-
-/* Maximum values */
 #define USB_MAX_ENDPOINTS       8
 #define USB_MAX_PIPES           (USB_MAX_ENDPOINTS*2)
 #define USB_MAX_CTRL_PAYLOAD    64
+
+/* USB DR device mode registers (Little Endian) */
+/* Identification registers */
+#define UDC_ID                  (*(volatile unsigned int *)(USB_BASE+0x000))
+#define UDC_HWGENERAL           (*(volatile unsigned int *)(USB_BASE+0x004))
+#define UDC_HWHOST              (*(volatile unsigned int *)(USB_BASE+0x008))
+#define UDC_HWTXBUF             (*(volatile unsigned int *)(USB_BASE+0x010))
+#define UDC_HWRXBUF             (*(volatile unsigned int *)(USB_BASE+0x014))
+
+/* Capability registers */
+#define UDC_CAPLENGTH           (*(volatile unsigned char *)(USB_BASE+0x100))   /* Capability Register Length */
+#define UDC_HCIVERSION          (*(volatile unsigned short *)(USB_BASE+0x102))  /* Host Controller Interface Version */
+#define UDC_HCSPARAMS           (*(volatile unsigned int *)(USB_BASE+0x104))    /* Host Controller Structual Parameters */
+#define UDC_HCCPARAMS           (*(volatile unsigned int *)(USB_BASE+0x108))    /* Host Controller Capability Parameters */
+#define UDC_DCIVERSION          (*(volatile unsigned short *)(USB_BASE+0x120))  /* Device Controller Interface Version */
+#define UDC_DCCPARAMS           (*(volatile unsigned int *)(USB_BASE+0x124))    /* Device Controller Capability Parameters */
+
+/* Operation registers */
+#define UDC_USBCMD              (*(volatile unsigned int *)(USB_BASE+0x140))    /* USB Command Register */
+#define UDC_USBSTS              (*(volatile unsigned int *)(USB_BASE+0x144))    /* USB Status Register */
+#define UDC_USBINTR             (*(volatile unsigned int *)(USB_BASE+0x148))    /* USB Interrupt Enable Register */
+#define UDC_FRINDEX             (*(volatile unsigned int *)(USB_BASE+0x14c))    /* Frame Index Register */
+#define UDC_DEVICEADDR          (*(volatile unsigned int *)(USB_BASE+0x154))    /* Device Address */
+#define UDC_ENDPOINTLISTADDR    (*(volatile unsigned int *)(USB_BASE+0x158))    /* Endpoint List Address Register */
+#define UDC_BURSTSIZE           (*(volatile unsigned int *)(USB_BASE+0x160))    /* Master Interface Data Burst Size Register */
+#define UDC_TXFILLTUNING        (*(volatile unsigned int *)(USB_BASE+0x164))    /* Transmit FIFO Tuning Controls Register */
+#define UDC_ULPIVIEW            (*(volatile unsigned int *)(USB_BASE+0x170))    
+#define UDC_CFGFLAG             (*(volatile unsigned int *)(USB_BASE+0x180))    /* Configure Flag Register */
+#define UDC_PORTSC1             (*(volatile unsigned int *)(USB_BASE+0x184))    /* Port 1 Status and Control Register */
+#define UDC_OTGSC               (*(volatile unsigned int *)(USB_BASE+0x1a4))    /* On-The-Go Status and Control */
+#define UDC_USBMODE             (*(volatile unsigned int *)(USB_BASE+0x1a8))    /* USB Mode Register */
+#define UDC_ENDPTSETUPSTAT      (*(volatile unsigned int *)(USB_BASE+0x1ac))    /* Endpoint Setup Status Register */
+#define UDC_ENDPTPRIME          (*(volatile unsigned int *)(USB_BASE+0x1b0))    /* Endpoint Initialization Register */
+#define UDC_ENDPTFLUSH          (*(volatile unsigned int *)(USB_BASE+0x1b4))    /* Endpoint Flush Register */
+#define UDC_ENDPTSTAT           (*(volatile unsigned int *)(USB_BASE+0x1b8))    /* Endpoint Status Register */
+#define UDC_ENDPTCOMPLETE       (*(volatile unsigned int *)(USB_BASE+0x1bc))    /* Endpoint Complete Register */
+#define UDC_ENDPTCTRL0          (*(volatile unsigned int *)(USB_BASE+0x1c0))    /* Endpoint 0 Control Register */
+#define UDC_ENDPTCTRL1          (*(volatile unsigned int *)(USB_BASE+0x1c4))    /* Endpoint 1 Control Register */
+#define UDC_ENDPTCTRL2          (*(volatile unsigned int *)(USB_BASE+0x1c8))    /* Endpoint 2 Control Register */
+#define UDC_ENDPTCTRL3          (*(volatile unsigned int *)(USB_BASE+0x1cc))    /* Endpoint 3 Control Register */
+#define UDC_ENDPTCTRL4          (*(volatile unsigned int *)(USB_BASE+0x1d0))    /* Endpoint 4 Control Register */
+#define UDC_ENDPTCTRL5          (*(volatile unsigned int *)(USB_BASE+0x1d4))    /* Endpoint 5 Control Register */
+#define UDC_ENDPTCTRL6          (*(volatile unsigned int *)(USB_BASE+0x1d8))    /* Endpoint 6 Control Register */
+#define UDC_ENDPTCTRL7          (*(volatile unsigned int *)(USB_BASE+0x1dc))    /* Endpoint 7 Control Register */
+#define UDC_ENDPTCTRL(x)        (*(volatile unsigned int *)(USB_BASE+0x1c0+4*(x)))      /* Endpoint X Control Register */
 
 /* ep0 transfer state */
 #define WAIT_FOR_SETUP          0
@@ -369,4 +312,9 @@
 #define  USB_CTRL_IOENB                         (0x00000004)
 #define  USB_CTRL_ULPI_INT0EN                   (0x00000001)
 
-#endif                /* __MX31_H */
+/* Externally used functions */
+int dr_controller_setup(void);
+void dr_controller_run(void);
+void dr_controller_stop(void);
+
+#endif                /* __ARCOTG_UDC_H */

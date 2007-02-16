@@ -212,6 +212,8 @@ drivers/tlv320.c
 drivers/isp1362.c
 #elif CONFIG_USBOTG == USBOTG_M5636
 drivers/m5636.c
+#elif CONFIG_USBOTG == USBOTG_ARC
+drivers/arcotg_udc.c
 #endif /* CONFIG_USBOTG */
 #endif /* !defined(SIMULATOR) && !defined(BOOTLOADER) */
 
