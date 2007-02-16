@@ -473,6 +473,8 @@ static void checkHighScore(void)
 static void chopKillPlayer(void)
 {
     int w, i, button;
+    char text[25];
+
     for (i = 0; i < NUMBER_OF_PARTICLES; i++) {
         mParticles[i].bIsActive = 0;
         chopAddParticle(iPlayerPosX + iR(0,20), iPlayerPosY + iR(0,20),
@@ -490,9 +492,9 @@ static void chopKillPlayer(void)
 
         rb->lcd_getstringsize("Game Over", &w, NULL);
         rb->lcd_putsxy(LCD_WIDTH/2 - w/2 ,LCD_HEIGHT/2 - 20, "Game Over");
-        rb->lcd_getstringsize("Press " ACTIONTEXT " to continue", &w, NULL);
-        rb->lcd_putsxy(LCD_WIDTH/2 - w/2 ,LCD_HEIGHT/2,
-                       "Press " ACTIONTEXT " to continue");
+        rb->snprintf(text, sizeof(text), "Press %s to continue", ACTIONTEXT);
+        rb->lcd_getstringsize(text, &w, NULL);
+        rb->lcd_putsxy(LCD_WIDTH/2 - w/2 ,LCD_HEIGHT/2, text);
         rb->lcd_update();
 
         rb->lcd_set_drawmode(DRMODE_SOLID);
