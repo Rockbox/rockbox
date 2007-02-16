@@ -113,6 +113,9 @@
 #define SER1_MASK    (1 << SER1_IRQ)
 #define DMA_OUT_MASK (1 << DMA_OUT_IRQ)
 
+/* The PortalPlayer USB controller uses base address 0xc5000000 */
+#define USB_BASE                0xc5000000
+
 #define PROC_SLEEP   0xca
 #define PROC_WAKE    0xce
 
