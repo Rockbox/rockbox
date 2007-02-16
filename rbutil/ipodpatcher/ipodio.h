@@ -21,6 +21,7 @@
 #define __IPODIO_H
 
 #include <stdint.h>
+#include <unistd.h>
 
 #ifdef __WIN32__
 #include <windows.h>
