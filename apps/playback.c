@@ -1047,20 +1047,17 @@ static bool voice_pcmbuf_insert_callback(
          * against resampling buffer overflows. */
         inp_count = dsp_input_count(out_count);
 
-        if (inp_count <= 0) 
-        {
-            DEBUGF("Error: dsp_input_count(%ld=dsp_output_count(%ld))=%ld<=0\n",
-                    out_count, count, inp_count);
-            /* If this happens, there are samples of codec data that don't
-             * become a number of pcm samples, and something is broken */
-            return false;
-        }
+        if (inp_count <= 0)
+            return true;
 
         /* Input size has grown, no error, just don't write more than length */
         if (inp_count > count)
             inp_count = count;
 
         out_count = dsp_process(dest, src, inp_count);
+
+        if (out_count <= 0)
+            return true;
 
         if (playing)
         {
@@ -1329,20 +1326,17 @@ static bool codec_pcmbuf_insert_callback(
          * against resampling buffer overflows. */
         inp_count = dsp_input_count(out_count);
 
-        if (inp_count <= 0) 
-        {
-            DEBUGF("Error: dsp_input_count(%ld=dsp_output_count(%ld))=%ld<=0\n",
-                    out_count, count, inp_count);
-            /* If this happens, there are samples of codec data that don't
-             * become a number of pcm samples, and something is broken */
-            return false;
-        }
+        if (inp_count <= 0)
+            return true;
 
         /* Input size has grown, no error, just don't write more than length */
         if (inp_count > count)
             inp_count = count;
 
         out_count = dsp_process(dest, src, inp_count);
+
+        if (out_count <= 0)
+            return true;
 
         pcmbuf_write_complete(out_count);
 

@@ -253,9 +253,15 @@ static int downsample(int32_t **dst, int32_t **src, int count,
         if (pos < count)
             *d[j]++ = last_sample + FRACMUL((phase & 0xffff) << 15,
                 src[j][pos] - last_sample);
-        else  /* This is kinda nasty but works somewhat well for now */
-            *d[j]++ = src[j][count - 1];
+        else
+        {
+            /* No samples can be output here since were already passed the
+               end. Keep phase, save the last sample and return nothing. */
+            i = 0;
+            goto done;
+        }
     }
+
     phase += delta;
  
     while ((pos = phase >> 16) < count)
@@ -268,6 +274,7 @@ static int downsample(int32_t **dst, int32_t **src, int count,
     }
 
     /* Wrap phase accumulator back to start of next frame. */
+done:
     r->phase = phase - (count << 16);
     r->last_sample[0] = src[0][count - 1];
     r->last_sample[1] = src[1][count - 1];
@@ -768,6 +775,8 @@ int dsp_process(char *dst, const char *src[], int count)
         count -= samples;
         apply_gain(tmp, samples);
         samples = resample(tmp, samples);
+        if (samples <= 0)
+            break; /* I'm pretty sure we're downsampling here */
         if (dsp->crossfeed_enabled && dsp->stereo_mode != STEREO_MONO)
             apply_crossfeed(tmp, samples);
         if (dsp->eq_enabled)
