@@ -37,6 +37,7 @@ PLUGIN_HEADER
 #define QUIT BUTTON_OFF
 #define ACTION BUTTON_UP
 #define ACTION2 BUTTON_SELECT
+#define ACTIONTEXT "SELECT"
 
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_4G_PAD)
@@ -492,9 +493,9 @@ static void chopKillPlayer(void)
 
         rb->lcd_getstringsize("Game Over", &w, NULL);
         rb->lcd_putsxy(LCD_WIDTH/2 - w/2 ,LCD_HEIGHT/2 - 20, "Game Over");
-        rb->snprintf(text, sizeof(text), "Press %s to continue", ACTIONTEXT);
-        rb->lcd_getstringsize(text, &w, NULL);
-        rb->lcd_putsxy(LCD_WIDTH/2 - w/2 ,LCD_HEIGHT/2, text);
+        rb->lcd_getstringsize("Press " ACTIONTEXT " to continue", &w, NULL);
+        rb->lcd_putsxy(LCD_WIDTH/2 - w/2 ,LCD_HEIGHT/2,
+                       "Press " ACTIONTEXT " to continue");
         rb->lcd_update();
 
         rb->lcd_set_drawmode(DRMODE_SOLID);
