@@ -17,7 +17,7 @@
  *
  ****************************************************************************/
 #include "config.h"
-
+#include <stdbool.h>
 #include <inttypes.h>
 #include <string.h>
 #include <sound.h>
