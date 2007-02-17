@@ -143,7 +143,7 @@ enum
     REPEAT_ALL,
     REPEAT_ONE,
     REPEAT_SHUFFLE,
-#if (AB_REPEAT_ENABLE == 1)
+#ifdef AB_REPEAT_ENABLE
     REPEAT_AB,
 #endif
     NUM_REPEAT_MODES
