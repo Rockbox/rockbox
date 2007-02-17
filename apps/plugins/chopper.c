@@ -49,7 +49,8 @@ PLUGIN_HEADER
 #elif CONFIG_KEYPAD == IAUDIO_X5_PAD /* grayscale at the moment */
 
 #define QUIT BUTTON_POWER
-#define ACTION BUTTON_SELECT
+#define ACTION BUTTON_UP
+#define ACTION2 BUTTON_SELECT
 #define ACTIONTEXT "SELECT"
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
@@ -73,8 +74,9 @@ PLUGIN_HEADER
 #define ACTIONTEXT "PLAY"
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
-#define QUIT BUTTON_MENU
-#define ACTION BUTTON_RIGHT
+#define QUIT BUTTON_OFF
+#define ACTION BUTTON_UP
+#define ACTION BUTTON_MENU
 #define ACTIONTEXT "RIGHT"
 
 #else
@@ -387,7 +389,6 @@ static void chopAddParticle(int x,int y,int sx,int sy)
     mParticles[i].iWorldY = y;
     mParticles[i].iSpeedX = sx;
     mParticles[i].iSpeedY = sy;
-
 }
 
 static void chopGenerateBlockIfNeeded(void)
@@ -458,19 +459,6 @@ static int chopParticleOffscreen(struct CParticle *mParticle)
         return 0;
 }
 
-static void checkHighScore(void)
-{
-    if (score > highscore) {
-        char scoretext[30];
-        int w;
-        highscore = score;
-        rb->snprintf(scoretext, sizeof(scoretext), "New High Score: %d",
-                     highscore);
-        rb->lcd_getstringsize(scoretext, &w, NULL);
-        rb->lcd_putsxy(LCD_WIDTH/2 - w/2 ,LCD_HEIGHT/2 + 20, scoretext);
-    }
-}
-
 static void chopKillPlayer(void)
 {
     int w, i, button;
@@ -486,20 +474,23 @@ static void chopKillPlayer(void)
     if (iPlayerAlive == 0) {
         rb->lcd_set_drawmode(DRMODE_FG);
 #if LCD_DEPTH >= 2
-        rb->lcd_set_foreground(LCD_WHITE);
+        rb->lcd_set_foreground(LCD_LIGHTGRAY);
 #endif
-        checkHighScore();
+        rb->splash(HZ, true, "Game Over");
 
-        rb->lcd_getstringsize("Game Over", &w, NULL);
-        rb->lcd_putsxy(LCD_WIDTH/2 - w/2 ,LCD_HEIGHT/2 - 20, "Game Over");
-        rb->lcd_getstringsize("Press " ACTIONTEXT " to continue", &w, NULL);
-        rb->lcd_putsxy(LCD_WIDTH/2 - w/2 ,LCD_HEIGHT/2,
-                       "Press " ACTIONTEXT " to continue");
+        if (score > highscore) {
+            char scoretext[30];
+            int w;
+            highscore = score;
+            rb->snprintf(scoretext, sizeof(scoretext), "New High Score: %d",
+                         highscore);
+            rb->splash(HZ*2, true, scoretext);
+        }
+
+        rb->splash(HZ/4, true, "Press " ACTIONTEXT " to continue");
         rb->lcd_update();
 
         rb->lcd_set_drawmode(DRMODE_SOLID);
-
-        rb->sleep(HZ * 0.5);
 
         while (true) {
             button = rb->button_get(true);
@@ -631,6 +622,9 @@ static int chopMenu(int menunum)
 #if HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_WHITE);
     rb->lcd_set_background(LCD_BLACK);
+#elif LCD_DEPTH == 2
+    rb->lcd_set_foreground(LCD_BLACK);
+    rb->lcd_set_background(LCD_WHITE);
 #endif
 
     rb->lcd_clear_display();
