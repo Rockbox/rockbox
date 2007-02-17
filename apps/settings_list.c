@@ -416,7 +416,8 @@ const struct settings_list settings[] = {
         0, 18, 1, backlight_formatter, backlight_getlang, 
         backlight_set_timeout),
 #ifdef CONFIG_CHARGING
-    INT_SETTING_W_CFGVALS(0, backlight_timeout_plugged, LANG_BACKLIGHT, 11,
+    INT_SETTING_W_CFGVALS(0, backlight_timeout_plugged,
+        LANG_BACKLIGHT_ON_WHEN_CHARGING, 11,
         "backlight timeout plugged", backlight_times_conf, UNIT_SEC,
         0, 18, 1, backlight_formatter, backlight_getlang, 
         backlight_set_timeout_plugged),
