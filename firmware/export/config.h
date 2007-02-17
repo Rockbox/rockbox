@@ -99,7 +99,7 @@
 #define LCD_IPODMINI 10 /* as used by iPod Mini g1/g2 */
 #define LCD_IFP7XX   11 /* as used by iRiver iFP 7xx/8xx */
 #define LCD_GIGABEAT 12
-#define LCD_H10      13 /* as used by iriver H10 20Gb */
+#define LCD_H10_20GB 13 /* as used by iriver H10 20Gb */
 #define LCD_H10_5GB  14 /* as used by iriver H10 5Gb */
 #define LCD_TPJ1022  15 /* as used by Tatung Elio TPJ-1022 */
 #define LCD_DSC25    16 /* as used by Archos AV300 */
