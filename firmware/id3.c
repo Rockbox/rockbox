@@ -355,14 +355,6 @@ static int parseyearnum( struct mp3entry* entry, char* tag, int bufferpos )
     return bufferpos;
 }
 
-/* parse comment */
-static int parsecomment( struct mp3entry* entry, char* tag, int bufferpos )
-{
-    
-    entry->comment = tag + 4;       // simplistic
-    return bufferpos;
-}
-
 /* parse numeric genre from string, version 2.2 and 2.3 */
 static int parsegenre( struct mp3entry* entry, char* tag, int bufferpos )
 {
@@ -462,7 +454,7 @@ static const struct tag_resolver taglist[] = {
     { "TCOM", 4, offsetof(struct mp3entry, composer), NULL, false },
     { "TPE2", 4, offsetof(struct mp3entry, albumartist), NULL, false },
     { "TP2", 3, offsetof(struct mp3entry, albumartist), NULL, false },
-    { "COMM", 4, offsetof(struct mp3entry, comment), &parsecomment, false },
+    { "COMM", 4, offsetof(struct mp3entry, comment), NULL, false }, 
     { "TCON", 4, offsetof(struct mp3entry, genre_string), &parsegenre, false },
     { "TCO",  3, offsetof(struct mp3entry, genre_string), &parsegenre, false },
 #if CONFIG_CODEC == SWCODEC
@@ -564,7 +556,7 @@ static int unicode_munge(char* string, char* utf8buf, int *len) {
 static bool setid3v1title(int fd, struct mp3entry *entry)
 {
     unsigned char buffer[128];
-    static const char offsets[] = {3, 33, 63, 93, 125, 127};
+    static const char offsets[] = {3, 33, 63, 97, 93, 125, 127};
     int i, j;
     unsigned char* utf8;
 
@@ -583,16 +575,13 @@ static bool setid3v1title(int fd, struct mp3entry *entry)
     for (i=0; i < (int)sizeof offsets; i++) {
         unsigned char* ptr = (unsigned char *)buffer + offsets[i];
 
-        if (i<3) {
-            /* kill trailing space in strings */
-            for (j=29; j && ptr[j]==' '; j--)
-                ptr[j] = 0;
-        }
-
         switch(i) {
             case 0:
             case 1:
             case 2:
+                /* kill trailing space in strings */
+                for (j=29; j && (ptr[j]==0 || ptr[j]==' '); j--)
+                    ptr[j] = 0;
                 /* convert string to utf8 */
                 utf8 = (unsigned char *)entry->id3v1buf[i];
                 utf8 = iso_decode(ptr, utf8, -1, 30);
@@ -601,11 +590,22 @@ static bool setid3v1title(int fd, struct mp3entry *entry)
                 break;
 
             case 3:
+                /* kill trailing space in strings */
+                for (j=27; j && (ptr[j]==0 || ptr[j]==' '); j--)
+                    ptr[j] = 0;
+                /* convert string to utf8 */
+                utf8 = (unsigned char *)entry->id3v1buf[3];
+                utf8 = iso_decode(ptr, utf8, -1, 28);
+                /* make sure string is terminated */
+                *utf8 = 0;
+                break;
+
+            case 4:
                 ptr[4] = 0;
                 entry->year = atoi((char *)ptr);
                 break;
 
-            case 4:
+            case 5:
                 /* id3v1.1 uses last two bytes of comment field for track
                    number: first must be 0 and second is track num */
                 if (!ptr[0] && ptr[1]) {
@@ -614,7 +614,7 @@ static bool setid3v1title(int fd, struct mp3entry *entry)
                 }
                 break;
 
-            case 5:
+            case 6:
                 /* genre */
                 entry->genre = ptr[0];
                 break;
@@ -624,6 +624,7 @@ static bool setid3v1title(int fd, struct mp3entry *entry)
     entry->title = entry->id3v1buf[0];
     entry->artist = entry->id3v1buf[1];
     entry->album = entry->id3v1buf[2];
+    entry->comment = entry->id3v1buf[3];
 
     return true;
 }
@@ -856,6 +857,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             char** ptag = tr->offset ? (char**) (((char*)entry) + tr->offset)
                 : NULL;
             char* tag;
+            int comm_offset=0;
 
             /* Only ID3_VER_2_2 uses frames with three-character names. */
             if (((version == ID3_VER_2_2) && (tr->tag_length != 3))
@@ -886,6 +888,19 @@ static void setid3v2title(int fd, struct mp3entry *entry)
 
                 if(unsynch || (global_unsynch && version >= ID3_VER_2_4))
                     bytesread = unsynchronize_frame(tag, bytesread);
+
+                /* the COMM frame has a 3 char field to hold an ISO-639-1 
+                 * language string and an optional short description;
+                 * remove them so unicode_munge can work correctly
+                 */
+                 
+                if(!memcmp( header, "COMM", 4 )) {
+                    comm_offset = 3 + strlen(tag+4) + 1;
+                    if(bytesread>comm_offset) {
+                        bytesread-=comm_offset;
+                        memmove(tag+1, tag+comm_offset+1, bytesread-1);
+                    }   
+                }
 
                 /* Attempt to parse Unicode string only if the tag contents
                    aren't binary */
