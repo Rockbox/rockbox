@@ -59,6 +59,8 @@
    and then set it to input to see if it stays low or goes high */
 #define HAVE_I2C_LOW_FIRST
 
+#define CONFIG_I2C I2C_PLAYREC
+
 /* Define this if you control power on PADR (instead of PBDR) */
 #define HAVE_POWEROFF_ON_PADR
 
