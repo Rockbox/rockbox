@@ -188,7 +188,7 @@ MAKE_MENU(playback_menu_item,ID2P(LANG_PLAYBACK),0,
          ,&unplug_menu
 #endif
          );
-         #include "debug.h"
+         
 int playback_callback(int action,const struct menu_item_ex *this_item)
 {
     static bool old_shuffle = false;
@@ -197,7 +197,6 @@ int playback_callback(int action,const struct menu_item_ex *this_item)
     switch (action)
     {
         case ACTION_ENTER_MENUITEM:
-            DEBUGF("boo\n");
             if (this_item == &shuffle_item)
                 old_shuffle = global_settings.playlist_shuffle;
             else if (this_item == &repeat_mode)
