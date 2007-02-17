@@ -1082,7 +1082,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
     entry->vbr = info.is_vbr;
     entry->has_toc = info.has_toc;
 
-#if CONFIC_CODEC==SWCODEC
+#if CONFIG_CODEC==SWCODEC
     entry->lead_trim = info.enc_delay;
     entry->tail_trim = info.enc_padding;
 #endif
