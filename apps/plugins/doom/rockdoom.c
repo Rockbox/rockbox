@@ -195,7 +195,7 @@ const unsigned char versions_builtin[7][20] =
    "Doom Registered",
    "Ultimate Doom",
    "Doom 2",
-   "Doom 2 French",
+   "Freedoom",
    "Plutonia",
    "TNT"
 };
@@ -206,7 +206,7 @@ const unsigned char wads_builtin[7][30] =
    GAMEBASE"doom.wad",
    GAMEBASE"doomu.wad",
    GAMEBASE"doom2.wad",
-   GAMEBASE"doom2f.wad",
+   GAMEBASE"doomf.wad",
    GAMEBASE"plutonia.wad",
    GAMEBASE"tnt.wad"
 };
