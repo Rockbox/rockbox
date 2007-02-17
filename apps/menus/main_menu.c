@@ -157,10 +157,10 @@ static bool show_info(void)
         ID2P(LANG_MEGABYTE),
         ID2P(LANG_GIGABYTE)
     };
-    
+#if defined(HAVE_LCD_BITMAP)
     FOR_NB_SCREENS(i)
         screens[i].setmargins(0, 0);
-    
+#endif
     while (!done)
     {
         int y=0;

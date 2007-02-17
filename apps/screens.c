@@ -1317,9 +1317,10 @@ bool view_runtime(void)
     unsigned char *lines[]={str(LANG_CLEAR_TIME)};
     struct text_message message={(char **)lines, 1};
 
+#if defined(HAVE_LCD_BITMAP)
     FOR_NB_SCREENS(i)
         screens[i].setmargins(0, 0);
-    
+#endif
     while(!done)
     {
         int y[NB_SCREENS]={0};
