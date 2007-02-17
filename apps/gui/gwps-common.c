@@ -845,7 +845,7 @@ static char* get_tag(struct wps_data* wps_data,
             }
             break;
 
-#if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
+#if (defined(CONFIG_LED) && (CONFIG_LED == LED_VIRTUAL)) || defined(HAVE_REMOTE_LCD)
         case 'l': /* VIRTUAL_LED */
         {
             switch(tag[1])

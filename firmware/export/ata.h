@@ -47,7 +47,7 @@ extern int ata_init(void);
 extern int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf);
 extern int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf);
 extern void ata_spin(void);
-#if CONFIG_LED == LED_REAL
+#if defined(CONFIG_LED) && (CONFIG_LED == LED_REAL)
 extern void ata_set_led_enabled(bool enabled);
 #endif
 extern unsigned short* ata_get_identify(void);

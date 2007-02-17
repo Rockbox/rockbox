@@ -173,7 +173,7 @@ extern void statusbar_icon_lock(void);
 #ifdef CONFIG_RTC
 extern void statusbar_time(int hour, int minute);
 #endif
-#if CONFIG_LED == LED_VIRTUAL
+#if defined(CONFIG_LED) && (CONFIG_LED == LED_VIRTUAL)
 extern void statusbar_led(void);
 #endif
 

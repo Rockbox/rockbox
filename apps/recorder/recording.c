@@ -773,7 +773,7 @@ bool recording_screen(bool no_source)
                             FMRADIO_OFF : get_radio_status();
 #endif
     int talk_menu = global_settings.talk_menu;
-#if CONFIG_LED == LED_REAL
+#if defined(CONFIG_LED) && (CONFIG_LED == LED_REAL)
     bool led_state = false;
     int led_countdown = 2;
 #endif
@@ -803,7 +803,7 @@ bool recording_screen(bool no_source)
 
     in_screen = true;
     cursor = 0;
-#if (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)
+#if defined(CONFIG_LED) && (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)
     ata_set_led_enabled(false);
 #endif
 
@@ -876,7 +876,7 @@ bool recording_screen(bool no_source)
     {
         audio_stat = audio_status();
         
-#if CONFIG_LED == LED_REAL
+#if defined(CONFIG_LED) && (CONFIG_LED == LED_REAL)
 
         /*
          * Flash the LED while waiting to record.  Turn it on while
@@ -1188,7 +1188,7 @@ bool recording_screen(bool no_source)
                     const int prev_rec_source = global_settings.rec_source;
 #endif
 
-#if CONFIG_LED == LED_REAL
+#if defined(CONFIG_LED) && (CONFIG_LED == LED_REAL)
                     /* led is restored at begin of loop / end of function */
                     led(false);
 #endif
@@ -1251,7 +1251,7 @@ bool recording_screen(bool no_source)
             case ACTION_REC_F2:
                 if(audio_stat != AUDIO_STATUS_RECORD)
                 {
-#if CONFIG_LED == LED_REAL
+#if defined(CONFIG_LED) && (CONFIG_LED == LED_REAL)
                     /* led is restored at begin of loop / end of function */
                     led(false);
 #endif
@@ -1275,7 +1275,7 @@ bool recording_screen(bool no_source)
                 {
                     if(audio_stat != AUDIO_STATUS_RECORD)
                     {
-#if CONFIG_LED == LED_REAL
+#if defined(CONFIG_LED) && (CONFIG_LED == LED_REAL)
                         /* led is restored at begin of loop / end of function */
                         led(false);
 #endif
@@ -1780,7 +1780,7 @@ bool recording_screen(bool no_source)
     if (have_recorded)
         reload_directory();
 
-#if (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)
+#if defined(CONFIG_LED) && (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)
     ata_set_led_enabled(true);
 #endif
     return been_in_usb_mode;

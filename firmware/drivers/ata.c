@@ -71,7 +71,7 @@ static struct mutex ata_mtx;
 int ata_device; /* device 0 (master) or 1 (slave) */
 
 int ata_spinup_time = 0;
-#if CONFIG_LED == LED_REAL
+#if defined(CONFIG_LED) && (CONFIG_LED == LED_REAL)
 static bool ata_led_enabled = true;
 static bool ata_led_on = false;
 #endif
@@ -152,7 +152,7 @@ STATICIRAM int wait_for_end_of_transfer(void)
     return (ATA_ALT_STATUS & (STATUS_RDY|STATUS_DRQ)) == STATUS_RDY;
 }    
 
-#if CONFIG_LED == LED_REAL
+#if defined(CONFIG_LED) && (CONFIG_LED == LED_REAL)
 /* Conditionally block LED access for the ATA driver, so the LED can be
  * (mis)used for other purposes */
 static void ata_led(bool on) 
@@ -1003,7 +1003,7 @@ int ata_init(void)
     return 0;
 }
 
-#if CONFIG_LED == LED_REAL
+#if defined(CONFIG_LED) && (CONFIG_LED == LED_REAL)
 void ata_set_led_enabled(bool enabled) 
 {
     ata_led_enabled = enabled;

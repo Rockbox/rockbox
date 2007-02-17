@@ -561,7 +561,7 @@ int main(void)
     app_main();
 
     while(1) {
-#if CONFIG_LED == LED_REAL
+#if defined(CONFIG_LED) && (CONFIG_LED == LED_REAL)
         led(true); sleep(HZ/10);
         led(false); sleep(HZ/10);
 #endif
