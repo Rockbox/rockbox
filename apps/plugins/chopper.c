@@ -76,8 +76,8 @@ PLUGIN_HEADER
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define QUIT BUTTON_OFF
 #define ACTION BUTTON_UP
-#define ACTION BUTTON_MENU
-#define ACTIONTEXT "RIGHT"
+#define ACTION2 BUTTON_MENU
+#define ACTIONTEXT "UP"
 
 #else
 #error Unsupported keypad
@@ -461,7 +461,7 @@ static int chopParticleOffscreen(struct CParticle *mParticle)
 
 static void chopKillPlayer(void)
 {
-    int w, i, button;
+    int i, button;
 
     for (i = 0; i < NUMBER_OF_PARTICLES; i++) {
         mParticles[i].bIsActive = 0;
@@ -480,7 +480,6 @@ static void chopKillPlayer(void)
 
         if (score > highscore) {
             char scoretext[30];
-            int w;
             highscore = score;
             rb->snprintf(scoretext, sizeof(scoretext), "New High Score: %d",
                          highscore);
