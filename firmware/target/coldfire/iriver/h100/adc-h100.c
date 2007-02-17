@@ -34,7 +34,7 @@ static unsigned char adcdata[NUM_ADC_CHANNELS];
 #define DI_HI  or_l(0x00200000, &GPIO_OUT)
 
 /* delay loop */
-#define DELAY   do { int _x; for(_x=0;_x<10;_x++);} while (0)
+#define DELAY   do { int _x; for(_x=0;_x<10;_x++) asm volatile ("");} while (0)
 
 unsigned short adc_scan(int channel)
 {
