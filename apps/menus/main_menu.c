@@ -158,6 +158,9 @@ static bool show_info(void)
         ID2P(LANG_GIGABYTE)
     };
     
+    FOR_NB_SCREENS(i)
+        screens[i].setmargins(0, 0);
+    
     while (!done)
     {
         int y=0;
