@@ -23,7 +23,6 @@
 
 #include "gwps.h"
 
-void gui_wps_format_time(char* buf, int buf_size, long time);
 void fade(bool fade_in);
 void gui_wps_format(struct wps_data *data);
 bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,

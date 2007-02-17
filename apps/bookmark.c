@@ -225,10 +225,8 @@ static bool write_bookmark(bool create_bookmark_file)
         }
     }
 
-    if (success)
-        gui_syncsplash(HZ, true, str(LANG_BOOKMARK_CREATE_SUCCESS));
-    else
-        gui_syncsplash(HZ, true, str(LANG_BOOKMARK_CREATE_FAILURE));
+    gui_syncsplash(HZ, true, str(success ? LANG_BOOKMARK_CREATE_SUCCESS
+        : LANG_BOOKMARK_CREATE_FAILURE));
 
     return true;
 }
@@ -380,11 +378,6 @@ bool bookmark_autoload(const char* file)
     fd = open(global_bookmark_file_name, O_RDONLY);
     if(fd<0)
         return false;
-    if(-1 == lseek(fd, 0, SEEK_END))
-    {
-        close(fd);
-        return false;
-    }
     close(fd);
     if(global_settings.autoloadbookmark == BOOKMARK_YES)
     {
@@ -555,16 +548,9 @@ static char* select_bookmark(const char* bookmark_file_name)
             case ACTION_BMS_SELECT:
                 /* User wants to use this bookmark */
 #ifdef HAVE_LCD_BITMAP
-                if (global_settings.statusbar)
-                {
-                    FOR_NB_SCREENS(i)
-                        screens[i].setmargins(0, STATUSBAR_HEIGHT);
-                }
-                else
-                {
-                   FOR_NB_SCREENS(i)
-                        screens[i].setmargins(0, 0);
-                }
+                FOR_NB_SCREENS(i)
+                    screens[i].setmargins(0, global_settings.statusbar 
+                        ? STATUSBAR_HEIGHT : 0);
 #endif
                 action_signalscreenchange();
                 return bookmark;
@@ -674,8 +660,8 @@ static void display_bookmark(const char* bookmark,
     long  ms = 0;
     int  repeat_mode = 0;
     bool playlist_shuffle = false;
-    int  len;
     char *dot;
+    char time_buf[32];
     int i;
 
     /* getting the index and the time into the file */
@@ -712,49 +698,34 @@ static void display_bookmark(const char* bookmark,
         statusbar_icon_shuffle();
 
     /* File Name */
-    len=strlen(global_filename);
-    if (len>3)
-      dot=strrchr(global_filename + len - 4, '.');
-    else
-      dot=NULL;
+    dot = strrchr(global_filename, '.');
+
     if (dot)
         *dot='\0';
+
     FOR_NB_SCREENS(i)
         screens[i].puts_scroll(0, 0, (unsigned char *)global_filename);
+
     if (dot)
         *dot='.';
 
     /* bookmark number */
-    snprintf(global_temp_buffer, sizeof(global_temp_buffer), "%s: %2d/%2d",
+    snprintf(global_temp_buffer, sizeof(global_temp_buffer), "%s: %d/%d",
              str(LANG_BOOKMARK_SELECT_BOOKMARK_TEXT),
              bookmark_id + 1, bookmark_count);
     FOR_NB_SCREENS(i)
         screens[i].puts_scroll(0, 1, (unsigned char *)global_temp_buffer);
 
     /* bookmark resume index */
-    snprintf(global_temp_buffer, sizeof(global_temp_buffer), "%s: %2d",
+    snprintf(global_temp_buffer, sizeof(global_temp_buffer), "%s: %d",
              str(LANG_BOOKMARK_SELECT_INDEX_TEXT), resume_index+1);
     FOR_NB_SCREENS(i)
         screens[i].puts_scroll(0, 2, (unsigned char *)global_temp_buffer);
 
     /* elapsed time*/
-    if ( ms < 3600000 )
-    {
-        snprintf(global_temp_buffer, sizeof(global_temp_buffer), "%s: %ld:%02d",
-                 str(LANG_BOOKMARK_SELECT_TIME_TEXT),
-                 ms / 60000,
-                 (unsigned int)(ms % 60000) / 1000);
-        /* unsigned int: hinting for 16bits archs */
-    }
-    else
-    {
-        snprintf(global_temp_buffer, sizeof(global_temp_buffer),
-                 "%s: %ld:%02ld:%02d",
-                 str(LANG_BOOKMARK_SELECT_TIME_TEXT),
-                 ms / 3600000,
-                 ms % 3600000 / 60000,
-                 (unsigned int)(ms % 60000) / 1000);
-    }
+    format_time(time_buf, sizeof(time_buf), ms);
+    snprintf(global_temp_buffer, sizeof(global_temp_buffer), "%s: %s",
+             str(LANG_BOOKMARK_SELECT_TIME_TEXT), time_buf);
     FOR_NB_SCREENS(i)
         screens[i].puts_scroll(0, 3, (unsigned char *)global_temp_buffer);
 
@@ -764,35 +735,21 @@ static void display_bookmark(const char* bookmark,
         screens[i].puts_scroll(0, 4, str(LANG_BOOKMARK_SELECT_PLAY));
         screens[i].puts_scroll(0, 5, str(LANG_BOOKMARK_SELECT_EXIT));
         screens[i].puts_scroll(0, 6, str(LANG_BOOKMARK_SELECT_DELETE));
+        screens[i].update();
     }
 #else
-    (void)bookmark_id;
-    len=strlen(global_filename);
-    if (len>3)
-      dot=strrchr(global_filename+len-4,'.');
-    else
-      dot=NULL;
+    dot = strrchr(global_filename, '.');
+
     if (dot)
         *dot='\0';
-    if ( ms < 3600000 )
-    {
-        snprintf(global_temp_buffer, sizeof(global_temp_buffer),
-                 "%2d, %ld:%02ld, %s,",
-                 (bookmark_count+1),
-                 ms / 60000,
-                 ms % 60000 / 1000,
-                 global_filename);
-    }
-    else
-    {
-        snprintf(global_temp_buffer, sizeof(global_temp_buffer),
-             "%2d, %ld:%02ld:%02ld, %s,",
-             (bookmark_count+1),
-             ms / 60000,
-             ms % 3600000 / 60000,
-             ms % 60000 / 1000,
-             global_filename);
-    }
+
+    format_time(time_buf, sizeof(time_buf), ms);
+    snprintf(global_temp_buffer, sizeof(global_temp_buffer), 
+             "%d/%d, %s, %s", (bookmark_id + 1), bookmark_count, 
+             time_buf, global_filename);
+
+    if (dot)
+        *dot='.';
 
     gui_syncstatusbar_draw(&statusbars, false);
     
@@ -801,13 +758,6 @@ static void display_bookmark(const char* bookmark,
         screens[i].puts_scroll(0,0,global_temp_buffer);
         screens[i].puts(0,1,str(LANG_RESUME_CONFIRM_PLAYER));
     }
-    if (dot)
-        *dot='.';
-#endif
-
-#ifdef HAVE_LCD_BITMAP
-    FOR_NB_SCREENS(i)
-        screens[i].update();
 #endif
 }
 
@@ -1047,7 +997,7 @@ static bool generate_bookmark_file_name(const char *in)
 }
 
 /* ----------------------------------------------------------------------- */
-/* Returns the bookmark name for the current playlist                      */
+/* Returns true if a bookmark file exists for the current playlist         */
 /* ----------------------------------------------------------------------- */
 bool bookmark_exist(void)
 {

@@ -371,24 +371,6 @@ static void gui_wps_statusbar_draw(struct gui_wps *wps, bool force)
     gui_statusbar_draw((wps)->statusbar, (force))
 #endif
 
-/* Format time into buf.
- *
- * buf      - buffer to format to.
- * buf_size - size of buffer.
- * time     - time to format, in milliseconds.
- */
-void gui_wps_format_time(char* buf, int buf_size, long time)
-{
-    if ( time < 3600000 ) {
-      snprintf(buf, buf_size, "%d:%02d",
-               (int) (time % 3600000 / 60000), (int) (time % 60000 / 1000));
-    } else {
-      snprintf(buf, buf_size, "%d:%02d:%02d",
-               (int) (time / 3600000), (int) (time % 3600000 / 60000),
-               (int) (time % 60000 / 1000));
-    }
-}
-
 /* Extract a part from a path.
  *
  * buf      - buffer extract part to.
@@ -688,20 +670,20 @@ static char* get_tag(struct wps_data* wps_data,
 
                 case 'c':  /* Current Time in Song */
                     *flags |= WPS_REFRESH_DYNAMIC;
-                    gui_wps_format_time(buf, buf_size,
-                                    id3->elapsed + wps_state.ff_rewind_count);
+                    format_time(buf, buf_size,
+                                id3->elapsed + wps_state.ff_rewind_count);
                     return buf;
 
                 case 'r': /* Remaining Time in Song */
                     *flags |= WPS_REFRESH_DYNAMIC;
-                    gui_wps_format_time(buf, buf_size,
-                                        id3->length - id3->elapsed -
-                                        wps_state.ff_rewind_count);
+                    format_time(buf, buf_size,
+                                id3->length - id3->elapsed -
+                                wps_state.ff_rewind_count);
                     return buf;
 
                 case 't':  /* Total Time */
                     *flags |= WPS_REFRESH_STATIC;
-                    gui_wps_format_time(buf, buf_size, id3->length);
+                    format_time(buf, buf_size, id3->length);
                     return buf;
 
 #ifdef HAVE_LCD_BITMAP
@@ -835,8 +817,8 @@ static char* get_tag(struct wps_data* wps_data,
                     }
                     else
                     {
-                        gui_wps_format_time(buf, buf_size, \
-                                            get_sleep_timer() * 1000);
+                        format_time(buf, buf_size, \
+                                    get_sleep_timer() * 1000);
                         return buf;
                     }
                 }
@@ -2252,7 +2234,7 @@ static void draw_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size)
     time=(state->id3->elapsed + state->ff_rewind_count);
 
     memset(timestr, 0, sizeof(timestr));
-    gui_wps_format_time(timestr, sizeof(timestr), time);
+    format_time(timestr, sizeof(timestr), time);
     for(lcd_char_pos=0; lcd_char_pos<6; lcd_char_pos++) {
         digits[lcd_char_pos] = map_fullbar_char(timestr[lcd_char_pos]);
     }

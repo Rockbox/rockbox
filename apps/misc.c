@@ -186,6 +186,27 @@ char *create_numbered_filename(char *buffer, const char *path,
     return buffer;
 }
 
+/* Format time into buf.
+ *
+ * buf      - buffer to format to.
+ * buf_size - size of buffer.
+ * t        - time to format, in milliseconds.
+ */
+void format_time(char* buf, int buf_size, long t)
+{
+    if ( t < 3600000 ) 
+    {
+      snprintf(buf, buf_size, "%d:%02d",
+               (int) (t / 60000), (int) (t % 60000 / 1000));
+    } 
+    else
+    {
+      snprintf(buf, buf_size, "%d:%02d:%02d",
+               (int) (t / 3600000), (int) (t % 3600000 / 60000),
+               (int) (t % 60000 / 1000));
+    }
+}
+
 #ifdef CONFIG_RTC
 /* Create a filename with a date+time part.
    It is allowed that buffer and path point to the same memory location,

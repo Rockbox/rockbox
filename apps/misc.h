@@ -49,6 +49,15 @@ char *output_dyn_value(char *buf, int buf_size, int value,
 char *create_numbered_filename(char *buffer, const char *path, 
                                const char *prefix, const char *suffix,
                                int numberlen IF_CNFN_NUM_(, int *num));
+
+/* Format time into buf.
+ *
+ * buf      - buffer to format to.
+ * buf_size - size of buffer.
+ * t        - time to format, in milliseconds.
+ */
+void format_time(char* buf, int buf_size, long t);
+
 #ifdef CONFIG_RTC
 /* Create a filename with a date+time part.
    It is allowed that buffer and path point to the same memory location,

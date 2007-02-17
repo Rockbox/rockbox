@@ -49,7 +49,6 @@
 #include "debug.h"
 #include "led.h"
 #include "sound.h"
-#include "gwps-common.h"
 #include "splash.h"
 #include "statusbar.h"
 #include "screen_access.h"
@@ -1197,7 +1196,7 @@ static char * id3_get_info(int selected_item, void* data, char *buffer)
                 }
                 break;
             case 8:/*LANG_ID3_LENGTH*/
-                gui_wps_format_time(buffer, MAX_PATH, id3->length);
+                format_time(buffer, MAX_PATH, id3->length);
                 info=buffer;
                 break;
             case 9:/*LANG_ID3_PLAYLIST*/
