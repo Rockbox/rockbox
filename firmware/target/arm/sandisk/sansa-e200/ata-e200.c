@@ -234,10 +234,10 @@ void sd_wait_for_state(tSDCardInfo* card, unsigned int state)
 }
 
 
-static void copy_read_sectors(unsigned char* buf, int wordcount) 
-        NOINLINE_ATTR ICODE_ATTR;
+STATICIRAM void copy_read_sectors(unsigned char* buf, int wordcount)
+                NOINLINE_ATTR ICODE_ATTR;
 
-static void copy_read_sectors(unsigned char* buf, int wordcount)
+STATICIRAM void copy_read_sectors(unsigned char* buf, int wordcount)
 {
     unsigned int tmp = 0;
 
@@ -262,10 +262,10 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
     }
 }
 
-static void copy_write_sectors(const unsigned char* buf, int wordcount)
-        NOINLINE_ATTR ICODE_ATTR;
+STATICIRAM void copy_write_sectors(const unsigned char* buf, int wordcount)
+                NOINLINE_ATTR ICODE_ATTR;
 
-static void copy_write_sectors(const unsigned char* buf, int wordcount)
+STATICIRAM void copy_write_sectors(const unsigned char* buf, int wordcount)
 {
     unsigned short tmp = 0;
     const unsigned char* bufend = buf + wordcount*2;

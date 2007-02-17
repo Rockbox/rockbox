@@ -98,8 +98,8 @@ static int perform_soft_reset(void);
 static int set_multiple_mode(int sectors);
 static int set_features(void);
 
-static int wait_for_bsy(void) ICODE_ATTR;
-static int wait_for_bsy(void)
+STATICIRAM int wait_for_bsy(void) ICODE_ATTR;
+STATICIRAM int wait_for_bsy(void)
 {
     long timeout = current_tick + HZ*30;
     while (TIME_BEFORE(current_tick, timeout) && (ATA_STATUS & STATUS_BSY)) {
@@ -113,8 +113,8 @@ static int wait_for_bsy(void)
         return 0; /* timeout */
 }
 
-static int wait_for_rdy(void) ICODE_ATTR;
-static int wait_for_rdy(void)
+STATICIRAM int wait_for_rdy(void) ICODE_ATTR;
+STATICIRAM int wait_for_rdy(void)
 {
     long timeout;
 
@@ -135,8 +135,8 @@ static int wait_for_rdy(void)
         return 0; /* timeout */
 }
 
-static int wait_for_start_of_transfer(void) ICODE_ATTR;
-static int wait_for_start_of_transfer(void)
+STATICIRAM int wait_for_start_of_transfer(void) ICODE_ATTR;
+STATICIRAM int wait_for_start_of_transfer(void)
 {
     if (!wait_for_bsy())
         return 0;
@@ -144,8 +144,8 @@ static int wait_for_start_of_transfer(void)
     return (ATA_ALT_STATUS & (STATUS_BSY|STATUS_DRQ)) == STATUS_DRQ;
 }
 
-static int wait_for_end_of_transfer(void) ICODE_ATTR;
-static int wait_for_end_of_transfer(void)
+STATICIRAM int wait_for_end_of_transfer(void) ICODE_ATTR;
+STATICIRAM int wait_for_end_of_transfer(void)
 {
     if (!wait_for_bsy())
         return 0;
@@ -166,8 +166,8 @@ static void ata_led(bool on)
 #endif
 
 #ifndef ATA_OPTIMIZED_READING
-static void copy_read_sectors(unsigned char* buf, int wordcount) ICODE_ATTR;
-static void copy_read_sectors(unsigned char* buf, int wordcount)
+STATICIRAM void copy_read_sectors(unsigned char* buf, int wordcount) ICODE_ATTR;
+STATICIRAM void copy_read_sectors(unsigned char* buf, int wordcount)
 {
     unsigned short tmp = 0;
 
@@ -365,8 +365,9 @@ int ata_read_sectors(IF_MV2(int drive,)
 }
 
 #ifndef ATA_OPTIMIZED_WRITING
-static void copy_write_sectors(const unsigned char* buf, int wordcount) ICODE_ATTR;
-static void copy_write_sectors(const unsigned char* buf, int wordcount)
+STATICIRAM void copy_write_sectors(const unsigned char* buf, int wordcount)
+                                   ICODE_ATTR;
+STATICIRAM void copy_write_sectors(const unsigned char* buf, int wordcount)
 {
     if ( (unsigned long)buf & 1)
     {   /* not 16-bit aligned, copy byte by byte */

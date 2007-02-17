@@ -181,8 +181,9 @@ static bool on_end_file(struct enc_file_event_data *data)
     return true;
 } /* on_end_file */
 
-static void enc_events_callback(enum enc_events event, void *data) ICODE_ATTR;
-static void enc_events_callback(enum enc_events event, void *data)
+STATICIRAM void enc_events_callback(enum enc_events event, void *data)
+                                    ICODE_ATTR;
+STATICIRAM void enc_events_callback(enum enc_events event, void *data)
 {
     if (event == ENC_WRITE_CHUNK)
     {
@@ -208,8 +209,8 @@ static void enc_events_callback(enum enc_events event, void *data)
 } /* enc_events_callback */
 
 /* convert native pcm samples to wav format samples */
-static void chunk_to_wav_format(uint32_t *src, uint32_t *dst) ICODE_ATTR;
-static void chunk_to_wav_format(uint32_t *src, uint32_t *dst)
+STATICIRAM void chunk_to_wav_format(uint32_t *src, uint32_t *dst) ICODE_ATTR;
+STATICIRAM void chunk_to_wav_format(uint32_t *src, uint32_t *dst)
 {
     if (num_channels == 1)
     {

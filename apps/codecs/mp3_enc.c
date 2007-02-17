@@ -2044,8 +2044,8 @@ bool init_mp3_encoder_engine(int sample_rate,
     return true;
 }
 
-static void to_mono_mm(void) ICODE_ATTR;
-static void to_mono_mm(void)
+STATICIRAM void to_mono_mm(void) ICODE_ATTR;
+STATICIRAM void to_mono_mm(void)
 {
     /* |llllllllllllllll|rrrrrrrrrrrrrrrr| =>
      * |mmmmmmmmmmmmmmmm|mmmmmmmmmmmmmmmm|
@@ -2100,8 +2100,9 @@ static inline void byte_swap_frame32(uint32_t *dst, uint32_t *src,
 } /* byte_swap_frame32 */
 #endif /* ROCKBOX_LITTLE_ENDIAN */
 
-static void encode_frame(char *buffer, struct enc_chunk_hdr *chunk) ICODE_ATTR;
-static void encode_frame(char *buffer, struct enc_chunk_hdr *chunk)
+STATICIRAM void encode_frame(char *buffer, struct enc_chunk_hdr *chunk)
+                             ICODE_ATTR;
+STATICIRAM void encode_frame(char *buffer, struct enc_chunk_hdr *chunk)
 {
    int gr, gr_cnt;
    int max, min;
@@ -2382,8 +2383,9 @@ static void on_rec_new_stream(struct enc_buffer_event_data *data)
     }
 } /* on_rec_new_stream */
 
-static void enc_events_callback(enum enc_events event, void *data) ICODE_ATTR;
-static void enc_events_callback(enum enc_events event, void *data)
+STATICIRAM void enc_events_callback(enum enc_events event, void *data)
+                                    ICODE_ATTR;
+STATICIRAM void enc_events_callback(enum enc_events event, void *data)
 {
     if (event == ENC_WRITE_CHUNK)
     {

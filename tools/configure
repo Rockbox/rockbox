@@ -229,7 +229,7 @@ arm7tdmicc () {
  prefixtools arm-elf-
  GCCOPTS="$CCOPTS -mcpu=arm7tdmi"
  if test "X$1" != "Xshort"; then
-   GCCOPTS="$GCCOPTS -ffunction-sections -mlong-calls"
+   GCCOPTS="$GCCOPTS -mlong-calls"
  fi
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
@@ -237,7 +237,7 @@ arm7tdmicc () {
 
 arm9tdmicc () {
  prefixtools arm-elf-
- GCCOPTS="$CCOPTS -mcpu=arm9tdmi -ffunction-sections -mlong-calls"
+ GCCOPTS="$CCOPTS -mcpu=arm9tdmi -mlong-calls"
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
 }

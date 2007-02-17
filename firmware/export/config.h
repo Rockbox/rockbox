@@ -298,11 +298,20 @@
 #if CONFIG_CPU != SH7034
 #define IRAM_STEAL
 #endif
+#if defined(CPU_ARM)
+/* GCC quirk workaround: arm-elf-gcc treats static functions as short_call
+ * when not compiling with -ffunction-sections, even when the function has
+ * a section attribute. */
+#define STATICIRAM
+#else
+#define STATICIRAM static
+#endif
 #else
 #define ICODE_ATTR
 #define ICONST_ATTR
 #define IDATA_ATTR
 #define IBSS_ATTR
+#define STATICIRAM static
 #endif
 
 #ifndef IRAM_LCDFRAMEBUFFER
