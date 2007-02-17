@@ -512,7 +512,7 @@ void W_ReadLump(int lump, void *dest)
    {
       int c;
 
-#if DEBUGCACHE
+#ifdef DEBUGCACHE
       if(gamestate==GS_LEVEL)
          printf("Loading %s\n", lumpinfo[lump].name);
 #endif

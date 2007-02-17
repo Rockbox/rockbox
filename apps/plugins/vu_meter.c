@@ -131,7 +131,7 @@ PLUGIN_HEADER
 
 const struct plugin_api* rb;
 
-#if SIMULATOR && (CONFIG_CODEC != SWCODEC)
+#if defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
 #define mas_codec_readreg(x) rand()%MAX_PEAK
 #endif
 
