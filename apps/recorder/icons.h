@@ -77,6 +77,7 @@ enum icons_6x8 {
     Icon_System_menu,
     Icon_Playback_menu,
     Icon_Display_menu,
+    Icon_Remote_Display_menu,
     Icon_Radio_screen,
     Icon6x8Last,
 };

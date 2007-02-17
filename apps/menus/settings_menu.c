@@ -73,7 +73,6 @@ MENUITEM_SETTING(sort_dir, &global_settings.sort_dir, fileview_callback);
 MENUITEM_SETTING(sort_file, &global_settings.sort_file, fileview_callback);
 MENUITEM_SETTING(dirfilter, &global_settings.dirfilter, NULL);
 MENUITEM_SETTING(browse_current, &global_settings.browse_current, NULL);
-MENUITEM_SETTING(show_icons, &global_settings.show_icons, NULL);
 MENUITEM_SETTING(show_path_in_browser, &global_settings.show_path_in_browser, NULL);
 static int fileview_callback(int action,const struct menu_item_ex *this_item)
 {
@@ -94,7 +93,7 @@ static int fileview_callback(int action,const struct menu_item_ex *this_item)
 
 MAKE_MENU(file_menu, ID2P(LANG_FILE), 0, NOICON,
                 &sort_case, &sort_dir, &sort_file,
-                &dirfilter, &browse_current, &show_icons, &show_path_in_browser,
+                &dirfilter, &browse_current, &show_path_in_browser,
 #ifdef HAVE_TAGCACHE
                 &tagcache_menu
 #endif

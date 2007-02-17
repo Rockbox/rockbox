@@ -560,6 +560,7 @@ int do_menu(const struct menu_item_ex *start_menu)
                         if ((setting->flags&F_BOOL_SETTING) == F_BOOL_SETTING)
                         {
                             bool temp_var, *var;
+                            bool show_icons = global_settings.show_icons;
                             if (setting->flags&F_TEMPVAR)
                             {
                                 temp_var = *(bool*)setting->setting;
@@ -575,6 +576,8 @@ int do_menu(const struct menu_item_ex *start_menu)
                                         setting->bool_setting->option_callback);
                             if (setting->flags&F_TEMPVAR)
                                 *(bool*)setting->setting = temp_var;
+                            if (show_icons != global_settings.show_icons)
+                                init_menu_lists(menu, &lists, 0, true);
                         }
                         else if (setting->flags&F_T_SOUND)
                         {

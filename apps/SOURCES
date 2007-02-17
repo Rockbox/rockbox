@@ -29,7 +29,6 @@ plugin.c
 screens.c
 settings.c
 settings_list.c
-settings_menu.c
 sound_menu.c
 status.c
 cuesheet.c

@@ -24,6 +24,8 @@
 #include "lang.h"
 #include "talk.h"
 #include "lcd.h"
+#include "button.h"
+#include "backlight.h"
 #include "settings.h"
 #include "settings_list.h"
 #include "sound.h"
@@ -33,6 +35,13 @@
 #include "audio.h"
 #include "power.h"
 #include "powermgmt.h"
+#include "kernel.h"
+#include "lcd-remote.h"
+#include "list.h"
+#include "rbunicode.h"
+#ifdef HAVE_LCD_BITMAP
+#include "peakmeter.h"
+#endif
 
 /* some sets of values which are used more than once, to save memory */
 static const char off_on[] = "off,on";
@@ -81,6 +90,27 @@ static const char trig_durations_conf [] =
 #if defined(CONFIG_BACKLIGHT)
 static const char backlight_times_conf [] =
                   "off,on,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90";
+static const int backlight_times[] = 
+            {-1, -1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 45, 60, 90};
+static void backlight_formatter(char *buffer, int buffer_size, 
+        int val, const char *unit)
+{
+    (void)unit;
+    if (val == 0)
+        strcpy(buffer, str(LANG_OFF));
+    else if (val == 1)
+        strcpy(buffer, str(LANG_ON));
+    else 
+        snprintf(buffer, buffer_size, "%d s", backlight_times[val]);
+}
+static long backlight_getlang(int value)
+{
+    if (value == 0)
+        return LANG_OFF;
+    else if (value == 1)
+        return LANG_ON;
+    return TALK_ID(backlight_times[value], UNIT_SEC);
+}
 #endif
 /* ffwd/rewind and scan acceleration stuff */
 static int ff_rewind_min_stepvals[] = {1,2,3,4,5,6,8,10,15,20,25,30,45,60};
@@ -267,6 +297,58 @@ static void set_superbass(bool value)
     sound_set_superbass((int)value);
 }
 #endif
+
+static void scrolldelay_format(char* buffer, int buffer_size, int value,
+    const char* unit)
+{
+    (void)unit;
+    snprintf(buffer, buffer_size, "%d ms", value* (HZ/100));
+}
+static long scrolldelay_getlang(int value)
+{
+    return TALK_ID(value* (HZ/100), UNIT_MS);
+}
+#ifdef HAVE_LCD_CHARCELLS
+static void jumpscroll_format(char* buffer, int buffer_size, int value,
+    const char* unit)
+{
+    (void)unit;
+    switch (value)
+    {
+        case 0:
+            strcpy(buffer, str(LANG_OFF));
+            break;
+        case 1:
+            strcpy(buffer, str(LANG_ONE_TIME));
+            break;
+        case 2:
+        case 3:
+        case 4:
+            snprintf(buffer, buffer_size, "%d", value);
+            break;
+        case 5:
+            strcpy(buffer, str(LANG_ALWAYS));
+            break;
+    }
+}
+static long jumpscroll_getlang(int value)
+{
+    switch (value)
+    {
+        case 0:
+            return LANG_OFF;
+        case 1:
+            return LANG_ONE_TIME;
+        case 2:
+        case 3:
+        case 4:
+            return TALK_ID(2, UNIT_INT);
+        case 5:
+            return LANG_ALWAYS;
+    }
+    return -1;
+}
+#endif /* HAVE_LCD_CHARCELLS */
                     
 const struct settings_list settings[] = {
     /* sound settings */
@@ -321,33 +403,43 @@ const struct settings_list settings[] = {
     ), /* CHOICE_SETTING( repeat_mode ) */
     /* LCD */
 #ifdef HAVE_LCD_CONTRAST
+    /* its easier to leave this one un-macro()ed for the time being */
     {F_T_INT|F_DEF_ISFUNC, &global_settings.contrast, LANG_CONTRAST,
          FUNCTYPE(lcd_default_contrast),
-         "contrast", NULL , UNUSED},
+         "contrast", NULL , {.int_setting = (struct int_setting[]){                
+            { lcd_set_contrast, UNIT_INT, MIN_CONTRAST_SETTING,
+                MAX_CONTRAST_SETTING, 1, NULL, NULL}}}},
 #endif
 #ifdef CONFIG_BACKLIGHT
-    {F_T_INT, &global_settings.backlight_timeout, LANG_BACKLIGHT, INT(6),
-        "backlight timeout",backlight_times_conf , UNUSED},
+    INT_SETTING_W_CFGVALS(0, backlight_timeout, LANG_BACKLIGHT, 6,
+        "backlight timeout", backlight_times_conf, UNIT_SEC,
+        0, 18, 1, backlight_formatter, backlight_getlang, 
+        backlight_set_timeout),
 #ifdef CONFIG_CHARGING
-    {F_T_INT, &global_settings.backlight_timeout_plugged, LANG_BACKLIGHT_ON_WHEN_CHARGING,
-         INT(11), "backlight timeout plugged",backlight_times_conf , UNUSED},
+    INT_SETTING_W_CFGVALS(0, backlight_timeout_plugged, LANG_BACKLIGHT, 11,
+        "backlight timeout plugged", backlight_times_conf, UNIT_SEC,
+        0, 18, 1, backlight_formatter, backlight_getlang, 
+        backlight_set_timeout_plugged),
 #endif
 #endif /* CONFIG_BACKLIGHT */
 #ifdef HAVE_LCD_BITMAP
-    OFFON_SETTING(0,invert, LANG_INVERT, false,"invert", NULL),
+    BOOL_SETTING(0, invert, LANG_INVERT, false ,"invert", off_on,
+        LANG_INVERT_LCD_INVERSE, LANG_INVERT_LCD_NORMAL, lcd_set_invert_display),
     OFFON_SETTING(0,flip_display, LANG_FLIP_DISPLAY, false,"flip display", NULL),
     /* display */
-    OFFON_SETTING(0,invert_cursor, LANG_INVERT_CURSOR,
-        true,"invert cursor", NULL),
+    BOOL_SETTING(F_TEMPVAR, invert_cursor, LANG_INVERT_CURSOR, true ,"invert cursor", off_on,
+        LANG_INVERT_CURSOR_BAR, LANG_INVERT_CURSOR_POINTER, lcd_set_invert_display),
     OFFON_SETTING(F_THEMESETTING,statusbar, LANG_STATUS_BAR, true,"statusbar", NULL),
     OFFON_SETTING(0,scrollbar, LANG_SCROLL_BAR, true,"scrollbar", NULL),
 #if CONFIG_KEYPAD == RECORDER_PAD
     OFFON_SETTING(0,buttonbar, LANG_BUTTON_BAR ,true,"buttonbar", NULL),
 #endif
-    {F_T_INT,&global_settings.volume_type,LANG_VOLUME_DISPLAY, INT(0),
-        "volume display",graphic_numeric,UNUSED},
-    {F_T_INT,&global_settings.battery_display, LANG_BATTERY_DISPLAY, INT(0),
-        "battery display",graphic_numeric,UNUSED},
+    CHOICE_SETTING(0, volume_type, LANG_VOLUME_DISPLAY, 0,
+        "volume display", graphic_numeric, NULL, 2,
+        ID2P(LANG_DISPLAY_GRAPHIC), ID2P(LANG_DISPLAY_NUMERIC)),
+    CHOICE_SETTING(0, battery_display, LANG_BATTERY_DISPLAY, 0,
+        "battery display", graphic_numeric, NULL, 2,
+        ID2P(LANG_DISPLAY_GRAPHIC), ID2P(LANG_DISPLAY_NUMERIC)),
     CHOICE_SETTING(0, timeformat, LANG_TIMEFORMAT, 0,
         "time format", "24hour,12hour", NULL, 2,
         ID2P(LANG_24_HOUR_CLOCK), ID2P(LANG_12_HOUR_CLOCK)),
@@ -400,19 +492,22 @@ const struct settings_list settings[] = {
 #endif
 #ifdef HAVE_REMOTE_LCD
     /* remote lcd */
-    {F_T_INT,&global_settings.remote_contrast, LANG_CONTRAST, 
-        INT(DEFAULT_REMOTE_CONTRAST_SETTING),
-        "remote contrast",NULL,UNUSED},
-    OFFON_SETTING(0,remote_invert, LANG_INVERT,
-        false,"remote invert", NULL),
+    INT_SETTING(0, remote_contrast, LANG_CONTRAST, DEFAULT_REMOTE_CONTRAST_SETTING,
+        "remote contrast", UNIT_INT, MIN_REMOTE_CONTRAST_SETTING, 
+        MIN_REMOTE_CONTRAST_SETTING, 1, NULL, NULL, lcd_remote_set_contrast),
+    BOOL_SETTING(0, remote_invert, LANG_INVERT, false ,"remote invert", off_on,
+        LANG_INVERT_LCD_INVERSE, LANG_INVERT_LCD_NORMAL, lcd_remote_set_invert_display),
     OFFON_SETTING(0,remote_flip_display, LANG_FLIP_DISPLAY,
         false,"remote flip display", NULL),
-    {F_T_INT,&global_settings.remote_backlight_timeout, LANG_BACKLIGHT, INT(6),
-        "remote backlight timeout",backlight_times_conf,UNUSED},
+    INT_SETTING_W_CFGVALS(0, remote_backlight_timeout, LANG_BACKLIGHT, 6,
+        "remote backlight timeout", backlight_times_conf, UNIT_SEC,
+        0, 18, 1, backlight_formatter, backlight_getlang, 
+        remote_backlight_set_timeout),
 #ifdef CONFIG_CHARGING
-    {F_T_INT,&global_settings.remote_backlight_timeout_plugged,
-        LANG_BACKLIGHT_ON_WHEN_CHARGING, INT(11),
-        "remote backlight timeout plugged",backlight_times_conf,UNUSED},
+    INT_SETTING_W_CFGVALS(0, remote_backlight_timeout_plugged, LANG_BACKLIGHT, 11,
+        "remote backlight timeout plugged", backlight_times_conf, UNIT_SEC,
+        0, 18, 1, backlight_formatter, backlight_getlang, 
+        remote_backlight_set_timeout_plugged),
 #endif
 #ifdef HAVE_REMOTE_LCD_TICKING
     OFFON_SETTING(0,remote_reduce_ticking, LANG_REDUCE_TICKING,
@@ -442,43 +537,53 @@ const struct settings_list settings[] = {
 #endif
 #endif /* CONFIG_BACKLIGHT */
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
-    {F_T_INT,&global_settings.brightness,LANG_BRIGHTNESS,
-        INT(DEFAULT_BRIGHTNESS_SETTING), "brightness", NULL ,UNUSED},
+    INT_SETTING(0, brightness, LANG_BRIGHTNESS, DEFAULT_BRIGHTNESS_SETTING,
+        "brightness",UNIT_INT, MIN_BRIGHTNESS_SETTING, MAX_BRIGHTNESS_SETTING, 1,
+        NULL, NULL, backlight_set_brightness),
 #endif
-#ifdef HAVE_BACKLIGHT_PWM_FADING
+#if defined(HAVE_BACKLIGHT_PWM_FADING)  && !defined(SIMULATOR)
     /* backlight fading */
-    {F_T_INT,&global_settings.backlight_fade_in, LANG_BACKLIGHT_FADE_IN, INT(1),
-        "backlight fade in","off,500ms,1s,2s",UNUSED},
-    {F_T_INT,&global_settings.backlight_fade_out, LANG_BACKLIGHT_FADE_OUT, INT(1),
-        "backlight fade out","off,500ms,1s,2s,3s,4s,5s,10s",UNUSED},
+    STRINGCHOICE_SETTING(0,backlight_fade_in, LANG_BACKLIGHT_FADE_IN, 1,
+        "backlight fade in","off,500ms,1s,2s", backlight_set_fade_in, 4,
+        LANG_OFF, TALK_ID(500, UNIT_MS), 
+        TALK_ID(1, UNIT_SEC), TALK_ID(2, UNIT_SEC)),
+    STRINGCHOICE_SETTING(0,backlight_fade_out, LANG_BACKLIGHT_FADE_OUT, 1,
+        "backlight fade out","off,500ms,1s,2s", backlight_set_fade_out, 4,
+        LANG_OFF, TALK_ID(500, UNIT_MS), 
+        TALK_ID(1, UNIT_SEC), TALK_ID(2, UNIT_SEC)),
 #endif
-    {F_T_INT,&global_settings.scroll_speed, LANG_SCROLL_SPEED ,
-        INT(9),"scroll speed",NULL,UNUSED},
-    {F_T_INT,&global_settings.scroll_delay, LANG_SCROLL_DELAY, 
-        INT(100),"scroll delay",NULL,UNUSED},
-    {F_T_INT,&global_settings.bidir_limit, LANG_BIDIR_SCROLL, 
-        INT(50),"bidir limit",NULL,UNUSED},
+    INT_SETTING(0, scroll_speed, LANG_SCROLL_SPEED, 9,"scroll speed",                      
+                UNIT_INT, 0, 15, 1, NULL, NULL, lcd_scroll_speed),
+    INT_SETTING(0, scroll_delay, LANG_SCROLL_DELAY, 100, "scroll delay",                      
+                UNIT_MS, 0, 2500, 100, scrolldelay_format,
+                scrolldelay_getlang, lcd_scroll_delay) ,
+    INT_SETTING(0, bidir_limit, LANG_BIDIR_SCROLL, 50, "bidir limit",                      
+                UNIT_PERCENT, 0, 200, 25, NULL, NULL, lcd_bidir_scroll),
 #ifdef HAVE_REMOTE_LCD
-    {F_T_INT,&global_settings.remote_scroll_speed,LANG_SCROLL_SPEED,INT(9),
-        "remote scroll speed",NULL,UNUSED},
-    {F_T_INT,&global_settings.remote_scroll_step,LANG_SCROLL_STEP,INT(6),
-        "remote scroll step",NULL,UNUSED},
-    {F_T_INT,&global_settings.remote_scroll_delay,LANG_SCROLL_DELAY,INT(100),
-        "remote scroll delay",NULL,UNUSED},
-    {F_T_INT,&global_settings.remote_bidir_limit,LANG_BIDIR_SCROLL,INT(50),
-        "remote bidir limit",NULL,UNUSED},
+    INT_SETTING(0, remote_scroll_speed, LANG_SCROLL_SPEED, 9, "remote scroll speed",                      
+                UNIT_INT, 0,15, 1, NULL, NULL, lcd_remote_scroll_speed),
+    INT_SETTING(0, remote_scroll_step, LANG_SCROLL_STEP, 6, "remote scroll step",                      
+                UNIT_PIXEL, 1, LCD_REMOTE_WIDTH, 1, NULL, NULL, lcd_remote_scroll_step),
+    INT_SETTING(0, remote_scroll_delay, LANG_SCROLL_DELAY, 100, "remote scroll delay",                      
+                UNIT_MS, 0, 2500, 100, scrolldelay_format, scrolldelay_getlang, lcd_remote_scroll_delay),
+    INT_SETTING(0, remote_bidir_limit, LANG_BIDIR_SCROLL, 50, "remote bidir limit",                      
+                UNIT_PERCENT, 0, 200, 25, NULL, NULL, lcd_remote_bidir_scroll),
 #endif
 #ifdef HAVE_LCD_BITMAP
-    OFFON_SETTING(0,offset_out_of_view,LANG_SCREEN_SCROLL_VIEW,
-        false,"Screen Scrolls Out Of View",NULL),
-    {F_T_INT,&global_settings.scroll_step,LANG_SCROLL_STEP,INT(6),"scroll step",NULL,UNUSED},
-    {F_T_INT,&global_settings.screen_scroll_step,LANG_SCREEN_SCROLL_STEP,
-        INT(16),"screen scroll step",NULL,UNUSED},
+    OFFON_SETTING(0, offset_out_of_view, LANG_SCREEN_SCROLL_VIEW,
+                    false, "Screen Scrolls Out Of View", NULL),
+    INT_SETTING(0, scroll_step, LANG_SCROLL_STEP, 6, "scroll step",                      
+                    UNIT_PIXEL, 1, LCD_WIDTH, 1, NULL, NULL, lcd_scroll_step),
+    INT_SETTING(0, screen_scroll_step, LANG_SCREEN_SCROLL_STEP,
+                    16, "screen scroll step",                      
+                    UNIT_PIXEL, 1, LCD_WIDTH, 1, NULL, NULL, NULL),
 #endif /* HAVE_LCD_BITMAP */
 #ifdef HAVE_LCD_CHARCELLS
-    {F_T_INT,&global_settings.jump_scroll,LANG_JUMP_SCROLL,INT(0),"jump scroll",NULL,UNUSED},
-    {F_T_INT,&global_settings.jump_scroll_delay,LANG_JUMP_SCROLL_DELAY,
-        INT(50),"jump scroll delay",NULL,UNUSED},
+    INT_SETTING(0, jump_scroll, LANG_JUMP_SCROLL, 0, "jump scroll",                      
+                    UNIT_INT, 0, 5, 1, jumpscroll_format, jumpscroll_getlang, lcd_jump_scroll),
+    INT_SETTING(0, jump_scroll_delay, LANG_JUMP_SCROLL_DELAY, 50, "jump scroll delay",                      
+                    UNIT_MS, 0, 2500, 100, scrolldelay_format,
+                    scrolldelay_getlang, lcd_jump_scroll_delay),
 #endif
     OFFON_SETTING(0,scroll_paginated,LANG_SCROLL_PAGINATED,
         false,"scroll paginated",NULL),
@@ -552,15 +657,24 @@ const struct settings_list settings[] = {
         ID2P(LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY)),
 #ifdef HAVE_LCD_BITMAP
     /* peak meter */
-    {F_T_INT, &global_settings.peak_meter_clip_hold, LANG_PM_CLIP_HOLD,
-        INT(16), "peak meter clip hold",
+    STRINGCHOICE_SETTING(0, peak_meter_clip_hold, LANG_PM_CLIP_HOLD, 16,
+        "peak meter clip hold",
         "on,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90,2min"
-        ",3min,5min,10min,20min,45min,90min", UNUSED},
+        ",3min,5min,10min,20min,45min,90min", peak_meter_set_clip_hold,
+        25, LANG_PM_ETERNAL,
+        TALK_ID(1, UNIT_SEC), TALK_ID(2, UNIT_SEC), TALK_ID(3, UNIT_SEC), 
+        TALK_ID(4, UNIT_SEC), TALK_ID(5, UNIT_SEC), TALK_ID(6, UNIT_SEC), 
+        TALK_ID(7, UNIT_SEC), TALK_ID(8, UNIT_SEC), TALK_ID(9, UNIT_SEC), 
+        TALK_ID(10, UNIT_SEC), TALK_ID(15, UNIT_SEC), TALK_ID(20, UNIT_SEC), 
+        TALK_ID(25, UNIT_SEC), TALK_ID(30, UNIT_SEC), TALK_ID(45, UNIT_SEC), 
+        TALK_ID(60, UNIT_SEC), TALK_ID(90, UNIT_SEC), TALK_ID(2, UNIT_MIN), 
+        TALK_ID(3, UNIT_MIN), TALK_ID(5, UNIT_MIN), TALK_ID(10, UNIT_MIN), 
+        TALK_ID(20, UNIT_MIN), TALK_ID(45, UNIT_MIN), TALK_ID(90, UNIT_MIN)),
     {F_T_INT,&global_settings.peak_meter_hold, LANG_PM_PEAK_HOLD, 
         INT(3),"peak meter hold",
         "off,200ms,300ms,500ms,1,2,3,4,5,6,7,8,9,10,15,20,30,1min",UNUSED},
-    {F_T_INT,&global_settings.peak_meter_release,LANG_PM_RELEASE, 
-        INT(8),"peak meter release",NULL,UNUSED},
+    INT_SETTING(0, peak_meter_release, LANG_PM_RELEASE, 8, "peak meter release",                      
+                    LANG_PM_UNITS_PER_READ, 1, 0x7e1, 1, NULL, NULL,NULL), 
     OFFON_SETTING(0,peak_meter_dbfs,LANG_PM_DBFS,true,"peak meter dbfs",NULL),
     {F_T_INT,&global_settings.peak_meter_min,LANG_PM_MIN,INT(60),"peak meter min",NULL,UNUSED},
     {F_T_INT,&global_settings.peak_meter_max,LANG_PM_MAX,INT(0),"peak meter max",NULL,UNUSED},
@@ -794,11 +908,18 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0,tagcache_autoupdate,
         LANG_TAGCACHE_AUTOUPDATE,false,"tagcache_autoupdate",NULL),
 #endif
-
-    {F_T_INT,&global_settings.default_codepage,LANG_DEFAULT_CODEPAGE,
-        INT(0),"default codepage",
+    CHOICE_SETTING(0, default_codepage, LANG_DEFAULT_CODEPAGE, 0,
+        "default codepage",
         "iso8859-1,iso8859-7,iso8859-8,cp1251,iso8859-11,cp1256,"
-        "iso8859-9,iso8859-2,sjis,gb2312,ksx1001,big5,utf-8,cp1256",UNUSED},
+        "iso8859-9,iso8859-2,sjis,gb2312,ksx1001,big5,utf-8,cp1256",
+        set_codepage, 13,
+        ID2P(LANG_CODEPAGE_LATIN1), ID2P(LANG_CODEPAGE_GREEK),
+        ID2P(LANG_CODEPAGE_HEBREW), ID2P(LANG_CODEPAGE_CYRILLIC),
+        ID2P(LANG_CODEPAGE_THAI), ID2P(LANG_CODEPAGE_ARABIC),
+        ID2P(LANG_CODEPAGE_TURKISH), ID2P(LANG_CODEPAGE_LATIN_EXTENDED),
+        ID2P(LANG_CODEPAGE_JAPANESE), ID2P(LANG_CODEPAGE_SIMPLIFIED),
+        ID2P(LANG_CODEPAGE_KOREAN),
+        ID2P(LANG_CODEPAGE_TRADITIONAL), ID2P(LANG_CODEPAGE_UTF8)),
 
     OFFON_SETTING(0,warnon_erase_dynplaylist,
         LANG_WARN_ERASEDYNPLAYLIST_MENU,false,
@@ -806,15 +927,20 @@ const struct settings_list settings[] = {
 
 #ifdef CONFIG_BACKLIGHT
 #ifdef HAS_BUTTON_HOLD
-    {F_T_INT,&global_settings.backlight_on_button_hold,LANG_BACKLIGHT_ON_BUTTON_HOLD,INT(0),
-        "backlight on button hold","normal,off,on",UNUSED},
+    CHOICE_SETTING(0, backlight_on_button_hold,
+        LANG_BACKLIGHT_ON_BUTTON_HOLD, 0, "backlight on button hold",
+        "normal,off,on", backlight_set_on_button_hold, 3,
+        ID2P(LANG_BACKLIGHT_ON_BUTTON_HOLD_NORMAL), ID2P(LANG_OFF), ID2P(LANG_ON)),
 #endif
 
 #ifdef HAVE_LCD_SLEEP
-    {F_T_INT,&global_settings.lcd_sleep_after_backlight_off,
-        LANG_LCD_SLEEP_AFTER_BACKLIGHT_OFF,INT(3),
+    STRINGCHOICE_SETTING(0, lcd_sleep_after_backlight_off,
+        LANG_LCD_SLEEP_AFTER_BACKLIGHT_OFF, 3,
         "lcd sleep after backlight off",
-        "always,never,5,10,15,20,30,45,60,90",UNUSED},
+        "always,never,5,10,15,20,30,45,60,90", lcd_set_sleep_after_backlight_off,
+        10, LANG_ALWAYS, LANG_NEVER, TALK_ID(5, UNIT_SEC), TALK_ID(10, UNIT_SEC),
+        TALK_ID(15, UNIT_SEC), TALK_ID(20, UNIT_SEC), TALK_ID(30, UNIT_SEC),
+        TALK_ID(45, UNIT_SEC),TALK_ID(60, UNIT_SEC), TALK_ID(90, UNIT_SEC)),
 #endif
 #endif /* CONFIG_BACKLIGHT */
 
@@ -880,9 +1006,10 @@ const struct settings_list settings[] = {
 
 #ifdef HAVE_REMOTE_LCD
 #ifdef HAS_REMOTE_BUTTON_HOLD
-    {F_T_INT,&global_settings.remote_backlight_on_button_hold,
-        LANG_BACKLIGHT_ON_BUTTON_HOLD,INT(0),
-        "remote backlight on button hold","normal,off,on",UNUSED},
+    CHOICE_SETTING(0, remote_backlight_on_button_hold,
+        LANG_BACKLIGHT_ON_BUTTON_HOLD, 0, "remote backlight on button hold",
+        "normal,off,on", remote_backlight_set_on_button_hold, 3,
+        ID2P(LANG_BACKLIGHT_ON_BUTTON_HOLD_NORMAL), ID2P(LANG_OFF), ID2P(LANG_ON)),
 #endif
 #endif
 #ifdef HAVE_HEADPHONE_DETECTION
