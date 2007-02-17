@@ -228,7 +228,6 @@ enum { sci_fac, sci_pi   , sci_sci , sci_sin   , sci_asin   ,
        sci_0  , sci_sign , sci_dot , sci_log   , sci_xy
      };
 
-#define PI 3.14159265358979323846
 #define MINIMUM 0.000000000001   /* e-12 */
               /*  ^   ^    ^    ^       */
               /*  123456789abcdef       */
@@ -505,7 +504,7 @@ double mySqrt(double square)
 ----------------------------------------------------------------------- */
 void transcendFunc(char* func, double* tt, int* ttPower)
 {
-    double t = (*tt)*PI/180; int tPower = *ttPower;
+    double t = (*tt)*M_PI/180; int tPower = *ttPower;
     int sign = 1;
     int n = 50; /* n <=50, tables are all <= 50 */
     int j;
@@ -539,15 +538,15 @@ void transcendFunc(char* func, double* tt, int* ttPower)
         tPower++;
     }
     j = 0;
-    while (t > j*2*PI) {j++;}
-    t -= (j-1)*2*PI;
-    if (PI/2 < t && t < 3*PI/2){
-        t = PI - t;
+    while (t > j*M_TWOPI) {j++;}
+    t -= (j-1)*M_TWOPI;
+    if (M_PI_2 < t && t < 3*M_PI_2){
+        t = M_PI - t;
         if (func[0] =='c' || func[0] =='C')
             sign = -1;
     }
-    else if ( 3*PI/2 <= t && t <= 2*PI)
-        t -= 2*PI;
+    else if ( 3*M_PI_2 <= t && t <= M_TWOPI)
+        t -= M_TWOPI;
 
     x = 0.60725293500888;  y = 0;  z = t;
     for (j=1;j<n+2;j++){
@@ -1309,7 +1308,7 @@ void sciButtonsProcess(void){
             switch( CAL_BUTTON ){
 
                 case sci_pi:
-                    result = PI;  power = 0;
+                    result = M_PI;  power = 0;
                     calStatus = cal_normal;
                     break;
 
