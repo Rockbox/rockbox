@@ -11,8 +11,13 @@
 
 
 CXX=$(shell $(PREFIX)wx-config --cxx)
-OBJS=rbutil.o rbutilApp.o rbutilFrm.o wizard_pages.o installlog.o
+INC = 
+OBJS=rbutil.o rbutilApp.o rbutilFrm.o wizard_pages.o bootloaders.o installlog.o ipodpatcher/ipodpatcher.o ipodpatcher/ipodio-posix.o fwpatcher/md5.o fwpatcher/iriver.o
 
+# Install into /usr/local by default
+ifndef DESTDIR
+  DESTDIR=/usr/local
+endif
 
 # type "make WIN=1" for a Windows build using the Debian mingw cross-compiler
 ifdef WIN
@@ -27,7 +32,10 @@ endif
 all: rbutil$(EXT)
 
 .cpp.o :
-	$(CXX) -c `$(PREFIX)wx-config --cxxflags` -o $@ $<
+	$(CXX) $(INC) -c `$(PREFIX)wx-config --cxxflags` -o $@ $<
+
+.c.o :
+	$(CC) $(INC) -c `$(PREFIX)wx-config --cxxflags` -o $@ $<
 
 rbutil-rc.o: rbutil-rc.rc
 	$(WINDRES) `$(PREFIX)wx-config --cxxflags` -O coff -F pe-i386 -o $@ $<
@@ -38,3 +46,6 @@ rbutil$(EXT): $(OBJS)
 .PHONY: clean
 clean:
 	rm -f rbutil rbutil.exe $(OBJS) *~
+
+.PHONY: install
+	install -D rbutil$(EXT) $(DESTDIR)/bin/rbutil$(EXT)
