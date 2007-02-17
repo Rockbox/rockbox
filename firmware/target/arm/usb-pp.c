@@ -85,6 +85,9 @@ void usb_init_device(void)
     outl(inl(0x70000028) | 0x2, 0x70000028);
 
     udelay(0x186A0);
+
+
+    dr_controller_setup();
 }
 
 void usb_enable(bool on)
@@ -138,9 +141,11 @@ bool usb_detect(void)
 
     usbstatus1 = (UDC_OTGSC & 0x800) ? true : false;
     if ((usbstatus1 == true) && (prev_usbstatus1 == false)) {
-        dr_controller_setup();
         dr_controller_run();
+    } else if ((usbstatus1 == false) && (prev_usbstatus1 == true)) {
+        dr_controller_stop();
     }
+
     prev_usbstatus1 = usbstatus1;
     usbstatus2 = (UDC_PORTSC1 & PORTSCX_CURRENT_CONNECT_STATUS) ? true : false;
 
