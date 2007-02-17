@@ -107,7 +107,7 @@ gray_show(false);
 gray_release();
 #endif 
 
-#if CODEC == SWCODEC && !defined SIMULATOR
+#if CONFIG_CODEC == SWCODEC && !defined SIMULATOR
     rb->pcm_play_stop();
 #endif
 
