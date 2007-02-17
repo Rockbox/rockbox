@@ -151,7 +151,8 @@ typedef void lcd_fastpixelfunc_type(fb_data *address);
 
 #ifdef HAVE_LCD_BITMAP
 
-#if defined(HAVE_LCD_COLOR) && LCD_REMOTE_DEPTH > 1
+#if defined(HAVE_LCD_COLOR) && defined(LCD_REMOTE_DEPTH) && \
+ LCD_REMOTE_DEPTH > 1
 /* Just return color for screens use */
 static inline unsigned lcd_color_to_native(unsigned color)
     { return color; }

@@ -20,6 +20,10 @@
 #ifndef PCM_SAMPR_H
 #define PCM_SAMPR_H
 
+#ifndef HW_SAMPR_CAPS
+#define HW_SAMPR_CAPS 0 /* if not defined, we define to 0 */
+#endif
+
 /* These must be macros for comparison with SAMPR_CAP_* flags by the
    preprocessor. Add samplerate index in descending order renumbering
    the ones later in the list if any */

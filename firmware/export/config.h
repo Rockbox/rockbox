@@ -77,6 +77,7 @@
 #define BATT_LPCS355385 1550 /* iriver h10 20Gb - SKC LPCS355385 */
 #define BATT_BP009       820 /* iriver H10 5/6Gb - iriver BP009 */
 #define BATT_LIION830    830 /* Toshiba Gigabeat Fxx and Xxx series MK11-2740 */
+#define BATT_1AA         333 /* iRiver iFP: Alkaline, NiHM */
 
 /* CONFIG_CHARGING */
 #define CHARGING_SIMPLE  1 /* Simple, hardware controlled charging */
@@ -217,7 +218,7 @@
 
 /* Enable the directory cache and tagcache in RAM if we have
  * plenty of RAM. Both features can be enabled independently. */
-#if (MEMORYSIZE > 8 || MEM > 8) && !defined(BOOTLOADER)
+#if defined(MEMORYSIZE) && (MEMORYSIZE > 8 || MEM > 8) && !defined(BOOTLOADER)
 #define HAVE_DIRCACHE
 #ifdef HAVE_TAGCACHE
 #define HAVE_TC_RAMCACHE
