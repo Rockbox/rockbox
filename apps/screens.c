@@ -1318,13 +1318,18 @@ bool view_runtime(void)
 
 #if defined(HAVE_LCD_BITMAP)
     FOR_NB_SCREENS(i)
-        screens[i].setmargins(0, 0);
+    {
+        if(global_settings.statusbar)
+            screens[i].setmargins(0, STATUSBAR_HEIGHT);
+        else
+            screens[i].setmargins(0, 0);
+    }
 #endif
     while(!done)
     {
         int y[NB_SCREENS]={0};
         int t;
-        
+
         FOR_NB_SCREENS(i)
         {
             screens[i].clear_display();
