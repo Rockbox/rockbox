@@ -96,7 +96,7 @@ void usb_enable(bool on)
        handling, which should be the same for all PortalPlayer targets. */
     if (on)
     {
-#if IPOD_ARCH || defined(IRIVER_H10) || defined (IRIVER_H10_5GB)
+#if defined(IPOD_ARCH) || defined(IRIVER_H10) || defined (IRIVER_H10_5GB)
         /* For the H10 and iPod, we can only do one thing with USB mode - reboot
            into the flash-based disk-mode.  This does not return. */
        

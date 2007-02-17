@@ -93,7 +93,7 @@ struct screen
     void (*transparent_bitmap_part)(const fb_data *src, int src_x, int src_y,
                                     int stride, int x, int y, int width, int height);
     void (*set_drawmode)(int mode);
-#if defined(HAVE_LCD_COLOR) && LCD_REMOTE_DEPTH > 1
+#if defined(HAVE_LCD_COLOR) && defined(LCD_REMOTE_DEPTH) && LCD_REMOTE_DEPTH > 1
     unsigned (*color_to_native)(unsigned color);
 #endif
 #if (LCD_DEPTH > 1) || (LCD_REMOTE_DEPTH > 1)

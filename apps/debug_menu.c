@@ -944,9 +944,6 @@ static bool dbg_spdif(void)
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #   define DEBUG_CANCEL  BUTTON_MENU
 
-#elif CONFIG_KEYPAD == GMINI100_PAD
-#   define DEBUG_CANCEL  BUTTON_OFF
-
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || \
     (CONFIG_KEYPAD == IPOD_4G_PAD)
 #   define DEBUG_CANCEL  BUTTON_MENU

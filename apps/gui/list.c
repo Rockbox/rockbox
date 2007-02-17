@@ -812,7 +812,7 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists,
             gui_synclist_draw(lists);
             yield();
             return ACTION_STD_PREV;
-#if (REMOTE_BUTTON != 0 )
+#ifdef REMOTE_BUTTON
         case ACTION_LISTTREE_RC_PGUP:
             gui_synclist_select_previous_page(lists, SCREEN_REMOTE);
             gui_synclist_draw(lists);

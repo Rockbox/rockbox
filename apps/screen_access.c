@@ -140,7 +140,7 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->transparent_bitmap=&lcd_bitmap_transparent;
             screen->transparent_bitmap_part=&lcd_bitmap_transparent_part;
 #endif
-#if defined(HAVE_LCD_COLOR) && LCD_REMOTE_DEPTH > 1
+#if defined(HAVE_LCD_COLOR) && defined(LCD_REMOTE_DEPTH) && LCD_REMOTE_DEPTH > 1
             screen->color_to_native=&lcd_color_to_native;
 #endif
             screen->get_background=&lcd_get_background;

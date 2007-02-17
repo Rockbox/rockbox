@@ -16,10 +16,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
+
 #include <inttypes.h>
 #include <string.h>
 #include <sound.h>
-#include "config.h"
 #include "dsp.h"
 #include "eq.h"
 #include "kernel.h"

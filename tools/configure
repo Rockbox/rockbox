@@ -9,7 +9,7 @@
 #
 
 # global CC options for all platforms
-CCOPTS="-W -Wall -O -nostdlib -ffreestanding -Wstrict-prototypes"
+CCOPTS="-W -Wall -Wundef -O -nostdlib -ffreestanding -Wstrict-prototypes"
 
 use_logf="#undef ROCKBOX_HAS_LOGF"
 use_simsound="#undef ROCKBOX_HAS_SIMSOUND"
