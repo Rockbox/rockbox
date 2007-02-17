@@ -218,7 +218,8 @@
 
 /* Enable the directory cache and tagcache in RAM if we have
  * plenty of RAM. Both features can be enabled independently. */
-#if defined(MEMORYSIZE) && (MEMORYSIZE > 8 || MEM > 8) && !defined(BOOTLOADER)
+#if (!defined(MEMORYSIZE) || (MEMORYSIZE > 8) || (MEM > 8)) && \
+ !defined(BOOTLOADER)
 #define HAVE_DIRCACHE
 #ifdef HAVE_TAGCACHE
 #define HAVE_TC_RAMCACHE
