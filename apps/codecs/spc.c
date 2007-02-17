@@ -92,7 +92,7 @@ static inline void set_le16( void* p, unsigned n )
 #define GET_LE16( addr )        get_le16( addr )
 #define SET_LE16( addr, data )  set_le16( addr, data )
 
-#if ROCKBOX_LITTLE_ENDIAN
+#ifdef ROCKBOX_LITTLE_ENDIAN
     #define GET_LE16A( addr )       (*(uint16_t*) (addr))
     #define GET_LE16SA( addr )      (*( int16_t*) (addr))
     #define SET_LE16A( addr, data ) (void) (*(uint16_t*) (addr) = (data))

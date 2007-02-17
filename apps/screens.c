@@ -663,7 +663,7 @@ bool quick_screen_quick(int button_enter)
         [REPEAT_ALL]={ STR(LANG_SYSFONT_REPEAT_ALL) },
         [REPEAT_ONE]={ STR(LANG_SYSFONT_REPEAT_ONE) },
         [REPEAT_SHUFFLE]={ STR(LANG_SYSFONT_SHUFFLE) },
-#if (AB_REPEAT_ENABLE == 1)
+#ifdef AB_REPEAT_ENABLE
         [REPEAT_AB]={ STR(LANG_SYSFONT_REPEAT_AB) }
 #endif
     };

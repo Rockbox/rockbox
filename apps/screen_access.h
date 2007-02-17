@@ -96,7 +96,7 @@ struct screen
 #if defined(HAVE_LCD_COLOR) && defined(LCD_REMOTE_DEPTH) && LCD_REMOTE_DEPTH > 1
     unsigned (*color_to_native)(unsigned color);
 #endif
-#if (LCD_DEPTH > 1) || (LCD_REMOTE_DEPTH > 1)
+#if (LCD_DEPTH > 1) || (defined(LCD_REMOTE_DEPTH) && (LCD_REMOTE_DEPTH > 1))
     unsigned (*get_background)(void);
     unsigned (*get_foreground)(void);
     void (*set_background)(unsigned background);

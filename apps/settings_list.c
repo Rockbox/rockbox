@@ -387,17 +387,17 @@ const struct settings_list settings[] = {
     SYSTEM_SETTING(NVRAM(4),resume_seed,-1),
     CHOICE_SETTING(0, repeat_mode, LANG_REPEAT, REPEAT_ALL, "repeat",
          "off,all,one,shuffle"
-#if (AB_REPEAT_ENABLE == 1)
+#ifdef AB_REPEAT_ENABLE
          ",ab"
 #endif
         , NULL,
-#if (AB_REPEAT_ENABLE == 1)
+#ifdef AB_REPEAT_ENABLE
         5,
 #else
         4,
 #endif
         ID2P(LANG_OFF), ID2P(LANG_REPEAT_ALL), ID2P(LANG_REPEAT_ONE), ID2P(LANG_SHUFFLE)
-#if (AB_REPEAT_ENABLE == 1) 	 
+#ifdef AB_REPEAT_ENABLE
         ,ID2P(LANG_REPEAT_AB)
 #endif
     ), /* CHOICE_SETTING( repeat_mode ) */
