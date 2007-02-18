@@ -387,7 +387,7 @@ static struct spbasekey compatkeys[] = {
   {TRKS(SK_Alt_R),     SPK_SYMBOLSHIFT,   SKE}, 
   {TRKS(SK_Meta_L),    SPK_SYMBOLSHIFT,   SKE},
   {TRKS(SK_Meta_R),    SPK_SYMBOLSHIFT,   SKE}, 
-#if TRUEKOMPAT                  
+#ifdef TRUEKOMPAT                  
   {TRKS(SK_Control_L), SPK_EXTRA,         SKE}, /* caps shift + symbol shift */
   {TRKS(SK_Control_R), SPK_EXTRA,         SKE},
 #endif                      
@@ -644,7 +644,7 @@ void init_basekeys(void)
     
   case 2:
     if(spkb_trueshift == -1) spkb_trueshift = 0;
-#if TRUEKOMPAT
+#ifdef TRUEKOMPAT
     if(spkb_funcshift == -1) spkb_funcshift = 0;
 #endif
 
