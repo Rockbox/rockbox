@@ -23,6 +23,8 @@
 #define LCD_HEIGHT 64
 #define LCD_DEPTH  1
 
+#define LCD_PIXELFORMAT VERTICAL_PACKING
+
 /* define this if you have the Recorder's 10-key keyboard */
 #define CONFIG_KEYPAD RECORDER_PAD
 
