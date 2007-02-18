@@ -123,7 +123,7 @@ const struct filetype filetypes[] = {
 #if LCD_DEPTH > 1
     { "bmp", TREE_ATTR_BMP, Icon_Wps, VOICE_EXT_WPS },
 #endif
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
     { "fmr", TREE_ATTR_FMR, Icon_Preset, LANG_FMR },
 #endif
     { "lng", TREE_ATTR_LNG, Icon_Language, LANG_LANGUAGE },

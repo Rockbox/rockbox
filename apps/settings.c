@@ -66,7 +66,7 @@
 #include "backdrop.h"
 #endif
 
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
 #include "radio.h"
 #endif
 

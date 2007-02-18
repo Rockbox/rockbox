@@ -42,7 +42,7 @@
 #include "screens.h"
 #include "playlist_menu.h"
 #include "talk.h"
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
 #include "radio.h"
 #endif
 #include "misc.h"
