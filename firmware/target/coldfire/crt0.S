@@ -78,7 +78,7 @@ start:
     move.l  %d0,(0x0a0,%a0) /* wait states are handled by the coldfire
                              * IDE interface logic. */
 
-#if CONFIG_USBOTG == USBOTG_ISP1362
+#if defined(CONFIG_USBOTG) && CONFIG_USBOTG == USBOTG_ISP1362
     /* Chip select 3 - USBOTG controller */
     move.l  #0xc0000000,%d0 /* CSAR3 - Base = 0xc0000000 */
     move.l  %d0,(0x0a4,%a0)
