@@ -216,6 +216,12 @@
 /* no known platform */
 #endif
 
+/* now set any CONFIG_ defines correctly if they are not used,
+   No need to do this on CONFIG_'s which are compulsary (e.g CONFIG_CODEC ) */
+#ifndef CONFIG_TUNER
+#define CONFIG_TUNER 0
+#endif
+
 /* Enable the directory cache and tagcache in RAM if we have
  * plenty of RAM. Both features can be enabled independently. */
 #if ((defined(MEMORYSIZE) && (MEMORYSIZE > 8)) || MEM > 8) && \

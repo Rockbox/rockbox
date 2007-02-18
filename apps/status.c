@@ -43,7 +43,7 @@
 #include "button.h"
 #endif
 #include "usb.h"
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
 #include "radio.h"
 #endif
 #if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
@@ -96,7 +96,7 @@ int current_playmode(void)
     }
 #endif
 
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
     audio_stat = get_radio_status();
     if(audio_stat & FMRADIO_PLAYING)
        return STATUS_RADIO;

@@ -46,7 +46,7 @@
 #include "keyboard.h"
 #endif
 
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
 #include "radio.h"
 #endif
 
@@ -288,7 +288,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
 #ifdef HAVE_REMOTE_LCD
             (*c->dirfilter == SHOW_RWPS && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_RWPS) ||
 #endif
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
             (*c->dirfilter == SHOW_FMR && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_FMR) ||
 #endif
             (*c->dirfilter == SHOW_CFG && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_CFG) ||
@@ -435,7 +435,7 @@ int ft_enter(struct tree_context* c)
                 }
                 break;
 
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
                 /* fmr preset file */
             case TREE_ATTR_FMR:
 

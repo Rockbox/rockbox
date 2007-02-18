@@ -60,7 +60,7 @@
 #ifdef HAVE_MMC
 #include "ata_mmc.h"
 #endif
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
 #include "tuner.h"
 #include "radio.h"
 #endif
@@ -1986,7 +1986,7 @@ static bool dbg_save_roms(void)
 #endif /* CPU */
 
 #ifndef SIMULATOR
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
 static bool dbg_fm_radio(void)
 {
     char buf[32];
@@ -2357,7 +2357,7 @@ bool debug_menu(void)
 #endif /* PM_DEBUG */
 #endif /* HAVE_LCD_BITMAP */
 #ifndef SIMULATOR
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
         { "FM Radio", dbg_fm_radio },
 #endif
 #endif

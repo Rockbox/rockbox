@@ -145,7 +145,7 @@ drivers/rtc/rtc_as3514.c
 #endif /* SIMULATOR */
 
 /* Tuner */
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
 #ifndef SIMULATOR
 #if (CONFIG_TUNER & S1A0903X01)
 drivers/fmradio.c

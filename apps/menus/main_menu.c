@@ -30,7 +30,7 @@
 #include "settings_menu.h"
 #include "exported_menus.h"
 #include "tree.h"
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
 #include "radio.h"
 #endif
 #ifdef HAVE_RECORDING
@@ -386,7 +386,7 @@ MENUITEM_FUNCTION_WPARAM(browse_themes, ID2P(LANG_CUSTOM_THEME),
 MENUITEM_FUNCTION_WPARAM(browse_plugins, ID2P(LANG_PLUGINS),
 		browse_folder, (void*)&rocks, NULL, bitmap_icons_6x8[Icon_Plugin]);
 
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
 MENUITEM_FUNCTION(load_radio_screen, ID2P(LANG_FM_RADIO),
                    (menu_function)radio_screen, dynamicitem_callback,
                     bitmap_icons_6x8[Icon_Radio_screen]);
@@ -428,7 +428,7 @@ MAKE_MENU(main_menu_, "Rockbox Main Menu", mainmenu_callback,
         bitmap_icons_6x8[Icon_Submenu_Entered],
         &mrb_bookmarks, &sound_settings,
         &settings_menu_item, &manage_settings, &browse_themes,
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
         &load_radio_screen,
 #endif
 #ifdef HAVE_RECORDING
@@ -449,7 +449,7 @@ int dynamicitem_callback(int action,const struct menu_item_ex *this_item)
     if (action != ACTION_ENTER_MENUITEM)
         return action;
 	
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
     if (this_item == &load_radio_screen)
     {
         if (radio_hardware_present() == 0)

@@ -84,7 +84,7 @@
 #define SETTINGS_RESET BUTTON_REC
 #endif
 
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
 #include "radio.h"
 #endif
 #ifdef HAVE_MMC
@@ -364,7 +364,7 @@ static void init(void)
     audio_preinit();
 #endif
 
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
     radio_init();
 #endif
 

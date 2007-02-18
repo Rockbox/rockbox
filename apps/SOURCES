@@ -72,7 +72,7 @@ recorder/backdrop.c
 gui/color_picker.c
 #endif
 #endif
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
 recorder/radio.c
 #endif
 #ifdef HAVE_RECORDING

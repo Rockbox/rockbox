@@ -37,7 +37,7 @@
 #include "backlight.h"
 #include "lcd.h"
 #include "rtc.h"
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
 #include "fmradio.h"
 #endif
 #ifdef HAVE_UDA1380
@@ -634,7 +634,7 @@ static void handle_auto_poweroff(void)
 #endif
 
     if(timeout &&
-#if defined(CONFIG_TUNER) && !defined(BOOTLOADER)
+#if CONFIG_TUNER && !defined(BOOTLOADER)
        (!(get_radio_status() & FMRADIO_PLAYING)) &&
 #endif
        !usb_inserted() &&
