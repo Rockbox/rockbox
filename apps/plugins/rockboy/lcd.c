@@ -1063,7 +1063,7 @@ void set_pal(void)
     pal_dirty();
 }
 
-#if HAVE_LCD_COLOR
+#ifdef HAVE_LCD_COLOR
 static void updatepalette(int i)
 {
     int c, r, g, b;
