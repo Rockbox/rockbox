@@ -342,7 +342,7 @@ static void options_menu(void){
 /* menu */
 static bool zxbox_menu(void)
 {
-#if CODEC == SWCODEC && !defined SIMULATOR
+#if CONFIG_CODEC == SWCODEC && !defined SIMULATOR
     rb->pcm_play_stop();
 #endif
     int m;
