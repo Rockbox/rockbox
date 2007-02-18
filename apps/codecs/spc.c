@@ -54,13 +54,13 @@ CODEC_HEADER
     /* Disable echo processing */
     #define SPC_NOECHO 1
 #else
-    /* Cache BRR waves */
-    #define SPC_BRRCACHE 0
-
-    /* Disable gaussian interpolation */
+    /* Don't cache BRR waves */
+    #define SPC_BRRCACHE 0 
+    
+    /* Allow gaussian interpolation */
     #define SPC_NOINTERP 0
-
-    /* Disable echo processing */
+    
+    /* Allow echo processing */
     #define SPC_NOECHO 0
 #endif
 
