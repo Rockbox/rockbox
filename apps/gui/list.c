@@ -203,7 +203,7 @@ void gui_list_draw(struct gui_list * gui_list)
         i = 1;
         lines = display->nb_lines - 1;
 
-        if (gui_list->title_icon != NOICON && draw_icons)
+        if (gui_list->title_icon != NOICON)
         {
             screen_put_iconxy(display, 0, 0, gui_list->title_icon);
 #ifdef HAVE_LCD_BITMAP
