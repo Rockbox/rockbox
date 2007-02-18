@@ -53,6 +53,15 @@ CODEC_HEADER
 
     /* Disable echo processing */
     #define SPC_NOECHO 1
+#else
+    /* Cache BRR waves */
+    #define SPC_BRRCACHE 0
+
+    /* Disable gaussian interpolation */
+    #define SPC_NOINTERP 0
+
+    /* Disable echo processing */
+    #define SPC_NOECHO 0
 #endif
 
 /* Samples per channel per iteration */
