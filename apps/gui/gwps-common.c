@@ -823,7 +823,7 @@ static char* get_tag(struct wps_data* wps_data,
                     }
                 }
                 
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
                 case 'p': /* External power plugged in? */
                 {
                     if(charger_input_state==CHARGER)

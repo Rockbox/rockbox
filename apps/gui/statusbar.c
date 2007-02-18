@@ -146,7 +146,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 #ifdef HAVE_USB_POWER
     bar->info.usb_inserted = usb_inserted();
 #endif
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
     bar->info.inserted = (charger_input_state == CHARGER);
     if (bar->info.inserted)
     {
@@ -245,7 +245,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
                                  STATUSBAR_Y_POS, STATUSBAR_PLUG_WIDTH,
                                  STATUSBAR_HEIGHT);
 #endif /* HAVE_USB_POWER */
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
 #ifdef HAVE_USB_POWER
         else
 #endif
@@ -358,7 +358,7 @@ void gui_statusbar_icon_battery(struct screen * display, int percent,
     unsigned int prevfg = 0;
 #endif
 
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
     if (batt_charge_step >= 0)
     {
         fill = percent * (STATUSBAR_BATTERY_WIDTH-3) / 100;

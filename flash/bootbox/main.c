@@ -65,7 +65,7 @@ int show_logo(void)
     return 0;
 }
 
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
 /*
 bool backlight_get_on_when_charging(void)
 {
@@ -167,7 +167,7 @@ void main(void)
     button_init();
     powermgmt_init();
 
-#if defined(CONFIG_CHARGING) && (CONFIG_CPU == SH7034)
+#if CONFIG_CHARGING && (CONFIG_CPU == SH7034)
     if (charger_inserted()
 #ifdef ATA_POWER_PLAYERSTYLE
         && !ide_powered() /* relies on probing result from bootloader */

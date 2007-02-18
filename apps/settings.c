@@ -665,7 +665,7 @@ void sound_settings_apply(void)
 #endif
 
 #ifdef HAVE_USB_POWER
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
     usb_charging_enable(global_settings.usb_charging);
 #endif
 #endif
@@ -699,7 +699,7 @@ void settings_apply(void)
     lcd_remote_emireduce(global_settings.remote_reduce_ticking);
 #endif
     remote_backlight_set_timeout(global_settings.remote_backlight_timeout);
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
     remote_backlight_set_timeout_plugged(global_settings.remote_backlight_timeout_plugged);
 #endif
 #ifdef HAS_REMOTE_BUTTON_HOLD
@@ -708,7 +708,7 @@ void settings_apply(void)
 #endif /* HAVE_REMOTE_LCD */
 #ifdef CONFIG_BACKLIGHT
     backlight_set_timeout(global_settings.backlight_timeout);
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
     backlight_set_timeout_plugged(global_settings.backlight_timeout_plugged);
 #endif
 #if defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)

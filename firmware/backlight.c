@@ -116,7 +116,7 @@ static struct event_queue backlight_queue;
 
 static int backlight_timer;
 static int backlight_timeout = 5*HZ;
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
 static int backlight_timeout_plugged = 5*HZ;
 #endif
 #ifdef HAS_BUTTON_HOLD
@@ -126,7 +126,7 @@ static int backlight_on_button_hold = 0;
 #ifdef HAVE_REMOTE_LCD
 static int remote_backlight_timer;
 static int remote_backlight_timeout = 5*HZ;
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
 static int remote_backlight_timeout_plugged = 5*HZ;
 #endif
 #ifdef HAS_REMOTE_BUTTON_HOLD
@@ -347,7 +347,7 @@ static void __remote_backlight_off(void)
 /* Update state of backlight according to timeout setting */
 static void backlight_update_state(void)
 {
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
     if (charger_inserted()
 #ifdef HAVE_USB_POWER
             || usb_powered()
@@ -386,7 +386,7 @@ static void backlight_update_state(void)
 /* Update state of remote backlight according to timeout setting */
 static void remote_backlight_update_state(void)
 {
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
     if (charger_inserted()
 #ifdef HAVE_USB_POWER
             || usb_powered()
@@ -503,7 +503,7 @@ void backlight_thread(void)
 
 static void backlight_tick(void)
 {
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
     static bool charger_was_inserted = false;
     bool charger_is_inserted = charger_inserted()
 #ifdef HAVE_USB_POWER
@@ -622,7 +622,7 @@ bool is_backlight_on(void)
 /* return value in ticks; 0 means always on, <0 means always off */
 int backlight_get_current_timeout(void)
 {
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
     if (charger_inserted()
 #ifdef HAVE_USB_POWER
             || usb_powered()
@@ -645,7 +645,7 @@ void backlight_set_timeout(int index)
     backlight_update_state();
 }
 
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
 void backlight_set_timeout_plugged(int index)
 {
     if((unsigned)index >= sizeof(backlight_timeout_value))
@@ -724,7 +724,7 @@ void remote_backlight_set_timeout(int index)
     remote_backlight_update_state();
 }
 
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
 void remote_backlight_set_timeout_plugged(int index)
 {
     if((unsigned)index >= sizeof(backlight_timeout_value))
@@ -766,7 +766,7 @@ void remote_backlight_set_on_button_hold(int index)
 /* return value in ticks; 0 means always on, <0 means always off */
 int remote_backlight_get_current_timeout(void)
 {
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
     if (charger_inserted()
 #ifdef HAVE_USB_POWER
             || usb_powered()

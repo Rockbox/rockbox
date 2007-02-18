@@ -293,7 +293,7 @@ static void init(void)
 {
     int rc;
     bool mounted = false;
-#if defined(CONFIG_CHARGING) && (CONFIG_CPU == SH7034)
+#if CONFIG_CHARGING && (CONFIG_CPU == SH7034)
     /* if nobody initialized ATA before, I consider this a cold start */
     bool coldstart = (PACR2 & 0x4000) != 0; /* starting from Flash */
 #endif
@@ -372,7 +372,7 @@ static void init(void)
     screen_access_init();
     gui_syncstatusbar_init(&statusbars);
 
-#if defined(CONFIG_CHARGING) && (CONFIG_CPU == SH7034)
+#if CONFIG_CHARGING && (CONFIG_CPU == SH7034)
     if (coldstart && charger_inserted()
         && !global_settings.car_adapter_mode
 #ifdef ATA_POWER_PLAYERSTYLE
@@ -536,7 +536,7 @@ static void init(void)
     }
 #endif /* #ifdef AUTOROCK */
 
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
     car_adapter_mode_init();
 #endif
 }

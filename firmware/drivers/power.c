@@ -83,7 +83,7 @@ void power_init(void)
 }
 
 
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
 bool charger_inserted(void)
 {     
 #if CONFIG_CHARGING == CHARGING_CONTROL

@@ -40,7 +40,7 @@ struct status_info {
     int minute;
 #endif
 
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
     bool inserted;
 #endif
 #ifdef HAVE_USB_POWER

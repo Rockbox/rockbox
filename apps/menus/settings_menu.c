@@ -110,7 +110,7 @@ MAKE_MENU(file_menu, ID2P(LANG_FILE), 0, NOICON,
 MENUITEM_SETTING(battery_capacity, &global_settings.battery_capacity, NULL);
 MENUITEM_SETTING(battery_type, &global_settings.battery_type, NULL);
 #ifdef HAVE_USB_POWER
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
 static int usbcharging_callback(int action,const struct menu_item_ex *this_item)
 {
     (void)this_item;
@@ -131,7 +131,7 @@ MAKE_MENU(battery_menu, ID2P(LANG_BATTERY_MENU), 0, NOICON,
             &battery_type,
 #endif
 #ifdef HAVE_USB_POWER
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
             &usb_charging,
 #endif
 #endif
@@ -272,7 +272,7 @@ static int linein_callback(int action,const struct menu_item_ex *this_item)
 }
 MENUITEM_SETTING(line_in, &global_settings.line_in, linein_callback);
 #endif
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
 MENUITEM_SETTING(car_adapter_mode, &global_settings.car_adapter_mode, NULL);
 #endif
 
@@ -296,7 +296,7 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #if CONFIG_CODEC == MAS3507D
             &line_in,
 #endif
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
             &car_adapter_mode,
 #endif
          );

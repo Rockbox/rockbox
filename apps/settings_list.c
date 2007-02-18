@@ -415,7 +415,7 @@ const struct settings_list settings[] = {
         "backlight timeout", backlight_times_conf, UNIT_SEC,
         0, 18, 1, backlight_formatter, backlight_getlang, 
         backlight_set_timeout),
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
     INT_SETTING_W_CFGVALS(0, backlight_timeout_plugged,
         LANG_BACKLIGHT_ON_WHEN_CHARGING, 11,
         "backlight timeout plugged", backlight_times_conf, UNIT_SEC,
@@ -475,7 +475,7 @@ const struct settings_list settings[] = {
                 BATTERY_CAPACITY_MIN, BATTERY_CAPACITY_MAX, BATTERY_CAPACITY_INC,
                 NULL, NULL, NULL),
 #endif
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
     OFFON_SETTING(NVRAM(1), car_adapter_mode,
         LANG_CAR_ADAPTER_MODE, false, "car adapter mode", NULL),
 #endif
@@ -504,7 +504,7 @@ const struct settings_list settings[] = {
         "remote backlight timeout", backlight_times_conf, UNIT_SEC,
         0, 18, 1, backlight_formatter, backlight_getlang, 
         remote_backlight_set_timeout),
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
     INT_SETTING_W_CFGVALS(0, remote_backlight_timeout_plugged, LANG_BACKLIGHT, 11,
         "remote backlight timeout plugged", backlight_times_conf, UNIT_SEC,
         0, 18, 1, backlight_formatter, backlight_getlang, 
@@ -1057,7 +1057,7 @@ const struct settings_list settings[] = {
     FILENAME_SETTING(0,kbd_file,"kbd","",ROCKBOX_DIR "/",".kbd",MAX_FILENAME+1),
 #endif
 #ifdef HAVE_USB_POWER
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
     OFFON_SETTING(0,usb_charging,LANG_USB_CHARGING,false,"usb charging",NULL),
 #endif
 #endif

@@ -595,7 +595,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 #else
     int i;
 
-#if defined(CONFIG_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
+#if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING)
     if(!charger_inserted())
 #endif
     {
@@ -668,7 +668,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
     return false;
 }
 
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
 static bool waiting_to_resume_play = false;
 static long play_resume_tick;
 
@@ -774,7 +774,7 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
             if (!clean_shutdown(callback, parameter))
                 return SYS_POWEROFF;
             break;
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
         case SYS_CHARGER_CONNECTED:
             car_adapter_mode_processing(true);
             return SYS_CHARGER_CONNECTED;

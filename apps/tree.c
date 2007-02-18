@@ -742,7 +742,7 @@ static bool dirbrowse(void)
                             audio_stop();
                         }
                     }
-#if defined(CONFIG_CHARGING) && \
+#if CONFIG_CHARGING && \
     (CONFIG_KEYPAD == RECORDER_PAD) && !defined(HAVE_SW_POWEROFF)
                     else {
                         if (!charger_inserted()) {
@@ -755,7 +755,7 @@ static bool dirbrowse(void)
                     }
 #endif
                 }
-#if defined(CONFIG_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
+#if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING)
 {
                 static int last_off = 0;
                 if (current_tick - last_off < 50) {

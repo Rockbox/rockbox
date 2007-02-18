@@ -492,7 +492,7 @@ bool usb_powered(void)
     return usb_state == USB_POWERED;
 }
 
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
 bool usb_charging_enable(bool on)
 {
     bool rc = false;

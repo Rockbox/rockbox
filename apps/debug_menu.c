@@ -1411,7 +1411,7 @@ static bool view_battery(void)
                 snprintf(buf, 30, "External: %d.%02d V", y / 100, y % 100);
                 lcd_puts(0, 2, buf);
 #endif
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
 #if CONFIG_CHARGING == CHARGING_CONTROL
                 snprintf(buf, 30, "Chgr: %s %s",
                          charger_inserted() ? "present" : "absent",

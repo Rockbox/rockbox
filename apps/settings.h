@@ -629,7 +629,7 @@ struct user_settings
 #endif
 
 #ifdef HAVE_USB_POWER
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
     bool usb_charging;
 #endif
 #endif

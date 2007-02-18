@@ -164,7 +164,7 @@ static void button_tick(void)
                                     || btn == RC_POWEROFF_BUTTON
 #endif
                                     ) &&
-#if defined(CONFIG_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
+#if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING)
                                 !charger_inserted() &&
 #endif
                                 repeat_count > POWEROFF_COUNT)

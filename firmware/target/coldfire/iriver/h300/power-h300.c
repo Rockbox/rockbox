@@ -61,7 +61,7 @@ void power_init(void)
 }
 
 
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
 bool charger_inserted(void)
 {     
     return (GPIO1_READ & 0x00400000)?true:false;

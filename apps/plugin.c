@@ -33,7 +33,7 @@
 #include "splash.h"
 #include "logf.h"
 
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
 #include "power.h"
 #endif
 
@@ -406,7 +406,7 @@ static const struct plugin_api rockbox_api = {
 #ifndef SIMULATOR
     battery_voltage,
 #endif
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
     charger_inserted,
 # if CONFIG_CHARGING == CHARGING_MONITOR
     charging_state,

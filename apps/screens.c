@@ -171,7 +171,7 @@ int mmc_remove_request(void)
 }
 #endif
 
-#if defined(CONFIG_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
+#if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING)
 
 #ifdef HAVE_LCD_BITMAP
 static void charging_display_info(bool animate)
@@ -778,7 +778,7 @@ bool quick_screen_f3(int button_enter)
 #endif /* BUTTON_F3 */
 #endif /* CONFIG_KEYPAD in (RECORDER_PAD |IRIVER_H100_PAD | IRIVER_H300_PAD) */
 
-#if defined(CONFIG_CHARGING) || defined(SIMULATOR)
+#if CONFIG_CHARGING || defined(SIMULATOR)
 void charging_splash(void)
 {
     gui_syncsplash(2*HZ, true, (unsigned char *)str(LANG_BATTERY_CHARGE));
@@ -1342,7 +1342,7 @@ bool view_runtime(void)
         }
 
         if (state & 1) {
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
             if (charger_inserted()
 #ifdef HAVE_USB_POWER
                     || usb_powered()

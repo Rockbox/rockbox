@@ -266,7 +266,7 @@ static const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 #endif
 };
 
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
 charger_input_state_type charger_input_state IDATA_ATTR;
 
 
@@ -545,7 +545,7 @@ static void battery_status_update(void)
                                       / 100 / (CURRENT_MAX_CHG - runcurrent());
     }
     else
-#elif defined(CONFIG_CHARGING) && CONFIG_BATTERY == BATT_LIPOL1300
+#elif CONFIG_CHARGING && CONFIG_BATTERY == BATT_LIPOL1300
     if (charger_inserted()) {
 #ifdef IRIVER_H300_SERIES
         /* H300_SERIES use CURRENT_MAX_CHG for basic charge time (80%)
@@ -612,7 +612,7 @@ static void handle_auto_poweroff(void)
     long timeout = poweroff_idle_timeout_value[poweroff_timeout]*60*HZ;
     int  audio_stat = audio_status();
 
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
     /*
      * Inhibit shutdown as long as the charger is plugged in.  If it is
      * unplugged, wait for a timeout period and then shut down.
@@ -656,7 +656,7 @@ static void handle_auto_poweroff(void)
             if(TIME_AFTER(current_tick, sleeptimer_endtick))
             {
                 audio_stop();
-#if defined(CONFIG_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
+#if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING)
                 if((charger_input_state == CHARGER) ||
                    (charger_input_state == CHARGER_PLUGGED))
                 {
@@ -751,7 +751,7 @@ static void power_thread_sleep(int ticks)
 
     while (ticks > 0) {
 
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
         /*
          * Detect charger plugged/unplugged transitions.  On a plugged or
          * unplugged event, we return immediately, run once through the main
@@ -761,7 +761,7 @@ static void power_thread_sleep(int ticks)
         if(charger_inserted()
 #ifdef HAVE_USB_POWER /* USB powered or USB inserted both provide power */
                 || usb_powered()
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
                 || (usb_inserted() && usb_charging_enabled())
 #endif
 #endif
@@ -924,7 +924,7 @@ static void power_thread(void)
     avgbat = avgbat * BATT_AVE_SAMPLES;
     battery_centivolts = avgbat / BATT_AVE_SAMPLES / 10000;
 
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
     if(charger_inserted()) {
         battery_percent  = voltage_to_percent(battery_centivolts,
                            percent_to_volt_charge);

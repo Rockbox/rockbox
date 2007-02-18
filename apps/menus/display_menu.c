@@ -79,7 +79,7 @@ int flipdisplay_callback(int action,const struct menu_item_ex *this_item)
 /*    LCD MENU                     */
 #ifdef CONFIG_BACKLIGHT
 MENUITEM_SETTING(backlight_timeout, &global_settings.backlight_timeout, NULL);
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
 MENUITEM_SETTING(backlight_timeout_plugged, 
                 &global_settings.backlight_timeout_plugged, NULL);
 #endif
@@ -174,7 +174,7 @@ MAKE_MENU(lcd_settings,ID2P(LANG_LCD_MENU),
             NULL, bitmap_icons_6x8[Icon_Display_menu]
 #ifdef CONFIG_BACKLIGHT
             ,&backlight_timeout
-# ifdef CONFIG_CHARGING
+# if CONFIG_CHARGING
             ,&backlight_timeout_plugged
 # endif
 # ifdef HAS_BUTTON_HOLD
@@ -218,7 +218,7 @@ MAKE_MENU(lcd_settings,ID2P(LANG_LCD_MENU),
 MENUITEM_SETTING(remote_backlight_timeout, 
                     &global_settings.remote_backlight_timeout, NULL);
 
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
 MENUITEM_SETTING(remote_backlight_timeout_plugged, 
                     &global_settings.remote_backlight_timeout_plugged, NULL);
 #endif
@@ -260,7 +260,7 @@ MENUITEM_SETTING(remote_reduce_ticking,
 MAKE_MENU(lcd_remote_settings, ID2P(LANG_LCD_REMOTE_MENU),
             NULL, bitmap_icons_6x8[Icon_Remote_Display_menu],
             &remote_backlight_timeout,
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
             &remote_backlight_timeout_plugged,
 #endif
 #ifdef HAS_REMOTE_BUTTON_HOLD

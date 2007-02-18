@@ -24,7 +24,7 @@ extern bool charger_enabled;
 void charger_enable(bool on);
 #endif
 
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
 bool charger_inserted(void);
 #endif
 

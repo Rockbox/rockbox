@@ -230,6 +230,10 @@
 #define CONFIG_LED 0
 #endif
 
+#ifndef CONFIG_CHARGING
+#define CONFIG_CHARGING 0
+#endif
+
 /* Enable the directory cache and tagcache in RAM if we have
  * plenty of RAM. Both features can be enabled independently. */
 #if ((defined(MEMORYSIZE) && (MEMORYSIZE > 8)) || MEM > 8) && \
