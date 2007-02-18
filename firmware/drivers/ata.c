@@ -845,7 +845,7 @@ static int set_multiple_mode(int sectors)
 
 static int set_features(void)
 {
-    struct {
+    static struct {
         unsigned char id_word;
         unsigned char id_bit;
         unsigned char subcommand;
@@ -855,7 +855,6 @@ static int set_features(void)
         { 83, 9, 0x42, 0x80 }, /* acoustic management: lowest noise */
         { 82, 6, 0xaa, 0 },    /* enable read look-ahead */
         { 83, 14, 0x03, 0 },   /* force PIO mode */
-        { 0, 0, 0, 0 }         /* <end of list> */
     };
     int i;
     int pio_mode = 2;
@@ -877,7 +876,7 @@ static int set_features(void)
         return -1;
     }
 
-    for (i=0; features[i].id_word; i++) {
+    for (i=0; i < (int)(sizeof(features)/sizeof(features[0])); i++) {
         if (identify_info[features[i].id_word] & (1 << features[i].id_bit)) {
             SET_REG(ATA_FEATURE, features[i].subcommand);
             SET_REG(ATA_NSECTOR, features[i].parameter);
