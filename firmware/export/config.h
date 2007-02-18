@@ -222,6 +222,10 @@
 #define CONFIG_TUNER 0
 #endif
 
+#ifndef CONFIG_USBOTG
+#define CONFIG_USBOTG 0
+#endif
+
 /* Enable the directory cache and tagcache in RAM if we have
  * plenty of RAM. Both features can be enabled independently. */
 #if ((defined(MEMORYSIZE) && (MEMORYSIZE > 8)) || MEM > 8) && \

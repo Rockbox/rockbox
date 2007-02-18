@@ -85,7 +85,7 @@ void set_cpu_frequency(long frequency)
         PLLCR = 0x018ae025 | (PLLCR & 0x70400000);
         CSCR0 = 0x00001180; /* Flash: 4 wait states */
         CSCR1 = 0x00001580; /* LCD: 5 wait states */
-#if defined(CONFIG_USBOTG) && CONFIG_USBOTG == USBOTG_ISP1362
+#if CONFIG_USBOTG == USBOTG_ISP1362
         CSCR3 = 0x00002180; /* USBOTG: 8 wait states */
 #endif
         while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
@@ -112,7 +112,7 @@ void set_cpu_frequency(long frequency)
         PLLCR = 0x038be025 | (PLLCR & 0x70400000);
         CSCR0 = 0x00000580; /* Flash: 1 wait state */
         CSCR1 = 0x00000180; /* LCD: 0 wait states */
-#if defined(CONFIG_USBOTG) && CONFIG_USBOTG == USBOTG_ISP1362
+#if CONFIG_USBOTG == USBOTG_ISP1362
         CSCR3 = 0x00000580; /* USBOTG: 1 wait state */
 #endif
         while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
@@ -139,7 +139,7 @@ void set_cpu_frequency(long frequency)
         PLLCR = 0x00800200 | (PLLCR & 0x70400000);
         CSCR0 = 0x00000180; /* Flash: 0 wait states */
         CSCR1 = 0x00000180; /* LCD: 0 wait states */
-#if defined(CONFIG_USBOTG) && CONFIG_USBOTG == USBOTG_ISP1362
+#if CONFIG_USBOTG == USBOTG_ISP1362
         CSCR3 = 0x00000180; /* USBOTG: 0 wait states */
 #endif
         DCR = (0x8000 | DEFAULT_REFRESH_TIMER);       /* Refresh timer */

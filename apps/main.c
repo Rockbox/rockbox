@@ -95,11 +95,11 @@
 #include "lcd-remote.h"
 #endif
 
-#if defined(CONFIG_USBOTG) && CONFIG_USBOTG == USBOTG_ISP1362
+#if CONFIG_USBOTG == USBOTG_ISP1362
 #include "isp1362.h"
 #endif
 
-#if defined(CONFIG_USBOTG) && CONFIG_USBOTG == USBOTG_M5636
+#if CONFIG_USBOTG == USBOTG_M5636
 #include "m5636.h"
 #endif
 
@@ -350,9 +350,9 @@ static void init(void)
     adc_init();
     
     usb_init();
-#if defined(CONFIG_USBOTG) && CONFIG_USBOTG == USBOTG_ISP1362
+#if CONFIG_USBOTG == USBOTG_ISP1362
     isp1362_init();
-#elif defined(CONFIG_USBOTG) && CONFIG_USBOTG == USBOTG_M5636
+#elif CONFIG_USBOTG == USBOTG_M5636
     m5636_init();
 #endif
 
