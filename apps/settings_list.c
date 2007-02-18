@@ -717,7 +717,7 @@ const struct settings_list settings[] = {
         ID2P(LANG_SORT_DATE_REVERSE)),
     BOOL_SETTING(0, id3_v1_first, LANG_ID3_ORDER, false,
         "id3 tag priority", "v2-v1,v1-v2",
-        LANG_ID3_V2_FIRST, LANG_ID3_V1_FIRST, mpeg_id3_options),
+        LANG_ID3_V1_FIRST, LANG_ID3_V2_FIRST, mpeg_id3_options),
 
 #ifdef HAVE_RECORDING
     /* recording */
@@ -1038,20 +1038,20 @@ const struct settings_list settings[] = {
     /** settings not in the old config blocks **/
 #if CONFIG_TUNER
     FILENAME_SETTING(0, fmr_file, "fmr",
-		"", FMPRESET_PATH "/", ".fmr", MAX_FILENAME+1),
+        "", FMPRESET_PATH "/", ".fmr", MAX_FILENAME+1),
 #endif
     FILENAME_SETTING(F_THEMESETTING, font_file, "font",
-		"", FONT_DIR "/", ".fnt", MAX_FILENAME+1),
+        "", FONT_DIR "/", ".fnt", MAX_FILENAME+1),
     FILENAME_SETTING(F_THEMESETTING,wps_file, "wps",
-		"", WPS_DIR "/", ".wps", MAX_FILENAME+1),
+        "", WPS_DIR "/", ".wps", MAX_FILENAME+1),
     FILENAME_SETTING(0,lang_file,"lang","",LANG_DIR "/",".lng",MAX_FILENAME+1),
 #ifdef HAVE_REMOTE_LCD
     FILENAME_SETTING(F_THEMESETTING,rwps_file,"rwps",
-		"", WPS_DIR "/", ".rwps", MAX_FILENAME+1),
+        "", WPS_DIR "/", ".rwps", MAX_FILENAME+1),
 #endif
 #if LCD_DEPTH > 1
     FILENAME_SETTING(F_THEMESETTING,backdrop_file,"backdrop",
-		"", BACKDROP_DIR "/", ".bmp", MAX_FILENAME+1),
+        "", BACKDROP_DIR "/", ".bmp", MAX_FILENAME+1),
 #endif
 #ifdef HAVE_LCD_BITMAP
     FILENAME_SETTING(0,kbd_file,"kbd","",ROCKBOX_DIR "/",".kbd",MAX_FILENAME+1),
