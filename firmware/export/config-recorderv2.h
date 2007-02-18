@@ -51,6 +51,8 @@
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_RTC /* on I2C controlled RTC port */
 
+#define CONFIG_I2C I2C_PLAYREC
+
 #define BATTERY_CAPACITY_DEFAULT 2200 /* default battery capacity */
 
 #ifndef SIMULATOR
