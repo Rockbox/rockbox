@@ -41,7 +41,7 @@
 #include "sound.h"
 #ifdef HAVE_RECORDING
 #include "audio.h"
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
 #include "radio.h"
 #endif
 #endif

@@ -61,7 +61,7 @@
 #include "dir.h"
 #include "action.h"
 
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
 
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define FM_RECORD

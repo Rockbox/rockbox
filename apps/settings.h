@@ -273,7 +273,7 @@ struct system_status
 #ifdef HAVE_DIRCACHE
     int dircache_size;      /* directory cache structure last size, 22 bits */
 #endif
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
     int last_frequency;  /* Last frequency for resuming, in FREQ_STEP units,
                             relative to MIN_FREQ */
 #endif
@@ -404,7 +404,7 @@ struct user_settings
 
     bool resume;        /* resume option: 0=off, 1=on */
 
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
     unsigned char fmr_file[MAX_FILENAME+1]; /* last fmr preset */
 #endif
     unsigned char font_file[MAX_FILENAME+1]; /* last font */
@@ -476,7 +476,7 @@ struct user_settings
     bool fade_on_stop; /* fade on pause/unpause/stop */
     bool caption_backlight; /* turn on backlight at end and start of track */
 
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
     int fm_freq_step;    /* Frequency step for manual tuning, in kHz */
     bool fm_force_mono;  /* Forces Mono mode if true */
     bool fm_full_range;  /* Enables full 10MHz-160MHz range if true, else
@@ -663,7 +663,7 @@ struct user_settings
     int unplug_rw; /* time in s to rewind when pausing */
     bool unplug_autoresume; /* disable auto-resume if no phones */
 #endif
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
     int fm_region;
 #endif
     bool audioscrobbler; /* Audioscrobbler logging  */

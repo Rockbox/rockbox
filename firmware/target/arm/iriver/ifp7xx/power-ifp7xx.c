@@ -27,7 +27,7 @@
 #include "logf.h"
 #include "usb.h"
 
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
 
 static bool powered = false;
 
@@ -44,7 +44,7 @@ bool radio_power(bool status)
     return old_status;
 }
 
-#endif /* #ifdef CONFIG_TUNER */
+#endif /* #if CONFIG_TUNER */
 
 #ifndef SIMULATOR
 

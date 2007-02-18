@@ -21,7 +21,7 @@
 #include "debug.h"
 #include "tuner.h"
 
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
 
 static int frequency = 0;
 static bool mono = false;

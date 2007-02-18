@@ -23,7 +23,7 @@
 #include "fmradio.h"
 #endif
 
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
 void radio_load_presets(char *filename);
 void radio_init(void);
 bool radio_screen(void);

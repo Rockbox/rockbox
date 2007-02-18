@@ -47,7 +47,7 @@ void spdif_power_enable(bool on);
 bool spdif_powered(void);
 #endif
 
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
 extern bool radio_power(bool status);
 extern bool radio_powered(void);
 #endif

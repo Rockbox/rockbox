@@ -480,7 +480,7 @@ const struct settings_list settings[] = {
         LANG_CAR_ADAPTER_MODE, false, "car adapter mode", NULL),
 #endif
     /* tuner */
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
     OFFON_SETTING(0,fm_force_mono, LANG_FM_MONO_MODE,
         false,"force fm mono", NULL),
     SYSTEM_SETTING(NVRAM(4),last_frequency,0),
@@ -1022,7 +1022,7 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0,unplug_autoresume,LANG_UNPLUG_DISABLE_AUTORESUME,false,
         "disable autoresume if phones not present",NULL),
 #endif
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
     {F_T_INT,&global_settings.fm_region,LANG_FM_REGION,INT(0),
         "fm_region","eu,us,jp,kr",UNUSED},
 #endif
@@ -1036,7 +1036,7 @@ const struct settings_list settings[] = {
 #endif
 
     /** settings not in the old config blocks **/
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
     FILENAME_SETTING(0, fmr_file, "fmr",
 		"", FMPRESET_PATH "/", ".fmr", MAX_FILENAME+1),
 #endif

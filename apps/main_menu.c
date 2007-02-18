@@ -143,7 +143,7 @@ bool main_menu(void)
     items[i].desc = ID2P(LANG_CUSTOM_THEME);
     items[i++].function = custom_theme_browse;
 
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
     if(radio_hardware_present()) {
         items[i].desc = ID2P(LANG_FM_RADIO);
         items[i++].function = radio_screen;

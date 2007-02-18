@@ -136,14 +136,14 @@ enum audio_sources
 #ifdef HAVE_SPDIF_IN
     AUDIO_SRC_SPDIF,            /* monitor spdif */
 #endif
-#if defined(HAVE_FMRADIO_IN) || defined(CONFIG_TUNER)
+#if defined(HAVE_FMRADIO_IN) || CONFIG_TUNER
     AUDIO_SRC_FMRADIO,          /* monitor fm radio */
 #endif
     /* define new audio sources above this line */
     AUDIO_SOURCE_LIST_END,
-    /* AUDIO_SRC_FMRADIO must be declared #ifdef CONFIG_TUNER but is not in
+    /* AUDIO_SRC_FMRADIO must be declared #if CONFIG_TUNER but is not in
        the list of recordable sources. HAVE_FMRADIO_IN implies CONFIG_TUNER. */
-#if defined(HAVE_FMRADIO_IN) || !defined(CONFIG_TUNER)
+#if defined(HAVE_FMRADIO_IN) || (CONFIG_TUNER == 0)
     AUDIO_NUM_SOURCES = AUDIO_SOURCE_LIST_END,
 #else
     AUDIO_NUM_SOURCES = AUDIO_SOURCE_LIST_END-1,
@@ -155,7 +155,7 @@ enum audio_sources
 /* selects an audio source for recording or playback */
 #define SRCF_PLAYBACK         0x0000    /* default */
 #define SRCF_RECORDING        0x1000
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
 /* for AUDIO_SRC_FMRADIO */
 #define SRCF_FMRADIO_PLAYING  0x0000    /* default */
 #define SRCF_FMRADIO_PAUSED   0x2000

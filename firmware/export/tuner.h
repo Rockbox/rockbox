@@ -37,7 +37,7 @@
 #define RADIO_STEREO 2
 #define RADIO_ALL 3 /* debug */
 
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
 
 #if (CONFIG_TUNER & S1A0903X01)
 void samsung_set(int setting, int value);
@@ -49,6 +49,6 @@ void philips_set(int setting, int value);
 int philips_get(int setting);
 #endif
 
-#endif /* #ifdef CONFIG_TUNER */
+#endif /* #if CONFIG_TUNER */
 
 #endif
