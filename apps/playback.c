@@ -3280,7 +3280,7 @@ static void audio_stop_playback(void)
 
 static void audio_play_start(size_t offset)
 {
-#if defined(HAVE_RECORDING) || defined(CONFIG_TUNER)
+#if defined(HAVE_RECORDING) || CONFIG_TUNER
     rec_set_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
 #endif
 

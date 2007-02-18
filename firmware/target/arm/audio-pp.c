@@ -32,7 +32,7 @@ void audio_set_source(int source, unsigned flags)
     (void)flags;
     /* Prevent pops from unneeded switching */
     static int last_source = AUDIO_SRC_PLAYBACK;
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
     static bool last_recording = false;
 #endif
 
@@ -64,7 +64,7 @@ void audio_set_source(int source, unsigned flags)
             }
         break;
 #endif
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
         case AUDIO_SRC_FMRADIO:         /* recording and playback */
             if (!recording)
                 audiohw_set_recvol(0, 0, AUDIO_GAIN_LINEIN);

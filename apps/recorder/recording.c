@@ -610,7 +610,7 @@ void rec_set_source(int source, unsigned flags)
 #endif /* !HAVE_SPDIF_POWER */
 
     /** Tuner **/
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
     /* Switch radio off or on per source and flags. */
     if (source != AUDIO_SRC_FMRADIO)
         radio_stop();
