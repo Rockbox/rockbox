@@ -1,20 +1,20 @@
 % $Id$ %
 \chapter{Installation}\label{sec:installation}
 
-\opt{ipodvideo}{ 
-  \note{Rockbox presently runs only on the original Ipod Video 30GB and 60GB, 
-  and on the newer 30GB Ipod Video (sometimes referred to as the ``5.5G''). 
-  Rockbox does \emph{not} run on the 80GB Ipod Video) (sometimes known as the 
-  ``5.5G'').  For information on identifying which Ipod you own, see this page 
-  on Apple's web site:  \url{http://www.info.apple.com/kbnum/n61688}
+\opt{ipodvideo}{
+  \note{Rockbox presently runs only on the original Ipod Video 30GB and 60GB,
+  and on the newer 30GB Ipod Video (sometimes referred to as the ``5.5G'').
+  Rockbox does \emph{not} run on the 80GB Ipod Video) (sometimes known as the
+  ``5.5G''). For information on identifying which Ipod you own, see this page
+  on Apple's web site: \url{http://www.info.apple.com/kbnum/n61688}
   }
 }
-  
-\opt{ipodnano}{ 
-  \note{Rockbox presently runs only on the original Ipod Nano. Rockbox does 
-  \emph{not} run on the newer, second generation Ipod Nano (the all alumminum 
-  verion).  For information on identifying which Ipod you own, see this page on 
-  Apple's web site:  \url{http://www.info.apple.com/kbnum/n61688}
+
+\opt{ipodnano}{
+  \note{Rockbox presently runs only on the original Ipod Nano. Rockbox does
+  \emph{not} run on the newer, second generation Ipod Nano (the all alumminum
+  verion). For information on identifying which Ipod you own, see this page on
+  Apple's web site: \url{http://www.info.apple.com/kbnum/n61688}
   }
 }
 
@@ -39,28 +39,28 @@ software.
   at \url{http://www.info-zip.org/} or \url{http://sevenzip.sf.net/} which
   can be downloaded and used free of charge.
 
-\item[USB connection.]  To transfer Rockbox to your \dap{} you need to
+\item[USB connection.] To transfer Rockbox to your \dap{} you need to
   connect it to your computer. To proceed you need to know where to access the
   \dap{}. On Windows this means you need to figure out the drive letter
   associated with the device. On Linux you need to know the mount point of
   your \dap{}.
 
   \opt{ipod}{
-    Your \dap{} should enter disk mode automatically when connected to a 
-    computer via USB. If your computer does not recognise your \dap{}, you may 
-    need to enter the disk mode manually. Disconnect your \dap{} from the 
-    computer. Reset the \dap{} by pressing and holding the \ButtonMenu{} and 
-    \ButtonSelect{} buttons simultaneously. As soon as the \dap{} resets, press 
-    and hold the \ButtonSelect{} and \ButtonPlay{} buttons simultaneously. Your 
-    \dap{} should enter disk mode, and you can try reconnecting to the computer. 
-  }  
-         
+    Your \dap{} should enter disk mode automatically when connected to a
+    computer via USB. If your computer does not recognise your \dap{}, you may
+    need to enter the disk mode manually. Disconnect your \dap{} from the
+    computer. Reset the \dap{} by pressing and holding the \ButtonMenu{} and
+    \ButtonSelect{} buttons simultaneously. As soon as the \dap{} resets, press
+    and hold the \ButtonSelect{} and \ButtonPlay{} buttons simultaneously. Your
+    \dap{} should enter disk mode, and you can try reconnecting to the computer.
+  }
+
   \opt{ipod3g,ipod4g,ipodcolor,ipodmini}{
     \note{\index{Firewire}Firewire detection is not supported in Rockbox at 
     the moment. Please use USB only.} 
   }
-    
-\item[Text editor.]  As you will see in the following chapters, Rockbox is
+
+\item[Text editor.] As you will see in the following chapters, Rockbox is
   highly configurable. In addition to saving configurations within Rockbox,
   Rockbox also allows you to create customised configuration files. If you
   would like to edit custom configuration files on your computer, you will
@@ -69,15 +69,15 @@ software.
 \end{description}
 
 \opt{ipod}{
-  \note{In addition to the requirements described above, Rockbox only works on 
-  Ipods formatted with the FAT32 filesystem (i.e., Ipods initialised by iTunes 
-  for Windows). It does not work with the HFS+ filesystem (i.e. Ipods 
-  initialised by iTunes for the Mac). More information and instructions for 
-  converting an Ipod to FAT32 can be found on the 
-  \url{http://www.rockbox.org/twiki/bin/view/Main/IpodConversionToFAT32} wiki 
-  page on the Rockbox web site.  Note that after conversion, you can still use 
-  a FAT32 Ipod on a Mac. 
-  } 
+  \note{In addition to the requirements described above, Rockbox only works on
+  Ipods formatted with the FAT32 filesystem (i.e., Ipods initialised by iTunes
+  for Windows). It does not work with the HFS+ filesystem (i.e. Ipods
+  initialised by iTunes for the Mac). More information and instructions for
+  converting an Ipod to FAT32 can be found on the
+  \url{http://www.rockbox.org/twiki/bin/view/Main/IpodConversionToFAT32} wiki
+  page on the Rockbox web site.  Note that after conversion, you can still use
+  a FAT32 Ipod on a Mac.
+  }
 }
 
 \section{Installing Rockbox}\label{sec:installing_rockbox}
@@ -170,7 +170,6 @@ you want to install and get the version for your \dap{}.
   built once a day from the latest source code in the SVN repository. You can
   download archived builds from \url{http://www.rockbox.org/daily.shtml}.
 
-
 \end{description}
 
 \nopt{player}{
@@ -178,10 +177,10 @@ you want to install and get the version for your \dap{}.
     Rockbox has a fonts package that is available at
     \url{http://www.rockbox.org/daily.shtml} or from the \emph{extras} link in
     the menu on the Rockbox website. While the current builds and
-    daily builds change frequently, the fonts package rarely changes.  Thus, 
+    daily builds change frequently, the fonts package rarely changes. Thus, 
     the fonts package is not included in these builds. (The release version, on
     the other hand, does not change, so fonts are included when you download a
-    release.) When installing Rockbox for the first time, you should install 
+    release.) When installing Rockbox for the first time, you should install
     the fonts package.
   }
 }
@@ -198,13 +197,6 @@ functional, but not perfect!
 After downloading the Rockbox package connect your \dap{} to the computer via
 USB as described in the manual that came with your \dap{}. Take the file that
 you downloaded above, and extract its contents to your \daps{} drive.
-
-\opt{gigabeatf}{
-    \note{After you install Rockbox you must plug your USB
-         cable directly into the player. There is no cradle support at this
-         time.
-    }
-}
 
 Use the ``Extract all'' command of your unzip program to extract the files in
 the \fname{.zip} file onto your \dap{}. Note that the entire contents of the
@@ -269,20 +261,6 @@ use.
 of your \dap{} like you did in the installation step before. If your unzip
 program asks you whether to overwrite files, choose the ``Yes to all'' option.
 The new build will be installed over your current build.
-
-\note{
-  Settings are stored on an otherwise-unused sector of your hard disk, not in
-  any of the files contained in the Rockbox build. Therefore, generally
-  speaking, installing a new build does \emph{not} reset Rockbox to its default
-  settings. Be aware, however, that from time to time, a change is made to the
-  Rockbox source code that \emph{does} cause settings to be reset to their
-  defaults when a Rockbox build is updated. Thus it is recommended to save your
-  settings using the \setting{Manage Settings} $\rightarrow$
-  \setting{Write .cfg file} function before updating your Rockbox build so that
-  you can easily restore the settings if necessary. For additional information
-  on how to save, load, and reset Rockbox's settings, see
-  \reference{ref:SystemOptions}.
-}
 
 \section{Uninstalling Rockbox}\index{Installation!uninstall}
 
