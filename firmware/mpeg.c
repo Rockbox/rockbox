@@ -1240,7 +1240,7 @@ static void mpeg_thread(void)
             case MPEG_PLAY:
                 DEBUGF("MPEG_PLAY\n");
 
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
                 /* Silence the A/D input, it may be on because the radio
                    may be playing */
                 mas_codec_writereg(6, 0x0000);
