@@ -204,7 +204,7 @@ static void chopDrawPlayer(int x,int y) /* These are SCREEN coords, not world! *
 
 static void chopClearTerrain(struct CTerrain *ter)
 {
-    ter->iNodesCount = -1;
+    ter->iNodesCount = 0;
 }
 
 
@@ -381,7 +381,7 @@ static void chopAddParticle(int x,int y,int sx,int sy)
     while(mParticles[i].bIsActive && i < NUMBER_OF_PARTICLES)
         i++;
 
-    if(i==NUMBER_OF_BLOCKS)
+    if(i==NUMBER_OF_PARTICLES)
         return;
 
     mParticles[i].bIsActive = 1;
