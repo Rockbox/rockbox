@@ -91,7 +91,7 @@ static int fileview_callback(int action,const struct menu_item_ex *this_item)
     return action;
 }
 
-MAKE_MENU(file_menu, ID2P(LANG_FILE), 0, NOICON,
+MAKE_MENU(file_menu, ID2P(LANG_FILE), 0, bitmap_icons_6x8[Icon_file_view_menu],
                 &sort_case, &sort_dir, &sort_file,
                 &dirfilter, &browse_current, &show_path_in_browser,
 #ifdef HAVE_TAGCACHE

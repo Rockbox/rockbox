@@ -78,7 +78,10 @@ enum icons_6x8 {
     Icon_Playback_menu,
     Icon_Display_menu,
     Icon_Remote_Display_menu,
+#if CONFIG_TUNER
     Icon_Radio_screen,
+#endif
+	Icon_file_view_menu,
     Icon6x8Last,
 };
 
