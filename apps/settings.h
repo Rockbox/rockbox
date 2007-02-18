@@ -609,7 +609,7 @@ struct user_settings
 #endif
     bool party_mode;    /* party mode - unstoppable music */
     
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
     bool bl_filter_first_keypress;   /* filter first keypress when dark? */
 #ifdef HAVE_REMOTE_LCD
     bool remote_bl_filter_first_keypress; /* filter first remote keypress when remote dark? */

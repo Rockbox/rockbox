@@ -430,7 +430,7 @@ static bool reconstartup(void)
                     &global_settings.rec_startup);
 }
 
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
 static bool cliplight(void)
 {
     static const struct opt_items names[] = {
@@ -941,7 +941,7 @@ bool recording_menu(bool no_source)
         { ID2P(LANG_RECORD_PRERECORD_TIME), recprerecord },
         { ID2P(LANG_RECORD_DIRECTORY), recdirectory },
         { ID2P(LANG_RECORD_STARTUP), reconstartup },
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
         { ID2P(LANG_CLIP_LIGHT), cliplight },
 #endif
         { ID2P(LANG_RECORD_TRIGGER), rectrigger },

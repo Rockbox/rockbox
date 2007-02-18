@@ -114,7 +114,7 @@ void drawrectangles(int color, struct rectangle *points, int count)
     SDL_UnlockSurface(lcd_surface);
 }
 
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
 void sim_backlight(int value)
 {
     if (value > 0) {

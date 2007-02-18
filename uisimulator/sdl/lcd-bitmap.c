@@ -25,7 +25,7 @@ SDL_Surface* lcd_surface;
 int lcd_backlight_val;
 
 #if LCD_DEPTH <= 8
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
 SDL_Color lcd_backlight_color_zero = {UI_LCD_BGCOLORLIGHT, 0};
 #endif
 SDL_Color lcd_color_zero = {UI_LCD_BGCOLOR, 0};
@@ -71,7 +71,7 @@ void lcd_update_rect(int x_start, int y_start, int width, int height)
                    LCD_HEIGHT, background ? UI_LCD_POSX : 0, background? UI_LCD_POSY : 0);
 }
 
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
 void sim_backlight(int value)
 {
     lcd_backlight_val = value;
@@ -118,7 +118,7 @@ void sim_lcd_init(void)
 #endif
 
 #if LCD_DEPTH <= 8
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
     sdl_set_gradient(lcd_surface, &lcd_backlight_color_zero, &lcd_color_max,
                      0, (1<<LCD_DEPTH));
 #else
@@ -134,7 +134,7 @@ void sim_lcd_ex_init(int shades, unsigned long (*getpixel)(int, int))
     lcd_ex_shades = shades;
     lcd_ex_getpixel = getpixel;
     if (shades) {
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
         if (lcd_backlight_val > 0) {
             sdl_set_gradient(lcd_surface, &lcd_color_max,
                              &lcd_backlight_color_zero, (1<<LCD_DEPTH),

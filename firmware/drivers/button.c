@@ -43,7 +43,7 @@ static long last_read; /* Last button status, for debouncing/filtering */
 #ifdef HAVE_LCD_BITMAP
 static bool flipped;  /* buttons can be flipped to match the LCD flip */
 #endif
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
 static bool filter_first_keypress;
 #ifdef HAVE_REMOTE_LCD
 static bool remote_filter_first_keypress;
@@ -71,7 +71,7 @@ static void button_tick(void)
     static int repeat_count = 0;
     static bool repeat = false;
     static bool post = false;
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
     static bool skip_release = false;
 #ifdef HAVE_REMOTE_LCD
     static bool skip_remote_release = false;
@@ -112,7 +112,7 @@ static void button_tick(void)
     diff = btn ^ lastbtn;
     if(diff && (btn & diff) == 0)
     {
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
         if(diff & BUTTON_REMOTE)
             if(!skip_remote_release)
@@ -202,7 +202,7 @@ static void button_tick(void)
                     if (queue_empty(&button_queue))
                     {
                         queue_post(&button_queue, BUTTON_REPEAT | btn, 0);
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
                         skip_remote_release = false;
 #endif
@@ -213,7 +213,7 @@ static void button_tick(void)
                 }
                 else
                 {
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
                     if (btn & BUTTON_REMOTE) {
                         if (!remote_filter_first_keypress || is_remote_backlight_on()
@@ -288,7 +288,7 @@ void button_init(void)
 #ifdef HAVE_LCD_BITMAP
     flipped = false;
 #endif
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
     filter_first_keypress = false;
 #ifdef HAVE_REMOTE_LCD
     remote_filter_first_keypress = false;
@@ -360,7 +360,7 @@ void button_set_flip(bool flip)
 }
 #endif /* HAVE_LCD_BITMAP */
 
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
 void set_backlight_filter_keypress(bool value)
 {
     filter_first_keypress = value;

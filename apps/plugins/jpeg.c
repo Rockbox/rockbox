@@ -2915,7 +2915,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
        (actually it should also set the timeout when plugged in,
        but the function backlight_set_timeout_plugged is not
        available in plugins) */
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
     if (rb->global_settings->backlight_timeout > 0)
         rb->backlight_set_timeout(1);
 #endif
@@ -2931,7 +2931,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->ata_spindown(rb->global_settings->disk_spindown);
 #endif
 
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
     /* reset backlight settings */
     rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
 #endif

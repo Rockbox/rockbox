@@ -90,7 +90,7 @@ static inline void __backlight_off(void)
 #endif
 #endif /* SIMULATOR */
 
-#if defined(CONFIG_BACKLIGHT) && !defined(BOOTLOADER)
+#if CONFIG_BACKLIGHT && !defined(BOOTLOADER)
 
 const signed char backlight_timeout_value[19] =
 {
@@ -804,10 +804,10 @@ void backlight_set_brightness(int val)
 }
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 
-#else /* !defined(CONFIG_BACKLIGHT) || defined(BOOTLOADER)
+#else /* (CONFIG_BACKLIGHT == 0) || defined(BOOTLOADER)
     -- no backlight, empty dummy functions */
 
-#if defined(BOOTLOADER) && defined(CONFIG_BACKLIGHT)
+#if defined(BOOTLOADER) && CONFIG_BACKLIGHT
 void backlight_init(void)
 {
 #ifdef __BACKLIGHT_INIT
@@ -830,4 +830,4 @@ bool is_remote_backlight_on(void) {return true;}
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
 void backlight_set_brightness(int val) { (void)val; }
 #endif
-#endif /* defined(CONFIG_BACKLIGHT) && !defined(BOOTLOADER) */
+#endif /* CONFIG_BACKLIGHT && !defined(BOOTLOADER) */

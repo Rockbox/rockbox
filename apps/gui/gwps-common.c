@@ -2100,7 +2100,7 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
     data->peak_meter_enabled = enable_pm;
 #endif
 
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
     if (global_settings.caption_backlight && state->id3) {
         /* turn on backlight n seconds before track ends, and turn it off n
            seconds into the new track. n == backlight_timeout, or 5s */

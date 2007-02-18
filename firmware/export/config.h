@@ -230,6 +230,10 @@
 #define CONFIG_LED 0
 #endif
 
+#ifndef CONFIG_BACKLIGHT
+#define CONFIG_BACKLIGHT 0
+#endif
+
 #ifndef CONFIG_CHARGING
 #define CONFIG_CHARGING 0
 #endif

@@ -49,7 +49,7 @@ struct event_queue button_queue;
 
 static int btn = 0;    /* Hopefully keeps track of currently pressed keys... */
 
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
 static bool filter_first_keypress;
 
 void set_backlight_filter_keypress(bool value)
@@ -76,7 +76,7 @@ void button_event(int key, bool pressed)
     static int repeat_count = 0;
     static bool repeat = false;
     static bool post = false;
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
     static bool skip_release = false;
 #ifdef HAVE_REMOTE_LCD
     static bool skip_remote_release = false;
@@ -520,7 +520,7 @@ void button_event(int key, bool pressed)
     diff = btn ^ lastbtn;
     if(diff && (btn & diff) == 0)
     {
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
         if(diff & BUTTON_REMOTE)
             if(!skip_remote_release)
@@ -587,7 +587,7 @@ void button_event(int key, bool pressed)
                     if (queue_empty(&button_queue))
                     {
                         queue_post(&button_queue, BUTTON_REPEAT | btn, 0);
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
                             if(btn & BUTTON_REMOTE)
                             {
@@ -604,7 +604,7 @@ void button_event(int key, bool pressed)
                 }
                 else
                 {
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
                         if (btn & BUTTON_REMOTE) {
                             if (!remote_filter_first_keypress || is_remote_backlight_on())

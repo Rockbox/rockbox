@@ -87,7 +87,7 @@ static const char trig_durations_conf [] =
 
 #endif /* HAVE_RECORDING */
 
-#if defined(CONFIG_BACKLIGHT)
+#if CONFIG_BACKLIGHT
 static const char backlight_times_conf [] =
                   "off,on,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90";
 static const int backlight_times[] = 
@@ -410,7 +410,7 @@ const struct settings_list settings[] = {
             { lcd_set_contrast, UNIT_INT, MIN_CONTRAST_SETTING,
                 MAX_CONTRAST_SETTING, 1, NULL, NULL}}}},
 #endif
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
     INT_SETTING_W_CFGVALS(0, backlight_timeout, LANG_BACKLIGHT, 6,
         "backlight timeout", backlight_times_conf, UNIT_SEC,
         0, 18, 1, backlight_formatter, backlight_getlang, 
@@ -516,7 +516,7 @@ const struct settings_list settings[] = {
 #endif
 #endif
 
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
     OFFON_SETTING(0,bl_filter_first_keypress,
         LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS, false,
         "backlight filters first keypress", NULL),
@@ -529,7 +529,7 @@ const struct settings_list settings[] = {
 
 /** End of old RTC config block **/
 
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
     OFFON_SETTING(0,caption_backlight, LANG_CAPTION_BACKLIGHT, 
         false,"caption backlight",NULL),
 #ifdef HAVE_REMOTE_LCD
@@ -748,7 +748,7 @@ const struct settings_list settings[] = {
         INT(0),"prerecording time",NULL,UNUSED},
     {F_T_INT,&global_settings.rec_directory,LANG_RECORD_DIRECTORY,
         INT(0),"rec directory",REC_BASE_DIR ",current",UNUSED},
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
     {F_T_INT,&global_settings.cliplight,LANG_CLIP_LIGHT,INT(0),
         "cliplight","off,main,both,remote",UNUSED},
 #endif
@@ -926,7 +926,7 @@ const struct settings_list settings[] = {
         LANG_WARN_ERASEDYNPLAYLIST_MENU,false,
         "warn when erasing dynamic playlist",NULL),
 
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
 #ifdef HAS_BUTTON_HOLD
     CHOICE_SETTING(0, backlight_on_button_hold,
         LANG_BACKLIGHT_ON_BUTTON_HOLD, 0, "backlight on button hold",

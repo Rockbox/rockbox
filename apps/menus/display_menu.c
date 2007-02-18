@@ -38,7 +38,7 @@
 #include "lcd-remote.h"
 
 
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
 int filterfirstkeypress_callback(int action,const struct menu_item_ex *this_item)
 {
     (void)this_item;
@@ -77,7 +77,7 @@ int flipdisplay_callback(int action,const struct menu_item_ex *this_item)
 
 /***********************************/
 /*    LCD MENU                     */
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
 MENUITEM_SETTING(backlight_timeout, &global_settings.backlight_timeout, NULL);
 #if CONFIG_CHARGING
 MENUITEM_SETTING(backlight_timeout_plugged, 
@@ -172,7 +172,7 @@ MENUITEM_FUNCTION(reset_colors, ID2P(LANG_RESET_COLORS),
 /* now the actual menu */
 MAKE_MENU(lcd_settings,ID2P(LANG_LCD_MENU),
             NULL, bitmap_icons_6x8[Icon_Display_menu]
-#ifdef CONFIG_BACKLIGHT
+#if CONFIG_BACKLIGHT
             ,&backlight_timeout
 # if CONFIG_CHARGING
             ,&backlight_timeout_plugged
