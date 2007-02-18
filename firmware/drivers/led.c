@@ -23,7 +23,7 @@
 #include "system.h"
 #include "kernel.h"
 
-#if (defined(CONFIG_LED) && (CONFIG_LED == LED_REAL))
+#if (CONFIG_LED == LED_REAL)
 
 void led(bool on)
 {
@@ -37,8 +37,7 @@ void led(bool on)
     }
 }
 
-#elif (defined(CONFIG_LED) && (CONFIG_LED == LED_VIRTUAL)) \
-      || defined(HAVE_REMOTE_LCD)
+#elif (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
 
 static bool current;
 static long last_on; /* timestamp of switching off */

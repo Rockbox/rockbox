@@ -116,7 +116,7 @@
                                                 7*ICONS_SPACING
 #define STATUSBAR_LOCKR_WIDTH                   5
 
-#if (defined(CONFIG_LED) && (CONFIG_LED == LED_VIRTUAL)) || defined(HAVE_REMOTE_LCD)
+#if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
 #define STATUSBAR_DISK_WIDTH                    12
 #define STATUSBAR_DISK_X_POS(statusbar_width)   statusbar_width - \
                                                 STATUSBAR_DISK_WIDTH
@@ -208,7 +208,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
     bar->info.repeat = global_settings.repeat_mode;
     bar->info.playmode = current_playmode();
 
-#if (defined(CONFIG_LED) && (CONFIG_LED == LED_VIRTUAL)) || defined(HAVE_REMOTE_LCD)
+#if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
     if(!display->has_disk_led)
         bar->info.led = led_read(HZ/2); /* delay should match polling interval */
 #endif
@@ -300,7 +300,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 #ifdef CONFIG_RTC
         gui_statusbar_time(display, bar->info.hour, bar->info.minute);
 #endif /* CONFIG_RTC */
-#if (defined(CONFIG_LED) && (CONFIG_LED == LED_VIRTUAL)) || defined(HAVE_REMOTE_LCD)
+#if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
         if(!display->has_disk_led && bar->info.led)
             gui_statusbar_led(display);
 #endif
@@ -541,7 +541,7 @@ void gui_statusbar_icon_lock_remote(struct screen * display)
 }
 #endif
 
-#if (defined(CONFIG_LED) && (CONFIG_LED == LED_VIRTUAL)) || defined(HAVE_REMOTE_LCD)
+#if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
 /*
  * no real LED: disk activity in status bar
  */

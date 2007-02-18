@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Björn Stenberg
+ * Copyright (C) 2002 by Bjï¿½n Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -561,7 +561,7 @@ int main(void)
     app_main();
 
     while(1) {
-#if defined(CONFIG_LED) && (CONFIG_LED == LED_REAL)
+#if (CONFIG_LED == LED_REAL)
         led(true); sleep(HZ/10);
         led(false); sleep(HZ/10);
 #endif

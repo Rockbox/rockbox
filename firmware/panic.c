@@ -39,7 +39,7 @@ void panicf( const char *fmt, ...)
     va_list ap;
 
 #ifndef SIMULATOR
-#if (defined(CONFIG_LED) && (CONFIG_LED == LED_REAL))
+#if (CONFIG_LED == LED_REAL)
     bool state = false;
     int i = 0;
 #endif
@@ -90,7 +90,7 @@ void panicf( const char *fmt, ...)
     while (1)
     {
 #ifndef SIMULATOR
-#if (defined(CONFIG_LED) && (CONFIG_LED == LED_REAL))
+#if (CONFIG_LED == LED_REAL)
         if (--i <= 0)
         {
             state = !state;
