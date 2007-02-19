@@ -12,6 +12,9 @@ main.c
 main_menu.c
 menu.c
 menus/display_menu.c
+#if CONFIG_CODEC == SWCODEC
+menus/eq_menu.c
+#endif
 menus/main_menu.c
 menus/playback_menu.c
 menus/playlist_menu.c
@@ -94,7 +97,6 @@ eq_cf.S
 dsp_arm.S
 eq_arm.S
 #endif
-eq_menu.c
 #endif
 metadata.c
 #ifdef HAVE_TAGCACHE

@@ -72,9 +72,12 @@ struct menu_func_with_param {
 };
 
 #define MENU_TYPE_MASK 0xF /* MT_* type */
+/* these next two are mutually exclusive */
 #define MENU_HAS_DESC   0x10
-#define MENU_COUNT_MASK (~(MENU_TYPE_MASK|MENU_HAS_DESC)) /* unless we need more flags*/
-#define MENU_COUNT_SHIFT 5
+#define MENU_DYNAMIC_DESC 0x20
+/* unless we need more flags*/
+#define MENU_COUNT_MASK (~(MENU_TYPE_MASK|MENU_HAS_DESC|MENU_DYNAMIC_DESC))
+#define MENU_COUNT_SHIFT 6
 
 struct menu_item_ex {
     int flags; /* above defines */
@@ -88,7 +91,9 @@ struct menu_item_ex {
         const char **strings; /* used with MT_RETURN_ID */
     };
     union {
+		/* For settings */
         int (*menu_callback)(int action, const struct menu_item_ex *this_item);
+		/* For everything else, except if the text is dynamic */
         const struct menu_callback_with_desc {
             int (*menu_callback)(int action, 
                                  const struct menu_item_ex *this_item);
@@ -97,12 +102,23 @@ struct menu_item_ex {
             ICON icon; /* Icon to display */
 #endif
         } *callback_and_desc;
+		/* For when the item text is dynamic */
+		const struct menu_get_name_and_icon {
+			int (*menu_callback)(int action, 
+                                 const struct menu_item_ex *this_item);
+			char *(*list_get_name)(int selected_item, void * data, char *buffer);
+			void *list_get_name_data;
+#ifdef HAVE_LCD_BITMAP
+            ICON icon; /* Icon to display */
+#endif
+		} *menu_get_name_and_icon;
     };
 };
 
 typedef int (*menu_callback_type)(int action,
                                   const struct menu_item_ex *this_item);
 int do_menu(const struct menu_item_ex *menu);
+bool do_setting_from_menu(const struct menu_item_ex *temp);
 
 #define MENU_ITEM_COUNT(c) (c<<MENU_COUNT_SHIFT)
 /* In all the following macros the argument names are as follows:
@@ -152,6 +168,17 @@ int do_menu(const struct menu_item_ex *menu);
         { MT_FUNCTION_WITH_PARAM|MENU_HAS_DESC,                             \
             { .func_with_param = &name##__},                                \
             {.callback_and_desc = & name##_}};
+			
+/* As above, except the text is dynamic */
+#define MENUITEM_FUNCTION_WPARAM_DYNTEXT(name, func, param, callback,  \
+										 text_callback, text_cb_data, icon) \
+    static const struct menu_get_name_and_icon name##_ 						\
+								= {callback,text_callback,text_cb_data,icon};\
+    static const struct menu_func_with_param name##__ = {func, param};      \
+    static const struct menu_item_ex name   =                               \
+        { MT_FUNCTION_WITH_PARAM|MENU_DYNAMIC_DESC,                             \
+            { .func_with_param = &name##__},                                \
+            {.menu_get_name_and_icon = & name##_}};
 
 /*  Use this to actually create a menu. the ... argument is a list of pointers 
     to any of the above macro'd variables. (It can also have other menus in the list. */

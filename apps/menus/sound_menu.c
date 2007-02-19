@@ -31,6 +31,7 @@
 #if CONFIG_CODEC == SWCODEC
 #include "pcmbuf.h"
 #endif
+#include "exported_menus.h"
 
 /***********************************/
 /*    SOUND MENU                   */
@@ -79,14 +80,8 @@ MENUITEM_SETTING(stereo_width, &global_settings.stereo_width, soundmenu_callback
               &crossfeed, &crossfeed_direct_gain, &crossfeed_cross_gain,
               &crossfeed_hf_attenuation, &crossfeed_hf_cutoff);
               
-    MENUITEM_FUNCTION(equalizer_menu, ID2P(LANG_EQUALIZER),
-                      (int(*)(void))eq_menu, NULL, NOICON);
     MENUITEM_SETTING(dithering_enabled,
                      &global_settings.dithering_enabled, soundmenu_callback);
-#ifdef HAVE_WM8758
-    MENUITEM_FUNCTION(hw_equalizer_menu, ID2P(LANG_EQUALIZER_HARDWARE),
-                      (int(*)(void))eq_hw_menu, NULL, NOICON);
-#endif
 #endif
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
@@ -109,10 +104,10 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, bitmap_icons_6x8[Icon
 #endif
           &balance,&channel_config,&stereo_width
 #if CONFIG_CODEC == SWCODEC
-         ,&crossfeed_menu, &equalizer_menu,&dithering_enabled
+         ,&crossfeed_menu, &equalizer_menu, &dithering_enabled
 #endif
 #ifdef HAVE_WM8758
-         ,&hw_equalizer_menu
+         ,&hw_eq_menu
 #endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
          ,&loudness,&avc,&superbass,&mdb_enable,&mdb_strength

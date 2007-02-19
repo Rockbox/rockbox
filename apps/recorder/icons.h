@@ -82,6 +82,7 @@ enum icons_6x8 {
     Icon_Radio_screen,
 #endif
 	Icon_file_view_menu,
+	Icon_EQ,
     Icon6x8Last,
 };
 

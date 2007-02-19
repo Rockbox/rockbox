@@ -89,7 +89,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #endif /* CONFIG_CODEC == SWCODEC */
 
 #ifdef HAVE_WM8758
-#include "eq_menu.h"
+#include "menus/eq_menu.h"
 #endif
 
 #define NVRAM_BLOCK_SIZE 44

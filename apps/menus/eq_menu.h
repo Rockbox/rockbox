@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id: eq_menu.h 10888 2006-09-05 11:48:17Z dan $
  *
  * Copyright (C) 2006 Dan Everton
  *
@@ -21,11 +21,37 @@
 
 #include "menu.h"
 #include "config.h"
+/* Various user interface limits and sizes */
+#define EQ_CUTOFF_MIN        20
+#define EQ_CUTOFF_MAX     22040
+#define EQ_CUTOFF_STEP       10
+#define EQ_CUTOFF_FAST_STEP 100
+#define EQ_GAIN_MIN       (-240)
+#define EQ_GAIN_MAX         240
+#define EQ_GAIN_STEP          5
+#define EQ_GAIN_FAST_STEP    10
+#define EQ_Q_MIN              5
+#define EQ_Q_MAX             64
+#define EQ_Q_STEP             1
+#define EQ_Q_FAST_STEP       10
+
+#define EQ_USER_DIVISOR      10
 
 bool eq_browse_presets(void);
 bool eq_menu_graphical(void);
-bool eq_menu(void);
+
+/* utility functions for settings_list.c */
+void eq_gain_format(char* buffer, int buffer_size, int value, const char* unit);
+void eq_q_format(char* buffer, int buffer_size, int value, const char* unit);
+void eq_precut_format(char* buffer, int buffer_size, int value, const char* unit);
 #ifdef HAVE_WM8758
+void eq_hw_gain_format(char* buffer, int buffer_size, int value,
+                                    const char* unit);
+/* WM8758 equalizer supports -12 to +12 dB gain in 1 dB increments. */
+#define EQ_HW_GAIN_STEP 1
+#define EQ_HW_GAIN_MIN -12
+#define EQ_HW_GAIN_MAX 12
+
 bool eq_hw_menu(void);
 void eq_hw_enable(bool enable);
 #endif

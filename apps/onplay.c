@@ -59,7 +59,7 @@
 #include "main_menu.h"
 #include "sound_menu.h"
 #if CONFIG_CODEC == SWCODEC
-#include "eq_menu.h"
+#include "menus/eq_menu.h"
 #endif
 #include "playlist_menu.h"
 #include "playlist_catalog.h"
