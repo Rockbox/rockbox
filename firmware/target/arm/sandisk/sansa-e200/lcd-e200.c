@@ -299,18 +299,114 @@ void lcd_blit(const fb_data* data, int x, int by, int width,
     (void)stride;
 }
 
+#define CSUB_X 2
+#define CSUB_Y 2
+
+#define RYFAC (31*257)
+#define GYFAC (63*257)
+#define BYFAC (31*257)
+#define RVFAC 11170     /* 31 * 257 *  1.402    */
+#define GVFAC (-11563)  /* 63 * 257 * -0.714136 */
+#define GUFAC (-5572)   /* 63 * 257 * -0.344136 */
+#define BUFAC 14118     /* 31 * 257 *  1.772    */
+
+#define ROUNDOFFS (127*257)
+
+/* Performance function to blit a YUV bitmap directly to the LCD
+   Actually this code is from gigabeat, because this target is also
+   writing direct to a buffer. */
 void lcd_yuv_blit(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
-                  int x, int y, int width, int height)
+                  int _x, int _y, int width, int height)
 {
-    /* TODO: Implement lcd_blit() */
-    (void)src;
-    (void)src_x;
-    (void)src_y;
-    (void)stride;
-    (void)x;
-    (void)y;
-    (void)width;
-    (void)height;
+    const unsigned char *usrc;
+    const unsigned char *vsrc;
+    const unsigned char *ysrc;
+    int xphase;
+    int rc, gc, bc;
+    int y, u, v;
+    int red, green, blue;
+    unsigned rbits, gbits, bbits;
+    int count;
+    fb_data *dst_row;
+
+
+    width = (width + 1) & ~1;
+    fb_data *dst = (fb_data*)lcd_framebuffer + _x * LCD_WIDTH + (LCD_WIDTH - _y) - 1;
+    fb_data *dst_last = dst - (height - 1);
+
+    do
+    {
+        dst_row = dst;
+        count = width;
+        ysrc = src[0] + stride * src_y + src_x;
+
+        /* upsampling, YUV->RGB conversion and reduction to RGB565 in one go */
+        usrc = src[1] + (stride/CSUB_X) * (src_y/CSUB_Y)
+                                           + (src_x/CSUB_X);
+        vsrc = src[2] + (stride/CSUB_X) * (src_y/CSUB_Y)
+                                           + (src_x/CSUB_X);
+        xphase = src_x % CSUB_X;
+
+        u = *usrc++ - 128;
+        v = *vsrc++ - 128;
+        rc = RVFAC * v + ROUNDOFFS;
+        gc = GVFAC * v + GUFAC * u + ROUNDOFFS;
+        bc = BUFAC * u + ROUNDOFFS;
+
+        do
+        {
+            y = *ysrc++;
+            red   = RYFAC * y + rc;
+            green = GYFAC * y + gc;
+            blue  = BYFAC * y + bc;
+
+            if ((unsigned)red > (RYFAC*255+ROUNDOFFS))
+            {
+                if (red < 0)
+                    red = 0;
+                else
+                    red = (RYFAC*255+ROUNDOFFS);
+            }
+            if ((unsigned)green > (GYFAC*255+ROUNDOFFS))
+            {
+                if (green < 0)
+                    green = 0;
+                else
+                    green = (GYFAC*255+ROUNDOFFS);
+            }
+            if ((unsigned)blue > (BYFAC*255+ROUNDOFFS))
+            {
+                if (blue < 0)
+                    blue = 0;
+                else
+                    blue = (BYFAC*255+ROUNDOFFS);
+            }
+            rbits = ((unsigned)red) >> 16 ;
+            gbits = ((unsigned)green) >> 16 ;
+            bbits = ((unsigned)blue) >> 16 ;
+
+            *dst_row = (rbits << 11) | (gbits << 5) | bbits;
+
+            /* next pixel - since rotated, add WIDTH */
+            dst_row += LCD_WIDTH;
+
+            if (++xphase >= CSUB_X)
+            {
+                u = *usrc++ - 128;
+                v = *vsrc++ - 128;
+                rc = RVFAC * v + ROUNDOFFS;
+                gc = GVFAC * v + GUFAC * u + ROUNDOFFS;
+                bc = BUFAC * u + ROUNDOFFS;
+                xphase = 0;
+            }
+        }
+        while (--count);
+
+        if (dst == dst_last) break;
+
+        dst--;
+        src_y++;
+    } while( 1);
 }
 
