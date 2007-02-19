@@ -494,13 +494,24 @@ bool do_setting_from_menu(const struct menu_item_ex *temp)
 			}
 			if (setting->flags&F_INT_SETTING)
 			{
+				int min, max, step;
+				if (setting->flags&F_FLIPLIST)
+				{
+					min = setting->int_setting->max;
+					max = setting->int_setting->min;
+					step = -setting->int_setting->step;
+				}
+				else
+				{
+					max = setting->int_setting->max;
+					min = setting->int_setting->min;
+					step = setting->int_setting->step;
+				}
 				set_int_ex(str(setting->lang_id),
 						NULL,
 						setting->int_setting->unit,var,
 						setting->int_setting->option_callback,
-						setting->int_setting->step,
-						setting->int_setting->min,
-						setting->int_setting->max,
+						step, min, max,
 						setting->int_setting->formatter,
 						setting->int_setting->get_talk_id);
 			}
