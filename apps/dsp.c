@@ -46,6 +46,18 @@
 #define RESAMPLE_BUF_COUNT  (256 * 4)   /* Enough for 11,025 Hz -> 44,100 Hz*/
 #define DEFAULT_GAIN        0x01000000
 
+
+enum
+{
+    CONVERT_LE_NATIVE_I_STEREO  = STEREO_INTERLEAVED,
+    CONVERT_LE_NATIVE_NI_STEREO = STEREO_NONINTERLEAVED,
+    CONVERT_LE_NATIVE_MONO      = STEREO_MONO,
+    CONVERT_GT_NATIVE_I_STEREO  = STEREO_INTERLEAVED + STEREO_NUM_MODES,
+    CONVERT_GT_NATIVE_NI_STEREO = STEREO_NONINTERLEAVED + STEREO_NUM_MODES,
+    CONVERT_GT_NATIVE_MONO      = STEREO_MONO + STEREO_NUM_MODES,
+    CONVERT_GT_NATIVE_1ST_INDEX = STEREO_NUM_MODES
+};
+
 struct dsp_config
 {
     long codec_frequency; /* Sample rate of data coming from the codec */
@@ -60,6 +72,7 @@ struct dsp_config
     int sample_depth;
     int sample_bytes;
     int stereo_mode;
+    int num_channels;
     int frac_bits;
     bool dither_enabled;
     long dither_bias;
@@ -69,11 +82,13 @@ struct dsp_config
     bool eq_enabled;
     long eq_precut;
     long gain;          /* Note that this is in S8.23 format. */
+    int (*convert_to_internal)(const char* src[], int32_t* dst[], int count);
 };
 
 struct resample_data
 {
-    long phase, delta;
+    long phase;
+    long delta;
     int32_t last_sample[2];
 };
 
@@ -139,86 +154,155 @@ void sound_set_pitch(int permille)
  * consume. Note that for mono, dst[0] equals dst[1], as there is no point
  * in processing the same data twice.
  */
-static int convert_to_internal(const char* src[], int count, int32_t* dst[])
+
+/* convert count 16-bit mono to 32-bit mono */
+static int convert_lte_native_mono(
+    const char *src[], int32_t *dst[], int count)
 {
-    count = MIN(SAMPLE_BUF_COUNT / 2, count);
+    count = MIN(SAMPLE_BUF_COUNT/2, count);
 
-    if ((dsp->sample_depth <= NATIVE_DEPTH)
-        || (dsp->stereo_mode == STEREO_INTERLEAVED))
-    {
-        dst[0] = &sample_buf[0];
-        dst[1] = (dsp->stereo_mode == STEREO_MONO)
-            ? dst[0] : &sample_buf[SAMPLE_BUF_COUNT / 2];
-    }
-    else
-    {
-        dst[0] = (int32_t*) src[0];
-        dst[1] = (int32_t*) ((dsp->stereo_mode == STEREO_MONO) ? src[0] : src[1]);
-    }
+    const short *s = (short*) src[0];
+    const short * const send = s + count;
+    int32_t *d = dst[0] = dst[1] = sample_buf;
+    const int scale = WORD_SHIFT;
 
-    if (dsp->sample_depth <= NATIVE_DEPTH)
+    do
     {
-        short* s0 = (short*) src[0];
-        int32_t* d0 = dst[0];
-        int32_t* d1 = dst[1];
-        int scale = WORD_SHIFT;
-        int i;
+        *d++ = *s++ << scale;
+    }
+    while (s < send);
 
-        if (dsp->stereo_mode == STEREO_INTERLEAVED)
-        {
-            for (i = 0; i < count; i++)
-            {
-                *d0++ = *s0++ << scale;
-                *d1++ = *s0++ << scale;
-            }
-        }
-        else if (dsp->stereo_mode == STEREO_NONINTERLEAVED)
-        {
-            short* s1 = (short*) src[1];
-
-            for (i = 0; i < count; i++)
-            {
-                *d0++ = *s0++ << scale;
-                *d1++ = *s1++ << scale;
-            }
-        }
-        else
-        {
-            for (i = 0; i < count; i++)
-            {
-                *d0++ = *s0++ << scale;
-            }
-        }
-    }
-    else if (dsp->stereo_mode == STEREO_INTERLEAVED)
-    {
-        int32_t* s0 = (int32_t*) src[0];
-        int32_t* d0 = dst[0];
-        int32_t* d1 = dst[1];
-        int i;
-
-        for (i = 0; i < count; i++)
-        {
-            *d0++ = *s0++;
-            *d1++ = *s0++;
-        }
-    }
-
-    if (dsp->stereo_mode == STEREO_NONINTERLEAVED)
-    {
-        src[0] += count * dsp->sample_bytes;
-        src[1] += count * dsp->sample_bytes;
-    }
-    else if (dsp->stereo_mode == STEREO_INTERLEAVED)
-    {
-        src[0] += count * dsp->sample_bytes * 2;
-    }
-    else
-    {
-        src[0] += count * dsp->sample_bytes;
-    }
+    src[0] = (char *)s;
 
     return count;
+}
+
+/* convert count 16-bit interleaved stereo to 32-bit noninterleaved */
+static int convert_lte_native_interleaved_stereo(
+    const char *src[], int32_t *dst[], int count)
+{
+    count = MIN(SAMPLE_BUF_COUNT/2, count);
+
+    const int32_t *s = (int32_t *) src[0];
+    const int32_t * const send = s + count;
+    int32_t *dl = dst[0] = sample_buf;
+    int32_t *dr = dst[1] = sample_buf + SAMPLE_BUF_COUNT/2;
+    const int scale = WORD_SHIFT;
+
+    do
+    {
+        short slr = *s++;
+#ifdef ROCKBOX_LITTLE_ENDIAN
+        *dl++ = (slr >> 16) << scale;
+        *dr++ = (int32_t)(short)slr << scale;
+#else  /* ROCKBOX_BIG_ENDIAN */
+        *dl++ = (int32_t)(short)slr << scale;
+        *dr++ = (slr >> 16) << scale;
+#endif
+    }
+    while (s < send);
+
+    src[0] = (char *)s;
+
+    return count;
+}
+
+/* convert count 16-bit noninterleaved stereo to 32-bit noninterleaved */
+static int convert_lte_native_noninterleaved_stereo(
+    const char *src[], int32_t *dst[], int count)
+{
+    const short *sl = (short *) src[0];
+    const short *sr = (short *) src[1];
+    const short * const slend = sl + count;
+    int32_t *dl = dst[0] = sample_buf;
+    int32_t *dr = dst[1] = sample_buf + SAMPLE_BUF_COUNT/2;
+    const int scale = WORD_SHIFT;
+
+    do
+    {
+        *dl++ = *sl++ << scale;
+        *dr++ = *sr++ << scale;
+    }
+    while (sl < slend);
+
+    src[0] = (char *)sl;
+    src[1] = (char *)sr;
+
+    return count;
+}
+
+/* convert count 32-bit mono to 32-bit mono */
+static int convert_gt_native_mono(
+    const char *src[], int32_t *dst[], int count)
+{
+    count = MIN(SAMPLE_BUF_COUNT/2, count);
+
+    dst[0] = dst[1] = (int32_t *)src[0];
+    src[0] = (char *)(dst[0] + count);
+
+    return count;
+}
+
+/* convert count 32-bit interleaved stereo to 32-bit noninterleaved stereo */
+static int convert_gt_native_interleaved_stereo(
+    const char *src[], int32_t *dst[], int count)
+{
+    count = MIN(SAMPLE_BUF_COUNT/2, count);
+
+    const int32_t *s = (int32_t *)src[0];
+    const int32_t * const send = s + 2*count;
+    int32_t *dl = sample_buf;
+    int32_t *dr = sample_buf + SAMPLE_BUF_COUNT/2;
+
+    dst[0] = dl;
+    dst[1] = dr;
+
+    do
+    {
+        *dl++ = *s++;
+        *dr++ = *s++;
+    }
+    while (s < send);
+
+    src[0] = (char *)send;
+
+    return count;
+}
+
+/* convert 32 bit-noninterleaved stereo to 32-bit noninterleaved stereo */
+static int convert_gt_native_noninterleaved_stereo(
+    const char *src[], int32_t *dst[], int count)
+{
+    count = MIN(SAMPLE_BUF_COUNT/2, count);
+
+    dst[0] = (int32_t *)src[0];
+    dst[1] = (int32_t *)src[1];
+    src[0] = (char *)(dst[0] + count);
+    src[1] = (char *)(dst[1] + count);
+
+    return count;
+}
+
+/* set the to-native sample conversion function based on dsp sample parameters */
+static void new_sample_conversion(void)
+{
+    static int (*convert_to_internal_functions[])(
+        const char* src[], int32_t *dst[], int count) =
+    {
+        [CONVERT_LE_NATIVE_MONO]      = convert_lte_native_mono,
+        [CONVERT_LE_NATIVE_I_STEREO]  = convert_lte_native_interleaved_stereo,
+        [CONVERT_LE_NATIVE_NI_STEREO] = convert_lte_native_noninterleaved_stereo,
+        [CONVERT_GT_NATIVE_MONO]      = convert_gt_native_mono,
+        [CONVERT_GT_NATIVE_I_STEREO]  = convert_gt_native_interleaved_stereo,
+        [CONVERT_GT_NATIVE_NI_STEREO] = convert_gt_native_noninterleaved_stereo,
+    };
+
+    int convert = dsp->stereo_mode;
+
+    if (dsp->sample_depth > NATIVE_DEPTH)
+        convert += CONVERT_GT_NATIVE_1ST_INDEX;
+
+    dsp->convert_to_internal = convert_to_internal_functions[convert];
 }
 
 static void resampler_set_delta(int frequency)
@@ -230,124 +314,118 @@ static void resampler_set_delta(int frequency)
 /* Linear interpolation resampling that introduces a one sample delay because
  * of our inability to look into the future at the end of a frame.
  */
-
-/* TODO: we really should have a separate set of resample functions for both
-   mono and stereo to avoid all this internal branching and looping. */
-static int downsample(int32_t **dst, int32_t **src, int count,
-    struct resample_data *r)
+#ifndef DSP_HAVE_ASM_RESAMPLING
+static int dsp_downsample(int channels, int count, struct resample_data *r,
+                          int32_t **src, int32_t **dst)
 {
-    long phase = r->phase;
     long delta = r->delta;
-    int32_t last_sample;
-    int32_t *d[2] = { dst[0], dst[1] };
-    int pos = phase >> 16;
-    int i = 1, j;
-    int num_channels = dsp->stereo_mode == STEREO_MONO ? 1 : 2;
-    
-    for (j = 0; j < num_channels; j++) {
-        last_sample = r->last_sample[j];
+    long phase, pos;
+    int32_t *d;
+
+    /* Rolled channel loop actually showed slightly faster. */
+    do
+    {
+        /* Just initialize things and not worry too much about the relatively
+         * uncommon case of not being able to spit out a sample for the frame.
+         */
+        int32_t *s = src[--channels];
+        int32_t last = r->last_sample[channels];
+        
+        r->last_sample[channels] = s[count - 1];
+        d = dst[channels];
+        phase = r->phase;
+        pos = phase >> 16;
+
         /* Do we need last sample of previous frame for interpolation? */
         if (pos > 0)
-            last_sample = src[j][pos - 1];
+            last = s[pos - 1];
 
-        /* Be sure starting position isn't passed the available data */
-        if (pos < count)
-            *d[j]++ = last_sample + FRACMUL((phase & 0xffff) << 15,
-                src[j][pos] - last_sample);
-        else
+        while (pos < count)
         {
-            /* No samples can be output here since were already passed the
-               end. Keep phase, save the last sample and return nothing. */
-            i = 0;
-            goto done;
+            *d++ = last + FRACMUL((phase & 0xffff) << 15, s[pos] - last);
+            phase += delta;
+            pos = phase >> 16;
+            last = s[pos - 1];
         }
     }
-
-    phase += delta;
- 
-    while ((pos = phase >> 16) < count)
-    {
-        for (j = 0; j < num_channels; j++)
-            *d[j]++ = src[j][pos - 1] + FRACMUL((phase & 0xffff) << 15,
-                src[j][pos] - src[j][pos - 1]);
-         phase += delta;
-         i++;
-    }
+    while (channels > 0);
 
     /* Wrap phase accumulator back to start of next frame. */
-done:
     r->phase = phase - (count << 16);
-    r->last_sample[0] = src[0][count - 1];
-    r->last_sample[1] = src[1][count - 1];
-    return i;
+    return d - dst[0];
 }
 
-static long upsample(int32_t **dst, int32_t **src, int count, struct resample_data *r)
+static int dsp_upsample(int channels, int count, struct resample_data *r,
+                        int32_t **src, int32_t **dst)
 {
-    long phase = r->phase;
     long delta = r->delta;
-    int32_t *d[2] = { dst[0], dst[1] };
-    int i = 0, j;
-    int pos;
-    int num_channels = dsp->stereo_mode == STEREO_MONO ? 1 : 2;
-   
-    while ((phase >> 16) == 0)
-    {
-       for (j = 0; j < num_channels; j++)
-           *d[j]++ = r->last_sample[j] + FRACMUL((phase & 0xffff) << 15,
-                src[j][0] - r->last_sample[j]);
-        phase += delta;
-        i++;
-    }
+    long phase, pos;
+    int32_t *d;
 
-    while ((pos = phase >> 16) < count)
+    /* Rolled channel loop actually showed slightly faster. */
+    do
     {
-        for (j = 0; j < num_channels; j++)
-            *d[j]++ = src[j][pos - 1] + FRACMUL((phase & 0xffff) << 15,
-                src[j][pos] - src[j][pos - 1]);
-        phase += delta;
-        i++;
+        /* Should always be able to output a sample for a ratio up to
+           RESAMPLE_BUF_COUNT / SAMPLE_BUF_COUNT. */
+        int32_t *s = src[--channels];
+        int32_t last = r->last_sample[channels];
+        
+        r->last_sample[channels] = s[count - 1];
+        d = dst[channels];
+        phase = r->phase;
+        pos = phase >> 16;
+
+        while (pos == 0)
+        {
+            *d++ = last + FRACMUL((phase & 0xffff) << 15, s[0] - last);
+            phase += delta;
+            pos = phase >> 16;
+        }
+
+        while (pos < count)
+        {
+            last = s[pos - 1];
+            *d++ = last + FRACMUL((phase & 0xffff) << 15, s[pos] - last);
+            phase += delta;
+            pos = phase >> 16;
+        }
     }
+    while (channels > 0);
 
     /* Wrap phase accumulator back to start of next frame. */
-    r->phase = phase - (count << 16);
-    r->last_sample[0] = src[0][count - 1];
-    r->last_sample[1] = src[1][count - 1];
-    return i;
+    r->phase = phase & 0xffff;
+    return d - dst[0];
 }
+#endif /* DSP_HAVE_ASM_RESAMPLING */
 
 /* Resample count stereo samples. Updates the src array, if resampling is
  * done, to refer to the resampled data. Returns number of stereo samples
  * for further processing.
  */
-static inline int resample(int32_t* src[], int count)
+static inline int resample(int32_t *src[], int count)
 {
-    long new_count;
+    long new_count = count;
 
     if (dsp->frequency != NATIVE_FREQUENCY)
     {
-        int32_t* dst[2] = {&resample_buf[0], &resample_buf[RESAMPLE_BUF_COUNT / 2]};
+        int32_t *dst[2] =
+        {
+            resample_buf,
+            resample_buf + RESAMPLE_BUF_COUNT/2,
+        };
+        int channels = dsp->num_channels;
 
         if (dsp->frequency < NATIVE_FREQUENCY)
-        {
-            new_count = upsample(dst, src, count, 
-                            &resample_data[current_codec]);
-        }
+            new_count = dsp_upsample(channels, count,
+                                     &resample_data[current_codec],
+                                     src, dst);
         else
-        {
-            new_count = downsample(dst, src, count,
-                            &resample_data[current_codec]);
-        }
+            new_count = dsp_downsample(channels, count,
+                                       &resample_data[current_codec],
+                                       src, dst);
 
         src[0] = dst[0];
-        if (dsp->stereo_mode != STEREO_MONO)
-            src[1] = dst[1];
-        else
-            src[1] = dst[0];
-    }
-    else
-    {
-        new_count = count;
+        src[1] = dst[channels - 1];
     }
 
     return new_count;
@@ -378,8 +456,7 @@ void dsp_dither_enable(bool enable)
 
 static void dither_init(void)
 {
-    memset(&dither_data[0], 0, sizeof(struct dither_data));
-    memset(&dither_data[1], 0, sizeof(struct dither_data));
+    memset(dither_data, 0, sizeof(dither_data));
     dsp->dither_bias = (1L << (dsp->frac_bits - NATIVE_DEPTH));
     dsp->dither_mask = (1L << (dsp->frac_bits + 1 - NATIVE_DEPTH)) - 1;
 }
@@ -592,7 +669,7 @@ void dsp_set_eq_coefs(int band)
 static void eq_process(int32_t **x, unsigned num)
 {
     int i;
-    unsigned int channels = dsp->stereo_mode != STEREO_MONO ? 2 : 1;
+    unsigned int channels = dsp->num_channels;
     unsigned shift;
 
     /* filter configuration currently is 1 low shelf filter, 3 band peaking
@@ -772,7 +849,7 @@ int dsp_process(char *dst, const char *src[], int count)
 
     while (count > 0)
     {
-        samples = convert_to_internal(src, count, tmp);
+        samples = dsp->convert_to_internal(src, tmp, count);
         count -= samples;
         apply_gain(tmp, samples);
         samples = resample(tmp, samples);
@@ -886,7 +963,7 @@ bool dsp_configure(int setting, intptr_t value)
 
     case DSP_SET_SAMPLE_DEPTH:
         dsp->sample_depth = value;
- 
+
         if (dsp->sample_depth <= NATIVE_DEPTH)
         {
             dsp->frac_bits = WORD_FRACBITS;
@@ -902,15 +979,19 @@ bool dsp_configure(int setting, intptr_t value)
             dsp->clip_min = -(1 << value);
         }
 
+        new_sample_conversion();
         dither_init(); 
         break;
 
     case DSP_SET_STEREO_MODE:
-        dsp->stereo_mode = (long) value;
+        dsp->stereo_mode = value;
+        dsp->num_channels = value == STEREO_MONO ? 1 : 2;
+        new_sample_conversion();
         break;
 
     case DSP_RESET:
         dsp->stereo_mode = STEREO_NONINTERLEAVED;
+        dsp->num_channels = 2;
         dsp->clip_max =  ((1 << WORD_FRACBITS) - 1);
         dsp->clip_min = -((1 << WORD_FRACBITS));
         dsp->track_gain = 0;
@@ -921,6 +1002,7 @@ bool dsp_configure(int setting, intptr_t value)
         dsp->sample_depth = NATIVE_DEPTH;
         dsp->frac_bits = WORD_FRACBITS;
         dsp->new_gain = true;
+        new_sample_conversion();
         break;
 
     case DSP_FLUSH:

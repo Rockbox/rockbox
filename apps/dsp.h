@@ -24,9 +24,13 @@
 #include <stdbool.h>
 
 #define NATIVE_FREQUENCY       44100
-#define STEREO_INTERLEAVED     0
-#define STEREO_NONINTERLEAVED  1
-#define STEREO_MONO            2
+enum
+{
+    STEREO_INTERLEAVED = 0,
+    STEREO_NONINTERLEAVED,
+    STEREO_MONO,
+    STEREO_NUM_MODES,
+};
 
 enum {
     CODEC_SET_FILEBUF_WATERMARK = 1,

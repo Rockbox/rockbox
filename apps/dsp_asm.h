@@ -27,5 +27,13 @@
 void apply_crossfeed(int32_t* src[], int count);
 #endif
 
+#if defined (CPU_COLDFIRE)
+#define DSP_HAVE_ASM_RESAMPLING
+int dsp_downsample(int channels, int count, void *resample_data,
+                   int32_t **src, int32_t **dst);
+int dsp_upsample(int channels, int count, void *resample_data,
+                 int32_t **src, int32_t **dst);
 #endif
+
+#endif /* _DSP_ASM_H */
 
