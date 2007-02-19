@@ -3,7 +3,7 @@
 %wd
 %X|bg-220x176x16.bmp|0|0|
 %P|pg-164.bmp|
-%x|o|pgln-164.bmp|28|122|
+%x|o|pgln-164.bmp|28|116|
 %xl|p|ply-color-big.bmp|102|156|
 %xl|q|ps-color-big.bmp|102|156|
 %xl|f|ff-color-big.bmp|102|156|
@@ -47,8 +47,7 @@
 %al %s%ac%?it<%it|Title?>%ar 
 
 %ac%t3%ig;%t%iy 
-
-%pb|5|28|191|122|
+%pb|5|28|191|116|
 %al  %pc%ac%?fc<mp1|mp2|mp3|aiff|wav|vorbis|flac|mpc|a52|wavpack|alac|aac|shn|sid|adx|unknown>%ar%pt  
 %?ps<%xdb>
 %?mp<%xdq|%xdp|%xdq|%xdf|%xdr>
