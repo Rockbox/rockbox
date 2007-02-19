@@ -497,10 +497,10 @@ static char* select_bookmark(const char* bookmark_file_name)
 
 #ifdef HAVE_LCD_BITMAP
     int i;
-    int x = lcd_getxmargin();
-    int y = lcd_getymargin();
+
     FOR_NB_SCREENS(i)
-        screens[i].setmargins(0, 0);
+        screens[i].setmargins(0, global_settings.statusbar
+            ? STATUSBAR_HEIGHT : 0);
 #endif
 
     bookmark_count = get_bookmark_count(bookmark_file_name);
@@ -547,11 +547,6 @@ static char* select_bookmark(const char* bookmark_file_name)
         {
             case ACTION_BMS_SELECT:
                 /* User wants to use this bookmark */
-#ifdef HAVE_LCD_BITMAP
-                FOR_NB_SCREENS(i)
-                    screens[i].setmargins(0, global_settings.statusbar 
-                        ? STATUSBAR_HEIGHT : 0);
-#endif
                 action_signalscreenchange();
                 return bookmark;
 
@@ -575,10 +570,6 @@ static char* select_bookmark(const char* bookmark_file_name)
                 break;
 
             case ACTION_BMS_EXIT:
-#ifdef HAVE_LCD_BITMAP
-                FOR_NB_SCREENS(i)
-                    screens[i].setmargins(x, y);
-#endif
                 action_signalscreenchange();
                 return NULL;
 
@@ -671,10 +662,7 @@ static void display_bookmark(const char* bookmark,
                    global_filename);
 
     FOR_NB_SCREENS(i)
-    {
         screens[i].clear_display();
-        screens[i].stop_scroll();
-    }
 
 #ifdef HAVE_LCD_BITMAP
     /* bookmark shuffle and repeat states*/
