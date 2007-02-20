@@ -107,6 +107,65 @@ chessbox_pieces.80x64x1.bmp
 chessbox_pieces.64x64x1.bmp
 #endif
 
+/* Clock */
+#if (LCD_WIDTH >= 320) && (LCD_HEIGHT >= 240) && (LCD_DEPTH >= 16)
+clock_digits.320x240x16.bmp
+clock_smalldigits.320x240x16.bmp
+clock_segments.320x240x16.bmp
+clock_smallsegments.320x240x16.bmp
+clock_logo.320x240x16.bmp
+clock_messages.320x240x16.bmp
+#elif (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176) && (LCD_DEPTH >= 16)
+clock_digits.220x176x16.bmp
+clock_smalldigits.220x176x16.bmp
+clock_segments.220x176x16.bmp
+clock_smallsegments.220x176x16.bmp
+clock_logo.220x176x16.bmp
+clock_messages.220x176x16.bmp
+#elif (LCD_WIDTH >= 176) && (LCD_HEIGHT >= 132) && (LCD_DEPTH >= 16)
+clock_digits.160x128x16.bmp
+clock_smalldigits.160x128x16.bmp
+clock_segments.160x128x16.bmp
+clock_smallsegments.160x128x16.bmp
+clock_logo.176x132x16.bmp
+clock_messages.176x132x16.bmp
+#elif (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128) && (LCD_DEPTH >= 16)
+clock_digits.160x128x16.bmp
+clock_smalldigits.160x128x16.bmp
+clock_segments.160x128x16.bmp
+clock_smallsegments.160x128x16.bmp
+clock_logo.160x128x16.bmp
+clock_messages.160x128x16.bmp
+#elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 128) && (LCD_DEPTH >= 16)
+clock_digits.128x128x16.bmp
+clock_smalldigits.128x128x16.bmp
+clock_segments.128x128x16.bmp
+clock_smallsegments.128x128x16.bmp
+clock_logo.128x128x16.bmp
+clock_messages.128x128x16.bmp
+#elif (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128) && (LCD_DEPTH >= 2)
+clock_digits.160x128x2.bmp
+clock_smalldigits.160x128x2.bmp
+clock_segments.160x128x2.bmp
+clock_smallsegments.160x128x2.bmp
+clock_logo.160x128x2.bmp
+clock_messages.160x128x2.bmp
+#elif (LCD_WIDTH >= 138) && (LCD_HEIGHT >= 110) && (LCD_DEPTH >= 2)
+clock_digits.138x110x2.bmp
+clock_smalldigits.160x128x2.bmp
+clock_segments.138x110x2.bmp
+clock_smallsegments.160x128x2.bmp
+clock_logo.138x110x2.bmp
+clock_messages.138x110x2.bmp
+#elif (LCD_WIDTH >= 112) && (LCD_HEIGHT >= 64) && (LCD_DEPTH >= 1)
+clock_digits.112x64x1.bmp
+clock_smalldigits.112x64x1.bmp
+clock_segments.112x64x1.bmp
+clock_smallsegments.112x64x1.bmp
+clock_logo.112x64x1.bmp
+clock_messages.112x64x1.bmp
+#endif
+
 /* Flipit */
 #ifdef HAVE_LCD_COLOR
 #if LCD_WIDTH >= 280 && LCD_HEIGHT >= 234
