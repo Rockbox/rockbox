@@ -16,81 +16,29 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "config.h"
-#include "cpu.h"
-#include "system.h"
-#include "kernel.h"
-#include "thread.h"
 #include "adc.h"
-
-static unsigned short adcdata[NUM_ADC_CHANNELS];
-
-/* Scan ADC so that adcdata[channel] gets updated */
-unsigned short adc_scan(int channel)
-{
-    unsigned int adc_data_1;
-    unsigned int adc_data_2;
-
-    /* Initialise */
-    ADC_ADDR=0x130;
-    ADC_STATUS=0;   /* 4 bytes, 1 per channel. Each byte is 0 if the channel is
-                       off, 0x40 if the channel is on */
-
-    /* Enable Channel */
-    ADC_ADDR |= (0x1000000<<channel);
-
-    /* Start? */
-    ADC_ADDR |= 0x20000000;
-    ADC_ADDR |= 0x80000000;
-
-    /* ADC_DATA_1 and ADC_DATA_2 are both four bytes, one byte per channel.
-       For each channel, ADC_DATA_1 stores the 8-bit msb, ADC_DATA_2 stores the
-       2-bit lsb (in bits 0 and 1). Each channel is 10 bits total. */
-    adc_data_1 = ((ADC_DATA_1 >> (8*channel)) & 0xff);
-    adc_data_2 = ((ADC_DATA_2 >> (8*channel+6)) & 0x3);
-
-    adcdata[channel] = (adc_data_1<<2 | adc_data_2);
-    
-    /* FIXME: Hardcode a value for ~82% charge in here until we figure out the
-       ADC. This will avoid the low battery warning message. */
-    adcdata[ADC_UNREG_POWER] = 0x2C0;
-    
-    return adcdata[channel];
-}
+#include "i2c-pp.h"
+#include "logf.h"
 
 /* Read 10-bit channel data */
 unsigned short adc_read(int channel)
 {
-    return adcdata[channel];
-}
+    unsigned char bat[2];
+    unsigned short data = 0;
 
-static int adc_counter;
-
-static void adc_tick(void)
-{
-    if(++adc_counter == HZ)
+    switch( channel)
     {
-        adc_counter = 0;
-        adc_scan(ADC_0);
-        adc_scan(ADC_1);
-        adc_scan(ADC_2);
-        adc_scan(ADC_3);
+        case ADC_UNREG_POWER:
+            pp_i2c_send( 0x46, 0x2e, 0x0);
+            pp_i2c_send( 0x46, 0x27, 0x1);
+            i2c_readbytes( 0x46, 0x2e, 2, bat);
+            data = ((bat[0]<<8) | bat[1]);
+            break;
     }
+    return data;
 }
 
 void adc_init(void)
 {
-    /* Enable ADC */
-    ADC_ENABLE_ADDR |= ADC_ENABLE;
-
-    /* Initialise */
-    ADC_INIT=0;
-
-    /* Force a scan of all channels to get initial values */
-    adc_scan(ADC_0);
-    adc_scan(ADC_1);
-    adc_scan(ADC_2);
-    adc_scan(ADC_3);
-
-    tick_add_task(adc_tick);
+    /* FIXME: Add initialization of the ADC */
 }

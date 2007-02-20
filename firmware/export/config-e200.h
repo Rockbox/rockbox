@@ -71,9 +71,7 @@
 #define CONFIG_BACKLIGHT BL_H10 /* TODO: figure this out, probably not necessary
                                    because of 'target' stuff */
 
-#define BATTERY_CAPACITY_DEFAULT 700 /* default battery capacity
-                                        TODO: check this, probably different
-                                        for different models too */
+#define BATTERY_CAPACITY_DEFAULT 750    /* default battery capacity */
 
 #ifndef SIMULATOR
 
@@ -85,11 +83,11 @@
 
 /* Type of mobile power */
 #define CONFIG_BATTERY BATT_LPCS355385
-#define BATTERY_CAPACITY_MIN 1500  /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 1600 /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC 10   /* capacity increment */
-#define BATTERY_TYPES_COUNT  1    /* only one type */
-#define BATTERY_SCALE_FACTOR 5865
+#define BATTERY_CAPACITY_MIN 750        /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 750        /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC 0          /* capacity increment */
+#define BATTERY_TYPES_COUNT  1          /* only one type */
+#define BATTERY_SCALE_FACTOR 5054
 
 /* Hardware controlled charging? FIXME */
 #define CONFIG_CHARGING CHARGING_SIMPLE
