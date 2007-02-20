@@ -1,8 +1,8 @@
 /* define this if you have recording possibility */
-#define HAVE_RECORDING 1
+#define HAVE_RECORDING
 
 /* define this if you have a bitmap LCD display */
-#define HAVE_LCD_BITMAP 1
+#define HAVE_LCD_BITMAP
 
 /* define this if you can flip your LCD */
 #define HAVE_LCD_FLIP
@@ -32,7 +32,7 @@
 #define CONFIG_RTC RTC_M41ST84W
 
 /* define this if you have RTC RAM available for settings */
-#define HAVE_RTC_RAM 1
+#define HAVE_RTC_RAM
 
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x8000

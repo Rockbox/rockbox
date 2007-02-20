@@ -1,8 +1,8 @@
 /* define this if you have recording possibility */
-#define HAVE_RECORDING 1
+#define HAVE_RECORDING
 
 /* define this if you have a bitmap LCD display */
-#define HAVE_LCD_BITMAP 1
+#define HAVE_LCD_BITMAP
 
 /* define this if you can flip your LCD */
 #define HAVE_LCD_FLIP
@@ -32,7 +32,7 @@
 #define CONFIG_RTC RTC_M41ST84W
 
 /* define this if you have RTC RAM available for settings */
-#define HAVE_RTC_RAM 1
+#define HAVE_RTC_RAM
 
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
@@ -64,7 +64,7 @@
 #define CONFIG_CPU SH7034
 
 /* Define this if you have a FM Recorder key system */
-#define HAVE_FMADC 1
+#define HAVE_FMADC
 
 /* Define this if you need to power on ATA */
 #define NEEDS_ATA_POWER_ON
@@ -97,7 +97,7 @@
 #define FIRMWARE_OFFSET_FILE_DATA 24
 
 /* FM recorders can wake up from RTC alarm */
-#define HAVE_ALARM_MOD 1
+#define HAVE_ALARM_MOD
 
 /* How to detect USB */
 #define USB_FMRECORDERSTYLE 1

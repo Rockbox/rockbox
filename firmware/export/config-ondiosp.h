@@ -1,5 +1,5 @@
 /* define this if you have a bitmap LCD display */
-#define HAVE_LCD_BITMAP 1
+#define HAVE_LCD_BITMAP
 
 /* define this if you can flip your LCD */
 #define HAVE_LCD_FLIP

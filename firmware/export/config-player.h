@@ -1,5 +1,5 @@
 /* define this if you have a charcell LCD display */
-#define HAVE_LCD_CHARCELLS 1
+#define HAVE_LCD_CHARCELLS
 
 /* define this if you would like tagcache to build on this target */
 #define HAVE_TAGCACHE

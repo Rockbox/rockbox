@@ -9,7 +9,7 @@
 #define MODEL_NUMBER 8
 
 /* define this if you have recording possibility */
-#define HAVE_RECORDING 1
+#define HAVE_RECORDING
 
 /* define the bitmask of hardware sample rates */
 #define HW_SAMPR_CAPS   (SAMPR_CAP_44)
@@ -18,7 +18,7 @@
 #define REC_SAMPR_CAPS  (SAMPR_CAP_44)
 
 /* define this if you have a bitmap LCD display */
-#define HAVE_LCD_BITMAP 1
+#define HAVE_LCD_BITMAP
 
 /* define this if you can invert the colours on your LCD */
 #define HAVE_LCD_INVERT

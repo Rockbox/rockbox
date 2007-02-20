@@ -9,13 +9,13 @@
 #define MODEL_NUMBER 6
 
 /* define this if you have recording possibility */
-/*#define HAVE_RECORDING 1*/
+/*#define HAVE_RECORDING*/
 
 /* define this if you have a bitmap LCD display */
-#define HAVE_LCD_BITMAP 1
+#define HAVE_LCD_BITMAP
 
 /* define this if you have a colour LCD */
-/* #define HAVE_LCD_COLOR 1 */
+/* #define HAVE_LCD_COLOR */
 
 /* define this if you would like tagcache to build on this target */
 #define HAVE_TAGCACHE

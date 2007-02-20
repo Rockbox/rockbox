@@ -13,7 +13,7 @@
 #define MODEL_NUMBER 1
 
 /* define this if you have a bitmap LCD display */
-#define HAVE_LCD_BITMAP 1
+#define HAVE_LCD_BITMAP
 
 /* define this if you can flip your LCD */
 #define HAVE_LCD_FLIP
@@ -80,7 +80,7 @@
 #define HAVE_UDA1380
 
 /* define this if you have recording possibility */
-#define HAVE_RECORDING 1
+#define HAVE_RECORDING
 
 /* define hardware samples rate caps mask */
 #define HW_SAMPR_CAPS   (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11)

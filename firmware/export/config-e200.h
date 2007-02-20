@@ -8,13 +8,13 @@
 #define MODEL_NAME   "Sandisk Sansa e200"
 
 /* define this if you have recording possibility */
-/*#define HAVE_RECORDING 1*/ /* TODO: add support for this */
+/*#define HAVE_RECORDING*/ /* TODO: add support for this */
 
 /* define this if you have a bitmap LCD display */
-#define HAVE_LCD_BITMAP 1
+#define HAVE_LCD_BITMAP
 
 /* define this if you have a colour LCD */
-#define HAVE_LCD_COLOR 1
+#define HAVE_LCD_COLOR
 
 #define HAVE_BACKLIGHT_BRIGHTNESS
 /* Main LCD backlight brightness range and defaults */

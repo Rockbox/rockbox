@@ -9,10 +9,10 @@
 #define MODEL_NUMBER 1
 
 /* define this if you have a bitmap LCD display */
-#define HAVE_LCD_BITMAP 1
+#define HAVE_LCD_BITMAP
 
 /* define this if you have a colour LCD */
-#define HAVE_LCD_COLOR 1
+#define HAVE_LCD_COLOR
 
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN
