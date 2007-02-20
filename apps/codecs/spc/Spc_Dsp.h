@@ -17,7 +17,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 /* The DSP portion (awe!) */
 
 enum { voice_count = 8 };
@@ -529,8 +529,8 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
     #ifdef CPU_COLDFIRE
         /* Initialize mask register with the buffer address mask */
         asm ("move.l %[m], %%mask" : : [m]"i"(fir_buf_mask));
-        const int echo_delay_mask = (this->r.g.echo_delay & 15) * 0x800 - 1;
-        const int echo_page       = this->r.g.echo_page * 0x100;
+        const int echo_wrap  = (this->r.g.echo_delay & 15) * 0x800;
+        const int echo_start = this->r.g.echo_page * 0x100;
     #endif /* CPU_COLDFIRE */
     #else
         #define VOICE_RATE(x) (INT16A(raw_voice->rate) & 0x3FFF)
@@ -1081,8 +1081,10 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
     #ifdef CPU_COLDFIRE
         /* Read feedback from echo buffer */
         int echo_pos = this->echo_pos;
-        uint8_t* const echo_ptr = RAM + ((echo_page + echo_pos) & 0xFFFF);
-        echo_pos = (echo_pos + 4) & echo_delay_mask;
+        uint8_t* const echo_ptr = RAM + ((echo_start + echo_pos) & 0xFFFF);
+        echo_pos += 4;
+        if ( echo_pos >= echo_wrap )
+            echo_pos = 0;
         this->echo_pos = echo_pos;
         int fb = swap_odd_even32(*(int32_t *)echo_ptr);
         int out_0, out_1;
