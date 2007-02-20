@@ -20,6 +20,12 @@
 /*****************************
  * RELEASE NOTES
 
+***** VERSION 4.00 **
+New almost entirely bitmap based display. Scales to all resolutions. Combined
+Digital and LCD modes into one. Use Rockbox menu code for the menu. Removed
+count-down option. A couple new options. Source code reworked, improved, cleaned
+up.
+
 ***** VERSION 3.10 **
 Drawing now scales for the display - still needs updated bitmaps for the binary
 and plain mode.  The Time's Up logo could also be updated.
