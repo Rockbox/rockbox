@@ -51,8 +51,13 @@ CODEC_HEADER
     /* Disable gaussian interpolation */
     #define SPC_NOINTERP 1
 
+#ifndef CPU_COLDFIRE
     /* Disable echo processing */
     #define SPC_NOECHO 1
+#else
+    /* Enable echo processing */
+    #define SPC_NOECHO 0
+#endif
 #else
     /* Don't cache BRR waves */
     #define SPC_BRRCACHE 0 
@@ -100,6 +105,8 @@ static inline void set_le16( void* p, unsigned n )
 
 #define GET_LE16( addr )        get_le16( addr )
 #define SET_LE16( addr, data )  set_le16( addr, data )
+#define INT16A( addr ) (*(uint16_t*) (addr))
+#define INT16SA( addr ) (*(int16_t*) (addr))
 
 #ifdef ROCKBOX_LITTLE_ENDIAN
     #define GET_LE16A( addr )       (*(uint16_t*) (addr))
@@ -793,6 +800,10 @@ static int play_track( void )
 enum codec_status codec_main(void)
 {
     memcpy( spc_emu.cycle_table, cycle_table, sizeof cycle_table );
+
+#ifdef CPU_COLDFIRE
+    coldfire_set_macsr(EMAC_SATURATE);
+#endif
 
     do
     {
