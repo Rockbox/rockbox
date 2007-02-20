@@ -92,7 +92,15 @@ static struct plugin_api* rb;
 #define LEVEL_MODE_NORMAL 0
 #define LEVEL_MODE_STEEP 1
 
+#if LCD_WIDTH <= 112
+#define CYCLETIME 100
+#define SCALE(x) ((x)==1 ? (x) : ((x) >> 1))
+#define SIZE 2
+#else
 #define CYCLETIME 60
+#define SCALE(x) (x)
+#define SIZE 1
+#endif
 
 /*Chopper's local variables to track the terrain position etc*/
 static int chopCounter;
@@ -175,30 +183,30 @@ static void chopDrawPlayer(int x,int y) /* These are SCREEN coords, not world! *
 #elif LCD_DEPTH == 2
     rb->lcd_set_foreground(LCD_DARKGRAY);
 #endif
-    rb->lcd_fillrect(x+6, y+2, 12, 9);
-    rb->lcd_fillrect(x-3, y+6, 20, 3);
+    rb->lcd_fillrect(SCALE(x+6), SCALE(y+2), SCALE(12), SCALE(9));
+    rb->lcd_fillrect(SCALE(x-3), SCALE(y+6), SCALE(20), SCALE(3));
 
 #if LCD_DEPTH > 2
     rb->lcd_set_foreground(LCD_RGBPACK(50,50,50));
 #elif LCD_DEPTH == 2
     rb->lcd_set_foreground(LCD_DARKGRAY);
 #endif
-    rb->lcd_fillrect(x+10, y, 2, 3);
-    rb->lcd_fillrect(x+10, y, 1, 3);
+    rb->lcd_fillrect(SCALE(x+10), SCALE(y), SCALE(2), SCALE(3));
+    rb->lcd_fillrect(SCALE(x+10), SCALE(y), SCALE(1), SCALE(3));
 
 #if LCD_DEPTH > 2
     rb->lcd_set_foreground(LCD_RGBPACK(40,40,100));
 #elif LCD_DEPTH == 2
     rb->lcd_set_foreground(LCD_BLACK);
 #endif
-    rb->lcd_drawline(x, y+iRotorOffset, x+20, y-iRotorOffset);
+    rb->lcd_drawline(SCALE(x), SCALE(y+iRotorOffset), SCALE(x+20), SCALE(y-iRotorOffset));
 
 #if LCD_DEPTH > 2
     rb->lcd_set_foreground(LCD_RGBPACK(20,20,50));
 #elif LCD_DEPTH == 2
     rb->lcd_set_foreground(LCD_BLACK);
 #endif
-    rb->lcd_fillrect(x - 2, y + 5, 2, 5);
+    rb->lcd_fillrect(SCALE(x - 2), SCALE(y + 5), SCALE(2), SCALE(5));
 
 }
 
@@ -564,7 +572,7 @@ static void chopDrawParticle(struct CParticle *mParticle)
 #elif LCD_DEPTH == 2
     rb->lcd_set_foreground(LCD_LIGHTGRAY);
 #endif
-    rb->lcd_fillrect(iPosX, iPosY, 3, 3);
+    rb->lcd_fillrect(SCALE(iPosX), SCALE(iPosY), SCALE(3), SCALE(3));
 
 }
 
@@ -583,17 +591,32 @@ static void chopDrawScene(void)
     chopDrawPlayer(iPlayerPosX - iCameraPosX, iPlayerPosY);
 
     score = -20 + iPlayerPosX/3;
+
+#if LCD_DEPTH == 1
+    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+#else
     rb->lcd_set_drawmode(DRMODE_FG);
+#endif
+
 #if LCD_DEPTH > 2
     rb->lcd_set_foreground(LCD_BLACK);
 #elif LCD_DEPTH == 2
     rb->lcd_set_foreground(LCD_WHITE);
 #endif
+
+#if LCD_WIDTH <= 128
+    rb->snprintf(s, sizeof(s), "Dist: %d", score);
+    rb->lcd_putsxy(1, 1, s);
+    rb->snprintf(s, sizeof(s), "Hi: %d", highscore);
+    rb->lcd_getstringsize(s, &w, NULL);
+    rb->lcd_putsxy(LCD_WIDTH - 1 - w, 1, s);
+#else
     rb->snprintf(s, sizeof(s), "Distance: %d", score);
     rb->lcd_putsxy(2, 2, s);
     rb->snprintf(s, sizeof(s), "Best: %d", highscore);
     rb->lcd_getstringsize(s, &w, NULL);
     rb->lcd_putsxy(LCD_WIDTH - 2 - w, 2, s);
+#endif
     rb->lcd_set_drawmode(DRMODE_SOLID);
 
     rb->lcd_update();
@@ -674,7 +697,7 @@ static int chopGameLoop(void)
 
     if (chopUpdateTerrainRecycling(&mGround) == 1)
         /* mirror the sky if we've changed the ground */
-        chopCopyTerrain(&mGround, &mRoof, 0, -( iScreenY * 0.75));
+        chopCopyTerrain(&mGround, &mRoof, 0, - ( (iScreenY * 3) / 4));
 
     ret = chopMenu(0);
     if (ret != -1)
@@ -688,7 +711,7 @@ static int chopGameLoop(void)
 
         if(chopUpdateTerrainRecycling(&mGround) == 1)
             /* mirror the sky if we've changed the ground */
-            chopCopyTerrain(&mGround, &mRoof, 0, -( iScreenY * 0.75));
+            chopCopyTerrain(&mGround, &mRoof, 0, - ( (iScreenY * 3) / 4));
 
         iRotorOffset = iR(-1,1);
 
@@ -816,8 +839,8 @@ static void chopDrawBlock(struct CBlock *mBlock)
 #elif LCD_DEPTH == 2
     rb->lcd_set_foreground(LCD_BLACK);
 #endif
-    rb->lcd_fillrect(iPosX, iPosY, mBlock->iSizeX,
-                     mBlock->iSizeY);
+    rb->lcd_fillrect(SCALE(iPosX), SCALE(iPosY), SCALE(mBlock->iSizeX),
+                     SCALE(mBlock->iSizeY));
 }
 
 
@@ -829,12 +852,12 @@ static void chopRenderTerrain(struct CTerrain *ter)
     int oldx=0;
 
     int ay=0;
-    if(ter->mNodes[0].y < LCD_HEIGHT/2)
+    if(ter->mNodes[0].y < (LCD_HEIGHT*SIZE)/2)
         ay=0;
     else
-        ay=LCD_HEIGHT;
+        ay=(LCD_HEIGHT*SIZE);
 
-    while(i < ter->iNodesCount && oldx < LCD_WIDTH)
+    while(i < ter->iNodesCount && oldx < iScreenX)
     {
 
         int x = ter->mNodes[i-1].x - iCameraPosX;
@@ -848,13 +871,15 @@ static void chopRenderTerrain(struct CTerrain *ter)
         rb->lcd_set_foreground(LCD_DARKGRAY);
 #endif
 
-        rb->lcd_drawline(x, y, x2, y2);
-        xlcd_filltriangle(x, y, x2, y2, x2, ay);
-        xlcd_filltriangle(x, ay, x2, y2, x2, ay);
+        rb->lcd_drawline(SCALE(x), SCALE(y), SCALE(x2), SCALE(y2));
+
+        xlcd_filltriangle(SCALE(x), SCALE(y), SCALE(x2), SCALE(y2), SCALE(x2), SCALE(ay));
+        xlcd_filltriangle(SCALE(x), SCALE(ay), SCALE(x2), SCALE(y2), SCALE(x2), SCALE(ay));
+
         if (ay == 0)
-            xlcd_filltriangle(x, ay, x, y, x2, y2 / 2);
+            xlcd_filltriangle(SCALE(x), SCALE(ay), SCALE(x), SCALE(y), SCALE(x2), SCALE(y2 / 2));
         else
-            xlcd_filltriangle(x, ay, x, y, x2, LCD_HEIGHT - (LCD_HEIGHT - y2) / 2);
+            xlcd_filltriangle(SCALE(x), SCALE(ay), SCALE(x), SCALE(y), SCALE(x2), SCALE((LCD_HEIGHT*SIZE) - ((LCD_HEIGHT*SIZE) - y2) / 2));
 
         oldx = x;
         i++;
@@ -870,16 +895,16 @@ void chopper_load(bool newgame)
     int g;
 
     if (newgame) {
-        iScreenX = LCD_WIDTH;
-        iScreenY = LCD_HEIGHT;
-        blockh = 0.2*iScreenY;
-        blockw = 0.04*iScreenX;
+        iScreenX = LCD_WIDTH * SIZE;
+        iScreenY = LCD_HEIGHT * SIZE;
+        blockh = iScreenY / 5;
+        blockw = iScreenX / 20;
         iPlayerAlive = 1;
         score = 0;
     }
     iRotorOffset = 0;
     iPlayerPosX = 60;
-    iPlayerPosY = iScreenY * 0.4;
+    iPlayerPosY = (iScreenY * 4) / 10;
     iLastBlockPlacedPosX = 0;
     iGravityTimerCountdown = 2;
     chopCounter = 0;
@@ -901,7 +926,7 @@ void chopper_load(bool newgame)
 
     if (chopUpdateTerrainRecycling(&mGround) == 1)
         /* mirror the sky if we've changed the ground */
-        chopCopyTerrain(&mGround, &mRoof, 0, -( iScreenY * 0.75));
+        chopCopyTerrain(&mGround, &mRoof, 0, - ( (iScreenY * 3) / 4));
 
     iLevelMode = LEVEL_MODE_NORMAL;
     if (iLevelMode == LEVEL_MODE_NORMAL)
