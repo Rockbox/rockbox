@@ -85,14 +85,14 @@ SECTIONS
 
   .text : { 
     *(.init.text)
-    *(.text)
+    *(.text*)
   }
 
   .data : { 
     *(.icode)
     *(.irodata)
     *(.idata)
-    *(.data)
+    *(.data*)
     _dataend = . ;
    }
 
@@ -112,7 +112,7 @@ SECTIONS
   . = (DRAMORIG+16*1024*1024);
   .bss : {
      _edata = .;
-     *(.bss);
+     *(.bss*);
      *(.ibss);
      _end = .;
    }
@@ -122,13 +122,13 @@ SECTIONS
   . = DRAMORIG + 0x1000000;
   .text : {
     *(.init.text)
-    *(.text)
+    *(.text*)
   }
   .data : {
     *(.icode)
     *(.irodata)
     *(.idata)
-    *(.data)
+    *(.data*)
     _dataend = . ;
    }
   .stack :
@@ -142,7 +142,7 @@ SECTIONS
   }
   .bss : {
      _edata = .;
-     *(.bss);
+     *(.bss*);
      *(.ibss);
      _end = .;
    }
@@ -166,7 +166,7 @@ SECTIONS
         *(.icode)
         *(.irodata)
         *(.idata)
-        *(.data)
+        *(.data*)
         . = ALIGN(0x4);
         _dataend = .;         
         . = ALIGN(0x10);  /* Maintain proper alignment for .text section */
@@ -178,15 +178,13 @@ SECTIONS
     .text LOADADDR(.data) + SIZEOF(.data) :
     {
         *(.init.text)
-        *(.text)
+        *(.text*)
         . = ALIGN(0x4);
     } > FLASH
 
     .rodata :
     {
-        *(.rodata)
-        *(.rodata.str1.1)
-        *(.rodata.str1.4)
+        *(.rodata*)
         . = ALIGN(0x4);
         _iramcopy = .;
     } > FLASH
@@ -209,7 +207,7 @@ SECTIONS
     {
        _edata = .;
         *(.ibss)
-        *(.bss)
+        *(.bss*)
         *(COMMON)
        _end = .;
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES) || defined(IAUDIO_X5)
