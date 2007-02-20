@@ -59,7 +59,8 @@
 #define MAX_BOOKMARK_SIZE  350
 #define RECENT_BOOKMARK_FILE ROCKBOX_DIR "/most-recent.bmark"
 
-static bool  add_bookmark(const char* bookmark_file_name, const char* bookmark);
+static bool  add_bookmark(const char* bookmark_file_name, const char* bookmark, 
+                          bool most_recent);
 static bool  check_bookmark(const char* bookmark);
 static char* create_bookmark(void);
 static bool  delete_bookmark(const char* bookmark_file_name, int bookmark_id);
@@ -211,7 +212,7 @@ static bool write_bookmark(bool create_bookmark_file)
        return false; /* something didn't happen correctly, do nothing */
 
     if (global_settings.usemrb)
-        success = add_bookmark(RECENT_BOOKMARK_FILE, bookmark);
+        success = add_bookmark(RECENT_BOOKMARK_FILE, bookmark, true);
 
 
     /* writing the bookmark */
@@ -221,7 +222,7 @@ static bool write_bookmark(bool create_bookmark_file)
                                        sizeof(global_temp_buffer));
         if (generate_bookmark_file_name(name))
         {
-            success = add_bookmark(global_bookmark_file_name, bookmark);
+            success = add_bookmark(global_bookmark_file_name, bookmark, false);
         }
     }
 
@@ -234,7 +235,8 @@ static bool write_bookmark(bool create_bookmark_file)
 /* ----------------------------------------------------------------------- */
 /* This function adds a bookmark to a file.                                */
 /* ------------------------------------------------------------------------*/
-static bool add_bookmark(const char* bookmark_file_name, const char* bookmark)
+static bool add_bookmark(const char* bookmark_file_name, const char* bookmark, 
+                         bool most_recent)
 {
     int    temp_bookmark_file = 0;
     int    bookmark_file = 0;
@@ -253,8 +255,7 @@ static bool add_bookmark(const char* bookmark_file_name, const char* bookmark)
     if (temp_bookmark_file < 0)
         return false; /* can't open the temp file */
 
-    if (!strcmp(bookmark_file_name,RECENT_BOOKMARK_FILE) &&
-        (global_settings.usemrb == BOOKMARK_UNIQUE_ONLY))
+    if (most_recent && (global_settings.usemrb == BOOKMARK_UNIQUE_ONLY))
     {
         playlist = strchr(bookmark,'/');
         cp = strrchr(bookmark,';');
@@ -272,15 +273,12 @@ static bool add_bookmark(const char* bookmark_file_name, const char* bookmark)
     if (bookmark_file >= 0)
     {
         while (read_line(bookmark_file, global_read_buffer,
-                         sizeof(global_read_buffer)))
+                         sizeof(global_read_buffer)) > 0)
         {
             /* The MRB has a max of MAX_BOOKMARKS in it */
             /* This keeps it from getting too large */
-            if ((strcmp(bookmark_file_name,RECENT_BOOKMARK_FILE)==0))
-            {
-                if(bookmark_count >= MAX_BOOKMARKS)
+            if (most_recent && (bookmark_count >= MAX_BOOKMARKS))
                 break;
-            }
                         
             cp  = strchr(global_read_buffer,'/');
             tmp = strrchr(global_read_buffer,';');
@@ -442,7 +440,7 @@ bool bookmark_load(const char* file, bool autoload)
         fd = open(file, O_RDONLY);
         if(fd >= 0)
         {
-            if(read_line(fd, global_read_buffer, sizeof(global_read_buffer)))
+            if(read_line(fd, global_read_buffer, sizeof(global_read_buffer)) > 0)
                 bookmark=global_read_buffer;
             close(fd);
         }
@@ -471,10 +469,9 @@ static int get_bookmark_count(const char* bookmark_file_name)
         return -1;
 
     /* Get the requested bookmark */
-    while(read_line(file, global_read_buffer, sizeof(global_read_buffer)))
+    while(read_line(file, global_read_buffer, sizeof(global_read_buffer)) > 0)
     {
-        if(check_bookmark(global_read_buffer))
-            read_count++;
+        read_count++;
     }
     
     close(file);
@@ -532,6 +529,7 @@ static char* select_bookmark(const char* bookmark_file_name)
             {
                bookmark_id_prev = bookmark_id;
                bookmark_id--;
+               continue;
             }
         }
         else
@@ -602,24 +600,16 @@ static bool delete_bookmark(const char* bookmark_file_name, int bookmark_id)
              "%s.tmp", bookmark_file_name);
     temp_bookmark_file = open(global_temp_buffer,
                               O_WRONLY | O_CREAT | O_TRUNC);
-    bookmark_file = open(bookmark_file_name, O_RDONLY);
 
-    if (temp_bookmark_file < 0 || bookmark_file < 0)
-        return false; /* can't open one of the files */
+    if (temp_bookmark_file < 0)
+        return false; /* can't open the temp file */
 
     /* Reading in the previous bookmarks and writing them to the temp file */
-    while (read_line(bookmark_file, global_read_buffer,
-                     sizeof(global_read_buffer)))
+    bookmark_file = open(bookmark_file_name, O_RDONLY);
+    if (bookmark_file >= 0)
     {
-        /* The MRB has a max of MAX_BOOKMARKS in it */
-        /* This keeps it from getting too large */
-        if ((strcmp(bookmark_file_name,RECENT_BOOKMARK_FILE)==0))
-        {
-            if(bookmark_count >= MAX_BOOKMARKS)
-            break;
-        }
-        
-        if (check_bookmark(global_read_buffer))
+        while (read_line(bookmark_file, global_read_buffer,
+                         sizeof(global_read_buffer)) > 0)
         {
             if (bookmark_id != bookmark_count)
             {
@@ -629,9 +619,8 @@ static bool delete_bookmark(const char* bookmark_file_name, int bookmark_id)
             }
             bookmark_count++;
         }
+        close(bookmark_file);
     }
-
-    close(bookmark_file);
     close(temp_bookmark_file);
 
     remove(bookmark_file_name);
@@ -834,9 +823,6 @@ static char* get_bookmark(const char* bookmark_file, int bookmark_count)
     if (file < 0)
         return NULL;
 
-    if (bookmark_count < 0)
-        return NULL;
-     
     /* Get the requested bookmark */
     while (read_count < bookmark_count)
     {
@@ -854,7 +840,7 @@ static char* get_bookmark(const char* bookmark_file, int bookmark_count)
     }
 
     close(file);
-    if (read_count == bookmark_count)
+    if ((read_count >= 0) && (read_count == bookmark_count))
         return global_read_buffer;
     else
         return NULL;
