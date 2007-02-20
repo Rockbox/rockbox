@@ -2,8 +2,8 @@
 # License: GNU GPL v2 or later.
 %wd
 %X|bg-220x176x16.bmp|0|0|
-%P|pg-164.bmp|
-%x|o|pgln-164.bmp|28|116|
+%P|pg-200.bmp|
+%x|o|pgln-200.bmp|10|116|
 %xl|p|ply-color-big.bmp|102|156|
 %xl|q|ps-color-big.bmp|102|156|
 %xl|f|ff-color-big.bmp|102|156|
@@ -42,12 +42,12 @@
 
 
 
-%al %s%ac%?ia<%ia|Artist?>%ar 
-%al %s%ac%?id<%id|Album?>%ar 
-%al %s%ac%?it<%it|Title?>%ar 
+%al %s%ac%?ia<%ia|%d2>%ar 
+%al %s%ac%?id<%id|%d1>%ar 
+%al %s%ac%?it<%it|%fn>%ar 
 
 %ac%t3%ig;%t%iy 
-%pb|5|28|191|116|
+%pb|5|10|210|116|
 %al  %pc%ac%?fc<mp1|mp2|mp3|aiff|wav|vorbis|flac|mpc|a52|wavpack|alac|aac|shn|sid|adx|unknown>%ar%pt  
 %?ps<%xdb>
 %?mp<%xdq|%xdp|%xdq|%xdf|%xdr>

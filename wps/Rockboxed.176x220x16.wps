@@ -45,16 +45,16 @@
 
 
 
-%al %s%ac%?ia<%ia|Artist?>%ar 
-%al %s%ac%?id<%id|Album?>%ar 
-%al %s%ac%?it<%it|Title?>%ar 
+%al %s%ac%?ia<%ia|%d2>%ar 
+%al %s%ac%?id<%id|%d1>%ar 
+%al %s%ac%?it<%it|%fn>%ar 
 
 %ac%t3%ig;%t%iy
 
 
 
 
-%pb|5|10|156|171|
+%pb|5|10|166|171|
 %al %pc%ac%?fc<mp1|mp2|mp3|aiff|wav|vorbis|flac|mpc|a52|wavpack|alac|aac|shn|sid|adx|unknown>%ar%pt 
 %?ps<%xdb>
 %?mp<%xdq|%xdp|%xdq|%xdf|%xdr>
