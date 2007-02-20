@@ -434,7 +434,7 @@ void screen_dump(void)
 
         /* BMP image goes bottom up */
 #if LCD_DEPTH == 1
-        for (by = LCD_HEIGHT/8 - 1; by >= 0; by--)
+        for (by = LCD_FBHEIGHT - 1; by >= 0; by--)
         {
             unsigned char *src = &lcd_framebuffer[by][0];
             unsigned char *dst = &line_block[0][0];
@@ -467,16 +467,16 @@ void screen_dump(void)
         }
 #elif LCD_DEPTH == 2
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-        for (by = LCD_HEIGHT - 1; by >= 0; by--)
+        for (by = LCD_FBHEIGHT - 1; by >= 0; by--)
         {
             unsigned char *src = &lcd_framebuffer[by][0];
             unsigned char *dst = line_block;
 
             memset(line_block, 0, sizeof(line_block));
-            for (bx = (LCD_WIDTH+3)/4; bx > 0; bx--)
+            for (bx = LCD_FBWIDTH; bx > 0; bx--)
             {
                 unsigned src_byte = *src++;
-                
+
                 *dst++ = ((src_byte >> 2) & 0x30) | ((src_byte >> 4) & 0x03);
                 *dst++ = ((src_byte << 2) & 0x30) | (src_byte & 0x03);
             }
@@ -484,7 +484,7 @@ void screen_dump(void)
             write(fh, line_block, sizeof(line_block));
         }
 #else /* VERTICAL_PACKING */
-        for (by = LCD_HEIGHT/4 - 1; by >= 0; by--)
+        for (by = LCD_FBHEIGHT - 1; by >= 0; by--)
         {
             unsigned char *src = &lcd_framebuffer[by][0];
             unsigned char *dst = &line_block[3][0];

@@ -48,7 +48,7 @@ enum fill_opt {
 };
 
 /*** globals ***/
-fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH] IRAM_LCDFRAMEBUFFER __attribute__ ((aligned (16)));
+fb_data lcd_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH] IRAM_LCDFRAMEBUFFER __attribute__ ((aligned (16)));
 
 
 static fb_data* lcd_backdrop = NULL;
@@ -599,7 +599,7 @@ void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
         dst_end = dst_col + height * LCD_WIDTH;
         do 
         {
-            switch (drawmode) 
+            switch (drawmode)
             {
                 case DRMODE_SOLID:
                     if (data & 0x01)

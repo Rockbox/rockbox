@@ -39,7 +39,7 @@
 
 /*** globals ***/
 
-fb_remote_data lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_FBWIDTH]
+fb_remote_data lcd_remote_framebuffer[LCD_REMOTE_FBHEIGHT][LCD_REMOTE_FBWIDTH]
                                       IBSS_ATTR;
 
 static const fb_remote_data patterns[4] = {0xFFFF, 0xFF00, 0x00FF, 0x0000};

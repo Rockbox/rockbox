@@ -37,7 +37,7 @@
 
 /*** globals ***/
 
-unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
+unsigned char lcd_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH];
 
 static int drawmode = DRMODE_SOLID;
 static int xmargin = 0;

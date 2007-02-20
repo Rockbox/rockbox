@@ -399,7 +399,7 @@ void lcd_remote_update(void)
 {
     int y;
     if(remote_initialized) {
-        for(y = 0;y < LCD_REMOTE_HEIGHT/8;y++) {
+        for(y = 0;y < LCD_REMOTE_FBHEIGHT;y++) {
             /* Copy display bitmap to hardware.
                The COM48-COM63 lines are not connected so we have to skip
                them. Further, the column address doesn't wrap, so we
@@ -427,8 +427,8 @@ void lcd_remote_update_rect(int x, int y, int width, int height)
             width = LCD_REMOTE_WIDTH - x;
         if (width <= 0)
             return; /* nothing left to do, 0 is harmful to lcd_write_data() */
-        if(ymax >= LCD_REMOTE_HEIGHT)
-            ymax = LCD_REMOTE_HEIGHT-1;
+        if(ymax >= LCD_REMOTE_FBHEIGHT)
+            ymax = LCD_REMOTE_FBHEIGHT-1;
 
         /* Copy specified rectangle bitmap to hardware
            COM48-COM63 are not connected, so we need to skip those */

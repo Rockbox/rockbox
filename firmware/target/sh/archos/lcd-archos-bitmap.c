@@ -164,7 +164,7 @@ void lcd_update(void)
     int y;
 
     /* Copy display bitmap to hardware */
-    for (y = 0; y < LCD_HEIGHT/8; y++)
+    for (y = 0; y < LCD_FBHEIGHT; y++)
     {
         lcd_write_command (LCD_CNTL_PAGE | (y & 0xf));
         lcd_write_command (LCD_CNTL_HIGHCOL | ((xoffset >> 4) & 0xf));
@@ -188,8 +188,8 @@ void lcd_update_rect(int x, int y, int width, int height)
         width = LCD_WIDTH - x;
     if (width <= 0)
         return; /* nothing left to do, 0 is harmful to lcd_write_data() */
-    if(ymax >= LCD_HEIGHT/8)
-        ymax = LCD_HEIGHT/8-1;
+    if(ymax >= LCD_FBHEIGHT)
+        ymax = LCD_FBHEIGHT-1;
 
     /* Copy specified rectange bitmap to hardware */
     for (; y <= ymax; y++)

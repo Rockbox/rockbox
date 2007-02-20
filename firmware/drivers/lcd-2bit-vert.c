@@ -37,7 +37,7 @@
 
 /*** globals ***/
 
-fb_data lcd_framebuffer[LCD_HEIGHT/4][LCD_WIDTH] IBSS_ATTR;
+fb_data lcd_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH] IBSS_ATTR;
 
 const unsigned char lcd_dibits[16] ICONST_ATTR = {
     0x00, 0x03, 0x0C, 0x0F, 0x30, 0x33, 0x3C, 0x3F,

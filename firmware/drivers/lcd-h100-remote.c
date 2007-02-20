@@ -65,7 +65,7 @@
 
 /*** globals ***/
 
-fb_remote_data lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH]
+fb_remote_data lcd_remote_framebuffer[LCD_REMOTE_FBHEIGHT][LCD_REMOTE_FBWIDTH]
                                       IBSS_ATTR;
 
 static int drawmode = DRMODE_SOLID;
@@ -629,7 +629,7 @@ void lcd_remote_update(void)
 #endif
 
     /* Copy display bitmap to hardware */
-    for (y = 0; y < LCD_REMOTE_HEIGHT/8; y++)
+    for (y = 0; y < LCD_REMOTE_FBHEIGHT; y++)
     {
         lcd_remote_write_command(LCD_REMOTE_CNTL_SET_PAGE_ADDRESS | y);
         lcd_remote_write_command(LCD_REMOTE_CNTL_HIGHCOL | ((xoffset >> 4) & 0xf));
@@ -655,8 +655,8 @@ void lcd_remote_update_rect(int x, int y, int width, int height)
         width = LCD_REMOTE_WIDTH - x;
     if (width <= 0)
         return; /* nothing left to do, 0 is harmful to lcd_write_data() */
-    if(ymax >= LCD_REMOTE_HEIGHT/8)
-        ymax = LCD_REMOTE_HEIGHT/8-1;
+    if(ymax >= LCD_REMOTE_FBHEIGHT)
+        ymax = LCD_REMOTE_FBHEIGHT-1;
 
 #ifdef HAVE_REMOTE_LCD_TICKING
     /* Adjust byte delay for emi reduction */

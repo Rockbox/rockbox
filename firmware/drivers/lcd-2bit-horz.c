@@ -38,7 +38,7 @@
 
 /*** globals ***/
 
-unsigned char lcd_framebuffer[LCD_HEIGHT][LCD_FBWIDTH] IBSS_ATTR;
+unsigned char lcd_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH] IBSS_ATTR;
 
 static const unsigned char pixmask[4] ICONST_ATTR = {
     0xC0, 0x30, 0x0C, 0x03

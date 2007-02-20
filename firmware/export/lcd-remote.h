@@ -82,14 +82,25 @@ extern unsigned lcd_remote_color_to_native(unsigned color);
 #define LCD_REMOTE_DEFAULT_BG LCD_REMOTE_WHITE
 #endif
 
-/* Memory copy of display bitmap */
+/* Frame buffer dimensions (format checks only cover existing targets!) */
 #if LCD_REMOTE_DEPTH == 1
-extern fb_remote_data lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH];
+#define LCD_REMOTE_FBHEIGHT ((LCD_REMOTE_HEIGHT+7)/8)
 #elif LCD_REMOTE_DEPTH == 2
 #if LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED
-extern fb_remote_data lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH];
+#define LCD_REMOTE_FBHEIGHT ((LCD_REMOTE_HEIGHT+7)/8)
 #endif
+#endif /* LCD_REMOTE_DEPTH */
+/* Set defaults if not defined different yet. The defaults apply to both
+ * dimensions for LCD_REMOTE_DEPTH >= 8 */
+#ifndef LCD_REMOTE_FBWIDTH
+#define LCD_REMOTE_FBWIDTH LCD_REMOTE_WIDTH
 #endif
+#ifndef LCD_REMOTE_FBHEIGHT
+#define LCD_REMOTE_FBHEIGHT LCD_REMOTE_HEIGHT
+#endif
+/* The actual framebuffer */
+extern fb_remote_data lcd_remote_framebuffer[LCD_REMOTE_FBHEIGHT][LCD_REMOTE_FBWIDTH];
+
 
 extern void lcd_remote_init(void);
 extern int  lcd_remote_default_contrast(void);

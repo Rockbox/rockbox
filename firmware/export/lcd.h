@@ -237,25 +237,30 @@ static inline unsigned lcd_color_to_native(unsigned color)
 #define LCD_DEFAULT_BG LCD_WHITE
 #endif
 
-/* Memory copy of display bitmap */
+/* Frame buffer dimensions */
 #if LCD_DEPTH == 1
-extern fb_data lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+#define LCD_FBWIDTH ((LCD_WIDTH+7)/8)
+#else /* LCD_PIXELFORMAT == VERTICAL_PACKING */
+#define LCD_FBHEIGHT ((LCD_HEIGHT+7)/8)
+#endif
 #elif LCD_DEPTH == 2
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
 #define LCD_FBWIDTH ((LCD_WIDTH+3)/4)
-extern fb_data lcd_framebuffer[LCD_HEIGHT][LCD_FBWIDTH];
-#else
-extern fb_data lcd_framebuffer[LCD_HEIGHT/4][LCD_WIDTH];
+#else /* LCD_PIXELFORMAT == VERTICAL_PACKING */
+#define LCD_FBHEIGHT ((LCD_HEIGHT+3)/4)
 #endif
-#elif LCD_DEPTH == 16
-extern fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH];
-#elif LCD_DEPTH == 18
-extern fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH];
-#endif
-
+#endif /* LCD_DEPTH */
+/* Set defaults if not defined different yet. The defaults apply to both
+ * dimensions for LCD_DEPTH >= 8 */
 #ifndef LCD_FBWIDTH
 #define LCD_FBWIDTH LCD_WIDTH
 #endif
+#ifndef LCD_FBHEIGHT
+#define LCD_FBHEIGHT LCD_HEIGHT
+#endif
+/* The actual framebuffer */
+extern fb_data lcd_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH];
 
 /** Port-specific functions. Enable in port config file. **/
 #ifdef HAVE_LCD_ENABLE
