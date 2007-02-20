@@ -44,7 +44,6 @@
 #include "splash.h"
 #include "statusbar.h"
 #include "textarea.h"
-#define MARGIN_Y (global_settings.statusbar ? STATUSBAR_HEIGHT : 0)
 
 bool alarm_screen(void)
 {
@@ -73,6 +72,7 @@ bool alarm_screen(void)
         {
             FOR_NB_SCREENS(i)
             {
+                screens[i].setmargins(0, 0);
                 gui_textarea_clear(&screens[i]);
                 screens[i].puts(0, 3, str(LANG_ALARM_MOD_KEYS));
             }
