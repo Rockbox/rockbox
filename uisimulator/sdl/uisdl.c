@@ -27,7 +27,7 @@
 #include "lcd-sdl.h"
 #ifdef HAVE_LCD_BITMAP
 #include "lcd-bitmap.h"
-#elif HAVE_LCD_CHARCELLS
+#elif defined(HAVE_LCD_CHARCELLS)
 #include "lcd-charcell.h"
 #endif
 #ifdef HAVE_REMOTE_LCD
