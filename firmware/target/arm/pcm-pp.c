@@ -208,7 +208,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
 #if CONFIG_CPU == PP5020
     /* setup I2S interrupt for FIQ */
     outl(inl(0x6000402c) | I2S_MASK, 0x6000402c);
-    outl(I2S_MASK, 0x60004024);
+    CPU_INT_EN = I2S_MASK;
 #elif CONFIG_CPU == PP5024
 #else
     /* setup I2S interrupt for FIQ */
@@ -453,13 +453,13 @@ void pcm_rec_dma_start(void *addr, size_t size)
     
     /* setup FIQ */
     outl(inl(0x6000402c) | I2S_MASK, 0x6000402c);
-    outl(I2S_MASK, 0x60004024);
+    CPU_INT_EN = I2S_MASK;
 
     /* interrupt on full fifo */
-    outl(inl(0x70002800) | 0x1, 0x70002800);
+    IISCONFIG |= 0x1;
 
     /* enable record fifo */
-    outl(inl(0x70002800) | 0x10000000, 0x70002800);
+    IISCONFIG |= 0x10000000;
 
     set_fiq_handler(fiq_record);
     enable_fiq();

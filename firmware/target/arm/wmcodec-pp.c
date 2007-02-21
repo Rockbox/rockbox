@@ -37,8 +37,7 @@
 
 
 /*
- * Initialise the WM8975 for playback via headphone and line out.
- * Note, I'm using the WM8750 datasheet as its apparently close.
+ * Initialise the PP I2C and I2S.
  */
 int audiohw_init(void) {
     /* reset I2C */
@@ -46,21 +45,21 @@ int audiohw_init(void) {
 
 #if CONFIG_CPU == PP5020
     /* normal outputs for CDI and I2S pin groups */
-    outl(inl(0x70000020) & ~0x300, 0x70000020);
+    DEV_INIT &= ~0x300;
 
     /*mini2?*/
     outl(inl(0x70000010) & ~0x3000000, 0x70000010);
     /*mini2?*/
 
     /* device reset */
-    outl(inl(0x60006004) | 0x800, 0x60006004);
-    outl(inl(0x60006004) & ~0x800, 0x60006004);
+    DEV_RS |= 0x800;
+    DEV_RS &=~0x800;
 
     /* device enable */
-    outl(inl(0x6000600C) | 0x807, 0x6000600C);
+    DEV_EN |= 0x807;
 
     /* enable external dev clock clocks */
-    outl(inl(0x6000600c) | 0x2, 0x6000600c);
+    DEV_EN |= 0x2;
 
     /* external dev clock to 24MHz */
     outl(inl(0x70000018) & ~0xc, 0x70000018);
