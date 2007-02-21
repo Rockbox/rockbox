@@ -191,7 +191,7 @@ static int convert_lte_native_interleaved_stereo(
 
     do
     {
-        short slr = *s++;
+        int32_t slr = *s++;
 #ifdef ROCKBOX_LITTLE_ENDIAN
         *dl++ = (slr >> 16) << scale;
         *dr++ = (int32_t)(short)slr << scale;
