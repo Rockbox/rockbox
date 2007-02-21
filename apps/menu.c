@@ -587,6 +587,9 @@ int do_menu(const struct menu_item_ex *start_menu)
     gui_syncstatusbar_draw(&statusbars, true);
     action_signalscreenchange();
     
+    /* load the callback, and only reload it if menu changes */
+    get_menu_callback(menu, &menu_callback);
+    
     while (ret == 0)
     {
         action = get_action(CONTEXT_MAINMENU,HZ); 
@@ -597,10 +600,10 @@ int do_menu(const struct menu_item_ex *start_menu)
             continue;
         }
 
-        get_menu_callback(menu,&menu_callback);
+        
         if (menu_callback)
         {
-            action = menu_callback(action,menu);
+            action = menu_callback(action, menu);
         }
 
         if (gui_synclist_do_button(&lists,action,LIST_WRAP_UNLESS_HELD))
@@ -615,28 +618,18 @@ int do_menu(const struct menu_item_ex *start_menu)
                  (action == ACTION_STD_MENU))
         {
             in_stringlist = false;
+            if (menu_callback)
+                menu_callback(ACTION_EXIT_MENUITEM, menu);
             
             if (stack_top > 0)
             {
-                get_menu_callback(menu,&menu_callback);
-                if (menu_callback)
-                {
-                    if (menu_callback(action,menu) ==
-                            ACTION_EXIT_MENUITEM)
-                        break;
-                }
                 stack_top--;
                 menu = menu_stack[stack_top];
                 init_menu_lists(menu, &lists, 
                                  menu_stack_selected_item[stack_top], false);
                 talk_menu_item(menu, &lists);
-            }
-            else 
-            {
+                /* new menu, so reload the callback */
                 get_menu_callback(menu, &menu_callback);
-                if (menu_callback)
-                    menu_callback(ACTION_EXIT_MENUITEM, menu);
-                break;
             }
         }
         else if (action == ACTION_STD_OK)
@@ -701,9 +694,10 @@ int do_menu(const struct menu_item_ex *start_menu)
                     }
                     break;
             }
-            get_menu_callback(temp,&menu_callback);
             if (type != MT_MENU && menu_callback)
                 menu_callback(ACTION_EXIT_MENUITEM,temp);
+            /* callback was changed, so reload the menu's callback */
+            get_menu_callback(menu, &menu_callback);
         }
         else if(default_event_handler(action) == SYS_USB_CONNECTED)
             ret = MENU_ATTACHED_USB;
