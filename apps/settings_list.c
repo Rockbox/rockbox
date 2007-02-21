@@ -396,8 +396,8 @@ const struct settings_list settings[] = {
     /* LCD */
 #ifdef HAVE_LCD_CONTRAST
     /* its easier to leave this one un-macro()ed for the time being */
-    {F_T_INT|F_DEF_ISFUNC, &global_settings.contrast, LANG_CONTRAST,
-         FUNCTYPE(lcd_default_contrast),
+    {F_T_INT|F_DEF_ISFUNC|F_INT_SETTING, &global_settings.contrast,
+         LANG_CONTRAST, FUNCTYPE(lcd_default_contrast),
          "contrast", NULL , {.int_setting = (struct int_setting[]){                
             { lcd_set_contrast, UNIT_INT, MIN_CONTRAST_SETTING,
                 MAX_CONTRAST_SETTING, 1, NULL, NULL}}}},
