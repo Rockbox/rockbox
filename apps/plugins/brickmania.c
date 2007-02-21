@@ -1028,6 +1028,7 @@ int game_menu(int when)
         button = rb->button_get(true);
         switch(button) {
             case UP:
+            case UP | BUTTON_REPEAT:
                 if (cur==0)
                     cur = MENU_LENGTH-1;
                 else
@@ -1038,6 +1039,7 @@ int game_menu(int when)
                 break;
 
             case DOWN:
+            case DOWN | BUTTON_REPEAT:
                 if (cur==MENU_LENGTH-1)
                     cur = 0;
                 else
