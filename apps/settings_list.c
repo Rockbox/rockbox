@@ -547,7 +547,7 @@ const struct settings_list settings[] = {
 #endif
     INT_SETTING(0, scroll_speed, LANG_SCROLL_SPEED, 9,"scroll speed",                      
                 UNIT_INT, 0, 15, 1, NULL, NULL, lcd_scroll_speed),
-    INT_SETTING(0, scroll_delay, LANG_SCROLL_DELAY, 100, "scroll delay",                      
+    INT_SETTING(0, scroll_delay, LANG_SCROLL_DELAY, 1000, "scroll delay",                      
                 UNIT_MS, 0, 2500, 100, NULL,
                 NULL, lcd_scroll_delay) ,
     INT_SETTING(0, bidir_limit, LANG_BIDIR_SCROLL, 50, "bidir limit",                      
@@ -557,7 +557,7 @@ const struct settings_list settings[] = {
                 UNIT_INT, 0,15, 1, NULL, NULL, lcd_remote_scroll_speed),
     INT_SETTING(0, remote_scroll_step, LANG_SCROLL_STEP, 6, "remote scroll step",                      
                 UNIT_PIXEL, 1, LCD_REMOTE_WIDTH, 1, NULL, NULL, lcd_remote_scroll_step),
-    INT_SETTING(0, remote_scroll_delay, LANG_SCROLL_DELAY, 100, "remote scroll delay",                      
+    INT_SETTING(0, remote_scroll_delay, LANG_SCROLL_DELAY, 1000, "remote scroll delay",                      
                 UNIT_MS, 0, 2500, 100, NULL, NULL, lcd_remote_scroll_delay),
     INT_SETTING(0, remote_bidir_limit, LANG_BIDIR_SCROLL, 50, "remote bidir limit",                      
                 UNIT_PERCENT, 0, 200, 25, NULL, NULL, lcd_remote_bidir_scroll),
@@ -574,7 +574,7 @@ const struct settings_list settings[] = {
 #ifdef HAVE_LCD_CHARCELLS
     INT_SETTING(0, jump_scroll, LANG_JUMP_SCROLL, 0, "jump scroll",                      
                     UNIT_INT, 0, 5, 1, jumpscroll_format, jumpscroll_getlang, lcd_jump_scroll),
-    INT_SETTING(0, jump_scroll_delay, LANG_JUMP_SCROLL_DELAY, 50, "jump scroll delay",                      
+    INT_SETTING(0, jump_scroll_delay, LANG_JUMP_SCROLL_DELAY, 500, "jump scroll delay",                      
                     UNIT_MS, 0, 2500, 100, NULL, NULL, lcd_jump_scroll_delay),
 #endif
     OFFON_SETTING(0,scroll_paginated,LANG_SCROLL_PAGINATED,
