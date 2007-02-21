@@ -1098,6 +1098,14 @@ void game_pause (void)
                 rb->sleep(HZ/2);
                 return;
 
+#ifdef SNAKE2_RC_QUIT
+             case SNAKE2_RC_QUIT:
+#endif
+             case SNAKE2_QUIT:
+                 dead = 1;
+                 quit = 1;
+                 return;
+
             default:
                 if (rb->default_event_handler(button)==SYS_USB_CONNECTED) {
                     dead = 1;
@@ -1146,7 +1154,7 @@ void game (void)
 
         draw_apple();
 
-        rb->sleep(HZ/speed); 
+        rb->sleep(HZ/speed);
 
         button = rb->button_get(false);
 
