@@ -172,38 +172,41 @@ dsp_upsample:
 .uschannel_loop:
     move.l      (%a0), %d5              | %d5 = phase = r->phase
     move.l      -4(%a1, %d2.l*4), %a3   | %a3 = s = src[ch-1]
+    lea.l       4(%a0, %d2.l*4), %a4    | %a4 = &r->last_sample[ch-1]
+    lea.l       (%a3, %d3.l*4), %a5     | %a5 = src_end = &src[count]
+    move.l      (%a4), %d0              | %d0 = last = r->last_sample[ch-1]
+    move.l      -4(%a5), %d1            | r->last_sample[ch-1] = s[count-1]
+    move.l      %d1, (%a4)              |
     move.l      -4(%a2, %d2.l*4), %a4   | %a4 = d = dst[ch-1]
-    lea.l       4(%a0, %d2.l*4), %a5    | %a5 = &r->last_sample[ch-1]
-    move.l      (%a5), %d0              | %d0 = last = r->last_sample[ch-1]
-    move.l      -4(%a3, %d3.l*4), %d1   | r->last_sample[ch-1] = s[count-1]
-    move.l      %d1, (%a5)              |
     moveq.l     #16, %d1                | %d0 = shift
     move.l      %d5, %d6                | %d6 = pos = phase >> 16
     lsl.l       %d1, %d5                | swap phase to high word to use
                                         | carries to increment position
     lsr.l       %d1, %d6                | pos == 0?
-    bne.b       .usstart_1              | no? transistion from down
-    move.l      (%a3), %d1              | %d1 = s[0]
-    sub.l       %d0, %d1                | diff = s[pos] - last
-    bra.b       .usloop_0               | jump to typical start point
-.usstart_1:
+    beq.b       .usstart_0              | no? transistion from down
     cmp.l       %d3, %d6                | past end of samples?
     bge.b       .usloop_skip            | yes? skip loop
+    lea.l       4(%a3, %d6.l*4), %a3    | %a3 = s + pos + 1
+    movem.l     -8(%a3), %d0-%d1        | %d0 = *(s - 2), %d1 = *(s - 1)
+    .word       0x51fa                  | tpf.w - trap next instruction
+.usstart_0:
+    move.l      (%a3)+, %d1             | %d1 = *s++
+    .word       0x51fb                  | tpf.l - trap next two instructions
 .usloop_1:
-    lea.l       -4(%a3, %d6.l*4), %a5   | load s[pos-1] and s[pos]
-    movem.l     (%a5), %d0-%d1          |
+    move.l      %d6, %d0                | move previous sample to %d0
+    move.l      (%a3)+, %d1             | fetch next sample
+    move.l      %d1, %d6                | save sample value
     sub.l       %d0, %d1                | %d1 = diff = s[pos] - s[pos-1]
 .usloop_0:
-    move.l      %d0, %acc0              | %acc0 = previous sample
     lsr.l       #1, %d5                 | make phase into frac
-    mac.l       %d1, %d5, %acc0         | %acc0 += diff * frac
-    move.l      %acc0, %d7              |
+    mac.l       %d1, %d5, %acc0         | %acc0 = diff * frac
+    movclr.l    %acc0, %d7              | %d7 = product
     lsl.l       #1, %d5                 | restore frac to phase
-    move.l      %d7, (%a4)+             | *d++ = %d0
+    add.l       %d0, %d7                | %d7 = last + product
+    move.l      %d7, (%a4)+             | *d++ = %d7
     add.l       %d4, %d5                | phase += delta
     bcc.b       .usloop_0               | load next values?
-    addq.l      #1, %d6                 | increment position
-    cmp.l       %d3, %d6                | pos < count?
+    cmp.l       %a5, %a3                | src < src_end?
     blt.b       .usloop_1               | yes? continue resampling
 .usloop_skip:
     subq.l      #1, %d2                 | ch > 0?
@@ -212,9 +215,8 @@ dsp_upsample:
     move.l      %d5, (%a0)              | ...and save in r->phase
     move.l      %a4, %d0                | return d - d[0]
     sub.l       (%a2), %d0              |
-    asr.l       #2, %d0                 | convert bytes->samples
     movem.l     (%sp), %d2-%d7/%a2-%a5  | restore non-clobberables
-    move.l      %acc1, %acc0            | clear %acc0
+    asr.l       #2, %d0                 | convert bytes->samples
     lea.l       40(%sp), %sp            | cleanup stack
     rts                                 | buh-bye
 .usend:
