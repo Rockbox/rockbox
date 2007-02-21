@@ -4525,10 +4525,14 @@
   desc: battery level in % and estimated time remaining
   user:
   <source>
-    *: "%d%% %dh %dm"
+    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,gmini120,gminisp: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
+    *: "Battery: %d%% %dh %dm"
   </source>
   <dest>
-    *: "%d%% %dh %dm"
+    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,gmini120,gminisp: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
+    *: "Battery: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Battery level"
