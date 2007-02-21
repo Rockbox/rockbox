@@ -299,16 +299,6 @@ static void set_superbass(bool value)
 }
 #endif
 
-static void scrolldelay_format(char* buffer, int buffer_size, int value,
-    const char* unit)
-{
-    (void)unit;
-    snprintf(buffer, buffer_size, "%d ms", value* (HZ/100));
-}
-static long scrolldelay_getlang(int value)
-{
-    return TALK_ID(value* (HZ/100), UNIT_MS);
-}
 #ifdef HAVE_LCD_CHARCELLS
 static void jumpscroll_format(char* buffer, int buffer_size, int value,
     const char* unit)
@@ -558,8 +548,8 @@ const struct settings_list settings[] = {
     INT_SETTING(0, scroll_speed, LANG_SCROLL_SPEED, 9,"scroll speed",                      
                 UNIT_INT, 0, 15, 1, NULL, NULL, lcd_scroll_speed),
     INT_SETTING(0, scroll_delay, LANG_SCROLL_DELAY, 100, "scroll delay",                      
-                UNIT_MS, 0, 2500, 100, scrolldelay_format,
-                scrolldelay_getlang, lcd_scroll_delay) ,
+                UNIT_MS, 0, 2500, 100, NULL,
+                NULL, lcd_scroll_delay) ,
     INT_SETTING(0, bidir_limit, LANG_BIDIR_SCROLL, 50, "bidir limit",                      
                 UNIT_PERCENT, 0, 200, 25, NULL, NULL, lcd_bidir_scroll),
 #ifdef HAVE_REMOTE_LCD
@@ -568,7 +558,7 @@ const struct settings_list settings[] = {
     INT_SETTING(0, remote_scroll_step, LANG_SCROLL_STEP, 6, "remote scroll step",                      
                 UNIT_PIXEL, 1, LCD_REMOTE_WIDTH, 1, NULL, NULL, lcd_remote_scroll_step),
     INT_SETTING(0, remote_scroll_delay, LANG_SCROLL_DELAY, 100, "remote scroll delay",                      
-                UNIT_MS, 0, 2500, 100, scrolldelay_format, scrolldelay_getlang, lcd_remote_scroll_delay),
+                UNIT_MS, 0, 2500, 100, NULL, NULL, lcd_remote_scroll_delay),
     INT_SETTING(0, remote_bidir_limit, LANG_BIDIR_SCROLL, 50, "remote bidir limit",                      
                 UNIT_PERCENT, 0, 200, 25, NULL, NULL, lcd_remote_bidir_scroll),
 #endif
@@ -585,8 +575,7 @@ const struct settings_list settings[] = {
     INT_SETTING(0, jump_scroll, LANG_JUMP_SCROLL, 0, "jump scroll",                      
                     UNIT_INT, 0, 5, 1, jumpscroll_format, jumpscroll_getlang, lcd_jump_scroll),
     INT_SETTING(0, jump_scroll_delay, LANG_JUMP_SCROLL_DELAY, 50, "jump scroll delay",                      
-                    UNIT_MS, 0, 2500, 100, scrolldelay_format,
-                    scrolldelay_getlang, lcd_jump_scroll_delay),
+                    UNIT_MS, 0, 2500, 100, NULL, NULL, lcd_jump_scroll_delay),
 #endif
     OFFON_SETTING(0,scroll_paginated,LANG_SCROLL_PAGINATED,
         false,"scroll paginated",NULL),

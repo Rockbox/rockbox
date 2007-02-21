@@ -693,7 +693,7 @@ void settings_apply(void)
     lcd_remote_set_flip(global_settings.remote_flip_display);
     lcd_remote_scroll_speed(global_settings.remote_scroll_speed);
     lcd_remote_scroll_step(global_settings.remote_scroll_step);
-    lcd_remote_scroll_delay(global_settings.remote_scroll_delay * (HZ/10));
+    lcd_remote_scroll_delay(global_settings.remote_scroll_delay);
     lcd_remote_bidir_scroll(global_settings.remote_bidir_limit);
 #ifdef HAVE_REMOTE_LCD_TICKING
     lcd_remote_emireduce(global_settings.remote_reduce_ticking);
@@ -806,10 +806,10 @@ void settings_apply(void)
     gui_list_screen_scroll_out_of_view(global_settings.offset_out_of_view);
 #else
     lcd_jump_scroll(global_settings.jump_scroll);
-    lcd_jump_scroll_delay(global_settings.jump_scroll_delay * (HZ/10));
+    lcd_jump_scroll_delay(global_settings.jump_scroll_delay);
 #endif
     lcd_bidir_scroll(global_settings.bidir_limit);
-    lcd_scroll_delay(global_settings.scroll_delay * (HZ/10));
+    lcd_scroll_delay(global_settings.scroll_delay);
 
     if ( global_settings.lang_file[0]) {
         snprintf(buf, sizeof buf, LANG_DIR "/%s.lng",
