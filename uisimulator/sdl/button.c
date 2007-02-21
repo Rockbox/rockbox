@@ -65,7 +65,6 @@ void set_remote_backlight_filter_keypress(bool value)
 }
 #endif
 #endif
-
 void button_event(int key, bool pressed)
 {
     int new_btn = 0;
@@ -82,10 +81,25 @@ void button_event(int key, bool pressed)
     static bool skip_remote_release = false;
 #endif
 #endif 
-
+    static bool usb_connected = false;
+    if (usb_connected && key != SDLK_u)
+        return;
     switch (key)
     {
 
+    case SDLK_u:
+        if (!pressed)
+        {
+            usb_connected = !usb_connected;
+            if (usb_connected)
+                btn = SYS_USB_CONNECTED;
+            else
+                btn = SYS_USB_DISCONNECTED;
+            queue_post(&button_queue, btn, 0);
+            return;
+        }
+        break;
+            
 #if CONFIG_KEYPAD == GIGABEAT_PAD
     case SDLK_KP4:
     case SDLK_LEFT:
@@ -689,4 +703,3 @@ bool remote_button_hold(void) {
     return false;
 }
 #endif
-
