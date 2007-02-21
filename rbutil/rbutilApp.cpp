@@ -19,6 +19,7 @@
  ****************************************************************************/
 
 #include "rbutilApp.h"
+#include "bootloaders.h"
 
 GlobalVars* gv = new GlobalVars();
 
@@ -30,15 +31,16 @@ bool rbutilFrmApp::OnInit()
 
     wxLogVerbose(wxT("=== begin rbutilFrmApp::Oninit()"));
 
+
     gv->stdpaths = new wxStandardPaths();
 
     // Get application directory
     // DANGER!  GetDataDir() doesn't portably return the application directory
     // We want to use the form below instead, but not until wxWidgets 2.8 is
-    // released.
+    // released.  *Datadir gives the wrong dir for this on Linux/Mac even on Wx2.8 *
     gv->AppDir = gv->stdpaths->GetExecutablePath().BeforeLast(PATH_SEP_CHR);
-//    buf = gv->stdpaths->GetDataDir(); buf.Append(PATH_SEP);
-//    gv->AppDir = buf.BeforeLast(PATH_SEP_CHR).c_str();
+ //   buf = gv->stdpaths->GetDataDir(); buf.Append(PATH_SEP);
+ //   gv->AppDir = buf.BeforeLast(PATH_SEP_CHR).c_str();
 
     buf = gv->stdpaths->GetUserDataDir();
     if (! wxDirExists(buf) )
@@ -80,6 +82,7 @@ bool rbutilFrmApp::OnInit()
     SetTopWindow(myFrame);
     myFrame->Show(TRUE);
 
+    initIpodpatcher();             // reserve mem for ipodpatcher
     wxLogVerbose(wxT("=== end rbUtilFrmApp::OnInit()"));
     return TRUE;
 }
@@ -92,7 +95,7 @@ int rbutilFrmApp::OnExit()
 
     gv->logfile->Close();
     /* Enabling this code causes the program to crash.  I
-     * have no idea why.
+     * have no idea why.  (possibly because deleting non existing objects ? :-) )
     wxLog::DontCreateOnDemand();
     // Free a bunch of structures.
     delete gv->GlobalConfig;
@@ -120,15 +123,15 @@ bool rbutilFrmApp::ReadGlobalConfig(rbutilFrm* myFrame)
     // are of course the same directory.
     buf.Printf(wxT("%s" PATH_SEP "rbutil.ini"), gv->AppDir.c_str() );
 
-    if (! wxFileExists(buf) )
-    {
-        gv->ResourceDir = gv->stdpaths->GetResourcesDir();
-        buf.Printf(wxT("%s" PATH_SEP "rbutil.ini"),
-            gv->ResourceDir.c_str() );
-    } else
-    {
-        gv->ResourceDir = gv->AppDir;
-    }
+//    if (! wxFileExists(buf) )
+//    {
+//        gv->ResourceDir = gv->stdpaths->GetResourcesDir();
+//        buf.Printf(wxT("%s" PATH_SEP "rbutil.ini"),
+//            gv->ResourceDir.c_str() );
+//    } else
+//    {
+//        gv->ResourceDir = gv->AppDir;
+//    }
 
     wxFileInputStream* cfgis = new wxFileInputStream(buf);
 
@@ -146,13 +149,33 @@ bool rbutilFrmApp::ReadGlobalConfig(rbutilFrm* myFrame)
     gv->GlobalConfig->SetPath(wxT("/platforms"));
     while(gv->GlobalConfig->Read(buf.Format(wxT("platform%d"), i + 1),
         &tmpstr)) {
-        gv->plat_id.Add(tmpstr);
+        wxString cur = tmpstr;
+        //gv->plat_id.Add(tmpstr);
         gv->GlobalConfig->Read(buf.Format(wxT("/%s/name"),
-            gv->plat_id[i].c_str()), &tmpstr);
+            cur.c_str()), &tmpstr);
         gv->plat_name.Add(tmpstr);
+        gv->GlobalConfig->Read(buf.Format(wxT("/%s/platform"),
+            cur.c_str()), &tmpstr);
+        gv->plat_id.Add(tmpstr);
         gv->GlobalConfig->Read(buf.Format(wxT("/%s/released"),
-            gv->plat_id[i].c_str()), &tmpstr);
+            cur.c_str()), &tmpstr);
         gv->plat_released.Add( (tmpstr == wxT("yes")) ? true : false ) ;
+        gv->GlobalConfig->Read(buf.Format(wxT("/%s/needsbootloader"),
+            cur.c_str()), &tmpstr);
+        gv->plat_needsbootloader.Add( (tmpstr == wxT("yes")) ? true : false ) ;
+        gv->GlobalConfig->Read(buf.Format(wxT("/%s/bootloadermethod"),
+            cur.c_str()), &tmpstr);
+        gv->plat_bootloadermethod.Add(tmpstr);
+        gv->GlobalConfig->Read(buf.Format(wxT("/%s/bootloadername"),
+            cur.c_str()), &tmpstr);
+        gv->plat_bootloadername.Add(tmpstr);
+        gv->GlobalConfig->Read(buf.Format(wxT("/%s/autodetect"),
+            cur.c_str()), &tmpstr);
+        gv->plat_autodetect.Add( (tmpstr == wxT("yes")) ? true : false ) ;
+        gv->GlobalConfig->Read(buf.Format(wxT("/%s/combinedname"),
+            cur.c_str()), &tmpstr);
+        gv->plat_combinedname.Add(tmpstr);
+
         i++;
     }
 
@@ -183,6 +206,9 @@ bool rbutilFrmApp::ReadGlobalConfig(rbutilFrm* myFrame)
 
     gv->GlobalConfig->Read(wxT("prog_name"), &tmpstr);
     gv->prog_name = tmpstr;
+
+    gv->GlobalConfig->Read(wxT("bootloader_url"), &tmpstr);
+    gv->bootloader_url = tmpstr;
 
 #ifdef __WXMSW__
     gv->curdestdir = wxT("D:\\");

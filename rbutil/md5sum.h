@@ -6,9 +6,9 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  * Module: rbutil
- * File: credits.h
+ * File: md5sum.h
  *
- * Copyright (C) 2006 Christi Alice Scarborough
+ * Copyright (C) 2007 Dominik Wenger
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -18,33 +18,34 @@
  *
  ****************************************************************************/
 
-#ifndef CREDITS_H_INCLUDED
-#define CREDITS_H_INCLUDED
 
-#define RBUTIL_FULLNAME "The Rockbox Utility"
-#define RBUTIL_VERSION "Version 0.2.1.1"
+#ifndef MD5SUM_H_INCLUDED
+#define MD5SUM_H_INCLUDED
 
-static const char* rbutil_developers[] = {
-    "Christi Alice Scarborough",
-    "Dave Chapman",
-    "Dominik Wenger",
-    ""
-};
-
-#define RBUTIL_WEBSITE "http://www.rockbox.org/"
-#define RBUTIL_COPYRIGHT "(C) 2005-6 The Rockbox Team\n" \
-        "released under the GNU Public License v2"
-#define RBUTIL_DESCRIPTION "Installer and housekeeping utility for " \
-        "the Rockbox open source digital audio player firmware."
+#ifndef uint8
+#define uint8  unsigned char
+#endif
 
 
-class AboutDlg: public wxDialog
+#ifndef uint32
+#define uint32 unsigned long int
+#endif
+
+#include "rbutil.h"
+
+
+typedef struct
 {
-	public:
-		AboutDlg(rbutilFrm *parent);
-		~AboutDlg();
-};
+    uint32 total[2];
+    uint32 state[4];
+    uint8 buffer[64];
+}
+md5_context;
 
-#include <wx/hyperlink.h>
+void md5_starts( md5_context *ctx );
+void md5_update( md5_context *ctx, uint8 *input, uint32 length );
+void md5_finish( md5_context *ctx, uint8 digest[16] );
 
-#endif // CREDITS_H_INCLUDED
+int FileMD5(wxString name,wxString *md5);
+
+#endif // MD5SUM_H_INCLUDED

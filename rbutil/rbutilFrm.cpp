@@ -28,6 +28,8 @@
 #include "tools2_3d.xpm"
 #include "rblogo.xpm"
 
+#include "bootloaders.h"
+
 #include "wizard.xpm"
 
 //----------------------------------------------------------------------------
@@ -39,6 +41,7 @@ BEGIN_EVENT_TABLE(rbutilFrm,wxFrame)
 	EVT_BUTTON      (ID_REMOVE_BTN, rbutilFrm::OnRemoveBtn)
 	EVT_BUTTON      (ID_FONT_BTN, rbutilFrm::OnFontBtn)
 	EVT_BUTTON      (ID_BOOTLOADER_BTN, rbutilFrm::OnBootloaderBtn)
+	EVT_BUTTON      (ID_BOOTLOADERREMOVE_BTN, rbutilFrm::OnBootloaderRemoveBtn)
 
 	EVT_CLOSE(rbutilFrm::rbutilFrmClose)
 	EVT_MENU(ID_FILE_EXIT, rbutilFrm::OnFileExit)
@@ -116,8 +119,7 @@ void rbutilFrm::CreateGUIControls(void)
         wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL | wxALL,5);
 
 	WxStaticText2 = new wxStaticText(WxPanel1, ID_WXSTATICTEXT2,
-        _("Install Rockbox on your audio player"), wxPoint(70,16),
-        wxSize(175,17), 0, wxT("WxStaticText2"));
+        _("Install Rockbox on your audio player"));
 	WxFlexGridSizer1->Add(WxStaticText2,0,
         wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL,5);
 
@@ -149,9 +151,22 @@ void rbutilFrm::CreateGUIControls(void)
         wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL | wxALL,5);
 
 	WxStaticText3 = new wxStaticText(WxPanel1, ID_WXSTATICTEXT3,
-        _("Remove Rockbox from your audio player"), wxPoint(60,66),
-        wxSize(196,17), 0, wxT("WxStaticText3"));
+        _("Remove Rockbox from your audio player"));
 	WxFlexGridSizer1->Add(WxStaticText3,0,
+        wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL,5);
+
+    wxBitmap WxBitmapButton4_BITMAP (uninstall_3d_xpm);
+	WxBitmapButton4 = new wxBitmapButton(WxPanel1, ID_BOOTLOADERREMOVE_BTN,
+        WxBitmapButton4_BITMAP, wxPoint(0,0), wxSize(64,54),
+        wxRAISED_BORDER | wxBU_AUTODRAW, wxDefaultValidator,
+        wxT("WxBitmapButton4"));
+	WxBitmapButton4->SetToolTip(_("Uninstall Bootloader"));
+	WxFlexGridSizer1->Add(WxBitmapButton4,0,
+        wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL | wxALL,5);
+
+	WxStaticText4 = new wxStaticText(WxPanel1, ID_WXSTATICTEXT4,
+        _("Remove Rockbox Bootloader from your audio player"));
+	WxFlexGridSizer1->Add(WxStaticText4,0,
         wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL,5);
 
 	WxMenuBar1 =  new wxMenuBar();
@@ -251,7 +266,10 @@ void rbutilFrm::OnFileWipeCache(wxCommandEvent& event)
 
     if (! rm_rf(cacheloc) )
     {
-        MESG_DIALOG(_("Local download cache has been deleted."));
+        wxMessageDialog* msg = new wxMessageDialog(this, _("Local download cache has been deleted.")
+                            ,"Cache deletion", wxOK |wxICON_INFORMATION);
+        msg->ShowModal();
+        delete msg;
     }
     else {
         MESG_DIALOG(_("Errors occured deleting the local download cache."));
@@ -260,16 +278,207 @@ void rbutilFrm::OnFileWipeCache(wxCommandEvent& event)
     wxMkdir(cacheloc, 0777);
 }
 
+void rbutilFrm::OnBootloaderRemoveBtn(wxCommandEvent& event)
+{
+    wxLogVerbose("=== begin rbutilFrm::OnBootloaderRemoveBtn(event)");
+
+    wxWizard *wizard = new wxWizard(this, wxID_ANY,
+                    _("Rockbox Bootloader Uninstallation Wizard"),
+                    wxBitmap(wizard_xpm),
+                    wxDefaultPosition,
+                    wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
+    wxBootPlatformPage* page1 = new wxBootPlatformPage(wizard);
+    wxBootLocationPage* page2 = new wxBootLocationPage(wizard);  //  Only one of these pages are shown
+    wxIpodLocationPage* page3 = new wxIpodLocationPage(wizard);  //  depending on Device selected
+
+    page1->SetNext(page2);
+    page2->SetPrev(page1);
+    page2->SetNext(page3);
+    page3->SetPrev(page2);
+
+    wizard->GetPageAreaSizer()->Add(page1);
+
+
+    if (wizard->RunWizard(page1) )
+    {
+        // uninstall the bootloader
+        if(gv->curbootloadermethod == "ipodpatcher")
+        {
+
+            if(ipodpatcher(BOOTLOADER_REM))
+            {
+                wxMessageDialog* msg = new wxMessageDialog(this, _("The Bootloader has been uninstalled.")
+                            ,"Uninstallation", wxOK |wxICON_INFORMATION);
+                msg->ShowModal();
+                delete msg;
+            }
+            else
+            {
+                MESG_DIALOG(_("The Uninstallation has failed.") );
+            }
+        }
+        else if(gv->curbootloadermethod == "gigabeatf")
+        {
+
+            if(gigabeatf(BOOTLOADER_REM))
+            {
+                wxMessageDialog* msg = new wxMessageDialog(this, _("The Bootloader has been uninstalled.")
+                            ,"Uninstallation", wxOK |wxICON_INFORMATION);
+                msg->ShowModal();
+                delete msg;
+            }
+            else
+                MESG_DIALOG(_("The Uninstallation has failed.") );
+        }
+        else if(gv->curbootloadermethod == "h10")
+        {
+            if(h10(BOOTLOADER_REM))
+            {
+                wxMessageDialog* msg = new wxMessageDialog(this, _("The Bootloader has been uninstalled.")
+                            ,"Uninstallation", wxOK |wxICON_INFORMATION);
+                msg->ShowModal();
+                delete msg;
+            }
+            else
+               MESG_DIALOG(_("The Uninstallation has failed.") );
+
+        }
+        else if(gv->curbootloadermethod == "iaudio" )
+        {
+           wxMessageDialog* msg = new wxMessageDialog(this, _("To uninstall the Bootloader on this Device,\n"
+                    "you need to download and install an Original Firmware from the Manufacturer.")
+                            ,"Uninstallation", wxOK |wxICON_INFORMATION);
+           msg->ShowModal();
+           delete msg;
+        }
+        else if(gv->curbootloadermethod == "fwpatcher" )
+        {
+           wxMessageDialog* msg = new wxMessageDialog(this, _("To uninstall the Bootloader on this Device,\n"
+                         "you need to download and install an original Firmware from the Manufacturer.\n"
+                         "To do this, you need to boot into the original Firmware.")
+                            ,"Uninstallation", wxOK |wxICON_INFORMATION);
+           msg->ShowModal();
+           delete msg;
+        }
+        else
+        {
+           MESG_DIALOG(_("Unsupported Bootloader Method") );
+        }
+    }
+    else
+    {
+        MESG_DIALOG(_("The bootloader Uninstallation wizard was cancelled") );
+    }
+
+    wxLogVerbose("=== end rbutilFrm::OnBootloaderRemoveBtn");
+}
 
 void rbutilFrm::OnBootloaderBtn(wxCommandEvent& event)
 {
-    if (!wxLaunchDefaultBrowser(wxT(
-        "http://www.rockbox.org/twiki/bin/view/Main/"
-        "DocsIndex#Rockbox_Installation_Instruction") ) )
+    wxLogVerbose("=== begin rbutilFrm::OnBootloaderBtn(event)");
+
+    wxWizard *wizard = new wxWizard(this, wxID_ANY,
+                    _("Rockbox Installation Wizard"),
+                    wxBitmap(wizard_xpm),
+                    wxDefaultPosition,
+                    wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
+    wxBootPlatformPage* page1 = new wxBootPlatformPage(wizard);
+    wxFirmwareLocationPage* page2 = new wxFirmwareLocationPage(wizard);   //this page is optional
+    wxBootLocationPage* page3 = new wxBootLocationPage(wizard);  //  Only one of these pages are shown
+    wxIpodLocationPage* page4 = new wxIpodLocationPage(wizard);  //  depending on Device selected
+
+    page1->SetNext(page2);
+    page2->SetPrev(page1);
+    page2->SetNext(page3);
+    page3->SetPrev(page2);
+    page3->SetNext(page4);
+    page4->SetPrev(page3);
+
+    wizard->GetPageAreaSizer()->Add(page1);
+
+    if (wizard->RunWizard(page1) )
     {
-        ERR_DIALOG(_("Unable to launch external browser"),
-            _("Boot loader install instructions."));
+        // start installation depending on player
+        if(gv->curbootloadermethod == "ipodpatcher")
+        {
+
+            if(ipodpatcher(BOOTLOADER_ADD))
+            {
+               wxMessageDialog* msg = new wxMessageDialog(this, _("The Bootloader has been installed on your device.")
+                            ,"Installation", wxOK |wxICON_INFORMATION);
+               msg->ShowModal();
+               delete msg;
+            }
+            else
+            {
+                MESG_DIALOG(_("The installation has failed.") );
+            }
+        }
+        else if(gv->curbootloadermethod == "gigabeatf")
+        {
+
+            if(gigabeatf(BOOTLOADER_ADD))
+            {
+               wxMessageDialog* msg = new wxMessageDialog(this, _("The Bootloader has been installed on your device.")
+                            ,"Installation", wxOK |wxICON_INFORMATION);
+               msg->ShowModal();
+               delete msg;
+            }
+            else
+                MESG_DIALOG(_("The installation has failed.") );
+        }
+        else if(gv->curbootloadermethod == "iaudio" )
+        {
+            if(iaudiox5(BOOTLOADER_ADD))
+            {
+               wxMessageDialog* msg = new wxMessageDialog(this, _("The Bootloader has been installed on your device.\n"
+                             "Now turn OFF your Device, unplug USB,and insert Charger\n"
+                             "Your Device will automatically upgrade the flash with the Rockbox bootloader")
+                            ,"Installation", wxOK |wxICON_INFORMATION);
+               msg->ShowModal();
+               delete msg;
+            }
+            else
+                MESG_DIALOG(_("The installation has failed.") );
+        }
+        else if(gv->curbootloadermethod == "fwpatcher")
+        {
+            if(fwpatcher(BOOTLOADER_ADD))
+            {
+               wxMessageDialog* msg = new wxMessageDialog(this, _("The Bootloader has been patched and copied on your device.\n"
+                             "Now use the Firmware upgrade option of your Device\n")
+                            ,"Installation", wxOK |wxICON_INFORMATION);
+               msg->ShowModal();
+               delete msg;
+            }
+            else
+                MESG_DIALOG(_("The installation has failed.") );
+        }
+        else if(gv->curbootloadermethod == "h10")
+        {
+            if(h10(BOOTLOADER_ADD))
+            {
+               wxMessageDialog* msg = new wxMessageDialog(this, _("The Bootloader has been patched and copied on your device.\n"
+                             "Now use the Firmware upgrade option of your Device\n")
+                            ,"Installation", wxOK |wxICON_INFORMATION);
+               msg->ShowModal();
+               delete msg;
+            }
+            else
+              MESG_DIALOG(_("The installation has failed.") );
+        }
+        else
+        {
+           MESG_DIALOG(_("Unsupported Bootloader Method") );
+        }
     }
+    else
+    {
+        MESG_DIALOG(_("The bootloader installation wizard was cancelled") );
+    }
+
+    wxLogVerbose("=== end rbutilFrm::OnBootloaderBtn");
+
 }
 
 void rbutilFrm::OnInstallBtn(wxCommandEvent& event)
@@ -378,7 +587,10 @@ void rbutilFrm::OnInstallBtn(wxCommandEvent& event)
 
         if ( !UnzipFile(dest, gv->curdestdir, true) )
         {
-            MESG_DIALOG(_("Rockbox has been installed on your device.") );
+            wxMessageDialog* msg = new wxMessageDialog(this, _("Rockbox has been installed on your device.")
+                            ,"Installation", wxOK |wxICON_INFORMATION);
+            msg->ShowModal();
+            delete msg;
         } else
         {
             wxRemoveFile(dest);
@@ -472,7 +684,10 @@ void rbutilFrm::OnFontBtn(wxCommandEvent& event)
 
         if ( !UnzipFile(dest, gv->curdestdir, true) )
         {
-            MESG_DIALOG(_("The Rockbox fonts have been installed on your device.") );
+            wxMessageDialog* msg = new wxMessageDialog(this, _("The Rockbox fonts have been installed on your device.")
+                            ,"Installation", wxOK |wxICON_INFORMATION);
+            msg->ShowModal();
+            delete msg;
         } else
         {
             wxRemoveFile(dest);
@@ -511,7 +726,11 @@ void rbutilFrm::OnRemoveBtn(wxCommandEvent& event)
            _("The uninstallation wizard was cancelled or completed with "
              "some errors.") );
         } else {
-            MESG_DIALOG(_("The uninstall wizard completed successfully") );
+            wxMessageDialog* msg = new wxMessageDialog(this, _("The uninstall wizard completed successfully\n"
+                          "Depending on which Device you own, you also have to uninstall the Bootloader")
+                            ,"Uninstallation", wxOK |wxICON_INFORMATION);
+            msg->ShowModal();
+            delete msg;
         }
     } else
     {
@@ -542,7 +761,10 @@ void rbutilFrm::OnPortableInstall(wxCommandEvent& event)
     {
         if ( InstallRbutil(gv->curdestdir) )
         {
-            MESG_DIALOG(_("The Rockbox Utility has been installed on your device.") );
+            wxMessageDialog* msg = new wxMessageDialog(this, _("The Rockbox Utility has been installed on your device.")
+                            ,"Installation", wxOK |wxICON_INFORMATION);
+            msg->ShowModal();
+            delete msg;
         } else
         {
             ERR_DIALOG(_("Installation failed"), _("Portable Install"));

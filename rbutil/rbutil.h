@@ -85,6 +85,11 @@ public:
     wxArrayString           plat_id;
     wxArrayString           plat_name;
     wxArrayInt              plat_released;
+    wxArrayInt              plat_needsbootloader;
+    wxArrayString           plat_bootloadermethod;
+    wxArrayString           plat_bootloadername;
+    wxArrayInt              plat_autodetect;
+    wxArrayString           plat_combinedname;
     wxString                download_url;
     wxString                daily_url;
     wxString                bleeding_url;
@@ -92,6 +97,7 @@ public:
     wxString                font_url;
     wxString                last_release;
     wxString                prog_name;
+    wxString                bootloader_url;
 
     // User configuration data.
     wxString                curplat;
@@ -101,6 +107,9 @@ public:
     bool                    curisfull;
     bool                    nocache;
     bool                    portable;
+    wxString                curbootloadermethod;
+    wxString                curbootloader;
+    wxString                curfirmware;
 
     // Global system variables
     wxFFile*                 logfile;
@@ -120,6 +129,7 @@ bool InstallRbutil(wxString dest);
 wxString stream_err_str(int errnum);
 bool rm_rf(wxString file);
 
+
 #define ERR_DIALOG(msg, title) \
     wxLogError("%s: %s", ((wxString) title).c_str(), ((wxString) msg).c_str())
 
@@ -135,5 +145,8 @@ bool rm_rf(wxString file);
 #define BUILD_RELEASE       0
 #define BUILD_DAILY         1
 #define BUILD_BLEEDING      2
+
+#define BOOTLOADER_ADD      0
+#define BOOTLOADER_REM      1
 
 #endif

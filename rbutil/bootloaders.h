@@ -6,9 +6,9 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  * Module: rbutil
- * File: credits.h
+ * File: bootloaders.h
  *
- * Copyright (C) 2006 Christi Alice Scarborough
+ * Copyright (C) 2007 Dominik Wenger
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -18,33 +18,24 @@
  *
  ****************************************************************************/
 
-#ifndef CREDITS_H_INCLUDED
-#define CREDITS_H_INCLUDED
 
-#define RBUTIL_FULLNAME "The Rockbox Utility"
-#define RBUTIL_VERSION "Version 0.2.1.1"
 
-static const char* rbutil_developers[] = {
-    "Christi Alice Scarborough",
-    "Dave Chapman",
-    "Dominik Wenger",
-    ""
+#ifndef BOOTLOADERS_H_INCLUDED
+#define BOOTLOADERS_H_INCLUDED
+
+
+extern "C" {
+    // Ipodpatcher
+    #include "ipodpatcher/ipodpatcher.h"
 };
 
-#define RBUTIL_WEBSITE "http://www.rockbox.org/"
-#define RBUTIL_COPYRIGHT "(C) 2005-6 The Rockbox Team\n" \
-        "released under the GNU Public License v2"
-#define RBUTIL_DESCRIPTION "Installer and housekeeping utility for " \
-        "the Rockbox open source digital audio player firmware."
+
+bool initIpodpatcher();
+bool ipodpatcher(int mode);
+bool gigabeatf(int mode);
+bool iaudiox5(int mode);
+bool fwpatcher(int mode);
+bool h10(int mode);
 
 
-class AboutDlg: public wxDialog
-{
-	public:
-		AboutDlg(rbutilFrm *parent);
-		~AboutDlg();
-};
-
-#include <wx/hyperlink.h>
-
-#endif // CREDITS_H_INCLUDED
+#endif // BOOTLOADERS_H_INCLUDED

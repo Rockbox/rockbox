@@ -21,28 +21,29 @@
 #include "rbutil.h"
 #include "installlog.h"
 
+
 // This class allows us to return directories as well as files to
 // wxDir::Traverse
 class wxDirTraverserIncludeDirs : public wxDirTraverser
+{
+public:
+    wxDirTraverserIncludeDirs(wxArrayString& files) : m_files(files) { }
+
+    virtual wxDirTraverseResult OnFile(const wxString& filename)
     {
-    public:
-        wxDirTraverserIncludeDirs(wxArrayString& files) : m_files(files) { }
+        m_files.Add(filename);
+        return wxDIR_CONTINUE;
+    }
 
-        virtual wxDirTraverseResult OnFile(const wxString& filename)
-        {
-            m_files.Add(filename);
-            return wxDIR_CONTINUE;
-        }
+    virtual wxDirTraverseResult OnDir(const wxString& dirname)
+    {
+        m_files.Add(dirname);
+        return wxDIR_CONTINUE;
+    }
 
-        virtual wxDirTraverseResult OnDir(const wxString& dirname)
-        {
-            m_files.Add(dirname);
-            return wxDIR_CONTINUE;
-        }
-
-    private:
-        wxArrayString& m_files;
-    };
+private:
+    wxArrayString& m_files;
+};
 
 wxDEFINE_SCOPED_PTR_TYPE(wxZipEntry);
 
@@ -272,18 +273,15 @@ int UnzipFile(wxString src, wxString destdir, bool isInstall)
         in_str.Printf(wxT("%s" PATH_SEP "%s"), destdir.c_str(), name.c_str());
 
         if (entry->IsDir() ) {
-            wxDir* dirname = new wxDir(in_str);
-            if (! dirname->Exists(in_str) ) {
+            if (!wxDirExists(in_str) ) {
                 if (! wxMkdir(in_str, 0777) ) {
                     buf.Printf(_("Unable to create directory %s"),
                                in_str.c_str() );
                     errnum = 100;
-                    delete dirname;
                     break;
                 }
             }
             log->WriteFile(name, true); // Directory
-            delete dirname;
             continue;
         }
 

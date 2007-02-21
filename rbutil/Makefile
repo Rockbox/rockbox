@@ -9,10 +9,9 @@
 
 # Unix-style Makefile for rbutil
 
-
 CXX=$(shell $(PREFIX)wx-config --cxx)
-INC = 
-OBJS=rbutil.o rbutilApp.o rbutilFrm.o wizard_pages.o bootloaders.o installlog.o ipodpatcher/ipodpatcher.o ipodpatcher/ipodio-posix.o fwpatcher/md5.o fwpatcher/iriver.o
+INC =
+OBJS=rbutil.o rbutilApp.o rbutilFrm.o wizard_pages.o bootloaders.o installlog.o ipodpatcher/ipodpatcher.o ipodpatcher/ipodio-posix.o irivertools.o md5sum.o
 
 # Install into /usr/local by default
 ifndef DESTDIR

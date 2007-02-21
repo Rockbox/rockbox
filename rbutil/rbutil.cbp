@@ -1,18 +1,45 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_project_file>
-	<FileVersion major="1" minor="5" />
+	<FileVersion major="1" minor="6" />
 	<Project>
 		<Option title="rbutil" />
 		<Option pch_mode="0" />
-		<Option default_target="" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="" />
+		<MakeCommands>
+			<Build command="$make -f $makefile all" />
+			<CompileFile command="$make -f $makefile $file" />
+			<Clean command="$make -f $makefile clean" />
+			<DistClean command="$make -f $makefile distclean" />
+		</MakeCommands>
 		<Build>
-			<Target title="default">
+			<Target title="Release">
 				<Option output="rbutil.exe" prefix_auto="0" extension_auto="0" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectResourceIncludeDirsRelation="0" />
+				<ExtraCommands>
+					<Add after="upx --best --compress-icons=0  rbutil.exe" />
+				</ExtraCommands>
+				<MakeCommands>
+					<Build command="$make -f $makefile all" />
+					<CompileFile command="$make -f $makefile $file" />
+					<Clean command="$make -f $makefile clean" />
+					<DistClean command="$make -f $makefile distclean" />
+				</MakeCommands>
+			</Target>
+			<Target title="Debug">
+				<Option output="rbutil.exe" prefix_auto="0" extension_auto="0" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<MakeCommands>
+					<Build command="$make -f $makefile all" />
+					<CompileFile command="$make -f $makefile all" />
+					<Clean command="$make -f $makefile clean" />
+					<DistClean command="$make -f $makefile distclean" />
+				</MakeCommands>
 			</Target>
 			<Environment>
 				<Variable name="WX_CFG" value="" />
@@ -34,12 +61,13 @@
 			<Add directory="$(#WX.include)" />
 			<Add directory="$(#WX.lib)\gcc_lib$(WX_CFG)\msw" />
 			<Add directory="$(#WX)\contrib\include" />
+			<Add directory=".\" />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="$(#WX.include)" />
 		</ResourceCompiler>
 		<Linker>
-			<Add library="wxmsw27" />
+			<Add library="wxmsw28" />
 			<Add library="winspool" />
 			<Add library="winmm" />
 			<Add library="shell32" />
@@ -56,133 +84,57 @@
 			<Add library="libwxzlib" />
 			<Add directory="$(#WX.lib)\gcc_lib$(WX_CFG)" />
 			<Add directory="$(#WX.lib)" />
+			<Add directory=".\" />
 		</Linker>
-		<ExtraCommands>
-			<Add after="upx --best --compress-icons=0  rbutil.exe" />
-		</ExtraCommands>
-		<Unit filename="archos.ico">
-			<Option compilerVar="CPP" />
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="default" />
+		<Unit filename="Makefile" />
+		<Unit filename="archos.ico" />
+		<Unit filename="bootloaders.cpp" />
+		<Unit filename="bootloaders.h" />
+		<Unit filename="copying.txt" />
+		<Unit filename="credits.h" />
+		<Unit filename="fonts_3d.xpm" />
+		<Unit filename="h100sums.h" />
+		<Unit filename="h120sums.h" />
+		<Unit filename="h300sums.h" />
+		<Unit filename="install_3d.xpm" />
+		<Unit filename="installlog.cpp" />
+		<Unit filename="installlog.h" />
+		<Unit filename="ipodpatcher\ipodio-win32.c">
+			<Option compilerVar="CC" />
+			<Option compiler="gcc" use="1" buildCommand="mingw32-gcc.exe -W -g -pipe -mthreads -Winvalid-pch  -D__GNUWIN32__ -D__WXMSW__ -DUSE_PCH -g   -I.\ -IC:\Dev-Cpp\include  -c $file -o .objs\ipodpatcher\ipodio-win32.o" />
 		</Unit>
-		<Unit filename="copying.txt">
-			<Option compilerVar="CPP" />
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="default" />
+		<Unit filename="ipodpatcher\ipodio.h" />
+		<Unit filename="ipodpatcher\ipodpatcher.c">
+			<Option compilerVar="CC" />
+			<Option compiler="gcc" use="1" buildCommand="mingw32-gcc.exe -W -g -pipe -mthreads -Winvalid-pch  -D__GNUWIN32__ -D__WXMSW__ -DUSE_PCH -g  -I.\ -IC:\Dev-Cpp\include  -c $file -o .objs\ipodpatcher\ipodpatcher.o\n" />
 		</Unit>
-		<Unit filename="credits.h">
-			<Option compilerVar="CPP" />
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="default" />
-		</Unit>
-		<Unit filename="fonts_3d.xpm">
-			<Option compilerVar="CPP" />
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="default" />
-		</Unit>
-		<Unit filename="install_3d.xpm">
-			<Option compilerVar="CPP" />
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="default" />
-		</Unit>
-		<Unit filename="rblogo.xpm">
-			<Option compilerVar="CPP" />
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="default" />
-		</Unit>
+		<Unit filename="ipodpatcher\ipodpatcher.h" />
+		<Unit filename="ipodpatcher\parttypes.h" />
+		<Unit filename="irivertools.cpp" />
+		<Unit filename="irivertools.h" />
+		<Unit filename="md5sum.cpp" />
+		<Unit filename="md5sum.h" />
+		<Unit filename="rblogo.xpm" />
 		<Unit filename="rbutil-rc.rc">
 			<Option compilerVar="WINDRES" />
-			<Option objectName="rbutil-rc.res" />
-			<Option target="default" />
 		</Unit>
-		<Unit filename="rbutil.cpp">
-			<Option compilerVar="CPP" />
-			<Option target="default" />
-		</Unit>
-		<Unit filename="rbutil.h">
-			<Option compilerVar="CPP" />
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="default" />
-		</Unit>
-		<Unit filename="rbutil.ini">
-			<Option compilerVar="CPP" />
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="default" />
-		</Unit>
-		<Unit filename="rbutil.iss">
-			<Option compilerVar="CPP" />
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="default" />
-		</Unit>
-		<Unit filename="rbutilApp.cpp">
-			<Option compilerVar="CPP" />
-			<Option target="default" />
-		</Unit>
-		<Unit filename="rbutilApp.h">
-			<Option compilerVar="CPP" />
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="default" />
-		</Unit>
-		<Unit filename="rbutilFrm.cpp">
-			<Option compilerVar="CPP" />
-			<Option target="default" />
-		</Unit>
-		<Unit filename="rbutilFrm.h">
-			<Option compilerVar="CPP" />
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="default" />
-		</Unit>
-		<Unit filename="rbutilFrm_XPM.xpm">
-			<Option compilerVar="CPP" />
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="default" />
-		</Unit>
-		<Unit filename="tools2_3d.xpm">
-			<Option compilerVar="CPP" />
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="default" />
-		</Unit>
-		<Unit filename="uninstall_3d.xpm">
-			<Option compilerVar="CPP" />
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="default" />
-		</Unit>
-		<Unit filename="wizard.xpm">
-			<Option compilerVar="CPP" />
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="default" />
-		</Unit>
-		<Unit filename="wizard_pages.cpp">
-			<Option compilerVar="CPP" />
-			<Option target="default" />
-		</Unit>
-		<Unit filename="wizard_pages.h">
-			<Option compilerVar="CPP" />
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="default" />
-		</Unit>
-		<Unit filename="wx_pch.h">
-			<Option compilerVar="CPP" />
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="default" />
-		</Unit>
-		<Extensions />
+		<Unit filename="rbutil.cpp" />
+		<Unit filename="rbutil.h" />
+		<Unit filename="rbutil.ini" />
+		<Unit filename="rbutil.iss" />
+		<Unit filename="rbutilApp.cpp" />
+		<Unit filename="rbutilApp.h" />
+		<Unit filename="rbutilFrm.cpp" />
+		<Unit filename="rbutilFrm.h" />
+		<Unit filename="rbutilFrm_XPM.xpm" />
+		<Unit filename="tools2_3d.xpm" />
+		<Unit filename="uninstall_3d.xpm" />
+		<Unit filename="wizard.xpm" />
+		<Unit filename="wizard_pages.cpp" />
+		<Unit filename="wizard_pages.h" />
+		<Unit filename="wx_pch.h" />
+		<Extensions>
+			<code_completion />
+		</Extensions>
 	</Project>
 </CodeBlocks_project_file>
