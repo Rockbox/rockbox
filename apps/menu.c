@@ -631,6 +631,8 @@ int do_menu(const struct menu_item_ex *start_menu)
                 /* new menu, so reload the callback */
                 get_menu_callback(menu, &menu_callback);
             }
+            else
+                break;
         }
         else if (action == ACTION_STD_OK)
         {
