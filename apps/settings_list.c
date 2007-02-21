@@ -421,7 +421,7 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0,flip_display, LANG_FLIP_DISPLAY, false,"flip display", NULL),
     /* display */
     BOOL_SETTING(F_TEMPVAR, invert_cursor, LANG_INVERT_CURSOR, true ,"invert cursor", off_on,
-        LANG_INVERT_CURSOR_BAR, LANG_INVERT_CURSOR_POINTER, lcd_set_invert_display),
+        LANG_INVERT_CURSOR_BAR, LANG_INVERT_CURSOR_POINTER, NULL),
     OFFON_SETTING(F_THEMESETTING,statusbar, LANG_STATUS_BAR, true,"statusbar", NULL),
     OFFON_SETTING(0,scrollbar, LANG_SCROLL_BAR, true,"scrollbar", NULL),
 #if CONFIG_KEYPAD == RECORDER_PAD
