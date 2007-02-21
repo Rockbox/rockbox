@@ -867,7 +867,7 @@ void init_clock(void)
  ******************/
 void analog_clock(int hour, int minute, int second)
 {
-    if(hour > 12)
+    if(hour >= 12)
         hour -= 12;
 
     int i;
@@ -1000,7 +1000,7 @@ void digital_clock(int hour, int minute, int second, bool colon)
  **********************/
 void fullscreen_clock(int hour, int minute, int second)
 {
-    if(hour > 12)
+    if(hour >= 12)
         hour -= 12;
 
     int i;
