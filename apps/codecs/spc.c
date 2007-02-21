@@ -767,16 +767,24 @@ static int play_track( void )
             /* fade? */
             if (curtime>ID666.length)
             {
+#ifdef CPU_COLDFIRE
+                /* Have to switch modes to do this */
+                long macsr = coldfire_get_macsr();
+                coldfire_set_macsr(EMAC_SATURATE | EMAC_FRACTIONAL | EMAC_ROUND);
+#endif
                 int i;
                 for (i=0;i<WAV_CHUNK_SIZE;i++) {
                     if (lasttimesample+i>fadestartsample) {
                         if (fadevol>0) {
-                            samples[i] = (samples[i]*(fadevol>>24))>>7;
-                            samples[i+WAV_CHUNK_SIZE] = (samples[i+WAV_CHUNK_SIZE]*(fadevol>>24))>>7;
+                            samples[i] = FRACMUL(samples[i], fadevol);
+                            samples[i+WAV_CHUNK_SIZE] = FRACMUL(samples[i+WAV_CHUNK_SIZE], fadevol);
                         } else samples[i]=samples[i+WAV_CHUNK_SIZE]=0;
                         fadevol-=fadedec;
                     }
                 }
+#ifdef CPU_COLDFIRE
+               coldfire_set_macsr(macsr);
+#endif
             }
             /* end? */
             if (lasttimesample>=fadeendsample)
