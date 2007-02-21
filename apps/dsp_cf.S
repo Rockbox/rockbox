@@ -178,22 +178,20 @@ dsp_upsample:
     move.l      -4(%a5), %d1            | r->last_sample[ch-1] = s[count-1]
     move.l      %d1, (%a4)              |
     move.l      -4(%a2, %d2.l*4), %a4   | %a4 = d = dst[ch-1]
-    moveq.l     #16, %d1                | %d0 = shift
-    move.l      %d5, %d6                | %d6 = pos = phase >> 16
-    lsl.l       %d1, %d5                | swap phase to high word to use
+    swap        %d5                     | swap phase to high word to use
                                         | carries to increment position
-    lsr.l       %d1, %d6                | pos == 0?
+    move.l      %d5, %d6                | %d6 = pos = phase >> 16
+    clr.w       %d5                     |
+    eor.l       %d5, %d6                | pos == 0?
     beq.b       .usstart_0              | no? transistion from down
     cmp.l       %d3, %d6                | past end of samples?
     bge.b       .usloop_skip            | yes? skip loop
-    lea.l       (%a3, %d6.l*4), %a3     | %a3 = s = s + pos
-    move.l      -4(%a3), %d6            | %d6 = *(s - 1)
-    .word       0x51fb                  | tpf.l - trap next two instructions
-.usstart_0:
-    move.l      (%a3)+, %d1             | %d1 = *s++
-    .word       0x51fb                  | tpf.l - trap next two instructions
+    lea.l       -4(%a3, %d6.l*4), %a3   | %a3 = s = &s[pos-1] (previous)
+    move.l      (%a3)+, %d0             | %d0 = *s++
+    .word       0x51fa                  | tpf.w - trap next instruction
 .usloop_1:
     move.l      %d6, %d0                | move previous sample to %d0
+.usstart_0:
     move.l      (%a3)+, %d1             | fetch next sample
     move.l      %d1, %d6                | save sample value
     sub.l       %d0, %d1                | %d1 = diff = s[pos] - s[pos-1]
