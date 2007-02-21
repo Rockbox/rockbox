@@ -169,13 +169,13 @@ static const struct menu_item_ex *band_items[3][3] = {
 char* centerband_get_name(int selected_item, void * data, char *buffer)
 {
     (void)selected_item;
-    int band = (int)data;
+    int band = (intptr_t)data;
     snprintf(buffer, MAX_PATH, str(LANG_EQUALIZER_BAND_PEAK), band);
     return buffer;
 }
 int do_center_band_menu(void* param)
 {
-    int band = (int)param;
+    int band = (intptr_t)param;
     struct menu_item_ex menu;
     struct menu_callback_with_desc cb_and_desc;
     char desc[MAX_PATH];
