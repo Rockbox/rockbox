@@ -186,9 +186,9 @@ dsp_upsample:
     beq.b       .usstart_0              | no? transistion from down
     cmp.l       %d3, %d6                | past end of samples?
     bge.b       .usloop_skip            | yes? skip loop
-    lea.l       4(%a3, %d6.l*4), %a3    | %a3 = s + pos + 1
-    movem.l     -8(%a3), %d0-%d1        | %d0 = *(s - 2), %d1 = *(s - 1)
-    .word       0x51fa                  | tpf.w - trap next instruction
+    lea.l       (%a3, %d6.l*4), %a3     | %a3 = s = s + pos
+    move.l      -4(%a3), %d6            | %d6 = *(s - 1)
+    .word       0x51fb                  | tpf.l - trap next two instructions
 .usstart_0:
     move.l      (%a3)+, %d1             | %d1 = *s++
     .word       0x51fb                  | tpf.l - trap next two instructions
