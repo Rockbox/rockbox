@@ -76,7 +76,7 @@ MENUITEM_SETTING(stereo_width, &global_settings.stereo_width, soundmenu_callback
                      &global_settings.crossfeed_hf_attenuation, soundmenu_callback);
     MENUITEM_SETTING(crossfeed_hf_cutoff,
                      &global_settings.crossfeed_hf_cutoff, soundmenu_callback);
-    MAKE_MENU(crossfeed_menu,ID2P(LANG_CROSSFEED),soundmenu_callback, NOICON,
+    MAKE_MENU(crossfeed_menu,ID2P(LANG_CROSSFEED), NULL, NOICON,
               &crossfeed, &crossfeed_direct_gain, &crossfeed_cross_gain,
               &crossfeed_hf_attenuation, &crossfeed_hf_cutoff);
               
