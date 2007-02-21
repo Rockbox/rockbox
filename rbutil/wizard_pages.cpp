@@ -148,8 +148,8 @@ wxIpodLocationPage::wxIpodLocationPage(wxWizard* parent) : wxWizardPageSimple(pa
     // Header text
     IpodLocationLabel = new wxStaticText(this, wxID_ANY,
         wxT("Rockbox utility needs to know the device where your ipod\n"
-            "device is located on your computer. Rockbox utility\n"
-            "has detected the following location:"));
+            "device is located on your computer. Use the\n"
+            "Scan Button:"));
     WxBoxSizer1->Add(IpodLocationLabel,0,wxGROW | wxALL, 5);
 
     // device location
@@ -208,13 +208,16 @@ void wxIpodLocationPage::OnIpodLocationBtn(wxCommandEvent& event)
     wxLogVerbose("=== begin wxIpodLocationPage::OnIpodLocationBtn");
     struct ipod_t ipod;
     int n = ipod_scan(&ipod);
+    gv->curbootloader="";
 
-    gv->curbootloader="bootloader-";
-    gv->curbootloader.Append(ipod.targetname);
     if(n == 0)
       IpodLocationText->SetLabel("no Ipod found");
     else if( n==1)
+    {
+      gv->curbootloader="bootloader-";
+      gv->curbootloader.Append(ipod.targetname);
       IpodLocationText->SetLabel(ipod.modelstr);
+    }
     else
       IpodLocationText->SetLabel("More than 1 Ipod found");
 
