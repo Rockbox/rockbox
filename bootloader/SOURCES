@@ -8,6 +8,8 @@ gigabeat.c
 main-pp.c
 #elif defined(ELIO_TPJ1022)
 tpj1022.c
+#elif defined(IAUDIO_X5)
+iaudio_x5.c
 #else
 main.c
 #endif

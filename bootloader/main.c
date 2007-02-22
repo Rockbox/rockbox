@@ -370,70 +370,8 @@ void main(void)
     bool rec_button = false;
     bool hold_status = false;
     int data;
-
-#ifdef IAUDIO_X5
-    (void)rc_on_button;
-    (void)on_button;
-    (void)rec_button;
-    (void)hold_status;
-    (void)data;
-    power_init();
-
-    system_init();
-    kernel_init();
-
-    set_cpu_frequency(CPUFREQ_NORMAL);
-    coldfire_set_pllcr_audio_bits(DEFAULT_PLLCR_AUDIO_BITS);
-
-    set_irq_level(0);
-    lcd_init();
-#ifdef HAVE_REMOTE_LCD
-    lcd_remote_init();
-#endif
-    backlight_init();
-    font_init();
-    adc_init();
-    button_init();
-
-    printf("Rockbox boot loader");
-    printf("Version %s", version);
-    
-    check_battery();
-
-    rc = ata_init();
-    if(rc)
-    {
-        printf("ATA error: %d", rc);
-        sleep(HZ*5);
-        power_off();
-    }
-
-    disk_init();
-
-    rc = disk_mount_all();
-    if (rc<=0)
-    {
-        printf("No partition found");
-        sleep(HZ*5);
-        power_off();
-    }
-
-    printf("Loading firmware");
-    i = load_firmware((unsigned char *)DRAM_START, BOOTFILE, MAX_LOADSIZE);
-    printf("Result: %s", strerror(i));
-
-    if (i < EOK) {
-        printf("Error!");
-        printf("Can't load rockbox.ipod:");
-        printf(strerror(rc));
-        sleep(HZ*3);
-        power_off();
-    } else {
-        start_firmware();
-    }
-
-#else
     extern int line;
+    
     /* We want to read the buttons as early as possible, before the user
        releases the ON button */
 
@@ -644,7 +582,6 @@ void main(void)
     }
     else
         start_iriver_fw();
-#endif /* IAUDIO_X5 */
 }
 
 /* These functions are present in the firmware library, but we reimplement
