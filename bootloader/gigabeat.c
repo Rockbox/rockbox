@@ -206,7 +206,7 @@ void * main(void)
     if(load_original) {
         loadbuffer = (unsigned char*)0x30008000;
         buffer_size =(unsigned char*)0x31000000 - loadbuffer;
-        rc = load_firmware("rockbox.gigabeat", loadbuffer, buffer_size);
+        rc = load_raw_firmware(loadbuffer, "/rockbox.gigabeat", buffer_size);
         if(rc < EOK) {
             printf("Error!");
             printf("Failed to load original firmware:");
@@ -236,7 +236,7 @@ load_rockbox:
 
     loadbuffer = (unsigned char*) 0x100;
     buffer_size = (unsigned char*)0x400000 - loadbuffer;
-    rc=load_firmware("rockbox.gigabeat", loadbuffer, buffer_size);
+    rc = load_raw_firmware(loadbuffer, "/rockbox.gigabeat", buffer_size);
     if(rc < EOK) {
             printf("Error!");
             printf("Can't load rockbox.gigabeat:");
