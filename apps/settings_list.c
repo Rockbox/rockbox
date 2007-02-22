@@ -808,7 +808,7 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0, replaygain_noclip, LANG_REPLAYGAIN_NOCLIP,
         false, "replaygain noclip", NULL),
     INT_SETTING(0, replaygain_preamp, LANG_REPLAYGAIN_PREAMP, 0, "replaygain preamp", 
-                UNIT_DB, -120, 120, 1, replaygain_preamp_format, NULL, NULL),
+                UNIT_DB, -120, 120, 5, replaygain_preamp_format, NULL, NULL),
     
     CHOICE_SETTING(0, beep, LANG_BEEP, 0,
         "beep", "off,weak,moderate,strong", NULL, 3,
