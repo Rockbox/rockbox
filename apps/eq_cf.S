@@ -48,9 +48,8 @@ eq_filter:
     move.l (11*4+12, %sp), %d5        | number of samples
     movem.l (%a5), %d0-%d3            | load filter history
 
-    /* d0-r3 = history, d4 = number of channels, d5 = sample count,
-     * d6 = lower shift amount, d7 = upper shift amount, a0-a4 = coefs,
-     * a5 = history pointer, a6 = x[]
+    /* d0-d3 = history, d4 = temp, d5 = sample count, d6 = lower shift amount,
+     * d7 = upper shift amount, a0-a4 = coefs, a5 = history pointer, a6 = x[]
      */
 .loop:
     /* Direct form 1 filtering code. We assume DSP has put EMAC in frac mode.
