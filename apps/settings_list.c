@@ -487,7 +487,7 @@ const struct settings_list settings[] = {
     /* remote lcd */
     INT_SETTING(0, remote_contrast, LANG_CONTRAST, DEFAULT_REMOTE_CONTRAST_SETTING,
         "remote contrast", UNIT_INT, MIN_REMOTE_CONTRAST_SETTING, 
-        MIN_REMOTE_CONTRAST_SETTING, 1, NULL, NULL, lcd_remote_set_contrast),
+        MAX_REMOTE_CONTRAST_SETTING, 1, NULL, NULL, lcd_remote_set_contrast),
     BOOL_SETTING(0, remote_invert, LANG_INVERT, false ,"remote invert", off_on,
         LANG_INVERT_LCD_INVERSE, LANG_INVERT_LCD_NORMAL, lcd_remote_set_invert_display),
     OFFON_SETTING(0,remote_flip_display, LANG_FLIP_DISPLAY,
@@ -845,7 +845,7 @@ const struct settings_list settings[] = {
                     crossfeed_format, NULL, crossfeed_hf_att_helper),
     INT_SETTING(0, crossfeed_hf_cutoff, LANG_CROSSFEED_HF_CUTOFF,700,
                     "crossfeed hf cutoff", UNIT_HERTZ, 500, 2000, 100,
-                    crossfeed_format, NULL, crossfeed_hf_cutoff_helper),
+                    NULL, NULL, crossfeed_hf_cutoff_helper),
     /* equalizer */
     OFFON_SETTING(0,eq_enabled,LANG_EQUALIZER_ENABLED,false,"eq enabled",NULL),
 	INT_SETTING(0, eq_precut, LANG_EQUALIZER_PRECUT, 0, "eq precut",                      
