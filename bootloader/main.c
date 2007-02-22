@@ -43,18 +43,17 @@
 #include "eeprom_settings.h"
 
 #include "pcf50606.h"
+#include "common.h"
 
 #include <stdarg.h>
+
+/* Maximum allowed firmware image size. 10MB is more than enough */
+#define MAX_LOADSIZE (10*1024*1024)
 
 #define DRAM_START 0x31000000
 
 #ifdef HAVE_EEPROM_SETTINGS
 static bool recovery_mode = false;
-#endif
-
-int line = 0;
-#ifdef HAVE_REMOTE_LCD
-int remote_line = 0;
 #endif
 
 int usb_screen(void)
@@ -63,41 +62,6 @@ int usb_screen(void)
 }
 
 char version[] = APPSVERSION;
-
-char printfbuf[256];
-
-void reset_screen(void)
-{
-    lcd_clear_display();
-    line = 0;
-#ifdef HAVE_REMOTE_LCD
-    lcd_remote_clear_display();
-    remote_line = 0;
-#endif
-}
-
-void printf(const char *format, ...)
-{
-    int len;
-    unsigned char *ptr;
-    va_list ap;
-    va_start(ap, format);
-
-    ptr = printfbuf;
-    len = vsnprintf(ptr, sizeof(printfbuf), format, ap);
-    va_end(ap);
-
-    lcd_puts(0, line++, ptr);
-    lcd_update();
-    if(line >= 16)
-        line = 0;
-#ifdef HAVE_REMOTE_LCD
-    lcd_remote_puts(0, remote_line++, ptr);
-    lcd_remote_update();
-    if(remote_line >= 8)
-        remote_line = 0;
-#endif
-}
 
 /* Reset the cookie for the crt0 crash check */
 inline void __reset_cookie(void)
@@ -114,68 +78,6 @@ void start_iriver_fw(void)
     asm(" move.l 0,%sp");
     asm(" lea.l 8,%a0");
     asm(" jmp (%a0)");
-}
-
-int load_firmware(void)
-{
-    int fd;
-    int rc;
-    int len;
-    unsigned long chksum;
-    char model[5];
-    unsigned long sum;
-    int i;
-    unsigned char *buf = (unsigned char *)DRAM_START;
-
-    fd = open("/.rockbox/" BOOTFILE, O_RDONLY);
-    if(fd < 0)
-    {
-        fd = open("/" BOOTFILE, O_RDONLY);
-        if(fd < 0)
-            return -1;
-    }
-
-    len = filesize(fd) - 8;
-
-    printf("Length: %x", len);
-
-    lseek(fd, FIRMWARE_OFFSET_FILE_CRC, SEEK_SET);
-
-    rc = read(fd, &chksum, 4);
-    if(rc < 4)
-        return -2;
-
-    printf("Checksum: %x", chksum);
-
-    rc = read(fd, model, 4);
-    if(rc < 4)
-        return -3;
-
-    model[4] = 0;
-
-    printf("Model name: %s", model);
-    lcd_update();
-
-    lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
-
-    rc = read(fd, buf, len);
-    if(rc < len)
-        return -4;
-
-    close(fd);
-
-    sum = MODEL_NUMBER;
-
-    for(i = 0;i < len;i++) {
-        sum += buf[i];
-    }
-
-    printf("Sum: %x", sum);
-
-    if(sum != chksum)
-        return -5;
-
-    return 0;
 }
 
 void start_firmware(void)
@@ -353,6 +255,7 @@ void failsafe_menu(void)
     int defopt = -1;
     char buf[32];
     int i;
+    extern int line;
     
     reset_screen();
     printf("Bootloader %s", version);
@@ -516,15 +419,21 @@ void main(void)
     }
 
     printf("Loading firmware");
-    i = load_firmware();
-    printf("Result: %d", i);
+    i = load_firmware((unsigned char *)DRAM_START, BOOTFILE, MAX_LOADSIZE);
+    printf("Result: %s", strerror(i));
 
-    if(i == 0)
+    if (i < EOK) {
+        printf("Error!");
+        printf("Can't load rockbox.ipod:");
+        printf(strerror(rc));
+        sleep(HZ*3);
+        power_off();
+    } else {
         start_firmware();
-
-    power_off();
+    }
 
 #else
+    extern int line;
     /* We want to read the buttons as early as possible, before the user
        releases the ON button */
 
@@ -721,15 +630,16 @@ void main(void)
     }
 
     printf("Loading firmware");
-    i = load_firmware();
-    printf("Result: %d", i);
+    i = load_firmware((unsigned char *)DRAM_START, BOOTFILE, MAX_LOADSIZE);
+    printf("Result: %d", strerror(i));
 
-    if (i == 0)
+    if (i == EOK)
         start_firmware();
 
     if (!detect_original_firmware())
     {
         printf("No firmware found on disk");
+        sleep(HZ*2);
         shutdown();
     }
     else
@@ -739,24 +649,6 @@ void main(void)
 
 /* These functions are present in the firmware library, but we reimplement
    them here because the originals do a lot more than we want */
-
-void reset_poweroff_timer(void)
-{
-}
-
 void screen_dump(void)
-{
-}
-
-int dbg_ports(void)
-{
-   return 0;
-}
-
-void mpeg_stop(void)
-{
-}
-
-void sys_poweroff(void)
 {
 }

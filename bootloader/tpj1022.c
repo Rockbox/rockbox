@@ -37,10 +37,9 @@
 #include "panic.h"
 #include "power.h"
 #include "file.h"
+#include "common.h"
 
 char version[] = APPSVERSION;
-
-int line=0;
 
 void* main(void)
 {
@@ -54,8 +53,7 @@ void* main(void)
     lcd_init();
     font_init();
 
-    lcd_puts(0, line++ ,"Hello World!");
-    lcd_update();
+    printf("Hello World!");
 #endif
 
     i=ata_init();
@@ -108,28 +106,10 @@ void* main(void)
 
 /* These functions are present in the firmware library, but we reimplement
    them here because the originals do a lot more than we want */
-
-void reset_poweroff_timer(void)
-{
-}
-
-int dbg_ports(void)
-{
-   return 0;
-}
-
-void mpeg_stop(void)
-{
-}
-
 void usb_acknowledge(void)
 {
 }
 
 void usb_wait_for_disconnect(void)
-{
-}
-
-void sys_poweroff(void)
 {
 }

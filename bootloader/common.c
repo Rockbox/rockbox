@@ -154,7 +154,7 @@ int load_firmware(unsigned char* buf, char* firmware, int buffer_size)
     if(sum != chksum)
         return EBAD_CHKSUM;
 
-    return len;
+    return EOK;
 }
 
 /* Load raw binary image. */

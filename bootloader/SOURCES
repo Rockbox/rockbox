@@ -1,10 +1,10 @@
-#if defined(IPOD_ARCH)
 common.c
+
+#if defined(IPOD_ARCH)
 ipod.c
 #elif defined(GIGABEAT_F)
 gigabeat.c
 #elif defined(IRIVER_H10) || defined(IRIVER_H10_5GB) || defined(SANSA_E200)
-common.c
 main-pp.c
 #elif defined(ELIO_TPJ1022)
 tpj1022.c
