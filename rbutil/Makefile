@@ -11,6 +11,7 @@
 
 CXX=$(shell $(PREFIX)wx-config --cxx)
 INC =
+CFLAGS = -Wall -Wundef
 OBJS=rbutil.o rbutilApp.o rbutilFrm.o wizard_pages.o bootloaders.o installlog.o ipodpatcher/ipodpatcher.o ipodpatcher/ipodio-posix.o irivertools.o md5sum.o
 
 # Install into /usr/local by default
@@ -31,10 +32,10 @@ endif
 all: rbutil$(EXT)
 
 .cpp.o :
-	$(CXX) $(INC) -c `$(PREFIX)wx-config --cxxflags` -o $@ $<
+	$(CXX) $(CFLAGS) $(INC) -c `$(PREFIX)wx-config --cxxflags` -o $@ $<
 
 .c.o :
-	$(CC) $(INC) -c `$(PREFIX)wx-config --cxxflags` -o $@ $<
+	$(CC) $(CFLAGS) $(INC) -c `$(PREFIX)wx-config --cxxflags` -o $@ $<
 
 rbutil-rc.o: rbutil-rc.rc
 	$(WINDRES) `$(PREFIX)wx-config --cxxflags` -O coff -F pe-i386 -o $@ $<
