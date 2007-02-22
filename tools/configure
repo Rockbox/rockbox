@@ -1261,11 +1261,9 @@ fi
       if test -n "$archosrom"; then
           # Archos SH-based players do this somewhat differently for
           # some reason
-          extradefines="-DBOOTLOADER -ffunction-sections -fdata-sections"
           appsdir='\$(ROOTDIR)/flash/bootbox'
           apps="bootbox"
       else
-          extradefines="-DBOOTLOADER" # for target makefile symbol EXTRA_DEFINES
           appsdir='\$(ROOTDIR)/bootloader'
           apps="bootloader"
           flash=""
@@ -1276,6 +1274,7 @@ fi
               output=$bootoutput
           fi
       fi
+      extradefines="-DBOOTLOADER -ffunction-sections -fdata-sections"
       bootloader="1"
       echo "Bootloader build selected"
       ;;
