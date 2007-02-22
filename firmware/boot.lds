@@ -160,7 +160,9 @@ SECTIONS
     .data : AT ( _datacopy )
     {
         _datastart = .;
+        KEEP(*(.resetvectors));
         *(.resetvectors);
+        KEEP(*(.vectors));
         *(.vectors);
         . = ALIGN(0x200);
         *(.icode)
