@@ -248,6 +248,8 @@ void system_init(void)
     /* Set INTBASE and SPURVEC */
     INTBASE = 64;
     SPURVEC = 24;
+
+    MPARK     = 0x81;   /* PARK[1,0]=10 + BCR24BIT                   */
 }
 
 void system_reboot (void)

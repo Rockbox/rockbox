@@ -237,8 +237,6 @@ static void _display_on(void)
 /* LCD init */
 void lcd_init_device(void)
 {
-    MPARK     = 0x81;   /* PARK[1,0]=10 + BCR24BIT                   */
-
     /* GPO46 is LCD RESET */
     or_l(0x00004000, &GPIO1_OUT);
     or_l(0x00004000, &GPIO1_ENABLE);

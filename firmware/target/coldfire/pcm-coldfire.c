@@ -188,7 +188,6 @@ void pcm_init(void)
     pcm_paused            = false;
     pcm_callback_for_more = NULL;
 
-    MPARK     = 0x81;   /* PARK[1,0]=10 + BCR24BIT                   */
     DIVR0     = 54;     /* DMA0 is mapped into vector 54 in system.c */
     DMAROUTE  = (DMAROUTE & 0xffffff00) | DMA0_REQ_AUDIO_1;
     DMACONFIG = 1;      /* DMA0Req = PDOR3, DMA1Req = PDIR2          */
