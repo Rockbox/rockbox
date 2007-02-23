@@ -1983,7 +1983,7 @@ static bool dbg_save_roms(void)
 
     return false;
 }
-#elif defined(IPOD_ARCH) || defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
+#elif defined(CPU_PP) && !defined(SANSA_E200)
 static bool dbg_save_roms(void)
 {
     int fd;
@@ -2320,7 +2320,7 @@ bool debug_menu(void)
             
 #endif
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || \
-    defined(IPOD_ARCH) || defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
+    (defined(CPU_PP) && !defined(SANSA_E200))
         { "Dump ROM contents", dbg_save_roms },
 #endif
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || defined(CPU_PP)
