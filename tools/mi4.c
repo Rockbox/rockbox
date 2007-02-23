@@ -102,7 +102,7 @@ static void int2le(unsigned int val, unsigned char* addr)
     addr[3] = (val >> 24) & 0xff;
 }
 
-int mi4_encode(char *iname, char *oname, int version)
+int mi4_encode(char *iname, char *oname, int version, int magic)
 {
     size_t len;
     int length;
@@ -146,7 +146,7 @@ int mi4_encode(char *iname, char *oname, int version)
     /* We need to write some data into the actual image - before calculating
        the CRC. */
     int2le(0x00000100,   &outbuf[0x2e0]);   /* magic */
-    int2le(0x000000ec,   &outbuf[0x2e4]);   /* magic */
+    int2le(magic,        &outbuf[0x2e4]);   /* magic */
     int2le(length+4,     &outbuf[0x2e8]);   /* length plus 0xaa55aa55 */
 
     int2le(0xaa55aa55,   &outbuf[0x200+length]);  /* More Magic */

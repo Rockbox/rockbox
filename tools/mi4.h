@@ -20,6 +20,9 @@
 #ifndef _MI4_H
 #define _MI4_H
 
-int mi4_encode(char *iname, char *oname, int version);
+#define MI4_MAGIC_DEFAULT 0xec
+#define MI4_MAGIC_R       0xfc
+
+int mi4_encode(char *iname, char *oname, int version, int magic);
 
 #endif

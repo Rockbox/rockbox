@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Björn Stenberg
+ * Copyright (C) 2002 - 2007 by Björn Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -87,6 +87,7 @@ void usage(void)
            "\t-gigabeat Toshiba Gigabeat format\n"
            "\t-mi4v2  PortalPlayer .mi4 format (revision 010201)\n"
            "\t-mi4v3  PortalPlayer .mi4 format (revision 010301)\n"
+           "\t-mi4r   Sandisk Rhapsody .mi4 format\n"
            "\t-add=X  Rockbox generic \"add-up\" checksum format\n"
            "\t        (X values: h100, h120, h140, h300, ipco, nano, ipvd, mn2g\n"
            "\t                   ip3g, ip4g, mini, iax5, h10, h10_5gb, tpj2, e200)\n"
@@ -260,12 +261,17 @@ int main (int argc, char** argv)
     else if(!strcmp(argv[1], "-mi4v2")) {
         iname = argv[2];
         oname = argv[3];
-        return mi4_encode(iname, oname, 0x00010201);
+        return mi4_encode(iname, oname, 0x00010201, MI4_MAGIC_DEFAULT);
     }
     else if(!strcmp(argv[1], "-mi4v3")) {
         iname = argv[2];
         oname = argv[3];
-        return mi4_encode(iname, oname, 0x00010301);
+        return mi4_encode(iname, oname, 0x00010301, MI4_MAGIC_DEFAULT);
+    }
+    else if(!strcmp(argv[1], "-mi4r")) {
+        iname = argv[2];
+        oname = argv[3];
+        return mi4_encode(iname, oname, 0x00010301, MI4_MAGIC_R);
     }
     
     /* open file */
