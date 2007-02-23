@@ -113,6 +113,15 @@
 #define SER1_MASK    (1 << SER1_IRQ)
 #define DMA_OUT_MASK (1 << DMA_OUT_IRQ)
 
+#define MMAP0_LOGICAL       (*(volatile unsigned long*)(0xf000f000))
+#define MMAP0_PHYSICAL      (*(volatile unsigned long*)(0xf000f004))
+#define MMAP1_LOGICAL       (*(volatile unsigned long*)(0xf000f008))
+#define MMAP1_PHYSICAL      (*(volatile unsigned long*)(0xf000f00c))
+#define MMAP2_LOGICAL       (*(volatile unsigned long*)(0xf000f010))
+#define MMAP2_PHYSICAL      (*(volatile unsigned long*)(0xf000f014))
+#define MMAP3_LOGICAL       (*(volatile unsigned long*)(0xf000f018))
+#define MMAP3_PHYSICAL      (*(volatile unsigned long*)(0xf000f01c))
+
 /* The PortalPlayer USB controller uses base address 0xc5000000 */
 #define USB_BASE                0xc5000000
 

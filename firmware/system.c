@@ -754,6 +754,10 @@ void ipod_set_cpu_frequency(void)
 void system_init(void)
 {
 #ifndef BOOTLOADER
+    /* Remap the flash ROM from 0x00000000 to 0x20000000. */
+    MMAP3_LOGICAL  = 0x20000000 | 0x3a00;
+    MMAP3_PHYSICAL = 0x00000000 | 0x3f84;
+
     /* The hw revision is written to the last 4 bytes of SDRAM by the
        bootloader - we save it before Rockbox overwrites it. */
     ipod_hw_rev = (*((volatile unsigned long*)(0x01fffffc)));
@@ -897,6 +901,10 @@ static void ipod_set_cpu_speed(void)
 void system_init(void)
 {
 #ifndef BOOTLOADER
+    /* Remap the flash ROM from 0x00000000 to 0x20000000. */
+    MMAP3_LOGICAL  = 0x20000000 | 0x3a00;
+    MMAP3_PHYSICAL = 0x00000000 | 0x3f84;
+
     ipod_hw_rev = (*((volatile unsigned long*)(0x01fffffc)));
     outl(-1, 0xcf00101c);
     outl(-1, 0xcf001028);

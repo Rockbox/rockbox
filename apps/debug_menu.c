@@ -1983,6 +1983,24 @@ static bool dbg_save_roms(void)
 
     return false;
 }
+#elif defined(IPOD_ARCH) || defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
+static bool dbg_save_roms(void)
+{
+    int fd;
+
+#if defined(IPOD_ARCH)
+    fd = creat("/internal_rom_000000-0FFFFF.bin");
+#elif defined(IRIVER_H10)
+    fd = creat("/internal_rom_000000-3FFFFF.bin");
+#endif
+    if(fd >= 0)
+    {
+        write(fd, (void *)0x20000000, FLASH_SIZE);
+        close(fd);
+    }
+
+    return false;
+}
 #endif /* CPU */
 
 #ifndef SIMULATOR
@@ -2305,7 +2323,8 @@ bool debug_menu(void)
         { "Button Light modes", dbg_buttonlights },
             
 #endif
-#if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE)
+#if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || \
+    defined(IPOD_ARCH) || defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
         { "Dump ROM contents", dbg_save_roms },
 #endif
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || defined(CPU_PP)

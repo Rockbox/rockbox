@@ -101,6 +101,9 @@
 /* The start address index for ROM builds */
 #define ROM_START 0x00000000
 
+/* The size of the flash ROM */
+#define FLASH_SIZE 0x100000
+
 /* Define this to the CPU frequency */
 /* TODO: this is probably wrong */
 #define CPU_FREQ      75000000
