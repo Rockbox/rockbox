@@ -58,10 +58,6 @@
  * the buffer under which the buffer must reload */
 #define MIN_BUFFER_MARGIN (screens[0].nb_lines+1)
 
-/* Default playlist name for saving */
-#define DEFAULT_VIEWER_PLAYLIST_NAME "/viewer.m3u"
-
-
 /* Information about a specific track */
 struct playlist_entry {
     char *name;                 /* Formatted track name                     */
