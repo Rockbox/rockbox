@@ -288,37 +288,27 @@ static long fp_atof(const char* s, int precision)
 
 static long convert_gain(long gain)
 {
-    if (gain != 0)
+    /* Don't allow unreasonably low or high gain changes.
+     * Our math code can't handle it properly anyway. :)
+     */
+    if (gain < (-48 * FP_ONE))
     {
-        /* Don't allow unreasonably low or high gain changes.
-         * Our math code can't handle it properly anyway. :)
-         */
-        if (gain < (-48 * FP_ONE))
-        {
-            gain = -48 * FP_ONE;
-        }
-
-        if (gain > (17 * FP_ONE))
-        {
-            gain = 17 * FP_ONE;
-        }
-
-        gain = fp_exp10(gain / 20) << (24 - FP_BITS);
+        gain = -48 * FP_ONE;
     }
+
+    if (gain > (17 * FP_ONE))
+    {
+        gain = 17 * FP_ONE;
+    }
+
+    gain = fp_exp10(gain / 20) << (24 - FP_BITS);
 
     return gain;
 }
 
 long get_replaygain_int(long int_gain)
 {
-    long gain = 0;
-
-    if (int_gain)
-    {
-        gain = convert_gain(int_gain * FP_ONE / 100);
-    }
-
-    return gain;
+    return convert_gain(int_gain * FP_ONE / 100);
 }
 
 long get_replaygain(const char* str)
