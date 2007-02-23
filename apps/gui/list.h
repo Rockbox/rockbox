@@ -100,22 +100,6 @@ struct gui_list
 };
 
 /*
- * Initializes a scrolling list
- *  - gui_list : the list structure to initialize
- *  - callback_get_item_icon : pointer to a function that associates an icon
- *    to a given item number
- *  - callback_get_item_name : pointer to a function that associates a label
- *    to a given item number
- *  - data : extra data passed to the list callback
- */
-extern void gui_list_init(struct gui_list * gui_list,
-    list_get_name callback_get_item_name,
-    void * data,
-    bool scroll_all,
-    int selected_size
-    );
-
-/*
  * Sets the numbers of items the list can currently display
  * note that the list's context like the currently pointed item is resetted
  *  - gui_list : the list structure
@@ -132,31 +116,12 @@ extern void gui_list_init(struct gui_list * gui_list,
     (gui_list)->nb_items
 
 /*
- * Puts the selection in the screen
- *  - gui_list : the list structure
- *  - put_from_end : if true, selection will be put as close from
- *                   the end of the list as possible, else, it's
- *                   from the beginning
- */
-extern void gui_list_put_selection_in_screen(struct gui_list * gui_list,
-                                             bool put_from_end);
-
-/*
  * Sets the icon callback function
  *  - gui_list : the list structure
  *  - _callback : the callback function
  */
 #define gui_list_set_icon_callback(gui_list, _callback) \
     (gui_list)->callback_get_item_icon=_callback
-
-/*
- * Attach the scrolling list to a screen
- * (The previous screen attachement is lost)
- *  - gui_list : the list structure
- *  - display : the screen to attach
- */
-extern void gui_list_set_display(struct gui_list * gui_list,
-                                 struct screen * display);
 
 /*
  * Gives the position of the selected item
@@ -167,82 +132,13 @@ extern void gui_list_set_display(struct gui_list * gui_list,
     (gui_list)->selected_item
 
 
-/*
- * Selects an item in the list
- *  - gui_list : the list structure
- *  - item_number : the number of the item which will be selected
- */
-extern void gui_list_select_item(struct gui_list * gui_list, int item_number);
-
-/*
- * Draws the list on the attached screen
- * - gui_list : the list structure
- */
-extern void gui_list_draw(struct gui_list * gui_list);
-
-/*
- * Selects the next item in the list
- * (Item 0 gets selected if the end of the list is reached)
- * - gui_list : the list structure
- */
-extern void gui_list_select_next(struct gui_list * gui_list);
-
-/*
- * Selects the previous item in the list
- * (Last item in the list gets selected if the list beginning is reached)
- * - gui_list : the list structure
- */
-extern void gui_list_select_previous(struct gui_list * gui_list);
-
 #ifdef HAVE_LCD_BITMAP
-/*
- * Makes all the item in the list scroll by one step to the right.
- * Should stop increasing the value when reaching the widest item value 
- * in the list.
- */
-void gui_list_scroll_right(struct gui_list * gui_list);
-
-/*
- * Makes all the item in the list scroll by one step to the left.
- * stops at starting position.
- */
-void gui_list_scroll_left(struct gui_list * gui_list);
-
 /* parse global setting to static int */
 extern void gui_list_screen_scroll_step(int ofs);
 
 /* parse global setting to static bool */
 extern void gui_list_screen_scroll_out_of_view(bool enable);
 #endif /* HAVE_LCD_BITMAP */
-
-/*
- * Go to next page if any, else selects the last item in the list
- * - gui_list : the list structure
- * - nb_lines : the number of lines to try to move the cursor
- */
-extern void gui_list_select_next_page(struct gui_list * gui_list,
-                                      int nb_lines);
-
-/*
- * Go to previous page if any, else selects the first item in the list
- * - gui_list : the list structure
- * - nb_lines : the number of lines to try to move the cursor
- */
-extern void gui_list_select_previous_page(struct gui_list * gui_list,
-                                          int nb_lines);
-
-/*
- * Adds an item to the list (the callback will be asked for one more item)
- * - gui_list : the list structure
- */
-extern void gui_list_add_item(struct gui_list * gui_list);
-
-/*
- * Removes an item to the list (the callback will be asked for one less item)
- * - gui_list : the list structure
- */
-extern void gui_list_del_item(struct gui_list * gui_list);
-
 /*
  * Tells the list wether it should stop when reaching the top/bottom
  * or should continue (by going to bottom/top)
@@ -253,20 +149,6 @@ extern void gui_list_del_item(struct gui_list * gui_list);
  */
 #define gui_list_limit_scroll(gui_list, scroll) \
     (gui_list)->limit_scroll=scroll
-
-/*
- * One call on 2, the selected lune will either blink the cursor or
- * invert/display normal the selected line
- * - gui_list : the list structure
- */
-extern void gui_list_flash(struct gui_list * gui_list);
-
-/* 
- * Set the title and title icon of the list. Setting title to NULL disables
- * both the title and icon. Use NOICON if there is no icon.
- */
-extern void gui_list_set_title(struct gui_list *gui_list, char* title,
-                               ICON icon);
 
 /*
  * This part handles as many lists as there are connected screens
@@ -298,20 +180,12 @@ extern int  gui_synclist_get_sel_pos(struct gui_synclist * lists);
 extern void gui_synclist_draw(struct gui_synclist * lists);
 extern void gui_synclist_select_item(struct gui_synclist * lists,
                                      int item_number);
-extern void gui_synclist_select_next(struct gui_synclist * lists);
-extern void gui_synclist_select_previous(struct gui_synclist * lists);
-extern void gui_synclist_select_next_page(struct gui_synclist * lists,
-                                          enum screen_type screen);
-extern void gui_synclist_select_previous_page(struct gui_synclist * lists,
-                                              enum screen_type screen);
 extern void gui_synclist_add_item(struct gui_synclist * lists);
 extern void gui_synclist_del_item(struct gui_synclist * lists);
 extern void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll);
 extern void gui_synclist_flash(struct gui_synclist * lists);
 extern void gui_synclist_set_title(struct gui_synclist * lists, char * title,
                                    ICON icon);
-void gui_synclist_scroll_right(struct gui_synclist * lists);
-void gui_synclist_scroll_left(struct gui_synclist * lists);
 
 /*
  * Do the action implied by the given button,

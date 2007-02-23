@@ -179,18 +179,10 @@ static const struct plugin_api rockbox_api = {
     gui_synclist_get_sel_pos,
     gui_synclist_draw,
     gui_synclist_select_item,
-    gui_synclist_select_next,
-    gui_synclist_select_previous,
-    gui_synclist_select_next_page,
-    gui_synclist_select_previous_page,
     gui_synclist_add_item,
     gui_synclist_del_item,
     gui_synclist_limit_scroll,
     gui_synclist_flash,
-#ifdef HAVE_LCD_BITMAP
-    gui_synclist_scroll_right,
-    gui_synclist_scroll_left,
-#endif
     gui_synclist_do_button,
     gui_synclist_set_title,
 

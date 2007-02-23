@@ -48,7 +48,20 @@ static bool offset_out_of_view = false;
 #define SHOW_LIST_TITLE ((gui_list->title != NULL) && \
                          (gui_list->display->nb_lines > 1))
 
-void gui_list_init(struct gui_list * gui_list,
+static void gui_list_put_selection_in_screen(struct gui_list * gui_list,
+                                             bool put_from_end);
+
+
+/*
+ * Initializes a scrolling list
+ *  - gui_list : the list structure to initialize
+ *  - callback_get_item_icon : pointer to a function that associates an icon
+ *    to a given item number
+ *  - callback_get_item_name : pointer to a function that associates a label
+ *    to a given item number
+ *  - data : extra data passed to the list callback
+ */
+static void gui_list_init(struct gui_list * gui_list,
     list_get_name callback_get_item_name,
     void * data,
     bool scroll_all,
@@ -74,7 +87,13 @@ void gui_list_init(struct gui_list * gui_list,
     gui_list->title_icon = NOICON;
 }
 
-void gui_list_set_display(struct gui_list * gui_list, struct screen * display)
+/*
+ * Attach the scrolling list to a screen
+ * (The previous screen attachement is lost)
+ *  - gui_list : the list structure
+ *  - display : the screen to attach
+ */
+static void gui_list_set_display(struct gui_list * gui_list, struct screen * display)
 {
     if(gui_list->display != 0) /* we switched from a previous display */
         gui_list->display->stop_scroll();
@@ -85,7 +104,12 @@ void gui_list_set_display(struct gui_list * gui_list, struct screen * display)
     gui_list_put_selection_in_screen(gui_list, false);
 }
 
-void gui_list_flash(struct gui_list * gui_list)
+/*
+ * One call on 2, the selected lune will either blink the cursor or
+ * invert/display normal the selected line
+ * - gui_list : the list structure
+ */
+static void gui_list_flash(struct gui_list * gui_list)
 {
     struct screen * display=gui_list->display;
     gui_list->cursor_flash_state=!gui_list->cursor_flash_state;
@@ -117,7 +141,14 @@ void gui_list_flash(struct gui_list * gui_list)
 #endif
 }
 
-void gui_list_put_selection_in_screen(struct gui_list * gui_list,
+/*
+ * Puts the selection in the screen
+ *  - gui_list : the list structure
+ *  - put_from_end : if true, selection will be put as close from
+ *                   the end of the list as possible, else, it's
+ *                   from the beginning
+ */
+static void gui_list_put_selection_in_screen(struct gui_list * gui_list,
                                       bool put_from_end)
 {
 #ifdef HAVE_LCD_BITMAP
@@ -181,7 +212,11 @@ static int gui_list_get_item_offset(struct gui_list * gui_list, int item_width,
 }
 #endif
 
-void gui_list_draw(struct gui_list * gui_list)
+/*
+ * Draws the list on the attached screen
+ * - gui_list : the list structure
+ */
+static void gui_list_draw(struct gui_list * gui_list)
 {
     struct screen * display=gui_list->display;
     int cursor_pos = 0;
@@ -371,7 +406,12 @@ void gui_list_draw(struct gui_list * gui_list)
     gui_textarea_update(display);
 }
 
-void gui_list_select_item(struct gui_list * gui_list, int item_number)
+/*
+ * Selects an item in the list
+ *  - gui_list : the list structure
+ *  - item_number : the number of the item which will be selected
+ */
+static void gui_list_select_item(struct gui_list * gui_list, int item_number)
 {
     if( item_number > gui_list->nb_items-1 || item_number < 0 )
         return;
@@ -379,7 +419,12 @@ void gui_list_select_item(struct gui_list * gui_list, int item_number)
     gui_list_put_selection_in_screen(gui_list, false);
 }
 
-void gui_list_select_next(struct gui_list * gui_list)
+/*
+ * Selects the next item in the list
+ * (Item 0 gets selected if the end of the list is reached)
+ * - gui_list : the list structure
+ */
+static void gui_list_select_next(struct gui_list * gui_list)
 {
     if( gui_list->selected_item+gui_list->selected_size >= gui_list->nb_items )
     {
@@ -422,7 +467,12 @@ void gui_list_select_next(struct gui_list * gui_list)
     }
 }
 
-void gui_list_select_previous(struct gui_list * gui_list)
+/*
+ * Selects the previous item in the list
+ * (Last item in the list gets selected if the list beginning is reached)
+ * - gui_list : the list structure
+ */
+static void gui_list_select_previous(struct gui_list * gui_list)
 {
     int nb_lines = gui_list->display->nb_lines;        
     if (SHOW_LIST_TITLE)
@@ -466,7 +516,12 @@ void gui_list_select_previous(struct gui_list * gui_list)
     }
 }
 
-void gui_list_select_next_page(struct gui_list * gui_list, int nb_lines)
+/*
+ * Go to next page if any, else selects the last item in the list
+ * - gui_list : the list structure
+ * - nb_lines : the number of lines to try to move the cursor
+ */
+static void gui_list_select_next_page(struct gui_list * gui_list, int nb_lines)
 {
     if(gui_list->selected_item == gui_list->nb_items-gui_list->selected_size)
     {
@@ -486,7 +541,12 @@ void gui_list_select_next_page(struct gui_list * gui_list, int nb_lines)
     gui_list_put_selection_in_screen(gui_list, true);
 }
 
-void gui_list_select_previous_page(struct gui_list * gui_list, int nb_lines)
+/*
+ * Go to previous page if any, else selects the first item in the list
+ * - gui_list : the list structure
+ * - nb_lines : the number of lines to try to move the cursor
+ */
+static void gui_list_select_previous_page(struct gui_list * gui_list, int nb_lines)
 {
     if(gui_list->selected_item == 0)
     {
@@ -506,7 +566,11 @@ void gui_list_select_previous_page(struct gui_list * gui_list, int nb_lines)
     gui_list_put_selection_in_screen(gui_list, false);
 }
 
-void gui_list_add_item(struct gui_list * gui_list)
+/*
+ * Adds an item to the list (the callback will be asked for one more item)
+ * - gui_list : the list structure
+ */
+static void gui_list_add_item(struct gui_list * gui_list)
 {
     gui_list->nb_items++;
     /* if only one item in the list, select it */
@@ -514,7 +578,11 @@ void gui_list_add_item(struct gui_list * gui_list)
         gui_list->selected_item = 0;
 }
 
-void gui_list_del_item(struct gui_list * gui_list)
+/*
+ * Removes an item to the list (the callback will be asked for one less item)
+ * - gui_list : the list structure
+ */
+static void gui_list_del_item(struct gui_list * gui_list)
 {
     if(gui_list->nb_items > 0)
     {
@@ -540,7 +608,13 @@ void gui_list_del_item(struct gui_list * gui_list)
 }
 
 #ifdef HAVE_LCD_BITMAP
-void gui_list_scroll_right(struct gui_list * gui_list)
+
+/*
+ * Makes all the item in the list scroll by one step to the right.
+ * Should stop increasing the value when reaching the widest item value 
+ * in the list.
+ */
+static void gui_list_scroll_right(struct gui_list * gui_list)
 {
     /* FIXME: This is a fake right boundry limiter. there should be some 
      * callback function to find the longest item on the list in pixels, 
@@ -550,7 +624,11 @@ void gui_list_scroll_right(struct gui_list * gui_list)
         gui_list->offset_position = 1000;
 }
 
-void gui_list_scroll_left(struct gui_list * gui_list)
+/*
+ * Makes all the item in the list scroll by one step to the left.
+ * stops at starting position.
+ */
+static void gui_list_scroll_left(struct gui_list * gui_list)
 {
     gui_list->offset_position-=offset_step;
     if (gui_list->offset_position < 0)
@@ -570,7 +648,11 @@ void gui_list_screen_scroll_out_of_view(bool enable)
 }
 #endif /* HAVE_LCD_BITMAP */
 
-void gui_list_set_title(struct gui_list * gui_list, char * title, ICON icon)
+/* 
+ * Set the title and title icon of the list. Setting title to NULL disables
+ * both the title and icon. Use NOICON if there is no icon.
+ */
+static void gui_list_set_title(struct gui_list * gui_list, char * title, ICON icon)
 {
     gui_list->title = title;
     gui_list->title_icon = icon;
@@ -649,21 +731,21 @@ void gui_synclist_select_item(struct gui_synclist * lists, int item_number)
         gui_list_select_item(&(lists->gui_list[i]), item_number);
 }
 
-void gui_synclist_select_next(struct gui_synclist * lists)
+static void gui_synclist_select_next(struct gui_synclist * lists)
 {
     int i;
     FOR_NB_SCREENS(i)
         gui_list_select_next(&(lists->gui_list[i]));
 }
 
-void gui_synclist_select_previous(struct gui_synclist * lists)
+static void gui_synclist_select_previous(struct gui_synclist * lists)
 {
     int i;
     FOR_NB_SCREENS(i)
         gui_list_select_previous(&(lists->gui_list[i]));
 }
 
-void gui_synclist_select_next_page(struct gui_synclist * lists,
+static void gui_synclist_select_next_page(struct gui_synclist * lists,
                                    enum screen_type screen)
 {
     int i;
@@ -672,7 +754,7 @@ void gui_synclist_select_next_page(struct gui_synclist * lists,
                                   screens[screen].nb_lines);
 }
 
-void gui_synclist_select_previous_page(struct gui_synclist * lists,
+static void gui_synclist_select_previous_page(struct gui_synclist * lists,
                                        enum screen_type screen)
 {
     int i;
@@ -718,14 +800,14 @@ void gui_synclist_flash(struct gui_synclist * lists)
 }
 
 #ifdef HAVE_LCD_BITMAP
-void gui_synclist_scroll_right(struct gui_synclist * lists)
+static void gui_synclist_scroll_right(struct gui_synclist * lists)
 {
     int i;
     FOR_NB_SCREENS(i)
         gui_list_scroll_right(&(lists->gui_list[i]));
 }
 
-void gui_synclist_scroll_left(struct gui_synclist * lists)
+static void gui_synclist_scroll_left(struct gui_synclist * lists)
 {
     int i;
     FOR_NB_SCREENS(i)

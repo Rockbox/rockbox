@@ -110,12 +110,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 44
+#define PLUGIN_API_VERSION 45
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 44
+#define PLUGIN_MIN_API_VERSION 45
 
 /* plugin return codes */
 enum plugin_status {
@@ -268,20 +268,10 @@ struct plugin_api {
     void (*gui_synclist_draw)(struct gui_synclist * lists);
     void (*gui_synclist_select_item)(struct gui_synclist * lists,
     int item_number);
-    void (*gui_synclist_select_next)(struct gui_synclist * lists);
-    void (*gui_synclist_select_previous)(struct gui_synclist * lists);
-    void (*gui_synclist_select_next_page)(struct gui_synclist * lists,
-    enum screen_type screen);
-    void (*gui_synclist_select_previous_page)(struct gui_synclist * lists,
-    enum screen_type screen);
     void (*gui_synclist_add_item)(struct gui_synclist * lists);
     void (*gui_synclist_del_item)(struct gui_synclist * lists);
     void (*gui_synclist_limit_scroll)(struct gui_synclist * lists, bool scroll);
     void (*gui_synclist_flash)(struct gui_synclist * lists);
-#ifdef HAVE_LCD_BITMAP
-    void (*gui_synclist_scroll_right)(struct gui_synclist * lists);
-    void (*gui_synclist_scroll_left)(struct gui_synclist * lists);
-#endif
     unsigned (*gui_synclist_do_button)(struct gui_synclist * lists,
                                          unsigned button,enum list_wrap wrap);
     void (*gui_synclist_set_title)(struct gui_synclist *lists, char* title, ICON icon);
