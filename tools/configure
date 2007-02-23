@@ -492,9 +492,9 @@ whichlang() {
     done
 }
 
-target=$1
+opt=$1
 
-if test "$target" = "--help"; then
+if test "$opt" = "--help"; then
   echo "Rockbox configure script."
   echo "Invoke this in a directory to generate a Makefile to build Rockbox"
   echo "Do *NOT* run this within the tools directory!"
@@ -564,7 +564,7 @@ cat <<EOF
 
  ==iAudio==            ==Toshiba==            ==SanDisk==
  30) X5/X5V/X5L        40) Gigabeat F         50) Sansa e200
-
+                                              51) Sansa e200R
  ==Tatung==
  60) Elio TPJ-1022
 EOF
@@ -1143,6 +1143,35 @@ EOF
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a  libspeex"
     boottool="$rootdir/tools/scramble -mi4v3"
     bootoutput="PP5022.mi4"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$genericbitmaptools scramble"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="sandisk"
+    t_model="sansa-e200"
+    ;;
+
+   51|e200r)
+    # the e200R model is pretty much identical to the e200, it only has a
+    # different option to the scramble tool when building a bootloader and
+    # makes the bootloader output file name in all lower case.
+    target_id=27
+    archos="e200r"
+    target="-DSANSA_E200"
+    memory=32 # supposedly
+    arm7tdmicc
+    tool="$rootdir/tools/scramble -add=e200"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.e200"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins="yes"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a  libspeex"
+    boottool="$rootdir/tools/scramble -mi4r"
+    bootoutput="pp5022.mi4"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$genericbitmaptools scramble"
