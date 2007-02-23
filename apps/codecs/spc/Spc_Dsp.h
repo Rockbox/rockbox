@@ -528,7 +528,7 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         #define IF_RBE(...) __VA_ARGS__
     #ifdef CPU_COLDFIRE
         /* Initialize mask register with the buffer address mask */
-        asm ("move.l %[m], %%mask" : : [m]"i"(fir_buf_mask));
+        asm volatile ("move.l %[m], %%mask" : : [m]"i"(fir_buf_mask));
         const int echo_wrap  = (this->r.g.echo_delay & 15) * 0x800;
         const int echo_start = this->r.g.echo_page * 0x100;
     #endif /* CPU_COLDFIRE */
@@ -976,7 +976,7 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                 uint32_t f = voice->position;
                 int32_t y1;
 
-                asm (
+                asm volatile (
               "move.l     %[f], %[y0]               \r\n" /* separate fraction */
               "and.l      #0xfff, %[f]              \r\n" /* and whole parts   */
               "lsr.l      %[sh], %[y0]              \r\n"
@@ -1095,10 +1095,9 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
 
         /* Apply echo FIR filter to output - circular buffer is hardware
            incremented and masked; FIR coefficients and buffer history are
-           loaded in parallel with multiply accumulate operations. Apply
-           scale factor to do hardware clipping later. */
+           loaded in parallel with multiply accumulate operations. */
         int _0, _1, _2;
-        asm (
+        asm volatile (
         "move.l                           (%[fir_c])  , %[_2]         \r\n"
         "mac.w      %[fb]u, %[_2]u, <<,   (%[fir_p])+&, %[_0], %%acc0 \r\n"
         "mac.w      %[fb]l, %[_2]u, <<,   (%[fir_p])& , %[_1], %%acc1 \r\n"
@@ -1125,7 +1124,7 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         );
 
         /* Generate output */
-        asm (
+        asm volatile (
         "mac.l      %[chans_0], %[gv_0]    , %%acc2 \r\n"
         "mac.l      %[chans_1], %[gv_1]    , %%acc3 \r\n"
         "mac.l      %[ev_0],   %[out_0], >>, %%acc2 \r\n"
@@ -1141,12 +1140,10 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         /* Feedback into echo buffer */
         if ( !(this->r.g.flags & 0x20) )
         {
-            asm (
-            "lsl.l      %[sh], %[e0]                \r\n"
-            "move.l     %[e0], %%acc0               \r\n"
+            asm volatile (
+            "mac.l      %[sh], %[e0]       , %%acc0 \r\n"
             "mac.l      %[out_0], %[ef], <<, %%acc0 \r\n"
-            "lsl.l      %[sh], %[e1]                \r\n"
-            "move.l     %[e1], %%acc1               \r\n"
+            "mac.l      %[sh], %[e1]       , %%acc1 \r\n"
             "mac.l      %[out_1], %[ef], <<, %%acc1 \r\n"
             "movclr.l   %%acc0, %[e0]               \r\n"
             "movclr.l   %%acc1, %[e1]               \r\n"
@@ -1155,13 +1152,14 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
             : [e0]"+&d"(echo_0), [e1]"+&d"(echo_1)
             : [out_0]"r"(out_0), [out_1]"r"(out_1),
               [ef]"r"((int)this->r.g.echo_feedback),
-              [sh]"d"(9)
+              [sh]"r"(1 << 9)
             );
+
             *(int32_t *)echo_ptr = swap_odd_even32(echo_0);
         }
 
         /* Output final samples */
-        asm (
+        asm volatile (
         "movclr.l   %%acc2, %[out_0] \r\n"
         "movclr.l   %%acc3, %[out_1] \r\n"
         "asr.l      %[gm],  %[out_0] \r\n"
