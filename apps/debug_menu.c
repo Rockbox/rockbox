@@ -1988,11 +1988,7 @@ static bool dbg_save_roms(void)
 {
     int fd;
 
-#if defined(IPOD_ARCH)
     fd = creat("/internal_rom_000000-0FFFFF.bin");
-#elif defined(IRIVER_H10)
-    fd = creat("/internal_rom_000000-3FFFFF.bin");
-#endif
     if(fd >= 0)
     {
         write(fd, (void *)0x20000000, FLASH_SIZE);
