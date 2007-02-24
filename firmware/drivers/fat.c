@@ -1460,7 +1460,7 @@ static void randomize_dos_name(unsigned char *name)
         num[7-(unsigned int)(tilde-name)] = 0;
         cnt = atoi(num) + 1;
     }
-    cnt %= 9999999; /* protection */
+    cnt %= 10000000; /* protection */
     snprintf(num, 9, "~%d", cnt);   /* allow room for trailing zero */
     numlen = strlen(num);           /* required space */
     offset = (unsigned int)(lastpt ? lastpt - name : 8); /* prev startpoint */
