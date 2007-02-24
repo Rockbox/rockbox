@@ -356,7 +356,7 @@ sample_output_stereo:
     move.l      (%a1), %d1                | %a1 = multiplier: (1 << (16 - scale))
     sub.l       #16, %d1                  |
     neg.l       %d1                       |
-    move.q      #1, %d0                   |
+    moveq.l     #1, %d0                   |
     asl.l       %d1, %d0                  |
     move.l      %d0, %a1                  |
     movem.l     (%a2), %a2-%a3            | get L/R channel pointers
@@ -452,7 +452,7 @@ sample_output_mono:
     move.l      (%a1), %d1                | %d5 = multiplier: (1 << (16 - scale))
     sub.l       #16, %d1                  |
     neg.l       %d1                       |
-    move.q      #1, %d5                   |
+    moveq.l     #1, %d5                   |
     asl.l       %d1, %d5                  |
     movem.l     (%a2), %a2                | get source channel pointer
     moveq.l     #28, %d0                  | %d0 = second line bound
