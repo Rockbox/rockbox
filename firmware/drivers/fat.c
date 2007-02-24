@@ -30,6 +30,7 @@
 #include "kernel.h"
 #include "rbunicode.h"
 #include "logf.h"
+#include "atoi.h"
 
 #define BYTES2INT16(array,pos) \
           (array[pos] | (array[pos+1] << 8 ))
@@ -1352,7 +1353,7 @@ static int add_dir_entry(struct fat_dir* dir,
     return 0;
 }
 
-unsigned char char2dos(unsigned char c)
+unsigned char char2dos(unsigned char c, int* randomize)
 {
     switch(c)
     {
@@ -1373,6 +1374,7 @@ unsigned char char2dos(unsigned char c)
         case 0x7c:
             /* Illegal char, replace */
             c = '_';
+            *randomize = 1; /* as per FAT spec */
             break;
                 
         default:
@@ -1389,16 +1391,22 @@ static void create_dos_name(const unsigned char *name, unsigned char *newname)
 {
     int i;
     unsigned char *ext;      
+    int randomize = 0;
 
     /* Find extension part */
     ext = strrchr(name, '.');
     if (ext == name)         /* handle .dotnames */
         ext = NULL;
 
+    /* needs to randomize? */
+    if((ext && (strlen(ext) > 4)) ||
+       ((ext ? (unsigned int)(ext-name) : strlen(name)) > 8) )
+        randomize = 1;
+
     /* Name part */
     for (i = 0; *name && (!ext || name < ext) && (i < 8); name++)
     {
-        unsigned char c = char2dos(*name);
+        unsigned char c = char2dos(*name, &randomize);
         if (c)
             newname[i++] = c;
     }
@@ -1415,23 +1423,54 @@ static void create_dos_name(const unsigned char *name, unsigned char *newname)
         ext++;
         for (i = 8; *ext && (i < 11); ext++)
         {
-            unsigned char c = char2dos(*ext);
+            unsigned char c = char2dos(*ext, &randomize);
             if (c)
                 newname[i++] = c;
         }
     }
+
+    if(randomize)
+        randomize_dos_name(newname);
 }
 
 static void randomize_dos_name(unsigned char *name)
 {
-    int i;
-    unsigned char buf[5];
+    unsigned char* tilde = NULL;    /* ~ location */
+    unsigned char* lastpt = NULL;   /* last point of filename */
+    unsigned char* nameptr = name;  /* working copy of name pointer */
+    unsigned char num[9];           /* holds number as string */
+    int i = 0;
+    int cnt = 1;
+    int numlen;
+    int offset;
 
-    snprintf(buf, sizeof buf, "%04X", (unsigned)rand() & 0xffff);
+    while(i++ < 8)
+    {
+        /* hunt for ~ and where to put it */
+        if((!tilde) && (*nameptr == '~'))
+            tilde = nameptr;
+        if((!lastpt) && ((*nameptr == ' ' || *nameptr == '~')))
+            lastpt = nameptr;
+        nameptr++;
+    }
+    if(tilde)
+    {
+        /* extract current count and increment */
+        memcpy(num,tilde+1,7-(unsigned int)(tilde-name));
+        num[7-(unsigned int)(tilde-name)] = 0;
+        cnt = atoi(num) + 1;
+    }
+    cnt %= 9999999; /* protection */
+    snprintf(num, 9, "~%d", cnt);   /* allow room for trailing zero */
+    numlen = strlen(num);           /* required space */
+    offset = (unsigned int)(lastpt ? lastpt - name : 8); /* prev startpoint */
+    if(offset > (8-numlen)) offset = 8-numlen;  /* correct for new numlen */
 
-    for (i = 0; (i < 4) && (name[i] != ' '); i++);
-    /* account for possible shortname length < 4 */
-    memcpy(&name[i], buf, 4);
+    memcpy(&name[offset], num, numlen);
+
+    /* in special case of counter overflow: pad with spaces */
+    for(offset = offset+numlen; offset < 8; offset++)
+        name[offset] = ' ';
 }
 
 static int update_short_entry( struct fat_file* file, long size, int attr )
