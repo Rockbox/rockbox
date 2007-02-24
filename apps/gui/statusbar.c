@@ -220,7 +220,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
             }
     }
 
-    bar->info.volume = sound_val2phys(SOUND_VOLUME, global_settings.volume);
+    bar->info.volume = global_settings.volume;
 #ifdef HAVE_LCD_BITMAP
     bar->info.shuffle = global_settings.playlist_shuffle;
 #ifdef HAS_BUTTON_HOLD
@@ -461,8 +461,8 @@ static bool gui_statusbar_icon_volume(struct gui_statusbar * bar, int volume)
     bool needs_redraw = false;
     int type = global_settings.volume_type;
     struct screen * display=bar->display; 
-    int minvol = sound_min(SOUND_VOLUME);
-    int maxvol = sound_max(SOUND_VOLUME);
+    const int minvol = sound_min(SOUND_VOLUME);
+    const int maxvol = sound_max(SOUND_VOLUME);
 
     if (volume < minvol)
         volume = minvol;
