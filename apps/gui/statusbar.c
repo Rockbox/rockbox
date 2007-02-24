@@ -17,19 +17,15 @@
  *
  ****************************************************************************/
 
-#include "config.h"
 #include "screen_access.h"
-#include "lcd.h"
 #include "font.h"
 #include "kernel.h"
 #include "string.h" /* for memcmp oO*/
 #include "sprintf.h"
 #include "sound.h"
-#include "power.h"
 #include "settings.h"
 #include "icons.h"
 #include "powermgmt.h"
-#include "button.h"
 #include "usb.h"
 #include "led.h"
 
@@ -127,7 +123,37 @@
                                                 STATUSBAR_DISK_WIDTH
 struct gui_syncstatusbar statusbars;
 
-void gui_statusbar_init(struct gui_statusbar * bar)
+/* Prototypes */
+#ifdef HAVE_LCD_BITMAP
+static void gui_statusbar_icon_battery(struct screen * display, int percent,
+                                       int batt_charge_step);
+static bool gui_statusbar_icon_volume(struct gui_statusbar * bar, int volume);
+static void gui_statusbar_icon_play_state(struct screen * display, int state);
+static void gui_statusbar_icon_play_mode(struct screen * display, int mode);
+static void gui_statusbar_icon_shuffle(struct screen * display);
+static void gui_statusbar_icon_lock(struct screen * display);
+#ifdef HAS_REMOTE_BUTTON_HOLD
+static void gui_statusbar_icon_lock_remote(struct screen * display);
+#endif
+#if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
+static void gui_statusbar_led(struct screen * display);
+#endif
+#ifdef HAVE_RECORDING
+static void gui_statusbar_icon_recording_info(struct screen * display);
+#endif
+#ifdef CONFIG_RTC
+static void gui_statusbar_time(struct screen * display, int hour, int minute);
+#endif
+#endif
+
+/* End prototypes */
+
+
+/*
+ * Initializes a status bar
+ *  - bar : the bar to initialize
+ */
+static void gui_statusbar_init(struct gui_statusbar * bar)
 {
     bar->redraw_volume = true;
     bar->volume_icon_switch_tick = bar->battery_icon_switch_tick = current_tick;
@@ -348,8 +374,8 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 /*
  * Print battery icon to status bar
  */
-void gui_statusbar_icon_battery(struct screen * display, int percent, 
-                                int batt_charge_step)
+static void gui_statusbar_icon_battery(struct screen * display, int percent, 
+                                       int batt_charge_step)
 {
     int fill, endfill;
     char buffer[5];
@@ -426,7 +452,7 @@ void gui_statusbar_icon_battery(struct screen * display, int percent,
 /*
  * Print volume gauge to status bar
  */
-bool gui_statusbar_icon_volume(struct gui_statusbar * bar, int volume)
+static bool gui_statusbar_icon_volume(struct gui_statusbar * bar, int volume)
 {
     int i;
     int vol;
@@ -492,7 +518,7 @@ bool gui_statusbar_icon_volume(struct gui_statusbar * bar, int volume)
 /*
  * Print play state to status bar
  */
-void gui_statusbar_icon_play_state(struct screen * display, int state)
+static void gui_statusbar_icon_play_state(struct screen * display, int state)
 {
     display->mono_bitmap(bitmap_icons_7x8[state], STATUSBAR_PLAY_STATE_X_POS,
                     STATUSBAR_Y_POS, STATUSBAR_PLAY_STATE_WIDTH,
@@ -502,7 +528,7 @@ void gui_statusbar_icon_play_state(struct screen * display, int state)
 /*
  * Print play mode to status bar
  */
-void gui_statusbar_icon_play_mode(struct screen * display, int mode)
+static void gui_statusbar_icon_play_mode(struct screen * display, int mode)
 {
     display->mono_bitmap(bitmap_icons_7x8[mode], STATUSBAR_PLAY_MODE_X_POS,
                     STATUSBAR_Y_POS, STATUSBAR_PLAY_MODE_WIDTH,
@@ -512,7 +538,7 @@ void gui_statusbar_icon_play_mode(struct screen * display, int mode)
 /*
  * Print shuffle mode to status bar
  */
-void gui_statusbar_icon_shuffle(struct screen * display)
+static void gui_statusbar_icon_shuffle(struct screen * display)
 {
     display->mono_bitmap(bitmap_icons_7x8[Icon_Shuffle],
                     STATUSBAR_SHUFFLE_X_POS, STATUSBAR_Y_POS,
@@ -522,7 +548,7 @@ void gui_statusbar_icon_shuffle(struct screen * display)
 /*
  * Print lock when keys are locked
  */
-void gui_statusbar_icon_lock(struct screen * display)
+static void gui_statusbar_icon_lock(struct screen * display)
 {
     display->mono_bitmap(bitmap_icons_5x8[Icon_Lock_Main],
                          STATUSBAR_LOCKM_X_POS, STATUSBAR_Y_POS,
@@ -533,7 +559,7 @@ void gui_statusbar_icon_lock(struct screen * display)
 /*
  * Print remote lock when remote hold is enabled
  */
-void gui_statusbar_icon_lock_remote(struct screen * display)
+static void gui_statusbar_icon_lock_remote(struct screen * display)
 {
     display->mono_bitmap(bitmap_icons_5x8[Icon_Lock_Remote],
                          STATUSBAR_LOCKR_X_POS, STATUSBAR_Y_POS,
@@ -545,7 +571,7 @@ void gui_statusbar_icon_lock_remote(struct screen * display)
 /*
  * no real LED: disk activity in status bar
  */
-void gui_statusbar_led(struct screen * display)
+static void gui_statusbar_led(struct screen * display)
 {
     display->mono_bitmap(bitmap_icon_disk,
                          STATUSBAR_DISK_X_POS(display->width),
@@ -558,7 +584,7 @@ void gui_statusbar_led(struct screen * display)
 /*
  * Print time to status bar
  */
-void gui_statusbar_time(struct screen * display, int hour, int minute)
+static void gui_statusbar_time(struct screen * display, int hour, int minute)
 {
     unsigned char buffer[6];
     unsigned int width, height;
@@ -684,7 +710,7 @@ static void gui_statusbar_write_samplerate_info(struct screen * display)
 }
 #endif /* CONFIG_CODEC == SWCODEC */
 
-void gui_statusbar_icon_recording_info(struct screen * display)
+static void gui_statusbar_icon_recording_info(struct screen * display)
 {
 #if CONFIG_CODEC != SWCODEC
     char buffer[3];

@@ -20,10 +20,8 @@
 #ifndef _GUI_STATUSBAR_H_
 #define _GUI_STATUSBAR_H_
 
-#include "config.h"
 #include "status.h"
 #include "screen_access.h"
-#include "button.h"
 
 #define STATUSBAR_X_POS                         0
 #define STATUSBAR_Y_POS                         0 /* MUST be a multiple of 8 */
@@ -76,12 +74,6 @@ struct gui_statusbar
 extern struct gui_syncstatusbar statusbars;
 
 /*
- * Initializes a status bar
- *  - bar : the bar to initialize
- */
-extern void gui_statusbar_init(struct gui_statusbar * bar);
-
-/*
  * Attach the status bar to a screen
  * (The previous screen attachement is lost)
  *  - bar : the statusbar structure
@@ -96,22 +88,6 @@ extern void gui_statusbar_init(struct gui_statusbar * bar);
  * - bar : the statusbar structure
  */
 extern void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw);
-
-void gui_statusbar_icon_battery(struct screen * display, int percent, int batt_charge_step);
-bool gui_statusbar_icon_volume(struct gui_statusbar * bar, int volume);
-void gui_statusbar_icon_play_state(struct screen * display, int state);
-void gui_statusbar_icon_play_mode(struct screen * display, int mode);
-void gui_statusbar_icon_shuffle(struct screen * display);
-void gui_statusbar_icon_lock(struct screen * display);
-void gui_statusbar_icon_lock_remote(struct screen * display);
-void gui_statusbar_led(struct screen * display);
-#ifdef HAVE_RECORDING
-void gui_statusbar_icon_recording_info(struct screen * display);
-#endif
-
-#ifdef CONFIG_RTC
-void gui_statusbar_time(struct screen * display, int hour, int minute);
-#endif
 
 
 struct gui_syncstatusbar
