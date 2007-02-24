@@ -109,7 +109,7 @@ int replaygain_callback(int action,const struct menu_item_ex *this_item)
     switch (action)
     {
         case ACTION_EXIT_MENUITEM: /* on exit */
-            dsp_set_replaygain(true);
+            dsp_set_replaygain();
             break;
     }
     return action;
@@ -208,7 +208,7 @@ int playback_callback(int action,const struct menu_item_ex *this_item)
                 && (audio_status() & AUDIO_STATUS_PLAY))
             {
 #if CONFIG_CODEC == SWCODEC
-                dsp_set_replaygain(true);
+                dsp_set_replaygain();
 #endif
                 if (global_settings.playlist_shuffle)
                 {

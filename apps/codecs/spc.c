@@ -712,7 +712,8 @@ static int LoadID666(unsigned char *buf) {
 
 /**************** Codec ****************/
 
-static int32_t samples[WAV_CHUNK_SIZE*2] IBSS_ATTR;
+static int32_t samples[WAV_CHUNK_SIZE*2]
+    __attribute__ ((aligned (16))) IBSS_ATTR;
 
 static struct Spc_Emu spc_emu IDATA_ATTR;
 

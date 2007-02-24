@@ -276,6 +276,7 @@ static size_t high_watermark; /* High watermark for rebuffer (A/V/other) */
 #endif
 
 /* Multiple threads */
+static void set_current_codec(int codec_idx);
 static const char *get_codec_filename(int enc_spec); /* (A-/C-/V-) */
 /* Set the watermark to trigger buffer fill (A/C) FIXME */
 static void set_filebuf_watermark(int seconds);
@@ -299,7 +300,7 @@ IBSS_ATTR;
 static const char codec_thread_name[] = "codec";
 struct thread_entry *codec_thread_p; /* For modifying thread priority later. */
 
-volatile int current_codec IDATA_ATTR; /* Current codec (normal/voice) */
+static volatile int current_codec IDATA_ATTR; /* Current codec (normal/voice) */
 
 /* Voice thread */
 #ifdef PLAYBACK_VOICE
@@ -840,7 +841,7 @@ void audio_preinit(void)
     logf("playback system pre-init");
 
     filling = false;
-    current_codec = CODEC_IDX_AUDIO;
+    set_current_codec(CODEC_IDX_AUDIO);
     playing = false;
     paused = false;
     audio_codec_loaded = false;
@@ -918,6 +919,12 @@ void voice_stop(void)
 
 
 /* --- Routines called from multiple threads --- */
+static void set_current_codec(int codec_idx)
+{
+    current_codec = codec_idx;
+    dsp_configure(DSP_SWITCH_CODEC, codec_idx);
+}
+
 #ifdef PLAYBACK_VOICE
 static void swap_codec(void)
 {
@@ -961,7 +968,7 @@ skip_iram_swap:
     mutex_lock(&mutex_codecthread);
 
     /* Take control */
-    current_codec = my_codec;
+    set_current_codec(my_codec);
 
     /* Reload our IRAM and DRAM */
     memcpy((unsigned char *)CODEC_IRAM_ORIGIN, iram_buf[my_codec],
@@ -1284,7 +1291,7 @@ static void voice_thread(void)
         logf("Loading voice codec");
         voice_codec_loaded = true;
         mutex_lock(&mutex_codecthread);
-        current_codec = CODEC_IDX_VOICE;
+        set_current_codec(CODEC_IDX_VOICE);
         dsp_configure(DSP_RESET, 0);
         voice_remaining = 0;
         voice_getmore = NULL;
@@ -1941,7 +1948,7 @@ static void codec_thread(void)
                 }
                 mutex_lock(&mutex_codecthread);
 #endif
-                current_codec = CODEC_IDX_AUDIO;
+                set_current_codec(CODEC_IDX_AUDIO);
                 ci.stop_codec = false;
                 status = codec_load_file((const char *)ev.data, &ci);
 #ifdef PLAYBACK_VOICE
@@ -1972,7 +1979,7 @@ static void codec_thread(void)
                 }
                 mutex_lock(&mutex_codecthread);
 #endif
-                current_codec = CODEC_IDX_AUDIO;
+                set_current_codec(CODEC_IDX_AUDIO);
                 ci.stop_codec = false;
                 wrap = (size_t)&filebuf[filebuflen] - (size_t)CUR_TI->codecbuf;
                 status = codec_load_ram(CUR_TI->codecbuf, CUR_TI->codecsize,
@@ -1995,7 +2002,7 @@ static void codec_thread(void)
                 mutex_lock(&mutex_codecthread);
 #endif
                 logf("loading encoder");
-                current_codec = CODEC_IDX_AUDIO;
+                set_current_codec(CODEC_IDX_AUDIO);
                 ci.stop_codec = false;
                 status = codec_load_file((const char *)ev.data, &ci);
 #ifdef PLAYBACK_VOICE
@@ -2702,12 +2709,12 @@ static bool audio_load_track(int offset, bool start_play, bool rebuffer)
     {
         int last_codec = current_codec;
         
-        current_codec = CODEC_IDX_AUDIO;
+        set_current_codec(CODEC_IDX_AUDIO);
         conf_watermark = AUDIO_DEFAULT_WATERMARK;
         conf_filechunk = AUDIO_DEFAULT_FILECHUNK;
         conf_preseek = AUDIO_REBUFFER_GUESS_SIZE;
         dsp_configure(DSP_RESET, 0);
-        current_codec = last_codec;
+        set_current_codec(last_codec);
     }
 
     /* Get track metadata if we don't already have it. */

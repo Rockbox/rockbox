@@ -113,8 +113,6 @@ enum codec_status codec_main(void)
     ogg_int64_t vf_pcmlengths[2];
 
     ci->configure(DSP_SET_SAMPLE_DEPTH, 24);
-    ci->configure(DSP_SET_CLIP_MAX, (1 << 24) - 1);
-    ci->configure(DSP_SET_CLIP_MIN, -((1 << 24) - 1));
     /* Note: These are sane defaults for these values.  Perhaps
      * they should be set differently based on quality setting
      */

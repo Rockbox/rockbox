@@ -63,6 +63,7 @@ enum {
     SOUND_CHAN_MONO_LEFT,
     SOUND_CHAN_MONO_RIGHT,
     SOUND_CHAN_KARAOKE,
+    SOUND_CHAN_NUM_MODES
 };
 
 typedef void sound_set_type(int value);

@@ -822,7 +822,7 @@ void settings_apply(void)
 
 #if CONFIG_CODEC == SWCODEC
     audio_set_crossfade(global_settings.crossfade);
-    dsp_set_replaygain(true);
+    dsp_set_replaygain();
     dsp_set_crossfeed(global_settings.crossfeed);
     dsp_set_crossfeed_direct_gain(global_settings.crossfeed_direct_gain);
     dsp_set_crossfeed_cross_params(global_settings.crossfeed_cross_gain,

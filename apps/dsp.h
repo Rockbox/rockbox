@@ -32,14 +32,14 @@ enum
     STEREO_NUM_MODES,
 };
 
-enum {
+enum
+{
     CODEC_SET_FILEBUF_WATERMARK = 1,
     CODEC_SET_FILEBUF_CHUNKSIZE,
     CODEC_SET_FILEBUF_PRESEEK,
+    DSP_SWITCH_CODEC,
     DSP_SET_FREQUENCY,
     DSP_SWITCH_FREQUENCY,
-    DSP_SET_CLIP_MIN,
-    DSP_SET_CLIP_MAX,
     DSP_SET_SAMPLE_DEPTH,
     DSP_SET_STEREO_MODE,
     DSP_RESET,
@@ -200,7 +200,7 @@ int dsp_input_count(int count);
 int dsp_output_count(int count);
 int dsp_stereo_mode(void);
 bool dsp_configure(int setting, intptr_t value);
-void dsp_set_replaygain(bool always);
+void dsp_set_replaygain(void);
 void dsp_set_crossfeed(bool enable);
 void dsp_set_crossfeed_direct_gain(int gain);
 void dsp_set_crossfeed_cross_params(long lf_gain, long hf_gain, long cutoff);

@@ -31,10 +31,6 @@
 #include "misc.h"
 #include "debug.h"
 
-#ifndef SIMULATOR
-#include <dsp_asm.h>
-#endif
-
 /* 16-bit samples are scaled based on these constants. The shift should be
  * no more than 15.
  */
@@ -46,87 +42,155 @@
 #define RESAMPLE_BUF_COUNT  (256 * 4)   /* Enough for 11,025 Hz -> 44,100 Hz*/
 #define DEFAULT_GAIN        0x01000000
 
+/* enums to index conversion properly with stereo mode and other settings */
+enum
+{
+    SAMPLE_INPUT_LE_NATIVE_I_STEREO  = STEREO_INTERLEAVED,
+    SAMPLE_INPUT_LE_NATIVE_NI_STEREO = STEREO_NONINTERLEAVED,
+    SAMPLE_INPUT_LE_NATIVE_MONO      = STEREO_MONO,
+    SAMPLE_INPUT_GT_NATIVE_I_STEREO  = STEREO_INTERLEAVED + STEREO_NUM_MODES,
+    SAMPLE_INPUT_GT_NATIVE_NI_STEREO = STEREO_NONINTERLEAVED + STEREO_NUM_MODES,
+    SAMPLE_INPUT_GT_NATIVE_MONO      = STEREO_MONO + STEREO_NUM_MODES,
+    SAMPLE_INPUT_GT_NATIVE_1ST_INDEX = STEREO_NUM_MODES
+};
 
 enum
 {
-    CONVERT_LE_NATIVE_I_STEREO  = STEREO_INTERLEAVED,
-    CONVERT_LE_NATIVE_NI_STEREO = STEREO_NONINTERLEAVED,
-    CONVERT_LE_NATIVE_MONO      = STEREO_MONO,
-    CONVERT_GT_NATIVE_I_STEREO  = STEREO_INTERLEAVED + STEREO_NUM_MODES,
-    CONVERT_GT_NATIVE_NI_STEREO = STEREO_NONINTERLEAVED + STEREO_NUM_MODES,
-    CONVERT_GT_NATIVE_MONO      = STEREO_MONO + STEREO_NUM_MODES,
-    CONVERT_GT_NATIVE_1ST_INDEX = STEREO_NUM_MODES
+    SAMPLE_OUTPUT_MONO = 0,
+    SAMPLE_OUTPUT_STEREO,
+    SAMPLE_OUTPUT_DITHERED_MONO,
+    SAMPLE_OUTPUT_DITHERED_STEREO
 };
 
-struct dsp_config
-{
-    long codec_frequency; /* Sample rate of data coming from the codec */
-    long frequency;       /* Effective sample rate after pitch shift (if any) */
-    long clip_min;
-    long clip_max;
-    long track_gain;
-    long album_gain;
-    long track_peak;
-    long album_peak;
-    long replaygain;
-    int sample_depth;
-    int sample_bytes;
-    int stereo_mode;
-    int num_channels;
-    int frac_bits;
-    bool dither_enabled;
-    long dither_bias;
-    long dither_mask;
-    bool new_gain;
-    bool crossfeed_enabled;
-    bool eq_enabled;
-    long eq_precut;
-    long gain;          /* Note that this is in S8.23 format. */
-    int (*convert_to_internal)(const char* src[], int32_t* dst[], int count);
-};
-
+/****************************************************************************
+ * NOTE: Any assembly routines that use these structures must be updated
+ * if current data members are moved or changed.
+ */
+                                        /* 32-bit achitecture offset */
 struct resample_data
 {
-    long phase;
-    long delta;
-    int32_t last_sample[2];
+    long delta;                         /* 00h */
+    long phase;                         /* 04h */
+    int32_t last_sample[2];             /* 08h */
+                                        /* 10h */
 };
 
+/* This is for passing needed data to assembly dsp routines. If another
+ * dsp parameter needs to be passed, add to the end of the structure
+ * and remove from dsp_config.
+ * If another function type becomes assembly optimized and requires dsp
+ * config info, add a pointer paramter of type "struct dsp_data *".
+ * If removing something from other than the end, reserve the spot or
+ * else update every implementation for every target.
+ * Be sure to add the offset of the new member for easy viewing as well. :)
+ * It is the first member of dsp_config and all members can be accessesed
+ * through the main aggregate but this is intended to make a safe haven
+ * for these items whereas the c part can be rearranged at will. dsp_data
+ * could even moved within dsp_config without disurbing the order.
+ */
+struct dsp_data
+{
+    int output_scale;                   /* 00h */
+    int num_channels;                   /* 04h */
+    struct resample_data resample_data; /* 08h */
+    int clip_min;                       /* 18h */
+    int clip_max;                       /* 2ch */
+                                        /* 30h */
+};
+
+/* No asm...yet */
 struct dither_data
 {
-    long error[3];
-    long random;
+    long error[3];  /* 00h */
+    long random;    /* 0ch */
+                    /* 10h */
 };
 
 struct crossfeed_data
 {
-    int32_t gain;       /* Direct path gain */
-    int32_t coefs[3];   /* Coefficients for the shelving filter */
-    int32_t history[4]; /* Format is x[n - 1], y[n - 1] for both channels */
-    int32_t delay[13][2];
-    int index;          /* Current index into the delay line */
+    int32_t gain;           /* 00h - Direct path gain */
+    int32_t coefs[3];       /* 04h - Coefficients for the shelving filter */
+    int32_t history[4];     /* 10h - Format is x[n - 1], y[n - 1] for both channels */
+    int32_t delay[13][2];   /* 20h */
+    int index;              /* 88h - Current index into the delay line */
+                            /* 8ch */
 };
 
 /* Current setup is one lowshelf filters, three peaking filters and one
    highshelf filter. Varying the number of shelving filters make no sense,
    but adding peaking filters is possible. */
-struct eq_state {
-    char enabled[5];    /* Flags for active filters */
-    struct eqfilter filters[5];
+struct eq_state
+{
+    char enabled[5];            /* 00h - Flags for active filters */
+    struct eqfilter filters[5]; /* 08h - packing is 4? */
+                                /* 10ch */
 };
 
-static struct dsp_config dsp_conf[2] IBSS_ATTR;
-static struct dither_data dither_data[2] IBSS_ATTR;
-static struct resample_data resample_data[2] IBSS_ATTR;
-struct crossfeed_data crossfeed_data IBSS_ATTR;
-static struct eq_state eq_data;
+/* Include header with defines which functions are implemented in assembly
+   code for the target */
+#ifndef SIMULATOR
+#include <dsp_asm.h>
+#endif
 
-static int pitch_ratio = 1000;
-static int channels_mode = 0;
-static int32_t sw_gain, sw_cross;
+#ifndef DSP_HAVE_ASM_CROSSFEED
+static void apply_crossfeed(int32_t *buf[], int count);
+#endif
+/*
+ ***************************************************************************/
 
-extern int current_codec;
-static struct dsp_config *dsp;
+struct dsp_config
+{
+    struct dsp_data data; /* Config members for use in asm routines */
+    long codec_frequency; /* Sample rate of data coming from the codec */
+    long frequency;       /* Effective sample rate after pitch shift (if any) */
+    int  sample_depth;
+    int  sample_bytes;
+    int  stereo_mode;
+    int  frac_bits;
+    long gain;          /* Note that this is in S8.23 format. */
+    /* Functions that change depending upon settings - NULL if stage is
+       disabled */
+    int (*input_samples)(int count, const char *src[], int32_t *dst[]);
+    int (*resample)(int count, struct dsp_data *data,
+                    int32_t *src[], int32_t *dst[]);
+    void (*output_samples)(int count, struct dsp_data *data,
+                           int32_t *src[], int16_t *dst);
+    /* These will be NULL for the voice codec and is more economical that
+       way */
+    void (*apply_crossfeed)(int32_t *src[], int count);
+    void (*channels_process)(int count, int32_t *buf[]);
+};
+
+/* General DSP config */
+static struct dsp_config dsp_conf[2] IBSS_ATTR;     /* 0=A, 1=V */
+/* Dithering */
+static struct dither_data dither_data[2] IBSS_ATTR; /* 0=left, 1=right */
+static long   dither_mask IBSS_ATTR;
+static long   dither_bias IBSS_ATTR;
+/* Crossfeed */
+struct crossfeed_data crossfeed_data IBSS_ATTR;     /* A */
+/* Equalizer */
+static struct eq_state eq_data;                     /* A/V */
+
+/* Settings applicable to audio codec only */
+static int  pitch_ratio = 1000;
+static int  channels_mode;
+       long dsp_sw_gain;
+       long dsp_sw_cross;
+static bool dither_enabled;
+static bool eq_enabled IBSS_ATTR;
+static long eq_precut;
+static long track_gain;
+static bool new_gain;
+static long album_gain;
+static long track_peak;
+static long album_peak;
+static long replaygain;
+static bool crossfeed_enabled;
+
+#define audio_dsp (&dsp_conf[CODEC_IDX_AUDIO])
+#define voice_dsp (&dsp_conf[CODEC_IDX_VOICE])
+static struct dsp_config *dsp IDATA_ATTR = audio_dsp;
 
 /* The internal format is 32-bit samples, non-interleaved, stereo. This
  * format is similar to the raw output from several codecs, so the amount
@@ -135,6 +199,38 @@ static struct dsp_config *dsp;
 
 static int32_t sample_buf[SAMPLE_BUF_COUNT] IBSS_ATTR;
 static int32_t resample_buf[RESAMPLE_BUF_COUNT] IBSS_ATTR;
+
+/* set a new dsp and return old one */
+static inline struct dsp_config * switch_dsp(struct dsp_config *_dsp)
+{
+    struct dsp_config * old_dsp = dsp;
+    dsp = _dsp;
+    return old_dsp;
+}
+
+#if 0
+/* Clip sample to arbitrary limits where range > 0 and min + range = max */
+static inline long clip_sample(int32_t sample, int32_t min, int32_t range)
+{
+    int32_t c = sample - min;
+    if ((uint32_t)c > (uint32_t)range)
+    {
+        sample -= c;
+        if (c > 0)
+            sample += range;
+    }
+
+    return sample;
+}
+#endif
+
+/* Clip sample to signed 16 bit range */
+static inline int32_t clip_sample_16(int32_t sample)
+{
+    if ((int16_t)sample != sample)
+        sample = 0x7fff ^ (sample >> 31);
+    return sample;
+}
 
 int sound_get_pitch(void)
 {
@@ -156,13 +252,13 @@ void sound_set_pitch(int permille)
  */
 
 /* convert count 16-bit mono to 32-bit mono */
-static int convert_lte_native_mono(
-    const char *src[], int32_t *dst[], int count)
+static int sample_input_lte_native_mono(
+    int count, const char *src[], int32_t *dst[])
 {
     count = MIN(SAMPLE_BUF_COUNT/2, count);
 
-    const short *s = (short*) src[0];
-    const short * const send = s + count;
+    const int16_t *s = (int16_t *) src[0];
+    const int16_t * const send = s + count;
     int32_t *d = dst[0] = dst[1] = sample_buf;
     const int scale = WORD_SHIFT;
 
@@ -178,8 +274,8 @@ static int convert_lte_native_mono(
 }
 
 /* convert count 16-bit interleaved stereo to 32-bit noninterleaved */
-static int convert_lte_native_interleaved_stereo(
-    const char *src[], int32_t *dst[], int count)
+static int sample_input_lte_native_i_stereo(
+    int count, const char *src[], int32_t *dst[])
 {
     count = MIN(SAMPLE_BUF_COUNT/2, count);
 
@@ -194,9 +290,9 @@ static int convert_lte_native_interleaved_stereo(
         int32_t slr = *s++;
 #ifdef ROCKBOX_LITTLE_ENDIAN
         *dl++ = (slr >> 16) << scale;
-        *dr++ = (int32_t)(short)slr << scale;
+        *dr++ = (int32_t)(int16_t)slr << scale;
 #else  /* ROCKBOX_BIG_ENDIAN */
-        *dl++ = (int32_t)(short)slr << scale;
+        *dl++ = (int32_t)(int16_t)slr << scale;
         *dr++ = (slr >> 16) << scale;
 #endif
     }
@@ -208,12 +304,14 @@ static int convert_lte_native_interleaved_stereo(
 }
 
 /* convert count 16-bit noninterleaved stereo to 32-bit noninterleaved */
-static int convert_lte_native_noninterleaved_stereo(
-    const char *src[], int32_t *dst[], int count)
+static int sample_input_lte_native_ni_stereo(
+    int count, const char *src[], int32_t *dst[])
 {
-    const short *sl = (short *) src[0];
-    const short *sr = (short *) src[1];
-    const short * const slend = sl + count;
+    count = MIN(SAMPLE_BUF_COUNT/2, count);
+
+    const int16_t *sl = (int16_t *) src[0];
+    const int16_t *sr = (int16_t *) src[1];
+    const int16_t * const slend = sl + count;
     int32_t *dl = dst[0] = sample_buf;
     int32_t *dr = dst[1] = sample_buf + SAMPLE_BUF_COUNT/2;
     const int scale = WORD_SHIFT;
@@ -232,8 +330,8 @@ static int convert_lte_native_noninterleaved_stereo(
 }
 
 /* convert count 32-bit mono to 32-bit mono */
-static int convert_gt_native_mono(
-    const char *src[], int32_t *dst[], int count)
+static int sample_input_gt_native_mono(
+    int count, const char *src[], int32_t *dst[])
 {
     count = MIN(SAMPLE_BUF_COUNT/2, count);
 
@@ -244,8 +342,8 @@ static int convert_gt_native_mono(
 }
 
 /* convert count 32-bit interleaved stereo to 32-bit noninterleaved stereo */
-static int convert_gt_native_interleaved_stereo(
-    const char *src[], int32_t *dst[], int count)
+static int sample_input_gt_native_i_stereo(
+    int count, const char *src[], int32_t *dst[])
 {
     count = MIN(SAMPLE_BUF_COUNT/2, count);
 
@@ -270,8 +368,8 @@ static int convert_gt_native_interleaved_stereo(
 }
 
 /* convert 32 bit-noninterleaved stereo to 32-bit noninterleaved stereo */
-static int convert_gt_native_noninterleaved_stereo(
-    const char *src[], int32_t *dst[], int count)
+static int sample_input_gt_native_ni_stereo(
+    int count, const char *src[], int32_t *dst[])
 {
     count = MIN(SAMPLE_BUF_COUNT/2, count);
 
@@ -283,42 +381,190 @@ static int convert_gt_native_noninterleaved_stereo(
     return count;
 }
 
-/* set the to-native sample conversion function based on dsp sample parameters */
-static void new_sample_conversion(void)
+/**
+ * sample_input_new_format()
+ *
+ * set the to-native sample conversion function based on dsp sample parameters
+ *
+ * !DSPPARAMSYNC
+ * needs syncing with changes to the following dsp parameters:
+ *  * dsp->stereo_mode (A/V)
+ *  * dsp->sample_depth (A/V)
+ */
+static void sample_input_new_format(void)
 {
-    static int (*convert_to_internal_functions[])(
-        const char* src[], int32_t *dst[], int count) =
+    static int (* const sample_input_functions[])(
+        int count, const char* src[], int32_t *dst[]) =
     {
-        [CONVERT_LE_NATIVE_MONO]      = convert_lte_native_mono,
-        [CONVERT_LE_NATIVE_I_STEREO]  = convert_lte_native_interleaved_stereo,
-        [CONVERT_LE_NATIVE_NI_STEREO] = convert_lte_native_noninterleaved_stereo,
-        [CONVERT_GT_NATIVE_MONO]      = convert_gt_native_mono,
-        [CONVERT_GT_NATIVE_I_STEREO]  = convert_gt_native_interleaved_stereo,
-        [CONVERT_GT_NATIVE_NI_STEREO] = convert_gt_native_noninterleaved_stereo,
+        [SAMPLE_INPUT_LE_NATIVE_MONO]      = sample_input_lte_native_mono,
+        [SAMPLE_INPUT_LE_NATIVE_I_STEREO]  = sample_input_lte_native_i_stereo,
+        [SAMPLE_INPUT_LE_NATIVE_NI_STEREO] = sample_input_lte_native_ni_stereo,
+        [SAMPLE_INPUT_GT_NATIVE_MONO]      = sample_input_gt_native_mono,
+        [SAMPLE_INPUT_GT_NATIVE_I_STEREO]  = sample_input_gt_native_i_stereo,
+        [SAMPLE_INPUT_GT_NATIVE_NI_STEREO] = sample_input_gt_native_ni_stereo,
     };
 
     int convert = dsp->stereo_mode;
 
     if (dsp->sample_depth > NATIVE_DEPTH)
-        convert += CONVERT_GT_NATIVE_1ST_INDEX;
+        convert += SAMPLE_INPUT_GT_NATIVE_1ST_INDEX;
 
-    dsp->convert_to_internal = convert_to_internal_functions[convert];
+    dsp->input_samples = sample_input_functions[convert];
+}
+
+#ifndef DSP_HAVE_ASM_SAMPLE_OUTPUT_MONO
+/* write mono internal format to output format */
+static void sample_output_mono(int count, struct dsp_data *data,
+                               int32_t *src[], int16_t *dst)
+{
+    const int32_t *s0 = src[0];
+    const int scale = data->output_scale;
+
+    do
+    {
+        int32_t lr = clip_sample_16(*s0++ >> scale);
+        *dst++ = lr;
+        *dst++ = lr;
+    }
+    while (--count > 0);
+}
+#endif /* DSP_HAVE_ASM_SAMPLE_OUTPUT_MONO */
+
+/* write stereo internal format to output format */
+#ifndef DSP_HAVE_ASM_SAMPLE_OUTPUT_STEREO
+static void sample_output_stereo(int count, struct dsp_data *data,
+                                 int32_t *src[], int16_t *dst)
+{
+    const int32_t *s0 = src[0];
+    const int32_t *s1 = src[1];
+    const int scale = data->output_scale;
+
+    do
+    {
+        *dst++ = clip_sample_16(*s0++ >> scale);
+        *dst++ = clip_sample_16(*s1++ >> scale);
+    }
+    while (--count > 0);
+}
+#endif /* DSP_HAVE_ASM_SAMPLE_OUTPUT_STEREO */
+
+/**
+ * The "dither" code to convert the 24-bit samples produced by libmad was
+ * taken from the coolplayer project - coolplayer.sourceforge.net
+ *
+ * This function handles mono and stereo outputs.
+ */
+static void sample_output_dithered(int count, struct dsp_data *data,
+                                   int32_t *src[], int16_t *dst)
+{
+    const int32_t mask = dither_mask;
+    const int32_t bias = dither_bias;
+    const int scale = data->output_scale;
+    const int32_t min = data->clip_min;
+    const int32_t max = data->clip_max;
+    const int32_t range = max - min;
+    const int dinc = dsp->data.num_channels;
+
+    int ch;
+    for (ch = 0; ch < dinc; ch++)
+    {
+        struct dither_data * const dither = &dither_data[ch];
+        int32_t *s = src[ch];
+        int16_t *d = &dst[ch];
+        int i;
+
+        for (i = 0; i < count; i++, s++, d += dinc)
+        {
+            int32_t output, sample;
+            int32_t random;
+
+            /* Noise shape and bias */
+            sample = *s;
+            sample += dither->error[0] - dither->error[1] + dither->error[2];
+            dither->error[2] = dither->error[1];
+            dither->error[1] = dither->error[0]/2;
+
+            output = sample + bias;
+
+            /* Dither */
+            random = dither->random*0x0019660dL + 0x3c6ef35fL;
+            output += (random & mask) - (dither->random & mask);
+            dither->random = random;
+
+            /* Clip */
+            int32_t c = output - min;
+            if ((uint32_t)c > (uint32_t)range)
+            {
+                output -= c;
+                if (c > 0)
+                {
+                    output += range;
+                    if (sample > max)
+                        sample = max;
+                }
+                else if (sample < min)
+                {
+                    sample = min;
+                }
+            }
+
+            output &= ~mask;
+
+            /* Error feedback */
+            dither->error[0] = sample - output;
+
+            /* Quantize */
+            *d = output >> scale;
+        }
+    }
+}
+
+/**
+ * sample_output_new_format()
+ *
+ * set the from-native to ouput sample conversion routine
+ *
+ * !DSPPARAMSYNC
+ * needs syncing with changes to the following dsp parameters:
+ *  * dsp->stereo_mode (A/V)
+ *  * dither_enabled (A)
+ */
+static void sample_output_new_format(void)
+{
+    static void (* const sample_output_functions[])(
+        int count, struct dsp_data *data,
+        int32_t *src[], int16_t *dst) =
+    {
+        sample_output_mono,
+        sample_output_stereo,
+        sample_output_dithered,
+        sample_output_dithered
+    };
+
+    int out = dsp->data.num_channels - 1;
+
+    if (dsp == audio_dsp && dither_enabled)
+        out += 2;
+
+    dsp->output_samples = sample_output_functions[out];
 }
 
 static void resampler_set_delta(int frequency)
 {
-    resample_data[current_codec].delta = (unsigned long) 
+    dsp->data.resample_data.delta = (unsigned long) 
         frequency * 65536LL / NATIVE_FREQUENCY;
 }
 
-/* Linear interpolation resampling that introduces a one sample delay because
+/**
+ * Linear interpolation resampling that introduces a one sample delay because
  * of our inability to look into the future at the end of a frame.
  */
 #ifndef DSP_HAVE_ASM_RESAMPLING
-static int dsp_downsample(int channels, int count, struct resample_data *r,
-                          int32_t **src, int32_t **dst)
+static int dsp_downsample(int count, struct dsp_data *data,
+                          int32_t *src[], int32_t *dst[])
 {
-    long delta = r->delta;
+    int  ch = data->num_channels - 1;
+    long delta = data->resample_data.delta;
     long phase, pos;
     int32_t *d;
 
@@ -328,12 +574,12 @@ static int dsp_downsample(int channels, int count, struct resample_data *r,
         /* Just initialize things and not worry too much about the relatively
          * uncommon case of not being able to spit out a sample for the frame.
          */
-        int32_t *s = src[--channels];
-        int32_t last = r->last_sample[channels];
+        int32_t *s = src[ch];
+        int32_t last = data->resample_data.last_sample[ch];
         
-        r->last_sample[channels] = s[count - 1];
-        d = dst[channels];
-        phase = r->phase;
+        data->resample_data.last_sample[ch] = s[count - 1];
+        d = dst[ch];
+        phase = data->resample_data.phase;
         pos = phase >> 16;
 
         /* Do we need last sample of previous frame for interpolation? */
@@ -348,17 +594,18 @@ static int dsp_downsample(int channels, int count, struct resample_data *r,
             last = s[pos - 1];
         }
     }
-    while (channels > 0);
+    while (--ch >= 0);
 
     /* Wrap phase accumulator back to start of next frame. */
-    r->phase = phase - (count << 16);
+    data->resample_data.phase = phase - (count << 16);
     return d - dst[0];
 }
 
-static int dsp_upsample(int channels, int count, struct resample_data *r,
-                        int32_t **src, int32_t **dst)
+static int dsp_upsample(int count,  struct dsp_data *data,
+                        int32_t *src[], int32_t *dst[])
 {
-    long delta = r->delta;
+    int  ch = data->num_channels - 1;
+    long delta = data->resample_data.delta;
     long phase, pos;
     int32_t *d;
 
@@ -367,12 +614,12 @@ static int dsp_upsample(int channels, int count, struct resample_data *r,
     {
         /* Should always be able to output a sample for a ratio up to
            RESAMPLE_BUF_COUNT / SAMPLE_BUF_COUNT. */
-        int32_t *s = src[--channels];
-        int32_t last = r->last_sample[channels];
+        int32_t *s = src[ch];
+        int32_t last = data->resample_data.last_sample[ch];
         
-        r->last_sample[channels] = s[count - 1];
-        d = dst[channels];
-        phase = r->phase;
+        data->resample_data.last_sample[ch] = s[count - 1];
+        d = dst[ch];
+        phase = data->resample_data.phase;
         pos = phase >> 16;
 
         while (pos == 0)
@@ -390,10 +637,10 @@ static int dsp_upsample(int channels, int count, struct resample_data *r,
             pos = phase >> 16;
         }
     }
-    while (channels > 0);
+    while (--ch >= 0);
 
     /* Wrap phase accumulator back to start of next frame. */
-    r->phase = phase & 0xffff;
+    data->resample_data.phase = phase & 0xffff;
     return d - dst[0];
 }
 #endif /* DSP_HAVE_ASM_RESAMPLING */
@@ -402,111 +649,57 @@ static int dsp_upsample(int channels, int count, struct resample_data *r,
  * done, to refer to the resampled data. Returns number of stereo samples
  * for further processing.
  */
-static inline int resample(int32_t *src[], int count)
+static inline int resample(int count, int32_t *src[])
 {
-    long new_count = count;
-
-    if (dsp->frequency != NATIVE_FREQUENCY)
+    if (dsp->resample)
     {
         int32_t *dst[2] =
         {
             resample_buf,
             resample_buf + RESAMPLE_BUF_COUNT/2,
         };
-        int channels = dsp->num_channels;
 
-        if (dsp->frequency < NATIVE_FREQUENCY)
-            new_count = dsp_upsample(channels, count,
-                                     &resample_data[current_codec],
-                                     src, dst);
-        else
-            new_count = dsp_downsample(channels, count,
-                                       &resample_data[current_codec],
-                                       src, dst);
-
+        count = dsp->resample(count, &dsp->data, src, dst);
         src[0] = dst[0];
-        src[1] = dst[channels - 1];
+        src[1] = dst[dsp->data.num_channels - 1];
     }
 
-    return new_count;
-}
-
-static inline long clip_sample(int32_t sample, int32_t min, int32_t max)
-{
-    if (sample > max)
-    {
-        sample = max;
-    }
-    else if (sample < min)
-    {
-        sample = min;
-    }
-
-    return sample;
-}
-
-/* The "dither" code to convert the 24-bit samples produced by libmad was
- * taken from the coolplayer project - coolplayer.sourceforge.net
- */
-
-void dsp_dither_enable(bool enable)
-{
-    dsp->dither_enabled = enable;
+    return count;
 }
 
 static void dither_init(void)
 {
-    memset(dither_data, 0, sizeof(dither_data));
-    dsp->dither_bias = (1L << (dsp->frac_bits - NATIVE_DEPTH));
-    dsp->dither_mask = (1L << (dsp->frac_bits + 1 - NATIVE_DEPTH)) - 1;
+    /* Voice codec should not reset the audio codec's dither data */
+    if (dsp != audio_dsp)
+        return;
+
+    memset(dither_data, 0, sizeof (dither_data));
+    dither_bias = (1L << (dsp->frac_bits - NATIVE_DEPTH));
+    dither_mask = (1L << (dsp->frac_bits + 1 - NATIVE_DEPTH)) - 1;
 }
 
-static void dither_samples(int32_t* src, int num, struct dither_data* dither)
+void dsp_dither_enable(bool enable)
 {
-    int32_t output, sample;
-    int32_t random;
-    int32_t min, max;
-    long mask = dsp->dither_mask;
-    long bias = dsp->dither_bias;
-    int i;
-    
-    for (i = 0; i < num; ++i) {
-        /* Noise shape and bias */
-        sample = src[i];
-        sample += dither->error[0] - dither->error[1] + dither->error[2];
-        dither->error[2] = dither->error[1];
-        dither->error[1] = dither->error[0]/2;
-
-        output = sample + bias;
-
-        /* Dither */
-        random = dither->random*0x0019660dL + 0x3c6ef35fL;
-        output += (random & mask) - (dither->random & mask);
-        dither->random = random;
-
-        /* Clip and quantize */
-        min = dsp->clip_min;
-        max = dsp->clip_max;
-        if (output > max) {
-            output = max;
-            if (sample > max)
-                sample = max;
-        } else if (output < min) {
-            output = min;
-            if (sample < min)
-                sample = min;
-        }
-        output &= ~mask;
-
-        /* Error feedback */
-        dither->error[0] = sample - output;
-        src[i] = output;
-    }
+    /* Be sure audio dsp is current to set correct function */
+    struct dsp_config *old_dsp = switch_dsp(audio_dsp);
+    dither_enabled = enable;
+    sample_output_new_format();
+    switch_dsp(old_dsp);    
 }
 
+/**
+ * dsp_set_crossfeed(bool enable)
+ *
+ * !DSPPARAMSYNC
+ * needs syncing with changes to the following dsp parameters:
+ *  * dsp->stereo_mode (A)
+ */
 void dsp_set_crossfeed(bool enable)
 {
-    dsp->crossfeed_enabled = enable;
+    crossfeed_enabled = enable;
+    audio_dsp->apply_crossfeed =
+        (enable && audio_dsp->data.num_channels > 1)
+            ? apply_crossfeed : NULL;
 }
 
 void dsp_set_crossfeed_direct_gain(int gain)
@@ -533,7 +726,7 @@ void dsp_set_crossfeed_cross_params(long lf_gain, long hf_gain, long cutoff)
  * to listen to on headphones with no crossfeed.
  */
 #ifndef DSP_HAVE_ASM_CROSSFEED
-static void apply_crossfeed(int32_t* src[], int count)
+static void apply_crossfeed(int32_t *buf[], int count)
 {
     int32_t *hist_l = &crossfeed_data.history[0];
     int32_t *hist_r = &crossfeed_data.history[2];
@@ -546,9 +739,10 @@ static void apply_crossfeed(int32_t* src[], int count)
     int32_t left, right;
     int i;
 
-    for (i = 0; i < count; i++) {
-        left = src[0][i];
-        right = src[1][i];
+    for (i = 0; i < count; i++)
+    {
+        left = buf[0][i];
+        right = buf[1][i];
 
         /* Filter delayed sample from left speaker */
         ACC_INIT(acc, delay[di*2], coefs[0]);
@@ -567,8 +761,8 @@ static void apply_crossfeed(int32_t* src[], int count)
         delay[di*2] = left;
         delay[di*2 + 1] = right;
         /* Now add the attenuated direct sound and write to outputs */
-        src[0][i] = FRACMUL(left, gain) + hist_r[1];
-        src[1][i] = FRACMUL(right, gain) + hist_l[1];
+        buf[0][i] = FRACMUL(left, gain) + hist_r[1];
+        buf[1][i] = FRACMUL(right, gain) + hist_l[1];
  
         /* Wrap delay line index if bigger than delay line size */
         if (++di > 12)
@@ -580,18 +774,19 @@ static void apply_crossfeed(int32_t* src[], int count)
 #endif
 
 /* Combine all gains to a global gain. */
-static void set_gain(void)
+static void set_gain(struct dsp_config *dsp)
 {
     dsp->gain = DEFAULT_GAIN;
-    
-    if (dsp->replaygain)
+
+    /* Replay gain not relevant to voice */
+    if (dsp == audio_dsp && replaygain)
     {
-        dsp->gain = dsp->replaygain;
+        dsp->gain = replaygain;
     }
     
-    if (dsp->eq_enabled && dsp->eq_precut)
+    if (eq_enabled && eq_precut)
     {
-        dsp->gain = (long) (((int64_t) dsp->gain * dsp->eq_precut) >> 24);
+        dsp->gain = (long) (((int64_t) dsp->gain * eq_precut) >> 24);
     }
     
     if (dsp->gain == DEFAULT_GAIN)
@@ -611,7 +806,7 @@ static void set_gain(void)
  */
 void dsp_set_eq(bool enable)
 {
-    dsp->eq_enabled = enable;
+    eq_enabled = enable;
 }
 
 /**
@@ -621,8 +816,9 @@ void dsp_set_eq(bool enable)
  */
 void dsp_set_eq_precut(int precut)
 {
-    dsp->eq_precut = get_replaygain_int(precut * -10);
-    set_gain();
+    eq_precut = get_replaygain_int(precut * -10);
+    set_gain(audio_dsp);
+    set_gain(voice_dsp); /* For EQ precut */
 }
 
 /**
@@ -651,9 +847,12 @@ void dsp_set_eq_coefs(int band)
        which it should be, since we're executed from the main thread. */
 
     /* Assume a band is disabled if the gain is zero */
-    if (gain == 0) {
+    if (gain == 0)
+    {
         eq_data.enabled[band] = 0;
-    } else {
+    }
+    else
+    {
         if (band == 0)
             eq_ls_coefs(cutoff, q, gain, eq_data.filters[band].coefs);
         else if (band == 4)
@@ -666,24 +865,28 @@ void dsp_set_eq_coefs(int band)
 }
 
 /* Apply EQ filters to those bands that have got it switched on. */
-static void eq_process(int32_t **x, unsigned num)
+static void eq_process(int count, int32_t *buf[])
 {
+    static const int shifts[] =
+    {
+        EQ_SHELF_SHIFT,  /* low shelf  */
+        EQ_PEAK_SHIFT,   /* peaking    */
+        EQ_PEAK_SHIFT,   /* peaking    */
+        EQ_PEAK_SHIFT,   /* peaking    */
+        EQ_SHELF_SHIFT,  /* high shelf */
+    };
+    unsigned int channels = dsp->data.num_channels;
     int i;
-    unsigned int channels = dsp->num_channels;
-    unsigned shift;
 
     /* filter configuration currently is 1 low shelf filter, 3 band peaking
        filters and 1 high shelf filter, in that order. we need to know this
        so we can choose the correct shift factor.
      */
-    for (i = 0; i < 5; i++) {
-        if (eq_data.enabled[i]) {
-            if (i == 0 || i == 4) /* shelving filters */
-                shift = EQ_SHELF_SHIFT;
-            else
-                shift = EQ_PEAK_SHIFT;
-            eq_filter(x, &eq_data.filters[i], num, channels, shift);
-        }
+    for (i = 0; i < 5; i++)
+    {
+        if (!eq_data.enabled[i])
+            continue;
+        eq_filter(buf, &eq_data.filters[i], count, channels, shifts[i]);
     }
 }
 
@@ -691,45 +894,44 @@ static void eq_process(int32_t **x, unsigned num)
  * the src array if gain was applied.
  * Note that this must be called before the resampler.
  */
-static void apply_gain(int32_t* _src[], int _count)
+static void apply_gain(int count, int32_t *buf[])
 {
-    if (dsp->gain)
-    {
-        int32_t** src = _src;
-        int count = _count;
-        int32_t* s0 = src[0];
-        int32_t* s1 = src[1];
-        long gain = dsp->gain;
-        int32_t s;
-        int i;
-        int32_t *d;
-    
-        if (s0 != s1)
-        {
-            d = &sample_buf[SAMPLE_BUF_COUNT / 2];
-            src[1] = d;
-            s = *s1++;
-    
-            for (i = 0; i < count; i++)
-                FRACMUL_8_LOOP(s, gain, s1, d);
-        }
-        else
-        {
-            src[1] = &sample_buf[0];
-        }
-    
-        d = &sample_buf[0];
-        src[0] = d;
-        s = *s0++;
-    
-        for (i = 0; i < count; i++)
-            FRACMUL_8_LOOP(s, gain, s0, d);
-    }
-}
+    int32_t *sl, *sr;
+    int32_t s, *d;
+    long gain;
+    int i;
 
-void channels_set(int value)
-{
-    channels_mode = value;
+    if (new_gain)
+    {
+        /* Gain has changed */
+        dsp_set_replaygain();
+        if (dsp->gain == 0)
+            return; /* No gain to apply now */
+    }
+
+    sl = buf[0], sr = buf[1];
+    gain = dsp->gain;
+
+    if (sl != sr)
+    {
+        d = &sample_buf[SAMPLE_BUF_COUNT / 2];
+        buf[1] = d;
+        s = *sr++;
+
+        for (i = 0; i < count; i++)
+            FRACMUL_8_LOOP(s, gain, sr, d);
+    }
+    else
+    {
+        buf[1] = &sample_buf[0];
+    }
+
+    d = &sample_buf[0];
+    buf[0] = d;
+    s = *sl++;
+
+    for (i = 0; i < count; i++)
+        FRACMUL_8_LOOP(s, gain, sl, d);
 }
 
 void stereo_width_set(int value)
@@ -737,89 +939,119 @@ void stereo_width_set(int value)
     long width, straight, cross;
     
     width = value * 0x7fffff / 100;
-    if (value <= 100) {
+
+    if (value <= 100)
+    {
         straight = (0x7fffff + width) / 2;
         cross = straight - width;
-    } else {
+    }
+    else
+    {
         /* straight = (1 + width) / (2 * width) */
         straight = ((int64_t)(0x7fffff + width) << 22) / width;
         cross = straight - 0x7fffff;
     }
-    sw_gain = straight << 8;
-    sw_cross = cross << 8;
+
+    dsp_sw_gain  = straight << 8;
+    dsp_sw_cross = cross << 8;
 }
 
-/* Implements the different channel configurations and stereo width.
- * We might want to combine this with the write_samples stage for efficiency,
- * but for now we'll just let it stay as a stage of its own. 
+/**
+ * Implements the different channel configurations and stereo width.
  */
-static void channels_process(int32_t **src, int num)
+
+/* SOUND_CHAN_STEREO mode is a noop so has no function - just outline one for
+ * completeness. */
+#if 0
+static void channels_process_sound_chan_stereo(int count, int32_t *buf[])
 {
-    int i;
-    int32_t *sl = src[0], *sr = src[1];
+    /* The channels are each just themselves */
+    (void)count; (void)buf;
+}
+#endif
 
-    if (channels_mode == SOUND_CHAN_STEREO)
-        return;
-    switch (channels_mode) {
-    case SOUND_CHAN_MONO:
-        for (i = 0; i < num; i++)
-            sl[i] = sr[i] = sl[i]/2 + sr[i]/2;
-        break;
-    case SOUND_CHAN_CUSTOM:
-        for (i = 0; i < num; i++) {
-            int32_t left_sample = sl[i];
+#ifndef DSP_HAVE_ASM_SOUND_CHAN_MONO
+static void channels_process_sound_chan_mono(int count, int32_t *buf[])
+{
+    int32_t *sl = buf[0], *sr = buf[1];
 
-            sl[i] = FRACMUL(sl[i], sw_gain) + FRACMUL(sr[i], sw_cross);
-            sr[i] = FRACMUL(sr[i], sw_gain) + FRACMUL(left_sample, sw_cross);
-        }
-        break;
-    case SOUND_CHAN_MONO_LEFT:
-        for (i = 0; i < num; i++)
-            sr[i] = sl[i];
-        break;
-    case SOUND_CHAN_MONO_RIGHT:
-        for (i = 0; i < num; i++)
-            sl[i] = sr[i];
-        break;
-    case SOUND_CHAN_KARAOKE:
-        for (i = 0; i < num; i++) {
-            int32_t left_sample = sl[i]/2;
-            
-            sl[i] = left_sample - sr[i]/2;
-            sr[i] = sr[i]/2 - left_sample;
-        }
-        break;
+    do
+    {
+        int32_t lr = *sl/2 + *sr/2;
+        *sl++ = lr;
+        *sr++ = lr;
     }
+    while (--count > 0);
+}
+#endif /* DSP_HAVE_ASM_SOUND_CHAN_MONO */
+
+#ifndef DSP_HAVE_ASM_SOUND_CHAN_CUSTOM
+static void channels_process_sound_chan_custom(int count, int32_t *buf[])
+{
+    const int32_t gain  = dsp_sw_gain;
+    const int32_t cross = dsp_sw_cross;
+    int32_t *sl = buf[0], *sr = buf[1];
+
+    do
+    {
+        int32_t l = *sl;
+        int32_t r = *sr;
+        *sl++ = FRACMUL(l, gain) + FRACMUL(r, cross);
+        *sr++ = FRACMUL(r, gain) + FRACMUL(l, cross);
+    }
+    while (--count > 0);
+}
+#endif /* DSP_HAVE_ASM_SOUND_CHAN_CUSTOM */
+
+static void channels_process_sound_chan_mono_left(int count, int32_t *buf[])
+{
+    /* Just copy over the other channel */
+    memcpy(buf[1], buf[0], count * sizeof (*buf));
 }
 
-static void write_samples(short* dst, int32_t* src[], int count)
+static void channels_process_sound_chan_mono_right(int count, int32_t *buf[])
 {
-    int32_t* s0 = src[0];
-    int32_t* s1 = src[1];
-    int scale = dsp->frac_bits + 1 - NATIVE_DEPTH;
+    /* Just copy over the other channel */
+    memcpy(buf[0], buf[1], count * sizeof (*buf));
+}
 
-    if (dsp->dither_enabled)
+#ifndef DSP_HAVE_ASM_SOUND_CHAN_KARAOKE
+static void channels_process_sound_chan_karaoke(int count, int32_t *buf[])
+{
+    int32_t *sl = buf[0], *sr = buf[1];
+
+    do
     {
-        dither_samples(src[0], count, &dither_data[0]);
-        dither_samples(src[1], count, &dither_data[1]);
-
-        while (count-- > 0)
-        {
-            *dst++ = (short) (*s0++ >> scale);
-            *dst++ = (short) (*s1++ >> scale);
-        }
+        int32_t l = *sl/2;
+        int32_t r = *sr/2;
+        *sl++ = l - r;
+        *sr++ = r - l;
     }
-    else
+    while (--count > 0);
+}
+#endif /* DSP_HAVE_ASM_SOUND_CHAN_KARAOKE */
+
+void channels_set(int value)
+{
+    static void (* const channels_process_functions[])(
+        int count, int32_t *buf[]) =
     {
-        long min = dsp->clip_min;
-        long max = dsp->clip_max;
+        /* SOUND_CHAN_STEREO = All-purpose index for no channel processing */
+        [SOUND_CHAN_STEREO]     = NULL,
+        [SOUND_CHAN_MONO]       = channels_process_sound_chan_mono,
+        [SOUND_CHAN_CUSTOM]     = channels_process_sound_chan_custom,
+        [SOUND_CHAN_MONO_LEFT]  = channels_process_sound_chan_mono_left,
+        [SOUND_CHAN_MONO_RIGHT] = channels_process_sound_chan_mono_right,
+        [SOUND_CHAN_KARAOKE]    = channels_process_sound_chan_karaoke,
+    };
 
-        while (count-- > 0)
-        {
-            *dst++ = (short) (clip_sample(*s0++, min, max) >> scale);
-            *dst++ = (short) (clip_sample(*s1++, min, max) >> scale);
-        }
-    }
+    if ((unsigned)value >= ARRAYLEN(channels_process_functions) ||
+        audio_dsp->stereo_mode == STEREO_MONO)
+        value = SOUND_CHAN_STEREO;
+
+    /* This doesn't apply to voice */
+    channels_mode = value;
+    audio_dsp->channels_process = channels_process_functions[value];
 }
 
 /* Process and convert src audio to dst based on the DSP configuration,
@@ -832,7 +1064,7 @@ static void write_samples(short* dst, int32_t* src[], int count)
  */
 int dsp_process(char *dst, const char *src[], int count)
 {
-    int32_t* tmp[2];
+    int32_t *tmp[2];
     int written = 0;
     int samples;
 
@@ -843,27 +1075,23 @@ int dsp_process(char *dst, const char *src[], int count)
     coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
     #endif
 
-    dsp = &dsp_conf[current_codec];
-
-    dsp_set_replaygain(false);
-
     while (count > 0)
     {
-        samples = dsp->convert_to_internal(src, tmp, count);
+        samples = dsp->input_samples(count, src, tmp);
         count -= samples;
-        apply_gain(tmp, samples);
-        samples = resample(tmp, samples);
-        if (samples <= 0)
+        if (dsp->gain != 0)
+            apply_gain(samples, tmp);
+        if ((samples = resample(samples, tmp)) <= 0)
             break; /* I'm pretty sure we're downsampling here */
-        if (dsp->crossfeed_enabled && dsp->stereo_mode != STEREO_MONO)
-            apply_crossfeed(tmp, samples);
-        if (dsp->eq_enabled)
-            eq_process(tmp, samples);
-        if (dsp->stereo_mode != STEREO_MONO)
-            channels_process(tmp, samples);
-        write_samples((short*) dst, tmp, samples);
+        if (dsp->apply_crossfeed)
+            dsp->apply_crossfeed(tmp, samples);
+        if (eq_enabled)
+            eq_process(samples, tmp);
+        if (dsp->channels_process)
+            dsp->channels_process(samples, tmp);
+        dsp->output_samples(samples, &dsp->data, tmp, (int16_t *)dst);
         written += samples;
-        dst += samples * sizeof(short) * 2;
+        dst += samples * sizeof (int16_t) * 2;
         yield();
     }
 
@@ -883,21 +1111,19 @@ int dsp_process(char *dst, const char *src[], int count)
 /* dsp_input_size MUST be called afterwards */
 int dsp_output_count(int count)
 {
-    dsp = &dsp_conf[current_codec];
-    
-    if (dsp->frequency != NATIVE_FREQUENCY)
+    if (dsp->resample)
     {
         count = (int)(((unsigned long)count * NATIVE_FREQUENCY
                     + (dsp->frequency - 1)) / dsp->frequency);
-    }
 
-    /* Now we have the resampled sample count which must not exceed
-     * RESAMPLE_BUF_COUNT/2 to avoid resample buffer overflow. One
-     * must call dsp_input_count() to get the correct input sample
-     * count.
-     */
-    if (count > RESAMPLE_BUF_COUNT/2)
-        count = RESAMPLE_BUF_COUNT/2;
+        /* Now we have the resampled sample count which must not exceed
+         * RESAMPLE_BUF_COUNT/2 to avoid resample buffer overflow. One
+         * must call dsp_input_count() to get the correct input sample
+         * count.
+         */
+        if (count > RESAMPLE_BUF_COUNT/2)
+            count = RESAMPLE_BUF_COUNT/2;
+    }
 
     return count;
 }
@@ -907,17 +1133,15 @@ int dsp_output_count(int count)
  */
 int dsp_input_count(int count)
 {
-    dsp = &dsp_conf[current_codec];
-
     /* count is now the number of resampled input samples. Convert to
        original input samples. */
-    if (dsp->frequency != NATIVE_FREQUENCY)
+    if (dsp->resample)
     {
         /* Use the real resampling delta =
          * dsp->frequency * 65536 / NATIVE_FREQUENCY, and
          * round towards zero to avoid buffer overflows. */
         count = (int)(((unsigned long)count *
-                      resample_data[current_codec].delta) >> 16);
+                      dsp->data.resample_data.delta) >> 16);
     }
 
     return count;
@@ -925,20 +1149,39 @@ int dsp_input_count(int count)
 
 int dsp_stereo_mode(void)
 {
-    dsp = &dsp_conf[current_codec];
-    
     return dsp->stereo_mode;
 }
 
 bool dsp_configure(int setting, intptr_t value)
 {
-    dsp = &dsp_conf[current_codec];
+    void set_gain_var(long *var, long value)
+    {
+        /* Voice shouldn't mess with these */
+        if (dsp != audio_dsp)
+            return;
+
+        *var = value;
+        new_gain = true;
+    }
+
+    void update_functions(void)
+    {
+        sample_input_new_format();
+        sample_output_new_format();
+        if (dsp == audio_dsp)
+            dsp_set_crossfeed(crossfeed_enabled);
+    }
 
     switch (setting)
     {
+    case DSP_SWITCH_CODEC:
+        if ((uintptr_t)value <= 1)
+            switch_dsp(&dsp_conf[value]);
+        break;
+
     case DSP_SET_FREQUENCY:
-        memset(&resample_data[current_codec], 0,
-            sizeof(struct resample_data));
+        memset(&dsp->data.resample_data, 0,
+               sizeof (dsp->data.resample_data));
         /* Fall through!!! */
     case DSP_SWITCH_FREQUENCY:
         dsp->codec_frequency = (value == 0) ? NATIVE_FREQUENCY : value;
@@ -946,19 +1189,20 @@ bool dsp_configure(int setting, intptr_t value)
            if we're called from the main audio thread. Voice UI thread should
            not need this feature.
          */
-        if (current_codec == CODEC_IDX_AUDIO)
+        if (dsp == audio_dsp)
             dsp->frequency = pitch_ratio * dsp->codec_frequency / 1000;
         else
             dsp->frequency = dsp->codec_frequency;
-        resampler_set_delta(dsp->frequency); 
-        break;
 
-    case DSP_SET_CLIP_MIN:
-        dsp->clip_min = value;
-        break;
+        resampler_set_delta(dsp->frequency);
 
-    case DSP_SET_CLIP_MAX:
-        dsp->clip_max = value;
+        if (dsp->frequency == NATIVE_FREQUENCY)
+            dsp->resample = NULL;
+        else if (dsp->frequency < NATIVE_FREQUENCY)
+            dsp->resample = dsp_upsample;
+        else
+            dsp->resample = dsp_downsample;
+
         break;
 
     case DSP_SET_SAMPLE_DEPTH:
@@ -967,69 +1211,73 @@ bool dsp_configure(int setting, intptr_t value)
         if (dsp->sample_depth <= NATIVE_DEPTH)
         {
             dsp->frac_bits = WORD_FRACBITS;
-            dsp->sample_bytes = sizeof(short);
-            dsp->clip_max =  ((1 << WORD_FRACBITS) - 1);
-            dsp->clip_min = -((1 << WORD_FRACBITS));
+            dsp->sample_bytes = sizeof (int16_t); /* samples are 16 bits */
+            dsp->data.clip_max =  ((1 << WORD_FRACBITS) - 1);
+            dsp->data.clip_min = -((1 << WORD_FRACBITS));
         }
         else
         {
             dsp->frac_bits = value;
-            dsp->sample_bytes = 4; /* samples are 32 bits */
-            dsp->clip_max = (1 << value) - 1;
-            dsp->clip_min = -(1 << value);
+            dsp->sample_bytes = sizeof (int32_t); /* samples are 32 bits */
+            dsp->data.clip_max = (1 << value) - 1;
+            dsp->data.clip_min = -(1 << value);
         }
 
-        new_sample_conversion();
+        dsp->data.output_scale = dsp->frac_bits + 1 - NATIVE_DEPTH;
+        sample_input_new_format();
         dither_init(); 
         break;
 
     case DSP_SET_STEREO_MODE:
         dsp->stereo_mode = value;
-        dsp->num_channels = value == STEREO_MONO ? 1 : 2;
-        new_sample_conversion();
+        dsp->data.num_channels = value == STEREO_MONO ? 1 : 2;
+        update_functions();
         break;
 
     case DSP_RESET:
         dsp->stereo_mode = STEREO_NONINTERLEAVED;
-        dsp->num_channels = 2;
-        dsp->clip_max =  ((1 << WORD_FRACBITS) - 1);
-        dsp->clip_min = -((1 << WORD_FRACBITS));
-        dsp->track_gain = 0;
-        dsp->album_gain = 0;
-        dsp->track_peak = 0;
-        dsp->album_peak = 0;
-        dsp->codec_frequency = dsp->frequency = NATIVE_FREQUENCY;
+        dsp->data.num_channels = 2;
         dsp->sample_depth = NATIVE_DEPTH;
         dsp->frac_bits = WORD_FRACBITS;
-        dsp->new_gain = true;
-        new_sample_conversion();
+        dsp->sample_bytes = sizeof (int16_t);
+        dsp->data.output_scale = dsp->frac_bits + 1 - NATIVE_DEPTH;
+        dsp->data.clip_max =  ((1 << WORD_FRACBITS) - 1);
+        dsp->data.clip_min = -((1 << WORD_FRACBITS));
+        dsp->codec_frequency = dsp->frequency = NATIVE_FREQUENCY;
+
+        if (dsp == audio_dsp)
+        {
+            track_gain = 0;
+            album_gain = 0;
+            track_peak = 0;
+            album_peak = 0;
+            new_gain   = true;
+        }
+
+        update_functions();
         break;
 
     case DSP_FLUSH:
-        memset(&resample_data[current_codec], 0,
-               sizeof (struct resample_data));
+        memset(&dsp->data.resample_data, 0,
+               sizeof (dsp->data.resample_data));
         resampler_set_delta(dsp->frequency);
         dither_init();
         break;
 
     case DSP_SET_TRACK_GAIN:
-        dsp->track_gain = (long) value;
-        dsp->new_gain = true;
+        set_gain_var(&track_gain, value);
         break;
 
     case DSP_SET_ALBUM_GAIN:
-        dsp->album_gain = (long) value;
-        dsp->new_gain = true;
+        set_gain_var(&album_gain, value);
         break;
 
     case DSP_SET_TRACK_PEAK:
-        dsp->track_peak = (long) value;
-        dsp->new_gain = true;
+        set_gain_var(&track_peak, value);
         break;
 
     case DSP_SET_ALBUM_PEAK:
-        dsp->album_peak = (long) value;
-        dsp->new_gain = true;
+        set_gain_var(&album_peak, value);
         break;
 
     default:
@@ -1039,59 +1287,51 @@ bool dsp_configure(int setting, intptr_t value)
     return 1;
 }
 
-void dsp_set_replaygain(bool always)
+void dsp_set_replaygain(void)
 {
-    dsp = &dsp_conf[current_codec];
-    
-    if (always || dsp->new_gain)
+    long gain = 0;
+
+    new_gain = false;
+
+    if (global_settings.replaygain || global_settings.replaygain_noclip)
     {
-        long gain = 0;
+        bool track_mode = get_replaygain_mode(track_gain != 0,
+            album_gain != 0) == REPLAYGAIN_TRACK;
+        long peak = (track_mode || !album_peak) ? track_peak : album_peak;
 
-        dsp->new_gain = false;
-
-        if (global_settings.replaygain || global_settings.replaygain_noclip)
+        if (global_settings.replaygain)
         {
-            bool track_mode = get_replaygain_mode(dsp->track_gain != 0,
-                dsp->album_gain != 0) == REPLAYGAIN_TRACK;
-            long peak = (track_mode || !dsp->album_peak)
-                ? dsp->track_peak : dsp->album_peak;
+            gain = (track_mode || !album_gain) ? track_gain : album_gain;
 
-            if (global_settings.replaygain)
+            if (global_settings.replaygain_preamp)
             {
-                gain = (track_mode || !dsp->album_gain)
-                    ? dsp->track_gain : dsp->album_gain;
+                long preamp = get_replaygain_int(
+                    global_settings.replaygain_preamp * 10);
 
-                if (global_settings.replaygain_preamp)
-                {
-                    long preamp = get_replaygain_int(
-                        global_settings.replaygain_preamp * 10);
-
-                    gain = (long) (((int64_t) gain * preamp) >> 24);
-                }
-            }
-
-            if (gain == 0)
-            {
-                /* So that noclip can work even with no gain information. */
-                gain = DEFAULT_GAIN;
-            }
-
-            if (global_settings.replaygain_noclip && (peak != 0)
-                && ((((int64_t) gain * peak) >> 24) >= DEFAULT_GAIN))
-            {
-                gain = (((int64_t) DEFAULT_GAIN << 24) / peak);
-            }
-
-            if (gain == DEFAULT_GAIN)
-            {
-                /* Nothing to do, disable processing. */
-                gain = 0;
-
+                gain = (long) (((int64_t) gain * preamp) >> 24);
             }
         }
 
-        /* Store in S8.23 format to simplify calculations. */
-        dsp->replaygain = gain;
-        set_gain();
+        if (gain == 0)
+        {
+            /* So that noclip can work even with no gain information. */
+            gain = DEFAULT_GAIN;
+        }
+
+        if (global_settings.replaygain_noclip && (peak != 0)
+            && ((((int64_t) gain * peak) >> 24) >= DEFAULT_GAIN))
+        {
+            gain = (((int64_t) DEFAULT_GAIN << 24) / peak);
+        }
+
+        if (gain == DEFAULT_GAIN)
+        {
+            /* Nothing to do, disable processing. */
+            gain = 0;
+        }
     }
+
+    /* Store in S8.23 format to simplify calculations. */
+    replaygain = gain;
+    set_gain(audio_dsp);
 }

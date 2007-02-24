@@ -79,8 +79,6 @@ enum codec_status codec_main(void)
     /* Create a decoder instance */
 
     ci->configure(DSP_SET_SAMPLE_DEPTH, MAD_F_FRACBITS);
-    ci->configure(DSP_SET_CLIP_MIN, -MAD_F_ONE);
-    ci->configure(DSP_SET_CLIP_MAX, MAD_F_ONE - 1);
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*16);
 
 next_track:
