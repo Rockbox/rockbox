@@ -58,6 +58,8 @@ static int cached_contrast = DEFAULT_REMOTE_CONTRAST_SETTING;
 
 bool remote_initialized = false;
 
+static void remote_tick(void);
+
 /* Standard low-level byte writer. Requires CLK high on entry */
 static inline void _write_byte(unsigned data)
 {
@@ -335,6 +337,9 @@ void lcd_remote_init_device(void)
     and_l(~0x01000000, &GPIO_OUT);
     and_l(~0x01000000, &GPIO_ENABLE);
     or_l(0x01000000, &GPIO_FUNCTION);
+
+    lcd_remote_clear_display();
+    tick_add_task(remote_tick);
 }
 
 void lcd_remote_on(void)
@@ -390,6 +395,49 @@ void lcd_remote_poweroff(void)
     /* Set power save -> Power OFF (VDD - VSS) .. that's it */
     if (remote_initialized && remote_detect())
         lcd_remote_write_command(LCD_SET_POWER_SAVE | 1);
+}
+
+/* Monitor remote hotswap */
+static void remote_tick(void)
+{
+    static bool last_status = false;
+    static int countdown = 0;
+    static int init_delay = 0;
+    bool current_status;
+
+    current_status = remote_detect();
+
+    /* Only report when the status has changed */
+    if (current_status != last_status)
+    {
+        last_status = current_status;
+        countdown = current_status ? 20*HZ : 1;
+    }
+    else
+    {
+        /* Count down until it gets negative */
+        if (countdown >= 0)
+            countdown--;
+
+        if (current_status)
+        {
+            if (!(countdown % 8))
+            {
+                if (--init_delay <= 0)
+                {
+                    queue_post(&remote_scroll_queue, REMOTE_INIT_LCD, 0);
+                    init_delay = 6;
+                }
+            }
+        }
+        else
+        {
+            if (countdown == 0)
+            {
+                queue_post(&remote_scroll_queue, REMOTE_DEINIT_LCD, 0);
+            }
+        }
+    }
 }
 
 /* Update the display.

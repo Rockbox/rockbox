@@ -73,9 +73,7 @@ static const char scroll_tick_table[16] = {
 
 /* remote hotplug */
 #ifndef SIMULATOR
-static struct event_queue remote_scroll_queue;
-#define REMOTE_INIT_LCD   1
-#define REMOTE_DEINIT_LCD 2
+struct event_queue remote_scroll_queue;
 #endif
 
 /*** parameter handling ***/
@@ -1131,51 +1129,6 @@ void lcd_remote_puts_scroll_style_offset(int x, int y, const unsigned char *stri
         scrolling_lines &= ~(1<<y);
 }
 
-#ifndef SIMULATOR
-/* Monitor remote hotswap */
-static void remote_tick(void)
-{
-    static bool last_status = false;
-    static int countdown = 0;
-    static int init_delay = 0;
-    bool current_status;
-
-    current_status = remote_detect();
-
-    /* Only report when the status has changed */
-    if (current_status != last_status)
-    {
-        last_status = current_status;
-        countdown = current_status ? 20*HZ : 1;
-    }
-    else
-    {
-        /* Count down until it gets negative */
-        if (countdown >= 0)
-            countdown--;
-
-        if (current_status)
-        {
-            if (!(countdown % 8))
-            {
-                if (--init_delay <= 0)
-                {
-                    queue_post(&remote_scroll_queue, REMOTE_INIT_LCD, 0);
-                    init_delay = 6;
-                }
-            }
-        }
-        else
-        {
-            if (countdown == 0)
-            {
-                queue_post(&remote_scroll_queue, REMOTE_DEINIT_LCD, 0);
-            }
-        }
-    }
-}
-#endif
-
 static void scroll_thread(void)
 {
     struct font* pf;
@@ -1279,23 +1232,14 @@ static void scroll_thread(void)
 }
 
 /* LCD init */
-#ifdef SIMULATOR
 void lcd_remote_init(void)
 {
-    create_thread(scroll_thread, scroll_stack,
-                  sizeof(scroll_stack), scroll_name IF_PRIO(, PRIORITY_USER_INTERFACE));
-}
-#else
-void lcd_remote_init(void)
-{
+#ifndef SIMULATOR
     /* Call device specific init */
     lcd_remote_init_device();
-
-    lcd_remote_clear_display();
     /* private queue */
     queue_init(&remote_scroll_queue, false);
-    tick_add_task(remote_tick);
+#endif
     create_thread(scroll_thread, scroll_stack,
                   sizeof(scroll_stack), scroll_name IF_PRIO(, PRIORITY_USER_INTERFACE));
 }
-#endif

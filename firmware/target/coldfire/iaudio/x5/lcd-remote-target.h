@@ -19,6 +19,9 @@
 #ifndef LCD_REMOTE_TARGET_H
 #define LCD_REMOTE_TARGET_H
 
+#define REMOTE_INIT_LCD   1
+#define REMOTE_DEINIT_LCD 2
+
 void lcd_remote_init_device(void);
 void lcd_remote_write_command(int cmd);
 void lcd_remote_write_command_ex(int cmd, int data);
