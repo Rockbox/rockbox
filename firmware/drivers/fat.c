@@ -221,15 +221,6 @@ static long cluster2sec(IF_MV2(struct bpb* fat_bpb,) long cluster)
            + fat_bpb->firstdatasector;
 }
 
-long fat_startsector(IF_MV_NONVOID(int volume))
-{
-#ifndef HAVE_MULTIVOLUME
-    const int volume = 0;
-#endif
-    struct bpb* fat_bpb = &fat_bpbs[volume];
-    return fat_bpb->startsector;
-}
-
 void fat_size(IF_MV2(int volume,) unsigned long* size, unsigned long* free)
 {
 #ifndef HAVE_MULTIVOLUME
@@ -1353,7 +1344,7 @@ static int add_dir_entry(struct fat_dir* dir,
     return 0;
 }
 
-unsigned char char2dos(unsigned char c, int* randomize)
+static unsigned char char2dos(unsigned char c, int* randomize)
 {
     switch(c)
     {
@@ -1829,7 +1820,7 @@ static int free_direntries(struct fat_file* file)
         rc = fat_seek(&dir, sector);
         if (rc < 0)
             return rc * 10 - 7;
-            
+
         rc = fat_readwrite(&dir, 1, buf, true);
         if (rc < 1)
             return rc * 10 - 8;

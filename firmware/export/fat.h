@@ -86,12 +86,13 @@ struct fat_dir
 extern void fat_init(void);
 extern int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) long startsector);
 extern int fat_unmount(int volume, bool flush);
-extern void fat_size(IF_MV2(int volume,) unsigned long* size, unsigned long* free); // public for info
-extern void fat_recalc_free(IF_MV_NONVOID(int volume)); // public for debug info screen
+extern void fat_size(IF_MV2(int volume,) /* public for info */
+                     unsigned long* size,
+                     unsigned long* free);
+extern void fat_recalc_free(IF_MV_NONVOID(int volume)); /* public for debug info screen */
 extern int fat_create_dir(const char* name,
                           struct fat_dir* newdir,
                           struct fat_dir* dir);
-extern long fat_startsector(IF_MV_NONVOID(int volume)); // public for config sector
 extern int fat_open(IF_MV2(int volume,)
                     long cluster,
                     struct fat_file* ent,
@@ -114,7 +115,7 @@ extern int fat_opendir(IF_MV2(int volume,)
                        struct fat_dir *ent, unsigned long currdir,
                        const struct fat_dir *parent_dir);
 extern int fat_getnext(struct fat_dir *ent, struct fat_direntry *entry);
-extern unsigned int fat_get_cluster_size(IF_MV_NONVOID(int volume));
+extern unsigned int fat_get_cluster_size(IF_MV_NONVOID(int volume)); /* public for debug info screen */
 extern bool fat_ismounted(int volume);
 
 #endif
