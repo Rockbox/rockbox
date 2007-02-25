@@ -85,7 +85,7 @@ drivers/lcd-16bit.c
 
 #ifdef HAVE_REMOTE_LCD
 #if LCD_REMOTE_DEPTH == 1
-drivers/lcd-h100-remote.c
+drivers/lcd-remote-1bit-v.c
 #elif LCD_REMOTE_DEPTH == 2
 drivers/lcd-remote-2bit-vi.c
 #endif /* LCD_REMOTE_DEPTH */
@@ -378,6 +378,7 @@ target/coldfire/iriver/h300/power-h300.c
 target/coldfire/ata-as-coldfire.S
 target/coldfire/pcf50606-coldfire.c
 target/coldfire/iriver/ata-iriver.c
+target/coldfire/iriver/lcd-remote-iriver.c
 target/coldfire/iriver/system-iriver.c
 target/coldfire/iriver/h300/adc-h300.c
 target/coldfire/iriver/h300/backlight-h300.c
@@ -397,6 +398,7 @@ target/coldfire/iriver/h100/power-h100.c
 #ifndef SIMULATOR
 target/coldfire/ata-as-coldfire.S
 target/coldfire/iriver/ata-iriver.c
+target/coldfire/iriver/lcd-remote-iriver.c
 target/coldfire/iriver/system-iriver.c
 target/coldfire/iriver/h100/adc-h100.c
 target/coldfire/iriver/h100/backlight-h100.c

@@ -27,13 +27,20 @@
 
 #ifdef HAVE_REMOTE_LCD
 
+#if defined(TARGET_TREE) && !defined(SIMULATOR)
+#include "lcd-remote-target.h"
+#endif
+
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
 #define REMOTETYPE_UNPLUGGED 0
 #define REMOTETYPE_H100_LCD 1
 #define REMOTETYPE_H300_LCD 2
 #define REMOTETYPE_H300_NONLCD 3
-extern int remote_type(void);
-extern bool remote_detect(void);
+int remote_type(void);
+#endif
+
+#ifndef SIMULATOR
+extern struct event_queue remote_scroll_queue;
 #endif
 
 #define STYLE_DEFAULT 0
@@ -105,7 +112,6 @@ extern fb_remote_data lcd_remote_framebuffer[LCD_REMOTE_FBHEIGHT][LCD_REMOTE_FBW
 extern void lcd_remote_init(void);
 extern int  lcd_remote_default_contrast(void);
 extern void lcd_remote_set_contrast(int val);
-extern void lcd_remote_emireduce(bool state);
 
 extern void lcd_remote_clear_display(void);
 extern void lcd_remote_puts(int x, int y, const unsigned char *str);
