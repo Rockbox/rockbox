@@ -206,6 +206,8 @@ static int get_tag(int *tag)
     MATCH(tag, buf, "year", tag_year);
     MATCH(tag, buf, "playcount", tag_playcount);
     MATCH(tag, buf, "lastplayed", tag_lastplayed);
+    MATCH(tag, buf, "commitid", tag_commitid);
+    MATCH(tag, buf, "entryage", tag_virt_entryage);
     MATCH(tag, buf, "autoscore", tag_virt_autoscore);
     MATCH(tag, buf, "%sort", var_sorttype);
     MATCH(tag, buf, "%limit", var_limit);

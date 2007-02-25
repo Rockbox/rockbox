@@ -112,13 +112,13 @@ static const int unique_tags[] = { tag_artist, tag_album, tag_genre,
 
 /* Numeric tags (we can use these tags with conditional clauses). */
 static const int numeric_tags[] = { tag_year, tag_tracknumber, tag_length, 
-    tag_bitrate, tag_playcount, tag_playtime, tag_lastplayed, 
-    tag_virt_autoscore };
+    tag_bitrate, tag_playcount, tag_playtime, tag_lastplayed, tag_commitid,
+    tag_virt_entryage, tag_virt_autoscore };
 
 /* String presentation of the tags defined in tagcache.h. Must be in correct order! */
 static const char *tags_str[] = { "artist", "album", "genre", "title", 
     "filename", "composer", "comment", "albumartist", "year", "tracknumber", 
-    "bitrate", "length", "playcount", "playtime", "lastplayed" };
+    "bitrate", "length", "playcount", "playtime", "lastplayed", "commitid" };
 
 /* Status information of the tagcache. */
 static struct tagcache_stat tc_stat;
@@ -158,15 +158,17 @@ struct tagcache_header {
 struct master_header {
     struct tagcache_header tch;
     long serial; /* Increasing counting number */
+    long commitid; /* Number of commits so far */
+    long dirty;
 };
 
 /* For the endianess correction */
 static const char *tagfile_entry_ec   = "ss";
-static const char *index_entry_ec     = "llllllllllllllll"; /* (1 + TAG_COUNT) * l */
+static const char *index_entry_ec     = "lllllllllllllllll"; /* (1 + TAG_COUNT) * l */
 static const char *tagcache_header_ec = "lll";
-static const char *master_header_ec   = "llll";
+static const char *master_header_ec   = "llllll";
 
-static long current_serial;
+static struct master_header current_tcmh;
 
 #ifdef HAVE_TC_RAMCACHE
 /* Header is created when loading database to ram. */
@@ -658,6 +660,11 @@ static long check_virtual_tags(int tag, const struct index_entry *idx)
             }
             break;
         
+        /* How many commits before the file has been added to the DB. */
+        case tag_virt_entryage:
+            data = current_tcmh.commitid - idx->tag_seek[tag_commitid] - 1;
+            break;
+        
         default:
             data = idx->tag_seek[tag];
     }
@@ -1048,6 +1055,39 @@ static int open_master_fd(struct master_header *hdr, bool write)
     return fd;
 }
 
+static bool check_all_headers(void)
+{
+    struct master_header myhdr;
+    struct tagcache_header tch;
+    int tag;
+    int fd;
+    
+    if ( (fd = open_master_fd(&myhdr, false)) < 0)
+        return false;
+    
+    close(fd);
+    if (myhdr.dirty)
+    {
+        logf("tagcache is dirty!");
+        return false;
+    }
+    
+    memcpy(&current_tcmh, &myhdr, sizeof(struct master_header));
+    
+    for (tag = 0; tag < TAG_COUNT; tag++)
+    {
+        if (tagcache_is_numeric_tag(tag))
+            continue;
+        
+        if ( (fd = open_tag_fd(&tch, tag, false)) < 0)
+            return false;
+        
+        close(fd);
+    }
+    
+    return true;
+}
+
 bool tagcache_search(struct tagcache_search *tcs, int tag)
 {
     struct tagcache_header tag_hdr;
@@ -1321,6 +1361,36 @@ bool tagcache_retrieve(struct tagcache_search *tcs, int idxid,
         return false;
     
     return retrieve(tcs, &idx, tag, buf, size);
+}
+
+static bool update_master_header(void)
+{
+    struct master_header myhdr;
+    int fd;
+    
+    if (!tc_stat.ready)
+        return false;
+    
+    if ( (fd = open_master_fd(&myhdr, true)) < 0)
+        return false;
+    
+    myhdr.serial = current_tcmh.serial;
+    myhdr.commitid = current_tcmh.commitid;
+    
+    /* Write it back */
+    lseek(fd, 0, SEEK_SET);
+    ecwrite(fd, &myhdr, 1, master_header_ec, tc_stat.econ);
+    close(fd);
+    
+#ifdef HAVE_TC_RAMCACHE
+    if (hdr)
+    {
+        hdr->h.serial = current_tcmh.serial;
+        hdr->h.commitid = current_tcmh.commitid;
+    }
+#endif
+    
+    return true;
 }
 
 #if 0
@@ -1819,7 +1889,7 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
 
     while (entries_processed < h->entry_count)
     {
-        int count = MIN(h->entry_count, max_entries);
+        int count = MIN(h->entry_count - entries_processed, max_entries);
          
         /* Read in as many entries as possible. */
         for (i = 0; i < count; i++)
@@ -1858,6 +1928,12 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
                 idx.tag_seek[j] = entrybuf[i].tag_offset[j];
             }
             idx.flag = entrybuf[i].flag;
+            
+            if (tc_stat.ready && current_tcmh.commitid > 0)
+            {
+                idx.tag_seek[tag_commitid] = current_tcmh.commitid;
+                idx.flag |= FLAG_DIRTYNUM;
+            }
             
             /* Write back the updated index. */
             lseek(masterfd, loc, SEEK_SET);
@@ -1909,6 +1985,8 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
         commit_entry_count += tcmh.tch.entry_count;
         close(masterfd);
     }
+    else
+        remove_files(); /* Just to be sure we are clean. */
 
     /* Open the index file, which contains the tag names. */
     fd = open_tag_fd(&tch, index_type, true);
@@ -2065,7 +2143,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
 
     if (masterfd < 0)
     {
-        logf("Creating new index");
+        logf("Creating new DB");
         masterfd = open(TAGCACHE_FILE_MASTER, O_WRONLY | O_CREAT | O_TRUNC);
 
         if (masterfd < 0)
@@ -2080,10 +2158,10 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
         tcmh.tch = *h;
         tcmh.tch.entry_count = 0;
         tcmh.tch.datasize = 0;
+        tcmh.dirty = true;
         ecwrite(masterfd, &tcmh, 1, master_header_ec, tc_stat.econ);
         init = true;
         masterfd_pos = lseek(masterfd, 0, SEEK_CUR);
-        current_serial = 0;
     }
     else
     {
@@ -2461,6 +2539,10 @@ static bool commit(void)
     
     logf("commit %d entries...", tch.entry_count);
     
+    /* Mark DB dirty so it will stay disabled if commit fails. */
+    current_tcmh.dirty = true;
+    update_master_header();
+    
     /* Now create the index files. */
     tc_stat.commit_step = 0;
     tch.datasize = 0;
@@ -2489,7 +2571,16 @@ static bool commit(void)
         }
     }
     
-    build_numeric_indices(&tch, tmpfd);
+    if (!build_numeric_indices(&tch, tmpfd))
+    {
+        logf("Failure to commit numeric indices");
+        close(tmpfd);
+        remove_files();
+        tc_stat.commit_step = 0;
+        read_lock--;
+        return false;
+    }
+    
     close(tmpfd);
     tc_stat.commit_step = 0;
     
@@ -2504,6 +2595,8 @@ static bool commit(void)
     tcmh.tch.datasize = sizeof(struct master_header) 
         + sizeof(struct index_entry) * tcmh.tch.entry_count
         + tch.datasize;
+    tcmh.dirty = false;
+    tcmh.commitid++;
 
     lseek(masterfd, 0, SEEK_SET);
     ecwrite(masterfd, &tcmh, 1, master_header_ec, tc_stat.econ);
@@ -2511,7 +2604,7 @@ static bool commit(void)
     
     logf("tagcache committed");
     remove(TAGCACHE_FILE_TEMP);
-    tc_stat.ready = true;
+    tc_stat.ready = check_all_headers();
     
     if (local_allocation)
     {
@@ -2563,47 +2656,31 @@ static void free_tempbuf(void)
     tempbuf_size = 0;
 }
 
-static bool update_current_serial(long serial)
-{
-    struct master_header myhdr;
-    int fd;
-    
-    if ( (fd = open_master_fd(&myhdr, true)) < 0)
-        return false;
-    
-    myhdr.serial = serial;
-    current_serial = serial;
-    
-#ifdef HAVE_TC_RAMCACHE
-    if (hdr)
-        hdr->h.serial = serial;
-#endif
-    
-    /* Write it back */
-    lseek(fd, 0, SEEK_SET);
-    ecwrite(fd, &myhdr, 1, master_header_ec, tc_stat.econ);
-    close(fd);
-    
-    return true;
-}
-
 long tagcache_increase_serial(void)
 {
+    long old;
+    
     if (!tc_stat.ready)
         return -2;
     
     while (read_lock)
         sleep(1);
     
-    if (!update_current_serial(current_serial + 1))
+    old = current_tcmh.serial++;
+    if (!update_master_header())
         return -1;
     
-    return current_serial;
+    return old;
 }
 
 long tagcache_get_serial(void)
 {
-    return current_serial;
+    return current_tcmh.serial;
+}
+
+long tagcache_get_commitid(void)
+{
+    return current_tcmh.commitid;
 }
 
 static bool modify_numeric_entry(int masterfd, int idx_id, int tag, long data)
@@ -2745,7 +2822,8 @@ static int parse_changelog_line(int line_n, const char *buf, void *parameters)
     char tag_data[TAG_MAXLEN+32];
     int idx_id;
     long masterfd = (long)parameters;
-    const int import_tags[] = { tag_playcount, tag_playtime, tag_lastplayed };
+    const int import_tags[] = { tag_playcount, tag_playtime, tag_lastplayed,
+        tag_commitid };
     int i;
     (void)line_n;
     
@@ -2796,8 +2874,10 @@ static int parse_changelog_line(int line_n, const char *buf, void *parameters)
         
         idx.tag_seek[import_tags[i]] = data;
         
-        if (import_tags[i] == tag_lastplayed && data > current_serial)
-            current_serial = data;
+        if (import_tags[i] == tag_lastplayed && data > current_tcmh.serial)
+            current_tcmh.serial = data;
+        else if (import_tags[i] == tag_commitid && data >= current_tcmh.commitid)
+            current_tcmh.commitid = data + 1;
     }
     
     return write_index(masterfd, idx_id, &idx) ? 0 : -5;
@@ -2846,7 +2926,7 @@ bool tagcache_import_changelog(void)
     
     write_lock--;
     
-    update_current_serial(current_serial);
+    update_master_header();
     
     return true;
 }
@@ -3646,33 +3726,6 @@ void tagcache_unload_ramcache(void)
 }
 #endif
 
-static bool check_all_headers(void)
-{
-    struct master_header myhdr;
-    struct tagcache_header tch;
-    int tag;
-    int fd;
-    
-    if ( (fd = open_master_fd(&myhdr, false)) < 0)
-        return false;
-    
-    close(fd);
-    current_serial = myhdr.serial;
-    
-    for (tag = 0; tag < TAG_COUNT; tag++)
-    {
-        if (tagcache_is_numeric_tag(tag))
-            continue;
-        
-        if ( (fd = open_tag_fd(&tch, tag, false)) < 0)
-            return false;
-        
-        close(fd);
-    }
-    
-    return true;
-}
-
 #ifndef __PCTOOL__
 static void tagcache_thread(void)
 {
@@ -3870,8 +3923,8 @@ bool tagcache_is_ramcache(void)
 void tagcache_init(void)
 {
     memset(&tc_stat, 0, sizeof(struct tagcache_stat));
+    memset(&current_tcmh, 0, sizeof(struct master_header));
     filenametag_fd = -1;
-    current_serial = 0;
     write_lock = read_lock = 0;
     
 #ifndef __PCTOOL__

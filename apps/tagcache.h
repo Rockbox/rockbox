@@ -23,12 +23,13 @@
 #include "id3.h"
 
 enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
-    tag_filename, tag_composer, tag_comment, tag_albumartist, tag_year, tag_tracknumber,
-    tag_bitrate, tag_length, tag_playcount, tag_playtime, tag_lastplayed, 
+    tag_filename, tag_composer, tag_comment, tag_albumartist, tag_year, 
+    tag_tracknumber, tag_bitrate, tag_length, tag_playcount, tag_playtime, 
+    tag_lastplayed, tag_commitid,
     /* Virtual tags */
-    tag_virt_autoscore };
+    tag_virt_entryage, tag_virt_autoscore };
 
-#define TAG_COUNT 15
+#define TAG_COUNT 16
 
 /* Maximum length of a single tag. */
 #define TAG_MAXLEN (MAX_PATH*2)
@@ -40,7 +41,7 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 #define IDX_BUF_DEPTH 64
 
 /* Tag Cache Header version 'TCHxx'. Increment when changing internal structures. */
-#define TAGCACHE_MAGIC  0x54434807
+#define TAGCACHE_MAGIC  0x54434808
 
 /* How much to allocate extra space for ramcache. */
 #define TAGCACHE_RESERVE 32768
