@@ -242,6 +242,11 @@ void system_init(void)
                   "movclr.l %%acc3, %%d0\n\t"
                   : : : "d0");
 
+    /* Set EMAC unit to fractional mode with saturation, since that's
+       what'll be the most useful for most things which the main thread
+       will do. */
+    coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
+
     /* Set INTBASE and SPURVEC */
     INTBASE = 64;
     SPURVEC = 24;
