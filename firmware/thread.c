@@ -141,6 +141,13 @@ static inline void load_context(const void* addr)
     );
 }
 
+/* Set EMAC unit to fractional mode with saturation for each new thread,
+   since that's what'll be the most useful for most things which the dsp
+   will do. Codecs should still initialize their preferred modes
+   explicitly. */
+#define THREAD_CPU_INIT(core, thread) \
+    ({ (thread)->context.macsr = EMAC_FRACTIONAL | EMAC_SATURATE; })
+
 #elif CONFIG_CPU == SH7034
 /*---------------------------------------------------------------------------
  * Store non-volatile context.
@@ -191,6 +198,11 @@ static inline void load_context(const void* addr)
     );
 }
 
+#endif
+
+#ifndef THREAD_CPU_INIT
+/* No cpu specific init - make empty */
+#define THREAD_CPU_INIT(core, thread)
 #endif
 
 static void add_to_list(struct thread_entry **list, struct thread_entry *thread)
@@ -660,6 +672,10 @@ struct thread_entry*
     regs->sp = (void*)(((unsigned int)stack + stack_size) & ~3);
     regs->start = (void*)function;
 
+    /* Do any CPU specific inits after initializing common items
+       to have access to valid data */
+    THREAD_CPU_INIT(core, thread);
+
     return thread;
 }
 
@@ -753,10 +769,12 @@ void init_threads(void)
      * probably a much better way to do this. */
     if (core == CPU)
     {
+        THREAD_CPU_INIT(core, &cores[CPU].threads[0]);
         cores[CPU].threads[0].stack = stackbegin;
         cores[CPU].threads[0].stack_size = (int)stackend - (int)stackbegin;
     } else {
 #if NUM_CORES > 1  /* This code path will not be run on single core targets */
+        THREAD_CPU_INIT(core, &cores[COP].threads[0]);
         cores[COP].threads[0].stack = cop_stackbegin;
         cores[COP].threads[0].stack_size =
             (int)cop_stackend - (int)cop_stackbegin;

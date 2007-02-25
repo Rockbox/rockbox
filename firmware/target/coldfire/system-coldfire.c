@@ -234,16 +234,13 @@ void (* const vbr[]) (void) __attribute__ ((section (".vectors"))) =
 void system_init(void)
 {
     /* Clear the accumulators. From here on it's the responsibility of
-       whoever uses them to clear them after use (use movclr instruction). */
+       whoever uses them to clear them after use and before giving control
+       to "foreign" code (use movclr instruction). */
     asm volatile ("movclr.l %%acc0, %%d0\n\t"
                   "movclr.l %%acc1, %%d0\n\t"
                   "movclr.l %%acc2, %%d0\n\t"
                   "movclr.l %%acc3, %%d0\n\t"
                   : : : "d0");
-    /* Set EMAC unit to fractional mode with saturation, since that's
-       what'll be the most useful for most things which the main thread
-       will do. */
-    coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
 
     /* Set INTBASE and SPURVEC */
     INTBASE = 64;
