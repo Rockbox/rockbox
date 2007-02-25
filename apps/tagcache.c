@@ -2641,11 +2641,11 @@ bool tagcache_modify_numeric_entry(struct tagcache_search *tcs,
 
 static bool write_tag(int fd, const char *tagstr, const char *datastr)
 {
-    char buf[256];
+    char buf[512];
     int i;
     
     snprintf(buf, sizeof buf, "%s=\"", tagstr);
-    for (i = strlen(buf); i < (long)sizeof(buf)-2; i++)
+    for (i = strlen(buf); i < (long)sizeof(buf)-3; i++)
     {
         if (*datastr == '\0')
             break;
