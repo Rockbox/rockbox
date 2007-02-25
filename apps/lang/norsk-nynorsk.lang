@@ -784,20 +784,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FIRMWARE
-  desc: in the main menu
-  user:
-  <source>
-    *: "Browse Firmwares"
-  </source>
-  <dest>
-    *: "Sjå fastvarefiler"
-  </dest>
-  <voice>
-    *: "Sjå fastvarefiler"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RESET
   desc: in system_settings_menu()
   user:
@@ -831,10 +817,17 @@
   user:
   <source>
     *: "PLAY = Yes"
+    h100,h120,h300: "NAVI = Yes"
+    ipod*: "SELECT = Yes"
+    x5: "SELECT = Yes"
+    h10: "NEXT = Yes"
   </source>
   <dest>
     *: "SPEL = ja"
     h100,h120,h300: "NAVI = ja"
+    ipod*: "VEL = ja"
+    x5: "VEL = ja"
+    h10: "NESTE = ja"
   </dest>
   <voice>
     *: ""
@@ -1657,7 +1650,7 @@
   desc: in settings menu
   user:
   <source>
-    *: "Tag Cache"
+    *: "Database"
   </source>
   <dest>
     *: "Songinfolager"
@@ -1727,7 +1720,7 @@
   desc: while initializing tagcache on boot
   user:
   <source>
-    *: "Committing tagcache"
+    *: "Committing database"
   </source>
   <dest>
     *: "Lagrar songinfo-oversikt"
@@ -1923,13 +1916,13 @@
   desc: show ID3 Database
   user:
   <source>
-    *: "ID3 Database"
+    *: "Database"
   </source>
   <dest>
-    *: "ID3-database"
+    *: "Database"
   </dest>
   <voice>
-    *: "ID3-database"
+    *: "Database"
   </voice>
 </phrase>
 <phrase>
@@ -2610,12 +2603,15 @@
   user:
   <source>
     *: "Mic"
+    h100,h120,h300: "Internal Mic"
   </source>
   <dest>
     *: "Mikrofon"
+    h100,h120,h300: "Intern mikrofon"
   </dest>
   <voice>
     *: "Mikrofon"
+    h100,h120,h300: "Intern mikrofon"
   </voice>
 </phrase>
 <phrase>
@@ -3809,20 +3805,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_POWEROFF
-  desc: disk poweroff flag
-  user:
-  <source>
-    *: "Disk Poweroff"
-  </source>
-  <dest>
-    *: "Diskavslåing"
-  </dest>
-  <voice>
-    *: "Diskavslåing"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_DIRCACHE_ENABLE
   desc: in directory cache settings
   user:
@@ -3834,20 +3816,6 @@
   </dest>
   <voice>
     *: "Snøggminne for mappe"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRCACHE_REBOOT
-  desc: when activating directory cache
-  user:
-  <source>
-    *: "Please reboot to enable the cache"
-  </source>
-  <dest>
-    *: "Start spelaren på nytt for å slå på snøggminnet"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4485,10 +4453,14 @@
   desc: battery level in % and estimated time remaining
   user:
   <source>
-    *: "%d%% %dh %dm"
+    *: "Battery: %d%% %dh %dm"
+    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "%d%% %dh %dm"
+    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "Bat.: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Batterinivå"
@@ -4682,9 +4654,17 @@
   user:
   <source>
     *: "OFF = Exit"
+    h100,h120,h300: "STOP = Exit"
+    ipod*: "PLAY/PAUSE = Exit"
+    x5: "RECORD = Exit"
+    h10: "PREV = Exit"
   </source>
   <dest>
-    *: "Av = avslutt"
+    *: "AV = avslutt"
+    h100,h120,h300: "STOPP = avslutt"
+    ipod*: "SPEL/PAUSE = avslutt"
+    x5: "OPPTAK = avslutt"
+    h10: "FØRRE = avslutt"
   </dest>
   <voice>
     *: ""
@@ -4738,10 +4718,17 @@
   user:
   <source>
     *: "PLAY = Select"
+    h100,h120,h300: "NAVI = Select"
+    ipod*: "SELECT = Select"
+    x5: "SELECT = Select"
+    h10: "NEXT = Select"
   </source>
   <dest>
     *: "SPEL = vel"
     h100,h120,h300: "NAVI = vel"
+    ipod*: "VEL = vel"
+    x5: "VEL = vel"
+    h10: "NESTE = vel"
   </dest>
   <voice>
     *: ""
@@ -4753,10 +4740,17 @@
   user:
   <source>
     *: "ON+Play = Delete"
+    h100,h120,h300: "RECORD = Delete"
+    ipod*: "Long MENU = Delete"
+    x5: "Long RECORD = Delete"
+    h10: "REWIND = Delete"
   </source>
   <dest>
     *: "PÅ+SPEL = slett"
-    h100,h120,h300: "PÅ+NAVI = slett"
+    h100,h120,h300: "OPPTAK = slett"
+    ipod*: "MENY lenge = slett"
+    x5: "OPPTAK lenge = slett"
+    h10: "BAKOVER = slett"
   </dest>
   <voice>
     *: ""
@@ -4838,9 +4832,17 @@
   user:
   <source>
     *: "ON To Set"
+    h100,h120,h300: "NAVI = Set"
+    ipod*: "SELECT = Set"
+    x5: "SELECT = Set"
+    h10: "NEXT = Set"
   </source>
   <dest>
     *: "PÅ for å velja"
+    h100,h120,h300: "NAVI = vel"
+    ipod*: "VEL = vel"
+    x5: "VEL = vel"
+    h10: "NESTE = vel"
   </dest>
   <voice>
     *: ""
@@ -4852,9 +4854,17 @@
   user:
   <source>
     *: "OFF To Revert"
+    h100,h120,h300: "STOP = Revert"
+    ipod*: "MENU = Revert"
+    x5: "RECORD = Revert"
+    h10: "PREV = Revert"
   </source>
   <dest>
     *: "AV for å tilbakestilla"
+    h100,h120,h300: "STOPP = tilbakestill"
+    ipod*: "MENY = tilbakestill"
+    x5: "OPPTAK = tilbakestill"
+    h10: "FØRRE = tilbakestill"
   </dest>
   <voice>
     *: ""
@@ -5048,9 +5058,11 @@
   user:
   <source>
     *: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
   </source>
   <dest>
     *: "Disken er full. Trykk AV for å halda fram."
+    h100,h120,h300: "Diskern er full. Trykk STOPP for å halda fram."
   </dest>
   <voice>
     *: ""
@@ -7820,9 +7832,17 @@
   user:
   <source>
     *: "OFF to abort"
+    h100,h120,h300: "STOP to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    x5: "Long PLAY to abort"
+    h10: "PREV to abort"
   </source>
   <dest>
     *: "AV for å avbryta"
+    h100,h120,h300: "STOPP for å avbryta"
+    ipod*: "SPEL/PAUSE for å avbryta"
+    x5: "SPEL (lenge) for å avbryta"
+    h10: "FØRRE for å avbryta"
   </dest>
   <voice>
     *: ""
@@ -8351,7 +8371,7 @@
   desc: When you run the radio without an fmr file in settings
   user:
   <source>
-    *: "No Settings found, AutoScan?"
+    *: "No settings found. Autoscan?"
   </source>
   <dest>
     *: "Fann ingen innstilligar. Vil du søkja automatisk?"
@@ -8458,7 +8478,7 @@
   id: LANG_TAGCACHE_BUSY
   desc: when trying to shutdown and tagcache is committing
   <source>
-    *: "Tagcache is not ready"
+    *: "Database is not ready"
   </source>
   <dest>
     *: "Songinfolageret er ikkje klart enno"
@@ -8514,7 +8534,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Auto update"
+    *: "Auto Update"
   </source>
   <dest>
     *: "Automatisk oppdatering"
@@ -8528,7 +8548,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Update now"
+    *: "Update Now"
   </source>
   <dest>
     *: "Oppdater songinfolager"
@@ -8542,7 +8562,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Export modifications"
+    *: "Export Modifications"
   </source>
   <dest>
     *: "Eksporter endringar"
@@ -8570,7 +8590,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Import modifications"
+    *: "Import Modifications"
   </source>
   <dest>
     *: "Hent inn endringar"
@@ -8625,7 +8645,7 @@
   desc: in onplay menu
   user:
   <source>
-    *: "Playlist catalog"
+    *: "Playlist Catalog"
   </source>
   <dest>
     *: "Spelelistekatalog"
@@ -8652,7 +8672,7 @@
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "Add to new playlist"
+    *: "Add to New Playlist"
   </source>
   <dest>
     *: "Legg til ny speleliste"
@@ -8679,7 +8699,7 @@
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "Add to playlist"
+    *: "Add to Playlist"
   </source>
   <dest>
     *: "Legg til speleliste"
@@ -8720,7 +8740,7 @@
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "View catalog"
+    *: "View Catalog"
   </source>
   <dest>
     *: "Vis katalog"
@@ -8748,7 +8768,7 @@
   desc: error message when no playlists for playlist catalog
   user:
   <source>
-    *: "No playlists"
+    *: "No Playlists"
   </source>
   <dest>
     *: "Ingen spelelister"
@@ -9042,7 +9062,7 @@
   desc: show ID3 Database
   user:
   <source>
-    *: "ID3 Database"
+    *: "Database"
   </source>
   <dest>
     *: "ID3-database"
@@ -9098,13 +9118,13 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Mic"
+    *: "Int. Mic"
   </source>
   <dest>
-    *: "Mikrofon"
+    *: "Intern mikrofon"
   </dest>
   <voice>
-    *: "Mikrofon"
+    *: "Intern mikrofon"
   </voice>
 </phrase>
 <phrase>
@@ -9365,9 +9385,11 @@
   user:
   <source>
     *: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
   </source>
   <dest>
     *: "Disken er full. Trykk AV for å halda fram."
+    h100,h120,h300: "Disken er full. Trykk STOPP for å halda fram."
   </dest>
   <voice>
     *: ""
@@ -9757,7 +9779,7 @@
 </phrase>
 <phrase>
   id: VOICE_KBIT_PER_SEC
-  desc: spoken only, for file extension
+  desc: spoken only, a unit postfix
   user:
   <source>
     *: ""
@@ -9801,7 +9823,7 @@
   desc: in pause_phones_menu.
   user:
   <source>
-    *: "Duration to rewind"
+    *: "Duration to Rewind"
   </source>
   <dest>
     *: "Lengd å spola tilbake"
@@ -9815,7 +9837,7 @@
   desc: in settings_menu.
   user:
   <source>
-    *: "Pause on headphone unplug"
+    *: "Pause on Headphone Unplug"
   </source>
   <dest>
     *: "Pause ved fjerning av hovudtelefon"
@@ -9868,7 +9890,7 @@
   desc: in pause_phones_menu.
   user:
   <source>
-    *: "Disable auto-resume if phones not present"
+    *: "Disable resume on startup if phones unplugged"
   </source>
   <dest>
     *: "Slå av autoframhald viss ikkje hovudtelefon er kopla til"
@@ -9980,5 +10002,476 @@
   </dest>
   <voice>
     *: "AGC maksimum forsterking"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_PCM_WAV
+  desc: audio format description
+  user:
+  <source>
+    *: "PCM Wave"
+  </source>
+  <dest>
+    *: "PCM-lyd"
+  </dest>
+  <voice>
+    *: "PCM-lyd"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PITCH_DOWN_SEMITONE
+  desc: in wps
+  user:
+  <source>
+    *: "Semitone Down"
+  </source>
+  <dest>
+    *: "Halvtone ned"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMMENT
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Comment]"
+  </source>
+  <dest>
+    *: "[Merknad]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_WAVPACK
+  desc: audio format description
+  user:
+  <source>
+    *: "WavPack"
+  </source>
+  <dest>
+    *: "WavPack"
+  </dest>
+  <voice>
+    *: "WavPack"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_CHARGING
+  desc: in Battery menu
+  user:
+  <source>
+    *: "Charge During USB Connection"
+  </source>
+  <dest>
+    *: "Lad batteri ved USB-samband"
+  </dest>
+  <voice>
+    *: "Lad batteri ved USB-samband"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOURCE_FREQUENCY
+  desc: when recording source frequency setting must follow source
+  user:
+  <source>
+    *: "(Same As Source)"
+  </source>
+  <dest>
+    *: "(same som kjelda)"
+  </dest>
+  <voice>
+    *: "same som kjelda"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PITCH_UP_SEMITONE
+  desc: in wps
+  user:
+  <source>
+    *: "Semitone Up"
+  </source>
+  <dest>
+    *: "Halvtone opp"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARNING_BATTERY_LOW
+  desc: general warning
+  user:
+  <source>
+    *: "WARNING! Low Battery!"
+  </source>
+  <dest>
+    *: "ÅTVARING! Snart tomt batteri!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENCODER_SETTINGS
+  desc: encoder settings
+  user:
+  <source>
+    *: "Encoder Settings"
+  </source>
+  <dest>
+    *: "Omkodingsoppsett"
+  </dest>
+  <voice>
+    *: "Omkodingsoppsett"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_FORMAT
+  desc: audio format item in recording menu
+  user:
+  <source>
+    *: "Format"
+  </source>
+  <dest>
+    *: "Format"
+  </dest>
+  <voice>
+    *: "Format"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_TRACKSKIP
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Shuffle and Track Skip"
+  </source>
+  <dest>
+    *: "Omstokking og sporendring"
+  </dest>
+  <voice>
+    *: "Omstokking og sporendring"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BITRATE
+  desc: bits-kilobits per unit time
+  user:
+  <source>
+    *: "Bitrate"
+  </source>
+  <dest>
+    *: "Bitrate"
+  </dest>
+  <voice>
+    *: "Bitrate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Top Time"
+  </source>
+  <dest>
+    *: "Lengste tid"
+  </dest>
+  <voice>
+    *: "Lengste tid"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RANDOM
+  desc: random folder
+  <source>
+    *: "Random"
+  </source>
+  <dest>
+    *: "Tilfeldig"
+  </dest>
+  <voice>
+    *: "Tilfeldig"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_NEWFILESTP
+  desc: trigger types
+  <source>
+    *: "New file"
+  </source>
+  <dest>
+    *: "Ny fil"
+  </dest>
+  <voice>
+    *: "Ny fil"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_THEME
+  desc: save a theme file
+  user:
+  <source>
+    *: "Save Theme Settings"
+  </source>
+  <dest>
+    *: "Lagra temaoppsett"
+  </dest>
+  <voice>
+    *: "Lagra temaoppsett"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_AIFF
+  desc: audio format description
+  user:
+  <source>
+    *: "AIFF"
+  </source>
+  <dest>
+    *: "AIFF"
+  </dest>
+  <voice>
+    *: "AIFF"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_SETTINGS
+  desc: when something has settings in a certain context
+  user:
+  <source>
+    *: "(No Settings)"
+  </source>
+  <dest>
+    *: "(ingen innstillingar)"
+  </dest>
+  <voice>
+    *: "Ingen innstillingar tilgjengeleg"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLACE
+  desc: in onplay menu.  Replace the current playlist with a new one.
+  user:
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "Spel neste"
+  </dest>
+  <voice>
+    *: "Spel neste"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARNING_BATTERY_EMPTY
+  desc: general warning
+  user:
+  <source>
+    *: "Battery empty! RECHARGE!"
+  </source>
+  <dest>
+    *: "Tomt batteri! DU MÅ LADA DET!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUNNING_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Running Time"
+  </source>
+  <dest>
+    *: "Køyretid"
+  </dest>
+  <voice>
+    *: "Køyretid"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_STOP
+  desc: trigger types
+  <source>
+    *: "Stop"
+  </source>
+  <dest>
+    *: "Stopp"
+  </dest>
+  <voice>
+    *: "Stopp"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLEASE_REBOOT
+  desc: when activating an option that requires a reboot
+  user:
+  <source>
+    *: "Please reboot to enable"
+  </source>
+  <dest>
+    *: "Start spelaren på nytt for å ta i bruk."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUESHEET_ENABLE
+  desc: cuesheet support option
+  user:
+  <source>
+    *: "Cuesheet Support"
+  </source>
+  <dest>
+    *: "Cuesheet-støtte"
+  </dest>
+  <voice>
+    *: "Cuesheet-støtte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_PAUSE
+  desc: trigger types
+  <source>
+    *: "Pause"
+  </source>
+  <dest>
+    *: "Pause"
+  </dest>
+  <voice>
+    *: "Pause"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUESHEET
+  desc:
+  user:
+  <source>
+    *: "Cuesheet"
+  </source>
+  <dest>
+    *: "Cuesheet"
+  </dest>
+  <voice>
+    *: "Cuesheet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DITHERING
+  desc: in the sound settings menu
+  user:
+  <source>
+    *: "Dithering"
+  </source>
+  <dest>
+    *: "Dithering"
+  </dest>
+  <voice>
+    *: "Dithering"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES
+  desc: browser file/dir properties
+  user:
+  <source>
+    *: "Properties"
+  </source>
+  <dest>
+    *: "Eigenskapar"
+  </dest>
+  <voice>
+    *: "Eigenskapar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUMARTIST
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Album Artist]"
+  </source>
+  <dest>
+    *: "[Albumartist]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_MPA_L3
+  desc: audio format description
+  user:
+  <source>
+    *: "MPEG Layer 3"
+  </source>
+  <dest>
+    *: "MPEG – lag 3"
+  </dest>
+  <voice>
+    *: "MPEG – lag 3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Current Time"
+  </source>
+  <dest>
+    *: "Gjeldande tid"
+  </dest>
+  <voice>
+    *: "Gjeldande tid"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Clear Time?"
+  </source>
+  <dest>
+    *: "Vil du nullstilla tida?"
+  </dest>
+  <voice>
+    *: "Vil du nullstilla tida?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUDIOSCROBBLER
+  desc: "Last.fm Log" in the playback menu
+  user:
+  <source>
+    *: "Last.fm Log"
+  </source>
+  <dest>
+    *: "Last.fm-logg"
+  </dest>
+  <voice>
+    *: "Last.fm-logg"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_TYPE
+  desc: in recording trigger menu
+  <source>
+    *: "Trigtype"
+  </source>
+  <dest>
+    *: "Starttype"
+  </dest>
+  <voice>
+    *: "Starttype"
   </voice>
 </phrase>
