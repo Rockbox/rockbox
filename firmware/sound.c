@@ -87,6 +87,11 @@ static const struct sound_settings_info sound_settings_table[] = {
     [SOUND_BASS]          = {"dB", 0,  1, -15,  15,   7, sound_set_bass},
     [SOUND_TREBLE]        = {"dB", 0,  1, -15,  15,   7, sound_set_treble},
 #endif
+/* Override any other potentially existing treble/bass controllers if wanted */
+#ifdef HAVE_SW_TONE_CONTROLS
+    [SOUND_BASS]          = {"dB", 0,  1, -24,  24,   0, sound_set_bass},
+    [SOUND_TREBLE]        = {"dB", 0,  1, -24,  24,   0, sound_set_treble},
+#endif
     [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0, sound_set_balance},
     [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0, sound_set_channels},
     [SOUND_STEREO_WIDTH]  = {"%",  0,  1,   0, 255, 100, sound_set_stereo_width},
@@ -165,6 +170,22 @@ sound_set_type* sound_get_fn(int setting)
     else
         return NULL;
 }
+
+#ifdef HAVE_SW_TONE_CONTROLS
+/* Copied from dsp.h, nasty nasty, but we don't want to include dsp.h */
+enum {
+    DSP_CALLBACK_SET_PRESCALE = 0,
+    DSP_CALLBACK_SET_BASS,
+    DSP_CALLBACK_SET_TREBLE
+};
+
+static int (*dsp_callback)(int, intptr_t) = NULL;
+
+void sound_set_dsp_callback(int (*func)(int, intptr_t))
+{
+    dsp_callback = func;
+}
+#endif
 
 #ifndef SIMULATOR
 #if CONFIG_CODEC == MAS3507D /* volume/balance/treble/bass interdependency */
@@ -293,10 +314,9 @@ int current_bass = 0;      /* -150..+150     0..+240 */
 
 static void set_prescaled_volume(void)
 {
-    int prescale = 0;
+    int prescale;
     int l, r;
 
-#ifndef HAVE_TLV320
     prescale = MAX(current_bass, current_treble);
     if (prescale < 0)
         prescale = 0;  /* no need to prescale if we don't boost
@@ -307,13 +327,12 @@ static void set_prescaled_volume(void)
      * instead (might cause clipping). */
     if (current_volume + prescale > VOLUME_MAX)
         prescale = VOLUME_MAX - current_volume;
-#endif
-    
-#if CONFIG_CODEC == MAS3507D
+   
+#if defined(HAVE_SW_TONE_CONTROLS)
+    dsp_callback(DSP_CALLBACK_SET_PRESCALE, prescale);
+#elif CONFIG_CODEC == MAS3507D
     mas_writereg(MAS_REG_KPRESCALE, prescale_table[prescale/10]);
-#elif defined(HAVE_UDA1380)
-    audiohw_set_mixer_vol(tenthdb2mixer(-prescale), tenthdb2mixer(-prescale));
-#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) \
+#elif defined(HAVE_UDA1380) || defined(HAVE_WM8975) || defined(HAVE_WM8758) \
    || defined(HAVE_WM8731) || defined(HAVE_WM8721) || defined(HAVE_WM8751)
     audiohw_set_mixer_vol(tenthdb2mixer(-prescale), tenthdb2mixer(-prescale));
 #endif
@@ -338,9 +357,7 @@ static void set_prescaled_volume(void)
 
 #if CONFIG_CODEC == MAS3507D
     dac_volume(tenthdb2reg(l), tenthdb2reg(r), false);
-#elif defined(HAVE_UDA1380)
-    audiohw_set_master_vol(tenthdb2master(l), tenthdb2master(r));
-#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) \
+#elif defined(HAVE_UDA1380) || defined(HAVE_WM8975) || defined(HAVE_WM8758) \
    || defined(HAVE_WM8731) || defined(HAVE_WM8721) || defined(HAVE_WM8751)
     audiohw_set_master_vol(tenthdb2master(l), tenthdb2master(r));
 #if defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8751)
@@ -484,12 +501,15 @@ void sound_set_balance(int value)
 #endif
 }
 
-#ifndef HAVE_TLV320
 void sound_set_bass(int value)
 {
     if(!audio_is_initialized)
         return;
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+#if defined(HAVE_SW_TONE_CONTROLS)
+    current_bass = value * 10;
+    dsp_callback(DSP_CALLBACK_SET_BASS, current_bass);
+    set_prescaled_volume();
+#elif (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     unsigned tmp = ((unsigned)(value * 8) & 0xff) << 8;
     mas_codec_writereg(0x14, tmp);
 #elif CONFIG_CODEC == MAS3507D
@@ -515,7 +535,11 @@ void sound_set_treble(int value)
 {
     if(!audio_is_initialized)
         return;
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+#if defined(HAVE_SW_TONE_CONTROLS)
+    current_treble = value * 10;
+    dsp_callback(DSP_CALLBACK_SET_TREBLE, current_treble);
+    set_prescaled_volume();
+#elif (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     unsigned tmp = ((unsigned)(value * 8) & 0xff) << 8;
     mas_codec_writereg(0x15, tmp);
 #elif CONFIG_CODEC == MAS3507D
@@ -536,7 +560,6 @@ void sound_set_treble(int value)
     (void)value;
 #endif    
 }
-#endif /* HAVE_TLV320 */
 
 void sound_set_channels(int value)
 {

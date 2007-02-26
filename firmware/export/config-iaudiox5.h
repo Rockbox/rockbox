@@ -84,6 +84,9 @@
 
 #define HAVE_TLV320
 
+/* TLV320 has no tone controls, so we use the software ones */
+#define HAVE_SW_TONE_CONTROLS
+
 #ifndef SIMULATOR
 
 /* Define this if your LCD can set contrast */

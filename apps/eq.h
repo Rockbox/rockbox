@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 Thom Johansen
+ * Copyright (C) 2006-2007 Thom Johansen
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -25,6 +25,7 @@
 /* These depend on the fixed point formats used by the different filter types
    and need to be changed when they change.
  */
+#define FILTER_BISHELF_SHIFT 5
 #define EQ_PEAK_SHIFT 4
 #define EQ_SHELF_SHIFT 6
 
@@ -33,7 +34,9 @@ struct eqfilter {
     int32_t history[2][4];
 };
 
-void filter_bishelf_coefs(unsigned long cutoff, long ad, long an, int32_t *c);
+void filter_shelf_coefs(unsigned long cutoff, long ad, long an, int32_t *c);
+void filter_bishelf_coefs(unsigned long cutoff_low, unsigned long cutoff_high,
+                          long A_low, long A_high, long A, int32_t *c);
 void eq_pk_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c);
 void eq_ls_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c);
 void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c);

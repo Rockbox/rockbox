@@ -55,12 +55,8 @@ int soundmenu_callback(int action,const struct menu_item_ex *this_item)
 #endif
 
 MENUITEM_SETTING(volume, &global_settings.volume, soundmenu_callback);
-
-#ifndef HAVE_TLV320
-    MENUITEM_SETTING(bass, &global_settings.bass, soundmenu_callback);
-    MENUITEM_SETTING(treble, &global_settings.treble, soundmenu_callback);
-#endif
-
+MENUITEM_SETTING(bass, &global_settings.bass, soundmenu_callback);
+MENUITEM_SETTING(treble, &global_settings.treble, soundmenu_callback);
 MENUITEM_SETTING(balance, &global_settings.balance, soundmenu_callback);
 MENUITEM_SETTING(channel_config, &global_settings.channel_config, soundmenu_callback);
 MENUITEM_SETTING(stereo_width, &global_settings.stereo_width, soundmenu_callback);
@@ -99,9 +95,7 @@ MENUITEM_SETTING(stereo_width, &global_settings.stereo_width, soundmenu_callback
 
 MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, bitmap_icons_6x8[Icon_Audio],
           &volume,
-#ifndef HAVE_TLV320
           &bass,&treble,
-#endif
           &balance,&channel_config,&stereo_width
 #if CONFIG_CODEC == SWCODEC
          ,&crossfeed_menu, &equalizer_menu, &dithering_enabled

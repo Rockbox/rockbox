@@ -19,6 +19,7 @@
 #ifndef SOUND_H
 #define SOUND_H
 
+#include <inttypes.h>
 #ifdef HAVE_UDA1380
 #include "uda1380.h"
 #elif defined(HAVE_WM8975) || defined(HAVE_WM8751)
@@ -76,6 +77,7 @@ int sound_max(int setting);
 int sound_default(int setting);
 sound_set_type* sound_get_fn(int setting);
 
+void sound_set_dsp_callback(int (*func)(int, intptr_t));
 void sound_set_volume(int value);
 void sound_set_balance(int value);
 void sound_set_bass(int value);

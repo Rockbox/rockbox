@@ -51,6 +51,12 @@ enum
     DSP_CROSSFEED
 };
 
+enum {
+    DSP_CALLBACK_SET_PRESCALE = 0,
+    DSP_CALLBACK_SET_BASS,
+    DSP_CALLBACK_SET_TREBLE
+};
+
 /* A bunch of fixed point assembler helper macros */
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
 /* These macros use the Coldfire EMAC extension and need the MACSR flags set
@@ -209,6 +215,7 @@ void dsp_set_eq_precut(int precut);
 void dsp_set_eq_coefs(int band);
 void sound_set_pitch(int r);
 int sound_get_pitch(void);
+int dsp_callback(int msg, intptr_t param);
 void channels_set(int value);
 void stereo_width_set(int value);
 void dsp_dither_enable(bool enable);

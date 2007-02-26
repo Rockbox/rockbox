@@ -642,6 +642,9 @@ void settings_apply_pm_range(void)
 
 void sound_settings_apply(void)
 {
+#ifdef HAVE_SW_TONE_CONTROLS
+    sound_set_dsp_callback(dsp_callback);
+#endif
     sound_set(SOUND_BASS, global_settings.bass);
     sound_set(SOUND_TREBLE, global_settings.treble);
     sound_set(SOUND_BALANCE, global_settings.balance);
@@ -967,7 +970,7 @@ bool set_sound(const unsigned char * string,
         talkunit = UNIT_PERCENT;
     else if (*unit == 'H')
         talkunit = UNIT_HERTZ;
-    if(!numdec)
+    if (!numdec)
 #if CONFIG_CODEC == SWCODEC
         /* We need to hijack this one and send it off to apps/dsp.c instead of
            firmware/sound.c */
@@ -975,7 +978,7 @@ bool set_sound(const unsigned char * string,
             return set_int(string, unit, talkunit, variable, &stereo_width_set,
                            steps, min, max, NULL );
         else
-#endif   
+#endif
         return set_int(string, unit, talkunit,  variable, sound_callback,
                        steps, min, max, NULL );
     else

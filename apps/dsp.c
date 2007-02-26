@@ -116,9 +116,10 @@ struct crossfeed_data
                             /* 8ch */
 };
 
-/* Current setup is one lowshelf filters, three peaking filters and one
-   highshelf filter. Varying the number of shelving filters make no sense,
-   but adding peaking filters is possible. */
+/* Current setup is one lowshelf filters three peaking filters and one
+ *  highshelf filter. Varying the number of shelving filters make no sense,
+ *  but adding peaking filters is possible.
+ */
 struct eq_state
 {
     char enabled[5];            /* 00h - Flags for active filters */
@@ -171,6 +172,13 @@ static long   dither_bias IBSS_ATTR;
 struct crossfeed_data crossfeed_data IBSS_ATTR;     /* A */
 /* Equalizer */
 static struct eq_state eq_data;                     /* A/V */
+#ifdef HAVE_SW_TONE_CONTROLS
+static int prescale;
+static int bass;
+static int treble;
+/* Filter struct for software bass/treble controls */
+static struct eqfilter tone_filter;
+#endif
 
 /* Settings applicable to audio codec only */
 static int  pitch_ratio = 1000;
@@ -704,11 +712,7 @@ void dsp_set_crossfeed(bool enable)
 
 void dsp_set_crossfeed_direct_gain(int gain)
 {
-    /* Work around bug in get_replaygain_int which returns 0 for 0 dB */
-    if (gain == 0)
-        crossfeed_data.gain = 0x7fffffff;
-    else
-        crossfeed_data.gain = get_replaygain_int(gain * -10) << 7;
+    crossfeed_data.gain = get_replaygain_int(gain * -10) << 7;
 }
 
 void dsp_set_crossfeed_cross_params(long lf_gain, long hf_gain, long cutoff)
@@ -716,8 +720,8 @@ void dsp_set_crossfeed_cross_params(long lf_gain, long hf_gain, long cutoff)
     long g1 = get_replaygain_int(lf_gain * -10) << 3;
     long g2 = get_replaygain_int(hf_gain * -10) << 3;
 
-    filter_bishelf_coefs(0xffffffff/NATIVE_FREQUENCY*cutoff, g1, g2,
-                         crossfeed_data.coefs);
+    filter_shelf_coefs(0xffffffff/NATIVE_FREQUENCY*cutoff, g1, g2,
+                       crossfeed_data.coefs);
 }
 
 /* Applies crossfeed to the stereo signal in src.
@@ -985,6 +989,36 @@ static void channels_process_sound_chan_mono(int count, int32_t *buf[])
 }
 #endif /* DSP_HAVE_ASM_SOUND_CHAN_MONO */
 
+#ifdef HAVE_SW_TONE_CONTROLS
+static void set_tone_controls(void)
+{
+    filter_bishelf_coefs(0xffffffff/NATIVE_FREQUENCY*200,
+                         0xffffffff/NATIVE_FREQUENCY*3500,
+                         bass, treble, -prescale, tone_filter.coefs);
+}
+
+int dsp_callback(int msg, intptr_t param)
+{
+    switch (msg) {
+    case DSP_CALLBACK_SET_PRESCALE:
+        prescale = param;
+        set_tone_controls();
+        break;
+    /* prescaler is always set after calling any of these, so we wait with
+     * calculating coefs until the above case is hit.
+     */
+    case DSP_CALLBACK_SET_BASS:
+        bass = param;
+        break;
+    case DSP_CALLBACK_SET_TREBLE:
+        treble = param;
+    default:
+        break;
+    }
+    return 0;
+}
+#endif
+
 #ifndef DSP_HAVE_ASM_SOUND_CHAN_CUSTOM
 static void channels_process_sound_chan_custom(int count, int32_t *buf[])
 {
@@ -1068,12 +1102,12 @@ int dsp_process(char *dst, const char *src[], int count)
     int written = 0;
     int samples;
 
-    #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
     /* set emac unit for dsp processing, and save old macsr, we're running in
        codec thread context at this point, so can't clobber it */
     unsigned long old_macsr = coldfire_get_macsr();
     coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
-    #endif
+#endif
 
     while (count > 0)
     {
@@ -1085,8 +1119,17 @@ int dsp_process(char *dst, const char *src[], int count)
             break; /* I'm pretty sure we're downsampling here */
         if (dsp->apply_crossfeed)
             dsp->apply_crossfeed(tmp, samples);
+        /* TODO: EQ and tone controls need separate structs for audio and voice
+         * DSP processing thanks to filter history. isn't really audible now, but
+         * might be the day we start handling voice more delicately.
+         */
         if (eq_enabled)
             eq_process(samples, tmp);
+#ifdef HAVE_SW_TONE_CONTROLS
+        if ((bass | treble) != 0)
+            eq_filter(tmp, &tone_filter, samples, dsp->data.num_channels,
+                      FILTER_BISHELF_SHIFT);
+#endif
         if (dsp->channels_process)
             dsp->channels_process(samples, tmp);
         dsp->output_samples(samples, &dsp->data, tmp, (int16_t *)dst);
@@ -1095,10 +1138,10 @@ int dsp_process(char *dst, const char *src[], int count)
         yield();
     }
 
-    #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
     /* set old macsr again */
     coldfire_set_macsr(old_macsr);
-    #endif
+#endif
     return written;
 }
 
