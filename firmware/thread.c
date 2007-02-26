@@ -769,12 +769,10 @@ void init_threads(void)
      * probably a much better way to do this. */
     if (core == CPU)
     {
-        THREAD_CPU_INIT(core, &cores[CPU].threads[0]);
         cores[CPU].threads[0].stack = stackbegin;
         cores[CPU].threads[0].stack_size = (int)stackend - (int)stackbegin;
     } else {
 #if NUM_CORES > 1  /* This code path will not be run on single core targets */
-        THREAD_CPU_INIT(core, &cores[COP].threads[0]);
         cores[COP].threads[0].stack = cop_stackbegin;
         cores[COP].threads[0].stack_size =
             (int)cop_stackend - (int)cop_stackbegin;
