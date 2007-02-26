@@ -183,10 +183,10 @@ else
   getfile binutils-$binutils.tar.bz2 ftp://ftp.gnu.org/pub/gnu/binutils
 fi
 
-if test -f "$dlwhere/gcc-$gccver.tar.bz2"; then
+if test -f "$dlwhere/gcc-core-$gccver.tar.bz2"; then
   echo "gcc $gccver already downloaded"
 else
-  getfile gcc-$gccver.tar.bz2 ftp://ftp.gnu.org/pub/gnu/gcc/gcc-$gccver
+  getfile gcc-core-$gccver.tar.bz2 ftp://ftp.gnu.org/pub/gnu/gcc/gcc-$gccver
 fi
 
 if test -n "$gccpatch"; then
@@ -200,7 +200,7 @@ fi
 echo "ROCKBOXDEV: extracting binutils-$binutils in $builddir"
 tar xjf $dlwhere/binutils-$binutils.tar.bz2
 echo "ROCKBOXDEV: extracting gcc-$gccver in $builddir"
-tar xjf $dlwhere/gcc-$gccver.tar.bz2
+tar xjf $dlwhere/gcc-core-$gccver.tar.bz2
 
 if test -n "$gccpatch"; then
   echo "ROCKBOXDEV: applying gcc patch"
