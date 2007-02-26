@@ -497,7 +497,8 @@ const struct settings_list settings[] = {
         0, 18, 1, backlight_formatter, backlight_getlang, 
         remote_backlight_set_timeout),
 #if CONFIG_CHARGING
-    INT_SETTING_W_CFGVALS(F_FLIPLIST, remote_backlight_timeout_plugged, LANG_BACKLIGHT, 11,
+    INT_SETTING_W_CFGVALS(F_FLIPLIST, remote_backlight_timeout_plugged,
+        LANG_BACKLIGHT_ON_WHEN_CHARGING, 11,
         "remote backlight timeout plugged", backlight_times_conf, UNIT_SEC,
         0, 18, 1, backlight_formatter, backlight_getlang, 
         remote_backlight_set_timeout_plugged),
