@@ -147,6 +147,7 @@ void filter_shelf_coefs(unsigned long cutoff, long ad, long an, int32_t *c)
     c[2] = -DIV64(a1, a0, 31);
 }
 
+#ifdef HAVE_SW_TONE_CONTROLS
 /** 
  * Calculate second order section filter consisting of one low-shelf and one
  * high-shelf section.
@@ -198,6 +199,7 @@ void filter_bishelf_coefs(unsigned long cutoff_low, unsigned long cutoff_high,
     *c++ = -FRACMUL_SHL(FRACMUL(a0, a3) + FRACMUL(a1, a2), rcp_a0, 5);
     *c++ = -FRACMUL_SHL(FRACMUL(a1, a3), rcp_a0, 5);
 }
+#endif
 
 /* Coef calculation taken from Audio-EQ-Cookbook.txt by Robert Bristow-Johnson.
  * Slightly faster calculation can be done by deriving forms which use tan()
