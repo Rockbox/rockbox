@@ -65,7 +65,7 @@ void lcd_init_device(void)
     clean_dcache_range((void *)fg_pattern_blit, sizeof(fg_pattern_blit));
     clean_dcache_range((void *)bg_pattern_blit, sizeof(bg_pattern_blit));
     use_dma_blit = true;
-    lcd_poweroff = true;
+    lcd_poweroff = false;
 #endif
 }
 
