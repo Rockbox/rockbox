@@ -237,6 +237,8 @@ next_track:
 
     while (!*ci->taginfo_ready && !ci->stop_codec)
         ci->sleep(1);
+
+    codec_set_replaygain(ci->id3);
     
     /* Need to save offset for later use (cleared indirectly by advance_buffer) */
     bytesdone = ci->id3->offset;

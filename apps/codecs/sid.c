@@ -1226,6 +1226,8 @@ next_track:
 
     while (!*ci->taginfo_ready)
         ci->yield();
+
+    codec_set_replaygain(ci->id3);
     
     /* Load SID file */    
     p = sidfile;

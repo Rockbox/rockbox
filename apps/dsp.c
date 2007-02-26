@@ -1200,11 +1200,14 @@ bool dsp_configure(int setting, intptr_t value)
     void set_gain_var(long *var, long value)
     {
         /* Voice shouldn't mess with these */
-        if (dsp != audio_dsp)
-            return;
-
-        *var = value;
-        new_gain = true;
+        if (dsp == audio_dsp)
+        {
+            *var = value;
+            /* In case current gain is zero, force at least one call
+               to apply_gain or apply_gain won't pick up on new_gain */
+            audio_dsp->gain = -1;
+            new_gain = true;
+        }
     }
 
     void update_functions(void)

@@ -4344,6 +4344,8 @@ next_track:
     /* wait for track info to load */
     while (!*ci->taginfo_ready && !ci->stop_codec)
         ci->sleep(1);
+
+    codec_set_replaygain(ci->id3);
         
     /* Read the entire file */
     DEBUGF("NSF: request file\n");

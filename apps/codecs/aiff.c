@@ -75,6 +75,8 @@ next_track:
 
     while (!*ci->taginfo_ready)
         ci->yield();
+
+    codec_set_replaygain(ci->id3);
     
     /* assume the AIFF header is less than 1024 bytes */
     buf = ci->request_buffer(&n, 1024);

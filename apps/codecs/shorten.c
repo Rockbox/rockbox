@@ -61,6 +61,8 @@ next_track:
     while (!*ci->taginfo_ready)
         ci->yield();
 
+    codec_set_replaygain(ci->id3);
+
     /* Shorten decoder initialization */
     ci->memset(&sc, 0, sizeof(ShortenContext));
 
