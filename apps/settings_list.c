@@ -801,7 +801,7 @@ const struct settings_list settings[] = {
 
 #if CONFIG_CODEC == SWCODEC
     /* replay gain */
-    OFFON_SETTING(0, replaygain, LANG_REPLAYGAIN, false, "replaygain", NULL),
+    OFFON_SETTING(0, replaygain, LANG_REPLAYGAIN_ENABLE, false, "replaygain", NULL),
     CHOICE_SETTING(0, replaygain_type, LANG_REPLAYGAIN_MODE, REPLAYGAIN_ALBUM,
         "replaygain type", "track,album,track shuffle", NULL, 3,
         ID2P(LANG_TRACK_GAIN), ID2P(LANG_ALBUM_GAIN), ID2P(LANG_SHUFFLE_GAIN)),
