@@ -65,8 +65,11 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x80000
 
-/* Define this if you have the WM8975 audio codec */
+/* Define this if you have the WM8731 audio codec */
 #define HAVE_WM8731
+
+/* WM8731 has no tone controls, so we use the software ones */
+#define HAVE_SW_TONE_CONTROLS
 
 #define AB_REPEAT_ENABLE 1
 

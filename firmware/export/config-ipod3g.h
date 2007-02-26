@@ -62,6 +62,9 @@
 /* Define this if you have the WM8731L audio codec */
 #define HAVE_WM8731
 
+/* WM8731 has no tone controls, so we use the software ones */
+#define HAVE_SW_TONE_CONTROLS
+
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_IPOD3G /* port controlled */
 

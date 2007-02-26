@@ -62,6 +62,9 @@
 /* Define this if you have the WM8721 audio codec */
 #define HAVE_WM8721 /* actually WM8731 but no recording */
 
+/* WM8721 has no tone controls, so we use the software ones */
+#define HAVE_SW_TONE_CONTROLS
+
 #define AB_REPEAT_ENABLE 1
 #define ACTION_WPSAB_SINGLE ACTION_WPS_BROWSE
 

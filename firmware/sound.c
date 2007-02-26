@@ -75,8 +75,6 @@ static const struct sound_settings_info sound_settings_table[] = {
     [SOUND_TREBLE]        = {"dB", 0,  1,  -6,   9,   0, sound_set_treble},
 #elif defined(HAVE_WM8731) || defined(HAVE_WM8721)
     [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25, sound_set_volume},
-    [SOUND_BASS]          = {"dB", 0,  1,  -6,   9,   0, sound_set_bass},
-    [SOUND_TREBLE]        = {"dB", 0,  1,  -6,   9,   0, sound_set_treble},
 #elif (CONFIG_CPU == PNX0101)
     [SOUND_VOLUME]        = {"dB", 0,  1, -48,  15,   0, sound_set_volume},
 #elif defined(HAVE_PP5024_CODEC)
