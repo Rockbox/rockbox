@@ -175,14 +175,15 @@ static struct dither_data dither_data[2] IBSS_ATTR; /* 0=left, 1=right */
 static long   dither_mask IBSS_ATTR;
 static long   dither_bias IBSS_ATTR;
 /* Crossfeed */
+#ifdef DSP_CROSSFEED_DELAY_PTR
 struct crossfeed_data crossfeed_data IDATA_ATTR =    /* A */
 {
-#ifdef DSP_CROSSFEED_DELAY_PTR
     .index = (intptr_t)crossfeed_data.delay
+};
 #else
-    .index = 0
+struct crossfeed_data crossfeed_data IBSS_ATTR;     /* A */
 #endif
-};     
+
 /* Equalizer */
 static struct eq_state eq_data;                     /* A/V */
 #ifdef HAVE_SW_TONE_CONTROLS
