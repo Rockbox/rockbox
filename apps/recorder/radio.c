@@ -1072,10 +1072,6 @@ static int radio_add_preset(void)
             buf[MAX_FMPRESET_LEN] = 0;
             strcpy(presets[num_presets].name, buf);
             presets[num_presets].frequency = curr_freq;
-#ifdef FM_PRESET_ADD  /* only for archos */         
-            menu_insert(preset_menu, -1,
-                        presets[num_presets].name, 0);
-#endif 
             num_presets++;
             presets_changed = true;
             if(num_presets > 0)
@@ -1496,7 +1492,7 @@ MAKE_MENU(radio_menu_items, ID2P(LANG_FM_MENU), NULL,
 #endif
             &set_region, &sound_settings,
 #ifdef FM_RECORDING_SCREEN
-            &LANG_RECORDING_MENU,
+            &recscreen_item,
 #endif
 #ifdef FM_RECORDING_SETTINGS
             &recsettings_item,
