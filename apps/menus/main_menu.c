@@ -447,7 +447,7 @@ MAKE_MENU(main_menu_, "Rockbox Main Menu", mainmenu_callback,
    callback is just to say if the item is shown or not */
 int dynamicitem_callback(int action,const struct menu_item_ex *this_item)
 {
-    if (action != ACTION_ENTER_MENUITEM)
+    if (action != ACTION_REQUEST_MENUITEM)
         return action;
     
 #if CONFIG_TUNER
