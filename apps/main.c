@@ -552,14 +552,21 @@ void cop_main(void)
    At present the COP sleeps unless it receives a message from the CPU telling
    it that we are loading a new kernel, so must reboot */
 
+#if CONFIG_CPU == PP5002
+/* 3G doesn't have Rolo support yet */
+    while(1) {
+        COP_CTL = PROC_SLEEP;
+    }
+#else
     extern volatile unsigned char cpu_message;
 
     while(cpu_message != COP_REBOOT) {
         COP_CTL = PROC_SLEEP;
     }
     rolo_restart_cop();
+#endif /* PP5002 */
 }
-#endif
+#endif /* CPU_PP */
 
 int main(void)
 {
