@@ -60,6 +60,8 @@
 #include "tree.h"
 #include "dir.h"
 #include "action.h"
+#include "list.h"
+#include "menus/exported_menus.h"
 
 #if CONFIG_TUNER
 
@@ -101,13 +103,13 @@
 #endif
 static struct fm_region_setting fm_region[] = {
     /* Europe */
-    { LANG_FM_EUROPE, 87500000, 108000000,   50000, DEEMPH_50 BAND_LIM_EU },
+    { 87500000, 108000000,   50000, DEEMPH_50 BAND_LIM_EU },
     /* US / Canada */
-    { LANG_FM_US,     87900000, 107900000,  200000, DEEMPH_75 BAND_LIM_EU },
+    { 87900000, 107900000,  200000, DEEMPH_75 BAND_LIM_EU },
     /* Japan */
-    { LANG_FM_JAPAN,  76000000,  90000000,  100000, DEEMPH_50 BAND_LIM_JP },
+    { 76000000,  90000000,  100000, DEEMPH_50 BAND_LIM_JP },
     /* Korea */
-    { LANG_FM_KOREA,  87500000, 108000000,  100000, DEEMPH_50 BAND_LIM_EU },
+    { 87500000, 108000000,  100000, DEEMPH_50 BAND_LIM_EU },
     };
 
 static int curr_preset = -1;
@@ -123,19 +125,17 @@ static struct fmstation presets[MAX_PRESETS];
 
 static char filepreset[MAX_PATH]; /* preset filename variable */
 
-static int preset_menu; /* The menu index of the preset list */
-static struct menu_item preset_menu_items[MAX_PRESETS];
 static int num_presets = 0; /* The number of presets in the preset list */
 
 static void radio_save_presets(void);
-static bool handle_radio_presets(void);
+static int handle_radio_presets(void);
 static bool radio_menu(void);
-static bool radio_add_preset(void);
-static bool save_preset_list(void);
-static bool load_preset_list(void);
-static bool clear_preset_list(void);
+static int radio_add_preset(void);
+static int save_preset_list(void);
+static int load_preset_list(void);
+static int clear_preset_list(void);
 
-static bool scan_presets(void);
+static int scan_presets(void);
 
 #ifdef SIMULATOR
 void radio_set(int setting, int value);
@@ -1058,16 +1058,8 @@ void radio_load_presets(char *filename)
     presets_changed = false;
 }
 
-static void rebuild_preset_menu(void)
-{
-    int i;
-    for(i = 0;i < num_presets;i++)
-    {
-        preset_menu_items[i].desc = presets[i].name;
-    }
-}
 
-static bool radio_add_preset(void)
+static int radio_add_preset(void)
 {
     char buf[MAX_FMPRESET_LEN];
 
@@ -1083,9 +1075,6 @@ static bool radio_add_preset(void)
 #ifdef FM_PRESET_ADD  /* only for archos */         
             menu_insert(preset_menu, -1,
                         presets[num_presets].name, 0);
-            /* We must still rebuild the menu table, since the
-               item name pointers must be updated */
-            rebuild_preset_menu();
 #endif 
             num_presets++;
             presets_changed = true;
@@ -1100,52 +1089,32 @@ static bool radio_add_preset(void)
     return true;
 }
 
-/* button preprocessor for preset option submenu */
-static int handle_radio_presets_menu_cb(int key, int m)
+/* needed to know which preset we are edit/delete-ing */
+static int selected_preset = 0;
+static int radio_edit_preset(void)
 {
-    (void)m;
-#ifdef FM_PRESET_ACTION
-    switch(key)
-    {
-        case ACTION_F3:
-            key = ACTION_STD_CANCEL; /* Fake an exit */
-            action_signalscreenchange();
-            break;
-    }
-#endif
-    return key;
-}
-
-static bool radio_edit_preset(void)
-{
-    int pos = menu_cursor(preset_menu);
     char buf[MAX_FMPRESET_LEN];
 
-    strncpy(buf, menu_description(preset_menu, pos), MAX_FMPRESET_LEN);
+    strncpy(buf, presets[selected_preset].name, MAX_FMPRESET_LEN);
         
     if (!kbd_input(buf, MAX_FMPRESET_LEN))
     {
         buf[MAX_FMPRESET_LEN] = 0;
-        strcpy(presets[pos].name, buf);
+        strcpy(presets[selected_preset].name, buf);
         presets_changed = true;
     }
     return true;
 }
 
-static bool radio_delete_preset(void)
+static int radio_delete_preset(void)
 {
-    int pos = menu_cursor(preset_menu);
+    int pos = selected_preset;
     int i;
 
     for(i = pos;i < num_presets;i++)
         presets[i] = presets[i+1];
     num_presets--;
-    
-    menu_delete(preset_menu, pos);
-    /* We must still rebuild the menu table, since the
-       item name pointers must be updated */
-    rebuild_preset_menu();
-    
+
      /* Don't ask to save when all presets are deleted. */
     if(num_presets > 0)
         presets_changed = true;
@@ -1160,12 +1129,12 @@ static bool radio_delete_preset(void)
     return true; /* Make the menu return immediately */
 }
 
-static bool load_preset_list(void)
+static int load_preset_list(void)
 {
     return !rockbox_browse(FMPRESET_PATH, SHOW_FMR);
 }
 
-static bool save_preset_list(void)
+static int save_preset_list(void)
 {   
     if(num_presets != 0)
     { 
@@ -1218,7 +1187,7 @@ static bool save_preset_list(void)
     return true;
 }
 
-static bool clear_preset_list(void)
+static int clear_preset_list(void)
 {
     int i;
     
@@ -1238,171 +1207,132 @@ static bool clear_preset_list(void)
     return true;
 }
 
-/* little menu on what to do with a preset entry */
-static bool handle_radio_presets_menu(void)
-{
-    static const struct menu_item preset_menu_items[] = {
-        { ID2P(LANG_FM_EDIT_PRESET), radio_edit_preset },
-        { ID2P(LANG_FM_DELETE_PRESET), radio_delete_preset },
-    };
-    int m;
-
-    m = menu_init( preset_menu_items,
-                   sizeof preset_menu_items / sizeof(struct menu_item),
-                   handle_radio_presets_menu_cb,
-                   NULL, NULL, str(LANG_FM_BUTTONBAR_EXIT));
-    menu_run(m);
-    menu_exit(m);
-    return false;
-}
-
-/* button preprocessor for list of preset stations menu */
-static int handle_radio_presets_cb(int key, int m)
-{
-    (void)m;
-
-    switch(key)
-    {
-#ifdef FM_PRESET_ADD
-        case ACTION_STD_MENU:
-            radio_add_preset();
-            menu_draw(m);
-            key = BUTTON_NONE;
-            break;
-#endif
-#if (CONFIG_KEYPAD != IRIVER_H100_PAD) && (CONFIG_KEYPAD != IRIVER_H300_PAD) && (CONFIG_KEYPAD != IAUDIO_X5_PAD)
-#ifdef FM_PRESET
-        case ACTION_STD_QUICKSCREEN:
-            menu_draw(m);
-            key = ACTION_STD_CANCEL; /* Fake an exit */
-            break;
-#endif
-#endif
-        case ACTION_F3:
-        case ACTION_STD_CONTEXT:
-        {
-            bool ret;
-            ret = handle_radio_presets_menu();
-            menu_draw(m);
-            if(ret)
-                key = SYS_USB_CONNECTED;
-            else
-                key = ACTION_NONE;
-            break;
-        }
-    }
-    return key;
-}
-
+MENUITEM_FUNCTION(radio_edit_preset_item, ID2P(LANG_FM_EDIT_PRESET), 
+                    radio_edit_preset, NULL, NOICON);
+MENUITEM_FUNCTION(radio_delete_preset_item, ID2P(LANG_FM_DELETE_PRESET), 
+                    radio_delete_preset, NULL, NOICON);
+MAKE_MENU(handle_radio_preset_menu, ID2P(LANG_FM_BUTTONBAR_PRESETS),
+            NULL, NOICON, &radio_edit_preset_item, &radio_delete_preset_item);
 /* present a list of preset stations */
-static bool handle_radio_presets(void)
+char * presets_get_name(int selected_item, void * data, char *buffer)
 {
-    int result;
-    bool reload_dir = false;
+    (void)data;
+    (void)buffer;
+    return presets[selected_item].name;
+}
 
-    if(presets_loaded)
-    {
-        rebuild_preset_menu();
+static int handle_radio_presets(void)
+{
+    struct gui_synclist lists;
+    int result = 0;
+    int action = ACTION_NONE;
+#ifdef HAS_BUTTONBAR
+    struct gui_buttonbar buttonbar;
+#endif
 
-        /* DIY menu handling, since we want to exit after selection */
-        preset_menu = menu_init( preset_menu_items, num_presets,
-                                 handle_radio_presets_cb,
-                                 str(LANG_FM_BUTTONBAR_ADD),
+    if(presets_loaded == false)
+        return result;
+
+#ifdef HAS_BUTTONBAR
+    gui_buttonbar_init(&buttonbar);
+    gui_buttonbar_set_display(&buttonbar, &(screens[SCREEN_MAIN]) );
+    gui_buttonbar_set(&buttonbar, str(LANG_FM_BUTTONBAR_ADD),
                                  str(LANG_FM_BUTTONBAR_EXIT),
                                  str(LANG_FM_BUTTONBAR_ACTION));
-        if (curr_preset >= 0)
-            menu_set_cursor(preset_menu, curr_preset);
-        result = menu_show(preset_menu);
-        menu_exit(preset_menu);
-        if (result == MENU_SELECTED_EXIT)
-            return false;
-        else if (result == MENU_ATTACHED_USB)
-            reload_dir = true;
-        
-        if (result >= 0) /* A preset was selected */
+    gui_buttonbar_draw(&buttonbar);
+#endif
+    gui_synclist_init(&lists, presets_get_name, NULL, false, 1);
+    gui_synclist_set_title(&lists, str(LANG_FM_BUTTONBAR_PRESETS), NOICON);
+    gui_synclist_set_icon_callback(&lists, NULL);
+    gui_synclist_set_nb_items(&lists, num_presets);
+    gui_synclist_select_item(&lists, curr_preset<0 ? 0 : curr_preset);
+
+    action_signalscreenchange();
+    while (result == 0)
+    {
+        gui_synclist_draw(&lists);
+        gui_syncstatusbar_draw(&statusbars, true);
+        action = get_action(CONTEXT_STD, HZ);
+
+        gui_synclist_do_button(&lists, action, LIST_WRAP_UNLESS_HELD);
+        switch (action)
         {
-            curr_preset = menu_cursor(preset_menu);
-            curr_freq = presets[curr_preset].frequency;
-            radio_set(RADIO_FREQUENCY, curr_freq);
-            remember_frequency();
+            case ACTION_STD_MENU:
+                radio_add_preset();
+                break;
+            case ACTION_STD_CANCEL:
+                result = 1;
+                break;
+            case ACTION_STD_OK:
+                curr_preset = gui_synclist_get_sel_pos(&lists);
+                curr_freq = presets[curr_preset].frequency;
+                radio_set(RADIO_FREQUENCY, curr_freq);
+                remember_frequency();
+                result = 1;
+                break;
+            case ACTION_F3:
+            case ACTION_STD_CONTEXT:
+                selected_preset = gui_synclist_get_sel_pos(&lists);
+                do_menu(&handle_radio_preset_menu);
+                break;
+            default:
+                if(default_event_handler(action) == SYS_USB_CONNECTED)
+                    result = 2;
         }
     }
-    
-    return reload_dir;
+    action_signalscreenchange();
+    return result - 1;
 }
 
-static char monomode_menu_string[32];
-
-static void create_monomode_menu(void)
+void toggle_mono_mode(bool mono)
 {
-    snprintf(monomode_menu_string, sizeof monomode_menu_string,
-             "%s: %s", str(LANG_FM_MONO_MODE),
-             global_settings.fm_force_mono?
-             str(LANG_SET_BOOL_YES):str(LANG_SET_BOOL_NO));
+    radio_set(RADIO_FORCE_MONO, mono);
 }
 
-static bool toggle_mono_mode(void)
+void set_radio_region(int region)
 {
-    global_settings.fm_force_mono = !global_settings.fm_force_mono;
-    radio_set(RADIO_FORCE_MONO, global_settings.fm_force_mono);
-    settings_save();
-    create_monomode_menu();
-    return false;
-}
-
-static char region_menu_string[32];
-static void create_region_menu(void)
-{
-    snprintf(region_menu_string, sizeof(region_menu_string),
-    "%s: %s", str(LANG_FM_REGION),
-        str(fm_region[global_settings.fm_region].lang));
-}
-
-static bool toggle_region_mode(void)
-{
-    global_settings.fm_region++;
-    if(global_settings.fm_region >= 
-        (int)(sizeof(fm_region) / sizeof(struct fm_region_setting)))
-        global_settings.fm_region = 0;
 #if (CONFIG_TUNER & TEA5767)
     radio_set(RADIO_SET_DEEMPHASIS, 
-        fm_region[global_settings.fm_region].deemphasis);
-    radio_set(RADIO_SET_BAND, fm_region[global_settings.fm_region].band);
+        fm_region[region].deemphasis);
+    radio_set(RADIO_SET_BAND, fm_region[region].band);
 #endif
     /* make sure the current frequency is in the region range */
-    curr_freq -= (curr_freq - fm_region[global_settings.fm_region].freq_min)
-        % fm_region[global_settings.fm_region].freq_step;
-    if(curr_freq < fm_region[global_settings.fm_region].freq_min)
-        curr_freq = fm_region[global_settings.fm_region].freq_min;
-    if(curr_freq > fm_region[global_settings.fm_region].freq_max)
-        curr_freq = fm_region[global_settings.fm_region].freq_max;
+    curr_freq -= (curr_freq - fm_region[region].freq_min)
+        % fm_region[region].freq_step;
+    if(curr_freq < fm_region[region].freq_min)
+        curr_freq = fm_region[region].freq_min;
+    if(curr_freq > fm_region[region].freq_max)
+        curr_freq = fm_region[region].freq_max;
     radio_set(RADIO_FREQUENCY, curr_freq);
 
     remember_frequency();
-    create_region_menu();
-    return false;
 }
+
+MENUITEM_SETTING(set_region, &global_settings.fm_region, NULL);
+MENUITEM_SETTING(force_mono, &global_settings.fm_force_mono, NULL);
 
 #ifndef FM_MODE
-static char radiomode_menu_string[32];
-
-static void create_radiomode_menu(void)
+char* get_mode_text(int selected_item, void * data, char *buffer)
 {
-    snprintf(radiomode_menu_string, 32, "%s %s", str(LANG_FM_TUNE_MODE),
+    (void)selected_item;
+    (void)data;
+    snprintf(buffer, MAX_PATH, "%s %s", str(LANG_FM_TUNE_MODE),
              radio_mode ? str(LANG_RADIO_PRESET_MODE) :
                           str(LANG_RADIO_SCAN_MODE));
+    return buffer;
 }
-
-static bool toggle_radio_mode(void)
+static int toggle_radio_mode(void* param)
 {
+    (void)param;
     radio_mode = (radio_mode == RADIO_SCAN_MODE) ?
                  RADIO_PRESET_MODE : RADIO_SCAN_MODE;
-    create_radiomode_menu();
-    return false;
+    return 0;
 }
+MENUITEM_FUNCTION_WPARAM_DYNTEXT(radio_mode_item, toggle_radio_mode, NULL, NULL,
+                                         get_mode_text, NULL, NOICON);
 #endif
 
-static bool scan_presets(void)
+static int scan_presets(void)
 {
     bool tuned = false, do_scan = true;
     char buf[MAX_FMPRESET_LEN];
@@ -1473,41 +1403,13 @@ static bool scan_presets(void)
     return true;
 }
 
-/* button preprocessor for the main menu */
-static int radio_menu_cb(int key, int m)
-{
-    (void)m;
-#if 0 /* this screen needs fixing! */
-    switch(key)
-    {
-#if (CONFIG_KEYPAD != IRIVER_H100_PAD) && (CONFIG_KEYPAD != IRIVER_H300_PAD) && (CONFIG_KEYPAD != IAUDIO_X5_PAD)
-#ifdef MENU_ENTER2
-    case MENU_ENTER2:
-#endif
-#endif
-    case MENU_ENTER:
-        key = BUTTON_NONE; /* eat the downpress, next menu reacts on release */
-        break;
-
-#if (CONFIG_KEYPAD != IRIVER_H100_PAD) && (CONFIG_KEYPAD != IRIVER_H300_PAD) && (CONFIG_KEYPAD != IAUDIO_X5_PAD)
-#ifdef MENU_ENTER2
-    case MENU_ENTER2 | BUTTON_REL:
-#endif
-#endif
-    case MENU_ENTER | BUTTON_REL:
-        key = MENU_ENTER; /* fake downpress, next menu doesn't like release */
-        break;
-    }
-#endif
-    return key;
-}
 
 #ifndef SIMULATOR
 #ifdef HAVE_RECORDING
 
 #if defined(HAVE_FMRADIO_IN) && CONFIG_CODEC == SWCODEC
 #define FM_RECORDING_SCREEN
-static bool fm_recording_screen(void)
+static int fm_recording_screen(void)
 {
     bool ret;
 
@@ -1516,7 +1418,7 @@ static bool fm_recording_screen(void)
     global_settings.rec_source = AUDIO_SRC_FMRADIO;
 
     /* clearing queue seems to cure a spontaneous abort during record */
-    while (button_get(false) != BUTTON_NONE);
+    action_signalscreenchange();
 
     ret = recording_screen(true);
 
@@ -1525,11 +1427,13 @@ static bool fm_recording_screen(void)
 
     return ret;
 }
+MENUITEM_FUNCTION(recscreen_item, ID2P(LANG_RECORDING_MENU), 
+                    fm_recording_screen, NULL, NOICON);
 #endif /* defined(HAVE_FMRADIO_IN) && CONFIG_CODEC == SWCODEC */
 
 #if defined(HAVE_FMRADIO_IN) || CONFIG_CODEC != SWCODEC
 #define FM_RECORDING_SETTINGS
-static bool fm_recording_settings(void)
+static int fm_recording_settings(void)
 {
     bool ret = recording_menu(true);
 
@@ -1545,54 +1449,55 @@ static bool fm_recording_settings(void)
 
     return ret;
 }
+MENUITEM_FUNCTION(recsettings_item, ID2P(LANG_RECORDING_SETTINGS), 
+                    fm_recording_settings, NULL, NOICON);
 #endif /* defined(HAVE_FMRADIO_IN) || CONFIG_CODEC != SWCODEC */
 #endif /* HAVE_RECORDING */
 #endif /* SIMULATOR */
+#ifndef FM_PRESET
+MENUITEM_FUNCTION(radio_presets_item, ID2P(LANG_FM_BUTTONBAR_PRESETS), 
+                    handle_radio_presets, NULL, NOICON);
+#endif
+#ifndef FM_PRESET_ADD
+MENUITEM_FUNCTION(radio_addpreset_item, ID2P(LANG_FM_ADD_PRESET), 
+                    radio_add_preset, NULL, NOICON);
+#endif
 
 
+MENUITEM_FUNCTION(presetload_item, ID2P(LANG_FM_PRESET_LOAD), 
+                    load_preset_list, NULL, NOICON);
+MENUITEM_FUNCTION(presetsave_item, ID2P(LANG_FM_PRESET_SAVE), 
+                    save_preset_list, NULL, NOICON);
+MENUITEM_FUNCTION(presetclear_item, ID2P(LANG_FM_PRESET_CLEAR), 
+                    clear_preset_list, NULL, NOICON);
+MENUITEM_FUNCTION(scan_presets_item, ID2P(LANG_FM_SCAN_PRESETS), 
+                    scan_presets, NULL, NOICON);
+
+MAKE_MENU(radio_menu_items, ID2P(LANG_FM_MENU), NULL, 
+            bitmap_icons_6x8[Icon_Radio_screen], 
+#ifndef FM_PRESET
+            &radio_presets_item,
+#endif
+#ifndef FM_PRESET_ADD
+            &radio_addpreset_item,
+#endif
+            &presetload_item, &presetsave_item, &presetclear_item,
+            &force_mono,
+#ifndef FM_MODE
+            &radio_mode_item,
+#endif
+            &set_region, &sound_settings,
+#ifdef FM_RECORDING_SCREEN
+            &LANG_RECORDING_MENU,
+#endif
+#ifdef FM_RECORDING_SETTINGS
+            &recsettings_item,
+#endif
+            &scan_presets_item);
 /* main menu of the radio screen */
 static bool radio_menu(void)
 {
-    int m;
-    bool result;
-    
-    static const struct menu_item items[] = {
-/* Add functions not accessible via buttons */
-#ifndef FM_PRESET
-        { ID2P(LANG_FM_BUTTONBAR_PRESETS), handle_radio_presets  },
-#endif
-#ifndef FM_PRESET_ADD
-        { ID2P(LANG_FM_ADD_PRESET)       , radio_add_preset      },
-#endif
-        { ID2P(LANG_FM_PRESET_LOAD)      , load_preset_list      },
-        { ID2P(LANG_FM_PRESET_SAVE)      , save_preset_list      },
-        { ID2P(LANG_FM_PRESET_CLEAR)     , clear_preset_list     },
-
-        { monomode_menu_string           , toggle_mono_mode      },
-#ifndef FM_MODE
-        { radiomode_menu_string          , toggle_radio_mode     },
-#endif
-        { region_menu_string             , toggle_region_mode    },
-        { ID2P(LANG_SOUND_SETTINGS)      , sound_menu            },
-#ifdef FM_RECORDING_SCREEN
-        { ID2P(LANG_RECORDING_MENU)      , fm_recording_screen   },
-#endif
-#ifdef FM_RECORDING_SETTINGS
-        { ID2P(LANG_RECORDING_SETTINGS)  , fm_recording_settings },
-#endif
-        { ID2P(LANG_FM_SCAN_PRESETS)     , scan_presets          },
-    };
-
-    create_monomode_menu();
-    create_region_menu();
-#ifndef FM_MODE
-    create_radiomode_menu();
-#endif
-    m = menu_init(items, sizeof(items) / sizeof(*items),
-                  radio_menu_cb, NULL, NULL, NULL);
-    result = menu_run(m);
-    menu_exit(m);
-    return result;
+    return (bool)do_menu(&radio_menu_items);
 }
 
 #endif

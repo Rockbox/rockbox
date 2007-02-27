@@ -159,7 +159,7 @@ static const struct button_mapping button_context_keyboard[]  = {
 
     LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */
-
+#if CONFIG_TUNER
 static const struct button_mapping button_context_radio[]  = {
     { ACTION_FM_MENU,          BUTTON_MENU | BUTTON_REPEAT,           BUTTON_NONE },
     { ACTION_FM_RECORD_DBLPRE, BUTTON_MENU,                           BUTTON_NONE},
@@ -176,7 +176,7 @@ static const struct button_mapping button_context_radio[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
     
 };
-
+#endif
 const struct button_mapping* get_context_mapping( int context )
 {
     switch( context )
@@ -207,9 +207,10 @@ const struct button_mapping* get_context_mapping( int context )
             return button_context_recscreen;
         case CONTEXT_KEYBOARD:
             return button_context_keyboard;
+#if CONFIG_TUNER
         case CONTEXT_FM:
             return button_context_radio;
-
+#endif
         case CONTEXT_LIST:
         case CONTEXT_MAINMENU:
         default:

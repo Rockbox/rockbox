@@ -43,6 +43,9 @@
 #include "peakmeter.h"
 #endif
 #include "menus/eq_menu.h"
+#if CONFIG_TUNER
+#include "radio.h"
+#endif
 
 /* some sets of values which are used more than once, to save memory */
 static const char off_on[] = "off,on";
@@ -474,7 +477,7 @@ const struct settings_list settings[] = {
     /* tuner */
 #if CONFIG_TUNER
     OFFON_SETTING(0,fm_force_mono, LANG_FM_MONO_MODE,
-        false,"force fm mono", NULL),
+        false, "force fm mono", toggle_mono_mode),
     SYSTEM_SETTING(NVRAM(4),last_frequency,0),
 #endif
 
@@ -1046,8 +1049,9 @@ const struct settings_list settings[] = {
         "disable autoresume if phones not present",NULL),
 #endif
 #if CONFIG_TUNER
-    {F_T_INT,&global_settings.fm_region,LANG_FM_REGION,INT(0),
-        "fm_region","eu,us,jp,kr",UNUSED},
+    CHOICE_SETTING(0, fm_region, LANG_FM_REGION, 0, 
+        "fm_region", "eu,us,jp,kr", set_radio_region, 4, ID2P(LANG_FM_EUROPE),
+        ID2P(LANG_FM_US), ID2P(LANG_FM_JAPAN), ID2P(LANG_FM_KOREA)),
 #endif
 
     OFFON_SETTING(0,audioscrobbler,LANG_AUDIOSCROBBLER,

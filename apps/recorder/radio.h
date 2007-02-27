@@ -32,6 +32,9 @@ void radio_pause(void);
 void radio_stop(void);
 bool radio_hardware_present(void);
 bool in_radio_screen(void);
+/* callbacks for the radio settings */
+void set_radio_region(int region);
+void toggle_mono_mode(bool mono);
 
 #define MAX_FMPRESET_LEN 27
 
@@ -43,7 +46,6 @@ struct fmstation
 
 struct fm_region_setting
 {
-    int lang;
     int freq_min;
     int freq_max;
     int freq_step;

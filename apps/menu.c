@@ -314,6 +314,9 @@ static char * get_menu_item_name(int selected_item,void * data, char *buffer)
     /* only MT_MENU or MT_RETURN_ID is allowed in here */
     if (type == MT_RETURN_ID)
     {
+        if (menu->flags&MENU_DYNAMIC_DESC)
+            return menu->menu_get_name_and_icon->list_get_name(selected_item,
+                    menu->menu_get_name_and_icon->list_get_name_data, buffer);
         return (char*)menu->strings[selected_item];
     }
     
