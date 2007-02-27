@@ -112,7 +112,7 @@ struct crossfeed_data
     int32_t coefs[3];       /* 04h - Coefficients for the shelving filter */
     int32_t history[4];     /* 10h - Format is x[n - 1], y[n - 1] for both channels */
     int32_t delay[13][2];   /* 20h */
-    int     index;          /* 88h - Current index/pointer into the delay line */
+    int32_t *index;         /* 88h - Current pointer into the delay line */
                             /* 8ch */
 };
 
@@ -138,10 +138,6 @@ typedef int (*resample_fn_type)(int count, struct dsp_data *data,
                                 int32_t *src[], int32_t *dst[]);
 typedef void (*sample_output_fn_type)(int count, struct dsp_data *data,
                                       int32_t *src[], int16_t *dst);
-/* If ACF_SWITCHPARAM is no longer needed, make apply_crossfeed of type
-   channels_process_fn_type since it is really just that */
-typedef void (*apply_crossfeed_fn_type)(ACF_SWITCHPARAM(int count,
-                                                        int32_t *buf[]));
 typedef void (*channels_process_fn_type)(int count, int32_t *buf[]);
 
 /*
@@ -164,7 +160,7 @@ struct dsp_config
     sample_output_fn_type       output_samples;
     /* These will be NULL for the voice codec and is more economical that
        way */
-    apply_crossfeed_fn_type     apply_crossfeed;
+    channels_process_fn_type    apply_crossfeed;
     channels_process_fn_type    channels_process;
 };
 
@@ -175,14 +171,10 @@ static struct dither_data dither_data[2] IBSS_ATTR; /* 0=left, 1=right */
 static long   dither_mask IBSS_ATTR;
 static long   dither_bias IBSS_ATTR;
 /* Crossfeed */
-#ifdef DSP_CROSSFEED_DELAY_PTR
 struct crossfeed_data crossfeed_data IDATA_ATTR =    /* A */
 {
-    .index = (intptr_t)crossfeed_data.delay
+    .index = (int32_t *)crossfeed_data.delay
 };
-#else
-struct crossfeed_data crossfeed_data IBSS_ATTR;     /* A */
-#endif
 
 /* Equalizer */
 static struct eq_state eq_data;                     /* A/V */
@@ -719,7 +711,7 @@ static void apply_crossfeed(int count, int32_t *buf[])
     int32_t *delay = &crossfeed_data.delay[0][0];
     int32_t *coefs = &crossfeed_data.coefs[0];
     int32_t gain = crossfeed_data.gain;
-    int di = crossfeed_data.index;
+    int32_t *di = crossfeed_data.index;
  
     int32_t acc;
     int32_t left, right;
@@ -731,28 +723,28 @@ static void apply_crossfeed(int count, int32_t *buf[])
         right = buf[1][i];
 
         /* Filter delayed sample from left speaker */
-        ACC_INIT(acc, delay[di*2], coefs[0]);
+        ACC_INIT(acc, *di, coefs[0]);
         ACC(acc, hist_l[0], coefs[1]);
         ACC(acc, hist_l[1], coefs[2]);
         /* Save filter history for left speaker */
         hist_l[1] = GET_ACC(acc);
-        hist_l[0] = delay[di*2];
+        hist_l[0] = *di;
+        *di++ = left;
         /* Filter delayed sample from right speaker */
-        ACC_INIT(acc, delay[di*2 + 1], coefs[0]);
+        ACC_INIT(acc, *di, coefs[0]);
         ACC(acc, hist_r[0], coefs[1]);
         ACC(acc, hist_r[1], coefs[2]);
         /* Save filter history for right speaker */
         hist_r[1] = GET_ACC(acc);
-        hist_r[0] = delay[di*2 + 1];
-        delay[di*2] = left;
-        delay[di*2 + 1] = right;
+        hist_r[0] = *di;
+        *di++ = right;
         /* Now add the attenuated direct sound and write to outputs */
         buf[0][i] = FRACMUL(left, gain) + hist_r[1];
         buf[1][i] = FRACMUL(right, gain) + hist_l[1];
  
         /* Wrap delay line index if bigger than delay line size */
-        if (++di > 12)
-            di = 0;
+        if (di >= delay + 13*2)
+            di = delay;
     }
     /* Write back local copies of data we've modified */
     crossfeed_data.index = di;
@@ -1127,7 +1119,7 @@ int dsp_process(char *dst, const char *src[], int count)
         if ((samples = resample(samples, tmp)) <= 0)
             break; /* I'm pretty sure we're downsampling here */
         if (dsp->apply_crossfeed)
-            dsp->apply_crossfeed(ACF_SWITCHPARAM(samples, tmp));
+            dsp->apply_crossfeed(samples, tmp);
         /* TODO: EQ and tone controls need separate structs for audio and voice
          * DSP processing thanks to filter history. isn't really audible now, but
          * might be the day we start handling voice more delicately.
