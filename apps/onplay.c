@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Björn Stenberg
+ * Copyright (C) 2002 Bjï¿½n Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -822,11 +822,19 @@ static bool clipboard_paste(void)
         /* Recursion. Set up external stack */
         char srcpath[MAX_PATH];
         char targetpath[MAX_PATH];
-
-        strncpy(srcpath, clipboard_selection, sizeof srcpath);
-        strncpy(targetpath, target, sizeof targetpath);
-
-        success = clipboard_pastedirectory(srcpath, sizeof(srcpath), target, sizeof(targetpath), clipboard_is_copy);
+        if (!strncmp(clipboard_selection, target, strlen(clipboard_selection)))
+        {
+            /* Do not allow the user to paste a directory into a dir they are copying */
+            success = 0;
+        }
+        else
+        {
+            strncpy(srcpath, clipboard_selection, sizeof srcpath);
+            strncpy(targetpath, target, sizeof targetpath);
+    
+            success = clipboard_pastedirectory(srcpath, sizeof(srcpath),
+                             target, sizeof(targetpath), clipboard_is_copy);
+        }
     } else {
         success = clipboard_pastefile(clipboard_selection, target, clipboard_is_copy);
     }
