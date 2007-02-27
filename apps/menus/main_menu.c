@@ -50,21 +50,21 @@
 #endif
 
 /* lazy coders can use this function if the needed callback 
-	is just to say if the item is shown or not */
+    is just to say if the item is shown or not */
 int dynamicitem_callback(int action,const struct menu_item_ex *this_item);
 
 
 struct browse_folder_info {
-	const char* dir;
-	int show_options;
+    const char* dir;
+    int show_options;
 };
 static struct browse_folder_info theme = {THEME_DIR, SHOW_CFG};
 static struct browse_folder_info rocks = {PLUGIN_DIR, SHOW_PLUGINS};
 static struct browse_folder_info config = {ROCKBOX_DIR, SHOW_CFG};
 static int browse_folder(void *param)
 {
-	const struct browse_folder_info *info =
-		(const struct browse_folder_info*)param;
+    const struct browse_folder_info *info =
+        (const struct browse_folder_info*)param;
     return rockbox_browse(info->dir, info->show_options);
 }
 
@@ -103,11 +103,11 @@ static int write_settings_file(void* param)
 }
 
 MENUITEM_FUNCTION_WPARAM(browse_configs, ID2P(LANG_CUSTOM_CFG), 
-		browse_folder, (void*)&config, NULL, NOICON);
+        browse_folder, (void*)&config, NULL, NOICON);
 MENUITEM_FUNCTION_WPARAM(save_settings_item, ID2P(LANG_SAVE_SETTINGS), 
-		write_settings_file, (void*)SETTINGS_SAVE_ALL, NULL, NOICON);
+        write_settings_file, (void*)SETTINGS_SAVE_ALL, NULL, NOICON);
 MENUITEM_FUNCTION_WPARAM(save_theme_item, ID2P(LANG_SAVE_THEME), 
-		write_settings_file, (void*)SETTINGS_SAVE_THEME, NULL, NOICON);
+        write_settings_file, (void*)SETTINGS_SAVE_THEME, NULL, NOICON);
 MENUITEM_FUNCTION(reset_settings_item,ID2P(LANG_RESET),reset_settings, NULL, NOICON);
 
 MAKE_MENU(manage_settings, ID2P(LANG_MANAGE_MENU), NULL, bitmap_icons_6x8[Icon_Config],
@@ -383,9 +383,9 @@ MAKE_MENU(info_menu, ID2P(LANG_INFO), 0, bitmap_icons_6x8[Icon_Questionmark],
 /*    MAIN MENU                    */
 
 MENUITEM_FUNCTION_WPARAM(browse_themes, ID2P(LANG_CUSTOM_THEME), 
-		browse_folder, (void*)&theme, NULL, bitmap_icons_6x8[Icon_Folder]);
+        browse_folder, (void*)&theme, NULL, bitmap_icons_6x8[Icon_Folder]);
 MENUITEM_FUNCTION_WPARAM(browse_plugins, ID2P(LANG_PLUGINS),
-		browse_folder, (void*)&rocks, NULL, bitmap_icons_6x8[Icon_Plugin]);
+        browse_folder, (void*)&rocks, NULL, bitmap_icons_6x8[Icon_Plugin]);
 
 #if CONFIG_TUNER
 MENUITEM_FUNCTION(load_radio_screen, ID2P(LANG_FM_RADIO),
@@ -449,7 +449,7 @@ int dynamicitem_callback(int action,const struct menu_item_ex *this_item)
 {
     if (action != ACTION_ENTER_MENUITEM)
         return action;
-	
+    
 #if CONFIG_TUNER
     if (this_item == &load_radio_screen)
     {

@@ -91,9 +91,9 @@ struct menu_item_ex {
         const char **strings; /* used with MT_RETURN_ID */
     };
     union {
-		/* For settings */
+        /* For settings */
         int (*menu_callback)(int action, const struct menu_item_ex *this_item);
-		/* For everything else, except if the text is dynamic */
+        /* For everything else, except if the text is dynamic */
         const struct menu_callback_with_desc {
             int (*menu_callback)(int action, 
                                  const struct menu_item_ex *this_item);
@@ -102,16 +102,16 @@ struct menu_item_ex {
             ICON icon; /* Icon to display */
 #endif
         } *callback_and_desc;
-		/* For when the item text is dynamic */
-		const struct menu_get_name_and_icon {
-			int (*menu_callback)(int action, 
+        /* For when the item text is dynamic */
+        const struct menu_get_name_and_icon {
+            int (*menu_callback)(int action, 
                                  const struct menu_item_ex *this_item);
-			char *(*list_get_name)(int selected_item, void * data, char *buffer);
-			void *list_get_name_data;
+            char *(*list_get_name)(int selected_item, void * data, char *buffer);
+            void *list_get_name_data;
 #ifdef HAVE_LCD_BITMAP
             ICON icon; /* Icon to display */
 #endif
-		} *menu_get_name_and_icon;
+        } *menu_get_name_and_icon;
     };
 };
 
@@ -168,12 +168,12 @@ bool do_setting_from_menu(const struct menu_item_ex *temp);
         { MT_FUNCTION_WITH_PARAM|MENU_HAS_DESC,                             \
             { .func_with_param = &name##__},                                \
             {.callback_and_desc = & name##_}};
-			
+            
 /* As above, except the text is dynamic */
 #define MENUITEM_FUNCTION_WPARAM_DYNTEXT(name, func, param, callback,  \
-										 text_callback, text_cb_data, icon) \
-    static const struct menu_get_name_and_icon name##_ 						\
-								= {callback,text_callback,text_cb_data,icon};\
+                                         text_callback, text_cb_data, icon) \
+    static const struct menu_get_name_and_icon name##_                         \
+                                = {callback,text_callback,text_cb_data,icon};\
     static const struct menu_func_with_param name##__ = {func, param};      \
     static const struct menu_item_ex name   =                               \
         { MT_FUNCTION_WITH_PARAM|MENU_DYNAMIC_DESC,                             \

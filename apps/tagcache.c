@@ -762,7 +762,7 @@ static bool check_against_clause(long numeric, const char *str,
             case clause_begins_with:
                 return (strcasestr(str, clause->str) == str);
             case clause_not_begins_with:
-	            return (strcasestr(str, clause->str) != str);
+                return (strcasestr(str, clause->str) != str);
             case clause_ends_with:
                 return str_ends_with(str, clause->str);
             case clause_not_ends_with:

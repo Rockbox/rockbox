@@ -2081,14 +2081,14 @@ static bool dbg_lcd_power_off(void)
 
     while(1)
     {
-		int button;
+        int button;
 
         lcd_clear_display();
         lcd_puts(0, 0, "LCD Power Off");
-		if(lcd_poweroff)
-			lcd_puts(1, 1, "Yes");
-		else
-			lcd_puts(1, 1, "No");
+        if(lcd_poweroff)
+            lcd_puts(1, 1, "Yes");
+        else
+            lcd_puts(1, 1, "No");
 
         lcd_update();
 
@@ -2099,13 +2099,13 @@ static bool dbg_lcd_power_off(void)
             case ACTION_STD_NEXT:
                 lcd_poweroff = !lcd_poweroff;
                 break;
-			case ACTION_STD_OK:
-			case ACTION_STD_CANCEL:
-				action_signalscreenchange();
-				return false;
-			default:
+            case ACTION_STD_OK:
+            case ACTION_STD_CANCEL:
+                action_signalscreenchange();
+                return false;
+            default:
                 sleep(HZ/10);
-				break;
+                break;
         }
     }
     return false;

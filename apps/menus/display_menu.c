@@ -508,8 +508,8 @@ MAKE_MENU(peak_meter_menu, ID2P(LANG_PM_MENU), NULL, NOICON,
 
 
 struct browse_folder_info {
-	const char* dir;
-	int show_options;
+    const char* dir;
+    int show_options;
 };
 #ifdef HAVE_LCD_BITMAP
 static struct browse_folder_info fonts = {FONT_DIR, SHOW_FONT};
@@ -521,20 +521,20 @@ static struct browse_folder_info rwps = {WPS_DIR, SHOW_RWPS};
 
 static int browse_folder(void *param)
 {
-	const struct browse_folder_info *info =
-		(const struct browse_folder_info*)param;
+    const struct browse_folder_info *info =
+        (const struct browse_folder_info*)param;
     return rockbox_browse(info->dir, info->show_options);
 }
 
 #ifdef HAVE_LCD_BITMAP
 MENUITEM_FUNCTION_WPARAM(browse_fonts, ID2P(LANG_CUSTOM_FONT), 
-		browse_folder, (void*)&fonts, NULL, NOICON);
+        browse_folder, (void*)&fonts, NULL, NOICON);
 #endif
 MENUITEM_FUNCTION_WPARAM(browse_wps, ID2P(LANG_WHILE_PLAYING), 
-		browse_folder, (void*)&wps, NULL, NOICON);
+        browse_folder, (void*)&wps, NULL, NOICON);
 #ifdef HAVE_REMOTE_LCD
 MENUITEM_FUNCTION_WPARAM(browse_rwps, ID2P(LANG_REMOTE_WHILE_PLAYING), 
-		browse_folder, (void*)&rwps, NULL, NOICON);
+        browse_folder, (void*)&rwps, NULL, NOICON);
 #endif
 
 MENUITEM_SETTING(show_icons, &global_settings.show_icons, NULL);

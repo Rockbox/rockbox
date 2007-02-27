@@ -33,7 +33,7 @@ extern const struct menu_item_ex
         sound_settings,             /* sound_menu.c     */
         settings_menu_item,         /* settings_menu.c  */
         playlist_menu_item,         /* playlist_menu.c  */
-		equalizer_menu;				/* eq_menu.c        */
+        equalizer_menu;                /* eq_menu.c        */
 
 #ifdef HAVE_WM8758
 extern const struct menu_item_ex hw_eq_menu; /* eq_menu.c        */

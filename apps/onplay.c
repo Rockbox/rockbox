@@ -210,7 +210,7 @@ static bool add_to_playlist(int position, bool queue)
         else if ((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_M3U)
             playlist_insert_playlist(NULL, selected_file, position, queue);
     }
-	
+    
     if (new_playlist && (playlist_amount() > 0))
     {
         /* nothing is currently playing so begin playing what we just

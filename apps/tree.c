@@ -224,7 +224,7 @@ static void tree_get_fileicon(int selected_item, void * data, ICON * icon)
     }
     else
 #endif
-		{
+        {
         struct entry* dc = local_tc->dircache;
         struct entry* e = &dc[selected_item];
         *icon = (ICON)filetype_get_icon(e->attr);
@@ -340,7 +340,7 @@ static int update_dir(void)
     }
     else 
 #endif
-		{
+        {
         /* if the tc.currdir has been changed, reload it ...*/
         if (strncmp(tc.currdir, lastdir, sizeof(lastdir)) || reload_dir) {
 
@@ -365,9 +365,9 @@ static int update_dir(void)
     {
         if(
 #ifdef HAVE_TAGCACHE
-		!id3db && 
+        !id3db && 
 #endif
-		(tc.dirfull ||
+        (tc.dirfull ||
                       tc.filesindir == global_settings.max_files_in_dir) )
         {
             gui_syncsplash(HZ, true, str(LANG_SHOWDIR_BUFFER_FULL));

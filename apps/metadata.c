@@ -536,7 +536,7 @@ static bool get_speex_metadata(int fd, struct mp3entry* id3)
     serial = get_long_le(&buf[14]);
     if ((lseek(fd, 33, SEEK_SET) < 0)||(read(fd, buf, 58) < 4))
     {
-	return false;
+    return false;
     }
 
     id3->frequency = get_slong(&buf[31]);
@@ -547,25 +547,25 @@ static bool get_speex_metadata(int fd, struct mp3entry* id3)
     /* Comments are in second Ogg page */
     if (lseek(fd, 28+last_serial/*(temporary for header size)*/, SEEK_SET) < 0)
     {
-	return false;
+    return false;
     }
 
     /* Minimum header length for Ogg pages is 27. */
     if (read(fd, buf, 27) < 27) 
     {
-	return false;
+    return false;
     }
 
     if (memcmp(buf, "OggS", 4) !=0 )
     {
-	return false;
+    return false;
     }
 
     segments = buf[26];
     /* read in segment table */
     if (read(fd, buf, segments) < segments) 
     {
-	return false;
+    return false;
     }
 
     /* The second packet in a vorbis stream is the comment packet. It *may*
@@ -595,7 +595,7 @@ static bool get_speex_metadata(int fd, struct mp3entry* id3)
     /* A page is always < 64 kB */
     if (lseek(fd, -(MIN(64 * 1024, id3->filesize)), SEEK_END) < 0)
     {
-	return false;
+    return false;
     }
 
     remaining = 0;
@@ -669,7 +669,7 @@ static bool get_speex_metadata(int fd, struct mp3entry* id3)
         logf("serialno mismatch");
         logf("%ld", serial);
         logf("%ld", last_serial);
-	return false;
+    return false;
     }
 
     id3->length = (id3->samples / id3->frequency) * 1000;
@@ -2190,7 +2190,7 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         track->id3.vbr = false;
         track->id3.filesize = filesize(fd);
         if (memcmp(buf,"NESM",4) && memcmp(buf,"NSFE",4)) return false;
-	break;
+    break;
 
     case AFMT_AIFF:
         if (!get_aiff_metadata(fd, &(track->id3)))
