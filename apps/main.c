@@ -549,10 +549,15 @@ void cop_main(void)
    so it should not be assumed that the coprocessor be usable even on
    platforms which support it.
 
-   At present all we do is send the COP to sleep if anything wakes it. */
-    while(1) {
+   At present the COP sleeps unless it receives a message from the CPU telling
+   it that we are loading a new kernel, so must reboot */
+
+    extern volatile unsigned char cpu_message;
+
+    while(cpu_message != COP_REBOOT) {
         COP_CTL = PROC_SLEEP;
     }
+    rolo_restart_cop();
 }
 #endif
 

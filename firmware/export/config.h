@@ -280,6 +280,8 @@
 
 #define NUM_CORES 1
 #define CURRENT_CORE 0
+
+#define COP_REBOOT 0x00000001
 #else
 #define NUM_CORES 1
 #define CURRENT_CORE 0

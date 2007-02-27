@@ -36,6 +36,38 @@
 
 #define IRQ0_EDGE_TRIGGER 0x80
 
+#ifdef CPU_PP
+/* Handle the COP properly - it needs to jump to a function outside SDRAM while
+ * the new firmware is being loaded, and then jump to the start of SDRAM
+ * TODO: Use the mailboxes built into the PP processor for this
+ */
+
+volatile unsigned char IDATA_ATTR cpu_message = 0;
+volatile unsigned char IDATA_ATTR cpu_reply = 0;
+
+void rolo_restart_cop(void) ICODE_ATTR;
+void rolo_restart_cop(void)
+{
+    /* Invalidate cache */
+    outl(inl(0xf000f044) | 0x6, 0xf000f044);
+    while ((inl(0x6000c000) & 0x8000) != 0) {}
+    
+    /* Disable cache */
+    outl(0x0, 0x6000C000);
+
+    /* Wait while RoLo loads the image into SDRAM */
+    /* TODO: Accept checksum failure gracefully */
+    while(cpu_message == 1) {}
+
+    cpu_reply = 1;
+
+    asm volatile(
+        "mov   r0, #0x10000000   \n"
+        "mov   pc, r0            \n"
+    );
+}
+#endif
+
 static void rolo_error(const char *text)
 {
     lcd_clear_display();
@@ -78,6 +110,9 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
         : : "a"(dest)
     );
 #elif (CONFIG_CPU==PP5020) || (CONFIG_CPU==PP5024)
+
+    cpu_message = 0;
+
     /* Flush cache */
     outl(inl(0xf000f044) | 0x2, 0xf000f044);
     while ((inl(0x6000c000) & 0x8000) != 0) {}
@@ -88,6 +123,8 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
     /* Reset the memory mapping registers to zero */
     for (i=0;i<8;i++)
         memmapregs[i]=0;
+
+    while(cpu_reply != 1) {}
 
     asm volatile(
         "mov   r0, #0x10000000   \n"
@@ -150,6 +187,10 @@ int rolo_load(const char* filename)
 
     /* Rockbox checksums are big-endian */
     file_checksum = betoh32(file_checksum);
+#ifdef CPU_PP
+    cpu_message = COP_REBOOT;
+    COP_CTL = PROC_WAKE;
+#endif
 
     lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
 
