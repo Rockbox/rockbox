@@ -476,17 +476,16 @@ static void sample_output_dithered(int count, struct dsp_data *data,
     const int32_t min = data->clip_min;
     const int32_t max = data->clip_max;
     const int32_t range = max - min;
-    const int dinc = dsp->data.num_channels;
-
     int ch;
-    for (ch = 0; ch < dinc; ch++)
+    int16_t *d;
+
+    for (ch = 0; ch < dsp->data.num_channels; ch++)
     {
         struct dither_data * const dither = &dither_data[ch];
         int32_t *s = src[ch];
-        int16_t *d = &dst[ch];
         int i;
 
-        for (i = 0; i < count; i++, s++, d += dinc)
+        for (i = 0, d = &dst[ch]; i < count; i++, s++, d += 2)
         {
             int32_t output, sample;
             int32_t random;
@@ -530,6 +529,20 @@ static void sample_output_dithered(int count, struct dsp_data *data,
             *d = output >> scale;
         }
     }
+
+    if (dsp->data.num_channels == 2)
+        return;
+
+    /* Have to duplicate left samples into the right channel since
+       pcm buffer and hardware is interleaved stereo */
+    d = &dst[0];
+
+    do
+    {
+        int16_t s = *d++;
+        *d++ = s;
+    }
+    while (--count > 0);
 }
 
 /**
