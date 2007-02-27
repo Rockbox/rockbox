@@ -614,7 +614,14 @@ int do_menu(const struct menu_item_ex *start_menu)
         
         if (menu_callback)
         {
+            int old_action = action;
             action = menu_callback(action, menu);
+            if (action == ACTION_EXIT_AFTER_THIS_MENUITEM)
+            {
+                action = old_action;
+                ret = MENU_SELECTED_EXIT; /* will exit after returning
+                                             from selection */
+            }
         }
 
         if (gui_synclist_do_button(&lists,action,LIST_WRAP_UNLESS_HELD))

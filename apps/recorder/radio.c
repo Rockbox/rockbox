@@ -1211,8 +1211,16 @@ MENUITEM_FUNCTION(radio_edit_preset_item, ID2P(LANG_FM_EDIT_PRESET),
                     radio_edit_preset, NULL, NOICON);
 MENUITEM_FUNCTION(radio_delete_preset_item, ID2P(LANG_FM_DELETE_PRESET), 
                     radio_delete_preset, NULL, NOICON);
+int radio_preset_callback(int action, const struct menu_item_ex *this_item)
+{
+    (void)this_item;
+    if (action == ACTION_STD_OK)
+        return ACTION_EXIT_AFTER_THIS_MENUITEM;
+    return action;
+}
 MAKE_MENU(handle_radio_preset_menu, ID2P(LANG_FM_BUTTONBAR_PRESETS),
-            NULL, NOICON, &radio_edit_preset_item, &radio_delete_preset_item);
+            radio_preset_callback, NOICON, &radio_edit_preset_item, 
+            &radio_delete_preset_item);
 /* present a list of preset stations */
 char * presets_get_name(int selected_item, void * data, char *buffer)
 {

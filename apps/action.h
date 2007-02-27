@@ -156,6 +156,8 @@ enum {
     /* main menu */
     ACTION_REQUEST_MENUITEM,
     ACTION_EXIT_MENUITEM,
+    ACTION_EXIT_AFTER_THIS_MENUITEM, /* if a menu returns this the menu will exit
+                                        once the subitem returns */
     ACTION_ENTER_MENUITEM,
     ACTION_MENU_WPS,
     
