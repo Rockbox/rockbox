@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2006 Thom Johansen
+ * Portions Copyright (C) 2007 Michael Sevakis
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -18,74 +19,62 @@
  ****************************************************************************/
 
 /****************************************************************************
- * void apply_crossfeed(int32_t *src[], int count)
+ * void apply_crossfeed(int count, int32_t *src[])
  */
     .section    .text
     .global     apply_crossfeed 
 apply_crossfeed:
-    lea.l (-44, %sp), %sp
-    movem.l %d2-%d7/%a2-%a6, (%sp)      | save all regs
-    move.l (44+4, %sp), %a4
-    movem.l (%a4), %a4-%a5              | a4 = src[0], a5 = src[1]
-    move.l (44+8, %sp), %d7             | d7 = count
-
-    lea.l crossfeed_data, %a1
-    lea.l (8*4, %a1), %a0               | a0 = &delay[0][0]
-    move.l (%a1)+, %a6                  | a6 = direct gain
-    movem.l (3*4, %a1), %d0-%d3         | fetch filter history samples
-    move.l (33*4, %a1), %d4             | fetch delay line index
-    movem.l (%a1), %a1-%a3              | load filter coefs
-    move.l %d4, %d5
-    lsl.l #3, %d5
-    add.l %d5, %a0                      | point a0 to current delay position
-|    lea.l (%d4*4, %a0), %a0
-|    lea.l (%d4*4, %a0), %a0             | point a0 to current delay position
+    lea.l       -44(%sp), %sp
+    movem.l     %d2-%d7/%a2-%a6, (%sp)  | save all regs
+    movem.l     48(%sp), %d7/%a4        | %d7 = count, %a4 = src
+    movem.l     (%a4), %a4-%a5          | %a4 = src[0], %a5 = src[1]
+    lea.l       crossfeed_data, %a1
+    move.l      (%a1)+, %a6             | a6 = direct gain
+    movem.l     12(%a1), %d0-%d3        | fetch filter history samples
+    move.l      132(%a1), %a0           | fetch delay line address
+    movem.l     (%a1), %a1-%a3          | load filter coefs
     /* Register usage in loop:
-     * a0 = &delay[index][0], a1..a3 = b0, b1, a1 (filter coefs),
-     * a4 = src[0], a5 = src[1], a6 = direct gain,
-     * d0..d3 = history
-     * d4 = delay line index,
-     * d5,d6 = temp.
-     * d7 = count
+     * %a0 = delay_p, %a1..%a3 = b0, b1, a1 (filter coefs),
+     * %a4 = src[0], %a5 = src[1], %a6 = direct gain,
+     * %d0..%d3 = history
+     * %d4..%d6 = temp.
+     * %d7 = count
      */
 .cfloop:
-    mac.l %a2, %d0, (4, %a0), %d0, %acc0 | acc = b1*dr[n - 1] d0 = dr[n]
-    mac.l %a1, %d0, %acc0               | acc += b0*dr[n]
-    mac.l %a3, %d1, (%a4), %d5, %acc0   | acc += a1*y_l[n - 1], load left input
-    move.l %acc0, %d1                   | get filtered delayed sample
-    mac.l %a6, %d5, %acc0               | acc += gain*x_l[n]
-    movclr.l %acc0, %d6
-    move.l %d6, (%a4)+                  | write result
+    mac.l       %a2, %d0, 4(%a0), %d0, %acc0 | acc  = b1*dr[n - 1] d0 = dr[n]
+    mac.l       %a1, %d0             , %acc0 | acc += b0*dr[n]
+    mac.l       %a3, %d1,  (%a4), %d4, %acc0 | acc += a1*y_l[n - 1], load L
+    move.l      %acc0, %d1              | get filtered delayed sample
+    mac.l       %a6, %d4, %acc0         | acc += gain*x_l[n]
+    movclr.l    %acc0, %d6              |
+    move.l      %d6, (%a4)+             | write result
 
-    mac.l %a2, %d2, (%a0), %d2, %acc0   | acc = b1*dl[n - 1], d2 = dl[n]
-    move.l %d5, (%a0)+                  | save left input to delay line
-    mac.l %a1, %d2, %acc0               | acc += b0*dl[n]
-    mac.l %a3, %d3, (%a5), %d5, %acc0   | acc += a1*y_r[n - 1], load right input
-    move.l %acc0, %d3                   | get filtered delayed sample
-    mac.l %a6, %d5, %acc0               | acc += gain*x_r[n]
-    move.l %d5, (%a0)+                  | save right input to delay line
-    movclr.l %acc0, %d6
-    move.l %d6, (%a5)+                  | write result
+    mac.l       %a2, %d2, (%a0), %d2, %acc0 | acc  = b1*dl[n - 1], d2 = dl[n]
+    mac.l       %a1, %d2            , %acc0 | acc += b0*dl[n]
+    mac.l       %a3, %d3, (%a5), %d5, %acc0 | acc += a1*y_r[n - 1], load R
+    movem.l     %d4-%d5, (%a0)          | save left & right inputs to delay line
+    move.l      %acc0, %d3              | get filtered delayed sample
+    mac.l       %a6, %d5, %acc0         | acc += gain*x_r[n]
+    lea.l       8(%a0), %a0             | increment delay pointer
+    movclr.l    %acc0, %d6              |
+    move.l      %d6, (%a5)+             | write result
 
-    addq.l #1, %d4                      | index++
-    moveq.l #13, %d6
-    cmp.l %d6, %d4                      | wrap index to 0 if it overflows
-    jlt .cfnowrap
-    moveq.l #13*8, %d4
-    sub.l %d4, %a0                      | wrap back delay line ptr as well
-    clr.l %d4
-.cfnowrap:
-    subq.l #1, %d7
-    jne .cfloop
-    | save data back to struct
-    lea.l crossfeed_data + 4*4, %a1
-    movem.l %d0-%d3, (%a1)
-    move.l %d4, (30*4, %a1)
-    movem.l (%sp), %d2-%d7/%a2-%a6
-    lea.l (44, %sp), %sp
+    cmpa.l      #crossfeed_data+136, %a0| wrap a0 if passed end
+    bge.b       .cfwrap                 |
+    .word       0x51fb                  | tpf.l - trap the buffer wrap
+.cfwrap:
+    lea.l       -104(%a0), %a0          | wrap
+    subq.l      #1, %d7                 | --count < 0 ?
+    bgt.b       .cfloop                 |
+    lea.l       crossfeed_data+16, %a1  | save data back to struct
+    movem.l     %d0-%d3, (%a1)          | ...history
+    move.l      %a0, 120(%a1)           | ...delay_p
+    movem.l     (%sp), %d2-%d7/%a2-%a6  | restore all regs
+    lea.l       44(%sp), %sp
     rts
 .cfend:
     .size       apply_crossfeed,.cfend-apply_crossfeed
+
 
 /****************************************************************************
  * int dsp_downsample(int count, struct dsp_data *data,
@@ -128,10 +117,10 @@ dsp_downsample:
     lsl.l       %d7, %d0                |
     lsr.l       #1, %d0                 |
     mac.l       %d0, %d1, %acc0         | %acc0 += frac * diff
-    move.l      %acc0, %d0              |
     add.l       %d4, %d5                | phase += delta
     move.l      %d5, %d6                | pos = phase >> 16
     lsr.l       %d7, %d6                |
+    movclr.l    %acc0, %d0              |
     move.l      %d0, (%a4)+             | *d++ = %d0
     cmp.l       %d2, %d6                | pos < count?
     blt.b       .dsloop                 | yes? continue resampling
@@ -145,7 +134,6 @@ dsp_downsample:
     sub.l       (%a2), %d0              |
     asr.l       #2, %d0                 | convert bytes->samples
     movem.l     (%sp), %d2-%d7/%a2-%a5  | restore non-clobberables
-    move.l      %acc1, %acc0            | clear %acc0
     lea.l       40(%sp), %sp            | cleanup stack
     rts                                 | buh-bye
 .dsend:
@@ -196,8 +184,8 @@ dsp_upsample:
 .usloop_0:
     lsr.l       #1, %d5                 | make phase into frac
     mac.l       %d1, %d5, %acc0         | %acc0 = diff * frac
-    movclr.l    %acc0, %d7              | %d7 = product
     lsl.l       #1, %d5                 | restore frac to phase
+    movclr.l    %acc0, %d7              | %d7 = product
     add.l       %d0, %d7                | %d7 = last + product
     move.l      %d7, (%a4)+             | *d++ = %d7
     add.l       %d4, %d5                | phase += delta
@@ -272,10 +260,10 @@ channels_process_sound_chan_custom:
     move.l      dsp_sw_cross, %d4       | load cross (side) gain
 1:
     move.l      (%a0), %d1              |
-    mac.l       %d1, %d3 , (%a1), %d2, %acc0 |  L = l*gain + r*cross
-    mac.l       %d1, %d4 , %acc1        |  R = r*gain + l*cross
-    mac.l       %d2, %d4 , %acc0        |
-    mac.l       %d2, %d3 , %acc1        |
+    mac.l       %d1, %d3, (%a1), %d2, %acc0 |  L = l*gain + r*cross
+    mac.l       %d1, %d4            , %acc1 |  R = r*gain + l*cross
+    mac.l       %d2, %d4            , %acc0 |
+    mac.l       %d2, %d3            , %acc1 |
     movclr.l    %acc0, %d1              |
     movclr.l    %acc1, %d2              |
     move.l      %d1, (%a0)+             |
@@ -306,15 +294,12 @@ channels_process_sound_chan_karaoke:
     move.l      #0x40000000, %d4        | %d3 = 0.5
 1:
     move.l     (%a0), %d1               |
-    mac.l      %d1, %d4, (%a1), %d2, %acc0 | L = l/2 - r/2
-    mac.l      %d2, %d4, %acc1          | R = r/2 - l/2
+    msac.l     %d1, %d4, (%a1), %d2, %acc0 | R = r/2 - l/2
+    mac.l      %d2, %d4            , %acc0 |
     movclr.l   %acc0, %d1               |
-    movclr.l   %acc1, %d2               |
-    move.l     %d1, %d3                 |
-    sub.l      %d2, %d1                 |
-    sub.l      %d3, %d2                 |
+    move.l     %d1, (%a1)+              |
+    neg.l      %d1                      | L = -R = -(r/2 - l/2) = l/2 - r/2
     move.l     %d1, (%a0)+              |
-    move.l     %d2, (%a1)+              |
     subq.l     #1, %d0                  |
     bgt.s      1b                       |
     movem.l    (%sp), %d1-%d4           | restore registers
@@ -323,7 +308,6 @@ channels_process_sound_chan_karaoke:
     rts
 .cpkaraoke_end:
     .size       channels_process_sound_chan_karaoke, .cpkaraoke_end-channels_process_sound_chan_karaoke
-
 /****************************************************************************
  * void sample_output_stereo(int count, struct dsp_data *data,
  *                               int32_t *src[], int16_t *dst)
@@ -382,34 +366,33 @@ sample_output_stereo:
 .sos_lineloop_start:
     lea.l       -12(%a0), %a5             | %a5 = at or just before last line bound
 .sos_lineloop:
-    move.l      (%a2)+, %d0               | get next 4 L samples and scale
-    mac.l       %d0, %a1, (%a2)+, %d1, %acc0 | with saturation
-    mac.l       %d1, %a1, (%a2)+, %d2, %acc1 |
-    mac.l       %d2, %a1, (%a2)+, %d3, %acc2 |
-    mac.l       %d3, %a1, %acc3           |
-    movclr.l    %acc0, %d0                | obtain results
-    movclr.l    %acc1, %d1                |
-    movclr.l    %acc2, %d2                |
-    movclr.l    %acc3, %d3                |
     move.l      (%a3)+, %d4               | get next 4 R samples and scale
-    mac.l       %d4, %a1, (%a3)+, %d5,  %acc0 | with saturation
-    mac.l       %d5, %a1, (%a3)+, %d6,  %acc1 |
-    mac.l       %d6, %a1, (%a3)+, %d7,  %acc2 |
-    mac.l       %d7, %a1, %acc3           |
-    movclr.l    %acc0, %d4                | obtain results
+    mac.l       %d4, %a1, (%a3)+, %d5, %acc0 | with saturation
+    mac.l       %d5, %a1, (%a3)+, %d6, %acc1 |
+    mac.l       %d6, %a1, (%a3)+, %d7, %acc2 |
+    mac.l       %d7, %a1, (%a2)+, %d0, %acc3 |
+    lea.l       16(%a4), %a4              | increment dest here, mitigate stalls
+    movclr.l    %acc0, %d4                | obtain R results
     movclr.l    %acc1, %d5                |
     movclr.l    %acc2, %d6                |
     movclr.l    %acc3, %d7                |
-    swap        %d4                       | interleave most significant
-    move.w      %d4, %d0                  | 16 bits of L and R
+    mac.l       %d0, %a1, (%a2)+, %d1, %acc0 | get next 4 L samples and scale
+    mac.l       %d1, %a1, (%a2)+, %d2, %acc1 | with saturation
+    mac.l       %d2, %a1, (%a2)+, %d3, %acc2 |
+    mac.l       %d3, %a1             , %acc3 |
+    swap        %d4                       | a) interleave most significant...
     swap        %d5                       |
-    move.w      %d5, %d1                  |
     swap        %d6                       |
-    move.w      %d6, %d2                  |
     swap        %d7                       |
+    movclr.l    %acc0, %d0                | obtain L results
+    movclr.l    %acc1, %d1                |
+    movclr.l    %acc2, %d2                |
+    movclr.l    %acc3, %d3                |
+    move.w      %d4, %d0                  | a) ... 16 bits of L and R
+    move.w      %d5, %d1                  |
+    move.w      %d6, %d2                  |
     move.w      %d7, %d3                  |
-    movem.l     %d0-%d3, (%a4)            | write four stereo samples
-    lea.l       16(%a4), %a4              |
+    movem.l     %d0-%d3, -16(%a4)         | write four stereo samples
     cmp.l       %a4, %a5                  |
     bhi.b       .sos_lineloop             |
 .sos_longloop_1_start:
@@ -480,7 +463,8 @@ sample_output_mono:
     mac.l       %d0, %d5, (%a2)+, %d1, %acc0 | with saturation
     mac.l       %d1, %d5, (%a2)+, %d2, %acc1 |
     mac.l       %d2, %d5, (%a2)+, %d3, %acc2 |
-    mac.l       %d3, %d5, %acc3           |
+    mac.l       %d3, %d5             , %acc3 |
+    lea.l       16(%a3), %a3              | increment dest here, mitigate stalls
     movclr.l    %acc0, %d0                | obtain results
     movclr.l    %acc1, %d1                |
     movclr.l    %acc2, %d2                |
@@ -497,8 +481,7 @@ sample_output_mono:
     move.l      %d3, %d4                  |
     swap        %d4                       |
     move.w      %d4, %d3                  |
-    movem.l     %d0-%d3, (%a3)            | write four stereo samples
-    lea.l       16(%a3), %a3              |
+    movem.l     %d0-%d3, -16(%a3)         | write four stereo samples
     cmp.l       %a3, %a1                  |
     bhi.b       .som_lineloop             |
 .som_longloop_1_start:

@@ -112,7 +112,7 @@ struct crossfeed_data
     int32_t coefs[3];       /* 04h - Coefficients for the shelving filter */
     int32_t history[4];     /* 10h - Format is x[n - 1], y[n - 1] for both channels */
     int32_t delay[13][2];   /* 20h */
-    int index;              /* 88h - Current index into the delay line */
+    int     index;          /* 88h - Current index/pointer into the delay line */
                             /* 8ch */
 };
 
@@ -129,13 +129,21 @@ struct eq_state
 
 /* Include header with defines which functions are implemented in assembly
    code for the target */
-#ifndef SIMULATOR
 #include <dsp_asm.h>
-#endif
 
-#ifndef DSP_HAVE_ASM_CROSSFEED
-static void apply_crossfeed(int32_t *buf[], int count);
-#endif
+/* Typedefs keep things much neater in this case */
+typedef int (*sample_input_fn_type)(int count, const char *src[],
+                                    int32_t *dst[]);    
+typedef int (*resample_fn_type)(int count, struct dsp_data *data,
+                                int32_t *src[], int32_t *dst[]);
+typedef void (*sample_output_fn_type)(int count, struct dsp_data *data,
+                                      int32_t *src[], int16_t *dst);
+/* If ACF_SWITCHPARAM is no longer needed, make apply_crossfeed of type
+   channels_process_fn_type since it is really just that */
+typedef void (*apply_crossfeed_fn_type)(ACF_SWITCHPARAM(int count,
+                                                        int32_t *buf[]));
+typedef void (*channels_process_fn_type)(int count, int32_t *buf[]);
+
 /*
  ***************************************************************************/
 
@@ -151,15 +159,13 @@ struct dsp_config
     long gain;          /* Note that this is in S8.23 format. */
     /* Functions that change depending upon settings - NULL if stage is
        disabled */
-    int (*input_samples)(int count, const char *src[], int32_t *dst[]);
-    int (*resample)(int count, struct dsp_data *data,
-                    int32_t *src[], int32_t *dst[]);
-    void (*output_samples)(int count, struct dsp_data *data,
-                           int32_t *src[], int16_t *dst);
+    sample_input_fn_type        input_samples;
+    resample_fn_type            resample;
+    sample_output_fn_type       output_samples;
     /* These will be NULL for the voice codec and is more economical that
        way */
-    void (*apply_crossfeed)(int32_t *src[], int count);
-    void (*channels_process)(int count, int32_t *buf[]);
+    apply_crossfeed_fn_type     apply_crossfeed;
+    channels_process_fn_type    channels_process;
 };
 
 /* General DSP config */
@@ -169,7 +175,14 @@ static struct dither_data dither_data[2] IBSS_ATTR; /* 0=left, 1=right */
 static long   dither_mask IBSS_ATTR;
 static long   dither_bias IBSS_ATTR;
 /* Crossfeed */
-struct crossfeed_data crossfeed_data IBSS_ATTR;     /* A */
+struct crossfeed_data crossfeed_data IDATA_ATTR =    /* A */
+{
+#ifdef DSP_CROSSFEED_DELAY_PTR
+    .index = (intptr_t)crossfeed_data.delay
+#else
+    .index = 0
+#endif
+};     
 /* Equalizer */
 static struct eq_state eq_data;                     /* A/V */
 #ifdef HAVE_SW_TONE_CONTROLS
@@ -401,8 +414,7 @@ static int sample_input_gt_native_ni_stereo(
  */
 static void sample_input_new_format(void)
 {
-    static int (* const sample_input_functions[])(
-        int count, const char* src[], int32_t *dst[]) =
+    static const sample_input_fn_type sample_input_functions[] =
     {
         [SAMPLE_INPUT_LE_NATIVE_MONO]      = sample_input_lte_native_mono,
         [SAMPLE_INPUT_LE_NATIVE_I_STEREO]  = sample_input_lte_native_i_stereo,
@@ -539,9 +551,7 @@ static void sample_output_dithered(int count, struct dsp_data *data,
  */
 static void sample_output_new_format(void)
 {
-    static void (* const sample_output_functions[])(
-        int count, struct dsp_data *data,
-        int32_t *src[], int16_t *dst) =
+    static const sample_output_fn_type sample_output_functions[] =
     {
         sample_output_mono,
         sample_output_stereo,
@@ -695,42 +705,13 @@ void dsp_dither_enable(bool enable)
     switch_dsp(old_dsp);    
 }
 
-/**
- * dsp_set_crossfeed(bool enable)
- *
- * !DSPPARAMSYNC
- * needs syncing with changes to the following dsp parameters:
- *  * dsp->stereo_mode (A)
- */
-void dsp_set_crossfeed(bool enable)
-{
-    crossfeed_enabled = enable;
-    audio_dsp->apply_crossfeed =
-        (enable && audio_dsp->data.num_channels > 1)
-            ? apply_crossfeed : NULL;
-}
-
-void dsp_set_crossfeed_direct_gain(int gain)
-{
-    crossfeed_data.gain = get_replaygain_int(gain * -10) << 7;
-}
-
-void dsp_set_crossfeed_cross_params(long lf_gain, long hf_gain, long cutoff)
-{
-    long g1 = get_replaygain_int(lf_gain * -10) << 3;
-    long g2 = get_replaygain_int(hf_gain * -10) << 3;
-
-    filter_shelf_coefs(0xffffffff/NATIVE_FREQUENCY*cutoff, g1, g2,
-                       crossfeed_data.coefs);
-}
-
 /* Applies crossfeed to the stereo signal in src.
  * Crossfeed is a process where listening over speakers is simulated. This
  * is good for old hard panned stereo records, which might be quite fatiguing
  * to listen to on headphones with no crossfeed.
  */
 #ifndef DSP_HAVE_ASM_CROSSFEED
-static void apply_crossfeed(int32_t *buf[], int count)
+static void apply_crossfeed(int count, int32_t *buf[])
 {
     int32_t *hist_l = &crossfeed_data.history[0];
     int32_t *hist_r = &crossfeed_data.history[2];
@@ -775,7 +756,36 @@ static void apply_crossfeed(int32_t *buf[], int count)
     /* Write back local copies of data we've modified */
     crossfeed_data.index = di;
 }
-#endif
+#endif /* DSP_HAVE_ASM_CROSSFEED */
+
+/**
+ * dsp_set_crossfeed(bool enable)
+ *
+ * !DSPPARAMSYNC
+ * needs syncing with changes to the following dsp parameters:
+ *  * dsp->stereo_mode (A)
+ */
+void dsp_set_crossfeed(bool enable)
+{
+    crossfeed_enabled = enable;
+    audio_dsp->apply_crossfeed =
+        (enable && audio_dsp->data.num_channels > 1)
+            ? apply_crossfeed : NULL;
+}
+
+void dsp_set_crossfeed_direct_gain(int gain)
+{
+    crossfeed_data.gain = get_replaygain_int(gain * -10) << 7;
+}
+
+void dsp_set_crossfeed_cross_params(long lf_gain, long hf_gain, long cutoff)
+{
+    long g1 = get_replaygain_int(lf_gain * -10) << 3;
+    long g2 = get_replaygain_int(hf_gain * -10) << 3;
+
+    filter_shelf_coefs(0xffffffff/NATIVE_FREQUENCY*cutoff, g1, g2,
+                       crossfeed_data.coefs);
+}
 
 /* Combine all gains to a global gain. */
 static void set_gain(struct dsp_config *dsp)
@@ -1056,10 +1066,9 @@ static void channels_process_sound_chan_karaoke(int count, int32_t *buf[])
 
     do
     {
-        int32_t l = *sl/2;
-        int32_t r = *sr/2;
-        *sl++ = l - r;
-        *sr++ = r - l;
+        int32_t ch = *sl/2 - *sr/2;
+        *sl++ = ch;
+        *sr++ = -ch;
     }
     while (--count > 0);
 }
@@ -1067,8 +1076,7 @@ static void channels_process_sound_chan_karaoke(int count, int32_t *buf[])
 
 void channels_set(int value)
 {
-    static void (* const channels_process_functions[])(
-        int count, int32_t *buf[]) =
+    static const channels_process_fn_type channels_process_functions[] =
     {
         /* SOUND_CHAN_STEREO = All-purpose index for no channel processing */
         [SOUND_CHAN_STEREO]     = NULL,
@@ -1118,7 +1126,7 @@ int dsp_process(char *dst, const char *src[], int count)
         if ((samples = resample(samples, tmp)) <= 0)
             break; /* I'm pretty sure we're downsampling here */
         if (dsp->apply_crossfeed)
-            dsp->apply_crossfeed(tmp, samples);
+            dsp->apply_crossfeed(ACF_SWITCHPARAM(samples, tmp));
         /* TODO: EQ and tone controls need separate structs for audio and voice
          * DSP processing thanks to filter history. isn't really audible now, but
          * might be the day we start handling voice more delicately.

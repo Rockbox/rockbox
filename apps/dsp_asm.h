@@ -22,10 +22,22 @@
 #ifndef _DSP_ASM_H
 #define _DSP_ASM_H
 
+#define ACF_SWITCHPARAM(count, buf)     count, buf
+
+#ifndef SIMULATOR
+
 #if defined(CPU_COLDFIRE) || defined(CPU_ARM)
 #define DSP_HAVE_ASM_CROSSFEED
-void apply_crossfeed(int32_t *src[], int count);
+#if defined(CPU_COLDFIRE)
+/* ACF_SWITCHPARAM can be stripped out if all have the same parameter
+   order - DSP_CROSSFEED_DELAY_PTR if all use a pointer instead of index */
+#define DSP_CROSSFEED_DELAY_PTR
+#else
+#undef ACF_SWITCHPARAM
+#define ACF_SWITCHPARAM(count, buf)     buf, count
 #endif
+void apply_crossfeed(ACF_SWITCHPARAM(int count, int32_t *buf[]));
+#endif /* defined(CPU_COLDFIRE) || defined(CPU_ARM) */
 
 #if defined (CPU_COLDFIRE)
 #define DSP_HAVE_ASM_RESAMPLING
@@ -45,5 +57,8 @@ void sample_output_mono(int count, struct dsp_data *data,
 #define DSP_HAVE_ASM_SAMPLE_OUTPUT_STEREO
 void sample_output_stereo(int count, struct dsp_data *data,
                           int32_t *src[], int16_t *dst);
-#endif
+#endif /* CPU_COLDFIRE */
+
+#endif /* SIMULATOR */
+
 #endif /* _DSP_ASM_H */
