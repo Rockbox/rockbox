@@ -769,6 +769,9 @@ void dsp_set_crossfeed(bool enable)
 void dsp_set_crossfeed_direct_gain(int gain)
 {
     crossfeed_data.gain = get_replaygain_int(gain * -10) << 7;
+    /* If gain is negative, the calculation overflowed and we need to clamp */
+    if (crossfeed_data.gain < 0)
+        crossfeed_data.gain = 0x7fffffff;
 }
 
 void dsp_set_crossfeed_cross_params(long lf_gain, long hf_gain, long cutoff)
