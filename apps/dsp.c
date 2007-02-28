@@ -1175,15 +1175,15 @@ int dsp_output_count(int count)
     {
         count = (int)(((unsigned long)count * NATIVE_FREQUENCY
                     + (dsp->frequency - 1)) / dsp->frequency);
-
-        /* Now we have the resampled sample count which must not exceed
-         * RESAMPLE_BUF_COUNT/2 to avoid resample buffer overflow. One
-         * must call dsp_input_count() to get the correct input sample
-         * count.
-         */
-        if (count > RESAMPLE_BUF_COUNT/2)
-            count = RESAMPLE_BUF_COUNT/2;
     }
+
+    /* Now we have the resampled sample count which must not exceed
+     * RESAMPLE_BUF_COUNT/2 to avoid resample buffer overflow. One
+     * must call dsp_input_count() to get the correct input sample
+     * count.
+     */
+    if (count > RESAMPLE_BUF_COUNT/2)
+        count = RESAMPLE_BUF_COUNT/2;
 
     return count;
 }
