@@ -26,6 +26,7 @@
 #include "metadata.h"
 #include "mp3_playback.h"
 #include "logf.h"
+#include "rbunicode.h"
 #include "atoi.h"
 #include "replaygain.h"
 #include "debug.h"
@@ -1727,7 +1728,7 @@ static bool get_sid_metadata(int fd, struct mp3entry* id3)
     
 
     if ((lseek(fd, 0, SEEK_SET) < 0) 
-        || ((read_bytes = read(fd, buf, sizeof(id3->path))) < 44))
+         || ((read_bytes = read(fd, buf, 0x80)) < 0x80))
     {
         return false;
     }
@@ -1740,15 +1741,23 @@ static bool get_sid_metadata(int fd, struct mp3entry* id3)
     p = id3->id3v2buf;
 
     /* Copy Title (assumed max 0x1f letters + 1 zero byte) */
-    strncpy(p, (char *)&buf[0x16], 0x20);
-    p[0x1f]=0; /* make sure it is zero terminated */
     id3->title = p;
-    p += strlen(p)+1;
+    buf[0x16+0x1f] = 0;
+    p = iso_decode(&buf[0x16], p, 0, strlen(&buf[0x16])+1);
 
     /* Copy Artist (assumed max 0x1f letters + 1 zero byte) */
-    strncpy(p, (char *)&buf[0x36], 0x20);
-    p[0x1f]=0; /* make sure it is zero terminated */
     id3->artist = p;
+    buf[0x36+0x1f] = 0;
+    p = iso_decode(&buf[0x36], p, 0, strlen(&buf[0x36])+1);
+
+    /* Copy Album (assumed max 4 letters + 1 zero byte) */
+    buf[0x56+0x4] = 0;
+    id3->year = atoi(&buf[0x56]);
+
+    /* Copy Album (assumed max 0x1f-0x05 letters + 1 zero byte) */
+    id3->album = p;
+    buf[0x56+0x1f] = 0;
+    p = iso_decode(&buf[0x5b], p, 0, strlen(&buf[0x5b])+1);
 
     id3->bitrate = 706;
     id3->frequency = 44100;
