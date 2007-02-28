@@ -20,12 +20,17 @@
 #define _RTC_H_
 
 #include <stdbool.h> 
+#include <system.h> 
 
 #ifdef CONFIG_RTC
 
 extern const int dayname[];
 
 extern const int monthname[];
+
+#if CONFIG_RTC == RTC_DS1339_DS3231
+extern bool rtc_detected; 
+#endif
 
 /* Common functions for all targets */
 void rtc_init(void);
@@ -40,6 +45,8 @@ int rtc_read(unsigned char address);
 int rtc_read_multiple(unsigned char address, unsigned char *buf, int numbytes);
 int rtc_write(unsigned char address, unsigned char value);
 
+#endif /* RTC_M41ST84W */
+
 #ifdef HAVE_ALARM_MOD  
 void rtc_set_alarm(int h, int m);
 void rtc_get_alarm(int *h, int *m);
@@ -47,8 +54,6 @@ bool rtc_enable_alarm(bool enable);
 bool rtc_check_alarm_started(bool release_alarm);
 bool rtc_check_alarm_flag(void);
 #endif /* HAVE_ALARM_MOD */
-
-#endif /* RTC_M41ST84W */
 
 #endif /* CONFIG_RTC */
 

@@ -153,6 +153,7 @@
 #define RTC_S3C2440  4
 #define RTC_E8564    5 /* iriver H10 */
 #define RTC_AS3514   6 /* Sandisk Sansa e200 series */
+#define RTC_DS1339_DS3231   7 /* h1x0 RTC mod */
 
 /* USB On-the-go */
 #define USBOTG_ISP1362 1362 /* iriver H300 */

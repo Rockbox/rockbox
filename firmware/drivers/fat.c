@@ -31,6 +31,9 @@
 #include "rbunicode.h"
 #include "logf.h"
 #include "atoi.h"
+#ifdef CONFIG_RTC
+#include "rtc.h"
+#endif 
 
 #define BYTES2INT16(array,pos) \
           (array[pos] | (array[pos+1] << 8 ))
@@ -945,6 +948,10 @@ static void fat_time(unsigned short* date,
 {
 #ifdef CONFIG_RTC
     struct tm* tm = get_time();
+#if CONFIG_RTC == RTC_DS1339_DS3231
+    if(rtc_detected) 
+    {  
+#endif /* CONFIG_RTC == RTC_DS1339_DS3231 */                    
 
     if (date)
         *date = ((tm->tm_year - 80) << 9) |
@@ -958,7 +965,14 @@ static void fat_time(unsigned short* date,
 
     if (tenth)
         *tenth = (tm->tm_sec & 1) * 100;
-#else
+        
+#if CONFIG_RTC == RTC_DS1339_DS3231
+    }  
+    else
+#endif /* CONFIG_RTC == RTC_DS1339_DS3231 */                    
+#endif /* CONFIG_RTC */                    
+#if !defined(CONFIG_RTC) || CONFIG_RTC == RTC_DS1339_DS3231
+    {
     /* non-RTC version returns an increment from the supplied time, or a
      * fixed standard time/date if no time given as input */
     bool next_day = false;
@@ -1025,9 +1039,9 @@ static void fat_time(unsigned short* date,
     }
     if (tenth)
         *tenth = 0;
-#endif /* CONFIG_RTC */
+    }  
+#endif /* !defined(CONFIG_RTC) || CONFIG_RTC == RTC_DS1339_DS3231 */   
 }
-
 static int write_long_name(struct fat_file* file,
                            unsigned int firstentry,
                            unsigned int numentries,

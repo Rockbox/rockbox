@@ -38,6 +38,12 @@
 #ifdef HAVE_ALARM_MOD
 #include "alarm_menu.h"
 #endif
+#ifdef CONFIG_RTC
+#include "rtc.h"
+#endif
+
+/* callback to display rtc menus dynamically */
+int rtc_detect_callback(int action,const struct menu_item_ex *this_item);
 
 /***********************************/
 /*    TAGCACHE MENU                */
@@ -206,7 +212,7 @@ static int timedate_set(void)
 
 MENUITEM_FUNCTION(time_set, ID2P(LANG_TIME), timedate_set, NULL, NOICON);
 MENUITEM_SETTING(timeformat, &global_settings.timeformat, NULL);
-MAKE_MENU(time_menu, ID2P(LANG_TIME_MENU), 0, NOICON, &time_set, &timeformat);
+MAKE_MENU(time_menu, ID2P(LANG_TIME_MENU), rtc_detect_callback, NOICON, &time_set, &timeformat);
 #endif
 
 /* System menu */
@@ -246,7 +252,7 @@ MENUITEM_FUNCTION(sleep_timer_call, ID2P(LANG_SLEEP_TIMER), sleep_timer,
                                                                 setting to the user */
 #ifdef HAVE_ALARM_MOD
 MENUITEM_FUNCTION(alarm_screen_call, ID2P(LANG_ALARM_MOD_ALARM_MENU),
-                   (menu_function)alarm_screen, NULL, NOICON);
+                   (menu_function)alarm_screen, rtc_detect_callback, NOICON);
 #endif
 
 /* Limits menu */
@@ -383,3 +389,23 @@ MAKE_MENU(settings_menu_item, ID2P(LANG_GENERAL_SETTINGS), 0,
           &bookmark_settings_menu, &browse_langs, &voice_settings_menu );
 /*    SETTINGS MENU                */
 /***********************************/
+
+/* callback to display rtc menus dynamically */
+int rtc_detect_callback(int action,const struct menu_item_ex *this_item)
+{
+    if (action != ACTION_REQUEST_MENUITEM)
+        return action;
+	
+#if defined(CONFIG_RTC) && CONFIG_RTC == RTC_DS1339_DS3231
+    if ((this_item == &time_menu) ||
+        (this_item == &alarm_screen_call))
+    {
+        if (!rtc_detected)
+            return ACTION_EXIT_MENUITEM;
+    }
+#else
+    (void)this_item;
+#endif
+
+    return action;
+}

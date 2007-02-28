@@ -60,6 +60,7 @@
 #include "gui/gwps-common.h"
 
 #include "misc.h"
+#include "rtc.h"
 
 /* Format a large-range value for output, using the appropriate unit so that
  * the displayed value is in the range 1 <= display < 1000 (1024 for "binary"
@@ -414,6 +415,12 @@ void screen_dump(void)
 #endif
 
 #ifdef CONFIG_RTC
+#if CONFIG_RTC == RTC_DS1339_DS3231
+    if(!rtc_detected) 
+        create_numbered_filename(filename, "", "dump_", ".bmp", 4
+                             IF_CNFN_NUM_(, NULL));
+    else
+#endif
     create_datetime_filename(filename, "", "dump ", ".bmp", false);
 #else
     create_numbered_filename(filename, "", "dump_", ".bmp", 4

@@ -137,6 +137,8 @@ drivers/rtc/rtc_pcf50606.c
 drivers/rtc/rtc_pcf50605.c
 #elif (CONFIG_RTC == RTC_E8564)
 drivers/rtc/rtc_e8564.c
+#elif (CONFIG_RTC == RTC_DS1339_DS3231)
+drivers/rtc/rtc_ds1339_ds3231.c
 #elif (CONFIG_RTC == RTC_S3C2440)
 drivers/rtc/rtc_s3c2440.c
 #elif (CONFIG_RTC == RTC_AS3514)
@@ -380,6 +382,7 @@ target/coldfire/pcf50606-coldfire.c
 target/coldfire/iriver/ata-iriver.c
 target/coldfire/iriver/lcd-remote-iriver.c
 target/coldfire/iriver/system-iriver.c
+target/coldfire/iriver/h300/sw_i2c-h300.c
 target/coldfire/iriver/h300/adc-h300.c
 target/coldfire/iriver/h300/backlight-h300.c
 target/coldfire/iriver/h300/button-h300.c
@@ -400,6 +403,7 @@ target/coldfire/ata-as-coldfire.S
 target/coldfire/iriver/ata-iriver.c
 target/coldfire/iriver/lcd-remote-iriver.c
 target/coldfire/iriver/system-iriver.c
+target/coldfire/iriver/h100/sw_i2c-h100.c
 target/coldfire/iriver/h100/adc-h100.c
 target/coldfire/iriver/h100/backlight-h100.c
 target/coldfire/iriver/h100/button-h100.c

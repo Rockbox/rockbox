@@ -49,6 +49,19 @@ struct tm *get_time(void)
 #ifdef CONFIG_RTC
     static long timeout = 0;
 
+#if CONFIG_RTC == RTC_DS1339_DS3231
+    if(!rtc_detected) {
+        tm.tm_sec = 0;
+        tm.tm_min = 0;
+        tm.tm_hour = 0;
+        tm.tm_mday = 1;
+        tm.tm_mon = 0;
+        tm.tm_year = 70;
+        tm.tm_wday = 1;
+        tm.tm_yday = 0; /* Not implemented for now */
+        tm.tm_isdst = -1; /* Not implemented for now */
+    } else
+#endif
     /* Don't read the RTC more than once per second */
     if (current_tick > timeout) {
         char rtcbuf[7];
