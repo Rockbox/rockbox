@@ -370,7 +370,8 @@ void main(void)
     bool rec_button = false;
     bool hold_status = false;
     int data;
-    extern int line;
+    extern int line;        /* From common.c */
+    extern int remote_line; /* From common.c */
     
     /* We want to read the buttons as early as possible, before the user
        releases the ON button */
@@ -511,6 +512,11 @@ void main(void)
         lcd_putsxy((LCD_WIDTH-w)/2, (LCD_HEIGHT-h)/2, msg);
         lcd_update();
 
+#ifdef HAVE_REMOTE_LCD
+        lcd_remote_puts(0, 3, msg);
+        lcd_remote_update();
+#endif
+
 #ifdef HAVE_EEPROM_SETTINGS
         if (firmware_settings.initialized)
         {
@@ -527,6 +533,7 @@ void main(void)
         {
             /* Print the battery status. */
             line = 0;
+            remote_line = 0;
             check_battery();
             
             ata_spin(); /* Prevent the drive from spinning down */
@@ -566,7 +573,8 @@ void main(void)
 
     printf("Loading firmware");
     i = load_firmware((unsigned char *)DRAM_START, BOOTFILE, MAX_LOADSIZE);
-    printf("Result: %d", strerror(i));
+    if(i < 0)
+        printf("Error: %d", strerror(i));
 
     if (i == EOK)
         start_firmware();
@@ -577,8 +585,10 @@ void main(void)
         sleep(HZ*2);
         shutdown();
     }
-    else
+    else {
+        sleep(HZ*2);
         start_iriver_fw();
+    }
 }
 
 /* These functions are present in the firmware library, but we reimplement
