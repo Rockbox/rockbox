@@ -501,16 +501,6 @@ void main(void)
 
     usb_init();
 
-    rc = ata_init();
-    if(rc)
-    {
-        reset_screen();
-        printf("ATA error: %d", rc);
-        printf("Insert USB cable and press");
-        printf("a button");
-        while(!(button_get(true) & BUTTON_REL));
-    }
-
     /* A hack to enter USB mode without using the USB thread */
     if(usb_detect())
     {
@@ -521,10 +511,6 @@ void main(void)
         lcd_putsxy((LCD_WIDTH-w)/2, (LCD_HEIGHT-h)/2, msg);
         lcd_update();
 
-#ifdef IRIVER_H300_SERIES
-        sleep(HZ);
-#endif
-
 #ifdef HAVE_EEPROM_SETTINGS
         if (firmware_settings.initialized)
         {
@@ -532,8 +518,9 @@ void main(void)
             eeprom_settings_store();
         }
 #endif
-        ata_spin();
+        ide_power_enable(true);
         ata_enable(false);
+        sleep(HZ/20);
         usb_enable(true);
         cpu_idle_mode(true);
         while (usb_detect())
@@ -551,11 +538,21 @@ void main(void)
 
         cpu_idle_mode(false);
         usb_enable(false);
-        ata_init(); /* Reinitialize ATA and continue booting */
 
         reset_screen();
         lcd_update();
     }
+
+    rc = ata_init();
+    if(rc)
+    {
+        reset_screen();
+        printf("ATA error: %d", rc);
+        printf("Insert USB cable and press");
+        printf("a button");
+        while(!(button_get(true) & BUTTON_REL));
+    }
+
 
     disk_init();
 
