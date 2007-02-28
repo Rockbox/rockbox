@@ -48,7 +48,7 @@
 #ifndef SIMULATOR
 /* RTC is autodetected on target only */
 #define CONFIG_RTC RTC_DS1339_DS3231
-#define HAVE_ALARM_MOD
+#define HAVE_RTC_ALARM
 #endif 
 
  /* Define this if you have an remote lcd */

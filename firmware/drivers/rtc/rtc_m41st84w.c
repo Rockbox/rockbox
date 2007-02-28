@@ -31,7 +31,7 @@ void rtc_init(void)
 {
     unsigned char data; 
 
-#ifdef HAVE_ALARM_MOD
+#ifdef HAVE_RTC_ALARM
     /* Check + save alarm bit first, before the power thread starts watching */
     rtc_check_alarm_started(false);
 #endif
@@ -52,7 +52,7 @@ void rtc_init(void)
         rtc_write(0x0c,data);
     }
     
-#ifdef HAVE_ALARM_MOD    
+#ifdef HAVE_RTC_ALARM    
 
     /* Clear Trec bit, write-protecting the RTC for 200ms when shutting off */
     /* without this, the alarm won't work! */
@@ -71,7 +71,7 @@ void rtc_init(void)
 #endif
 }
 
-#ifdef HAVE_ALARM_MOD    
+#ifdef HAVE_RTC_ALARM    
 
 /* check whether the unit has been started by the RTC alarm function */
 /* (check for AF, which => started using wakeup alarm) */
@@ -168,7 +168,7 @@ bool rtc_enable_alarm(bool enable)
     return false; /* all ok */
 }
 
-#endif /* HAVE_ALARM_MOD */
+#endif /* HAVE_RTC_ALARM */
 
 int rtc_write(unsigned char address, unsigned char value)
 {

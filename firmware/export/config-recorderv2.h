@@ -94,7 +94,7 @@
 #define FIRMWARE_OFFSET_FILE_DATA 24
 
 /* FM recorders can wake up from RTC alarm */
-#define HAVE_ALARM_MOD
+#define HAVE_RTC_ALARM
 
 /* Define this if you have an FM Radio */
 #define CONFIG_TUNER S1A0903X01

@@ -35,7 +35,7 @@
 #include "talk.h"
 #include "sprintf.h"
 #include "powermgmt.h"
-#ifdef HAVE_ALARM_MOD
+#ifdef HAVE_RTC_ALARM
 #include "alarm_menu.h"
 #endif
 #ifdef CONFIG_RTC
@@ -250,7 +250,7 @@ static int sleep_timer(void)
 MENUITEM_FUNCTION(sleep_timer_call, ID2P(LANG_SLEEP_TIMER), sleep_timer,
                     NULL, bitmap_icons_6x8[Icon_Menu_setting]); /* make it look like a 
                                                                 setting to the user */
-#ifdef HAVE_ALARM_MOD
+#ifdef HAVE_RTC_ALARM
 MENUITEM_FUNCTION(alarm_screen_call, ID2P(LANG_ALARM_MOD_ALARM_MENU),
                    (menu_function)alarm_screen, rtc_detect_callback, NOICON);
 #endif
@@ -295,7 +295,7 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #endif
             &poweroff,
             &sleep_timer_call,
-#ifdef HAVE_ALARM_MOD
+#ifdef HAVE_RTC_ALARM
             &alarm_screen_call,
 #endif
             &limits_menu,

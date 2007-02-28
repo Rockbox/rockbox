@@ -89,10 +89,9 @@ int pcf50605_write(int address, unsigned char val)
 
 int pcf50605_write_multiple(int address, const unsigned char* buf, int count)
 {
-    /* TODO */
-    (void)address;
-    (void)buf;
-    (void)count;
+    int i;
+    for (i = 0; i < count; i++)
+        pp_i2c_send(0x8, address + i, buf[i]);
     return 0;
 }
 
@@ -102,7 +101,8 @@ int pcf50605_write_multiple(int address, const unsigned char* buf, int count)
    power on your iPod again. */
 void pcf50605_standby_mode(void)
 {
-    pcf50605_write(OOCC1, GOSTDBY | CHGWAK | EXTONWAK);
+    const char mask = pcf50605_read(OOCC1) | GOSTDBY | CHGWAK | EXTONWAK;
+    pcf50605_write(OOCC1, mask);
 }
 
 void pcf50605_init(void)

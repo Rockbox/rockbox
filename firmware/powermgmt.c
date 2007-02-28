@@ -727,7 +727,7 @@ static int runcurrent(void)
 
 
 /* Check to see whether or not we've received an alarm in the last second */
-#ifdef HAVE_ALARM_MOD
+#ifdef HAVE_RTC_ALARM
 static void power_thread_rtc_process(void)
 {
     if (rtc_check_alarm_flag()) {
@@ -823,7 +823,7 @@ static void power_thread_sleep(int ticks)
                 power_off();
         }
 
-#ifdef HAVE_ALARM_MOD
+#ifdef HAVE_RTC_ALARM
         power_thread_rtc_process();
 #endif
 

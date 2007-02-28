@@ -18,7 +18,7 @@
  ****************************************************************************/
 #include "config.h"
 
-#ifdef HAVE_ALARM_MOD
+#ifdef HAVE_RTC_ALARM
 
 #include <stdbool.h>
 
@@ -165,4 +165,4 @@ bool alarm_screen(void)
     return false;
 }
 
-#endif /* HAVE_ALARM_MOD */
+#endif /* HAVE_RTC_ALARM */

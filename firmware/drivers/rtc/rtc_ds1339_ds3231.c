@@ -33,14 +33,14 @@ void rtc_init(void)
     /* read one byte from RTC; 0 on success */
     rtc_detected = !sw_i2c_read(RTC_ADDR, 0, &byte, 1); 
 
-#ifdef HAVE_ALARM_MOD
+#ifdef HAVE_RTC_ALARM
     /* Check + save alarm bit first, before the power thread starts watching */
     rtc_check_alarm_started(false);
 #endif
 
 }
 
-#ifdef HAVE_ALARM_MOD    
+#ifdef HAVE_RTC_ALARM    
 
 /* check whether the unit has been started by the RTC alarm function */
 /* (check for A2F, which => started using wakeup alarm) */
@@ -117,7 +117,7 @@ bool rtc_enable_alarm(bool enable)
     return false; /* all ok */
 }
 
-#endif /* HAVE_ALARM_MOD */ 
+#endif /* HAVE_RTC_ALARM */ 
 
 int rtc_read_datetime(unsigned char* buf)
 {

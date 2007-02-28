@@ -486,7 +486,7 @@ static void start_resume(bool just_powered_on)
                global_status.resume_index,
                global_status.resume_offset);
 
-#ifdef HAVE_ALARM_MOD
+#ifdef HAVE_RTC_ALARM
         if ( rtc_check_alarm_started(true) ) {
            rtc_enable_alarm(false);
            do_resume = true;

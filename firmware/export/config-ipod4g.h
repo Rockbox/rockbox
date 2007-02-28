@@ -54,6 +54,7 @@
 /* define this if you have a real-time clock */
 #ifndef BOOTLOADER
 #define CONFIG_RTC RTC_PCF50605
+#define HAVE_RTC_ALARM
 #endif
 
 /* Define this if you have a software controlled poweroff */

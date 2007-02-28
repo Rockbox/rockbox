@@ -24,8 +24,12 @@
 #include "pcf50605.h"
 #include <stdbool.h>
 
+/* Values which each disable one alarm time register */
+static char alarm_disable[] = { 0x7f, 0x7f, 0x3f, 0x07, 0x3f, 0x1f, 0xff };
+
 void rtc_init(void)
 {
+    rtc_check_alarm_started(false);
 }
 
 int rtc_read_datetime(unsigned char* buf)
@@ -35,11 +39,93 @@ int rtc_read_datetime(unsigned char* buf)
 
 int rtc_write_datetime(unsigned char* buf)
 {
-    int i;
-
-    for (i=0;i<7;i++) {
-        pcf50605_write(0x0a+i, buf[i]);
-    }
-
+    pcf50605_write_multiple(0x0a, buf, 7);
     return 1;
 }
+
+/**
+ * Checks the PCF interrupt 1 register bit 7 to see if an alarm interrupt has
+ * triggered since last we checked.
+ */
+bool rtc_check_alarm_flag(void) 
+{
+    return pcf50605_read(0x02) & 0x80;
+}
+
+/**
+ * Enables or disables the alarm.
+ * The Ipod bootloader clears all PCF interrupt registers and always enables
+ * the "wake on RTC" bit on OOCC1, so we have to rely on other means to find
+ * out if we just woke from an alarm.
+ * Return value is always false for us. 
+ */
+bool rtc_enable_alarm(bool enable)
+{
+    if (enable) {
+        /* Tell the PCF to ignore everything but second, minute and hour, so
+         * that an alarm will trigger the next time the alarm time occurs.
+         */
+        pcf50605_write_multiple(0x14, alarm_disable + 3, 4);
+        /* Unmask the alarm interrupt (might be unneeded) */
+        pcf50605_write(0x5, pcf50605_read(0x5) & ~0x80);
+        /* Make sure wake on RTC is set */
+        pcf50605_write(0x8, pcf50605_read(0x8) | 0x10);
+    } else {
+        /* We use this year to indicate a disabled alarm. If you happen to live
+         * around this time and are annoyed by this, feel free to seek out my
+         * grave and do something nasty to it.
+         */
+        pcf50605_write(0x17, 0x99);
+    }
+    return false;
+}
+
+/**
+ * Check if alarm caused unit to start.
+ */
+bool rtc_check_alarm_started(bool release_alarm)
+{
+    static bool run_before = false, alarm_state;
+    bool rc;
+
+    if (run_before) { 
+        rc = alarm_state;
+        alarm_state &= ~release_alarm;
+    } else {
+        char rt[3], at[3];
+        /* The Ipod bootloader seems to read (and thus clear) the PCF interrupt
+         * registers, so we need to find some other way to detect if an alarm
+         * just happened
+         */
+        pcf50605_read_multiple(0x0a, rt, 3);
+        pcf50605_read_multiple(0x11, at, 3);
+
+        /* If alarm time and real time match within 10 seconds of each other, we
+         * assume an alarm just triggered
+         */
+        rc = alarm_state = rt[1] == at[1] && rt[2] == at[2]
+                           && (rt[0] - at[0]) <= 10;
+        run_before = true;
+    }
+    return rc;
+}
+
+void rtc_set_alarm(int h, int m)
+{
+    /* Set us to wake at the first second of the specified time */
+    pcf50605_write(0x11, 0);
+    /* Convert to BCD */
+    pcf50605_write(0x12, ((m/10) << 4) | m%10);
+    pcf50605_write(0x13, ((h/10) << 4) | h%10);
+}
+
+void rtc_get_alarm(int *h, int *m)
+{
+    char buf[2];
+
+    pcf50605_read_multiple(0x12, buf, 2);
+    /* Convert from BCD */
+    *m = ((buf[0] >> 4) & 0x7)*10 + (buf[0] & 0x0f);
+    *h = ((buf[1] >> 4) & 0x3)*10 + (buf[1] & 0x0f);
+}
+
