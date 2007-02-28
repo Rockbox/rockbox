@@ -1750,7 +1750,7 @@ static bool get_sid_metadata(int fd, struct mp3entry* id3)
     buf[0x36+0x1f] = 0;
     p = iso_decode(&buf[0x36], p, 0, strlen(&buf[0x36])+1);
 
-    /* Copy Album (assumed max 4 letters + 1 zero byte) */
+    /* Copy Year (assumed max 4 letters + 1 zero byte) */
     buf[0x56+0x4] = 0;
     id3->year = atoi(&buf[0x56]);
 
