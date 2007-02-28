@@ -52,7 +52,7 @@
 #define CONFIG_CODEC SWCODEC
 
 /* define this if you have a real-time clock */
-#ifndef BOOTLOADER
+#if !defined(BOOTLOADER) && !defined(SIMULATOR)
 #define CONFIG_RTC RTC_PCF50605
 #define HAVE_RTC_ALARM
 #endif
