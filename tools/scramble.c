@@ -81,6 +81,7 @@ void usage(void)
            "\t-iriver iRiver format\n"
            "\t-iaudiox5 iAudio X5 format\n"
            "\t-iaudiox5v iAudio X5V format\n"
+           "\t-iaudiom5 iAudio M5 format\n"
            "\t-ipod3g ipod firmware partition format (3rd Gen)\n"
            "\t-ipod4g ipod firmware partition format (4th Gen, Mini, Nano, Photo/Color)\n"
            "\t-ipod5g ipod firmware partition format (5th Gen - aka Video)\n"
@@ -210,6 +211,8 @@ int main (int argc, char** argv)
             modelnum = 15;
         else if(!strcmp(&argv[1][5], "e200"))
             modelnum = 16;
+        else if(!strcmp(&argv[1][5], "iam5"))
+            modelnum = 17;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;
@@ -242,6 +245,11 @@ int main (int argc, char** argv)
         iname = argv[2];
         oname = argv[3];
         return iaudio_encode(iname, oname, "COWON_X5V_FW");
+    }
+    else if(!strcmp(argv[1], "-iaudiom5")) {
+        iname = argv[2];
+        oname = argv[3];
+        return iaudio_encode(iname, oname, "COWON_M5_FW");
     }
     else if(!strcmp(argv[1], "-ipod3g")) {
         iname = argv[2];
