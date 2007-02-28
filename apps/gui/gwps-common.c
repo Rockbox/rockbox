@@ -2610,30 +2610,28 @@ bool update(struct gui_wps *gwps)
                    sizeof(gwps->state->current_track_path));
     }
 
-    if (cuesheet_is_enabled() && gwps->state->id3->cuesheet_type
-        && (gwps->state->id3->elapsed < curr_cue->curr_track->offset
-            || (curr_cue->curr_track_idx < curr_cue->track_count - 1
-                && gwps->state->id3->elapsed >= (curr_cue->curr_track+1)->offset)))
-    {
-        /* We've changed tracks within the cuesheet :
-           we need to update the ID3 info and refresh the WPS */
-
-        cue_find_current_track(curr_cue, gwps->state->id3->elapsed);
-        cue_spoof_id3(curr_cue, gwps->state->id3);
-
-        gwps->display->stop_scroll();
-        if (gui_wps_display())
-            retcode = true;
-        else{
-            gui_wps_refresh(gwps, 0, WPS_REFRESH_ALL);
-        }
-        gui_wps_statusbar_draw(gwps, false);
-
-        return retcode;
-    }
-
     if (gwps->state->id3)
-        gui_wps_refresh(gwps, 0, WPS_REFRESH_NON_STATIC);
+    {
+        if (cuesheet_is_enabled() && gwps->state->id3->cuesheet_type
+            && (gwps->state->id3->elapsed < curr_cue->curr_track->offset
+                || (curr_cue->curr_track_idx < curr_cue->track_count - 1
+                    && gwps->state->id3->elapsed >= (curr_cue->curr_track+1)->offset)))
+        {
+            /* We've changed tracks within the cuesheet :
+               we need to update the ID3 info and refresh the WPS */
+
+            cue_find_current_track(curr_cue, gwps->state->id3->elapsed);
+            cue_spoof_id3(curr_cue, gwps->state->id3);
+
+            gwps->display->stop_scroll();
+            if (gui_wps_display())
+                retcode = true;
+            else
+                gui_wps_refresh(gwps, 0, WPS_REFRESH_ALL);
+        }
+        else
+            gui_wps_refresh(gwps, 0, WPS_REFRESH_NON_STATIC);
+    }
 
     gui_wps_statusbar_draw(gwps, false);
 
