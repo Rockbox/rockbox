@@ -377,7 +377,7 @@ static int update_dir(void)
             || global_settings.show_path_in_browser == SHOW_PATH_CURRENT)
         {
             gui_synclist_set_title(&tree_lists, tagtree_get_title(&tc),
-                                   filetype_get_icon(ATTR_DIRECTORY));
+                global_settings.show_icons?filetype_get_icon(ATTR_DIRECTORY):NULL);
         }
         else
         {
@@ -391,7 +391,7 @@ static int update_dir(void)
         if (global_settings.show_path_in_browser == SHOW_PATH_FULL)
         {
             gui_synclist_set_title(&tree_lists, tc.currdir,
-                    filetype_get_icon(ATTR_DIRECTORY));
+                global_settings.show_icons?filetype_get_icon(ATTR_DIRECTORY):NULL);
         }
         else if (global_settings.show_path_in_browser == SHOW_PATH_CURRENT)
         {
@@ -403,7 +403,7 @@ static int update_dir(void)
             }
             else
                 gui_synclist_set_title(&tree_lists, title,
-                        filetype_get_icon(ATTR_DIRECTORY));
+                    global_settings.show_icons?filetype_get_icon(ATTR_DIRECTORY):NULL);
         }
         else
         {
