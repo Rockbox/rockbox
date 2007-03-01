@@ -52,6 +52,9 @@
 #include "bookmark.h"
 #include "tagtree.h"
 #include "menus/exported_menus.h"
+#ifdef HAVE_RTC_ALARM
+#include "rtc.h"
+#endif
 
 struct root_items {
     int (*function)(void* param);
