@@ -26,7 +26,7 @@
 #if CONFIG_TUNER
 void radio_load_presets(char *filename);
 void radio_init(void);
-bool radio_screen(void);
+int radio_screen(void);
 void radio_start(void);
 void radio_pause(void);
 void radio_stop(void);

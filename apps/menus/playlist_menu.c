@@ -73,12 +73,14 @@ MENUITEM_FUNCTION(catalog, ID2P(LANG_CATALOG),
 MENUITEM_SETTING(recursive_dir_insert, &global_settings.recursive_dir_insert, NULL);
 MENUITEM_SETTING(warn_on_erase, &global_settings.warnon_erase_dynplaylist, NULL);
 
-MAKE_MENU(playlist_menu_item, ID2P(LANG_PLAYLIST_MENU), NULL,
+MAKE_MENU(playlist_settings, ID2P(LANG_PLAYLIST_MENU), NULL,
           bitmap_icons_6x8[Icon_Playlist],
-          &create_playlist_item, &view_playlist, &save_playlist, &catalog,
           &recursive_dir_insert, &warn_on_erase);
+MAKE_MENU(playlist_options, ID2P(LANG_PLAYLIST_MENU), NULL,
+          bitmap_icons_6x8[Icon_Playlist],
+          &create_playlist_item, &view_playlist, &save_playlist, &catalog);
 
 bool playlist_menu(void)
 {
-    return do_menu(&playlist_menu_item);
+    return do_menu(&playlist_options, NULL);
 }

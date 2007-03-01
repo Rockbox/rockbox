@@ -617,15 +617,8 @@ const struct settings_list settings[] = {
 #endif /* HAVE_MMC */
     /* browser */
     CHOICE_SETTING(0, dirfilter, LANG_FILTER, SHOW_SUPPORTED, "show files",
-#ifndef HAVE_TAGCACHE
         "all,supported,music,playlists", NULL, 4, ID2P(LANG_FILTER_ALL),
-        ID2P(LANG_FILTER_SUPPORTED), ID2P(LANG_FILTER_MUSIC), ID2P(LANG_FILTER_PLAYLIST)
-#else
-        "all,supported,music,playlists,id3 database", NULL, 5, ID2P(LANG_FILTER_ALL),
-        ID2P(LANG_FILTER_SUPPORTED), ID2P(LANG_FILTER_MUSIC),
-        ID2P(LANG_FILTER_PLAYLIST), ID2P(LANG_FILTER_ID3DB)
-#endif
-       ),
+        ID2P(LANG_FILTER_SUPPORTED), ID2P(LANG_FILTER_MUSIC), ID2P(LANG_FILTER_PLAYLIST)),
     OFFON_SETTING(0,sort_case,LANG_SORT_CASE,false,"sort case",NULL),
     OFFON_SETTING(0,browse_current,LANG_FOLLOW,false,"follow playlist",NULL),
     OFFON_SETTING(0,playlist_viewer_icons,LANG_SHOW_ICONS,true,
@@ -1089,6 +1082,34 @@ const struct settings_list settings[] = {
 #endif
 #endif
     OFFON_SETTING(0,cuesheet,LANG_CUESHEET_ENABLE,false,"cuesheet support", NULL),
+    CHOICE_SETTING(0, start_in_screen, LANG_START_SCREEN, 1, 
+            "start in screen", "previous,root,files,db,wps,menu,"
+#ifdef HAVE_RECORDING
+            ",recording"
+#endif
+#if CONFIG_TUNER
+            ",radio"
+#endif
+                ,NULL, 
+#if defined(HAVE_RECORDING) && CONFIG_TUNER
+            8,
+#elif defined(HAVE_RECORDING) || CONFIG_TUNER /* only one of them */
+            7,
+#else 
+            6,
+#endif
+            ID2P(LANG_PREVIOUS_SCREEN), ID2P(LANG_MAIN_MENU),
+            ID2P(LANG_DIR_BROWSER), ID2P(LANG_TAGCACHE),
+            ID2P(LANG_RESUME_PLAYBACK), ID2P(LANG_SETTINGS_MENU)
+#ifdef HAVE_RECORDING
+            ,ID2P(LANG_RECORDING)
+#endif
+#if CONFIG_TUNER
+            ,ID2P(LANG_FM_RADIO)
+#endif
+
+            ),
+    SYSTEM_SETTING(NVRAM(1),last_screen,-1),
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

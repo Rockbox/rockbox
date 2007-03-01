@@ -113,5 +113,5 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, bitmap_icons_6x8[Icon
 
 bool sound_menu(void)
 {
-    return do_menu(&sound_settings);
+    return do_menu(&sound_settings, 0);
 }

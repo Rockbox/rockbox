@@ -60,6 +60,12 @@ static const struct button_mapping button_context_tree[]  = {
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_tree */
+static const struct button_mapping button_context_menu[]  = {
+    { ACTION_MENU_WPS,          BUTTON_PLAY|BUTTON_REL,      BUTTON_PLAY },
+    { ACTION_MENU_STOP,         BUTTON_PLAY|BUTTON_REPEAT,   BUTTON_PLAY },
+    
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
+}; /* button_context_menu */
 
 static const struct button_mapping button_context_tree_scroll_lr[]  = {
     { ACTION_NONE,              BUTTON_LEFT,                BUTTON_NONE },
@@ -191,8 +197,9 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_tree;
             
         case CONTEXT_LIST:
-        case CONTEXT_MAINMENU:
             return button_context_standard;
+        case CONTEXT_MAINMENU:
+            return button_context_menu;
             
         case CONTEXT_SETTINGS_EQ:
         case CONTEXT_SETTINGS_COLOURCHOOSER:

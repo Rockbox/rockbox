@@ -29,14 +29,8 @@
 #include "recording.h"
 
 #ifdef HAVE_RECORDING
-MENUITEM_FUNCTION(rec_menu_recording_screen_item, ID2P(LANG_RECORDING_MENU),
-                   (menu_function)recording_screen, NULL, NOICON);
 /* TEMP */
 bool recording_menu(bool no_source); /* from apps/sound_menu.h */
 MENUITEM_FUNCTION_WPARAM(recording_settings, ID2P(LANG_RECORDING_SETTINGS),
                           (int (*)(void*))recording_menu,0, NULL, NOICON);
-
-MAKE_MENU(recording_settings_menu,ID2P(LANG_RECORDING), 
-          0, bitmap_icons_6x8[Icon_Recording],
-          &rec_menu_recording_screen_item, &recording_settings);
 #endif

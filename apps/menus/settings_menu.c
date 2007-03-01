@@ -281,9 +281,11 @@ MENUITEM_SETTING(line_in, &global_settings.line_in, linein_callback);
 #if CONFIG_CHARGING
 MENUITEM_SETTING(car_adapter_mode, &global_settings.car_adapter_mode, NULL);
 #endif
+MENUITEM_SETTING(start_screen, &global_settings.start_in_screen, NULL);
 
 MAKE_MENU(system_menu, ID2P(LANG_SYSTEM), 
           0, bitmap_icons_6x8[Icon_System_menu],
+            &start_screen,
 #ifndef SIMULATOR
             &battery_menu,
 #endif
@@ -385,7 +387,8 @@ MENUITEM_FUNCTION(browse_langs, ID2P(LANG_LANGUAGE), language_browse,
 
 MAKE_MENU(settings_menu_item, ID2P(LANG_GENERAL_SETTINGS), 0,
           bitmap_icons_6x8[Icon_General_settings_menu],
-          &playback_menu_item, &file_menu, &display_menu, &system_menu,
+          &playback_menu_item, &playlist_settings, &file_menu,
+          &display_menu, &system_menu,
           &bookmark_settings_menu, &browse_langs, &voice_settings_menu );
 /*    SETTINGS MENU                */
 /***********************************/

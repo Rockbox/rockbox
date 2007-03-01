@@ -63,6 +63,7 @@ enum menu_item_type {
     MT_FUNCTION_CALL, /* used when the standard code wont work */
     MT_FUNCTION_WITH_PARAM,
     MT_RETURN_ID, /* returns the position of the selected item (starting at 0)*/
+    MT_RETURN_VALUE, /* returns a value associated with an item */
 };
 
 typedef int (*menu_function)(void);
@@ -89,6 +90,7 @@ struct menu_item_ex {
         const struct menu_func_with_param 
                                 *func_with_param; /* MT_FUNCTION_WITH_PARAM */
         const char **strings; /* used with MT_RETURN_ID */
+        int value; /* MT_RETURN_VALUE */
     };
     union {
         /* For settings */
@@ -117,7 +119,7 @@ struct menu_item_ex {
 
 typedef int (*menu_callback_type)(int action,
                                   const struct menu_item_ex *this_item);
-int do_menu(const struct menu_item_ex *menu);
+int do_menu(const struct menu_item_ex *menu, int *start_selected);
 bool do_setting_from_menu(const struct menu_item_ex *temp);
 
 #define MENU_ITEM_COUNT(c) (c<<MENU_COUNT_SHIFT)
@@ -149,22 +151,37 @@ bool do_setting_from_menu(const struct menu_item_ex *temp);
 
 #ifdef HAVE_LCD_BITMAP /* Kill the player port already.... PLEASE!! */
             
-/* This one should be static'ed also, 
-   but cannot be done untill settings menu is done */
+/* returns a value associated with the item */
+#define MENUITEM_RETURNVALUE(name, str, val, cb, icon)                      \
+     static const struct menu_callback_with_desc name##_ = {cb,str,icon};     \
+     static const struct menu_item_ex name   =                                  \
+         { MT_RETURN_VALUE|MENU_HAS_DESC, { .value = val},             \
+         {.callback_and_desc = & name##_}};
+         
+/* same as above, except the item name is dynamic */
+#define MENUITEM_RETURNVALUE_DYNTEXT(name, val, cb, text_callback, text_cb_data, icon)                      \
+     static const struct menu_get_name_and_icon name##_                       \
+                                = {cb,text_callback,text_cb_data,icon}; \
+     static const struct menu_item_ex name   =                              \
+        { MT_RETURN_VALUE|MENU_DYNAMIC_DESC, { .value = val},               \
+        {.menu_get_name_and_icon = & name##_}};
+        
 /*  Use this to put a function call into the menu.
     When the user selects this item the function will be run,
     when it exits the user will be back in the menu. return value is ignored */
 #define MENUITEM_FUNCTION(name, str, func, callback, icon)                     \
     static const struct menu_callback_with_desc name##_ = {callback,str,icon}; \
-    const struct menu_item_ex name   =                                  \
+    static const struct menu_item_ex name   =                                  \
         { MT_FUNCTION_CALL|MENU_HAS_DESC, { .function = func},          \
         {.callback_and_desc = & name##_}};
 
+/* This one should be static'ed also, 
+   but cannot be done untill recording menu is done */
 /* Same as above, except the function will be called with a (void*)param. */
 #define MENUITEM_FUNCTION_WPARAM(name, str, func, param, callback, icon)    \
     static const struct menu_callback_with_desc name##_ = {callback,str,icon}; \
     static const struct menu_func_with_param name##__ = {func, param};      \
-    static const struct menu_item_ex name   =                               \
+    const struct menu_item_ex name   =                               \
         { MT_FUNCTION_WITH_PARAM|MENU_HAS_DESC,                             \
             { .func_with_param = &name##__},                                \
             {.callback_and_desc = & name##_}};
@@ -189,8 +206,20 @@ bool do_setting_from_menu(const struct menu_item_ex *temp);
         {MT_MENU|MENU_HAS_DESC|                                         \
          MENU_ITEM_COUNT(sizeof( name##_)/sizeof(*name##_)),            \
             { (void*)name##_},{.callback_and_desc = & name##__}};
+            
 
 #else /* HAVE_LCD_BITMAP */
+#define MENUITEM_RETURNVALUE(name, str, val, cb, icon)                      \
+     static const struct menu_callback_with_desc name##_ = {cb,str};   \
+     static const struct menu_item_ex name   =                              \
+        { MT_RETURN_VALUE|MENU_HAS_DESC, { .value = val},                  \
+        {.callback_and_desc = & name##_}};
+#define MENUITEM_RETURNVALUE_DYNTEXT(name, val, cb, text_callback, text_cb_data, icon)                      \
+     static const struct menu_get_name_and_icon name##_                       \
+                                = {cb,text_callback,text_cb_data}; \
+     static const struct menu_item_ex name   =                              \
+        { MT_RETURN_VALUE|MENU_DYNAMIC_DESC, { .value = val},               \
+        {.menu_get_name_and_icon = & name##_}};
 #define MENUITEM_FUNCTION(name, str, func, callback, icon)                     \
     static const struct menu_callback_with_desc name##_ = {callback,str}; \
     const struct menu_item_ex name   =                                  \

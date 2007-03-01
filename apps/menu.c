@@ -23,6 +23,7 @@
 */
 #include <stdbool.h>
 #include <stdlib.h>
+#include "config.h"
 
 #include "hwcompat.h"
 #include "lcd.h"
@@ -44,6 +45,10 @@
 #include "action.h"
 #include "menus/exported_menus.h"
 #include "string.h"
+#include "root_menu.h"
+#include "bookmark.h"
+#include "gwps-common.h" /* for fade() */
+#include "audio.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
@@ -303,7 +308,14 @@ static int get_menu_selection(int selected_item, const struct menu_item_ex *menu
         return current_subitems[selected_item];
     return selected_item;
 }
-
+static int find_menu_selection(int selected)
+{
+    int i;
+    for (i=0; i< current_subitems_count; i++)
+        if (current_subitems[i] == selected)
+            return i;
+    return 0;
+}
 static char * get_menu_item_name(int selected_item,void * data, char *buffer)
 {
     const struct menu_item_ex *menu = (const struct menu_item_ex *)data;
@@ -363,6 +375,7 @@ static void menu_get_icon(int selected_item, void * data, ICON * icon)
             break;
         case MT_FUNCTION_CALL:
         case MT_FUNCTION_WITH_PARAM:
+        case MT_RETURN_VALUE:
             if (menu_icon == NOICON)
                 *icon = bitmap_icons_6x8[Icon_Menu_functioncall];
             else 
@@ -418,7 +431,7 @@ static void init_menu_lists(const struct menu_item_ex *menu,
         gui_synclist_set_icon_callback(lists, NULL);
     gui_synclist_set_nb_items(lists,current_subitems_count);
     gui_synclist_limit_scroll(lists,true);
-    gui_synclist_select_item(lists, selected);
+    gui_synclist_select_item(lists, find_menu_selection(selected));
     
     get_menu_callback(menu,&menu_callback);
     if (callback && menu_callback)
@@ -434,14 +447,14 @@ static void talk_menu_item(const struct menu_item_ex *menu,
         int sel = get_menu_selection(gui_synclist_get_sel_pos(lists),menu);
         if ((menu->flags&MENU_TYPE_MASK) == MT_MENU)
         {
-           if ((menu->submenus[sel]->flags&MENU_TYPE_MASK) == MT_SETTING)
-               talk_setting(menu->submenus[sel]->variable);
-           else 
-           {
-               id = P2ID(menu->submenus[sel]->callback_and_desc->desc);
-               if (id != -1)
+            if ((menu->submenus[sel]->flags&MENU_TYPE_MASK) == MT_SETTING)
+                talk_setting(menu->submenus[sel]->variable);
+            else 
+            {
+                id = P2ID(menu->submenus[sel]->callback_and_desc->desc);
+                if (id != -1)
                    talk_id(id,false);
-           }
+            }
         }
     }
 }
@@ -564,10 +577,10 @@ bool do_setting_from_menu(const struct menu_item_ex *temp)
     return ret_val;
 }
 
-int do_menu(const struct menu_item_ex *start_menu)
+int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
 {
+    int selected = start_selected? *start_selected : 0;
     int action;
-    int selected = 0;
     struct gui_synclist lists;
     const struct menu_item_ex *temp, *menu;
     int ret = 0;
@@ -630,10 +643,24 @@ int do_menu(const struct menu_item_ex *start_menu)
         }
         else if (action == ACTION_MENU_WPS)
         {
-            ret = MENU_RETURN_TO_WPS;
+            ret = GO_TO_PREVIOUS_MUSIC;
         }
-        else if ((action == ACTION_STD_CANCEL) ||
-                 (action == ACTION_STD_MENU))
+        else if (action == ACTION_MENU_STOP)
+        {
+            if (audio_status() && !global_settings.party_mode)
+            {
+                if (global_settings.fade_on_stop)
+                    fade(0);
+                bookmark_autobookmark();
+                audio_stop();
+            }
+        }
+        else if (action == ACTION_STD_MENU)
+        {
+            if (menu != &root_menu_)
+                ret = GO_TO_ROOT;
+        }
+        else if (action == ACTION_STD_CANCEL)
         {
             in_stringlist = false;
             if (menu_callback)
@@ -649,8 +676,11 @@ int do_menu(const struct menu_item_ex *start_menu)
                 /* new menu, so reload the callback */
                 get_menu_callback(menu, &menu_callback);
             }
-            else
+            else if (menu != &root_menu_)
+            {
+                ret = GO_TO_PREVIOUS;
                 break;
+            }
         }
         else if (action == ACTION_STD_OK)
         {
@@ -678,8 +708,7 @@ int do_menu(const struct menu_item_ex *start_menu)
                     if (stack_top < MAX_MENUS)
                     {
                         menu_stack[stack_top] = menu;
-                        menu_stack_selected_item[stack_top]
-                                = gui_synclist_get_sel_pos(&lists);
+                        menu_stack_selected_item[stack_top] = selected;
                         stack_top++;
                         init_menu_lists(temp, &lists, 0, true);
                         menu = temp;
@@ -717,6 +746,10 @@ int do_menu(const struct menu_item_ex *start_menu)
                         in_stringlist = true;
                     }
                     break;
+                case MT_RETURN_VALUE:
+                    if (start_selected)
+                        *start_selected = selected;
+                    return temp->value;
             }
             if (type != MT_MENU && menu_callback)
                 menu_callback(ACTION_EXIT_MENUITEM,temp);
@@ -733,10 +766,12 @@ int do_menu(const struct menu_item_ex *start_menu)
         gui_synclist_draw(&lists);
     }
     action_signalscreenchange();
+    if (start_selected)
+        *start_selected = selected;
     return ret;
 }
 
 int main_menu(void)
 {
-    return do_menu(NULL);
+    return do_menu(NULL, 0);
 }

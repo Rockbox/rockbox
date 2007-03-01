@@ -277,6 +277,7 @@ struct system_status
     int last_frequency;  /* Last frequency for resuming, in FREQ_STEP units,
                             relative to MIN_FREQ */
 #endif
+    char last_screen;
 };
 
 struct user_settings
@@ -684,6 +685,7 @@ struct user_settings
     /* Encoder Settings End */
 #endif /* CONFIG_CODEC == SWCODEC */
     bool cuesheet;
+    int start_in_screen;
 };
 
 /** global variables **/

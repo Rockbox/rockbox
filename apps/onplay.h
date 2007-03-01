@@ -22,7 +22,8 @@
 int onplay(char* file, int attr, int from_screen);
 
 enum {
-    ONPLAY_OK,
+    ONPLAY_MAINMENU = -1,
+    ONPLAY_OK = 0,
     ONPLAY_RELOAD_DIR,
     ONPLAY_START_PLAY
 };

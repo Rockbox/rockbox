@@ -1043,7 +1043,7 @@ int onplay(char* file, int attr, int from)
         menu_exit(m);
 
         if (exit_to_main)
-            result = main_menu();
+            onplay_result = ONPLAY_MAINMENU;
 
 #ifdef HAVE_LCD_BITMAP
         if (global_settings.statusbar)

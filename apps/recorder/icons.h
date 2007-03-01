@@ -83,6 +83,7 @@ enum icons_6x8 {
 #endif
     Icon_file_view_menu,
     Icon_EQ,
+    Icon_Rockbox,
     Icon6x8Last,
 };
 

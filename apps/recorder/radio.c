@@ -62,6 +62,7 @@
 #include "action.h"
 #include "list.h"
 #include "menus/exported_menus.h"
+#include "root_menu.h"
 
 #if CONFIG_TUNER
 
@@ -365,11 +366,12 @@ static void next_preset(int direction)
 }
 
 
-bool radio_screen(void)
+int radio_screen(void)
 {
     char buf[MAX_PATH];
     bool done = false;
     int button, lastbutton = BUTTON_NONE;
+    int ret_val = GO_TO_ROOT;
 #ifdef FM_RECORD_DBLPRE
     unsigned long rec_lastclick = 0;
 #endif
@@ -582,7 +584,7 @@ bool radio_screen(void)
 #endif
                 keep_playing = true;
                 done = true;
-                
+                ret_val = GO_TO_ROOT;
                 if(presets_changed)
                 {
                     if(yesno_pop(str(LANG_FM_SAVE_CHANGES)))
@@ -596,7 +598,7 @@ bool radio_screen(void)
                 
                 /* Clear the preset list on exit. */
                 clear_preset_list();
-                    
+                
                 break;
 
             case ACTION_STD_PREV:
@@ -1277,7 +1279,7 @@ static int handle_radio_presets(void)
             case ACTION_F3:
             case ACTION_STD_CONTEXT:
                 selected_preset = gui_synclist_get_sel_pos(&lists);
-                do_menu(&handle_radio_preset_menu);
+                do_menu(&handle_radio_preset_menu, NULL);
                 break;
             default:
                 if(default_event_handler(action) == SYS_USB_CONNECTED)
@@ -1501,7 +1503,7 @@ MAKE_MENU(radio_menu_items, ID2P(LANG_FM_MENU), NULL,
 /* main menu of the radio screen */
 static bool radio_menu(void)
 {
-    return (bool)do_menu(&radio_menu_items);
+    return (bool)do_menu(&radio_menu_items, NULL);
 }
 
 #endif

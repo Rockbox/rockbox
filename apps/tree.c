@@ -79,6 +79,7 @@
 #include "textarea.h"
 #include "action.h"
 
+#include "root_menu.h"
 
 #if LCD_DEPTH > 1
 #include "backdrop.h"
@@ -160,8 +161,9 @@ static int max_files = 0;
 static bool reload_dir = false;
 
 static bool start_wps = false;
-static bool dirbrowse(void);
 static int curr_context = false;/* id3db or tree*/
+
+int dirbrowse(void);
 
 /*
  * removes the extension of filename (if it doesn't start with a .)
@@ -272,13 +274,8 @@ void browse_root(void)
     gui_synclist_init(&tree_lists, &tree_get_filename, &tc, false, 1);
     gui_synclist_set_icon_callback(&tree_lists,
                   global_settings.show_icons?&tree_get_fileicon:NULL);
-#ifndef SIMULATOR
-    dirbrowse();
-#else
-    if (!dirbrowse()) {
-        DEBUGF("No filesystem found. Have you forgotten to create it?\n");
-    }
-#endif
+    /* not the best place for this call... but... */
+    root_menu();
 }
 
 void tree_get_filetypes(const struct filetype** types, int* count)
@@ -478,54 +475,6 @@ void reload_directory(void)
     reload_dir = true;
 }
 
-static void start_resume(bool just_powered_on)
-{
-    bool do_resume = false;
-    if ( global_status.resume_index != -1 ) {
-        DEBUGF("Resume index %X offset %X\n",
-               global_status.resume_index,
-               global_status.resume_offset);
-
-#ifdef HAVE_RTC_ALARM
-        if ( rtc_check_alarm_started(true) ) {
-           rtc_enable_alarm(false);
-           do_resume = true;
-        }
-#endif
-
-        /* always resume? */
-        if ( global_settings.resume || ! just_powered_on)
-#ifdef HAVE_HEADPHONE_DETECTION
-        {
-            if ( just_powered_on )
-            {
-                if ( !global_settings.unplug_autoresume
-                    || headphones_inserted() )
-                    do_resume = true;
-            }
-            else
-                do_resume = true;
-        }
-#else
-             do_resume = true;
-#endif
-
-        if (! do_resume) return;
-
-        if (playlist_resume() != -1)
-        {
-            playlist_start(global_status.resume_index,
-                global_status.resume_offset);
-
-            start_wps = true;
-        }
-        else return;
-    }
-    else if (! just_powered_on) {
-        gui_syncsplash(HZ*2, true, str(LANG_NOTHING_TO_RESUME));
-    }
-}
-
 /* Selects a file and update tree context properly */
 void set_current_file(char *path)
 {
@@ -568,10 +517,7 @@ void set_current_file(char *path)
         tc.selected_item_history[tc.dirlevel] = -1;
 
         /* use '/' to calculate dirlevel */
-        /* FIXME : strlen(path) : crazy oO better to store it at
-           the beginning */
-        int path_len = strlen(path) + 1;
-        for (i = 1; i < path_len; i++)
+        for (i = 1; path[i] != '\0'; i++)
         {
             if (path[i] == '/')
             {
@@ -580,9 +526,13 @@ void set_current_file(char *path)
             }
         }
     }
+    if (ft_load(&tc, NULL) >= 0)
+    {
+        tc.selected_item = tree_get_file_position(lastfile);
+    }
 }
 
-#ifdef HAVE_TAGCACHE
+#if defined(HAVE_TAGCACHE) && defined(HAVE_QUICKSCREEN)
 static bool check_changed_id3mode(bool currmode)
 {
     if (currmode != (global_settings.dirfilter == SHOW_ID3DB)) {
@@ -605,7 +555,7 @@ static bool check_changed_id3mode(bool currmode)
 #endif
 
 /* main loop, handles key events */
-static bool dirbrowse(void)
+int dirbrowse()
 {
     int numentries=0;
     char buf[MAX_PATH];
@@ -627,8 +577,8 @@ static bool dirbrowse(void)
     else
 #endif
         curr_context=CONTEXT_TREE;
-    tc.selected_item = 0;
-    tc.dirlevel=0;
+    if (tc.selected_item < 0)
+        tc.selected_item = 0;
 #ifdef HAVE_TAGCACHE
     tc.firstpos=0;
     lasttable = -1;
@@ -636,43 +586,22 @@ static bool dirbrowse(void)
     lastfirstpos = 0;
 #endif
 
-    if (*tc.dirfilter < NUM_FILTER_MODES) {
-#ifdef HAVE_RECORDING
-#ifndef SIMULATOR
-        if (global_settings.rec_startup) {
-            /* We fake being in the menu structure by calling
-               the appropriate parent when we drop out of each screen */
-#if CONFIG_CODEC == SWCODEC
-            /* Put in a 1 sec pause to slow bootup or the recording codecs
-               won't initialize */
-            sleep(HZ);
-#endif
-            recording_screen(false);
-            rec_menu();
-            main_menu();
-        }
-        else
-#endif
-#endif
-        start_resume(true);
+    start_wps = false;
+    numentries = update_dir();
+    if (numentries == -1)
+        return false;  /* currdir is not a directory */
 
+    if (*tc.dirfilter > NUM_FILTER_MODES && numentries==0)
+    {
+        gui_syncsplash(HZ*2, true, str(LANG_NO_FILES));
+        return false;  /* No files found for rockbox_browser() */
     }
-    /* If we don't need to show the wps, draw the dir */
-    if (!start_wps) {
-        numentries = update_dir();
-        if (numentries == -1)
-            return false;  /* currdir is not a directory */
-
-        if (*tc.dirfilter > NUM_FILTER_MODES && numentries==0)
-        {
-            gui_syncsplash(HZ*2, true, str(LANG_NO_FILES));
-            return false;  /* No files found for rockbox_browser() */
-        }
-    }
-
+    
     while(1) {
         struct entry *dircache = tc.dircache;
         bool restore = false;
+        if (tc.dirlevel < 0)
+          tc.dirlevel = 0; /* shouldnt be needed.. this code needs work! */
 #ifdef BOOTFILE
         if (boot_changed) {
             char *lines[]={str(LANG_BOOT_CHANGED), str(LANG_REBOOT_NOW)};
@@ -715,10 +644,12 @@ static bool dirbrowse(void)
                     exit_func = true;
                     break;
                 }
-                /* if we are in /, nothing to do */
-                if (tc.dirlevel == 0 && !strcmp(currdir,"/"))
-                    break;
-
+                if ((*tc.dirfilter == SHOW_ID3DB && tc.dirlevel == 0) ||
+                    ((*tc.dirfilter != SHOW_ID3DB && !strcmp(currdir,"/"))))
+                {
+                    break; /* do nothing */
+                }
+                
 #ifdef HAVE_TAGCACHE
                 if (id3db)
                     tagtree_exit(&tc);
@@ -772,37 +703,17 @@ static bool dirbrowse(void)
                 /* don't enter menu from plugin browser */
                 if (*tc.dirfilter < NUM_FILTER_MODES)
                 {
-                    int i;
-                    FOR_NB_SCREENS(i)
-                        screens[i].stop_scroll();
-                    action_signalscreenchange();
-                    if (main_menu())
-                        reload_dir = true;
-                    restore = true;
-
-#ifdef HAVE_TAGCACHE
-                    id3db = check_changed_id3mode(id3db);
-                    if(id3db)
-                        reload_dir = true;
-#endif
+                    return GO_TO_ROOT;
                 }
                 else /* use it as a quick exit instead */
-                    exit_func = true;
+                    return GO_TO_PREVIOUS;
                 break;
 
             case ACTION_TREE_WPS:
                 /* don't enter wps from plugin browser etc */
                 if (*tc.dirfilter < NUM_FILTER_MODES)
                 {
-                    if (audio_status() & AUDIO_STATUS_PLAY)
-                    {
-                        start_wps=true;
-                    }
-                    else
-                    {
-                        start_resume(false);
-                        restore = true;
-                    }
+                    return GO_TO_PREVIOUS_MUSIC;
                 }
                 break;
 #ifdef HAVE_QUICKSCREEN
@@ -869,6 +780,9 @@ static bool dirbrowse(void)
                 }
                 switch (onplay_result)
                 {
+                    case ONPLAY_MAINMENU:
+                        return GO_TO_ROOT;
+
                     case ONPLAY_OK:
                         restore = true;
                         break;
@@ -878,7 +792,7 @@ static bool dirbrowse(void)
                         break;
 
                     case ONPLAY_START_PLAY:
-                        start_wps = true;
+                        return GO_TO_WPS;
                         break;
                 }
                 break;
@@ -952,37 +866,13 @@ static bool dirbrowse(void)
                 }
                 break;
         }
-
+        if (start_wps)
+            return GO_TO_WPS;
         if ( button )
         {
             ata_spin();
         }
 
-        if (start_wps && audio_status() )
-        {
-            int i;
-
-            FOR_NB_SCREENS(i)
-                screens[i].stop_scroll();
-
-            if (gui_wps_show() == SYS_USB_CONNECTED)
-                reload_dir = true;
-#ifdef HAVE_HOTSWAP
-            else
-#ifdef HAVE_TAGCACHE
-                if (!id3db) /* Try reload to catch 'no longer valid' case. */
-#endif
-                    reload_dir = true;
-#endif
-#if LCD_DEPTH > 1
-            show_main_backdrop();
-#endif
-#ifdef HAVE_TAGCACHE
-            id3db = check_changed_id3mode(id3db);
-#endif
-            restore = true;
-            start_wps=false;
-        }
 
     check_rescan:
         /* do we need to rescan dir? */
@@ -1016,7 +906,7 @@ static bool dirbrowse(void)
         }
 
         if (exit_func)
-            break;
+            return GO_TO_PREVIOUS;
 
         if (restore || reload_dir) {
             /* restore display */
@@ -1252,24 +1142,39 @@ bool create_playlist(void)
     return true;
 }
 
-bool rockbox_browse(const char *root, int dirfilter)
+int rockbox_browse(const char *root, int dirfilter)
 {
-    static struct tree_context backup;
-    int last_context;
-    
-    backup = tc;
-    reload_dir = true;
-    memcpy(tc.currdir, root, sizeof(tc.currdir));
-    start_wps = false;
+    int ret_val = 0;
+    int *last_filter = tc.dirfilter;
     tc.dirfilter = &dirfilter;
-    last_context = curr_context;
     
-    dirbrowse();
-
-    tc = backup;
-    curr_context = last_context;
-    
-    return false;
+    reload_dir = true;
+    if (dirfilter >= NUM_FILTER_MODES)
+    {
+        static struct tree_context backup;
+        int last_context;
+        
+        backup = tc;
+        tc.dirlevel = 0;
+        memcpy(tc.currdir, root, sizeof(tc.currdir));
+        start_wps = false;
+        last_context = curr_context;
+        
+        ret_val = dirbrowse();
+        tc = backup;
+        curr_context = last_context;
+    }
+    else
+    {
+        static char buf[MAX_PATH];
+        if (dirfilter != SHOW_ID3DB)
+            tc.dirfilter = &global_settings.dirfilter;
+        strcpy(buf,root);
+        set_current_file(buf);
+        ret_val = dirbrowse();
+    }
+    tc.dirfilter = last_filter;
+    return ret_val;
 }
 
 void tree_init(void)

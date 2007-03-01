@@ -117,7 +117,7 @@ static const struct button_mapping button_context_keyboard[]  = {
 /* Main Menu Context Menu **/
 static const struct button_mapping button_context_mainmenu[] = {
     { ACTION_NONE,     BUTTON_POWER,                  BUTTON_NONE },
-
+    { ACTION_MENU_WPS, BUTTON_PLAY,                   BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_mainmenu */
 

@@ -128,9 +128,6 @@ bool main_menu(void)
     if(inside_menu) return false;
     inside_menu = true;
 
-    items[i].desc = ID2P(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS);
-    items[i++].function = bookmark_mrb_load;
-
     items[i].desc = ID2P(LANG_SOUND_SETTINGS);
     items[i++].function = sound_menu;
 

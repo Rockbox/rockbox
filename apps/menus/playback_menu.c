@@ -57,7 +57,6 @@ int playback_callback(int action,const struct menu_item_ex *this_item);
 MENUITEM_SETTING(shuffle_item, &global_settings.playlist_shuffle, playback_callback);
 MENUITEM_SETTING(repeat_mode, &global_settings.repeat_mode, playback_callback);
 MENUITEM_SETTING(play_selected, &global_settings.play_selected, NULL);
-MENUITEM_SETTING(resume, &global_settings.resume, NULL);
 
 MENUITEM_SETTING(ff_rewind_accel, &global_settings.ff_rewind_accel, NULL);
 MENUITEM_SETTING(ff_rewind_min_step, &global_settings.ff_rewind_min_step, NULL);
@@ -108,7 +107,7 @@ int replaygain_callback(int action,const struct menu_item_ex *this_item)
     (void)this_item;
     switch (action)
     {
-        case ACTION_EXIT_MENUITEM: /* on exit */
+        case ACTION_EXIT_MENUITEM: /* on exit */    
             dsp_set_replaygain();
             break;
     }
@@ -172,7 +171,7 @@ MAKE_MENU(unplug_menu, ID2P(LANG_UNPLUG), 0, NOICON,
 
 MAKE_MENU(playback_menu_item,ID2P(LANG_PLAYBACK),0,
           bitmap_icons_6x8[Icon_Playback_menu],
-          &shuffle_item, &repeat_mode, &play_selected, &resume,
+          &shuffle_item, &repeat_mode, &play_selected,
           &ff_rewind_settings_menu, 
           &buffer_margin, &fade_on_stop, &party_mode,
           

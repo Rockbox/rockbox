@@ -3953,7 +3953,10 @@ bool tagcache_is_initialized(void)
 {
     return tc_stat.initialized;
 }
-    
+bool tagcache_is_usable(void)
+{
+    return tc_stat.initialized && tc_stat.ready;
+}
 int tagcache_get_commit_step(void)
 {
     return tc_stat.commit_step;

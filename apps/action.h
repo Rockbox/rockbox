@@ -160,6 +160,7 @@ enum {
                                         once the subitem returns */
     ACTION_ENTER_MENUITEM,
     ACTION_MENU_WPS,
+    ACTION_MENU_STOP,
     
     /* id3db */
     

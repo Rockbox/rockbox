@@ -59,6 +59,7 @@
 #include "backdrop.h"
 #endif
 #include "ata_idle_notify.h"
+#include "root_menu.h"
 
 #define WPS_DEFAULTCFG WPS_DIR "/rockbox_default.wps"
 #define RWPS_DEFAULTCFG WPS_DIR "/rockbox_default.rwps"
@@ -238,7 +239,9 @@ long gui_wps_show(void)
                 show_main_backdrop();
 #endif
                 action_signalscreenchange();
-                onplay(wps_state.id3->path, TREE_ATTR_MPA, CONTEXT_WPS);
+                if (onplay(wps_state.id3->path, TREE_ATTR_MPA, CONTEXT_WPS)
+                     == ONPLAY_MAINMENU)
+                    return GO_TO_ROOT;
 #if LCD_DEPTH > 1
                 show_wps_backdrop();
 #endif
@@ -258,13 +261,8 @@ long gui_wps_show(void)
 #endif
                 FOR_NB_SCREENS(i)
                     gui_wps[i].display->stop_scroll();
-
-                /* set dir browser to current playing song */
-                if (global_settings.browse_current &&
-                    wps_state.current_track_path[0] != '\0')
-                    set_current_file(wps_state.current_track_path);
                 action_signalscreenchange();
-                return 0;
+                return GO_TO_PREVIOUS_BROWSER;
                 break;
 
                 /* play/pause */
@@ -497,23 +495,7 @@ long gui_wps_show(void)
             case ACTION_WPS_MENU:
                 FOR_NB_SCREENS(i)
                     gui_wps[i].display->stop_scroll();
-
-#if LCD_DEPTH > 1
-                show_main_backdrop();
-#endif
-                action_signalscreenchange();
-                if (main_menu())
-                    return true;
-#if LCD_DEPTH > 1
-                show_wps_backdrop();
-#endif
-#ifdef HAVE_LCD_BITMAP
-                FOR_NB_SCREENS(i)
-                {
-                    gui_wps_set_margin(&gui_wps[i]);
-                }
-#endif
-                restore = true;
+                return GO_TO_ROOT;
                 break;
 
 
@@ -639,12 +621,7 @@ long gui_wps_show(void)
             }
             if (update_failed)
             {
-                /* set dir browser to current playing song */
-                if (global_settings.browse_current &&
-                    wps_state.current_track_path[0] != '\0')
-                    set_current_file(wps_state.current_track_path);
-
-                return 0;
+                return GO_TO_ROOT;
             }
             update_track = false;
         }
@@ -666,12 +643,7 @@ long gui_wps_show(void)
             ab_reset_markers();
 #endif
 
-            /* set dir browser to current playing song */
-            if (global_settings.browse_current &&
-                wps_state.current_track_path[0] != '\0')
-                set_current_file(wps_state.current_track_path);
-
-            return 0;
+            return GO_TO_PREVIOUS;
         }
 
         if ( button )
@@ -685,12 +657,7 @@ long gui_wps_show(void)
             restoretimer = 0;
             if (gui_wps_display())
             {
-                /* set dir browser to current playing song */
-                if (global_settings.browse_current &&
-                    wps_state.current_track_path[0] != '\0')
-                    set_current_file(wps_state.current_track_path);
-
-                return 0;
+                return GO_TO_ROOT;
             }
 
             if (wps_state.id3){
@@ -699,7 +666,7 @@ long gui_wps_show(void)
             }
         }
     }
-    return 0; /* unreachable - just to reduce compiler warnings */
+    return GO_TO_ROOT; /* unreachable - just to reduce compiler warnings */
 }
 
 /* needs checking if needed end*/

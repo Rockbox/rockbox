@@ -424,12 +424,6 @@ static bool recdirectory(void)
                       names, 2, NULL );
 }
 
-static bool reconstartup(void)
-{
-    return set_bool(str(LANG_RECORD_STARTUP),
-                    &global_settings.rec_startup);
-}
-
 #if CONFIG_BACKLIGHT
 static bool cliplight(void)
 {
@@ -940,7 +934,6 @@ bool recording_menu(bool no_source)
         { ID2P(LANG_RECORD_TIMESPLIT), filesplitoptionsmenu },
         { ID2P(LANG_RECORD_PRERECORD_TIME), recprerecord },
         { ID2P(LANG_RECORD_DIRECTORY), recdirectory },
-        { ID2P(LANG_RECORD_STARTUP), reconstartup },
 #if CONFIG_BACKLIGHT
         { ID2P(LANG_CLIP_LIGHT), cliplight },
 #endif

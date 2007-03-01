@@ -48,6 +48,12 @@ static const struct button_mapping button_context_standard[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
 
+static const struct button_mapping button_context_menu[]  = {
+    { ACTION_MENU_WPS,        BUTTON_UP,       BUTTON_NONE },
+    
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
+}; /* button_context_menu */
+
 static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_PLAY,     BUTTON_UP|BUTTON_REL,        BUTTON_UP },
     { ACTION_WPS_STOP,     BUTTON_UP|BUTTON_REPEAT,     BUTTON_UP },
@@ -228,8 +234,9 @@ const struct button_mapping* get_context_mapping(int context)
     switch (context)
     {
         case CONTEXT_STD:
-        case CONTEXT_MAINMENU:
             return button_context_standard;
+        case CONTEXT_MAINMENU:
+            return button_context_menu;
             
         case CONTEXT_WPS:
             return button_context_wps;
