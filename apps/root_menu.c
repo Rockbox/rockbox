@@ -29,6 +29,8 @@
 #include "debug.h"
 #include "misc.h"
 #include "rolo.h"
+#include "powermgmt.h"
+
 #if LCD_DEPTH > 1
 #include "backdrop.h"
 #endif
