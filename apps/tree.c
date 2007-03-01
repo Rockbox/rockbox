@@ -566,6 +566,7 @@ int dirbrowse()
     bool need_update = true;
     bool exit_func = false;
     long thumbnail_time = -1; /* for delaying a thumbnail */
+    long last_cancel = 0;
 
     char* currdir = tc.currdir; /* just a shortcut */
 #ifdef HAVE_TAGCACHE
@@ -646,8 +647,16 @@ int dirbrowse()
                 if ((*tc.dirfilter == SHOW_ID3DB && tc.dirlevel == 0) ||
                     ((*tc.dirfilter != SHOW_ID3DB && !strcmp(currdir,"/"))))
                 {
-                    break; /* do nothing */
+                    if (last_cancel && TIME_BEFORE(current_tick, last_cancel+HZ/2))
+                    {
+                        last_cancel = 0;
+                        action_signalscreenchange(); /* eat the cancel presses */
+                        break;
+                    }
+                    else
+                        return GO_TO_ROOT;
                 }
+                last_cancel = current_tick;
                 
 #ifdef HAVE_TAGCACHE
                 if (id3db)
