@@ -398,8 +398,9 @@ static int update_dir(void)
             char *title = strrchr(tc.currdir, '/') + 1;
             if (*title == '\0')
             {
-                /* Display nothing for the root dir */
-                gui_synclist_set_title(&tree_lists, NULL, NOICON);
+                /* Display "Files" for the root dir */
+                gui_synclist_set_title(&tree_lists, str(LANG_DIR_BROWSER),
+                    global_settings.show_icons?filetype_get_icon(ATTR_DIRECTORY):(ICON)NULL);
             }
             else
                 gui_synclist_set_title(&tree_lists, title,
