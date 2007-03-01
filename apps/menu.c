@@ -415,20 +415,16 @@ static void init_menu_lists(const struct menu_item_ex *menu,
     
     gui_synclist_init(lists,get_menu_item_name,(void*)menu,false,1);
 #ifdef HAVE_LCD_BITMAP
-    if (global_settings.show_icons == false)
-        icon = NOICON;
-    else if (menu->callback_and_desc->icon == NOICON)
+    if (menu->callback_and_desc->icon == NOICON)
         icon = bitmap_icons_6x8[Icon_Submenu_Entered];
     else
         icon = menu->callback_and_desc->icon;
     gui_synclist_set_title(lists, P2STR(menu->callback_and_desc->desc), icon);  
-    if (global_settings.show_icons)
-        gui_synclist_set_icon_callback(lists, menu_get_icon);
-    else 
+    gui_synclist_set_icon_callback(lists, menu_get_icon);
 #else
     (void)icon;
+    gui_synclist_set_icon_callback(lists, NULL);
 #endif
-        gui_synclist_set_icon_callback(lists, NULL);
     gui_synclist_set_nb_items(lists,current_subitems_count);
     gui_synclist_limit_scroll(lists,true);
     gui_synclist_select_item(lists, find_menu_selection(selected));

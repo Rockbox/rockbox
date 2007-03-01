@@ -272,8 +272,7 @@ void browse_root(void)
     gui_buttonbar_set_display(&tree_buttonbar, &(screens[SCREEN_MAIN]) );
 #endif
     gui_synclist_init(&tree_lists, &tree_get_filename, &tc, false, 1);
-    gui_synclist_set_icon_callback(&tree_lists,
-                  global_settings.show_icons?&tree_get_fileicon:NULL);
+    gui_synclist_set_icon_callback(&tree_lists, &tree_get_fileicon);
     /* not the best place for this call... but... */
     root_menu();
 }
@@ -377,7 +376,7 @@ static int update_dir(void)
             || global_settings.show_path_in_browser == SHOW_PATH_CURRENT)
         {
             gui_synclist_set_title(&tree_lists, tagtree_get_title(&tc),
-                global_settings.show_icons?filetype_get_icon(ATTR_DIRECTORY):(ICON)NULL);
+                filetype_get_icon(ATTR_DIRECTORY));
         }
         else
         {
@@ -391,7 +390,7 @@ static int update_dir(void)
         if (global_settings.show_path_in_browser == SHOW_PATH_FULL)
         {
             gui_synclist_set_title(&tree_lists, tc.currdir,
-                global_settings.show_icons?filetype_get_icon(ATTR_DIRECTORY):(ICON)NULL);
+                filetype_get_icon(ATTR_DIRECTORY));
         }
         else if (global_settings.show_path_in_browser == SHOW_PATH_CURRENT)
         {
@@ -400,11 +399,11 @@ static int update_dir(void)
             {
                 /* Display "Files" for the root dir */
                 gui_synclist_set_title(&tree_lists, str(LANG_DIR_BROWSER),
-                    global_settings.show_icons?filetype_get_icon(ATTR_DIRECTORY):(ICON)NULL);
+                    filetype_get_icon(ATTR_DIRECTORY));
             }
             else
                 gui_synclist_set_title(&tree_lists, title,
-                    global_settings.show_icons?filetype_get_icon(ATTR_DIRECTORY):(ICON)NULL);
+                    filetype_get_icon(ATTR_DIRECTORY));
         }
         else
         {
@@ -414,8 +413,7 @@ static int update_dir(void)
     }
     
     gui_synclist_set_nb_items(&tree_lists, tc.filesindir);
-    gui_synclist_set_icon_callback(&tree_lists,
-                  global_settings.show_icons?&tree_get_fileicon:NULL);
+    gui_synclist_set_icon_callback(&tree_lists, tree_get_fileicon);
     if( tc.selected_item >= tc.filesindir)
         tc.selected_item=tc.filesindir-1;
 

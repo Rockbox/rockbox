@@ -222,7 +222,7 @@ static void gui_list_draw(struct gui_list * gui_list)
     int cursor_pos = 0;
     int icon_pos = 1;
     int text_pos;
-    bool draw_icons = (gui_list->callback_get_item_icon != NULL ) ;
+    bool draw_icons = (gui_list->callback_get_item_icon != NULL && global_settings.show_icons);
     bool draw_cursor;
     int i;
     int lines;
@@ -238,7 +238,7 @@ static void gui_list_draw(struct gui_list * gui_list)
         i = 1;
         lines = display->nb_lines - 1;
 
-        if (gui_list->title_icon != NOICON)
+        if (gui_list->title_icon != NOICON && draw_icons)
         {
             screen_put_iconxy(display, 0, 0, gui_list->title_icon);
 #ifdef HAVE_LCD_BITMAP
