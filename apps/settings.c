@@ -1151,10 +1151,22 @@ static bool do_set_setting(const unsigned char* string, void *variable,
         }
         else if (action == ACTION_STD_CANCEL)
         {
-            gui_syncsplash(HZ/2,true,str(LANG_MENU_SETTING_CANCEL));
             if (cb_data->type == INT)
-                *(int*)variable = oldvalue;
-            else *(bool*)variable = (bool)oldvalue;
+            {
+                if (*(int*)variable != oldvalue)
+                {
+                    gui_syncsplash(HZ/2,true,str(LANG_MENU_SETTING_CANCEL));
+                    *(int*)variable = oldvalue;
+                }
+            }
+            else
+            {
+                if (*(bool*)variable != (bool)oldvalue)
+                {
+                    gui_syncsplash(HZ/2,true,str(LANG_MENU_SETTING_CANCEL));
+                    *(bool*)variable = (bool)oldvalue;
+                }
+            }
             done = true;
         }
         else if (action == ACTION_STD_OK)
