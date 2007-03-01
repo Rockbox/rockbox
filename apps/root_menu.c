@@ -29,7 +29,9 @@
 #include "debug.h"
 #include "misc.h"
 #include "rolo.h"
+#if LCD_DEPTH > 1
 #include "backdrop.h"
+#endif
 #include "talk.h"
 #include "audio.h"
 
@@ -44,7 +46,9 @@
 
 #include "main_menu.h"
 #include "tree.h"
+#if CONFIG_TUNER
 #include "radio.h"
+#endif
 #ifdef HAVE_RECORDING
 #include "recording.h"
 #endif
@@ -74,7 +78,7 @@ static int browser(void* param)
     /* and stuff for the database browser */
     static int last_db_dirlevel = 0;
     
-    switch ((int)param)
+    switch ((intptr_t)param)
     {
         case GO_TO_FILEBROWSER:
             filter = global_settings.dirfilter;
@@ -102,7 +106,7 @@ static int browser(void* param)
         break;
     }
     ret_val = rockbox_browse(folder, filter);
-    switch ((int)param)
+    switch ((intptr_t)param)
     {
         case GO_TO_FILEBROWSER:
             strcpy(last_folder, tc->currdir);
