@@ -700,21 +700,11 @@ int dirbrowse()
 #endif
                 break; /* case ACTION_TREE_STOP: */
             case ACTION_STD_MENU:
-                /* don't enter menu from plugin browser */
-                if (*tc.dirfilter < NUM_FILTER_MODES)
-                {
-                    return GO_TO_ROOT;
-                }
-                else /* use it as a quick exit instead */
-                    return GO_TO_PREVIOUS;
+                return GO_TO_ROOT;
                 break;
 
             case ACTION_TREE_WPS:
-                /* don't enter wps from plugin browser etc */
-                if (*tc.dirfilter < NUM_FILTER_MODES)
-                {
-                    return GO_TO_PREVIOUS_MUSIC;
-                }
+                return GO_TO_PREVIOUS_MUSIC;
                 break;
 #ifdef HAVE_QUICKSCREEN
             case ACTION_STD_QUICKSCREEN:
