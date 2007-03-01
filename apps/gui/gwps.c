@@ -606,7 +606,7 @@ long gui_wps_show(void)
 
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
-                    return SYS_USB_CONNECTED;
+                    return GO_TO_ROOT;
                 update_track = true;
                 break;
         }
