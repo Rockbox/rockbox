@@ -121,6 +121,9 @@ void (*track_changed_callback)(struct mp3entry *id3);
 void (*track_buffer_callback)(struct mp3entry *id3, bool last_track);
 void (*track_unbuffer_callback)(struct mp3entry *id3, bool last_track);
 
+/* Cuesheet callback */
+static bool (*cuesheet_callback)(const char *filename) = NULL;
+
 static const char mpeg_thread_name[] = "mpeg";
 static unsigned int mpeg_errno;
 
@@ -488,6 +491,11 @@ void audio_set_track_unbuffer_event(void (*handler)(struct mp3entry *id3,
 void audio_set_track_changed_event(void (*handler)(struct mp3entry *id3))
 {
     track_changed_callback = handler;
+}
+
+void audio_set_cuesheet_callback(bool (*handler)(const char *filename))
+{
+    cuesheet_callback = handler;
 }
 
 #ifndef SIMULATOR
@@ -926,6 +934,9 @@ static struct trackdata *add_track_to_tag_list(const char *filename)
     if (track->id3.album)
         lcd_getstringsize(track->id3.album, NULL, NULL);
 #endif
+    if (cuesheet_callback)
+        if (cuesheet_callback(filename))
+            track->id3.cuesheet_type = 1;
 
     track_write_idx = (track_write_idx+1) & MAX_TRACK_ENTRIES_MASK;
     debug_tags();
