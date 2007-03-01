@@ -139,7 +139,7 @@ static int wpsscrn(void* param)
                global_status.resume_index,
                global_status.resume_offset);
 
-#ifdef HAVE_ALARM_MOD
+#ifdef HAVE_RTC_ALARM
         if ( rtc_check_alarm_started(true) ) {
            rtc_enable_alarm(false);
         }
