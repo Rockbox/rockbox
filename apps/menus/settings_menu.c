@@ -99,11 +99,7 @@ static int fileview_callback(int action,const struct menu_item_ex *this_item)
 
 MAKE_MENU(file_menu, ID2P(LANG_FILE), 0, bitmap_icons_6x8[Icon_file_view_menu],
                 &sort_case, &sort_dir, &sort_file,
-                &dirfilter, &browse_current, &show_path_in_browser,
-#ifdef HAVE_TAGCACHE
-                &tagcache_menu
-#endif
-        );
+                &dirfilter, &browse_current, &show_path_in_browser);
 /*    FILE VIEW MENU               */
 /***********************************/
 
@@ -388,6 +384,9 @@ MENUITEM_FUNCTION(browse_langs, ID2P(LANG_LANGUAGE), language_browse,
 MAKE_MENU(settings_menu_item, ID2P(LANG_GENERAL_SETTINGS), 0,
           bitmap_icons_6x8[Icon_General_settings_menu],
           &playback_menu_item, &playlist_settings, &file_menu,
+#ifdef HAVE_TAGCACHE
+          &tagcache_menu,
+#endif
           &display_menu, &system_menu,
           &bookmark_settings_menu, &browse_langs, &voice_settings_menu );
 /*    SETTINGS MENU                */
