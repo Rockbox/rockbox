@@ -277,8 +277,9 @@ bool h10(int mode)
   wxString err,src,dest,path1,path2;
 
    int pos = gv->curbootloader.Find('/');
+   if(pos == wxNOT_FOUND) pos = 0;
    wxString firmwarename = gv->curbootloader.SubString(pos,gv->curbootloader.Length());
-   wxString firmDir = gv->curbootloader.SubString(0,pos);
+   //wxString firmDir = gv->curbootloader.SubString(0,pos);
 
   if(mode == BOOTLOADER_ADD)
   {
@@ -294,12 +295,12 @@ bool h10(int mode)
            return false;
      }
 
-     path1.Printf("%s" PATH_SEP "SYSTEM" PATH_SEP "%s",gv->curdestdir.c_str(),firmwarename.c_str());
-     path2.Printf("%s" PATH_SEP "SYSTEM" PATH_SEP "Original.mi4",gv->curdestdir.c_str());
+     path1.Printf("%sSYSTEM" PATH_SEP "%s",gv->curdestdir.c_str(),firmwarename.c_str());
+     path2.Printf("%sSYSTEM" PATH_SEP "Original.mi4",gv->curdestdir.c_str());
 
      if(!wxFileExists(path1))  //Firmware dosent exists on player
      {
-        path1.Printf("%s" PATH_SEP "SYSTEM" PATH_SEP "H10EMP.mi4");   //attempt other firmwarename
+        path1.Printf("%sSYSTEM" PATH_SEP "H10EMP.mi4");   //attempt other firmwarename
         if(!wxFileExists(path1))  //Firmware dosent exists on player
         {
             err.Printf("[ERR] File %s does not Exist",path1.c_str());
@@ -307,9 +308,9 @@ bool h10(int mode)
             return false;
         }
      }
-     if(!wxFileExists(path2))  //there is already a original firmware
+     if(wxFileExists(path2))  //there is already a original firmware
      {
-        err.Printf("[ERR] File %s does not Exist",path1.c_str());
+        err.Printf("[ERR2] File %s does Exist",path2.c_str());
         ERR_DIALOG(err, _("Bootloader add"));
         return false;
      }
@@ -331,8 +332,8 @@ bool h10(int mode)
   }
   else if(mode == BOOTLOADER_REM)
   {
-     path1.Printf("%s" PATH_SEP "SYSTEM" PATH_SEP "%s",gv->curdestdir.c_str(),firmwarename.c_str());
-     path2.Printf("%s" PATH_SEP "SYSTEM" PATH_SEP "Original.mi4",gv->curdestdir.c_str());
+     path1.Printf("%sSYSTEM" PATH_SEP "%s",gv->curdestdir.c_str(),firmwarename.c_str());
+     path2.Printf("%sSYSTEM" PATH_SEP "Original.mi4",gv->curdestdir.c_str());
      if(!wxFileExists(path1))  //Firmware dosent exists on player
      {
          path1.Printf("%s" PATH_SEP "SYSTEM" PATH_SEP "H10EMP.mi4");   //attempt other firmwarename

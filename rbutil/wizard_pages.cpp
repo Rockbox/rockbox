@@ -481,8 +481,8 @@ wxBuildPage::wxBuildPage(wxWizard *parent) : wxWizardPageSimple(parent)
     wxArrayString* array = new wxArrayString();
     buf.Printf(_("Rockbox stable version (%s)") , gv->last_release.c_str());
     array->Add(buf);
-    array->Add(_("Daily Build"));
-    array->Add(_("Bleeding Edge Build "));
+    array->Add(_("Archived Build"));
+    array->Add(_("Current Build "));
 
     BuildRadioBox = new wxRadioBox(this, ID_BUILD_BOX, _("Version"),
         wxDefaultPosition, wxDefaultSize, *array, 0, wxRA_SPECIFY_ROWS);
@@ -539,8 +539,7 @@ void wxBuildPage::OnBuildBox(wxCommandEvent& event)
             break;
         case BUILD_BLEEDING:
             str = _("This is the absolute up to the minute Rockbox built after\n"
-                "the last change was made.  This should be avoided unless the\n"
-                "daily version is causing problems for some reason.\n\n"
+                "the last change was made.\n\n"
                 "Note:  This option will always download a fresh copy from the\n"
                 "web server.\n");
             NoCacheCheckBox->Enable(false);

@@ -458,8 +458,7 @@ void rbutilFrm::OnBootloaderBtn(wxCommandEvent& event)
         {
             if(h10(BOOTLOADER_ADD))
             {
-               wxMessageDialog* msg = new wxMessageDialog(this, _("The Bootloader has been patched and copied on your device.\n"
-                             "Now use the Firmware upgrade option of your Device\n")
+               wxMessageDialog* msg = new wxMessageDialog(this, _("The Bootloader has been patched and copied on your device.\n")
                             ,"Installation", wxOK |wxICON_INFORMATION);
                msg->ShowModal();
                delete msg;
