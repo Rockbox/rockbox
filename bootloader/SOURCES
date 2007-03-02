@@ -10,6 +10,8 @@ main-pp.c
 tpj1022.c
 #elif defined(IAUDIO_X5)
 iaudio_x5.c
+#elif defined(IRIVER_H300_SERIES)
+iriver_h300.c
 #else
 main.c
 #endif

@@ -23,6 +23,9 @@
 #include "button-target.h"
 #include "logf.h"
 
+/* Used by the bootloader to find out what caused the device to start */
+unsigned char pcf50606_intregs[3];
+
 static bool usb_ch_enabled = false;
 
 /* These voltages were determined by measuring the output of the PCF50606
@@ -57,7 +60,7 @@ static void init_pmu_interrupts(void)
     /* unmask the PMU interrupts we want to service */
     pcf50606_write_multiple(0x05, data, 3);
     /* clear INT1-3 as these are left set after standby */
-    pcf50606_read_multiple(0x02, data, 3);
+    pcf50606_read_multiple(0x02, pcf50606_intregs, 3);
 
     /* Set to read pcf50606 INT but keep GPI6 off until init completes */
     and_l(~0x00000040, &GPIO_ENABLE);
