@@ -51,6 +51,9 @@
 
 #define CONFIG_KEYPAD IAUDIO_X5_PAD
 
+#define AB_REPEAT_ENABLE 1
+#define ACTION_WPSAB_SINGLE ACTION_WPS_QUICKSCREEN
+
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 
