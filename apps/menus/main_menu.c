@@ -341,6 +341,40 @@ static bool show_info(void)
 }
 MENUITEM_FUNCTION(show_info_item, ID2P(LANG_INFO_MENU),
                    (menu_function)show_info, NULL, NOICON);
+
+
+/* sleep Menu */
+static void sleep_timer_formatter(char* buffer, int buffer_size, int value,
+                                  const char* unit)
+{
+    int minutes, hours;
+
+    (void) unit;
+
+    if (value) {
+        hours = value / 60;
+        minutes = value - (hours * 60);
+        snprintf(buffer, buffer_size, "%d:%02d", hours, minutes);
+   } else {
+        snprintf(buffer, buffer_size, "%s", str(LANG_OFF));
+    }
+}
+
+static void sleep_timer_set(int minutes)
+{
+    set_sleep_timer(minutes * 60);
+}
+
+static int sleep_timer(void)
+{
+    int minutes = (get_sleep_timer() + 59) / 60; /* round up */
+    return (int)set_int(str(LANG_SLEEP_TIMER), "", UNIT_MIN, &minutes,
+                   &sleep_timer_set, -5, 300, 0, sleep_timer_formatter);
+}
+
+MENUITEM_FUNCTION(sleep_timer_call, ID2P(LANG_SLEEP_TIMER), sleep_timer,
+                    NULL, bitmap_icons_6x8[Icon_Menu_setting]); /* make it look like a 
+                                                                setting to the user */
 MENUITEM_FUNCTION(show_credits_item, ID2P(LANG_VERSION),
                    (menu_function)show_credits, NULL, NOICON);
 MENUITEM_FUNCTION(show_runtime_item, ID2P(LANG_RUNNING_TIME),
@@ -359,7 +393,8 @@ MENUITEM_FUNCTION(logfdump_item, "logfdump",(int (*)(void)) logfdump, NULL, NOIC
 #endif
 
 MAKE_MENU(info_menu, ID2P(LANG_INFO), 0, bitmap_icons_6x8[Icon_Questionmark],
-          &show_info_item, &show_credits_item, &show_runtime_item,
+          &show_info_item, &show_credits_item, &show_runtime_item, 
+          &sleep_timer_call,
 #ifndef SIMULATOR
          &debug_menu_item
 #else
