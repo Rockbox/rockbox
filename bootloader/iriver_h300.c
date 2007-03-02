@@ -43,6 +43,7 @@
 #include "pcf50606.h"
 #include "common.h"
 #include "rbunicode.h"
+#include "isp1362.h"
 
 #include <stdarg.h>
 
@@ -189,6 +190,8 @@ void main(void)
     coldfire_set_pllcr_audio_bits(DEFAULT_PLLCR_AUDIO_BITS);
     set_irq_level(0);
 
+    isp1362_init();
+
     adc_init();
     button_init();
     
@@ -245,6 +248,8 @@ void main(void)
         bool blink_toggle = false;
         bool request_start = false;
 
+        cpu_idle_mode(true);
+        
         while(charger_inserted() && !request_start)
         {
             button = button_get_w_tmo(HZ);
@@ -286,6 +291,8 @@ void main(void)
             __reset_cookie();
             power_off();
         }
+
+        cpu_idle_mode(false);
     }
     
     usb_init();

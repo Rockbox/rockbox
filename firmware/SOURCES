@@ -209,10 +209,13 @@ drivers/tlv320.c
 #endif /* SIMULATOR */
 
 /* USBOTG */
-#if !defined(SIMULATOR) && !defined(BOOTLOADER)
+#if !defined(SIMULATOR)
 #if CONFIG_USBOTG == USBOTG_ISP1362
 drivers/isp1362.c
-#elif CONFIG_USBOTG == USBOTG_M5636
+#endif
+#endif
+#if !defined(SIMULATOR) && !defined(BOOTLOADER)
+#if CONFIG_USBOTG == USBOTG_M5636
 drivers/m5636.c
 #elif CONFIG_USBOTG == USBOTG_ARC
 drivers/arcotg_udc.c
