@@ -99,7 +99,7 @@ int main (int argc, char* argv[])
     int n;
 
     if (argc != 3) {
-        fprintf(stderr,"Usage: ipod2c file.bin cname\n");
+        fprintf(stderr,"Usage: ipod2c file.ipod cname\n");
         return 0;
     }
 
