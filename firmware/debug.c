@@ -28,7 +28,7 @@
 
 #ifdef DEBUG
 static char debugmembuf[200];
-#if CONFIG_CPU == SH3704
+#if CONFIG_CPU == SH7034
 static char debugbuf[400];
 #endif
 #endif
