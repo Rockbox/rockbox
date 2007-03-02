@@ -41,8 +41,7 @@
 #include "file.h"
 #include "uda1380.h"
 #include "eeprom_settings.h"
-
-#include "pcf50606.h"
+#include "rbunicode.h"
 #include "common.h"
 
 #include <stdarg.h>
