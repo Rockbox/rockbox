@@ -305,8 +305,6 @@ static bool read_ape_tags(int fd, struct mp3entry* id3)
         return false;
     }
 
-    id3->genre = 0xff;
-
     if ((header.version == 2000) && (header.item_count > 0)
         && (header.length > APETAG_HEADER_LENGTH)) 
     {
@@ -387,8 +385,6 @@ static bool read_vorbis_tags(int fd, struct mp3entry *id3,
     long len;
     int buf_remaining = sizeof(id3->id3v2buf) + sizeof(id3->id3v1buf);
     int i;
-
-    id3->genre = 255;
 
     if (ecread(fd, &len, 1, "l", IS_BIG_ENDIAN) < (long) sizeof(len)) 
     {
@@ -1355,7 +1351,7 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                 unsigned short genre;
                 
                 read_mp4_tag(fd, size, (char*) &genre, sizeof(genre));
-                id3->genre = betoh16(genre);
+                id3->genre_string = id3_get_num_genre(betoh16(genre));
             }
             break;
 
@@ -1591,7 +1587,6 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
 static bool get_mp4_metadata(int fd, struct mp3entry* id3)
 {
     id3->codectype = AFMT_UNKNOWN;
-    id3->genre = 255;
     id3->filesize = 0;
     errno = 0;
 
@@ -2179,7 +2174,7 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         break;
     case AFMT_SPC:
         track->id3.filesize = filesize(fd);
-        track->id3.genre = 36;
+        track->id3.genre_string = id3_get_num_genre(36);
         break;
     case AFMT_ADX:
         if (!get_adx_metadata(fd, &(track->id3)))

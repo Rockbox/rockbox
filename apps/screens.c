@@ -1181,7 +1181,7 @@ static char * id3_get_info(int selected_item, void* data, char *buffer)
                 info=id3->comment;
                 break;
             case 6:/*LANG_ID3_GENRE*/
-                info = id3_get_genre(id3);
+                info = id3->genre_string;
                 break;
             case 7:/*LANG_ID3_YEAR*/
                 if (id3->year_string)

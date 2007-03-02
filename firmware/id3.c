@@ -179,13 +179,10 @@ static const char* const genres[] = {
     "Synthpop"
 };
 
-char* id3_get_genre(const struct mp3entry* id3)
+char* id3_get_num_genre(const unsigned int genre_num)
 {
-    if( id3->genre_string )
-        return id3->genre_string ;
-
-    if (id3->genre < sizeof(genres)/sizeof(char*))
-        return (char*)genres[id3->genre];
+    if (genre_num < sizeof(genres)/sizeof(char*))
+        return (char*)genres[genre_num];
     return NULL;
 }
 
@@ -364,23 +361,19 @@ static int parsegenre( struct mp3entry* entry, char* tag, int bufferpos )
 
         /* Is it a number? */
         if(isdigit(tag[0])) {
-            entry->genre = atoi( tag );
-            entry->genre_string = 0;
+            entry->genre_string = id3_get_num_genre(atoi( tag ));
             return tag - entry->id3v2buf;
         } else {
             entry->genre_string = tag;
-            entry->genre = 0xff;
             return bufferpos;
         }
     } else {
         if( tag[0] == '(' && tag[1] != '(' ) {
-            entry->genre = atoi( tag + 1 );
-            entry->genre_string = 0;
+            entry->genre_string = id3_get_num_genre(atoi( tag + 1 ));
             return tag - entry->id3v2buf;
         }
         else {
             entry->genre_string = tag;
-            entry->genre = 0xff;
             return bufferpos;
         }
     }
@@ -616,7 +609,7 @@ static bool setid3v1title(int fd, struct mp3entry *entry)
 
             case 6:
                 /* genre */
-                entry->genre = ptr[0];
+                entry->genre_string = id3_get_num_genre(ptr[0]);
                 break;
         }
     }
@@ -695,8 +688,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
     }
     entry->id3version = version;
     entry->tracknum = entry->year = 0;
-    entry->genre = 0xff;
-    entry->title = entry->artist = entry->album = NULL;
+    entry->title = entry->artist = entry->album = NULL; /* FIXME incomplete */
 
     global_flags = header[5];
 
@@ -1117,7 +1109,6 @@ bool get_mp3_metadata(int fd, struct mp3entry *entry, const char *filename, bool
     entry->filesize = filesize(fd);
     entry->id3v2len = getid3v2len(fd);
     entry->tracknum = 0;
-    entry->genre = 0xff;
 
     if(v1first)
         v1found = setid3v1title(fd, entry);

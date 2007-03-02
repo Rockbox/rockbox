@@ -1534,7 +1534,6 @@ static void add_tagcache(char *path)
     bool ret;
     int fd;
     char tracknumfix[3];
-    char *genrestr;
     int offset = 0;
     int path_length = strlen(path);
 
@@ -1620,8 +1619,6 @@ static void add_tagcache(char *path)
         }
     }
     
-    genrestr = id3_get_genre(&track.id3);
-    
     /* Numeric tags */
     entry.tag_offset[tag_year] = track.id3.year;
     entry.tag_offset[tag_tracknumber] = track.id3.tracknum;
@@ -1633,7 +1630,7 @@ static void add_tagcache(char *path)
     ADD_TAG(entry, tag_title, &track.id3.title);
     ADD_TAG(entry, tag_artist, &track.id3.artist);
     ADD_TAG(entry, tag_album, &track.id3.album);
-    ADD_TAG(entry, tag_genre, &genrestr);
+    ADD_TAG(entry, tag_genre, &track.id3.genre_string);
     ADD_TAG(entry, tag_composer, &track.id3.composer);
     ADD_TAG(entry, tag_comment, &track.id3.comment);
     ADD_TAG(entry, tag_albumartist, &track.id3.albumartist);
@@ -1647,7 +1644,7 @@ static void add_tagcache(char *path)
     write_item(track.id3.title);
     write_item(track.id3.artist);
     write_item(track.id3.album);
-    write_item(genrestr);
+    write_item(track.id3.genre_string);
     write_item(track.id3.composer);
     write_item(track.id3.comment);
     write_item(track.id3.albumartist);

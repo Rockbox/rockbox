@@ -506,7 +506,7 @@ static char* get_tag(struct wps_data* wps_data,
                     return NULL;
 
                 case 'g':  /* genre */
-                    return id3_get_genre(id3);
+                    return id3->genre_string;
 
                 case 'v': /* id3 version */
                     switch (id3->id3version)
