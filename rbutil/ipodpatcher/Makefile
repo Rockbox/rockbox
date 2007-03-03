@@ -32,6 +32,17 @@ ipodpatcher.exe: main.c ipodpatcher.c ipodio-win32.c parttypes.h $(BOOTSRC)
 	$(CC) $(CFLAGS) -o ipodpatcher.exe main.c ipodpatcher.c ipodio-win32.c $(BOOTSRC)
 	$(CROSS)strip ipodpatcher.exe
 
+ipodpatcher-mac: ipodpatcher-i386 ipodpatcher-ppc
+	lipo -create ipodpatcher-ppc ipodpatcher-i386 -output ipodpatcher-mac
+
+ipodpatcher-i386: main.c ipodpatcher.c ipodio-posix.c parttypes.h $(BOOTSRC)
+	gcc -isysroot /Developer/SDKs/MacOSX10.4u.sdk -o bin/i386/program -arch i386 $(CFLAGS) -o ipodpatcher-i386 main.c ipodpatcher.c ipodio-posix.c $(BOOTSRC)
+	strip ipodpatcher-i386
+
+ipodpatcher-ppc: main.c ipodpatcher.c ipodio-posix.c parttypes.h $(BOOTSRC)
+	gcc -arch ppc $(CFLAGS) -o ipodpatcher-ppc main.c ipodpatcher.c ipodio-posix.c $(BOOTSRC)
+	strip ipodpatcher-ppc
+
 ipod2c: ipod2c.c
 	$(NATIVECC) $(CFLAGS) -o ipod2c ipod2c.c
 
@@ -58,4 +69,4 @@ ipodvideo.c: bootloader-ipodvideo.ipod ipod2c
 
 
 clean:
-	rm -f ipodpatcher.exe ipodpatcher ipod2c *~ $(BOOTSRC) $(BOOT_H)
+	rm -f ipodpatcher.exe ipodpatcher-mac ipodpatcher-i386 ipodpatcher-ppc ipodpatcher ipod2c *~ $(BOOTSRC) $(BOOT_H)
