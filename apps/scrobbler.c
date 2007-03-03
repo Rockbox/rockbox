@@ -35,7 +35,6 @@ http://www.audioscrobbler.net/wiki/Portable_Player_Logging
 #ifdef CONFIG_RTC
 #include "time.h"
 #include "timefuncs.h"
-#include "rtc.h"
 #endif
 
 #include "scrobbler.h"
@@ -209,11 +208,6 @@ void scrobbler_change_event(struct mp3entry *id)
         logf("SCROBBLER: add pending");
         copy_mp3entry(&scrobbler_entry, id);
 #ifdef CONFIG_RTC
-#if CONFIG_RTC == RTC_DS1339_DS3231
-        if(!rtc_detected) 
-            timestamp = 0;
-        else
-#endif
         timestamp = mktime(get_time());
 #else
         timestamp = 0;

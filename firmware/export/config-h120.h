@@ -45,16 +45,7 @@
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 
-/* Set to 1 if you want to build with RTC support */
-#if 0
-#ifndef SIMULATOR
-/* RTC is autodetected on target only */
-#define CONFIG_RTC RTC_DS1339_DS3231
-#define HAVE_RTC_ALARM
-#endif 
-#endif
-
- /* Define this if you have an remote lcd */
+/* Define this if you have an remote lcd */
 #define HAVE_REMOTE_LCD
 
 #define CONFIG_LCD LCD_S1D15E06

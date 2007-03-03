@@ -28,9 +28,6 @@
 #include "powermgmt.h"
 #include "usb.h"
 #include "led.h"
-#ifdef CONFIG_RTC
-#include "rtc.h"
-#endif
 
 #include "status.h" /* needed for battery_state global var */
 #include "action.h" /* for keys_locked */
@@ -242,9 +239,6 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
         bar->info.led = led_read(HZ/2); /* delay should match polling interval */
 #endif
 #ifdef CONFIG_RTC
-#if CONFIG_RTC == RTC_DS1339_DS3231
-    if(rtc_detected) 
-#endif
     {
         struct tm* tm = get_time();
         bar->info.hour = tm->tm_hour;
@@ -330,9 +324,6 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
             gui_statusbar_icon_lock_remote(display);
 #endif
 #ifdef CONFIG_RTC
-#if CONFIG_RTC == RTC_DS1339_DS3231
-        if(rtc_detected) 
-#endif
         gui_statusbar_time(display, bar->info.hour, bar->info.minute);
 #endif /* CONFIG_RTC */
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)

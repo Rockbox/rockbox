@@ -23,9 +23,7 @@
 #include <stdlib.h>
 #include "system.h"
 #include "settings.h"
-#ifdef CONFIG_RTC
 #include "rtc.h"
-#endif
 #include "audio.h"
 #include "status.h"
 #include "power.h"
@@ -974,11 +972,6 @@ static char* get_tag(struct wps_data* wps_data,
 #ifdef CONFIG_RTC
        case 'c':  /* Real Time Clock display */
             *flags |= WPS_REFRESH_DYNAMIC;
-#if CONFIG_RTC == RTC_DS1339_DS3231
-            if(!rtc_detected) 
-                return NULL;
-            else
-#endif
             {
                 int value;
                 char *format = 0;

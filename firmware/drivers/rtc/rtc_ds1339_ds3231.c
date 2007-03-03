@@ -22,16 +22,9 @@
 
 #define RTC_ADDR   0xD0
 
-bool rtc_detected = false; 
-
 void rtc_init(void)
 {
-    char byte;
-  
     sw_i2c_init();
-
-    /* read one byte from RTC; 0 on success */
-    rtc_detected = !sw_i2c_read(RTC_ADDR, 0, &byte, 1); 
 
 #ifdef HAVE_RTC_ALARM
     /* Check + save alarm bit first, before the power thread starts watching */
@@ -72,7 +65,8 @@ bool rtc_check_alarm_flag(void)
     sw_i2c_read(RTC_ADDR, 0x0f, buf, 1);        
     if (buf[0] & 0x02) flag = true;
       
-    rtc_enable_alarm(false);
+    buf[0] = 0x00;
+    sw_i2c_write(RTC_ADDR, 0x0f, buf, 1);        
     
     return flag;
 }
@@ -109,7 +103,7 @@ bool rtc_enable_alarm(bool enable)
 {
     unsigned char buf[2];
     
-    buf[0] = enable ? 0x26 : 0x04; /* BBSQI INTCN A2IE vs INTCH  only */
+    buf[0] = enable ? 0x26 : 0x24; /* BBSQI INTCN A2IE vs INTCH  only */
     buf[1] = 0x00; /* reset alarm flags (and OSF for good measure) */
     
     sw_i2c_write(RTC_ADDR, 0x0e, buf, 2);        

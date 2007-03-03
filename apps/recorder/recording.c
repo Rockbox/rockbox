@@ -68,9 +68,6 @@
 #include "screen_access.h"
 #include "action.h"
 #include "radio.h"
-#ifdef CONFIG_RTC
-#include "rtc.h"
-#endif
 #ifdef HAVE_RECORDING
 
 static bool in_screen = false;   
@@ -524,12 +521,6 @@ char *rec_create_filename(char *buffer)
 #ifdef CONFIG_RTC 
     /* We'll wait at least up to the start of the next second so no duplicate
        names are created */
-#if CONFIG_RTC == RTC_DS1339_DS3231
-    if(!rtc_detected) 
-        return create_numbered_filename(buffer, buffer, "rec_", ext, 4
-                                    IF_CNFN_NUM_(, &file_number));
-    else
-#endif
     return create_datetime_filename(buffer, buffer, "R", ext, true);
 #else
     return create_numbered_filename(buffer, buffer, "rec_", ext, 4

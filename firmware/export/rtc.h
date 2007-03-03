@@ -20,17 +20,14 @@
 #define _RTC_H_
 
 #include <stdbool.h> 
-#include <system.h> 
+#include "system.h"
+#include "config.h"
 
 #ifdef CONFIG_RTC
 
 extern const int dayname[];
 
 extern const int monthname[];
-
-#if CONFIG_RTC == RTC_DS1339_DS3231
-extern bool rtc_detected; 
-#endif
 
 /* Common functions for all targets */
 void rtc_init(void);
