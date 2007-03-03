@@ -6,6 +6,8 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
+ * $Id$
+ *
  * Copyright (C) 2006-2007 Adam Gashlin (hcs)
  * Copyright (C) 2004-2007 Shay Green (blargg)
  * Copyright (C) 2002 Brad Martin
@@ -880,7 +882,7 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         #if !SPC_NOINTERP
             /* Interleved gauss table (to improve cache coherency). */
             /* gauss [i * 2 + j] = normal_gauss [(1 - j) * 256 + i] */
-            static short const gauss [512] =
+            static short const gauss [512] ICONST_ATTR =
             {
 370,1305, 366,1305, 362,1304, 358,1304, 354,1304, 351,1304, 347,1304, 343,1303,
 339,1303, 336,1303, 332,1302, 328,1302, 325,1301, 321,1300, 318,1300, 314,1299,
@@ -915,7 +917,6 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
   0, 434,   0, 430,   0, 426,   0, 422,   0, 418,   0, 414,   0, 410,   0, 405,
   0, 401,   0, 397,   0, 393,   0, 389,   0, 385,   0, 381,   0, 378,   0, 374,
             };
-            
             /* Gaussian interpolation using most recent 4 samples */
             long position = voice->position;
             voice->position += rate;
@@ -969,7 +970,8 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         #else
         /* two-point linear interpolation */
         #ifdef CPU_COLDFIRE
-            int32_t  output = (int16_t)this->noise;
+            int amp_0 = (int16_t)this->noise;
+            int amp_1;
 
             if ( (this->r.g.noise_enables & vbit) == 0 )
             {
@@ -1001,12 +1003,45 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                 /* output = y0 + (result >> 12)          */
                 "asr.l      %[sh], %[y1]              \r\n"
                 "add.l      %[y0], %[y1]              \r\n"
-                : [f]"+&d"(f), [y0]"=&a"(y0), [y1]"=&d"(output)
+                : [f]"+&d"(f), [y0]"=&a"(y0), [y1]"=&d"(amp_0)
                 : [s]"a"(voice->samples), [sh]"d"(12)
                     );
             }
 
+            /* apply voice envelope to output */
+            asm volatile (
+            "mac.w %[output]l, %[envx]l, %%acc0 \r\n"
+            :
+            : [output]"r"(amp_0), [envx]"r"(voice->envx)
+            );
+
+            /* advance voice position */
             voice->position += rate;
+
+            /* fetch output, scale and apply left and right
+               voice volume */
+            asm volatile (
+            "movclr.l %%acc0,    %[output]         \r\n"
+            "asr.l    %[sh],     %[output]         \r\n"
+            "mac.l    %[vvol_0], %[output], %%acc0 \r\n"
+            "mac.l    %[vvol_1], %[output], %%acc1 \r\n"
+            : [output]"=&r"(amp_0)
+            : [vvol_0]"r"((int)voice->volume[0]),
+              [vvol_1]"r"((int)voice->volume[1]),
+              [sh]"d"(11)
+            );
+
+            /* save this output into previous, scale and save in
+               output register */
+            prev_outx = amp_0;
+            raw_voice->outx = amp_0 >> 8;
+
+            /* fetch final voice output */
+            asm volatile (
+            "movclr.l %%acc0, %[amp_0] \r\n"
+            "movclr.l %%acc1, %[amp_1] \r\n"
+            : [amp_0]"=r"(amp_0), [amp_1]"=r"(amp_1)
+            );
         #else
 
             /* Try this one out on ARM and see - similar to above but the asm
@@ -1043,8 +1078,6 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
             if ( this->r.g.noise_enables & vbit )
                 output = *(int16_t*) &this->noise;
 #endif
-        #endif /* CPU_COLDFIRE */
-
             output = (output * voice->envx) >> 11;
 
             /* duplicated here to give compiler more to run in parallel */
@@ -1053,6 +1086,7 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
 
             prev_outx = output;
             raw_voice->outx = (int8_t) (output >> 8);
+        #endif /* CPU_COLDFIRE */
         #endif
         
         #if SPC_BRRCACHE
