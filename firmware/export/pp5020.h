@@ -20,11 +20,72 @@
 #define __PP5020_H__
 
 /* All info gleaned and/or copied from the iPodLinux project. */
+
+/* DRAM starts at 0x10000000, but in Rockbox we remap it to 0x00000000 */
 #define DRAM_START       0x10000000
 
+/* Processor ID */
+#define PROCESSOR_ID     (*(volatile unsigned long *)(0x60000000))
+
+#define PROC_ID_CPU      0x55
+#define PROC_ID_COP      0xaa
+
+/* Interrupts */
+#define CPU_INT_EN       (*(volatile unsigned long*)(0x60004024))
+#define CPU_HI_INT_EN    (*(volatile unsigned long*)(0x60004124))
+#define CPU_INT_CLR      (*(volatile unsigned long*)(0x60004028))
+#define CPU_HI_INT_CLR   (*(volatile unsigned long*)(0x60004128))
+#define CPU_INT_STAT     (*(volatile unsigned long*)(0x64004000))
+#define CPU_HI_INT_STAT  (*(volatile unsigned long*)(0x64004100))
+       
+#define TIMER1_IRQ   0
+#define TIMER2_IRQ   1
+#define I2S_IRQ      10
+#define IDE_IRQ      23
+#define GPIO_IRQ     (32+0)
+#define SER0_IRQ     (32+4)
+#define SER1_IRQ     (32+5)
+#define I2C_IRQ      (32+8)
+
+#define TIMER1_MASK  (1 << TIMER1_IRQ)
+#define TIMER2_MASK  (1 << TIMER2_IRQ)
+#define I2S_MASK     (1 << I2S_IRQ)
+#define IDE_MASK     (1 << IDE_IRQ)
+#define GPIO_MASK    (1 << (GPIO_IRQ-32))
+#define SER0_MASK    (1 << (SER0_IRQ-32))
+#define SER1_MASK    (1 << (SER1_IRQ-32))
+#define I2C_MASK     (1 << (I2C_IRQ-32))
+
+/* Timers */
+#define TIMER1_CFG   (*(volatile unsigned long *)(0x60005000))
+#define TIMER1_VAL   (*(volatile unsigned long *)(0x60005004))
+#define TIMER2_CFG   (*(volatile unsigned long *)(0x60005008))
+#define TIMER2_VAL   (*(volatile unsigned long *)(0x6000500c))
+#define USEC_TIMER   (*(volatile unsigned long *)(0x60005010))
+
+/* Device Controller */
+#define DEV_RS (*(volatile unsigned long *)(0x60006004))
+#define DEV_EN (*(volatile unsigned long *)(0x6000600c))
+
+#define DEV_SYSTEM  0x4
+#define DEV_I2C     0x1000
+#define DEV_USB     0x400000
+
+/* Processors Control */
 #define CPU_CTL          (*(volatile unsigned long *)(0x60007000))
 #define COP_CTL          (*(volatile unsigned long *)(0x60007004))
 
+#define PROC_SLEEP   0x80000000
+#define PROC_WAKE    0x0
+
+/* Cache Control */
+#define CACHE_CTL        (*(volatile unsigned long *)(0x6000c000))
+
+#define CACHE_DISABLE    0
+#define CACHE_ENABLE     1
+#define CACHE_INIT       4
+
+/* GPIO Ports */
 #define GPIOA_ENABLE     (*(volatile unsigned long *)(0x6000d000))
 #define GPIOB_ENABLE     (*(volatile unsigned long *)(0x6000d004))
 #define GPIOC_ENABLE     (*(volatile unsigned long *)(0x6000d008))
@@ -124,56 +185,24 @@
 #define GPIOK_INT_CLR    (*(volatile unsigned long *)(0x6000d178))
 #define GPIOL_INT_CLR    (*(volatile unsigned long *)(0x6000d17c))
 
-#define DEV_RS (*(volatile unsigned long *)(0x60006004))
-#define DEV_EN (*(volatile unsigned long *)(0x6000600c))
-
-#define DEV_SYSTEM  0x4
-#define DEV_I2C     0x1000
-#define DEV_USB     0x400000
-
+/* Device initialization */
 #define DEV_INIT    (*(volatile unsigned long *)(0x70000020))
 
 #define INIT_USB    0x80000000
 
-#define TIMER1_CFG   (*(volatile unsigned long *)(0x60005000))
-#define TIMER1_VAL   (*(volatile unsigned long *)(0x60005004))
-#define TIMER2_CFG   (*(volatile unsigned long *)(0x60005008))
-#define TIMER2_VAL   (*(volatile unsigned long *)(0x6000500c))
-#define USEC_TIMER   (*(volatile unsigned long *)(0x60005010))
-
-#define CPU_INT_STAT     (*(volatile unsigned long*)(0x64004000))
-#define CPU_HI_INT_STAT  (*(volatile unsigned long*)(0x64004100))
-#define CPU_INT_EN       (*(volatile unsigned long*)(0x60004024))
-#define CPU_HI_INT_EN    (*(volatile unsigned long*)(0x60004124))
-#define CPU_INT_CLR      (*(volatile unsigned long*)(0x60004028))
-#define CPU_HI_INT_CLR   (*(volatile unsigned long*)(0x60004128))
-       
-#define TIMER1_IRQ   0
-#define TIMER2_IRQ   1
-#define I2S_IRQ      10
-#define IDE_IRQ      23
-#define GPIO_IRQ     (32+0)
-#define SER0_IRQ     (32+4)
-#define SER1_IRQ     (32+5)
-#define I2C_IRQ      (32+8)
-
-#define TIMER1_MASK  (1 << TIMER1_IRQ)
-#define TIMER2_MASK  (1 << TIMER2_IRQ)
-#define I2S_MASK     (1 << I2S_IRQ)
-#define IDE_MASK     (1 << IDE_IRQ)
-#define GPIO_MASK    (1 << (GPIO_IRQ-32))
-#define SER0_MASK    (1 << (SER0_IRQ-32))
-#define SER1_MASK    (1 << (SER1_IRQ-32))
-#define I2C_MASK     (1 << (I2C_IRQ-32))
-
+/* I2C */
 #define I2C_BASE    0x7000c000
 
+/* I2S */
 #define IISCONFIG           (*(volatile unsigned long*)(0x70002800))
-
 #define IISFIFO_CFG         (*(volatile unsigned long*)(0x7000280c))
 #define IISFIFO_WR          (*(volatile unsigned long*)(0x70002840))
 #define IISFIFO_RD          (*(volatile unsigned long*)(0x70002880))
 
+/* USB controller */
+#define USB_BASE                0xc5000000
+
+/* Memory controller */
 #define MMAP0_LOGICAL       (*(volatile unsigned long*)(0xf000f000))
 #define MMAP0_PHYSICAL      (*(volatile unsigned long*)(0xf000f004))
 #define MMAP1_LOGICAL       (*(volatile unsigned long*)(0xf000f008))
@@ -182,11 +211,5 @@
 #define MMAP2_PHYSICAL      (*(volatile unsigned long*)(0xf000f014))
 #define MMAP3_LOGICAL       (*(volatile unsigned long*)(0xf000f018))
 #define MMAP3_PHYSICAL      (*(volatile unsigned long*)(0xf000f01c))
-
-/* The PortalPlayer USB controller uses base address 0xc5000000 */
-#define USB_BASE                0xc5000000
-
-#define PROC_SLEEP   0x80000000
-#define PROC_WAKE    0x0
 
 #endif

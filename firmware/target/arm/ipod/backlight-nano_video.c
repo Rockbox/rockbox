@@ -37,7 +37,7 @@ inline void __backlight_on(void)
     outl(((0x100 | 1) << 3), 0x6000d824);
 
     /* set port L07 on */
-    outl(((0x100 | 1) << 7), 0x6000d12c);
+    GPIOL_OUTPUT_VAL = ((0x100 | 1) << 7);
 }
 
 inline void __backlight_off(void)
@@ -46,5 +46,5 @@ inline void __backlight_off(void)
     outl(((0x100 | 0) << 3), 0x6000d824);
 
     /* set port L07 off */
-    outl(((0x100 | 0) << 7), 0x6000d12c);
+    GPIOL_OUTPUT_VAL = ((0x100 | 0) << 7);
 }

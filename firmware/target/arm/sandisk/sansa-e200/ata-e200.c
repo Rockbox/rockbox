@@ -364,9 +364,9 @@ void sd_init_device(void)
     GPIOD_ENABLE |= (0x1f);
     GPIOD_OUTPUT_EN |= (0x1f);
     GPIOD_OUTPUT_VAL |= (0x1f);
-    outl(inl(0x6000600c) | (1 << 14), 0x6000600c);
-    outl(inl(0x60006004) | (1 << 14), 0x60006004);
-    outl(inl(0x60006004) & ~(1 << 14), 0x60006004); /* Reset Controller? */
+    DEV_EN |= (1 << 14); /* Enable controller */
+    DEV_RS |= (1 << 14); /* Reset controller */
+    DEV_RS &=~(1 << 14); /* Clear Reset */
     outl(0, 0x6000b000);
     outl(0, 0x6000a000); /* Init DMA controller? */
 

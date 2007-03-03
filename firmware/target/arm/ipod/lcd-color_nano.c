@@ -115,9 +115,9 @@ void lcd_init_device(void)
         int gpio_a01, gpio_a04;
 
         /* A01 */
-        gpio_a01 = (inl(0x6000D030) & 0x2) >> 1;
+        gpio_a01 = (GPIOA_INPUT_VAL & 0x2) >> 1;
         /* A04 */
-        gpio_a04 = (inl(0x6000D030) & 0x10) >> 4;
+        gpio_a04 = (GPIOA_INPUT_VAL & 0x10) >> 4;
 
         if (((gpio_a01 << 1) | gpio_a04) == 0 || ((gpio_a01 << 1) | gpio_a04) == 2) {
             lcd_type = 0;
@@ -126,12 +126,12 @@ void lcd_init_device(void)
         }
     }
 
-    outl(inl(0x6000d004) | 0x4, 0x6000d004); /* B02 enable */
-    outl(inl(0x6000d004) | 0x8, 0x6000d004); /* B03 enable */
+    GPIOB_ENABLE |= 0x4; /* B02 enable */
+    GPIOB_ENABLE |= 0x8; /* B03 enable */
     outl(inl(0x70000084) | 0x2000000, 0x70000084); /* D01 enable */
     outl(inl(0x70000080) | 0x2000000, 0x70000080); /* D01 =1 */
 
-    outl(inl(0x6000600c) | 0x20000, 0x6000600c);    /* PWM enable */
+    DEV_EN |= 0x20000;   /* PWM enable */
 
 #elif CONFIG_LCD == LCD_IPODNANO
     /* iPodLinux doesn't appear have any LCD init code for the Nano */

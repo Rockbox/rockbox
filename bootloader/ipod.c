@@ -82,14 +82,14 @@ static void ser_opto_keypad_cfg(int val)
 {
     int start_time;
 
-    outl(inl(0x6000d004) & ~0x80, 0x6000d004);
+    GPIOB_ENABLE &=~ 0x80;
 
     outl(inl(0x7000c104) | 0xc000000, 0x7000c104);
     outl(val, 0x7000c120);
     outl(inl(0x7000c100) | 0x80000000, 0x7000c100);
 
-    outl(inl(0x6000d024) & ~0x10, 0x6000d024);
-    outl(inl(0x6000d014) | 0x10, 0x6000d014);
+    GPIOB_OUTPUT_VAL &=~ 0x10;
+    GPIOB_OUTPUT_EN  |=  0x10;
 
     start_time = USEC_TIMER;
     do {
@@ -100,9 +100,9 @@ static void ser_opto_keypad_cfg(int val)
 
     outl(inl(0x7000c100) & ~0x80000000, 0x7000c100);
 
-    outl(inl(0x6000d004) | 0x80, 0x6000d004);
-    outl(inl(0x6000d024) | 0x10, 0x6000d024);
-    outl(inl(0x6000d014) & ~0x10, 0x6000d014);
+    GPIOB_ENABLE     |= 0x80;
+    GPIOB_OUTPUT_VAL |= 0x10;
+    GPIOB_OUTPUT_EN  &=~0x10;
 
     outl(inl(0x7000c104) | 0xc000000, 0x7000c104);
     outl(inl(0x7000c100) | 0x60000000, 0x7000c100);
@@ -253,7 +253,7 @@ void* main(void)
     outl(((0x100 | 1) << 3), 0x6000d824);
 
     /* set port L07 on */
-    outl(((0x100 | 1) << 7), 0x6000d12c);
+    GPIOL_OUTPUT_VAL = ((0x100 | 1) << 7);
 #elif CONFIG_BACKLIGHT==BL_IPOD3G
     outl(inl(IPOD_LCD_BASE) | 0x2, IPOD_LCD_BASE);
 #endif

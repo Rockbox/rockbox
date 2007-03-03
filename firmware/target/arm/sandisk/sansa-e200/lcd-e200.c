@@ -110,7 +110,7 @@ static inline void cache_flush(void)
 {
 #ifndef BOOTLOADER
     outl(inl(0xf000f044) | 0x2, 0xf000f044);
-    while ((inl(0x6000c000) & 0x8000) != 0)
+    while ((CACHE_CTL & 0x8000) != 0)
     {
     }
 #endif
@@ -141,12 +141,12 @@ inline void lcd_init_device(void)
     outl(((inl(0x70000010) & (0x03ffffff)) | (0x15 << 26)), 0x70000010);
     outl(((inl(0x70000014) & (0x0fffffff)) | (0x5 << 28)), 0x70000014);
     outl((inl(0x70000020) & ~(0x3 << 10)), 0x70000020);
-    outl((inl(0x6000600c) | (1 << 26)), 0x6000600c); /* Enable controller */
+    DEV_EN |= (1 << 26); /* Enable controller */
     outl(0x6, 0x600060d0);
-    outl((inl(0x60006004) | (1 << 26)), 0x60006004); /* Reset controller? */
+    DEV_RS |= (1 << 26); /* Reset controller */
     outl((inl(0x70000020) & ~(1 << 14)), 0x70000020);
     lcd_bus_idle();
-    outl((inl(0x60006004) & ~(1 << 26)), 0x60006004); /* Clear reset? */
+    DEV_RS &=~(1 << 26); /* Clear reset */
     udelay(1000);
 
     LCD_REG_0 = (LCD_REG_0 & (0x00ffffff)) | (0x22 << 24);

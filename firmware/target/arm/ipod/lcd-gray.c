@@ -133,12 +133,12 @@ void lcd_init_device(void)
     lcd_cmd_and_data(R_ENTRY_MODE, 0x0000);
 
 #ifdef IPOD_4G
-    outl(inl(0x6000d004) | 0x4, 0x6000d004); /* B02 enable */
-    outl(inl(0x6000d004) | 0x8, 0x6000d004); /* B03 enable */
+    GPIOB_ENABLE |= 0x4; /* B02 enable */
+    GPIOB_ENABLE |= 0x8; /* B03 enable */
     outl(inl(0x70000084) | 0x2000000, 0x70000084); /* D01 enable */
     outl(inl(0x70000080) | 0x2000000, 0x70000080); /* D01 =1 */
 
-    outl(inl(0x6000600c) | 0x20000, 0x6000600c);    /* PWM enable */
+    DEV_EN |= 0x20000;   /* PWM enable */
 #endif
 }
 

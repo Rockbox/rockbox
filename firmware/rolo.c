@@ -50,10 +50,10 @@ void rolo_restart_cop(void)
 {
     /* Invalidate cache */
     outl(inl(0xf000f044) | 0x6, 0xf000f044);
-    while ((inl(0x6000c000) & 0x8000) != 0) {}
+    while ((CACHE_CTL & 0x8000) != 0) {}
     
     /* Disable cache */
-    outl(0x0, 0x6000C000);
+    CACHE_CTL = CACHE_DISABLE;
 
     /* Wait while RoLo loads the image into SDRAM */
     /* TODO: Accept checksum failure gracefully */
@@ -115,10 +115,10 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
 
     /* Flush cache */
     outl(inl(0xf000f044) | 0x2, 0xf000f044);
-    while ((inl(0x6000c000) & 0x8000) != 0) {}
+    while ((CACHE_CTL & 0x8000) != 0) {}
 
     /* Disable cache */
-    outl(0x0, 0x6000C000);
+    CACHE_CTL = CACHE_DISABLE;
 
     /* Reset the memory mapping registers to zero */
     for (i=0;i<8;i++)

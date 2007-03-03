@@ -648,7 +648,7 @@ void irq(void)
 
 unsigned int current_core(void)
 {
-    if(((*(volatile unsigned long *)(0x60000000)) & 0xff) == 0x55)
+    if((PROCESSOR_ID & 0xff) == PROC_ID_CPU)
     {
         return CPU;
     }
@@ -670,7 +670,7 @@ static void ipod_init_cache(void)
     unsigned i;
 
     /* cache init mode? */
-    outl(0x4, 0x6000C000);
+    CACHE_CTL = CACHE_INIT;
 
     /* PP5002 has 8KB cache */
     for (i = 0xf0004000; i < 0xf0006000; i += 16) {
@@ -681,7 +681,7 @@ static void ipod_init_cache(void)
     outl(0x3fc0, 0xf000f044);
 
     /* enable cache */
-    outl(0x1, 0x6000C000);
+    CACHE_CTL = CACHE_ENABLE;
 
     for (i = 0x10000000; i < 0x10002000; i += 16)
         inb(i);

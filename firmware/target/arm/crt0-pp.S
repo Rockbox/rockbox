@@ -205,7 +205,7 @@ cop_init:
     orr    r1, r1, #0x6
     str    r1, [r0]
 
-    ldr    r0, =0x6000c000
+    ldr    r0, =CACHE_CTRL
 1:
     ldr    r1, [r0]
     tst    r1, #0x8000
