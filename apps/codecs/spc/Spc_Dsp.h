@@ -974,23 +974,35 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
             if ( (this->r.g.noise_enables & vbit) == 0 )
             {
                 uint32_t f = voice->position;
-                int32_t y1;
+                int32_t y0;
 
+                /**
+                 * Formula (fastest found so far of MANY):
+                 * output = y0 + f*y1 - f*y0
+                 */
                 asm volatile (
-              "move.l     %[f], %[y0]               \r\n" /* separate fraction */
-              "and.l      #0xfff, %[f]              \r\n" /* and whole parts   */
-              "lsr.l      %[sh], %[y0]              \r\n"
-              "move.l     2(%[s], %[y0].l*2), %[y1] \r\n" /* load two samples  */
-              "move.l     %[y1], %[y0]              \r\n" /* separate samples  */
-              "ext.l      %[y1]                     \r\n" /* y0=s[1], y1=s[2]  */
-              "swap       %[y0]                     \r\n"
-              "ext.l      %[y0]                     \r\n"
-              "sub.l      %[y0], %[y1]              \r\n" /* diff = y1 - y0    */
-              "muls.l     %[f], %[y1]               \r\n" /* y0 += f*diff      */
-              "asr.l      %[sh], %[y1]              \r\n"
-              "add.l      %[y1], %[y0]              \r\n"
-              : [f]"+&d"(f), [y0]"=&d"(output), [y1]"=&d"(y1)
-              : [s]"a"(voice->samples), [sh]"r"(12)
+                /* separate fractional and whole parts   */
+                "move.l     %[f], %[y1]               \r\n"
+                "and.l      #0xfff, %[f]              \r\n"
+                "lsr.l      %[sh], %[y1]              \r\n"
+                /* load samples y0 (upper) & y1 (lower)  */
+                "move.l     2(%[s], %[y1].l*2), %[y1] \r\n"
+                /* %acc0 = f*y1                          */
+                "mac.w      %[f]l, %[y1]l, %%acc0     \r\n"
+                /* msac.w is 2% boostier so add negative */
+                "neg.l      %[f]                      \r\n"
+                /* %acc0 -= f*y0                         */
+                "mac.w      %[f]l, %[y1]u, %%acc0     \r\n"
+                /* separate out y0 and sign extend       */
+                "swap       %[y1]                     \r\n"
+                "movea.w    %[y1], %[y0]              \r\n"
+                /* fetch result, scale down and add y0   */
+                "movclr.l   %%acc0, %[y1]             \r\n"
+                /* output = y0 + (result >> 12)          */
+                "asr.l      %[sh], %[y1]              \r\n"
+                "add.l      %[y0], %[y1]              \r\n"
+                : [f]"+&d"(f), [y0]"=&a"(y0), [y1]"=&d"(output)
+                : [s]"a"(voice->samples), [sh]"d"(12)
                     );
             }
 
@@ -1093,9 +1105,13 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         *this->last_fir_ptr = fb;
         this->last_fir_ptr  = this->fir_ptr;
 
-        /* Apply echo FIR filter to output - circular buffer is hardware
-           incremented and masked; FIR coefficients and buffer history are
-           loaded in parallel with multiply accumulate operations. */
+        /* Apply echo FIR filter to output samples read from echo buffer -
+           circular buffer is hardware incremented and masked; FIR
+           coefficients and buffer history are loaded in parallel with
+           multiply accumulate operations. Shift left by one here and once
+           again when calculating feedback to have sample values justified
+           to bit 31 in the output to ease endian swap, interleaving and
+           clamping before placing result in the program's echo buffer. */
         int _0, _1, _2;
         asm volatile (
         "move.l                           (%[fir_c])  , %[_2]         \r\n"
@@ -1115,53 +1131,68 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         "mac.w      %[_1]l, %[_2]u, <<                       , %%acc1 \r\n"
         "mac.w      %[_0]u, %[_2]l, <<                       , %%acc0 \r\n"
         "mac.w      %[_0]l, %[_2]l, <<                       , %%acc1 \r\n"
-        "movclr.l   %%acc0, %[out_0]                                  \r\n"
-        "movclr.l   %%acc1, %[out_1]                                  \r\n"
         : [_0]"=&r"(_0), [_1]"=&r"(_1), [_2]"=&r"(_2),
-          [fir_p]"+a"(this->fir_ptr),
-          [out_0]"=r"(out_0), [out_1]"=r"(out_1)
+          [fir_p]"+a"(this->fir_ptr)
         : [fir_c]"a"(this->fir_coeff), [fb]"r"(fb)
         );
 
         /* Generate output */
         asm volatile (
+        /* fetch filter results to eliminate stalls    */
+        "movclr.l   %%acc0, %[out_0]                \r\n"
+        "movclr.l   %%acc1, %[out_1]                \r\n"
+        /* apply global volume                         */
         "mac.l      %[chans_0], %[gv_0]    , %%acc2 \r\n"
         "mac.l      %[chans_1], %[gv_1]    , %%acc3 \r\n"
+        /* apply echo volume and add to final output   */
         "mac.l      %[ev_0],   %[out_0], >>, %%acc2 \r\n"
         "mac.l      %[ev_1],   %[out_1], >>, %%acc3 \r\n"
-        :
+        : [out_0]"=&r"(out_0), [out_1]"=&r"(out_1)
         : [chans_0]"r"(chans_0), [gv_0]"r"(global_vol_0),
           [ev_0]"r"((int)this->r.g.echo_volume_0),
           [chans_1]"r"(chans_1), [gv_1]"r"(global_vol_1),
-          [ev_1]"r"((int)this->r.g.echo_volume_1),
-          [out_0]"r"(out_0), [out_1]"r"(out_1)
+          [ev_1]"r"((int)this->r.g.echo_volume_1)
         );
 
         /* Feedback into echo buffer */
         if ( !(this->r.g.flags & 0x20) )
         {
             asm volatile (
-            "mac.l      %[sh], %[e0]       , %%acc0 \r\n"
-            "mac.l      %[out_0], %[ef], <<, %%acc0 \r\n"
+            /* scale echo voices; saturate if overflow */
             "mac.l      %[sh], %[e1]       , %%acc1 \r\n"
+            "mac.l      %[sh], %[e0]       , %%acc0 \r\n"
+            /* add scaled output from FIR filter       */
             "mac.l      %[out_1], %[ef], <<, %%acc1 \r\n"
-            "movclr.l   %%acc0, %[e0]               \r\n"
+            "mac.l      %[out_0], %[ef], <<, %%acc0 \r\n"
+            /* swap and fetch feedback results - simply
+               swap_odd_even32 mixed in between macs and
+               movclrs to mitigate stall issues        */
+            "move.l     #0x00ff00ff, %[sh]          \r\n"
             "movclr.l   %%acc1, %[e1]               \r\n"
             "swap       %[e1]                       \r\n"
+            "movclr.l   %%acc0, %[e0]               \r\n"
             "move.w     %[e1], %[e0]                \r\n"
+            "and.l      %[e0], %[sh]                \r\n"
+            "eor.l      %[sh], %[e0]                \r\n"
+            "lsl.l      #8, %[sh]                   \r\n"
+            "lsr.l      #8, %[e0]                   \r\n"
+            "or.l       %[sh], %[e0]                \r\n"
+            /* save final feedback into echo buffer    */
+            "move.l     %[e0], (%[echo_ptr])        \r\n"
             : [e0]"+&d"(echo_0), [e1]"+&d"(echo_1)
             : [out_0]"r"(out_0), [out_1]"r"(out_1),
               [ef]"r"((int)this->r.g.echo_feedback),
-              [sh]"r"(1 << 9)
+              [echo_ptr]"a"((int32_t *)echo_ptr),
+              [sh]"d"(1 << 9)
             );
-
-            *(int32_t *)echo_ptr = swap_odd_even32(echo_0);
         }
 
         /* Output final samples */
         asm volatile (
+        /* fetch output saved in %acc2 and %acc3 */
         "movclr.l   %%acc2, %[out_0] \r\n"
         "movclr.l   %%acc3, %[out_1] \r\n"
+        /* scale right by global_muting shift    */
         "asr.l      %[gm],  %[out_0] \r\n"
         "asr.l      %[gm],  %[out_1] \r\n"
         : [out_0]"=&d"(out_0), [out_1]"=&d"(out_1)
