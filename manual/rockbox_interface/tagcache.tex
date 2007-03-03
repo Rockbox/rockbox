@@ -11,7 +11,7 @@ files on your player and allows you to browse them by Artist, Album and Genre.
 \subsection{Initializing the database}
 Before you use the database for the first time, you must initialize it by using
 the \setting{Initialize Now} function in the \setting{Database Menu}
-(\setting{General Settings $\rightarrow$ File View $\rightarrow$ Database})
+(\setting{Settings $\rightarrow$ General Settings $\rightarrow$ Database})
 , which is described in the following section.
 
 \subsection{\label{ref:databasemenu}The Database Menu}
@@ -35,10 +35,10 @@ the \setting{Initialize Now} function in the \setting{Database Menu}
   boots, the database will automatically be updated.
   \opt{SWCODEC}{
     \note{The \setting{Auto Update} will only check for deleted files if the
-      \setting{Directory Cache} (\setting{General Settings $\rightarrow$
-      System Options $\rightarrow$ Disk $\rightarrow$ Directory Cache}) is
-      enabled. \setting{Update now} includes that check whether dircache has
-      been enabled or not.}
+      \setting{Directory Cache} (\setting{Settings $\rightarrow$ General
+      Settings $\rightarrow$ System $\rightarrow$ Disk $\rightarrow$
+      Directory Cache}) is enabled. \setting{Update now} includes that check
+      whether dircache has been enabled or not.}
   }%
   \opt{MASCODEC}{\setting{Auto Update} does not detect deleted files. To remove
     deleted files from the database you need to run \setting{Update Now}.}%
@@ -89,15 +89,13 @@ the \setting{Initialize Now} function in the \setting{Database Menu}
 
 \subsection{Using the database}
 Once the database has been initialised, you can browse your music by Artist, 
-Album, Genre and Song Name. To use the database, change the 
-\setting{Show Files} show mode by changing the \setting{General Settings 
-$\rightarrow$ File View $\rightarrow$ Show files} option to 
-\setting{Database}. This disables the \setting{File Browser} and instead
-allows you to view files using the information in the database.\\
+Album, Genre and Song Name. To use the database, go to the \setting{Main Menu}
+and select \setting{Database}.\\
 
 \note{You may need to increase the value of the \setting{Max files in dir 
-browser} setting (\setting{General Settings $\rightarrow$ System $\rightarrow$ 
-Limits}) in order to view long lists of tracks in the ID3 database browser.\\
+browser} setting (\setting{Settings $\rightarrow$ General Settings
+$\rightarrow$ System $\rightarrow$ Limits}) in order to view long lists of
+tracks in the ID3 database browser.\\
 
 There is no option to turn off database completely. If you do not want
 to use it just don't do the initial build of the database and do not load it

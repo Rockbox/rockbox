@@ -209,20 +209,13 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
 }
 \subsection{The first contact}
 
-After you have  first started the \dap{} you'll be presented by the
-\setting{File Browser}. With the default settings only supported files are
-shown. Rockbox' default view is the \setting{File Browser}, similar to Windows'
-Explorer. If you don't have audio files on your \dap{}, or created folders you
-will only see a blank screen with the statusbar at the top. If this is your
-case, now is a good time to connect your \dap{} to a computer and transfer some
-audio files to it.
-
-When you have files on your \dap{} you'll see the supported ones now. Of
-course you can change this view later. You can also completely switch to
-a view that is based on the meta-data\footnote{ID3 Tags, Vorbis comments, etc.}
-of your audio files. This view is called Database (see
-\reference{ref:database}). Now you can start browsing the folder structure of
-your \dap{}.
+After you have first started the \dap{} you'll be presented by the
+\setting{Main Menu}. From this menu you can reach every function of Rockbox,
+for more information (see \reference{ref:main_menu}). To browse the files
+on you \dap{} select \setting{Files} (see\reference{ref:file_browser}), and to
+browse in a view that is based on the meta-data\footnote{ID3 Tags, Vorbis
+comments, etc.} of your audio files, select \setting{Database} (see
+\reference{ref:database}).
 
 \subsection{Basic controls}
 When browsing files and moving through menus you usually get a list view
@@ -239,20 +232,9 @@ be extended or modified while playing. This is also known as
 To go back to the \setting{File Browser} stop the playback with the
 \ActionWpsStop{} button or return to the file browser while keeping playback
 running using \ActionWpsBrowse{}.
-In list views you can go back one step with \ActionStdCancel{}. The file
-browser is a bit different in this case as pressing \ActionWpsStop{}
-stops the playback instead of going up a level.
+In list views you can go back one step with \ActionTreeParentDirectory.
 
 \subsection{Basic concepts}
-\subsubsection{Main Screen}
-Rockbox' main screen is the \setting{File Browser}. This is pretty different to
-most other players that use the ``While Playing Screen'' as their main screen.
-In Rockbox' view this doesn't make any sense as when you are not playing a
-file, information about the currently playing file isn't available and therefore
-useless. Because of this the \dap{} switches to the \setting{File Browser} when
-playback gets stopped. There is no point showing the WPS when playback is
-stopped, so this is not and will not be possible.
-
 \subsubsection{Playlists}
 Rockbox is playlist oriented. This means that every time you play an audio file,
 a so-called ``dynamic playlist'' is generated, unless you play a saved

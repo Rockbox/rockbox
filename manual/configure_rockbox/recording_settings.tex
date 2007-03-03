@@ -1,66 +1,8 @@
-% $Id$ %
-\section{\label{ref:Recording}Recording}
-\subsection{\label{ref:while_recording_screen}While Recording Screen}
-\screenshot{main_menu/images/ss-while-recording-screen}{The while recording
-  screen}{}
-
-Entering the \setting{Recording} option in the \setting{Main Menu} brings up
-a screen in which you can choose to enter the \setting{Recording Screen} or
-the \setting{Recording Settings} (see below). The \setting{Recording Screen}
-shows the time elapsed and the size of the file being recorded. A peak meter
-is present to allow you set gain correctly. There is also a volume setting,
-this will only affect the output level of the \dap{} and does \emph{not}
-affect the recorded sound.
-\opt{SWCODEC}{
-\note{When you start a recording, the hard disk will spin up. This will cause
-the peak meters to freeze in the process. This is expected behaviour, and
-nothing to worry about. The recording continues during the spin up.}}
-\opt{MASCODEC}{The frequency, channels and quality}
-\opt{SWCODEC}{The frequency and channels} settings are shown on the last line.
-
-The controls for this screen are:
-\begin{table}
-  \begin{btnmap}{}{}
-    
-    \ActionStdPrev{} / \ActionStdNext & Select setting.\\
-    %
-    \ActionSettingsDec{} / \ActionSettingsInc & Adjust selected setting.\\
-    %
-    \ActionRecPause & Start recording.\\
-                    & While recording: pause recording (press again to
-                      continue).\\
-    %
-    \ActionRecExit  & Exit \setting{Recording Screen}.\\
-                    & While recording: Stop recording.\\
-    %
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{
-      \ActionRecNewfile & Starts recording.\\
-                        & While recording: close the current file and open
-                          a new one.\\
-    }
-    %
-    \ActionRecMenu & Open \setting{Recording Settings} (see below).\\
-    %
-    \opt{RECORDER_PAD}{
-      \ActionRecFTwo & Quick menu for recording settings. A quick press will
-      leave the screen up (press \ActionRecFTwo{} again to exit), while holding
-      it will close the screen when you release it.\\
-    }
-    %
-    \opt{RECORDER_PAD}{
-      \ActionRecFThree & Quick menu for source setting.\\
-      & Quick/hold works as for \ActionRecFTwo.\\
-      & While recording: Start a new recording file.\\
-    }
-  \end{btnmap}
-\end{table}
-
-\subsection{\label{ref:Recordingsettings}Recording Settings}
+% $Id:$ %
 \screenshot{main_menu/images/ss-recording-settings}{The recording settings screen}{}
 
 \opt{MASCODEC}{
-  \begin{description}
-  \item[Quality:]
+  \section{Quality}
     Choose the quality here (0 to 7). Default is 5, best quality is 7,
     smallest file size is 0. This setting effects how much your sound
     sample will be compressed. Higher quality settings result in larger
@@ -70,7 +12,6 @@ The controls for this screen are:
     or number of  bits per second, for a recording.  When  this setting
     is lowered, recordings are compressed more (meaning worse sound quality),
     and the average bitrate changes as follows.
-  \end{description}
   
   \begin{table}[h!]
     \begin{center}
@@ -85,20 +26,19 @@ The controls for this screen are:
   \end{table}
 }
 
-\begin{description}
 \opt{SWCODEC}{
-  \item[Format:]
+  \section{Format}
     Choose which format to save your recording in. The available choices are
     the two uncompressed formats \setting{PCM Wave} and \setting{AIFF}, the
     losslessly compressed \setting{WavPack} and the lossy
     \setting{MPEG Layer 3}.
 
-  \item[Encoder Settings:]
+  \section{Encoder Settings}
     This sets the bitrate when using the \setting{MPEG Layer 3} format. And has
     no settings for the other formats.
 }
 
-  \item[Frequency:]
+  \section{Frequency}
     Choose the recording frequency (sample rate).
     \opt{MASCODEC}{48kHz, 44.1kHz, 32kHz, 24kHz, 22.05kHz, 16kHz}
     \opt{h1xx,h300}{44.1kHz, 22.05kHz and 11.025kHz}
@@ -118,25 +58,25 @@ The controls for this screen are:
       {\note{You cannot change the sample rate for digital recordings.}
     }  
 
-\item[Source:]
+\section{Source}
   Choose the source of the recording. This can be
   \opt{recorder,recorderv2fm,h1xx}{\setting{SPDIF (digital)},}%
   \setting{Mic} or \setting{Line In}.
   \opt{CONFIG_TUNER}{For recording from the radio see \reference{ref:FMradio}.}
 
-\item[Channels:]
+\section{Channels}
   This allows you to select mono or stereo recording. Please note that
   for mono recording, only the left channel is recorded. Mono recordings
   are usually somewhat smaller than stereo.
 
 \opt{MASCODEC}{
-  \item[Independent Frames:]
+  \section{Independent Frames}
     The independent frames option tells the \dap{} to encode with the bit
     reservoir disabled, so the frames are independent of each other. This
     makes a file easier to edit.
 }
       
-\item[File Split Options:]
+\section{File Split Options}
   This sub menu contains options for file splitting, which can be used to split
   up long recordings into manageable pieces. The splits are seamless (frame
   accurate), no audio is lost at the split point. The break between recordings
@@ -166,32 +106,29 @@ The controls for this screen are:
 
   \end{description}
 
-  \item[Prerecord Time:]
+\section{Prerecord Time}
     This setting buffers a small amount of audio so that when the record button
     is pressed, the recording will begin from that number of seconds earlier.
     This is useful for ensuring that a recording begins before a cue that is
     being waited for.
 
-  \item[Directory:]
+\section{Directory}
     Allows changing the location where the recorded files are saved. The
     default location is \fname{/recordings}. If set to
     \setting{Current Directory} the recorded files will be saved in the
     directory where the \setting{File Browser} was left.
 
-  \item[Show recording screen on startup:]
-    If set to yes, the \dap{} will start up with the recording screen showing.
-
-  \nopt{ondio}{
-  \item[Clipping Light:]
+\nopt{ondio}{
+  \section{Clipping Light}
     Causes the backlight to flash on when clipping has been detected.\\
     Options: \setting{Off}, \setting{Main unit only},
     \setting{Main and remote unit}, \setting{Remote unit only}.
-  }
-  \item[Trigger:]
+}
+  \section{Trigger}
     \fixme{Add description of triggered recording.}
 
 \opt{h1xx,h300}{%
-  \item[Automatic Gain Control:]
+  \section{Automatic Gain Control}
     The \setting{Automatic Gain Control} has five different presets for
     automatically controlling the gain while recording.
     \begin{description}
@@ -218,8 +155,7 @@ The controls for this screen are:
         decrease gain to reach it.
     \end{description}
 
-  \item[AGC clip time:]
+  \section{AGC clip time}
     This setting controls how long the level is too loud or soft before the
     \setting{Automatic Gain Control} kicks in.
 }%
-\end{description}

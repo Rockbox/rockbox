@@ -1,5 +1,11 @@
 % $Id$ %
-\section{\label{ref:SystemOptions}System Options}
+\section{\label{ref:SystemOptions}System}
+\subsection{Start Screen}
+    Set the screen that Rockbox will start in. Selecting
+    \setting{Resume Playback} will resume playback where it was when the \dap{}
+    was shut off if there is a playlist to resume and will then end up in the
+    WPS. Selecting \setting{Previous Screen} will make Rockbox start in the
+    screen it was when the \dap{} was shut off.
 
 \subsection{Battery}
     Options relating to the \opt{archos}{batteries}\nopt{archos}{battery}%
@@ -78,12 +84,9 @@ paused. It is not idle while the USB or charger is connected, or while
 recording. Settings are either \setting{Off} or \setting{1} to \setting{10}
 minutes in 1 minute steps. Then \setting{15,30,45} and \setting{60} minutes are
 available.
-\subsection{Sleep Timer}
-This option lets you power off your \dap{} after playing for a given time. Can
-be set from \setting{Off} to 5 hours in 5 minute steps.
-\opt{recorderv2fm}{This setting is reset on boot. Using this option
-  disables the \setting{Wake up alarm} (see below).
-  \subsection{Wake Up alarm}
+
+\opt{HAVE_RTC_ALARM}{
+\subsection{Wake Up alarm}
     This option turns the \dap{} off and then starts it up again at the 
     specified time. This is most useful when combined with the \setting{Resume}
     setting in the \setting{Playback Options} menu is set to \setting{Yes}, so 
@@ -93,7 +96,7 @@ be set from \setting{Off} to 5 hours in 5 minute steps.
     \ButtonPlay{} confirms the alarm and shuts your \dap{} down, and \ButtonOff
     cancels setting an alarm. If the \dap{} is turned on again before the alarm
     occurs, the alarm will be cancelled. Using this option disables the 
-    \setting{Sleep Timer}(see above).
+    \setting{Sleep Timer}.
 }
 
 \subsection{Limits}
