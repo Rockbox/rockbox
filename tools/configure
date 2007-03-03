@@ -648,6 +648,7 @@ EOF
     target_id=1
     archos="player"
     target="-DARCHOS_PLAYER"
+    memory="2"
     shcc
     tool="$rootdir/tools/scramble"
     output="archos.mod"
