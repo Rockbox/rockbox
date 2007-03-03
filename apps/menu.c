@@ -334,12 +334,12 @@ static char * get_menu_item_name(int selected_item,void * data, char *buffer)
     
     menu = menu->submenus[selected_item];
     
-    if (menu->flags&MENU_DYNAMIC_DESC)
+    if ((menu->flags&MENU_DYNAMIC_DESC) && (type != MT_SETTING_W_TEXT))
         return menu->menu_get_name_and_icon->list_get_name(selected_item,
                     menu->menu_get_name_and_icon->list_get_name_data, buffer);
     
     type = (menu->flags&MENU_TYPE_MASK);
-    if (type == MT_SETTING)
+    if ((type == MT_SETTING) || (type == MT_SETTING_W_TEXT))
     {
         const struct settings_list *v
                 = find_setting(menu->variable, NULL);
@@ -353,7 +353,7 @@ static char * get_menu_item_name(int selected_item,void * data, char *buffer)
 static void menu_get_icon(int selected_item, void * data, ICON * icon)
 {
     const struct menu_item_ex *menu = (const struct menu_item_ex *)data;
-    int menu_icon;
+    int menu_icon = Icon_NOICON;
     selected_item = get_menu_selection(selected_item, menu);
     
     menu = menu->submenus[selected_item];
@@ -365,6 +365,7 @@ static void menu_get_icon(int selected_item, void * data, ICON * icon)
     switch (menu->flags&MENU_TYPE_MASK)
     {
         case MT_SETTING:
+        case MT_SETTING_W_TEXT:
             *icon = bitmap_icons_6x8[Icon_Menu_setting];
             break;
         case MT_MENU:
@@ -438,12 +439,14 @@ static void talk_menu_item(const struct menu_item_ex *menu,
                     struct gui_synclist *lists)
 {
     int id = -1;
+    int type;
     if (global_settings.talk_menu)
     {
         int sel = get_menu_selection(gui_synclist_get_sel_pos(lists),menu);
         if ((menu->flags&MENU_TYPE_MASK) == MT_MENU)
         {
-            if ((menu->submenus[sel]->flags&MENU_TYPE_MASK) == MT_SETTING)
+            type = menu->submenus[sel]->flags&MENU_TYPE_MASK;
+            if ((type == MT_SETTING) || (type == MT_SETTING_W_TEXT))
                 talk_setting(menu->submenus[sel]->variable);
             else 
             {
@@ -463,8 +466,14 @@ bool do_setting_from_menu(const struct menu_item_ex *temp)
                                                temp->variable,
                                                &setting_id);
     bool ret_val = false;
+    unsigned char *title;
     if (setting)
     {
+        if ((temp->flags&MENU_TYPE_MASK) == MT_SETTING_W_TEXT)
+            title = temp->callback_and_desc->desc;
+        else
+            title = ID2P(setting->lang_id);
+
         if ((setting->flags&F_BOOL_SETTING) == F_BOOL_SETTING)
         {
             bool temp_var, *var;
@@ -478,7 +487,7 @@ bool do_setting_from_menu(const struct menu_item_ex *temp)
             {
                 var = (bool*)setting->setting;
             }
-            set_bool_options(str(setting->lang_id),var,
+            set_bool_options(P2STR(title), var,
                         STR(setting->bool_setting->lang_yes),
                         STR(setting->bool_setting->lang_no),
                         setting->bool_setting->option_callback);
@@ -489,7 +498,7 @@ bool do_setting_from_menu(const struct menu_item_ex *temp)
         }
         else if (setting->flags&F_T_SOUND)
         {
-            set_sound(str(setting->lang_id), setting->setting,
+            set_sound(P2STR(title), setting->setting,
                         setting->sound_setting->setting);
         }
         else /* other setting, must be an INT type */
@@ -519,8 +528,7 @@ bool do_setting_from_menu(const struct menu_item_ex *temp)
                     min = setting->int_setting->min;
                     step = setting->int_setting->step;
                 }
-                set_int_ex(str(setting->lang_id),
-                        NULL,
+                set_int_ex(P2STR(title), NULL,
                         setting->int_setting->unit,var,
                         setting->int_setting->option_callback,
                         step, min, max,
@@ -561,7 +569,7 @@ bool do_setting_from_menu(const struct menu_item_ex *temp)
                         j++;
                     }
                 }
-                set_option(str(setting->lang_id), var, INT,
+                set_option(P2STR(title), var, INT,
                             options,j,
                             setting->
                                choice_setting->option_callback);
@@ -721,6 +729,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                                     temp->func_with_param->param);
                     break;
                 case MT_SETTING:
+                case MT_SETTING_W_TEXT:
                 {
                     if (do_setting_from_menu(temp))
                         init_menu_lists(menu, &lists, 0, true);

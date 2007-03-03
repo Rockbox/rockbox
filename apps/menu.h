@@ -60,6 +60,9 @@ void menu_talk_selected(int m);
 enum menu_item_type {
     MT_MENU = 0,
     MT_SETTING,
+    MT_SETTING_W_TEXT, /* same as setting, but uses different
+                          text for the setting title,
+                          ID2P() or "literal" for the str param */
     MT_FUNCTION_CALL, /* used when the standard code wont work */
     MT_FUNCTION_WITH_PARAM,
     MT_RETURN_ID, /* returns the position of the selected item (starting at 0)*/
@@ -133,6 +136,14 @@ bool do_setting_from_menu(const struct menu_item_ex *temp);
 #define MENUITEM_SETTING(name,var,callback)                  \
     static const struct menu_item_ex name =                  \
         {MT_SETTING, {.variable = (void*)var},{callback}};
+
+/*  Use this for settings which have a differnt title in their
+    setting screen than in the menu (e.g scroll options */
+#define MENUITEM_SETTING_W_TEXT(name, var, str, callback )              \
+    static const struct menu_callback_with_desc name##__ = {callback,str, Icon_NOICON};\
+    static const struct menu_item_ex name =                             \
+        {MT_SETTING_W_TEXT|MENU_HAS_DESC, {.variable = (void*)var },     \
+            {.callback_and_desc = & name##__}};
 
 /*  Use this To create a list of NON-XLATABLE (for the time being) Strings
     When the user enters this list and selects one, the menu will exits

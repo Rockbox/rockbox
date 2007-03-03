@@ -279,16 +279,20 @@ MAKE_MENU(lcd_remote_settings, ID2P(LANG_LCD_REMOTE_MENU),
 
 /***********************************/
 /*    SCROLL MENU                  */
-MENUITEM_SETTING(scroll_speed, &global_settings.scroll_speed, NULL);
+MENUITEM_SETTING_W_TEXT(scroll_speed, &global_settings.scroll_speed,
+                         ID2P(LANG_SCROLL), NULL);
 MENUITEM_SETTING(scroll_delay, &global_settings.scroll_delay, NULL);
 #ifdef HAVE_LCD_BITMAP
-MENUITEM_SETTING(scroll_step, &global_settings.scroll_step, NULL);
+MENUITEM_SETTING_W_TEXT(scroll_step, &global_settings.scroll_step,
+                        ID2P(LANG_SCROLL_STEP_EXAMPLE), NULL);
 #endif
 MENUITEM_SETTING(bidir_limit, &global_settings.bidir_limit, NULL);
 #ifdef HAVE_REMOTE_LCD
-MENUITEM_SETTING(remote_scroll_speed, &global_settings.remote_scroll_speed, NULL);
+MENUITEM_SETTING_W_TEXT(remote_scroll_speed, &global_settings.remote_scroll_speed,
+                         ID2P(LANG_SCROLL), NULL);
 MENUITEM_SETTING(remote_scroll_delay, &global_settings.remote_scroll_delay, NULL);
-MENUITEM_SETTING(remote_scroll_step, &global_settings.remote_scroll_step, NULL);
+MENUITEM_SETTING_W_TEXT(remote_scroll_step, &global_settings.remote_scroll_step,
+                        ID2P(LANG_SCROLL_STEP_EXAMPLE), NULL);
 MENUITEM_SETTING(remote_bidir_limit, &global_settings.remote_bidir_limit, NULL);
 MAKE_MENU(remote_scroll_sets, ID2P(LANG_REMOTE_SCROLL_SETS), 0, Icon_NOICON,
           &remote_scroll_speed, &remote_scroll_delay,
