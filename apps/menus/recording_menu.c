@@ -32,5 +32,5 @@
 /* TEMP */
 bool recording_menu(bool no_source); /* from apps/sound_menu.h */
 MENUITEM_FUNCTION_WPARAM(recording_settings, ID2P(LANG_RECORDING_SETTINGS),
-                          (int (*)(void*))recording_menu,0, NULL, NOICON);
+                          (int (*)(void*))recording_menu,0, NULL, Icon_NOICON);
 #endif

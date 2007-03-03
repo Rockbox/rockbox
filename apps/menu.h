@@ -100,9 +100,7 @@ struct menu_item_ex {
             int (*menu_callback)(int action, 
                                  const struct menu_item_ex *this_item);
             unsigned char *desc; /* string or ID */
-#ifdef HAVE_LCD_BITMAP
-            ICON icon; /* Icon to display */
-#endif
+            int icon_id; /* from icons_6x8 in icons.h */
         } *callback_and_desc;
         /* For when the item text is dynamic */
         const struct menu_get_name_and_icon {
@@ -110,9 +108,7 @@ struct menu_item_ex {
                                  const struct menu_item_ex *this_item);
             char *(*list_get_name)(int selected_item, void * data, char *buffer);
             void *list_get_name_data;
-#ifdef HAVE_LCD_BITMAP
-            ICON icon; /* Icon to display */
-#endif
+            int icon_id;
         } *menu_get_name_and_icon;
     };
 };
@@ -143,13 +139,12 @@ bool do_setting_from_menu(const struct menu_item_ex *temp);
     and its return value will be the index of the chosen item */
 #define MENUITEM_STRINGLIST(name, str, callback, ... )                  \
     static const char *name##_[] = {__VA_ARGS__};                       \
-    static const struct menu_callback_with_desc name##__ = {callback,str, NOICON};\
+    static const struct menu_callback_with_desc name##__ = {callback,str, Icon_NOICON};\
     static const struct menu_item_ex name =                             \
         {MT_RETURN_ID|MENU_HAS_DESC|                                    \
          MENU_ITEM_COUNT(sizeof( name##_)/sizeof(*name##_)),            \
             { .submenus = name##_},{.callback_and_desc = & name##__}};
 
-#ifdef HAVE_LCD_BITMAP /* Kill the player port already.... PLEASE!! */
             
 /* returns a value associated with the item */
 #define MENUITEM_RETURNVALUE(name, str, val, cb, icon)                      \
@@ -208,38 +203,5 @@ bool do_setting_from_menu(const struct menu_item_ex *temp);
             { (void*)name##_},{.callback_and_desc = & name##__}};
             
 
-#else /* HAVE_LCD_BITMAP */
-#define MENUITEM_RETURNVALUE(name, str, val, cb, icon)                      \
-     static const struct menu_callback_with_desc name##_ = {cb,str};   \
-     static const struct menu_item_ex name   =                              \
-        { MT_RETURN_VALUE|MENU_HAS_DESC, { .value = val},                  \
-        {.callback_and_desc = & name##_}};
-#define MENUITEM_RETURNVALUE_DYNTEXT(name, val, cb, text_callback, text_cb_data, icon)                      \
-     static const struct menu_get_name_and_icon name##_                       \
-                                = {cb,text_callback,text_cb_data}; \
-     static const struct menu_item_ex name   =                              \
-        { MT_RETURN_VALUE|MENU_DYNAMIC_DESC, { .value = val},               \
-        {.menu_get_name_and_icon = & name##_}};
-#define MENUITEM_FUNCTION(name, str, func, callback, icon)                     \
-    static const struct menu_callback_with_desc name##_ = {callback,str}; \
-    const struct menu_item_ex name   =                                  \
-        { MT_FUNCTION_CALL|MENU_HAS_DESC, { .function = func},          \
-        {.callback_and_desc = & name##_}};
-#define MENUITEM_FUNCTION_WPARAM(name, str, func, param, callback, icon)    \
-    static const struct menu_callback_with_desc name##_ = {callback,str}; \
-    static const struct menu_func_with_param name##__ = {func, param};      \
-    static const struct menu_item_ex name   =                               \
-        { MT_FUNCTION_WITH_PARAM|MENU_HAS_DESC,                             \
-            { .func_with_param = &name##__},                                \
-            {.callback_and_desc = & name##_}};
-#define MAKE_MENU( name, str, callback, icon, ... )                           \
-    static const struct menu_item_ex *name##_[]  = {__VA_ARGS__};       \
-    static const struct menu_callback_with_desc name##__ = {callback,str};\
-    const struct menu_item_ex name =                                    \
-        {MT_MENU|MENU_HAS_DESC|                                         \
-         MENU_ITEM_COUNT(sizeof( name##_)/sizeof(*name##_)),            \
-            { (void*)name##_},{.callback_and_desc = & name##__}};
-            
-#endif /* HAVE_LCD_BITMAP */
-            
+
 #endif /* End __MENU_H__ */

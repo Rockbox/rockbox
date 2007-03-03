@@ -49,6 +49,8 @@ enum icons_5x8 {
     Icon5x8Last
 };
 
+/* If any icons are added to this enum, they must be
+   added to the unused_but_needed enum in ../player/icons.h */
 enum icons_6x8 {
     Icon_Audio,
     Icon_Folder,

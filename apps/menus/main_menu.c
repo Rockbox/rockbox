@@ -96,14 +96,14 @@ static int write_settings_file(void* param)
 }
 
 MENUITEM_FUNCTION_WPARAM(browse_configs, ID2P(LANG_CUSTOM_CFG), 
-        browse_folder, (void*)&config, NULL, NOICON);
+        browse_folder, (void*)&config, NULL, Icon_NOICON);
 MENUITEM_FUNCTION_WPARAM(save_settings_item, ID2P(LANG_SAVE_SETTINGS), 
-        write_settings_file, (void*)SETTINGS_SAVE_ALL, NULL, NOICON);
+        write_settings_file, (void*)SETTINGS_SAVE_ALL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION_WPARAM(save_theme_item, ID2P(LANG_SAVE_THEME), 
-        write_settings_file, (void*)SETTINGS_SAVE_THEME, NULL, NOICON);
-MENUITEM_FUNCTION(reset_settings_item,ID2P(LANG_RESET),reset_settings, NULL, NOICON);
+        write_settings_file, (void*)SETTINGS_SAVE_THEME, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(reset_settings_item,ID2P(LANG_RESET),reset_settings, NULL, Icon_NOICON);
 
-MAKE_MENU(manage_settings, ID2P(LANG_MANAGE_MENU), NULL, bitmap_icons_6x8[Icon_Config],
+MAKE_MENU(manage_settings, ID2P(LANG_MANAGE_MENU), NULL, Icon_Config,
           &browse_configs, &reset_settings_item,
           &save_settings_item, &save_theme_item);
 /*    MANAGE SETTINGS MENU        */
@@ -340,7 +340,7 @@ static bool show_info(void)
     return false;
 }
 MENUITEM_FUNCTION(show_info_item, ID2P(LANG_INFO_MENU),
-                   (menu_function)show_info, NULL, NOICON);
+                   (menu_function)show_info, NULL, Icon_NOICON);
 
 
 /* sleep Menu */
@@ -373,24 +373,24 @@ static int sleep_timer(void)
 }
 
 MENUITEM_FUNCTION(sleep_timer_call, ID2P(LANG_SLEEP_TIMER), sleep_timer,
-                    NULL, bitmap_icons_6x8[Icon_Menu_setting]); /* make it look like a 
+                    NULL, Icon_Menu_setting); /* make it look like a 
                                                                 setting to the user */
 MENUITEM_FUNCTION(show_credits_item, ID2P(LANG_VERSION),
-                   (menu_function)show_credits, NULL, NOICON);
+                   (menu_function)show_credits, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(show_runtime_item, ID2P(LANG_RUNNING_TIME),
-                   (menu_function)view_runtime, NULL, NOICON);
+                   (menu_function)view_runtime, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(debug_menu_item, ID2P(LANG_DEBUG),
-                   (menu_function)debug_menu, NULL, NOICON);
+                   (menu_function)debug_menu, NULL, Icon_NOICON);
 #ifdef SIMULATOR
 MENUITEM_FUNCTION(simulate_usb_item, ID2P(LANG_USB),
-                   (menu_function)simulate_usb, NULL, NOICON);
+                   (menu_function)simulate_usb, NULL, Icon_NOICON);
 #ifdef ROCKBOX_HAS_LOGF
-MENUITEM_FUNCTION(logfdisplay_item, "logf",(int (*)(void)) logfdisplay, NULL, NOICON);
-MENUITEM_FUNCTION(logfdump_item, "logfdump",(int (*)(void)) logfdump, NULL, NOICON);
+MENUITEM_FUNCTION(logfdisplay_item, "logf",(int (*)(void)) logfdisplay, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(logfdump_item, "logfdump",(int (*)(void)) logfdump, NULL, Icon_NOICON);
 #endif
 #endif
 
-MAKE_MENU(info_menu, ID2P(LANG_INFO), 0, bitmap_icons_6x8[Icon_Questionmark],
+MAKE_MENU(info_menu, ID2P(LANG_INFO), 0, Icon_Questionmark,
           &show_info_item, &show_credits_item, &show_runtime_item, 
           &sleep_timer_call, &debug_menu_item
 #ifdef SIMULATOR
@@ -407,7 +407,7 @@ MAKE_MENU(info_menu, ID2P(LANG_INFO), 0, bitmap_icons_6x8[Icon_Questionmark],
 /*    MAIN MENU                    */
 
 MENUITEM_FUNCTION_WPARAM(browse_themes, ID2P(LANG_CUSTOM_THEME), 
-        browse_folder, (void*)&theme, NULL, bitmap_icons_6x8[Icon_Folder]);
+        browse_folder, (void*)&theme, NULL, Icon_Folder);
 
 #ifdef HAVE_LCD_CHARCELLS
 int mainmenu_callback(int action,const struct menu_item_ex *this_item)
@@ -428,7 +428,7 @@ int mainmenu_callback(int action,const struct menu_item_ex *this_item)
 #define mainmenu_callback NULL
 #endif
 MAKE_MENU(main_menu_, ID2P(LANG_SETTINGS_MENU), mainmenu_callback,
-        bitmap_icons_6x8[Icon_Submenu_Entered],
+        Icon_Submenu_Entered,
         &sound_settings,
         &settings_menu_item, &manage_settings, &browse_themes,
 #ifdef HAVE_RECORDING

@@ -224,11 +224,11 @@ static void check_boot(void)
 int item_callback(int action, const struct menu_item_ex *this_item) ;
 
 MENUITEM_RETURNVALUE(file_browser, ID2P(LANG_DIR_BROWSER), GO_TO_FILEBROWSER,
-                        NULL, bitmap_icons_6x8[Icon_file_view_menu]);
+                        NULL, Icon_file_view_menu);
 MENUITEM_RETURNVALUE(db_browser, ID2P(LANG_TAGCACHE), GO_TO_DBBROWSER, 
-                        NULL, bitmap_icons_6x8[Icon_Audio]);
+                        NULL, Icon_Audio);
 MENUITEM_RETURNVALUE(rocks_browser, ID2P(LANG_PLUGINS), GO_TO_BROWSEPLUGINS, 
-                        NULL, bitmap_icons_6x8[Icon_Plugin]);
+                        NULL, Icon_Plugin);
 char *get_wps_item_name(int selected_item, void * data, char *buffer)
 {
     (void)selected_item; (void)data; (void)buffer;
@@ -237,30 +237,30 @@ char *get_wps_item_name(int selected_item, void * data, char *buffer)
     return str(LANG_RESUME_PLAYBACK);
 }
 MENUITEM_RETURNVALUE_DYNTEXT(wps_item, GO_TO_WPS, NULL, get_wps_item_name, 
-                                NULL, bitmap_icons_6x8[Icon_Playback_menu]);
+                                NULL, Icon_Playback_menu);
 #ifdef HAVE_RECORDING
 MENUITEM_RETURNVALUE(rec, ID2P(LANG_RECORDING_MENU), GO_TO_RECSCREEN,  
-                        NULL, bitmap_icons_6x8[Icon_Recording]);
+                        NULL, Icon_Recording);
 #endif
 #if CONFIG_TUNER
 MENUITEM_RETURNVALUE(fm, ID2P(LANG_FM_RADIO), GO_TO_FM,  
-                        item_callback, bitmap_icons_6x8[Icon_Radio_screen]);
+                        item_callback, Icon_Radio_screen);
 #endif
 MENUITEM_RETURNVALUE(menu_, ID2P(LANG_SETTINGS_MENU), GO_TO_MAINMENU,  
-                        NULL, bitmap_icons_6x8[Icon_Submenu_Entered]);
+                        NULL, Icon_Submenu_Entered);
 MENUITEM_RETURNVALUE(bookmarks, ID2P(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS),
                         GO_TO_RECENTBMARKS,  item_callback, 
-                        bitmap_icons_6x8[Icon_Bookmark]);
+                        Icon_Bookmark);
 #ifdef HAVE_LCD_CHARCELLS
 static int do_shutdown(void)
 {
     sys_poweroff();
     return 0;
 }
-MENUITEM_FUNCTION(do_shutdown_item, ID2P(LANG_SHUTDOWN), do_shutdown, NULL, NOICON);
+MENUITEM_FUNCTION(do_shutdown_item, ID2P(LANG_SHUTDOWN), do_shutdown, NULL, Icon_NOICON);
 #endif
 MAKE_MENU(root_menu_, ID2P(LANG_ROCKBOX_TITLE),
-            NULL, bitmap_icons_6x8[Icon_Rockbox],
+            NULL, Icon_Rockbox,
             &bookmarks, &file_browser, &db_browser,
             &wps_item, &menu_, 
 #ifdef HAVE_RECORDING

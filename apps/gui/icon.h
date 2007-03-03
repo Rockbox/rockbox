@@ -30,6 +30,8 @@ typedef short ICON;
 #define NOICON -1
 #endif
 
+#define Icon_NOICON -1
+
 #define CURSOR_CHAR 0x92
 #define CURSOR_WIDTH 6
 #define CURSOR_HEIGHT 8

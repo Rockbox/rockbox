@@ -43,6 +43,32 @@ enum {
     Icon_Config,
 };
 
+/* put icons from the 6x8 enum here if the player
+   doesnt have an icon for it */
+enum unused_but_needed {
+    Icon_Cursor,
+    Icon_Font,
+    Icon_Preset,
+    Icon_Keyboard,
+    Icon_Reverse_Cursor,
+    Icon_Questionmark,
+    Icon_Menu_setting,
+    Icon_Menu_functioncall,
+    Icon_Submenu,
+    Icon_Submenu_Entered,
+    Icon_Recording,
+    Icon_Voice,
+    Icon_General_settings_menu,
+    Icon_System_menu,
+    Icon_Playback_menu,
+    Icon_Display_menu,
+    Icon_Remote_Display_menu,
+    Icon_Radio_screen,
+    Icon_file_view_menu,
+    Icon_EQ,
+    Icon_Rockbox,
+    Icon6x8Last,
+};
 #endif
 
 #endif /* _ICONS_H_ */

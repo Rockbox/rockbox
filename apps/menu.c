@@ -353,14 +353,14 @@ static char * get_menu_item_name(int selected_item,void * data, char *buffer)
 static void menu_get_icon(int selected_item, void * data, ICON * icon)
 {
     const struct menu_item_ex *menu = (const struct menu_item_ex *)data;
-    ICON menu_icon = NOICON;
+    int menu_icon;
     selected_item = get_menu_selection(selected_item, menu);
     
     menu = menu->submenus[selected_item];
     if (menu->flags&MENU_HAS_DESC)
-        menu_icon = menu->callback_and_desc->icon;
+        menu_icon = menu->callback_and_desc->icon_id;
     else if (menu->flags&MENU_DYNAMIC_DESC)
-        menu_icon = menu->menu_get_name_and_icon->icon;
+        menu_icon = menu->menu_get_name_and_icon->icon_id;
     
     switch (menu->flags&MENU_TYPE_MASK)
     {
@@ -368,18 +368,18 @@ static void menu_get_icon(int selected_item, void * data, ICON * icon)
             *icon = bitmap_icons_6x8[Icon_Menu_setting];
             break;
         case MT_MENU:
-            if (menu_icon == NOICON)
+            if (menu_icon == Icon_NOICON)
                 *icon = bitmap_icons_6x8[Icon_Submenu];
             else
-                *icon = menu_icon;
+                *icon = bitmap_icons_6x8[menu_icon];
             break;
         case MT_FUNCTION_CALL:
         case MT_FUNCTION_WITH_PARAM:
         case MT_RETURN_VALUE:
-            if (menu_icon == NOICON)
+            if (menu_icon == Icon_NOICON)
                 *icon = bitmap_icons_6x8[Icon_Menu_functioncall];
             else 
-                *icon = menu_icon;
+                *icon = bitmap_icons_6x8[menu_icon];
             break;
         default:
             *icon = NOICON;
@@ -415,10 +415,10 @@ static void init_menu_lists(const struct menu_item_ex *menu,
     
     gui_synclist_init(lists,get_menu_item_name,(void*)menu,false,1);
 #ifdef HAVE_LCD_BITMAP
-    if (menu->callback_and_desc->icon == NOICON)
+    if (menu->callback_and_desc->icon_id == Icon_NOICON)
         icon = bitmap_icons_6x8[Icon_Submenu_Entered];
     else
-        icon = menu->callback_and_desc->icon;
+        icon = bitmap_icons_6x8[menu->callback_and_desc->icon_id];
     gui_synclist_set_title(lists, P2STR(menu->callback_and_desc->desc), icon);  
     gui_synclist_set_icon_callback(lists, menu_get_icon);
 #else
