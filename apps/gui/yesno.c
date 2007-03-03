@@ -26,9 +26,7 @@ void gui_yesno_draw(struct gui_yesno * yn)
 {
     struct screen * display=yn->display;
     int nb_lines, line_shift=0;
-#ifdef HAS_LCD_BITMAP
-    screen_set_xmargin(display, 0);
-#endif
+
     gui_textarea_clear(display);
     nb_lines=yn->main_message->nb_lines;
 
