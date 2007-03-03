@@ -106,7 +106,7 @@ int main (int argc, char* argv[])
     infile=argv[1];
     cname=argv[2];
 
-    fd = open(infile,O_RDONLY);
+    fd = open(infile,O_RDONLY|O_BINARY);
     if (fd < 0) {
         fprintf(stderr,"Can not open %s\n",infile);
         return 0;
