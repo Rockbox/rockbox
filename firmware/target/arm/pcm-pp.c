@@ -206,9 +206,8 @@ void pcm_play_dma_start(const void *addr, size_t size)
     pcm_playing = true;
 
 #if CONFIG_CPU == PP5020
-    /* setup I2S interrupt for FIQ */
-    outl(inl(0x6000402c) | I2S_MASK, 0x6000402c);
-    CPU_INT_EN = I2S_MASK;
+    CPU_INT_PRIORITY |= I2S_MASK;   /* FIQ priority for I2S */
+    CPU_INT_EN = I2S_MASK;          /* Enable I2S interrupt */
 #elif CONFIG_CPU == PP5024
 #else
     /* setup I2S interrupt for FIQ */

@@ -43,9 +43,9 @@ bool ata_is_coldstart()
 void ata_device_init()
 {
     /* From ipod-ide.c:ipod_ide_register() */
-    outl(inl(0xc3000028) | (1 << 5), 0xc3000028);
-    outl(inl(0xc3000028) & ~0x10000000, 0xc3000028);
+    IDE0_CFG |= (1<<5);
+    IDE0_CFG &=~(0x10000000);   /* cpu < 65MHz */
 
-    outl(0x10, 0xc3000000);
-    outl(0x80002150, 0xc3000004);
+    IDE0_PRI_TIMING0 = 0x10;
+    IDE0_PRI_TIMING1 = 0x80002150;
 }

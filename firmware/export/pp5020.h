@@ -31,30 +31,71 @@
 #define PROC_ID_COP      0xaa
 
 /* Interrupts */
-#define CPU_INT_EN       (*(volatile unsigned long*)(0x60004024))
-#define CPU_HI_INT_EN    (*(volatile unsigned long*)(0x60004124))
-#define CPU_INT_CLR      (*(volatile unsigned long*)(0x60004028))
-#define CPU_HI_INT_CLR   (*(volatile unsigned long*)(0x60004128))
-#define CPU_INT_STAT     (*(volatile unsigned long*)(0x64004000))
-#define CPU_HI_INT_STAT  (*(volatile unsigned long*)(0x64004100))
-       
+#define CPU_INT_STAT        (*(volatile unsigned long*)(0x64004000))
+#define COP_INT_STAT        (*(volatile unsigned long*)(0x60004004))
+#define CPU_FIQ_STAT        (*(volatile unsigned long*)(0x60004008))
+#define COP_FIQ_STAT        (*(volatile unsigned long*)(0x6000400c))
+
+#define INT_STAT            (*(volatile unsigned long*)(0x60004010))
+#define INT_FORCED_STAT     (*(volatile unsigned long*)(0x60004014))
+#define INT_FORCED_SET      (*(volatile unsigned long*)(0x60004018))
+#define INT_FORCED_CLR      (*(volatile unsigned long*)(0x6000401c))
+
+#define CPU_INT_EN_STAT     (*(volatile unsigned long*)(0x60004020))
+#define CPU_INT_EN          (*(volatile unsigned long*)(0x60004024))
+#define CPU_INT_CLR         (*(volatile unsigned long*)(0x60004028))
+#define CPU_INT_PRIORITY    (*(volatile unsigned long*)(0x6000402c))
+
+#define COP_INT_EN_STAT     (*(volatile unsigned long*)(0x60004030))
+#define COP_INT_EN          (*(volatile unsigned long*)(0x60004034))
+#define COP_INT_CLR         (*(volatile unsigned long*)(0x60004038))
+#define COP_INT_PRIORITY    (*(volatile unsigned long*)(0x6000403c))
+
+#define CPU_HI_INT_STAT     (*(volatile unsigned long*)(0x64004100))
+#define COP_HI_INT_STAT     (*(volatile unsigned long*)(0x60004104))
+#define CPU_HI_FIQ_STAT     (*(volatile unsigned long*)(0x60004108))
+#define COP_HI_FIQ_STAT     (*(volatile unsigned long*)(0x6000410c))
+
+#define HI_INT_STAT         (*(volatile unsigned long*)(0x60004110))
+#define HI_INT_FORCED_STAT  (*(volatile unsigned long*)(0x60004114))
+#define HI_INT_FORCED_SET   (*(volatile unsigned long*)(0x60004118))
+#define HI_INT_FORCED_CLR   (*(volatile unsigned long*)(0x6000411c))
+
+#define CPU_HI_INT_EN_STAT  (*(volatile unsigned long*)(0x60004120))
+#define CPU_HI_INT_EN       (*(volatile unsigned long*)(0x60004124))
+#define CPU_HI_INT_CLR      (*(volatile unsigned long*)(0x60004128))
+#define CPU_HI_INT_PRIORITY (*(volatile unsigned long*)(0x6000412c))
+ 
+#define COP_HI_INT_EN_STAT  (*(volatile unsigned long*)(0x60004130))
+#define COP_HI_INT_EN       (*(volatile unsigned long*)(0x60004134))
+#define COP_HI_INT_CLR      (*(volatile unsigned long*)(0x60004138))
+#define COP_HI_INT_PRIORITY (*(volatile unsigned long*)(0x6000413c))
+
 #define TIMER1_IRQ   0
 #define TIMER2_IRQ   1
+#define MAILBOX_IRQ  4
 #define I2S_IRQ      10
 #define IDE_IRQ      23
+#define USB_IRQ      24
+#define FIREWIRE_IRQ 25
+#define HI_IRQ       30
 #define GPIO_IRQ     (32+0)
 #define SER0_IRQ     (32+4)
 #define SER1_IRQ     (32+5)
 #define I2C_IRQ      (32+8)
 
-#define TIMER1_MASK  (1 << TIMER1_IRQ)
-#define TIMER2_MASK  (1 << TIMER2_IRQ)
-#define I2S_MASK     (1 << I2S_IRQ)
-#define IDE_MASK     (1 << IDE_IRQ)
-#define GPIO_MASK    (1 << (GPIO_IRQ-32))
-#define SER0_MASK    (1 << (SER0_IRQ-32))
-#define SER1_MASK    (1 << (SER1_IRQ-32))
-#define I2C_MASK     (1 << (I2C_IRQ-32))
+#define TIMER1_MASK   (1 << TIMER1_IRQ)
+#define TIMER2_MASK   (1 << TIMER2_IRQ)
+#define MAILBOX_MASK  (1 << MAILBOX_IRQ)
+#define I2S_MASK      (1 << I2S_IRQ)
+#define IDE_MASK      (1 << IDE_IRQ)
+#define USB_MASK      (1 << USB_IRQ)
+#define FIREWIRE_MASK (1 << FIREWIRE_IRQ)
+#define HI_MASK       (1 << HI_IRQ)
+#define GPIO_MASK     (1 << (GPIO_IRQ-32))
+#define SER0_MASK     (1 << (SER0_IRQ-32))
+#define SER1_MASK     (1 << (SER1_IRQ-32))
+#define I2C_MASK      (1 << (I2C_IRQ-32))
 
 /* Timers */
 #define TIMER1_CFG   (*(volatile unsigned long *)(0x60005000))
@@ -62,14 +103,22 @@
 #define TIMER2_CFG   (*(volatile unsigned long *)(0x60005008))
 #define TIMER2_VAL   (*(volatile unsigned long *)(0x6000500c))
 #define USEC_TIMER   (*(volatile unsigned long *)(0x60005010))
+#define RTC          (*(volatile unsigned long *)(0x60005014))
 
 /* Device Controller */
 #define DEV_RS (*(volatile unsigned long *)(0x60006004))
 #define DEV_EN (*(volatile unsigned long *)(0x6000600c))
 
-#define DEV_SYSTEM  0x4
-#define DEV_I2C     0x1000
-#define DEV_USB     0x400000
+#define DEV_SYSTEM      0x4
+#define DEV_SER0        0x40
+#define DEV_SER1        0x80
+#define DEV_I2S         0x800
+#define DEV_I2C         0x1000
+#define DEV_OPTO        0x10000
+#define DEV_PIEZO       0x10000
+#define DEV_USB         0x400000
+#define DEV_FIREWIRE    0x800000
+#define DEV_IDE0        0x2000000
 
 /* Processors Control */
 #define CPU_CTL          (*(volatile unsigned long *)(0x60007000))
@@ -186,12 +235,11 @@
 #define GPIOL_INT_CLR    (*(volatile unsigned long *)(0x6000d17c))
 
 /* Device initialization */
-#define DEV_INIT    (*(volatile unsigned long *)(0x70000020))
+#define PP_VER1          (*(volatile unsigned long *)(0x70000000))
+#define PP_VER2          (*(volatile unsigned long *)(0x70000004))
+#define DEV_INIT         (*(volatile unsigned long *)(0x70000020))
 
-#define INIT_USB    0x80000000
-
-/* I2C */
-#define I2C_BASE    0x7000c000
+#define INIT_USB         0x80000000
 
 /* I2S */
 #define IISCONFIG           (*(volatile unsigned long*)(0x70002800))
@@ -199,10 +247,40 @@
 #define IISFIFO_WR          (*(volatile unsigned long*)(0x70002840))
 #define IISFIFO_RD          (*(volatile unsigned long*)(0x70002880))
 
+/* Serial Controller */
+#define SERIAL0             (*(volatile unsigned long*)(0x70006000))
+#define SERIAL1             (*(volatile unsigned long*)(0x70006040))
+
+/* I2C */
+#define I2C_BASE            0x7000c000
+
+/* EIDE Controller */
+#define IDE0_PRI_TIMING0    (*(volatile unsigned long*)(0xc3000000))
+#define IDE0_PRI_TIMING1    (*(volatile unsigned long*)(0xc3000004))
+#define IDE0_SEC_TIMING0    (*(volatile unsigned long*)(0xc3000008))
+#define IDE0_SEC_TIMING1    (*(volatile unsigned long*)(0xc300000c))
+
+#define IDE1_PRI_TIMING0    (*(volatile unsigned long*)(0xc3000010))
+#define IDE1_PRI_TIMING1    (*(volatile unsigned long*)(0xc3000014))
+#define IDE1_SEC_TIMING0    (*(volatile unsigned long*)(0xc3000018))
+#define IDE1_SEC_TIMING1    (*(volatile unsigned long*)(0xc300001c))
+
+#define IDE0_CFG            (*(volatile unsigned long*)(0xc3000028))
+#define IDE1_CFG            (*(volatile unsigned long*)(0xc300002c))
+
+#define IDE0_CNTRLR_STAT    (*(volatile unsigned long*)(0xc30001e0))
+
 /* USB controller */
-#define USB_BASE                0xc5000000
+#define USB_BASE            0xc5000000
+
+/* Firewire Controller */
+#define FIREWIRE_BASE       0xc6000000
 
 /* Memory controller */
+#define CACHE_BASE          (*(volatile unsigned long*)(0xf0000000))
+#define CACHE_INIT_BASE     (*(volatile unsigned long*)(0xf0004000))
+#define CACHE_FLUSH_BASE    (*(volatile unsigned long*)(0xf0008000))
+#define CACHE_INVALID_BASE  (*(volatile unsigned long*)(0xf000c000))
 #define MMAP0_LOGICAL       (*(volatile unsigned long*)(0xf000f000))
 #define MMAP0_PHYSICAL      (*(volatile unsigned long*)(0xf000f004))
 #define MMAP1_LOGICAL       (*(volatile unsigned long*)(0xf000f008))
@@ -211,5 +289,7 @@
 #define MMAP2_PHYSICAL      (*(volatile unsigned long*)(0xf000f014))
 #define MMAP3_LOGICAL       (*(volatile unsigned long*)(0xf000f018))
 #define MMAP3_PHYSICAL      (*(volatile unsigned long*)(0xf000f01c))
+#define CACHE_CTRL1         (*(volatile unsigned long*)(0xf000f020))
+#define CACHE_CTRL2         (*(volatile unsigned long*)(0xf000f024))
 
 #endif
