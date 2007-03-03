@@ -1914,9 +1914,7 @@ static bool get_spc_metadata(int fd, struct mp3entry* id3)
     if (i==8) isbinary = false;
     
     if(isbinary) {
-        unsigned char * tbuf = buf;
-        
-        id3->year = tbuf[0] | (tbuf[1]<<8);
+        id3->year = buf[0] | (buf[1]<<8);
         buf += 11;
         
         length = (buf[0] | (buf[1]<<8) | (buf[2]<<16)) * 1000;
