@@ -94,7 +94,7 @@ static int browser(void* param)
                 snprintf(folder, MAX_PATH, "%s/", last_folder);
         break;
         case GO_TO_DBBROWSER:
-            if (!tagcache_is_usable())
+            if ((last_screen != GO_TO_ROOT) && !tagcache_is_usable())
             {
                 gui_syncsplash(HZ, true, str(LANG_TAGCACHE_BUSY));
                 return GO_TO_PREVIOUS;
