@@ -1138,7 +1138,8 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
 
         /* Generate output */
         asm volatile (
-        /* fetch filter results to eliminate stalls    */
+        /* fetch filter results _after_ gcc loads asm
+           block parameters to eliminate emac stalls   */
         "movclr.l   %%acc0, %[out_0]                \r\n"
         "movclr.l   %%acc1, %[out_1]                \r\n"
         /* apply global volume                         */
