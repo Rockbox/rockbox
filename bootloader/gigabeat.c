@@ -254,11 +254,14 @@ load_rockbox:
 
     loadbuffer = (unsigned char*) 0x100;
     buffer_size = (unsigned char*)0x400000 - loadbuffer;
-    rc = load_raw_firmware(loadbuffer, "/rockbox.gigabeat", buffer_size);
+    rc = load_raw_firmware(loadbuffer, "/.rockbox/rockbox.gigabeat", buffer_size);
     if(rc < EOK) {
-            printf("Error!");
-            printf("Can't load rockbox.gigabeat:");
-            printf(strerror(rc));
+        rc = load_raw_firmware(loadbuffer, "/rockbox.gigabeat", buffer_size);      
+    }
+    if(rc < EOK) {
+        printf("Error!");
+        printf("Can't load rockbox.gigabeat:");
+        printf(strerror(rc));
     } else {
         if(!show_bootsplash) {
             printf("Rockbox loaded.");
