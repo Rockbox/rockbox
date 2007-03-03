@@ -671,14 +671,31 @@ static int LoadID666(unsigned char *buf) {
         ID666.emulator=*ib;
         ib++;    
     } else {
-        int year, month, day;
         unsigned long tmp;
         char buf[64];
         
         DEBUGF("text tag detected\n");
-    
-        year=month=day=0;
-        ib+=11;
+        
+        memcpy(buf, ib, 2);
+        buf[2] = 0; 
+        tmp = 0;
+        for (i=0;i<2 && buf[i]>='0' && buf[i]<='9';i++) tmp=tmp*10+buf[i]-'0';
+        ID666.month = tmp;
+        ib+=3;
+        
+        memcpy(buf, ib, 2);
+        buf[2] = 0; 
+        tmp = 0;
+        for (i=0;i<2 && buf[i]>='0' && buf[i]<='9';i++) tmp=tmp*10+buf[i]-'0';
+        ID666.day = tmp;
+        ib+=3;
+        
+        memcpy(buf, ib, 4);
+        buf[4] = 0; 
+        tmp = 0;
+        for (i=0;i<4 && buf[i]>='0' && buf[i]<='9';i++) tmp=tmp*10+buf[i]-'0';
+        ID666.year = tmp;
+        ib+=5;
     
         memcpy(buf, ib, 3);
         buf[3] = 0; 
@@ -861,6 +878,8 @@ enum codec_status codec_main(void)
             ci->id3->title = ID666.song;
             ci->id3->album = ID666.game;
             ci->id3->artist = ID666.artist;
+            ci->id3->year = ID666.year;
+            ci->id3->comment = ID666.comments;
 
             reset_profile_timers();
         }
