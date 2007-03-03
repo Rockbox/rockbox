@@ -242,13 +242,21 @@ arm9tdmicc () {
  endian="little"
 }
 
-whichdevel () {
+whichadvanced () {
   ##################################################################
   # Prompt for specific developer options
   #
   echo ""
   echo "Enter your developer options (press enter when done)"
-  echo "(D)EBUG, (L)ogf, (S)imulator, (P)rofiling"
+  echo -n "(D)EBUG, (L)ogf, (S)imulator, (P)rofiling"
+  if [ "$memory" = "2" ]; then
+    echo -n ", (8)MB MOD"
+  fi
+  if [ "$archos" = "h120" ]; then
+    echo -n ", (R)TC MOD"
+  fi
+  echo ""
+
   cont=1
 
   while [ $cont = "1" ]; do
@@ -280,12 +288,29 @@ whichdevel () {
           profile="yes"
         fi
         ;;
+      8)
+        if [ "$memory" = "2" ]; then
+          memory="8"
+          echo "Memory size selected: 8MB"
+        else
+          cont=0
+        fi
+        ;;
+      [Rr])
+        if [ "$archos" = "h120" ]; then
+          config_rtc="#define CONFIG_RTC RTC_DS1339_DS3231"
+          have_rtc_alarm="#define HAVE_RTC_ALARM"
+          echo "RTC functions enabled (DS1339/DS3231)"
+        else
+          cont=0
+        fi
+        ;;
       *)
-        echo "done"
         cont=0
         ;;
     esac
   done
+  echo "done"
 
   if [ "yes" = "$use_debug" ]; then
     debug="-DDEBUG"
@@ -649,6 +674,7 @@ EOF
     target_id=2
     archos="recorder"
     target="-DARCHOS_RECORDER"
+    memory="2"
     shcc
     tool="$rootdir/tools/scramble"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -671,6 +697,7 @@ EOF
     target_id=3
     archos="fmrecorder"
     target="-DARCHOS_FMRECORDER"
+    memory="2"
     shcc
     tool="$rootdir/tools/scramble -fm"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -693,6 +720,7 @@ EOF
     target_id=4
     archos="recorderv2"
     target="-DARCHOS_RECORDERV2"
+    memory="2"
     shcc
     tool="$rootdir/tools/scramble -v2"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -715,6 +743,7 @@ EOF
     target_id=7
     archos="ondiosp"
     target="-DARCHOS_ONDIOSP"
+    memory="2"
     shcc
     tool="$rootdir/tools/scramble -osp"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -737,6 +766,7 @@ EOF
     target_id=8
     archos="ondiofm"
     target="-DARCHOS_ONDIOFM"
+    memory="2"
     shcc
     tool="$rootdir/tools/scramble -ofm"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -1243,11 +1273,12 @@ EOF
   echo "Platform set to $archos"
 
 
+#remove start
 ############################################################################
 # Amount of memory, for those that can differ.
 #
 
-if [ -z "$memory" ]; then
+if [ "$memory" = "2" ]; then
   size="2"
   if [ -z "$update" ]; then
     echo "Enter size of your RAM (in MB): (defaults to 2)"
@@ -1265,6 +1296,7 @@ if [ -z "$memory" ]; then
   esac
   echo "Memory size selected: $memory MB"
 fi
+#remove end
 
 ##################################################################
 # Figure out build "type"
@@ -1281,7 +1313,7 @@ fi
   esac
 
   echo ""
-  echo "Build (N)ormal, (D)evel, (S)imulator, (B)ootloader, $gdbstub(M)anual, (V)oice? (N)"
+  echo "Build (N)ormal, (A)dvanced, (S)imulator, (B)ootloader, $gdbstub(M)anual, (V)oice? (N)"
 
   option=`input`;
 
@@ -1314,9 +1346,9 @@ fi
       echo "Simulator build selected"
       whichsim
       ;;
-    [Dd])
-      echo "Devel build selected"
-      whichdevel
+    [Aa])
+      echo "Advanced build selected"
+      whichadvanced
       ;;
     [Gg])
       extradefines="-DSTUB" # for target makefile symbol EXTRA_DEFINES
@@ -1492,6 +1524,8 @@ sed > autoconf.h \
  -e "s,@ENDIAN@,${defendian},g" \
  -e "s,^#undef ROCKBOX_HAS_LOGF,$use_logf,g" \
  -e "s,@SIMSOUND@,$use_simsound,g" \
+ -e "s,@config_rtc@,$config_rtc,g" \
+ -e "s,@have_rtc_alarm@,$have_rtc_alarm,g" \
 <<EOF
 /* This header was made by configure */
 #ifndef __BUILD_AUTOCONF_H
@@ -1506,6 +1540,10 @@ sed > autoconf.h \
 /* Define this if you have the linux/soundcard.h header and thus can compile
    the sound-playing code in the X11 sim */
 @SIMSOUND@
+
+/* optional defines for RTC mod for h1x0 */
+@config_rtc@
+@have_rtc_alarm@
 
 #endif /* __BUILD_AUTOCONF_H */
 EOF
