@@ -65,6 +65,9 @@
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #define KBD_MODES /* iriver H10 uses 2 modes, picker and line edit */
 #define KBD_MORSE_INPUT
+
+#elif CONFIG_KEYPAD == GIGABEAT_PAD
+#define KBD_MORSE_INPUT
 #endif
 
 struct keyboard_parameters {
