@@ -1945,10 +1945,12 @@ static bool get_spc_metadata(int fd, struct mp3entry* id3)
     buf[31] = 0;
     p = iso_decode(buf, p, 0, 32);
     
+#ifndef __PCTOOL__
     if (global_settings.repeat_mode!=REPEAT_ONE && length==0) {
         length=3*60*1000; /* 3 minutes */
         fade=5*1000; /* 5 seconds */
     }
+#endif
     
     id3->length = length+fade;
 
@@ -2317,11 +2319,13 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
 
     /* We have successfully read the metadata from the file */
 
+#ifndef __PCTOOL__
     if (cuesheet_is_enabled() && look_for_cuesheet_file(trackname))
     {
         track->id3.cuesheet_type = 1;
     }
-
+#endif
+    
     lseek(fd, 0, SEEK_SET);
     strncpy(track->id3.path, trackname, sizeof(track->id3.path));
     track->taginfo_ready = true;
