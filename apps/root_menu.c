@@ -311,6 +311,19 @@ void root_menu(void)
         ret_val = (int)global_status.last_screen;
     else ret_val = global_settings.start_in_screen - 2;
     
+    /* try to select the start item if its not the menu */
+    if (ret_val != GO_TO_ROOT)
+    {
+        unsigned int i;
+        for(i=0; i< sizeof(root_menu__)/sizeof(*root_menu__) - 1; i++)
+        {
+            if (root_menu__[i]->value == ret_val)
+            {
+                selected = i;
+                break;
+            }
+        }
+    }
     while (true)
     {
         switch (ret_val)
