@@ -138,10 +138,6 @@ enum {
 #if MEM > 8
     Q_AUDIO_FILL_BUFFER_IF_ACTIVE_ATA,
 #endif
-#ifdef AUDIO_HAVE_RECORDING
-    Q_AUDIO_LOAD_ENCODER,
-#endif
-
 #if 0
     Q_CODEC_REQUEST_PENDING,
 #endif
@@ -525,8 +521,8 @@ bool audio_load_encoder(int afmt)
     audio_remove_encoder();
     ci.enc_codec_loaded = 0; /* clear any previous error condition */
 
-    LOGFQUEUE("audio > Q_AUDIO_LOAD_ENCODER");
-    queue_post(&audio_queue, Q_AUDIO_LOAD_ENCODER, (intptr_t)enc_fn);
+    LOGFQUEUE("codec > Q_ENCODER_LOAD_DISK");
+    queue_post(&codec_queue, Q_ENCODER_LOAD_DISK, (intptr_t)enc_fn);
 
     while (ci.enc_codec_loaded == 0)
         yield();
@@ -547,7 +543,7 @@ void audio_remove_encoder(void)
     if (ci.enc_codec_loaded <= 0)
         return;
 
-    ci.stop_codec = true;
+    ci.stop_encoder = true;
     while (ci.enc_codec_loaded > 0)
         yield();
 #endif
@@ -2003,7 +1999,7 @@ static void codec_thread(void)
 #endif
                 logf("loading encoder");
                 set_current_codec(CODEC_IDX_AUDIO);
-                ci.stop_codec = false;
+                ci.stop_encoder = false;
                 status = codec_load_file((const char *)ev.data, &ci);
 #ifdef PLAYBACK_VOICE
                 mutex_unlock(&mutex_codecthread);
@@ -3690,14 +3686,6 @@ static void audio_thread(void)
                 track_changed = true;
                 playlist_update_resume_info(audio_current_track());
                 break ;
-
-#ifdef AUDIO_HAVE_RECORDING
-            case Q_AUDIO_LOAD_ENCODER:
-                LOGFQUEUE("audio < Q_AUDIO_LOAD_ENCODER");
-                LOGFQUEUE("audio > codec Q_ENCODER_LOAD_DISK");
-                queue_post(&codec_queue, Q_ENCODER_LOAD_DISK, ev.data);
-                break;
-#endif
 
 #ifndef SIMULATOR
             case SYS_USB_CONNECTED:

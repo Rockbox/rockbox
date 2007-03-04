@@ -215,14 +215,15 @@ struct codec_api ci = {
 #endif
 
 #if defined(HAVE_RECORDING) && !defined(SIMULATOR)
-    false,
+    false,  /* stop_encoder */
+    0,      /* enc_codec_loaded */
     enc_get_inputs,
     enc_set_parameters,
     enc_get_chunk,
     enc_finish_chunk,
     enc_pcm_buf_near_empty,
     enc_get_pcm_data,
-    enc_unget_pcm_data
+    enc_unget_pcm_data,
 #endif
 
     /* new stuff at the end, sort into place next time

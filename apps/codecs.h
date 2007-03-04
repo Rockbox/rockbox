@@ -90,12 +90,12 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 14
+#define CODEC_API_VERSION 15
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 14
+#define CODEC_MIN_API_VERSION 15
 
 /* codec return codes */
 enum codec_status {
@@ -303,6 +303,7 @@ struct codec_api {
 #endif
  
 #if defined(HAVE_RECORDING) && !defined(SIMULATOR)
+    volatile bool   stop_encoder;
     volatile int    enc_codec_loaded; /* <0=error, 0=pending, >0=ok */
     void            (*enc_get_inputs)(struct enc_inputs *inputs);
     void            (*enc_set_parameters)(struct enc_parameters *params);

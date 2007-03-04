@@ -2482,7 +2482,7 @@ enum codec_status codec_main(void)
 #endif
 
     /* main encoding loop */
-    while (!ci->stop_codec)
+    while (!ci->stop_encoder)
     {
         char *buffer;
 
@@ -2490,7 +2490,7 @@ enum codec_status codec_main(void)
         {
             struct enc_chunk_hdr *chunk;
 
-            if (ci->stop_codec)
+            if (ci->stop_encoder)
                 break;
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ

@@ -408,7 +408,7 @@ enum codec_status codec_main(void)
 #endif
 
     /* main encoding loop */
-    while(!ci->stop_codec)
+    while(!ci->stop_encoder)
     {
         uint8_t *src;
 
@@ -419,7 +419,7 @@ enum codec_status codec_main(void)
             uint8_t *dst;
             uint8_t *src_end;
 
-            if(ci->stop_codec)
+            if(ci->stop_encoder)
                 break;
 
             abort_chunk = true;
@@ -455,7 +455,7 @@ enum codec_status codec_main(void)
                     chunk->num_pcm += PCM_SAMP_PER_CHUNK/4;
                     ci->yield();
                     /* could've been stopped in some way */
-                    abort_chunk = ci->stop_codec ||
+                    abort_chunk = ci->stop_encoder ||
                                   (chunk->flags & CHUNKF_ABORT);
                 }
 
