@@ -886,29 +886,32 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists,
  * on the screen for which the user pressed the key since for example, remote
  * and main screen doesn't have the same number of lines */
         case ACTION_LISTTREE_PGUP:
-            gui_synclist_select_previous_page(lists, SCREEN_MAIN);
-            gui_synclist_draw(lists);
-            yield();
-        return ACTION_STD_NEXT;
-              
-        case ACTION_LISTTREE_PGDOWN:
-            gui_synclist_select_next_page(lists, SCREEN_MAIN);
-            gui_synclist_draw(lists);
-            yield();
-            return ACTION_STD_PREV;
-#ifdef REMOTE_BUTTON
-        case ACTION_LISTTREE_RC_PGUP:
-            gui_synclist_select_previous_page(lists, SCREEN_REMOTE);
-            gui_synclist_draw(lists);
-            yield();
-            return ACTION_STD_NEXT;
-  
-        case ACTION_LISTTREE_RC_PGDOWN:
-            gui_synclist_select_next_page(lists, SCREEN_REMOTE);
-            gui_synclist_draw(lists);
-            yield();
-            return ACTION_STD_PREV;
+        {
+            int screen =
+#if BUTTON_REMOTE
+                get_action_statuscode(NULL)&ACTION_REMOTE ?
+                         SCREEN_REMOTE : 
 #endif
+                                          SCREEN_MAIN;
+            gui_synclist_select_previous_page(lists, screen);
+            gui_synclist_draw(lists);
+            yield();
+        }
+        return ACTION_STD_NEXT;
+
+        case ACTION_LISTTREE_PGDOWN:
+        {
+            int screen =
+#if BUTTON_REMOTE
+                get_action_statuscode(NULL)&ACTION_REMOTE ?
+                         SCREEN_REMOTE : 
+#endif
+                                          SCREEN_MAIN;
+            gui_synclist_select_next_page(lists, screen);
+            gui_synclist_draw(lists);
+            yield();
+        }
+        return ACTION_STD_PREV;
     }
     return 0;
 }

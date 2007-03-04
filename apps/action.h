@@ -123,8 +123,6 @@ enum {
     /* list and tree page up/down */    
     ACTION_LISTTREE_PGUP,/* optional */
     ACTION_LISTTREE_PGDOWN,/* optional */
-    ACTION_LISTTREE_RC_PGUP,/* optional */
-    ACTION_LISTTREE_RC_PGDOWN,/* optional */
     
     /* tree */ 
     ACTION_TREE_ROOT_INIT,
@@ -248,4 +246,15 @@ const struct button_mapping* get_context_mapping(int context);
 #ifndef HAS_BUTTON_HOLD
 bool is_keys_locked(void);
 #endif
+
+/* returns the status code variable from action.c for the button just pressed 
+   If button != NULL it will be set to the actual button code */
+#define ACTION_REMOTE   0x1 /* remote was pressed */
+#define ACTION_REPEAT   0x2 /* action was repeated (NOT button) */
+#define ACTION_IGNORING 0x4 /* action_signalscreenchange() was called \
+                               waiting for BUTTON_REL */
+int get_action_statuscode(int *button);
+
+
+
 #endif

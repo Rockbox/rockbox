@@ -31,6 +31,8 @@
 
 static bool ignore_until_release = false;
 static int last_button = BUTTON_NONE;
+static int last_action = ACTION_NONE;
+static bool repeated = false;
 
 /* software keylock stuff */
 #ifndef HAS_BUTTON_HOLD
@@ -107,7 +109,6 @@ static int get_action_worker(int context, int timeout,
     else
         button = button_get_w_tmo(timeout);
 
-    
     if (button == BUTTON_NONE || button&SYS_EVENT)
     {
         return button;
@@ -185,6 +186,11 @@ static int get_action_worker(int context, int timeout,
         return ACTION_REDRAW;
     }
 #endif
+    if (ret == last_action)
+        repeated = true;
+    else 
+        repeated = false;
+
     last_button = button;
     return ret;
 }
@@ -224,3 +230,18 @@ bool is_keys_locked(void)
     return (screen_has_lock && (keys_locked == true));
 }
 #endif
+
+int get_action_statuscode(int *button)
+{
+    int ret = 0;
+    if (button)
+        *button = last_button;
+
+    if (last_button&BUTTON_REMOTE)
+        ret |= ACTION_REMOTE;
+    if (repeated)
+        ret |= ACTION_REPEAT;
+    if (ignore_until_release)
+        ret |= ACTION_IGNORING;
+    return ret;
+}
