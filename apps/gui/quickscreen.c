@@ -59,7 +59,10 @@ void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * display)
     display->has_buttonbar=false;
 #endif
     gui_textarea_clear(display);
-    display->setfont(FONT_SYSFIXED);
+    if (display->height / display->char_height < 7) /* we need at leats 7 lines */
+    {
+        display->setfont(FONT_SYSFIXED);
+    }
     display->getstringsize("A", NULL, &font_h);
 
     /* Displays the first line of text */
