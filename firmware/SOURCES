@@ -244,9 +244,10 @@ target/coldfire/crt0.S
 target/coldfire/memcpy-coldfire.S
 target/coldfire/memmove-coldfire.S
 target/coldfire/memset-coldfire.S
-#ifdef HAVE_LCD_COLOR
+#if defined(HAVE_LCD_COLOR) \
+ || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED)
 target/coldfire/memset16-coldfire.S
-#endif /* HAVE_LCD_COLOR */
+#endif
 target/coldfire/system-coldfire.c
 #ifndef BOOTLOADER
 target/coldfire/pcm-coldfire.c
@@ -369,6 +370,28 @@ target/coldfire/iaudio/x5/audio-x5.c
 #endif
 #endif /* SIMULATOR */
 #endif /* IAUDIO_X5 */
+
+#ifdef IAUDIO_M5
+target/coldfire/iaudio/x5/power-x5.c
+#ifndef SIMULATOR
+target/coldfire/ata-as-coldfire.S
+target/coldfire/pcf50606-coldfire.c
+target/coldfire/iaudio/x5/adc-x5.c
+target/coldfire/iaudio/x5/ata-x5.c
+target/coldfire/iaudio/x5/backlight-x5.c
+target/coldfire/iaudio/x5/button-x5.c
+target/coldfire/iaudio/x5/lcd-as-x5.S
+target/coldfire/iaudio/x5/lcd-remote-x5.c
+target/coldfire/iaudio/x5/lcd-x5.c
+target/coldfire/iaudio/x5/m5636-x5.c
+target/coldfire/iaudio/x5/pcf50606-x5.c
+target/coldfire/iaudio/x5/system-x5.c
+target/coldfire/iaudio/x5/usb-x5.c
+#ifndef BOOTLOADER
+target/coldfire/iaudio/x5/audio-x5.c
+#endif
+#endif /* SIMULATOR */
+#endif /* IAUDIO_M5 */
 
 #ifdef IRIVER_IFP7XX_SERIES
 #ifdef STUB

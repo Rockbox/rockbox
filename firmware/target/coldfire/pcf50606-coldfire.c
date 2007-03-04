@@ -29,7 +29,7 @@
 #if defined(IRIVER_H300_SERIES)
 #define SDA_BITNUM          13              /* LRCK3/GPIO45     */
 #define SCL_BITNUM          12              /* SWE/GPIO12       */
-#elif defined(IAUDIO_X5)
+#elif defined(IAUDIO_X5) || defined(IAUDIO_M5)
 #define SDA_BITNUM          12              /* SDA1/RXD1/GPIO44 */
 #define SCL_BITNUM          10              /* SCL1/TXD1/GPIO10 */
 #endif

@@ -589,7 +589,8 @@ cat <<EOF
 
  ==iAudio==            ==Toshiba==            ==SanDisk==
  30) X5/X5V/X5L        40) Gigabeat F         50) Sansa e200
-                                              51) Sansa e200R
+ 31) M5/M5L                                   51) Sansa e200R
+
  ==Tatung==
  60) Elio TPJ-1022
 EOF
@@ -907,6 +908,32 @@ EOF
     t_cpu="coldfire"
     t_manufacturer="iaudio"
     t_model="x5"
+    ;;
+
+   31|m5)
+    target_id=28
+    archos="m5"
+    target="-DIAUDIO_M5"
+    memory=16 # always
+    coldfirecc
+    tool="$rootdir/tools/scramble -add=iam5"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 2"
+    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 7"
+    output="rockbox.iaudio"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins="yes"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a  libspeex"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$iaudiobitmaptools"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="coldfire"
+    t_manufacturer="iaudio"
+    t_model="m5"
     ;;
 
    20|ipodcolor)

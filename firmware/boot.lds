@@ -31,7 +31,7 @@ INPUT(target/sh/crt0.o)
 #define IRAMSIZE 0x18000
 #define FLASHORIG 0x003f0000
 #define FLASHSIZE 4M
-#elif defined(IAUDIO_X5)
+#elif defined(IAUDIO_X5) || defined(IAUDIO_M5)
 #define DRAMORIG 0x31000000
 #define IRAMORIG 0x10000000
 #define IRAMSIZE 0x20000
@@ -151,7 +151,7 @@ SECTIONS
 {
     .vectors :
     {
-#ifdef IAUDIO_X5
+#if defined(IAUDIO_X5) || defined(IAUDIO_M5)
         *(.init.text)
 #endif
         _datacopy = .;
@@ -201,7 +201,8 @@ SECTIONS
        stackend = .;
     } > IRAM
 
-#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES) || defined(IAUDIO_X5)
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES) \
+ || defined(IAUDIO_X5) || defined(IAUDIO_M5)
     .bss DRAMORIG+0x800000:
 #else
     .bss :
@@ -212,7 +213,8 @@ SECTIONS
         *(.bss*)
         *(COMMON)
        _end = .;
-#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES) || defined(IAUDIO_X5)
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES) \
+ || defined(IAUDIO_X5) || defined(IAUDIO_M5)
     } > DRAM
 #else
     } > IRAM

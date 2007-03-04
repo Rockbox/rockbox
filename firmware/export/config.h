@@ -187,6 +187,8 @@
 #include "config-h300.h"
 #elif defined(IAUDIO_X5)
 #include "config-iaudiox5.h"
+#elif defined(IAUDIO_M5)
+#include "config-iaudiom5.h"
 #elif defined(IPOD_COLOR)
 #include "config-ipodcolor.h"
 #elif defined(IPOD_NANO)

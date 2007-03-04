@@ -8,7 +8,7 @@ gigabeat.c
 main-pp.c
 #elif defined(ELIO_TPJ1022)
 tpj1022.c
-#elif defined(IAUDIO_X5)
+#elif defined(IAUDIO_X5) || defined(IAUDIO_M5)
 iaudio_x5.c
 #elif defined(IRIVER_H300_SERIES)
 iriver_h300.c

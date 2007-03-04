@@ -33,7 +33,7 @@ INPUT(target/sh/crt0.o)
 #define DRAMORIG 0x31000000 + STUBOFFSET
 #define IRAMORIG 0x10000000
 #define IRAMSIZE 0xc000
-#elif defined(IAUDIO_X5)
+#elif defined(IAUDIO_X5) || defined(IAUDIO_M5)
 #define DRAMORIG 0x31000000 + STUBOFFSET
 #define IRAMORIG 0x10000000
 #define IRAMSIZE 0x10000
