@@ -888,7 +888,7 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists,
         case ACTION_LISTTREE_PGUP:
         {
             int screen =
-#if BUTTON_REMOTE
+#if HAVE_REMOTE_LCD
                 get_action_statuscode(NULL)&ACTION_REMOTE ?
                          SCREEN_REMOTE : 
 #endif
@@ -902,7 +902,7 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists,
         case ACTION_LISTTREE_PGDOWN:
         {
             int screen =
-#if BUTTON_REMOTE
+#if HAVE_REMOTE_LCD
                 get_action_statuscode(NULL)&ACTION_REMOTE ?
                          SCREEN_REMOTE : 
 #endif
