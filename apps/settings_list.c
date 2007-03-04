@@ -1092,29 +1092,29 @@ const struct settings_list settings[] = {
     CHOICE_SETTING(0, start_in_screen, LANG_START_SCREEN, 1, 
             "start in screen", "previous,root,files,db,wps,menu,"
 #ifdef HAVE_RECORDING
-            ",recording"
+            "recording,"
 #endif
 #if CONFIG_TUNER
-            ",radio"
+            "radio,"
 #endif
-                ,NULL, 
+            "bookmarks"    ,NULL, 
 #if defined(HAVE_RECORDING) && CONFIG_TUNER
-            8,
+            9,
 #elif defined(HAVE_RECORDING) || CONFIG_TUNER /* only one of them */
-            7,
+            8,
 #else 
-            6,
+            7,
 #endif
             ID2P(LANG_PREVIOUS_SCREEN), ID2P(LANG_MAIN_MENU),
             ID2P(LANG_DIR_BROWSER), ID2P(LANG_TAGCACHE),
-            ID2P(LANG_RESUME_PLAYBACK), ID2P(LANG_SETTINGS_MENU)
+            ID2P(LANG_RESUME_PLAYBACK), ID2P(LANG_SETTINGS_MENU),
 #ifdef HAVE_RECORDING
-            ,ID2P(LANG_RECORDING)
+            ID2P(LANG_RECORDING),
 #endif
 #if CONFIG_TUNER
-            ,ID2P(LANG_FM_RADIO)
+            ID2P(LANG_FM_RADIO),
 #endif
-
+            ID2P(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS)
             ),
     SYSTEM_SETTING(NVRAM(1),last_screen,-1),
 };
