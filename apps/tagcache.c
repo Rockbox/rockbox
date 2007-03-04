@@ -1458,11 +1458,16 @@ static long get_tag_numeric(const struct index_entry *entry, int tag)
     return entry->tag_seek[tag];
 }
 
+static char* get_tag_string(const struct index_entry *entry, int tag)
+{
+    char* s = get_tag(entry, tag)->tag_data;
+    return strcmp(s, UNTAGGED) ? s : NULL;
+}
+
 bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
 {
     struct index_entry *entry;
     int idx_id;
-    char *tmp;
     
     if (!tc_stat.ready)
         return false;
@@ -1474,26 +1479,13 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
     
     entry = &hdr->indices[idx_id];
     
-    tmp = get_tag(entry, tag_title)->tag_data;
-    id3->title        = strcmp(tmp, UNTAGGED) ? tmp : NULL;
-
-    tmp = get_tag(entry, tag_artist)->tag_data;
-    id3->artist       = strcmp(tmp, UNTAGGED) ? tmp : NULL;
-
-    tmp = get_tag(entry, tag_album)->tag_data;
-    id3->album        = strcmp(tmp, UNTAGGED) ? tmp : NULL;
-
-    tmp = get_tag(entry, tag_genre)->tag_data;
-    id3->genre_string = strcmp(tmp, UNTAGGED) ? tmp : NULL;
-
-    tmp = get_tag(entry, tag_composer)->tag_data;
-    id3->composer     = strcmp(tmp, UNTAGGED) ? tmp : NULL;
-
-    tmp = get_tag(entry, tag_comment)->tag_data;
-    id3->comment      = strcmp(tmp, UNTAGGED) ? tmp : NULL;
-
-    tmp = get_tag(entry, tag_albumartist)->tag_data;
-    id3->albumartist  = strcmp(tmp, UNTAGGED) ? tmp : NULL;
+    id3->title        = get_tag_string(entry, tag_title);
+    id3->artist       = get_tag_string(entry, tag_artist);
+    id3->album        = get_tag_string(entry, tag_album);
+    id3->genre_string = get_tag_string(entry, tag_genre);
+    id3->composer     = get_tag_string(entry, tag_composer);
+    id3->comment      = get_tag_string(entry, tag_comment);
+    id3->albumartist  = get_tag_string(entry, tag_albumartist);
 
     id3->playcount  = get_tag_numeric(entry, tag_playcount);
     id3->lastplayed = get_tag_numeric(entry, tag_lastplayed);
