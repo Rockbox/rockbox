@@ -659,9 +659,16 @@ const struct settings_list settings[] = {
         TALK_ID(60, UNIT_SEC), TALK_ID(90, UNIT_SEC), TALK_ID(2, UNIT_MIN), 
         TALK_ID(3, UNIT_MIN), TALK_ID(5, UNIT_MIN), TALK_ID(10, UNIT_MIN), 
         TALK_ID(20, UNIT_MIN), TALK_ID(45, UNIT_MIN), TALK_ID(90, UNIT_MIN)),
-    {F_T_INT,&global_settings.peak_meter_hold, LANG_PM_PEAK_HOLD, 
-        INT(3),"peak meter hold",
-        "off,200ms,300ms,500ms,1,2,3,4,5,6,7,8,9,10,15,20,30,1min",UNUSED},
+    STRINGCHOICE_SETTING(0, peak_meter_hold, LANG_PM_PEAK_HOLD, 3,
+        "peak meter hold",
+        "off,200ms,300ms,500ms,1,2,3,4,5,6,7,8,9,10,15,20,30,1min",
+        NULL, 18, LANG_OFF,
+        TALK_ID(200, UNIT_MS), TALK_ID(300, UNIT_MS), TALK_ID(500, UNIT_MS), 
+        TALK_ID(1, UNIT_SEC), TALK_ID(2, UNIT_SEC), TALK_ID(3, UNIT_SEC), 
+        TALK_ID(4, UNIT_SEC), TALK_ID(5, UNIT_SEC), TALK_ID(6, UNIT_SEC), 
+        TALK_ID(7, UNIT_SEC), TALK_ID(8, UNIT_SEC), TALK_ID(9, UNIT_SEC), 
+        TALK_ID(10, UNIT_SEC), TALK_ID(15, UNIT_SEC), TALK_ID(20, UNIT_SEC), 
+        TALK_ID(30, UNIT_SEC), TALK_ID(60, UNIT_SEC)),
     INT_SETTING(0, peak_meter_release, LANG_PM_RELEASE, 8, "peak meter release",                      
                     LANG_PM_UNITS_PER_READ, 1, 0x7e1, 1, NULL, NULL,NULL), 
     OFFON_SETTING(0,peak_meter_dbfs,LANG_PM_DBFS,true,"peak meter dbfs",NULL),
@@ -808,7 +815,7 @@ const struct settings_list settings[] = {
                 UNIT_DB, -120, 120, 5, replaygain_preamp_format, NULL, NULL),
     
     CHOICE_SETTING(0, beep, LANG_BEEP, 0,
-        "beep", "off,weak,moderate,strong", NULL, 3,
+        "beep", "off,weak,moderate,strong", NULL, 4,
         ID2P(LANG_OFF), ID2P(LANG_WEAK), ID2P(LANG_MODERATE), ID2P(LANG_STRONG)),
 
     /* crossfade */
