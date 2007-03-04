@@ -991,7 +991,8 @@ int ata_init(void)
         last_disk_activity = current_tick;
         create_thread(ata_thread, ata_stack,
                       sizeof(ata_stack), ata_thread_name
-                      IF_PRIO(, PRIORITY_SYSTEM));
+                      IF_PRIO(, PRIORITY_SYSTEM)
+		      IF_COP(, CPU, false));
         initialized = true;
 
     }

@@ -2905,7 +2905,8 @@ void audio_init(void)
     queue_init(&mpeg_queue, true);
 #endif /* !SIMULATOR */
     create_thread(mpeg_thread, mpeg_stack,
-                  sizeof(mpeg_stack), mpeg_thread_name IF_PRIO(, PRIORITY_SYSTEM));
+                  sizeof(mpeg_stack), mpeg_thread_name IF_PRIO(, PRIORITY_SYSTEM)
+		  IF_COP(, CPU, false));
 
     memset(trackdata, sizeof(trackdata), 0);
 

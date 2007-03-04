@@ -124,13 +124,8 @@ struct core_entry {
 
 struct thread_entry*
     create_thread(void (*function)(void), void* stack, int stack_size,
-                  const char *name IF_PRIO(, int priority));
-
-struct thread_entry*
-    create_thread_on_core(unsigned int core, void (*function)(void), 
-                          void* stack, int stack_size,
-                          const char *name
-                          IF_PRIO(, int priority));
+                  const char *name IF_PRIO(, int priority)
+		  IF_COP(, unsigned int core, bool fallback));
 
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
 void trigger_cpu_boost(void);

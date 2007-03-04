@@ -327,7 +327,8 @@ struct plugin_api {
     long (*default_event_handler_ex)(long event, void (*callback)(void *), void *parameter);
     struct thread_entry* (*create_thread)(void (*function)(void), void* stack,
                                           int stack_size, const char *name
-                                          IF_PRIO(, int priority));
+                                          IF_PRIO(, int priority)
+					  IF_COP(, unsigned int core, bool fallback));
     void (*remove_thread)(struct thread_entry *thread);
     void (*reset_poweroff_timer)(void);
 #ifndef SIMULATOR
@@ -594,11 +595,6 @@ struct plugin_api {
     int (*sound_default)(int setting);
     void (*pcm_record_more)(void *start, size_t size);
 #endif
-    
-    struct thread_entry*(*create_thread_on_core)(
-                          unsigned int core, void (*function)(void), 
-                          void* stack, int stack_size,
-                          const char *name IF_PRIO(, int priority));
     
 #ifdef IRIVER_H100_SERIES
     /* Routines for the iriver_flash -plugin. */

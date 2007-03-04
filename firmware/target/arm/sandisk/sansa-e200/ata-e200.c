@@ -687,7 +687,8 @@ int ata_init(void)
     {
         queue_init(&sd_queue, true);
         create_thread(sd_thread, sd_stack,
-                      sizeof(sd_stack), sd_thread_name IF_PRIO(, PRIORITY_SYSTEM));
+                      sizeof(sd_stack), sd_thread_name IF_PRIO(, PRIORITY_SYSTEM)
+		      IF_COP(, CPU, false));
         initialized = true;
     }
 

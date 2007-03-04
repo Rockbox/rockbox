@@ -75,12 +75,6 @@ int create_thread(void (*fp)(void), void* sp, int stk_size)
     return 0;
 }
 
-int create_thread_on_core(void (*core)(void), void (*fp)(void), void* sp, int stk_size)
-{
-    (void)core;
-    return create_thread(fp, sp, stk_size);
-}
-
 void init_threads(void)
 {
     m = SDL_CreateMutex();

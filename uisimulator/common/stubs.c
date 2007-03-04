@@ -258,12 +258,6 @@ void remove_thread(int threadnum)
     (void)threadnum;
 }
 
-void remove_thread_on_core(unsigned int core, int threadnum)
-{
-    (void)core;
-    (void)threadnum;
-}
-
 /* assure an unused place to direct virtual pointers to */
 #define VIRT_SIZE 0xFFFF /* more than enough for our string ID range */
 unsigned char vp_dummy[VIRT_SIZE];

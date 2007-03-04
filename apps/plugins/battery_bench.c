@@ -479,7 +479,8 @@ int main(void)
     rb->queue_init(&thread_q, true); /* put the thread's queue in the bcast list */
     if(rb->create_thread(thread, thread_stack,
         sizeof(thread_stack), "Battery Benchmark" 
-        IF_PRIO(, PRIORITY_BACKGROUND)) == NULL)
+        IF_PRIO(, PRIORITY_BACKGROUND)
+	IF_COP(, CPU, false)) == NULL)
     {
         rb->splash(HZ,true,"Cannot create thread!");
         return PLUGIN_ERROR;

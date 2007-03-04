@@ -3941,7 +3941,8 @@ void tagcache_init(void)
     queue_init(&tagcache_queue, true);
     create_thread(tagcache_thread, tagcache_stack,
                   sizeof(tagcache_stack), tagcache_thread_name 
-                  IF_PRIO(, PRIORITY_BACKGROUND));
+                  IF_PRIO(, PRIORITY_BACKGROUND)
+		  IF_COP(, CPU, false));
 #else
     tc_stat.initialized = true;
     allocate_tempbuf();

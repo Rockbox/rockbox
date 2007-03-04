@@ -26,7 +26,7 @@
 #include "panic.h"
 
 #if !defined(CPU_PP) || !defined(BOOTLOADER) 
-long current_tick = 0;
+long current_tick NOCACHEDATA_ATTR = 0;
 #endif
 
 static void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
@@ -45,10 +45,13 @@ void kernel_init(void)
     /* Init the threading API */
     init_threads();
     
-    memset(tick_funcs, 0, sizeof(tick_funcs));
+    if(CURRENT_CORE == CPU)
+    {
+        memset(tick_funcs, 0, sizeof(tick_funcs));
 
-    num_queues = 0;
-    memset(all_queues, 0, sizeof(all_queues));
+        num_queues = 0;
+        memset(all_queues, 0, sizeof(all_queues));
+    }
 
     tick_start(1000/HZ);
 }
@@ -496,28 +499,36 @@ void TIMER1(void)
     int i;
 
     TIMER1_VAL; /* Read value to ack IRQ */
-    /* Run through the list of tick tasks */
-    for (i = 0;i < MAX_NUM_TICK_TASKS;i++)
+    /* Run through the list of tick tasks (using main core) */
+    if (CURRENT_CORE == CPU)
     {
-        if (tick_funcs[i])
+        for (i = 0;i < MAX_NUM_TICK_TASKS;i++)
         {
-            tick_funcs[i]();
+            if (tick_funcs[i])
+            {
+                tick_funcs[i]();
+            }
         }
-    }
 
-    current_tick++;
+        current_tick++;
+    }
 }
 #endif
 
 void tick_start(unsigned int interval_in_ms)
 {
 #ifndef BOOTLOADER
-    TIMER1_CFG = 0x0;
-    TIMER1_VAL;
-    /* enable timer */
-    TIMER1_CFG = 0xc0000000 | (interval_in_ms*1000 - 1);
-    /* unmask interrupt source */
-    CPU_INT_EN = TIMER1_MASK;
+    if(CURRENT_CORE == CPU)
+    {
+        TIMER1_CFG = 0x0;
+        TIMER1_VAL;
+        /* enable timer */
+        TIMER1_CFG = 0xc0000000 | (interval_in_ms*1000 - 1);
+        /* unmask interrupt source */
+        CPU_INT_EN = TIMER1_MASK;
+    } else {
+        COP_INT_EN = TIMER1_MASK;
+    }
 #else
     /* We don't enable interrupts in the bootloader */
     (void)interval_in_ms;
@@ -645,6 +656,29 @@ void mutex_init(struct mutex *m)
     m->thread = NULL;
 }
 
+#ifdef CPU_PP
+/* PortalPlayer chips have 2 cores, therefore need atomic mutexes */
+
+static inline bool test_and_set(bool *x, bool v)
+{
+    asm volatile (
+        "swpb %0, %0, [%1]\n"
+        : "+r"(v)
+        : "r"(x)
+    );
+    return v;
+}
+
+void mutex_lock(struct mutex *m)
+{
+    if (test_and_set(&m->locked,true))
+    {
+        /* Wait until the lock is open... */
+        block_thread(&m->thread);
+    }
+}
+
+#else
 void mutex_lock(struct mutex *m)
 {
     if (m->locked)
@@ -656,6 +690,7 @@ void mutex_lock(struct mutex *m)
     /* ...and lock it */
     m->locked = true;
 }
+#endif
 
 void mutex_unlock(struct mutex *m)
 {

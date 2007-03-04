@@ -1171,7 +1171,8 @@ int main(void* parameter)
     rb->memset(&gTread, 0, sizeof(gTread));
     gTread.foreground = true;
     rb->create_thread(thread, stack, stacksize, "CDC"
-                      IF_PRIO(, PRIORITY_BACKGROUND));
+                      IF_PRIO(, PRIORITY_BACKGROUND)
+		      IF_COP(, CPU, false));
 
 #ifdef DEBUG
     do

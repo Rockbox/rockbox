@@ -273,21 +273,6 @@
 /* define for all cpus from PP family */
 #if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5024)
 #define CPU_PP
-
-/* PP family has dual cores */
-#if 0
-/* Keep it as single core until dual core support is ready */
-#define NUM_CORES 2
-#define CURRENT_CORE current_core()
-#endif
-
-#define NUM_CORES 1
-#define CURRENT_CORE 0
-
-#define COP_REBOOT 0x00000001
-#else
-#define NUM_CORES 1
-#define CURRENT_CORE 0
 #endif
 
 /* define for all cpus from ARM family */
@@ -347,5 +332,29 @@
 /* if the LCD framebuffer has not been moved to IRAM, define it empty here */
 #define IRAM_LCDFRAMEBUFFER
 #endif
+
+/* Dual core support - not yet working on the 3G iPod */
+#if defined(CPU_PP) && CONFIG_CPU != PP5002
+#define NUM_CORES 2
+#define CURRENT_CORE current_core()
+/* Hopefully at some point we will learn how to mark areas of main memory as
+ * not to be cached.  Until then, use IRAM for variables shared across cores */
+#define NOCACHEBSS_ATTR IBSS_ATTR
+#define NOCACHEDATA_ATTR IDATA_ATTR
+
+#define IF_COP(empty, x, y) , x, y
+
+/* Defines for inter-core messaging */
+#define COP_REBOOT 1
+
+#else
+#define NUM_CORES 1
+#define CURRENT_CORE CPU
+#define NOCACHEBSS_ATTR
+#define NOCACHEDATA_ATTR
+
+#define IF_COP(empty, x, y)
+
+#endif /* Processor specific */
 
 #endif

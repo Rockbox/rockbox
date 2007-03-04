@@ -199,9 +199,10 @@ struct codec_api {
     long* current_tick;
     long (*default_event_handler)(long event);
     long (*default_event_handler_ex)(long event, void (*callback)(void *), void *parameter);
-    struct thread_entry* (*create_thread)(unsigned int core, void (*function)(void), 
+    struct thread_entry* (*create_thread)(void (*function)(void), 
                                           void* stack, int stack_size, const char *name
-                                          IF_PRIO(, int priority));
+                                          IF_PRIO(, int priority)
+					  IF_COP(, unsigned int core, bool fallback));
     void (*remove_thread)(struct thread_entry *thread);
     void (*reset_poweroff_timer)(void);
 #ifndef SIMULATOR

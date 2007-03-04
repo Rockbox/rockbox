@@ -64,6 +64,10 @@ int *cop_stackend = stackend;
 #endif
 #endif
 
+#if (NUM_CORES > 1)
+bool IDATA_ATTR kernel_running_on_cop = false;
+#endif
+
 /* Conserve IRAM
 static void add_to_list(struct thread_entry **list,
                         struct thread_entry *thread) ICODE_ATTR;
@@ -316,10 +320,13 @@ static inline void sleep_core(void)
 #elif CONFIG_CPU == SH7034
         and_b(0x7F, &SBYCR);
         asm volatile ("sleep");
-#elif CONFIG_CPU == PP5020
+#elif defined (CPU_PP)
         /* This should sleep the CPU. It appears to wake by itself on
            interrupts */
-        CPU_CTL = 0x80000000;
+        if (CURRENT_CORE == CPU)
+            CPU_CTL = PROC_SLEEP;
+        else
+            COP_CTL = PROC_SLEEP;
 #elif CONFIG_CPU == S3C2440
         CLKCON |= (1 << 2); /* set IDLE bit */
         for(i=0; i<10; i++); /* wait for IDLE */
@@ -608,27 +615,16 @@ void wakeup_thread(struct thread_entry **list)
 }
 
 /*---------------------------------------------------------------------------
- * Create thread on the current core.
- * Return ID if context area could be allocated, else -1.
+ * Create a thread
+ * If using a dual core architecture, specify which core to start the thread
+ * on, and whether to fall back to the other core if it can't be created
+ * Return ID if context area could be allocated, else NULL.
  *---------------------------------------------------------------------------
  */
 struct thread_entry* 
     create_thread(void (*function)(void), void* stack, int stack_size,
-                  const char *name IF_PRIO(, int priority))
-{
-    return create_thread_on_core(CURRENT_CORE, function, stack, stack_size,
-                  name IF_PRIO(, priority));
-}
-
-/*---------------------------------------------------------------------------
- * Create thread on a specific core.
- * Return ID if context area could be allocated, else -1.
- *---------------------------------------------------------------------------
- */
-struct thread_entry* 
-    create_thread_on_core(unsigned int core, void (*function)(void), 
-                          void* stack, int stack_size,
-                          const char *name IF_PRIO(, int priority))
+                  const char *name IF_PRIO(, int priority)
+		  IF_COP(, unsigned int core, bool fallback))
 {
     unsigned int i;
     unsigned int stacklen;
@@ -637,6 +633,29 @@ struct thread_entry*
     struct regs *regs;
     struct thread_entry *thread;
 
+/*****
+ * Ugly code alert!
+ * To prevent ifdef hell while keeping the binary size down, we define
+ * core here if it hasn't been passed as a parameter
+ *****/
+#if NUM_CORES == 1
+#define core CPU
+#endif
+
+#if NUM_CORES > 1
+/* If the kernel hasn't initialised on the COP (most likely due to an old
+ * bootloader) then refuse to start threads on the COP
+ */
+    if((core == COP) && !kernel_running_on_cop)
+    {
+        if (fallback)
+            return create_thread(function, stack, stack_size, name
+	                         IF_PRIO(, priority) IF_COP(, CPU, false));
+	else
+            return NULL;
+    }
+#endif
+
     for (n = 0; n < MAXTHREADS; n++)
     {
         if (cores[core].threads[n].name == NULL)
@@ -644,8 +663,15 @@ struct thread_entry*
     }
     
     if (n == MAXTHREADS)
-        return NULL;
-    
+    {
+#if NUM_CORES > 1
+        if (fallback)
+	    return create_thread(function, stack, stack_size, name
+	                         IF_PRIO(, priority) IF_COP(, 1 - core, fallback));
+	else
+#endif
+            return NULL;
+    }
     
     /* Munge the stack to make it easy to spot stack overflows */
     stacklen = stack_size / sizeof(int);
@@ -677,6 +703,9 @@ struct thread_entry*
     THREAD_CPU_INIT(core, thread);
 
     return thread;
+#if NUM_CORES == 1
+#undef core
+#endif
 }
 
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
@@ -751,7 +780,8 @@ void init_threads(void)
 {
     unsigned int core = CURRENT_CORE;
 
-    memset(cores, 0, sizeof cores);
+    if (core == CPU)
+        memset(cores, 0, sizeof cores);
     cores[core].sleeping = NULL;
     cores[core].running = NULL;
     cores[core].threads[0].name = main_thread_name;
@@ -779,6 +809,10 @@ void init_threads(void)
 #endif
     }
     cores[core].threads[0].context.start = 0; /* thread 0 already running */
+#if NUM_CORES > 1
+    if(core == COP)
+        kernel_running_on_cop = true; /* can we use context.start for this? */
+#endif
 }
 
 int thread_stack_usage(const struct thread_entry *thread)

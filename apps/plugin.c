@@ -481,7 +481,6 @@ static const struct plugin_api rockbox_api = {
     sound_default,
     pcm_record_more,
 #endif
-    create_thread_on_core,
 
 #ifdef IRIVER_H100_SERIES
     /* Routines for the iriver_flash -plugin. */

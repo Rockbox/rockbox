@@ -1173,7 +1173,8 @@ int ata_init(void)
 
         queue_init(&mmc_queue, true);
         create_thread(mmc_thread, mmc_stack,
-                      sizeof(mmc_stack), mmc_thread_name IF_PRIO(, PRIORITY_SYSTEM));
+                      sizeof(mmc_stack), mmc_thread_name IF_PRIO(, PRIORITY_SYSTEM)
+		      IF_COP(, CPU, false));
         tick_add_task(mmc_tick);
         initialized = true;
     }

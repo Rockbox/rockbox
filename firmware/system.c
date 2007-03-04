@@ -612,12 +612,22 @@ extern void ipod_mini_button_int(void);
 
 void irq(void)
 {
-    if (CPU_INT_STAT & TIMER1_MASK)
-        TIMER1();
-    else if (CPU_INT_STAT & TIMER2_MASK)
-        TIMER2();
-    else if (CPU_HI_INT_STAT & GPIO_MASK)
-        ipod_mini_button_int();
+    if(CURRENT_CORE == CPU)
+    {
+        if (CPU_INT_STAT & TIMER1_MASK)
+            TIMER1();
+        else if (CPU_INT_STAT & TIMER2_MASK)
+            TIMER2();
+        else if (CPU_HI_INT_STAT & GPIO_MASK)
+            ipod_mini_button_int();
+    } else {
+        if (COP_INT_STAT & TIMER1_MASK)
+            TIMER1();
+        else if (COP_INT_STAT & TIMER2_MASK)
+            TIMER2();
+        else if (COP_HI_INT_STAT & GPIO_MASK)
+            ipod_mini_button_int();
+    }
 }
 #elif (defined IRIVER_H10) || (defined IRIVER_H10_5GB) || defined(ELIO_TPJ1022) \
     || (defined SANSA_E200)
@@ -626,22 +636,40 @@ void irq(void)
 /* TODO: Even if it isn't in the target tree, this should be the default case */
 void irq(void)
 {
-    if (CPU_INT_STAT & TIMER1_MASK)
-        TIMER1();
-    else if (CPU_INT_STAT & TIMER2_MASK)
-        TIMER2();
+    if(CURRENT_CORE == CPU)
+    {
+        if (CPU_INT_STAT & TIMER1_MASK)
+            TIMER1();
+        else if (CPU_INT_STAT & TIMER2_MASK)
+            TIMER2();
+    } else {
+        if (COP_INT_STAT & TIMER1_MASK)
+            TIMER1();
+        else if (COP_INT_STAT & TIMER2_MASK)
+            TIMER2();
+    }
 }
 #else
 extern void ipod_4g_button_int(void);
 
 void irq(void)
 {
-    if (CPU_INT_STAT & TIMER1_MASK)
-        TIMER1();
-    else if (CPU_INT_STAT & TIMER2_MASK)
-        TIMER2();
-    else if (CPU_HI_INT_STAT & I2C_MASK)
-        ipod_4g_button_int();
+    if(CURRENT_CORE == CPU)
+    {
+        if (CPU_INT_STAT & TIMER1_MASK)
+            TIMER1();
+        else if (CPU_INT_STAT & TIMER2_MASK)
+            TIMER2();
+        else if (CPU_HI_INT_STAT & I2C_MASK)
+            ipod_4g_button_int();
+    } else {
+        if (COP_INT_STAT & TIMER1_MASK)
+            TIMER1();
+        else if (COP_INT_STAT & TIMER2_MASK)
+            TIMER2();
+        else if (COP_HI_INT_STAT & I2C_MASK)
+            ipod_4g_button_int();
+    }
 }
 #endif
 #endif /* BOOTLOADER */
@@ -694,43 +722,47 @@ void set_cpu_frequency(long frequency)
 {
     unsigned long postmult;
 
-    if (frequency == CPUFREQ_NORMAL)
-        postmult = CPUFREQ_NORMAL_MULT;
-    else if (frequency == CPUFREQ_MAX)
-        postmult = CPUFREQ_MAX_MULT;
-    else
-        postmult = CPUFREQ_DEFAULT_MULT;
-    cpu_frequency = frequency;
+    if (CURRENT_CORE == CPU)
+    {
+        if (frequency == CPUFREQ_NORMAL)
+            postmult = CPUFREQ_NORMAL_MULT;
+        else if (frequency == CPUFREQ_MAX)
+            postmult = CPUFREQ_MAX_MULT;
+        else
+            postmult = CPUFREQ_DEFAULT_MULT;
+        cpu_frequency = frequency;
 
-    /* Enable PLL? */
-    outl(inl(0x70000020) | (1<<30), 0x70000020);
+        /* Enable PLL? */
+        outl(inl(0x70000020) | (1<<30), 0x70000020);
 
-    /* Select 24MHz crystal as clock source? */
-    outl((inl(0x60006020) & 0x0fffff0f) | 0x20000020, 0x60006020);
+        /* Select 24MHz crystal as clock source? */
+        outl((inl(0x60006020) & 0x0fffff0f) | 0x20000020, 0x60006020);
 
-    /* Clock frequency = (24/8)*postmult */
-    outl(0xaa020000 | 8 | (postmult << 8), 0x60006034);
+        /* Clock frequency = (24/8)*postmult */
+        outl(0xaa020000 | 8 | (postmult << 8), 0x60006034);
 
-    /* Wait for PLL relock? */
-    udelay(2000);
+        /* Wait for PLL relock? */
+        udelay(2000);
 
-    /* Select PLL as clock source? */
-    outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);
+        /* Select PLL as clock source? */
+        outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);
 
 #if defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI) || defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
-    /* We don't know why the timer interrupt gets disabled on the PP5020
-       based ipods, but without the following line, the 4Gs will freeze
-       when CPU frequency changing is enabled.
+        /* We don't know why the timer interrupt gets disabled on the PP5020
+           based ipods, but without the following line, the 4Gs will freeze
+           when CPU frequency changing is enabled.
 
-       Note also that a simple "CPU_INT_EN = TIMER1_MASK;" (as used
-       elsewhere to enable interrupts) doesn't work, we need "|=".
+           Note also that a simple "CPU_INT_EN = TIMER1_MASK;" (as used
+           elsewhere to enable interrupts) doesn't work, we need "|=".
 
-       It's not needed on the PP5021 and PP5022 ipods.
-    */
+           It's not needed on the PP5021 and PP5022 ipods.
+        */
 
-    /* unmask interrupt source */
-    CPU_INT_EN |= TIMER1_MASK;
+        /* unmask interrupt source */
+        CPU_INT_EN |= TIMER1_MASK;
+        COP_INT_EN |= TIMER1_MASK;
 #endif
+    }
 }
 #elif !defined(BOOTLOADER)
 void ipod_set_cpu_frequency(void)
@@ -754,24 +786,33 @@ void ipod_set_cpu_frequency(void)
 void system_init(void)
 {
 #ifndef BOOTLOADER
-    /* Remap the flash ROM from 0x00000000 to 0x20000000. */
-    MMAP3_LOGICAL  = 0x20000000 | 0x3a00;
-    MMAP3_PHYSICAL = 0x00000000 | 0x3f84;
+    if (CURRENT_CORE == CPU)
+    {
+        /* Remap the flash ROM from 0x00000000 to 0x20000000. */
+        MMAP3_LOGICAL  = 0x20000000 | 0x3a00;
+        MMAP3_PHYSICAL = 0x00000000 | 0x3f84;
 
-    /* The hw revision is written to the last 4 bytes of SDRAM by the
-       bootloader - we save it before Rockbox overwrites it. */
-    ipod_hw_rev = (*((volatile unsigned long*)(0x01fffffc)));
+        /* The hw revision is written to the last 4 bytes of SDRAM by the
+           bootloader - we save it before Rockbox overwrites it. */
+        ipod_hw_rev = (*((volatile unsigned long*)(0x01fffffc)));
 
-    /* disable all irqs */
-    outl(-1, 0x60001138);
-    outl(-1, 0x60001128);
-    outl(-1, 0x6000111c);
+        /* disable all irqs */
+        outl(-1, 0x60001138);
+        outl(-1, 0x60001128);
+        outl(-1, 0x6000111c);
 
-    outl(-1, 0x60001038);
-    outl(-1, 0x60001028);
-    outl(-1, 0x6000101c);
-#ifndef HAVE_ADJUSTABLE_CPU_FREQ
-    ipod_set_cpu_frequency();
+        outl(-1, 0x60001038);
+        outl(-1, 0x60001028);
+        outl(-1, 0x6000101c);
+#if (!defined HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES == 1)
+        ipod_set_cpu_frequency();
+#endif
+    }
+#if (!defined HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES > 1)
+    else
+    {
+        ipod_set_cpu_frequency();
+    }
 #endif
     ipod_init_cache();
 #endif
@@ -796,10 +837,18 @@ extern void TIMER2(void);
 
 void irq(void)
 {
-    if (CPU_INT_STAT & TIMER1_MASK)
-        TIMER1();
-    else if (CPU_INT_STAT & TIMER2_MASK)
-        TIMER2();
+    if(CURRENT_CORE == CPU)
+    {
+        if (CPU_INT_STAT & TIMER1_MASK)
+            TIMER1();
+        else if (CPU_INT_STAT & TIMER2_MASK)
+            TIMER2();
+    } else {
+        if (COP_INT_STAT & TIMER1_MASK)
+            TIMER1();
+        else if (COP_INT_STAT & TIMER2_MASK)
+            TIMER2();
+    }
 }
 
 #endif
@@ -848,29 +897,32 @@ void set_cpu_frequency(long frequency)
 {
     unsigned long postmult;
 
-    if (frequency == CPUFREQ_NORMAL)
-        postmult = CPUFREQ_NORMAL_MULT;
-    else if (frequency == CPUFREQ_MAX)
-        postmult = CPUFREQ_MAX_MULT;
-    else
-        postmult = CPUFREQ_DEFAULT_MULT;
-    cpu_frequency = frequency;
+    if (CURRENT_CORE == CPU)
+    {
+        if (frequency == CPUFREQ_NORMAL)
+            postmult = CPUFREQ_NORMAL_MULT;
+        else if (frequency == CPUFREQ_MAX)
+            postmult = CPUFREQ_MAX_MULT;
+        else
+            postmult = CPUFREQ_DEFAULT_MULT;
+        cpu_frequency = frequency;
 
-    outl(0x02, 0xcf005008);
-    outl(0x55, 0xcf00500c);
-    outl(0x6000, 0xcf005010);
+        outl(0x02, 0xcf005008);
+        outl(0x55, 0xcf00500c);
+        outl(0x6000, 0xcf005010);
 
-    /* Clock frequency = (24/8)*postmult */
-    outl(8, 0xcf005018);
-    outl(postmult, 0xcf00501c);
+        /* Clock frequency = (24/8)*postmult */
+        outl(8, 0xcf005018);
+        outl(postmult, 0xcf00501c);
 
-    outl(0xe000, 0xcf005010);
+        outl(0xe000, 0xcf005010);
 
-    /* Wait for PLL relock? */
-    udelay(2000);
+        /* Wait for PLL relock? */
+        udelay(2000);
 
-    /* Select PLL as clock source? */
-    outl(0xa8, 0xcf00500c);
+        /* Select PLL as clock source? */
+        outl(0xa8, 0xcf00500c);
+    }
 }
 #elif !defined(BOOTLOADER)
 static void ipod_set_cpu_speed(void)
@@ -901,17 +953,20 @@ static void ipod_set_cpu_speed(void)
 void system_init(void)
 {
 #ifndef BOOTLOADER
-    /* Remap the flash ROM from 0x00000000 to 0x20000000. */
-    MMAP3_LOGICAL  = 0x20000000 | 0x3a00;
-    MMAP3_PHYSICAL = 0x00000000 | 0x3f84;
+    if (CURRENT_CORE == CPU)
+    {
+        /* Remap the flash ROM from 0x00000000 to 0x20000000. */
+        MMAP3_LOGICAL  = 0x20000000 | 0x3a00;
+        MMAP3_PHYSICAL = 0x00000000 | 0x3f84;
 
-    ipod_hw_rev = (*((volatile unsigned long*)(0x01fffffc)));
-    outl(-1, 0xcf00101c);
-    outl(-1, 0xcf001028);
-    outl(-1, 0xcf001038);
+        ipod_hw_rev = (*((volatile unsigned long*)(0x01fffffc)));
+        outl(-1, 0xcf00101c);
+        outl(-1, 0xcf001028);
+        outl(-1, 0xcf001038);
 #ifndef HAVE_ADJUSTABLE_CPU_FREQ
-    ipod_set_cpu_speed();
+        ipod_set_cpu_speed();
 #endif
+    }
     ipod_init_cache();
 #endif
 }

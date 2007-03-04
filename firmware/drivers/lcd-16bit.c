@@ -89,7 +89,8 @@ void lcd_init(void)
 
     create_thread(scroll_thread, scroll_stack,
                   sizeof(scroll_stack), scroll_name
-                  IF_PRIO(, PRIORITY_USER_INTERFACE));
+                  IF_PRIO(, PRIORITY_USER_INTERFACE)
+		  IF_COP(, CPU, false));
 }
 
 /*** parameter handling ***/

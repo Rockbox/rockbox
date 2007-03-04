@@ -194,9 +194,9 @@ static bool audio_is_initialized = false;
 /* TBD: Split out "audio" and "playback" (ie. calling) threads */
 
 /* Main state control */
-static volatile bool audio_codec_loaded; /* Is codec loaded? (C/A-) */
-static volatile bool playing;            /* Is audio playing? (A) */
-static volatile bool paused;             /* Is audio paused? (A/C-) */
+static volatile bool audio_codec_loaded NOCACHEBSS_ATTR;/* Codec loaded? (C/A-) */
+static volatile bool playing NOCACHEBSS_ATTR;          /* Is audio playing? (A) */
+static volatile bool paused NOCACHEBSS_ATTR;         /* Is audio paused? (A/C-) */
 static volatile bool filling IDATA_ATTR; /* Is file buffer refilling? (A/C-) */
 
 /* Ring buffer where compressed audio and codecs are loaded */
@@ -290,7 +290,7 @@ static void audio_reset_buffer(size_t pcmbufsize);
 
 /* Codec thread */
 extern struct codec_api ci;
-static struct event_queue codec_queue;
+static struct event_queue codec_queue NOCACHEBSS_ATTR;
 static long codec_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)]
 IBSS_ATTR;
 static const char codec_thread_name[] = "codec";
@@ -304,7 +304,7 @@ static volatile int current_codec IDATA_ATTR; /* Current codec (normal/voice) */
 extern struct codec_api ci_voice;
 
 static struct thread_entry *voice_thread_p = NULL;
-static struct event_queue voice_queue;
+static struct event_queue voice_queue NOCACHEBSS_ATTR;
 static long voice_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)]
 IBSS_ATTR_VOICE_STACK;
 static const char voice_thread_name[] = "voice codec";
@@ -324,12 +324,12 @@ static unsigned char *iram_buf[2] = { NULL, NULL };
 /* Pointer to DRAM buffers for normal/voice codecs */
 static unsigned char *dram_buf[2] = { NULL, NULL };
 /* Mutex to control which codec (normal/voice) is running */
-static struct mutex mutex_codecthread;
+static struct mutex mutex_codecthread NOCACHEBSS_ATTR; 
 
 /* Voice state */
 static volatile bool voice_thread_start; /* Triggers voice playback (A/V) */
-static volatile bool voice_is_playing;   /* Is voice currently playing? (V) */
-static volatile bool voice_codec_loaded; /* Is voice codec loaded (V/A-) */
+static volatile bool voice_is_playing NOCACHEBSS_ATTR; /* Is voice currently playing? (V) */
+static volatile bool voice_codec_loaded NOCACHEBSS_ATTR; /* Is voice codec loaded (V/A-) */
 static char *voicebuf;
 static size_t voice_remaining;
 
@@ -863,7 +863,8 @@ void audio_preinit(void)
     queue_init(&codec_queue, true);
 
     create_thread(audio_thread, audio_stack, sizeof(audio_stack),
-                  audio_thread_name IF_PRIO(, PRIORITY_BUFFERING));
+                  audio_thread_name IF_PRIO(, PRIORITY_BUFFERING)
+		  IF_COP(, CPU, false));
 }
 
 void audio_init(void)
@@ -888,7 +889,7 @@ void voice_init(void)
     queue_init(&voice_queue, true);
     voice_thread_p = create_thread(voice_thread, voice_stack,
             sizeof(voice_stack), voice_thread_name 
-            IF_PRIO(, PRIORITY_PLAYBACK));
+            IF_PRIO(, PRIORITY_PLAYBACK) IF_COP(, CPU, false));
     
     while (!voice_codec_loaded)
         yield();
@@ -3533,7 +3534,8 @@ static void audio_playback_init(void)
 
     codec_thread_p = create_thread(
             codec_thread, codec_stack, sizeof(codec_stack),
-            codec_thread_name IF_PRIO(, PRIORITY_PLAYBACK));
+            codec_thread_name IF_PRIO(, PRIORITY_PLAYBACK)
+	    IF_COP(, COP, true));
 
     while (1)
     {

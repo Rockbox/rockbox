@@ -30,6 +30,15 @@
 #define PROC_ID_CPU      0x55
 #define PROC_ID_COP      0xaa
 
+/* Mailboxes */
+/* Each processor has two mailboxes it can write to and two which
+   it can read from.  We define the first to be for sending messages
+   and the second for replying to messages */
+#define CPU_MESSAGE      (*(volatile unsigned long *)(0x60001000))
+#define COP_MESSAGE      (*(volatile unsigned long *)(0x60001004))
+#define CPU_REPLY        (*(volatile unsigned long *)(0x60001008))
+#define COP_REPLY        (*(volatile unsigned long *)(0x6000100c))
+
 /* Interrupts */
 #define CPU_INT_STAT        (*(volatile unsigned long*)(0x64004000))
 #define COP_INT_STAT        (*(volatile unsigned long*)(0x60004004))

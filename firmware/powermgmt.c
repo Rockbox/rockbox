@@ -1245,7 +1245,8 @@ void powermgmt_init(void)
     /* init history to 0 */
     memset(power_history, 0x00, sizeof(power_history));
     create_thread(power_thread, power_stack, sizeof(power_stack),
-                  power_thread_name IF_PRIO(, PRIORITY_SYSTEM));
+                  power_thread_name IF_PRIO(, PRIORITY_SYSTEM)
+		  IF_COP(, CPU, false));
 }
 
 #endif /* SIMULATOR */

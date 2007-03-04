@@ -909,19 +909,17 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     videostatus = STREAM_PLAYING;
 
     /* We put the video thread on the second processor for multi-core targets. */
-#if NUM_CORES > 1
-    if ((videothread_id = rb->create_thread_on_core(COP,decode_mpeg2,
-#else
     if ((videothread_id = rb->create_thread(decode_mpeg2,
-#endif
-        (uint8_t*)video_stack,VIDEO_STACKSIZE,"mpgvideo" IF_PRIO(,PRIORITY_PLAYBACK))) == NULL)
+        (uint8_t*)video_stack,VIDEO_STACKSIZE,"mpgvideo" IF_PRIO(,PRIORITY_PLAYBACK)
+	IF_COP(, COP, true))) == NULL)
     {
         rb->splash(HZ,true,"Cannot create video thread!");
         return PLUGIN_ERROR;
     }
 
     if ((audiothread_id = rb->create_thread(mad_decode,
-        (uint8_t*)audio_stack,AUDIO_STACKSIZE,"mpgaudio" IF_PRIO(,PRIORITY_PLAYBACK))) == NULL)
+        (uint8_t*)audio_stack,AUDIO_STACKSIZE,"mpgaudio" IF_PRIO(,PRIORITY_PLAYBACK)
+	IF_COP(, CPU, false))) == NULL)
     {
         rb->splash(HZ,true,"Cannot create audio thread!");
         rb->remove_thread(videothread_id);

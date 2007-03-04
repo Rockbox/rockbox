@@ -418,7 +418,8 @@ void pcm_rec_init(void)
     queue_enable_queue_send(&pcmrec_queue, &pcmrec_queue_send);
     pcmrec_thread_p =
         create_thread(pcmrec_thread, pcmrec_stack, sizeof(pcmrec_stack),
-                      pcmrec_thread_name IF_PRIO(, PRIORITY_RECORDING));
+                      pcmrec_thread_name IF_PRIO(, PRIORITY_RECORDING)
+		      IF_COP(, CPU, false));
 } /* pcm_rec_init */
 
 /** audio_* group **/

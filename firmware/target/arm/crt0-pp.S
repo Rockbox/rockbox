@@ -222,6 +222,19 @@ cop_init:
     strhi  r4, [r2], #4
     bhi    2b
 
+    /* Set up stack for IRQ mode */
+    msr    cpsr_c, #0xd2
+    ldr    sp, =cop_irq_stack
+    /* Set up stack for FIQ mode */
+    msr    cpsr_c, #0xd1
+    ldr    sp, =fiq_stack
+
+    /* Let abort and undefined modes use IRQ stack */
+    msr    cpsr_c, #0xd7
+    ldr    sp, =cop_irq_stack
+    msr    cpsr_c, #0xdb
+    ldr    sp, =cop_irq_stack
+
     ldr    sp, =cop_stackend
     
     /* Run cop_main() in apps/main.c */
@@ -306,6 +319,10 @@ UIE:
 /* 256 words of IRQ stack */
     .space 256*4
 irq_stack:
+
+/* 256 words of COP IRQ stack */
+    .space 256*4
+cop_irq_stack:
 
 /* 256 words of FIQ stack */
     .space 256*4

@@ -701,7 +701,8 @@ void dircache_init(void)
     
     queue_init(&dircache_queue, true);
     create_thread(dircache_thread, dircache_stack,
-                sizeof(dircache_stack), dircache_thread_name IF_PRIO(, PRIORITY_BACKGROUND));
+                sizeof(dircache_stack), dircache_thread_name IF_PRIO(, PRIORITY_BACKGROUND)
+		IF_COP(, CPU, false));
 }
 
 /**

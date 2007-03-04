@@ -431,7 +431,8 @@ Kernel
      SYS_USB_CONNECTED. Else do nothing and return 0.
      
   int create_thread(void* function, void* stack, int stack_size,
-                    const char *name);
+                    const char *name IF_PRIO(int priority)
+		    IF_COP(, unsigned int core, bool fallback));
  
      Create a thread.
      ??? (see firmware/thread.c:145)
