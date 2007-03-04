@@ -451,7 +451,7 @@ void pcm_rec_dma_start(void *addr, size_t size)
     p = addr;
     
     /* setup FIQ */
-    outl(inl(0x6000402c) | I2S_MASK, 0x6000402c);
+    CPU_INT_PRIORITY |= I2S_MASK;
     CPU_INT_EN = I2S_MASK;
 
     /* interrupt on full fifo */

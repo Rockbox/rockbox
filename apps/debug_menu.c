@@ -572,7 +572,11 @@ static bool dbg_hw_info(void)
     }
 #elif CONFIG_CPU == PP5020
     char buf[32];
-
+    char pp_version[] = { (PP_VER2 >> 24) & 0xff, (PP_VER2 >> 16) & 0xff,
+                          (PP_VER2 >> 8) & 0xff, (PP_VER2) & 0xff,
+                          (PP_VER1 >> 24) & 0xff, (PP_VER1 >> 16) & 0xff,
+                          (PP_VER1 >> 8) & 0xff, (PP_VER1) & 0xff, '\0' };
+                          
     lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
     lcd_clear_display();
@@ -582,10 +586,6 @@ static bool dbg_hw_info(void)
     snprintf(buf, sizeof(buf), "HW rev: 0x%08x", ipod_hw_rev);
     lcd_puts(0, 1, buf);
 
-    char pp_version[] = { (PP_VER2 >> 24) & 0xff, (PP_VER2 >> 16) & 0xff,
-                          (PP_VER2 >> 8) & 0xff, (PP_VER2) & 0xff,
-                          (PP_VER1 >> 24) & 0xff, (PP_VER1 >> 16) & 0xff,
-                          (PP_VER1 >> 8) & 0xff, (PP_VER1) & 0xff, '\0' };
     snprintf(buf, sizeof(buf), "PP version: %s", pp_version);
     lcd_puts(0, 2, buf);
     lcd_update();
