@@ -283,13 +283,13 @@
   desc: in the main menu
   user:
   <source>
-    *: "Playlist Options"
+    *: "Playlist"
   </source>
   <dest>
-    *: "Playlist Optionen"
+    *: "Playlist"
   </dest>
   <voice>
-    *: "Abspiellisten-Optionen"
+    *: "Abspiellisten"
   </voice>
 </phrase>
 <phrase>
@@ -297,13 +297,13 @@
   desc: in the main menu
   user:
   <source>
-    *: "Browse Plugins"
+    *: "Plugins"
   </source>
   <dest>
-    *: "Zeige Plugins"
+    *: "Plugins"
   </dest>
   <voice>
-    *: "Zeige Zusatzprogramme"
+    *: "Zusatzprogramme"
   </voice>
 </phrase>
 <phrase>
@@ -311,7 +311,7 @@
   desc: in the main menu
   user:
   <source>
-    *: "Info"
+    *: "System"
   </source>
   <dest>
     *: "Info"
@@ -784,16 +784,16 @@
 </phrase>
 <phrase>
   id: LANG_FIRMWARE
-  desc: in the main menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Browse Firmwares"
+    *: ""
   </source>
   <dest>
-    *: "Zeige Firmwares"
+    *: deprecated
   </dest>
   <voice>
-    *: "Zeige Firmwares"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -830,10 +830,17 @@
   user:
   <source>
     *: "PLAY = Yes"
+    h100,h120,h300: "NAVI = Yes"
+    ipod*: "SELECT = Yes"
+    x5: "SELECT = Yes"
+    h10: "NEXT = Yes"
   </source>
   <dest>
     *: "PLAY = Ja"
     h100,h120,h300: "NAVI = Ja"
+    ipod*: "SELECT = Ja"
+    x5: "SELECT = Ja"
+    h10: "NEXT = Ja"
   </dest>
   <voice>
     *: ""
@@ -970,13 +977,13 @@
   desc: in the recording sub menu
   user:
   <source>
-    *: "Recording Screen"
+    *: "Recording"
   </source>
   <dest>
-    *: "Aufnahmemodus"
+    *: "Aufnahme"
   </dest>
   <voice>
-    *: "Aufnahmemodus"
+    *: "Aufnahme"
   </voice>
 </phrase>
 <phrase>
@@ -1429,16 +1436,16 @@
 </phrase>
 <phrase>
   id: LANG_RESUME
-  desc: in settings_menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Resume on Startup"
+    *: ""
   </source>
   <dest>
-    *: "Beim Start fortsetzen"
+    *: deprecated
   </dest>
   <voice>
-    *: "Beim Start fortsetzen"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1656,13 +1663,13 @@
   desc: in settings menu
   user:
   <source>
-    *: "Tag Cache"
+    *: "Database"
   </source>
   <dest>
-    *: "Tag-Datenbank"
+    *: "Datenbank"
   </dest>
   <voice>
-    *: "Tag-Datenbank"
+    *: "Datenbank"
   </voice>
 </phrase>
 <phrase>
@@ -1726,7 +1733,7 @@
   desc: while initializing tagcache on boot
   user:
   <source>
-    *: "Committing tagcache"
+    *: "Committing database"
   </source>
   <dest>
     *: "Erstelle Tag-Datenbank..."
@@ -1922,13 +1929,13 @@
   desc: show ID3 Database
   user:
   <source>
-    *: "ID3 Database"
+    *: "Database"
   </source>
   <dest>
-    *: "ID3-Datenbank"
+    *: "Datenbank"
   </dest>
   <voice>
-    *: "ID3-Datenbank"
+    *: "Datenbank"
   </voice>
 </phrase>
 <phrase>
@@ -2609,9 +2616,11 @@
   user:
   <source>
     *: "Mic"
+    h100,h120,h300: "Internal Mic"
   </source>
   <dest>
     *: "Mikrofon"
+    h100,h120,h300: "Internes Mikrofon"
   </dest>
   <voice>
     *: "Mikrofon"
@@ -2731,16 +2740,16 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_STARTUP
-  desc: Start Rockbox in Recording Screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "Show Recording Screen on Startup"
+    *: ""
   </source>
   <dest>
-    *: "Im Aufnahmemodus starten"
+    *: deprecated
   </dest>
   <voice>
-    *: "Im Aufnahmemodus starten"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3823,16 +3832,16 @@
 </phrase>
 <phrase>
   id: LANG_POWEROFF
-  desc: disk poweroff flag
+  desc: DEPRECATED
   user:
   <source>
-    *: "Disk Poweroff"
+    *: ""
   </source>
   <dest>
-    *: "HD ausschalten"
+    *: deprecated
   </dest>
   <voice>
-    *: "Festplatte ausschalten"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3851,13 +3860,13 @@
 </phrase>
 <phrase>
   id: LANG_DIRCACHE_REBOOT
-  desc: when activating directory cache
+  desc: DEPRECATED
   user:
   <source>
-    *: "Please reboot to enable the cache"
+    *: ""
   </source>
   <dest>
-    *: "Neustarten, um den Puffer zu aktivieren"
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -4498,10 +4507,14 @@
   desc: battery level in % and estimated time remaining
   user:
   <source>
-    *: "%d%% %dh %dm"
+    *: "Battery: %d%% %dh %dm"
+    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
-    *: "%d%% %d Std %d Min"
+    *: "Batterie: %d%% %d Std %d Min"
+    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Batterieladung:"
@@ -4695,9 +4708,17 @@
   user:
   <source>
     *: "OFF = Exit"
+    h100,h120,h300: "STOP = Exit"
+    ipod*: "PLAY/PAUSE = Exit"
+    x5: "RECORD = Exit"
+    h10: "PREV = Exit"
   </source>
   <dest>
     *: "OFF = Beenden"
+    h100,h120,h300: "STOP = Beenden"
+    ipod*: "PLAY/PAUSE = Beenden"
+    x5: "RECORD = Beenden"
+    h10: "PREV = Beenden"
   </dest>
   <voice>
     *: ""
@@ -4751,10 +4772,17 @@
   user:
   <source>
     *: "PLAY = Select"
+    h100,h120,h300: "NAVI = Select"
+    ipod*: "SELECT = Select"
+    x5: "SELECT = Select"
+    h10: "NEXT = Select"
   </source>
   <dest>
     *: "PLAY = Auswählen"
     h100,h120,h300: "NAVI = Auswählen"
+    ipod*: "SELECT = Auswählen"
+    x5: "SELECT = Auswählen"
+    h10: "NEXT = Auswählen"
   </dest>
   <voice>
     *: ""
@@ -4766,10 +4794,17 @@
   user:
   <source>
     *: "ON+Play = Delete"
+    h100,h120,h300: "RECORD = Delete"
+    ipod*: "Long MENU = Delete"
+    x5: "Long RECORD = Delete"
+    h10: "REWIND = Delete"
   </source>
   <dest>
     *: "ON+Play = Löschen"
-    h100,h120,h300: "ON+NAVI = Löschen"
+    h100,h120,h300: "RECORD = Löschen"
+    ipod*: "Long MENU = Löschen"
+    x5: "Long RECORD = Löschen"
+    h10: "REWIND = Löschen"
   </dest>
   <voice>
     *: ""
@@ -4851,9 +4886,17 @@
   user:
   <source>
     *: "ON To Set"
+    h100,h120,h300: "NAVI = Set"
+    ipod*: "SELECT = Set"
+    x5: "SELECT = Set"
+    h10: "NEXT = Set"
   </source>
   <dest>
-    *: "ON = speichern"
+    *: "ON zum Speichern"
+    h100,h120,h300: "NAVI = Speichern"
+    ipod*: "SELECT = Speichern"
+    x5: "SELECT = Speichern"
+    h10: "NEXT = Speichern"
   </dest>
   <voice>
     *: ""
@@ -4865,9 +4908,17 @@
   user:
   <source>
     *: "OFF To Revert"
+    h100,h120,h300: "STOP = Revert"
+    ipod*: "MENU = Revert"
+    x5: "RECORD = Revert"
+    h10: "PREV = Revert"
   </source>
   <dest>
-    *: "OFF = abbrechen"
+    *: "OFF zum Abbrechen"
+    h100,h120,h300: "STOP = Abbrechen"
+    ipod*: "MENU = Abbrechen"
+    x5: "RECORD = Abbrechen"
+    h10: "PREV = Abbrechen"
   </dest>
   <voice>
     *: ""
@@ -5061,9 +5112,11 @@
   user:
   <source>
     *: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
   </source>
   <dest>
-    *: "Festplatte voll. Drücke OFF zum fortfahren."
+    *: "Kein Speicherplatz mehr vorhanden. Drücke OFF zum fortfahren."
+    h100,h120,h300: "Kein Speicherplatz mehr vorhanden. Drücke STOP zum fortfahren."
   </dest>
   <voice>
     *: ""
@@ -5285,9 +5338,11 @@
   user:
   <source>
     *: "PLAY=Set OFF=Cancel"
+    ipod*: "SELECT=Set MENU=Cancel"
   </source>
   <dest>
     *: "PLAY=OK OFF=Abbruch"
+    ipod*: "SELECT=OK MENU=Abbruch"
   </dest>
   <voice>
     *: ""
@@ -7833,9 +7888,17 @@
   user:
   <source>
     *: "OFF to abort"
+    h100,h120,h300: "STOP to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    x5: "Long PLAY to abort"
+    h10: "PREV to abort"
   </source>
   <dest>
     *: "OFF zum Abbrechen"
+    h100,h120,h300: "STOP zum Abbrechen"
+    ipod*: "PLAY/PAUSE zum Abbrechen"
+    x5: "Long PLAY zum Abbrechen"
+    h10: "PREV zum Abbrechen"
   </dest>
   <voice>
     *: ""
@@ -8364,7 +8427,7 @@
   desc: When you run the radio without an fmr file in settings
   user:
   <source>
-    *: "No Settings found, AutoScan?"
+    *: "No settings found. Autoscan?"
   </source>
   <dest>
     *: "Keine Sender gefunden, automatische Suche?"
@@ -8686,13 +8749,13 @@
   desc: show ID3 Database
   user:
   <source>
-    *: "ID3 Database"
+    *: "Database"
   </source>
   <dest>
-    *: "ID3-Datenbank"
+    *: "Datenbank"
   </dest>
   <voice>
-    *: "ID3-Datenbank"
+    *: "Datenbank"
   </voice>
 </phrase>
 <phrase>
@@ -8742,13 +8805,13 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Mic"
+    *: "Int. Mic"
   </source>
   <dest>
-    *: "Mikrofon"
+    *: "Int. Mikrofon"
   </dest>
   <voice>
-    *: "Mikrofon"
+    *: "Internes Mikrofon"
   </voice>
 </phrase>
 <phrase>
@@ -9009,9 +9072,11 @@
   user:
   <source>
     *: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
   </source>
   <dest>
-    *: "Festplatte voll. Drücke OFF zum fortfahren."
+    *: "Kein Speicherplatz mehr vorhanden. Drücke OFF zum fortfahren."
+    h100,h120,h300: "Kein Speicherplatz mehr vorhanden. Drücke STOP zum fortfahren."
   </dest>
   <voice>
     *: ""
@@ -9102,7 +9167,7 @@
 </phrase>
 <phrase>
   id: VOICE_KBIT_PER_SEC
-  desc: spoken only, for file extension
+  desc: spoken only, a unit postfix
   user:
   <source>
     *: ""
@@ -9173,7 +9238,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Import modifications"
+    *: "Import Modifications"
   </source>
   <dest>
     *: "Änderungen importieren"
@@ -9243,7 +9308,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Auto update"
+    *: "Auto Update"
   </source>
   <dest>
     *: "Auto-Aktualisierung"
@@ -9270,13 +9335,13 @@
   id: LANG_TAGCACHE_BUSY
   desc: when trying to shutdown and tagcache is committing
   <source>
-    *: "Tagcache is not ready"
+    *: "Database is not ready"
   </source>
   <dest>
-    *: "Tag-Cache ist nicht bereit"
+    *: "Datenbank ist nicht bereit"
   </dest>
   <voice>
-    *: "Tag-Cache ist nicht bereit"
+    *: "Datenbank ist nicht bereit"
   </voice>
 </phrase>
 <phrase>
@@ -9298,7 +9363,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Update now"
+    *: "Update Now"
   </source>
   <dest>
     *: "Jetzt aktualisieren"
@@ -9366,7 +9431,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Export modifications"
+    *: "Export Modifications"
   </source>
   <dest>
     *: "Änderungen exportieren"
@@ -9447,7 +9512,7 @@
   desc: in onplay menu
   user:
   <source>
-    *: "Playlist catalog"
+    *: "Playlist Catalog"
   </source>
   <dest>
     *: "Playlist-Katalog"
@@ -9501,7 +9566,7 @@
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "Add to new playlist"
+    *: "Add to New Playlist"
   </source>
   <dest>
     *: "Zu neuer Playlist hinzufügen"
@@ -9528,7 +9593,7 @@
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "Add to playlist"
+    *: "Add to Playlist"
   </source>
   <dest>
     *: "Zu Playlist hinzufügen"
@@ -9677,7 +9742,7 @@
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "View catalog"
+    *: "View Catalog"
   </source>
   <dest>
     *: "Katalog anzeigen"
@@ -9787,7 +9852,7 @@
   desc: error message when no playlists for playlist catalog
   user:
   <source>
-    *: "No playlists"
+    *: "No Playlists"
   </source>
   <dest>
     *: "Keine Playlists"
@@ -9928,5 +9993,653 @@
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_PCM_WAV
+  desc: audio format description
+  user:
+  <source>
+    *: "PCM Wave"
+  </source>
+  <dest>
+    *: "PCM Wave"
+  </dest>
+  <voice>
+    *: "PCM Wave"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PITCH_DOWN_SEMITONE
+  desc: in wps
+  user:
+  <source>
+    *: "Semitone Down"
+  </source>
+  <dest>
+    *: "Halbton nach unten"
+  </dest>
+  <voice>
+    *: "Halbton nach unten"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIR_BROWSER
+  desc: in root menu
+  user:
+  <source>
+    *: "Files"
+  </source>
+  <dest>
+    *: "Dateien"
+  </dest>
+  <voice>
+    *: "Dateien"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_WAVPACK
+  desc: audio format description
+  user:
+  <source>
+    *: "WavPack"
+  </source>
+  <dest>
+    *: "WavPack"
+  </dest>
+  <voice>
+    *: "WavPack"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOURCE_FREQUENCY
+  desc: when recording source frequency setting must follow source
+  user:
+  <source>
+    *: "(Same As Source)"
+  </source>
+  <dest>
+    *: "(wie Quelle)"
+  </dest>
+  <voice>
+    *: "wie Quelle"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PITCH_UP_SEMITONE
+  desc: in wps
+  user:
+  <source>
+    *: "Semitone Up"
+  </source>
+  <dest>
+    *: "Halbton nach oben"
+  </dest>
+  <voice>
+    *: "Halbton nach oben""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_EUROPE
+  desc: fm tuner region europe
+  <source>
+    *: "Europe"
+  </source>
+  <dest>
+    *: "Europa"
+  </dest>
+  <voice>
+    *: "Europa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENCODER_SETTINGS
+  desc: encoder settings
+  user:
+  <source>
+    *: "Encoder Settings"
+  </source>
+  <dest>
+    *: "Encoder-Einstellungen"
+  </dest>
+  <voice>
+    *: "Encoder-Einstellungen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOW_PLAYING
+  desc: in root menu
+  user:
+  <source>
+    *: "Now Playing"
+  </source>
+  <dest>
+    *: "Spielt gerade"
+  </dest>
+  <voice>
+    *: "Spielt gerade"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_FORMAT
+  desc: audio format item in recording menu
+  user:
+  <source>
+    *: "Format"
+  </source>
+  <dest>
+    *: "Format"
+  </dest>
+  <voice>
+    *: "Format"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_TRACKSKIP
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Shuffle and Track Skip"
+  </source>
+  <dest>
+    *: "Zufallswiedergabe und manuellem Titelwechsel"
+  </dest>
+  <voice>
+    *: "Zufallswiedergabe und manuellem Titelwechsel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_RW
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Duration to Rewind"
+  </source>
+  <dest>
+    *: "Rücklaufdauer"
+  </dest>
+  <voice>
+    *: "Rücklaufdauer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BITRATE
+  desc: bits-kilobits per unit time
+  user:
+  <source>
+    *: "Bitrate"
+  </source>
+  <dest>
+    *: "Bitrate"
+  </dest>
+  <voice>
+    *: "Bitrate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Top Time"
+  </source>
+  <dest>
+    *: "Längste Zeit"
+  </dest>
+  <voice>
+    *: "Längste Zeit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RANDOM
+  desc: random folder
+  <source>
+    *: "Random"
+  </source>
+  <dest>
+    *: "Zufällig"
+  </dest>
+  <voice>
+    *: "Zufällig"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_NEWFILESTP
+  desc: trigger types
+  <source>
+    *: "New file"
+  </source>
+  <dest>
+    *: "Neue Datei"
+  </dest>
+  <voice>
+    *: "Neue Datei"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_MENU
+  desc: in root menu
+  user:
+  <source>
+    *: "Settings"
+  </source>
+  <dest>
+    *: "Einstellungen"
+  </dest>
+  <voice>
+    *: "Einstellungen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Main Menu"
+  </source>
+  <dest>
+    *: "Hauptmenü"
+  </dest>
+  <voice>
+    *: "Hauptmenü"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_THEME
+  desc: save a theme file
+  user:
+  <source>
+    *: "Save Theme Settings"
+  </source>
+  <dest>
+    *: "Themen-Einstellungen speichern"
+  </dest>
+  <voice>
+    *: "Themen-Einstellungen speichern"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_AIFF
+  desc: audio format description
+  user:
+  <source>
+    *: "AIFF"
+  </source>
+  <dest>
+    *: "AIFF"
+  </dest>
+  <voice>
+    *: "AIFF"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_SETTINGS
+  desc: when something has settings in a certain context
+  user:
+  <source>
+    *: "(No Settings)"
+  </source>
+  <dest>
+    *: "(Keine Einstellungen)"
+  </dest>
+  <voice>
+    *: "Keine Einstellungen verfügbar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG
+  desc: in settings_menu.
+  user:
+  <source>
+    *: "Pause on Headphone Unplug"
+  </source>
+  <dest>
+    *: "Wiedergabe bei Ausstecken des Kopfhörers anhalten"
+  </dest>
+  <voice>
+    *: "Wiedergabe bei Ausstecken des Kopfhörers anhalten"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_PLAYBACK
+  desc: in root menu
+  user:
+  <source>
+    *: "Resume Playback"
+  </source>
+  <dest>
+    *: "Wiedergabe fortsetzen"
+  </dest>
+  <voice>
+    *: "Wiedergabe fortsetzen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLACE
+  desc: in onplay menu.  Replace the current playlist with a new one.
+  user:
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "Aktuelle ersetzen"
+  </dest>
+  <voice>
+    *: "Aktuelle ersetzen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_KOREA
+  desc: fm region korea
+  <source>
+    *: "Korea"
+  </source>
+  <dest>
+    *: "Korea"
+  </dest>
+  <voice>
+    *: "Korea"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUNNING_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Running Time"
+  </source>
+  <dest>
+    *: "Laufzeit"
+  </dest>
+  <voice>
+    *: "Laufzeit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_REGION
+  desc: fm tuner region setting
+  <source>
+    *: "Region"
+  </source>
+  <dest>
+    *: "Region"
+  </dest>
+  <voice>
+    *: "Region"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ROCKBOX_TITLE
+  desc: in root menu
+  user:
+  <source>
+    *: "Rockbox"
+  </source>
+  <dest>
+    *: "Rockbox"
+  </dest>
+  <voice>
+    *: "Rockbox"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_STOP
+  desc: trigger types
+  <source>
+    *: "Stop"
+  </source>
+  <dest>
+    *: "Anhalten"
+  </dest>
+  <voice>
+    *: "Anhalten"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLEASE_REBOOT
+  desc: when activating an option that requires a reboot
+  user:
+  <source>
+    *: "Please reboot to enable"
+  </source>
+  <dest>
+    *: "Option wird beim nächsten Neustart wirksam"
+  </dest>
+  <voice>
+    *: "Option wird beim nächsten Neustart wirksam"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVIOUS_SCREEN
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Previous Screen"
+  </source>
+  <dest>
+    *: "Voriger Bildschirm"
+  </dest>
+  <voice>
+    *: "Voriger Bildschirm"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUESHEET_ENABLE
+  desc: cuesheet support option
+  user:
+  <source>
+    *: "Cuesheet Support"
+  </source>
+  <dest>
+    *: "Cuesheet-Unterstützung"
+  </dest>
+  <voice>
+    *: "Cuesheet-Unterstützung"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_SCREEN
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Start Screen"
+  </source>
+  <dest>
+    *: "Startbildschirm"
+  </dest>
+  <voice>
+    *: "Startbildschirm"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_DISABLE_AUTORESUME
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Disable resume on startup if phones unplugged"
+  </source>
+  <dest>
+    *: "Wiedergabe beim Starten bei ausgesteckten Kopfhörern deaktivieren"
+  </dest>
+  <voice>
+    *: "Wiedergabe beim Starten bei ausgesteckten Kopfhörern deaktivieren"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_PAUSE
+  desc: trigger types
+  <source>
+    *: "Pause"
+  </source>
+  <dest>
+    *: "Pause"
+  </dest>
+  <voice>
+    *: "Pause"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUESHEET
+  desc:
+  user:
+  <source>
+    *: "Cuesheet"
+  </source>
+  <dest>
+    *: "Cuesheet"
+  </dest>
+  <voice>
+    *: "Cuesheet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_JAPAN
+  desc: fm region japan
+  <source>
+    *: "Japan"
+  </source>
+  <dest>
+    *: "Japan"
+  </dest>
+  <voice>
+    *: "Japan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DITHERING
+  desc: in the sound settings menu
+  user:
+  <source>
+    *: "Dithering"
+  </source>
+  <dest>
+    *: "Dithering"
+  </dest>
+  <voice>
+    *: "Dithering"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_RESUME
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Pause and Resume"
+  </source>
+  <dest>
+    *: "Pause und Fortsetzen"
+  </dest>
+  <voice>
+    *: "Pause und Fortsetzen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES
+  desc: browser file/dir properties
+  user:
+  <source>
+    *: "Properties"
+  </source>
+  <dest>
+    *: "Eigenschaften"
+  </dest>
+  <voice>
+    *: "Eigenschaften"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_MPA_L3
+  desc: audio format description
+  user:
+  <source>
+    *: "MPEG Layer 3"
+  </source>
+  <dest>
+    *: "MPEG Layer 3"
+  </dest>
+  <voice>
+    *: "MPEG Layer 3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Current Time"
+  </source>
+  <dest>
+    *: "Aktuelle Zeit"
+  </dest>
+  <voice>
+    *: "Aktuelle Zeit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Clear Time?"
+  </source>
+  <dest>
+    *: "Zeit löschen?"
+  </dest>
+  <voice>
+    *: "Zeit löschen?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUDIOSCROBBLER
+  desc: "Last.fm Log" in the playback menu
+  user:
+  <source>
+    *: "Last.fm Log"
+  </source>
+  <dest>
+    *: "Last.fm-Log"
+  </dest>
+  <voice>
+    *: "Last.fm-Log"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_TYPE
+  desc: in recording trigger menu
+  <source>
+    *: "Trigtype"
+  </source>
+  <dest>
+    *: "Triggerart"
+  </dest>
+  <voice>
+    *: "Triggerart"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_MENU
+  desc: fm menu title
+  user:
+  <source>
+    *: "FM Radio Menu"
+  </source>
+  <dest>
+    *: "UKW-Radio-Menü"
+  </dest>
+  <voice>
+    *: "UKW-Radio-Menü"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_US
+  desc: fm region us / canada
+  <source>
+    *: "US / Canada"
+  </source>
+  <dest>
+    *: "US/Kanada"
+  </dest>
+  <voice>
+    *: "US/Kanada"
   </voice>
 </phrase>
