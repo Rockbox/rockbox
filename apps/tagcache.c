@@ -92,7 +92,6 @@ static const char tagcache_thread_name[] = "tagcache";
 #endif
 
 #define UNTAGGED "<Untagged>"
-#define SIZEOF_UNTAGGED 11 /* Including \0 */
 
 /* Previous path when scanning directory tree recursively. */
 static char curpath[TAG_MAXLEN+32];
@@ -1525,7 +1524,7 @@ static int check_if_empty(char **tag)
     if (*tag == NULL || *tag[0] == '\0')
     {
         *tag = UNTAGGED;
-        return SIZEOF_UNTAGGED; /* Tag length */
+        return sizeof(UNTAGGED); /* Tag length */
     }
     
     length = strlen(*tag);
