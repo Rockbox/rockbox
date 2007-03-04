@@ -91,6 +91,8 @@ static long tagcache_stack[(DEFAULT_STACK_SIZE + 0x4000)/sizeof(long)];
 static const char tagcache_thread_name[] = "tagcache";
 #endif
 
+#define UNTAGGED "<Untagged>"
+
 /* Previous path when scanning directory tree recursively. */
 static char curpath[TAG_MAXLEN+32];
 static long curpath_size = sizeof(curpath);
@@ -1460,6 +1462,7 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
 {
     struct index_entry *entry;
     int idx_id;
+    char *tmp;
     
     if (!tc_stat.ready)
         return false;
@@ -1471,14 +1474,32 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
     
     entry = &hdr->indices[idx_id];
     
-    id3->title = get_tag(entry, tag_title)->tag_data;
-    id3->artist = get_tag(entry, tag_artist)->tag_data;
-    id3->album = get_tag(entry, tag_album)->tag_data;
-    id3->genre_string = get_tag(entry, tag_genre)->tag_data;
-    id3->composer = get_tag(entry, tag_composer)->tag_data;
-    id3->comment = get_tag(entry, tag_comment)->tag_data;
-    id3->albumartist = get_tag(entry, tag_albumartist)->tag_data;
-    id3->year = get_tag_numeric(entry, tag_year);
+    tmp = get_tag(entry, tag_title)->tag_data;
+    id3->title        = strcmp(tmp, UNTAGGED) ? tmp : NULL;
+
+    tmp = get_tag(entry, tag_artist)->tag_data;
+    id3->artist       = strcmp(tmp, UNTAGGED) ? tmp : NULL;
+
+    tmp = get_tag(entry, tag_album)->tag_data;
+    id3->album        = strcmp(tmp, UNTAGGED) ? tmp : NULL;
+
+    tmp = get_tag(entry, tag_genre)->tag_data;
+    id3->genre_string = strcmp(tmp, UNTAGGED) ? tmp : NULL;
+
+    tmp = get_tag(entry, tag_composer)->tag_data;
+    id3->composer     = strcmp(tmp, UNTAGGED) ? tmp : NULL;
+
+    tmp = get_tag(entry, tag_comment)->tag_data;
+    id3->comment      = strcmp(tmp, UNTAGGED) ? tmp : NULL;
+
+    tmp = get_tag(entry, tag_albumartist)->tag_data;
+    id3->albumartist  = strcmp(tmp, UNTAGGED) ? tmp : NULL;
+
+    id3->playcount  = get_tag_numeric(entry, tag_playcount);
+    id3->lastplayed = get_tag_numeric(entry, tag_lastplayed);
+    id3->rating     = get_tag_numeric(entry, tag_virt_autoscore) / 10;
+    id3->year       = get_tag_numeric(entry, tag_year);
+
     id3->tracknum = get_tag_numeric(entry, tag_tracknumber);
     id3->bitrate = get_tag_numeric(entry, tag_bitrate);
     if (id3->bitrate == 0)
@@ -1502,7 +1523,7 @@ static int check_if_empty(char **tag)
     
     if (*tag == NULL || *tag[0] == '\0')
     {
-        *tag = "<Untagged>";
+        *tag = UNTAGGED;
         return 11; /* Tag length */
     }
     
