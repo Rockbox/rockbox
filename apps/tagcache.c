@@ -1524,7 +1524,7 @@ static int check_if_empty(char **tag)
     if (*tag == NULL || *tag[0] == '\0')
     {
         *tag = UNTAGGED;
-        return 11; /* Tag length */
+        return sizeof(UNTAGGED); /* Tag length */
     }
     
     length = strlen(*tag);
