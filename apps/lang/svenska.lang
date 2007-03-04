@@ -216,7 +216,7 @@
     *: "General Settings"
   </source>
   <dest>
-    *: "Inställningar"
+    *: "Generella"
   </dest>
   <voice>
     *: "General Settings"
@@ -283,13 +283,13 @@
   desc: in the main menu
   user:
   <source>
-    *: "Playlist Options"
+    *: "Playlist"
   </source>
   <dest>
     *: "Spellista"
   </dest>
   <voice>
-    *: "Playlist Options"
+    *: "Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -297,13 +297,13 @@
   desc: in the main menu
   user:
   <source>
-    *: "Browse Plugins"
+    *: "Plugins"
   </source>
   <dest>
     *: "Insticksmoduler"
   </dest>
   <voice>
-    *: "Browse Plugins"
+    *: "Plugins"
   </voice>
 </phrase>
 <phrase>
@@ -311,13 +311,13 @@
   desc: in the main menu
   user:
   <source>
-    *: "Info"
+    *: "System"
   </source>
   <dest>
-    *: "Information"
+    *: "System"
   </dest>
   <voice>
-    *: "Info"
+    *: "System"
   </voice>
 </phrase>
 <phrase>
@@ -790,7 +790,7 @@
     *: ""
   </source>
   <dest>
-    *: ""
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -838,9 +838,10 @@
   <dest>
     *: "SPELA = Ja"
     h100,h120,h300: "VÄLJ = Ja"
-    ipod*: "VÄLJ = Yes"
-    x5: "VÄLJ = Yes"
-    h10: "NÄSTA = Yes"
+    ipod*: "VÄLJ = Ja"
+    x5: "VÄLJ = Ja"
+    h10: "NÄSTA = Ja"
+    gigabeat: "VÄLJ = Ja"
   </dest>
   <voice>
     *: ""
@@ -977,13 +978,13 @@
   desc: in the recording sub menu
   user:
   <source>
-    *: "Recording Screen"
+    *: "Recording"
   </source>
   <dest>
-    *: "Inspelningsskärm"
+    *: "Inspelning"
   </dest>
   <voice>
-    *: "Recording Screen"
+    *: "Recording"
   </voice>
 </phrase>
 <phrase>
@@ -994,7 +995,7 @@
     *: "Recording Settings"
   </source>
   <dest>
-    *: "Inspelningsinställningar"
+    *: "Inspelning"
   </dest>
   <voice>
     *: "Recording Settings"
@@ -1436,16 +1437,16 @@
 </phrase>
 <phrase>
   id: LANG_RESUME
-  desc: in settings_menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Resume on Startup"
+    *: ""
   </source>
   <dest>
-    *: "Återuppta vid start"
+    *: deprecated
   </dest>
   <voice>
-    *: "Resume on Startup"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2741,16 +2742,16 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_STARTUP
-  desc: Start Rockbox in Recording Screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "Show Recording Screen on Startup"
+    *: ""
   </source>
   <dest>
-    *: "Visa inspelningsskärm vid start"
+    *: deprecated
   </dest>
   <voice>
-    *: "Show Recording Screen on Startup"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3825,7 +3826,7 @@
     *: ""
   </source>
   <dest>
-    *: ""
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -4494,10 +4495,14 @@
   desc: battery level in % and estimated time remaining
   user:
   <source>
-    *: "%d%% %dh %dm"
+    *: "Battery: %d%% %dh %dm"
+    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
-    *: "%d%% %dh %dm"
+    *: "Batteri: %d%% %dh %dm"
+    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Battery level"
@@ -4695,6 +4700,7 @@
     ipod*: "PLAY/PAUSE = Exit"
     x5: "RECORD = Exit"
     h10: "PREV = Exit"
+    gigabeat: "A = Exit"
   </source>
   <dest>
     *: "AV = Avsluta"
@@ -4702,6 +4708,7 @@
     ipod*: "SPELA/PAUSA = Avsluta"
     x5: "SPELA IN = Avsluta"
     h10: "FÖREGÅENDE = Avsluta"
+    gigabeat: "A = Avsluta"
   </dest>
   <voice>
     *: ""
@@ -4759,6 +4766,7 @@
     ipod*: "SELECT = Select"
     x5: "SELECT = Select"
     h10: "NEXT = Select"
+    gigabeat: "SELECT = Select"
   </source>
   <dest>
     *: "SPELA = Välj"
@@ -4766,6 +4774,7 @@
     ipod*: "VÄLJ = Välj"
     x5: "VÄLJ = Välj"
     h10: "NÄSTA = Välj"
+    gigabeat: "VÄLJ = Välj"
   </dest>
   <voice>
     *: ""
@@ -4781,6 +4790,7 @@
     ipod*: "Long MENU = Delete"
     x5: "Long RECORD = Delete"
     h10: "REWIND = Delete"
+    gigabeat: "POWER = Delete"
   </source>
   <dest>
     *: "PÅ+SPELA = Ta bort"
@@ -4788,6 +4798,7 @@
     ipod*: "Lång MENY = Ta bort"
     x5: "Lång SPELA IN = Ta bort"
     h10: "SPOLA BAK = Ta bort"
+    gigabeat: "PÅ = Ta bort"
   </dest>
   <voice>
     *: ""
@@ -4873,13 +4884,15 @@
     ipod*: "SELECT = Set"
     x5: "SELECT = Set"
     h10: "NEXT = Set"
+    gigabeat: "SELECT = Set"
   </source>
   <dest>
-    *: "PÅ = Ställ klocka"
-    h100,h120,h300: "VÄLJ = Ställ klocka"
-    ipod*: "VÄLJ = Ställ klocka"
-    x5: "VÄLJ = Ställ klocka"
-    h10: "NÄSTA = Ställ klocka"
+    *: "PÅ = Ställ"
+    h100,h120,h300: "VÄLJ = Ställ"
+    ipod*: "VÄLJ = Ställ"
+    x5: "VÄLJ = Ställ"
+    h10: "NÄSTA = Ställ"
+    gigabeat: "VÄLJ = Ställ"
   </dest>
   <voice>
     *: ""
@@ -4895,6 +4908,7 @@
     ipod*: "MENU = Revert"
     x5: "RECORD = Revert"
     h10: "PREV = Revert"
+    gigabeat: "POWER = Revert"
   </source>
   <dest>
     *: "AV = Avbryt"
@@ -4902,6 +4916,7 @@
     ipod*: "MENY = Avbryt"
     x5: "SPELA IN = Avbryt"
     h10: "FÖREGÅENDE = Avbryt"
+    gigabeat: "PÅ = Avbryt"
   </dest>
   <voice>
     *: ""
@@ -5321,9 +5336,11 @@
   user:
   <source>
     *: "PLAY=Set OFF=Cancel"
+    ipod*: "SELECT=Set MENU=Cancel"
   </source>
   <dest>
     *: "SPELA=Sätt AV=Avbryt"
+    ipod*: "VÄLJ=Sätt MENY=Avbryt"
   </dest>
   <voice>
     *: ""
@@ -10482,5 +10499,159 @@
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUESHEET
+  desc:
+  user:
+  <source>
+    *: "Cuesheet"
+  </source>
+  <dest>
+    *: "Cuesheet"
+  </dest>
+  <voice>
+    *: "Cuesheet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUESHEET_ENABLE
+  desc: cuesheet support option
+  user:
+  <source>
+    *: "Cuesheet Support"
+  </source>
+  <dest>
+    *: "Cuesheet-stöd"
+  </dest>
+  <voice>
+    *: "Cuesheet Support"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_MENU
+  desc: fm menu title
+  user:
+  <source>
+    *: "FM Radio Menu"
+  </source>
+  <dest>
+    *: "FM-radiomeny"
+  </dest>
+  <voice>
+    *: "FM Radio Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIR_BROWSER
+  desc: in root menu
+  user:
+  <source>
+    *: "Files"
+  </source>
+  <dest>
+    *: "Filer"
+  </dest>
+  <voice>
+    *: "Files"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_MENU
+  desc: in root menu
+  user:
+  <source>
+    *: "Settings"
+  </source>
+  <dest>
+    *: "Inställningar"
+  </dest>
+  <voice>
+    *: "Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOW_PLAYING
+  desc: in root menu
+  user:
+  <source>
+    *: "Now Playing"
+  </source>
+  <dest>
+    *: "Spelas nu"
+  </dest>
+  <voice>
+    *: "Now Playing"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_PLAYBACK
+  desc: in root menu
+  user:
+  <source>
+    *: "Resume Playback"
+  </source>
+  <dest>
+    *: "Återuppta uppspelning"
+  </dest>
+  <voice>
+    *: "Resume Playback"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_SCREEN
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Start Screen"
+  </source>
+  <dest>
+    *: "Startskärm"
+  </dest>
+  <voice>
+    *: "Start Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ROCKBOX_TITLE
+  desc: in root menu
+  user:
+  <source>
+    *: "Rockbox"
+  </source>
+  <dest>
+    *: "Rockbox"
+  </dest>
+  <voice>
+    *: "Rockbox"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Main Menu"
+  </source>
+  <dest>
+    *: "Huvudmeny"
+  </dest>
+  <voice>
+    *: "Main Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVIOUS_SCREEN
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Previous Screen"
+  </source>
+  <dest>
+    *: "Föregående skärm"
+  </dest>
+  <voice>
+    *: "Previous Screen"
   </voice>
 </phrase>
