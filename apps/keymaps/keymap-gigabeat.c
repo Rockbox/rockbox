@@ -252,14 +252,14 @@ static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_SELECT,       BUTTON_SELECT,                           BUTTON_NONE },
     { ACTION_KBD_PAGE_FLIP,    BUTTON_POWER|BUTTON_MENU,                BUTTON_NONE },
     { ACTION_KBD_DONE,         BUTTON_POWER|BUTTON_REL,                 BUTTON_POWER },
-    { ACTION_KBD_ABORT,        BUTTON_A,                                BUTTON_NONE },
-    { ACTION_KBD_BACKSPACE,    BUTTON_MENU|BUTTON_REL,                  BUTTON_MENU },
+    { ACTION_KBD_ABORT,        BUTTON_A|BUTTON_REL,                     BUTTON_A },
+    { ACTION_KBD_BACKSPACE,    BUTTON_MENU,                             BUTTON_NONE },
     { ACTION_KBD_BACKSPACE,    BUTTON_MENU|BUTTON_REPEAT,               BUTTON_NONE },
     { ACTION_KBD_UP,           BUTTON_UP,                               BUTTON_NONE },
     { ACTION_KBD_UP,           BUTTON_UP|BUTTON_REPEAT,                 BUTTON_NONE },
     { ACTION_KBD_DOWN,         BUTTON_DOWN,                             BUTTON_NONE },
     { ACTION_KBD_DOWN,         BUTTON_DOWN|BUTTON_REPEAT,               BUTTON_NONE },
-    { ACTION_KBD_MORSE_INPUT,  BUTTON_MENU|BUTTON_SELECT,               BUTTON_NONE },
+    { ACTION_KBD_MORSE_INPUT,  BUTTON_POWER|BUTTON_A,                   BUTTON_NONE },
     { ACTION_KBD_MORSE_SELECT, BUTTON_SELECT|BUTTON_REL,                BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
