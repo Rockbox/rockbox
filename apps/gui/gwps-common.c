@@ -922,11 +922,12 @@ static char* get_tag(struct wps_data* wps_data,
             switch(tag[1])
             {
                 case 'p':  /* Playcount */
-                    *flags |= WPS_REFRESH_STATIC;
+                    *flags |= WPS_REFRESH_DYNAMIC;
+                    *intval = cid3->playcount+1;
                     snprintf(buf, buf_size, "%ld", cid3->playcount);
                     return buf;
                 case 'r':  /* Rating */
-                    *flags |= WPS_REFRESH_STATIC;
+                    *flags |= WPS_REFRESH_DYNAMIC;
                     *intval = cid3->rating+1;
                     snprintf(buf, buf_size, "%d", cid3->rating);
                     return buf;
