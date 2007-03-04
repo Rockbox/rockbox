@@ -7893,10 +7893,10 @@
   desc: in settings_menu.
   user:
   <source>
-    *: "Gather Runtime Data (experimental)"
+    *: "Gather Runtime Data"
   </source>
   <dest>
-    *: "Recollir Runtime Data (experimental)"
+    *: "Recollir Runtime Data"
   </dest>
   <voice>
     *: "Gather Runtime Data"

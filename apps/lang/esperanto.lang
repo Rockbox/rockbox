@@ -1754,10 +1754,10 @@
   desc: in settings_menu.
   user:
   <source>
-    *: "Gather Runtime Data (experimental)"
+    *: "Gather Runtime Data"
   </source>
   <dest>
-    *: "Kolekti Rultempan Datumon (Eksperimenta)"
+    *: "Kolekti Rultempan Datumon"
   </dest>
   <voice>
     *: "Kolekti Rultempan Datumon"

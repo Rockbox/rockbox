@@ -1627,7 +1627,7 @@
   desc: in settings_menu.
   user:
   <source>
-    *: "Gather runtime data (experimental)"
+    *: "Gather Runtime Data"
   </source>
   <dest>
     *: "ランタイム情報の収集"

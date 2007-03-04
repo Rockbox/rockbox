@@ -1628,7 +1628,7 @@
   desc: in settings_menu.
   user:
   <source>
-    *: "Gather runtime data (experimental)"
+    *: "Gather Runtime Data"
   </source>
   <dest>
     *: "Recolher Dados de Operação"

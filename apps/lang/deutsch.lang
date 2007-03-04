@@ -1740,10 +1740,10 @@
   desc: in settings_menu.
   user:
   <source>
-    *: "Gather Runtime Data (experimental)"
+    *: "Gather Runtime Data"
   </source>
   <dest>
-    *: "Spielzeitdaten sammeln (experimentell)"
+    *: "Spielzeitdaten sammeln"
   </dest>
   <voice>
     *: "Spielzeitdaten sammeln"

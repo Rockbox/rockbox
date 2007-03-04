@@ -1734,10 +1734,10 @@
   desc: in settings_menu.
   user:
   <source>
-    *: "Gather Runtime Data (experimental)"
+    *: "Gather Runtime Data"
   </source>
   <dest>
-    *: "Hent køyretidsdata (eksperimentelt)"
+    *: "Hent køyretidsdata"
   </dest>
   <voice>
     *: "Hent køyretidsdata"

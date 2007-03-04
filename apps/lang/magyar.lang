@@ -1636,10 +1636,10 @@
   desc: in settings_menu.
   user:
   <source>
-    *: "Gather Runtime Data (experimental)"
+    *: "Gather Runtime Data"
   </source>
   <dest>
-    *: "Futási idő adatok gyűjtése (kísérleti)"
+    *: "Futási idő adatok gyűjtése"
   </dest>
   <voice>
     *: "Gather runtime data"

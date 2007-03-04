@@ -1747,13 +1747,13 @@
   desc: in settings_menu.
   user:
   <source>
-    *: "Gather Runtime Data (experimental)"
+    *: "Gather Runtime Data"
   </source>
   <dest>
-    *: "Zbieraj dane podczas działania (ekperymentalne)"
+    *: "Zbieraj dane podczas działania"
   </dest>
   <voice>
-    *: "Ekperymentalne zbieranie danych podczas działania"
+    *: "Zbieranie danych podczas działania"
   </voice>
 </phrase>
 <phrase>

@@ -1765,10 +1765,10 @@
   desc: in settings_menu.
   user:
   <source>
-    *: "Gather Runtime Data (experimental)"
+    *: "Gather Runtime Data"
   </source>
   <dest>
-    *: "런타임 데이터 수집 (실험용)"
+    *: "런타임 데이터 수집"
   </dest>
   <voice>
     *: "런타임 데이터 수집"

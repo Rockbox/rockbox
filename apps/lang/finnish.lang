@@ -1725,10 +1725,10 @@
   desc: in settings_menu.
   user:
   <source>
-    *: "Gather Runtime Data (experimental)"
+    *: "Gather Runtime Data"
   </source>
   <dest>
-    *: "Kerää soittotilastoja (koekäytössä)"
+    *: "Kerää soittotilastoja"
   </dest>
   <voice>
     *: "Ker�� soittotilastoja"

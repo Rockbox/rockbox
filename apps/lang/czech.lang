@@ -1772,13 +1772,13 @@
   desc: in settings_menu.
   user:
   <source>
-    *: "Gather Runtime Data (experimental)"
+    *: "Gather Runtime Data"
   </source>
   <dest>
-    *: "Sbírat provozní informace (experimentální)"
+    *: "Sbírat provozní informace"
   </dest>
   <voice>
-    *: "Sbírat provozní informace, experimentální funkce"
+    *: "Sbírat provozní informace"
   </voice>
 </phrase>
 <phrase>

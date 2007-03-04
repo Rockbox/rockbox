@@ -1628,10 +1628,10 @@
   desc: in settings_menu.
   user:
   <source>
-    *: "Gather runtime data (experimental)"
+    *: "Gather Runtime Data"
   </source>
   <dest>
-    *: "Сбор данных о времени работы (эксперемент.)"
+    *: "Сбор данных о времени работы"
   </dest>
   <voice>
     *: "Gather runtime data"

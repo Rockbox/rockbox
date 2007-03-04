@@ -1747,10 +1747,10 @@
   desc: in settings_menu.
   user:
   <source>
-    *: "Gather Runtime Data (experimental)"
+    *: "Gather Runtime Data"
   </source>
   <dest>
-    *: "收集運行時資料(實驗性的)"
+    *: "收集運行時資料"
   </dest>
   <voice>
     *: "Gather Runtime Data"
