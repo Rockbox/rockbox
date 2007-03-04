@@ -374,7 +374,6 @@ const struct settings_list settings[] = {
     SOUND_SETTING(0,stereo_width, LANG_STEREO_WIDTH,
             "stereo_width", SOUND_STEREO_WIDTH),
     /* playback */
-    OFFON_SETTING(0, resume, LANG_RESUME, false, "resume", NULL),
     OFFON_SETTING(0, playlist_shuffle, LANG_SHUFFLE, false, "shuffle", NULL),
     SYSTEM_SETTING(NVRAM(4),resume_index,-1),
     SYSTEM_SETTING(NVRAM(4),resume_first_index,0),
@@ -716,8 +715,6 @@ const struct settings_list settings[] = {
 
 #ifdef HAVE_RECORDING
     /* recording */
-    OFFON_SETTING(0,rec_startup,LANG_RECORD_STARTUP,false,
-        "rec screen on startup",NULL),
     {F_T_INT,&global_settings.rec_timesplit, LANG_SPLIT_TIME, INT(0),"rec timesplit",
         "off,00:05,00:10,00:15,00:30,01:00,01:14,01:20,02:00,"
         "04:00,06:00,08:00,10:00,12:00,18:00,24:00",UNUSED},

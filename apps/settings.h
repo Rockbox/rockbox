@@ -342,7 +342,6 @@ struct user_settings
 
     int rec_prerecord_time; /* In seconds, 0-30, 0 means OFF */
     int rec_directory; /* 0=base dir, 1=current dir */
-    bool rec_startup; /* true means start Rockbox in recording screen */
     int cliplight; /* 0 = off
                       1 = main lcd
                       2 = main and remote lcd
@@ -400,10 +399,6 @@ struct user_settings
 #ifdef HAVE_SPDIF_POWER
     bool spdif_enable; /* S/PDIF power on/off */
 #endif
-
-    /* resume settings */
-
-    bool resume;        /* resume option: 0=off, 1=on */
 
 #if CONFIG_TUNER
     unsigned char fmr_file[MAX_FILENAME+1]; /* last fmr preset */

@@ -1467,16 +1467,16 @@
 </phrase>
 <phrase>
   id: LANG_RESUME
-  desc: in settings_menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Resume on Startup"
+    *: ""
   </source>
   <dest>
-    *: "Resume on Startup"
+    *: deprecated
   </dest>
   <voice>
-    *: "Resume on Startup"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2772,16 +2772,16 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_STARTUP
-  desc: Start Rockbox in Recording Screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "Show Recording Screen on Startup"
+    *: ""
   </source>
   <dest>
-    *: "Show Recording Screen on Startup"
+    *: deprecated
   </dest>
   <voice>
-    *: "Show Recording Screen on Startup"
+    *: ""
   </voice>
 </phrase>
 <phrase>
