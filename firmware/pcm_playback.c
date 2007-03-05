@@ -236,9 +236,8 @@ size_t pcm_get_bytes_waiting(void)
 #endif /* CONFIG_CPU == */
 
 /* dummy functions for those not actually supporting all this yet */
-void pcm_apply_settings(bool reset)
+void pcm_apply_settings(void)
 {
-    (void)reset;
 }
 /** **/
 
