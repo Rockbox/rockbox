@@ -100,8 +100,6 @@ void sim_backlight(int value)
     sdl_gui_update(lcd_surface, 0, 0, LCD_WIDTH, LCD_HEIGHT, LCD_WIDTH,
                    LCD_HEIGHT, background ? UI_LCD_POSX : 0, background? UI_LCD_POSY : 0);
 
-#else
-    DEBUGF("backlight: %s\n", (value > 0) ? "on" : "off");
 #endif
 }
 #endif
