@@ -219,14 +219,16 @@ static long parse_tag(const char* name, char* value, struct mp3entry* id3,
     else if (((strcasecmp(name, "year") == 0) && (type == TAGTYPE_APE))
         || ((strcasecmp(name, "date") == 0) && (type == TAGTYPE_VORBIS)))
     {
-        /* Date can be in more any format in a Vorbis tag, so don't try to 
-         * parse it. 
+        /* Date's can be in any format in Vorbis. However most of them 
+         * are in ISO8601 format so if we try and parse the first part
+         * of the tag as a number, we should get the year. If we get crap,
+         * then act like we never parsed it.
          */
-        if (type != TAGTYPE_VORBIS)
-        {
-            id3->year = atoi(value);
+        id3->year = atoi(value);
+        if (id3->year < 1900)
+        { /* yeah, not likely */
+            id3->year = 0;
         }
-        
         p = &(id3->year_string);
     }
     else if (strcasecmp(name, "title") == 0)
