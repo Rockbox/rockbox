@@ -60,6 +60,8 @@ int button_read_device(void)
     int  btn = BUTTON_NONE;
     bool hold_button_old;
     bool remote_hold_button_old;
+    static int prev_data = 0xff;
+    static int last_valid = 0xff;
     int  data;
 
     /* normal buttons */
@@ -76,6 +78,13 @@ int button_read_device(void)
     {
         data = adc_scan(ADC_BUTTONS);
 
+        /* ADC debouncing: Only accept new reading if it's
+         * stable (+/-1). Use latest stable value otherwise. */
+        if ((unsigned)(data - prev_data + 1) <= 2)
+            last_valid = data;
+        prev_data = data;
+        data = last_valid;
+        
         if (data < 0xf0)
         {
             if(data < 0x7c)
