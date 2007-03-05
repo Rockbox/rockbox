@@ -107,13 +107,11 @@ void button_event(int key, bool pressed)
         {
             usb_connected = !usb_connected;
             if (usb_connected)
-                btn = SYS_USB_CONNECTED;
+                queue_post(&button_queue, SYS_USB_CONNECTED, 0);
             else
-                btn = SYS_USB_DISCONNECTED;
-            queue_post(&button_queue, btn, 0);
-            return;
+                queue_post(&button_queue, SYS_USB_DISCONNECTED, 0);
         }
-        break;
+        return;
 
 #ifdef HAS_BUTTON_HOLD
     case SDLK_h:
@@ -122,7 +120,7 @@ void button_event(int key, bool pressed)
             hold_button_state = !hold_button_state;
             DEBUGF("Hold button is %s\n", hold_button_state?"ON":"OFF");
         }
-        break;
+        return;
 #endif
         
 #ifdef HAS_REMOTE_BUTTON_HOLD
@@ -133,7 +131,7 @@ void button_event(int key, bool pressed)
             DEBUGF("Remote hold button is %s\n",
                    remote_hold_button_state?"ON":"OFF");
         }
-        break;
+        return;
 #endif
         
 #if CONFIG_KEYPAD == GIGABEAT_PAD
