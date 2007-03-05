@@ -82,10 +82,6 @@
 #include "pcf50606.h"   /* for pcf50606_read */
 #endif
 
-#ifdef IAUDIO_X5
-#include "lcd-remote-target.h"
-#endif
-
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
 /*---------------------------------------------------*/
@@ -1070,7 +1066,7 @@ bool dbg_ports(void)
         adc_remote  = adc_read(ADC_REMOTE);
         battery_read_info(&adc_battery, &adc_battery_voltage,
                           &adc_battery_level);
-#if defined(IAUDIO_X5) || defined(IRIVER_H300_SERIES)
+#if defined(IAUDIO_X5) ||  defined(IAUDIO_M5) || defined(IRIVER_H300_SERIES)
         snprintf(buf, sizeof(buf), "ADC_BUTTONS (%c): %02x",
             button_scan_enabled() ? '+' : '-', adc_buttons);
 #else

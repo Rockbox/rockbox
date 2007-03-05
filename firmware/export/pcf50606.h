@@ -40,7 +40,7 @@ void pcf50606_i2c_outb(unsigned char byte);
 unsigned char pcf50606_i2c_inb(bool ack);
 #endif
 
-#if defined(IAUDIO_X5) && !defined(SIMULATOR)
+#if (defined(IAUDIO_X5) || defined(IAUDIO_M5)) && !defined (SIMULATOR)
 void pcf50606_reset_timeout(void);
 #endif
 
