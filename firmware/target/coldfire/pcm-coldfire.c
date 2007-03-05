@@ -41,22 +41,22 @@ enum
 };
 static int peaks[4]; /* p-l, p-r, r-l, r-r */
 
-#define IIS_DEFPARM(output)     ( (freq_ent[FPARM_CLOCKSEL] << 12) | \
-                                  (output) | \
-                                  (4 << 2) )  /* 64 bit clocks / word clock */
-#define IIS_RESET       0x800
+#define IIS_PLAY_DEFPARM    ( (freq_ent[FPARM_CLOCKSEL] << 12) | \
+                              (IIS_PLAY & (7 << 8)) | \
+                              (4 << 2) )  /* 64 bit clocks / word clock */
+#define IIS_FIFO_RESET      (1 << 11)
+#define PDIR2_FIFO_RESET    (1 << 9)
 
 #if defined(IAUDIO_X5) || defined(IAUDIO_M5)
-#define SET_IIS_CONFIG(x) IIS1CONFIG = (x);
-#define IIS_CONFIG        IIS1CONFIG
+#define SET_IIS_PLAY(x) IIS1CONFIG = (x)
+#define IIS_PLAY        IIS1CONFIG
+#else
+#define SET_IIS_PLAY(x) IIS2CONFIG = (x)
+#define IIS_PLAY        IIS2CONFIG
+#endif
+
 #define PLLCR_SET_AUDIO_BITS_DEFPARM \
             ((freq_ent[FPARM_CLSEL] << 28) | (1 << 22))
-#else
-#define SET_IIS_CONFIG(x) IIS2CONFIG = (x);
-#define IIS_CONFIG        IIS2CONFIG
-#define PLLCR_SET_AUDIO_BITS_DEFPARM \
-            ((freq_ent[FPARM_CLSEL] << 28) | (3 << 22))
-#endif
 
 /** Sample rates **/
 #define FPARM_CLOCKSEL       0
@@ -113,29 +113,31 @@ void pcm_set_frequency(unsigned int frequency)
 } /* pcm_set_frequency */
 
 /* apply audio settings */
-void pcm_apply_settings(bool reset)
+void _pcm_apply_settings(bool clear_reset)
 {
-    static int last_pcm_freq = HW_SAMPR_DEFAULT;
-    unsigned long output = IIS_CONFIG & (7 << 8);
-
-    /* Playback must prevent pops and record monitoring won't work at all if
-       adding IIS_RESET when setting IIS_CONFIG. Use a different method for
-       each. */
-    if (reset && output != (3 << 8))
-    {
-        /* Not playback - reset first */
-        SET_IIS_CONFIG(IIS_RESET);
-        reset = false;
-    }
-
+    static int last_pcm_freq = 0;
+ 
     if (pcm_freq != last_pcm_freq)
     {
         last_pcm_freq = pcm_freq;
+        /* Reprogramming bits 15-12 requires FIFO to be in a reset
+           condition - Users Manual 17-8, Note 11 */
+        or_l(IIS_FIFO_RESET, &IIS_PLAY);
         audiohw_set_frequency(freq_ent[FPARM_FSEL]);
         coldfire_set_pllcr_audio_bits(PLLCR_SET_AUDIO_BITS_DEFPARM);
     }
 
-    SET_IIS_CONFIG(IIS_DEFPARM(output) | (reset ? IIS_RESET : 0));
+    SET_IIS_PLAY(IIS_PLAY_DEFPARM |
+        (clear_reset ? 0 : (IIS_PLAY & IIS_FIFO_RESET)));
+#if 0
+    logf("IISPLAY: %08X", IIS_PLAY);
+#endif
+} /* _pcm_apply_settings */
+
+/* This clears the reset bit to enable monitoring immediately */
+void pcm_apply_settings(void)
+{
+    _pcm_apply_settings(true);
 } /* pcm_apply_settings */
 
 /** DMA **/
@@ -157,27 +159,31 @@ void pcm_play_dma_start(const void *addr, size_t size)
     /* Set up DMA transfer  */
     SAR0 = (unsigned long)addr;   /* Source address      */
     DAR0 = (unsigned long)&PDOR3; /* Destination address */
-    BCR0 = size;                  /* Bytes to transfer   */
+    BCR0 = (unsigned long)size;   /* Bytes to transfer   */
 
     /* Enable the FIFO and force one write to it */
-    pcm_apply_settings(false);
+    pcm_apply_settings();
 
     DCR0 = DMA_INT | DMA_EEXT | DMA_CS | DMA_AA |
-           DMA_SINC | DMA_SSIZE(3) | DMA_START;
+           DMA_SINC | DMA_SSIZE(DMA_SIZE_LINE) | DMA_START;
 } /* pcm_play_dma_start */
 
 /* Stops the DMA transfer and interrupt */
 void pcm_play_dma_stop(void)
 {
+#if 0
     logf("pcm_play_dma_stop");
+#endif
 
     pcm_playing = false;
 
-    DCR0 = 0;
     DSR0 = 1;
+    DCR0 = 0;
 
-    /* Reset the FIFO */
-    pcm_apply_settings(false);
+    /* Place FIFO in reset condition */
+    or_l(IIS_FIFO_RESET, &IIS_PLAY);
+
+    pcm_playing = false;    
 } /* pcm_play_dma_stop */
 
 void pcm_init(void)
@@ -188,17 +194,26 @@ void pcm_init(void)
     pcm_paused            = false;
     pcm_callback_for_more = NULL;
 
+    AUDIOGLOB =   (1 <<  8) /* IIS1 fifo auto sync  */
+                | (1 <<  7) /* PDIR2 fifo auto sync */
+#ifdef HAVE_SPDIF_OUT
+                | (1 << 10) /* EBU TX auto sync     */
+#endif
+                ;
     DIVR0     = 54;     /* DMA0 is mapped into vector 54 in system.c */
-    DMAROUTE  = (DMAROUTE & 0xffffff00) | DMA0_REQ_AUDIO_1;
+    and_l(0xffffff00, &DMAROUTE);
+    or_l(DMA0_REQ_AUDIO_1, &DMAROUTE);
     DMACONFIG = 1;      /* DMA0Req = PDOR3, DMA1Req = PDIR2          */
 
-    /* Reset the audio FIFO */
-    SET_IIS_CONFIG(IIS_RESET);
-
+    /* Call pcm_play_dma_stop to initialize everything. */
+    pcm_play_dma_stop();
+    /* Call pcm_close_recording to put in closed state */
+    pcm_close_recording();
+    audio_set_output_source(AUDIO_SRC_PLAYBACK);
+    audio_set_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
     pcm_set_frequency(HW_FREQ_DEFAULT);
 
-    /* Prevent pops (resets DAC to zero point) */
-    SET_IIS_CONFIG(IIS_DEFPARM(3 << 8) | IIS_RESET);
+    _pcm_apply_settings(false);
 
 #if defined(HAVE_SPDIF_IN) || defined(HAVE_SPDIF_OUT)
     spdif_init();
@@ -221,12 +236,9 @@ void pcm_init(void)
        (DAC should be at zero point now). */
     audiohw_mute(false);
 
-    /* Call pcm_play_dma_stop to initialize everything. */
-    pcm_play_dma_stop();
-
     /* Enable interrupt at level 7, priority 0 */
     ICR6 = (7 << 2);
-    IMR &= ~(1 << 14);      /* bit 14 is DMA0 */
+    and_l(~(1 << 14), &IMR); /* bit 14 is DMA0 */
 } /* pcm_init */
 
 size_t pcm_get_bytes_waiting(void)
@@ -241,9 +253,8 @@ void DMA0(void)
 {
     int res = DSR0;
 
-    DSR0  = 1;    /* Clear interrupt */
-    DCR0 &= ~DMA_EEXT;
-
+    DSR0  = 1;                  /* Clear interrupt */
+    and_l(~DMA_EEXT, &DCR0);    /* Disable peripheral request */
     /* Stop on error */
     if ((res & 0x70) == 0)
     {
@@ -258,7 +269,7 @@ void DMA0(void)
         {
             SAR0  = (unsigned long)next_start;  /* Source address */
             BCR0  = next_size;                  /* Bytes to transfer */
-            DCR0 |= DMA_EEXT;
+            or_l(DMA_EEXT, &DCR0);              /* Enable peripheral request */
             return;
         }
         else
@@ -272,7 +283,13 @@ void DMA0(void)
     }
     else
     {
-        logf("DMA Error:0x%04x", res);
+        logf("DMA0 err: %02x", res);
+#if 0
+        logf("  SAR0: %08x", SAR0);
+        logf("  DAR0: %08x", DAR0);
+        logf("  BCR0: %08x", BCR0);
+        logf("  DCR0: %08x", DCR0);
+#endif
     }
 
     pcm_play_dma_stop();
@@ -290,7 +307,10 @@ void pcm_rec_dma_start(void *addr, size_t size)
 
     pcm_recording = true;
 
-    pcm_apply_settings(false);
+    and_l(~PDIR2_FIFO_RESET, &DATAINCONTROL);
+    /* Clear reset bit if the source is not set to monitor playback
+       otherwise maintain independence between playback and recording. */
+    _pcm_apply_settings((IIS_PLAY & (7 << 8)) != (3 << 8));
 
     /* Start the DMA transfer.. */
 #ifdef HAVE_SPDIF_IN
@@ -303,7 +323,7 @@ void pcm_rec_dma_start(void *addr, size_t size)
     BCR1          = (unsigned long)size;   /* Bytes to transfer     */
 
     DCR1 = DMA_INT | DMA_EEXT | DMA_CS | DMA_AA | DMA_DINC |
-           DMA_DSIZE(3) | DMA_START;
+           DMA_DSIZE(DMA_SIZE_LINE) /* | DMA_START */;
 } /* pcm_dma_start */
 
 void pcm_rec_dma_stop(void)
@@ -314,6 +334,7 @@ void pcm_rec_dma_stop(void)
     DCR1 = 0;
 
     pcm_recording = false;
+    or_l(PDIR2_FIFO_RESET, &DATAINCONTROL);
 } /* pcm_dma_stop */
 
 void pcm_init_recording(void)
@@ -323,16 +344,15 @@ void pcm_init_recording(void)
     pcm_recording           = false;
     pcm_callback_more_ready = NULL;
 
-    AUDIOGLOB |= 0x180;   /* IIS1 fifo auto sync = on, PDIR2 auto sync = on */
-
-    DIVR1     = 55;       /* DMA1 is mapped into vector 55 in system.c      */
-    DMACONFIG = 1;        /* DMA0Req = PDOR3, DMA1Req = PDIR2               */
-    DMAROUTE  = (DMAROUTE & 0xffff00ff) | DMA1_REQ_AUDIO_2;
+    DIVR1     = 55;       /* DMA1 is mapped into vector 55 in system.c     */
+    DMACONFIG = 1;        /* DMA0Req = PDOR3, DMA1Req = PDIR2              */
+    and_l(0xffff00ff, &DMAROUTE);
+    or_l(DMA1_REQ_AUDIO_2, &DMAROUTE);
 
     pcm_rec_dma_stop();
 
-    ICR7 = (7 << 2);        /* Enable interrupt at level 7, priority 0      */
-    IMR &= ~(1 << 15);      /* bit 15 is DMA1                               */
+    ICR7 = (7 << 2);         /* Enable interrupt at level 7, priority 0    */
+    and_l(~(1 << 15), &IMR); /* bit 15 is DMA1                             */
 } /* pcm_init_recording */
 
 void pcm_close_recording(void)
@@ -341,9 +361,9 @@ void pcm_close_recording(void)
 
     pcm_rec_dma_stop();
 
-    DMAROUTE &= 0xffff00ff;
-    ICR7      = 0x00;      /* Disable interrupt */
-    IMR      |= (1 << 15); /* bit 15 is DMA1    */
+    and_l(0xffff00ff, &DMAROUTE);
+    ICR7 = 0x00;            /* Disable interrupt */
+    or_l((1 << 15), &IMR);  /* bit 15 is DMA1    */
 } /* pcm_close_recording */
 
 /* DMA1 Interrupt is called when the DMA has finished transfering a chunk
@@ -355,13 +375,19 @@ void DMA1(void)
     int status = 0;
     pcm_more_callback_type2 more_ready;
 
-    DSR1  = 1;          /* Clear interrupt */
-    DCR1 &= ~DMA_EEXT;  /* Disable peripheral request */
+    DSR1  = 1;               /* Clear interrupt */
+    and_l(~DMA_EEXT, &DCR1); /* Disable peripheral request */
 
     if (res & 0x70)
     {
         status = DMA_REC_ERROR_DMA;
-        logf("DMA1 err: 0x%x", res);
+        logf("DMA1 err: %02x", res);
+#if 0
+        logf("  SAR1: %08x", SAR1);
+        logf("  DAR1: %08x", DAR1);
+        logf("  BCR1: %08x", BCR1);
+        logf("  DCR1: %08x", DCR1);
+#endif
     }
 #ifdef HAVE_SPDIF_IN
     else if (DATAINCONTROL == 0xc038 &&
@@ -392,7 +418,7 @@ void pcm_record_more(void *start, size_t size)
     rec_peak_addr = (unsigned long *)start; /* Start peaking at dest */
     DAR1          = (unsigned long)start;   /* Destination address */
     BCR1          = (unsigned long)size;    /* Bytes to transfer   */
-    DCR1         |= DMA_EEXT;
+    or_l(DMA_EEXT, &DCR1);                  /* Enable peripheral request */
 }
 
 void pcm_mute(bool mute)
@@ -405,15 +431,15 @@ void pcm_mute(bool mute)
 void pcm_play_pause_pause(void)
 {
     /* Disable DMA peripheral request. */
-    DCR0 &= ~DMA_EEXT;
-    pcm_apply_settings(true);
+    and_l(~DMA_EEXT, &DCR0);
+    or_l(IIS_FIFO_RESET, &IIS_PLAY);
 } /* pcm_play_pause_pause */
 
 void pcm_play_pause_unpause(void)
 {
     /* Enable the FIFO and force one write to it */
-    pcm_apply_settings(false);
-    DCR0 |= DMA_EEXT | DMA_START;
+    pcm_apply_settings();
+    or_l(DMA_EEXT | DMA_START, &DCR0);
 } /* pcm_play_pause_unpause */
 
 /**

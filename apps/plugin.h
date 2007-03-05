@@ -568,7 +568,7 @@ struct plugin_api {
     const unsigned long *audio_master_sampr_list;
     const unsigned long *hw_freq_sampr;
 #ifndef SIMULATOR
-    void (*pcm_apply_settings)(bool reset);
+    void (*pcm_apply_settings)(void);
 #endif
 #ifdef HAVE_RECORDING
     const unsigned long *rec_freq_sampr;

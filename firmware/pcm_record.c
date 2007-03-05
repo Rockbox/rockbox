@@ -329,7 +329,7 @@ static void reset_hardware(void)
     /* reset pcm to defaults (playback only) */
     pcm_set_frequency(HW_SAMPR_DEFAULT);
     audio_set_output_source(AUDIO_SRC_PLAYBACK);
-    pcm_apply_settings(true);
+    pcm_apply_settings();
 }
 
 /** pcm_rec_* group **/
@@ -1326,8 +1326,8 @@ static void pcmrec_set_recording_options(
     /* set monitoring */
     audio_set_output_source(rec_source);
 
-    /* apply pcm settings to hardware */
-    pcm_apply_settings(true);
+    /* apply hardware setting to start monitoring now */
+    pcm_apply_settings();
 
     queue_reply(&pcmrec_queue, 0); /* Release sender */
 

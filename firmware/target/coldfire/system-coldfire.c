@@ -321,3 +321,8 @@ void coldfire_set_pllcr_audio_bits(long bits)
     PLLCR = (PLLCR & ~0x70400000) | (bits & 0x70400000);
 }
 
+/* Set DATAINCONTROL without disturbing FIFO reset state */
+void coldfire_set_dataincontrol(unsigned long value)
+{
+    DATAINCONTROL = (DATAINCONTROL & (1 << 9)) | value;
+}

@@ -33,7 +33,7 @@ void pcm_init(void);
  */
 void pcm_set_frequency(unsigned int frequency);
 /* apply settings to hardware immediately */
-void pcm_apply_settings(bool reset);
+void pcm_apply_settings(void);
 
 /* This is for playing "raw" PCM data */
 void pcm_play_data(pcm_more_callback_type get_more,

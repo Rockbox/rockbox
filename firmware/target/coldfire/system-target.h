@@ -143,6 +143,9 @@ static inline void invalidate_icache(void)
 #define DEFAULT_PLLCR_AUDIO_BITS 0x10400000
 void coldfire_set_pllcr_audio_bits(long bits);
 
+/* Set DATAINCONTROL without disturbing FIFO reset state */
+void coldfire_set_dataincontrol(unsigned long value);
+
 /* 11.2896 MHz */
 #define CPUFREQ_DEFAULT_MULT 1
 #define CPUFREQ_DEFAULT      (CPUFREQ_DEFAULT_MULT * CPU_FREQ)

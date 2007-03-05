@@ -49,8 +49,7 @@ void audio_set_source(int source, unsigned flags)
             {
                 audiohw_disable_recording();
                 audiohw_set_monitor(false);
-                /* Reset PDIR2 data flow */
-                DATAINCONTROL = (1 << 9);
+                coldfire_set_dataincontrol(0);
             }
         break;
 
@@ -59,7 +58,7 @@ void audio_set_source(int source, unsigned flags)
             {
                 audiohw_enable_recording(true);  /* source mic */
                 /* Int. when 6 samples in FIFO, PDIR2 src = iis1RcvData */
-                DATAINCONTROL = (3 << 14) | (4 << 3);
+                coldfire_set_dataincontrol((3 << 14) | (4 << 3));
             }
         break;
 
@@ -68,7 +67,7 @@ void audio_set_source(int source, unsigned flags)
             {
                 audiohw_enable_recording(false); /* source line */
                 /* Int. when 6 samples in FIFO, PDIR2 src = iis1RcvData */
-                DATAINCONTROL = (3 << 14) | (4 << 3);
+                coldfire_set_dataincontrol((3 << 14) | (4 << 3));
             }
         break;
     } /* end switch */
