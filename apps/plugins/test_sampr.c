@@ -192,7 +192,7 @@ void play_waveform(void)
     void set_frequency(int index)
     {
         rb->pcm_set_frequency(rb->hw_freq_sampr[index]);
-        rb->pcm_apply_settings(false);
+        rb->pcm_apply_settings();
     }
 
     rb->audio_stop();
@@ -209,9 +209,8 @@ void play_waveform(void)
     /* Recordable targets can play back from other sources */
     rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
-    /* This reset parameter will likely be deleted soon and resetting be
-       automatic - ignore if the implementation doesn't need it */
-    rb->pcm_apply_settings(true);
+
+    rb->pcm_apply_settings();
 
     init_audio(waveform);
     rb->pcm_play_data(get_more, NULL, 0);
