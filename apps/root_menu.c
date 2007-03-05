@@ -298,6 +298,19 @@ int item_callback(int action, const struct menu_item_ex *this_item)
     }
     return action;
 }
+static int get_selection(int last_screen)
+{
+    unsigned int i;
+    for(i=0; i< sizeof(root_menu__)/sizeof(*root_menu__); i++)
+    {
+        if ((root_menu__[i]->flags&MT_RETURN_VALUE) && 
+            (root_menu__[i]->value == last_screen))
+        {
+            return i;
+        }
+    }
+    return 0;
+}
 
 void root_menu(void)
 {
@@ -311,24 +324,12 @@ void root_menu(void)
         ret_val = (int)global_status.last_screen;
     else ret_val = global_settings.start_in_screen - 2;
     
-    /* try to select the start item if its not the menu */
-    if (ret_val != GO_TO_ROOT)
-    {
-        unsigned int i;
-        for(i=0; i< sizeof(root_menu__)/sizeof(*root_menu__) - 1; i++)
-        {
-            if (root_menu__[i]->value == ret_val)
-            {
-                selected = i;
-                break;
-            }
-        }
-    }
     while (true)
     {
         switch (ret_val)
         {
             case GO_TO_ROOT:
+                selected = get_selection(last_screen);
                 ret_val = do_menu(&root_menu_, &selected);
                 /* As long as MENU_ATTACHED_USB == GO_TO_ROOT this works */
                 if (ret_val == MENU_ATTACHED_USB)
