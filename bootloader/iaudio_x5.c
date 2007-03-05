@@ -183,7 +183,7 @@ void main(void)
 
     if (i < EOK) {
         printf("Error!");
-        printf("Can't load rockbox.ipod:");
+        printf("Can't load rockbox.iaudio:");
         printf(strerror(rc));
         sleep(HZ*3);
         power_off();
