@@ -47,6 +47,9 @@
 
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
     (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define KBD_CURSOR_KEYS /* certain key combos move the cursor even if not
+                           in line edit mode */
+#define KBD_MODES /* I-Rivers can use picker, line edit and cursor keys */
 #define KBD_MORSE_INPUT /* I-Rivers have a Morse input mode */
 
 #elif CONFIG_KEYPAD == ONDIO_PAD /* restricted Ondio keypad */
@@ -929,7 +932,7 @@ int kbd_input(char* text, int buflen)
                 /* speak revised text */
                 break;
 
-#ifndef KBD_MODES
+#if !defined (KBD_MODES) || defined (KBD_CURSOR_KEYS)
             case ACTION_KBD_BACKSPACE:
                 if (hangul)
                 {
@@ -977,7 +980,7 @@ int kbd_input(char* text, int buflen)
                     kbd_spellchar(text[c]);
                 }
                 break;
-#endif /* !KBD_MODES */
+#endif /* !defined (KBD_MODES) || defined (KBD_CURSOR_KEYS) */
 
             case BUTTON_NONE:
                 gui_syncstatusbar_draw(&statusbars, false);
