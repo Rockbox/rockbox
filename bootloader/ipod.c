@@ -223,6 +223,7 @@ void* main(void)
 {
     char buf[256];
     int i;
+    int btn;
     int rc;
     bool haveretailos;
     bool button_was_held;
@@ -278,6 +279,11 @@ void* main(void)
     button_init();
 #endif
 
+    btn=key_pressed();
+
+    /* Enable bootloader messages */
+    if (btn==BUTTON_RIGHT)
+        verbose = true;
 
     lcd_setfont(FONT_SYSFIXED);
 
@@ -314,10 +320,7 @@ void* main(void)
            pinfo->type, pinfo->size / 2048);
 
     
-    /* Check for a keypress */
-    i=key_pressed();
-
-    if (button_was_held || (i==BUTTON_MENU)) {
+    if (button_was_held || (btn==BUTTON_MENU)) {
         /* If either the hold switch was on, or the Menu button was held, then 
            try the Apple firmware */
 
@@ -349,7 +352,7 @@ void* main(void)
         /* Everything failed - just loop forever */
         printf("No RetailOS detected");
         
-    } else if (i==BUTTON_PLAY) {
+    } else if (btn==BUTTON_PLAY) {
         printf("Loading Linux...");
         rc=load_raw_firmware(loadbuffer, "/linux.bin", MAX_LOADSIZE);
         if (rc < EOK) {

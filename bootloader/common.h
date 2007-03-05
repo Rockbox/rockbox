@@ -26,6 +26,9 @@
 #define     EBAD_CHKSUM             -5
 #define     EFILE_TOO_BIG           -6
 
+/* Set this to true to enable lcd_update() in the printf function */
+extern bool verbose;
+
 /* Functions common to all bootloaders */
 void reset_screen(void);
 void printf(const char *format, ...);

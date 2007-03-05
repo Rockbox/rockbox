@@ -22,8 +22,17 @@
 #include "system.h"
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include "cpu.h"
 #include "common.h"
+
+/* TODO: Other bootloaders need to be adjusted to set this variable to true
+   on a button press - currently only the ipod version does. */
+#ifdef IPOD_ARCH
+bool verbose = false;
+#else
+bool verbose = true;
+#endif
 
 int line = 0;
 #ifdef HAVE_REMOTE_LCD
@@ -54,12 +63,14 @@ void printf(const char *format, ...)
     va_end(ap);
 
     lcd_puts(0, line++, ptr);
-    lcd_update();
+    if (verbose)
+        lcd_update();
     if(line >= LCD_HEIGHT/SYSFONT_HEIGHT)
         line = 0;
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_puts(0, remote_line++, ptr);
-    lcd_remote_update();
+    if (verbose)
+        lcd_remote_update();
     if(remote_line >= LCD_REMOTE_HEIGHT/SYSFONT_HEIGHT)
         remote_line = 0;
 #endif
