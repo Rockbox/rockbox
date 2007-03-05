@@ -1,0 +1,97 @@
+% $Id$ %
+\def\UseOption{m5}
+\edef\UseOption{\UseOption,HAVE_RB_BL_IN_FLASH}
+\edef\UseOption{\UseOption,HAVE_LCD_BITMAP}
+\edef\UseOption{\UseOption,HAVE_RECORDING}
+\edef\UseOption{\UseOption,CONFIG_RTC}
+\edef\UseOption{\UseOption,SWCODEC}
+\edef\UseOption{\UseOption,IAUDIO_X5_PAD}
+\edef\UseOption{\UseOption,HAVE_REMOTE_LCD}
+\edef\UseOption{\UseOption,iaudio}
+
+\newcommand{\playerman}{Iaudio}
+\newcommand{\playertype}{M5}
+\newcommand{\playerlongtype}{\playertype}
+\newcommand{\genericimg}{160x128x2}
+\newcommand{\specimg}{m5}
+%Used to name the player, e.g. ...to the \dap
+\newcommand{\dap}{player}
+%For use when referring to the player. E.g. the \daps\ capacity ...
+\newcommand{\daps}{player's}
+\newcommand{\firmwarefilename}{\fname{rockbox.iaudio}}
+\newcommand{\screenshotsize}{4cm}
+
+\newcommand{\ButtonLeft}{\btnfnt{Left}}
+\newcommand{\ButtonRight}{\btnfnt{Right}}
+\newcommand{\ButtonUp}{\btnfnt{Up}}
+\newcommand{\ButtonDown}{\btnfnt{Down}}
+\newcommand{\ButtonSelect}{\btnfnt{Select}}
+\newcommand{\ButtonPower}{\btnfnt{Power}}
+\newcommand{\ButtonRec}{\btnfnt{Rec}}
+\newcommand{\ButtonPlay}{\btnfnt{Play}}
+
+%Button actions, standard context
+\newcommand{\ActionStdPrev}{\ButtonUp}
+\newcommand{\ActionStdPrevRepeat}{Long \ButtonUp}
+\newcommand{\ActionStdNext}{\ButtonDown}
+\newcommand{\ActionStdNextRepeat}{Long \ButtonDown}
+\newcommand{\ActionStdCancel}{\ButtonLeft{} or \ButtonPower}
+\newcommand{\ActionStdContext}{Long \ButtonSelect}
+\newcommand{\ActionStdQuickScreen}{Long \ButtonRec}
+\newcommand{\ActionStdMenu}{\ButtonRec}
+\newcommand{\ActionStdOk}{\ButtonSelect, \ButtonRight{} or \ButtonPlay}
+
+%Button actions, wps context
+\newcommand{\ActionWpsPlay}{\ButtonPlay}
+\newcommand{\ActionWpsStop}{Long \ButtonPlay}
+\newcommand{\ActionWpsSkipNext}{\ButtonRight}
+\newcommand{\ActionWpsSkipPrev}{\ButtonLeft}
+\newcommand{\ActionWpsSeekBack}{Long \ButtonLeft}
+\newcommand{\ActionWpsSeekFwd}{Long \ButtonRight}
+\newcommand{\ActionWpsVolDown}{\ButtonDown}
+\newcommand{\ActionWpsVolUp}{\ButtonUp}
+\newcommand{\ActionWpsQuickScreen}{Long \ButtonRec}
+\newcommand{\ActionWpsMenu}{\ButtonRec}
+\newcommand{\ActionWpsContext}{Long \ButtonSelect}
+\newcommand{\ActionWpsBrowse}{\ButtonSelect}
+
+%Button actions, tree context
+\newcommand{\ActionTreeWps}{\ButtonPlay}
+\newcommand{\ActionTreeStop}{Long \ButtonPlay}
+\newcommand{\ActionTreeEnter}{\ButtonSelect{} or \ButtonRight}
+\newcommand{\ActionTreeParentDirectory}{\ButtonLeft}
+
+%Button actions, YesNo context
+\newcommand{\ActionYesNoAccept}{\ButtonSelect}
+
+%Button actions, Setting context
+\newcommand{\ActionSettingInc}{\ButtonUp}
+\newcommand{\ActionSettingDec}{\ButtonDown}
+
+%Button actions, Virtual Keyboard Context
+\newcommand{\ActionKbdLeft}{\ButtonLeft}
+\newcommand{\ActionKbdRight}{\ButtonRight}
+\newcommand{\ActionKbdUp}{\ButtonUp}
+\newcommand{\ActionKbdDown}{\ButtonDown}
+\newcommand{\ActionKbdSelect}{\ButtonSelect}
+\newcommand{\ActionKbdDone}{\ButtonPlay}
+\newcommand{\ActionKbdAbort}{\ButtonRec}
+
+%Button actions, Pitch Screen context
+\newcommand{\ActionPsToggleMode}{\ButtonSelect}
+\newcommand{\ActionPsIncSmall}{\ButtonUp}
+\newcommand{\ActionPsIncBig}{Long \ButtonUp}
+\newcommand{\ActionPsDecSmall}{\ButtonDown}
+\newcommand{\ActionPsDecBig}{Long \ButtonDown}
+\newcommand{\ActionPsNudgeLeft}{\ButtonLeft}
+\newcommand{\ActionPsNudgeRight}{\ButtonRight}
+\newcommand{\ActionPsReset}{\ButtonPower}
+\newcommand{\ActionPsExit}{\ButtonPlay}
+
+%Button actions, Recording screen context
+\newcommand{\ActionRecPause}{\ButtonPlay}
+\newcommand{\ActionRecNewfile}{\ButtonRec}
+\newcommand{\ActionSettingsInc}{\ButtonRight}
+\newcommand{\ActionSettingsDec}{\ButtonLeft}
+\newcommand{\ActionRecMenu}{Long \ButtonRec}
+\newcommand{\ActionRecExit}{Long \ButtonPlay}
