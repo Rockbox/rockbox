@@ -32,6 +32,7 @@
 #include "scrollbar.h"
 #include "statusbar.h"
 #include "textarea.h"
+#include "lang.h"
 
 #ifdef HAVE_LCD_CHARCELLS
 #define SCROLL_LIMIT 1
@@ -310,6 +311,7 @@ static void gui_list_draw(struct gui_list * gui_list)
 
     while (i < display->nb_lines)
     {
+        unsigned char *s;
         char entry_buffer[MAX_PATH];
         unsigned char *entry_name;
         int current_item = gui_list->start_item + 
@@ -319,9 +321,11 @@ static void gui_list_draw(struct gui_list * gui_list)
          * current available space on the screen, we stop*/
         if(current_item >= gui_list->nb_items)
             break;
-        entry_name = gui_list->callback_get_item_name(current_item,
-                                                      gui_list->data,
-                                                      entry_buffer);
+        s = gui_list->callback_get_item_name(current_item,
+                                             gui_list->data,
+                                             entry_buffer);
+        entry_name = P2STR(s);
+        
 #ifdef HAVE_LCD_BITMAP
         /* position the string at the correct offset place */
         int item_width,h;

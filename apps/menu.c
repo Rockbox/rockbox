@@ -440,6 +440,8 @@ static void talk_menu_item(const struct menu_item_ex *menu,
 {
     int id = -1;
     int type;
+    unsigned char *str;
+    
     if (global_settings.talk_menu)
     {
         int sel = get_menu_selection(gui_synclist_get_sel_pos(lists),menu);
@@ -450,7 +452,17 @@ static void talk_menu_item(const struct menu_item_ex *menu,
                 talk_setting(menu->submenus[sel]->variable);
             else 
             {
-                id = P2ID(menu->submenus[sel]->callback_and_desc->desc);
+                if (menu->submenus[sel]->flags&(MENU_DYNAMIC_DESC))
+                {
+                    char buffer[80];
+                    str = menu->submenus[sel]->menu_get_name_and_icon->
+                        list_get_name(sel, menu->submenus[sel]->
+                                      menu_get_name_and_icon->
+                                      list_get_name_data, buffer);
+                    id = P2ID(str);
+                }
+                else
+                    id = P2ID(menu->submenus[sel]->callback_and_desc->desc);
                 if (id != -1)
                    talk_id(id,false);
             }
