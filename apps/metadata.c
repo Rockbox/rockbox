@@ -33,7 +33,6 @@
 #include "system.h"
 #include "cuesheet.h"
 #include "structec.h"
-#include "settings.h"
 
 enum tagtype { TAGTYPE_APE = 1, TAGTYPE_VORBIS };
 
@@ -1947,12 +1946,10 @@ static bool get_spc_metadata(int fd, struct mp3entry* id3)
     buf[31] = 0;
     p = iso_decode(buf, p, 0, 32);
     
-#ifndef __PCTOOL__
-    if (global_settings.repeat_mode!=REPEAT_ONE && length==0) {
+    if (length==0) {
         length=3*60*1000; /* 3 minutes */
         fade=5*1000; /* 5 seconds */
     }
-#endif
     
     id3->length = length+fade;
 
