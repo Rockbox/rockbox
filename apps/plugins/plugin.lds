@@ -24,7 +24,7 @@ OUTPUT_FORMAT(elf32-sh)
 #define DRAMORIG 0x31000000
 #define IRAMORIG 0x1000c000
 #define IRAMSIZE 0xc000
-#elif defined(IAUDIO_X5)
+#elif defined(IAUDIO_X5) || defined(IAUDIO_M5)
 #define DRAMORIG 0x31000000
 #define IRAMORIG 0x10010000
 #define IRAMSIZE 0x10000

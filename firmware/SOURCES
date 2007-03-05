@@ -354,17 +354,17 @@ target/coldfire/iaudio/x5/power-x5.c
 #ifndef SIMULATOR
 target/coldfire/ata-as-coldfire.S
 target/coldfire/pcf50606-coldfire.c
-target/coldfire/iaudio/x5/adc-x5.c
-target/coldfire/iaudio/x5/ata-x5.c
+target/coldfire/iaudio/adc-iaudio.c
+target/coldfire/iaudio/ata-iaudio.c
+target/coldfire/iaudio/lcd-remote-iaudio.c
+target/coldfire/iaudio/pcf50606-iaudio.c
+target/coldfire/iaudio/system-iaudio.c
+target/coldfire/iaudio/usb-iaudio.c
 target/coldfire/iaudio/x5/backlight-x5.c
 target/coldfire/iaudio/x5/button-x5.c
 target/coldfire/iaudio/x5/lcd-as-x5.S
-target/coldfire/iaudio/x5/lcd-remote-x5.c
 target/coldfire/iaudio/x5/lcd-x5.c
 target/coldfire/iaudio/x5/m5636-x5.c
-target/coldfire/iaudio/x5/pcf50606-x5.c
-target/coldfire/iaudio/x5/system-x5.c
-target/coldfire/iaudio/x5/usb-x5.c
 #ifndef BOOTLOADER
 target/coldfire/iaudio/x5/audio-x5.c
 #endif
@@ -372,23 +372,22 @@ target/coldfire/iaudio/x5/audio-x5.c
 #endif /* IAUDIO_X5 */
 
 #ifdef IAUDIO_M5
-target/coldfire/iaudio/x5/power-x5.c
+target/coldfire/iaudio/m5/power-m5.c
 #ifndef SIMULATOR
 target/coldfire/ata-as-coldfire.S
 target/coldfire/pcf50606-coldfire.c
-target/coldfire/iaudio/x5/adc-x5.c
-target/coldfire/iaudio/x5/ata-x5.c
-target/coldfire/iaudio/x5/backlight-x5.c
-target/coldfire/iaudio/x5/button-x5.c
-target/coldfire/iaudio/x5/lcd-as-x5.S
-target/coldfire/iaudio/x5/lcd-remote-x5.c
-target/coldfire/iaudio/x5/lcd-x5.c
-target/coldfire/iaudio/x5/m5636-x5.c
-target/coldfire/iaudio/x5/pcf50606-x5.c
-target/coldfire/iaudio/x5/system-x5.c
-target/coldfire/iaudio/x5/usb-x5.c
+target/coldfire/iaudio/adc-iaudio.c
+target/coldfire/iaudio/ata-iaudio.c
+target/coldfire/iaudio/lcd-remote-iaudio.c
+target/coldfire/iaudio/m5/backlight-m5.c
+target/coldfire/iaudio/m5/button-m5.c
+target/coldfire/iaudio/m5/lcd-as-m5.S
+target/coldfire/iaudio/m5/lcd-m5.c
+target/coldfire/iaudio/pcf50606-iaudio.c
+target/coldfire/iaudio/system-iaudio.c
+target/coldfire/iaudio/usb-iaudio.c
 #ifndef BOOTLOADER
-target/coldfire/iaudio/x5/audio-x5.c
+target/coldfire/iaudio/m5/audio-m5.c
 #endif
 #endif /* SIMULATOR */
 #endif /* IAUDIO_M5 */

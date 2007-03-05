@@ -46,7 +46,7 @@ static int peaks[4]; /* p-l, p-r, r-l, r-r */
                                   (4 << 2) )  /* 64 bit clocks / word clock */
 #define IIS_RESET       0x800
 
-#ifdef IAUDIO_X5
+#if defined(IAUDIO_X5) || defined(IAUDIO_M5)
 #define SET_IIS_CONFIG(x) IIS1CONFIG = (x);
 #define IIS_CONFIG        IIS1CONFIG
 #define PLLCR_SET_AUDIO_BITS_DEFPARM \

@@ -144,15 +144,9 @@
 /** Port-specific settings **/
 
 /* Main LCD contrast range and defaults */
-#define MIN_CONTRAST_SETTING        1
-#define MAX_CONTRAST_SETTING        30
-#define DEFAULT_CONTRAST_SETTING    19 /* Match boot contrast */
-
-/* Main LCD backlight brightness range and defaults */
-/* PCF50506 can output 0%-100% duty cycle but D305A expects %15-100%. */
-#define MIN_BRIGHTNESS_SETTING      1  /* 15/16 (93.75%) */
-#define MAX_BRIGHTNESS_SETTING      13 /*  3/16 (18.75%) */
-#define DEFAULT_BRIGHTNESS_SETTING  8  /*  8/16 (50.00%) = x5 boot default */
+#define MIN_CONTRAST_SETTING        24
+#define MAX_CONTRAST_SETTING        63
+#define DEFAULT_CONTRAST_SETTING    40
 
 /* Remote LCD contrast range and defaults */
 #define MIN_REMOTE_CONTRAST_SETTING     10

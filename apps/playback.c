@@ -169,7 +169,7 @@ enum {
 #if defined(CPU_PP)
 #define CODEC_IRAM_ORIGIN   0x4000c000
 #define CODEC_IRAM_SIZE     0xc000
-#elif defined(IAUDIO_X5)
+#elif defined(IAUDIO_X5) || defined(IAUDIO_M5)
 #define CODEC_IRAM_ORIGIN   0x10010000
 #define CODEC_IRAM_SIZE     0x10000
 #else

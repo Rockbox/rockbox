@@ -136,7 +136,7 @@ default_interrupt (CDROMNOSYNC); /* CD-ROM No sync */
 default_interrupt (CDROMILSYNC); /* CD-ROM Illegal sync */
 default_interrupt (CDROMNEWBLK); /* CD-ROM New block */
 
-#ifdef IAUDIO_X5
+#if defined(IAUDIO_X5) || defined(IAUDIO_M5)
 #define EXCP_BUTTON_GPIO_READ   GPIO_READ
 #define EXCP_BUTTON_MASK        0x0c000000
 #define EXCP_BUTTON_VALUE       0x08000000 /* On button and !hold */

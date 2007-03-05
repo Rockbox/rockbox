@@ -58,7 +58,7 @@ void i2c_init(void)
     MFDR  = 0x0d;
     MFDR2 = 0x0d;
 
-#ifdef IAUDIO_X5
+#if defined(IAUDIO_X5) || defined(IAUDIO_M5)
     MBCR  = IEN;  /* Enable interface */
     MBCR2 = IEN; 
 #endif

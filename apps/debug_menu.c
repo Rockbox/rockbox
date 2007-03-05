@@ -1077,7 +1077,7 @@ bool dbg_ports(void)
         snprintf(buf, sizeof(buf), "ADC_BUTTONS: %02x", adc_buttons);
 #endif
         lcd_puts(0, line++, buf);
-#ifdef IAUDIO_X5
+#if defined(IAUDIO_X5) || defined(IAUDIO_M5)
         snprintf(buf, sizeof(buf), "ADC_REMOTE  (%c): %02x",
             remote_detect() ? '+' : '-', adc_remote);
 #else
@@ -1953,7 +1953,7 @@ static bool dbg_save_roms(void)
     fd = creat("/internal_rom_000000-1FFFFF.bin");
 #elif defined(IRIVER_H300_SERIES)
     fd = creat("/internal_rom_000000-3FFFFF.bin");
-#elif defined(IAUDIO_X5)
+#elif defined(IAUDIO_X5) || defined(IAUDIO_M5)
     fd = creat("/internal_rom_000000-3FFFFF.bin");
 #endif
     if(fd >= 0)
