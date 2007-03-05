@@ -65,6 +65,21 @@ void set_remote_backlight_filter_keypress(bool value)
 }
 #endif
 #endif
+
+#ifdef HAS_BUTTON_HOLD
+bool hold_button_state = false;
+bool button_hold(void) {
+    return hold_button_state;
+}
+#endif
+
+#ifdef HAS_REMOTE_BUTTON_HOLD
+bool remote_hold_button_state = false;
+bool remote_button_hold(void) {
+    return remote_hold_button_state;
+}
+#endif
+
 void button_event(int key, bool pressed)
 {
     int new_btn = 0;
@@ -99,7 +114,28 @@ void button_event(int key, bool pressed)
             return;
         }
         break;
-            
+
+#ifdef HAS_BUTTON_HOLD
+    case SDLK_h:
+        if(pressed)
+        {
+            hold_button_state = !hold_button_state;
+            DEBUGF("Hold button is %s\n", hold_button_state?"ON":"OFF");
+        }
+        break;
+#endif
+        
+#ifdef HAS_REMOTE_BUTTON_HOLD
+    case SDLK_j:
+        if(pressed)
+        {
+            remote_hold_button_state = !remote_hold_button_state;
+            DEBUGF("Remote hold button is %s\n",
+                   remote_hold_button_state?"ON":"OFF");
+        }
+        break;
+#endif
+        
 #if CONFIG_KEYPAD == GIGABEAT_PAD
     case SDLK_KP4:
     case SDLK_LEFT:
@@ -689,17 +725,3 @@ void button_clear_queue(void)
 {
     queue_clear(&button_queue);
 }
-
-#ifdef HAS_BUTTON_HOLD
-bool button_hold(void) {
-    /* temp fix for hold button on irivers */
-    return false;
-}
-#endif
-
-#ifdef HAS_REMOTE_BUTTON_HOLD
-bool remote_button_hold(void) {
-    /* temp fix for hold button on irivers */
-    return false;
-}
-#endif
