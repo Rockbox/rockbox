@@ -29,7 +29,7 @@
 #include "ipodpatcher.h"
 #include "ipodio.h"
 
-#define VERSION "0.8 with r12194-070204 bootloaders"
+#define VERSION "0.9 with v1.0 bootloaders"
 
 int verbose = 0;
 
@@ -326,9 +326,10 @@ int main(int argc, char* argv[])
 #ifdef WITH_BOOTOBJS
     } else if (action==INTERACTIVE) {
 
-        printf("Do you wish to install the rockbox bootloader? (y/n) :");
+        printf("Enter i to install the Rockbox bootloader, u to uninstall\n or c to cancel and do nothing (i/u/c) :");
+
         if (fgets(yesno,4,stdin)) {
-            if (yesno[0]=='y') {
+            if (yesno[0]=='i') {
                 if (ipod_reopen_rw(&ipod) < 0) {
                     return 5;
                 }
@@ -337,6 +338,16 @@ int main(int argc, char* argv[])
                     fprintf(stderr,"[INFO] Bootloader installed successfully.\n");
                 } else {
                     fprintf(stderr,"[ERR]  --install failed.\n");
+                }
+            } else if (yesno[0]=='u') {
+                if (ipod_reopen_rw(&ipod) < 0) {
+                    return 5;
+                }
+
+                if (delete_bootloader(&ipod)==0) {
+                    fprintf(stderr,"[INFO] Bootloader removed.\n");
+                } else {
+                    fprintf(stderr,"[ERR]  Bootloader removal failed.\n");
                 }
             }
         }
