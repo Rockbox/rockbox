@@ -722,7 +722,6 @@ static const struct button_mapping button_context_radio_h300lcdremote[] = {
 };
 
 static const struct button_mapping button_context_menu_remote[] = {
-    { ACTION_MENU_STOP,     BUTTON_RC_STOP,         BUTTON_NONE },
     { ACTION_MENU_WPS,      BUTTON_RC_ON,         BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST|CONTEXT_REMOTE)
