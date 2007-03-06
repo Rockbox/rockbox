@@ -342,40 +342,39 @@ void root_menu(void)
                     check_boot();
                     continue;
                 }
-                
-                if (ret_val == GO_TO_PREVIOUS_MUSIC)
-                    ret_val = previous_music;
+                else if (ret_val <= GO_TO_ROOT)
+                    continue;
                 last_screen = GO_TO_ROOT;
                 break;
+
             case GO_TO_PREVIOUS:
                 ret_val = last_screen;
-                if (last_screen == GO_TO_ROOT)
-                    continue;
+                continue;
                 break;
+
             case GO_TO_PREVIOUS_BROWSER:
                 if ((previous_browser == GO_TO_DBBROWSER) && 
                     !tagcache_is_usable())
                     ret_val = GO_TO_FILEBROWSER;
                 else 
                     ret_val = previous_browser;
+                /* fall through */
+            case GO_TO_FILEBROWSER:
+            case GO_TO_DBBROWSER:
+                previous_browser = ret_val;
                 break;
+
             case GO_TO_PREVIOUS_MUSIC:
                 ret_val = previous_music;
+                /* fall through */
+            case GO_TO_WPS:
+#if CONFIG_TUNER
+            case GO_TO_FM:
+#endif
+                previous_music = ret_val;
                 break;
         }
         this_screen = ret_val;
-        
-        if (this_screen == GO_TO_FILEBROWSER)
-            previous_browser = GO_TO_FILEBROWSER;
-        else if (this_screen == GO_TO_DBBROWSER)
-            previous_browser = GO_TO_DBBROWSER;
-        else if (this_screen == GO_TO_WPS)
-            previous_music = GO_TO_WPS;
-#if CONFIG_TUNER
-        else if (this_screen == GO_TO_FM)
-            previous_music = GO_TO_FM;
-#endif
-        
         /* set the global_status.last_screen before entering,
            if we dont we will always return to the wrong screen on boot */
         global_status.last_screen = (char)this_screen;

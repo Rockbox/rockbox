@@ -675,6 +675,8 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
         {
             if (menu != &root_menu_)
                 ret = GO_TO_ROOT;
+            else
+                ret = GO_TO_PREVIOUS;
         }
         else if (action == ACTION_STD_CANCEL)
         {
