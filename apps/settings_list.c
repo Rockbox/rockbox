@@ -355,7 +355,7 @@ const struct settings_list settings[] = {
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     SOUND_SETTING(0,loudness, LANG_LOUDNESS, "loudness", SOUND_LOUDNESS),
     STRINGCHOICE_SETTING(0,avc,LANG_AUTOVOL,0,"auto volume",
-            "off,20ms,4,4,8,", sound_set_avc, 5,
+            "off,20ms,2,4,8,", sound_set_avc, 5,
             LANG_OFF,TALK_ID(20, UNIT_MS),TALK_ID(2, UNIT_SEC),
             TALK_ID(4, UNIT_SEC),TALK_ID(8, UNIT_SEC)), 
     OFFON_SETTING(0, superbass, LANG_SUPERBASS, false, "superbass", set_superbass),
