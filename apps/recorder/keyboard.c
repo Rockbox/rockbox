@@ -272,9 +272,8 @@ int kbd_input(char* text, int buflen)
     FOR_NB_SCREENS(l)
     {
         struct keyboard_parameters *pm = &param[l];
-        struct screen *sc = &screens[l];
-
 #if LCD_WIDTH >= 160 && LCD_HEIGHT >= 96
+        struct screen *sc = &screens[l];
 
         if (sc->width >= 160 && sc->height >= 96)
         {
@@ -719,7 +718,7 @@ int kbd_input(char* text, int buflen)
             screens[l].update();
 
         button = get_action(CONTEXT_KEYBOARD, HZ/2);
-#ifdef HAVE_REMOTE_LCD
+#if NB_SCREENS > 1
         button_screen = (get_action_statuscode(NULL) & ACTION_REMOTE) ? 1 : 0;
 #endif
         pm = &param[button_screen];
