@@ -3436,7 +3436,7 @@
     *: "Logarithmic (dB)"
   </source>
   <dest>
-    *: "Logaritmica (dB)"		"
+    *: "Logaritmica (dB)"
   </dest>
   <voice>
     *: "Logaritmica decibel"
@@ -3646,7 +3646,7 @@
     *: "12 Hour Clock"
   </source>
   <dest>
-    *: "Orologio 12 ore (AM/PM)"	"
+    *: "Orologio 12 ore (AM/PM)"
   </dest>
   <voice>
     *: "Orologio 12 ore"
