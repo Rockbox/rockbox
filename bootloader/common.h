@@ -17,6 +17,8 @@
  *
  ****************************************************************************/
 
+#include <stdbool.h>
+
 /* Error codes */
 #define     EOK                      0
 #define     EFILE_NOT_FOUND         -1
