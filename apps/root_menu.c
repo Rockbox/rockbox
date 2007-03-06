@@ -117,6 +117,11 @@ static int browser(void* param)
             last_db_dirlevel = tc->dirlevel;
         break;
     }
+    /* hopefully only happens trying to go back into the WPS
+       from plugins, if music is stopped... */
+    if ((ret_val == GO_TO_PREVIOUS) && (last_screen == (intptr_t)param))
+        ret_val = GO_TO_ROOT;
+
     return ret_val;
 }  
 
