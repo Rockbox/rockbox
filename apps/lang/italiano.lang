@@ -5230,7 +5230,7 @@
     *: "Mon"
   </source>
   <dest>
-    *: "Lun"				"
+    *: "Lun"
   </dest>
   <voice>
     *: ""
