@@ -255,8 +255,12 @@ static int get_param_k(const struct keyboard_parameters *pm)
 int kbd_input(char* text, int buflen)
 {
     bool done = false;
-    /* This seems to keep the sizes of everything down */
+#ifdef CPU_ARM
+    /* This seems to keep the sizes for ARM way down */
     struct keyboard_parameters * volatile param = kbd_param;
+#else
+    struct keyboard_parameters * const param = kbd_param;
+#endif
     int l; /* screen loop variable */
     int text_w = 0;
     int editpos;                /* Edit position on all screens */
