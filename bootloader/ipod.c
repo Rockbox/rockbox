@@ -332,7 +332,10 @@ void* main(void)
     
         rc=load_firmware(loadbuffer, "apple_os.ipod", MAX_LOADSIZE);
     
-        if(rc==EFILE_NOT_FOUND) {
+        if (rc == EOK) {
+            printf("apple_os.ipod loaded.");
+            return (void*)DRAM_START;
+        } else if (rc == EFILE_NOT_FOUND) {
             /* If apple_os.ipod doesn't exist, then check if there is an Apple 
                firmware image in RAM  */
             haveretailos = (memcmp((void*)(DRAM_START+0x20),"portalplayer",12)==0);
@@ -344,9 +347,6 @@ void* main(void)
             printf("Error!");
             printf("Can't load apple_os.ipod:");
             printf(strerror(rc));
-        } else if (rc > 0) {
-            printf("apple_os.ipod loaded.");
-            return (void*)DRAM_START;
         }
         
         /* Everything failed - just loop forever */
