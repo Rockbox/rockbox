@@ -100,6 +100,7 @@ struct tree_context {
 void tree_get_filetypes(const struct filetype**, int*);
 void tree_init(void);
 void browse_root(void);
+void get_current_file(char* buffer, int buffer_len);
 void set_current_file(char *path);
 int rockbox_browse(const char *root, int dirfilter);
 bool create_playlist(void);

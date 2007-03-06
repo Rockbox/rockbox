@@ -88,10 +88,10 @@ static int browser(void* param)
                     last_screen == GO_TO_WPS && audio_status() &&
                     wps_state.current_track_path[0] != '\0')
             {
-                snprintf(folder, MAX_PATH, "%s", wps_state.current_track_path);
+                strcpy(folder, wps_state.current_track_path);
             }
             else
-                snprintf(folder, MAX_PATH, "%s/", last_folder);
+                strcpy(folder, last_folder);
         break;
         case GO_TO_DBBROWSER:
             if ((last_screen != GO_TO_ROOT) && !tagcache_is_usable())
@@ -111,7 +111,7 @@ static int browser(void* param)
     switch ((intptr_t)param)
     {
         case GO_TO_FILEBROWSER:
-            strcpy(last_folder, tc->currdir);
+            get_current_file(last_folder, MAX_PATH);
         break;
         case GO_TO_DBBROWSER:
             last_db_dirlevel = tc->dirlevel;

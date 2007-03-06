@@ -474,6 +474,21 @@ void reload_directory(void)
     reload_dir = true;
 }
 
+void get_current_file(char* buffer, int buffer_len)
+{
+#ifdef HAVE_TAGCACHE
+    /* in ID3DB mode it is a bad idea to call this function */
+    /* (only happens with `follow playlist') */
+    if( *tc.dirfilter == SHOW_ID3DB )
+        return;
+#endif
+
+    struct entry* dc = tc.dircache;
+    struct entry* e = &dc[tc.selected_item];
+    snprintf(buffer, buffer_len, "%s/%s", getcwd(NULL,0),
+                                          e->name);
+}
+
 /* Selects a file and update tree context properly */
 void set_current_file(char *path)
 {
@@ -505,8 +520,6 @@ void set_current_file(char *path)
 
     strcpy(lastfile, name);
 
-    /* undefined item selected */
-    tc.selected_item = -1;
 
     /* If we changed dir we must recalculate the dirlevel
        and adjust the selected history properly */
@@ -1153,6 +1166,7 @@ int rockbox_browse(const char *root, int dirfilter)
         int last_context;
         
         backup = tc;
+        tc.selected_item = 0;
         tc.dirlevel = 0;
         memcpy(tc.currdir, root, sizeof(tc.currdir));
         start_wps = false;
