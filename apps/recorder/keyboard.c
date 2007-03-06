@@ -74,7 +74,8 @@
 #define KBD_MORSE_INPUT
 #endif
 
-struct keyboard_parameters {
+struct keyboard_parameters
+{
     const unsigned char* default_kbd;
     int DEFAULT_LINES;
     unsigned short kbd_buf[KBD_BUF_SIZE];
@@ -103,7 +104,7 @@ struct keyboard_parameters {
     unsigned short hlead, hvowel, htail;
 };
 
-static struct keyboard_parameters param[NB_SCREENS];
+static struct keyboard_parameters kbd_param[NB_SCREENS];
 static bool kbd_loaded = false;
 
 #ifdef KBD_MORSE_INPUT
@@ -160,10 +161,10 @@ int load_kbd(unsigned char* filename)
         }
 
         FOR_NB_SCREENS(l)
-            utf8decode(buf, &param[l].kbd_buf[i]);
+            utf8decode(buf, &kbd_param[l].kbd_buf[i]);
 
-        if (param[0].kbd_buf[i] != 0xFEFF &&
-            param[0].kbd_buf[i] != '\r') /*skip BOM & carriage returns */
+        if (kbd_param[0].kbd_buf[i] != 0xFEFF &&
+            kbd_param[0].kbd_buf[i] != '\r') /*skip BOM & carriage returns */
         {
             i++;
         }
@@ -173,7 +174,7 @@ int load_kbd(unsigned char* filename)
     kbd_loaded = true;
 
     FOR_NB_SCREENS(l)
-        param[l].nchars = i;
+        kbd_param[l].nchars = i;
 
     return 0;
 }
@@ -254,6 +255,8 @@ static int get_param_k(const struct keyboard_parameters *pm)
 int kbd_input(char* text, int buflen)
 {
     bool done = false;
+    /* This seems to keep the sizes of everything down */
+    struct keyboard_parameters * volatile param = kbd_param;
     int l; /* screen loop variable */
     int text_w = 0;
     int editpos;                /* Edit position on all screens */
@@ -401,7 +404,7 @@ int kbd_input(char* text, int buflen)
 
                     for (j = i; j < pm->nchars; j++)
                     {
-                        pm->kbd_buf[j] = pm->kbd_buf[j+1];
+                        pm->kbd_buf[j] = pm->kbd_buf[j + 1];
                     }
                 }
                 else
