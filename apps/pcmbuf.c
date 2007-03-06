@@ -104,7 +104,9 @@ static size_t pcmbuf_mix_sample IDATA_ATTR;
 static bool low_latency_mode = false;
 static bool pcmbuf_flush;
 
+#ifdef HAVE_PRIORITY_SCHEDULING
 static int codec_thread_priority = 0;
+#endif
 
 extern struct thread_entry *codec_thread_p;
 
@@ -258,7 +260,9 @@ static void pcmbuf_under_watermark(void)
 {
     /* Only codec thread initiates boost - voice boosts the cpu when playing
        a clip */
+#ifndef SIMULATOR
     if (thread_get_current() == codec_thread_p)
+#endif /* SIMULATOR */
     {
 #ifdef HAVE_PRIORITY_SCHEDULING
         /* If buffer is critically low, override UI priority, else
