@@ -285,13 +285,13 @@
   desc: in the main menu
   user:
   <source>
-    *: "Playlist Options"
+    *: "Playlist"
   </source>
   <dest>
-    *: "Opzioni Playlist"
+    *: "Playlist"
   </dest>
   <voice>
-    *: "Opzioni Playlist"
+    *: "Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -299,13 +299,13 @@
   desc: in the main menu
   user:
   <source>
-    *: "Browse Plugins"
+    *: "Plugins"
   </source>
   <dest>
-    *: "Scegli Plugin"
+    *: "Plugin"
   </dest>
   <voice>
-    *: "Scegli Plugin"
+    *: "Plugin"
   </voice>
 </phrase>
 <phrase>
@@ -313,13 +313,13 @@
   desc: in the main menu
   user:
   <source>
-    *: "Info"
+    *: "System"
   </source>
   <dest>
-    *: "Informazioni"
+    *: "Sistema"
   </dest>
   <voice>
-    *: "Informazioni"
+    *: "Sistema"
   </voice>
 </phrase>
 <phrase>
@@ -836,6 +836,7 @@
     ipod*: "SELECT = Yes"
     x5: "SELECT = Yes"
     h10: "NEXT = Yes"
+    gigabeat: "SELECT = Yes"
   </source>
   <dest>
     *: "PLAY = Si"
@@ -843,6 +844,7 @@
     ipod*: "SELECT = Si"
     x5: "SELECT = Si"
     h10: "NEXT = Si"
+    gigabeat: "SELECT = Si"
   </dest>
   <voice>
     *: ""
@@ -979,13 +981,13 @@
   desc: in the recording sub menu
   user:
   <source>
-    *: "Recording Screen"
+    *: "Recording"
   </source>
   <dest>
-    *: "Schermo Registrazione"
+    *: "Registrazione"
   </dest>
   <voice>
-    *: "Schermo registrazione"
+    *: "registrazione"
   </voice>
 </phrase>
 <phrase>
@@ -1424,16 +1426,16 @@
 </phrase>
 <phrase>
   id: LANG_RESUME
-  desc: in settings_menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Resume on Startup"
+    *: ""
   </source>
   <dest>
-    *: "Riprendi all'avvio"
+    *: ""
   </dest>
   <voice>
-    *: "Riprendi all'avvio"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2616,16 +2618,16 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_STARTUP
-  desc: Start Rockbox in Recording Screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "Show Recording Screen on Startup"
+    *: ""
   </source>
   <dest>
-    *: "Entra in modo registrazione all'avvio"
+    *: ""
   </dest>
   <voice>
-    *: "Entra in modo registrazione all'avvio"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4131,10 +4133,14 @@
   desc: battery level in % and estimated time remaining
   user:
   <source>
-    *: "%d%% %dh %dm"
+    *: "Battery: %d%% %dh %dm"
+    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
-    *: "%d%% %dh %dm"
+    *: "Batteria: %d%% %dh %dm"
+ player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh
+    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"   
   </dest>
   <voice>
     *: "Livello Batteria"
@@ -4332,6 +4338,7 @@
     ipod*: "PLAY/PAUSE = Exit"
     x5: "RECORD = Exit"
     h10: "PREV = Exit"
+    gigabeat: "A = Exit"
   </source>
   <dest>
     *: "OFF = Esci"
@@ -4339,6 +4346,7 @@
     ipod*: "PLAY/PAUSE = Esci"
     x5: "RECORD = Esci"
     h10: "PREV = Esci"
+    gigabeat: "A = Esci"
   </dest>
   <voice>
     *: ""
@@ -4396,6 +4404,7 @@
     ipod*: "SELECT = Select"
     x5: "SELECT = Select"
     h10: "NEXT = Select"
+    gigabeat: "SELECT = Select"
   </source>
   <dest>
     *: "Play = Seleziona"
@@ -4403,6 +4412,7 @@
     ipod*: "SELECT = Seleziona"
     x5: "SELECT = Seleziona"
     h10: "NEXT = Seleziona"
+    gigabeat: "SELECT = Seleziona"
   </dest>
   <voice>
     *: ""
@@ -4418,6 +4428,7 @@
     ipod*: "Long MENU = Delete"
     x5: "Long RECORD = Delete"
     h10: "REWIND = Delete"
+    gigabeat: "POWER = Delete"
   </source>
   <dest>
     *: "ON+Play = Cancella"
@@ -4425,6 +4436,7 @@
     ipod*: "MENU Lungo = Cancella"
     x5: "RECORD LUNGO = Cancella"
     h10: "REWIND = Cancella"
+    gigabeat: "POWER = Cancella"
   </dest>
   <voice>
     *: ""
@@ -4505,11 +4517,12 @@
   desc: used in set_time()
   user:
   <source>
-    *: "ON To Set"
+    *: "ON = Set"
     h100,h120,h300: "NAVI = Set"
     ipod*: "SELECT = Set"
     x5: "SELECT = Set"
     h10: "NEXT = Set"
+    gigabeat: "SELECT = Set"
   </source>
   <dest>
     *: "ON = salva"
@@ -4517,6 +4530,7 @@
     ipod*: "SELECT = Salva"
     x5: "SELECT = Salva"
     h10: "NEXT = Salva"
+    gigabeat: "SELECT = Salva"
   </dest>
   <voice>
     *: ""
@@ -4527,11 +4541,12 @@
   desc: used in set_time()
   user:
   <source>
-    *: "OFF To Revert"
+    *: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
     ipod*: "MENU = Revert"
     x5: "RECORD = Revert"
     h10: "PREV = Revert"
+    gigabeat: "POWER = Revert"
   </source>
   <dest>
     *: "OFF = Annulla"
@@ -4539,6 +4554,7 @@
     ipod*: "MENU = Annulla"
     x5: "RECORD = Annulla"
     h10: "PREV = Annulla"
+    gigabeat: "POWER = Annulla"
   </dest>
   <voice>
     *: ""
@@ -4958,9 +4974,11 @@
   user:
   <source>
     *: "PLAY=Set OFF=Cancel"
+    ipod*: "SELECT=Set MENU=Cancel"
   </source>
   <dest>
     *: "PLAY=Imposta OFF=Annulla"
+    ipod*: "SELECT=Imposta MENU=Annulla"
   </dest>
   <voice>
     *: ""
@@ -10428,5 +10446,215 @@ LANG_RECORDING_AGC_PRESET: The phrase is not used. Skipped
   </dest>
   <voice>
     *: "Suona Successiva"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_THEME
+  desc: save a theme file
+  user:
+  <source>
+    *: "Save Theme Settings"
+  </source>
+  <dest>
+    *: "Salva le impostazioni del tema"
+  </dest>
+  <voice>
+    *: "Salva le impostazioni del tema"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_CHARGING
+  desc: in Battery menu
+  user:
+  <source>
+    *: "Charge During USB Connection"
+  </source>
+  <dest>
+    *: "Carica durante il collegamento alla USB"
+  </dest>
+  <voice>
+    *: "Carica durante il collegamento alla USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUMARTIST
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Album Artist]"
+  </source>
+  <dest>
+    *: "[Album Artista]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMMENT
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Comment]"
+  </source>
+  <dest>
+    *: "[Commento]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUESHEET
+  desc:
+  user:
+  <source>
+    *: "Cuesheet"
+  </source>
+  <dest>
+    *: "Cuesheet"
+  </dest>
+  <voice>
+    *: "Cuesheet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUESHEET_ENABLE
+  desc: cuesheet support option
+  user:
+  <source>
+    *: "Cuesheet Support"
+  </source>
+  <dest>
+    *: "Supporto Cuesheet"
+  </dest>
+  <voice>
+    *: "Supporto Cuesheet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_MENU
+  desc: fm menu title
+  user:
+  <source>
+    *: "FM Radio Menu"
+  </source>
+  <dest>
+    *: "Menu Radio FM"
+  </dest>
+  <voice>
+    *: "Menu Radio FM"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIR_BROWSER
+  desc: in root menu
+  user:
+  <source>
+    *: "Files"
+  </source>
+  <dest>
+    *: "File"
+  </dest>
+  <voice>
+    *: "File"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOW_PLAYING
+  desc: in root menu
+  user:
+  <source>
+    *: "Now Playing"
+  </source>
+  <dest>
+    *: "In Riproduzione"
+  </dest>
+  <voice>
+    *: "In Riproduzione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_MENU
+  desc: in root menu
+  user:
+  <source>
+    *: "Settings"
+  </source>
+  <dest>
+    *: "Impostazioni"
+  </dest>
+  <voice>
+    *: "Impostazioni"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Main Menu"
+  </source>
+  <dest>
+    *: "Menu Principale"
+  </dest>
+  <voice>
+    *: "Menu Principale"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_PLAYBACK
+  desc: in root menu
+  user:
+  <source>
+    *: "Resume Playback"
+  </source>
+  <dest>
+    *: "Riprendi Riproduzione"
+  </dest>
+  <voice>
+    *: "Riprendi Riproduzione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ROCKBOX_TITLE
+  desc: in root menu
+  user:
+  <source>
+    *: "Rockbox"
+  </source>
+  <dest>
+    *: "Rockbox"
+  </dest>
+  <voice>
+    *: "Rockbox"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVIOUS_SCREEN
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Previous Screen"
+  </source>
+  <dest>
+    *: "Schermata Precedente"
+  </dest>
+  <voice>
+    *: "Schermata Precedente"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_SCREEN
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Start Screen"
+  </source>
+  <dest>
+    *: "Schermata in Avvio"
+  </dest>
+  <voice>
+    *: "Schermata in Avvio"
   </voice>
 </phrase>
