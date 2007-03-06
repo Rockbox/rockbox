@@ -288,7 +288,7 @@ void* main(void)
     lcd_setfont(FONT_SYSFIXED);
 
     printf("Rockbox boot loader");
-    printf("Version: 20%s", version);
+    printf("Version: %s", version);
     printf("IPOD version: 0x%08x", IPOD_HW_REVISION);
 
     i=ata_init();
