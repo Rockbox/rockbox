@@ -776,6 +776,11 @@ int thread_get_priority(struct thread_entry *thread)
 }
 #endif
 
+struct thread_entry * thread_get_current(void)
+{
+    return cores[CURRENT_CORE].running;
+}
+
 void init_threads(void)
 {
     unsigned int core = CURRENT_CORE;

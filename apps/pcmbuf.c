@@ -104,6 +104,8 @@ static size_t pcmbuf_mix_sample IDATA_ATTR;
 static bool low_latency_mode = false;
 static bool pcmbuf_flush;
 
+static int codec_thread_priority = 0;
+
 extern struct thread_entry *codec_thread_p;
 
 /* Helpful macros for use in conditionals this assumes some of the above
@@ -235,30 +237,37 @@ static inline void pcmbuf_add_chunk(void)
     audiobuffer_fillpos = 0;
 }
 
+#ifdef HAVE_PRIORITY_SCHEDULING
+static void boost_codec_thread(bool boost)
+{
+    if (boost)
+    {
+        if (codec_thread_priority == 0)
+            codec_thread_priority = thread_set_priority(
+                codec_thread_p, PRIORITY_REALTIME);
+    }
+    else if (codec_thread_priority != 0)
+    {
+        thread_set_priority(codec_thread_p, codec_thread_priority);
+        codec_thread_priority = 0;
+    }
+}
+#endif /* HAVE_PRIORITY_SCHEDULING */
+
 static void pcmbuf_under_watermark(void)
 {
+    /* Only codec thread initiates boost - voice boosts the cpu when playing
+       a clip */
+    if (thread_get_current() == codec_thread_p)
+    {
 #ifdef HAVE_PRIORITY_SCHEDULING
-    static int old_priority = 0;
-    
-    if (LOW_DATA(2) && pcm_is_playing())
-    {
-        if (!old_priority)
-        {
-            /* Buffer is critically low so override UI priority. */
-            old_priority = thread_set_priority(codec_thread_p, 
-                                               PRIORITY_REALTIME);
-        }
-    }
-    else if (old_priority)
-    {
-        /* Set back the original priority. */
-        thread_set_priority(codec_thread_p, old_priority);
-        old_priority = 0;
-    }
+        /* If buffer is critically low, override UI priority, else
+           set back to the original priority. */
+        boost_codec_thread(LOW_DATA(2) && pcm_is_playing());
 #endif
-
-    /* Fill audio buffer by boosting cpu */
-    trigger_cpu_boost();
+        /* Fill audio buffer by boosting cpu */
+        trigger_cpu_boost();
+    }
 
     /* Disable crossfade if < .5s of audio */
     if (LOW_DATA(2))
@@ -364,6 +373,11 @@ void pcmbuf_play_stop(void)
     crossfade_init = false;
     crossfade_active = false;
     pcmbuf_flush = false;
+
+#ifdef HAVE_PRIORITY_SCHEDULING
+    /* Can unboost the codec thread here no matter who's calling */
+    boost_codec_thread(false);
+#endif
 }
 
 int pcmbuf_used_descs(void) {

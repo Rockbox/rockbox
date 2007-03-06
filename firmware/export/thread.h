@@ -150,6 +150,7 @@ void wakeup_thread(struct thread_entry **thread);
 int thread_set_priority(struct thread_entry *thread, int priority);
 int  thread_get_priority(struct thread_entry *thread);
 #endif
+struct thread_entry * thread_get_current(void);
 void init_threads(void);
 int thread_stack_usage(const struct thread_entry *thread);
 int thread_get_status(const struct thread_entry *thread);
