@@ -13,8 +13,8 @@
 #    Modifié par Manuel Dejonghe (lImbus) <lImbus AT users.soureforge.net> - February 2005
 #
 #    Refonte totale du fichier par Mustapha Senhaji (Moos) <moos75 AT gmail.com>
-#    Nov 2005, Avr 2006, Mai 2006, Juil 2006, Oct 2006, Dec 2006
-
+#    Nov 2005, Avr 2006, Mai 2006, Juil 2006, Oct 2006, Dec 2006, Mars 2007
+#
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -300,7 +300,7 @@
   desc: in the main menu
   user:
   <source>
-    *: "Playlist Options"
+    *: "Playlist"
   </source>
   <dest>
     *: "Options Listes de Lecture"
@@ -314,7 +314,7 @@
   desc: in the main menu
   user:
   <source>
-    *: "Browse Plugins"
+    *: "Plugins"
   </source>
   <dest>
     *: "Liste des Modules d'Extension"
@@ -328,13 +328,13 @@
   desc: in the main menu
   user:
   <source>
-    *: "Info"
+    *: "System"
   </source>
   <dest>
-    *: "Informations"
+    *: "Système"
   </dest>
   <voice>
-    *: "Informations"
+    *: "Système"
   </voice>
 </phrase>
 <phrase>
@@ -432,7 +432,7 @@
     *: "Config. des Canaux"
   </dest>
   <voice>
-    *: ""
+    *: "Configuration des canaux"
   </voice>
 </phrase>
 <phrase>
@@ -801,16 +801,16 @@
 </phrase>
 <phrase>
   id: LANG_FIRMWARE
-  desc: in the main menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Browse Firmwares"
+    *: ""
   </source>
   <dest>
-    *: "Liste des Microprogrammes"
+    *: deprecated
   </dest>
   <voice>
-    *: "Liste des microprogrammes"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -851,6 +851,7 @@
     ipod*: "SELECT = Oui"
     x5: "SELECT = Oui"
     h10: "NEXT = Oui"
+    gigabeat: "SELECT = Oui"
   </source>
   <dest>
     *: "PLAY = Oui"
@@ -858,6 +859,7 @@
     ipod*: "SELECT = Oui"
     x5: "SELECT = Oui"
     h10: "NEXT = Oui"
+    gigabeat: "SELECT = Oui"
   </dest>
   <voice>
     *: ""
@@ -1453,16 +1455,16 @@
 </phrase>
 <phrase>
   id: LANG_RESUME
-  desc: in settings_menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Resume on startup"
+    *: ""
   </source>
   <dest>
-    *: "Reprise auto. au Démarrage"
+    *: deprecated
   </dest>
   <voice>
-    *: "Reprise automatique au démarrage"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2633,12 +2635,15 @@
   user:
   <source>
     *: "Mic"
+    h100,h120,h300: "Internal Mic"
   </source>
   <dest>
     *: "Micro Intégré"
+    h100,h120,h300: "Micro Intégré"
   </dest>
   <voice>
     *: "Micro intégré"
+    h100,h120,h300: "Microphone Intégré"
   </voice>
 </phrase>
 <phrase>
@@ -2755,16 +2760,16 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_STARTUP
-  desc: Start Rockbox in Recording Screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "Show Recording Screen on Startup"
+    *: ""
   </source>
   <dest>
-    *: "Afficher Menu Enregistrement au Démarrage"
+    *: deprecated
   </dest>
   <voice>
-    *: "Afficher menu d'enregistrement au démarrage"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3833,16 +3838,16 @@
 </phrase>
 <phrase>
   id: LANG_POWEROFF
-  desc: disk poweroff flag
+  desc: DEPRECATED
   user:
   <source>
-    *: "Disk Poweroff"
+    *: ""
   </source>
   <dest>
-    *: "Arrêt du Disque (Economie d'énergie)"
+    *: deprecated
   </dest>
   <voice>
-    *: "Arrêt du disque"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4508,10 +4513,14 @@
   desc: battery level in % and estimated time remaining
   user:
   <source>
-    *: "%d%% %dh %dm"
+    *: "Battery: %d%% %dh %dm"
+    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
-    *: "%d%% %dh %dm"
+    *: "Batterie: %d%% %dh %dm"
+    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Niveau de batterie"
@@ -4709,13 +4718,15 @@
     ipod*: "PLAY/PAUSE = Exit"
     x5: "RECORD = Exit"
     h10: "PREV = Exit"
+    gigabeat: "A = Exit"
   </source>
   <dest>
-    *: "OFF = Sortie"
-    h100,h120,h300: "STOP = Sotie"
-    ipod*: "PLAY/PAUSE = Sotie"
-    x5: "RECORD = Sotie"
-    h10: "PREV = Sotie"
+    *: "OFF = Quitter"
+    h100,h120,h300: "STOP = Quitter"
+    ipod*: "PLAY/PAUSE = Quitter"
+    x5: "RECORD = Quitter"
+    h10: "PREV = Quitter"
+    gigabeat: "A = Quitter"
   </dest>
   <voice>
     *: ""
@@ -4773,6 +4784,7 @@
     ipod*: "SELECT = Select"
     x5: "SELECT = Select"
     h10: "NEXT = Select"
+    gigabeat: "SELECT = Select"
   </source>
   <dest>
     *: "PLAY = Sélect."
@@ -4780,6 +4792,7 @@
     ipod*: "SELECT = Sélect."
     x5: "SELECT = Sélect."
     h10: "NEXT = Sélect."
+    gigabeat: "SELECT = Sélect."
   </dest>
   <voice>
     *: ""
@@ -4795,6 +4808,7 @@
     ipod*: "Long MENU = Delete"
     x5: "Long RECORD = Delete"
     h10: "REWIND = Delete"
+    gigabeat: "POWER = Delete"
   </source>
   <dest>
     *: "ON+PLAY = Suppr."
@@ -4802,6 +4816,7 @@
     ipod*: "Long MENU = Suppr."
     x5: "Long RECORD = Suppr."
     h10: "REWIND = Suppr."
+    gigabeat: "POWER = Suppr."
   </dest>
   <voice>
     *: ""
@@ -4882,18 +4897,20 @@
   desc: used in set_time()
   user:
   <source>
-    *: "ON To Set"
+    *: "ON = Set"
     h100,h120,h300: "NAVI = Set"
     ipod*: "SELECT = Set"
     x5: "SELECT = Set"
     h10: "NEXT = Set"
+    gigabeat: "SELECT = Set"
   </source>
   <dest>
-    *: "ON pour Valider"
+    *: "ON = Valider"
     h100,h120,h300: "NAVI = Valider"
     ipod*: "SELECT = Valider"
     x5: "SELECT = Valider"
     h10: "NEXT = Valider"
+    gigabeat: "SELECT = Valider"
   </dest>
   <voice>
     *: ""
@@ -4904,18 +4921,20 @@
   desc: used in set_time()
   user:
   <source>
-    *: "OFF To Revert"
+    *: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
     ipod*: "MENU = Revert"
     x5: "RECORD = Revert"
     h10: "PREV = Revert"
+    gigabeat: "POWER = Revert"
   </source>
   <dest>
-    *: "OFF pour Annuler"
+    *: "OFF = Annuler"
     h100,h120,h300: "STOP = Annuler"
     ipod*: "MENU = Annuler"
     x5: "RECORD = Annuler"
     h10: "PREV = Annuler"
+    gigabeat: "POWER = Annuler"
   </dest>
   <voice>
     *: ""
@@ -5335,9 +5354,11 @@
   user:
   <source>
     *: "PLAY=Set OFF=Cancel"
+    ipod*: "SELECT=Set MENU=Cancel"
   </source>
   <dest>
     *: "PLAY=Régler OFF=Annuler"
+    ipod*: "SELECT=Sélect. MENU=Annuler"
   </dest>
   <voice>
     *: ""
@@ -8422,7 +8443,7 @@
   desc: When you run the radio without an fmr file in settings
   user:
   <source>
-    *: "No Settings found, AutoScan?"
+    *: "No settings found. Autoscan?"
   </source>
   <dest>
     *: "Aucune Présélection Trouvée, AutoScanner?"
@@ -8460,7 +8481,7 @@
   </voice>
 </phrase>
 <phrase>
-id: LANG_CROSSFEED_DIRECT_GAIN
+  id: LANG_CROSSFEED_DIRECT_GAIN
   desc: in crossfeed settings
   user:
   <source>
@@ -8585,7 +8606,7 @@ id: LANG_CROSSFEED_DIRECT_GAIN
   desc: in tag cache settings
   user:
   <source>
-    *: "Update now"
+    *: "Update Now"
   </source>
   <dest>
     *: "Mise à Jour Immédiate"
@@ -8599,7 +8620,7 @@ id: LANG_CROSSFEED_DIRECT_GAIN
   desc: in tag cache settings
   user:
   <source>
-    *: "Auto update"
+    *: "Auto Update"
   </source>
   <dest>
     *: "Mise à Jour Automatique"
@@ -8613,7 +8634,7 @@ id: LANG_CROSSFEED_DIRECT_GAIN
   desc: in tag cache settings
   user:
   <source>
-    *: "Export modifications"
+    *: "Export Modifications"
   </source>
   <dest>
     *: "Exporter des Modifications"
@@ -8627,7 +8648,7 @@ id: LANG_CROSSFEED_DIRECT_GAIN
   desc: in onplay menu
   user:
   <source>
-    *: "Playlist catalog"
+    *: "Playlist Catalog"
   </source>
   <dest>
     *: "Catalogue de Listes de Lecture"
@@ -8641,7 +8662,7 @@ id: LANG_CROSSFEED_DIRECT_GAIN
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "Add to playlist"
+    *: "Add to Playlist"
   </source>
   <dest>
     *: "Ajouter à la Liste de Lecture"
@@ -8655,7 +8676,7 @@ id: LANG_CROSSFEED_DIRECT_GAIN
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "Add to new playlist"
+    *: "Add to New Playlist"
   </source>
   <dest>
     *: "Ajouter à une Nouvelle Liste"
@@ -8669,7 +8690,7 @@ id: LANG_CROSSFEED_DIRECT_GAIN
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "View catalog"
+    *: "View Catalog"
   </source>
   <dest>
     *: "Voir le Catalogue"
@@ -8697,7 +8718,7 @@ id: LANG_CROSSFEED_DIRECT_GAIN
   desc: error message when no playlists for playlist catalog
   user:
   <source>
-    *: "No playlists"
+    *: "No Playlists"
   </source>
   <dest>
     *: "Pas de Listes de Lecture"
@@ -8711,7 +8732,7 @@ id: LANG_CROSSFEED_DIRECT_GAIN
   desc: in tag cache settings
   user:
   <source>
-    *: "Import modifications"
+    *: "Import Modifications"
   </source>
   <dest>
     *: "Importer des Modifications"
@@ -9197,7 +9218,7 @@ id: LANG_CROSSFEED_DIRECT_GAIN
   desc: show ID3 Database
   user:
   <source>
-    *: "ID3 Database"
+    *: "Database"
   </source>
   <dest>
     *: "Base de Données Tags"
@@ -9253,13 +9274,13 @@ id: LANG_CROSSFEED_DIRECT_GAIN
   desc: in the recording settings
   user:
   <source>
-    *: "Mic"
+    *: "Int. Mic"
   </source>
   <dest>
     *: "Micro Intégré"
   </dest>
   <voice>
-    *: "Micro intégré"
+    *: "Microphone intégré"
   </voice>
 </phrase>
 <phrase>
@@ -9861,7 +9882,7 @@ id: LANG_CROSSFEED_DIRECT_GAIN
   desc: in settings_menu.
   user:
   <source>
-    *: "Pause on headphone unplug"
+    *: "Pause on Headphone Unplug"
   </source>
   <dest>
     *: "Pause Quand Ecouteurs Insérés"
@@ -9889,7 +9910,7 @@ id: LANG_CROSSFEED_DIRECT_GAIN
   desc: in pause_phones_menu.
   user:
   <source>
-    *: "Duration to rewind"
+    *: "Duration to Rewind"
   </source>
   <dest>
     *: "Durée du Retour"
@@ -9903,7 +9924,7 @@ id: LANG_CROSSFEED_DIRECT_GAIN
   desc: in pause_phones_menu.
   user:
   <source>
-    *: "Disable auto-resume if phones not present"
+    *: "Disable resume on startup if phones unplugged"
   </source>
   <dest>
     *: "Désactiver auto-reprise si écouteurs non présent"
@@ -10440,5 +10461,229 @@ id: LANG_CROSSFEED_DIRECT_GAIN
   </dest>
   <voice>
     *: "Lire suivant (remplacer)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_THEME
+  desc: save a theme file
+  user:
+  <source>
+    *: "Save Theme Settings"
+  </source>
+  <dest>
+    *: "Sauvegarder le Thème Actuel"
+  </dest>
+  <voice>
+    *: "Sauvegarder le thème actuel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_CHARGING
+  desc: in Battery menu
+  user:
+  <source>
+    *: "Charge During USB Connection"
+  </source>
+  <dest>
+    *: "Charger Durant la Connection USB"
+  </dest>
+  <voice>
+    *: "Charger durant la connection U S B"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUMARTIST
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Album Artist]"
+  </source>
+  <dest>
+    *: "[Artiste de l'Album]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMMENT
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Comment]"
+  </source>
+  <dest>
+    *: "[Commentaire]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUESHEET
+  desc:
+  user:
+  <source>
+    *: "Cuesheet"
+  </source>
+  <dest>
+    *: "Cuesheet"
+  </dest>
+  <voice>
+    *: "Cuesheet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUESHEET_ENABLE
+  desc: cuesheet support option
+  user:
+  <source>
+    *: "Cuesheet Support"
+  </source>
+  <dest>
+    *: "Support des Fichiers Cuesheet"
+  </dest>
+  <voice>
+    *: "Support des fichiers cuesheet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_MENU
+  desc: fm menu title
+  user:
+  <source>
+    *: "FM Radio Menu"
+  </source>
+  <dest>
+    *: "Menu Radio FM"
+  </dest>
+  <voice>
+    *: "Menu radio FM"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIR_BROWSER
+  desc: in root menu
+  user:
+  <source>
+    *: "Files"
+  </source>
+  <dest>
+    *: "Dossiers et Fichiers"
+  </dest>
+  <voice>
+    *: "Dossiers et fichiers"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_MENU
+  desc: in root menu
+  user:
+  <source>
+    *: "Settings"
+  </source>
+  <dest>
+    *: "Réglages"
+  </dest>
+  <voice>
+    *: "Réglages"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOW_PLAYING
+  desc: in root menu
+  user:
+  <source>
+    *: "Now Playing"
+  </source>
+  <dest>
+    *: "Lecture en Cours"
+  </dest>
+  <voice>
+    *: "Lecture en cours"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_PLAYBACK
+  desc: in root menu
+  user:
+  <source>
+    *: "Resume Playback"
+  </source>
+  <dest>
+    *: "Reprendre la Lecture"
+  </dest>
+  <voice>
+    *: "Reprendre la lecture"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_SCREEN
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Start Screen"
+  </source>
+  <dest>
+    *: "Ecran de Démarrage"
+  </dest>
+  <voice>
+    *: "Ecran de démarrage"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ROCKBOX_TITLE
+  desc: in root menu
+  user:
+  <source>
+    *: "Rockbox"
+  </source>
+  <dest>
+    *: "Rockbox"
+  </dest>
+  <voice>
+    *: "Rockbox"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Main Menu"
+  </source>
+  <dest>
+    *: "Menu Principal"
+  </dest>
+  <voice>
+    *: "Menu principal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVIOUS_SCREEN
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Previous Screen"
+  </source>
+  <dest>
+    *: "Ecran Précédant"
+  </dest>
+  <voice>
+    *: "Ecran précédant"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_WAKEUP_SCREEN
+  desc: in alarm menu setting
+  user:
+  <source>
+    *: "Alarm Wake up Screen"
+  </source>
+  <dest>
+    *: "Ecran d'Alarme/Réveil"
+  </dest>
+  <voice>
+    *: "Ecran d'alarme,réveil"
   </voice>
 </phrase>
