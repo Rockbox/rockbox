@@ -34,10 +34,14 @@ void audio_set_output_source(int source)
     #endif
     };
 
+    int level = set_irq_level(DMA_IRQ_LEVEL);
+
     if ((unsigned)source >= AUDIO_NUM_SOURCES)
         source = AUDIO_SRC_PLAYBACK;
 
     IIS2CONFIG = (IIS2CONFIG & ~(7 << 8)) | (txsrc_select[source+1] << 8);
+
+    set_irq_level(level);
 } /* audio_set_output_source */
 
 void audio_set_source(int source, unsigned flags)

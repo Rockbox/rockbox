@@ -63,30 +63,42 @@ void spdif_set_output_source(int source, bool src_on)
     };
 
     bool kick;
+    int level;
+    int iis2config = 0;
 
     if ((unsigned)source >= ARRAYLEN(ebu1_config))
         source = AUDIO_SRC_PLAYBACK;
 
     spdif_source = source;
     spdif_on     = spdif_powered() && src_on;
-    kick         = spdif_on && source == AUDIO_SRC_PLAYBACK;
+
+    /* Keep a DMA interrupt initiated stop from changing play state */
+    level = set_irq_level(DMA_IRQ_LEVEL);
+
+    kick         = spdif_on && source == AUDIO_SRC_PLAYBACK
+                   && (DCR0 & DMA_EEXT);
 
     /* FIFO must be in reset condition to reprogram bits 15-12 */
     or_l(0x800, &EBU1CONFIG);
 
     if (kick)
+    {
+        iis2config = IIS2CONFIG;
         or_l(0x800, &IIS2CONFIG); /* Have to resync IIS2 TXSRC */
+    }
 
     /* Tranceiver must be powered or else monitoring will be disabled.
        CLOCKSEL bits only have relevance to normal operation so just
        set them always. */
     EBU1CONFIG = (spdif_on ? ebu1_config[source + 1] : 0) | (7 << 12);
 
-    if (kick && (DCR0 & DMA_EEXT)) /* only if still playing */
+    if (kick)
     {
-        and_l(~0x800, &IIS2CONFIG);
+        IIS2CONFIG = iis2config;
         PDOR3 = 0; /* A write to the FIFO kick-starts playback */
     }
+
+    set_irq_level(level);
 } /* spdif_set_output_source */
 
 /* Return the last set S/PDIF audio source */

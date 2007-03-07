@@ -23,6 +23,7 @@
 
 void audio_set_output_source(int source)
 {
+    int level = set_irq_level(DMA_IRQ_LEVEL);
     unsigned long txsrc;
 
     if ((unsigned)source >= AUDIO_NUM_SOURCES)
@@ -31,6 +32,7 @@ void audio_set_output_source(int source)
         txsrc = (4 << 8); /* recording, iis1RcvData */
 
     IIS1CONFIG = (IIS1CONFIG & ~(7 << 8)) | txsrc;
+    set_irq_level(level);
 } /* audio_set_output_source */
 
 void audio_set_source(int source, unsigned flags)

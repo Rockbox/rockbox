@@ -57,7 +57,16 @@ static inline unsigned long coldfire_get_macsr(void)
     return m;
 }
 
-#define HIGHEST_IRQ_LEVEL (7<<8)
+/* ColdFire IRQ Levels/Priorities in Rockbox summary:
+ * DMA0   - level 6, priority 0 (playback)
+ * DMA1   - level 6, priority 1 (recording)
+ * TIMER1 - level 4, priority 0 (timers)
+ * TIMER0 - level 3, priority 0 (ticks)
+ * GPI0   - level 3, priority 0 (pcf50606 PMU, secondary controller)
+ */
+#define HIGHEST_IRQ_LEVEL   (5<<8) /* Disable all but DMA and higher */
+#define DMA_IRQ_LEVEL       (6<<8) /* Disable DMA and lower */
+#define DISABLE_INTERRUPTS  (7<<8) /* Disable all but NMIs */
 static inline int set_irq_level(int level)
 {
     int oldlevel;

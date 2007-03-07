@@ -91,7 +91,7 @@ bool ide_powered(void)
 
 void power_off(void)
 {
-    set_irq_level(HIGHEST_IRQ_LEVEL);
+    set_irq_level(DISABLE_INTERRUPTS);
     and_l(~0x00080000, &GPIO1_OUT);
     asm("halt");
     while(1)
