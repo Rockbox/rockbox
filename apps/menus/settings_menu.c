@@ -38,6 +38,9 @@
 #ifdef HAVE_RTC_ALARM
 #include "alarm_menu.h"
 #endif
+#if CONFIG_TUNER
+#include "radio.h"
+#endif
 
 /***********************************/
 /*    TAGCACHE MENU                */
