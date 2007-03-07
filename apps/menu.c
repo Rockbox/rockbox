@@ -607,7 +607,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
     const struct menu_item_ex *menu_stack[MAX_MENUS];
     int menu_stack_selected_item[MAX_MENUS];
     int stack_top = 0;
-    bool in_stringlist;
+    bool in_stringlist, done = false;
     menu_callback_type menu_callback = NULL;
     if (start_menu == NULL)
         menu = &main_menu_;
@@ -630,7 +630,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
     /* load the callback, and only reload it if menu changes */
     get_menu_callback(menu, &menu_callback);
     
-    while (ret == 0)
+    while (!done)
     {
         action = get_action(CONTEXT_MAINMENU,HZ); 
         /* HZ so the status bar redraws corectly */
@@ -660,6 +660,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
         else if (action == ACTION_MENU_WPS)
         {
             ret = GO_TO_PREVIOUS_MUSIC;
+            done = true;
         }
         else if (action == ACTION_MENU_STOP)
         {
@@ -677,6 +678,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                 ret = GO_TO_ROOT;
             else
                 ret = GO_TO_PREVIOUS;
+            done = true;
         }
         else if (action == ACTION_STD_CANCEL)
         {
@@ -697,7 +699,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
             else if (menu != &root_menu_)
             {
                 ret = GO_TO_PREVIOUS;
-                break;
+                done = true;
             }
         }
         else if (action == ACTION_STD_OK)
@@ -766,9 +768,9 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                     }
                     break;
                 case MT_RETURN_VALUE:
-                    if (start_selected)
-                        *start_selected = selected;
-                    return temp->value;
+                    ret = temp->value;
+                    done = true;
+                    break;
             }
             if (type != MT_MENU && menu_callback)
                 menu_callback(ACTION_EXIT_MENUITEM,temp);
@@ -786,7 +788,8 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
     }
     action_signalscreenchange();
     if (start_selected)
-        *start_selected = selected;
+        *start_selected = get_menu_selection(
+                            gui_synclist_get_sel_pos(&lists), menu);
     return ret;
 }
 

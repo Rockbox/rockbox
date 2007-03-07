@@ -359,16 +359,21 @@ void root_menu(void)
         switch (ret_val)
         {
             case GO_TO_ROOT:
-                selected = get_selection(last_screen);
+                if (last_screen != GO_TO_ROOT)
+                    selected = get_selection(last_screen);
                 ret_val = do_menu(&root_menu_, &selected);
                 /* As long as MENU_ATTACHED_USB == GO_TO_ROOT this works */
-                if (ret_val == MENU_ATTACHED_USB)
+                if (ret_val <= GO_TO_ROOT)
                 {
-                    check_boot();
+                    if (ret_val == MENU_ATTACHED_USB)
+                        check_boot();
+                    else if (ret_val == GO_TO_PREVIOUS)
+                    {
+                        ret_val = last_screen;
+                        last_screen = GO_TO_ROOT;
+                    }
                     continue;
                 }
-                else if (ret_val <= GO_TO_ROOT)
-                    continue;
                 last_screen = GO_TO_ROOT;
                 break;
 
