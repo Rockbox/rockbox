@@ -1740,12 +1740,14 @@ static int compare(const void *p1, const void *p2)
     struct tempbuf_searchidx *e1 = (struct tempbuf_searchidx *)p1;
     struct tempbuf_searchidx *e2 = (struct tempbuf_searchidx *)p2;
     
-    /*
-    if (!strncasecmp("the ", e1, 4))
-        e1 = &e1[4];
-    if (!strncasecmp("the ", e2, 4))
-        e2 = &e2[4];
-    */
+    if (strcmp(e1->str, UNTAGGED) == 0)
+    {
+        if (strcmp(e2->str, UNTAGGED) == 0)
+            return 0;
+        return -1;
+    }
+    else if (strcmp(e2->str, UNTAGGED) == 0)
+        return 1;
     
     return strncasecmp(e1->str, e2->str, TAG_MAXLEN);
 }
