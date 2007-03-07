@@ -195,12 +195,6 @@ void main(void)
     adc_init();
     button_init();
     
-    if ((on_button && button_hold()) ||
-         (rc_on_button && remote_button_hold()))
-    {
-        hold_status = true;
-    }
-    
     backlight_init();
 
     lcd_init();
@@ -218,9 +212,17 @@ void main(void)
 
     check_battery();
 
+    if(rtc_alarm)
+        printf("RTC alarm detected");
+    
     /* Don't start if the Hold button is active on the device you
        are starting with */
-    if (!usb_detect() && !charger_inserted() && hold_status)
+    if ((on_button && button_hold()) ||
+         (rc_on_button && remote_button_hold()))
+    {
+        hold_status = true;
+    }
+    if (hold_status && !rtc_alarm && !usb_detect() && !charger_inserted())
     {
         if (detect_original_firmware())
         {
@@ -229,9 +231,6 @@ void main(void)
         }
     }
 
-    if(rtc_alarm)
-        printf("RTC alarm detected");
-    
     /* Holding REC while starting runs the original firmware */
     if (detect_original_firmware() && rec_button)
     {
