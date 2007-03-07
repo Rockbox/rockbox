@@ -74,7 +74,7 @@ the \setting{Initialize Now} function in the \setting{Database Menu}
   played tracks to be logged and scored.
   
 \item[Export modifications.]
-  This allows for the runtime data to be exported into \\
+  This allows for the runtime data to be exported to the file \\
   \fname{/.rockbox/database\_changelog.txt}, which backs up the runtime data in
   ASCII format. This is needed when database structures change, because new
   code cannot read old database code. But, all modifications
@@ -82,8 +82,8 @@ the \setting{Initialize Now} function in the \setting{Database Menu}
   
 \item[Import modifications.]
   Allows the \fname{/.rockbox/database\_changelog.txt} backup to be 
-  conveniently loaded into the database. This is performed automatically when
-  the database is initialised.
+  conveniently loaded into the database. If \setting{Auto Update} is
+  enabled this is performed automatically when the database is initialised.
   
 \end{description}
 
