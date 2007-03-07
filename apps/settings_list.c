@@ -610,9 +610,8 @@ const struct settings_list settings[] = {
 #endif
     /* disk */
 #ifndef HAVE_MMC
-    INT_SETTING(0, disk_spindown, LANG_SPINDOWN, 5, "disk spindown",                      
+    INT_SETTING(0, disk_spindown, LANG_SPINDOWN, 5, "disk spindown",
                     UNIT_SEC, 3, 254, 1, NULL, NULL, ata_spindown),
-    {F_T_INT,&global_settings.disk_spindown,LANG_SPINDOWN,INT(5),"disk spindown",NULL,UNUSED},
 #endif /* HAVE_MMC */
     /* browser */
     CHOICE_SETTING(0, dirfilter, LANG_FILTER, SHOW_SUPPORTED, "show files",
