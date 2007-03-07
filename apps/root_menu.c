@@ -389,9 +389,9 @@ void root_menu(void)
             case GO_TO_FILEBROWSER:
 #ifdef HAVE_TAGCACHE
             case GO_TO_DBBROWSER:
+#endif
                 previous_browser = ret_val;
                 break;
-#endif
 
             case GO_TO_PREVIOUS_MUSIC:
                 ret_val = previous_music;
