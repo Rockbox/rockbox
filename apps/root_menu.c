@@ -104,8 +104,15 @@ static int browser(void* param)
         case GO_TO_DBBROWSER:
             if (!tagcache_is_usable())
             {
+                /* Check if we're still initialising, so status is unknown */
+                struct tagcache_stat *stat = tagcache_get_stat();                
+                if  (!stat->initialized)
+                {
+                    gui_syncsplash(HZ*2, true, str(LANG_TAGCACHE_BUSY));
+                    return GO_TO_PREVIOUS;
+                }
+               
                 /* Re-init if required */
-                struct tagcache_stat *stat = tagcache_get_stat();
                 if (!stat->ready && !stat->commit_delayed && stat->processed_entries == 0)
                 {
                     /* Prompt the user */
