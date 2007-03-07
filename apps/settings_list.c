@@ -352,11 +352,7 @@ const struct settings_list settings[] = {
          
     CHOICE_SETTING(0,channel_config,LANG_CHANNEL,0,"channels",
          "stereo,mono,custom,mono left,mono right,karaoke", 
-#if CONFIG_CODEC == SWCODEC
-         channels_set,
-#else
          sound_set_channels,
-#endif
          6, ID2P(LANG_CHANNEL_STEREO), ID2P(LANG_CHANNEL_MONO),
             ID2P(LANG_CHANNEL_CUSTOM), ID2P(LANG_CHANNEL_LEFT),
             ID2P(LANG_CHANNEL_RIGHT), ID2P(LANG_CHANNEL_KARAOKE)),

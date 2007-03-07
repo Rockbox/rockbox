@@ -169,12 +169,14 @@ sound_set_type* sound_get_fn(int setting)
         return NULL;
 }
 
-#ifdef HAVE_SW_TONE_CONTROLS
+#if CONFIG_CODEC == SWCODEC
 /* Copied from dsp.h, nasty nasty, but we don't want to include dsp.h */
 enum {
     DSP_CALLBACK_SET_PRESCALE = 0,
     DSP_CALLBACK_SET_BASS,
-    DSP_CALLBACK_SET_TREBLE
+    DSP_CALLBACK_SET_TREBLE,
+    DSP_CALLBACK_SET_CHANNEL_CONFIG,
+    DSP_CALLBACK_SET_STEREO_WIDTH
 };
 
 static int (*dsp_callback)(int, intptr_t) = NULL;
@@ -567,7 +569,7 @@ void sound_set_treble(int value)
 void sound_set_channels(int value)
 {
 #if CONFIG_CODEC == SWCODEC
-    (void)value;
+    dsp_callback(DSP_CALLBACK_SET_CHANNEL_CONFIG, value);
 #else
     if(!audio_is_initialized)
         return;
@@ -579,7 +581,7 @@ void sound_set_channels(int value)
 void sound_set_stereo_width(int value)
 {
 #if CONFIG_CODEC == SWCODEC
-    (void)value;
+    dsp_callback(DSP_CALLBACK_SET_STEREO_WIDTH, value);
 #else
     if(!audio_is_initialized)
         return;

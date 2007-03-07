@@ -971,7 +971,7 @@ static void apply_gain(int count, int32_t *buf[])
         FRACMUL_8_LOOP(s, gain, sl, d);
 }
 
-void stereo_width_set(int value)
+void dsp_set_stereo_width(int value)
 {
     long width, straight, cross;
     
@@ -1022,6 +1022,8 @@ static void channels_process_sound_chan_mono(int count, int32_t *buf[])
 }
 #endif /* DSP_HAVE_ASM_SOUND_CHAN_MONO */
 
+#if CONFIG_CODEC == SWCODEC
+
 #ifdef HAVE_SW_TONE_CONTROLS
 static void set_tone_controls(void)
 {
@@ -1029,10 +1031,12 @@ static void set_tone_controls(void)
                          0xffffffff/NATIVE_FREQUENCY*3500,
                          bass, treble, -prescale, tone_filter.coefs);
 }
+#endif
 
 int dsp_callback(int msg, intptr_t param)
 {
     switch (msg) {
+#ifdef HAVE_SW_TONE_CONTROLS
     case DSP_CALLBACK_SET_PRESCALE:
         prescale = param;
         set_tone_controls();
@@ -1045,6 +1049,13 @@ int dsp_callback(int msg, intptr_t param)
         break;
     case DSP_CALLBACK_SET_TREBLE:
         treble = param;
+#endif
+    case DSP_CALLBACK_SET_CHANNEL_CONFIG:
+        dsp_set_channel_config(param);
+        break;
+    case DSP_CALLBACK_SET_STEREO_WIDTH:
+        dsp_set_stereo_width(param);
+        break;
     default:
         break;
     }
@@ -1097,7 +1108,7 @@ static void channels_process_sound_chan_karaoke(int count, int32_t *buf[])
 }
 #endif /* DSP_HAVE_ASM_SOUND_CHAN_KARAOKE */
 
-void channels_set(int value)
+void dsp_set_channel_config(int value)
 {
     static const channels_process_fn_type channels_process_functions[] =
     {

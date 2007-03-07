@@ -642,20 +642,15 @@ void settings_apply_pm_range(void)
 
 void sound_settings_apply(void)
 {
-#ifdef HAVE_SW_TONE_CONTROLS
+#if CONFIG_CODEC == SWCODEC
     sound_set_dsp_callback(dsp_callback);
 #endif
     sound_set(SOUND_BASS, global_settings.bass);
     sound_set(SOUND_TREBLE, global_settings.treble);
     sound_set(SOUND_BALANCE, global_settings.balance);
     sound_set(SOUND_VOLUME, global_settings.volume);
-#if CONFIG_CODEC == SWCODEC
-    channels_set(global_settings.channel_config);
-    stereo_width_set(global_settings.stereo_width);
-#else
     sound_set(SOUND_CHANNELS, global_settings.channel_config);
     sound_set(SOUND_STEREO_WIDTH, global_settings.stereo_width);
-#endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     sound_set(SOUND_LOUDNESS, global_settings.loudness);
     sound_set(SOUND_AVC, global_settings.avc);
@@ -952,6 +947,7 @@ static void dec_sound_formatter(char *buffer, int buffer_size,
     int dec = val % 10;
     snprintf(buffer, buffer_size, "%c%d.%d %s", sign, integer, dec, unit);
 }
+
 bool set_sound(const unsigned char * string,
                int* variable,
                int setting)
@@ -970,14 +966,6 @@ bool set_sound(const unsigned char * string,
     else if (*unit == 'H')
         talkunit = UNIT_HERTZ;
     if (!numdec)
-#if CONFIG_CODEC == SWCODEC
-        /* We need to hijack this one and send it off to apps/dsp.c instead of
-           firmware/sound.c */
-        if (setting == SOUND_STEREO_WIDTH)
-            return set_int(string, unit, talkunit, variable, &stereo_width_set,
-                           steps, min, max, NULL );
-        else
-#endif
         return set_int(string, unit, talkunit,  variable, sound_callback,
                        steps, min, max, NULL );
     else

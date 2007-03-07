@@ -54,7 +54,9 @@ enum
 enum {
     DSP_CALLBACK_SET_PRESCALE = 0,
     DSP_CALLBACK_SET_BASS,
-    DSP_CALLBACK_SET_TREBLE
+    DSP_CALLBACK_SET_TREBLE,
+    DSP_CALLBACK_SET_CHANNEL_CONFIG,
+    DSP_CALLBACK_SET_STEREO_WIDTH
 };
 
 /* A bunch of fixed point assembler helper macros */
@@ -216,8 +218,8 @@ void dsp_set_eq_coefs(int band);
 void sound_set_pitch(int r);
 int sound_get_pitch(void);
 int dsp_callback(int msg, intptr_t param);
-void channels_set(int value);
-void stereo_width_set(int value);
+void dsp_set_channel_config(int value);
+void dsp_set_stereo_width(int value);
 void dsp_dither_enable(bool enable);
 
 #endif
