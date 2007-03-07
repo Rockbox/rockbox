@@ -724,9 +724,12 @@ bool menu_run(int m)
 
             default:
             {
-                if (menus[m].items[selected].function &&
-                    menus[m].items[selected].function())
-                    return  true;
+                if (selected >= 0 && selected < menus[m].count)
+                {
+                    if (menus[m].items[selected].function &&
+                        menus[m].items[selected].function())
+                        return  true;
+                }
                 gui_syncstatusbar_draw(&statusbars, true);
             }
         }
