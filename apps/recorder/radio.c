@@ -425,9 +425,9 @@ int radio_screen(void)
         radio_load_presets(global_settings.fmr_file);
     }
                                        
-#ifndef SIMULATOR
     if(radio_status == FMRADIO_OFF)    
         audio_stop();
+#ifndef SIMULATOR
 
 #if CONFIG_CODEC != SWCODEC
     if(rec_create_directory() > 0)
