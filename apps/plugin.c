@@ -370,17 +370,13 @@ static const struct plugin_api rockbox_api = {
 #endif /* !SIMULATOR && CONFIG_CODEC != SWCODEC */
 
     /* menu */
+    do_menu,
+    /* OLD API - dont use unless you have to */
     menu_init,
     menu_exit,
     menu_show,
     menu_run,
-    menu_cursor,
-    menu_description,
-    menu_delete,
     menu_count,
-    menu_draw,
-    menu_insert,
-    menu_set_cursor,
     set_option,
     set_int,
     set_bool,

@@ -110,12 +110,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 46
+#define PLUGIN_API_VERSION 47
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 46
+#define PLUGIN_MIN_API_VERSION 47
 
 /* plugin return codes */
 enum plugin_status {
@@ -465,19 +465,15 @@ struct plugin_api {
 #endif
 
     /* menu */
+    int (*do_menu)(const struct menu_item_ex *menu, int *start_selected);
+    /* OLD API - dont use unless you have to */
     int (*menu_init)(const struct menu_item* mitems, int count,
                int (*callback)(int, int),
                const char *button1, const char *button2, const char *button3);
     void (*menu_exit)(int menu);
     int (*menu_show)(int m);
     bool (*menu_run)(int menu);
-    int (*menu_cursor)(int menu);
-    char* (*menu_description)(int menu, int position);
-    void (*menu_delete)(int menu, int position);
     int (*menu_count)(int menu);
-    void (*menu_draw)(int menu);
-    void (*menu_insert)(int menu, int position, char *desc, bool (*function) (void));
-    void (*menu_set_cursor)(int menu, int position);
 
     bool (*set_option)(const char* string, void* variable,
                        enum optiontype type, const struct opt_items* options,

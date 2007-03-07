@@ -25,38 +25,6 @@
 #include "icons.h"
 
 
-struct menu_item {
-    unsigned char *desc; /* string or ID */
-    bool (*function) (void); /* return true if USB was connected */
-};
-
-int menu_init(const struct menu_item* mitems, int count,
-                int (*callback)(int, int),
-                const char *button1, const char *button2, const char *button3);
-void menu_exit(int menu);
-
-void put_cursorxy(int x, int y, bool on);
-
- /* Returns below define, or number of selected menu item*/
-int menu_show(int m);
-#define MENU_ATTACHED_USB -1
-#define MENU_SELECTED_EXIT -2
-#define MENU_EXIT_ALL -3
-#define MENU_RETURN_TO_WPS -4
-
-bool menu_run(int menu);
-int menu_cursor(int menu);
-char* menu_description(int menu, int position);
-void menu_delete(int menu, int position);
-int menu_count(int menu);
-bool menu_moveup(int menu);
-bool menu_movedown(int menu);
-void menu_draw(int menu);
-void menu_insert(int menu, int position, char *desc, bool (*function) (void));
-void menu_set_cursor(int menu, int position);
-void menu_talk_selected(int m);
-
-
 enum menu_item_type {
     MT_MENU = 0,
     MT_SETTING,
@@ -67,6 +35,8 @@ enum menu_item_type {
     MT_FUNCTION_WITH_PARAM,
     MT_RETURN_ID, /* returns the position of the selected item (starting at 0)*/
     MT_RETURN_VALUE, /* returns a value associated with an item */
+    MT_OLD_MENU, /* used so we can wrap the old menu api 
+                    around the new api. Noone else should use this */
 };
 
 typedef int (*menu_function)(void);
@@ -214,5 +184,25 @@ bool do_setting_from_menu(const struct menu_item_ex *temp);
             { (void*)name##_},{.callback_and_desc = & name##__}};
             
 
+/* OLD API - only use if you really have to.. Ideally this will be dropped */
+struct menu_item {
+    unsigned char *desc; /* string or ID */
+    bool (*function) (void); /* return true if USB was connected */
+};
+
+int menu_init(const struct menu_item* mitems, int count,
+                int (*callback)(int, int),
+                const char *button1, const char *button2, const char *button3);
+void menu_exit(int menu);
+
+ /* Returns below define, or number of selected menu item*/
+int menu_show(int m);
+#define MENU_ATTACHED_USB -1
+#define MENU_SELECTED_EXIT -2
+#define MENU_EXIT_ALL -3
+#define MENU_RETURN_TO_WPS -4
+
+bool menu_run(int menu);
+int menu_count(int menu);
 
 #endif /* End __MENU_H__ */
