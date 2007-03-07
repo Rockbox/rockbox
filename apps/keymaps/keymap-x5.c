@@ -120,6 +120,7 @@ static const struct button_mapping remote_button_context_keyboard[] = {
     { ACTION_KBD_RIGHT,        BUTTON_RC_FF,                      BUTTON_NONE },
     { ACTION_KBD_RIGHT,        BUTTON_RC_FF|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_KBD_SELECT_REM,   BUTTON_RC_REC|BUTTON_REL,          BUTTON_NONE },
+    { ACTION_KBD_SELECT_REM,   BUTTON_RC_MENU|BUTTON_REL,         BUTTON_NONE },
     { ACTION_KBD_DONE,         BUTTON_RC_PLAY|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_KBD_ABORT,        BUTTON_RC_MODE,                    BUTTON_NONE },
     { ACTION_KBD_UP,           BUTTON_RC_VOL_DOWN,                BUTTON_NONE },
