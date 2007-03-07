@@ -211,11 +211,58 @@ MENUITEM_SETTING(poweroff, &global_settings.poweroff, NULL);
 #ifdef HAVE_RTC_ALARM
 MENUITEM_FUNCTION(alarm_screen_call, ID2P(LANG_ALARM_MOD_ALARM_MENU),
                    (menu_function)alarm_screen, NULL, Icon_NOICON);
-#if defined(HAVE_RECORDING) || CONFIG_TUNER
-MENUITEM_SETTING(alarm_wake_up_screen,
-                    &global_settings.alarm_wake_up_screen, NULL);
+#if CONFIG_TUNER || defined(HAVE_RECORDING)
+
+#if CONFIG_TUNER && !defined(HAVE_RECORDING)
+/* This need only be shown if we dont have recording, because if we do
+   then always show the setting item, because there will always be at least
+   2 items */
+static int alarm_callback(int action,const struct menu_item_ex *this_item)
+{
+    (void)this_item;
+    switch (action)
+    {
+        case ACTION_REQUEST_MENUITEM:
+            if (radio_hardware_present() == 0)
+                return ACTION_EXIT_MENUITEM;
+            break;
+    }
+    return action;
+}
+#else
+#define alarm_callback NULL
+#endif /* CONFIG_TUNER && !HAVE_RECORDING */
+/* have to do this manually because the setting screen
+   doesnt handle variable item count */
+static int alarm_setting(void)
+{
+    struct opt_items items[ALARM_START_COUNT];
+    int i = 0;
+    items[i].string = str(LANG_RESUME_PLAYBACK);
+    items[i].voice_id = LANG_RESUME_PLAYBACK;
+    i++;
+#if CONFIG_TUNER
+    if (radio_hardware_present())
+    {
+        items[i].string = str(LANG_FM_RADIO);
+        items[i].voice_id = LANG_FM_RADIO;
+        i++;
+    }
 #endif
+#ifdef HAVE_RECORDING
+    items[i].string = str(LANG_RECORDING);
+    items[i].voice_id = LANG_RECORDING;
+    i++;
 #endif
+    return set_option(str(LANG_ALARM_WAKEUP_SCREEN),
+                      &global_settings.alarm_wake_up_screen, 
+                      INT, items, i, NULL);
+}
+
+MENUITEM_FUNCTION(alarm_wake_up_screen, ID2P(LANG_ALARM_WAKEUP_SCREEN),
+                    alarm_setting, alarm_callback, Icon_Menu_setting);
+#endif /* CONFIG_TUNER || defined(HAVE_RECORDING) */
+#endif /* HAVE_RTC_ALARM */
 
 /* Limits menu */
 MENUITEM_SETTING(max_files_in_dir, &global_settings.max_files_in_dir, NULL);

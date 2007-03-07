@@ -1115,17 +1115,8 @@ const struct settings_list settings[] = {
     SYSTEM_SETTING(NVRAM(1),last_screen,-1),
 #if defined(HAVE_RTC_ALARM) && \
     (defined(HAVE_RECORDING) || CONFIG_TUNER)
-    CHOICE_SETTING(0, alarm_wake_up_screen, LANG_ALARM_WAKEUP_SCREEN, 
-            ALARM_START_WPS,
-            "alarm wakeup screen", ALARM_SETTING_TEXT, 
-            NULL, ALARM_START_COUNT, ID2P(LANG_RESUME_PLAYBACK)
-#if CONFIG_TUNER
-            ,ID2P(LANG_FM_RADIO)
-#endif
-#ifdef HAVE_RECORDING
-            ,ID2P(LANG_RECORDING)
-#endif
-            ),
+    {F_T_INT, &global_settings.alarm_wake_up_screen, LANG_ALARM_WAKEUP_SCREEN,
+        INT(ALARM_START_WPS), "alarm wakeup screen", ALARM_SETTING_TEXT, UNUSED},
 #endif /* HAVE_RTC_ALARM */
 };
 
