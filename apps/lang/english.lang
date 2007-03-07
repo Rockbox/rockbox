@@ -10701,3 +10701,25 @@
     *: "Alarm Wake up Screen"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_BUILDING_DATABASE
+  desc: splash database building progress
+  user:
+  <source>
+    *: "Building database... %d found (OFF for menu)"
+    h100,h120,h300: "Building database... %d found (STOP for menu)"
+    ipod*: "Building database... %d found (PLAY/PAUSE for menu)"
+    x5: "Building database... %d found (Long PLAY for menu)"
+    h10: "Building database... %d found (PREV for menu)"
+  </source>
+  <dest>
+    *: "Building database... %d found (OFF for menu)"
+    h100,h120,h300: "Building database... %d found (STOP for menu)"
+    ipod*: "Building database... %d found (PLAY/PAUSE for menu)"
+    x5: "Building database... %d found (Long PLAY for menu)"
+    h10: "Building database... %d found (PREV for menu)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>

@@ -207,10 +207,12 @@ static void init_tagcache(void)
         {
 #ifdef HAVE_LCD_BITMAP
             gui_syncsplash(0, true, "%s [%d/%d]",
-                                    str(LANG_TAGCACHE_INIT), ret, 7);
+                str(LANG_TAGCACHE_INIT), ret, 
+                tagcache_get_max_commit_step());
 #else
             lcd_double_height(false);
-            snprintf(buf, sizeof(buf), " TC [%d/%d]", ret, 7);
+            snprintf(buf, sizeof(buf), " TC [%d/%d]", ret, 
+                tagcache_get_max_commit_step());
             lcd_puts(0, 1, buf);
 #endif
             clear = true;

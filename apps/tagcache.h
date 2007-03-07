@@ -187,6 +187,6 @@ void tagcache_start_scan(void);
 void tagcache_stop_scan(void);
 bool tagcache_update(void);
 bool tagcache_rebuild(void);
-
+int tagcache_get_max_commit_step(void);
 #endif
 #endif

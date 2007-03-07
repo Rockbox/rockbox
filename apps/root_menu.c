@@ -61,6 +61,9 @@
 #ifdef HAVE_RTC_ALARM
 #include "rtc.h"
 #endif
+#ifdef HAVE_TAGCACHE
+#include "tagcache.h"
+#endif
 
 struct root_items {
     int (*function)(void* param);
@@ -99,11 +102,58 @@ static int browser(void* param)
         break;
 #ifdef HAVE_TAGCACHE
         case GO_TO_DBBROWSER:
-            if ((last_screen != GO_TO_ROOT) && !tagcache_is_usable())
+            if (!tagcache_is_usable())
             {
-                gui_syncsplash(HZ, true, str(LANG_TAGCACHE_BUSY));
-                return GO_TO_PREVIOUS;
+                /* Re-init if required */
+                struct tagcache_stat *stat = tagcache_get_stat();
+                if (!stat->ready && !stat->commit_delayed && stat->processed_entries == 0)
+                {
+                    /* Prompt the user */
+                    char *lines[]={str(LANG_TAGCACHE_BUSY), str(LANG_TAGCACHE_FORCE_UPDATE)};
+                    struct text_message message={lines, 2};
+                    if(gui_syncyesno_run(&message, NULL, NULL) == YESNO_NO)
+                        return GO_TO_PREVIOUS;
+                    int i;
+                    FOR_NB_SCREENS(i)
+                        screens[i].clear_display();
+
+                    /* Start initialisation */
+                    tagcache_rebuild();
+                }
+
+                /* Now display progress until it's ready or the user exits */
+                while(!tagcache_is_usable())
+                {
+                    gui_syncstatusbar_draw(&statusbars, false);
+                    stat = tagcache_get_stat();
+
+                    /* Maybe just needs to reboot due to delayed commit */
+                    if (stat->commit_delayed)
+                    {
+                        gui_syncsplash(HZ*2, true, str(LANG_PLEASE_REBOOT));
+                        break;
+                    }
+
+                    /* Display building progress */
+                    if (stat->commit_step > 0)
+                    {
+                        gui_syncsplash(0, true, "%s [%d/%d]",
+                            str(LANG_TAGCACHE_INIT), stat->commit_step, 
+                            tagcache_get_max_commit_step());
+                    }
+                    else
+                    {
+                        gui_syncsplash(0, true, str(LANG_BUILDING_DATABASE),
+                            stat->processed_entries);
+                    }
+
+                    /* Allow user to exit */
+                    if (action_userabort(HZ/2))
+                        break;
+                }
             }
+            if (!tagcache_is_usable())
+                return GO_TO_PREVIOUS;
             filter = SHOW_ID3DB;
             tc->dirlevel = last_db_dirlevel;
         break;

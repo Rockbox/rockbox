@@ -45,14 +45,27 @@
 /***********************************/
 /*    TAGCACHE MENU                */
 #ifdef HAVE_TAGCACHE
+
+static void tagcache_rebuild_with_splash(void)
+{
+    tagcache_rebuild();
+    gui_syncsplash(HZ*2, true, str(LANG_TAGCACHE_FORCE_UPDATE_SPLASH));   
+}
+
+static void tagcache_update_with_splash(void)
+{
+    tagcache_update();
+    gui_syncsplash(HZ*2, true, str(LANG_TAGCACHE_FORCE_UPDATE_SPLASH));
+}
+
 #ifdef HAVE_TC_RAMCACHE
 MENUITEM_SETTING(tagcache_ram, &global_settings.tagcache_ram, NULL);
 #endif
 MENUITEM_SETTING(tagcache_autoupdate, &global_settings.tagcache_autoupdate, NULL);
 MENUITEM_FUNCTION(tc_init, ID2P(LANG_TAGCACHE_FORCE_UPDATE),
-                    (int(*)(void))tagcache_rebuild, NULL, Icon_NOICON);
+                    (int(*)(void))tagcache_rebuild_with_splash, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(tc_update, ID2P(LANG_TAGCACHE_UPDATE),
-                    (int(*)(void))tagcache_update, NULL, Icon_NOICON);
+                    (int(*)(void))tagcache_update_with_splash, NULL, Icon_NOICON);
 MENUITEM_SETTING(runtimedb, &global_settings.runtimedb, NULL);
 MENUITEM_FUNCTION(tc_export, ID2P(LANG_TAGCACHE_EXPORT),
                     (int(*)(void))tagtree_export, NULL, Icon_NOICON);

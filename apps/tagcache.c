@@ -3904,16 +3904,12 @@ bool tagcache_update(void)
         return false;
     
     queue_post(&tagcache_queue, Q_UPDATE, 0);
-    gui_syncsplash(HZ*2, true, str(LANG_TAGCACHE_FORCE_UPDATE_SPLASH));
-    
     return false;
 }
 
-bool tagcache_rebuild(void)
+bool tagcache_rebuild()
 {
     queue_post(&tagcache_queue, Q_REBUILD, 0);
-    gui_syncsplash(HZ*2, true, str(LANG_TAGCACHE_FORCE_UPDATE_SPLASH));
-    
     return false;
 }
 
@@ -3973,5 +3969,9 @@ bool tagcache_is_usable(void)
 int tagcache_get_commit_step(void)
 {
     return tc_stat.commit_step;
+}
+int tagcache_get_max_commit_step(void)
+{
+    return 8;   /* To be written, better hard-coded here than in the UI */
 }
 
