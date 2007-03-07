@@ -333,7 +333,10 @@ void root_menu(void)
 #endif
 #ifdef HAVE_RECORDING
         if (global_settings.alarm_wake_up_screen == ALARM_START_REC)
+        {
+            recording_start_automatic = true;
             ret_val = GO_TO_RECSCREEN;
+        }
 #endif
     }
 #endif /* HAVE_RTC_ALARM */

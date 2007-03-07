@@ -745,6 +745,8 @@ static void trigger_listener(int trigger_status)
     }
 }
 
+bool recording_start_automatic = false;
+
 bool recording_screen(bool no_source)
 {
     long button;
@@ -933,6 +935,14 @@ bool recording_screen(bool no_source)
                 have_recorded = true;
             }
             last_audio_stat = audio_stat;
+        }
+
+
+        if (recording_start_automatic)
+        {
+            /* simulate a button press */
+            button = ACTION_REC_PAUSE;
+            recording_start_automatic = false;
         }
 
         switch(button)

@@ -25,6 +25,9 @@ bool recording_screen(bool no_source);
 char *rec_create_filename(char *buf);
 int rec_create_directory(void);
 
+/* If true, start recording automatically when recording_sreen() is entered */
+extern bool recording_start_automatic;
+
 #if CONFIG_CODEC == SWCODEC
 /* handles device powerup and sets audio source */
 void rec_set_source(int source, unsigned flags);
