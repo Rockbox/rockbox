@@ -72,13 +72,17 @@ static int last_screen = GO_TO_ROOT; /* unfortunatly needed so we can resume
 static int browser(void* param)
 {
     int ret_val;
+#ifdef HAVE_TAGCACHE
     struct tree_context* tc = tree_get_context();
+#endif
     int filter = SHOW_SUPPORTED;
     char folder[MAX_PATH] = "/";
     /* stuff needed to remember position in file browser */
     static char last_folder[MAX_PATH] = "/";
     /* and stuff for the database browser */
+#ifdef HAVE_TAGCACHE
     static int last_db_dirlevel = 0;
+#endif
     
     switch ((intptr_t)param)
     {
@@ -93,6 +97,7 @@ static int browser(void* param)
             else
                 strcpy(folder, last_folder);
         break;
+#ifdef HAVE_TAGCACHE
         case GO_TO_DBBROWSER:
             if ((last_screen != GO_TO_ROOT) && !tagcache_is_usable())
             {
@@ -102,6 +107,7 @@ static int browser(void* param)
             filter = SHOW_ID3DB;
             tc->dirlevel = last_db_dirlevel;
         break;
+#endif
         case GO_TO_BROWSEPLUGINS:
             filter = SHOW_PLUGINS;
             snprintf(folder, MAX_PATH, "%s/", PLUGIN_DIR);
@@ -113,9 +119,11 @@ static int browser(void* param)
         case GO_TO_FILEBROWSER:
             get_current_file(last_folder, MAX_PATH);
         break;
+#ifdef HAVE_TAGCACHE
         case GO_TO_DBBROWSER:
             last_db_dirlevel = tc->dirlevel;
         break;
+#endif
     }
     /* hopefully only happens trying to go back into the WPS
        from plugins, if music is stopped... */
@@ -223,8 +231,10 @@ int item_callback(int action, const struct menu_item_ex *this_item) ;
 
 MENUITEM_RETURNVALUE(file_browser, ID2P(LANG_DIR_BROWSER), GO_TO_FILEBROWSER,
                         NULL, Icon_file_view_menu);
+#ifdef HAVE_TAGCACHE
 MENUITEM_RETURNVALUE(db_browser, ID2P(LANG_TAGCACHE), GO_TO_DBBROWSER, 
                         NULL, Icon_Audio);
+#endif
 MENUITEM_RETURNVALUE(rocks_browser, ID2P(LANG_PLUGINS), GO_TO_BROWSEPLUGINS, 
                         NULL, Icon_Plugin);
 char *get_wps_item_name(int selected_item, void * data, char *buffer)
@@ -259,7 +269,10 @@ MENUITEM_FUNCTION(do_shutdown_item, ID2P(LANG_SHUTDOWN), do_shutdown, NULL, Icon
 #endif
 MAKE_MENU(root_menu_, ID2P(LANG_ROCKBOX_TITLE),
             NULL, Icon_Rockbox,
-            &bookmarks, &file_browser, &db_browser,
+            &bookmarks, &file_browser, 
+#ifdef HAVE_TAGCACHE
+            &db_browser,
+#endif
             &wps_item, &menu_, 
 #ifdef HAVE_RECORDING
             &rec, 
@@ -365,16 +378,20 @@ void root_menu(void)
                 break;
 
             case GO_TO_PREVIOUS_BROWSER:
+#ifdef HAVE_TAGCACHE
                 if ((previous_browser == GO_TO_DBBROWSER) && 
                     !tagcache_is_usable())
                     ret_val = GO_TO_FILEBROWSER;
                 else 
+#endif
                     ret_val = previous_browser;
                 /* fall through */
             case GO_TO_FILEBROWSER:
+#ifdef HAVE_TAGCACHE
             case GO_TO_DBBROWSER:
                 previous_browser = ret_val;
                 break;
+#endif
 
             case GO_TO_PREVIOUS_MUSIC:
                 ret_val = previous_music;
