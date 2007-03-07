@@ -312,8 +312,13 @@ int current_bass = 0;      /* -150..+150     0..+240 */
 
 static void set_prescaled_volume(void)
 {
-    int prescale;
+    int prescale = 0;
     int l, r;
+
+/* The WM codecs listed don't have suitable prescaler functionality, so we let
+ * the prescaler stay at 0 for these unless SW tone controls are in use */
+#if defined(HAVE_SW_TONE_CONTROLS) || !(defined(HAVE_WM8975) \
+    || defined(HAVE_WM8731) || defined(HAVE_WM8721) || defined(HAVE_WM8751))
 
     prescale = MAX(current_bass, current_treble);
     if (prescale < 0)
@@ -325,13 +330,13 @@ static void set_prescaled_volume(void)
      * instead (might cause clipping). */
     if (current_volume + prescale > VOLUME_MAX)
         prescale = VOLUME_MAX - current_volume;
-   
+#endif
+
 #if defined(HAVE_SW_TONE_CONTROLS)
     dsp_callback(DSP_CALLBACK_SET_PRESCALE, prescale);
 #elif CONFIG_CODEC == MAS3507D
     mas_writereg(MAS_REG_KPRESCALE, prescale_table[prescale/10]);
-#elif defined(HAVE_UDA1380) || defined(HAVE_WM8975) || defined(HAVE_WM8758) \
-   || defined(HAVE_WM8731) || defined(HAVE_WM8721) || defined(HAVE_WM8751)
+#elif defined(HAVE_UDA1380) || defined(HAVE_WM8758)
     audiohw_set_mixer_vol(tenthdb2mixer(-prescale), tenthdb2mixer(-prescale));
 #endif
 

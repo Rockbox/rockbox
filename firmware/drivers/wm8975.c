@@ -53,7 +53,7 @@ int tenthdb2master(int db)
     /* 1111111 == +6dB  (0x7f) */
     /* 1111001 == 0dB   (0x79) */
     /* 0110000 == -73dB (0x30 */
-    /* 0101111 == mute  (0x2f) */
+    /* 0101111..0000000 == mute  (0x2f) */
 
     if (db < VOLUME_MIN) {
         return 0x0;
@@ -65,14 +65,8 @@ int tenthdb2master(int db)
 /* convert tenth of dB volume (-780..0) to mixer volume register value */
 int tenthdb2mixer(int db)
 {
-    if (db < -660)                 /* 1.5 dB steps */
-        return (2640 - db) / 15;
-    else if (db < -600)            /* 0.75 dB steps */
-        return (990 - db) * 2 / 15;
-    else if (db < -460)            /* 0.5 dB steps */
-        return (460 - db) / 5; 
-    else                           /* 0.25 dB steps */
-        return -db * 2 / 5;
+    (void)db;
+    return 0;
 }
 
 
@@ -171,25 +165,28 @@ int audiohw_set_mixer_vol(int channel1, int channel2)
     return 0;
 }
 
-/* We are using Linear bass control */
 void audiohw_set_bass(int value)
 {
-  int regvalues[]={11, 10, 10,  9,  8,  8, 0xf , 6, 6, 5, 4, 4, 3, 2, 1, 0};
+    const int regvalues[] = {
+        11, 10, 10, 9, 8, 8, 0xf, 6, 6, 5, 4, 4, 3, 2, 1, 0
+    };
 
-  if ((value >= -6) && (value <= 9)) {
-      /* We use linear bass control with 130Hz cutoff */
-      wmcodec_write(BASSCTRL, regvalues[value+6]);
-  }
+    if ((value >= -6) && (value <= 9)) {
+        /* We use linear bass control with 200 Hz cutoff */
+        wmcodec_write(BASSCTRL, regvalues[value + 6] | 0x40);
+    }
 }
 
 void audiohw_set_treble(int value)
 {
-  int regvalues[]={11, 10, 10,  9,  8,  8, 0xf , 6, 6, 5, 4, 4, 3, 2, 1, 0};
+    const int regvalues[] = {
+        11, 10, 10, 9, 8, 8, 0xf, 6, 6, 5, 4, 4, 3, 2, 1, 0
+    };
 
-  if ((value >= -6) && (value <= 9)) {
-      /* We use a 8Khz cutoff */
-      wmcodec_write(TREBCTRL, regvalues[value+6]);
-  }
+    if ((value >= -6) && (value <= 9)) {
+        /* We use linear treble control with 4 kHz cutoff */
+        wmcodec_write(TREBCTRL, regvalues[value + 6] | 0x40);
+    }
 }
 
 int audiohw_mute(int mute)
