@@ -211,6 +211,10 @@ MENUITEM_SETTING(poweroff, &global_settings.poweroff, NULL);
 #ifdef HAVE_RTC_ALARM
 MENUITEM_FUNCTION(alarm_screen_call, ID2P(LANG_ALARM_MOD_ALARM_MENU),
                    (menu_function)alarm_screen, NULL, Icon_NOICON);
+#if defined(HAVE_RECORDING) || CONFIG_TUNER
+MENUITEM_SETTING(alarm_wake_up_screen,
+                    &global_settings.alarm_wake_up_screen, NULL);
+#endif
 #endif
 
 /* Limits menu */
@@ -256,6 +260,9 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
             &poweroff,
 #ifdef HAVE_RTC_ALARM
             &alarm_screen_call,
+#if defined(HAVE_RECORDING) || CONFIG_TUNER
+            &alarm_wake_up_screen,
+#endif
 #endif
             &limits_menu,
 #if CONFIG_CODEC == MAS3507D

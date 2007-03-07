@@ -152,13 +152,6 @@ static int wpsscrn(void* param)
         DEBUGF("Resume index %X offset %X\n",
                global_status.resume_index,
                global_status.resume_offset);
-
-#ifdef HAVE_RTC_ALARM
-        if ( rtc_check_alarm_started(true) ) {
-           rtc_enable_alarm(false);
-        }
-#endif
-
         if (playlist_resume() != -1)
         {
             playlist_start(global_status.resume_index,
@@ -329,6 +322,22 @@ void root_menu(void)
         ret_val = (int)global_status.last_screen;
     else ret_val = global_settings.start_in_screen - 2;
     
+#ifdef HAVE_RTC_ALARM
+    if ( rtc_check_alarm_started(true) ) 
+    {
+        rtc_enable_alarm(false);
+        ret_val = GO_TO_WPS;
+#if CONFIG_TUNER
+        if (global_settings.alarm_wake_up_screen == ALARM_START_FM)
+            ret_val = GO_TO_FM;
+#endif
+#ifdef HAVE_RECORDING
+        if (global_settings.alarm_wake_up_screen == ALARM_START_REC)
+            ret_val = GO_TO_RECSCREEN;
+#endif
+    }
+#endif /* HAVE_RTC_ALARM */
+
     while (true)
     {
         switch (ret_val)

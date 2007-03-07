@@ -166,7 +166,26 @@ enum { REPLAYGAIN_TRACK = 0, REPLAYGAIN_ALBUM, REPLAYGAIN_SHUFFLE };
 /* show path types */
 enum { SHOW_PATH_OFF = 0, SHOW_PATH_CURRENT, SHOW_PATH_FULL };
 
+/* Alarm settings */
+#ifdef HAVE_RTC_ALARM
+enum {  ALARM_START_WPS = 0,
+#if CONFIG_TUNER
+        ALARM_START_FM,
+#endif
+#ifdef HAVE_RECORDING
+        ALARM_START_REC,
+#endif
+        ALARM_START_COUNT
+    };
+#if CONFIG_TUNER && defined(HAVE_RECORDING)
+#define ALARM_SETTING_TEXT "wps,fm,rec"
+#elif CONFIG_TUNER
+#define ALARM_SETTING_TEXT "wps,fm"
+#elif defined(HAVE_RECORDING)
+#define ALARM_SETTING_TEXT "wps,rec"
+#endif
 
+#endif /* HAVE_RTC_ALARM */
 /** virtual pointer stuff.. move to another .h maybe? **/
 /* These define "virtual pointers", which could either be a literal string,
    or a mean a string ID if the pointer is in a certain range.
@@ -681,6 +700,11 @@ struct user_settings
 #endif /* CONFIG_CODEC == SWCODEC */
     bool cuesheet;
     int start_in_screen;
+#if defined(HAVE_RTC_ALARM) && \
+    (defined(HAVE_RECORDING) || CONFIG_TUNER)
+    int alarm_wake_up_screen;
+#endif
+
 };
 
 /** global variables **/
