@@ -262,23 +262,12 @@ static void crossfeed_format(char* buffer, int buffer_size, int value,
     snprintf(buffer, buffer_size, "%s%d.%d %s", value == 0 ? " " : "-",
         value / 10, value % 10, unit);
 }
-static void crossfeed_cross_gain_helper(int val)
+static void crossfeed_cross_set(int val)
 {
-    dsp_set_crossfeed_cross_params(val,
-        val + global_settings.crossfeed_hf_attenuation,
-        global_settings.crossfeed_hf_cutoff);
-}
-static void crossfeed_hf_att_helper(int val)
-{
-    dsp_set_crossfeed_cross_params(global_settings.crossfeed_cross_gain,
-        global_settings.crossfeed_cross_gain + val,
-        global_settings.crossfeed_hf_cutoff);
-}
-static void crossfeed_hf_cutoff_helper(int val)
-{
-    dsp_set_crossfeed_cross_params(global_settings.crossfeed_cross_gain,
-        global_settings.crossfeed_cross_gain
-            + global_settings.crossfeed_hf_attenuation, val);
+   (void)val;
+   dsp_set_crossfeed_cross_params(global_settings.crossfeed_cross_gain,
+                                  global_settings.crossfeed_hf_attenuation,
+                                  global_settings.crossfeed_hf_cutoff);
 }
 
 static void replaygain_preamp_format(char* buffer, int buffer_size, int value,
@@ -828,7 +817,7 @@ const struct settings_list settings[] = {
     INT_SETTING(0, crossfade_fade_out_duration, LANG_CROSSFADE_FADE_OUT_DURATION, 0,
         "crossfade fade out duration", UNIT_SEC, 0, 15, 1, NULL, NULL, NULL),
     CHOICE_SETTING(0, crossfade_fade_out_mixmode, LANG_CROSSFADE_FADE_OUT_MODE,
-        0, "crossfade fade out mode", "crossfade,mix" ,NULL, 2,
+        0, "crossfade fade out mode", "crossfade,mix", NULL, 2,
         ID2P(LANG_CROSSFADE), ID2P(LANG_MIX)),
         
     /* crossfeed */
@@ -839,13 +828,13 @@ const struct settings_list settings[] = {
                     crossfeed_format, NULL, dsp_set_crossfeed_direct_gain),
     INT_SETTING(0, crossfeed_cross_gain, LANG_CROSSFEED_CROSS_GAIN, 60,
                     "crossfeed cross gain", UNIT_DB, 30, 120, 5,
-                    crossfeed_format, NULL, crossfeed_cross_gain_helper),
+                    crossfeed_format, NULL, crossfeed_cross_set),
     INT_SETTING(0, crossfeed_hf_attenuation, LANG_CROSSFEED_HF_ATTENUATION, 160,
                     "crossfeed hf attenuation", UNIT_DB, 60, 240, 5,
-                    crossfeed_format, NULL, crossfeed_hf_att_helper),
-    INT_SETTING(0, crossfeed_hf_cutoff, LANG_CROSSFEED_HF_CUTOFF,700,
+                    crossfeed_format, NULL, crossfeed_cross_set),
+    INT_SETTING(0, crossfeed_hf_cutoff, LANG_CROSSFEED_HF_CUTOFF, 700,
                     "crossfeed hf cutoff", UNIT_HERTZ, 500, 2000, 100,
-                    NULL, NULL, crossfeed_hf_cutoff_helper),
+                    NULL, NULL, crossfeed_cross_set),
     /* equalizer */
     OFFON_SETTING(0,eq_enabled,LANG_EQUALIZER_ENABLED,false,"eq enabled",NULL),
     INT_SETTING(0, eq_precut, LANG_EQUALIZER_PRECUT, 0, "eq precut",

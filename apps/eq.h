@@ -34,7 +34,7 @@ struct eqfilter {
     int32_t history[2][4];
 };
 
-void filter_shelf_coefs(unsigned long cutoff, long ad, long an, int32_t *c);
+void filter_shelf_coefs(unsigned long cutoff, long A, bool low, int32_t *c);
 void filter_bishelf_coefs(unsigned long cutoff_low, unsigned long cutoff_high,
                           long A_low, long A_high, long A, int32_t *c);
 void eq_pk_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c);

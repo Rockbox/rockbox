@@ -118,33 +118,42 @@ static long fsincos(unsigned long phase, long *cos) {
     return y;
 }
 
-/**
- * Calculate first order shelving filter coefficients.
- * Note that the filter is not compatible with the eq_filter routine.
- * @param cutoff a value from 0 to 0x80000000, where 0 represents 0 Hz and
- * 0x80000000 represents the Nyquist frequency (samplerate/2).
- * @param ad gain at 0 Hz. s3.27 fixed point.
- * @param an gain at Nyquist frequency. s3.27 fixed point.
- * @param c pointer to coefficient storage. The coefs are s0.31 format.
+/** 
+ * Calculate first order shelving filter. Filter is not directly usable by the
+ * eq_filter() function.
+ * @param cutoff shelf midpoint frequency. See eq_pk_coefs for format.
+ * @param A decibel value multiplied by ten, describing gain/attenuation of
+ * shelf. Max value is 24 dB.
+ * @param low true for low-shelf filter, false for high-shelf filter.
+ * @param c pointer to coefficient storage. Coefficients are s4.27 format.
  */
-void filter_shelf_coefs(unsigned long cutoff, long ad, long an, int32_t *c)
+void filter_shelf_coefs(unsigned long cutoff, long A, bool low, int32_t *c)
 {
-    const long one = 1 << 27;
-    long a0, a1;
-    long b0, b1;
-    long s, cs;
-    s = fsincos(cutoff, &cs) >> 4;
-    cs = one + (cs >> 4);
+    long sin, cos;
+    int32_t b0, b1, a0, a1; /* s3.28 */
+    const long g = get_replaygain_int(A*5) << 4; /* 10^(db/40), s3.28 */
 
-    /* For max A = 4 (24 dB) */
-    b0 = FRACMUL_SHL(ad, s, 4) + FRACMUL_SHL(an, cs, 4);
-    b1 = FRACMUL_SHL(ad, s, 4) - FRACMUL_SHL(an, cs, 4);
-    a0 = s + cs;
-    a1 = s - cs;
+    sin = fsincos(cutoff/2, &cos);
+    if (low) {
+        const int32_t sin_div_g = DIV64(sin, g, 25);
+        cos >>= 3;
+        b0 = FRACMUL(sin, g) + cos;   /* 0.25 .. 4.10 */
+        b1 = FRACMUL(sin, g) - cos;   /* -1 .. 3.98 */
+        a0 = sin_div_g + cos;         /* 0.25 .. 4.10 */
+        a1 = sin_div_g - cos;         /* -1 .. 3.98 */
+    } else {
+        const int32_t cos_div_g = DIV64(cos, g, 25);
+        sin >>= 3;
+        b0 = sin + FRACMUL(cos, g);   /* 0.25 .. 4.10 */
+        b1 = sin - FRACMUL(cos, g);   /* -3.98 .. 1 */
+        a0 = sin + cos_div_g;         /* 0.25 .. 4.10 */
+        a1 = sin - cos_div_g;         /* -3.98 .. 1 */
+    }
 
-    c[0] = DIV64(b0, a0, 31);
-    c[1] = DIV64(b1, a0, 31);
-    c[2] = -DIV64(a1, a0, 31);
+    const int32_t rcp_a0 = DIV64(1, a0, 57); /* 0.24 .. 3.98, s2.29 */
+    *c++ = FRACMUL_SHL(b0, rcp_a0, 1);       /* 0.063 .. 15.85 */
+    *c++ = FRACMUL_SHL(b1, rcp_a0, 1);       /* -15.85 .. 15.85 */
+    *c++ = -FRACMUL_SHL(a1, rcp_a0, 1);      /* -1 .. 1 */
 }
 
 #ifdef HAVE_SW_TONE_CONTROLS
@@ -163,41 +172,26 @@ void filter_shelf_coefs(unsigned long cutoff, long ad, long an, int32_t *c)
 void filter_bishelf_coefs(unsigned long cutoff_low, unsigned long cutoff_high,
                           long A_low, long A_high, long A, int32_t *c)
 {
-    long sin1, cos2;        /* s0.31 */
-    long cos1, sin2;        /* s3.28 */
-    int32_t b0, b1, b2, b3; /* s3.28 */
-    int32_t a0, a1, a2, a3;
-    const long gd = get_replaygain_int(A_low*5) << 4; /* 10^(db/40), s3.28 */
-    const long gn = get_replaygain_int(A_high*5) << 4; /* 10^(db/40), s3.28 */
     const long g = get_replaygain_int(A*10) << 7; /* 10^(db/20), s0.31 */
+    int32_t c_ls[3], c_hs[3];
 
-    sin1 = fsincos(cutoff_low/2, &cos1);
-    sin2 = fsincos(cutoff_high/2, &cos2) >> 3;
-    cos1 >>= 3;
-
-    /* lowshelf filter, ranges listed are for all possible cutoffs */
-    b0 = FRACMUL(sin1, gd) + cos1;   /* 0.25 .. 4.10 */
-    b1 = FRACMUL(sin1, gd) - cos1;   /* -1 .. 3.98 */
-    a0 = DIV64(sin1, gd, 25) + cos1; /* 0.25 .. 4.10 */
-    a1 = DIV64(sin1, gd, 25) - cos1; /* -1 .. 3.98 */
-
-    /* highshelf filter */
-    b2 = sin2 + FRACMUL(cos2, gn);   /* 0.25 .. 4.10 */
-    b3 = sin2 - FRACMUL(cos2, gn);   /* -3.98 .. 1 */
-    a2 = sin2 + DIV64(cos2, gn, 25); /* 0.25 .. 4.10 */
-    a3 = sin2 - DIV64(cos2, gn, 25); /* -3.98 .. 1 */
+    filter_shelf_coefs(cutoff_low, A_low, true, c_ls);
+    filter_shelf_coefs(cutoff_high, A_high, false, c_hs);
+    c_ls[0] = FRACMUL(g, c_ls[0]);
+    c_ls[1] = FRACMUL(g, c_ls[1]);
 
     /* now we cascade the two first order filters to one second order filter
      * which can be used by eq_filter(). these resulting coefficients have a
      * really wide numerical range, so we use a fixed point format which will
      * work for the selected cutoff frequencies (in dsp.c) only.
      */
-    const int32_t rcp_a0 = DIV64(1, FRACMUL(a0, a2), 53); /* s3.28 */
-    *c++ = FRACMUL(g, FRACMUL_SHL(FRACMUL(b0, b2), rcp_a0, 5));
-    *c++ = FRACMUL(g, FRACMUL_SHL(FRACMUL(b0, b3) + FRACMUL(b1, b2), rcp_a0, 5));
-    *c++ = FRACMUL(g, FRACMUL_SHL(FRACMUL(b1, b3), rcp_a0, 5));
-    *c++ = -FRACMUL_SHL(FRACMUL(a0, a3) + FRACMUL(a1, a2), rcp_a0, 5);
-    *c++ = -FRACMUL_SHL(FRACMUL(a1, a3), rcp_a0, 5);
+    const int32_t b0 = c_ls[0], b1 = c_ls[1], b2 = c_hs[0], b3 = c_hs[1];
+    const int32_t a0 = c_ls[2], a1 = c_hs[2];
+    *c++ = FRACMUL_SHL(b0, b2, 4);
+    *c++ = FRACMUL_SHL(b0, b3, 4) + FRACMUL_SHL(b1, b2, 4);
+    *c++ = FRACMUL_SHL(b1, b3, 4);
+    *c++ = a0 + a1;
+    *c++ = -FRACMUL_SHL(a0, a1, 4);
 }
 #endif
 
@@ -276,7 +270,7 @@ void eq_ls_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
     a2 = ap1 + FRACMUL(am1, cs) - twosqrtalpha;
 
     /* [0.1 .. 1.99] */
-    const long rcp_a0 = DIV64(1, a0, 55); /* s1.30 */
+    const long rcp_a0 = DIV64(1, a0, 55);    /* s1.30 */
     *c++ = FRACMUL_SHL(b0, rcp_a0, 2);       /* [0.06 .. 15.9] */
     *c++ = FRACMUL_SHL(b1, rcp_a0, 2);       /* [-2 .. 31.7] */
     *c++ = FRACMUL_SHL(b2, rcp_a0, 2);       /* [0 .. 15.9] */
@@ -315,7 +309,7 @@ void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
     a2 = ap1 - FRACMUL(am1, cs) - twosqrtalpha;
 
     /* [0.1 .. 1.99] */
-    const long rcp_a0 = DIV64(1, a0, 55); /* s1.30 */
+    const long rcp_a0 = DIV64(1, a0, 55);    /* s1.30 */
     *c++ = FRACMUL_SHL(b0, rcp_a0, 2);       /* [0 .. 16] */
     *c++ = FRACMUL_SHL(b1, rcp_a0, 2);       /* [-31.7 .. 2] */
     *c++ = FRACMUL_SHL(b2, rcp_a0, 2);       /* [0 .. 16] */

@@ -829,8 +829,7 @@ void settings_apply(void)
     dsp_set_crossfeed(global_settings.crossfeed);
     dsp_set_crossfeed_direct_gain(global_settings.crossfeed_direct_gain);
     dsp_set_crossfeed_cross_params(global_settings.crossfeed_cross_gain,
-                                   global_settings.crossfeed_cross_gain
-                                   + global_settings.crossfeed_hf_attenuation,
+                                   global_settings.crossfeed_hf_attenuation,
                                    global_settings.crossfeed_hf_cutoff);
 
     dsp_set_eq(global_settings.eq_enabled);
