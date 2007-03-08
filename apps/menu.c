@@ -677,7 +677,7 @@ static void init_oldmenu(const struct menu_item_ex *menu,
 {
     (void)callback;
     gui_synclist_init(lists, oldmenuwrapper_getname, 
-                        (void*)menu->value, false, 1);
+                        (intptr_t)menu->value, false, 1);
     gui_synclist_set_nb_items(lists,
         (menu->flags&MENU_COUNT_MASK)>>MENU_COUNT_SHIFT);
     gui_synclist_limit_scroll(lists, true);
@@ -699,7 +699,7 @@ int menu_show(int m)
     {
         oldmenuwrapper_callback, 
         oldmenuwrapper_getname,
-        (void*)m, Icon_NOICON
+        (intptr_t)m, Icon_NOICON
     };
 
     menu.flags = (MENU_TYPE_MASK&MT_OLD_MENU) | MENU_DYNAMIC_DESC |
