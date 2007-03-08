@@ -86,6 +86,7 @@ enum clause { clause_none, clause_is, clause_is_not, clause_gt, clause_gteq,
 
 struct tagcache_stat {
     bool initialized;        /* Is tagcache currently busy? */
+    bool readyvalid;         /* Has tagcache ready status been ascertained */
     bool ready;              /* Is tagcache ready to be used? */
     bool ramcache;           /* Is tagcache loaded in ram? */
     bool commit_delayed;     /* Has commit been delayed until next reboot? */

@@ -2617,6 +2617,7 @@ static bool commit(void)
     logf("tagcache committed");
     remove(TAGCACHE_FILE_TEMP);
     tc_stat.ready = check_all_headers();
+    tc_stat.readyvalid = true;
     
     if (local_allocation)
     {
@@ -3770,6 +3771,7 @@ static void tagcache_thread(void)
     /* Don't delay bootup with the header check but do it on background. */
     sleep(HZ);
     tc_stat.ready = check_all_headers();
+    tc_stat.readyvalid = true;
     
     while (1)
     {
@@ -3972,6 +3974,6 @@ int tagcache_get_commit_step(void)
 }
 int tagcache_get_max_commit_step(void)
 {
-    return 8;   /* To be written, better hard-coded here than in the UI */
+    return (int)(sizeof(sorted_tags)/sizeof(sorted_tags[0]))+1;
 }
 

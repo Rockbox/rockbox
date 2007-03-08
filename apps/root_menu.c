@@ -104,41 +104,48 @@ static int browser(void* param)
         case GO_TO_DBBROWSER:
             if (!tagcache_is_usable())
             {
-                /* Check if we're still initialising, so status is unknown */
-                struct tagcache_stat *stat = tagcache_get_stat();                
-                if  (!stat->initialized)
-                {
-                    gui_syncsplash(HZ*2, true, str(LANG_TAGCACHE_BUSY));
-                    return GO_TO_PREVIOUS;
-                }
-               
-                /* Re-init if required */
-                if (!stat->ready && !stat->commit_delayed && stat->processed_entries == 0)
-                {
-                    /* Prompt the user */
-                    char *lines[]={str(LANG_TAGCACHE_BUSY), str(LANG_TAGCACHE_FORCE_UPDATE)};
-                    struct text_message message={lines, 2};
-                    if(gui_syncyesno_run(&message, NULL, NULL) == YESNO_NO)
-                        return GO_TO_PREVIOUS;
-                    int i;
-                    FOR_NB_SCREENS(i)
-                        screens[i].clear_display();
-
-                    /* Start initialisation */
-                    tagcache_rebuild();
-                }
+                bool reinit_attempted = false;
 
                 /* Now display progress until it's ready or the user exits */
                 while(!tagcache_is_usable())
                 {
                     gui_syncstatusbar_draw(&statusbars, false);
-                    stat = tagcache_get_stat();
+                    struct tagcache_stat *stat = tagcache_get_stat();                
+    
+                    /* Allow user to exit */
+                    if (action_userabort(HZ/2))
+                        break;
 
                     /* Maybe just needs to reboot due to delayed commit */
                     if (stat->commit_delayed)
                     {
                         gui_syncsplash(HZ*2, true, str(LANG_PLEASE_REBOOT));
                         break;
+                    }
+
+                    /* Check if ready status is known */
+                    if (!stat->readyvalid)
+                    {
+                        gui_syncsplash(0, true, str(LANG_TAGCACHE_BUSY));
+                        continue;
+                    }
+               
+                    /* Re-init if required */
+                    if (!reinit_attempted && !stat->ready && 
+                        stat->processed_entries == 0 && stat->commit_step == 0)
+                    {
+                        /* Prompt the user */
+                        reinit_attempted = true;
+                        char *lines[]={str(LANG_TAGCACHE_BUSY), str(LANG_TAGCACHE_FORCE_UPDATE)};
+                        struct text_message message={lines, 2};
+                        if(gui_syncyesno_run(&message, NULL, NULL) == YESNO_NO)
+                            break;
+                        int i;
+                        FOR_NB_SCREENS(i)
+                            screens[i].clear_display();
+
+                        /* Start initialisation */
+                        tagcache_rebuild();
                     }
 
                     /* Display building progress */
@@ -153,10 +160,6 @@ static int browser(void* param)
                         gui_syncsplash(0, true, str(LANG_BUILDING_DATABASE),
                             stat->processed_entries);
                     }
-
-                    /* Allow user to exit */
-                    if (action_userabort(HZ/2))
-                        break;
                 }
             }
             if (!tagcache_is_usable())
