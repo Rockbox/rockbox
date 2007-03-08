@@ -102,6 +102,7 @@ static int browser(void* param)
         break;
 #ifdef HAVE_TAGCACHE
         case GO_TO_DBBROWSER:
+#if 0 /* Revert this for now */
             if (!tagcache_is_usable())
             {
                 bool reinit_attempted = false;
@@ -164,6 +165,13 @@ static int browser(void* param)
             }
             if (!tagcache_is_usable())
                 return GO_TO_PREVIOUS;
+#else /* The old code */
+            if ((last_screen != GO_TO_ROOT) && !tagcache_is_usable())
+            {
+                gui_syncsplash(0, true, str(LANG_TAGCACHE_BUSY));
+                return GO_TO_PREVIOUS;
+            }
+#endif /* Sorry for the interruption */
             filter = SHOW_ID3DB;
             tc->dirlevel = last_db_dirlevel;
         break;
