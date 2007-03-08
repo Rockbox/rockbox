@@ -411,6 +411,12 @@ void root_menu(void)
     }
 #endif /* HAVE_RTC_ALARM */
 
+#ifdef HAVE_HEADPHONE_DETECTION
+    if (ret_val == GO_TO_WPS && 
+        (global_settings.unplug_autoresume && !headphones_inserted() ))
+            ret_val = GO_TO_ROOT;
+#endif
+
     while (true)
     {
         switch (ret_val)
