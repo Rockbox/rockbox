@@ -244,9 +244,6 @@ static void init(void)
     button_init();
     backlight_init();
     lang_init();
-#if CONFIG_CODEC == SWCODEC
-    audio_preinit();    /* Must be done before settings_apply() */
-#endif
     /* Must be done before any code uses the multi-screen APi */
     screen_access_init();
     gui_syncstatusbar_init(&statusbars);
@@ -262,6 +259,8 @@ static void init(void)
     sleep(HZ/2);
     tree_init();
     playlist_init();
+
+#if CONFIG_CODEC != SWCODEC
     mp3_init( global_settings.volume,
               global_settings.bass,
               global_settings.treble,
@@ -277,13 +276,12 @@ static void init(void)
               global_settings.mdb_enable,
               global_settings.superbass);
 
+    /* audio_init must to know the size of voice buffer so init voice first */
+    talk_init();
+#endif /* CONFIG_CODEC != SWCODEC */
+
     scrobbler_init();
     cuesheet_init();
-
-    /* audio_init must to know the size of voice buffer so init voice first */
-#if CONFIG_CODEC == SWCODEC
-    talk_init();
-#endif
 
     audio_init();
     button_clear_queue(); /* Empty the keyboard buffer */
@@ -365,10 +363,6 @@ static void init(void)
 
     powermgmt_init();
     
-#if CONFIG_CODEC == SWCODEC
-    audio_preinit();
-#endif
-
 #if CONFIG_TUNER
     radio_init();
 #endif
@@ -499,6 +493,7 @@ static void init(void)
     scrobbler_init();
     cuesheet_init();
 
+#if CONFIG_CODEC != SWCODEC
     /* No buffer allocation (see buffer.c) may take place after the call to
        audio_init() since the mpeg thread takes the rest of the buffer space */
     mp3_init( global_settings.volume,
@@ -518,8 +513,10 @@ static void init(void)
 
      /* audio_init must to know the size of voice buffer so init voice first */
     talk_init();
+#endif /* CONFIG_CODEC != SWCODEC */
 
     audio_init();
+
 #if (CONFIG_CODEC == SWCODEC) && defined(HAVE_RECORDING) && !defined(SIMULATOR)
     pcm_rec_init();
 #endif

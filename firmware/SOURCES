@@ -161,7 +161,9 @@ tuner_philips.c
 #endif /* CONFIG_TUNER */
 
 /* Sound */
+#if CONFIG_CODEC != SWCODEC
 mp3_playback.c
+#endif /* CONFIG_CODEC != SWCODEC */
 mp3data.c
 sound.c
 

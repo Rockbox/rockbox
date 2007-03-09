@@ -832,57 +832,11 @@ void audio_set_crossfade(int enable)
         audio_play(offset);
 }
 
-void audio_preinit(void)
-{
-    logf("playback system pre-init");
-
-    filling = false;
-    set_current_codec(CODEC_IDX_AUDIO);
-    playing = false;
-    paused = false;
-    audio_codec_loaded = false;
-#ifdef PLAYBACK_VOICE
-    voice_is_playing = false;
-    voice_thread_start = false;
-    voice_codec_loaded = false;
-#endif
-    track_changed = false;
-    current_fd = -1;
-    track_buffer_callback = NULL;
-    track_unbuffer_callback = NULL;
-    track_changed_callback = NULL;
-    track_ridx = 0; /* Just to prevent CUR_TI from being anything random. */
-    prev_ti = &tracks[MAX_TRACK-1]; /* And prevent prev_ti being random too */
-
-#ifdef PLAYBACK_VOICE
-    mutex_init(&mutex_codecthread);
-#endif
-
-    queue_init(&audio_queue, true);
-    queue_enable_queue_send(&audio_queue, &audio_queue_sender_list);
-    queue_init(&codec_queue, true);
-
-    create_thread(audio_thread, audio_stack, sizeof(audio_stack),
-                  audio_thread_name IF_PRIO(, PRIORITY_BUFFERING)
-		  IF_COP(, CPU, false));
-}
-
-void audio_init(void)
-{
-    LOGFQUEUE("audio > audio Q_AUDIO_POSTINIT");
-    queue_post(&audio_queue, Q_AUDIO_POSTINIT, 0);
-}
-
 void voice_init(void)
 {
 #ifdef PLAYBACK_VOICE
-    if (!filebuf)
-        return;     /* Audio buffers not yet set up */
-
-    if (voice_thread_p)
-        return;
-
-    if (!talk_voice_required())
+    if (voice_thread_p || !filebuf || voice_codec_loaded ||
+        !talk_voice_required())
         return;
 
     logf("Starting voice codec");
@@ -1283,22 +1237,20 @@ static bool voice_request_next_track_callback(void)
 
 static void voice_thread(void)
 {
-    while (1)
-    {
-        logf("Loading voice codec");
-        voice_codec_loaded = true;
-        mutex_lock(&mutex_codecthread);
-        set_current_codec(CODEC_IDX_VOICE);
-        dsp_configure(DSP_RESET, 0);
-        voice_remaining = 0;
-        voice_getmore = NULL;
+    logf("Loading voice codec");
+    voice_codec_loaded = true;
+    mutex_lock(&mutex_codecthread);
+    set_current_codec(CODEC_IDX_VOICE);
+    dsp_configure(DSP_RESET, 0);
+    voice_remaining = 0;
+    voice_getmore = NULL;
 
-        codec_load_file(get_codec_filename(AFMT_MPA_L3), &ci_voice);
+    codec_load_file(get_codec_filename(AFMT_MPA_L3), &ci_voice);
 
-        logf("Voice codec finished");
-        voice_codec_loaded = false;
-        mutex_unlock(&mutex_codecthread);
-    }
+    logf("Voice codec finished");
+    voice_codec_loaded = false;
+    mutex_unlock(&mutex_codecthread);
+    remove_thread(NULL);
 } /* voice_thread */
 
 #endif /* PLAYBACK_VOICE */
@@ -3465,103 +3417,6 @@ static void audio_reset_buffer(size_t pcmbufsize)
     buffer_state = BUFFER_STATE_NORMAL;
 }
 
-#ifdef ROCKBOX_HAS_LOGF
-static void audio_test_track_changed_event(struct mp3entry *id3)
-{
-    (void)id3;
-
-    logf("tce:%s", id3->path);
-}
-#endif
-
-static void audio_playback_init(void)
-{
-#ifdef PLAYBACK_VOICE
-    static bool voicetagtrue = true;
-    static struct mp3entry id3_voice;
-#endif
-    struct event ev;
-
-    logf("playback api init");
-    pcm_init();
-
-#ifdef AUDIO_HAVE_RECORDING
-    rec_set_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
-#endif
-
-#ifdef ROCKBOX_HAS_LOGF
-    audio_set_track_changed_event(audio_test_track_changed_event);
-#endif
-
-    /* Initialize codec api. */
-    ci.read_filebuf = codec_filebuf_callback;
-    ci.pcmbuf_insert = codec_pcmbuf_insert_callback;
-    ci.get_codec_memory = codec_get_memory_callback;
-    ci.request_buffer = codec_request_buffer_callback;
-    ci.advance_buffer = codec_advance_buffer_callback;
-    ci.advance_buffer_loc = codec_advance_buffer_loc_callback;
-    ci.request_next_track = codec_request_next_track_callback;
-    ci.mp3_get_filepos = codec_mp3_get_filepos_callback;
-    ci.seek_buffer = codec_seek_buffer_callback;
-    ci.seek_complete = codec_seek_complete_callback;
-    ci.set_elapsed = codec_set_elapsed_callback;
-    ci.set_offset = codec_set_offset_callback;
-    ci.configure = codec_configure_callback;
-    ci.discard_codec = codec_discard_codec_callback;
-
-    /* Initialize voice codec api. */
-#ifdef PLAYBACK_VOICE
-    memcpy(&ci_voice, &ci, sizeof(struct codec_api));
-    memset(&id3_voice, 0, sizeof(struct mp3entry));
-    ci_voice.read_filebuf = voice_filebuf_callback;
-    ci_voice.pcmbuf_insert = voice_pcmbuf_insert_callback;
-    ci_voice.get_codec_memory = voice_get_memory_callback;
-    ci_voice.request_buffer = voice_request_buffer_callback;
-    ci_voice.advance_buffer = voice_advance_buffer_callback;
-    ci_voice.advance_buffer_loc = voice_advance_buffer_loc_callback;
-    ci_voice.request_next_track = voice_request_next_track_callback;
-    ci_voice.mp3_get_filepos = voice_mp3_get_filepos_callback;
-    ci_voice.seek_buffer = voice_seek_buffer_callback;
-    ci_voice.seek_complete = voice_do_nothing;
-    ci_voice.set_elapsed = voice_set_elapsed_callback;
-    ci_voice.set_offset = voice_set_offset_callback;
-    ci_voice.discard_codec = voice_do_nothing;
-    ci_voice.taginfo_ready = &voicetagtrue;
-    ci_voice.id3 = &id3_voice;
-    id3_voice.frequency = 11200;
-    id3_voice.length = 1000000L;
-#endif
-
-    codec_thread_p = create_thread(
-            codec_thread, codec_stack, sizeof(codec_stack),
-            codec_thread_name IF_PRIO(, PRIORITY_PLAYBACK)
-	    IF_COP(, COP, true));
-
-    while (1)
-    {
-        queue_wait(&audio_queue, &ev);
-        if (ev.id == Q_AUDIO_POSTINIT)
-            break ;
-
-#ifndef SIMULATOR
-        if (ev.id == SYS_USB_CONNECTED)
-        {
-            logf("USB: Audio preinit");
-            usb_acknowledge(SYS_USB_CONNECTED_ACK);
-            usb_wait_for_disconnect(&audio_queue);
-        }
-#endif
-    }
-
-    /* initialize the buffer */
-    filebuf = audiobuf; /* must be non-NULL for audio_set_crossfade */
-    buffer_state = BUFFER_STATE_TRASHED; /* force it */
-    audio_set_crossfade(global_settings.crossfade);
-
-    audio_is_initialized = true;
-
-    sound_settings_apply();
-}
 #if MEM > 8
 /* we dont want this rebuffering on targets with little ram
    because the disk may never spin down */
@@ -3575,8 +3430,6 @@ static bool ata_fillbuffer_callback(void)
 static void audio_thread(void)
 {
     struct event ev;
-    /* At first initialize audio system in background. */
-    audio_playback_init();
     
     while (1) 
     {
@@ -3707,3 +3560,106 @@ static void audio_thread(void)
     } /* end while */
 }
 
+#ifdef ROCKBOX_HAS_LOGF
+static void audio_test_track_changed_event(struct mp3entry *id3)
+{
+    (void)id3;
+
+    logf("tce:%s", id3->path);
+}
+#endif
+
+/* Initialize the audio system - called from init() in main.c.
+ * Last function because of all the references to internal symbols
+ */
+void audio_init(void)
+{
+#ifdef PLAYBACK_VOICE
+    static bool voicetagtrue = true;
+    static struct mp3entry id3_voice;
+#endif
+
+    logf("audio: %s", audio_is_initialized ?
+         "initializing" : "already initialized");
+ 
+    /* Can never do this twice */
+    if (audio_is_initialized)
+        return;
+
+    /* Initialize queues before giving control elsewhere in case it likes
+       to send messages. Thread creation will be delayed however so nothing
+       starts running until ready if something yields such as talk_init. */
+#ifdef PLAYBACK_VOICE
+    mutex_init(&mutex_codecthread);
+#endif
+    queue_init(&audio_queue, true);
+    queue_enable_queue_send(&audio_queue, &audio_queue_sender_list);
+    queue_init(&codec_queue, true);
+
+    pcm_init();
+
+#ifdef ROCKBOX_HAS_LOGF
+    audio_set_track_changed_event(audio_test_track_changed_event);
+#endif
+ 
+     /* Initialize codec api. */
+    ci.read_filebuf        = codec_filebuf_callback;
+    ci.pcmbuf_insert       = codec_pcmbuf_insert_callback;
+    ci.get_codec_memory    = codec_get_memory_callback;
+    ci.request_buffer      = codec_request_buffer_callback;
+    ci.advance_buffer      = codec_advance_buffer_callback;
+    ci.advance_buffer_loc  = codec_advance_buffer_loc_callback;
+    ci.request_next_track  = codec_request_next_track_callback;
+    ci.mp3_get_filepos     = codec_mp3_get_filepos_callback;
+    ci.seek_buffer         = codec_seek_buffer_callback;
+    ci.seek_complete       = codec_seek_complete_callback;
+    ci.set_elapsed         = codec_set_elapsed_callback;
+    ci.set_offset          = codec_set_offset_callback;
+    ci.configure           = codec_configure_callback;
+    ci.discard_codec       = codec_discard_codec_callback;
+ 
+     /* Initialize voice codec api. */
+#ifdef PLAYBACK_VOICE
+    memcpy(&ci_voice, &ci, sizeof(ci_voice));
+    memset(&id3_voice, 0, sizeof(id3_voice));
+    ci_voice.read_filebuf        = voice_filebuf_callback;
+    ci_voice.pcmbuf_insert       = voice_pcmbuf_insert_callback;
+    ci_voice.get_codec_memory    = voice_get_memory_callback;
+    ci_voice.request_buffer      = voice_request_buffer_callback;
+    ci_voice.advance_buffer      = voice_advance_buffer_callback;
+    ci_voice.advance_buffer_loc  = voice_advance_buffer_loc_callback;
+    ci_voice.request_next_track  = voice_request_next_track_callback;
+    ci_voice.mp3_get_filepos     = voice_mp3_get_filepos_callback;
+    ci_voice.seek_buffer         = voice_seek_buffer_callback;
+    ci_voice.seek_complete       = voice_do_nothing;
+    ci_voice.set_elapsed         = voice_set_elapsed_callback;
+    ci_voice.set_offset          = voice_set_offset_callback;
+    ci_voice.discard_codec       = voice_do_nothing;
+    ci_voice.taginfo_ready       = &voicetagtrue;
+    ci_voice.id3                 = &id3_voice;
+    id3_voice.frequency          = 11200;
+    id3_voice.length             = 1000000L;
+#endif
+ 
+    /* initialize the buffer */
+    filebuf = audiobuf; /* must be non-NULL for audio_set_crossfade */
+    /* audio_reset_buffer must to know the size of voice buffer so init
+       voice first */
+    talk_init();
+
+    codec_thread_p = create_thread(
+            codec_thread, codec_stack, sizeof(codec_stack),
+            codec_thread_name IF_PRIO(, PRIORITY_PLAYBACK)
+        IF_COP(, COP, true));
+
+    create_thread(audio_thread, audio_stack, sizeof(audio_stack),
+                  audio_thread_name IF_PRIO(, PRIORITY_BUFFERING)
+          IF_COP(, CPU, false));
+
+    audio_set_crossfade(global_settings.crossfade);
+ 
+    audio_is_initialized = true;
+ 
+    sound_settings_apply();
+    audio_set_buffer_margin(global_settings.buffer_margin);
+} /* audio_init */
