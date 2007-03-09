@@ -83,10 +83,6 @@ struct event_queue
 #endif
 };
 
-#define MTX_UNOWNED         0x00000000
-#define MTX_BLOCKED_WAITER  0x00000001
-#define MTX_SPIN_WAITER     0x00010001
-#define MTX_SPIN_OWNER      0x00020001
 struct mutex
 {
     uint32_t locked;
