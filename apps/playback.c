@@ -322,18 +322,18 @@ static unsigned char *dram_buf[2] = { NULL, NULL };
 static struct mutex mutex_codecthread NOCACHEBSS_ATTR; 
 
 /* Voice state */
-static volatile bool voice_thread_start; /* Triggers voice playback (A/V) */
-static volatile bool voice_is_playing NOCACHEBSS_ATTR; /* Is voice currently playing? (V) */
-static volatile bool voice_codec_loaded NOCACHEBSS_ATTR; /* Is voice codec loaded (V/A-) */
-static char *voicebuf;
-static size_t voice_remaining;
+static volatile bool voice_thread_start = false; /* Triggers voice playback (A/V) */
+static volatile bool voice_is_playing NOCACHEBSS_ATTR = false; /* Is voice currently playing? (V) */
+static volatile bool voice_codec_loaded NOCACHEBSS_ATTR = false; /* Is voice codec loaded (V/A-) */
+static char *voicebuf = NULL;
+static size_t voice_remaining = 0;
 
 #ifdef IRAM_STEAL
 /* Voice IRAM has been stolen for other use */
 static bool voice_iram_stolen = false;
 #endif
 
-static void (*voice_getmore)(unsigned char** start, int* size);
+static void (*voice_getmore)(unsigned char** start, int* size) = NULL;
 
 struct voice_info {
     void (*callback)(unsigned char **start, int *size);
