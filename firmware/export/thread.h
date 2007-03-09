@@ -159,8 +159,7 @@ int  thread_get_priority(struct thread_entry *thread);
    without altering the scheduler's thread precedence. */
 void priority_yield(void);
 #else
-static inline void priority_yield(void)
-    { yield(); }
+#define priority_yield  yield
 #endif /* HAVE_PRIORITY_SCHEDULING */
 struct thread_entry * thread_get_current(void);
 void init_threads(void);
