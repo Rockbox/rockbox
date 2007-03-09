@@ -189,18 +189,18 @@ bool audio_is_initialized = false;
 /* TBD: Split out "audio" and "playback" (ie. calling) threads */
 
 /* Main state control */
-static volatile bool audio_codec_loaded NOCACHEBSS_ATTR;/* Codec loaded? (C/A-) */
-static volatile bool playing NOCACHEBSS_ATTR;          /* Is audio playing? (A) */
-static volatile bool paused NOCACHEBSS_ATTR;         /* Is audio paused? (A/C-) */
-static volatile bool filling IDATA_ATTR; /* Is file buffer refilling? (A/C-) */
+static volatile bool audio_codec_loaded NOCACHEBSS_ATTR = false; /* Codec loaded? (C/A-) */
+static volatile bool playing NOCACHEBSS_ATTR = false; /* Is audio playing? (A) */
+static volatile bool paused NOCACHEBSS_ATTR = false; /* Is audio paused? (A/C-) */
+static volatile bool filling IDATA_ATTR = false; /* Is file buffer refilling? (A/C-) */
 
 /* Ring buffer where compressed audio and codecs are loaded */
-static unsigned char *filebuf;              /* Start of buffer (A/C-) */
+static unsigned char *filebuf = NULL;       /* Start of buffer (A/C-) */
 /* FIXME: make filebuflen static */
-size_t filebuflen;                          /* Size of buffer (A/C-) */
+size_t filebuflen = 0;                      /* Size of buffer (A/C-) */
 /* FIXME: make buf_ridx (C/A-) */
-static volatile size_t buf_ridx IDATA_ATTR; /* Buffer read position (A/C)*/
-static volatile size_t buf_widx IDATA_ATTR; /* Buffer write position (A/C-) */
+static volatile size_t buf_ridx IDATA_ATTR = 0; /* Buffer read position (A/C)*/
+static volatile size_t buf_widx IDATA_ATTR = 0; /* Buffer write position (A/C-) */
 
 /* Possible arrangements of the buffer */
 #define BUFFER_STATE_TRASHED        -1          /* trashed; must be reset */
@@ -221,24 +221,24 @@ static int buffer_state = BUFFER_STATE_TRASHED; /* Buffer state */
 
 /* Track info structure about songs in the file buffer (A/C-) */
 static struct track_info tracks[MAX_TRACK];
-static volatile int track_ridx;      /* Track being decoded (A/C-) */
-static int track_widx;               /* Track being buffered (A) */
+static volatile int track_ridx = 0;  /* Track being decoded (A/C-) */
+static int track_widx = 0;           /* Track being buffered (A) */
 
-static struct track_info *prev_ti;   /* Previous track info pointer (A/C-) */
+static struct track_info *prev_ti = NULL; /* Previous track info pointer (A/C-) */
 #define CUR_TI (&tracks[track_ridx]) /* Playing track info pointer (A/C-) */
 
 /* Set by the audio thread when the current track information has updated
  * and the WPS may need to update its cached information */
-static bool track_changed;
+static bool track_changed = false;
 
 /* Information used only for filling the buffer */
 /* Playlist steps from playing track to next track to be buffered (A) */
-static int last_peek_offset;
+static int last_peek_offset = 0;
 /* Partially loaded track file handle to continue buffering (A) */
-static int current_fd;
+static int current_fd = -1;
 
 /* Scrobbler support */
-static unsigned long prev_track_elapsed; /* Previous track elapsed time (C/A-)*/
+static unsigned long prev_track_elapsed = 0; /* Previous track elapsed time (C/A-)*/
 
 /* Track change controls */
 static bool automatic_skip = false; /* Who initiated in-progress skip? (C/A-) */
@@ -250,20 +250,20 @@ static int wps_offset = 0;
 
 /* Callbacks which applications or plugins may set */
 /* When the playing track has changed from the user's perspective */
-void (*track_changed_callback)(struct mp3entry *id3);
+void (*track_changed_callback)(struct mp3entry *id3) = NULL;
 /* When a track has been buffered */
-void (*track_buffer_callback)(struct mp3entry *id3, bool last_track);
+void (*track_buffer_callback)(struct mp3entry *id3, bool last_track) = NULL;
 /* When a track's buffer has been overwritten or cleared */
-void (*track_unbuffer_callback)(struct mp3entry *id3, bool last_track);
+void (*track_unbuffer_callback)(struct mp3entry *id3, bool last_track) = NULL;
 
 /* Configuration */
-static size_t conf_watermark; /* Level to trigger filebuf fill (A/C) FIXME */
-static size_t conf_filechunk; /* Largest chunk the codec accepts (A/C) FIXME */
-static size_t conf_preseek;   /* Codec pre-seek margin (A/C) FIXME */
-static size_t buffer_margin;  /* Buffer margin aka anti-skip buffer (A/C-) */
-static bool v1first = false;  /* ID3 data control, true if V1 then V2 (A) */
+static size_t conf_watermark = 0; /* Level to trigger filebuf fill (A/C) FIXME */
+static size_t conf_filechunk = 0; /* Largest chunk the codec accepts (A/C) FIXME */
+static size_t conf_preseek   = 0; /* Codec pre-seek margin (A/C) FIXME */
+static size_t buffer_margin  = 0; /* Buffer margin aka anti-skip buffer (A/C-) */
+static bool v1first = false;      /* ID3 data control, true if V1 then V2 (A) */
 #if MEM > 8
-static size_t high_watermark; /* High watermark for rebuffer (A/V/other) */
+static size_t high_watermark = 0; /* High watermark for rebuffer (A/V/other) */
 #endif
 
 /* Multiple threads */
