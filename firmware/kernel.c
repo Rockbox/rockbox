@@ -656,48 +656,73 @@ void mutex_init(struct mutex *m)
     m->thread = NULL;
 }
 
-#ifdef CPU_PP
-/* PortalPlayer chips have 2 cores, therefore need atomic mutexes */
+/* PortalPlayer chips have 2 cores, therefore need atomic mutexes 
+ * Just use it for ARM, Coldfire and whatever else well...why not?
+ */
 
-static inline bool test_and_set(bool *x, bool v)
-{
-    asm volatile (
-        "swpb %0, %0, [%1]\n"
-        : "+r"(v)
-        : "r"(x)
-    );
-    return v;
-}
-
-void mutex_lock(struct mutex *m)
-{
-    if (test_and_set(&m->locked,true))
-    {
-        /* Wait until the lock is open... */
-        block_thread(&m->thread);
-    }
-}
-
+/* Macros generate better code than an inline function is this case */
+#if defined (CPU_PP) || defined (CPU_ARM)
+#define test_and_set(x_, v_) \
+({ \
+    uint32_t old; \
+    asm volatile ( \
+        "swpb %[old], %[v], [%[x]] \r\n" \
+        : [old]"=r"(old) \
+        : [v]"r"((uint32_t)v_), [x]"r"((uint32_t *)x_) \
+    ); \
+    old; \
+    })
+#elif defined (CPU_COLDFIRE)
+#define test_and_set(x_, v_) \
+({ \
+    uint8_t old; \
+    asm volatile ( \
+        "bset.l %[v], (%[x]) \r\n" \
+        "sne.b  %[old]       \r\n" \
+        : [old]"=d,d"(old) \
+        : [v]"i,d"((uint32_t)v_), [x]"a,a"((uint32_t *)x_) \
+    ); \
+    old; \
+    })
 #else
+/* default for no asm version */
+#define test_and_set(x_, v_) \
+({ \
+    uint32_t old = *(uint32_t *)x_; \
+    *(uint32_t *)x_ = v_; \
+    old; \
+    })
+#endif
+
 void mutex_lock(struct mutex *m)
 {
-    if (m->locked)
+    if (test_and_set(&m->locked, 1))
     {
         /* Wait until the lock is open... */
         block_thread(&m->thread);
     }
-    
-    /* ...and lock it */
-    m->locked = true;
 }
-#endif
 
 void mutex_unlock(struct mutex *m)
 {
     if (m->thread == NULL)
-        m->locked = false;
+        m->locked = 0;
     else
         wakeup_thread(&m->thread);
 }
 
-#endif
+void spinlock_lock(struct mutex *m)
+{
+    while (test_and_set(&m->locked, 1))
+    {
+        /* wait until the lock is open... */
+        switch_thread(true, NULL);
+    }
+}
+
+void spinlock_unlock(struct mutex *m)
+{
+    m->locked = 0;
+}
+
+#endif /* ndef SIMULATOR */

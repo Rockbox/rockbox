@@ -39,11 +39,6 @@ static unsigned short highest_priority IBSS_ATTR;
 static int boosted_threads IBSS_ATTR;
 #endif
 
-#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
-#define STAY_IRQ_LEVEL -1
-static int switch_to_irq_level = STAY_IRQ_LEVEL;
-#endif
-
 /* Define to enable additional checks for blocking violations etc. */
 #define THREAD_EXTRA_CHECKS
 
@@ -136,11 +131,11 @@ static inline void load_context(const void* addr)
         "movem.l (%0),%%d0/%%d2-%%d7/%%a2-%%a7   \n"  /* Load context */
         "move.l  %%d0,%%macsr    \n"
         "move.l  (52,%0),%%d0    \n"  /* Get start address */
-        "beq.b   .running        \n"  /* NULL -> already running */
+        "beq.b   1f              \n"  /* NULL -> already running */
         "clr.l   (52,%0)         \n"  /* Clear start address.. */
         "move.l  %%d0,%0         \n"
         "jmp     (%0)            \n"  /* ..and start the thread */
-    ".running:                   \n"
+    "1:                          \n"
         : : "a" (addr) : "d0" /* only! */
     );
 }
@@ -422,10 +417,10 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
         /* This has to be done after the scheduler is finished with the
            blocked_list pointer so that an IRQ can't kill us by attempting
            a wake but before attempting any core sleep. */
-        if (switch_to_irq_level != STAY_IRQ_LEVEL)
+        if (cores[CURRENT_CORE].switch_to_irq_level != STAY_IRQ_LEVEL)
         {
-            int level = switch_to_irq_level;
-            switch_to_irq_level = STAY_IRQ_LEVEL;
+            int level = cores[CURRENT_CORE].switch_to_irq_level;
+            cores[CURRENT_CORE].switch_to_irq_level = STAY_IRQ_LEVEL;
             set_irq_level(level);
         }
 #endif
@@ -442,13 +437,14 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
     for (;;)
     {
         int priority = cores[CURRENT_CORE].running->priority;
-        
+
         if (priority < highest_priority)
             highest_priority = priority;
-        
+
         if (priority == highest_priority ||
                 (current_tick - cores[CURRENT_CORE].running->last_run >
-                 priority * 8))
+                 priority * 8) ||
+            cores[CURRENT_CORE].running->priority_x != 0)
             break;
 
         cores[CURRENT_CORE].running = cores[CURRENT_CORE].running->next;
@@ -567,7 +563,7 @@ void block_thread_w_tmo(struct thread_entry **list, int timeout)
 #if defined(HAVE_EXTENDED_MESSAGING_AND_NAME) && !defined(SIMULATOR)
 void set_irq_level_and_block_thread(struct thread_entry **list, int level)
 {
-    switch_to_irq_level = level;
+    cores[CURRENT_CORE].switch_to_irq_level = level;
     block_thread(list);
 }
 
@@ -575,7 +571,7 @@ void set_irq_level_and_block_thread(struct thread_entry **list, int level)
 void set_irq_level_and_block_thread_w_tmo(struct thread_entry **list,
                                           int timeout, int level)
 {
-    switch_to_irq_level = level;
+    cores[CURRENT_CORE].switch_to_irq_level = level;
     block_thread_w_tmo(list, timeout);
 }
 #endif
@@ -688,6 +684,7 @@ struct thread_entry*
     thread->stack_size = stack_size;
     thread->statearg = 0;
 #ifdef HAVE_PRIORITY_SCHEDULING
+    thread->priority_x = 0;
     thread->priority = priority;
     highest_priority = 100;
 #endif
@@ -759,7 +756,7 @@ int thread_set_priority(struct thread_entry *thread, int priority)
     
     if (thread == NULL)
         thread = cores[CURRENT_CORE].running;
-    
+
     old_priority = thread->priority;
     thread->priority = priority;
     highest_priority = 100;
@@ -774,7 +771,15 @@ int thread_get_priority(struct thread_entry *thread)
 
     return thread->priority;
 }
-#endif
+
+void priority_yield(void)
+{
+    struct thread_entry *thread = cores[CURRENT_CORE].running;
+    thread->priority_x = 1;
+    switch_thread(true, NULL);
+    thread->priority_x = 0;
+}
+#endif /* HAVE_PRIORITY_SCHEDULING */
 
 struct thread_entry * thread_get_current(void)
 {
@@ -789,10 +794,14 @@ void init_threads(void)
         memset(cores, 0, sizeof cores);
     cores[core].sleeping = NULL;
     cores[core].running = NULL;
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+    cores[core].switch_to_irq_level = STAY_IRQ_LEVEL;
+#endif
     cores[core].threads[0].name = main_thread_name;
     cores[core].threads[0].statearg = 0;
 #ifdef HAVE_PRIORITY_SCHEDULING
     cores[core].threads[0].priority = PRIORITY_USER_INTERFACE;
+    cores[core].threads[0].priority_x = 0;
     highest_priority = 100;
 #endif
 #ifdef HAVE_SCHEDULER_BOOSTCTRL

@@ -105,6 +105,7 @@ struct thread_entry {
     unsigned short stack_size;
 #ifdef HAVE_PRIORITY_SCHEDULING
     unsigned short priority;
+    unsigned long priority_x;
     long last_run;
 #endif
     struct thread_entry *next, *prev;
@@ -114,6 +115,10 @@ struct core_entry {
     struct thread_entry threads[MAXTHREADS];
     struct thread_entry *running;
     struct thread_entry *sleeping;
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+    int switch_to_irq_level;
+    #define STAY_IRQ_LEVEL -1
+#endif
 };
 
 #ifdef HAVE_PRIORITY_SCHEDULING
@@ -149,7 +154,14 @@ void wakeup_thread(struct thread_entry **thread);
 #ifdef HAVE_PRIORITY_SCHEDULING
 int thread_set_priority(struct thread_entry *thread, int priority);
 int  thread_get_priority(struct thread_entry *thread);
-#endif
+/* Yield that guarantees thread execution once per round regardless of
+   thread's scheduler priority - basically a transient realtime boost
+   without altering the scheduler's thread precedence. */
+void priority_yield(void);
+#else
+static inline void priority_yield(void)
+    { yield(); }
+#endif /* HAVE_PRIORITY_SCHEDULING */
 struct thread_entry * thread_get_current(void);
 void init_threads(void);
 int thread_stack_usage(const struct thread_entry *thread);

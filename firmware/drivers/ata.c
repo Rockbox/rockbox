@@ -104,7 +104,7 @@ STATICIRAM int wait_for_bsy(void)
     long timeout = current_tick + HZ*30;
     while (TIME_BEFORE(current_tick, timeout) && (ATA_STATUS & STATUS_BSY)) {
         last_disk_activity = current_tick;
-        yield();
+        priority_yield();
     }
 
     if (TIME_BEFORE(current_tick, timeout))
@@ -126,7 +126,7 @@ STATICIRAM int wait_for_rdy(void)
     while (TIME_BEFORE(current_tick, timeout) &&
            !(ATA_ALT_STATUS & STATUS_RDY)) {
         last_disk_activity = current_tick;
-        yield();
+        priority_yield();
     }
 
     if (TIME_BEFORE(current_tick, timeout))
@@ -216,7 +216,7 @@ int ata_read_sectors(IF_MV2(int drive,)
 #ifdef HAVE_MULTIVOLUME
     (void)drive; /* unused for now */
 #endif
-    mutex_lock(&ata_mtx);
+    spinlock_lock(&ata_mtx);
 
     last_disk_activity = current_tick;
     spinup_start = current_tick;
@@ -227,14 +227,14 @@ int ata_read_sectors(IF_MV2(int drive,)
         spinup = true;
         if (poweroff) {
             if (ata_power_on()) {
-                mutex_unlock(&ata_mtx);
+                spinlock_unlock(&ata_mtx);
                 ata_led(false);
                 return -1;
             }
         }
         else {
             if (perform_soft_reset()) {
-                mutex_unlock(&ata_mtx);
+                spinlock_unlock(&ata_mtx);
                 ata_led(false);
                 return -1;
             }
@@ -246,7 +246,7 @@ int ata_read_sectors(IF_MV2(int drive,)
     SET_REG(ATA_SELECT, ata_device);
     if (!wait_for_rdy())
     {
-        mutex_unlock(&ata_mtx);
+        spinlock_unlock(&ata_mtx);
         ata_led(false);
         return -2;
     }
@@ -359,7 +359,7 @@ int ata_read_sectors(IF_MV2(int drive,)
     }
     ata_led(false);
 
-    mutex_unlock(&ata_mtx);
+    spinlock_unlock(&ata_mtx);
 
     return ret;
 }
@@ -417,7 +417,7 @@ int ata_write_sectors(IF_MV2(int drive,)
     if (start == 0)
         panicf("Writing on sector 0\n");
 
-    mutex_lock(&ata_mtx);
+    spinlock_lock(&ata_mtx);
     
     last_disk_activity = current_tick;
     spinup_start = current_tick;
@@ -428,14 +428,14 @@ int ata_write_sectors(IF_MV2(int drive,)
         spinup = true;
         if (poweroff) {
             if (ata_power_on()) {
-                mutex_unlock(&ata_mtx);
+                spinlock_unlock(&ata_mtx);
                 ata_led(false);
                 return -1;
             }
         }
         else {
             if (perform_soft_reset()) {
-                mutex_unlock(&ata_mtx);
+                spinlock_unlock(&ata_mtx);
                 ata_led(false);
                 return -1;
             }
@@ -445,7 +445,7 @@ int ata_write_sectors(IF_MV2(int drive,)
     SET_REG(ATA_SELECT, ata_device);
     if (!wait_for_rdy())
     {
-        mutex_unlock(&ata_mtx);
+        spinlock_unlock(&ata_mtx);
         ata_led(false);
         return -2;
     }
@@ -507,7 +507,7 @@ int ata_write_sectors(IF_MV2(int drive,)
 
     ata_led(false);
 
-    mutex_unlock(&ata_mtx);
+    spinlock_unlock(&ata_mtx);
 
     return ret;
 }
@@ -572,13 +572,13 @@ static int ata_perform_sleep(void)
 {
     int ret = 0;
 
-    mutex_lock(&ata_mtx);
+    spinlock_lock(&ata_mtx);
 
     SET_REG(ATA_SELECT, ata_device);
 
     if(!wait_for_rdy()) {
         DEBUGF("ata_perform_sleep() - not RDY\n");
-        mutex_unlock(&ata_mtx);
+        spinlock_unlock(&ata_mtx);
         return -1;
     }
 
@@ -591,7 +591,7 @@ static int ata_perform_sleep(void)
     }
 
     sleeping = true;
-    mutex_unlock(&ata_mtx);
+    spinlock_unlock(&ata_mtx);
     return ret;
 }
 
@@ -649,9 +649,9 @@ static void ata_thread(void)
             if ( !spinup && sleeping && !poweroff &&
                  TIME_AFTER( current_tick, last_sleep + ATA_POWER_OFF_TIMEOUT ))
             {
-                mutex_lock(&ata_mtx);
+                spinlock_lock(&ata_mtx);
                 ide_power_enable(false);
-                mutex_unlock(&ata_mtx);
+                spinlock_unlock(&ata_mtx);
                 poweroff = true;
             }
 #endif
@@ -663,11 +663,11 @@ static void ata_thread(void)
 #ifndef USB_NONE
             case SYS_USB_CONNECTED:
                 if (poweroff) {
-                    mutex_lock(&ata_mtx);
+                    spinlock_lock(&ata_mtx);
                     ata_led(true);
                     ata_power_on();
                     ata_led(false);
-                    mutex_unlock(&ata_mtx);
+                    spinlock_unlock(&ata_mtx);
                 }
 
                 /* Tell the USB thread that we are safe */
@@ -741,11 +741,11 @@ int ata_soft_reset(void)
 {
     int ret;
     
-    mutex_lock(&ata_mtx);
+    spinlock_lock(&ata_mtx);
 
     ret = perform_soft_reset();
 
-    mutex_unlock(&ata_mtx);
+    spinlock_unlock(&ata_mtx);
     return ret;
 }
 
@@ -936,7 +936,7 @@ int ata_init(void)
     bool coldstart = ata_is_coldstart();
          /* must be called before ata_device_init() */          
 
-    mutex_init(&ata_mtx);
+    spinlock_init(&ata_mtx);
 
     ata_led(false);
     ata_device_init();

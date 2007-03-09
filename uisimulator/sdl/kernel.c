@@ -355,3 +355,15 @@ void mutex_unlock(struct mutex *m)
 {
     m->locked = false;
 }
+
+void spinlock_lock(struct mutex *m)
+{
+    while(m->locked)
+        switch_thread(true, NULL);
+    m->locked = true;
+}
+
+void spinlock_unlock(struct mutex *m)
+{
+    m->locked = false;
+}

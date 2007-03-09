@@ -83,10 +83,14 @@ struct event_queue
 #endif
 };
 
+#define MTX_UNOWNED         0x00000000
+#define MTX_BLOCKED_WAITER  0x00000001
+#define MTX_SPIN_WAITER     0x00010001
+#define MTX_SPIN_OWNER      0x00020001
 struct mutex
 {
+    uint32_t locked;
     struct thread_entry *thread;
-    bool locked;
 };
 
 /* global tick variable */
@@ -126,8 +130,12 @@ extern void queue_remove_from_head(struct event_queue *q, long id);
 extern int queue_broadcast(long id, intptr_t data);
 
 extern void mutex_init(struct mutex *m);
+static inline void spinlock_init(struct mutex *m)
+{ mutex_init(m); } /* Same thing for now */
 extern void mutex_lock(struct mutex *m);
 extern void mutex_unlock(struct mutex *m);
+extern void spinlock_lock(struct mutex *m);
+extern void spinlock_unlock(struct mutex *m);
 extern void tick_start(unsigned int interval_in_ms);
 
 #define IS_SYSEVENT(ev) ((ev & SYS_EVENT) == SYS_EVENT)
