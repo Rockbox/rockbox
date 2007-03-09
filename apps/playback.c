@@ -181,12 +181,7 @@ enum {
 #define IBSS_ATTR_VOICE_STACK IBSS_ATTR
 #endif
 
-#ifndef SIMULATOR
-extern bool audio_is_initialized;
-#else
-static bool audio_is_initialized = false;
-#endif
-
+bool audio_is_initialized = false;
 
 /* Variables are commented with the threads that use them: *
  * A=audio, C=codec, V=voice. A suffix of - indicates that *
@@ -379,6 +374,17 @@ void mp3_play_stop(void)
     LOGFQUEUE("mp3 > voice Q_VOICE_STOP");
     queue_post(&voice_queue, Q_VOICE_STOP, 1);
 #endif
+}
+
+void mp3_play_pause(bool play)
+{
+    /* a dummy */
+    (void)play;
+}
+
+bool mp3_is_playing(void)
+{
+    return voice_is_playing;
 }
 
 bool mp3_pause_done(void)

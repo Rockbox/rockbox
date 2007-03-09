@@ -1315,7 +1315,10 @@ void shutdown_hw(void)
     remote_backlight_off();
 #endif
 
+#if CONFIG_CODEC != SWCODEC
     mp3_shutdown();
+#endif
+
 #ifdef HAVE_UDA1380
     audiohw_close();
 #elif defined(HAVE_TLV320)

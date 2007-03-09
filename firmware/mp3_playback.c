@@ -72,7 +72,6 @@ static void (*callback_for_more)(unsigned char**, int*);
 bool audio_is_initialized = false;
 #endif
 
-#if CONFIG_CODEC != SWCODEC
 /* FIX: this code pretty much assumes a MAS */
 
 #ifndef SIMULATOR
@@ -594,59 +593,3 @@ unsigned char* mp3_get_pos(void)
 
 
 #endif /* #ifndef SIMULATOR */
-
-#else /* CONFIG_CODEC != SWCODEC */
-void mp3_init(int volume, int bass, int treble, int balance, int loudness,
-              int avc, int channel_config, int stereo_width,
-              int mdb_strength, int mdb_harmonics,
-              int mdb_center, int mdb_shape, bool mdb_enable,
-              bool superbass)
-{
-    /* a dummy */
-    (void)volume;
-    (void)bass;
-    (void)treble;
-    (void)balance;
-    (void)loudness;
-    (void)avc;
-    (void)channel_config;
-    (void)stereo_width;
-    (void)mdb_strength;
-    (void)mdb_harmonics;
-    (void)mdb_center;
-    (void)mdb_shape;
-    (void)mdb_enable;
-    (void)superbass;
-
-    paused = false;
-    playing = false;
-#ifndef SIMULATOR
-    playstart_tick = 0;
-    cumulative_ticks = 0;
-    callback_for_more = 0;
-#endif
-}
-
-void mp3_shutdown(void)
-{
-    /* a dummy */
-}
-
-void mp3_play_pause(bool play)
-{
-    /* a dummy */
-    (void)play;
-}
-
-unsigned char* mp3_get_pos(void)
-{
-    /* a dummy */
-    return (unsigned char *)0x1234;
-}
-
-bool mp3_is_playing(void)
-{
-    return playing;
-}
-
-#endif /* CONFIG_CODEC == SWCODEC */
