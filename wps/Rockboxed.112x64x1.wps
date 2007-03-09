@@ -37,14 +37,14 @@
 %xl|x|rs-mono-small.bmp|42|49|
 %xl|w|rab-mono-small.bmp|42|49|
 %x|i|b24-mono-small.bmp|68|49|
-%al %s%ac%?ia<%ia|%d2>%ar 
-%al %s%ac%?id<%id|%d1>%ar 
-%al %s%ac%?it<%it|%fn>%ar 
-%ac%t3%ig;%t%iy 
+%al%s%ac%?ia<%ia|%d2>%ar
+%al%s%ac%?id<%id|%d1>%ar
+%al%s%ac%?it<%it|%fn>%ar
+%ac%t3%ig;%t%iy
 %pb|5|10|102|
 %al %pc%ac%?fc<mp1|mp2|mp3|aiff|wav|vorbis|flac|mpc|a52|wavpack|alac|aac|shn|sid|adx|unknown>%ar%pt 
 %?ps<%xdb|%xdu>
 %?mp<%xdo|%xdp|%xdq|%xdf|%xdr>
 %?mm<%xdv|%xdz|%xdy|%xdx|%xdw>
-%?pv<%xdA|%xdB|%xdC|%xdD|%xdE%|%xdF|%xdG|%xdH|%xdI|%xdJ>
-%?bl<%xdP|%xdQ|%xdR|%xdS|%xdT|%xdU%|%xdV|%xdW|xdX|%xdY|%xdZ>
+%?pv<%xdA|%xdB|%xdC|%xdD|%xdE|%xdF|%xdG|%xdH|%xdI|%xdJ>
+%?bl<%xdP|%xdQ|%xdR|%xdS|%xdT|%xdU|%xdV|%xdW|%xdX|%xdY|%xdZ>
