@@ -27,6 +27,7 @@
 #include "file.h"
 #include "buffer.h"
 #include "system.h"
+#include "kernel.h"
 #include "settings.h"
 #include "mp3_playback.h"
 #include "audio.h"
@@ -79,6 +80,7 @@ const char* const file_thumbnail_ext = ".talk";
 #define MAX_THUMBNAIL_BUFSIZE 32768
 #endif
 
+extern bool audio_is_initialized;
 
 /***************** Data types *****************/
 
@@ -178,6 +180,10 @@ static void load_voicefile(void)
     load_size = file_size; 
 #endif
 
+    /* Wait until the audio is initialized before continuing */
+    while(!audio_is_initialized)
+        sleep(HZ/100);
+    
     got_size = read(filehandle, audiobuf, load_size);
     if (got_size != load_size /* failure */)
         goto load_err;
