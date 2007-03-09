@@ -102,7 +102,6 @@ static int browser(void* param)
         break;
 #ifdef HAVE_TAGCACHE
         case GO_TO_DBBROWSER:
-#if 0 /* Revert this for now */
             if (!tagcache_is_usable())
             {
                 bool reinit_attempted = false;
@@ -165,13 +164,6 @@ static int browser(void* param)
             }
             if (!tagcache_is_usable())
                 return GO_TO_PREVIOUS;
-#else /* The old code */
-            if ((last_screen != GO_TO_ROOT) && !tagcache_is_usable())
-            {
-                gui_syncsplash(0, true, str(LANG_TAGCACHE_BUSY));
-                return GO_TO_PREVIOUS;
-            }
-#endif /* Sorry for the interruption */
             filter = SHOW_ID3DB;
             tc->dirlevel = last_db_dirlevel;
         break;
@@ -457,35 +449,29 @@ void root_menu(void)
                 break;
 
             case GO_TO_PREVIOUS_BROWSER:
-#ifdef HAVE_TAGCACHE
-                if ((previous_browser == GO_TO_DBBROWSER) && 
-                    !tagcache_is_usable())
-                    ret_val = GO_TO_FILEBROWSER;
-                else 
-#endif
-                    ret_val = previous_browser;
-                /* fall through */
-            case GO_TO_FILEBROWSER:
-#ifdef HAVE_TAGCACHE
-            case GO_TO_DBBROWSER:
-#endif
-                previous_browser = ret_val;
+                ret_val = previous_browser;
                 break;
 
             case GO_TO_PREVIOUS_MUSIC:
                 ret_val = previous_music;
-                /* fall through */
-            case GO_TO_WPS:
-#if CONFIG_TUNER
-            case GO_TO_FM:
-#endif
-                previous_music = ret_val;
                 break;
         }
         this_screen = ret_val;
         /* set the global_status.last_screen before entering,
            if we dont we will always return to the wrong screen on boot */
         global_status.last_screen = (char)this_screen;
+        if (this_screen == GO_TO_FILEBROWSER 
+#ifdef HAVE_TAGCACHE
+            || this_screen == GO_TO_DBBROWSER
+#endif
+            )
+            previous_browser = this_screen;
+        if (this_screen == GO_TO_WPS 
+#ifdef CONFIG_TUNER
+            || this_screen == GO_TO_FM
+#endif
+            )
+            previous_music = this_screen;
         status_save();
         action_signalscreenchange();
         ret_val = items[this_screen].function(items[this_screen].param);

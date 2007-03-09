@@ -10706,18 +10706,18 @@
   desc: splash database building progress
   user:
   <source>
-    *: "Building database... %d found (OFF for menu)"
-    h100,h120,h300: "Building database... %d found (STOP for menu)"
-    ipod*: "Building database... %d found (PLAY/PAUSE for menu)"
-    x5: "Building database... %d found (Long PLAY for menu)"
-    h10: "Building database... %d found (PREV for menu)"
+    *: "Building database... %d found (OFF to return)"
+    h100,h120,h300: "Building database... %d found (STOP to return)"
+    ipod*: "Building database... %d found (PLAY/PAUSE to return)"
+    x5: "Building database... %d found (Long PLAY to return)"
+    h10: "Building database... %d found (PREV to return)"
   </source>
   <dest>
-    *: "Building database... %d found (OFF for menu)"
-    h100,h120,h300: "Building database... %d found (STOP for menu)"
-    ipod*: "Building database... %d found (PLAY/PAUSE for menu)"
-    x5: "Building database... %d found (Long PLAY for menu)"
-    h10: "Building database... %d found (PREV for menu)"
+    *: "Building database... %d found (OFF to return)"
+    h100,h120,h300: "Building database... %d found (STOP to return)"
+    ipod*: "Building database... %d found (PLAY/PAUSE to return)"
+    x5: "Building database... %d found (Long PLAY to return)"
+    h10: "Building database... %d found (PREV to return)"
   </dest>
   <voice>
     *: ""
