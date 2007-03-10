@@ -81,6 +81,7 @@
 #include <ctype.h>
 #define yield() do { } while(0)
 #define sim_sleep(timeout) do { } while(0)
+#define do_timed_yield() do { } while(0)
 #endif
 
 
@@ -306,12 +307,26 @@ static int open_tag_fd(struct tagcache_header *hdr, int tag, bool write)
     return fd;
 }
 
+#ifndef __PCTOOL__
+static bool do_timed_yield(void)
+{
+    /* Sorting can lock up for quite a while, so yield occasionally */
+    static long wakeup_tick = 0;
+    if (current_tick >= wakeup_tick)
+    {
+        wakeup_tick = current_tick + (HZ/4);
+        yield();
+        return true;
+    }
+    return false;
+}
+#endif
+
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
 static long find_entry_ram(const char *filename,
                            const struct dircache_entry *dc)
 {
     static long last_pos = 0;
-    int counter = 0;
     int i;
     
     /* Check if we tagcache is loaded into ram. */
@@ -342,11 +357,7 @@ static long find_entry_ram(const char *filename,
             return i;
         }
         
-        if (++counter == 100)
-        {
-            yield();
-            counter = 0;
-        }
+        do_timed_yield();
     }
 
     if (last_pos > 0)
@@ -1737,6 +1748,8 @@ static bool tempbuf_insert(char *str, int id, int idx_id, bool unique)
 
 static int compare(const void *p1, const void *p2)
 {
+    do_timed_yield();
+
     struct tempbuf_searchidx *e1 = (struct tempbuf_searchidx *)p1;
     struct tempbuf_searchidx *e2 = (struct tempbuf_searchidx *)p2;
     
@@ -1790,6 +1803,8 @@ static int tempbuf_sort(int fd)
         idlist = idlist->next;
         idlist->id = i;
         idlist->next = NULL;
+
+        do_timed_yield();
     }
     
     qsort(index, tempbufidx, sizeof(struct tempbuf_searchidx), compare);
@@ -2115,7 +2130,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                     close(fd);
                     return -3;
                 }
-                yield();
+                do_timed_yield();
             }
             logf("done");
         }
@@ -2260,7 +2275,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
             /* Skip to next. */
             lseek(tmpfd, entry.data_length - entry.tag_offset[index_type] -
                     entry.tag_length[index_type], SEEK_CUR);
-            yield();
+            do_timed_yield();
         }
         logf("done");
 
@@ -2312,7 +2327,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                     goto error_exit;
                 }
                 
-                yield();
+                do_timed_yield();
             }
             
             /* Write back the updated index. */
@@ -2431,7 +2446,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
             break ;
         }
         
-        yield();
+        do_timed_yield();
     }
     logf("done");
     
@@ -3016,7 +3031,7 @@ bool tagcache_create_changelog(struct tagcache_search *tcs)
         }
         
         write(clfd, "\n", 1);
-        yield();
+        do_timed_yield();
     }
     
     close(clfd);
@@ -3278,7 +3293,6 @@ static bool load_tagcache(void)
     int rc, fd;
     char *p;
     int i, tag;
-    int yield_count = 0;
 
 # ifdef HAVE_DIRCACHE
     while (dircache_is_initializing())
@@ -3355,13 +3369,11 @@ static bool load_tagcache(void)
         {
             long pos;
             
-            if (yield_count++ == 100)
+            if (do_timed_yield())
             {
-                yield();
                 /* Abort if we got a critical event in queue */
                 if (check_event_queue())
                     return false;
-                yield_count = 0;
             }
             
             fe = (struct tagfile_entry *)p;
