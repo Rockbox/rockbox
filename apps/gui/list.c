@@ -408,8 +408,7 @@ static void gui_list_draw(struct gui_list * gui_list)
                            gui_list->start_item + lines, VERTICAL);
     }
 
-    screen_set_xmargin(display, old_xmargin);
-    screen_set_ymargin(display, old_ymargin);
+    display->setmargins(old_xmargin, old_ymargin);
 #endif
 
     gui_textarea_update(display);
