@@ -22,6 +22,7 @@
 
 #include "cpu.h"
 #include "stdbool.h"
+#include "kernel.h"
 
 extern void system_reboot (void);
 extern void system_init(void);
@@ -40,7 +41,7 @@ extern unsigned int ipod_hw_rev;
 static inline void udelay(unsigned usecs)
 {
     unsigned stop = USEC_TIMER + usecs;
-    while (TIME_AFTER(USEC_TIMER, stop));
+    while (TIME_BEFORE(USEC_TIMER, stop));
 }
 
 unsigned int current_core(void);
