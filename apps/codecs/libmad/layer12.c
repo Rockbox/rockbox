@@ -28,6 +28,7 @@
 # ifdef HAVE_LIMITS_H
 #  include <limits.h>
 # else
+#  undef  CHAR_BIT
 #  define CHAR_BIT  8
 # endif
 
