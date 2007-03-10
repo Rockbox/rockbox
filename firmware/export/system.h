@@ -39,8 +39,8 @@ extern unsigned int ipod_hw_rev;
 
 static inline void udelay(unsigned usecs)
 {
-    unsigned start = USEC_TIMER;
-    while ((USEC_TIMER - start) < usecs);
+    unsigned stop = USEC_TIMER + usecs;
+    while (TIME_AFTER(USEC_TIMER, stop));
 }
 
 unsigned int current_core(void);
