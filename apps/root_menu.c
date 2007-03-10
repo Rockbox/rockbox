@@ -84,7 +84,7 @@ static int browser(void* param)
     static char last_folder[MAX_PATH] = "/";
     /* and stuff for the database browser */
 #ifdef HAVE_TAGCACHE
-    static int last_db_dirlevel = 0;
+    static int last_db_dirlevel = 0, last_db_selection = 0;
 #endif
     
     switch ((intptr_t)param)
@@ -166,6 +166,7 @@ static int browser(void* param)
                 return GO_TO_PREVIOUS;
             filter = SHOW_ID3DB;
             tc->dirlevel = last_db_dirlevel;
+            tc->selected_item = last_db_selection;
         break;
 #endif
         case GO_TO_BROWSEPLUGINS:
@@ -182,6 +183,7 @@ static int browser(void* param)
 #ifdef HAVE_TAGCACHE
         case GO_TO_DBBROWSER:
             last_db_dirlevel = tc->dirlevel;
+            last_db_selection = tc->selected_item;
         break;
 #endif
     }

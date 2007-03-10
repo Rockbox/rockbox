@@ -632,6 +632,7 @@ int dirbrowse()
         if (returned_button == ACTION_STD_CANCEL)
             button = ACTION_STD_CANCEL;
 
+        tc.selected_item = gui_synclist_get_sel_pos(&tree_lists);
         switch ( button ) {
             case ACTION_STD_OK:
                 /* nothing to do if no files to display */
@@ -933,7 +934,6 @@ int dirbrowse()
         }
 
         if(need_update) {
-            tc.selected_item = gui_synclist_get_sel_pos(&tree_lists);
             need_update=false;
             if ( numentries > 0 ) {
                 /* Voice the file if changed */
