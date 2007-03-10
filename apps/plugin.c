@@ -641,6 +641,7 @@ int plugin_load(const char* plugin, void* parameter)
     lcd_remote_clear_display();
     lcd_remote_update();
 #endif
+    action_signalscreenchange();
 
     if (pfn_tsr_exit == NULL)
         plugin_loaded = false;
