@@ -3443,6 +3443,11 @@ static bool ata_fillbuffer_callback(void)
 static void audio_thread(void)
 {
     struct event ev;
+
+    audiohw_postinit();
+
+    /* Unlock mutex that init stage locks before creating this thread */
+    mutex_unlock(&mutex_codecthread);
     
     while (1) 
     {
@@ -3604,6 +3609,10 @@ void audio_init(void)
        starts running until ready if something yields such as talk_init. */
 #ifdef PLAYBACK_VOICE
     mutex_init(&mutex_codecthread);
+    /* Take ownership of lock to prevent playback of anything before audio
+       hardware is initialized - audio thread unlocks it after final init
+       stage */
+    mutex_lock(&mutex_codecthread);
 #endif
     queue_init(&audio_queue, true);
     queue_enable_queue_send(&audio_queue, &audio_queue_sender_list);
@@ -3656,6 +3665,7 @@ void audio_init(void)
  
     /* initialize the buffer */
     filebuf = audiobuf; /* must be non-NULL for audio_set_crossfade */
+
     /* audio_reset_buffer must to know the size of voice buffer so init
        voice first */
     talk_init();
@@ -3670,9 +3680,9 @@ void audio_init(void)
           IF_COP(, CPU, false));
 
     audio_set_crossfade(global_settings.crossfade);
- 
+
     audio_is_initialized = true;
- 
+
     sound_settings_apply();
     audio_set_buffer_margin(global_settings.buffer_margin);
 } /* audio_init */

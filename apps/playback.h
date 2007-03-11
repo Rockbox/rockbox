@@ -74,7 +74,6 @@ extern void audio_prev_dir(void);
 #define audio_next_dir() 
 #define audio_prev_dir()
 #endif
-void audio_preinit(void);
 
 #endif
 

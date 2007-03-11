@@ -255,6 +255,10 @@ void pcm_init(void)
     pcm_play_dma_stop();
     /* Call pcm_close_recording to put in closed state */
     pcm_close_recording();
+
+    /* Initialize default register values. */
+    audiohw_init();
+
     audio_set_output_source(AUDIO_SRC_PLAYBACK);
     audio_set_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
     pcm_set_frequency(HW_FREQ_DEFAULT);
@@ -264,24 +268,6 @@ void pcm_init(void)
 #if defined(HAVE_SPDIF_IN) || defined(HAVE_SPDIF_OUT)
     spdif_init();
 #endif
-
-    /* Initialize default register values. */
-    audiohw_init();
-
-#if defined(HAVE_UDA1380)
-    /* Sleep a while so the power can stabilize (especially a long
-       delay is needed for the line out connector). */
-    sleep(HZ);
-    /* Power on FSDAC and HP amp. */
-    audiohw_enable_output(true);
-#elif defined(HAVE_TLV320)
-    sleep(HZ/4);
-#endif
-
-    /* UDA1380: Unmute the master channel
-       (DAC should be at zero point now). */
-    audiohw_mute(false);
-
     /* Enable interrupt at level 6, priority 0 */
     ICR6 = (6 << 2);
     and_l(~(1 << 14), &IMR); /* bit 14 is DMA0 */

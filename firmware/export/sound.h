@@ -32,6 +32,8 @@
 #include "tlv320.h"
 #endif
 
+extern void audiohw_postinit(void);
+
 enum {
     SOUND_VOLUME = 0,
     SOUND_BASS,

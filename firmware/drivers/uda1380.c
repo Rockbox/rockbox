@@ -270,6 +270,19 @@ int audiohw_init(void)
     return 0;
 }
 
+void audiohw_postinit(void)
+{
+    /* Sleep a while so the power can stabilize (especially a long
+       delay is needed for the line out connector). */
+    sleep(HZ);
+    /* Power on FSDAC and HP amp. */
+    audiohw_enable_output(true);
+
+    /* UDA1380: Unmute the master channel
+       (DAC should be at zero point now). */
+    audiohw_mute(false);
+}
+
 /* Nice shutdown of UDA1380 codec */
 void audiohw_close(void)
 {

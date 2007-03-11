@@ -99,8 +99,18 @@ void audiohw_init(void)
     tlv320_write_reg(REG_DAIF, DAIF_IWL_16 | DAIF_FOR_I2S);
     tlv320_write_reg(REG_DIA, DIA_ACT);
     audiohw_set_frequency(-1); /* default */
+}
+
+/**
+ * Switch outputs ON
+ */
+void audiohw_postinit(void)
+{
     /* All ON except ADC, MIC and LINE */
+    sleep(HZ);
     tlv320_write_reg(REG_PC, PC_ADC | PC_MIC | PC_LINE);
+    sleep(HZ/4);
+    audiohw_mute(false);
 }
 
 /**

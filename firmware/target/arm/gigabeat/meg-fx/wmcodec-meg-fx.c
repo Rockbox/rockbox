@@ -61,6 +61,10 @@ int audiohw_init(void) {
     return 0;
 }
 
+void audiohw_postinit(void)
+{
+}
+
 void wmcodec_write(int reg, int data)
 {
     i2c_send(0x34, (reg<<1) | ((data&0x100)>>8), data&0xff);
