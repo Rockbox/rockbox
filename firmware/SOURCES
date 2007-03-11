@@ -205,6 +205,8 @@ drivers/wm8975.c
 drivers/wm8758.c
 #elif defined(HAVE_WM8731) || defined(HAVE_WM8721)
 drivers/wm8731l.c
+#elif defined(HAVE_AS3514)
+drivers/as3514.c
 #elif defined(HAVE_TLV320)
 drivers/tlv320.c
 #endif /* defined(HAVE_*) */

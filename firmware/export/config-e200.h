@@ -40,6 +40,10 @@
 
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
+/* There is no hardware tone control */
+#define HAVE_SW_TONE_CONTROLS
+/* The PP5024 has a built-in AustriaMicrosystems AS3514 */
+#define HAVE_AS3514
 
 /* define this if you have a real-time clock */
 #ifndef BOOTLOADER
@@ -57,9 +61,6 @@
 
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x80000
-
-/* Use the built-in DAC on the PP5024 */
-#define HAVE_PP5024_CODEC
 
 #define AB_REPEAT_ENABLE 1
 

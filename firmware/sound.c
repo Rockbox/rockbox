@@ -77,9 +77,8 @@ static const struct sound_settings_info sound_settings_table[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25, sound_set_volume},
 #elif (CONFIG_CPU == PNX0101)
     [SOUND_VOLUME]        = {"dB", 0,  1, -48,  15,   0, sound_set_volume},
-#elif defined(HAVE_PP5024_CODEC)
-/* TODO: Make this correct */
-    [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25, sound_set_volume},
+#elif defined(HAVE_AS3514)
+    [SOUND_VOLUME]        = {"dB", 0,  1, -45,   1, -25, sound_set_volume},
 #else /* MAS3507D */
     [SOUND_VOLUME]        = {"dB", 0,  1, -78,  18, -18, sound_set_volume},
     [SOUND_BASS]          = {"dB", 0,  1, -15,  15,   7, sound_set_bass},
@@ -292,17 +291,10 @@ static int tenthdb2reg(int db)
 }
 #endif
 
-#if defined(HAVE_PP5024_CODEC)
-/* TODO: Work out volume/balance/treble/bass interdependency */
-#define VOLUME_MIN 0
-#define VOLUME_MAX 1
-
-#endif
-
 #if (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 \
     || defined HAVE_WM8975 || defined HAVE_WM8758 || defined(HAVE_WM8731) \
     || defined(HAVE_WM8721) || defined(HAVE_TLV320) || defined(HAVE_WM8751) \
-    || defined(HAVE_PP5024_CODEC)
+    || defined(HAVE_AS3514)
  /* volume/balance/treble/bass interdependency main part */
 #define VOLUME_RANGE (VOLUME_MAX - VOLUME_MIN)
 
@@ -363,7 +355,8 @@ static void set_prescaled_volume(void)
 #if CONFIG_CODEC == MAS3507D
     dac_volume(tenthdb2reg(l), tenthdb2reg(r), false);
 #elif defined(HAVE_UDA1380) || defined(HAVE_WM8975) || defined(HAVE_WM8758) \
-   || defined(HAVE_WM8731) || defined(HAVE_WM8721) || defined(HAVE_WM8751)
+   || defined(HAVE_WM8731) || defined(HAVE_WM8721) || defined(HAVE_WM8751) \
+   || defined(HAVE_AS3514)
     audiohw_set_master_vol(tenthdb2master(l), tenthdb2master(r));
 #if defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8751)
     audiohw_set_lineout_vol(tenthdb2master(0), tenthdb2master(0));
@@ -479,7 +472,7 @@ void sound_set_volume(int value)
 #elif (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 \
    || defined HAVE_WM8975 || defined HAVE_WM8758 || defined HAVE_WM8731 \
    || defined(HAVE_WM8721) || defined(HAVE_TLV320) || defined(HAVE_WM8751) \
-   || defined(HAVE_PP5024_CODEC)
+   || defined(HAVE_AS3514)
     current_volume = value * 10;     /* tenth of dB */
     set_prescaled_volume();                          
 #elif CONFIG_CPU == PNX0101
@@ -500,7 +493,7 @@ void sound_set_balance(int value)
    || defined(HAVE_WM8721) || defined(HAVE_TLV320) || defined(HAVE_WM8751)
     current_balance = value * VOLUME_RANGE / 100; /* tenth of dB */
     set_prescaled_volume();
-#elif CONFIG_CPU == PNX0101 || defined(HAVE_PP5024_CODEC)
+#elif CONFIG_CPU == PNX0101 || defined(HAVE_AS3514)
     /* TODO: implement for iFP and Sansa */
     (void)value;
 #endif
@@ -530,8 +523,8 @@ void sound_set_bass(int value)
     current_bass = value * 10;
     audiohw_set_bass(value);
     set_prescaled_volume();
-#elif CONFIG_CPU == PNX0101 || defined(HAVE_PP5024_CODEC)
-    /* TODO: implement for iFP and Sansa */
+#elif CONFIG_CPU == PNX0101
+    /* TODO: implement for iFP */
     (void)value;
 #endif               
 }
@@ -560,8 +553,8 @@ void sound_set_treble(int value)
     audiohw_set_treble(value);
     current_treble = value * 10;
     set_prescaled_volume();
-#elif CONFIG_CPU == PNX0101 || defined(HAVE_PP5024_CODEC)
-    /* TODO: implement for iFP and Sansa */
+#elif CONFIG_CPU == PNX0101 
+    /* TODO: implement for iFP */
     (void)value;
 #endif    
 }

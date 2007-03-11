@@ -84,6 +84,12 @@ void i2s_reset(void)
     /* FIFO.FORMAT */
     /* If BIT.SIZE < FIFO.FORMAT low bits will be 0 */
     IISCONFIG = ((IISCONFIG & ~FIFO_FORMAT_MASK) | FIFO_FORMAT_32LSB);
+#ifdef HAVE_AS3514
+    /* AS3514 can only operate as I2S Slave */
+    IISCONFIG |= I2S_MASTER;
+    /* Set I2S to 44.1kHz */
+    outl((inl(0x70002808) & ~(0x1ff)) | 271, 0x70002808);
+#endif
 
     /* RX_ATN_LVL=1 == when 12 slots full */
     /* TX_ATN_LVL=1 == when 12 slots empty */
