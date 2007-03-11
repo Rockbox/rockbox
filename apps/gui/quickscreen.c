@@ -43,7 +43,12 @@ void gui_quickscreen_init(struct gui_quickscreen * qs,
     qs->callback=callback;
 }
 
-void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * display)
+/*
+ * Draws the quickscreen on a given screen
+ *  - qs : the quickscreen
+ *  - display : the screen to draw on
+ */
+static void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * display)
 {
     #define PUTS_CENTER (display->height/2/font_h)
     #define PUTS_BOTTOM (display->height/font_h)
@@ -120,14 +125,24 @@ void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * display)
     display->setfont(FONT_UI);
 }
 
-void gui_syncquickscreen_draw(struct gui_quickscreen * qs)
+/*
+ * Draws the quickscreen on all available screens
+ *  - qs : the quickscreen
+ */
+static void gui_syncquickscreen_draw(struct gui_quickscreen * qs)
 {
     int i;
     FOR_NB_SCREENS(i)
         gui_quickscreen_draw(qs, &screens[i]);
 }
 
-bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
+/*
+ * Does the actions associated to the given button if any
+ *  - qs : the quickscreen
+ *  - button : the key we are going to analyse
+ * returns : true if the button corresponded to an action, false otherwise
+ */
+static bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
 {
 
     switch(button)

@@ -57,26 +57,7 @@ void gui_quickscreen_init(struct gui_quickscreen * qs,
                           struct option_select *bottom_option,
                           struct option_select *right_option,
                           quickscreen_callback *callback);
-/*
- * Draws the quickscreen on a given screen
- *  - qs : the quickscreen
- *  - display : the screen to draw on
- */
-void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * display);
 
-/*
- * Does the actions associated to the given button if any
- *  - qs : the quickscreen
- *  - button : the key we are going to analyse
- * returns : true if the button corresponded to an action, false otherwise
- */
-bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button);
-
-/*
- * Draws the quickscreen on all available screens
- *  - qs : the quickscreen
- */
-void gui_syncquickscreen_draw(struct gui_quickscreen * qs);
 
 /*
  * Runs the quickscreen on all available screens, if button_enter is released, quits
