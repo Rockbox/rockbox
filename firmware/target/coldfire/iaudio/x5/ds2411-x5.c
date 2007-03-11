@@ -36,7 +36,7 @@ static unsigned int ds2411_delay_factor = 0;
     "1:                         \n" \
         "subq.l #1, %%d0        \n" \
         "bhi.s  1b              \n" \
-        : : [factor]"d"(ds2411_delay_factor), [x]"d"(uS) : "d0");
+        : : [factor]"d,d"(ds2411_delay_factor), [x]"r,i"(uS) : "d0");
 
 /* Calculate the CRC of a byte */
 static unsigned char ds2411_calc_crc(unsigned char byte)
