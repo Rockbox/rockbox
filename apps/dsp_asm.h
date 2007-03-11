@@ -27,13 +27,12 @@
 #if defined(CPU_COLDFIRE) || defined(CPU_ARM)
 #define DSP_HAVE_ASM_CROSSFEED
 void apply_crossfeed(int count, int32_t *buf[]);
-#endif /* defined(CPU_COLDFIRE) || defined(CPU_ARM) */
-
-#if defined (CPU_COLDFIRE)
 #define DSP_HAVE_ASM_RESAMPLING
 int dsp_downsample(int count, struct dsp_data *data, int32_t *src[], int32_t *dst[]);
 int dsp_upsample(int count, struct dsp_data *data, int32_t *src[], int32_t *dst[]);
+#endif /* defined(CPU_COLDFIRE) || defined(CPU_ARM) */
 
+#if defined (CPU_COLDFIRE)
 #define DSP_HAVE_ASM_SOUND_CHAN_MONO
 void channels_process_sound_chan_mono(int count, int32_t *buf[]);
 #define DSP_HAVE_ASM_SOUND_CHAN_CUSTOM
