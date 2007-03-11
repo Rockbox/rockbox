@@ -134,11 +134,12 @@ static unsigned char ds2411_read_byte(void)
  */
 int ds2411_read_id(struct ds2411_id *id)
 {
+    int level = set_irq_level(DISABLE_INTERRUPTS); /* Timing sensitive */
     int i;
     unsigned char crc;
 
     /* Initialize delay factor based on loop time: 3*(uS-1) + 3 */
-    ds2411_delay_factor = MIN(cpu_frequency / (1000000*3), 1);
+    ds2411_delay_factor = MAX(cpu_frequency / (1000000*3), 1);
 
     /* Init GPIO 1 wire bus for bit banging with a pullup resistor where 
      * it is set low as output and switched between input and output mode.
@@ -162,45 +163,52 @@ int ds2411_read_id(struct ds2411_id *id)
 
     /* Read presence pulse - line should be pulled low at proper time by the
        slave device */
-    if (GPIO_READ & DS2411_BIT)
+    if ((GPIO_READ & DS2411_BIT) == 0)
+    {
+        /* Trsth + 1 - 66 = Tpdhmax + Tpdlmax + Trecmin + 1 - 66 */
+        DELAY(240);
+
+        /* ds2411 should be ready for data transfer */
+
+        /* Send Read ROM command */
+        ds2411_write_byte(0x33);
+
+        /* Read ROM serial number and CRC */
+        i = 0, crc = 0;
+
+        do
+        {
+            unsigned char byte = ds2411_read_byte();
+            ((unsigned char *)id)[i] = byte;
+            crc = ds2411_calc_crc(crc ^ byte);
+        }
+        while (++i < 8);
+
+        /* Check that family code is ok */
+        if (id->family_code != 0x01)
+        {
+            logf("ds2411: invalid family code=%02X", (unsigned)id->family_code);
+            i = DS2411_INVALID_FAMILY_CODE;
+        }
+        /* Check that CRC was ok */
+        else if (crc != 0) /* Because last loop eors the CRC with the resulting CRC */
+        {
+            logf("ds2411: invalid CRC=%02X", (unsigned)id->crc);
+            i = DS2411_INVALID_CRC;
+        }
+        else
+        {
+            /* Good ID read */
+            i = DS2411_OK;
+        }
+    }
+    else
     {
         logf("ds2411: no presence pulse");
-        return DS2411_NO_PRESENCE;
+        i = DS2411_NO_PRESENCE;
     }
 
-    /* Trsth + 1 - 66 = Tpdhmax + Tpdlmax + Trecmin + 1 - 66 */
-    DELAY(240);
+    set_irq_level(level);
 
-    /* ds2411 should be ready for data transfer */
-
-    /* Send Read ROM command */
-    ds2411_write_byte(0x33);
-
-    /* Read ROM serial number and CRC */
-    i = 0, crc = 0;
-
-    do
-    {
-        unsigned char byte = ds2411_read_byte();
-        ((unsigned char *)id)[i] = byte;
-        crc = ds2411_calc_crc(crc ^ byte);
-    }
-    while (++i < 8);
-
-    /* Check that family code is ok */
-    if (id->family_code != 0x01)
-    {
-        logf("ds2411: invalid family code=%02X", (unsigned)id->family_code);
-        return DS2411_INVALID_FAMILY_CODE;
-    }
-
-    /* Check that CRC was ok */
-    if (crc != 0) /* Because last loop eors the CRC with the resulting CRC */
-    {
-        logf("ds2411: invalid CRC=%02X", (unsigned)id->crc);
-        return DS2411_INVALID_CRC;
-    }
-
-    /* Good ID read */
-    return DS2411_OK;
+    return i;
 } /* ds2411_read_id */
