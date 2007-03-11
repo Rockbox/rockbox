@@ -3446,8 +3446,10 @@ static void audio_thread(void)
 
     audiohw_postinit();
 
+#ifdef PLAYBACK_VOICE
     /* Unlock mutex that init stage locks before creating this thread */
     mutex_unlock(&mutex_codecthread);
+#endif
     
     while (1) 
     {
