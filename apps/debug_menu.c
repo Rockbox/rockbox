@@ -567,27 +567,26 @@ static bool dbg_hw_info(void)
     {
         struct ds2411_id id;
 
-        line++;
-        lcd_puts(0, line++, "Serial Number:");
+        lcd_puts(0, ++line, "Serial Number:");
 
         got_id = ds2411_read_id(&id);
 
         if (got_id == DS2411_OK)
         {
             snprintf(buf, 32, "  FC=%02x", (unsigned)id.family_code);
-            lcd_puts(0, line++, buf);
+            lcd_puts(0, ++line, buf);
             snprintf(buf, 32, "  ID=%02X %02X %02X %02X %02X %02X",
                 (unsigned)id.uid[0], (unsigned)id.uid[1], (unsigned)id.uid[2],
                 (unsigned)id.uid[3], (unsigned)id.uid[4], (unsigned)id.uid[5]);
-            lcd_puts(0, line++, buf);
+            lcd_puts(0, ++line, buf);
             snprintf(buf, 32, "  CRC=%02X", (unsigned)id.crc);
-            lcd_puts(0, line++, buf);
         }
         else
         {
             snprintf(buf, 32, "READ ERR=%d", got_id);
-            lcd_puts(0, line++, buf);
         }
+
+        lcd_puts(0, ++line, buf);
     }
 #endif
 
