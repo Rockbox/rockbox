@@ -334,6 +334,9 @@ size_t pcm_get_bytes_waiting(void)
 void pcm_init(void)
 {
 }
+void audiohw_postinit(void)
+{
+}
 #else
 void pcm_init(void)
 {
