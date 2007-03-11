@@ -364,6 +364,7 @@ target/coldfire/iaudio/system-iaudio.c
 target/coldfire/iaudio/usb-iaudio.c
 target/coldfire/iaudio/x5/backlight-x5.c
 target/coldfire/iaudio/x5/button-x5.c
+target/coldfire/iaudio/x5/ds2411-x5.c
 target/coldfire/iaudio/x5/lcd-as-x5.S
 target/coldfire/iaudio/x5/lcd-x5.c
 target/coldfire/iaudio/x5/m5636-x5.c

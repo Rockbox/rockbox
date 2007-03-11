@@ -81,6 +81,9 @@
 #ifdef IRIVER_H300_SERIES
 #include "pcf50606.h"   /* for pcf50606_read */
 #endif
+#ifdef IAUDIO_X5
+#include "ds2411.h"
+#endif
 
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
@@ -535,8 +538,9 @@ static bool dbg_hw_info(void)
 #elif CONFIG_CPU == MCF5249 || CONFIG_CPU == MCF5250
     char buf[32];
     unsigned manu, id; /* flash IDs */
-    bool got_id; /* flag if we managed to get the flash IDs */
+    int got_id; /* flag if we managed to get the flash IDs */
     int oldmode;  /* saved memory guard mode */
+    int line = 0;
 
     oldmode = system_memory_guard(MEMGUARD_NONE);  /* disable memory guard */
 
@@ -551,13 +555,41 @@ static bool dbg_hw_info(void)
     lcd_setfont(FONT_SYSFIXED);
     lcd_clear_display();
 
-    lcd_puts(0, 0, "[Hardware info]");
+    lcd_puts(0, line++, "[Hardware info]");
 
     if (got_id)
         snprintf(buf, 32, "Flash: M=%04x D=%04x", manu, id);
     else
         snprintf(buf, 32, "Flash: M=???? D=????"); /* unknown, sorry */
-    lcd_puts(0, 1, buf);
+    lcd_puts(0, line++, buf);
+
+#ifdef IAUDIO_X5
+    {
+        struct ds2411_id id;
+
+        line++;
+        lcd_puts(0, line++, "Serial Number:");
+
+        got_id = ds2411_read_id(&id);
+
+        if (got_id == DS2411_OK)
+        {
+            snprintf(buf, 32, "  FC=%02x", (unsigned)id.family_code);
+            lcd_puts(0, line++, buf);
+            snprintf(buf, 32, "  ID=%02X %02X %02X %02X %02X %02X",
+                (unsigned)id.uid[0], (unsigned)id.uid[1], (unsigned)id.uid[2],
+                (unsigned)id.uid[3], (unsigned)id.uid[4], (unsigned)id.uid[5]);
+            lcd_puts(0, line++, buf);
+            snprintf(buf, 32, "  CRC=%02X", (unsigned)id.crc);
+            lcd_puts(0, line++, buf);
+        }
+        else
+        {
+            snprintf(buf, 32, "READ ERR=%d", got_id);
+            lcd_puts(0, line++, buf);
+        }
+    }
+#endif
 
     lcd_update();
 
