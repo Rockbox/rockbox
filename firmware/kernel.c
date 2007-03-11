@@ -374,6 +374,27 @@ void queue_remove_from_head(struct event_queue *q, long id)
     set_irq_level(oldlevel);
 }
 
+/**
+ * The number of events waiting in the queue.
+ * 
+ * @param struct of event_queue
+ * @return number of events in the queue
+ */
+int queue_count(const struct event_queue *q)
+{
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int result = 0;
+    
+    if (q->read <= q->write)
+        result = q->write - q->read;
+    else
+        result = QUEUE_LENGTH - (q->read - q->write);
+    
+    set_irq_level(oldlevel);
+    
+    return result;
+}
+
 int queue_broadcast(long id, intptr_t data)
 {
    int i;

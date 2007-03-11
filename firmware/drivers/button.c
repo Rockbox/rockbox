@@ -26,6 +26,7 @@
 #include "system.h"
 #include "button.h"
 #include "kernel.h"
+#include "thread.h"
 #include "backlight.h"
 #include "serial.h"
 #include "power.h"
@@ -255,21 +256,52 @@ static void button_tick(void)
     lastbtn = btn & ~(BUTTON_REL | BUTTON_REPEAT);
 }
 
+void button_boost(bool state)
+{
+    static bool boosted = false;
+    
+    if (state && !boosted)
+    {
+        cpu_boost(true);
+        boosted = true;
+    }
+    else if (!state && boosted)
+    {
+        cpu_boost(false);
+        boosted = false;
+    }
+}
+
 long button_get(bool block)
 {
     struct event ev;
-
-    if ( block || !queue_empty(&button_queue) )
+    int pending_count = queue_count(&button_queue);
+    
+    /* Control the CPU boost trying to keep queue empty. */
+    if (pending_count == 0)
+        button_boost(false);
+    else if (pending_count > 2)
+        button_boost(true);
+    
+    if ( block || pending_count )
     {
         queue_wait(&button_queue, &ev);
         return ev.id;
     }
+    
     return BUTTON_NONE;
 }
 
 long button_get_w_tmo(int ticks)
 {
     struct event ev;
+    
+    /* Be sure to keep boosted state. */
+    if (!queue_empty(&button_queue))
+        return button_get(true);
+    
+    button_boost(false);
+    
     queue_wait_w_tmo(&button_queue, &ev, ticks);
     return (ev.id != SYS_TIMEOUT)? ev.id: BUTTON_NONE;
 }

@@ -123,6 +123,7 @@ extern bool queue_in_queue_send(struct event_queue *q);
 extern bool queue_empty(const struct event_queue* q);
 extern void queue_clear(struct event_queue* q);
 extern void queue_remove_from_head(struct event_queue *q, long id);
+extern int queue_count(const struct event_queue *q);
 extern int queue_broadcast(long id, intptr_t data);
 
 extern void mutex_init(struct mutex *m);

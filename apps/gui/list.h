@@ -91,6 +91,10 @@ struct gui_list
     int selected_size;
     /* The data that will be passed to the callback function YOU implement */
     void * data;
+    /* These are used to calculate how much of the screen content we need
+       to redraw. */
+    int last_displayed_selected_item;
+    int last_displayed_start_item;
     /* The optional title, set to NULL for none */
     char *title;
     /* Cache the width of the title string in pixels/characters */
@@ -162,6 +166,7 @@ extern void gui_list_screen_scroll_out_of_view(bool enable);
 struct gui_synclist
 {
     struct gui_list gui_list[NB_SCREENS];
+    struct gui_list *last_displayed[NB_SCREENS];
 };
 
 extern void gui_synclist_init(
