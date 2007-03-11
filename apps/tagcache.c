@@ -969,21 +969,21 @@ static bool build_lookup_list(struct tagcache_search *tcs)
     while (ecread(tcs->masterfd, &entry, 1, index_entry_ec, tc_stat.econ) 
            == sizeof(struct index_entry))
     {
+        if (tcs->seek_list_count == SEEK_LIST_SIZE)
+            break ;
+
+        tcs->seek_pos++;
+        
         /* Check if entry has been deleted. */
         if (entry.flag & FLAG_DELETED)
             continue;
         
-        if (tcs->seek_list_count == SEEK_LIST_SIZE)
-            break ;
-
         /* Go through all filters.. */
         for (i = 0; i < tcs->filter_count; i++)
         {
             if (entry.tag_seek[tcs->filter_tag[i]] != tcs->filter_seek[i])
                 break ;
         }
-        
-        tcs->seek_pos++;
         
         if (i < tcs->filter_count)
             continue ;
