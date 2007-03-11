@@ -196,6 +196,7 @@ static volatile bool filling IDATA_ATTR = false; /* Is file buffer refilling? (A
 
 /* Ring buffer where compressed audio and codecs are loaded */
 static unsigned char *filebuf = NULL;       /* Start of buffer (A/C-) */
+static unsigned char *malloc_buf = NULL;    /* Start of malloc buffer (A/C-) */
 /* FIXME: make filebuflen static */
 size_t filebuflen = 0;                      /* Size of buffer (A/C-) */
 /* FIXME: make buf_ridx (C/A-) */
@@ -1041,6 +1042,8 @@ static bool voice_pcmbuf_insert_callback(
 
 static void* voice_get_memory_callback(size_t *size)
 {
+    /* Voice should have no use for this. If it did, we'd have to
+       swap the malloc buffer as well. */
     *size = 0;
     return NULL;
 }
@@ -1321,7 +1324,7 @@ static bool codec_pcmbuf_insert_callback(
 static void* codec_get_memory_callback(size_t *size)
 {
     *size = MALLOC_BUFSIZE;
-    return &audiobuf[talk_get_bufsize()];
+    return malloc_buf;
 }
 
 static void codec_pcmbuf_position_callback(size_t size) ICODE_ATTR;
@@ -3351,7 +3354,11 @@ static void audio_reset_buffer(size_t pcmbufsize)
     logf("  size:%08X", pcmbufsize);
 
     /* Initially set up file buffer as all space available */
-    filebuf    = audiobuf + MALLOC_BUFSIZE + talk_get_bufsize();
+    malloc_buf = audiobuf + talk_get_bufsize();
+    /* Align the malloc buf to line size. Especially important to cf
+       targets that do line reads/writes. */
+    malloc_buf = (unsigned char *)(((uintptr_t)filebuf + 15) & ~15);
+    filebuf    = malloc_buf + MALLOC_BUFSIZE;
     filebuflen = audiobufend - filebuf;
 
     /* Allow for codec(s) at end of audio buffer */
