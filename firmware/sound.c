@@ -490,7 +490,8 @@ void sound_set_balance(int value)
     mas_codec_writereg(0x11, tmp);
 #elif CONFIG_CODEC == MAS3507D || defined HAVE_UDA1380 \
    || defined HAVE_WM8975 || defined HAVE_WM8758 || defined HAVE_WM8731 \
-   || defined(HAVE_WM8721) || defined(HAVE_TLV320) || defined(HAVE_WM8751)
+   || defined(HAVE_WM8721) || defined(HAVE_TLV320) || defined(HAVE_WM8751) \
+   || defined(HAVE_AS3514)
     current_balance = value * VOLUME_RANGE / 100; /* tenth of dB */
     set_prescaled_volume();
 #elif CONFIG_CPU == PNX0101 || defined(HAVE_AS3514)
