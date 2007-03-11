@@ -30,6 +30,8 @@
 #include "wm8731l.h"
 #elif defined(HAVE_TLV320)
 #include "tlv320.h"
+#elif defined(HAVE_AS3514)
+#include "as3514.h"
 #endif
 
 extern void audiohw_postinit(void);
