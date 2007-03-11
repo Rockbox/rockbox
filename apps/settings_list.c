@@ -529,9 +529,10 @@ const struct settings_list settings[] = {
         LANG_OFF, TALK_ID(500, UNIT_MS), 
         TALK_ID(1, UNIT_SEC), TALK_ID(2, UNIT_SEC)),
     STRINGCHOICE_SETTING(0,backlight_fade_out, LANG_BACKLIGHT_FADE_OUT, 1,
-        "backlight fade out","off,500ms,1s,2s", backlight_set_fade_out, 4,
+        "backlight fade out","off,500ms,1s,2s,3s,5s,10s", backlight_set_fade_out, 7,
         LANG_OFF, TALK_ID(500, UNIT_MS), 
-        TALK_ID(1, UNIT_SEC), TALK_ID(2, UNIT_SEC)),
+        TALK_ID(1, UNIT_SEC), TALK_ID(2, UNIT_SEC), 
+        TALK_ID(3, UNIT_SEC), TALK_ID(5, UNIT_SEC), TALK_ID(10, UNIT_SEC)),
 #endif
     INT_SETTING(0, scroll_speed, LANG_SCROLL_SPEED, 9,"scroll speed",                      
                 UNIT_INT, 0, 15, 1, NULL, NULL, lcd_scroll_speed),

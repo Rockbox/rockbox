@@ -192,6 +192,7 @@ static int get_action_worker(int context, int timeout,
         repeated = false;
 
     last_button = button;
+    last_action = ret;
     return ret;
 }
 
