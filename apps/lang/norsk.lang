@@ -283,13 +283,13 @@
   desc: in the main menu
   user:
   <source>
-    *: "Playlist Options"
+    *: "Playlist"
   </source>
   <dest>
-    *: "Spillelisteinnstillinger"
+    *: "Spilleliste"
   </dest>
   <voice>
-    *: "Playlist Options"
+    *: "Playlist" 
   </voice>
 </phrase>
 <phrase>
@@ -297,13 +297,13 @@
   desc: in the main menu
   user:
   <source>
-    *: "Browse Plugins"
+    *: "Plugins"
   </source>
   <dest>
-    *: "Bla igjennom instikkprogram"
+    *: "Instikkprogrammer"
   </dest>
   <voice>
-    *: "Browse Plugins"
+    *: "Plugins"
   </voice>
 </phrase>
 <phrase>
@@ -311,13 +311,13 @@
   desc: in the main menu
   user:
   <source>
-    *: "Info"
+    *: "System"
   </source>
   <dest>
-    *: "Info"
+    *: "System"
   </dest>
   <voice>
-    *: "Info"
+    *: "System"
   </voice>
 </phrase>
 <phrase>
@@ -784,16 +784,16 @@
 </phrase>
 <phrase>
   id: LANG_FIRMWARE
-  desc: in the main menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Browse Firmwares"
+    *: ""
   </source>
   <dest>
-    *: "Bla igjennom firmware-filer"
+    *: ""
   </dest>
   <voice>
-    *: "Browse Firmwares"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -834,6 +834,7 @@
     ipod*: "SELECT = Yes"
     x5: "SELECT = Yes"
     h10: "NEXT = Yes"
+    gigabeat: "SELECT = Yes"
   </source>
   <dest>
     *: "SPILL = Ja"
@@ -841,6 +842,7 @@
     ipod*: "VELG = Ja"
     x5: "VELG = Ja"
     h10: "NESTE = Ja"
+    gigabeat: "VELG = Ja"
   </dest>
   <voice>
     *: ""
@@ -977,13 +979,13 @@
   desc: in the recording sub menu
   user:
   <source>
-    *: "Recording Screen"
+    *: "Recording"
   </source>
   <dest>
-    *: "Innspillingskjerm"
+    *: "Innspilling"
   </dest>
   <voice>
-    *: "Recording screen"
+    *: "Recording"
   </voice>
 </phrase>
 <phrase>
@@ -1198,16 +1200,16 @@
 </phrase>
 <phrase>
   id: LANG_RESUME
-  desc: in settings_menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Resume on Startup"
+    *: ""
   </source>
   <dest>
-    *: "Start avspilling ved oppstart"
+    *: ""
   </dest>
   <voice>
-    *: "Resume on startup"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2279,10 +2281,12 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Internal Mic"
+    *: "Mic"
+    h100,h120,h300: "Internal Mic"
   </source>
   <dest>
-    *: "Intern mikrofon"
+    *: "Mikrofon"
+    h100,h120,h300: "Intern mikrofon"
   </dest>
   <voice>
     *: "Microphone"
@@ -2402,16 +2406,16 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_STARTUP
-  desc: Start Rockbox in Recording Screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "Show Recording Screen on Startup"
+    *: ""
   </source>
   <dest>
-    *: "Vis innspillingsskjerm ved oppstart"
+    *: ""
   </dest>
   <voice>
-    *: "Show recording screen on startup"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3298,16 +3302,16 @@
 </phrase>
 <phrase>
   id: LANG_POWEROFF
-  desc: disk poweroff flag
+  desc: DEPRECATED
   user:
   <source>
-    *: "Disk Poweroff"
+    *: ""
   </source>
   <dest>
-    *: "Disk slås av"
+    *: ""
   </dest>
   <voice>
-    *: "Disk Poweroff"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3846,10 +3850,14 @@
   desc: battery level in % and estimated time remaining
   user:
   <source>
-    *: "%d%% %dh %dm"
+    *: "Battery: %d%% %dh %dm"
+    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
-    *: "%d%% %dh %dmin"
+    *: "Batteri: %d%% %dh %dmin"
+    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Battery level"
@@ -4047,6 +4055,7 @@
     ipod*: "PLAY/PAUSE = Exit"
     x5: "RECORD = Exit"
     h10: "PREV = Exit"
+    gigabeat: "A = Exit"
   </source>
   <dest>
     *: "AV = Avslutt"
@@ -4054,6 +4063,7 @@
     ipod*: "SPILL/PAUSE = Avslutt"
     x5: "OPPTAK = Avslutt"
     h10: "FORRIGE = Avslutt"
+    gigabeat: "A = Avslutt"
   </dest>
   <voice>
     *: ""
@@ -4111,6 +4121,7 @@
     ipod*: "SELECT = Select"
     x5: "SELECT = Select"
     h10: "NEXT = Select"
+    gigabeat: "SELECT = Select"
   </source>
   <dest>
     *: "SPILL = Velg"
@@ -4118,6 +4129,7 @@
     ipod*: "VELG = Velg"
     x5: "VELG = Velg"
     h10: "NESTE = Velg"
+    gigabeat: "VELG = Velg"
   </dest>
   <voice>
     *: ""
@@ -4133,13 +4145,15 @@
     ipod*: "Long MENU = Delete"
     x5: "Long RECORD = Delete"
     h10: "REWIND = Delete"
+    gigabeat: "POWER = Delete"
   </source>
   <dest>
     *: "PÅ+Spill = Slett"
-    h100,h120,h300: "OPPTAK = Delete"
-    ipod*: "Lang MENY = Delete"
-    x5: "Lang OPPTAK = Delete"
-    h10: "SPOL TILBAKE = Delete"
+    h100,h120,h300: "OPPTAK = Slett"
+    ipod*: "Lang MENY = Slett"
+    x5: "Lang OPPTAK = Slett"
+    h10: "SPOL TILBAKE = Slett"
+    gigabeat: "POWER = Slett"
   </dest>
   <voice>
     *: ""
@@ -4220,11 +4234,12 @@
   desc: used in set_time()
   user:
   <source>
-    *: "ON To Set"
+    *: "ON = Set"
     h100,h120,h300: "NAVI = Set"
     ipod*: "SELECT = Set"
     x5: "SELECT = Set"
     h10: "NEXT = Set"
+    gigabeat: "SELECT = Set"
   </source>
   <dest>
     *: "PÅ for å stille"
@@ -4232,6 +4247,7 @@
     ipod*: "VELG = Still"
     x5: "VELG = Still"
     h10: "NESTE = Still"
+    gigabeat: "VELG = Still"
   </dest>
   <voice>
     *: ""
@@ -4242,11 +4258,12 @@
   desc: used in set_time()
   user:
   <source>
-    *: "OFF To Revert"
+    *: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
     ipod*: "MENU = Revert"
     x5: "RECORD = Revert"
     h10: "PREV = Revert"
+    gigabeat: "POWER = Revert"
   </source>
   <dest>
     *: "AV for å tilbakestille"
@@ -4254,6 +4271,7 @@
     ipod*: "MENY = Tilbakestill"
     x5: "OPPTAK = Tilbakestill"
     h10: "FORRIGE = Tilbakestill"
+    gigabeat: "POWER = Tilbakestill"
   </dest>
   <voice>
     *: ""
@@ -4645,9 +4663,11 @@
   user:
   <source>
     *: "PLAY=Set OFF=Cancel"
+    ipod*: "SELECT=Set MENU=Cancel"
   </source>
   <dest>
     *: "SPILL=Sett AV=Avbryt"
+    ipod*: "VELG=Sett MENY=Avbryt"
   </dest>
   <voice>
     *: ""
@@ -7930,7 +7950,7 @@
     *: "Screen Scrolls Out Of View"
   </source>
   <dest>
-    *: "Skal skjermen kunne rulle ut av syne"
+    *: "Skal skjermen kunne rulle ut av syne?"
   </dest>
   <voice>
     *: "Screen Scrolls Out Of View"
@@ -8123,7 +8143,7 @@
   desc: When you run the radio without an fmr file in settings
   user:
   <source>
-    *: "No Settings found, AutoScan?"
+    *: "No settings found. Autoscan?"
   </source>
   <dest>
     *: "Fant ikke noe oppsett, autoskann?"
@@ -8777,13 +8797,13 @@
   desc: show ID3 Database
   user:
   <source>
-    *: "ID3 Database"
+    *: "Database"
   </source>
   <dest>
-    *: "Spordatabase"
+    *: "Database"
   </dest>
   <voice>
-    *: "ID3 database"
+    *: "Database"
   </voice>
 </phrase>
 <phrase>
@@ -9400,7 +9420,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Import modifications"
+    *: "Import Modifications"
   </source>
   <dest>
     *: "Importer modifikasjoner"
@@ -9553,7 +9573,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Auto update"
+    *: "Auto Update"
   </source>
   <dest>
     *: "Oppdater automatisk"
@@ -9623,7 +9643,7 @@
   desc: in pause_phones_menu.
   user:
   <source>
-    *: "Duration to rewind"
+    *: "Duration to Rewind"
   </source>
   <dest>
     *: "Varighet å spole tilbake"
@@ -9637,7 +9657,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Update now"
+    *: "Update Now"
   </source>
   <dest>
     *: "Oppdater nå"
@@ -9773,7 +9793,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Export modifications"
+    *: "Export Modifications"
   </source>
   <dest>
     *: "Eksporter modifikasjoner"
@@ -9828,7 +9848,7 @@
   desc: in settings_menu.
   user:
   <source>
-    *: "Pause on headphone unplug"
+    *: "Pause on Headphone Unplug"
   </source>
   <dest>
     *: "Pause når hodetelefonene plugges ut"
@@ -9882,7 +9902,7 @@
   desc: in onplay menu
   user:
   <source>
-    *: "Playlist catalog"
+    *: "Playlist Catalog"
   </source>
   <dest>
     *: "Spillelistekatalog"
@@ -10003,7 +10023,7 @@
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "Add to new playlist"
+    *: "Add to New Playlist"
   </source>
   <dest>
     *: "Legg til i ny spilleliste"
@@ -10057,7 +10077,7 @@
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "Add to playlist"
+    *: "Add to Playlist"
   </source>
   <dest>
     *: "Legg til i spilleliste"
@@ -10139,13 +10159,13 @@
   desc: in pause_phones_menu.
   user:
   <source>
-    *: "Disable auto-resume if phones not present"
+    *: "Disable resume on startup if phones unplugged"
   </source>
   <dest>
-    *: "Slå av auto-fortsett hvis hodetelefoner ikke er plugget i"
+    *: "Ikke fortsett avspilling på oppstart hvis hodetelefoner ikke er plugget i"
   </dest>
   <voice>
-    *: "Disable auto-resume if phones not present"
+    *: "Disable resume on startup if phones unplugged"
   </voice>
 </phrase>
 <phrase>
@@ -10249,7 +10269,7 @@
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "View catalog"
+    *: "View Catalog"
   </source>
   <dest>
     *: "Vis katalog"
@@ -10388,7 +10408,7 @@
   desc: error message when no playlists for playlist catalog
   user:
   <source>
-    *: "No playlists"
+    *: "No Playlists"
   </source>
   <dest>
     *: "Ingen spillelister"
@@ -10422,5 +10442,251 @@
   </dest>
   <voice>
     *: "Play Next"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUILDING_DATABASE
+  desc: splash database building progress
+  user:
+  <source>
+    *: "Building database... %d found (OFF to return)"
+    h100,h120,h300: "Building database... %d found (STOP to return)"
+    ipod*: "Building database... %d found (PLAY/PAUSE to return)"
+    x5: "Building database... %d found (Long PLAY to return)"
+    h10: "Building database... %d found (PREV to return)"
+  </source>
+  <dest>
+    *: "Bygger database... %d funnet (AV for å gå tilbake)"
+    h100,h120,h300: "Bygger database... %d funnet (STOPP for å gå tilbake)"
+    ipod*: "Bygger database... %d funnet (SPILL/PAUSE for å gå tilbake)"
+    x5: "Bygger database... %d funnet (Lang SPILL for å gå tilbake)"
+    h10: "Bygger database... %d funnet (FORRIGE to for å gå tilbake)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIR_BROWSER
+  desc: in root menu
+  user:
+  <source>
+    *: "Files"
+  </source>
+  <dest>
+    *: "Filer"
+  </dest>
+  <voice>
+    *: "Files"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMMENT
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Comment]"
+  </source>
+  <dest>
+    *: "[Kommentar]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_CHARGING
+  desc: in Battery menu
+  user:
+  <source>
+    *: "Charge During USB Connection"
+  </source>
+  <dest>
+    *: "Lad opp under USB-tilkobling"
+  </dest>
+  <voice>
+    *: "Charge During U S B Connection"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOW_PLAYING
+  desc: in root menu
+  user:
+  <source>
+    *: "Now Playing"
+  </source>
+  <dest>
+    *: "Spiller"
+  </dest>
+  <voice>
+    *: "Now Playing"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_MENU
+  desc: in root menu
+  user:
+  <source>
+    *: "Settings"
+  </source>
+  <dest>
+    *: "Innstillinger"
+  </dest>
+  <voice>
+    *: "Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Main Menu"
+  </source>
+  <dest>
+    *: "Hovedmeny"
+  </dest>
+  <voice>
+    *: "Main Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_WAKEUP_SCREEN
+  desc: in alarm menu setting
+  user:
+  <source>
+    *: "Alarm Wake up Screen"
+  </source>
+  <dest>
+    *: "Alarm-oppvåkningsskjermbilde"
+  </dest>
+  <voice>
+    *: "Alarm Wake up Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_THEME
+  desc: save a theme file
+  user:
+  <source>
+    *: "Save Theme Settings"
+  </source>
+  <dest>
+    *: "Lagre temainnstillinger"
+  </dest>
+  <voice>
+    *: "Save Theme Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_PLAYBACK
+  desc: in root menu
+  user:
+  <source>
+    *: "Resume Playback"
+  </source>
+  <dest>
+    *: "Fortsett avspilling"
+  </dest>
+  <voice>
+    *: "Resume Playback"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ROCKBOX_TITLE
+  desc: in root menu
+  user:
+  <source>
+    *: "Rockbox"
+  </source>
+  <dest>
+    *: "Rockbox"
+  </dest>
+  <voice>
+    *: "Rockbox"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVIOUS_SCREEN
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Previous Screen"
+  </source>
+  <dest>
+    *: "Forrige skjermbilde"
+  </dest>
+  <voice>
+    *: "Previous Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUESHEET_ENABLE
+  desc: cuesheet support option
+  user:
+  <source>
+    *: "Cuesheet Support"
+  </source>
+  <dest>
+    *: "Støtte for cue-ark"
+  </dest>
+  <voice>
+    *: "Cuesheet Support"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_SCREEN
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Start Screen"
+  </source>
+  <dest>
+    *: "Oppstartsskjermbilde"
+  </dest>
+  <voice>
+    *: "Start Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUESHEET
+  desc:
+  user:
+  <source>
+    *: "Cuesheet"
+  </source>
+  <dest>
+    *: "Cue-ark"
+  </dest>
+  <voice>
+    *: "Cuesheet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUMARTIST
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Album Artist]"
+  </source>
+  <dest>
+    *: "[Album-artist]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_MENU
+  desc: fm menu title
+  user:
+  <source>
+    *: "FM Radio Menu"
+  </source>
+  <dest>
+    *: "FM-radiomeny"
+  </dest>
+  <voice>
+    *: "FM Radio Menu"
   </voice>
 </phrase>
