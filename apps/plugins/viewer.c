@@ -1287,6 +1287,8 @@ static bool viewer_options_menu(void)
     result = rb->menu_run(m);
     rb->menu_exit(m);
 #ifdef HAVE_LCD_BITMAP
+    rb->lcd_setmargins(0,0);
+
     /* Show-scrollbar mode for current view-width mode */
     if (!ONE_SCREEN_FITS_ALL())
         if (prefs.scrollbar_mode == true)
@@ -1326,6 +1328,9 @@ static void viewer_menu(void)
             break;
     }
     rb->menu_exit(m);
+#ifdef HAVE_LCD_BITMAP
+    rb->lcd_setmargins(0,0);
+#endif
     viewer_draw(col);
 }
 

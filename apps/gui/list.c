@@ -229,8 +229,7 @@ static void gui_list_draw(struct gui_list * gui_list)
     int lines;
 #ifdef HAVE_LCD_BITMAP
     int item_offset;
-    int old_xmargin = display->getxmargin();
-    int old_ymargin = display->getymargin();
+    int old_margin = display->getxmargin();
 #endif
 
     gui_textarea_clear(display);
@@ -408,7 +407,7 @@ static void gui_list_draw(struct gui_list * gui_list)
                            gui_list->start_item + lines, VERTICAL);
     }
 
-    display->setmargins(old_xmargin, old_ymargin);
+    screen_set_xmargin(display, old_margin);
 #endif
 
     gui_textarea_update(display);
