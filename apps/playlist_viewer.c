@@ -628,6 +628,7 @@ bool playlist_viewer_ex(char* filename)
     gui_synclist_set_nb_items(&playlist_lists, viewer.num_tracks);
     gui_synclist_select_item(&playlist_lists, viewer.selected_track);
     gui_synclist_draw(&playlist_lists);
+    action_signalscreenchange();
     while (!exit)
     {
         int track;
