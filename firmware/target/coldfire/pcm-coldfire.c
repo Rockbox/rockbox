@@ -21,11 +21,7 @@
 #include "kernel.h"
 #include "logf.h"
 #include "audio.h"
-#if defined(HAVE_UDA1380)
-#include "uda1380.h"
-#elif defined(HAVE_TLV320)
-#include "tlv320.h"
-#endif
+#include "sound.h"
 #if defined(HAVE_SPDIF_IN) || defined(HAVE_SPDIF_OUT)
 #include "spdif.h"
 #endif
@@ -272,6 +268,11 @@ void pcm_init(void)
     ICR6 = (6 << 2);
     and_l(~(1 << 14), &IMR); /* bit 14 is DMA0 */
 } /* pcm_init */
+
+void pcm_postinit(void)
+{
+    audiohw_postinit();
+}
 
 size_t pcm_get_bytes_waiting(void)
 {

@@ -20,15 +20,9 @@
 #include "kernel.h"
 #include "logf.h"
 #include "audio.h"
-#if defined(HAVE_WM8975)
-#include "wm8975.h"
-#elif defined(HAVE_WM8758)
-#include "wm8758.h"
-#elif defined(HAVE_WM8731) || defined(HAVE_WM8721)
-#include "wm8731l.h"
-#elif CONFIG_CPU == PNX0101
+#include "sound.h"
+#if CONFIG_CPU == PNX0101
 #include "string.h"
-#include "pnx0101.h"
 #endif
 
 /**
@@ -222,6 +216,11 @@ void pcm_init(void)
     DMAINTEN &= ~3;
     DMAR10(0) |= 1;
     DMAR10(1) |= 1;
+}
+
+void pcm_postinit(void)
+{
+    audiohw_postinit();
 }
 
 void pcm_set_frequency(unsigned int frequency)

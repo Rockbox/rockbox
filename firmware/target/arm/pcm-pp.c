@@ -21,15 +21,7 @@
 #include "kernel.h"
 #include "logf.h"
 #include "audio.h"
-#if defined(HAVE_WM8975)
-#include "wm8975.h"
-#elif defined(HAVE_WM8758)
-#include "wm8758.h"
-#elif defined(HAVE_WM8731) || defined(HAVE_WM8721)
-#include "wm8731l.h"
-#endif
-
-
+#include "sound.h"
 
 /* peaks */
 #ifdef HAVE_RECORDING
@@ -334,7 +326,7 @@ size_t pcm_get_bytes_waiting(void)
 void pcm_init(void)
 {
 }
-void audiohw_postinit(void)
+void pcm_postinit(void)
 {
 }
 #else
@@ -355,6 +347,11 @@ void pcm_init(void)
 
     /* Call pcm_play_dma_stop to initialize everything. */
     pcm_play_dma_stop();
+}
+
+void pcm_postinit(void)
+{
+    audiohw_postinit();
 }
 #endif /* HAVE_PP5024_CODEC */
 

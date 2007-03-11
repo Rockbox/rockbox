@@ -262,9 +262,3 @@ void remove_thread(int threadnum)
 #define VIRT_SIZE 0xFFFF /* more than enough for our string ID range */
 unsigned char vp_dummy[VIRT_SIZE];
 
-
-void audiohw_postinit(void)
-{
-}
-
-

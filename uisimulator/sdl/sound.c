@@ -316,5 +316,9 @@ int pcm_init(void)
     return 0;
 }
 
+void pcm_postinit(void)
+{
+}
+
 #endif /* ROCKBOX_HAS_SIMSOUND */
 

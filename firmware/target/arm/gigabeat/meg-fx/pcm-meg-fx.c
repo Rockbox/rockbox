@@ -20,7 +20,7 @@
 #include "kernel.h"
 #include "logf.h"
 #include "audio.h"
-#include "wm8975.h"
+#include "sound.h"
 #include "file.h"
 #include "mmu-meg-fx.h"
 
@@ -120,7 +120,10 @@ void pcm_init(void)
 
 }
 
-
+void pcm_postinit(void)
+{
+    audiohw_postinit();
+}
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {

@@ -27,6 +27,7 @@ typedef void (*pcm_more_callback_type)(unsigned char **start,
 typedef int (*pcm_more_callback_type2)(int status);
 
 void pcm_init(void);
+void pcm_postinit(void);
 
 /* set the pcm frequency - use values in hw_sampr_list
  * use -1 for the default frequency

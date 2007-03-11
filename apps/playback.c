@@ -3444,7 +3444,7 @@ static void audio_thread(void)
 {
     struct event ev;
 
-    audiohw_postinit();
+    pcm_postinit();
 
 #ifdef PLAYBACK_VOICE
     /* Unlock mutex that init stage locks before creating this thread */
