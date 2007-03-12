@@ -25,10 +25,13 @@
 #include <stdbool.h>
 #include "cpu.h"
 #include "common.h"
+#include "power.h"
+#include "kernel.h"
 
 /* TODO: Other bootloaders need to be adjusted to set this variable to true
-   on a button press - currently only the ipod version does. */
-#ifdef IPOD_ARCH
+   on a button press - currently only the ipod, H10 and Sansa versions do. */
+#if defined(IPOD_ARCH) || defined(IRIVER_H10) || defined(IRIVER_H10_5GB) || \
+    defined(SANSA_E200)
 bool verbose = false;
 #else
 bool verbose = true;
@@ -97,6 +100,28 @@ char *strerror(int error)
     default:
         return "Unknown";
     }
+}
+
+void error(int errortype, int error)
+{
+    switch(errortype)
+    {
+    case EATA:
+        printf("ATA error: %d", error);
+        break;
+
+    case EDISK:
+        printf("No partition found");
+        break;
+
+    case EBOOTFILE:
+        printf(strerror(error));
+        break;
+    }
+
+    lcd_update();
+    sleep(5*HZ);
+    power_off();
 }
 
 /* Load firmware image in a format created by tools/scramble */

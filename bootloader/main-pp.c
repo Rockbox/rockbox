@@ -29,7 +29,17 @@
 #include "ata.h"
 #include "button.h"
 #include "disk.h"
-#include "power.h"
+
+/* Button definitions */
+#if CONFIG_KEYPAD == IRIVER_H10_PAD
+#define BOOTLOADER_VERBOSE      BUTTON_PLAY
+#define BOOTLOADER_BOOT_OF      BUTTON_LEFT
+
+#elif CONFIG_KEYPAD == SANSA_E200_PAD
+#define BOOTLOADER_VERBOSE      BUTTON_RIGHT
+#define BOOTLOADER_BOOT_OF      BUTTON_LEFT
+
+#endif
 
 /* Maximum allowed firmware image size. 10MB is more than enough */
 #define MAX_LOADSIZE (10*1024*1024)
@@ -44,6 +54,7 @@ void* main(void)
 {
     char buf[256];
     int i;
+    int btn;
     int rc;
     unsigned short* identify_info;
     struct partinfo* pinfo;
@@ -53,6 +64,12 @@ void* main(void)
     lcd_init();
     font_init();
     button_init();
+
+    btn = button_read_device();
+
+    /* Enable bootloader messages */
+    if (btn==BOOTLOADER_VERBOSE)
+            verbose = true;
 
     lcd_setfont(FONT_SYSFIXED);
 
@@ -73,25 +90,20 @@ void* main(void)
         }
         printf(buf);
     } else {
-        printf("ATA error: %d", i);
-        udelay(5000000);
-        power_off();
+        error(EATA, i);
     }
 
     disk_init();
     rc = disk_mount_all();
     if (rc<=0)
     {
-        printf("No partition found");
-        udelay(5000000);
-        power_off();
+        error(EDISK,rc);
     }
 
     pinfo = disk_partinfo(0);
     printf("Partition 0: 0x%02x %ld MB", pinfo->type, pinfo->size / 2048);
 
-    i=button_read_device();
-    if(i==BUTTON_LEFT)
+    if(btn==BOOTLOADER_BOOT_OF)
     {
         /* Load original mi4 firmware. This expects a file called 
            "/System/OF.bin" on the player. It should be a mi4 firmware decrypted 
@@ -101,21 +113,15 @@ void* main(void)
         printf("Loading original firmware...");
         rc=load_raw_firmware(loadbuffer, "/System/OF.bin", MAX_LOADSIZE);
         if (rc < EOK) {
-            printf("Error!");
-            printf("Can't load /System/OF.bin:");
-            printf(strerror(rc));
-            udelay(5000000);
-            power_off();
+            printf("Can't load /System/OF.bin");
+            error(EBOOTFILE, rc);
         }
     } else {
         printf("Loading Rockbox...");
         rc=load_firmware(loadbuffer, BOOTFILE, MAX_LOADSIZE);
         if (rc < EOK) {
-            printf("Error!");
             printf("Can't load %s:", BOOTFILE);
-            printf(strerror(rc));
-            udelay(5000000);
-            power_off();
+            error(EBOOTFILE, rc);
         }
     }
     

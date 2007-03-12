@@ -72,6 +72,10 @@ void sleep(int ticks)
        counter = TCNTO4;
     } while(counter > 0);
 
+#elif defined(CPU_PP) && defined(BOOTLOADER)
+    unsigned stop = USEC_TIMER + ticks * (1000000/HZ);
+    while (TIME_BEFORE(USEC_TIMER, stop))
+        switch_thread(true,NULL);
 #else
     sleep_thread(ticks);
 #endif
