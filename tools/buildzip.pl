@@ -76,7 +76,7 @@ Depth: LCD_DEPTH
 Codec: CONFIG_CODEC
 STOP
 ;
-    close(gcc);
+    close(GCC);
 
     my $c="cat gcctemp | gcc $cppdef -I. -I$firmdir/export -E -P -";
 
@@ -191,7 +191,7 @@ sub buildzip {
         `$c`;
 
         system("$ROOT/tools/codepages");
-        my $c = 'find . -name "*.cp" ! -empty -exec mv {} .rockbox/codepages/ \; >/dev/null 2>&1';
+        $c = 'find . -name "*.cp" ! -empty -exec mv {} .rockbox/codepages/ \; >/dev/null 2>&1';
         `$c`;
 
         my @call = `find .rockbox/codecs -type f 2>/dev/null`;
@@ -316,8 +316,8 @@ my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) =
 $mon+=1;
 $year+=1900;
 
-$date=sprintf("%04d%02d%02d", $year,$mon, $mday);
-$shortdate=sprintf("%02d%02d%02d", $year%100,$mon, $mday);
+#$date=sprintf("%04d%02d%02d", $year,$mon, $mday);
+#$shortdate=sprintf("%02d%02d%02d", $year%100,$mon, $mday);
 
 # made once for all targets
 sub runone {
