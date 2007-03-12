@@ -64,6 +64,45 @@ my $firmdir="$ROOT/firmware";
 
 my $cppdef = $target;
 
+sub gettargetinfo {
+    open(GCC, ">gcctemp");
+    # Get the LCD screen depth and graphical status
+    print GCC <<STOP
+\#include "config.h"
+#ifdef HAVE_LCD_BITMAP
+Bitmap: yes
+Depth: LCD_DEPTH
+#endif
+Codec: CONFIG_CODEC
+STOP
+;
+    close(gcc);
+
+    my $c="cat gcctemp | gcc $cppdef -I. -I$firmdir/export -E -P -";
+
+    # print STDERR "CMD $c\n";
+
+    open(TARGET, "$c|");
+
+    my ($bitmap, $depth, $swcodec);
+    while(<TARGET>) {
+        # print STDERR "DATA: $_";
+        if($_ =~ /^Bitmap: (.*)/) {
+            $bitmap = $1;
+        }
+        elsif($_ =~ /^Depth: (\d*)/) {
+            $depth = $1;
+        }
+        elsif($_ =~ /^Codec: (\d*)/) {
+            # SWCODEC is 1, the others are HWCODEC
+            $swcodec = ($1 == 1);
+        }
+    }
+    close(TARGET);
+    unlink("gcctemp");
+
+    return ($bitmap, $depth, $swcodec);
+}
 
 sub filesize {
     my ($filename)=@_;
@@ -89,12 +128,21 @@ sub buildlangs {
 }
 
 sub buildzip {
-    my ($zip, $image, $notplayer, $fonts)=@_;
+    my ($zip, $image, $fonts)=@_;
+
+    my ($bitmap, $depth, $swcodec) = &gettargetinfo();
+
+    print "Bitmap: $bitmap\nDepth: $depth\nSwcodec: $swcodec\n";
 
     # remove old traces
     `rm -rf .rockbox`;
 
     mkdir ".rockbox", 0777;
+
+    if(!$bitmap) {
+        # always disable fonts on non-bitmap targets
+        $fonts = 0;
+    }
 
     if($fonts) {
         mkdir ".rockbox/fonts", 0777;
@@ -122,15 +170,22 @@ sub buildzip {
 
     mkdir ".rockbox/langs", 0777;
     mkdir ".rockbox/rocks", 0777;
-    if($notplayer) {
-        mkdir ".rockbox/codepages", 0777;
-        mkdir ".rockbox/codecs", 0777;
-        mkdir ".rockbox/wps", 0777;
-        mkdir ".rockbox/themes", 0777;
-        mkdir ".rockbox/backdrops", 0777;
+
+    if($swcodec) {
         mkdir ".rockbox/eqs", 0777;
 
         `cp $ROOT/apps/eqs/*.cfg .rockbox/eqs/`; # equalizer presets
+    }
+
+    mkdir ".rockbox/wps", 0777;
+
+    if($bitmap) {
+        mkdir ".rockbox/codepages", 0777;
+        mkdir ".rockbox/codecs", 0777;
+        mkdir ".rockbox/themes", 0777;
+        if($depth > 1) {
+            mkdir ".rockbox/backdrops", 0777;
+        }
 
         my $c = 'find apps -name "*.codec" ! -empty -exec cp {} .rockbox/codecs/ \; 2>/dev/null';
         `$c`;
@@ -203,7 +258,7 @@ sub buildzip {
     
     `cp $ROOT/apps/tagnavi.config .rockbox/`;
       
-    if($notplayer) {
+    if($bitmap) {
         `cp $ROOT/apps/plugins/sokoban.levels .rockbox/rocks/`; # sokoban levels
         `cp $ROOT/apps/plugins/snake2.levels .rockbox/rocks/`; # snake2 levels
     }
@@ -266,11 +321,10 @@ $shortdate=sprintf("%02d%02d%02d", $year%100,$mon, $mday);
 
 # made once for all targets
 sub runone {
-    my ($type, $target, $fonts)=@_;
+    my ($target, $fonts)=@_;
 
     # build a full install .rockbox directory
-    buildzip($output, $target,
-             ($type eq "player")?0:1, $fonts);
+    buildzip($output, $target, $fonts);
 
     # create a zip file from the .rockbox dfir
 
@@ -308,10 +362,6 @@ elsif($exe =~ /rockboxui/) {
     $exe = "";
 }
 
-if($target =~ /player/i) {
-    runone("player", $exe, 0);
-}
-else {
-    runone("recorder", $exe, $incfonts);
-}
+runone($exe, $incfonts);
+
 
