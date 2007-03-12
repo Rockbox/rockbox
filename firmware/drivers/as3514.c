@@ -132,7 +132,7 @@ int audiohw_set_master_vol(int vol_l, int vol_r)
 {
     vol_l &= 0x1f;
     vol_r &= 0x1f;
-    pp_i2c_send(AS3514_I2C_ADDR, HPH_OUT_R, 0x40 | vol_r);
+    pp_i2c_send(AS3514_I2C_ADDR, HPH_OUT_R, vol_r);
     pp_i2c_send(AS3514_I2C_ADDR, HPH_OUT_L, 0x40 | vol_l);
 
     return 0;
@@ -140,7 +140,7 @@ int audiohw_set_master_vol(int vol_l, int vol_r)
 
 int audiohw_set_lineout_vol(int vol_l, int vol_r)
 {
-    pp_i2c_send(AS3514_I2C_ADDR, LINE_OUT_R, 0x40 | vol_r);
+    pp_i2c_send(AS3514_I2C_ADDR, LINE_OUT_R, vol_r);
     pp_i2c_send(AS3514_I2C_ADDR, LINE_OUT_L, 0x40 | vol_l);
 
     return 0;
