@@ -64,7 +64,7 @@ Depth: LCD_DEPTH
 STOP
 ;
 }
-    close(gcc);
+    close(GCC);
 
     my $c="cat gcctemp | gcc $cppdef -I. -I$firmdir/export -E -P -";
 
@@ -199,7 +199,7 @@ my ($main_height, $main_width, $main_depth) = getlcdsizes();
 my ($remote_height, $remote_width, $remote_depth) = getlcdsizes(1);
 
 #print "LCD: ${main_height}x${main_width}x${main_depth}\n";
-$has_remote = true if ($remote_height && $remote_width && remote_depth);
+$has_remote = 1 if ($remote_height && $remote_width && remote_depth);
 
 open(WPS, "<$wpslist");
 while(<WPS>) {
@@ -241,7 +241,7 @@ while(<WPS>) {
 
             if(!$rheight || !$rwidth) {
                 #printf STDERR "wpsbuild notice: No %sLCD size, skipping $wps\n",
-                $isrwps?"remote ":"";
+                #$isrwps?"remote ":"";
                 $within = 0;
                 next;
             }
