@@ -1,0 +1,37 @@
+% $Id:$ %
+\fixme{This information is new and might contain errors. Please
+  \emph{always} check out the installation page in the wiki at
+  \wikilink{SansaE200Install} and the troubleshooting page at
+  \wikilink{SansaE200TroubleShooting} first. If you have any doubts
+  about installation, \emph{stop now!} Errors during the installation might
+  render your player useless!}
+
+The installation of the bootloader is the most critical part of the
+installation. Please make sure to read the instructions completely
+first before doing any installation step. You \emph{need} to
+prepare your \dap{} for dual boot as explained below as you
+otherwise \emph{will not} have USB access to your player.
+
+\begin{enumerate}
+\item Save a copy of your original firmware onto your computer's hard drive.
+  You can obtain a firmware file from \url{http://daniel.haxx.se/sansa/mi4.html},
+  another way to obtain the file is to intercept the file during the firmware
+  upgrade.
+\item Install a version of the mi4code program on your system.
+  You can get a windows binary from
+  \url{http://daniel.haxx.se/sansa/mi4code.html}.
+\item Decrypt the mi4 firmware file with the following command
+  \begin{code}
+    mi4code decrypt -s SKU_E-PP5022.mi4 OF.bin
+  \end{code}
+\item Copy the decrypted original firmware file \fname{OF.bin} to the 
+  \fname{/SYSTEM} folder on your \dap{}. (This folder might be hidden).
+\item Download the Rockbox bootloader from 
+  \url{http://download.rockbox.org/bootloader/sandisk-sansa/}.
+\item Copy the bootloader you just downloaded to the root directory
+  of your \dap{}.
+\item Safely remove your \dap{} from the computer and then disconnect the
+  USB cable. This will reboot the \dap{}, then it will install the Rockbox
+  bootloader and reboot again into Rockbox.
+\end{enumerate}
+
