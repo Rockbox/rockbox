@@ -137,7 +137,6 @@ void spx_ifft(void *table, float *in, float *out)
 struct kiss_config {
    kiss_fftr_cfg forward;
    kiss_fftr_cfg backward;
-   kiss_fft_cpx *freq_data;
    int N;
 };
 
@@ -145,7 +144,6 @@ void *spx_fft_init(int size)
 {
    struct kiss_config *table;
    table = (struct kiss_config*)speex_alloc(sizeof(struct kiss_config));
-   table->freq_data = (kiss_fft_cpx*)speex_alloc(sizeof(kiss_fft_cpx)*((size>>1)+1));
    table->forward = kiss_fftr_alloc(size,0,NULL,NULL);
    table->backward = kiss_fftr_alloc(size,1,NULL,NULL);
    table->N = size;
@@ -157,7 +155,6 @@ void spx_fft_destroy(void *table)
    struct kiss_config *t = (struct kiss_config *)table;
    kiss_fftr_free(t->forward);
    kiss_fftr_free(t->backward);
-   speex_free(t->freq_data);
    speex_free(table);
 }
 
@@ -165,18 +162,10 @@ void spx_fft_destroy(void *table)
 
 void spx_fft(void *table, spx_word16_t *in, spx_word16_t *out)
 {
-   int i;
    int shift;
    struct kiss_config *t = (struct kiss_config *)table;
    shift = maximize_range(in, in, 32000, t->N);
-   kiss_fftr(t->forward, in, t->freq_data);
-   out[0] = t->freq_data[0].r;
-   for (i=1;i<t->N>>1;i++)
-   {
-      out[(i<<1)-1] = t->freq_data[i].r;
-      out[(i<<1)] = t->freq_data[i].i;
-   }
-   out[(i<<1)-1] = t->freq_data[i].r;
+   kiss_fftr2(t->forward, in, out);
    renorm_range(in, in, shift, t->N);
    renorm_range(out, out, shift, t->N);
 }
@@ -189,32 +178,16 @@ void spx_fft(void *table, spx_word16_t *in, spx_word16_t *out)
    float scale;
    struct kiss_config *t = (struct kiss_config *)table;
    scale = 1./t->N;
-   kiss_fftr(t->forward, in, t->freq_data);
-   out[0] = scale*t->freq_data[0].r;
-   for (i=1;i<t->N>>1;i++)
-   {
-      out[(i<<1)-1] = scale*t->freq_data[i].r;
-      out[(i<<1)] = scale*t->freq_data[i].i;
-   }
-   out[(i<<1)-1] = scale*t->freq_data[i].r;
+   kiss_fftr2(t->forward, in, out);
+   for (i=0;i<t->N;i++)
+      out[i] *= scale;
 }
 #endif
 
 void spx_ifft(void *table, spx_word16_t *in, spx_word16_t *out)
 {
-   int i;
    struct kiss_config *t = (struct kiss_config *)table;
-   t->freq_data[0].r = in[0];
-   t->freq_data[0].i = 0;
-   for (i=1;i<t->N>>1;i++)
-   {
-      t->freq_data[i].r = in[(i<<1)-1];
-      t->freq_data[i].i = in[(i<<1)];
-   }
-   t->freq_data[i].r = in[(i<<1)-1];
-   t->freq_data[i].i = 0;
-
-   kiss_fftri(t->backward, t->freq_data, out);
+   kiss_fftri2(t->backward, in, out);
 }
 
 

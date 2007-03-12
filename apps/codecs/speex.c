@@ -30,20 +30,18 @@
 #define CHUNKSIZE 10000  /*2kb*/
 #define SEEK_CHUNKSIZE 7*CHUNKSIZE
 
-//#define LOGF(...)
-
 CODEC_HEADER
 
-struct codec_api *rb;
+spx_int16_t output[MAX_FRAME_SIZE] IBSS_ATTR;
 
-int get_more_data(spx_ogg_sync_state *oy,struct codec_api *rb)
+int get_more_data(spx_ogg_sync_state *oy)
 {
     int bytes;
     char *buffer;
 
     buffer = (char *)spx_ogg_sync_buffer(oy,CHUNKSIZE);
 
-    bytes = rb->read_filebuf(buffer, sizeof(char)*CHUNKSIZE);
+    bytes = ci->read_filebuf(buffer, sizeof(char)*CHUNKSIZE);
 
     spx_ogg_sync_wrote(oy,bytes);
 
@@ -53,14 +51,14 @@ int get_more_data(spx_ogg_sync_state *oy,struct codec_api *rb)
 /* The read/seek functions track absolute position within the stream */
 
 static spx_int64_t get_next_page(spx_ogg_sync_state *oy,spx_ogg_page *og,
-                                 spx_int64_t boundary,struct codec_api *rb)
+                                 spx_int64_t boundary)
 {
-    spx_int64_t localoffset = rb->curpos;
+    spx_int64_t localoffset = ci->curpos;
     long more;
     long ret;
 
     if (boundary > 0)
-        boundary += rb->curpos;
+        boundary += ci->curpos;
 
     while (1) {
         more = spx_ogg_sync_pageseek(oy,og);
@@ -73,7 +71,7 @@ static spx_int64_t get_next_page(spx_ogg_sync_state *oy,spx_ogg_page *og,
                 /* send more paramedics */
                 if(!boundary)return(-1);
                 {
-                    ret = get_more_data(oy,rb);
+                    ret = get_more_data(oy);
                     if (ret == 0)
                         return(-2);
 
@@ -93,12 +91,11 @@ static spx_int64_t get_next_page(spx_ogg_sync_state *oy,spx_ogg_page *og,
 }
 
 static spx_int64_t seek_backwards(spx_ogg_sync_state *oy, spx_ogg_page *og,
-                                  spx_int64_t wantedpos,
-                                  struct codec_api *rb)
+                                  spx_int64_t wantedpos)
 {
     spx_int64_t crofs;
     spx_int64_t *curoffset=&crofs;
-    *curoffset=rb->curpos;
+    *curoffset=ci->curpos;
     spx_int64_t begin=*curoffset;
     spx_int64_t end=begin;
     spx_int64_t ret;
@@ -124,14 +121,14 @@ static spx_int64_t seek_backwards(spx_ogg_sync_state *oy, spx_ogg_page *og,
 
         *curoffset = begin;
 
-        rb->seek_buffer(*curoffset);
+        ci->seek_buffer(*curoffset);
 
         spx_ogg_sync_reset(oy);
 
         lastgranule = -1;
 
         while (*curoffset < end) {
-            ret = get_next_page(oy,og,end-*curoffset,rb);
+            ret = get_next_page(oy,og,end-*curoffset);
 
             if (ret > 0) {
                 if (lastgranule != -1) {
@@ -184,8 +181,7 @@ static spx_int64_t seek_backwards(spx_ogg_sync_state *oy, spx_ogg_page *og,
 
 int speex_seek_page_granule(spx_int64_t pos, spx_int64_t curpos,
                             spx_ogg_sync_state *oy,
-                            spx_int64_t headerssize,
-                            struct codec_api *rb)
+                            spx_int64_t headerssize)
 {
     /* TODO: Someone may want to try to implement seek to packet, 
              instead of just to page (should be more accurate, not be any 
@@ -193,7 +189,7 @@ int speex_seek_page_granule(spx_int64_t pos, spx_int64_t curpos,
 
     spx_int64_t crofs;
     spx_int64_t *curbyteoffset = &crofs;
-    *curbyteoffset = rb->curpos;
+    *curbyteoffset = ci->curpos;
     spx_int64_t curoffset;
     curoffset = *curbyteoffset;
     spx_int64_t offset = 0;
@@ -217,31 +213,31 @@ int speex_seek_page_granule(spx_int64_t pos, spx_int64_t curpos,
 
         //spx_int64_t toffset=curoffset;
 
-        rb->seek_buffer(curoffset);
+        ci->seek_buffer(curoffset);
 
         spx_ogg_sync_reset(oy);
 
-        offset = get_next_page(oy,&og,-1,rb);
+        offset = get_next_page(oy,&og,-1);
 
         if (offset < 0) { /* could not find new page,use old offset */
             LOGF("Seek/guess/fault:%d->-<-%d,%d:%d,%d,%d\n",
                  curpos,0,pos,offset,0,
-                 rb->curpos,/*stream_length*/0);
+                 ci->curpos,/*stream_length*/0);
 
             curoffset = *curbyteoffset;
 
-            rb->seek_buffer(curoffset);
+            ci->seek_buffer(curoffset);
 
             spx_ogg_sync_reset(oy);
         } else {
             if (spx_ogg_page_granulepos(&og) == 0 && pos > 5000) {
                 LOGF("SEEK/guess/fault:%d->-<-%d,%d:%d,%d,%d\n",
                      curpos,spx_ogg_page_granulepos(&og),pos,
-                     offset,0,rb->curpos,/*stream_length*/0);
+                     offset,0,ci->curpos,/*stream_length*/0);
 
                 curoffset = *curbyteoffset;
 
-                rb->seek_buffer(curoffset);
+                ci->seek_buffer(curoffset);
 
                 spx_ogg_sync_reset(oy);
             } else {
@@ -254,7 +250,7 @@ int speex_seek_page_granule(spx_int64_t pos, spx_int64_t curpos,
     /* which way do we want to seek? */
 
     if (curpos > pos) {  /* backwards */
-        offset = seek_backwards(oy,&og,pos,rb);
+        offset = seek_backwards(oy,&og,pos);
 
         if (offset > 0) {
             *curbyteoffset = curoffset;
@@ -262,7 +258,7 @@ int speex_seek_page_granule(spx_int64_t pos, spx_int64_t curpos,
         }
     } else {  /* forwards */
 
-        while ( (offset = get_next_page(oy,&og,-1,rb)) > 0) {
+        while ( (offset = get_next_page(oy,&og,-1)) > 0) {
             if (lastgranule != -1) {
                if (avgpagelen < 0)
                    avgpagelen = (spx_ogg_page_granulepos(&og) - lastgranule);
@@ -286,13 +282,13 @@ int speex_seek_page_granule(spx_int64_t pos, spx_int64_t curpos,
         }
     }
 
-    rb->seek_buffer(*curbyteoffset);
+    ci->seek_buffer(*curbyteoffset);
 
     spx_ogg_sync_reset(oy);
 
     LOGF("Seek failed:%d\n", offset);
 
-    rb->splash(HZ*2, true, "Seek failed");
+    ci->splash(HZ*2, true, "Seek failed");
 
     return -1;
 }
@@ -327,7 +323,7 @@ static void *process_header(spx_ogg_packet *op,
 
     modeID = header->mode;
 
-    mode = speex_lib_get_mode (modeID);
+    mode = speex_lib_get_mode(modeID);
 
     if (header->speex_version_id > 1) {
         DEBUGF("Undecodeable bitstream");
@@ -352,9 +348,6 @@ static void *process_header(spx_ogg_packet *op,
     speex_decoder_ctl(st, SPEEX_SET_ENH, &enh_enabled);
     speex_decoder_ctl(st, SPEEX_GET_FRAME_SIZE, frame_size);
 
-    if (*channels==-1)
-        *channels = header->nb_channels;
-
     if (!(*channels==1)){
         callback.callback_id = SPEEX_INBAND_STEREO;
         callback.func = speex_std_stereo_request_handler;
@@ -368,11 +361,8 @@ static void *process_header(spx_ogg_packet *op,
 
     *nframes = header->frames_per_packet;
 
-    if (*channels == 2) {
-        rb->configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
-    } else if (*channels == 1) {
-        rb->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
-    }
+    if (*channels == -1)
+        *channels = header->nb_channels;
 
     *extra_headers = header->extra_headers;
 
@@ -383,35 +373,28 @@ static void *process_header(spx_ogg_packet *op,
 /* this is the codec entry point */
 enum codec_status codec_main(void)
 {
-    SpeexBits vf;
-    int error;
-    int eof;
+    SpeexBits bits;
+    int error = 0;
+    int eof = 0;
     spx_ogg_sync_state oy;
     spx_ogg_page og;
     spx_ogg_packet op;
     spx_ogg_stream_state os;
-    spx_int64_t page_granule=0, cur_granule=0;
-    int enh_enabled;
-    int nframes=2;
-    int eos=0;
+    spx_int64_t page_granule = 0, cur_granule = 0;
+    int enh_enabled = 1;
+    int nframes = 2;
+    int eos = 0;
     SpeexStereoState stereo = SPEEX_STEREO_STATE_INIT;
-    int channels=-1;
-    int rate=0,samplerate=0;
-    int extra_headers;
-    int stream_init=0;
-    int page_nb_packets,frame_size,packet_count=0;
-    int lookahead;
-    int headerssize=-1;
-    unsigned long strtoffset;
-    short output[MAX_FRAME_SIZE];
-    enh_enabled = 1;
-    void *st=0;
-    int j;
-    rb = ci;
-
-    //rb->configure(CODEC_SET_FILEBUF_CHUNKSIZE, CHUNKSIZE*128);
-    //rb->configure(DSP_DITHER, false);
-    rb->configure(DSP_SET_SAMPLE_DEPTH, 16);
+    int channels = -1;
+    int rate = 0, samplerate = 0;
+    int extra_headers = 0;
+    int stream_init = 0;
+    int page_nb_packets, frame_size, packet_count = 0;
+    int lookahead = 0;
+    int headerssize = -1;
+    unsigned long strtoffset = 0;
+    void *st = NULL;
+    int j = 0;
 
     /* We need to flush reserver memory every track load. */
 next_track:
@@ -421,44 +404,44 @@ next_track:
         goto exit;
     }
 
-    strtoffset=rb->id3->offset;
+    strtoffset = ci->id3->offset;
 
-    while (!*rb->taginfo_ready && !rb->stop_codec)
-       rb->sleep(1);
+    while (!*ci->taginfo_ready && !ci->stop_codec)
+       ci->sleep(1);
 
     spx_ogg_sync_init(&oy);
     spx_ogg_alloc_buffer(&oy,2*CHUNKSIZE);
 
-    samplerate = rb->id3->frequency; 
-    codec_set_replaygain(rb->id3);
+    samplerate = ci->id3->frequency; 
+    codec_set_replaygain(ci->id3);
 
-    speex_bits_init(&vf);
+    speex_bits_init(&bits);
 
     eof = 0;
     while (!eof) {
-        rb->yield();
-        if (rb->stop_codec || rb->new_track)
+        ci->yield();
+        if (ci->stop_codec || ci->new_track)
             break;
 
         /*seek (seeks to the page before the position) */
-        if (rb->seek_time) {
+        if (ci->seek_time) {
             if(samplerate!=0&&packet_count>1){
                 LOGF("Speex seek page:%d,%d,%d,%d\n",
-                     ((spx_int64_t)rb->seek_time/1000) *
+                     ((spx_int64_t)ci->seek_time/1000) *
                      (spx_int64_t)samplerate,
-                     page_granule, rb->seek_time,
+                     page_granule, ci->seek_time,
                      (page_granule/samplerate)*1000, samplerate);
 
-                speex_seek_page_granule(((spx_int64_t)rb->seek_time/1000) *
+                speex_seek_page_granule(((spx_int64_t)ci->seek_time/1000) *
                                         (spx_int64_t)samplerate,
-                                        page_granule, &oy, headerssize, rb);
-                rb->seek_complete();
+                                        page_granule, &oy, headerssize);
+                ci->seek_complete();
             }
         }
 
 next_page:
         /*Get the ogg buffer for writing*/
-        if(get_more_data(&oy,rb)<1){/*read error*/
+        if(get_more_data(&oy)<1){/*read error*/
             error=CODEC_ERROR;
             goto done;
         }
@@ -467,7 +450,7 @@ next_page:
         while (spx_ogg_sync_pageout(&oy, &og) == 1) {
             int packet_no;
             if (stream_init == 0) {
-                spx_ogg_stream_init(&os,spx_ogg_page_serialno(&og));
+                spx_ogg_stream_init(&os, spx_ogg_page_serialno(&og));
                 stream_init = 1;
             }
 
@@ -486,7 +469,7 @@ next_page:
                 /* If first packet, process as Speex header */
                 if (packet_count==0){
                     st = process_header(&op, enh_enabled, &frame_size,
-                                         &samplerate,&nframes, &channels,
+                                         &samplerate, &nframes, &channels,
                                          &stereo, &extra_headers);
 
                     speex_decoder_ctl(st, SPEEX_GET_LOOKAHEAD, &lookahead);
@@ -499,13 +482,19 @@ next_page:
                         goto exit;
                     }
 
-                    rb->id3->vbr = true;
-                    rb->id3->frequency = samplerate;
-                    rb->configure(DSP_SET_FREQUENCY, rb->id3->frequency);
+                    ci->id3->vbr = true;
+                    ci->id3->frequency = samplerate;
+                    ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
+                    ci->configure(DSP_SET_SAMPLE_DEPTH, 16);
+                    if (channels == 2) {
+                        ci->configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
+                    } else if (channels == 1) {
+                        ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
+                    }
 
                     /* Speex header in its own page, add the whole page
                        headersize */
-                    headerssize+=og.header_len+og.body_len;
+                    headerssize += og.header_len+og.body_len;
 
                 } else if (packet_count<=1+extra_headers){
                     /* add packet to headersize */
@@ -515,7 +504,7 @@ next_page:
                 } else {
                     if (packet_count <= 2+extra_headers) {
                         if (strtoffset) {
-                            rb->seek_buffer(strtoffset);
+                            ci->seek_buffer(strtoffset);
                             spx_ogg_sync_reset(&oy);
                             packet_count++;
                             goto next_page;
@@ -528,21 +517,21 @@ next_page:
 
                     /* Copy Ogg packet to Speex bitstream */
 
-                    speex_bits_read_from(&vf, (char*)op.packet, op.bytes);
+                    speex_bits_read_from(&bits, (char*)op.packet, op.bytes);
 
                     for (j = 0; j != nframes; j++){
                         int ret;
 
                         /* Decode frame */
-                        ret = speex_decode_int(st, &vf, output);
+                        ret = speex_decode_int(st, &bits, output);
 
-                        if (ret==-1)
+                        if (ret == -1)
                             break;
 
-                        if (ret==-2)
+                        if (ret == -2)
                             break;
 
-                        if (speex_bits_remaining(&vf) < 0)
+                        if (speex_bits_remaining(&bits) < 0)
                             break;
 
                         if (channels == 2)
@@ -550,17 +539,16 @@ next_page:
 
                         int new_frame_size = frame_size;
 
-                        if (new_frame_size>0){  
-                            rb->pcmbuf_insert((const char*)output, NULL,
-                                              new_frame_size);
+                        if (new_frame_size > 0) {  
+                            ci->pcmbuf_insert(output, NULL, new_frame_size);
 
                             /* 2 bytes/sample */
                             cur_granule += new_frame_size / 2;
 
-                            rb->set_offset((long)rb->curpos);
+                            ci->set_offset((long) ci->curpos);
 
-                            rb->set_elapsed( (samplerate==0) ? 0 :
-                                             cur_granule*1000/samplerate);
+                            ci->set_elapsed((samplerate == 0) ? 0 :
+                                             cur_granule * 1000 / samplerate);
                          }
                     }
                 }
@@ -570,24 +558,24 @@ next_page:
     }
 
 done:
-    if (rb->request_next_track()) {
+    if (ci->request_next_track()) {
 
         /* Clean things up for the next track */
 
         speex_decoder_destroy(st);
-        speex_bits_reset(&vf);
+        speex_bits_reset(&bits);
 
-        if (stream_init==1)
+        if (stream_init == 1)
             spx_ogg_stream_reset(&os);
 
         spx_ogg_sync_reset(&oy);
 
         cur_granule = stream_init = rate = samplerate = headerssize 
-        = packet_count = eos = 0;
+            = packet_count = eos = 0;
 
-        stereo.balance =stereo.smooth_left = stereo.smooth_right = 1;
+        stereo.balance = stereo.smooth_left = stereo.smooth_right = 1;
         stereo.e_ratio = .5;
-        stereo.reserved1=stereo.reserved2= 0;
+        stereo.reserved1 = stereo.reserved2 = 0;
 
         goto next_track;
     }
@@ -595,7 +583,7 @@ done:
     error = CODEC_OK;
 
 exit:
-    speex_bits_destroy(&vf);
+    speex_bits_destroy(&bits);
 
     if (stream_init)
        spx_ogg_stream_destroy(&os);

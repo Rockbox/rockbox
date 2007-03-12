@@ -31,7 +31,6 @@ nb_celp.c
 oggframing.c
 preprocess.c
 quant_lsp.c
-resample.c
 rockbox.c
 sb_celp.c
 smallft.c

@@ -155,20 +155,6 @@ extern "C" {
 /** Get status of input/output high-pass filtering */
 #define SPEEX_GET_HIGHPASS 45
 
-/* Used internally, NOT TO BE USED in applications */
-/** Used internally*/
-#define SPEEX_GET_PI_GAIN 100
-/** Used internally*/
-#define SPEEX_GET_EXC     101
-/** Used internally*/
-#define SPEEX_GET_INNOV   102
-/** Used internally*/
-#define SPEEX_GET_DTX_STATUS   103
-/** Used internally*/
-#define SPEEX_SET_INNOVATION_SAVE   104
-/** Used internally*/
-#define SPEEX_SET_WIDEBAND   105
-
 
 /* Preserving compatibility:*/
 /** Equivalent to SPEEX_SET_ENH */
@@ -322,7 +308,9 @@ void speex_encoder_destroy(void *state);
 /** Uses an existing encoder state to encode one frame of speech pointed to by
     "in". The encoded bit-stream is saved in "bits".
  @param state Encoder state
- @param in Frame that will be encoded with a +-2^15 range
+ @param in Frame that will be encoded with a +-2^15 range. This data MAY be 
+        overwritten by the encoder and should be considered uninitialised 
+        after the call.
  @param bits Bit-stream where the data will be written
  @return 0 if frame needs not be transmitted (DTX only), 1 otherwise
  */

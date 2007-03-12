@@ -1,5 +1,5 @@
-Library: libspeex-1.2beta1 (SVN version 12449)
-Imported: 2007-02-10 by Dan Everton
+Library: libspeex-1.2beta1 (SVN version 12735)
+Imported: 2007-03-12 by Dan Everton
 
 
 This directory contains a local version of libspeex for decoding Ogg/Speex
@@ -16,7 +16,8 @@ license is described in the COPYING file in this directory.
 IMPORT DETAILS
 
 The .[ch] files from speex/libspeex/ and speex/include/ were imported 
-into Rockbox.  This includes the test files.
+into Rockbox.  This includes the test files. Some hackery was done to
+the include files so that they #include properly when built in Rockbox.
 
 A simple config.h file was added to enable libspeex's fixed-point
 integer-only mode and to specify the endianness of the target CPU. Also,
@@ -25,4 +26,5 @@ ARM specific optimisations were enabled.
 Since some parts of Speex still rely on <math.h> functions, a simple 
 include was created to get these parts to compile. Stub functions can be
 found in rockbox.c in this directory.
+
 
