@@ -29,7 +29,16 @@ bool prevtrack(void)
 
 bool play(void)
 {
-    if (api->audio_status() & AUDIO_STATUS_PAUSE)
+    int audio_status = api->audio_status();
+    if (!audio_status && api->global_status->resume_index != -1)
+    {
+        if (api->playlist_resume() != -1)
+        {
+            api->playlist_start(api->global_status->resume_index,
+                api->global_status->resume_offset);
+        }
+    }
+    else if (audio_status & AUDIO_STATUS_PAUSE)
         api->audio_resume();
     else
         api->audio_pause();

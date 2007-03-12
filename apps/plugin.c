@@ -484,6 +484,9 @@ static const struct plugin_api rockbox_api = {
     detect_flashed_ramimage,
     detect_flashed_romimage,
 #endif
+    playlist_resume,
+    playlist_start,
+    &global_status,
 };
 
 int plugin_load(const char* plugin, void* parameter)
