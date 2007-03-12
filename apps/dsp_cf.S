@@ -170,7 +170,7 @@ dsp_upsample:
     clr.w       %d5                     |
     eor.l       %d5, %d6                | pos == 0?
     beq.b       .usstart_0              | no? transistion from down
-    cmp.l       %d3, %d6                | past end of samples?
+    cmp.l       %d2, %d6                | past end of samples?
     bge.b       .usloop_skip            | yes? skip loop
     lea.l       -4(%a3, %d6.l*4), %a3   | %a3 = s = &s[pos-1] (previous)
     move.l      (%a3)+, %d0             | %d0 = *s++
@@ -347,8 +347,8 @@ sample_output_stereo:
     moveq.l     #28, %d0                  | %d0 = second line bound
     add.l       %a4, %d0                  |
     and.l       #0xfffffff0, %d0          |
-    cmp.l       %a4, %d0                  | at least a full line?
-    blo.w       .sos_longloop_1_start     | no? jump to trailing longword
+    cmp.l       %a0, %d0                  | at least a full line?
+    bhi.w       .sos_longloop_1_start     | no? jump to trailing longword
     sub.l       #16, %d0                  | %d1 = first line bound
     cmp.l       %a4, %d0                  | any leading longwords?
     bls.b       .sos_lineloop_start       | no? jump to line loop
@@ -441,8 +441,8 @@ sample_output_mono:
     moveq.l     #28, %d0                  | %d0 = second line bound
     add.l       %a3, %d0                  |
     and.l       #0xfffffff0, %d0          |
-    cmp.l       %a3, %d0                  | at least a full line?
-    blo.w       .som_longloop_1_start     | no? jump to trailing longword
+    cmp.l       %a0, %d0                  | at least a full line?
+    bhi.w       .som_longloop_1_start     | no? jump to trailing longword
     sub.l       #16, %d0                  | %d1 = first line bound
     cmp.l       %a3, %d0                  | any leading longwords?
     bls.b       .som_lineloop_start       | no? jump to line loop
