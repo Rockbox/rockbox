@@ -31,10 +31,9 @@
 */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "config-speex.h"
 #endif
 
-#include "filters.h"
 #include "stack_alloc.h"
 #include "misc.h"
 #include "math_approx.h"
@@ -47,6 +46,8 @@
 #include "filters_arm4.h"
 #elif defined (BFIN_ASM)
 #include "filters_bfin.h"
+#else
+#include "filters.h"
 #endif
 
 

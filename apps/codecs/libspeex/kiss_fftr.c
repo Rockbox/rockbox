@@ -13,7 +13,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "config-speex.h"
 #endif
 
 #include "kiss_fftr.h"

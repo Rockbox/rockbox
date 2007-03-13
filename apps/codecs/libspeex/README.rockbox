@@ -19,7 +19,7 @@ The .[ch] files from speex/libspeex/ and speex/include/ were imported
 into Rockbox.  This includes the test files. Some hackery was done to
 the include files so that they #include properly when built in Rockbox.
 
-A simple config.h file was added to enable libspeex's fixed-point
+A simple config-speex.h file was added to enable libspeex's fixed-point
 integer-only mode and to specify the endianness of the target CPU. Also,
 ARM specific optimisations were enabled.
 

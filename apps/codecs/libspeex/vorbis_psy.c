@@ -30,7 +30,7 @@
 */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "config-speex.h"
 #endif
 
 #ifdef VORBIS_PSYCHO
