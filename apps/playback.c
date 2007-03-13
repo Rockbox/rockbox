@@ -3353,6 +3353,10 @@ static void audio_reset_buffer(size_t pcmbufsize)
     logf("audio_reset_buffer");
     logf("  size:%08X", pcmbufsize);
 
+    /* If the setup of anything allocated before the file buffer is
+       changed, do check the adjustments after the buffer_alloc call
+       as it will likely be affected and need sliding over */
+
     /* Initially set up file buffer as all space available */
     malloc_buf = audiobuf + talk_get_bufsize();
     /* Align the malloc buf to line size. Especially important to cf
@@ -3390,6 +3394,7 @@ static void audio_reset_buffer(size_t pcmbufsize)
             /* buffer_alloc moves audiobuf; this is safe because only the end
              * has been touched so far in this function and the address of
              * filebuf + filebuflen is not changed */
+            malloc_buf += CODEC_IRAM_SIZE;
             filebuf += CODEC_IRAM_SIZE;
             filebuflen -= CODEC_IRAM_SIZE;
         }
