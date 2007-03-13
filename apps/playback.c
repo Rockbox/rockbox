@@ -3357,7 +3357,7 @@ static void audio_reset_buffer(size_t pcmbufsize)
     malloc_buf = audiobuf + talk_get_bufsize();
     /* Align the malloc buf to line size. Especially important to cf
        targets that do line reads/writes. */
-    malloc_buf = (unsigned char *)(((uintptr_t)filebuf + 15) & ~15);
+    malloc_buf = (unsigned char *)(((uintptr_t)malloc_buf + 15) & ~15);
     filebuf    = malloc_buf + MALLOC_BUFSIZE;
     filebuflen = audiobufend - filebuf;
 
