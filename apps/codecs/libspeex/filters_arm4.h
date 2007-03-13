@@ -35,7 +35,6 @@
 #define OVERRIDE_NORMALIZE16
 int normalize16(const spx_sig_t *x, spx_word16_t *y, int max_scale, int len)
 {
-   int i;
    spx_sig_t max_val=1;
    int sig_shift;
    int dead1, dead2, dead3, dead4, dead5, dead6;

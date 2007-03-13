@@ -1,3 +1,4 @@
+#include "../codec.h" 
 #include "autoconf.h"
 /* config.h.  Generated from config.h.in by configure.  */
 /* config.h.in.  Generated from configure.ac by autoheader.  */
@@ -7,7 +8,7 @@
 
 /* Make use of ARM5E assembly optimizations */
 #if defined(CPU_ARM) && !defined(SIMULATOR)
-#define ARM5E_ASM 1
+#define ARM4_ASM
 #endif
 
 /* Make use of Blackfin assembly optimizations */
