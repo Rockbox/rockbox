@@ -18,23 +18,25 @@
  ****************************************************************************/
 #include "adc.h"
 #include "i2c-pp.h"
-#include "logf.h"
+#include "as3514.h"
 
 /* Read 10-bit channel data */
 unsigned short adc_read(int channel)
 {
-    unsigned char bat[2];
+    unsigned char buf[2];
     unsigned short data = 0;
 
-    switch( channel)
-    {
-        case ADC_UNREG_POWER:
-            pp_i2c_send( 0x46, 0x2e, 0x0);
-            pp_i2c_send( 0x46, 0x27, 0x1);
-            i2c_readbytes( 0x46, 0x2e, 2, bat);
-            data = ((bat[0]<<8) | bat[1]);
-            break;
-    }
+    /* Select channel */
+    pp_i2c_send( AS3514_I2C_ADDR, ADC_0, (channel << 4));
+    
+    /* Wait for conversion to be complete */
+    pp_i2c_send( AS3514_I2C_ADDR, IRQ_ENRD2, 0x1);
+    while( (i2c_readbyte( AS3514_I2C_ADDR, IRQ_ENRD2) & 0x1) == 0);
+
+    /* Read data */
+    i2c_readbytes( AS3514_I2C_ADDR, ADC_0, 2, buf);
+    data = (((buf[0] & 0x3) << 8) | buf[1]);
+    
     return data;
 }
 

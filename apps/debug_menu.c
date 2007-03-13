@@ -1190,6 +1190,34 @@ bool dbg_ports(void)
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "ADC_SCROLLPAD: %02x", adc_read(ADC_SCROLLPAD));
         lcd_puts(0, line++, buf);
+#elif defined(SANSA_E200)
+        line++;
+        snprintf(buf, sizeof(buf), "ADC_BVDD:   %02x", adc_read(ADC_BVDD));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "ADC_RTCSUP: %02x", adc_read(ADC_RTCSUP));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "ADC_UVDD:    %02x", adc_read(ADC_UVDD));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "ADC_CHG_IN: %02x", adc_read(ADC_CHG_IN));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "ADC_CVDD: %02x", adc_read(ADC_CVDD));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "ADC_BATTEMP: %02x", adc_read(ADC_BATTEMP));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "ADC_MICSUP1: %02x", adc_read(ADC_MICSUP1));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "ADC_MICSUP2: %02x", adc_read(ADC_MICSUP2));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "ADC_VBE1: %02x", adc_read(ADC_VBE1));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "ADC_VBE2: %02x", adc_read(ADC_VBE2));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "ADC_I_MICSUP1: %02x", adc_read(ADC_I_MICSUP1));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "ADC_I_MICSUP2: %02x", adc_read(ADC_I_MICSUP2));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "ADC_VBAT: %02x", adc_read(ADC_VBAT));
+        lcd_puts(0, line++, buf);
 #endif
         lcd_update();
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))

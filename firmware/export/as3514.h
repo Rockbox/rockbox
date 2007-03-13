@@ -20,6 +20,8 @@
 #ifndef _AS3514_H
 #define _AS3514_H
 
+#include <stdbool.h>
+
 extern int tenthdb2master(int db);
 extern int tenthdb2mixer(int db);
 
@@ -66,6 +68,13 @@ extern void audiohw_set_equalizer_band(int band, int freq, int bw, int gain);
 #define AUDIOSET2  0x15
 #define AUDIOSET3  0x16
 #define PLLMODE    0x1d
+
+#define IRQ_ENRD0  0x25
+#define IRQ_ENRD1  0x26
+#define IRQ_ENRD2  0x27
+
+#define ADC_0      0x2e
+#define ADC_1      0x2f
 
 /* Headphone volume goes from -45.43 - 1.07dB */
 #define VOLUME_MIN -454

@@ -88,7 +88,7 @@
 #define BATTERY_CAPACITY_MAX 750        /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 0          /* capacity increment */
 #define BATTERY_TYPES_COUNT  1          /* only one type */
-#define BATTERY_SCALE_FACTOR 5054
+#define BATTERY_SCALE_FACTOR 5005       /* ADC should read 0x3ff=5.12V */
 
 /* Hardware controlled charging? FIXME */
 #define CONFIG_CHARGING CHARGING_SIMPLE
