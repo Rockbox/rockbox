@@ -89,6 +89,22 @@ static const char trig_durations_conf [] =
 # endif
 #endif
 
+static long rectime_getlang(int value)
+{
+    if (value == 0)
+        return LANG_OFF;
+    return TALK_ID(value, UNIT_SEC);
+}
+static void rectime_formatter(char *buffer, int buffer_size, 
+        int val, const char *unit)
+{
+    (void)unit;
+    if (val == 0)
+        strcpy(buffer, str(LANG_OFF));
+    else
+        snprintf(buffer, buffer_size, "%d s", val);
+}
+
 #endif /* HAVE_RECORDING */
 
 #if CONFIG_BACKLIGHT
@@ -700,18 +716,35 @@ const struct settings_list settings[] = {
 
 #ifdef HAVE_RECORDING
     /* recording */
-    {F_T_INT,&global_settings.rec_timesplit, LANG_SPLIT_TIME, INT(0),"rec timesplit",
+    STRINGCHOICE_SETTING(0, rec_timesplit, LANG_SPLIT_TIME, 0,
+        "rec timesplit",
         "off,00:05,00:10,00:15,00:30,01:00,01:14,01:20,02:00,"
-        "04:00,06:00,08:00,10:00,12:00,18:00,24:00",UNUSED},
-    {F_T_INT,&global_settings.rec_sizesplit,LANG_SPLIT_SIZE,INT(0),"rec sizesplit",
+        "04:00,06:00,08:00,10:00,12:00,18:00,24:00",
+        NULL, 16, LANG_OFF,
+        TALK_ID(5, UNIT_MIN), TALK_ID(10, UNIT_MIN), TALK_ID(15, UNIT_MIN), 
+        TALK_ID(30, UNIT_MIN), TALK_ID(60, UNIT_MIN), TALK_ID(74, UNIT_MIN), 
+        TALK_ID(80, UNIT_MIN), TALK_ID(2, UNIT_HOUR), TALK_ID(4, UNIT_HOUR), 
+        TALK_ID(6, UNIT_HOUR), TALK_ID(8, UNIT_HOUR), TALK_ID(10, UNIT_HOUR), 
+        TALK_ID(12, UNIT_HOUR), TALK_ID(18, UNIT_HOUR), TALK_ID(20, UNIT_HOUR), 
+        TALK_ID(24, UNIT_HOUR)),
+    STRINGCHOICE_SETTING(0, rec_sizesplit, LANG_SPLIT_SIZE, 0,
+        "rec sizesplit",
         "off,5MB,10MB,15MB,32MB,64MB,75MB,100MB,128MB,"
-        "256MB,512MB,650MB,700MB,1GB,1.5GB,1.75GB",UNUSED},
+        "256MB,512MB,650MB,700MB,1GB,1.5GB,1.75GB",
+        NULL, 16, LANG_OFF,
+        TALK_ID(5, UNIT_MB), TALK_ID(10, UNIT_MB), TALK_ID(15, UNIT_MB), 
+        TALK_ID(32, UNIT_MB), TALK_ID(64, UNIT_MB), TALK_ID(75, UNIT_MB), 
+        TALK_ID(100, UNIT_MB), TALK_ID(128, UNIT_MB), TALK_ID(256, UNIT_MB), 
+        TALK_ID(512, UNIT_MB), TALK_ID(650, UNIT_MB), TALK_ID(700, UNIT_MB), 
+        TALK_ID(1024, UNIT_MB), TALK_ID(1536, UNIT_MB), TALK_ID(1792, UNIT_MB)),
     {F_T_INT,&global_settings.rec_channels,LANG_RECORDING_CHANNELS,INT(0),
         "rec channels","stereo,mono",UNUSED},
-    {F_T_INT,&global_settings.rec_split_type,LANG_RECORDING_CHANNELS,INT(0),
-        "rec split type","Split, Stop",UNUSED},
-    {F_T_INT,&global_settings.rec_split_method,LANG_SPLIT_MEASURE,INT(0),
-        "rec split method","Time,Filesize",UNUSED},
+    CHOICE_SETTING(0, rec_split_type, LANG_SPLIT_TYPE, 0 ,
+        "rec split type", "Split, Stop", NULL, 2,
+        ID2P(LANG_START_NEW_FILE), ID2P(LANG_STOP_RECORDING)),
+    CHOICE_SETTING(0, rec_split_method, LANG_SPLIT_MEASURE, 0 ,
+        "rec split method", "Time,Filesize", NULL, 2,
+        ID2P(LANG_REC_TIME), ID2P(LANG_REC_SIZE)),
     {F_T_INT,&global_settings.rec_source,LANG_RECORDING_SOURCE,INT(0),
         "rec source","mic,line"
 #ifdef HAVE_SPDIF_IN
@@ -721,11 +754,24 @@ const struct settings_list settings[] = {
         ",fmradio"
 #endif
     ,UNUSED},
-    {F_T_INT,&global_settings.rec_prerecord_time,LANG_RECORD_PRERECORD_TIME,
-        INT(0),"prerecording time",NULL,UNUSED},
+    INT_SETTING(0, rec_prerecord_time, LANG_RECORD_PRERECORD_TIME,
+                0, "prerecording time",
+                UNIT_SEC, 0, 30, 1, rectime_formatter, rectime_getlang, NULL),
     {F_T_INT,&global_settings.rec_directory,LANG_RECORD_DIRECTORY,
         INT(0),"rec directory",REC_BASE_DIR ",current",UNUSED},
 #if CONFIG_BACKLIGHT
+    CHOICE_SETTING(0, cliplight, LANG_CLIP_LIGHT, 0 ,
+        "cliplight", "off,main,both,remote", NULL, 
+#ifdef HAVE_REMOTE_LCD
+        4,
+#else
+        2,
+#endif
+        ID2P(LANG_OFF), ID2P(LANG_MAIN_UNIT)
+#ifdef HAVE_REMOTE_LCD
+        , ID2P(LANG_REMOTE_MAIN), ID2P(LANG_REMOTE_UNIT)
+#endif
+        ),
     {F_T_INT,&global_settings.cliplight,LANG_CLIP_LIGHT,INT(0),
         "cliplight","off,main,both,remote",UNUSED},
 #endif
@@ -739,10 +785,10 @@ const struct settings_list settings[] = {
 #if CONFIG_CODEC == MAS3587F
     {F_T_INT,&global_settings.rec_frequency,LANG_RECORDING_FREQUENCY,
         INT(0),"rec frequency","44,48,32,22,24,16",UNUSED},
-    {F_T_INT,&global_settings.rec_quality,LANG_RECORDING_QUALITY,INT(5),
-        "rec quality",NULL,UNUSED},
+    INT_SETTING(0, rec_quality, LANG_RECORDING_QUALITY, 5, "rec quality",
+                    UNIT_INT, 0, 7, 1, NULL, NULL, NULL),
     OFFON_SETTING(0,rec_editable,LANG_RECORDING_EDITABLE,
-        false,"editable recordings",NULL),
+                    false,"editable recordings",NULL),
 #endif /* CONFIG_CODEC == MAS3587F */
 #if CONFIG_CODEC == SWCODEC
     {F_T_INT,&global_settings.rec_frequency,LANG_RECORDING_FREQUENCY,INT(REC_FREQ_DEFAULT),

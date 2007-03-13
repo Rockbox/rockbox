@@ -33,7 +33,6 @@ root_menu.c
 screens.c
 settings.c
 settings_list.c
-sound_menu.c
 status.c
 cuesheet.c
 #if !defined(SIMULATOR) || CONFIG_CODEC == SWCODEC
