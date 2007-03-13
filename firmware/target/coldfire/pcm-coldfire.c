@@ -135,6 +135,10 @@ bool _pcm_apply_settings(bool clear_reset)
         /* Reprogramming bits 15-12 requires FIFO to be in a reset
            condition - Users Manual 17-8, Note 11 */
         or_l(IIS_FIFO_RESET, &IIS_PLAY);
+        /* Important for TLV320 - this must happen in the correct order
+           or starting recording will sound absolutely awful once in
+           awhile - audiohw_set_frequency then coldfire_set_pllcr_audio_bits
+         */
         audiohw_set_frequency(freq_ent[FPARM_FSEL]);
         coldfire_set_pllcr_audio_bits(PLLCR_SET_AUDIO_BITS_DEFPARM);
         did_reset = true;
@@ -252,14 +256,20 @@ void pcm_init(void)
     /* Call pcm_close_recording to put in closed state */
     pcm_close_recording();
 
+    /* Setup Coldfire I2S before initializing hardware or changing
+       other settings. */
+    or_l(IIS_FIFO_RESET, &IIS_PLAY);
+    pcm_set_frequency(HW_FREQ_DEFAULT);
+    audio_set_output_source(AUDIO_SRC_PLAYBACK);
+    SET_IIS_PLAY(IIS_FIFO_RESET | IIS_PLAY_DEFPARM);
+
     /* Initialize default register values. */
     audiohw_init();
 
-    audio_set_output_source(AUDIO_SRC_PLAYBACK);
     audio_set_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
-    pcm_set_frequency(HW_FREQ_DEFAULT);
 
-    _pcm_apply_settings(false);
+    audiohw_set_frequency(freq_ent[FPARM_FSEL]);
+    coldfire_set_pllcr_audio_bits(PLLCR_SET_AUDIO_BITS_DEFPARM);
 
 #if defined(HAVE_SPDIF_IN) || defined(HAVE_SPDIF_OUT)
     spdif_init();
