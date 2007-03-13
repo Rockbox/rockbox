@@ -1353,7 +1353,7 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                 unsigned short genre;
                 
                 read_mp4_tag(fd, size, (char*) &genre, sizeof(genre));
-                id3->genre_string = id3_get_num_genre(betoh16(genre));
+                id3->genre_string = id3_get_num_genre(betoh16(genre) - 1);
             }
             break;
 
