@@ -1725,6 +1725,9 @@ bin: tools
 	\$(SILENT)\$(MAKE) -C \$(FIRMDIR) OBJDIR=\$(BUILDDIR)/firmware
 	\$(SILENT)\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@ \$(BUILDDIR)/\$(BINARY)
 
+rocks: tools
+	\$(SILENT)\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@ rocks
+
 veryclean: clean toolsclean
 
 toolsclean:
