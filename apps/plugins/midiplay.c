@@ -146,10 +146,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->profstop();
 #endif
 
-//#ifndef SIMULATOR
     rb->pcm_play_stop();
-    rb->pcm_set_frequency(SAMPLE_RATE); // 44100
-//#endif
+    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
     rb->cpu_boost(false);
