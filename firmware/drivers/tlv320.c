@@ -141,10 +141,22 @@ void audiohw_set_frequency(unsigned fsel)
         (0xf << 2),             /* 88200        */
     };
 
+    unsigned value_dap, value_pc;
+
     if (fsel >= ARRAYLEN(values_src))
         fsel = 1;
 
+    /* Temporarily turn off the DAC and ADC before switching sample
+       rates or they don't choose their filters correctly */
+    value_dap = tlv320_regs[REG_DAP];
+    value_pc = tlv320_regs[REG_PC];
+
+    tlv320_write_reg(REG_DAP, value_dap | DAP_DACM);
+    tlv320_write_reg(REG_PC,  value_pc | PC_DAC | PC_ADC);
     tlv320_write_reg(REG_SRC, values_src[fsel]);
+    tlv320_write_reg(REG_PC,  value_pc | PC_DAC);
+    tlv320_write_reg(REG_PC,  value_pc);
+    tlv320_write_reg(REG_DAP, value_dap);
 }
 
 /**

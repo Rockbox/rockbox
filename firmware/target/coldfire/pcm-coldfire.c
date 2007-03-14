@@ -128,6 +128,7 @@ bool _pcm_apply_settings(bool clear_reset)
 {
     static int last_pcm_freq = 0;
     bool did_reset = false;
+    unsigned long iis_play_defparm = IIS_PLAY_DEFPARM;
  
     if (pcm_freq != last_pcm_freq)
     {
@@ -139,13 +140,18 @@ bool _pcm_apply_settings(bool clear_reset)
            or starting recording will sound absolutely awful once in
            awhile - audiohw_set_frequency then coldfire_set_pllcr_audio_bits
          */
+        SET_IIS_PLAY(iis_play_defparm | IIS_FIFO_RESET);
         audiohw_set_frequency(freq_ent[FPARM_FSEL]);
         coldfire_set_pllcr_audio_bits(PLLCR_SET_AUDIO_BITS_DEFPARM);
         did_reset = true;
     }
 
-    SET_IIS_PLAY(IIS_PLAY_DEFPARM |
-        (clear_reset ? 0 : (IIS_PLAY & IIS_FIFO_RESET)));
+    /* If a reset was done because of a sample rate change, IIS_PLAY will have
+       been set already, so only needs to be set again if the reset flag must
+       be cleared. If the frequency didn't change, it was never altered and
+       the reset flag can just be removed or no action taken. */
+    if (clear_reset)
+        SET_IIS_PLAY(iis_play_defparm & ~IIS_FIFO_RESET);
 #if 0
     logf("IISPLAY: %08X", IIS_PLAY);
 #endif
@@ -259,9 +265,9 @@ void pcm_init(void)
     /* Setup Coldfire I2S before initializing hardware or changing
        other settings. */
     or_l(IIS_FIFO_RESET, &IIS_PLAY);
+    SET_IIS_PLAY(IIS_PLAY_DEFPARM | IIS_FIFO_RESET);
     pcm_set_frequency(HW_FREQ_DEFAULT);
     audio_set_output_source(AUDIO_SRC_PLAYBACK);
-    SET_IIS_PLAY(IIS_FIFO_RESET | IIS_PLAY_DEFPARM);
 
     /* Initialize default register values. */
     audiohw_init();
