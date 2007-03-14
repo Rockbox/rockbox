@@ -49,12 +49,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
         btn = rb->button_get(false);
         if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
-            goto EndOfProc;
+            goto end_of_proc;
     }
 
     roll_credits();
 
-EndOfProc:
+end_of_proc:
     /* Restore the values we've changed */
     rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
 
