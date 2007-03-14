@@ -833,7 +833,7 @@ MAKE_MENU(recording_setting_menu, ID2P(LANG_RECORDING_SETTINGS), NULL, Icon_Reco
 bool recording_menu(bool no_source)
 {
     no_source_in_menu = no_source;
-    return do_menu(&recording_setting_menu, NULL);
+    return do_menu(&recording_setting_menu, NULL) == MENU_ATTACHED_USB;
 };
 
 MENUITEM_FUNCTION_WPARAM(recording_settings, ID2P(LANG_RECORDING_SETTINGS),
