@@ -43,7 +43,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_double_height(false);
 #endif
 
-    /* Show the logo for about 1.5 secs allowing the user to stop */
+    /* Show the logo for about 3 secs allowing the user to stop */
     for (j = 0; j < 15; j++) {
         rb->sleep((HZ*2)/10);
 
