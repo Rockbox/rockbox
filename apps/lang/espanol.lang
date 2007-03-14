@@ -1,4 +1,4 @@
-Ôªø<phrase>
+<phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
   user:
@@ -202,10 +202,10 @@
     *: "Manage Settings"
   </source>
   <dest>
-    *: "Administraci√≥n de Configuraciones"
+    *: "AdministraciÛn de Configuraciones"
   </dest>
   <voice>
-    *: "Administraci√≥n de Configuraciones"
+    *: "AdministraciÛn de Configuraciones"
   </voice>
 </phrase>
 <phrase>
@@ -230,10 +230,10 @@
     *: "Recording"
   </source>
   <dest>
-    *: "Grabaci√≥n"
+    *: "GrabaciÛn"
   </dest>
   <voice>
-    *: "Grabaci√≥n"
+    *: "GrabaciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -244,10 +244,10 @@
     *: "Playlist Options"
   </source>
   <dest>
-    *: "Opciones de Listas de Reproducci√≥n"
+    *: "Opciones de Listas de ReproducciÛn"
   </dest>
   <voice>
-    *: "Opciones de Listas de Reproducci√≥n"
+    *: "Opciones de Listas de ReproducciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -272,10 +272,10 @@
     *: "Info"
   </source>
   <dest>
-    *: "Informaci√≥n"
+    *: "InformaciÛn"
   </dest>
   <voice>
-    *: "Informaci√≥n"
+    *: "InformaciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -370,7 +370,7 @@
     *: "Channel Configuration"
   </source>
   <dest>
-    *: "Configuraci√≥n de Canales"
+    *: "ConfiguraciÛn de Canales"
   </dest>
   <voice>
     *: ""
@@ -384,10 +384,10 @@
     *: "Stereo"
   </source>
   <dest>
-    *: "Est√©reo"
+    *: "EstÈreo"
   </dest>
   <voice>
-    *: "Est√©reo"
+    *: "EstÈreo"
   </voice>
 </phrase>
 <phrase>
@@ -468,10 +468,10 @@
     *: "Stereo Width"
   </source>
   <dest>
-    *: "Amplitud de Est√©reo"
+    *: "Amplitud de EstÈreo"
   </dest>
   <voice>
-    *: "Amplitud Est√©reo"
+    *: "Amplitud EstÈreo"
   </voice>
 </phrase>
 <phrase>
@@ -496,10 +496,10 @@
     *: "Auto Volume"
   </source>
   <dest>
-    *: "Volumen Autom√°tico"
+    *: "Volumen Autom·tico"
   </dest>
   <voice>
-    *: "Volumen Autom√°tico"
+    *: "Volumen Autom·tico"
   </voice>
 </phrase>
 <phrase>
@@ -510,7 +510,7 @@
     *: "AV Decay Time"
   </source>
   <dest>
-    *: "Tiempo de ca√≠da de AV"
+    *: "Tiempo de caÌda de AV"
   </dest>
   <voice>
     *: ""
@@ -566,10 +566,10 @@
     *: "MDB Harmonics"
   </source>
   <dest>
-    *: "Arm√≥nicos MDB"
+    *: "ArmÛnicos MDB"
   </dest>
   <voice>
-    *: "Arm√≥nicos MDB"
+    *: "ArmÛnicos MDB"
   </voice>
 </phrase>
 <phrase>
@@ -608,10 +608,10 @@
     *: "Playback"
   </source>
   <dest>
-    *: "Reproducci√≥n"
+    *: "ReproducciÛn"
   </dest>
   <voice>
-    *: "Reproducci√≥n"
+    *: "ReproducciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -622,10 +622,10 @@
     *: "File View"
   </source>
   <dest>
-    *: "Visualizaci√≥n de Archivos"
+    *: "VisualizaciÛn de Archivos"
   </dest>
   <voice>
-    *: "Visualizaci√≥n de Archivos"
+    *: "VisualizaciÛn de Archivos"
   </voice>
 </phrase>
 <phrase>
@@ -706,10 +706,10 @@
     *: "Browse .cfg files"
   </source>
   <dest>
-    *: "Explorar Archivos de Configuraci√≥n (.cfg)"
+    *: "Explorar Archivos de ConfiguraciÛn (.cfg)"
   </dest>
   <voice>
-    *: "Explorar Archivos de Configuraci√≥n"
+    *: "Explorar Archivos de ConfiguraciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -748,7 +748,7 @@
     *: "Are You Sure?"
   </source>
   <dest>
-    *: "¬øEst√°s seguro?"
+    *: "øEst·s seguro?"
   </dest>
   <voice>
     *: ""
@@ -833,10 +833,10 @@
     *: "Write .cfg file"
   </source>
   <dest>
-    *: "Guardar Configuraci√≥n Actual en Archivo (.cfg)"
+    *: "Guardar ConfiguraciÛn Actual en Archivo (.cfg)"
   </dest>
   <voice>
-    *: "Guardar Configuraci√≥n Actual en Archivo"
+    *: "Guardar ConfiguraciÛn Actual en Archivo"
   </voice>
 </phrase>
 <phrase>
@@ -861,7 +861,7 @@
     *: "Partition?"
   </source>
   <dest>
-    *: "¬øPartici√≥n?"
+    *: "øParticiÛn?"
   </dest>
   <voice>
     *: ""
@@ -889,7 +889,7 @@
     *: "No partition?"
   </source>
   <dest>
-    *: "¬øNo hay partici√≥n?"
+    *: "øNo hay particiÛn?"
   </dest>
   <voice>
     *: ""
@@ -903,10 +903,10 @@
     *: "Recording Screen"
   </source>
   <dest>
-    *: "Pantalla de Grabaci√≥n"
+    *: "Pantalla de GrabaciÛn"
   </dest>
   <voice>
-    *: "Pantalla de Grabaci√≥n"
+    *: "Pantalla de GrabaciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -917,10 +917,10 @@
     *: "Recording Settings"
   </source>
   <dest>
-    *: "Configuraciones de Grabaci√≥n"
+    *: "Configuraciones de GrabaciÛn"
   </dest>
   <voice>
-    *: "Configuraciones de Grabaci√≥n"
+    *: "Configuraciones de GrabaciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -931,10 +931,10 @@
     *: "Create Playlist"
   </source>
   <dest>
-    *: "Crear Lista de Reproducci√≥n"
+    *: "Crear Lista de ReproducciÛn"
   </dest>
   <voice>
-    *: "Crear Lista de Reproducci√≥n"
+    *: "Crear Lista de ReproducciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -945,10 +945,10 @@
     *: "View Current Playlist"
   </source>
   <dest>
-    *: "Ver Lista de Reproducci√≥n Actual"
+    *: "Ver Lista de ReproducciÛn Actual"
   </dest>
   <voice>
-    *: "Ver Lista de Reproducci√≥n Actual"
+    *: "Ver Lista de ReproducciÛn Actual"
   </voice>
 </phrase>
 <phrase>
@@ -959,10 +959,10 @@
     *: "Save Current Playlist"
   </source>
   <dest>
-    *: "Guardar Lista de Reproducci√≥n Actual"
+    *: "Guardar Lista de ReproducciÛn Actual"
   </dest>
   <voice>
-    *: "Guardar Lista de Reproducci√≥n Actual"
+    *: "Guardar Lista de ReproducciÛn Actual"
   </voice>
 </phrase>
 <phrase>
@@ -973,10 +973,10 @@
     *: "Recursively Insert Directories"
   </source>
   <dest>
-    *: "A√±adir Carpetas Recursivamente"
+    *: "AÒadir Carpetas Recursivamente"
   </dest>
   <voice>
-    *: "A√±adir Carpetas Recursivamente"
+    *: "AÒadir Carpetas Recursivamente"
   </voice>
 </phrase>
 <phrase>
@@ -987,10 +987,10 @@
     *: "Rockbox Info"
   </source>
   <dest>
-    *: "Informaci√≥n de Rockbox"
+    *: "InformaciÛn de Rockbox"
   </dest>
   <voice>
-    *: "Informaci√≥n de Rockbox"
+    *: "InformaciÛn de Rockbox"
   </voice>
 </phrase>
 <phrase>
@@ -1001,10 +1001,10 @@
     *: "Version"
   </source>
   <dest>
-    *: "Versi√≥n"
+    *: "VersiÛn"
   </dest>
   <voice>
-    *: "Versi√≥n"
+    *: "VersiÛn"
   </voice>
 </phrase>
 <phrase>
@@ -1015,10 +1015,10 @@
     *: "Debug (Keep Out!)"
   </source>
   <dest>
-    *: "Depuraci√≥n (¬°no tocar!)"
+    *: "DepuraciÛn (°no tocar!)"
   </dest>
   <voice>
-    *: "Depuraci√≥n (¬°no tocar!)"
+    *: "DepuraciÛn (°no tocar!)"
   </voice>
 </phrase>
 <phrase>
@@ -1099,10 +1099,10 @@
     *: "Play Selected First"
   </source>
   <dest>
-    *: "Reproducir Primero la Canci√≥n Seleccionada"
+    *: "Reproducir Primero la CanciÛn Seleccionada"
   </dest>
   <voice>
-    *: "Reproducir Primero la Canci√≥n Seleccionada"
+    *: "Reproducir Primero la CanciÛn Seleccionada"
   </voice>
 </phrase>
 <phrase>
@@ -1183,10 +1183,10 @@
     *: "V1 then V2"
   </source>
   <dest>
-    *: "V1 y despu√©s V2"
+    *: "V1 y despuÈs V2"
   </dest>
   <voice>
-    *: "Versi√≥n 1 y despu√©s Versi√≥n 2"
+    *: "VersiÛn 1 y despuÈs VersiÛn 2"
   </voice>
 </phrase>
 <phrase>
@@ -1197,10 +1197,10 @@
     *: "V2 then V1"
   </source>
   <dest>
-    *: "V2 y despu√©s V1"
+    *: "V2 y despuÈs V1"
   </dest>
   <voice>
-    *: "Versi√≥n 2 y despu√©s Versi√≥n 1"
+    *: "VersiÛn 2 y despuÈs VersiÛn 1"
   </voice>
 </phrase>
 <phrase>
@@ -1211,10 +1211,10 @@
     *: "Sort Case Sensitive"
   </source>
   <dest>
-    *: "Ordenamiento Sensible a May√∫sculas/Min√∫sculas"
+    *: "Ordenamiento Sensible a May˙sculas/Min˙sculas"
   </dest>
   <voice>
-    *: "Ordenamiento Sensible a May√∫sculas/Min√∫sculas"
+    *: "Ordenamiento Sensible a May˙sculas/Min˙sculas"
   </voice>
 </phrase>
 <phrase>
@@ -1253,10 +1253,10 @@
     *: "Alphabetical"
   </source>
   <dest>
-    *: "Alfab√©tico"
+    *: "AlfabÈtico"
   </dest>
   <voice>
-    *: "Alfab√©tico"
+    *: "AlfabÈtico"
   </voice>
 </phrase>
 <phrase>
@@ -1281,10 +1281,10 @@
     *: "By Newest Date"
   </source>
   <dest>
-    *: "M√°s Reciente"
+    *: "M·s Reciente"
   </dest>
   <voice>
-    *: "M√°s Reciente"
+    *: "M·s Reciente"
   </voice>
 </phrase>
 <phrase>
@@ -1351,10 +1351,10 @@
     *: "Music"
   </source>
   <dest>
-    *: "Archivos de M√∫sica"
+    *: "Archivos de M˙sica"
   </dest>
   <voice>
-    *: "Archivos de M√∫sica"
+    *: "Archivos de M˙sica"
   </voice>
 </phrase>
 <phrase>
@@ -1365,10 +1365,10 @@
     *: "Playlists"
   </source>
   <dest>
-    *: "Listas de Reproducci√≥n"
+    *: "Listas de ReproducciÛn"
   </dest>
   <voice>
-    *: "Listas de Reproducci√≥n"
+    *: "Listas de ReproducciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -1393,10 +1393,10 @@
     *: "Follow Playlist"
   </source>
   <dest>
-    *: "Seguir Lista de Reproducci√≥n"
+    *: "Seguir Lista de ReproducciÛn"
   </dest>
   <voice>
-    *: "Seguir Lista de Reproducci√≥n"
+    *: "Seguir Lista de ReproducciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -1435,10 +1435,10 @@
     *: "Browse .wps files"
   </source>
   <dest>
-    *: "Explorar Archivos de Pantalla de Reproducci√≥n (.wps)"
+    *: "Explorar Archivos de Pantalla de ReproducciÛn (.wps)"
   </dest>
   <voice>
-    *: "Explorar Archivos de Pantalla de Reproducci√≥n"
+    *: "Explorar Archivos de Pantalla de ReproducciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -1505,10 +1505,10 @@
     *: "Battery"
   </source>
   <dest>
-    *: "Bater√≠a"
+    *: "BaterÌa"
   </dest>
   <voice>
-    *: "Bater√≠a"
+    *: "BaterÌa"
   </voice>
 </phrase>
 <phrase>
@@ -1547,10 +1547,10 @@
     *: "Idle Poweroff"
   </source>
   <dest>
-    *: "Apagado Autom√°tico por Inactividad"
+    *: "Apagado Autom·tico por Inactividad"
   </dest>
   <voice>
-    *: "Apagado Autom√°tico por Inactividad"
+    *: "Apagado Autom·tico por Inactividad"
   </voice>
 </phrase>
 <phrase>
@@ -1589,10 +1589,10 @@
     *: "Limits"
   </source>
   <dest>
-    *: "L√≠mites"
+    *: "LÌmites"
   </dest>
   <voice>
-    *: "L√≠mites"
+    *: "LÌmites"
   </voice>
 </phrase>
 <phrase>
@@ -1603,10 +1603,10 @@
     *: "Line In"
   </source>
   <dest>
-    *: "L√≠nea de Entrada"
+    *: "LÌnea de Entrada"
   </dest>
   <voice>
-    *: "L√≠nea de Entrada"
+    *: "LÌnea de Entrada"
   </voice>
 </phrase>
 <phrase>
@@ -1617,10 +1617,10 @@
     *: "Car Adapter Mode"
   </source>
   <dest>
-    *: "Modo Adaptador de Autom√≥vil"
+    *: "Modo Adaptador de AutomÛvil"
   </dest>
   <voice>
-    *: "Modo Adaptador de Autom√≥vil"
+    *: "Modo Adaptador de AutomÛvil"
   </voice>
 </phrase>
 <phrase>
@@ -1631,10 +1631,10 @@
     *: "Bookmark on Stop"
   </source>
   <dest>
-    *: "Marcar posici√≥n al Detener"
+    *: "Marcar posiciÛn al Detener"
   </dest>
   <voice>
-    *: "Marcar posici√≥n al Detener"
+    *: "Marcar posiciÛn al Detener"
   </voice>
 </phrase>
 <phrase>
@@ -1645,10 +1645,10 @@
     *: "Yes - Recent only"
   </source>
   <dest>
-    *: "Si - S√≥lo Recientes"
+    *: "Si - SÛlo Recientes"
   </dest>
   <voice>
-    *: "Si - S√≥lo Recientes"
+    *: "Si - SÛlo Recientes"
   </voice>
 </phrase>
 <phrase>
@@ -1659,10 +1659,10 @@
     *: "Ask - Recent only"
   </source>
   <dest>
-    *: "Preguntar - S√≥lo Recientes"
+    *: "Preguntar - SÛlo Recientes"
   </dest>
   <voice>
-    *: "Preguntar - S√≥lo Recientes"
+    *: "Preguntar - SÛlo Recientes"
   </voice>
 </phrase>
 <phrase>
@@ -1673,10 +1673,10 @@
     *: "Load Last Bookmark"
   </source>
   <dest>
-    *: "Cargar √öltimo Marcador"
+    *: "Cargar ⁄ltimo Marcador"
   </dest>
   <voice>
-    *: "Cargar √öltimo Marcador"
+    *: "Cargar ⁄ltimo Marcador"
   </voice>
 </phrase>
 <phrase>
@@ -1687,10 +1687,10 @@
     *: "Maintain a List of Recent Bookmarks?"
   </source>
   <dest>
-    *: "¬øMantener una Lista de Marcadores Recientes?"
+    *: "øMantener una Lista de Marcadores Recientes?"
   </dest>
   <voice>
-    *: "¬øMantener una Lista de Marcadores Recientes?"
+    *: "øMantener una Lista de Marcadores Recientes?"
   </voice>
 </phrase>
 <phrase>
@@ -1701,10 +1701,10 @@
     *: "Unique only"
   </source>
   <dest>
-    *: "Solo uno por cada Lista de Reproducci√≥n"
+    *: "Solo uno por cada Lista de ReproducciÛn"
   </dest>
   <voice>
-    *: "Solo uno por cada Lista de Reproducci√≥n"
+    *: "Solo uno por cada Lista de ReproducciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -1715,10 +1715,10 @@
     *: "Voice Menus"
   </source>
   <dest>
-    *: "Hablar Men√∫s"
+    *: "Hablar Men˙s"
   </dest>
   <voice>
-    *: "Hablar Men√∫s"
+    *: "Hablar Men˙s"
   </voice>
 </phrase>
 <phrase>
@@ -1757,10 +1757,10 @@
     *: "Numbers"
   </source>
   <dest>
-    *: "N√∫meros"
+    *: "N˙meros"
   </dest>
   <voice>
-    *: "N√∫meros"
+    *: "N˙meros"
   </voice>
 </phrase>
 <phrase>
@@ -1841,10 +1841,10 @@
     *: "Mic"
   </source>
   <dest>
-    *: "Micr√≥fono"
+    *: "MicrÛfono"
   </dest>
   <voice>
-    *: "Micr√≥fono"
+    *: "MicrÛfono"
   </voice>
 </phrase>
 <phrase>
@@ -1855,10 +1855,10 @@
     *: "Line In"
   </source>
   <dest>
-    *: "L√≠nea de Entrada"
+    *: "LÌnea de Entrada"
   </dest>
   <voice>
-    *: "L√≠nea de Entrada"
+    *: "LÌnea de Entrada"
   </voice>
 </phrase>
 <phrase>
@@ -1911,10 +1911,10 @@
     *: "File Split Options"
   </source>
   <dest>
-    *: "Opciones de Separaci√≥n de Archivos"
+    *: "Opciones de SeparaciÛn de Archivos"
   </dest>
   <voice>
-    *: "Opciones de Separaci√≥n de Archivos"
+    *: "Opciones de SeparaciÛn de Archivos"
   </voice>
 </phrase>
 <phrase>
@@ -1925,10 +1925,10 @@
     *: "Prerecord Time"
   </source>
   <dest>
-    *: "Tiempo de Pregrabaci√≥n"
+    *: "Tiempo de PregrabaciÛn"
   </dest>
   <voice>
-    *: "Tiempo de Pregrabaci√≥n"
+    *: "Tiempo de PregrabaciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -1967,10 +1967,10 @@
     *: "Show Recording Screen on Startup"
   </source>
   <dest>
-    *: "Mostrar Pantalla de Grabaci√≥n al Encender"
+    *: "Mostrar Pantalla de GrabaciÛn al Encender"
   </dest>
   <voice>
-    *: "Mostrar Pantalla de Grabaci√≥n al Encender"
+    *: "Mostrar Pantalla de GrabaciÛn al Encender"
   </voice>
 </phrase>
 <phrase>
@@ -1981,10 +1981,10 @@
     *: "FF/RW Min Step"
   </source>
   <dest>
-    *: "Paso M√≠nimo Adelantar/Retroceder"
+    *: "Paso MÌnimo Adelantar/Retroceder"
   </dest>
   <voice>
-    *: "Paso M√≠nimo Adelantar y Retroceder"
+    *: "Paso MÌnimo Adelantar y Retroceder"
   </voice>
 </phrase>
 <phrase>
@@ -1995,10 +1995,10 @@
     *: "FF/RW Accel"
   </source>
   <dest>
-    *: "Aceleraci√≥n de Adelantar/Retroceder"
+    *: "AceleraciÛn de Adelantar/Retroceder"
   </dest>
   <voice>
-    *: "Aceleraci√≥n de Adelantar y Retroceder"
+    *: "AceleraciÛn de Adelantar y Retroceder"
   </voice>
 </phrase>
 <phrase>
@@ -2009,10 +2009,10 @@
     *: "Backlight"
   </source>
   <dest>
-    *: "Iluminaci√≥n"
+    *: "IluminaciÛn"
   </dest>
   <voice>
-    *: "Iluminaci√≥n"
+    *: "IluminaciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -2023,10 +2023,10 @@
     *: "Backlight (While Plugged In)"
   </source>
   <dest>
-    *: "Iluminaci√≥n (mientras est√© conectado)"
+    *: "IluminaciÛn (mientras estÈ conectado)"
   </dest>
   <voice>
-    *: "Iluminaci√≥n (mientras est√© conectado)"
+    *: "IluminaciÛn (mientras estÈ conectado)"
   </voice>
 </phrase>
 <phrase>
@@ -2037,10 +2037,10 @@
     *: "Caption Backlight"
   </source>
   <dest>
-    *: "Iluminaci√≥n al Iniciar Canci√≥n"
+    *: "IluminaciÛn al Iniciar CanciÛn"
   </dest>
   <voice>
-    *: "Iluminacion al Iniciar Canci√≥n"
+    *: "Iluminacion al Iniciar CanciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -2205,10 +2205,10 @@
     *: "Scroll Step Size"
   </source>
   <dest>
-    *: "Tama√±o del Paso de Desplazamiento"
+    *: "TamaÒo del Paso de Desplazamiento"
   </dest>
   <voice>
-    *: "Tama√±o del Paso de Desplazamiento"
+    *: "TamaÒo del Paso de Desplazamiento"
   </voice>
 </phrase>
 <phrase>
@@ -2219,7 +2219,7 @@
     *: "Scroll Step Size Setting Example Text"
   </source>
   <dest>
-    *: "Texto Ejemplo del Tama√±o del Paso de Desplazamiento"
+    *: "Texto Ejemplo del TamaÒo del Paso de Desplazamiento"
   </dest>
   <voice>
     *: ""
@@ -2233,10 +2233,10 @@
     *: "Bidirectional Scroll Limit"
   </source>
   <dest>
-    *: "L√≠mite de Desplazamiento Bidireccional"
+    *: "LÌmite de Desplazamiento Bidireccional"
   </dest>
   <voice>
-    *: "L√≠mite de Desplazamiento Bidireccional"
+    *: "LÌmite de Desplazamiento Bidireccional"
   </voice>
 </phrase>
 <phrase>
@@ -2345,10 +2345,10 @@
     *: "Battery Display"
   </source>
   <dest>
-    *: "Mostrar Bater√≠a"
+    *: "Mostrar BaterÌa"
   </dest>
   <voice>
-    *: "Mostrar Bater√≠a"
+    *: "Mostrar BaterÌa"
   </voice>
 </phrase>
 <phrase>
@@ -2359,10 +2359,10 @@
     *: "Graphic"
   </source>
   <dest>
-    *: "Gr√°fico"
+    *: "Gr·fico"
   </dest>
   <voice>
-    *: "Gr√°fico"
+    *: "Gr·fico"
   </voice>
 </phrase>
 <phrase>
@@ -2373,10 +2373,10 @@
     *: "Numeric"
   </source>
   <dest>
-    *: "Num√©rico"
+    *: "NumÈrico"
   </dest>
   <voice>
-    *: "Num√©rico"
+    *: "NumÈrico"
   </voice>
 </phrase>
 <phrase>
@@ -2471,10 +2471,10 @@
     *: "Logarithmic (dB)"
   </source>
   <dest>
-    *: "Logar√≠tmica (dB)"
+    *: "LogarÌtmica (dB)"
   </dest>
   <voice>
-    *: "Logar√≠tmica decibelio"
+    *: "LogarÌtmica decibelio"
   </voice>
 </phrase>
 <phrase>
@@ -2499,10 +2499,10 @@
     *: "Minimum Of Range"
   </source>
   <dest>
-    *: "M√≠nimo de Rango"
+    *: "MÌnimo de Rango"
   </dest>
   <voice>
-    *: "M√≠nimo de Rango"
+    *: "MÌnimo de Rango"
   </voice>
 </phrase>
 <phrase>
@@ -2513,10 +2513,10 @@
     *: "Maximum Of Range"
   </source>
   <dest>
-    *: "M√°ximo de Rango"
+    *: "M·ximo de Rango"
   </dest>
   <voice>
-    *: "M√°ximo de Rango"
+    *: "M·ximo de Rango"
   </voice>
 </phrase>
 <phrase>
@@ -2527,10 +2527,10 @@
     *: "Battery Capacity"
   </source>
   <dest>
-    *: "Capacidad de la Bater√≠a"
+    *: "Capacidad de la BaterÌa"
   </dest>
   <voice>
-    *: "Capacidad de la Bater√≠a"
+    *: "Capacidad de la BaterÌa"
   </voice>
 </phrase>
 <phrase>
@@ -2541,10 +2541,10 @@
     *: "Battery Type"
   </source>
   <dest>
-    *: "Tipo de Bater√≠a"
+    *: "Tipo de BaterÌa"
   </dest>
   <voice>
-    *: "Tipo de Bater√≠a"
+    *: "Tipo de BaterÌa"
   </voice>
 </phrase>
 <phrase>
@@ -2572,7 +2572,7 @@
     *: "NiMH"
   </dest>
   <voice>
-    *: "N√≠quel e hidruro de metal"
+    *: "NÌquel e hidruro de metal"
   </voice>
 </phrase>
 <phrase>
@@ -2583,10 +2583,10 @@
     *: "Disk Spindown"
   </source>
   <dest>
-    *: "Detenci√≥n del Disco Duro"
+    *: "DetenciÛn del Disco Duro"
   </dest>
   <voice>
-    *: "Detenci√≥n del Disco Duro"
+    *: "DetenciÛn del Disco Duro"
   </voice>
 </phrase>
 <phrase>
@@ -2667,10 +2667,10 @@
     *: "Max Files in Dir Browser"
   </source>
   <dest>
-    *: "M√°x. Archivos por Carpeta"
+    *: "M·x. Archivos por Carpeta"
   </dest>
   <voice>
-    *: "N√∫mero M√°ximo de Archivos por Carpeta"
+    *: "N˙mero M·ximo de Archivos por Carpeta"
   </voice>
 </phrase>
 <phrase>
@@ -2681,10 +2681,10 @@
     *: "Max Playlist Size"
   </source>
   <dest>
-    *: "Tama√±o M√°ximo de Lista de Reproducci√≥n"
+    *: "TamaÒo M·ximo de Lista de ReproducciÛn"
   </dest>
   <voice>
-    *: "Tama√±o M√°ximo de Lista de Reproducci√≥n"
+    *: "TamaÒo M·ximo de Lista de ReproducciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -2695,10 +2695,10 @@
     *: "Playlist"
   </source>
   <dest>
-    *: "Lista de Reproducci√≥n"
+    *: "Lista de ReproducciÛn"
   </dest>
   <voice>
-    *: "Lista de Reproducci√≥n"
+    *: "Lista de ReproducciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -2723,10 +2723,10 @@
     *: "Show ID3 Info"
   </source>
   <dest>
-    *: "Mostrar Informaci√≥n ID3"
+    *: "Mostrar InformaciÛn ID3"
   </dest>
   <voice>
-    *: "Mostrar Informaci√≥n ID3"
+    *: "Mostrar InformaciÛn ID3"
   </voice>
 </phrase>
 <phrase>
@@ -2779,7 +2779,7 @@
     *: "Delete?"
   </source>
   <dest>
-    *: "¬øBorrar?"
+    *: "øBorrar?"
   </dest>
   <voice>
     *: ""
@@ -2849,10 +2849,10 @@
     *: "Insert"
   </source>
   <dest>
-    *: "A√±adir"
+    *: "AÒadir"
   </dest>
   <voice>
-    *: "A√±adir"
+    *: "AÒadir"
   </voice>
 </phrase>
 <phrase>
@@ -2863,10 +2863,10 @@
     *: "Insert next"
   </source>
   <dest>
-    *: "A√±adir como siguiente"
+    *: "AÒadir como siguiente"
   </dest>
   <voice>
-    *: "A√±adir como siguiente"
+    *: "AÒadir como siguiente"
   </voice>
 </phrase>
 <phrase>
@@ -2877,10 +2877,10 @@
     *: "Insert last"
   </source>
   <dest>
-    *: "A√±adir al final"
+    *: "AÒadir al final"
   </dest>
   <voice>
-    *: "A√±adir al final"
+    *: "AÒadir al final"
   </voice>
 </phrase>
 <phrase>
@@ -2961,7 +2961,7 @@
     *: "Rockbox Info:"
   </source>
   <dest>
-    *: "Informaci√≥n de Rockbox:"
+    *: "InformaciÛn de Rockbox:"
   </dest>
   <voice>
     *: ""
@@ -3003,7 +3003,7 @@
     *: "Battery: Charging"
   </source>
   <dest>
-    *: "Bater√≠a: Cargando"
+    *: "BaterÌa: Cargando"
   </dest>
   <voice>
     *: ""
@@ -3017,7 +3017,7 @@
     *: "Battery: Top-Off Chg"
   </source>
   <dest>
-    *: "Bater√≠a: Top-Off Chg"
+    *: "BaterÌa: Top-Off Chg"
   </dest>
   <voice>
     *: ""
@@ -3031,7 +3031,7 @@
     *: "Battery: Trickle Chg"
   </source>
   <dest>
-    *: "Bater√≠a: Trickle Chg"
+    *: "BaterÌa: Trickle Chg"
   </dest>
   <voice>
     *: ""
@@ -3048,7 +3048,7 @@
     *: "%d%% %dh %dm"
   </dest>
   <voice>
-    *: "Nivel de bater√≠a"
+    *: "Nivel de baterÌa"
   </voice>
 </phrase>
 <phrase>
@@ -3241,10 +3241,10 @@
     *: "Index"
   </source>
   <dest>
-    *: "√çndice"
+    *: "Õndice"
   </dest>
   <voice>
-    *: "√çndice"
+    *: "Õndice"
   </voice>
 </phrase>
 <phrase>
@@ -3297,7 +3297,7 @@
     *: "Load Last Bookmark?"
   </source>
   <dest>
-    *: "¬øCargar √öltimo Marcador?"
+    *: "øCargar ⁄ltimo Marcador?"
   </dest>
   <voice>
     *: ""
@@ -3311,7 +3311,7 @@
     *: "Create a Bookmark?"
   </source>
   <dest>
-    *: "¬øCrear un Marcador?"
+    *: "øCrear un Marcador?"
   </dest>
   <voice>
     *: ""
@@ -3339,7 +3339,7 @@
     *: "Bookmark Failed!"
   </source>
   <dest>
-    *: "Fall√≥ el Marcador"
+    *: "FallÛ el Marcador"
   </dest>
   <voice>
     *: ""
@@ -3353,7 +3353,7 @@
     *: "Bookmark Empty"
   </source>
   <dest>
-    *: "Marcador Vac√≠o"
+    *: "Marcador VacÌo"
   </dest>
   <voice>
     *: ""
@@ -3465,7 +3465,7 @@
     *: "Split Time:"
   </source>
   <dest>
-    *: "Tiempo de Separaci√≥n:"
+    *: "Tiempo de SeparaciÛn:"
   </dest>
   <voice>
     *: ""
@@ -3479,7 +3479,7 @@
     *: "Size:"
   </source>
   <dest>
-    *: "Tama√±o:"
+    *: "TamaÒo:"
   </dest>
   <voice>
     *: ""
@@ -3493,7 +3493,7 @@
     *: "Pre-Recording"
   </source>
   <dest>
-    *: "Pregrabaci√≥n"
+    *: "PregrabaciÛn"
   </dest>
   <voice>
     *: ""
@@ -3647,7 +3647,7 @@
     *: "[Title]"
   </source>
   <dest>
-    *: "[T√≠tulo]"
+    *: "[TÌtulo]"
   </dest>
   <voice>
     *: ""
@@ -3675,7 +3675,7 @@
     *: "[Album]"
   </source>
   <dest>
-    *: "[√Ålbum]"
+    *: "[¡lbum]"
   </dest>
   <voice>
     *: ""
@@ -3689,7 +3689,7 @@
     *: "[Tracknum]"
   </source>
   <dest>
-    *: "[N¬∫ Pista]"
+    *: "[N∫ Pista]"
   </dest>
   <voice>
     *: ""
@@ -3703,7 +3703,7 @@
     *: "[Genre]"
   </source>
   <dest>
-    *: "[G√©nero]"
+    *: "[GÈnero]"
   </dest>
   <voice>
     *: ""
@@ -3717,7 +3717,7 @@
     *: "[Year]"
   </source>
   <dest>
-    *: "[A√±o]"
+    *: "[AÒo]"
   </dest>
   <voice>
     *: ""
@@ -3885,10 +3885,10 @@
     *: "Sat"
   </source>
   <dest>
-    *: "S√°b"
+    *: "S·b"
   </dest>
   <voice>
-    *: "S√°bado"
+    *: "S·bado"
   </voice>
 </phrase>
 <phrase>
@@ -4490,7 +4490,7 @@
     *: ""
   </dest>
   <voice>
-    *: "mill√≥n"
+    *: "millÛn"
   </voice>
 </phrase>
 <phrase>
@@ -4504,7 +4504,7 @@
     *: ""
   </dest>
   <voice>
-    *: "bill√≥n"
+    *: "billÛn"
   </voice>
 </phrase>
 <phrase>
@@ -4532,7 +4532,7 @@
     *: ""
   </dest>
   <voice>
-    *: "m√°s"
+    *: "m·s"
   </voice>
 </phrase>
 <phrase>
@@ -5072,7 +5072,7 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+?   *: ""
   </source>
   <dest>
     *: ""
@@ -5246,7 +5246,7 @@
     *: ""
   </dest>
   <voice>
-    *: "configuraci√≥n"
+    *: "configuraciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -5383,7 +5383,7 @@
     *: "Playlist Buffer Full"
   </source>
   <dest>
-    *: "Buffer de Lista de Reproducci√≥n Lleno"
+    *: "Buffer de Lista de ReproducciÛn Lleno"
   </dest>
   <voice>
     *: ""
@@ -5397,7 +5397,7 @@
     *: "End of List"
   </source>
   <dest>
-    *: "Fin de Lista de Reproducci√≥n"
+    *: "Fin de Lista de ReproducciÛn"
   </dest>
   <voice>
     *: ""
@@ -5411,7 +5411,7 @@
     *: "End of Song List"
   </source>
   <dest>
-    *: "Fin de Lista de Reproducci√≥n"
+    *: "Fin de Lista de ReproducciÛn"
   </dest>
   <voice>
     *: ""
@@ -5439,7 +5439,7 @@
     *: "Inserted %d tracks (%s)"
   </source>
   <dest>
-    *: "A√±adidas %d Pistas (%s)"
+    *: "AÒadidas %d Pistas (%s)"
   </dest>
   <voice>
     *: ""
@@ -5481,7 +5481,7 @@
     *: "Recursively?"
   </source>
   <dest>
-    *: "¬øRecursivamente?"
+    *: "øRecursivamente?"
   </dest>
   <voice>
     *: ""
@@ -5495,7 +5495,7 @@
     *: "Error updating playlist control file"
   </source>
   <dest>
-    *: "Error al Actualizar el Archivo de Control de Listas de Reproducci√≥n"
+    *: "Error al Actualizar el Archivo de Control de Listas de ReproducciÛn"
   </dest>
   <voice>
     *: ""
@@ -5509,7 +5509,7 @@
     *: "Error accessing playlist file"
   </source>
   <dest>
-    *: "Error al Acceder a la Lista de Reproducci√≥n"
+    *: "Error al Acceder a la Lista de ReproducciÛn"
   </dest>
   <voice>
     *: ""
@@ -5523,7 +5523,7 @@
     *: "Error accessing playlist control file"
   </source>
   <dest>
-    *: "Error al Acceder al Archivo de Control de Listas de Reproducci√≥n"
+    *: "Error al Acceder al Archivo de Control de Listas de ReproducciÛn"
   </dest>
   <voice>
     *: ""
@@ -5551,7 +5551,7 @@
     *: "Playlist control file is invalid"
   </source>
   <dest>
-    *: "Archivo de Control de Listas de Reproducci√≥n Inv√°lido"
+    *: "Archivo de Control de Listas de ReproducciÛn Inv·lido"
   </dest>
   <voice>
     *: ""
@@ -5579,10 +5579,10 @@
     *: "No presets"
   </source>
   <dest>
-    *: "No hay Presinton√≠as"
+    *: "No hay PresintonÌas"
   </dest>
   <voice>
-    *: "No hay Presinton√≠as"
+    *: "No hay PresintonÌas"
   </voice>
 </phrase>
 <phrase>
@@ -5593,10 +5593,10 @@
     *: "Edit Preset"
   </source>
   <dest>
-    *: "Editar Presinton√≠a"
+    *: "Editar PresintonÌa"
   </dest>
   <voice>
-    *: "Editar Presinton√≠a"
+    *: "Editar PresintonÌa"
   </voice>
 </phrase>
 <phrase>
@@ -5607,10 +5607,10 @@
     *: "Remove Preset"
   </source>
   <dest>
-    *: "Eliminar Presinton√≠a"
+    *: "Eliminar PresintonÌa"
   </dest>
   <voice>
-    *: "Eliminar Presinton√≠a"
+    *: "Eliminar PresintonÌa"
   </voice>
 </phrase>
 <phrase>
@@ -5621,10 +5621,10 @@
     *: "Preset Save Failed"
   </source>
   <dest>
-    *: "Error al Guardar Presinton√≠a"
+    *: "Error al Guardar PresintonÌa"
   </dest>
   <voice>
-    *: "Error al Guardar Presinton√≠a"
+    *: "Error al Guardar PresintonÌa"
   </voice>
 </phrase>
 <phrase>
@@ -5635,10 +5635,10 @@
     *: "The Preset List is Full"
   </source>
   <dest>
-    *: "Lista de Presinton√≠as Llena"
+    *: "Lista de PresintonÌas Llena"
   </dest>
   <voice>
-    *: "Lista de Presinton√≠as Llena"
+    *: "Lista de PresintonÌas Llena"
   </voice>
 </phrase>
 <phrase>
@@ -5649,10 +5649,10 @@
     *: "Menu"
   </source>
   <dest>
-    *: "Men√∫"
+    *: "Men˙"
   </dest>
   <voice>
-    *: "Men√∫"
+    *: "Men˙"
   </voice>
 </phrase>
 <phrase>
@@ -5677,7 +5677,7 @@
     *: "Action"
   </source>
   <dest>
-    *: "Acci√≥n"
+    *: "AcciÛn"
   </dest>
   <voice>
     *: ""
@@ -5691,7 +5691,7 @@
     *: "Preset"
   </source>
   <dest>
-    *: "Presinton√≠as"
+    *: "PresintonÌas"
   </dest>
   <voice>
     *: ""
@@ -5705,7 +5705,7 @@
     *: "Add"
   </source>
   <dest>
-    *: "A√±adir"
+    *: "AÒadir"
   </dest>
   <voice>
     *: ""
@@ -5747,7 +5747,7 @@
     *: "Menu"
   </source>
   <dest>
-    *: "Men√∫"
+    *: "Men˙"
   </dest>
   <voice>
     *: ""
@@ -5761,7 +5761,7 @@
     *: "Option"
   </source>
   <dest>
-    *: "Opci√≥n"
+    *: "OpciÛn"
   </dest>
   <voice>
     *: ""
@@ -5859,7 +5859,7 @@
     *: "Reboot now?"
   </source>
   <dest>
-    *: "¬øReiniciar Ahora?"
+    *: "øReiniciar Ahora?"
   </dest>
   <voice>
     *: ""
@@ -5957,10 +5957,10 @@
     *: "Search"
   </source>
   <dest>
-    *: "B√∫squeda"
+    *: "B˙squeda"
   </dest>
   <voice>
-    *: "B√∫squeda"
+    *: "B˙squeda"
   </voice>
 </phrase>
 <phrase>
@@ -6069,10 +6069,10 @@
     *: "Show Indices"
   </source>
   <dest>
-    *: "Mostrar √çndices"
+    *: "Mostrar Õndices"
   </dest>
   <voice>
-    *: "Mostrar √çndices"
+    *: "Mostrar Õndices"
   </voice>
 </phrase>
 <phrase>
@@ -6097,10 +6097,10 @@
     *: "Track Name Only"
   </source>
   <dest>
-    *: "S√≥lo Nombre de Pista"
+    *: "SÛlo Nombre de Pista"
   </dest>
   <voice>
-    *: "S√≥lo Nombre de Pista"
+    *: "SÛlo Nombre de Pista"
   </voice>
 </phrase>
 <phrase>
@@ -6195,7 +6195,7 @@
     *: "Incompatible version"
   </source>
   <dest>
-    *: "Versi√≥n Incompatible"
+    *: "VersiÛn Incompatible"
   </dest>
   <voice>
     *: ""
@@ -6209,7 +6209,7 @@
     *: "Plugin returned error"
   </source>
   <dest>
-    *: "El Plugin Devolvi√≥ un Error"
+    *: "El Plugin DevolviÛ un Error"
   </dest>
   <voice>
     *: ""
@@ -6265,7 +6265,7 @@
     *: "Filetype string buffer empty"
   </source>
   <dest>
-    *: "Buffer de la Cadena de Tipos de Archivo Vac√≠a"
+    *: "Buffer de la Cadena de Tipos de Archivo VacÌa"
   </dest>
   <voice>
     *: ""
@@ -6363,10 +6363,10 @@
     *: "Stereo"
   </source>
   <dest>
-    *: "Est√©reo"
+    *: "EstÈreo"
   </dest>
   <voice>
-    *: "Est√©reo"
+    *: "EstÈreo"
   </voice>
 </phrase>
 <phrase>
@@ -6489,10 +6489,10 @@
     *: "Music"
   </source>
   <dest>
-    *: "Archivos de M√∫sica"
+    *: "Archivos de M˙sica"
   </dest>
   <voice>
-    *: "Archivos de M√∫sica"
+    *: "Archivos de M˙sica"
   </voice>
 </phrase>
 <phrase>
@@ -6503,10 +6503,10 @@
     *: "Playlists"
   </source>
   <dest>
-    *: "Listas de Reproducci√≥n"
+    *: "Listas de ReproducciÛn"
   </dest>
   <voice>
-    *: "Listas de Reproducci√≥n"
+    *: "Listas de ReproducciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -6573,10 +6573,10 @@
     *: "Mic"
   </source>
   <dest>
-    *: "Micr√≥fono"
+    *: "MicrÛfono"
   </dest>
   <voice>
-    *: "Micr√≥fono"
+    *: "MicrÛfono"
   </voice>
 </phrase>
 <phrase>
@@ -6587,10 +6587,10 @@
     *: "Line In"
   </source>
   <dest>
-    *: "L√≠nea de Entrada"
+    *: "LÌnea de Entrada"
   </dest>
   <voice>
-    *: "L√≠nea de Entrada"
+    *: "LÌnea de Entrada"
   </voice>
 </phrase>
 <phrase>
@@ -6727,7 +6727,7 @@
     *: "Split Time:"
   </source>
   <dest>
-    *: "Tiempo de Separaci√≥n:"
+    *: "Tiempo de SeparaciÛn:"
   </dest>
   <voice>
     *: ""
@@ -6741,7 +6741,7 @@
     *: "Size:"
   </source>
   <dest>
-    *: "Tama√±o:"
+    *: "TamaÒo:"
   </dest>
   <voice>
     *: ""
@@ -6755,7 +6755,7 @@
     *: "Pre-Recording"
   </source>
   <dest>
-    *: "Pregrabaci√≥n"
+    *: "PregrabaciÛn"
   </dest>
   <voice>
     *: ""
@@ -6825,7 +6825,7 @@
     *: "Menu"
   </source>
   <dest>
-    *: "Men√∫"
+    *: "Men˙"
   </dest>
   <voice>
     *: ""
@@ -6839,7 +6839,7 @@
     *: "Option"
   </source>
   <dest>
-    *: "Opci√≥n"
+    *: "OpciÛn"
   </dest>
   <voice>
     *: ""
@@ -6923,7 +6923,7 @@
     *: "Edit mode: %s"
   </source>
   <dest>
-    *: "Modo de Edici√≥n: %s"
+    *: "Modo de EdiciÛn: %s"
   </dest>
   <voice>
     *: ""
@@ -6951,7 +6951,7 @@
     *: "Save Changes?"
   </source>
   <dest>
-    *: "¬øGuardar Cambios?"
+    *: "øGuardar Cambios?"
   </dest>
   <voice>
     *: ""
@@ -6993,10 +6993,10 @@
     *: "Warn When Erasing Dynamic Playlist"
   </source>
   <dest>
-    *: "Advertir al Borrar Listas Din√°micas"
+    *: "Advertir al Borrar Listas Din·micas"
   </dest>
   <voice>
-    *: "Advertir al Borrar Listas Din√°micas"
+    *: "Advertir al Borrar Listas Din·micas"
   </voice>
 </phrase>
 <phrase>
@@ -7007,10 +7007,10 @@
     *: "Optical Output"
   </source>
   <dest>
-    *: "Salida √ìptica"
+    *: "Salida ”ptica"
   </dest>
   <voice>
-    *: "Salida √ìptica"
+    *: "Salida ”ptica"
   </voice>
 </phrase>
 <phrase>
@@ -7049,10 +7049,10 @@
     *: "Auto-Change Directory"
   </source>
   <dest>
-    *: "Cambiar Carpeta Autom√°ticamente"
+    *: "Cambiar Carpeta Autom·ticamente"
   </dest>
   <voice>
-    *: "Cambiar Carpeta Autom√°ticamente"
+    *: "Cambiar Carpeta Autom·ticamente"
   </voice>
 </phrase>
 <phrase>
@@ -7091,10 +7091,10 @@
     *: "Graphical EQ"
   </source>
   <dest>
-    *: "Ecualizador Gr√°fico"
+    *: "Ecualizador Gr·fico"
   </dest>
   <voice>
-    *: "Ecualizador Gr√°fico"
+    *: "Ecualizador Gr·fico"
   </voice>
 </phrase>
 <phrase>
@@ -7164,7 +7164,7 @@
     *: "Explorar Archivos .rwps"
   </dest>
   <voice>
-    *: "Explorar Archivos de Pantalla de Reproducci√≥n Remota"
+    *: "Explorar Archivos de Pantalla de ReproducciÛn Remota"
   </voice>
 </phrase>
 <phrase>
@@ -7217,10 +7217,10 @@
     *: "Filesize"
   </source>
   <dest>
-    *: "Tama√±o de Archivo"
+    *: "TamaÒo de Archivo"
   </dest>
   <voice>
-    *: "Tama√±o de Archivo"
+    *: "TamaÒo de Archivo"
   </voice>
 </phrase>
 <phrase>
@@ -7301,10 +7301,10 @@
     *: "Remote Display OFF"
   </source>
   <dest>
-    *: "Apagar Visualizaci√≥n Remota"
+    *: "Apagar VisualizaciÛn Remota"
   </dest>
   <voice>
-    *: "Apagar Visualizaci√≥n Remota"
+    *: "Apagar VisualizaciÛn Remota"
   </voice>
 </phrase>
 <phrase>
@@ -7385,10 +7385,10 @@
     *: "Backlight Fade In"
   </source>
   <dest>
-    *: "Fundido de Entrada de Iluminaci√≥n"
+    *: "Fundido de Entrada de IluminaciÛn"
   </dest>
   <voice>
-    *: "Fundido de Entrada de Iluminaci√≥n"
+    *: "Fundido de Entrada de IluminaciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -7455,10 +7455,10 @@
     *: "Auto update"
   </source>
   <dest>
-    *: "Actualizar Autom√°ticamente"
+    *: "Actualizar Autom·ticamente"
   </dest>
   <voice>
-    *: "Actualizar Autom√°ticamente"
+    *: "Actualizar Autom·ticamente"
   </voice>
 </phrase>
 <phrase>
@@ -7497,10 +7497,10 @@
     *: "Stop recording"
   </source>
   <dest>
-    *: "Detener Grabaci√≥n"
+    *: "Detener GrabaciÛn"
   </dest>
   <voice>
-    *: "Detener Grabaci√≥n"
+    *: "Detener GrabaciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -7511,7 +7511,7 @@
     *: "Erase dynamic playlist?"
   </source>
   <dest>
-    *: "¬øBorrar Lista de Reproducci√≥n Din√°mica?"
+    *: "øBorrar Lista de ReproducciÛn Din·mica?"
   </dest>
   <voice>
     *: ""
@@ -7622,10 +7622,10 @@
     *: "First Keypress Enables Backlight Only"
   </source>
   <dest>
-    *: "S√≥lo Activar Iluminaci√≥n a la Primera Acci√≥n"
+    *: "SÛlo Activar IluminaciÛn a la Primera AcciÛn"
   </dest>
   <voice>
-    *: "S√≥lo Activar Iluminaci√≥n a la Primera Acci√≥n"
+    *: "SÛlo Activar IluminaciÛn a la Primera AcciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -7748,10 +7748,10 @@
     *: "Main Unit Only"
   </source>
   <dest>
-    *: "√önicamente Unidad Principal"
+    *: "⁄nicamente Unidad Principal"
   </dest>
   <voice>
-    *: "√önicamente Unidad Principal"
+    *: "⁄nicamente Unidad Principal"
   </voice>
 </phrase>
 <phrase>
@@ -7762,10 +7762,10 @@
     *: "Load Preset List"
   </source>
   <dest>
-    *: "Cargar Lista de Presinton√≠as"
+    *: "Cargar Lista de PresintonÌas"
   </dest>
   <voice>
-    *: "Cargar Lista de Presinton√≠as"
+    *: "Cargar Lista de PresintonÌas"
   </voice>
 </phrase>
 <phrase>
@@ -7776,10 +7776,10 @@
     *: "Backlight Fade Out"
   </source>
   <dest>
-    *: "Fundido de Salida de Iluminaci√≥n"
+    *: "Fundido de Salida de IluminaciÛn"
   </dest>
   <voice>
-    *: "Fundido de Salida de Iluminaci√≥n"
+    *: "Fundido de Salida de IluminaciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -7790,7 +7790,7 @@
     *: "Restarting playback..."
   </source>
   <dest>
-    *: "Reiniciando Reproducci√≥n..."
+    *: "Reiniciando ReproducciÛn..."
   </dest>
   <voice>
     *: ""
@@ -7818,10 +7818,10 @@
     *: "Crossfeed"
   </source>
   <dest>
-    *: "Reproducci√≥n con Fundido"
+    *: "ReproducciÛn con Fundido"
   </dest>
   <voice>
-    *: "Reproducci√≥n con Fundido"
+    *: "ReproducciÛn con Fundido"
   </voice>
 </phrase>
 <phrase>
@@ -7957,10 +7957,10 @@
     *: "Split Filesize"
   </source>
   <dest>
-    *: "Tama√±o por el cual Separar"
+    *: "TamaÒo por el cual Separar"
   </dest>
   <voice>
-    *: "Tama√±o por el cual Separar"
+    *: "TamaÒo por el cual Separar"
   </voice>
 </phrase>
 <phrase>
@@ -8027,10 +8027,10 @@
     *: "Pitch"
   </source>
   <dest>
-    *: "Aceleraci√≥n"
+    *: "AceleraciÛn"
   </dest>
   <voice>
-    *: "Aceleraci√≥n"
+    *: "AceleraciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -8041,10 +8041,10 @@
     *: "Screen Scroll Step Size"
   </source>
   <dest>
-    *: "Tama√±o del Paso de Desplazamiento por Pantalla"
+    *: "TamaÒo del Paso de Desplazamiento por Pantalla"
   </dest>
   <voice>
-    *: "Tama√±o del Paso de Desplazamiento por Pantalla"
+    *: "TamaÒo del Paso de Desplazamiento por Pantalla"
   </voice>
 </phrase>
 <phrase>
@@ -8069,10 +8069,10 @@
     *: "Playlist catalog"
   </source>
   <dest>
-    *: "Catalogo de Listas de Reproducci√≥n"
+    *: "Catalogo de Listas de ReproducciÛn"
   </dest>
   <voice>
-    *: "Catalogo de Listas de Reproducci√≥n"
+    *: "Catalogo de Listas de ReproducciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -8096,10 +8096,10 @@
     *: "Split Measure"
   </source>
   <dest>
-    *: "Medici√≥n de Separaci√≥n"
+    *: "MediciÛn de SeparaciÛn"
   </dest>
   <voice>
-    *: "Medici√≥n de Separaci√≥n"
+    *: "MediciÛn de SeparaciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -8137,10 +8137,10 @@
     *: "Preset List"
   </source>
   <dest>
-    *: "Lista de Presinton√≠as"
+    *: "Lista de PresintonÌas"
   </dest>
   <voice>
-    *: "Lista de Presinton√≠as"
+    *: "Lista de PresintonÌas"
   </voice>
 </phrase>
 <phrase>
@@ -8193,7 +8193,7 @@
     *: "Invalid colour"
   </source>
   <dest>
-    *: "Color Inv√°lido"
+    *: "Color Inv·lido"
   </dest>
   <voice>
     *: ""
@@ -8263,7 +8263,7 @@
     *: "Genres"
   </source>
   <dest>
-    *: "G√©neros"
+    *: "GÈneros"
   </dest>
   <voice>
     *: ""
@@ -8277,10 +8277,10 @@
     *: "Invalid Filename!"
   </source>
   <dest>
-    *: "Nombre de Archivo Inv√°lido!"
+    *: "Nombre de Archivo Inv·lido!"
   </dest>
   <voice>
-    *: "Nombre de Archivo Inv√°lido!"
+    *: "Nombre de Archivo Inv·lido!"
   </voice>
 </phrase>
 <phrase>
@@ -8291,10 +8291,10 @@
     *: "Search In Playlist"
   </source>
   <dest>
-    *: "Buscar en Lista de Reproducci√≥n"
+    *: "Buscar en Lista de ReproducciÛn"
   </dest>
   <voice>
-    *: "Buscar en Lista de Reproducci√≥n"
+    *: "Buscar en Lista de ReproducciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -8333,7 +8333,7 @@
     *: "Backdrop Failed"
   </source>
   <dest>
-    *: "Fondo de Pantalla Fall√≥"
+    *: "Fondo de Pantalla FallÛ"
   </dest>
   <voice>
     *: ""
@@ -8347,10 +8347,10 @@
     *: "Remote Unit Only"
   </source>
   <dest>
-    *: "√önicamente Unidad Remota"
+    *: "⁄nicamente Unidad Remota"
   </dest>
   <voice>
-    *: "√önicamente Unidad Remota"
+    *: "⁄nicamente Unidad Remota"
   </voice>
 </phrase>
 <phrase>
@@ -8361,7 +8361,7 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "Archivo/Carpeta Existe. ¬øSobreescribir?"
+    *: "Archivo/Carpeta Existe. øSobreescribir?"
   </dest>
   <voice>
     *: ""
@@ -8459,10 +8459,10 @@
     *: "Add to new playlist"
   </source>
   <dest>
-    *: "A√±adir a Nueva Lista de Reproducci√≥n"
+    *: "AÒadir a Nueva Lista de ReproducciÛn"
   </dest>
   <voice>
-    *: "A√±adir a Nueva Lista de Reproducci√≥n"
+    *: "AÒadir a Nueva Lista de ReproducciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -8473,10 +8473,10 @@
     *: "Fade-In Duration"
   </source>
   <dest>
-    *: "Duraci√≥n de Entrada"
+    *: "DuraciÛn de Entrada"
   </dest>
   <voice>
-    *: "Duraci√≥n de Entrada"
+    *: "DuraciÛn de Entrada"
   </voice>
 </phrase>
 <phrase>
@@ -8487,10 +8487,10 @@
     *: "Fade-Out Duration"
   </source>
   <dest>
-    *: "Duraci√≥n de Salida"
+    *: "DuraciÛn de Salida"
   </dest>
   <voice>
-    *: "Duraci√≥n de Salida"
+    *: "DuraciÛn de Salida"
   </voice>
 </phrase>
 <phrase>
@@ -8500,10 +8500,10 @@
     *: "Split Time"
   </source>
   <dest>
-    *: "Tiempo de Separaci√≥n"
+    *: "Tiempo de SeparaciÛn"
   </dest>
   <voice>
-    *: "Tiempo de Separaci√≥n"
+    *: "Tiempo de SeparaciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -8514,7 +8514,7 @@
     *: "No Settings found, AutoScan?"
   </source>
   <dest>
-    *: "No se Encontraron Configuraciones, ¬øAutoScanear?"
+    *: "No se Encontraron Configuraciones, øAutoScanear?"
   </dest>
   <voice>
     *: ""
@@ -8556,10 +8556,10 @@
     *: "Directory Cache"
   </source>
   <dest>
-    *: "Cach√© de Carpetas"
+    *: "CachÈ de Carpetas"
   </dest>
   <voice>
-    *: "Cach√© de Carpetas"
+    *: "CachÈ de Carpetas"
   </voice>
 </phrase>
 <phrase>
@@ -8598,10 +8598,10 @@
     *: "Track Skip Only"
   </source>
   <dest>
-    *: "S√≥lo Saltar Pista"
+    *: "SÛlo Saltar Pista"
   </dest>
   <voice>
-    *: "S√≥lo Saltar Pista"
+    *: "SÛlo Saltar Pista"
   </voice>
 </phrase>
 <phrase>
@@ -8626,10 +8626,10 @@
     *: "Clear Preset List"
   </source>
   <dest>
-    *: "Borrar Lista de Presinton√≠as"
+    *: "Borrar Lista de PresintonÌas"
   </dest>
   <voice>
-    *: "Borrar Lista de Presinton√≠as"
+    *: "Borrar Lista de PresintonÌas"
   </voice>
 </phrase>
 <phrase>
@@ -8668,10 +8668,10 @@
     *: "Add to playlist"
   </source>
   <dest>
-    *: "A√±adir a Lista de Reproducci√≥n"
+    *: "AÒadir a Lista de ReproducciÛn"
   </dest>
   <voice>
-    *: "A√±adir a Lista de Reproducci√≥n"
+    *: "AÒadir a Lista de ReproducciÛn"
   </voice>
 </phrase>
 <phrase>
@@ -8793,10 +8793,10 @@
     *: "What to do when Splitting"
   </source>
   <dest>
-    *: "Qu√© hacer al separar"
+    *: "QuÈ hacer al separar"
   </dest>
   <voice>
-    *: "Qu√© hacer al separar"
+    *: "QuÈ hacer al separar"
   </voice>
 </phrase>
 <phrase>
@@ -8806,10 +8806,10 @@
     *: "Split Filesize"
   </source>
   <dest>
-    *: "Tama√±o por el cual Separar"
+    *: "TamaÒo por el cual Separar"
   </dest>
   <voice>
-    *: "Tama√±o por el cual Separar"
+    *: "TamaÒo por el cual Separar"
   </voice>
 </phrase>
 <phrase>
@@ -8902,10 +8902,10 @@
     *: "Save Preset List"
   </source>
   <dest>
-    *: "Guardar Lista de Presinton√≠as"
+    *: "Guardar Lista de PresintonÌas"
   </dest>
   <voice>
-    *: "Guardar Lista de Presinton√≠as"
+    *: "Guardar Lista de PresintonÌas"
   </voice>
 </phrase>
 <phrase>
@@ -8972,10 +8972,10 @@
     *: "Add Preset"
   </source>
   <dest>
-    *: "A√±adir Presinton√≠a"
+    *: "AÒadir PresintonÌa"
   </dest>
   <voice>
-    *: "A√±adir Presinton√≠a"
+    *: "AÒadir PresintonÌa"
   </voice>
 </phrase>
 <phrase>
@@ -8986,10 +8986,10 @@
     *: "Weak"
   </source>
   <dest>
-    *: "D√©bil"
+    *: "DÈbil"
   </dest>
   <voice>
-    *: "D√©bil"
+    *: "DÈbil"
   </voice>
 </phrase>
 <phrase>
@@ -9014,7 +9014,7 @@
     *: "Edit mode: %s"
   </source>
   <dest>
-    *: "Modo de Edici√≥n: %s"
+    *: "Modo de EdiciÛn: %s"
   </dest>
   <voice>
     *: ""
@@ -9027,10 +9027,10 @@
     *: "High-Frequency Attenuation"
   </source>
   <dest>
-    *: "Atenuaci√≥n de Altas Frecuencias"
+    *: "AtenuaciÛn de Altas Frecuencias"
   </dest>
   <voice>
-    *: "Atenuaci√≥n de Altas Frecuencias"
+    *: "AtenuaciÛn de Altas Frecuencias"
   </voice>
 </phrase>
 <phrase>
@@ -9139,7 +9139,7 @@
     *: "Preset"
   </source>
   <dest>
-    *: "Presinton√≠a"
+    *: "PresintonÌa"
   </dest>
   <voice>
     *: ""
@@ -9181,10 +9181,10 @@
     *: "Auto-Scan Presets"
   </source>
   <dest>
-    *: "Auto-Scanear Presinton√≠as"
+    *: "Auto-Scanear PresintonÌas"
   </dest>
   <voice>
-    *: "Auto Scanear Presinton√≠as"
+    *: "Auto Scanear PresintonÌas"
   </voice>
 </phrase>
 <phrase>
@@ -9349,7 +9349,7 @@
     *: "Clear Current Presets?"
   </source>
   <dest>
-    *: "¬øBorrar Presinton√≠a Actual?"
+    *: "øBorrar PresintonÌa Actual?"
   </dest>
   <voice>
     *: ""
@@ -9419,7 +9419,7 @@
     *: "No playlists"
   </source>
   <dest>
-    *: "No hay Listas de Reproducci√≥n"
+    *: "No hay Listas de ReproducciÛn"
   </dest>
   <voice>
     *: ""
@@ -9433,7 +9433,7 @@
     *: "for at least"
   </source>
   <dest>
-    *: "for at least"
+    *: "por al menos"
   </dest>
   <voice>
     *: ""
@@ -9462,7 +9462,7 @@
     *: "Safety (clip)"
   </source>
   <dest>
-    *: "Safety (clip)"
+    *: "Con seguridad (clip)"
   </dest>
   <voice>
     *: "Safety (clip)"
@@ -9477,7 +9477,7 @@
     *: "Voice (fast)"
   </source>
   <dest>
-    *: "Voice (fast)"
+    *: "Voz (r·pido)"
   </dest>
   <voice>
     *: "Voice (fast)"
@@ -9492,7 +9492,7 @@
     *: "Medium"
   </source>
   <dest>
-    *: "Medium"
+    *: "Medio"
   </dest>
   <voice>
     *: "Medium"
@@ -9507,7 +9507,7 @@
     *: "Live (slow)"
   </source>
   <dest>
-    *: "Live (slow)"
+    *: "Directo (lento)"
   </dest>
   <voice>
     *: "Live (slow)"
@@ -9522,7 +9522,7 @@
     *: "DJ-Set (slow)"
   </source>
   <dest>
-    *: "DJ-Set (slow)"
+    *: "DJ-Set (lento)"
   </dest>
   <voice>
     *: "DJ set (slow)"
@@ -9537,9 +9537,355 @@
     *: "AGC max. gain"
   </source>
   <dest>
-    *: "AGC max. gain"
+    *: "AGC max. gan·ncia"
   </dest>
   <voice>
     *: "AGC maximum gain"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_PROPERTIES
+  desc: browser file/dir properties
+  user:
+  <source>
+    *: "Properties"
+  </source>
+  <dest>
+    *: "Propiedades"
+  </dest>
+  <voice>
+    *: "Properties"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_TRACKSKIP
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Shuffle and Track Skip"
+  </source>
+  <dest>
+    *: "Rep. aleatoria y Saltar Pista"
+  </dest>
+  <voice>
+    *: "Shuffle and Track Skip"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUNNING_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Running Time"
+  </source>
+  <dest>
+    *: "Tiempo de EjecuciÛn"
+  </dest>
+  <voice>
+    *: "Running Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Current Time"
+  </source>
+  <dest>
+    *: "Tiempo Actual"
+  </dest>
+  <voice>
+    *: "Current Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Top Time"
+  </source>
+  <dest>
+    *: "Maximo Tiempo"
+  </dest>
+  <voice>
+    *: "Top Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Clear Time?"
+  </source>
+  <dest>
+    *: "øBorrar Tiempo?"
+  </dest>
+  <voice>
+    *: "Clear Time?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLACE
+  desc: in onplay menu.  Replace the current playlist with a new one.
+  user:
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "Reproducir el Siguiente"
+  </dest>
+  <voice>
+    *: "Play Next"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_THEME
+  desc: save a theme file
+  user:
+  <source>
+    *: "Save Theme Settings"
+  </source>
+  <dest>
+    *: "Guardar Ajustes del Tema"
+  </dest>
+  <voice>
+    *: "Save Theme Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_CHARGING
+  desc: in Battery menu
+  user:
+  <source>
+    *: "Charge During USB Connection"
+  </source>
+  <dest>
+    *: "Cargar Durante ConexiÛn USB"
+  </dest>
+  <voice>
+    *: "Charge During U S B Connection"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUMARTIST
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Album Artist]"
+  </source>
+  <dest>
+    *: "[Album Artist]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMMENT
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Comment]"
+  </source>
+  <dest>
+    *: "[Comment]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUESHEET
+  desc:
+  user:
+  <source>
+    *: "Cuesheet"
+  </source>
+  <dest>
+    *: "Cuesheet"
+  </dest>
+  <voice>
+    *: "Cuesheet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUESHEET_ENABLE
+  desc: cuesheet support option
+  user:
+  <source>
+    *: "Cuesheet Support"
+  </source>
+  <dest>
+    *: "Soporte de Cuesheet"
+  </dest>
+  <voice>
+    *: "Cuesheet Support"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_MENU
+  desc: fm menu title
+  user:
+  <source>
+    *: "FM Radio Menu"
+  </source>
+  <dest>
+    *: "Men˙ Radio FM"
+  </dest>
+  <voice>
+    *: "FM Radio Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIR_BROWSER
+  desc: in root menu
+  user:
+  <source>
+    *: "Files"
+  </source>
+  <dest>
+    *: "Archivos"
+  </dest>
+  <voice>
+    *: "Files"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_MENU
+  desc: in root menu
+  user:
+  <source>
+    *: "Settings"
+  </source>
+  <dest>
+    *: "ConfiguraciÛn"
+  </dest>
+  <voice>
+    *: "Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOW_PLAYING
+  desc: in root menu
+  user:
+  <source>
+    *: "Now Playing"
+  </source>
+  <dest>
+    *: "Ahora suena"
+  </dest>
+  <voice>
+    *: "Now Playing"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_PLAYBACK
+  desc: in root menu
+  user:
+  <source>
+    *: "Resume Playback"
+  </source>
+  <dest>
+    *: "Continuar ReproducciÛn"
+  </dest>
+  <voice>
+    *: "Resume Playback"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_SCREEN
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Start Screen"
+  </source>
+  <dest>
+    *: "Pantalla de Inicio"
+  </dest>
+  <voice>
+    *: "Start Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ROCKBOX_TITLE
+  desc: in root menu
+  user:
+  <source>
+    *: "Rockbox"
+  </source>
+  <dest>
+    *: "Rockbox"
+  </dest>
+  <voice>
+    *: "Rockbox"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Main Menu"
+  </source>
+  <dest>
+    *: "Men˙ Principal"
+  </dest>
+  <voice>
+    *: "Main Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVIOUS_SCREEN
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Previous Screen"
+  </source>
+  <dest>
+    *: "Pantalla Anterior"
+  </dest>
+  <voice>
+    *: "Previous Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_WAKEUP_SCREEN
+  desc: in alarm menu setting
+  user:
+  <source>
+    *: "Alarm Wake up Screen"
+  </source>
+  <dest>
+    *: "Pantalla de Alarma Despertador"
+  </dest>
+  <voice>
+    *: "Alarm Wake up Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUILDING_DATABASE
+  desc: splash database building progress
+  user:
+  <source>
+    *: "Building database... %d found (OFF for menu)"
+    h100,h120,h300: "Building database... %d found (STOP for menu)"
+    ipod*: "Building database... %d found (PLAY/PAUSE for menu)"
+    x5: "Building database... %d found (Long PLAY for menu)"
+    h10: "Building database... %d found (PREV for menu)"
+  </source>
+  <dest>
+    *: "Construyendo base de datos... %d encontrados (OFF para men˙)"
+    h100,h120,h300: "Construyendo base de datos... %d encontrados (STOP para men˙)"
+    ipod*: "Construyendo base de datos... %d encontrados (PLAY/PAUSE para men˙)"
+    x5: "Construyendo base de datos... %d encontrados (PLAY Largo para men˙)"
+    h10: "Construyendo base de datos... %d encontrados (PREV para men˙)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+
+
