@@ -35,6 +35,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     (void)parameter;
     rb = api;
 
+    /* Turn off backlight timeout */
     rb->backlight_set_timeout(1);
 
     rb->show_logo();
@@ -42,16 +43,19 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_double_height(false);
 #endif
 
+    /* Show the logo for about 1.5 secs allowing the user to stop */
     for (j = 0; j < 15; j++) {
         rb->sleep((HZ*2)/10);
 
         btn = rb->button_get(false);
         if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
-            return PLUGIN_OK;
+            goto EndOfProc;
     }
 
     roll_credits();
 
+EndOfProc:
+    /* Restore the values we've changed */
     rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
 
     return PLUGIN_OK;
