@@ -102,7 +102,8 @@ static void int2le(unsigned int val, unsigned char* addr)
     addr[3] = (val >> 24) & 0xff;
 }
 
-int mi4_encode(char *iname, char *oname, int version, int magic)
+int mi4_encode(char *iname, char *oname, int version, int magic,
+                char *model, char *type)
 {
     size_t len;
     int length;
@@ -150,7 +151,10 @@ int mi4_encode(char *iname, char *oname, int version, int magic)
     int2le(length+4,     &outbuf[0x2e8]);   /* length plus 0xaa55aa55 */
 
     int2le(0xaa55aa55,   &outbuf[0x200+length]);  /* More Magic */
-
+    
+    strncpy((char *)outbuf+0x1f8, type, 4);    /* type of binary - RBBL, RBOS, ... */
+    strncpy((char *)outbuf+0x1fc, model, 4);    /* type of binary - RBBL, RBOS, ... */
+    
     /* Calculate CRC32 checksum */
     chksum_crc32gentab ();
     crc = chksum_crc32 (outbuf+28,mi4length-28);

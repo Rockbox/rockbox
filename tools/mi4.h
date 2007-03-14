@@ -23,6 +23,7 @@
 #define MI4_MAGIC_DEFAULT 0xec
 #define MI4_MAGIC_R       0xfc
 
-int mi4_encode(char *iname, char *oname, int version, int magic);
+int mi4_encode(char *iname, char *oname, int version, int magic,
+                char *model, char *type);
 
 #endif

@@ -89,6 +89,10 @@ void usage(void)
            "\t-mi4v2  PortalPlayer .mi4 format (revision 010201)\n"
            "\t-mi4v3  PortalPlayer .mi4 format (revision 010301)\n"
            "\t-mi4r   Sandisk Rhapsody .mi4 format\n"
+           "\t        All mi4 options take two optional arguments:\n"
+           "\t        -model=XXXX   where XXXX is the model id string\n"
+           "\t        -type=XXXX    where XXXX is a string indicating the \n"
+           "\t                      type of binary, eg. RBOS, RBBL\n"
            "\t-add=X  Rockbox generic \"add-up\" checksum format\n"
            "\t        (X values: h100, h120, h140, h300, ipco, nano, ipvd, mn2g\n"
            "\t                   ip3g, ip4g, mini, iax5, h10, h10_5gb, tpj2, e200)\n"
@@ -266,20 +270,45 @@ int main (int argc, char** argv)
         oname = argv[3];
         return ipod_encode(iname, oname, 3, true);  /* Firmware image v3 */
     }
-    else if(!strcmp(argv[1], "-mi4v2")) {
+    else if(!strncmp(argv[1], "-mi4", 4)) {
+        int mi4magic;
+        int version;
+        char model[4] = "";
+        char type[4] = "";
+        
+        if(!strcmp(&argv[1][4], "v2")) {
+            mi4magic = MI4_MAGIC_DEFAULT;
+            version = 0x00010201;
+        }
+        else if(!strcmp(&argv[1][4], "v3")) {
+            mi4magic = MI4_MAGIC_DEFAULT;
+            version = 0x00010301;
+        }
+        else if(!strcmp(&argv[1][4], "r")) {
+            mi4magic = MI4_MAGIC_R;
+            version = 0x00010301;
+        }
+        else {
+            printf( "Invalid mi4 version: %s\n", &argv[1][4]);
+            return -1;
+        }
+
         iname = argv[2];
         oname = argv[3];
-        return mi4_encode(iname, oname, 0x00010201, MI4_MAGIC_DEFAULT);
-    }
-    else if(!strcmp(argv[1], "-mi4v3")) {
-        iname = argv[2];
-        oname = argv[3];
-        return mi4_encode(iname, oname, 0x00010301, MI4_MAGIC_DEFAULT);
-    }
-    else if(!strcmp(argv[1], "-mi4r")) {
-        iname = argv[2];
-        oname = argv[3];
-        return mi4_encode(iname, oname, 0x00010301, MI4_MAGIC_R);
+        
+        if(!strncmp(argv[2], "-model=", 7)) {
+            iname = argv[3];
+            oname = argv[4];
+            strncpy(model, &argv[2][7], 4);
+            
+            if(!strncmp(argv[3], "-type=", 6)) {
+                iname = argv[4];
+                oname = argv[5];
+                strncpy(type, &argv[3][6], 4);
+            }
+        }
+
+        return mi4_encode(iname, oname, version, mi4magic, model, type);
     }
     
     /* open file */
