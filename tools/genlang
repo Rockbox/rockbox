@@ -7,7 +7,7 @@
 #                     \/            \/     \/    \/            \/
 # $Id$
 #
-# Copyright (C) 2006 by Daniel Stenberg
+# Copyright (C) 2006 - 2007 by Daniel Stenberg
 #
 
 # binary version for the binary lang file
@@ -118,7 +118,7 @@ sub match {
     $pattern =~ s/\*/.?*/g;
     $pattern =~ s/\?/./g;
 
-    return ($string =~ $pattern);
+    return ($string =~ /^$pattern\z/);
 }
 
 sub blank {
