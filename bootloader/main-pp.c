@@ -68,7 +68,7 @@ void* main(void)
     btn = button_read_device();
 
     /* Enable bootloader messages */
-    if (btn==BOOTLOADER_VERBOSE)
+    if (btn & BOOTLOADER_VERBOSE)
             verbose = true;
 
     lcd_setfont(FONT_SYSFIXED);
@@ -103,7 +103,7 @@ void* main(void)
     pinfo = disk_partinfo(0);
     printf("Partition 0: 0x%02x %ld MB", pinfo->type, pinfo->size / 2048);
 
-    if(btn==BOOTLOADER_BOOT_OF)
+    if(btn & BOOTLOADER_BOOT_OF)
     {
         /* Load original mi4 firmware. This expects a file called 
            "/System/OF.bin" on the player. It should be a mi4 firmware decrypted 
