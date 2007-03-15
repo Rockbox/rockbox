@@ -706,7 +706,7 @@ int menu_show(int m)
                  MENU_ITEM_COUNT(menus[m].count);
     menu.value = m;
     menu.menu_get_name_and_icon = &menu_info;
-    return do_menu(&menu, &menus[m].current_selection) == MENU_ATTACHED_USB;
+    return do_menu(&menu, &menus[m].current_selection);
 }
 
 
