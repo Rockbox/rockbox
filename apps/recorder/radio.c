@@ -1442,7 +1442,6 @@ MENUITEM_FUNCTION(recscreen_item, ID2P(LANG_RECORDING_MENU),
 static int fm_recording_settings(void)
 {
     bool ret = recording_menu(true);
-
 #if CONFIG_CODEC != SWCODEC
     if (!ret)
     {
@@ -1503,7 +1502,7 @@ MAKE_MENU(radio_menu_items, ID2P(LANG_FM_MENU), NULL,
 /* main menu of the radio screen */
 static bool radio_menu(void)
 {
-    return (bool)do_menu(&radio_menu_items, NULL);
+    return do_menu(&radio_menu_items, NULL) == MENU_ATTACHED_USB;
 }
 
 #endif

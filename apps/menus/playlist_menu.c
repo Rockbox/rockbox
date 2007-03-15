@@ -82,5 +82,5 @@ MAKE_MENU(playlist_options, ID2P(LANG_PLAYLIST_MENU), NULL,
 
 bool playlist_menu(void)
 {
-    return do_menu(&playlist_options, NULL);
+    return do_menu(&playlist_options, NULL) == MENU_ATTACHED_USB;
 }

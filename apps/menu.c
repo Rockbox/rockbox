@@ -603,7 +603,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
 
 int main_menu(void)
 {
-    return do_menu(NULL, 0);
+    return do_menu(NULL, 0) == MENU_ATTACHED_USB;
 }
 
 /* wrappers for the old menu system to work with the new system */
@@ -706,7 +706,7 @@ int menu_show(int m)
                  MENU_ITEM_COUNT(menus[m].count);
     menu.value = m;
     menu.menu_get_name_and_icon = &menu_info;
-    return do_menu(&menu, &menus[m].current_selection);
+    return do_menu(&menu, &menus[m].current_selection) == MENU_ATTACHED_USB;
 }
 
 
