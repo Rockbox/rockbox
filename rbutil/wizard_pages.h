@@ -34,6 +34,8 @@ private:
 public:
     wxThemeImageDialog(wxWindow* parent,wxWindowID id,wxString title,wxBitmap bmp);
     void OnPaint(wxPaintEvent& WXUNUSED(event));
+    void SetImage(wxBitmap bmp);
+    void OnClose(wxCloseEvent& event);
 
 private:
     wxBitmap m_bitmap;
@@ -68,6 +70,7 @@ public:
    wxStaticText* m_desc;
    wxStaticText* m_size;
    wxCheckBox* m_InstallCheckBox;
+   wxThemeImageDialog* myImageDialog;
 
    wxArrayString m_Themes;
    wxArrayString m_Themes_path;

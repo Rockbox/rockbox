@@ -368,10 +368,11 @@ bool fwpatcher(int mode)
 {
     if(mode == BOOTLOADER_ADD)
     {
-        wxString md5sum_str,src,dest,err;
+		char md5sum_str[32];
+        wxString src,dest,err;
         int series,table_entry;
 
-        if (!FileMD5(gv->curfirmware, &md5sum_str)) {
+        if (!FileMD5(gv->curfirmware, md5sum_str)) {
         ERR_DIALOG(wxT("Could not open firmware"), wxT("Open Firmware"));
         return false;
        }
@@ -426,11 +427,11 @@ bool fwpatcher(int mode)
                 src.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "new.hex"),
                         gv->stdpaths->GetUserDataDir().c_str());
 
-                if(gv->curplat == "h100")
+                if(gv->curplat == wxT("h100"))
                     dest.Printf(wxT("%s" PATH_SEP "ihp_100.hex"),gv->curdestdir.c_str());
-                else if(gv->curplat == "h120")
+                else if(gv->curplat == wxT("h120"))
                     dest.Printf(wxT("%s" PATH_SEP "ihp_120.hex"),gv->curdestdir.c_str());
-                else if(gv->curplat == "h300")
+                else if(gv->curplat == wxT("h300"))
                 dest.Printf(wxT("%s" PATH_SEP "H300.hex"),gv->curdestdir.c_str());
 
                 if(!wxRenameFile(src,dest))

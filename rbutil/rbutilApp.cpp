@@ -53,8 +53,8 @@ bool rbutilFrmApp::OnInit()
         }
     }
 
-    buf += wxT(PATH_SEP "rbutil.log");
-    gv->logfile = new wxFFile(buf, "w");
+    buf += PATH_SEP wxT("rbutil.log");
+    gv->logfile = new wxFFile(buf, wxT("w"));
     if (! gv->logfile->IsOpened() )
         wxLogFatalError(wxT("Unable to open log file"));
 

@@ -170,11 +170,11 @@ bool mkboot(wxString infile, wxString outfile,wxString bootloader,int origin)
 /* end mkboot.c excerpt */
 
 
-int intable(wxString md5, struct sumpairs *table, int len)
+int intable(char *md5, struct sumpairs *table, int len)
 {
     int i;
     for (i = 0; i < len; i++) {
-        if (md5.Cmp(table[i].unpatched) == 0) {
+        if (strncmp(md5, table[i].unpatched, 32) == 0) {
             return i;
         }
     }
@@ -544,7 +544,7 @@ bool PatchFirmware(wxString firmware,wxString bootloader,int series, int table_e
 {
     wxString name1, name2, name3;
 
-    wxString md5sum_str;
+	char md5sum_str[32];
     int i;
     struct sumpairs *sums;
     int origin;
@@ -595,14 +595,14 @@ bool PatchFirmware(wxString firmware,wxString bootloader,int series, int table_e
         return false;
     }
     /* now md5sum it */
-    if (!FileMD5(name3, &md5sum_str)) {
+    if (!FileMD5(name3, md5sum_str)) {
         ERR_DIALOG(wxT("Error in checksumming"),wxT("Checksumming Firmware"));
         wxRemoveFile(name1);
         wxRemoveFile(name2);
         wxRemoveFile(name3);
         return false;
     }
-    if (strncmp(sums[table_entry].patched, md5sum_str.c_str(), 32) == 0) {
+    if (strncmp(sums[table_entry].patched, md5sum_str, 32) == 0) {
         /* delete temp files */
         wxRemoveFile(name1);
         wxRemoveFile(name2);

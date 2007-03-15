@@ -488,14 +488,14 @@ int Uninstall(const wxString dir, bool isFullUninstall) {
             // If we're running on the device, let's not delete our own
             // installation, eh?
             if (gv->portable &&
-                FilesToRemove->Item(i).StartsWith(wxT(PATH_SEP
-                    "RockboxUtility")) )
+                FilesToRemove->Item(i).StartsWith(PATH_SEP
+                    wxT("RockboxUtility")) )
             {
                 continue;
             }
 
             wxString* buf2 = new wxString;
-            buf.Printf("%s%s", dir.c_str() , FilesToRemove->Item(i).c_str() );
+            buf.Printf(wxT("%s%s"), dir.c_str() , FilesToRemove->Item(i).c_str() );
             buf2->Format(wxT("Deleting %s"), buf.c_str());
 
             if (! progress->Update((i + 1) * 100 / totalfiles, *buf2) )

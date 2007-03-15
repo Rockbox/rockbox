@@ -57,7 +57,7 @@ enum striptype
 
 /* protos for iriver.c */
 
-int intable(wxString md5, struct sumpairs *table, int len);
+int intable(char *md5, struct sumpairs *table, int len);
 
 bool PatchFirmware(wxString firmware,wxString bootloader,int series, int table_entry);
 

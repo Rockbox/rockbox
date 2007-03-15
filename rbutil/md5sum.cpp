@@ -268,20 +268,19 @@ void md5_finish( md5_context *ctx, uint8 digest[16] )
     PUT_UINT32( ctx->state[3], digest, 12 );
 }
 
-int FileMD5(wxString name,wxString *md5)
+int FileMD5(wxString name, char *md5)
 {
     int i, read;
     md5_context ctx;
     unsigned char md5sum[16];
     unsigned char block[32768];
 
-    char temp[255];
     wxFile file;
 
     file.Open(name);
 
     if (!file.IsOpened()) {
-        ERR_DIALOG("Could not open patched firmware for checksum check", _("Open Firmware"));
+        ERR_DIALOG(wxT("Could not open patched firmware for checksum check"), wxT("Open Firmware"));
         return 0;
     }
     md5_starts(&ctx);
@@ -293,8 +292,7 @@ int FileMD5(wxString name,wxString *md5)
     md5_finish(&ctx, md5sum);
     for (i = 0; i < 16; ++i)
     {
-        sprintf(temp + 2*i, "%02x", md5sum[i]);
+        sprintf(md5 + 2*i, "%02x", md5sum[i]);
     }
-    md5->Append(temp);
     return 1;
 }

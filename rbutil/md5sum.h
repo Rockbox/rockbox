@@ -46,6 +46,6 @@ void md5_starts( md5_context *ctx );
 void md5_update( md5_context *ctx, uint8 *input, uint32 length );
 void md5_finish( md5_context *ctx, uint8 digest[16] );
 
-int FileMD5(wxString name,wxString *md5);
+int FileMD5(wxString name, char *md5);
 
 #endif // MD5SUM_H_INCLUDED

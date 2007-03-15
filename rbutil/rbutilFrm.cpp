@@ -271,7 +271,7 @@ void rbutilFrm::OnFileWipeCache(wxCommandEvent& event)
     wxString cacheloc, datadir;
 
     datadir = gv->stdpaths->GetUserDataDir();
-    if (datadir == "")
+    if (datadir == wxT(""))
     {
         ERR_DIALOG(wxT("Can't locate user data directory.  Unable to delete "
             "cache."), wxT("Delete download cache.") );
@@ -284,7 +284,7 @@ void rbutilFrm::OnFileWipeCache(wxCommandEvent& event)
     if (! rm_rf(cacheloc) )
     {
         wxMessageDialog* msg = new wxMessageDialog(this, wxT("Local download cache has been deleted.")
-                            ,"Cache deletion", wxOK |wxICON_INFORMATION);
+                            , wxT("Cache deletion"), wxOK |wxICON_INFORMATION);
         msg->ShowModal();
         delete msg;
     }
@@ -542,7 +542,7 @@ void rbutilFrm::OnInstallBtn(wxCommandEvent& event)
                 if (DownloadURL(gv->server_conf_url, dest)) {
                     WARN_DIALOG(wxT("Unable to download build status."),
                     wxT("Install"));
-                    buf = "";
+                    buf = wxT("");
                 } else
                 {
                     buildinfo = new wxFileConfig(wxEmptyString,
@@ -557,7 +557,7 @@ void rbutilFrm::OnInstallBtn(wxCommandEvent& event)
                     }
                 }
 
-                if (buf == "") {
+                if (buf == wxT("")) {
                     WARN_DIALOG(wxT("Can't get date of latest build from "
                         "server.  Using yesterday's date."), wxT("Install") );
                     date = wxDateTime::Now();
@@ -657,7 +657,7 @@ void rbutilFrm::OnFontBtn(wxCommandEvent& event)
         {
             WARN_DIALOG(wxT("Unable to download build status."),
                 wxT("Font Install"));
-                buf = "";
+                buf = wxT("");
         } else
         {
             buildinfo = new wxFileConfig(wxEmptyString,
@@ -668,11 +668,11 @@ void rbutilFrm::OnFontBtn(wxCommandEvent& event)
             if (buf.Len() != 8) {
                 dest.Printf(wxT("Invalid build date: %s"), buf.c_str());
                 WARN_DIALOG(dest, wxT("Font Install"));
-                buf = "";
+                buf = wxT("");
             }
         }
 
-        if (buf == "") {
+        if (buf == wxT("")) {
             WARN_DIALOG(wxT("Can't get date of latest build from "
                 "server.  Using yesterday's date."),
                 wxT("Font Install") );
@@ -880,7 +880,7 @@ AboutDlg::AboutDlg(rbutilFrm* parent)
         wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY);
 
     long i = 0;
-    while ( rbutil_developers[i] != "")
+    while ( rbutil_developers[i] != wxT(""))
     {
         WxTextCtrl1->AppendText(rbutil_developers[i++]);
         WxTextCtrl1->AppendText(wxT("\n"));

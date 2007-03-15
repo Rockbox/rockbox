@@ -145,6 +145,7 @@ bool wxPlatformPage::TransferDataFromWindow()
 //////////////// ThemeImage Dialog /////////////////
 BEGIN_EVENT_TABLE(wxThemeImageDialog,wxDialog)
    EVT_PAINT(wxThemeImageDialog::OnPaint)
+   EVT_CLOSE(wxThemeImageDialog::OnClose)
 END_EVENT_TABLE();
 wxThemeImageDialog::wxThemeImageDialog(wxWindow* parent,wxWindowID id,wxString title,wxBitmap bmp)  :
    wxDialog(parent, id, title)
@@ -152,13 +153,28 @@ wxThemeImageDialog::wxThemeImageDialog(wxWindow* parent,wxWindowID id,wxString t
     wxBoxSizer *sizerTop = new wxBoxSizer(wxHORIZONTAL);
     m_bitmap = bmp;
 
-    sizerTop->SetMinSize(m_bitmap.GetWidth(),m_bitmap.GetHeight());
+    sizerTop->SetMinSize(64,64);
 
     SetSizer(sizerTop);
 
     sizerTop->SetSizeHints(this);
     sizerTop->Fit(this);
 
+}
+
+void wxThemeImageDialog::OnClose(wxCloseEvent& event)
+{
+    event.Veto();
+    this->Show(false);
+}
+
+void wxThemeImageDialog::SetImage(wxBitmap bmp)
+{
+    m_bitmap = bmp;
+    this->GetSizer()->SetMinSize(m_bitmap.GetWidth(),m_bitmap.GetHeight());
+    this->GetSizer()->Fit(this);
+    Layout();
+    Refresh();
 }
 
 void wxThemeImageDialog::OnPaint(wxPaintEvent& WXUNUSED(event))
@@ -179,6 +195,10 @@ END_EVENT_TABLE();
 wxThemesPage::wxThemesPage(wxWizard *parent) : wxWizardPageSimple(parent)
 {
     m_parent = parent;
+
+    myImageDialog = new wxThemeImageDialog(this,wxID_ANY,wxT("Preview"),NULL);
+    myImageDialog->Show(false);
+
     wxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
 
     wxStaticText* WxStaticText1 = new wxStaticText(this, wxID_ANY,
@@ -189,7 +209,7 @@ wxThemesPage::wxThemesPage(wxWizard *parent) : wxWizardPageSimple(parent)
     // create theme listbox
     wxArrayString list;
     for(int i = 0; i< 35;i++)
-        list.Add("");
+        list.Add(wxT(""));
     ThemesListBox= new wxListBox(this, ID_LISTBOX, wxDefaultPosition,
         wxDefaultSize,list, wxLB_SINGLE);
     mainSizer->Add(ThemesListBox,10,wxGROW | wxALL,5);
@@ -289,6 +309,35 @@ void wxThemesPage::OnListBox(wxCommandEvent& event)
 
     this->GetSizer()->Layout();
 
+    if(myImageDialog->IsShown())
+    {
+        wxString src,dest;
+
+        int pos = m_Themes_image[index].Find('/',true);
+        wxString filename = m_Themes_image[index](pos+1,m_Themes_image[index].Length());
+
+        dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s"),
+                gv->stdpaths->GetUserDataDir().c_str(),gv->curresolution.c_str());
+
+        if(!wxDirExists(dest))
+            wxMkdir(dest);
+
+        //this is a URL no PATH_SEP
+        src.Printf("%s/data/%s/%s",gv->themes_url.c_str(),gv->curresolution.c_str(),filename.c_str());
+        dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s" PATH_SEP "%s"),
+            gv->stdpaths->GetUserDataDir().c_str(),gv->curresolution.c_str(),filename.c_str());
+
+        if(DownloadURL(src, dest))
+        {
+            MESG_DIALOG(wxT("Unable to download image."));
+            return;
+        }
+
+        wxBitmap bmp;
+        bmp.LoadFile(dest,wxBITMAP_TYPE_PNG);
+        myImageDialog->SetImage(bmp);
+    }
+
 }
 
 void wxThemesPage::OnPreviewBtn(wxCommandEvent& event)
@@ -310,7 +359,7 @@ void wxThemesPage::OnPreviewBtn(wxCommandEvent& event)
         wxMkdir(dest);
 
     //this is a URL no PATH_SEP
-    src.Printf("%s/data/%s/%s",gv->themes_url.c_str(),gv->curresolution.c_str(),filename.c_str());
+    src.Printf(wxT("%s/data/%s/%s"),gv->themes_url.c_str(),gv->curresolution.c_str(),filename.c_str());
     dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s" PATH_SEP "%s"),
         gv->stdpaths->GetUserDataDir().c_str(),gv->curresolution.c_str(),filename.c_str());
 
@@ -323,8 +372,9 @@ void wxThemesPage::OnPreviewBtn(wxCommandEvent& event)
     wxBitmap bmp;
     bmp.LoadFile(dest,wxBITMAP_TYPE_PNG);
 
-    wxThemeImageDialog dlg(this,wxID_ANY,wxT("Preview"),bmp);
-    dlg.ShowModal();
+    myImageDialog->SetImage(bmp);
+
+    myImageDialog->Show(true);
 
 }
 
@@ -344,7 +394,7 @@ void wxThemesPage::OnPageShown(wxWizardEvent& event)
     //get correct Themes list
     wxString src,dest,err;
 
-    src.Printf("%srbutil.php?res=%s",gv->themes_url.c_str(),gv->curresolution.c_str());
+    src.Printf(wxT("%srbutil.php?res=%s"),gv->themes_url.c_str(),gv->curresolution.c_str());
     dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s.list"),
         gv->stdpaths->GetUserDataDir().c_str(),gv->curresolution.c_str());
 
@@ -419,7 +469,7 @@ wxIpodLocationPage::wxIpodLocationPage(wxWizard* parent) : wxWizardPageSimple(pa
    	WxBoxSizer1->Add(WxBoxSizer3,0,
         wxGROW | wxALIGN_CENTER_VERTICAL | wxALL, 5);
 
-  	IpodLocationText = new wxStaticText(this, wxID_ANY, "",
+  	IpodLocationText = new wxStaticText(this, wxID_ANY, wxT(""),
         wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
     WxBoxSizer3->Add(IpodLocationText,1,
         wxGROW | wxALIGN_CENTER_VERTICAL | wxALL, 5);
@@ -477,8 +527,8 @@ void wxIpodLocationPage::OnIpodLocationBtn(wxCommandEvent& event)
     else if( n==1)
     {
       gv->curbootloader=wxT("bootloader-");
-      gv->curbootloader.Append(ipod.targetname);
-      IpodLocationText->SetLabel(ipod.modelstr);
+      gv->curbootloader.Append(wxString(ipod.targetname, wxConvUTF8));
+      IpodLocationText->SetLabel(wxString(ipod.modelstr, wxConvUTF8));
     }
     else
       IpodLocationText->SetLabel(wxT("More than 1 Ipod found"));
@@ -571,7 +621,7 @@ void wxBootLocationPage::OnPageShown(wxWizardEvent& event)
    }
    else
    {
-      BootLocationInfo->SetLabel("");
+      BootLocationInfo->SetLabel(wxT(""));
    }
 
 }
@@ -667,7 +717,7 @@ void wxFirmwareLocationPage::OnWizardPageChanging(wxWizardEvent& event)
 void wxFirmwareLocationPage::OnFirmwareFilenameBtn(wxCommandEvent& event)
 {
      wxString temp = wxFileSelector(
-        wxT("Please select the location of the original Firmware"), gv->curdestdir,"","","*.hex");
+        wxT("Please select the location of the original Firmware"), gv->curdestdir,wxT(""),wxT(""),wxT("*.hex"));
        wxLogVerbose(wxT("=== begin wxFirmwareLocationPage::OnFirmwareFilenameBtn(event)"));
        if (!temp.empty())
        {
@@ -675,7 +725,7 @@ void wxFirmwareLocationPage::OnFirmwareFilenameBtn(wxCommandEvent& event)
            if(temp.Length() > 30)
            {
                 temp.Remove(0, temp.Length()-30);
-                temp.Prepend("...");
+                temp.Prepend(wxT("..."));
            }
            FirmwareLocationFilename->SetLabel(temp);
        }
@@ -737,7 +787,7 @@ void wxLocationPage::OnPageShown(wxWizardEvent& event)
    }
    else
    {
-      LocationInfo->SetLabel("");
+      LocationInfo->SetLabel(wxT(""));
    }
 
 

@@ -38,9 +38,9 @@ InstallLog::InstallLog(wxString logname, bool CreateLog)
         return;
     }
 
-    logfile->SetPath("/InstallLog");
-    if (logfile->Exists("Version") &&
-        logfile->Read("Version", 0l) != LOGFILE_VERSION )
+    logfile->SetPath(wxT("/InstallLog"));
+    if (logfile->Exists(wxT("Version")) &&
+        logfile->Read(wxT("Version"), 0l) != LOGFILE_VERSION )
     {
         buf.Printf(_("Logfile version mismatch: %s"), logname.c_str() );
         wxLogWarning(buf);
@@ -48,7 +48,7 @@ InstallLog::InstallLog(wxString logname, bool CreateLog)
         return;
     }
 
-    logfile->Write("Version", LOGFILE_VERSION);
+    logfile->Write(wxT("Version"), LOGFILE_VERSION);
     dirtyflag = false;
 }
 
@@ -105,12 +105,12 @@ unsigned int InstallLog::WriteFile(wxArrayString filepaths)
 
 wxArrayString* InstallLog::GetInstalledFiles()
 {
-    wxString curdir = "";
+    wxString curdir = wxT("");
 
     if (dirtyflag) return NULL;
     workingAS.Clear();
 
-    EnumerateCurDir("");
+    EnumerateCurDir(wxT(""));
 
     wxArrayString* out = new wxArrayString(workingAS);
     return out;
@@ -129,8 +129,8 @@ void InstallLog::EnumerateCurDir(wxString curdir)
     contflag = logfile->GetFirstGroup(curname, dummy);
     while (contflag)
     {
-        buf.Printf("%s/%s", curdir.c_str(), curname.c_str() );
-        buf2 = buf; buf2.Replace(wxT("/"), wxT(PATH_SEP));
+        buf.Printf(wxT("%s/%s"), curdir.c_str(), curname.c_str() );
+        buf2 = buf; buf2.Replace(wxT("/"), PATH_SEP);
         workingAS.Add(buf2);
         EnumerateCurDir(buf);
         contflag = logfile->GetNextGroup(curname, dummy);
@@ -141,8 +141,8 @@ void InstallLog::EnumerateCurDir(wxString curdir)
     {
         if (curname != wxT(DIRECTORY_KLUDGE) )
         {
-            buf.Printf("%s/%s", curdir.c_str(), curname.c_str() );
-            buf2 = buf; buf2.Replace(wxT("/"), wxT(PATH_SEP));
+            buf.Printf(wxT("%s/%s"), curdir.c_str(), curname.c_str() );
+            buf2 = buf; buf2.Replace(wxT("/"), PATH_SEP);
             workingAS.Add(buf2);
         }
         contflag = logfile->GetNextEntry(curname, dummy);
