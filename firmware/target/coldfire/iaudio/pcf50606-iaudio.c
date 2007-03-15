@@ -31,7 +31,11 @@ static void set_voltages(void)
     {
         0xf4,   /* IOREGC = 2.9V, ON in all states */
         0xf0,   /* D1REGC = 2.5V, ON in all states */
+#ifdef IAUDIO_M5
+        0xf8,   /* D2REGC = 3.3V, ON in all states */
+#else
         0xf6,   /* D2REGC = 3.1V, ON in all states */
+#endif
         0xf4,   /* D3REGC = 2.9V, ON in all states */
     };
 
