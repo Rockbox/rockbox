@@ -152,12 +152,12 @@ int mi4_encode(char *iname, char *oname, int version, int magic,
 
     int2le(0xaa55aa55,   &outbuf[0x200+length]);  /* More Magic */
     
-    strncpy((char *)outbuf+0x1f8, type, 4);    /* type of binary - RBBL, RBOS, ... */
-    strncpy((char *)outbuf+0x1fc, model, 4);    /* type of binary - RBBL, RBOS, ... */
+    strncpy((char *)outbuf+0x1f8, type, 4);  /* type of binary (RBBL, RBOS) */
+    strncpy((char *)outbuf+0x1fc, model, 4); /* 4 character model id */
     
     /* Calculate CRC32 checksum */
     chksum_crc32gentab ();
-    crc = chksum_crc32 (outbuf+28,mi4length-28);
+    crc = chksum_crc32 (outbuf+0x200,mi4length-0x200);
 
     strncpy((char *)outbuf, "PPOS", 4);     /* Magic */
     int2le(version,      &outbuf[0x04]);    /* .mi4 version */
