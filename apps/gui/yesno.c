@@ -1,3 +1,22 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id $
+ *
+ * Copyright (C) 2005 by Kevin Ferrare
+ *
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
 #include "yesno.h"
 #include "system.h"
 #include "kernel.h"
@@ -5,7 +24,14 @@
 #include "lang.h"
 #include "action.h"
 
-void gui_yesno_init(struct gui_yesno * yn,
+/*
+ * Initializes the yesno asker
+ *  - yn : the yesno structure
+ *  - main_message : the question the user has to answer
+ *  - yes_message : message displayed if answer is 'yes'
+ *  - no_message : message displayed if answer is 'no'
+ */
+static void gui_yesno_init(struct gui_yesno * yn,
                     struct text_message * main_message,
                     struct text_message * yes_message,
                     struct text_message * no_message)
@@ -16,13 +42,22 @@ void gui_yesno_init(struct gui_yesno * yn,
     yn->display=0;
 }
 
-void gui_yesno_set_display(struct gui_yesno * yn,
+/*
+ * Attach the yesno to a screen
+ *  - yn : the yesno structure
+ *  - display : the screen to attach
+ */
+static void gui_yesno_set_display(struct gui_yesno * yn,
                            struct screen * display)
 {
     yn->display=display;
 }
 
-void gui_yesno_draw(struct gui_yesno * yn)
+/*
+ * Draws the yesno
+ *  - yn : the yesno structure
+ */
+static void gui_yesno_draw(struct gui_yesno * yn)
 {
     struct screen * display=yn->display;
     int nb_lines, line_shift=0;
@@ -45,7 +80,14 @@ void gui_yesno_draw(struct gui_yesno * yn)
     gui_textarea_update(display);
 }
 
-bool gui_yesno_draw_result(struct gui_yesno * yn, enum yesno_res result)
+/*
+ * Draws the yesno result
+ *  - yn : the yesno structure
+ *  - result : the result tha must be displayed :
+ *    YESNO_NO if no
+ *    YESNO_YES if yes
+ */
+static bool gui_yesno_draw_result(struct gui_yesno * yn, enum yesno_res result)
 {
     struct text_message * message=yn->result_message[result];
     if(message==NULL)
