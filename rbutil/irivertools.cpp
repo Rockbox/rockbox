@@ -279,7 +279,7 @@ int iriver_decode(wxString infile_name, wxString outfile_name, unsigned int modi
     {
         ERR_DIALOG( wxT( "This doesn't look like a valid encrypted "
                  "iHP firmware - reason: file 'length' data\n" ),wxT("iriver_decode"));
-		infile.Close();
+        infile.Close();
         outfile.Close();
         return -1;
     };
@@ -341,7 +341,7 @@ int iriver_decode(wxString infile_name, wxString outfile_name, unsigned int modi
     {
         ERR_DIALOG( wxT(  "This doesn't look like a valid encrypted "
                  "iHP firmware - reason: 'length2' mismatch\n" ),wxT("iriver_decode"));
-		infile.Close();
+        infile.Close();
         outfile.Close();
         return -1;
     };
@@ -358,7 +358,7 @@ int iriver_decode(wxString infile_name, wxString outfile_name, unsigned int modi
         {
             ERR_DIALOG( wxT(  "This doesn't look like a valid encrypted "
                      "iHP firmware - reason: Checksum mismatch!" ),wxT("iriver_decode"));
-			infile.Close();
+            infile.Close();
             outfile.Close();
             return -1;
         };
@@ -369,7 +369,7 @@ int iriver_decode(wxString infile_name, wxString outfile_name, unsigned int modi
     {
         ERR_DIALOG(wxT(  "This doesn't look like a valid encrypted "
                  "iHP firmware - reason: 'length3' mismatch\n" ),wxT("iriver_decode"));
-		infile.Close();
+        infile.Close();
         outfile.Close();
         return -1;
     };
@@ -393,7 +393,7 @@ int iriver_decode(wxString infile_name, wxString outfile_name, unsigned int modi
             break;
     };
 
-	infile.Close();
+    infile.Close();
     outfile.Close();
     return 0;
 
@@ -534,7 +534,7 @@ int iriver_encode(wxString infile_name, wxString outfile_name, unsigned int modi
 
     fprintf( stderr, "File encoded successfully and checksum table built!\n" );
 
-	infile.Close();
+    infile.Close();
     outfile.Close();
     return 0;
 
@@ -544,7 +544,7 @@ bool PatchFirmware(wxString firmware,wxString bootloader,int series, int table_e
 {
     wxString name1, name2, name3;
 
-	char md5sum_str[32];
+    char md5sum_str[32];
     int i;
     struct sumpairs *sums;
     int origin;
