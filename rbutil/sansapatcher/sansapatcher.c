@@ -623,6 +623,11 @@ int add_bootloader(struct sansa_t* sansa, char* filename, int type)
                           ,bl_length,n);
             return -1;
         }
+
+        if (memcmp(sectorbuf+0x200+0x1f8,"RBBL",4)!=0) {
+            fprintf(stderr,"[ERR]  Not a Rockbox bootloader, aborting.\n");
+            return -1;
+        }
     } else {
         memcpy(sectorbuf+0x200,bootimg,LEN_bootimg);
     }
