@@ -5,9 +5,7 @@
 \subsection{\label{ref:GettingExtras}Getting Extras}
 \opt{HAVE_LCD_BITMAP}{
 Rockbox supports custom fonts. A collection of fonts is available for download
-in the font package at \url{http://www.rockbox.org/daily.shtml}}. Support for a
-number of languages is included with Rockbox, and the latest \fname{.lng} files
-are always included in the different Rockbox builds.
+in the font package at \url{http://www.rockbox.org/daily.shtml}}.
 
 \opt{HAVE_LCD_BITMAP}{
   \subsection{\label{ref:Loadingfonts}Loading Fonts}\index{Fonts}
@@ -16,8 +14,8 @@ are always included in the different Rockbox builds.
   be loaded automatically every time you start up, it must be located in the
   \fname{/.rockbox/fonts} folder and the filename must be at most 24 characters
   long. You can browse the fonts in \fname{/.rockbox/fonts} under
-  \setting{General Settings $\rightarrow$ Display $\rightarrow$ Browse Fonts}
-  in the \setting{Main Menu}.
+  \setting{Settings $\rightarrow$ General Settings $\rightarrow$ Display
+  $\rightarrow$ Browse Fonts} in the \setting{Main Menu}.
   \warn{Advanced Users Only: Any BDF font file up to 16 pixels high should
     be usable with Rockbox. To convert from \fname{.bdf} to \fname{.fnt}, use
     the \fname{convbdf} tool. This tool can be found in the \fname{tools}
@@ -28,8 +26,8 @@ are always included in the different Rockbox builds.
 \index{Language files}%
 Rockbox can load language files at runtime. Simply copy the \fname{.lng} file 
 \emph{(do not use the .lang file)} to the \dap\ and ``play'' it in the 
-Rockbox directory browser or select \setting{General Settings $\rightarrow$ 
-Languages }from the Main Menu.
+Rockbox directory browser or select \setting{Settings $\rightarrow$
+General Settings $\rightarrow$ Languages }from the \setting{Main Menu}.
 
 \note{If you want a language to be loaded automatically every time you start 
 up, it must be located in the \fname{/.rockbox/langs} folder and the filename
@@ -38,6 +36,16 @@ must be a maximum of 24 characters long.}
 If your language is not yet supported and you want to write your own language
 file find the instructions on the Rockbox website:
 \wikilink{LangFiles}
+
+\opt{HAVE_LCD_COLOR}{
+  \subsection{Changing Colours}
+  The colours used in the Rockbox interface can be changed to any combination
+  of background and foreground colour you like. To do this go to the
+  \setting{Settings $\rightarrow$ General Settings $\rightarrow$ Display}
+  and select \setting{Background Colour} or \setting{Foreground Colour}.
+  The colours set here are used in all menus, browsers and in the
+  \setting{While Playing Screen}.
+}
 
 \nopt{archos}{%
   \subsection{\label{ref:LoadingBackdrops}Loading Backdrops}
