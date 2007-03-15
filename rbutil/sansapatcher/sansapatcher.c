@@ -539,7 +539,6 @@ int load_original_firmware(struct sansa_t* sansa, unsigned char* buf, struct mi4
         }
 
         if (key_found) {
-printf("Key found - %d\n",i);
             memcpy(buf+(mi4header->plaintext+0x200),tmpbuf,mi4header->mi4size-(mi4header->plaintext+0x200));
             free(tmpbuf);
         } else {
@@ -593,14 +592,18 @@ int add_bootloader(struct sansa_t* sansa, char* filename, int type)
     int n;
     int length;
 
-    /* Step 1 - read bootloader into RAM. */
-    infile=open(filename,O_RDONLY|O_BINARY);
-    if (infile < 0) {
-        fprintf(stderr,"[ERR]  Couldn't open input file %s\n",filename);
-        return -1;
-    }
+    if (type==FILETYPE_MI4) {
+        /* Step 1 - read bootloader into RAM. */
+        infile=open(filename,O_RDONLY|O_BINARY);
+        if (infile < 0) {
+            fprintf(stderr,"[ERR]  Couldn't open input file %s\n",filename);
+            return -1;
+        }
 
-    bl_length = filesize(infile);
+        bl_length = filesize(infile);
+    } else {
+        bl_length = LEN_bootimg;
+    }
 
     /* Create PPMI header */
     memset(sectorbuf,0,0x200);
@@ -608,12 +611,16 @@ int add_bootloader(struct sansa_t* sansa, char* filename, int type)
     int2le(bl_length,   sectorbuf+4);
     int2le(0x00020000,  sectorbuf+8);
 
-    /* Read bootloader into sectorbuf+0x200 */
-    n = read(infile,sectorbuf+0x200,bl_length);
-    if (n < bl_length) {
-        fprintf(stderr,"[ERR]  Short read - requested %d bytes, received %d\n"
-                      ,bl_length,n);
-        return -1;
+    if (type==FILETYPE_MI4) {
+        /* Read bootloader into sectorbuf+0x200 */
+        n = read(infile,sectorbuf+0x200,bl_length);
+        if (n < bl_length) {
+            fprintf(stderr,"[ERR]  Short read - requested %d bytes, received %d\n"
+                          ,bl_length,n);
+            return -1;
+        }
+    } else {
+        memcpy(sectorbuf+0x200,bootimg,LEN_bootimg);
     }
 
     /* Load original firmware from Sansa to the space after the bootloader */

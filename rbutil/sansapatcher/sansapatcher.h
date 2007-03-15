@@ -28,9 +28,7 @@
 extern unsigned char* sectorbuf;
 
 #define FILETYPE_MI4 0
-#ifdef WITH_BOOTOBJS
-  #define FILETYPE_INTERNAL 1
-#endif
+#define FILETYPE_INTERNAL 1
 
 char* get_parttype(int pt);
 int read_partinfo(struct sansa_t* sansa, int silent);

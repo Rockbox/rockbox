@@ -35,9 +35,7 @@ int verbose = 0;
 
 enum {
    NONE,
-#ifdef WITH_BOOTOBJS
    INSTALL,
-#endif
    INTERACTIVE,
    SHOW_INFO,
    LIST_IMAGES,
@@ -59,9 +57,7 @@ void print_usage(void)
 #endif
     fprintf(stderr,"\n");
     fprintf(stderr,"Where [action] is one of the following options:\n");
-#ifdef WITH_BOOTOBJS
     fprintf(stderr,"        --install\n");
-#endif
     fprintf(stderr,"  -l,   --list\n");
     fprintf(stderr,"  -rf,  --read-firmware      filename.mi4\n");
     fprintf(stderr,"  -a,   --add-bootloader     filename.mi4\n");
@@ -109,9 +105,7 @@ void display_partinfo(struct sansa_t* sansa)
 
 int main(int argc, char* argv[])
 {
-#ifdef WITH_BOOTOBJS
     char yesno[4];
-#endif
     int i;
     int n;
     char* filename;
@@ -167,33 +161,25 @@ int main(int argc, char* argv[])
         }
 
         if (n != 1) {
-#ifdef WITH_BOOTOBJS
             if (argc==1) {
                 printf("\nPress ENTER to exit sansapatcher :");
                 fgets(yesno,4,stdin);
             }
-#endif
             return 0;
         }
 
         i = 1;
     }
 
-#ifdef WITH_BOOTOBJS
     action = INTERACTIVE;
-#else
-    action = NONE;
-#endif
 
     while (i < argc) {
         if ((strcmp(argv[i],"-l")==0) || (strcmp(argv[i],"--list")==0)) {
             action = LIST_IMAGES;
             i++;
-#ifdef WITH_BOOTOBJS
         } else if (strcmp(argv[i],"--install")==0) {
             action = INSTALL;
             i++;
-#endif
         } else if ((strcmp(argv[i],"-d")==0) || 
                    (strcmp(argv[i],"--delete-bootloader")==0)) {
             action = DELETE_BOOTLOADER;
@@ -252,11 +238,48 @@ int main(int argc, char* argv[])
 
     if (action==LIST_IMAGES) {
         list_images(&sansa);
+    } else if (action==INTERACTIVE) {
+
+        printf("Enter i to install the Rockbox bootloader, u to uninstall\n or c to cancel and do nothing (i/u/c) :");
+
+        if (fgets(yesno,4,stdin)) {
+            if (yesno[0]=='i') {
+                if (sansa_reopen_rw(&sansa) < 0) {
+                    return 5;
+                }
+
+                if (add_bootloader(&sansa, NULL, FILETYPE_INTERNAL)==0) {
+                    fprintf(stderr,"[INFO] Bootloader installed successfully.\n");
+                } else {
+                    fprintf(stderr,"[ERR]  --install failed.\n");
+                }
+            } else if (yesno[0]=='u') {
+                if (sansa_reopen_rw(&sansa) < 0) {
+                    return 5;
+                }
+
+                if (delete_bootloader(&sansa)==0) {
+                    fprintf(stderr,"[INFO] Bootloader removed.\n");
+                } else {
+                    fprintf(stderr,"[ERR]  Bootloader removal failed.\n");
+                }
+            }
+        }
     } else if (action==READ_FIRMWARE) {
         if (read_firmware(&sansa, filename)==0) {
             fprintf(stderr,"[INFO] Firmware read to file %s.\n",filename);
         } else {
             fprintf(stderr,"[ERR]  --read-firmware failed.\n");
+        }
+    } else if (action==INSTALL) {
+        if (sansa_reopen_rw(&sansa) < 0) {
+            return 5;
+        }
+
+        if (add_bootloader(&sansa, NULL, FILETYPE_INTERNAL)==0) {
+            fprintf(stderr,"[INFO] Bootloader installed successfully.\n");
+        } else {
+            fprintf(stderr,"[ERR]  --install failed.\n");
         }
     } else if (action==ADD_BOOTLOADER) {
         if (sansa_reopen_rw(&sansa) < 0) {
@@ -282,12 +305,10 @@ int main(int argc, char* argv[])
 
     sansa_close(&sansa);
 
-#ifdef WITH_BOOTOBJS
     if (action==INTERACTIVE) {
         printf("Press ENTER to exit sansapatcher :");
         fgets(yesno,4,stdin);
     }
-#endif
 
     return 0;
 }

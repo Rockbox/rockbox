@@ -33,12 +33,11 @@ sansapatcher-ppc: main.c sansapatcher.c sansaio-posix.c parttypes.h bootimg.c
 	gcc -arch ppc $(CFLAGS) -o sansapatcher-ppc main.c sansapatcher.c sansaio-posix.c bootimg.c
 	strip sansapatcher-ppc
 
-#mi42c: mi42c.c
-#	$(NATIVECC) $(CFLAGS) -o mi42c mi42c.c
+bin2c: bin2c.c
+	$(NATIVECC) $(CFLAGS) -o bin2c bin2c.c
 
-#bootimg.c: PP5022.mi4 mi42c
-#	./mi42c PP5022.mi4 bootimg
+bootimg.c: PP5022.mi4 bin2c
+	./bin2c PP5022.mi4 bootimg
 
 clean:
-	rm -f sansapatcher.exe sansapatcher-mac sansapatcher-i386 sansapatcher-ppc sansapatcher mi42c *~ 
-#bootimg.c bootimg.h
+	rm -f sansapatcher.exe sansapatcher-mac sansapatcher-i386 sansapatcher-ppc sansapatcher bin2c bootimg.c bootimg.h *~
