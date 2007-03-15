@@ -1738,13 +1738,13 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Initialize now"
+    *: "Initialise now"
   </source>
   <dest>
-    *: "Initialize now"
+    *: "Initialise now"
   </dest>
   <voice>
-    *: "Initialize now"
+    *: "Initialise now"
   </voice>
 </phrase>
 <phrase>
@@ -1763,7 +1763,7 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE_INIT
-  desc: while initializing tagcache on boot
+  desc: while initialising tagcache on boot
   user:
   <source>
     *: "Committing database"
