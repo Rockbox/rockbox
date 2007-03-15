@@ -866,6 +866,7 @@
     x5: "SELECT = Yes"
     h10: "NEXT = Yes"
     gigabeat: "SELECT = Yes"
+    e200: "SELECT = Yes"
   </source>
   <dest>
     *: "PLAY = Yes"
