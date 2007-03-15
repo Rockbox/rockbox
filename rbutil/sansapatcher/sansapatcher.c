@@ -333,6 +333,10 @@ static int set_mi4header(unsigned char* buf,struct mi4header_t* mi4header)
     int2le(mi4header->mi4size   ,buf+0x14);
     int2le(mi4header->plaintext ,buf+0x18);
 
+    /* Add a dummy DSA signature */
+    memset(buf+0x1c,0,40);
+    buf[0x2f] = 1;
+
     return 0;
 }
 
