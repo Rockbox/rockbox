@@ -31,6 +31,8 @@ void power_off(void)
     byte = i2c_readbyte(0x46, 0x20);
     byte &= ~0x1;   
     pp_i2c_send(0x46, 0x20, byte);
+    
+    while(1); /* Wait for device to power off */
 }
 
 bool charger_inserted(void)
