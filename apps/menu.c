@@ -515,6 +515,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
             {
                 selected = gui_synclist_get_sel_pos(&lists);
                 menus[menu->value].current_selection = selected;
+                action_signalscreenchange();
                 return selected;
             }
             selected = get_menu_selection(gui_synclist_get_sel_pos(&lists), menu);
