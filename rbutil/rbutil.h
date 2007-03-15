@@ -137,10 +137,10 @@ bool rm_rf(wxString file);
 
 
 #define ERR_DIALOG(msg, title) \
-    wxLogError("%s: %s", ((wxString) title).c_str(), ((wxString) msg).c_str())
+    wxLogError(wxT("%s: %s"), ((wxString) title).c_str(), ((wxString) msg).c_str())
 
 #define WARN_DIALOG(msg, title) \
-    wxLogWarning("%s: %s", ((wxString) title).c_str(), ((wxString) msg).c_str())
+    wxLogWarning(wxT("%s: %s"), ((wxString) title).c_str(), ((wxString) msg).c_str())
 
 #define MESG_DIALOG(msg) \
    wxLogMessage(msg)

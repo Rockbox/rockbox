@@ -140,6 +140,7 @@ public:
 private:
     wxStaticText* BootLocationText;
     wxStaticText* BootLocationLabel;
+    wxStaticText* BootLocationInfo;
     wxButton* BootLocationBtn;
     wxWizardPage *my_prev;
 
@@ -193,9 +194,12 @@ public:
     virtual bool TransferDataFromWindow(void);
     void OnWizardPageChanging(wxWizardEvent& event);
    	void OnLocationBtn(wxCommandEvent& event);
+   	void OnPageShown(wxWizardEvent& event);
 
 private:
     wxStaticText* LocationText;
+    wxStaticText* BootLocationInfo;
+     wxStaticText* LocationInfo;
 };
 
 class wxBuildPage : public wxWizardPageSimple

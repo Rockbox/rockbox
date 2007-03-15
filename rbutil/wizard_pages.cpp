@@ -494,6 +494,7 @@ void wxIpodLocationPage::OnIpodLocationBtn(wxCommandEvent& event)
 BEGIN_EVENT_TABLE(wxBootLocationPage,wxWizardPageSimple)
 	EVT_BUTTON   (ID_BOOTLOCATION_BTN, wxBootLocationPage::OnBootLocationBtn)
 	EVT_WIZARD_PAGE_CHANGING(wxID_ANY, wxBootLocationPage::OnWizardPageChanging)
+	EVT_WIZARD_PAGE_CHANGED (wxID_ANY, wxBootLocationPage::OnPageShown)
 END_EVENT_TABLE();
 
 wxBootLocationPage::wxBootLocationPage(wxWizard* parent) : wxWizardPageSimple(parent)
@@ -525,6 +526,12 @@ wxBootLocationPage::wxBootLocationPage(wxWizard* parent) : wxWizardPageSimple(pa
    	BootLocationBtn->SetToolTip(wxT("Select the location of your audio device"));
    	WxBoxSizer3->Add(BootLocationBtn,0,wxALIGN_CENTER_VERTICAL | wxALL, 5);
 
+
+    BootLocationInfo = new wxStaticText(this, wxID_ANY, wxT(""),
+        wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
+    WxBoxSizer1->Add(BootLocationInfo,0,
+        wxGROW | wxALIGN_CENTER_VERTICAL | wxALL, 5);
+
    	SetSizer(WxBoxSizer1);
     WxBoxSizer1->Fit(this);
 }
@@ -548,6 +555,25 @@ wxWizardPage* wxBootLocationPage::GetNext() const
         return wxWizardPageSimple::GetNext();  // if ipod then this is not the last page
     }
     else return NULL;  // else this is the last page
+}
+
+void wxBootLocationPage::OnPageShown(wxWizardEvent& event)
+{
+   if(gv->curplat == wxT("h10") || gv->curplat == wxT("h10_5gb"))
+   {
+      BootLocationInfo->SetLabel(wxT("Your Device needs to be in UMS Mode. \n\n"
+                                     "If it is an MTP device, you can do this by \n"
+                                     "reseting you Device via the Pinhole,or disconnecting the Battery \n"
+                                     "then connecting it via the Data cable with the PC. \n"
+                                     "Then press and hold Next,push the Power button, and \n"
+                                     "continue to hold the Next button until the \n"
+                                     "USB-Connected Screen appears." ));
+   }
+   else
+   {
+      BootLocationInfo->SetLabel("");
+   }
+
 }
 
 void wxBootLocationPage::OnWizardPageChanging(wxWizardEvent& event)
@@ -659,6 +685,7 @@ void wxFirmwareLocationPage::OnFirmwareFilenameBtn(wxCommandEvent& event)
 BEGIN_EVENT_TABLE(wxLocationPage,wxWizardPageSimple)
 	EVT_BUTTON   (ID_LOCATION_BTN, wxLocationPage::OnLocationBtn)
 	EVT_WIZARD_PAGE_CHANGING(wxID_ANY, wxLocationPage::OnWizardPageChanging)
+	EVT_WIZARD_PAGE_CHANGED(wxID_ANY, wxLocationPage::OnPageShown)
 END_EVENT_TABLE();
 
 wxLocationPage::wxLocationPage(wxWizard* parent) : wxWizardPageSimple(parent)
@@ -687,10 +714,34 @@ wxLocationPage::wxLocationPage(wxWizard* parent) : wxWizardPageSimple(parent)
    	LocationBtn->SetToolTip(wxT("Select the location of your audio device"));
    	WxBoxSizer3->Add(LocationBtn,0,wxALIGN_CENTER_VERTICAL | wxALL, 5);
 
+   	LocationInfo = new wxStaticText(this, wxID_ANY, wxT(""),
+        wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
+    WxBoxSizer1->Add(LocationInfo,0,wxGROW | wxALL, 5);
+
    	SetSizer(WxBoxSizer1);
     WxBoxSizer1->Fit(this);
 }
 
+
+void wxLocationPage::OnPageShown(wxWizardEvent& event)
+{
+   if(gv->curplat == wxT("h10") || gv->curplat == wxT("h10_5gb"))
+   {
+      LocationInfo->SetLabel(wxT("Your Device needs to be in UMS Mode. \n\n"
+                                     "If it is an MTP device, you can do this by \n"
+                                     "reseting you Device via the Pinhole,or disconnecting the Battery \n"
+                                     "then connecting it via the Data cable with the PC. \n"
+                                     "Then press and hold Next,push the Power button, and \n"
+                                     "continue to hold the Next button until the \n"
+                                     "USB-Connected Screen appears." ));
+   }
+   else
+   {
+      LocationInfo->SetLabel("");
+   }
+
+
+}
 
 void wxLocationPage::OnWizardPageChanging(wxWizardEvent& event)
 {
