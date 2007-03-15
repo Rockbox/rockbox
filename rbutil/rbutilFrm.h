@@ -58,13 +58,13 @@ public:
 public:
 		wxMenuBar *WxMenuBar1;
 		wxStaticText *WxStaticText3;
-		wxStaticText *WxStaticText4;
 		wxBitmapButton *WxBitmapButton2;
 		wxStaticText *WxStaticText2;
 		wxBitmapButton *WxBitmapButton1;
 		wxBitmapButton *WxBitmapButton3;
 		wxBitmapButton *WxBitmapButton4;
 		wxBitmapButton *WxBitmapButton5;
+		wxBitmapButton *WxBitmapButton6;
 		wxFlexGridSizer *WxFlexGridSizer1;
 		wxStaticBoxSizer *WxStaticBoxSizer3;
 		wxStaticBitmap *WxStaticBitmap1;
@@ -87,6 +87,7 @@ public:
 			ID_INSTALL_BTN = 1028,
 			ID_WXSTATICBITMAP1 = 1053,
             ID_FONT_BTN = 1128,
+            ID_THEMES_BTN = 1139,
             ID_BOOTLOADER_BTN = 1129,
 			ID_WXPANEL1 = 1064,
 
@@ -102,6 +103,7 @@ public:
 	void OnInstallBtn(wxCommandEvent& event);
 	void OnRemoveBtn(wxCommandEvent& event);
 	void OnFontBtn(wxCommandEvent& event);
+	void OnThemesBtn(wxCommandEvent& event);
 	void OnBootloaderBtn(wxCommandEvent& event);
 	void OnPortableInstall(wxCommandEvent& event);
 	void OnBootloaderRemoveBtn(wxCommandEvent& event);

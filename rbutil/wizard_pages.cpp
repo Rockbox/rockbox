@@ -21,12 +21,17 @@
 #include "wizard_pages.h"
 #include "bootloaders.h"
 
+
+#include <wx/regex.h>
+#include <wx/tokenzr.h>
+
+/////// Bootplatform page ///////////////////////////////////77
 wxBootPlatformPage::wxBootPlatformPage(wxWizard *parent) : wxWizardPageSimple(parent)
 {
     wxBoxSizer* WxBoxSizer1 = new wxBoxSizer(wxVERTICAL);
 
     wxStaticText* WxStaticText1 = new wxStaticText(this, wxID_ANY,
-        _("Please select the model of audio device that you would like to"
+        wxT("Please select the model of audio device that you would like to"
         "\ninstall the Rockbox Bootloader on from the list below:"));
     WxBoxSizer1->Add(WxStaticText1,0,wxGROW | wxALL,5);
 
@@ -61,12 +66,12 @@ wxBootPlatformPage::wxBootPlatformPage(wxWizard *parent) : wxWizardPageSimple(pa
 
 wxWizardPage * wxBootPlatformPage::GetNext() const
 {
-   if(gv->curbootloadermethod != "fwpatcher"&& gv->curbootloadermethod != "ipodpatcher")
+   if(gv->curbootloadermethod != wxT("fwpatcher")&& gv->curbootloadermethod != wxT("ipodpatcher"))
    {
        if(wxWizardPageSimple::GetNext()->GetNext() != NULL)  // not iriver hx0 and ipod, skip one page
            return wxWizardPageSimple::GetNext()->GetNext();
    }
-   else if(gv->curbootloadermethod == "ipodpatcher")
+   else if(gv->curbootloadermethod == wxT("ipodpatcher"))
    {
         if(wxWizardPageSimple::GetNext()->GetNext() != NULL)
             if(wxWizardPageSimple::GetNext()->GetNext()->GetNext() != NULL)
@@ -83,8 +88,8 @@ bool wxBootPlatformPage::TransferDataFromWindow()
 {
     if (BootPlatformListBox->GetSelection() == wxNOT_FOUND )
     {
-        WARN_DIALOG(_("You must select an audio device type before proceeding"),
-            _("Select Platform"));
+        WARN_DIALOG(wxT("You must select an audio device type before proceeding"),
+            wxT("Select Platform"));
         return false;
     } else
     {
@@ -98,13 +103,13 @@ bool wxBootPlatformPage::TransferDataFromWindow()
         return true;
     }
 }
-
+//// Plattfor Page //////////////////////////
 wxPlatformPage::wxPlatformPage(wxWizard *parent) : wxWizardPageSimple(parent)
 {
     wxBoxSizer* WxBoxSizer1 = new wxBoxSizer(wxVERTICAL);
 
     wxStaticText* WxStaticText1 = new wxStaticText(this, wxID_ANY,
-        _("Please select the model of audio device that you would like to"
+        wxT("Please select the model of audio device that you would like to"
         "\ninstall Rockbox on from the list below:"));
     WxBoxSizer1->Add(WxStaticText1,0,wxGROW | wxALL,5);
 
@@ -124,17 +129,274 @@ bool wxPlatformPage::TransferDataFromWindow()
 {
     if (PlatformListBox->GetSelection() == wxNOT_FOUND )
     {
-        WARN_DIALOG(_("You must select an audio device type before proceeding"),
-            _("Select Platform"));
+        WARN_DIALOG(wxT("You must select an audio device type before proceeding"),
+            wxT("Select Platform"));
         return false;
     } else
     {
         gv->curplatnum = PlatformListBox->GetSelection();
         gv->curplat = gv->plat_id[gv->curplatnum];
+        gv->curresolution = gv->plat_resolution[gv->curplatnum];
         return true;
     }
 }
 
+
+//////////////// ThemeImage Dialog /////////////////
+BEGIN_EVENT_TABLE(wxThemeImageDialog,wxDialog)
+   EVT_PAINT(wxThemeImageDialog::OnPaint)
+END_EVENT_TABLE();
+wxThemeImageDialog::wxThemeImageDialog(wxWindow* parent,wxWindowID id,wxString title,wxBitmap bmp)  :
+   wxDialog(parent, id, title)
+{
+    wxBoxSizer *sizerTop = new wxBoxSizer(wxHORIZONTAL);
+    m_bitmap = bmp;
+
+    sizerTop->SetMinSize(m_bitmap.GetWidth(),m_bitmap.GetHeight());
+
+    SetSizer(sizerTop);
+
+    sizerTop->SetSizeHints(this);
+    sizerTop->Fit(this);
+
+}
+
+void wxThemeImageDialog::OnPaint(wxPaintEvent& WXUNUSED(event))
+{
+    wxPaintDC dc( this );
+    dc.DrawBitmap( m_bitmap, 0, 0, true /* use mask */ );
+}
+
+////////////////// Themes page ////////////////////////
+BEGIN_EVENT_TABLE(wxThemesPage,wxWizardPageSimple)
+	EVT_WIZARD_PAGE_CHANGED          (wxID_ANY, wxThemesPage::OnPageShown)
+	EVT_WIZARD_PAGE_CHANGING         (wxID_ANY, wxThemesPage::OnWizardPageChanging)
+	EVT_LISTBOX                      (ID_LISTBOX,wxThemesPage::OnListBox)
+	EVT_BUTTON                       (ID_PREVIEW_BTN, wxThemesPage::OnPreviewBtn)
+	EVT_CHECKBOX                     (ID_INSTALLCHECKBOX, wxThemesPage::OnCheckBox)
+END_EVENT_TABLE();
+
+wxThemesPage::wxThemesPage(wxWizard *parent) : wxWizardPageSimple(parent)
+{
+    m_parent = parent;
+    wxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
+
+    wxStaticText* WxStaticText1 = new wxStaticText(this, wxID_ANY,
+        wxT("Please select the Theme you would like to"
+        "\ninstall on your Device from the list below:"));
+    mainSizer->Add(WxStaticText1,0,wxGROW | wxALL,5);
+
+    // create theme listbox
+    wxArrayString list;
+    for(int i = 0; i< 35;i++)
+        list.Add("");
+    ThemesListBox= new wxListBox(this, ID_LISTBOX, wxDefaultPosition,
+        wxDefaultSize,list, wxLB_SINGLE);
+    mainSizer->Add(ThemesListBox,10,wxGROW | wxALL,5);
+
+    // create groupbox
+    wxStaticBox* groupbox= new wxStaticBox(this,wxID_ANY,wxT("Selected Theme:"));
+    wxBoxSizer* styleSizer = new wxStaticBoxSizer( groupbox, wxVERTICAL );
+    mainSizer->Add(styleSizer,11,wxGROW | wxALL,5);
+
+    // horizontal sizer
+    wxBoxSizer* wxBoxSizer2 = new wxBoxSizer(wxHORIZONTAL);
+    styleSizer->Add(wxBoxSizer2,0,wxGROW | wxALL,0);
+
+    // preview button
+    m_previewBtn = new wxButton(this, ID_PREVIEW_BTN, wxT("Preview"),
+         wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator,
+        wxT("PreviewBtn"));
+    wxBoxSizer2->Add(m_previewBtn,0,wxGROW | wxALL,5);
+
+    // checkbox for Install
+    m_InstallCheckBox= new wxCheckBox(this,ID_INSTALLCHECKBOX,wxT("Install")
+        ,wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator,
+        wxT("InstallCheckbox"));
+    wxBoxSizer2->Add(m_InstallCheckBox,0,wxGROW | wxALL,5);
+
+    // horizontal sizer
+    wxBoxSizer* wxBoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
+    styleSizer->Add(wxBoxSizer3,0,wxGROW | wxALL,0);
+
+    // File size
+    wxStaticText* size= new wxStaticText(this,wxID_ANY,wxT("Filesize:"));
+    wxBoxSizer3->Add(size,0,wxGROW | wxALL,5);
+
+    m_size= new wxStaticText(this,wxID_ANY,wxT(""));
+    wxBoxSizer3->Add(m_size,0,wxGROW | wxALL,5);
+
+    // Description
+    wxStaticText* desc= new wxStaticText(this,wxID_ANY,wxT("Description:"));
+    styleSizer->Add(desc,0,wxGROW | wxALL,5);
+
+    m_desc= new wxStaticText(this,wxID_ANY,wxT(""));
+    styleSizer->Add(m_desc,0,wxGROW | wxALL,5);
+
+    SetSizer(mainSizer);
+    mainSizer->Fit(this);
+
+}
+
+bool wxThemesPage::TransferDataFromWindow()
+{
+    gv->themesToInstall.Clear();
+
+    for(int i=0; i < m_installTheme.GetCount(); i++)
+    {
+        if(m_installTheme[i])
+        {
+            gv->themesToInstall.Add(m_Themes_path[i]);
+        }
+    }
+
+    return true;
+
+}
+
+void wxThemesPage::OnWizardPageChanging(wxWizardEvent& event)
+{
+   if(event.GetDirection())  // going forwards in the Wizard
+   {
+        if(gv->themesToInstall.GetCount() == 0)
+        {
+            WARN_DIALOG(wxT("You have not selected a Theme to Install"), wxT("Select a Theme"));
+            event.Veto();
+        }
+   }
+}
+
+void wxThemesPage::OnCheckBox(wxCommandEvent& event)
+{
+    int index = ThemesListBox->GetSelection();         //get Index
+    if(index == wxNOT_FOUND)
+        return;
+
+    m_installTheme[index]= ! m_installTheme[index];    // Toggle install
+
+}
+
+void wxThemesPage::OnListBox(wxCommandEvent& event)
+{
+    int index = ThemesListBox->GetSelection();  //get Index
+    if(index == wxNOT_FOUND)
+        return;
+
+    m_desc->SetLabel(m_Themes_desc[index]);     //set Desc
+    m_desc->Wrap(270);                       // wrap desc
+    m_size->SetLabel(m_Themes_size[index]+wxT(" kb"));  //set file size
+    m_InstallCheckBox->SetValue(m_installTheme[index]);  // set the install checkbox
+
+    this->GetSizer()->Layout();
+
+}
+
+void wxThemesPage::OnPreviewBtn(wxCommandEvent& event)
+{
+
+    int index = ThemesListBox->GetSelection();
+    if(index == wxNOT_FOUND)
+        return;
+
+    wxString src,dest;
+
+    int pos = m_Themes_image[index].Find('/',true);
+    wxString filename = m_Themes_image[index](pos+1,m_Themes_image[index].Length());
+
+    dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s"),
+            gv->stdpaths->GetUserDataDir().c_str(),gv->curresolution.c_str());
+
+    if(!wxDirExists(dest))
+        wxMkdir(dest);
+
+    //this is a URL no PATH_SEP
+    src.Printf("%s/data/%s/%s",gv->themes_url.c_str(),gv->curresolution.c_str(),filename.c_str());
+    dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s" PATH_SEP "%s"),
+        gv->stdpaths->GetUserDataDir().c_str(),gv->curresolution.c_str(),filename.c_str());
+
+    if(DownloadURL(src, dest))
+    {
+        MESG_DIALOG(wxT("Unable to download image."));
+        return;
+    }
+
+    wxBitmap bmp;
+    bmp.LoadFile(dest,wxBITMAP_TYPE_PNG);
+
+    wxThemeImageDialog dlg(this,wxID_ANY,wxT("Preview"),bmp);
+    dlg.ShowModal();
+
+}
+
+void wxThemesPage::OnPageShown(wxWizardEvent& event)
+{
+    // clear Theme info
+    m_Themes.Clear();
+    m_Themes_image.Clear();
+    m_Themes_path.Clear();
+    m_Themes_desc.Clear();
+    m_Themes_size.Clear();
+    m_installTheme.Clear();
+    m_desc->SetLabel(wxT(""));
+    m_size->SetLabel(wxT(""));
+    m_InstallCheckBox->SetValue(false);
+
+    //get correct Themes list
+    wxString src,dest,err;
+
+    src.Printf("%srbutil.php?res=%s",gv->themes_url.c_str(),gv->curresolution.c_str());
+    dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s.list"),
+        gv->stdpaths->GetUserDataDir().c_str(),gv->curresolution.c_str());
+
+    if(DownloadURL(src, dest))
+    {
+        MESG_DIALOG(wxT("Unable to download themes list."));
+        return;
+    }
+
+    //read and parse Themes list
+    wxString themelistraw;
+    wxFFile themefile;
+    if(!themefile.Open(dest))       //open file
+    {
+        MESG_DIALOG(wxT("Unable to open themes list."));
+        return;
+    }
+    if(!themefile.ReadAll(&themelistraw))  //read complete file
+    {
+        MESG_DIALOG(wxT("Unable to read themes list."));
+        return;
+    }
+    wxRegEx reAll(wxT("<body >(.+)</body>"));  //extract body part
+    if(! reAll.Matches(themelistraw))
+    {
+        MESG_DIALOG(wxT("Themes list is in wrong Format."));
+        return;
+    }
+    wxString lines = reAll.GetMatch(themelistraw,1);
+
+    // prepare text
+    lines.Replace(wxT("<br />"),wxT(""),true);   //replace <br /> with nothing
+    lines.Replace(wxT("\n"),wxT(""),true);   //replace \n with nothing
+    lines.Trim(true);                         //strip WS at end
+    lines.Trim(false);                         //strip WS at beginning
+    wxStringTokenizer tkz(lines,wxT("|"));   //tokenize it
+
+    while ( tkz.HasMoreTokens() )           // read all entrys
+    {
+        m_Themes.Add(tkz.GetNextToken());         //Theme name
+        m_Themes_path.Add(tkz.GetNextToken());    //Theme path
+        m_Themes_size.Add(tkz.GetNextToken());    //File size
+        m_Themes_image.Add(tkz.GetNextToken());   //Screenshot
+        m_Themes_desc.Add(tkz.GetNextToken());    //Description
+        m_installTheme.Add(false);                //Theme should be installed ?
+    }
+
+    // set ThemeList
+    ThemesListBox->Set(m_Themes);
+}
+
+ //////////////////// Ipod Locaction Page /////////////////////////////
 BEGIN_EVENT_TABLE(wxIpodLocationPage,wxWizardPageSimple)
 	EVT_BUTTON   (ID_IPODLOCATION_BTN, wxIpodLocationPage::OnIpodLocationBtn)
 	EVT_WIZARD_PAGE_CHANGING(wxID_ANY, wxIpodLocationPage::OnWizardPageChanging)
@@ -178,7 +440,7 @@ wxIpodLocationPage::wxIpodLocationPage(wxWizard* parent) : wxWizardPageSimple(pa
 
 wxWizardPage* wxIpodLocationPage::GetPrev() const
 {
-    if(gv->curbootloadermethod == "ipodpatcher")   //if ipod, skip previous
+    if(gv->curbootloadermethod == wxT("ipodpatcher"))   //if ipod, skip previous
     {
         if(wxWizardPageSimple::GetPrev()->GetPrev() != NULL)
             return wxWizardPageSimple::GetPrev()->GetPrev();
@@ -190,13 +452,13 @@ void wxIpodLocationPage::OnWizardPageChanging(wxWizardEvent& event)
 {
    if(event.GetDirection())  // going forwards in the Wizard
    {
-       if(gv->curbootloadermethod=="ipodpatcher")
+       if(gv->curbootloadermethod==wxT("ipodpatcher"))
        {
-            if(IpodLocationText->GetLabel() == "no Ipod found" ||
-                    IpodLocationText->GetLabel() =="More than 1 Ipod found" ||
-                    IpodLocationText->GetLabel() =="")
+            if(IpodLocationText->GetLabel() == wxT("no Ipod found") ||
+                    IpodLocationText->GetLabel() ==wxT("More than 1 Ipod found") ||
+                    IpodLocationText->GetLabel() ==wxT(""))
             {
-                WARN_DIALOG(_("No valid ipod found!"), _("Select Location"));
+                WARN_DIALOG(wxT("No valid ipod found!"), wxT("Select Location"));
                 event.Veto();       //stop pagechanging
             }
        }
@@ -205,27 +467,27 @@ void wxIpodLocationPage::OnWizardPageChanging(wxWizardEvent& event)
 
 void wxIpodLocationPage::OnIpodLocationBtn(wxCommandEvent& event)
 {
-    wxLogVerbose("=== begin wxIpodLocationPage::OnIpodLocationBtn");
+    wxLogVerbose(wxT("=== begin wxIpodLocationPage::OnIpodLocationBtn"));
     struct ipod_t ipod;
     int n = ipod_scan(&ipod);
-    gv->curbootloader="";
+    gv->curbootloader=wxT("");
 
     if(n == 0)
-      IpodLocationText->SetLabel("no Ipod found");
+      IpodLocationText->SetLabel(wxT("no Ipod found"));
     else if( n==1)
     {
-      gv->curbootloader="bootloader-";
+      gv->curbootloader=wxT("bootloader-");
       gv->curbootloader.Append(ipod.targetname);
       IpodLocationText->SetLabel(ipod.modelstr);
     }
     else
-      IpodLocationText->SetLabel("More than 1 Ipod found");
+      IpodLocationText->SetLabel(wxT("More than 1 Ipod found"));
 
     if(ipod.macpod)
-      IpodLocationExtraText->SetLabel("This Ipod is a Mac formated Ipod\n"
+      IpodLocationExtraText->SetLabel(wxT("This Ipod is a Mac formated Ipod\n"
                                       "Rockbox will not work on this.\n"
-                                      "You have to convert it first to Fat32");
-    wxLogVerbose("=== end wxIpodLocationPage::OnIpodLocationBtn");
+                                      "You have to convert it first to Fat32"));
+    wxLogVerbose(wxT("=== end wxIpodLocationPage::OnIpodLocationBtn"));
 
 }
 
@@ -251,7 +513,7 @@ wxBootLocationPage::wxBootLocationPage(wxWizard* parent) : wxWizardPageSimple(pa
    	WxBoxSizer1->Add(WxBoxSizer3,0,
         wxGROW | wxALIGN_CENTER_VERTICAL | wxALL, 5);
 
-    if (gv->curdestdir == wxT("")) gv->curdestdir = _("<none>");
+    if (gv->curdestdir == wxT("")) gv->curdestdir = wxT("<none>");
   	BootLocationText = new wxStaticText(this, wxID_ANY, gv->curdestdir,
         wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
     WxBoxSizer3->Add(BootLocationText,1,
@@ -269,7 +531,7 @@ wxBootLocationPage::wxBootLocationPage(wxWizard* parent) : wxWizardPageSimple(pa
 
 wxWizardPage* wxBootLocationPage::GetPrev() const
 {
-    if(gv->curbootloadermethod != "fwpatcher")
+    if(gv->curbootloadermethod != wxT("fwpatcher"))
     {
         if(wxWizardPageSimple::GetPrev()->GetPrev() != NULL)
             return wxWizardPageSimple::GetPrev()->GetPrev();
@@ -281,7 +543,7 @@ wxWizardPage* wxBootLocationPage::GetPrev() const
 
 wxWizardPage* wxBootLocationPage::GetNext() const
 {
-    if(gv->curbootloadermethod == "ipodpatcher")
+    if(gv->curbootloadermethod == wxT("ipodpatcher"))
     {
         return wxWizardPageSimple::GetNext();  // if ipod then this is not the last page
     }
@@ -294,8 +556,8 @@ void wxBootLocationPage::OnWizardPageChanging(wxWizardEvent& event)
    {
       if(!wxDirExists(BootLocationText->GetLabel()))
       {
-          WARN_DIALOG(_("You have not selected a valid location for your audio "
-                    "device"), _("Select Location"));
+          WARN_DIALOG(wxT("You have not selected a valid location for your audio "
+                    "device"), wxT("Select Location"));
            event.Veto();
       }
 
@@ -313,13 +575,13 @@ bool wxBootLocationPage::TransferDataFromWindow()
 void wxBootLocationPage::OnBootLocationBtn(wxCommandEvent& event)
 {
    const wxString& temp = wxDirSelector(
-        _("Please select the location of your audio device"), gv->curdestdir);
-   wxLogVerbose("=== begin wxBootLocationPage::OnBootLocationBtn(event)");
+        wxT("Please select the location of your audio device"), gv->curdestdir);
+   wxLogVerbose(wxT("=== begin wxBootLocationPage::OnBootLocationBtn(event)"));
    if (!temp.empty())
    {
            BootLocationText->SetLabel(temp);
    }
-   wxLogVerbose("=== end wxBootLocationPage::OnBootLocationBtn");
+   wxLogVerbose(wxT("=== end wxBootLocationPage::OnBootLocationBtn"));
 
 }
 
@@ -368,8 +630,8 @@ void wxFirmwareLocationPage::OnWizardPageChanging(wxWizardEvent& event)
    {
         if( !wxFileExists(gv->curfirmware))
         {
-            WARN_DIALOG(_("You have not selected a valid location for the firmware "
-                      "file"), _("Select File"));
+            WARN_DIALOG(wxT("You have not selected a valid location for the firmware "
+                      "file"), wxT("Select File"));
             event.Veto();
         }
    }
@@ -379,8 +641,8 @@ void wxFirmwareLocationPage::OnWizardPageChanging(wxWizardEvent& event)
 void wxFirmwareLocationPage::OnFirmwareFilenameBtn(wxCommandEvent& event)
 {
      wxString temp = wxFileSelector(
-        _("Please select the location of the original Firmware"), gv->curdestdir,"","","*.hex");
-       wxLogVerbose("=== begin wxFirmwareLocationPage::OnFirmwareFilenameBtn(event)");
+        wxT("Please select the location of the original Firmware"), gv->curdestdir,"","","*.hex");
+       wxLogVerbose(wxT("=== begin wxFirmwareLocationPage::OnFirmwareFilenameBtn(event)"));
        if (!temp.empty())
        {
            gv->curfirmware=temp;
@@ -391,7 +653,7 @@ void wxFirmwareLocationPage::OnFirmwareFilenameBtn(wxCommandEvent& event)
            }
            FirmwareLocationFilename->SetLabel(temp);
        }
-       wxLogVerbose("=== end wxFirmwareLocationPage::OnFirmwareFilenameBtn");
+       wxLogVerbose(wxT("=== end wxFirmwareLocationPage::OnFirmwareFilenameBtn"));
 }
 
 BEGIN_EVENT_TABLE(wxLocationPage,wxWizardPageSimple)
@@ -413,7 +675,7 @@ wxLocationPage::wxLocationPage(wxWizard* parent) : wxWizardPageSimple(parent)
    	WxBoxSizer1->Add(WxBoxSizer3,0,
         wxGROW | wxALIGN_CENTER_VERTICAL | wxALL, 5);
 
-    if (gv->curdestdir == wxT("")) gv->curdestdir = _("<none>");
+    if (gv->curdestdir == wxT("")) gv->curdestdir = wxT("<none>");
   	LocationText = new wxStaticText(this, wxID_ANY, gv->curdestdir,
         wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
     WxBoxSizer3->Add(LocationText,1,
@@ -436,8 +698,8 @@ void wxLocationPage::OnWizardPageChanging(wxWizardEvent& event)
    {
         if(!wxDirExists(LocationText->GetLabel()))
         {
-              WARN_DIALOG(_("You have not selected a valid location for your audio "
-            "device"), _("Select Location"));
+              WARN_DIALOG(wxT("You have not selected a valid location for your audio "
+            "device"), wxT("Select Location"));
             event.Veto();
         }
    }
@@ -452,13 +714,13 @@ bool wxLocationPage::TransferDataFromWindow()
 void wxLocationPage::OnLocationBtn(wxCommandEvent& event)
 {
     const wxString& temp = wxDirSelector(
-        _("Please select the location of your audio device"), gv->curdestdir);
-    wxLogVerbose("=== begin wxLocationPage::OnLocationBtn(event)");
+        wxT("Please select the location of your audio device"), gv->curdestdir);
+    wxLogVerbose(wxT("=== begin wxLocationPage::OnLocationBtn(event)"));
     if (!temp.empty())
     {
         LocationText->SetLabel(temp);
     }
-    wxLogVerbose("=== end wxLocationPage::OnLocationBtn");
+    wxLogVerbose(wxT("=== end wxLocationPage::OnLocationBtn"));
 }
 
 BEGIN_EVENT_TABLE(wxBuildPage,wxWizardPageSimple)
@@ -479,17 +741,17 @@ wxBuildPage::wxBuildPage(wxWizard *parent) : wxWizardPageSimple(parent)
     WxBoxSizer1->Add(WxStaticText1,0,wxGROW | wxALL,5);
 
     wxArrayString* array = new wxArrayString();
-    buf.Printf(_("Rockbox stable version (%s)") , gv->last_release.c_str());
+    buf.Printf(wxT("Rockbox stable version (%s)") , gv->last_release.c_str());
     array->Add(buf);
-    array->Add(_("Archived Build"));
-    array->Add(_("Current Build "));
+    array->Add(wxT("Archived Build"));
+    array->Add(wxT("Current Build "));
 
-    BuildRadioBox = new wxRadioBox(this, ID_BUILD_BOX, _("Version"),
+    BuildRadioBox = new wxRadioBox(this, ID_BUILD_BOX, wxT("Version"),
         wxDefaultPosition, wxDefaultSize, *array, 0, wxRA_SPECIFY_ROWS);
     WxBoxSizer1->Add(BuildRadioBox, 0, wxGROW | wxALL, 5);
     delete array;
 
-    wxStaticBox* WxStaticBox1 = new wxStaticBox(this, wxID_ANY, _("Details:"));
+    wxStaticBox* WxStaticBox1 = new wxStaticBox(this, wxID_ANY, wxT("Details:"));
     wxStaticBoxSizer* WxStaticBoxSizer2 = new wxStaticBoxSizer(WxStaticBox1,
         wxVERTICAL);
     DetailText = new wxStaticText(this, wxID_ANY, wxT(""));
@@ -497,13 +759,13 @@ wxBuildPage::wxBuildPage(wxWizard *parent) : wxWizardPageSimple(parent)
     WxStaticBoxSizer2->Add(DetailText, 1, wxGROW | wxALL, 5);
 
     wxStaticText* WxStaticText2 = new wxStaticText(this, wxID_ANY,
-        _("Rockbox Utility stores copies of Rockbox it has downloaded on the\n"
+        wxT("Rockbox Utility stores copies of Rockbox it has downloaded on the\n"
         "local hard disk to save network traffic.  If your local copy is\n"
         "no longer working, tick this box to download a fresh copy.") );
     WxBoxSizer1->Add(WxStaticText2, 0 , wxALL, 5);
 
     NoCacheCheckBox = new wxCheckBox(this, wxID_ANY,
-        _("Don't use locally cached copies of Rockbox") );
+        wxT("Don't use locally cached copies of Rockbox") );
     WxBoxSizer1->Add(NoCacheCheckBox, 0, wxALL, 5);
 
     SetSizer(WxBoxSizer1);
@@ -577,7 +839,7 @@ wxFullUninstallPage::wxFullUninstallPage(wxWizard* parent) :
 	wxBoxSizer* WxBoxSizer1 = new wxBoxSizer(wxVERTICAL);
 
     wxStaticText* WxStaticText1 = new wxStaticText(this, wxID_ANY,
-        _("Rockbox Utility normally uninstalls Rockbox using an uninstall\n"
+        wxT("Rockbox Utility normally uninstalls Rockbox using an uninstall\n"
           "file created during installation.  This means that when Rockbox is\n"
           "uninstalled all your configuration files are preserved.  However,\n"
           "you can also perform a full uninstall, which will completely\n"
@@ -588,7 +850,7 @@ wxFullUninstallPage::wxFullUninstallPage(wxWizard* parent) :
     WxBoxSizer1->Add(WxStaticText1,0,wxGROW | wxALL,5);
 
     FullCheckBox = new wxCheckBox(this, wxID_ANY,
-        _("Perform a full uninstall"));
+        wxT("Perform a full uninstall"));
     WxBoxSizer1->Add(FullCheckBox, 0, wxALL, 5);
 
     SetSizer(WxBoxSizer1);

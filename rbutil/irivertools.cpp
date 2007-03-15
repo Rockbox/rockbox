@@ -61,13 +61,13 @@ bool mkboot(wxString infile, wxString outfile,wxString bootloader,int origin)
     wxFile f;
     if(!f.Open(infile))
     {
-        err.Printf("Could not open: %s",infile.c_str());
-        ERR_DIALOG(err, _("mkboot"));
+        err.Printf(wxT("Could not open: %s"),infile.c_str());
+        ERR_DIALOG(err, wxT("mkboot"));
         return false;
     }
     i = f.Read(image,16);
     if(i < 16) {
-        ERR_DIALOG("reading header failed", _("mkboot"));
+        ERR_DIALOG(wxT("reading header failed"), wxT("mkboot"));
         return false;
     }
 
@@ -80,7 +80,7 @@ bool mkboot(wxString infile, wxString outfile,wxString bootloader,int origin)
     len = binary_length+0x200-16;
     i = f.Read(image+16, len);
     if(i < len) {
-        ERR_DIALOG("reading firmware failed", _("mkboot"));
+        ERR_DIALOG(wxT("reading firmware failed"),wxT("mkboot"));
         return false;
     }
 
@@ -88,8 +88,8 @@ bool mkboot(wxString infile, wxString outfile,wxString bootloader,int origin)
     /* Now, read the boot loader into the image */
     if(!f.Open(bootloader))
     {
-        err.Printf("Could not open: %s",bootloader.c_str());
-        ERR_DIALOG(err, _("mkboot"));
+        err.Printf(wxT("Could not open: %s"),bootloader.c_str());
+        ERR_DIALOG(err, wxT("mkboot"));
         return false;
     }
 
@@ -97,7 +97,7 @@ bool mkboot(wxString infile, wxString outfile,wxString bootloader,int origin)
 
     i = f.Read(image+0x220 + origin, bllen);
     if(i < bllen) {
-       ERR_DIALOG("reading bootloader failed", _("mkboot"));
+       ERR_DIALOG(wxT("reading bootloader failed"), wxT("mkboot"));
        return false;
     }
 
@@ -105,8 +105,8 @@ bool mkboot(wxString infile, wxString outfile,wxString bootloader,int origin)
 
     if(!f.Open(outfile,wxFile::write))
     {
-        err.Printf("Could not open: %s",outfile.c_str());
-        ERR_DIALOG(err, _("mkboot"));
+        err.Printf(wxT("Could not open: %s"),outfile.c_str());
+        ERR_DIALOG(err, wxT("mkboot"));
         return false;
     }
 
@@ -158,7 +158,7 @@ bool mkboot(wxString infile, wxString outfile,wxString bootloader,int origin)
 
     i = f.Write(image,total_length);
     if(i < total_length) {
-        ERR_DIALOG("writing bootloader failed", _("mkboot"));
+        ERR_DIALOG(wxT("writing bootloader failed"), wxT("mkboot"));
         return false;
     }
 
@@ -230,21 +230,21 @@ int iriver_decode(wxString infile_name, wxString outfile_name, unsigned int modi
 
     if(!infile.Open(infile_name))
     {
-        err.Printf("Could not open: %s",infile_name.c_str());
-        ERR_DIALOG(err, _("iriver_decode"));
+        err.Printf(wxT("Could not open: %s"),infile_name.c_str());
+        ERR_DIALOG(err, wxT("iriver_decode"));
         return -1;
     }
     if(!outfile.Open(outfile_name,wxFile::write))
     {
-        err.Printf("Could not open: %s",outfile_name.c_str());
-        ERR_DIALOG(err, _("iriver_decode"));
+        err.Printf(wxT("Could not open: %s"),outfile_name.c_str());
+        ERR_DIALOG(err, wxT("iriver_decode"));
         return -1;
     }
     lenread = infile.Read( headerdata, 512);
     if( lenread != 512 )
     {
-        ERR_DIALOG(_("This doesn't look like a valid encrypted iHP "
-                 "firmware - reason: header length\n"),_("iriver_decode"));
+        ERR_DIALOG(wxT("This doesn't look like a valid encrypted iHP "
+                 "firmware - reason: header length\n"),wxT("iriver_decode"));
 
         infile.Close();
         outfile.Close();
@@ -254,8 +254,8 @@ int iriver_decode(wxString infile_name, wxString outfile_name, unsigned int modi
     i = testheader( headerdata );
     if( i == -1 )
     {
-        ERR_DIALOG( _( "This firmware is for an unknown model, or is not"
-                 " a valid encrypted iHP firmware\n" ),_("iriver_decode"));
+        ERR_DIALOG( wxT( "This firmware is for an unknown model, or is not"
+                 " a valid encrypted iHP firmware\n" ),wxT("iriver_decode"));
         infile.Close();
         outfile.Close();
         return -1;
@@ -277,8 +277,8 @@ int iriver_decode(wxString infile_name, wxString outfile_name, unsigned int modi
         dwLength2>>9 != dwLength3 ||
         dwLength2+dwLength3+512 != dwLength1 )
     {
-        ERR_DIALOG( _( "This doesn't look like a valid encrypted "
-                 "iHP firmware - reason: file 'length' data\n" ),_("iriver_decode"));
+        ERR_DIALOG( wxT( "This doesn't look like a valid encrypted "
+                 "iHP firmware - reason: file 'length' data\n" ),wxT("iriver_decode"));
 		infile.Close();
         outfile.Close();
         return -1;
@@ -339,8 +339,8 @@ int iriver_decode(wxString infile_name, wxString outfile_name, unsigned int modi
 
     if( fp != dwLength2 )
     {
-        ERR_DIALOG( _(  "This doesn't look like a valid encrypted "
-                 "iHP firmware - reason: 'length2' mismatch\n" ),_("iriver_decode"));
+        ERR_DIALOG( wxT(  "This doesn't look like a valid encrypted "
+                 "iHP firmware - reason: 'length2' mismatch\n" ),wxT("iriver_decode"));
 		infile.Close();
         outfile.Close();
         return -1;
@@ -356,8 +356,8 @@ int iriver_decode(wxString infile_name, wxString outfile_name, unsigned int modi
             outfile.Write( blockdata, lenread );
         if( memcmp( ppChecksums, blockdata, lenread ) != 0 )
         {
-            ERR_DIALOG( _(  "This doesn't look like a valid encrypted "
-                     "iHP firmware - reason: Checksum mismatch!" ),_("iriver_decode"));
+            ERR_DIALOG( wxT(  "This doesn't look like a valid encrypted "
+                     "iHP firmware - reason: Checksum mismatch!" ),wxT("iriver_decode"));
 			infile.Close();
             outfile.Close();
             return -1;
@@ -367,8 +367,8 @@ int iriver_decode(wxString infile_name, wxString outfile_name, unsigned int modi
 
     if( fp != dwLength3 )
     {
-        ERR_DIALOG(_(  "This doesn't look like a valid encrypted "
-                 "iHP firmware - reason: 'length3' mismatch\n" ),_("iriver_decode"));
+        ERR_DIALOG(wxT(  "This doesn't look like a valid encrypted "
+                 "iHP firmware - reason: 'length3' mismatch\n" ),wxT("iriver_decode"));
 		infile.Close();
         outfile.Close();
         return -1;
@@ -419,22 +419,22 @@ int iriver_encode(wxString infile_name, wxString outfile_name, unsigned int modi
 
     if(!infile.Open(infile_name,wxFile::read))
     {
-        err.Printf("Could not open: %s",infile_name.c_str());
-        ERR_DIALOG(err, _("iriver_decode"));
+        err.Printf(wxT("Could not open: %s"),infile_name.c_str());
+        ERR_DIALOG(err, wxT("iriver_decode"));
         return -1;
     }
     if(!outfile.Open(outfile_name,wxFile::write))
     {
-        err.Printf("Could not open: %s",outfile_name.c_str());
-        ERR_DIALOG(err, _("iriver_decode"));
+        err.Printf(wxT("Could not open: %s"),outfile_name.c_str());
+        ERR_DIALOG(err, wxT("iriver_decode"));
         return -1;
     }
 
     lenread = infile.Read( headerdata, 512 );
     if( lenread != 512 )
     {
-        ERR_DIALOG("This doesn't look like a valid decoded "
-                 "iHP firmware - reason: header length\n", _("iriver_decode"));
+        ERR_DIALOG(wxT("This doesn't look like a valid decoded "
+                 "iHP firmware - reason: header length\n"), wxT("iriver_decode"));
         infile.Close();
         outfile.Close();
     };
@@ -447,8 +447,8 @@ int iriver_encode(wxString infile_name, wxString outfile_name, unsigned int modi
     i = testheader( headerdata );
     if( i == -1 )
     {
-        ERR_DIALOG("This firmware is for an unknown model, or is not"
-                 " a valid decoded iHP firmware\n", _("iriver_decode"));
+        ERR_DIALOG(wxT("This firmware is for an unknown model, or is not"
+                 " a valid decoded iHP firmware\n"), wxT("iriver_decode"));
        infile.Close();
        outfile.Close();
     };
@@ -468,8 +468,8 @@ int iriver_encode(wxString infile_name, wxString outfile_name, unsigned int modi
         dwLength3 > dwLength1 ||
         dwLength2+dwLength3+512 != dwLength1 )
     {
-        ERR_DIALOG("This doesn't look like a valid decoded iHP"
-                 " firmware - reason: file 'length' data\n", _("iriver_decode"));
+        ERR_DIALOG(wxT("This doesn't look like a valid decoded iHP"
+                 " firmware - reason: file 'length' data\n"), wxT("iriver_decode"));
        infile.Close();
        outfile.Close();
     };
@@ -506,8 +506,8 @@ int iriver_encode(wxString infile_name, wxString outfile_name, unsigned int modi
 
     if( fp != dwLength2 )
     {
-        ERR_DIALOG("This doesn't look like a valid decoded "
-                 "iHP firmware - reason: 'length1' mismatch\n", _("iriver_decode"));
+        ERR_DIALOG(wxT("This doesn't look like a valid decoded "
+                 "iHP firmware - reason: 'length1' mismatch\n"), wxT("iriver_decode"));
         infile.Close();
         outfile.Close();
     };
@@ -526,8 +526,8 @@ int iriver_encode(wxString infile_name, wxString outfile_name, unsigned int modi
 
     if( fp != dwLength3 )
     {
-       ERR_DIALOG("This doesn't look like a valid decoded "
-                 "iHP firmware - reason: 'length2' mismatch\n", _("iriver_decode"));
+       ERR_DIALOG(wxT("This doesn't look like a valid decoded "
+                 "iHP firmware - reason: 'length2' mismatch\n"), wxT("iriver_decode"));
        infile.Close();
        outfile.Close();
     };
@@ -565,30 +565,30 @@ bool PatchFirmware(wxString firmware,wxString bootloader,int series, int table_e
             break;
     }
 
-    name1.Printf("%s" PATH_SEP "download" PATH_SEP "firmware.bin",
+    name1.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "firmware.bin"),
                         gv->stdpaths->GetUserDataDir().c_str());
                                         /* descrambled file */
-    name2.Printf("%s" PATH_SEP "download" PATH_SEP "new.bin",
+    name2.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "new.bin"),
                         gv->stdpaths->GetUserDataDir().c_str());
                                     /* patched file */
-    name3.Printf("%s" PATH_SEP "download" PATH_SEP "new.hex",
+    name3.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "new.hex"),
                        gv->stdpaths->GetUserDataDir().c_str());
     if (iriver_decode(firmware, name1, FALSE, STRIP_NONE) == -1) {
-        ERR_DIALOG("Error in descramble", _("Descramble Firmware"));
+        ERR_DIALOG(wxT("Error in descramble"), wxT("Descramble Firmware"));
         wxRemoveFile(name1);
         wxRemoveFile(name2);
         wxRemoveFile(name3);
         return false;
     }
     if (!mkboot(name1, name2, bootloader, origin)) {
-        ERR_DIALOG("Error in patching",_("Patching Firmware"));
+        ERR_DIALOG(wxT("Error in patching"),wxT("Patching Firmware"));
         wxRemoveFile(name1);
         wxRemoveFile(name2);
         wxRemoveFile(name3);
         return false;
     }
     if (iriver_encode(name2, name3, FALSE) == -1) {
-        ERR_DIALOG("Error in scramble",_("Scramble Firmware"));
+        ERR_DIALOG(wxT("Error in scramble"),wxT("Scramble Firmware"));
         wxRemoveFile(name1);
         wxRemoveFile(name2);
         wxRemoveFile(name3);
@@ -596,7 +596,7 @@ bool PatchFirmware(wxString firmware,wxString bootloader,int series, int table_e
     }
     /* now md5sum it */
     if (!FileMD5(name3, &md5sum_str)) {
-        ERR_DIALOG("Error in checksumming",_("Checksumming Firmware"));
+        ERR_DIALOG(wxT("Error in checksumming"),wxT("Checksumming Firmware"));
         wxRemoveFile(name1);
         wxRemoveFile(name2);
         wxRemoveFile(name3);

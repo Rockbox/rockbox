@@ -58,15 +58,70 @@ const wxChar* _rootmatch[] = {
 const wxArrayString* rootmatch = new wxArrayString(
     (size_t) (sizeof(_rootmatch) / sizeof(wxChar*)), _rootmatch);
 
+bool InstallTheme(wxString Themesrc)
+{
+    wxString dest,src,err;
+
+    int pos = Themesrc.Find('/',true);
+    wxString themename = Themesrc.SubString(pos+1,Themesrc.Length());
+
+    src.Printf(wxT("%s/%s"), gv->themes_url.c_str(),Themesrc.c_str());
+    dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s"),
+                  gv->stdpaths->GetUserDataDir().c_str(),themename.c_str());
+    if( DownloadURL(src, dest) )
+    {
+        wxRemoveFile(dest);
+        err.Printf(wxT("Unable to download %s"), src.c_str() );
+        ERR_DIALOG(err, wxT("Install Theme"));
+        return false;
+    }
+
+    if(!checkZip(dest))
+    {
+        err.Printf(wxT("The Zip %s does not contain the correct dir structure"), dest.c_str());
+        ERR_DIALOG(err, wxT("Install Theme"));
+        return false;
+    }
+
+    if(UnzipFile(dest,gv->curdestdir, true))
+    {
+        err.Printf(wxT("Unable to unzip %s to %s"), dest.c_str(), gv->curdestdir.c_str());
+        ERR_DIALOG(err, wxT("Install Theme"));
+        return false;
+    }
+
+    return true;
+}
+
+bool checkZip(wxString zipname)
+{
+    wxZipEntryPtr       entry;
+
+    wxFFileInputStream* in_file = new wxFFileInputStream(zipname);
+    wxZipInputStream* in_zip = new wxZipInputStream(*in_file);
+
+    entry.reset(in_zip->GetNextEntry());
+
+    wxString name = entry->GetName();
+    if(entry->IsDir())
+    {
+        if(name.Contains(wxT(".rockbox\\")))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 int DownloadURL(wxString src, wxString dest)
 {
     int input, errnum = 0, success = false;
     wxString buf, errstr;
-    wxLogVerbose(_("=== begin DownloadURL(%s,%s)"), src.c_str(),
+    wxLogVerbose(wxT("=== begin DownloadURL(%s,%s)"), src.c_str(),
         dest.c_str());
 
-    buf.Printf(_("Fetching %s"), src.c_str());
-    wxProgressDialog* progress = new wxProgressDialog(_("Downloading"),
+    buf.Printf(wxT("Fetching %s"), src.c_str());
+    wxProgressDialog* progress = new wxProgressDialog(wxT("Downloading"),
                 buf, 100, NULL, wxPD_APP_MODAL |
                 wxPD_AUTO_HIDE | wxPD_SMOOTH | wxPD_ELAPSED_TIME |
                 wxPD_REMAINING_TIME | wxPD_CAN_ABORT);
@@ -105,7 +160,7 @@ int DownloadURL(wxString src, wxString dest)
                             current += os->LastWrite();
                             if (!progress->Update(current * 100 / filesize))
                             {
-                                errstr = _("Download aborted by user");
+                                errstr = wxT("Download aborted by user");
                                 errnum = 1000;
                                 break;
                             }
@@ -113,7 +168,7 @@ int DownloadURL(wxString src, wxString dest)
                         } else
                         {
                             errnum = os->GetLastError();
-                            errstr.Printf(_("Can't write to output stream (%s)"),
+                            errstr.Printf(wxT("Can't write to output stream (%s)"),
                                         stream_err_str(errnum).c_str() );
 
                             break;
@@ -127,7 +182,7 @@ int DownloadURL(wxString src, wxString dest)
                             errnum = 0;
                             break;
                         }
-                        errstr.Printf(_("Can't read from input stream (%s)"),
+                        errstr.Printf(wxT("Can't read from input stream (%s)"),
                                       stream_err_str(errnum).c_str() );
                     }
                 }
@@ -136,7 +191,7 @@ int DownloadURL(wxString src, wxString dest)
                 if (! errnum)
                 {
                     errnum = os->GetLastError();
-                    errstr.Printf(_("Can't close output file (%s)"),
+                    errstr.Printf(wxT("Can't close output file (%s)"),
                             stream_err_str(errnum).c_str() );
 
                     input = false;
@@ -147,26 +202,26 @@ int DownloadURL(wxString src, wxString dest)
                 } else
                 {
                     errnum = is->GetLastError();
-                    errstr.Printf(_("Can't get input stream size (%s)"),
+                    errstr.Printf(wxT("Can't get input stream size (%s)"),
                             stream_err_str(errnum).c_str() );
 
                 }
             } else
             {
                 errnum = in_http->GetError();
-                errstr.Printf(_("Can't get input stream (%d)"), errnum);
+                errstr.Printf(wxT("Can't get input stream (%d)"), errnum);
             }
             delete is;
         } else
         {
             errnum = os->GetLastError();
-            errstr.Printf(_("Can't create output stream (%s)"),
+            errstr.Printf(wxT("Can't create output stream (%s)"),
                     stream_err_str(errnum).c_str() );
         }
         delete os;
     } else
     {
-        errstr.Printf(_("Can't open URL %s (%d)"), src.c_str(),
+        errstr.Printf(wxT("Can't open URL %s (%d)"), src.c_str(),
             in_http->GetError() );
         errnum = 100;
     }
@@ -179,19 +234,19 @@ int DownloadURL(wxString src, wxString dest)
         if (errnum == 0) errnum = 999;
         if (input)
         {
-            buf.Printf(_("%s reading\n%s"),
+            buf.Printf(wxT("%s reading\n%s"),
                 errstr.c_str(), src.c_str());
-            ERR_DIALOG(buf, _("Download URL"));
+            ERR_DIALOG(buf, wxT("Download URL"));
         } else
         {
-            buf.Printf(_("%s writing to download\n/%s"),
+            buf.Printf(wxT("%s writing to download\n/%s"),
                 errstr.c_str(), dest.c_str());
-            ERR_DIALOG(buf, _("Download URL"));
+            ERR_DIALOG(buf, wxT("Download URL"));
         }
 
     }
 
-    wxLogVerbose(_("=== end DownloadURL"));
+    wxLogVerbose(wxT("=== end DownloadURL"));
     return errnum;
 }
 
@@ -202,7 +257,7 @@ int UnzipFile(wxString src, wxString destdir, bool isInstall)
     int                 errnum = 0, curfile = 0, totalfiles = 0;
     InstallLog*         log = NULL;
 
-    wxLogVerbose(_("===begin UnzipFile(%s,%s,%i)"),
+    wxLogVerbose(wxT("===begin UnzipFile(%s,%s,%i)"),
                src.c_str(), destdir.c_str(), isInstall);
 
     wxFFileInputStream* in_file = new wxFFileInputStream(src);
@@ -212,9 +267,9 @@ int UnzipFile(wxString src, wxString destdir, bool isInstall)
         if (! in_zip->IsOk() )
         {
             errnum = in_zip->GetLastError();
-            buf.Printf(_("Can't open ZIP stream %s for reading (%s)"),
+            buf.Printf(wxT("Can't open ZIP stream %s for reading (%s)"),
                 src.c_str(), stream_err_str(errnum).c_str() );
-            ERR_DIALOG(buf, _("Unzip File") );
+            ERR_DIALOG(buf, wxT("Unzip File") );
             delete in_zip;
             delete in_file;
             return true;
@@ -224,9 +279,9 @@ int UnzipFile(wxString src, wxString destdir, bool isInstall)
         if (! in_zip->IsOk() )
         {
             errnum = in_zip->GetLastError();
-            buf.Printf(_("Error Getting total ZIP entries for %s (%s)"),
+            buf.Printf(wxT("Error Getting total ZIP entries for %s (%s)"),
                 src.c_str(), stream_err_str(errnum).c_str() );
-            ERR_DIALOG(buf, _("Unzip File") );
+            ERR_DIALOG(buf, wxT("Unzip File") );
             delete in_zip;
             delete in_file;
             return true;
@@ -234,16 +289,16 @@ int UnzipFile(wxString src, wxString destdir, bool isInstall)
     } else
     {
         errnum = in_file->GetLastError();
-        buf.Printf(_("Can't open %s (%s)"), src.c_str(),
+        buf.Printf(wxT("Can't open %s (%s)"), src.c_str(),
                    stream_err_str(errnum).c_str() );
-        ERR_DIALOG(buf, _("Unzip File") );
+        ERR_DIALOG(buf, wxT("Unzip File") );
         delete in_zip;
         delete in_file;
         return true;
     }
 
-    wxProgressDialog* progress = new wxProgressDialog(_("Unpacking archive"),
-                  _("Preparing to unpack the downloaded files to your audio"
+    wxProgressDialog* progress = new wxProgressDialog(wxT("Unpacking archive"),
+                  wxT("Preparing to unpack the downloaded files to your audio"
                   "device"), totalfiles, NULL, wxPD_APP_MODAL |
                   wxPD_AUTO_HIDE | wxPD_SMOOTH | wxPD_ELAPSED_TIME |
                   wxPD_REMAINING_TIME | wxPD_CAN_ABORT);
@@ -262,9 +317,9 @@ int UnzipFile(wxString src, wxString destdir, bool isInstall)
 
         curfile++;
         wxString name = entry->GetName();
-        progress_msg.Printf(_("Unpacking %s"), name.c_str());
+        progress_msg.Printf(wxT("Unpacking %s"), name.c_str());
         if (! progress->Update(curfile, progress_msg) ) {
-            buf.Printf(_("Unpacking cancelled by user"));
+            buf.Printf(wxT("Unpacking cancelled by user"));
             MESG_DIALOG(buf);
             errnum = 1000;
             break;
@@ -275,7 +330,7 @@ int UnzipFile(wxString src, wxString destdir, bool isInstall)
         if (entry->IsDir() ) {
             if (!wxDirExists(in_str) ) {
                 if (! wxMkdir(in_str, 0777) ) {
-                    buf.Printf(_("Unable to create directory %s"),
+                    buf.Printf(wxT("Unable to create directory %s"),
                                in_str.c_str() );
                     errnum = 100;
                     break;
@@ -288,7 +343,7 @@ int UnzipFile(wxString src, wxString destdir, bool isInstall)
         wxFFileOutputStream* out = new wxFFileOutputStream(in_str);
         if (! out->IsOk() )
         {
-            buf.Printf(_("Can't open file %s for writing"), in_str.c_str() );
+            buf.Printf(wxT("Can't open file %s for writing"), in_str.c_str() );
             delete out;
             return 100;
         } else if (isInstall)
@@ -298,19 +353,19 @@ int UnzipFile(wxString src, wxString destdir, bool isInstall)
 
         in_zip->Read(*out);
         if (! out->IsOk()) {
-            buf.Printf(_("Can't write to %s (%d)"), in_str.c_str(),
+            buf.Printf(wxT("Can't write to %s (%d)"), in_str.c_str(),
                         errnum = out->GetLastError() );
         }
 
         if (!in_zip->IsOk() && ! in_file->GetLastError() == wxSTREAM_EOF)
         {
-            buf.Printf(_("Can't read from %s (%d)"), src.c_str(),
+            buf.Printf(wxT("Can't read from %s (%d)"), src.c_str(),
             errnum = in_file->GetLastError() );
         }
 
         if (! out->Close() && errnum == 0)
         {
-            buf.Printf(_("Unable to close %s (%d)"), in_str.c_str(),
+            buf.Printf(wxT("Unable to close %s (%d)"), in_str.c_str(),
                 errnum = out->GetLastError() );
 
         }
@@ -323,11 +378,11 @@ int UnzipFile(wxString src, wxString destdir, bool isInstall)
 
     if (errnum)
     {
-        ERR_DIALOG(buf, _("Unzip File"));
+        ERR_DIALOG(buf, wxT("Unzip File"));
     }
 
     if (log) delete log;
-    wxLogVerbose(_("=== end UnzipFile"));
+    wxLogVerbose(wxT("=== end UnzipFile"));
     return(errnum);
 }
 
@@ -339,10 +394,10 @@ int Uninstall(const wxString dir, bool isFullUninstall) {
     InstallLog *log = NULL;
     wxArrayString* FilesToRemove = NULL;
 
-    wxLogVerbose(_("=== begin Uninstall(%s,%i)"), dir.c_str(), isFullUninstall);
+    wxLogVerbose(wxT("=== begin Uninstall(%s,%i)"), dir.c_str(), isFullUninstall);
 
-    wxProgressDialog* progress = new wxProgressDialog(_("Uninstalling"),
-                _("Reading uninstall data from jukebox"), 100, NULL,
+    wxProgressDialog* progress = new wxProgressDialog(wxT("Uninstalling"),
+                wxT("Reading uninstall data from jukebox"), 100, NULL,
                 wxPD_APP_MODAL | wxPD_AUTO_HIDE | wxPD_SMOOTH |
                 wxPD_ELAPSED_TIME | wxPD_REMAINING_TIME | wxPD_CAN_ABORT);
     progress->Update(0);
@@ -358,19 +413,19 @@ int Uninstall(const wxString dir, bool isFullUninstall) {
         if (FilesToRemove == NULL || FilesToRemove->GetCount() < 1) {
             wxLogNull lognull;
             if ( wxMessageDialog(NULL,
-                _("Rockbox Utility can't find any uninstall data on this "
+                wxT("Rockbox Utility can't find any uninstall data on this "
                 "jukebox.\n"
                 "Would you like to attempt a full uninstall?\n"
                 "(WARNING: A full uninstall removes all files in your Rockbox "
                 "folder)"),
-                _("Standard uninstall not possible"),
+                wxT("Standard uninstall not possible"),
                 wxICON_EXCLAMATION | wxYES_NO | wxNO_DEFAULT).ShowModal()
                 == wxID_YES)
             {
                 isFullUninstall = true;
             }
             else {
-                MESG_DIALOG(_("Uninstall cancelled by user"));
+                MESG_DIALOG(wxT("Uninstall cancelled by user"));
                 delete progress;
                 return 1000;
             }
@@ -382,8 +437,8 @@ int Uninstall(const wxString dir, bool isFullUninstall) {
         buf.Printf(wxT("%s" PATH_SEP ".rockbox"), dir.c_str());
         if (rm_rf(buf) )
         {
-            WARN_DIALOG(_("Unable to completely remove Rockbox directory"),
-            _("Full uninstall") );
+            WARN_DIALOG(wxT("Unable to completely remove Rockbox directory"),
+            wxT("Full uninstall") );
             errflag = true;
         }
 
@@ -413,8 +468,8 @@ int Uninstall(const wxString dir, bool isFullUninstall) {
             {
                 if (! wxRemoveFile((*special)[i]) )
                 {
-                    buf.Printf(_("Can't delete %s"), (*special)[i].c_str());
-                    WARN_DIALOG(buf.c_str(), _("Full uninstall"));
+                    buf.Printf(wxT("Can't delete %s"), (*special)[i].c_str());
+                    WARN_DIALOG(buf.c_str(), wxT("Full uninstall"));
                     errflag = true;
                 }
             }
@@ -441,11 +496,11 @@ int Uninstall(const wxString dir, bool isFullUninstall) {
 
             wxString* buf2 = new wxString;
             buf.Printf("%s%s", dir.c_str() , FilesToRemove->Item(i).c_str() );
-            buf2->Format(_("Deleting %s"), buf.c_str());
+            buf2->Format(wxT("Deleting %s"), buf.c_str());
 
             if (! progress->Update((i + 1) * 100 / totalfiles, *buf2) )
             {
-                WARN_DIALOG(_("Cancelled by user"), _("Normal Uninstall"));
+                WARN_DIALOG(wxT("Cancelled by user"), wxT("Normal Uninstall"));
                 delete progress;
                 return true;
             }
@@ -463,41 +518,41 @@ int Uninstall(const wxString dir, bool isFullUninstall) {
 
                 if ( rc = ! wxRmdir(buf) )
                 {
-                    buf = buf.Format(_("Can't remove directory %s"),
+                    buf = buf.Format(wxT("Can't remove directory %s"),
                         buf.c_str());
                     errflag = true;
-                    WARN_DIALOG(buf.c_str(), _("Standard uninstall"));
+                    WARN_DIALOG(buf.c_str(), wxT("Standard uninstall"));
                 }
             } else if (wxFileExists(buf) )
             {
                 if ( rc = ! wxRemoveFile(buf) )
                 {
-                    buf = buf.Format(_("Can't delete file %s"),
+                    buf = buf.Format(wxT("Can't delete file %s"),
                         buf.c_str());
                     errflag = true;
-                    WARN_DIALOG(buf.c_str(), _("Standard uninstall"));
+                    WARN_DIALOG(buf.c_str(), wxT("Standard uninstall"));
                 }
             } else
             {
                 errflag = true;
-                buf = buf.Format(_("Can't find file or directory %s"),
+                buf = buf.Format(wxT("Can't find file or directory %s"),
                     buf.c_str() );
-                WARN_DIALOG(buf.c_str(), _("Standard uninstall") );
+                WARN_DIALOG(buf.c_str(), wxT("Standard uninstall") );
             }
 
             uninst = uninst.AfterFirst('\n');
         }
         if (errflag)
         {
-            ERR_DIALOG(_("Unable to remove some files"),
-                _("Standard uninstall"))    ;
+            ERR_DIALOG(wxT("Unable to remove some files"),
+                wxT("Standard uninstall"))    ;
         }
 
         if (FilesToRemove != NULL) delete FilesToRemove;
     }
 
     delete progress;
-    wxLogVerbose(_("=== end Uninstall"));
+    wxLogVerbose(wxT("=== end Uninstall"));
     return errflag;
 }
 
@@ -553,8 +608,8 @@ bool InstallRbutil(wxString dest)
         if (! wxMkdir(destdir, 0777) )
         {
             buf.Printf(wxT("%s (%s)"),
-                _("Unable to create directory for installer"), destdir.c_str());
-            WARN_DIALOG(buf , _("Portable install") );
+                wxT("Unable to create directory for installer"), destdir.c_str());
+            WARN_DIALOG(buf , wxT("Portable install") );
             return false;
         }
         log->WriteFile(wxT("RockboxUtility"), true);
@@ -564,7 +619,7 @@ bool InstallRbutil(wxString dest)
         wxDIR_FILES);
     if (filestocopy.GetCount() < 1)
     {
-        WARN_DIALOG(_("No files to copy"), _("Portable install") );
+        WARN_DIALOG(wxT("No files to copy"), wxT("Portable install") );
         return false;
     }
 
@@ -581,8 +636,8 @@ bool InstallRbutil(wxString dest)
         if (! wxCopyFile(filestocopy[i], dstr) )
         {
             buf.Printf(wxT("%s (%s -> %s)"),
-                _("Error copying file"), filestocopy[i].c_str(), dstr.c_str());
-            WARN_DIALOG(buf, _("Portable Install") );
+                wxT("Error copying file"), filestocopy[i].c_str(), dstr.c_str());
+            WARN_DIALOG(buf, wxT("Portable Install") );
             return false;
         }
         buf = dstr;
@@ -599,7 +654,7 @@ bool InstallRbutil(wxString dest)
         {
             buf.Printf(wxT("Can't copy program binary %s -> %s"),
                 str.c_str(), dstr.c_str() );
-            WARN_DIALOG(buf, _("Portable Install") );
+            WARN_DIALOG(buf, wxT("Portable Install") );
             return false;
         }
         buf = dstr;
@@ -613,9 +668,9 @@ bool InstallRbutil(wxString dest)
     if (! wxCopyFile(gv->UserConfigFile, dstr) )
     {
         buf.Printf(wxT("%s (%s -> %s)"),
-            _("Unable to install user config file"), gv->UserConfigFile.c_str(),
+            wxT("Unable to install user config file"), gv->UserConfigFile.c_str(),
             dstr.c_str() );
-        WARN_DIALOG(buf, _("Portable Install") );
+        WARN_DIALOG(buf, wxT("Portable Install") );
         return false;
     }
     buf = dstr;
@@ -628,7 +683,7 @@ bool InstallRbutil(wxString dest)
 
 bool rm_rf(wxString file)
 {
-    wxLogVerbose(_("=== begin rm-rf(%s)"), file.c_str() );
+    wxLogVerbose(wxT("=== begin rm-rf(%s)"), file.c_str() );
 
     wxString buf;
     wxArrayString selected;
@@ -649,8 +704,8 @@ bool rm_rf(wxString file)
         selected.Sort(true);
         selected.Add(file);
 
-        wxProgressDialog* progress = new wxProgressDialog(_("Removing files"),
-                _("Deleting files"), selected.GetCount(), NULL,
+        wxProgressDialog* progress = new wxProgressDialog(wxT("Removing files"),
+                wxT("Deleting files"), selected.GetCount(), NULL,
                 wxPD_APP_MODAL | wxPD_AUTO_HIDE | wxPD_SMOOTH |
                 wxPD_ELAPSED_TIME | wxPD_REMAINING_TIME | wxPD_CAN_ABORT);
 
@@ -659,10 +714,10 @@ bool rm_rf(wxString file)
             wxLogVerbose(selected[i]);
             if (progress != NULL)
             {
-                buf.Printf(_("Deleting %s"), selected[i].c_str() );
+                buf.Printf(wxT("Deleting %s"), selected[i].c_str() );
                 if (! progress->Update(i, buf))
                 {
-                    WARN_DIALOG(_("Cancelled by user"), _("Erase Files"));
+                    WARN_DIALOG(wxT("Cancelled by user"), wxT("Erase Files"));
                     delete progress;
                     return true;
                 }
@@ -672,27 +727,27 @@ bool rm_rf(wxString file)
             {
                 if (rc = ! wxRmdir(selected[i]) )
                 {
-                    buf.Printf(_("Can't remove directory %s"),
+                    buf.Printf(wxT("Can't remove directory %s"),
                         selected[i].c_str());
                     errflag = true;
-                    WARN_DIALOG(buf.c_str(), _("Erase files"));
+                    WARN_DIALOG(buf.c_str(), wxT("Erase files"));
                 }
             } else if (rc = ! wxRemoveFile(selected[i]) )
             {
-                buf.Printf(_("Error deleting file %s"), selected[i].c_str() );
+                buf.Printf(wxT("Error deleting file %s"), selected[i].c_str() );
                 errflag = true;
-                WARN_DIALOG(buf.c_str(),_("Erase files"));
+                WARN_DIALOG(buf.c_str(),wxT("Erase files"));
             }
         }
         delete progress;
     } else
     {
-        buf.Printf(_("Can't find expected file %s"), file.c_str());
-        WARN_DIALOG(buf.c_str(), _("Erase files"));
+        buf.Printf(wxT("Can't find expected file %s"), file.c_str());
+        WARN_DIALOG(buf.c_str(), wxT("Erase files"));
         return true;
     }
 
-    wxLogVerbose(_("=== end rm-rf"));
+    wxLogVerbose(wxT("=== end rm-rf"));
     return rc ? true : false;
 }
 

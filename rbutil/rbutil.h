@@ -90,6 +90,7 @@ public:
     wxArrayString           plat_bootloadername;
     wxArrayInt              plat_autodetect;
     wxArrayString           plat_combinedname;
+    wxArrayString           plat_resolution;
     wxString                download_url;
     wxString                daily_url;
     wxString                bleeding_url;
@@ -98,6 +99,7 @@ public:
     wxString                last_release;
     wxString                prog_name;
     wxString                bootloader_url;
+    wxString                themes_url;
 
     // User configuration data.
     wxString                curplat;
@@ -110,6 +112,8 @@ public:
     wxString                curbootloadermethod;
     wxString                curbootloader;
     wxString                curfirmware;
+    wxString                curresolution;
+    wxArrayString           themesToInstall;
 
     // Global system variables
     wxFFile*                 logfile;
@@ -126,6 +130,8 @@ int DownloadURL(wxString src, wxString dest);
 int UnzipFile(wxString src, wxString destdir, bool isInstall = false);
 int Uninstall(const wxString dir, bool isFullUninstall = false);
 bool InstallRbutil(wxString dest);
+bool InstallTheme(wxString src);
+bool checkZip(wxString zipname);
 wxString stream_err_str(int errnum);
 bool rm_rf(wxString file);
 

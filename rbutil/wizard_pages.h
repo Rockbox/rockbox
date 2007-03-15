@@ -24,6 +24,60 @@
 
 #include "rbutil.h"
 
+
+////// Dialog for Preview of Theme //////////////
+class wxThemeImageDialog : public wxDialog
+{
+private:
+   DECLARE_EVENT_TABLE()
+
+public:
+    wxThemeImageDialog(wxWindow* parent,wxWindowID id,wxString title,wxBitmap bmp);
+    void OnPaint(wxPaintEvent& WXUNUSED(event));
+
+private:
+    wxBitmap m_bitmap;
+};
+
+
+
+class wxThemesPage : public wxWizardPageSimple
+{
+private:
+    DECLARE_EVENT_TABLE()
+
+public:
+    enum {
+         ID_PREVIEW_BTN      = 1000,
+         ID_LISTBOX          = 1001,
+         ID_INSTALLCHECKBOX  = 1002,
+    };
+
+public:
+    wxThemesPage(wxWizard *parent);
+    virtual bool TransferDataFromWindow(void);
+    void OnPageShown(wxWizardEvent& event);
+    void OnPreviewBtn(wxCommandEvent& event);
+    void OnListBox(wxCommandEvent& event);
+    void OnCheckBox(wxCommandEvent& event);
+    void OnWizardPageChanging(wxWizardEvent& event);
+
+public:
+   wxListBox* ThemesListBox;
+   wxButton* m_previewBtn;
+   wxStaticText* m_desc;
+   wxStaticText* m_size;
+   wxCheckBox* m_InstallCheckBox;
+
+   wxArrayString m_Themes;
+   wxArrayString m_Themes_path;
+   wxArrayString m_Themes_image;
+   wxArrayString m_Themes_desc;
+   wxArrayString m_Themes_size;
+   wxArrayInt    m_installTheme;
+
+};
+
 class wxBootPlatformPage : public wxWizardPageSimple
 {
 public:

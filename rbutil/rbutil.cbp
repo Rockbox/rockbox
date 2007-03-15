@@ -82,6 +82,10 @@
 			<Add library="oleaut32" />
 			<Add library="uuid" />
 			<Add library="libwxzlib" />
+			<Add library="libwxregex" />
+			<Add library="libwxpng" />
+			<Add library="libwxjpeg" />
+			<Add library="libwxtiff" />
 			<Add directory="$(#WX.lib)\gcc_lib$(WX_CFG)" />
 			<Add directory="$(#WX.lib)" />
 			<Add directory=".\" />
@@ -127,8 +131,10 @@
 		<Unit filename="rbutilFrm.cpp" />
 		<Unit filename="rbutilFrm.h" />
 		<Unit filename="rbutilFrm_XPM.xpm" />
+		<Unit filename="themes_3d.xpm" />
 		<Unit filename="tools2_3d.xpm" />
 		<Unit filename="uninstall_3d.xpm" />
+		<Unit filename="untools2_3d.xpm" />
 		<Unit filename="wizard.xpm" />
 		<Unit filename="wizard_pages.cpp" />
 		<Unit filename="wizard_pages.h" />

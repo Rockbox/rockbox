@@ -27,7 +27,7 @@ IMPLEMENT_APP(rbutilFrmApp)
 
 bool rbutilFrmApp::OnInit()
 {
-    wxString buf = "";
+    wxString buf = wxT("");
 
     wxLogVerbose(wxT("=== begin rbutilFrmApp::Oninit()"));
 
@@ -48,7 +48,7 @@ bool rbutilFrmApp::OnInit()
         wxLogNull lognull;
         if (! wxMkdir(buf, 0777))
         {
-            wxLogFatalError(_("Can't create data directory %s"),
+            wxLogFatalError(wxT("Can't create data directory %s"),
                 buf.c_str());
         }
     }
@@ -56,7 +56,7 @@ bool rbutilFrmApp::OnInit()
     buf += wxT(PATH_SEP "rbutil.log");
     gv->logfile = new wxFFile(buf, "w");
     if (! gv->logfile->IsOpened() )
-        wxLogFatalError(_("Unable to open log file"));
+        wxLogFatalError(wxT("Unable to open log file"));
 
     gv->loggui = new wxLogGui();
     gv->loggui->SetActiveTarget(gv->loggui);
@@ -73,7 +73,7 @@ bool rbutilFrmApp::OnInit()
 
     if (!ReadGlobalConfig(NULL))
     {
-        ERR_DIALOG(gv->ErrStr->GetData(), _("Rockbox Utility"));
+        ERR_DIALOG(gv->ErrStr->GetData(), wxT("Rockbox Utility"));
         return FALSE;
     }
     ReadUserConfig();
@@ -83,6 +83,8 @@ bool rbutilFrmApp::OnInit()
     myFrame->Show(TRUE);
 
     initIpodpatcher();             // reserve mem for ipodpatcher
+    wxInitAllImageHandlers();       //init Image handlers
+
     wxLogVerbose(wxT("=== end rbUtilFrmApp::OnInit()"));
     return TRUE;
 }
@@ -136,7 +138,7 @@ bool rbutilFrmApp::ReadGlobalConfig(rbutilFrm* myFrame)
     wxFileInputStream* cfgis = new wxFileInputStream(buf);
 
     if (!cfgis->CanRead()) {
-        gv->ErrStr = new wxString(_("Unable to open configuration file"));
+        gv->ErrStr = new wxString(wxT("Unable to open configuration file"));
         return false;
     }
 
@@ -175,6 +177,9 @@ bool rbutilFrmApp::ReadGlobalConfig(rbutilFrm* myFrame)
         gv->GlobalConfig->Read(buf.Format(wxT("/%s/combinedname"),
             cur.c_str()), &tmpstr);
         gv->plat_combinedname.Add(tmpstr);
+        gv->GlobalConfig->Read(buf.Format(wxT("/%s/resolution"),
+            cur.c_str()), &tmpstr);
+        gv->plat_resolution.Add(tmpstr);
 
         i++;
     }
@@ -209,6 +214,9 @@ bool rbutilFrmApp::ReadGlobalConfig(rbutilFrm* myFrame)
 
     gv->GlobalConfig->Read(wxT("bootloader_url"), &tmpstr);
     gv->bootloader_url = tmpstr;
+
+    gv->GlobalConfig->Read(wxT("themes_url"), &tmpstr);
+    gv->themes_url = tmpstr;
 
 #ifdef __WXMSW__
     gv->curdestdir = wxT("D:\\");
