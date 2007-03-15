@@ -62,7 +62,7 @@ int rtc_read_datetime(unsigned char* buf)
      * get_time() from firmware/common/timefuncs.c */
     
     /* weekday */
-    buf[3] = ((seconds % WEEK_SECONDS) / DAY_SECONDS + 1) % 7;
+    buf[3] = ((seconds % WEEK_SECONDS) / DAY_SECONDS + 2) % 7;
     
     /* Year */
     year = 1980;
