@@ -55,14 +55,14 @@
 #ifdef __WXMSW__
 #define PATH_SEP "\\"
 #define PATH_SEP_CHR '\\'
-#define EXE_NAME "rbutil.exe"
+#define EXE_NAME wxT("rbutil.exe")
 #else
-#define PATH_SEP "/"
+#define PATH_SEP wxT("/")
 #define PATH_SEP_CHR '/'
-#define EXE_NAME "rbutil"
+#define EXE_NAME wxT("rbutil")
 #endif
 
-#define UNINSTALL_FILE ".rockbox" PATH_SEP ".rbutil_install_data"
+#define UNINSTALL_FILE wxT(".rockbox" PATH_SEP ".rbutil_install_data")
 #define MAX_PLATFORMS 50
 #define SYSTEM_CONFIG rbutil.ini
 #define FILE_BUFFER_SIZE 1024
