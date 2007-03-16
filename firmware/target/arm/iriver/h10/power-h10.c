@@ -93,4 +93,5 @@ bool ide_powered(void)
 void power_off(void)
 {
     GPIOF_OUTPUT_VAL &=~ 0x20;
+    while(1);
 }
