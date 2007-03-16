@@ -17,8 +17,8 @@
  *
  ****************************************************************************/
 
-#ifndef _IPODPATCHER_H
-#define _IPODPATCHER_H
+#ifndef _SANSAPATCHER_H
+#define _SANSAPATCHER_H
 
 #include "sansaio.h"
 
@@ -30,14 +30,12 @@ extern unsigned char* sectorbuf;
 #define FILETYPE_MI4 0
 #define FILETYPE_INTERNAL 1
 
-char* get_parttype(int pt);
-int read_partinfo(struct sansa_t* sansa, int silent);
-off_t filesize(int fd);
+int sansa_read_partinfo(struct sansa_t* sansa, int silent);
 int is_e200(struct sansa_t* sansa);
 int sansa_scan(struct sansa_t* sansa);
-int read_firmware(struct sansa_t* sansa, char* filename);
-int add_bootloader(struct sansa_t* sansa, char* filename, int type);
-int delete_bootloader(struct sansa_t* sansa);
-void list_images(struct sansa_t* sansa);
+int sansa_read_firmware(struct sansa_t* sansa, char* filename);
+int sansa_add_bootloader(struct sansa_t* sansa, char* filename, int type);
+int sansa_delete_bootloader(struct sansa_t* sansa);
+void sansa_list_images(struct sansa_t* sansa);
 
 #endif

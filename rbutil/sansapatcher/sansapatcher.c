@@ -26,7 +26,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "parttypes.h"
 #include "sansaio.h"
 #include "sansapatcher.h"
 #include "bootimg.h"
@@ -43,27 +42,7 @@ extern int verbose;
 
 unsigned char* sectorbuf;
 
-char* get_parttype(int pt)
-{
-    int i;
-    static char unknown[]="Unknown";
-
-    if (pt == -1) {
-        return "HFS/HFS+";
-    }
-
-    i=0;
-    while (parttypes[i].name != NULL) {
-        if (parttypes[i].type == pt) {
-            return (parttypes[i].name);
-        }
-        i++;
-    }
-
-    return unknown;
-}
-
-off_t filesize(int fd) {
+static off_t filesize(int fd) {
     struct stat buf;
 
     if (fstat(fd,&buf) < 0) {
@@ -134,7 +113,7 @@ void int2be(unsigned int val, unsigned char* addr)
     ((long)array[pos] | ((long)array[pos+1] << 8 ) |\
     ((long)array[pos+2] << 16 ) | ((long)array[pos+3] << 24 ))
 
-int read_partinfo(struct sansa_t* sansa, int silent)
+int sansa_read_partinfo(struct sansa_t* sansa, int silent)
 {
     int i;
     unsigned long count;
@@ -340,7 +319,7 @@ static int set_mi4header(unsigned char* buf,struct mi4header_t* mi4header)
     return 0;
 }
 
-int sansa_seek_and_read(struct sansa_t* sansa, loff_t pos, unsigned char* buf, int nbytes)
+static int sansa_seek_and_read(struct sansa_t* sansa, loff_t pos, unsigned char* buf, int nbytes)
 {
     int n;
 
@@ -450,7 +429,7 @@ int sansa_scan(struct sansa_t* sansa)
              continue;
          }
 
-         if (read_partinfo(sansa,1) < 0) {
+         if (sansa_read_partinfo(sansa,1) < 0) {
              continue;
          }
 
@@ -475,7 +454,7 @@ int sansa_scan(struct sansa_t* sansa)
     return n;
 }
 
-int load_original_firmware(struct sansa_t* sansa, unsigned char* buf, struct mi4header_t* mi4header)
+static int load_original_firmware(struct sansa_t* sansa, unsigned char* buf, struct mi4header_t* mi4header)
 {
     int ppmi_length;
     int n;
@@ -564,7 +543,7 @@ int load_original_firmware(struct sansa_t* sansa, unsigned char* buf, struct mi4
     return 0;
 }
 
-int read_firmware(struct sansa_t* sansa, char* filename)
+int sansa_read_firmware(struct sansa_t* sansa, char* filename)
 {
     int res;
     int outfile;
@@ -587,7 +566,7 @@ int read_firmware(struct sansa_t* sansa, char* filename)
 }
 
 
-int add_bootloader(struct sansa_t* sansa, char* filename, int type)
+int sansa_add_bootloader(struct sansa_t* sansa, char* filename, int type)
 {
     int res;
     int infile;
@@ -656,7 +635,7 @@ int add_bootloader(struct sansa_t* sansa, char* filename, int type)
     return 0;
 }
 
-int delete_bootloader(struct sansa_t* sansa)
+int sansa_delete_bootloader(struct sansa_t* sansa)
 {
     int res;
     struct mi4header_t mi4header;
@@ -693,7 +672,7 @@ int delete_bootloader(struct sansa_t* sansa)
     return 0;
 }
 
-void list_images(struct sansa_t* sansa)
+void sansa_list_images(struct sansa_t* sansa)
 {
     struct mi4header_t mi4header;
     loff_t ppmi_length;

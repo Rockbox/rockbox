@@ -28,6 +28,7 @@
 
 #include "sansapatcher.h"
 #include "sansaio.h"
+#include "parttypes.h"
 
 #define VERSION "0.1"
 
@@ -81,6 +82,26 @@ void print_usage(void)
     fprintf(stderr,"sansapatcher will refuse to access a disk unless it can identify it as being\n");
     fprintf(stderr,"an E200.\n");
 #endif
+}
+
+char* get_parttype(int pt)
+{
+    int i;
+    static char unknown[]="Unknown";
+
+    if (pt == -1) {
+        return "HFS/HFS+";
+    }
+
+    i=0;
+    while (parttypes[i].name != NULL) {
+        if (parttypes[i].type == pt) {
+            return (parttypes[i].name);
+        }
+        i++;
+    }
+
+    return unknown;
 }
 
 void display_partinfo(struct sansa_t* sansa)
@@ -214,7 +235,7 @@ int main(int argc, char* argv[])
     fprintf(stderr,"[INFO] Reading partition table from %s\n",sansa.diskname);
     fprintf(stderr,"[INFO] Sector size is %d bytes\n",sansa.sector_size);
 
-    if (read_partinfo(&sansa,0) < 0) {
+    if (sansa_read_partinfo(&sansa,0) < 0) {
         return 2;
     }
 
@@ -237,7 +258,7 @@ int main(int argc, char* argv[])
     }
 
     if (action==LIST_IMAGES) {
-        list_images(&sansa);
+        sansa_list_images(&sansa);
     } else if (action==INTERACTIVE) {
 
         printf("Enter i to install the Rockbox bootloader, u to uninstall\n or c to cancel and do nothing (i/u/c) :");
@@ -248,7 +269,7 @@ int main(int argc, char* argv[])
                     return 5;
                 }
 
-                if (add_bootloader(&sansa, NULL, FILETYPE_INTERNAL)==0) {
+                if (sansa_add_bootloader(&sansa, NULL, FILETYPE_INTERNAL)==0) {
                     fprintf(stderr,"[INFO] Bootloader installed successfully.\n");
                 } else {
                     fprintf(stderr,"[ERR]  --install failed.\n");
@@ -258,7 +279,7 @@ int main(int argc, char* argv[])
                     return 5;
                 }
 
-                if (delete_bootloader(&sansa)==0) {
+                if (sansa_delete_bootloader(&sansa)==0) {
                     fprintf(stderr,"[INFO] Bootloader removed.\n");
                 } else {
                     fprintf(stderr,"[ERR]  Bootloader removal failed.\n");
@@ -266,7 +287,7 @@ int main(int argc, char* argv[])
             }
         }
     } else if (action==READ_FIRMWARE) {
-        if (read_firmware(&sansa, filename)==0) {
+        if (sansa_read_firmware(&sansa, filename)==0) {
             fprintf(stderr,"[INFO] Firmware read to file %s.\n",filename);
         } else {
             fprintf(stderr,"[ERR]  --read-firmware failed.\n");
@@ -276,7 +297,7 @@ int main(int argc, char* argv[])
             return 5;
         }
 
-        if (add_bootloader(&sansa, NULL, FILETYPE_INTERNAL)==0) {
+        if (sansa_add_bootloader(&sansa, NULL, FILETYPE_INTERNAL)==0) {
             fprintf(stderr,"[INFO] Bootloader installed successfully.\n");
         } else {
             fprintf(stderr,"[ERR]  --install failed.\n");
@@ -286,7 +307,7 @@ int main(int argc, char* argv[])
             return 5;
         }
 
-        if (add_bootloader(&sansa, filename, type)==0) {
+        if (sansa_add_bootloader(&sansa, filename, type)==0) {
             fprintf(stderr,"[INFO] Bootloader %s written to device.\n",filename);
         } else {
             fprintf(stderr,"[ERR]  --add-bootloader failed.\n");
@@ -296,7 +317,7 @@ int main(int argc, char* argv[])
             return 5;
         }
 
-        if (delete_bootloader(&sansa)==0) {
+        if (sansa_delete_bootloader(&sansa)==0) {
             fprintf(stderr,"[INFO] Bootloader removed successfully.\n");
         } else {
             fprintf(stderr,"[ERR]  --delete-bootloader failed.\n");
