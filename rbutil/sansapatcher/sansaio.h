@@ -31,7 +31,7 @@
 #define O_BINARY 0
 
 /* Only Linux seems to need lseek64 and loff_t */
-#if !defined(linux) && defined (__linux)
+#if !defined(linux) && !defined (__linux)
 #define loff_t off_t
 #define lseek64 lseek
 #endif
