@@ -27,6 +27,7 @@
 #define     EREAD_IMAGE_FAILED      -4
 #define     EBAD_CHKSUM             -5
 #define     EFILE_TOO_BIG           -6
+#define     EINVALID_FORMAT         -7
 
 /* Set this to true to enable lcd_update() in the printf function */
 extern bool verbose;

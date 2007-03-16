@@ -118,13 +118,19 @@
 #define HAVE_ATA_POWER_OFF
 
 /* Offset ( in the firmware file's header ) to the file length */
-#define FIRMWARE_OFFSET_FILE_LENGTH 0
+#define FIRMWARE_OFFSET_FILE_LENGTH 0x8
 
 /* Offset ( in the firmware file's header ) to the file CRC */
-#define FIRMWARE_OFFSET_FILE_CRC 0
+#define FIRMWARE_OFFSET_FILE_CRC    0x0c
+
+/* Offset ( in the firmware file's header ) to the file type */
+#define FIRMWARE_OFFSET_FILE_TYPE   0x1f8
+
+/* Offset ( in the firmware file's header ) to the file model id */
+#define FIRMWARE_OFFSET_FILE_MODEL  0x1fc
 
 /* Offset ( in the firmware file's header ) to the real data */
-#define FIRMWARE_OFFSET_FILE_DATA 8
+#define FIRMWARE_OFFSET_FILE_DATA   0x200
 
 /* #define USB_IPODSTYLE */
 

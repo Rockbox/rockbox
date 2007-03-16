@@ -1173,8 +1173,34 @@ EOF
     flash=""
     plugins="yes"
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a  libspeex"
-    boottool="$rootdir/tools/scramble -mi4v3"
+    boottool="$rootdir/tools/scramble -mi4v3 -model=h10 -type=RBBL"
     bootoutput="H10_20GC.mi4"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$genericbitmaptools scramble"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="iriver"
+    t_model="h10"
+    ;;
+
+   15|h10_5gb)
+    target_id=24
+    archos="h10_5gb"
+    target="-DIRIVER_H10_5GB"
+    memory=32 # always
+    arm7tdmicc
+    tool="$rootdir/tools/scramble -add=h10_5gb"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
+    output="rockbox.h10"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins="yes"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a  libspeex"
+    boottool="$rootdir/tools/scramble -mi4v2 -model=h105 -type=RBBL"
+    bootoutput="H10.mi4"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$genericbitmaptools scramble"
@@ -1199,7 +1225,7 @@ EOF
     flash=""
     plugins="yes"
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a  libspeex"
-    boottool="$rootdir/tools/scramble -mi4v3"
+    boottool="$rootdir/tools/scramble -mi4v3 -model=e200 -type=RBBL"
     bootoutput="PP5022.mi4"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -1228,7 +1254,7 @@ EOF
     flash=""
     plugins="yes"
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a  libspeex"
-    boottool="$rootdir/tools/scramble -mi4r"
+    boottool="$rootdir/tools/scramble -mi4r -model=e20r -type=RBBL"
     bootoutput="pp5022.mi4"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -1237,32 +1263,6 @@ EOF
     t_cpu="arm"
     t_manufacturer="sandisk"
     t_model="sansa-e200"
-    ;;
-
-   15|h10_5gb)
-    target_id=24
-    archos="h10_5gb"
-    target="-DIRIVER_H10_5GB"
-    memory=32 # always
-    arm7tdmicc
-    tool="$rootdir/tools/scramble -add=h10_5gb"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
-    output="rockbox.h10"
-    appextra="recorder:gui"
-    archosrom=""
-    flash=""
-    plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a  libspeex"
-    boottool="$rootdir/tools/scramble -mi4v2"
-    bootoutput="H10.mi4"
-    # toolset is the tools within the tools directory that we build for
-    # this particular target.
-    toolset="$genericbitmaptools scramble"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="arm"
-    t_manufacturer="iriver"
-    t_model="h10"
     ;;
 
    60|tpj1022)

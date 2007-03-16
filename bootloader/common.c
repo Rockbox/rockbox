@@ -97,6 +97,8 @@ char *strerror(int error)
         return "Bad checksum";
     case EFILE_TOO_BIG:
         return "File too big";
+    case EINVALID_FORMAT:
+        return "Invalid file format";
     default:
         return "Unknown";
     }
