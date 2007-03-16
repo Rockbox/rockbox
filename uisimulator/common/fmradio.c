@@ -26,7 +26,7 @@
 static int frequency = 0;
 static bool mono = false;
 
-void radio_set(int setting, int value)
+int radio_set(int setting, int value)
 {
     switch(setting)
     {
@@ -34,6 +34,10 @@ void radio_set(int setting, int value)
             break;
 
         case RADIO_FREQUENCY:
+            frequency = value;
+            break;
+
+        case RADIO_SCAN_FREQUENCY:
             frequency = value;
             break;
 
@@ -45,8 +49,10 @@ void radio_set(int setting, int value)
             break;
 
         default:
-            return;
+            return -1;
     }
+
+    return 1;
 }
 
 int radio_get(int setting)

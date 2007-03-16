@@ -2074,7 +2074,6 @@ static bool dbg_fm_radio(void)
     while(1)
     {
         int row = 0;
-        unsigned long regs;
 
         lcd_clear_display();
         fm_detected = radio_hardware_present();
@@ -2083,16 +2082,31 @@ static bool dbg_fm_radio(void)
         lcd_puts(0, row++, buf);
 
 #if (CONFIG_TUNER & S1A0903X01)
-        regs = samsung_get(RADIO_ALL);
-        snprintf(buf, sizeof buf, "Samsung regs: %08lx", regs);
+        snprintf(buf, sizeof buf, "Samsung regs: %08X",
+                 samsung_get(RADIO_ALL));
         lcd_puts(0, row++, buf);
 #endif
 #if (CONFIG_TUNER & TEA5767)
-        regs = philips_get(RADIO_ALL);
-        snprintf(buf, sizeof buf, "Philips regs: %08lx", regs);
-        lcd_puts(0, row++, buf);
-#endif
+        {
+            struct philips_dbg_info info;
+            philips_dbg_info(&info);
 
+            snprintf(buf, sizeof buf, "Philips regs:");
+            lcd_puts(0, row++, buf);
+
+            snprintf(buf, sizeof buf, "   Read: %02X %02X %02X %02X %02X",
+                (unsigned)info.read_regs[0], (unsigned)info.read_regs[1],
+                (unsigned)info.read_regs[2], (unsigned)info.read_regs[3],
+                (unsigned)info.read_regs[4]);
+            lcd_puts(0, row++, buf);
+
+            snprintf(buf, sizeof buf, "   Write: %02X %02X %02X %02X %02X",
+                (unsigned)info.write_regs[0], (unsigned)info.write_regs[1],
+                (unsigned)info.write_regs[2], (unsigned)info.write_regs[3],
+                (unsigned)info.write_regs[4]);
+            lcd_puts(0, row++, buf);
+        }
+#endif
         lcd_update();
 
         if (action_userabort(HZ))

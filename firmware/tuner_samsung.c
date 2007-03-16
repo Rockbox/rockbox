@@ -21,6 +21,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "config.h"
+#include "kernel.h"
 #include "tuner.h" /* tuner abstraction interface */
 #include "fmradio.h" /* physical interface driver */
 #include "mpeg.h"
@@ -34,8 +35,10 @@ static int fm_in1;
 static int fm_in2;
 
 /* tuner abstraction layer: set something to the tuner */
-void samsung_set(int setting, int value)
+int samsung_set(int setting, int value)
 {
+    int val = 1;
+
     switch(setting)
     {
         case RADIO_SLEEP:
@@ -90,6 +93,16 @@ void samsung_set(int setting, int value)
             break;
         }
 
+        case RADIO_SCAN_FREQUENCY:
+            /* Tune in and delay */
+            samsung_set(RADIO_FREQUENCY, value);
+            sleep(1);
+            /* Start IF measurement */
+            samsung_set(RADIO_IF_MEASUREMENT, 1);
+            sleep(1);
+            val = samsung_get(RADIO_TUNED);
+            break;
+
         case RADIO_MUTE:
             fm_in1 = (fm_in1 & 0xfffffffe) | (value?1:0);
             fmradio_set(1, fm_in1);
@@ -109,7 +122,11 @@ void samsung_set(int setting, int value)
             fm_in2 = (fm_in2 & 0xfffffffb) | (value?0:4);
             fmradio_set(2, fm_in2);
             break;
+        default:
+            val = -1;
     }
+
+    return val;
 }
 
 /* tuner abstraction layer: read something from the tuner */

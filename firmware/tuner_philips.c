@@ -29,7 +29,7 @@
 static unsigned char write_bytes[5] = { 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 /* tuner abstraction layer: set something to the tuner */
-void philips_set(int setting, int value)
+int philips_set(int setting, int value)
 {
     switch(setting)
     {
@@ -60,6 +60,11 @@ void philips_set(int setting, int value)
             }
             break;
 
+        case RADIO_SCAN_FREQUENCY:
+            philips_set(RADIO_FREQUENCY, value);
+            sleep(HZ/30);
+            return philips_get(RADIO_TUNED);
+
         case RADIO_MUTE:
             write_bytes[0] = (write_bytes[0] & 0x7F) | (value ? 0x80 : 0);
             break;
@@ -75,9 +80,10 @@ void philips_set(int setting, int value)
         case RADIO_SET_BAND:
             write_bytes[3] = (write_bytes[3] & ~(1<<5)) | (value ? (1<<5) : 0);
         default:
-            return;
+            return -1;
     }
     fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
+    return 1;
 }
 
 /* tuner abstraction layer: read something from the tuner */
@@ -106,13 +112,12 @@ int philips_get(int setting)
         case RADIO_STEREO:
             val = read_bytes[2] >> 7;
             break;
-
-        case RADIO_ALL: /* debug query */
-            val = read_bytes[0] << 24 
-                | read_bytes[1] << 16 
-                | read_bytes[2] << 8 
-                | read_bytes[3];
-            break;
     }
     return val;
+}
+
+void philips_dbg_info(struct philips_dbg_info *info)
+{
+    fmradio_i2c_read(I2C_ADR, info->read_regs, 5);
+    memcpy(info->write_regs, write_bytes, 5);
 }
