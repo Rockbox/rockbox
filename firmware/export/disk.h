@@ -27,10 +27,10 @@ struct partinfo {
     unsigned char type;
 };
 
-#define PARTITION_TYPE_FAT32     0x0b
-#define PARTITION_TYPE_FAT32_LBA 0x0c
-#define PARTITION_TYPE_FAT16     0x06
-#define PARTITION_TYPE_HIDDEN    0x84
+#define PARTITION_TYPE_FAT32                0x0b
+#define PARTITION_TYPE_FAT32_LBA            0x0c
+#define PARTITION_TYPE_FAT16                0x06
+#define PARTITION_TYPE_OS2_HIDDEN_C_DRIVE   0x84
 
 /* returns a pointer to an array of 8 partinfo structs */
 struct partinfo* disk_init(IF_MV_NONVOID(int volume));

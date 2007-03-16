@@ -346,7 +346,7 @@ void* main(void)
         /* First try a (hidden) firmware partition */
         printf("Trying firmware partition");
         pinfo = disk_partinfo(1);
-        if(pinfo->type == PARTITION_TYPE_HIDDEN)
+        if(pinfo->type == PARTITION_TYPE_OS2_HIDDEN_C_DRIVE)
         {
             rc = load_mi4_part(loadbuffer, pinfo, MAX_LOADSIZE);
             if (rc < EOK) {
