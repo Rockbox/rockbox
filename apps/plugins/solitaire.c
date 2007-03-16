@@ -32,6 +32,7 @@ use F3 to put card on top of the remains' stack on one of the 4 final stacks
 *****************************************************************************/
 
 #include "plugin.h"
+#include "playback_control.h"
 #include "configfile.h"
 #include "button.h"
 #include "lcd.h"
@@ -247,7 +248,7 @@ static struct plugin_api* rb;
 static int helplines;
 static int displaylines;
 
-static char helptext[] = 
+static char helptext[] =
     /* Use single spaces only! Close each line with one \0. */
     "-- Navigation --\0"
     HK_LR   ": Move the cursor to the previous/ next column.\0"
@@ -263,7 +264,7 @@ static char helptext[] =
 /**
  * Misc constants, graphics and other defines
  */
- 
+
 #include "card_back.h"
 #include "card_deck.h"
 #include "solitaire_suitsi.h"
@@ -443,7 +444,7 @@ static void init_help(void)
     para_len = rb->strlen(para);
 
     while (para_len)
-    {   
+    {
         bool first = true;
         int x = 0;
         char *next, *store;
@@ -546,7 +547,7 @@ enum help solitaire_help( void )
 /**
  * Custom menu / options
  */
- 
+
 #define CFGFILE_VERSION 0
 
 struct sol_config {
@@ -606,6 +607,7 @@ int solitaire_menu(bool in_game)
     }
     items[i++].desc = unhide_option_string;
     items[i++].desc = "Help";
+    items[i++].desc = "Audio Playback";
     items[i++].desc = "Quit";
 
     create_draw_option_string();
@@ -652,6 +654,10 @@ int solitaire_menu(bool in_game)
                 break;
 
             case 4:
+                 playback_control(rb);
+                 break;
+
+            case 5:
                 result = MENU_QUIT;
                 break;
         }
@@ -1024,7 +1030,7 @@ enum { SOLITAIRE_WIN, SOLITAIRE_QUIT, SOLITAIRE_USB };
 /**
  * Bouncing cards at the end of the game
  */
- 
+
 #define BC_ACCEL   ((1<<16)*LCD_HEIGHT/128)
 #define BC_MYSPEED (6*BC_ACCEL)
 #define BC_MXSPEED (6*LCD_HEIGHT/128)
@@ -1139,10 +1145,10 @@ int solitaire( void )
                             j++;
                     }
                     c = deck[c].next;
-                } 
+                }
                 /* make column distinguishable from an empty column,
                  * and avoid division by zero while displaying */
-                if( j == 0 ) 
+                if( j == 0 )
                     j = 1;
             }
             if( j > biggest_col_length )
@@ -1595,7 +1601,7 @@ enum plugin_status plugin_start( struct plugin_api* api, void* parameter )
      * Keep playing if a game was won (that means display the menu after
      * winning instead of quiting) */
     while( ( result = solitaire() ) == SOLITAIRE_WIN );
-    
+
     if (rb->memcmp(&sol, &sol_disk, sizeof(sol))) /* save settings if changed */
     {
         rb->memcpy(&sol_disk, &sol, sizeof(sol));
