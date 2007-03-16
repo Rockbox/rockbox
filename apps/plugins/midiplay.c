@@ -124,7 +124,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb = api;
     if(parameter == NULL)
     {
-        rb->splash(HZ*2, true, " Play .MID file ");
+        rb->splash(HZ*2, " Play .MID file ");
         return PLUGIN_OK;
     }
     rb->lcd_setfont(0);
@@ -153,7 +153,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->cpu_boost(false);
 #endif
 
-    rb->splash(HZ, true, "FINISHED PLAYING");
+    rb->splash(HZ, "FINISHED PLAYING");
 
     if(retval == -1)
         return PLUGIN_ERROR;
