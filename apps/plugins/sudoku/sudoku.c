@@ -490,7 +490,7 @@ void sudoku_solve(struct sudoku_state_t* state)
             }
         }
     } else {
-        rb->splash(HZ*2, true, "Solve failed");
+        rb->splash(HZ*2, "Solve failed");
     }
 
     return;
@@ -696,7 +696,7 @@ bool save_sudoku(struct sudoku_state_t* state)
     char line[13];
     char sep[13];
 
-    rb->splash(0, true, "Saving...");
+    rb->splash(0, "Saving...");
     rb->memcpy(line,"...|...|...\r\n",13);
     rb->memcpy(sep,"-----------\r\n",13);
 
@@ -966,7 +966,7 @@ bool sudoku_generate(struct sudoku_state_t* state)
 
     clear_state(&new_state);
     display_board(&new_state);
-    rb->splash(0, true, "Generating...");
+    rb->splash(0, "Generating...");
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
@@ -982,11 +982,11 @@ bool sudoku_generate(struct sudoku_state_t* state)
         rb->memcpy(state,&new_state,sizeof(new_state));
         rb->snprintf(str,sizeof(str),"Difficulty: %s",difficulty);
         display_board(state);
-        rb->splash(HZ*3, true, str);
+        rb->splash(HZ*3, str);
         rb->strncpy(state->filename,GAME_FILE,MAX_PATH);
     } else {
         display_board(&new_state);
-        rb->splash(HZ*2, true, "Aborted");
+        rb->splash(HZ*2, "Aborted");
     }
     return res;
 }
@@ -1079,7 +1079,7 @@ int sudoku_edit_menu(struct sudoku_state_t* state)
             if (save_sudoku(state)) {
                 state->editmode=0;
             } else {
-                rb->splash(HZ*2, true, "Save failed");
+                rb->splash(HZ*2, "Save failed");
             }
             break;
 
@@ -1101,7 +1101,7 @@ void move_cursor(struct sudoku_state_t* state, int newx, int newy)
 
     /* Check that the character at the cursor position is legal */
     if (check_status(state)) {
-        rb->splash(HZ*2, true, "Illegal move!");
+        rb->splash(HZ*2, "Illegal move!");
         /* Ignore any button presses during the splash */
         rb->button_clear_queue();
         return;
@@ -1148,7 +1148,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         }
     } else {
         if (!load_sudoku(&state,(char*)parameter)) {
-            rb->splash(HZ*2, true, "Load error");
+            rb->splash(HZ*2, "Load error");
             return(PLUGIN_ERROR);
         }
     }
@@ -1167,7 +1167,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             /* Exit game */
             case SUDOKU_BUTTON_QUIT:
                 if (check_status(&state)) {
-                    rb->splash(HZ*2, true, "Illegal move!");
+                    rb->splash(HZ*2, "Illegal move!");
                     /* Ignore any button presses during the splash */
                     rb->button_clear_queue();
                 } else {
@@ -1316,7 +1316,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
                 /* Don't let the user leave a game in a bad state */
                 if (check_status(&state)) {
-                    rb->splash(HZ*2, true, "Illegal move!");
+                    rb->splash(HZ*2, "Illegal move!");
                     /* Ignore any button presses during the splash */
                     rb->button_clear_queue();
                 } else {

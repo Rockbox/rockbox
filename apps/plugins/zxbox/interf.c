@@ -95,7 +95,7 @@ char *spif_get_tape_fileinfo(int *startp, int *nump)
 void put_msg(const char *msg)
 {
 #ifndef USE_GRAY
-    rb->splash (HZ/2,true , msg );
+    rb->splash (HZ/2, msg );
 #else
 	LOGF(msg);
     (void)msg;
@@ -106,7 +106,7 @@ void put_msg(const char *msg)
 void put_tmp_msg(const char *msg)
 {
 #ifndef USE_GRAY
-    rb->splash (HZ/10,true , msg );
+    rb->splash (HZ/10, msg );
 #else
     LOGF(msg);
 	(void)msg;

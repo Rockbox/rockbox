@@ -1659,7 +1659,7 @@ static int run(void)
         cycle_start = *rb->current_tick;
     }
 
-    rb->splash(HZ*2, true, "Game Over!");
+    rb->splash(HZ*2, "Game Over!");
 
     return 2; /* back to menu */
 }

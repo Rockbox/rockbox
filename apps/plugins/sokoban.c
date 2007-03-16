@@ -460,7 +460,7 @@ static int read_levels(int initialize_count)
     endpoint += NUM_BUFFERED_BOARDS;
 
     if ((fd = rb->open(LEVELS_FILE, O_RDONLY)) < 0) {
-        rb->splash(HZ*2, true, "Unable to open %s", LEVELS_FILE);
+        rb->splash(HZ*2, "Unable to open %s", LEVELS_FILE);
         return -1;
     }
 
@@ -472,7 +472,7 @@ static int read_levels(int initialize_count)
              * a mixed unix and dos CR/LF file format, I'm not going to
              * do a precise check */
             if (len < COLS) {
-                rb->splash(HZ*2, true, "Error in levels file: short line");
+                rb->splash(HZ*2, "Error in levels file: short line");
                 return -1;
             }
             if (level_count >= buffered_boards.low && level_count < endpoint) {
@@ -487,8 +487,7 @@ static int read_levels(int initialize_count)
                 level_count++;
                 if (level_count >= endpoint && !initialize_count) break;
                 if (level_count && row != ROWS) {
-                    rb->splash(HZ*2, true,
-                               "Error in levels file: short board");
+                    rb->splash(HZ*2, "Error in levels file: short board");
                     return -1;
                 }
                 row = 0;

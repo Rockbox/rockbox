@@ -144,28 +144,28 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     stringbuffer = buf;
 
     rb->lcd_clear_display();
-    rb->splash(0, true, "Converting...");
+    rb->splash(0, "Converting...");
     
     rc = read_buffer(0);
     if(rc == 0) {
         rb->lcd_clear_display();
-        rb->splash(0, true, "Writing...");
+        rb->splash(0, "Writing...");
         rc = write_file();
 
         if(rc < 0) {
             rb->lcd_clear_display();
-            rb->splash(HZ, true, "Can't write file: %d", rc);
+            rb->splash(HZ, "Can't write file: %d", rc);
         } else {
             rb->lcd_clear_display();
-            rb->splash(HZ, true, "Done");
+            rb->splash(HZ, "Done");
         }
     } else {
         if(rc < 0) {
             rb->lcd_clear_display();
-            rb->splash(HZ, true, "Can't read file: %d", rc);
+            rb->splash(HZ, "Can't read file: %d", rc);
         } else {
             rb->lcd_clear_display();
-            rb->splash(HZ, true, "The file is too big");
+            rb->splash(HZ, "The file is too big");
         }
     }
     

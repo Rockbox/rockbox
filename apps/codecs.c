@@ -312,7 +312,7 @@ int codec_load_file(const char *plugin, struct codec_api *api)
     if (fd < 0) {
         snprintf(msgbuf, sizeof(msgbuf)-1, "Couldn't load codec: %s", path);
         logf("Codec load error:%d", fd);
-        gui_syncsplash(HZ*2, true, msgbuf);
+        gui_syncsplash(HZ*2, msgbuf);
         return fd;
     }
     

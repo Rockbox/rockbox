@@ -1017,7 +1017,7 @@ void printResult(void)
     switch(calStatus){
         case cal_exit:
             rb->lcd_clear_display();
-            rb->splash(HZ/3, true, "Bye now!");
+            rb->splash(HZ/3, "Bye now!");
             break;
         case cal_error:
             clearbuf();
@@ -1447,7 +1447,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             lastbtn = btn;
     } /* while (calStatus != cal_exit ) */
 
-    /*  rb->splash(HZ*2, true, "Hello world!"); */
+    /*  rb->splash(HZ*2, "Hello world!"); */
     rb->button_clear_queue();
     return PLUGIN_OK;
 }

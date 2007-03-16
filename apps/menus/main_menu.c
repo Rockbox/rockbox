@@ -320,7 +320,7 @@ static bool show_info(void)
 
 #ifndef SIMULATOR
             case ACTION_STD_OK:
-                gui_syncsplash(0, true, str(LANG_DIRCACHE_BUILDING));
+                gui_syncsplash(0, str(LANG_DIRCACHE_BUILDING));
                 fat_recalc_free(IF_MV(0));
 #ifdef HAVE_MULTIVOLUME
                 if (fat_ismounted(1))

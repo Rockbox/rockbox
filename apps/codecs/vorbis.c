@@ -79,7 +79,7 @@ bool vorbis_set_codec_parameters(OggVorbis_File *vf)
     vi = ov_info(vf, -1);
 
     if (vi == NULL) {
-        //ci->splash(HZ*2, true, "Vorbis Error");
+        //ci->splash(HZ*2, "Vorbis Error");
         return false;
     }
 

@@ -180,13 +180,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_getstringsize("Files: ", &fontwidth, &fontheight);
 #endif
-    rb->splash(HZ, true, "Counting...");
+    rb->splash(HZ, "Counting...");
     update_screen();
     lasttick = *rb->current_tick;
 
     traversedir("", "");
     if (abort == true) {
-        rb->splash(HZ, true, "Aborted");
+        rb->splash(HZ, "Aborted");
         return PLUGIN_OK;
     }
     update_screen();
@@ -194,7 +194,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->remote_backlight_on();
 #endif
     rb->backlight_on();
-    rb->splash(HZ, true, "Done");
+    rb->splash(HZ, "Done");
     update_screen();
     button = rb->button_get(true);
     while (1) {

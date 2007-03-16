@@ -2030,7 +2030,7 @@ static bool dbg_save_roms(void)
 
         err = eeprom_24cxx_read(0, buf, sizeof buf);
         if (err)
-            gui_syncsplash(HZ*3, true, "Eeprom read failure (%d)",err);
+            gui_syncsplash(HZ*3, "Eeprom read failure (%d)",err);
         else
         {
             write(fd, buf, sizeof buf);
@@ -2123,7 +2123,7 @@ extern bool do_screendump_instead_of_usb;
 static bool dbg_screendump(void)
 {
     do_screendump_instead_of_usb = !do_screendump_instead_of_usb;
-    gui_syncsplash(HZ, true, "Screendump %s",
+    gui_syncsplash(HZ, "Screendump %s",
                  do_screendump_instead_of_usb?"enabled":"disabled");
     return false;
 }
@@ -2314,21 +2314,21 @@ static bool dbg_write_eeprom(void)
 
             err = eeprom_24cxx_write(0, buf, sizeof buf);
             if (err)
-                gui_syncsplash(HZ*3, true, "Eeprom write failure (%d)",err);
+                gui_syncsplash(HZ*3, "Eeprom write failure (%d)",err);
             else
-                gui_syncsplash(HZ*3, true, "Eeprom written successfully");
+                gui_syncsplash(HZ*3, "Eeprom written successfully");
 
             set_irq_level(old_irq_level);
         }
         else
         {
-            gui_syncsplash(HZ*3, true, "File read error (%d)",rc);
+            gui_syncsplash(HZ*3, "File read error (%d)",rc);
         }
         close(fd);
     }
     else
     {
-        gui_syncsplash(HZ*3, true, "Failed to open 'internal_eeprom.bin'");
+        gui_syncsplash(HZ*3, "Failed to open 'internal_eeprom.bin'");
     }
 
     return false;

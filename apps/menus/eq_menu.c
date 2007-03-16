@@ -589,12 +589,12 @@ static bool eq_save_preset(void)
         if (!kbd_input(filename, sizeof filename)) {
             fd = creat(filename);
             if (fd < 0)
-                gui_syncsplash(HZ, true, str(LANG_FAILED));
+                gui_syncsplash(HZ, str(LANG_FAILED));
             else
                 break;
         }
         else {
-            gui_syncsplash(HZ, true, str(LANG_MENU_SETTING_CANCEL));
+            gui_syncsplash(HZ, str(LANG_MENU_SETTING_CANCEL));
             return false;
         }
     }
@@ -613,7 +613,7 @@ static bool eq_save_preset(void)
 
     close(fd);
 
-    gui_syncsplash(HZ, true, str(LANG_SETTINGS_SAVED));
+    gui_syncsplash(HZ, str(LANG_SETTINGS_SAVED));
 
     return true;
 }

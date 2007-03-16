@@ -526,32 +526,32 @@ int plugin_load(const char* plugin, void* parameter)
         plugin_loaded = false;
     }
     
-    gui_syncsplash(0, true, str(LANG_WAIT));
+    gui_syncsplash(0, str(LANG_WAIT));
     strcpy(current_plugin,p);
 
 #ifdef SIMULATOR
     hdr = sim_plugin_load((char *)plugin, &pd);
     if (pd == NULL) {
-        gui_syncsplash(HZ*2, true, str(LANG_PLUGIN_CANT_OPEN), plugin);
+        gui_syncsplash(HZ*2, str(LANG_PLUGIN_CANT_OPEN), plugin);
         return -1;
     }
     if (hdr == NULL
         || hdr->magic != PLUGIN_MAGIC
         || hdr->target_id != TARGET_ID) {
         sim_plugin_close(pd);
-        gui_syncsplash(HZ*2, true,  str(LANG_PLUGIN_WRONG_MODEL));
+        gui_syncsplash(HZ*2, str(LANG_PLUGIN_WRONG_MODEL));
         return -1;
     }
     if (hdr->api_version > PLUGIN_API_VERSION
         || hdr->api_version < PLUGIN_MIN_API_VERSION) {
         sim_plugin_close(pd);
-        gui_syncsplash(HZ*2, true,  str(LANG_PLUGIN_WRONG_VERSION));
+        gui_syncsplash(HZ*2, str(LANG_PLUGIN_WRONG_VERSION));
         return -1;
     }
 #else
     fd = open(plugin, O_RDONLY);
     if (fd < 0) {
-        gui_syncsplash(HZ*2, true, str(LANG_PLUGIN_CANT_OPEN), plugin);
+        gui_syncsplash(HZ*2, str(LANG_PLUGIN_CANT_OPEN), plugin);
         return fd;
     }
 
@@ -559,7 +559,7 @@ int plugin_load(const char* plugin, void* parameter)
     close(fd);
 
     if (readsize < 0) {
-        gui_syncsplash(HZ*2, true, str(LANG_READ_FAILED), plugin);
+        gui_syncsplash(HZ*2, str(LANG_READ_FAILED), plugin);
         return -1;
     }
     hdr = (struct plugin_header *)pluginbuf;
@@ -569,12 +569,12 @@ int plugin_load(const char* plugin, void* parameter)
         || hdr->target_id != TARGET_ID
         || hdr->load_addr != pluginbuf
         || hdr->end_addr > pluginbuf + PLUGIN_BUFFER_SIZE) {
-        gui_syncsplash(HZ*2, true,  str(LANG_PLUGIN_WRONG_MODEL));
+        gui_syncsplash(HZ*2, str(LANG_PLUGIN_WRONG_MODEL));
         return -1;
     }
     if (hdr->api_version > PLUGIN_API_VERSION
         || hdr->api_version < PLUGIN_MIN_API_VERSION) {
-        gui_syncsplash(HZ*2, true,  str(LANG_PLUGIN_WRONG_VERSION));
+        gui_syncsplash(HZ*2, str(LANG_PLUGIN_WRONG_VERSION));
         return -1;
     }
     plugin_size = hdr->end_addr - pluginbuf;
@@ -659,7 +659,7 @@ int plugin_load(const char* plugin, void* parameter)
             return PLUGIN_USB_CONNECTED;
 
         default:
-            gui_syncsplash(HZ*2, true, str(LANG_PLUGIN_ERROR));
+            gui_syncsplash(HZ*2, str(LANG_PLUGIN_ERROR));
             break;
     }
     return PLUGIN_OK;

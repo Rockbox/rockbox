@@ -43,14 +43,14 @@ char *getstring(struct token *token) {
                     return currententry->filename;
                 default:
                     rb->snprintf(buf,199,"unknown stringid intvalue %d",token->intvalue);
-                    rb->splash(HZ*2,true,buf);
+                    rb->splash(HZ*2,buf);
                     return "";
             }
             break;
         default:
             // report error
             rb->snprintf(buf,199,"unknown token %d in getstring..",token->kind); 
-            rb->splash(HZ*2,true,buf);
+            rb->splash(HZ*2,buf);
             return "";
     }
 }
@@ -104,13 +104,13 @@ int getvalue(struct token *token) {
                     return (currententry->playcount-dbglobal.playcountmin)*10/(dbglobal.playcountmax-dbglobal.playcountmin);
                 default:
                     rb->snprintf(buf,199,"unknown numid intvalue %d",token->intvalue);
-                    rb->splash(HZ*2,true,buf);
+                    rb->splash(HZ*2,buf);
                     // report error.
                     return 0;
             }
         default:
             rb->snprintf(buf,199,"unknown token %d in getvalue..",token->kind);
-            rb->splash(HZ*2,true,buf);
+            rb->splash(HZ*2,buf);
             return 0;
     }
 }

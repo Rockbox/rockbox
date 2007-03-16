@@ -433,7 +433,7 @@ void dynamic_recompile (struct dynarec_block *newblock)
     }
 #endif
     snprintf(meow,499,"Recompiling 0x%x",oldpc);
-    rb->splash(HZ*1,1,meow);
+    rb->splash(HZ*1,meow);
     while(!done)
     {
 #ifdef DYNA_DEBUG

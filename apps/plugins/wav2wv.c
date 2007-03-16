@@ -124,19 +124,19 @@ static int wav2wv (char *filename)
     extension = filename + rb->strlen (filename) - 3;
 
     if (rb->strcasecmp (extension, "wav")) {
-        rb->splash(HZ*2, true, "only for wav files!");
+        rb->splash(HZ*2, "only for wav files!");
         return 1;
     }
 
     in_fd = rb->open(filename, O_RDONLY);
 
     if (in_fd < 0) {
-        rb->splash(HZ*2, true, "could not open file!");
+        rb->splash(HZ*2, "could not open file!");
         return true;
     }
 
     if (rb->read (in_fd, &raw_header, sizeof (raw_header)) != sizeof (raw_header)) {
-        rb->splash(HZ*2, true, "could not read file!");
+        rb->splash(HZ*2, "could not read file!");
         return true;
     }
 
@@ -148,7 +148,7 @@ static int wav2wv (char *filename)
 	    rb->strncmp (native_header.fmt_ckID, "fmt ", 4) ||
 	    rb->strncmp (native_header.data_ckID, "data", 4) ||
         native_header.FormatTag != 1 || native_header.BitsPerSample != 16) {
-            rb->splash(HZ*2, true, "incompatible wav file!");
+            rb->splash(HZ*2, "incompatible wav file!");
             return true;
     }
 
@@ -164,7 +164,7 @@ static int wav2wv (char *filename)
 /*  config.flags |= CONFIG_HIGH_FLAG; */
 
     if (!WavpackSetConfiguration (wpc, &config, total_samples)) {
-        rb->splash(HZ*2, true, "internal error!");
+        rb->splash(HZ*2, "internal error!");
         rb->close (in_fd);
         return true;
     }
@@ -180,7 +180,7 @@ static int wav2wv (char *filename)
     extension [1] = save_a;
 
     if (out_fd < 0) {
-        rb->splash(HZ*2, true, "could not create file!");
+        rb->splash(HZ*2, "could not create file!");
         rb->close (in_fd);
         return true;
     }
@@ -201,7 +201,7 @@ static int wav2wv (char *filename)
         bytes_count = samples_count * num_chans * 2;
 
         if (rb->read (in_fd, input_buffer, bytes_count) != (int32_t) bytes_count) {
-            rb->splash(HZ*2, true, "could not read file!");
+            rb->splash(HZ*2, "could not read file!");
             error = true;
             break;
         }
@@ -237,7 +237,7 @@ static int wav2wv (char *filename)
                 } 
 
             if (!WavpackPackSamples (wpc, temp_buffer, samples_this_pass)) {
-                rb->splash(HZ*2, true, "internal error!");
+                rb->splash(HZ*2, "internal error!");
                 error = true;
                 break;
             }
@@ -251,7 +251,7 @@ static int wav2wv (char *filename)
         bytes_count = WavpackFinishBlock (wpc);
 
         if (rb->write (out_fd, output_buffer, bytes_count) != (int32_t) bytes_count) {
-            rb->splash(HZ*2, true, "could not write file!");
+            rb->splash(HZ*2, "could not write file!");
             error = true;
             break;
         }
@@ -265,7 +265,7 @@ static int wav2wv (char *filename)
         buttons = rb->button_status ();
 
         if (last_buttons == BUTTON_NONE && buttons != BUTTON_NONE) {
-            rb->splash(HZ*2, true, "operation aborted!");
+            rb->splash(HZ*2, "operation aborted!");
             error = true;
             break;
         }
@@ -285,7 +285,7 @@ static int wav2wv (char *filename)
         extension [1] = save_a;
     }
     else
-        rb->splash(HZ*3, true, "operation successful");
+        rb->splash(HZ*3, "operation successful");
 
     return error;
 }
@@ -309,7 +309,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void *parameter)
     audiobuf = rb->plugin_get_audio_buffer(&audiobuflen);
 
     if (audiobuflen < 0x200000) {
-        rb->splash(HZ*2, true, "not enough memory!");
+        rb->splash(HZ*2, "not enough memory!");
         return PLUGIN_ERROR;
     }
     

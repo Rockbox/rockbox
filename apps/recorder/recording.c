@@ -538,7 +538,7 @@ int rec_create_directory(void)
         rc = mkdir(rec_base_directory);
         if(rc < 0 && errno != EEXIST)
         {
-            gui_syncsplash(HZ * 2, true,
+            gui_syncsplash(HZ * 2,
                    "Can't create the %s directory. Error code %d.",
                    rec_base_directory, rc);
             return -1;
@@ -870,7 +870,7 @@ bool recording_screen(bool no_source)
         screens[1].puts((screens[1].width/w - strlen(buf))/2 + 1, 
                             screens[1].height/(h*2) + 1, buf);
         screens[1].update();
-        gui_syncsplash(0, true, str(LANG_REMOTE_LCD_OFF));
+        gui_syncsplash(0, str(LANG_REMOTE_LCD_OFF));
     }
 #endif
 
@@ -958,7 +958,7 @@ bool recording_screen(bool no_source)
                     screens[1].puts((screens[1].width/w - strlen(buf))/2 + 1, 
                                           screens[1].height/(h*2) + 1, buf);
                     screens[1].update();
-                    gui_syncsplash(0, true, str(LANG_REMOTE_LCD_OFF));
+                    gui_syncsplash(0, str(LANG_REMOTE_LCD_OFF));
                 }
                 else
                 {
@@ -1741,7 +1741,7 @@ bool recording_screen(bool no_source)
     audio_stat = audio_status();
     if (audio_stat & AUDIO_STATUS_ERROR)
     {
-        gui_syncsplash(0, true, str(LANG_SYSFONT_DISK_FULL));
+        gui_syncsplash(0, str(LANG_SYSFONT_DISK_FULL));
         gui_syncstatusbar_draw(&statusbars, true);
         
         FOR_NB_SCREENS(i)

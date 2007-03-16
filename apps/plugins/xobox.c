@@ -573,7 +573,7 @@ static void die (void)
         player.gameover = true;
     else {
         refresh_board ();
-        rb->splash (HZ, true, "Crash!");
+        rb->splash (HZ, "Crash!");
         complete_trail (false);
         player.move = MOVE_NO;
         player.drawing = false;
@@ -700,13 +700,13 @@ static inline void move_board (void)
     }
     j = percentage ();
     if (j > 75) {               /* finished level */
-        rb->splash (HZ * 2, true, "Level %d finished", player.level+1);
+        rb->splash (HZ * 2, "Level %d finished", player.level+1);
         player.score += j;
         if (player.level < MAX_LEVEL)
             player.level++;
         init_board ();
         refresh_board ();
-        rb->splash (HZ * 2, true, "Ready?");
+        rb->splash (HZ * 2, "Ready?");
     }
 }
 
@@ -785,7 +785,7 @@ static void init_game (void)
     rb->lcd_setfont(FONT_SYSFIXED);
     init_board ();
     refresh_board ();
-    rb->splash (HZ * 2, true, "Ready?");
+    rb->splash (HZ * 2, "Ready?");
 }
 
 /* general keypad handler loop */
@@ -801,7 +801,7 @@ static int xobox_loop (void)
 #ifdef HAS_BUTTON_HOLD
         if (rb->button_hold()) {
         pause = true;
-        rb->splash (HZ, true, "PAUSED");
+        rb->splash (HZ, "PAUSED");
         }
 #endif
 
@@ -826,7 +826,7 @@ static int xobox_loop (void)
             case PAUSE:
                 pause = !pause;
                 if (pause)
-                    rb->splash (HZ, true, "Paused");
+                    rb->splash (HZ, "Paused");
                 break;
             case QUIT:
                 ret = game_menu ();
@@ -845,7 +845,7 @@ static int xobox_loop (void)
             refresh_board ();
         }
         if (player.gameover) {
-            rb->splash (HZ, true, "Game Over!");
+            rb->splash (HZ, "Game Over!");
             ret = game_menu ();
             if (ret == MENU_START)
                 init_game ();

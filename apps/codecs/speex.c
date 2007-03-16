@@ -288,7 +288,7 @@ int speex_seek_page_granule(spx_int64_t pos, spx_int64_t curpos,
 
     LOGF("Seek failed:%d\n", offset);
 
-    ci->splash(HZ*2, true, "Seek failed");
+    ci->splash(HZ*2, "Seek failed");
 
     return -1;
 }

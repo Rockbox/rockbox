@@ -431,7 +431,7 @@ void V_DrawMemPatch(int x, int y, int scrn, const patch_t *patch,
          || y<0
          || y+SHORT(patch->height) > ((flags & VPT_STRETCH) ? 200 :  SCREENHEIGHT))
    {
-      rb->splash(HZ*2, true, "This wad does not follow standard doom graphics!");
+      rb->splash(HZ*2, "This wad does not follow standard doom graphics!");
       // killough 1/19/98: improved error message:
       I_Error("V_DrawMemPatch: Patch (%d,%d)-(%d,%d) exceeds LFB Bad V_DrawMemPatch (flags=%u)",
          x, y, x+SHORT(patch->width), y+SHORT(patch->height), flags);

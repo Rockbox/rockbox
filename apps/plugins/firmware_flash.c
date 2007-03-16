@@ -647,21 +647,21 @@ void DoUserDialog(char* filename)
     /* this can only work if Rockbox runs in DRAM, not flash ROM */
     if ((UINT8*)rb >= FB && (UINT8*)rb < FB + 4096*1024) /* 4 MB max */
     {   /* we're running from flash */
-        rb->splash(HZ*3, true, "Not from ROM");
+        rb->splash(HZ*3, "Not from ROM");
         return; /* exit */
     }
 
     /* test if the user is running the correct plugin for this box */
     if (!CheckPlatform(PLATFORM_ID, *(UINT16*)(FB + VERSION_ADR)))
     {
-        rb->splash(HZ*3, true, "Wrong plugin");
+        rb->splash(HZ*3, "Wrong plugin");
         return; /* exit */
     }
 
     /* refuse to work if the power may fail meanwhile */
     if (!rb->battery_level_safe())
     {
-        rb->splash(HZ*3, true, "Battery too low!");
+        rb->splash(HZ*3, "Battery too low!");
         return; /* exit */
     }
     
@@ -669,7 +669,7 @@ void DoUserDialog(char* filename)
     result = CheckBootROM();
     if (result == eUnknown)
     {   /* no support for any other yet */
-        rb->splash(HZ*3, true, "Wrong boot ROM");
+        rb->splash(HZ*3, "Wrong boot ROM");
         return; /* exit */
     }
     is_romless = (result == eROMless);
@@ -690,7 +690,7 @@ void DoUserDialog(char* filename)
     sector = rb->plugin_get_buffer(&memleft);
     if (memleft < SEC_SIZE) /* need buffer for a flash sector */
     {
-        rb->splash(HZ*3, true, "Out of memory");
+        rb->splash(HZ*3, "Out of memory");
         return; /* exit */
     }
 
@@ -700,7 +700,7 @@ void DoUserDialog(char* filename)
     ShowFlashInfo(&FlashInfo);
     if (FlashInfo.size == 0) /* no valid chip */
     {
-        rb->splash(HZ*3, true, "Sorry!");
+        rb->splash(HZ*3, "Sorry!");
         return; /* exit */
     }
     
@@ -884,21 +884,21 @@ void DoUserDialog(char* filename)
     /* this can only work if Rockbox runs in DRAM, not flash ROM */
     if ((UINT8*)rb >= FB && (UINT8*)rb < FB + 4096*1024) /* 4 MB max */
     {   /* we're running from flash */
-        rb->splash(HZ*3, true, "Not from ROM");
+        rb->splash(HZ*3, "Not from ROM");
         return; /* exit */
     }
 
     /* test if the user is running the correct plugin for this box */
     if (!CheckPlatform(PLATFORM_ID, *(UINT16*)(FB + VERSION_ADR)))
     {
-        rb->splash(HZ*3, true, "Wrong version");
+        rb->splash(HZ*3, "Wrong version");
         return; /* exit */
     }
 
     /* refuse to work if the power may fail meanwhile */
     if (!rb->battery_level_safe())
     {
-        rb->splash(HZ*3, true, "Batt. too low!");
+        rb->splash(HZ*3, "Batt. too low!");
         return; /* exit */
     }
     
@@ -906,7 +906,7 @@ void DoUserDialog(char* filename)
     result = CheckBootROM();
     if (result == eUnknown)
     {   /* no support for any other yet */
-        rb->splash(HZ*3, true, "Wrong boot ROM");
+        rb->splash(HZ*3, "Wrong boot ROM");
         return; /* exit */
     }
     is_romless = (result == eROMless);
@@ -927,7 +927,7 @@ void DoUserDialog(char* filename)
     sector = rb->plugin_get_buffer(&memleft);
     if (memleft < SEC_SIZE) /* need buffer for a flash sector */
     {
-        rb->splash(HZ*3, true, "Out of memory");
+        rb->splash(HZ*3, "Out of memory");
         return; /* exit */
     }
 

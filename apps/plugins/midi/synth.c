@@ -92,7 +92,7 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
         if(mf->tracks[a] == NULL)
         {
             printf("\nNULL TRACK !!!");
-            rb->splash(HZ*2, true, "Null Track in loader.");
+            rb->splash(HZ*2, "Null Track in loader.");
             return -1;
         }
 
@@ -115,8 +115,7 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
         printf("\nPlease install the instruments.");
         printf("\nSee Rockbox page for more info.");
 
-        rb->splash(HZ*2, true, "No Instruments");
-        rb->splash(HZ*2, true, "No Instruments");
+        rb->splash(HZ*2, "No Instruments");
         return -1;
     }
 
@@ -151,7 +150,7 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
     file = rb->open(drumConfig, O_RDONLY);
     if(file < 0)
     {
-        rb->splash(HZ*2, true, "Bad drum config.\nDid you install the patchset?");
+        rb->splash(HZ*2, "Bad drum config. Did you install the patchset?");
         return -1;
     }
 

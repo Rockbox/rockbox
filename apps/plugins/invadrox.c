@@ -1660,12 +1660,12 @@ inline bool handle_buttons(void)
         }
 #ifdef RC_QUIT
         if (pressed & RC_QUIT) {
-            rb->splash(HZ * 1, true, "Quit");
+            rb->splash(HZ * 1, "Quit");
             return true;
         }
 #endif
         if (pressed & QUIT) {
-            rb->splash(HZ * 1, true, "Quit");
+            rb->splash(HZ * 1, "Quit");
             return true;
         }
     }
@@ -1772,7 +1772,7 @@ enum plugin_status plugin_start(struct plugin_api* api, UNUSED void* parameter)
 
     /* Game Over. */
     /* TODO: Play game over sound */
-    rb->splash(HZ * 2, true, "Game Over");
+    rb->splash(HZ * 2, "Game Over");
     if (score > hiscore.score) {
         /* Save new hiscore */
         hiscore.score = score;

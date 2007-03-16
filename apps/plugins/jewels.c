@@ -1026,7 +1026,7 @@ static unsigned int jewels_nextlevel(struct game_context* bj) {
     while(bj->score >= LEVEL_PTS) {
         bj->score -= LEVEL_PTS;
         bj->level++;
-        rb->splash(HZ*2, true, "Level %d", bj->level);
+        rb->splash(HZ*2, "Level %d", bj->level);
         jewels_drawboard(bj);
     }
 
@@ -1165,7 +1165,7 @@ static void jewels_savegame(struct game_context* bj) {
 static void jewels_callback(void* param) {
     struct game_context* bj = (struct game_context*) param;
     if(bj->dirty) {
-        rb->splash(HZ, true, "Saving high scores...");
+        rb->splash(HZ, "Saving high scores...");
         jewels_savescores(bj);
     }
 }
@@ -1211,7 +1211,7 @@ static int jewels_main(struct game_context* bj) {
 
             case MRES_RESUME:
                 if(!jewels_loadgame(bj)) {
-                    rb->splash(HZ*2, true, "Nothing to resume");
+                    rb->splash(HZ*2, "Nothing to resume");
                     rb->lcd_clear_display();
                 } else {
                     startgame = true;
@@ -1438,7 +1438,7 @@ static int jewels_main(struct game_context* bj) {
                     break;
 
                 case MRES_SAVE:
-                    rb->splash(HZ, true, "Saving game...");
+                    rb->splash(HZ, "Saving game...");
                     jewels_savegame(bj);
                     return BJ_END;
 
@@ -1602,14 +1602,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     while(!exit) {
         switch(jewels_main(&bj)){
             case BJ_LOSE:
-                rb->splash(HZ*2, true, "No more moves!");
+                rb->splash(HZ*2, "No more moves!");
                 /* fall through to BJ_END */
 
             case BJ_END:
                 if(!bj.resume) {
                     if((position = jewels_recordscore(&bj))) {
                         rb->snprintf(str, 19, "New high score #%d!", position);
-                        rb->splash(HZ*2, true, str);
+                        rb->splash(HZ*2, str);
                     }
                 }
                 break;
@@ -1620,7 +1620,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
 
             case BJ_QUIT:
                 if(bj.dirty) {
-                    rb->splash(HZ, true, "Saving high scores...");
+                    rb->splash(HZ, "Saving high scores...");
                     jewels_savescores(&bj);
                 }
                 exit = true;
@@ -1630,11 +1630,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
                 if(!bj.resume) {
                     if((position = jewels_recordscore(&bj))) {
                         rb->snprintf(str, 19, "New high score #%d!", position);
-                        rb->splash(HZ*2, true, str);
+                        rb->splash(HZ*2, str);
                     }
                 }
                 if(bj.dirty) {
-                    rb->splash(HZ, true, "Saving high scores...");
+                    rb->splash(HZ, "Saving high scores...");
                     jewels_savescores(&bj);
                 }
                 exit = true;

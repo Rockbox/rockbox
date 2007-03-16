@@ -205,7 +205,7 @@ struct plugin_api {
     void (*backlight_on)(void);
     void (*backlight_off)(void);
     void (*backlight_set_timeout)(int index);
-    void (*splash)(int ticks, bool center, const unsigned char *fmt, ...);
+    void (*splash)(int ticks, const unsigned char *fmt, ...);
 
 #ifdef HAVE_REMOTE_LCD
     /* remote lcd */

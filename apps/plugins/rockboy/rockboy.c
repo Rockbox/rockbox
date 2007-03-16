@@ -194,7 +194,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     if (!parameter)
     {
-        rb->splash(HZ*3, true, "Play gameboy ROM file! (.gb/.gbc)");
+        rb->splash(HZ*3, "Play gameboy ROM file! (.gb/.gbc)");
         return PLUGIN_OK;
     }
 
@@ -223,11 +223,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     if(shut&&!cleanshut)
     {
-        rb->splash(HZ/2, true, errormsg);
+        rb->splash(HZ/2, errormsg);
         return PLUGIN_ERROR;
     }
     pcm_close();
-    rb->splash(HZ/2, true, "Shutting down");
+    rb->splash(HZ/2, "Shutting down");
 
     savesettings();
 

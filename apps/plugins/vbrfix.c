@@ -118,7 +118,7 @@ static int insert_data_in_file(char *fname, int fpos, char *buf, int num_bytes)
 
 static void fileerror(int rc)
 {
-    rb->splash(HZ*2, true, "File error: %d", rc);
+    rb->splash(HZ*2, "File error: %d", rc);
 }
 
 static const unsigned char empty_id3_header[] =
@@ -259,7 +259,7 @@ static bool vbr_fix(char *selected_file)
     {
         /* Not a VBR file */
         DEBUGF("Not a VBR file\n");
-        rb->splash(HZ*2, true, "Not a VBR file");
+        rb->splash(HZ*2, "Not a VBR file");
     }
 
     return false;

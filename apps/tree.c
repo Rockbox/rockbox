@@ -242,10 +242,10 @@ bool check_rockboxdir(void)
         int i;
         FOR_NB_SCREENS(i)
             screens[i].clear_display();
-        gui_syncsplash(HZ*2, true, "No .rockbox directory");
+        gui_syncsplash(HZ*2, "No .rockbox directory");
         FOR_NB_SCREENS(i)
             screens[i].clear_display();
-        gui_syncsplash(HZ*2, true, "Installation incomplete");
+        gui_syncsplash(HZ*2, "Installation incomplete");
         return false;
     }
     closedir(dir);
@@ -366,7 +366,7 @@ static int update_dir(void)
         (tc.dirfull ||
                       tc.filesindir == global_settings.max_files_in_dir) )
         {
-            gui_syncsplash(HZ, true, str(LANG_SHOWDIR_BUFFER_FULL));
+            gui_syncsplash(HZ, str(LANG_SHOWDIR_BUFFER_FULL));
         }
     }
 #ifdef HAVE_TAGCACHE
@@ -606,7 +606,7 @@ int dirbrowse()
 
     if (*tc.dirfilter > NUM_FILTER_MODES && numentries==0)
     {
-        gui_syncsplash(HZ*2, true, str(LANG_NO_FILES));
+        gui_syncsplash(HZ*2, str(LANG_NO_FILES));
         return false;  /* No files found for rockbox_browser() */
     }
     

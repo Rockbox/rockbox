@@ -156,7 +156,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     hsmile=rb->lcd_get_locked_pattern();
 
 
-    rb->splash(HZ, true, "NIM V1.2");
+    rb->splash(HZ, "NIM V1.2");
     rb->lcd_clear_display();
 
     /* Main loop */

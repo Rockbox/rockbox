@@ -1295,7 +1295,7 @@ bool chip8_run(char* file)
     chip8();
 
     if (!ok) {
-        rb->splash(HZ, true, "Error");
+        rb->splash(HZ, "Error");
         return false;
     }
 
@@ -1308,7 +1308,7 @@ bool chip8_run(char* file)
 
     if (chip8_running == 3) {
 	/* unsupported instruction */
-        rb->splash(HZ, true, "Error: Unsupported"
+        rb->splash(HZ, "Error: Unsupported"
 #ifndef CHIP8_SUPER
 	" CHIP-8 instruction. (maybe S-CHIP)"
 #else
@@ -1332,7 +1332,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     if (parameter == NULL)
     {
-        rb->splash(HZ, true, "Play a .ch8 file!");
+        rb->splash(HZ, "Play a .ch8 file!");
         return PLUGIN_ERROR;
     }
     else

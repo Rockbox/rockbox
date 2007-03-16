@@ -137,7 +137,7 @@ void generate(void)
     rb->write(fd,&dirs_count,sizeof(int));
     if (fd < 0)
     {
-        rb->splash(HZ, true, "Couldnt open %s", RFA_FILE);
+        rb->splash(HZ, "Couldnt open %s", RFA_FILE);
         return;
     }
 #ifndef HAVE_LCD_CHARCELLS
@@ -242,11 +242,11 @@ void edit_list(void)
                 {
                     case 0:
                         exit = true;
-                        rb->splash(HZ*2, true, "Saving " RFA_FILE);
+                        rb->splash(HZ*2, "Saving " RFA_FILE);
                         fd = rb->open(RFA_FILE, O_CREAT|O_WRONLY);
                         if (fd < 0)
                         {
-                            rb->splash(HZ, true, "Could Not Open " RFA_FILE);
+                            rb->splash(HZ, "Could Not Open " RFA_FILE);
                             break;
                         }
                         dirs_count = 0;

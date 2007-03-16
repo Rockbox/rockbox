@@ -112,7 +112,7 @@ static int initialize_catalog(void)
     if (!playlist_dir_exists)
     {
         if (mkdir(playlist_dir) < 0) {
-            gui_syncsplash(HZ*2, true, str(LANG_CATALOG_NO_DIRECTORY),
+            gui_syncsplash(HZ*2, str(LANG_CATALOG_NO_DIRECTORY),
                 playlist_dir);
             return -1;
         }
@@ -146,7 +146,7 @@ static int create_playlist_list(char** playlists, int num_items,
     
     if (ft_load(tc, playlist_dir) < 0)
     {
-        gui_syncsplash(HZ*2, true, str(LANG_CATALOG_NO_DIRECTORY),
+        gui_syncsplash(HZ*2, str(LANG_CATALOG_NO_DIRECTORY),
             playlist_dir);
         goto exit;
     }
@@ -231,7 +231,7 @@ static int display_playlists(char* playlist, bool view)
 
     if (num_playlists <= 0)
     {
-        gui_syncsplash(HZ*2, true, str(LANG_CATALOG_NO_PLAYLISTS));
+        gui_syncsplash(HZ*2, str(LANG_CATALOG_NO_PLAYLISTS));
         return -1;
     }
 
@@ -319,7 +319,7 @@ static int display_playlists(char* playlist, bool view)
    insert */
 static void display_insert_count(int count)
 {
-    gui_syncsplash(0, true, str(LANG_PLAYLIST_INSERT_COUNT), count,
+    gui_syncsplash(0, str(LANG_PLAYLIST_INSERT_COUNT), count,
 #if CONFIG_KEYPAD == PLAYER_PAD
         str(LANG_STOP_ABORT)
 #else

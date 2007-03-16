@@ -354,10 +354,10 @@ static void get_next_data( Stream* str )
             } else if ((p[4] & 0xf0) == 0x20) { /* mpeg-1 */
                 p += 12;
             } else {
-                rb->splash( 30, true, "Weird Pack header!" );
+                rb->splash( 30, "Weird Pack header!" );
                 p += 5;
             }
-            /*rb->splash( 30, true, "Pack header" );*/
+            /*rb->splash( 30, "Pack header" );*/
         }
 
         /* System header, parse and skip it */
@@ -370,14 +370,14 @@ static void get_next_data( Stream* str )
             header_length += *(p++);
 
             p += header_length;
-            /*rb->splash( 30, true, "System header" );*/
+            /*rb->splash( 30, "System header" );*/
         }
         
         /* Packet header, parse it */
         if( rb->memcmp (p, packet_start_code_prefix, sizeof (packet_start_code_prefix)) != 0 )
         {
             /* Problem */
-            //rb->splash( HZ*3, true, "missing packet start code prefix : %X%X at %X", *p, *(p+2), p-disk_buf );
+            //rb->splash( HZ*3, "missing packet start code prefix : %X%X at %X", *p, *(p+2), p-disk_buf );
             str->curr_packet_end = str->curr_packet = NULL;
             return;
             //++p;
@@ -389,7 +389,7 @@ static void get_next_data( Stream* str )
         length = (*(p+4)) << 8;
         length += *(p+5);
         
-        /*rb->splash( 100, true, "Stream : %X", stream );*/
+        /*rb->splash( 100, "Stream : %X", stream );*/
         if (stream != str->id)
         {
             /* End of stream ? */
@@ -436,7 +436,7 @@ static void get_next_data( Stream* str )
                 length++;
                 if (length > 23) 
                 {
-                    rb->splash( 30, true, "Too much stuffing" );
+                    rb->splash( 30, "Too much stuffing" );
                     break;
                 }
             }
@@ -551,7 +551,7 @@ static void mad_decode(void)
             }
             len = audio_str.curr_packet_end - audio_str.curr_packet;
             if (n + len > mpa_buffer_size) { 
-                rb->splash( 30, true, "Audio buffer overflow" );
+                rb->splash( 30, "Audio buffer overflow" );
                 audiostatus=STREAM_DONE;
                 /* Wait to be killed */
                 for (;;) { rb->sleep(HZ); }
@@ -898,7 +898,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     eta = 0;
 
-    rb->splash(0,true,"Buffering...");
+    rb->splash(0, "Buffering...");
 
     disk_buf_end = buffer + rb->read (in_file, buffer, buffer_size);
     disk_buf = buffer;
@@ -913,7 +913,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         (uint8_t*)video_stack,VIDEO_STACKSIZE,"mpgvideo" IF_PRIO(,PRIORITY_PLAYBACK)
 	IF_COP(, COP, true))) == NULL)
     {
-        rb->splash(HZ,true,"Cannot create video thread!");
+        rb->splash(HZ, "Cannot create video thread!");
         return PLUGIN_ERROR;
     }
 
@@ -921,7 +921,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         (uint8_t*)audio_stack,AUDIO_STACKSIZE,"mpgaudio" IF_PRIO(,PRIORITY_PLAYBACK)
 	IF_COP(, CPU, false))) == NULL)
     {
-        rb->splash(HZ,true,"Cannot create audio thread!");
+        rb->splash(HZ, "Cannot create audio thread!");
         rb->remove_thread(videothread_id);
         return PLUGIN_ERROR;
     }

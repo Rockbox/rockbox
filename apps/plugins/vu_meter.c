@@ -327,9 +327,9 @@ void load_settings(void) {
     else {
         reset_settings();
 #if CONFIG_KEYPAD == RECORDER_PAD
-        rb->splash(HZ, true, "Press ON for help");
+        rb->splash(HZ, "Press ON for help");
 #elif CONFIG_KEYPAD == ONDIO_PAD
-        rb->splash(HZ, true, "Press MODE for help");
+        rb->splash(HZ, "Press MODE for help");
 #endif
     }
 }

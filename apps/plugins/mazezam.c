@@ -705,7 +705,7 @@ static enum level_state level_loop(short level, short lives) {
      */
     rb->lcd_remote_clear_display();
 #endif
-    rb->splash(MAZEZAM_LEVEL_LIVES_DELAY, true, MAZEZAM_LEVEL_LIVES_TEXT, level+1, lives);
+    rb->splash(MAZEZAM_LEVEL_LIVES_DELAY, MAZEZAM_LEVEL_LIVES_TEXT, level+1, lives);
 
     /* ensure keys pressed during the splash screen are ignored */
     rb->button_clear_queue();
@@ -844,7 +844,7 @@ static enum game_state game_loop(struct resume_data *r) {
              */
             rb->lcd_remote_clear_display();
 #endif
-            rb->splash(MAZEZAM_GAMEOVER_DELAY, true, MAZEZAM_GAMEOVER_TEXT);
+            rb->splash(MAZEZAM_GAMEOVER_DELAY, MAZEZAM_GAMEOVER_TEXT);
             break;
 
         case GAME_STATE_COMPLETED:

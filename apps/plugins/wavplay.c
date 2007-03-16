@@ -3465,7 +3465,7 @@ int play_file(char* filename)
     fd = rb->open(filename, O_RDONLY);
     if (fd < 0)
     {
-        rb->splash(2*HZ, true, "Couldn't open WAV file");
+        rb->splash(2*HZ, "Couldn't open WAV file");
         return PLAY_ERROR;
     }
 
@@ -3474,13 +3474,13 @@ int play_file(char* filename)
     got = rb->read(fd, aud_buf, wanted); /* wav header */
     if (got < 0)
     {
-        rb->splash(2*HZ, true, "Read error");
+        rb->splash(2*HZ, "Read error");
         rb->close(fd);
         return PLAY_ERROR;
     }
     else if (got < wanted)
     {
-        rb->splash(2*HZ, true, "File too short");
+        rb->splash(2*HZ, "File too short");
         rb->close(fd);
         return PLAY_ERROR;
     }
@@ -3490,7 +3490,7 @@ int play_file(char* filename)
         || rb->memcmp(aud_buf + 12, "fmt ", 4)
         || rb->memcmp(aud_buf + 36, "data", 4))
     {
-        rb->splash(2*HZ, true, "No canonical WAV file");
+        rb->splash(2*HZ, "No canonical WAV file");
         rb->close(fd);
         return PLAY_ERROR;
     }
@@ -3498,7 +3498,7 @@ int play_file(char* filename)
     format = letoh16(*(uint16_t *)(aud_buf + 20));
     if (format != 1)
     {
-        rb->splash(2*HZ, true, "Unsupported format: %d", format);
+        rb->splash(2*HZ, "Unsupported format: %d", format);
         rb->close(fd);
         return PLAY_ERROR;
     }
@@ -3506,7 +3506,7 @@ int play_file(char* filename)
     channels = letoh16(*(uint16_t *)(aud_buf + 22));
     if (channels > 2)
     {
-        rb->splash(2*HZ, true, "Too many channels: %d", channels);
+        rb->splash(2*HZ, "Too many channels: %d", channels);
         rb->close(fd);
         return PLAY_ERROR;
     }
@@ -3514,7 +3514,7 @@ int play_file(char* filename)
     samplebits = letoh16(*(uint16_t *)(aud_buf + 34));
     if (samplebits != 16)
     {
-        rb->splash(2*HZ, true, "Unsupported sample depth: %dbit", samplebits);
+        rb->splash(2*HZ, "Unsupported sample depth: %dbit", samplebits);
         rb->close(fd);
         return PLAY_ERROR;
     }
@@ -3532,7 +3532,7 @@ int play_file(char* filename)
         case 44100:  rate =  9; break;
         case 48000:  rate = 10; break;
         default:
-            rb->splash(2*HZ, true, "Unsupported samplerate: %dHz", samplerate);
+            rb->splash(2*HZ, "Unsupported samplerate: %dHz", samplerate);
             rb->close(fd);
             return PLAY_ERROR;
     }
@@ -3655,14 +3655,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     
     if (!parameter)
     {
-        rb->splash(HZ, true, "Play WAV file!");
+        rb->splash(HZ, "Play WAV file!");
         return PLUGIN_OK;
     }
 
     plug_buf = rb->plugin_get_buffer(&buf_size);
     if (buf_size < 6700)  /* needed for i2c transfer */
     {
-        rb->splash(HZ, true, "Out of memory.");
+        rb->splash(HZ, "Out of memory.");
         return PLUGIN_ERROR;
     }
 

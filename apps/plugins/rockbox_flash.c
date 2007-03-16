@@ -652,14 +652,14 @@ void DoUserDialog(char* filename)
     /* this can only work if Rockbox runs in DRAM, not flash ROM */
     if ((UINT8*)rb >= FB && (UINT8*)rb < FB + 4096*1024) /* 4 MB max */
     {   /* we're running from flash */
-        rb->splash(HZ*3, true, "Not from ROM");
+        rb->splash(HZ*3, "Not from ROM");
         return; /* exit */
     }
 
     /* refuse to work if the power may fail meanwhile */
     if (!rb->battery_level_safe())
     {
-        rb->splash(HZ*3, true, "Battery too low!");
+        rb->splash(HZ*3, "Battery too low!");
         return; /* exit */
     }
     
@@ -667,7 +667,7 @@ void DoUserDialog(char* filename)
     sector = rb->plugin_get_buffer(&memleft);
     if (memleft < SECTORSIZE) /* need buffer for a flash sector */
     {
-        rb->splash(HZ*3, true, "Out of memory");
+        rb->splash(HZ*3, "Out of memory");
         return; /* exit */
     }
 
@@ -681,12 +681,12 @@ void DoUserDialog(char* filename)
 
     if (FlashInfo.size == 0) /* no valid chip */
     {
-        rb->splash(HZ*3, true, "Not flashable");
+        rb->splash(HZ*3, "Not flashable");
         return; /* exit */
     }
     else if (pos == 0)
     {
-        rb->splash(HZ*3, true, "No image");
+        rb->splash(HZ*3, "No image");
         return; /* exit */
     }
 
@@ -855,14 +855,14 @@ void DoUserDialog(char* filename)
     /* this can only work if Rockbox runs in DRAM, not flash ROM */
     if ((UINT8*)rb >= FB && (UINT8*)rb < FB + 4096*1024) /* 4 MB max */
     {   /* we're running from flash */
-        rb->splash(HZ*3, true, "Not from ROM");
+        rb->splash(HZ*3, "Not from ROM");
         return; /* exit */
     }
 
     /* refuse to work if the power may fail meanwhile */
     if (!rb->battery_level_safe())
     {
-        rb->splash(HZ*3, true, "Batt. too low!");
+        rb->splash(HZ*3, "Batt. too low!");
         return; /* exit */
     }
     
@@ -870,7 +870,7 @@ void DoUserDialog(char* filename)
     sector = rb->plugin_get_buffer(&memleft);
     if (memleft < SECTORSIZE) /* need buffer for a flash sector */
     {
-        rb->splash(HZ*3, true, "Out of memory");
+        rb->splash(HZ*3, "Out of memory");
         return; /* exit */
     }
 
@@ -879,12 +879,12 @@ void DoUserDialog(char* filename)
 
     if (FlashInfo.size == 0) /* no valid chip */
     {
-        rb->splash(HZ*3, true, "Not flashable");
+        rb->splash(HZ*3, "Not flashable");
         return; /* exit */
     }
     else if (pos == 0)
     {
-        rb->splash(HZ*3, true, "No image");
+        rb->splash(HZ*3, "No image");
         return; /* exit */
     }
     
@@ -1016,7 +1016,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     if (parameter == NULL)
     {
-        rb->splash(HZ*3, true, "Play .ucl file!");
+        rb->splash(HZ*3, "Play .ucl file!");
         return PLUGIN_OK;
     }
 

@@ -928,7 +928,7 @@ next:
         byte *ptr=mbc.rmap[PC>>12];
         snprintf(meow,499,"PC: 0x%x 0x%x a: 0x%x\n",
                   ptr,PC, b ? b->address.d : 0);
-        rb->splash(HZ*2,true,meow);
+        rb->splash(HZ*2,meow);
         while(b&&b->address.d!=((unsigned int)(ptr)+PC))
         {
             p=b;

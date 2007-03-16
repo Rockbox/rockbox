@@ -172,7 +172,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     if (fIndex < 0)
     {
         DEBUGF("Err: Failed to open index file.\n");
-        rb->splash(HZ*2, true, "Failed to open index.");
+        rb->splash(HZ*2, "Failed to open index.");
         return PLUGIN_ERROR;
     }
 
@@ -212,7 +212,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     if (low == -1 || rb->strcasecmp(searchword, word.word) != 0)
     {
         DEBUGF("Not found.\n");
-        rb->splash(HZ*2, true, "Not found.");
+        rb->splash(HZ*2, "Not found.");
         rb->close(fIndex);
         return PLUGIN_OK;
     }
@@ -224,7 +224,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     if (fData < 0)
     {
         DEBUGF("Err: Failed to open description file.\n");
-        rb->splash(HZ*2, true, "Failed to open descriptions.");
+        rb->splash(HZ*2, "Failed to open descriptions.");
         rb->close(fIndex);
         return PLUGIN_ERROR;
     }

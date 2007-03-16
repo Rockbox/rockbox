@@ -146,7 +146,7 @@ struct GPatch * gusload(char * filename)
     {
         char message[50];
         rb->snprintf(message, 50, "Error opening %s", filename);
-        rb->splash(HZ*2, true, message);
+        rb->splash(HZ*2, message);
         return NULL;
     }
 

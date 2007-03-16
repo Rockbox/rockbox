@@ -181,7 +181,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #ifdef HAVE_LCD_CHARCELLS
     if (!pgfx_init(rb, 4, 2))
     {
-        rb->splash(HZ*2, true, "Old LCD :(");
+        rb->splash(HZ*2, "Old LCD :(");
         return PLUGIN_OK;
     }
 #endif

@@ -39,8 +39,7 @@
 
 #endif
 
-static void splash(struct screen * screen,  bool center,
-                   const char *fmt, va_list ap)
+static void splash(struct screen * screen, const char *fmt, va_list ap)
 {
     char splash_buf[MAXBUFFER];
     short widths[MAXLINES];
@@ -127,43 +126,33 @@ static void splash(struct screen * screen,  bool center,
 #ifdef HAVE_LCD_BITMAP
     /* If we center the display, then just clear the box we need and put
        a nice little frame and put the text in there! */
-    if (center)
+    y = (screen->height - y) / 2;  /* height => y start position */
+    x = (screen->width - maxw) / 2 - 2;
+
+#if LCD_DEPTH > 1
+    if (screen->depth > 1)
     {
-        y = (screen->height - y) / 2;  /* height => y start position */
-        x = (screen->width - maxw) / 2 - 2;
-
-#if LCD_DEPTH > 1
-        if (screen->depth > 1)
-        {
-            prevfg = screen->get_foreground();
-            screen->set_drawmode(DRMODE_FG);
-            screen->set_foreground(
-                SCREEN_COLOR_TO_NATIVE(screen, LCD_LIGHTGRAY));
-        }
-        else
-#endif
-            screen->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-
-        screen->fillrect(x, y-2, maxw+4, screen->height-y*2+4);
-
-#if LCD_DEPTH > 1
-        if (screen->depth > 1)
-            screen->set_foreground(
-                SCREEN_COLOR_TO_NATIVE(screen, LCD_BLACK));
-        else
-#endif
-            screen->set_drawmode(DRMODE_SOLID);
-
-        screen->drawrect(x, y-2, maxw+4, screen->height-y*2+4);
+        prevfg = screen->get_foreground();
+        screen->set_drawmode(DRMODE_FG);
+        screen->set_foreground(
+            SCREEN_COLOR_TO_NATIVE(screen, LCD_LIGHTGRAY));
     }
     else
-    {
-        y = 0;
-        x = 0;
-        screen->clear_display();
-    }
+#endif
+        screen->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+
+    screen->fillrect(x, y-2, maxw+4, screen->height-y*2+4);
+
+#if LCD_DEPTH > 1
+    if (screen->depth > 1)
+        screen->set_foreground(SCREEN_COLOR_TO_NATIVE(screen, LCD_BLACK));
+    else
+#endif
+        screen->set_drawmode(DRMODE_SOLID);
+
+    screen->drawrect(x, y-2, maxw+4, screen->height-y*2+4);
 #else /* HAVE_LCD_CHARCELLS */
-    y = 0;    /* vertical center on 2 lines would be silly */
+    y = 0;    /* vertical centering on 2 lines would be silly */
     x = 0;
     screen->clear_display();
 #endif
@@ -172,8 +161,7 @@ static void splash(struct screen * screen,  bool center,
 
     for (i = 0; i <= line; i++)
     {
-        if (center)
-            x = MAX((screen->width - widths[i]) / 2, 0);
+        x = MAX((screen->width - widths[i]) / 2, 0);
 
 #ifdef HAVE_LCD_BITMAP
         screen->putsxy(x, y, lines[i]);
@@ -184,7 +172,7 @@ static void splash(struct screen * screen,  bool center,
     }
 
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH > 1)
-    if (center && screen->depth > 1)
+    if (screen->depth > 1)
     {
         screen->set_foreground(prevfg);
         screen->set_drawmode(DRMODE_SOLID);
@@ -195,25 +183,25 @@ static void splash(struct screen * screen,  bool center,
 #endif
 }
 
-void gui_splash(struct screen * screen, int ticks,
-                    bool center,  const unsigned char *fmt, ...)
+void gui_splash(struct screen * screen, int ticks, 
+                const unsigned char *fmt, ...)
 {
     va_list ap;
     va_start( ap, fmt );
-    splash(screen, center, fmt, ap);
+    splash(screen, fmt, ap);
     va_end( ap );
 
     if(ticks)
         sleep(ticks);
 }
 
-void gui_syncsplash(int ticks, bool center,  const unsigned char *fmt, ...)
+void gui_syncsplash(int ticks, const unsigned char *fmt, ...)
 {
     va_list ap;
     int i;
     va_start( ap, fmt );
     FOR_NB_SCREENS(i)
-        splash(&(screens[i]), center, fmt, ap);
+        splash(&(screens[i]), fmt, ap);
     va_end( ap );
 
     if(ticks)

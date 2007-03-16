@@ -351,7 +351,7 @@ int load_all_levels(void)
             num_levels++;
             if(num_levels > max_levels)
             {
-                rb->splash(HZ, true, "Too many levels in file");
+                rb->splash(HZ, "Too many levels in file");
                 break;
             }
             continue;
@@ -834,7 +834,7 @@ void die (void)
     bool done=false;
     char pscore[20];
 
-    rb->splash(HZ*2, true, "Oops!");
+    rb->splash(HZ*2, "Oops!");
 
     rb->lcd_clear_display();
 
@@ -914,7 +914,7 @@ void collision ( int x, int y )
                         num_apples_to_get+=2;
                         game_b_level++;
                     }
-                    rb->splash(HZ, true, "Level Completed!");
+                    rb->splash(HZ, "Level Completed!");
                     rb->lcd_clear_display();
                     new_level(level_from_file);
                     rb->lcd_clear_display();
@@ -1357,7 +1357,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     load_all_levels();
 
     if (num_levels == 0) {
-        rb->splash(HZ*2, true, "Failed loading levels!");
+        rb->splash(HZ*2, "Failed loading levels!");
         return PLUGIN_OK;
     }
 

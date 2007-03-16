@@ -596,15 +596,15 @@ bool settings_save_config(int options)
             break;
         }
         else {
-            gui_syncsplash(HZ, true, str(LANG_MENU_SETTING_CANCEL));
+            gui_syncsplash(HZ, str(LANG_MENU_SETTING_CANCEL));
             return false;
         }
     }
 
     if (settings_write_config(filename, options))
-        gui_syncsplash(HZ, true, str(LANG_SETTINGS_SAVED));
+        gui_syncsplash(HZ, str(LANG_SETTINGS_SAVED));
     else
-        gui_syncsplash(HZ, true, str(LANG_FAILED));
+        gui_syncsplash(HZ, str(LANG_FAILED));
     return true;
 }
 
@@ -1142,7 +1142,7 @@ static bool do_set_setting(const unsigned char* string, void *variable,
             {
                 if (*(int*)variable != oldvalue)
                 {
-                    gui_syncsplash(HZ/2,true,str(LANG_MENU_SETTING_CANCEL));
+                    gui_syncsplash(HZ/2, str(LANG_MENU_SETTING_CANCEL));
                     *(int*)variable = oldvalue;
                 }
             }
@@ -1150,7 +1150,7 @@ static bool do_set_setting(const unsigned char* string, void *variable,
             {
                 if (*(bool*)variable != (bool)oldvalue)
                 {
-                    gui_syncsplash(HZ/2,true,str(LANG_MENU_SETTING_CANCEL));
+                    gui_syncsplash(HZ/2, str(LANG_MENU_SETTING_CANCEL));
                     *(bool*)variable = (bool)oldvalue;
                 }
             }

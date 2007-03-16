@@ -121,7 +121,7 @@ static bool search_init(char* file)
     if (!rb->kbd_input(search_string,sizeof search_string))
     {
         rb->lcd_clear_display();
-        rb->splash(0, true, "Searching...");	
+        rb->splash(0, "Searching...");	
         fd = rb->open(file, O_RDONLY);
         if (fd==-1)
             return false;
@@ -130,9 +130,9 @@ static bool search_init(char* file)
 
         if (fdw < 0) {
 #ifdef HAVE_LCD_BITMAP
-            rb->splash(HZ, true, "Failed to create result file!");
+            rb->splash(HZ, "Failed to create result file!");
 #else
-            rb->splash(HZ, true, "File creation failed");
+            rb->splash(HZ, "File creation failed");
 #endif
             return false;
         }
@@ -158,7 +158,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* Check the extension. We only allow .m3u files. */
     if(rb->strcasecmp(&filename[rb->strlen(filename)-4], ".m3u") &&
        rb->strcasecmp(&filename[rb->strlen(filename)-5], ".m3u8")) {
-        rb->splash(HZ, true, "Not a .m3u or .m3u8 file");
+        rb->splash(HZ, "Not a .m3u or .m3u8 file");
         return PLUGIN_ERROR;
     }
 
@@ -176,7 +176,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     search_buffer();
 
     rb->lcd_clear_display();
-    rb->splash(HZ, true, "Done");
+    rb->splash(HZ, "Done");
     rb->close(fdw);
     rb->close(fd);
 

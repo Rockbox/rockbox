@@ -580,7 +580,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     if (gray_init(rb, gbuf, gbuf_size, true, LCD_WIDTH, LCD_HEIGHT, 3, 0, NULL)
         != 3)
     {
-        rb->splash(HZ, true, "Couldn't get grayscale buffer");
+        rb->splash(HZ, "Couldn't get grayscale buffer");
         return PLUGIN_ERROR;
     }
     /* init lcd_ function pointers */
@@ -595,7 +595,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #else /* LCD_CHARCELLS */
     if (!pgfx_init(rb, 4, 2))
     {
-        rb->splash(HZ*2, true, "Old LCD :(");
+        rb->splash(HZ*2, "Old LCD :(");
         return PLUGIN_OK;
     }
     pgfx_display(3, 0);

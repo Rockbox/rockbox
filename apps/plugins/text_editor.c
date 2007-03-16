@@ -178,7 +178,7 @@ void save_changes(int overwrite)
     fd = rb->open(filename,O_WRONLY|O_CREAT|O_TRUNC);
     if (fd < 0)
     {
-        rb->splash(HZ*2,1,"Changes NOT saved");
+        rb->splash(HZ*2, "Changes NOT saved");
         return;
     }
 
@@ -315,7 +315,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         fd = rb->open(filename,O_RDONLY);
         if (fd<0)
         {
-            rb->splash(HZ*2,true,"Couldnt open file: %s",(char*)parameter);
+            rb->splash(HZ*2,"Couldnt open file: %s",(char*)parameter);
             return PLUGIN_ERROR;
         }
         /* read in the file */
@@ -323,7 +323,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         {
             if (!do_action(ACTION_INSERT,temp_line,line_count))
             {
-                rb->splash(HZ*2,true,"Error reading file: %s",(char*)parameter);
+                rb->splash(HZ*2,"Error reading file: %s",(char*)parameter);
                 rb->close(fd);
                 return PLUGIN_ERROR;
             }

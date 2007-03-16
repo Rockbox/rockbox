@@ -71,7 +71,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     PUTS("SearchEngine v0.1");
     parsefd=rb->open(parameter,O_RDONLY);
     if(parsefd<0) {
-        rb->splash(2*HZ,true,"Unable to open search tokenstream");
+        rb->splash(2*HZ,"Unable to open search tokenstream");
         return PLUGIN_ERROR;    
     }
     result=parse(parsefd);
@@ -90,7 +90,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->close(fd);
     }
     rb->snprintf(buf,250,"Hits: %d",hits);
-    rb->splash(HZ*3,true,buf);
+    rb->splash(HZ*3,buf);
     if (result!=0) {
         /* Return PLUGIN_USB_CONNECTED to force a file-tree refresh */
         return PLUGIN_USB_CONNECTED;

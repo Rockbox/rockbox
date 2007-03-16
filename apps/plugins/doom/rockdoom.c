@@ -610,7 +610,7 @@ int doom_menu()
 
    if( (status=Dbuild_base(names)) == 0 ) // Build up the base wad files (select last added file)
    {
-      rb->splash(HZ*2, true, "Missing Base WAD!");
+      rb->splash(HZ*2, "Missing Base WAD!");
       return -2;
    }
 
@@ -694,7 +694,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
    printf ("M_LoadDefaults: Load system defaults.\n");
    M_LoadDefaults ();              // load before initing other systems
 
-   rb->splash(HZ*2, true, "Welcome to RockDoom");
+   rb->splash(HZ*2, "Welcome to RockDoom");
 
    myargv =0;
    myargc=0;

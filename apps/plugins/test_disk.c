@@ -105,7 +105,7 @@ static bool test_fs(void)
     fd = rb->creat(TEST_FILE);
     if (fd < 0)
     {
-        rb->splash(0, true, "Couldn't create testfile.");
+        rb->splash(0, "Couldn't create testfile.");
         goto error;
     }
 
@@ -123,7 +123,7 @@ static bool test_fs(void)
         mem_fill_frnd(buf_start + align, current);
         if (current != rb->write(fd, buf_start + align, current))
         {
-            rb->splash(0, true, "Write error.");
+            rb->splash(0, "Write error.");
             rb->close(fd);
             goto error;
         }
@@ -134,7 +134,7 @@ static bool test_fs(void)
     fd = rb->open(TEST_FILE, O_RDONLY);
     if (fd < 0)
     {
-        rb->splash(0, true, "Couldn't open testfile.");
+        rb->splash(0, "Couldn't open testfile.");
         goto error;
     }
 
@@ -151,7 +151,7 @@ static bool test_fs(void)
 
         if (current != rb->read(fd, buf_start + align, current))
         {
-            rb->splash(0, true, "Read error.");
+            rb->splash(0, "Read error.");
             rb->close(fd);
             goto error;
         }
@@ -196,13 +196,13 @@ static bool test_speed(void)
     fd = rb->creat(TEST_FILE);
     if (fd < 0)
     {
-        rb->splash(0, true, "Couldn't create testfile.");
+        rb->splash(0, "Couldn't create testfile.");
         goto error;
     }
     time = *rb->current_tick;
     if (buf_len != rb->write(fd, buf_start, buf_len))
     {
-        rb->splash(0, true, "Write error.");
+        rb->splash(0, "Write error.");
         rb->close(fd);
         goto error;
     }
@@ -215,13 +215,13 @@ static bool test_speed(void)
     fd = rb->open(TEST_FILE, O_WRONLY);
     if (fd < 0)
     {
-        rb->splash(0, true, "Couldn't open testfile.");
+        rb->splash(0, "Couldn't open testfile.");
         goto error;
     }
     time = *rb->current_tick;
     if (buf_len != rb->write(fd, buf_start, buf_len))
     {
-        rb->splash(0, true, "Write error.");
+        rb->splash(0, "Write error.");
         rb->close(fd);
         goto error;
     }
@@ -234,13 +234,13 @@ static bool test_speed(void)
     fd = rb->open(TEST_FILE, O_WRONLY);
     if (fd < 0)
     {
-        rb->splash(0, true, "Couldn't open testfile.");
+        rb->splash(0, "Couldn't open testfile.");
         goto error;
     }
     time = *rb->current_tick;
     if (buf_len != rb->write(fd, buf_start + 1, buf_len))
     {
-        rb->splash(0, true, "Write error.");
+        rb->splash(0, "Write error.");
         rb->close(fd);
         goto error;
     }
@@ -253,13 +253,13 @@ static bool test_speed(void)
     fd = rb->open(TEST_FILE, O_RDONLY);
     if (fd < 0)
     {
-        rb->splash(0, true, "Couldn't open testfile.");
+        rb->splash(0, "Couldn't open testfile.");
         goto error;
     }
     time = *rb->current_tick;
     if (buf_len != rb->read(fd, buf_start, buf_len))
     {
-        rb->splash(0, true, "Read error.");
+        rb->splash(0, "Read error.");
         rb->close(fd);
         goto error;
     }
@@ -272,13 +272,13 @@ static bool test_speed(void)
     fd = rb->open(TEST_FILE, O_RDONLY);
     if (fd < 0)
     {
-        rb->splash(0, true, "Couldn't open testfile.");
+        rb->splash(0, "Couldn't open testfile.");
         goto error;
     }
     time = *rb->current_tick;
     if (buf_len != rb->read(fd, buf_start + 1, buf_len))
     {
-        rb->splash(0, true, "Read error.");
+        rb->splash(0, "Read error.");
         rb->close(fd);
         goto error;
     }

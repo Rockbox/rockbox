@@ -2475,12 +2475,12 @@ static void goto_menu(void)
                 {
                     if( load_bitmap( filename ) <= 0 )
                     {
-                        rb->splash( 1*HZ, true, "Error while loading %s",
+                        rb->splash( 1*HZ, "Error while loading %s",
                                     filename );
                     }
                     else
                     {
-                        rb->splash( 1*HZ, true, "Image loaded (%s)", filename );
+                        rb->splash( 1*HZ, "Image loaded (%s)", filename );
                         restore_screen();
                         inv_cursor(true);
                         return;
@@ -2492,7 +2492,7 @@ static void goto_menu(void)
                 if( !rb->kbd_input( filename, MAX_PATH ) )
                 {
                     save_bitmap( filename );
-                    rb->splash( 1*HZ, true, "File saved (%s)", filename );
+                    rb->splash( 1*HZ, "File saved (%s)", filename );
                 }
                 break;
 
@@ -2943,7 +2943,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_set_foreground(COLOR_WHITE);
     rb->lcd_set_backdrop(NULL);
     rb->lcd_fillrect(0,0,LCD_WIDTH,LCD_HEIGHT);
-    rb->splash( HZ/2, true, "Rock Paint");
+    rb->splash( HZ/2, "Rock Paint");
 
     rb->lcd_clear_display();
 
@@ -2953,12 +2953,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     {
         if( load_bitmap( parameter ) <= 0 )
         {
-            rb->splash( 1*HZ, true, "Error");
+            rb->splash( 1*HZ, "Error");
             clear_drawing();
         }
         else
         {
-            rb->splash( 1*HZ, true, "Image loaded (%s)", parameter );
+            rb->splash( 1*HZ, "Image loaded (%s)", parameter );
             restore_screen();
             rb->strcpy( filename, parameter );
         }

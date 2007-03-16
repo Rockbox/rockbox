@@ -986,7 +986,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     
     if (parameter == NULL)
     {
-        rb->splash(HZ*2, true, "Play .rvf file!");
+        rb->splash(HZ*2, "Play .rvf file!");
         return PLUGIN_ERROR;
     }
 

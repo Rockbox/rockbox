@@ -1418,10 +1418,10 @@ void confirm_reset(void)
     if(result == 1) /* reset! */
     {
         reset_settings();
-        rb->splash(HZ, true, "Settings reset!");
+        rb->splash(HZ, "Settings reset!");
     }
     else
-        rb->splash(HZ, true, "Settings NOT reset.");
+        rb->splash(HZ, "Settings NOT reset.");
 }
 
 /************************************
@@ -1449,7 +1449,7 @@ void general_settings(void)
 
             case 1:
                 save_settings(false);
-                rb->splash(HZ, true, "Settings saved");
+                rb->splash(HZ, "Settings saved");
                 break;
 
             case 2:

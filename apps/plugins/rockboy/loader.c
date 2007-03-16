@@ -189,10 +189,10 @@ int sram_load(void)
 
     fd = open(sramfile, O_RDONLY);
         snprintf(meow,499,"Opening %s %d",sramfile,fd);
-    rb->splash(HZ*2, true, meow);        
+    rb->splash(HZ*2, meow);        
     if (fd<0) return -1;
         snprintf(meow,499,"Loading savedata from %s",sramfile);
-        rb->splash(HZ*2, true, meow);    
+        rb->splash(HZ*2, meow);    
     read(fd,ram.sbank, 8192*mbc.ramsize);
     close(fd);
     
@@ -211,7 +211,7 @@ int sram_save(void)
     fd = open(sramfile, O_WRONLY|O_CREAT|O_TRUNC);
     if (fd<0) return -1;
     snprintf(meow,499,"Saving savedata to %s",sramfile);
-    rb->splash(HZ*2, true, meow);
+    rb->splash(HZ*2, meow);
     write(fd,ram.sbank, 8192*mbc.ramsize);
     close(fd);
     
@@ -301,7 +301,7 @@ void loader_init(char *s)
     romfile = s;
     if(rom_load())
         return;
-    rb->splash(HZ/2, true, rom.name);
+    rb->splash(HZ/2, rom.name);
     
     snprintf(saveprefix, 499, "%s/%s", savedir, rom.name);
 

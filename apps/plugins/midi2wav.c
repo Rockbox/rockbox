@@ -74,16 +74,16 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     if(parameter == NULL)
     {
-        rb->splash(HZ*2, true, " Play .MID file ");
+        rb->splash(HZ*2, "Play .MID file");
         return PLUGIN_OK;
     }
 
-    rb->splash(HZ, true, parameter);
+    rb->splash(HZ, parameter);
     if(midimain(parameter) == -1)
     {
         return PLUGIN_ERROR;
     }
-    rb->splash(HZ*3, true, "FINISHED PLAYING");
+    rb->splash(HZ*3, "FINISHED PLAYING");
     /* Return PLUGIN_USB_CONNECTED to force a file-tree refresh */
     return PLUGIN_USB_CONNECTED;
 }
@@ -102,11 +102,11 @@ int midimain(void * filename)
 
     printf("\nHello.\n");
 
-    rb->splash(HZ/5, true, "LOADING MIDI");
+    rb->splash(HZ/5, "LOADING MIDI");
 
     struct MIDIfile * mf = loadFile(filename);
 
-    rb->splash(HZ/5, true, "LOADING PATCHES");
+    rb->splash(HZ/5, "LOADING PATCHES");
     if (initSynth(mf, "/.rockbox/patchset/patchset.cfg", "/.rockbox/patchset/drums.cfg") == -1)
     {
         return -1;
@@ -153,7 +153,7 @@ int midimain(void * filename)
 #endif
 
 
-    rb->splash(HZ/5, true, "  I hope this works...  ");
+    rb->splash(HZ/5, "I hope this works...");
 
 
 

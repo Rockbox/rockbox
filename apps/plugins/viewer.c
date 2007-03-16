@@ -1043,12 +1043,12 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
     settings_fd=rb->open(SETTINGS_FILE, O_RDONLY);
     if (settings_fd < 0)
     {
-        rb->splash(HZ*2, true, "No Settings File");
+        rb->splash(HZ*2, "No Settings File");
         return;
     }
     if (rb->filesize(settings_fd) != sizeof(struct preferences))
     {
-        rb->splash(HZ*2, true, "Settings File Invalid");
+        rb->splash(HZ*2, "Settings File Invalid");
         return;
     }
 
@@ -1313,7 +1313,7 @@ static void viewer_menu(void)
     switch (result)
     {
         case 0: /* quit */
-            rb->splash(1, true, "Saving Settings");
+            rb->splash(1, "Saving Settings");
             rb->menu_exit(m);
             viewer_exit(NULL);
             done = true;
@@ -1350,7 +1350,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
     file_name = file;
     ok = viewer_init();
     if (!ok) {
-        rb->splash(HZ, false, "Error");
+        rb->splash(HZ, "Error");
         viewer_exit(NULL);
         return PLUGIN_OK;
     }

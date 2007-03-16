@@ -288,7 +288,7 @@ static void create_control(struct playlist_info* playlist)
     {
         if (check_rockboxdir())
         {
-            gui_syncsplash(HZ*2, true, (unsigned char *)"%s (%d)",
+            gui_syncsplash(HZ*2, (unsigned char *)"%s (%d)",
                            str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR),
                            playlist->control_fd);
         }
@@ -484,7 +484,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
         lcd_setmargins(0, 0);
 #endif
 
-    gui_syncsplash(0, true, str(LANG_PLAYLIST_LOAD));
+    gui_syncsplash(0, str(LANG_PLAYLIST_LOAD));
 
     if (!buffer)
     {
@@ -1348,9 +1348,9 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
         if (max < 0)
         {
             if (control_file)
-                gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+                gui_syncsplash(HZ*2, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
             else
-                gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_ACCESS_ERROR));
+                gui_syncsplash(HZ*2, str(LANG_PLAYLIST_ACCESS_ERROR));
 
             return max;
         }
@@ -1440,7 +1440,7 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
 
         if (ft_load(tc, (dir[0]=='\0')?"/":dir) < 0)
         {
-            gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
+            gui_syncsplash(HZ*2, str(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
             exit = true;
             result = -1;
             break;
@@ -1525,7 +1525,7 @@ static int check_subdir_for_music(char *dir, char *subdir)
     
     if (ft_load(tc, dir) < 0)
     {
-        gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
+        gui_syncsplash(HZ*2, str(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
         return -2;
     }
     
@@ -1578,7 +1578,7 @@ static int check_subdir_for_music(char *dir, char *subdir)
 
         /* we now need to reload our current directory */
         if(ft_load(tc, dir) < 0)
-            gui_syncsplash(HZ*2, true,
+            gui_syncsplash(HZ*2,
                 str(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));        
     }
 
@@ -1663,7 +1663,7 @@ static void display_playlist_count(int count, const unsigned char *fmt)
         lcd_setmargins(0, 0);
 #endif
 
-    gui_syncsplash(0, true, fmt, count,
+    gui_syncsplash(0, fmt, count,
 #if CONFIG_KEYPAD == PLAYER_PAD
                    str(LANG_STOP_ABORT)
 #else
@@ -1677,7 +1677,7 @@ static void display_playlist_count(int count, const unsigned char *fmt)
  */
 static void display_buffer_full(void)
 {
-    gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_BUFFER_FULL));
+    gui_syncsplash(HZ*2, str(LANG_PLAYLIST_BUFFER_FULL));
 }
 
 /*
@@ -1756,7 +1756,7 @@ static int flush_cached_control(struct playlist_info* playlist)
     else
     {
         result = -1;
-        gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_UPDATE_ERROR));
+        gui_syncsplash(HZ*2, str(LANG_PLAYLIST_CONTROL_UPDATE_ERROR));
     }
 
     return result;
@@ -1943,11 +1943,11 @@ int playlist_resume(void)
 
     empty_playlist(playlist, true);
 
-    gui_syncsplash(0, true, str(LANG_WAIT));
+    gui_syncsplash(0, str(LANG_WAIT));
     playlist->control_fd = open(playlist->control_filename, O_RDWR);
     if (playlist->control_fd < 0)
     {
-        gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+        gui_syncsplash(HZ*2, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
         return -1;
     }
     playlist->control_created = true;
@@ -1955,7 +1955,7 @@ int playlist_resume(void)
     control_file_size = filesize(playlist->control_fd);
     if (control_file_size <= 0)
     {
-        gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+        gui_syncsplash(HZ*2, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
         return -1;
     }
 
@@ -1964,7 +1964,7 @@ int playlist_resume(void)
         PLAYLIST_COMMAND_SIZE<buflen?PLAYLIST_COMMAND_SIZE:buflen);
     if(nread <= 0)
     {
-        gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+        gui_syncsplash(HZ*2, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
         return -1;
     }
 
@@ -1990,7 +1990,7 @@ int playlist_resume(void)
             /* So a splash while we are loading. */
             if (current_tick - last_tick > HZ/4)
             {
-                gui_syncsplash(0, true, str(LANG_LOADING_PERCENT), 
+                gui_syncsplash(0, str(LANG_LOADING_PERCENT), 
                                (total_read+count)*100/control_file_size,
 #if CONFIG_KEYPAD == PLAYER_PAD
                                str(LANG_STOP_ABORT)
@@ -2264,7 +2264,7 @@ int playlist_resume(void)
 
         if (result < 0)
         {
-            gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_INVALID));
+            gui_syncsplash(HZ*2, str(LANG_PLAYLIST_CONTROL_INVALID));
             return result;
         }
 
@@ -2273,7 +2273,7 @@ int playlist_resume(void)
             if ((total_read + count) >= control_file_size)
             {
                 /* no newline at end of control file */
-                gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_INVALID));
+                gui_syncsplash(HZ*2, str(LANG_PLAYLIST_CONTROL_INVALID));
                 return -1;
             }
 
@@ -2367,7 +2367,7 @@ int playlist_shuffle(int random_seed, int start_index)
         start_current = true;
     }
 
-    gui_syncsplash(0, true, str(LANG_PLAYLIST_SHUFFLE));
+    gui_syncsplash(0, str(LANG_PLAYLIST_SHUFFLE));
     
     randomise_playlist(playlist, random_seed, start_current, true);
 
@@ -2859,7 +2859,7 @@ int playlist_insert_track(struct playlist_info* playlist, const char *filename,
 
     if (check_control(playlist) < 0)
     {
-        gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+        gui_syncsplash(HZ*2, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
         return -1;
     }
 
@@ -2890,7 +2890,7 @@ int playlist_insert_directory(struct playlist_info* playlist,
 
     if (check_control(playlist) < 0)
     {
-        gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+        gui_syncsplash(HZ*2, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
         return -1;
     }
 
@@ -2956,14 +2956,14 @@ int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
 
     if (check_control(playlist) < 0)
     {
-        gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+        gui_syncsplash(HZ*2, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
         return -1;
     }
 
     fd = open(filename, O_RDONLY);
     if (fd < 0)
     {
-        gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_ACCESS_ERROR));
+        gui_syncsplash(HZ*2, str(LANG_PLAYLIST_ACCESS_ERROR));
         return -1;
     }
 
@@ -3076,7 +3076,7 @@ int playlist_delete(struct playlist_info* playlist, int index)
 
     if (check_control(playlist) < 0)
     {
-        gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+        gui_syncsplash(HZ*2, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
         return -1;
     }
 
@@ -3111,7 +3111,7 @@ int playlist_move(struct playlist_info* playlist, int index, int new_index)
 
     if (check_control(playlist) < 0)
     {
-        gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+        gui_syncsplash(HZ*2, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
         return -1;
     }
 
@@ -3374,7 +3374,7 @@ int playlist_save(struct playlist_info* playlist, char *filename)
         if (playlist->buffer_size < (int)(playlist->amount * sizeof(int)))
         {
             /* not enough buffer space to store updated indices */
-            gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_ACCESS_ERROR));
+            gui_syncsplash(HZ*2, str(LANG_PLAYLIST_ACCESS_ERROR));
             return -1;
         }
 
@@ -3390,7 +3390,7 @@ int playlist_save(struct playlist_info* playlist, char *filename)
     fd = open(path, O_CREAT|O_WRONLY|O_TRUNC);
     if (fd < 0)
     {
-        gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_ACCESS_ERROR));
+        gui_syncsplash(HZ*2, str(LANG_PLAYLIST_ACCESS_ERROR));
         return -1;
     }
 
@@ -3431,7 +3431,7 @@ int playlist_save(struct playlist_info* playlist, char *filename)
 
             if (fdprintf(fd, "%s\n", tmp_buf) < 0)
             {
-                gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_ACCESS_ERROR));
+                gui_syncsplash(HZ*2, str(LANG_PLAYLIST_ACCESS_ERROR));
                 result = -1;
                 break;
             }
@@ -3518,7 +3518,7 @@ int playlist_directory_tracksearch(const char* dirname, bool recurse,
 
     if (ft_load(tc, dirname) < 0)
     {
-        gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
+        gui_syncsplash(HZ*2, str(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
         *(tc->dirfilter) = old_dirfilter;
         return -1;
     }

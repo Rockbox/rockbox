@@ -820,7 +820,7 @@ void audio_set_crossfade(int enable)
         offset = CUR_TI->id3.offset;
 
         /* Playback has to be stopped before changing the buffer size. */
-        gui_syncsplash(0, true, (char *)str(LANG_RESTARTING_PLAYBACK));
+        gui_syncsplash(0, (char *)str(LANG_RESTARTING_PLAYBACK));
         audio_stop();
     }
 
@@ -2006,7 +2006,7 @@ static void codec_thread(void)
                         if (!ci.new_track) 
                         {
                             logf("Codec failure");
-                            gui_syncsplash(HZ*2, true, "Codec failure");
+                            gui_syncsplash(HZ*2, "Codec failure");
                         }
                         
                         if (!codec_load_next_track())
@@ -2060,7 +2060,7 @@ static void codec_thread(void)
                     break;
 
                 logf("Encoder failure");
-                gui_syncsplash(HZ*2, true, "Encoder failure");
+                gui_syncsplash(HZ*2, "Encoder failure");
 
                 if (ci.enc_codec_loaded < 0)
                     break;
@@ -2742,7 +2742,7 @@ static bool audio_load_track(int offset, bool start_play, bool rebuffer)
          * the codec file failed part way through, either way, skip the track */
         snprintf(msgbuf, sizeof(msgbuf)-1, "No codec for: %s", trackname);
         /* We should not use gui_syncplash from audio thread! */
-        gui_syncsplash(HZ*2, true, msgbuf);
+        gui_syncsplash(HZ*2, msgbuf);
         /* Skip invalid entry from playlist. */
         playlist_skip_entry(NULL, last_peek_offset);
         tracks[track_widx].taginfo_ready = false;

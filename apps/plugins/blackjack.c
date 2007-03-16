@@ -712,7 +712,7 @@ static void blackjack_savegame(struct game_context* bj) {
 static void blackjack_callback(void* param) {
     struct game_context* bj = (struct game_context*) param;
     if(bj->dirty) {
-        rb->splash(HZ, true, "Saving high scores...");
+        rb->splash(HZ, "Saving high scores...");
         blackjack_savescores(bj);
     }
 }
@@ -1124,9 +1124,9 @@ static unsigned int blackjack_menu(struct game_context* bj) {
 
             case BJACK_RESUME:/* resume game */
                 if(!blackjack_loadgame(bj)) {
-                    rb->splash(HZ*2, true, "Nothing to resume");
+                    rb->splash(HZ*2, "Nothing to resume");
                 } else {
-                    rb->splash(HZ*2, true, "Loading...");
+                    rb->splash(HZ*2, "Loading...");
                     breakout = true;
                 }
                 break;
@@ -1218,7 +1218,7 @@ static int blackjack(struct game_context* bj) {
                 !bj->asked_insurance) {
             temp_var = insurance(bj);
             if (bj->dealer_total == 21) {
-                rb->splash(HZ, true, "Dealer has blackjack");
+                rb->splash(HZ, "Dealer has blackjack");
                 bj->player_money += temp_var;
                 bj->end_hand = true;
                 breakout = true;
@@ -1226,7 +1226,7 @@ static int blackjack(struct game_context* bj) {
                 finish_game(bj);
             }
             else {
-                rb->splash(HZ, true, "Dealer does not have blackjack");
+                rb->splash(HZ, "Dealer does not have blackjack");
                 bj->player_money -= temp_var;
                 breakout = true;
                 redraw_board(bj);
@@ -1285,13 +1285,13 @@ static int blackjack(struct game_context* bj) {
                         }
                     }
                     else if((signed int)bj->current_bet * 2 > bj->player_money) {
-                        rb->splash(HZ, true, "Not enough money to double down.");
+                        rb->splash(HZ, "Not enough money to double down.");
                         redraw_board(bj);
                         rb->lcd_update();
                     }
                     break;
                 case BJACK_RESUME:           /* save and end game */
-                    rb->splash(HZ, true, "Saving game...");
+                    rb->splash(HZ, "Saving game...");
                     blackjack_savegame(bj);
                     /* fall through to BJACK_QUIT */
 
@@ -1412,14 +1412,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     while(!exit) {
         switch(blackjack(&bj)){
             case BJ_LOSE:
-                rb->splash(HZ, true, "Not enough money to continue");
+                rb->splash(HZ, "Not enough money to continue");
                 /* fall through to BJ_END */
 
             case BJ_END:
                 if(!bj.resume) {
                     if((position = blackjack_recordscore(&bj))) {
                         rb->snprintf(str, 19, "New high score #%d!", position);
-                        rb->splash(HZ*2, true, str);
+                        rb->splash(HZ*2, str);
                     }
                 }
                 break;
@@ -1430,7 +1430,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
 
             case BJ_QUIT:
                 if(bj.dirty) {
-                    rb->splash(HZ, true, "Saving high scores...");
+                    rb->splash(HZ, "Saving high scores...");
                     blackjack_savescores(&bj);
                 }
                 exit = true;

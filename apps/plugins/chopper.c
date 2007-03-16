@@ -484,17 +484,17 @@ static void chopKillPlayer(void)
 #if LCD_DEPTH >= 2
         rb->lcd_set_foreground(LCD_LIGHTGRAY);
 #endif
-        rb->splash(HZ, true, "Game Over");
+        rb->splash(HZ, "Game Over");
 
         if (score > highscore) {
             char scoretext[30];
             highscore = score;
             rb->snprintf(scoretext, sizeof(scoretext), "New High Score: %d",
                          highscore);
-            rb->splash(HZ*2, true, scoretext);
+            rb->splash(HZ*2, scoretext);
         }
 
-        rb->splash(HZ/4, true, "Press " ACTIONTEXT " to continue");
+        rb->splash(HZ/4, "Press " ACTIONTEXT " to continue");
         rb->lcd_update();
 
         rb->lcd_set_drawmode(DRMODE_SOLID);
@@ -668,7 +668,7 @@ static int chopMenu(int menunum)
                     menu_quit=true;
                     res = -1;
                 } else if(menunum==0){
-                    rb->splash(HZ, true, "No game to resume");
+                    rb->splash(HZ, "No game to resume");
                 }
                 break;
             case 2:

@@ -1804,7 +1804,7 @@ int game_loop(void)
                     if (score>highscore) {
                         sleep(2);
                         highscore=score;
-                        rb->splash(HZ*2,true,"New High Score");
+                        rb->splash(HZ*2, "New High Score");
                     }
                     else {
                         sleep(3);
@@ -1960,7 +1960,7 @@ int game_loop(void)
         }
         else {
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
-            rb->splash(HZ*2,true,"Game Over");
+            rb->splash(HZ*2, "Game Over");
 #else
             rb->lcd_bitmap(brickmania_gameover,LCD_WIDTH/2-55,LCD_HEIGHT-87,
                            110,52);
@@ -1969,7 +1969,7 @@ int game_loop(void)
             if (score>highscore) {
                 sleep(2);
                 highscore=score;
-                rb->splash(HZ*2,true,"New High Score");
+                rb->splash(HZ*2, "New High Score");
             } else {
                 sleep(3);
             }

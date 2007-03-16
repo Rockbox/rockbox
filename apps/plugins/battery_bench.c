@@ -320,7 +320,7 @@ void thread(void)
         if(exit)
         {
             if(exit == 2)
-                    rb->splash(HZ,true,
+                    rb->splash(HZ,
 #ifdef HAVE_LCD_BITMAP                                    
                         "Exiting battery_bench...");
 #else
@@ -464,7 +464,7 @@ int main(void)
         }
         else
         {
-            rb->splash(HZ / 2, true, "Cannot create file!");
+            rb->splash(HZ / 2, "Cannot create file!");
             return PLUGIN_ERROR;
         }
     }
@@ -482,7 +482,7 @@ int main(void)
         IF_PRIO(, PRIORITY_BACKGROUND)
 	IF_COP(, CPU, false)) == NULL)
     {
-        rb->splash(HZ,true,"Cannot create thread!");
+        rb->splash(HZ, "Cannot create thread!");
         return PLUGIN_ERROR;
     }
             

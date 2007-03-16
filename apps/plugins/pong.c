@@ -245,7 +245,7 @@ void bounce(struct pong *p, int pad, int info)
 
 void score(struct pong *p, int pad)
 {
-    rb->splash(HZ/4, true, "%s scores!", pad?"right":"left");
+    rb->splash(HZ/4, "%s scores!", pad?"right":"left");
     rb->lcd_clear_display();
     p->score[pad]++;
 
@@ -424,7 +424,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* go go go */
     while(game > 0) {
         if (game == 2) { /* Game Paused */
-            rb->splash(0, true, "PAUSED");
+            rb->splash(0, "PAUSED");
             while(game == 2)
                 game = keys(&pong); /* short circuit */
             rb->lcd_clear_display();

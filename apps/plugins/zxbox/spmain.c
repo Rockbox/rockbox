@@ -297,7 +297,7 @@ static void options_menu(void){
                                no_yes, 2, NULL);
                 if (new_setting != settings.invert_colors )
                     settings.invert_colors=new_setting;
-                rb->splash(HZ, true , "Restart to see effect");
+                rb->splash(HZ, "Restart to see effect");
                 break;
             case 3:
                 new_setting = settings.frameskip;
@@ -467,7 +467,7 @@ static void run_singlemode(void)
 #ifdef USE_GRAY
                     gray_show(false);
 #endif
-                    rb->splash(0,true,"Saving settings...");
+                    rb->splash(0, "Saving settings...");
                     configfile_save(GLOBALCFG, config,sizeof(config)/sizeof(*config),SETTINGS_VERSION);
                 }
 
@@ -531,7 +531,7 @@ static void init_load(void *parameter)
   check_params (parameter);
   if(spcf_init_snapshot != NULL) {
 #ifndef USE_GRAY
-    rb->splash(HZ,true, "Loading snapshot '%s'", spcf_init_snapshot);
+    rb->splash(HZ, "Loading snapshot '%s'", spcf_init_snapshot);
 #endif
     
     load_snapshot_file_type(spcf_init_snapshot, spcf_init_snapshot_type);

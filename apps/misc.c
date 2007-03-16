@@ -608,11 +608,11 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
         x5_backlight_shutdown();
 #endif
         if (!battery_level_safe())
-            gui_syncsplash(3*HZ, true, "%s %s",
+            gui_syncsplash(3*HZ, "%s %s",
                            str(LANG_WARNING_BATTERY_EMPTY),
                            str(LANG_SHUTTINGDOWN));
         else if (battery_level_critical())
-            gui_syncsplash(3*HZ, true, "%s %s",
+            gui_syncsplash(3*HZ, "%s %s",
                            str(LANG_WARNING_BATTERY_LOW),
                            str(LANG_SHUTTINGDOWN));
         else {
@@ -620,11 +620,11 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
             if (!tagcache_prepare_shutdown())
             {
                 cancel_shutdown();
-                gui_syncsplash(HZ, true, str(LANG_TAGCACHE_BUSY));
+                gui_syncsplash(HZ, str(LANG_TAGCACHE_BUSY));
                 return false;
             }
 #endif
-            gui_syncsplash(0, true, str(LANG_SHUTTINGDOWN));
+            gui_syncsplash(0, str(LANG_SHUTTINGDOWN));
         }
         
         if (global_settings.fade_on_stop 

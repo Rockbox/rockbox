@@ -650,7 +650,7 @@ enum minesweeper_status minesweeper( void )
                 if( no_mines )
                     break;
                 tiles_left = count_tiles_left();
-                rb->splash( HZ*2, true, "You found %d mines out of %d",
+                rb->splash( HZ*2, "You found %d mines out of %d",
                             tiles_left, mine_num );
                 break;
 
@@ -681,13 +681,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         switch( minesweeper() )
         {
             case MINESWEEPER_WIN:
-                rb->splash( HZ, true, "You Win!" );
+                rb->splash( HZ, "You Win!" );
                 rb->lcd_clear_display();
                 mine_show();
                 break;
 
             case MINESWEEPER_LOSE:
-                rb->splash( HZ, true, "You Lose!" );
+                rb->splash( HZ, "You Lose!" );
                 rb->lcd_clear_display();
                 mine_show();
                 break;

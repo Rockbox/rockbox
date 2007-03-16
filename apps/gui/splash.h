@@ -22,24 +22,19 @@
 #include "screen_access.h"
 
 /*
- * Puts a splash message on the given screen for a given period
+ * Puts a splash message centered on the given screen for a given period
  *  - screen : the screen to put the splash on
  *  - ticks : how long the splash is displayed (in rb ticks)
- *  - center : FALSE means left-justified, TRUE means
- *             horizontal and vertical center
  *  - fmt : what to say *printf style
  */
 extern void gui_splash(struct screen * screen, int ticks,
-                       bool center,  const char *fmt, ...);
+                       const char *fmt, ...);
 
 /*
- * Puts a splash message on all the screens for a given period
+ * Puts a splash message centered on all the screens for a given period
  *  - ticks : how long the splash is displayed (in rb ticks)
- *  - center : FALSE means left-justified, TRUE means
- *             horizontal and vertical center
  *  - fmt : what to say *printf style
  */
-extern void gui_syncsplash(int ticks, bool center,
-                           const unsigned char *fmt, ...);
+extern void gui_syncsplash(int ticks, const unsigned char *fmt, ...);
 
 #endif /* _GUI_ICON_H_ */

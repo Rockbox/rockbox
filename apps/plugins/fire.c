@@ -352,7 +352,7 @@ int main(void)
                        32, 1<<8, NULL) + 1;
     if(shades <= 1)
     {
-        rb->splash(HZ, true, "not enough memory");
+        rb->splash(HZ, "not enough memory");
         return PLUGIN_ERROR;
     }
     /* switch on grayscale overlay */

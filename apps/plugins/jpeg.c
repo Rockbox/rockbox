@@ -2083,7 +2083,7 @@ int change_filename(int direct)
 
     if(count == entries && file_pt[curfile] == '\0')
     {
-        rb->splash(HZ,true,"No supported files");
+        rb->splash(HZ, "No supported files");
         return PLUGIN_ERROR;
     }
     if(rb->strlen(tree->currdir) > 1)
@@ -2557,7 +2557,7 @@ struct t_disp* get_image(struct jpeg* p_jpg, int ds)
 #endif
     if (status)
     {
-        rb->splash(HZ, true, "decode error %d", status);
+        rb->splash(HZ, "decode error %d", status);
         file_pt[curfile] = '\0';
         return NULL;
     }
@@ -2619,7 +2619,7 @@ int load_and_show(char* filename)
     if (fd < 0)
     {
         rb->snprintf(print,sizeof(print),"err opening %s:%d",filename,fd);
-        rb->splash(HZ, true, print);
+        rb->splash(HZ, print);
         return PLUGIN_ERROR;
     }
     filesize = rb->filesize(fd);
@@ -2696,7 +2696,7 @@ int load_and_show(char* filename)
         else
 #endif
         {
-            rb->splash(HZ, true, "Out of Memory");
+            rb->splash(HZ, "Out of Memory");
             rb->close(fd);
             return PLUGIN_ERROR;
         }
@@ -2743,7 +2743,7 @@ int load_and_show(char* filename)
 
     if (status < 0 || (status & (DQT | SOF0)) != (DQT | SOF0))
     {   /* bad format or minimum components not contained */
-        rb->splash(HZ, true, "unsupported %d", status);
+        rb->splash(HZ, "unsupported %d", status);
         file_pt[curfile] = '\0';
         return change_filename(direction);
     }
@@ -2762,7 +2762,7 @@ int load_and_show(char* filename)
     ds_min = min_downscale(&jpg, buf_size);  /* check memory constraint */
     if (ds_min == 0)
     {
-        rb->splash(HZ, true, "too large");
+        rb->splash(HZ, "too large");
         file_pt[curfile] = '\0';
         return change_filename(direction);
     }
@@ -2902,7 +2902,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     buf_size -= graysize;
     if (grayscales < 33 || buf_size <= 0)
     {
-        rb->splash(HZ, true, "gray buf error");
+        rb->splash(HZ, "gray buf error");
         return PLUGIN_ERROR;
     }
 #else

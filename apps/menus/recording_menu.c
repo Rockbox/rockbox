@@ -638,7 +638,7 @@ bool rectrigger(void)
 
         switch (button) {
             case ACTION_STD_CANCEL:
-                gui_syncsplash(50, true, str(LANG_MENU_SETTING_CANCEL));
+                gui_syncsplash(50, str(LANG_MENU_SETTING_CANCEL));
                 global_settings.rec_start_thres = old_start_thres;
                 global_settings.rec_start_duration = old_start_duration;
                 global_settings.rec_prerecord_time = old_prerecord_time;

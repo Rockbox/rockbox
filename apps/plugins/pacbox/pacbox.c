@@ -412,13 +412,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
         /* Save the user settings if they have changed */
         if (rb->memcmp(&settings,&old_settings,sizeof(settings))!=0) {
-            rb->splash(0,true,"Saving settings...");
+            rb->splash(0, "Saving settings...");
             configfile_save(SETTINGS_FILENAME, config,
                             sizeof(config)/sizeof(*config),
                             SETTINGS_VERSION);
         }
     } else {
-        rb->splash(HZ*2,true,"No ROMs in /.rockbox/pacman/");
+        rb->splash(HZ*2, "No ROMs in /.rockbox/pacman/");
     }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ

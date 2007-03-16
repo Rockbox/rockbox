@@ -673,10 +673,10 @@ static void tagtree_unbuffer_event(struct mp3entry *id3, bool last_track)
 
 bool tagtree_export(void)
 {
-    gui_syncsplash(0, true, str(LANG_CREATING));
+    gui_syncsplash(0, str(LANG_CREATING));
     if (!tagcache_create_changelog(&tcs))
     {
-        gui_syncsplash(HZ*2, true, str(LANG_FAILED));
+        gui_syncsplash(HZ*2, str(LANG_FAILED));
     }
     
     return false;
@@ -684,10 +684,10 @@ bool tagtree_export(void)
 
 bool tagtree_import(void)
 {
-    gui_syncsplash(0, true, str(LANG_WAIT));
+    gui_syncsplash(0, str(LANG_WAIT));
     if (!tagcache_import_changelog())
     {
-        gui_syncsplash(HZ*2, true, str(LANG_FAILED));
+        gui_syncsplash(HZ*2, str(LANG_FAILED));
     }
     
     return false;
@@ -882,7 +882,7 @@ static bool show_search_progress(bool init, int count)
     
     if (current_tick - last_tick > HZ/4)
     {
-        gui_syncsplash(0, true, str(LANG_PLAYLIST_SEARCH_MSG), count,
+        gui_syncsplash(0, str(LANG_PLAYLIST_SEARCH_MSG), count,
 #if CONFIG_KEYPAD == PLAYER_PAD
                        str(LANG_STOP_ABORT)
 #else
@@ -1000,7 +1000,7 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
         )
     {
         show_search_progress(true, 0);
-        gui_syncsplash(0, true, str(LANG_PLAYLIST_SEARCH_MSG),
+        gui_syncsplash(0, str(LANG_PLAYLIST_SEARCH_MSG),
                        0, csi->name);
     }
     
@@ -1200,7 +1200,7 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     
     if (!sort && (sort_inverse || sort_limit))
     {
-        gui_syncsplash(HZ*4, true, str(LANG_SHOWDIR_BUFFER_FULL), total_count);
+        gui_syncsplash(HZ*4, str(LANG_SHOWDIR_BUFFER_FULL), total_count);
         logf("Too small dir buffer");
         return 0;
     }
@@ -1303,7 +1303,7 @@ int tagtree_load(struct tree_context* c)
     {
         c->dirlevel = 0;
         count = load_root(c);
-        gui_syncsplash(HZ, true, str(LANG_TAGCACHE_BUSY));
+        gui_syncsplash(HZ, str(LANG_TAGCACHE_BUSY));
     }
 
     /* The _total_ numer of entries available. */
@@ -1468,7 +1468,7 @@ static bool insert_all_playlist(struct tree_context *c, int position, bool queue
     cpu_boost(true);
     if (!tagcache_search(&tcs, tag_filename))
     {
-        gui_syncsplash(HZ, true, str(LANG_TAGCACHE_BUSY));
+        gui_syncsplash(HZ, str(LANG_TAGCACHE_BUSY));
         cpu_boost(false);
         return false;
     }
@@ -1571,12 +1571,12 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
     }
 
     if (tc->filesindir <= 0)
-        gui_syncsplash(HZ, true, str(LANG_END_PLAYLIST_PLAYER));
+        gui_syncsplash(HZ, str(LANG_END_PLAYLIST_PLAYER));
     else
     {
         logf("insert_all_playlist");
         if (!insert_all_playlist(tc, position, queue))
-            gui_syncsplash(HZ*2, true, str(LANG_FAILED));
+            gui_syncsplash(HZ*2, str(LANG_FAILED));
     }
     
     /* Finally return the dirlevel to its original value. */

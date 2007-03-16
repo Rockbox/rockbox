@@ -1151,7 +1151,7 @@ int main(void* parameter)
     mbus_init(); /* init the M-Bus layer */
     emu_init(); /* init emulator */
 
-    rb->splash(HZ/5, true, "Alpine CDC"); /* be quick on autostart */
+    rb->splash(HZ/5, "Alpine CDC"); /* be quick on autostart */
 
 #ifdef DEBUG
     print_scroll("Alpine M-Bus Test");
@@ -1164,7 +1164,7 @@ int main(void* parameter)
     stacksize = (stacksize - 100) & ~3;
     if (stacksize < DEFAULT_STACK_SIZE)
     {
-        rb->splash(HZ*2, true, "Out of memory");
+        rb->splash(HZ*2, "Out of memory");
         return -1;
     }
 

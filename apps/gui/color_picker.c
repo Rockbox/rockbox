@@ -392,7 +392,7 @@ bool set_color(struct screen *display, char *title, unsigned *color,
                 if (banned_color != (unsigned)-1 &&
                     banned_color == rgb.color)
                 {
-                    gui_syncsplash(HZ*2, true, str(LANG_COLOR_UNACCEPTABLE));
+                    gui_syncsplash(HZ*2, str(LANG_COLOR_UNACCEPTABLE));
                     break;
                 }
                 *color = rgb.color;

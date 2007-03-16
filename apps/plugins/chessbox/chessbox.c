@@ -384,7 +384,7 @@ void cb_levelup ( void ) {
         cb_setlevel ( 1 );
     else
         cb_setlevel ( Level+1 );
-    rb->splash ( 50 , true , level_string[Level-1] );
+    rb->splash ( 50 , level_string[Level-1] );
 };
 
 /* ---- Save current position ---- */
@@ -393,7 +393,7 @@ void cb_saveposition ( void ) {
     short sq,i,c;
     unsigned short temp;
     
-    rb->splash ( 0 , true , "Saving position" );
+    rb->splash ( 0 , "Saving position" );
 
     fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT);
 
@@ -448,7 +448,7 @@ void cb_restoreposition ( void ) {
     unsigned short m;
     
     if ( (fd = rb->open(SAVE_FILE, O_RDONLY)) >= 0 ) {
-        rb->splash ( 0 , true , "Loading position" );
+        rb->splash ( 0 , "Loading position" );
         rb->read(fd, &(computer), sizeof(computer));
         rb->read(fd, &(opponent), sizeof(opponent));
         rb->read(fd, &(Game50), sizeof(Game50));
@@ -673,7 +673,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     
     while (!exit) {
         if ( mate ) {
-            rb->splash ( 500 , true , "Checkmate!" );
+            rb->splash ( 500 , "Checkmate!" );
             rb->button_get(true);
             GNUChess_Initialize();
             cb_drawboard();
@@ -682,11 +682,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
         switch (command.type) {
             case COMMAND_MOVE:
                 if ( ! VerifyMove ( command.mv_s , 0 , &command.mv ) ) {
-                    rb->splash ( 50 , true , "Illegal move!" );
+                    rb->splash ( 50 , "Illegal move!" );
                     cb_drawboard();
                 } else {
                     cb_drawboard();
-                    rb->splash ( 0 , true , "Thinking..." );
+                    rb->splash ( 0 , "Thinking..." );
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
                     rb->cpu_boost ( true );
 #endif
@@ -709,7 +709,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
 #endif
             case COMMAND_PLAY:
                 opponent = !opponent; computer = !computer;
-                rb->splash ( 0 , true , "Thinking..." );
+                rb->splash ( 0 , "Thinking..." );
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
                 rb->cpu_boost ( true );
 #endif

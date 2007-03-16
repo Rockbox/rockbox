@@ -330,10 +330,10 @@ enum plugin_status tidy_do(enum tidy_system system)
         rb->snprintf(text, 24, "Cleaned up %d items", removed);
         if (status == TIDY_RETURN_ABORT)
         {
-            rb->splash(HZ, true, "User aborted");
+            rb->splash(HZ, "User aborted");
             rb->lcd_clear_display();
         }
-        rb->splash(HZ*2, true, text);
+        rb->splash(HZ*2, text);
     }
     return status;
 }

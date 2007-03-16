@@ -141,7 +141,7 @@ static bool list_viewers(void)
     else
     {
         /* FIX: translation! */
-        gui_syncsplash(HZ*2, true, (unsigned char *)"No viewers found");
+        gui_syncsplash(HZ*2, (unsigned char *)"No viewers found");
     }
 
     if (ret == PLUGIN_USB_CONNECTED)
@@ -173,7 +173,7 @@ static bool add_to_playlist(int position, bool queue)
     };
     struct text_message message={lines, 2};
 
-    gui_syncsplash(0, true, str(LANG_WAIT));
+    gui_syncsplash(0, str(LANG_WAIT));
     
     if (new_playlist)
         playlist_create(NULL, NULL);
@@ -454,7 +454,7 @@ static int remove_dir(char* dirname, int len)
 #endif
         if(ACTION_STD_CANCEL == get_action(CONTEXT_STD,TIMEOUT_NOBLOCK))
         {
-            gui_syncsplash(HZ, true, str(LANG_MENU_SETTING_CANCEL));
+            gui_syncsplash(HZ, str(LANG_MENU_SETTING_CANCEL));
             result = -1;
             break;
         }
@@ -522,12 +522,12 @@ static bool set_backdrop(void)
 {
     /* load the image */
     if(load_main_backdrop(selected_file)) {
-        gui_syncsplash(HZ, true, str(LANG_BACKDROP_LOADED));
+        gui_syncsplash(HZ, str(LANG_BACKDROP_LOADED));
         set_file(selected_file, (char *)global_settings.backdrop_file, MAX_FILENAME);
         show_main_backdrop();
         return true;
     } else {
-        gui_syncsplash(HZ, true, str(LANG_BACKDROP_FAILED));
+        gui_syncsplash(HZ, str(LANG_BACKDROP_FAILED));
         return false;
     }
 }
@@ -575,7 +575,7 @@ static bool create_dir(void)
 
     rc = mkdir(dirname);
     if (rc < 0) {
-        gui_syncsplash(HZ, true, (unsigned char *)"%s %s",
+        gui_syncsplash(HZ, (unsigned char *)"%s %s",
                        str(LANG_CREATE_DIR), str(LANG_FAILED));
     } else {
         onplay_result = ONPLAY_RELOAD_DIR;
@@ -849,7 +849,7 @@ static bool clipboard_paste(void)
         /* Force reload of the current directory */
         onplay_result = ONPLAY_RELOAD_DIR;
     } else {
-        gui_syncsplash(HZ, true, (unsigned char *)"%s %s",
+        gui_syncsplash(HZ, (unsigned char *)"%s %s",
                str(LANG_PASTE), str(LANG_FAILED));
     }
 

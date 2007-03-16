@@ -226,7 +226,7 @@ static bool write_bookmark(bool create_bookmark_file)
         }
     }
 
-    gui_syncsplash(HZ, true, str(success ? LANG_BOOKMARK_CREATE_SUCCESS
+    gui_syncsplash(HZ, str(success ? LANG_BOOKMARK_CREATE_SUCCESS
         : LANG_BOOKMARK_CREATE_FAILURE));
 
     return true;
@@ -520,7 +520,7 @@ static char* select_bookmark(const char* bookmark_file_name)
             /* if there were no bookmarks in the file, delete the file and exit. */
             if(bookmark_id <= 0)
             {
-                gui_syncsplash(HZ, true, str(LANG_BOOKMARK_LOAD_EMPTY));
+                gui_syncsplash(HZ, str(LANG_BOOKMARK_LOAD_EMPTY));
                 remove(bookmark_file_name);
                 action_signalscreenchange();
                 return NULL;

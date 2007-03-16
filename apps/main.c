@@ -146,7 +146,7 @@ static int init_dircache(bool preinit)
             {
                 /* This will be in default language, settings are not
                    applied yet. Not really any easy way to fix that. */
-                gui_syncsplash(0, true, str(LANG_DIRCACHE_BUILDING));
+                gui_syncsplash(0, str(LANG_DIRCACHE_BUILDING));
                 clear = true;
             }
             
@@ -164,14 +164,14 @@ static int init_dircache(bool preinit)
         {
             if (global_status.dircache_size <= 0)
             {
-                gui_syncsplash(0, true, str(LANG_DIRCACHE_BUILDING));
+                gui_syncsplash(0, str(LANG_DIRCACHE_BUILDING));
                 clear = true;
             }
             result = dircache_build(global_status.dircache_size);
         }
         
         if (result < 0)
-            gui_syncsplash(0, true, "Failed! Result: %d", result);
+            gui_syncsplash(0, "Failed! Result: %d", result);
     }
     
     if (clear)
@@ -206,7 +206,7 @@ static void init_tagcache(void)
         if (ret > 0)
         {
 #ifdef HAVE_LCD_BITMAP
-            gui_syncsplash(0, true, "%s [%d/%d]",
+            gui_syncsplash(0, "%s [%d/%d]",
                 str(LANG_TAGCACHE_INIT), ret, 
                 tagcache_get_max_commit_step());
 #else
@@ -458,7 +458,7 @@ static void init(void)
     if (button_hold())
 #endif
     {
-        gui_syncsplash(HZ*2, true, str(LANG_RESET_DONE_CLEAR));
+        gui_syncsplash(HZ*2, str(LANG_RESET_DONE_CLEAR));
         settings_reset();
     }
     else

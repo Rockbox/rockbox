@@ -90,12 +90,12 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 16
+#define CODEC_API_VERSION 17
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 16
+#define CODEC_MIN_API_VERSION 17
 
 /* codec return codes */
 enum codec_status {
@@ -166,7 +166,7 @@ struct codec_api {
     /* Configure different codec buffer parameters. */
     void (*configure)(int setting, intptr_t value);
 
-    void (*splash)(int ticks, bool center, const unsigned char *fmt, ...);
+    void (*splash)(int ticks, const unsigned char *fmt, ...);
 
     /* file */
     int (*PREFIX(open))(const char* pathname, int flags);

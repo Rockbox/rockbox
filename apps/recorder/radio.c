@@ -703,7 +703,7 @@ int radio_screen(void)
             case ACTION_FM_PRESET:
                 if(num_presets < 1)
                 {
-                    gui_syncsplash(HZ, true, str(LANG_FM_NO_PRESETS));
+                    gui_syncsplash(HZ, str(LANG_FM_NO_PRESETS));
                     update_screen = true;
                     FOR_NB_SCREENS(i)
                     {
@@ -737,7 +737,7 @@ int radio_screen(void)
             case ACTION_FM_FREEZE:
                 if(!screen_freeze)
                 {
-                    gui_syncsplash(HZ, true, str(LANG_FM_FREEZE));
+                    gui_syncsplash(HZ, str(LANG_FM_FREEZE));
                     screen_freeze = true;
                 }
                 else
@@ -931,7 +931,7 @@ int radio_screen(void)
 #if CONFIG_CODEC != SWCODEC
     if(audio_status() & AUDIO_STATUS_ERROR)
     {
-        gui_syncsplash(0, true, str(LANG_DISK_FULL));
+        gui_syncsplash(0, str(LANG_DISK_FULL));
         gui_syncstatusbar_draw(&statusbars,true);
         FOR_NB_SCREENS(i)
             gui_textarea_update(&screens[i]);
@@ -1009,7 +1009,7 @@ static void radio_save_presets(void)
     }
     else
     {
-        gui_syncsplash(HZ, true, str(LANG_FM_PRESET_SAVE_FAILED));
+        gui_syncsplash(HZ, str(LANG_FM_PRESET_SAVE_FAILED));
     }    
 }
 
@@ -1095,7 +1095,7 @@ static int radio_add_preset(void)
     }
     else
     {
-        gui_syncsplash(HZ, true, str(LANG_FM_NO_FREE_PRESETS));
+        gui_syncsplash(HZ, str(LANG_FM_NO_FREE_PRESETS));
     }
     return true;
 }
@@ -1183,7 +1183,7 @@ static int save_preset_list(void)
                 if((!p1) || (len > MAX_FILENAME) || (len == 0))
                 {
                     /* no slash, too long or too short */
-                    gui_syncsplash(HZ,true,str(LANG_INVALID_FILENAME));                    
+                    gui_syncsplash(HZ, str(LANG_INVALID_FILENAME));                    
                 }
                 else
                 {
@@ -1203,7 +1203,7 @@ static int save_preset_list(void)
         }
     }
     else
-        gui_syncsplash(HZ,true,str(LANG_FM_NO_PRESETS));
+        gui_syncsplash(HZ, str(LANG_FM_NO_PRESETS));
         
     return true;
 }
@@ -1380,7 +1380,7 @@ static int scan_presets(void)
             freq /= 100;
 
             snprintf(buf, MAX_FMPRESET_LEN, str(LANG_FM_SCANNING), freq, frac);
-            gui_syncsplash(0, true, buf);
+            gui_syncsplash(0, buf);
 
             if(radio_set(RADIO_SCAN_FREQUENCY, curr_freq))
             {

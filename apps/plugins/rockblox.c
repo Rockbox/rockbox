@@ -854,7 +854,7 @@ static int rockblox_loop (void)
             /* Restore user's original backlight setting */
             rb->backlight_set_timeout (rb->global_settings->backlight_timeout);
 
-            rb->splash(0, true, "Paused");
+            rb->splash(0, "Paused");
             while (rb->button_hold ())
                 rb->sleep(HZ/10);
 
@@ -939,7 +939,7 @@ static int rockblox_loop (void)
                 break;
 #ifdef ROCKBLOX_RESTART
             case ROCKBLOX_RESTART:
-                rb->splash (HZ * 1, true, "Restarting...");
+                rb->splash (HZ * 1, "Restarting...");
                 init_rockblox ();
                 new_block ();
                 break;
@@ -992,7 +992,7 @@ static int rockblox_loop (void)
 #if LCD_DEPTH >= 2
             rb->lcd_set_foreground (LCD_BLACK);
 #endif
-            rb->splash (HZ * 2, true, "Game Over");
+            rb->splash (HZ * 2, "Game Over");
             init_rockblox ();
             new_block ();
         }
@@ -1025,7 +1025,7 @@ enum plugin_status plugin_start (struct plugin_api *api, void *parameter)
 #else
     if (!pgfx_init(rb, 4, 2))
     {
-        rb->splash(HZ*2, true, "Old LCD :(");
+        rb->splash(HZ*2, "Old LCD :(");
         return PLUGIN_OK;
     }
 #endif

@@ -636,9 +636,9 @@ bool playlist_viewer_ex(char* filename)
         {
             /* Play has stopped */
 #ifdef HAVE_LCD_CHARCELLS
-            gui_syncsplash(HZ, true, str(LANG_END_PLAYLIST_PLAYER));
+            gui_syncsplash(HZ, str(LANG_END_PLAYLIST_PLAYER));
 #else
-            gui_syncsplash(HZ, true, str(LANG_END_PLAYLIST_RECORDER));
+            gui_syncsplash(HZ, str(LANG_END_PLAYLIST_RECORDER));
 #endif
             goto exit;
         }
@@ -696,7 +696,7 @@ bool playlist_viewer_ex(char* filename)
                     ret = playlist_move(viewer.playlist, viewer.move_track,
                         current_track->index);
                     if (ret < 0)
-                        gui_syncsplash(HZ, true, str(LANG_MOVE_FAILED));
+                        gui_syncsplash(HZ, str(LANG_MOVE_FAILED));
 
                     update_playlist(true);
                     viewer.move_track = -1;
@@ -819,7 +819,7 @@ bool search_playlist(void)
     playlist_count = playlist_amount_ex(viewer.playlist);
     for (i=0;(i<playlist_count)&&(found_indicies_count<MAX_PLAYLIST_ENTRIES);i++)
     {
-        gui_syncsplash(0, true, str(LANG_PLAYLIST_SEARCH_MSG),found_indicies_count,
+        gui_syncsplash(0, str(LANG_PLAYLIST_SEARCH_MSG),found_indicies_count,
 #if CONFIG_KEYPAD == PLAYER_PAD
                    str(LANG_STOP_ABORT)
 #else

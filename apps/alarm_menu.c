@@ -97,11 +97,11 @@ bool alarm_screen(void)
                 rtc_init();
                 rtc_set_alarm(h,m);
                 rtc_enable_alarm(true);
-                gui_syncsplash(HZ*2, true, str(LANG_ALARM_MOD_TIME_TO_GO),
+                gui_syncsplash(HZ*2, str(LANG_ALARM_MOD_TIME_TO_GO),
                        togo / 60, togo % 60);
                 done = true;
             } else {
-                gui_syncsplash(HZ, true, str(LANG_ALARM_MOD_ERROR));
+                gui_syncsplash(HZ, str(LANG_ALARM_MOD_ERROR));
                 update = true;
             }
             break;
@@ -144,7 +144,7 @@ bool alarm_screen(void)
 
         case ACTION_STD_CANCEL:
             rtc_enable_alarm(false);
-            gui_syncsplash(HZ*2, true, str(LANG_ALARM_MOD_DISABLE));
+            gui_syncsplash(HZ*2, str(LANG_ALARM_MOD_DISABLE));
             done = true;
             break;
 

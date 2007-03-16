@@ -47,7 +47,7 @@ unsigned char *parse(int fd) {
     ret=parseMExpr();
     if(syntaxerror) {
         PUTS("Syntaxerror");
-        rb->splash(HZ*3,true,errormsg);
+        rb->splash(HZ*3,errormsg);
     }
     parser_accept(TOKEN_EOF);
     return ret;
@@ -267,7 +267,7 @@ unsigned char *parseMExpr() {
             if(filter[currentlevel][i]) // this should always be true
                 ret[i]=ret[i] || ret2[i];
             else
-                rb->splash(HZ*2,true,"An or is having a filter, bad.");
+                rb->splash(HZ*2,"An or is having a filter, bad.");
     }
     return ret;
 }

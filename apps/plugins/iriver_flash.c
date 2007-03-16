@@ -275,7 +275,7 @@ bool show_info(void)
     ShowFlashInfo(&fi);
     if (fi.size == 0) /* no valid chip */
     {
-        rb->splash(HZ*3, true, "Sorry!");
+        rb->splash(HZ*3, "Sorry!");
         return false; /* exit */
     }
     
@@ -288,7 +288,7 @@ bool confirm(const char *msg)
     bool ret;
     
     rb->snprintf(buf, sizeof buf, "%s ([PLAY] to CONFIRM)", msg);
-    rb->splash(0, true, buf);
+    rb->splash(0, buf);
     
     ret = (wait_for_button() == BUTTON_ON);
     show_info();
@@ -311,7 +311,7 @@ int load_firmware_file(const char *filename, uint32_t *checksum)
     
     if (audiobuf_size < len)
     {
-        rb->splash(HZ*3, true, "Aborting: Out of memory!");
+        rb->splash(HZ*3, "Aborting: Out of memory!");
         rb->close(fd);
         return -2;
     }
@@ -324,7 +324,7 @@ int load_firmware_file(const char *filename, uint32_t *checksum)
     rb->close(fd);
     if (rc != len)
     {
-        rb->splash(HZ*3, true, "Aborting: Read failure");
+        rb->splash(HZ*3, "Aborting: Read failure");
         return -3;
     }
     
@@ -335,7 +335,7 @@ int load_firmware_file(const char *filename, uint32_t *checksum)
     
     if (sum != *checksum)
     {
-        rb->splash(HZ*3, true, "Aborting: Checksums mismatch!");
+        rb->splash(HZ*3, "Aborting: Checksums mismatch!");
         return -4;
     }
     
@@ -393,7 +393,7 @@ int flash_rockbox(const char *filename, int section)
     p8 = (char *)BOOTLOADER_ENTRYPOINT;
     if (!detect_valid_bootloader(p8, 0))
     {
-        rb->splash(HZ*3, true, "Incompatible bootloader");
+        rb->splash(HZ*3, "Incompatible bootloader");
         return -1;
     }
 
@@ -423,7 +423,7 @@ int flash_rockbox(const char *filename, int section)
         {
             rb->snprintf(buf, sizeof(buf), "Incorrect relocation: 0x%08x/0x%08x",
                          *p32, pos+sizeof(struct flash_header));
-            rb->splash(HZ*10, true, buf);
+            rb->splash(HZ*10, buf);
             return -1;
         }
         
@@ -489,7 +489,7 @@ int flash_rockbox(const char *filename, int section)
     
     if (sum != checksum)
     {
-        rb->splash(HZ*3, true, "Verify failed!");
+        rb->splash(HZ*3, "Verify failed!");
         /* Erase the magic sector so bootloader does not try to load
          * rockbox from flash and crash. */
         if (section == SECT_RAMIMAGE)
@@ -499,17 +499,17 @@ int flash_rockbox(const char *filename, int section)
         return -5;
     }
     
-    rb->splash(HZ*2, true, "Success");
+    rb->splash(HZ*2, "Success");
     
     return 0;
 }
 
 void show_fatal_error(void)
 {
-    rb->splash(HZ*30, true, "Disable idle poweroff, connect AC power and DON'T TURN PLAYER OFF!!");
-    rb->splash(HZ*30, true, "Contact Rockbox developers as soon as possible!");
-    rb->splash(HZ*30, true, "Your device won't be bricked unless you turn off the power");
-    rb->splash(HZ*30, true, "Don't use the device before further instructions from Rockbox developers");
+    rb->splash(HZ*30, "Disable idle poweroff, connect AC power and DON'T TURN PLAYER OFF!!");
+    rb->splash(HZ*30, "Contact Rockbox developers as soon as possible!");
+    rb->splash(HZ*30, "Your device won't be bricked unless you turn off the power");
+    rb->splash(HZ*30, "Don't use the device before further instructions from Rockbox developers");
 }
 
 int flash_bootloader(const char *filename)
@@ -533,14 +533,14 @@ int flash_bootloader(const char *filename)
     
     if (len > 0xFFFF)
     {
-        rb->splash(HZ*3, true, "Too big bootloader");
+        rb->splash(HZ*3, "Too big bootloader");
         return -1;
     }
     
     /* Verify the crc32 checksum also. */
     if (!detect_valid_bootloader(audiobuf, len))
     {
-        rb->splash(HZ*3, true, "Incompatible/Untested bootloader");
+        rb->splash(HZ*3, "Incompatible/Untested bootloader");
         return -1;
     }
 
@@ -579,7 +579,7 @@ int flash_bootloader(const char *filename)
     
     if (sum != checksum)
     {
-        rb->splash(HZ*3, true, "Verify failed!");
+        rb->splash(HZ*3, "Verify failed!");
         show_fatal_error();
         return -5;
     }
@@ -589,13 +589,13 @@ int flash_bootloader(const char *filename)
     {
         if (p8[i] != audiobuf[i])
         {
-            rb->splash(HZ*3, true, "Bootvector corrupt!");
+            rb->splash(HZ*3, "Bootvector corrupt!");
             show_fatal_error();
             return -6;
         }
     }
     
-    rb->splash(HZ*2, true, "Success");
+    rb->splash(HZ*2, "Success");
     
     return 0;
 }
@@ -653,7 +653,7 @@ int flash_original_fw(int len)
     {
         if (p8[i] != reset_vector[i])
         {
-            rb->splash(HZ*3, true, "Bootvector corrupt!");
+            rb->splash(HZ*3, "Bootvector corrupt!");
             show_fatal_error();
             break;
         }
@@ -665,14 +665,14 @@ int flash_original_fw(int len)
     {
         if (p8[i] != audiobuf[i])
         {
-            rb->splash(HZ*3, true, "Verify failed!");
+            rb->splash(HZ*3, "Verify failed!");
             rb->snprintf(buf, sizeof buf, "at: 0x%08x", i);
-            rb->splash(HZ*10, true, buf);
+            rb->splash(HZ*10, buf);
             return -5;
         }
     }
     
-    rb->splash(HZ*2, true, "Success");
+    rb->splash(HZ*2, "Success");
     
     return 0;
 }
@@ -695,7 +695,7 @@ int load_original_bin(const char *filename)
     rb->read(fd, magic, 8);
     if (magic[1] != 0x00000008 || len <= 0 || len > audiobuf_size)
     {
-        rb->splash(HZ*2, true, "Not an original firmware file");
+        rb->splash(HZ*2, "Not an original firmware file");
         rb->close(fd);
         return -1;
     }
@@ -705,7 +705,7 @@ int load_original_bin(const char *filename)
     
     if (rc != len)
     {
-        rb->splash(HZ*2, true, "Read error");
+        rb->splash(HZ*2, "Read error");
         return -2;
     }
     
@@ -737,7 +737,7 @@ int load_romdump(const char *filename)
     
     if (rc != len)
     {
-        rb->splash(HZ*2, true, "Read error");
+        rb->splash(HZ*2, "Read error");
         return -2;
     }
     
@@ -756,14 +756,14 @@ void DoUserDialog(char* filename)
     /* this can only work if Rockbox runs in DRAM, not flash ROM */
     if ((uint16_t*)rb >= FB && (uint16_t*)rb < FB + 4096*1024) /* 4 MB max */
     {   /* we're running from flash */
-        rb->splash(HZ*3, true, "Not from ROM");
+        rb->splash(HZ*3, "Not from ROM");
         return; /* exit */
     }
 
     /* refuse to work if the power may fail meanwhile */
     if (!rb->battery_level_safe())
     {
-        rb->splash(HZ*3, true, "Battery too low!");
+        rb->splash(HZ*3, "Battery too low!");
         return; /* exit */
     }
     
@@ -773,7 +773,7 @@ void DoUserDialog(char* filename)
 
     if (filename == NULL)
     {
-        rb->splash(HZ*3, true, "Please use this plugin with \"Open with...\"");
+        rb->splash(HZ*3, "Please use this plugin with \"Open with...\"");
         return ;
     }
     
@@ -790,7 +790,7 @@ void DoUserDialog(char* filename)
     else if (rb->strcasestr(filename, "/internal_rom_000000-1FFFFF.bin"))
         load_romdump(filename);
     else
-        rb->splash(HZ*3, true, "Unknown file type");
+        rb->splash(HZ*3, "Unknown file type");
 }
 
 

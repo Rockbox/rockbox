@@ -1159,7 +1159,7 @@ int solitaire( void )
         /* if there aren't any, that means you won :) */
         if( biggest_col_length == 0 && rem == NOT_A_CARD )
         {
-            rb->splash( HZ, true, "You Won :)" );
+            rb->splash( HZ, "You Won :)" );
             return bouncing_cards();
         }
 
@@ -1588,7 +1588,7 @@ enum plugin_status plugin_start( struct plugin_api* api, void* parameter )
     (void)parameter;
     rb = api;
 
-    rb->splash( HZ, true, "Welcome to Solitaire!" );
+    rb->splash( HZ, "Welcome to Solitaire!" );
 
     configfile_init(rb);
     configfile_load(CONFIG_FILENAME, config,

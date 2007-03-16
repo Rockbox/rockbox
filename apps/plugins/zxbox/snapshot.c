@@ -651,7 +651,7 @@ void load_snapshot_file_type(char *name, int type)
   snsh = rb->open(filenamebuf, O_RDONLY);
   if(snsh < 0) {
 #ifndef USE_GRAY
-  rb->splash(HZ,true, "Could not open snapshot file `%s'",filenamebuf);
+  rb->splash(HZ, "Could not open snapshot file `%s'",filenamebuf);
 #endif
     return;
   }

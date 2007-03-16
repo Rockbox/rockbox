@@ -2164,7 +2164,7 @@ static int bubbles_checklevel(struct game_context* bb) {
     }
 
     rb->snprintf(str, 12, "%d points", points);
-    rb->splash(HZ, true, str);
+    rb->splash(HZ, str);
 
     /* advance to the next level */
     if(!bubbles_nextlevel(bb)) {
@@ -2174,7 +2174,7 @@ static int bubbles_checklevel(struct game_context* bb) {
     bubbles_drawboard(bb);
     rb->lcd_update();
     rb->snprintf(str, 12, "Level %d", bb->level);
-    rb->splash(HZ, true, str);
+    rb->splash(HZ, str);
     bubbles_drawboard(bb);
     rb->lcd_update();
 
@@ -2334,7 +2334,7 @@ static inline void bubbles_setcolors(void) {
 static void bubbles_callback(void* param) {
     struct game_context* bb = (struct game_context*) param;
     if(bb->dirty) {
-        rb->splash(HZ/2, true, "Saving high scores...");
+        rb->splash(HZ/2, "Saving high scores...");
         bubbles_savescores(bb);
     }
 }
@@ -2385,7 +2385,7 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
 
         case BUBBLES_START:  /* pause the game */
             start = *rb->current_tick;
-            rb->splash(1, true, "Paused");
+            rb->splash(1, "Paused");
             while(pluginlib_getaction(rb,TIMEOUT_BLOCK,plugin_contexts,2)
                  != (BUBBLES_START));
             bb->startedshot += *rb->current_tick-start;
@@ -2395,7 +2395,7 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
 
         case BUBBLES_RESUME: /* save and end the game */
             if(!animblock) {
-                rb->splash(HZ/2, true, "Saving game...");
+                rb->splash(HZ/2, "Saving game...");
                 bubbles_savegame(bb);
                 return BB_END;
             }
@@ -2554,7 +2554,7 @@ static int bubbles(struct game_context* bb) {
 
             case BUBBLES_RESUME: /* resume game */
                 if(!bubbles_loadgame(bb)) {
-                    rb->splash(HZ*2, true, "Nothing to resume");
+                    rb->splash(HZ*2, "Nothing to resume");
                 } else {
                     startgame = true;
                 }
@@ -2652,7 +2652,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     xlcd_init(rb);
 
     /* load files */
-    rb->splash(0, true, "Loading...");
+    rb->splash(0, "Loading...");
     bubbles_loadscores(&bb);
     rb->lcd_clear_display();
 
@@ -2666,7 +2666,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
         switch(bubbles(&bb)){
             char str[19];
             case BB_WIN:
-                rb->splash(HZ*2, true, "You Win!");
+                rb->splash(HZ*2, "You Win!");
                 /* record high level */
                 if( NUM_LEVELS-1 > bb.highlevel) {
                     bb.highlevel = NUM_LEVELS-1;
@@ -2676,12 +2676,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
                 /* record high score */
                 if((position = bubbles_recordscore(&bb))) {
                     rb->snprintf(str, 19, "New high score #%d!", position);
-                    rb->splash(HZ*2, true, str);
+                    rb->splash(HZ*2, str);
                 }
                 break;
 
             case BB_LOSE:
-                rb->splash(HZ*2, true, "Game Over");
+                rb->splash(HZ*2, "Game Over");
                 /* fall through to BB_END */
 
             case BB_END:
@@ -2695,7 +2695,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
                     /* record high score */
                     if((position = bubbles_recordscore(&bb))) {
                         rb->snprintf(str, 19, "New high score #%d!", position);
-                        rb->splash(HZ*2, true, str);
+                        rb->splash(HZ*2, str);
                     }
                 }
                 break;
@@ -2706,7 +2706,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
 
             case BB_QUIT:
                 if(bb.dirty) {
-                    rb->splash(HZ/2, true, "Saving high scores...");
+                    rb->splash(HZ/2, "Saving high scores...");
                     bubbles_savescores(&bb);
                 }
                 exit = true;

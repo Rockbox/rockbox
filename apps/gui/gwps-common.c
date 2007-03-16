@@ -2336,8 +2336,8 @@ bool update_onvol_change(struct gui_wps * gwps)
     gui_wps_refresh(gwps, 0, WPS_REFRESH_NON_STATIC);
 
 #ifdef HAVE_LCD_CHARCELLS
-    gui_splash(gwps->display,0, false, "Vol: %d dB   ",
-                   sound_val2phys(SOUND_VOLUME, global_settings.volume));
+    gui_splash(gwps->display, 0, "Vol: %3d dB",
+               sound_val2phys(SOUND_VOLUME, global_settings.volume));
     return true;
 #endif
     return false;
@@ -2494,10 +2494,10 @@ bool gui_wps_display(void)
     {
         global_status.resume_index = -1;
 #ifdef HAVE_LCD_CHARCELLS
-        gui_syncsplash(HZ, true, str(LANG_END_PLAYLIST_PLAYER));
+        gui_syncsplash(HZ, str(LANG_END_PLAYLIST_PLAYER));
 #else
         gui_syncstatusbar_draw(&statusbars, true);
-        gui_syncsplash(HZ, true, str(LANG_END_PLAYLIST_RECORDER));
+        gui_syncsplash(HZ, str(LANG_END_PLAYLIST_RECORDER));
 #endif
         return true;
     }
@@ -2651,6 +2651,6 @@ void display_keylock_text(bool locked)
     else
         s = str(LANG_KEYLOCK_OFF_RECORDER);
 #endif
-    gui_syncsplash(HZ, true, s);
+    gui_syncsplash(HZ, s);
 }
 

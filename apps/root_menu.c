@@ -119,14 +119,14 @@ static int browser(void* param)
                     /* Maybe just needs to reboot due to delayed commit */
                     if (stat->commit_delayed)
                     {
-                        gui_syncsplash(HZ*2, true, str(LANG_PLEASE_REBOOT));
+                        gui_syncsplash(HZ*2, str(LANG_PLEASE_REBOOT));
                         break;
                     }
 
                     /* Check if ready status is known */
                     if (!stat->readyvalid)
                     {
-                        gui_syncsplash(0, true, str(LANG_TAGCACHE_BUSY));
+                        gui_syncsplash(0, str(LANG_TAGCACHE_BUSY));
                         continue;
                     }
                
@@ -151,13 +151,13 @@ static int browser(void* param)
                     /* Display building progress */
                     if (stat->commit_step > 0)
                     {
-                        gui_syncsplash(0, true, "%s [%d/%d]",
+                        gui_syncsplash(0, "%s [%d/%d]",
                             str(LANG_TAGCACHE_INIT), stat->commit_step, 
                             tagcache_get_max_commit_step());
                     }
                     else
                     {
-                        gui_syncsplash(0, true, str(LANG_BUILDING_DATABASE),
+                        gui_syncsplash(0, str(LANG_BUILDING_DATABASE),
                             stat->processed_entries);
                     }
                 }
@@ -231,7 +231,7 @@ static int wpsscrn(void* param)
     }
     else 
     {
-        gui_syncsplash(HZ*2, true, str(LANG_NOTHING_TO_RESUME));
+        gui_syncsplash(HZ*2, str(LANG_NOTHING_TO_RESUME));
     }
 #if LCD_DEPTH > 1
     show_main_backdrop();

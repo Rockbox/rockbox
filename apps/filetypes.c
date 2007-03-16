@@ -340,14 +340,14 @@ static void scan_plugins(void)
         /* exttypes[] full, bail out */
         if (cnt_exttypes >= MAX_EXTTYPES)
         {
-            gui_syncsplash(HZ, true, str(LANG_FILETYPES_EXTENSION_FULL));
+            gui_syncsplash(HZ, str(LANG_FILETYPES_EXTENSION_FULL));
             break;
         }
 
         /* filetypes[] full, bail out */
         if (cnt_filetypes >= MAX_FILETYPES)
         {
-            gui_syncsplash(HZ, true, str(LANG_FILETYPES_FULL));
+            gui_syncsplash(HZ, str(LANG_FILETYPES_FULL));
             break;
         }
 
@@ -380,7 +380,7 @@ static void scan_plugins(void)
         /* filter out to long filenames */
         if (strlen((char *)entry->d_name) > MAX_PLUGIN_LENGTH + 5)
         {
-            gui_syncsplash(HZ, true, str(LANG_FILETYPES_PLUGIN_NAME_LONG));
+            gui_syncsplash(HZ, str(LANG_FILETYPES_PLUGIN_NAME_LONG));
             continue;
         }
 
@@ -561,13 +561,13 @@ static bool read_config(const char* file)
     {
         if (cnt_exttypes >= MAX_EXTTYPES)
         {
-            gui_syncsplash(HZ, true, str(LANG_FILETYPES_EXTENSION_FULL));
+            gui_syncsplash(HZ, str(LANG_FILETYPES_EXTENSION_FULL));
             break;
         }
 
         if (cnt_filetypes >= MAX_FILETYPES)
         {
-            gui_syncsplash(HZ, true, str(LANG_FILETYPES_FULL));
+            gui_syncsplash(HZ, str(LANG_FILETYPES_FULL));
             break;
         }
 
@@ -636,7 +636,7 @@ static bool read_config(const char* file)
         {
             if (strlen(str[plugin]) > MAX_PLUGIN_LENGTH)
             {
-                gui_syncsplash(HZ, true, str(LANG_FILETYPES_PLUGIN_NAME_LONG));
+                gui_syncsplash(HZ, str(LANG_FILETYPES_PLUGIN_NAME_LONG));
                 str[plugin] = NULL;
                 continue;
             }
@@ -736,7 +736,7 @@ static char* string2icon(const char* str)
          (unsigned long) string_buffer -
          (unsigned long) next_free_string) < ICON_LENGTH)
     {
-        gui_syncsplash(HZ, true, str(LANG_FILETYPES_STRING_BUFFER_EMPTY));
+        gui_syncsplash(HZ, str(LANG_FILETYPES_STRING_BUFFER_EMPTY));
         return NULL;
     }
 
@@ -792,7 +792,7 @@ static char* get_string(const char* str)
     }
     else
     {
-        gui_syncsplash(HZ, true, str(LANG_FILETYPES_STRING_BUFFER_EMPTY));
+        gui_syncsplash(HZ, str(LANG_FILETYPES_STRING_BUFFER_EMPTY));
         return NULL;
     }
 }

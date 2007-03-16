@@ -196,7 +196,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->memset(&settings, 0, sizeof(settings));
     
     /* now go ahead and have fun! */
-    rb->splash(HZ, true, "Chess Clock");
+    rb->splash(HZ, "Chess Clock");
 
     rb->lcd_clear_display();
     i=0;

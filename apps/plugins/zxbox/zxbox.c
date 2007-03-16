@@ -64,7 +64,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     rb = api;
     rb->lcd_set_backdrop(NULL);
-    rb->splash(HZ, true, "Welcome to ZXBox");
+    rb->splash(HZ, "Welcome to ZXBox");
 
 
     sp_init();

@@ -543,14 +543,14 @@ static void generateFileName(char* file_name, int part_no)
         }
         else
         {
-            rb->splash(0, true, "wrong extension");
+            rb->splash(0, "wrong extension");
             rb->button_get(true);
             rb->button_get(true);
         }
     }
     else
     {
-        rb->splash(0, true, "name too long");
+        rb->splash(0, "name too long");
         rb->button_get(true);
         rb->button_get(true);
 
@@ -585,7 +585,7 @@ static int copy_file(
         bytes_written = rb->write(dest, buffer, bytes_read);
 
         if (bytes_written < 0) {
-            rb->splash(0, true, "Write failed in copy.");
+            rb->splash(0, "Write failed in copy.");
             rb->button_get(true);
             rb->button_get(true);
             return -1;
@@ -598,7 +598,7 @@ static int copy_file(
             || button == SPLITEDIT_RC_QUIT:
 #endif
         ) {
-            rb->splash(0, true, "Aborting copy.");
+            rb->splash(0, "Aborting copy.");
             rb->button_get(true);
             rb->button_get(true);
             return -1;
@@ -632,7 +632,7 @@ static int save(
         if (file1 >= 0)
         {
             rb->close(file1);
-            rb->splash(0, true, "File 1 exists. Please rename.");
+            rb->splash(0, "File 1 exists. Please rename.");
             rb->button_get(true);
             rb->button_get(true);
             return -1;
@@ -646,7 +646,7 @@ static int save(
         if (file2 >= 0)
         {
             rb->close(file2);
-            rb->splash(0, true, "File 2 exists. Please rename.");
+            rb->splash(0, "File 2 exists. Please rename.");
             rb->button_get(true);
             rb->button_get(true);
             return -2;
@@ -688,8 +688,7 @@ static int save(
 
                 if (close_stat != 0)
                 {
-                    rb->splash(0, true,
-                        "failed closing file1: error %d", close_stat);
+                    rb->splash(0, "failed closing file1: error %d", close_stat);
                     rb->button_get(true);
                     rb->button_get(true);
                 } else {
@@ -701,8 +700,7 @@ static int save(
             }
             else
             {
-                rb->splash(0, true,
-                    "Can't write File1: error %d", file1);
+                rb->splash(0, "Can't write File1: error %d", file1);
                 rb->button_get(true);
                 rb->button_get(true);
                 retval = -1;
@@ -713,8 +711,7 @@ static int save(
         {
             if (rb->lseek(src_file, end, SEEK_SET) < (off_t)end)
             {
-                rb->splash(0, true,
-                    "Src file to short: error %d", src_file);
+                rb->splash(0, "Src file to short: error %d", src_file);
                 rb->button_get(true);
                 rb->button_get(true);
             }
@@ -732,8 +729,8 @@ static int save(
 
                 if (close_stat != 0)
                 {
-                    rb->splash(0, true,
-                        "failed: closing file2: error %d", close_stat);
+                    rb->splash(0, "failed: closing file2: error %d",
+                               close_stat);
                     rb->button_get(true);
                     rb->button_get(true);
                 } else {
@@ -745,8 +742,7 @@ static int save(
             }
             else
             {
-                rb->splash(0, true,
-                    "Can't write File2: error %d", file2);
+                rb->splash(0, "Can't write File2: error %d", file2);
                 rb->button_get(true);
                 rb->button_get(true);
                 retval = -2;
@@ -756,15 +752,14 @@ static int save(
         close_stat = rb->close(src_file);
         if (close_stat != 0)
         {
-            rb->splash(0, true,
-                "failed: closing src: error %d", close_stat);
+            rb->splash(0, "failed: closing src: error %d", close_stat);
             rb->button_get(true);
             rb->button_get(true);
         }
     }
     else
     {
-        rb->splash(0, true, "Source file not found");
+        rb->splash(0, "Source file not found");
         rb->button_get(true);
         rb->button_get(true);
         retval = -3;
@@ -1051,7 +1046,7 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
 /* MMC is slow - wait some time to allow track reload to finish */
                         rb->sleep(HZ/20);
                         if (mp3->elapsed > play_end) /* reload in progress */
-                            rb->splash(10*HZ, true, "Wait - reloading");
+                            rb->splash(10*HZ, "Wait - reloading");
 #endif
                         rb->audio_resume();
                         break;
@@ -1063,7 +1058,7 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
 /* MMC is slow - wait some time to allow track reload to finish */
                         rb->sleep(HZ/20);
                         if (mp3->elapsed > play_end) /* reload in progress */
-                            rb->splash(10*HZ, true, "Wait - reloading");
+                            rb->splash(10*HZ, "Wait - reloading");
 #endif
                         rb->audio_resume();
                         break;
@@ -1228,7 +1223,7 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 if (rb->strncasecmp(path_mp3, new_mp3->path,
                                     sizeof (path_mp3)))
                 {
-                    rb->splash(0, true,"Abort due to file change");
+                    rb->splash(0, "Abort due to file change");
                     rb->button_get(true);
                     rb->button_get(true);
                     exit_request = true;
@@ -1272,7 +1267,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
     else
     {
-        rb->splash(0, true, "Play or pause a mp3 file first.");
+        rb->splash(0, "Play or pause a mp3 file first.");
         rb->button_get(true);
         rb->button_get(true);
     }
