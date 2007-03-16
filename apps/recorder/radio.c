@@ -1319,6 +1319,8 @@ void set_radio_region(int region)
     radio_set(RADIO_SET_DEEMPHASIS, 
         fm_region[region].deemphasis);
     radio_set(RADIO_SET_BAND, fm_region[region].band);
+#else
+    (void)region;
 #endif
     next_station(0);
     remember_frequency();
