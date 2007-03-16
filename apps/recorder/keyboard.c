@@ -63,7 +63,7 @@
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
 #define KBD_MODES /* iFP7xx uses 2 modes, picker and line edit */
 
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 #define KBD_MODES /* iAudio X5 uses 2 modes, picker and line edit */
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD

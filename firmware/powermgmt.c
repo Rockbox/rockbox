@@ -192,7 +192,7 @@ static const unsigned int battery_level_dangerous[BATTERY_TYPES_COUNT] =
     338
 #elif CONFIG_BATTERY == BATT_LIION830   /* Gigabeat F */
     345
-#elif CONFIG_BATTERY == BATT_IAUDIO_X5  /* iAudio X5 */
+#elif CONFIG_BATTERY == BATT_IAUDIO_X5M5  /* iAudio X5 */
     354
 #elif CONFIG_BATTERY == BATT_LPCS355385 /* iriver H10 20GB: LiPolymer*/
     376
@@ -213,7 +213,7 @@ static const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
     302
 #elif CONFIG_BATTERY == BATT_LIION830   /* Gigabeat F */
     340
-#elif CONFIG_BATTERY == BATT_IAUDIO_X5  /* iAudio X5 */
+#elif CONFIG_BATTERY == BATT_IAUDIO_X5M5  /* iAudio X5 */
     350
 #elif CONFIG_BATTERY == BATT_LPCS355385 /* iriver H10 20GB */
     365
@@ -237,7 +237,7 @@ static const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 #elif CONFIG_BATTERY == BATT_LIPOL1300
     /* Below 337 the backlight starts flickering during HD access */
      { 337, 365, 370, 374, 378, 382, 387, 393, 400, 408, 416 }
-#elif CONFIG_BATTERY == BATT_IAUDIO_X5
+#elif CONFIG_BATTERY == BATT_IAUDIO_X5M5
     /* iAudio x5 series  - still experimenting with best curve */
 // Lithium ion discharge curve
     { 355, 356, 357, 359, 362, 365, 369, 374, 380, 387, 395 }

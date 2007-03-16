@@ -49,7 +49,7 @@
 
 #define LCD_REMOTE_PIXELFORMAT VERTICAL_INTERLEAVED
 
-#define CONFIG_KEYPAD IAUDIO_X5_PAD
+#define CONFIG_KEYPAD IAUDIO_X5M5_PAD
 
 #define AB_REPEAT_ENABLE 1
 #define ACTION_WPSAB_SINGLE ACTION_WPS_BROWSE
@@ -122,7 +122,7 @@
 
 /* Type of mobile power */
 #define X5_BATT_CONFIG          2
-#define CONFIG_BATTERY          BATT_IAUDIO_X5
+#define CONFIG_BATTERY          BATT_IAUDIO_X5M5
 #define BATTERY_CAPACITY_MIN    950   /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX    2250  /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC    50    /* capacity increment */
@@ -141,7 +141,7 @@
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 8
 
-#define USB_X5STYLE
+#define USB_X5M5_STYLE
 
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_M5636

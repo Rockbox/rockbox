@@ -96,7 +96,7 @@ enum minesweeper_status {
 #   define MINESWP_RIGHT    (BUTTON_SELECT | BUTTON_RIGHT)
 #   define MINESWP_LEFT     (BUTTON_SELECT | BUTTON_LEFT)
 
-#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
+#elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
 #   define MINESWP_UP       BUTTON_UP
 #   define MINESWP_DOWN     BUTTON_DOWN
 #   define MINESWP_QUIT     BUTTON_POWER
@@ -446,7 +446,7 @@ enum minesweeper_status menu( void )
       || (CONFIG_KEYPAD == IPOD_3G_PAD) \
       || (CONFIG_KEYPAD == GIGABEAT_PAD)
             "SELECT to start"
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
             "REC to start"
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
             "FF to start"

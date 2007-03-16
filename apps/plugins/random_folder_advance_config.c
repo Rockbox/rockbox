@@ -46,7 +46,7 @@ struct file_format *list = NULL;
 
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
 
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
 

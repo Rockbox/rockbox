@@ -124,7 +124,7 @@ enum {
 
 /* fixme: if/when simultaneous button presses work for X5,
    add redo & level repeat */
-#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
+#elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
 #define SOKOBAN_UP BUTTON_UP
 #define SOKOBAN_DOWN BUTTON_DOWN
 #define SOKOBAN_QUIT BUTTON_POWER
@@ -961,7 +961,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_putsxy(3, 26, "[SELECT+PLAY] Redo");
     rb->lcd_putsxy(3, 36, "[SELECT+LEFT] Down a Level");
     rb->lcd_putsxy(3, 46, "[SELECT+RIGHT] Up a Level");
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
     rb->lcd_putsxy(3,  6, "[POWER] Quit");
     rb->lcd_putsxy(3, 16, "[SELECT] Undo");
     rb->lcd_putsxy(3, 26, "[REC] Down a Level");

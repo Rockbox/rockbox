@@ -123,7 +123,7 @@ PLUGIN_HEADER
 #define STAR_MENU_RUN       BUTTON_RIGHT
 #define STAR_MENU_RUN2      BUTTON_SELECT
 
-#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
+#elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
 
 #define STAR_QUIT           BUTTON_POWER
 #define STAR_UP             BUTTON_UP
@@ -1061,7 +1061,7 @@ static int star_menu(void)
                                           "[S <] Prev. level\n"
                                           "[S + PLAY] Reset level\n"
                                           "[S >] Next level", true);
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
                         star_display_text("KEYS\n\n"
                                           "[SELECT] Toggle Ctl\n"
                                           "[POWER] Exit\n"

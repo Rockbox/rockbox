@@ -79,7 +79,7 @@
 #define FM_NEXT_PRESET
 #define FM_PREV_PRESET
 
-#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
+#elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
 #define FM_PRESET
 #define FM_MODE
 /* This should be removeable if the whole tuning thing is sorted out since

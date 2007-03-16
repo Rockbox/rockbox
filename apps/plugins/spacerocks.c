@@ -80,7 +80,7 @@ static struct plugin_api* rb; /* global api struct pointer */
 
 #define AST_RC_QUIT BUTTON_RC_STOP
 
-#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
+#elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
 #define AST_PAUSE BUTTON_PLAY
 #define AST_QUIT BUTTON_POWER
 #define AST_THRUST_REP BUTTON_UP | BUTTON_REPEAT
@@ -156,7 +156,7 @@ static struct plugin_api* rb; /* global api struct pointer */
   #define LARGE_LCD 0
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD) || \
-      (CONFIG_KEYPAD == IAUDIO_X5_PAD) || \
+      (CONFIG_KEYPAD == IAUDIO_X5M5_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == GIGABEAT_PAD)|| \

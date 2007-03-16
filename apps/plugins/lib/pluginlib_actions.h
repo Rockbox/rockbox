@@ -49,7 +49,7 @@ static const struct button_mapping generic_directions[] =
 {
 #if    (CONFIG_KEYPAD == IRIVER_H100_PAD)   \
     || (CONFIG_KEYPAD == IRIVER_H300_PAD)   \
-    || (CONFIG_KEYPAD == IAUDIO_X5_PAD)     \
+    || (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)     \
     || (CONFIG_KEYPAD == GIGABEAT_PAD)      \
     || (CONFIG_KEYPAD == RECORDER_PAD)      \
     || (CONFIG_KEYPAD == ARCHOS_AV300_PAD)  \
@@ -109,7 +109,7 @@ static const struct button_mapping generic_left_right_fire[] =
 {
 #if    (CONFIG_KEYPAD == IRIVER_H100_PAD)   \
     || (CONFIG_KEYPAD == IRIVER_H300_PAD)   \
-    || (CONFIG_KEYPAD == IAUDIO_X5_PAD)     \
+    || (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)     \
     || (CONFIG_KEYPAD == GIGABEAT_PAD)      \
     || (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD)
     { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
@@ -189,7 +189,7 @@ static const struct button_mapping generic_actions[] =
     {PLA_MENU,          BUTTON_MENU|BUTTON_REL,         BUTTON_NONE},
     {PLA_FIRE,          BUTTON_SELECT|BUTTON_REL,       BUTTON_SELECT},
     {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
     {PLA_QUIT,          BUTTON_POWER,       BUTTON_NONE},
     {PLA_START,         BUTTON_PLAY,        BUTTON_NONE},
     {PLA_MENU,          BUTTON_REC,         BUTTON_NONE},

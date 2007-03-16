@@ -121,7 +121,7 @@ PLUGIN_HEADER
 #define CUBE_PAUSE         (BUTTON_SELECT | BUTTON_REL)
 #define CUBE_HIGHSPEED     (BUTTON_MODE | BUTTON_EQ) /* TODO: this is impossible */
 
-#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
+#elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
 #define CUBE_QUIT          BUTTON_POWER
 #define CUBE_X_INC         BUTTON_LEFT
 #define CUBE_X_DEC         BUTTON_RIGHT

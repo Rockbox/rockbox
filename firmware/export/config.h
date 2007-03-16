@@ -53,7 +53,7 @@
 #define ONDIO_PAD           3
 #define IRIVER_H100_PAD     4
 #define IRIVER_H300_PAD     5
-#define IAUDIO_X5_PAD       6
+#define IAUDIO_X5M5_PAD     6
 #define IPOD_4G_PAD         7
 #define IPOD_3G_PAD         8
 #define IRIVER_IFP7XX_PAD   9
@@ -69,15 +69,15 @@
 #define X5_REMOTE   3
 
 /* CONFIG_BATTERY */
-#define BATT_LIION2200  2200 /* FM/V2 recorder type */
-#define BATT_4AA_NIMH   1500
-#define BATT_3AAA       1000 /* Ondio */
-#define BATT_IAUDIO_X5   950
-#define BATT_LIPOL1300  1300 /* the type used in iRiver h1x0 models */
-#define BATT_LPCS355385 1550 /* iriver h10 20Gb - SKC LPCS355385 */
-#define BATT_BP009       820 /* iriver H10 5/6Gb - iriver BP009 */
-#define BATT_LIION830    830 /* Toshiba Gigabeat Fxx and Xxx series MK11-2740 */
-#define BATT_1AA         333 /* iRiver iFP: Alkaline, NiHM */
+#define BATT_LIION2200   2200 /* FM/V2 recorder type */
+#define BATT_4AA_NIMH    1500
+#define BATT_3AAA        1000 /* Ondio */
+#define BATT_IAUDIO_X5M5  950
+#define BATT_LIPOL1300   1300 /* the type used in iRiver h1x0 models */
+#define BATT_LPCS355385  1550 /* iriver h10 20Gb - SKC LPCS355385 */
+#define BATT_BP009        820 /* iriver H10 5/6Gb - iriver BP009 */
+#define BATT_LIION830     830 /* Toshiba Gigabeat Fxx and Xxx series MK11-2740 */
+#define BATT_1AA          333 /* iRiver iFP: Alkaline, NiHM */
 
 /* CONFIG_CHARGING */
 #define CHARGING_SIMPLE  1 /* Simple, hardware controlled charging */
@@ -128,6 +128,7 @@
 #define BL_X5            13 /* iAudio X5 PCF50606 I2C */
 #define BL_H10_5GB       14 /* iriver H10 5/6GB */
 #define BL_TPJ1022       15 /* Tatung Elio TPJ-1022 */
+#define BL_M5            16 /* iAudio M5 PCF50606 I2C */
 
 /* CONFIG_I2C */
 #define I2C_PLAYREC  1 /* Archos Player/Recorder style */

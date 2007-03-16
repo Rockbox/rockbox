@@ -46,7 +46,7 @@ PLUGIN_HEADER
 #define ACTION BUTTON_SELECT
 #define ACTIONTEXT "SELECT"
 
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD /* grayscale at the moment */
+#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD /* grayscale at the moment */
 
 #define QUIT BUTTON_POWER
 #define ACTION BUTTON_UP

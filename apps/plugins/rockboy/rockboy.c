@@ -136,7 +136,7 @@ void setoptions (void)
       options.START=BUTTON_SCROLL_UP;
       options.SELECT=BUTTON_SCROLL_DOWN;
       options.MENU=BUTTON_POWER;
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
       options.A=BUTTON_PLAY;
       options.B=BUTTON_REC;
       options.START=BUTTON_SELECT;

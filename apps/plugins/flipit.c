@@ -84,7 +84,7 @@ PLUGIN_HEADER
 #define FLIPIT_TOGGLE_PRE   BUTTON_SELECT
 #define FLIPIT_TOGGLE       (BUTTON_SELECT | BUTTON_REL)
 
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 
 #define FLIPIT_UP           BUTTON_UP
 #define FLIPIT_DOWN         BUTTON_DOWN
@@ -514,7 +514,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_putsxy(2, 28, "[S-LEFT] shuffle");
     rb->lcd_putsxy(2, 38, "[S-PLAY] solution");
     rb->lcd_putsxy(2, 48, "[S-RIGHT] step by step");
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
     rb->lcd_putsxy(2, 8, "[POWER] to stop");
     rb->lcd_putsxy(2, 18, "[SELECT] toggle");
     rb->lcd_putsxy(2, 28, "[REC] shuffle");

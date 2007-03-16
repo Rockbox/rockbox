@@ -102,7 +102,7 @@ PLUGIN_HEADER
 #define SCROLL_FWD(x) (0)
 #define SCROLL_BACK(x) (0)
 
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD /* grayscale at the moment */
+#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD /* grayscale at the moment */
 
 #define QUIT BUTTON_POWER
 #define LEFT BUTTON_LEFT

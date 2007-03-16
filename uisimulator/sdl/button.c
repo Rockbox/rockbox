@@ -172,7 +172,7 @@ void button_event(int key, bool pressed)
         new_btn = BUTTON_MENU;
         break;
 
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
     case SDLK_KP4:
     case SDLK_LEFT:
         new_btn = BUTTON_LEFT;

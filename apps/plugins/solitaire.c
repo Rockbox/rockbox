@@ -154,7 +154,7 @@ static struct plugin_api* rb;
 #   define HK_CUR2STACK    "MENU.."
 #   define HK_REM2STACK    "RIGHT.."
 
-#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
+#elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
 #   define SOL_QUIT          BUTTON_POWER
 #   define SOL_UP            BUTTON_UP
 #   define SOL_DOWN          BUTTON_DOWN

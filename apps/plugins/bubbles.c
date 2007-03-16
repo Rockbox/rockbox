@@ -2465,7 +2465,7 @@ static int bubbles(struct game_context* bb) {
             rb->lcd_puts(0, 6, " and show high scores");
             rb->lcd_puts(0, 7, "SCROLL to aim");
             rb->lcd_puts(0, 8, " and to change level");
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
             rb->lcd_puts(0, 2, "PLAY to start/pause");
             rb->lcd_puts(0, 3, "REC to save/resume");
             rb->lcd_puts(0, 4, "POWER to exit");

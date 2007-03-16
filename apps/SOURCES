@@ -114,7 +114,7 @@ keymaps/keymap-recorder.c
 keymaps/keymap-ondio.c
 #elif CONFIG_KEYPAD == PLAYER_PAD
 keymaps/keymap-player.c
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 keymaps/keymap-x5.c
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
 keymaps/keymap-gigabeat.c

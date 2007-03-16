@@ -62,7 +62,7 @@ static struct plugin_api* rb;
 #define MAZEZAM_QUIT                BUTTON_OFF
 #define MAZEZAM_QUIT_KEYNAME        "[OFF]"
 
-#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
+#elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
 #define MAZEZAM_UP                  BUTTON_UP
 #define MAZEZAM_DOWN                BUTTON_DOWN
 #define MAZEZAM_LEFT                BUTTON_LEFT
