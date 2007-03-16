@@ -208,6 +208,7 @@ int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
     return EOK;
 }
 
+#ifdef SANSA_E200
 /* Load mi4 firmware from a hidden disk partition */
 int load_mi4_part(unsigned char* buf, struct partinfo* pinfo, unsigned int buffer_size)
 {
@@ -262,6 +263,7 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo, unsigned int buffe
     
     return EOK;
 }
+#endif
 
 void* main(void)
 {
@@ -339,9 +341,10 @@ void* main(void)
               a mi4 firmware decrypted and header stripped using mi4code.
         */
         printf("Loading original firmware...");
-        
-        /* First try a hidden partition */
-        printf("Trying hidden partition");
+
+#ifdef SANSA_E200        
+        /* First try a (hidden) firmware partition */
+        printf("Trying firmware partition");
         pinfo = disk_partinfo(1);
         if(pinfo->type == PARTITION_TYPE_HIDDEN)
         {
@@ -355,6 +358,7 @@ void* main(void)
         } else {
             printf("No hidden partition found.");
         }
+#endif
 
         printf("Trying /System/OF.mi4");
         rc=load_mi4(loadbuffer, "/System/OF.mi4", MAX_LOADSIZE);
