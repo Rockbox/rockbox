@@ -225,7 +225,6 @@ bool rbutilFrmApp::ReadGlobalConfig(rbutilFrm* myFrame)
 #endif
     gv->GlobalConfig->SetPath(stack);
 
-    delete buf; delete tmpstr;
     wxLogVerbose(wxT("=== end rbutilFrmApp::ReadGlobalConfig()"));
     return true;
 }

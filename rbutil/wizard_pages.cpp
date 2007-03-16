@@ -323,7 +323,7 @@ void wxThemesPage::OnListBox(wxCommandEvent& event)
             wxMkdir(dest);
 
         //this is a URL no PATH_SEP
-        src.Printf("%s/data/%s/%s",gv->themes_url.c_str(),gv->curresolution.c_str(),filename.c_str());
+        src.Printf(wxT("%s/data/%s/%s"),gv->themes_url.c_str(),gv->curresolution.c_str(),filename.c_str());
         dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s" PATH_SEP "%s"),
             gv->stdpaths->GetUserDataDir().c_str(),gv->curresolution.c_str(),filename.c_str());
 
