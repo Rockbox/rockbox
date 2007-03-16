@@ -199,7 +199,7 @@ static bool show_info(void)
                 output_dyn_value(NULL, 0, free, kbyte_units, true);
 #endif
 
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
                 {
                     struct tm* tm = get_time();
                     talk_id(VOICE_CURRENT_TIME, true);

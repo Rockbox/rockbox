@@ -185,7 +185,7 @@ MAKE_MENU(disk_menu, ID2P(LANG_DISK_MENU), 0, Icon_NOICON,
 #endif
 
 /* Time & Date */
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
 static int timedate_set(void)
 {
     struct tm tm;
@@ -317,7 +317,7 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #ifndef HAVE_MMC
             &disk_menu,
 #endif
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
             &time_menu,
 #endif
             &poweroff,

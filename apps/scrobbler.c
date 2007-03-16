@@ -32,7 +32,7 @@ http://www.audioscrobbler.net/wiki/Portable_Player_Logging
 #include "settings.h"
 #include "ata_idle_notify.h"
 
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
 #include "time.h"
 #include "timefuncs.h"
 #endif
@@ -41,7 +41,7 @@ http://www.audioscrobbler.net/wiki/Portable_Player_Logging
 
 #define SCROBBLER_VERSION "1.0"
 
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
 #define SCROBBLER_FILE "/.scrobbler.log"
 #else
 #define SCROBBLER_FILE "/.scrobbler-timeless.log"
@@ -62,7 +62,7 @@ static struct mp3entry scrobbler_entry;
 static bool pending = false;
 static bool scrobbler_initialised = false;
 static bool scrobbler_ata_callback = false;
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
 static time_t timestamp;
 #else
 static unsigned long timestamp;
@@ -92,7 +92,7 @@ static void write_cache(void)
         {
             fdprintf(scrobbler_fd, "#AUDIOSCROBBLER/%s\n", SCROBBLER_VERSION);
             fdprintf(scrobbler_fd, "#TZ/UNKNOWN\n");
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
             fdprintf(scrobbler_fd,
                      "#CLIENT/Rockbox " TARGET_NAME SCROBBLER_REVISION "\n");
 #else
@@ -207,7 +207,7 @@ void scrobbler_change_event(struct mp3entry *id)
     {
         logf("SCROBBLER: add pending");
         copy_mp3entry(&scrobbler_entry, id);
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
         timestamp = mktime(get_time());
 #else
         timestamp = 0;

@@ -970,7 +970,7 @@ static char* get_tag(struct wps_data* wps_data,
 #endif
             }
             break;
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
        case 'c':  /* Real Time Clock display */
             *flags |= WPS_REFRESH_DYNAMIC;
             {

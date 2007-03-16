@@ -141,7 +141,7 @@ static void gui_statusbar_led(struct screen * display);
 #ifdef HAVE_RECORDING
 static void gui_statusbar_icon_recording_info(struct screen * display);
 #endif
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
 static void gui_statusbar_time(struct screen * display, int hour, int minute);
 #endif
 #endif
@@ -238,7 +238,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
     if(!display->has_disk_led)
         bar->info.led = led_read(HZ/2); /* delay should match polling interval */
 #endif
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
     {
         struct tm* tm = get_time();
         bar->info.hour = tm->tm_hour;
@@ -323,7 +323,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
         if (bar->info.keylockremote)
             gui_statusbar_icon_lock_remote(display);
 #endif
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
         gui_statusbar_time(display, bar->info.hour, bar->info.minute);
 #endif /* CONFIG_RTC */
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
@@ -580,7 +580,7 @@ static void gui_statusbar_led(struct screen * display)
 }
 #endif
 
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
 /*
  * Print time to status bar
  */

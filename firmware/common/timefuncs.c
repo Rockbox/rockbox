@@ -46,7 +46,7 @@ bool valid_time(const struct tm *tm)
 struct tm *get_time(void)
 {
 #ifndef SIMULATOR
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
     static long timeout = 0;
 
     /* Don't read the RTC more than once per second */
@@ -95,7 +95,7 @@ struct tm *get_time(void)
 
 int set_time(const struct tm *tm)
 {
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
     int rc;
     char rtcbuf[7];
     

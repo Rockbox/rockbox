@@ -271,7 +271,7 @@ struct counter values[]={
   {"ydist", -6},
 };
 
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
 
 #define CLOCK_STEP (0xffffffff/60)
 #define CLOCK_FRAC (0xffffffff%60)
@@ -382,7 +382,7 @@ static int scrollit(void)
                     return -1;
         }
         rb->lcd_clear_display();
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
         addclock();
 #endif
 
@@ -451,7 +451,7 @@ static int loopit(void)
         x+= speed[xsanke&15] + values[NUM_XADD].num;
 
         rb->lcd_clear_display();
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
         addclock();
 #endif
         if(timeout) {
@@ -516,7 +516,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->sleep(HZ);
     rb->lcd_set_drawmode(DRMODE_FG);
     init_tables();
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
     init_clock();
 #endif
 

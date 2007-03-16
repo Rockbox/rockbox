@@ -19,7 +19,7 @@
  ****************************************************************************/
 #include "plugin.h"
 
-#if defined(HAVE_LCD_BITMAP) && defined(CONFIG_RTC)
+#if defined(HAVE_LCD_BITMAP) && (CONFIG_RTC != 0)
 
 #include <timefuncs.h>
 
@@ -71,7 +71,7 @@ static int calc_weekday( struct shown *shown )
 static void calendar_init(struct today *today, struct shown *shown)
 {
     int w,h;
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
     struct tm *tm;
 #else
     (void)today;
@@ -83,7 +83,7 @@ static void calendar_init(struct today *today, struct shown *shown)
         use_system_font = true;
     }
     rb->lcd_clear_display();
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
     tm = rb->get_time();
     today->mon = tm->tm_mon +1;
     today->year = 2000+tm->tm_year%100;

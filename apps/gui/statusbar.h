@@ -33,7 +33,7 @@ struct status_info {
     int volume;
     int playmode;
     int repeat;
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
     int hour;
     int minute;
 #endif

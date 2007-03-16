@@ -341,7 +341,7 @@ static void init(void)
 
     i2c_init();
 
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
     rtc_init();
 #endif
 #ifdef HAVE_RTC_RAM

@@ -518,7 +518,7 @@ char *rec_create_filename(char *buffer)
     snprintf(ext, sizeof(ext), ".%s",
              REC_FILE_ENDING(global_settings.rec_format));
 
-#ifdef CONFIG_RTC 
+#if CONFIG_RTC 
     /* We'll wait at least up to the start of the next second so no duplicate
        names are created */
     return create_datetime_filename(buffer, buffer, "R", ext, true);

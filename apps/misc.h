@@ -38,7 +38,7 @@ char *output_dyn_value(char *buf, int buf_size, int value,
  * less than zero to number automatically. The final number used will also
  * be returned in *num. If *num is >= 0 then *num will be incremented by
  * one. */
-#if CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING) && !defined(CONFIG_RTC)
+#if CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING) && (CONFIG_RTC == 0)
 /* this feature is needed by SWCODEC recording without a RTC to prevent
    disk access when changing files */
 #define IF_CNFN_NUM_(...) __VA_ARGS__
@@ -58,7 +58,7 @@ char *create_numbered_filename(char *buffer, const char *path,
  */
 void format_time(char* buf, int buf_size, long t);
 
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
 /* Create a filename with a date+time part.
    It is allowed that buffer and path point to the same memory location,
    saving a strcpy(). Path must always be given without trailing slash.

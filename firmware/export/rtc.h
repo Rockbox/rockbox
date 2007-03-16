@@ -23,7 +23,7 @@
 #include "system.h"
 #include "config.h"
 
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
 
 extern const int dayname[];
 

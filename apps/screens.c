@@ -784,7 +784,7 @@ void charging_splash(void)
 #endif
 
 
-#if defined(HAVE_LCD_BITMAP) && defined (CONFIG_RTC)
+#if defined(HAVE_LCD_BITMAP) && (CONFIG_RTC != 0)
 
 const int dayname[] = {
     LANG_WEEKDAY_SUNDAY,
@@ -1081,7 +1081,7 @@ bool set_time_screen(const char* string, struct tm *tm)
     lcd_set_drawmode(lastmode);
     return false;
 }
-#endif /* defined(HAVE_LCD_BITMAP) && defined (CONFIG_RTC) */
+#endif /* defined(HAVE_LCD_BITMAP) && (CONFIG_RTC != 0) */
 
 #if (CONFIG_KEYPAD == RECORDER_PAD) && !defined(HAVE_SW_POWEROFF)
 bool shutdown_screen(void)
