@@ -163,7 +163,10 @@ static bool reload_dir = false;
 static bool start_wps = false;
 static int curr_context = false;/* id3db or tree*/
 
-int dirbrowse(void);
+static int dirbrowse(void);
+static int ft_play_filenumber(int pos, int attr);
+static int ft_play_dirname(char* name);
+static void ft_play_filename(char *dir, char *file);
 
 /*
  * removes the extension of filename (if it doesn't start with a .)
@@ -490,7 +493,7 @@ void get_current_file(char* buffer, int buffer_len)
 }
 
 /* Selects a file and update tree context properly */
-void set_current_file(char *path)
+static void set_current_file(char *path)
 {
     char *name;
     int i;
@@ -567,7 +570,7 @@ static bool check_changed_id3mode(bool currmode)
 #endif
 
 /* main loop, handles key events */
-int dirbrowse()
+static int dirbrowse()
 {
     int numentries=0;
     char buf[MAX_PATH];
@@ -1275,7 +1278,7 @@ void bookmark_play(char *resume_file, int index, int offset, int seed,
     start_wps=true;
 }
 
-int ft_play_filenumber(int pos, int attr)
+static int ft_play_filenumber(int pos, int attr)
 {
     /* try to find a voice ID for the extension, if known */
     unsigned int j;
@@ -1295,7 +1298,7 @@ int ft_play_filenumber(int pos, int attr)
     return 1;
 }
 
-int ft_play_dirname(char* name)
+static int ft_play_dirname(char* name)
 {
     int fd;
     char dirname_mp3_filename[MAX_PATH+1];
@@ -1326,7 +1329,7 @@ int ft_play_dirname(char* name)
     return 1;
 }
 
-void ft_play_filename(char *dir, char *file)
+static void ft_play_filename(char *dir, char *file)
 {
     char name_mp3_filename[MAX_PATH+1];
 
