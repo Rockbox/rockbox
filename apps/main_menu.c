@@ -18,8 +18,6 @@
  ****************************************************************************/
 #include <timefuncs.h>
 #include "config.h"
-#include "options.h"
-
 #include "menu.h"
 #include "tree.h"
 #include "lcd.h"

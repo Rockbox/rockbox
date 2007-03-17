@@ -22,8 +22,6 @@
 
 #include <stdbool.h>
 
-#include "options.h"
-
 #include "lcd.h"
 #include "action.h"
 #include "kernel.h"
