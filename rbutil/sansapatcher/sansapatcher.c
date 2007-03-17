@@ -540,6 +540,9 @@ static int load_original_firmware(struct sansa_t* sansa, unsigned char* buf, str
 
     set_mi4header(buf,mi4header);
 
+    /* Add Rockbox-specific header */
+    memcpy(buf+0x1f8,"RBOFe200",8);
+
     return 0;
 }
 
@@ -604,7 +607,8 @@ int sansa_add_bootloader(struct sansa_t* sansa, char* filename, int type)
         }
 
         if (memcmp(sectorbuf+0x200+0x1f8,"RBBL",4)!=0) {
-            fprintf(stderr,"[ERR]  Not a Rockbox bootloader, aborting.\n");
+            fprintf(stderr,"[ERR]  %s is not a Rockbox bootloader, aborting.\n",
+                           filename);
             return -1;
         }
     } else {
