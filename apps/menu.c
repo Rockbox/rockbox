@@ -205,7 +205,7 @@ static void init_menu_lists(const struct menu_item_ex *menu,
             current_subitems_count++;
         }
     }
-    current_submenus_menu = menu;
+    current_submenus_menu = (struct menu_item_ex *)menu;
 
     gui_synclist_init(lists,get_menu_item_name,(void*)menu,false,1);
 #ifdef HAVE_LCD_BITMAP

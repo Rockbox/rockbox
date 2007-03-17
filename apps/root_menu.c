@@ -198,7 +198,7 @@ static int browser(void* param)
 static int menu(void* param)
 {
     (void)param;
-    return main_menu();
+    return do_menu(NULL, 0);
     
 }
 #ifdef HAVE_RECORDING
