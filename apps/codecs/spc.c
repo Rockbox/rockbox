@@ -759,7 +759,7 @@ static int play_track( void )
 
         if (ci->seek_time) {
             int curtime = sampleswritten*1000LL/sample_rate;
-            DEBUGF("seek to %d\ncurrently at %d\n",ci->seek_time,curtime);
+            DEBUGF("seek to %ld\ncurrently at %d\n",ci->seek_time,curtime);
             if (ci->seek_time < curtime) {
                 DEBUGF("seek backwards = reset\n");
                 ci->seek_complete();

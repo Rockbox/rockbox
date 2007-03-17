@@ -217,7 +217,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         return PLUGIN_OK;
     }
 
-    DEBUGF("Found %s at offset %d\n", word.word, reverse(word.offset));
+    DEBUGF("Found %s at offset %ld\n", word.word, reverse(word.offset));
 
     /* now open the description file */
     fData = rb->open(DICT_DESC, O_RDONLY);

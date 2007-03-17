@@ -19,7 +19,7 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-#include <_ansi.h>
+#include "../include/_ansi.h"
 
 extern void debug_init(void);
 extern void debugf(const char* fmt,...) ATTRIBUTE_PRINTF(1, 2);

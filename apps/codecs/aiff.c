@@ -112,7 +112,7 @@ next_track:
             sample_size  = ((buf[14]<<8)|buf[15]);
             /* sample_rate (don't use last 4 bytes, only integer fs) */
             if (buf[16] != 0x40) {
-                DEBUGF("CODEC_ERROR: weird sampling rate (no @)\n", i);
+                DEBUGF("CODEC_ERROR: weird sampling rate (no @)\n");
                 i = CODEC_ERROR;
                 goto done;
             }

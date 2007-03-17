@@ -1611,13 +1611,13 @@ static bool get_mp4_metadata(int fd, struct mp3entry* id3)
         }
         
         id3->bitrate = ((int64_t) id3->filesize * 8) / id3->length;
-        DEBUGF("MP4 bitrate %d, frequency %d Hz, length %d ms\n",
+        DEBUGF("MP4 bitrate %d, frequency %ld Hz, length %ld ms\n",
             id3->bitrate, id3->frequency, id3->length);
     }
     else
     {
         logf("MP4 metadata error");
-        DEBUGF("MP4 metadata error. errno %d, length %d, frequency %d, filesize %d\n",
+        DEBUGF("MP4 metadata error. errno %d, length %ld, frequency %ld, filesize %ld\n",
             errno, id3->length, id3->frequency, id3->filesize);
         return false;
     }

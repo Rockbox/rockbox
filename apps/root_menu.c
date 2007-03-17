@@ -219,7 +219,7 @@ static int wpsscrn(void* param)
     }
     else if ( global_status.resume_index != -1 )
     {
-        DEBUGF("Resume index %X offset %X\n",
+        DEBUGF("Resume index %X offset %lX\n",
                global_status.resume_index,
                global_status.resume_offset);
         if (playlist_resume() != -1)
@@ -229,7 +229,7 @@ static int wpsscrn(void* param)
             ret_val = gui_wps_show();
         }
     }
-    else 
+    else
     {
         gui_syncsplash(HZ*2, str(LANG_NOTHING_TO_RESUME));
     }

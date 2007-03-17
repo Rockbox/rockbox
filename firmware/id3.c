@@ -768,7 +768,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
         /* Keep track of the total size */
         totframelen = framelen;
 
-        DEBUGF("framelen = %d\n", framelen);
+        DEBUGF("framelen = %ld\n", framelen);
         if(framelen == 0){
             if (header[0] == 0 && header[1] == 0 && header[2] == 0)
                 return;
@@ -1000,7 +1000,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
 
     bytecount = get_mp3file_info(fd, &info);
 
-    DEBUGF("Space between ID3V2 tag and first audio frame: 0x%x bytes\n",
+    DEBUGF("Space between ID3V2 tag and first audio frame: 0x%lx bytes\n",
            bytecount);
 
     if(bytecount < 0)
@@ -1021,7 +1021,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
             || (info.byte_count < expected - diff))
         {
             DEBUGF("Note: info.byte_count differs from expected value by "
-                "%d bytes\n", labs((long) (expected - info.byte_count)));
+                "%ld bytes\n", labs((long) (expected - info.byte_count)));
             info.byte_count = 0;
             info.frame_count = 0;
             info.file_time = 0;
@@ -1085,7 +1085,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
 
     /* Update the seek point for the first playable frame */
     entry->first_frame_offset = bytecount;
-    DEBUGF("First frame is at %x\n", entry->first_frame_offset);
+    DEBUGF("First frame is at %lx\n", entry->first_frame_offset);
 
     return filetime;
 }

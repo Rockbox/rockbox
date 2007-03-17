@@ -297,7 +297,7 @@ next_track:
                     /* this is not a fatal error with some formats,
                      * we'll see later if we can't decode it */
                     DEBUGF("CODEC_WARNING: non-PCM WAVE (formattag=0x%x) "
-                           "doesn't have ext. fmt descr (chunksize=%d<18).\n",
+                           "doesn't have ext. fmt descr (chunksize=%ld<18).\n",
                            formattag, i);
                 }
                 size = buf[24]|(buf[25]<<8);

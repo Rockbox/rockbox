@@ -92,8 +92,8 @@ next_track:
     
     /* useful for seeking and reporting current playback position */
     avgbytespersec = ci->id3->frequency * 18 * channels / 32;
-    DEBUGF("avgbytespersec=%d\n",avgbytespersec);
-    
+    DEBUGF("avgbytespersec=%ld\n",avgbytespersec);
+
     /* Get loop data */
     
     looping = 0; start_adr = 0; end_adr = 0;
@@ -146,14 +146,14 @@ next_track:
     }
 
     if (looping) {
-        DEBUGF("ADX: looped, start: %x end: %x\n",start_adr,end_adr);
+        DEBUGF("ADX: looped, start: %lx end: %lx\n",start_adr,end_adr);
     } else {
         DEBUGF("ADX: not looped\n");
     }
     
     /* advance to first frame */
     /*ci->seek_buffer(chanstart);*/
-    DEBUGF("ADX: first frame at %x\n",chanstart);
+    DEBUGF("ADX: first frame at %lx\n",chanstart);
     bufoff = chanstart;
 
     /* setup pcm buffer format */
@@ -205,7 +205,7 @@ next_track:
         if (ci->seek_time) {
             uint32_t newpos;
             
-            DEBUGF("ADX: seek to %dms\n",ci->seek_time);
+            DEBUGF("ADX: seek to %ldms\n",ci->seek_time);
 
             endofstream = 0;
             loop_count = 0;
@@ -227,7 +227,7 @@ next_track:
         /* dance with the devil in the pale moonlight */
         if ((bufoff > ci->curpos + (off_t)bufsize - channels*18) ||
             bufoff < ci->curpos) {
-            DEBUGF("ADX: requesting another buffer at %x size %x\n",
+            DEBUGF("ADX: requesting another buffer at %lx size %lx\n",
                 bufoff,ci->filesize-bufoff);
             ci->seek_buffer(bufoff);
             buf = ci->request_buffer(&n, ci->filesize-bufoff);
@@ -236,13 +236,13 @@ next_track:
             if ((off_t)bufsize < channels*18) {
                 /* if we can't get a full frame, just request a single
                    frame (should be able to fit it in the guard buffer) */
-                DEBUGF("ADX: requesting single frame at %x\n",bufoff);
+                DEBUGF("ADX: requesting single frame at %lx\n",bufoff);
                 buf = ci->request_buffer(&n, channels*18);
                 bufsize=n;
                 DEBUGF("ADX: read size = %x\n",bufsize);
             }
             if (!buf) {
-                DEBUGF("ADX: couldn't get buffer at %x size %x\n",
+                DEBUGF("ADX: couldn't get buffer at %lx size %lx\n",
                     bufoff,ci->filesize-bufoff);
                 return CODEC_ERROR;
             }

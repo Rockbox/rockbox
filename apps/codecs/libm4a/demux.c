@@ -139,7 +139,7 @@ static bool read_chunk_esds(qtmovie_t *qtmovie, size_t chunk_len)
     temp=stream_read_int32(qtmovie->stream);//0x15000414 ????
     maxBitrate = stream_read_int32(qtmovie->stream);
     avgBitrate = stream_read_int32(qtmovie->stream);
-    DEBUGF("audioType=%d, maxBitrate=%d, avgBitrate=%d\n",audioType,maxBitrate,avgBitrate);
+    DEBUGF("audioType=%d, maxBitrate=%ld, avgBitrate=%ld\n",audioType,maxBitrate,avgBitrate);
 
     /* get and verify DecSpecificInfoTag */
     if (stream_read_uint8(qtmovie->stream) != 0x05)
@@ -272,7 +272,7 @@ static bool read_chunk_stsd(qtmovie_t *qtmovie, size_t chunk_len)
           j=qtmovie->stream->ci->curpos+sub_chunk_len-8;
           if (read_chunk_esds(qtmovie,sub_chunk_len)) {
              if (j!=qtmovie->stream->ci->curpos) {
-               DEBUGF("curpos=%d, j=%d - Skipping %d bytes\n",qtmovie->stream->ci->curpos,j,j-qtmovie->stream->ci->curpos);
+               DEBUGF("curpos=%ld, j=%d - Skipping %ld bytes\n",qtmovie->stream->ci->curpos,j,j-qtmovie->stream->ci->curpos);
                stream_skip(qtmovie->stream,j-qtmovie->stream->ci->curpos);
              }
              entry_remaining-=sub_chunk_len;
@@ -281,7 +281,7 @@ static bool read_chunk_stsd(qtmovie_t *qtmovie, size_t chunk_len)
               return false;
           }
 
-          DEBUGF("entry_remaining=%d\n",entry_remaining);
+          DEBUGF("entry_remaining=%ld\n",entry_remaining);
           stream_skip(qtmovie->stream,entry_remaining);
 
         } else {
@@ -379,7 +379,7 @@ static bool read_chunk_stsz(qtmovie_t *qtmovie, size_t chunk_len)
         
         if (v > 0x0000ffff)
         {
-            DEBUGF("stsz[%d] > 65 kB (%d)\n", i, v);
+            DEBUGF("stsz[%d] > 65 kB (%ld)\n", i, v);
             return false;
         }
         
@@ -545,7 +545,7 @@ static bool read_chunk_minf(qtmovie_t *qtmovie, size_t chunk_len)
 
     if ((i = stream_read_uint32(qtmovie->stream)) != 16)
     {
-        DEBUGF("unexpected size in media info: %d\n",i);
+        DEBUGF("unexpected size in media info: %ld\n",i);
         stream_skip(qtmovie->stream, size_remaining-4);
         return true;
     }

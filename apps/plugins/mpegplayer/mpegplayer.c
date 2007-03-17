@@ -830,7 +830,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* Grab most of the buffer for the compressed video - leave some for 
        PCM audio data and some for libmpeg2 malloc use. */
     buffer_size = audiosize - (PCMBUFFER_SIZE+AUDIOBUFFER_SIZE+LIBMPEG2BUFFER_SIZE);
-    DEBUGF("audiosize=%d, buffer_size=%d\n",audiosize,buffer_size);
+    DEBUGF("audiosize=%d, buffer_size=%ld\n",audiosize,buffer_size);
     buffer = mpeg2_malloc(buffer_size,-1);
 
     if (buffer == NULL)
