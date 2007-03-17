@@ -107,20 +107,10 @@
 /* Type of LCD TODO: hopefully the same as the x5 but check this*/
 #define CONFIG_LCD LCD_X5
 
-/* Offset ( in the firmware file's header ) to the file length */
-#define FIRMWARE_OFFSET_FILE_LENGTH 0x8
-
-/* Offset ( in the firmware file's header ) to the file CRC */
-#define FIRMWARE_OFFSET_FILE_CRC    0x0c
-
-/* Offset ( in the firmware file's header ) to the file type */
-#define FIRMWARE_OFFSET_FILE_TYPE   0x1f8
-
-/* Offset ( in the firmware file's header ) to the file model id */
-#define FIRMWARE_OFFSET_FILE_MODEL  0x1fc
-
-/* Offset ( in the firmware file's header ) to the real data */
-#define FIRMWARE_OFFSET_FILE_DATA   0x200
+/* Offset ( in the firmware file's header ) to the file CRC and data. These are
+   only used when loading the old format rockbox.e200 file */
+#define FIRMWARE_OFFSET_FILE_CRC    0x0
+#define FIRMWARE_OFFSET_FILE_DATA   0x8
 
 /* #define USB_IPODSTYLE */
 
@@ -136,8 +126,9 @@
 /* Define this if you have adjustable CPU frequency */
 /*#define HAVE_ADJUSTABLE_CPU_FREQ Let's say we don't for now*/
 
-#define BOOTFILE_EXT "e200"
-#define BOOTFILE "rockbox." BOOTFILE_EXT
+#define BOOTFILE_EXT    "mi4"
+#define BOOTFILE        "rockbox." BOOTFILE_EXT
+#define OLD_BOOTFILE    "rockbox.e200"
 
 #define ICODE_ATTR_TREMOR_NOT_MDCT
 

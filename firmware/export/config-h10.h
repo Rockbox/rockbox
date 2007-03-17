@@ -137,20 +137,10 @@
 /* We're able to shut off power to the HDD */
 #define HAVE_ATA_POWER_OFF
 
-/* Offset ( in the firmware file's header ) to the file length */
-#define FIRMWARE_OFFSET_FILE_LENGTH 0x8
-
-/* Offset ( in the firmware file's header ) to the file CRC */
-#define FIRMWARE_OFFSET_FILE_CRC    0x0c
-
-/* Offset ( in the firmware file's header ) to the file type */
-#define FIRMWARE_OFFSET_FILE_TYPE   0x1f8
-
-/* Offset ( in the firmware file's header ) to the file model id */
-#define FIRMWARE_OFFSET_FILE_MODEL  0x1fc
-
-/* Offset ( in the firmware file's header ) to the real data */
-#define FIRMWARE_OFFSET_FILE_DATA   0x200
+/* Offset ( in the firmware file's header ) to the file CRC and data. These are
+   only used when loading the old format rockbox.h10 file */
+#define FIRMWARE_OFFSET_FILE_CRC    0x0
+#define FIRMWARE_OFFSET_FILE_DATA   0x8
 
 /* #define USB_IPODSTYLE */
 
@@ -166,8 +156,9 @@
 /* Define this if you have adjustable CPU frequency */
 /*#define HAVE_ADJUSTABLE_CPU_FREQ*/
 
-#define BOOTFILE_EXT "h10"
-#define BOOTFILE "rockbox." BOOTFILE_EXT
+#define BOOTFILE_EXT    "mi4"
+#define BOOTFILE        "rockbox." BOOTFILE_EXT
+#define OLD_BOOTFILE    "rockbox.h10"
 
 #define ICODE_ATTR_TREMOR_NOT_MDCT
 

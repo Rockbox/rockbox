@@ -125,9 +125,10 @@ unsigned char *loadbuffer = (unsigned char *)DRAM_START;
 char version[] = APPSVERSION;
 
 /* Locations and sizes in hidden partition on Sansa */
-#define PPMI_OFFSET         1024
-#define PPMI_SIZE           1
-#define MI4_HEADER_SIZE     1
+#define PPMI_SECTOR_OFFSET  1024
+#define PPMI_SECTORS        1
+#define MI4_HEADER_SECTORS  1
+#define MI4_HEADER_SIZE     0x200
 
 /* mi4 header structure */
 struct mi4header_t {
@@ -170,10 +171,10 @@ int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
             return EFILE_NOT_FOUND;
     }
 
-    read(fd, &mi4header, 0x200);
+    read(fd, &mi4header, MI4_HEADER_SIZE);
 
     /* We don't support encrypted mi4 files yet */
-    if( (mi4header.plaintext + 0x200) != mi4header.mi4size)
+    if( (mi4header.plaintext + MI4_HEADER_SIZE) != mi4header.mi4size)
         return EINVALID_FORMAT;
 
     /* MI4 file size */
@@ -192,13 +193,13 @@ int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
     printf("Binary type: %4s", mi4header.type);
 
     /* Load firmware */
-    lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
-    rc = read(fd, buf, mi4header.mi4size-0x200);
-    if(rc < (int)mi4header.mi4size-0x200)
+    lseek(fd, MI4_HEADER_SIZE, SEEK_SET);
+    rc = read(fd, buf, mi4header.mi4size-MI4_HEADER_SIZE);
+    if(rc < (int)mi4header.mi4size-MI4_HEADER_SIZE)
         return EREAD_IMAGE_FAILED;
 
     /* Check CRC32 to see if we have a valid file */
-    sum = chksum_crc32 (buf,mi4header.mi4size-0x200);
+    sum = chksum_crc32 (buf,mi4header.mi4size-MI4_HEADER_SIZE);
 
     printf("Calculated CRC32: %x", sum);
 
@@ -217,7 +218,8 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo, unsigned int buffe
     unsigned long sum;
     
     /* Read header to find out how long the mi4 file is. */
-    ata_read_sectors(pinfo->start + PPMI_OFFSET, PPMI_SIZE, &ppmi_header);
+    ata_read_sectors(pinfo->start + PPMI_SECTOR_OFFSET,
+                            PPMI_SECTORS, &ppmi_header);
     
     /* The first four characters at 0x80000 (sector 1024) should be PPMI*/
     if( memcmp(ppmi_header.magic, "PPMI", 4) )
@@ -226,11 +228,11 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo, unsigned int buffe
     printf("BL mi4 size: %x", ppmi_header.length);
     
     /* Read mi4 header of the OF */
-    ata_read_sectors(pinfo->start + PPMI_OFFSET + PPMI_SIZE 
-                       + (ppmi_header.length/512), MI4_HEADER_SIZE, &mi4header);
+    ata_read_sectors(pinfo->start + PPMI_SECTOR_OFFSET + PPMI_SECTORS 
+                       + (ppmi_header.length/512), MI4_HEADER_SECTORS, &mi4header);
     
     /* We don't support encrypted mi4 files yet */
-    if( (mi4header.plaintext + 0x200) != mi4header.mi4size)
+    if( (mi4header.plaintext + MI4_HEADER_SIZE) != mi4header.mi4size)
         return EINVALID_FORMAT;
 
     /* MI4 file size */
@@ -249,12 +251,12 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo, unsigned int buffe
     printf("Binary type: %4s", mi4header.type);
 
     /* Load firmware */
-    ata_read_sectors(pinfo->start + PPMI_OFFSET + PPMI_SIZE
-                        + (ppmi_header.length/512) + MI4_HEADER_SIZE,
-                        (mi4header.length-0x200)/512, buf);
+    ata_read_sectors(pinfo->start + PPMI_SECTOR_OFFSET + PPMI_SECTORS
+                        + (ppmi_header.length/512) + MI4_HEADER_SECTORS,
+                        (mi4header.length-MI4_HEADER_SIZE)/512, buf);
 
     /* Check CRC32 to see if we have a valid file */
-    sum = chksum_crc32 (buf,mi4header.mi4size-0x200);
+    sum = chksum_crc32 (buf,mi4header.mi4size-MI4_HEADER_SIZE);
 
     printf("Calculated CRC32: %x", sum);
 
@@ -383,7 +385,14 @@ void* main(void)
         rc=load_mi4(loadbuffer, BOOTFILE, MAX_LOADSIZE);
         if (rc < EOK) {
             printf("Can't load %s:", BOOTFILE);
-            error(EBOOTFILE, rc);
+            printf(strerror(rc));
+
+            /* Try loading rockbox from old rockbox.e200/rockbox.h10 format */
+            rc=load_firmware(loadbuffer, OLD_BOOTFILE, MAX_LOADSIZE);
+            if (rc < EOK) {
+                printf("Can't load %s:", OLD_BOOTFILE);
+                printf(strerror(rc));
+            }
         }
     }
     
