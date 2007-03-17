@@ -74,6 +74,7 @@ static void menu_talk_selected(int m);
 
 /* used to allow for dynamic menus */
 #define MAX_MENU_SUBITEMS 64
+static struct menu_item_ex *current_submenus_menu;
 static int current_subitems[MAX_MENU_SUBITEMS];
 static int current_subitems_count = 0;
 
@@ -204,7 +205,8 @@ static void init_menu_lists(const struct menu_item_ex *menu,
             current_subitems_count++;
         }
     }
-    
+    current_submenus_menu = menu;
+
     gui_synclist_init(lists,get_menu_item_name,(void*)menu,false,1);
 #ifdef HAVE_LCD_BITMAP
     if (menu->callback_and_desc->icon_id == Icon_NOICON)
@@ -589,6 +591,8 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
             }
             if (type != MT_MENU && menu_callback)
                 menu_callback(ACTION_EXIT_MENUITEM,temp);
+            if (current_submenus_menu != menu)
+                init_menu_lists(menu,&lists,selected,true);
             /* callback was changed, so reload the menu's callback */
             get_menu_callback(menu, &menu_callback);
 #ifdef HAS_BUTTONBAR
