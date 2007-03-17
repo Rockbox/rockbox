@@ -31,8 +31,7 @@ enum menu_item_type {
     MT_SETTING_W_TEXT, /* same as setting, but uses different
                           text for the setting title,
                           ID2P() or "literal" for the str param */
-    MT_FUNCTION_CALL, /* used when the standard code wont work */
-    MT_FUNCTION_WITH_PARAM,
+    MT_FUNCTION_CALL, /* call a function from the menus */
     MT_RETURN_ID, /* returns the position of the selected item (starting at 0)*/
     MT_RETURN_VALUE, /* returns a value associated with an item */
     MT_OLD_MENU, /* used so we can wrap the old menu api 
@@ -40,28 +39,36 @@ enum menu_item_type {
 };
 
 typedef int (*menu_function)(void);
-struct menu_func_with_param {
-    int (*function)(void* param);
-    void *param;
+struct menu_func {
+    union {
+        int (*function_w_param)(void* param); /* intptr_t instead of void*
+                                                    for 64bit systems */
+        int (*function)(void);
+    };
+    void *param; /* passed to function_w_param */
+    int exit_value; /* exit do_menu() if function returns this value */
 };
 
 #define MENU_TYPE_MASK 0xF /* MT_* type */
 /* these next two are mutually exclusive */
 #define MENU_HAS_DESC   0x10
 #define MENU_DYNAMIC_DESC 0x20
-/* unless we need more flags*/
-#define MENU_COUNT_MASK (~(MENU_TYPE_MASK|MENU_HAS_DESC|MENU_DYNAMIC_DESC))
-#define MENU_COUNT_SHIFT 6
+
+/* Flags for MT_FUNCTION_CALL */
+#define MENU_FUNC_USEPARAM 0x40
+#define MENU_FUNC_CHECK_RETVAL 0x80
+
+#define MENU_COUNT_MASK 0xFFF
+#define MENU_COUNT_SHIFT 8
+#define MENU_ITEM_COUNT(c) ((c&MENU_COUNT_MASK)<<MENU_COUNT_SHIFT)
 
 struct menu_item_ex {
-    int flags; /* above defines */
+    unsigned int flags; /* above defines */
     union {
         const struct menu_item_ex **submenus; /* used with MT_MENU */
         void *variable; /* used with MT_SETTING,
                            must be in the settings_list.c list */
-        int (*function)(void); /* used with MT_FUNCTION_CALL */
-        const struct menu_func_with_param 
-                                *func_with_param; /* MT_FUNCTION_WITH_PARAM */
+        const struct menu_func *function; /* MT_FUNCTION_* */
         const char **strings; /* used with MT_RETURN_ID */
         int value; /* MT_RETURN_VALUE */
     };
@@ -91,7 +98,6 @@ typedef int (*menu_callback_type)(int action,
 int do_menu(const struct menu_item_ex *menu, int *start_selected);
 bool do_setting_from_menu(const struct menu_item_ex *temp);
 
-#define MENU_ITEM_COUNT(c) (c<<MENU_COUNT_SHIFT)
 /* In all the following macros the argument names are as follows:
     - name: The name for the variable (so it can be used in a MAKE_MENU()
     - str:  the string to display for this menu item. use ID2P() for LANG_* id's
@@ -144,34 +150,27 @@ bool do_setting_from_menu(const struct menu_item_ex *temp);
         
 /*  Use this to put a function call into the menu.
     When the user selects this item the function will be run,
-    when it exits the user will be back in the menu. return value is ignored */
-#define MENUITEM_FUNCTION(name, str, func, callback, icon)                     \
+    unless MENU_FUNC_IGNORE_RETVAL is set, when it exits the user 
+    will be back in the menu and return value is ignored,
+    else if it returns exit_if do_mneu() will exit                  */
+#define MENUITEM_FUNCTION(name, flags, str, func, param,                   \
+                              exit_if, callback, icon)                         \
     static const struct menu_callback_with_desc name##_ = {callback,str,icon}; \
-    static const struct menu_item_ex name   =                                  \
-        { MT_FUNCTION_CALL|MENU_HAS_DESC, { .function = func},          \
-        {.callback_and_desc = & name##_}};
-
-/* This one should be static'ed also, 
-   but cannot be done untill recording menu is done */
-/* Same as above, except the function will be called with a (void*)param. */
-#define MENUITEM_FUNCTION_WPARAM(name, str, func, param, callback, icon)    \
-    static const struct menu_callback_with_desc name##_ = {callback,str,icon}; \
-    static const struct menu_func_with_param name##__ = {func, param};      \
-    const struct menu_item_ex name   =                               \
-        { MT_FUNCTION_WITH_PARAM|MENU_HAS_DESC,                             \
-            { .func_with_param = &name##__},                                \
-            {.callback_and_desc = & name##_}};
+    static const struct menu_func name##__ = {{(void*)func}, param, exit_if}; \
+    /* should be const, but recording_settings wont let us do that */           \
+    const struct menu_item_ex name   =                                  \
+        { MT_FUNCTION_CALL|MENU_HAS_DESC|flags,                                \
+         { .function = & name##__}, {.callback_and_desc = & name##_}};
             
 /* As above, except the text is dynamic */
-#define MENUITEM_FUNCTION_WPARAM_DYNTEXT(name, func, param, callback,  \
-                                         text_callback, text_cb_data, icon) \
+#define MENUITEM_FUNCTION_DYNTEXT(name, flags, func, param, exit_if,   \
+                                  text_callback, text_cb_data, callback, icon)    \
     static const struct menu_get_name_and_icon name##_                         \
-                                = {callback,text_callback,text_cb_data,icon};\
-    static const struct menu_func_with_param name##__ = {func, param};      \
-    static const struct menu_item_ex name   =                               \
-        { MT_FUNCTION_WITH_PARAM|MENU_DYNAMIC_DESC,                             \
-            { .func_with_param = &name##__},                                \
-            {.menu_get_name_and_icon = & name##_}};
+                                = {callback,text_callback,text_cb_data,icon};  \
+    static const struct menu_func name##__ = {{(void*)func}, param, exit_if}; \
+    static const struct menu_item_ex name   =                                  \
+        { MT_FUNCTION_CALL|MENU_DYNAMIC_DESC|flags,                            \
+         { .function = & name##__}, {.menu_get_name_and_icon = & name##_}};
 
 /*  Use this to actually create a menu. the ... argument is a list of pointers 
     to any of the above macro'd variables. (It can also have other menus in the list. */

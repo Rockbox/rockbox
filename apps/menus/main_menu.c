@@ -95,13 +95,14 @@ static int write_settings_file(void* param)
     return settings_save_config((intptr_t)param);
 }
 
-MENUITEM_FUNCTION_WPARAM(browse_configs, ID2P(LANG_CUSTOM_CFG), 
-        browse_folder, (void*)&config, NULL, Icon_NOICON);
-MENUITEM_FUNCTION_WPARAM(save_settings_item, ID2P(LANG_SAVE_SETTINGS), 
-        write_settings_file, (void*)SETTINGS_SAVE_ALL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION_WPARAM(save_theme_item, ID2P(LANG_SAVE_THEME), 
-        write_settings_file, (void*)SETTINGS_SAVE_THEME, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(reset_settings_item,ID2P(LANG_RESET),reset_settings, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(browse_configs, MENU_FUNC_USEPARAM, ID2P(LANG_CUSTOM_CFG), 
+        browse_folder, (void*)&config, 0, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(save_settings_item, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_SETTINGS), 
+        write_settings_file, (void*)SETTINGS_SAVE_ALL, 0, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(save_theme_item, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_THEME), 
+        write_settings_file, (void*)SETTINGS_SAVE_THEME, 0, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(reset_settings_item, 0, ID2P(LANG_RESET),
+                  reset_settings, NULL, 0, NULL, Icon_NOICON);
 
 MAKE_MENU(manage_settings, ID2P(LANG_MANAGE_MENU), NULL, Icon_Config,
           &browse_configs, &reset_settings_item,
@@ -339,8 +340,8 @@ static bool show_info(void)
     action_signalscreenchange();
     return false;
 }
-MENUITEM_FUNCTION(show_info_item, ID2P(LANG_INFO_MENU),
-                   (menu_function)show_info, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(show_info_item, 0, ID2P(LANG_INFO_MENU),
+                   (menu_function)show_info, NULL, 0, NULL, Icon_NOICON);
 
 
 /* sleep Menu */
@@ -372,21 +373,23 @@ static int sleep_timer(void)
                    &sleep_timer_set, -5, 300, 0, sleep_timer_formatter);
 }
 
-MENUITEM_FUNCTION(sleep_timer_call, ID2P(LANG_SLEEP_TIMER), sleep_timer,
-                    NULL, Icon_Menu_setting); /* make it look like a 
+MENUITEM_FUNCTION(sleep_timer_call, 0, ID2P(LANG_SLEEP_TIMER), sleep_timer,
+                    NULL, 0, NULL, Icon_Menu_setting); /* make it look like a 
                                                                 setting to the user */
-MENUITEM_FUNCTION(show_credits_item, ID2P(LANG_VERSION),
-                   (menu_function)show_credits, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(show_runtime_item, ID2P(LANG_RUNNING_TIME),
-                   (menu_function)view_runtime, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(debug_menu_item, ID2P(LANG_DEBUG),
-                   (menu_function)debug_menu, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(show_credits_item, 0, ID2P(LANG_VERSION),
+                   (menu_function)show_credits, NULL, 0, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(show_runtime_item, 0, ID2P(LANG_RUNNING_TIME),
+                   (menu_function)view_runtime, NULL, 0, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(debug_menu_item, 0, ID2P(LANG_DEBUG),
+                   (menu_function)debug_menu, NULL, 0, NULL, Icon_NOICON);
 #ifdef SIMULATOR
-MENUITEM_FUNCTION(simulate_usb_item, ID2P(LANG_USB),
-                   (menu_function)simulate_usb, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(simulate_usb_item, 0, ID2P(LANG_USB),
+                   (menu_function)simulate_usb, NULL, 0, NULL, Icon_NOICON);
 #ifdef ROCKBOX_HAS_LOGF
-MENUITEM_FUNCTION(logfdisplay_item, "logf",(int (*)(void)) logfdisplay, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(logfdump_item, "logfdump",(int (*)(void)) logfdump, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(logfdisplay_item, 0, "logf",
+        (int (*)(void)) logfdisplay, NULL, 0, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(logfdump_item, 0, "logfdump",
+        (int (*)(void)) logfdump, NULL, 0, NULL, Icon_NOICON);
 #endif
 #endif
 
@@ -406,8 +409,8 @@ MAKE_MENU(info_menu, ID2P(LANG_INFO), 0, Icon_Questionmark,
 /***********************************/
 /*    MAIN MENU                    */
 
-MENUITEM_FUNCTION_WPARAM(browse_themes, ID2P(LANG_CUSTOM_THEME), 
-        browse_folder, (void*)&theme, NULL, Icon_Folder);
+MENUITEM_FUNCTION(browse_themes, MENU_FUNC_USEPARAM, ID2P(LANG_CUSTOM_THEME), 
+        browse_folder, (void*)&theme, 0, NULL, Icon_Folder);
 
 #ifdef HAVE_LCD_CHARCELLS
 int mainmenu_callback(int action,const struct menu_item_ex *this_item)

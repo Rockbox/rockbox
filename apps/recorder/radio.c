@@ -1223,10 +1223,12 @@ static int clear_preset_list(void)
     return true;
 }
 
-MENUITEM_FUNCTION(radio_edit_preset_item, ID2P(LANG_FM_EDIT_PRESET), 
-                    radio_edit_preset, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(radio_delete_preset_item, ID2P(LANG_FM_DELETE_PRESET), 
-                    radio_delete_preset, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(radio_edit_preset_item, 0, 
+                    ID2P(LANG_FM_EDIT_PRESET), 
+                    radio_edit_preset, NULL, 0, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(radio_delete_preset_item, 0,
+                    ID2P(LANG_FM_DELETE_PRESET), 
+                    radio_delete_preset, NULL, 0, NULL, Icon_NOICON);
 int radio_preset_callback(int action, const struct menu_item_ex *this_item)
 {
     if (action == ACTION_STD_OK)
@@ -1339,15 +1341,15 @@ char* get_mode_text(int selected_item, void * data, char *buffer)
                           str(LANG_RADIO_SCAN_MODE));
     return buffer;
 }
-static int toggle_radio_mode(void* param)
+static int toggle_radio_mode(void)
 {
-    (void)param;
     radio_mode = (radio_mode == RADIO_SCAN_MODE) ?
                  RADIO_PRESET_MODE : RADIO_SCAN_MODE;
     return 0;
 }
-MENUITEM_FUNCTION_WPARAM_DYNTEXT(radio_mode_item, toggle_radio_mode, NULL, NULL,
-                                         get_mode_text, NULL, Icon_NOICON);
+MENUITEM_FUNCTION_DYNTEXT(radio_mode_item, 0,
+                                 toggle_radio_mode, NULL, 0, 
+                                 get_mode_text, NULL, NULL, Icon_NOICON);
 #endif
 
 static int scan_presets(void)
@@ -1447,6 +1449,7 @@ static int fm_recording_screen(void)
 
     return ret;
 }
+
 #endif /* defined(HAVE_FMRADIO_IN) && CONFIG_CODEC == SWCODEC */
 
 #if defined(HAVE_FMRADIO_IN) || CONFIG_CODEC != SWCODEC
@@ -1467,35 +1470,36 @@ static int fm_recording_settings(void)
 
     return ret;
 }
+
 #endif /* defined(HAVE_FMRADIO_IN) || CONFIG_CODEC != SWCODEC */
 #endif /* HAVE_RECORDING */
 
 #ifdef FM_RECORDING_SCREEN
-MENUITEM_FUNCTION(recscreen_item, ID2P(LANG_RECORDING_MENU), 
-                    fm_recording_screen, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(recscreen_item, 0, ID2P(LANG_RECORDING_MENU), 
+                    fm_recording_screen, NULL, 0, NULL, Icon_NOICON);
 #endif
 #ifdef FM_RECORDING_SETTINGS
-MENUITEM_FUNCTION(recsettings_item, ID2P(LANG_RECORDING_SETTINGS), 
-                    fm_recording_settings, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(recsettings_item, 0, ID2P(LANG_RECORDING_SETTINGS), 
+                    fm_recording_settings, NULL, 0, NULL, Icon_NOICON);
 #endif
 #ifndef FM_PRESET
-MENUITEM_FUNCTION(radio_presets_item, ID2P(LANG_FM_BUTTONBAR_PRESETS), 
-                    handle_radio_presets, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(radio_presets_item, 0, ID2P(LANG_FM_BUTTONBAR_PRESETS), 
+                    handle_radio_presets, NULL, 0, NULL, Icon_NOICON);
 #endif
 #ifndef FM_PRESET_ADD
-MENUITEM_FUNCTION(radio_addpreset_item, ID2P(LANG_FM_ADD_PRESET), 
-                    radio_add_preset, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(radio_addpreset_item, 0, ID2P(LANG_FM_ADD_PRESET), 
+                    radio_add_preset, NULL, 0, NULL, Icon_NOICON);
 #endif
 
 
-MENUITEM_FUNCTION(presetload_item, ID2P(LANG_FM_PRESET_LOAD), 
-                    load_preset_list, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(presetsave_item, ID2P(LANG_FM_PRESET_SAVE), 
-                    save_preset_list, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(presetclear_item, ID2P(LANG_FM_PRESET_CLEAR), 
-                    clear_preset_list, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(scan_presets_item, ID2P(LANG_FM_SCAN_PRESETS), 
-                    scan_presets, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(presetload_item, 0, ID2P(LANG_FM_PRESET_LOAD), 
+                    load_preset_list, NULL, 0, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(presetsave_item, 0, ID2P(LANG_FM_PRESET_SAVE), 
+                    save_preset_list, NULL, 0, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(presetclear_item, 0, ID2P(LANG_FM_PRESET_CLEAR), 
+                    clear_preset_list, NULL, 0, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(scan_presets_item, 0, ID2P(LANG_FM_SCAN_PRESETS), 
+                    scan_presets, NULL, 0, NULL, Icon_NOICON);
 
 MAKE_MENU(radio_menu_items, ID2P(LANG_FM_MENU), NULL, 
             Icon_Radio_screen, 

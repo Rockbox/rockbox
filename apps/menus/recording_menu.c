@@ -90,8 +90,8 @@ static int recsource_func(void)
                       &global_settings.rec_source, INT, names,
                       n_opts, NULL );
 }
-MENUITEM_FUNCTION(recsource, ID2P(LANG_RECORDING_SOURCE), 
-                    recsource_func, recmenu_callback, Icon_Menu_setting);
+MENUITEM_FUNCTION(recsource, 0, ID2P(LANG_RECORDING_SOURCE), 
+                    recsource_func, NULL, 0, recmenu_callback, Icon_Menu_setting);
 
 #if CONFIG_CODEC == SWCODEC
 /* Makes an options list from a source list of options and indexes */
@@ -205,8 +205,8 @@ static int recfrequency_func(void)
     return ret;
 #endif /* CONFIG_CODEC == SWCODEC */
 } /* recfrequency */
-MENUITEM_FUNCTION(recfrequency, ID2P(LANG_RECORDING_FREQUENCY), 
-                    recfrequency_func, NULL, Icon_Menu_setting);
+MENUITEM_FUNCTION(recfrequency, 0, ID2P(LANG_RECORDING_FREQUENCY), 
+                    recfrequency_func, NULL, 0, NULL, Icon_Menu_setting);
 
 
 static int recchannels_func(void)
@@ -253,8 +253,8 @@ static int recchannels_func(void)
     return ret;
 #endif /* CONFIG_CODEC == SWCODEC */
 }
-MENUITEM_FUNCTION(recchannels, ID2P(LANG_RECORDING_CHANNELS), 
-                    recchannels_func, NULL, Icon_Menu_setting);
+MENUITEM_FUNCTION(recchannels, 0, ID2P(LANG_RECORDING_CHANNELS), 
+                    recchannels_func, NULL, 0, NULL, Icon_Menu_setting);
 
 #if CONFIG_CODEC == SWCODEC
 
@@ -279,11 +279,12 @@ static int recformat_func(void)
 
     return res;
 } /* recformat */
-MENUITEM_FUNCTION(recformat, ID2P(LANG_RECORDING_FORMAT), 
-                    recformat_func, NULL, Icon_Menu_setting);
+MENUITEM_FUNCTION(recformat, 0, ID2P(LANG_RECORDING_FORMAT), 
+                    recformat_func, NULL, 0, NULL, Icon_Menu_setting);
 
-MENUITEM_FUNCTION(enc_global_config_menu_item, ID2P(LANG_ENCODER_SETTINGS),
-                    (int(*)(void))enc_global_config_menu, NULL, Icon_Submenu);
+MENUITEM_FUNCTION(enc_global_config_menu_item, 0, ID2P(LANG_ENCODER_SETTINGS),
+                    (int(*)(void))enc_global_config_menu,
+                     NULL, 0, NULL, Icon_Submenu);
 
 #endif /* CONFIG_CODEC == SWCODEC */
 
@@ -323,8 +324,8 @@ static int recdirectory_func(void)
                       &global_settings.rec_directory, INT,
                       names, 2, NULL );
 }
-MENUITEM_FUNCTION(recdirectory, ID2P(LANG_RECORD_DIRECTORY), 
-                    recdirectory_func, NULL, Icon_Menu_setting);
+MENUITEM_FUNCTION(recdirectory, 0, ID2P(LANG_RECORD_DIRECTORY), 
+                    recdirectory_func, NULL, 0, NULL, Icon_Menu_setting);
 
 MENUITEM_SETTING(cliplight, &global_settings.cliplight, NULL);
 
@@ -362,10 +363,10 @@ static int agc_cliptime_func(void)
                       &global_settings.rec_agc_cliptime,
                       INT, names, 5, NULL );
 }
-MENUITEM_FUNCTION(agc_preset, ID2P(LANG_RECORD_AGC_PRESET), 
-                    agc_preset_func, NULL, Icon_Menu_setting);
-MENUITEM_FUNCTION(agc_cliptime, ID2P(LANG_RECORD_AGC_CLIPTIME), 
-                    agc_cliptime_func, NULL, Icon_Menu_setting);
+MENUITEM_FUNCTION(agc_preset, 0, ID2P(LANG_RECORD_AGC_PRESET), 
+                    agc_preset_func, NULL, 0, NULL, Icon_Menu_setting);
+MENUITEM_FUNCTION(agc_cliptime, 0, ID2P(LANG_RECORD_AGC_CLIPTIME), 
+                    agc_cliptime_func, NULL, 0, NULL, Icon_Menu_setting);
 #endif /* HAVE_AGC */
 
 /** Rec trigger **/
@@ -796,8 +797,8 @@ bool rectrigger(void)
     return retval;
 }
 
-MENUITEM_FUNCTION(rectrigger_item, ID2P(LANG_RECORD_TRIGGER), 
-                    (int(*)(void))rectrigger, NULL, Icon_Menu_setting);
+MENUITEM_FUNCTION(rectrigger_item, 0, ID2P(LANG_RECORD_TRIGGER), 
+                    (int(*)(void))rectrigger, NULL, 0, NULL, Icon_Menu_setting);
 
 
 
@@ -836,5 +837,5 @@ bool recording_menu(bool no_source)
     return do_menu(&recording_setting_menu, NULL) == MENU_ATTACHED_USB;
 };
 
-MENUITEM_FUNCTION_WPARAM(recording_settings, ID2P(LANG_RECORDING_SETTINGS),
-                          (int (*)(void*))recording_menu,0, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(recording_settings, MENU_FUNC_USEPARAM, ID2P(LANG_RECORDING_SETTINGS),
+                          (int (*)(void*))recording_menu, 0, 0, NULL, Icon_NOICON);

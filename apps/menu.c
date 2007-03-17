@@ -160,7 +160,6 @@ static void menu_get_icon(int selected_item, void * data, ICON * icon)
                 *icon = bitmap_icons_6x8[menu_icon];
             break;
         case MT_FUNCTION_CALL:
-        case MT_FUNCTION_WITH_PARAM:
         case MT_RETURN_VALUE:
             if (menu_icon == Icon_NOICON)
                 *icon = bitmap_icons_6x8[Icon_Menu_functioncall];
@@ -545,14 +544,21 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                     }
                     break;
                 case MT_FUNCTION_CALL:
+                {
+                    int return_value;
                     action_signalscreenchange();
-                    temp->function();
+                    if (temp->flags&MENU_FUNC_USEPARAM)
+                        return_value = temp->function->function_w_param(
+                                    temp->function->param);
+                    else 
+                        return_value = temp->function->function();
+                    if (temp->flags&MENU_FUNC_CHECK_RETVAL)
+                    {
+                        if (return_value == temp->function->exit_value)
+                            return return_value;
+                    }
                     break;
-                case MT_FUNCTION_WITH_PARAM:
-                    action_signalscreenchange();
-                    temp->func_with_param->function(
-                                    temp->func_with_param->param);
-                    break;
+                }
                 case MT_SETTING:
                 case MT_SETTING_W_TEXT:
                 {
