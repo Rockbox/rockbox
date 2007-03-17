@@ -124,7 +124,7 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
 
     /* Scan our config file and load the right patches as needed    */
     int c = 0;
-    rb->snprintf(name, 40, "");
+    name[0] = '\0';
     printf("\nLoading instruments");
     for(a=0; a<128; a++)
     {

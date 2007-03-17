@@ -205,7 +205,7 @@ struct plugin_api {
     void (*backlight_on)(void);
     void (*backlight_off)(void);
     void (*backlight_set_timeout)(int index);
-    void (*splash)(int ticks, const unsigned char *fmt, ...);
+    void (*splash)(int ticks, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
 
 #ifdef HAVE_REMOTE_LCD
     /* remote lcd */
@@ -296,7 +296,7 @@ struct plugin_api {
     int (*PREFIX(rename))(const char* path, const char* newname);
     int (*PREFIX(ftruncate))(int fd, off_t length);
     off_t (*PREFIX(filesize))(int fd);
-    int (*fdprintf)(int fd, const char *fmt, ...);
+    int (*fdprintf)(int fd, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
     int (*read_line)(int fd, char* buffer, int buffer_size);
     bool (*settings_parseline)(char* line, char** name, char** value);
 #ifndef SIMULATOR
@@ -369,7 +369,8 @@ struct plugin_api {
 #endif
 
     /* strings and memory */
-    int (*snprintf)(char *buf, size_t size, const char *fmt, ...);
+    int (*snprintf)(char *buf, size_t size, const char *fmt, ...)
+                    ATTRIBUTE_PRINTF(3, 4);
     int (*vsnprintf)(char *buf, int size, const char *fmt, va_list ap);
     char* (*strcpy)(char *dst, const char *src);
     char* (*strncpy)(char *dst, const char *src, size_t length);
@@ -519,10 +520,10 @@ struct plugin_api {
     void* (*plugin_get_audio_buffer)(int* buffer_size);
     void (*plugin_tsr)(bool (*exit_callback)(bool reenter));
 #if defined(DEBUG) || defined(SIMULATOR)
-    void (*debugf)(const char *fmt, ...);
+    void (*debugf)(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2);
 #endif
 #ifdef ROCKBOX_HAS_LOGF
-    void (*logf)(const char *fmt, ...);
+    void (*logf)(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2);
 #endif
     struct user_settings* global_settings;
     bool (*mp3info)(struct mp3entry *entry, const char *filename, bool v1first);

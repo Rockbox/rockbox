@@ -19,9 +19,12 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+#include <_ansi.h>
+
 extern void debug_init(void);
-extern void debugf(const char* fmt,...);
-extern void ldebugf(const char* file, int line, const char *fmt, ...);
+extern void debugf(const char* fmt,...) ATTRIBUTE_PRINTF(1, 2);
+extern void ldebugf(const char* file, int line, const char *fmt, ...)
+                    ATTRIBUTE_PRINTF(3, 4);
 
 #ifdef __GNUC__
 

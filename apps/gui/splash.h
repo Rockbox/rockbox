@@ -19,6 +19,7 @@
 
 #ifndef _GUI_SPLASH_H_
 #define _GUI_SPLASH_H_
+#include <_ansi.h>
 #include "screen_access.h"
 
 /*
@@ -28,13 +29,14 @@
  *  - fmt : what to say *printf style
  */
 extern void gui_splash(struct screen * screen, int ticks,
-                       const char *fmt, ...);
+                       const char *fmt, ...) ATTRIBUTE_PRINTF(3, 4);
 
 /*
  * Puts a splash message centered on all the screens for a given period
  *  - ticks : how long the splash is displayed (in rb ticks)
  *  - fmt : what to say *printf style
  */
-extern void gui_syncsplash(int ticks, const unsigned char *fmt, ...);
+extern void gui_syncsplash(int ticks, const char *fmt, ...)
+                           ATTRIBUTE_PRINTF(2, 3);
 
 #endif /* _GUI_ICON_H_ */

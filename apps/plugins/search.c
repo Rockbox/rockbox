@@ -168,7 +168,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     if(p)
         *p = 0;
 
-    rb->snprintf(resultfile, MAX_PATH, "%s/search_result.m3u", path, p+1);
+    rb->snprintf(resultfile, MAX_PATH, "%s/search_result.m3u", path);
     ok = search_init(parameter);
     if (!ok) {
     	return PLUGIN_ERROR;

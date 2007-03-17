@@ -34,7 +34,7 @@ extern bool logfwrap;
 #endif /* __PCTOOL__ */
 
 #define logf _logf
-void _logf(const char *format, ...);
+void _logf(const char *format, ...) ATTRIBUTE_PRINTF(1, 2);
 
 #else /* !ROCKBOX_HAS_LOGF */
 /* built without logf() support enabled */

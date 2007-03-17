@@ -2958,7 +2958,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         }
         else
         {
-            rb->splash( 1*HZ, "Image loaded (%s)", parameter );
+            rb->splash( 1*HZ, "Image loaded (%s)", (char *)parameter );
             restore_screen();
             rb->strcpy( filename, parameter );
         }

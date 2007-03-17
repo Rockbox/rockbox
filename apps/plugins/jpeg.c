@@ -2565,7 +2565,7 @@ struct t_disp* get_image(struct jpeg* p_jpg, int ds)
 
     if(!running_slideshow)
     {
-        rb->snprintf(print, sizeof(print), " %d.%02d sec ", time/HZ, time%HZ);
+        rb->snprintf(print, sizeof(print), " %ld.%02ld sec ", time/HZ, time%HZ);
         rb->lcd_getstringsize(print, &w, &h); /* centered in progress bar */
         rb->lcd_putsxy((LCD_WIDTH - w)/2, LCD_HEIGHT - h, print);
         rb->lcd_update();

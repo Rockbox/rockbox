@@ -166,7 +166,7 @@ struct codec_api {
     /* Configure different codec buffer parameters. */
     void (*configure)(int setting, intptr_t value);
 
-    void (*splash)(int ticks, const unsigned char *fmt, ...);
+    void (*splash)(int ticks, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
 
     /* file */
     int (*PREFIX(open))(const char* pathname, int flags);
@@ -180,7 +180,7 @@ struct codec_api {
     int (*PREFIX(ftruncate))(int fd, off_t length);
     int (*PREFIX(fsync))(int fd);
 
-    int (*fdprintf)(int fd, const char *fmt, ...);
+    int (*fdprintf)(int fd, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
     int (*read_line)(int fd, char* buffer, int buffer_size);
     bool (*settings_parseline)(char* line, char** name, char** value);
 #ifndef SIMULATOR
@@ -218,7 +218,8 @@ struct codec_api {
 #endif
 
     /* strings and memory */
-    int (*snprintf)(char *buf, size_t size, const char *fmt, ...);
+    int (*snprintf)(char *buf, size_t size, const char *fmt, ...)
+                    ATTRIBUTE_PRINTF(3, 4);
     char* (*strcpy)(char *dst, const char *src);
     char* (*strncpy)(char *dst, const char *src, size_t length);
     size_t (*strlen)(const char *str);
@@ -278,10 +279,10 @@ struct codec_api {
                                  bool signd);
 
 #if defined(DEBUG) || defined(SIMULATOR)
-    void (*debugf)(const char *fmt, ...);
+    void (*debugf)(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2);
 #endif
 #ifdef ROCKBOX_HAS_LOGF
-    void (*logf)(const char *fmt, ...);
+    void (*logf)(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2);
 #endif
     struct user_settings* global_settings;
     bool (*mp3info)(struct mp3entry *entry, const char *filename, bool v1first);

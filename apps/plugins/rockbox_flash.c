@@ -693,7 +693,7 @@ void DoUserDialog(char* filename)
     crc = CheckBootloader();
     if (crc) /* outdated version found */
     {
-        rb->snprintf(buf, sizeof(buf), "(check=0x%08x)", crc);
+        rb->snprintf(buf, sizeof(buf), "(check=0x%08lx)", crc);
         rb->lcd_puts(0, 0, buf);
         rb->lcd_puts(0, 1, "Hint: You're not  ");
         rb->lcd_puts(0, 2, "using the latest  ");

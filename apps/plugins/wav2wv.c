@@ -80,7 +80,7 @@ static void wvupdate (int32_t start_tick,
         compression = (int)(((int64_t)(bytes_read - bytes_written) * 100 +
             (bytes_read/2)) / bytes_read);
 
-    rb->snprintf(buf, 32, "elapsed time: %d secs", (elapsed_ticks + (HZ/2)) / HZ);
+    rb->snprintf(buf, 32, "elapsed time: %ld secs", (elapsed_ticks + (HZ/2)) / HZ);
     rb->lcd_puts(0, 2, (unsigned char *)buf);
 
     rb->snprintf(buf, 32, "progress: %d%%", progress);

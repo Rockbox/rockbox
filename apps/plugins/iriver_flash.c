@@ -418,10 +418,10 @@ int flash_rockbox(const char *filename, int section)
     if (section == SECT_ROMIMAGE)
     {
         uint32_t *p32 = (uint32_t *)audiobuf;
-        
+
         if (pos+sizeof(struct flash_header) != *p32)
         {
-            rb->snprintf(buf, sizeof(buf), "Incorrect relocation: 0x%08x/0x%08x",
+            rb->snprintf(buf, sizeof(buf), "Incorrect relocation: 0x%08lx/0x%08lx",
                          *p32, pos+sizeof(struct flash_header));
             rb->splash(HZ*10, buf);
             return -1;

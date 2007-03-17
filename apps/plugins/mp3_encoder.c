@@ -2466,10 +2466,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         }
 
         rb->lcd_clear_display();
-        rb->snprintf(stg, 30, "  Conversion: %d.%02ds    ", tim/100, tim%100);
+        rb->snprintf(stg, 30, "  Conversion: %ld.%02lds    ", tim/100, tim%100);
         rb->lcd_putsxy(0, 30, stg);
         tim = frames * SAMP_PER_FRAME * 100 / 44100; /* unit=.01s */
-        rb->snprintf(stg, 30, "  WAV-Length: %d.%02ds    ", tim/100, tim%100);
+        rb->snprintf(stg, 30, "  WAV-Length: %ld.%02lds    ", tim/100, tim%100);
         rb->lcd_putsxy(0, 20, stg);
         rb->lcd_update();
         rb->sleep(5*HZ);

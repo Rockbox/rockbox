@@ -123,7 +123,7 @@ char *list_get_name_cb(int selected_item,void* data,char* buf)
     {
         char t = b[MAX_PATH-10];
         b[MAX_PATH-10] = '\0';
-        rb->snprintf(buf,MAX_PATH,"%s ...\0",b);
+        rb->snprintf(buf,MAX_PATH,"%s ...",b);
         b[MAX_PATH-10] = t;
     }
     else rb->strcpy(buf,b);

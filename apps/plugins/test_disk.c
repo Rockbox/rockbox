@@ -207,7 +207,7 @@ static bool test_speed(void)
         goto error;
     }
     time = *rb->current_tick - time;
-    rb->snprintf(text_buf, sizeof text_buf, "Create: %d KByte/s",
+    rb->snprintf(text_buf, sizeof text_buf, "Create: %ld KByte/s",
                  (25 * buf_len / time) >> 8);
     log_lcd(text_buf, true);
     rb->close(fd);
@@ -226,7 +226,7 @@ static bool test_speed(void)
         goto error;
     }
     time = *rb->current_tick - time;
-    rb->snprintf(text_buf, sizeof text_buf, "Write A: %d KByte/s",
+    rb->snprintf(text_buf, sizeof text_buf, "Write A: %ld KByte/s",
                  (25 * buf_len / time) >> 8);
     log_lcd(text_buf, true);
     rb->close(fd);
@@ -245,7 +245,7 @@ static bool test_speed(void)
         goto error;
     }
     time = *rb->current_tick - time;
-    rb->snprintf(text_buf, sizeof text_buf, "Write U: %d KByte/s",
+    rb->snprintf(text_buf, sizeof text_buf, "Write U: %ld KByte/s",
                  (25 * buf_len / time) >> 8);
     log_lcd(text_buf, true);
     rb->close(fd);
@@ -264,7 +264,7 @@ static bool test_speed(void)
         goto error;
     }
     time = *rb->current_tick - time;
-    rb->snprintf(text_buf, sizeof text_buf, "Read A: %d KByte/s",
+    rb->snprintf(text_buf, sizeof text_buf, "Read A: %ld KByte/s",
                  (25 * buf_len / time) >> 8);
     log_lcd(text_buf, true);
     rb->close(fd);
@@ -283,7 +283,7 @@ static bool test_speed(void)
         goto error;
     }
     time = *rb->current_tick - time;
-    rb->snprintf(text_buf, sizeof text_buf, "Read U: %d KByte/s",
+    rb->snprintf(text_buf, sizeof text_buf, "Read U: %ld KByte/s",
                  (25 * buf_len / time) >> 8);
     log_lcd(text_buf, true);
     rb->close(fd);

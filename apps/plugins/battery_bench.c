@@ -459,7 +459,7 @@ int main(void)
 #endif
                 "\n"
                 ,BATTERY_LOG,rb->global_settings->battery_capacity,
-                BUF_SIZE / sizeof(struct batt_info));
+                BUF_SIZE / (unsigned)sizeof(struct batt_info));
             rb->close(fd);
         }
         else

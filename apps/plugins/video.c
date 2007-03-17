@@ -962,9 +962,9 @@ int main(char* filename)
         rb->lcd_puts(0, 2, gPrint);
         rb->snprintf(gPrint, sizeof(gPrint), "%d MinVideo bytes", gStats.minVideoAvail);
         rb->lcd_puts(0, 3, gPrint);
-        rb->snprintf(gPrint, sizeof(gPrint), "MinSpinup %d.%02d", gStats.minSpinup/HZ, gStats.minSpinup%HZ);
+        rb->snprintf(gPrint, sizeof(gPrint), "MinSpinup %ld.%02ld", gStats.minSpinup/HZ, gStats.minSpinup%HZ);
         rb->lcd_puts(0, 4, gPrint);
-        rb->snprintf(gPrint, sizeof(gPrint), "MaxSpinup %d.%02d", gStats.maxSpinup/HZ, gStats.maxSpinup%HZ);
+        rb->snprintf(gPrint, sizeof(gPrint), "MaxSpinup %ld.%02ld", gStats.maxSpinup/HZ, gStats.maxSpinup%HZ);
         rb->lcd_puts(0, 5, gPrint);
         rb->snprintf(gPrint, sizeof(gPrint), "LowWater: %d", gBuf.low_water);
         rb->lcd_puts(0, 6, gPrint);
