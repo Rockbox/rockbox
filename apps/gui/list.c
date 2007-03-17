@@ -525,6 +525,8 @@ static void scroll_up(struct gui_list *gui_list, bool paginate)
 {
     int item_pos = gui_list->selected_item - gui_list->start_item;
     int nb_lines = gui_list->display->nb_lines;
+    if (SHOW_LIST_TITLE)
+        nb_lines--;
 
     if (paginate)
     {
