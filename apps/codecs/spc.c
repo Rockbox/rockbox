@@ -859,7 +859,7 @@ enum codec_status codec_main(void)
             return CODEC_ERROR;
         }
 
-        DEBUGF("SPC: read size = 0x%x\n",buffersize);
+        DEBUGF("SPC: read size = 0x%lx\n",(unsigned long)buffersize);
         do
         {
             SPC_Init(&spc_emu);

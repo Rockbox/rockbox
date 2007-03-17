@@ -221,7 +221,7 @@ static int wpsscrn(void* param)
     {
         DEBUGF("Resume index %X offset %lX\n",
                global_status.resume_index,
-               global_status.resume_offset);
+               (unsigned long)global_status.resume_offset);
         if (playlist_resume() != -1)
         {
             playlist_start(global_status.resume_index,

@@ -139,7 +139,8 @@ static bool read_chunk_esds(qtmovie_t *qtmovie, size_t chunk_len)
     temp=stream_read_int32(qtmovie->stream);//0x15000414 ????
     maxBitrate = stream_read_int32(qtmovie->stream);
     avgBitrate = stream_read_int32(qtmovie->stream);
-    DEBUGF("audioType=%d, maxBitrate=%ld, avgBitrate=%ld\n",audioType,maxBitrate,avgBitrate);
+    DEBUGF("audioType=%d, maxBitrate=%ld, avgBitrate=%ld\n",audioType,
+           (long)maxBitrate,(long)avgBitrate);
 
     /* get and verify DecSpecificInfoTag */
     if (stream_read_uint8(qtmovie->stream) != 0x05)
@@ -257,7 +258,8 @@ static bool read_chunk_stsd(qtmovie_t *qtmovie, size_t chunk_len)
           sub_chunk_len = stream_read_uint32(qtmovie->stream);
           if (sub_chunk_len <= 1 || sub_chunk_len > entry_remaining)
           {
-              DEBUGF("strange size (%u) for chunk inside mp4a\n", sub_chunk_len);
+              DEBUGF("strange size (%lu) for chunk inside mp4a\n",
+                     (unsigned long)sub_chunk_len);
               return false;
           }
 
@@ -281,7 +283,7 @@ static bool read_chunk_stsd(qtmovie_t *qtmovie, size_t chunk_len)
               return false;
           }
 
-          DEBUGF("entry_remaining=%ld\n",entry_remaining);
+          DEBUGF("entry_remaining=%ld\n",(long)entry_remaining);
           stream_skip(qtmovie->stream,entry_remaining);
 
         } else {
@@ -379,7 +381,7 @@ static bool read_chunk_stsz(qtmovie_t *qtmovie, size_t chunk_len)
         
         if (v > 0x0000ffff)
         {
-            DEBUGF("stsz[%d] > 65 kB (%ld)\n", i, v);
+            DEBUGF("stsz[%d] > 65 kB (%ld)\n", i, (long)v);
             return false;
         }
         
@@ -488,7 +490,8 @@ static bool read_chunk_stbl(qtmovie_t *qtmovie, size_t chunk_len)
         sub_chunk_len = stream_read_uint32(qtmovie->stream);
         if (sub_chunk_len <= 1 || sub_chunk_len > size_remaining)
         {
-            DEBUGF("strange size (%u) for chunk inside stbl\n", sub_chunk_len);
+            DEBUGF("strange size (%lu) for chunk inside stbl\n",
+                   (unsigned long)sub_chunk_len);
             return false;
         }
 
@@ -545,7 +548,7 @@ static bool read_chunk_minf(qtmovie_t *qtmovie, size_t chunk_len)
 
     if ((i = stream_read_uint32(qtmovie->stream)) != 16)
     {
-        DEBUGF("unexpected size in media info: %ld\n",i);
+        DEBUGF("unexpected size in media info: %ld\n", (long)i);
         stream_skip(qtmovie->stream, size_remaining-4);
         return true;
     }
@@ -569,7 +572,8 @@ static bool read_chunk_minf(qtmovie_t *qtmovie, size_t chunk_len)
 
         if (sub_chunk_len <= 1 || sub_chunk_len > size_remaining)
         {
-            DEBUGF("strange size (%u) for chunk inside minf\n", sub_chunk_len);
+            DEBUGF("strange size (%lu) for chunk inside minf\n",
+                   (unsigned long)sub_chunk_len);
             return false;
         }
 
@@ -606,7 +610,8 @@ static bool read_chunk_mdia(qtmovie_t *qtmovie, size_t chunk_len)
         sub_chunk_len = stream_read_uint32(qtmovie->stream);
         if (sub_chunk_len <= 1 || sub_chunk_len > size_remaining)
         {
-            DEBUGF("strange size (%u) for chunk inside mdia\n", sub_chunk_len);
+            DEBUGF("strange size (%lu) for chunk inside mdia\n",
+                   (unsigned long)sub_chunk_len);
             return false;
         }
 
@@ -644,7 +649,8 @@ static bool read_chunk_trak(qtmovie_t *qtmovie, size_t chunk_len)
         sub_chunk_len = stream_read_uint32(qtmovie->stream);
         if (sub_chunk_len <= 1 || sub_chunk_len > size_remaining)
         {
-            DEBUGF("strange size (%u) for chunk inside trak\n", sub_chunk_len);
+            DEBUGF("strange size (%lu) for chunk inside trak\n",
+                   (unsigned long)sub_chunk_len);
             return false;
         }
 
@@ -682,7 +688,8 @@ static bool read_chunk_moov(qtmovie_t *qtmovie, size_t chunk_len)
         sub_chunk_len = stream_read_uint32(qtmovie->stream);
         if (sub_chunk_len <= 1 || sub_chunk_len > size_remaining)
         {
-            DEBUGF("strange size (%u) for chunk inside moov\n", sub_chunk_len);
+            DEBUGF("strange size (%lu) for chunk inside moov\n",
+                   (unsigned long)sub_chunk_len);
             return false;
         }
 

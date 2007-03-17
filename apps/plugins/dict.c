@@ -179,7 +179,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     filesize = rb->filesize(fIndex); /* get filesize */
 
     DEBUGF("Filesize: %d bytes = %d words \n", filesize,
-           (filesize / sizeof(struct stWord)));
+           (filesize / (int)sizeof(struct stWord)));
 
     /* for the searching algorithm */
     high = filesize / sizeof( struct stWord );

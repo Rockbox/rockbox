@@ -298,7 +298,8 @@ static void decode_brr( struct Spc_Dsp* this, unsigned start_addr,
             if ( addr == loop_ptr )
             {
                 loop_start = out;
-                DEBUGF( "loop at %08x (wave #%d)\n", addr - RAM, raw_voice->waveform );
+                DEBUGF( "loop at %08lx (wave #%d)\n",
+                        (unsigned long)(addr - RAM), raw_voice->waveform );
             }
             
             /* header */
@@ -398,7 +399,8 @@ static void decode_brr( struct Spc_Dsp* this, unsigned start_addr,
             }
         }
         
-        DEBUGF( "end at %08x (wave #%d)\n", addr - RAM, raw_voice->waveform );
+        DEBUGF( "end at %08lx (wave #%d)\n",
+                (unsigned long)(addr - RAM), raw_voice->waveform );
         
         /* add to cache */
         this->wave_entry_old [this->oldsize++] = *wave_entry;

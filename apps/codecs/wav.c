@@ -276,7 +276,8 @@ next_track:
         i = (buf[4]|(buf[5]<<8)|(buf[6]<<16)|(buf[7]<<24));
         if (memcmp(buf, "fmt ", 4) == 0) {
             if (i < 16) {
-                DEBUGF("CODEC_ERROR: 'fmt ' chunk size=%lu < 16\n", i);
+                DEBUGF("CODEC_ERROR: 'fmt ' chunk size=%lu < 16\n",
+                       (unsigned long)i);
                 i = CODEC_ERROR;
                 goto done;
             }
@@ -298,7 +299,7 @@ next_track:
                      * we'll see later if we can't decode it */
                     DEBUGF("CODEC_WARNING: non-PCM WAVE (formattag=0x%x) "
                            "doesn't have ext. fmt descr (chunksize=%ld<18).\n",
-                           formattag, i);
+                           formattag, (long)i);
                 }
                 size = buf[24]|(buf[25]<<8);
                 if (formattag == WAVE_FORMAT_DVI_ADPCM) {
@@ -335,7 +336,7 @@ next_track:
                 totalsamples = (buf[8]|(buf[9]<<8)|(buf[10]<<16)|(buf[11]<<24));
         } else {
             DEBUGF("unknown WAVE chunk: '%c%c%c%c', size=%lu\n",
-                   buf[0], buf[1], buf[2], buf[3], i);
+                   buf[0], buf[1], buf[2], buf[3], (unsigned long)i);
         }
 
         /* go to next chunk (even chunk sizes must be padded) */

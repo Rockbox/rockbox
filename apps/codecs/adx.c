@@ -83,7 +83,7 @@ next_track:
     }
     bufsize = n;
     bufoff = 0;
-    DEBUGF("ADX: read size = %x\n",bufsize);
+    DEBUGF("ADX: read size = %lx\n",(unsigned long)bufsize);
 
     /* Get file header for starting offset, channel count */
     
@@ -92,7 +92,7 @@ next_track:
     
     /* useful for seeking and reporting current playback position */
     avgbytespersec = ci->id3->frequency * 18 * channels / 32;
-    DEBUGF("avgbytespersec=%ld\n",avgbytespersec);
+    DEBUGF("avgbytespersec=%ld\n",(unsigned long)avgbytespersec);
 
     /* Get loop data */
     
@@ -232,14 +232,14 @@ next_track:
             ci->seek_buffer(bufoff);
             buf = ci->request_buffer(&n, ci->filesize-bufoff);
             bufsize = n;
-            DEBUGF("ADX: read size = %x\n",bufsize);
+            DEBUGF("ADX: read size = %lx\n",(unsigned long)bufsize);
             if ((off_t)bufsize < channels*18) {
                 /* if we can't get a full frame, just request a single
                    frame (should be able to fit it in the guard buffer) */
                 DEBUGF("ADX: requesting single frame at %lx\n",bufoff);
                 buf = ci->request_buffer(&n, channels*18);
                 bufsize=n;
-                DEBUGF("ADX: read size = %x\n",bufsize);
+                DEBUGF("ADX: read size = %lx\n",(unsigned long)bufsize);
             }
             if (!buf) {
                 DEBUGF("ADX: couldn't get buffer at %lx size %lx\n",

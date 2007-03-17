@@ -331,8 +331,8 @@ void fat_size(unsigned int* size, unsigned int* free)
     struct statfs fs;
 
     if (!statfs(".", &fs)) {
-        DEBUGF("statfs: bsize=%d blocks=%d free=%d\n",
-               fs.f_bsize, fs.f_blocks, fs.f_bfree);
+        DEBUGF("statfs: bsize=%d blocks=%ld free=%ld\n",
+               (int)fs.f_bsize, fs.f_blocks, fs.f_bfree);
         if (size)
             *size = fs.f_blocks * (fs.f_bsize / 1024);
         if (free)
