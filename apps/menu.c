@@ -708,6 +708,7 @@ static void menu_talk_selected(int m)
 
 int menu_show(int m)
 {
+    int value;
     struct menu_item_ex menu;
     struct menu_get_name_and_icon menu_info = 
     {
@@ -720,7 +721,19 @@ int menu_show(int m)
                  MENU_ITEM_COUNT(menus[m].count);
     menu.value = m;
     menu.menu_get_name_and_icon = &menu_info;
-    return do_menu(&menu, &menus[m].current_selection);
+    value = do_menu(&menu, &menus[m].current_selection);
+    switch (value)
+    {
+        case MENU_ATTACHED_USB:
+        /* case GO_TO_ROOT: */
+            return MENU_ATTACHED_USB;
+        case GO_TO_PREVIOUS:
+            return MENU_SELECTED_EXIT;
+        default:
+            if (value < 0)
+                return menus[m].current_selection;
+            else return value;
+    }
 }
 
 

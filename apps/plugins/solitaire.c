@@ -593,7 +593,7 @@ int solitaire_menu(bool in_game)
     int result = -1;
     int i = 0;
 
-    struct menu_item items[5];
+    struct menu_item items[6];
 
     if (in_game)
     {
