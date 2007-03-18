@@ -106,8 +106,6 @@ unsigned short buffer_lcd_mirror[11][2];
 
 #ifdef SIMULATOR
 unsigned char hardware_buffer_lcd[11][2];
-#else
-static unsigned char lcd_data_byte; /* global write buffer */
 #endif
 
 #define NO_CHAR -1
@@ -133,8 +131,7 @@ static void lcd_free_pat(int map_ch)
 #ifdef SIMULATOR
                     hardware_buffer_lcd[x][y]=substitute_char;
 #else
-                    lcd_write_command(LCD_CURSOR(x, y));
-                    lcd_write_data(&substitute_char, 1);
+                    lcd_write_command_e(LCD_CURSOR(x, y), substitute_char);
 #endif
                 }
             }
@@ -231,8 +228,7 @@ void xlcd_update(void)
 #ifdef SIMULATOR
             hardware_buffer_lcd[x][y]=hw_ch;
 #else
-            lcd_write_command(LCD_CURSOR(x,y));
-            lcd_write_data(&hw_ch, 1);
+            lcd_write_command_e(LCD_CURSOR(x,y), hw_ch);
 #endif
         }
     }
@@ -265,9 +261,7 @@ bool lcdx_putc(int x, int y, unsigned short ch)
 #ifdef SIMULATOR
     hardware_buffer_lcd[x][y]=lcd_char;
 #else
-    lcd_data_byte = (unsigned char) lcd_char;
-    lcd_write_command(LCD_CURSOR(x, y));
-    lcd_write_data(&lcd_data_byte, 1);
+    lcd_write_command_e(LCD_CURSOR(x, y), lcd_char);
 #endif
     return false;
 }
@@ -450,15 +444,13 @@ void lcd_icon(int icon, bool enable)
 
     pos = icon_pos[icon];
     mask = icon_mask[icon];
-    
-    lcd_write_command(LCD_ICON(pos));
-    
+      
     if(enable)
         icon_mirror[pos] |= mask;
     else
         icon_mirror[pos] &= ~mask;
     
-    lcd_write_data(&icon_mirror[pos], 1);
+    lcd_write_command_e(LCD_ICON(pos), icon_mirror[pos]);
 }
 
 int lcd_default_contrast(void)
@@ -468,9 +460,7 @@ int lcd_default_contrast(void)
 
 void lcd_set_contrast(int val)
 {
-    lcd_data_byte = (unsigned char) (31 - val);
-    lcd_write_command(lcd_contrast_set);
-    lcd_write_data(&lcd_data_byte, 1);
+    lcd_write_command_e(lcd_contrast_set, 31 - val);
 }
 #endif /* SIMULATOR */
 
@@ -500,9 +490,7 @@ void lcd_init (void)
         or_b(0x0f, &PBDRL);              /* ... and high */
 
         lcd_write_command(NEW_LCD_FUNCTION_SET + 1); /* CGRAM selected */
-        lcd_write_command(NEW_LCD_CONTRAST_SET);
-        lcd_data_byte = 0x08;
-        lcd_write_data(&lcd_data_byte, 1);
+        lcd_write_command_e(NEW_LCD_CONTRAST_SET, 0x08);
         lcd_write_command(NEW_LCD_POWER_SAVE_MODE_OSC_CONTROL_SET + 2);
                                          /* oscillator on */
         lcd_write_command(NEW_LCD_POWER_CONTROL_REGISTER_SET + 7);
@@ -599,9 +587,7 @@ void lcd_init (void)
         for (i=0; i<300000; i++) asm volatile ("nop"); /* wait 150 ms */
 
         lcd_write_command(0x31);
-        lcd_write_command(0xa8);         /* Set contrast control */
-        lcd_data_byte = 0;
-        lcd_write_data(&lcd_data_byte, 1); /* 0 */
+        lcd_write_command_e(0xa8, 0);    /* Set contrast control */
         }
 #endif
 #endif /* !SIMULATOR */

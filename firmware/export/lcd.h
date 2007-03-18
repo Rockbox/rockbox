@@ -46,6 +46,7 @@ typedef unsigned long fb_data;
 
 /* common functions */
 extern void lcd_write_command(int byte);
+extern void lcd_write_command_e(int cmd, int data);
 extern void lcd_write_command_ex(int cmd, int data1, int data2);
 extern void lcd_write_data(const fb_data* p_bytes, int count);
 extern void lcd_init(void);
