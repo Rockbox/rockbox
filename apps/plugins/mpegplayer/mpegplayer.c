@@ -117,31 +117,45 @@ PLUGIN_IRAM_DECLARE
 #define MPEG_MENU       BUTTON_MODE
 #define MPEG_STOP       BUTTON_OFF
 #define MPEG_PAUSE      BUTTON_ON
+#define MPEG_VOLDOWN    BUTTON_DOWN
+#define MPEG_VOLUP      BUTTON_UP
 
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define MPEG_MENU       BUTTON_MENU
 #define MPEG_PAUSE      (BUTTON_PLAY | BUTTON_REL)
 #define MPEG_STOP       (BUTTON_PLAY | BUTTON_REPEAT)
+#define MPEG_VOLDOWN    BUTTON_SCROLL_BACK
+#define MPEG_VOLUP      BUTTON_SCROLL_FWD
 
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 #define MPEG_MENU       (BUTTON_REC | BUTTON_REL)
 #define MPEG_STOP       BUTTON_POWER
 #define MPEG_PAUSE      BUTTON_PLAY
+#define MPEG_VOLDOWN    BUTTON_DOWN
+#define MPEG_VOLUP      BUTTON_UP
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
 #define MPEG_MENU       BUTTON_MENU
 #define MPEG_STOP       BUTTON_A
 #define MPEG_PAUSE      BUTTON_SELECT
+#define MPEG_VOLDOWN    BUTTON_DOWN
+#define MPEG_VOLUP      BUTTON_UP
+#define MPEG_VOLDOWN2   BUTTON_VOL_DOWN
+#define MPEG_VOLUP2     BUTTON_VOL_UP
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #define MPEG_MENU       (BUTTON_REW | BUTTON_REL)
 #define MPEG_STOP       BUTTON_POWER
 #define MPEG_PAUSE      BUTTON_PLAY
+#define MPEG_VOLDOWN    BUTTON_SCROLL_DOWN
+#define MPEG_VOLUP      BUTTON_SCROLL_UP
 
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
 #define MPEG_MENU       BUTTON_SELECT
 #define MPEG_STOP       BUTTON_POWER
 #define MPEG_PAUSE      BUTTON_UP
+#define MPEG_VOLDOWN    BUTTON_SCROLL_UP
+#define MPEG_VOLUP      BUTTON_SCROLL_DOWN
 
 #else
 #error MPEGPLAYER: Unsupported keypad
@@ -224,10 +238,43 @@ static void pause_timer(void)
 static void button_loop(void)
 {
     bool result;
+    int vol, minvol, maxvol;
     int button = rb->button_get(false);
 
     switch (button)
     {
+        case MPEG_VOLUP:
+        case MPEG_VOLUP|BUTTON_REPEAT:
+#ifdef MPEG_VOLUP2
+        case MPEG_VOLUP2:
+        case MPEG_VOLUP2|BUTTON_REPEAT:
+#endif
+            vol = rb->global_settings->volume;
+            maxvol = rb->sound_max(SOUND_VOLUME);
+
+            if (vol < maxvol) {
+                vol++;
+                rb->sound_set(SOUND_VOLUME, vol);
+                rb->global_settings->volume = vol;
+            }
+            break;
+
+        case MPEG_VOLDOWN:
+        case MPEG_VOLDOWN|BUTTON_REPEAT:
+#ifdef MPEG_VOLDOWN2
+        case MPEG_VOLDOWN2:
+        case MPEG_VOLDOWN2|BUTTON_REPEAT:
+#endif
+            vol = rb->global_settings->volume;
+            minvol = rb->sound_min(SOUND_VOLUME);
+            
+            if (vol > minvol) {
+                vol--;
+                rb->sound_set(SOUND_VOLUME, vol);
+                rb->global_settings->volume = vol;
+            }
+            break;
+
         case MPEG_MENU:
             videostatus=PLEASE_PAUSE;
             rb->pcm_play_pause(false);
