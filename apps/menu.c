@@ -556,7 +556,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                         return_value = temp->function->function();
                     if (temp->flags&MENU_FUNC_CHECK_RETVAL)
                     {
-                        if (return_value == temp->function->exit_value)
+                        if (return_value == 1)
                         {
                             done = true;
                             ret =  return_value;

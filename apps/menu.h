@@ -46,7 +46,6 @@ struct menu_func {
         int (*function)(void);
     };
     void *param; /* passed to function_w_param */
-    int exit_value; /* exit do_menu() if function returns this value */
 };
 
 #define MENU_TYPE_MASK 0xF /* MT_* type */
@@ -151,24 +150,23 @@ bool do_setting_from_menu(const struct menu_item_ex *temp);
         
 /*  Use this to put a function call into the menu.
     When the user selects this item the function will be run,
-    unless MENU_FUNC_IGNORE_RETVAL is set, when it exits the user 
-    will be back in the menu and return value is ignored,
-    else if it returns exit_if do_mneu() will exit                  */
+    unless MENU_FUNC_IGNORE_RETVAL is set, the return value
+    will be checked, returning 1 will exit do_menu();                  */
 #define MENUITEM_FUNCTION(name, flags, str, func, param,                   \
-                              exit_if, callback, icon)                         \
+                              callback, icon)                         \
     static const struct menu_callback_with_desc name##_ = {callback,str,icon}; \
-    static const struct menu_func name##__ = {{(void*)func}, param, exit_if}; \
+    static const struct menu_func name##__ = {{(void*)func}, param}; \
     /* should be const, but recording_settings wont let us do that */           \
     const struct menu_item_ex name   =                                  \
         { MT_FUNCTION_CALL|MENU_HAS_DESC|flags,                                \
          { .function = & name##__}, {.callback_and_desc = & name##_}};
             
 /* As above, except the text is dynamic */
-#define MENUITEM_FUNCTION_DYNTEXT(name, flags, func, param, exit_if,   \
+#define MENUITEM_FUNCTION_DYNTEXT(name, flags, func, param,   \
                                   text_callback, text_cb_data, callback, icon)    \
     static const struct menu_get_name_and_icon name##_                         \
                                 = {callback,text_callback,text_cb_data,icon};  \
-    static const struct menu_func name##__ = {{(void*)func}, param, exit_if}; \
+    static const struct menu_func name##__ = {{(void*)func}, param}; \
     static const struct menu_item_ex name   =                                  \
         { MT_FUNCTION_CALL|MENU_DYNAMIC_DESC|flags,                            \
          { .function = & name##__}, {.menu_get_name_and_icon = & name##_}};

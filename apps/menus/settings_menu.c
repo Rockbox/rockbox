@@ -64,16 +64,16 @@ MENUITEM_SETTING(tagcache_ram, &global_settings.tagcache_ram, NULL);
 MENUITEM_SETTING(tagcache_autoupdate, &global_settings.tagcache_autoupdate, NULL);
 MENUITEM_FUNCTION(tc_init, 0, ID2P(LANG_TAGCACHE_FORCE_UPDATE),
                     (int(*)(void))tagcache_rebuild_with_splash, 
-                    NULL, 0, NULL, Icon_NOICON);
+                    NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(tc_update, 0, ID2P(LANG_TAGCACHE_UPDATE),
                     (int(*)(void))tagcache_update_with_splash, 
-                    NULL, 0, NULL, Icon_NOICON);
+                    NULL, NULL, Icon_NOICON);
 MENUITEM_SETTING(runtimedb, &global_settings.runtimedb, NULL);
 MENUITEM_FUNCTION(tc_export, 0, ID2P(LANG_TAGCACHE_EXPORT),
-                    (int(*)(void))tagtree_export, NULL, 0, 
+                    (int(*)(void))tagtree_export, NULL, 
                     NULL, Icon_NOICON);
 MENUITEM_FUNCTION(tc_import, 0, ID2P(LANG_TAGCACHE_IMPORT),
-                    (int(*)(void))tagtree_import, NULL, 0, 
+                    (int(*)(void))tagtree_import, NULL, 
                     NULL, Icon_NOICON);
 MAKE_MENU(tagcache_menu, ID2P(LANG_TAGCACHE), 0, Icon_NOICON,
 #ifdef HAVE_TC_RAMCACHE
@@ -221,7 +221,7 @@ static int timedate_set(void)
 }
 
 MENUITEM_FUNCTION(time_set, 0, ID2P(LANG_TIME), 
-                    timedate_set, NULL, 0, NULL, Icon_NOICON);
+                    timedate_set, NULL, NULL, Icon_NOICON);
 MENUITEM_SETTING(timeformat, &global_settings.timeformat, NULL);
 MAKE_MENU(time_menu, ID2P(LANG_TIME_MENU), 0, Icon_NOICON, &time_set, &timeformat);
 #endif
@@ -231,7 +231,7 @@ MENUITEM_SETTING(poweroff, &global_settings.poweroff, NULL);
 
 #ifdef HAVE_RTC_ALARM
 MENUITEM_FUNCTION(alarm_screen_call, 0, ID2P(LANG_ALARM_MOD_ALARM_MENU),
-                   (menu_function)alarm_screen, NULL, 0, NULL, Icon_NOICON);
+                   (menu_function)alarm_screen, NULL, NULL, Icon_NOICON);
 #if CONFIG_TUNER || defined(HAVE_RECORDING)
 
 #if CONFIG_TUNER && !defined(HAVE_RECORDING)
@@ -281,7 +281,7 @@ static int alarm_setting(void)
 }
 
 MENUITEM_FUNCTION(alarm_wake_up_screen, 0, ID2P(LANG_ALARM_WAKEUP_SCREEN),
-                    alarm_setting, NULL, 0, alarm_callback, Icon_Menu_setting);
+                    alarm_setting, NULL, alarm_callback, Icon_Menu_setting);
 #endif /* CONFIG_TUNER || defined(HAVE_RECORDING) */
 #endif /* HAVE_RTC_ALARM */
 
@@ -415,7 +415,7 @@ static int language_browse(void)
     return (int)rockbox_browse(LANG_DIR, SHOW_LNG);
 }
 MENUITEM_FUNCTION(browse_langs, 0, ID2P(LANG_LANGUAGE), language_browse,
-                    NULL, 0, NULL, Icon_Language);
+                    NULL, NULL, Icon_Language);
 
 MAKE_MENU(settings_menu_item, ID2P(LANG_GENERAL_SETTINGS), 0,
           Icon_General_settings_menu,

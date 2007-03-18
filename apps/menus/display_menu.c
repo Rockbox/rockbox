@@ -124,6 +124,7 @@ static int clear_main_backdrop(void)
     global_settings.backdrop_file[0]=0;
     unload_main_backdrop();
     show_main_backdrop();
+    settings_save();
     return 0;
 }
 
@@ -159,13 +160,13 @@ static int reset_color(void)
     return 0;
 }
 MENUITEM_FUNCTION(clear_main_bd, 0, ID2P(LANG_CLEAR_BACKDROP),
-                    clear_main_backdrop, NULL, 0, NULL, Icon_NOICON);
+                    clear_main_backdrop, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(set_bg_col, 0, ID2P(LANG_BACKGROUND_COLOR),
-                    set_bg_color, NULL, 0, NULL, Icon_NOICON);
+                    set_bg_color, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(set_fg_col, 0, ID2P(LANG_FOREGROUND_COLOR),
-                    set_fg_color, NULL, 0, NULL, Icon_NOICON);
+                    set_fg_color, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(reset_colors, 0, ID2P(LANG_RESET_COLORS),
-                    reset_color, NULL, 0, NULL, Icon_NOICON);
+                    reset_color, NULL, NULL, Icon_NOICON);
 #endif
 
 /* now the actual menu */
@@ -498,11 +499,11 @@ static int peak_meter_max(void) {
     return retval;
 }
 MENUITEM_FUNCTION(peak_meter_scale_item, 0, ID2P(LANG_PM_SCALE),
-                    peak_meter_scale, NULL, 0, NULL, Icon_NOICON);
+                    peak_meter_scale, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(peak_meter_min_item, 0, ID2P(LANG_PM_MIN), 
-                    peak_meter_min, NULL, 0, NULL, Icon_NOICON);
+                    peak_meter_min, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(peak_meter_max_item, 0, ID2P(LANG_PM_MAX), 
-                    peak_meter_max, NULL, 0, NULL, Icon_NOICON);
+                    peak_meter_max, NULL, NULL, Icon_NOICON);
 MAKE_MENU(peak_meter_menu, ID2P(LANG_PM_MENU), NULL, Icon_NOICON,
           &peak_meter_release, &peak_meter_hold, 
           &peak_meter_clip_hold,
@@ -535,15 +536,15 @@ static int browse_folder(void *param)
 #ifdef HAVE_LCD_BITMAP
 MENUITEM_FUNCTION(browse_fonts, MENU_FUNC_USEPARAM, 
         ID2P(LANG_CUSTOM_FONT), 
-        browse_folder, (void*)&fonts, 0, NULL, Icon_NOICON);
+        browse_folder, (void*)&fonts, NULL, Icon_NOICON);
 #endif
 MENUITEM_FUNCTION(browse_wps, MENU_FUNC_USEPARAM, 
         ID2P(LANG_WHILE_PLAYING), 
-        browse_folder, (void*)&wps, 0, NULL, Icon_NOICON);
+        browse_folder, (void*)&wps, NULL, Icon_NOICON);
 #ifdef HAVE_REMOTE_LCD
 MENUITEM_FUNCTION(browse_rwps, MENU_FUNC_USEPARAM, 
         ID2P(LANG_REMOTE_WHILE_PLAYING), 
-        browse_folder, (void*)&rwps, 0, NULL, Icon_NOICON);
+        browse_folder, (void*)&rwps, NULL, Icon_NOICON);
 #endif
 
 MENUITEM_SETTING(show_icons, &global_settings.show_icons, NULL);

@@ -63,15 +63,15 @@ int save_playlist_screen(struct playlist_info* playlist)
     return 0;
 }
 MENUITEM_FUNCTION(create_playlist_item, 0, ID2P(LANG_CREATE_PLAYLIST), 
-                  (int(*)(void))create_playlist, NULL, 0, NULL, Icon_NOICON);
+                  (int(*)(void))create_playlist, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(view_playlist, 0, ID2P(LANG_VIEW_DYNAMIC_PLAYLIST), 
-                  (int(*)(void))playlist_viewer, NULL, 0, NULL, Icon_NOICON);
+                  (int(*)(void))playlist_viewer, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(save_playlist, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_DYNAMIC_PLAYLIST), 
                          (int(*)(void*))save_playlist_screen, 
-                        NULL, 0, NULL, Icon_NOICON);
+                        NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(catalog, 0, ID2P(LANG_CATALOG), 
                   (int(*)(void))catalog_view_playlists,
-                   NULL, 0, NULL, Icon_NOICON);
+                   NULL, NULL, Icon_NOICON);
 MENUITEM_SETTING(recursive_dir_insert, &global_settings.recursive_dir_insert, NULL);
 MENUITEM_SETTING(warn_on_erase, &global_settings.warnon_erase_dynplaylist, NULL);
 

@@ -91,7 +91,7 @@ static int recsource_func(void)
                       n_opts, NULL );
 }
 MENUITEM_FUNCTION(recsource, 0, ID2P(LANG_RECORDING_SOURCE), 
-                    recsource_func, NULL, 0, recmenu_callback, Icon_Menu_setting);
+                    recsource_func, NULL, recmenu_callback, Icon_Menu_setting);
 
 #if CONFIG_CODEC == SWCODEC
 /* Makes an options list from a source list of options and indexes */
@@ -206,7 +206,7 @@ static int recfrequency_func(void)
 #endif /* CONFIG_CODEC == SWCODEC */
 } /* recfrequency */
 MENUITEM_FUNCTION(recfrequency, 0, ID2P(LANG_RECORDING_FREQUENCY), 
-                    recfrequency_func, NULL, 0, NULL, Icon_Menu_setting);
+                    recfrequency_func, NULL, NULL, Icon_Menu_setting);
 
 
 static int recchannels_func(void)
@@ -254,7 +254,7 @@ static int recchannels_func(void)
 #endif /* CONFIG_CODEC == SWCODEC */
 }
 MENUITEM_FUNCTION(recchannels, 0, ID2P(LANG_RECORDING_CHANNELS), 
-                    recchannels_func, NULL, 0, NULL, Icon_Menu_setting);
+                    recchannels_func, NULL, NULL, Icon_Menu_setting);
 
 #if CONFIG_CODEC == SWCODEC
 
@@ -280,11 +280,11 @@ static int recformat_func(void)
     return res;
 } /* recformat */
 MENUITEM_FUNCTION(recformat, 0, ID2P(LANG_RECORDING_FORMAT), 
-                    recformat_func, NULL, 0, NULL, Icon_Menu_setting);
+                    recformat_func, NULL, NULL, Icon_Menu_setting);
 
 MENUITEM_FUNCTION(enc_global_config_menu_item, 0, ID2P(LANG_ENCODER_SETTINGS),
                     (int(*)(void))enc_global_config_menu,
-                     NULL, 0, NULL, Icon_Submenu);
+                     NULL, NULL, Icon_Submenu);
 
 #endif /* CONFIG_CODEC == SWCODEC */
 
@@ -325,7 +325,7 @@ static int recdirectory_func(void)
                       names, 2, NULL );
 }
 MENUITEM_FUNCTION(recdirectory, 0, ID2P(LANG_RECORD_DIRECTORY), 
-                    recdirectory_func, NULL, 0, NULL, Icon_Menu_setting);
+                    recdirectory_func, NULL, NULL, Icon_Menu_setting);
 
 MENUITEM_SETTING(cliplight, &global_settings.cliplight, NULL);
 
@@ -364,9 +364,9 @@ static int agc_cliptime_func(void)
                       INT, names, 5, NULL );
 }
 MENUITEM_FUNCTION(agc_preset, 0, ID2P(LANG_RECORD_AGC_PRESET), 
-                    agc_preset_func, NULL, 0, NULL, Icon_Menu_setting);
+                    agc_preset_func, NULL, NULL, Icon_Menu_setting);
 MENUITEM_FUNCTION(agc_cliptime, 0, ID2P(LANG_RECORD_AGC_CLIPTIME), 
-                    agc_cliptime_func, NULL, 0, NULL, Icon_Menu_setting);
+                    agc_cliptime_func, NULL, NULL, Icon_Menu_setting);
 #endif /* HAVE_AGC */
 
 /** Rec trigger **/
@@ -798,7 +798,7 @@ bool rectrigger(void)
 }
 
 MENUITEM_FUNCTION(rectrigger_item, 0, ID2P(LANG_RECORD_TRIGGER), 
-                    (int(*)(void))rectrigger, NULL, 0, NULL, Icon_Menu_setting);
+                    (int(*)(void))rectrigger, NULL, NULL, Icon_Menu_setting);
 
 
 
@@ -838,4 +838,4 @@ bool recording_menu(bool no_source)
 };
 
 MENUITEM_FUNCTION(recording_settings, MENU_FUNC_USEPARAM, ID2P(LANG_RECORDING_SETTINGS),
-                          (int (*)(void*))recording_menu, 0, 0, NULL, Icon_NOICON);
+                          (int (*)(void*))recording_menu, 0, NULL, Icon_NOICON);

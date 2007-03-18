@@ -143,19 +143,19 @@ MENUITEM_SETTING(gain_3, &global_settings.eq_band3_gain, dsp_set_coefs_callback)
 MENUITEM_SETTING(gain_4, &global_settings.eq_band4_gain, dsp_set_coefs_callback);
 
 MENUITEM_FUNCTION_DYNTEXT(gain_item_0, MENU_FUNC_USEPARAM, do_option, (void*)&gain_0,
-                                    0, gainitem_get_name, &global_settings.eq_band0_cutoff,
+                                    gainitem_get_name, &global_settings.eq_band0_cutoff,
                                     NULL, Icon_NOICON);
 MENUITEM_FUNCTION_DYNTEXT(gain_item_1, MENU_FUNC_USEPARAM, do_option, (void*)&gain_1,
-                                    0, gainitem_get_name, &global_settings.eq_band1_cutoff, 
+                                    gainitem_get_name, &global_settings.eq_band1_cutoff, 
                                     NULL, Icon_NOICON);
 MENUITEM_FUNCTION_DYNTEXT(gain_item_2, MENU_FUNC_USEPARAM, do_option, (void*)&gain_2,
-                                    0, gainitem_get_name, &global_settings.eq_band2_cutoff, 
+                                    gainitem_get_name, &global_settings.eq_band2_cutoff, 
                                     NULL, Icon_NOICON);
 MENUITEM_FUNCTION_DYNTEXT(gain_item_3, MENU_FUNC_USEPARAM, do_option, (void*)&gain_3,
-                                    0, gainitem_get_name, &global_settings.eq_band3_cutoff, 
+                                    gainitem_get_name, &global_settings.eq_band3_cutoff, 
                                     NULL, Icon_NOICON);
 MENUITEM_FUNCTION_DYNTEXT(gain_item_4, MENU_FUNC_USEPARAM, do_option, (void*)&gain_4,
-                                    0, gainitem_get_name, &global_settings.eq_band4_cutoff, 
+                                    gainitem_get_name, &global_settings.eq_band4_cutoff, 
                                     NULL, Icon_NOICON);
                                     
 MAKE_MENU(gain_menu, ID2P(LANG_EQUALIZER_GAIN), NULL, Icon_NOICON, &gain_item_0, 
@@ -193,13 +193,13 @@ int do_center_band_menu(void* param)
 MAKE_MENU(band_0_menu, ID2P(LANG_EQUALIZER_BAND_LOW_SHELF), NULL, 
             Icon_EQ, &cutoff_0, &q_0, &gain_0);
 MENUITEM_FUNCTION_DYNTEXT(band_1_menu, MENU_FUNC_USEPARAM, 
-                            do_center_band_menu, (void*)1, 0,
+                            do_center_band_menu, (void*)1, 
                             centerband_get_name, (void*)1, NULL, Icon_EQ);
 MENUITEM_FUNCTION_DYNTEXT(band_2_menu, MENU_FUNC_USEPARAM, 
-                            do_center_band_menu, (void*)2, 0,
+                            do_center_band_menu, (void*)2, 
                             centerband_get_name, (void*)2, NULL, Icon_EQ);
 MENUITEM_FUNCTION_DYNTEXT(band_3_menu, MENU_FUNC_USEPARAM, 
-                            do_center_band_menu, (void*)3, 0,
+                            do_center_band_menu, (void*)3, 
                             centerband_get_name, (void*)3, NULL, Icon_EQ);
 MAKE_MENU(band_4_menu, ID2P(LANG_EQUALIZER_BAND_HIGH_SHELF), NULL, 
             Icon_EQ, &cutoff_4, &q_4, &gain_4);
@@ -629,12 +629,12 @@ bool eq_browse_presets(void)
 
 
 MENUITEM_FUNCTION(eq_graphical, 0, ID2P(LANG_EQUALIZER_GRAPHICAL),
-                    (int(*)(void))eq_menu_graphical, NULL, 0, NULL, 
+                    (int(*)(void))eq_menu_graphical, NULL, NULL, 
                     Icon_EQ);
 MENUITEM_FUNCTION(eq_save, 0, ID2P(LANG_EQUALIZER_SAVE),
-                    (int(*)(void))eq_save_preset, NULL, 0, NULL, Icon_NOICON);
+                    (int(*)(void))eq_save_preset, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(eq_browse, 0, ID2P(LANG_EQUALIZER_BROWSE),
-                    (int(*)(void))eq_browse_presets, NULL, 0, NULL, Icon_NOICON);
+                    (int(*)(void))eq_browse_presets, NULL, NULL, Icon_NOICON);
 
 MAKE_MENU(equalizer_menu, ID2P(LANG_EQUALIZER), NULL, Icon_EQ,
         &eq_enable, &eq_graphical, &eq_precut, &gain_menu, 
