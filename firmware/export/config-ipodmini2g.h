@@ -46,9 +46,8 @@
 #define CONFIG_CODEC SWCODEC
 
 /* define this if you have a real-time clock */
-#if !defined(BOOTLOADER) && !defined(SIMULATOR)
+#if !defined(BOOTLOADER)
 #define CONFIG_RTC RTC_PCF50605
-#define HAVE_RTC_ALARM
 #endif
 
 /* Define this if you have a software controlled poweroff */
@@ -129,6 +128,9 @@
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
+
+/* Define if the device can wake from an RTC alarm */
+#define HAVE_RTC_ALARM 
 
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
