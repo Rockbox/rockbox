@@ -645,7 +645,7 @@ static void tagtree_unbuffer_event(struct mp3entry *id3, bool last_track)
     lastplayed = tagcache_increase_serial();
     if (lastplayed < 0)
     {
-        logf("incorrect tc serial:%d", lastplayed);
+        logf("incorrect tc serial:%ld", lastplayed);
         tagcache_search_finish(&tcs);
         return;
     }
@@ -654,8 +654,8 @@ static void tagtree_unbuffer_event(struct mp3entry *id3, bool last_track)
     playtime += MIN(id3->length, id3->elapsed + 15 * 1000);
     
     logf("ube:%s", id3->path);
-    logf("-> %d/%d/%d", last_track, playcount, playtime);
-    logf("-> %d/%d/%d", id3->elapsed, id3->length, MIN(id3->length, id3->elapsed + 15 * 1000));
+    logf("-> %d/%ld/%ld", last_track, playcount, playtime);
+    logf("-> %ld/%ld/%ld", id3->elapsed, id3->length, MIN(id3->length, id3->elapsed + 15 * 1000));
     
     /* lastplayed not yet supported. */
     
@@ -750,7 +750,7 @@ static int parse_line(int n, const char *buf, void *parameters)
             case var_include:
                 if (get_token_str(data, sizeof(data)) < 0)
                 {
-                    logf("%include empty");
+                    logf("%%include empty");
                     return 0;
                 }
             
@@ -772,12 +772,12 @@ static int parse_line(int n, const char *buf, void *parameters)
                 memset(menu, 0, sizeof(struct root_menu));
                 if (get_token_str(menu->id, sizeof(menu->id)) < 0)
                 {
-                    logf("%menu_start id empty");
+                    logf("%%menu_start id empty");
                     return 0;
                 }
                 if (get_token_str(menu->title, sizeof(menu->title)) < 0)
                 {
-                    logf("%menu_start title empty");
+                    logf("%%menu_start title empty");
                     return 0;
                 }
                 logf("menu: %s", menu->title);
@@ -792,7 +792,7 @@ static int parse_line(int n, const char *buf, void *parameters)
                 
                 if (get_token_str(data, sizeof(data)) < 0)
                 {
-                    logf("%root_menu empty");
+                    logf("%%root_menu empty");
                     return 0;
                 }
                 

@@ -461,7 +461,7 @@ int dircache_load(void)
     dircache_size = maindata.size;
     allocated_size = dircache_size + DIRCACHE_RESERVE;
     reserve_used = 0;
-    logf("Done, %d KiB used", dircache_size / 1024);
+    logf("Done, %ld KiB used", dircache_size / 1024);
     dircache_initialized = true;
     memset(fd_bindings, 0, sizeof(fd_bindings));
 
@@ -564,7 +564,7 @@ static int dircache_do_rebuild(void)
     }
     cpu_boost(false);
 
-    logf("Done, %d KiB used", dircache_size / 1024);
+    logf("Done, %ld KiB used", dircache_size / 1024);
     
     dircache_initialized = true;
     dircache_initializing = false;

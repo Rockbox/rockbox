@@ -1568,7 +1568,7 @@ static void add_tagcache(char *path)
     if (path_length > TAG_MAXLEN)
     {
         /* Path can't be shortened. */
-        logf("Too long path: %s");
+        logf("Too long path: %s", path);
         return ;
     }
     
@@ -1974,7 +1974,7 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
         }
         
         entries_processed += count;
-        logf("%d/%d entries processed", entries_processed, h->entry_count);
+        logf("%d/%ld entries processed", entries_processed, h->entry_count);
     }
     
     close(masterfd);
@@ -2019,7 +2019,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
     fd = open_tag_fd(&tch, index_type, true);
     if (fd >= 0)
     {
-        logf("tch.datasize=%d", tch.datasize);
+        logf("tch.datasize=%ld", tch.datasize);
         lookup_buffer_depth = 1 +
         /* First part */ commit_entry_count +
         /* Second part */ (tch.datasize / TAGFILE_ENTRY_CHUNK_LENGTH);
@@ -2031,8 +2031,8 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
         /* Second part */ 0;
     }
     
-    logf("lookup_buffer_depth=%d", lookup_buffer_depth);
-    logf("commit_entry_count=%d", commit_entry_count);
+    logf("lookup_buffer_depth=%ld", lookup_buffer_depth);
+    logf("commit_entry_count=%ld", commit_entry_count);
     
     /* Allocate buffer for all index entries from both old and new
      * tag files. */
@@ -2322,7 +2322,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 
                 if (idxbuf[j].tag_seek[index_type] < 0)
                 {
-                    logf("update error: %d/%d", i+j, tcmh.tch.entry_count);
+                    logf("update error: %d/%ld", i+j, tcmh.tch.entry_count);
                     error = true;
                     goto error_exit;
                 }
@@ -2405,7 +2405,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                     entry.tag_length[index_type])
                 {
                     logf("read fail #8");
-                    logf("offset=0x%02x", entry.tag_offset[index_type]);
+                    logf("offset=0x%02lx", entry.tag_offset[index_type]);
                     logf("length=0x%02x", entry.tag_length[index_type]);
                     error = true;
                     break ;
@@ -2459,7 +2459,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
     
     if (index_type != tag_filename)
         h->datasize += tch.datasize;
-    logf("s:%d/%d/%d", index_type, tch.datasize, h->datasize);
+    logf("s:%d/%ld/%ld", index_type, tch.datasize, h->datasize);
     error_exit:
     
     close(fd);
@@ -2564,7 +2564,7 @@ static bool commit(void)
         return false;
     }
     
-    logf("commit %d entries...", tch.entry_count);
+    logf("commit %ld entries...", tch.entry_count);
     
     /* Mark DB dirty so it will stay disabled if commit fails. */
     current_tcmh.dirty = true;
@@ -3050,7 +3050,7 @@ static bool delete_entry(long idx_id)
     char buf[TAG_MAXLEN+32];
     int in_use[TAG_COUNT];
     
-    logf("delete_entry(): %d", idx_id);
+    logf("delete_entry(): %ld", idx_id);
     
 #ifdef HAVE_TC_RAMCACHE
     /* At first mark the entry removed from ram cache. */
@@ -3482,7 +3482,7 @@ static bool load_tagcache(void)
             {
                 logf("too big tagcache #2");
                 logf("tl: %d", fe->tag_length);
-                logf("bl: %d", bytesleft);
+                logf("bl: %ld", bytesleft);
                 close(fd);
                 return false;
             }
