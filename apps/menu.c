@@ -176,7 +176,7 @@ static void menu_get_icon(int selected_item, void * data, ICON * icon)
 static void init_menu_lists(const struct menu_item_ex *menu,
                      struct gui_synclist *lists, int selected, bool callback)
 {
-    int i, count = (menu->flags&MENU_COUNT_MASK)>>MENU_COUNT_SHIFT;
+    int i, count = MENU_GET_COUNT(menu->flags);
     menu_callback_type menu_callback = NULL;
     ICON icon = NOICON;
     current_subitems_count = 0;
@@ -557,7 +557,10 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                     if (temp->flags&MENU_FUNC_CHECK_RETVAL)
                     {
                         if (return_value == temp->function->exit_value)
-                            return return_value;
+                        {
+                            done = true;
+                            ret =  return_value;
+                        }
                     }
                     break;
                 }
@@ -572,7 +575,8 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                     if (in_stringlist)
                     {
                         action_signalscreenchange();
-                        return selected;
+                        done = true;
+                        ret =  selected;
                     }
                     else if (stack_top < MAX_MENUS)
                     {
@@ -689,8 +693,7 @@ static void init_oldmenu(const struct menu_item_ex *menu,
     (void)callback;
     gui_synclist_init(lists, oldmenuwrapper_getname, 
                         (void*)(intptr_t)menu->value, false, 1);
-    gui_synclist_set_nb_items(lists,
-        (menu->flags&MENU_COUNT_MASK)>>MENU_COUNT_SHIFT);
+    gui_synclist_set_nb_items(lists, MENU_GET_COUNT(menu->flags));
     gui_synclist_limit_scroll(lists, true);
     gui_synclist_select_item(lists, selected);
 }

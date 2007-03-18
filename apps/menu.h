@@ -61,6 +61,7 @@ struct menu_func {
 #define MENU_COUNT_MASK 0xFFF
 #define MENU_COUNT_SHIFT 8
 #define MENU_ITEM_COUNT(c) ((c&MENU_COUNT_MASK)<<MENU_COUNT_SHIFT)
+#define MENU_GET_COUNT(flags) ((flags>>MENU_COUNT_SHIFT)&MENU_COUNT_MASK)
 
 struct menu_item_ex {
     unsigned int flags; /* above defines */
