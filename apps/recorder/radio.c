@@ -1120,7 +1120,7 @@ static int radio_edit_preset(void)
         }
     }
 
-    return true;
+    return 1;
 }
 
 static int radio_delete_preset(void)
@@ -1147,7 +1147,7 @@ static int radio_delete_preset(void)
         presets_loaded = false;
     }
         
-    return true;
+    return 1;
 }
 
 static int load_preset_list(void)
@@ -1223,10 +1223,10 @@ static int clear_preset_list(void)
     return true;
 }
 
-MENUITEM_FUNCTION(radio_edit_preset_item, 0, 
+MENUITEM_FUNCTION(radio_edit_preset_item, MENU_FUNC_CHECK_RETVAL, 
                     ID2P(LANG_FM_EDIT_PRESET), 
                     radio_edit_preset, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(radio_delete_preset_item, 0,
+MENUITEM_FUNCTION(radio_delete_preset_item, MENU_FUNC_CHECK_RETVAL,
                     ID2P(LANG_FM_DELETE_PRESET), 
                     radio_delete_preset, NULL, NULL, Icon_NOICON);
 int radio_preset_callback(int action, const struct menu_item_ex *this_item)
