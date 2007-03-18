@@ -328,7 +328,7 @@ static int do_shutdown(void)
     return 0;
 }
 MENUITEM_FUNCTION(do_shutdown_item, 0, ID2P(LANG_SHUTDOWN),
-                  do_shutdown, NULL, 0, NULL, Icon_NOICON);
+                  do_shutdown, NULL, NULL, Icon_NOICON);
 #endif
 MAKE_MENU(root_menu_, ID2P(LANG_ROCKBOX_TITLE),
             NULL, Icon_Rockbox,
