@@ -998,7 +998,6 @@ void peak_meter_draw(struct screen *display, struct meter_scales *scales,
     /* draw scale end */
     display->vline(x + meterwidth, y, y + height - 2);
 
-    display->set_drawmode(DRMODE_COMPLEMENT);
     /* draw dots for scale marks */
     for (i = 0; i < db_scale_count; i++) {
         /* The x-coordinates of interesting scale mark points 
@@ -1053,7 +1052,7 @@ void peak_meter_draw(struct screen *display, struct meter_scales *scales,
 #endif /*HAVE_RECORDING*/
 
 #ifdef PM_DEBUG
-    /* display a bar to show how many calls to peak_meter_peek 
+    /* display a bar to show how many calls to peak_meter_peek
        have ocurred since the last display */
     display->set_drawmode(DRMODE_COMPLEMENT);
     display->fillrect(x, y, tmp, 3);
