@@ -1,30 +1,23 @@
 \fixme{This is merely a copy of the wiki page IaudioBoot, so this section needs
 a more natural language and also error checking by Iaudio owners.}
 
-The \playerman{} \playername{} has a builtin boot loader which performs the 
-firmware update, and can also access the hard drive via USB. Therefore the 
+The \playername{} has a builtin boot loader which performs the
+firmware update, and can also access the hard drive via USB. Therefore the
 Rockbox bootloader can be very minimalistic, without USB mode.
 This also makes it less dangerous to install the Rockbox bootloader, as you can
-always restore it using the iAudio bootloader.
+always restore it using the \playerman{} bootloader.
 
-\note{The current bootloader is not prepared to coexist with the original 
-firmware. It replaces the original firmware. Therefore it is only useful to 
-developers at this point.}
+\note{The current bootloader is not prepared to coexist with the original
+firmware. It replaces the original firmware.}
 
 \subsubsection{Installation}
 \begin{itemize}
-\item Download the bootloader binary from 
-\url{http://download.rockbox.org/bootloader/iaudio/}. Use \fname{x5v\_fw.bin}
-file if your \dap{} is a X5V. If it is a X5, use the \fname{x5\_fw.bin} file.
-\item Copy it to the \fname{FIRMWARE} directory on your X5.
-\item Turn the X5 off, remove the USB cable and insert the charger. The X5 will
-automatically upgrade the flash with the Rockbox bootloader.
-\end{itemize}
-
-\subsubsection{Restoring the original firmware}
-\begin{itemize}
-\item Download the original X5 firmware from the iAudio web site.
-\item Copy it to the \fname{FIRMWARE} directory on your X5
-\item Turn the X5 off, remove the USB cable and insert the charger. The X5 will
-automatically upgrade the flash with the original firmware.
+\item Download the Rockbox bootloader binary from 
+\url{http://download.rockbox.org/bootloader/iaudio/}.
+  \opt{x5}{Use the \fname{x5v\_fw.bin} file if your \dap{} is a X5V. If it is a X5,
+    use the \fname{x5\_fw.bin} file.}
+  \opt{m5}{Use the \fname{m5\_fw.bin} file.}
+\item Copy it to the \fname{FIRMWARE} directory on your \dap{}.
+\item Turn the \dap{} off, remove the USB cable and insert the charger. The
+Rockbox bootloader will automatically be flashed.
 \end{itemize}

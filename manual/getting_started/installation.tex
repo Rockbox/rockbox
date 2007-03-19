@@ -268,8 +268,8 @@ The new build will be installed over your current build.
 
 \section{Uninstalling Rockbox}\index{Installation!uninstall}
 
-If you would like to go back to using the original \playerman{} software, then
-connect the \playerman{} to your computer, and delete the
+If you would like to go back to using the original \playerman{} software,
+connect the \dap{} to your computer, and delete the
 \fname{\firmwarefilename} file.
 
 \opt{h10,h10_5gb}{
@@ -291,12 +291,21 @@ connect the \playerman{} to your computer, and delete the
   prompted by ipodpatcher, enter 'u' for uninstall, instead of 'i' for install.
 }
 
+\opt{m5,x5}{
+  Download the original \playername{} firmware from the \playerman{} web site.
+  And copy it to the \fname{FIRMWARE} directory on your \playername{}. Turn off the
+  \dap{}, remove the USB cable and insert the charger. The original
+  firmware will automatically be flashed.
+}
+
 If you wish to clean up your disk, you may also wish to delete the
-\fname{.rockbox} folder and its contents. Turn the \playerman{} off.
+\fname{.rockbox} folder and its contents.
+\nopt{m5,x5}{Turn the \playerman{} off.}
 
 \opt{h300}{Press and hold the \ButtonRec{} button.}
 
-Turn the \dap{} back on and the original \playerman{} software will load.
+\nopt{m5,x5}{Turn the \dap{} back on and the original \playerman{} software
+  will load.}
 
 \opt{h1xx}{
   \note{
@@ -311,7 +320,7 @@ Turn the \dap{} back on and the original \playerman{} software will load.
 
 \opt{h300}{
   \note{
-    There's no need to remove the installed boot loader, although you if you
+    There's no need to remove the installed boot loader, although if you
     retain the Rockbox boot loader, you will need to hold the \ButtonRec{}
     button each time you want to start the original firmware. If you want to
     remove it simply flash an unpatched \playerman{} firmware. Be aware that
