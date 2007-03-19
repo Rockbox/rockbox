@@ -249,7 +249,6 @@ target/coldfire/memcpy-coldfire.S
 target/coldfire/memmove-coldfire.S
 target/coldfire/memset-coldfire.S
 target/coldfire/memswap128-coldfire.S
-common/memswap128.c
 #if defined(HAVE_LCD_COLOR) \
  || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED)
 target/coldfire/memset16-coldfire.S
