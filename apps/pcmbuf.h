@@ -37,10 +37,14 @@
                                      for mixing (crossfade or voice) */
 
 /* Returns true if the buffer needs to change size */
-bool pcmbuf_is_same_size(size_t bufsize);
-size_t pcmbuf_init(size_t bufsize, char *bufend);
+bool pcmbuf_is_same_size(void);
+size_t pcmbuf_init(unsigned char *bufend);
 /* Size in bytes used by the pcmbuffer */
 size_t pcmbuf_get_bufsize(void);
+#ifdef ROCKBOX_HAS_LOGF
+/* just used for logging for now */
+unsigned char * pcmbuf_get_meminfo(size_t *length);
+#endif
 size_t get_pcmbuf_descsize(void);
 
 void pcmbuf_pause(bool pause);
@@ -68,7 +72,7 @@ void* pcmbuf_request_buffer(int *count);
 void* pcmbuf_request_voice_buffer(int *count, bool mix);
 bool pcmbuf_is_crossfade_enabled(void);
 void pcmbuf_crossfade_enable(bool on_off);
-
+void pcmbuf_crossfade_enable_finished(void);
 int pcmbuf_usage(void);
 int pcmbuf_mix_free(void);
 void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude);

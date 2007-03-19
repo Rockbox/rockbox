@@ -58,7 +58,10 @@ struct pcmbufdesc
     void (*callback)(void);
 };
 
-#define PCMBUF_DESCS(bufsize) ((bufsize) / PCMBUF_MINAVG_CHUNK)
+#define PCMBUF_DESCS(bufsize) \
+    ((bufsize) / PCMBUF_MINAVG_CHUNK)
+#define PCMBUF_DESCS_SIZE(bufsize) \
+    (PCMBUF_DESCS(bufsize)*sizeof(struct pcmbufdesc))
 
 /* Size of the PCM buffer. */
 static size_t pcmbuf_size IDATA_ATTR = 0;
@@ -76,6 +79,7 @@ static void (*position_callback)(size_t size) IDATA_ATTR;
 
 /* Crossfade related state */
 static bool crossfade_enabled;
+static bool crossfade_enabled_pending;
 static bool crossfade_mixmode;
 static bool crossfade_active IDATA_ATTR;
 static bool crossfade_init IDATA_ATTR;
@@ -187,9 +191,13 @@ void pcmbuf_set_position_callback(void (*callback)(size_t size))
     position_callback = callback;
 }
 
-static void pcmbuf_set_watermark_bytes(size_t numbytes)
+static void pcmbuf_set_watermark_bytes(void)
 {
-    pcmbuf_watermark = numbytes;
+    pcmbuf_watermark = (crossfade_enabled && pcmbuf_size) ?
+        /* If crossfading, try to keep the buffer full other than 1 second */
+        (pcmbuf_size - (NATIVE_FREQUENCY * 4 * 1)) :
+        /* Otherwise, just keep it above 2 second */
+        PCMBUF_WATERMARK;
 }
 
 /* This is really just part of pcmbuf_flush_fillpos, but is easier to keep
@@ -413,30 +421,60 @@ static void pcmbuf_init_pcmbuffers(void) {
     }
 }
 
-bool pcmbuf_is_same_size(size_t bufsize)
+static size_t pcmbuf_get_next_required_pcmbuf_size(void)
 {
-    /* keep calculations synced with pcmbuf_init */
-    bufsize += PCMBUF_MIX_CHUNK * 2 +
-               PCMBUF_DESCS(bufsize)*sizeof(struct pcmbufdesc);
-    return bufsize == (size_t)(pcmbuf_bufend - audiobuffer);
+#if MEM > 1
+    size_t seconds = 1;
+
+    if (crossfade_enabled_pending)
+        seconds += global_settings.crossfade_fade_out_delay
+                   + global_settings.crossfade_fade_out_duration;
+
+    /* Buffer has to be at least 2s long. */
+    seconds += 2;
+    logf("pcmbuf len: %ld", seconds);
+    return seconds * (NATIVE_FREQUENCY*4);
+#else
+    return NATIVE_FREQUENCY*2;
+#endif
+}
+
+static char *pcmbuf_calc_audiobuffer_ptr(size_t bufsize)
+{
+    return pcmbuf_bufend - (bufsize + PCMBUF_MIX_CHUNK * 2 +
+               PCMBUF_DESCS_SIZE(bufsize));
+}
+
+bool pcmbuf_is_same_size(void)
+{
+    if (audiobuffer == NULL)
+        return true; /* Not set up yet even once so always */
+
+    size_t bufsize = pcmbuf_get_next_required_pcmbuf_size();
+    return pcmbuf_calc_audiobuffer_ptr(bufsize) == audiobuffer;
 }
 
 /* Initialize the pcmbuffer the structure looks like this:
  * ...|---------PCMBUF---------|FADEBUF|VOICEBUF|DESCS|... */
-size_t pcmbuf_init(size_t bufsize, char *bufend)
+size_t pcmbuf_init(unsigned char *bufend)
 {
-    pcmbuf_size = bufsize;
     pcmbuf_bufend = bufend;
-    pcmbuf_descsize = pcmbuf_descs()*sizeof(struct pcmbufdesc);
-    audiobuffer = pcmbuf_bufend - (pcmbuf_size + PCMBUF_MIX_CHUNK * 2
-                  + pcmbuf_descsize);
+    pcmbuf_size = pcmbuf_get_next_required_pcmbuf_size();
+    audiobuffer = pcmbuf_calc_audiobuffer_ptr(pcmbuf_size);
     fadebuf = &audiobuffer[pcmbuf_size];
     voicebuf = &fadebuf[PCMBUF_MIX_CHUNK];
     pcmbuf_write = (struct pcmbufdesc *)&voicebuf[PCMBUF_MIX_CHUNK];
+
+    pcmbuf_descsize = PCMBUF_DESCS_SIZE(pcmbuf_size);
     pcmbuf_init_pcmbuffers();
+
     position_callback = NULL;
     pcmbuf_event_handler = NULL;
+
+    pcmbuf_crossfade_enable_finished();
+
     pcmbuf_play_stop();
+
     return pcmbuf_bufend - audiobuffer;
 }
 
@@ -444,6 +482,14 @@ size_t pcmbuf_get_bufsize(void)
 {
     return pcmbuf_size;
 }
+
+#ifdef ROCKBOX_HAS_LOGF
+unsigned char * pcmbuf_get_meminfo(size_t *length)
+{
+    *length = pcmbuf_bufend - audiobuffer;
+    return audiobuffer;
+}
+#endif
 
 void pcmbuf_pause(bool pause) {
 #ifdef PCMBUF_MUTING
@@ -1036,15 +1082,18 @@ void pcmbuf_mix_voice(int count)
 
 void pcmbuf_crossfade_enable(bool on_off)
 {
-    crossfade_enabled = on_off;
+#if MEM > 1
+    /* Next setting to be used, not applied now */
+    crossfade_enabled_pending = on_off;
+#endif
+    (void)on_off;
+}
 
-    if (crossfade_enabled) {
-        /* If crossfading, try to keep the buffer full other than 1 second */
-        pcmbuf_set_watermark_bytes(pcmbuf_size - (NATIVE_FREQUENCY * 4 * 1));
-    } else {
-        /* Otherwise, just keep it above 2 second */
-        pcmbuf_set_watermark_bytes(PCMBUF_WATERMARK);
-    }
+void pcmbuf_crossfade_enable_finished(void)
+{
+    /* Copy the pending setting over now */
+    crossfade_enabled = crossfade_enabled_pending;
+    pcmbuf_set_watermark_bytes();
 }
 
 bool pcmbuf_is_crossfade_enabled(void)
@@ -1054,4 +1103,3 @@ bool pcmbuf_is_crossfade_enabled(void)
 
     return crossfade_enabled;
 }
-

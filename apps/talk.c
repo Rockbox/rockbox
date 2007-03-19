@@ -528,9 +528,6 @@ void talk_init(void)
     if (has_voicefile)
     {
         voicefile_size = filesize(filehandle);
-#if CONFIG_CODEC == SWCODEC
-        voice_init();
-#endif
         close(filehandle); /* close again, this was just to detect presence */
         filehandle = -1;
     }
