@@ -42,7 +42,7 @@ static int format(
 {
     char *str;
     char tmpbuf[12], pad;
-    int ch, width, val, sign;
+    int ch, width, val, sign, precision;
     long lval, lsign;
     unsigned int uval;
     unsigned long ulval;
@@ -65,6 +65,17 @@ static int format(
         width = 10*width + ch - '0';
         ch = *fmt++;
         }
+        
+        precision = 0;
+        if(ch == '.')
+        {
+            ch = *fmt++;
+            while (ch >= '0' && ch <= '9')
+            {
+                precision = 10*precision + ch - '0';
+                ch = *fmt++;
+            }
+        }
 
         str = tmpbuf + sizeof tmpbuf - 1;
         switch (ch)
@@ -75,6 +86,8 @@ static int format(
 
         case 's':
             str = va_arg (ap, char*);
+            if(precision > 0)
+                str[precision] = '\0';
             break;
 
         case 'd':
