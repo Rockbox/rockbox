@@ -187,10 +187,10 @@ int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
     printf("CRC32: %x", mi4header.crc32);
 
     /* Rockbox model id */
-    printf("Model id: %4s", mi4header.model);
+    printf("Model id: %.4s", mi4header.model);
 
     /* Read binary type (RBOS, RBBL) */
-    printf("Binary type: %4s", mi4header.type);
+    printf("Binary type: %.4s", mi4header.type);
 
     /* Load firmware */
     lseek(fd, MI4_HEADER_SIZE, SEEK_SET);
@@ -245,10 +245,10 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo, unsigned int buffe
     printf("CRC32: %x", mi4header.crc32);
 
     /* Rockbox model id */
-    printf("Model id: %4s", mi4header.model);
+    printf("Model id: %.4s", mi4header.model);
 
     /* Read binary type (RBOS, RBBL) */
-    printf("Binary type: %4s", mi4header.type);
+    printf("Binary type: %.4s", mi4header.type);
 
     /* Load firmware */
     ata_read_sectors(pinfo->start + PPMI_SECTOR_OFFSET + PPMI_SECTORS
@@ -298,7 +298,7 @@ void* main(void)
     lcd_setfont(FONT_SYSFIXED);
 
     printf("Rockbox boot loader");
-    printf("Version: 20%s", version);
+    printf("Version: %s", version);
     printf(MODEL_NAME);
 
     i=ata_init();
