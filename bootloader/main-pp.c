@@ -106,11 +106,9 @@ static void chksum_crc32gentab (void)
 
 /* Button definitions */
 #if CONFIG_KEYPAD == IRIVER_H10_PAD
-#define BOOTLOADER_VERBOSE      BUTTON_PLAY
 #define BOOTLOADER_BOOT_OF      BUTTON_LEFT
 
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
-#define BOOTLOADER_VERBOSE      BUTTON_RIGHT
 #define BOOTLOADER_BOOT_OF      BUTTON_LEFT
 
 #endif
@@ -291,9 +289,9 @@ void* main(void)
     
     btn = button_read_device();
 
-    /* Enable bootloader messages */
-    if (btn & BOOTLOADER_VERBOSE)
-            verbose = true;
+    /* Enable bootloader messages if any button is pressed */
+    if (btn)
+        verbose = true;
 
     lcd_setfont(FONT_SYSFIXED);
 
@@ -379,6 +377,8 @@ void* main(void)
         } else {
             return (void*)loadbuffer;
         }
+        
+        error(EBOOTFILE, rc);
 
     } else {
         printf("Loading Rockbox...");
@@ -391,7 +391,7 @@ void* main(void)
             rc=load_firmware(loadbuffer, OLD_BOOTFILE, MAX_LOADSIZE);
             if (rc < EOK) {
                 printf("Can't load %s:", OLD_BOOTFILE);
-                printf(strerror(rc));
+                error(EBOOTFILE, rc);
             }
         }
     }
