@@ -335,6 +335,12 @@ sub runone {
     `find .rockbox | xargs $ziptool $output >/dev/null`;
 
     if($target && ($fonts != 1)) {
+        # On some targets, rockbox.* is inside .rockbox
+        if($target !=~ /mod|ajz|wma/i) {
+            `cp $target .rockbox/$target`;
+            $target = ".rockbox/".$target;
+        }
+        
         if($verbose) {
             print "$ziptool $output $target\n";
         }
