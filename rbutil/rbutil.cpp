@@ -105,7 +105,7 @@ bool checkZip(wxString zipname)
     wxString name = entry->GetName();
     if(entry->IsDir())
     {
-        if(name.Contains(wxT(".rockbox\\")))
+        if(name.Contains(wxT(".rockbox")))
         {
             return true;
         }
@@ -126,6 +126,7 @@ int DownloadURL(wxString src, wxString dest)
                 wxPD_AUTO_HIDE | wxPD_SMOOTH | wxPD_ELAPSED_TIME |
                 wxPD_REMAINING_TIME | wxPD_CAN_ABORT);
     progress->Update(0);
+    progress->SetSize(500,200);
 
     input = true;
     wxURL* in_http = new wxURL(src);
@@ -647,8 +648,7 @@ bool InstallRbutil(wxString dest)
     if (! copied_exe)
     {
         str.Printf(wxT("%s" PATH_SEP EXE_NAME), gv->AppDir.c_str());
-        dstr.Printf(wxT("%s" PATH_SEP EXE_NAME), destdir.c_str(),
-            filestocopy[i].AfterLast(PATH_SEP_CHR).c_str());
+        dstr.Printf(wxT("%s" PATH_SEP EXE_NAME), destdir.c_str());
         if (! wxCopyFile(str, dstr) )
         {
             buf.Printf(wxT("Can't copy program binary %s -> %s"),

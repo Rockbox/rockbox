@@ -194,19 +194,17 @@ bool gigabeatf(int mode)
       }
       path2 = path1;
       path2.Append(wxT(".ORIG"));
-      if(wxFileExists(path2))
+      if(!wxFileExists(path2))
       {
-          err = wxT("Its seems there is already a Bootloader install, if not, delete the *.IMG.ORIG file");
-          ERR_DIALOG(err, wxT("Bootloader add"));
-          return false;
+         if(!wxRenameFile(path1,path2,false))
+         {
+           err.Printf(wxT("[ERR] Coud not rename %s to %s"),path1.c_str(),path2.c_str());
+           ERR_DIALOG(err, wxT("Bootloader add"));
+           return false;
+         }
       }
 
-      if(!wxRenameFile(path1,path2,false))
-      {
-         err.Printf(wxT("[ERR] Coud not rename %s to %s"),path1.c_str(),path2.c_str());
-         ERR_DIALOG(err, wxT("Bootloader add"));
-         return false;
-      }
+
       if(!wxCopyFile(dest,path1))
       {
          err.Printf(wxT("[ERR] Coud not copy %s to %s"),dest.c_str(),path2.c_str());
@@ -300,7 +298,7 @@ bool h10(int mode)
 
      if(!wxFileExists(path1))  //Firmware dosent exists on player
      {
-        path1.Printf(wxT("%sSYSTEM" PATH_SEP "H10EMP.mi4"));   //attempt other firmwarename
+        path1.Printf(wxT("%sSYSTEM" PATH_SEP "H10EMP.mi4"),gv->curdestdir.c_str());   //attempt other firmwarename
         if(!wxFileExists(path1))  //Firmware dosent exists on player
         {
             err.Printf(wxT("[ERR] File %s does not Exist"),path1.c_str());
@@ -308,18 +306,16 @@ bool h10(int mode)
             return false;
         }
      }
-     if(wxFileExists(path2))  //there is already a original firmware
+     if(!wxFileExists(path2))  //there is already a original firmware
      {
-        err.Printf(wxT("[ERR2] File %s does Exist"),path2.c_str());
-        ERR_DIALOG(err, wxT("Bootloader add"));
-        return false;
+        if(!wxRenameFile(path1,path2,false))  //rename Firmware to Original
+        {
+           err.Printf(wxT("[ERR] Coud not rename %s to %s"),path1.c_str(),path2.c_str());
+           ERR_DIALOG(err, wxT("Bootloader add"));
+           return false;
+        }
      }
-     if(!wxRenameFile(path1,path2,false))  //rename Firmware to Original
-     {
-         err.Printf(wxT("[ERR] Coud not rename %s to %s"),path1.c_str(),path2.c_str());
-         ERR_DIALOG(err, wxT("Bootloader add"));
-         return false;
-     }
+
      if(!wxCopyFile(dest,path1))  // copy file
      {
         err.Printf(wxT("[ERR] Coud not copy %s to %s"),dest.c_str(),path1.c_str());
@@ -336,7 +332,7 @@ bool h10(int mode)
      path2.Printf(wxT("%sSYSTEM" PATH_SEP "Original.mi4"),gv->curdestdir.c_str());
      if(!wxFileExists(path1))  //Firmware dosent exists on player
      {
-         path1.Printf(wxT("%s" PATH_SEP "SYSTEM" PATH_SEP "H10EMP.mi4"));   //attempt other firmwarename
+         path1.Printf(wxT("%s" PATH_SEP "SYSTEM" PATH_SEP "H10EMP.mi4"),gv->curdestdir.c_str());   //attempt other firmwarename
          if(!wxFileExists(path1))  //Firmware dosent exists on player
          {
             err.Printf(wxT("[ERR] File %s does not Exist"),path1.c_str());

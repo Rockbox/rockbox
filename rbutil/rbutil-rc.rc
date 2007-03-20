@@ -10,8 +10,8 @@ BEGIN
   BEGIN
     BLOCK "FFFF0000"
     BEGIN
-      VALUE "FileVersion", "0.3.0.1\0"
-      VALUE "ProductVersion", "0.3.0.1\0"
+      VALUE "FileVersion", "0.3.0.2\0"
+      VALUE "ProductVersion", "0.3.0.2\0"
       VALUE "CompanyName", "Rockbox Team\0"
       VALUE "FileDescription", "Rockbox Utility\0"
       VALUE "InternalName", "rbutil\0"
