@@ -31,6 +31,194 @@
 #include "disk.h"
 #include <string.h>
 
+/* Locations and sizes in hidden partition on Sansa */
+#define PPMI_SECTOR_OFFSET  1024
+#define PPMI_SECTORS        1
+#define MI4_HEADER_SECTORS  1
+#define MI4_HEADER_SIZE     0x200
+
+/* mi4 header structure */
+struct mi4header_t {
+    unsigned char magic[4];
+    uint32_t version;
+    uint32_t length;
+    uint32_t crc32;
+    uint32_t enctype;
+    uint32_t mi4size;
+    uint32_t plaintext;
+    uint32_t dsa_key[10];
+    uint32_t pad[109];
+    unsigned char type[4];
+    unsigned char model[4];
+};
+
+/* PPMI header structure */
+struct ppmi_header_t {
+    unsigned char magic[4];
+    uint32_t length;
+    uint32_t pad[126];
+};
+
+inline unsigned int le2int(unsigned char* buf)
+{
+   int32_t res = (buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8) | buf[0];
+
+   return res;
+}
+
+inline void int2le(unsigned int val, unsigned char* addr)
+{
+    addr[0] = val & 0xFF;
+    addr[1] = (val >> 8) & 0xff;
+    addr[2] = (val >> 16) & 0xff;
+    addr[3] = (val >> 24) & 0xff;
+}
+
+struct tea_key {
+  const char * name;
+  uint32_t     key[4];
+};
+
+#define NUM_KEYS 11
+struct tea_key tea_keytable[] = {
+  { "default" ,          { 0x20d36cc0, 0x10e8c07d, 0xc0e7dcaa, 0x107eb080 } },
+  { "sansa",             { 0xe494e96e, 0x3ee32966, 0x6f48512b, 0xa93fbb42 } },
+  { "sansa_gh",          { 0xd7b10538, 0xc662945b, 0x1b3fce68, 0xf389c0e6 } },
+  { "rhapsody",          { 0x7aa9c8dc, 0xbed0a82a, 0x16204cc7, 0x5904ef38 } },
+  { "p610",              { 0x950e83dc, 0xec4907f9, 0x023734b9, 0x10cfb7c7 } },
+  { "p640",              { 0x220c5f23, 0xd04df68e, 0x431b5e25, 0x4dcc1fa1 } },
+  { "virgin",            { 0xe83c29a1, 0x04862973, 0xa9b3f0d4, 0x38be2a9c } },
+  { "20gc_eng",          { 0x0240772c, 0x6f3329b5, 0x3ec9a6c5, 0xb0c9e493 } },
+  { "20gc_fre",          { 0xbede8817, 0xb23bfe4f, 0x80aa682d, 0xd13f598c } },
+  { "elio_p722",         { 0x6af3b9f8, 0x777483f5, 0xae8181cc, 0xfa6d8a84 } },
+  { "c200",              { 0xbf2d06fa, 0xf0e23d59, 0x29738132, 0xe2d04ca7 } },
+};
+
+/*
+
+tea_decrypt() from http://en.wikipedia.org/wiki/Tiny_Encryption_Algorithm
+
+"Following is an adaptation of the reference encryption and decryption
+routines in C, released into the public domain by David Wheeler and
+Roger Needham:"
+
+*/
+
+/* NOTE: The mi4 version of TEA uses a different initial value to sum compared
+         to the reference implementation and the main loop is 8 iterations, not
+         32.
+*/
+
+static void tea_decrypt(uint32_t* v0, uint32_t* v1, uint32_t* k) {
+    uint32_t sum=0xF1BBCDC8, i;                    /* set up */
+    uint32_t delta=0x9E3779B9;                     /* a key schedule constant */
+    uint32_t k0=k[0], k1=k[1], k2=k[2], k3=k[3];   /* cache key */
+    for(i=0; i<8; i++) {                               /* basic cycle start */
+        *v1 -= ((*v0<<4) + k2) ^ (*v0 + sum) ^ ((*v0>>5) + k3);
+        *v0 -= ((*v1<<4) + k0) ^ (*v1 + sum) ^ ((*v1>>5) + k1);
+        sum -= delta;                                   /* end cycle */
+    }
+}
+
+/* mi4 files are encrypted in 64-bit blocks (two little-endian 32-bit
+   integers) and the key is incremented after each block
+ */
+
+static void tea_decrypt_buf(unsigned char* src, unsigned char* dest, size_t n, uint32_t * key)
+{
+    uint32_t v0, v1;
+    unsigned int i;
+
+    for (i = 0; i < (n / 8); i++) {
+        v0 = le2int(src);
+        v1 = le2int(src+4);
+
+        tea_decrypt(&v0, &v1, key);
+
+        int2le(v0, dest);
+        int2le(v1, dest+4);
+
+        src += 8;
+        dest += 8;
+
+        /* Now increment the key */
+        key[0]++;
+        if (key[0]==0) {
+            key[1]++;
+            if (key[1]==0) {
+                key[2]++;
+                if (key[2]==0) {
+                    key[3]++;
+                }
+            }
+        }
+    }
+}
+
+static inline bool tea_test_key(unsigned char magic_enc[8], uint32_t * key, int unaligned)
+{
+    unsigned char magic_dec[8];
+    tea_decrypt_buf(magic_enc, magic_dec, 8, key);
+
+    return (le2int(&magic_dec[4*unaligned]) == 0xaa55aa55);
+}
+
+static int tea_find_key(struct mi4header_t *mi4header, int fd)
+{
+    int i, rc;
+    unsigned int j;
+    uint32_t key[4];
+    unsigned char magic_enc[8];
+    int key_found = -1;
+    unsigned int magic_location = mi4header->length-4;
+    int unaligned = 0;
+    
+    if ( (magic_location % 8) != 0 )
+    {
+        unaligned = 1;
+        magic_location -= 4;
+    }
+    
+    /* Load encrypted magic 0xaa55aa55 to check key */
+    lseek(fd, MI4_HEADER_SIZE + magic_location, SEEK_SET);
+    rc = read(fd, magic_enc, 8);
+    if(rc < 8 )
+        return EREAD_IMAGE_FAILED;
+
+    printf("Trying key:");
+
+    for (i=0; i < NUM_KEYS && (key_found<0) ; i++) {
+        key[0] = tea_keytable[i].key[0];
+        key[1] = tea_keytable[i].key[1];
+        key[2] = tea_keytable[i].key[2];
+        key[3] = tea_keytable[i].key[3];
+        
+        /* Now increment the key */
+        for(j=0; j<((magic_location-mi4header->plaintext)/8); j++){
+            key[0]++;
+            if (key[0]==0) {
+                key[1]++;
+                if (key[1]==0) {
+                    key[2]++;
+                    if (key[2]==0) {
+                        key[3]++;
+                    }
+                }
+            }
+        }
+        
+        if (tea_test_key(magic_enc,key,unaligned))
+        {
+            key_found = i;
+            printf("%s...found", tea_keytable[i].name);
+        } else {
+            printf("%s...failed", tea_keytable[i].name);
+        }
+    }
+    
+    return key_found;
+}
+        
 /*
  * CRC32 implementation taken from:
  *
@@ -122,40 +310,13 @@ unsigned char *loadbuffer = (unsigned char *)DRAM_START;
 /* Bootloader version */
 char version[] = APPSVERSION;
 
-/* Locations and sizes in hidden partition on Sansa */
-#define PPMI_SECTOR_OFFSET  1024
-#define PPMI_SECTORS        1
-#define MI4_HEADER_SECTORS  1
-#define MI4_HEADER_SIZE     0x200
-
-/* mi4 header structure */
-struct mi4header_t {
-    unsigned char magic[4];
-    uint32_t version;
-    uint32_t length;
-    uint32_t crc32;
-    uint32_t enctype;
-    uint32_t mi4size;
-    uint32_t plaintext;
-    uint32_t dsa_key[10];
-    uint32_t pad[109];
-    unsigned char type[4];
-    unsigned char model[4];
-};
-
-/* PPMI header structure */
-struct ppmi_header_t {
-    unsigned char magic[4];
-    uint32_t length;
-    uint32_t pad[126];
-};
-
 /* Load mi4 format firmware image */
 int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
 {
     int fd;
     struct mi4header_t mi4header;
     int rc;
+    unsigned int i;
     unsigned long sum;
     char filename[MAX_PATH];
 
@@ -170,10 +331,6 @@ int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
     }
 
     read(fd, &mi4header, MI4_HEADER_SIZE);
-
-    /* We don't support encrypted mi4 files yet */
-    if( (mi4header.plaintext + MI4_HEADER_SIZE) != mi4header.mi4size)
-        return EINVALID_FORMAT;
 
     /* MI4 file size */
     printf("mi4 size: %x", mi4header.mi4size);
@@ -190,20 +347,54 @@ int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
     /* Read binary type (RBOS, RBBL) */
     printf("Binary type: %.4s", mi4header.type);
 
-    /* Load firmware */
-    lseek(fd, MI4_HEADER_SIZE, SEEK_SET);
-    rc = read(fd, buf, mi4header.mi4size-MI4_HEADER_SIZE);
-    if(rc < (int)mi4header.mi4size-MI4_HEADER_SIZE)
-        return EREAD_IMAGE_FAILED;
-
-    /* Check CRC32 to see if we have a valid file */
-    sum = chksum_crc32 (buf,mi4header.mi4size-MI4_HEADER_SIZE);
-
-    printf("Calculated CRC32: %x", sum);
-
-    if(sum != mi4header.crc32)
-        return EBAD_CHKSUM;
+    /* Decrypt or calculate CRC */
+    if( (mi4header.plaintext + 0x200) != mi4header.mi4size)
+    {
+        /* Load encrypted firmware */
+        int key_index = tea_find_key(&mi4header, fd);
+        unsigned char encrypted_block[8];
+        unsigned int blocks_to_decrypt;
+        
+        if (key_index < 0)
+            return EINVALID_FORMAT;
+        
+        /* Load plaintext part */
+        lseek(fd, MI4_HEADER_SIZE, SEEK_SET);
+        rc = read(fd, buf, mi4header.plaintext );
+        if(rc < (int)mi4header.plaintext )
+            return EREAD_IMAGE_FAILED;
+        buf += mi4header.plaintext;
+        
+        /* Load encrypted part */
+        blocks_to_decrypt = (mi4header.mi4size-(mi4header.plaintext+MI4_HEADER_SIZE))/8;
+        for(i=0; i < blocks_to_decrypt; i++)
+        {
+            lseek(fd, MI4_HEADER_SIZE + mi4header.plaintext + i*8, SEEK_SET);
+            rc = read(fd, encrypted_block, 8);
+            if(rc < 8)
+                return EREAD_IMAGE_FAILED;
+                
+            tea_decrypt_buf(encrypted_block, buf, 8, tea_keytable[key_index].key);
+            buf += 8;
+        }
+        
+        printf("%s key used", tea_keytable[key_index].name);
+    } else {
+        /* Load plaintext firmware */
+        lseek(fd, MI4_HEADER_SIZE, SEEK_SET);
+        rc = read(fd, buf, mi4header.mi4size-MI4_HEADER_SIZE);
+        if(rc < (int)mi4header.mi4size-MI4_HEADER_SIZE)
+            return EREAD_IMAGE_FAILED;
+     
+        /* Check CRC32 to see if we have a valid file */
+        sum = chksum_crc32 (buf, mi4header.mi4size - MI4_HEADER_SIZE);
     
+        printf("Calculated CRC32: %x", sum);
+    
+        if(sum != mi4header.crc32)
+            return EBAD_CHKSUM;
+    }
+
     return EOK;
 }
 
@@ -378,7 +569,7 @@ void* main(void)
             return (void*)loadbuffer;
         }
         
-        error(EBOOTFILE, rc);
+        error(0, 0);
 
     } else {
         printf("Loading Rockbox...");
