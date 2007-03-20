@@ -27,6 +27,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdbool.h>
+#include <limits.h>
 
 #include "file.h" /* for write(), used in fprintf() */
 #include "sprintf.h" /* to allow the simulator magic */
@@ -75,6 +76,8 @@ static int format(
                 precision = 10*precision + ch - '0';
                 ch = *fmt++;
             }
+        } else {
+            precision = INT_MAX;
         }
 
         str = tmpbuf + sizeof tmpbuf - 1;
@@ -86,8 +89,6 @@ static int format(
 
         case 's':
             str = va_arg (ap, char*);
-            if(precision > 0)
-                str[precision] = '\0';
             break;
 
         case 'd':
@@ -160,7 +161,7 @@ static int format(
         while (width-- > 0 && ok)
             ok=push(userp, pad);
         }
-        while (*str != '\0' && ok)
+        while (*str != '\0' && ok && precision--)
                 ok=push(userp, *str++);
     }
     else
