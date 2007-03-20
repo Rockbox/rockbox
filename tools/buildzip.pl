@@ -132,7 +132,7 @@ sub buildzip {
 
     my ($bitmap, $depth, $swcodec) = &gettargetinfo();
 
-    print "Bitmap: $bitmap\nDepth: $depth\nSwcodec: $swcodec\n";
+    # print "Bitmap: $bitmap\nDepth: $depth\nSwcodec: $swcodec\n";
 
     # remove old traces
     `rm -rf .rockbox`;
