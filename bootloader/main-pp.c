@@ -176,9 +176,9 @@ int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
         return EINVALID_FORMAT;
 
     /* MI4 file size */
-    printf("mi4 size: %x", mi4header.length);
+    printf("mi4 size: %x", mi4header.mi4size);
 
-    if (mi4header.length > buffer_size)
+    if ((mi4header.mi4size-MI4_HEADER_SIZE) > buffer_size)
         return EFILE_TOO_BIG;
 
     /* CRC32 */
@@ -230,13 +230,13 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo, unsigned int buffe
                        + (ppmi_header.length/512), MI4_HEADER_SECTORS, &mi4header);
     
     /* We don't support encrypted mi4 files yet */
-    if( (mi4header.plaintext + MI4_HEADER_SIZE) != mi4header.mi4size)
+    if( (mi4header.plaintext) != (mi4header.mi4size-MI4_HEADER_SIZE))
         return EINVALID_FORMAT;
 
     /* MI4 file size */
-    printf("OF mi4 size: %x", mi4header.length);
+    printf("OF mi4 size: %x", mi4header.mi4size);
 
-    if (mi4header.length > buffer_size)
+    if ((mi4header.mi4size-MI4_HEADER_SIZE) > buffer_size)
         return EFILE_TOO_BIG;
 
     /* CRC32 */
@@ -251,7 +251,7 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo, unsigned int buffe
     /* Load firmware */
     ata_read_sectors(pinfo->start + PPMI_SECTOR_OFFSET + PPMI_SECTORS
                         + (ppmi_header.length/512) + MI4_HEADER_SECTORS,
-                        (mi4header.length-MI4_HEADER_SIZE)/512, buf);
+                        (mi4header.mi4size-MI4_HEADER_SIZE)/512, buf);
 
     /* Check CRC32 to see if we have a valid file */
     sum = chksum_crc32 (buf,mi4header.mi4size-MI4_HEADER_SIZE);
