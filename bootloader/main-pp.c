@@ -220,6 +220,9 @@ static int tea_find_key(struct mi4header_t *mi4header, int fd)
 }
         
 /*
+ * We can't use the CRC32 implementation in the firmware library as it uses a
+ * different polynomial. The polynomial needed is 0xEDB88320L
+ *
  * CRC32 implementation taken from:
  *
  * efone - Distributed internet phone system.
@@ -316,7 +319,6 @@ int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
     int fd;
     struct mi4header_t mi4header;
     int rc;
-    unsigned int i;
     unsigned long sum;
     char filename[MAX_PATH];
 
@@ -347,52 +349,43 @@ int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
     /* Read binary type (RBOS, RBBL) */
     printf("Binary type: %.4s", mi4header.type);
 
-    /* Decrypt or calculate CRC */
-    if( (mi4header.plaintext + 0x200) != mi4header.mi4size)
+    /* Load firmware file */
+    lseek(fd, MI4_HEADER_SIZE, SEEK_SET);
+    rc = read(fd, buf, mi4header.mi4size-MI4_HEADER_SIZE);
+    if(rc < (int)mi4header.mi4size-MI4_HEADER_SIZE)
+        return EREAD_IMAGE_FAILED;
+ 
+    /* Check CRC32 to see if we have a valid file */
+    sum = chksum_crc32 (buf, mi4header.mi4size - MI4_HEADER_SIZE);
+
+    printf("Calculated CRC32: %x", sum);
+
+    if(sum != mi4header.crc32)
+        return EBAD_CHKSUM;
+        
+    if( (mi4header.plaintext + MI4_HEADER_SIZE) != mi4header.mi4size)
     {
         /* Load encrypted firmware */
         int key_index = tea_find_key(&mi4header, fd);
-        unsigned char encrypted_block[8];
-        unsigned int blocks_to_decrypt;
         
         if (key_index < 0)
             return EINVALID_FORMAT;
         
-        /* Load plaintext part */
-        lseek(fd, MI4_HEADER_SIZE, SEEK_SET);
-        rc = read(fd, buf, mi4header.plaintext );
-        if(rc < (int)mi4header.plaintext )
-            return EREAD_IMAGE_FAILED;
+        /* Plaintext part is already loaded */
         buf += mi4header.plaintext;
         
-        /* Load encrypted part */
-        blocks_to_decrypt = (mi4header.mi4size-(mi4header.plaintext+MI4_HEADER_SIZE))/8;
-        for(i=0; i < blocks_to_decrypt; i++)
-        {
-            lseek(fd, MI4_HEADER_SIZE + mi4header.plaintext + i*8, SEEK_SET);
-            rc = read(fd, encrypted_block, 8);
-            if(rc < 8)
-                return EREAD_IMAGE_FAILED;
-                
-            tea_decrypt_buf(encrypted_block, buf, 8, tea_keytable[key_index].key);
-            buf += 8;
-        }
-        
+        /* Decrypt in-place */
+        tea_decrypt_buf(buf, buf, 
+                        mi4header.mi4size-(mi4header.plaintext+MI4_HEADER_SIZE),
+                        tea_keytable[key_index].key);
+
         printf("%s key used", tea_keytable[key_index].name);
-    } else {
-        /* Load plaintext firmware */
-        lseek(fd, MI4_HEADER_SIZE, SEEK_SET);
-        rc = read(fd, buf, mi4header.mi4size-MI4_HEADER_SIZE);
-        if(rc < (int)mi4header.mi4size-MI4_HEADER_SIZE)
+        
+        /* Check decryption was successfull */
+        if(le2int(&buf[mi4header.length-4]) != 0xaa55aa55)
+        {
             return EREAD_IMAGE_FAILED;
-     
-        /* Check CRC32 to see if we have a valid file */
-        sum = chksum_crc32 (buf, mi4header.mi4size - MI4_HEADER_SIZE);
-    
-        printf("Calculated CRC32: %x", sum);
-    
-        if(sum != mi4header.crc32)
-            return EBAD_CHKSUM;
+        }
     }
 
     return EOK;
