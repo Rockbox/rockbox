@@ -23,6 +23,7 @@
 #include "config.h"
 #include "lcd.h"
 #include "system.h"
+#include <string.h>
 
 #define LCD_DATA_IN_GPIO GPIOB_INPUT_VAL
 #define LCD_DATA_IN_PIN 6
@@ -47,6 +48,11 @@
 #define LCD_REG_8 (*(volatile unsigned long *)(0xc2000020))
 #define LCD_REG_9 (*(volatile unsigned long *)(0xc2000024))
 #define LCD_FB_BASE_REG (*(volatile unsigned long *)(0xc2000028))
+
+/* We don't know how to receive a DMA finished signal from the LCD controller
+ * To avoid problems with flickering, we double-buffer the framebuffer and turn
+ * off DMA while updates are taking place */
+fb_data lcd_driver_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH];
 
 static inline void lcd_init_gpio(void)
 {
@@ -133,6 +139,10 @@ inline void lcd_init_device(void)
 {
 /* All this is magic worked out by MrH */
 
+/* Stop any DMA which is in progress */
+    LCD_REG_6 &= ~1;
+    udelay(100000);
+
 /* Init GPIO ports */
     lcd_init_gpio();
 /* Controller init */
@@ -179,7 +189,7 @@ inline void lcd_init_device(void)
     LCD_REG_6 |= (1 << 4);
 
     LCD_REG_5 &= ~(1 << 7);
-    LCD_FB_BASE_REG = phys_fb_address((unsigned long)lcd_framebuffer);
+    LCD_FB_BASE_REG = phys_fb_address((unsigned long)lcd_driver_framebuffer);
 
     udelay(100000);
 
@@ -247,20 +257,40 @@ inline void lcd_init_device(void)
     lcd_send_msg(0x70, 34);
 }
 
-inline void lcd_update(void)
-{
-    cache_flush();
-    if(!(LCD_REG_6 & 1))
-        LCD_REG_6 |= 1;
-}
-
 inline void lcd_update_rect(int x, int y, int width, int height)
 {
-    (void) x;
-    (void) y;
-    (void) width;
-    (void) height;
-    lcd_update();
+    (void)x;
+    (void)width;
+    /* Turn off DMA and wait for the transfer to complete */
+    /* TODO: Work out the proper delay */
+    LCD_REG_6 &= ~1;
+    udelay(1000);
+
+    /* Copy the Rockbox framebuffer to the second framebuffer */
+    /* TODO: Move the second framebuffer into uncached SDRAM */
+    memcpy(((char*)&lcd_driver_framebuffer)+(y * sizeof(fb_data) * LCD_WIDTH),
+           ((char *)&lcd_framebuffer)+(y * sizeof(fb_data) * LCD_WIDTH),
+           ((height * sizeof(fb_data) * LCD_WIDTH)));
+    cache_flush();
+
+    /* Restart DMA */
+    LCD_REG_6 |= 1;
+}
+
+inline void lcd_update(void)
+{
+    /* TODO: It may be faster to swap the addresses of lcd_driver_framebuffer
+     * and lcd_framebuffer */
+    /* Turn off DMA and wait for the transfer to complete */
+    LCD_REG_6 &= ~1;
+    udelay(1000);
+
+    /* Copy the Rockbox framebuffer to the second framebuffer */
+    memcpy(lcd_driver_framebuffer, lcd_framebuffer, sizeof(fb_data) * LCD_WIDTH * LCD_HEIGHT);
+    cache_flush();
+
+    /* Restart DMA */
+    LCD_REG_6 |= 1;
 }
 
 
