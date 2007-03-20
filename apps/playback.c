@@ -3737,7 +3737,6 @@ void audio_init(void)
        hardware is initialized - audio thread unlocks it after final init
        stage */
     mutex_lock(&mutex_codecthread);
-    queue_init(&voice_queue, true);
 #endif
     queue_init(&audio_queue, true);
     queue_enable_queue_send(&audio_queue, &audio_queue_sender_list);
@@ -3812,6 +3811,7 @@ void audio_init(void)
     if (talk_voice_required())
     {
         logf("Starting voice codec");
+        queue_init(&voice_queue, true);
         create_thread(voice_thread, voice_stack,
                 sizeof(voice_stack), voice_thread_name 
                 IF_PRIO(, PRIORITY_PLAYBACK) IF_COP(, CPU, false));
