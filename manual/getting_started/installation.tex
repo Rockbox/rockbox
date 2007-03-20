@@ -197,6 +197,9 @@ functional, but not perfect!
   \setting{Settings $\rightarrow$ USB Mode} to \setting{MSC} from within the
   original firmware. Never extract files to your \dap{} while it is in
   recovery mode.}}
+\opt{h10,h10_5gb}{\warn{The following steps require you to use UMS mode and so
+  may require use of the UMS trick as described in the bootloader installation
+  section.}}
 After downloading the Rockbox package connect your \dap{} to the computer via
 USB as described in the manual that came with your \dap{}. Take the file that
 you downloaded above, and extract its contents to your \daps{} drive.
@@ -295,11 +298,11 @@ The new build will be installed over your current build.
 }
 
 \opt{h10,h10_5gb}{
-  Next, put the \opt{h10}{\fname{H10\_20GC.mi4}}\opt{h10_5gb}{\fname{H10.mi4}}
-  file backed up in the installation phase back into the \fname{System}
-  directory on your \playertype{}, replacing the file that is there already. As
-  in the installation, it may be necessary to first put your device into UMS
-  mode.
+  Next, delete the 
+  \opt{h10}{\fname{H10\_20GC.mi4}}\opt{h10_5gb}{\fname{H10.mi4}} file and rename
+  \fname{OF.mi4} to \opt{h10}{\fname{H10\_20GC.mi4}}\opt{h10_5gb}{\fname{H10.mi4}}
+  in the \fname{System} directory on your \playertype{}. As in the installation,
+  it may be necessary to first put your device into UMS mode.
 }
 
 \opt{e200}{
