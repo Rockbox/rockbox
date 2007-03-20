@@ -262,7 +262,7 @@ bool wxThemesPage::TransferDataFromWindow()
 {
     gv->themesToInstall.Clear();
 
-    for(int i=0; i < m_installTheme.GetCount(); i++)
+    for(unsigned int i=0; i < m_installTheme.GetCount(); i++)
     {
         if(m_installTheme[i])
         {
@@ -496,6 +496,7 @@ wxWizardPage* wxIpodLocationPage::GetPrev() const
             return wxWizardPageSimple::GetPrev()->GetPrev();
 
     }
+    return wxWizardPageSimple::GetPrev();
 }
 
 void wxIpodLocationPage::OnWizardPageChanging(wxWizardEvent& event)

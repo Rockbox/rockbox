@@ -360,7 +360,8 @@ bool h10(int mode)
      }
 
   }
-
+  // shouldn't get here
+  return false;
 }
 
 // FWPatcher

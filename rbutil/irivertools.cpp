@@ -415,8 +415,6 @@ int iriver_encode(wxString infile_name, wxString outfile_name, unsigned int modi
     unsigned char * pChecksums, * ppChecksums;
     unsigned char ck;
 
-    enum striptype stripmode = STRIP_NONE;
-
     if(!infile.Open(infile_name,wxFile::read))
     {
         err.Printf(wxT("Could not open: %s"),infile_name.c_str());
@@ -545,7 +543,6 @@ bool PatchFirmware(wxString firmware,wxString bootloader,int series, int table_e
     wxString name1, name2, name3;
 
     char md5sum_str[32];
-    int i;
     struct sumpairs *sums;
     int origin;
 

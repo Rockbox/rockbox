@@ -388,7 +388,6 @@ int UnzipFile(wxString src, wxString destdir, bool isInstall)
 
 int Uninstall(const wxString dir, bool isFullUninstall) {
     wxString buf, uninst;
-    bool gooddata = false;
     unsigned int i;
     bool errflag = false;
     InstallLog *log = NULL;
@@ -516,7 +515,7 @@ int Uninstall(const wxString dir, bool isFullUninstall) {
                     wxRemoveFile(*buf2);
                 }
 
-                if ( rc = ! wxRmdir(buf) )
+                if ( (rc = ! wxRmdir(buf)) )
                 {
                     buf = buf.Format(wxT("Can't remove directory %s"),
                         buf.c_str());
@@ -525,7 +524,7 @@ int Uninstall(const wxString dir, bool isFullUninstall) {
                 }
             } else if (wxFileExists(buf) )
             {
-                if ( rc = ! wxRemoveFile(buf) )
+                if ( (rc = ! wxRemoveFile(buf)) )
                 {
                     buf = buf.Format(wxT("Can't delete file %s"),
                         buf.c_str());
@@ -725,14 +724,14 @@ bool rm_rf(wxString file)
 
             if (wxDirExists(selected[i]) )
             {
-                if (rc = ! wxRmdir(selected[i]) )
+                if ((rc = ! wxRmdir(selected[i])) )
                 {
                     buf.Printf(wxT("Can't remove directory %s"),
                         selected[i].c_str());
                     errflag = true;
                     WARN_DIALOG(buf.c_str(), wxT("Erase files"));
                 }
-            } else if (rc = ! wxRemoveFile(selected[i]) )
+            } else if ((rc = ! wxRemoveFile(selected[i])) )
             {
                 buf.Printf(wxT("Error deleting file %s"), selected[i].c_str() );
                 errflag = true;

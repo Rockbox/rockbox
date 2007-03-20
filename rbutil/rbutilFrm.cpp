@@ -743,7 +743,7 @@ void rbutilFrm::OnThemesBtn(wxCommandEvent& event)
     if (wizard->RunWizard(page1) )
     {
         bool success=true;
-        for(int i=0 ;i < gv->themesToInstall.GetCount();i++)
+        for(unsigned int i=0 ;i < gv->themesToInstall.GetCount();i++)
         {
             if(!InstallTheme(gv->themesToInstall[i]))
             {
@@ -811,7 +811,6 @@ void rbutilFrm::OnPortableInstall(wxCommandEvent& event)
     wxString src, dest, buf;
     wxLogVerbose(wxT("=== begin rbutilFrm::OnPortableInstall(event)"));
     wxFileSystem fs;
-    wxFileConfig* buildinfo;
     wxDateSpan oneday;
 
     wxWizard *wizard = new wxWizard(this, wxID_ANY,
