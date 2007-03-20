@@ -105,6 +105,16 @@ static int format(
             *--str = '-';
             break;
 
+        case 'u':
+            val = va_arg(ap, unsigned int);
+            do
+            {
+            *--str = (val % 10) + '0';
+            val /= 10;
+            }
+            while (val > 0);
+            break;
+
         case 'x':
         case 'X':
             uval = va_arg (ap, int);
@@ -141,6 +151,16 @@ static int format(
                     while (lval > 0);
                     if (lsign < 0)
                         *--str = '-';
+                    break;
+
+                case 'u':
+                    lval = va_arg(ap, unsigned long);
+                    do
+                    {
+                        *--str = (lval % 10) + '0';
+                        lval /= 10;
+                    }
+                    while (lval > 0);
                     break;
 
                 default:
