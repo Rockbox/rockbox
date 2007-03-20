@@ -52,7 +52,7 @@
 /* We don't know how to receive a DMA finished signal from the LCD controller
  * To avoid problems with flickering, we double-buffer the framebuffer and turn
  * off DMA while updates are taking place */
-fb_data lcd_driver_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH];
+static fb_data lcd_driver_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH];
 
 static inline void lcd_init_gpio(void)
 {
