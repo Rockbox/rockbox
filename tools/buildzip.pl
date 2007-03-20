@@ -336,7 +336,7 @@ sub runone {
 
     if($target && ($fonts != 1)) {
         # On some targets, rockbox.* is inside .rockbox
-        if($target !=~ /mod|ajz|wma/i) {
+        if($target !~ /(mod|ajz|wma)\z/i) {
             `cp $target .rockbox/$target`;
             $target = ".rockbox/".$target;
         }
