@@ -39,10 +39,11 @@
 #define NUM_PARTITIONS      2
 
 #else
-#define MI4_HEADER_SIZE     0x200
 #define NUM_PARTITIONS      1
 
 #endif
+
+#define MI4_HEADER_SIZE     0x200
 
 /* mi4 header structure */
 struct mi4header_t {
