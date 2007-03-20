@@ -106,13 +106,13 @@ static int format(
             break;
 
         case 'u':
-            val = va_arg(ap, unsigned int);
+            uval = va_arg(ap, unsigned int);
             do
             {
-            *--str = (val % 10) + '0';
-            val /= 10;
+            *--str = (uval % 10) + '0';
+            uval /= 10;
             }
-            while (val > 0);
+            while (uval > 0);
             break;
 
         case 'x':
@@ -154,13 +154,13 @@ static int format(
                     break;
 
                 case 'u':
-                    lval = va_arg(ap, unsigned long);
+                    ulval = va_arg(ap, unsigned long);
                     do
                     {
-                        *--str = (lval % 10) + '0';
-                        lval /= 10;
+                        *--str = (ulval % 10) + '0';
+                        ulval /= 10;
                     }
-                    while (lval > 0);
+                    while (ulval > 0);
                     break;
 
                 default:
