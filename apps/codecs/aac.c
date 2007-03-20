@@ -200,7 +200,7 @@ next_track:
     err = CODEC_OK;
 
 done:
-    LOGF("AAC: Decoded %d samples, %d frames\n", sound_samples_done);
+    LOGF("AAC: Decoded %lu samples\n", sound_samples_done);
 
     if (ci->request_next_track())
         goto next_track;

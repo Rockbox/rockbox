@@ -796,7 +796,7 @@ static inline void pcmrec_write_chunk(void)
     }
     else if (errors == 0)
     {
-        logf("wr chk enc error %d %d",
+        logf("wr chk enc error %lu %lu",
              rec_fdata.chunk->enc_size, rec_fdata.chunk->num_pcm);
         errors |= PCMREC_E_ENCODER;
     }
@@ -1680,7 +1680,7 @@ void enc_set_parameters(struct enc_parameters *params)
     }
 
     enc_sample_rate = params->enc_sample_rate;
-    logf("enc sampr:%d", enc_sample_rate);
+    logf("enc sampr:%lu", enc_sample_rate);
 
     SET_PCM_POS(pcm_rd_pos, dma_wr_pos);
     pcm_enc_pos = pcm_rd_pos;
@@ -1691,7 +1691,7 @@ void enc_set_parameters(struct enc_parameters *params)
                 ALIGN_UP_P2(ENC_CHUNK_HDR_SIZE + params->chunk_size, 2);
     enc_events_callback = params->events_callback;
 
-    logf("chunk size:%d", enc_chunk_size);
+    logf("chunk size:%lu", enc_chunk_size);
 
     /*** Configure the buffers ***/
 
@@ -1702,7 +1702,7 @@ void enc_set_parameters(struct enc_parameters *params)
      * |[[s4]:Reserved Bytes]|Filename Queue->|[space]|
      */
     resbytes = ALIGN_UP_P2(params->reserve_bytes, 2);
-    logf("resbytes:%d", resbytes);
+    logf("resbytes:%lu", resbytes);
 
     bufsize   = rec_buffer_size - (enc_buffer - pcm_buffer) -
                 resbytes - FNQ_MIN_NUM_PATHS*MAX_PATH
@@ -1716,7 +1716,7 @@ void enc_set_parameters(struct enc_parameters *params)
         
     /* get real amount used by encoder chunks */
     bufsize = enc_num_chunks*enc_chunk_size;
-    logf("enc size:%d", bufsize);
+    logf("enc size:%lu", bufsize);
 
 #ifdef PCMREC_PARANOID
     /* add magic at wraparound */
@@ -1747,19 +1747,19 @@ void enc_set_parameters(struct enc_parameters *params)
     if (fnq_size > FNQ_MAX_NUM_PATHS)
         fnq_size = FNQ_MAX_NUM_PATHS;
     fnq_size  *= MAX_PATH;
-    logf("fnq files: %d", fnq_size / MAX_PATH);
+    logf("fnq files:%ld", fnq_size / MAX_PATH);
 
-#if 0
-    logf("ab :%08X", (unsigned long)audiobuf);
-    logf("pcm:%08X", (unsigned long)pcm_buffer);
-    logf("enc:%08X", (unsigned long)enc_buffer);
-    logf("res:%08X", (unsigned long)params->reserve_buffer);
+#if 1
+    logf("ab :%08lX", (uintptr_t)audiobuf);
+    logf("pcm:%08lX", (uintptr_t)pcm_buffer);
+    logf("enc:%08lX", (uintptr_t)enc_buffer);
+    logf("res:%08lX", (uintptr_t)params->reserve_buffer);
 #ifdef PCMREC_PARANOID
-    logf("wip:%08X", (unsigned long)wrap_id_p);
+    logf("wip:%08lX", (uintptr_t)wrap_id_p);
 #endif
-    logf("fnq:%08X", (unsigned long)fn_queue);
-    logf("end:%08X", (unsigned long)fn_queue + fnq_size);
-    logf("abe:%08X", (unsigned long)audiobufend);
+    logf("fnq:%08lX", (uintptr_t)fn_queue);
+    logf("end:%08lX", (uintptr_t)fn_queue + fnq_size);
+    logf("abe:%08lX", (uintptr_t)audiobufend);
 #endif
 
     /* init all chunk headers and reset indexes */

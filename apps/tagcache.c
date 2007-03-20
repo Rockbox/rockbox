@@ -2395,7 +2395,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 {
                     logf("too long entry!");
                     logf("length=%d", entry.tag_length[index_type]);
-                    logf("pos=0x%02x", lseek(tmpfd, 0, SEEK_CUR));
+                    logf("pos=0x%02lx", lseek(tmpfd, 0, SEEK_CUR));
                     error = true;
                     break ;
                 }
@@ -2429,7 +2429,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 idxbuf[j].tag_seek[index_type] = tempbuf_find_location(i + j);
                 if (idxbuf[j].tag_seek[index_type] < 0)
                 {
-                    logf("entry not found (%d)");
+                    logf("entry not found (%d)", j);
                     error = true;
                     break ;
                 }
@@ -3496,7 +3496,7 @@ static bool load_tagcache(void)
                 logf("read error #13");
                 logf("rc=0x%04x", rc); // 0x431
                 logf("len=0x%04x", fe->tag_length); // 0x4000
-                logf("pos=0x%04x", lseek(fd, 0, SEEK_CUR)); // 0x433
+                logf("pos=0x%04lx", lseek(fd, 0, SEEK_CUR)); // 0x433
                 logf("tag=0x%02x", tag); // 0x00
                 close(fd);
                 return false;

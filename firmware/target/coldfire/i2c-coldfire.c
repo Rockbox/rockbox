@@ -169,7 +169,7 @@ int i2c_start(volatile unsigned char *iface)
         ;
     if (!j)
     {
-        logf("i2c: bus is busy (iface=%08x)", iface);
+        logf("i2c: bus is busy (iface=%08lX)", (uintptr_t)iface);
         return -1;
     }
  
@@ -190,7 +190,7 @@ int i2c_wait_for_slave(volatile unsigned char *iface)
         ;
     if (!j)
     {
-        logf("i2c: IFF not set (iface=%08x)", iface);
+        logf("i2c: IFF not set (iface=%08lX)", (uintptr_t)iface);
         i2c_stop(iface); 
         return -2;
     }
@@ -218,7 +218,7 @@ int i2c_outb(volatile unsigned char *iface, unsigned char byte)
     /* Check that transfer is complete */
     if ( !(iface[O_MBSR] & ICF))
     {
-        logf("i2c: transfer error (iface=%08x)", iface);
+        logf("i2c: transfer error (iface=%08lX)", (uintptr_t)iface);
         i2c_stop(iface); 
         return -3;
     }
@@ -226,7 +226,7 @@ int i2c_outb(volatile unsigned char *iface, unsigned char byte)
     /* Check that the byte has been ACKed */
     if (iface[O_MBSR] & RXAK)
     {
-        logf("i2c: no ACK (iface=%08x)", iface);
+        logf("i2c: no ACK (iface=%08lX)", (uintptr_t)iface);
         i2c_stop(iface); 
         return -4;
     }

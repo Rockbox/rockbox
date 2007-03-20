@@ -40,11 +40,12 @@ void m5636_dump_regs(void)
          address < (unsigned short *)(M5636_BASE + 0x100);
          address++)
     {
-         logf("m5636 A:%08x D:%04x", address, (unsigned)*address);
+         logf("m5636 A:%08lX D:%04lX", (uintptr_t)address,
+              (uintptr_t)*address);
     }
 
-    logf("GPIO_INT_EN    %08x", GPIO_INT_EN);
-    logf("GPIO1_OUT      %08x", GPIO1_OUT);
-    logf("GPIO1_ENABLE   %08x", GPIO1_ENABLE);
-    logf("GPIO1_FUNCTION %08x", GPIO1_FUNCTION);
+    logf("GPIO_INT_EN    %08lX", GPIO_INT_EN);
+    logf("GPIO1_OUT      %08lX", GPIO1_OUT);
+    logf("GPIO1_ENABLE   %08lX", GPIO1_ENABLE);
+    logf("GPIO1_FUNCTION %08lX", GPIO1_FUNCTION);
 }
