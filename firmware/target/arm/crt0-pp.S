@@ -54,7 +54,7 @@ start:
 
     b      pad_skip
 
-.space 60*4 /* (more than enough) space for exception vectors and mi4 magic */
+.space 50*4 /* (more than enough) space for exception vectors */
 
 pad_skip:
 #ifdef SANSA_E200
