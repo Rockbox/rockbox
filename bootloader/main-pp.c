@@ -32,10 +32,17 @@
 #include <string.h>
 
 /* Locations and sizes in hidden partition on Sansa */
+#ifdef SANSA_E200
 #define PPMI_SECTOR_OFFSET  1024
 #define PPMI_SECTORS        1
 #define MI4_HEADER_SECTORS  1
+#define NUM_PARTITIONS      2
+
+#else
 #define MI4_HEADER_SIZE     0x200
+#define NUM_PARTITIONS      1
+
+#endif
 
 /* mi4 header structure */
 struct mi4header_t {
@@ -185,7 +192,7 @@ static int tea_find_key(struct mi4header_t *mi4header, int fd)
     if(rc < 8 )
         return EREAD_IMAGE_FAILED;
 
-    printf("Trying key:");
+    printf("Searching for key:");
 
     for (i=0; i < NUM_KEYS && (key_found<0) ; i++) {
         key[0] = tea_keytable[i].key[0];
@@ -212,7 +219,7 @@ static int tea_find_key(struct mi4header_t *mi4header, int fd)
             key_found = i;
             printf("%s...found", tea_keytable[i].name);
         } else {
-            printf("%s...failed", tea_keytable[i].name);
+           /* printf("%s...failed", tea_keytable[i].name); */
         }
     }
     
@@ -382,7 +389,7 @@ int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
         printf("%s key used", tea_keytable[key_index].name);
         
         /* Check decryption was successfull */
-        if(le2int(&buf[mi4header.length-4]) != 0xaa55aa55)
+        if(le2int(&buf[mi4header.length-mi4header.plaintext-4]) != 0xaa55aa55)
         {
             return EREAD_IMAGE_FAILED;
         }
@@ -508,7 +515,7 @@ void* main(void)
 
     /* Just list the first 2 partitions since we don't have any devices yet 
        that have more than that */
-    for(i=0; i<2; i++)
+    for(i=0; i<NUM_PARTITIONS; i++)
     {
         pinfo = disk_partinfo(i);
         printf("Partition %d: 0x%02x %ld MB",
