@@ -57,18 +57,13 @@ struct event
 };
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
-struct queue_sender
-{
-    struct thread_entry *thread;
-    intptr_t             retval;
-};
-
 struct queue_sender_list
 {
     /* If non-NULL, there is a thread waiting for the corresponding event */
-    struct queue_sender *senders[QUEUE_LENGTH];
+    /* Must be statically allocated to put in non-cached ram. */
+    struct thread_entry *senders[QUEUE_LENGTH];
     /* Send info for last message dequeued or NULL if replied or not sent */
-    struct queue_sender *curr_sender;
+    struct thread_entry *curr_sender;
 };
 #endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
 

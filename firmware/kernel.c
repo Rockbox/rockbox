@@ -101,24 +101,24 @@ static void queue_fetch_sender(struct queue_sender_list *send,
                                unsigned int i)
 {
     int old_level = set_irq_level(HIGHEST_IRQ_LEVEL);
-    struct queue_sender **spp = &send->senders[i];
+    struct thread_entry **spp = &send->senders[i];
 
-    if(*spp)
+    if (*spp)
     {
         send->curr_sender = *spp;
         *spp = NULL;
     }
-
+    
     set_irq_level(old_level);
 }
 
 /* Puts the specified return value in the waiting thread's return value
    and wakes the thread  - a sender should be confirmed to exist first */
-static void queue_release_sender(struct queue_sender **sender,
+static void queue_release_sender(struct thread_entry **sender,
                                  intptr_t retval)
 {
     (*sender)->retval = retval;
-    wakeup_thread(&(*sender)->thread);
+    wakeup_thread(sender);
     *sender = NULL;
 }
 
@@ -131,8 +131,9 @@ static void queue_release_all_senders(struct event_queue *q)
         unsigned int i;
         for(i = q->read; i != q->write; i++)
         {
-            struct queue_sender **spp =
+            struct thread_entry **spp =
                 &q->send->senders[i & QUEUE_LENGTH_MASK];
+
             if(*spp)
             {
                 queue_release_sender(spp, 0);
@@ -207,10 +208,10 @@ void queue_wait(struct event_queue *q, struct event *ev)
 {
     unsigned int rd;
 
-    if(q->read == q->write)
+    if (q->read == q->write)
     {
         block_thread(&q->thread);
-    }
+    } 
 
     rd = q->read++ & QUEUE_LENGTH_MASK;
     *ev = q->events[rd];
@@ -226,12 +227,12 @@ void queue_wait(struct event_queue *q, struct event *ev)
 
 void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks)
 {
-    if(q->read == q->write && ticks > 0)
+    if (q->read == q->write && ticks > 0)
     {
         block_thread_w_tmo(&q->thread, ticks);
     }
 
-    if(q->read != q->write)
+    if (q->read != q->write)
     {
         unsigned int rd = q->read++ & QUEUE_LENGTH_MASK;
         *ev = q->events[rd];
@@ -261,9 +262,9 @@ void queue_post(struct event_queue *q, long id, intptr_t data)
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     if(q->send)
     {
-        struct queue_sender **spp = &q->send->senders[wr];
+        struct thread_entry **spp = &q->send->senders[wr];
 
-        if(*spp)
+        if (*spp)
         {
             /* overflow protect - unblock any thread waiting at this index */
             queue_release_sender(spp, 0);
@@ -280,32 +281,28 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
 {
     int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
     unsigned int wr = q->write++ & QUEUE_LENGTH_MASK;
-
     q->events[wr].id   = id;
     q->events[wr].data = data;
-
+    
     if(q->send)
     {
-        struct queue_sender **spp = &q->send->senders[wr];
-        struct queue_sender sender;
+        struct thread_entry **spp = &q->send->senders[wr];
 
-        if(*spp)
+        if (*spp)
         {
             /* overflow protect - unblock any thread waiting at this index */
             queue_release_sender(spp, 0);
         }
 
-        *spp = &sender;
-        sender.thread = NULL;
-
         wakeup_thread(&q->thread);
-        set_irq_level_and_block_thread(&sender.thread, oldlevel);
-        return sender.retval;
+        set_irq_level_and_block_thread(spp, oldlevel);
+        return thread_get_current()->retval;
     }
 
     /* Function as queue_post if sending is not enabled */
     wakeup_thread(&q->thread);
     set_irq_level(oldlevel);
+    
     return 0;
 }
 
@@ -350,7 +347,7 @@ void queue_clear(struct event_queue* q)
 void queue_remove_from_head(struct event_queue *q, long id)
 {
     int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-    
+
     while(q->read != q->write)
     {
         unsigned int rd = q->read & QUEUE_LENGTH_MASK;
@@ -363,9 +360,9 @@ void queue_remove_from_head(struct event_queue *q, long id)
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
         if(q->send)
         {
-            struct queue_sender **spp = &q->send->senders[rd];
+            struct thread_entry **spp = &q->send->senders[rd];
 
-            if(*spp)
+            if (*spp)
             {
                 /* Release any thread waiting on this message */
                 queue_release_sender(spp, 0);
@@ -401,14 +398,14 @@ int queue_count(const struct event_queue *q)
 
 int queue_broadcast(long id, intptr_t data)
 {
-   int i;
-
-   for(i = 0;i < num_queues;i++)
-   {
-      queue_post(all_queues[i], id, data);
-   }
+    int i;
+    
+    for(i = 0;i < num_queues;i++)
+    {
+        queue_post(all_queues[i], id, data);
+    }
    
-   return num_queues;
+    return num_queues;
 }
 
 /****************************************************************************
@@ -610,7 +607,7 @@ void tick_start(unsigned int interval_in_ms)
 }
 
 void timer4(void) {
-	int i;
+    int i;
     /* Run through the list of tick tasks */
     for(i = 0; i < MAX_NUM_TICK_TASKS; i++)
     {
@@ -680,44 +677,6 @@ void mutex_init(struct mutex *m)
     m->locked = false;
     m->thread = NULL;
 }
-
-/* PortalPlayer chips have 2 cores, therefore need atomic mutexes 
- * Just use it for ARM, Coldfire and whatever else well...why not?
- */
-
-/* Macros generate better code than an inline function is this case */
-#if defined (CPU_PP) || defined (CPU_ARM)
-#define test_and_set(x_, v_) \
-({ \
-    uint32_t old; \
-    asm volatile ( \
-        "swpb %[old], %[v], [%[x]] \r\n" \
-        : [old]"=r"(old) \
-        : [v]"r"((uint32_t)v_), [x]"r"((uint32_t *)x_) \
-    ); \
-    old; \
-    })
-#elif defined (CPU_COLDFIRE)
-#define test_and_set(x_, v_) \
-({ \
-    uint8_t old; \
-    asm volatile ( \
-        "bset.l %[v], (%[x]) \r\n" \
-        "sne.b  %[old]       \r\n" \
-        : [old]"=d,d"(old) \
-        : [v]"i,d"((uint32_t)v_), [x]"a,a"((uint32_t *)x_) \
-    ); \
-    old; \
-    })
-#else
-/* default for no asm version */
-#define test_and_set(x_, v_) \
-({ \
-    uint32_t old = *(uint32_t *)x_; \
-    *(uint32_t *)x_ = v_; \
-    old; \
-    })
-#endif
 
 void mutex_lock(struct mutex *m)
 {

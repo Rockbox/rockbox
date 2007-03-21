@@ -20,6 +20,7 @@
 #define THREAD_H
 
 #include "config.h"
+#include <inttypes.h>
 #include <stdbool.h>
 
 /* Priority scheduling (when enabled with HAVE_PRIORITY_SCHEDULING) works
@@ -109,6 +110,9 @@ struct thread_entry {
     long last_run;
 #endif
     struct thread_entry *next, *prev;
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+    intptr_t retval;
+#endif
 };
 
 struct core_entry {
@@ -125,6 +129,44 @@ struct core_entry {
 #define IF_PRIO(empty, type)  , type
 #else
 #define IF_PRIO(empty, type)
+#endif
+
+/* PortalPlayer chips have 2 cores, therefore need atomic mutexes 
+ * Just use it for ARM, Coldfire and whatever else well...why not?
+ */
+
+/* Macros generate better code than an inline function is this case */
+#if defined (CPU_PP) || defined (CPU_ARM)
+#define test_and_set(x_, v_) \
+({ \
+    uint32_t old; \
+    asm volatile ( \
+        "swpb %[old], %[v], [%[x]] \r\n" \
+        : [old]"=r"(old) \
+        : [v]"r"((uint32_t)v_), [x]"r"((uint32_t *)x_) \
+    ); \
+    old; \
+    })
+#elif defined (CPU_COLDFIRE)
+#define test_and_set(x_, v_) \
+({ \
+    uint8_t old; \
+    asm volatile ( \
+        "bset.l %[v], (%[x]) \r\n" \
+        "sne.b  %[old]       \r\n" \
+        : [old]"=d,d"(old) \
+        : [v]"i,d"((uint32_t)v_), [x]"a,a"((uint32_t *)x_) \
+    ); \
+    old; \
+    })
+#else
+/* default for no asm version */
+#define test_and_set(x_, v_) \
+({ \
+    uint32_t old = *(uint32_t *)x_; \
+    *(uint32_t *)x_ = v_; \
+    old; \
+    })
 #endif
 
 struct thread_entry*
