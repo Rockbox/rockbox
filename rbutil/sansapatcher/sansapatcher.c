@@ -353,6 +353,7 @@ static int sansa_seek_and_read(struct sansa_t* sansa, loff_t pos, unsigned char*
 int is_e200(struct sansa_t* sansa)
 {
     struct mi4header_t mi4header;
+    int ppmi_length;
 
     /* Check partition layout */
 
@@ -381,6 +382,7 @@ int is_e200(struct sansa_t* sansa)
         /* No bootloader header, abort */
         return -7;
     }
+    ppmi_length = le2int(sectorbuf+4);
 
     /* Check main mi4 file header */
     if (sansa_seek_and_read(sansa, sansa->start+PPMI_OFFSET+0x200, sectorbuf, 0x200) < 0) {
@@ -394,11 +396,28 @@ int is_e200(struct sansa_t* sansa)
         return -6;
     }
 
-    if ((mi4header.mi4size < 100000) &&
-        (memcmp(sectorbuf+0x1f8,"RBBL",4)!=0)) {
+    /* Some sanity checks:
+
+       1) Main MI4 image without RBBL and < 100000 bytes -> old install
+       2) Main MI4 image with RBBL but no second image -> old install
+     */
+
+    sansa->hasoldbootloader = 0;
+    if (memcmp(sectorbuf+0x1f8,"RBBL",4)==0) {
+        /* Look for an original firmware after the first image */
+        if (sansa_seek_and_read(sansa, 
+                                sansa->start + PPMI_OFFSET + 0x200 + ppmi_length, 
+                                sectorbuf, 512) < 0) {
+            return -7;
+        }
+
+        if (get_mi4header(sectorbuf,&mi4header)!=0) {
+            fprintf(stderr,"[ERR]  No original firmware found\n");
+            sansa->hasoldbootloader = 1;
+        }
+    } else if (mi4header.mi4size < 100000) {
+        fprintf(stderr,"[ERR]  Old bootloader found\n");
         sansa->hasoldbootloader = 1;
-    } else {
-        sansa->hasoldbootloader = 0;
     }
 
     return 0;
