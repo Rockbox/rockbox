@@ -40,7 +40,7 @@ static void queue_fetch_sender(struct queue_sender_list *send,
                                unsigned int i)
 {
     int old_level = set_irq_level(15<<4);
-    struct queue_sender **spp = &send->senders[i];
+    struct thread_entry **spp = &send->senders[i];
 
     if(*spp)
     {
@@ -53,7 +53,7 @@ static void queue_fetch_sender(struct queue_sender_list *send,
 
 /* Puts the specified return value in the waiting thread's return value
    and wakes the thread  - a sender should be confirmed to exist first */
-static void queue_release_sender(struct queue_sender **sender,
+static void queue_release_sender(struct thread_entry **sender,
                                  intptr_t retval)
 {
     (*sender)->retval = retval;
@@ -69,7 +69,7 @@ static void queue_release_all_senders(struct event_queue *q)
         unsigned int i;
         for(i = q->read; i != q->write; i++)
         {
-            struct queue_sender **spp =
+            struct thread_entry **spp =
                 &q->send->senders[i & QUEUE_LENGTH_MASK];
             if(*spp)
             {
@@ -166,7 +166,7 @@ void queue_post(struct event_queue *q, long id, intptr_t data)
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     if(q->send)
     {
-        struct queue_sender **spp = &q->send->senders[wr];
+        struct thread_entry **spp = &q->send->senders[wr];
 
         if(*spp)
         {
@@ -190,8 +190,8 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
 
     if(q->send)
     {
-        struct queue_sender **spp = &q->send->senders[wr];
-        struct queue_sender sender;
+        struct thread_entry **spp = &q->send->senders[wr];
+        struct thread_entry sender;
 
         if(*spp)
         {
@@ -266,7 +266,7 @@ void queue_remove_from_head(struct event_queue *q, long id)
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
         if(q->send)
         {
-            struct queue_sender **spp = &q->send->senders[rd];
+            struct thread_entry **spp = &q->send->senders[rd];
 
             if(*spp)
             {
