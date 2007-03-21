@@ -362,7 +362,8 @@ void lcd_yuv_blit(unsigned char * const src[3],
 
 
     width = (width + 1) & ~1;
-    fb_data *dst = (fb_data*)lcd_framebuffer + _x * LCD_WIDTH + (LCD_WIDTH - _y) - 1;
+    fb_data *dst = (fb_data*)lcd_driver_framebuffer + 
+                   _x * LCD_WIDTH + (LCD_WIDTH - _y) - 1;
     fb_data *dst_last = dst - (height - 1);
 
     do
