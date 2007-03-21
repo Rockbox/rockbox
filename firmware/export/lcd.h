@@ -211,9 +211,9 @@ static inline unsigned lcd_color_to_native(unsigned color)
 #define RGB_UNPACK_RED(x)        _RGB_UNPACK_RED(x)
 #define RGB_UNPACK_GREEN(x)      _RGB_UNPACK_GREEN(x)
 #define RGB_UNPACK_BLUE(x)       _RGB_UNPACK_BLUE(x)
-#define RGB_UNPACK_RED_LCD(x)    _RGB_UNPACK_RED(x)
-#define RGB_UNPACK_GREEN_LCD(x)  _RGB_UNPACK_GREEN(x)
-#define RGB_UNPACK_BLUE_LCD(x)   _RGB_UNPACK_BLUE(x)
+#define RGB_UNPACK_RED_LCD(x)    _RGB_UNPACK_RED_LCD(x)
+#define RGB_UNPACK_GREEN_LCD(x)  _RGB_UNPACK_GREEN_LCD(x)
+#define RGB_UNPACK_BLUE_LCD(x)   _RGB_UNPACK_BLUE_LCD(x)
 #endif
 #else
 /* other colour depths */
