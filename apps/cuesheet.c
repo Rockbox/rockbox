@@ -252,14 +252,14 @@ static void browse_cuesheet(struct cuesheet *cue)
     gui_synclist_set_nb_items(&lists, 2*cue->track_count);
     gui_synclist_set_title(&lists, title, 0);
 
-    if (strcmp(id3->path, "No file!"))
+    if (id3 && *id3->path && strcmp(id3->path, "No file!"))
     {
         strncpy(cuepath, id3->path, MAX_PATH);
         dot = strrchr(cuepath, '.');
         strcpy(dot, ".cue");
     }
 
-    if (id3->cuesheet_type && !strcmp(cue->path, cuepath))
+    if (id3 && id3->cuesheet_type && !strcmp(cue->path, cuepath))
     {
         gui_synclist_select_item(&lists,
                                  2*cue_find_current_track(cue, id3->elapsed));
