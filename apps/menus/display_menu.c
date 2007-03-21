@@ -79,6 +79,7 @@ int flipdisplay_callback(int action,const struct menu_item_ex *this_item)
 /*    LCD MENU                     */
 #if CONFIG_BACKLIGHT
 MENUITEM_SETTING(backlight_timeout, &global_settings.backlight_timeout, NULL);
+MENUITEM_SETTING(backlight_in_plugins, &global_settings.backlight_in_plugins, NULL);
 #if CONFIG_CHARGING
 MENUITEM_SETTING(backlight_timeout_plugged, 
                 &global_settings.backlight_timeout_plugged, NULL);
@@ -180,7 +181,7 @@ MAKE_MENU(lcd_settings,ID2P(LANG_LCD_MENU),
 # ifdef HAS_BUTTON_HOLD
             ,&backlight_on_button_hold
 # endif
-            ,&caption_backlight
+            ,&caption_backlight, &backlight_in_plugins
 # if defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)
             ,&backlight_fade_in, &backlight_fade_out
 # endif

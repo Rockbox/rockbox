@@ -704,7 +704,9 @@ struct user_settings
     (defined(HAVE_RECORDING) || CONFIG_TUNER)
     int alarm_wake_up_screen;
 #endif
-
+#if CONFIG_BACKLIGHT
+    int backlight_in_plugins;
+#endif
 };
 
 /** global variables **/

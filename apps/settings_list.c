@@ -971,7 +971,10 @@ const struct settings_list settings[] = {
         "normal,off,on", backlight_set_on_button_hold, 3,
         ID2P(LANG_BACKLIGHT_ON_BUTTON_HOLD_NORMAL), ID2P(LANG_OFF), ID2P(LANG_ON)),
 #endif
-
+    CHOICE_SETTING(0, backlight_in_plugins,
+        LANG_BACKLIGHT_IN_PLUGINS, 0, "backlight in settings",
+        "normal,on", NULL, 2,
+        ID2P(LANG_BACKLIGHT_ON_BUTTON_HOLD_NORMAL), ID2P(LANG_ON)),
 #ifdef HAVE_LCD_SLEEP
     STRINGCHOICE_SETTING(0, lcd_sleep_after_backlight_off,
         LANG_LCD_SLEEP_AFTER_BACKLIGHT_OFF, 3,
