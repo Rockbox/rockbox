@@ -275,7 +275,7 @@ static void browse_cuesheet(struct cuesheet *cue)
         {
             case ACTION_STD_OK:
                 id3 = audio_current_track();
-                if (strcmp(id3->path, "No file!"))
+                if (id3 && *id3->path && strcmp(id3->path, "No file!"))
                 {
                     strncpy(cuepath, id3->path, MAX_PATH);
                     dot = strrchr(cuepath, '.');
