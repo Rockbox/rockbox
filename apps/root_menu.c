@@ -232,6 +232,8 @@ static int wpsscrn(void* param)
     else
     {
         gui_syncsplash(HZ*2, str(LANG_NOTHING_TO_RESUME));
+        if (last_screen == GO_TO_ROOT)
+            ret_val = GO_TO_ROOT;
     }
 #if LCD_DEPTH > 1
     show_main_backdrop();
