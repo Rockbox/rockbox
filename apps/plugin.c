@@ -609,17 +609,10 @@ int plugin_load(const char* plugin, void* parameter)
 #endif
 
     invalidate_icache();
-#if CONFIG_BACKLIGHT
-    if (global_settings.backlight_in_plugins == 1)
-        backlight_set_timeout(1);
-#endif
+
     rc = hdr->entry_point((struct plugin_api*) &rockbox_api, parameter);
     /* explicitly casting the pointer here to avoid touching every plugin. */
-#if CONFIG_BACKLIGHT
-    if (global_settings.backlight_in_plugins == 1)
-      backlight_set_timeout(global_settings.backlight_timeout);
-#endif
-    
+
     button_clear_queue();
 
 #ifdef HAVE_LCD_BITMAP

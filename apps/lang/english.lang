@@ -10725,17 +10725,3 @@
     *: ""
   </voice>
 </phrase>
-<phrase>
-  id: LANG_BACKLIGHT_IN_PLUGINS
-  desc: in lcd settings
-  user:
-  <source>
-    *: "Backlight (In Plugins)"
-  </source>
-  <dest>
-    *: "Backlight (In Plugins)"
-  </dest>
-  <voice>
-    *: "Backlight in plugins"
-  </voice>
-</phrase>
