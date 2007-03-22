@@ -26,6 +26,21 @@
 
 int iaudio_decode(char *iname, char *oname);
 
+unsigned int le2int(unsigned char* buf)
+{
+   int32_t res = (buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8) | buf[0];
+
+   return res;
+}
+
+void int2le(unsigned int val, unsigned char* addr)
+{
+    addr[0] = val & 0xFF;
+    addr[1] = (val >> 8) & 0xff;
+    addr[2] = (val >> 16) & 0xff;
+    addr[3] = (val >> 24) & 0xff;
+}
+
 void usage(void)
 {
     printf("usage: descramble [options] <input file> <output file>\n");

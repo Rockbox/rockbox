@@ -49,6 +49,7 @@ int gigabeat_code(char *infile, char *outfile)
     FILE *in, *out;
     unsigned long size = 0;
     unsigned long bytes_read;
+    unsigned char buf[4];
     unsigned long data;
     unsigned long key = 0x19751217;
 
@@ -56,8 +57,11 @@ int gigabeat_code(char *infile, char *outfile)
     out = openoutfile(outfile);
 
     while (!feof(in)) {
-        bytes_read = fread(&data, 1, 4, in);
+        bytes_read = fread(buf, 1, 4, in);
 
+        /* Read in little-endian */
+        data = le2int(buf);
+        
         data = data ^ key;
 
         key = key + (key << 1);
@@ -65,7 +69,10 @@ int gigabeat_code(char *infile, char *outfile)
 
         size += bytes_read;
 
-        fwrite(&data, 1, bytes_read, out);
+        /* Write out little-endian */
+        int2le(data, buf);
+
+        fwrite(buf, 1, bytes_read, out);
     }
 
     fprintf(stderr, "File processed successfully\n" );

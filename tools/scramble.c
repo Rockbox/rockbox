@@ -52,6 +52,13 @@ void short2le(unsigned short val, unsigned char* addr)
     addr[1] = (val >> 8) & 0xff;
 }
 
+unsigned int le2int(unsigned char* buf)
+{
+   int32_t res = (buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8) | buf[0];
+
+   return res;
+}
+
 void int2le(unsigned int val, unsigned char* addr)
 {
     addr[0] = val & 0xFF;
