@@ -487,6 +487,8 @@ static const struct plugin_api rockbox_api = {
     playlist_resume,
     playlist_start,
     &global_status,
+
+    pcm_get_bytes_waiting,
 };
 
 int plugin_load(const char* plugin, void* parameter)

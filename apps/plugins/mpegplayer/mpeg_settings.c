@@ -82,8 +82,8 @@ void init_settings(void)
 {
     /* Set the default settings */
     settings.showfps = 0;     /* Do not show FPS */
-    settings.limitfps = 0;    /* Do not limit FPS */
-    settings.skipframes = 0;  /* Do not skip frames */
+    settings.limitfps = 1;    /* Limit FPS */
+    settings.skipframes = 1;  /* Skip frames */
 
     configfile_init(rb);
 

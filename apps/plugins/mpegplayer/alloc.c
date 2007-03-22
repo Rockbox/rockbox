@@ -36,7 +36,8 @@ void mpeg2_alloc_init(unsigned char* buf, int mallocsize)
     mem_ptr = 0;
     bufsize = mallocsize;
     mallocbuf = buf;
-  
+    rb->memset(buf,0,bufsize);
+
     return;
 }
 

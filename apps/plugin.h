@@ -110,7 +110,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 48
+#define PLUGIN_API_VERSION 49
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -602,6 +602,8 @@ struct plugin_api {
     int (*playlist_resume)(void);
     int (*playlist_start)(int start_index, int offset);
     struct system_status *global_status;
+
+    size_t (*pcm_get_bytes_waiting)(void);
 };
 
 /* plugin header */

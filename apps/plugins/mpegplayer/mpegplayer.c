@@ -83,16 +83,16 @@ In libmpeg2, info->sequence->frame_period contains the frame_period.
 Working with Rockbox's 100Hz tick, the common frame rates would need
 to be as follows:
 
-FPS     | 27Mhz   | 100Hz
---------|----------------
-10*     | 2700000 | 10
-12*     | 2250000 |  8.3333
-15*     | 1800000 |  6.6667
-23.9760 | 1126125 |  4.170833333
-24      | 1125000 |  4.166667
-25      | 1080000 |  4
-29.9700 |  900900 |  3.336667
-30      |  900000 |  3.333333
+FPS     | 27Mhz   | 100Hz          | 44.1KHz   | 48KHz
+--------|-----------------------------------------------------------
+10*     | 2700000 | 10             | 4410      | 4800
+12*     | 2250000 |  8.3333        | 3675      | 4000
+15*     | 1800000 |  6.6667        | 2940      | 3200
+23.9760 | 1126125 |  4.170833333   | 1839.3375 | 2002
+24      | 1125000 |  4.166667      | 1837.5    | 2000
+25      | 1080000 |  4             | 1764      | 1920
+29.9700 |  900900 |  3.336667      | 1471,47   | 1601.6
+30      |  900000 |  3.333333      | 1470      | 1600
 
 
 *Unofficial framerates
@@ -177,8 +177,12 @@ typedef struct
    int id;
 } Stream;
 
-static Stream audio_str, video_str;
+static Stream audio_str IBSS_ATTR;
+static Stream video_str IBSS_ATTR;
 
+/* NOTE: Putting the following variables in IRAM cause audio corruption
+   on the ipod (reason unknown)
+*/
 static uint8_t *disk_buf, *disk_buf_end;
 
 /* Events */
@@ -195,8 +199,10 @@ static struct thread_entry* videothread_id;
 #define STREAM_PLAYING 0
 #define STREAM_DONE 1
 #define STREAM_PAUSING 2
-#define PLEASE_STOP 3
-#define PLEASE_PAUSE 4
+#define STREAM_BUFFERING 3
+#define STREAM_ERROR 4
+#define PLEASE_STOP 5
+#define PLEASE_PAUSE 6
 
 int audiostatus IBSS_ATTR;
 int videostatus IBSS_ATTR;
@@ -206,34 +212,6 @@ int videostatus IBSS_ATTR;
 #define PCMBUFFER_SIZE (512*1024)
 #define AUDIOBUFFER_SIZE (32*1024)
 #define LIBMPEG2BUFFER_SIZE (2*1024*1024)
-
-static int tick_enabled IBSS_ATTR = 0;
-
-#define MPEG_CURRENT_TICK ((unsigned int)((*rb->current_tick - tick_offset)))
-
-/* The value to subtract from current_tick to get the current mpeg tick */
-static int tick_offset IBSS_ATTR;
-
-/* The last tick - i.e. the time to reset the tick_offset to when unpausing */
-static int last_tick IBSS_ATTR;
-
-static void start_timer(void)
-{
-    last_tick = 0;
-    tick_offset = *rb->current_tick;
-}
-
-static void unpause_timer(void)
-{
-    tick_offset = *rb->current_tick - last_tick;
-}
-
-static void pause_timer(void)
-{
-    /* Save the current MPEG tick */
-    last_tick = *rb->current_tick - tick_offset;
-}
-
 
 static void button_loop(void)
 {
@@ -276,37 +254,35 @@ static void button_loop(void)
             break;
 
         case MPEG_MENU:
-            videostatus=PLEASE_PAUSE;
             rb->pcm_play_pause(false);
-            pause_timer(); 
+            if (videostatus != STREAM_DONE) {
+                videostatus=PLEASE_PAUSE;
 
-            /* Wait for video thread to stop */
-            while (videostatus == PLEASE_PAUSE) { rb->sleep(HZ/25); }
+                /* Wait for video thread to stop */
+                while (videostatus == PLEASE_PAUSE) { rb->sleep(HZ/25); }
+            }
             result = mpeg_menu();
 
             /* The menu can change the font, so restore */
             rb->lcd_setfont(FONT_SYSFIXED);
 
-            unpause_timer();
-
             if (result) {
                 audiostatus = PLEASE_STOP;
-                videostatus = PLEASE_STOP;
+                if (videostatus != STREAM_DONE) videostatus = PLEASE_STOP;
             } else {
-                videostatus = STREAM_PLAYING;
+                if (videostatus != STREAM_DONE) videostatus = STREAM_PLAYING;
                 rb->pcm_play_pause(true);
             }
             break;
 
         case MPEG_STOP:
             audiostatus = PLEASE_STOP;
-            videostatus = PLEASE_STOP;
+            if (videostatus != STREAM_DONE) videostatus = PLEASE_STOP;
             break;
 
         case MPEG_PAUSE:
-            videostatus=PLEASE_PAUSE;
+            if (videostatus != STREAM_DONE) videostatus=PLEASE_PAUSE;
             rb->pcm_play_pause(false);
-            pause_timer(); /* Freeze time */
 
             button = BUTTON_NONE;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -316,23 +292,22 @@ static void button_loop(void)
                 button = rb->button_get(true);
                 if (button == MPEG_STOP) {
                     audiostatus = PLEASE_STOP;
-                    videostatus = PLEASE_STOP;
+                    if (videostatus != STREAM_DONE) videostatus = PLEASE_STOP;
                     return;
                 }
             } while (button != MPEG_PAUSE);
 
-            videostatus = STREAM_PLAYING;
+            if (videostatus != STREAM_DONE) videostatus = STREAM_PLAYING;
             rb->pcm_play_pause(true);
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
             rb->cpu_boost(true);
 #endif
-            unpause_timer(); /* Resume time */
             break;
 
         default:
             if(rb->default_event_handler(button) == SYS_USB_CONNECTED) {
                 audiostatus = PLEASE_STOP;
-                videostatus = PLEASE_STOP;
+                if (videostatus != STREAM_DONE) videostatus = PLEASE_STOP;
             }
     }
 }
@@ -379,13 +354,15 @@ static void get_next_data( Stream* str )
         0, 0, 4, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
     
-    if( str->curr_packet_end == NULL )
-    {
+    if (str->curr_packet_end == NULL) {
+        /* What does this do? */
         while( (p = disk_buf) == NULL )
         {
+            rb->lcd_putsxy(0,LCD_HEIGHT-10,"FREEZE!");
+            rb->lcd_update();
             rb->sleep(100);
         }
-    }else{
+    } else {
         p = str->curr_packet_end;
     }
     
@@ -469,7 +446,7 @@ static void get_next_data( Stream* str )
                     (header[15] << 22) |
                     ((header[16] >> 1) << 15) |
                     (header[17] << 7) | (header[18] >> 1))));
-                    
+                
                 if( stream >= 0xe0 )
                     mpeg2_tag_picture (mpeg2dec, pts, dts);
             }
@@ -533,14 +510,16 @@ static void get_next_data( Stream* str )
 uint8_t* mpa_buffer;
 size_t mpa_buffer_size;
 
-static volatile int madpcm_playing;
-static volatile int16_t* pcm_buffer;
-static volatile size_t pcm_buffer_size;
+static volatile int madpcm_playing IBSS_ATTR;
+static volatile int16_t* pcm_buffer IBSS_ATTR;
+static volatile size_t pcm_buffer_size IBSS_ATTR;
 
-static volatile size_t pcmbuf_len;
-static volatile int16_t* pcmbuf_end;
-static volatile int16_t* pcmbuf_head;
-static volatile int16_t* pcmbuf_tail;
+static volatile size_t pcmbuf_len IBSS_ATTR;
+static volatile int16_t* pcmbuf_end IBSS_ATTR;
+static volatile int16_t* pcmbuf_head IBSS_ATTR;
+static volatile int16_t* pcmbuf_tail IBSS_ATTR;
+
+static volatile uint32_t samplesplayed IBSS_ATTR;
 
 static void init_pcmbuf(void)
 {
@@ -557,18 +536,22 @@ static void get_more(unsigned char** start, size_t* size)
       *start = NULL;
       *size = 0;
       madpcm_playing = 0;
+      pcmbuf_len = 0;
    } else {
       *start = (unsigned char*)(pcmbuf_tail);
       *size = 32*1024;
       pcmbuf_tail += (32*1024)/sizeof(int16_t);
       pcmbuf_len -= 32*1024;
       if (pcmbuf_tail >= pcmbuf_end) { pcmbuf_tail = pcm_buffer; }
+
+      /* Update master clock */
+      samplesplayed += (32*1024)/4;
    }
 }
 
 int line;
 
-static void mad_decode(void)
+static void audio_thread(void)
 {
     int32_t* left;
     int32_t* right;
@@ -594,6 +577,8 @@ static void mad_decode(void)
         if (n < 1000) {  /* TODO: What is the maximum size of an MPEG audio frame? */
             get_next_data( &audio_str );
             if (audio_str.curr_packet == NULL) {
+                /* Wait for audio to finish */
+                while (pcmbuf_len > 0) { rb->sleep(HZ/10); }
                 goto done;
             }
             len = audio_str.curr_packet_end - audio_str.curr_packet;
@@ -701,6 +686,7 @@ static void mad_decode(void)
             if ((!madpcm_playing) && (pcmbuf_len > 64*1024)) {
                 madpcm_playing = 1;
                 rb->pcm_play_data(get_more,NULL,0);
+                audiostatus = STREAM_PLAYING;
             }
         }
         rb->yield();
@@ -710,7 +696,10 @@ done:
     rb->pcm_play_stop();
     audiostatus=STREAM_DONE;
 
-    for (;;) {  rb->sleep(HZ); }
+    for (;;) {  
+        button_loop();
+        rb->sleep(HZ/4);
+    }
 }
 
 /* End of libmad stuff */
@@ -728,24 +717,36 @@ uint32_t audio_stack[AUDIO_STACKSIZE / sizeof(uint32_t)] IBSS_ATTR;
 #define VIDEO_STACKSIZE (4*1024)
 static uint32_t video_stack[VIDEO_STACKSIZE / sizeof(uint32_t)] IBSS_ATTR;
 
-static void decode_mpeg2 (void)
+static void video_thread(void)
 {
     const mpeg2_info_t * info;
     mpeg2_state_t state;
     char str[80];
-    static int skipped = 0;
+    int skipped = 0;
     int skipcount = 0;
-    static int frame = 0;
-    static int starttick = 0;
-    static int lasttick;
+    int frame = 0;
+    int lasttick;
     unsigned int eta2;
-    unsigned int x;
+    unsigned int s;
     int fps;
 
-    if (starttick == 0) {
-        starttick=*rb->current_tick-1; /* Avoid divby0 */
-        lasttick=starttick;
+    rb->sleep(HZ/5);
+    mpeg2dec = mpeg2_init ();
+
+    if (mpeg2dec == NULL) {
+        videostatus = STREAM_ERROR;
+        rb->splash(0, "mpeg2_init failed");
+        /* Commit suicide */
+        rb->remove_thread(NULL);
     }
+
+    /* Clear the display - this is mainly just to indicate that the
+       video thread has started successfully. */
+    rb->lcd_clear_display();
+    rb->lcd_update();
+
+    /* Used to decide when to display FPS */
+    lasttick = *rb->current_tick - HZ;
 
     /* Request the first packet data */
     get_next_data( &video_str );
@@ -791,26 +792,26 @@ static void decode_mpeg2 (void)
         case STATE_INVALID_END:
             /* draw current picture */
             if (info->display_fbuf) {
-                /* We start the timer when we draw the first frame */
-                if (!tick_enabled) {
-                    start_timer();
-                    tick_enabled = 1 ;
+                /* Wait if the audio thread is buffering - i.e. before
+                   the first frames are decoded */
+                while (audiostatus == STREAM_BUFFERING) {
+                    rb->sleep(1);
                 }
-
                 eta += (info->sequence->frame_period);
-                eta2 = eta / (27000000 / HZ);
 
+                /*  Convert eta (in 27MHz ticks) into audio samples */
+                eta2 =(eta * 44100) / 27000000;
+                s = samplesplayed - (rb->pcm_get_bytes_waiting() >> 2);
                 if (settings.limitfps) {
-                    if (eta2 > MPEG_CURRENT_TICK) {
-                        rb->sleep(eta2-MPEG_CURRENT_TICK);
+                    if (eta2 > s) {
+                        rb->sleep(4); //((eta2-s)*HZ)/44100);
                     }              
                 }
-                x = MPEG_CURRENT_TICK;
 
                 /* If we are more than 1/20 second behind schedule (and 
                    more than 1/20 second into the decoding), skip frame */
-                if (settings.skipframes && (x > HZ/20) && 
-                   (eta2 < (x - (HZ/20))) && (skipcount < 10)) {
+                if (settings.skipframes && (s > (44100/20)) && 
+                   (eta2 < (s - (44100/20))) && (skipcount < 10)) {
                     skipped++;
                     skipcount++;
                 } else {
@@ -821,9 +822,9 @@ static void decode_mpeg2 (void)
                 /* Calculate fps */
                 frame++;
                 if (settings.showfps && (*rb->current_tick-lasttick>=HZ)) {
-                    fps=(frame*(HZ*10))/x;
+                    fps=(frame*441000)/s;
                     rb->snprintf(str,sizeof(str),"%d.%d %d %d %d",
-                                 (fps/10),fps%10,skipped,x,eta2);
+                                 (fps/10),fps%10,skipped,s,eta2);
                     rb->lcd_putsxy(0,0,str);
                     rb->lcd_update_rect(0,0,LCD_WIDTH,8);
         
@@ -840,7 +841,8 @@ static void decode_mpeg2 (void)
 
 done:
     videostatus = STREAM_DONE;
-    for (;;) { rb->sleep(HZ); }
+    /* Commit suicide */
+    rb->remove_thread(NULL);
 }
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
@@ -919,12 +921,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     init_settings();
 
-    mpeg2dec = mpeg2_init ();
-
     rb->queue_init( &msg_queue, false );    /* Msg queue init */
-
-    if (mpeg2dec == NULL)
-        return PLUGIN_ERROR;
 
     /* make sure the backlight is always on when viewing video
        (actually it should also set the timeout when plugged in,
@@ -952,23 +949,23 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     rb->lcd_setfont(FONT_SYSFIXED);
 
-    audiostatus = STREAM_PLAYING;
+    audiostatus = STREAM_BUFFERING;
     videostatus = STREAM_PLAYING;
 
     /* We put the video thread on the second processor for multi-core targets. */
-    if ((videothread_id = rb->create_thread(decode_mpeg2,
+    if ((videothread_id = rb->create_thread(video_thread,
         (uint8_t*)video_stack,VIDEO_STACKSIZE,"mpgvideo" IF_PRIO(,PRIORITY_PLAYBACK)
-	IF_COP(, COP, true))) == NULL)
+        IF_COP(, COP, true))) == NULL)
     {
         rb->splash(HZ, "Cannot create video thread!");
         return PLUGIN_ERROR;
     }
-
-    if ((audiothread_id = rb->create_thread(mad_decode,
+    if ((audiothread_id = rb->create_thread(audio_thread,
         (uint8_t*)audio_stack,AUDIO_STACKSIZE,"mpgaudio" IF_PRIO(,PRIORITY_PLAYBACK)
-	IF_COP(, CPU, false))) == NULL)
+        IF_COP(, CPU, false))) == NULL)
     {
         rb->splash(HZ, "Cannot create audio thread!");
+        /* To do: Handle this error correctly on dual-core targets */
         rb->remove_thread(videothread_id);
         return PLUGIN_ERROR;
     }
@@ -979,7 +976,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
 
     rb->remove_thread(audiothread_id);
-    rb->remove_thread(videothread_id);
     rb->yield(); /* Is this needed? */
 
     rb->lcd_clear_display();
