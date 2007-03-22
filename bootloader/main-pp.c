@@ -249,6 +249,9 @@ static int tea_find_key(struct mi4header_t *mi4header, int fd)
 
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef SANSA_E200
+#include "usb.h"
+#endif
 
 /* crc_tab[] -- this crcTable is being build by chksum_crc32GenTab().
  *		so make sure, you call it before using the other
@@ -401,7 +404,8 @@ int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
 
 #ifdef SANSA_E200
 /* Load mi4 firmware from a hidden disk partition */
-int load_mi4_part(unsigned char* buf, struct partinfo* pinfo, unsigned int buffer_size)
+int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
+                  unsigned int buffer_size, bool disable_rebuild)
 {
     struct mi4header_t mi4header;
     struct ppmi_header_t ppmi_header;
@@ -453,6 +457,31 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo, unsigned int buffe
     if(sum != mi4header.crc32)
         return EBAD_CHKSUM;
     
+    if (disable_rebuild)
+    {
+        char block[512];
+        int  sector = 0, offset = 0;
+    
+        /* check which known version we have */
+        /* These are taken from the PPPS section, 0x00780240 */
+        ata_read_sectors(pinfo->start + 0x3C01, 1, block);
+        if (!memcmp(&block[0x40], 
+            "PP5022AF-05.51-S301-01.11-S301.01.11A-D", 39))
+        {   /* American e200, OF version 1.01.11A */
+            sector = pinfo->start + 0x3c08;
+            offset  = 0xe1;
+        }
+        else if (!memcmp(&block[0x40], 
+                "PP5022AF-05.51-S301-00.12-S301.00.12E-D", 39))
+        {   /* European e200, OF version 1.00.12 */
+            sector = pinfo->start + 0x3c5c;
+            offset  = 0x2;
+        }
+        else return EOK;
+        ata_read_sectors(sector, 1, block);
+        block[offset] = 0;
+        ata_write_sectors(sector, 1, block);
+    }
     return EOK;
 }
 #endif
@@ -466,6 +495,10 @@ void* main(void)
     int num_partitions;
     unsigned short* identify_info;
     struct partinfo* pinfo;
+#ifdef SANSA_E200
+    int usb_retry = 0;
+    bool usb = false;
+#endif
 
     chksum_crc32gentab ();
 
@@ -480,7 +513,17 @@ void* main(void)
     lcd_clear_display();
     
     btn = button_read_device();
-
+#ifdef SANSA_E200
+    usb_init();
+    while (usb_retry < 5 && !usb)
+    {
+        usb_retry++;
+        sleep(HZ/4);
+        usb = usb_detect();
+    }
+    if (usb)
+        btn |= BOOTLOADER_BOOT_OF;
+#endif
     /* Enable bootloader messages if any button is pressed */
     if (btn)
         verbose = true;
@@ -540,7 +583,7 @@ void* main(void)
         pinfo = disk_partinfo(1);
         if(pinfo->type == PARTITION_TYPE_OS2_HIDDEN_C_DRIVE)
         {
-            rc = load_mi4_part(loadbuffer, pinfo, MAX_LOADSIZE);
+            rc = load_mi4_part(loadbuffer, pinfo, MAX_LOADSIZE, usb);
             if (rc < EOK) {
                 printf("Can't load from partition");
                 printf(strerror(rc));
@@ -591,6 +634,7 @@ void* main(void)
     return (void*)loadbuffer;
 }
 
+#ifndef SANSA_E200
 /* These functions are present in the firmware library, but we reimplement
    them here because the originals do a lot more than we want */
 void usb_acknowledge(void)
@@ -600,3 +644,5 @@ void usb_acknowledge(void)
 void usb_wait_for_disconnect(void)
 {
 }
+#endif
+

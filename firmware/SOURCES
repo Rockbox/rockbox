@@ -217,14 +217,14 @@ drivers/tlv320.c
 #if CONFIG_USBOTG == USBOTG_ISP1362
 drivers/isp1362.c
 #endif
-#endif
-#if !defined(SIMULATOR) && !defined(BOOTLOADER)
+#if defined(SANSA_E200) || !defined(BOOTLOADER)
 #if CONFIG_USBOTG == USBOTG_M5636
 drivers/m5636.c
 #elif CONFIG_USBOTG == USBOTG_ARC
 drivers/arcotg_udc.c
 #endif /* CONFIG_USBOTG */
-#endif /* !defined(SIMULATOR) && !defined(BOOTLOADER) */
+#endif /* !defined(BOOTLOADER) */
+#endif /* !defined(SIMULATOR) */
 
 /* CPU Specific - By class then particular chip if applicable */
 #if defined(CPU_SH)
