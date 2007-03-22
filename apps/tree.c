@@ -547,27 +547,6 @@ static void set_current_file(char *path)
     }
 }
 
-#if defined(HAVE_TAGCACHE) && defined(HAVE_QUICKSCREEN)
-static bool check_changed_id3mode(bool currmode)
-{
-    if (currmode != (global_settings.dirfilter == SHOW_ID3DB)) {
-        currmode = global_settings.dirfilter == SHOW_ID3DB;
-        if (currmode) {
-            curr_context=CONTEXT_ID3DB;
-            tc.dirlevel = 0;
-            tagtree_load(&tc);
-        }
-        else
-        {
-            tc.dirlevel = 0;
-            curr_context=CONTEXT_TREE;
-            ft_load(&tc, NULL);
-            reload_dir = true;
-        }
-    }
-    return currmode;
-}
-#endif
 
 /* main loop, handles key events */
 static int dirbrowse()
