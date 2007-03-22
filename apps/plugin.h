@@ -603,7 +603,9 @@ struct plugin_api {
     int (*playlist_start)(int start_index, int offset);
     struct system_status *global_status;
 
+#if CONFIG_CODEC == SWCODEC
     size_t (*pcm_get_bytes_waiting)(void);
+#endif
 };
 
 /* plugin header */

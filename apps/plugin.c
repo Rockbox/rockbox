@@ -488,7 +488,9 @@ static const struct plugin_api rockbox_api = {
     playlist_start,
     &global_status,
 
+#if CONFIG_CODEC == SWCODEC
     pcm_get_bytes_waiting,
+#endif
 };
 
 int plugin_load(const char* plugin, void* parameter)
