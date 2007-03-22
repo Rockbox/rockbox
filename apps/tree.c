@@ -739,11 +739,6 @@ static int dirbrowse()
                     if (quick_screen_quick(button))
                         reload_dir = true;
                     restore = true;
-
-#ifdef HAVE_TAGCACHE
-                    id3db = check_changed_id3mode(id3db);
-                    reload_dir = true;
-#endif
                 }
                 break;
 #endif
