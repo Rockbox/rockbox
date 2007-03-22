@@ -555,6 +555,7 @@ static void audio_thread(void)
 {
     int32_t* left;
     int32_t* right;
+    int32_t sample;
     int i;
     size_t n = 0;
     size_t len;
@@ -655,15 +656,33 @@ static void audio_thread(void)
                 left = &synth.pcm.samples[0][0];
                 right = &synth.pcm.samples[1][0];
                 for (i = 0 ; i < framelength; i++) {
-                    *(pcmbuf_head++) = *(left++) >> 13;
-                    *(pcmbuf_head++) = *(right++) >> 13;
+                    /* libmad outputs s3.28 */
+                    sample = *(left++) >> 13;
+                    if (sample > 32767)
+                        sample = 32767;
+                    else if (sample < -32768)
+                        sample = -32768;
+                    *(pcmbuf_head++) = sample;
+
+                    sample = *(right++) >> 13;
+                    if (sample > 32767)
+                        sample = 32767;
+                    else if (sample < -32768)
+                        sample = -32768;
+                    *(pcmbuf_head++) = sample;
+
                     if (pcmbuf_head >= pcmbuf_end) { pcmbuf_head = pcm_buffer; }
                 }
             } else { /* mono */
-                int16_t sample;
                 left = &synth.pcm.samples[0][0];
                 for (i = 0 ; i < framelength; i++) {
                     sample = *(left++) >> 13;
+
+                    if (sample > 32767)
+                        sample = 32767;
+                    else if (sample < -32768)
+                        sample = -32768;
+
                     *(pcmbuf_head++) = sample;
                     *(pcmbuf_head++) = sample;
                     if (pcmbuf_head >= pcmbuf_end) { pcmbuf_head = pcm_buffer; }
