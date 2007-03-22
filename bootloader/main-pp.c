@@ -19,6 +19,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <stdio.h>
+#include <stdlib.h>
 #include "common.h"
 #include "cpu.h"
 #include "file.h"
@@ -30,7 +32,29 @@
 #include "button.h"
 #include "disk.h"
 #include <string.h>
+#ifdef SANSA_E200
+#include "usb.h"
+#endif
 
+
+/* Button definitions */
+#if CONFIG_KEYPAD == IRIVER_H10_PAD
+#define BOOTLOADER_BOOT_OF      BUTTON_LEFT
+
+#elif CONFIG_KEYPAD == SANSA_E200_PAD
+#define BOOTLOADER_BOOT_OF      BUTTON_LEFT
+
+#endif
+
+/* Maximum allowed firmware image size. 10MB is more than enough */
+#define MAX_LOADSIZE (10*1024*1024)
+
+/* A buffer to load the original firmware or Rockbox into */
+unsigned char *loadbuffer = (unsigned char *)DRAM_START;
+
+/* Bootloader version */
+char version[] = APPSVERSION;
+        
 /* Locations and sizes in hidden partition on Sansa */
 #ifdef SANSA_E200
 #define PPMI_SECTOR_OFFSET  1024
@@ -247,11 +271,7 @@ static int tea_find_key(struct mi4header_t *mi4header, int fd)
 
 /* based on implementation by Finn Yannick Jacobs */
 
-#include <stdio.h>
-#include <stdlib.h>
-#ifdef SANSA_E200
-#include "usb.h"
-#endif
+
 
 /* crc_tab[] -- this crcTable is being build by chksum_crc32GenTab().
  *		so make sure, you call it before using the other
@@ -306,23 +326,6 @@ static void chksum_crc32gentab (void)
    }
 }
 
-/* Button definitions */
-#if CONFIG_KEYPAD == IRIVER_H10_PAD
-#define BOOTLOADER_BOOT_OF      BUTTON_LEFT
-
-#elif CONFIG_KEYPAD == SANSA_E200_PAD
-#define BOOTLOADER_BOOT_OF      BUTTON_LEFT
-
-#endif
-
-/* Maximum allowed firmware image size. 10MB is more than enough */
-#define MAX_LOADSIZE (10*1024*1024)
-
-/* A buffer to load the original firmware or Rockbox into */
-unsigned char *loadbuffer = (unsigned char *)DRAM_START;
-
-/* Bootloader version */
-char version[] = APPSVERSION;
 
 /* Load mi4 format firmware image */
 int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
@@ -477,7 +480,8 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
             sector = pinfo->start + 0x3c5c;
             offset  = 0x2;
         }
-        else return EOK;
+        else 
+            return EOK;
         ata_read_sectors(sector, 1, block);
         block[offset] = 0;
         ata_write_sectors(sector, 1, block);
