@@ -89,6 +89,7 @@ static const struct button_mapping button_context_wps[]  = {
 }; /* button_context_wps */
 
 static const struct button_mapping button_context_settings[] = {
+    { ACTION_STD_CANCEL,        BUTTON_POWER,                     BUTTON_NONE },
     { ACTION_SETTINGS_INC,      BUTTON_SCROLL_UP,                 BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT,BUTTON_SCROLL_UP|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_SETTINGS_DEC,      BUTTON_SCROLL_DOWN,               BUTTON_NONE },
