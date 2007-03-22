@@ -54,7 +54,7 @@ void short2le(unsigned short val, unsigned char* addr)
 
 unsigned int le2int(unsigned char* buf)
 {
-   int32_t res = (buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8) | buf[0];
+   unsigned int res = (buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8) | buf[0];
 
    return res;
 }
