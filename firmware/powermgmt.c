@@ -190,6 +190,8 @@ static const unsigned int battery_level_dangerous[BATTERY_TYPES_COUNT] =
     105, 115
 #elif CONFIG_BATTERY == BATT_LIPOL1300  /* iRiver H1x0: LiPolymer */
     338
+#elif CONFIG_BATTERY == BATT_LIION750   /* Sansa e200 */
+    340
 #elif CONFIG_BATTERY == BATT_LIION830   /* Gigabeat F */
     345
 #elif CONFIG_BATTERY == BATT_IAUDIO_X5M5  /* iAudio X5 */
@@ -211,6 +213,8 @@ static const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
     270, 280
 #elif CONFIG_BATTERY == BATT_LIPOL1300  /* iRiver Hxxx */
     302
+#elif CONFIG_BATTERY == BATT_LIION750   /* Sansa e200 */
+    330
 #elif CONFIG_BATTERY == BATT_LIION830   /* Gigabeat F */
     340
 #elif CONFIG_BATTERY == BATT_IAUDIO_X5M5  /* iAudio X5 */
@@ -258,6 +262,9 @@ static const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 #elif CONFIG_BATTERY == BATT_LIION830
     /* Toshiba Gigabeat Li Ion 830mAH figured from discharge curve */
     { 354, 357, 359, 361, 364, 366, 372, 381, 377, 381, 394 },
+#elif CONFIG_BATTERY == BATT_LIION750
+    /* Sansa Li Ion 750mAH FIXME this is a first linear approach */
+    { 330, 339, 348, 357, 366, 375, 384, 393, 402, 411, 420 },
 #else /* NiMH */
     /* original values were taken directly after charging, but it should show
        100% after turning off the device for some hours, too */
@@ -276,6 +283,9 @@ static const unsigned short percent_to_volt_charge[11] =
 #if CONFIG_BATTERY == BATT_LIPOL1300
     /* values measured over one full charging cycle */
     354, 386, 393, 398, 400, 402, 404, 408, 413, 418, 423 /* LiPo */
+#elif CONFIG_BATTERY == BATT_LIION750
+    /* Sansa Li Ion 750mAH FIXME*/
+    330, 339, 348, 357, 366, 375, 384, 393, 402, 411, 420 
 #elif CONFIG_BATTERY == BATT_LIION830
     /* Toshiba Gigabeat Li Ion 830mAH */
     354, 357, 359, 361, 364, 366, 372, 381, 377, 381, 394

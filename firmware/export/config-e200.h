@@ -83,7 +83,7 @@
 #define CONFIG_I2C I2C_PP5020
 
 /* Type of mobile power */
-#define CONFIG_BATTERY BATT_LPCS355385
+#define CONFIG_BATTERY BATT_LIION750
 #define BATTERY_CAPACITY_MIN 750        /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX 750        /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 0          /* capacity increment */
