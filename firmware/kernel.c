@@ -100,6 +100,7 @@ void yield(void)
 static void queue_fetch_sender(struct queue_sender_list *send,
                                unsigned int i)
 {
+    /* Disable interrupts to protect against collision in this slot */
     int old_level = set_irq_level(HIGHEST_IRQ_LEVEL);
     struct thread_entry **spp = &send->senders[i];
 
@@ -113,17 +114,31 @@ static void queue_fetch_sender(struct queue_sender_list *send,
 }
 
 /* Puts the specified return value in the waiting thread's return value
-   and wakes the thread  - a sender should be confirmed to exist first */
+ * and wakes the thread.
+ * 1) A sender should be confirmed to exist before calling which makes it
+ *    more efficent to reject the majority of cases that don't need this
+      called.
+ * 2) Requires interrupts disabled since queue overflows can cause posts
+ *    from interrupt handlers to wake threads. Not doing so could cause
+ *    an attempt at multiple wakes or other problems.
+ */
 static void queue_release_sender(struct thread_entry **sender,
                                  intptr_t retval)
 {
     (*sender)->retval = retval;
     wakeup_thread(sender);
-    *sender = NULL;
+#if 0
+    /* This should _never_ happen - there must never be multiple
+       threads in this list and it is a corrupt state */
+    if (*sender != NULL)
+        panicf("Queue: send slot ovf");
+#endif
 }
 
 /* Releases any waiting threads that are queued with queue_send -
-   reply with NULL */
+ * reply with 0.
+ * Disable IRQs before calling since it uses queue_release_sender.
+ */
 static void queue_release_all_senders(struct event_queue *q)
 {
     if(q->send)
@@ -191,8 +206,10 @@ void queue_delete(struct event_queue *q)
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
         /* Release waiting threads and reply to any dequeued message
            waiting for one. */
+        int level = set_irq_level(HIGHEST_IRQ_LEVEL);
         queue_release_all_senders(q);
         queue_reply(q, NULL);
+        set_irq_level(level);
 #endif
         /* Move the following queues up in the list */
         for(;i < num_queues-1;i++)
@@ -319,7 +336,12 @@ void queue_reply(struct event_queue *q, intptr_t retval)
 {
     if(q->send && q->send->curr_sender)
     {
-        queue_release_sender(&q->send->curr_sender, retval);
+        int level = set_irq_level(HIGHEST_IRQ_LEVEL);
+        if(q->send->curr_sender)
+        {
+            queue_release_sender(&q->send->curr_sender, retval);
+        }
+        set_irq_level(level);
     }
 }
 #endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
