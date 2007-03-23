@@ -30,7 +30,7 @@
 #include "sansaio.h"
 #include "parttypes.h"
 
-#define VERSION "0.1 with r12824 bootloader"
+#define VERSION "0.2 with r12896 bootloader"
 
 int verbose = 0;
 
