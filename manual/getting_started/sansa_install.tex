@@ -1,37 +1,97 @@
 % $Id$ %
-\fixme{This information is new and might contain errors. Please
-  \emph{always} check out the installation page in the wiki at
-  \wikilink{SansaE200Install} and the troubleshooting page at
-  \wikilink{SansaE200TroubleShooting} first. If you have any doubts
-  about installation, \emph{stop now!} Errors during the installation might
-  render your player useless!}
+In order to make your e200 load and execute the Rockbox firmware you
+have just installed, you will need to install the Rockbox
+bootloader. Unless bugs are found in the bootloader code, or
+significant new feature are added, you will only have to perform this
+step once.
 
-The installation of the bootloader is the most critical part of the
-installation. Please make sure to read the instructions completely
-first before doing any installation step. You \emph{need} to
-prepare your \dap{} for dual boot as explained below as you
-otherwise \emph{will not} have USB access to your player.
+These steps use the sansapatcher tool. Source code is available in the Rockbox SVN repository (\url{http://svn.rockbox.org/viewvc.cgi/trunk/rbutil/sansapatcher/}).
+
+\subsubsection{Bootloader installation from Windows}
 
 \begin{enumerate}
-\item Save a backup copy of your original firmware onto your computer's hard drive.
-  You can obtain a firmware file from \url{http://daniel.haxx.se/sansa/mi4.html},
-  another way to obtain the file is to intercept the file during the firmware
-  upgrade.
-\item Install a version of the mi4code program on your system.
-  You can get a windows binary from
-  \url{http://daniel.haxx.se/sansa/mi4code.html}.
-\item Decrypt the mi4 firmware file with the following command
-  \begin{code}
-    mi4code decrypt -s SKU_E-PP5022.mi4 OF.bin
-  \end{code}
-\item Copy the decrypted original firmware file \fname{OF.bin} to the 
-  \fname{/SYSTEM} folder on your \dap{}. (This folder might be hidden).
-\item Download the Rockbox bootloader from 
-  \url{http://download.rockbox.org/bootloader/sandisk-sansa/}.
-\item Copy the bootloader you just downloaded to the root directory
-  of your \dap{}.
-\item Safely remove your \dap{} from the computer and then disconnect the
-  USB cable. This will reboot the \dap{}, then it will install the Rockbox
-  bootloader and reboot again into Rockbox.
+
+\item Make sure you are logged into your computer as Administrator, or a 
+user with Administrator privileges and connect your \dap{}.
+
+\item Download sansapatcher.exe from 
+\download{bootloader/sandisk-sansa/e200/win32/sansapatcher.exe} 
+and run it.
+
+\item If all has gone well, you should see some information displayed about
+your e200 and a message asking you if you wish to install the Rockbox
+bootloader. Press i followed by ENTER, and sansapatcher will now
+install the bootloader. After a short time you should see the message
+``[INFO] Bootloader installed successfully.'' Press ENTER again to exit
+sansapatcher.
+
+\item Disconnect your \dap{} in the usual way. The bootloader is now installed. 
+
 \end{enumerate}
 
+\subsubsection{Bootloader installation from Mac OS X}
+
+\begin{enumerate}
+
+\item Attach your \dap{} to your Mac and wait for its icon to appear in 
+Finder.
+
+\item\label{subsec:macos_umount} Open up Disk Utility
+(in Applications $\rightarrow$ Utilities) and click 
+on the name of your \dap{} (e.g. Sansa e280) in the list on the left 
+pane. Then click on the ``unmount'' icon at the top. \warn{Do \emph{not}
+click on the ``eject'' icon.}
+
+\item Download and open sansa.dmg from 
+\download{bootloader/sandisk-sansa/e200/macosx/sansapatcher.dmg} 
+and then double-click on the sansapatcher icon inside. 
+
+\item If all has gone well, you should see some 
+information displayed about your \dap{} and a message asking you if you 
+wish to install the Rockbox bootloader. Press i followed by ENTER, and 
+sansapatcher will now install the bootloader. After a short time you 
+should see the message ``[INFO] Bootloader installed successfully.'' Press 
+ENTER again to exit sansapatcher and then quit the Terminal application.
+
+\item \warn{If you received a ``Resource busy'' error from 
+sansapatcher, then this means you didn't complete step 
+\ref{subsec:macos_umount}. Go back to Disk Utility, unmount your
+\dap{} and then run sansapatcher again.}
+
+\item Your \dap{} will now automatically reconnect itself to your Mac. 
+Wait for it to connect, and then eject and unplug it in the normal way. 
+
+\end{enumerate}
+
+\subsubsection{Bootloader installation from Linux}
+
+\begin{enumerate}
+
+\item Download sansapatcher from
+\download{bootloader/sandisk-sansa/e200/linux32x86/sansapatcher} (32-bit x86 
+binary) or \download{bootloader/sandisk-sansa/e200/linux64amd64/sansapatcher} 
+(64-bit amd64 binary). You can save this anywhere you wish, but the next 
+steps will assume you've saved it in your home directory.
+
+\item Attach your \dap{} to your computer.
+
+\item Open up a terminal window and type the following commands:
+
+\begin{code} 
+    cd $HOME
+    chmod +x sansapatcher
+    ./sansapatcher
+\end{code}
+
+\warn{You may need to be the root user in order for sansapatcher to have
+sufficient permission to perform raw disk access to your \dap{}.}
+
+\item If all has gone well, you should see some information displayed about
+your e200 and a message asking you if you wish to install the Rockbox
+bootloader. Press i followed by ENTER, and sansapatcher will now install the
+bootloader. After a short time you should see the message ``[INFO] Bootloader
+installed successfully.'' Press ENTER again to exit sansapatcher.
+
+\item Disconnect your \dap{} in the usual way. The bootloader is now installed.
+
+\end{enumerate}
