@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include "thread-sdl.h"
 #include "kernel.h"
+#include "thread.h"
 #include "debug.h"
 
 SDL_Thread          *threads[256];
@@ -58,21 +59,29 @@ int runthread(void *data)
     return 0;
 }
 
-int create_thread(void (*fp)(void), void* sp, int stk_size)
+struct thread_entry* 
+    create_thread(void (*function)(void), void* stack, int stack_size,
+                  const char *name)
 {
     /** Avoid compiler warnings */
-    (void)sp;
-    (void)stk_size;
+    (void)stack;
+    (void)stack_size;
+    (void)name;
+    SDL_Thread* t;
 
     if (threadCount == 256) {
-        return -1;
+        return NULL;
     }
 
-    threads[threadCount++] = SDL_CreateThread(runthread, fp);
+    t = SDL_CreateThread(runthread, function);
+    threads[threadCount++] = t;
 
     yield();
 
-    return 0;
+    /* The return value is never de-referenced outside thread.c so this
+       nastiness should be fine.  However, a better solution would be nice.
+      */
+    return (struct thread_entry*)t;
 }
 
 void init_threads(void)
