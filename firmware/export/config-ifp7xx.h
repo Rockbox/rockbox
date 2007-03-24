@@ -80,7 +80,7 @@
 #define CONFIG_BACKLIGHT BL_IRIVER_IFP7XX /* port controlled */
 
 /* Define this to the CPU frequency */
-#define CPU_FREQ      30000000
+#define CPU_FREQ      48000000
 
 #define CONFIG_LCD LCD_IFP7XX
 
@@ -98,7 +98,7 @@
 #define HAVE_GDB_API
 
 /* Define this if you have adjustable CPU frequency */
-//#define HAVE_ADJUSTABLE_CPU_FREQ
+#define HAVE_ADJUSTABLE_CPU_FREQ
 
 #define BOOTFILE_EXT "iriver"
 #define BOOTFILE "rockbox." BOOTFILE_EXT

@@ -9,6 +9,8 @@ OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
 #ifdef CPU_PP
 INPUT(target/arm/crt0-pp.o)
+#elif CONFIG_CPU == PNX0101
+INPUT(target/arm/crt0-pnx0101.o)
 #elif defined(CPU_ARM)
 INPUT(target/arm/crt0.o)
 #endif

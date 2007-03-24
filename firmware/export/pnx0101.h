@@ -78,4 +78,147 @@
 
 #define CODECVOL     (*(volatile unsigned long *)0x80200398)
 
+#ifndef ASM
+
+/* Clock generation unit */
+
+struct pnx0101_cgu {
+    unsigned long base_scr[12];
+    unsigned long base_fs1[12];
+    unsigned long base_fs2[12];
+    unsigned long base_ssr[12];
+    unsigned long clk_pcr[73];
+    unsigned long clk_psr[73];
+    unsigned long clk_esr[67];
+    unsigned long base_bcr[3];
+    unsigned long base_fdc[18];
+};
+
+#define CGU (*(volatile struct pnx0101_cgu *)0x80004000)
+
+#define PNX0101_SEL_STAGE_SYS  0
+#define PNX0101_SEL_STAGE_APB0 1
+#define PNX0101_SEL_STAGE_APB1 2
+#define PNX0101_SEL_STAGE_APB3 3
+#define PNX0101_SEL_STAGE_DAIO 9
+
+#define PNX0101_HIPREC_FDC 16
+
+#define PNX0101_FIRST_DIV_SYS  0
+#define PNX0101_N_DIV_SYS      7
+#define PNX0101_FIRST_DIV_APB0 7
+#define PNX0101_N_DIV_APB0     2
+#define PNX0101_FIRST_DIV_APB1 9
+#define PNX0101_N_DIV_APB1     1
+#define PNX0101_FIRST_DIV_APB3 10
+#define PNX0101_N_DIV_APB3     1
+#define PNX0101_FIRST_DIV_DAIO 12
+#define PNX0101_N_DIV_DAIO     6
+
+#define PNX0101_BCR_SYS  0
+#define PNX0101_BCR_APB0 1
+#define PNX0101_BCR_DAIO 2
+
+#define PNX0101_FIRST_ESR_SYS  0
+#define PNX0101_N_ESR_SYS      28
+#define PNX0101_FIRST_ESR_APB0 28
+#define PNX0101_N_ESR_APB0     9
+#define PNX0101_FIRST_ESR_APB1 37
+#define PNX0101_N_ESR_APB1     4
+#define PNX0101_FIRST_ESR_APB3 41
+#define PNX0101_N_ESR_APB3     16
+#define PNX0101_FIRST_ESR_DAIO 58
+#define PNX0101_N_ESR_DAIO     9
+
+#define PNX0101_ESR_APB1 0x25
+#define PNX0101_ESR_T0   0x26
+#define PNX0101_ESR_T1   0x27
+#define PNX0101_ESR_I2C  0x28
+
+#define PNX0101_CLOCK_APB1 0x25
+#define PNX0101_CLOCK_T0   0x26
+#define PNX0101_CLOCK_T1   0x27
+#define PNX0101_CLOCK_I2C  0x28
+
+#define PNX0101_MAIN_CLOCK_FAST     1
+#define PNX0101_MAIN_CLOCK_MAIN_PLL 9
+
+struct pnx0101_pll {
+    unsigned long hpfin;
+    unsigned long hpmdec;
+    unsigned long hpndec;
+    unsigned long hppdec;
+    unsigned long hpmode;
+    unsigned long hpstat;
+    unsigned long hpack;
+    unsigned long hpreq;
+    unsigned long hppad1;
+    unsigned long hppad2;
+    unsigned long hppad3;
+    unsigned long hpselr;
+    unsigned long hpseli;
+    unsigned long hpselp;
+    unsigned long lpfin;
+    unsigned long lppdn;
+    unsigned long lpmbyp;
+    unsigned long lplock;
+    unsigned long lpdbyp;
+    unsigned long lpmsel;
+    unsigned long lppsel;
+};
+
+#define PLL (*(volatile struct pnx0101_pll *)0x80004cac)
+
+struct pnx0101_emc {
+    unsigned long control;
+    unsigned long status;
+};
+
+#define EMC (*(volatile struct pnx0101_emc *)0x80008000)
+
+struct pnx0101_emcstatic {
+    unsigned long config;
+    unsigned long waitwen;
+    unsigned long waitoen;
+    unsigned long waitrd;
+    unsigned long waitpage;
+    unsigned long waitwr;
+    unsigned long waitturn;
+};
+
+#define EMCSTATIC0 (*(volatile struct pnx0101_emcstatic *)0x80008200)
+#define EMCSTATIC1 (*(volatile struct pnx0101_emcstatic *)0x80008220)
+#define EMCSTATIC2 (*(volatile struct pnx0101_emcstatic *)0x80008240)
+
+/* Timers */
+
+struct pnx0101_timer {
+    unsigned long load;
+    unsigned long value;
+    unsigned long ctrl;
+    unsigned long clr;
+};
+
+#define TIMER0 (*(volatile struct pnx0101_timer *)0x80020000)
+#define TIMER1 (*(volatile struct pnx0101_timer *)0x80020400)
+
+/* Interrupt controller */
+
+#define IRQ_TIMER0 5
+#define IRQ_TIMER1 6
+#define IRQ_DMA    28
+
+#define INTPRIOMASK ((volatile unsigned long *)0x80300000)
+#define INTVECTOR   ((volatile unsigned long *)0x80300100)
+#define INTPENDING  (*(volatile unsigned long *)0x80300200)
+#define INTFEATURES (*(volatile unsigned long *)0x80300300)
+#define INTREQ      ((volatile unsigned long *)0x80300400)
+
+#define INTREQ_WEPRIO   0x10000000
+#define INTREQ_WETARGET 0x08000000
+#define INTREQ_WEENABLE 0x04000000
+#define INTREQ_WEACTVLO 0x02000000
+
+#endif /* ASM */
+
 #endif

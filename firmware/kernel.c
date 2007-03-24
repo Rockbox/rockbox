@@ -594,23 +594,21 @@ void timer_handler(void)
 
     current_tick++;
 
-    TIMERR0C = 1;
+    TIMER0.clr = 0;
 }
 
 void tick_start(unsigned int interval_in_ms)
 {
-  TIMERR08 &= ~0x80;
-  TIMERR0C = 1;
-  TIMERR08 &= ~0x80;
-  TIMERR08 |= 0x40;
-  TIMERR00 = 3000000 * interval_in_ms / 1000;
-  TIMERR08 &= ~0xc;
-  TIMERR0C = 1;
+    TIMER0.ctrl &= ~0x80; /* Disable the counter */
+    TIMER0.ctrl |= 0x40;  /* Reload after counting down to zero */
+    TIMER0.load = 3000000 * interval_in_ms / 1000;
+    TIMER0.ctrl &= ~0xc;  /* No prescaler */
+    TIMER0.clr = 1;       /* Clear the interrupt request */
 
-  irq_set_int_handler(4, timer_handler);
-  irq_enable_int(4);
+    irq_set_int_handler(IRQ_TIMER0, timer_handler);
+    irq_enable_int(IRQ_TIMER0);
 
-  TIMERR08 |= 0x80;
+    TIMER0.ctrl |= 0x80;  /* Enable the counter */
 }
 #elif CONFIG_CPU == S3C2440
 void tick_start(unsigned int interval_in_ms)

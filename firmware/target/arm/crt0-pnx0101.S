@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id: crt0.S 11850 2006-12-29 02:49:12Z markun $
  *
  * Copyright (C) 2002 by Linus Nielsen Feltzing
  *
@@ -16,6 +16,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#define ASM  /* do not include structure definitions from pnx0101.h */
+
 #include "config.h"
 #include "cpu.h"
 
@@ -34,6 +36,33 @@ start:
     msr    cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ */
 
 #ifndef BOOTLOADER
+#ifndef DEBUG
+    ldr    r0, =0x80105000
+    mov    r1, #1
+    str    r1, [r0, #4]
+    mov    r1, #0
+    str    r1, [r0, #4]
+1:  ldr    r1, [r0]
+    cmp    r1, #0
+    bne    1b
+    mov    r1, #0x74
+    str    r1, [r0, #8]
+    mov    r1, #2
+    str    r1, [r0, #0x18]
+    mov    r1, #2
+    str    r1, [r0, #0x20]
+    mov    r1, #82
+    str    r1, [r0, #0x28]
+    mov    r1, #100
+    str    r1, [r0, #0x2c]
+    mov    r1, #0x120
+    str    r1, [r0, #0x30]
+    mov    r1, #6
+    str    r1, [r0, #4]
+    ldr    r0, =1f
+    mov    r15, r0
+1:
+#endif /* !DEBUG */
 
 #ifndef DEBUG
     /* Copy exception handler code to address 0 */
@@ -94,34 +123,6 @@ start:
     strhi  r4, [r2], #4
     bhi    1b
 
-#ifdef BOOTLOADER
-/* Code for ARM bootloader targets other than iPod go here */
-
-#if CONFIG_CPU == S3C2440
-    /* get the high part of our execute address */
-    ldr    r2, =0xffffff00
-    and    r4, pc, r2
-
-    /* Copy bootloader to safe area - 0x31000000 */
-    mov    r5, #0x30000000
-    add    r5, r5, #0x1000000
-    ldr    r6, = _dataend
-    sub    r0, r6, r5       /* length of loader */
-    add    r0, r4, r0     /* r0 points to start of loader */
-1:
-    cmp    r5, r6
-    ldrcc  r2, [r4], #4
-    strcc  r2, [r5], #4
-    bcc    1b
-
-    ldr    pc, =start_loc    /* jump to the relocated start_loc:  */
-    
-start_loc:
-     bl main
-#endif
-
-#else /* BOOTLOADER */
-    
     /* Set up stack for IRQ mode */ 
     msr    cpsr_c, #0xd2
     ldr    sp, =irq_stack
@@ -226,5 +227,3 @@ irq_stack:
 /* 256 words of FIQ stack */
     .space 256*4
 fiq_stack:
-
-#endif /* BOOTLOADER */ 

@@ -278,6 +278,9 @@ drivers/i2c-pnx0101.c
 #elif CONFIG_I2C == I2C_S3C2440
 /* no i2c driver yet */
 #endif
+#if CONFIG_CPU == PNX0101
+target/arm/system-pnx0101.c
+#endif
 #if defined(CPU_PP)
 #ifdef BOOTLOADER
 target/arm/crt0-pp-bl.S
@@ -286,6 +289,8 @@ target/arm/pcm-pp.c
 target/arm/audio-pp.c
 target/arm/crt0-pp.S
 #endif
+#elif CONFIG_CPU == PNX0101
+target/arm/crt0-pnx0101.S
 #elif defined(CPU_ARM)
 target/arm/crt0.S
 #endif /* defined(CPU_*) */

@@ -296,6 +296,12 @@ static inline unsigned long swap32(unsigned long value)
 #define CPUFREQ_NORMAL  98784000
 #define CPUFREQ_MAX    296352000
 
+#elif CONFIG_CPU == PNX0101
+
+#define CPUFREQ_DEFAULT 12000000
+#define CPUFREQ_NORMAL  48000000
+#define CPUFREQ_MAX     60000000
+
 #else
 
 #define CPUFREQ_DEFAULT_MULT 8
@@ -385,6 +391,7 @@ typedef void (*interrupt_handler_t)(void);
 
 void irq_set_int_handler(int n, interrupt_handler_t handler);
 void irq_enable_int(int n);
+void irq_disable_int(int n);
 #endif
 
 #endif

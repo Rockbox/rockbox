@@ -32,6 +32,8 @@
 #elif defined(CPU_COLDFIRE)
  /* timer is based on busclk == cpuclk/2 */
  #define TIMER_FREQ (CPU_FREQ/2)
+#elif CONFIG_CPU == PNX0101
+ #define TIMER_FREQ 3000000
 #else
  #define TIMER_FREQ CPU_FREQ
 #endif
