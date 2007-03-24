@@ -154,9 +154,9 @@ static inline long decode_packed_entry_number(codebook *book,
   long lo,hi;
   long lok = oggpack_look(b,book->dec_firsttablen);
  
-  if (lok >= 0) {
+  if (EXPECT(lok >= 0, 1)) {
     long entry = book->dec_firsttable[lok];
-    if(entry&0x80000000UL){
+    if(EXPECT(entry&0x80000000UL, 0)){
       lo=(entry>>15)&0x7fff;
       hi=book->used_entries-(entry&0x7fff);
     }else{
@@ -194,6 +194,78 @@ static inline long decode_packed_entry_number(codebook *book,
   oggpack_adv(b, read);
   return(-1);
 }
+
+static inline long decode_packed_block(codebook *book, oggpack_buffer *b,
+                                long *buf, int n){
+  long *bufptr = buf;
+  long *bufend = buf + n;
+
+  while (bufptr<bufend) {
+    if (b->headend > 8) {
+      ogg_uint32_t *ptr;
+      unsigned long bit, bitend;
+      unsigned long adr;
+      ogg_uint32_t cache = 0;
+      int cachesize = 0;
+
+      adr = (unsigned long)b->headptr;
+      bit = (adr&3)*8+b->headbit;
+      ptr = (ogg_uint32_t *)(adr&~3);
+      bitend = ((adr&3)+b->headend)*8;
+      while (bufptr<bufend){
+	long entry, lo, hi;
+	if (EXPECT(cachesize<book->dec_maxlength, 0)) {
+	  if (bit-cachesize+32>=bitend)
+	    break;
+	  bit-=cachesize;
+	  cache=letoh32(ptr[bit>>5]) >> (bit&31);
+	  if (bit&31)
+	    cache|=letoh32(ptr[(bit>>5)+1]) << (32-(bit&31));
+	  cachesize=32;
+	  bit+=32;
+	}
+
+	entry=book->dec_firsttable[cache&((1<<book->dec_firsttablen)-1)];
+	if(EXPECT(entry&0x80000000UL, 0)){
+	  lo=(entry>>15)&0x7fff;
+	  hi=book->used_entries-(entry&0x7fff);
+	  {
+	    ogg_uint32_t testword=bitreverse((ogg_uint32_t)cache);
+	    
+            while(EXPECT(hi-lo>1, 1)){
+              long p=(hi-lo)>>1;
+              if (book->codelist[lo+p]>testword)
+                hi-=p;
+              else
+                lo+=p;
+            }
+            entry=lo;
+          }
+	}else
+	  entry--;
+
+	*bufptr++=entry;
+	{
+	  int l=book->dec_codelengths[entry];
+	  cachesize-=l;
+	  cache>>=l;
+	}
+      }
+
+      adr=(unsigned long)b->headptr;
+      bit-=(adr&3)*8+cachesize;
+      b->headend-=(bit/8);
+      b->headptr+=bit/8;
+      b->headbit=bit%8;
+    } else {
+      long r = decode_packed_entry_number(book, b);
+      if (r == -1) return bufptr-buf;
+      *bufptr++ = r;
+    }
+  }
+  return n;
+}
+
 
 /* Decode side is specced and easier, because we don't need to find
    matches using different criteria; we simply read and map.  There are
@@ -310,17 +382,20 @@ long vorbis_book_decodev_set(codebook *book,ogg_int32_t *a,
 long vorbis_book_decodevv_add(codebook *book,ogg_int32_t **a,
 			      long offset,int ch,
 			      oggpack_buffer *b,int n,int point){
-  long i,j,entry;
+  long i,j,k,chunk,read;
   int chptr=0;
   int shift=point-book->binarypoint;
-  
+  long entries[32];
+
   if(shift>=0){
     
     for(i=offset;i<offset+n;){
-      entry = decode_packed_entry_number(book,b);
-      if(entry==-1)return(-1);
-      {
-	const ogg_int32_t *t = book->valuelist+entry*book->dim;
+      chunk=32;
+      if (chunk*book->dim>(offset+n-i)*ch)
+        chunk=((offset+n-i)*ch+book->dim-1)/book->dim;
+      read = decode_packed_block(book,b,entries,chunk);
+      for(k=0;k<read;k++){
+	const ogg_int32_t *t = book->valuelist+entries[k]*book->dim;
 	for (j=0;j<book->dim;j++){
 	  a[chptr++][i]+=t[j]>>shift;
 	  if(chptr==ch){
@@ -329,14 +404,17 @@ long vorbis_book_decodevv_add(codebook *book,ogg_int32_t **a,
 	  }
 	}
       }
+      if (read<chunk)return-1;
     }
   }else{
     shift = -shift;
     for(i=offset;i<offset+n;){
-      entry = decode_packed_entry_number(book,b);
-      if(entry==-1)return(-1);
-      {
-	const ogg_int32_t *t = book->valuelist+entry*book->dim;
+      chunk=32;
+      if (chunk*book->dim>(offset+n-i)*ch)
+        chunk=((offset+n-i)*ch+book->dim-1)/book->dim;
+      read = decode_packed_block(book,b,entries,chunk);
+      for(k=0;k<read;k++){
+	const ogg_int32_t *t = book->valuelist+entries[k]*book->dim;
 	for (j=0;j<book->dim;j++){
 	  a[chptr++][i]+=t[j]<<shift;
 	  if(chptr==ch){
@@ -345,6 +423,7 @@ long vorbis_book_decodevv_add(codebook *book,ogg_int32_t **a,
 	  }
 	}
       }
+      if (read<chunk)return-1;
     }
   }
   return(0);
