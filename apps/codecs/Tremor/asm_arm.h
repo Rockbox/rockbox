@@ -95,6 +95,112 @@ static inline void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
   *y = y1 << 1;
 }
 
+#ifndef _V_VECT_OPS
+#define _V_VECT_OPS
+
+/* asm versions of vector operations for block.c, window.c */
+static inline 
+void vect_add(ogg_int32_t *x, ogg_int32_t *y, int n)
+{
+  while (n>=4) {
+    asm volatile ("ldmia %[x], {r0, r1, r2, r3};"
+                  "ldmia %[y]!, {r4, r5, r6, r7};"
+                  "add r0, r0, r4;"
+                  "add r1, r1, r5;"
+                  "add r2, r2, r6;"
+                  "add r3, r3, r7;"
+                  "stmia %[x]!, {r0, r1, r2, r3};"
+                  : [x] "+r" (x), [y] "+r" (y)
+                  : : "r0", "r1", "r2", "r3",
+                  "r4", "r5", "r6", "r7",
+                  "memory");
+    n -= 4;
+  }
+  /* add final elements */
+  while (n>0) {
+    *x++ += *y++;
+    n--;
+  }
+}
+
+static inline 
+void vect_copy(ogg_int32_t *x, ogg_int32_t *y, int n)
+{
+  while (n>=4) {
+    asm volatile ("ldmia %[y]!, {r0, r1, r2, r3};"
+                  "stmia %[x]!, {r0, r1, r2, r3};"
+                  : [x] "+r" (x), [y] "+r" (y)
+                  : : "r0", "r1", "r2", "r3",
+                  "memory");
+    n -= 4;
+  }
+  /* copy final elements */
+  while (n>0) {
+    *x++ = *y++;
+    n--;
+  }
+}
+
+static inline 
+void vect_mult_fw(ogg_int32_t *data, LOOKUP_T *window, int n)
+{
+  while (n>=4) {
+    asm volatile ("ldmia %[d], {r0, r1, r2, r3};"
+                  "ldmia %[w]!, {r4, r5, r6, r7};"
+                  "smull r8, r9, r0, r4;"
+                  "mov   r0, r9, lsl #1;"
+                  "smull r8, r9, r1, r5;"
+                  "mov   r1, r9, lsl #1;"
+                  "smull r8, r9, r2, r6;"
+                  "mov   r2, r9, lsl #1;"
+                  "smull r8, r9, r3, r7;"
+                  "mov   r3, r9, lsl #1;"
+                  "stmia %[d]!, {r0, r1, r2, r3};"
+                  : [d] "+r" (data), [w] "+r" (window)
+                  : : "r0", "r1", "r2", "r3",
+                  "r4", "r5", "r6", "r7", "r8", "r9",
+                  "memory", "cc");
+    n -= 4;
+  }
+  while(n>0) {
+    *data = MULT31(*data, *window);
+    data++;
+    window++;
+    n--;
+  }
+}
+
+static inline
+void vect_mult_bw(ogg_int32_t *data, LOOKUP_T *window, int n)
+{
+  while (n>=4) {
+    asm volatile ("ldmia %[d], {r0, r1, r2, r3};"
+                  "ldmda %[w]!, {r4, r5, r6, r7};"
+                  "smull r8, r9, r0, r7;"
+                  "mov   r0, r9, lsl #1;"
+                  "smull r8, r9, r1, r6;"
+                  "mov   r1, r9, lsl #1;"
+                  "smull r8, r9, r2, r5;"
+                  "mov   r2, r9, lsl #1;"
+                  "smull r8, r9, r3, r4;"
+                  "mov   r3, r9, lsl #1;"
+                  "stmia %[d]!, {r0, r1, r2, r3};"
+                  : [d] "+r" (data), [w] "+r" (window)
+                  : : "r0", "r1", "r2", "r3",
+                  "r4", "r5", "r6", "r7", "r8", "r9",
+                  "memory", "cc");
+    n -= 4;
+  }
+  while(n>0) {
+    *data = MULT31(*data, *window);
+    data++;
+    window--;
+    n--;
+  }
+}
+
+#endif
+
 #endif
 
 #ifndef _V_CLIP_MATH

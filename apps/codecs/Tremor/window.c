@@ -68,27 +68,11 @@ void _vorbis_apply_window(ogg_int32_t *d,const void *window_p[2],
   long rightbegin=n/2+n/4-rn/4;
   long rightend=rightbegin+rn/2;
 
-#ifdef CPU_COLDFIRE
   memset((void *)&d[0], 0, sizeof(ogg_int32_t)*leftbegin);
   /* mcf5249_vect_zero(&d[0], leftbegin); */
-  mcf5249_vect_mult_fw(&d[leftbegin], &window[lW][0], leftend-leftbegin);
-  mcf5249_vect_mult_bw(&d[rightbegin], &window[nW][rn/2-1], rightend-rightbegin);
+  vect_mult_fw(&d[leftbegin], &window[lW][0], leftend-leftbegin);
+  vect_mult_bw(&d[rightbegin], &window[nW][rn/2-1], rightend-rightbegin);
   memset((void *)&d[rightend], 0, sizeof(ogg_int32_t)*(n-rightend));
   /* mcf5249_vect_zero(&d[rightend], n-rightend); */
-#else  
-  int i,p;
-
-  for(i=0;i<leftbegin;i++)
-    d[i]=0;
-
-  for(p=0;i<leftend;i++,p++)
-    d[i]=MULT31(d[i],window[lW][p]);
-
-  for(i=rightbegin,p=rn/2-1;i<rightend;i++,p--)
-    d[i]=MULT31(d[i],window[nW][p]);
-
-  for(;i<n;i++)
-    d[i]=0;
-#endif
 }
 

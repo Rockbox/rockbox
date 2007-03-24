@@ -262,11 +262,7 @@ int vorbis_synthesis_blockin(vorbis_dsp_state *v,vorbis_block *vb){
   vorbis_info *vi=v->vi;
   codec_setup_info *ci=(codec_setup_info *)vi->codec_setup;
   private_state *b=v->backend_state;
-#ifdef CPU_COLDFIRE
   int j;
-#else
-  int i,j;
-#endif
 
   if(v->pcm_current>v->pcm_returned  && v->pcm_returned!=-1)return(OV_EINVAL);
 
@@ -312,47 +308,25 @@ int vorbis_synthesis_blockin(vorbis_dsp_state *v,vorbis_block *vb){
           /* large/large */
           ogg_int32_t *pcm=v->pcm[j]+prevCenter;
           ogg_int32_t *p=vb->pcm[j];
-#ifdef CPU_COLDFIRE
-          mcf5249_vect_add(pcm, p, n1);
-#else
-          for(i=0;i<n1;i++)
-            pcm[i]+=p[i]; 
-#endif
+          vect_add(pcm, p, n1);
         }else{
           /* large/small */
           ogg_int32_t *pcm=v->pcm[j]+prevCenter+n1/2-n0/2;
           ogg_int32_t *p=vb->pcm[j];
-#ifdef CPU_COLDFIRE
-          mcf5249_vect_add(pcm, p, n0);
-#else
-          for(i=0;i<n0;i++)
-            pcm[i]+=p[i];
-#endif
+          vect_add(pcm, p, n0);
         }
       }else{
         if(v->W){
           /* small/large */
           ogg_int32_t *pcm=v->pcm[j]+prevCenter;
           ogg_int32_t *p=vb->pcm[j]+n1/2-n0/2;
-#ifdef CPU_COLDFIRE
-          mcf5249_vect_add(pcm, p, n0);
-          mcf5249_vect_copy(&pcm[n0], &p[n0], n1/2-n0/2);
-#else
-          for(i=0;i<n0;i++)
-            pcm[i]+=p[i];
-          for(;i<n1/2+n0/2;i++)
-            pcm[i]=p[i];
-#endif
+          vect_add(pcm, p, n0);
+          vect_copy(&pcm[n0], &p[n0], n1/2-n0/2);
         }else{
           /* small/small */
           ogg_int32_t *pcm=v->pcm[j]+prevCenter;
           ogg_int32_t *p=vb->pcm[j];
-#ifdef CPU_COLDFIRE
-          mcf5249_vect_add(pcm, p, n0);
-#else 
-          for(i=0;i<n0;i++)
-            pcm[i]+=p[i];
-#endif
+          vect_add(pcm, p, n0);
         }
       }
       
@@ -360,12 +334,7 @@ int vorbis_synthesis_blockin(vorbis_dsp_state *v,vorbis_block *vb){
       {
         ogg_int32_t *pcm=v->pcm[j]+thisCenter;
         ogg_int32_t *p=vb->pcm[j]+n;
-#ifdef CPU_COLDFIRE
-        mcf5249_vect_copy(pcm, p, n);
-#else
-        for(i=0;i<n;i++)
-          pcm[i]=p[i];
-#endif
+        vect_copy(pcm, p, n);
       }
     }
     

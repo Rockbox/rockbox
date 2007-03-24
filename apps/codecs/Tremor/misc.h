@@ -151,6 +151,51 @@ static inline void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
   *y = MULT31(b, t) + MULT31(a, v);
 }
 #endif
+
+#ifndef _V_VECT_OPS
+#define _V_VECT_OPS
+
+static inline 
+void vect_add(ogg_int32_t *x, ogg_int32_t *y, int n)
+{
+  while (n>0) {
+    *x++ += *y++;
+    n--;
+  }
+}
+
+static inline 
+void vect_copy(ogg_int32_t *x, ogg_int32_t *y, int n)
+{
+  while (n>0) {
+    *x++ = *y++;
+    n--;
+  }
+}
+
+static inline 
+void vect_mult_fw(ogg_int32_t *data, LOOKUP_T *window, int n)
+{
+  while(n>0) {
+    *data = MULT31(*data, *window);
+    data++;
+    window++;
+    n--;
+  }
+}
+
+static inline
+void vect_mult_bw(ogg_int32_t *data, LOOKUP_T *window, int n)
+{
+  while(n>0) {
+    *data = MULT31(*data, *window);
+    data++;
+    window--;
+    n--;
+  }
+}
+#endif
+
 #endif
 
 #ifndef _V_CLIP_MATH

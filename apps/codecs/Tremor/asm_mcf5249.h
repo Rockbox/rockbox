@@ -132,10 +132,13 @@ void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
                   [t] "r" (_t), [v] "r" (_v) \
                 : "cc");
 
+#ifndef _V_VECT_OPS
+#define _V_VECT_OPS
+
 /* asm versions of vector operations for block.c, window.c */
 /* assumes MAC is initialized & accumulators cleared */
 static inline 
-void mcf5249_vect_add(ogg_int32_t *x, ogg_int32_t *y, int n)
+void vect_add(ogg_int32_t *x, ogg_int32_t *y, int n)
 {
   /* align to 16 bytes */
   while(n>0 && (int)x&16) {
@@ -169,7 +172,7 @@ void mcf5249_vect_add(ogg_int32_t *x, ogg_int32_t *y, int n)
 }
 
 static inline 
-void mcf5249_vect_copy(ogg_int32_t *x, ogg_int32_t *y, int n)
+void vect_copy(ogg_int32_t *x, ogg_int32_t *y, int n)
 {
   /* align to 16 bytes */
   while(n>0 && (int)x&16) {
@@ -196,7 +199,7 @@ void mcf5249_vect_copy(ogg_int32_t *x, ogg_int32_t *y, int n)
 
 
 static inline 
-void mcf5249_vect_mult_fw(ogg_int32_t *data, LOOKUP_T *window, int n)
+void vect_mult_fw(ogg_int32_t *data, LOOKUP_T *window, int n)
 {
   /* ensure data is aligned to 16-bytes */
   while(n>0 && (int)data%16) {
@@ -250,7 +253,7 @@ void mcf5249_vect_mult_fw(ogg_int32_t *data, LOOKUP_T *window, int n)
 }
 
 static inline 
-void mcf5249_vect_mult_bw(ogg_int32_t *data, LOOKUP_T *window, int n)
+void vect_mult_bw(ogg_int32_t *data, LOOKUP_T *window, int n)
 {
   /* ensure at least data is aligned to 16-bytes */
   while(n>0 && (int)data%16) {
@@ -334,6 +337,8 @@ void mcf5249_vect_zero(ogg_int32_t *ptr, int n)
     n--;
   }
 }
+#endif
+
 #endif
 
 #endif
