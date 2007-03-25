@@ -718,8 +718,10 @@ static int game_menu (void)
 {
     MENUITEM_STRINGLIST(menu, "XOBOX Menu", NULL, "Start New Game", "Quit");
     int selection = 0;
+#ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground (rb->global_settings->fg_color);
     rb->lcd_set_background (rb->global_settings->bg_color);
+#endif
     selection = rb->do_menu(&menu, NULL);
     if (selection < 0)
     {
