@@ -115,7 +115,7 @@ MENUITEM_SETTING(flip_display, &global_settings.flip_display, flipdisplay_callba
 #endif
 MENUITEM_SETTING(invert_cursor, &global_settings.invert_cursor, NULL);
 #endif /* HAVE_LCD_BITMAP */
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
 /**
 * Menu to clear the backdrop image
  */
@@ -127,7 +127,10 @@ static int clear_main_backdrop(void)
     settings_save();
     return 0;
 }
-
+MENUITEM_FUNCTION(clear_main_bd, 0, ID2P(LANG_CLEAR_BACKDROP),
+                    clear_main_backdrop, NULL, NULL, Icon_NOICON);
+#endif /* LCD_DEPTH > 1 */
+#ifdef HAVE_LCD_COLOR
 /**
  * Menu for fore/back colors
  */
@@ -159,8 +162,6 @@ static int reset_color(void)
     screens[SCREEN_MAIN].set_background(global_settings.bg_color);
     return 0;
 }
-MENUITEM_FUNCTION(clear_main_bd, 0, ID2P(LANG_CLEAR_BACKDROP),
-                    clear_main_backdrop, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(set_bg_col, 0, ID2P(LANG_BACKGROUND_COLOR),
                     set_bg_color, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(set_fg_col, 0, ID2P(LANG_FOREGROUND_COLOR),
@@ -204,8 +205,11 @@ MAKE_MENU(lcd_settings,ID2P(LANG_LCD_MENU),
 # endif
             ,&invert_cursor
 #endif /* HAVE_LCD_BITMAP */
+#if LCD_DEPTH > 1
+            ,&clear_main_bd,
+#endif
 #ifdef HAVE_LCD_COLOR
-            ,&clear_main_bd, &set_bg_col, &set_fg_col, &reset_colors
+            &set_bg_col, &set_fg_col, &reset_colors
 #endif
          );
 /*    LCD MENU                    */
