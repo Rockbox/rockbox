@@ -142,6 +142,11 @@ static void menu_get_icon(int selected_item, void * data, ICON * icon)
     int menu_icon = Icon_NOICON;
     selected_item = get_menu_selection(selected_item, menu);
     
+    if ((menu->flags&MENU_TYPE_MASK) == MT_RETURN_ID)
+    {
+        *icon = bitmap_icons_6x8[Icon_Menu_functioncall];
+        return;
+    }
     menu = menu->submenus[selected_item];
     if (menu->flags&MENU_HAS_DESC)
         menu_icon = menu->callback_and_desc->icon_id;
@@ -177,22 +182,27 @@ static void init_menu_lists(const struct menu_item_ex *menu,
                      struct gui_synclist *lists, int selected, bool callback)
 {
     int i, count = MENU_GET_COUNT(menu->flags);
+    int type = (menu->flags&MENU_TYPE_MASK);
     menu_callback_type menu_callback = NULL;
     ICON icon = NOICON;
     current_subitems_count = 0;
 
-    if ((menu->flags&MENU_TYPE_MASK) == MT_OLD_MENU)
+    if (type == MT_OLD_MENU)
     {
         init_oldmenu(menu, lists, selected, callback);
         return;
     }
-    
+    if (type == MT_RETURN_ID)
+        get_menu_callback(menu, &menu_callback);
+
     for (i=0; i<count; i++)
     {
-        get_menu_callback(menu->submenus[i],&menu_callback);
+        if (type != MT_RETURN_ID)
+            get_menu_callback(menu->submenus[i],&menu_callback);
         if (menu_callback)
         {
-            if (menu_callback(ACTION_REQUEST_MENUITEM,menu->submenus[i])
+            if (menu_callback(ACTION_REQUEST_MENUITEM,
+                    type==MT_RETURN_ID ? (void*)(intptr_t)i: menu->submenus[i])
                     != ACTION_EXIT_MENUITEM)
             {
                 current_subitems[current_subitems_count] = i;
@@ -524,13 +534,15 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
             if (in_stringlist)
                 type = (menu->flags&MENU_TYPE_MASK);
             else 
-                type = (temp->flags&MENU_TYPE_MASK);
-            get_menu_callback(temp, &menu_callback);
-            if (menu_callback)
             {
-                action = menu_callback(ACTION_ENTER_MENUITEM,temp);
-                if (action == ACTION_EXIT_MENUITEM)
-                    break;
+                type = (temp->flags&MENU_TYPE_MASK);
+                get_menu_callback(temp, &menu_callback);
+                if (menu_callback)
+                {
+                    action = menu_callback(ACTION_ENTER_MENUITEM,temp);
+                    if (action == ACTION_EXIT_MENUITEM)
+                        break;
+                }
             }
             switch (type)
             {

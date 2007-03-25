@@ -716,60 +716,14 @@ static inline void move_board (void)
 #define MENU_QUIT  1
 static int game_menu (void)
 {
-    static char menu[MAIN_MENU_SIZE][15] = {
-        "Start New Game",
-        "Quit"
-    };
-
-    int button, selection = 0, sw, sh, i;
-    bool quit = false;
-
-    rb->lcd_setfont(FONT_UI);
-    rb->lcd_getstringsize("A", &sw, &sh);
-    if(sw*20 > LCD_WIDTH || sh*4 > LCD_HEIGHT)
-        rb->lcd_setfont(FONT_SYSFIXED);
-
-    rb->lcd_getstringsize ("XOBOX", &sw, &sh);
-    sh++;
-    rb->lcd_set_background (LCD_WHITE);
-    rb->lcd_set_foreground (LCD_BLACK);
-    rb->lcd_clear_display ();
-    rb->lcd_putsxy (LCD_WIDTH / 2 - sw / 2, 2, "XOBOX");
-    while (!quit) {
-        for (i = 0; i < MAIN_MENU_SIZE; i++) {
-            rb->lcd_set_foreground ((i == selection ? LCD_WHITE : LCD_BLACK));
-            rb->lcd_set_background ((i == selection ? CLR_BLUE : LCD_WHITE));
-            rb->lcd_putsxy (10, sh + 4 + i * sh, menu[i]);
-        }
-        rb->lcd_update ();
-        button = rb->button_get (true);
-        switch (button) {
-#ifdef MENU_UP
-            case MENU_UP:
-#else
-            case UP:
-#endif
-                selection = (selection + MAIN_MENU_SIZE - 1) % MAIN_MENU_SIZE;
-                break;
-#ifdef MENU_UP
-            case MENU_DOWN:
-#else
-            case DOWN:
-#endif
-                selection = (selection + 1) % MAIN_MENU_SIZE;
-                break;
-            case SELECT:
-            case RIGHT:
-                quit = true;
-                break;
-#ifdef RC_QUIT
-            case RC_QUIT:
-#endif
-            case QUIT:
-                selection = MENU_QUIT;
-                quit = true;
-                break;
-        }
+    MENUITEM_STRINGLIST(menu, "XOBOX Menu", NULL, "Start New Game", "Quit");
+    int selection = 0;
+    rb->lcd_set_foreground (rb->global_settings->fg_color);
+    rb->lcd_set_background (rb->global_settings->bg_color);
+    selection = rb->do_menu(&menu, NULL);
+    if (selection < 0)
+    {
+        selection = MENU_QUIT;
     }
     return selection;
 }

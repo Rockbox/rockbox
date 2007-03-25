@@ -130,7 +130,7 @@ bool do_setting_from_menu(const struct menu_item_ex *temp);
     static const struct menu_item_ex name =                             \
         {MT_RETURN_ID|MENU_HAS_DESC|                                    \
          MENU_ITEM_COUNT(sizeof( name##_)/sizeof(*name##_)),            \
-            { .submenus = name##_},{.callback_and_desc = & name##__}};
+            { .strings = name##_},{.callback_and_desc = & name##__}};
 
             
 /* returns a value associated with the item */
