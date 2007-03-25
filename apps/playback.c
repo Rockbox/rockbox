@@ -3295,6 +3295,12 @@ static void audio_stop_playback(void)
         /* Save the current playing spot, or NULL if the playlist has ended */
         playlist_update_resume_info(
             (playlist_end && ci.stop_codec)?NULL:audio_current_track());
+
+        /* inc index so runtime info is saved in audio_clear_track_entries() */
+        /* done here, as audio_stop_playback() may be called more than once */
+        track_ridx++;
+        track_ridx &= MAX_TRACK_MASK;
+
     }
 
     filling = false;
