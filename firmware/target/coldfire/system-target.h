@@ -71,9 +71,10 @@ static inline int set_irq_level(int level)
 {
     int oldlevel;
     /* Read the old level and set the new one */
-    asm volatile ("move.w %%sr,%0\n"
-                  "or.l #0x2000,%1\n"
-                  "move.w %1,%%sr\n" : "=d" (oldlevel), "+d" (level) : );
+    asm volatile ("move.w %%sr, %0 \n"
+                  "bset.l #13, %1  \n" /* Keep supervisor state set */
+                  "move.w %1, %%sr \n"
+                  : "=d"(oldlevel), "+d"(level));
     return oldlevel;
 }
 
