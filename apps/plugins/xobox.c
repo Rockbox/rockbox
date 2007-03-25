@@ -131,12 +131,10 @@ PLUGIN_HEADER
 
 #ifdef HAVE_LCD_COLOR
 #define CLR_RED  LCD_RGBPACK(255,0,0)         /* used to imply danger */
-#define CLR_BLUE LCD_RGBPACK(0,0,128)         /* used for menu selection */
 #define CLR_LTBLUE LCD_RGBPACK(125, 145, 180) /* used for frame and filling */
 #define PLR_COL  LCD_WHITE                    /* color used for the player */
 #else
 #define CLR_RED  LCD_DARKGRAY     /* used to imply danger */
-#define CLR_BLUE LCD_BLACK        /* used for menu selection */
 #define CLR_LTBLUE LCD_LIGHTGRAY  /* used for frame and filling */
 #define PLR_COL  LCD_BLACK        /* color used for the player */
 #endif
@@ -149,6 +147,9 @@ PLUGIN_HEADER
 #define CHECKED 1
 #define PIC_QIX 0
 #define PIC_PLAYER 1
+
+#define MENU_START 0
+#define MENU_QUIT 1
 
 /* The time (in ms) for one iteration through the game loop - decrease this
    to speed up the game - note that current_tick is (currently) only accurate
@@ -711,9 +712,6 @@ static inline void move_board (void)
 }
 
 /* the main menu */
-#define MAIN_MENU_SIZE 2
-#define MENU_START 0
-#define MENU_QUIT  1
 static int game_menu (void)
 {
     MENUITEM_STRINGLIST(menu, "XOBOX Menu", NULL, "Start New Game", "Quit");
@@ -721,6 +719,9 @@ static int game_menu (void)
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground (rb->global_settings->fg_color);
     rb->lcd_set_background (rb->global_settings->bg_color);
+#else
+    rb->lcd_set_foreground(LCD_BLACK);
+    rb->lcd_set_background(LCD_WHITE);
 #endif
     selection = rb->do_menu(&menu, NULL);
     if (selection < 0)
@@ -789,7 +790,10 @@ static int xobox_loop (void)
                 if (ret == MENU_START)
                     init_game ();
                 else
+                {
                     quit = true;
+                    continue;
+                }
                 break;
             default:
                 if (rb->default_event_handler (button) == SYS_USB_CONNECTED)
@@ -832,6 +836,8 @@ enum plugin_status plugin_start (struct plugin_api *api, void *parameter)
     /* Permanently enable the backlight (unless the user has turned it off) */
     if (rb->global_settings->backlight_timeout > 0)
         rb->backlight_set_timeout (1);
+        
+    quit = false;
 
     randomize ();
     if (game_menu () == MENU_START) {
