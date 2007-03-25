@@ -172,8 +172,11 @@ typedef struct
    uint8_t* curr_packet;        /* Current stream packet beginning */
    uint8_t* curr_packet_end;    /* Current stream packet end */
 
-   uint8_t* next_packet;        /* Next stream packet beginning */    
- 
+   uint8_t* prev_packet;        /* Previous stream packet beginning */
+   uint8_t* next_packet;        /* Next stream packet beginning */
+
+   size_t guard_bytes;          /* Number of bytes in guardbuf used */
+   size_t buffer_remaining;     /* How much data is left in the buffer */ 
    int id;
 } Stream;
 
@@ -184,6 +187,8 @@ static Stream video_str IBSS_ATTR;
    on the ipod (reason unknown)
 */
 static uint8_t *disk_buf, *disk_buf_end;
+static uint8_t *disk_buf_tail IBSS_ATTR;
+static size_t buffer_size IBSS_ATTR;
 
 /* Events */
 static struct event_queue msg_queue IBSS_ATTR;
@@ -212,6 +217,10 @@ int videostatus IBSS_ATTR;
 #define PCMBUFFER_SIZE (512*1024)
 #define AUDIOBUFFER_SIZE (32*1024)
 #define LIBMPEG2BUFFER_SIZE (2*1024*1024)
+
+/* TODO: Is 32KB enough?  */
+#define MPEG_GUARDBUF_SIZE (32*1024)
+#define MPEG_LOW_WATERMARK (1024*1024)
 
 static void button_loop(void)
 {
@@ -353,7 +362,7 @@ static void get_next_data( Stream* str )
     static int mpeg1_skip_table[16] = {
         0, 0, 4, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-    
+
     if (str->curr_packet_end == NULL) {
         /* What does this do? */
         while( (p = disk_buf) == NULL )
@@ -365,11 +374,16 @@ static void get_next_data( Stream* str )
     } else {
         p = str->curr_packet_end;
     }
-    
+
     for( ;; )
     {
         int length, bytes;
         
+            if( p >= disk_buf_end )
+            {
+                p = disk_buf + (p - disk_buf_end);
+            }
+
         /* Pack header, skip it */
         if( rb->memcmp (p, pack_start_code, sizeof (pack_start_code)) == 0 )
         {
@@ -461,6 +475,7 @@ static void get_next_data( Stream* str )
                 if (length > 23) 
                 {
                     rb->splash( 30, "Too much stuffing" );
+                    DEBUGF("Too much stuffing" );
                     break;
                 }
             }
@@ -488,19 +503,33 @@ static void get_next_data( Stream* str )
                     mpeg2_tag_picture (mpeg2dec, pts, dts);
             }
         }
+
         p += length;
         bytes = 6 + (header[4] << 8) + header[5] - length;
         if (bytes > 0) {
-            /*str->curr_packet_end = p+bytes;*/
+            str->curr_packet_end = p+bytes;
+            //DEBUGF("prev = %d, curr = %d\n",str->prev_packet,str->curr_packet);
+
+            if (str->curr_packet != NULL) {
+                if (str->curr_packet < str->prev_packet) {
+                    str->buffer_remaining -= (disk_buf_end - str->prev_packet) + (str->curr_packet - disk_buf);
+                    str->buffer_remaining -= str->guard_bytes;
+                    str->guard_bytes = 0;
+                } else {
+                    str->buffer_remaining -= (str->curr_packet - str->prev_packet);
+                }
+
+                str->prev_packet = str->curr_packet;
+            }
+
             str->curr_packet = p;
-            return;
-        }
-        
-        if( str->curr_packet_end > disk_buf_end )
-        {
-            /* We should ask for buffering here */
-            str->curr_packet_end = str->curr_packet = NULL;
-            return;
+
+            if( str->curr_packet_end > disk_buf_end )
+            {
+                str->guard_bytes = str->curr_packet_end-disk_buf_end;
+                rb->memcpy(disk_buf_end,disk_buf,str->guard_bytes);
+            }
+            return ;
         }
                 
         break;
@@ -575,7 +604,7 @@ static void audio_thread(void)
            goto done;
         }
 
-        if (n < 1000) {  /* TODO: What is the maximum size of an MPEG audio frame? */
+        if (n < 1500) {  /* TODO: What is the maximum size of an MPEG audio frame? */
             get_next_data( &audio_str );
             if (audio_str.curr_packet == NULL) {
                 /* Wait for audio to finish */
@@ -585,6 +614,7 @@ static void audio_thread(void)
             len = audio_str.curr_packet_end - audio_str.curr_packet;
             if (n + len > mpa_buffer_size) { 
                 rb->splash( 30, "Audio buffer overflow" );
+                DEBUGF("Audio buffer overflow" );
                 audiostatus=STREAM_DONE;
                 /* Wait to be killed */
                 for (;;) { rb->sleep(HZ); }
@@ -599,6 +629,7 @@ static void audio_thread(void)
         }
 
         if (mad_frame_decode(&frame, &stream)) {
+            DEBUGF("Audio stream error - %d\n",stream.error);
             if (stream.error == MAD_FLAG_INCOMPLETE
                 || stream.error == MAD_ERROR_BUFLEN) {
                 /* This makes the codec support partially corrupted files */
@@ -620,6 +651,7 @@ static void audio_thread(void)
                 continue;
             } else {
                 /* Some other unrecoverable error */
+                DEBUGF("Unrecoverable error\n");
                 break;
             }
             break;
@@ -636,6 +668,7 @@ static void audio_thread(void)
             n -= len;
         } else {
             /* What to do here? */
+            DEBUGF("/* What to do here? */\n");
             goto done;
         }
 #if 0
@@ -723,7 +756,7 @@ done:
 
 /* End of libmad stuff */
 
-static uint64_t eta IBSS_ATTR;
+static int64_t eta IBSS_ATTR;
 
 /* TODO: Running in the main thread, libmad needs 8.25KB of stack.
    The codec thread uses a 9KB stack.  So we can probable reduce this a
@@ -745,9 +778,9 @@ static void video_thread(void)
     int skipcount = 0;
     int frame = 0;
     int lasttick;
-    unsigned int eta2;
-    unsigned int s;
-    int fps;
+    int64_t eta2;
+    int64_t s;
+    int64_t fps;
 
     rb->sleep(HZ/5);
     mpeg2dec = mpeg2_init ();
@@ -820,6 +853,7 @@ static void video_thread(void)
 
                 /*  Convert eta (in 27MHz ticks) into audio samples */
                 eta2 =(eta * 44100) / 27000000;
+
                 s = samplesplayed - (rb->pcm_get_bytes_waiting() >> 2);
                 if (settings.limitfps) {
                     if (eta2 > s) {
@@ -841,9 +875,11 @@ static void video_thread(void)
                 /* Calculate fps */
                 frame++;
                 if (settings.showfps && (*rb->current_tick-lasttick>=HZ)) {
-                    fps=(frame*441000)/s;
+                    fps=frame;
+                    fps*=441000;
+                    fps/=s;
                     rb->snprintf(str,sizeof(str),"%d.%d %d %d %d",
-                                 (fps/10),fps%10,skipped,s,eta2);
+                                 (int)(fps/10),(int)(fps%10),skipped,(int)s,(int)eta2);
                     rb->lcd_putsxy(0,0,str);
                     rb->lcd_update_rect(0,0,LCD_WIDTH,8);
         
@@ -870,7 +906,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int audiosize;
     int in_file;
     uint8_t* buffer;
-    size_t buffer_size;
+    size_t audio_remaining, video_remaining;
+    size_t bytes_to_read;
+    size_t file_remaining;
+    size_t n;
+    size_t disk_buf_len;
 
     /* We define this here so it is on the main stack (in IRAM) */
     mad_fixed_t mad_frame_overlap[2][32][18];       /* 4608 bytes */
@@ -898,6 +938,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* Grab most of the buffer for the compressed video - leave some for 
        PCM audio data and some for libmpeg2 malloc use. */
     buffer_size = audiosize - (PCMBUFFER_SIZE+AUDIOBUFFER_SIZE+LIBMPEG2BUFFER_SIZE);
+
+    DEBUGF("audiosize=%d, buffer_size=%ld\n",audiosize,buffer_size);
+    buffer_size &= ~(0x7ff);  /* Round buffer down to nearest 2KB */
     DEBUGF("audiosize=%d, buffer_size=%ld\n",audiosize,buffer_size);
     buffer = mpeg2_malloc(buffer_size,-1);
 
@@ -961,11 +1004,23 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     eta = 0;
 
-    rb->splash(0, "Buffering...");
+    file_remaining = rb->filesize(in_file);
+    disk_buf_end = buffer + buffer_size-MPEG_GUARDBUF_SIZE;
 
-    disk_buf_end = buffer + rb->read (in_file, buffer, buffer_size);
+    disk_buf_len = rb->read (in_file, buffer, MPEG_LOW_WATERMARK);
+
+    DEBUGF("Initial Buffering - %d bytes\n",(int)disk_buf_len);
     disk_buf = buffer;
+    disk_buf_tail = buffer+disk_buf_len;
+    file_remaining -= disk_buf_len;
 
+    video_str.guard_bytes = audio_str.guard_bytes = 0;
+    video_str.prev_packet = disk_buf;
+    audio_str.prev_packet = disk_buf;
+    video_str.buffer_remaining = disk_buf_len;
+    audio_str.buffer_remaining = disk_buf_len;
+
+    //DEBUGF("START: video = %d, audio = %d\n",audio_str.buffer_remaining,video_str.buffer_remaining);
     rb->lcd_setfont(FONT_SYSFIXED);
 
     audiostatus = STREAM_BUFFERING;
@@ -991,6 +1046,31 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     /* Wait until both threads have finished their work */
     while ((audiostatus != STREAM_DONE) || (videostatus != STREAM_DONE)) { 
+        audio_remaining = audio_str.buffer_remaining;
+        video_remaining = video_str.buffer_remaining;
+        if (MIN(audio_remaining,video_remaining) < MPEG_LOW_WATERMARK) {
+
+            // TODO: Add mutex when updating the A/V buffer_remaining variables.
+            bytes_to_read = buffer_size - MPEG_GUARDBUF_SIZE - MAX(audio_remaining,video_remaining);
+
+            bytes_to_read = MIN(bytes_to_read,(size_t)(disk_buf_end-disk_buf_tail));
+
+            while (( bytes_to_read > 0) && (file_remaining > 0) && 
+                   ((audiostatus != STREAM_DONE) || (videostatus != STREAM_DONE))) {
+                n = rb->read(in_file, disk_buf_tail, MIN(128*1024,bytes_to_read));
+
+                bytes_to_read -= n;
+                file_remaining -= n;
+                audio_str.buffer_remaining += n;
+                video_str.buffer_remaining += n;
+                disk_buf_tail += n;
+                rb->yield();
+            }
+
+            if (disk_buf_tail == disk_buf_end)
+                disk_buf_tail = buffer;
+
+        }
         rb->sleep(HZ/10);
     }
 
