@@ -36,7 +36,9 @@ long cpu_frequency NOCACHEBSS_ATTR = CPU_FREQ;
 static int boost_counter NOCACHEBSS_ATTR = 0;
 static bool cpu_idle NOCACHEBSS_ATTR = false;
 
+#if NUM_CORES > 1
 struct mutex boostctrl_mtx NOCACHEBSS_ATTR;
+#endif
 
 int get_cpu_boost_counter(void)
 {
@@ -725,8 +727,10 @@ void set_cpu_frequency(long frequency)
 {
     unsigned long postmult;
 
+# if NUM_CORES > 1
     /* Using mutex or spinlock isn't safe here. */
     while (test_and_set(&boostctrl_mtx.locked, 1)) ;
+# endif
     
     if (frequency == CPUFREQ_NORMAL)
         postmult = CPUFREQ_NORMAL_MULT;
@@ -767,7 +771,9 @@ void set_cpu_frequency(long frequency)
     COP_INT_EN |= TIMER1_MASK;
 # endif
     
+# if NUM_CORES > 1
     boostctrl_mtx.locked = 0;
+# endif
 }
 #elif !defined(BOOTLOADER)
 void ipod_set_cpu_frequency(void)
@@ -810,7 +816,10 @@ void system_init(void)
         outl(-1, 0x60001028);
         outl(-1, 0x6000101c);
         
+# if NUM_CORES > 1 && defined(HAVE_ADJUSTABLE_CPU_FREQ)
         spinlock_init(&boostctrl_mtx);
+# endif
+        
 #if (!defined HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES == 1)
         ipod_set_cpu_frequency();
 #endif
