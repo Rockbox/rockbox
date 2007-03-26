@@ -35,6 +35,8 @@
 #include "audio.h"
 #include "mp3_playback.h"
 #include "settings.h"
+#include "list.h"
+#include "statusbar.h"
 #include "dir.h"
 #include "panic.h"
 #include "screens.h"
@@ -93,7 +95,6 @@ extern int ata_io_address;
 extern struct core_entry cores[NUM_CORES];
 
 #ifndef SIMULATOR
-#ifdef HAVE_LCD_BITMAP
 static char thread_status_char(int status)
 {
     switch (status)
@@ -106,136 +107,93 @@ static char thread_status_char(int status)
 
     return '?';
 }
-
+#if NUM_CORES > 1
+#define IF_COP2(...) __VA_ARGS__
+#else
+#define IF_COP2(...)
+#endif
+/* the MSB of thread_ids[..] is the core, so this will need changing 
+   if we ever get a target with more than 2 cores...
+   The next 7 bits are used for the thread number on that core...
+   SO, MAXTHREADS must be kept under 256... which shouldnt be a problem */
+static unsigned char thread_ids[NUM_CORES * MAXTHREADS];
+static char* dbg_os_getname(int selected_item, void * data, char *buffer)
+{
+    (void)data;
+    struct thread_entry *thread = NULL;
+    int status, usage;
+    int core = (thread_ids[selected_item]&0x80)>>7;
+    int thread_number = thread_ids[selected_item]&0x7F;
+    thread = &cores[core].threads[thread_number];
+    
+    if (thread == NULL)
+        return "";
+    usage = thread_stack_usage(thread);
+    status = thread_get_status(thread);
+#ifdef HAVE_PRIORITY_SCHEDULING
+    snprintf(buffer, MAX_PATH, IF_COP2("(%d) ") "%c%c %d %2d%% %s", 
+             IF_COP2(core,)
+             (status == STATE_RUNNING) ? '*' : ' ',
+             thread_status_char(status),
+             thread->priority,
+             usage, thread->name);
+#else
+    snprintf(buffer, MAX_PATH, IF_COP2("(%d) ") "%c%c %2d%% %s", 
+             IF_COP2(core,)
+             (status == STATE_RUNNING) ? '*' : ' ',
+             thread_status_char(status),
+             usage, thread->name);
+#endif
+    return buffer;
+}
+    
 /* Test code!!! */
 static bool dbg_os(void)
 {
-    struct thread_entry *thread;
-    char buf[32];
-    int i;
-    int usage;
-    int status;
+    struct gui_synclist lists;
+    struct thread_entry *thread = NULL;
+    int action, i;
+    int thread_count = 0;
+    int core = 0;
 #if NUM_CORES > 1
-    unsigned int core;
-    int line;
-#endif
-
-    lcd_setmargins(0, 0);
-    lcd_setfont(FONT_SYSFIXED);
-    lcd_clear_display();
-
-    while(1)
+    for(core = 0; core < NUM_CORES; core++)
     {
-#if 0 /* Enable to simulate UI lag. */
-        int _x;
-        for (_x = 0; _x < 1000000L; _x++) ;
 #endif
-#if NUM_CORES > 1
-        lcd_puts(0, 0, "Core and stack usage:");
-        line = 0;
-        for(core = 0; core < NUM_CORES; core++)
+        for(i = 0;i < MAXTHREADS; i++)
         {
-            for(i = 0; i < MAXTHREADS; i++)
+            thread = &cores[core].threads[i];
+            if (thread->name != NULL)
             {
-                thread = &cores[core].threads[i];
-                if (thread->name == NULL)
-                    continue;
-
-                usage = thread_stack_usage(thread);
-                status = thread_get_status(thread);
-
-# ifdef HAVE_PRIORITY_SCHEDULING
-                snprintf(buf, 32, "(%d) %c%c %d %s: %d%%", core,
-                         (status == STATE_RUNNING) ? '*' : ' ',
-                         thread_status_char(status),
-                         cores[CURRENT_CORE].threads[i].priority,
-                         cores[core].threads[i].name, usage);
-# else
-                snprintf(buf, 32, "(%d) %c%c %s: %d%%", core,
-                         (status == STATE_RUNNING) ? '*' : ' ',
-                         thread_status_char(status),
-                         cores[core].threads[i].name, usage);
-# endif
-                lcd_puts(0, ++line, buf);
+                thread_ids[thread_count] = (core<<7)|i;
+                thread_count++;
             }
         }
-#else
-        lcd_puts(0, 0, "Stack usage:");
-        for(i = 0; i < MAXTHREADS; i++)
-        {
-            thread = &cores[CURRENT_CORE].threads[i];
-            if (thread->name == NULL)
-                continue;
-
-            usage = thread_stack_usage(thread);
-            status = thread_get_status(thread);
-# ifdef HAVE_PRIORITY_SCHEDULING
-            snprintf(buf, 32, "%c%c %d %s: %d%%",
-                     (status == STATE_RUNNING) ? '*' : ' ',
-                     thread_status_char(status),
-                     cores[CURRENT_CORE].threads[i].priority,
-                     cores[CURRENT_CORE].threads[i].name, usage);
-# else
-            snprintf(buf, 32, "%c%c %s: %d%%",
-                     (status == STATE_RUNNING) ? '*' : ' ',
-                     thread_status_char(status),
-                     cores[CURRENT_CORE].threads[i].name, usage);
-# endif
-            lcd_puts(0, 1+i, buf);
-        }
-#endif
-
-        lcd_update();
-
-        if (action_userabort(HZ/10))
-            return false;
+#if NUM_CORES > 1
     }
-    return false;
-}
-#else /* !HAVE_LCD_BITMAP */
-static bool dbg_os(void)
-{
-    char buf[32];
-    int button;
-    int usage;
-    int currval = 0;
-
-    lcd_clear_display();
-
+#endif
+    gui_synclist_init(&lists, dbg_os_getname, NULL, false, 1);
+    gui_synclist_set_title(&lists, IF_COP2("Core and ") "Stack usage:", NOICON);
+    gui_synclist_set_icon_callback(&lists, NULL);
+    gui_synclist_set_nb_items(&lists, thread_count);
+    action_signalscreenchange();
     while(1)
     {
-        lcd_puts(0, 0, "Stack usage");
-
-        /* Only Archos Player uses this - so assume a single core */
-        usage = thread_stack_usage(&cores[CPU].threads[currval]);
-        snprintf(buf, 32, "%d: %d%%  ", currval, usage);
-        lcd_puts(0, 1, buf);
-
-        button = get_action(CONTEXT_SETTINGS,HZ/10);
-
-        switch(button)
-        {
-        case ACTION_STD_CANCEL:
-            action_signalscreenchange();
-            return false;
-
-        case ACTION_SETTINGS_DEC:
-            currval--;
-            if(currval < 0)
-                currval = MAXTHREADS-1;
+        /* Do a redraw every time so the thread info is updated,
+           disabled scrolling, but the name isnt important */
+        gui_synclist_draw(&lists);
+        gui_syncstatusbar_draw(&statusbars, true);
+        action = get_action(CONTEXT_STD, HZ/5); 
+        gui_synclist_do_button(&lists, action, LIST_WRAP_UNLESS_HELD);
+        if (action == ACTION_STD_CANCEL)
             break;
-
-        case ACTION_SETTINGS_INC:
-            currval++;
-            if(currval > MAXTHREADS-1)
-                currval = 0;
-            break;
-        }
+        else if(default_event_handler(action) == SYS_USB_CONNECTED)
+            return true;
     }
+    action_signalscreenchange();
     return false;
 }
-#endif /* !HAVE_LCD_BITMAP */
 #endif /* !SIMULATOR */
+
 #ifdef HAVE_LCD_BITMAP
 #if CONFIG_CODEC != SWCODEC
 #ifndef SIMULATOR
