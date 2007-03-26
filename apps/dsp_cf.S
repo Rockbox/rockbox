@@ -22,17 +22,17 @@
  * void dsp_apply_gain(int count, struct dsp_data *data, int32_t *buf[])
  */
     .section    .text
-	.align      2
+    .align      2
     .global     dsp_apply_gain
 dsp_apply_gain:
     lea.l       -20(%sp), %sp           | save registers
     movem.l     %d2-%d4/%a2-%a3, (%sp)  |
     movem.l     28(%sp), %a0-%a1        | %a0 = data,
                                         | %a1 = buf
-	move.l      4(%a0), %d1             | %d1 = data->num_channels
+    move.l      4(%a0), %d1             | %d1 = data->num_channels
     move.l      32(%a0), %a0            | %a0 = data->gain (in s8.23)
 10: | channel loop                      |
-	move.l      24(%sp), %d0            | %d0 = count
+    move.l      24(%sp), %d0            | %d0 = count
     move.l      -4(%a1, %d1.l*4), %a2   | %a2 = s = buf[ch-1]
     move.l      %a2, %a3                | %a3 = d = s
     move.l      (%a2)+, %d2             | %d2 = *s++,
@@ -54,8 +54,8 @@ dsp_apply_gain:
     asl.l       #8, %d3                 | *s = (S(n-1)[40:8] << 8) | S(n-1)[7:0]
     move.b      %d4, %d3                |
     move.l      %d3, (%a3)              |
-	subq.l      #1, %d1                 | next channel
-	bgt.b       10b | channel loop      |
+    subq.l      #1, %d1                 | next channel
+    bgt.b       10b | channel loop      |
     movem.l     (%sp), %d2-%d4/%a2-%a3  | restore registers
     lea.l       20(%sp), %sp            | cleanup stack
     rts                                 |
@@ -65,7 +65,7 @@ dsp_apply_gain:
  * void apply_crossfeed(int count, int32_t *buf[])
  */
     .section    .text
-        .align      2
+    .align      2
     .global     apply_crossfeed 
 apply_crossfeed:
     lea.l       -44(%sp), %sp           |
@@ -129,7 +129,7 @@ apply_crossfeed:
  *                    in32_t *src[], int32_t *dst[])
  */
     .section    .text
-	.align      2
+    .align      2
     .global     dsp_downsample
 dsp_downsample:
     lea.l       -40(%sp), %sp           | save non-clobberables
@@ -192,7 +192,7 @@ dsp_downsample:
  *                  int32_t *src[], int32_t *dst[])
  */
     .section    .text
-	.align      2
+    .align      2
     .global     dsp_upsample
 dsp_upsample:
     lea.l       -40(%sp), %sp           | save non-clobberables
@@ -226,10 +226,10 @@ dsp_upsample:
     cmp.l       %d2, %d7                | past end of samples?
     bge.b       50f | skip resample loop| yes? go to next channel and collect info
     lea.l       (%a3, %d7.l*4), %a3     | %a3 = s = &s[pos+1]
-	movem.l     -8(%a3), %d0-%d1        | %d0 = s[pos-1], %d1 = s[pos]
+    movem.l     -8(%a3), %d0-%d1        | %d0 = s[pos-1], %d1 = s[pos]
     move.l      %d1, %d6                | save sample value
     sub.l       %d0, %d1                | %d1 = diff = s[pos] - s[pos-1]
-	bra.b       40f | loop start        |
+    bra.b       40f | loop start        |
 20: | next sample loop                  |
     move.l      %d6, %d0                | move previous sample to %d0
     move.l      (%a3)+, %d1             | fetch next sample
@@ -268,7 +268,7 @@ dsp_upsample:
  * Mix left and right channels 50/50 into a center channel.
  */
     .section    .text
-	.align      2
+    .align      2
     .global     channels_process_sound_chan_mono
 channels_process_sound_chan_mono:
     movem.l     4(%sp), %d0/%a0         | %d0 = count, %a0 = buf
@@ -308,7 +308,7 @@ channels_process_sound_chan_mono:
  * Apply stereo width (narrowing/expanding) effect.
  */
     .section    .text
-	.align      2
+    .align      2
     .global     channels_process_sound_chan_custom
 channels_process_sound_chan_custom:
     movem.l     4(%sp), %d0/%a0         | %d0 = count, %a0 = buf
@@ -330,7 +330,6 @@ channels_process_sound_chan_custom:
 10: | loop                              |
     movclr.l    %acc0, %d5              |
     movclr.l    %acc1, %d6              |
-15: | loop start                        |
     mac.l       %d1, %d3             , %acc0 |  L = l*gain + r*cross
     mac.l       %d1, %d4, (%a0)+, %d1, %acc1 |  R = r*gain + l*cross
     mac.l       %d2, %d4             , %acc0 |
@@ -356,7 +355,7 @@ channels_process_sound_chan_custom:
  *  Separate channels into side channels.
  */
     .section    .text
-	.align      2
+    .align      2
     .global     channels_process_sound_chan_karaoke
 channels_process_sound_chan_karaoke:
     movem.l     4(%sp), %d0/%a0         | %d0 = count, %a0 = buf
@@ -413,7 +412,7 @@ channels_process_sound_chan_karaoke:
  *
  */
     .section   .text
-	.align      2
+    .align      2
     .global    sample_output_stereo
 sample_output_stereo:
     lea.l       -44(%sp), %sp             | save registers
@@ -508,7 +507,7 @@ sample_output_stereo:
  * Same treatment as sample_output_stereo but for one channel.
  */
     .section   .text
-	.align      2
+    .align      2
     .global    sample_output_mono
 sample_output_mono:
     lea.l       -28(%sp), %sp             | save registers
