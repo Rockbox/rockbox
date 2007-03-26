@@ -28,13 +28,17 @@
 #include <profile.h>
 #endif
 
+#if NUM_CORES > 1
+# define IF_COP2(x) x
+#else
+# define IF_COP2(x) CURRENT_CORE
+#endif
+
 #define DEADBEEF ((unsigned int)0xdeadbeef)
 /* Cast to the the machine int type, whose size could be < 4. */
 
 struct core_entry cores[NUM_CORES] IBSS_ATTR;
-#ifdef HAVE_PRIORITY_SCHEDULING
-static unsigned short highest_priority IBSS_ATTR;
-#endif
+struct thread_entry threads[MAXTHREADS] IBSS_ATTR;
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
 static int boosted_threads IBSS_ATTR;
 #endif
@@ -59,8 +63,29 @@ int *cop_stackend = stackend;
 #endif
 #endif
 
-#if (NUM_CORES > 1)
-bool IDATA_ATTR kernel_running_on_cop = false;
+#if NUM_CORES > 1
+static long cores_locked IBSS_ATTR;
+
+#define LOCK(...) do { } while (test_and_set(&cores_locked, 1))
+#define UNLOCK(...) cores_locked = 0
+
+inline void lock_cores(void)
+{
+    if (!cores[CURRENT_CORE].lock_issued)
+    {
+        LOCK();
+        cores[CURRENT_CORE].lock_issued = true;
+    }
+}
+
+inline void unlock_cores(void)
+{
+    if (cores[CURRENT_CORE].lock_issued)
+    {
+        cores[CURRENT_CORE].lock_issued = false;
+        UNLOCK();
+    }
+}
 #endif
 
 /* Conserve IRAM
@@ -70,7 +95,7 @@ static void remove_from_list(struct thread_entry **list,
                              struct thread_entry *thread) ICODE_ATTR;
 */
 
-void switch_thread(bool save_context, struct thread_entry **blocked_list)
+void switch_thread(bool save_context, struct thread_entry **blocked_list) 
     ICODE_ATTR;
 
 static inline void store_context(void* addr) __attribute__ ((always_inline));
@@ -326,7 +351,6 @@ static void wake_list_awaken(void)
 
 static inline void sleep_core(void)
 {
-    static long last_tick = 0;
 #if CONFIG_CPU == S3C2440
     int i;
 #endif
@@ -339,10 +363,10 @@ static inline void sleep_core(void)
         if (cores[CURRENT_CORE].waking != NULL)
             wake_list_awaken();
 
-        if (last_tick != current_tick)
+        if (cores[CURRENT_CORE].last_tick != current_tick)
         {
             check_sleepers();
-            last_tick = current_tick;
+            cores[CURRENT_CORE].last_tick = current_tick;
         }
         
         /* We must sleep until there is at least one process in the list
@@ -357,17 +381,22 @@ static inline void sleep_core(void)
         and_b(0x7F, &SBYCR);
         asm volatile ("sleep");
 #elif defined (CPU_PP)
+        unlock_cores();
+        
         /* This should sleep the CPU. It appears to wake by itself on
            interrupts */
         if (CURRENT_CORE == CPU)
             CPU_CTL = PROC_SLEEP;
         else
             COP_CTL = PROC_SLEEP;
+        
+        lock_cores();
 #elif CONFIG_CPU == S3C2440
         CLKCON |= (1 << 2); /* set IDLE bit */
         for(i=0; i<10; i++); /* wait for IDLE */
         CLKCON &= ~(1 << 2); /* reset IDLE bit when wake up */
 #endif
+        
     }
 }
 
@@ -378,7 +407,7 @@ static int get_threadnum(struct thread_entry *thread)
     
     for (i = 0; i < MAXTHREADS; i++)
     {
-        if (&cores[CURRENT_CORE].threads[i] == thread)
+        if (&threads[i] == thread)
             return i;
     }
     
@@ -415,8 +444,8 @@ void change_thread_state(struct thread_entry **blocked_list)
         
 #ifdef HAVE_PRIORITY_SCHEDULING
         /* Reset priorities */
-        if (old->priority == highest_priority)
-            highest_priority = 100;
+        if (old->priority == cores[CURRENT_CORE].highest_priority)
+            cores[CURRENT_CORE].highest_priority = 100;
 #endif
     }
     else
@@ -439,6 +468,8 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
     /* Do nothing */
 #else
 
+    lock_cores();
+    
     /* Begin task switching by saving our current context so that we can
      * restore the state of the current thread later to the point prior
      * to this call. */
@@ -479,14 +510,16 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
     {
         int priority = cores[CURRENT_CORE].running->priority;
 
-        if (priority < highest_priority)
-            highest_priority = priority;
+        if (priority < cores[CURRENT_CORE].highest_priority)
+            cores[CURRENT_CORE].highest_priority = priority;
 
-        if (priority == highest_priority ||
+        if (priority == cores[CURRENT_CORE].highest_priority ||
                 (current_tick - cores[CURRENT_CORE].running->last_run >
                  priority * 8) ||
             cores[CURRENT_CORE].running->priority_x != 0)
+        {
             break;
+        }
 
         cores[CURRENT_CORE].running = cores[CURRENT_CORE].running->next;
     }
@@ -496,6 +529,8 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
 #endif
     
 #endif
+    unlock_cores();
+    
     /* And finally give control to the next thread. */
     load_context(&cores[CURRENT_CORE].running->context);
     
@@ -508,10 +543,13 @@ void sleep_thread(int ticks)
 {
     struct thread_entry *current;
 
+    lock_cores();
+    
     current = cores[CURRENT_CORE].running;
 
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
-    if (STATE_IS_BOOSTED(current->statearg)) {
+    if (STATE_IS_BOOSTED(current->statearg))
+    {
         boosted_threads--;
         if (!boosted_threads)
         {
@@ -524,12 +562,16 @@ void sleep_thread(int ticks)
      * so that scheduler removes thread from the list of running processes
      * and puts it in list of sleeping tasks. */
     SET_STATE(current->statearg, STATE_SLEEPING, current_tick + ticks + 1);
+    
     switch_thread(true, NULL);
 }
 
 void block_thread(struct thread_entry **list)
 {
     struct thread_entry *current;
+    
+    lock_cores();
+    
     /* Get the entry for the current running thread. */
     current = cores[CURRENT_CORE].running;
 
@@ -567,11 +609,13 @@ void block_thread_w_tmo(struct thread_entry **list, int timeout)
     /* Get the entry for the current running thread. */
     current = cores[CURRENT_CORE].running;
     
+    lock_cores();
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
     /* A block with a timeout is a sleep situation, whatever we are waiting
      * for _may or may not_ happen, regardless of boost state, (user input
      * for instance), so this thread no longer needs to boost */
-    if (STATE_IS_BOOSTED(current->statearg)) {
+    if (STATE_IS_BOOSTED(current->statearg))
+    {
         boosted_threads--;
         if (!boosted_threads)
         {
@@ -624,7 +668,9 @@ void wakeup_thread(struct thread_entry **list)
     
     /* Check if there is a blocked thread at all. */
     if (*list == NULL)
+    {
         return ;
+    }
     
     /* Wake up the last thread first. */
     thread = *list;
@@ -638,7 +684,7 @@ void wakeup_thread(struct thread_entry **list)
              * is safe since each object maintains it's own list of
              * sleepers and queues protect against reentrancy. */
             remove_from_list(list, thread);
-            add_to_list(cores[CURRENT_CORE].wakeup_list, thread);
+            add_to_list(cores[IF_COP2(thread->core)].wakeup_list, thread);
 
         case STATE_BLOCKED_W_TMO:
             /* Just remove the timeout to cause scheduler to immediately
@@ -651,6 +697,19 @@ void wakeup_thread(struct thread_entry **list)
              * or it's state is not blocked or blocked with timeout. */
             return ;
     }
+}
+
+inline static int find_empty_thread_slot(void)
+{
+    int n;
+    
+    for (n = 0; n < MAXTHREADS; n++)
+    {
+        if (threads[n].name == NULL)
+            return n;
+    }
+    
+    return -1;
 }
 
 /* Like wakeup_thread but safe against IRQ corruption when IRQs are disabled
@@ -680,7 +739,7 @@ struct thread_entry*
     unsigned int i;
     unsigned int stacklen;
     unsigned int *stackptr;
-    int n;
+    int slot;
     struct regs *regs;
     struct thread_entry *thread;
 
@@ -697,7 +756,7 @@ struct thread_entry*
 /* If the kernel hasn't initialised on the COP (most likely due to an old
  * bootloader) then refuse to start threads on the COP
  */
-    if((core == COP) && !kernel_running_on_cop)
+    if ((core == COP) && !cores[core].kernel_running)
     {
         if (fallback)
             return create_thread(function, stack, stack_size, name
@@ -707,21 +766,13 @@ struct thread_entry*
     }
 #endif
 
-    for (n = 0; n < MAXTHREADS; n++)
-    {
-        if (cores[core].threads[n].name == NULL)
-            break;
-    }
+    lock_cores();
     
-    if (n == MAXTHREADS)
+    slot = find_empty_thread_slot();
+    if (slot < 0)
     {
-#if NUM_CORES > 1
-        if (fallback)
-	    return create_thread(function, stack, stack_size, name
-	                         IF_PRIO(, priority) IF_COP(, 1 - core, fallback));
-	else
-#endif
-            return NULL;
+        unlock_cores();
+        return NULL;
     }
     
     /* Munge the stack to make it easy to spot stack overflows */
@@ -733,7 +784,7 @@ struct thread_entry*
     }
 
     /* Store interesting information */
-    thread = &cores[core].threads[n];
+    thread = &threads[slot];
     thread->name = name;
     thread->stack = stack;
     thread->stack_size = stack_size;
@@ -741,9 +792,12 @@ struct thread_entry*
 #ifdef HAVE_PRIORITY_SCHEDULING
     thread->priority_x = 0;
     thread->priority = priority;
-    highest_priority = 100;
+    cores[core].highest_priority = 100;
 #endif
-    add_to_list(&cores[core].running, thread);
+
+#if NUM_CORES > 1
+    thread->core = core;
+#endif
     
     regs = &thread->context;
     /* Align stack to an even 32 bit boundary */
@@ -753,6 +807,9 @@ struct thread_entry*
     /* Do any CPU specific inits after initializing common items
        to have access to valid data */
     THREAD_CPU_INIT(core, thread);
+    
+    add_to_list(&cores[core].running, thread);
+    unlock_cores();
 
     return thread;
 #if NUM_CORES == 1
@@ -763,6 +820,8 @@ struct thread_entry*
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
 void trigger_cpu_boost(void)
 {
+    lock_cores();
+    
     if (!STATE_IS_BOOSTED(cores[CURRENT_CORE].running->statearg))
     {
         SET_BOOST_STATE(cores[CURRENT_CORE].running->statearg);
@@ -772,6 +831,8 @@ void trigger_cpu_boost(void)
         }
         boosted_threads++;
     }
+    
+    unlock_cores();
 }
 #endif
 
@@ -782,26 +843,30 @@ void trigger_cpu_boost(void)
  */
 void remove_thread(struct thread_entry *thread)
 {
+    lock_cores();
+    
     if (thread == NULL)
-        thread = cores[CURRENT_CORE].running;
+        thread = cores[IF_COP2(thread->core)].running;
     
     /* Free the entry by removing thread name. */
     thread->name = NULL;
 #ifdef HAVE_PRIORITY_SCHEDULING
-    highest_priority = 100;
+    cores[IF_COP2(thread->core)].highest_priority = 100;
 #endif
     
-    if (thread == cores[CURRENT_CORE].running)
+    if (thread == cores[IF_COP2(thread->core)].running)
     {
-        remove_from_list(&cores[CURRENT_CORE].running, thread);
+        remove_from_list(&cores[IF_COP2(thread->core)].running, thread);
         switch_thread(false, NULL);
         return ;
     }
     
-    if (thread == cores[CURRENT_CORE].sleeping)
-        remove_from_list(&cores[CURRENT_CORE].sleeping, thread);
+    if (thread == cores[IF_COP2(thread->core)].sleeping)
+        remove_from_list(&cores[IF_COP2(thread->core)].sleeping, thread);
     else
         remove_from_list(NULL, thread);
+    
+    unlock_cores();
 }
 
 #ifdef HAVE_PRIORITY_SCHEDULING
@@ -809,12 +874,14 @@ int thread_set_priority(struct thread_entry *thread, int priority)
 {
     int old_priority;
     
+    lock_cores();
     if (thread == NULL)
         thread = cores[CURRENT_CORE].running;
 
     old_priority = thread->priority;
     thread->priority = priority;
-    highest_priority = 100;
+    cores[IF_COP2(thread->core)].highest_priority = 100;
+    unlock_cores();
     
     return old_priority;
 }
@@ -844,9 +911,19 @@ struct thread_entry * thread_get_current(void)
 void init_threads(void)
 {
     unsigned int core = CURRENT_CORE;
+    int slot;
 
-    if (core == CPU)
-        memset(cores, 0, sizeof cores);
+    /* Let main CPU initialize first. */
+#if NUM_CORES > 1
+    if (core != CPU)
+    {
+        while (!cores[CPU].kernel_running) ;
+    }
+#endif
+    
+    lock_cores();
+    slot = find_empty_thread_slot();
+    
     cores[core].sleeping = NULL;
     cores[core].running = NULL;
     cores[core].waking = NULL;
@@ -854,36 +931,41 @@ void init_threads(void)
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     cores[core].switch_to_irq_level = STAY_IRQ_LEVEL;
 #endif
-    cores[core].threads[0].name = main_thread_name;
-    cores[core].threads[0].statearg = 0;
+    threads[slot].name = main_thread_name;
+    threads[slot].statearg = 0;
+    threads[slot].context.start = 0; /* core's main thread already running */
+#if NUM_CORES > 1
+    threads[slot].core = core;
+#endif
 #ifdef HAVE_PRIORITY_SCHEDULING
-    cores[core].threads[0].priority = PRIORITY_USER_INTERFACE;
-    cores[core].threads[0].priority_x = 0;
-    highest_priority = 100;
+    threads[slot].priority = PRIORITY_USER_INTERFACE;
+    threads[slot].priority_x = 0;
+    cores[core].highest_priority = 100;
 #endif
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
     boosted_threads = 0;
 #endif
-    add_to_list(&cores[core].running, &cores[core].threads[0]);
+    add_to_list(&cores[core].running, &threads[slot]);
     
     /* In multiple core setups, each core has a different stack.  There is
      * probably a much better way to do this. */
     if (core == CPU)
     {
-        cores[CPU].threads[0].stack = stackbegin;
-        cores[CPU].threads[0].stack_size = (int)stackend - (int)stackbegin;
-    } else {
+        threads[slot].stack = stackbegin;
+        threads[slot].stack_size = (int)stackend - (int)stackbegin;
+    } 
 #if NUM_CORES > 1  /* This code path will not be run on single core targets */
-        cores[COP].threads[0].stack = cop_stackbegin;
-        cores[COP].threads[0].stack_size =
+    else 
+    {
+        threads[slot].stack = cop_stackbegin;
+        threads[slot].stack_size =
             (int)cop_stackend - (int)cop_stackbegin;
-#endif
     }
-    cores[core].threads[0].context.start = 0; /* thread 0 already running */
-#if NUM_CORES > 1
-    if(core == COP)
-        kernel_running_on_cop = true; /* can we use context.start for this? */
+
+    cores[core].kernel_running = true;
 #endif
+    
+    unlock_cores();
 }
 
 int thread_stack_usage(const struct thread_entry *thread)

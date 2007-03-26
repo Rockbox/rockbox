@@ -58,7 +58,7 @@ bool detect_flashed_ramimage(void);
 bool detect_original_firmware(void);
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ) \
-        && defined(ROCKBOX_HAS_LOGF) 
+        && defined(ROCKBOX_HAS_LOGF) && (NUM_CORES == 1)
 #define CPU_BOOST_LOGGING
 #endif
 

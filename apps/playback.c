@@ -3806,7 +3806,7 @@ void audio_init(void)
     codec_thread_p = create_thread(
             codec_thread, codec_stack, sizeof(codec_stack),
             codec_thread_name IF_PRIO(, PRIORITY_PLAYBACK)
-        IF_COP(, COP, true));
+        IF_COP(, CPU, true));
 
     create_thread(audio_thread, audio_stack, sizeof(audio_stack),
                   audio_thread_name IF_PRIO(, PRIORITY_BUFFERING)

@@ -37,6 +37,14 @@
 #include "lcd-remote.h"
 #endif
 
+#if 0
+/* Older than MAX_EVENT_AGE button events are going to be ignored.
+ * Used to prevent for example volume going up uncontrollable when events
+ * are getting queued and UI is lagging too much.
+ */
+#define MAX_EVENT_AGE  HZ
+#endif
+
 struct event_queue button_queue;
 
 static long lastbtn;   /* Last valid button status */
@@ -290,6 +298,14 @@ long button_get(bool block)
     if ( block || pending_count )
     {
         queue_wait(&button_queue, &ev);
+        
+#if 0
+        /* Ignore if the event was too old and for simplicity, just
+         * wait for a new button_get() request. */
+        if (current_tick - ev.tick > MAX_EVENT_AGE)
+            return BUTTON_NONE;
+#endif
+        
         return ev.id;
     }
     
@@ -318,6 +334,11 @@ void button_init(void)
     button_init_device();
 
     queue_init(&button_queue, true);
+    
+    /* Enable less protection which would kill IRQ handler. Writing queue is
+     * no longer core-wise thread safe. */
+    queue_set_irq_safe(&button_queue, true);
+    
     button_read();
     lastbtn = button_read();
     tick_add_task(button_tick);

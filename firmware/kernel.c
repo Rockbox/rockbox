@@ -32,8 +32,8 @@ long current_tick NOCACHEDATA_ATTR = 0;
 static void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
 
 /* This array holds all queues that are initiated. It is used for broadcast. */
-static struct event_queue *all_queues[32];
-static int num_queues;
+static struct event_queue *all_queues[32] NOCACHEBSS_ATTR;
+static int num_queues NOCACHEBSS_ATTR;
 
 void queue_wait(struct event_queue *q, struct event *ev) ICODE_ATTR;
 
@@ -163,7 +163,7 @@ void queue_enable_queue_send(struct event_queue *q,
                              struct queue_sender_list *send)
 {
     q->send = send;
-    memset(send, 0, sizeof(*send));
+    memset(send, 0, sizeof(struct queue_sender_list));
 }
 #endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
 
@@ -173,6 +173,9 @@ void queue_init(struct event_queue *q, bool register_queue)
     q->read   = 0;
     q->write  = 0;
     q->thread = NULL;
+#if NUM_CORES > 1
+    q->irq_safe = false;
+#endif
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     q->send   = NULL; /* No message sending by default */
 #endif
@@ -184,11 +187,28 @@ void queue_init(struct event_queue *q, bool register_queue)
     }
 }
 
+#if NUM_CORES > 1
+/**
+ * If IRQ mode is enabled, some core-wise locking mechanisms are disabled
+ * causing accessing queue to be no longer thread safe from the other core. 
+ * However, that locking mechanism would also kill IRQ handlers.
+ * 
+ * @param q struct of an event_queue
+ * @param state enable/disable IRQ mode
+ * @default state disabled
+ */
+void queue_set_irq_safe(struct event_queue *q, bool state)
+{
+    q->irq_safe = state;
+}
+#endif
+
 void queue_delete(struct event_queue *q)
 {
     int i;
     bool found = false;
 
+    lock_cores();
     wakeup_thread(&q->thread);
     
     /* Find the queue to be deleted */
@@ -219,15 +239,20 @@ void queue_delete(struct event_queue *q)
         
         num_queues--;
     }
+    
+    unlock_cores();
 }
 
 void queue_wait(struct event_queue *q, struct event *ev)
 {
     unsigned int rd;
 
+    lock_cores();
+    
     if (q->read == q->write)
     {
         block_thread(&q->thread);
+        lock_cores();
     } 
 
     rd = q->read++ & QUEUE_LENGTH_MASK;
@@ -240,13 +265,18 @@ void queue_wait(struct event_queue *q, struct event *ev)
         queue_fetch_sender(q->send, rd);
     }
 #endif
+    
+    unlock_cores();
 }
 
 void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks)
 {
+    lock_cores();
+    
     if (q->read == q->write && ticks > 0)
     {
         block_thread_w_tmo(&q->thread, ticks);
+        lock_cores();
     }
 
     if (q->read != q->write)
@@ -266,12 +296,21 @@ void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks)
     {
         ev->id = SYS_TIMEOUT;
     }
+    
+    unlock_cores();
 }
 
 void queue_post(struct event_queue *q, long id, intptr_t data)
 {
     int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-    unsigned int wr = q->write++ & QUEUE_LENGTH_MASK;
+    unsigned int wr;
+    
+#if NUM_CORES > 1
+    if (!q->irq_safe)
+        lock_cores();
+#endif
+    
+    wr = q->write++ & QUEUE_LENGTH_MASK;
 
     q->events[wr].id   = id;
     q->events[wr].data = data;
@@ -290,7 +329,12 @@ void queue_post(struct event_queue *q, long id, intptr_t data)
 #endif
 
     wakeup_thread_irq_safe(&q->thread);
+#if NUM_CORES > 1
+    if (!q->irq_safe)
+        unlock_cores();
+#endif
     set_irq_level(oldlevel);
+    
 }
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
@@ -300,7 +344,12 @@ void queue_post(struct event_queue *q, long id, intptr_t data)
 intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
 {
     int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-    unsigned int wr = q->write++ & QUEUE_LENGTH_MASK;
+    unsigned int wr;
+    
+    lock_cores();
+    
+    wr = q->write++ & QUEUE_LENGTH_MASK;
+
     q->events[wr].id   = id;
     q->events[wr].data = data;
     
@@ -321,6 +370,7 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
 
     /* Function as queue_post if sending is not enabled */
     wakeup_thread(&q->thread);
+    unlock_cores();
     set_irq_level(oldlevel);
     
     return 0;
@@ -337,6 +387,7 @@ bool queue_in_queue_send(struct event_queue *q)
 /* Replies with retval to any dequeued message sent with queue_send */
 void queue_reply(struct event_queue *q, intptr_t retval)
 {
+    lock_cores();
     if(q->send && q->send->curr_sender)
     {
         int level = set_irq_level(HIGHEST_IRQ_LEVEL);
@@ -346,18 +397,37 @@ void queue_reply(struct event_queue *q, intptr_t retval)
         }
         set_irq_level(level);
     }
+    unlock_cores();
 }
 #endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
 
 bool queue_empty(const struct event_queue* q)
 {
-    return ( q->read == q->write );
+    bool is_empty;
+    
+#if NUM_CORES > 1
+    if (!q->irq_safe)
+        lock_cores();
+#endif
+    
+    is_empty = ( q->read == q->write );
+#if NUM_CORES > 1
+    if (!q->irq_safe)
+        unlock_cores();
+#endif
+    
+    return is_empty;
 }
 
 void queue_clear(struct event_queue* q)
 {
     int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
 
+#if NUM_CORES > 1
+    if (!q->irq_safe)
+        lock_cores();
+#endif
+    
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     /* Release all thread waiting in the queue for a reply -
        dequeued sent message will be handled by owning thread */
@@ -366,6 +436,12 @@ void queue_clear(struct event_queue* q)
 
     q->read = 0;
     q->write = 0;
+    
+#if NUM_CORES > 1
+    if (!q->irq_safe)
+        unlock_cores();
+#endif
+
     set_irq_level(oldlevel);
 }
 
@@ -373,6 +449,11 @@ void queue_remove_from_head(struct event_queue *q, long id)
 {
     int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
 
+#if NUM_CORES > 1
+    if (!q->irq_safe)
+        lock_cores();
+#endif
+    
     while(q->read != q->write)
     {
         unsigned int rd = q->read & QUEUE_LENGTH_MASK;
@@ -397,6 +478,11 @@ void queue_remove_from_head(struct event_queue *q, long id)
         q->read++;
     }
     
+#if NUM_CORES > 1
+    if (!q->irq_safe)
+        unlock_cores();
+#endif
+    
     set_irq_level(oldlevel);
 }
 
@@ -411,10 +497,20 @@ int queue_count(const struct event_queue *q)
     int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
     int result = 0;
     
+#if NUM_CORES > 1
+    if (!q->irq_safe)
+        lock_cores();
+#endif
+    
     if (q->read <= q->write)
         result = q->write - q->read;
     else
         result = QUEUE_LENGTH - (q->read - q->write);
+    
+#if NUM_CORES > 1
+    if (!q->irq_safe)
+        unlock_cores();
+#endif
     
     set_irq_level(oldlevel);
     
@@ -712,10 +808,14 @@ void mutex_lock(struct mutex *m)
 
 void mutex_unlock(struct mutex *m)
 {
+    lock_cores();
+    
     if (m->thread == NULL)
         m->locked = 0;
     else
         wakeup_thread(&m->thread);
+    
+    unlock_cores();
 }
 
 void spinlock_lock(struct mutex *m)

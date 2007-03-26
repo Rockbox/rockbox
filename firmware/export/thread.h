@@ -105,8 +105,11 @@ struct thread_entry {
     unsigned long statearg;
     unsigned short stack_size;
 #ifdef HAVE_PRIORITY_SCHEDULING
-    unsigned short priority;
-    unsigned long priority_x;
+    unsigned char priority;
+    unsigned char priority_x;
+# if NUM_CORES > 1
+    unsigned char core; /* To which core threads belongs to. */
+# endif
     long last_run;
 #endif
     struct thread_entry *next, *prev;
@@ -116,11 +119,18 @@ struct thread_entry {
 };
 
 struct core_entry {
-    struct thread_entry threads[MAXTHREADS];
     struct thread_entry *running;
     struct thread_entry *sleeping;
     struct thread_entry *waking;
     struct thread_entry **wakeup_list;
+#ifdef HAVE_PRIORITY_SCHEDULING
+    long highest_priority;
+#endif
+#if NUM_CORES > 1
+    volatile bool lock_issued;
+    volatile bool kernel_running;
+#endif
+    long last_tick;
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     int switch_to_irq_level;
     #define STAY_IRQ_LEVEL -1
@@ -169,6 +179,14 @@ struct core_entry {
     *(uint32_t *)x_ = v_; \
     old; \
     })
+#endif
+
+#if NUM_CORES > 1
+inline void lock_cores(void);
+inline void unlock_cores(void);
+#else
+#define lock_cores(...)
+#define unlock_cores(...)
 #endif
 
 struct thread_entry*

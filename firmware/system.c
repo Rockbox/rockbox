@@ -23,17 +23,20 @@
 #include "font.h"
 #include "system.h"
 #include "kernel.h"
+#include "thread.h"
 #include "timer.h"
 #include "inttypes.h"
 #include "string.h"
 
 #ifndef SIMULATOR
-long cpu_frequency = CPU_FREQ;
+long cpu_frequency NOCACHEBSS_ATTR = CPU_FREQ;
 #endif
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-static int boost_counter = 0;
-static bool cpu_idle = false;
+static int boost_counter NOCACHEBSS_ATTR = 0;
+static bool cpu_idle NOCACHEBSS_ATTR = false;
+
+struct mutex boostctrl_mtx NOCACHEBSS_ATTR;
 
 int get_cpu_boost_counter(void)
 {
@@ -722,47 +725,49 @@ void set_cpu_frequency(long frequency)
 {
     unsigned long postmult;
 
-    if (CURRENT_CORE == CPU)
-    {
-        if (frequency == CPUFREQ_NORMAL)
-            postmult = CPUFREQ_NORMAL_MULT;
-        else if (frequency == CPUFREQ_MAX)
-            postmult = CPUFREQ_MAX_MULT;
-        else
-            postmult = CPUFREQ_DEFAULT_MULT;
-        cpu_frequency = frequency;
+    /* Using mutex or spinlock isn't safe here. */
+    while (test_and_set(&boostctrl_mtx.locked, 1)) ;
+    
+    if (frequency == CPUFREQ_NORMAL)
+        postmult = CPUFREQ_NORMAL_MULT;
+    else if (frequency == CPUFREQ_MAX)
+        postmult = CPUFREQ_MAX_MULT;
+    else
+        postmult = CPUFREQ_DEFAULT_MULT;
+    cpu_frequency = frequency;
 
-        /* Enable PLL? */
-        outl(inl(0x70000020) | (1<<30), 0x70000020);
+    /* Enable PLL? */
+    outl(inl(0x70000020) | (1<<30), 0x70000020);
+    
+    /* Select 24MHz crystal as clock source? */
+    outl((inl(0x60006020) & 0x0fffff0f) | 0x20000020, 0x60006020);
+    
+    /* Clock frequency = (24/8)*postmult */
+    outl(0xaa020000 | 8 | (postmult << 8), 0x60006034);
+    
+    /* Wait for PLL relock? */
+    udelay(2000);
+    
+    /* Select PLL as clock source? */
+    outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);
+    
+# if defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI) || defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
+    /* We don't know why the timer interrupt gets disabled on the PP5020
+     based ipods, but without the following line, the 4Gs will freeze
+     when CPU frequency changing is enabled.
 
-        /* Select 24MHz crystal as clock source? */
-        outl((inl(0x60006020) & 0x0fffff0f) | 0x20000020, 0x60006020);
+     Note also that a simple "CPU_INT_EN = TIMER1_MASK;" (as used
+     elsewhere to enable interrupts) doesn't work, we need "|=".
 
-        /* Clock frequency = (24/8)*postmult */
-        outl(0xaa020000 | 8 | (postmult << 8), 0x60006034);
+     It's not needed on the PP5021 and PP5022 ipods.
+     */
 
-        /* Wait for PLL relock? */
-        udelay(2000);
-
-        /* Select PLL as clock source? */
-        outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);
-
-#if defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI) || defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
-        /* We don't know why the timer interrupt gets disabled on the PP5020
-           based ipods, but without the following line, the 4Gs will freeze
-           when CPU frequency changing is enabled.
-
-           Note also that a simple "CPU_INT_EN = TIMER1_MASK;" (as used
-           elsewhere to enable interrupts) doesn't work, we need "|=".
-
-           It's not needed on the PP5021 and PP5022 ipods.
-        */
-
-        /* unmask interrupt source */
-        CPU_INT_EN |= TIMER1_MASK;
-        COP_INT_EN |= TIMER1_MASK;
-#endif
-    }
+    /* unmask interrupt source */
+    CPU_INT_EN |= TIMER1_MASK;
+    COP_INT_EN |= TIMER1_MASK;
+# endif
+    
+    boostctrl_mtx.locked = 0;
 }
 #elif !defined(BOOTLOADER)
 void ipod_set_cpu_frequency(void)
@@ -804,6 +809,8 @@ void system_init(void)
         outl(-1, 0x60001038);
         outl(-1, 0x60001028);
         outl(-1, 0x6000101c);
+        
+        spinlock_init(&boostctrl_mtx);
 #if (!defined HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES == 1)
         ipod_set_cpu_frequency();
 #endif
@@ -890,6 +897,7 @@ static void ipod_init_cache(void)
 
     outl(0x3, 0xcf004024);
 }
+    
 #endif
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ

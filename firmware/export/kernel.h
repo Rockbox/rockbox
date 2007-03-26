@@ -73,6 +73,9 @@ struct event_queue
     struct thread_entry *thread;
     unsigned int read;
     unsigned int write;
+#if NUM_CORES > 1
+    bool irq_safe;
+#endif
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     struct queue_sender_list *send;
 #endif
@@ -105,6 +108,11 @@ int tick_add_task(void (*f)(void));
 int tick_remove_task(void (*f)(void));
 
 extern void queue_init(struct event_queue *q, bool register_queue);
+#if NUM_CORES > 1
+extern void queue_set_irq_safe(struct event_queue *q, bool state);
+#else
+#define queue_set_irq_safe(q,state)
+#endif
 extern void queue_delete(struct event_queue *q);
 extern void queue_wait(struct event_queue *q, struct event *ev);
 extern void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks);

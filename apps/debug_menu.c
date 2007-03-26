@@ -92,7 +92,7 @@
 /*---------------------------------------------------*/
 extern int ata_device;
 extern int ata_io_address;
-extern struct core_entry cores[NUM_CORES];
+extern struct thread_entry threads[MAXTHREADS];
 
 #ifndef SIMULATOR
 static char thread_status_char(int status)
@@ -112,34 +112,33 @@ static char thread_status_char(int status)
 #else
 #define IF_COP2(...)
 #endif
-/* the MSB of thread_ids[..] is the core, so this will need changing 
-   if we ever get a target with more than 2 cores...
-   The next 7 bits are used for the thread number on that core...
-   SO, MAXTHREADS must be kept under 256... which shouldnt be a problem */
-static unsigned char thread_ids[NUM_CORES * MAXTHREADS];
 static char* dbg_os_getname(int selected_item, void * data, char *buffer)
 {
     (void)data;
     struct thread_entry *thread = NULL;
     int status, usage;
-    int core = (thread_ids[selected_item]&0x80)>>7;
-    int thread_number = thread_ids[selected_item]&0x7F;
-    thread = &cores[core].threads[thread_number];
+    thread = &threads[selected_item];
     
-    if (thread == NULL)
-        return "";
+    if (thread->name == NULL)
+    {
+        snprintf(buffer, MAX_PATH, "%2d: ---", selected_item);
+        return buffer;
+    }
+    
     usage = thread_stack_usage(thread);
     status = thread_get_status(thread);
 #ifdef HAVE_PRIORITY_SCHEDULING
-    snprintf(buffer, MAX_PATH, IF_COP2("(%d) ") "%c%c %d %2d%% %s", 
-             IF_COP2(core,)
+    snprintf(buffer, MAX_PATH, "%2d: " IF_COP2("(%d) ") "%c%c %d %2d%% %s", 
+             selected_item,
+             IF_COP2(thread->core,)
              (status == STATE_RUNNING) ? '*' : ' ',
              thread_status_char(status),
              thread->priority,
              usage, thread->name);
 #else
-    snprintf(buffer, MAX_PATH, IF_COP2("(%d) ") "%c%c %2d%% %s", 
-             IF_COP2(core,)
+    snprintf(buffer, MAX_PATH, "%2d: " IF_COP2("(%d) ") "%c%c %2d%% %s", 
+             selected_item,
+             IF_COP2(thread->core,)
              (status == STATE_RUNNING) ? '*' : ' ',
              thread_status_char(status),
              usage, thread->name);
@@ -151,30 +150,12 @@ static char* dbg_os_getname(int selected_item, void * data, char *buffer)
 static bool dbg_os(void)
 {
     struct gui_synclist lists;
-    struct thread_entry *thread = NULL;
-    int action, i;
-    int thread_count = 0;
-    int core = 0;
-#if NUM_CORES > 1
-    for(core = 0; core < NUM_CORES; core++)
-    {
-#endif
-        for(i = 0;i < MAXTHREADS; i++)
-        {
-            thread = &cores[core].threads[i];
-            if (thread->name != NULL)
-            {
-                thread_ids[thread_count] = (core<<7)|i;
-                thread_count++;
-            }
-        }
-#if NUM_CORES > 1
-    }
-#endif
+    int action;
+    
     gui_synclist_init(&lists, dbg_os_getname, NULL, false, 1);
     gui_synclist_set_title(&lists, IF_COP2("Core and ") "Stack usage:", NOICON);
     gui_synclist_set_icon_callback(&lists, NULL);
-    gui_synclist_set_nb_items(&lists, thread_count);
+    gui_synclist_set_nb_items(&lists, MAXTHREADS);
     action_signalscreenchange();
     while(1)
     {

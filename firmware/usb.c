@@ -427,6 +427,8 @@ void usb_init(void)
 
 #ifndef BOOTLOADER
     queue_init(&usb_queue, true);
+    queue_set_irq_safe(&usb_queue, true);
+    
     create_thread(usb_thread, usb_stack, sizeof(usb_stack), 
                   usb_thread_name IF_PRIO(, PRIORITY_SYSTEM)
 		  IF_COP(, CPU, false));
