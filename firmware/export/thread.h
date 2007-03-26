@@ -104,12 +104,12 @@ struct thread_entry {
     void *stack;
     unsigned long statearg;
     unsigned short stack_size;
-#ifdef HAVE_PRIORITY_SCHEDULING
-    unsigned char priority;
-    unsigned char priority_x;
 # if NUM_CORES > 1
     unsigned char core; /* To which core threads belongs to. */
 # endif
+#ifdef HAVE_PRIORITY_SCHEDULING
+    unsigned char priority;
+    unsigned char priority_x;
     long last_run;
 #endif
     struct thread_entry *next, *prev;
