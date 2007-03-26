@@ -178,6 +178,8 @@ typedef struct
 
    size_t guard_bytes;          /* Number of bytes in guardbuf used */
    size_t buffer_remaining;     /* How much data is left in the buffer */ 
+   uint32_t first_pts;
+   uint32_t curr_pts;
    int id;
 } Stream;
 
@@ -464,6 +466,12 @@ static void get_next_data( Stream* str )
                 pts = (((header[9] >> 1) << 30) |
                        (header[10] << 22) | ((header[11] >> 1) << 15) |
                        (header[12] << 7) | (header[13] >> 1));
+
+                if (str->first_pts==0)
+                    str->first_pts = pts;
+
+                str->curr_pts = pts;
+
                 dts = (!(header[7] & 0x40) ? pts :
                        ((uint32_t)(((header[14] >> 1) << 30) |
                     (header[15] << 22) |
@@ -558,6 +566,7 @@ static volatile int16_t* pcmbuf_head IBSS_ATTR;
 static volatile int16_t* pcmbuf_tail IBSS_ATTR;
 
 static volatile uint32_t samplesplayed IBSS_ATTR;
+static volatile int delay IBSS_ATTR;
 
 static void init_pcmbuf(void)
 {
@@ -599,6 +608,10 @@ static void audio_thread(void)
     size_t len;
     int file_end = 0;  /* A count of the errors in each frame */
     int framelength;
+    int found_avdelay = 0;
+    int avdelay = 0;   /* Number of audio samples difference between first audio and video PTS values. */
+    int64_t apts_samples;
+    uint32_t samplesdecoded = 0;
 
     /* We need this here to init the EMAC for Coldfire targets */
     mad_synth_init(&synth);
@@ -608,6 +621,14 @@ static void audio_thread(void)
     /* This is the decoding loop. */
     for (;;) {
         button_loop();
+
+        if (!found_avdelay) {
+            if ((audio_str.first_pts != 0) && (video_str.first_pts != 0)) {
+                avdelay = ((audio_str.first_pts - video_str.first_pts)*44100)/90000;
+                found_avdelay = 1;
+                DEBUGF("First Audio PTS = %lu, First Video PTS=%lu, A-V=%d samples\n",audio_str.first_pts,video_str.first_pts,avdelay);
+            }
+        }
 
         if (audiostatus == PLEASE_STOP) {
            goto done;
@@ -620,6 +641,7 @@ static void audio_thread(void)
                 while (pcmbuf_len > 0) { rb->sleep(HZ/10); }
                 goto done;
             }
+
             len = audio_str.curr_packet_end - audio_str.curr_packet;
             if (n + len > mpa_buffer_size) { 
                 rb->splash( 30, "Audio buffer overflow" );
@@ -689,6 +711,14 @@ static void audio_thread(void)
 #endif
 
         framelength = synth.pcm.length; 
+        samplesdecoded += framelength;
+
+        if (found_avdelay) {
+            apts_samples = (audio_str.curr_pts-audio_str.first_pts);
+            apts_samples *= 44100;
+            apts_samples /= 90000;
+            delay=(int)(avdelay+apts_samples-samplesdecoded);
+        }
 
         if (framelength > 0) {
             /* Leave at least 32KB free (this will be the currently playing chunk) */
@@ -862,6 +892,8 @@ static void video_thread(void)
 
                 /*  Convert eta (in 27MHz ticks) into audio samples */
                 eta2 =(eta * 44100) / 27000000;
+
+                eta2 -= delay;
 
                 s = samplesplayed - (rb->pcm_get_bytes_waiting() >> 2);
                 if (settings.limitfps) {
@@ -1042,6 +1074,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     file_remaining -= disk_buf_len;
 
     video_str.guard_bytes = audio_str.guard_bytes = 0;
+    video_str.first_pts = audio_str.first_pts = 0;
     video_str.prev_packet = disk_buf;
     audio_str.prev_packet = disk_buf;
     video_str.buffer_remaining = disk_buf_len;
