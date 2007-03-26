@@ -126,7 +126,7 @@ static void queue_release_sender(struct thread_entry **sender,
                                  intptr_t retval)
 {
     (*sender)->retval = retval;
-    wakeup_thread(sender);
+    wakeup_thread_irq_safe(sender);
 #if 0
     /* This should _never_ happen - there must never be multiple
        threads in this list and it is a corrupt state */
@@ -289,11 +289,14 @@ void queue_post(struct event_queue *q, long id, intptr_t data)
     }
 #endif
 
-    wakeup_thread(&q->thread);
+    wakeup_thread_irq_safe(&q->thread);
     set_irq_level(oldlevel);
 }
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+/* No wakeup_thread_irq_safe here because IRQ handlers are not allowed
+   use of this function - we only aim to protect the queue integrity by
+   turning them off. */
 intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
 {
     int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);

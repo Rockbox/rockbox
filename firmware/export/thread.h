@@ -119,6 +119,8 @@ struct core_entry {
     struct thread_entry threads[MAXTHREADS];
     struct thread_entry *running;
     struct thread_entry *sleeping;
+    struct thread_entry *waking;
+    struct thread_entry **wakeup_list;
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     int switch_to_irq_level;
     #define STAY_IRQ_LEVEL -1
@@ -193,6 +195,7 @@ void set_irq_level_and_block_thread_w_tmo(struct thread_entry **list,
 #endif
 #endif
 void wakeup_thread(struct thread_entry **thread);
+void wakeup_thread_irq_safe(struct thread_entry **thread);
 #ifdef HAVE_PRIORITY_SCHEDULING
 int thread_set_priority(struct thread_entry *thread, int priority);
 int  thread_get_priority(struct thread_entry *thread);

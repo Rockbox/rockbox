@@ -289,15 +289,56 @@ void check_sleepers(void)
     }
 }
 
+/* Safely finish waking all threads potentialy woken by interrupts -
+ * statearg already zeroed in wakeup_thread. */
+static void wake_list_awaken(void)
+{
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+
+    /* No need for another check in the IRQ lock since IRQs are allowed
+       only to add threads to the waking list. They won't be adding more
+       until we're done here though. */
+
+    struct thread_entry *waking = cores[CURRENT_CORE].waking;
+    struct thread_entry *running = cores[CURRENT_CORE].running;
+
+    if (running != NULL)
+    {
+        /* Place waking threads at the end of the running list. */
+        struct thread_entry *tmp;
+        waking->prev->next  = running;
+        running->prev->next = waking;
+        tmp                 = running->prev;
+        running->prev       = waking->prev;
+        waking->prev        = tmp;
+    }
+    else
+    {
+        /* Just transfer the list as-is - just came out of a core
+         * sleep. */
+        cores[CURRENT_CORE].running = waking;
+    }
+
+    /* Done with waking list */
+    cores[CURRENT_CORE].waking = NULL;
+    set_irq_level(oldlevel);
+}
+
 static inline void sleep_core(void)
 {
     static long last_tick = 0;
 #if CONFIG_CPU == S3C2440
     int i;
 #endif
-    
+
     for (;;)
     {
+        /* We want to do these ASAP as it may change the decision to sleep
+           the core or the core has woken because an interrupt occurred
+           and posted a message to a queue. */
+        if (cores[CURRENT_CORE].waking != NULL)
+            wake_list_awaken();
+
         if (last_tick != current_tick)
         {
             check_sleepers();
@@ -397,7 +438,7 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
 #ifdef SIMULATOR
     /* Do nothing */
 #else
-    
+
     /* Begin task switching by saving our current context so that we can
      * restore the state of the current thread later to the point prior
      * to this call. */
@@ -593,10 +634,12 @@ void wakeup_thread(struct thread_entry **list)
     {
         case STATE_BLOCKED:
             /* Remove thread from the list of blocked threads and add it
-             * to the scheduler's list of running processes. */
+             * to the scheduler's list of running processes. List removal
+             * is safe since each object maintains it's own list of
+             * sleepers and queues protect against reentrancy. */
             remove_from_list(list, thread);
-            add_to_list(&cores[CURRENT_CORE].running, thread);
-        
+            add_to_list(cores[CURRENT_CORE].wakeup_list, thread);
+
         case STATE_BLOCKED_W_TMO:
             /* Just remove the timeout to cause scheduler to immediately
              * wake up the thread. */
@@ -608,6 +651,18 @@ void wakeup_thread(struct thread_entry **list)
              * or it's state is not blocked or blocked with timeout. */
             return ;
     }
+}
+
+/* Like wakeup_thread but safe against IRQ corruption when IRQs are disabled
+   before calling. */
+void wakeup_thread_irq_safe(struct thread_entry **list)
+{
+    struct core_entry *core = &cores[CURRENT_CORE];
+    /* Switch wakeup lists and call wakeup_thread */
+    core->wakeup_list = &core->waking;
+    wakeup_thread(list);
+    /* Switch back to normal running list */
+    core->wakeup_list = &core->running;
 }
 
 /*---------------------------------------------------------------------------
@@ -794,6 +849,8 @@ void init_threads(void)
         memset(cores, 0, sizeof cores);
     cores[core].sleeping = NULL;
     cores[core].running = NULL;
+    cores[core].waking = NULL;
+    cores[core].wakeup_list = &cores[core].running;
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     cores[core].switch_to_irq_level = STAY_IRQ_LEVEL;
 #endif
