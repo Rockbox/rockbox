@@ -626,7 +626,7 @@ static void audio_thread(void)
             if ((audio_str.first_pts != 0) && (video_str.first_pts != 0)) {
                 avdelay = ((audio_str.first_pts - video_str.first_pts)*44100)/90000;
                 found_avdelay = 1;
-                DEBUGF("First Audio PTS = %lu, First Video PTS=%lu, A-V=%d samples\n",audio_str.first_pts,video_str.first_pts,avdelay);
+                DEBUGF("First Audio PTS = %u, First Video PTS=%u, A-V=%d samples\n",(unsigned int)audio_str.first_pts,(unsigned int)video_str.first_pts,avdelay);
             }
         }
 
