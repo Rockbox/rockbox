@@ -869,6 +869,34 @@ static int onplay_callback(int key, int menu)
     return key;
 }
 
+
+char rating_menu_string[32];
+
+static void create_rating_menu(void)
+{
+    struct mp3entry* id3 = audio_current_track();
+    if(id3)
+        snprintf(rating_menu_string, sizeof rating_menu_string,
+             "%s: %d", str(LANG_MENU_SET_RATING), id3->rating);
+    else         
+        snprintf(rating_menu_string, sizeof rating_menu_string,
+             "%s: -", str(LANG_MENU_SET_RATING));
+}
+
+static bool set_rating_inline(void)
+{
+    struct mp3entry* id3 = audio_current_track();
+    if(id3) {
+        if(id3->rating<10) 
+            id3->rating++;
+        else
+            id3->rating=0;
+    }    
+    create_rating_menu();
+    return false;
+}
+
+
 int onplay(char* file, int attr, int from)
 {
 #if CONFIG_CODEC == SWCODEC
@@ -908,6 +936,13 @@ int onplay(char* file, int attr, int from)
 
     if (context == CONTEXT_WPS)
     {
+        if(file && global_settings.runtimedb)
+        {
+            create_rating_menu();
+            items[i].desc = rating_menu_string;
+            items[i].function = set_rating_inline;
+            i++;
+        }
         items[i].desc = ID2P(LANG_BOOKMARK_MENU);
         items[i].function = bookmark_menu;
         i++;
@@ -1037,9 +1072,11 @@ int onplay(char* file, int attr, int from)
     if (i)
     {
         m = menu_init( items, i, onplay_callback, NULL, NULL, NULL );
-        result = menu_show(m);
-        if (result >= 0)
-            items[result].function();
+        do {
+          result = menu_show(m);
+          if (result >= 0)
+              items[result].function();
+        } while (items[result].function == set_rating_inline);    
         menu_exit(m);
 
         if (exit_to_main)

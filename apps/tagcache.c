@@ -115,13 +115,13 @@ static const int unique_tags[] = { tag_artist, tag_album, tag_genre,
 
 /* Numeric tags (we can use these tags with conditional clauses). */
 static const int numeric_tags[] = { tag_year, tag_tracknumber, tag_length, 
-    tag_bitrate, tag_playcount, tag_playtime, tag_lastplayed, tag_commitid,
+    tag_bitrate, tag_playcount, tag_rating, tag_playtime, tag_lastplayed, tag_commitid,
     tag_virt_entryage, tag_virt_autoscore };
 
 /* String presentation of the tags defined in tagcache.h. Must be in correct order! */
 static const char *tags_str[] = { "artist", "album", "genre", "title", 
     "filename", "composer", "comment", "albumartist", "year", "tracknumber", 
-    "bitrate", "length", "playcount", "playtime", "lastplayed", "commitid" };
+    "bitrate", "length", "playcount", "rating", "playtime", "lastplayed", "commitid" };
 
 /* Status information of the tagcache. */
 static struct tagcache_stat tc_stat;
@@ -167,7 +167,7 @@ struct master_header {
 
 /* For the endianess correction */
 static const char *tagfile_entry_ec   = "ss";
-static const char *index_entry_ec     = "lllllllllllllllll"; /* (1 + TAG_COUNT) * l */
+static const char *index_entry_ec     = "llllllllllllllllll"; /* (1 + TAG_COUNT) * l */
 static const char *tagcache_header_ec = "lll";
 static const char *master_header_ec   = "llllll";
 
@@ -1499,8 +1499,9 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
     id3->albumartist  = get_tag_string(entry, tag_albumartist);
 
     id3->playcount  = get_tag_numeric(entry, tag_playcount);
+    id3->rating     = get_tag_numeric(entry, tag_rating);
     id3->lastplayed = get_tag_numeric(entry, tag_lastplayed);
-    id3->rating     = get_tag_numeric(entry, tag_virt_autoscore) / 10;
+    id3->score      = get_tag_numeric(entry, tag_virt_autoscore) / 10;
     id3->year       = get_tag_numeric(entry, tag_year);
 
     id3->tracknum = get_tag_numeric(entry, tag_tracknumber);
@@ -2850,7 +2851,7 @@ static int parse_changelog_line(int line_n, const char *buf, void *parameters)
     char tag_data[TAG_MAXLEN+32];
     int idx_id;
     long masterfd = (long)parameters;
-    const int import_tags[] = { tag_playcount, tag_playtime, tag_lastplayed,
+    const int import_tags[] = { tag_playcount, tag_rating, tag_playtime, tag_lastplayed,
         tag_commitid };
     int i;
     (void)line_n;

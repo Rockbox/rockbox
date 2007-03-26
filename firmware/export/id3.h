@@ -199,6 +199,7 @@ struct mp3entry {
 
     /* runtime database fields */
     short rating;
+    short score;
     long playcount;
     long lastplayed;
     
