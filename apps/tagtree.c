@@ -659,7 +659,7 @@ static void tagtree_unbuffer_event(struct mp3entry *id3, bool last_track)
     playtime += MIN(id3->length, id3->elapsed + 15 * 1000);
     
     logf("ube:%s", id3->path);
-    logf("-> %d/%ld/%d/%ld", last_track, playcount, rating, playtime);
+    logf("-> %d/%ld/%ld/%ld", last_track, playcount, rating, playtime);
     logf("-> %ld/%ld/%ld", id3->elapsed, id3->length, MIN(id3->length, id3->elapsed + 15 * 1000));
     
     /* lastplayed not yet supported. */
