@@ -31,53 +31,46 @@
 #include "misc.h"
 #include "rbunicode.h"
 
+#define KBD_BUF_SIZE  64
 #define KEYBOARD_PAGES 3
 
-extern unsigned short *lcd_ascii;
-
-static unsigned char* kbd_setupkeys(int page, int* len)
+static unsigned short *kbd_setupkeys(int page, int* len)
 {
-    static unsigned char lines[128];
-
-    unsigned ch;
+    static unsigned short kbdline[KBD_BUF_SIZE];
+    const unsigned char *p;
     int i = 0;
 
-    switch (page) 
+    switch (page)
     {
         case 0: /* Capitals */
-            for (ch = 'A'; ch <= 'Z'; ch++)
-                lines[i++] = ch;
-            for (ch = 0xc0; ch <= 0xdd; ch++)
-                if (lcd_ascii[ch] != NOCHAR_NEW && lcd_ascii[ch] != NOCHAR_OLD)
-                    lines[i++] = ch;
+            p = "ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅ"
+                "ÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÝ";
             break;
 
         case 1: /* Small */
-            for (ch = 'a'; ch <= 'z'; ch++)
-                lines[i++] = ch;
-            for (ch = 0xdf; ch <= 0xff; ch++)
-                if (lcd_ascii[ch] != NOCHAR_NEW && lcd_ascii[ch] != NOCHAR_OLD)
-                    lines[i++] = ch;
+            p = "abcdefghijklmnopqrstuvwxyzßàáâãä"
+                "åçèéêëìíîïñòóôöøùúûüýÿ";
             break;
 
-        case 2: /* Others */
-            for (ch = ' '; ch <= '@'; ch++)
-                lines[i++] = ch;
+        default: /* Others */
+            p = " !\"#$%&'()*+,-./0123456789:;<=>?@[]_{}~";
             break;
     }
 
-    lines[i] = 0;
+    while (*p)
+        p = utf8decode(p, &kbdline[i++]);
+
     *len = i;
 
-    return lines;
+    return kbdline;
 }
 
 /* Delimiters for highlighting the character selected for insertion */
-#define KEYBOARD_INSERT_LEFT 0x81
-#define KEYBOARD_INSERT_RIGHT 0x82
+#define KEYBOARD_INSERT_LEFT 0xe110
+#define KEYBOARD_INSERT_RIGHT 0xe10f
 
 #define KEYBOARD_CURSOR 0x7f
-#define KEYBOARD_ARROW 0x92
+#define KEYBOARD_ARROW 0xe10c
 
 /* helper function to spell a char if voice UI is enabled */
 static void kbd_spellchar(char c)
@@ -101,9 +94,8 @@ int kbd_input(char* text, int buflen)
 
     int len, len_utf8, i, j;
     int editpos, curpos, leftpos;
-    unsigned char *line = kbd_setupkeys(page, &linelen);
+    unsigned short *line = kbd_setupkeys(page, &linelen);
     unsigned char temptext[36];
-    unsigned char tmp;
     unsigned char *utf8;
 
     int button, lastbutton = 0;
@@ -130,20 +122,14 @@ int kbd_input(char* text, int buflen)
                 lcd_putc(0, 0, KEYBOARD_ARROW);
                 lcd_putc(0, 1, ' ');
             }
-
-            /* Draw insert chars */
-            utf8 = temptext;
-            tmp = KEYBOARD_INSERT_LEFT;
-            utf8 = iso_decode(&tmp, utf8, 0, 1);
-            utf8 = iso_decode(&line[x], utf8, 0, 1);
-            tmp = KEYBOARD_INSERT_RIGHT;
-            utf8 = iso_decode(&tmp, utf8, 0, 1);
+            
+            lcd_putc(1, 0, KEYBOARD_INSERT_LEFT);
+            lcd_putc(2, 0, line[x]);
+            lcd_putc(3, 0, KEYBOARD_INSERT_RIGHT);
             for (i = 1; i < 8; i++)
             {
-                utf8 = iso_decode(&line[(x+i)%linelen], utf8, 0, 1);
+                lcd_putc(i + 3, 0, line[(x+i)%linelen]);
             }
-            *utf8 = 0;
-            lcd_puts(1, 0, temptext);
 
             /* write out the text */
             curpos = MIN(MIN(editpos, 10 - MIN(len_utf8 - editpos, 3)), 9);
@@ -175,7 +161,7 @@ int kbd_input(char* text, int buflen)
             lcd_remove_cursor();
             lcd_puts(1, 1, temptext);
             lcd_put_cursor(curpos + 1, 1, KEYBOARD_CURSOR);
-            
+
             gui_syncstatusbar_draw(&statusbars, true);
         }
 
@@ -270,7 +256,7 @@ int kbd_input(char* text, int buflen)
                 }
                 else  /* inserts the selected char */
                 {
-                    utf8 = iso_decode((unsigned char*)&line[x], temptext, 0, 1);
+                    utf8 = utf8encode(line[x], temptext);
                     *utf8 = 0;
                     j = strlen(temptext);
                     if (len + j < buflen)

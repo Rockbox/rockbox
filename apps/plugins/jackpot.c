@@ -47,7 +47,7 @@ static unsigned char pattern[]={
 };
 
 static unsigned char str[12]; /*Containt the first line*/
-static unsigned char h1,h2,h3; /*Handle for the pattern*/
+static unsigned long h1,h2,h3; /*Handle for the pattern*/
 
 /* here is a global api struct pointer. while not strictly necessary,
    it's nice not to have to pass the api pointer in all function calls
@@ -109,10 +109,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_define_pattern(h1, pattern);
     rb->lcd_define_pattern(h2, pattern+7);
     rb->lcd_define_pattern(h3, pattern+28);
-    rb->snprintf(str,sizeof(str),"%c%cJackpot%c%c",h1,h2,h2,h1);
-    rb->lcd_puts(0,0,str);
-    rb->snprintf(str,sizeof(str)," %c V1.1  %c",h3,h3);
-    rb->lcd_puts(0,1,str);
+
+    rb->lcd_puts(0,0,"  Jackpot  ");
+    rb->lcd_putc(0,0,h1); rb->lcd_putc(1,0,h2);
+    rb->lcd_putc(9,0,h2); rb->lcd_putc(10,0,h1);
+    rb->lcd_puts(0,1,"   V1.1    ");
+    rb->lcd_putc(1,1,h3); rb->lcd_putc(9,1,h3);
     rb->sleep(HZ*2);
     rb->lcd_clear_display();
 

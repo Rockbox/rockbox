@@ -56,7 +56,7 @@ static unsigned char pattern2[]={0x14, 0x14, 0x14, 0x14, 0x14, 0x14, 0x14}; /*2 
 static unsigned char pattern1[]={0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10}; /*1 part*/
 
 static unsigned char str[12];   /*String use to display the first line*/
-static unsigned char hsmile,hcry,h1,h2; /*Handle for the new pattern*/
+static unsigned long hsmile,hcry,h1,h2; /*Handle for the new pattern*/
 
 static bool end;    /*If true game is finished*/
 static struct plugin_api* rb;
@@ -74,8 +74,8 @@ static void impossible(void)
 static void lose(void)
 {
     rb->lcd_define_pattern(hsmile,smile);
-    rb->snprintf(str,sizeof(str),"You Win!!%c",hsmile);
-    rb->lcd_puts(0,1,str);
+    rb->lcd_puts(0,1,"You Win!!");
+    rb->lcd_putc(8,1,hsmile);
     end=true;
     rb->sleep(HZ*2);
     return;
@@ -86,8 +86,8 @@ static void lose(void)
 static void win(void)
 {
     rb->lcd_define_pattern(hcry,cry);
-    rb->snprintf(str,sizeof(str),"You Lose!!%c",hcry);
-    rb->lcd_puts(0,1,str);
+    rb->lcd_puts(0,1,"You Lose!!");
+    rb->lcd_putc(9,1,hcry);
     end=true;
     rb->sleep(HZ*2);
     return;
@@ -100,22 +100,22 @@ static void display_first_line(int x)
     int i;
 
     rb->snprintf(str,sizeof(str),"       =%d",x);
+    rb->lcd_puts(0,0,str);
 
     rb->lcd_define_pattern(h1,pattern3);
-    for(i=0;i<x/3;i++)
-        str[i]=h1;
+    for (i=0;i<x/3;i++) 
+        rb->lcd_putc(i,0,h1);
 
     if (x%3==2)
     {
         rb->lcd_define_pattern(h2,pattern2);
-        str[i]=h2;
+        rb->lcd_putc(i,0,h2);
     }
     if (x%3==1)
     {
         rb->lcd_define_pattern(h2,pattern1);
-        str[i]=h2;
+        rb->lcd_putc(i,0,h2);
     }
-    rb->lcd_puts(0,0,str);
 }
 
 /* Call when the program end */

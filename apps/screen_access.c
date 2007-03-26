@@ -41,16 +41,15 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->depth=LCD_REMOTE_DEPTH;
             screen->has_disk_led=false;
 
-#if 1 /* all remote LCDs are bitmapped so far */
             screen->width=LCD_REMOTE_WIDTH;
             screen->height=LCD_REMOTE_HEIGHT;
             screen->setmargins=&lcd_remote_setmargins;
             screen->getymargin=&lcd_remote_getymargin;
             screen->getxmargin=&lcd_remote_getxmargin;
+            screen->getstringsize=&lcd_remote_getstringsize;
+#if 1 /* all remote LCDs are bitmapped so far */
             screen->setfont=&lcd_remote_setfont;
             screen->setfont(FONT_UI);
-            screen->getstringsize=&lcd_remote_getstringsize;
-            screen->putsxy=&lcd_remote_putsxy;
             screen->mono_bitmap=&lcd_remote_mono_bitmap;
             screen->mono_bitmap_part=&lcd_remote_mono_bitmap_part;
             screen->set_drawmode=&lcd_remote_set_drawmode;
@@ -70,20 +69,14 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->drawline=&lcd_remote_drawline;
             screen->vline=&lcd_remote_vline;
             screen->hline=&lcd_remote_hline;
-            screen->scroll_speed=&lcd_remote_scroll_speed;
-            screen->scroll_delay=&lcd_remote_scroll_delay;
             screen->scroll_step=&lcd_remote_scroll_step;
             screen->invertscroll=&lcd_remote_invertscroll;
-#endif /* LCD_REMOTE_DEPTH > 1 */
-            screen->puts_offset=&lcd_remote_puts_offset;
             screen->puts_style_offset=&lcd_remote_puts_style_offset;
             screen->puts_scroll_style=&lcd_remote_puts_scroll_style;
-            screen->puts_scroll_offset=&lcd_remote_puts_scroll_offset;
             screen->puts_scroll_style_offset=&lcd_remote_puts_scroll_style_offset;
+#endif /* 1 */
 
 #if 0 /* no charcell remote LCDs so far */
-            screen->width=11;
-            screen->height=2;
             screen->double_height=&lcd_remote_double_height;
             screen->putc=&lcd_remote_putc;
             screen->get_locked_pattern=&lcd_remote_get_locked_pattern;
@@ -96,11 +89,16 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
 #endif /* 0 */
 
             screen->init=&lcd_remote_init;
+            screen->putsxy=&lcd_remote_putsxy;
+            screen->puts=&lcd_remote_puts;
+            screen->puts_offset=&lcd_remote_puts_offset;
             screen->puts_scroll=&lcd_remote_puts_scroll;
+            screen->puts_scroll_offset=&lcd_remote_puts_scroll_offset;
+            screen->scroll_speed=&lcd_remote_scroll_speed;
+            screen->scroll_delay=&lcd_remote_scroll_delay;
             screen->stop_scroll=&lcd_remote_stop_scroll;
             screen->clear_display=&lcd_remote_clear_display;
             screen->update=&lcd_remote_update;
-            screen->puts=&lcd_remote_puts;
             screen->backlight_on=&remote_backlight_on;
             screen->backlight_off=&remote_backlight_off;
             screen->is_backlight_on=&is_remote_backlight_on;
@@ -116,16 +114,15 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
 #elif defined(HAVE_REMOTE_LCD)
             screen->has_disk_led=true;
 #endif
-#ifdef HAVE_LCD_BITMAP
             screen->width=LCD_WIDTH;
             screen->height=LCD_HEIGHT;
             screen->setmargins=&lcd_setmargins;
             screen->getymargin=&lcd_getymargin;
             screen->getxmargin=&lcd_getxmargin;
+            screen->getstringsize=&lcd_getstringsize;
+#ifdef HAVE_LCD_BITMAP
             screen->setfont=&lcd_setfont;
             screen->setfont(FONT_UI);
-            screen->getstringsize=&lcd_getstringsize;
-            screen->putsxy=&lcd_putsxy;
             screen->mono_bitmap=&lcd_mono_bitmap;
             screen->mono_bitmap_part=&lcd_mono_bitmap_part;
             screen->set_drawmode=&lcd_set_drawmode;
@@ -147,7 +144,7 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->get_foreground=&lcd_get_foreground;
             screen->set_background=&lcd_set_background;
             screen->set_foreground=&lcd_set_foreground;
-#endif
+#endif /* LCD_DEPTH > 1 */
             screen->update_rect=&lcd_update_rect;
             screen->fillrect=&lcd_fillrect;
             screen->drawrect=&lcd_drawrect;
@@ -155,20 +152,14 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->drawline=&lcd_drawline;
             screen->vline=&lcd_vline;
             screen->hline=&lcd_hline;
-            screen->scroll_speed=&lcd_scroll_speed;
-            screen->scroll_delay=&lcd_scroll_delay;
             screen->scroll_step=&lcd_scroll_step;
             screen->invertscroll=&lcd_invertscroll;
-            screen->puts_offset=&lcd_puts_offset;
             screen->puts_style_offset=&lcd_puts_style_offset;
             screen->puts_scroll_style=&lcd_puts_scroll_style;
-            screen->puts_scroll_offset=&lcd_puts_scroll_offset;
             screen->puts_scroll_style_offset=&lcd_puts_scroll_style_offset;
 #endif /* HAVE_LCD_BITMAP */
 
 #ifdef HAVE_LCD_CHARCELLS
-            screen->width=11; /* width in characters instead of pixels */
-            screen->height=2;
             screen->double_height=&lcd_double_height;
             screen->putc=&lcd_putc;
             screen->get_locked_pattern=&lcd_get_locked_pattern;
@@ -181,13 +172,18 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
 #endif /* HAVE_LCD_CHARCELLS */
 
             screen->init=&lcd_init;
+            screen->putsxy=&lcd_putsxy;
+            screen->puts=&lcd_puts;
+            screen->puts_offset=&lcd_puts_offset;
             screen->puts_scroll=&lcd_puts_scroll;
+            screen->puts_scroll_offset=&lcd_puts_scroll_offset;
+            screen->scroll_speed=&lcd_scroll_speed;
+            screen->scroll_delay=&lcd_scroll_delay;
             screen->stop_scroll=&lcd_stop_scroll;
             screen->clear_display=&lcd_clear_display;
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
             screen->update=&lcd_update;
 #endif
-            screen->puts=&lcd_puts;
             screen->backlight_on=&backlight_on;
             screen->backlight_off=&backlight_off;
             screen->is_backlight_on=&is_backlight_on;

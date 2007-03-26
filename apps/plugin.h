@@ -29,7 +29,7 @@
 #define MEM 2
 #endif
 
-#include <stdbool.h>
+#include <stdbool.h>                  
 #include <sys/types.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -110,12 +110,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 49
+#define PLUGIN_API_VERSION 50
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 47
+#define PLUGIN_MIN_API_VERSION 50
 
 /* plugin return codes */
 enum plugin_status {
@@ -135,24 +135,25 @@ struct plugin_api {
     /* lcd */
     void (*lcd_set_contrast)(int x);
     void (*lcd_clear_display)(void);
+    void (*lcd_setmargins)(int x, int y);
+    int  (*lcd_getstringsize)(const unsigned char *str, int *w, int *h);
+    void (*lcd_putsxy)(int x, int y, const unsigned char *string);
     void (*lcd_puts)(int x, int y, const unsigned char *string);
     void (*lcd_puts_scroll)(int x, int y, const unsigned char* string);
     void (*lcd_stop_scroll)(void);
 #ifdef HAVE_LCD_CHARCELLS
-    void (*lcd_define_pattern)(int which,const char *pattern);
-    unsigned char (*lcd_get_locked_pattern)(void);
-    void (*lcd_unlock_pattern)(unsigned char pat);
-    void (*lcd_putc)(int x, int y, unsigned short ch);
-    void (*lcd_put_cursor)(int x, int y, char cursor_char);
+    void (*lcd_define_pattern)(unsigned long ucs, const char *pattern);
+    unsigned long (*lcd_get_locked_pattern)(void);
+    void (*lcd_unlock_pattern)(unsigned long ucs);
+    void (*lcd_putc)(int x, int y, unsigned long ucs);
+    void (*lcd_put_cursor)(int x, int y, unsigned long ucs);
     void (*lcd_remove_cursor)(void);
     void (*PREFIX(lcd_icon))(int icon, bool enable);
     void (*lcd_double_height)(bool on);
 #else
-    void (*lcd_setmargins)(int x, int y);
     void (*lcd_set_drawmode)(int mode);
     int  (*lcd_get_drawmode)(void);
     void (*lcd_setfont)(int font);
-    int  (*lcd_getstringsize)(const unsigned char *str, int *w, int *h);
     void (*lcd_drawpixel)(int x, int y);
     void (*lcd_drawline)(int x1, int y1, int x2, int y2);
     void (*lcd_hline)(int x1, int x2, int y);
@@ -184,7 +185,6 @@ struct plugin_api {
     unsigned short *(*bidi_l2v)( const unsigned char *str, int orientation );
     const unsigned char *(*font_get_bits)( struct font *pf, unsigned short char_code );
     struct font* (*font_load)(const char *path);
-    void (*lcd_putsxy)(int x, int y, const unsigned char *string);
     void (*lcd_puts_style)(int x, int y, const unsigned char *str, int style);
     void (*lcd_puts_scroll_style)(int x, int y, const unsigned char* string,
                                   int style);

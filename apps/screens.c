@@ -254,12 +254,12 @@ static void charging_display_info(bool animate)
 }
 #else /* not HAVE_LCD_BITMAP */
 
-static unsigned char logo_chars[5];
+static unsigned long logo_chars[4];
 static const unsigned char logo_pattern[] = {
-    0x07, 0x04, 0x1c, 0x14, 0x1c, 0x04, 0x07, /* char 1 */
-    0x1f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1f, /* char 2 */
-    0x1f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1f, /* char 3 */
-    0x1f, 0x01, 0x01, 0x01, 0x01, 0x01, 0x1f, /* char 4 */
+    0x07, 0x04, 0x1c, 0x14, 0x1c, 0x04, 0x07, 0, /* char 1 */
+    0x1f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1f, 0, /* char 2 */
+    0x1f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1f, 0, /* char 3 */
+    0x1f, 0x01, 0x01, 0x01, 0x01, 0x01, 0x1f, 0, /* char 4 */
 };
 
 static void logo_lock_patterns(bool on)
@@ -270,7 +270,6 @@ static void logo_lock_patterns(bool on)
     {
         for (i = 0; i < 4; i++)
             logo_chars[i] = lcd_get_locked_pattern();
-        logo_chars[4] = '\0';
     }
     else
     {
@@ -284,19 +283,20 @@ static void charging_display_info(bool animate)
     int battv;
     unsigned i, ypos;
     static unsigned phase = 3;
-    char buf[28];
+    char buf[32];
 
     battv = battery_voltage();
-    snprintf(buf, sizeof(buf), "%s %d.%02dV", logo_chars,
-             battv / 100, battv % 100);
-    lcd_puts(0, 1, buf);
+    snprintf(buf, sizeof(buf), " %d.%02dV", battv / 100, battv % 100);
+    lcd_puts(4, 1, buf);
 
-    memcpy(buf, logo_pattern, 28); /* copy logo patterns */
+    memcpy(buf, logo_pattern, 32); /* copy logo patterns */
 
     if (!animate) /* build the screen */
     {
         lcd_double_height(false);
         lcd_puts(0, 0, "[Charging]");
+        for (i = 0; i < 4; i++)
+            lcd_putc(i, 1, logo_chars[i]);
     }
     else          /* animate the logo */
     {
@@ -307,14 +307,14 @@ static void charging_display_info(bool animate)
                 ypos = (phase + i/5) % 9; /* "bounce" effect */
                 if (ypos > 4)
                     ypos = 8 - ypos;
-                buf[5 - ypos + 7 * (i/5)] |= 0x10 >> (i%5);
+                buf[5 - ypos + 8 * (i/5)] |= 0x10 >> (i%5);
             }
         }
         phase++;
     }
 
     for (i = 0; i < 4; i++)
-        lcd_define_pattern(logo_chars[i], buf + 7 * i);
+        lcd_define_pattern(logo_chars[i], buf + 8 * i);
 }
 #endif /* (not) HAVE_LCD_BITMAP */
 

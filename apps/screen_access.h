@@ -60,24 +60,19 @@ struct screen
 #ifdef HAS_BUTTONBAR
     bool has_buttonbar;
 #endif
-
-#if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD) /* always bitmap */
     void (*setmargins)(int x, int y);
     int (*getxmargin)(void);
     int (*getymargin)(void);
 
-    void (*setfont)(int newfont);
     int (*getstringsize)(const unsigned char *str, int *w, int *h);
-    void (*putsxy)(int x, int y, const unsigned char *str);
+#if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD) /* always bitmap */
+    void (*setfont)(int newfont);
 
     void (*scroll_step)(int pixels);
-    void (*puts_offset)(int x, int y, const unsigned char *str, int offset);
     void (*puts_style_offset)(int x, int y, const unsigned char *str,
                               int style, int offset);
     void (*puts_scroll_style)(int x, int y, const unsigned char *string,
                                  int style);
-    void (*puts_scroll_offset)(int x, int y, const unsigned char *string,
-                                 int offset);
     void (*puts_scroll_style_offset)(int x, int y, const unsigned char *string,
                                      int style, int offset);
     void (*mono_bitmap)(const unsigned char *src,
@@ -114,17 +109,22 @@ struct screen
 
 #ifdef HAVE_LCD_CHARCELLS  /* no charcell remote LCDs so far */
     void (*double_height)(bool on);
-    void (*putc)(int x, int y, unsigned short ch);
+    void (*putc)(int x, int y, unsigned long ucs);
     void (*icon)(int icon, bool enable);
+    unsigned long (*get_locked_pattern)(void);
+    void (*define_pattern)(unsigned long ucs, const char *pattern);
 #endif
     void (*init)(void);
+    void (*putsxy)(int x, int y, const unsigned char *str);
+    void (*puts)(int x, int y, const unsigned char *str);
+    void (*puts_offset)(int x, int y, const unsigned char *str, int offset);
     void (*puts_scroll)(int x, int y, const unsigned char *string);
+    void (*puts_scroll_offset)(int x, int y, const unsigned char *string,
+                                 int offset);
     void (*scroll_speed)(int speed);
     void (*scroll_delay)(int ms);
     void (*stop_scroll)(void);
     void (*clear_display)(void);
-    unsigned char (*get_locked_pattern)(void);
-    void (*define_pattern)(int pat, const char *pattern);
 #if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD) || defined(SIMULATOR)
     void (*update)(void);
 #endif
@@ -132,7 +132,6 @@ struct screen
     void (*backlight_off)(void);
     bool (*is_backlight_on)(void);
     void (*backlight_set_timeout)(int index);
-    void (*puts)(int x, int y, const unsigned char *str);
 };
 
 /*

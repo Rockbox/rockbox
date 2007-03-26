@@ -59,8 +59,8 @@ common/unicode.c
 
 /* Display */
 #ifdef HAVE_LCD_CHARCELLS
-drivers/lcd-player-charset.c
-drivers/lcd-player.c
+drivers/lcd-charcell.c
+drivers/lcd-charset-player.c
 #endif /* HAVE_LCD_CHARCELLS */
 
 #ifdef HAVE_LCD_BITMAP
@@ -317,6 +317,7 @@ target/sh/archos/ata-archos.c
 target/sh/archos/ata-as-archos.S
 target/sh/archos/player/button-player.c
 target/sh/archos/player/lcd-as-player.S
+target/sh/archos/player/lcd-player.c
 #endif /* SIMULATOR */
 #endif /* ARCHOS_PLAYER */
 

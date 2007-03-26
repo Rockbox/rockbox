@@ -30,8 +30,8 @@
 enum {
     Icon_Queued = 'Q',
     Icon_Moving = 'M',
-    Icon_Unknown = 0x90,
-    Icon_Bookmark = 0x16,
+    Icon_Unknown = 0xe100,
+    Icon_Bookmark,
     Icon_Plugin,
     Icon_Folder,
     Icon_Firmware,

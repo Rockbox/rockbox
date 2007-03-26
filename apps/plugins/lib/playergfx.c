@@ -31,7 +31,7 @@ static int char_width;
 static int char_height;
 static int pixel_height;
 static int pixel_width;
-static unsigned char gfx_chars[8];
+static unsigned long gfx_chars[8];
 static unsigned char gfx_buffer[56];
 static int drawmode = DRMODE_SOLID;
 

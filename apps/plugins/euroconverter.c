@@ -138,7 +138,7 @@ static unsigned char *abbrev_str[12] = {
                                       };
 
 
-static unsigned char heuro,hhome; /*Handles for the new patterns*/
+static unsigned long heuro,hhome; /*Handles for the new patterns*/
 
 static struct plugin_api* rb;
 
@@ -239,7 +239,6 @@ static void round(longlong_t* i, longlong_t* f, int n)
 */
 static void display(longlong_t euro, longlong_t home, bool pos)
 {
-    char c1,c2;
     longlong_t i,f;
     unsigned char str[20];
     unsigned char s1[20];
@@ -247,52 +246,50 @@ static void display(longlong_t euro, longlong_t home, bool pos)
 
     if (pos)
     {   /*Edit the second line*/
-        c1=0x20;
-        rb->strcpy(s1,"%c%c%6d.%02d");
-        c2=0x81;
+        rb->strcpy(s1," %6d.%02d");
         if (nb_digit[country]==2)
-            rb->strcpy(s2,"%c%c%06d.%02d");
+            rb->strcpy(s2,"\xee\x84\x90%06d.%02d");
         else
-            rb->strcpy(s2,"%c%c%09d");
+            rb->strcpy(s2,"\xee\x84\x90%09d");
     }
     else
     {
-        c1=0x81;
-        rb->strcpy(s1,"%c%c%06d.%02d");
-        c2=0x20;
+        rb->strcpy(s1,"\xee\x84\x90%06d.%02d");
         if (nb_digit[country]==2)
-            rb->strcpy(s2,"%c%c%6d.%02d");
+            rb->strcpy(s2," %6d.%02d");
         else
-            rb->strcpy(s2,"%c%c%9d");
+            rb->strcpy(s2," %9d");
     }
 
     rb->lcd_remove_cursor();
     /*First line*/
+    rb->lcd_putc(0,0,heuro);
     split(euro,&i,&f);
     if (pos)
         round(&i,&f,2);
-    rb->snprintf(str,sizeof(str),s1,heuro,c1,(int)i,(int)f);
+    rb->snprintf(str,sizeof(str),s1,(int)i,(int)f);
 
     if (!pos)
     {
-        rb->lcd_puts(0,0,str);
+        rb->lcd_puts(1,0,str);
         rb->lcd_put_cursor(10-cur_pos,0,0x5F);
     }
     else
-        rb->lcd_puts_scroll(0,0,str);
+        rb->lcd_puts_scroll(1,0,str);
 
     /*Second line*/
+    rb->lcd_putc(0,1,hhome);
     split(home,&i,&f);
     if (!pos)
         round(&i,&f,nb_digit[country]);
-    rb->snprintf(str,sizeof(str),s2,hhome,c2,(int)i,(int)f);
+    rb->snprintf(str,sizeof(str),s2,(int)i,(int)f);
     if (pos)
     {
-        rb->lcd_puts(0,1,str);
+        rb->lcd_puts(1,1,str);
         rb->lcd_put_cursor(10-cur_pos,1,0x5F);
     }
     else
-        rb->lcd_puts_scroll(0,1,str);
+        rb->lcd_puts_scroll(1,1,str);
 }
 
 
@@ -363,7 +360,7 @@ static int euro_menu(void)
         rb->lcd_clear_display();
         rb->lcd_puts(0,0," Currency");
         rb->lcd_puts(0,1," Exit");
-        rb->lcd_putc(0,c,0x81);
+        rb->lcd_putc(0,c,0xe110);
 
         switch (rb->button_get(true))
         {

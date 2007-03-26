@@ -26,13 +26,13 @@
 typedef const unsigned char * ICON;
 #define NOICON NULL
 #else
-typedef short ICON;
+typedef long ICON;
 #define NOICON -1
 #endif
 
 #define Icon_NOICON -1
 
-#define CURSOR_CHAR 0x92
+#define CURSOR_CHAR 0xe10c
 #define CURSOR_WIDTH 6
 #define CURSOR_HEIGHT 8
 

@@ -661,7 +661,7 @@ EOF
 
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset="$toolset scramble descramble sh2d generate_rocklatin uclpack"
+    toolset="$toolset scramble descramble sh2d uclpack"
 
     # Note: the convbdf is present in the toolset just because: 1) the
     # firmware/Makefile assumes it is present always, and 2) we will need it when we

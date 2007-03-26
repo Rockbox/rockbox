@@ -132,8 +132,10 @@ void sim_backlight(int value)
 /* initialise simulator lcd driver */
 void sim_lcd_init(void)
 {
-    lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE, LCD_WIDTH * display_zoom,
-        LCD_HEIGHT * display_zoom, 8, 0, 0, 0, 0);
+    lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE, 
+                                       SIM_LCD_WIDTH * display_zoom,
+                                       SIM_LCD_HEIGHT * display_zoom,
+                                       8, 0, 0, 0, 0);
 
     sdl_set_gradient(lcd_surface, &lcd_backlight_color_zero, &lcd_color_max,
                      0, (1<<LCD_DEPTH));
@@ -142,10 +144,10 @@ void sim_lcd_init(void)
 #define BMP_COMPRESSION 0 /* BI_RGB */
 #define BMP_NUMCOLORS (1 << LCD_DEPTH)
 #define BMP_BPP 1
-#define BMP_LINESIZE (((LCD_WIDTH + 31) / 32) * 4)
+#define BMP_LINESIZE (((SIM_LCD_WIDTH + 31) / 32) * 4)
 
 #define BMP_HEADERSIZE (54 + 4 * BMP_NUMCOLORS)
-#define BMP_DATASIZE   (BMP_LINESIZE * LCD_HEIGHT)
+#define BMP_DATASIZE   (BMP_LINESIZE * SIM_LCD_HEIGHT)
 #define BMP_TOTALSIZE  (BMP_HEADERSIZE + BMP_DATASIZE)
 
 #define LE16_CONST(x) (x)&0xff, ((x)>>8)&0xff
@@ -159,8 +161,8 @@ static const unsigned char bmpheader[] =
     LE32_CONST(BMP_HEADERSIZE), /* Offset to start of pixel data */
 
     0x28, 0x00, 0x00, 0x00,     /* Size of (2nd) header */
-    LE32_CONST(LCD_WIDTH),      /* Width in pixels */
-    LE32_CONST(LCD_HEIGHT),     /* Height in pixels */
+    LE32_CONST(SIM_LCD_WIDTH),  /* Width in pixels */
+    LE32_CONST(SIM_LCD_HEIGHT), /* Height in pixels */
     0x01, 0x00,                 /* Number of planes (always 1) */
     LE16_CONST(BMP_BPP),        /* Bits per pixel 1/4/8/16/24 */
     LE32_CONST(BMP_COMPRESSION),/* Compression mode */
@@ -193,15 +195,15 @@ void screen_dump(void)
     SDL_LockSurface(lcd_surface);
 
     /* BMP image goes bottom up */
-    for (y = LCD_HEIGHT - 1; y >= 0; y--)
+    for (y = SIM_LCD_HEIGHT - 1; y >= 0; y--)
     {
         Uint8 *src = (Uint8 *)lcd_surface->pixels 
-                   + y * LCD_WIDTH * display_zoom * display_zoom;
+                   + y * SIM_LCD_WIDTH * display_zoom * display_zoom;
         unsigned char *dst = line;
         unsigned dst_mask = 0x80;
 
         memset(line, 0, sizeof(line));
-        for (x = LCD_WIDTH; x > 0; x--)
+        for (x = SIM_LCD_WIDTH; x > 0; x--)
         {
             if (*src)
                 *dst |= dst_mask;

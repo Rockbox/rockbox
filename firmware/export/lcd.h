@@ -59,12 +59,21 @@ extern void lcd_init_device(void);
 extern void lcd_backlight(bool on);
 extern int  lcd_default_contrast(void);
 extern void lcd_set_contrast(int val);
+extern void lcd_setmargins(int xmargin, int ymargin);
+extern int  lcd_getxmargin(void);
+extern int  lcd_getymargin(void);
+extern int  lcd_getstringsize(const unsigned char *str, int *w, int *h);
 
 extern void lcd_clear_display(void);
+extern void lcd_putsxy(int x, int y, const unsigned char *string);
 extern void lcd_puts(int x, int y, const unsigned char *string);
 extern void lcd_puts_style(int x, int y, const unsigned char *string, int style);
-extern void lcd_putc(int x, int y, unsigned short ch);
+extern void lcd_puts_offset(int x, int y, const unsigned char *str, int offset);
+extern void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
+                                  int offset);
+extern void lcd_putc(int x, int y, unsigned long ucs);
 extern void lcd_stop_scroll(void);
+extern void lcd_bidir_scroll(int threshold);
 extern void lcd_scroll_speed(int speed);
 extern void lcd_scroll_delay(int ms);
 extern void lcd_puts_scroll(int x, int y, const unsigned char* string);
@@ -123,14 +132,14 @@ enum
     ICON_PARAM
 };
 
-extern void lcd_double_height(bool on);
-extern void lcd_define_hw_pattern(int which,const char *pattern,int length);
-extern void lcd_define_pattern(int which,const char *pattern);
-unsigned char lcd_get_locked_pattern(void);
-void lcd_unlock_pattern(unsigned char pat);
-void lcd_put_cursor(int x, int y, char cursor_char);
+void lcd_double_height(bool on);
+void lcd_put_hw_char(int x, int y, unsigned char hw_char);
+void lcd_define_hw_pattern(int which, const char *pattern);
+void lcd_define_pattern(unsigned long ucs, const char *pattern);
+unsigned long lcd_get_locked_pattern(void);
+void lcd_unlock_pattern(unsigned long ucs);
+void lcd_put_cursor(int x, int y, unsigned long cursor_ucs);
 void lcd_remove_cursor(void);
-extern void lcd_bidir_scroll(int threshold);
 #define JUMP_SCROLL_ALWAYS 5
 extern void lcd_jump_scroll(int mode); /* 0=off, 1=once, ..., ALWAYS */
 extern void lcd_jump_scroll_delay(int ms);
@@ -303,17 +312,10 @@ extern void lcd_set_flip(bool yesno);
 
 extern void lcd_set_drawmode(int mode);
 extern int  lcd_get_drawmode(void);
-extern void lcd_setmargins(int xmargin, int ymargin);
-extern int  lcd_getxmargin(void);
-extern int  lcd_getymargin(void);
 extern void lcd_setfont(int font);
-extern int  lcd_getstringsize(const unsigned char *str, int *w, int *h);
 
-extern void lcd_puts_offset(int x, int y, const unsigned char *str, int offset);
 extern void lcd_puts_style_offset(int x, int y, const unsigned char *str,
                                   int style, int offset);
-extern void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
-                                  int offset);
 extern void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
                                   int style, int offset);
 
@@ -338,10 +340,8 @@ extern void lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
                             int stride, int x, int y, int width, int height);
 extern void lcd_bitmap(const fb_data *src, int x, int y, int width,
                        int height);
-extern void lcd_putsxy(int x, int y, const unsigned char *string);
 
 extern void lcd_invertscroll(int x, int y);
-extern void lcd_bidir_scroll(int threshold);
 extern void lcd_scroll_step(int pixels);
 
 #if LCD_DEPTH > 1
@@ -380,36 +380,25 @@ extern void lcd_bitmap_transparent(const fb_data *src, int x, int y,
 #endif /* HAVE_LCD_BITMAP */
 
 /* internal usage, but in multiple drivers */
+#define SCROLL_SPACING   3
 #ifdef HAVE_LCD_BITMAP
-#define SCROLL_SPACING 3
-#define SCROLL_LINE_SIZE    (MAX_PATH + LCD_WIDTH/2 + SCROLL_SPACING + 2)
+#define SCROLL_LINE_SIZE (MAX_PATH + LCD_WIDTH/2 + SCROLL_SPACING + 2)
+#else
+#define SCROLL_LINE_SIZE (MAX_PATH + LCD_WIDTH + SCROLL_SPACING + 2)
+#endif
 
 struct scrollinfo {
     char line[SCROLL_LINE_SIZE];
     int len;    /* length of line in chars */
-    int width;  /* length of line in pixels */
     int offset;
     int startx;
+#ifdef HAVE_LCD_BITMAP
+    int width;  /* length of line in pixels */
+    bool invert; /* invert the scrolled text */
+#endif
     bool backward; /* scroll presently forward or backward? */
     bool bidir;
-    bool invert; /* invert the scrolled text */
     long start_tick;
 };
-#else /* !HAVE_LCD_BITMAP */
-
-struct scrollinfo {
-    int mode;
-    char text[MAX_PATH];
-    int textlen;
-    int offset;
-    int turn_offset;
-    int startx;
-    int starty;
-    long scroll_start_tick;
-    int direction; /* +1 for right or -1 for left*/
-    int jump_scroll;
-    int jump_scroll_steps;
-};
-#endif
 
 #endif /* __LCD_H__ */

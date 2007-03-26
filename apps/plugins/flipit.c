@@ -203,7 +203,7 @@ static const unsigned char tk_pat[4][7] = {
 };
 
 static unsigned char cur_pat[7];
-static unsigned char gfx_chars[5];
+static unsigned long gfx_chars[5];
 
 static void release_gfx(void)
 {

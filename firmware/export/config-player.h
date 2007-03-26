@@ -4,10 +4,11 @@
 /* define this if you would like tagcache to build on this target */
 #define HAVE_TAGCACHE
 
-/* LCD dimensions (for the simulator) */
-#define LCD_WIDTH       132 /* Display width in pixels */
-#define LCD_HEIGHT      64  /* Display height in pixels */
-#define LCD_DEPTH       1
+#define LCD_WIDTH  11
+#define LCD_HEIGHT  2
+#define LCD_DEPTH   1
+#define SIM_LCD_WIDTH  132 /* pixels */
+#define SIM_LCD_HEIGHT  64 /* pixels */
 
 /* define this if you have the Player's keyboard */
 #define CONFIG_KEYPAD PLAYER_PAD

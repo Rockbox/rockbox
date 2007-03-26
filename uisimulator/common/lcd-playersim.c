@@ -51,8 +51,8 @@ void lcd_print_icon(int x, int icon_line, bool enable, char **icon)
   int row=0, col;
 
   int p=0, cp=0;
-  struct coordinate points[LCD_WIDTH * LCD_HEIGHT];
-  struct coordinate clearpoints[LCD_WIDTH * LCD_HEIGHT];
+  struct coordinate points[SIM_LCD_WIDTH * SIM_LCD_HEIGHT];
+  struct coordinate clearpoints[SIM_LCD_WIDTH * SIM_LCD_HEIGHT];
 
   while (icon[row]) {
     col=0;
@@ -221,16 +221,15 @@ void lcd_double_height(bool on)
     lcd_update();
 }
 
-void lcd_define_hw_pattern(int which, const char *pattern, int length)
+void lcd_define_hw_pattern(int pat, const char *pattern)
 {
     int i, j;
-    int pat = which / 8;
     unsigned char icon[8];
     memset(icon, 0, sizeof icon);
 
     DEBUGF("Defining pattern %d:", pat);
     for (j = 0; j <= 5; j++) {
-        for (i = 0; i < length; i++) {
+        for (i = 0; i < 7; i++) {
             if ((pattern[i])&(1<<(j)))
                 icon[5-j] |= (1<<(i));
         }
