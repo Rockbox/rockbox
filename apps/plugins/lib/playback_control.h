@@ -19,6 +19,12 @@
 #ifndef __PLAYBACK_CONTROL_H__
 #define __PLAYBACK_CONTROL_H__
 
+/* Use these if your menu uses the new menu api. 
+   REMEBER to call playback_control_init(rb) before rb->do_menu()... */
+extern const struct menu_item_ex *playback_control_menu;
+void playback_control_init(struct plugin_api* newapi);
+
+/* Use this if your menu still uses the old menu api */
 bool playback_control(struct plugin_api* api);
 
 #endif /* __PLAYBACK_CONTROL_H__ */

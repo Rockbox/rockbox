@@ -98,26 +98,31 @@ static bool repeat_mode(void)
 
     return result;
 }
+MENUITEM_FUNCTION(prevtrack_item, 0, "Previous Track",
+                  prevtrack, NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(playpause_item, 0, "Pause / Play",
+                  play, NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(stop_item, 0, "Stop Playback",
+                  stop, NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(nexttrack_item, 0, "Next Track",
+                  nexttrack, NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(volume_item, 0, "Change Volume",
+                  volume, NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(shuffle_item, 0, "Enable/Disable Shuffle",
+                  shuffle, NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(repeat_mode_item, 0, "Change Repeat Mode",
+                  repeat_mode, NULL, NULL, Icon_NOICON);
+MAKE_MENU(playback_control_menu, "Playback Control", NULL, Icon_NOICON,
+            &prevtrack_item, &playpause_item, &stop_item, &nexttrack_item,
+            &volume_item, &shuffle_item, &repeat_mode_item);
+
+void playback_control_init(struct plugin_api* newapi)
+{
+    api = newapi;
+}
 
 bool playback_control(struct plugin_api* newapi)
 {
-    int m;
     api = newapi;
-    bool result;
-    
-    static struct menu_item items[] = {
-        { "Previous Track", prevtrack },
-        { "Pause / Play", play },
-        { "Stop Playback", stop },
-        { "Next Track", nexttrack },
-        { "Change Volume", volume },
-        { "Enable/Disable Shuffle", shuffle },
-        { "Change Repeat Mode", repeat_mode },
-    };
-
-    m=api->menu_init( items, sizeof(items) / sizeof(*items), NULL,
-                 NULL, NULL, NULL);
-    result = api->menu_run(m);
-    api->menu_exit(m);
-    return result;
+    return api->do_menu(&playback_control_menu, NULL) == SYS_USB_CONNECTED;
 }
