@@ -145,13 +145,26 @@ bool parse_cuesheet(char *file, struct cuesheet *cue)
             else strncpy(cue->tracks[cue->track_count-1].performer,
                          start,MAX_NAME);
         }
+        else if (!strncmp(s, "SONGWRITER", 10))
+        {
+            start = strchr(s,'"');
+            if (!start)
+                break;
+            end = strchr(++start,'"');
+            if (!end)
+                break;
+            *end = '\0';
+            if (cue->track_count > 0)
+                strncpy(cue->tracks[cue->track_count-1].songwriter,
+                        start, MAX_NAME);
+        }
         else if (!strncmp(s, "TRACK", 5))
         {
             if (cue->track_count >= MAX_TRACKS)
                 break; /* out of memeory! stop parsing */
             cue->track_count++;
         }
-        else if (!strncmp(s, "INDEX", 5))
+        else if (!strncmp(s, "INDEX 01", 8))
         {
             s = strchr(s,' ');
             s = skip_whitespace(s);
@@ -342,9 +355,10 @@ void cue_spoof_id3(struct cuesheet *cue, struct mp3entry *id3)
 
     id3->title = cue->tracks[i].title;
     id3->artist = cue->tracks[i].performer;
+    id3->composer = cue->tracks[i].songwriter;
+    id3->albumartist = cue->performer;
     id3->tracknum = i+1;
     id3->album = cue->title;
-    id3->composer = cue->performer;
     if (id3->track_string)
         snprintf(id3->track_string, 10, "%d/%d", i+1, cue->track_count);
 }

@@ -29,6 +29,7 @@
 struct cue_track_info {
     char title[MAX_NAME];
     char performer[MAX_NAME];
+    char songwriter[MAX_NAME];
     unsigned long offset; /* ms from start of track */
 };
 
