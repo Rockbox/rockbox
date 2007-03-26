@@ -544,8 +544,8 @@ static void init_rockblox (void)
     pgfx_fillrect (15, 7, 2, 7);
     pgfx_update();
 #endif
-#ifdef HIGH_SCORE_Y
     show_details ();
+#ifdef HIGH_SCORE_Y
     for (i = MAX_HIGH_SCORES-1; i>=0; i--)
     {
         rb->snprintf (str, sizeof (str), "%06d L%1d", Highest[i].score, Highest[i].level);
