@@ -22,6 +22,16 @@ Build Your Own Rockbox
    $ mkdir build
    $ cd build
 
+3. Make sure you have sh/arm/m68k-elf-gcc and siblings in the PATH. Make sure
+   that you have 'perl' in your PATH too. Your gcc cross compiler needs to be
+   a particular version depending on what player you are compiling for. These
+   can be acquired with the rockboxdev.sh script in the /tools/ folder of the
+   source, or will have been included if you've installed one of the
+   toolchains or development environments provided at http://www.rockbox.org/
+
+   $ which sh-elf-gcc
+   $ which perl
+
 4. In your build directory, run the 'tools/configure' script and enter what
    target you want to build for and if you want a debug version or not (and a
    few more questions). It'll prompt you. The debug version is for making a
@@ -32,19 +42,13 @@ Build Your Own Rockbox
 
 5. *ploink*. Now you have got a Makefile generated for you.
 
-6. Make sure you have sh/arm/m68k-elf-gcc and siblings in the PATH. Make sure
-   that you have 'perl' in your PATH too.
-
-   $ which sh-elf-gcc
-   $ which perl
-
-7. Run 'make' and soon the necessary pieces from the firmware and the apps
+6. Run 'make' and soon the necessary pieces from the firmware and the apps
    directories have been compiled, linked and scrambled for you.
 
    $ make
    $ make zip
 
-8. unzip the rockbox.zip on your music player, reboot it and
+7. unzip the rockbox.zip on your music player, reboot it and
    *smile*.
 
 Whenever the tools/configure script gets updated, you can make your makefile
