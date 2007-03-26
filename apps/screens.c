@@ -1254,55 +1254,6 @@ bool browse_id3(void)
     }
 }
 
-#if 0 /* Currently unused */
-bool set_rating(void)
-{
-    struct mp3entry* id3 = audio_current_track();
-    int button;
-    bool exit = false;
-    char rating_text[20];
-
-    if (!(audio_status() & AUDIO_STATUS_PLAY)||id3==NULL)
-        return false;
-    while (!exit)
-    {
-        lcd_clear_display();
-        lcd_puts(0, 0, str(LANG_RATING));
-        snprintf(rating_text, sizeof(rating_text), "%d", id3->rating);
-        lcd_puts(0, 1, (unsigned char *)rating_text);
-        lcd_update();
-        button = get_action(CONTEXT_SETTINGS,TIMEOUT_BLOCK);
-
-        switch(button)
-        {
-            case ACTION_SETTINGS_DEC:
-                if (id3->rating > 0)
-                    id3->rating--;
-                else
-                    id3->rating = 10;
-                break;
-
-            case ACTION_SETTINGS_INC:
-                if (id3->rating < 10)
-                    id3->rating++;
-                else
-                    id3->rating = 0;
-                break;
-            case ACTION_STD_CANCEL:
-                exit = true;
-                break;
-
-            default:
-                if(default_event_handler(button) ==  SYS_USB_CONNECTED)
-                    return true;
-                break;
-        }
-    }
-    action_signalscreenchange();
-    return false;
-}
-#endif
-
 bool view_runtime(void)
 {
     char s[32];

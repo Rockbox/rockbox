@@ -869,7 +869,7 @@ static int onplay_callback(int key, int menu)
     return key;
 }
 
-
+#ifdef HAVE_TAGCACHE
 char rating_menu_string[32];
 
 static void create_rating_menu(void)
@@ -895,7 +895,7 @@ static bool set_rating_inline(void)
     create_rating_menu();
     return false;
 }
-
+#endif
 
 int onplay(char* file, int attr, int from)
 {
@@ -936,6 +936,7 @@ int onplay(char* file, int attr, int from)
 
     if (context == CONTEXT_WPS)
     {
+#ifdef HAVE_TAGCACHE
         if(file && global_settings.runtimedb)
         {
             create_rating_menu();
@@ -943,6 +944,7 @@ int onplay(char* file, int attr, int from)
             items[i].function = set_rating_inline;
             i++;
         }
+#endif
         items[i].desc = ID2P(LANG_BOOKMARK_MENU);
         items[i].function = bookmark_menu;
         i++;
@@ -955,12 +957,6 @@ int onplay(char* file, int attr, int from)
             items[i].desc = ID2P(LANG_MENU_SHOW_ID3_INFO);
             items[i].function = browse_id3;
             i++;
-/*            if(rundb_initialized)
-            {
-                items[i].desc = ID2P(LANG_MENU_SET_RATING);
-                items[i].function = set_rating;
-                i++;
-            }*/
         }
 
 #ifdef HAVE_MULTIVOLUME
@@ -1072,11 +1068,17 @@ int onplay(char* file, int attr, int from)
     if (i)
     {
         m = menu_init( items, i, onplay_callback, NULL, NULL, NULL );
-        do {
-          result = menu_show(m);
-          if (result >= 0)
-              items[result].function();
-        } while (items[result].function == set_rating_inline);    
+#ifdef HAVE_TAGCACHE      
+        do 
+        {
+#endif        
+            result = menu_show(m);
+            if (result >= 0)
+                items[result].function();
+#ifdef HAVE_TAGCACHE      
+        } 
+        while (items[result].function == set_rating_inline);    
+#endif        
         menu_exit(m);
 
         if (exit_to_main)
