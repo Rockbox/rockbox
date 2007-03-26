@@ -24,7 +24,6 @@
 #include "debug_menu.h"
 #include "sprintf.h"
 #include <string.h>
-#include "lcd-player-charset.h"
 #include "settings.h"
 #include "statusbar.h"
 #include "talk.h"
