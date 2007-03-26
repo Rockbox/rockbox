@@ -124,5 +124,5 @@ void playback_control_init(struct plugin_api* newapi)
 bool playback_control(struct plugin_api* newapi)
 {
     api = newapi;
-    return api->do_menu(&playback_control_menu, NULL) == SYS_USB_CONNECTED;
+    return api->do_menu(&playback_control_menu, NULL) == MENU_ATTACHED_USB;
 }
