@@ -43,7 +43,7 @@ static int output_y;
 static int output_width;
 static int output_height;
 
-#ifdef SIMULATOR
+#if defined(SIMULATOR) && defined(HAVE_LCD_COLOR)
 
 #define RYFAC (31*257)
 #define GYFAC (63*257)
