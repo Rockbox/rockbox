@@ -1329,6 +1329,7 @@ bool dsp_configure(int setting, intptr_t value)
         }
 
         update_functions();
+        resampler_new_delta();
         break;
 
     case DSP_FLUSH:
