@@ -31,10 +31,9 @@ pacbox
 doom
 #endif
 
-/* For all the colour targets */
-#if defined(HAVE_LCD_COLOR)
+/* For all the swcodec targets */
+#if CONFIG_CODEC == SWCODEC
 mpegplayer
 #endif
-
 
 #endif /* IRIVER_IFP7XX_SERIES */

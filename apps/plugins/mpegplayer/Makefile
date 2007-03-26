@@ -8,7 +8,7 @@
 #
 
 INCLUDES = -I$(APPSDIR) -I.. -I. $(TARGET_INC) -I$(FIRMDIR)/include -I$(FIRMDIR)/export \
- -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers -I$(OUTDIR) -I$(BUILDDIR)
+ -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers -I$(APPSDIR)/plugins/lib -I$(OUTDIR) -I$(BUILDDIR)
 CFLAGS = $(INCLUDES) $(GCCOPTS) -O2 $(TARGET) $(EXTRA_DEFINES) \
  -DTARGET_ID=$(TARGET_ID) -DMEM=${MEMORYSIZE} -DPLUGIN
 

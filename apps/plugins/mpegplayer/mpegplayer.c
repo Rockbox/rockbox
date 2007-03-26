@@ -103,6 +103,7 @@ FPS     | 27Mhz   | 100Hz          | 44.1KHz   | 48KHz
 #include "mpeg2dec_config.h"
 
 #include "plugin.h"
+#include "gray.h"
 
 #include "mpeg2.h"
 #include "mpeg_settings.h"
@@ -270,7 +271,15 @@ static void button_loop(void)
                 /* Wait for video thread to stop */
                 while (videostatus == PLEASE_PAUSE) { rb->sleep(HZ/25); }
             }
+
+#ifndef HAVE_LCD_COLOR
+            gray_show(false);
+#endif
             result = mpeg_menu();
+
+#ifndef HAVE_LCD_COLOR
+            gray_show(true);
+#endif
 
             /* The menu can change the font, so restore */
             rb->lcd_setfont(FONT_SYSFIXED);
@@ -911,6 +920,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     size_t file_remaining;
     size_t n;
     size_t disk_buf_len;
+#ifndef HAVE_LCD_COLOR
+    long graysize;
+    int grayscales;
+#endif
 
     /* We define this here so it is on the main stack (in IRAM) */
     mad_fixed_t mad_frame_overlap[2][32][18];       /* 4608 bytes */
@@ -940,12 +953,26 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     buffer_size = audiosize - (PCMBUFFER_SIZE+AUDIOBUFFER_SIZE+LIBMPEG2BUFFER_SIZE);
 
     DEBUGF("audiosize=%d, buffer_size=%ld\n",audiosize,buffer_size);
-    buffer_size &= ~(0x7ff);  /* Round buffer down to nearest 2KB */
-    DEBUGF("audiosize=%d, buffer_size=%ld\n",audiosize,buffer_size);
     buffer = mpeg2_malloc(buffer_size,-1);
 
     if (buffer == NULL)
         return PLUGIN_ERROR;
+
+#ifndef HAVE_LCD_COLOR
+    /* initialize the grayscale buffer: 32 bitplanes for 33 shades of gray. */
+    grayscales = gray_init(rb, buffer, buffer_size, false, LCD_WIDTH, LCD_HEIGHT,
+                           32, 2<<8, &graysize) + 1;
+    buffer += graysize;
+    buffer_size -= graysize;
+    if (grayscales < 33 || buffer_size <= 0)
+    {
+        rb->splash(HZ, "gray buf error");
+        return PLUGIN_ERROR;
+    }
+#endif
+
+    buffer_size &= ~(0x7ff);  /* Round buffer down to nearest 2KB */
+    DEBUGF("audiosize=%d, buffer_size=%ld\n",audiosize,buffer_size);
 
     mpa_buffer_size = AUDIOBUFFER_SIZE;
     mpa_buffer = mpeg2_malloc(mpa_buffer_size,-2);
@@ -1026,6 +1053,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     audiostatus = STREAM_BUFFERING;
     videostatus = STREAM_PLAYING;
 
+#ifndef HAVE_LCD_COLOR
+    gray_show(true);
+#endif
+
     /* We put the video thread on the second processor for multi-core targets. */
     if ((videothread_id = rb->create_thread(video_thread,
         (uint8_t*)video_stack,VIDEO_STACKSIZE,"mpgvideo" IF_PRIO(,PRIORITY_PLAYBACK)
@@ -1073,6 +1104,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         }
         rb->sleep(HZ/10);
     }
+
+#ifndef HAVE_LCD_COLOR
+    gray_release();
+#endif
 
     rb->remove_thread(audiothread_id);
     rb->yield(); /* Is this needed? */

@@ -24,6 +24,7 @@
 #include "mpeg2dec_config.h"
 
 #include "plugin.h"
+#include "gray.h"
 
 extern struct plugin_api* rb;
 
@@ -188,6 +189,7 @@ static void yuv_bitmap_part(unsigned char * const src[3],
 
 void vo_draw_frame (uint8_t * const * buf)
 {
+#ifdef HAVE_LCD_COLOR
 #ifdef SIMULATOR
     yuv_bitmap_part(buf,0,0,image_width,
                     output_x,output_y,output_width,output_height);
@@ -196,6 +198,10 @@ void vo_draw_frame (uint8_t * const * buf)
     rb->lcd_yuv_blit(buf,
                     0,0,image_width,
                     output_x,output_y,output_width,output_height);
+#endif
+#else
+    gray_ub_gray_bitmap_part(buf[0],0,0,image_width,
+                             output_x,output_y,output_width,output_height);
 #endif
 }
 
