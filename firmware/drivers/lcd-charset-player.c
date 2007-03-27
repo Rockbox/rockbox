@@ -320,7 +320,7 @@ static const struct xchar_info xchar_info_newlcd[] = {
     { 0x0439, XF_CYR_SHORTi, 1, 0x75 }, /* cyrillic short i */
     { 0x043a, XF_CYR_ka,     1, 0x6b }, /* cyrillic ka */
     { 0x043b, XF_CYR_el,     2, 0xca }, /* cyrillic el */
-    { 0x043c, XF_CYR_em,     1, 0x6b }, /* cyrillic em */
+    { 0x043c, XF_CYR_em,     1, 0x6d }, /* cyrillic em */
     { 0x043d, XF_CYR_en,     2, 0x48 }, /* cyrillic en */
     { 0x043e, 0, 0, 0x6f }, /* cyrillic o */
     { 0x043f, 0, 0, 0xe3 }, /* cyrillic pe */
