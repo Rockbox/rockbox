@@ -556,7 +556,8 @@ static void backlight_tick(void)
 void backlight_init(void)
 {
     queue_init(&backlight_queue, true);
-
+    queue_set_irq_safe(&backlight_queue, true);
+    
 #ifdef SIMULATOR
     /* do nothing */
 #elif defined(__BACKLIGHT_INIT)
