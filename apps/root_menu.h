@@ -17,9 +17,16 @@
 *
 ****************************************************************************/
 #include "config.h"
+#ifndef __ROOT_MENU_H__
+#define __ROOT_MENU_H__
+
 void root_menu(void);
 
 enum {
+    /* from old menu api, but still required*/
+    MENU_ATTACHED_USB = -10,
+    MENU_SELECTED_EXIT = -9,
+
     GO_TO_PREVIOUS_MUSIC = -4,
     GO_TO_PREVIOUS_BROWSER = -3,
     GO_TO_PREVIOUS = -2,
@@ -42,3 +49,5 @@ enum {
 };
 
 extern const struct menu_item_ex root_menu_;
+
+#endif /* __ROOT_MENU_H__ */

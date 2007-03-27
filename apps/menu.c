@@ -737,7 +737,7 @@ int menu_show(int m)
     switch (value)
     {
         case MENU_ATTACHED_USB:
-        /* case GO_TO_ROOT: */
+        case GO_TO_ROOT:
             return MENU_ATTACHED_USB;
         case GO_TO_PREVIOUS:
             return MENU_SELECTED_EXIT;

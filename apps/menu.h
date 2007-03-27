@@ -23,6 +23,7 @@
 #include <stdbool.h>
 #include "icon.h"
 #include "icons.h"
+#include "root_menu.h" /* needed for MENU_* return codes */
 
 
 enum menu_item_type {
@@ -193,12 +194,8 @@ int menu_init(const struct menu_item* mitems, int count,
                 const char *button1, const char *button2, const char *button3);
 void menu_exit(int menu);
 
- /* Returns below define, or number of selected menu item*/
+ /* Returns MENU_* define from root_menu.h, or number of selected menu item*/
 int menu_show(int m);
-#define MENU_ATTACHED_USB -1
-#define MENU_SELECTED_EXIT -2
-#define MENU_EXIT_ALL -3
-#define MENU_RETURN_TO_WPS -4
 
 bool menu_run(int menu);
 int menu_count(int menu);
