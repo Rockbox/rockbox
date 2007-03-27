@@ -43,12 +43,12 @@ static unsigned short *kbd_setupkeys(int page, int* len)
     {
         case 0: /* Capitals */
             p = "ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅ"
-                "ÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÝ";
+                "ÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ";
             break;
 
         case 1: /* Small */
             p = "abcdefghijklmnopqrstuvwxyzßàáâãä"
-                "åçèéêëìíîïñòóôöøùúûüýÿ";
+                "åçèéêëìíîïñòóôõöøùúûüýÿ";
             break;
 
         default: /* Others */
