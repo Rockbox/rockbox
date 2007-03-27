@@ -69,23 +69,29 @@ static long cores_locked IBSS_ATTR;
 #define LOCK(...) do { } while (test_and_set(&cores_locked, 1))
 #define UNLOCK(...) cores_locked = 0
 
+#warning "Core locking mechanism should be fixed on H10/4G!"
 inline void lock_cores(void)
 {
+#if 0
     if (!cores[CURRENT_CORE].lock_issued)
     {
         LOCK();
         cores[CURRENT_CORE].lock_issued = true;
     }
+#endif
 }
 
 inline void unlock_cores(void)
 {
+#if 0
     if (cores[CURRENT_CORE].lock_issued)
     {
         cores[CURRENT_CORE].lock_issued = false;
         UNLOCK();
     }
+#endif
 }
+
 #endif
 
 /* Conserve IRAM
