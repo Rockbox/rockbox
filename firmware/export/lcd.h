@@ -382,9 +382,9 @@ extern void lcd_bitmap_transparent(const fb_data *src, int x, int y,
 /* internal usage, but in multiple drivers */
 #define SCROLL_SPACING   3
 #ifdef HAVE_LCD_BITMAP
-#define SCROLL_LINE_SIZE (MAX_PATH + LCD_WIDTH/2 + SCROLL_SPACING + 2)
+#define SCROLL_LINE_SIZE (MAX_PATH + SCROLL_SPACING + 3*LCD_WIDTH/2 + 2)
 #else
-#define SCROLL_LINE_SIZE (MAX_PATH + LCD_WIDTH + SCROLL_SPACING + 2)
+#define SCROLL_LINE_SIZE (MAX_PATH + SCROLL_SPACING + 3*LCD_WIDTH + 2)
 #endif
 
 struct scrollinfo {
