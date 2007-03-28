@@ -167,12 +167,14 @@ static bool dbg_os(void)
         gui_synclist_do_button(&lists, action, LIST_WRAP_UNLESS_HELD);
         if (action == ACTION_STD_CANCEL)
             break;
-        if (action == ACTION_STD_OK)
+#ifdef ROCKBOX_HAS_LOGF
+        else if (action == ACTION_STD_OK)
         {
             struct thread_entry *thread = &threads[gui_synclist_get_sel_pos(&lists)];
             if (thread->name != NULL)
                 remove_thread(thread);
         }
+#endif
         else if(default_event_handler(action) == SYS_USB_CONNECTED)
             return true;
     }
