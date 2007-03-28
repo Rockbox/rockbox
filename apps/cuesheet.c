@@ -89,7 +89,7 @@ bool look_for_cuesheet_file(const char *trackpath)
 static char *skip_whitespace(char* buf)
 {
     char *r = buf;
-    while (*r && (*r < 33))
+    while (*r && isspace(*r))
         r++;
     return r;
 }
