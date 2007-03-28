@@ -36,6 +36,7 @@ enum {
     XF_ICON_UNKNOWN,  XF_ICON_BOOKMARK, XF_ICON_PLUGIN, XF_ICON_FOLDER,
     XF_ICON_FIRMWARE, XF_ICON_LANGUAGE, XF_ICON_AUDIO,  XF_ICON_WPS,
     XF_ICON_PLAYLIST, XF_ICON_TEXTFILE, XF_ICON_CONFIG,
+
     /* Latin1 */
     XF_INVEXCLAMATION, XF_CENTSIGN, XF_POUNDSIGN, XF_CURRENCY,
     XF_LEFTDBLANGLEQUOT, XF_MACRON, XF_PLUSMINUS, XF_SUPER2,
@@ -57,6 +58,26 @@ enum {
     XF_uGRAVE, XF_uACUTE, XF_uCIRCUMFLEX, XF_uDIERESIS,
     XF_yACUTE, XF_yDIERESIS,
 
+    /* Greek */
+    XF_GR_DELTA, XF_GR_THETA, XF_GR_LAMBDA, XF_GR_XI,
+    XF_GR_PSI, XF_GR_alpha, XF_GR_alphaTONOS, XF_GR_gamma,
+    XF_GR_epsilon, XF_GR_epsilonTONOS, XF_GR_zeta, XF_GR_eta,
+    XF_GR_etaTONOS, XF_GR_iota, XF_GR_lambda, XF_GR_xi,
+    XF_GR_rho, XF_GR_FINALsigma, XF_GR_sigma, XF_GR_upsilon,
+    XF_GR_upsilonTONOS, XF_GR_chi, XF_GR_psi, XF_GR_omega,
+    XF_GR_omegaTONOS,
+#define XF_GR_ANOTELEIA XF_MIDDLEDOT
+#define XF_GR_GAMMA     XF_CYR_GHE
+#define XF_GR_PI        XF_CYR_PE
+#define XF_GR_delta     XF_CYR_be
+#define XF_GR_iotaTONOS XF_iACUTE
+#define XF_GR_iotaDIA   XF_iDIERESIS
+#define XF_GR_kappa     XF_CYR_ka
+#define XF_GR_mu        XF_MICRO
+#define XF_GR_pi        XF_CYR_pe
+#define XF_GR_omicronTONOS XF_oACUTE
+#define XF_GR_tau XF_CYR_te
+
     /* Cyrillic */
     XF_CYR_BE, XF_CYR_GHE, XF_CYR_DE, XF_CYR_ZHE,
     XF_CYR_ZE, XF_CYR_I, XF_CYR_SHORTI, XF_CYR_EL,
@@ -69,6 +90,12 @@ enum {
     XF_CYR_tse, XF_CYR_che, XF_CYR_sha, XF_CYR_shcha,
     XF_CYR_hard, XF_CYR_yeru, XF_CYR_soft, XF_CYR_e,
     XF_CYR_yu, XF_CYR_ya,
+#define XF_CYR_IEGRAVE XF_EGRAVE
+#define XF_CYR_IO      XF_EDIERESIS
+#define XF_CYR_YI      XF_IDIERESIS
+#define XF_CYR_ieGRAVE XF_eGRAVE
+#define XF_CYR_io      XF_eDIERESIS
+#define XF_CYR_yi      XF_iDIERESIS
 
 #endif
 };
@@ -267,19 +294,96 @@ static const struct xchar_info xchar_info_newlcd[] = {
 
     {   0xff, XF_yDIERESIS,   1, 0x79 }, /* ÿ (y dieresis) */
     
+    /* Greek */
+    { 0x037e, 0, 0, 0x3b }, /* greek question mark */
+    
+    { 0x0386, 0, 0, 0x41 }, /* greek ALPHA with tonos */
+    { 0x0387, 0, 0, 0xa5 }, /* greek ano teleia */
+    { 0x0388, 0, 0, 0x45 }, /* greek EPSILON with tonos */
+    { 0x0389, 0, 0, 0x48 }, /* greek ETA with tonos */
+    { 0x038a, 0, 0, 0x49 }, /* greek IOTA with tonos */
+    /* reserved */
+    { 0x038c, 0, 0, 0x4f }, /* greek OMICRON with tonos */
+    /* reserved */
+    { 0x038e, 0, 0, 0x59 }, /* greek YPSILON with tonos */
+    { 0x038f, 0, 0, 0xea }, /* greek OMEGA with tonos */
+    { 0x0390, XF_GR_iotaTONOS, 1, 0x69 }, /* greek iota with dialytica + tonos */
+    { 0x0391, 0, 0, 0x41 }, /* greek ALPHA */
+    { 0x0392, 0, 0, 0x42 }, /* greek BETA */
+    { 0x0393, XF_GR_GAMMA,   2, 0xb2 }, /* greek GAMMA */
+    { 0x0394, XF_GR_DELTA,   2, 0x1f }, /* greek DELTA */
+    { 0x0395, 0, 0, 0x45 }, /* greek EPSILON */
+    { 0x0396, 0, 0, 0x5a }, /* greek ZETA */
+    { 0x0397, 0, 0, 0x48 }, /* greek ETA */
+    { 0x0398, XF_GR_THETA,   1, 0x30 }, /* greek THETA */
+    { 0x0399, 0, 0, 0x49 }, /* greek IOTA */
+    { 0x039a, 0, 0, 0x4b }, /* greek KAPPA */
+    { 0x039b, XF_GR_LAMBDA,  2, 0x4c }, /* greek LAMBDA */
+    { 0x039c, 0, 0, 0x4d }, /* greek MU */
+    { 0x039d, 0, 0, 0x4e }, /* greek NU */
+    { 0x039e, XF_GR_XI,      2, 0xd0 }, /* greek XI */
+    { 0x039f, 0, 0, 0x4f }, /* greek OMICRON */
+    { 0x03a0, XF_GR_PI,      1, 0x14 }, /* greek PI */
+    { 0x03a1, 0, 0, 0x50 }, /* greek RHO */
+    /* reserved */
+    { 0x03a3, 0, 0, 0xe4 }, /* greek SIGMA */
+    { 0x03a4, 0, 0, 0x54 }, /* greek TAU */
+    { 0x03a5, 0, 0, 0x59 }, /* greek UPSILON */
+    { 0x03a6, 0, 0, 0xe8 }, /* greek PHI */
+    { 0x03a7, 0, 0, 0x58 }, /* greek CHI */
+    { 0x03a8, XF_GR_PSI,     2, 0xc2 }, /* greek PSI */
+    { 0x03a9, 0, 0, 0xea }, /* greek OMEGA */
+    { 0x03aa, 0, 0, 0x49 }, /* greek IOTA with dialytica */
+    { 0x03ab, 0, 0, 0x59 }, /* greek UPSILON with dialytica */
+    { 0x03ac, XF_GR_alphaTONOS,   1, 0xe0 }, /* greek alpha with tonos */
+    { 0x03ad, XF_GR_epsilonTONOS, 1, 0xee }, /* greek epsilon with tonos */
+    { 0x03ae, XF_GR_etaTONOS,     1, 0x6e }, /* greek eta with tonos */
+    { 0x03af, XF_GR_iotaTONOS,    1, 0x69 }, /* greek iota with tonos */
+    { 0x03b0, XF_GR_upsilonTONOS, 1, 0x75 }, /* greek upsilon with dialytica + tonos */
+    { 0x03b1, 0, 0, 0xe0 }, /* greek alpha */
+    { 0x03b2, 0, 0, 0xe1 }, /* greek beta */
+    { 0x03b3, 0, 0, 0xe2 }, /* greek gamma */
+    { 0x03b4, 0, 0, 0xeb }, /* greek delta */
+    { 0x03b5, XF_GR_epsilon, 1, 0xee }, /* greek epsilon */
+    { 0x03b6, XF_GR_zeta,    1, 0x7a }, /* greek zeta */
+    { 0x03b7, XF_GR_eta,     1, 0x6e }, /* greek eta */
+    { 0x03b8, 0, 0, 0xe9 }, /* greek theta */
+    { 0x03b9, XF_GR_iota,    1, 0x69 }, /* greek iota */
+    { 0x03ba, XF_GR_kappa,   1, 0x6b }, /* greek kappa */
+    { 0x03bb, XF_GR_lambda,  2, 0xca }, /* greek lambda */
+    { 0x03bc, 0, 0, 0xe6 }, /* greek mu */
+    { 0x03bd, 0, 0, 0x76 }, /* greek nu */
+    { 0x03be, XF_GR_xi,      2, 0xd0 }, /* greek xi */
+    { 0x03bf, 0, 0, 0x6f }, /* greek omicron */
+    { 0x03c0, 0, 0, 0xe3 }, /* greek pi */
+    { 0x03c1, XF_GR_rho,     1, 0x70 }, /* greek rho */
+    { 0x03c2, XF_GR_FINALsigma, 1, 0x73 }, /* greek final sigma */
+    { 0x03c3, 0, 0, 0xe5 }, /* greek sigma */
+    { 0x03c4, 0, 0, 0xe7 }, /* greek tau */
+    { 0x03c5, XF_GR_upsilon, 1, 0x75 }, /* greek upsilon */
+    { 0x03c6, 0, 0, 0xed }, /* greek phi */
+    { 0x03c7, XF_GR_chi,     1, 0x78 }, /* greek chi */
+    { 0x03c8, XF_GR_psi,     2, 0xc2 }, /* greek psi */
+    { 0x03c9, XF_GR_omega,   1, 0x77 }, /* greek omega */
+    { 0x03ca, XF_GR_iotaDIA, 1, 0x69 }, /* greek iota with dialytica */
+    { 0x03cb, XF_GR_upsilon, 1, 0x75 }, /* greek upsilon with dialytica */
+    { 0x03cc, XF_GR_omicronTONOS, 1, 0x6f }, /* greek omicron with tonos */
+    { 0x03cd, XF_GR_upsilonTONOS, 1, 0x75 }, /* greek upsilon with tonos */
+    { 0x03ce, XF_GR_omegaTONOS,   1, 0x77 }, /* greek omega with tonos */
+
     /* Cyrillic */
-    { 0x0400, XF_EGRAVE,     1, 0x45 }, /* cyrillic IE grave */
-    { 0x0401, XF_EDIERESIS,  1, 0x45 }, /* cyrillic IO */
+    { 0x0400, XF_CYR_IEGRAVE,1, 0x45 }, /* cyrillic IE grave */
+    { 0x0401, XF_CYR_IO,     1, 0x45 }, /* cyrillic IO */
 
     { 0x0405, 0, 0, 0x53 }, /* cyrillic DZE */
     { 0x0406, 0, 0, 0x49 }, /* cyrillic byeloruss-ukr. I */
-    { 0x0407, XF_IDIERESIS,  1, 0x49 }, /* cyrillic YI */
+    { 0x0407, XF_CYR_YI,     1, 0x49 }, /* cyrillic YI */
     { 0x0408, 0, 0, 0x4a }, /* cyrillic JE */
-    
+
     { 0x0410, 0, 0, 0x41 }, /* cyrillic A */
     { 0x0411, XF_CYR_BE,     1, 0xeb }, /* cyrillic BE */
     { 0x0412, 0, 0, 0x42 }, /* cyrillic VE */
-    { 0x0413, XF_CYR_GHE,    2, 0xeb }, /* cyrillic GHE */
+    { 0x0413, XF_CYR_GHE,    2, 0xb2 }, /* cyrillic GHE */
     { 0x0414, XF_CYR_DE,     2, 0x44 }, /* cyrillic DE */
     { 0x0415, 0, 0, 0x45 }, /* cyrillic IE */
     { 0x0416, XF_CYR_ZHE,    2, 0x2a }, /* cyrillic ZHE */
@@ -326,7 +430,7 @@ static const struct xchar_info xchar_info_newlcd[] = {
     { 0x043f, 0, 0, 0xe3 }, /* cyrillic pe */
     { 0x0440, 0, 0, 0x70 }, /* cyrillic er */
     { 0x0441, 0, 0, 0x63 }, /* cyrillic es */
-    { 0x0442, XF_CYR_te,     1, 0x74 }, /* cyrillic te */
+    { 0x0442, 0, 0, 0xe7 }, /* cyrillic te */
     { 0x0443, 0, 0, 0x79 }, /* cyrillic u */
     { 0x0444, 0, 0, 0xed }, /* cyrillic ef */
     { 0x0445, 0, 0, 0x78 }, /* cyrillic ha */
@@ -340,12 +444,12 @@ static const struct xchar_info xchar_info_newlcd[] = {
     { 0x044d, XF_CYR_e,      2, 0xa7 }, /* cyrillic e */
     { 0x044e, XF_CYR_yu,     2, 0x1b }, /* cyrillic yu */
     { 0x044f, XF_CYR_ya,     2, 0xfb }, /* cyrillic ya */
-    { 0x0450, XF_eGRAVE,     1, 0x65 }, /* cyrillic ie grave */
-    { 0x0451, XF_eDIERESIS,  1, 0x65 }, /* cyrillic io */
-    
+    { 0x0450, XF_CYR_ieGRAVE,1, 0x65 }, /* cyrillic ie grave */
+    { 0x0451, XF_CYR_io,     1, 0x65 }, /* cyrillic io */
+
     { 0x0455, 0, 0, 0x73 }, /* cyrillic dze */
     { 0x0456, 0, 0, 0x69 }, /* cyrillic byeloruss-ukr. i */
-    { 0x0457, XF_iDIERESIS,  1, 0x69 }, /* cyrillic yi */
+    { 0x0457, XF_CYR_yi,     1, 0x69 }, /* cyrillic yi */
     { 0x0458, 0, 0, 0x6a }, /* cyrillic je */
 
     /* Runtime-definable characters */
@@ -509,7 +613,7 @@ static const struct xchar_info xchar_info_oldlcd[] = {
     {   0xa5, 0, 0, 0x07 }, /* ¥ (yen sign) */
 
     {   0xa7, 0, 0, 0x63 }, /* § (paragraph sign) */
-	
+
 	{   0xab, XF_LEFTDBLANGLEQUOT, 1, 0x40 }, /* « (left double-angle quotation mark) */
 
     {   0xad, 0, 0, 0x31 }, /* ­ (soft hyphen) */
@@ -594,15 +698,92 @@ static const struct xchar_info xchar_info_oldlcd[] = {
 
     {   0xff, XF_yDIERESIS,   1, 0x7d }, /* ÿ (y dieresis) */
 
+    /* Greek */
+    { 0x037e, 0, 0, 0x3f }, /* greek question mark */
+
+    { 0x0386, 0, 0, 0x45 }, /* greek ALPHA with tonos */
+    { 0x0387, XF_GR_ANOTELEIA,1, 0x32 }, /* greek ano teleia */
+    { 0x0388, 0, 0, 0x49 }, /* greek EPSILON with tonos */
+    { 0x0389, 0, 0, 0x4c }, /* greek ETA with tonos */
+    { 0x038a, 0, 0, 0x4d }, /* greek IOTA with tonos */
+    /* reserved */
+    { 0x038c, 0, 0, 0x53 }, /* greek OMICRON with tonos */
+    /* reserved */
+    { 0x038e, 0, 0, 0x5d }, /* greek YPSILON with tonos */
+    { 0x038f, 0, 0, 0x19 }, /* greek OMEGA with tonos */
+    { 0x0390, 0, 0, 0xa1 }, /* greek iota with dialytica + tonos */
+    { 0x0391, 0, 0, 0x45 }, /* greek ALPHA */
+    { 0x0392, 0, 0, 0x46 }, /* greek BETA */
+    { 0x0393, 0, 0, 0x17 }, /* greek GAMMA */
+    { 0x0394, 0, 0, 0x14 }, /* greek DELTA */
+    { 0x0395, 0, 0, 0x49 }, /* greek EPSILON */
+    { 0x0396, 0, 0, 0x5e }, /* greek ZETA */
+    { 0x0397, 0, 0, 0x4c }, /* greek ETA */
+    { 0x0398, 0, 0, 0x1d }, /* greek THETA */
+    { 0x0399, 0, 0, 0x4d }, /* greek IOTA */
+    { 0x039a, 0, 0, 0x4f }, /* greek KAPPA */
+    { 0x039b, 0, 0, 0x18 }, /* greek LAMBDA */
+    { 0x039c, 0, 0, 0x51 }, /* greek MU */
+    { 0x039d, 0, 0, 0x52 }, /* greek NU */
+    { 0x039e, 0, 0, 0x1e }, /* greek XI */
+    { 0x039f, 0, 0, 0x53 }, /* greek OMICRON */
+    { 0x03a0, 0, 0, 0x1a }, /* greek PI */
+    { 0x03a1, 0, 0, 0x54 }, /* greek RHO */
+    /* reserved */
+    { 0x03a3, 0, 0, 0x1c }, /* greek SIGMA */
+    { 0x03a4, 0, 0, 0x58 }, /* greek TAU */
+    { 0x03a5, 0, 0, 0x5d }, /* greek UPSILON */
+    { 0x03a6, 0, 0, 0x16 }, /* greek PHI */
+    { 0x03a7, 0, 0, 0x5c }, /* greek CHI */
+    { 0x03a8, 0, 0, 0x1b }, /* greek PSI */
+    { 0x03a9, 0, 0, 0x19 }, /* greek OMEGA */
+    { 0x03aa, 0, 0, 0x4d }, /* greek IOTA with dialytica */
+    { 0x03ab, 0, 0, 0x5d }, /* greek UPSILON with dialytica */
+    { 0x03ac, XF_GR_alphaTONOS,   1, 0x65 }, /* greek alpha with tonos */
+    { 0x03ad, XF_GR_epsilonTONOS, 1, 0x69 }, /* greek epsilon with tonos */
+    { 0x03ae, XF_GR_etaTONOS,     1, 0x72 }, /* greek eta with tonos */
+    { 0x03af, 0, 0, 0xa1 }, /* greek iota with tonos */
+    { 0x03b0, XF_GR_upsilonTONOS, 1, 0x79 }, /* greek upsilon with dialytica + tonos */
+    { 0x03b1, XF_GR_alpha,   1, 0x65 }, /* greek alpha */
+    { 0x03b2, 0, 0, 0x22 }, /* greek beta */
+    { 0x03b3, XF_GR_gamma,   1, 0x7d }, /* greek gamma */
+    { 0x03b4, XF_GR_delta,   2, 0x14 }, /* greek delta */
+    { 0x03b5, XF_GR_epsilon, 1, 0x69 }, /* greek epsilon */
+    { 0x03b6, XF_GR_zeta,    1, 0x7e }, /* greek zeta */
+    { 0x03b7, XF_GR_eta,     1, 0x72 }, /* greek eta */
+    { 0x03b8, 0, 0, 0x1d }, /* greek theta */
+    { 0x03b9, 0, 0, 0xc6 }, /* greek iota */
+    { 0x03ba, XF_GR_kappa,   1, 0x6f }, /* greek kappa */
+    { 0x03bb, XF_GR_lambda,  1, 0x18 }, /* greek lambda */
+    { 0x03bc, XF_GR_mu,      1, 0x79 }, /* greek mu */
+    { 0x03bd, 0, 0, 0x7a }, /* greek nu */
+    { 0x03be, XF_GR_xi,      2, 0x1e }, /* greek xi */
+    { 0x03bf, 0, 0, 0x73 }, /* greek omicron */
+    { 0x03c0, XF_GR_pi,      1, 0x72 }, /* greek pi */
+    { 0x03c1, XF_GR_rho,     1, 0x74 }, /* greek rho */
+    { 0x03c2, XF_GR_FINALsigma, 1, 0x77 }, /* greek final sigma */
+    { 0x03c3, XF_GR_sigma,   1, 0x73 }, /* greek sigma */
+    { 0x03c4, XF_GR_tau,     1, 0x78 }, /* greek tau */
+    { 0x03c5, XF_GR_upsilon, 1, 0x79 }, /* greel upsilon */
+    { 0x03c6, 0, 0, 0x10 }, /* greek phi */
+    { 0x03c7, XF_GR_chi,     1, 0x7c }, /* greek chi */
+    { 0x03c8, XF_GR_psi,     1, 0x1b }, /* greek psi */
+    { 0x03c9, XF_GR_omega,   1, 0x7b }, /* greek omega */
+    { 0x03ca, 0, 0, 0xa3 }, /* greek iota with dialytica */
+    { 0x03cb, XF_GR_upsilon, 1, 0x82 }, /* greek upsilon with dialytica */
+    { 0x03cc, 0, 0, 0xa4 }, /* greek omicron with tonos */
+    { 0x03cd, XF_GR_upsilonTONOS, 1, 0xa7 }, /* greek upsilon with tonos */
+    { 0x03ce, XF_GR_omegaTONOS,   1, 0x7b }, /* greek omega with tonos */
+
     /* Cyrillic */
     { 0x0400, 0, 0, 0x90 }, /* cyrillic IE grave */
     { 0x0401, 0, 0, 0x92 }, /* cyrillic IO */
 
     { 0x0405, 0, 0, 0x57 }, /* cyrillic DZE */
     { 0x0406, 0, 0, 0x4d }, /* cyrillic byeloruss-ukr. I */
-    { 0x0407, XF_IDIERESIS,  1, 0x4d }, /* cyrillic YI */
+    { 0x0407, XF_CYR_YI,     1, 0x4d }, /* cyrillic YI */
     { 0x0408, 0, 0, 0x4e }, /* cyrillic JE */
-    
+
     { 0x0410, 0, 0, 0x45 }, /* cyrillic A */
     { 0x0411, XF_CYR_BE,     1, 0x3a }, /* cyrillic BE */
     { 0x0412, 0, 0, 0x46 }, /* cyrillic VE */
@@ -823,6 +1004,32 @@ const unsigned char xfont_fixed[][8] = {
     [XF_uDIERESIS] =     { 0x00, 0x0a, 0x00, 0x11, 0x11, 0x13, 0x0d, 0x00}, /* ü */
     [XF_yACUTE] =        { 0x02, 0x04, 0x11, 0x11, 0x0f, 0x01, 0x0e, 0x00}, /* ý */
     [XF_yDIERESIS] =     { 0x0a, 0x00, 0x11, 0x11, 0x0f, 0x01, 0x0e, 0x00}, /* ÿ */
+    /* Greek */
+    [XF_GR_DELTA] =        { 0x04, 0x04, 0x0a, 0x0a, 0x11, 0x11, 0x1f, 0x00},
+    [XF_GR_THETA] =        { 0x0e, 0x11, 0x11, 0x1f, 0x11, 0x11, 0x0e, 0x00},
+    [XF_GR_LAMBDA] =       { 0x04, 0x04, 0x0a, 0x0a, 0x11, 0x11, 0x11, 0x00},
+    [XF_GR_XI] =           { 0x1f, 0x11, 0x00, 0x0e, 0x00, 0x11, 0x1f, 0x00},
+    [XF_GR_PSI] =          { 0x15, 0x15, 0x15, 0x15, 0x0e, 0x04, 0x04, 0x00},
+    [XF_GR_alpha] =        { 0x00, 0x00, 0x09, 0x15, 0x12, 0x12, 0x0d, 0x00},
+    [XF_GR_alphaTONOS] =   { 0x02, 0x04, 0x09, 0x15, 0x12, 0x12, 0x0d, 0x00},
+    [XF_GR_gamma] =        { 0x00, 0x11, 0x0a, 0x0a, 0x04, 0x04, 0x08, 0x00},
+    [XF_GR_epsilon] =      { 0x00, 0x00, 0x0f, 0x10, 0x0e, 0x10, 0x0f, 0x00},
+    [XF_GR_epsilonTONOS] = { 0x02, 0x04, 0x0f, 0x10, 0x0e, 0x10, 0x0f, 0x00},
+    [XF_GR_zeta] =         { 0x1e, 0x08, 0x10, 0x10, 0x0e, 0x01, 0x06, 0x00},
+    [XF_GR_eta] =          { 0x00, 0x16, 0x19, 0x11, 0x11, 0x11, 0x01, 0x00},
+    [XF_GR_etaTONOS] =     { 0x02, 0x04, 0x16, 0x19, 0x11, 0x11, 0x01, 0x00},
+    [XF_GR_iota] =         { 0x00, 0x00, 0x04, 0x04, 0x04, 0x04, 0x02, 0x00},
+    [XF_GR_lambda] =       { 0x88, 0x04, 0x04, 0x0a, 0x0a, 0x11, 0x11, 0x00},
+    [XF_GR_xi] =           { 0x0c, 0x10, 0x0c, 0x10, 0x0e, 0x01, 0x06, 0x00},
+    [XF_GR_rho] =          { 0x00, 0x0e, 0x11, 0x11, 0x19, 0x16, 0x10, 0x00},
+    [XF_GR_FINALsigma] =   { 0x00, 0x0e, 0x10, 0x10, 0x0e, 0x01, 0x06, 0x00},
+    [XF_GR_sigma] =        { 0x00, 0x00, 0x0f, 0x14, 0x12, 0x11, 0x0e, 0x00},
+    [XF_GR_upsilon] =      { 0x00, 0x00, 0x11, 0x09, 0x09, 0x09, 0x06, 0x00},
+    [XF_GR_upsilonTONOS] = { 0x02, 0x04, 0x11, 0x09, 0x09, 0x09, 0x06, 0x00},
+    [XF_GR_chi] =          { 0x00, 0x12, 0x0a, 0x04, 0x04, 0x0a, 0x09, 0x00},
+    [XF_GR_psi] =          { 0x00, 0x15, 0x15, 0x15, 0x0e, 0x04, 0x04, 0x00},
+    [XF_GR_omega] =        { 0x00, 0x00, 0x0a, 0x11, 0x15, 0x15, 0x0a, 0x00},
+    [XF_GR_omegaTONOS] =   { 0x02, 0x04, 0x0a, 0x11, 0x15, 0x15, 0x0a, 0x00},
     /* Cyrillic */
     [XF_CYR_BE] =        { 0x1f, 0x10, 0x10, 0x1e, 0x11, 0x11, 0x1e, 0x00},
     [XF_CYR_GHE] =       { 0x1f, 0x11, 0x10, 0x10, 0x10, 0x10, 0x10, 0x00},
