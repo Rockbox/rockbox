@@ -157,10 +157,8 @@ bool parse_cuesheet(char *file, struct cuesheet *cue)
                  || !strncmp(s, "PERFORMER", 9)
                  || !strncmp(s, "SONGWRITER", 10))
         {
-            char *dest;
-            char *string;
-
-            string = get_string(s);
+            char *dest = NULL;
+            char *string = get_string(s);
             if (!string)
                 break;
 
@@ -179,6 +177,7 @@ bool parse_cuesheet(char *file, struct cuesheet *cue)
                 case 'S': /* SONGWRITER */
                     dest = (cue->track_count <= 0) ? NULL :
                             cue->tracks[cue->track_count-1].songwriter;
+                    break;
             }
 
             if (dest)
