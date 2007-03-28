@@ -498,6 +498,71 @@ static const struct xchar_info xchar_info_newlcd[] = {
     { 0xe118, 0, 0, 0x84 }, /* level 5/7 */
     { 0xe119, 0, 0, 0x85 }, /* level 6/7 */
     { 0xe11a, 0, 0, 0x86 }, /* level 7/7 */
+    
+    /* Halfwidth CJK punctuation and katakana - new LCD only */
+    { 0xff61, 0, 0, 0xa1 }, /* hw ideographic full stop */
+    { 0xff62, 0, 0, 0xa2 }, /* hw left corner bracket */
+    { 0xff63, 0, 0, 0xa3 }, /* hw right corner bracket */
+    { 0xff64, 0, 0, 0xa4 }, /* hw ideographic comma */
+    { 0xff65, 0, 0, 0xa5 }, /* hw katakana middle dot */
+    { 0xff66, 0, 0, 0xa6 }, /* hw katakana WO */
+    { 0xff67, 0, 0, 0xa7 }, /* hw katakana a */
+    { 0xff68, 0, 0, 0xa8 }, /* hw katakana i */
+    { 0xff69, 0, 0, 0xa9 }, /* hw katakana u */
+    { 0xff6a, 0, 0, 0xaa }, /* hw katakana e */
+    { 0xff6b, 0, 0, 0xab }, /* hw katakana o */
+    { 0xff6c, 0, 0, 0xac }, /* hw katakana ya */
+    { 0xff6d, 0, 0, 0xad }, /* hw katakana yu */
+    { 0xff6e, 0, 0, 0xae }, /* hw katakana yo */
+    { 0xff6f, 0, 0, 0xaf }, /* hw katakana tu */
+    { 0xff70, 0, 0, 0xb0 }, /* hw katakana-hiragana prolonged soundmark */
+    { 0xff71, 0, 0, 0xb1 }, /* hw katakana A */
+    { 0xff72, 0, 0, 0xb2 }, /* hw katakana I */
+    { 0xff73, 0, 0, 0xb3 }, /* hw katakana U */
+    { 0xff74, 0, 0, 0xb4 }, /* hw katakana E */
+    { 0xff75, 0, 0, 0xb5 }, /* hw katakana O */
+    { 0xff76, 0, 0, 0xb6 }, /* hw katakana KA */
+    { 0xff77, 0, 0, 0xb7 }, /* hw katakana KI */
+    { 0xff78, 0, 0, 0xb8 }, /* hw katakana KU */
+    { 0xff79, 0, 0, 0xb9 }, /* hw katakana KE */
+    { 0xff7a, 0, 0, 0xba }, /* hw katakana KO */
+    { 0xff7b, 0, 0, 0xbb }, /* hw katakana SA */
+    { 0xff7c, 0, 0, 0xbc }, /* hw katakana SI */
+    { 0xff7d, 0, 0, 0xbd }, /* hw katakana SU */
+    { 0xff7e, 0, 0, 0xbe }, /* hw katakana SE */
+    { 0xff7f, 0, 0, 0xbf }, /* hw katakana SO */
+    { 0xff80, 0, 0, 0xc0 }, /* hw katakana TA */
+    { 0xff81, 0, 0, 0xc1 }, /* hw katakana TI */
+    { 0xff82, 0, 0, 0xc2 }, /* hw katakana TU */
+    { 0xff83, 0, 0, 0xc3 }, /* hw katakana TE */
+    { 0xff84, 0, 0, 0xc4 }, /* hw katakana TO */
+    { 0xff85, 0, 0, 0xc5 }, /* hw katakana NA */
+    { 0xff86, 0, 0, 0xc6 }, /* hw katakana NI */
+    { 0xff87, 0, 0, 0xc7 }, /* hw katakana NU */
+    { 0xff88, 0, 0, 0xc8 }, /* hw katakana NE */
+    { 0xff89, 0, 0, 0xc9 }, /* hw katakana NO */
+    { 0xff8a, 0, 0, 0xca }, /* hw katakana HA */
+    { 0xff8b, 0, 0, 0xcb }, /* hw katakana HI */
+    { 0xff8c, 0, 0, 0xcc }, /* hw katakana HU */
+    { 0xff8d, 0, 0, 0xcd }, /* hw katakana HE */
+    { 0xff8e, 0, 0, 0xce }, /* hw katakana HO */
+    { 0xff8f, 0, 0, 0xcf }, /* hw katakana MA */
+    { 0xff90, 0, 0, 0xd0 }, /* hw katakana MI */
+    { 0xff91, 0, 0, 0xd1 }, /* hw katakana MU */
+    { 0xff92, 0, 0, 0xd2 }, /* hw katakana ME */
+    { 0xff93, 0, 0, 0xd3 }, /* hw katakana MO */
+    { 0xff94, 0, 0, 0xd4 }, /* hw katakana YA */
+    { 0xff95, 0, 0, 0xd5 }, /* hw katakana YU */
+    { 0xff96, 0, 0, 0xd6 }, /* hw katakana YO */
+    { 0xff97, 0, 0, 0xd7 }, /* hw katakana RA */
+    { 0xff98, 0, 0, 0xd8 }, /* hw katakana RI */
+    { 0xff99, 0, 0, 0xd9 }, /* hw katakana RU */
+    { 0xff9a, 0, 0, 0xda }, /* hw katakana RE */
+    { 0xff9b, 0, 0, 0xdb }, /* hw katakana RO */
+    { 0xff9c, 0, 0, 0xdc }, /* hw katakana WA */
+    { 0xff9d, 0, 0, 0xdd }, /* hw katakana N */
+    { 0xff9e, 0, 0, 0xde }, /* hw katakana voiced sound mark */
+    { 0xff9f, 0, 0, 0xdf }, /* hw katakana semi-voiced sound mark */
 #endif /* !BOOTLOADER */
 
     /* no-char symbol */
