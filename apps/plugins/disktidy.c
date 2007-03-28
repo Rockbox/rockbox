@@ -340,15 +340,11 @@ enum plugin_status tidy_do(enum tidy_system system)
 
 int tidy_lcd_menu(void)
 {
-    int loc, ret = 2;
+    int selection, ret = 2;
     bool menu_quit = false;
     
-    static const struct menu_item items[] = 
-    {
-        { "Start Cleaning", NULL },
-        { "Files to Clean", NULL },
-        { "Quit", NULL }
-    };
+    MENUITEM_STRINGLIST(menu,"Disktidy Menu",NULL,"Start Cleaning",
+                        "Files to Clean","Quit");
     
     static const struct opt_items system_option[3] = 
     {
@@ -356,13 +352,11 @@ int tidy_lcd_menu(void)
         { "Windows", -1 },
         { "Both", -1 }
     };
-
-    loc = rb->menu_init(items, sizeof(items) / sizeof(*items),
-                      NULL, NULL, NULL, NULL);
                       
     while (!menu_quit)
     {    
-        switch(rb->menu_show(loc))
+        selection = rb->do_menu(&menu,&selection);
+        switch(selection)
         {
          
             case 0:
@@ -373,13 +367,12 @@ int tidy_lcd_menu(void)
                 rb->set_option("Files to Clean", &ret, INT, system_option, 3, NULL);
                 break;
         
-            case 2:
+            default:
                 ret = 99;    /* exit plugin */
                 menu_quit = true;
                 break;
         }
     }
-    rb->menu_exit(loc);
     return ret;
 }
 

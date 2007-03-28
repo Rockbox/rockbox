@@ -415,99 +415,50 @@ int count_tiles_left( void )
 /* welcome screen where player can chose mine percentage */
 enum minesweeper_status menu( void )
 {
-    int button;
-
-    while( true )
-    {
+    int selection, result = MINESWEEPER_QUIT;
+    bool menu_quit = false;
+     
+    MENUITEM_STRINGLIST(menu, "Minesweeper Menu",NULL,"Play Minesweeper",
+                        "Mine Percentage", "Number of Rows", "Number of Columns",
+                        "Quit");
+                      
 #ifdef HAVE_LCD_COLOR
-        rb->lcd_set_background( LCD_WHITE );
-        rb->lcd_set_foreground( LCD_BLACK );
+    rb->lcd_set_foreground(rb->global_settings->fg_color);
+    rb->lcd_set_background(rb->global_settings->bg_color);
 #endif
-        rb->lcd_clear_display();
 
-        rb->lcd_puts( 0, 0, "Mine Sweeper" );
-
-        rb->snprintf( str, 20, "%d%% mines", p );
-        rb->lcd_puts( 0, 2, str );
-        rb->lcd_puts( 0, 3, "down / up" );
-        rb->snprintf( str, 20, "%d cols x %d rows", width, height );
-        rb->lcd_puts( 0, 4, str );
-        rb->lcd_puts( 0, 5, "left x right" );
-        rb->lcd_puts( 0, 6,
-#if CONFIG_KEYPAD == RECORDER_PAD
-            "ON to start"
-#elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
-            "ON to start"
-#elif CONFIG_KEYPAD == ONDIO_PAD
-            "MODE to start"
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) \
-      || (CONFIG_KEYPAD == IRIVER_H300_PAD ) \
-      || (CONFIG_KEYPAD == IPOD_4G_PAD) \
-      || (CONFIG_KEYPAD == IPOD_3G_PAD) \
-      || (CONFIG_KEYPAD == GIGABEAT_PAD)
-            "SELECT to start"
-#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
-            "REC to start"
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD
-            "FF to start"
-#elif CONFIG_KEYPAD == SANSA_E200_PAD
-            "SELECT to start"
-#else
-            ""
-#       warning Please define help string for this keypad.
-#endif
-        );
-        rb->lcd_update();
-
-        switch( button = rb->button_get( true ) )
+    while (!menu_quit) {
+        selection=rb->do_menu(&menu,&selection);
+        switch(selection)
         {
-            case MINESWP_DOWN:
-            case MINESWP_DOWN|BUTTON_REPEAT:
-                p = (p + 94)%98 + 2;
+            case 0:
+                result = MINESWEEPER_WIN; /* start playing */
+                menu_quit = true;
                 break;
 
-            case MINESWP_UP:
-            case MINESWP_UP|BUTTON_REPEAT:
-                p = p%98 + 2;
+            case 1:
+                rb->set_int("Mine Percentage", "%", UNIT_INT, &p, NULL, 1, 2, 
+                        98, NULL );
                 break;
 
-            case BUTTON_RIGHT:
-            case BUTTON_RIGHT|BUTTON_REPEAT:
-                height = height%MAX_HEIGHT + 1;
+            case 2:
+                rb->set_int("Number of Rows", "", UNIT_INT, &height, NULL, 1, 1, 
+                        MAX_HEIGHT, NULL );
                 break;
-
-            case BUTTON_LEFT:
-            case BUTTON_LEFT|BUTTON_REPEAT:
-                width = width%MAX_WIDTH + 1;
+                
+            case 3:
+                rb->set_int("Number of Columns", "", UNIT_INT, &width, NULL, 1, 1, 
+                        MAX_WIDTH, NULL );
                 break;
-
-            case MINESWP_RIGHT:
-            case MINESWP_RIGHT|BUTTON_REPEAT:
-                height--;
-                if( height < 1 ) height = MAX_HEIGHT;
-                break;
-
-            case MINESWP_LEFT:
-            case MINESWP_LEFT|BUTTON_REPEAT:
-                width--;
-                if( width < 1 ) width = MAX_WIDTH;
-                break;
-
-            case MINESWP_START:/* start playing */
-                return MINESWEEPER_WIN;
-
-#ifdef MINESWP_RC_QUIT
-            case MINESWP_RC_QUIT:
-#endif
-            case MINESWP_QUIT:/* quit program */
-                return MINESWEEPER_QUIT;
-
+                
             default:
-                if( rb->default_event_handler(button) == SYS_USB_CONNECTED )
-                    return MINESWEEPER_USB;
+                result = MINESWEEPER_QUIT; /* quit program */
+                menu_quit = true;
                 break;
         }
     }
+
+    return result;
 }
 
 /* the big and ugly game function */

@@ -21,12 +21,6 @@
 
 PLUGIN_HEADER
 
-/* title of the game */
-#define STAR_TITLE      "Star"
-
-/* font used to display title */
-#define STAR_TITLE_FONT  2
-
 /* size of a level in file */
 #define STAR_LEVEL_SIZE    ((STAR_WIDTH + 1) * STAR_HEIGHT + 1)
 
@@ -45,7 +39,8 @@ PLUGIN_HEADER
 #define STAR_BLOCK      'x'
 
 /* sleep time between two frames */
-#if (LCD_HEIGHT * LCD_WIDTH >= 70000) /* iPod 5G LCD is *slow* */
+#if (LCD_HEIGHT * LCD_WIDTH >= 70000) && defined(IPOD_ARCH)
+/* iPod 5G LCD is *slow* */
 #define STAR_SLEEP rb->yield();
 #elif (LCD_HEIGHT * LCD_WIDTH >= 30000)
 #define STAR_SLEEP rb->sleep(0);
@@ -204,20 +199,7 @@ static char board[STAR_HEIGHT][STAR_WIDTH];
 #define STAR  3
 #define BALL  4
 
-/* bitmap of the arrow animation */
-static unsigned char arrow_bmp[4][7] =
-    {
-        {0x7f, 0x7f, 0x3e, 0x3e, 0x1c, 0x1c, 0x08},
-        {0x3e, 0x3e, 0x1c, 0x1c, 0x08, 0x08, 0x08},
-        {0x1c, 0x1c, 0x1c, 0x1c, 0x08, 0x08, 0x08},
-        {0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08}
-    };
-
-/* sequence of the bitmap arrow to follow to do one turn */
-static unsigned char anim_arrow[8] = {0, 1, 2, 3, 2, 1, 0};
-
-/* current_level */
-static int current_level = 0;
+#define MENU_START 0
 
 /* char font size */
 static int char_width = -1;
@@ -528,6 +510,8 @@ void star_display_text(char *str, bool waitkey)
 /**
  * Do a pretty transition from one level to another.
  */
+#if !defined(GIGABEAT_F) || defined(SIMULATOR)
+/* FIXME: this crashes on the Gigabeat but not in the sim */
 static void star_transition_update(void)
 {
     int center_x = LCD_WIDTH / 2;
@@ -573,11 +557,12 @@ static void star_transition_update(void)
 #endif
     rb->lcd_update();
 }
+#endif
 
 /**
  * Display information board of the current level.
  */
-static void star_display_board_info(void)
+static void star_display_board_info(int current_level)
 {
     int label_pos_y, tile_pos_y;
     char str_info[32];
@@ -617,6 +602,12 @@ static int star_load_level(int current_level)
 {
     int x, y;
     char *ptr_tab;
+    
+    if (current_level < 0)
+        current_level = 0;
+    else if (current_level > STAR_LEVEL_COUNT-1)
+        current_level = STAR_LEVEL_COUNT-1;
+        
 
     ptr_tab = levels + current_level * STAR_LEVEL_SIZE;
     control = STAR_CONTROL_BALL;
@@ -667,8 +658,12 @@ static int star_load_level(int current_level)
         }
         ptr_tab++;
     }
-    star_display_board_info();
+    star_display_board_info(current_level);
+#if !defined(GIGABEAT_F) || defined(SIMULATOR)
     star_transition_update();
+#else
+    rb->lcd_update();
+#endif
     return 1;
 }
 
@@ -708,7 +703,7 @@ static void star_animate_tile(int tile_no, int start_x, int start_y,
 /**
  * Run the game.
  */
-static int star_run_game(void)
+static int star_run_game(int current_level)
 {
     int move_x = 0;
     int move_y = 0;
@@ -794,7 +789,7 @@ static int star_run_game(void)
                         control = STAR_CONTROL_BLOCK;
                     else
                         control = STAR_CONTROL_BALL;
-                    star_display_board_info();
+                    star_display_board_info(current_level);
                     break;
 
                 default:
@@ -827,7 +822,7 @@ static int star_run_game(void)
                     board[ball_y][ball_x] = STAR_VOID;
                     star_count--;
 
-                    star_display_board_info();
+                    star_display_board_info(current_level);
                 }
             }
             board[ball_y][ball_x] = STAR_BALL;
@@ -866,251 +861,106 @@ static int star_run_game(void)
 }
 
 /**
- * Display the choose level screen.
- */
-static int star_choose_level(void)
-{
-    int level = current_level;
-    int key = BUTTON_NONE;
-    char str_info[32];
-    int lastkey = BUTTON_NONE;
-
-    while (true)
-    {
-       rb->lcd_clear_display();
-       /* levels are numbered 0 to (STAR_LEVEL_COUNT-1) internally, but 
-        * displayed as 1 to STAR_LEVEL_COUNT because it looks nicer */
-       rb->snprintf(str_info, sizeof(str_info), "Level:%02d / %02d",
-                 level+1, STAR_LEVEL_COUNT );
-       rb->lcd_putsxy(0, 0, str_info);
-       rb->lcd_update();
-         key = rb->button_get(true);
-         switch (key)
-         {
-             case STAR_QUIT:
-             case BUTTON_LEFT:
-                 return -1;
-                 break;
-
-            case STAR_MENU_RUN:
-#ifdef STAR_MENU_RUN2
-            case STAR_MENU_RUN2:
-#endif
-#ifdef STAR_MENU_RUN3
-            case STAR_MENU_RUN3:
-#endif
-                 current_level=level;
-                 return star_run_game();
-                 break;
-
-             case STAR_UP:
-             case BUTTON_REPEAT | STAR_UP:
-                 if(level< STAR_LEVEL_COUNT - 1)
-                    level++;
-                 break;
-
-             case STAR_DOWN:
-             case BUTTON_REPEAT | STAR_DOWN:
-                 if(level> 0)
-                    level--;
-                 break;
-
-             default:
-                 if (rb->default_event_handler(key) == SYS_USB_CONNECTED)
-                 {
-                     usb_detected = true;
-                     return 0;
-                 }
-                 break;
-         }
-         
-         if (key != BUTTON_NONE)
-             lastkey = key;
-     }
-}
-
-/**
  * Display the choice menu.
  */
 static int star_menu(void)
 {
-    int move_y;
-    int menu_y = 0;
-    int i = 0;
-    bool refresh = true;
-    char anim_state = 0;
-    unsigned char *menu[5] = {"Play", "Choose Level", "Information",
-                                                      "Keys", "Exit"};
-    int menu_count = sizeof(menu) / sizeof(unsigned char *);
-    int menu_offset_y;
-    int key;
-
-    menu_offset_y = LCD_HEIGHT - char_height * menu_count;
-
-    while (true)
+    int selection, level=1;
+    bool menu_quit = false;
+    
+    /* get the size of char */
+    rb->lcd_getstringsize("a", &char_width, &char_height);
+                      
+    MENUITEM_STRINGLIST(menu,"Star Menu",NULL,"Play","Choose Level",
+                        "Information","Keys","Quit");                  
+    
+    while(!menu_quit)
     {
-        if (refresh)
+        selection = rb->do_menu(&menu, &selection);
+        switch(selection)
         {
-            rb->lcd_clear_display();
-            rb->lcd_putsxy((LCD_WIDTH - char_width *
-                            rb->strlen(STAR_TITLE)) / 2,
-                           0, STAR_TITLE);
-            for (i = 0 ; i < menu_count ; i++)
-            {
-                rb->lcd_putsxy(15, menu_offset_y + char_height * i, menu[i]);
-            }
-
-            rb->lcd_update();
-            refresh = false;
-        }
-
-        move_y = 0;
-        rb->lcd_mono_bitmap(arrow_bmp[anim_arrow[(anim_state & 0x38) >> 3]],
-                            2, menu_offset_y + menu_y * char_height, 7, 8);
-        rb->lcd_update_rect (2, menu_offset_y + menu_y * 8, 8, 8);
-        STAR_SLEEP
-        anim_state++;
-
-        key = rb->button_get(false);
-        switch (key)
-        {
-#ifdef STAR_RC_QUIT
-            case STAR_RC_QUIT:
-#endif
-            case STAR_QUIT:
-                return PLUGIN_OK;
-            case STAR_UP:
-                if (menu_y > 0) {
-                    move_y = -1;
-#if LCD_DEPTH > 1
-                    int oldforeground = rb->lcd_get_foreground();
-                    rb->lcd_set_foreground(LCD_BLACK);
-#endif
-                    rb->lcd_fillrect(0,menu_offset_y + char_height * menu_y - 2,
-                                                      15, char_height + 3);
-#if LCD_DEPTH > 1
-                    rb->lcd_set_foreground(oldforeground);
-#endif
-                }
+            case 0:
+                menu_quit = true;
                 break;
-            case STAR_DOWN:
-                if (menu_y < menu_count-1) {
-                    move_y = 1;
-#if LCD_DEPTH > 1
-                    int oldforeground = rb->lcd_get_foreground();
-                    rb->lcd_set_foreground(LCD_BLACK);
-#endif
-                    rb->lcd_fillrect(0,menu_offset_y + char_height * menu_y - 1,
-                                                       15, char_height + 2);
-#if LCD_DEPTH > 1
-                    rb->lcd_set_foreground(oldforeground);
-#endif
-                }
+            case 1:
+                rb->set_int("Level", "", UNIT_INT, &level, 
+                            NULL, 1, 1, STAR_LEVEL_COUNT, NULL );
                 break;
-
-            case STAR_MENU_RUN:
-#ifdef STAR_MENU_RUN2
-            case STAR_MENU_RUN2:
-#endif
-#ifdef STAR_MENU_RUN3
-            case STAR_MENU_RUN3:
-#endif
-                refresh = true;
-                switch (menu_y)
-                {
-                    case 0:
-                        star_run_game();
-                        break;
-                    case 1:
-                        star_choose_level();
-                        break;
-                    case 2:
-                        star_display_text(
-                            "INFO\n\n"
-                            "Take all the stars to go to the next level. "
-                            "You can toggle control with the block to "
-                            "use it as a mobile wall. The block cannot "
-                            "take stars.", true);
-                        break;
-                    case 3:
+            case 2:
+                star_display_text(
+                    "INFO\n\n"
+                    "Take all the stars to go to the next level. "
+                    "You can toggle control with the block to "
+                    "use it as a mobile wall. The block cannot "
+                    "take stars.", true);
+                    break;
+            case 3:
 #if CONFIG_KEYPAD == RECORDER_PAD
-                        star_display_text("KEYS\n\n"
-                                          "[ON] Toggle Ctl.\n"
-                                          "[OFF] Exit\n"
-                                          "[F1] Prev. level\n"
-                                          "[F2] Reset level\n"
-                                          "[F3] Next level", true);
+                star_display_text("KEYS\n\n"
+                                  "[ON] Toggle Ctl.\n"
+                                  "[OFF] Exit\n"
+                                  "[F1] Prev. level\n"
+                                  "[F2] Reset level\n"
+                                  "[F3] Next level", true);
 #elif CONFIG_KEYPAD == ONDIO_PAD
-                        star_display_text("KEYS\n\n"
-                                          "[MODE] Toggle Ctl\n"
-                                          "[OFF] Exit\n"
-                                          "[M <] Prev. level\n"
-                                          "[M ^] Reset level\n"
-                                          "[M >] Next level", true);
+                star_display_text("KEYS\n\n"
+                                  "[MODE] Toggle Ctl\n"
+                                  "[OFF] Exit\n"
+                                  "[M <] Prev. level\n"
+                                  "[M ^] Reset level\n"
+                                  "[M >] Next level", true);
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-                        star_display_text("KEYS\n\n"
-                                          "[MODE/NAVI] Toggle Ctrl\n"
-                                          "[OFF] Exit\n"
-                                          "[ON + LEFT] Prev. level\n"
-                                          "[ON + NAVI] Reset level\n"
-                                          "[ON + RIGHT] Next level", true);
+                star_display_text("KEYS\n\n"
+                                  "[MODE/NAVI] Toggle Ctrl\n"
+                                  "[OFF] Exit\n"
+                                  "[ON + LEFT] Prev. level\n"
+                                  "[ON + NAVI] Reset level\n"
+                                  "[ON + RIGHT] Next level", true);
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
-                        star_display_text("KEYS\n\n"
-                                          "[SELECT] Toggle Ctl\n"
-                                          "[S + MENU] Exit\n"
-                                          "[S <] Prev. level\n"
-                                          "[S + PLAY] Reset level\n"
-                                          "[S >] Next level", true);
+                star_display_text("KEYS\n\n"
+                                  "[SELECT] Toggle Ctl\n"
+                                  "[S + MENU] Exit\n"
+                                  "[S <] Prev. level\n"
+                                  "[S + PLAY] Reset level\n"
+                                  "[S >] Next level", true);
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
-                        star_display_text("KEYS\n\n"
-                                          "[SELECT] Toggle Ctl\n"
-                                          "[POWER] Exit\n"
-                                          "[REC..] Prev. level\n"
-                                          "[PLAY] Reset level\n"
-                                          "[REC] Next level", true);
+                star_display_text("KEYS\n\n"
+                                  "[SELECT] Toggle Ctl\n"
+                                  "[POWER] Exit\n"
+                                  "[REC..] Prev. level\n"
+                                  "[PLAY] Reset level\n"
+                                  "[REC] Next level", true);
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
-                        star_display_text("KEYS\n\n"
-                                          "[MENU] Toggle Ctl\n"
-                                          "[A] Exit\n"
-                                          "[PWR+DOWN] Prev. level\n"
-                                          "[PWR+RIGHT] Reset level\n"
-                                          "[PWR+UP] Next level", true);
+                star_display_text("KEYS\n\n"
+                                  "[MENU] Toggle Control\n"
+                                  "[A] Exit\n"
+                                  "[PWR+DOWN] Prev. level\n"
+                                  "[PWR+RIGHT] Reset level\n"
+                                  "[PWR+UP] Next level", true);
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
-                        star_display_text("KEYS\n\n"
-                                          "[REW] Toggle Ctl\n"
-                                          "[POWER] Exit\n"
-                                          "[PLAY+DOWN] Prev. level\n"
-                                          "[PLAY+RIGHT] Reset level\n"
-                                          "[PLAY+UP] Next level", true);
+                star_display_text("KEYS\n\n"
+                                  "[REW] Toggle Ctl\n"
+                                  "[POWER] Exit\n"
+                                  "[PLAY+DOWN] Prev. level\n"
+                                  "[PLAY+RIGHT] Reset level\n"
+                                  "[PLAY+UP] Next level", true);
 #endif
-                        break;
-                    case 4:
-                        return PLUGIN_OK;
-                }
-                if (usb_detected)
-                    return PLUGIN_USB_CONNECTED;
                 break;
-
             default:
-                if (rb->default_event_handler(key) == SYS_USB_CONNECTED)
-                    return PLUGIN_USB_CONNECTED;
+                menu_quit = true;
                 break;
         }
-
-        for (i = 0 ; i < char_height ; i++)
-        {
-            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-            rb->lcd_fillrect (2, menu_offset_y, 8, menu_count * 8);
-            rb->lcd_set_drawmode(DRMODE_FG);
-            rb->lcd_mono_bitmap(arrow_bmp[anim_arrow[(anim_state & 0x38) >> 3]],
-                                2, menu_offset_y + menu_y * 8 + move_y * i, 7, 8);
-            rb->lcd_update_rect(2, menu_offset_y, 8, menu_count * 8);
-            anim_state++;
-            STAR_SLEEP
-        }
-            rb->lcd_set_drawmode(DRMODE_SOLID);
-        menu_y += move_y;
     }
+        
+    if (selection == MENU_START)
+    {
+        rb->lcd_setfont(FONT_SYSFIXED);
+        rb->lcd_getstringsize("a", &char_width, &char_height);
+        level--;
+        star_run_game(level);
+    }
+        
+    return PLUGIN_OK;
 }
 
 /**
@@ -1120,11 +970,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     (void)parameter;
     rb = api;
-
-    /* get the size of char */
-    rb->lcd_setfont(FONT_SYSFIXED);
-    if (char_width == -1)
-        rb->lcd_getstringsize("a", &char_width, &char_height);
 
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);

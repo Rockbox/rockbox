@@ -102,25 +102,24 @@ PLUGIN_HEADER
 #define BOARD_HEIGHT (LCD_HEIGHT/4)
 
 static int board[BOARD_WIDTH][BOARD_HEIGHT],snakelength;
-static unsigned int score,hiscore=0;
-static short dir,frames,apple,level=1,dead=0;
+static unsigned int score,hiscore=0,level=1;
+static short dir,frames,apple,dead=0;
 static struct plugin_api* rb;
 
 void die (void)
 {
-    char pscore[5],hscore[17];
+    char pscore[17];
     rb->lcd_clear_display();
-    rb->snprintf(pscore,sizeof(pscore),"%d",score);
-    rb->lcd_putsxy(3,12,"oops...");
-    rb->lcd_putsxy(3,22,"Your score :");
-    rb->lcd_putsxy(3,32, pscore);
+    rb->snprintf(pscore,sizeof(pscore),"Your score: %d",score);
+    rb->lcd_puts(0,0,"Oops...");
+    rb->lcd_puts(0,1, pscore);
     if (score>hiscore) {
         hiscore=score;
-        rb->lcd_putsxy(3,42,"New High Score!");
+        rb->lcd_puts(0,2,"New High Score!");
     }
     else {
-        rb->snprintf(hscore,sizeof(hscore),"High Score: %d",hiscore);
-        rb->lcd_putsxy(3,42,hscore);
+        rb->snprintf(pscore,sizeof(pscore),"High Score: %d",hiscore);
+        rb->lcd_puts(0,2,pscore);
     }
     rb->lcd_update();
     rb->sleep(3*HZ);
@@ -324,9 +323,9 @@ void game (void) {
 }
 
 void game_init(void) {
-    int button;
+    int selection=0;
     short x,y;
-    char plevel[10],phscore[20];
+    bool menu_quit = false;
 
     for (x=0; x<BOARD_WIDTH; x++) {
         for (y=0; y<BOARD_HEIGHT; y++) {
@@ -338,58 +337,30 @@ void game_init(void) {
     snakelength=4;
     score=0;
     board[11][7]=1;   
-
-
-    rb->lcd_clear_display();
-    rb->lcd_setfont(FONT_SYSFIXED);
-    rb->snprintf(plevel,sizeof(plevel),"Level - %d",level);
-    rb->snprintf(phscore,sizeof(phscore),"High Score: %d",hiscore);
-    rb->lcd_puts(0,0, plevel);
-    rb->lcd_puts(0,1, "(1-slow, 9-fast)");
-    rb->lcd_puts(0,2, "OFF - quit");
-#if CONFIG_KEYPAD == RECORDER_PAD
-    rb->lcd_puts(0,3, "PLAY - start/pause");
-#elif CONFIG_KEYPAD == ONDIO_PAD
-    rb->lcd_puts(0,3, "MODE - start/pause");
-#endif
-    rb->lcd_puts(0,4, phscore);
-    rb->lcd_update();
-
-    while (1) {  
-        button=rb->button_get(true);
-        switch (button) {
-            case BUTTON_RIGHT:
-            case SNAKE_UP:
-                if (level<9) 
-                    level++;
+    
+    MENUITEM_STRINGLIST(menu,"Snake Menu",NULL,"Start New Game","Starting Level",
+                        "Quit");
+                                           
+    while (!menu_quit) {
+        selection = rb->do_menu(&menu, &selection);
+        switch(selection)
+        {
+            case 0:
+                menu_quit = true; /* start playing */
                 break;
-            case BUTTON_LEFT:
-            case SNAKE_DOWN:
-                if (level>1)
-                    level--;
+                
+            case 1:
+                rb->set_int("Starting Level", "", UNIT_INT, &level, NULL,
+                            1, 1, 9, NULL );
                 break;
-#ifdef SNAKE_RC_QUIT
-            case SNAKE_RC_QUIT:
-#endif
-            case SNAKE_QUIT:
-                dead=1;
-                return;
-                break;
-            case SNAKE_PLAYPAUSE:
-                return;
-                break;
+                
             default:
-                if (rb->default_event_handler(button)==SYS_USB_CONNECTED) {
-                    dead=2;
-                    return;
-                }
+                dead=1; /* quit program */
+                menu_quit = true;
                 break;
+
         }
-        rb->snprintf(plevel,sizeof(plevel),"Level - %d",level);
-        rb->lcd_puts(0,0, plevel);
-        rb->lcd_update();
     }
-     
 }
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
