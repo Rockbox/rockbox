@@ -94,11 +94,33 @@ static char *skip_whitespace(char* buf)
     return r;
 }
 
+
+static char *get_string(const char *line)
+{
+    char *start, *end;
+
+    start = strchr(line, '"');
+    if (!start)
+    {
+        start = strchr(line, ' ');
+
+        if (!start)
+            return NULL;
+    }
+
+    end = strchr(++start, '"');
+    if (end)
+        *end = '\0';
+
+    return start;
+}
+
 /* parse cuesheet "file" and store the information in "cue" */
 bool parse_cuesheet(char *file, struct cuesheet *cue)
 {
     char line[MAX_PATH];
-    char *s, *start, *end;
+    char *s;
+
     int fd = open(file,O_RDONLY);
     if (fd < 0)
     {
@@ -106,62 +128,17 @@ bool parse_cuesheet(char *file, struct cuesheet *cue)
         return false;
     }
 
+    /* Initialization */
     memset(cue, 0, sizeof(struct cuesheet));
-
     strcpy(cue->path, file);
-
-    cue->curr_track_idx = 0;
     cue->curr_track = cue->tracks;
 
-    cue->track_count = 0;
-    while (read_line(fd,line,MAX_PATH))
+    while ( read_line(fd,line,MAX_PATH) && cue->track_count < MAX_TRACKS )
     {
         s = skip_whitespace(line);
-        if (!strncmp(s, "TITLE", 5))
+
+        if (!strncmp(s, "TRACK", 5))
         {
-            start = strchr(s,'"');
-            if (!start)
-                break;
-            end = strchr(++start,'"');
-            if (!end)
-                break;
-            *end = '\0';
-            if (cue->track_count <= 0)
-                strncpy(cue->title,start,MAX_NAME);
-            else strncpy(cue->tracks[cue->track_count-1].title,
-                         start,MAX_NAME);
-        }
-        else if (!strncmp(s, "PERFORMER", 9))
-        {
-            start = strchr(s,'"');
-            if (!start)
-                break;
-            end = strchr(++start,'"');
-            if (!end)
-                break;
-            *end = '\0';
-            if (cue->track_count <= 0)
-                strncpy(cue->performer,start,MAX_NAME);
-            else strncpy(cue->tracks[cue->track_count-1].performer,
-                         start,MAX_NAME);
-        }
-        else if (!strncmp(s, "SONGWRITER", 10))
-        {
-            start = strchr(s,'"');
-            if (!start)
-                break;
-            end = strchr(++start,'"');
-            if (!end)
-                break;
-            *end = '\0';
-            if (cue->track_count > 0)
-                strncpy(cue->tracks[cue->track_count-1].songwriter,
-                        start, MAX_NAME);
-        }
-        else if (!strncmp(s, "TRACK", 5))
-        {
-            if (cue->track_count >= MAX_TRACKS)
-                break; /* out of memeory! stop parsing */
             cue->track_count++;
         }
         else if (!strncmp(s, "INDEX 01", 8))
@@ -176,6 +153,37 @@ bool parse_cuesheet(char *file, struct cuesheet *cue)
             s = strchr(s,':') + 1;
             cue->tracks[cue->track_count-1].offset += 13 * atoi(s);
         }
+        else if (!strncmp(s, "TITLE", 5)
+                 || !strncmp(s, "PERFORMER", 9)
+                 || !strncmp(s, "SONGWRITER", 10))
+        {
+            char *dest;
+            char *string;
+
+            string = get_string(s);
+            if (!string)
+                break;
+
+            switch (*s)
+            {
+                case 'T': /* TITLE */
+                    dest = (cue->track_count <= 0) ? cue->title :
+                            cue->tracks[cue->track_count-1].title;
+                    break;
+
+                case 'P': /* PERFORMER */
+                    dest = (cue->track_count <= 0) ? cue->performer :
+                        cue->tracks[cue->track_count-1].performer;
+                    break;
+
+                case 'S': /* SONGWRITER */
+                    dest = (cue->track_count <= 0) ? NULL :
+                            cue->tracks[cue->track_count-1].songwriter;
+            }
+
+            if (dest)
+                strncpy(dest, string, MAX_NAME);
+        }
     }
     close(fd);
 
@@ -184,9 +192,7 @@ bool parse_cuesheet(char *file, struct cuesheet *cue)
     for (i = 0; i < cue->track_count; i++)
     {
         if (*(cue->tracks[i].performer) == '\0')
-        {
             strncpy(cue->tracks[i].performer, cue->performer, MAX_NAME);
-        }
     }
 
     return true;
