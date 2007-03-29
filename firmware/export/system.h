@@ -248,29 +248,29 @@ static inline int set_irq_level(int level)
     return i;
 }
 
-static inline unsigned short swap16(unsigned short value)
+static inline uint16_t swap16(uint16_t value)
   /*
     result[15..8] = value[ 7..0];
     result[ 7..0] = value[15..8];
   */
 {
-    unsigned short result;
+    uint16_t result;
     asm volatile ("swap.b\t%1,%0" : "=r"(result) : "r"(value));
     return result;
 }
 
-static inline unsigned long SWAW32(unsigned long value)
+static inline uint32_t SWAW32(uint32_t value)
   /*
     result[31..16] = value[15.. 0];
     result[15.. 0] = value[31..16];
   */
 {
-    unsigned long result;
+    uint32_t result;
     asm volatile ("swap.w\t%1,%0" : "=r"(result) : "r"(value));
     return result;
 }
 
-static inline unsigned long swap32(unsigned long value)
+static inline uint32_t swap32(uint32_t value)
   /*
     result[31..24] = value[ 7.. 0];
     result[23..16] = value[15.. 8];
@@ -282,6 +282,18 @@ static inline unsigned long swap32(unsigned long value)
                   "swap.w\t%0,%0\n"
                   "swap.b\t%0,%0\n" : "+r"(value));
     return value;
+}
+
+static inline uint32_t swap_odd_even32(uint32_t value)
+{
+    /*
+      result[31..24],[15.. 8] = value[23..16],[ 7.. 0]
+      result[23..16],[ 7.. 0] = value[31..24],[15.. 8]
+    */
+    asm volatile ("swap.b\t%0,%0\n"
+                  "swap.w\t%0,%0\n"
+                  "swap.b\t%0,%0\n"
+                  "swap.w\t%0,%0\n" : "+r"(value));
 }
 
 #define invalidate_icache()
@@ -313,7 +325,7 @@ static inline unsigned long swap32(unsigned long value)
 
 #endif
 
-static inline unsigned short swap16(unsigned short value)
+static inline uint16_t swap16(uint16_t value)
     /*
       result[15..8] = value[ 7..0];
       result[ 7..0] = value[15..8];
@@ -322,7 +334,7 @@ static inline unsigned short swap16(unsigned short value)
     return (value >> 8) | (value << 8);
 }
 
-static inline unsigned long swap32(unsigned long value)
+static inline uint32_t swap32(uint32_t value)
     /*
       result[31..24] = value[ 7.. 0];
       result[23..16] = value[15.. 8];
@@ -330,7 +342,7 @@ static inline unsigned long swap32(unsigned long value)
       result[ 7.. 0] = value[31..24];
     */
 {
-    unsigned int tmp;
+    uint32_t tmp;
 
     asm volatile (
         "eor %1, %0, %0, ror #16 \n\t"
@@ -338,6 +350,24 @@ static inline unsigned long swap32(unsigned long value)
         "mov %0, %0, ror #8      \n\t"
         "eor %0, %0, %1, lsr #8  \n\t"
         : "+r" (value), "=r" (tmp)
+    );
+    return value;
+}
+
+static inline uint32_t swap_odd_even32(uint32_t value)
+{
+    /*
+      result[31..24],[15.. 8] = value[23..16],[ 7.. 0]
+      result[23..16],[ 7.. 0] = value[31..24],[15.. 8]
+    */
+    uint32_t tmp;
+
+    asm volatile (                    /* ABCD      */
+        "bic %1, %0, #0x00ff00  \n\t" /* AB.D      */
+        "bic %0, %0, #0xff0000  \n\t" /* A.CD      */
+        "mov %0, %0, lsr #8     \n\t" /* .A.C      */
+        "orr %0, %0, %1, lsl #8 \n\t" /* B.D.|.A.C */
+        : "+r" (value), "=r" (tmp)    /* BADC      */
     );
     return value;
 }
@@ -396,21 +426,9 @@ void irq_disable_int(int n);
 
 #endif
 
-#ifndef CPU_COLDFIRE
-static inline unsigned long swap_odd_even32(unsigned long value)
-{
-    /*
-      result[31..24],[15.. 8] = value[23..16],[ 7.. 0]
-      result[23..16],[ 7.. 0] = value[31..24],[15.. 8]
-    */
-    unsigned long t = value & 0xff00ff00;
-    return (t >> 8) | ((t ^ value) << 8);
-}
-#endif
-
 #else /* SIMULATOR */
 
-static inline unsigned short swap16(unsigned short value)
+static inline uint16_t swap16(uint16_t value)
     /*
       result[15..8] = value[ 7..0];
       result[ 7..0] = value[15..8];
@@ -419,7 +437,7 @@ static inline unsigned short swap16(unsigned short value)
     return (value >> 8) | (value << 8);
 }
 
-static inline unsigned long swap32(unsigned long value)
+static inline uint32_t swap32(uint32_t value)
     /*
       result[31..24] = value[ 7.. 0];
       result[23..16] = value[15.. 8];
@@ -427,18 +445,18 @@ static inline unsigned long swap32(unsigned long value)
       result[ 7.. 0] = value[31..24];
     */
 {
-    unsigned long hi = swap16(value >> 16);
-    unsigned long lo = swap16(value & 0xffff);
+    uint32_t hi = swap16(value >> 16);
+    uint32_t lo = swap16(value & 0xffff);
     return (lo << 16) | hi;
 }
 
-static inline unsigned long swap_odd_even32(unsigned long value)
+static inline uint32_t swap_odd_even32(uint32_t value)
 {
     /*
       result[31..24],[15.. 8] = value[23..16],[ 7.. 0]
       result[23..16],[ 7.. 0] = value[31..24],[15.. 8]
     */
-    unsigned long t = value & 0xff00ff00;
+    uint32_t t = value & 0xff00ff00;
     return (t >> 8) | ((t ^ value) << 8);
 }
 

@@ -78,7 +78,7 @@ static inline int set_irq_level(int level)
     return oldlevel;
 }
 
-static inline unsigned short swap16(unsigned short value)
+static inline uint16_t swap16(uint16_t value)
   /*
     result[15..8] = value[ 7..0];
     result[ 7..0] = value[15..8];
@@ -87,7 +87,7 @@ static inline unsigned short swap16(unsigned short value)
     return (value >> 8) | (value << 8);
 }
 
-static inline unsigned long SWAW32(unsigned long value)
+static inline uint32_t SWAW32(uint32_tg value)
   /*
     result[31..16] = value[15.. 0];
     result[15.. 0] = value[31..16];
@@ -97,7 +97,7 @@ static inline unsigned long SWAW32(unsigned long value)
     return value;
 }
 
-static inline unsigned long swap32(unsigned long value)
+static inline uint32_t swap32(uint32_t value)
   /*
     result[31..24] = value[ 7.. 0];
     result[23..16] = value[15.. 8];
@@ -105,7 +105,7 @@ static inline unsigned long swap32(unsigned long value)
     result[ 7.. 0] = value[31..24];
   */
 {
-    unsigned long mask = 0x00FF00FF;
+    uint32_t mask = 0x00FF00FF;
     asm (                             /* val  = ABCD */
         "and.l   %[val],%[mask]  \n"  /* mask = .B.D */
         "eor.l   %[mask],%[val]  \n"  /* val  = A.C. */
@@ -120,7 +120,7 @@ static inline unsigned long swap32(unsigned long value)
     return value;
 }
 
-static inline unsigned long swap_odd_even32(unsigned long value)
+static inline uint32_t swap_odd_even32(uint32_t value)
 {
     /*
       result[31..24],[15.. 8] = value[23..16],[ 7.. 0]
