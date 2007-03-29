@@ -23,7 +23,7 @@
 #include <stdbool.h>
 #include "screens.h"
 
-#define MAX_NAME 64    /* Max length of information strings */
+#define MAX_NAME 80    /* Max length of information strings */
 #define MAX_TRACKS 99  /* Max number of tracks in a cuesheet */
 
 struct cue_track_info {
@@ -39,6 +39,7 @@ struct cuesheet {
 
     char title[MAX_NAME];
     char performer[MAX_NAME];
+    char songwriter[MAX_NAME];
 
     int track_count;
     struct cue_track_info tracks[MAX_TRACKS];

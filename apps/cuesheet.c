@@ -175,7 +175,7 @@ bool parse_cuesheet(char *file, struct cuesheet *cue)
                     break;
 
                 case 'S': /* SONGWRITER */
-                    dest = (cue->track_count <= 0) ? NULL :
+                    dest = (cue->track_count <= 0) ? cue->songwriter :
                             cue->tracks[cue->track_count-1].songwriter;
                     break;
             }
@@ -192,6 +192,9 @@ bool parse_cuesheet(char *file, struct cuesheet *cue)
     {
         if (*(cue->tracks[i].performer) == '\0')
             strncpy(cue->tracks[i].performer, cue->performer, MAX_NAME);
+
+        if (*(cue->tracks[i].songwriter) == '\0')
+            strncpy(cue->tracks[i].songwriter, cue->songwriter, MAX_NAME);
     }
 
     return true;
@@ -225,9 +228,8 @@ int cue_find_current_track(struct cuesheet *cue, unsigned long curpos)
 {
     int i=0;
     while (i < cue->track_count-1 && cue->tracks[i+1].offset < curpos)
-    {
         i++;
-    }
+
     cue->curr_track_idx = i;
     cue->curr_track = cue->tracks + i;
     return i;
@@ -241,16 +243,12 @@ static char *list_get_name_cb(int selected_item,
     struct cuesheet *cue = (struct cuesheet *)data;
 
     if (selected_item & 1)
-    {
-        snprintf(buffer, MAX_PATH,
-                 (selected_item+1)/2 > 9 ? "   %s" : "  %s",
+        snprintf(buffer, MAX_PATH, "%s",
                  cue->tracks[selected_item/2].title);
-    }
     else
-    {
-        snprintf(buffer, MAX_PATH, "%d %s", selected_item/2+1,
+        snprintf(buffer, MAX_PATH, "%02d. %s", selected_item/2+1,
                  cue->tracks[selected_item/2].performer);
-    }
+
     return buffer;
 }
 
@@ -361,7 +359,13 @@ void cue_spoof_id3(struct cuesheet *cue, struct mp3entry *id3)
     id3->title = cue->tracks[i].title;
     id3->artist = cue->tracks[i].performer;
     id3->composer = cue->tracks[i].songwriter;
-    id3->albumartist = cue->performer;
+
+    /* if the album artist is the same as the track artist, we hide it. */
+    if (strcmp(cue->performer, cue->tracks[i].performer))
+        id3->albumartist = cue->performer;
+    else
+        id3->albumartist = "\0";
+
     id3->tracknum = i+1;
     id3->album = cue->title;
     if (id3->track_string)
