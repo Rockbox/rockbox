@@ -126,8 +126,7 @@ static inline uint32_t swap_odd_even32(uint32_t value)
       result[31..24],[15.. 8] = value[23..16],[ 7.. 0]
       result[23..16],[ 7.. 0] = value[31..24],[15.. 8]
     */
-    unsigned long mask = 0x00FF00FF;
-
+    uint32_t mask = 0x00FF00FF;
     asm (                             /* val  = ABCD */
         "and.l   %[val],%[mask]  \n"  /* mask = .B.D */
         "eor.l   %[mask],%[val]  \n"  /* val  = A.C. */
@@ -138,7 +137,6 @@ static inline uint32_t swap_odd_even32(uint32_t value)
         [val] "+d"(value),
         [mask]"+d"(mask)
     );
-
     return value;
 }
 
