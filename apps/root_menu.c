@@ -187,11 +187,6 @@ static int browser(void* param)
         break;
 #endif
     }
-    /* hopefully only happens trying to go back into the WPS
-       from plugins, if music is stopped... */
-    if ((ret_val == GO_TO_PREVIOUS) && (last_screen == (intptr_t)param))
-        ret_val = GO_TO_ROOT;
-
     return ret_val;
 }  
 
@@ -232,8 +227,6 @@ static int wpsscrn(void* param)
     else
     {
         gui_syncsplash(HZ*2, str(LANG_NOTHING_TO_RESUME));
-        if (last_screen == GO_TO_WPS)
-            ret_val = GO_TO_ROOT;
     }
 #if LCD_DEPTH > 1
     show_main_backdrop();
@@ -388,46 +381,65 @@ static int get_selection(int last_screen)
     return 0;
 }
 
+static inline int load_screen(int screen)
+{
+    /* set the global_status.last_screen before entering,
+        if we dont we will always return to the wrong screen on boot */
+    int old_previous = last_screen;
+    int ret_val;
+    if (screen <= GO_TO_ROOT)
+        return screen;
+    if (screen == old_previous)
+        old_previous = GO_TO_ROOT;
+    global_status.last_screen = (char)screen;
+    status_save();
+    action_signalscreenchange();
+    last_screen = screen;
+    ret_val = items[screen].function(items[screen].param);
+    if (ret_val == GO_TO_PREVIOUS)
+        last_screen = old_previous;
+    return ret_val;
+}
+
 void root_menu(void)
 {
     int previous_browser = GO_TO_FILEBROWSER;
     int previous_music = GO_TO_WPS;
-    int ret_val = GO_TO_ROOT;
-    int this_screen = GO_TO_ROOT;
+    int next_screen = GO_TO_ROOT;
     int selected = 0;
 
     if (global_settings.start_in_screen == 0)
-        ret_val = (int)global_status.last_screen;
-    else ret_val = global_settings.start_in_screen - 2;
+        next_screen = (int)global_status.last_screen;
+    else next_screen = global_settings.start_in_screen - 2;
     
 #ifdef HAVE_RTC_ALARM
     if ( rtc_check_alarm_started(true) ) 
     {
         rtc_enable_alarm(false);
-        ret_val = GO_TO_WPS;
+        next_screen = GO_TO_WPS;
 #if CONFIG_TUNER
         if (global_settings.alarm_wake_up_screen == ALARM_START_FM)
-            ret_val = GO_TO_FM;
+            next_screen = GO_TO_FM;
 #endif
 #ifdef HAVE_RECORDING
         if (global_settings.alarm_wake_up_screen == ALARM_START_REC)
         {
             recording_start_automatic = true;
-            ret_val = GO_TO_RECSCREEN;
+            next_screen = GO_TO_RECSCREEN;
         }
 #endif
     }
 #endif /* HAVE_RTC_ALARM */
 
 #ifdef HAVE_HEADPHONE_DETECTION
-    if (ret_val == GO_TO_WPS && 
+    if (next_screen == GO_TO_WPS && 
         (global_settings.unplug_autoresume && !headphones_inserted() ))
-            ret_val = GO_TO_ROOT;
+            next_screen = GO_TO_ROOT;
 #endif
 
     while (true)
     {
-        switch (ret_val)
+        switch (next_screen)
         {
             case MENU_ATTACHED_USB:
             case MENU_SELECTED_EXIT:
@@ -436,53 +448,39 @@ void root_menu(void)
             case GO_TO_ROOT:
                 if (last_screen != GO_TO_ROOT)
                     selected = get_selection(last_screen);
-                ret_val = do_menu(&root_menu_, &selected);
-                if (ret_val <= GO_TO_ROOT)
-                {
-                    if (ret_val == GO_TO_PREVIOUS)
-                    {
-                        ret_val = last_screen;
-                        last_screen = GO_TO_ROOT;
-                    }
-                    continue;
-                }
-                last_screen = GO_TO_ROOT;
+                next_screen = do_menu(&root_menu_, &selected);
+                if (next_screen != GO_TO_PREVIOUS)
+                    last_screen = GO_TO_ROOT;
                 break;
 
             case GO_TO_PREVIOUS:
-                ret_val = last_screen;
-                continue;
+                next_screen = last_screen;
                 break;
 
             case GO_TO_PREVIOUS_BROWSER:
-                ret_val = previous_browser;
+                next_screen = previous_browser;
                 break;
 
             case GO_TO_PREVIOUS_MUSIC:
-                ret_val = previous_music;
+                next_screen = previous_music;
                 break;
-        }
-        this_screen = ret_val;
-        /* set the global_status.last_screen before entering,
-           if we dont we will always return to the wrong screen on boot */
-        global_status.last_screen = (char)this_screen;
-        if (this_screen == GO_TO_FILEBROWSER 
+                
+            default:
+                if (next_screen == GO_TO_FILEBROWSER 
 #ifdef HAVE_TAGCACHE
-            || this_screen == GO_TO_DBBROWSER
+                    || next_screen == GO_TO_DBBROWSER
 #endif
-            )
-            previous_browser = this_screen;
-        if (this_screen == GO_TO_WPS 
+                   )
+                    previous_browser = next_screen;
+                if (next_screen == GO_TO_WPS 
 #ifdef CONFIG_TUNER
-            || this_screen == GO_TO_FM
+                    || next_screen == GO_TO_FM
 #endif
-            )
-            previous_music = this_screen;
-        status_save();
-        action_signalscreenchange();
-        ret_val = items[this_screen].function(items[this_screen].param);
-        if (ret_val != GO_TO_PREVIOUS)
-            last_screen = this_screen;
+                   )
+                    previous_music = next_screen;
+                next_screen = load_screen(next_screen);
+                break;
+        } /* switch() */
     }
     return;
 }
