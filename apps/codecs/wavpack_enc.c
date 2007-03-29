@@ -99,6 +99,25 @@ static const struct riff_header riff_header =
     /* (*) updated during ENC_END_FILE event */
 };
 
+static inline void sample_to_int32_mono(int32_t **src, int32_t **dst)
+{
+    int32_t t = *(*src)++;
+    /* endianness irrelevant */
+    t = (int16_t)t + (t >> 16) + err;
+    err = t & 1;
+    *(*dst)++ = t >> 1;
+} /* sample_to_int32_mono */
+
+static inline void sample_to_int32_stereo(int32_t **src, int32_t **dst)
+{
+    int32_t t = *(*src)++;
+#ifdef ROCKBOX_BIG_ENDIAN
+    *(*dst)++ = t >> 16, *(*dst)++ = (int16_t)t;
+#else
+    *(*dst)++ = (int16_t)t, *(*dst)++ = t >> 16;
+#endif
+} /* sample_to_int32_stereo */
+
 STATICIRAM void chunk_to_int32(int32_t *src) ICODE_ATTR;
 STATICIRAM void chunk_to_int32(int32_t *src)
 {
@@ -123,28 +142,19 @@ STATICIRAM void chunk_to_int32(int32_t *src)
          *  |llllllllllllllll|rrrrrrrrrrrrrrrr| =>
          *  |mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm|
          */
-        inline void to_int32(int32_t **src, int32_t **dst)
-        {
-            int32_t t = *(*src)++;
-            /* endianness irrelevant */
-            t = (int16_t)t + (t >> 16) + err;
-            err = t & 1;
-            *(*dst)++ = t >> 1;
-        } /* to_int32 */
-
         do
         {
             /* read 10 longs and write 10 longs */
-            to_int32(&src, &dst);
-            to_int32(&src, &dst);
-            to_int32(&src, &dst);
-            to_int32(&src, &dst);
-            to_int32(&src, &dst);
-            to_int32(&src, &dst);
-            to_int32(&src, &dst);
-            to_int32(&src, &dst);
-            to_int32(&src, &dst);
-            to_int32(&src, &dst);
+            sample_to_int32_mono(&src, &dst);
+            sample_to_int32_mono(&src, &dst);
+            sample_to_int32_mono(&src, &dst);
+            sample_to_int32_mono(&src, &dst);
+            sample_to_int32_mono(&src, &dst);
+            sample_to_int32_mono(&src, &dst);
+            sample_to_int32_mono(&src, &dst);
+            sample_to_int32_mono(&src, &dst);
+            sample_to_int32_mono(&src, &dst);
+            sample_to_int32_mono(&src, &dst);
         }
         while(src < src_end);
 
@@ -156,29 +166,19 @@ STATICIRAM void chunk_to_int32(int32_t *src)
          *  |llllllllllllllll|rrrrrrrrrrrrrrrr| =>
          *  |llllllllllllllllllllllllllllllll|rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr|
          */
-        inline void to_int32(int32_t **src, int32_t **dst)
-        {
-            int32_t t = *(*src)++;
-#ifdef ROCKBOX_BIG_ENDIAN
-            *(*dst)++ = t >> 16, *(*dst)++ = (int16_t)t;
-#else
-            *(*dst)++ = (int16_t)t, *(*dst)++ = t >> 16;
-#endif
-        } /* to_int32 */
-
         do
         {
             /* read 10 longs and write 20 longs */
-            to_int32(&src, &dst);
-            to_int32(&src, &dst);
-            to_int32(&src, &dst);
-            to_int32(&src, &dst);
-            to_int32(&src, &dst);
-            to_int32(&src, &dst);
-            to_int32(&src, &dst);
-            to_int32(&src, &dst);
-            to_int32(&src, &dst);
-            to_int32(&src, &dst);
+            sample_to_int32_stereo(&src, &dst);
+            sample_to_int32_stereo(&src, &dst);
+            sample_to_int32_stereo(&src, &dst);
+            sample_to_int32_stereo(&src, &dst);
+            sample_to_int32_stereo(&src, &dst);
+            sample_to_int32_stereo(&src, &dst);
+            sample_to_int32_stereo(&src, &dst);
+            sample_to_int32_stereo(&src, &dst);
+            sample_to_int32_stereo(&src, &dst);
+            sample_to_int32_stereo(&src, &dst);
         }
         while (src < src_end);
 

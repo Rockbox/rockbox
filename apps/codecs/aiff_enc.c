@@ -221,6 +221,22 @@ STATICIRAM void enc_events_callback(enum enc_events event, void *data)
 } /* enc_events_callback */
 
 /* convert native pcm samples to aiff format samples */
+static inline void sample_to_mono(uint32_t **src, uint32_t **dst)
+{
+    int32_t lr1, lr2;
+
+    lr1 = *(*src)++;
+    lr1 = (int16_t)lr1 + (lr1 >> 16) + err;
+    err = lr1 & 1;
+    lr1 >>= 1;
+
+    lr2 = *(*src)++;
+    lr2 = (int16_t)lr2 + (lr2 >> 16) + err;
+    err = lr2 & 1;
+    lr2 >>= 1;
+    *(*dst)++ = swap_odd_even_le32((lr1 << 16) | (uint16_t)lr2);
+} /* sample_to_mono */
+
 STATICIRAM void chunk_to_aiff_format(uint32_t *src, uint32_t *dst) ICODE_ATTR;
 STATICIRAM void chunk_to_aiff_format(uint32_t *src, uint32_t *dst)
 {
@@ -238,32 +254,16 @@ STATICIRAM void chunk_to_aiff_format(uint32_t *src, uint32_t *dst)
          */
         uint32_t *src_end = src + PCM_SAMP_PER_CHUNK;
 
-        inline void to_mono(uint32_t **src, uint32_t **dst)
-        {
-            int32_t lr1, lr2;
-
-            lr1 = *(*src)++;
-            lr1 = (int16_t)lr1 + (lr1 >> 16) + err;
-            err = lr1 & 1;
-            lr1 >>= 1;
-
-            lr2 = *(*src)++;
-            lr2 = (int16_t)lr2 + (lr2 >> 16) + err;
-            err = lr2 & 1;
-            lr2 >>= 1;
-            *(*dst)++ = swap_odd_even_le32((lr1 << 16) | (uint16_t)lr2);
-        } /* to_mono */
-
         do
         {
-            to_mono(&src, &dst);
-            to_mono(&src, &dst);
-            to_mono(&src, &dst);
-            to_mono(&src, &dst);
-            to_mono(&src, &dst);
-            to_mono(&src, &dst);
-            to_mono(&src, &dst);
-            to_mono(&src, &dst);
+            sample_to_mono(&src, &dst);
+            sample_to_mono(&src, &dst);
+            sample_to_mono(&src, &dst);
+            sample_to_mono(&src, &dst);
+            sample_to_mono(&src, &dst);
+            sample_to_mono(&src, &dst);
+            sample_to_mono(&src, &dst);
+            sample_to_mono(&src, &dst);
         }
         while (src < src_end);
     }

@@ -67,6 +67,19 @@ static int flush_interrupts = 0;       /* Number of messages queued that
                                           only interrupts a flush initiated
                                           by pcmrec_flush(0) */
 
+/* Utility functions for setting/clearing flushing interrupt flag */
+static inline void flush_interrupt(void)
+{
+    flush_interrupts++;
+    logf("flush int: %d", flush_interrupts);
+}
+
+static inline void clear_flush_interrupt(void)
+{
+    if (--flush_interrupts < 0)
+        flush_interrupts = 0;
+}
+
 /** Stats on encoded data for current file **/
 static size_t        num_rec_bytes;      /* Num bytes recorded             */
 static unsigned long num_rec_samples;    /* Number of PCM samples recorded */
@@ -461,8 +474,7 @@ void audio_set_recording_options(struct audio_recording_options *options)
 void audio_record(const char *filename)
 {
     logf("audio_record: %s", filename);
-    flush_interrupts++;
-    logf("flush int: %d", flush_interrupts);
+    flush_interrupt();
     queue_send(&pcmrec_queue, PCMREC_RECORD, (intptr_t)filename);
     logf("audio_record_done");
 } /* audio_record */
@@ -473,8 +485,7 @@ void audio_record(const char *filename)
 void audio_stop_recording(void)
 {
     logf("audio_stop_recording");
-    flush_interrupts++;
-    logf("flush int: %d", flush_interrupts);
+    flush_interrupt();
     queue_send(&pcmrec_queue, PCMREC_STOP, 0);
     logf("audio_stop_recording done");
 } /* audio_stop_recording */
@@ -485,8 +496,7 @@ void audio_stop_recording(void)
 void audio_pause_recording(void)
 {
     logf("audio_pause_recording");
-    flush_interrupts++;
-    logf("flush int: %d", flush_interrupts);
+    flush_interrupt();
     queue_send(&pcmrec_queue, PCMREC_PAUSE, 0);
     logf("audio_pause_recording done");
 } /* audio_pause_recording */
@@ -1060,6 +1070,20 @@ static void pcmrec_flush(unsigned flush_num)
  * chunk so it can recognize this. ENC_WRITE_CHUNK event must be able to accept
  * a NULL data pointer without error as well.
  */
+static int pcmrec_get_chunk_index(struct enc_chunk_hdr *chunk)
+{
+    return ((char *)chunk - (char *)enc_buffer) / enc_chunk_size;
+} /* pcmrec_get_chunk_index */
+
+static struct enc_chunk_hdr * pcmrec_get_prev_chunk(int index)
+{
+#ifdef PCMREC_PARANOID
+    int index_last = index;
+#endif
+    DEC_ENC_INDEX(index);
+    return GET_ENC_CHUNK(index);
+} /* pcmrec_get_prev_chunk */
+
 static void pcmrec_new_stream(const char *filename, /* next file name */
                               unsigned long flags,  /* CHUNKF_* flags */
                               int pre_index) /* index for prerecorded data */
@@ -1073,20 +1097,6 @@ static void pcmrec_new_stream(const char *filename, /* next file name */
     struct enc_chunk_hdr *start = NULL;      /* pointer to starting chunk of
                                                 stream */
     bool did_flush = false;                  /* did a flush occurr? */
-
-    int get_chunk_index(struct enc_chunk_hdr *chunk)
-    {
-        return ((char *)chunk - (char *)enc_buffer) / enc_chunk_size;
-    }
-
-    struct enc_chunk_hdr * get_prev_chunk(int index)
-    {
-#ifdef PCMREC_PARANOID
-        int index_last = index;
-#endif
-        DEC_ENC_INDEX(index);
-        return GET_ENC_CHUNK(index);
-    }
 
     if (filename)
         strncpy(path, filename, MAX_PATH);
@@ -1120,7 +1130,7 @@ static void pcmrec_new_stream(const char *filename, /* next file name */
         }
         else
         {
-            struct enc_chunk_hdr *last = get_prev_chunk(enc_wr_index);
+            struct enc_chunk_hdr *last = pcmrec_get_prev_chunk(enc_wr_index);
 
             if (last->flags & CHUNKF_END_FILE)
             {
@@ -1170,8 +1180,8 @@ static void pcmrec_new_stream(const char *filename, /* next file name */
 
     if (flags & CHUNKF_END_FILE)
     {
-        int i = get_chunk_index(data.chunk);
-        get_prev_chunk(i)->flags |= CHUNKF_END_FILE;
+        int i = pcmrec_get_chunk_index(data.chunk);
+        pcmrec_get_prev_chunk(i)->flags |= CHUNKF_END_FILE;
     }
 
     if (start)
@@ -1180,7 +1190,7 @@ static void pcmrec_new_stream(const char *filename, /* next file name */
         {
             /* get stats on data added to start - sort of a prerecord
                operation */
-            int i = get_chunk_index(data.chunk);
+            int i = pcmrec_get_chunk_index(data.chunk);
 #ifdef PCMREC_PARANOID
             int i_last = i;
 #endif
@@ -1564,12 +1574,6 @@ static void pcmrec_thread(void)
     struct event ev;
 
     logf("thread pcmrec start");
-
-    void clear_flush_interrupt(void)
-    {
-        if (--flush_interrupts < 0)
-            flush_interrupts = 0;
-    }
 
     while(1)
     {

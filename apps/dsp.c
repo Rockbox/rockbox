@@ -1234,26 +1234,26 @@ int dsp_stereo_mode(void)
     return dsp->stereo_mode;
 }
 
+static void dsp_set_gain_var(long *var, long value)
+{
+    /* Voice shouldn't mess with these */
+    if (dsp == audio_dsp)
+    {
+        *var = value;
+        new_gain = true;
+    }
+}
+
+static void dsp_update_functions(void)
+{
+    sample_input_new_format();
+    sample_output_new_format();
+    if (dsp == audio_dsp)
+        dsp_set_crossfeed(crossfeed_enabled);
+}
+
 bool dsp_configure(int setting, intptr_t value)
 {
-    void set_gain_var(long *var, long value)
-    {
-        /* Voice shouldn't mess with these */
-        if (dsp == audio_dsp)
-        {
-            *var = value;
-            new_gain = true;
-        }
-    }
-
-    void update_functions(void)
-    {
-        sample_input_new_format();
-        sample_output_new_format();
-        if (dsp == audio_dsp)
-            dsp_set_crossfeed(crossfeed_enabled);
-    }
-
     switch (setting)
     {
     case DSP_SWITCH_CODEC:
@@ -1305,7 +1305,7 @@ bool dsp_configure(int setting, intptr_t value)
     case DSP_SET_STEREO_MODE:
         dsp->stereo_mode = value;
         dsp->data.num_channels = value == STEREO_MONO ? 1 : 2;
-        update_functions();
+        dsp_update_functions();
         break;
 
     case DSP_RESET:
@@ -1328,7 +1328,7 @@ bool dsp_configure(int setting, intptr_t value)
             new_gain   = true;
         }
 
-        update_functions();
+        dsp_update_functions();
         resampler_new_delta();
         break;
 
@@ -1340,19 +1340,19 @@ bool dsp_configure(int setting, intptr_t value)
         break;
 
     case DSP_SET_TRACK_GAIN:
-        set_gain_var(&track_gain, value);
+        dsp_set_gain_var(&track_gain, value);
         break;
 
     case DSP_SET_ALBUM_GAIN:
-        set_gain_var(&album_gain, value);
+        dsp_set_gain_var(&album_gain, value);
         break;
 
     case DSP_SET_TRACK_PEAK:
-        set_gain_var(&track_peak, value);
+        dsp_set_gain_var(&track_peak, value);
         break;
 
     case DSP_SET_ALBUM_PEAK:
-        set_gain_var(&album_peak, value);
+        dsp_set_gain_var(&album_peak, value);
         break;
 
     default:

@@ -106,6 +106,7 @@ static const struct fm_region_setting fm_region[] = {
 static int curr_preset = -1;
 static int curr_freq;
 static int radio_mode = RADIO_SCAN_MODE;
+static int search_dir = 0;
 
 static int radio_status = FMRADIO_OFF;
 static bool in_screen = false; 
@@ -389,6 +390,14 @@ static void next_station(int direction)
     remember_frequency();
 }
 
+/* Ends an in-progress search */
+static void end_search(void)
+{
+    if (search_dir != 0 && radio_status == FMRADIO_PLAYING)
+        radio_set(RADIO_MUTE, 0);
+    search_dir = 0;
+}
+
 int radio_screen(void)
 {
     char buf[MAX_PATH];
@@ -396,7 +405,6 @@ int radio_screen(void)
     int ret_val = GO_TO_ROOT;
     int button;
     int i;
-    int search_dir = 0;
     bool stereo = false, last_stereo = false;
     int fh;
     int top_of_screen = 0;
@@ -424,14 +432,6 @@ int radio_screen(void)
     gui_buttonbar_init(&buttonbar);
     gui_buttonbar_set_display(&buttonbar, &(screens[SCREEN_MAIN]) );
 #endif
-
-    /* Ends an in-progress search - needs access to search_dir */
-    void end_search(void)
-    {
-        if (search_dir != 0 && radio_status == FMRADIO_PLAYING)
-            radio_set(RADIO_MUTE, 0);
-        search_dir = 0;
-    }
 
     /* change status to "in screen" */
     in_screen = true;
