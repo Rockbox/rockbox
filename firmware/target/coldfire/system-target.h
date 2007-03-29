@@ -87,7 +87,7 @@ static inline uint16_t swap16(uint16_t value)
     return (value >> 8) | (value << 8);
 }
 
-static inline uint32_t SWAW32(uint32_tg value)
+static inline uint32_t SWAW32(uint32_t value)
   /*
     result[31..16] = value[15.. 0];
     result[15.. 0] = value[31..16];
