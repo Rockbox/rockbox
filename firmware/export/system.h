@@ -294,6 +294,7 @@ static inline uint32_t swap_odd_even32(uint32_t value)
                   "swap.w\t%0,%0\n"
                   "swap.b\t%0,%0\n"
                   "swap.w\t%0,%0\n" : "+r"(value));
+    return value;
 }
 
 #define invalidate_icache()
