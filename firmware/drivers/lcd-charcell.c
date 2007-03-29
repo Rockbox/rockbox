@@ -70,8 +70,7 @@ unsigned char hardware_buffer_lcd[LCD_WIDTH][LCD_HEIGHT];
 static int xmargin = 0;
 static int ymargin = 0;
 
-static unsigned char xfont_variable[VARIABLE_XCHARS][(HW_PATTERN_SIZE+3)&~3];
-       /* round up pattern size to a multiple of 4 bytes for faster access */
+static unsigned char xfont_variable[VARIABLE_XCHARS][HW_PATTERN_SIZE];
 static bool xfont_variable_locked[VARIABLE_XCHARS];
 static struct pattern_info hw_pattern[MAX_HW_PATTERNS];
 static struct cursor_info cursor;
