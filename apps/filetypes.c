@@ -123,7 +123,7 @@ static void read_builtin_types(void)
 #ifdef HAVE_LCD_BITMAP
                             (ICON_NO_CONST)&bitmap_icons_6x8[types[i].icon];
 #else
-                            (ICON_NO_CONST)Icon_Folder;
+                            (ICON_NO_CONST)types[i].icon;
 #endif
         filetype_count++;
     }
