@@ -7,7 +7,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2004 Henrik Backe
+ * Copyright (C) 2007 Jonathan Gordon
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -21,6 +21,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include "string.h"
+#include <ctype.h>
 
 #include "sprintf.h"
 #include "settings.h"
@@ -36,241 +38,294 @@
 #include "file.h"
 #include "icons.h"
 #include "splash.h"
-
-/* max plugin name size without extensions and path */
-#define MAX_PLUGIN_LENGTH 32
+#include "buffer.h"
 
 /* max filetypes (plugins & icons stored here) */
 #if CONFIG_CODEC == SWCODEC
-#define MAX_FILETYPES 64
+#define MAX_FILETYPES 72
 #else
 #define MAX_FILETYPES 48
 #endif
-
-/* max exttypes (extensions stored here) */
-#if CONFIG_CODEC == SWCODEC
-/* Software codecs require more file extensions */
-#define MAX_EXTTYPES 64
-#else
-#define MAX_EXTTYPES 32
-#endif
-
-/* string buffer length */
-#define STRING_BUFFER_SIZE 548
 
 /* number of bytes for the binary icon */
 #define ICON_LENGTH 6
 
 /* mask for dynamic filetype info in attribute */
 #define FILETYPES_MASK 0xFF00
+#define ROCK_EXTENSION "rock"
 
-/* filenames */
-#define ROCK_EXTENSION ".rock"
-#define VIEWERS_CONFIG ROCKBOX_DIR "/viewers.config"
-#define VIEWERS_DIR    ROCKBOX_DIR "/viewers"
-
-/* global variables */
-static int    cnt_filetypes;
-static int    cnt_exttypes;
-static struct ext_type  exttypes [MAX_EXTTYPES];
+struct file_type {
+    ICON_NO_CONST  icon; /* the icon which shall be used for it, NOICON if unknown */
+    bool  viewer; /* true if the rock is in viewers, false if in rocks */
+    unsigned char  attr; /* FILETYPES_MASK >> 8 */ 
+    char* plugin; /* Which plugin to use, NULL if unknown, or builtin */
+    char* extension; /* NULL for none */
+};
 static struct file_type filetypes[MAX_FILETYPES];
-static int    first_soft_exttype;
-static int    first_soft_filetype;
-static char*  next_free_string;
-static char   plugin_name[sizeof(VIEWERS_DIR) + 7 + MAX_PLUGIN_LENGTH];
-static char   string_buffer[STRING_BUFFER_SIZE];
+static int filetype_count = 0;
+static unsigned char heighest_attr = 0;
 
-/* prototypes */
-#ifdef HAVE_LCD_BITMAP
-static char*  string2icon(const char*);
-static int    add_plugin(char*,char*);
-#else
-static int    add_plugin(char*);
-#endif
-static char*  get_string(const char*);
-static int    find_attr_index(int);
-static bool   read_config(const char*);
-static void   rm_whitespaces(char*);
-static void   scan_plugins(void);
-
-/* initialize dynamic filetypes (called at boot from tree.c) */
-void filetype_init(void)
+static char *filetypes_strdup(char* string)
 {
-    int cnt,i,ix;
-    const struct filetype* ftypes;
+    char *buffer = (char*)buffer_alloc(strlen(string)+1);
+    strcpy(buffer, string);
+    return buffer;
+}
+static void read_builtin_types(void);
+static void read_config(char* config_file);
 
-    memset(exttypes,0,sizeof(exttypes));
-    memset(filetypes,0,sizeof(filetypes));
-    next_free_string=string_buffer;
-
-/* The special filetype folder must always be stored at index 0 */
+void  filetype_init(void)
+{
+    /* set the directory item first */
+    filetypes[0].extension = NULL;
+    filetypes[0].plugin = NULL;
+    filetypes[0].attr   = 0;
+    filetypes[0].icon   = 
 #ifdef HAVE_LCD_BITMAP
-    if (!filetypes[0].icon)
-        filetypes[0].icon = bitmap_icons_6x8[Icon_Folder];
+                            (ICON_NO_CONST)&bitmap_icons_6x8[Icon_Folder];
 #else
-    if (!filetypes[0].icon)
-        filetypes[0].icon = Icon_Folder;
-    for (i=1; i < MAX_FILETYPES; i++)
-        filetypes[i].icon = -1;
+                            (ICON_NO_CONST)Icon_Folder;
 #endif
-
-    /* register hardcoded filetypes */
-    tree_get_filetypes(&ftypes, &cnt);
-    cnt_exttypes=0;
-    cnt_filetypes=0;
-
-    for (i = 0; i < cnt ; i++)
-    {
-        ix = ((ftypes[i].tree_attr & FILETYPES_MASK) >> 8);
-        if (ix < MAX_FILETYPES && i < MAX_EXTTYPES)
-        {
-#ifdef HAVE_LCD_BITMAP
-            if (filetypes[ix].icon == NULL)
-                filetypes[ix].icon=bitmap_icons_6x8[ftypes[i].icon];
-#else
-            if (filetypes[ix].icon == -1)
-                filetypes[ix].icon=ftypes[i].icon;
-#endif
-            if (ix > cnt_filetypes)
-                cnt_filetypes=ix;
-            exttypes[cnt_exttypes].type=&filetypes[ix];
-            exttypes[cnt_exttypes].extension=ftypes[i].extension;
-            cnt_exttypes++;
-        }
-    }
-    first_soft_exttype=cnt_exttypes;
-    cnt_filetypes++;
-    first_soft_filetype=cnt_filetypes;
-
-    /* register dynamic filetypes */
+    filetype_count = 1;
+    read_builtin_types();
     read_config(VIEWERS_CONFIG);
-    scan_plugins();
 }
 
-/* get icon */
-#ifdef HAVE_LCD_BITMAP
-const unsigned char* filetype_get_icon(int attr)
-#else
-int   filetype_get_icon(int attr)
-#endif
+/* remove all white spaces from string */
+static void rm_whitespaces(char* str)
 {
-    int ix;
-
-    ix = find_attr_index(attr);
-
-    if (ix < 0)
+    char *s = str;
+    while (*str)
     {
-#ifdef HAVE_LCD_BITMAP
-        return NULL;
-#else
-        return Icon_Unknown;
-#endif
-    }
-    else
-    {
-        return filetypes[ix].icon;
-    }
-}
-
-/* get plugin */
-char* filetype_get_plugin(const struct entry* file)
-{
-    int ix;
-
-    ix=find_attr_index(file->attr);
-
-    if (ix < 0)
-    {
-        return NULL;
-    }
-
-    if ((filetypes[ix].plugin == NULL) ||
-        (strlen(filetypes[ix].plugin) > MAX_PLUGIN_LENGTH))
-        return NULL;
-
-    snprintf(plugin_name, sizeof(plugin_name),
-             "%s/%s.rock", ROCKBOX_DIR, filetypes[ix].plugin);
-
-    return plugin_name;
-}
-
-/* check if filetype is supported */
-bool filetype_supported(int attr)
-{
-    int ix;
-
-    ix=find_attr_index(attr);
-
-    /* hard filetypes and soft filetypes with plugins is supported */
-    if (ix > 0)
-        if (filetypes[ix].plugin || ix < first_soft_filetype)
-            return true;
-
-    return false;
-}
-
-/* get the "dynamic" attribute for an extension */
-int filetype_get_attr(const char* name)
-{
-    int i;
-    const char *cp = strrchr(name,'.');
-    
-    if (!cp)  /* no extension? -> can't be a supported type */
-        return 0;
-    cp++;
-
-    for (i=0; i < cnt_exttypes; i++)
-    {
-        if (exttypes[i].extension)
+        if (!isspace(*str))
         {
-            if (!strcasecmp(cp,exttypes[i].extension))
+            *s = *str;
+            s++;
+        }
+        str++;
+    }
+    *s = '\0';
+}
+
+static void read_builtin_types(void)
+{
+    const struct filetype *types;
+    int count, i;
+    tree_get_filetypes(&types, &count);
+    for(i=0; i<count && (filetype_count < MAX_FILETYPES); i++)
+    {
+        filetypes[filetype_count].extension = types[i].extension;
+        filetypes[filetype_count].plugin = NULL;
+        filetypes[filetype_count].attr   = types[i].tree_attr>>8;
+        if (filetypes[filetype_count].attr > heighest_attr)
+            heighest_attr = filetypes[filetype_count].attr;
+        filetypes[filetype_count].icon   = 
+#ifdef HAVE_LCD_BITMAP
+                            (ICON_NO_CONST)&bitmap_icons_6x8[types[i].icon];
+#else
+                            (ICON_NO_CONST)Icon_Folder;
+#endif
+        filetype_count++;
+    }
+}
+
+static void read_config(char* config_file)
+{
+    char line[64], *s, *e;
+    char extension[8], plugin[32];
+#ifdef HAVE_LCD_BITMAP
+    char icon[ICON_LENGTH];
+    int good_icon;
+#endif
+    bool viewer;
+    int fd = open(config_file, O_RDONLY);
+    if (fd < 0)
+        return;
+    /* config file is in the for 
+       <extension>,<plugin>,<icon code>
+       ignore line if either of the first two are missing */
+    while (read_line(fd, line, 64) > 0)
+    {
+        if (filetype_count >= MAX_FILETYPES)
+        {
+            gui_syncsplash(HZ, str(LANG_FILETYPES_FULL));
+            break;
+        }
+        rm_whitespaces(line);
+        /* get the extention */
+        s = line;
+        e = strchr(s, ',');
+        if (!e)
+            continue;
+        *e = '\0';
+        strcpy(extension, s);
+    
+        /* get the plugin */
+        s = e+1;
+        e = strchr(s, '/');
+        if (!e)
+            continue;
+        *e = '\0';
+        if (!strcasecmp("viewers", s))
+            viewer = true;
+        else
+            viewer = false;
+        s = e+1;
+        e = strchr(s, ',');
+        if (!e)
+            continue;
+        *e = '\0';
+        strcpy(plugin, s);
+        /* ok, store this plugin/extension, check icon after */
+        filetypes[filetype_count].extension = filetypes_strdup(extension);
+        filetypes[filetype_count].plugin = filetypes_strdup(plugin);
+        filetypes[filetype_count].viewer = viewer;
+        filetypes[filetype_count].attr = heighest_attr +1;
+        heighest_attr++;
+        /* get the icon */
+#ifdef  HAVE_LCD_BITMAP
+        s = e+1;
+        good_icon = 1;
+        if (strlen(s) == 12)
+        {
+            int i, j;
+            char val[2]; 
+            for (i = 0; good_icon && i < ICON_LENGTH; i++)
             {
-                return ((((unsigned long)exttypes[i].type -
-                          (unsigned long)&filetypes[0]) /
-                         sizeof(struct file_type)) << 8);
+                for (j=0; good_icon && j<2; j++)
+                {
+                    val[j] = tolower(s[i*2+j]);
+                    if (val[j] >= 'a' && val[j] <= 'f')
+                    {
+                        val[j] = val[j] - 'a' + 10;
+                    }
+                    else if (val[j] >= '0' && val[j] <= '9')
+                    {
+                        val[j] = val[j] - '0';
+                    }
+                    else 
+                        good_icon = 0;
+                }
+                icon[i]=((val[0]<<4) | val[1]);
             }
         }
+        if (good_icon)
+        {
+            filetypes[filetype_count].icon = 
+                                (ICON_NO_CONST)buffer_alloc(ICON_LENGTH);
+            memcpy(filetypes[filetype_count].icon, icon, ICON_LENGTH);
+        }
+        else 
+            filetypes[filetype_count].icon = NOICON;
+#else
+        filetypes[filetype_count].icon = Icon_Unknown;
+#endif
+        filetype_count++;
     }
+}
 
+int filetype_get_attr(const char* file)
+{
+    char *extension = strrchr(file, '.');
+    int i;
+    if (!extension)
+        return 0;
+    extension++;
+    for (i=0; i<filetype_count; i++)
+    {
+        if (filetypes[i].extension && 
+            !strcasecmp(extension, filetypes[i].extension))
+            return (filetypes[i].attr<<8)&TREE_ATTR_MASK;
+    }
     return 0;
 }
 
-/* fill a menu list with viewers (used in onplay.c) */
-int filetype_load_menu(struct menu_item*  menu,int max_items)
+static int find_attr(int attr)
 {
     int i;
-    char *cp;
-    int cnt=0;
+    /* skip the directory item */
+    if ((attr & ATTR_DIRECTORY)==ATTR_DIRECTORY)
+        return 0;
+    for (i=1; i<filetype_count; i++)
+    {
+        if ((attr>>8) == filetypes[i].attr)
+            return i;
+    }
+    return -1;
+}
 
-    for (i=0; i < cnt_filetypes; i++)
+ICON filetype_get_icon(int attr)
+{
+    int index = find_attr(attr);
+    if (index < 0)
+        return NOICON;
+    return (ICON)filetypes[index].icon;
+}
+
+char* filetype_get_plugin(const struct entry* file)
+{
+    static char plugin_name[MAX_PATH];
+    int index = find_attr(file->attr);
+    if (index < 0)
+        return NULL;
+    snprintf(plugin_name, MAX_PATH, "%s/%s.%s", 
+             filetypes[index].viewer? VIEWERS_DIR: PLUGIN_DIR,
+                        filetypes[index].plugin, ROCK_EXTENSION);
+    return plugin_name;
+}
+
+bool  filetype_supported(int attr)
+{
+    return find_attr(attr) >= 0;
+}
+
+int filetype_list_viewers(const char* current_file)
+{
+    int i, count = 0;
+    char *strings[MAX_FILETYPES/2];
+    struct menu_callback_with_desc cb_and_desc = 
+        { NULL, ID2P(LANG_ONPLAY_OPEN_WITH), Icon_Plugin };
+    struct menu_item_ex menu;
+    
+    for (i=0; i<filetype_count && count < (MAX_FILETYPES/2); i++)
     {
         if (filetypes[i].plugin)
         {
             int j;
-            for (j=0;j<cnt;j++) /* check if the plugin is in the list yet */
+            for (j=0;j<count;j++) /* check if the plugin is in the list yet */
             {
-                if (!strcmp(menu[j].desc,filetypes[i].plugin))
+                if (!strcmp(strings[j], filetypes[i].plugin))
                     break;
             }
-            if (j<cnt) continue; /* it is so grab the next plugin */
-            cp=strrchr(filetypes[i].plugin,'/');
-            if (cp) cp++;
-            else    cp=filetypes[i].plugin;
-            menu[cnt].desc = (unsigned char *)cp;
-            cnt++;
-            if (cnt == max_items)
-                break;
+            if (j<count) 
+                continue; /* it is so grab the next plugin */
+            strings[count] = filetypes[i].plugin;
+            count++;
         }
     }
-    return cnt;
+#ifndef HAVE_LCD_BITMAP
+    if (count == 0)
+    {
+        /* FIX: translation! */
+        gui_syncsplash(HZ*2, (unsigned char *)"No viewers found");
+        return PLUGIN_OK;
+    }
+#endif
+    menu.flags = MT_RETURN_ID|MENU_HAS_DESC|MENU_ITEM_COUNT(count);
+    menu.strings = (const char**)strings;
+    menu.callback_and_desc = &cb_and_desc;
+    i = do_menu(&menu, NULL);
+    if (i >= 0)
+        return filetype_load_plugin(strings[i], (void*)current_file);
+    return i;
 }
 
-/* start a plugin with an argument (called from onplay.c) */
 int filetype_load_plugin(const char* plugin, char* file)
 {
     int fd;
-    snprintf(plugin_name,sizeof(plugin_name),"%s/%s.rock",
-             VIEWERS_DIR,plugin);
+    char plugin_name[MAX_PATH];
+    snprintf(plugin_name, sizeof(plugin_name), "%s/%s.%s",
+             VIEWERS_DIR, plugin, ROCK_EXTENSION);
     if ((fd = open(plugin_name,O_RDONLY))>=0)
     {
         close(fd);
@@ -278,8 +333,8 @@ int filetype_load_plugin(const char* plugin, char* file)
     }
     else
     { 
-        snprintf(plugin_name,sizeof(plugin_name),"%s/%s.rock",
-             PLUGIN_DIR,plugin);
+        snprintf(plugin_name, sizeof(plugin_name), "%s/%s.%s",
+                 PLUGIN_DIR, plugin, ROCK_EXTENSION);
         if ((fd = open(plugin_name,O_RDONLY))>=0)
         {
             close(fd);
@@ -287,540 +342,4 @@ int filetype_load_plugin(const char* plugin, char* file)
         }
     }
     return PLUGIN_ERROR;
-}
-
-/* get index to filetypes[] from the file attribute */
-static int find_attr_index(int attr)
-{
-    int ix;
-    ix = ((attr & FILETYPES_MASK) >> 8);
-
-    if ((attr & ATTR_DIRECTORY)==ATTR_DIRECTORY)
-    {
-        ix=0;
-    }
-    else
-    {
-        if (ix==0)
-            ix=-1;
-        if (ix > cnt_filetypes)
-            ix=-1;
-        else
-            if ((filetypes[ix].plugin == NULL) &&
-#ifdef HAVE_LCD_BITMAP
-                (filetypes[ix].icon == NULL)
-#else
-                (filetypes[ix].icon == -1)
-#endif
-                )
-                ix=-1;
-    }
-
-    return ix;
-}
-
-/* scan the plugin directory and register filetypes */
-static void scan_plugins(void)
-{
-    DIR *dir;
-    struct dirent *entry;
-    char* cp;
-    char* dot;
-    char* dash;
-    int   ix;
-    int   i;
-    bool  found;
-
-    dir = opendir(VIEWERS_DIR);
-    if(!dir)
-        return;
-
-    while (true)
-    {
-        /* exttypes[] full, bail out */
-        if (cnt_exttypes >= MAX_EXTTYPES)
-        {
-            gui_syncsplash(HZ, str(LANG_FILETYPES_EXTENSION_FULL));
-            break;
-        }
-
-        /* filetypes[] full, bail out */
-        if (cnt_filetypes >= MAX_FILETYPES)
-        {
-            gui_syncsplash(HZ, str(LANG_FILETYPES_FULL));
-            break;
-        }
-
-        entry = readdir(dir);
-
-        if (!entry)
-            break;
-
-        /* skip directories */
-        if ((entry->attribute & ATTR_DIRECTORY))
-            continue;
-
-        /* Skip FAT volume ID */
-        if (entry->attribute & ATTR_VOLUME_ID)
-            continue;
-
-        /* filter out dotfiles and hidden files */
-        if ((entry->d_name[0]=='.') ||
-            (entry->attribute & ATTR_HIDDEN)) {
-            continue;
-        }
-
-        /* filter out non rock files */
-        if (strcasecmp((char *)&entry->d_name[strlen((char *)entry->d_name) -
-                                              sizeof(ROCK_EXTENSION) + 1],
-                       ROCK_EXTENSION)) {
-            continue;
-        }
-
-        /* filter out to long filenames */
-        if (strlen((char *)entry->d_name) > MAX_PLUGIN_LENGTH + 5)
-        {
-            gui_syncsplash(HZ, str(LANG_FILETYPES_PLUGIN_NAME_LONG));
-            continue;
-        }
-
-        dot=strrchr((char *)entry->d_name,'.');
-        *dot='\0';
-        dash=strchr((char *)entry->d_name,'-');
-
-        /* add plugin and extension */
-        if (dash)
-        {
-            *dash='\0';
-            ix=(filetype_get_attr((char *)entry->d_name) >> 8);
-            if (!ix)
-            {
-                cp=get_string((char *)entry->d_name);
-                if (cp)
-                {
-                    exttypes[cnt_exttypes].extension=cp;
-                    exttypes[cnt_exttypes].type=&filetypes[cnt_filetypes];
-#ifdef HAVE_LCD_BITMAP
-                    exttypes[cnt_exttypes].type->icon = bitmap_icons_6x8[Icon_Plugin];
-#else
-                    exttypes[cnt_exttypes].type->icon = Icon_Plugin;
-#endif
-                    cnt_exttypes++;
-
-                    *dash='-';
-                    cp=get_string((char *)entry->d_name);
-                    if (cp)
-                    {
-                        filetypes[cnt_filetypes].plugin=cp;
-                        cnt_filetypes++;
-                    }
-                    else
-                        break;
-                }
-                else
-                    break;
-            }
-            else
-            {
-                *dash='-';
-                if (!filetypes[ix].plugin)
-                {
-                    cp=get_string((char *)entry->d_name);
-                    if (cp)
-                    {
-                        filetypes[cnt_filetypes].plugin=cp;
-                        cnt_filetypes++;
-                    }
-                    else
-                        break;
-                }
-            }
-            *dash='-';
-        }
-        /* add plugin only */
-        else
-        {
-            found=false;
-            for (i = first_soft_filetype; i < cnt_filetypes; i++)
-            {
-                if (filetypes[i].plugin)
-                    if (!strcasecmp(filetypes[i].plugin, (char *)entry->d_name))
-                    {
-                        found=true;
-                        break;
-                    }
-            }
-
-            if (!found)
-            {
-                cp=get_string((char *)entry->d_name);
-                if (cp)
-                {
-                    filetypes[cnt_filetypes].plugin=cp;
-                    filetypes[cnt_filetypes].no_extension=true;
-                    cnt_filetypes++;
-                }
-                else
-                    break;
-            }
-        }
-        *dot='.';
-    }
-    closedir(dir);
-}
-
-#ifdef HAVE_LCD_BITMAP
-static int add_plugin(char *plugin, char *icon)
-#else
-static int add_plugin(char *plugin)
-#endif
-{
-    char *cp;
-    int i;
-
-    if (!plugin)
-        return 0;
-
-#if 0
-    /* starting now, Oct 2005, the plugins are given without extension in the
-       viewers.config file */
-    cp=strrchr(plugin, '.');
-    if (cp)
-        *cp='\0';
-#endif
-
-    for (i=first_soft_filetype; i < cnt_filetypes; i++)
-    {
-        if (filetypes[i].plugin)
-        {
-            if (!strcasecmp(plugin, filetypes[i].plugin))
-            {
-#ifdef HAVE_LCD_BITMAP
-                if (filetypes[i].icon == NULL && icon)
-                {
-                    cp = string2icon(icon);
-                    if (cp)
-                        filetypes[cnt_filetypes].icon = (unsigned char *)cp;
-                    else
-                        return 0;
-                }
-#endif
-                return i;
-            }
-        }
-    }
-
-    /* new plugin */
-    cp = get_string(plugin);
-    if (cp)
-    {
-        filetypes[cnt_filetypes].plugin = cp;
-#ifdef HAVE_LCD_BITMAP
-        /* add icon */
-        if (icon)
-        {
-            cp = string2icon(icon);
-            if (cp)
-                filetypes[cnt_filetypes].icon = (unsigned char *)cp;
-            else
-                return 0;
-        }
-#endif
-    }
-    else
-    {
-        return 0;
-    }
-
-    cnt_filetypes++;
-    return cnt_filetypes - 1;
-}
-
-/* read config file (or cahe file) */
-static bool read_config(const char* file)
-{
-    enum {extension,
-          plugin,
-#ifdef HAVE_LCD_BITMAP
-          icon,
-#endif
-          last};
-
-    int   i,ix;
-    int   fd;
-    char* end;
-    char* cp;
-    char* str[last];
-    char   buf[80];
-
-    fd = open(file, O_RDONLY);
-    if (fd < 0)
-        return false;
-
-    while (read_line(fd, buf, sizeof(buf)))
-    {
-        if (cnt_exttypes >= MAX_EXTTYPES)
-        {
-            gui_syncsplash(HZ, str(LANG_FILETYPES_EXTENSION_FULL));
-            break;
-        }
-
-        if (cnt_filetypes >= MAX_FILETYPES)
-        {
-            gui_syncsplash(HZ, str(LANG_FILETYPES_FULL));
-            break;
-        }
-
-        /* parse buffer */
-        rm_whitespaces(buf);
-
-        if (strlen(buf) == 0)
-            continue;
-
-        if (buf[0] == '#')
-            continue;
-
-        memset(str,0,sizeof(str));
-        i=0;
-        cp=buf;
-        while (*cp==',') {
-            cp++;
-            i++;
-        }
-        str[i] = strtok_r(cp, ",", &end);
-        i++;
-
-        while (end && i < last)
-        {
-            if (end)
-            {
-                cp=end;
-                while (*cp==',') {
-                    cp++;
-                    i++;
-                }
-            }
-            str[i] = strtok_r(NULL, ",", &end);
-            if (str[i])
-                if (!strlen(str[i]))
-                    str[i]=NULL;
-            i++;
-        }
-
-        /* bail out if no icon and no plugin */
-        if (!str[plugin]
-#ifdef HAVE_LCD_BITMAP
-            && !str[icon]
-#endif
-           )
-            continue;
-
-        /* bail out if no plugin and icon is incorrect*/
-        if (!str[plugin]
-#ifdef HAVE_LCD_BITMAP
-            && strlen(str[icon]) != ICON_LENGTH*2
-#endif
-           )
-            continue;
-
-        /* bail out if no icon and no plugin and no extension*/
-        if (!str[plugin] &&
-#ifdef HAVE_LCD_BITMAP
-            !str[icon] &&
-#endif
-            !str[extension])
-            continue;
-
-        /* bail out if we are not able to start plugin from onplay.c ?*/
-        if (str[plugin])
-        {
-            if (strlen(str[plugin]) > MAX_PLUGIN_LENGTH)
-            {
-                gui_syncsplash(HZ, str(LANG_FILETYPES_PLUGIN_NAME_LONG));
-                str[plugin] = NULL;
-                continue;
-            }
-        }
-
-        ix=0;
-        /* if extension already exist don't add a new one */
-        for (i=0; i < cnt_exttypes; i++)
-        {
-            if (!strcasecmp(str[extension],exttypes[i].extension))
-            {
-#ifdef HAVE_LCD_BITMAP
-                ix=add_plugin(str[plugin],NULL);
-                if (ix)
-                {
-                    if (str[icon] && filetypes[ix].icon == NULL)
-                    {
-                        if (exttypes[i].type->icon == NULL)
-                        {
-                            cp = string2icon(str[icon]);
-                            if (cp)
-                                exttypes[i].type->icon = (unsigned char *)cp;
-                        }
-                    }
-                }
-#else
-                ix=add_plugin(str[plugin]);
-#endif
-                if (exttypes[i].type == NULL)
-                {
-                    exttypes[i].type = &filetypes[ix];
-                }
-                break;
-            }
-        }
-        if (ix)
-            continue;
-
-        /* add extension */
-        if (str[extension])
-        {
-#ifdef HAVE_LCD_BITMAP
-            ix=add_plugin(str[plugin],str[icon]);
-#else
-            ix=add_plugin(str[plugin]);
-#endif
-            if (ix)
-            {
-                cp=get_string(str[extension]);
-                if (cp)
-                {
-                    exttypes[cnt_exttypes].extension = cp;
-
-                    exttypes[cnt_exttypes].type = &filetypes[ix];
-                    cnt_exttypes++;
-                    filetypes[i].no_extension=false;
-                }
-                else
-                {
-                    break;
-                }
-            }
-            else
-            {
-                break;
-            }
-        }
-        else
-        {
-#ifdef HAVE_LCD_BITMAP
-            ix=add_plugin(str[plugin],str[icon]);
-#else
-            ix=add_plugin(str[plugin]);
-#endif
-            filetypes[ix].no_extension=true;
-            if (!i)
-                break;
-        }
-    }
-    close(fd);
-
-    return true;
-}
-
-#ifdef HAVE_LCD_BITMAP
-/* convert an ascii hexadecimal icon to a binary icon */
-static char* string2icon(const char* str)
-{
-    char tmp[ICON_LENGTH*2];
-    char *cp;
-    int i;
-
-    if (strlen(str)!=ICON_LENGTH*2)
-        return NULL;
-
-    if ((sizeof(string_buffer) +
-         (unsigned long) string_buffer -
-         (unsigned long) next_free_string) < ICON_LENGTH)
-    {
-        gui_syncsplash(HZ, str(LANG_FILETYPES_STRING_BUFFER_EMPTY));
-        return NULL;
-    }
-
-    for (i=0; i<12; i++)
-    {
-        if (str[i] >= '0' && str[i] <= '9')
-        {
-            tmp[i]=str[i]-'0';
-            continue;
-        }
-
-        if (str[i] >= 'a' && str[i] <= 'f')
-        {
-            tmp[i]=str[i]-'a'+10;
-            continue;
-        }
-
-        if (str[i] >= 'A' && str[i] <= 'F')
-        {
-            tmp[i]=str[i]-'A'+10;
-            continue;
-        }
-
-        return NULL;
-    }
-
-    cp=next_free_string;
-    for (i = 0; i < ICON_LENGTH; i++)
-        cp[i]=((tmp[i*2]<<4) | tmp[i*2+1]);
-
-    next_free_string=&next_free_string[ICON_LENGTH];
-    return cp;
-}
-#endif
-
-/* get string from buffer */
-static char* get_string(const char* str)
-{
-    unsigned int l=strlen(str)+1;
-    char* cp;
-
-    if (!str)
-        return NULL;
-
-    if (l <= (sizeof(string_buffer) +
-             (unsigned long) string_buffer -
-             (unsigned long) next_free_string))
-    {
-        strcpy(next_free_string, str);
-        cp=next_free_string;
-        next_free_string=&next_free_string[l];
-        return cp;
-    }
-    else
-    {
-        gui_syncsplash(HZ, str(LANG_FILETYPES_STRING_BUFFER_EMPTY));
-        return NULL;
-    }
-}
-
-/* remove all white spaces from string */
-static void rm_whitespaces(char* str)
-{
-    char *cp, *free;
-
-    cp=str;
-    free=cp;
-
-    while (cp < &str[strlen(str)])
-    {
-        switch (*cp)
-        {
-            case ' '  :
-            case '\t' :
-            case '\r' :
-                break;
-
-            default:
-                *free=*cp;
-                free++;
-                break;
-        }
-        cp++;
-    }
-
-    *free='\0';
 }

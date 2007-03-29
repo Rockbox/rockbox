@@ -56,14 +56,16 @@
 #define WPS_DIR     ROCKBOX_DIR "/wps"
 #define THEME_DIR   ROCKBOX_DIR "/themes"
 #define PLUGIN_DIR  ROCKBOX_DIR "/rocks"
+#define VIEWERS_DIR  ROCKBOX_DIR "/viewers"
 #define BACKDROP_DIR ROCKBOX_DIR "/backdrops"
 #define REC_BASE_DIR "/recordings"
 #define EQS_DIR     ROCKBOX_DIR "/eqs"
 #define CODECS_DIR  ROCKBOX_DIR"/codecs"
 #define FMPRESET_PATH ROCKBOX_DIR "/fmpresets"
 
-#define CONFIGFILE  ROCKBOX_DIR "/config.cfg"
-#define FIXEDSETTINGSFILE  ROCKBOX_DIR "/fixed.cfg"
+#define VIEWERS_CONFIG      ROCKBOX_DIR "/viewers.config"
+#define CONFIGFILE          ROCKBOX_DIR "/config.cfg"
+#define FIXEDSETTINGSFILE   ROCKBOX_DIR "/fixed.cfg"
 
 #define MAX_FILENAME 32
 

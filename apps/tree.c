@@ -259,7 +259,6 @@ void browse_root(void)
 {
     gui_sync_wps_screen_init();
 
-    filetype_init();
     check_rockboxdir();
 
     strcpy(tc.currdir, "/");

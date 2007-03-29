@@ -125,28 +125,9 @@ static bool bookmark_menu(void)
 
 static bool list_viewers(void)
 {
-    struct menu_item menu[16];
-    int m, i, result;
-    int ret = 0;
-
-    i=filetype_load_menu(menu,sizeof(menu)/sizeof(*menu));
-    if (i)
-    {
-        m = menu_init( menu, i, NULL, NULL, NULL, NULL );
-        result = menu_show(m);
-        menu_exit(m);
-        if (result >= 0)
-            ret = filetype_load_plugin((char *)menu[result].desc,selected_file);
-    }
-    else
-    {
-        /* FIX: translation! */
-        gui_syncsplash(HZ*2, (unsigned char *)"No viewers found");
-    }
-
+    int ret = filetype_list_viewers(selected_file);
     if (ret == PLUGIN_USB_CONNECTED)
         onplay_result = ONPLAY_RELOAD_DIR;
-
     return false;
 }
 

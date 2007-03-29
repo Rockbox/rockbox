@@ -24,9 +24,11 @@
  * char-based displays and bitmap displays */
 #ifdef HAVE_LCD_BITMAP
 typedef const unsigned char * ICON;
+typedef unsigned char * ICON_NO_CONST;
 #define NOICON NULL
 #else
 typedef long ICON;
+#define ICON_NO_CONST ICON
 #define NOICON -1
 #endif
 

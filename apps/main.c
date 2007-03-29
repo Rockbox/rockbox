@@ -29,6 +29,7 @@
 #include "kernel.h"
 #include "button.h"
 #include "tree.h"
+#include "filetypes.h"
 #include "panic.h"
 #include "menu.h"
 #include "system.h"
@@ -258,6 +259,7 @@ static void init(void)
 #endif
     sleep(HZ/2);
     tree_init();
+    filetype_init();
     playlist_init();
 
 #if CONFIG_CODEC != SWCODEC
@@ -490,6 +492,7 @@ static void init(void)
     status_init();
     playlist_init();
     tree_init();
+    filetype_init();
     scrobbler_init();
     cuesheet_init();
 

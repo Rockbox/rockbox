@@ -22,32 +22,24 @@
 #include <stdbool.h>
 #include <tree.h>
 #include <menu.h>
-
-int filetype_get_attr(const char*);
-#ifdef HAVE_LCD_BITMAP
-const unsigned char* filetype_get_icon(int);
-#else
-int   filetype_get_icon(int);
-#endif
-char* filetype_get_plugin(const struct entry*);
+/* init the filetypes structs.
+   uses audio buffer for storage, so call early in init... */
 void  filetype_init(void);
-bool  filetype_supported(int);
-int   filetype_load_menu(struct menu_item*, int);
-int   filetype_load_plugin(const char*, char*);
 
-struct file_type {
-#ifdef HAVE_LCD_BITMAP
-    const unsigned char* icon; /* the icon which shall be used for it, NULL if unknown */
-#else
-    int icon; /* the icon which shall be used for it, -1 if unknown */
-#endif
-    char* plugin; /* Which plugin to use, NULL if unknown */
-    bool  no_extension;
-};
+/* Return the attribute (TREE_ATTR_*) of the file */
+int filetype_get_attr(const char* file);
+ICON filetype_get_icon(int attr);
+/* return the plugin filename associated with the file */
+char* filetype_get_plugin(const struct entry* file);
 
-struct ext_type {
-    char* extension; /* extension for which the file type is recognized */
-    struct file_type*  type;
-};
+/* returns true if the attr is supported */
+bool  filetype_supported(int attr);
+
+/* List avialable viewers */
+int filetype_list_viewers(const char* current_file);
+
+/* start a plugin with file as the argument (called from onplay.c) */
+int filetype_load_plugin(const char* plugin, char* file);
+
 
 #endif
