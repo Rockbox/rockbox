@@ -283,13 +283,13 @@
   desc: in the main menu
   user:
   <source>
-    *: "Playlist Options"
+    *: "Playlist"
   </source>
   <dest>
-    *: "Speellijst opties"
+    *: "Speellijst"
   </dest>
   <voice>
-    *: "Speellijst opties"
+    *: "Speellijst"
   </voice>
 </phrase>
 <phrase>
@@ -784,16 +784,16 @@
 </phrase>
 <phrase>
   id: LANG_FIRMWARE
-  desc: in the main menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Browse Firmwares"
+    *: ""
   </source>
   <dest>
-    *: "Laad andere firmware"
+    *: ""
   </dest>
   <voice>
-    *: "Laad andere firmware"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -835,6 +835,7 @@
     x5: "SELECT = Yes"
     h10: "NEXT = Yes"
     gigabeat: "SELECT = Yes"
+    e200: "SELECT = Yes"
   </source>
   <dest>
     *: "PLAY = Ja"
@@ -843,6 +844,7 @@
     x5: "SELECT = Ja"
     h10: "NEXT = Ja"
     gigabeat: "SELECT = Ja"
+    e200: "SELECT = Ja"
   </dest>
   <voice>
     *: ""
@@ -1931,13 +1933,13 @@
   desc: show ID3 Database
   user:
   <source>
-    *: "ID3 Database"
+    *: "Database"
   </source>
   <dest>
-    *: "ID3 gegevens bestand"
+    *: "Database"
   </dest>
   <voice>
-    *: "ID3 gegevens bestand"
+    *: "Database"
   </voice>
 </phrase>
 <phrase>
@@ -2618,15 +2620,15 @@
   user:
   <source>
     *: "Mic"
-	h100,h120,h300: "Internal Mic"
+    h100,h120,h300: "Internal Mic"
   </source>
   <dest>
     *: "Microfoon"
-	h100,h120,h300: "Interne microfoon"
+    h100,h120,h300: "Interne microfoon"
   </dest>
   <voice>
     *: "Microfoon"
-	h100,h120,h300: "Interne microfoon"
+    h100,h120,h300: "Interne microfoon"
   </voice>
 </phrase>
 <phrase>
@@ -4496,10 +4498,14 @@
   desc: battery level in % and estimated time remaining
   user:
   <source>
-    *: "%d%% %dh %dm"
+    *: "Battery: %d%% %dh %dm"
+    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
-    *: "%d%% %du %dm"
+    *: "Batterij: %d%% %du %dm"
+    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Batterij niveau"
@@ -4783,7 +4789,7 @@
   user:
   <source>
     *: "ON+Play = Delete"
-	h100,h120,h300: "RECORD = Delete"
+    h100,h120,h300: "RECORD = Delete"
     ipod*: "Long MENU = Delete"
     x5: "Long RECORD = Delete"
     h10: "REWIND = Delete"
@@ -4791,7 +4797,7 @@
   </source>
   <dest>
     *: "ON+Play = verwijderen"
-    h100,h120,h300: "ON+NAVI = verwijderen"
+    h100,h120,h300: "RECORD = verwijderen"
     ipod*: "Long MENU = verwijderen"
     x5: "Long RECORD = verwijderen"
     h10: "REWIND = verwijderen"
@@ -4876,7 +4882,7 @@
   desc: used in set_time()
   user:
   <source>
-    *: "ON To Set"
+    *: "ON = Set"
     h100,h120,h300: "NAVI = Set"
     ipod*: "SELECT = Set"
     x5: "SELECT = Set"
@@ -4884,7 +4890,7 @@
     gigabeat: "SELECT = Set"
   </source>
   <dest>
-    *: "ON om in te stellen"
+    *: "ON = instellen"
     h100,h120,h300: "NAVI = instellen"
     ipod*: "SELECT = instellen"
     x5: "SELECT = instellen"
@@ -4900,7 +4906,7 @@
   desc: used in set_time()
   user:
   <source>
-    *: "OFF To Revert"
+    *: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
     ipod*: "MENU = Revert"
     x5: "RECORD = Revert"
@@ -4908,7 +4914,7 @@
     gigabeat: "POWER = Revert"
   </source>
   <dest>
-    *: "OFF om terug te zetten"
+    *: "OFF = terugzetten"
     h100,h120,h300: "STOP = terugzetten"
     ipod*: "MENU = terugzetten"
     x5: "RECORD = terugzetten"
@@ -8422,7 +8428,7 @@
   desc: When you run the radio without an fmr file in settings
   user:
   <source>
-    *: "No Settings found, AutoScan?"
+    *: "No settings found. Autoscan?"
   </source>
   <dest>
     *: "Geen voorkeuze gevonden, zoeken?"
@@ -8529,13 +8535,13 @@
   id: LANG_TAGCACHE_BUSY
   desc: when trying to shutdown and tagcache is committing
   <source>
-    *: "Tagcache is not ready"
+    *: "Database is not ready"
   </source>
   <dest>
-    *: "Tagcache niet klaar"
+    *: "Database niet klaar"
   </dest>
   <voice>
-    *: "Tagcache niet klaar"
+    *: "Database niet klaar"
   </voice>
 </phrase>
 <phrase>
@@ -8585,7 +8591,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Update now"
+    *: "Update Now"
   </source>
   <dest>
     *: "Ververs nu"
@@ -8599,7 +8605,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Auto update"
+    *: "Auto Update"
   </source>
   <dest>
     *: "Automatisch verversen"
@@ -8613,7 +8619,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Export modifications"
+    *: "Export Modifications"
   </source>
   <dest>
     *: "Exporteer wijzigingen"
@@ -8627,7 +8633,7 @@
   desc: in onplay menu
   user:
   <source>
-    *: "Playlist catalog"
+    *: "Playlist Catalog"
   </source>
   <dest>
     *: "Speellijst cataloog"
@@ -8641,7 +8647,7 @@
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "Add to playlist"
+    *: "Add to Playlist"
   </source>
   <dest>
     *: "Voeg toe aan speellijst"
@@ -8655,7 +8661,7 @@
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "Add to new playlist"
+    *: "Add to New Playlist"
   </source>
   <dest>
     *: "Voeg toe aan nieuwe speellijst"
@@ -8669,7 +8675,7 @@
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "View catalog"
+    *: "View Catalog"
   </source>
   <dest>
     *: "Toon catalogus"
@@ -8697,7 +8703,7 @@
   desc: error message when no playlists for playlist catalog
   user:
   <source>
-    *: "No playlists"
+    *: "No Playlists"
   </source>
   <dest>
     *: "Geen speellijsten"
@@ -8711,7 +8717,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Import modifications"
+    *: "Import Modifications"
   </source>
   <dest>
     *: "Importeer wijzigingen"
@@ -9197,13 +9203,13 @@
   desc: show ID3 Database
   user:
   <source>
-    *: "ID3 Database"
+    *: "Database"
   </source>
   <dest>
-    *: "ID3 gegevens bestand"
+    *: "Database"
   </dest>
   <voice>
-    *: "ID3 gegevens bestand"
+    *: "Database"
   </voice>
 </phrase>
 <phrase>
@@ -9253,13 +9259,13 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Mic"
+    *: "Int. Mic"
   </source>
   <dest>
-    *: "Microfoon"
+    *: "Int. Microfoon"
   </dest>
   <voice>
-    *: "Microfoon"
+    *: "Int. Microfoon"
   </voice>
 </phrase>
 <phrase>
@@ -9830,7 +9836,7 @@
 </phrase>
 <phrase>
   id: VOICE_KBIT_PER_SEC
-  desc: spoken only, for file extension
+  desc: spoken only, a unit postfix
   user:
   <source>
     *: ""
