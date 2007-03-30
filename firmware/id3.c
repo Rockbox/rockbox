@@ -308,7 +308,7 @@ static int read_unsynched(int fd, void *buf, int len)
     while(remaining) {
         rp = wp;
         rc = read(fd, rp, remaining);
-        if(rc < 0)
+        if(rc <= 0)
             return rc;
 
         i = unsynchronize(wp, remaining, &global_ff_found);
@@ -329,7 +329,7 @@ static int skip_unsynched(int fd, int len)
     while(remaining) {
         rlen = MIN(sizeof(buf), (unsigned int)remaining);
         rc = read(fd, buf, rlen);
-        if(rc < 0)
+        if(rc <= 0)
             return rc;
 
         remaining -= unsynchronize(buf, rlen, &global_ff_found);
