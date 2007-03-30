@@ -296,13 +296,16 @@ void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
 #define CSUB_X 2
 #define CSUB_Y 2
 
-#define RYFAC (31*257)
-#define GYFAC (63*257)
-#define BYFAC (31*257)
-#define RVFAC 11170     /* 31 * 257 *  1.402    */
-#define GVFAC (-11563)  /* 63 * 257 * -0.714136 */
-#define GUFAC (-5572)   /* 63 * 257 * -0.344136 */
-#define BUFAC 14118     /* 31 * 257 *  1.772    */
+#define RFULL (31*257)
+#define GFULL (63*257)
+#define BFULL (31*257)
+#define RYFAC 9277     /* 31 * 257 *  1.0      * (255/219) */
+#define GYFAC 18853    /* 63 * 257 *  1.0      * (255/219) */
+#define BYFAC 9277     /* 31 * 257 *  1.0      * (255/219) */
+#define RVFAC 12716    /* 31 * 257 *  1.402    * (255/224) */
+#define GVFAC (-13163) /* 63 * 257 * -0.714136 * (255/224) */
+#define GUFAC (-6343)  /* 63 * 257 * -0.344136 * (255/224) */
+#define BUFAC 16071    /* 31 * 257 *  1.772    * (255/224) */
 
 #define ROUNDOFFS (127*257)
 
@@ -342,31 +345,31 @@ void lcd_yuv_blit(unsigned char * const src[3],
 
         do
         {
-            y = *ysrc++;
+            y = *ysrc++ - 16;
             red   = RYFAC * y + rc;
             green = GYFAC * y + gc;
             blue  = BYFAC * y + bc;
 
-            if ((unsigned)red > (RYFAC*255+ROUNDOFFS))
+            if ((unsigned)red > (RFULL*255+ROUNDOFFS))
             {
                 if (red < 0)
                     red = 0;
                 else
-                    red = (RYFAC*255+ROUNDOFFS);
+                    red = (RFULL*255+ROUNDOFFS);
             }
-            if ((unsigned)green > (GYFAC*255+ROUNDOFFS))
+            if ((unsigned)green > (GFULL*255+ROUNDOFFS))
             {
                 if (green < 0)
                     green = 0;
                 else
-                    green = (GYFAC*255+ROUNDOFFS);
+                    green = (GFULL*255+ROUNDOFFS);
             }
-            if ((unsigned)blue > (BYFAC*255+ROUNDOFFS))
+            if ((unsigned)blue > (BFULL*255+ROUNDOFFS))
             {
                 if (blue < 0)
                     blue = 0;
                 else
-                    blue = (BYFAC*255+ROUNDOFFS);
+                    blue = (BFULL*255+ROUNDOFFS);
             }
             rbits = ((unsigned)red) >> 16 ;
             gbits = ((unsigned)green) >> 16 ;
