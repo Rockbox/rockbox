@@ -61,6 +61,12 @@
 
 #include "misc.h"
 
+#ifdef BOOTFILE
+#include "textarea.h"
+#include "rolo.h"
+#include "yesno.h"
+#endif
+
 /* Format a large-range value for output, using the appropriate unit so that
  * the displayed value is in the range 1 <= display < 1000 (1024 for "binary"
  * units) if possible, and 3 significant digits are shown. If a buffer is
@@ -766,7 +772,13 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
             {
                 scrobbler_flush_cache();
                 system_flush();
+#ifdef BOOTFILE
+                check_bootfile(false); /* gets initial size */
+#endif
                 usb_screen();
+#ifdef BOOTFILE
+                check_bootfile(true);
+#endif
                 system_restore();
             }
             return SYS_USB_CONNECTED;
@@ -855,5 +867,50 @@ int get_replaygain_mode(bool have_track_gain, bool have_album_gain)
         : have_track_gain ? REPLAYGAIN_TRACK : -1;
     
     return type;
+}
+#endif
+
+#ifdef BOOTFILE
+/*
+    memorize/compare details about the BOOTFILE
+    we don't use dircache because it may not be up to date after
+    USB disconnect (scanning in the background)
+*/
+void check_bootfile(bool do_rolo)
+{
+    static int boot_size = 0;
+    static int boot_cluster = 0;
+    DIR* dir = NULL;
+    struct dirent* entry = NULL;
+
+    /* 1. open ROCKBOX_DIR and find the BOOTFILE dir entry */
+    dir = opendir(ROCKBOX_DIR);
+
+    if(!dir) return; /* do we want an error splash? */
+
+    /* loop all files in ROCKBOX_DIR */
+    while(0 != (entry = readdir(dir)))
+    {
+        if(!strcasecmp(entry->d_name, BOOTFILE))
+        {
+            /* found the bootfile */
+            if(boot_size && do_rolo)
+            {
+                if((entry->size != boot_size) ||
+                   (entry->startcluster != boot_cluster))
+                {
+                    char *lines[] = { str(LANG_BOOT_CHANGED),
+                                      str(LANG_REBOOT_NOW) };
+                    struct text_message message={ lines, 2 };
+                    button_clear_queue(); /* Empty the keyboard buffer */
+                    if(gui_syncyesno_run(&message, NULL, NULL) == YESNO_YES)
+                    rolo_load(ROCKBOX_DIR "/" BOOTFILE);
+                }
+            }
+            boot_size = entry->size;
+            boot_cluster = entry->startcluster;
+        }
+    }
+    closedir(dir);
 }
 #endif

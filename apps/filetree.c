@@ -50,16 +50,9 @@
 #include "radio.h"
 #endif
 
-#ifndef SIMULATOR
-static int boot_size = 0;
-static int boot_cluster;
-#endif
-
 #if LCD_DEPTH > 1
 #include "backdrop.h"
 #endif
-
-extern bool boot_changed;
 
 int ft_build_playlist(struct tree_context* c, int start_index)
 {
@@ -265,19 +258,6 @@ int ft_load(struct tree_context* c, const char* tempdir)
         /* check for known file types */
         if ( !(dptr->attr & ATTR_DIRECTORY) )
             dptr->attr |= filetype_get_attr((char *)entry->d_name);
-
-#ifdef BOOTFILE
-        /* memorize/compare details about the boot file */
-        if ((c->currdir[1] == 0) && !strcasecmp(entry->d_name, BOOTFILE)) {
-            if (boot_size) {
-                if ((entry->size != boot_size) ||
-                    (entry->startcluster != boot_cluster))
-                    boot_changed = true;
-            }
-            boot_size = entry->size;
-            boot_cluster = entry->startcluster;
-        }
-#endif
 
         /* filter out non-visible files */
         if ((!(dptr->attr & ATTR_DIRECTORY) && (

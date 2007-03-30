@@ -269,21 +269,6 @@ static const struct root_items items[] = {
 };
 static const int nb_items = sizeof(items)/sizeof(*items);
 
-#ifdef BOOTFILE
-extern bool boot_changed; /* from tree.c */
-static void check_boot(void)
-{
-    if (boot_changed) {
-        char *lines[]={str(LANG_BOOT_CHANGED), str(LANG_REBOOT_NOW)};
-        struct text_message message={lines, 2};
-        if(gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
-            rolo_load("/" BOOTFILE);
-        boot_changed = false;
-    }
-}
-#else
-# define check_boot()
-#endif
 int item_callback(int action, const struct menu_item_ex *this_item) ;
 
 MENUITEM_RETURNVALUE(file_browser, ID2P(LANG_DIR_BROWSER), GO_TO_FILEBROWSER,
@@ -443,7 +428,6 @@ void root_menu(void)
         {
             case MENU_ATTACHED_USB:
             case MENU_SELECTED_EXIT:
-                check_boot();
                 /* fall through */
             case GO_TO_ROOT:
                 if (last_screen != GO_TO_ROOT)

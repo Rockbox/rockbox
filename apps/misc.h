@@ -99,4 +99,8 @@ extern int show_logo(void);
 int get_replaygain_mode(bool have_track_gain, bool have_album_gain);
 #endif
 
+#ifdef BOOTFILE
+void check_bootfile(bool do_rolo);
+#endif
+
 #endif /* MISC_H */
