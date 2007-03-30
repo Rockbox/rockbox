@@ -100,7 +100,9 @@ int get_replaygain_mode(bool have_track_gain, bool have_album_gain);
 #endif
 
 #ifdef BOOTFILE
+#ifndef USB_IPODSTYLE
 void check_bootfile(bool do_rolo);
+#endif
 #endif
 
 #endif /* MISC_H */

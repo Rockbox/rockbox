@@ -62,9 +62,11 @@
 #include "misc.h"
 
 #ifdef BOOTFILE
+#ifndef USB_IPODSTYLE
 #include "textarea.h"
 #include "rolo.h"
 #include "yesno.h"
+#endif
 #endif
 
 /* Format a large-range value for output, using the appropriate unit so that
@@ -773,11 +775,15 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
                 scrobbler_flush_cache();
                 system_flush();
 #ifdef BOOTFILE
+#ifndef USB_IPODSTYLE
                 check_bootfile(false); /* gets initial size */
+#endif
 #endif
                 usb_screen();
 #ifdef BOOTFILE
+#ifndef USB_IPODSTYLE
                 check_bootfile(true);
+#endif
 #endif
                 system_restore();
             }
@@ -871,6 +877,7 @@ int get_replaygain_mode(bool have_track_gain, bool have_album_gain)
 #endif
 
 #ifdef BOOTFILE
+#ifndef USB_IPODSTYLE
 /*
     memorize/compare details about the BOOTFILE
     we don't use dircache because it may not be up to date after
@@ -913,4 +920,5 @@ void check_bootfile(bool do_rolo)
     }
     closedir(dir);
 }
+#endif
 #endif
