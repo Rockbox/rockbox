@@ -251,13 +251,6 @@ const char* const dir_thumbnail_name = "_dirname.talk";
 const char* const file_thumbnail_ext = ".talk";
 #endif
 
-/* FIXME: this shoudn't be a stub, rather the real thing.
-   I'm afraid on Win32/X11 it'll be hard to kill a thread from outside. */
-void remove_thread(int threadnum)
-{
-    (void)threadnum;
-}
-
 /* assure an unused place to direct virtual pointers to */
 #define VIRT_SIZE 0xFFFF /* more than enough for our string ID range */
 unsigned char vp_dummy[VIRT_SIZE];

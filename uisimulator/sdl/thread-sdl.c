@@ -93,3 +93,8 @@ void init_threads(void)
         exit(-1);
     }
 }
+
+void remove_thread(struct thread_entry *thread)
+{
+    SDL_KillThread((SDL_Thread*) thread);
+}
