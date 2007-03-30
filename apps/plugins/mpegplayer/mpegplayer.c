@@ -512,10 +512,17 @@ static void get_next_data( Stream* str )
                 pts = (((ptsbuf[-1] >> 1) << 30) |
                        (ptsbuf[0] << 22) | ((ptsbuf[1] >> 1) << 15) |
                        (ptsbuf[2] << 7) | (ptsbuf[3] >> 1));
+
+                if (str->first_pts==0)
+                    str->first_pts = pts;
+
+                str->curr_pts = pts;
+
                 dts = (((ptsbuf[-1] & 0xf0) != 0x30) ? pts :
                        ((uint32_t)(((ptsbuf[4] >> 1) << 30) |
                     (ptsbuf[5] << 22) | ((ptsbuf[6] >> 1) << 15) |
                     (ptsbuf[7] << 7) | (ptsbuf[18] >> 1))));
+
                 if( stream >= 0xe0 )    
                     mpeg2_tag_picture (mpeg2dec, pts, dts);
             }
@@ -717,7 +724,8 @@ static void audio_thread(void)
             apts_samples = (audio_str.curr_pts-audio_str.first_pts);
             apts_samples *= 44100;
             apts_samples /= 90000;
-            delay=(int)(avdelay+apts_samples-samplesdecoded);
+            delay = (int)(avdelay+apts_samples-samplesdecoded);
+            //DEBUGF("delay=%d\n",delay);
         }
 
         if (framelength > 0) {
@@ -902,10 +910,11 @@ static void video_thread(void)
                     }              
                 }
 
-                /* If we are more than 1/20 second behind schedule (and 
-                   more than 1/20 second into the decoding), skip frame */
-                if (settings.skipframes && (s > (44100/20)) && 
-                   (eta2 < (s - (44100/20))) && (skipcount < 10)) {
+                /* If we are more than 3/20 second behind schedule (and 
+                   more than 3/20 second into the decoding), skip frame.
+                   But don't skip more than 10 consecutive frames.  */
+                if (settings.skipframes && (s > ((3*44100)/20)) && 
+                   (eta2 < (s - ((3*44100)/20))) && (skipcount < 10)) {
                     skipped++;
                     skipcount++;
                 } else {
