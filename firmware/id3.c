@@ -697,15 +697,12 @@ static void setid3v2title(int fd, struct mp3entry *entry)
         if(version == ID3_VER_2_3) {
             if(10 != read(fd, header, 10))
                 return;
-            /* The 2.3 extended header size doesn't include the following
-               data, so we have to find out the size by checking the flags.
-               Also, it is not unsynched. */
-            framelen = bytes2int(header[0], header[1], header[2], header[3]) +
-                bytes2int(header[6], header[7], header[8], header[9]);
-            flags = bytes2int(0, 0, header[4], header[5]);
-            if(flags & 0x8000)
-                framelen += 4;   /* CRC */
+            /* The 2.3 extended header size doesn't include the header size
+               field itself. Also, it is not unsynched. */
+            framelen =
+                bytes2int(header[0], header[1], header[2], header[3]) + 4;
 
+            /* Skip the rest of the header */
             lseek(fd, framelen - 10, SEEK_CUR);
         }
 
