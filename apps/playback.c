@@ -2081,8 +2081,8 @@ static void codec_thread(void)
                         
                         if (!codec_load_next_track())
                         {
-                            // queue_post(&codec_queue, Q_AUDIO_STOP, 0);
                             LOGFQUEUE("codec > audio Q_AUDIO_STOP");
+                            /* End of playlist */
                             queue_post(&audio_queue, Q_AUDIO_STOP, 0);
                             break;
                         }
@@ -2101,6 +2101,7 @@ static void codec_thread(void)
                                 sleep(1);
                             }
                             LOGFQUEUE("codec > audio Q_AUDIO_STOP");
+                            /* End of playlist */
                             queue_post(&audio_queue, Q_AUDIO_STOP, 0);
                             break;
                         }
@@ -3296,11 +3297,17 @@ static void audio_stop_playback(void)
         playlist_update_resume_info(
             (playlist_end && ci.stop_codec)?NULL:audio_current_track());
 
-        /* inc index so runtime info is saved in audio_clear_track_entries() */
-        /* done here, as audio_stop_playback() may be called more than once */
-        track_ridx++;
-        track_ridx &= MAX_TRACK_MASK;
-
+        /* Increment index so runtime info is saved in audio_clear_track_entries().
+         * Done here, as audio_stop_playback() may be called more than once.
+         * Don't update runtime unless playback is stopped because of end of playlist.
+         * Updating runtime when manually stopping a tracks, can destroy autoscores
+         * and playcounts. 
+         */
+        if (playlist_end)
+        {
+            track_ridx++;
+            track_ridx &= MAX_TRACK_MASK;
+        }
     }
 
     filling = false;
