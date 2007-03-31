@@ -341,7 +341,7 @@ void lcd_put_cursor(int x, int y, unsigned long cursor_ucs)
     lcd_cursor.x = x;
     lcd_cursor.y = y;
     lcd_cursor.downcount = 0;
-    lcd_cursor.divider = 4;
+    lcd_cursor.divider = MAX((HZ/2) / scroll_ticks, 1);
 }
 
 /* Remove the cursor */
@@ -562,7 +562,7 @@ static void scroll_thread(void)
         }
         if (lcd_cursor.enabled)
         {
-            if (--lcd_cursor.downcount < 0)
+            if (--lcd_cursor.downcount <= 0)
             {
                 lcd_cursor.downcount = lcd_cursor.divider;
                 lcd_cursor.visible = !lcd_cursor.visible;
