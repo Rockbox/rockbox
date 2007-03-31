@@ -492,7 +492,7 @@ void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
     lcd_puts_offset(x, y, string, offset);
     len = utf8length(string);
 
-    if (LCD_WIDTH - xmargin < len) 
+    if (LCD_WIDTH - x - xmargin < len) 
     {
         /* prepare scroll line */
         char *end;
