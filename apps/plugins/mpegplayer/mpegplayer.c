@@ -930,8 +930,8 @@ static void video_thread(void)
                     fps=frame;
                     fps*=441000;
                     fps/=s;
-                    rb->snprintf(str,sizeof(str),"%d.%d %d %d %d",
-                                 (int)(fps/10),(int)(fps%10),skipped,(int)s,(int)eta2);
+                    rb->snprintf(str,sizeof(str),"%d.%d %d %d",
+                                 (int)(fps/10),(int)(fps%10),skipped,delay);
                     rb->lcd_putsxy(0,0,str);
                     rb->lcd_update_rect(0,0,LCD_WIDTH,8);
         
@@ -1132,7 +1132,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
             while (( bytes_to_read > 0) && (file_remaining > 0) && 
                    ((audiostatus != STREAM_DONE) || (videostatus != STREAM_DONE))) {
-                n = rb->read(in_file, disk_buf_tail, MIN(128*1024,bytes_to_read));
+                n = rb->read(in_file, disk_buf_tail, MIN(32*1024,bytes_to_read));
 
                 bytes_to_read -= n;
                 file_remaining -= n;
