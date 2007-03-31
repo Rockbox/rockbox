@@ -202,14 +202,20 @@ static int timedate_set(void)
     /* This prevents problems with time/date setting after a power loss */
     if (!valid_time(&tm))
     {
-        /* hour   */
+/* Macros to convert a 2-digit string to a decimal constant. 
+   (YEAR), MONTH and DAY are set by the date command, which outputs
+   DAY as 00..31 and MONTH as 01..12. The leading zero would lead to
+   misinterpretation as an octal constant. */
+#define S100(x) 1 ## x
+#define C2DIG2DEC(x) (S100(x)-100)
+
         tm.tm_hour = 0;
         tm.tm_min = 0;
         tm.tm_sec = 0;
-        tm.tm_mday = 1;
-        tm.tm_mon = 0;
+        tm.tm_mday = C2DIG2DEC(DAY);
+        tm.tm_mon =  C2DIG2DEC(MONTH)-1;
         tm.tm_wday = 1;
-        tm.tm_year = 100;
+        tm.tm_year = YEAR-1900;
     }
 
     result = (int)set_time_screen(str(LANG_TIME), &tm);
