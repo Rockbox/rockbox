@@ -428,6 +428,7 @@ unsigned long pcm_rec_sample_rate(void)
 void pcm_rec_init(void)
 {
     queue_init(&pcmrec_queue, true);
+    queue_set_irq_safe(&pcmrec_queue, true);
     queue_enable_queue_send(&pcmrec_queue, &pcmrec_queue_send);
     pcmrec_thread_p =
         create_thread(pcmrec_thread, pcmrec_stack, sizeof(pcmrec_stack),
