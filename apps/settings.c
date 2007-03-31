@@ -1218,6 +1218,7 @@ bool set_int_ex(const unsigned char* string,
              void (*formatter)(char*, int, int, const char*),
              long (*get_talk_id)(int))
 {
+    int count = (max-min)/step + 1;
 #if CONFIG_KEYPAD != PLAYER_PAD
     struct value_setting_data data = {
         INT,max, step, voice_unit,unit,formatter,get_talk_id,NULL };
@@ -1225,10 +1226,9 @@ bool set_int_ex(const unsigned char* string,
         data.unit = unit_strings[voice_unit];
     else 
         data.unit = str(voice_unit);
-    return do_set_setting(string,variable,(max-min)/step + 1,
+    return do_set_setting(string,variable,count,
                           (max-*variable)/step, &data,function);
 #else
-    int count = (max-min)/step + 1;
     struct value_setting_data data = {
         INT,min, -step, voice_unit,unit,formatter,get_talk_id,NULL };
     if (voice_unit < UNIT_LAST)
@@ -1236,7 +1236,7 @@ bool set_int_ex(const unsigned char* string,
     else 
         data.unit = str(voice_unit);
     return do_set_setting(string,variable,count,
-                          count - ((max-*variable)/step), &data,function);
+                          (*variable-min)/step, &data,function);
 #endif
 }
 bool set_int(const unsigned char* string,
