@@ -19,6 +19,7 @@
 
 #include "debug.h"
 #include "lcd.h"
+#include "lcd-charcell.h"
 #include "misc.h"
 #include <string.h>
 #include <unistd.h>
@@ -36,82 +37,38 @@ SDL_Color lcd_color_zero = {UI_LCD_BGCOLOR, 0};
 SDL_Color lcd_backlight_color_zero = {UI_LCD_BGCOLORLIGHT, 0};
 SDL_Color lcd_color_max  = {0, 0, 0, 0};
 
-/* Defined in lcd-playersim.c */
-extern void lcd_print_char(int x, int y);
+
+static unsigned long get_lcd_pixel(int x, int y)
+{
+    return sim_lcd_framebuffer[y][x];
+}
+
+void sim_lcd_update_rect(int x_start, int y_start, int width, int height)
+{
+    sdl_update_rect(lcd_surface, x_start, y_start, width, height,
+                    SIM_LCD_WIDTH, SIM_LCD_HEIGHT, get_lcd_pixel);
+    sdl_gui_update(lcd_surface, x_start, y_start, width, height,
+                   SIM_LCD_WIDTH, SIM_LCD_HEIGHT,
+                   background ? UI_LCD_POSX : 0, background ? UI_LCD_POSY : 0);
+}
 
 void lcd_update(void)
 {
     int x, y;
-    SDL_Rect dest = {UI_LCD_POSX, UI_LCD_POSY, UI_LCD_WIDTH, UI_LCD_HEIGHT};
-
-    SDL_LockSurface(lcd_surface);
     
-    for (y=0; y<2; y++) {
-        for (x=0; x<11; x++) {
-            lcd_print_char(x, y);
-        }
-    }
-    
-    SDL_UnlockSurface(lcd_surface);
-
-    if (!background) {
-        dest.x -= UI_LCD_POSX;
-        dest.y -= UI_LCD_POSY;
-    }
-    
-    SDL_BlitSurface(lcd_surface, NULL, gui_surface, &dest);
-    SDL_UpdateRect(gui_surface, dest.x, dest.y, dest.w, dest.h);
-    SDL_Flip(gui_surface);
-}
-
-void drawdots(int color, struct coordinate *points, int count)
-{
-    SDL_Rect dest;
-    Uint32 sdlcolor;
-    
-    SDL_LockSurface(lcd_surface);
-
-    if (color == 1) {
-        sdlcolor = SDL_MapRGB(lcd_surface->format, lcd_color_max.r, lcd_color_max.g, lcd_color_max.b);
-    } else {
-        sdlcolor = SDL_MapRGB(lcd_surface->format, lcd_color_zero.r, lcd_color_zero.g, lcd_color_zero.b);
-    }
-
-    while (count--) {
-        dest.x = points[count].x * display_zoom;
-        dest.y = points[count].y * display_zoom;
-        dest.w = 1 * display_zoom;
-        dest.h = 1 * display_zoom;
-
-        SDL_FillRect(lcd_surface, &dest, sdlcolor);
-    }
-
-    SDL_UnlockSurface(lcd_surface);
-}
-
-void drawrectangles(int color, struct rectangle *points, int count)
-{
-    SDL_Rect dest;
-    Uint32 sdlcolor;
-
-    SDL_LockSurface(lcd_surface);
-
-    if (color == 1) {
-        sdlcolor = SDL_MapRGB(lcd_surface->format, lcd_color_max.r, lcd_color_max.g, lcd_color_max.b);
-    } else {
-        sdlcolor = SDL_MapRGB(lcd_surface->format, lcd_color_zero.r, lcd_color_zero.g, lcd_color_zero.b);
-    }
-    
-    while (count--) {
-        dest.x = points[count].x * display_zoom;
-        dest.y = points[count].y * display_zoom;
-        dest.w = points[count].width * display_zoom;
-        dest.h = points[count].height * display_zoom;
+    for (y = 0; y < lcd_pattern_count; y++)
+        if (lcd_patterns[y].count > 0)
+            sim_lcd_define_pattern(y, lcd_patterns[y].pattern);
         
-        SDL_FillRect(lcd_surface, &dest, sdlcolor);
-    }
+    for (y = 0; y < LCD_HEIGHT; y++)
+        for (x = 0; x < LCD_WIDTH; x++)
+            lcd_print_char(x, y, lcd_charbuffer[y][x]);
 
-    SDL_UnlockSurface(lcd_surface);
+    if (lcd_cursor.visible)
+        lcd_print_char(lcd_cursor.x, lcd_cursor.y, lcd_cursor.hw_char);
+
+    sim_lcd_update_rect(0, ICON_HEIGHT, SIM_LCD_WIDTH,
+                        LCD_HEIGHT*CHAR_HEIGHT*CHAR_PIXEL);
 }
 
 #if CONFIG_BACKLIGHT
@@ -124,8 +81,8 @@ void sim_backlight(int value)
         sdl_set_gradient(lcd_surface, &lcd_color_zero, &lcd_color_max,
                          0, (1<<LCD_DEPTH));
     }
-    
-    lcd_update();
+
+    sim_lcd_update_rect(0, 0, SIM_LCD_WIDTH, SIM_LCD_HEIGHT);
 }
 #endif
 

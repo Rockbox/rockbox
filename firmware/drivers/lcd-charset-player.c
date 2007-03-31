@@ -22,7 +22,7 @@
 
 #include "lcd-charcell.h"
 
-int hw_pattern_count;  /* actual number of user-definable hw patterns */
+int lcd_pattern_count;  /* actual number of user-definable hw patterns */
 
 const struct xchar_info *xchar_info;
 int xchar_info_size;  /* number of entries */       
@@ -1237,13 +1237,13 @@ void lcd_charset_init(void)
 {
     if (is_new_player())
     {
-        hw_pattern_count = 8;
+        lcd_pattern_count = 8;
         xchar_info = xchar_info_newlcd;
         xchar_info_size = sizeof(xchar_info_newlcd)/sizeof(struct xchar_info);
     }
     else /* old lcd */
     {
-        hw_pattern_count = 4;
+        lcd_pattern_count = 4;
         xchar_info = xchar_info_oldlcd;
         xchar_info_size = sizeof(xchar_info_oldlcd)/sizeof(struct xchar_info);
     }

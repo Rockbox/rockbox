@@ -20,6 +20,7 @@
 #include "hwcompat.h"
 
 #include "lcd.h"
+#include "lcd-charcell.h"
 #include "kernel.h"
 #include "thread.h"
 #include <string.h>
@@ -32,215 +33,85 @@
 
 /*** definitions ***/
 
-#define CHAR_WIDTH 6
-#define CHAR_HEIGHT 8
-#define ICON_HEIGHT 12
-#define CHAR_PIXEL 2
-#define BORDER_MARGIN 1
+bool sim_lcd_framebuffer[SIM_LCD_HEIGHT][SIM_LCD_WIDTH];
 
-static int double_height=1;
-extern bool lcd_display_redraw;
-extern const unsigned short *lcd_ascii;
-extern unsigned char hardware_buffer_lcd[11][2];
-
+static int double_height = 1;
 
 void lcd_print_icon(int x, int icon_line, bool enable, char **icon)
 {
-  int xpos = x;
-  int ypos = icon_line*(ICON_HEIGHT+(CHAR_HEIGHT*2+2)*CHAR_PIXEL);
-  int row=0, col;
+    int row, col;
+    int y = (ICON_HEIGHT+(CHAR_HEIGHT*2+2)*CHAR_PIXEL) * icon_line;
 
-  int p=0, cp=0;
-  struct coordinate points[SIM_LCD_WIDTH * SIM_LCD_HEIGHT];
-  struct coordinate clearpoints[SIM_LCD_WIDTH * SIM_LCD_HEIGHT];
+    y += BORDER_MARGIN;
+    x += BORDER_MARGIN;
 
-  while (icon[row]) {
-    col=0;
-    while (icon[row][col]) {
-      switch(icon[row][col]) {
-      case '*':
-        if (enable) {
-          /* set a dot */
-          points[p].x = xpos + col +BORDER_MARGIN;
-          points[p].y = ypos+row +BORDER_MARGIN;
-          p++; /* increase the point counter */
-        } else {
-          /* clear a dot */
-          clearpoints[cp].x = xpos + col +BORDER_MARGIN;
-          clearpoints[cp].y = ypos+row +BORDER_MARGIN;
-          cp++; /* increase the point counter */
+    for (row = 0; icon[row]; row++)
+    {
+        for (col = 0; icon[row][col]; col++)
+        {
+            switch (icon[row][col])
+            {
+              case '*':
+                sim_lcd_framebuffer[y+row][x+col] = enable;
+                break;
+
+              case ' ':
+                sim_lcd_framebuffer[y+row][x+col] = false;
+                break;
+            }
         }
-        break;
-      case ' ': /* Clear bit */
-        /* clear a dot */
-        clearpoints[cp].x = xpos + col+BORDER_MARGIN;
-        clearpoints[cp].y = ypos+row+BORDER_MARGIN;
-        cp++; /* increase the point counter */
-        break;
-      }
-      col++;
     }
-    row++;
-  }
-/*  DEBUGF("icon draw %d/%d\n", p, cp);*/
-  if (cp)
-      drawdots(0, &clearpoints[0], cp);
-  if (p)
-      drawdots(1, &points[0], p);
+    sim_lcd_update_rect(x, y, col, row);
+    /* icon drawing updates immediately */
 }
 
-void lcd_print_char(int x, int y)
+void lcd_print_char(int x, int y, unsigned char ch)
 {
-  int xpos = x * CHAR_WIDTH * CHAR_PIXEL;
-  int ypos = y * CHAR_HEIGHT * CHAR_PIXEL + ICON_HEIGHT;
-  int col, row;
-  int p=0, cp=0;
-  struct rectangle points[CHAR_HEIGHT*CHAR_WIDTH];
-  struct rectangle clearpoints[CHAR_HEIGHT*CHAR_WIDTH];
-  unsigned char ch=hardware_buffer_lcd[x][y];
-  static char bitmap_content[11*8][2*8];
+    int xpos = x * CHAR_WIDTH*CHAR_PIXEL;
+    int ypos = y * CHAR_HEIGHT*CHAR_PIXEL + ICON_HEIGHT;
+    int row, col, r, c;
 
-  if (double_height == 2 && y == 1)
-    return; /* only one row available if text is double height */
+    if (double_height > 1 && y == 1)
+        return;  /* only one row available if text is double height */
+        
+    for (row = 0; row < 7; row ++)
+    {
+        unsigned fontbitmap = (*font_player)[ch][row];
+        int height = (row == 3) ? 1 : double_height;
+        
+        y = ypos + row * CHAR_PIXEL * double_height;
+        for (col = 0; col < 5; col++)
+        {
+            bool fontbit = fontbitmap & (0x10 >> col);
 
-  for (col=0; col<5; col++) {
-    unsigned char fontbitmap=(*font_player)[ch][col];
-    for (row=0; row<7; row++) {
-      char fontbit=fontbitmap&(1<<row);
-      int height=CHAR_PIXEL*double_height;
-      int ypixel;
-      if (bitmap_content[x*8+col][y*8+row*double_height]!=fontbit ||
-          bitmap_content[x*8+col][y*8+row*double_height+double_height-1]!=
-          fontbit) {
-        bitmap_content[x*8+col][y*8+row*double_height]=fontbit;
-        bitmap_content[x*8+col][y*8+row*double_height+double_height-1]=fontbit;
-
-        ypixel=CHAR_PIXEL*(double_height*row)+ypos;
-        if (double_height==2) {
-            if (row == 3) /* Adjust for blank row in the middle */
-                height=CHAR_PIXEL;
+            x = xpos + col * CHAR_PIXEL;
+            for (r = 0; r < height * CHAR_PIXEL; r++)
+                for (c = 0; c < CHAR_PIXEL; c++)
+                    sim_lcd_framebuffer[y+r][x+c] = fontbit;
         }
-
-        if (fontbit) {
-            /* set a dot */
-            points[p].x = xpos + col*CHAR_PIXEL +BORDER_MARGIN;
-            points[p].y = ypixel +BORDER_MARGIN;
-            points[p].width=CHAR_PIXEL;
-            points[p].height=height;
-            p++; /* increase the point counter */
-        } else {
-            clearpoints[cp].x = xpos + col*CHAR_PIXEL +BORDER_MARGIN;
-            clearpoints[cp].y = ypixel +BORDER_MARGIN;
-            clearpoints[cp].width=CHAR_PIXEL;
-            clearpoints[cp].height=height;
-            cp++;
-        }
-      }
     }
-  }
-/*  DEBUGF("print_char %d/%d\n", p, cp);*/
-  if (cp)
-      drawrectangles(0, &clearpoints[0], cp);
-  if (p)
-      drawrectangles(1, &points[0], p);
+    if (double_height > 1)
+    {
+        y = ypos + 15*CHAR_PIXEL;
+        for (r = 0; r < CHAR_PIXEL; r++)
+            for (c = 0; c < 5*CHAR_PIXEL; c++)
+                sim_lcd_framebuffer[y+r][xpos+c] = false;
+    }
 }
-
-
-/*
- * Draw a rectangle with upper left corner at (x, y)
- * and size (nx, ny)
- */
-void lcd_drawrect (int x, int y, int nx, int ny)
-{
-    (void)x;
-    (void)y;
-    (void)nx;
-    (void)ny;
-}
-
-/* Invert a rectangular area at (x, y), size (nx, ny) */
-void lcd_invertrect (int x, int y, int nx, int ny)
-{
-    (void)x;
-    (void)y;
-    (void)nx;
-    (void)ny;
-}
-
-void lcd_drawline( int x1, int y1, int x2, int y2 )
-{
-    (void)x1;
-    (void)x2;
-    (void)y1;
-    (void)y2;
-}
-
-void lcd_clearline( int x1, int y1, int x2, int y2 )
-{
-    (void)x1;
-    (void)x2;
-    (void)y1;
-    (void)y2;
-}
-
-/*
- * Set a single pixel
- */
-void lcd_drawpixel(int x, int y)
-{
-    (void)x;
-    (void)y;
-}
-
-/*
- * Clear a single pixel
- */
-void lcd_clearpixel(int x, int y)
-{
-    (void)x;
-    (void)y;
-}
-
-/*
- * Invert a single pixel
- */
-void lcd_invertpixel(int x, int y)
-{
-    (void)x;
-    (void)y;
-}
-
-
 
 void lcd_double_height(bool on)
 {
-    double_height = 1;
-    if (on)
-        double_height = 2;
-    lcd_display_redraw=true;
-    lcd_update();
-}
-
-void lcd_define_hw_pattern(int pat, const char *pattern)
-{
-    int i, j;
-    unsigned char icon[8];
-    memset(icon, 0, sizeof icon);
-
-    DEBUGF("Defining pattern %d:", pat);
-    for (j = 0; j <= 5; j++) {
-        for (i = 0; i < 7; i++) {
-            if ((pattern[i])&(1<<(j)))
-                icon[5-j] |= (1<<(i));
-        }
-    }
-    for (i = 1; i <= 5; i++)
+    int newval = (is_new_player() && on) ? 2 : 1;
+    
+    if (newval != double_height)
     {
-        DEBUGF(" 0x%02x", icon[i]);
-        (*font_player)[pat][i-1] = icon[i];
+        double_height = newval;
+        lcd_update();
     }
-    DEBUGF("\n");
-    lcd_display_redraw=true;
-    lcd_update();
 }
 
+void sim_lcd_define_pattern(int pat, const char *pattern)
+{
+    if (pat < lcd_pattern_count)
+        memcpy((*font_player)[pat], pattern, 7);
+}

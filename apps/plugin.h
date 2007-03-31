@@ -110,12 +110,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 50
+#define PLUGIN_API_VERSION 51
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 50
+#define PLUGIN_MIN_API_VERSION 51
 
 /* plugin return codes */
 enum plugin_status {
@@ -134,6 +134,7 @@ struct plugin_api {
 
     /* lcd */
     void (*lcd_set_contrast)(int x);
+    void (*lcd_update)(void);
     void (*lcd_clear_display)(void);
     void (*lcd_setmargins)(int x, int y);
     int  (*lcd_getstringsize)(const unsigned char *str, int *w, int *h);
@@ -191,7 +192,6 @@ struct plugin_api {
     fb_data* lcd_framebuffer;
     void (*lcd_blit) (const fb_data* data, int x, int by, int width,
                       int bheight, int stride);
-    void (*lcd_update)(void);
     void (*lcd_update_rect)(int x, int y, int width, int height);
     void (*gui_scrollbar_draw)(struct screen * screen, int x, int y,
                                int width, int height, int items,

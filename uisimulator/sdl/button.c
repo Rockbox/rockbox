@@ -18,7 +18,7 @@
  ****************************************************************************/
 
 #include "uisdl.h"
-#include "lcd-charcell.h"
+#include "lcd-charcells.h"
 #include "lcd-remote.h"
 #include "config.h"
 #include "button.h"

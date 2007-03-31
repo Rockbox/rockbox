@@ -64,6 +64,7 @@ extern int  lcd_getxmargin(void);
 extern int  lcd_getymargin(void);
 extern int  lcd_getstringsize(const unsigned char *str, int *w, int *h);
 
+extern void lcd_update(void);
 extern void lcd_clear_display(void);
 extern void lcd_putsxy(int x, int y, const unsigned char *string);
 extern void lcd_puts(int x, int y, const unsigned char *string);
@@ -79,7 +80,6 @@ extern void lcd_scroll_delay(int ms);
 extern void lcd_puts_scroll(int x, int y, const unsigned char* string);
 extern void lcd_puts_scroll_style(int x, int y, const unsigned char* string,
                                   int style);
-extern void lcd_icon(int icon, bool enable);
 
 #if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
 extern void lcd_yuv_blit(unsigned char * const src[3],
@@ -87,12 +87,11 @@ extern void lcd_yuv_blit(unsigned char * const src[3],
                          int x, int y, int width, int height);
 #endif
 
-#if defined(SIMULATOR) || defined(HAVE_LCD_BITMAP)
+#ifdef HAVE_LCD_BITMAP
 /* performance function */
 extern void lcd_blit(const fb_data* data, int x, int by, int width,
                      int bheight, int stride);
 
-extern void lcd_update(void);
 /* update a fraction of the screen */
 extern void lcd_update_rect(int x, int y, int width, int height);
 
@@ -101,10 +100,6 @@ extern void lcd_remote_update(void);
 /* update a fraction of the screen */
 extern void lcd_remote_update_rect(int x, int y, int width, int height);
 #endif
-
-#else
-  #define lcd_update()
-  #define lcd_update_rect(x,y,w,h)
 #endif
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -132,9 +127,8 @@ enum
     ICON_PARAM
 };
 
+void lcd_icon(int icon, bool enable);
 void lcd_double_height(bool on);
-void lcd_put_hw_char(int x, int y, unsigned char hw_char);
-void lcd_define_hw_pattern(int which, const char *pattern);
 void lcd_define_pattern(unsigned long ucs, const char *pattern);
 unsigned long lcd_get_locked_pattern(void);
 void lcd_unlock_pattern(unsigned long ucs);

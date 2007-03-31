@@ -15,7 +15,7 @@
  *
  ****************************************************************************/
 
-extern unsigned char (*font_player)[256][5];
+extern unsigned char (*font_player)[256][7];
 
 void font_init();
 

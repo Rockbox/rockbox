@@ -3,7 +3,7 @@ kernel.c
 #ifdef HAVE_LCD_BITMAP
 lcd-bitmap.c
 #elif defined(HAVE_LCD_CHARCELLS)
-lcd-charcell.c
+lcd-charcells.c
 #endif
 #ifdef HAVE_REMOTE_LCD
 lcd-remote-bitmap.c

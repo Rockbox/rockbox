@@ -17,23 +17,15 @@
  *
  ****************************************************************************/
 
-struct coordinate {
-  int x;
-  int y;
-};
-struct rectangle {
-  int x;
-  int y;
-  int width;
-  int height;
-};
+#define ICON_HEIGHT 12
+#define CHAR_HEIGHT 8
+#define CHAR_WIDTH 6
+#define CHAR_PIXEL 2
+#define BORDER_MARGIN 1
 
-void drawdots(int color, struct coordinate *coord, int count);
-void drawdot(int color, int x, int y);
-void drawrect(int color, int x1, int y1, int x2, int y2);
-void drawrectangles(int color, struct rectangle *rects, int count);
+extern bool sim_lcd_framebuffer[SIM_LCD_HEIGHT][SIM_LCD_WIDTH];
 
-
-void dots(int *colors, struct coordinate *points, int count);
-
-
+void lcd_print_icon(int x, int icon_line, bool enable, char **icon);
+void lcd_print_char(int x, int y, unsigned char ch);
+void sim_lcd_update_rect(int x, int y, int width, int height);
+void sim_lcd_define_pattern(int pat, const char *pattern);

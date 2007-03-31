@@ -23,6 +23,7 @@
 #include "hwcompat.h"
 #include "system.h"
 #include "lcd.h"
+#include "lcd-charcell.h"
 
 #define OLD_LCD_CRAM         ((char)0xB0) /* Characters */
 #define OLD_LCD_PRAM         ((char)0x80) /*  Patterns  */
@@ -67,17 +68,6 @@ void lcd_double_height(bool on)
     if(new_lcd)
         lcd_write_command(on ? (NEW_LCD_SET_DOUBLE_HEIGHT|1)
                              : NEW_LCD_SET_DOUBLE_HEIGHT);
-}
-
-void lcd_put_hw_char(int x, int y, unsigned char hw_char)
-{
-    lcd_write_command_e(LCD_CURSOR(x, y), hw_char);
-}
-
-void lcd_define_hw_pattern (int which, const char *pattern)
-{
-    lcd_write_command(lcd_pram | (which << 3));
-    lcd_write_data(pattern, 7);
 }
 
 void lcd_icon(int icon, bool enable)
@@ -232,4 +222,30 @@ void lcd_init_device(void)
 #endif
     }
     lcd_set_contrast(lcd_default_contrast());
+}
+
+/*** Update functions ***/
+
+void lcd_update(void)
+{
+    int y;
+    
+    for (y = 0; y < lcd_pattern_count; y++)
+    {
+        if (lcd_patterns[y].count > 0)
+        {
+            lcd_write_command(lcd_pram | (y << 3));
+            lcd_write_data(lcd_patterns[y].pattern, 7);
+        }
+    }
+    for (y = 0; y < LCD_HEIGHT; y++)
+    {
+        lcd_write_command(LCD_CURSOR(0, y));
+        lcd_write_data(lcd_charbuffer[y], LCD_WIDTH);
+    }
+    if (lcd_cursor.visible)
+    {
+        lcd_write_command_e(LCD_CURSOR(lcd_cursor.x, lcd_cursor.y),
+                            lcd_cursor.hw_char);
+    }
 }
