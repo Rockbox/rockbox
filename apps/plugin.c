@@ -616,7 +616,8 @@ int plugin_load(const char* plugin, void* parameter)
 
     rc = hdr->entry_point((struct plugin_api*) &rockbox_api, parameter);
     /* explicitly casting the pointer here to avoid touching every plugin. */
-
+    
+    action_signalscreenchange();
     button_clear_queue();
 
 #ifdef HAVE_LCD_BITMAP
@@ -648,7 +649,6 @@ int plugin_load(const char* plugin, void* parameter)
     lcd_remote_clear_display();
     lcd_remote_update();
 #endif
-    action_signalscreenchange();
 
     if (pfn_tsr_exit == NULL)
         plugin_loaded = false;
