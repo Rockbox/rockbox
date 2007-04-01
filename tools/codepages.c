@@ -23,6 +23,10 @@
 
 #define MAX_TABLE_SIZE     32768
 
+static const int mini_index[5] = {
+    0, 1, 3, 6, 7
+};
+
 static unsigned short iso_table[MAX_TABLE_SIZE];
 
 unsigned short iso_decode(unsigned char *latin1, int cp, int count)
@@ -147,53 +151,100 @@ int writeshort(FILE *f, unsigned short s)
     return putc(s>>8, f) != EOF;
 }
 
-int main(void)
+void print_usage(void)
 {
+    printf("Usage: codepages [-m]\n"
+           "\t-m       Create isomini.cp only\n");
+    printf("build date: " __DATE__ "\n\n");
+}
 
+int main(int argc, char **argv)
+{
+    int mini = 0;
     int i, j;
     unsigned char k;
     unsigned short uni;
     FILE *of;
 
+    for (i = 1;i < argc;i++)
+    {
+        if (argv[i][0] == '-')
+        {
+            switch (argv[i][1])
+            {
+              case 'm':   /* create isomini.cp only */
+                mini = 1;
+                break;
+
+              case 'h':   /* help */
+              case '?':
+                print_usage();
+                exit(1);
+                break;
+
+              default:
+                print_usage();
+                exit(1);
+                break;
+            }
+        }
+    }
+
     for (i=0; i < MAX_TABLE_SIZE; i++)
         iso_table[i] = 0;
 
-    of = fopen("iso.cp", "wb");
-    if (!of) return 1;
+    if (mini) {
+        of = fopen("isomini.cp", "wb");
+        if (!of) return 1;
 
-    for (i=1; i<8; i++) {
+        for (i=1; i<5; i++) {
 
-        for (j=0; j<128; j++) {
-            k = (unsigned char)j + 128;
-            uni = iso_decode(&k, i, 1);
-            writeshort(of, uni);
+            for (j=0; j<128; j++) {
+                k = (unsigned char)j + 128;
+                uni = iso_decode(&k, mini_index[i], 1);
+                writeshort(of, uni);
+            }
         }
+        fclose(of);
     }
-    fclose(of);
+    else {
+        of = fopen("iso.cp", "wb");
+        if (!of) return 1;
 
-    of = fopen("932.cp", "wb");
-    if (!of) return 1;
-    for (i=0; i < MAX_TABLE_SIZE; i++)
-        writeshort(of, cp932_table[i]);
-    fclose(of);
+        for (i=1; i<8; i++) {
 
-    of = fopen("936.cp", "wb");
-    if (!of) return 1;
-    for (i=0; i < MAX_TABLE_SIZE; i++)  
-        writeshort(of, cp936_table[i]);
-    fclose(of);
+            for (j=0; j<128; j++) {
+                k = (unsigned char)j + 128;
+                uni = iso_decode(&k, i, 1);
+                writeshort(of, uni);
+            }
+        }
+        fclose(of);
 
-    of = fopen("949.cp", "wb");
-    if (!of) return 1;
-    for (i=0; i < MAX_TABLE_SIZE; i++)  
-        writeshort(of, cp949_table[i]);
-    fclose(of);
+        of = fopen("932.cp", "wb");
+        if (!of) return 1;
+        for (i=0; i < MAX_TABLE_SIZE; i++)
+            writeshort(of, cp932_table[i]);
+        fclose(of);
 
-    of = fopen("950.cp", "wb");
-    if (!of) return 1;
-    for (i=0; i < MAX_TABLE_SIZE; i++)  
-        writeshort(of, cp950_table[i]);
-    fclose(of);
+        of = fopen("936.cp", "wb");
+        if (!of) return 1;
+        for (i=0; i < MAX_TABLE_SIZE; i++)
+            writeshort(of, cp936_table[i]);
+        fclose(of);
+
+        of = fopen("949.cp", "wb");
+        if (!of) return 1;
+        for (i=0; i < MAX_TABLE_SIZE; i++)
+            writeshort(of, cp949_table[i]);
+        fclose(of);
+
+        of = fopen("950.cp", "wb");
+        if (!of) return 1;
+        for (i=0; i < MAX_TABLE_SIZE; i++)
+            writeshort(of, cp950_table[i]);
+        fclose(of);
+    }
 
     return 0;
 }

@@ -598,16 +598,16 @@ EOF
   buildfor=`input`;
 
   # Set of tools built for all target platforms:
-  toolset="rdf2binary convbdf"
+  toolset="rdf2binary convbdf codepages"
 
   # Toolsets for some target families:
-  archosbitmaptools="$toolset scramble descramble sh2d uclpack bmp2rb codepages"
-  iriverbitmaptools="$toolset scramble descramble mkboot bmp2rb codepages"
-  iaudiobitmaptools="$toolset scramble descramble mkboot bmp2rb codepages"
+  archosbitmaptools="$toolset scramble descramble sh2d uclpack bmp2rb"
+  iriverbitmaptools="$toolset scramble descramble mkboot bmp2rb"
+  iaudiobitmaptools="$toolset scramble descramble mkboot bmp2rb"
   ipodbitmaptools="$toolset scramble ipod_fw bmp2rb codepages"
-  gigabeatbitmaptools="$toolset scramble descramble bmp2rb codepages"
+  gigabeatbitmaptools="$toolset scramble descramble bmp2rb"
   # generic is used by IFP, H10, Sansa-e200
-  genericbitmaptools="$toolset bmp2rb codepages"
+  genericbitmaptools="$toolset bmp2rb"
 
 
   #  ---- For each target ----

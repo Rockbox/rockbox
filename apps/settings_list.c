@@ -947,18 +947,28 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0,tagcache_autoupdate,
         LANG_TAGCACHE_AUTOUPDATE,false,"tagcache_autoupdate",NULL),
 #endif
+#ifdef HAVE_LCD_BITMAP
     CHOICE_SETTING(0, default_codepage, LANG_DEFAULT_CODEPAGE, 0,
-        "default codepage",
+        "default codepage", /* The order must match with that in unicode.c */
         "iso8859-1,iso8859-7,iso8859-8,cp1251,iso8859-11,cp1256,"
-        "iso8859-9,iso8859-2,sjis,gb2312,ksx1001,big5,utf-8,cp1256",
+        "iso8859-9,iso8859-2,sjis,gb2312,ksx1001,big5,utf-8",
         set_codepage, 13,
         ID2P(LANG_CODEPAGE_LATIN1), ID2P(LANG_CODEPAGE_GREEK),
         ID2P(LANG_CODEPAGE_HEBREW), ID2P(LANG_CODEPAGE_CYRILLIC),
         ID2P(LANG_CODEPAGE_THAI), ID2P(LANG_CODEPAGE_ARABIC),
         ID2P(LANG_CODEPAGE_TURKISH), ID2P(LANG_CODEPAGE_LATIN_EXTENDED),
         ID2P(LANG_CODEPAGE_JAPANESE), ID2P(LANG_CODEPAGE_SIMPLIFIED),
-        ID2P(LANG_CODEPAGE_KOREAN),
-        ID2P(LANG_CODEPAGE_TRADITIONAL), ID2P(LANG_CODEPAGE_UTF8)),
+        ID2P(LANG_CODEPAGE_KOREAN), ID2P(LANG_CODEPAGE_TRADITIONAL),
+        ID2P(LANG_CODEPAGE_UTF8)),
+#else /* !HAVE_LCD_BITMAP */
+    CHOICE_SETTING(0, default_codepage, LANG_DEFAULT_CODEPAGE, 0,
+        "default codepage", /* The order must match with that in unicode.c */
+        "iso8859-1,iso8859-7,cp1251,iso8859-9,iso8859-2,utf-8",
+        set_codepage, 6,
+        ID2P(LANG_CODEPAGE_LATIN1), ID2P(LANG_CODEPAGE_GREEK),
+        ID2P(LANG_CODEPAGE_CYRILLIC), ID2P(LANG_CODEPAGE_TURKISH),
+        ID2P(LANG_CODEPAGE_LATIN_EXTENDED), ID2P(LANG_CODEPAGE_UTF8)),
+#endif
 
     OFFON_SETTING(0,warnon_erase_dynplaylist,
         LANG_WARN_ERASEDYNPLAYLIST_MENU,false,

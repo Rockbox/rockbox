@@ -8,10 +8,6 @@
  *   http://en.wikipedia.org/wiki/Unicode
  */
 
-#define CODEPAGE_DIR    "/.rockbox/codepages"
-
-#define MAX_CP_TABLE_SIZE    32768
-
 #define MASK   0xC0 /* 11000000 */
 #define COMP   0x80 /* 10x      */
 

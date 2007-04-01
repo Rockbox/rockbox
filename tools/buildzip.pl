@@ -178,9 +178,18 @@ sub buildzip {
     }
 
     mkdir ".rockbox/wps", 0777;
+    mkdir ".rockbox/codepages", 0777;
 
     if($bitmap) {
-        mkdir ".rockbox/codepages", 0777;
+        system("$ROOT/tools/codepages");
+    }
+    else {
+        system("$ROOT/tools/codepages -m");
+    }
+    $c = 'find . -name "*.cp" ! -empty -exec mv {} .rockbox/codepages/ \; >/dev/null 2>&1';
+    `$c`;
+
+    if($bitmap) {
         mkdir ".rockbox/codecs", 0777;
         mkdir ".rockbox/themes", 0777;
         if($depth > 1) {
@@ -188,10 +197,6 @@ sub buildzip {
         }
 
         my $c = 'find apps -name "*.codec" ! -empty -exec cp {} .rockbox/codecs/ \; 2>/dev/null';
-        `$c`;
-
-        system("$ROOT/tools/codepages");
-        $c = 'find . -name "*.cp" ! -empty -exec mv {} .rockbox/codepages/ \; >/dev/null 2>&1';
         `$c`;
 
         my @call = `find .rockbox/codecs -type f 2>/dev/null`;

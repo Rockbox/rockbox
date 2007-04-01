@@ -17,19 +17,20 @@
 #define O_BINARY 0
 #endif
 
-#define NUM_TABLES 5
-#define NUM_CODEPAGES 13
-
+#define CODEPAGE_DIR    "/.rockbox/codepages"
 static int default_codepage = 0;
-static unsigned short codepage_table[MAX_CP_TABLE_SIZE];
 static int loaded_cp_table = 0;
 
+#ifdef HAVE_LCD_BITMAP
 
-static const unsigned char utf8comp[6] = 
-{
-    0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC
+#define MAX_CP_TABLE_SIZE  32768
+#define NUM_TABLES             5
+
+enum {
+    ISO_8859_1 = 0, ISO_8859_7, ISO_8859_8, WIN_1251,
+    ISO_8859_11, WIN_1256, ISO_8859_9, ISO_8859_2,
+    SJIS, GB_2312, KSX_1001, BIG_5, UTF_8, NUM_CODEPAGES
 };
-
 static const char *filename[NUM_TABLES] =
 {
     CODEPAGE_DIR"/iso.cp",
@@ -38,10 +39,36 @@ static const char *filename[NUM_TABLES] =
     CODEPAGE_DIR"/949.cp",  /* KSX1001 */
     CODEPAGE_DIR"/950.cp"   /* BIG5    */
 };
-
 static const char cp_2_table[NUM_CODEPAGES] =
 {
     0, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 0
+};
+
+#else /* !HAVE_LCD_BITMAP, reduced support */
+
+#define MAX_CP_TABLE_SIZE  512
+#define NUM_TABLES           1
+
+enum {
+    ISO_8859_1 = 0, ISO_8859_7, WIN_1251,
+    ISO_8859_9, ISO_8859_2, UTF_8, NUM_CODEPAGES
+};
+static const char *filename[NUM_TABLES] =
+{
+    CODEPAGE_DIR"/isomini.cp",
+};
+static const char cp_2_table[NUM_CODEPAGES] =
+{
+    0, 1, 1, 1, 1, 0
+};
+
+#endif
+
+static unsigned short codepage_table[MAX_CP_TABLE_SIZE];
+
+static const unsigned char utf8comp[6] =
+{
+    0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC
 };
 
 /* Load codepage file into memory */
@@ -113,34 +140,37 @@ unsigned char* iso_decode(const unsigned char *iso, unsigned char *utf8,
     if (!load_cp_table(cp)) cp = 0;
 
     while (count--) {
-        if (*iso < 128 || cp == 0x0C) /* Already UTF-8 */
+        if (*iso < 128 || cp == UTF_8) /* Already UTF-8 */
             *utf8++ = *iso++;
 
         else {
 
             /* cp tells us which codepage to convert from */
             switch (cp) {
-                case 0x01: /* Greek (ISO-8859-7) */
-                case 0x02: /* Hebrew (ISO-8859-8) */
-                case 0x03: /* Cyrillic (CP1251) */
-                case 0x04: /* Thai (ISO-8859-11) */
-                case 0x05: /* Arabic (CP1256) */
-                case 0x06: /* Turkish (ISO-8859-9) */
-                case 0x07: /* Latin Extended (ISO-8859-2) */
+                case ISO_8859_7:  /* Greek */
+                case WIN_1251:    /* Cyrillic */
+                case ISO_8859_9:  /* Turkish */
+                case ISO_8859_2:  /* Latin Extended */
+#ifdef HAVE_LCD_BITMAP
+                case ISO_8859_8:  /* Hebrew */
+                case ISO_8859_11: /* Thai */
+                case WIN_1256:    /* Arabic */
+#endif
                     tmp = ((cp-1)*128) + (*iso++ - 128);
                     ucs = codepage_table[tmp];
                     break;
 
-                case 0x08: /* Japanese (SJIS) */
+#ifdef HAVE_LCD_BITMAP
+                case SJIS: /* Japanese */
                     if (*iso > 0xA0 && *iso < 0xE0) {
                         tmp = *iso++ | (0xA100 - 0x8000);
                         ucs = codepage_table[tmp];
                         break;
                     }
 
-                case 0x09: /* Simplified Chinese (GB2312) */
-                case 0x0A: /* Korean (KSX1001) */
-                case 0x0B: /* Traditional Chinese (BIG5) */
+                case GB_2312:  /* Simplified Chinese */
+                case KSX_1001: /* Korean */
+                case BIG5:     /* Traditional Chinese */
                     if (count < 1 || !iso[1]) {
                         ucs = *iso++;
                         break;
@@ -154,6 +184,7 @@ unsigned char* iso_decode(const unsigned char *iso, unsigned char *utf8,
                     ucs = codepage_table[tmp];
                     count--;
                     break;
+#endif /* HAVE_LCD_BITMAP */
 
                 default:
                     ucs = *iso++;
