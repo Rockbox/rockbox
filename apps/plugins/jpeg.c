@@ -31,6 +31,10 @@
 #include "gray.h"
 #include "xlcd.h"
 
+#ifdef HAVE_LCD_COLOR
+#include "lib/configfile.h"
+#endif
+
 PLUGIN_HEADER
 
 /* variable button definitions */
@@ -192,7 +196,49 @@ static int running_slideshow = false;   /* loading image because of slideshw */
 #ifndef SIMULATOR
 static int immediate_ata_off = false;   /* power down disk after loading */
 #endif
-static int  button_timeout = HZ*5;
+static int button_timeout    = HZ*5;
+
+#ifdef HAVE_LCD_COLOR
+
+/* Persistent configuration  - only needed for color displays atm */
+#define JPEG_CONFIGFILE             "jpeg.cfg"
+#define JPEG_SETTINGS_MINVERSION    1
+#define JPEG_SETTINGS_VERSION       1
+
+enum color_modes
+{
+    COLOURMODE_COLOUR = 0,
+    COLOURMODE_GRAY,
+    COLOUR_NUM_MODES
+};
+
+enum dither_modes
+{
+    DITHER_NONE = 0,    /* No dithering */
+    DITHER_ORDERED,     /* Bayer ordered */
+    DITHER_DIFFUSION,   /* Floyd/Steinberg error diffusion */
+    DITHER_NUM_MODES
+};
+
+struct jpeg_settings
+{
+    int colour_mode;
+    int dither_mode;
+};
+
+static struct jpeg_settings jpeg_settings =
+    { COLOURMODE_COLOUR, DITHER_NONE };
+static struct jpeg_settings old_settings;
+
+static struct configdata jpeg_config[] =
+{
+   { TYPE_ENUM, 0, COLOUR_NUM_MODES, &jpeg_settings.colour_mode,
+     "Colour Mode", (char *[]){ "Colour", "Grayscale" }, NULL },
+   { TYPE_ENUM, 0, DITHER_NUM_MODES, &jpeg_settings.dither_mode,
+     "Dither Mode", (char *[]){ "None", "Ordered", "Diffusion" }, NULL },
+};
+
+#endif /* HAVE_LCD_COLOR */
 #if LCD_DEPTH > 1
 fb_data* old_backdrop;
 #endif
@@ -1852,143 +1898,369 @@ bool plug_buf = false;
 /************************* Implementation ***************************/
 
 #ifdef HAVE_LCD_COLOR
+/*
+ * Conversion of full 0-255 range YCrCb to RGB:
+ *   |R|   |1.000000 -0.000001  1.402000| |Y'|
+ *   |G| = |1.000000 -0.334136 -0.714136| |Pb|
+ *   |B|   |1.000000  1.772000  0.000000| |Pr|
+ * Scaled (yields s15-bit output):
+ *   |R|   |128    0  179| |Y       |
+ *   |G| = |128  -43  -91| |Cb - 128|
+ *   |B|   |128  227    0| |Cr - 128|
+ */
+#define YFAC            128
+#define RVFAC           179
+#define GUFAC           (-43)
+#define GVFAC           (-91)
+#define BUFAC           227
+#define YUV_WHITE       (255*YFAC)
+#define NODITHER_DELTA  (127*YFAC)
+#define COMPONENT_SHIFT  15
+#define MATRIX_SHIFT      7
 
-#if (LCD_DEPTH == 16) && \
-    ((LCD_PIXELFORMAT == RGB565) || (LCD_PIXELFORMAT == RGB565SWAPPED))
-#define RYFAC (31*257)
-#define GYFAC (63*257)
-#define BYFAC (31*257)
-#define RVFAC 11170     /* 31 * 257 *  1.402    */
-#define GVFAC (-11563)  /* 63 * 257 * -0.714136 */
-#define GUFAC (-5572)   /* 63 * 257 * -0.344136 */
-#define BUFAC 14118     /* 31 * 257 *  1.772    */
-#endif
+static inline int clamp_component(int x)
+{
+    if ((unsigned)x > YUV_WHITE)
+        x = x < 0 ? 0 : YUV_WHITE;
+    return x;
+}
 
-#define ROUNDOFFS (127*257)
+static inline int clamp_component_bits(int x, int bits)
+{
+    if ((unsigned)x > (1u << bits) - 1)
+        x = x < 0 ? 0 : (1 << bits) - 1;
+    return x;
+}
 
-/* Draw a partial YUV colour bitmap */
+static inline int component_to_lcd(int x, int bits, int delta)
+{
+    /* Formula used in core bitmap loader. */
+    return (((1 << bits) - 1)*x + (x >> (8 - bits)) + delta) >> COMPONENT_SHIFT;
+}
+
+static inline int lcd_to_component(int x, int bits, int delta)
+{
+    /* Reasonable, approximate reversal to get a full range back from the
+       quantized value. */
+    return YUV_WHITE*x / ((1 << bits) - 1);
+    (void)delta;
+}
+
+#define RED 0
+#define GRN 1
+#define BLU 2
+
+struct rgb_err
+{
+    int16_t errbuf[LCD_WIDTH+2]; /* Error record for line below            */
+} rgb_err_buffers[3];
+
+fb_data rgb_linebuf[LCD_WIDTH];  /* Line buffer for scrolling when
+                                    DITHER_DIFFUSION is set                */
+
+struct rgb_pixel
+{
+    int r, g, b;                 /* Current pixel components in s16.0      */
+    int inc;                     /* Current line increment (-1 or 1)       */
+    int row;                     /* Current row in source image            */
+    int col;                     /* Current column in source image         */
+    int ce[3];                   /* Errors to apply to current pixel       */
+    struct rgb_err *e;           /* RED, GRN, BLU                          */
+    int epos;                    /* Current position in error record       */
+};
+
+struct rgb_pixel *pixel;
+
+/** round and truncate to lcd depth **/
+static fb_data pixel_to_lcd_colour(void)
+{
+    struct rgb_pixel *p = pixel;
+    int r, g, b;
+
+    r = component_to_lcd(p->r, LCD_RED_BITS, NODITHER_DELTA);
+    r = clamp_component_bits(r, LCD_RED_BITS);
+
+    g = component_to_lcd(p->g, LCD_GREEN_BITS, NODITHER_DELTA);
+    g = clamp_component_bits(g, LCD_GREEN_BITS);
+
+    b = component_to_lcd(p->b, LCD_BLUE_BITS, NODITHER_DELTA);
+    b = clamp_component_bits(b, LCD_BLUE_BITS);
+
+    return LCD_RGBPACK_LCD(r, g, b);
+}
+
+/** write a monochrome pixel to the colour LCD **/
+static fb_data pixel_to_lcd_gray(void)
+{
+    int r, g, b;
+
+    g = clamp_component(pixel->g);
+    r = component_to_lcd(g, LCD_RED_BITS, NODITHER_DELTA);
+    b = component_to_lcd(g, LCD_BLUE_BITS, NODITHER_DELTA);
+    g = component_to_lcd(g, LCD_GREEN_BITS, NODITHER_DELTA);
+
+    return LCD_RGBPACK_LCD(r, g, b);
+}
+
+/**
+ * Bayer ordered dithering - swiped from the core bitmap loader.
+ */
+static fb_data pixel_odither_to_lcd(void)
+{
+    /* canonical ordered dither matrix */
+    static const unsigned char dither_matrix[16][16] = {
+        {   0,192, 48,240, 12,204, 60,252,  3,195, 51,243, 15,207, 63,255 },
+        { 128, 64,176,112,140, 76,188,124,131, 67,179,115,143, 79,191,127 },
+        {  32,224, 16,208, 44,236, 28,220, 35,227, 19,211, 47,239, 31,223 },
+        { 160, 96,144, 80,172,108,156, 92,163, 99,147, 83,175,111,159, 95 },
+        {   8,200, 56,248,  4,196, 52,244, 11,203, 59,251,  7,199, 55,247 },
+        { 136, 72,184,120,132, 68,180,116,139, 75,187,123,135, 71,183,119 },
+        {  40,232, 24,216, 36,228, 20,212, 43,235, 27,219, 39,231, 23,215 },
+        { 168,104,152, 88,164,100,148, 84,171,107,155, 91,167,103,151, 87 },
+        {   2,194, 50,242, 14,206, 62,254,  1,193, 49,241, 13,205, 61,253 },
+        { 130, 66,178,114,142, 78,190,126,129, 65,177,113,141, 77,189,125 },
+        {  34,226, 18,210, 46,238, 30,222, 33,225, 17,209, 45,237, 29,221 },
+        { 162, 98,146, 82,174,110,158, 94,161, 97,145, 81,173,109,157, 93 },
+        {  10,202, 58,250,  6,198, 54,246,  9,201, 57,249,  5,197, 53,245 },
+        { 138, 74,186,122,134, 70,182,118,137, 73,185,121,133, 69,181,117 },
+        {  42,234, 26,218, 38,230, 22,214, 41,233, 25,217, 37,229, 21,213 },
+        { 170,106,154, 90,166,102,150, 86,169,105,153, 89,165,101,149, 85 }
+    };
+
+    struct rgb_pixel *p = pixel;
+    int r, g, b, delta;
+
+    delta = dither_matrix[p->col & 15][p->row & 15] << MATRIX_SHIFT;
+
+    r = component_to_lcd(p->r, LCD_RED_BITS, delta);
+    r = clamp_component_bits(r, LCD_RED_BITS);
+
+    g = component_to_lcd(p->g, LCD_GREEN_BITS, delta);
+    g = clamp_component_bits(g, LCD_GREEN_BITS);
+
+    b = component_to_lcd(p->b, LCD_BLUE_BITS, delta);
+    b = clamp_component_bits(b, LCD_BLUE_BITS);
+
+    p->col += p->inc;
+
+    return LCD_RGBPACK_LCD(r, g, b);
+} 
+
+/**
+ * Floyd/Steinberg dither to lcd depth.
+ *
+ * Apply filter to each component in serpentine pattern. Kernel shown for
+ * L->R scan. Kernel is reversed for R->L.
+ *        *   7
+ *    3   5   1     (1/16)
+ */
+static inline void distribute_error(int *ce, struct rgb_err *e,
+                                    int err, int epos, int inc)
+{
+    *ce                  = (7*err >> 4) + e->errbuf[epos+inc];
+    e->errbuf[epos+inc]  =   err >> 4;
+    e->errbuf[epos]     += 5*err >> 4;
+    e->errbuf[epos-inc] += 3*err >> 4;
+}
+
+static fb_data pixel_fsdither_to_lcd(void)
+{
+    struct rgb_pixel *p = pixel;
+    int rc, gc, bc, r, g, b;
+    int inc, epos;
+
+    /* Full components with error terms */
+    rc = p->r + p->ce[RED];
+    r  = component_to_lcd(rc, LCD_RED_BITS, 0);
+    r  = clamp_component_bits(r, LCD_RED_BITS);
+
+    gc = p->g + p->ce[GRN];
+    g  = component_to_lcd(gc, LCD_GREEN_BITS, 0);
+    g  = clamp_component_bits(g, LCD_GREEN_BITS);
+
+    bc = p->b + p->ce[BLU];
+    b  = component_to_lcd(bc, LCD_BLUE_BITS, 0);
+    b  = clamp_component_bits(b, LCD_BLUE_BITS);
+
+    /* Get pixel errors */
+    rc -= lcd_to_component(r, LCD_RED_BITS, 0);
+    gc -= lcd_to_component(g, LCD_GREEN_BITS, 0);
+    bc -= lcd_to_component(b, LCD_BLUE_BITS, 0);
+
+    /* Spead error to surrounding pixels. */
+    inc      = p->inc;
+    epos     = p->epos;
+    p->epos += inc;
+
+    distribute_error(&p->ce[RED], &p->e[RED], rc, epos, inc);
+    distribute_error(&p->ce[GRN], &p->e[GRN], gc, epos, inc);
+    distribute_error(&p->ce[BLU], &p->e[BLU], bc, epos, inc);
+
+    /* Pack and return pixel */
+    return LCD_RGBPACK_LCD(r, g, b);
+}
+
+/* Functions for each output mode, colour then grayscale. */
+static fb_data (* const pixel_funcs[COLOUR_NUM_MODES][DITHER_NUM_MODES])(void) =
+{
+    [COLOURMODE_COLOUR] =
+    {
+        [DITHER_NONE]      = pixel_to_lcd_colour,
+        [DITHER_ORDERED]   = pixel_odither_to_lcd,
+        [DITHER_DIFFUSION] = pixel_fsdither_to_lcd,
+    },
+    [COLOURMODE_GRAY] =
+    {
+        [DITHER_NONE]      = pixel_to_lcd_gray,
+        [DITHER_ORDERED]   = pixel_odither_to_lcd,
+        [DITHER_DIFFUSION] = pixel_fsdither_to_lcd,
+    },
+};
+ 
+/**
+ * Draw a partial YUV colour bitmap
+ *
+ * Runs serpentine pattern when dithering is DITHER_DIFFUSION, else scan is
+ * always L->R.
+ */
 void yuv_bitmap_part(unsigned char *src[3], int csub_x, int csub_y,
                      int src_x, int src_y, int stride,
                      int x, int y, int width, int height)
 {
     fb_data *dst, *dst_end;
+    fb_data (*pixel_func)(void);
+    struct rgb_pixel px;
 
-    /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
-        || (x + width <= 0) || (y + height <= 0))
-        return;
-
-    /* clipping */
-    if (x < 0)
-    {
-        width += x;
-        src_x -= x;
-        x = 0;
-    }
-    if (y < 0)
-    {
-        height += y;
-        src_y -= y;
-        y = 0;
-    }
     if (x + width > LCD_WIDTH)
-        width = LCD_WIDTH - x;
+        width = LCD_WIDTH - x; /* Clip right */
+    if (x < 0)
+        width += x, x = 0; /* Clip left */
+    if (width <= 0)
+        return; /* nothing left to do */
+
     if (y + height > LCD_HEIGHT)
-        height = LCD_HEIGHT - y;
+        height = LCD_HEIGHT - y; /* Clip bottom */
+    if (y < 0)
+        height += y, y = 0; /* Clip top */
+    if (height <= 0)
+        return; /* nothing left to do */
+
+    pixel = &px;
 
     dst = rb->lcd_framebuffer + LCD_WIDTH * y + x;
     dst_end = dst + LCD_WIDTH * height;
 
+    if (jpeg_settings.colour_mode == COLOURMODE_GRAY)
+        csub_y = 0; /* Ignore Cb, Cr */
+
+    pixel_func = pixel_funcs[jpeg_settings.colour_mode]
+                            [jpeg_settings.dither_mode];
+
+    if (jpeg_settings.dither_mode == DITHER_DIFFUSION)
+    {
+        /* Reset error terms. */
+        px.e = rgb_err_buffers;
+        px.ce[RED] = px.ce[GRN] = px.ce[BLU] = 0;
+        rb->memset(px.e, 0, 3*sizeof (struct rgb_err));
+    }
+
     do
     {
-        fb_data *dst_row = dst;
-        fb_data *row_end = dst_row + width;
-        const unsigned char *ysrc = src[0] + stride * src_y + src_x;
-        int y, u, v;
-        int red, green, blue;
-        unsigned rbits, gbits, bbits;
+        fb_data *dst_row, *row_end;
+        const unsigned char *ysrc;
+        px.inc = 1;
 
+        if (jpeg_settings.dither_mode == DITHER_DIFFUSION)
+        {
+            /* Use R->L scan on odd lines */
+            px.inc -= (src_y & 1) << 1;
+            px.epos = x + 1;
+
+            if (px.inc < 0)
+                px.epos += width - 1;
+        }
+
+        if (px.inc == 1)
+        {
+            /* Scan is L->R */
+            dst_row = dst;
+            row_end = dst_row + width;
+            px.col  = src_x;
+        }
+        else
+        {
+            /* Scan is R->L */
+            row_end = dst - 1;
+            dst_row = row_end + width;
+            px.col  = src_x + width - 1;
+        }
+
+        ysrc = src[0] + stride * src_y + px.col;
+        px.row = src_y;
+
+        /* Do one row of pixels */
         if (csub_y) /* colour */
         {
             /* upsampling, YUV->RGB conversion and reduction to RGB565 in one go */
-            const unsigned char *usrc = src[1] + (stride/csub_x) * (src_y/csub_y)
-                                               + (src_x/csub_x);
-            const unsigned char *vsrc = src[2] + (stride/csub_x) * (src_y/csub_y)
-                                               + (src_x/csub_x);
-            int xphase = src_x % csub_x;
-            int rc, gc, bc;
+            const unsigned char *usrc, *vsrc;
 
-            u = *usrc++ - 128;
-            v = *vsrc++ - 128;
-            rc = RVFAC * v + ROUNDOFFS;
-            gc = GVFAC * v + GUFAC * u + ROUNDOFFS;
-            bc = BUFAC * u + ROUNDOFFS;
+            usrc = src[1] + (stride/csub_x) * (src_y/csub_y)
+                                            + (px.col/csub_x);
+            vsrc = src[2] + (stride/csub_x) * (src_y/csub_y)
+                                            + (px.col/csub_x);
+            int xphase = px.col % csub_x;
+            int xphase_reset = px.inc * csub_x;
+            int y, v, u, rv, guv, bu;
 
-            do
+            v     = *vsrc - 128;
+            vsrc += px.inc;
+            u     = *usrc - 128;
+            usrc += px.inc;
+            rv    =           RVFAC*v;
+            guv   = GUFAC*u + GVFAC*v;
+            bu    = BUFAC*u;
+
+            while (1)
             {
-                y = *ysrc++;
-                red   = RYFAC * y + rc;
-                green = GYFAC * y + gc;
-                blue  = BYFAC * y + bc;
+                y     = YFAC*(*ysrc);
+                ysrc += px.inc;
+                px.r  = y + rv;
+                px.g  = y + guv;
+                px.b  = y + bu;
 
-                if ((unsigned)red > (RYFAC*255+ROUNDOFFS))
-                {
-                    if (red < 0)
-                        red = 0;
-                    else
-                        red = (RYFAC*255+ROUNDOFFS);
-                }
-                if ((unsigned)green > (GYFAC*255+ROUNDOFFS))
-                {
-                    if (green < 0)
-                        green = 0;
-                    else
-                        green = (GYFAC*255+ROUNDOFFS);
-                }
-                if ((unsigned)blue > (BYFAC*255+ROUNDOFFS))
-                {
-                    if (blue < 0)
-                        blue = 0;
-                    else
-                        blue = (BYFAC*255+ROUNDOFFS);
-                }
-                rbits = ((unsigned)red) >> 16 ;
-                gbits = ((unsigned)green) >> 16 ;
-                bbits = ((unsigned)blue) >> 16 ;
-#if LCD_PIXELFORMAT == RGB565
-                *dst_row++ = (rbits << 11) | (gbits << 5) | bbits;
-#elif LCD_PIXELFORMAT == RGB565SWAPPED
-                *dst_row++ = swap16((rbits << 11) | (gbits << 5) | bbits);
-#endif
+                *dst_row = pixel_func();
+                dst_row += px.inc;
 
-                if (++xphase >= csub_x)
-                {
-                    u = *usrc++ - 128;
-                    v = *vsrc++ - 128;
-                    rc = RVFAC * v + ROUNDOFFS;
-                    gc = GVFAC * v + GUFAC * u + ROUNDOFFS;
-                    bc = BUFAC * u + ROUNDOFFS;
-                    xphase = 0;
-                }
+                if (dst_row == row_end)
+                    break;
+
+                xphase += px.inc;
+                if ((unsigned)xphase < (unsigned)csub_x)
+                    continue;
+
+                /* fetch new chromas */
+                v     = *vsrc - 128;
+                vsrc += px.inc;
+                u     = *usrc - 128;
+                usrc += px.inc;
+                rv    =           RVFAC*v;
+                guv   = GUFAC*u + GVFAC*v;
+                bu    = BUFAC*u;
+
+                xphase -= xphase_reset;
             }
-            while (dst_row < row_end);
         }
         else /* monochrome */
         {
             do
             {
-                y = *ysrc++;
-                red   = RYFAC * y + ROUNDOFFS;  /* blue == red */
-                green = GYFAC * y + ROUNDOFFS;
-                rbits = ((unsigned)red) >> 16;
-                gbits = ((unsigned)green) >> 16;
-#if LCD_PIXELFORMAT == RGB565
-                *dst_row++ = (rbits << 11) | (gbits << 5) | rbits;
-#elif LCD_PIXELFORMAT == RGB565SWAPPED
-                *dst_row++ = swap16((rbits << 11) | (gbits << 5) | rbits);
-#endif
+                /* Set all components the same for dithering purposes */
+                px.g  = px.r = px.b = YFAC*(*ysrc);
+                *dst_row = pixel_func();
+                ysrc    += px.inc;
+                dst_row += px.inc;
             }
-            while (dst_row < row_end);
+            while (dst_row != row_end);
         }
 
         src_y++;
@@ -1996,7 +2268,8 @@ void yuv_bitmap_part(unsigned char *src[3], int csub_x, int csub_y,
     }
     while (dst < dst_end);
 }
-#endif
+
+#endif /* HAVE_LCD_COLOR */
 
 
 /* support function for qsort() */
@@ -2114,6 +2387,42 @@ void cleanup(void *parameter)
 #define ZOOM_IN  100 /* return codes for below function */
 #define ZOOM_OUT 101
 
+#ifdef HAVE_LCD_COLOR
+bool set_option_grayscale(void)
+{
+    bool gray = jpeg_settings.colour_mode == COLOURMODE_GRAY;
+    rb->set_bool("Grayscale", &gray);
+    jpeg_settings.colour_mode = gray ? COLOURMODE_GRAY : COLOURMODE_COLOUR;
+    return false;
+}
+
+bool set_option_dithering(void)
+{
+    static const struct opt_items dithering[DITHER_NUM_MODES] = {
+        [DITHER_NONE]      = { "Off",       -1 },
+        [DITHER_ORDERED]   = { "Ordered",   -1 },
+        [DITHER_DIFFUSION] = { "Diffusion", -1 },
+    };
+
+    rb->set_option("Dithering", &jpeg_settings.dither_mode, INT,
+                   dithering, DITHER_NUM_MODES, NULL);
+    return false;
+}
+
+static void display_options(void)
+{
+    static const struct menu_item items[] = {
+        { "Grayscale", set_option_grayscale },
+        { "Dithering", set_option_dithering },
+    };
+
+    int m = rb->menu_init(items, ARRAYLEN(items),
+                          NULL, NULL, NULL, NULL);
+    rb->menu_run(m);
+    rb->menu_exit(m);
+}
+#endif /* HAVE_LCD_COLOR */
+
 int show_menu(void) /* return 1 to quit */
 {
 #if LCD_DEPTH > 1
@@ -2128,19 +2437,45 @@ int show_menu(void) /* return 1 to quit */
 #endif
     int m;
     int result;
-    static const struct menu_item items[] = {
-        { "Quit", NULL },
-        { "Toggle Slideshow Mode", NULL },
-        { "Change Slideshow Time", NULL },
+
+    enum menu_id
+    {
+        MIID_QUIT = 0,
+        MIID_TOGGLE_SS_MODE,
+        MIID_CHANGE_SS_MODE,
 #if PLUGIN_BUFFER_SIZE >= MIN_MEM
-        { "Show Playback Menu", NULL },
+        MIID_SHOW_PLAYBACK_MENU,
 #endif
-        { "Return", NULL },
+#ifdef HAVE_LCD_COLOR
+        MIID_DISPLAY_OPTIONS,
+#endif
+        MIID_RETURN,
     };
+
+    static const struct menu_item items[] = {
+        [MIID_QUIT] =
+            { "Quit", NULL },
+        [MIID_TOGGLE_SS_MODE] =
+            { "Toggle Slideshow Mode", NULL },
+        [MIID_CHANGE_SS_MODE] =
+            { "Change Slideshow Time", NULL },
+#if PLUGIN_BUFFER_SIZE >= MIN_MEM
+        [MIID_SHOW_PLAYBACK_MENU] =
+            { "Show Playback Menu", NULL },
+#endif
+#ifdef HAVE_LCD_COLOR
+        [MIID_DISPLAY_OPTIONS] =
+            { "Display Options", NULL },
+#endif
+        [MIID_RETURN] =
+            { "Return", NULL },
+    };
+
     static const struct opt_items slideshow[2] = {
         { "Disable", -1 },
         { "Enable", -1 },
     };
+
     static const struct opt_items timeout[12] = {
         { "1 second", -1 },
         { "2 seconds", -1 },
@@ -2155,20 +2490,22 @@ int show_menu(void) /* return 1 to quit */
         { "15 seconds", -1 },
         { "20 seconds", -1 },
     };
+
     m = rb->menu_init(items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
     result=rb->menu_show(m);
+
     switch (result)
     {
-        case 0:
+        case MIID_QUIT:
             rb->menu_exit(m);
             return 1;
             break;
-        case 1: //toggle slideshow
+        case MIID_TOGGLE_SS_MODE:
             rb->set_option("Toggle Slideshow", &slideshow_enabled, INT,
                            slideshow , 2, NULL);
             break;
-        case 2:
+        case MIID_CHANGE_SS_MODE:
             switch (button_timeout/HZ)
             {
                 case 10: result = 9; break;
@@ -2186,12 +2523,17 @@ int show_menu(void) /* return 1 to quit */
                 default: button_timeout = (result+1)*HZ; break;
             }
             break;
-        case 3:
 #if PLUGIN_BUFFER_SIZE >= MIN_MEM
+        case MIID_SHOW_PLAYBACK_MENU:
             playback_control(rb);
             break;
-        case 4:
 #endif
+#ifdef HAVE_LCD_COLOR
+        case MIID_DISPLAY_OPTIONS:
+            display_options();
+            break;
+#endif
+        case MIID_RETURN:
             break;
     }
 
@@ -2300,6 +2642,13 @@ int scroll_bmp(struct t_disp* pdisp)
                 MYXLCD(scroll_down)(move); /* scroll down */
                 pdisp->y -= move;
 #ifdef HAVE_LCD_COLOR
+                if (jpeg_settings.dither_mode == DITHER_DIFFUSION)
+                {
+                    /* Draw over the band at the top of the last update
+                       caused by lack of error history on line zero. */
+                    move = MIN(move + 1, pdisp->y + pdisp->height);
+                }
+
                 yuv_bitmap_part(
                     pdisp->bitmap, pdisp->csub_x, pdisp->csub_y,
                     pdisp->x, pdisp->y, pdisp->stride,
@@ -2323,11 +2672,32 @@ int scroll_bmp(struct t_disp* pdisp)
                 MYXLCD(scroll_up)(move); /* scroll up */
                 pdisp->y += move;
 #ifdef HAVE_LCD_COLOR
-               yuv_bitmap_part(
+                if (jpeg_settings.dither_mode == DITHER_DIFFUSION)
+                {
+                    /* Save the line that was on the last line of the display
+                       and draw one extra line above then recover the line with
+                       image data that had an error history when it was drawn.
+                     */
+                    move++, pdisp->y--;
+                    MEMCPY(rgb_linebuf,
+                           rb->lcd_framebuffer + (LCD_HEIGHT - move)*LCD_WIDTH,
+                           LCD_WIDTH*sizeof (fb_data));
+                }
+
+                yuv_bitmap_part(
                     pdisp->bitmap, pdisp->csub_x, pdisp->csub_y, pdisp->x,
                     pdisp->y + LCD_HEIGHT - move, pdisp->stride,
                     MAX(0, (LCD_WIDTH-pdisp->width)/2), LCD_HEIGHT - move, /* x, y */
                     MIN(LCD_WIDTH, pdisp->width), move);     /* w, h */
+
+                if (jpeg_settings.dither_mode == DITHER_DIFFUSION)
+                {
+                    /* Cover the first row drawn with previous image data. */
+                    MEMCPY(rb->lcd_framebuffer + (LCD_HEIGHT - move)*LCD_WIDTH,
+                           rgb_linebuf,
+                           LCD_WIDTH*sizeof (fb_data));
+                    pdisp->y++;
+                }
 #else
                 MYXLCD(gray_bitmap_part)(
                     pdisp->bitmap[0], pdisp->x,
@@ -2909,6 +3279,15 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     xlcd_init(rb);
 #endif
 
+#ifdef HAVE_LCD_COLOR
+    /* should be ok to just load settings since a parameter is present
+       here and the drive should be spinning */
+    configfile_init(rb);
+    configfile_load(JPEG_CONFIGFILE, jpeg_config,
+                    ARRAYLEN(jpeg_config), JPEG_SETTINGS_MINVERSION);
+    old_settings = jpeg_settings;
+#endif
+
     buf_images = buf; buf_images_size = buf_size;
 
     /* make sure the backlight is always on when viewing pictures
@@ -2925,6 +3304,16 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         condition = load_and_show(np_file);
     }while (condition != PLUGIN_OK && condition != PLUGIN_USB_CONNECTED
                                           && condition != PLUGIN_ERROR);
+
+#ifdef HAVE_LCD_COLOR
+    if (rb->memcmp(&jpeg_settings, &old_settings, sizeof (jpeg_settings)))
+    {
+        /* Just in case drive has to spin, keep it from looking locked */
+        rb->splash(0, "Saving Settings");
+        configfile_save(JPEG_CONFIGFILE, jpeg_config,
+                        ARRAYLEN(jpeg_config), JPEG_SETTINGS_VERSION);
+    }
+#endif
 
 #ifndef SIMULATOR
     /* set back ata spindown time in case we changed it */
