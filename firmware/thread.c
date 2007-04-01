@@ -69,10 +69,10 @@ static long cores_locked IBSS_ATTR;
 #define LOCK(...) do { } while (test_and_set(&cores_locked, 1))
 #define UNLOCK(...) cores_locked = 0
 
-#warning "Core locking mechanism should be fixed on H10/4G!"
+//#warning "Core locking mechanism should be fixed on H10/4G!"
 inline void lock_cores(void)
 {
-#if 0
+#if 1
     if (!cores[CURRENT_CORE].lock_issued)
     {
         LOCK();
@@ -83,7 +83,7 @@ inline void lock_cores(void)
 
 inline void unlock_cores(void)
 {
-#if 0
+#if 1
     if (cores[CURRENT_CORE].lock_issued)
     {
         cores[CURRENT_CORE].lock_issued = false;
@@ -852,7 +852,7 @@ void remove_thread(struct thread_entry *thread)
     lock_cores();
     
     if (thread == NULL)
-        thread = cores[IF_COP2(thread->core)].running;
+        thread = cores[CURRENT_CORE].running;
     
     /* Free the entry by removing thread name. */
     thread->name = NULL;
