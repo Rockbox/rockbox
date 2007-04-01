@@ -12,6 +12,7 @@
 #include "file.h"
 #include "debug.h"
 #include "rbunicode.h"
+#include "config.h"
 
 #ifndef O_BINARY
 #define O_BINARY 0
@@ -170,7 +171,7 @@ unsigned char* iso_decode(const unsigned char *iso, unsigned char *utf8,
 
                 case GB_2312:  /* Simplified Chinese */
                 case KSX_1001: /* Korean */
-                case BIG5:     /* Traditional Chinese */
+                case BIG_5:    /* Traditional Chinese */
                     if (count < 1 || !iso[1]) {
                         ucs = *iso++;
                         break;
