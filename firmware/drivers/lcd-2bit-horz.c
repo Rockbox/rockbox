@@ -889,6 +889,8 @@ void lcd_invertscroll(int x, int y)
 
     (void)x;
 
+    if(y>=SCROLLABLE_LINES) return;
+
     s = &scroll[y];
     s->invert = !s->invert;
 }
@@ -938,6 +940,8 @@ void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
 {
     struct scrollinfo* s;
     int w, h;
+
+    if(y>=SCROLLABLE_LINES) return;
 
     s = &scroll[y];
 

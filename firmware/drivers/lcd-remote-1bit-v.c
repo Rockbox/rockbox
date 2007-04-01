@@ -691,6 +691,8 @@ void lcd_remote_invertscroll(int x, int y)
 
     (void)x;
 
+    if(y>=SCROLLABLE_LINES) return;
+
     s = &scroll[y];
     s->invert = !s->invert;
 }
@@ -740,6 +742,8 @@ void lcd_remote_puts_scroll_style_offset(int x, int y, const unsigned char *stri
 {
     struct scrollinfo* s;
     int w, h;
+
+    if(y>=SCROLLABLE_LINES) return;
 
     s = &scroll[y];
 

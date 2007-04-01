@@ -456,6 +456,8 @@ void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
     struct scrollinfo* s;
     int len;
 
+    if(y>=SCROLLABLE_LINES) return;
+
     s = &scroll[y];
 
     s->start_tick = current_tick + scroll_delay;
