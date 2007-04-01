@@ -94,7 +94,7 @@ struct wps_data
     bool show_sb_on_wps;
 #endif
 #ifdef HAVE_LCD_CHARCELLS
-    unsigned char wps_progress_pat[8];
+    unsigned short wps_progress_pat[8];
     bool full_line_progressbar;
 #endif
     char format_buffer[FORMAT_BUFFER_SIZE];

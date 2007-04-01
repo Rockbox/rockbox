@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include "system.h"
 #include "settings.h"
+#include "rbunicode.h"
 #include "rtc.h"
 #include "audio.h"
 #include "status.h"
@@ -597,8 +598,8 @@ static char* get_tag(struct wps_data* wps_data,
                 case 'b':  /* progress bar */
                     *flags |= WPS_REFRESH_PLAYER_PROGRESS;
 #ifdef HAVE_LCD_CHARCELLS
-                    snprintf(buf, buf_size, "%c",
-                             wps_data->wps_progress_pat[0]);
+                    char *end = utf8encode(wps_data->wps_progress_pat[0], buf);
+                    *end = '\0';
                     wps_data->full_line_progressbar=0;
                     return buf;
 #else
@@ -1793,14 +1794,12 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
             new_subline_refresh)
         {
             flags = 0;
-#ifdef HAVE_LCD_BITMAP
             int left_width,   left_xpos;
             int center_width, center_xpos;
             int right_width,  right_xpos;
             int space_width;
             int string_height;
             int ypos;
-#endif
 
             format_display(gwps, buf, sizeof(buf),
                            state->id3, state->nid3,
@@ -1883,7 +1882,6 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
                     draw_player_progress(gwps);
             }
 #endif
-#ifdef HAVE_LCD_BITMAP
             /* calculate different string sizes and positions */
             display->getstringsize((unsigned char *)" ", &space_width, &string_height);
             if (format_align.left != 0) {
@@ -1996,30 +1994,29 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
                 right_width = 0;
             }
 
-#endif
-
             if (flags & WPS_REFRESH_SCROLL) {
 
                 /* scroll line */
                 if ((refresh_mode & WPS_REFRESH_SCROLL) ||
                     new_subline_refresh) {
-#ifdef HAVE_LCD_BITMAP
+
                     ypos = (i*string_height)+display->getymargin();
                     update_line = true;
-
+                    
                     if (left_width>display->width) {
                         display->puts_scroll(0, i,
                                              (unsigned char *)format_align.left);
                     } else {
                         /* clear the line first */
+#ifdef HAVE_LCD_BITMAP
                         display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
                         display->fillrect(0, ypos, display->width, string_height);
                         display->set_drawmode(DRMODE_SOLID);
-
+#endif
                         /* Nasty hack: we output an empty scrolling string,
                            which will reset the scroller for that line */
                         display->puts_scroll(0, i, (unsigned char *)"");
-                        
+
                         /* print aligned strings */
                         if (left_width != 0)
                         {
@@ -2037,10 +2034,6 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
                                             (unsigned char *)format_align.right);
                         }
                     }
-#else
-                    display->puts_scroll(0, i, buf);
-                    update_line = true;
-#endif
                 }
             }
             else if (flags & (WPS_REFRESH_DYNAMIC | WPS_REFRESH_STATIC))
@@ -2049,14 +2042,15 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
                 if ((refresh_mode & (WPS_REFRESH_DYNAMIC|WPS_REFRESH_STATIC)) ||
                     new_subline_refresh)
                 {
-#ifdef HAVE_LCD_BITMAP
                     ypos = (i*string_height)+display->getymargin();
                     update_line = true;
 
+#ifdef HAVE_LCD_BITMAP
                     /* clear the line first */
                     display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
                     display->fillrect(0, ypos, display->width, string_height);
                     display->set_drawmode(DRMODE_SOLID);
+#endif
 
                     /* Nasty hack: we output an empty scrolling string,
                        which will reset the scroller for that line */
@@ -2078,10 +2072,6 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
                         display->putsxy(right_xpos, ypos,
                                         (unsigned char *)format_align.right);
                     }
-#else
-                    update_line = true;
-                    display->puts(0, i, buf);
-#endif
                 }
             }
         }
@@ -2213,7 +2203,7 @@ static void draw_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size)
     int digits[6];
     int time;
     char timestr[7];
-    
+
     struct wps_state *state = gwps->state;
     struct screen *display = gwps->display;
     struct wps_data *data = gwps->data;
@@ -2280,8 +2270,7 @@ static void draw_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size)
 
         display->define_pattern(data->wps_progress_pat[lcd_char_pos+1],
                                 player_progressbar);
-        buf[lcd_char_pos]=data->wps_progress_pat[lcd_char_pos+1];
-
+        buf = utf8encode(data->wps_progress_pat[lcd_char_pos+1], buf);
     }
 
     /* make rest of the progressbar if necessary */
@@ -2289,7 +2278,7 @@ static void draw_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size)
 
         /* set the characters positions that use the full 5 pixel wide bar */
         for (lcd_char_pos=6; lcd_char_pos < (songpos/5); lcd_char_pos++)
-            buf[lcd_char_pos] = 0x86; /* '_' */
+            buf = utf8encode(0xe115, buf);  /* 2/7 '_' */
 
         /* build the partial bar character for the tail character position */
         memset(binline, 0, sizeof binline);
@@ -2311,8 +2300,8 @@ static void draw_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size)
         }
 
         display->define_pattern(data->wps_progress_pat[7],player_progressbar);
-
-        buf[songpos/5]=data->wps_progress_pat[7];
+        buf = utf8encode(data->wps_progress_pat[7], buf);
+        *buf = '\0';
     }
 }
 #endif
