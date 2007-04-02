@@ -212,7 +212,7 @@ static void init_tagcache(void)
                 tagcache_get_max_commit_step());
 #else
             lcd_double_height(false);
-            snprintf(buf, sizeof(buf), " TC [%d/%d]", ret, 
+            snprintf(buf, sizeof(buf), " DB [%d/%d]", ret, 
                 tagcache_get_max_commit_step());
             lcd_puts(0, 1, buf);
 #endif
