@@ -293,22 +293,12 @@ void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
         : : "r" (src), "r" (dst), "r" (width), "r" (dst_end), "r" (stride), "r" (transcolor) : "r0", "r1" );
 }
 
-#define CSUB_X 2
-#define CSUB_Y 2
-
-#define RFULL (31*257)
-#define GFULL (63*257)
-#define BFULL (31*257)
-#define RYFAC 9277     /* 31 * 257 *  1.0      * (255/219) */
-#define GYFAC 18853    /* 63 * 257 *  1.0      * (255/219) */
-#define BYFAC 9277     /* 31 * 257 *  1.0      * (255/219) */
-#define RVFAC 12716    /* 31 * 257 *  1.402    * (255/224) */
-#define GVFAC (-13163) /* 63 * 257 * -0.714136 * (255/224) */
-#define GUFAC (-6343)  /* 63 * 257 * -0.344136 * (255/224) */
-#define BUFAC 16071    /* 31 * 257 *  1.772    * (255/224) */
-
-#define ROUNDOFFS (127*257)
-
+/* Line write helper function for lcd_yuv_blit. Write two lines of yuv420. */
+extern void lcd_write_yuv420_lines(fb_data *dst,
+                                   unsigned char chroma_buf[LCD_HEIGHT/2*3],
+                                   unsigned char const * const src[3],
+                                   int width,
+                                   int stride);
 /* Performance function to blit a YUV bitmap directly to the LCD */
 /* For the Gigabeat - show it rotated */
 /* So the LCD_WIDTH is now the height */
@@ -316,89 +306,37 @@ void lcd_yuv_blit(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
-    width = (width + 1) & ~1;
+    /* Caches for chroma data so it only need be recaculated every other
+       line */
+    unsigned char chroma_buf[LCD_HEIGHT/2*3]; /* 480 bytes */
+    unsigned char const * yuv_src[3];
+    off_t z;
+
+    if (!lcd_on)
+        return;
+
+    /* Sorry, but width and height must be >= 2 or else */
+    width &= ~1;
+    height >>= 1;
+
     fb_data *dst = (fb_data*)FRAME + x * LCD_WIDTH + (LCD_WIDTH - y) - 1;
-    fb_data *dst_last = dst - (height - 1);
 
-    for (;;)
+    z = stride*src_y;
+    yuv_src[0] = src[0] + z + src_x;
+    yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
+    yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
+
+    do
     {
-        fb_data *dst_row = dst;
-        int count = width;
-        const unsigned char *ysrc = src[0] + stride * src_y + src_x;
-        int y, u, v;
-        int red, green, blue;
-        unsigned rbits, gbits, bbits;
-
-        /* upsampling, YUV->RGB conversion and reduction to RGB565 in one go */
-        const unsigned char *usrc = src[1] + (stride/CSUB_X) * (src_y/CSUB_Y)
-                                           + (src_x/CSUB_X);
-        const unsigned char *vsrc = src[2] + (stride/CSUB_X) * (src_y/CSUB_Y)
-                                           + (src_x/CSUB_X);
-        int xphase = src_x % CSUB_X;
-        int rc, gc, bc;
-
-        u = *usrc++ - 128;
-        v = *vsrc++ - 128;
-        rc = RVFAC * v + ROUNDOFFS;
-        gc = GVFAC * v + GUFAC * u + ROUNDOFFS;
-        bc = BUFAC * u + ROUNDOFFS;
-
-        do
-        {
-            y = *ysrc++ - 16;
-            red   = RYFAC * y + rc;
-            green = GYFAC * y + gc;
-            blue  = BYFAC * y + bc;
-
-            if ((unsigned)red > (RFULL*255+ROUNDOFFS))
-            {
-                if (red < 0)
-                    red = 0;
-                else
-                    red = (RFULL*255+ROUNDOFFS);
-            }
-            if ((unsigned)green > (GFULL*255+ROUNDOFFS))
-            {
-                if (green < 0)
-                    green = 0;
-                else
-                    green = (GFULL*255+ROUNDOFFS);
-            }
-            if ((unsigned)blue > (BFULL*255+ROUNDOFFS))
-            {
-                if (blue < 0)
-                    blue = 0;
-                else
-                    blue = (BFULL*255+ROUNDOFFS);
-            }
-            rbits = ((unsigned)red) >> 16 ;
-            gbits = ((unsigned)green) >> 16 ;
-            bbits = ((unsigned)blue) >> 16 ;
-
-            *dst_row = (rbits << 11) | (gbits << 5) | bbits;
-
-            /* next pixel - since rotated, add WIDTH */
-            dst_row += LCD_WIDTH;
-
-            if (++xphase >= CSUB_X)
-            {
-                u = *usrc++ - 128;
-                v = *vsrc++ - 128;
-                rc = RVFAC * v + ROUNDOFFS;
-                gc = GVFAC * v + GUFAC * u + ROUNDOFFS;
-                bc = BUFAC * u + ROUNDOFFS;
-                xphase = 0;
-            }
-        }
-        while (--count);
-
-        if (dst == dst_last) break;
-
-        dst--;
-        src_y++;
+        lcd_write_yuv420_lines(dst, chroma_buf, yuv_src, width,
+                               stride);
+        yuv_src[0] += stride << 1; /* Skip down two luma lines */
+        yuv_src[1] += stride >> 1; /* Skip down one chroma line */
+        yuv_src[2] += stride >> 1;
+        dst -= 2;
     }
+    while (--height > 0);
 }
-
 
 void lcd_set_contrast(int val) {
   (void) val;

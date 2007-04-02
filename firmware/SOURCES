@@ -494,6 +494,7 @@ target/arm/gigabeat/meg-fx/ata-meg-fx.c
 target/arm/gigabeat/meg-fx/backlight-meg-fx.c
 target/arm/gigabeat/meg-fx/button-meg-fx.c
 target/arm/gigabeat/meg-fx/i2c-meg-fx.c
+target/arm/gigabeat/meg-fx/lcd-as-meg-fx.S
 target/arm/gigabeat/meg-fx/lcd-meg-fx.c
 target/arm/gigabeat/meg-fx/power-meg-fx.c
 target/arm/gigabeat/meg-fx/sc606-meg-fx.c
