@@ -60,12 +60,12 @@ enum {
     
     /* Latin extended A */
     XF_aOGONEK, XF_cACUTE, XF_cCARON, XF_dCARON,
-    XF_dSTROKE, XF_eOGONEK, XF_eCARON, XF_DOTLESSi,
-    XF_lSTROKE, XF_nACUTE, XF_nCARON, XF_ODBLACUTE,
-    XF_oDBLACUTE, XF_rCARON, XF_sACUTE, XF_SCEDILLA,
-    XF_sCEDILLA, XF_sCARON, XF_tCARON, XF_uRING,
-    XF_UDBLACUTE, XF_uDBLACUTE, XF_zACUTE, XF_zDOT,
-    XF_zCARON,
+    XF_dSTROKE, XF_eOGONEK, XF_eCARON, XF_GBREVE,
+    XF_gBREVE, XF_IDOT, XF_DOTLESSi, XF_lSTROKE,
+    XF_nACUTE, XF_nCARON, XF_ODBLACUTE, XF_oDBLACUTE,
+    XF_rCARON, XF_sACUTE, XF_SCEDILLA, XF_sCEDILLA,
+    XF_sCARON, XF_tCARON, XF_uRING, XF_UDBLACUTE,
+    XF_uDBLACUTE, XF_zACUTE, XF_zDOT, XF_zCARON,
 #define XF_DSTROKE XF_ETH
 
     /* Greek */
@@ -313,6 +313,9 @@ static const struct xchar_info xchar_info_newlcd[] = {
     { 0x0111, XF_dSTROKE,     1, 0x64 }, /* d stroke */
     { 0x0119, XF_eOGONEK,     1, 0x65 }, /* e ogonek */
     { 0x011b, XF_eCARON,      1, 0x65 }, /* e caron */
+    { 0x011e, XF_GBREVE,      1, 0x47 }, /* G breve */
+    { 0x011f, XF_gBREVE,      1, 0x67 }, /* g breve */
+    { 0x0130, XF_IDOT,        1, 0x49 }, /* I with dot above */
     { 0x0131, XF_DOTLESSi,    1, 0x69 }, /* dotless i */
     { 0x0142, XF_lSTROKE,     1, 0x6c }, /* l stroke */
     { 0x0144, XF_nACUTE,      1, 0x6e }, /* n acute */
@@ -810,6 +813,9 @@ static const struct xchar_info xchar_info_oldlcd[] = {
     { 0x0111, 0, 0, 0xb0 }, /* d stroke */
     { 0x0119, 0, 0, 0xb2 }, /* e ogonek */
     { 0x011b, 0, 0, 0xad }, /* e caron */
+    { 0x011e, 0, 0, 0xc1 }, /* G breve */
+    { 0x011f, 0, 0, 0xc2 }, /* g breve */
+    { 0x0130, 0, 0, 0xc5 }, /* I with dot above */
     { 0x0131, 0, 0, 0xc6 }, /* dotless i */
     { 0x0142, 0, 0, 0xb8 }, /* l stroke */
     { 0x0144, 0, 0, 0xb7 }, /* n acute */
@@ -1143,6 +1149,9 @@ const unsigned char xfont_fixed[][HW_PATTERN_SIZE] = {
     [XF_dSTROKE] =       { 0x02, 0x0f, 0x02, 0x0e, 0x12, 0x12, 0x0e},
     [XF_eOGONEK] =       { 0x0e, 0x11, 0x1f, 0x10, 0x0e, 0x04, 0x06},
     [XF_eCARON] =        { 0x0a, 0x04, 0x0e, 0x11, 0x1f, 0x10, 0x0e},
+    [XF_GBREVE] =        { 0x1f, 0x00, 0x0e, 0x10, 0x17, 0x11, 0x0e},
+    [XF_gBREVE] =        { 0x1f, 0x00, 0x0f, 0x11, 0x0f, 0x01, 0x0e},
+    [XF_IDOT] =          { 0x04, 0x00, 0x0e, 0x04, 0x04, 0x04, 0x0e},
     [XF_DOTLESSi] =      { 0x00, 0x00, 0x0c, 0x04, 0x04, 0x04, 0x0e},
     [XF_lSTROKE] =       { 0x0c, 0x04, 0x06, 0x0c, 0x04, 0x04, 0x0e},
     [XF_nACUTE] =        { 0x02, 0x04, 0x16, 0x19, 0x11, 0x11, 0x11},
