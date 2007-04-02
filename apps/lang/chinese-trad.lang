@@ -283,13 +283,13 @@
   desc: in the main menu
   user:
   <source>
-    *: "Playlist Options"
+    *: "Playlist"
   </source>
   <dest>
-    *: "播放清單選項"
+    *: "播放清單"
   </dest>
   <voice>
-    *: "Playlist Options"
+    *: "Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -297,13 +297,13 @@
   desc: in the main menu
   user:
   <source>
-    *: "Browse Plugins"
+    *: "Plugins"
   </source>
   <dest>
-    *: "瀏覽Plugins"
+    *: "Plugins"
   </dest>
   <voice>
-    *: "Browse Plugins"
+    *: "Plugins"
   </voice>
 </phrase>
 <phrase>
@@ -311,10 +311,10 @@
   desc: in the main menu
   user:
   <source>
-    *: "Info"
+    *: "System"
   </source>
   <dest>
-    *: "資訊"
+    *: "系統"
   </dest>
   <voice>
     *: "Info"
@@ -834,6 +834,8 @@
     ipod*: "SELECT = Yes"
     x5: "SELECT = Yes"
     h10: "NEXT = Yes"
+    gigabeat: "SELECT = Yes"
+    e200: "SELECT = Yes"
   </source>
   <dest>
     *: "PLAY = 是"
@@ -841,6 +843,8 @@
     ipod*: "SELECT = 是"
     x5: "SELECT = 是"
     h10: "NEXT = 是"
+    gigabeat: "SELECT = 是"
+    e200: "SELECT = 是"
   </dest>
   <voice>
     *: ""
@@ -977,13 +981,13 @@
   desc: in the recording sub menu
   user:
   <source>
-    *: "Recording Screen"
+    *: "Recording"
   </source>
   <dest>
-    *: "錄音畫面"
+    *: "錄音"
   </dest>
   <voice>
-    *: "Recording Screen"
+    *: "Recording"
   </voice>
 </phrase>
 <phrase>
@@ -1436,16 +1440,16 @@
 </phrase>
 <phrase>
   id: LANG_RESUME
-  desc: in settings_menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Resume on Startup"
+    *: ""
   </source>
   <dest>
-    *: "啟動時繼續"
+    *: ""
   </dest>
   <voice>
-    *: "Resume on Startup"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2741,16 +2745,16 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_STARTUP
-  desc: Start Rockbox in Recording Screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "Show Recording Screen on Startup"
+    *: ""
   </source>
   <dest>
-    *: "開機時顯示錄音畫面"
+    *: ""
   </dest>
   <voice>
-    *: "Show Recording Screen on Startup"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4494,10 +4498,14 @@
   desc: battery level in % and estimated time remaining
   user:
   <source>
-    *: "%d%% %dh %dm"
+    *: "Battery: %d%% %dh %dm"
+    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
-    *: "%d%% %d小時%d分"
+    *: "電池: %d%% %d小時%d分"
+    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "電池: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Battery level"
@@ -4695,6 +4703,7 @@
     ipod*: "PLAY/PAUSE = Exit"
     x5: "RECORD = Exit"
     h10: "PREV = Exit"
+    gigabeat: "A = Exit"
   </source>
   <dest>
     *: "OFF = 離開"
@@ -4702,6 +4711,7 @@
     ipod*: "PLAY/PAUSE = 離開"
     x5: "RECORD = 離開"
     h10: "PREV = 離開"
+    gigabeat: "A = 離開"
   </dest>
   <voice>
     *: ""
@@ -4759,6 +4769,7 @@
     ipod*: "SELECT = Select"
     x5: "SELECT = Select"
     h10: "NEXT = Select"
+    gigabeat: "SELECT = Select"
   </source>
   <dest>
     *: "PLAY = 選擇"
@@ -4766,6 +4777,7 @@
     ipod*: "SELECT = 選擇"
     x5: "SELECT = 選擇"
     h10: "NEXT = 選擇"
+    gigabeat: "SELECT = 選擇"
   </dest>
   <voice>
     *: ""
@@ -4781,6 +4793,7 @@
     ipod*: "Long MENU = Delete"
     x5: "Long RECORD = Delete"
     h10: "REWIND = Delete"
+    gigabeat: "POWER = Delete"
   </source>
   <dest>
     *: "ON+Play = 刪除"
@@ -4788,6 +4801,7 @@
     ipod*: "Long MENU = 刪除"
     x5: "Long RECORD = 刪除"
     h10: "REWIND = 刪除"
+    gigabeat: "POWER = 刪除"
   </dest>
   <voice>
     *: ""
@@ -4868,11 +4882,12 @@
   desc: used in set_time()
   user:
   <source>
-    *: "ON To Set"
+    *: "ON = Set"
     h100,h120,h300: "NAVI = Set"
     ipod*: "SELECT = Set"
     x5: "SELECT = Set"
     h10: "NEXT = Set"
+    gigabeat: "SELECT = Set"
   </source>
   <dest>
     *: "ON: 設定"
@@ -4880,6 +4895,7 @@
     ipod*: "SELECT = 設定"
     x5: "SELECT = 設定"
     h10: "NEXT = 設定"
+    gigabeat: "SELECT = 設定"
   </dest>
   <voice>
     *: ""
@@ -4890,11 +4906,12 @@
   desc: used in set_time()
   user:
   <source>
-    *: "OFF To Revert"
+    *: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
     ipod*: "MENU = Revert"
     x5: "RECORD = Revert"
     h10: "PREV = Revert"
+    gigabeat: "POWER = Revert"
   </source>
   <dest>
     *: "OFF: 回復"
@@ -4902,6 +4919,7 @@
     ipod*: "MENU = 回復"
     x5: "RECORD = 回復"
     h10: "PREV = 回復"
+    gigabeat: "POWER = 回復"
   </dest>
   <voice>
     *: ""
@@ -5321,9 +5339,11 @@
   user:
   <source>
     *: "PLAY=Set OFF=Cancel"
+    ipod*: "SELECT=Set MENU=Cancel"
   </source>
   <dest>
     *: "播放=設定 關閉=取消"
+    ipod*: "SELECT=設定 MENU=取消"
   </dest>
   <voice>
     *: ""
@@ -10338,7 +10358,7 @@
     *: "Shuffle and Track Skip"
   </source>
   <dest>
-    *: "亂續播放與跳過曲目"
+    *: "亂序播放與跳過曲目"
   </dest>
   <voice>
     *: "Shuffle and Track Skip"
@@ -10426,5 +10446,251 @@
   </dest>
   <voice>
     *: "Clear Time?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUILDING_DATABASE
+  desc: splash database building progress
+  user:
+  <source>
+    *: "Building database... %d found (OFF to return)"
+    h100,h120,h300: "Building database... %d found (STOP to return)"
+    ipod*: "Building database... %d found (PLAY/PAUSE to return)"
+    x5: "Building database... %d found (Long PLAY to return)"
+    h10: "Building database... %d found (PREV to return)"
+  </source>
+  <dest>
+    *: "建立資料庫... 找到%d項 (OFF: 回上一畫面)"
+    h100,h120,h300: "建立資料庫... 找到%d項 (STOP: 回上一畫面)"
+    ipod*: "建立資料庫... 找到%d項 (PLAY/PAUSE: 回上一畫面)"
+    x5: "建立資料庫... 找到%d項 (長按PLAY: 回上一畫面)"
+    h10: "建立資料庫... 找到%d項 (PREV: 回上一畫面)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIR_BROWSER
+  desc: in root menu
+  user:
+  <source>
+    *: "Files"
+  </source>
+  <dest>
+    *: "檔案"
+  </dest>
+  <voice>
+    *: "Files"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMMENT
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Comment]"
+  </source>
+  <dest>
+    *: "[註解]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_CHARGING
+  desc: in Battery menu
+  user:
+  <source>
+    *: "Charge During USB Connection"
+  </source>
+  <dest>
+    *: "在USB連線時充電"
+  </dest>
+  <voice>
+    *: "Charge During U S B Connection"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOW_PLAYING
+  desc: in root menu
+  user:
+  <source>
+    *: "Now Playing"
+  </source>
+  <dest>
+    *: "正在播放"
+  </dest>
+  <voice>
+    *: "Now Playing"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_MENU
+  desc: in root menu
+  user:
+  <source>
+    *: "Settings"
+  </source>
+  <dest>
+    *: "設定"
+  </dest>
+  <voice>
+    *: "Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Main Menu"
+  </source>
+  <dest>
+    *: "主選單"
+  </dest>
+  <voice>
+    *: "Main Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_WAKEUP_SCREEN
+  desc: in alarm menu setting
+  user:
+  <source>
+    *: "Alarm Wake up Screen"
+  </source>
+  <dest>
+    *: "鬧鈴啟動畫面"
+  </dest>
+  <voice>
+    *: "Alarm Wake up Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_THEME
+  desc: save a theme file
+  user:
+  <source>
+    *: "Save Theme Settings"
+  </source>
+  <dest>
+    *: "儲存佈景主題設定"
+  </dest>
+  <voice>
+    *: "Save Theme Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_PLAYBACK
+  desc: in root menu
+  user:
+  <source>
+    *: "Resume Playback"
+  </source>
+  <dest>
+    *: "繼續播放"
+  </dest>
+  <voice>
+    *: "Resume Playback"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ROCKBOX_TITLE
+  desc: in root menu
+  user:
+  <source>
+    *: "Rockbox"
+  </source>
+  <dest>
+    *: "Rockbox"
+  </dest>
+  <voice>
+    *: "Rockbox"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVIOUS_SCREEN
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Previous Screen"
+  </source>
+  <dest>
+    *: "先前畫面"
+  </dest>
+  <voice>
+    *: "Previous Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUESHEET_ENABLE
+  desc: cuesheet support option
+  user:
+  <source>
+    *: "Cuesheet Support"
+  </source>
+  <dest>
+    *: "Cuesheet支援"
+  </dest>
+  <voice>
+    *: "Cuesheet Support"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_SCREEN
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Start Screen"
+  </source>
+  <dest>
+    *: "開機畫面"
+  </dest>
+  <voice>
+    *: "Start Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUESHEET
+  desc:
+  user:
+  <source>
+    *: "Cuesheet"
+  </source>
+  <dest>
+    *: "Cuesheet"
+  </dest>
+  <voice>
+    *: "Cuesheet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUMARTIST
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Album Artist]"
+  </source>
+  <dest>
+    *: "[專輯作者]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_MENU
+  desc: fm menu title
+  user:
+  <source>
+    *: "FM Radio Menu"
+  </source>
+  <dest>
+    *: "FM收音選單"
+  </dest>
+  <voice>
+    *: "FM Radio Menu"
   </voice>
 </phrase>
