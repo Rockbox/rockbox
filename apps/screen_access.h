@@ -125,9 +125,7 @@ struct screen
     void (*scroll_delay)(int ms);
     void (*stop_scroll)(void);
     void (*clear_display)(void);
-#if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD) || defined(SIMULATOR)
     void (*update)(void);
-#endif
     void (*backlight_on)(void);
     void (*backlight_off)(void);
     bool (*is_backlight_on)(void);
