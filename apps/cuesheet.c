@@ -351,23 +351,24 @@ bool curr_cuesheet_skip(int direction, unsigned long curr_pos)
 
 void cue_spoof_id3(struct cuesheet *cue, struct mp3entry *id3)
 {
-    if (!cue)
+    if (!cue || !cue->curr_track)
         return;
 
-    int i = cue->curr_track_idx;
+    struct cue_track_info *track = cue->curr_track;
 
-    id3->title = cue->tracks[i].title;
-    id3->artist = cue->tracks[i].performer;
-    id3->composer = cue->tracks[i].songwriter;
+    id3->title = *track->title ? track->title : NULL;
+    id3->artist = *track->performer ? track->performer : NULL;
+    id3->composer = *track->songwriter ? track->songwriter : NULL;
+    id3->album = *cue->title ? cue->title : NULL;
 
     /* if the album artist is the same as the track artist, we hide it. */
-    if (strcmp(cue->performer, cue->tracks[i].performer))
-        id3->albumartist = cue->performer;
+    if (strcmp(cue->performer, track->performer))
+        id3->albumartist = *cue->performer ? cue->performer : NULL;
     else
-        id3->albumartist = "\0";
+        id3->albumartist = NULL;
 
+    int i = cue->curr_track_idx;
     id3->tracknum = i+1;
-    id3->album = cue->title;
     if (id3->track_string)
         snprintf(id3->track_string, 10, "%d/%d", i+1, cue->track_count);
 }
