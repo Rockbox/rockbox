@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id:$
+ * $Id$
  *
  * Copyright (C) 2007 by Michael Sevakis
  *
@@ -22,7 +22,7 @@
 
 /****************************************************************************
  * void lcd_write_yuv_420_lines(fb_data *dst,
- *                              unsigned char chroma_buf[3][LCD_HEIGHT/2],
+ *                              unsigned char chroma_buf[LCD_HEIGHT/2*3],
                                 unsigned char const * const src[3],
  *                              int width,
  *                              int stride);
@@ -141,7 +141,7 @@ lcd_write_yuv420_lines:
                                         @ do second line
                                         @
     ldmia       sp!, { r0, r3 }         @ pop dst and width
-    sub         r0, r0, #2              @ set dst to start of next line                                        @
+    sub         r0, r0, #2              @ set dst to start of next line
     sub         r1, r1, r3, asl #1      @ rewind chroma pointer...
     ldr         r2, [sp, #40]           @ r2 = stride
     add         r1, r1, r3, asr #1      @ ... (r1 -= width/2*3)
