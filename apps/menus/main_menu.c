@@ -385,12 +385,6 @@ MENUITEM_FUNCTION(debug_menu_item, 0, ID2P(LANG_DEBUG),
 #ifdef SIMULATOR
 MENUITEM_FUNCTION(simulate_usb_item, 0, ID2P(LANG_USB),
                    (menu_function)simulate_usb, NULL, NULL, Icon_NOICON);
-#ifdef ROCKBOX_HAS_LOGF
-MENUITEM_FUNCTION(logfdisplay_item, 0, "logf",
-        (int (*)(void)) logfdisplay, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(logfdump_item, 0, "logfdump",
-        (int (*)(void)) logfdump, NULL, NULL, Icon_NOICON);
-#endif
 #endif
 
 MAKE_MENU(info_menu, ID2P(LANG_INFO), 0, Icon_Questionmark,
@@ -398,9 +392,6 @@ MAKE_MENU(info_menu, ID2P(LANG_INFO), 0, Icon_Questionmark,
           &sleep_timer_call, &debug_menu_item
 #ifdef SIMULATOR
         ,&simulate_usb_item
-#ifdef ROCKBOX_HAS_LOGF
-        ,&logfdisplay_item, &logfdump_item
-#endif
 #endif
         );
 /*      INFO MENU                  */
