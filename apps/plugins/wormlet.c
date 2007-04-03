@@ -2525,27 +2525,16 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         { "Out of Control", -1 }
     };
 
-    static const struct menu_item items[] = {
-        { "Play Wormlet!", NULL },
-        { "Number of Worms",  NULL },
-        { "Number of Players", NULL },
-        { "Control Style", NULL },
-        { "Worm Growth Per Food", NULL },
-        { "Worm Speed", NULL },
-        { "Arghs Per Food", NULL },
-        { "Argh Size", NULL },
-        { "Food Size", NULL },
-        { "Revert to Default Settings", NULL },
-        { "Quit", NULL }
-    };
-
-    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
-                      NULL, NULL, NULL, NULL);
+    MENUITEM_STRINGLIST(menu, "Wormlet Menu", NULL, "Play Wormlet!",
+                        "Number of Worms", "Number of Players", "Control Style",
+                        "Worm Growth Per Food","Worm Speed","Arghs Per Food",
+                        "Argh Size","Food Size","Revert to Default Settings",
+                        "Quit");
 
     rb->button_clear_queue();
 
     while (!menu_quit) {
-        result = rb->menu_show(m);
+        result = rb->do_menu(&menu, &result);
 
         switch(result)
         {
