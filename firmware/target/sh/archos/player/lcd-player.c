@@ -29,6 +29,7 @@
 #define OLD_LCD_CGRAM        ((char)0x80) /* Character generator (patterns) */
 #define OLD_LCD_ICONRAM      ((char)0xE0)
 #define OLD_LCD_CONTRAST_SET ((char)0xA8)
+#define OLD_LCD_NOP          ((char)0x00)
 #define OLD_LCD_SYSTEM_SET                 ((char)0x60)
 #define OLD_LCD_SET_POWER_SAVE_OSC_CONTROL ((char)0x40)
 #define OLD_LCD_SET_POWER_CONTROL          ((char)0x50)
@@ -38,6 +39,7 @@
 #define NEW_LCD_CGRAM        ((char)0xC0) /* Character generator (patterns) */
 #define NEW_LCD_ICONRAM      ((char)0x40)
 #define NEW_LCD_CONTRAST_SET ((char)0x50)
+#define NEW_LCD_NOP          ((char)0x00)
 #define NEW_LCD_FUNCTION_SET               ((char)0x10)
 #define NEW_LCD_SET_POWER_SAVE_OSC_CONTROL ((char)0x0c)
 #define NEW_LCD_SET_POWER_CONTROL_REG      ((char)0x20)
@@ -112,6 +114,11 @@ void lcd_init_device(void)
 {
     unsigned char data_vector[64];
 
+    /* LCD init for cold start */
+    PBCR2 &= 0xff00;                    /* Set PB0..PB3 to GPIO */
+    or_b(0x0f, &PBDRL);                 /* ... high */
+    or_b(0x0f, &PBIORL);                /* ... and output */
+
     new_lcd = is_new_player();
 
     if (new_lcd)
@@ -120,11 +127,6 @@ void lcd_init_device(void)
         lcd_ddram = NEW_LCD_DDRAM;
         lcd_cgram = NEW_LCD_CGRAM;
         lcd_iconram = NEW_LCD_ICONRAM;
-
-        /* LCD init for cold start */
-        PBCR2 &= 0xff00;                    /* Set PB0..PB3 to GPIO */
-        or_b(0x0f, &PBDRL);                 /* ... high */
-        or_b(0x0f, &PBIORL);                /* ... and output */
 
         lcd_write_command(NEW_LCD_FUNCTION_SET|1); /* CGRAM selected */
         lcd_write_command_e(NEW_LCD_CONTRAST_SET, 0x08);
@@ -152,12 +154,7 @@ void lcd_init_device(void)
         lcd_cgram = OLD_LCD_CGRAM;
         lcd_iconram = OLD_LCD_ICONRAM;
 
-#if 1
-        /* LCD init for cold start */
-        PBCR2 &= 0xff00;                    /* Set PB0..PB3 to GPIO */
-        or_b(0x0f, &PBDRL);                 /* ... high */
-        or_b(0x0f, &PBIORL);                /* ... and output */
-
+        lcd_write_command(OLD_LCD_NOP);
         lcd_write_command(OLD_LCD_SYSTEM_SET|1);  /* CGRAM selected */
         lcd_write_command(OLD_LCD_SET_POWER_SAVE_OSC_CONTROL|2); 
                                             /* oscillator on */
@@ -180,52 +177,8 @@ void lcd_init_device(void)
         lcd_write_command(OLD_LCD_ICONRAM + 0x10);
         lcd_write_data(data_vector, 13);
 
+        sleep(HZ/10);
         lcd_write_command(OLD_LCD_SET_DISPLAY_CONTROL|1); /* display on */
-#else  
-        /* archos look-alike code, left here for reference. As soon as the
-         * rockbox version is confirmed working, this will go away */
-        {
-        int i;
-
-        PBCR2 &= 0xc000;
-        PBIOR |= 0x000f;
-        PBDR |= 0x0002;
-        PBDR |= 0x0001;
-        PBDR |= 0x0004;
-        PBDR |= 0x0008;
-
-        for (i=0; i<200; i++) asm volatile ("nop"); /* wait 100 us */
-
-        PBDR &= 0xfffd; /* CS low (assert) */
-
-        for (i=0; i<100; i++) asm volatile ("nop"); /* wait 50 us */
-
-        lcd_write_command(OLD_LCD_SYSTEM_SET|1);
-        lcd_write_command(OLD_LCD_SET_POWER_SAVE_OSC_CONTROL|2);
-        lcd_write_command(OLD_LCD_SET_POWER_CONTROL|7);
-
-        memset(data_vector, 0x24, 13);
-        lcd_write_command(OLD_LCD_DDRAM);   /* Set DDRAM address */
-        lcd_write_data(data_vector, 13);    /* all spaces */
-        lcd_write_command(OLD_LCD_DDRAM + 0x10);
-        lcd_write_data(data_vector, 13);
-        lcd_write_command(OLD_LCD_DDRAM + 0x20);
-        lcd_write_data(data_vector, 13);
-
-        memset(data_vector, 0, 32);
-        lcd_write_command(OLD_LCD_CGRAM);   /* Set CGRAM address */
-        lcd_write_data(data_vector, 32);    /* zero out */
-        lcd_write_command(OLD_LCD_ICONRAM); /* Set ICONRAM address */
-        lcd_write_data(data_vector, 13); /* zero out */
-        lcd_write_command(OLD_LCD_ICONRAM + 0x10);
-        lcd_write_data(data_vector, 13);
-
-        for (i=0; i<300000; i++) asm volatile ("nop"); /* wait 150 ms */
-
-        lcd_write_command(OLD_LCD_SET_DISPLAY_CONTROL|1);
-        lcd_write_command_e(OLD_LCD_CONTRAST_SET, 0);  /* Set contrast */
-        }
-#endif
     }
     lcd_set_contrast(lcd_default_contrast());
 }
