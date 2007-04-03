@@ -298,9 +298,6 @@ static void usb_thread(void)
                 waiting_for_ack = true;
                 DEBUGF("USB extracted. Waiting for ack from %d threads...\n",
                        num_acks_to_expect);
-#ifdef HAVE_LCD_CHARCELLS
-                lcd_icon(ICON_USB, false);
-#endif
                 break;
 
             case SYS_USB_DISCONNECTED_ACK:

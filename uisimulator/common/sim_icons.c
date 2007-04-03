@@ -19,8 +19,6 @@
 #include "config.h"
 #ifdef HAVE_LCD_CHARCELLS
 
-#include "sim_icons.h"
-
 #include <lcd.h>
 #include <kernel.h>
 #include <sprintf.h>

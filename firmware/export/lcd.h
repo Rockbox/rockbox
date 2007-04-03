@@ -28,7 +28,6 @@
 #define STYLE_INVERT  1
 
 #ifdef SIMULATOR
-#define lcd_icon(x,y) sim_lcd_icon(x,y)
 #ifndef MAX_PATH
 #define MAX_PATH 260
 #endif

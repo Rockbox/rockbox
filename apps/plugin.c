@@ -81,7 +81,7 @@ static const struct plugin_api rockbox_api = {
     lcd_putc,
     lcd_put_cursor,
     lcd_remove_cursor,
-    PREFIX(lcd_icon),
+    lcd_icon,
     lcd_double_height,
 #else
     lcd_set_drawmode,

@@ -81,11 +81,7 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->putc=&lcd_remote_putc;
             screen->get_locked_pattern=&lcd_remote_get_locked_pattern;
             screen->define_pattern=&lcd_remote_define_pattern;
-#ifdef SIMULATOR
-            screen->icon=&sim_lcd_remote_icon;
-#else
             screen->icon=&lcd_remote_icon;
-#endif
 #endif /* 0 */
 
             screen->init=&lcd_remote_init;
@@ -164,11 +160,7 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->putc=&lcd_putc;
             screen->get_locked_pattern=&lcd_get_locked_pattern;
             screen->define_pattern=&lcd_define_pattern;
-#ifdef SIMULATOR
-            screen->icon=&sim_lcd_icon;
-#else
             screen->icon=&lcd_icon;
-#endif
 #endif /* HAVE_LCD_CHARCELLS */
 
             screen->init=&lcd_init;

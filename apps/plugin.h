@@ -149,7 +149,7 @@ struct plugin_api {
     void (*lcd_putc)(int x, int y, unsigned long ucs);
     void (*lcd_put_cursor)(int x, int y, unsigned long ucs);
     void (*lcd_remove_cursor)(void);
-    void (*PREFIX(lcd_icon))(int icon, bool enable);
+    void (*lcd_icon)(int icon, bool enable);
     void (*lcd_double_height)(bool on);
 #else
     void (*lcd_set_drawmode)(int mode);
