@@ -2634,8 +2634,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         }
     }
 
-    rb->menu_exit(m);
-
     configfile_save(SETTINGS_FILENAME, config,
                         sizeof(config)/sizeof(*config),
                         SETTINGS_VERSION);

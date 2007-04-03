@@ -624,22 +624,17 @@ static void chopDrawScene(void)
 
 static int chopMenu(int menunum)
 {
-    int m;
     int result;
     int res = 0;
     bool menu_quit = false;
-
-    static const struct menu_item items[] = {
-        { "Start New Game", NULL },
-        { "Resume Game", NULL },
-        { "Level", NULL },
-        { "Quit", NULL },
-    };
 
     static const struct opt_items levels[2] = {
         { "Normal", -1 },
         { "Steep", -1 },
     };
+    
+    MENUITEM_STRINGLIST(menu,"Chopper Menu",NULL,"Start New Game","Resume Game",
+                        "Level","Quit");
 
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_WHITE);
@@ -651,11 +646,8 @@ static int chopMenu(int menunum)
 
     rb->lcd_clear_display();
 
-    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
-                      NULL, NULL, NULL, NULL);
-
     while (!menu_quit) {
-        result=rb->menu_show(m);
+        result=rb->do_menu(&menu,&result);
         switch (result)
         {
             case 0:     /* Start New Game */
@@ -685,7 +677,6 @@ static int chopMenu(int menunum)
         }
     }
     rb->lcd_clear_display();
-    rb->menu_exit(m);
     return res;
 }
 
