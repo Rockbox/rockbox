@@ -25,29 +25,33 @@
 #include "lcd.h"
 #include "lcd-charcell.h"
 
-#define OLD_LCD_CRAM         ((char)0xB0) /* Characters */
-#define OLD_LCD_PRAM         ((char)0x80) /*  Patterns  */
-#define OLD_LCD_IRAM         ((char)0xE0) /*    Icons   */
+#define OLD_LCD_DDRAM        ((char)0xB0) /* Display data (characters) */
+#define OLD_LCD_CGRAM        ((char)0x80) /* Character generator (patterns) */
+#define OLD_LCD_ICONRAM      ((char)0xE0)
 #define OLD_LCD_CONTRAST_SET ((char)0xA8)
+#define OLD_LCD_SYSTEM_SET                 ((char)0x60)
+#define OLD_LCD_SET_POWER_SAVE_OSC_CONTROL ((char)0x40)
+#define OLD_LCD_SET_POWER_CONTROL          ((char)0x50)
+#define OLD_LCD_SET_DISPLAY_CONTROL        ((char)0x30)
 
-#define NEW_LCD_CRAM         ((char)0x80) /* Characters */
-#define NEW_LCD_PRAM         ((char)0xC0) /*  Patterns  */
-#define NEW_LCD_IRAM         ((char)0x40) /*    Icons   */
+#define NEW_LCD_DDRAM        ((char)0x80) /* Display data (characters) */
+#define NEW_LCD_CGRAM        ((char)0xC0) /* Character generator (patterns) */
+#define NEW_LCD_ICONRAM      ((char)0x40)
 #define NEW_LCD_CONTRAST_SET ((char)0x50)
-#define NEW_LCD_FUNCTION_SET                    ((char)0x10)
-#define NEW_LCD_POWER_SAVE_MODE_OSC_CONTROL_SET ((char)0x0c)
-#define NEW_LCD_POWER_CONTROL_REGISTER_SET      ((char)0x20)
-#define NEW_LCD_DISPLAY_CONTROL_SET             ((char)0x28)
-#define NEW_LCD_SET_DOUBLE_HEIGHT               ((char)0x08)
+#define NEW_LCD_FUNCTION_SET               ((char)0x10)
+#define NEW_LCD_SET_POWER_SAVE_OSC_CONTROL ((char)0x0c)
+#define NEW_LCD_SET_POWER_CONTROL_REG      ((char)0x20)
+#define NEW_LCD_SET_DISPLAY_CONTROL        ((char)0x28)
+#define NEW_LCD_SET_DOUBLE_HEIGHT          ((char)0x08)
 
-#define LCD_CURSOR(x,y)      ((char)(lcd_cram+((y)*16+(x))))
-#define LCD_ICON(i)          ((char)(lcd_iram+i))
+#define LCD_CURSOR(x,y)      ((char)(lcd_ddram+((y)*16+(x))))
+#define LCD_ICON(i)          ((char)(lcd_iconram+i))
 
 static bool new_lcd;
 static char lcd_contrast_set;
-static char lcd_cram;
-static char lcd_pram;
-static char lcd_iram;
+static char lcd_ddram;
+static char lcd_cgram;
+static char lcd_iconram;
 
 /* hardware configuration */
 
@@ -113,68 +117,70 @@ void lcd_init_device(void)
     if (new_lcd)
     {
         lcd_contrast_set = NEW_LCD_CONTRAST_SET;
-        lcd_cram = NEW_LCD_CRAM;
-        lcd_pram = NEW_LCD_PRAM;
-        lcd_iram = NEW_LCD_IRAM;
+        lcd_ddram = NEW_LCD_DDRAM;
+        lcd_cgram = NEW_LCD_CGRAM;
+        lcd_iconram = NEW_LCD_ICONRAM;
 
         /* LCD init for cold start */
-        PBCR2 &= 0xff00;                 /* Set PB0..PB3 to GPIO */
-        or_b(0x0f, &PBDRL);              /* ... high */
-        or_b(0x0f, &PBIORL);             /* ... and output */
+        PBCR2 &= 0xff00;                    /* Set PB0..PB3 to GPIO */
+        or_b(0x0f, &PBDRL);                 /* ... high */
+        or_b(0x0f, &PBIORL);                /* ... and output */
 
-        lcd_write_command(NEW_LCD_FUNCTION_SET + 1); /* CGRAM selected */
+        lcd_write_command(NEW_LCD_FUNCTION_SET|1); /* CGRAM selected */
         lcd_write_command_e(NEW_LCD_CONTRAST_SET, 0x08);
-        lcd_write_command(NEW_LCD_POWER_SAVE_MODE_OSC_CONTROL_SET + 2);
-                                         /* oscillator on */
-        lcd_write_command(NEW_LCD_POWER_CONTROL_REGISTER_SET + 7);
-                                         /* opamp buffer + voltage booster on*/
+        lcd_write_command(NEW_LCD_SET_POWER_SAVE_OSC_CONTROL|2);
+                                            /* oscillator on */
+        lcd_write_command(NEW_LCD_SET_POWER_CONTROL_REG|7);
+        /* opamp buffer + voltage booster on */
 
         memset(data_vector, 0x20, 64);
-        lcd_write_command(NEW_LCD_CRAM); /* Set DDRAM address */
-        lcd_write_data(data_vector, 64); /* all spaces */
+        lcd_write_command(NEW_LCD_DDRAM);   /* Set DDRAM address */
+        lcd_write_data(data_vector, 64);    /* all spaces */
 
         memset(data_vector, 0, 64);
-        lcd_write_command(NEW_LCD_PRAM); /* Set CGRAM address */
-        lcd_write_data(data_vector, 64); /* zero out */
-        lcd_write_command(NEW_LCD_IRAM); /* Set ICONRAM address */
-        lcd_write_data(data_vector, 16); /* zero out */
+        lcd_write_command(NEW_LCD_CGRAM);   /* Set CGRAM address */
+        lcd_write_data(data_vector, 64);    /* zero out */
+        lcd_write_command(NEW_LCD_ICONRAM); /* Set ICONRAM address */
+        lcd_write_data(data_vector, 16);    /* zero out */
 
-        lcd_write_command(NEW_LCD_DISPLAY_CONTROL_SET + 1); /* display on */
+        lcd_write_command(NEW_LCD_SET_DISPLAY_CONTROL|1); /* display on */
     }
     else
     {
         lcd_contrast_set = OLD_LCD_CONTRAST_SET;
-        lcd_cram = OLD_LCD_CRAM;
-        lcd_pram = OLD_LCD_PRAM;
-        lcd_iram = OLD_LCD_IRAM;
+        lcd_ddram = OLD_LCD_DDRAM;
+        lcd_cgram = OLD_LCD_CGRAM;
+        lcd_iconram = OLD_LCD_ICONRAM;
 
 #if 1
         /* LCD init for cold start */
-        PBCR2 &= 0xff00;                 /* Set PB0..PB3 to GPIO */
-        or_b(0x0f, &PBDRL);              /* ... high */
-        or_b(0x0f, &PBIORL);             /* ... and output */
+        PBCR2 &= 0xff00;                    /* Set PB0..PB3 to GPIO */
+        or_b(0x0f, &PBDRL);                 /* ... high */
+        or_b(0x0f, &PBIORL);                /* ... and output */
 
-        lcd_write_command(0x61);
-        lcd_write_command(0x42);
-        lcd_write_command(0x57);
+        lcd_write_command(OLD_LCD_SYSTEM_SET|1);  /* CGRAM selected */
+        lcd_write_command(OLD_LCD_SET_POWER_SAVE_OSC_CONTROL|2); 
+                                            /* oscillator on */
+        lcd_write_command(OLD_LCD_SET_POWER_CONTROL|7);
+        /* voltage regulator, voltage follower and booster on */
 
         memset(data_vector, 0x24, 13);
-        lcd_write_command(OLD_LCD_CRAM); /* Set DDRAM address */
-        lcd_write_data(data_vector, 13); /* all spaces */
-        lcd_write_command(OLD_LCD_CRAM + 0x10);
+        lcd_write_command(OLD_LCD_DDRAM);   /* Set DDRAM address */
+        lcd_write_data(data_vector, 13);    /* all spaces */
+        lcd_write_command(OLD_LCD_DDRAM + 0x10);
         lcd_write_data(data_vector, 13);
-        lcd_write_command(OLD_LCD_CRAM + 0x20);
+        lcd_write_command(OLD_LCD_DDRAM + 0x20);
         lcd_write_data(data_vector, 13);
 
         memset(data_vector, 0, 32);
-        lcd_write_command(OLD_LCD_PRAM); /* Set CGRAM address */
-        lcd_write_data(data_vector, 32); /* zero out */
-        lcd_write_command(OLD_LCD_IRAM); /* Set ICONRAM address */
-        lcd_write_data(data_vector, 13); /* zero out */
-        lcd_write_command(OLD_LCD_IRAM + 0x10);
+        lcd_write_command(OLD_LCD_CGRAM);   /* Set CGRAM address */
+        lcd_write_data(data_vector, 32);    /* zero out */
+        lcd_write_command(OLD_LCD_ICONRAM); /* Set ICONRAM address */
+        lcd_write_data(data_vector, 13);    /* zero out */
+        lcd_write_command(OLD_LCD_ICONRAM + 0x10);
         lcd_write_data(data_vector, 13);
 
-        lcd_write_command(0x31);
+        lcd_write_command(OLD_LCD_SET_DISPLAY_CONTROL|1); /* display on */
 #else  
         /* archos look-alike code, left here for reference. As soon as the
          * rockbox version is confirmed working, this will go away */
@@ -194,30 +200,30 @@ void lcd_init_device(void)
 
         for (i=0; i<100; i++) asm volatile ("nop"); /* wait 50 us */
 
-        lcd_write_command(0x61);
-        lcd_write_command(0x42);
-        lcd_write_command(0x57);
+        lcd_write_command(OLD_LCD_SYSTEM_SET|1);
+        lcd_write_command(OLD_LCD_SET_POWER_SAVE_OSC_CONTROL|2);
+        lcd_write_command(OLD_LCD_SET_POWER_CONTROL|7);
 
         memset(data_vector, 0x24, 13);
-        lcd_write_command(0xb0);         /* Set DDRAM address */
-        lcd_write_data(data_vector, 13); /* all spaces */
-        lcd_write_command(0xc0);
+        lcd_write_command(OLD_LCD_DDRAM);   /* Set DDRAM address */
+        lcd_write_data(data_vector, 13);    /* all spaces */
+        lcd_write_command(OLD_LCD_DDRAM + 0x10);
         lcd_write_data(data_vector, 13);
-        lcd_write_command(0xd0);
+        lcd_write_command(OLD_LCD_DDRAM + 0x20);
         lcd_write_data(data_vector, 13);
 
         memset(data_vector, 0, 32);
-        lcd_write_command(0x80);         /* Set CGRAM address */
-        lcd_write_data(data_vector, 32); /* zero out */
-        lcd_write_command(0xe0);         /* Set ICONRAM address */
+        lcd_write_command(OLD_LCD_CGRAM);   /* Set CGRAM address */
+        lcd_write_data(data_vector, 32);    /* zero out */
+        lcd_write_command(OLD_LCD_ICONRAM); /* Set ICONRAM address */
         lcd_write_data(data_vector, 13); /* zero out */
-        lcd_write_command(0xf0);
+        lcd_write_command(OLD_LCD_ICONRAM + 0x10);
         lcd_write_data(data_vector, 13);
 
         for (i=0; i<300000; i++) asm volatile ("nop"); /* wait 150 ms */
 
-        lcd_write_command(0x31);
-        lcd_write_command_e(0xa8, 0);    /* Set contrast control */
+        lcd_write_command(OLD_LCD_SET_DISPLAY_CONTROL|1);
+        lcd_write_command_e(OLD_LCD_CONTRAST_SET, 0);  /* Set contrast */
         }
 #endif
     }
@@ -234,7 +240,7 @@ void lcd_update(void)
     {
         if (lcd_patterns[y].count > 0)
         {
-            lcd_write_command(lcd_pram | (y << 3));
+            lcd_write_command(lcd_cgram | (y << 3));
             lcd_write_data(lcd_patterns[y].pattern, 7);
         }
     }
