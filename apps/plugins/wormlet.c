@@ -2357,7 +2357,6 @@ bool launch_wormlet(void)
  */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    int m;
     int result;
     int menu_quit = 0;
     int new_setting;
