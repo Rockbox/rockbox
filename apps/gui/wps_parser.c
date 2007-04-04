@@ -40,24 +40,24 @@
 
 /* level of current conditional.
    -1 means we're not in a conditional. */
-int level = -1;
+static int level = -1;
 
 /* index of the last WPS_TOKEN_CONDITIONAL_OPTION
     or WPS_TOKEN_CONDITIONAL_START in current level */
-int lastcond[WPS_MAX_COND_LEVEL];
+static int lastcond[WPS_MAX_COND_LEVEL];
 
 /* index of the WPS_TOKEN_CONDITIONAL in current level */
-int condindex[WPS_MAX_COND_LEVEL];
+static int condindex[WPS_MAX_COND_LEVEL];
 
 /* number of condtional options in current level */
-int numoptions[WPS_MAX_COND_LEVEL];
+static int numoptions[WPS_MAX_COND_LEVEL];
 
 #ifdef HAVE_LCD_BITMAP
 /* pointers to the bitmap filenames in the WPS source */
-const char *bmp_names[MAX_IMAGES];
-const char *pb_bmp_name;
+static const char *bmp_names[MAX_IMAGES];
+static const char *pb_bmp_name;
 #if LCD_DEPTH > 1
-const char *backdrop_bmp_name;
+static const char *backdrop_bmp_name;
 #endif
 #endif
 
@@ -185,7 +185,7 @@ static const struct wps_tag all_tags[] = {
     { "Iy",  WPS_TOKEN_METADATA_YEAR,            WPS_REFRESH_DYNAMIC, NULL },
     { "IC",  WPS_TOKEN_METADATA_COMMENT,         WPS_REFRESH_DYNAMIC, NULL },
 
-#if (CONFIG_CODEC == SWCODEC)
+#if (CONFIG_CODEC != MAS3507D)
     { "Sp",  WPS_TOKEN_SOUND_PITCH,              WPS_REFRESH_DYNAMIC, NULL },
 #endif
 

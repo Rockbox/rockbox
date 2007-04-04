@@ -122,9 +122,11 @@ enum wps_token_type {
     WPS_TOKEN_BATTERY_CHARGING,
     WPS_TOKEN_BATTERY_SLEEPTIME,
 
-#if (CONFIG_CODEC == SWCODEC)
     /* Sound */
+#if (CONFIG_CODEC != MAS3507D)
     WPS_TOKEN_SOUND_PITCH,
+#endif
+#if (CONFIG_CODEC == SWCODEC)
     WPS_TOKEN_REPLAYGAIN,
 #endif
 

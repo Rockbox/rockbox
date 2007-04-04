@@ -1284,12 +1284,16 @@ static char *get_tag(struct gui_wps *gwps,
             }
             return buf;
         }
+#endif
 
+#if (CONFIG_CODEC != MAS3507D)
         case WPS_TOKEN_SOUND_PITCH:
+        {
+            int val = sound_get_pitch();
             snprintf(buf, buf_size, "%d.%d",
-                    *intval / 10, *intval % 10);
+                    val / 10, val % 10);
             return buf;
-
+        }
 #endif
 
 #ifdef HAS_BUTTON_HOLD
