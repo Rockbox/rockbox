@@ -191,3 +191,8 @@ Foreground Color: 000000
 Background Color: FFC000
 Statusbar: on
 </wps>
+
+<wps>
+Name: progressive.wps
+Author: Jens Arnold
+</wps>

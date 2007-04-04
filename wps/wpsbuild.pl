@@ -56,11 +56,9 @@ STOP
     else {
     print GCC <<STOP
 \#include "config.h"
-#ifdef HAVE_LCD_BITMAP
 Height: LCD_HEIGHT
 Width: LCD_WIDTH
 Depth: LCD_DEPTH
-#endif
 STOP
 ;
 }
@@ -93,7 +91,7 @@ STOP
     return ($height, $width, $depth);
 }
 
-sub mkdirs {        
+sub mkdirs {
     my $wpsdir = $wps;
     $wpsdir =~ s/\.(r|)wps//;
     mkdir ".rockbox/wps", 0777;
@@ -132,20 +130,22 @@ sub copywps {
            }
            close(WPSFILE);
 
-           if (-e "$dir/$wps_prefix/$req_g") {
-              foreach $file (@filelist) {
-                  system("cp $dir/$wps_prefix/$req_g/$file .rockbox/wps/$wps_prefix/");
+           if ($#filelist >= 0) {
+              if (-e "$dir/$wps_prefix/$req_g") {
+                 foreach $file (@filelist) {
+                     system("cp $dir/$wps_prefix/$req_g/$file .rockbox/wps/$wps_prefix/");
+                 }
               }
-           } 
-           elsif (-e "$dir/$wps_prefix") {
-              foreach $file (@filelist) {
-                  system("cp $dir/$wps_prefix/$file .rockbox/wps/$wps_prefix/");
+              elsif (-e "$dir/$wps_prefix") {
+                 foreach $file (@filelist) {
+                     system("cp $dir/$wps_prefix/$file .rockbox/wps/$wps_prefix/");
+                 }
               }
-           } 
-           else {
-               print STDERR "beep, no dir to copy WPS from!\n";
+              else {
+                  print STDERR "beep, no dir to copy WPS from!\n";
+              }
            }
-         
+
        } else {
            print STDERR "Skipping $wps - no matching resolution.\n";
        }
@@ -255,7 +255,7 @@ while(<WPS>) {
                 $req_g = $rwidth . "x" . $rheight . "x" . $d;
 
                 $req_g_wps = $wps_prefix . "." . $req_g . ".wps";
-                last if (-e "$wpsdir/$req_g_wps"); 
+                last if (-e "$wpsdir/$req_g_wps");
 
                 if ($isrwps) {
                     $req_g = $req_g . "." . $main_width . "x" . $main_height . "x" . "$main_depth";

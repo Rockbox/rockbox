@@ -178,6 +178,7 @@ sub buildzip {
     }
 
     mkdir ".rockbox/wps", 0777;
+    mkdir ".rockbox/themes", 0777;
     mkdir ".rockbox/codepages", 0777;
 
     if($bitmap) {
@@ -191,7 +192,6 @@ sub buildzip {
 
     if($bitmap) {
         mkdir ".rockbox/codecs", 0777;
-        mkdir ".rockbox/themes", 0777;
         if($depth > 1) {
             mkdir ".rockbox/backdrops", 0777;
         }
