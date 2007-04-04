@@ -586,179 +586,113 @@ static void wps_display_images(struct gui_wps *gwps)
 
 static bool draw_player_progress(struct gui_wps *gwps)
 {
-    char player_progressbar[7];
-    char binline[36];
-    int songpos = 0;
-    int i,j;
     struct wps_state *state = gwps->state;
     struct screen *display = gwps->display;
+    unsigned char progress_pattern[7];
+    int pos = 0;
+    int i;
+
     if (!state->id3)
         return false;
 
-    memset(binline, 1, sizeof binline);
-    memset(player_progressbar, 1, sizeof player_progressbar);
+    if (state->id3->length)
+        pos = 36 * (state->id3->elapsed + state->ff_rewind_count)
+              / state->id3->length;
 
-    if(state->id3->elapsed >= state->id3->length)
-        songpos = 0;
-    else
+    for (i = 0; i < 7; i++, pos -= 5)
     {
-        if(state->wps_time_countup == false)
-            songpos = ((state->id3->elapsed - state->ff_rewind_count) * 36) /
-                            state->id3->length;
+        if (pos <= 0)
+            progress_pattern[i] = 0x1f;
+        else if (pos >= 5)
+            progress_pattern[i] = 0x00;
         else
-            songpos = ((state->id3->elapsed + state->ff_rewind_count) * 36) /
-                            state->id3->length;
+            progress_pattern[i] = 0x1f >> pos;
     }
-    for (i=0; i < songpos; i++)
-        binline[i] = 0;
 
-    for (i=0; i<=6; i++) {
-        for (j=0;j<5;j++) {
-            player_progressbar[i] <<= 1;
-            player_progressbar[i] += binline[i*5+j];
-        }
-    }
-    display->define_pattern(gwps->data->wps_progress_pat[0], player_progressbar);
+    display->define_pattern(gwps->data->wps_progress_pat[0], progress_pattern);
     return true;
 }
 
-static char map_fullbar_char(char ascii_val)
+static int map_fullbar_char(int ascii_val)
 {
-    if (ascii_val >= '0' && ascii_val <= '9') {
-        return(ascii_val - '0');
-    }
-    else if (ascii_val == ':') {
-        return(10);
-    }
+    if (ascii_val >= '0' && ascii_val <= ':') /* 0123456789: */
+        return ascii_val - '0';
     else
-        return(11); /* anything besides a number or ':' is mapped to <blank> */
+        return -1; /* anything besides a number or ':' is blank */
 }
 
 static void draw_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size)
 {
-    int i,j,lcd_char_pos;
-
-    char player_progressbar[7];
-    char binline[36];
-    static const char numbers[12][4][3]={
-        {{1,1,1},{1,0,1},{1,0,1},{1,1,1}},/*0*/
-        {{0,1,0},{1,1,0},{0,1,0},{0,1,0}},/*1*/
-        {{1,1,1},{0,0,1},{0,1,0},{1,1,1}},/*2*/
-        {{1,1,1},{0,0,1},{0,1,1},{1,1,1}},/*3*/
-        {{1,0,0},{1,1,0},{1,1,1},{0,1,0}},/*4*/
-        {{1,1,1},{1,1,0},{0,0,1},{1,1,0}},/*5*/
-        {{1,1,1},{1,0,0},{1,1,1},{1,1,1}},/*6*/
-        {{1,1,1},{0,0,1},{0,1,0},{1,0,0}},/*7*/
-        {{1,1,1},{1,1,1},{1,0,1},{1,1,1}},/*8*/
-        {{1,1,1},{1,1,1},{0,0,1},{1,1,1}},/*9*/
-        {{0,0,0},{0,1,0},{0,0,0},{0,1,0}},/*:*/
-        {{0,0,0},{0,0,0},{0,0,0},{0,0,0}} /*<blank>*/
+    static const unsigned char numbers[11][4] = {
+        {0x1c, 0x14, 0x14, 0x1c}, /* 0 */
+        {0x08, 0x18, 0x08, 0x08}, /* 1 */
+        {0x1c, 0x04, 0x08, 0x1c}, /* 2 */
+        {0x1c, 0x04, 0x0c, 0x1c}, /* 3 */
+        {0x10, 0x18, 0x1c, 0x08}, /* 4 */
+        {0x1c, 0x18, 0x04, 0x18}, /* 5 */
+        {0x1c, 0x10, 0x1c, 0x1c}, /* 6 */
+        {0x1c, 0x04, 0x08, 0x10}, /* 7 */
+        {0x1c, 0x1c, 0x14, 0x1c}, /* 8 */
+        {0x1c, 0x1c, 0x04, 0x1c}, /* 9 */
+        {0x00, 0x08, 0x00, 0x08}, /* : */
     };
-
-    int songpos = 0;
-    int digits[6];
-    int time;
-    char timestr[7];
 
     struct wps_state *state = gwps->state;
     struct screen *display = gwps->display;
     struct wps_data *data = gwps->data;
+    unsigned char progress_pattern[7];
+    char timestr[12];
+    int time;
+    int pos = 0;
+    int pat_idx = 1;
+    int i, digit;
+    bool softchar;
 
-    for (i=0; i < buf_size; i++)
-        buf[i] = ' ';
+    if (!state->id3 || buf_size < 34) /* worst case: 11x UTF-8 char + \0 */
+        return;
 
-    if(state->id3->elapsed >= state->id3->length)
-        songpos = 55;
-    else {
-        if(state->wps_time_countup == false)
-            songpos = ((state->id3->elapsed - state->ff_rewind_count) * 55) /
-                                state->id3->length;
-        else
-            songpos = ((state->id3->elapsed + state->ff_rewind_count) * 55) /
-                                state->id3->length;
-    }
-
-    time=(state->id3->elapsed + state->ff_rewind_count);
+    time = state->id3->elapsed + state->ff_rewind_count;
+    if (state->id3->length)
+        pos = 55 * time / state->id3->length;
 
     memset(timestr, 0, sizeof(timestr));
     format_time(timestr, sizeof(timestr), time);
-    for(lcd_char_pos=0; lcd_char_pos<6; lcd_char_pos++) {
-        digits[lcd_char_pos] = map_fullbar_char(timestr[lcd_char_pos]);
+
+    for (i = 0; i < 11; i++, pos -= 5)
+    {
+        softchar = false;
+        memset(progress_pattern, 0, sizeof(progress_pattern));
+
+        digit = map_fullbar_char(timestr[i]);
+        if (digit >= 0)
+        {
+            softchar = true;
+            memcpy(progress_pattern, numbers[digit], 4);
+
+            if (pos >= 5)
+                progress_pattern[5] = progress_pattern[6] = 0x1f;
+        }
+        if (pos > 0 && pos < 5)
+        {
+            softchar = true;
+            progress_pattern[5] = progress_pattern[6] = (~0x1f >> pos) & 0x1f;
+        }
+
+        if (softchar && pat_idx < 8)
+        {
+            display->define_pattern(data->wps_progress_pat[pat_idx],
+                                    progress_pattern);
+            buf = utf8encode(data->wps_progress_pat[pat_idx], buf);
+            pat_idx++;
+        }
+        else if (pos <= 0)
+            buf = utf8encode(' ', buf);
+        else if (pos >= 5)
+            buf = utf8encode(0xe115, buf); /* 2/7 _ */
+        else          /* in between, but cannot map */
+            buf = utf8encode('_', buf);    /* 1/7 _ */
     }
-
-    /* build the progressbar-icons */
-    for (lcd_char_pos=0; lcd_char_pos<6; lcd_char_pos++) {
-        memset(binline, 0, sizeof binline);
-        memset(player_progressbar, 0, sizeof player_progressbar);
-
-        /* make the character (progressbar & digit)*/
-        for (i=0; i<7; i++) {
-            for (j=0;j<5;j++) {
-                /* make the progressbar */
-                if (lcd_char_pos==(songpos/5)) {
-                    /* partial */
-                    if ((j<(songpos%5))&&(i>4))
-                        binline[i*5+j] = 1;
-                    else
-                        binline[i*5+j] = 0;
-                }
-                else {
-                    if (lcd_char_pos<(songpos/5)) {
-                        /* full character */
-                        if (i>4)
-                            binline[i*5+j] = 1;
-                    }
-                }
-                /* insert the digit */
-                if ((j<3)&&(i<4)) {
-                    if (numbers[digits[lcd_char_pos]][i][j]==1)
-                        binline[i*5+j] = 1;
-                }
-            }
-        }
-
-        for (i=0; i<=6; i++) {
-            for (j=0;j<5;j++) {
-                player_progressbar[i] <<= 1;
-                player_progressbar[i] += binline[i*5+j];
-            }
-        }
-
-        display->define_pattern(data->wps_progress_pat[lcd_char_pos+1],
-                                player_progressbar);
-        buf = utf8encode(data->wps_progress_pat[lcd_char_pos+1], buf);
-    }
-
-    /* make rest of the progressbar if necessary */
-    if (songpos/5>5) {
-
-        /* set the characters positions that use the full 5 pixel wide bar */
-        for (lcd_char_pos=6; lcd_char_pos < (songpos/5); lcd_char_pos++)
-            buf = utf8encode(0xe115, buf);  /* 2/7 '_' */
-
-        /* build the partial bar character for the tail character position */
-        memset(binline, 0, sizeof binline);
-        memset(player_progressbar, 0, sizeof player_progressbar);
-
-        for (i=5; i<7; i++) {
-            for (j=0;j<5;j++) {
-                if (j<(songpos%5)) {
-                    binline[i*5+j] = 1;
-                }
-            }
-        }
-
-        for (i=0; i<7; i++) {
-            for (j=0;j<5;j++) {
-                player_progressbar[i] <<= 1;
-                player_progressbar[i] += binline[i*5+j];
-            }
-        }
-
-        display->define_pattern(data->wps_progress_pat[7],player_progressbar);
-        buf = utf8encode(data->wps_progress_pat[7], buf);
-        *buf = '\0';
-    }
+    *buf = '\0';
 }
 
 #endif /* HAVE_LCD_CHARCELL */
