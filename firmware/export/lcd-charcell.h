@@ -16,6 +16,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+             
+#include "config.h"
 
 /* target dependent - to be adjusted for other charcell targets */
 #define HW_PATTERN_SIZE 7  /* number of bytes per pattern */

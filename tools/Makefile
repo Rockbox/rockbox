@@ -53,8 +53,8 @@ convbdf: convbdf.c
 codepages: codepages.c codepage_tables.c
 	$(SILENT)$(CC) -g $+ -o $@
 
-generate_rocklatin: generate_rocklatin.c ../firmware/drivers/lcd-player-charset.c 
-	$(SILENT)$(CC) -DHAVE_LCD_CHARCELLS -D__CONFIG_H__ -I../firmware/export $+ -o $@
+player_unifont: player_unifont.c ../firmware/drivers/lcd-charset-player.c
+	$(SILENT)$(CC) -DARCHOS_PLAYER -D__PCTOOL__ -I../firmware/export $+ -o $@
 
 uclpack:
 	$(SILENT)$(MAKE) -C ucl

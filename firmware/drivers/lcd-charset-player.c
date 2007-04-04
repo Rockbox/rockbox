@@ -110,7 +110,7 @@ enum {
 #endif
 };
 
-static const struct xchar_info xchar_info_newlcd[] = {
+const struct xchar_info xchar_info_newlcd[] = {
     /* Standard ascii */
     {   0x20, 0, 0, 0x20 }, /*   */
     {   0x21, 0, 0, 0x21 }, /* ! */
@@ -610,7 +610,7 @@ static const struct xchar_info xchar_info_newlcd[] = {
     { 0xfffd, 0, 0, 0x91 },
 };
 
-static const struct xchar_info xchar_info_oldlcd[] = {
+const struct xchar_info xchar_info_oldlcd[] = {
     /* Standard ascii */
     {   0x20, 0, 0, 0x24 }, /*   */
     {   0x21, 0, 0, 0x25 }, /* ! */
