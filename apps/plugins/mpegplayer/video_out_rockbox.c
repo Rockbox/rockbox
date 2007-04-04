@@ -213,27 +213,26 @@ void vo_draw_frame (uint8_t * const * buf)
 #define SCREEN_HEIGHT LCD_WIDTH
 #endif
 
-void vo_setup(unsigned int display_width, unsigned int display_height, unsigned int width, unsigned int height, 
-             unsigned int chroma_width, unsigned int chroma_height)
+void vo_setup(const mpeg2_sequence_t * sequence)
 {
-    image_width=width;
-    image_height=height;
-    image_chroma_x=image_width/chroma_width;
-    image_chroma_y=image_height/chroma_height;
+    image_width=sequence->width;
+    image_height=sequence->height;
+    image_chroma_x=image_width/sequence->chroma_width;
+    image_chroma_y=image_height/sequence->chroma_height;
 
-    if (display_width >= SCREEN_WIDTH) {
+    if (sequence->display_width >= SCREEN_WIDTH) {
         output_width = SCREEN_WIDTH;
         output_x = 0;
     } else {
-        output_width = display_width;
-        output_x = (SCREEN_WIDTH-display_width)/2;
+        output_width = sequence->display_width;
+        output_x = (SCREEN_WIDTH-sequence->display_width)/2;
     }
 
-    if (display_height >= SCREEN_HEIGHT) {
+    if (sequence->display_height >= SCREEN_HEIGHT) {
         output_height = SCREEN_HEIGHT;
         output_y = 0;
     } else {
-        output_height = display_height;
-        output_y = (SCREEN_HEIGHT-display_height)/2;
+        output_height = sequence->display_height;
+        output_y = (SCREEN_HEIGHT-sequence->display_height)/2;
     }
 }
