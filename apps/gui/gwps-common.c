@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Björn Stenberg
+ * Copyright (C) 2007 Nicolas Pennequin
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -56,16 +56,11 @@
 #include "action.h"
 #include "cuesheet.h"
 
-#ifdef HAVE_LCD_CHARCELLS
-static bool draw_player_progress(struct gui_wps *gwps);
-static void draw_player_fullbar(struct gui_wps *gwps,
-                                char* buf, int buf_size);
-#endif
-
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
                                 /* 3% of 30min file == 54s step size */
 #define MIN_FF_REWIND_STEP 500
 
+#if 0
 /* Skip leading UTF-8 BOM, if present. */
 static char* skip_utf8_bom(char* buf)
 {
@@ -78,287 +73,14 @@ static char* skip_utf8_bom(char* buf)
     
     return buf;
 }
-
-/*
- * returns the image_id between
- * a..z and A..Z
- */
-#ifdef HAVE_LCD_BITMAP
-static int get_image_id(int c)
-{
-    if(c >= 'a' && c <= 'z')
-        return c - 'a';
-    else if(c >= 'A' && c <= 'Z')
-        return c - 'A' + 26;
-    else
-        return -1;
-}
 #endif
-    
-/*
- * parse the given buffer for following static tags:
- * %x    -   load image for always display
- * %X    -   load backdrop image
- * %xl   -   preload image
- * %we   -   enable statusbar on wps regardless of the global setting
- * %wd   -   disable statusbar on wps regardless of the global setting
- * and also for:
- * #     -   a comment line
- *
- * it returns true if one of these tags is found and handled
- * false otherwise
- */
-bool wps_data_preload_tags(struct wps_data *data, char *buf,
-                            const char *bmpdir, size_t bmpdirlen)
-{
-    if(!data || !buf) return false;
-    
-    char c;
-#ifndef HAVE_LCD_BITMAP
-    /* no bitmap-lcd == no bitmap loading */
-    (void)bmpdir;
-    (void)bmpdirlen;
-#endif
-    buf = skip_utf8_bom(buf);
-    
-    if(*buf == '#')
-        return true;
-    if('%' != *buf)
-        return false;
-    buf++;
-    
-    c  = *buf;
-    switch (c)
-    {
-#ifdef HAVE_LCD_BITMAP
-        case 'w':
-            /* 
-             * if tag found then return because these two tags must be on 
-             * must be on their own line
-             */
-            if(*(buf+1) == 'd' || *(buf+1) == 'e')
-            {
-                data->wps_sb_tag = true;
-                if( *(buf+1) == 'e' )
-                    data->show_sb_on_wps = true;
-                return true;
-            }
-        break;
-
-#if LCD_DEPTH > 1
-        case 'X':
-            /* Backdrop image - must be the same size as the LCD */
-        {
-            char *ptr = buf+2;
-            char *pos = NULL;
-            char imgname[MAX_PATH];
-
-            /* format: %X|filename.bmp| */
-
-            /* get filename */
-            pos = strchr(ptr, '|');
-            if ((pos - ptr) <
-                (int)sizeof(imgname)-ROCKBOX_DIR_LEN-2)
-            {
-                memcpy(imgname, bmpdir, bmpdirlen);
-                imgname[bmpdirlen] = '/';
-                memcpy(&imgname[bmpdirlen+1],
-                        ptr, pos - ptr);
-                imgname[bmpdirlen+1+pos-ptr] = 0;
-            }
-            else
-            {
-                /* filename too long */
-                imgname[0] = 0;
-            }
-
-            /* load the image */
-            return load_wps_backdrop(imgname);
-        }
-
-        break;
-#endif
-
-        case 'P':
-            /* progress bar image */
-        {
-            int ret = 0;
-            char *ptr = buf+2;
-            char *pos = NULL;
-            char imgname[MAX_PATH];
-
-            /* format: %P|filename.bmp| */
-            {
-                /* get filename */
-                pos = strchr(ptr, '|');
-                if ((pos - ptr) <
-                    (int)sizeof(imgname)-ROCKBOX_DIR_LEN-2)
-                {
-                    memcpy(imgname, bmpdir, bmpdirlen);
-                    imgname[bmpdirlen] = '/';
-                    memcpy(&imgname[bmpdirlen+1],
-                           ptr, pos - ptr);
-                    imgname[bmpdirlen+1+pos-ptr] = 0;
-                }
-                else
-                    /* filename too long */
-                    imgname[0] = 0;
-
-                ptr = pos+1;
-
-                /* load the image */
-                data->progressbar.bm.data=data->img_buf_ptr;
-                ret = read_bmp_file(imgname, &data->progressbar.bm,
-                                    data->img_buf_free,
-                                    FORMAT_ANY|FORMAT_TRANSPARENT);
-                        
-                if (ret > 0)
-                {
-#if LCD_DEPTH == 16
-                     if (ret % 2) ret++; 
-                     /* Always consume an even number of bytes */
-#endif
-
-                     data->img_buf_ptr += ret;
-                     data->img_buf_free -= ret;
-
-                     if (data->progressbar.bm.width <= LCD_WIDTH) {
-                          data->progressbar.have_bitmap_pb=true;
-                          return true;
-                     } else
-                          return false;
-                }
-                
-            }
-        }
-
-        break;
-        
-        case 'x':
-            /* Preload images so the %xd# tag can display it */
-        {
-            int ret = 0;
-            int n;
-            char *ptr = buf+1;
-            char *pos = NULL;
-            char imgname[MAX_PATH];
-            char qual = *ptr;
-
-            if (qual == 'l' || qual == '|')  /* format:
-                                                %x|n|filename.bmp|x|y|
-                                                or
-                                                %xl|n|filename.bmp|x|y|
-                                             */
-            {
-                ptr = strchr(ptr, '|') + 1;
-                pos = strchr(ptr, '|');
-                if (pos)
-                {
-                    /* get the image ID */
-                    n = get_image_id(*ptr);
-                    
-                    if(n < 0 || n >= MAX_IMAGES)
-                    {
-                        /* Skip the rest of the line */
-                        while(*buf != '\n')
-                            buf++;
-                        return false;
-                    }
-                    ptr = pos+1;
-
-                    /* check the image number and load state */
-                    if (data->img[n].loaded)
-                    {
-                        /* Skip the rest of the line */
-                        while(*buf != '\n')
-                            buf++;
-                        return false;
-                    }
-                    else
-                    {
-                        /* get filename */
-                        pos = strchr(ptr, '|');
-
-                        if (pos == NULL)
-                            return false;
-
-                        if ((pos - ptr) <
-                            (int)sizeof(imgname)-ROCKBOX_DIR_LEN-2)
-                        {
-                            memcpy(imgname, bmpdir, bmpdirlen);
-                            imgname[bmpdirlen] = '/';
-                            memcpy(&imgname[bmpdirlen+1],
-                                   ptr, pos - ptr);
-                            imgname[bmpdirlen+1+pos-ptr] = 0;
-                        }
-                        else
-                            /* filename too long */
-                            imgname[0] = 0;
-
-                        ptr = pos+1;
-
-                        /* get x-position */
-                        pos = strchr(ptr, '|');
-                        if (pos)
-                            data->img[n].x = atoi(ptr);
-                        else
-                        {
-                            /* weird syntax, bail out */
-                            buf++;
-                            return false;
-                        }
-
-                        /* get y-position */
-                        ptr = pos+1;
-                        pos = strchr(ptr, '|');
-                        if (pos)
-                            data->img[n].y = atoi(ptr);
-                        else
-                        {
-                            /* weird syntax, bail out */
-                            buf++;
-                            return false;
-                        }
-
-                        /* load the image */
-                        data->img[n].bm.data = data->img_buf_ptr;
-                        ret = read_bmp_file(imgname, &data->img[n].bm,
-                                            data->img_buf_free,
-                                            FORMAT_ANY|FORMAT_TRANSPARENT);
-                        
-                        if (ret > 0)
-                        {
-#if LCD_DEPTH == 16
-                            if (ret % 2) ret++; 
-                            /* Always consume an even number of bytes */
-#endif
-
-                            data->img_buf_ptr += ret;
-                            data->img_buf_free -= ret;
-                            data->img[n].loaded = true;
-                            if(qual == '|')
-                                data->img[n].always_display = true;
-                        }
-                        return true;
-                    }
-                }
-            }
-        }
-
-        break;
-#endif
-    }
-    /* no of these tags found */
-    return false;
-}
-
 
 /* draws the statusbar on the given wps-screen */
 #ifdef HAVE_LCD_BITMAP
-static void gui_wps_statusbar_draw(struct gui_wps *wps, bool force)
+void gui_wps_statusbar_draw(struct gui_wps *wps, bool force)
 {
     bool draw = global_settings.statusbar;
-    
+
     if(wps->data->wps_sb_tag 
         && wps->data->show_sb_on_wps)
         draw = true;
@@ -371,1103 +93,6 @@ static void gui_wps_statusbar_draw(struct gui_wps *wps, bool force)
 #define gui_wps_statusbar_draw(wps, force) \
     gui_statusbar_draw((wps)->statusbar, (force))
 #endif
-
-/* Extract a part from a path.
- *
- * buf      - buffer extract part to.
- * buf_size - size of buffer.
- * path     - path to extract from.
- * level    - what to extract. 0 is file name, 1 is parent of file, 2 is
- *            parent of parent, etc.
- *
- * Returns buf if the desired level was found, NULL otherwise.
- */
-static char* get_dir(char* buf, int buf_size, const char* path, int level)
-{
-    const char* sep;
-    const char* last_sep;
-    int len;
-
-    sep = path + strlen(path);
-    last_sep = sep;
-
-    while (sep > path)
-    {
-        if ('/' == *(--sep))
-        {
-            if (!level)
-            {
-                break;
-            }
-
-            level--;
-            last_sep = sep - 1;
-        }
-    }
-
-    if (level || (last_sep <= sep))
-    {
-        return NULL;
-    }
-
-    len = MIN(last_sep - sep, buf_size - 1);
-    strncpy(buf, sep + 1, len);
-    buf[len] = 0;
-    return buf;
-}
-
-/* Get the tag specified by the two characters at fmt.
- *
- * cid3      - ID3 data to get tag values from.
- * nid3     - next-song ID3 data to get tag values from.
- * tag      - string (of two characters) specifying the tag to get.
- * buf      - buffer to certain tags, such as track number, play time or
- *           directory name.
- * buf_size - size of buffer.
- * flags    - returns the type of the line. See constants i wps-display.h
- *
- * Returns the tag. NULL indicates the tag wasn't available.
- */
-static char* get_tag(struct wps_data* wps_data,
-                     struct mp3entry* cid3,
-                     struct mp3entry* nid3,
-                     const char* tag,
-                     char* buf,
-                     int buf_size,
-                     unsigned char* tag_len,
-                     unsigned short* subline_time_mult,
-                     unsigned char* flags,
-                     int *intval)
-{
-    struct mp3entry *id3 = cid3; /* default to current song */
-    int limit = *intval;
-#ifndef HAVE_LCD_CHARCELLS
-    (void)wps_data;
-#endif
-    if ((0 == tag[0]) || (0 == tag[1]))
-    {
-        *tag_len = 0;
-        return NULL;
-    }
-
-    *tag_len = 2;
-
-    *intval = 0;
-    
-    switch (tag[0])
-    {
-        case 'I':  /* ID3 Information */
-            id3 = nid3; /* display next-song data */
-            *flags |= WPS_REFRESH_DYNAMIC;
-            if(!id3)
-                return NULL; /* no such info (yet) */
-            /* fall-through */
-        case 'i':  /* ID3 Information */
-            *flags |= WPS_REFRESH_STATIC;
-            switch (tag[1])
-            {
-                case 't':  /* ID3 Title */
-                    return id3->title;
-
-                case 'a':  /* ID3 Artist */
-                    return id3->artist;
-
-                case 'n':  /* ID3 Track Number */
-                    if (id3->track_string)
-                        return id3->track_string;
-
-                    if (id3->tracknum) {
-                        snprintf(buf, buf_size, "%d", id3->tracknum);
-                        return buf;
-                    }
-                    return NULL;
-
-                case 'd':  /* ID3 Album/Disc */
-                    return id3->album;
-
-                case 'c':  /* ID3 Composer */
-                    return id3->composer;
-
-                case 'C':  /* ID3 Comment */
-                    return id3->comment;
-
-                case 'A':  /* ID3 Albumartist */
-                    return id3->albumartist;
-
-                case 'y':  /* year */
-                    if( id3->year_string )
-                        return id3->year_string;
-
-                    if (id3->year) {
-                        snprintf(buf, buf_size, "%d", id3->year);
-                        return buf;
-                    }
-                    return NULL;
-
-                case 'g':  /* genre */
-                    return id3->genre_string;
-
-                case 'v': /* id3 version */
-                    switch (id3->id3version)
-                    {
-                        case ID3_VER_1_0:
-                            return "1";
-
-                        case ID3_VER_1_1:
-                            return "1.1";
-
-                        case ID3_VER_2_2:
-                            return "2.2";
-
-                        case ID3_VER_2_3:
-                            return "2.3";
-
-                        case ID3_VER_2_4:
-                            return "2.4";
-
-                        default:
-                            return NULL;
-                    }
-            }
-            break;
-
-        case 'F':  /* File Information */
-            id3 = nid3;
-            *flags |= WPS_REFRESH_DYNAMIC;
-            if(!id3)
-                return NULL; /* no such info (yet) */
-            /* fall-through */
-        case 'f':  /* File Information */
-            *flags |= WPS_REFRESH_STATIC;
-            switch(tag[1])
-            {
-                case 'v':  /* VBR file? */
-                    return id3->vbr ? "(avg)" : NULL;
-
-                case 'b':  /* File Bitrate */
-                    if(id3->bitrate)
-                        snprintf(buf, buf_size, "%d", id3->bitrate);
-                    else
-                        snprintf(buf, buf_size, "?");
-                    return buf;
-
-                case 'f':  /* File Frequency */
-                    snprintf(buf, buf_size, "%ld", id3->frequency);
-                    return buf;
-
-                case 'p':  /* File Path */
-                    return id3->path;
-
-                case 'm':  /* File Name - With Extension */
-                    return get_dir(buf, buf_size, id3->path, 0);
-
-                case 'n':  /* File Name */
-                    if (get_dir(buf, buf_size, id3->path, 0))
-                    {
-                        /* Remove extension */
-                        char* sep = strrchr(buf, '.');
-
-                        if (NULL != sep)
-                        {
-                            *sep = 0;
-                        }
-
-                        return buf;
-                    }
-                    else
-                    {
-                        return NULL;
-                    }
-
-                case 's':  /* File Size (in kilobytes) */
-                    snprintf(buf, buf_size, "%ld", id3->filesize / 1024);
-                    return buf;
-
-                case 'c':  /* File Codec */
-                    if(id3->codectype == AFMT_UNKNOWN)
-                        *intval = AFMT_NUM_CODECS;
-                    else
-                        *intval = id3->codectype;
-                    return id3_get_codec(id3);
-            }
-            break;
-
-        case 'p':  /* Playlist/Song Information */
-            switch(tag[1])
-            {
-                case 'b':  /* progress bar */
-                    *flags |= WPS_REFRESH_PLAYER_PROGRESS;
-#ifdef HAVE_LCD_CHARCELLS
-                    char *end = utf8encode(wps_data->wps_progress_pat[0], buf);
-                    *end = '\0';
-                    wps_data->full_line_progressbar=0;
-                    return buf;
-#else
-                    /* default values : */
-                    wps_data->progress_top = -1;
-                    wps_data->progress_height = 6;
-                    wps_data->progress_start = 0;
-                    wps_data->progress_end = 0;
-
-                    char *prev=strchr(tag, '|');
-                    if (prev) {
-                        char *p=strchr(prev+1, '|');
-                        if (p) {
-                            wps_data->progress_height=atoi(++prev);
-                            prev=strchr(prev, '|');
-                            p=strchr(++p, '|');
-                            if (p) {
-                                wps_data->progress_start=atoi(++prev);
-                                prev=strchr(prev, '|');
-                                p=strchr(++p, '|');
-                                if (p) {
-                                    wps_data->progress_end=atoi(++prev);
-                                    prev=strchr(prev, '|');
-                                    p=strchr(++p, '|');
-                                    if(p)
-                                        wps_data->progress_top = atoi(++prev);
-                                }
-
-                            if (wps_data->progress_height<3)
-                                wps_data->progress_height=3;
-                            if (wps_data->progress_end<wps_data->progress_start+3)
-                                wps_data->progress_end=0;
-                            }
-                        }
-                    }
-                    return "\x01";
-#endif
-                case 'f':  /* full-line progress bar */
-#ifdef HAVE_LCD_CHARCELLS
-                    if(is_new_player()) {
-                        *flags |= WPS_REFRESH_PLAYER_PROGRESS;
-                        *flags |= WPS_REFRESH_DYNAMIC;
-                        wps_data->full_line_progressbar=1;
-                        /* we need 11 characters (full line) for
-                           progress-bar */
-                        snprintf(buf, buf_size, "           ");
-                    }
-                    else
-                    {
-                        /* Tell the user if we have an OldPlayer */
-                        snprintf(buf, buf_size, " <Old LCD> ");
-                    }
-                    return buf;
-#endif
-                case 'p':  /* Playlist Position */
-                    *flags |= WPS_REFRESH_STATIC;
-                    snprintf(buf, buf_size, "%d",
-                             playlist_get_display_index());
-                    return buf;
-
-                case 'n':  /* Playlist Name (without path) */
-                    *flags |= WPS_REFRESH_STATIC;
-                    return playlist_name(NULL, buf, buf_size);
-
-                case 'e':  /* Playlist Total Entries */
-                    *flags |= WPS_REFRESH_STATIC;
-                    snprintf(buf, buf_size, "%d", playlist_amount());
-                    return buf;
-
-                case 'c':  /* Current Time in Song */
-                    *flags |= WPS_REFRESH_DYNAMIC;
-                    format_time(buf, buf_size,
-                                id3->elapsed + wps_state.ff_rewind_count);
-                    return buf;
-
-                case 'r': /* Remaining Time in Song */
-                    *flags |= WPS_REFRESH_DYNAMIC;
-                    format_time(buf, buf_size,
-                                id3->length - id3->elapsed -
-                                wps_state.ff_rewind_count);
-                    return buf;
-
-                case 't':  /* Total Time */
-                    *flags |= WPS_REFRESH_STATIC;
-                    format_time(buf, buf_size, id3->length);
-                    return buf;
-
-#ifdef HAVE_LCD_BITMAP
-                case 'm': /* Peak Meter */
-                    *flags |= WPS_REFRESH_PEAK_METER;
-                    return "\x01";
-#endif
-                case 's': /* shuffle */
-                    *flags |= WPS_REFRESH_DYNAMIC;
-                    if ( global_settings.playlist_shuffle )
-                        return "s";
-                    else
-                        return NULL;
-                    break;
-
-                case 'v': /* volume */
-                    *flags |= WPS_REFRESH_DYNAMIC;
-                    snprintf(buf, buf_size, "%d", global_settings.volume);
-                    *intval = limit * (global_settings.volume 
-                                    - sound_min(SOUND_VOLUME))
-                                 / (sound_max(SOUND_VOLUME)
-                                    - sound_min(SOUND_VOLUME)) + 1;
-                    return buf;
-
-            }
-            break;
-
-#if (CONFIG_CODEC == SWCODEC)
-        case 'S': /* DSP/Equalizer/Sound settings */
-            switch (tag[1])
-            {
-                case 'p': /* pitch */
-                    *intval = sound_get_pitch();
-                    snprintf(buf, buf_size, "%d.%d",
-                            *intval / 10, *intval % 10);
-                    return buf;
-            }
-            break;
-#endif
-            
-        case 'm':
-            switch (tag[1])
-            {
-                case 'm': /* playback repeat mode */
-                    *flags |= WPS_REFRESH_DYNAMIC;
-                    *intval = global_settings.repeat_mode + 1;
-                    snprintf(buf, buf_size, "%d", *intval);
-                    return buf;
-                    
-                /* playback status */
-                case 'p': /* play */
-                    *flags |= WPS_REFRESH_DYNAMIC;
-                    int status = audio_status();
-                    *intval = 1;
-                    if (status == AUDIO_STATUS_PLAY && \
-                        !(status & AUDIO_STATUS_PAUSE))
-                        *intval = 2;
-                    if (audio_status() & AUDIO_STATUS_PAUSE && \
-                        (! status_get_ffmode()))
-                        *intval = 3;
-                    if (status_get_ffmode() == STATUS_FASTFORWARD)
-                        *intval = 4;
-                    if (status_get_ffmode() == STATUS_FASTBACKWARD)
-                        *intval = 5;
-                    snprintf(buf, buf_size, "%d", *intval);
-                    return buf;
-
-#ifdef HAS_BUTTON_HOLD
-                case 'h': /* hold */
-                    *flags |= WPS_REFRESH_DYNAMIC;
-                    if (button_hold())
-                        return "h";
-                    else
-                        return NULL;
-#endif
-#ifdef HAS_REMOTE_BUTTON_HOLD
-                case 'r': /* remote hold */
-                    *flags |= WPS_REFRESH_DYNAMIC;
-                    if (remote_button_hold())
-                        return "r";
-                    else
-                        return NULL;
-#endif
-            }
-            break;
-
-        case 'b': /* battery info */
-            *flags |= WPS_REFRESH_DYNAMIC;
-            switch (tag[1])
-            {
-                case 'l': /* battery level */
-                {
-                    int l = battery_level();
-                    limit = MAX(limit, 2);
-                    if (l > -1)
-                    {
-                        snprintf(buf, buf_size, "%d", l);
-                        /* First enum is used for "unknown level". */
-                        *intval = (limit - 1) * l / 100 + 1 + 1;
-                    }
-                    else
-                    {
-                        *intval = 1;
-                        return "?";
-                    }
-                    return buf;
-                }
-
-                case 'v': /* battery voltage */
-                {
-                    unsigned int v = battery_voltage();
-                    snprintf(buf, buf_size, "%d.%02d", v/100, v%100);
-                    return buf;
-                }
-
-                case 't': /* estimated battery time */
-                {
-                    int t = battery_time();
-                    if (t >= 0)
-                        snprintf(buf, buf_size, "%dh %dm", t / 60, t % 60);
-                    else
-                        strncpy(buf, "?h ?m", buf_size);
-                    return buf;
-                }
-
-                case 's': /* sleep timer */
-                {
-                    if (get_sleep_timer() == 0)
-                    {
-                        return NULL;
-                    }
-                    else
-                    {
-                        format_time(buf, buf_size, \
-                                    get_sleep_timer() * 1000);
-                        return buf;
-                    }
-                }
-                
-#if CONFIG_CHARGING
-                case 'p': /* External power plugged in? */
-                {
-                    if(charger_input_state==CHARGER)
-                        return "p";
-                    else
-                        return NULL;
-                }
-#endif
-#if CONFIG_CHARGING >= CHARGING_MONITOR
-                case 'c': /* Charging */
-                {
-                    if (charge_state == CHARGING || charge_state == TOPOFF) {
-                        return "c";
-                    } else {
-                        return NULL;
-                    }
-                }
-#endif
-            }
-            break;
-
-#if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
-        case 'l': /* VIRTUAL_LED */
-        {
-            switch(tag[1])
-            {
-                case 'h': /* Only one we have so far HDD LED */
-                    *flags |= WPS_REFRESH_DYNAMIC;
-                    if(led_read(HZ/2))
-                        return "h";
-                    else
-                        return NULL;
-            }
-        }
-        break;
-#endif
-
-        case 'D': /* Directory path information */
-            id3 = nid3; /* next song please! */
-            *flags |= WPS_REFRESH_DYNAMIC;
-            if(!id3)
-                return NULL; /* no such info (yet) */
-            /* fall-through */
-        case 'd': /* Directory path information */
-            {
-                int level = tag[1] - '0';
-                *flags |= WPS_REFRESH_STATIC;
-                /* d1 through d9 */
-                if ((0 < level) && (9 > level))
-                {
-                    return get_dir(buf, buf_size, id3->path, level);
-                }
-            }
-            break;
-
-        case 't': /* set sub line time multiplier */
-            {
-                int d = 1;
-                int time_mult = 0;
-                bool have_point = false;
-                bool have_tenth = false;
-
-                while (((tag[d] >= '0') &&
-                        (tag[d] <= '9')) ||
-                       (tag[d] == '.'))
-                {
-                    if (tag[d] != '.')
-                    {
-                        time_mult = time_mult * 10;
-                        time_mult = time_mult + tag[d] - '0';
-                        if (have_point)
-                        {
-                            have_tenth = true;
-                            d++;
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        have_point = true;
-                    }
-                    d++;
-                }
-
-                if (have_tenth == false)
-                    time_mult *= 10;
-
-                *subline_time_mult = time_mult;
-                *tag_len = d;
-
-                buf[0] = 0;
-                return buf;
-            }
-            break;
-       case 'r':  /* Runtime database Information and Replaygain */
-            switch(tag[1])
-            {
-                case 'p':  /* Playcount */
-                    *flags |= WPS_REFRESH_DYNAMIC;
-                    *intval = cid3->playcount+1;
-                    snprintf(buf, buf_size, "%ld", cid3->playcount);
-                    return buf;
-                case 'r':  /* Rating */
-                    *flags |= WPS_REFRESH_DYNAMIC;
-                    *intval = cid3->rating+1;
-                    snprintf(buf, buf_size, "%d", cid3->rating);
-                    return buf;
-#if CONFIG_CODEC == SWCODEC
-                case 'g': /* ReplayGain */
-                    *flags |= WPS_REFRESH_STATIC;
-                    if (global_settings.replaygain == 0)
-                        *intval = 1; /* off */
-                    else
-                    {
-                        int type = get_replaygain_mode(
-                            id3->track_gain_string != NULL,
-                            id3->album_gain_string != NULL);
-                        
-                        if (type < 0)
-                            *intval = 6;    /* no tag */
-                        else
-                            *intval = type + 2;
-                            
-                        if (global_settings.replaygain_type == REPLAYGAIN_SHUFFLE)
-                            *intval += 2;
-                    }
-
-                    switch (*intval)
-                    {
-                        case 1:
-                        case 6:
-                            return "+0.00 dB";
-                            break;
-                        case 2:
-                        case 4:
-                            strncpy(buf, id3->track_gain_string, buf_size);
-                            break;
-                        case 3:
-                        case 5:
-                            strncpy(buf, id3->album_gain_string, buf_size);
-                            break;
-                    }
-                    return buf;
-#endif
-            }
-            break;
-#if CONFIG_RTC
-       case 'c':  /* Real Time Clock display */
-            *flags |= WPS_REFRESH_DYNAMIC;
-            {
-                int value;
-                char *format = 0;
-                char *bufptr = buf;
-                struct tm* tm = get_time();
-                int i;
-                for (i=1;/*break*/;i++) {
-                    switch(tag[i])
-                    {
-                        case 'a': /* abbreviated weekday name (Sun..Sat) */
-                            value = tm->tm_wday;
-                            if (value > 6 || value < 0) continue;
-                            value = snprintf(
-                                    bufptr,buf_size,"%s",str(dayname[value]));
-                            bufptr += value;
-                            buf_size -= value;
-                            continue;
-                        case 'b': /* abbreviated month name (Jan..Dec) */
-                            value = tm->tm_mon;
-                            if (value > 11 || value < 0) continue;
-                            value = snprintf(
-                                    bufptr,buf_size,"%s",str(monthname[value]));
-                            bufptr += value;
-                            buf_size -= value;
-                            continue;
-                        case 'd': /* day of month (01..31) */
-                            value = tm->tm_mday;
-                            if (value > 31 || value < 1) continue;
-                            format = "%02d";
-                            break;
-                        case 'e': /* day of month, blank padded ( 1..31) */
-                            value = tm->tm_mday;
-                            if (value > 31 || value < 1) continue;
-                            format = "%2d";
-                            break;
-                        case 'H': /* hour (00..23) */
-                            value = tm->tm_hour;
-                            if (value > 23) continue;
-                            format = "%02d";
-                            break;
-                        case 'k': /* hour ( 0..23) */
-                            value = tm->tm_hour;
-                            if (value > 23) continue;
-                            format = "%2d";
-                            break;
-                        case 'I': /* hour (01..12) */
-                            value = tm->tm_hour;
-                            if (value > 23) continue;
-                            value %= 12;
-                            if (value == 0) value = 12;
-                            format = "%02d";
-                            break;
-                        case 'l': /* hour ( 1..12) */
-                            value = tm->tm_hour;
-                            if (value > 23 || value < 0) continue;
-                            value %= 12;
-                            if (value == 0) value = 12;
-                            format = "%2d";
-                            break;
-                        case 'm': /* month (01..12) */
-                            value = tm->tm_mon;
-                            if (value > 11 || value < 0) continue;
-                            value++;
-                            format = "%02d";
-                            break;
-                        case 'M': /* minute (00..59) */
-                            value = tm->tm_min;
-                            if (value > 59 || value < 0) continue;
-                            format = "%02d";
-                            break;
-                        case 'S': /* second (00..59) */
-                            value = tm->tm_sec;
-                            if (value > 59 || value < 0) continue;
-                            format = "%02d";
-                            break;
-                        case 'y': /* last two digits of year (00..99) */
-                            value = tm->tm_year;
-                            value %= 100;
-                            format = "%02d";
-                            break;
-                        case 'Y': /* year (1970...) */
-                            value = tm->tm_year;
-                            if (value > 199 || value < 100) continue;
-                            value += 1900;
-                            format = "%04d";
-                            break;
-                        case 'p': /* upper case AM or PM indicator */
-                            if (tm->tm_hour/12 == 0) format = "AM";
-                            else format = "PM";
-                            snprintf(bufptr,buf_size,"%s",format);
-                            bufptr += 2;
-                            buf_size -= 2;
-                            continue;
-                        case 'P': /* lower case am or pm indicator */
-                            if (tm->tm_hour/12 == 0) format = "am";
-                            else format = "pm";
-                            snprintf(bufptr,buf_size,"%s",format);
-                            bufptr += 2;
-                            buf_size -= 2;
-                            continue;
-                        case 'u': /* day of week (1..7); 1 is Monday */
-                            value = tm->tm_wday;
-                            if (value < 0 || value > 6) continue;
-                            value++;
-                            format = "%1d";
-                            break;
-                        case 'w': /* day of week (0..6); 0 is Sunday */
-                            value = tm->tm_wday;
-                            if (value < 0 || value > 6) continue;
-                            format = "%1d";
-                            break;
-                        default:
-                            if (tag[i] == 'c') {
-                                i++;
-                                value = -1;
-                                break;
-                            } else if (tag[i] == '\n') {
-                                value = -1;
-                                break;
-                            }
-                            snprintf(bufptr,buf_size,"%c",tag[i]);
-                            bufptr++;
-                            buf_size--;
-                            continue;
-                    } /* switch */
-                    if (value < 0) break;
-
-                    value = snprintf(bufptr, buf_size, format, value);
-                    bufptr += value;
-                    buf_size -= value;
-                } /* while */
-                *tag_len = i;
-                return buf;
-            }
-#endif /* CONFIG_RTC */
-#if CONFIG_CODEC == SWCODEC
-        case 'x':
-            *flags |= WPS_REFRESH_DYNAMIC;
-            switch(tag[1])
-            {
-                case 'd': /* crossfeed */
-                    if(global_settings.crossfeed)
-                        return "d";
-                    else
-                        return NULL;
-                case 'f': /* crossfade */
-                     *intval = global_settings.crossfade+1;
-                     snprintf(buf, buf_size, "%d", global_settings.crossfade);
-                return buf;
-            }
-            break;
-#endif
-    }
-    return NULL;
-}
-
-#ifdef HAVE_LCD_BITMAP
-/* clears the area where the image was shown */
-static void clear_image_pos(struct gui_wps *gwps, int n)
-{
-    if(!gwps)
-        return;
-    struct wps_data *data = gwps->data;
-    gwps->display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    gwps->display->fillrect(data->img[n].x, data->img[n].y, 
-                            data->img[n].bm.width, data->img[n].bm.height);
-    gwps->display->set_drawmode(DRMODE_SOLID);
-}
-#endif
-
-/* Skip to the end of the current %? conditional.
- *
- * fmt     - string to skip it. Should point to somewhere after the leading
- *           "<" char (and before or at the last ">").
- * num     - number of |'s to skip, or 0 to skip to the end (the ">").
- * enums   - If not NULL, set to the number of |'s found in the current 
- *           conditional (sub-conditionals are ignored). num should be 0
- *           to find all |'s.
- *
- * Returns the new position in fmt.
- */
-static const char* skip_conditional(struct gui_wps *gwps, const char* fmt,
-                                    int num, int *enums)
-{
-    int level = 1;
-    int count = num;
-    const char *last_alternative = NULL;
-#ifdef HAVE_LCD_BITMAP
-    struct wps_data *data = NULL;
-    int last_x=-1, last_y=-1, last_w=-1, last_h=-1;
-    if(gwps)
-        data = gwps->data;
-    if (enums)
-        *enums = 0;
-#else
-    (void)gwps;
-#endif
-    while (*fmt)
-    {
-        switch (*fmt++)
-        {
-            case '%':
-#ifdef HAVE_LCD_BITMAP
-                if(data && *(fmt) == 'x' && *(fmt+1) == 'd' )
-                {
-                    fmt +=2;
-                    int n = *fmt;
-                    if(n >= 'a' && n <= 'z')
-                        n -= 'a';
-                    if(n >= 'A' && n <= 'Z')
-                        n = n - 'A' + 26;
-                    if(last_x != data->img[n].x || last_y != data->img[n].y
-                       || last_w != data->img[n].bm.width
-                       || last_h != data->img[n].bm.height)
-                    {
-                        last_x = data->img[n].x;
-                        last_y = data->img[n].y;
-                        last_w = data->img[n].bm.width;
-                        last_h = data->img[n].bm.height;
-                        clear_image_pos(gwps,n);
-                    }
-                }
-#endif
-                break;
-
-            case '|':
-                if(1 == level) {
-                    if (enums)
-                        (*enums)++;
-                    last_alternative = fmt;
-                    if(num) {
-                        count--;
-                        if(count == 0)
-                            return fmt;
-                        continue;
-                    }
-                }
-                continue;
-
-            case '>':
-                if (0 == --level)
-                {
-                    /* We're just skipping to the end */
-                    if(num == 0)
-                        return fmt;
-
-                    /* If we are parsing an enum, we'll return the selected
-                       item. If there weren't enough items in the enum, we'll
-                       return the last one found. */
-                    if(count && last_alternative)
-                    {
-                        return last_alternative;
-                    }
-                    return fmt - 1;
-                }
-                continue;
-
-            default:
-                continue;
-        }
-
-        switch (*fmt++)
-        {
-            case 0:
-            case '%':
-            case '|':
-            case '<':
-            case '>':
-                break;
-
-            case '?':
-                while (*fmt && ('<' != *fmt))
-                    fmt++;
-
-                if ('<' == *fmt)
-                    fmt++;
-
-                level++;
-                break;
-
-            default:
-                break;
-        }
-    }
-
-    return fmt;
-}
-
-/* Generate the display based on id3 information and format string.
- *
- * buf      - char buffer to write the display to.
- * buf_size - the size of buffer.
- * id3      - the ID3 data to format with.
- * nid3     - the ID3 data of the next song (might by NULL)
- * fmt      - format description.
- * flags    - returns the type of the line. See constants i wps-display.h
- */
-static void format_display(struct gui_wps *gwps, char* buf,
-                           int buf_size,
-                           struct mp3entry* id3,
-                           struct mp3entry* nid3, /* next song's id3 */
-                           const char* fmt,
-                           struct align_pos* align,
-                           unsigned short* subline_time_mult,
-                           unsigned char* flags)
-{
-    char temp_buf[128];
-    char* buf_start = buf;
-    char* buf_end = buf + buf_size - 1;   /* Leave room for end null */
-    char* value = NULL;
-    int level = 0;
-    unsigned char tag_length;
-    int intval;
-    int cur_align;
-    char* cur_align_start;
-#ifdef HAVE_LCD_BITMAP
-    struct gui_img *img = gwps->data->img;
-    int n;
-#endif
-    
-    cur_align_start = buf;
-    cur_align = WPS_ALIGN_LEFT;
-    *subline_time_mult = DEFAULT_SUBLINE_TIME_MULTIPLIER;
-
-    align->left = 0;
-    align->center = 0;
-    align->right = 0;
-
-    while (fmt && *fmt && buf < buf_end)
-    {
-        switch (*fmt)
-        {
-            case '%':
-                ++fmt;
-                break;
-
-            case '|':
-            case '>':
-                if (level > 0)
-                {
-                    fmt = skip_conditional(NULL, fmt, 0, NULL);
-                    level--;
-                    continue;
-                }
-                /* Else fall through */
-
-            default:
-                *buf++ = *fmt++;
-                continue;
-        }
-
-        switch (*fmt)
-        {
-            case 0:
-                *buf++ = '%';
-                break;
-            case 'a':
-                ++fmt;
-                /* remember where the current aligned text started */
-                switch (cur_align)
-                {
-                    case WPS_ALIGN_LEFT:
-                        align->left = cur_align_start;
-                        break;
-
-                    case WPS_ALIGN_CENTER:
-                        align->center = cur_align_start;
-                        break;
-
-                    case WPS_ALIGN_RIGHT:
-                        align->right = cur_align_start;
-                        break;
-                }
-                /* start a new alignment */
-                switch (*fmt)
-                {
-                    case 'l':
-                        cur_align = WPS_ALIGN_LEFT;
-                        break;
-                    case 'c':
-                        cur_align = WPS_ALIGN_CENTER;
-                        break;
-                    case 'r':
-                        cur_align = WPS_ALIGN_RIGHT;
-                        break;
-                } 
-                *buf++=0;
-                cur_align_start = buf;
-                ++fmt;
-                break;
-            case 's':
-                *flags |= WPS_REFRESH_SCROLL;
-                ++fmt;
-                break;
-
-            case 'x': /* image support */
-#ifdef HAVE_LCD_BITMAP
-                if ('d' == *(fmt+1) )
-                {
-                    fmt+=2;
-
-                    /* get the image ID */
-                    n = *fmt;
-                    if(n >= 'a' && n <= 'z')
-                        n -= 'a';
-                    if(n >= 'A' && n <= 'Z')
-                        n = n - 'A' + 26;
-                    if (n >= 0 && n < MAX_IMAGES && img[n].loaded) {
-                        img[n].display = true;
-                    }
-                }
-
-#endif
-                fmt++;
-                break;
-
-
-            case '%':
-            case '|':
-            case '<':
-            case '>':
-            case ';':
-                *buf++ = *fmt++;
-                break;
-
-            case '?':
-                fmt++;
-                /* Get number of "|" chars in the current conditional;
-                 * used by get_tag when calculating levels.
-                 */
-                skip_conditional(gwps, fmt, 0, &intval);
-                value = get_tag(gwps->data, id3, nid3, fmt, temp_buf,
-                                sizeof(temp_buf),&tag_length,
-                                subline_time_mult, flags, &intval);
-
-                while (*fmt && ('<' != *fmt))
-                    fmt++;
-
-                if ('<' == *fmt)
-                    fmt++;
-
-                /* No value, so skip to else part, using a sufficiently high
-                   value to "hit" the last part of the conditional */
-                if ((!value) || (!strlen(value)))
-                    fmt = skip_conditional(NULL, fmt, 1000, NULL);
-                else
-                    if(intval > 1) /* enum */
-                        fmt = skip_conditional(NULL, fmt, intval - 1, NULL);
-
-                level++;
-                break;
-
-            default:
-                intval = 1;
-                value = get_tag(gwps->data, id3, nid3, fmt, temp_buf,
-                                sizeof(temp_buf), &tag_length,
-                                subline_time_mult, flags,&intval);
-                fmt += tag_length;
-
-                if (value)
-                {
-                    while (*value && (buf < buf_end))
-                        *buf++ = *value++;
-                }
-        }
-    }
-
-    /* remember where the current aligned text started */
-    switch (cur_align)
-    {
-        case WPS_ALIGN_LEFT:
-            align->left = cur_align_start;
-            break;
-
-        case WPS_ALIGN_CENTER:
-            align->center = cur_align_start;
-            break;
-
-        case WPS_ALIGN_RIGHT:
-            align->right = cur_align_start;
-            break;
-    }
-
-    *buf = 0;
-
-    /* if resulting line is an empty line, set the subline time to 0 */
-    if (buf - buf_start == 0)
-        *subline_time_mult = 0;
-
-    /* If no flags have been set, the line didn't contain any format codes.
-       We still want to refresh it. */
-    if(*flags == 0)
-        *flags = WPS_REFRESH_STATIC;
-}
 
 /* fades the volume */
 void fade(bool fade_in)
@@ -1513,798 +138,6 @@ void fade(bool fade_in)
         sound_set_volume(global_settings.volume);
     }
 }
-
-/* Set format string to use for WPS, splitting it into lines */
-void gui_wps_format(struct wps_data *data)
-{
-    char* buf = data->format_buffer;
-    char* start_of_line = data->format_buffer;
-    int line = 0;
-    int subline;
-    char c;
-    if(!data)
-        return;
-
-    for (line=0; line<WPS_MAX_LINES; line++)
-    {
-        for (subline=0; subline<WPS_MAX_SUBLINES; subline++)
-        {
-            data->format_lines[line][subline] = 0;
-            data->time_mult[line][subline] = 0;
-        }
-        data->subline_expire_time[line] = 0;
-        data->curr_subline[line] = SUBLINE_RESET;
-    }
-    
-    line = 0;
-    subline = 0;
-    buf = skip_utf8_bom(buf);
-    data->format_lines[line][subline] = buf;
-
-    while ((*buf) && (line < WPS_MAX_LINES))
-    {
-        c = *buf;
-        
-        switch (c)
-        {
-            /*
-             * skip % sequences so "%;" doesn't start a new subline
-             * don't skip %x lines (pre-load bitmaps)
-             */
-            case '%':
-                buf++;
-                break;
-
-            case '\r': /* CR */
-                *buf = 0;
-                break;
-
-            case '\n': /* LF */
-                *buf = 0;
-
-                if (*start_of_line != '#') /* A comment? */
-                    line++;
-
-                if (line < WPS_MAX_LINES)
-                {
-                    /* the next line starts on the next byte */
-                    subline = 0;
-                    data->format_lines[line][subline] = buf+1;
-                    start_of_line = data->format_lines[line][subline];
-                }
-                break;
-
-            case ';': /* start a new subline */
-                *buf = 0;
-                subline++;
-                if (subline < WPS_MAX_SUBLINES)
-                {
-                    data->format_lines[line][subline] = buf+1;
-                }
-                else /* exceeded max sublines, skip rest of line */
-                {
-                    while (*(++buf))
-                    {
-                        if  ((*buf == '\r') || (*buf == '\n'))
-                        {
-                            break;
-                        }
-                    }
-                    buf--;
-                    subline = 0;
-                }
-                break;
-        }
-        buf++;
-    }
-}
-
-#ifdef HAVE_LCD_BITMAP
-/* Display images */
-static void wps_draw_image(struct gui_wps *gwps, int n)
-{
-    struct screen *display = gwps->display;
-    struct wps_data *data = gwps->data;
-    if(data->img[n].always_display)
-        display->set_drawmode(DRMODE_FG);
-    else
-        display->set_drawmode(DRMODE_SOLID);
-
-#if LCD_DEPTH > 1
-    if(data->img[n].bm.format == FORMAT_MONO) {
-#endif
-        display->mono_bitmap(data->img[n].bm.data, data->img[n].x,
-                             data->img[n].y, data->img[n].bm.width,
-                             data->img[n].bm.height);
-#if LCD_DEPTH > 1
-    } else {
-        display->transparent_bitmap((fb_data *)data->img[n].bm.data,
-                                    data->img[n].x,
-                                    data->img[n].y, data->img[n].bm.width,
-                                    data->img[n].bm.height);
-    }
-#endif
-}
-static void wps_display_images(struct gui_wps *gwps, bool always)
-{
-    if(!gwps || !gwps->data || !gwps->display) return;
-    int n;
-    struct wps_data *data = gwps->data;
-    struct screen *display = gwps->display;
-    for (n = 0; n < MAX_IMAGES; n++) {
-        if (data->img[n].loaded) {
-            if( (!always && data->img[n].display)
-                || (always && data->img[n].always_display) )
-                wps_draw_image(gwps, n);
-        }
-    }
-    display->set_drawmode(DRMODE_SOLID);
-}
-#endif
-
-#if 0 /* currently unused */
-void gui_wps_reset(struct gui_wps *gui_wps)
-{
-    if(!gui_wps || !gui_wps->data)
-        return;
-    gui_wps->data->wps_loaded = false;
-    memset(&gui_wps->data->format_buffer, 0,
-           sizeof(gui_wps->data->format_buffer));
-}
-#endif
-
-bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
-                     unsigned char refresh_mode)
-{
-    char buf[MAX_PATH];
-    unsigned char flags;
-    int i;
-    bool update_line;
-    bool only_one_subline;
-    bool new_subline_refresh;
-    bool reset_subline;
-    int search;
-    int search_start;
-    struct align_pos format_align;
-    struct wps_data *data = gwps->data;
-    struct wps_state *state = gwps->state;
-    struct screen *display = gwps->display;
-    if(!gwps || !data || !state || !display)
-    {
-        return false;
-    }
-#ifdef HAVE_LCD_BITMAP
-    int h = font_get(FONT_UI)->height;
-    int offset = 0;
-    gui_wps_statusbar_draw(gwps, true);
-    if(data->wps_sb_tag && data->show_sb_on_wps)
-        offset = STATUSBAR_HEIGHT;
-    else if ( global_settings.statusbar && !data->wps_sb_tag)
-        offset = STATUSBAR_HEIGHT;
-    
-    /* to find out wether the peak meter is enabled we
-       assume it wasn't until we find a line that contains
-       the peak meter. We can't use peak_meter_enabled itself
-       because that would mean to turn off the meter thread
-       temporarily. (That shouldn't matter unless yield
-       or sleep is called but who knows...)
-    */
-    bool enable_pm = false;
-
-    /* Set images to not to be displayed */
-    for (i = 0; i < MAX_IMAGES; i++) {
-        data->img[i].display = false;
-    }
-#endif
-    /* reset to first subline if refresh all flag is set */
-    if (refresh_mode == WPS_REFRESH_ALL)
-    {
-        for (i=0; i<WPS_MAX_LINES; i++)
-        {
-            data->curr_subline[i] = SUBLINE_RESET;
-        }
-    }
-
-#ifdef HAVE_LCD_CHARCELLS
-    for (i=0; i<8; i++) {
-       if (data->wps_progress_pat[i]==0)
-           data->wps_progress_pat[i]=display->get_locked_pattern();
-    }
-#endif
-
-    if (!state->id3)
-    {
-        display->stop_scroll();
-        return false;
-    }
-
-    state->ff_rewind_count = ffwd_offset;
-
-    for (i = 0; i < WPS_MAX_LINES; i++)
-    {
-        reset_subline = (data->curr_subline[i] == SUBLINE_RESET);
-        new_subline_refresh = false;
-        only_one_subline = false;
-
-        /* if time to advance to next sub-line  */
-        if (TIME_AFTER(current_tick,  data->subline_expire_time[i] - 1) ||
-           reset_subline)
-        {
-            /* search all sublines until the next subline with time > 0
-               is found or we get back to the subline we started with */
-            if (reset_subline)
-                search_start = 0;
-            else
-                search_start = data->curr_subline[i];
-            for (search=0; search<WPS_MAX_SUBLINES; search++)
-            {
-                data->curr_subline[i]++;
-
-                /* wrap around if beyond last defined subline or WPS_MAX_SUBLINES */
-                if ((!data->format_lines[i][data->curr_subline[i]]) ||
-                    (data->curr_subline[i] == WPS_MAX_SUBLINES))
-                {
-                    if (data->curr_subline[i] == 1)
-                        only_one_subline = true;
-                    data->curr_subline[i] = 0;
-                }
-
-                /* if back where we started after search or
-                   only one subline is defined on the line */
-                if (((search > 0) && (data->curr_subline[i] == search_start)) ||
-                    only_one_subline)
-                {
-                    /* no other subline with a time > 0 exists */
-                    data->subline_expire_time[i] = (reset_subline?
-                        current_tick : data->subline_expire_time[i]) + 100 * HZ;
-                    break;
-                }
-                else
-                {
-                    /* get initial time multiplier and
-                       line type flags for this subline */
-                    format_display(gwps, buf, sizeof(buf),
-                                   state->id3, state->nid3,
-                                   data->format_lines[i][data->curr_subline[i]],
-                                   &format_align,
-                                   &data->time_mult[i][data->curr_subline[i]],
-                                   &data->line_type[i][data->curr_subline[i]]);
-
-                    /* only use this subline if subline time > 0 */
-                    if (data->time_mult[i][data->curr_subline[i]] > 0)
-                    {
-                        new_subline_refresh = true;
-                        data->subline_expire_time[i] = (reset_subline?
-                            current_tick : data->subline_expire_time[i]) +
-                            BASE_SUBLINE_TIME * data->time_mult[i][data->curr_subline[i]];
-                        break;
-                    }
-                }
-            }
-
-        }
-
-        update_line = false;
-
-        if ( !data->format_lines[i][data->curr_subline[i]] )
-            break;
-
-        if ((data->line_type[i][data->curr_subline[i]] & refresh_mode) ||
-            (refresh_mode == WPS_REFRESH_ALL) ||
-            new_subline_refresh)
-        {
-            flags = 0;
-            int left_width,   left_xpos;
-            int center_width, center_xpos;
-            int right_width,  right_xpos;
-            int space_width;
-            int string_height;
-            int ypos;
-
-            format_display(gwps, buf, sizeof(buf),
-                           state->id3, state->nid3,
-                           data->format_lines[i][data->curr_subline[i]],
-                           &format_align,
-                           &data->time_mult[i][data->curr_subline[i]],
-                           &flags);
-            data->line_type[i][data->curr_subline[i]] = flags;
-
-#ifdef HAVE_LCD_BITMAP
-            /* progress */
-            if (flags & refresh_mode & WPS_REFRESH_PLAYER_PROGRESS) 
-            {
-                int sb_y;
-                if (data->progress_top == -1)
-                    sb_y = i*h + offset + ((h > data->progress_height + 1)
-                                           ? (h - data->progress_height) / 2 : 1);
-                else
-                    sb_y = data->progress_top;
-
-                if (!data->progress_end)
-                    data->progress_end=display->width;
-                
-                if (gwps->data->progressbar.have_bitmap_pb)
-                    gui_bitmap_scrollbar_draw(display, data->progressbar.bm,
-                                        data->progress_start, sb_y, 
-                                        data->progress_end-data->progress_start,
-                                        data->progressbar.bm.height,
-                                        state->id3->length?state->id3->length:1, 0,
-                                        state->id3->length?state->id3->elapsed + state->ff_rewind_count:0,
-                                        HORIZONTAL);
-                else
-                    gui_scrollbar_draw(display, data->progress_start, sb_y, 
-                                        data->progress_end-data->progress_start,
-                                        data->progress_height,
-                                        state->id3->length?state->id3->length:1, 0,
-                                        state->id3->length?state->id3->elapsed + state->ff_rewind_count:0,
-                                        HORIZONTAL);
-#ifdef AB_REPEAT_ENABLE
-                if ( ab_repeat_mode_enabled() )
-                    ab_draw_markers(display, state->id3->length,
-                            data->progress_start, data->progress_end, sb_y,
-                            data->progress_height);
-#endif
-
-                if (cuesheet_is_enabled() && state->id3->cuesheet_type)
-                {
-                    cue_draw_markers(display, state->id3->length,
-                                     data->progress_start, data->progress_end,
-                                     sb_y+1, data->progress_height-2);
-                }
-
-                update_line = true;
-            }
-            if (flags & refresh_mode & WPS_REFRESH_PEAK_METER) {
-                /* peak meter */
-                int peak_meter_y;
-
-                update_line = true;
-                peak_meter_y = i * h + offset;
-
-                /* The user might decide to have the peak meter in the last
-                   line so that it is only displayed if no status bar is
-                   visible. If so we neither want do draw nor enable the
-                   peak meter. */
-                if (peak_meter_y + h <= display->height) {
-                    /* found a line with a peak meter -> remember that we must
-                       enable it later */
-                    enable_pm = true;
-                    peak_meter_screen(gwps->display, 0, peak_meter_y,
-                                    MIN(h, display->height - peak_meter_y));
-                }
-            }
-#else
-            /* progress */
-            if (flags & refresh_mode & WPS_REFRESH_PLAYER_PROGRESS) {
-                if (data->full_line_progressbar)
-                    draw_player_fullbar(gwps, buf, sizeof(buf));
-                else
-                    draw_player_progress(gwps);
-            }
-#endif
-            /* calculate different string sizes and positions */
-            display->getstringsize((unsigned char *)" ", &space_width, &string_height);
-            if (format_align.left != 0) {
-                display->getstringsize((unsigned char *)format_align.left,
-                                       &left_width, &string_height);
-            }
-            else {
-                left_width = 0;
-            }
-            left_xpos = 0;
-
-            if (format_align.center != 0) {
-                display->getstringsize((unsigned char *)format_align.center,
-                                       &center_width, &string_height);
-            }
-            else {
-                center_width = 0;
-            }
-            center_xpos=(display->width - center_width) / 2;
-
-            if (format_align.right != 0) {
-                display->getstringsize((unsigned char *)format_align.right,
-                                       &right_width, &string_height);
-            }
-            else {
-                right_width = 0;
-            }
-            right_xpos = (display->width - right_width);
-
-            /* Checks for overlapping strings.
-               If needed the overlapping strings will be merged, separated by a
-               space */
-
-            /* CASE 1: left and centered string overlap */
-            /* there is a left string, need to merge left and center */
-            if ((left_width != 0 && center_width != 0) &&
-                (left_xpos + left_width + space_width > center_xpos)) {
-                /* replace the former separator '\0' of left and 
-                   center string with a space */
-                *(--format_align.center) = ' ';
-                /* calculate the new width and position of the merged string */
-                left_width = left_width + space_width + center_width;
-                left_xpos = 0;
-                /* there is no centered string anymore */
-                center_width = 0;
-            }
-            /* there is no left string, move center to left */
-            if ((left_width == 0 && center_width != 0) &&
-                (left_xpos + left_width > center_xpos)) {
-                /* move the center string to the left string */
-                format_align.left = format_align.center;
-                /* calculate the new width and position of the string */
-                left_width = center_width;
-                left_xpos = 0;
-                /* there is no centered string anymore */
-                center_width = 0;
-            }
-
-            /* CASE 2: centered and right string overlap */
-            /* there is a right string, need to merge center and right */
-            if ((center_width != 0 && right_width != 0) &&
-                (center_xpos + center_width + space_width > right_xpos)) {
-                /* replace the former separator '\0' of center and 
-                   right string with a space */
-                *(--format_align.right) = ' ';
-                /* move the center string to the right after merge */
-                format_align.right = format_align.center;
-                /* calculate the new width and position of the merged string */
-                right_width = center_width + space_width + right_width;
-                right_xpos = (display->width - right_width);
-                /* there is no centered string anymore */
-                center_width = 0;
-            }
-            /* there is no right string, move center to right */
-            if ((center_width != 0 && right_width == 0) &&
-                (center_xpos + center_width > right_xpos)) {
-                /* move the center string to the right string */
-                format_align.right = format_align.center;
-                /* calculate the new width and position of the string */
-                right_width = center_width;
-                right_xpos = (display->width - right_width);
-                /* there is no centered string anymore */
-                center_width = 0;
-            }
-
-            /* CASE 3: left and right overlap
-               There is no center string anymore, either there never
-               was one or it has been merged in case 1 or 2 */
-            /* there is a left string, need to merge left and right */
-            if ((left_width != 0 && center_width == 0 && right_width != 0) &&
-                (left_xpos + left_width + space_width > right_xpos)) {
-                /* replace the former separator '\0' of left and 
-                   right string with a space */
-                *(--format_align.right) = ' ';
-                /* calculate the new width and position of the string */
-                left_width = left_width + space_width + right_width;
-                left_xpos = 0;
-                /* there is no right string anymore */
-                right_width = 0;
-            }
-            /* there is no left string, move right to left */
-            if ((left_width == 0 && center_width == 0 && right_width != 0) &&
-                (left_xpos + left_width > right_xpos)) {
-                /* move the right string to the left string */
-                format_align.left = format_align.right;
-                /* calculate the new width and position of the string */
-                left_width = right_width;
-                left_xpos = 0;
-                /* there is no right string anymore */
-                right_width = 0;
-            }
-
-            if (flags & WPS_REFRESH_SCROLL) {
-
-                /* scroll line */
-                if ((refresh_mode & WPS_REFRESH_SCROLL) ||
-                    new_subline_refresh) {
-
-                    ypos = (i*string_height)+display->getymargin();
-                    update_line = true;
-                    
-                    if (left_width>display->width) {
-                        display->puts_scroll(0, i,
-                                             (unsigned char *)format_align.left);
-                    } else {
-                        /* clear the line first */
-#ifdef HAVE_LCD_BITMAP
-                        display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-                        display->fillrect(0, ypos, display->width, string_height);
-                        display->set_drawmode(DRMODE_SOLID);
-#endif
-                        /* Nasty hack: we output an empty scrolling string,
-                           which will reset the scroller for that line */
-                        display->puts_scroll(0, i, (unsigned char *)"");
-
-                        /* print aligned strings */
-                        if (left_width != 0)
-                        {
-                            display->putsxy(left_xpos, ypos,
-                                            (unsigned char *)format_align.left);
-                        }
-                        if (center_width != 0)
-                        {
-                            display->putsxy(center_xpos, ypos, 
-                                            (unsigned char *)format_align.center);
-                        }
-                        if (right_width != 0)
-                        {
-                            display->putsxy(right_xpos, ypos,
-                                            (unsigned char *)format_align.right);
-                        }
-                    }
-                }
-            }
-            else if (flags & (WPS_REFRESH_DYNAMIC | WPS_REFRESH_STATIC))
-            {
-                /* dynamic / static line */
-                if ((refresh_mode & (WPS_REFRESH_DYNAMIC|WPS_REFRESH_STATIC)) ||
-                    new_subline_refresh)
-                {
-                    ypos = (i*string_height)+display->getymargin();
-                    update_line = true;
-
-#ifdef HAVE_LCD_BITMAP
-                    /* clear the line first */
-                    display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-                    display->fillrect(0, ypos, display->width, string_height);
-                    display->set_drawmode(DRMODE_SOLID);
-#endif
-
-                    /* Nasty hack: we output an empty scrolling string,
-                       which will reset the scroller for that line */
-                    display->puts_scroll(0, i, (unsigned char *)"");
-                        
-                    /* print aligned strings */
-                    if (left_width != 0)
-                    {
-                        display->putsxy(left_xpos, ypos,
-                                        (unsigned char *)format_align.left);
-                    }
-                    if (center_width != 0)
-                    {
-                        display->putsxy(center_xpos, ypos,
-                                        (unsigned char *)format_align.center);
-                    }
-                    if (right_width != 0)
-                    {
-                        display->putsxy(right_xpos, ypos,
-                                        (unsigned char *)format_align.right);
-                    }
-                }
-            }
-        }
-#ifdef HAVE_LCD_BITMAP
-        if (update_line) {
-            wps_display_images(gwps,false);
-        }
-#endif
-    }
-
-#ifdef HAVE_LCD_BITMAP
-    /* Display all images */
-    wps_display_images(gwps,true);
-    display->update();
-    /* Now we know wether the peak meter is used.
-       So we can enable / disable the peak meter thread */
-    data->peak_meter_enabled = enable_pm;
-#endif
-
-#if CONFIG_BACKLIGHT
-    if (global_settings.caption_backlight && state->id3) {
-        /* turn on backlight n seconds before track ends, and turn it off n
-           seconds into the new track. n == backlight_timeout, or 5s */
-        int n = backlight_timeout_value[global_settings.backlight_timeout] 
-              * 1000;
-
-        if ( n < 1000 )
-            n = 5000; /* use 5s if backlight is always on or off */
-
-        if (((state->id3->elapsed < 1000) ||
-            ((state->id3->length - state->id3->elapsed) < (unsigned)n)) &&
-            (state->paused == false))
-            backlight_on();
-    }
-#endif
-#ifdef HAVE_REMOTE_LCD
-    if (global_settings.remote_caption_backlight && state->id3) {
-        /* turn on remote backlight n seconds before track ends, and turn it
-           off n seconds into the new track. n == remote_backlight_timeout,
-           or 5s */
-        int n = backlight_timeout_value[global_settings.remote_backlight_timeout]
-              * 1000;
-
-        if ( n < 1000 )
-            n = 5000; /* use 5s if backlight is always on or off */
-
-        if (((state->id3->elapsed < 1000) ||
-            ((state->id3->length - state->id3->elapsed) < (unsigned)n)) &&
-            (state->paused == false))
-            remote_backlight_on();
-    }
-#endif
-    return true;
-}
-
-#ifdef HAVE_LCD_CHARCELLS
-static bool draw_player_progress(struct gui_wps *gwps)
-{
-    char player_progressbar[7];
-    char binline[36];
-    int songpos = 0;
-    int i,j;
-    struct wps_state *state = gwps->state;
-    struct screen *display = gwps->display;
-    if (!state->id3)
-        return false;
-
-    memset(binline, 1, sizeof binline);
-    memset(player_progressbar, 1, sizeof player_progressbar);
-
-    if(state->id3->elapsed >= state->id3->length)
-        songpos = 0;
-    else
-    {
-        if(state->wps_time_countup == false)
-            songpos = ((state->id3->elapsed - state->ff_rewind_count) * 36) /
-                            state->id3->length;
-        else
-            songpos = ((state->id3->elapsed + state->ff_rewind_count) * 36) / 
-                            state->id3->length;
-    }
-    for (i=0; i < songpos; i++)
-        binline[i] = 0;
-
-    for (i=0; i<=6; i++) {
-        for (j=0;j<5;j++) {
-            player_progressbar[i] <<= 1;
-            player_progressbar[i] += binline[i*5+j];
-        }
-    }
-    display->define_pattern(gwps->data->wps_progress_pat[0], player_progressbar);
-    return true;
-}
-
-static char map_fullbar_char(char ascii_val)
-{
-    if (ascii_val >= '0' && ascii_val <= '9') {
-        return(ascii_val - '0');
-    }
-    else if (ascii_val == ':') {
-        return(10);
-    }
-    else
-        return(11); /* anything besides a number or ':' is mapped to <blank> */
-}
-
-static void draw_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size)
-{
-    int i,j,lcd_char_pos;
-
-    char player_progressbar[7];
-    char binline[36];
-    static const char numbers[12][4][3]={
-        {{1,1,1},{1,0,1},{1,0,1},{1,1,1}},/*0*/
-        {{0,1,0},{1,1,0},{0,1,0},{0,1,0}},/*1*/
-        {{1,1,1},{0,0,1},{0,1,0},{1,1,1}},/*2*/
-        {{1,1,1},{0,0,1},{0,1,1},{1,1,1}},/*3*/
-        {{1,0,0},{1,1,0},{1,1,1},{0,1,0}},/*4*/
-        {{1,1,1},{1,1,0},{0,0,1},{1,1,0}},/*5*/
-        {{1,1,1},{1,0,0},{1,1,1},{1,1,1}},/*6*/
-        {{1,1,1},{0,0,1},{0,1,0},{1,0,0}},/*7*/
-        {{1,1,1},{1,1,1},{1,0,1},{1,1,1}},/*8*/
-        {{1,1,1},{1,1,1},{0,0,1},{1,1,1}},/*9*/
-        {{0,0,0},{0,1,0},{0,0,0},{0,1,0}},/*:*/
-        {{0,0,0},{0,0,0},{0,0,0},{0,0,0}} /*<blank>*/
-    };
-
-    int songpos = 0;
-    int digits[6];
-    int time;
-    char timestr[7];
-
-    struct wps_state *state = gwps->state;
-    struct screen *display = gwps->display;
-    struct wps_data *data = gwps->data;
-
-    for (i=0; i < buf_size; i++)
-        buf[i] = ' ';
-
-    if(state->id3->elapsed >= state->id3->length)
-        songpos = 55;
-    else {
-        if(state->wps_time_countup == false)
-            songpos = ((state->id3->elapsed - state->ff_rewind_count) * 55) / 
-                                state->id3->length;
-        else
-            songpos = ((state->id3->elapsed + state->ff_rewind_count) * 55) / 
-                                state->id3->length;
-    }
-
-    time=(state->id3->elapsed + state->ff_rewind_count);
-
-    memset(timestr, 0, sizeof(timestr));
-    format_time(timestr, sizeof(timestr), time);
-    for(lcd_char_pos=0; lcd_char_pos<6; lcd_char_pos++) {
-        digits[lcd_char_pos] = map_fullbar_char(timestr[lcd_char_pos]);
-    }
-
-    /* build the progressbar-icons */
-    for (lcd_char_pos=0; lcd_char_pos<6; lcd_char_pos++) {
-        memset(binline, 0, sizeof binline);
-        memset(player_progressbar, 0, sizeof player_progressbar);
-
-        /* make the character (progressbar & digit)*/
-        for (i=0; i<7; i++) {
-            for (j=0;j<5;j++) {
-                /* make the progressbar */
-                if (lcd_char_pos==(songpos/5)) {
-                    /* partial */
-                    if ((j<(songpos%5))&&(i>4))
-                        binline[i*5+j] = 1;
-                    else
-                        binline[i*5+j] = 0;
-                }
-                else {
-                    if (lcd_char_pos<(songpos/5)) {
-                        /* full character */
-                        if (i>4)
-                            binline[i*5+j] = 1;
-                    }
-                }
-                /* insert the digit */
-                if ((j<3)&&(i<4)) {
-                    if (numbers[digits[lcd_char_pos]][i][j]==1)
-                        binline[i*5+j] = 1;
-                }
-            }
-        }
-
-        for (i=0; i<=6; i++) {
-            for (j=0;j<5;j++) {
-                player_progressbar[i] <<= 1;
-                player_progressbar[i] += binline[i*5+j];
-            }
-        }
-
-        display->define_pattern(data->wps_progress_pat[lcd_char_pos+1],
-                                player_progressbar);
-        buf = utf8encode(data->wps_progress_pat[lcd_char_pos+1], buf);
-    }
-
-    /* make rest of the progressbar if necessary */
-    if (songpos/5>5) {
-
-        /* set the characters positions that use the full 5 pixel wide bar */
-        for (lcd_char_pos=6; lcd_char_pos < (songpos/5); lcd_char_pos++)
-            buf = utf8encode(0xe115, buf);  /* 2/7 '_' */
-
-        /* build the partial bar character for the tail character position */
-        memset(binline, 0, sizeof binline);
-        memset(player_progressbar, 0, sizeof player_progressbar);
-
-        for (i=5; i<7; i++) {
-            for (j=0;j<5;j++) {
-                if (j<(songpos%5)) {
-                    binline[i*5+j] = 1;
-                }
-            }
-        }
-
-        for (i=0; i<7; i++) {
-            for (j=0;j<5;j++) {
-                player_progressbar[i] <<= 1;
-                player_progressbar[i] += binline[i*5+j];
-            }
-        }
-
-        display->define_pattern(data->wps_progress_pat[7],player_progressbar);
-        buf = utf8encode(data->wps_progress_pat[7], buf);
-        *buf = '\0';
-    }
-}
-#endif
 
 /* set volume */
 void setvol(void)
@@ -2482,12 +315,10 @@ bool gui_wps_display(void)
     if (!wps_state.id3 && !(audio_status() & AUDIO_STATUS_PLAY))
     {
         global_status.resume_index = -1;
-#ifdef HAVE_LCD_CHARCELLS
-        gui_syncsplash(HZ, str(LANG_END_PLAYLIST_PLAYER));
-#else
+#ifdef HAVE_LCD_BITMAP
         gui_syncstatusbar_draw(&statusbars, true);
-        gui_syncsplash(HZ, str(LANG_END_PLAYLIST_RECORDER));
 #endif
+        gui_syncsplash(HZ, str(LANG_END_PLAYLIST_RECORDER));
         return true;
     }
     else
@@ -2496,7 +327,7 @@ bool gui_wps_display(void)
         {
             gui_wps[i].display->clear_display();
             if (!gui_wps[i].data->wps_loaded) {
-                if ( !gui_wps[i].data->format_buffer[0] ) {
+                if ( !gui_wps[i].data->num_tokens ) {
                     /* set the default wps for the main-screen */
                     if(i == 0)
                     {
@@ -2643,3 +474,1476 @@ void display_keylock_text(bool locked)
     gui_syncsplash(HZ, s);
 }
 
+#ifdef HAVE_LCD_BITMAP
+
+static void draw_progressbar(struct gui_wps *gwps, int line)
+{
+    struct wps_data *data = gwps->data;
+    struct screen *display = gwps->display;
+    struct wps_state *state = gwps->state;
+    int h = font_get(FONT_UI)->height;
+
+    int sb_y;
+    if (data->progress_top < 0)
+        sb_y = line*h + display->getymargin() +
+               ((h > data->progress_height + 1)
+                ? (h - data->progress_height) / 2 : 1);
+    else
+        sb_y = data->progress_top;
+
+    if (!data->progress_end)
+        data->progress_end=display->width;
+
+    if (gwps->data->progressbar.have_bitmap_pb)
+        gui_bitmap_scrollbar_draw(display, data->progressbar.bm,
+                                  data->progress_start, sb_y,
+                                  data->progress_end-data->progress_start,
+                                  data->progressbar.bm.height,
+                                  state->id3->length ? state->id3->length : 1, 0,
+                                  state->id3->length ? state->id3->elapsed
+                                                       + state->ff_rewind_count : 0,
+                                  HORIZONTAL);
+    else
+        gui_scrollbar_draw(display, data->progress_start, sb_y,
+                           data->progress_end-data->progress_start,
+                           data->progress_height,
+                           state->id3->length ? state->id3->length : 1, 0,
+                           state->id3->length ? state->id3->elapsed
+                                                + state->ff_rewind_count : 0,
+                           HORIZONTAL);
+
+#ifdef AB_REPEAT_ENABLE
+    if ( ab_repeat_mode_enabled() )
+        ab_draw_markers(display, state->id3->length,
+                        data->progress_start, data->progress_end, sb_y,
+                        data->progress_height);
+#endif
+
+    if ( cuesheet_is_enabled() && state->id3->cuesheet_type )
+        cue_draw_markers(display, state->id3->length,
+                         data->progress_start, data->progress_end,
+                         sb_y+1, data->progress_height-2);
+}
+
+/* clears the area where the image was shown */
+static void clear_image_pos(struct gui_wps *gwps, int n)
+{
+    if(!gwps)
+        return;
+    struct wps_data *data = gwps->data;
+    gwps->display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    gwps->display->fillrect(data->img[n].x, data->img[n].y,
+                            data->img[n].bm.width, data->img[n].bm.height);
+    gwps->display->set_drawmode(DRMODE_SOLID);
+}
+
+static void wps_draw_image(struct gui_wps *gwps, int n)
+{
+    struct screen *display = gwps->display;
+    struct wps_data *data = gwps->data;
+    if(data->img[n].always_display)
+        display->set_drawmode(DRMODE_FG);
+    else
+        display->set_drawmode(DRMODE_SOLID);
+
+#if LCD_DEPTH > 1
+    if(data->img[n].bm.format == FORMAT_MONO) {
+#endif
+        display->mono_bitmap(data->img[n].bm.data, data->img[n].x,
+                             data->img[n].y, data->img[n].bm.width,
+                             data->img[n].bm.height);
+#if LCD_DEPTH > 1
+    } else {
+        display->transparent_bitmap((fb_data *)data->img[n].bm.data,
+                                    data->img[n].x,
+                                    data->img[n].y, data->img[n].bm.width,
+                                    data->img[n].bm.height);
+    }
+#endif
+}
+
+static void wps_display_images(struct gui_wps *gwps)
+{
+    if(!gwps || !gwps->data || !gwps->display)
+        return;
+
+    int n;
+    struct wps_data *data = gwps->data;
+    struct screen *display = gwps->display;
+
+    for (n = 0; n < MAX_IMAGES; n++)
+    {
+        if (data->img[n].loaded &&
+            (data->img[n].display || data->img[n].always_display))
+        {
+            wps_draw_image(gwps, n);
+        }
+    }
+    display->set_drawmode(DRMODE_SOLID);
+}
+
+#else /* HAVE_LCD_CHARCELL */
+
+static bool draw_player_progress(struct gui_wps *gwps)
+{
+    char player_progressbar[7];
+    char binline[36];
+    int songpos = 0;
+    int i,j;
+    struct wps_state *state = gwps->state;
+    struct screen *display = gwps->display;
+    if (!state->id3)
+        return false;
+
+    memset(binline, 1, sizeof binline);
+    memset(player_progressbar, 1, sizeof player_progressbar);
+
+    if(state->id3->elapsed >= state->id3->length)
+        songpos = 0;
+    else
+    {
+        if(state->wps_time_countup == false)
+            songpos = ((state->id3->elapsed - state->ff_rewind_count) * 36) /
+                            state->id3->length;
+        else
+            songpos = ((state->id3->elapsed + state->ff_rewind_count) * 36) /
+                            state->id3->length;
+    }
+    for (i=0; i < songpos; i++)
+        binline[i] = 0;
+
+    for (i=0; i<=6; i++) {
+        for (j=0;j<5;j++) {
+            player_progressbar[i] <<= 1;
+            player_progressbar[i] += binline[i*5+j];
+        }
+    }
+    display->define_pattern(gwps->data->wps_progress_pat[0], player_progressbar);
+    return true;
+}
+
+static char map_fullbar_char(char ascii_val)
+{
+    if (ascii_val >= '0' && ascii_val <= '9') {
+        return(ascii_val - '0');
+    }
+    else if (ascii_val == ':') {
+        return(10);
+    }
+    else
+        return(11); /* anything besides a number or ':' is mapped to <blank> */
+}
+
+static void draw_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size)
+{
+    int i,j,lcd_char_pos;
+
+    char player_progressbar[7];
+    char binline[36];
+    static const char numbers[12][4][3]={
+        {{1,1,1},{1,0,1},{1,0,1},{1,1,1}},/*0*/
+        {{0,1,0},{1,1,0},{0,1,0},{0,1,0}},/*1*/
+        {{1,1,1},{0,0,1},{0,1,0},{1,1,1}},/*2*/
+        {{1,1,1},{0,0,1},{0,1,1},{1,1,1}},/*3*/
+        {{1,0,0},{1,1,0},{1,1,1},{0,1,0}},/*4*/
+        {{1,1,1},{1,1,0},{0,0,1},{1,1,0}},/*5*/
+        {{1,1,1},{1,0,0},{1,1,1},{1,1,1}},/*6*/
+        {{1,1,1},{0,0,1},{0,1,0},{1,0,0}},/*7*/
+        {{1,1,1},{1,1,1},{1,0,1},{1,1,1}},/*8*/
+        {{1,1,1},{1,1,1},{0,0,1},{1,1,1}},/*9*/
+        {{0,0,0},{0,1,0},{0,0,0},{0,1,0}},/*:*/
+        {{0,0,0},{0,0,0},{0,0,0},{0,0,0}} /*<blank>*/
+    };
+
+    int songpos = 0;
+    int digits[6];
+    int time;
+    char timestr[7];
+
+    struct wps_state *state = gwps->state;
+    struct screen *display = gwps->display;
+    struct wps_data *data = gwps->data;
+
+    for (i=0; i < buf_size; i++)
+        buf[i] = ' ';
+
+    if(state->id3->elapsed >= state->id3->length)
+        songpos = 55;
+    else {
+        if(state->wps_time_countup == false)
+            songpos = ((state->id3->elapsed - state->ff_rewind_count) * 55) /
+                                state->id3->length;
+        else
+            songpos = ((state->id3->elapsed + state->ff_rewind_count) * 55) /
+                                state->id3->length;
+    }
+
+    time=(state->id3->elapsed + state->ff_rewind_count);
+
+    memset(timestr, 0, sizeof(timestr));
+    format_time(timestr, sizeof(timestr), time);
+    for(lcd_char_pos=0; lcd_char_pos<6; lcd_char_pos++) {
+        digits[lcd_char_pos] = map_fullbar_char(timestr[lcd_char_pos]);
+    }
+
+    /* build the progressbar-icons */
+    for (lcd_char_pos=0; lcd_char_pos<6; lcd_char_pos++) {
+        memset(binline, 0, sizeof binline);
+        memset(player_progressbar, 0, sizeof player_progressbar);
+
+        /* make the character (progressbar & digit)*/
+        for (i=0; i<7; i++) {
+            for (j=0;j<5;j++) {
+                /* make the progressbar */
+                if (lcd_char_pos==(songpos/5)) {
+                    /* partial */
+                    if ((j<(songpos%5))&&(i>4))
+                        binline[i*5+j] = 1;
+                    else
+                        binline[i*5+j] = 0;
+                }
+                else {
+                    if (lcd_char_pos<(songpos/5)) {
+                        /* full character */
+                        if (i>4)
+                            binline[i*5+j] = 1;
+                    }
+                }
+                /* insert the digit */
+                if ((j<3)&&(i<4)) {
+                    if (numbers[digits[lcd_char_pos]][i][j]==1)
+                        binline[i*5+j] = 1;
+                }
+            }
+        }
+
+        for (i=0; i<=6; i++) {
+            for (j=0;j<5;j++) {
+                player_progressbar[i] <<= 1;
+                player_progressbar[i] += binline[i*5+j];
+            }
+        }
+
+        display->define_pattern(data->wps_progress_pat[lcd_char_pos+1],
+                                player_progressbar);
+        buf = utf8encode(data->wps_progress_pat[lcd_char_pos+1], buf);
+    }
+
+    /* make rest of the progressbar if necessary */
+    if (songpos/5>5) {
+
+        /* set the characters positions that use the full 5 pixel wide bar */
+        for (lcd_char_pos=6; lcd_char_pos < (songpos/5); lcd_char_pos++)
+            buf = utf8encode(0xe115, buf);  /* 2/7 '_' */
+
+        /* build the partial bar character for the tail character position */
+        memset(binline, 0, sizeof binline);
+        memset(player_progressbar, 0, sizeof player_progressbar);
+
+        for (i=5; i<7; i++) {
+            for (j=0;j<5;j++) {
+                if (j<(songpos%5)) {
+                    binline[i*5+j] = 1;
+                }
+            }
+        }
+
+        for (i=0; i<7; i++) {
+            for (j=0;j<5;j++) {
+                player_progressbar[i] <<= 1;
+                player_progressbar[i] += binline[i*5+j];
+            }
+        }
+
+        display->define_pattern(data->wps_progress_pat[7],player_progressbar);
+        buf = utf8encode(data->wps_progress_pat[7], buf);
+        *buf = '\0';
+    }
+}
+
+#endif /* HAVE_LCD_CHARCELL */
+
+/* Extract a part from a path.
+ *
+ * buf      - buffer extract part to.
+ * buf_size - size of buffer.
+ * path     - path to extract from.
+ * level    - what to extract. 0 is file name, 1 is parent of file, 2 is
+ *            parent of parent, etc.
+ *
+ * Returns buf if the desired level was found, NULL otherwise.
+ */
+static char* get_dir(char* buf, int buf_size, const char* path, int level)
+{
+    const char* sep;
+    const char* last_sep;
+    int len;
+
+    sep = path + strlen(path);
+    last_sep = sep;
+
+    while (sep > path)
+    {
+        if ('/' == *(--sep))
+        {
+            if (!level)
+                break;
+
+            level--;
+            last_sep = sep - 1;
+        }
+    }
+
+    if (level || (last_sep <= sep))
+        return NULL;
+
+    len = MIN(last_sep - sep, buf_size - 1);
+    strncpy(buf, sep + 1, len);
+    buf[len] = 0;
+    return buf;
+}
+
+/* Return the tag found at index i and write its value in buf.
+   The return value is buf if the tag had a value, or NULL if not.
+
+   intval is used with enums: when this function is called, it should contain
+   the number of options in the enum. When this function returns, it will
+   contain the enum case we are actually in.
+   When not treating an enum, intval should be NULL.
+*/
+static char *get_tag(struct gui_wps *gwps,
+                     int i,
+                     char *buf,
+                     int buf_size,
+                     int *intval)
+{
+    if (!gwps)
+        return NULL;
+
+    struct wps_data *data = gwps->data;
+    struct wps_state *state = gwps->state;
+
+    if (!data || !state)
+        return NULL;
+
+    struct mp3entry *id3;
+
+    if (data->tokens[i].next)
+        id3 = state->nid3;
+    else
+        id3 = state->id3;
+
+    if (!id3)
+        return NULL;
+
+    int limit = 1;
+    if (intval)
+        limit = *intval;
+
+#if CONFIG_RTC
+    static struct tm* tm;
+#endif
+
+    switch (data->tokens[i].type)
+    {
+        case WPS_TOKEN_CHARACTER:
+            return &(data->tokens[i].value.c);
+
+        case WPS_TOKEN_STRING:
+            return data->strings[data->tokens[i].value.i];
+
+        case WPS_TOKEN_TRACK_TIME_ELAPSED:
+            format_time(buf, buf_size,
+                        id3->elapsed + state->ff_rewind_count);
+            return buf;
+
+        case WPS_TOKEN_TRACK_TIME_REMAINING:
+            format_time(buf, buf_size,
+                        id3->length - id3->elapsed -
+                        state->ff_rewind_count);
+            return buf;
+
+        case WPS_TOKEN_TRACK_LENGTH:
+            format_time(buf, buf_size, id3->length);
+            return buf;
+
+        case WPS_TOKEN_PLAYLIST_ENTRIES:
+            snprintf(buf, buf_size, "%d", playlist_amount());
+            return buf;
+
+        case WPS_TOKEN_PLAYLIST_NAME:
+            return playlist_name(NULL, buf, buf_size);
+
+        case WPS_TOKEN_PLAYLIST_POSITION:
+            snprintf(buf, buf_size, "%d",
+                        playlist_get_display_index());
+            return buf;
+
+        case WPS_TOKEN_PLAYLIST_SHUFFLE:
+            if ( global_settings.playlist_shuffle )
+                return "s";
+            else
+                return NULL;
+            break;
+
+        case WPS_TOKEN_VOLUME:
+            snprintf(buf, buf_size, "%d", global_settings.volume);
+            if (intval)
+            {
+                *intval = limit * (global_settings.volume
+                                    - sound_min(SOUND_VOLUME))
+                                    / (sound_max(SOUND_VOLUME)
+                                        - sound_min(SOUND_VOLUME)) + 1;
+            }
+            return buf;
+
+        case WPS_TOKEN_METADATA_ARTIST:
+            return id3->artist;
+
+        case WPS_TOKEN_METADATA_COMPOSER:
+            return id3->composer;
+
+        case WPS_TOKEN_METADATA_ALBUM:
+            return id3->album;
+
+        case WPS_TOKEN_METADATA_ALBUM_ARTIST:
+            return id3->albumartist;
+
+        case WPS_TOKEN_METADATA_GENRE:
+            return id3->genre_string;
+
+        case WPS_TOKEN_METADATA_TRACK_NUMBER:
+            if (id3->track_string)
+                return id3->track_string;
+
+            if (id3->tracknum) {
+                snprintf(buf, buf_size, "%d", id3->tracknum);
+                return buf;
+            }
+            return NULL;
+
+        case WPS_TOKEN_METADATA_TRACK_TITLE:
+            return id3->title;
+
+        case WPS_TOKEN_METADATA_VERSION:
+            switch (id3->id3version)
+            {
+                case ID3_VER_1_0:
+                    return "1";
+
+                case ID3_VER_1_1:
+                    return "1.1";
+
+                case ID3_VER_2_2:
+                    return "2.2";
+
+                case ID3_VER_2_3:
+                    return "2.3";
+
+                case ID3_VER_2_4:
+                    return "2.4";
+
+                default:
+                    return NULL;
+            }
+
+        case WPS_TOKEN_METADATA_YEAR:
+            if( id3->year_string )
+                return id3->year_string;
+
+            if (id3->year) {
+                snprintf(buf, buf_size, "%d", id3->year);
+                return buf;
+            }
+            return NULL;
+
+        case WPS_TOKEN_METADATA_COMMENT:
+            return id3->comment;
+
+        case WPS_TOKEN_FILE_BITRATE:
+            if(id3->bitrate)
+                snprintf(buf, buf_size, "%d", id3->bitrate);
+            else
+                snprintf(buf, buf_size, "?");
+            return buf;
+
+        case WPS_TOKEN_FILE_CODEC:
+            if (intval)
+            {
+                if(id3->codectype == AFMT_UNKNOWN)
+                    *intval = AFMT_NUM_CODECS;
+                else
+                    *intval = id3->codectype;
+            }
+            return id3_get_codec(id3);
+
+        case WPS_TOKEN_FILE_FREQUENCY:
+            snprintf(buf, buf_size, "%ld", id3->frequency);
+            return buf;
+
+        case WPS_TOKEN_FILE_NAME:
+            if (get_dir(buf, buf_size, id3->path, 0)) {
+                /* Remove extension */
+                char* sep = strrchr(buf, '.');
+                if (NULL != sep) {
+                    *sep = 0;
+                }
+                return buf;
+            }
+            else {
+                return NULL;
+            }
+
+        case WPS_TOKEN_FILE_NAME_WITH_EXTENSION:
+            return get_dir(buf, buf_size, id3->path, 0);
+
+        case WPS_TOKEN_FILE_PATH:
+            return id3->path;
+
+        case WPS_TOKEN_FILE_SIZE:
+            snprintf(buf, buf_size, "%ld", id3->filesize / 1024);
+            return buf;
+
+        case WPS_TOKEN_FILE_VBR:
+            return id3->vbr ? "(avg)" : NULL;
+
+        case WPS_TOKEN_FILE_DIRECTORY:
+            return get_dir(buf, buf_size, id3->path, data->tokens[i].value.i);
+
+        case WPS_TOKEN_BATTERY_PERCENT:
+        {
+            int l = battery_level();
+
+            if (intval)
+            {
+                limit = MAX(limit, 2);
+                if (l > -1) {
+                    /* First enum is used for "unknown level". */
+                    *intval = (limit - 1) * l / 100 + 2;
+                } else {
+                    *intval = 1;
+                }
+            }
+
+            if (l > -1) {
+                snprintf(buf, buf_size, "%d", l);
+                return buf;
+            } else {
+                return "?";
+            }
+        }
+
+        case WPS_TOKEN_BATTERY_VOLTS:
+        {
+            unsigned int v = battery_voltage();
+            snprintf(buf, buf_size, "%d.%02d", v/100, v%100);
+            return buf;
+        }
+
+        case WPS_TOKEN_BATTERY_TIME:
+        {
+            int t = battery_time();
+            if (t >= 0)
+                snprintf(buf, buf_size, "%dh %dm", t / 60, t % 60);
+            else
+                strncpy(buf, "?h ?m", buf_size);
+            return buf;
+        }
+
+#if CONFIG_CHARGING
+        case WPS_TOKEN_BATTERY_CHARGER_CONNECTED:
+        {
+            if(charger_input_state==CHARGER)
+                return "p";
+            else
+                return NULL;
+        }
+#endif
+#if CONFIG_CHARGING >= CHARGING_MONITOR
+        case WPS_TOKEN_BATTERY_CHARGING:
+        {
+            if (charge_state == CHARGING || charge_state == TOPOFF) {
+                return "c";
+            } else {
+                return NULL;
+            }
+        }
+#endif
+
+        case WPS_TOKEN_PLAYBACK_STATUS:
+        {
+            int status = audio_status();
+            int mode = 1;
+            if (status == AUDIO_STATUS_PLAY && \
+                !(status & AUDIO_STATUS_PAUSE))
+                mode = 2;
+            if (audio_status() & AUDIO_STATUS_PAUSE && \
+                (! status_get_ffmode()))
+                mode = 3;
+            if (status_get_ffmode() == STATUS_FASTFORWARD)
+                mode = 4;
+            if (status_get_ffmode() == STATUS_FASTBACKWARD)
+                mode = 5;
+
+            if (intval) {
+                *intval = mode;
+            }
+
+            snprintf(buf, buf_size, "%d", mode);
+            return buf;
+        }
+
+        case WPS_TOKEN_REPEAT_MODE:
+            if (intval)
+                *intval = global_settings.repeat_mode + 1;
+            snprintf(buf, buf_size, "%d", *intval);
+            return buf;
+
+#if CONFIG_RTC
+        case WPS_TOKEN_RTC:
+            tm = get_time();
+            return NULL;
+
+        case WPS_TOKEN_RTC_DAY_OF_MONTH:
+            /* d: day of month (01..31) */
+            if (tm->tm_mday > 31 || tm->tm_mday < 1) return NULL;
+            snprintf(buf, buf_size, "%02d", tm->tm_mday);
+            return buf;
+
+        case WPS_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED:
+            /* e: day of month, blank padded ( 1..31) */
+            if (tm->tm_mday > 31 || tm->tm_mday < 1) return NULL;
+            snprintf(buf, buf_size, "%2d", tm->tm_mday);
+            return buf;
+
+        case WPS_TOKEN_RTC_HOUR_24_ZERO_PADDED:
+            /* H: hour (00..23) */
+            if (tm->tm_hour > 23) return NULL;
+            snprintf(buf, buf_size, "%02d", tm->tm_hour);
+            return buf;
+
+        case WPS_TOKEN_RTC_HOUR_24:
+            /* k: hour ( 0..23) */
+            if (tm->tm_hour > 23) return NULL;
+            snprintf(buf, buf_size, "%2d", tm->tm_hour);
+            return buf;
+
+        case WPS_TOKEN_RTC_HOUR_12_ZERO_PADDED:
+            /* I: hour (01..12) */
+            if (tm->tm_hour > 23) return NULL;
+            snprintf(buf, buf_size, "%02d",
+                     (tm->tm_hour % 12 == 0) ? 12 : tm->tm_hour % 12);
+            return buf;
+
+        case WPS_TOKEN_RTC_HOUR_12:
+            /* l: hour ( 1..12) */
+            if (tm->tm_hour > 23) return NULL;
+            snprintf(buf, buf_size, "%2d",
+                     (tm->tm_hour % 12 == 0) ? 12 : tm->tm_hour % 12);
+            return buf;
+
+        case WPS_TOKEN_RTC_MONTH:
+            /* m: month (01..12) */
+            if (tm->tm_mon > 11 || tm->tm_mon < 0) return NULL;
+            snprintf(buf, buf_size, "%02d", tm->tm_mon + 1);
+            return buf;
+
+        case WPS_TOKEN_RTC_MINUTE:
+            /* M: minute (00..59) */
+            if (tm->tm_min > 59 || tm->tm_min < 0) return NULL;
+            snprintf(buf, buf_size, "%02d", tm->tm_min);
+            return buf;
+
+        case WPS_TOKEN_RTC_SECOND:
+            /* S: second (00..59) */
+            if (tm->tm_sec > 59 || tm->tm_sec < 0) return NULL;
+            snprintf(buf, buf_size, "%02d", tm->tm_sec);
+            return buf;
+
+        case WPS_TOKEN_RTC_YEAR_2_DIGITS:
+            /* y: last two digits of year (00..99) */
+            snprintf(buf, buf_size, "%02d", tm->tm_year % 100);
+            return buf;
+
+        case WPS_TOKEN_RTC_YEAR_4_DIGITS:
+            /* Y: year (1970...) */
+            if (tm->tm_year > 199 || tm->tm_year < 100) return NULL;
+            snprintf(buf, buf_size, "%04d", tm->tm_year + 1900);
+            return buf;
+
+        case WPS_TOKEN_RTC_AM_PM_UPPER:
+            /* p: upper case AM or PM indicator */
+            snprintf(buf, buf_size, (tm->tm_hour/12 == 0) ? "AM" : "PM");
+            return buf;
+
+        case WPS_TOKEN_RTC_AM_PM_LOWER:
+            /* P: lower case am or pm indicator */
+            snprintf(buf, buf_size, (tm->tm_hour/12 == 0) ? "am" : "pm");
+            return buf;
+
+        case WPS_TOKEN_RTC_WEEKDAY_NAME:
+            /* a: abbreviated weekday name (Sun..Sat) */
+            if (tm->tm_wday > 6 || tm->tm_wday < 0) return NULL;
+            snprintf(buf, buf_size, "%s",str(dayname[tm->tm_wday]));
+            return buf;
+
+        case WPS_TOKEN_RTC_MONTH_NAME:
+            /* b: abbreviated month name (Jan..Dec) */
+            if (tm->tm_mon > 11 || tm->tm_mon < 0) return NULL;
+            snprintf(buf, buf_size, "%s",str(monthname[tm->tm_mon]));
+            return buf;
+
+        case WPS_TOKEN_RTC_DAY_OF_WEEK_START_MON:
+            /* u: day of week (1..7); 1 is Monday */
+            if (tm->tm_wday > 6 || tm->tm_wday < 0) return NULL;
+            snprintf(buf, buf_size, "%1d", tm->tm_wday + 1);
+            return buf;
+
+        case WPS_TOKEN_RTC_DAY_OF_WEEK_START_SUN:
+            /* w: day of week (0..6); 0 is Sunday */
+            if (tm->tm_wday > 6 || tm->tm_wday < 0) return NULL;
+            snprintf(buf, buf_size, "%1d", tm->tm_wday);
+            return buf;
+#endif
+
+#ifdef HAVE_LCD_CHARCELLS
+        case WPS_TOKEN_PROGRESSBAR:
+        {
+            char *end = utf8encode(data->wps_progress_pat[0], buf);
+            *end = '\0';
+            return buf;
+        }
+
+        case WPS_TOKEN_PLAYER_PROGRESSBAR:
+            if(is_new_player())
+            {
+                /* we need 11 characters (full line) for
+                    progress-bar */
+                snprintf(buf, buf_size, "           ");
+            }
+            else
+            {
+                /* Tell the user if we have an OldPlayer */
+                snprintf(buf, buf_size, " <Old LCD> ");
+            }
+            return buf;
+#endif
+
+        case WPS_TOKEN_DATABASE_PLAYCOUNT:
+            if (intval) {
+                *intval = id3->playcount + 1;
+            }
+            snprintf(buf, buf_size, "%ld", id3->playcount);
+            return buf;
+
+        case WPS_TOKEN_DATABASE_RATING:
+            if (intval) {
+                *intval = id3->rating + 1;
+            }
+            snprintf(buf, buf_size, "%d", id3->rating);
+            return buf;
+
+#if (CONFIG_CODEC == SWCODEC)
+        case WPS_TOKEN_REPLAYGAIN:
+        {
+            int val;
+
+            if (global_settings.replaygain == 0)
+                val = 1; /* off */
+            else
+            {
+                int type =
+                    get_replaygain_mode(id3->track_gain_string != NULL,
+                                        id3->album_gain_string != NULL);
+                if (type < 0)
+                    val = 6;    /* no tag */
+                else
+                    val = type + 2;
+
+                if (global_settings.replaygain_type == REPLAYGAIN_SHUFFLE)
+                    val += 2;
+            }
+
+            if (intval)
+                *intval = val;
+
+            switch (val)
+            {
+                case 1:
+                case 6:
+                    return "+0.00 dB";
+                    break;
+                case 2:
+                case 4:
+                    strncpy(buf, id3->track_gain_string, buf_size);
+                    break;
+                case 3:
+                case 5:
+                    strncpy(buf, id3->album_gain_string, buf_size);
+                    break;
+            }
+            return buf;
+        }
+
+        case WPS_TOKEN_SOUND_PITCH:
+            snprintf(buf, buf_size, "%d.%d",
+                    *intval / 10, *intval % 10);
+            return buf;
+
+#endif
+
+#ifdef HAS_BUTTON_HOLD
+        case WPS_TOKEN_MAIN_HOLD:
+            if (button_hold())
+                return "h";
+            else
+                return NULL;
+#endif
+#ifdef HAS_REMOTE_BUTTON_HOLD
+        case WPS_TOKEN_REMOTE_HOLD:
+            if (remote_button_hold())
+                return "r";
+            else
+                return NULL;
+#endif
+
+#if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
+        case WPS_TOKEN_VLED_HDD:
+            if(led_read(HZ/2))
+                return "h";
+            else
+                return NULL;
+#endif
+
+        default:
+            return NULL;
+    }
+}
+
+/* Return the index to the end token for the conditional token at index.
+   The conditional token can be either a start token or a separator
+   (i.e. option) token.
+*/
+static int find_conditional_end(struct wps_data *data, int index)
+{
+    int type = data->tokens[index].type;
+
+    if (type != WPS_TOKEN_CONDITIONAL_START
+        && type != WPS_TOKEN_CONDITIONAL_OPTION)
+    {
+        /* this function should only be used with "index" pointing to a
+           WPS_TOKEN_CONDITIONAL_START or a WPS_TOKEN_CONDITIONAL_OPTION */
+        return index + 1;
+    }
+
+    int ret = index;
+    do
+        ret = data->tokens[ret].value.i;
+    while (data->tokens[ret].type != WPS_TOKEN_CONDITIONAL_END);
+
+    /* ret now is the index to the end token for the conditional. */
+    return ret;
+}
+
+/* Return the index of the appropriate case for the conditional
+   that starts at cond_index.
+*/
+static int evaluate_conditional(struct gui_wps *gwps, int cond_index)
+{
+    if (!gwps)
+        return 0;
+
+    struct wps_data *data = gwps->data;
+
+    int ret;
+    int num_options = data->tokens[cond_index].value.i;
+    char result[128], *value;
+    int cond_start = cond_index;
+
+    /* find the index of the conditional start token */
+    while (data->tokens[cond_start].type != WPS_TOKEN_CONDITIONAL_START
+           && cond_start < data->num_tokens)
+        cond_start++;
+
+    if (num_options > 2)  /* enum */
+    {
+        int intval = num_options;
+        /* get_tag needs to know the number of options in the enum */
+        get_tag(gwps, cond_index + 1, result, sizeof(result), &intval);
+        /* intval is now the number of the enum option we want to read,
+           starting from 1 */
+        if (intval > num_options || intval < 1)
+            intval = num_options;
+
+        int next = cond_start;
+        int i;
+        for (i = 1; i < intval; i++)
+        {
+            next = data->tokens[next].value.i;
+        }
+        ret = next;
+    }
+    else  /* %?xx<true|false> or %?<true> */
+    {
+        value = get_tag(gwps, cond_index + 1, result, sizeof(result), NULL);
+        ret = value ? cond_start : data->tokens[cond_start].value.i;
+    }
+
+#ifdef HAVE_LCD_BITMAP
+    /* clear all pictures in the conditional */
+    int i;
+    for (i=0; i < MAX_IMAGES; i++)
+    {
+        if (data->img[i].cond_index == cond_index)
+            clear_image_pos(gwps, i);
+    }
+#endif
+
+    return ret;
+}
+
+/* Read a (sub)line to the given alignment format buffer.
+   linebuf is the buffer where the data is actually stored.
+   align is the alignment format that'll be used to display the text.
+   The return value indicates whether the line needs to be updated.
+*/
+static bool get_line(struct gui_wps *gwps,
+                     int line, int subline,
+                     struct align_pos *align,
+                     char *linebuf,
+                     int linebuf_size)
+{
+    struct wps_data *data = gwps->data;
+
+    char temp_buf[128];
+    char *buf = linebuf;  /* will always point to the writing position */
+    char *linebuf_end = linebuf + linebuf_size - 1;
+    bool update = false;
+
+    /* alignment-related variables */
+    int cur_align;
+    char* cur_align_start;
+    cur_align_start = buf;
+    cur_align = WPS_ALIGN_LEFT;
+    align->left = 0;
+    align->center = 0;
+    align->right = 0;
+
+    /* start at the beginning of the current (sub)line */
+    int i = data->format_lines[line][subline];
+
+    while (data->tokens[i].type != WPS_TOKEN_EOL
+           && data->tokens[i].type != WPS_TOKEN_SUBLINE_SEPARATOR
+           && i < data->num_tokens)
+    {
+        switch(data->tokens[i].type)
+        {
+            case WPS_TOKEN_CONDITIONAL:
+                /* place ourselves in the right conditional case */
+                i = evaluate_conditional(gwps, i);
+                break;
+
+            case WPS_TOKEN_CONDITIONAL_OPTION:
+                /* we've finished in the curent conditional case,
+                    skip to the end of the conditional structure */
+                i = find_conditional_end(data, i);
+                break;
+
+#ifdef HAVE_LCD_BITMAP
+            case WPS_TOKEN_IMAGE_PRELOAD_DISPLAY:
+            {
+                struct gui_img *img = data->img;
+                int n = data->tokens[i].value.i;
+                if (n >= 0 && n < MAX_IMAGES && img[n].loaded)
+                    img[n].display = true;
+                break;
+            }
+#endif
+
+            case WPS_TOKEN_ALIGN_LEFT:
+            case WPS_TOKEN_ALIGN_CENTER:
+            case WPS_TOKEN_ALIGN_RIGHT:
+                /* remember where the current aligned text started */
+                switch (cur_align)
+                {
+                    case WPS_ALIGN_LEFT:
+                        align->left = cur_align_start;
+                        break;
+
+                    case WPS_ALIGN_CENTER:
+                        align->center = cur_align_start;
+                        break;
+
+                    case WPS_ALIGN_RIGHT:
+                        align->right = cur_align_start;
+                        break;
+                }
+                /* start a new alignment */
+                switch (data->tokens[i].type)
+                {
+                    case WPS_TOKEN_ALIGN_LEFT:
+                        cur_align = WPS_ALIGN_LEFT;
+                        break;
+                    case WPS_TOKEN_ALIGN_CENTER:
+                        cur_align = WPS_ALIGN_CENTER;
+                        break;
+                    case WPS_TOKEN_ALIGN_RIGHT:
+                        cur_align = WPS_ALIGN_RIGHT;
+                        break;
+                    default:
+                        break;
+                }
+                *buf++ = 0;
+                cur_align_start = buf;
+                break;
+
+            default:
+            {
+                /* get the value of the tag and copy it to the buffer */
+                char *value = get_tag(gwps, i, temp_buf,
+                                      sizeof(temp_buf), NULL);
+                if (value)
+                {
+                    update = true;
+                    while (*value && (buf < linebuf_end))
+                        *buf++ = *value++;
+                }
+                break;
+            }
+        }
+        i++;
+    }
+
+    /* close the current alignment */
+    switch (cur_align)
+    {
+        case WPS_ALIGN_LEFT:
+            align->left = cur_align_start;
+            break;
+
+        case WPS_ALIGN_CENTER:
+            align->center = cur_align_start;
+            break;
+
+        case WPS_ALIGN_RIGHT:
+            align->right = cur_align_start;
+            break;
+    }
+
+    return update;
+}
+
+/* Calculate which subline should be displayed for each line */
+static bool get_curr_subline(struct wps_data *data, int line)
+{
+    int search, search_start;
+    bool reset_subline;
+    bool new_subline_refresh;
+    bool only_one_subline;
+
+    reset_subline = (data->curr_subline[line] == SUBLINE_RESET);
+    new_subline_refresh = false;
+    only_one_subline = false;
+
+    /* if time to advance to next sub-line  */
+    if (TIME_AFTER(current_tick, data->subline_expire_time[line] - 1) ||
+        reset_subline)
+    {
+        /* search all sublines until the next subline with time > 0
+            is found or we get back to the subline we started with */
+        if (reset_subline)
+            search_start = 0;
+        else
+            search_start = data->curr_subline[line];
+
+        for (search = 0; search < WPS_MAX_SUBLINES; search++)
+        {
+            data->curr_subline[line]++;
+
+            /* wrap around if beyond last defined subline or WPS_MAX_SUBLINES */
+            if ((!data->format_lines[line][data->curr_subline[line]]) ||
+                (data->curr_subline[line] == WPS_MAX_SUBLINES))
+            {
+                if (data->curr_subline[line] == 1)
+                    only_one_subline = true;
+                data->curr_subline[line] = 0;
+            }
+
+            /* if back where we started after search or
+                only one subline is defined on the line */
+            if (((search > 0) && (data->curr_subline[line] == search_start)) ||
+                only_one_subline)
+            {
+                /* no other subline with a time > 0 exists */
+                data->subline_expire_time[line] = (reset_subline?
+                    current_tick : data->subline_expire_time[line]) + 100 * HZ;
+                break;
+            }
+            else
+            {
+                /* only use this subline if subline time > 0 */
+                if (data->time_mult[line][data->curr_subline[line]] > 0)
+                {
+                    new_subline_refresh = true;
+                    data->subline_expire_time[line] = (reset_subline ?
+                        current_tick : data->subline_expire_time[line]) +
+                        BASE_SUBLINE_TIME * data->time_mult[line][data->curr_subline[line]];
+                    break;
+                }
+            }
+        }
+    }
+
+    return new_subline_refresh;
+}
+
+/* Display a line appropriately according to its alignment format.
+   format_align contains the text, separated between left, center and right.
+   line is the index of the line on the screen.
+   scroll indicates whether the line is a scrolling one or not.
+*/
+static void write_line(struct screen *display,
+                       struct align_pos *format_align,
+                       int line,
+                       bool scroll)
+{
+
+    int left_width,   left_xpos;
+    int center_width, center_xpos;
+    int right_width,  right_xpos;
+    int ypos;
+    int space_width;
+    int string_height;
+
+    /* calculate different string sizes and positions */
+    display->getstringsize((unsigned char *)" ", &space_width, &string_height);
+    if (format_align->left != 0) {
+        display->getstringsize((unsigned char *)format_align->left,
+                                &left_width, &string_height);
+    }
+    else {
+        left_width = 0;
+    }
+    left_xpos = 0;
+
+    if (format_align->center != 0) {
+        display->getstringsize((unsigned char *)format_align->center,
+                                &center_width, &string_height);
+    }
+    else {
+        center_width = 0;
+    }
+    center_xpos=(display->width - center_width) / 2;
+
+    if (format_align->right != 0) {
+        display->getstringsize((unsigned char *)format_align->right,
+                                &right_width, &string_height);
+    }
+    else {
+        right_width = 0;
+    }
+    right_xpos = (display->width - right_width);
+
+    /* Checks for overlapping strings.
+        If needed the overlapping strings will be merged, separated by a
+        space */
+
+    /* CASE 1: left and centered string overlap */
+    /* there is a left string, need to merge left and center */
+    if ((left_width != 0 && center_width != 0) &&
+        (left_xpos + left_width + space_width > center_xpos)) {
+        /* replace the former separator '\0' of left and
+            center string with a space */
+        *(--format_align->center) = ' ';
+        /* calculate the new width and position of the merged string */
+        left_width = left_width + space_width + center_width;
+        left_xpos = 0;
+        /* there is no centered string anymore */
+        center_width = 0;
+    }
+    /* there is no left string, move center to left */
+    if ((left_width == 0 && center_width != 0) &&
+        (left_xpos + left_width > center_xpos)) {
+        /* move the center string to the left string */
+        format_align->left = format_align->center;
+        /* calculate the new width and position of the string */
+        left_width = center_width;
+        left_xpos = 0;
+        /* there is no centered string anymore */
+        center_width = 0;
+    }
+
+    /* CASE 2: centered and right string overlap */
+    /* there is a right string, need to merge center and right */
+    if ((center_width != 0 && right_width != 0) &&
+        (center_xpos + center_width + space_width > right_xpos)) {
+        /* replace the former separator '\0' of center and
+            right string with a space */
+        *(--format_align->right) = ' ';
+        /* move the center string to the right after merge */
+        format_align->right = format_align->center;
+        /* calculate the new width and position of the merged string */
+        right_width = center_width + space_width + right_width;
+        right_xpos = (display->width - right_width);
+        /* there is no centered string anymore */
+        center_width = 0;
+    }
+    /* there is no right string, move center to right */
+    if ((center_width != 0 && right_width == 0) &&
+        (center_xpos + center_width > right_xpos)) {
+        /* move the center string to the right string */
+        format_align->right = format_align->center;
+        /* calculate the new width and position of the string */
+        right_width = center_width;
+        right_xpos = (display->width - right_width);
+        /* there is no centered string anymore */
+        center_width = 0;
+    }
+
+    /* CASE 3: left and right overlap
+        There is no center string anymore, either there never
+        was one or it has been merged in case 1 or 2 */
+    /* there is a left string, need to merge left and right */
+    if ((left_width != 0 && center_width == 0 && right_width != 0) &&
+        (left_xpos + left_width + space_width > right_xpos)) {
+        /* replace the former separator '\0' of left and
+            right string with a space */
+        *(--format_align->right) = ' ';
+        /* calculate the new width and position of the string */
+        left_width = left_width + space_width + right_width;
+        left_xpos = 0;
+        /* there is no right string anymore */
+        right_width = 0;
+    }
+    /* there is no left string, move right to left */
+    if ((left_width == 0 && center_width == 0 && right_width != 0) &&
+        (left_xpos + left_width > right_xpos)) {
+        /* move the right string to the left string */
+        format_align->left = format_align->right;
+        /* calculate the new width and position of the string */
+        left_width = right_width;
+        left_xpos = 0;
+        /* there is no right string anymore */
+        right_width = 0;
+    }
+
+    ypos = (line * string_height) + display->getymargin();
+
+
+    if (scroll && left_width > display->width)
+    {
+        display->puts_scroll(0, line,
+                             (unsigned char *)format_align->left);
+    }
+    else
+    {
+#ifdef HAVE_LCD_BITMAP
+        /* clear the line first */
+        display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        display->fillrect(0, ypos, display->width, string_height);
+        display->set_drawmode(DRMODE_SOLID);
+#endif
+
+        /* Nasty hack: we output an empty scrolling string,
+        which will reset the scroller for that line */
+        display->puts_scroll(0, line, (unsigned char *)"");
+
+        /* print aligned strings */
+        if (left_width != 0)
+        {
+            display->putsxy(left_xpos, ypos,
+                            (unsigned char *)format_align->left);
+        }
+        if (center_width != 0)
+        {
+            display->putsxy(center_xpos, ypos,
+                            (unsigned char *)format_align->center);
+        }
+        if (right_width != 0)
+        {
+            display->putsxy(right_xpos, ypos,
+                            (unsigned char *)format_align->right);
+        }
+    }
+}
+
+/* Refresh the WPS according to refresh_mode. */
+bool gui_wps_refresh(struct gui_wps *gwps,
+                     int ffwd_offset,
+                     unsigned char refresh_mode)
+{
+    struct wps_data *data = gwps->data;
+    struct screen *display = gwps->display;
+    struct wps_state *state = gwps->state;
+
+    if(!gwps || !data || !state || !display)
+        return false;
+
+    int line, i;
+    unsigned char flags;
+    char linebuf[MAX_PATH];
+
+    struct align_pos align;
+    align.left = NULL;
+    align.center = NULL;
+    align.right = NULL;
+
+    bool update_line, new_subline_refresh;
+
+#ifdef HAVE_LCD_BITMAP
+    gui_wps_statusbar_draw(gwps, true);
+
+    /* to find out wether the peak meter is enabled we
+       assume it wasn't until we find a line that contains
+       the peak meter. We can't use peak_meter_enabled itself
+       because that would mean to turn off the meter thread
+       temporarily. (That shouldn't matter unless yield
+       or sleep is called but who knows...)
+    */
+    bool enable_pm = false;
+
+    /* Set images to not to be displayed */
+    for (i = 0; i < MAX_IMAGES; i++)
+    {
+        data->img[i].display = false;
+    }
+#endif
+
+    /* reset to first subline if refresh all flag is set */
+    if (refresh_mode == WPS_REFRESH_ALL)
+    {
+        for (i = 0; i < data->num_lines; i++)
+        {
+            data->curr_subline[i] = SUBLINE_RESET;
+        }
+    }
+
+#ifdef HAVE_LCD_CHARCELLS
+    for (i = 0; i < 8; i++)
+    {
+       if (data->wps_progress_pat[i] == 0)
+           data->wps_progress_pat[i] = display->get_locked_pattern();
+    }
+#endif
+
+    if (!state->id3)
+    {
+        display->stop_scroll();
+        return false;
+    }
+
+    state->ff_rewind_count = ffwd_offset;
+
+    for (line = 0; line < data->num_lines; line++)
+    {
+        memset(linebuf, 0, sizeof(linebuf));
+        update_line = false;
+
+        /* get current subline for the line */
+        new_subline_refresh = get_curr_subline(data, line);
+
+        flags = data->line_type[line][data->curr_subline[line]];
+
+        if (refresh_mode == WPS_REFRESH_ALL || flags & refresh_mode
+            || new_subline_refresh)
+        {
+            /* get_line tells us if we need to update the line */
+            update_line = get_line(gwps, line, data->curr_subline[line],
+                                   &align, linebuf, sizeof(linebuf));
+        }
+
+#ifdef HAVE_LCD_BITMAP
+        /* progressbar */
+        if (flags & refresh_mode & WPS_REFRESH_PLAYER_PROGRESS)
+        {
+            /* the progressbar should be alone on its line */
+            update_line = false;
+            draw_progressbar(gwps, line);
+        }
+
+        /* peakmeter */
+        if (flags & refresh_mode & WPS_REFRESH_PEAK_METER)
+        {
+            /* the peakmeter should be alone on its line */
+            update_line = false;
+
+            int h = font_get(FONT_UI)->height;
+            int peak_meter_y = display->getymargin() + line * h;
+
+            /* The user might decide to have the peak meter in the last
+                line so that it is only displayed if no status bar is
+                visible. If so we neither want do draw nor enable the
+                peak meter. */
+            if (peak_meter_y + h <= display->height) {
+                /* found a line with a peak meter -> remember that we must
+                    enable it later */
+                enable_pm = true;
+                peak_meter_screen(gwps->display, 0, peak_meter_y,
+                                  MIN(h, display->height - peak_meter_y));
+            }
+        }
+
+#else /* HAVE_LCD_CHARCELL */
+
+        /* progressbar */
+        if (flags & refresh_mode & WPS_REFRESH_PLAYER_PROGRESS)
+        {
+            if (data->full_line_progressbar)
+                draw_player_fullbar(gwps, linebuf, sizeof(linebuf));
+            else
+                draw_player_progress(gwps);
+        }
+#endif
+
+        if (update_line)
+        {
+            /* calculate alignment and draw the strings */
+            write_line(display, &align, line, flags & WPS_REFRESH_SCROLL);
+        }
+    }
+
+#ifdef HAVE_LCD_BITMAP
+    data->peak_meter_enabled = enable_pm;
+    wps_display_images(gwps);
+#endif
+
+    display->update();
+
+#if CONFIG_BACKLIGHT
+    if (global_settings.caption_backlight && state->id3)
+    {
+        /* turn on backlight n seconds before track ends, and turn it off n
+           seconds into the new track. n == backlight_timeout, or 5s */
+        int n = backlight_timeout_value[global_settings.backlight_timeout]
+                * 1000;
+
+        if ( n < 1000 )
+            n = 5000; /* use 5s if backlight is always on or off */
+
+        if (((state->id3->elapsed < 1000) ||
+             ((state->id3->length - state->id3->elapsed) < (unsigned)n)) &&
+            (state->paused == false))
+            backlight_on();
+    }
+#endif
+#ifdef HAVE_REMOTE_LCD
+    if (global_settings.remote_caption_backlight && state->id3)
+    {
+        /* turn on remote backlight n seconds before track ends, and turn it
+           off n seconds into the new track. n == remote_backlight_timeout,
+           or 5s */
+        int n = backlight_timeout_value[global_settings.remote_backlight_timeout]
+                * 1000;
+
+        if ( n < 1000 )
+            n = 5000; /* use 5s if backlight is always on or off */
+
+        if (((state->id3->elapsed < 1000) ||
+             ((state->id3->length - state->id3->elapsed) < (unsigned)n)) &&
+            (state->paused == false))
+            remote_backlight_on();
+    }
+#endif
+
+    return true;
+}

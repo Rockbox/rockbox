@@ -61,8 +61,6 @@
 #include "ata_idle_notify.h"
 #include "root_menu.h"
 
-#define WPS_DEFAULTCFG WPS_DIR "/rockbox_default.wps"
-#define RWPS_DEFAULTCFG WPS_DIR "/rockbox_default.rwps"
 /* currently only on wps_state is needed */
 struct wps_state wps_state;
 struct gui_wps gui_wps[NB_SCREENS];
@@ -80,7 +78,6 @@ static void gui_wps_set_data(struct gui_wps *gui_wps, struct wps_data *data);
 static void gui_wps_set_disp(struct gui_wps *gui_wps, struct screen *display);
 /* connects a wps with a statusbar*/
 static void gui_wps_set_statusbar(struct gui_wps *gui_wps, struct gui_statusbar *statusbar);
-
 
 #ifdef HAVE_LCD_BITMAP
 static void gui_wps_set_margin(struct gui_wps *gwps)
@@ -670,144 +667,6 @@ long gui_wps_show(void)
 }
 
 /* needs checking if needed end*/
-
-/* wps_data*/
-#ifdef HAVE_LCD_BITMAP
-/* Clear the WPS image cache */
-static void wps_clear(struct wps_data *data )
-{
-    int i;
-    /* set images to unloaded and not displayed */
-    for (i = 0; i < MAX_IMAGES; i++) {
-       data->img[i].loaded = false;
-       data->img[i].display = false;
-       data->img[i].always_display = false;
-    }
-    data->wps_sb_tag = false;
-    data->show_sb_on_wps = false;
-    data->progressbar.have_bitmap_pb=false;
-}
-#else
-#define wps_clear(a)
-#endif
-
-/* initial setup of wps_data */
-void wps_data_init(struct wps_data *wps_data)
-{
-#ifdef HAVE_LCD_BITMAP
-    wps_clear(wps_data);
-#else /* HAVE_LCD_CHARCELLS */
-    {
-        int i;
-        for(i = 0; i < 8; i++)
-            wps_data->wps_progress_pat[i] = 0;
-        wps_data->full_line_progressbar = 0;
-    }
-#endif
-    wps_data->format_buffer[0] = '\0';
-    wps_data->wps_loaded = false;
-    wps_data->peak_meter_enabled = false;
-}
-
-static void wps_reset(struct wps_data *data)
-{
-    data->wps_loaded = false;
-    memset(&data->format_buffer, 0, sizeof data->format_buffer);
-    wps_data_init(data);
-}
-
-/* to setup up the wps-data from a format-buffer (isfile = false)
-   from a (wps-)file (isfile = true)*/
-bool wps_data_load(struct wps_data *wps_data,
-                   const char *buf,
-                   bool isfile)
-{
-    int fd;
-
-    if(!wps_data || !buf)
-        return false;
-
-    if(!isfile)
-    {
-        wps_clear(wps_data);
-        strncpy(wps_data->format_buffer, buf, sizeof(wps_data->format_buffer));
-        wps_data->format_buffer[sizeof(wps_data->format_buffer) - 1] = 0;
-        gui_wps_format(wps_data);
-        return true;
-    }
-    else
-    {
-        /*
-         * Hardcode loading WPS_DEFAULTCFG to cause a reset ideally this
-         * wants to be a virtual file.  Feel free to modify dirbrowse()
-         * if you're feeling brave.
-         */
-        if (! strcmp(buf, WPS_DEFAULTCFG) )
-        {
-            wps_reset(wps_data);
-            global_settings.wps_file[0] = 0;
-            return false;
-        }
-
-#ifdef HAVE_REMOTE_LCD
-        if (! strcmp(buf, RWPS_DEFAULTCFG) )
-        {
-            wps_reset(wps_data);
-            global_settings.rwps_file[0] = 0;
-            return false;
-        }
-#endif
-
-        size_t bmpdirlen;
-        char *bmpdir = strrchr(buf, '.');
-        bmpdirlen = bmpdir - buf;
-
-        fd = open(buf, O_RDONLY);
-
-        if (fd >= 0)
-        {
-            unsigned int start = 0;
-
-            wps_reset(wps_data);
-#ifdef HAVE_LCD_BITMAP
-            wps_data->img_buf_ptr = wps_data->img_buf; /* where in image buffer */
-
-            wps_data->img_buf_free = IMG_BUFSIZE; /* free space in image buffer */
-#endif
-            while( ( read_line(fd, &wps_data->format_buffer[start],
-                    sizeof(wps_data->format_buffer)-start) ) > 0 )
-            {
-                if(!wps_data_preload_tags(wps_data,
-                                          &wps_data->format_buffer[start],
-                                          buf, bmpdirlen))
-                {
-                    start += strlen(&wps_data->format_buffer[start]);
-
-                    if (start < sizeof(wps_data->format_buffer) - 1)
-                    {
-                        wps_data->format_buffer[start++] = '\n';
-                        wps_data->format_buffer[start] = 0;
-                    }
-                }
-            }
-
-            if (start > 0)
-            {
-                gui_wps_format(wps_data);
-            }
-
-            close(fd);
-
-            wps_data->wps_loaded = true;
-
-            return start > 0;
-        }
-    }
-
-    return false;
-}
-
-/* wps_data end */
 
 /* wps_state */
 

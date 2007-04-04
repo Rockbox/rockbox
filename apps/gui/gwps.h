@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Jerome Kuptz
+ * Copyright (C) 2007 Nicolas Pennequin
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -49,6 +49,9 @@ struct gui_img{
     bool loaded;            /* load state */
     bool display;           /* is to be displayed */
     bool always_display;    /* not using the preload/display mechanism */
+
+    /* the index of the conditional the image is in */
+    unsigned short cond_index;
 };
 
 struct prog_img{ /*progressbar image*/
@@ -64,23 +67,189 @@ struct align_pos {
 };
 
 #ifdef HAVE_LCD_BITMAP
+
 #define MAX_IMAGES (26*2) /* a-z and A-Z */
 #define IMG_BUFSIZE ((LCD_HEIGHT*LCD_WIDTH*LCD_DEPTH/8) \
                    + (2*LCD_HEIGHT*LCD_WIDTH/8))
 #define WPS_MAX_LINES (LCD_HEIGHT/5+1)
-#define FORMAT_BUFFER_SIZE 3072
+#define WPS_MAX_TOKENS 1024
+#define WPS_MAX_STRINGS 128
+#define STRING_BUFFER_SIZE 512
+#define WPS_MAX_COND_LEVEL 10
+
 #else
+
 #define WPS_MAX_LINES 2
-#define FORMAT_BUFFER_SIZE 400
+#define WPS_MAX_TOKENS 64
+#define WPS_MAX_STRINGS 32
+#define STRING_BUFFER_SIZE 64
+#define WPS_MAX_COND_LEVEL 5
+
 #endif
+
 #define WPS_MAX_SUBLINES 12
 #define DEFAULT_SUBLINE_TIME_MULTIPLIER 20 /* (10ths of sec) */
 #define BASE_SUBLINE_TIME 10 /* base time that multiplier is applied to
                                 (1/HZ sec, or 100ths of sec) */
 #define SUBLINE_RESET -1
 
+enum wps_token_type {
+    WPS_NO_TOKEN,   /* for WPS tags we don't want to save as tokens */
+    WPS_TOKEN_UNKNOWN,
+
+    /* Markers */
+    WPS_TOKEN_CHARACTER,
+    WPS_TOKEN_STRING,
+    WPS_TOKEN_EOL,
+
+    /* Alignment */
+    WPS_TOKEN_ALIGN_LEFT,
+    WPS_TOKEN_ALIGN_CENTER,
+    WPS_TOKEN_ALIGN_RIGHT,
+
+    /* Scrolling */
+    WPS_TOKEN_SCROLL,
+
+    /* Alternating sublines */
+    WPS_TOKEN_SUBLINE_SEPARATOR,
+    WPS_TOKEN_SUBLINE_TIMEOUT,
+
+    /* Battery */
+    WPS_TOKEN_BATTERY_PERCENT,
+    WPS_TOKEN_BATTERY_VOLTS,
+    WPS_TOKEN_BATTERY_TIME,
+    WPS_TOKEN_BATTERY_CHARGER_CONNECTED,
+    WPS_TOKEN_BATTERY_CHARGING,
+    WPS_TOKEN_BATTERY_SLEEPTIME,
+
+#if (CONFIG_CODEC == SWCODEC)
+    /* Sound */
+    WPS_TOKEN_SOUND_PITCH,
+    WPS_TOKEN_REPLAYGAIN,
+#endif
+
+#if CONFIG_RTC
+    /* Time */
+    WPS_TOKEN_RTC,
+    WPS_TOKEN_RTC_DAY_OF_MONTH,
+    WPS_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED,
+    WPS_TOKEN_RTC_HOUR_24_ZERO_PADDED,
+    WPS_TOKEN_RTC_HOUR_24,
+    WPS_TOKEN_RTC_HOUR_12_ZERO_PADDED,
+    WPS_TOKEN_RTC_HOUR_12,
+    WPS_TOKEN_RTC_MONTH,
+    WPS_TOKEN_RTC_MINUTE,
+    WPS_TOKEN_RTC_SECOND,
+    WPS_TOKEN_RTC_YEAR_2_DIGITS,
+    WPS_TOKEN_RTC_YEAR_4_DIGITS,
+    WPS_TOKEN_RTC_AM_PM_UPPER,
+    WPS_TOKEN_RTC_AM_PM_LOWER,
+    WPS_TOKEN_RTC_WEEKDAY_NAME,
+    WPS_TOKEN_RTC_MONTH_NAME,
+    WPS_TOKEN_RTC_DAY_OF_WEEK_START_MON,
+    WPS_TOKEN_RTC_DAY_OF_WEEK_START_SUN,
+#endif
+
+    /* Conditional */
+    WPS_TOKEN_CONDITIONAL,
+    WPS_TOKEN_CONDITIONAL_START,
+    WPS_TOKEN_CONDITIONAL_OPTION,
+    WPS_TOKEN_CONDITIONAL_END,
+
+    /* Database */
+    WPS_TOKEN_DATABASE_PLAYCOUNT,
+    WPS_TOKEN_DATABASE_RATING,
+
+    /* File */
+    WPS_TOKEN_FILE_BITRATE,
+    WPS_TOKEN_FILE_CODEC,
+    WPS_TOKEN_FILE_FREQUENCY,
+    WPS_TOKEN_FILE_NAME,
+    WPS_TOKEN_FILE_NAME_WITH_EXTENSION,
+    WPS_TOKEN_FILE_PATH,
+    WPS_TOKEN_FILE_SIZE,
+    WPS_TOKEN_FILE_VBR,
+    WPS_TOKEN_FILE_DIRECTORY,
+
+#ifdef HAVE_LCD_BITMAP
+    /* Image */
+    WPS_TOKEN_IMAGE_BACKDROP,
+    WPS_TOKEN_IMAGE_PROGRESS_BAR,
+    WPS_TOKEN_IMAGE_PRELOAD,
+    WPS_TOKEN_IMAGE_PRELOAD_DISPLAY,
+    WPS_TOKEN_IMAGE_DISPLAY,
+#endif
+
+    /* Metadata */
+    WPS_TOKEN_METADATA_ARTIST,
+    WPS_TOKEN_METADATA_COMPOSER,
+    WPS_TOKEN_METADATA_ALBUM_ARTIST,
+    WPS_TOKEN_METADATA_ALBUM,
+    WPS_TOKEN_METADATA_GENRE,
+    WPS_TOKEN_METADATA_TRACK_NUMBER,
+    WPS_TOKEN_METADATA_TRACK_TITLE,
+    WPS_TOKEN_METADATA_VERSION,
+    WPS_TOKEN_METADATA_YEAR,
+    WPS_TOKEN_METADATA_COMMENT,
+
+    /* Mode */
+    WPS_TOKEN_REPEAT_MODE,
+    WPS_TOKEN_PLAYBACK_STATUS,
+
+#ifdef HAS_BUTTON_HOLD
+    WPS_TOKEN_MAIN_HOLD,
+#endif
+#ifdef HAS_REMOTE_BUTTON_HOLD
+    WPS_TOKEN_REMOTE_HOLD,
+#endif
+
+    /* Progressbar */
+    WPS_TOKEN_PROGRESSBAR,
+    WPS_TOKEN_PLAYER_PROGRESSBAR,
+
+#ifdef HAVE_LCD_BITMAP
+    /* Peakmeter */
+    WPS_TOKEN_PEAKMETER,
+#endif
+
+    /* Volume level */
+    WPS_TOKEN_VOLUME,
+
+    /* Current track */
+    WPS_TOKEN_TRACK_TIME_ELAPSED,
+    WPS_TOKEN_TRACK_TIME_REMAINING,
+    WPS_TOKEN_TRACK_LENGTH,
+
+    /* Playlist */
+    WPS_TOKEN_PLAYLIST_ENTRIES,
+    WPS_TOKEN_PLAYLIST_NAME,
+    WPS_TOKEN_PLAYLIST_POSITION,
+    WPS_TOKEN_PLAYLIST_SHUFFLE,
+
+#ifdef HAVE_LCD_BITMAP
+    /* Statusbar */
+    WPS_TOKEN_STATUSBAR_ENABLED,
+    WPS_TOKEN_STATUSBAR_DISABLED,
+#endif
+
+#if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
+    /* Virtual LED */
+    WPS_TOKEN_VLED_HDD
+#endif
+};
+
+struct wps_token {
+    enum wps_token_type type;
+    bool next;
+    union {
+        char c;
+        unsigned short i;
+    } value;
+};
+
+
 /* wps_data
-   this struct old all necessary data which describes the
+   this struct holds all necessary data which describes the
    viewable content of a wps */
 struct wps_data
 {
@@ -92,23 +261,32 @@ struct wps_data
     int img_buf_free;
     bool wps_sb_tag;
     bool show_sb_on_wps;
-#endif
-#ifdef HAVE_LCD_CHARCELLS
+
+    short progress_top;
+    short progress_height;
+    short progress_start;
+    short progress_end;
+    bool peak_meter_enabled;
+#else /*HAVE_LCD_CHARCELLS */
     unsigned short wps_progress_pat[8];
     bool full_line_progressbar;
 #endif
-    char format_buffer[FORMAT_BUFFER_SIZE];
-    char* format_lines[WPS_MAX_LINES][WPS_MAX_SUBLINES];
+    unsigned short format_lines[WPS_MAX_LINES][WPS_MAX_SUBLINES];
+    unsigned char num_lines;
     unsigned char line_type[WPS_MAX_LINES][WPS_MAX_SUBLINES];
     unsigned short time_mult[WPS_MAX_LINES][WPS_MAX_SUBLINES];
     long subline_expire_time[WPS_MAX_LINES];
-    int curr_subline[WPS_MAX_LINES];
-    int progress_top;
-    int progress_height;
-    int progress_start;
-    int progress_end;
+    short curr_subline[WPS_MAX_LINES];
+    unsigned char num_sublines[WPS_MAX_LINES];
+
+    struct wps_token tokens[WPS_MAX_TOKENS];
+    unsigned short num_tokens;
+
+    char string_buffer[STRING_BUFFER_SIZE];
+    char *strings[WPS_MAX_STRINGS];
+    unsigned char num_strings;
+
     bool wps_loaded;
-    bool peak_meter_enabled;
 };
 
 /* initial setup of wps_data */

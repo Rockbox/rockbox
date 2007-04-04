@@ -7286,13 +7286,13 @@
 </phrase>
 <phrase>
   id: LANG_END_PLAYLIST_PLAYER
-  desc: when playlist has finished
+  desc: DEPRECATED
   user:
   <source>
-    *: "End of List"
+    *: ""
   </source>
   <dest>
-    *: "End of List"
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -7304,9 +7304,11 @@
   user:
   <source>
     *: "End of Song List"
+    player: "End of List"
   </source>
   <dest>
     *: "End of Song List"
+    player: "End of List"
   </dest>
   <voice>
     *: ""

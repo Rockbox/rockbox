@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Björn Stenberg
+ * Copyright (C) 2007 Nicolas Pennequin
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -24,16 +24,14 @@
 #include "gwps.h"
 
 void fade(bool fade_in);
-void gui_wps_format(struct wps_data *data);
-bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
-                     unsigned char refresh_mode);
 bool gui_wps_display(void);
 void setvol(void);
 bool update_onvol_change(struct gui_wps * gwps);
 bool update(struct gui_wps *gwps);
 bool ffwd_rew(int button);
-bool wps_data_preload_tags(struct wps_data *data, char *buf,
-                            const char *bmpdir, size_t bmpdirlen);
 void display_keylock_text(bool locked);
-#endif
 
+bool gui_wps_refresh(struct gui_wps *gwps,
+                     int ffwd_offset,
+                     unsigned char refresh_mode);
+#endif
