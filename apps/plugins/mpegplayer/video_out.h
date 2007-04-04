@@ -22,5 +22,6 @@
  */
 
 void vo_draw_frame (uint8_t * const * buf);
-void vo_setup (unsigned int width, unsigned int height, 
+void vo_setup (unsigned int display_width, unsigned int display_height,
+               unsigned int width, unsigned int height,
                unsigned int chroma_width, unsigned int chroma_height);

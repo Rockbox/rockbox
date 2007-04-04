@@ -879,7 +879,9 @@ static void video_thread(void)
             continue;
 
         case STATE_SEQUENCE:
-            vo_setup(info->sequence->width,
+            vo_setup(info->sequence->display_width,
+                     info->sequence->display_height,
+                     info->sequence->width,
                      info->sequence->height,
                      info->sequence->chroma_width,
                      info->sequence->chroma_height);
