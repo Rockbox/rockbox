@@ -613,39 +613,31 @@ static bool draw_player_progress(struct gui_wps *gwps)
     return true;
 }
 
-static int map_fullbar_char(int ascii_val)
-{
-    if (ascii_val >= '0' && ascii_val <= ':') /* 0123456789: */
-        return ascii_val - '0';
-    else
-        return -1; /* anything besides a number or ':' is blank */
-}
-
 static void draw_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size)
 {
-    static const unsigned char numbers[11][4] = {
-        {0x1c, 0x14, 0x14, 0x1c}, /* 0 */
-        {0x08, 0x18, 0x08, 0x08}, /* 1 */
-        {0x1c, 0x04, 0x08, 0x1c}, /* 2 */
-        {0x1c, 0x04, 0x0c, 0x1c}, /* 3 */
-        {0x10, 0x18, 0x1c, 0x08}, /* 4 */
-        {0x1c, 0x18, 0x04, 0x18}, /* 5 */
-        {0x1c, 0x10, 0x1c, 0x1c}, /* 6 */
-        {0x1c, 0x04, 0x08, 0x10}, /* 7 */
-        {0x1c, 0x1c, 0x14, 0x1c}, /* 8 */
-        {0x1c, 0x1c, 0x04, 0x1c}, /* 9 */
-        {0x00, 0x08, 0x00, 0x08}, /* : */
+    static const unsigned char numbers[10][4] = {
+        {0x0e, 0x0a, 0x0a, 0x0e}, /* 0 */
+        {0x04, 0x0c, 0x04, 0x04}, /* 1 */
+        {0x0e, 0x02, 0x04, 0x0e}, /* 2 */
+        {0x0e, 0x02, 0x06, 0x0e}, /* 3 */
+        {0x08, 0x0c, 0x0e, 0x04}, /* 4 */
+        {0x0e, 0x0c, 0x02, 0x0c}, /* 5 */
+        {0x0e, 0x08, 0x0e, 0x0e}, /* 6 */
+        {0x0e, 0x02, 0x04, 0x08}, /* 7 */
+        {0x0e, 0x0e, 0x0a, 0x0e}, /* 8 */
+        {0x0e, 0x0e, 0x02, 0x0e}, /* 9 */
     };
 
     struct wps_state *state = gwps->state;
     struct screen *display = gwps->display;
     struct wps_data *data = gwps->data;
     unsigned char progress_pattern[7];
-    char timestr[12];
+    char timestr[10];
     int time;
+    int time_idx = 0;
     int pos = 0;
     int pat_idx = 1;
-    int i, digit;
+    int digit, i, j;
     bool softchar;
 
     if (!state->id3 || buf_size < 34) /* worst case: 11x UTF-8 char + \0 */
@@ -656,22 +648,41 @@ static void draw_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size)
         pos = 55 * time / state->id3->length;
 
     memset(timestr, 0, sizeof(timestr));
-    format_time(timestr, sizeof(timestr), time);
+    format_time(timestr, sizeof(timestr)-2, time);
+    timestr[strlen(timestr)] = ':';   /* always safe */
 
     for (i = 0; i < 11; i++, pos -= 5)
     {
         softchar = false;
         memset(progress_pattern, 0, sizeof(progress_pattern));
-
-        digit = map_fullbar_char(timestr[i]);
-        if (digit >= 0)
+        
+        if ((digit = timestr[time_idx]))
         {
             softchar = true;
-            memcpy(progress_pattern, numbers[digit], 4);
+            digit -= '0';
+
+            if (timestr[time_idx + 1] == ':')  /* ones, left aligned */
+            {   
+                memcpy(progress_pattern, numbers[digit], 4);
+                time_idx += 2;
+            }
+            else  /* tens, shifted right */
+            {
+                for (j = 0; j < 4; j++)
+                    progress_pattern[j] = numbers[digit][j] >> 1;
+
+                if (time_idx > 0)  /* not the first group, add colon in front */
+                {
+                    progress_pattern[1] |= 0x10;
+                    progress_pattern[3] |= 0x10;
+                }
+                time_idx++;
+            }
 
             if (pos >= 5)
                 progress_pattern[5] = progress_pattern[6] = 0x1f;
         }
+
         if (pos > 0 && pos < 5)
         {
             softchar = true;
@@ -687,10 +698,8 @@ static void draw_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size)
         }
         else if (pos <= 0)
             buf = utf8encode(' ', buf);
-        else if (pos >= 5)
+        else
             buf = utf8encode(0xe115, buf); /* 2/7 _ */
-        else          /* in between, but cannot map */
-            buf = utf8encode('_', buf);    /* 1/7 _ */
     }
     *buf = '\0';
 }
