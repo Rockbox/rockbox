@@ -87,12 +87,43 @@
 #include "ds2411.h"
 #endif
 
+static bool dbg_list(char *title, int count, int selection_size,
+                     int (*action_callback)(int btn, struct gui_synclist *lists), 
+                     char* (*dbg_getname)(int item, void * data, char *buffer))
+{
+    struct gui_synclist lists;
+    int action;
+    
+    gui_synclist_init(&lists, dbg_getname, NULL, false, selection_size);
+    gui_synclist_set_title(&lists, title, NOICON);
+    gui_synclist_set_icon_callback(&lists, NULL);
+    gui_synclist_set_nb_items(&lists, count);
+    action_signalscreenchange();
+    gui_synclist_draw(&lists);
+    while(1)
+    {
+        gui_syncstatusbar_draw(&statusbars, true);
+        action = get_action(CONTEXT_STD, HZ/5); 
+        if (gui_synclist_do_button(&lists, action, LIST_WRAP_UNLESS_HELD))
+            gui_synclist_draw(&lists);
+        if (action_callback)
+            action = action_callback(action, &lists);
+        if (action == ACTION_STD_CANCEL)
+            break;
+        else if(default_event_handler(action) == SYS_USB_CONNECTED)
+            return true;
+    }
+    action_signalscreenchange();
+    return false;
+}
+
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
 /*---------------------------------------------------*/
 extern int ata_device;
 extern int ata_io_address;
 extern struct thread_entry threads[MAXTHREADS];
+
 
 #ifndef SIMULATOR
 static char thread_status_char(int status)
@@ -112,7 +143,7 @@ static char thread_status_char(int status)
 #else
 #define IF_COP2(...)
 #endif
-static char* dbg_os_getname(int selected_item, void * data, char *buffer)
+static char* threads_getname(int selected_item, void * data, char *buffer)
 {
     (void)data;
     struct thread_entry *thread = NULL;
@@ -145,41 +176,24 @@ static char* dbg_os_getname(int selected_item, void * data, char *buffer)
 #endif
     return buffer;
 }
-    
+static int dbg_threads_action_callback(int action, struct gui_synclist *lists)
+{
+#ifdef ROCKBOX_HAS_LOGF
+    if (action == ACTION_STD_OK)
+    {
+        struct thread_entry *thread = &threads[gui_synclist_get_sel_pos(lists)];
+        if (thread->name != NULL)
+            remove_thread(thread);
+    }
+#endif
+    gui_synclist_draw(lists);
+    return action;
+}
 /* Test code!!! */
 static bool dbg_os(void)
 {
-    struct gui_synclist lists;
-    int action;
-    
-    gui_synclist_init(&lists, dbg_os_getname, NULL, false, 1);
-    gui_synclist_set_title(&lists, IF_COP2("Core and ") "Stack usage:", NOICON);
-    gui_synclist_set_icon_callback(&lists, NULL);
-    gui_synclist_set_nb_items(&lists, MAXTHREADS);
-    action_signalscreenchange();
-    while(1)
-    {
-        /* Do a redraw every time so the thread info is updated,
-           disabled scrolling, but the name isnt important */
-        gui_synclist_draw(&lists);
-        gui_syncstatusbar_draw(&statusbars, true);
-        action = get_action(CONTEXT_STD, HZ/5); 
-        gui_synclist_do_button(&lists, action, LIST_WRAP_UNLESS_HELD);
-        if (action == ACTION_STD_CANCEL)
-            break;
-#ifdef ROCKBOX_HAS_LOGF
-        else if (action == ACTION_STD_OK)
-        {
-            struct thread_entry *thread = &threads[gui_synclist_get_sel_pos(&lists)];
-            if (thread->name != NULL)
-                remove_thread(thread);
-        }
-#endif
-        else if(default_event_handler(action) == SYS_USB_CONNECTED)
-            return true;
-    }
-    action_signalscreenchange();
-    return false;
+    return dbg_list(IF_COP2("Core and ") "Stack usage:", MAXTHREADS, 1,
+                    dbg_threads_action_callback, threads_getname);
 }
 #endif /* !SIMULATOR */
 
@@ -682,56 +696,26 @@ static bool dbg_hw_info(void)
 #endif /* !SIMULATOR */
 
 #ifndef SIMULATOR
+static char* dbg_partitions_getname(int selected_item, void * data, char *buffer)
+{
+    (void)data;
+    int partition = selected_item/2;
+    struct partinfo* p = disk_partinfo(partition);
+    if (selected_item%2)
+    {
+        snprintf(buffer, MAX_PATH, "T:%x %ld MB", p->type, p->size / 2048);
+    }
+    else
+    {
+        snprintf(buffer, MAX_PATH, "P%d: S:%lx", partition, p->start);
+    }
+    return buffer;
+}
+
 bool dbg_partitions(void)
 {
-    int partition=0;
-
-    lcd_clear_display();
-    lcd_puts(0, 0, "Partition");
-    lcd_puts(0, 1, "list");
-    lcd_update();
-    sleep(HZ/2);
-
-    while(1)
-    {
-        char buf[32];
-        int button;
-        struct partinfo* p = disk_partinfo(partition);
-
-        lcd_clear_display();
-        snprintf(buf, sizeof buf, "P%d: S:%lx", partition, p->start);
-        lcd_puts(0, 0, buf);
-        snprintf(buf, sizeof buf, "T:%x %ld MB", p->type, p->size / 2048);
-        lcd_puts(0, 1, buf);
-        lcd_update();
-
-        button = get_action(CONTEXT_SETTINGS,TIMEOUT_BLOCK);
-
-        switch(button)
-        {
-            case ACTION_STD_CANCEL:
-                action_signalscreenchange();
-                return false;
-
-            case ACTION_SETTINGS_DEC:
-                partition--;
-                if (partition < 0)
-                    partition = 3;
-                break;
-
-            case ACTION_SETTINGS_INC:
-                partition++;
-                if (partition > 3)
-                    partition = 0;
-                break;
-
-            default:
-                if(default_event_handler(button) == SYS_USB_CONNECTED)
-                    return true;
-                break;
-        }
-    }
-    return false;
+    return dbg_list("Partition Info", 4, 2,
+                    NULL, dbg_partitions_getname);
 }
 #endif
 
