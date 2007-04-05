@@ -98,7 +98,7 @@ static bool dbg_list(char *title, int count, int selection_size,
     gui_synclist_init(&lists, dbg_getname, NULL, false, selection_size);
     gui_synclist_set_title(&lists, title, NOICON);
     gui_synclist_set_icon_callback(&lists, NULL);
-    gui_synclist_set_nb_items(&lists, count);
+    gui_synclist_set_nb_items(&lists, count*selection_size);
     action_signalscreenchange();
     gui_synclist_draw(&lists);
     while(1)
