@@ -1396,6 +1396,10 @@ static bool get_line(struct gui_wps *gwps,
                 i = find_conditional_end(data, i);
                 break;
 
+            case WPS_TOKEN_SUBLINE_TIMEOUT:
+                data->time_mult[line][subline] = data->tokens[i].value.i;
+                break;
+
 #ifdef HAVE_LCD_BITMAP
             case WPS_TOKEN_IMAGE_PRELOAD_DISPLAY:
             {
@@ -1759,9 +1763,14 @@ bool gui_wps_refresh(struct gui_wps *gwps,
     /* reset to first subline if refresh all flag is set */
     if (refresh_mode == WPS_REFRESH_ALL)
     {
+        int j;
         for (i = 0; i < data->num_lines; i++)
         {
             data->curr_subline[i] = SUBLINE_RESET;
+            for (j = 0; j < data->num_sublines[i]; j++)
+            {
+                data->time_mult[i][j] = DEFAULT_SUBLINE_TIME_MULTIPLIER;
+            }
         }
     }
 

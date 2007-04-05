@@ -493,13 +493,6 @@ static int parse_subline_timeout(const char *wps_token, struct wps_data *wps_dat
     if (have_tenth == false)
         val *= 10;
 
-    if (val > 0)
-    {
-        int line = wps_data->num_lines;
-        int subline = wps_data->num_sublines[line];
-        wps_data->time_mult[line][subline] = val;
-    }
-
     wps_data->tokens[wps_data->num_tokens].value.i = val;
     return skip;
 }
