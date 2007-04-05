@@ -102,6 +102,7 @@
 
 #define BOOTFILE_EXT "iriver"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
+#define BOOTDIR "/.rockbox"
 
 #define IBSS_ATTR_VOICE_STACK
 #define ICODE_ATTR_TREMOR_NOT_MDCT

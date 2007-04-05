@@ -122,5 +122,6 @@
 
 #define BOOTFILE_EXT "elio"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
+#define BOOTDIR "/.rockbox"
 
 #endif

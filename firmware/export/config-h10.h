@@ -159,6 +159,7 @@
 #define BOOTFILE_EXT    "mi4"
 #define BOOTFILE        "rockbox." BOOTFILE_EXT
 #define OLD_BOOTFILE    "rockbox.h10"
+#define BOOTDIR "/.rockbox"
 
 #define ICODE_ATTR_TREMOR_NOT_MDCT
 

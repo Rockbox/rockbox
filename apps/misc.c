@@ -890,12 +890,12 @@ void check_bootfile(bool do_rolo)
     DIR* dir = NULL;
     struct dirent* entry = NULL;
 
-    /* 1. open ROCKBOX_DIR and find the BOOTFILE dir entry */
-    dir = opendir(ROCKBOX_DIR);
+    /* 1. open BOOTDIR and find the BOOTFILE dir entry */
+    dir = opendir(BOOTDIR);
 
     if(!dir) return; /* do we want an error splash? */
 
-    /* loop all files in ROCKBOX_DIR */
+    /* loop all files in BOOTDIR */
     while(0 != (entry = readdir(dir)))
     {
         if(!strcasecmp(entry->d_name, BOOTFILE))
@@ -911,7 +911,7 @@ void check_bootfile(bool do_rolo)
                     struct text_message message={ lines, 2 };
                     button_clear_queue(); /* Empty the keyboard buffer */
                     if(gui_syncyesno_run(&message, NULL, NULL) == YESNO_YES)
-                    rolo_load(ROCKBOX_DIR "/" BOOTFILE);
+                    rolo_load(BOOTDIR "/" BOOTFILE);
                 }
             }
             boot_size = entry->size;

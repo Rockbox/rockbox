@@ -106,5 +106,6 @@
 
 #define BOOTFILE_EXT "ajz"
 #define BOOTFILE "ajbrec." BOOTFILE_EXT
+#define BOOTDIR "."
 
 #endif /* SIMULATOR */
