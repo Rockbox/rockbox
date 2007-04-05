@@ -50,14 +50,14 @@ enum {
     XF_OCIRCUMFLEX, XF_OTILDE, XF_ODIERESIS, XF_OSTROKE,
     XF_UGRAVE, XF_UACUTE, XF_UCIRCUMFLEX, XF_UDIERESIS,
     XF_YACUTE, XF_aGRAVE, XF_aACUTE, XF_aCIRCUMFLEX,
-    XF_aTILDE, XF_aDIERESIS, XF_aRING, XF_cCEDILLA,
-    XF_eGRAVE, XF_eACUTE, XF_eCIRCUMFLEX, XF_eDIERESIS,
-    XF_iGRAVE, XF_iACUTE, XF_iCIRCUMFLEX, XF_iDIERESIS,
-    XF_nTILDE, XF_oGRAVE, XF_oACUTE, XF_oCIRCUMFLEX,
-    XF_oTILDE, XF_oDIERESIS, XF_DIVISION, XF_oSLASH,
-    XF_uGRAVE, XF_uACUTE, XF_uCIRCUMFLEX, XF_uDIERESIS,
-    XF_yACUTE, XF_yDIERESIS,
-    
+    XF_aTILDE, XF_aDIERESIS, XF_aRING, XF_aeLIGATURE,
+    XF_cCEDILLA, XF_eGRAVE, XF_eACUTE, XF_eCIRCUMFLEX,
+    XF_eDIERESIS, XF_iGRAVE, XF_iACUTE, XF_iCIRCUMFLEX,
+    XF_iDIERESIS, XF_nTILDE, XF_oGRAVE, XF_oACUTE,
+    XF_oCIRCUMFLEX, XF_oTILDE, XF_oDIERESIS, XF_DIVISION,
+    XF_oSLASH, XF_uGRAVE, XF_uACUTE, XF_uCIRCUMFLEX,
+    XF_uDIERESIS, XF_yACUTE, XF_yDIERESIS,
+
     /* Latin extended A */
     XF_aBREVE, XF_aOGONEK, XF_cACUTE, XF_cCARON,
     XF_dCARON, XF_dSTROKE, XF_eOGONEK, XF_eCARON,
@@ -264,7 +264,7 @@ const struct xchar_info xchar_info_newlcd[] = {
     {   0xd5, XF_OTILDE,      1, 0x4f }, /* Õ (O tilde) */
     {   0xd6, XF_ODIERESIS,   1, 0x4f }, /* Ö (O dieresis) */
     {   0xd7, 0, 0, 0x96 }, /* × (multiplication sign) */
-    {   0xd8, XF_OSTROKE,     1, 0x4f }, /* Ø (O stroke) */
+    {   0xd8, XF_OSTROKE,     1, 0x30 }, /* Ø (O stroke) */
     {   0xd9, XF_UGRAVE,      1, 0x55 }, /* Ù (U grave) */
     {   0xda, XF_UACUTE,      1, 0x55 }, /* Ú (U acute) */
     {   0xdb, XF_UCIRCUMFLEX, 1, 0x55 }, /* Û (U circumflex) */
@@ -278,7 +278,7 @@ const struct xchar_info xchar_info_newlcd[] = {
     {   0xe3, XF_aTILDE,      1, 0x61 }, /* ã (a tilde) */
     {   0xe4, XF_aDIERESIS,   1, 0x61 }, /* ä (a dieresis) */
     {   0xe5, XF_aRING,       1, 0x61 }, /* å (a with ring above) */
-
+    {   0xe6, XF_aeLIGATURE,  1, 0x61 }, /* æ (ae ligature) */
     {   0xe7, XF_cCEDILLA,    1, 0x63 }, /* ç (c cedilla) */
     {   0xe8, XF_eGRAVE,      1, 0x65 }, /* è (e grave) */
     {   0xe9, XF_eACUTE,      1, 0x65 }, /* é (e acute) */
@@ -780,7 +780,7 @@ const struct xchar_info xchar_info_oldlcd[] = {
     {   0xe3, 0, 0, 0x9e }, /* ã (a tilde) */
     {   0xe4, 0, 0, 0x7f }, /* ä (a dieresis) */
     {   0xe5, 0, 0, 0x13 }, /* å (a with ring above) */
-
+    {   0xe6, 0, 0, 0x21 }, /* æ (ae ligature */
     {   0xe7, 0, 0, 0x84 }, /* ç (c cedilla) */
     {   0xe8, 0, 0, 0x08 }, /* è (e grave) */
     {   0xe9, 0, 0, 0x09 }, /* é (e acute) */
@@ -881,11 +881,11 @@ const struct xchar_info xchar_info_oldlcd[] = {
     { 0x03a9, 0, 0, 0x19 }, /* greek OMEGA */
     { 0x03aa, 0, 0, 0x4d }, /* greek IOTA with dialytica */
     { 0x03ab, 0, 0, 0x5d }, /* greek UPSILON with dialytica */
-    { 0x03ac, XF_GR_alphaTONOS,   1, 0x65 }, /* greek alpha with tonos */
+    { 0x03ac, XF_GR_alphaTONOS,   1, 0x9c }, /* greek alpha with tonos */
     { 0x03ad, XF_GR_epsilonTONOS, 1, 0x69 }, /* greek epsilon with tonos */
     { 0x03ae, XF_GR_etaTONOS,     1, 0x72 }, /* greek eta with tonos */
     { 0x03af, 0, 0, 0xa1 }, /* greek iota with tonos */
-    { 0x03b0, XF_GR_upsilonTONOS, 1, 0x79 }, /* greek upsilon with dialytica + tonos */
+    { 0x03b0, XF_GR_upsilonTONOS, 1, 0xa7 }, /* greek upsilon with dialytica + tonos */
     { 0x03b1, XF_GR_alpha,   1, 0x65 }, /* greek alpha */
     { 0x03b2, 0, 0, 0x22 }, /* greek beta */
     { 0x03b3, XF_GR_gamma,   1, 0x7d }, /* greek gamma */
@@ -967,7 +967,7 @@ const struct xchar_info xchar_info_oldlcd[] = {
     { 0x0436, XF_CYR_zhe,    1, 0x2e }, /* cyrillic zhe */
     { 0x0437, XF_CYR_ze,     1, 0x37 }, /* cyrillic ze */
     { 0x0438, XF_CYR_i,      1, 0x79 }, /* cyrillic i */
-    { 0x0439, XF_CYR_SHORTi, 1, 0xc9 }, /* cyrillic short i */
+    { 0x0439, XF_CYR_SHORTi, 1, 0xa7 }, /* cyrillic short i */
     { 0x043a, XF_CYR_ka,     1, 0x6f }, /* cyrillic ka */
     { 0x043b, XF_CYR_el,     1, 0x18 }, /* cyrillic el */
     { 0x043c, XF_CYR_em,     1, 0x71 }, /* cyrillic em */
@@ -1123,6 +1123,7 @@ const unsigned char xfont_fixed[][HW_PATTERN_SIZE] = {
     [XF_aTILDE] =        { 0x0d, 0x12, 0x0e, 0x01, 0x0f, 0x11, 0x0f}, /* ã */
     [XF_aDIERESIS] =     { 0x0a, 0x00, 0x0e, 0x01, 0x0f, 0x11, 0x0f}, /* ä */
     [XF_aRING] =         { 0x04, 0x0a, 0x0e, 0x01, 0x0f, 0x11, 0x0f}, /* å */
+    [XF_aeLIGATURE] =    { 0x00, 0x00, 0x1a, 0x05, 0x0f, 0x14, 0x0f}, /* æ */
     [XF_cCEDILLA] =      { 0x00, 0x0f, 0x10, 0x10, 0x0f, 0x02, 0x04}, /* ç */
     [XF_eGRAVE] =        { 0x08, 0x04, 0x0e, 0x11, 0x1f, 0x10, 0x0e}, /* è */
     [XF_eACUTE] =        { 0x02, 0x04, 0x0e, 0x11, 0x1f, 0x10, 0x0e}, /* é */
@@ -1217,8 +1218,8 @@ const unsigned char xfont_fixed[][HW_PATTERN_SIZE] = {
     [XF_CYR_CHE] =       { 0x11, 0x11, 0x11, 0x0f, 0x01, 0x01, 0x01},
     [XF_CYR_SHA] =       { 0x15, 0x15, 0x15, 0x15, 0x15, 0x15, 0x1f},
     [XF_CYR_SHCHA] =     { 0x15, 0x15, 0x15, 0x15, 0x15, 0x1f, 0x01},
-    [XF_CYR_HARD] =      { 0x18, 0x08, 0x08, 0x0e, 0x09, 0x09, 0x0e},
-    [XF_CYR_YERU] =      { 0x11, 0x11, 0x11, 0x19, 0x15, 0x15, 0x19},
+    [XF_CYR_HARD] =      { 0x18, 0x08, 0x0e, 0x09, 0x09, 0x09, 0x0e},
+    [XF_CYR_YERU] =      { 0x11, 0x11, 0x19, 0x15, 0x15, 0x15, 0x19},
     [XF_CYR_E] =         { 0x0e, 0x11, 0x01, 0x07, 0x01, 0x11, 0x0e},
     [XF_CYR_YU] =        { 0x12, 0x15, 0x15, 0x1d, 0x15, 0x15, 0x12},
     [XF_CYR_YA] =        { 0x0f, 0x11, 0x11, 0x0f, 0x05, 0x09, 0x11},
@@ -1235,7 +1236,7 @@ const unsigned char xfont_fixed[][HW_PATTERN_SIZE] = {
     [XF_CYR_em] =        { 0x00, 0x00, 0x11, 0x1b, 0x15, 0x11, 0x11},
     [XF_CYR_en] =        { 0x00, 0x00, 0x11, 0x11, 0x1f, 0x11, 0x11},
     [XF_CYR_pe] =        { 0x00, 0x00, 0x1f, 0x11, 0x11, 0x11, 0x11},
-    [XF_CYR_te] =        { 0x00, 0x00, 0x1f, 0x04, 0x04, 0x04, 0x04},
+    [XF_CYR_te] =        { 0x00, 0x00, 0x1f, 0x04, 0x04, 0x04, 0x02},
     [XF_CYR_tse] =       { 0x00, 0x00, 0x11, 0x11, 0x11, 0x1f, 0x01},
     [XF_CYR_che] =       { 0x00, 0x00, 0x11, 0x11, 0x0f, 0x01, 0x01},
     [XF_CYR_sha] =       { 0x00, 0x00, 0x15, 0x15, 0x15, 0x15, 0x1f},
