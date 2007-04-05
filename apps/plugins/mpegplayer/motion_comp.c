@@ -58,7 +58,12 @@ void mpeg2_mc_init (uint32_t accel)
         mpeg2_mc = mpeg2_mc_vis;
     else
 #endif
+
+#ifdef CPU_ARM
+        mpeg2_mc = mpeg2_mc_arm;
+#else
         mpeg2_mc = mpeg2_mc_c;
+#endif
 }
 
 #define avg2(a,b) ((a+b+1)>>1)
