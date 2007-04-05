@@ -885,8 +885,8 @@ int get_replaygain_mode(bool have_track_gain, bool have_album_gain)
 */
 void check_bootfile(bool do_rolo)
 {
-    static int wrtdate = 0;
-    static int wrttime = 0;
+    static unsigned short wrtdate = 0;
+    static unsigned short wrttime = 0;
     DIR* dir = NULL;
     struct dirent* entry = NULL;
 
