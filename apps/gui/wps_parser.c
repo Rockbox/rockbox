@@ -69,7 +69,10 @@ extern void print_img_cond_indexes(struct wps_data *data);
 extern void print_wps_strings(struct wps_data *data);
 #endif
 
-typedef int (*wps_tag_parse_func)(const char *wps_token, struct wps_data *wps_data);
+/* special parsing function.
+   wps_bufptr points to the char following the tag.
+   The return value is the number of chars read. */
+typedef int (*wps_tag_parse_func)(const char *wps_bufptr, struct wps_data *wps_data);
 
 struct wps_tag {
     enum wps_token_type type;
@@ -79,18 +82,17 @@ struct wps_tag {
 };
 
 /* prototypes of all special parse functions : */
-
-static int parse_subline_timeout(const char *wps_token, struct wps_data *wps_data);
-static int parse_progressbar(const char *wps_token, struct wps_data *wps_data);
-static int parse_dir_level(const char *wps_token, struct wps_data *wps_data);
+static int parse_subline_timeout(const char *wps_bufptr, struct wps_data *wps_data);
+static int parse_progressbar(const char *wps_bufptr, struct wps_data *wps_data);
+static int parse_dir_level(const char *wps_bufptr, struct wps_data *wps_data);
 #ifdef HAVE_LCD_BITMAP
-static int parse_image_special(const char *wps_token, struct wps_data *wps_data);
-static int parse_statusbar(const char *wps_token, struct wps_data *wps_data);
-static int parse_image_display(const char *wps_token, struct wps_data *wps_data);
-static int parse_image_load(const char *wps_token, struct wps_data *wps_data);
+static int parse_image_special(const char *wps_bufptr, struct wps_data *wps_data);
+static int parse_statusbar(const char *wps_bufptr, struct wps_data *wps_data);
+static int parse_image_display(const char *wps_bufptr, struct wps_data *wps_data);
+static int parse_image_load(const char *wps_bufptr, struct wps_data *wps_data);
 #endif /*HAVE_LCD_BITMAP */
 #if CONFIG_RTC
-static int parse_rtc_format(const char *wps_token, struct wps_data *wps_data);
+static int parse_rtc_format(const char *wps_bufptr, struct wps_data *wps_data);
 
 /* RTC tokens array */
 static const struct wps_tag rtc_tags[] = {
@@ -250,36 +252,36 @@ static const struct wps_tag all_tags[] = {
 };
 
 
-static int skip_end_of_line(const char *wps_token)
+static int skip_end_of_line(const char *wps_bufptr)
 {
     int skip = 0;
-    while(*(wps_token + skip) != '\n')
+    while(*(wps_bufptr + skip) != '\n')
         skip++;
     return ++skip;
 }
 
 #if CONFIG_RTC
-static int parse_rtc_format(const char *wps_token, struct wps_data *wps_data)
+static int parse_rtc_format(const char *wps_bufptr, struct wps_data *wps_data)
 {
     int skip = 0, i;
 
     /* RTC tag format ends with a c or a newline */
-    while (wps_token && *wps_token != 'c' && *wps_token != '\n')
+    while (wps_bufptr && *wps_bufptr != 'c' && *wps_bufptr != '\n')
     {
         /* find what format char we have */
         i = 0;
-        while (*(rtc_tags[i].name) && *wps_token != *(rtc_tags[i].name))
+        while (*(rtc_tags[i].name) && *wps_bufptr != *(rtc_tags[i].name))
             i++;
 
         wps_data->num_tokens++;
         wps_data->tokens[wps_data->num_tokens].type = rtc_tags[i].type;
-        wps_data->tokens[wps_data->num_tokens].value.c = *wps_token;
+        wps_data->tokens[wps_data->num_tokens].value.c = *wps_bufptr;
         skip ++;
-        wps_token++;
+        wps_bufptr++;
     }
 
     /* eat the unwanted c at the end of the format */
-    if (*wps_token == 'c')
+    if (*wps_bufptr == 'c')
         skip++;
 
     return skip;
@@ -288,7 +290,7 @@ static int parse_rtc_format(const char *wps_token, struct wps_data *wps_data)
 
 #ifdef HAVE_LCD_BITMAP
 
-static int parse_statusbar(const char *wps_token, struct wps_data *wps_data)
+static int parse_statusbar(const char *wps_bufptr, struct wps_data *wps_data)
 {
     wps_data->wps_sb_tag = true;
 
@@ -298,7 +300,7 @@ static int parse_statusbar(const char *wps_token, struct wps_data *wps_data)
         wps_data->show_sb_on_wps = false;
 
     /* Skip the rest of the line */
-    return skip_end_of_line(wps_token);
+    return skip_end_of_line(wps_bufptr);
 }
 
 static bool load_bitmap(struct wps_data *wps_data,
@@ -355,9 +357,9 @@ static char *get_image_filename(const char *start, const char* bmpdir,
     return buf;
 }
 
-static int parse_image_display(const char *wps_token, struct wps_data *wps_data)
+static int parse_image_display(const char *wps_bufptr, struct wps_data *wps_data)
 {
-    int n = get_image_id(*wps_token);
+    int n = get_image_id(*wps_bufptr);
     wps_data->tokens[wps_data->num_tokens].value.i = n;
 
     /* if the image is in a conditional, remember it */
@@ -367,10 +369,10 @@ static int parse_image_display(const char *wps_token, struct wps_data *wps_data)
     return 1;
 }
 
-static int parse_image_load(const char *wps_token, struct wps_data *wps_data)
+static int parse_image_load(const char *wps_bufptr, struct wps_data *wps_data)
 {
     int n;
-    const char *ptr = wps_token;
+    const char *ptr = wps_bufptr;
     char *pos = NULL;
 
     /* format: %x|n|filename.bmp|x|y|
@@ -387,7 +389,7 @@ static int parse_image_load(const char *wps_token, struct wps_data *wps_data)
         if(n < 0 || n >= MAX_IMAGES || wps_data->img[n].loaded)
         {
             /* Skip the rest of the line */
-            return skip_end_of_line(wps_token);
+            return skip_end_of_line(wps_bufptr);
         }
 
         ptr = pos + 1;
@@ -405,7 +407,7 @@ static int parse_image_load(const char *wps_token, struct wps_data *wps_data)
         else
         {
             /* weird syntax, bail out */
-            return skip_end_of_line(wps_token);
+            return skip_end_of_line(wps_bufptr);
         }
 
         /* get y-position */
@@ -416,7 +418,7 @@ static int parse_image_load(const char *wps_token, struct wps_data *wps_data)
         else
         {
             /* weird syntax, bail out */
-            return skip_end_of_line(wps_token);
+            return skip_end_of_line(wps_bufptr);
         }
 
         if (wps_data->tokens[wps_data->num_tokens].type == WPS_TOKEN_IMAGE_DISPLAY)
@@ -424,56 +426,56 @@ static int parse_image_load(const char *wps_token, struct wps_data *wps_data)
     }
 
     /* Skip the rest of the line */
-    return skip_end_of_line(wps_token);
+    return skip_end_of_line(wps_bufptr);
 }
 
-static int parse_image_special(const char *wps_token, struct wps_data *wps_data)
+static int parse_image_special(const char *wps_bufptr, struct wps_data *wps_data)
 {
     if (wps_data->tokens[wps_data->num_tokens].type == WPS_TOKEN_IMAGE_PROGRESS_BAR)
     {
         /* format: %P|filename.bmp| */
-        pb_bmp_name = wps_token + 1;
+        pb_bmp_name = wps_bufptr + 1;
     }
 #if LCD_DEPTH > 1
     else if (wps_data->tokens[wps_data->num_tokens].type == WPS_TOKEN_IMAGE_BACKDROP)
     {
         /* format: %X|filename.bmp| */
-        backdrop_bmp_name = wps_token + 1;
+        backdrop_bmp_name = wps_bufptr + 1;
     }
 #endif
 
     (void)wps_data; /* to avoid a warning */
 
     /* Skip the rest of the line */
-    return skip_end_of_line(wps_token);
+    return skip_end_of_line(wps_bufptr);
 }
 
 #endif /* HAVE_LCD_BITMAP */
 
-static int parse_dir_level(const char *wps_token, struct wps_data *wps_data)
+static int parse_dir_level(const char *wps_bufptr, struct wps_data *wps_data)
 {
-    char val[] = { *wps_token, '\0' };
+    char val[] = { *wps_bufptr, '\0' };
     wps_data->tokens[wps_data->num_tokens].value.i = atoi(val);
     return 1;
 }
 
-static int parse_subline_timeout(const char *wps_token, struct wps_data *wps_data)
+static int parse_subline_timeout(const char *wps_bufptr, struct wps_data *wps_data)
 {
     int skip = 0;
     int val = 0;
     bool have_point = false;
     bool have_tenth = false;
 
-    while ( isdigit(*wps_token) || *wps_token == '.' )
+    while ( isdigit(*wps_bufptr) || *wps_bufptr == '.' )
     {
-        if (*wps_token != '.')
+        if (*wps_bufptr != '.')
         {
             val *= 10;
-            val += *wps_token - '0';
+            val += *wps_bufptr - '0';
             if (have_point)
             {
                 have_tenth = true;
-                wps_token++;
+                wps_bufptr++;
                 skip++;
                 break;
             }
@@ -481,7 +483,7 @@ static int parse_subline_timeout(const char *wps_token, struct wps_data *wps_dat
         else
             have_point = true;
 
-        wps_token++;
+        wps_bufptr++;
         skip++;
     }
 
@@ -492,7 +494,7 @@ static int parse_subline_timeout(const char *wps_token, struct wps_data *wps_dat
     return skip;
 }
 
-static int parse_progressbar(const char *wps_token, struct wps_data *wps_data)
+static int parse_progressbar(const char *wps_bufptr, struct wps_data *wps_data)
 {
 #ifdef HAVE_LCD_BITMAP
 
@@ -509,8 +511,8 @@ static int parse_progressbar(const char *wps_token, struct wps_data *wps_data)
     wps_data->progress_top = -1;
 
     int i = 0;
-    char *newline = strchr(wps_token, '\n');
-    char *prev = strchr(wps_token, '|');
+    char *newline = strchr(wps_bufptr, '\n');
+    char *prev = strchr(wps_bufptr, '|');
     if (prev && prev < newline) {
         char *next = strchr(prev+1, '|');
         while (i < 4 && next && next < newline)
@@ -526,11 +528,11 @@ static int parse_progressbar(const char *wps_token, struct wps_data *wps_data)
             wps_data->progress_end = 0;
     }
 
-    return newline - wps_token;
+    return newline - wps_bufptr;
 
 #else
 
-    if (*(wps_token-1) == 'f')
+    if (*(wps_bufptr-1) == 'f')
         wps_data->full_line_progressbar = true;
     else
         wps_data->full_line_progressbar = false;
@@ -541,14 +543,14 @@ static int parse_progressbar(const char *wps_token, struct wps_data *wps_data)
 }
 
 /* Parse a generic token from the given string. Return the length read */
-static int parse_token(const char *wps_token, struct wps_data *wps_data)
+static int parse_token(const char *wps_bufptr, struct wps_data *wps_data)
 {
     int skip = 0, taglen = 0;
     int i = 0;
     int line = wps_data->num_lines;
     int subline = wps_data->num_sublines[line];
 
-    switch(*wps_token)
+    switch(*wps_bufptr)
     {
 
         case '%':
@@ -558,7 +560,7 @@ static int parse_token(const char *wps_token, struct wps_data *wps_data)
         case ';':
             /* escaped characters */
             wps_data->tokens[wps_data->num_tokens].type = WPS_TOKEN_CHARACTER;
-            wps_data->tokens[wps_data->num_tokens].value.c = *wps_token;
+            wps_data->tokens[wps_data->num_tokens].value.c = *wps_bufptr;
             wps_data->num_tokens++;
             skip++;
             break;
@@ -570,14 +572,14 @@ static int parse_token(const char *wps_token, struct wps_data *wps_data)
             condindex[level] = wps_data->num_tokens;
             numoptions[level] = 1;
             wps_data->num_tokens++;
-            wps_token++;
+            wps_bufptr++;
             skip++;
             /* no "break" because a '?' is followed by a regular tag */
 
         default:
             /* find what tag we have */
             while (all_tags[i].name &&
-                   strncmp(wps_token, all_tags[i].name, strlen(all_tags[i].name)))
+                   strncmp(wps_bufptr, all_tags[i].name, strlen(all_tags[i].name)))
                 i++;
 
             taglen  = strlen(all_tags[i].name);
@@ -586,7 +588,7 @@ static int parse_token(const char *wps_token, struct wps_data *wps_data)
 
             /* if the tag has a special parsing function, we call it */
             if (all_tags[i].parse_func)
-                skip += all_tags[i].parse_func(wps_token + taglen, wps_data);
+                skip += all_tags[i].parse_func(wps_bufptr + taglen, wps_data);
 
             /* Some tags we don't want to save as tokens */
             if (all_tags[i].type == WPS_NO_TOKEN)
@@ -605,24 +607,24 @@ static int parse_token(const char *wps_token, struct wps_data *wps_data)
     return skip;
 }
 
-static bool wps_parse(struct wps_data *data, const char *wps_buffer)
+static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
 {
-    if (!data || !wps_buffer || !*wps_buffer)
+    if (!data || !wps_bufptr || !*wps_bufptr)
         return false;
 
     int subline;
     data->num_tokens = 0;
     char *current_string = data->string_buffer;
 
-    while(wps_buffer && *wps_buffer && data->num_tokens < WPS_MAX_TOKENS
+    while(wps_bufptr && *wps_bufptr && data->num_tokens < WPS_MAX_TOKENS
           && data->num_lines < WPS_MAX_LINES)
     {
-        switch(*wps_buffer++)
+        switch(*wps_bufptr++)
         {
 
             /* Regular tag */
             case '%':
-                wps_buffer += parse_token(wps_buffer, data);
+                wps_bufptr += parse_token(wps_bufptr, data);
                 break;
 
             /* Alternating sublines separator */
@@ -634,7 +636,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_buffer)
                     data->format_lines[data->num_lines][subline] = data->num_tokens;
                 }
                 else
-                    wps_buffer += skip_end_of_line(wps_buffer);
+                    wps_bufptr += skip_end_of_line(wps_bufptr);
 
                 break;
 
@@ -678,7 +680,7 @@ condlistend:  /* close a conditional. sometimes we want to close them even when
 
             /* Comment */
             case '#':
-                wps_buffer += skip_end_of_line(wps_buffer);
+                wps_bufptr += skip_end_of_line(wps_bufptr);
                 break;
 
             /* End of this line */
@@ -687,7 +689,7 @@ condlistend:  /* close a conditional. sometimes we want to close them even when
                 {
                     /* We have unclosed conditionals, so we
                        close them before adding the EOL token */
-                    wps_buffer--;
+                    wps_bufptr--;
                     goto condlistend;
                     break;
                 }
@@ -712,15 +714,15 @@ condlistend:  /* close a conditional. sometimes we want to close them even when
                     data->num_tokens++;
 
                     /* Copy the first byte */
-                    *current_string++ = *(wps_buffer - 1);
+                    *current_string++ = *(wps_bufptr - 1);
 
                     /* continue until we hit something that ends the string */
-                    while(wps_buffer &&
-                          *wps_buffer != '%' && //*wps_buffer != '#' &&
-                          *wps_buffer != '<' && *wps_buffer != '>' &&
-                          *wps_buffer != '|' && *wps_buffer != '\n')
+                    while(wps_bufptr &&
+                          *wps_bufptr != '%' && *wps_bufptr != ';' &&
+                          *wps_bufptr != '<' && *wps_bufptr != '>' &&
+                          *wps_bufptr != '|' && *wps_bufptr != '\n')
                     {
-                        *current_string++ = *wps_buffer++;
+                        *current_string++ = *wps_bufptr++;
                     }
 
                     /* null terminate the string */

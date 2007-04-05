@@ -363,18 +363,6 @@ void print_line_info(struct wps_data *data)
     }
 
     DEBUGF("\n");
-
-    DEBUGF("subline time multipliers :\n");
-    for (line = 0; line < data->num_lines; line++)
-    {
-        DEBUGF("%2d. ", line);
-        for (subline = 0; subline < data->num_sublines[line]; subline++)
-        {
-            DEBUGF("%3d ", data->time_mult[line][subline]);
-        }
-        DEBUGF("\n");
-    }
-
 }
 
 void print_wps_strings(struct wps_data *data)
