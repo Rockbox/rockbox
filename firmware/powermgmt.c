@@ -240,14 +240,10 @@ static const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
     { 310, 355, 363, 369, 372, 374, 376, 378, 380, 386, 405 }  /* NiMH */
 #elif CONFIG_BATTERY == BATT_LIPOL1300
     /* Below 337 the backlight starts flickering during HD access */
-     { 337, 365, 370, 374, 378, 382, 387, 393, 400, 408, 416 }
+    { 337, 365, 370, 374, 378, 382, 387, 393, 400, 408, 416 }
 #elif CONFIG_BATTERY == BATT_IAUDIO_X5M5
-    /* iAudio x5 series  - still experimenting with best curve */
-// Lithium ion discharge curve
-    { 355, 356, 357, 359, 362, 365, 369, 374, 380, 387, 395 }
-// Linear
-//  { 355, 360, 364, 369, 373, 378, 382, 387, 391, 390, 400 }
-//  { 355, 359, 363, 367, 371, 375, 379, 383, 387, 391, 395 }
+    /* average measured values from X5 and M5L */
+    { 350, 365, 372, 374, 376, 379, 384, 390, 395, 404, 412 }
 #elif CONFIG_BATTERY == BATT_LPCS355385
     /* iriver H10 20GB */
     { 376, 380, 385, 387, 390, 395, 402, 407, 411, 418, 424 }
