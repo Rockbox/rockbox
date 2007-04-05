@@ -72,10 +72,10 @@ extern void print_wps_strings(struct wps_data *data);
 typedef int (*wps_tag_parse_func)(const char *wps_token, struct wps_data *wps_data);
 
 struct wps_tag {
-    const char name[3];
     enum wps_token_type type;
+    const char name[3];
     unsigned char refresh_type;
-    wps_tag_parse_func parse_func;
+    const wps_tag_parse_func parse_func;
 };
 
 /* prototypes of all special parse functions : */
@@ -94,24 +94,24 @@ static int parse_rtc_format(const char *wps_token, struct wps_data *wps_data);
 
 /* RTC tokens array */
 static const struct wps_tag rtc_tags[] = {
-    { "d", WPS_TOKEN_RTC_DAY_OF_MONTH,              0, NULL },
-    { "e", WPS_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED, 0, NULL },
-    { "H", WPS_TOKEN_RTC_HOUR_24_ZERO_PADDED,       0, NULL },
-    { "k", WPS_TOKEN_RTC_HOUR_24,                   0, NULL },
-    { "I", WPS_TOKEN_RTC_HOUR_12_ZERO_PADDED,       0, NULL },
-    { "l", WPS_TOKEN_RTC_HOUR_12,                   0, NULL },
-    { "m", WPS_TOKEN_RTC_MONTH,                     0, NULL },
-    { "M", WPS_TOKEN_RTC_MINUTE,                    0, NULL },
-    { "S", WPS_TOKEN_RTC_SECOND,                    0, NULL },
-    { "y", WPS_TOKEN_RTC_YEAR_2_DIGITS,             0, NULL },
-    { "Y", WPS_TOKEN_RTC_YEAR_4_DIGITS,             0, NULL },
-    { "p", WPS_TOKEN_RTC_AM_PM_UPPER,               0, NULL },
-    { "P", WPS_TOKEN_RTC_AM_PM_LOWER,               0, NULL },
-    { "a", WPS_TOKEN_RTC_WEEKDAY_NAME,              0, NULL },
-    { "b", WPS_TOKEN_RTC_MONTH_NAME,                0, NULL },
-    { "u", WPS_TOKEN_RTC_DAY_OF_WEEK_START_MON,     0, NULL },
-    { "w", WPS_TOKEN_RTC_DAY_OF_WEEK_START_SUN,     0, NULL },
-    { "\0",WPS_TOKEN_CHARACTER,                     0, NULL }
+    { WPS_TOKEN_RTC_DAY_OF_MONTH,              "d", 0, NULL },
+    { WPS_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED, "e", 0, NULL },
+    { WPS_TOKEN_RTC_HOUR_24_ZERO_PADDED,       "H", 0, NULL },
+    { WPS_TOKEN_RTC_HOUR_24,                   "k", 0, NULL },
+    { WPS_TOKEN_RTC_HOUR_12_ZERO_PADDED,       "I", 0, NULL },
+    { WPS_TOKEN_RTC_HOUR_12,                   "l", 0, NULL },
+    { WPS_TOKEN_RTC_MONTH,                     "m", 0, NULL },
+    { WPS_TOKEN_RTC_MINUTE,                    "M", 0, NULL },
+    { WPS_TOKEN_RTC_SECOND,                    "S", 0, NULL },
+    { WPS_TOKEN_RTC_YEAR_2_DIGITS,             "y", 0, NULL },
+    { WPS_TOKEN_RTC_YEAR_4_DIGITS,             "Y", 0, NULL },
+    { WPS_TOKEN_RTC_AM_PM_UPPER,               "p", 0, NULL },
+    { WPS_TOKEN_RTC_AM_PM_LOWER,               "P", 0, NULL },
+    { WPS_TOKEN_RTC_WEEKDAY_NAME,              "a", 0, NULL },
+    { WPS_TOKEN_RTC_MONTH_NAME,                "b", 0, NULL },
+    { WPS_TOKEN_RTC_DAY_OF_WEEK_START_MON,     "u", 0, NULL },
+    { WPS_TOKEN_RTC_DAY_OF_WEEK_START_SUN,     "w", 0, NULL },
+    { WPS_TOKEN_CHARACTER,                     "\0",0, NULL }
     /* the array MUST end with a "\0" token */
 };
 #endif
@@ -120,137 +120,132 @@ static const struct wps_tag rtc_tags[] = {
    (e.g. "xl" and "xd" before "x"). It needs to end with the unknown token. */
 static const struct wps_tag all_tags[] = {
 
-    { "ac",  WPS_TOKEN_ALIGN_CENTER,             0,                   NULL },
-    { "al",  WPS_TOKEN_ALIGN_LEFT,               0,                   NULL },
-    { "ar",  WPS_TOKEN_ALIGN_RIGHT,              0,                   NULL },
+    { WPS_TOKEN_ALIGN_CENTER,             "ac",  0,                   NULL },
+    { WPS_TOKEN_ALIGN_LEFT,               "al",  0,                   NULL },
+    { WPS_TOKEN_ALIGN_RIGHT,              "ar",  0,                   NULL },
 
-    { "bl",  WPS_TOKEN_BATTERY_PERCENT,          WPS_REFRESH_DYNAMIC, NULL },
-    { "bv",  WPS_TOKEN_BATTERY_VOLTS,            WPS_REFRESH_DYNAMIC, NULL },
-    { "bt",  WPS_TOKEN_BATTERY_TIME,             WPS_REFRESH_DYNAMIC, NULL },
-    { "bs",  WPS_TOKEN_BATTERY_SLEEPTIME,        WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_BATTERY_PERCENT,          "bl",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_BATTERY_VOLTS,            "bv",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_BATTERY_TIME,             "bt",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_BATTERY_SLEEPTIME,        "bs",  WPS_REFRESH_DYNAMIC, NULL },
 #if CONFIG_CHARGING >= CHARGING_MONITOR
-    { "bc",  WPS_TOKEN_BATTERY_CHARGING,         WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_BATTERY_CHARGING,         "bc",  WPS_REFRESH_DYNAMIC, NULL },
 #endif
 #if CONFIG_CHARGING
-    { "bp",  WPS_TOKEN_BATTERY_CHARGER_CONNECTED,WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_BATTERY_CHARGER_CONNECTED,"bp",  WPS_REFRESH_DYNAMIC, NULL },
 #endif
 
 #if CONFIG_RTC
-    { "c",   WPS_TOKEN_RTC,          WPS_REFRESH_DYNAMIC, parse_rtc_format },
+    {  WPS_TOKEN_RTC,                     "c",   WPS_REFRESH_DYNAMIC, parse_rtc_format },
 #endif
 
     /* current file */
-    { "fb",  WPS_TOKEN_FILE_BITRATE,             WPS_REFRESH_STATIC,  NULL },
-    { "fc",  WPS_TOKEN_FILE_CODEC,               WPS_REFRESH_STATIC,  NULL },
-    { "ff",  WPS_TOKEN_FILE_FREQUENCY,           WPS_REFRESH_STATIC,  NULL },
-    { "fm",  WPS_TOKEN_FILE_NAME_WITH_EXTENSION, WPS_REFRESH_STATIC,  NULL },
-    { "fn",  WPS_TOKEN_FILE_NAME,                WPS_REFRESH_STATIC,  NULL },
-    { "fp",  WPS_TOKEN_FILE_PATH,                WPS_REFRESH_STATIC,  NULL },
-    { "fs",  WPS_TOKEN_FILE_SIZE,                WPS_REFRESH_STATIC,  NULL },
-    { "fv",  WPS_TOKEN_FILE_VBR,                 WPS_REFRESH_STATIC,  NULL },
-    { "d",   WPS_TOKEN_FILE_DIRECTORY, WPS_REFRESH_STATIC, parse_dir_level },
+    { WPS_TOKEN_FILE_BITRATE,             "fb",  WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_FILE_CODEC,               "fc",  WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_FILE_FREQUENCY,           "ff",  WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_FILE_NAME_WITH_EXTENSION, "fm",  WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_FILE_NAME,                "fn",  WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_FILE_PATH,                "fp",  WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_FILE_SIZE,                "fs",  WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_FILE_VBR,                 "fv",  WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_FILE_DIRECTORY,           "d",   WPS_REFRESH_STATIC, parse_dir_level },
 
     /* next file */
-    { "Fb",  WPS_TOKEN_FILE_BITRATE,             WPS_REFRESH_DYNAMIC, NULL },
-    { "Fc",  WPS_TOKEN_FILE_CODEC,               WPS_REFRESH_DYNAMIC, NULL },
-    { "Ff",  WPS_TOKEN_FILE_FREQUENCY,           WPS_REFRESH_DYNAMIC, NULL },
-    { "Fm",  WPS_TOKEN_FILE_NAME_WITH_EXTENSION, WPS_REFRESH_DYNAMIC, NULL },
-    { "Fn",  WPS_TOKEN_FILE_NAME,                WPS_REFRESH_DYNAMIC, NULL },
-    { "Fp",  WPS_TOKEN_FILE_PATH,                WPS_REFRESH_DYNAMIC, NULL },
-    { "Fs",  WPS_TOKEN_FILE_SIZE,                WPS_REFRESH_DYNAMIC, NULL },
-    { "Fv",  WPS_TOKEN_FILE_VBR,                 WPS_REFRESH_DYNAMIC, NULL },
-    { "D",   WPS_TOKEN_FILE_DIRECTORY, WPS_REFRESH_DYNAMIC,parse_dir_level },
+    { WPS_TOKEN_FILE_BITRATE,             "Fb",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_FILE_CODEC,               "Fc",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_FILE_FREQUENCY,           "Ff",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_FILE_NAME_WITH_EXTENSION, "Fm",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_FILE_NAME,                "Fn",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_FILE_PATH,                "Fp",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_FILE_SIZE,                "Fs",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_FILE_VBR,                 "Fv",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_FILE_DIRECTORY,           "D",   WPS_REFRESH_DYNAMIC, parse_dir_level },
 
     /* current metadata */
-    { "ia",  WPS_TOKEN_METADATA_ARTIST,          WPS_REFRESH_STATIC,  NULL },
-    { "ic",  WPS_TOKEN_METADATA_COMPOSER,        WPS_REFRESH_STATIC,  NULL },
-    { "id",  WPS_TOKEN_METADATA_ALBUM,           WPS_REFRESH_STATIC,  NULL },
-    { "iA",  WPS_TOKEN_METADATA_ALBUM_ARTIST,    WPS_REFRESH_STATIC,  NULL },
-    { "ig",  WPS_TOKEN_METADATA_GENRE,           WPS_REFRESH_STATIC,  NULL },
-    { "in",  WPS_TOKEN_METADATA_TRACK_NUMBER,    WPS_REFRESH_STATIC,  NULL },
-    { "it",  WPS_TOKEN_METADATA_TRACK_TITLE,     WPS_REFRESH_STATIC,  NULL },
-    { "iv",  WPS_TOKEN_METADATA_VERSION,         WPS_REFRESH_STATIC,  NULL },
-    { "iy",  WPS_TOKEN_METADATA_YEAR,            WPS_REFRESH_STATIC,  NULL },
-    { "iC",  WPS_TOKEN_METADATA_COMMENT,         WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_METADATA_ARTIST,          "ia",  WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_METADATA_COMPOSER,        "ic",  WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_METADATA_ALBUM,           "id",  WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_METADATA_ALBUM_ARTIST,    "iA",  WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_METADATA_GENRE,           "ig",  WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_METADATA_TRACK_NUMBER,    "in",  WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_METADATA_TRACK_TITLE,     "it",  WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_METADATA_VERSION,         "iv",  WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_METADATA_YEAR,            "iy",  WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_METADATA_COMMENT,         "iC",  WPS_REFRESH_DYNAMIC, NULL },
 
     /* next metadata */
-    { "Ia",  WPS_TOKEN_METADATA_ARTIST,          WPS_REFRESH_DYNAMIC, NULL },
-    { "Ic",  WPS_TOKEN_METADATA_COMPOSER,        WPS_REFRESH_DYNAMIC, NULL },
-    { "Id",  WPS_TOKEN_METADATA_ALBUM,           WPS_REFRESH_DYNAMIC, NULL },
-    { "IA",  WPS_TOKEN_METADATA_ALBUM_ARTIST,    WPS_REFRESH_STATIC,  NULL },
-    { "Ig",  WPS_TOKEN_METADATA_GENRE,           WPS_REFRESH_DYNAMIC, NULL },
-    { "In",  WPS_TOKEN_METADATA_TRACK_NUMBER,    WPS_REFRESH_DYNAMIC, NULL },
-    { "It",  WPS_TOKEN_METADATA_TRACK_TITLE,     WPS_REFRESH_DYNAMIC, NULL },
-    { "Iv",  WPS_TOKEN_METADATA_VERSION,         WPS_REFRESH_DYNAMIC, NULL },
-    { "Iy",  WPS_TOKEN_METADATA_YEAR,            WPS_REFRESH_DYNAMIC, NULL },
-    { "IC",  WPS_TOKEN_METADATA_COMMENT,         WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_METADATA_ARTIST,          "Ia",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_METADATA_COMPOSER,        "Ic",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_METADATA_ALBUM,           "Id",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_METADATA_ALBUM_ARTIST,    "IA",  WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_METADATA_GENRE,           "Ig",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_METADATA_TRACK_NUMBER,    "In",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_METADATA_TRACK_TITLE,     "It",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_METADATA_VERSION,         "Iv",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_METADATA_YEAR,            "Iy",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_METADATA_COMMENT,         "IC",  WPS_REFRESH_DYNAMIC, NULL },
 
 #if (CONFIG_CODEC != MAS3507D)
-    { "Sp",  WPS_TOKEN_SOUND_PITCH,              WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_SOUND_PITCH,              "Sp",  WPS_REFRESH_DYNAMIC, NULL },
 #endif
 
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
-    { "lh",  WPS_TOKEN_VLED_HDD,                 WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_VLED_HDD,                 "lh",  WPS_REFRESH_DYNAMIC, NULL },
 #endif
 
 #ifdef HAS_BUTTON_HOLD
-    { "mh",  WPS_TOKEN_MAIN_HOLD,                WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_MAIN_HOLD,                "mh",  WPS_REFRESH_DYNAMIC, NULL },
 #endif
 #ifdef HAS_REMOTE_BUTTON_HOLD
-    { "mr",  WPS_TOKEN_REMOTE_HOLD,              WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_REMOTE_HOLD,              "mr",  WPS_REFRESH_DYNAMIC, NULL },
 #endif
 
-    { "mm",  WPS_TOKEN_REPEAT_MODE,              WPS_REFRESH_DYNAMIC, NULL },
-    { "mp",  WPS_TOKEN_PLAYBACK_STATUS,          WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_REPEAT_MODE,              "mm",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_PLAYBACK_STATUS,          "mp",  WPS_REFRESH_DYNAMIC, NULL },
 
 #ifdef HAVE_LCD_BITMAP
-    { "pm",  WPS_TOKEN_PEAKMETER,
-             WPS_REFRESH_PEAK_METER, NULL },
+    { WPS_TOKEN_PEAKMETER,                "pm",  WPS_REFRESH_PEAK_METER, NULL },
 #else
-    { "pf",  WPS_TOKEN_PLAYER_PROGRESSBAR,
-             WPS_REFRESH_DYNAMIC | WPS_REFRESH_PLAYER_PROGRESS,
-             parse_progressbar },
+    { WPS_TOKEN_PLAYER_PROGRESSBAR,       "pf",  WPS_REFRESH_DYNAMIC | WPS_REFRESH_PLAYER_PROGRESS, parse_progressbar },
 #endif
-    { "pb",  WPS_TOKEN_PROGRESSBAR,
-             WPS_REFRESH_PLAYER_PROGRESS, parse_progressbar },
+    { WPS_TOKEN_PROGRESSBAR,              "pb",  WPS_REFRESH_PLAYER_PROGRESS, parse_progressbar },
 
-    { "pv",  WPS_TOKEN_VOLUME,                   WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_VOLUME,                   "pv",  WPS_REFRESH_DYNAMIC, NULL },
 
-    { "pc",  WPS_TOKEN_TRACK_TIME_ELAPSED,       WPS_REFRESH_DYNAMIC, NULL },
-    { "pr",  WPS_TOKEN_TRACK_TIME_REMAINING,     WPS_REFRESH_DYNAMIC, NULL },
-    { "pt",  WPS_TOKEN_TRACK_LENGTH,             WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_TRACK_TIME_ELAPSED,       "pc",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_TRACK_TIME_REMAINING,     "pr",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_TRACK_LENGTH,             "pt",  WPS_REFRESH_STATIC,  NULL },
 
-    { "pp",  WPS_TOKEN_PLAYLIST_POSITION,        WPS_REFRESH_STATIC,  NULL },
-    { "pe",  WPS_TOKEN_PLAYLIST_ENTRIES,         WPS_REFRESH_STATIC,  NULL },
-    { "pn",  WPS_TOKEN_PLAYLIST_NAME,            WPS_REFRESH_STATIC,  NULL },
-    { "ps",  WPS_TOKEN_PLAYLIST_SHUFFLE,         WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_PLAYLIST_POSITION,        "pp",  WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_PLAYLIST_ENTRIES,         "pe",  WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_PLAYLIST_NAME,            "pn",  WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_PLAYLIST_SHUFFLE,         "ps",  WPS_REFRESH_DYNAMIC, NULL },
 
-    { "rp",  WPS_TOKEN_DATABASE_PLAYCOUNT,       WPS_REFRESH_DYNAMIC, NULL },
-    { "rr",  WPS_TOKEN_DATABASE_RATING,          WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_DATABASE_PLAYCOUNT,       "rp",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_DATABASE_RATING,          "rr",  WPS_REFRESH_DYNAMIC, NULL },
 #if CONFIG_CODEC == SWCODEC
-    { "rg",  WPS_TOKEN_REPLAYGAIN,               WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_REPLAYGAIN,               "rg",  WPS_REFRESH_STATIC,  NULL },
 #endif
 
-    { "s",   WPS_TOKEN_SCROLL,                   WPS_REFRESH_SCROLL,  NULL },
-    { "t",   WPS_TOKEN_SUBLINE_TIMEOUT,          0,  parse_subline_timeout },
+    { WPS_TOKEN_SCROLL,                   "s",   WPS_REFRESH_SCROLL,  NULL },
+    { WPS_TOKEN_SUBLINE_TIMEOUT,          "t",   0,  parse_subline_timeout },
 
 #ifdef HAVE_LCD_BITMAP
-    { "we",  WPS_TOKEN_STATUSBAR_ENABLED,        0,        parse_statusbar },
-    { "wd",  WPS_TOKEN_STATUSBAR_DISABLED,       0,        parse_statusbar },
+    { WPS_TOKEN_STATUSBAR_ENABLED,        "we",  0,        parse_statusbar },
+    { WPS_TOKEN_STATUSBAR_DISABLED,       "wd",  0,        parse_statusbar },
 
-    { "xl",  WPS_NO_TOKEN,                       0,       parse_image_load },
+    { WPS_NO_TOKEN,                       "xl",  0,       parse_image_load },
 
-    { "xd",  WPS_TOKEN_IMAGE_PRELOAD_DISPLAY,
-             WPS_REFRESH_STATIC, parse_image_display },
+    { WPS_TOKEN_IMAGE_PRELOAD_DISPLAY,    "xd",  WPS_REFRESH_STATIC, parse_image_display },
 
-    { "x",   WPS_TOKEN_IMAGE_DISPLAY,            0,       parse_image_load },
-    { "P",   WPS_TOKEN_IMAGE_PROGRESS_BAR,       0,    parse_image_special },
+    {  WPS_TOKEN_IMAGE_DISPLAY,           "x",   0,       parse_image_load },
+    {  WPS_TOKEN_IMAGE_PROGRESS_BAR,      "P",   0,    parse_image_special },
 #if LCD_DEPTH > 1
-    { "X",   WPS_TOKEN_IMAGE_BACKDROP,           0,    parse_image_special },
+    {  WPS_TOKEN_IMAGE_BACKDROP,          "X",   0,    parse_image_special },
 #endif
 #endif
 
-    { "\0",  WPS_TOKEN_UNKNOWN, 0, NULL }
+    { WPS_TOKEN_UNKNOWN,                  "\0",  0, NULL }
     /* the array MUST end with a "\0" token */
 };
 
