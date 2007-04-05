@@ -87,6 +87,7 @@
 #include "ds2411.h"
 #endif
 
+#ifndef SIMULATOR
 static bool dbg_list(char *title, int count, int selection_size,
                      int (*action_callback)(int btn, struct gui_synclist *lists), 
                      char* (*dbg_getname)(int item, void * data, char *buffer))
@@ -116,7 +117,7 @@ static bool dbg_list(char *title, int count, int selection_size,
     action_signalscreenchange();
     return false;
 }
-
+#endif /* SIMULATOR */
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
 /*---------------------------------------------------*/
