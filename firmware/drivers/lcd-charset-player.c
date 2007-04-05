@@ -59,13 +59,14 @@ enum {
     XF_yACUTE, XF_yDIERESIS,
     
     /* Latin extended A */
-    XF_aOGONEK, XF_cACUTE, XF_cCARON, XF_dCARON,
-    XF_dSTROKE, XF_eOGONEK, XF_eCARON, XF_GBREVE,
-    XF_gBREVE, XF_IDOT, XF_DOTLESSi, XF_lSTROKE,
-    XF_nACUTE, XF_nCARON, XF_ODBLACUTE, XF_oDBLACUTE,
-    XF_rCARON, XF_sACUTE, XF_SCEDILLA, XF_sCEDILLA,
-    XF_sCARON, XF_tCARON, XF_uRING, XF_UDBLACUTE,
-    XF_uDBLACUTE, XF_zACUTE, XF_zDOT, XF_zCARON,
+    XF_aBREVE, XF_aOGONEK, XF_cACUTE, XF_cCARON,
+    XF_dCARON, XF_dSTROKE, XF_eOGONEK, XF_eCARON,
+    XF_GBREVE, XF_gBREVE, XF_IDOT, XF_DOTLESSi,
+    XF_lSTROKE, XF_nACUTE, XF_nCARON, XF_ODBLACUTE,
+    XF_oDBLACUTE, XF_rCARON, XF_sACUTE, XF_SCEDILLA,
+    XF_sCEDILLA, XF_sCARON, XF_tCEDILLA, XF_tCARON,
+    XF_uRING, XF_UDBLACUTE, XF_uDBLACUTE, XF_zACUTE,
+    XF_zDOT, XF_zCARON,
 #define XF_DSTROKE XF_ETH
 
     /* Greek */
@@ -305,6 +306,7 @@ const struct xchar_info xchar_info_newlcd[] = {
     {   0xff, XF_yDIERESIS,   1, 0x79 }, /* ÿ (y dieresis) */
     
     /* Latin extended A */
+    { 0x0103, XF_aBREVE,      1, 0x61 }, /* a breve */
     { 0x0105, XF_aOGONEK,     1, 0x61 }, /* a ogonek */
     { 0x0107, XF_cACUTE,      1, 0x63 }, /* c acute */
     { 0x010d, XF_cCARON,      1, 0x63 }, /* c caron */
@@ -327,6 +329,7 @@ const struct xchar_info xchar_info_newlcd[] = {
     { 0x015e, XF_SCEDILLA,    1, 0x53 }, /* S cedilla */
     { 0x015f, XF_sCEDILLA,    1, 0x73 }, /* s cedilla */
     { 0x0161, XF_sCARON,      1, 0x73 }, /* s caron */
+    { 0x0163, XF_tCEDILLA,    1, 0x74 }, /* t cedilla */
     { 0x0165, XF_tCARON,      1, 0x74 }, /* t caron */
     { 0x016f, XF_uRING,       1, 0x75 }, /* u with ring above */
     { 0x0170, XF_UDBLACUTE,   1, 0x55 }, /* U double acute */
@@ -805,6 +808,7 @@ const struct xchar_info xchar_info_oldlcd[] = {
     {   0xff, XF_yDIERESIS,   1, 0x7d }, /* ÿ (y dieresis) */
     
     /* Latin extended A */
+    { 0x0103, 0, 0, 0xe9 }, /* a breve */
     { 0x0105, 0, 0, 0xb3 }, /* a ogonek */
     { 0x0107, 0, 0, 0xb1 }, /* c acute */
     { 0x010d, 0, 0, 0xab }, /* c caron */
@@ -827,6 +831,7 @@ const struct xchar_info xchar_info_oldlcd[] = {
     { 0x015e, 0, 0, 0xc3 }, /* S cedilla */
     { 0x015f, 0, 0, 0xc4 }, /* s cedilla */
     { 0x0161, 0, 0, 0xac }, /* s caron */
+    { 0x0163, 0, 0, 0xd9 }, /* t cedilla */
     { 0x0165, 0, 0, 0xbb }, /* t caron */
     { 0x016f, 0, 0, 0xae }, /* u with ring above */
     { 0x0170, 0, 0, 0xc7 }, /* U double acute */
@@ -1142,6 +1147,7 @@ const unsigned char xfont_fixed[][HW_PATTERN_SIZE] = {
     [XF_yACUTE] =        { 0x02, 0x04, 0x11, 0x11, 0x0f, 0x01, 0x0e}, /* ý */
     [XF_yDIERESIS] =     { 0x0a, 0x00, 0x11, 0x11, 0x0f, 0x01, 0x0e}, /* ÿ */
     /* Latin extended A */
+    [XF_aBREVE] =        { 0x09, 0x06, 0x0e, 0x01, 0x0f, 0x11, 0x0f},
     [XF_aOGONEK] =       { 0x0e, 0x01, 0x0f, 0x11, 0x0f, 0x02, 0x03},
     [XF_cACUTE] =        { 0x02, 0x04, 0x0f, 0x10, 0x10, 0x10, 0x0f},
     [XF_cCARON] =        { 0x0a, 0x04, 0x0f, 0x10, 0x10, 0x10, 0x0f},
@@ -1163,6 +1169,7 @@ const unsigned char xfont_fixed[][HW_PATTERN_SIZE] = {
     [XF_SCEDILLA] =      { 0x0e, 0x10, 0x0e, 0x01, 0x0e, 0x04, 0x0c},
     [XF_sCEDILLA] =      { 0x00, 0x0e, 0x10, 0x0e, 0x01, 0x0e, 0x04},
     [XF_sCARON] =        { 0x0a, 0x04, 0x0e, 0x10, 0x0e, 0x01, 0x1e},
+    [XF_tCEDILLA] =      { 0x04, 0x0f, 0x04, 0x04, 0x04, 0x03, 0x06},
     [XF_tCARON] =        { 0x09, 0x09, 0x08, 0x1e, 0x08, 0x08, 0x06},
     [XF_uRING] =         { 0x04, 0x0a, 0x04, 0x11, 0x11, 0x13, 0x0d},
     [XF_UDBLACUTE] =     { 0x05, 0x0a, 0x11, 0x11, 0x11, 0x11, 0x0e},
