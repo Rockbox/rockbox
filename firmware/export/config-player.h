@@ -91,6 +91,6 @@
 
 #define BOOTFILE_EXT "mod"
 #define BOOTFILE "archos." BOOTFILE_EXT
-#define BOOTDIR "."
+#define BOOTDIR "/"
 
 #endif /* SIMULATOR */
