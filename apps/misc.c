@@ -885,8 +885,8 @@ int get_replaygain_mode(bool have_track_gain, bool have_album_gain)
 */
 void check_bootfile(bool do_rolo)
 {
-    static int boot_size = 0;
-    static int boot_cluster = 0;
+    static int wrtdate = 0;
+    static int wrttime = 0;
     DIR* dir = NULL;
     struct dirent* entry = NULL;
 
@@ -901,10 +901,10 @@ void check_bootfile(bool do_rolo)
         if(!strcasecmp(entry->d_name, BOOTFILE))
         {
             /* found the bootfile */
-            if(boot_size && do_rolo)
+            if(wrtdate && do_rolo)
             {
-                if((entry->size != boot_size) ||
-                   (entry->startcluster != boot_cluster))
+                if((entry->wrtdate != wrtdate) ||
+                   (entry->wrttime != wrttime))
                 {
                     char *lines[] = { str(LANG_BOOT_CHANGED),
                                       str(LANG_REBOOT_NOW) };
@@ -914,8 +914,8 @@ void check_bootfile(bool do_rolo)
                     rolo_load(BOOTDIR "/" BOOTFILE);
                 }
             }
-            boot_size = entry->size;
-            boot_cluster = entry->startcluster;
+            wrtdate = entry->wrtdate;
+            wrttime = entry->wrttime;
         }
     }
     closedir(dir);
