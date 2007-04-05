@@ -501,6 +501,11 @@ static char* select_bookmark(const char* bookmark_file_name)
 #endif
 
     bookmark_count = get_bookmark_count(bookmark_file_name);
+    if (bookmark_count < 1) /* error opening file, or empty file */
+    {
+        gui_syncsplash(HZ, str(LANG_BOOKMARK_LOAD_EMPTY));
+        return NULL;
+    }
     action_signalscreenchange();
     while(true)
     {

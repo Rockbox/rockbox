@@ -38,7 +38,7 @@ enum {
 #ifdef HAVE_RECORDING
     GO_TO_RECSCREEN,
 #endif
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
     GO_TO_FM,
 #endif
     GO_TO_RECENTBMARKS,

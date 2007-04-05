@@ -457,7 +457,7 @@ void root_menu(void)
                    )
                     previous_browser = next_screen;
                 if (next_screen == GO_TO_WPS 
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
                     || next_screen == GO_TO_FM
 #endif
                    )
