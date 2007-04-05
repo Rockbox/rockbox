@@ -627,6 +627,13 @@ bool playlist_viewer_ex(char* filename)
                   &playlist_callback_icons:NULL);
     gui_synclist_set_nb_items(&playlist_lists, viewer.num_tracks);
     gui_synclist_select_item(&playlist_lists, viewer.selected_track);
+    gui_synclist_set_title(&playlist_lists, str(LANG_PLAYLIST_MENU), 
+#ifdef HAVE_LCD_BITMAP
+                            bitmap_icons_6x8[Icon_Playlist]
+#else
+                            NOICON
+#endif
+                          );
     gui_synclist_draw(&playlist_lists);
     action_signalscreenchange();
     while (!exit)
