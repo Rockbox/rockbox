@@ -359,7 +359,7 @@ bool gui_wps_display(void)
                                        "%s%?it<%?in<%in. |>%it|%fn>\n"
                                        "%al%pc/%pt%ar[%pp:%pe]\n"
                                        "%fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>\n"
-                                       "%pb", false);
+                                       "%pb\n", false);
                      }
 #endif
                 }
