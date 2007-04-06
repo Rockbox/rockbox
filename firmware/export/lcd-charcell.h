@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: lcd-player.c 12835 2007-03-18 17:58:49Z amiconn $
+ * $Id$
  *
  * Copyright (C) 2007 by Jens Arnold
  *
