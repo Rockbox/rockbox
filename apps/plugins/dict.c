@@ -301,10 +301,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             break;
         }
     }
-
-#ifdef HAVE_LCD_BITMAP
     rb->lcd_update();
-#endif
 
     /* wait for keypress */
     while(rb->button_get(true) != LP_QUIT)

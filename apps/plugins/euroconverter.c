@@ -290,14 +290,15 @@ static void display(longlong_t euro, longlong_t home, bool pos)
     }
     else
         rb->lcd_puts_scroll(1,1,str);
+        
+    rb->lcd_update();
 }
 
 
 /* Show country Abbreviation */
 static void show_abbrev(void)
 {
-    rb->lcd_puts(2,1,abbrev_str[country]);
-    rb->sleep(HZ*3/4);
+    rb->splash(HZ*3/4,abbrev_str[country]);
 }
 
 
@@ -325,6 +326,7 @@ static void currency_menu(void)
     {
         rb->lcd_puts(0,0,"Currency:");
         rb->lcd_puts(0,1,currency_str[c]);
+        rb->lcd_update();
         switch (rb->button_get(true))
         {
             case BUTTON_RIGHT|BUTTON_REL:
@@ -361,6 +363,7 @@ static int euro_menu(void)
         rb->lcd_puts(0,0," Currency");
         rb->lcd_puts(0,1," Exit");
         rb->lcd_putc(0,c,0xe110);
+        rb->lcd_update();
 
         switch (rb->button_get(true))
         {
@@ -394,6 +397,7 @@ static void euro_exit(void *parameter)
 
     //Clear the screen
     rb->lcd_clear_display();
+    rb->lcd_update();
 }
 
 

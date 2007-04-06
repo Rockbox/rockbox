@@ -647,9 +647,7 @@ void print_scroll(char* string)
     rb->snprintf(screen[(pos+screentop) % LINES], sizeof(screen[0]), "%s", string);
 
     rb->lcd_puts(0, pos, screen[(pos+screentop) % LINES]);
-#ifndef HAVE_LCD_CHARCELLS
     rb->lcd_update();
-#endif
     pos++;
 }
 

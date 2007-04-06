@@ -40,16 +40,7 @@ extern void gui_textarea_clear(struct screen * display);
  * Updates the area in the screen in which text can be displayed
  *  - display : the screen structure
  */
-#ifdef HAVE_LCD_BITMAP
 extern void gui_textarea_update(struct screen * display);
-#else
-#ifdef SIMULATOR
-#define gui_textarea_update(display) \
-    (display)->update();
-#else
-#define gui_textarea_update(display)
-#endif
-#endif
 
 /*
  * Displays message lines on the given screen

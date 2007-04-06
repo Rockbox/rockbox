@@ -31,9 +31,7 @@ static void xingupdate(int percent)
 
     rb->snprintf(buf, 32, "%d%%", percent);
     rb->lcd_puts(0, 1, buf);
-#ifdef HAVE_LCD_BITMAP
     rb->lcd_update();
-#endif
 }
 
 static int insert_data_in_file(char *fname, int fpos, char *buf, int num_bytes)
@@ -141,9 +139,7 @@ static bool vbr_fix(char *selected_file)
 
     rb->lcd_clear_display();
     rb->lcd_puts_scroll(0, 0, selected_file);
-#ifdef HAVE_LCD_BITMAP
     rb->lcd_update();
-#endif
 
     xingupdate(0);
 

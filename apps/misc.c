@@ -825,36 +825,34 @@ int show_logo( void )
     char version[32];
     int font_h, font_w;
 
+    snprintf(version, sizeof(version), "Ver. %s", appsversion);
+
     lcd_clear_display();
     lcd_bitmap(rockboxlogo, 0, 10, BMPWIDTH_rockboxlogo, BMPHEIGHT_rockboxlogo);
+    lcd_setfont(FONT_SYSFIXED);
+    lcd_getstringsize((unsigned char *)"A", &font_w, &font_h);
+    lcd_putsxy((LCD_WIDTH/2) - ((strlen(version)*font_w)/2),
+               LCD_HEIGHT-font_h, (unsigned char *)version);
+
+#else
+    char *rockbox = "  ROCKbox!";
+
+    lcd_clear_display();
+    lcd_double_height(true);
+    lcd_puts(0, 0, rockbox);
+    lcd_puts_scroll(0, 1, appsversion);
+#endif
+    lcd_update();
 
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_clear_display();
     lcd_remote_bitmap(remote_rockboxlogo, 0, 10, BMPWIDTH_remote_rockboxlogo,
                       BMPHEIGHT_remote_rockboxlogo);
-#endif
-
-    snprintf(version, sizeof(version), "Ver. %s", appsversion);
-    lcd_setfont(FONT_SYSFIXED);
-    lcd_getstringsize((unsigned char *)"A", &font_w, &font_h);
-    lcd_putsxy((LCD_WIDTH/2) - ((strlen(version)*font_w)/2),
-               LCD_HEIGHT-font_h, (unsigned char *)version);
-    lcd_update();
-
-#ifdef HAVE_REMOTE_LCD
     lcd_remote_setfont(FONT_SYSFIXED);
     lcd_remote_getstringsize((unsigned char *)"A", &font_w, &font_h);
     lcd_remote_putsxy((LCD_REMOTE_WIDTH/2) - ((strlen(version)*font_w)/2),
                LCD_REMOTE_HEIGHT-font_h, (unsigned char *)version);
     lcd_remote_update();
-#endif
-
-#else
-    char *rockbox = "  ROCKbox!";
-    lcd_clear_display();
-    lcd_double_height(true);
-    lcd_puts(0, 0, rockbox);
-    lcd_puts_scroll(0, 1, appsversion);
 #endif
 
     return 0;

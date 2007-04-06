@@ -893,6 +893,7 @@ void DoUserDialog(char* filename)
     {
         rb->lcd_puts_scroll(0, 0, "Hint: You're not using the latest bootloader. A full reflash is recommended, but not required.");
         rb->lcd_puts_scroll(0, 1, "Press [Menu] to ignore");
+        rb->lcd_update();
 
         if (WaitForButton() != BUTTON_MENU)
         {
@@ -902,6 +903,7 @@ void DoUserDialog(char* filename)
     }
 
     rb->lcd_puts(0, 0, "Checking...");
+    rb->lcd_update();
 
     space = FlashInfo.size - (pos-FB + sizeof(ImageHeader));
     /* size minus start */
@@ -941,6 +943,7 @@ void DoUserDialog(char* filename)
             rb->lcd_puts_scroll(0, 1, "Check failed.");
             break;
     }
+    rb->lcd_update();
 
     if (rc == eOK)
     {    /* was OK */
@@ -955,6 +958,7 @@ void DoUserDialog(char* filename)
         rb->lcd_puts_scroll(0, 0, "Flash failed.");
         rb->lcd_puts_scroll(0, 1, "Any key to exit.");
     }
+    rb->lcd_update();
 
     button = WaitForButton();
     if (rc != eOK || button != BUTTON_ON)
@@ -972,6 +976,7 @@ void DoUserDialog(char* filename)
     
     rb->lcd_clear_display();
     rb->lcd_puts_scroll(0, 0, "Programming...");
+    rb->lcd_update();
 
     rc = ProgramImageFile(filename, pos, &ImageHeader, UCL_HEADER, true_size);
     if (rc)
@@ -980,11 +985,13 @@ void DoUserDialog(char* filename)
         rb->snprintf(buf, sizeof(buf), "%d errors", rc);
         rb->lcd_puts_scroll(0, 0, "Programming failed!");
         rb->lcd_puts_scroll(0, 1, buf);
+        rb->lcd_update();
         button = WaitForButton();
     }
     
     rb->lcd_clear_display();
     rb->lcd_puts_scroll(0, 0, "Verifying...");
+    rb->lcd_update();
 
     rc = VerifyImageFile(filename, pos, &ImageHeader, UCL_HEADER, true_size);
 
@@ -992,12 +999,14 @@ void DoUserDialog(char* filename)
     if (rc == 0)
     {
         rb->lcd_puts(0, 0, "Verify OK.");
+        rb->lcd_update();
     }
     else
     {
         rb->snprintf(buf, sizeof(buf), "Verify fail! %d errors", rc);
         rb->lcd_puts_scroll(0, 0, buf);
         rb->lcd_puts_scroll(0, 1, "Use safe image if booting hangs: [-] during power-on");
+        rb->lcd_update();
         button = WaitForButton();
     }
 }

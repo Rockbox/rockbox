@@ -932,12 +932,12 @@ static void viewer_draw(int col)
 
     if (prefs.need_scrollbar)
         viewer_scrollbar();
-
-    if (col != -1)
-        rb->lcd_update();
 #else
     next_screen_to_draw_ptr = next_screen_ptr;
 #endif
+
+    if (col != -1)
+        rb->lcd_update();
 }
 
 static void viewer_top(void)

@@ -442,8 +442,9 @@ static void init(void)
 #ifdef HAVE_LCD_BITMAP
             lcd_puts(0, 2, "Insert USB cable");
             lcd_puts(0, 3, "and fix it.");
-            lcd_update();
 #endif
+            lcd_update();
+
             while(button_get(true) != SYS_USB_CONNECTED) {};
             usb_screen();
             system_reboot();

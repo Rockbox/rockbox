@@ -778,8 +778,8 @@ void draw_display(void)
         rb->lcd_puts(0,2,METRONOME_MSG_START);
     else
         rb->lcd_puts(0,2,METRONOME_MSG_STOP);
-    rb->lcd_update();
 #endif
+    rb->lcd_update();
 #ifdef HAVE_REMOTE_LCD
     rb->lcd_remote_drawline(0, 12, 111, 12);
     if(sound_paused)

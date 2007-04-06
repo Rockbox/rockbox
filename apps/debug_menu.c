@@ -1057,7 +1057,7 @@ bool dbg_ports(void)
         lcd_puts(0, line++, buf);
 
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-        snprintf(buf, sizeof(buf), "remotetype:: %d", remote_type());
+        snprintf(buf, sizeof(buf), "remotetype: %d", remote_type());
         lcd_puts(0, line++, buf);
 #endif
 
@@ -1248,6 +1248,7 @@ bool dbg_ports(void)
         snprintf(buf, 32, "Batt: %d.%02dV", adc_battery_voltage / 100,
                  adc_battery_voltage % 100);
         lcd_puts(0, 1, buf);
+        lcd_update();
 
         button = get_action(CONTEXT_SETTINGS,HZ/5);
 
@@ -1350,6 +1351,7 @@ static bool view_battery(void)
 
     while(1)
     {
+        lcd_clear_display();
         switch (view) {
             case 0: /* voltage history graph */
                 /* Find maximum and minimum voltage for scaling */
@@ -1371,7 +1373,6 @@ static bool view_battery(void)
                 if (minv == maxv)
                     maxv < 65535 ? maxv++ : minv--;
 
-                lcd_clear_display();
                 snprintf(buf, 30, "Battery %d.%02d", power_history[0] / 100,
                          power_history[0] % 100);
                 lcd_puts(0, 0, buf);
@@ -1393,7 +1394,6 @@ static bool view_battery(void)
                 break;
 
             case 1: /* status: */
-                lcd_clear_display();
                 lcd_puts(0, 0, "Power status:");
 
                 battery_read_info(NULL, &y, NULL);
@@ -1456,7 +1456,6 @@ static bool view_battery(void)
                 break;
 
             case 2: /* voltage deltas: */
-                lcd_clear_display();
                 lcd_puts(0, 0, "Voltage deltas:");
 
                 for (i = 0; i <= 6; i++) {
@@ -1469,7 +1468,6 @@ static bool view_battery(void)
                 break;
 
             case 3: /* remaining time estimation: */
-                lcd_clear_display();
 
 #if CONFIG_CHARGING == CHARGING_CONTROL
                 snprintf(buf, 30, "charge_state: %d", charge_state);
@@ -1657,9 +1655,7 @@ static bool dbg_disk_info(void)
     bool timing_info_present = false;
     char pio3[2], pio4[2];
 
-#ifdef HAVE_LCD_BITMAP
     lcd_setmargins(0, 0);
-#endif
 
     while(!done)
     {
@@ -1999,9 +1995,7 @@ static bool dbg_fm_radio(void)
     char buf[32];
     bool fm_detected;
 
-#ifdef HAVE_LCD_BITMAP
     lcd_setmargins(0, 0);
-#endif
 
     while(1)
     {

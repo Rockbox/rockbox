@@ -78,6 +78,7 @@ static void jackpot_exit(void *parameter)
 
     /* Clear the screen */
     rb->lcd_clear_display();
+    rb->lcd_update();
 }
 
 
@@ -115,13 +116,15 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_putc(9,0,h2); rb->lcd_putc(10,0,h1);
     rb->lcd_puts(0,1,"   V1.1    ");
     rb->lcd_putc(1,1,h3); rb->lcd_putc(9,1,h3);
+    rb->lcd_update();
     rb->sleep(HZ*2);
-    rb->lcd_clear_display();
 
     /*First display*/
+    rb->lcd_clear_display();
     rb->snprintf(str,sizeof(str),"[   ]$%d",g);
     rb->lcd_puts(0,0,str);
     rb->lcd_puts_scroll(0,1,"PLAY to begin");
+    rb->lcd_update();
 
     /*Empty the event queue*/
     rb->button_clear_queue();
@@ -165,6 +168,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
         /*Clear the Second line*/
         rb->lcd_puts_scroll(0,1,"Good luck");
+        rb->lcd_update();
 
         /*GO !!!!*/
         if ( go && !exit )
@@ -188,6 +192,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 rb->lcd_putc(1,0, h1);
                 rb->lcd_putc(2,0, h2);
                 rb->lcd_putc(3,0, h3);
+                rb->lcd_update();
                 for(i=0;i<3;i++)
                 {
                     if (n[i]>=0)
@@ -268,6 +273,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 rb->snprintf(str,sizeof(str),"You win %d$",j);
                 rb->lcd_puts(0,1,str);
             }
+            rb->lcd_update();
         }
     }
 

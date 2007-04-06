@@ -323,9 +323,7 @@ static void move_cursor(int x, int y)
                      + ( ( y + 4 + cursor_pos/5 )%4 )*5;
         draw_cursor();
     }
-#ifdef HAVE_LCD_BITMAP
     rb->lcd_update();
-#endif
 }
 
 /* initialize the board */
@@ -339,9 +337,8 @@ static void flipit_init(void)
         toggle[i]=1;
         draw_spot(i);
     }
-#ifdef HAVE_LCD_BITMAP
     rb->lcd_update();
-#endif
+
     for (i=0; i<20; i++) {
         cursor_pos = (rb->rand() % 20);
         flipit_toggle();
@@ -351,9 +348,7 @@ static void flipit_init(void)
     draw_cursor();
     moves = 0;
     draw_info_panel();
-#ifdef HAVE_LCD_BITMAP
     rb->lcd_update();
-#endif
 }
 
 /* the main game loop */
@@ -392,9 +387,7 @@ static bool flipit_loop(void)
                             cursor_pos = i;
                             flipit_toggle();
                             draw_cursor();
-#ifdef HAVE_LCD_BITMAP
                             rb->lcd_update();
-#endif
                             rb->sleep(HZ*2/3);
                         }
                 }
@@ -412,9 +405,7 @@ static bool flipit_loop(void)
                             cursor_pos = i;
                             flipit_toggle();
                             draw_cursor();
-#ifdef HAVE_LCD_BITMAP
                             rb->lcd_update();
-#endif
                             break;
                         }
                 }
@@ -429,9 +420,7 @@ static bool flipit_loop(void)
                 if (!flipit_finished()) {
                     flipit_toggle();
                     draw_cursor();
-#ifdef HAVE_LCD_BITMAP
                     rb->lcd_update();
-#endif
                 }
                 break;
 
@@ -546,9 +535,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         spots[i]=1;
         draw_spot(i);
     }
-#ifdef HAVE_LCD_BITMAP
     rb->lcd_update();
-#endif
     rb->sleep(HZ*3/2);
     rb->srand(*rb->current_tick);
 

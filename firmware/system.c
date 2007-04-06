@@ -452,10 +452,7 @@ void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
     lcd_puts(0,0,str);
     snprintf(str,sizeof(str),"at %08x",pc);
     lcd_puts(0,1,str);
-
-#ifdef HAVE_LCD_BITMAP
     lcd_update ();
-#endif
 
     while (1)
     {

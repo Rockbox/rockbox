@@ -178,9 +178,7 @@ static void splash(struct screen * screen, const char *fmt, va_list ap)
         screen->set_drawmode(DRMODE_SOLID);
     }
 #endif
-#if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
     screen->update();
-#endif
 }
 
 void gui_splash(struct screen * screen, int ticks, 

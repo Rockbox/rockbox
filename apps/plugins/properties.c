@@ -173,9 +173,8 @@ static bool _dir_properties(DPS* dps)
             rb->snprintf(dps->tstr, 64, "Size: %s",
                 filesize2string(dps->bc, dps->tstr2, 64));
             rb->lcd_puts(0,5,dps->tstr);
-#ifdef HAVE_LCD_BITMAP
             rb->lcd_update();
-#endif
+
              /* recursion */
             result = _dir_properties(dps);
         }
@@ -302,9 +301,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
         rb->lcd_clear_display();
         rb->lcd_puts(0,0,"File/Dir not found:");
         rb->lcd_puts(0,1,(char*)file);
-#ifdef HAVE_LCD_BITMAP
         rb->lcd_update();
-#endif
+
         rb->action_userabort(TIMEOUT_BLOCK);
         return PLUGIN_OK;
     }

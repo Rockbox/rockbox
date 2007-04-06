@@ -312,12 +312,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
 #else
         if (cpos != old_cpos) {
             rb->lcd_clear_display();
-            pgfx_update();
             pgfx_display(cpos, 0);
             old_cpos = cpos;
         }
-        else
-            pgfx_update();
+        pgfx_update();
 #endif
         rb->sleep(HZ/timer);
         

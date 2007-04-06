@@ -59,22 +59,16 @@ struct file_format *list = NULL;
 void update_screen(bool clear)
 {
     char buf[15];
-#if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD) /* always bitmap */
     int i;
+
+    rb->snprintf(buf,sizeof(buf),"Folders: %d",dirs_count);
     FOR_NB_SCREENS(i)
     {
-        rb->snprintf(buf,15,"Folders: %d",dirs_count);
         if(clear)
             rb->screens[i]->clear_display();
         rb->screens[i]->putsxy(0,0,buf);
         rb->screens[i]->update();
     }
-#else
-    rb->snprintf(buf,15,"Folders: %d",dirs_count);
-    if(clear)
-        rb->lcd_clear_display();
-    rb->lcd_puts(0,0,buf);
-#endif
 }
 
 void traversedir(char* location, char* name)

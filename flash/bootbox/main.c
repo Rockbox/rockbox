@@ -46,9 +46,8 @@ void usb_screen(void)
 {
     lcd_clear_display();
     lcd_puts(0, 0, "USB mode");
-#ifdef HAVE_LCD_BITMAP
     lcd_update();
-#endif
+
     usb_acknowledge(SYS_USB_CONNECTED_ACK);
     while(usb_wait_for_disconnect_w_tmo(&button_queue, HZ)) {
     }
@@ -59,9 +58,8 @@ int show_logo(void)
     lcd_clear_display();
     lcd_puts(0, 0, "Rockbox");
     lcd_puts(0, 1, "Rescue boot");
-#ifdef HAVE_LCD_BITMAP
     lcd_update();
-#endif
+
     return 0;
 }
 
@@ -104,10 +102,7 @@ void charging_screen(void)
                 battv / 100, battv % 100, battery_level());
             lcd_puts(0, 1, buf);
         }
-
-#ifdef HAVE_LCD_BITMAP
         lcd_update();
-#endif
 
         button = button_get_w_tmo(HZ/2);
 #ifdef BUTTON_ON
@@ -137,8 +132,8 @@ void prompt_usb(const char* msg1, const char* msg2)
 #ifdef HAVE_LCD_BITMAP
     lcd_puts(0, 2, "Insert USB cable");
     lcd_puts(0, 3, "and fix it.");
-    lcd_update();
 #endif
+    lcd_update();
     do
     {
         button = button_get(true);

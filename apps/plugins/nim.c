@@ -66,6 +66,7 @@ static struct plugin_api* rb;
 static void impossible(void)
 {
     rb->lcd_puts(0,1,"Impossible!");
+    rb->lcd_update();
     rb->sleep(HZ);
     return;
 }
@@ -76,6 +77,7 @@ static void lose(void)
     rb->lcd_define_pattern(hsmile,smile);
     rb->lcd_puts(0,1,"You Win!!");
     rb->lcd_putc(8,1,hsmile);
+    rb->lcd_update();
     end=true;
     rb->sleep(HZ*2);
     return;
@@ -88,6 +90,7 @@ static void win(void)
     rb->lcd_define_pattern(hcry,cry);
     rb->lcd_puts(0,1,"You Lose!!");
     rb->lcd_putc(9,1,hcry);
+    rb->lcd_update();
     end=true;
     rb->sleep(HZ*2);
     return;
@@ -103,7 +106,7 @@ static void display_first_line(int x)
     rb->lcd_puts(0,0,str);
 
     rb->lcd_define_pattern(h1,pattern3);
-    for (i=0;i<x/3;i++) 
+    for (i=0;i<x/3;i++)
         rb->lcd_putc(i,0,h1);
 
     if (x%3==2)
@@ -131,6 +134,7 @@ static void nim_exit(void *parameter)
 
     /*Clear the screen*/
     rb->lcd_clear_display();
+    rb->lcd_update();
 }
 
 /* this is the plugin entry point */
@@ -183,6 +187,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
                 rb->snprintf(str,sizeof(str),"[%d..%d]?=%d",min,v,y);
                 rb->lcd_puts(0,1,str);
+                rb->lcd_update();
 
                 go=false;
                 while (!go)
@@ -221,6 +226,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                     display_first_line(x);
                     rb->snprintf(str,sizeof(str),"[%d..%d]?=%d",min,v,y);
                     rb->lcd_puts(0,1,str);
+                    rb->lcd_update();
                 }
 
                 if ( (y==0) && (x<21))
@@ -281,6 +287,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 x-=y;
                 rb->snprintf(str,sizeof(str),"I take=%d",y);
                 rb->lcd_puts(0,1,str);
+                rb->lcd_update();
                 rb->sleep(HZ);
             }
             if ((x==1)&&(!end))

@@ -74,11 +74,10 @@ void panicf( const char *fmt, ...)
             panic_buf[i+18] = c;
         }
     }
-    lcd_update();
-
 #else
     /* no LCD */
 #endif
+    lcd_update();
     DEBUGF(panic_buf);
 
     set_cpu_frequency(0);

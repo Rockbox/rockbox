@@ -34,7 +34,8 @@ rb->lcd_update()
 #define PUTS(str) do { \
       rb->lcd_puts(0, y, str); \
       y = (y + 1) % 2; \
-} while (0);
+} while (0); \
+rb->lcd_update()
 #endif
 
 extern struct plugin_api* rb;

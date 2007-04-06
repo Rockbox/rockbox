@@ -848,6 +848,7 @@ void ShowFlashInfo(tFlashInfo* pInfo)
     {
         rb->lcd_puts_scroll(0, 0, "Flash: M=? D=?");
         rb->lcd_puts_scroll(0, 1, "Impossible to program");
+        rb->lcd_update();
         WaitForButton();
     }
     else
@@ -860,10 +861,12 @@ void ShowFlashInfo(tFlashInfo* pInfo)
         {
             rb->snprintf(buf, sizeof(buf), "Size: %d KB", pInfo->size / 1024);
             rb->lcd_puts_scroll(0, 1, buf);
+            rb->lcd_update();
         }
         else
         {
             rb->lcd_puts_scroll(0, 1, "Unsupported chip");
+            rb->lcd_update();
             WaitForButton();
         }
     }
@@ -941,7 +944,8 @@ void DoUserDialog(char* filename)
     
     rb->lcd_puts_scroll(0, 0, filename);
     rb->lcd_puts_scroll(0, 1, "[Menu] to check");
-    
+    rb->lcd_update();
+
     button = WaitForButton();
     if (button != BUTTON_MENU)
     {
@@ -950,7 +954,8 @@ void DoUserDialog(char* filename)
     
     rb->lcd_clear_display();
     rb->lcd_puts(0, 0, "Checking...");
-    
+    rb->lcd_update();
+
     rc = CheckFirmwareFile(filename, FlashInfo.size, is_romless);
     rb->lcd_puts(0, 0, "Checked:");
     switch (rc)
@@ -989,6 +994,7 @@ void DoUserDialog(char* filename)
         rb->lcd_puts_scroll(0, 0, "Check failed.");
         break;
     }
+    rb->lcd_update();
 
     rb->sleep(HZ*3);
 
@@ -996,6 +1002,7 @@ void DoUserDialog(char* filename)
     {
         rb->lcd_puts_scroll(0, 0, "[On] to program,");
         rb->lcd_puts_scroll(0, 1, "other key to exit.");
+        rb->lcd_update();
     }
     else
     {   /* error occured */
@@ -1012,7 +1019,8 @@ void DoUserDialog(char* filename)
     rb->lcd_clear_display();
     rb->lcd_puts_scroll(0, 0, "Are you sure?");
     rb->lcd_puts_scroll(0, 1, "[+] to proceed.");
-    
+    rb->lcd_update();
+
     button = WaitForButton();
     
     if (button != BUTTON_RIGHT)
@@ -1022,7 +1030,8 @@ void DoUserDialog(char* filename)
     
     rb->lcd_clear_display();
     rb->lcd_puts_scroll(0, 0, "Programming...");
-    
+    rb->lcd_update();
+
     rc = ProgramFirmwareFile(filename, FlashInfo.size);
     
     if (rc)
@@ -1031,12 +1040,14 @@ void DoUserDialog(char* filename)
         rb->lcd_puts_scroll(0, 0, "Programming failed!");
         rb->snprintf(buf, sizeof(buf), "%d errors", rc);
         rb->lcd_puts_scroll(0, 1, buf);
+        rb->lcd_update();
         WaitForButton();
     }
     
     rb->lcd_clear_display();
     rb->lcd_puts_scroll(0, 0, "Verifying...");
-    
+    rb->lcd_update();
+
     rc = VerifyFirmwareFile(filename);
     
     rb->lcd_clear_display();
@@ -1052,6 +1063,7 @@ void DoUserDialog(char* filename)
     }
 
     rb->lcd_puts_scroll(0, 1, "Press any key to exit.");
+    rb->lcd_update();
     WaitForButton();
 }
 

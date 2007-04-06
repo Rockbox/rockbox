@@ -191,10 +191,10 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
         }
         else
         {
-#else
+#else /* CONFIG_CHARGING < CHARGING_MONITOR */
         lasttime = current_tick;
         {
-#endif
+#endif /* CONFIG_CHARGING < CHARGING_MONITOR */
             /* animate in (max.) 4 steps, starting near the current charge level */
             if (TIME_AFTER(current_tick, bar->battery_icon_switch_tick)) 
             {
@@ -205,7 +205,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
         }
     }
     else
-#endif
+#endif /* CONFIG_CHARGING */
     {
         bar->info.batt_charge_step = -1;
         if (battery_level_safe())
@@ -254,13 +254,6 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
         display->fillrect(0, 0, display->width, STATUSBAR_HEIGHT);
         display->set_drawmode(DRMODE_SOLID);
 
-#else
-
-    /* players always "redraw" */
-    {
-#endif /* HAVE_LCD_BITMAP */
-
-#ifdef HAVE_LCD_BITMAP
         if (bar->info.battery_state)
             gui_statusbar_icon_battery(display, bar->info.battlevel, 
                                        bar->info.batt_charge_step);
@@ -281,7 +274,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
                                     STATUSBAR_PLUG_X_POS,
                                     STATUSBAR_Y_POS, STATUSBAR_PLUG_WIDTH,
                                     STATUSBAR_HEIGHT);
-#endif
+#endif /* CONFIG_CHARGING */
 #ifdef HAVE_RECORDING
         /* turn off volume display in recording screen */
         bool recscreen_on = in_recording_screen();
@@ -332,8 +325,8 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 #endif
         display->update_rect(0, 0, display->width, STATUSBAR_HEIGHT);
         bar->lastinfo = bar->info;
-#endif /* HAVE_LCD_BITMAP */
     }
+#endif /* HAVE_LCD_BITMAP */
 
 
 #ifdef HAVE_LCD_CHARCELLS

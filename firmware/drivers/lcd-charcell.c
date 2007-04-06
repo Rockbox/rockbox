@@ -295,10 +295,7 @@ void lcd_define_pattern(unsigned long ucs, const char *pattern)
         memcpy(xfont_variable[glyph & 0x7fff], pattern, HW_PATTERN_SIZE);
         pat = glyph_to_pat(glyph);
         if (pat != NO_PATTERN)
-        {
             memcpy(lcd_patterns[pat].pattern, pattern, HW_PATTERN_SIZE);
-            lcd_update(); //FIXME: remove when lcd_update() calls are checked all over
-        }
     }
 }
 
@@ -315,8 +312,6 @@ void lcd_clear_display(void)
     for (x = 0; x < LCD_WIDTH; x++)
         for (y = 0; y < LCD_HEIGHT; y++)
             lcd_putxchar(x, y, xspace);
-
-    lcd_update(); //FIXME: remove when lcd_update() calls are checked all over
 }
 
 /* Put an unicode character at the given position */
@@ -326,7 +321,6 @@ void lcd_putc(int x, int y, unsigned long ucs)
         return;
 
     lcd_putxchar(x, y, find_xchar(ucs));
-    lcd_update(); //FIXME: remove when lcd_update() calls are checked all over
 }
 
 /* Show cursor (alternating with existing character) at the given position */
@@ -384,7 +378,6 @@ void lcd_putsxy(int x, int y, const unsigned char *str)
         return;
 
     lcd_putsxyofs(x, y, 0, str);
-    lcd_update(); //FIXME: remove when lcd_update() calls are checked all over
 }
 
 /*** Line oriented text output ***/
@@ -410,8 +403,6 @@ void lcd_puts_offset(int x, int y, const unsigned char *str, int offset)
     x = lcd_putsxyofs(x, y, offset, str);
     while (x < LCD_WIDTH)
         lcd_putxchar(x++, y, xspace);
-
-    lcd_update(); //FIXME: remove when lcd_update() calls are checked all over
 }
 
 /** scrolling **/

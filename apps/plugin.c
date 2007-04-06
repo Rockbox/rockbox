@@ -504,9 +504,7 @@ int plugin_load(const char* plugin, void* parameter)
     int fd;
     ssize_t readsize;
 #endif
-#ifdef HAVE_LCD_BITMAP
     int xm, ym;
-#endif
 #ifdef HAVE_REMOTE_LCD
     int rxm, rym;
 #endif
@@ -589,20 +587,15 @@ int plugin_load(const char* plugin, void* parameter)
 
     plugin_loaded = true;
 
-#ifdef HAVE_LCD_BITMAP
     xm = lcd_getxmargin();
     ym = lcd_getymargin();
     lcd_setmargins(0,0);
-
-#if LCD_DEPTH > 1
+    
+#if defined HAVE_LCD_BITMAP && LCD_DEPTH > 1
     old_backdrop = lcd_get_backdrop();
 #endif
-
     lcd_clear_display();
     lcd_update();
-#else /* !HAVE_LCD_BITMAP */
-    lcd_clear_display();
-#endif
 
 #ifdef HAVE_REMOTE_LCD
     rxm = lcd_remote_getxmargin();
@@ -632,11 +625,12 @@ int plugin_load(const char* plugin, void* parameter)
 #else /* LCD_DEPTH == 1 */
     lcd_set_drawmode(DRMODE_SOLID);
 #endif /* LCD_DEPTH */
+#endif /* HAVE_LCD_BITMAP */
+
     /* restore margins */
     lcd_setmargins(xm,ym);
     lcd_clear_display();
     lcd_update();
-#endif /* HAVE_LCD_BITMAP */
 
 #ifdef HAVE_REMOTE_LCD
 #if LCD_REMOTE_DEPTH > 1

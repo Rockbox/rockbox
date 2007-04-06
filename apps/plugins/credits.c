@@ -90,7 +90,6 @@ void roll_credits(void)
             else
                 rb->lcd_puts(x, line, credits[name]);
 
-
             if (++name >= numnames)
                 break;
 
@@ -104,6 +103,8 @@ void roll_credits(void)
             x += MAX(len/2 + 2, len - new_len/2 + 1);
             len = new_len;
         }
+        rb->lcd_update();
+
         /* abort on keypress */
         if (rb->button_get_w_tmo(HZ/8) & BUTTON_REL)
             return;

@@ -113,8 +113,6 @@ void usb_screen(void)
                         (LCD_HEIGHT-BMPHEIGHT_usblogo)/2,
                         BMPWIDTH_usblogo, BMPHEIGHT_usblogo);
 #endif  /* HAVE_LCD_COLOR */
-
-    lcd_update();
 #else
     lcd_double_height(false);
     lcd_puts_scroll(0, 0, "[USB Mode]");
@@ -122,6 +120,7 @@ void usb_screen(void)
     status_set_audio(false);
     status_set_usb(true);
 #endif /* HAVE_LCD_BITMAP */
+    lcd_update();
 
     gui_syncstatusbar_draw(&statusbars, true);
 #ifdef SIMULATOR
@@ -315,6 +314,8 @@ static void charging_display_info(bool animate)
 
     for (i = 0; i < 4; i++)
         lcd_define_pattern(logo_chars[i], buf + 8 * i);
+        
+    lcd_update();
 }
 #endif /* (not) HAVE_LCD_BITMAP */
 

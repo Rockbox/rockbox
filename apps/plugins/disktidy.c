@@ -87,8 +87,8 @@ void tidy_lcd_status(const char *name, int *removed)
     rb->snprintf(text, 24, "Cleaned up %d items", *removed);
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_puts(0, 2, text);
-    rb->lcd_update();
 #endif
+    rb->lcd_update();
 }
 
 void tidy_get_absolute_path(struct dirent *entry, char *fullname, 

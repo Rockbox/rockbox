@@ -99,6 +99,8 @@ void pgfx_update(void)
 
     for (i = 0; i < char_width * char_height; i++)
         pgfx_rb->lcd_define_pattern(gfx_chars[i], gfx_buffer + 7 * i);
+    
+    pgfx_rb->lcd_update();
 }
 
 /*** Parameter handling ***/

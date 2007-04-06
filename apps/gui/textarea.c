@@ -33,14 +33,16 @@ void gui_textarea_clear(struct screen * display)
 #endif
 }
 
-#ifdef HAVE_LCD_BITMAP
 void gui_textarea_update(struct screen * display)
 {
+#ifdef HAVE_LCD_BITMAP
     int y_start = gui_textarea_get_ystart(display);
     int y_end = gui_textarea_get_yend(display);
     display->update_rect(0, y_start, display->width, y_end - y_start);
-}
+#else
+    display->update();
 #endif
+}
 
 int gui_textarea_put_message(struct screen * display,
                              struct text_message * message,
@@ -56,8 +58,8 @@ int gui_textarea_put_message(struct screen * display,
 
 void gui_textarea_update_nblines(struct screen * display)
 {
-#ifdef HAVE_LCD_BITMAP
     int height=display->height;
+#ifdef HAVE_LCD_BITMAP
     if(global_settings.statusbar)
         height -= STATUSBAR_HEIGHT;
 #ifdef HAS_BUTTONBAR
@@ -66,11 +68,9 @@ void gui_textarea_update_nblines(struct screen * display)
 #endif
     display->getstringsize((unsigned char *)"A", &display->char_width,
                            &display->char_height);
-    display->nb_lines = height / display->char_height;
 #else
     display->char_width  = 1;
     display->char_height = 1;
-    /* default on char based player supported by rb */
-    display->nb_lines = MAX_LINES_ON_SCREEN;
 #endif
+    display->nb_lines = height / display->char_height;
 }

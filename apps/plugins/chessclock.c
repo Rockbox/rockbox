@@ -369,9 +369,8 @@ static int run_timer(int nr)
                              (unsigned char *)show_time((max_ticks-ticks+HZ-1)/HZ));
             }
         }
-#ifdef HAVE_LCD_BITMAP
         rb->lcd_update();
-#endif
+
         button = rb->button_get(false);
         switch (button) {
             /* OFF/ON key to exit */
@@ -493,9 +492,8 @@ static int chessclock_set_int(char* string,
         else
             rb->snprintf(str, sizeof str,"%d", *variable);
         rb->lcd_puts(0, FIRST_LINE+1, (unsigned char *)str);
-#ifdef HAVE_LCD_BITMAP
         rb->lcd_update();
-#endif
+
         button = rb->button_get(true);
         switch(button) {
             case CHC_SETTINGS_INC:
@@ -562,9 +560,8 @@ static int simple_menu(int nr, unsigned char **strarr)
         if (show<0)
             show=nr-1;
         rb->lcd_puts_scroll(0, FIRST_LINE, strarr[show]);
-#ifdef HAVE_LCD_BITMAP
         rb->lcd_update();
-#endif
+
         button = rb->button_get(true);
         switch(button) {
             case CHC_SETTINGS_INC:

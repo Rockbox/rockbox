@@ -129,10 +129,11 @@ bool exit_tsr(bool reenter)
     rb->lcd_clear_display();
     rb->lcd_puts_scroll(0, 0, "Batt.Bench is currently running.");
     rb->lcd_puts_scroll(0, 1, "Press OFF to cancel the test");
-    rb->lcd_puts_scroll(0, 2, "Anything else will resume");
 #ifdef HAVE_LCD_BITMAP
-    rb->lcd_update();
+    rb->lcd_puts_scroll(0, 2, "Anything else will resume");
 #endif
+    rb->lcd_update();
+
     if (rb->button_get(true) != BATTERY_OFF)
         exit = false;
     if (exit)
@@ -369,21 +370,24 @@ int main(void)
     int button, fd;
     bool on = false;
 #ifdef HAVE_LCD_BITMAP
+    int i;
     const char *msgs[] = { "Battery Benchmark","Check file", BATTERY_LOG,
             "for more info", "PLAY - start", "OFF  - quit" };
 #endif    
     rb->lcd_clear_display();
 
 #ifdef HAVE_LCD_BITMAP
-    int i;
-    
     rb->lcd_clear_display();
     rb->lcd_setfont(FONT_SYSFIXED);
 
     for(i = 0; i<(int)(sizeof(msgs)/sizeof(char *)); i++)
         put_centered_str(msgs[i],rb->lcd_putsxy,LCD_WIDTH,i+1);
-    
+#else
+    rb->lcd_puts_scroll(0, 0, "Batt.Bench.");
+    rb->lcd_puts_scroll(0, 1, "PLAY/STOP");
+#endif
     rb->lcd_update();
+    
 #ifdef HAVE_REMOTE_LCD
     rb->lcd_remote_clear_display();
     put_centered_str(msgs[0],rb->lcd_remote_putsxy,LCD_REMOTE_WIDTH,0);
@@ -392,11 +396,6 @@ int main(void)
     put_centered_str(msgs[sizeof(msgs)/sizeof(char*)-1],
                     rb->lcd_remote_putsxy,LCD_REMOTE_WIDTH,2);
     rb->lcd_remote_update();
-#endif
-    
-#else
-    rb->lcd_puts_scroll(0, 0, "Batt.Bench.");
-    rb->lcd_puts_scroll(0, 1, "PLAY/STOP");
 #endif
     
     do

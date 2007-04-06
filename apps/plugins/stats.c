@@ -24,9 +24,6 @@ static struct plugin_api* rb;
 static int files, dirs, musicfiles;
 static int lasttick;
 static bool abort;
-#ifdef HAVE_LCD_BITMAP
-static int fontwidth, fontheight;
-#endif
 
 #if CONFIG_KEYPAD == PLAYER_PAD 
 #define STATS_STOP BUTTON_STOP
@@ -70,42 +67,38 @@ const char *music_exts[] = {"mp3","mp2","mp1","mpa","ogg",
 
 void prn(const char *str, int y)
 {
-#ifdef HAVE_LCD_BITMAP
-    rb->lcd_putsxy(0,y,str);
+    rb->lcd_puts(0,y,str);
 #ifdef HAVE_REMOTE_LCD
-    rb->lcd_remote_putsxy(0,y,str);    
-#endif
-#else
-    rb->lcd_puts(0,y,str);   
+    rb->lcd_remote_puts(0,y,str);
 #endif
 }
 
 void update_screen(void)
 {
     char buf[15];
-#ifdef HAVE_LCD_BITMAP
+
     rb->lcd_clear_display();
 #ifdef HAVE_REMOTE_LCD
     rb->lcd_remote_clear_display();
 #endif
-    
+
+#ifdef HAVE_LCD_BITMAP
     rb->snprintf(buf, sizeof(buf), "Files: %d", files);
     prn(buf,0);
-
     rb->snprintf(buf, sizeof(buf), "Music: %d", musicfiles);
-    prn(buf,fontheight);
-    
+    prn(buf,1);
     rb->snprintf(buf, sizeof(buf), "Dirs: %d", dirs);
-    prn(buf,fontheight*2);
-    rb->lcd_update();
-#ifdef HAVE_REMOTE_LCD
-    rb->lcd_remote_update();
-#endif
+    prn(buf,2);
 #else
     rb->snprintf(buf, sizeof(buf), "Files:%5d", files);
     prn(buf,0);
     rb->snprintf(buf, sizeof(buf), "Dirs: %5d", dirs);
     prn(buf,1);
+#endif
+
+    rb->lcd_update();
+#ifdef HAVE_REMOTE_LCD
+    rb->lcd_remote_update();
 #endif
 }
 
@@ -177,9 +170,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     musicfiles = 0;
     abort = false;
 
-#ifdef HAVE_LCD_BITMAP
-    rb->lcd_getstringsize("Files: ", &fontwidth, &fontheight);
-#endif
     rb->splash(HZ, "Counting...");
     update_screen();
     lasttick = *rb->current_tick;

@@ -214,9 +214,7 @@ static void print_dice(const int dice[], const int total) {
         rb->lcd_puts(0,START_DICE_ROW+(++row)," ");
     }
 #endif
-#ifdef HAVE_LCD_BITMAP
     rb->lcd_update();
-#endif
 }
 static bool dice_menu(int *num_dice, int *side_index) {
     int selection;
