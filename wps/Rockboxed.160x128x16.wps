@@ -42,7 +42,7 @@
 %al %s%ac%?id<%id|%d1>%ar 
 %al %s%ac%?it<%it|%fn>%ar 
 
-%ac%t3%ig;%t%iy 
+%ac%t3%ig;%ac%iy 
 %pb|5|10|150|76|
 %al  %pc%ac%?fc<mp1|mp2|mp3|aiff|wav|vorbis|flac|mpc|a52|wavpack|alac|aac|shn|sid|adx|unknown>%ar%pt  
 %?ps<%xdb>
