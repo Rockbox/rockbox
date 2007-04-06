@@ -1485,6 +1485,8 @@ static void get_subline_timeout(struct gui_wps *gwps, int line, int subline)
     struct wps_data *data = gwps->data;
     int i = data->format_lines[line][subline];
 
+    data->time_mult[line][subline] = DEFAULT_SUBLINE_TIME_MULTIPLIER;
+
     while (data->tokens[i].type != WPS_TOKEN_EOL
            && data->tokens[i].type != WPS_TOKEN_SUBLINE_SEPARATOR
            && i < data->num_tokens)
