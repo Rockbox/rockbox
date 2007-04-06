@@ -1396,10 +1396,6 @@ static bool get_line(struct gui_wps *gwps,
                 i = find_conditional_end(data, i);
                 break;
 
-            case WPS_TOKEN_SUBLINE_TIMEOUT:
-                data->time_mult[line][subline] = data->tokens[i].value.i;
-                break;
-
 #ifdef HAVE_LCD_BITMAP
             case WPS_TOKEN_IMAGE_PRELOAD_DISPLAY:
             {
@@ -1484,9 +1480,44 @@ static bool get_line(struct gui_wps *gwps,
     return update;
 }
 
-/* Calculate which subline should be displayed for each line */
-static bool get_curr_subline(struct wps_data *data, int line)
+static void get_subline_timeout(struct gui_wps *gwps, int line, int subline)
 {
+    struct wps_data *data = gwps->data;
+    int i = data->format_lines[line][subline];
+
+    while (data->tokens[i].type != WPS_TOKEN_EOL
+           && data->tokens[i].type != WPS_TOKEN_SUBLINE_SEPARATOR
+           && i < data->num_tokens)
+    {
+        switch(data->tokens[i].type)
+        {
+            case WPS_TOKEN_CONDITIONAL:
+                /* place ourselves in the right conditional case */
+                i = evaluate_conditional(gwps, i);
+                break;
+
+            case WPS_TOKEN_CONDITIONAL_OPTION:
+                /* we've finished in the curent conditional case,
+                    skip to the end of the conditional structure */
+                i = find_conditional_end(data, i);
+                break;
+
+            case WPS_TOKEN_SUBLINE_TIMEOUT:
+                data->time_mult[line][subline] = data->tokens[i].value.i;
+                break;
+
+            default:
+                break;
+        }
+        i++;
+    }
+}
+
+/* Calculate which subline should be displayed for each line */
+static bool get_curr_subline(struct gui_wps *gwps, int line)
+{
+    struct wps_data *data = gwps->data;
+
     int search, search_start;
     bool reset_subline;
     bool new_subline_refresh;
@@ -1532,6 +1563,9 @@ static bool get_curr_subline(struct wps_data *data, int line)
             }
             else
             {
+                /* get initial time multiplier for this subline */
+                get_subline_timeout(gwps, line, data->curr_subline[line]);
+
                 /* only use this subline if subline time > 0 */
                 if (data->time_mult[line][data->curr_subline[line]] > 0)
                 {
@@ -1791,7 +1825,7 @@ bool gui_wps_refresh(struct gui_wps *gwps,
         update_line = false;
 
         /* get current subline for the line */
-        new_subline_refresh = get_curr_subline(data, line);
+        new_subline_refresh = get_curr_subline(gwps, line);
 
         flags = data->line_type[line][data->curr_subline[line]];
 

@@ -490,13 +490,6 @@ static int parse_subline_timeout(const char *wps_bufptr, struct wps_data *wps_da
     if (have_tenth == false)
         val *= 10;
 
-    /* We only want to allow strictly positive timeout values */
-    if (val <= 0)
-        val = DEFAULT_SUBLINE_TIME_MULTIPLIER;
-
-    int line = wps_data->num_lines;
-    int subline = wps_data->num_sublines[line];
-    wps_data->time_mult[line][subline] = val;
     wps_data->tokens[wps_data->num_tokens].value.i = val;
 
     return skip;
@@ -624,8 +617,6 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
     data->num_tokens = 0;
     char *current_string = data->string_buffer;
 
-    data->time_mult[0][0] = DEFAULT_SUBLINE_TIME_MULTIPLIER;
-
     while(wps_bufptr && *wps_bufptr && data->num_tokens < WPS_MAX_TOKENS
           && data->num_lines < WPS_MAX_LINES)
     {
@@ -644,7 +635,6 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
                     data->tokens[data->num_tokens++].type = WPS_TOKEN_SUBLINE_SEPARATOR;
                     subline = ++(data->num_sublines[data->num_lines]);
                     data->format_lines[data->num_lines][subline] = data->num_tokens;
-                    data->time_mult[data->num_lines][subline] = DEFAULT_SUBLINE_TIME_MULTIPLIER;
                 }
                 else
                     wps_bufptr += skip_end_of_line(wps_bufptr);
@@ -711,7 +701,6 @@ condlistend:  /* close a conditional. sometimes we want to close them even when
                 if (data->num_lines < WPS_MAX_LINES)
                 {
                     data->format_lines[data->num_lines][0] = data->num_tokens;
-                    data->time_mult[data->num_lines][0] = DEFAULT_SUBLINE_TIME_MULTIPLIER;
                 }
 
                 break;
