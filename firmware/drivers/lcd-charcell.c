@@ -26,7 +26,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include "file.h"
-#include "debug.h"
 #include "system.h"
 #include "lcd-charcell.h"
 #include "rbunicode.h"
@@ -35,6 +34,8 @@
 
 #define SCROLLABLE_LINES LCD_HEIGHT
 #define VARIABLE_XCHARS 16 /* number of software user-definable characters */
+/* There must be mappings for this many characters in the 0xe000 unicode range
+ * in lcd-charset-<target>.c */
 
 #define NO_PATTERN (-1)
 
@@ -42,8 +43,8 @@ static int find_xchar(unsigned long ucs);
 
 /** globals **/
 
-/* The "frame"buffer */
-unsigned char lcd_charbuffer[LCD_HEIGHT][LCD_WIDTH];
+unsigned char lcd_charbuffer[LCD_HEIGHT][LCD_WIDTH];  /* The "frame"buffer */
+static unsigned char lcd_substbuffer[LCD_HEIGHT][LCD_WIDTH];
 struct pattern_info lcd_patterns[MAX_HW_PATTERNS];
 struct cursor_info lcd_cursor;
 
@@ -141,44 +142,30 @@ static int find_xchar(unsigned long ucs)
     return xchar_info_size - 1;
 }
 
-static int xchar_to_pat(int xchar)
+static int glyph_to_pat(unsigned glyph)
 {
     int i;
 
     for (i = 0; i < lcd_pattern_count; i++)
-        if (lcd_patterns[i].xchar == xchar)
+        if (lcd_patterns[i].glyph == glyph)
             return i;
 
     return NO_PATTERN;
 }
 
-static const unsigned char *xchar_to_glyph(int xchar)
-{
-    unsigned index = xchar_info[xchar].glyph;
-    
-    if (index & 0x8000)
-        return xfont_variable[index & 0x7fff];
-    else
-        return xfont_fixed[index];
-}
-
-static void lcd_free_pat(int xchar)
+static void lcd_free_pat(int pat)
 {
     int x, y;
-    unsigned char substitute;
-    int pat = xchar_to_pat(xchar);
 
     if (pat != NO_PATTERN)
     {
-        substitute = xchar_info[xchar].hw_char;
-
         for (x = 0; x < LCD_WIDTH; x++)
             for (y = 0; y < LCD_HEIGHT; y++)
                 if (pat == lcd_charbuffer[y][x])
-                    lcd_charbuffer[y][x] = substitute;
+                    lcd_charbuffer[y][x] = lcd_substbuffer[y][x];
 
         if (lcd_cursor.enabled && pat == lcd_cursor.hw_char)
-            lcd_cursor.hw_char = substitute;
+            lcd_cursor.hw_char = lcd_cursor.subst_char;
 
         lcd_patterns[pat].count = 0;
     }
@@ -190,7 +177,7 @@ static int lcd_get_free_pat(int xchar)
 
     int pat = last_used_pat; /* start from last used pattern */
     int least_pat = pat;     /* pattern with least priority */
-    int least_priority = xchar_info[lcd_patterns[pat].xchar].priority;
+    int least_priority = lcd_patterns[pat].priority;
     int i;
 
     for (i = 0; i < lcd_pattern_count; i++)
@@ -200,44 +187,58 @@ static int lcd_get_free_pat(int xchar)
             
         if (lcd_patterns[pat].count == 0)
         {
-            lcd_patterns[pat].xchar = xchar;
             last_used_pat = pat;
             return pat;
         }
-        if (xchar_info[lcd_patterns[pat].xchar].priority < least_priority)
+        if (lcd_patterns[pat].priority < least_priority)
         {
-            least_priority = xchar_info[lcd_patterns[pat].xchar].priority;
+            least_priority = lcd_patterns[pat].priority;
             least_pat = pat;
         }
     }
     if (xchar_info[xchar].priority > least_priority) /* prioritized char */
     {
-        lcd_free_pat(lcd_patterns[least_pat].xchar);
-        lcd_patterns[least_pat].xchar = xchar;
+        lcd_free_pat(least_pat);
         last_used_pat = least_pat;
         return least_pat;
     }
     return NO_PATTERN;
 }
 
-static int map_xchar(int xchar)
+static const unsigned char *glyph_to_pattern(unsigned glyph)
+{
+    if (glyph & 0x8000)
+        return xfont_variable[glyph & 0x7fff];
+    else
+        return xfont_fixed[glyph];
+}
+
+static int map_xchar(int xchar, unsigned char *substitute)
 {
     int pat;
+    unsigned glyph;
 
     if (xchar_info[xchar].priority > 0)      /* soft char */
     {
-        pat = xchar_to_pat(xchar);
+        glyph = xchar_info[xchar].glyph;
+        pat = glyph_to_pat(glyph);
  
         if (pat == NO_PATTERN)               /* not yet mapped */
         {
             pat = lcd_get_free_pat(xchar);   /* try to map */
+
             if (pat == NO_PATTERN)           /* failed: just use substitute */
                 return xchar_info[xchar].hw_char;
-            else                             /* define pattern */
-                memcpy(lcd_patterns[pat].pattern, xchar_to_glyph(xchar),
+            else 
+            {                            /* define pattern */
+                lcd_patterns[pat].priority = xchar_info[xchar].priority;
+                lcd_patterns[pat].glyph = glyph;
+                memcpy(lcd_patterns[pat].pattern, glyph_to_pattern(glyph),
                        HW_PATTERN_SIZE);
+            }
         }
-        lcd_patterns[pat].count++;             /* increase reference count */
+        lcd_patterns[pat].count++;           /* increase reference count */
+        *substitute = xchar_info[xchar].hw_char;
         return pat;
     }
     else                                     /* hardware char */
@@ -248,10 +249,10 @@ static void lcd_putxchar(int x, int y, int xchar)
 {
     int lcd_char = lcd_charbuffer[y][x];
 
-    if (lcd_char < lcd_pattern_count)         /* old char was soft */
-        lcd_patterns[lcd_char].count--;        /* decrease old reference count */
+    if (lcd_char < lcd_pattern_count)        /* old char was soft */
+        lcd_patterns[lcd_char].count--;      /* decrease old reference count */
 
-    lcd_charbuffer[y][x] = map_xchar(xchar);
+    lcd_charbuffer[y][x] = map_xchar(xchar, &lcd_substbuffer[y][x]);
 }
 
 /** user-definable pattern handling **/
@@ -274,25 +275,25 @@ unsigned long lcd_get_locked_pattern(void)
 void lcd_unlock_pattern(unsigned long ucs)
 {
     int xchar = find_xchar(ucs);
-    int index = xchar_info[xchar].glyph;
+    unsigned glyph = xchar_info[xchar].glyph;
 
-    if (index & 0x8000) /* variable extended char */
+    if (glyph & 0x8000) /* variable extended char */
     {
-        lcd_free_pat(xchar);
-        xfont_variable_locked[index & 0x7fff] = false;
+        lcd_free_pat(glyph_to_pat(glyph));
+        xfont_variable_locked[glyph & 0x7fff] = false;
     }
 }
 
 void lcd_define_pattern(unsigned long ucs, const char *pattern)
 {
     int xchar = find_xchar(ucs);
-    int index = xchar_info[xchar].glyph;
+    unsigned glyph = xchar_info[xchar].glyph;
     int pat;
 
-    if (index & 0x8000) /* variable extended char */
+    if (glyph & 0x8000) /* variable extended char */
     {
-        memcpy(xfont_variable[index & 0x7fff], pattern, HW_PATTERN_SIZE);
-        pat = xchar_to_pat(xchar);
+        memcpy(xfont_variable[glyph & 0x7fff], pattern, HW_PATTERN_SIZE);
+        pat = glyph_to_pat(glyph);
         if (pat != NO_PATTERN)
         {
             memcpy(lcd_patterns[pat].pattern, pattern, HW_PATTERN_SIZE);
@@ -337,7 +338,7 @@ void lcd_put_cursor(int x, int y, unsigned long cursor_ucs)
 
     lcd_cursor.enabled = true;
     lcd_cursor.visible = false;
-    lcd_cursor.hw_char = map_xchar(find_xchar(cursor_ucs));
+    lcd_cursor.hw_char = map_xchar(find_xchar(cursor_ucs), &lcd_cursor.subst_char);
     lcd_cursor.x = x;
     lcd_cursor.y = y;
     lcd_cursor.downcount = 0;

@@ -25,6 +25,7 @@
 
 struct cursor_info {
     unsigned char hw_char;
+    unsigned char subst_char;
     bool enabled;
     bool visible;
     int x;
@@ -47,7 +48,8 @@ struct xchar_info {
 /* track usage of user-definable characters */
 struct pattern_info {
     short count;
-    unsigned short xchar;
+    unsigned short glyph;
+    unsigned char priority;
     unsigned char pattern[HW_PATTERN_SIZE];
 };
 
