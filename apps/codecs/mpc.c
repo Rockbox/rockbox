@@ -100,6 +100,8 @@ next_track:
         goto exit;
     }
 
+    samplesdone = ci->id3->offset;
+
     /* read file's streaminfo data */
     mpc_streaminfo_init(&info);
     if (mpc_streaminfo_read(&info, &reader) != ERROR_CODE_OK) {
@@ -128,9 +130,21 @@ next_track:
         retval = CODEC_ERROR;
         goto done;
     }
+    
+    /* Resume to saved sample offset. */
+    if(samplesdone > 0) {
+        /* hack to improve seek time if filebuf goes empty */
+        ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*512);
+        if (mpc_decoder_seek_sample(&decoder, samplesdone)) {
+            ci->set_elapsed(samplesdone/frequency);
+        } else {
+            samplesdone = 0;
+        }
+        /* reset chunksize */
+        ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*16);
+    }
 
     /* This is the decoding loop. */
-    samplesdone = 0;
     do {
        #if 1
        /* Complete seek handler. */
@@ -173,6 +187,7 @@ next_track:
                               status);
             samplesdone += status;
             ci->set_elapsed(samplesdone/frequency);
+            ci->set_offset(samplesdone);
         }
     } while (status != 0);
     retval = CODEC_OK;

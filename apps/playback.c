@@ -2855,6 +2855,7 @@ static bool audio_load_track(int offset, bool start_play, bool rebuffer)
         case AFMT_PCM_WAV:
         case AFMT_A52:
         case AFMT_AAC:
+        case AFMT_MPC:
             tracks[track_widx].id3.offset = offset;
             break;
         }
