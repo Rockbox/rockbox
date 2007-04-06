@@ -22,7 +22,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <sys/stat.h>
-#include <sys/time.h>
+#include <time.h>
 #ifdef __FreeBSD__
 #include <sys/param.h>
 #include <sys/mount.h>
