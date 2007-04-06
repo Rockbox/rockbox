@@ -22,6 +22,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <sys/stat.h>
+#include <sys/time.h>
 #ifdef __FreeBSD__
 #include <sys/param.h>
 #include <sys/mount.h>
@@ -136,6 +137,7 @@ struct sim_dirent *sim_readdir(MYDIR *dir)
     static struct sim_dirent secret;
     struct stat s;
     struct dirent *x11 = (readdir)(dir->dir);
+    struct tm* tm;
 
     if(!x11)
         return (struct sim_dirent *)0;
@@ -155,9 +157,14 @@ struct sim_dirent *sim_readdir(MYDIR *dir)
     
     secret.attribute = S_ISDIR(s.st_mode)?ATTR_DIRECTORY:0;
     secret.size = s.st_size;
-    secret.wrtdate = (unsigned short)(s.st_mtime >> 16); 
-    secret.wrttime = (unsigned short)(s.st_mtime & 0xFFFF); 
 
+    tm = localtime(&(s.st_mtime));
+    secret.wrtdate = ((tm->tm_year - 80) << 9) |
+                        ((tm->tm_mon + 1) << 5) |
+                        tm->tm_mday;
+    secret.wrttime = (tm->tm_hour << 11) |
+                        (tm->tm_min << 5) |
+                        (tm->tm_sec >> 1);
     return &secret;
 }
 
