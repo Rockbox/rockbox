@@ -353,6 +353,7 @@ target/sh/archos/ondio/button-ondio.c
 #ifndef SIMULATOR
 target/arm/sandisk/sansa-e200/ata-e200.c
 target/arm/sandisk/sansa-e200/lcd-e200.c
+target/arm/sandisk/sansa-e200/lcd-as-e200.S
 target/arm/sandisk/sansa-e200/adc-e200.c
 target/arm/sandisk/sansa-e200/backlight-e200.c
 target/arm/usb-pp.c
