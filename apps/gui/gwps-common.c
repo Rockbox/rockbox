@@ -1763,14 +1763,9 @@ bool gui_wps_refresh(struct gui_wps *gwps,
     /* reset to first subline if refresh all flag is set */
     if (refresh_mode == WPS_REFRESH_ALL)
     {
-        int j;
         for (i = 0; i < data->num_lines; i++)
         {
             data->curr_subline[i] = SUBLINE_RESET;
-            for (j = 0; j < data->num_sublines[i]; j++)
-            {
-                data->time_mult[i][j] = DEFAULT_SUBLINE_TIME_MULTIPLIER;
-            }
         }
     }
 
