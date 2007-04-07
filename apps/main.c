@@ -172,7 +172,14 @@ static int init_dircache(bool preinit)
         }
         
         if (result < 0)
-            gui_syncsplash(0, "Failed! Result: %d", result);
+        {
+            /* Initialization of dircache failed. Manual action is
+             * necessary to enable dircache again.
+             */
+            gui_syncsplash(0, "Dircache failed, disabled. Result: %d", result);
+            global_settings.dircache = false;
+        }
+            
     }
     
     if (clear)

@@ -405,7 +405,7 @@ static struct dircache_entry* dircache_get_entry(const char *path,
     return cache_entry;
 }
 
-#if 1
+#ifdef HAVE_EEPROM_SETTINGS
 /**
  * Function to load the internal cache structure from disk to initialize
  * the dircache really fast and little disk access.
@@ -480,9 +480,6 @@ int dircache_save(void)
 
     remove(DIRCACHE_FILE);
     
-    while (thread_enabled)
-        sleep(1);
-        
     if (!dircache_initialized)
         return -1;
 
@@ -718,7 +715,7 @@ bool dircache_is_enabled(void)
  */
 bool dircache_is_initializing(void)
 {
-    return dircache_initializing;
+    return dircache_initializing || thread_enabled;
 }
 
 /**
@@ -835,7 +832,7 @@ void dircache_copy_path(const struct dircache_entry *entry, char *buf, int size)
 static int block_until_ready(void)
 {
     /* Block until dircache has been built. */
-    while (!dircache_initialized && dircache_initializing)
+    while (!dircache_initialized && dircache_is_initializing())
         sleep(1);
     
     if (!dircache_initialized)
@@ -918,7 +915,7 @@ void dircache_bind(int fd, const char *path)
     struct dircache_entry *entry;
     
     /* Queue requests until dircache has been built. */
-    if (!dircache_initialized && dircache_initializing)
+    if (!dircache_initialized && dircache_is_initializing())
     {
         if (fdbind_idx >= MAX_PENDING_BINDINGS)
             return ;
