@@ -1013,6 +1013,18 @@ static char *get_tag(struct gui_wps *gwps,
         }
 #endif
 
+        case WPS_TOKEN_BATTERY_SLEEPTIME:
+        {
+            if (get_sleep_timer() == 0)
+                return NULL;
+            else
+            {
+                format_time(buf, buf_size, \
+                            get_sleep_timer() * 1000);
+                return buf;
+            }
+        }
+
         case WPS_TOKEN_PLAYBACK_STATUS:
         {
             int status = audio_status();
