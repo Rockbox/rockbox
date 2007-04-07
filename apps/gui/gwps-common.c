@@ -1388,6 +1388,7 @@ static bool get_line(struct gui_wps *gwps,
             case WPS_TOKEN_CONDITIONAL:
                 /* place ourselves in the right conditional case */
                 i = evaluate_conditional(gwps, i);
+                update = true;
                 break;
 
             case WPS_TOKEN_CONDITIONAL_OPTION:
