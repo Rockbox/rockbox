@@ -488,7 +488,7 @@ void get_current_file(char* buffer, int buffer_len)
     struct entry* dc = tc.dircache;
     struct entry* e = &dc[tc.selected_item];
     snprintf(buffer, buffer_len, "%s/%s", getcwd(NULL,0),
-                                          e->name);
+                                          tc.dirlength ? e->name : "");
 }
 
 /* Selects a file and update tree context properly */
