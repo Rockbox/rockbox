@@ -86,13 +86,15 @@ Example for the \config{\%dN} commands: If the path is
          & You can set the height, position and width of the progressbar %
            (in pixels): \config{\%pb{\textbar}height{\textbar}leftpos%
            {\textbar}rightpos{\textbar}}} \\
-    \opt{player}{
+    \opt{player}{%
     \config{\%pf} & Full-line progress bar \& time display\\
-    }
+    }%
     \config{\%pc} & Current Time In Song\\
     \config{\%pe} & Total Number of Playlist Entries\\
-    \config{\%pm} & Peak Meter (Recorder only) The entire line is used as%
-                    volume peak meter.\\
+    \nopt{player}{%
+    \config{\%pm} & Peak Meter. The entire line is used as %
+                    volume peak meter.\\%
+    }%
     \config{\%pn} & Playlist Name (Without path or extension)\\
     \config{\%pp} & Playlist Position\\
     \config{\%pr} & Remaining Time In Song\\

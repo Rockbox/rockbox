@@ -288,7 +288,7 @@
 \newcommand{\optnvalue}{0}
  \newcommand{\nopt}[2]{%
    \renewcommand{\optnvalue}{0}\opt{#1}{\renewcommand{\optnvalue}{1}}%
-   \ifthenelse{\optnvalue > 0}{}{#2}
+   \ifthenelse{\optnvalue > 0}{}{#2}%
  }
 
 % Use the reference to handle get a flexible reference command
