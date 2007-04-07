@@ -67,8 +67,8 @@ void dircache_rename(const char *oldpath, const char *newpath);
 struct sim_dirent {
     unsigned char d_name[MAX_PATH];
     int attribute;
-    int size;
-    int startcluster;
+    long size;
+    long startcluster;
     unsigned short wrtdate; /*  Last write date */ 
     unsigned short wrttime; /*  Last write time */
 };
