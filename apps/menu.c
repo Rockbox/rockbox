@@ -668,7 +668,7 @@ int menu_init(const struct menu_item* mitems, int count, int (*callback)(int, in
     menus[menu].callback = callback;
     menus[menu].current_selection = 0;
     if ((button2 == NULL) && (button3 == NULL))
-        menus[menu].title = button1;
+        menus[menu].title = (char*)button1;
     else menus[menu].title = NULL;
     return menu;
 }
@@ -707,6 +707,7 @@ static char* oldmenuwrapper_getname(int selected_item,
 #ifdef HAVE_LCD_BITMAP
 static void oldmenu_get_icon(int selected_item, void * data, ICON * icon)
 {
+    (void)data; (void)selected_item;
     *icon = bitmap_icons_6x8[Icon_Menu_functioncall];
 }
 #endif
