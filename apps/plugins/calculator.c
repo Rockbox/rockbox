@@ -521,7 +521,7 @@ void transcendFunc(char* func, double* tt, int* ttPower)
     *ttPower = 0;
     calStatus = cal_normal;
 
-    if( func[0] =='s' || func[0] =='S')
+    if( func[0] =='s' || func[0] =='S'|| func[0] =='t' || func[0] =='T')
         sign = SIGN(t);
     else {
         /* if( func[0] =='c' || func[0] =='C') */
@@ -544,6 +544,8 @@ void transcendFunc(char* func, double* tt, int* ttPower)
         t = M_PI - t;
         if (func[0] =='c' || func[0] =='C')
             sign = -1;
+        else if (func[0] =='t' || func[0] =='T')
+            t*=-1;
     }
     else if ( 3*M_PI_2 <= t && t <= M_TWOPI)
         t -= M_TWOPI;
@@ -561,9 +563,19 @@ void transcendFunc(char* func, double* tt, int* ttPower)
         *tt = sign*y;
         return;
     }
-    else /* if( func[0] =='c' || func[0] =='C')*/ {
+    else if( func[0] =='c' || func[0] =='C') {
         *tt = sign*x;
         return;
+    }
+    else /*if( func[0] =='t' || func[0] =='T')*/ {
+        if(t==M_PI_2||t==-M_PI_2){
+            calStatus = cal_error;
+            return;
+        }
+        else{
+            *tt = sign*(y/x);
+            return;
+        }
     }
 
 }
@@ -657,6 +669,9 @@ void oneOperand(void)
                 break;
             case sci_cos:
                 transcendFunc("cos", &result, &power);
+                break;
+            case sci_tan:
+                transcendFunc("tan", &result, &power);
                 break;
             case sci_fac:
                 if (power<0 || power>8 || result<0 )
