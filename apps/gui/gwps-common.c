@@ -747,16 +747,16 @@ static char* get_dir(char* buf, int buf_size, const char* path, int level)
 /* Return the tag found at index i and write its value in buf.
    The return value is buf if the tag had a value, or NULL if not.
 
-   intval is used with enums: when this function is called, it should contain
-   the number of options in the enum. When this function returns, it will
-   contain the enum case we are actually in.
-   When not treating an enum, intval should be NULL.
+   intval is used with conditionals/enums: when this function is called,
+   intval should contain the number of options in the conditional/enum.
+   When this function returns, intval is -1 if the tag is non numeric or,
+   if the tag is numeric, intval is the enum case we want to go to.
+   When not treating a conditional/enum, intval should be NULL.
 */
-static char *get_tag(struct gui_wps *gwps,
-                     int i,
-                     char *buf,
-                     int buf_size,
-                     int *intval)
+static char *get_token_value(struct gui_wps *gwps,
+                             struct wps_token *token,
+                             char *buf, int buf_size,
+                             int *intval)
 {
     if (!gwps)
         return NULL;
@@ -769,7 +769,7 @@ static char *get_tag(struct gui_wps *gwps,
 
     struct mp3entry *id3;
 
-    if (data->tokens[i].next)
+    if (token->next)
         id3 = state->nid3;
     else
         id3 = state->id3;
@@ -779,19 +779,22 @@ static char *get_tag(struct gui_wps *gwps,
 
     int limit = 1;
     if (intval)
+    {
         limit = *intval;
+        *intval = -1;
+    }
 
 #if CONFIG_RTC
     static struct tm* tm;
 #endif
 
-    switch (data->tokens[i].type)
+    switch (token->type)
     {
         case WPS_TOKEN_CHARACTER:
-            return &(data->tokens[i].value.c);
+            return &(token->value.c);
 
         case WPS_TOKEN_STRING:
-            return data->strings[data->tokens[i].value.i];
+            return data->strings[token->value.i];
 
         case WPS_TOKEN_TRACK_TIME_ELAPSED:
             format_time(buf, buf_size,
@@ -949,7 +952,7 @@ static char *get_tag(struct gui_wps *gwps,
             return id3->vbr ? "(avg)" : NULL;
 
         case WPS_TOKEN_FILE_DIRECTORY:
-            return get_dir(buf, buf_size, id3->path, data->tokens[i].value.i);
+            return get_dir(buf, buf_size, id3->path, token->value.i);
 
         case WPS_TOKEN_BATTERY_PERCENT:
         {
@@ -1310,7 +1313,7 @@ static int evaluate_conditional(struct gui_wps *gwps, int cond_index)
 
     struct wps_data *data = gwps->data;
 
-    int ret;
+    int ret, i;
     int num_options = data->tokens[cond_index].value.i;
     char result[128], *value;
     int cond_start = cond_index;
@@ -1320,34 +1323,33 @@ static int evaluate_conditional(struct gui_wps *gwps, int cond_index)
            && cond_start < data->num_tokens)
         cond_start++;
 
-    if (num_options > 2)  /* enum */
-    {
-        int intval = num_options;
-        /* get_tag needs to know the number of options in the enum */
-        get_tag(gwps, cond_index + 1, result, sizeof(result), &intval);
-        /* intval is now the number of the enum option we want to read,
-           starting from 1 */
-        if (intval > num_options || intval < 1)
-            intval = num_options;
+    /* treat ?xx<true> constructs as if they had 2 options. */
+    if (num_options < 2)
+        num_options = 2;
 
-        int next = cond_start;
-        int i;
-        for (i = 1; i < intval; i++)
-        {
-            next = data->tokens[next].value.i;
-        }
-        ret = next;
-    }
-    else  /* %?xx<true|false> or %?<true> */
+    int intval = num_options;
+    /* get_token_value needs to know the number of options in the enum */
+    value = get_token_value(gwps, &data->tokens[cond_index + 1],
+                            result, sizeof(result), &intval);
+
+    /* intval is now the number of the enum option we want to read,
+       starting from 1. If intval is -1, we check on the nullity of value. */
+    if (intval == -1)
+        intval = value ? 1 : num_options;
+    else if (intval > num_options || intval < 1)
+        intval = num_options;
+
+    /* skip to the right enum case */
+    int next = cond_start;
+    for (i = 1; i < intval; i++)
     {
-        value = get_tag(gwps, cond_index + 1, result, sizeof(result), NULL);
-        ret = value ? cond_start : data->tokens[cond_start].value.i;
+        next = data->tokens[next].value.i;
     }
+    ret = next;
 
 #ifdef HAVE_LCD_BITMAP
     /* clear all pictures in the conditional */
-    int i;
-    for (i=0; i < MAX_IMAGES; i++)
+    for (i = 0; i < MAX_IMAGES; i++)
     {
         if (data->img[i].cond_index == cond_index)
             clear_image_pos(gwps, i);
@@ -1455,7 +1457,8 @@ static bool get_line(struct gui_wps *gwps,
             default:
             {
                 /* get the value of the tag and copy it to the buffer */
-                char *value = get_tag(gwps,i,temp_buf,sizeof(temp_buf),NULL);
+                char *value = get_token_value(gwps, &data->tokens[i],
+                                              temp_buf, sizeof(temp_buf), NULL);
                 if (value)
                 {
                     update = true;
