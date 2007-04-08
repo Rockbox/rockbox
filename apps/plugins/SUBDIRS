@@ -20,8 +20,9 @@ sudoku
 zxbox
 #endif
 
-/* For all the colour targets and iriver H1x0 */
-#if defined(HAVE_LCD_COLOR) || defined(IRIVER_H100_SERIES)
+/* For all the colour targets, iriver H1x0 and iAudio M5 */
+#if defined(HAVE_LCD_COLOR) || defined(IRIVER_H100_SERIES) \
+ || defined(IAUDIO_M5)
 pacbox
 #endif
 
