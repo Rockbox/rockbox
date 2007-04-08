@@ -671,7 +671,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
     char *current_string = data->string_buffer;
 
     while(*wps_bufptr && data->num_tokens < WPS_MAX_TOKENS - 1
-            && data->num_lines < WPS_MAX_LINES)
+          && data->num_lines < WPS_MAX_LINES)
     {
         switch(*wps_bufptr++)
         {
@@ -906,6 +906,19 @@ static void load_wps_bitmaps(struct wps_data *wps_data, char *bmpdir)
 
 #endif /* HAVE_LCD_BITMAP */
 
+/* Skip leading UTF-8 BOM, if present. */
+static char *skip_utf8_bom(char *buf)
+{
+    unsigned char *s = (unsigned char *)buf;
+
+    if(s[0] == 0xef && s[1] == 0xbb && s[2] == 0xbf)
+    {
+        buf += 3;
+    }
+
+    return buf;
+}
+
 /* to setup up the wps-data from a format-buffer (isfile = false)
    from a (wps-)file (isfile = true)*/
 bool wps_data_load(struct wps_data *wps_data,
@@ -974,6 +987,9 @@ bool wps_data_load(struct wps_data *wps_data,
 #ifdef HAVE_LCD_BITMAP
         clear_bmp_names();
 #endif
+
+        /* Skip leading UTF-8 BOM, if present. */
+        wps_buffer = skip_utf8_bom(wps_buffer);
 
         /* parse the WPS source */
         if (!wps_parse(wps_data, wps_buffer))

@@ -60,21 +60,6 @@
                                 /* 3% of 30min file == 54s step size */
 #define MIN_FF_REWIND_STEP 500
 
-#if 0
-/* Skip leading UTF-8 BOM, if present. */
-static char* skip_utf8_bom(char* buf)
-{
-    unsigned char* s = (unsigned char*) buf;
-    
-    if(s[0] == 0xef && s[1] == 0xbb && s[2] == 0xbf)
-    {
-        buf += 3;
-    }
-    
-    return buf;
-}
-#endif
-
 /* draws the statusbar on the given wps-screen */
 #ifdef HAVE_LCD_BITMAP
 void gui_wps_statusbar_draw(struct gui_wps *wps, bool force)
