@@ -1105,6 +1105,7 @@ static bool do_set_setting(const unsigned char* string, void *variable,
     }
 
     gui_synclist_draw(&lists);
+    action_signalscreenchange();
     while (!done)
     {
 
@@ -1174,6 +1175,7 @@ static bool do_set_setting(const unsigned char* string, void *variable,
     else if (oldvalue != *(bool*)variable)
          settings_save();
 
+    action_signalscreenchange();
     return false;
 }
 static const char *unit_strings[] = 
