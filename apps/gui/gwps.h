@@ -71,23 +71,25 @@ struct align_pos {
 #define MAX_IMAGES (26*2) /* a-z and A-Z */
 #define IMG_BUFSIZE ((LCD_HEIGHT*LCD_WIDTH*LCD_DEPTH/8) \
                    + (2*LCD_HEIGHT*LCD_WIDTH/8))
-#define WPS_MAX_LINES (LCD_HEIGHT/5+1)
-#define WPS_MAX_TOKENS 1024
-#define WPS_MAX_STRINGS 128
-#define STRING_BUFFER_SIZE 512
-#define WPS_MAX_COND_LEVEL 10
+
+#define WPS_MAX_LINES       (LCD_HEIGHT/5+1)
+#define WPS_MAX_SUBLINES    (WPS_MAX_LINES*3)
+#define WPS_MAX_TOKENS      1024
+#define WPS_MAX_STRINGS     128
+#define STRING_BUFFER_SIZE  512
+#define WPS_MAX_COND_LEVEL  10
 
 #else
 
-#define WPS_MAX_LINES 2
-#define WPS_MAX_TOKENS 64
-#define WPS_MAX_STRINGS 32
-#define STRING_BUFFER_SIZE 64
-#define WPS_MAX_COND_LEVEL 5
+#define WPS_MAX_LINES       2
+#define WPS_MAX_SUBLINES    12
+#define WPS_MAX_TOKENS      64
+#define WPS_MAX_STRINGS     32
+#define STRING_BUFFER_SIZE  64
+#define WPS_MAX_COND_LEVEL  5
 
 #endif
 
-#define WPS_MAX_SUBLINES 12
 #define DEFAULT_SUBLINE_TIME_MULTIPLIER 20 /* (10ths of sec) */
 #define BASE_SUBLINE_TIME 10 /* base time that multiplier is applied to
                                 (1/HZ sec, or 100ths of sec) */
@@ -100,18 +102,13 @@ enum wps_token_type {
     /* Markers */
     WPS_TOKEN_CHARACTER,
     WPS_TOKEN_STRING,
-    WPS_TOKEN_EOL,
 
     /* Alignment */
     WPS_TOKEN_ALIGN_LEFT,
     WPS_TOKEN_ALIGN_CENTER,
     WPS_TOKEN_ALIGN_RIGHT,
 
-    /* Scrolling */
-    WPS_TOKEN_SCROLL,
-
-    /* Alternating sublines */
-    WPS_TOKEN_SUBLINE_SEPARATOR,
+    /* Sublines */
     WPS_TOKEN_SUBLINE_TIMEOUT,
 
     /* Battery */
@@ -228,12 +225,6 @@ enum wps_token_type {
     WPS_TOKEN_PLAYLIST_POSITION,
     WPS_TOKEN_PLAYLIST_SHUFFLE,
 
-#ifdef HAVE_LCD_BITMAP
-    /* Statusbar */
-    WPS_TOKEN_STATUSBAR_ENABLED,
-    WPS_TOKEN_STATUSBAR_DISABLED,
-#endif
-
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
     /* Virtual LED */
     WPS_TOKEN_VLED_HDD
@@ -242,11 +233,50 @@ enum wps_token_type {
 
 struct wps_token {
     enum wps_token_type type;
+
+    /* Whether the tag (e.g. track name or the album) refers the
+       current or the next song (false=current, true=next) */
     bool next;
+
     union {
         char c;
         unsigned short i;
     } value;
+};
+
+/* Description of a subline on the WPS */
+struct wps_subline {
+
+    /* Index of the first token for this subline in the token array.
+       Tokens of this subline end where tokens for the next subline
+       begin. */
+    unsigned short first_token_idx;
+
+    /* Bit or'ed WPS_REFRESH_xxx */
+    unsigned char line_type;
+
+    /* How long the subline should be displayed, in 10ths of sec */
+    unsigned char time_mult;
+};
+
+/* Description of a line on the WPS. A line is a set of sublines.
+   A subline is displayed for a certain amount of time. After that,
+   the next subline of the line is displayed. And so on. */
+struct wps_line {
+
+    /* Number of sublines in this line */
+    signed char num_sublines;
+
+    /* Number (0-based) of the subline within this line currently being displayed */
+    signed char curr_subline;
+
+    /* Index of the first subline of this line in the subline array.
+       Sublines for this line end where sublines for the next line begin. */
+    unsigned short first_subline_idx;
+
+    /* When the next subline of this line should be displayed
+       (absolute time value in ticks) */
+    long subline_expire_time;
 };
 
 
@@ -273,20 +303,24 @@ struct wps_data
     unsigned short wps_progress_pat[8];
     bool full_line_progressbar;
 #endif
-    unsigned short format_lines[WPS_MAX_LINES][WPS_MAX_SUBLINES];
-    unsigned char num_lines;
-    unsigned char line_type[WPS_MAX_LINES][WPS_MAX_SUBLINES];
-    unsigned short time_mult[WPS_MAX_LINES][WPS_MAX_SUBLINES];
-    long subline_expire_time[WPS_MAX_LINES];
-    short curr_subline[WPS_MAX_LINES];
-    unsigned char num_sublines[WPS_MAX_LINES];
+    /* Number of lines in the WPS. During WPS parsing, this is
+       the index of the line being parsed. */
+    int num_lines;
+    struct wps_line lines[WPS_MAX_LINES];
 
+    /* Total number of sublines in the WPS. During WPS parsing, this is
+       the index of the subline where the parsed tokens are added to. */
+    int num_sublines;
+    struct wps_subline sublines[WPS_MAX_SUBLINES];
+
+    /* Total number of tokens in the WPS. During WPS parsing, this is
+       the index of the token being parsed. */
+    int num_tokens;
     struct wps_token tokens[WPS_MAX_TOKENS];
-    unsigned short num_tokens;
 
     char string_buffer[STRING_BUFFER_SIZE];
     char *strings[WPS_MAX_STRINGS];
-    unsigned char num_strings;
+    int num_strings;
 
     bool wps_loaded;
 };
@@ -299,6 +333,24 @@ void wps_data_init(struct wps_data *wps_data);
 bool wps_data_load(struct wps_data *wps_data,
                    const char *buf,
                    bool isfile);
+
+/* Returns the index of the subline in the subline array
+   line - 0-based line number
+   subline - 0-based subline number within the line
+ */
+int wps_subline_index(struct wps_data *wps_data, int line, int subline);
+
+/* Returns the index of the first subline's token in the token array
+   line - 0-based line number
+   subline - 0-based subline number within the line
+ */
+int wps_first_token_index(struct wps_data *data, int line, int subline);
+
+/* Returns the index of the last subline's token in the token array.
+   line - 0-based line number
+   subline - 0-based subline number within the line
+ */
+int wps_last_token_index(struct wps_data *data, int line, int subline);
 
 /* wps_data end */
 
@@ -329,11 +381,11 @@ struct wps_state
 /* wps_state end*/
 
 /* gui_wps
-   defines a wps with it's data, state,
+   defines a wps with its data, state,
    and the screen on which the wps-content should be drawn */
 struct gui_wps
 {
-    struct screen * display;
+    struct screen *display;
     struct wps_data *data;
     struct wps_state *state;
     struct gui_statusbar *statusbar;

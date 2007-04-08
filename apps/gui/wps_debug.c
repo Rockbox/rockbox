@@ -24,107 +24,122 @@
 #include "gwps.h"
 #include "debug.h"
 
+static char *next_str(bool next) {
+    return next ? "next" : "";
+}
+
 void dump_wps_tokens(struct wps_data *data)
 {
+    struct wps_token *token;
     int i, j;
     int indent = 0;
     char buf[64];
     bool next;
 
+    if (data->num_tokens > WPS_MAX_TOKENS) {
+        DEBUGF("Number of tokens is too high (%d)!!!\n", data->num_tokens);
+        return;
+    }
+
     /* Dump parsed WPS */
-    for(i = 0; i < data->num_tokens && i < WPS_MAX_TOKENS; i++) {
+    for (i = 0, token = data->tokens; i < data->num_tokens; i++, token++) {
+        next = token->next;
 
-        next = data->tokens[i].next;
-
-        switch(data->tokens[i].type) {
+        switch(token->type) {
             case WPS_TOKEN_UNKNOWN:
                 snprintf(buf, sizeof(buf), "Unknown token");
                 break;
             case WPS_TOKEN_CHARACTER:
                 snprintf(buf, sizeof(buf), "Character '%c'",
-                         data->tokens[i].value.c);
+                         token->value.c);
                 break;
 
             case WPS_TOKEN_STRING:
                 snprintf(buf, sizeof(buf), "String '%s'",
-                         data->strings[data->tokens[i].value.i]);
-                break;
-
-            case WPS_TOKEN_EOL:
-                snprintf(buf, sizeof(buf), "%s", "EOL");
+                         data->strings[token->value.i]);
                 break;
 
 #ifdef HAVE_LCD_BITMAP
             case WPS_TOKEN_ALIGN_LEFT:
-                snprintf(buf, sizeof(buf), "%s", "align left");
+                snprintf(buf, sizeof(buf), "align left");
                 break;
 
             case WPS_TOKEN_ALIGN_CENTER:
-                snprintf(buf, sizeof(buf), "%s", "align center");
+                snprintf(buf, sizeof(buf), "align center");
                 break;
 
             case WPS_TOKEN_ALIGN_RIGHT:
-                snprintf(buf, sizeof(buf), "%s", "align right");
+                snprintf(buf, sizeof(buf), "align right");
                 break;
 #endif
 
+            case WPS_TOKEN_SUBLINE_TIMEOUT:
+                snprintf(buf, sizeof(buf), "subline timeout value: %d",
+                         token->value.i);
+                break;
+
             case WPS_TOKEN_CONDITIONAL:
-            snprintf(buf, sizeof(buf), "%s, %d options", "conditional",
-                     data->tokens[i].value.i);
+                snprintf(buf, sizeof(buf), "conditional, %d options",
+                        token->value.i);
                 break;
 
             case WPS_TOKEN_CONDITIONAL_START:
-                snprintf(buf, sizeof(buf), "%s, next cond: %d",
-                         "conditional start", data->tokens[i].value.i);
+                snprintf(buf, sizeof(buf), "conditional start, next cond: %d",
+                         token->value.i);
                 indent++;
                 break;
 
             case WPS_TOKEN_CONDITIONAL_OPTION:
-                snprintf(buf, sizeof(buf), "%s, next cond: %d",
-                         "conditional option", data->tokens[i].value.i);
+                snprintf(buf, sizeof(buf), "conditional option, next cond: %d",
+                         token->value.i);
                 break;
 
             case WPS_TOKEN_CONDITIONAL_END:
-                snprintf(buf, sizeof(buf), "%s", "conditional end");
+                snprintf(buf, sizeof(buf), "conditional end");
                 indent--;
                 break;
 
 #ifdef HAVE_LCD_BITMAP
             case WPS_TOKEN_IMAGE_PRELOAD:
-                snprintf(buf, sizeof(buf), "%s", "preload image");
+                snprintf(buf, sizeof(buf), "preload image");
                 break;
 
             case WPS_TOKEN_IMAGE_PRELOAD_DISPLAY:
-                snprintf(buf, sizeof(buf), "%s %d", "display preloaded image",
-                         data->tokens[i].value.i);
+                snprintf(buf, sizeof(buf), "display preloaded image %d",
+                         token->value.i);
                 break;
 
             case WPS_TOKEN_IMAGE_DISPLAY:
-                snprintf(buf, sizeof(buf), "%s", "display image");
+                snprintf(buf, sizeof(buf), "display image");
                 break;
 #endif
 
 #ifdef HAS_BUTTON_HOLD
             case WPS_TOKEN_MAIN_HOLD:
-                snprintf(buf, sizeof(buf), "%s", "mode hold");
+                snprintf(buf, sizeof(buf), "mode hold");
                 break;
 #endif
 
 #ifdef HAS_REMOTE_BUTTON_HOLD
             case WPS_TOKEN_REMOTE_HOLD:
-                snprintf(buf, sizeof(buf), "%s", "mode remote hold");
+                snprintf(buf, sizeof(buf), "mode remote hold");
                 break;
 #endif
 
             case WPS_TOKEN_REPEAT_MODE:
-                snprintf(buf, sizeof(buf), "%s", "mode repeat");
+                snprintf(buf, sizeof(buf), "mode repeat");
                 break;
 
             case WPS_TOKEN_PLAYBACK_STATUS:
-                snprintf(buf, sizeof(buf), "%s", "mode playback");
+                snprintf(buf, sizeof(buf), "mode playback");
                 break;
 
 #if CONFIG_RTC
+            case WPS_TOKEN_RTC:
+                snprintf(buf, sizeof(buf), "real-time clock",
+                        token->value.c);
+                break;
+
             case WPS_TOKEN_RTC_DAY_OF_MONTH:
             case WPS_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED:
             case WPS_TOKEN_RTC_HOUR_24_ZERO_PADDED:
@@ -142,199 +157,159 @@ void dump_wps_tokens(struct wps_data *data)
             case WPS_TOKEN_RTC_MONTH_NAME:
             case WPS_TOKEN_RTC_DAY_OF_WEEK_START_MON:
             case WPS_TOKEN_RTC_DAY_OF_WEEK_START_SUN:
-            case WPS_TOKEN_RTC:
-            snprintf(buf, sizeof(buf), "%s %c", "real-time clock tag:",
-                     data->tokens[i].value.c);
+                snprintf(buf, sizeof(buf), "real-time clock tag: %c",
+                        token->value.c);
                 break;
 #endif
 
 #ifdef HAVE_LCD_BITMAP
             case WPS_TOKEN_IMAGE_BACKDROP:
-                snprintf(buf, sizeof(buf), "%s", "backdrop image");
+                snprintf(buf, sizeof(buf), "backdrop image");
                 break;
 
             case WPS_TOKEN_IMAGE_PROGRESS_BAR:
-                snprintf(buf, sizeof(buf), "%s", "progressbar bitmap");
-                break;
-
-
-            case WPS_TOKEN_STATUSBAR_ENABLED:
-                snprintf(buf, sizeof(buf), "%s", "statusbar enable");
-                break;
-
-            case WPS_TOKEN_STATUSBAR_DISABLED:
-                snprintf(buf, sizeof(buf), "%s", "statusbar disable");
+                snprintf(buf, sizeof(buf), "progressbar bitmap");
                 break;
 
             case WPS_TOKEN_PEAKMETER:
-                snprintf(buf, sizeof(buf), "%s", "peakmeter");
+                snprintf(buf, sizeof(buf), "peakmeter");
                 break;
 #endif
 
             case WPS_TOKEN_PROGRESSBAR:
-                snprintf(buf, sizeof(buf), "%s", "progressbar");
+                snprintf(buf, sizeof(buf), "progressbar");
                 break;
 
 #ifdef HAVE_LCD_CHARCELLS
             case WPS_TOKEN_PLAYER_PROGRESSBAR:
-                snprintf(buf, sizeof(buf), "%s", "full line progressbar");
+                snprintf(buf, sizeof(buf), "full line progressbar");
                 break;
 #endif
 
             case WPS_TOKEN_TRACK_TIME_ELAPSED:
-                snprintf(buf, sizeof(buf), "%s", "time elapsed in track");
+                snprintf(buf, sizeof(buf), "time elapsed in track");
                 break;
 
             case WPS_TOKEN_PLAYLIST_ENTRIES:
-                snprintf(buf, sizeof(buf), "%s", "number of entries in playlist");
+                snprintf(buf, sizeof(buf), "number of entries in playlist");
                 break;
 
             case WPS_TOKEN_PLAYLIST_NAME:
-                snprintf(buf, sizeof(buf), "%s", "playlist name");
+                snprintf(buf, sizeof(buf), "playlist name");
                 break;
 
             case WPS_TOKEN_PLAYLIST_POSITION:
-                snprintf(buf, sizeof(buf), "%s", "position in playlist");
+                snprintf(buf, sizeof(buf), "position in playlist");
                 break;
 
             case WPS_TOKEN_TRACK_TIME_REMAINING:
-                snprintf(buf, sizeof(buf), "%s", "time remaining in track");
+                snprintf(buf, sizeof(buf), "time remaining in track");
                 break;
 
             case WPS_TOKEN_PLAYLIST_SHUFFLE:
-                snprintf(buf, sizeof(buf), "%s", "playlist shuffle mode");
+                snprintf(buf, sizeof(buf), "playlist shuffle mode");
                 break;
 
             case WPS_TOKEN_TRACK_LENGTH:
-                snprintf(buf, sizeof(buf), "%s", "track length");
+                snprintf(buf, sizeof(buf), "track length");
                 break;
 
             case WPS_TOKEN_VOLUME:
-                snprintf(buf, sizeof(buf), "%s", "volume");
+                snprintf(buf, sizeof(buf), "volume");
                 break;
 
             case WPS_TOKEN_METADATA_ARTIST:
-                snprintf(buf, sizeof(buf), "%s%s", next ? "next " : "",
-                         "track artist");
+                snprintf(buf, sizeof(buf), "%strack artist", next_str(next));
                 break;
 
             case WPS_TOKEN_METADATA_COMPOSER:
-                snprintf(buf, sizeof(buf), "%s%s", next ? "next " : "",
-                         "track composer");
+                snprintf(buf, sizeof(buf), "%strack composer", next_str(next));
                 break;
 
             case WPS_TOKEN_METADATA_ALBUM:
-                snprintf(buf, sizeof(buf), "%s%s", next ? "next " : "",
-                         "track album");
+                snprintf(buf, sizeof(buf), "%strack album", next_str(next));
                 break;
 
             case WPS_TOKEN_METADATA_GENRE:
-                snprintf(buf, sizeof(buf), "%s%s", next ? "next " : "",
-                         "track genre");
+                snprintf(buf, sizeof(buf), "%strack genre", next_str(next));
                 break;
 
             case WPS_TOKEN_METADATA_TRACK_NUMBER:
-                snprintf(buf, sizeof(buf), "%s%s", next ? "next " : "",
-                         "track number");
+                snprintf(buf, sizeof(buf), "%strack number", next_str(next));
                 break;
 
             case WPS_TOKEN_METADATA_TRACK_TITLE:
-                snprintf(buf, sizeof(buf), "%s%s", next ? "next " : "",
-                         "track title");
+                snprintf(buf, sizeof(buf), "%strack title", next_str(next));
                 break;
 
             case WPS_TOKEN_METADATA_VERSION:
-                snprintf(buf, sizeof(buf), "%s%s", next ? "next " : "",
-                         "track ID3 version");
+                snprintf(buf, sizeof(buf), "%strack ID3 version", next_str(next));
                 break;
 
             case WPS_TOKEN_METADATA_YEAR:
-                snprintf(buf, sizeof(buf), "%s%s", next ? "next " : "",
-                         "track year");
+                snprintf(buf, sizeof(buf), "%strack year", next_str(next));
                 break;
 
             case WPS_TOKEN_BATTERY_PERCENT:
-                snprintf(buf, sizeof(buf), "%s", "battery percentage");
+                snprintf(buf, sizeof(buf), "battery percentage");
                 break;
 
             case WPS_TOKEN_BATTERY_VOLTS:
-                snprintf(buf, sizeof(buf), "%s", "battery voltage");
+                snprintf(buf, sizeof(buf), "battery voltage");
                 break;
 
             case WPS_TOKEN_BATTERY_TIME:
-                snprintf(buf, sizeof(buf), "%s", "battery time left");
+                snprintf(buf, sizeof(buf), "battery time left");
                 break;
 
             case WPS_TOKEN_BATTERY_CHARGER_CONNECTED:
-                snprintf(buf, sizeof(buf), "%s", "battery charger connected");
+                snprintf(buf, sizeof(buf), "battery charger connected");
                 break;
 
             case WPS_TOKEN_BATTERY_CHARGING:
-                snprintf(buf, sizeof(buf), "%s", "battery charging");
+                snprintf(buf, sizeof(buf), "battery charging");
                 break;
 
             case WPS_TOKEN_FILE_BITRATE:
-                snprintf(buf, sizeof(buf), "%s%s", next ? "next " : "",
-                         "file bitrate");
+                snprintf(buf, sizeof(buf), "%sfile bitrate", next_str(next));
                 break;
 
             case WPS_TOKEN_FILE_CODEC:
-                snprintf(buf, sizeof(buf), "%s%s", next ? "next " : "",
-                         "file codec");
+                snprintf(buf, sizeof(buf), "%sfile codec", next_str(next));
                 break;
 
             case WPS_TOKEN_FILE_FREQUENCY:
-                snprintf(buf, sizeof(buf), "%s%s", next ? "next " : "",
-                         "file audio frequency");
+                snprintf(buf, sizeof(buf), "%sfile audio frequency", next_str(next));
                 break;
 
             case WPS_TOKEN_FILE_NAME:
-                snprintf(buf, sizeof(buf), "%s%s", next ? "next " : "",
-                         "file name");
+                snprintf(buf, sizeof(buf), "%sfile name", next_str(next));
                 break;
 
             case WPS_TOKEN_FILE_NAME_WITH_EXTENSION:
-                snprintf(buf, sizeof(buf), "%s%s", next ? "next " : "",
-                         "file name with extension");
+                snprintf(buf, sizeof(buf), "%sfile name with extension", next_str(next));
                 break;
 
             case WPS_TOKEN_FILE_PATH:
-                snprintf(buf, sizeof(buf), "%s%s", next ? "next " : "",
-                         "file path");
+                snprintf(buf, sizeof(buf), "%sfile path", next_str(next));
                 break;
 
             case WPS_TOKEN_FILE_SIZE:
-                snprintf(buf, sizeof(buf), "%s%s", next ? "next " : "",
-                         "file size");
+                snprintf(buf, sizeof(buf), "%sfile size", next_str(next));
                 break;
 
             case WPS_TOKEN_FILE_VBR:
-                snprintf(buf, sizeof(buf), "%s%s", next ? "next " : "",
-                         "file is vbr");
+                snprintf(buf, sizeof(buf), "%sfile is vbr", next_str(next));
                 break;
 
             case WPS_TOKEN_FILE_DIRECTORY:
-                snprintf(buf, sizeof(buf), "%s%s: %d", next ? "next " : "",
-                         "file directory, level",
-                         data->tokens[i].value.i);
-                break;
-
-            case WPS_TOKEN_SCROLL:
-                snprintf(buf, sizeof(buf), "%s", "scrolling line");
-                break;
-
-            case WPS_TOKEN_SUBLINE_TIMEOUT:
-                snprintf(buf, sizeof(buf), "%s: %d", "subline timeout value",
-                         data->tokens[i].value.i);
-                break;
-
-            case WPS_TOKEN_SUBLINE_SEPARATOR:
-                snprintf(buf, sizeof(buf), "%s", "subline separator");
+                snprintf(buf, sizeof(buf), "%sfile directory, level: %d", next_str(next),
+                         token->value.i);
                 break;
 
             default:
-                snprintf(buf, sizeof(buf), "%s (code: %d)", "FIXME",
-                         data->tokens[i].type);
+                snprintf(buf, sizeof(buf), "FIXME (code: %d)",
+                         token->type);
                 break;
         }
 
@@ -342,24 +317,43 @@ void dump_wps_tokens(struct wps_data *data)
             DEBUGF("\t");
         }
 
-        DEBUGF("[%03d] = %s\n", i, buf);
+        DEBUGF("[%3d] = (%2d) %s\n", i, token->type, buf);
     }
     DEBUGF("\n");
 }
 
 void print_line_info(struct wps_data *data)
 {
-    int line, subline;
+    int i, j;
+    struct wps_line *line;
+    struct wps_subline *subline;
 
-    DEBUGF("line/subline start indexes :\n");
-    for (line = 0; line < data->num_lines; line++)
+    DEBUGF("Number of lines   : %d\n", data->num_lines);
+    DEBUGF("Number of sublines: %d\n", data->num_sublines);
+    DEBUGF("Number of tokens  : %d\n", data->num_tokens);
+    DEBUGF("\n");
+
+    for (i = 0, line = data->lines; i < data->num_lines; i++,line++)
     {
-        DEBUGF("%2d. ", line);
-        for (subline = 0; subline < data->num_sublines[line]; subline++)
+        DEBUGF("Line %2d (num_sublines=%d, first_subline=%d)\n",
+                i, line->num_sublines, line->first_subline_idx);
+
+        for (j = 0, subline = data->sublines + line->first_subline_idx;
+             j < line->num_sublines; j++, subline++)
         {
-            DEBUGF("%3d ", data->format_lines[line][subline]);
+            DEBUGF("    Subline %d: first_token=%3d, last_token=%3d",
+                    j, subline->first_token_idx,
+                    wps_last_token_index(data, i, j));
+
+            if (subline->line_type & WPS_REFRESH_SCROLL)
+                DEBUGF(", scrolled");
+            else if (subline->line_type & WPS_REFRESH_PLAYER_PROGRESS)
+                DEBUGF(", progressbar");
+            else if (subline->line_type & WPS_REFRESH_PEAK_METER)
+                DEBUGF(", peakmeter");
+
+            DEBUGF("\n");
         }
-        DEBUGF("\n");
     }
 
     DEBUGF("\n");
@@ -367,21 +361,21 @@ void print_line_info(struct wps_data *data)
 
 void print_wps_strings(struct wps_data *data)
 {
-    DEBUGF("strings :\n");
+    DEBUGF("Strings:\n");
     int i, len = 0;
     for (i=0; i < data->num_strings; i++)
     {
         len += strlen(data->strings[i]);
         DEBUGF("%2d: '%s'\n", i, data->strings[i]);
     }
-    DEBUGF("total length : %d\n", len);
+    DEBUGF("Total length: %d\n", len);
     DEBUGF("\n");
 }
 
 #ifdef HAVE_LCD_BITMAP
 void print_img_cond_indexes(struct wps_data *data)
 {
-    DEBUGF("image conditional indexes :\n");
+    DEBUGF("Image conditional indexes:\n");
     int i;
     for (i=0; i < MAX_IMAGES; i++)
     {

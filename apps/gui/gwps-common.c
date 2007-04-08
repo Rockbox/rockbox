@@ -81,12 +81,10 @@ void gui_wps_statusbar_draw(struct gui_wps *wps, bool force)
 {
     bool draw = global_settings.statusbar;
 
-    if(wps->data->wps_sb_tag 
-        && wps->data->show_sb_on_wps)
-        draw = true;
-    else if(wps->data->wps_sb_tag)
-        draw = false;
-    if(draw)
+    if (wps->data->wps_sb_tag)
+        draw = wps->data->show_sb_on_wps;
+
+    if (draw)
         gui_statusbar_draw(wps->statusbar, force);
 }
 #else
@@ -1012,15 +1010,13 @@ static char *get_tag(struct gui_wps *gwps,
             }
         }
 #endif
-
         case WPS_TOKEN_BATTERY_SLEEPTIME:
         {
             if (get_sleep_timer() == 0)
                 return NULL;
             else
             {
-                format_time(buf, buf_size, \
-                            get_sleep_timer() * 1000);
+                format_time(buf, buf_size, get_sleep_timer() * 1000);
                 return buf;
             }
         }
@@ -1377,6 +1373,7 @@ static bool get_line(struct gui_wps *gwps,
     char temp_buf[128];
     char *buf = linebuf;  /* will always point to the writing position */
     char *linebuf_end = linebuf + linebuf_size - 1;
+    int i, last_token_idx;
     bool update = false;
 
     /* alignment-related variables */
@@ -1384,16 +1381,14 @@ static bool get_line(struct gui_wps *gwps,
     char* cur_align_start;
     cur_align_start = buf;
     cur_align = WPS_ALIGN_LEFT;
-    align->left = 0;
-    align->center = 0;
-    align->right = 0;
+    align->left = NULL;
+    align->center = NULL;
+    align->right = NULL;
 
-    /* start at the beginning of the current (sub)line */
-    int i = data->format_lines[line][subline];
-
-    while (data->tokens[i].type != WPS_TOKEN_EOL
-           && data->tokens[i].type != WPS_TOKEN_SUBLINE_SEPARATOR
-           && i < data->num_tokens)
+    /* Process all tokens of the desired subline */
+    last_token_idx = wps_last_token_index(data, line, subline);
+    for (i = wps_first_token_index(data, line, subline);
+         i <= last_token_idx; i++)
     {
         switch(data->tokens[i].type)
         {
@@ -1460,8 +1455,7 @@ static bool get_line(struct gui_wps *gwps,
             default:
             {
                 /* get the value of the tag and copy it to the buffer */
-                char *value = get_tag(gwps, i, temp_buf,
-                                      sizeof(temp_buf), NULL);
+                char *value = get_tag(gwps,i,temp_buf,sizeof(temp_buf),NULL);
                 if (value)
                 {
                     update = true;
@@ -1471,7 +1465,6 @@ static bool get_line(struct gui_wps *gwps,
                 break;
             }
         }
-        i++;
     }
 
     /* close the current alignment */
@@ -1496,13 +1489,14 @@ static bool get_line(struct gui_wps *gwps,
 static void get_subline_timeout(struct gui_wps *gwps, int line, int subline)
 {
     struct wps_data *data = gwps->data;
-    int i = data->format_lines[line][subline];
+    int i;
+    int subline_idx = wps_subline_index(data, line, subline);
+    int last_token_idx = wps_last_token_index(data, line, subline);
 
-    data->time_mult[line][subline] = DEFAULT_SUBLINE_TIME_MULTIPLIER;
+    data->sublines[subline_idx].time_mult = DEFAULT_SUBLINE_TIME_MULTIPLIER;
 
-    while (data->tokens[i].type != WPS_TOKEN_EOL
-           && data->tokens[i].type != WPS_TOKEN_SUBLINE_SEPARATOR
-           && i < data->num_tokens)
+    for (i = wps_first_token_index(data, line, subline);
+         i <= last_token_idx; i++)
     {
         switch(data->tokens[i].type)
         {
@@ -1518,32 +1512,33 @@ static void get_subline_timeout(struct gui_wps *gwps, int line, int subline)
                 break;
 
             case WPS_TOKEN_SUBLINE_TIMEOUT:
-                data->time_mult[line][subline] = data->tokens[i].value.i;
+                data->sublines[subline_idx].time_mult = data->tokens[i].value.i;
                 break;
 
             default:
                 break;
         }
-        i++;
     }
 }
 
-/* Calculate which subline should be displayed for each line */
-static bool get_curr_subline(struct gui_wps *gwps, int line)
+/* Calculates which subline should be displayed for the specified line
+   Returns true iff the subline must be refreshed */
+static bool update_curr_subline(struct gui_wps *gwps, int line)
 {
     struct wps_data *data = gwps->data;
 
-    int search, search_start;
+    int search, search_start, num_sublines;
     bool reset_subline;
     bool new_subline_refresh;
     bool only_one_subline;
 
-    reset_subline = (data->curr_subline[line] == SUBLINE_RESET);
+    num_sublines = data->lines[line].num_sublines;
+    reset_subline = (data->lines[line].curr_subline == SUBLINE_RESET);
     new_subline_refresh = false;
     only_one_subline = false;
 
     /* if time to advance to next sub-line  */
-    if (TIME_AFTER(current_tick, data->subline_expire_time[line] - 1) ||
+    if (TIME_AFTER(current_tick, data->lines[line].subline_expire_time - 1) ||
         reset_subline)
     {
         /* search all sublines until the next subline with time > 0
@@ -1551,43 +1546,45 @@ static bool get_curr_subline(struct gui_wps *gwps, int line)
         if (reset_subline)
             search_start = 0;
         else
-            search_start = data->curr_subline[line];
+            search_start = data->lines[line].curr_subline;
 
-        for (search = 0; search < WPS_MAX_SUBLINES; search++)
+        for (search = 0; search < num_sublines; search++)
         {
-            data->curr_subline[line]++;
+            data->lines[line].curr_subline++;
 
             /* wrap around if beyond last defined subline or WPS_MAX_SUBLINES */
-            if ((!data->format_lines[line][data->curr_subline[line]]) ||
-                (data->curr_subline[line] == WPS_MAX_SUBLINES))
+            if (data->lines[line].curr_subline == num_sublines)
             {
-                if (data->curr_subline[line] == 1)
+                if (data->lines[line].curr_subline == 1)
                     only_one_subline = true;
-                data->curr_subline[line] = 0;
+                data->lines[line].curr_subline = 0;
             }
 
             /* if back where we started after search or
                 only one subline is defined on the line */
-            if (((search > 0) && (data->curr_subline[line] == search_start)) ||
+            if (((search > 0) && (data->lines[line].curr_subline == search_start)) ||
                 only_one_subline)
             {
                 /* no other subline with a time > 0 exists */
-                data->subline_expire_time[line] = (reset_subline?
-                    current_tick : data->subline_expire_time[line]) + 100 * HZ;
+                data->lines[line].subline_expire_time = (reset_subline ?
+                    current_tick : data->lines[line].subline_expire_time) + 100 * HZ;
                 break;
             }
             else
             {
                 /* get initial time multiplier for this subline */
-                get_subline_timeout(gwps, line, data->curr_subline[line]);
+                get_subline_timeout(gwps, line, data->lines[line].curr_subline);
+
+                int subline_idx = wps_subline_index(data, line,
+                                               data->lines[line].curr_subline);
 
                 /* only use this subline if subline time > 0 */
-                if (data->time_mult[line][data->curr_subline[line]] > 0)
+                if (data->sublines[subline_idx].time_mult > 0)
                 {
                     new_subline_refresh = true;
-                    data->subline_expire_time[line] = (reset_subline ?
-                        current_tick : data->subline_expire_time[line]) +
-                        BASE_SUBLINE_TIME * data->time_mult[line][data->curr_subline[line]];
+                    data->lines[line].subline_expire_time = (reset_subline ?
+                        current_tick : data->lines[line].subline_expire_time) +
+                        BASE_SUBLINE_TIME * data->sublines[subline_idx].time_mult;
                     break;
                 }
             }
@@ -1779,7 +1776,7 @@ bool gui_wps_refresh(struct gui_wps *gwps,
     if(!gwps || !data || !state || !display)
         return false;
 
-    int line, i;
+    int line, i, subline_idx;
     unsigned char flags;
     char linebuf[MAX_PATH];
 
@@ -1814,7 +1811,7 @@ bool gui_wps_refresh(struct gui_wps *gwps,
     {
         for (i = 0; i < data->num_lines; i++)
         {
-            data->curr_subline[i] = SUBLINE_RESET;
+            data->lines[i].curr_subline = SUBLINE_RESET;
         }
     }
 
@@ -1840,15 +1837,16 @@ bool gui_wps_refresh(struct gui_wps *gwps,
         update_line = false;
 
         /* get current subline for the line */
-        new_subline_refresh = get_curr_subline(gwps, line);
+        new_subline_refresh = update_curr_subline(gwps, line);
 
-        flags = data->line_type[line][data->curr_subline[line]];
+        subline_idx = wps_subline_index(data, line, data->lines[line].curr_subline);
+        flags = data->sublines[subline_idx].line_type;
 
-        if (refresh_mode == WPS_REFRESH_ALL || flags & refresh_mode
+        if (refresh_mode == WPS_REFRESH_ALL || (flags & refresh_mode)
             || new_subline_refresh)
         {
             /* get_line tells us if we need to update the line */
-            update_line = get_line(gwps, line, data->curr_subline[line],
+            update_line = get_line(gwps, line, data->lines[line].curr_subline,
                                    &align, linebuf, sizeof(linebuf));
         }
 
@@ -1946,4 +1944,31 @@ bool gui_wps_refresh(struct gui_wps *gwps,
 #endif
 
     return true;
+}
+
+int wps_subline_index(struct wps_data *data, int line, int subline)
+{
+    return data->lines[line].first_subline_idx + subline;
+}
+
+int wps_first_token_index(struct wps_data *data, int line, int subline)
+{
+    int first_subline_idx = data->lines[line].first_subline_idx;
+    return data->sublines[first_subline_idx + subline].first_token_idx;
+}
+
+int wps_last_token_index(struct wps_data *data, int line, int subline)
+{
+    int first_subline_idx = data->lines[line].first_subline_idx;
+    int idx = first_subline_idx + subline;
+    if (idx < data->num_sublines - 1)
+    {
+        /* This subline ends where the next begins */
+        return data->sublines[idx+1].first_token_idx - 1;
+    }
+    else
+    {
+        /* The last subline goes to the end */
+        return data->num_tokens - 1;
+    }
 }
