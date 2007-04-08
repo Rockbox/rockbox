@@ -235,42 +235,47 @@ int plugin_main(void)
         rb->sleep(1);
         rb->lcd_clear_display();
 
+#if ((CONFIG_CODEC == SWCODEC)  || !defined(SIMULATOR) && \
+    ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)))
+
         /* This will make the stars pulse to the music */
         if(pulse==true){
 
             /* Get the peaks. ( Borrowed from vu_meter ) */
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-            int left_peak = rb->mas_codec_readreg(0xC);
-            int right_peak = rb->mas_codec_readreg(0xD);
-#elif (CONFIG_CODEC == SWCODEC)
+#if (CONFIG_CODEC == SWCODEC)
             int left_peak, right_peak;
             rb->pcm_calculate_peaks(&left_peak, &right_peak);
+#else
+            int left_peak = rb->mas_codec_readreg(0xC);
+            int right_peak = rb->mas_codec_readreg(0xD);
 #endif
-                /* Devide peak data by 4098 to bring the max
-                   value down from ~32k to 8 */
-                left_peak        =    left_peak/0x1000;
-                right_peak    =    right_peak/0x1000;
+            /* Devide peak data by 4098 to bring the max
+               value down from ~32k to 8 */
+            left_peak  =    left_peak/0x1000;
+            right_peak =    right_peak/0x1000;
 
-                /* Make sure they dont stop */
-                if(left_peak<0x1)
-                    left_peak     = 0x1;
-                if(right_peak<0x1)
-                    right_peak    = 0x1;
+            /* Make sure they dont stop */
+            if(left_peak<0x1)
+                left_peak     = 0x1;
+            if(right_peak<0x1)
+                right_peak    = 0x1;
 
-                /* And make sure they dont go over 8 */
-                if(left_peak>0x8)
-                    left_peak     = 0x8;
-                if(right_peak>0x8)
-                    right_peak    = 0x8;
+            /* And make sure they dont go over 8 */
+            if(left_peak>0x8)
+                left_peak     = 0x8;
+            if(right_peak>0x8)
+                right_peak    = 0x8;
 
-                /* We need the average of both chanels */
-                avg_peak     = ( left_peak + right_peak )/2;
+            /* We need the average of both chanels */
+            avg_peak     = ( left_peak + right_peak )/2;
 
             /* Set the speed to the peak meter */
             starfield.z_move = avg_peak;
 
         } /* if pulse */
-
+#else
+        (void) avg_peak;        
+#endif
         starfield_move_and_draw(&starfield);
 
 #ifdef HAVE_LCD_COLOR
