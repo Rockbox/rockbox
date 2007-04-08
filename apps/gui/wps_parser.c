@@ -827,6 +827,7 @@ void wps_data_init(struct wps_data *wps_data)
     wps_data->img_buf_free = IMG_BUFSIZE; /* free space in image buffer */
     wps_data->peak_meter_enabled = false;
 #else /* HAVE_LCD_CHARCELLS */
+    int i;
     for (i = 0; i < 8; i++)
     {
         wps_data->wps_progress_pat[i] = 0;
