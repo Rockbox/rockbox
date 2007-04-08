@@ -9,7 +9,6 @@ debug_menu.c
 filetypes.c
 language.c
 main.c
-main_menu.c
 menu.c
 menus/display_menu.c
 #if CONFIG_CODEC == SWCODEC
