@@ -10727,3 +10727,17 @@
     *: ""
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ONPLAY_MENU_TITLE
+  desc: title for the onplay menus
+  user:
+  <source>
+    *: "Context Menu"
+  </source>
+  <dest>
+    *: "Context Menu"
+  </dest>
+  <voice>
+    *: "Context Menu"
+  </voice>
+</phrase>

@@ -61,6 +61,7 @@
 /* needed for the old menu system */
 struct menu {
     struct menu_item* items;
+    char *title;
     int count;
     int (*callback)(int, int);
     int current_selection;
@@ -659,9 +660,6 @@ static int menu_find_free(void)
 int menu_init(const struct menu_item* mitems, int count, int (*callback)(int, int),
               const char *button1, const char *button2, const char *button3)
 {
-    (void)button1;
-    (void)button2;
-    (void)button3;
     int menu=menu_find_free();
     if(menu==-1)/* Out of menus */
         return -1;
@@ -669,6 +667,9 @@ int menu_init(const struct menu_item* mitems, int count, int (*callback)(int, in
     menus[menu].count = count;
     menus[menu].callback = callback;
     menus[menu].current_selection = 0;
+    if ((button2 == NULL) && (button3 == NULL))
+        menus[menu].title = button1;
+    else menus[menu].title = NULL;
     return menu;
 }
 
@@ -702,6 +703,14 @@ static char* oldmenuwrapper_getname(int selected_item,
     unsigned char* desc = menus[(intptr_t)data].items[selected_item].desc;
     return P2STR(desc);
 }
+
+#ifdef HAVE_LCD_BITMAP
+static void oldmenu_get_icon(int selected_item, void * data, ICON * icon)
+{
+    *icon = bitmap_icons_6x8[Icon_Menu_functioncall];
+}
+#endif
+
 static void init_oldmenu(const struct menu_item_ex *menu,
                      struct gui_synclist *lists, int selected, bool callback)
 {
@@ -711,6 +720,11 @@ static void init_oldmenu(const struct menu_item_ex *menu,
     gui_synclist_set_nb_items(lists, MENU_GET_COUNT(menu->flags));
     gui_synclist_limit_scroll(lists, true);
     gui_synclist_select_item(lists, selected);
+#ifdef HAVE_LCD_BITMAP
+    gui_synclist_set_title(lists, menus[menu->value].title,
+                           bitmap_icons_6x8[Icon_Submenu_Entered]);
+    gui_synclist_set_icon_callback(lists, oldmenu_get_icon);
+#endif
 }
 
 static void menu_talk_selected(int m)
@@ -729,7 +743,7 @@ int menu_show(int m)
     {
         oldmenuwrapper_callback, 
         oldmenuwrapper_getname,
-        (void*)(intptr_t)m, Icon_NOICON
+        (void*)(intptr_t)m, Icon_Submenu
     };
 
     menu.flags = (MENU_TYPE_MASK&MT_OLD_MENU) | MENU_DYNAMIC_DESC |

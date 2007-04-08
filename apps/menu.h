@@ -189,6 +189,7 @@ struct menu_item {
     bool (*function) (void); /* return true if USB was connected */
 };
 
+/* if button2 == button3 == NULL, button1 is the menu title */
 int menu_init(const struct menu_item* mitems, int count,
                 int (*callback)(int, int),
                 const char *button1, const char *button2, const char *button3);

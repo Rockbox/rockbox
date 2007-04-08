@@ -440,7 +440,7 @@ static int onplay_menu(int index)
     items[i].desc = ID2P(LANG_CATALOG_ADD_TO_NEW);
     i++;
 
-    m = menu_init(items, i, NULL, NULL, NULL, NULL);
+    m = menu_init(items, i, NULL, str(LANG_PLAYLIST_MENU), NULL, NULL);
     result = menu_show(m);
     if (result == MENU_ATTACHED_USB)
     {

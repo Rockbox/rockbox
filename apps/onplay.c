@@ -107,7 +107,7 @@ static bool bookmark_menu(void)
         }
     }
 
-    m=menu_init( items, i, NULL, NULL, NULL, NULL );
+    m=menu_init( items, i, NULL, str(LANG_BOOKMARK_MENU), NULL, NULL );
 
 #ifdef HAVE_LCD_CHARCELLS
     status_set_param(true);
@@ -256,7 +256,7 @@ static bool cat_playlist_options(void)
         i++;
     }
 
-    m = menu_init( items, i, NULL, NULL, NULL, NULL );
+    m = menu_init( items, i, NULL, str(LANG_CATALOG), NULL, NULL );
     result = menu_show(m);
     if(result >= 0)
         ret = items[result].function();
@@ -373,7 +373,7 @@ static bool playlist_options(void)
         }
     }
 
-    m = menu_init( items, i, NULL, NULL, NULL, NULL );
+    m = menu_init( items, i, NULL, str(LANG_PLAYLIST_MENU), NULL, NULL );
     result = menu_show(m);
     if (result >= 0 && result < pstart)
         ret = items[result].function();
@@ -1048,7 +1048,8 @@ int onplay(char* file, int attr, int from)
     /* DIY menu handling, since we want to exit after selection */
     if (i)
     {
-        m = menu_init( items, i, onplay_callback, NULL, NULL, NULL );
+        m = menu_init( items, i, onplay_callback,
+                       str(LANG_ONPLAY_MENU_TITLE), NULL, NULL );
 #ifdef HAVE_TAGCACHE      
         do 
         {

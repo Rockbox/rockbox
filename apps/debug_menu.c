@@ -2390,7 +2390,7 @@ bool debug_menu(void)
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_item), NULL,
-                 NULL, NULL, NULL);
+                 "Debug Menu", NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
 
