@@ -44,7 +44,7 @@ enum {
     CONTEXT_WPS = 1,
     CONTEXT_TREE = 2, 
     CONTEXT_RECORD = 3,
-    CONTEXT_MAINMENU = 4,
+    CONTEXT_MAINMENU = 4, /* uses CONTEXT_TREE and ACTION_TREE_* */
     CONTEXT_ID3DB = 5,
     /* Add new contexts here, no need to explicitly define a value for them */    
     CONTEXT_LIST,
@@ -123,6 +123,10 @@ enum {
     /* list and tree page up/down */    
     ACTION_LISTTREE_PGUP,/* optional */
     ACTION_LISTTREE_PGDOWN,/* optional */
+#ifdef HAVE_VOLUME_IN_LIST
+    ACTION_LIST_VOLUP,
+    ACTION_LIST_VOLDOWN,
+#endif
     
     /* tree */ 
     ACTION_TREE_ROOT_INIT,
@@ -152,13 +156,13 @@ enum {
     ACTION_REC_F3,
     
     /* main menu */
+    /* These are not strictly actions, but must be here
+       so they dont conflict with real actions in the menu code */
     ACTION_REQUEST_MENUITEM,
     ACTION_EXIT_MENUITEM,
     ACTION_EXIT_AFTER_THIS_MENUITEM, /* if a menu returns this the menu will exit
                                         once the subitem returns */
     ACTION_ENTER_MENUITEM,
-    ACTION_MENU_WPS,
-    ACTION_MENU_STOP,
     
     /* id3db */
     

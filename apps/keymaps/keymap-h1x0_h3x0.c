@@ -65,13 +65,6 @@ static const struct button_mapping button_context_standard[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
 
-static const struct button_mapping button_context_menu[]  = {
-    { ACTION_MENU_WPS,            BUTTON_ON,       BUTTON_NONE },
-    { ACTION_MENU_STOP,           BUTTON_OFF,       BUTTON_NONE },
-    
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
-}; /* button_context_menu */
-
 static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_PLAY,          BUTTON_ON|BUTTON_REL,           BUTTON_ON },
     { ACTION_WPS_SKIPNEXT,      BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT },
@@ -721,17 +714,11 @@ static const struct button_mapping button_context_radio_h300lcdremote[] = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
 };
 
-static const struct button_mapping button_context_menu_remote[] = {
-    { ACTION_MENU_WPS,      BUTTON_RC_ON,         BUTTON_NONE },
-
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST|CONTEXT_REMOTE)
-};
 
 /* the actual used tables */
 static const struct button_mapping 
         *remote_btn_ctxt_std = 0, 
         *remote_btn_ctxt_wps = 0,
-        *remote_btn_ctxt_menu = button_context_menu_remote,
         *remote_btn_ctxt_list = 0,
         *remote_btn_ctxt_tree = 0,
         *remote_btn_ctxt_listtree_scroll_w_cmb = 0,
@@ -880,8 +867,6 @@ static const struct button_mapping* get_context_mapping_remote(int context)
     {
         case CONTEXT_STD:
             return remote_btn_ctxt_std;
-        case CONTEXT_MAINMENU:
-            return remote_btn_ctxt_menu;
         case CONTEXT_WPS: /* common for all remotes */
             return button_context_wps_remotescommon;
 
@@ -891,6 +876,7 @@ static const struct button_mapping* get_context_mapping_remote(int context)
         case CONTEXT_LIST:
             return remote_btn_ctxt_list;
         case CONTEXT_TREE:
+        case CONTEXT_MAINMENU:
             if (global_settings.hold_lr_for_scroll_in_list)
                 return remote_btn_ctxt_listtree_scroll_wo_cmb;
             else 
@@ -929,14 +915,13 @@ const struct button_mapping* get_context_mapping(int context)
     {
         case CONTEXT_STD:
             return button_context_standard;
-        case CONTEXT_MAINMENU:
-            return button_context_menu;
         case CONTEXT_WPS:
             return button_context_wps;
             
         case CONTEXT_LIST:
             return button_context_list;
         case CONTEXT_TREE:
+        case CONTEXT_MAINMENU:
             if (global_settings.hold_lr_for_scroll_in_list)
                 return button_context_listtree_scroll_without_combo;
             else 

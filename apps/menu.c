@@ -468,12 +468,12 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
         {
             talk_menu_item(menu, &lists);
         }
-        else if (action == ACTION_MENU_WPS)
+        else if (action == ACTION_TREE_WPS)
         {
             ret = GO_TO_PREVIOUS_MUSIC;
             done = true;
         }
-        else if (action == ACTION_MENU_STOP)
+        else if (action == ACTION_TREE_STOP)
         {
             if (audio_status() && !global_settings.party_mode)
             {

@@ -236,6 +236,7 @@ const struct button_mapping* get_context_mapping( int context )
         case CONTEXT_BOOKMARKSCREEN:
             return button_context_bmark;
         case CONTEXT_TREE:
+        case CONTEXT_MAINMENU:
             if (global_settings.hold_lr_for_scroll_in_list)
                 return button_context_tree_scroll_lr;
             /* else fall through to CUSTOM|1 */
@@ -254,7 +255,6 @@ const struct button_mapping* get_context_mapping( int context )
 
         case CONTEXT_STD:
         case CONTEXT_LIST:
-        case CONTEXT_MAINMENU:
         default:
             return button_context_standard;
     }

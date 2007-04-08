@@ -79,12 +79,6 @@ static const struct button_mapping button_context_tree[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_listtree */
 
-static const struct button_mapping button_context_menu[]  = {
-    { ACTION_MENU_WPS,      BUTTON_ON,     BUTTON_NONE },
-    
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
-}; /* button_context_menu */
-
 static const struct button_mapping button_context_yesno[]  = {
     { ACTION_YESNO_ACCEPT,  BUTTON_PLAY,   BUTTON_NONE },
 
@@ -157,11 +151,10 @@ const struct button_mapping* get_context_mapping( int context )
             return button_context_yesno;
 
         case CONTEXT_TREE:
+        case CONTEXT_MAINMENU:
             return button_context_tree;
         case CONTEXT_BOOKMARKSCREEN:
             return button_context_bmark;
-        case CONTEXT_MAINMENU:
-            return button_context_menu;
         case CONTEXT_STD:
         case CONTEXT_LIST:
         default:

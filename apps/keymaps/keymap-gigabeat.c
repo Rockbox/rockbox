@@ -104,6 +104,13 @@ static const struct button_mapping button_context_list[]  = {
     { ACTION_LISTTREE_PGDOWN,       BUTTON_POWER|BUTTON_DOWN,                  BUTTON_POWER },
     { ACTION_LISTTREE_PGDOWN,       BUTTON_DOWN|BUTTON_REL,                 BUTTON_POWER|BUTTON_DOWN },
     { ACTION_LISTTREE_PGDOWN,       BUTTON_POWER|BUTTON_DOWN|BUTTON_REPEAT,    BUTTON_NONE },
+#ifdef HAVE_VOLUME_IN_LIST
+    { ACTION_LIST_VOLUP,         BUTTON_VOL_UP|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_LIST_VOLUP,         BUTTON_VOL_UP,                      BUTTON_NONE },
+    { ACTION_LIST_VOLDOWN,       BUTTON_VOL_DOWN,                    BUTTON_NONE },
+    { ACTION_LIST_VOLDOWN,       BUTTON_VOL_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
+#endif
+    
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_list */
 
@@ -114,15 +121,6 @@ static const struct button_mapping button_context_tree[]  = {
     { ACTION_TREE_STOP,   BUTTON_A|BUTTON_REPEAT,     BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST)
-}; /* button_context_tree */
-
-static const struct button_mapping button_context_menu[]  = {
-    { ACTION_MENU_WPS,    BUTTON_POWER|BUTTON_REL,    BUTTON_POWER },
-    { ACTION_MENU_STOP,   BUTTON_A,                   BUTTON_NONE },
-    { ACTION_MENU_STOP,   BUTTON_A|BUTTON_REL,        BUTTON_A },
-    { ACTION_MENU_STOP,   BUTTON_A|BUTTON_REPEAT,     BUTTON_NONE },
-
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_tree */
 
 static const struct button_mapping button_context_listtree_scroll_with_combo[]  = {
@@ -271,13 +269,12 @@ const struct button_mapping* get_context_mapping(int context)
     {
         case CONTEXT_STD:
             return button_context_standard;
-        case CONTEXT_MAINMENU:
-            return button_context_menu;
         case CONTEXT_WPS:
             return button_context_wps;
 
         case CONTEXT_LIST:
             return button_context_list;
+        case CONTEXT_MAINMENU:
         case CONTEXT_TREE:
             if (global_settings.hold_lr_for_scroll_in_list)
                 return button_context_listtree_scroll_without_combo;

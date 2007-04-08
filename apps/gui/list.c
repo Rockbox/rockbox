@@ -33,6 +33,7 @@
 #include "statusbar.h"
 #include "textarea.h"
 #include "lang.h"
+#include "sound.h"
 
 #ifdef HAVE_LCD_CHARCELLS
 #define SCROLL_LIMIT 1
@@ -924,6 +925,21 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists,
 
     switch(button)
     {
+#ifdef HAVE_VOLUME_IN_LIST
+        case ACTION_LIST_VOLUP:
+            global_settings.volume += 2; 
+            /* up two because the falthrough brings it down one */
+        case ACTION_LIST_VOLDOWN:
+            global_settings.volume--;
+            
+            if (global_settings.volume < sound_min(SOUND_VOLUME))
+                global_settings.volume = sound_min(SOUND_VOLUME);
+            if (global_settings.volume > sound_max(SOUND_VOLUME))
+                global_settings.volume = sound_max(SOUND_VOLUME);
+            sound_set_volume(global_settings.volume);
+            settings_save();
+            return button;
+#endif
         case ACTION_STD_PREV:
         case ACTION_STD_PREVREPEAT:
             gui_synclist_select_previous(lists);

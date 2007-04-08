@@ -48,11 +48,6 @@ static const struct button_mapping button_context_standard[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
 
-static const struct button_mapping button_context_menu[]  = {
-    { ACTION_MENU_WPS,        BUTTON_UP,       BUTTON_NONE },
-    
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
-}; /* button_context_menu */
 
 static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_PLAY,     BUTTON_UP|BUTTON_REL,        BUTTON_UP },
@@ -237,8 +232,6 @@ const struct button_mapping* get_context_mapping(int context)
     {
         case CONTEXT_STD:
             return button_context_standard;
-        case CONTEXT_MAINMENU:
-            return button_context_menu;
             
         case CONTEXT_WPS:
             return button_context_wps;
@@ -246,6 +239,7 @@ const struct button_mapping* get_context_mapping(int context)
         case CONTEXT_LIST:
             return button_context_list;
         case CONTEXT_TREE:
+        case CONTEXT_MAINMENU:
             if (global_settings.hold_lr_for_scroll_in_list)
                 return button_context_listtree_scroll_without_combo;
             else 

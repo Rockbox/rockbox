@@ -131,13 +131,6 @@ static const struct button_mapping remote_button_context_keyboard[] = {
     LAST_ITEM_IN_LIST
 }; /* button_context_keyboard_h100remote */
 
-/** Main Menu Context Menu **/
-static const struct button_mapping button_context_mainmenu[] = {
-    { ACTION_NONE,     BUTTON_POWER,                  BUTTON_NONE },
-    { ACTION_MENU_WPS, BUTTON_PLAY,                   BUTTON_NONE },
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
-}; /* button_context_mainmenu */
-
 static const struct button_mapping remote_button_context_mainmenu[] = {
     { ACTION_STD_CANCEL,  BUTTON_RC_VOL_DOWN,         BUTTON_NONE },
     { ACTION_STD_OK,      BUTTON_RC_VOL_UP,           BUTTON_NONE },
@@ -412,8 +405,6 @@ const struct button_mapping* get_context_mapping( int context )
         case CONTEXT_KEYBOARD:
             return button_context_keyboard;
 
-        case CONTEXT_MAINMENU:
-            return button_context_mainmenu;
 
         case CONTEXT_PITCHSCREEN:
             return button_context_pitchscreen;
@@ -435,6 +426,7 @@ const struct button_mapping* get_context_mapping( int context )
             return button_context_settings_time;
 
         case CONTEXT_TREE:
+        case CONTEXT_MAINMENU:
             if (global_settings.hold_lr_for_scroll_in_list)
                 return button_context_tree_scroll_lr;
             /* else fall through to CONTEXT_TREE|CONTEXT_CUSTOM */
