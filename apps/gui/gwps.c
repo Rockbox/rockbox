@@ -639,7 +639,8 @@ long gui_wps_show(void)
 #ifdef AB_REPEAT_ENABLE
             ab_reset_markers();
 #endif
-
+            if (global_settings.browse_current)
+                return GO_TO_PREVIOUS_BROWSER;
             return GO_TO_PREVIOUS;
         }
 
