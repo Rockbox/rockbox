@@ -76,8 +76,8 @@ static struct plugin_api* rb; /* global api struct pointer */
 
 
 #define MAX_STARS (LCD_WIDTH*LCD_HEIGHT*20)/100
-#define INIT_STARS 600
-#define STARFIELD_INCREASE_STEP 100
+#define INIT_STARS 200
+#define STARFIELD_INCREASE_STEP 50
 #define INIT_SPACE_SPEED 1
 #define STAR_MAX_VELOCITY 2
 /*
@@ -149,6 +149,7 @@ static inline void star_draw(struct star * star, int z_move)
         star_init(star, z_move);
         return;
     }
+
     rb->lcd_drawpixel(x_draw, y_draw);
     if(star->z<5*Z_MAX_DIST/6)
     {
@@ -217,15 +218,13 @@ static struct starfield starfield;
 int plugin_main(void)
 {
     char str_buffer[40];
-    int button, t_disp=0;
+    int button, avg_peak, t_disp=0;
     int font_h, font_w;
+    bool pulse=true;
     rb->lcd_getstringsize("A", &font_w, &font_h);
     starfield_init(&starfield);
     starfield_add_stars(&starfield, INIT_STARS);
-    
-#if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
-#endif
+
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_background(LCD_BLACK);
     rb->lcd_set_foreground(LCD_WHITE);
@@ -236,10 +235,51 @@ int plugin_main(void)
         rb->sleep(1);
         rb->lcd_clear_display();
 
+        /* This will make the stars pulse to the music */
+        if(pulse==true){
+
+            /* Get the peaks. ( Borrowed from vu_meter ) */
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+            int left_peak = rb->mas_codec_readreg(0xC);
+            int right_peak = rb->mas_codec_readreg(0xD);
+#elif (CONFIG_CODEC == SWCODEC)
+            int left_peak, right_peak;
+            rb->pcm_calculate_peaks(&left_peak, &right_peak);
+#endif
+                /* Devide peak data by 4098 to bring the max
+                   value down from ~32k to 8 */
+                left_peak        =    left_peak/0x1000;
+                right_peak    =    right_peak/0x1000;
+
+                /* Make sure they dont stop */
+                if(left_peak<0x1)
+                    left_peak     = 0x1;
+                if(right_peak<0x1)
+                    right_peak    = 0x1;
+
+                /* And make sure they dont go over 8 */
+                if(left_peak>0x8)
+                    left_peak     = 0x8;
+                if(right_peak>0x8)
+                    right_peak    = 0x8;
+
+                /* We need the average of both chanels */
+                avg_peak     = ( left_peak + right_peak )/2;
+
+            /* Set the speed to the peak meter */
+            starfield.z_move = avg_peak;
+
+        } /* if pulse */
+
         starfield_move_and_draw(&starfield);
 
+#ifdef HAVE_LCD_COLOR
+            rb->lcd_set_foreground(LCD_WHITE);
+#endif
+
+        /* if a parameter is updated (by the user), we must print it */
         if (t_disp > 0)
-        {/* if a parameter is updated (by the user), we must print it */
+        {
             --t_disp;
             rb->snprintf(str_buffer, sizeof(str_buffer),
                          "star:%d speed:%d",
@@ -255,11 +295,13 @@ int plugin_main(void)
             case (STARFIELD_INCREASE_ZMOVE):
             case (STARFIELD_INCREASE_ZMOVE | BUTTON_REPEAT):
                 ++(starfield.z_move);
+                pulse=false;
                 t_disp=MSG_DISP_TIME;
                 break;
             case (STARFIELD_DECREASE_ZMOVE):
             case (STARFIELD_DECREASE_ZMOVE | BUTTON_REPEAT):
                 --(starfield.z_move);
+                pulse=false;
                 t_disp=MSG_DISP_TIME;
                 break;
             case(STARFIELD_INCREASE_NB_STARS):
