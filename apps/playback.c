@@ -2732,7 +2732,6 @@ static bool audio_load_track(int offset, bool start_play, bool rebuffer)
     tracks[track_widx].filerem = size;
     tracks[track_widx].filesize = size;
     tracks[track_widx].available = 0;
-    tracks[track_widx].taginfo_ready = false;
 
     /* Set default values */
     if (start_play) 
