@@ -7,30 +7,15 @@
  
                                How to build the UISimulators
 
-Terminology
-
-  The hardware is mainly separated in two different versions. The "Player" is
-  the Archos Jukebox Player 6000 and Archos Studio 20, while the "Recorder" is
-  the Archos Recorder 20. The "Player" has a character-based LCD screen with 2
-  lines of 11 letters and a big round thing on the keypad (featuring 6
-  different keys), while the "Recorder" has a graphical LCD and has all its 10
-  keys separate.
-
 1. Get Sources
 
-  The the very latest sources off the CVS server. Get the 'tools' dir,
-  'firmware' dir, the 'apps' dir and the 'uisimulator' dir on the same dir
-  level, to make it easier to build things (some of the files assume this
-  hierarchy).
+  The the very latest sources off the SVN server (or possibly get a recent
+  source code tarball).
 
-  All CVS details can be found here: http://rockbox.haxx.se/cvs.html
+  All SVN details can be found here:
+  http://www.rockbox.org/twiki/bin/view/Main/UsingSVN
 
 2. Build Uisimulator
-
-  For the X11 simulator:
-
-    (This has been compiled and run on at least Solaris and Linux. It should
-    work on other unixes too but we haven't tried any other yet.)
 
     Create a new directory and run the 'tools/configure' script in
     there. Select target to simulate and select simulation. The script will
@@ -53,11 +38,6 @@ Terminology
     directory, create subdirectories and do all sorts of things you want to be
     able to browse when you fire up the simulator.
 
-
-  For the Win32 simulator:
-
-    No info yet.
-
 3. Run Uisimulator
 
   To create a simulated disk drive for the simulator to see, create a
@@ -68,25 +48,5 @@ Terminology
 
 4. Target Keypad Equivalents
 
-  The keyboard's numerical keypad is used to simulate the Archos keypads:
-
-  Keyboard   Generic Archos
-  --------   --------------
-  +          ON
-  8          UP
-  2          DOWN
-  4          LEFT
-  6          RIGHT
-             
-  Keyboard   Recorder-only
-  --------   --------------
-  Enter      OFF
-  5          PLAY
-  /          F1
-  *          F2
-  -          F3
-
-  Keyboard   Player-only
-  --------   --------------
-  Enter      MENU
-  6          PLAY  (there's no separation between PLAY and RIGHT)
+  The keyboard's numerical keypad is used to simulate the target keypad. See
+  the output rockboxui displays on start for details.
