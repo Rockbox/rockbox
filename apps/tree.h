@@ -63,7 +63,6 @@ struct tree_context {
     int extra_history[MAX_DIR_LEVELS]; /* db use */
     int currtable; /* db use */
     int currextra; /* db use */
-    int currextra2; /* db use */
 #endif
     /* A big buffer with plenty of entry structs,
      * contains all files and dirs in the current
