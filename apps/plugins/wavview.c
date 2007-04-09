@@ -174,7 +174,7 @@ static int readwavpeaks(char *filename)
     rb->snprintf(tstr,127, "Bits/sample: %d", header.bitspersample);
     rb->lcd_puts(0, 3, tstr);
 
-    rb->snprintf(tstr,127, "Samplerate: %ld Hz", header.samplerate);
+    rb->snprintf(tstr,127, "Samplerate: %d Hz", (int)(header.samplerate));
     rb->lcd_puts(0, 4, tstr);
 
     seconds = header.datachunksize / header.byterate;
@@ -218,7 +218,7 @@ static int readwavpeaks(char *filename)
         }
         if(((bytes_read/4)*4) != bytes_read)
         {
-            rb->splash(HZ*2, "bytes_read/*4 err: %ld",bytes_read);
+            rb->splash(HZ*2, "bytes_read/*4 err: %ld",(long int)bytes_read);
             return 1;
         }
 
@@ -281,9 +281,9 @@ static int readwavpeaks(char *filename)
         }
 
         /* update progress */
-        rb->snprintf(tstr,127, "Searching for peaks... %ld%%",
-            total_bytes_read / ((header.datachunksize +
-                                 sizeof(struct wav_header)) / 100));
+        rb->snprintf(tstr,127, "Searching for peaks... %d%%",(int)
+            (total_bytes_read / ((header.datachunksize +
+                                 sizeof(struct wav_header)) / 100)));
         rb->lcd_puts(0, 6, tstr);
         rb->lcd_update();
     }
@@ -447,12 +447,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void *parameter)
             /* zoom out */
             if(zoomlevel > 1)
                 zoomlevel /= 2;
-            rb->splash(HZ/2, "ZOOM: %ldx",zoomlevel);
+            rb->splash(HZ/2, "ZOOM: %dx",(int)zoomlevel);
             break;
         case ACTION_KBD_DOWN:
             if(zoomlevel < (mempeakcount / LCD_WIDTH / 2))
                 zoomlevel *= 2;
-            rb->splash(HZ/2, "ZOOM: %ldx",zoomlevel);
+            rb->splash(HZ/2, "ZOOM: %dx",(int)zoomlevel);
             break;
         case ACTION_KBD_LEFT:
             center -= 10 * (mempeakcount / LCD_WIDTH) / zoomlevel;
