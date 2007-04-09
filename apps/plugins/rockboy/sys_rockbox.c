@@ -76,7 +76,7 @@ void ev_poll(void)
     released = ~newbuttonstate & oldbuttonstate;
     pressed = newbuttonstate & ~oldbuttonstate;
     oldbuttonstate = newbuttonstate;
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
+#if (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 2)
     if (rb->button_hold()&~holdbutton)
         fb.mode=(fb.mode+1)%4;
     holdbutton=rb->button_hold();
@@ -161,8 +161,7 @@ void ev_poll(void)
 #else
         if(pressed & options.MENU) {
 #endif
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
-    defined(HAVE_LCD_COLOR)
+#if (CONFIG_KEYPAD != RECORDER_PAD)
 #ifdef HAVE_WHEEL_POSITION
             rb->wheel_send_events(true);
 #endif

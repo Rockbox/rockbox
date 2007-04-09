@@ -3,9 +3,8 @@
 /* For all targets */
 
 /* For various targets... */
-#if (CONFIG_KEYPAD == RECORDER_PAD) || \
-    (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
-    defined(HAVE_LCD_COLOR)
+#if (CONFIG_KEYPAD == RECORDER_PAD) || defined(HAVE_LCD_COLOR) \
+ || defined(IRIVER_H100_SERIES) || defined(IAUDIO_M5)
 rockboy
 #endif
 
