@@ -88,6 +88,7 @@ void screen_dump_set_hook(void (*hook)(int fh));
 bool settings_parseline(char* line, char** name, char** value);
 long default_event_handler_ex(long event, void (*callback)(void *), void *parameter);
 long default_event_handler(long event);
+bool list_stop_handler(void);
 void car_adapter_mode_init(void);
 extern int show_logo(void);
 

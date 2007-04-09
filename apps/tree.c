@@ -665,43 +665,10 @@ static int dirbrowse()
                 break;
 
             case ACTION_TREE_STOP:
-                if (*tc.dirfilter < NUM_FILTER_MODES)
-                {
-                    /* Stop the music if it is playing */
-                    if(audio_status()) {
-                        if (!global_settings.party_mode) {
-                            if (global_settings.fade_on_stop)
-                                fade(0);
-                            bookmark_autobookmark();
-                            audio_stop();
-                        }
-                    }
-#if CONFIG_CHARGING && \
-    (CONFIG_KEYPAD == RECORDER_PAD) && !defined(HAVE_SW_POWEROFF)
-                    else {
-                        if (!charger_inserted()) {
-                            if(shutdown_screen())
-                                reload_dir = true;
-                        } else {
-                            charging_splash();
-                        }
-                        restore = true;
-                    }
-#endif
-                }
-#if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING)
-{
-                static int last_off = 0;
-                if (current_tick - last_off < 50) {
-                    if (charger_inserted()) {
-                        charging_splash();
-                        restore = true;
-                    }
-                }
-                last_off = current_tick;
-}
-#endif
-                break; /* case ACTION_TREE_STOP: */
+                if (list_stop_handler())
+                    restore = true;
+                break;
+
             case ACTION_STD_MENU:
                 return GO_TO_ROOT;
                 break;

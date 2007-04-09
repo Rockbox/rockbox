@@ -476,13 +476,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
         }
         else if (action == ACTION_TREE_STOP)
         {
-            if (audio_status() && !global_settings.party_mode)
-            {
-                if (global_settings.fade_on_stop)
-                    fade(0);
-                bookmark_autobookmark();
-                audio_stop();
-            }
+            list_stop_handler();
         }
         else if (action == ACTION_STD_MENU)
         {

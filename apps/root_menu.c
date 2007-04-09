@@ -25,11 +25,13 @@
 #include "root_menu.h"
 #include "lang.h"
 #include "settings.h"
+#include "screens.h"
 #include "kernel.h"
 #include "debug.h"
 #include "misc.h"
 #include "rolo.h"
 #include "powermgmt.h"
+#include "power.h"
 
 #if LCD_DEPTH > 1
 #include "backdrop.h"
@@ -304,7 +306,10 @@ MENUITEM_RETURNVALUE(bookmarks, ID2P(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS),
 #ifdef HAVE_LCD_CHARCELLS
 static int do_shutdown(void)
 {
-    sys_poweroff();
+    if (charger_inserted())
+        charging_splash();
+    else
+        sys_poweroff();
     return 0;
 }
 MENUITEM_FUNCTION(do_shutdown_item, 0, ID2P(LANG_SHUTDOWN),

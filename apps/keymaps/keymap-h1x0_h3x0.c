@@ -106,7 +106,6 @@ static const struct button_mapping button_context_list[]  = {
 static const struct button_mapping button_context_tree[]  = {
     { ACTION_TREE_WPS,    BUTTON_ON|BUTTON_REL,         BUTTON_ON },
     { ACTION_TREE_STOP,   BUTTON_OFF,                   BUTTON_NONE },
-    { ACTION_TREE_STOP,   BUTTON_OFF|BUTTON_REL,        BUTTON_OFF },
     { ACTION_TREE_STOP,   BUTTON_OFF|BUTTON_REPEAT,     BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST)

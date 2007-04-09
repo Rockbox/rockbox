@@ -58,6 +58,7 @@
 #include "icons.h"
 #endif /* End HAVE_LCD_BITMAP */
 #include "gui/gwps-common.h"
+#include "bookmark.h"
 
 #include "misc.h"
 
@@ -674,6 +675,52 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
     }
 #endif
     return false;
+}
+
+bool list_stop_handler(void)
+{
+    bool ret = false;
+
+    /* Stop the music if it is playing */
+    if(audio_status()) 
+    {
+        if (!global_settings.party_mode) 
+        {
+            if (global_settings.fade_on_stop)
+                fade(0);
+            bookmark_autobookmark();
+            audio_stop();
+        }
+    }
+#if CONFIG_CHARGING
+#if (CONFIG_KEYPAD == RECORDER_PAD) && !defined(HAVE_SW_POWEROFF)
+    else
+    {
+        if (charger_inserted())
+            charging_splash();
+        else
+            shutdown_screen(); /* won't return if shutdown actually happens */
+
+        ret = true;  /* screen is dirty, caller needs to refresh */
+    }
+#endif
+#ifndef HAVE_POWEROFF_WHILE_CHARGING
+    {
+        static long last_off = 0;
+
+        if (TIME_BEFORE(current_tick, last_off + HZ/2))
+        {
+            if (charger_inserted()) 
+            {
+                charging_splash();
+                ret = true;  /* screen is dirty, caller needs to refresh */
+            }
+        }
+        last_off = current_tick;
+    }
+#endif
+#endif /* CONFIG_CHARGING */
+    return ret;
 }
 
 #if CONFIG_CHARGING
