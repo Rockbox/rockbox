@@ -55,3 +55,69 @@ int rtc_write_datetime(unsigned char* buf)
     return 1;
 }
 
+#ifdef HAVE_RTC_ALARM 
+/*  This alarm code works in that it at least triggers INT_RTC.  I am guessing
+ *  that the OF bootloader for the Gigabeat detects the startup by alarm and shuts down.
+ *  This code is available for use once the OF bootloader is no longer required.
+ */
+
+/* check whether the unit has been started by the RTC alarm function
+ * This code has not been written/checked for the gigabeat
+ */
+bool rtc_check_alarm_started(bool release_alarm)
+{
+    static bool alarm_state, run_before;
+    bool rc;
+
+    if (run_before) {
+        rc = alarm_state;
+        alarm_state &= ~release_alarm;         
+    } else { 
+        /* This call resets AF, so we store the state for later recall */
+        rc = alarm_state = rtc_check_alarm_flag();
+        run_before = true;
+    }
+
+    return rc;
+}
+
+/*
+ * I don't think this matters on the gigabeat, it seems designed to shut off the alarm in the
+ * event one happens while the player is running.  This does not cause any problems on the
+ * gigabeat as the interupt is recieved (if not masked) and ignored.
+ */
+bool rtc_check_alarm_flag(void) 
+{
+    return false;
+}
+
+/* set alarm time registers to the given time (repeat once per day) */
+void rtc_set_alarm(int h, int m)
+{
+    ALMMIN=(((m / 10) << 4) | (m % 10)) & 0x7f; /* minutes */
+    ALMHOUR=(((h / 10) << 4) | (h % 10)) & 0x3f; /* hour */
+}
+
+/* read out the current alarm time */
+void rtc_get_alarm(int *h, int *m)
+{
+    *m=((ALMMIN & 0x70) >> 4) * 10 + (ALMMIN & 0x0f);
+    *h=((ALMHOUR & 0x30) >> 4) * 10 + (ALMHOUR & 0x0f);
+}
+
+/* turn alarm on or off by setting the alarm flag enable
+ * returns false if alarm was set and alarm flag (output) is off 
+ */
+bool rtc_enable_alarm(bool enable)
+{
+    /* Note: The interupt for the alarm is normally masked.  May want to enable ( INTMSK&=~(1<<30); )
+     *  it here if an alarm handler is desired (while the unit is not in sleep).
+     */
+    if (enable)
+        RTCALM=0x46;
+    else
+        RTCALM=0x00;
+
+    return false; /* all ok */
+}
+#endif
