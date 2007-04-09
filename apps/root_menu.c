@@ -306,9 +306,11 @@ MENUITEM_RETURNVALUE(bookmarks, ID2P(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS),
 #ifdef HAVE_LCD_CHARCELLS
 static int do_shutdown(void)
 {
+#if CONFIG_CHARGING
     if (charger_inserted())
         charging_splash();
     else
+#endif
         sys_poweroff();
     return 0;
 }
