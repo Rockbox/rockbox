@@ -1883,8 +1883,15 @@ bool gui_wps_refresh(struct gui_wps *gwps,
 
         if (update_line)
         {
-            /* calculate alignment and draw the strings */
-            write_line(display, &align, line, flags & WPS_REFRESH_SCROLL);
+            if (flags & WPS_REFRESH_SCROLL)
+            {
+                /* if the line is a scrolling one we don't want to update
+                   too often, so that it has the time to scroll */
+                if (refresh_mode & WPS_REFRESH_SCROLL)
+                    write_line(display, &align, line, true);
+            }
+            else
+                write_line(display, &align, line, false);
         }
     }
 
