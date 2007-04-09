@@ -18,26 +18,12 @@
  ****************************************************************************/
 #include "plugin.h"
 
-#include <codecs/libwavpack/wavpack.h>  /* for little_endian_to_native() */
-
 PLUGIN_HEADER
 
 static struct plugin_api* rb;
 
-// temp byte buffer
+/* temp byte buffer */
 uint8_t samples[10 * 1024]; /* read 10KB at the time */
-
-/* +++ required by wavpack */
-void *memset(void *s, int c, size_t n)
-{
-  return(rb->memset(s,c,n));
-}
-
-void *memcpy(void *dest, const void *src, size_t n)
-{
-  return(rb->memcpy(dest,src,n));
-}
-/* --- required by wavpack */
 
 static struct wav_header
 {
@@ -86,7 +72,7 @@ static uint32_t ppp = 1;
 /* helper function copied from libwavpack bits.c */
 void little_endian_to_native (void *data, char *format)
 {
-    uchar *cp = (uchar *) data;
+    unsigned char *cp = (unsigned char *) data;
 
     while (*format) {
         switch (*format) {
@@ -106,7 +92,6 @@ void little_endian_to_native (void *data, char *format)
 
                 break;
         }
-
         format++;
     }
 }
@@ -186,12 +171,8 @@ static int readwavpeaks(char *filename)
                                                                 minutes,
                                                                 seconds);
     rb->lcd_puts(0, 5, tstr);
-
     rb->lcd_puts(0, 6, "Searching for peaks... ");
-
-#ifdef HAVE_LCD_BITMAP
     rb->lcd_update();
-#endif
 
     /* calculate room for peaks */
     filepeakcount = header.datachunksize /
@@ -226,27 +207,13 @@ static int readwavpeaks(char *filename)
     
         while(bytes_read)
         {
-#ifdef ROCKBOX_BIG_ENDIAN
-            sampleval = (*sampleshort) >> 8;
-            sampleval |= (*sampleshort) << 8;
-            sampleshort++;
-#else
-            sampleval = *(sampleshort++);
-#endif
-
+            sampleval = letoh16(*sampleshort++);
             if(sampleval < peak->lmin)
                 peak->lmin = sampleval;
             else if (sampleval > peak->lmax)
                 peak->lmax = sampleval;
 
-#ifdef ROCKBOX_BIG_ENDIAN
-            sampleval = (*sampleshort) >> 8;
-            sampleval |= (*sampleshort) << 8;
-            sampleshort++;
-#else
-            sampleval = *(sampleshort++);
-#endif
-
+            sampleval = letoh16(*sampleshort++);
             if(sampleval < peak->rmin)
                 peak->rmin = sampleval;
             else if (sampleval > peak->rmax)
@@ -360,9 +327,7 @@ int displaypeaks(void)
             rymin = INT_MAX;
             rymax = INT_MIN;
             x++;
-#ifdef HAVE_LCD_BITMAP
             rb->lcd_update();
-#endif
         }
         peakcount++;
     }
