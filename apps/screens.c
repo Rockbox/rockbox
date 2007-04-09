@@ -1322,9 +1322,7 @@ bool view_runtime(void)
         FOR_NB_SCREENS(i)
         {
             screens[i].puts(0, y[i]++, s);
-#if defined(HAVE_LCD_BITMAP)
             screens[i].update();
-#endif
         }
 
         /* Wait for a key to be pushed */

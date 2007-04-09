@@ -299,10 +299,8 @@ static bool show_info(void)
 #endif
         }
 
-#if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
         FOR_NB_SCREENS(i)
                 screens[i].update();
-#endif
 
         /* Wait for a key to be pushed */
         key = get_action(CONTEXT_MAINMENU,HZ*5);
