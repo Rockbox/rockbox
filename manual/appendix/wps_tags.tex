@@ -234,6 +234,31 @@ order left -- center -- right. If the aligned texts overlap, they are merged.
 \end{tagmap}
 \end{table}
 
+\opt{CONFIG_RTC}{
+  \section{Real Time Clock}
+  \begin{table}
+    \begin{tagmap}{}{}
+      \config{\%cd}          & Day of month\\
+      \config{\%ce}          & Zero padded day of month\\
+      \config{\%cH}          & Zero padded hour from 00 to 24\\
+      \config{\%ck}          & Hour from 0 to 24\\
+      \config{\%cI}          & Zero padded hour from 12 to 12\\
+      \config{\%cl}          & Hour from 12 to 12\\
+      \config{\%cm}          & Month\\
+      \config{\%cM}          & Minutes\\
+      \config{\%cS}          & Seconds\\
+      \config{\%cy}          & 2-digit year\\ 
+      \config{\%cY}          & 4-digit year\\
+      \config{\%cP}          & Capital AM/PM\\
+      \config{\%cp}          & Lowercase am/pm\\
+      \config{\%ca}          & Weekday name\\
+      \config{\%cb}          & Month name\\
+      \config{\%cu}          & Day of week from 1 to 7, 1 is Monday\\
+      \config{\%cw}          & Day of week from 0 to 6, 0 is Sunday\\
+    \end{tagmap}
+  \end{table}
+}
+
 \section{Other Tags}
 \begin{table}
 \begin{tagmap}{}{}
