@@ -1321,6 +1321,8 @@ bool view_runtime(void)
                     global_status.topruntime = 0;
             }
         }
+        if(default_event_handler(action) == SYS_USB_CONNECTED)
+            return true;
     }
     action_signalscreenchange();
     return false;
