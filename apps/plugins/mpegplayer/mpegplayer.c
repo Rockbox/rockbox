@@ -173,13 +173,6 @@ static int total_offset = 0;
 
 /* Utility */
 
-#define FF_I_TYPE 1 // Intra
-#define FF_P_TYPE 2 // Predicted
-#define FF_B_TYPE 3 // Bi-dir predicted
-#define FF_S_TYPE 4 // S(GMC)-VOP MPEG4
-#define FF_SI_TYPE 5
-#define FF_SP_TYPE 6
-
 /* Atomically add one long value to another - not core safe atm if ever needed */
 static inline void locked_add_long(volatile long *value, long amount)
 {
@@ -1315,7 +1308,6 @@ static void video_thread(void)
             /* A new picture is available - see if we should draw it */
             uint32_t period; /* Frame period in clock ticks */
             int32_t offset;  /* Tick adjustment to keep sync */
-            int type;        /* Frame type: I/P/B/D */
 
             /* No limiting => no dropping so simply make sure skipping is off
                in the decoder and the frame will be drawn */
@@ -1417,10 +1409,11 @@ static void video_thread(void)
             dither_index = (dither_index + 1) & 7;
             offset += time_dither[dither_index]*period >> 3;
 
-            type = info->current_picture->flags & PIC_MASK_CODING_TYPE;
-
             if (frame_drop_level > 1 || offset > CLOCK_RATE*167/1000)
             {
+                /* Frame type: I/P/B/D */
+                int type = info->current_picture->flags & PIC_MASK_CODING_TYPE;
+
                 /* Things are running a bit late or all frames are being
                    dropped until a key frame */
 
