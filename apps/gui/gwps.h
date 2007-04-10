@@ -129,6 +129,12 @@ enum wps_token_type {
 
 #if CONFIG_RTC
     /* Time */
+
+    /* The begin/end values allow us to know if a token is an RTC one.
+       New RTC tokens should be added between the markers. */
+
+    WPS_TOKENS_RTC_BEGIN, /* just the start marker, not an actual token */
+
     WPS_TOKEN_RTC_DAY_OF_MONTH,
     WPS_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED,
     WPS_TOKEN_RTC_HOUR_24_ZERO_PADDED,
@@ -146,6 +152,8 @@ enum wps_token_type {
     WPS_TOKEN_RTC_MONTH_NAME,
     WPS_TOKEN_RTC_DAY_OF_WEEK_START_MON,
     WPS_TOKEN_RTC_DAY_OF_WEEK_START_SUN,
+
+    WPS_TOKENS_RTC_END,     /* just the end marker, not an actual token */
 #endif
 
     /* Conditional */

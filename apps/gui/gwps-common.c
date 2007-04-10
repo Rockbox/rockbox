@@ -767,30 +767,12 @@ static char *get_token_value(struct gui_wps *gwps,
 
     /* if the token is an RTC one, update the time and do the necessary checks */
 
-    if (token->type >= WPS_TOKEN_RTC_DAY_OF_MONTH
-        && token->type <= WPS_TOKEN_RTC_DAY_OF_WEEK_START_SUN)
+    if (token->type >= WPS_TOKENS_RTC_BEGIN
+        && token->type <= WPS_TOKENS_RTC_END)
     {
         tm = get_time();
 
-        if (tm->tm_mday > 31 || tm->tm_mday < 1)
-            return NULL;
-
-        if (tm->tm_hour > 23)
-            return NULL;
-
-        if (tm->tm_mon > 11 || tm->tm_mon < 0)
-            return NULL;
-
-        if (tm->tm_min > 59 || tm->tm_min < 0)
-            return NULL;
-
-        if (tm->tm_sec > 59 || tm->tm_sec < 0)
-            return NULL;
-
-        if (tm->tm_year > 199 || tm->tm_year < 100)
-            return NULL;
-
-        if (tm->tm_wday > 6 || tm->tm_wday < 0)
+        if (!valid_time(tm))
             return NULL;
     }
 #endif
