@@ -113,11 +113,12 @@ static int readwavpeaks(char *filename)
     uint16_t* sampleshort = NULL;
     int16_t sampleval;
     struct peakstruct* peak = NULL;
+    uint32_t fppmp_count;
 
     if(rb->strcasecmp (filename + rb->strlen (filename) - 3, "wav"))
     {
         rb->splash(HZ*2, "Only for wav files!");
-        return 1;
+        return -1;
     }
 
     file = rb->open(filename, O_RDONLY);
@@ -125,13 +126,14 @@ static int readwavpeaks(char *filename)
     if(file < 0)
     {
         rb->splash(HZ*2, "Could not open file!");
-        return 1;
+        return -1;
     }
 
     if(rb->read(file, &header, sizeof (header)) != sizeof (header))
     {
         rb->splash(HZ*2, "Could not read file!");
-        return 1;
+        rb->close (file);
+        return -1;
     }
 
     total_bytes_read += sizeof (header);
@@ -144,7 +146,8 @@ static int readwavpeaks(char *filename)
         header.audioformat != 1)
     {
             rb->splash(HZ*2, "Incompatible wav file!");
-            return true;
+            rb->close (file);
+            return -1;
     }
 
     rb->lcd_clear_display();
@@ -181,11 +184,8 @@ static int readwavpeaks(char *filename)
     fppmp = (filepeakcount / mempeakcount) + 1;
     peak = (struct peakstruct*)audiobuf;
 
+    fppmp_count = fppmp;
     mempeakcount = 0;
-    peak->lmin = INT_MAX;
-    peak->lmax = INT_MIN;
-    peak->rmin = INT_MAX;
-    peak->rmax = INT_MIN;
     while(total_bytes_read < (header.datachunksize +
                               sizeof(struct wav_header)))
     {
@@ -195,15 +195,23 @@ static int readwavpeaks(char *filename)
         if(0 == bytes_read)
         {
             rb->splash(HZ*2, "File read error!");
-            return 1;
+            rb->close (file);
+            return -1;
         }
         if(((bytes_read/4)*4) != bytes_read)
         {
             rb->splash(HZ*2, "bytes_read/*4 err: %ld",(long int)bytes_read);
-            return 1;
+            rb->close (file);
+            return -1;
         }
 
         sampleshort = (int16_t*)samples;
+        sampleval = letoh16(*sampleshort);
+        peak->lmin = sampleval;
+        peak->lmax = sampleval;
+        sampleval = letoh16(*(sampleshort+1));
+        peak->rmin = sampleval;
+        peak->rmax = sampleval;
     
         while(bytes_read)
         {
@@ -221,29 +229,18 @@ static int readwavpeaks(char *filename)
 
             bytes_read -= 4;
             peakcount++;
-            if(0 == (peakcount % fppmp))
+            fppmp_count--;
+            if(!fppmp_count)
             {
-                /* extra min/max check */
-                if(peak->lmin > peak->lmax)
-                {
-                    if(peak->lmin == INT_MAX)
-                        peak->lmin = peak->lmax;
-                    if(peak->lmax == INT_MIN)
-                        peak->lmax = peak->lmin;
-                }
-                if(peak->rmin > peak->rmax)
-                {
-                    if(peak->rmin == INT_MAX)
-                        peak->rmin = peak->rmax;
-                    if(peak->rmax == INT_MIN)
-                        peak->rmax = peak->rmin;
-                }
                 peak++;
                 mempeakcount++;
-                peak->lmin = INT_MAX;
-                peak->lmax = INT_MIN;
-                peak->rmin = INT_MAX;
-                peak->rmax = INT_MIN;
+                fppmp_count = fppmp;
+                sampleval = letoh16(*sampleshort);
+                peak->lmin = sampleval;
+                peak->lmax = sampleval;
+                sampleval = letoh16(*(sampleshort+1));
+                peak->rmin = sampleval;
+                peak->rmax = sampleval;
             }
         }
 
@@ -253,6 +250,14 @@ static int readwavpeaks(char *filename)
                                  sizeof(struct wav_header)) / 100)));
         rb->lcd_puts(0, 6, tstr);
         rb->lcd_update();
+
+        /* allow user to abort */
+        if(ACTION_KBD_ABORT == rb->get_action(CONTEXT_KEYBOARD,TIMEOUT_NOBLOCK))
+        {
+            rb->splash(HZ*2, "ABORTED");
+            rb->close (file);
+            return -1;
+        }
     }
 
     rb->lcd_puts(0, 6, "Searching for peaks... done");
@@ -339,12 +344,24 @@ int displaypeaks(void)
     return 0;
 }
 
+void show_help(void)
+{
+    rb->lcd_clear_display();
+    rb->lcd_puts(0, 0, "WAVVIEW USAGE:");
+    rb->lcd_puts(0, 2, "up/down: zoom out/in");
+    rb->lcd_puts(0, 3, "left/right: pan left/right");
+    rb->lcd_puts(0, 4, "select: refresh/continue");
+    rb->lcd_puts(0, 5, "stop/off: quit");
+    rb->lcd_update();
+}
+
 enum plugin_status plugin_start(struct plugin_api* api, void *parameter)
 {
     unsigned int quit = 0;
     unsigned int action = 0;
     unsigned int dodisplay = 1;
     rb = api;
+    int retval;
 
     if (!parameter)
         return PLUGIN_ERROR;
@@ -361,14 +378,24 @@ enum plugin_status plugin_start(struct plugin_api* api, void *parameter)
     rb->cpu_boost(true);
 #endif
 
-    readwavpeaks(parameter); /* read WAV file and create peaks array */
+    retval = readwavpeaks(parameter); /* read WAV file and create peaks array */
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
 #endif
 
+    if(retval)
+        return 0;
+
     /* press any key to continue */
-    while(ACTION_KBD_ABORT != rb->get_action(CONTEXT_KEYBOARD,TIMEOUT_BLOCK));
+    while(1)
+    {
+        retval = rb->get_action(CONTEXT_KEYBOARD,TIMEOUT_BLOCK);
+        if(ACTION_KBD_ABORT == retval)
+            return 0;
+        else if(ACTION_KBD_SELECT == retval)
+            break;
+    }
 
     /* start with the overview */
     zoomlevel = 1;
@@ -430,6 +457,17 @@ enum plugin_status plugin_start(struct plugin_api* api, void *parameter)
             break;
         case ACTION_KBD_SELECT:
             /* refresh */
+            break;
+        case ACTION_KBD_PAGE_FLIP:
+            /* menu key shows help */
+            show_help();
+            while(1)
+            {
+                retval = rb->get_action(CONTEXT_KEYBOARD,TIMEOUT_BLOCK);
+                if((ACTION_KBD_SELECT == retval) ||
+                   (ACTION_KBD_ABORT == retval))
+                   break;
+            }
             break;
         default:
             /* eat it */
