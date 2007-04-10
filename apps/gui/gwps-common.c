@@ -1887,7 +1887,7 @@ bool gui_wps_refresh(struct gui_wps *gwps,
             {
                 /* if the line is a scrolling one we don't want to update
                    too often, so that it has the time to scroll */
-                if (refresh_mode & WPS_REFRESH_SCROLL)
+                if ((refresh_mode & WPS_REFRESH_SCROLL) || new_subline_refresh)
                     write_line(display, &align, line, true);
             }
             else
