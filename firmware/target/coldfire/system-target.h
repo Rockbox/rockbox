@@ -40,6 +40,13 @@
      : /* %0 */ "d"(mask),   \
        /* %1 */ "a"(address))
 
+#define add_l(addend, address) \
+  asm                          \
+    ("add.l %0, (%1)"          \
+     :                         \
+     : /* %0 */ "r"(addend),   \
+       /* %1 */ "a"(address))
+
 #define EMAC_ROUND      0x10
 #define EMAC_FRACTIONAL 0x20
 #define EMAC_SATURATE   0x80

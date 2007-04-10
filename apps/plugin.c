@@ -39,7 +39,7 @@
 
 #ifdef HAVE_LCD_BITMAP
 #include "scrollbar.h"
-#include "peakmeter.h" 
+#include "peakmeter.h"
 #include "bmp.h"
 #include "bidi.h"
 #endif
@@ -222,7 +222,7 @@ static const struct plugin_api rockbox_api = {
     PREFIX(readdir),
     PREFIX(mkdir),
     PREFIX(rmdir),
-    
+
     /* dir, cached */
 #ifdef HAVE_DIRCACHE
     opendir_cached,
@@ -233,6 +233,9 @@ static const struct plugin_api rockbox_api = {
     /* kernel/ system */
     PREFIX(sleep),
     yield,
+#ifdef HAVE_PRIORITY_SCHEDULING
+    priority_yield,
+#endif
     &current_tick,
     default_event_handler,
     default_event_handler_ex,
@@ -306,6 +309,9 @@ static const struct plugin_api rockbox_api = {
     utf8seek,
 
     /* sound */
+#if CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING)
+    sound_default,
+#endif
     sound_set,
     set_sound,
 
@@ -321,17 +327,40 @@ static const struct plugin_api rockbox_api = {
 #endif
 #endif
 #if CONFIG_CODEC == SWCODEC
+    &audio_master_sampr_list[0],
+    &hw_freq_sampr[0],
+#ifndef SIMULATOR
+    pcm_apply_settings,
+#endif
     pcm_play_data,
     pcm_play_stop,
     pcm_set_frequency,
     pcm_is_playing,
+    pcm_is_paused,
     pcm_play_pause,
-#endif
-#if CONFIG_CODEC == SWCODEC
+    pcm_get_bytes_waiting,
     pcm_calculate_peaks,
+#ifdef HAVE_RECORDING
+    &rec_freq_sampr[0],
+#ifndef SIMULATOR
+    pcm_init_recording,
+    pcm_close_recording,
+    pcm_record_data,
+    pcm_record_more,
+    pcm_stop_recording,
+    pcm_calculate_rec_peaks,
+    audio_set_recording_gain,
+    audio_set_output_source,
+    rec_set_source,
+#endif
+#endif /* HAVE_RECORDING */
+
 #endif
 
     /* playback control */
+    playlist_amount,
+    playlist_resume,
+    playlist_start,
     PREFIX(audio_play),
     audio_stop,
     audio_pause,
@@ -340,7 +369,6 @@ static const struct plugin_api rockbox_api = {
     audio_prev,
     audio_ff_rewind,
     audio_next_track,
-    playlist_amount,
     audio_status,
     audio_has_changed_track,
     audio_current_track,
@@ -414,6 +442,9 @@ static const struct plugin_api rockbox_api = {
     plugin_get_buffer,
     plugin_get_audio_buffer,
     plugin_tsr,
+#ifdef IRAM_STEAL
+    plugin_iram_init,
+#endif
 #if defined(DEBUG) || defined(SIMULATOR)
     debugf,
 #endif
@@ -421,6 +452,7 @@ static const struct plugin_api rockbox_api = {
     _logf,
 #endif
     &global_settings,
+    &global_status,
     mp3info,
     count_mp3_frames,
     create_xing_header,
@@ -444,52 +476,15 @@ static const struct plugin_api rockbox_api = {
 #if LCD_DEPTH > 1
     lcd_get_backdrop,
 #endif
+
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-
-/* Keep these at the bottom till fully proven */
-#if CONFIG_CODEC == SWCODEC
-    &audio_master_sampr_list[0],
-    &hw_freq_sampr[0],
-#ifndef SIMULATOR
-    pcm_apply_settings,
-#endif
-#ifdef HAVE_RECORDING
-    &rec_freq_sampr[0],
-#ifndef SIMULATOR
-    pcm_init_recording,
-    pcm_close_recording,
-    pcm_record_data,
-    pcm_stop_recording,
-    pcm_calculate_rec_peaks,
-    audio_set_recording_gain,
-    audio_set_output_source,
-    rec_set_source,
-#endif
-#endif /* HAVE_RECORDING */
-#endif /* CONFIG_CODEC == SWCODEC */
-
-#ifdef IRAM_STEAL
-    plugin_iram_init,
-#endif
-
-#if CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING) && !defined(SIMULATOR)
-    sound_default,
-    pcm_record_more,
-#endif
 
 #ifdef IRIVER_H100_SERIES
     /* Routines for the iriver_flash -plugin. */
     detect_original_firmware,
     detect_flashed_ramimage,
     detect_flashed_romimage,
-#endif
-    playlist_resume,
-    playlist_start,
-    &global_status,
-
-#if CONFIG_CODEC == SWCODEC
-    pcm_get_bytes_waiting,
 #endif
 };
 
@@ -516,7 +511,7 @@ int plugin_load(const char* plugin, void* parameter)
     if (!p)
         p = plugin;
     action_signalscreenchange();
-    
+
     if (pfn_tsr_exit != NULL) /* if we have a resident old plugin: */
     {
         if (pfn_tsr_exit(!strcmp(current_plugin,p)) == false )
@@ -527,7 +522,7 @@ int plugin_load(const char* plugin, void* parameter)
         pfn_tsr_exit = NULL;
         plugin_loaded = false;
     }
-    
+
     gui_syncsplash(0, str(LANG_WAIT));
     strcpy(current_plugin,p);
 
@@ -590,7 +585,7 @@ int plugin_load(const char* plugin, void* parameter)
     xm = lcd_getxmargin();
     ym = lcd_getymargin();
     lcd_setmargins(0,0);
-    
+
 #if defined HAVE_LCD_BITMAP && LCD_DEPTH > 1
     old_backdrop = lcd_get_backdrop();
 #endif
@@ -609,7 +604,7 @@ int plugin_load(const char* plugin, void* parameter)
 
     rc = hdr->entry_point((struct plugin_api*) &rockbox_api, parameter);
     /* explicitly casting the pointer here to avoid touching every plugin. */
-    
+
     action_signalscreenchange();
     button_clear_queue();
 

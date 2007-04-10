@@ -29,7 +29,7 @@
 #define MEM 2
 #endif
 
-#include <stdbool.h>                  
+#include <stdbool.h>
 #include <sys/types.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -110,12 +110,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 51
+#define PLUGIN_API_VERSION 52
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 51
+#define PLUGIN_MIN_API_VERSION 52
 
 /* plugin return codes */
 enum plugin_status {
@@ -322,6 +322,9 @@ struct plugin_api {
     /* kernel/ system */
     void (*PREFIX(sleep))(int ticks);
     void (*yield)(void);
+#ifdef HAVE_PRIORITY_SCHEDULING
+    void (*priority_yield)(void);
+#endif
     long* current_tick;
     long (*default_event_handler)(long event);
     long (*default_event_handler_ex)(long event, void (*callback)(void *), void *parameter);
@@ -401,6 +404,9 @@ struct plugin_api {
     int (*utf8seek)(const unsigned char* utf8, int offset);
 
     /* sound */
+#if CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING)
+    int (*sound_default)(int setting);
+#endif
     void (*sound_set)(int setting, int value);
     bool (*set_sound)(const unsigned char * string,
                       int* variable, int setting);
@@ -416,18 +422,42 @@ struct plugin_api {
 #endif
 #endif /* !SIMULATOR */
 #if CONFIG_CODEC == SWCODEC
+    const unsigned long *audio_master_sampr_list;
+    const unsigned long *hw_freq_sampr;
+#ifndef SIMULATOR
+    void (*pcm_apply_settings)(void);
+#endif
     void (*pcm_play_data)(pcm_more_callback_type get_more,
             unsigned char* start, size_t size);
     void (*pcm_play_stop)(void);
     void (*pcm_set_frequency)(unsigned int frequency);
     bool (*pcm_is_playing)(void);
+    bool (*pcm_is_paused)(void);
     void (*pcm_play_pause)(bool play);
-#endif
-#if CONFIG_CODEC == SWCODEC
+    size_t (*pcm_get_bytes_waiting)(void);
     void (*pcm_calculate_peaks)(int *left, int *right);
+#ifdef HAVE_RECORDING
+    const unsigned long *rec_freq_sampr;
+#ifndef SIMULATOR
+    void (*pcm_init_recording)(void);
+    void (*pcm_close_recording)(void);
+    void (*pcm_record_data)(pcm_more_callback_type2 more_ready,
+                            void *start, size_t size);
+    void (*pcm_record_more)(void *start, size_t size);
+    void (*pcm_stop_recording)(void);
+    void (*pcm_calculate_rec_peaks)(int *left, int *right);
+    void (*audio_set_recording_gain)(int left, int right, int type);
+    void (*audio_set_output_source)(int monitor);
+    void (*rec_set_source)(int source, unsigned flags);
+#endif
+#endif /* HAVE_RECORDING */
+
 #endif
 
     /* playback control */
+    int (*playlist_amount)(void);
+    int (*playlist_resume)(void);
+    int (*playlist_start)(int start_index, int offset);
     void (*PREFIX(audio_play))(long offset);
     void (*audio_stop)(void);
     void (*audio_pause)(void);
@@ -436,7 +466,6 @@ struct plugin_api {
     void (*audio_prev)(void);
     void (*audio_ff_rewind)(long newtime);
     struct mp3entry* (*audio_next_track)(void);
-    int (*playlist_amount)(void);
     int (*audio_status)(void);
     bool (*audio_has_changed_track)(void);
     struct mp3entry* (*audio_current_track)(void);
@@ -519,6 +548,10 @@ struct plugin_api {
     void* (*plugin_get_buffer)(int* buffer_size);
     void* (*plugin_get_audio_buffer)(int* buffer_size);
     void (*plugin_tsr)(bool (*exit_callback)(bool reenter));
+#ifdef IRAM_STEAL
+    void (*plugin_iram_init)(char *iramstart, char *iramcopy, size_t iram_size,
+                             char *iedata, size_t iedata_size);
+#endif
 #if defined(DEBUG) || defined(SIMULATOR)
     void (*debugf)(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2);
 #endif
@@ -526,6 +559,7 @@ struct plugin_api {
     void (*logf)(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2);
 #endif
     struct user_settings* global_settings;
+    struct system_status *global_status;
     bool (*mp3info)(struct mp3entry *entry, const char *filename, bool v1first);
     int (*count_mp3_frames)(int fd, int startpos, int filesize,
                             void (*progressfunc)(int));
@@ -560,51 +594,11 @@ struct plugin_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
-/* Keep these at the bottom till fully proven */
-#if CONFIG_CODEC == SWCODEC
-    const unsigned long *audio_master_sampr_list;
-    const unsigned long *hw_freq_sampr;
-#ifndef SIMULATOR
-    void (*pcm_apply_settings)(void);
-#endif
-#ifdef HAVE_RECORDING
-    const unsigned long *rec_freq_sampr;
-#ifndef SIMULATOR
-    void (*pcm_init_recording)(void);
-    void (*pcm_close_recording)(void);
-    void (*pcm_record_data)(pcm_more_callback_type2 more_ready,
-                            void *start, size_t size);
-    void (*pcm_stop_recording)(void);
-    void (*pcm_calculate_rec_peaks)(int *left, int *right);
-    void (*audio_set_recording_gain)(int left, int right, int type);
-    void (*audio_set_output_source)(int monitor);
-    void (*rec_set_source)(int source, unsigned flags);
-#endif
-#endif /* HAVE_RECORDING */
-#endif /* CONFIG_CODEC == SWCODEC */
-
-#ifdef IRAM_STEAL
-    void (*plugin_iram_init)(char *iramstart, char *iramcopy, size_t iram_size,
-                             char *iedata, size_t iedata_size);
-#endif
-
-#if CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING) && !defined(SIMULATOR)
-    int (*sound_default)(int setting);
-    void (*pcm_record_more)(void *start, size_t size);
-#endif
-    
 #ifdef IRIVER_H100_SERIES
     /* Routines for the iriver_flash -plugin. */
     bool (*detect_original_firmware)(void);
     bool (*detect_flashed_ramimage)(void);
     bool (*detect_flashed_romimage)(void);
-#endif
-    int (*playlist_resume)(void);
-    int (*playlist_start)(int start_index, int offset);
-    struct system_status *global_status;
-
-#if CONFIG_CODEC == SWCODEC
-    size_t (*pcm_get_bytes_waiting)(void);
 #endif
 };
 
@@ -660,7 +654,7 @@ void plugin_iram_init(char *iramstart, char *iramcopy, size_t iram_size,
                       char *iedata, size_t iedata_size);
 #endif
 
-/* plugin_tsr, 
+/* plugin_tsr,
     callback returns true to allow the new plugin to load,
     reenter means the currently running plugin is being reloaded */
 void plugin_tsr(bool (*exit_callback)(bool reenter));
