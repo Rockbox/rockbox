@@ -1255,103 +1255,74 @@ bool browse_id3(void)
     }
 }
 
+static char* runtime_get_data(int selected_item, void* data, char* buffer)
+{
+    (void) data;
+    unsigned char *headers[] = {str(LANG_RUNNING_TIME), str(LANG_TOP_TIME) };
+    int t;
+    if(!(selected_item%2))
+        return headers[selected_item/2];
+
+    if(selected_item/2) t = global_status.topruntime;
+    else t = global_status.runtime;
+
+    snprintf(buffer, 16, "%dh %dm %ds",
+        t / 3600, (t % 3600) / 60, t % 60);
+    return buffer;
+
+}
+
+
 bool view_runtime(void)
 {
-    char s[32];
-    bool done = false;
-    int state = 1;
-    int i;
-    int key;
     unsigned char *lines[]={str(LANG_CLEAR_TIME)};
     struct text_message message={(char **)lines, 1};
 
-#if defined(HAVE_LCD_BITMAP)
-    FOR_NB_SCREENS(i)
-    {
-        if(global_settings.statusbar)
-            screens[i].setmargins(0, STATUSBAR_HEIGHT);
-        else
-            screens[i].setmargins(0, 0);
-    }
+    struct gui_synclist lists;
+    int action;
+    gui_synclist_init(&lists, runtime_get_data, NULL, false, 2);
+#if !defined(HAVE_LCD_CHARCELLS)
+    gui_synclist_set_title(&lists, str(LANG_RUNNING_TIME), NOICON);
+#else
+    gui_synclist_set_title(&lists, NULL, NOICON);
 #endif
-    while(!done)
+    gui_synclist_set_icon_callback(&lists, NULL);
+    gui_synclist_set_nb_items(&lists, 4);
+    action_signalscreenchange();
+    while(1)
     {
-        int y[NB_SCREENS]={0};
-        int t;
-
-        FOR_NB_SCREENS(i)
-        {
-            screens[i].clear_display();
-#ifdef HAVE_LCD_BITMAP
-            if (screens[i].nb_lines >4)
-            {
-                screens[i].puts(0, y[i]++, str(LANG_RUNNING_TIME));
-            }
-#endif
-        }
-
-        if (state & 1) {
 #if CONFIG_CHARGING
-            if (charger_inserted()
+        if (charger_inserted()
 #ifdef HAVE_USB_POWER
-                    || usb_powered()
+            || usb_powered()
 #endif
-                    )
-            {
-                global_status.runtime = 0;
-            }
-            else
-#endif
-            {
-                global_status.runtime += ((current_tick - lasttime) / HZ);
-            }
-            lasttime = current_tick;
-
-            t = global_status.runtime;
-            FOR_NB_SCREENS(i)
-                screens[i].puts(0, y[i]++, str(LANG_CURRENT_TIME));
-        }
-        else {
-            t = global_status.topruntime;
-            FOR_NB_SCREENS(i)
-                screens[i].puts(0, y[i]++, str(LANG_TOP_TIME));
-        }
-        snprintf(s, sizeof(s), "%dh %dm %ds",
-                 t / 3600, (t % 3600) / 60, t % 60);
-        gui_syncstatusbar_draw(&statusbars, true);
-        FOR_NB_SCREENS(i)
+        )
         {
-            screens[i].puts(0, y[i]++, s);
-            screens[i].update();
+            global_status.runtime = 0;
         }
-
-        /* Wait for a key to be pushed */
-        key = get_action(CONTEXT_STD,HZ);
-        switch(key) {
-            case ACTION_STD_CANCEL:
-                done = true;
-                break;
-
-            case ACTION_STD_NEXT:
-            case ACTION_STD_PREV:
-                state = (state==1)?2:1;
-                break;
-
-            case ACTION_STD_OK:
-                if(gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
-                {
-                    if ( state == 1 )
-                        global_status.runtime = 0;
-                    else
-                        global_status.topruntime = 0;
-                }
-                break;
-            default:
-                if(default_event_handler(key) ==  SYS_USB_CONNECTED)
-                    return true;
-                break;
+        else
+#endif
+        {
+            global_status.runtime += ((current_tick - lasttime) / HZ);
+        }
+        lasttime = current_tick;
+        gui_synclist_draw(&lists);
+        gui_syncstatusbar_draw(&statusbars, true);
+        action = get_action(CONTEXT_STD, HZ);
+        gui_synclist_do_button(&lists, action, LIST_WRAP_UNLESS_HELD);
+        if(action == ACTION_STD_CANCEL)
+            break;
+        if(action == ACTION_STD_OK) {
+            if(gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
+            {
+                if (!(gui_synclist_get_sel_pos(&lists)/2))
+                    global_status.runtime = 0;
+                else
+                    global_status.topruntime = 0;
+            }
         }
     }
     action_signalscreenchange();
     return false;
 }
+
