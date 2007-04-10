@@ -138,13 +138,6 @@ void usb_enable(bool on)
         or_b(0x08, &PADRL); /* deassert card detect */
     }
     or_b(0x28, &PAIORL); /* output for USB enable and card detect */
-#elif defined(USB_ISP1582)
-    /* TODO: Implement USB_ISP1582 */
-    (void) on;
-#elif defined(USB_X5M5_STYLE)
-    /* TODO X5 */
-#elif defined(USB_GIGABEAT_STYLE)
-    /* TODO gigabeat */
 #else
 #ifdef HAVE_LCD_BITMAP
     if(read_hw_mask() & USB_ACTIVE_HIGH)
@@ -350,10 +343,6 @@ bool usb_detect(void)
 #endif
 #ifdef USB_PLAYERSTYLE
     current_status = (PADR & 0x8000)?false:true;
-#endif
-#ifdef USB_ISP1582
-    /* TODO: Implement USB_ISP1582 */
-    current_status = false;
 #endif
     return current_status;
 }
