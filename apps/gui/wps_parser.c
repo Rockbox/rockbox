@@ -108,33 +108,6 @@ static int parse_image_display(const char *wps_bufptr,
 static int parse_image_load(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 #endif /*HAVE_LCD_BITMAP */
-#if CONFIG_RTC
-static int parse_rtc_format(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data);
-
-/* RTC tokens array */
-static const struct wps_tag rtc_tags[] = {
-    { WPS_TOKEN_RTC_DAY_OF_MONTH,              "d", 0, NULL },
-    { WPS_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED, "e", 0, NULL },
-    { WPS_TOKEN_RTC_HOUR_24_ZERO_PADDED,       "H", 0, NULL },
-    { WPS_TOKEN_RTC_HOUR_24,                   "k", 0, NULL },
-    { WPS_TOKEN_RTC_HOUR_12_ZERO_PADDED,       "I", 0, NULL },
-    { WPS_TOKEN_RTC_HOUR_12,                   "l", 0, NULL },
-    { WPS_TOKEN_RTC_MONTH,                     "m", 0, NULL },
-    { WPS_TOKEN_RTC_MINUTE,                    "M", 0, NULL },
-    { WPS_TOKEN_RTC_SECOND,                    "S", 0, NULL },
-    { WPS_TOKEN_RTC_YEAR_2_DIGITS,             "y", 0, NULL },
-    { WPS_TOKEN_RTC_YEAR_4_DIGITS,             "Y", 0, NULL },
-    { WPS_TOKEN_RTC_AM_PM_UPPER,               "p", 0, NULL },
-    { WPS_TOKEN_RTC_AM_PM_LOWER,               "P", 0, NULL },
-    { WPS_TOKEN_RTC_WEEKDAY_NAME,              "a", 0, NULL },
-    { WPS_TOKEN_RTC_MONTH_NAME,                "b", 0, NULL },
-    { WPS_TOKEN_RTC_DAY_OF_WEEK_START_MON,     "u", 0, NULL },
-    { WPS_TOKEN_RTC_DAY_OF_WEEK_START_SUN,     "w", 0, NULL },
-    { WPS_TOKEN_CHARACTER,                     "",  0, NULL }
-    /* the array MUST end with an empty string (first char is \0) */
-};
-#endif
 
 /* array of available tags - those with more characters have to go first
    (e.g. "xl" and "xd" before "x"). It needs to end with the unknown token. */
@@ -156,7 +129,23 @@ static const struct wps_tag all_tags[] = {
 #endif
 
 #if CONFIG_RTC
-    {  WPS_TOKEN_RTC,                     "c",   WPS_REFRESH_DYNAMIC, parse_rtc_format },
+    { WPS_TOKEN_RTC_DAY_OF_MONTH,              "cd", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED, "ce", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_HOUR_24_ZERO_PADDED,       "cH", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_HOUR_24,                   "ck", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_HOUR_12_ZERO_PADDED,       "cI", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_HOUR_12,                   "cl", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_MONTH,                     "cm", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_MINUTE,                    "cM", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_SECOND,                    "cS", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_YEAR_2_DIGITS,             "cy", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_YEAR_4_DIGITS,             "cY", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_AM_PM_UPPER,               "cP", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_AM_PM_LOWER,               "cp", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_WEEKDAY_NAME,              "ca", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_MONTH_NAME,                "cb", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_DAY_OF_WEEK_START_MON,     "cu", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_DAY_OF_WEEK_START_SUN,     "cw", WPS_REFRESH_DYNAMIC, NULL },
 #endif
 
     /* current file */
@@ -285,37 +274,6 @@ static void wps_start_new_subline(struct wps_data *data) {
     data->sublines[data->num_sublines].first_token_idx = data->num_tokens;
     data->lines[data->num_lines].num_sublines++;
 }
-
-#if CONFIG_RTC
-static int parse_rtc_format(const char *wps_bufptr,
-                            struct wps_token *token,
-                            struct wps_data *wps_data)
-{
-    int skip = 0, i;
-    (void)token; /* kill the warning */
-
-    /* RTC tag format ends with a c or a newline */
-    while (wps_bufptr && *wps_bufptr != 'c' && *wps_bufptr != '\n')
-    {
-        /* find what format char we have */
-        i = 0;
-        while (*(rtc_tags[i].name) && *wps_bufptr != *(rtc_tags[i].name))
-            i++;
-
-        wps_data->num_tokens++;
-        wps_data->tokens[wps_data->num_tokens].type = rtc_tags[i].type;
-        wps_data->tokens[wps_data->num_tokens].value.c = *wps_bufptr;
-        skip++;
-        wps_bufptr++;
-    }
-
-    /* eat the unwanted c at the end of the format */
-    if (*wps_bufptr == 'c')
-        skip++;
-
-    return skip;
-}
-#endif
 
 #ifdef HAVE_LCD_BITMAP
 

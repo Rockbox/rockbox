@@ -135,30 +135,56 @@ void dump_wps_tokens(struct wps_data *data)
                 break;
 
 #if CONFIG_RTC
-            case WPS_TOKEN_RTC:
-                snprintf(buf, sizeof(buf), "real-time clock",
-                        token->value.c);
-                break;
-
             case WPS_TOKEN_RTC_DAY_OF_MONTH:
+                snprintf(buf, sizeof(buf), "rtc: day of month (01..31)");
+                break;
             case WPS_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED:
+                snprintf(buf, sizeof(buf), "rtc: day of month, blank padded ( 1..31)");
+                break;
             case WPS_TOKEN_RTC_HOUR_24_ZERO_PADDED:
+                snprintf(buf, sizeof(buf), "rtc: hour (00..23)");
+                break;
             case WPS_TOKEN_RTC_HOUR_24:
+                snprintf(buf, sizeof(buf), "rtc: hour ( 0..23)");
+                break;
             case WPS_TOKEN_RTC_HOUR_12_ZERO_PADDED:
+                snprintf(buf, sizeof(buf), "rtc: hour (01..12)");
+                break;
             case WPS_TOKEN_RTC_HOUR_12:
+                snprintf(buf, sizeof(buf), "rtc: hour ( 1..12)");
+                break;
             case WPS_TOKEN_RTC_MONTH:
+                snprintf(buf, sizeof(buf), "rtc: month (01..12)");
+                break;
             case WPS_TOKEN_RTC_MINUTE:
+                snprintf(buf, sizeof(buf), "rtc: minute (00..59)");
+                break;
             case WPS_TOKEN_RTC_SECOND:
+                snprintf(buf, sizeof(buf), "rtc: second (00..59)");
+                break;
             case WPS_TOKEN_RTC_YEAR_2_DIGITS:
+                snprintf(buf, sizeof(buf), "rtc: last two digits of year (00..99)");
+                break;
             case WPS_TOKEN_RTC_YEAR_4_DIGITS:
+                snprintf(buf, sizeof(buf), "rtc: year (1970...)");
+                break;
             case WPS_TOKEN_RTC_AM_PM_UPPER:
+                snprintf(buf, sizeof(buf), "rtc: upper case AM or PM indicator");
+                break;
             case WPS_TOKEN_RTC_AM_PM_LOWER:
+                snprintf(buf, sizeof(buf), "rtc: lower case am or pm indicator");
+                break;
             case WPS_TOKEN_RTC_WEEKDAY_NAME:
+                snprintf(buf, sizeof(buf), "rtc: abbreviated weekday name (Sun..Sat)");
+                break;
             case WPS_TOKEN_RTC_MONTH_NAME:
+                snprintf(buf, sizeof(buf), "rtc: abbreviated month name (Jan..Dec)");
+                break;
             case WPS_TOKEN_RTC_DAY_OF_WEEK_START_MON:
+                snprintf(buf, sizeof(buf), "rtc: day of week (1..7); 1 is Monday");
+                break;
             case WPS_TOKEN_RTC_DAY_OF_WEEK_START_SUN:
-                snprintf(buf, sizeof(buf), "real-time clock tag: %c",
-                        token->value.c);
+                snprintf(buf, sizeof(buf), "rtc: day of week (0..6); 0 is Sunday");
                 break;
 #endif
 
