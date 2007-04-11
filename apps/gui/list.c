@@ -54,7 +54,7 @@ static bool offset_out_of_view = false;
 static struct gui_list* last_list_displayed[NB_SCREENS];
 
 #define SHOW_LIST_TITLE ((gui_list->title != NULL) && \
-                         (gui_list->display->nb_lines > 1))
+                         (gui_list->display->nb_lines > 2))
 
 static void gui_list_put_selection_in_screen(struct gui_list * gui_list,
                                              bool put_from_end);
