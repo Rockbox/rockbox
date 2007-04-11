@@ -26,7 +26,8 @@
  * read_bmp_file()
  *
  * Reads a 8bit BMP file and puts the data in a 1-pixel-per-byte
- * array. Returns 0 on success.
+ * array. 
+ * Returns < 0 for error, or number of bytes used from the bitmpa buffer
  *
  **********************************************/
 int read_bmp_file(char* filename,
