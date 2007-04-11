@@ -64,7 +64,6 @@
 #define SET_16BITREG(reg,val) reg = (val)
 
 extern volatile unsigned char* ata_control;
-extern int ata_io_address;
 
 void ata_reset(void);
 void ata_enable(bool on);

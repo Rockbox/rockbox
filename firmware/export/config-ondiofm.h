@@ -78,12 +78,6 @@
 /* Define this if the tuner is switched on by software */
 #define HAVE_TUNER_PWR_CTRL
 
-/* How to detect USB */
-#define USB_FMRECORDERSTYLE 1 /* like FM, on AN1 */
-
-/* How to enable USB */
-#define USB_ENABLE_ONDIOSTYLE 1 /* with PA5 */
-
 /* The start address index for ROM builds */
 /* #define ROM_START 0x16010 for behind original Archos */
 #define ROM_START 0x7010 /* for behind BootBox */

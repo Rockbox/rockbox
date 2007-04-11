@@ -121,8 +121,6 @@ static bool dbg_list(char *title, int count, int selection_size,
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
 /*---------------------------------------------------*/
-extern int ata_device;
-extern int ata_io_address;
 extern struct thread_entry threads[MAXTHREADS];
 
 
@@ -407,8 +405,6 @@ static bool dbg_hw_info(void)
 {
 #if CONFIG_CPU == SH7034
     char buf[32];
-    int usb_polarity;
-    int pr_polarity;
     int bitmask = *(unsigned short*)0x20000fc;
     int rom_version = *(unsigned short*)0x20000fe;
     unsigned manu, id; /* flash IDs */
@@ -416,20 +412,6 @@ static bool dbg_hw_info(void)
     unsigned rom_crc = 0xffffffff; /* CRC32 of the boot ROM */
     bool has_bootrom; /* flag for boot ROM present */
     int oldmode;  /* saved memory guard mode */
-
-#ifdef USB_ENABLE_ONDIOSTYLE
-    if(PADRL & 0x20)
-#else
-    if(PADRH & 0x04)
-#endif
-        usb_polarity = 0; /* Negative */
-    else
-        usb_polarity = 1; /* Positive */
-
-    if(PADRH & 0x08)
-        pr_polarity = 0; /* Negative */
-    else
-        pr_polarity = 1; /* Positive */
 
     oldmode = system_memory_guard(MEMGUARD_NONE);  /* disable memory guard */
 
@@ -460,17 +442,11 @@ static bool dbg_hw_info(void)
     snprintf(buf, 32, "Mask: 0x%04x", bitmask);
     lcd_puts(0, 2, buf);
 
-    snprintf(buf, 32, "USB: %s", usb_polarity?"positive":"negative");
-    lcd_puts(0, 3, buf);
-
-    snprintf(buf, 32, "PR: %s", pr_polarity?"positive":"negative");
-    lcd_puts(0, 4, buf);
-
     if (got_id)
         snprintf(buf, 32, "Flash: M=%02x D=%02x", manu, id);
     else
         snprintf(buf, 32, "Flash: M=?? D=??"); /* unknown, sorry */
-    lcd_puts(0, 5, buf);
+    lcd_puts(0, 3, buf);
 
     if (has_bootrom)
     {
@@ -483,13 +459,8 @@ static bool dbg_hw_info(void)
     {
         snprintf(buf, 32, "Boot ROM: none");
     }
-    lcd_puts(0, 6, buf);
+    lcd_puts(0, 4, buf);
 
-#ifndef HAVE_MMC /* have ATA */
-    snprintf(buf, 32, "ATA: 0x%x,%s", ata_io_address,
-             ata_device ? "slave":"master");
-    lcd_puts(0, 7, buf);
-#endif
     lcd_update();
 
     while(1)
@@ -593,19 +564,12 @@ static bool dbg_hw_info(void)
     char buf[32];
     int button;
     int currval = 0;
-    int usb_polarity;
-    int bitmask = *(unsigned short*)0x20000fc;
     int rom_version = *(unsigned short*)0x20000fe;
     unsigned manu, id; /* flash IDs */
     bool got_id; /* flag if we managed to get the flash IDs */
     unsigned rom_crc = 0xffffffff; /* CRC32 of the boot ROM */
     bool has_bootrom; /* flag for boot ROM present */
     int oldmode;  /* saved memory guard mode */
-
-    if(PADRH & 0x04)
-        usb_polarity = 0; /* Negative */
-    else
-        usb_polarity = 1; /* Positive */
 
     oldmode = system_memory_guard(MEMGUARD_NONE);  /* disable memory guard */
 
@@ -636,23 +600,12 @@ static bool dbg_hw_info(void)
                          rom_version/100, rom_version%100);
                 break;
             case 1:
-                snprintf(buf, 32, "USB: %s",
-                         usb_polarity?"pos":"neg");
-                break;
-            case 2:
-                snprintf(buf, 32, "ATA: 0x%x%s",
-                         ata_io_address, ata_device ? "s":"m");
-                break;
-            case 3:
-                snprintf(buf, 32, "Mask: %04x", bitmask);
-                break;
-            case 4:
                 if (got_id)
                     snprintf(buf, 32, "Flash:%02x,%02x", manu, id);
                 else
                     snprintf(buf, 32, "Flash:??,??"); /* unknown, sorry */
                 break;
-            case 5:
+            case 2:
                 if (has_bootrom)
                 {
                     if (rom_crc == 0x56DBA4EE) /* known Version 1 */
@@ -681,12 +634,12 @@ static bool dbg_hw_info(void)
             case ACTION_SETTINGS_DEC:
                 currval--;
                 if(currval < 0)
-                    currval = 5;
+                    currval = 2;
                 break;
 
             case ACTION_SETTINGS_INC:
                 currval++;
-                if(currval > 5)
+                if(currval > 2)
                     currval = 0;
                 break;
         }
@@ -968,11 +921,7 @@ bool dbg_ports(void)
         snprintf(buf, 32, "Batt: %d.%02dV %d%%  ", adc_battery_voltage / 100,
                  adc_battery_voltage % 100, adc_battery_level);
         lcd_puts(0, 6, buf);
-#ifndef HAVE_MMC /* have ATA */
-        snprintf(buf, 32, "ATA: %s, 0x%x",
-                 ata_device?"slave":"master", ata_io_address);
-        lcd_puts(0, 7, buf);
-#endif
+
         lcd_update();
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
             return false;
@@ -1208,38 +1157,35 @@ bool dbg_ports(void)
         switch(currval)
         {
         case 0:
-            snprintf(buf, 32, "PADR: %04x  ", porta);
+            snprintf(buf, 32, "PADR: %04x", porta);
             break;
         case 1:
-            snprintf(buf, 32, "PBDR: %04x  ", portb);
+            snprintf(buf, 32, "PBDR: %04x", portb);
             break;
         case 2:
-            snprintf(buf, 32, "AN0: %03x  ", adc_read(0));
+            snprintf(buf, 32, "AN0: %03x", adc_read(0));
             break;
         case 3:
-            snprintf(buf, 32, "AN1: %03x  ", adc_read(1));
+            snprintf(buf, 32, "AN1: %03x", adc_read(1));
             break;
         case 4:
-            snprintf(buf, 32, "AN2: %03x  ", adc_read(2));
+            snprintf(buf, 32, "AN2: %03x", adc_read(2));
             break;
         case 5:
-            snprintf(buf, 32, "AN3: %03x  ", adc_read(3));
+            snprintf(buf, 32, "AN3: %03x", adc_read(3));
             break;
         case 6:
-            snprintf(buf, 32, "AN4: %03x  ", adc_read(4));
+            snprintf(buf, 32, "AN4: %03x", adc_read(4));
             break;
         case 7:
-            snprintf(buf, 32, "AN5: %03x  ", adc_read(5));
+            snprintf(buf, 32, "AN5: %03x", adc_read(5));
             break;
         case 8:
-            snprintf(buf, 32, "AN6: %03x  ", adc_read(6));
+            snprintf(buf, 32, "AN6: %03x", adc_read(6));
             break;
         case 9:
-            snprintf(buf, 32, "AN7: %03x  ", adc_read(7));
+            snprintf(buf, 32, "AN7: %03x", adc_read(7));
             break;
-        case 10:
-            snprintf(buf, 32, "%s, 0x%x ",
-                     ata_device?"slv":"mst", ata_io_address);
             break;
         }
         lcd_puts(0, 0, buf);
@@ -1261,12 +1207,12 @@ bool dbg_ports(void)
         case ACTION_SETTINGS_DEC:
             currval--;
             if(currval < 0)
-                currval = 10;
+                currval = 9;
             break;
 
         case ACTION_SETTINGS_INC:
             currval++;
-            if(currval > 10)
+            if(currval > 9)
                 currval = 0;
             break;
         }

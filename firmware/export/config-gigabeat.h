@@ -124,8 +124,6 @@
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 8
 
-#define USB_GIGABEAT_STYLE
-
 #define HAVE_HEADPHONE_DETECTION
 
 /* Define this if you have adjustable CPU frequency */

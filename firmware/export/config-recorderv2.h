@@ -99,9 +99,6 @@
 /* Define this if you have an FM Radio */
 #define CONFIG_TUNER S1A0903X01
 
-/* How to detect USB */
-#define USB_FMRECORDERSTYLE 1
-
 /* Hardware controlled charging with monitoring */
 #define CONFIG_CHARGING CHARGING_MONITOR
 

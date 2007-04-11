@@ -99,9 +99,6 @@
 /* FM recorders can wake up from RTC alarm */
 #define HAVE_RTC_ALARM
 
-/* How to detect USB */
-#define USB_FMRECORDERSTYLE 1
-
 /* Hardware controlled charging with monitoring */
 #define CONFIG_CHARGING CHARGING_MONITOR
 

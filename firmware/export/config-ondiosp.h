@@ -65,12 +65,6 @@
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 24
 
-/* How to detect USB */
-#define USB_FMRECORDERSTYLE 1 /* like FM, on AN1 */
-
-/* How to enable USB */
-#define USB_ENABLE_ONDIOSTYLE 1 /* with PA5 */
-
 /* The start address index for ROM builds */
 /* #define ROM_START 0x12010 for behind original Archos */
 #define ROM_START 0x7010 /* for behind BootBox */

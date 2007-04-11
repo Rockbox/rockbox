@@ -86,9 +86,6 @@
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 6
 
-/* How to detect USB */
-#define USB_RECORDERSTYLE 1
-
 /* Software controlled charging */
 #define CONFIG_CHARGING CHARGING_CONTROL
 

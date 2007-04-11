@@ -29,7 +29,6 @@
 #define ATA_CONTROL2    ((volatile unsigned char*)0x06200306)
 
 volatile unsigned char* ata_control;
-int ata_io_address; /* 0x300 or 0x200 */
 
 void ata_reset(void)
 {
@@ -59,15 +58,9 @@ void ata_device_init(void)
     PACR2 &= 0xBFFF; /* GPIO function for PA7 (IDE enable) */
  
     if (read_hw_mask() & ATA_ADDRESS_200)
-    {
-        ata_io_address = 0x200; /* For debug purposes only */
         ata_control = ATA_CONTROL1;
-    }
     else
-    {
-        ata_io_address = 0x300; /* For debug purposes only */
         ata_control = ATA_CONTROL2;
-    }
 }
 
 bool ata_is_coldstart(void)

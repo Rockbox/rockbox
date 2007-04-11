@@ -128,8 +128,6 @@
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 8
 
-#define USB_IRIVERSTYLE
-
 #define HAVE_ATA_LED_CTRL
 
 /* Define this if you have adjustable CPU frequency */
