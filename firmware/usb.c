@@ -32,18 +32,11 @@
 #include "disk.h"
 #include "panic.h"
 #include "lcd.h"
-#include "adc.h"
 #include "usb.h"
 #include "button.h"
 #include "sprintf.h"
 #include "string.h"
-#include "hwcompat.h"
-#ifdef HAVE_MMC
-#include "ata_mmc.h"
-#endif
-#ifdef TARGET_TREE
 #include "usb-target.h"
-#endif
 #ifdef IRIVER_H300_SERIES
 #include "pcf50606.h"        /* for pcf50606_usb_charging_... */
 #endif
@@ -55,8 +48,6 @@ extern void dbg_ports(void); /* NASTY! defined in apps/ */
 bool do_screendump_instead_of_usb = false;
 void screen_dump(void);   /* Nasty again. Defined in apps/ too */
 #endif
-
-#define USB_REALLY_BRAVE
 
 #if !defined(SIMULATOR) && !defined(USB_NONE)
 
@@ -93,10 +84,7 @@ void screen_dump(void);   /* Nasty again. Defined in apps/ too */
 #endif
 #endif /* HAVE_USB_POWER */
 
-/* The ADC tick reads one channel per tick, and we want to check 3 successive
-   readings on the USB voltage channel. This doesn't apply to the Player, but
-   debouncing the USB detection port won't hurt us either. */
-#define NUM_POLL_READINGS (NUM_ADC_CHANNELS * 3)
+#define NUM_POLL_READINGS (HZ/5)
 static int countdown;
 
 static int usb_state;
@@ -115,46 +103,6 @@ static struct event_queue usb_queue;
 static bool last_usb_status;
 static bool usb_monitor_enabled;
 
-#ifndef TARGET_TREE
-void usb_enable(bool on)
-{
-#ifdef USB_ENABLE_ONDIOSTYLE
-    PACR2 &= ~0x04C0; /* use PA3, PA5 as GPIO */
-    if(on)
-    {
-#ifdef HAVE_MMC
-        mmc_enable_int_flash_clock(!mmc_detect());
-#endif
-        if (!(read_hw_mask() & MMC_CLOCK_POLARITY))
-            and_b(~0x20, &PBDRH); /* old circuit needs SCK1 = low while on USB */
-        or_b(0x20, &PADRL); /* enable USB */
-        and_b(~0x08, &PADRL); /* assert card detect */
-    }
-    else
-    {
-        if (!(read_hw_mask() & MMC_CLOCK_POLARITY))
-            or_b(0x20, &PBDRH); /* reset SCK1 = high for old circuit */
-        and_b(~0x20, &PADRL); /* disable USB */
-        or_b(0x08, &PADRL); /* deassert card detect */
-    }
-    or_b(0x28, &PAIORL); /* output for USB enable and card detect */
-#else
-#ifdef HAVE_LCD_BITMAP
-    if(read_hw_mask() & USB_ACTIVE_HIGH)
-        on = !on;
-#endif
-    if(on)
-    {
-        and_b(~0x04, &PADRH); /* enable USB */
-    }
-    else
-    {
-        or_b(0x04, &PADRH);
-    }
-    or_b(0x04, &PAIORH);
-#endif
-}
-#endif
 
 #ifndef BOOTLOADER
 static void usb_slave_mode(bool on)
@@ -246,13 +194,9 @@ static void usb_thread(void)
                     if(num_acks_to_expect == 0)
                     {
                         DEBUGF("All threads have acknowledged the connect.\n");
-#ifdef USB_REALLY_BRAVE
                         usb_slave_mode(true);
                         usb_state = USB_INSERTED;
                         cpu_idle_mode(true);
-#else
-                        system_reboot();
-#endif
                     }
                     else
                     {
@@ -330,23 +274,6 @@ static void usb_thread(void)
 }
 #endif
 
-#ifndef TARGET_TREE
-bool usb_detect(void)
-{
-    bool current_status;
-
-#ifdef USB_RECORDERSTYLE
-    current_status = (adc_read(ADC_USB_POWER) > 500)?true:false;
-#endif
-#ifdef USB_FMRECORDERSTYLE
-    current_status = (adc_read(ADC_USB_POWER) <= 512)?true:false;
-#endif
-#ifdef USB_PLAYERSTYLE
-    current_status = (PADR & 0x8000)?false:true;
-#endif
-    return current_status;
-}
-#endif
 
 #ifndef BOOTLOADER
 static void usb_tick(void)
@@ -402,10 +329,7 @@ void usb_init(void)
     usb_monitor_enabled = false;
     countdown = -1;
 
-#ifdef TARGET_TREE
     usb_init_device();
-#endif
-
     usb_enable(false);
 
     /* We assume that the USB cable is extracted */

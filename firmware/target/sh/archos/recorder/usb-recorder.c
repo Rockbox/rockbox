@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Linus Nielsen Feltzing
+ * Copyright (C) 2007 by Jens Arnold
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,9 +16,31 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef USB_TARGET_H
-#define USB_TARGET_H
+#include "config.h"
+#include <stdbool.h>
+#include "adc.h"
+#include "cpu.h"
+#include "hwcompat.h"
+#include "system.h"
 
-bool usb_init_device(void);
+bool usb_detect(void)
+{
+    return (adc_read(ADC_USB_POWER) > 500) ? true : false;
+}
 
-#endif
+void usb_enable(bool on)
+{
+    if(read_hw_mask() & USB_ACTIVE_HIGH)
+        on = !on;
+
+    if(on)
+        and_b(~0x04, &PADRH); /* enable USB */
+    else
+        or_b(0x04, &PADRH);
+}
+
+void usb_init_device(void)
+{
+    usb_enable(false);
+    or_b(0x04, &PAIORH);
+}
