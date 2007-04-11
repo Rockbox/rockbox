@@ -40,7 +40,7 @@ bool mpeg_menu(void)
         { "Skip frames", NULL },
         { "Quit mpegplayer", NULL },
     };
-    
+
     m = rb->menu_init(items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
 
@@ -52,19 +52,21 @@ bool mpeg_menu(void)
         switch(result)
         {
             case 0: /* Show FPS */
-                rb->set_option("Display FPS",&settings.showfps,INT, 
+                rb->set_option("Display FPS",&settings.showfps,INT,
                                noyes, 2, NULL);
                 break;
             case 1: /* Limit FPS */
-                rb->set_option("Limit FPS",&settings.limitfps,INT, 
+                rb->set_option("Limit FPS",&settings.limitfps,INT,
                                noyes, 2, NULL);
                 break;
             case 2: /* Skip frames */
-                rb->set_option("Skip frames",&settings.skipframes,INT, 
+                rb->set_option("Skip frames",&settings.skipframes,INT,
                                noyes, 2, NULL);
                 break;
             default:
                 menu_quit=1;
+                if (result == MENU_ATTACHED_USB)
+                    result = 3;
                 break;
         }
     }
@@ -99,7 +101,7 @@ void init_settings(void)
                         SETTINGS_VERSION);
     }
 
-    /* Keep a copy of the saved version of the settings - so we can check if 
+    /* Keep a copy of the saved version of the settings - so we can check if
        the settings have changed when we quit */
     old_settings = settings;
 }

@@ -929,7 +929,6 @@ static inline int32_t clip_sample(int32_t sample)
     return sample;
 }
 
-static void audio_thread(void) __attribute__((noreturn));
 static void audio_thread(void)
 {
     uint8_t *mpabuf = mpa_buffer;
@@ -1197,12 +1196,10 @@ done:
         rb->sleep(HZ/4);
     }
 
-    /* Don't really terminate but just signal that it's ok for this thread
-       to be killed */
-    audiostatus = THREAD_TERMINATED;
+    pcm_playback_stop();
 
-    while (1)
-        rb->yield();
+    audiostatus = THREAD_TERMINATED;
+    rb->remove_thread(NULL);
 }
 
 /* End of libmad stuff */
@@ -1744,20 +1741,21 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
 
     /* Stop the threads and wait for them to terminate */
-    if (audiothread_id != NULL)
-        audiostatus = PLEASE_STOP;
-
-    if (videothread_id != NULL)
+    if (videostatus != THREAD_TERMINATED)
+    {
         videostatus = PLEASE_STOP;
+        while (videostatus != THREAD_TERMINATED)
+            rb->yield();
+    }
 
-    while (audiostatus != THREAD_TERMINATED ||
-           videostatus != THREAD_TERMINATED)
-        rb->yield();
+    if (audiostatus != THREAD_TERMINATED)
+    {
+        audiostatus = PLEASE_STOP;
+        while (audiostatus != THREAD_TERMINATED)
+            rb->yield();
+    }
 
-    if (audiothread_id != NULL)
-        rb->remove_thread(audiothread_id);
-
-    pcm_playback_stop();
+    rb->sleep(HZ/10);
 
     rb->lcd_clear_display();
     rb->lcd_update();
