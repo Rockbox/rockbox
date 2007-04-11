@@ -81,7 +81,7 @@ PLUGIN_IRAM_DECLARE
 
 #ifndef SIMULATOR
 	#define SAMPLE_RATE 22050  // 44100 22050 11025
-	#define MAX_VOICES 14   // Note: 24 midi channels is the minimum general midi
+	#define MAX_VOICES 20   // Note: 24 midi channels is the minimum general midi
                          // spec implementation
 #else	// Simulator requires 44100, and we can afford to use more voices
 	#define SAMPLE_RATE 44100
@@ -89,7 +89,7 @@ PLUGIN_IRAM_DECLARE
 #endif
 
 
-#define BUF_SIZE 512
+#define BUF_SIZE 256
 #define NBUF   2
 
 #undef SYNC
@@ -110,7 +110,7 @@ long bpm IBSS_ATTR;
 #include "midi/midifile.c"
 #include "midi/synth.c"
 
-short gmbuf[BUF_SIZE*NBUF] IBSS_ATTR;
+long gmbuf[BUF_SIZE*NBUF];
 
 int quit=0;
 struct plugin_api * rb;
@@ -165,7 +165,7 @@ bool lastswap=1;
 
 inline void synthbuf(void)
 {
-   short *outptr;
+   long *outptr;
    register int i;
    static int currentSample=0;
    int synthtemp[2];
@@ -183,9 +183,7 @@ inline void synthbuf(void)
    {
       synthSample(&synthtemp[0], &synthtemp[1]);
       currentSample++;
-      *outptr=synthtemp[0]&0xFFFF;
-      outptr++;
-      *outptr=synthtemp[1]&0xFFFF;
+      *outptr=((synthtemp[0]&0xFFFF) << 16) | (synthtemp[1]&0xFFFF);
       outptr++;
       if(currentSample==numberOfSamples)
       {

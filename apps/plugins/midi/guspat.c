@@ -29,9 +29,12 @@ unsigned int readDWord(int file)
     return (readChar(file)<<0) | (readChar(file)<<8) | (readChar(file)<<16) | (readChar(file)<<24);
 }
 
+int curr_waveform;
+struct GWaveform waveforms[32] IBSS_ATTR;
+
 struct GWaveform * loadWaveform(int file)
 {
-    struct GWaveform * wav = (struct GWaveform *)malloc(sizeof(struct GWaveform));
+    struct GWaveform * wav = &waveforms[curr_waveform++];
     rb->memset(wav, 0, sizeof(struct GWaveform));
 
     wav->name=readData(file, 7);

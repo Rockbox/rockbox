@@ -182,12 +182,7 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
     return 0;
 }
 
-inline short getSample(int s,struct GWaveform * wf )
-{
-    /* Sign conversion moved to guspat.c */
-    /* 8bit conversion NOT YET IMPLEMENTED in guspat.c */
-    return ((short *) wf->data)[s];
-}
+#define getSample(s,wf) ((short *)(wf)->data)[s]
 
 void setPoint(struct SynthObject * so, int pt)
 {
@@ -254,6 +249,7 @@ inline void stopVoice(struct SynthObject * so)
     so->decay = 0;
 }
 
+signed short int synthVoice(struct SynthObject * so) ICODE_ATTR;
 signed short int synthVoice(struct SynthObject * so)
 {
     struct GWaveform * wf;
