@@ -21,18 +21,16 @@
 #include "cpu.h"
 #include "system.h"
 #include "kernel.h"
+#include "ata.h"
 
 #define USB_RST_ASSERT   GPBDAT &= ~(1 << 4)
 #define USB_RST_DEASSERT GPBDAT |=  (1 << 4)
-
-#define USB_ATA_ENABLE   GPBDAT |=  (1 << 5)
-#define USB_ATA_DISABLE  GPBDAT &= ~(1 << 5)
 
 #define USB_VPLUS_PWR_ASSERT    GPBDAT |=  (1 << 6)
 #define USB_VPLUS_PWR_DEASSERT  GPBDAT &= ~(1 << 6)
 
 #define USB_UNIT_IS_PRESENT  !(GPFDAT & 0x01)
-#define USB_CRADLE_IS_PRESENT  ((GPFDAT &0x02)&&!(GPGDAT&0x00004000))
+#define USB_CRADLE_IS_PRESENT  ((GPFDAT &0x02)&&!(GPGDAT&1<<14))
 
 #define USB_CRADLE_BUS_ENABLE GPHDAT |=  (1 << 8)
 #define USB_CRADLE_BUS_DISABLE GPHDAT &= ~(1 << 8)
@@ -45,22 +43,30 @@ inline bool usb_detect(void)
 
 void usb_init_device(void)
 {
+    /* Input is the default configuration, only pullups need to be disabled */
+    GPFUP|=0x03;
+    GPGUP|= 1<<14;
+
     USB_VPLUS_PWR_ASSERT;
+    GPBCON=( GPBCON&~(1<<13) ) | (1 << 12);
+    GPBUP|= 1<<6;
+
     sleep(HZ/20);
     
     /* Reset the usb port */
-    /* Make sure the cpu pin for reset line is set to output */
-    GPBCON = (GPBCON & ~0x300) | 0x100;
     USB_RST_ASSERT;
+    GPBCON = (GPBCON & ~0x200) | 0x100; /* Make sure reset line is an output */
+    GPBUP |= 1<<4; /* Make sure pullup is disabled */
+
     sleep(HZ/25);
     USB_RST_DEASSERT;
     
     /* needed to complete the reset */
-    USB_ATA_ENABLE;
+    ata_enable(false);
     
     sleep(HZ/15);       /* 66ms */
     
-    USB_ATA_DISABLE;
+    ata_enable(true);
     
     sleep(HZ/25);
     
@@ -74,18 +80,18 @@ void usb_enable(bool on)
 {
     if (on)
     {
-        /* make sure ata_en is high */
         USB_VPLUS_PWR_ASSERT;
-        USB_ATA_ENABLE;
         if(USB_CRADLE_IS_PRESENT) USB_CRADLE_BUS_ENABLE;
     }
     else
     {
-        /* make sure ata_en is low */
         if(USB_CRADLE_IS_PRESENT) USB_CRADLE_BUS_DISABLE;
-        USB_ATA_DISABLE;
         USB_VPLUS_PWR_DEASSERT;
     }
+
+    /* Make sure USB_CRADLE_BUS pin is an output */
+    GPHCON=( GPGCON&~(1<<17) ) | (1<<16); /* Make the pin an output */
+    GPBUP|=1<<8;  /* Disable pullup in SOC as we are now driving */
 
     sleep(HZ/20); // > 50ms for detecting the enable state change
 }

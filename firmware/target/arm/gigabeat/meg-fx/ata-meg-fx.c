@@ -28,29 +28,54 @@
 #include "mmu-meg-fx.h"
 #include "backlight-target.h"
 
+/* ARESET on C7C68300 and RESET on ATA interface (Active Low) */
+#define ATA_RESET_ENABLE GPGDAT &= ~(1 << 10)
+#define ATA_RESET_DISABLE GPGDAT |= (1 << 10)
+
+/* ATA_EN on C7C68300 */
+#define USB_ATA_ENABLE   GPBDAT |=  (1 << 5)
+#define USB_ATA_DISABLE  GPBDAT &= ~(1 << 5)
+
 void ata_reset(void)
 {
-    GPGDAT &= ~(1 << 10);
+    ATA_RESET_ENABLE;
     sleep(1); /* > 25us */
-    GPGDAT |= (1 << 10);
+    ATA_RESET_DISABLE;
     sleep(1); /* > 2ms */
 }
 
+/* This function is called before enabling the USB bus */
 void ata_enable(bool on)
 {
     if(on)
-        GPGDAT &= ~(1 << 12);
+        USB_ATA_DISABLE;
     else
-        GPGDAT |= (1 << 12);
+        USB_ATA_ENABLE;
+
+    GPBCON=( GPGCON&~(1<<11) ) | (1<<10); /* Make the pin an output */
+    GPBUP|=1<<5;  /* Disable pullup in SOC as we are now driving */
+
+/* Code was originally: (Does not seem that GPG12 is connected in the F series)
+    if(on)
+        GPGDAT &= 1<<12;
+    else
+        GPGDAT |= 1<<12;
+*/
+
 }
 
 bool ata_is_coldstart(void)
 {
-    return true; /* TODO */
+    /* Check the pin configuration - return true when pin is unconfigured */
+    return (GPGCON & 0x00300000) == 0;
 }
 
 void ata_device_init(void)
 {
+    /* ATA reset */
+    ATA_RESET_DISABLE; /* Set the pin to disable an active low reset */
+    GPGCON=( GPGCON&~(1<<21) ) | (1<<20); /* Make the pin an output */
+    GPGUP |= 1<<10;  /* Disable pullup in SOC as we are now driving */
 }
 
 #if !defined(BOOTLOADER)
