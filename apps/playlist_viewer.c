@@ -749,6 +749,8 @@ bool playlist_viewer_ex(char* filename)
                     update_playlist(true);
                     if (viewer.num_tracks <= 0)
                         exit = true;
+                    if(viewer.selected_track >= viewer.num_tracks)
+                        viewer.selected_track = viewer.num_tracks-1;
                 }
                 gui_synclist_draw(&playlist_lists);
                 break;
