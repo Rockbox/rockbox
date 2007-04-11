@@ -82,6 +82,10 @@
 #include "talk.h"
 #endif
 
+#ifdef HAVE_WM8758
+#include "menus/eq_menu.h"
+#endif
+
 #define PLAYBACK_VOICE
 
 
@@ -3842,5 +3846,8 @@ void audio_init(void)
     audio_is_initialized = true;
 
     sound_settings_apply();
+#ifdef HAVE_WM8758
+    eq_hw_enable(global_settings.eq_hw_enabled);
+#endif
     audio_set_buffer_margin(global_settings.buffer_margin);
 } /* audio_init */

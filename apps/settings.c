@@ -88,10 +88,6 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #endif
 #endif /* CONFIG_CODEC == SWCODEC */
 
-#ifdef HAVE_WM8758
-#include "menus/eq_menu.h"
-#endif
-
 #define NVRAM_BLOCK_SIZE 44
 
 #ifdef HAVE_LCD_BITMAP
@@ -827,18 +823,14 @@ void settings_apply(void)
                                    global_settings.crossfeed_hf_attenuation,
                                    global_settings.crossfeed_hf_cutoff);
 
+    /* Configure software equalizer, hardware eq is handled in audio_init() */
     dsp_set_eq(global_settings.eq_enabled);
     dsp_set_eq_precut(global_settings.eq_precut);
-    /* Update all EQ bands */
     for(i = 0; i < 5; i++) {
         dsp_set_eq_coefs(i);
     }
 
     dsp_dither_enable(global_settings.dithering_enabled);
-#endif
-
-#ifdef HAVE_WM8758
-    eq_hw_enable(global_settings.eq_hw_enabled);
 #endif
 
 #ifdef HAVE_SPDIF_POWER
