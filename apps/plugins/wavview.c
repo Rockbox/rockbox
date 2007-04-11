@@ -102,18 +102,19 @@ void little_endian_to_native (void *data, char *format)
     store peak info in aufiobuf for display routine */
 static int readwavpeaks(char *filename)
 {
+    register uint32_t bytes_read;
+    register uint32_t fppmp_count;
+    register int16_t sampleval;
+    register uint16_t* sampleshort = NULL;
+
     int file;
     uint32_t total_bytes_read = 0;
     char tstr[128];
     int hours;
     int minutes;
     int seconds;
-    uint32_t bytes_read;
     uint32_t peakcount = 0;
-    uint16_t* sampleshort = NULL;
-    int16_t sampleval;
     struct peakstruct* peak = NULL;
-    uint32_t fppmp_count;
 
     if(rb->strcasecmp (filename + rb->strlen (filename) - 3, "wav"))
     {
@@ -270,12 +271,12 @@ static int readwavpeaks(char *filename)
 
 int displaypeaks(void)
 {
-    int x = 0;
-    int lymin = INT_MAX;
-    int lymax = INT_MIN;
-    int rymin = INT_MAX;
-    int rymax = INT_MIN;
-    unsigned int peakcount = 0;
+    register int x = 0;
+    register int lymin = INT_MAX;
+    register int lymax = INT_MIN;
+    register int rymin = INT_MAX;
+    register int rymax = INT_MIN;
+    register unsigned int peakcount = 0;
     struct peakstruct* peak = (struct peakstruct*)audiobuf + leftmargin;
 
 #if LCD_DEPTH > 1
