@@ -21,7 +21,6 @@
 #include <stdbool.h>
 #include "kernel.h"
 #include "system.h"
-#include "hwcompat.h"
 #include "logf.h"
 #include "debug.h"
 #include "string.h"

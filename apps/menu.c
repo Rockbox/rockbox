@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include "config.h"
 
-#include "hwcompat.h"
 #include "lcd.h"
 #include "font.h"
 #include "backlight.h"

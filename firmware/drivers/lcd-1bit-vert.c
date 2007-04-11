@@ -27,7 +27,6 @@
 #include "debug.h"
 #include "system.h"
 #include "font.h"
-#include "hwcompat.h"
 #include "rbunicode.h"
 #include "bidi.h"
 

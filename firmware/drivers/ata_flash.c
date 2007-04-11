@@ -36,7 +36,6 @@
 #include "usb.h"
 #include "power.h"
 #include "string.h"
-#include "hwcompat.h"
 */
 
 #define SECTOR_SIZE     (512)

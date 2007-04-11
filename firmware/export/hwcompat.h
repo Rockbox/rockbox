@@ -22,6 +22,10 @@
 #include <stdbool.h>
 #include "config.h"
 
+#if (CONFIG_CPU == SH7034) && !defined(SIMULATOR)
+
+#define ROM_VERSION (*(short *)0x020000fe)
+
 /* Bit mask values for HW compatibility */
 #define ATA_ADDRESS_200 0x0100
 #define USB_ACTIVE_HIGH 0x0100
@@ -30,11 +34,16 @@
 #define MMC_CLOCK_POLARITY 0x0400
 #define TUNER_MODEL 0x0800
 
-int read_rom_version(void);
-int read_hw_mask(void);
+#ifdef ARCHOS_PLAYER
+#define HW_MASK 0
+#else /* Recorders, Ondios */
+#define HW_MASK (*(short *)0x020000fc)
+#endif
+
+#endif /* (CONFIG_CPU == SH7034) && !SIMULATOR */
 
 #ifdef ARCHOS_PLAYER
 bool is_new_player(void);
 #endif
 
-#endif
+#endif /* HWCOMPAT_H */

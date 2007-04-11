@@ -32,7 +32,6 @@
 #include "mas.h"
 #include "dac.h"
 #include "system.h"
-#include "hwcompat.h"
 #endif
 
 /* hacking into mpeg.c, recording is still there */

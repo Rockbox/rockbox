@@ -16,33 +16,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include <stdbool.h>
-#include "config.h"
-#include "debug.h"
+#include "hwcompat.h"
 
-int read_rom_version(void)
-{
-    int ver = *(short *)0x020000fe;
-    
-    return ver;
-}
-
-int read_hw_mask(void)
-{
-#ifdef ARCHOS_PLAYER
-    int mask = 0; /* Fake value for simplicity */
-#else
-    int mask = *(short *)0x020000fc;
-#endif
-    
-    return mask;
-}
-
-#ifdef ARCHOS_PLAYER
 bool is_new_player(void)
 {
-    int ver = read_rom_version();
-
-    return (ver > 449) || (ver == 116);
-}           
-#endif
+    return (ROM_VERSION > 449) || (ROM_VERSION == 116);
+}

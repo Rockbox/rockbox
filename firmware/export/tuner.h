@@ -82,7 +82,7 @@ static inline void tuner_init(void)
 {
 #ifndef SIMULATOR
 #if CONFIG_TUNER == (S1A0903X01 | TEA5767)
-    if (read_hw_mask() & TUNER_MODEL)
+    if (HW_MASK & TUNER_MODEL)
     {
         _radio_set = philips_set;
         _radio_get = philips_get;

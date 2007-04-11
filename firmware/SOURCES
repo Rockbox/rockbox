@@ -12,7 +12,6 @@ logf.c
 #ifdef RB_PROFILE
 profile.c
 #endif /* RB_PROFILE */
-hwcompat.c
 kernel.c
 rolo.c
 thread.c
@@ -238,6 +237,7 @@ target/sh/memcpy-sh.S
 target/sh/memmove-sh.S
 target/sh/memset-sh.S
 target/sh/strlen-sh.S
+target/sh/system-sh.c
 #endif /* SIMULATOR */
 
 #elif defined(CPU_COLDFIRE)
@@ -316,6 +316,7 @@ drivers/i2c.c
 target/sh/archos/ata-archos.c
 target/sh/archos/ata-as-archos.S
 target/sh/archos/player/button-player.c
+target/sh/archos/player/hwcompat-player.c
 target/sh/archos/player/lcd-as-player.S
 target/sh/archos/player/lcd-player.c
 target/sh/archos/player/usb-player.c

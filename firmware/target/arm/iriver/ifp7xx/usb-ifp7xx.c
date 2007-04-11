@@ -32,7 +32,6 @@
 #include "button.h"
 #include "sprintf.h"
 #include "string.h"
-#include "hwcompat.h"
 
 void usb_init_device(void)
 {

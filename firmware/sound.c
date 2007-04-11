@@ -29,7 +29,6 @@
 #endif
 #include "dac.h"
 #include "system.h"
-#include "hwcompat.h"
 #if CONFIG_CODEC == SWCODEC
 #include "pcm_playback.h"
 #endif
@@ -282,7 +281,7 @@ static const unsigned int prescale_table[] =
 };
 
 /* convert tenth of dB volume (-780..+180) to dac3550 register value */
-static int tenthdb2reg(int db) 
+static int tenthdb2reg(int db)
 {
     if (db < -540)                  /* 3 dB steps */
         return (db + 780) / 30;

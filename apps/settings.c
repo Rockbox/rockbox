@@ -46,7 +46,6 @@
 #include "icons.h"
 #include "font.h"
 #include "peakmeter.h"
-#include "hwcompat.h"
 #endif
 #include "lang.h"
 #include "language.h"

@@ -286,7 +286,7 @@ void mas_reset(void)
     or_b(0x01, &PADRH);
     sleep(HZ/5);
 #elif (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    if (read_hw_mask() & ATA_ADDRESS_200)
+    if (HW_MASK & ATA_ADDRESS_200)
     {
         and_b(~0x01, &PADRH);
         sleep(HZ/100);

@@ -86,6 +86,7 @@
 #ifdef IAUDIO_X5
 #include "ds2411.h"
 #endif
+#include "hwcompat.h"
 
 #ifndef SIMULATOR
 static bool dbg_list(char *title, int count, int selection_size,
@@ -405,8 +406,8 @@ static bool dbg_hw_info(void)
 {
 #if CONFIG_CPU == SH7034
     char buf[32];
-    int bitmask = *(unsigned short*)0x20000fc;
-    int rom_version = *(unsigned short*)0x20000fe;
+    int bitmask = HW_MASK;
+    int rom_version = ROM_VERSION;
     unsigned manu, id; /* flash IDs */
     bool got_id; /* flag if we managed to get the flash IDs */
     unsigned rom_crc = 0xffffffff; /* CRC32 of the boot ROM */
@@ -564,7 +565,7 @@ static bool dbg_hw_info(void)
     char buf[32];
     int button;
     int currval = 0;
-    int rom_version = *(unsigned short*)0x20000fe;
+    int rom_version = ROM_VERSION;
     unsigned manu, id; /* flash IDs */
     bool got_id; /* flag if we managed to get the flash IDs */
     unsigned rom_crc = 0xffffffff; /* CRC32 of the boot ROM */

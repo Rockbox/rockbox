@@ -28,7 +28,6 @@
 #include "usb.h"
 #include "power.h"
 #include "string.h"
-#include "hwcompat.h"
 #include "ata_idle_notify.h"
 #include "ata-target.h"
 

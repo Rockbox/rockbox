@@ -23,7 +23,6 @@
 #include "kernel.h"
 #include "system.h"
 #include "power.h"
-#include "hwcompat.h"
 #include "logf.h"
 #include "usb.h"
 

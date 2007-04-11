@@ -1163,7 +1163,7 @@ int ata_init(void)
     }
 #endif
 
-    new_mmc_circuit = ((read_hw_mask() & MMC_CLOCK_POLARITY) != 0);
+    new_mmc_circuit = ((HW_MASK & MMC_CLOCK_POLARITY) != 0);
     ata_enable(true);
     
     if ( !initialized ) 

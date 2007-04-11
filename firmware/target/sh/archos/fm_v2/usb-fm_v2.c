@@ -30,7 +30,7 @@ bool usb_detect(void)
 
 void usb_enable(bool on)
 {
-    if(read_hw_mask() & USB_ACTIVE_HIGH)
+    if(HW_MASK & USB_ACTIVE_HIGH)
         on = !on;
 
     if(on)
