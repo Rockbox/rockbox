@@ -1566,10 +1566,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
 
     /* Initialize IRAM - stops audio and voice as well */
-    audiobuf = api->plugin_get_audio_buffer(&audiosize);
     PLUGIN_IRAM_INIT(api)
 
     rb = api;
+
+    audiobuf = rb->plugin_get_audio_buffer(&audiosize);
 
     /* Set disk pointers to NULL */
     disk_buf_end = disk_buf = NULL;
