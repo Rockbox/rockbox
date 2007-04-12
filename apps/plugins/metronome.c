@@ -706,6 +706,9 @@ static signed short sound[] = {
 };
 
 int tock;
+#if CONFIG_CODEC == SWCODEC
+bool need_to_play = false;
+#endif
 
 short sndbuf[sizeof(sound)*2];
 
@@ -829,7 +832,12 @@ void timer_callback(void)
     if(minitick >= period){
         minitick = 0;
         if(!sound_active && !sound_paused && !tap_count) {
+#if CONFIG_CODEC == SWCODEC
+            /* On SWCODEC we can't call play_tock() directly from an ISR. */
+            need_to_play = true;
+#else
             play_tock();
+#endif
             rb->reset_poweroff_timer();
         }
     }
@@ -855,7 +863,7 @@ void cleanup(void *parameter)
 
 void tap(void)
 {
-    if (tap_count == 0) {
+    if (tap_count == 0 || tap_time < tap_count) {
         tap_time = 0;
     } 
     else {
@@ -918,9 +926,19 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
     while (true){
         reset_tap = true;
                     
+    
+#if CONFIG_CODEC == SWCODEC
+        button = pluginlib_getaction(rb,1,plugin_contexts,PLA_ARRAY_COUNT);
+        if (need_to_play)
+        {
+            need_to_play = false;
+            play_tock();
+        }
+#else
         button = pluginlib_getaction(rb,TIMEOUT_BLOCK,
                                      plugin_contexts,PLA_ARRAY_COUNT);
-    
+#endif
+        
         switch (button) {
 
             case METRONOME_QUIT:
