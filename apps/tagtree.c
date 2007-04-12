@@ -793,7 +793,7 @@ static int parse_line(int n, const char *buf, void *parameters)
                 
             case var_rootmenu:
                 /* Only set root menu once. */
-                if (root_menu)
+                if (root_menu >= 0)
                     break;
                 
                 if (get_token_str(data, sizeof(data)) < 0)
@@ -868,8 +868,13 @@ void tagtree_init(void)
     format_count = 0;
     menu_count = 0;
     menu = NULL;
-    root_menu = 0;
+    root_menu = -1;
     parse_menu(FILE_SEARCH_INSTRUCTIONS);
+    
+    /* If no root menu is set, assume it's the first single menu
+     * we have. That shouldn't normally happen. */
+    if (root_menu < 0)
+        root_menu = 0;
     
     uniqbuf = buffer_alloc(UNIQBUF_SIZE);
     audio_set_track_buffer_event(tagtree_buffer_event);
