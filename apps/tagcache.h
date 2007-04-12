@@ -27,6 +27,7 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
     tag_tracknumber, tag_bitrate, tag_length, tag_playcount, tag_rating, 
     tag_playtime, tag_lastplayed, tag_commitid,
     /* Virtual tags */
+    tag_virt_length_min, tag_virt_length_sec,
     tag_virt_entryage, tag_virt_autoscore };
 
 #define TAG_COUNT 17
