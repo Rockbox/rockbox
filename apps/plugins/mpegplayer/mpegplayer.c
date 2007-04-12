@@ -251,8 +251,8 @@ enum
     THREAD_TERMINATED,
 };
 
-int audiostatus IBSS_ATTR;
-int videostatus IBSS_ATTR;
+volatile int audiostatus IBSS_ATTR;
+volatile int videostatus IBSS_ATTR;
 
 /* Various buffers */
 /* TODO: Can we reduce the PCM buffer size? */
@@ -782,7 +782,7 @@ static struct pcm_frame_header * volatile pcmbuf_head IBSS_ATTR;
 static struct pcm_frame_header * volatile pcmbuf_tail IBSS_ATTR;
 
 static volatile uint32_t samplesplayed IBSS_ATTR; /* Our base clock */
-static          uint32_t samplestart   IBSS_ATTR; /* Clock at playback start */
+static volatile uint32_t samplestart   IBSS_ATTR; /* Clock at playback start */
 static volatile int32_t  sampleadjust  IBSS_ATTR; /* Clock drift adjustment */
 
 static bool init_pcmbuf(void)
@@ -1172,19 +1172,25 @@ static void audio_thread(void)
     } /* end decoding loop */
 
 done:
-    /* Force any residue to play if audio ended before reaching the
-       threshold */
-    if (pcmbuf_threshold != PCMBUF_PLAY_ALL && pcmbuf_used > 0)
+    if (audiostatus != PLEASE_STOP)
     {
-        pcm_playback_play(pcmbuf_tail->time);
-        pcmbuf_threshold = PCMBUF_PLAY_ALL;
-    }
+        /* Force any residue to play if audio ended before reaching the
+           threshold */
+        if (pcmbuf_threshold != PCMBUF_PLAY_ALL && pcmbuf_used > 0)
+        {
+            pcm_playback_play(pcmbuf_tail->time);
+            pcmbuf_threshold = PCMBUF_PLAY_ALL;
+        }
 
-    if (rb->pcm_is_playing() && !rb->pcm_is_paused())
-    {
-        /* Wait for audio to finish */
-        while (pcmbuf_used > 0)
-            rb->sleep(HZ/10);
+        if (rb->pcm_is_playing() && !rb->pcm_is_paused())
+        {
+            /* Wait for audio to finish */
+            while (pcmbuf_used > 0 && audiostatus != PLEASE_STOP)
+            {
+                button_loop();
+                rb->sleep(HZ/10);
+            }
+        }
     }
 
     audiostatus = STREAM_DONE;
@@ -1560,11 +1566,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
 
     /* Initialize IRAM - stops audio and voice as well */
+    audiobuf = api->plugin_get_audio_buffer(&audiosize);
     PLUGIN_IRAM_INIT(api)
 
     rb = api;
-
-    audiobuf = rb->plugin_get_audio_buffer(&audiosize);
 
     /* Set disk pointers to NULL */
     disk_buf_end = disk_buf = NULL;
@@ -1688,14 +1693,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         IF_COP(, COP, true))) == NULL)
     {
         rb->splash(HZ, "Cannot create video thread!");
-        videostatus = THREAD_TERMINATED;
     }
     else if ((audiothread_id = rb->create_thread(audio_thread,
         (uint8_t*)audio_stack,AUDIO_STACKSIZE,"mpgaudio" IF_PRIO(,PRIORITY_PLAYBACK)
         IF_COP(, CPU, false))) == NULL)
     {
         rb->splash(HZ, "Cannot create audio thread!");
-        audiostatus = THREAD_TERMINATED;
     }
     else
     {
@@ -1736,19 +1739,15 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         status = PLUGIN_OK;
     }
 
-#ifndef HAVE_LCD_COLOR
-    gray_release();
-#endif
-
     /* Stop the threads and wait for them to terminate */
-    if (videostatus != THREAD_TERMINATED)
+    if (videothread_id != NULL && videostatus != THREAD_TERMINATED)
     {
         videostatus = PLEASE_STOP;
         while (videostatus != THREAD_TERMINATED)
             rb->yield();
     }
 
-    if (audiostatus != THREAD_TERMINATED)
+    if (audiothread_id != NULL && audiostatus != THREAD_TERMINATED)
     {
         audiostatus = PLEASE_STOP;
         while (audiostatus != THREAD_TERMINATED)
@@ -1756,6 +1755,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
 
     rb->sleep(HZ/10);
+
+#ifndef HAVE_LCD_COLOR
+    gray_release();
+#endif
 
     rb->lcd_clear_display();
     rb->lcd_update();
