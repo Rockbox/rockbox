@@ -687,6 +687,7 @@ bool playlist_viewer_ex(char* filename)
         }
         switch (button)
         {
+            case ACTION_TREE_WPS:
             case ACTION_STD_CANCEL:
                 exit = true;
                 break;
