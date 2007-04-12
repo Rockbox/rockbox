@@ -202,6 +202,8 @@ static int get_tag(int *tag)
     MATCH(tag, buf, "length", tag_length);
     MATCH(tag, buf, "Lm", tag_virt_length_min);
     MATCH(tag, buf, "Ls", tag_virt_length_sec);
+    MATCH(tag, buf, "Pm", tag_virt_playtime_min);
+    MATCH(tag, buf, "Ps", tag_virt_playtime_sec);
     MATCH(tag, buf, "title", tag_title);
     MATCH(tag, buf, "filename", tag_filename);
     MATCH(tag, buf, "tracknum", tag_tracknumber);

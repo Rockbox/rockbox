@@ -117,6 +117,7 @@ static const int unique_tags[] = { tag_artist, tag_album, tag_genre,
 static const int numeric_tags[] = { tag_year, tag_tracknumber, tag_length, 
     tag_bitrate, tag_playcount, tag_rating, tag_playtime, tag_lastplayed, tag_commitid,
     tag_virt_length_min, tag_virt_length_sec,
+    tag_virt_playtime_min, tag_virt_playtime_sec,
     tag_virt_entryage, tag_virt_autoscore };
 
 /* String presentation of the tags defined in tagcache.h. Must be in correct order! */
@@ -666,6 +667,14 @@ static long check_virtual_tags(int tag, const struct index_entry *idx)
         
         case tag_virt_length_min:
             data = (idx->tag_seek[tag_length]/1000) / 60;
+            break;
+        
+        case tag_virt_playtime_sec:
+            data = (idx->tag_seek[tag_playtime]/1000) % 60;
+            break;
+        
+        case tag_virt_playtime_min:
+            data = (idx->tag_seek[tag_playtime]/1000) / 60;
             break;
         
         case tag_virt_autoscore:
