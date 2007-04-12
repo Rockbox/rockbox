@@ -258,12 +258,12 @@ volatile int videostatus IBSS_ATTR;
 /* TODO: Can we reduce the PCM buffer size? */
 #define PCMBUFFER_SIZE              ((512*1024)-PCMBUFFER_GUARD_SIZE)
 #define PCMBUFFER_GUARD_SIZE        (1152*4 + sizeof (struct pcm_frame_header))
-#define MPA_MAX_FRAME_SIZE          1441 /* Largest frame with a padding byte */
+#define MPA_MAX_FRAME_SIZE          1729 /* Largest frame - MPEG1, Layer II, 384kbps, 32kHz, pad */
 #define MPABUF_SIZE                 (64*1024 + ALIGN_UP(MPA_MAX_FRAME_SIZE + 2*MAD_BUFFER_GUARD, 4))
 #define LIBMPEG2BUFFER_SIZE         (2*1024*1024)
 
 /* 65536+6 is required since each PES has a 6 byte header with a 16 bit packet length field  */
-#define MPEG_GUARDBUF_SIZE (64*1024+16) /* Keep a bit extra */
+#define MPEG_GUARDBUF_SIZE (64*1024+1024) /* Keep a bit extra - excessive for now */
 #define MPEG_LOW_WATERMARK (1024*1024)
 
 static void pcm_playback_play_pause(bool play);
@@ -544,6 +544,11 @@ static void get_next_data( Stream* str )
             header_length += *p++;
 
             p += header_length;
+
+            if (p >= disk_buf_end)
+            {
+                p = disk_buf + (p - disk_buf_end);
+            }
             /*rb->splash( 30, "System header" );*/
         }
 
@@ -1021,8 +1026,7 @@ static void audio_thread(void)
         }
 
         /** Decoding **/
-        if (stream.error == 0)
-            mad_stream_buffer(&stream, mpabuf, mpabuf_used);
+        mad_stream_buffer(&stream, mpabuf, mpabuf_used);
 
         mad_stat = mad_frame_decode(&frame, &stream);
 
@@ -1061,16 +1065,16 @@ static void audio_thread(void)
                 || stream.error == MAD_ERROR_BUFLEN)
             {
                 /* This makes the codec support partially corrupted files */
-                if (mad_errors >= 30)
+                if (++mad_errors > 30)
                     break;
 
                 stream.error = 0;
-                mad_errors++;
                 rb->priority_yield();
                 continue;
             }
             else if (MAD_RECOVERABLE(stream.error))
             {
+                stream.error = 0;
                 rb->priority_yield();
                 continue;
             }
