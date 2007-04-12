@@ -774,7 +774,7 @@ void backlight_set_brightness(int val)
 #if defined(BOOTLOADER) && defined(HAVE_BACKLIGHT)
 void backlight_init(void)
 {
-    __backlight_init();
+    (void)__backlight_init();
     __backlight_on();
 }
 #endif
