@@ -44,35 +44,32 @@ inline bool usb_detect(void)
 void usb_init_device(void)
 {
     /* Input is the default configuration, only pullups need to be disabled */
-    GPFUP|=0x03;
-    GPGUP|= 1<<14;
+    GPFUP|=0x02;
 
     USB_VPLUS_PWR_ASSERT;
     GPBCON=( GPBCON&~(1<<13) ) | (1 << 12);
-    GPBUP|= 1<<6;
 
     sleep(HZ/20);
-    
+
     /* Reset the usb port */
     USB_RST_ASSERT;
     GPBCON = (GPBCON & ~0x200) | 0x100; /* Make sure reset line is an output */
-    GPBUP |= 1<<4; /* Make sure pullup is disabled */
 
     sleep(HZ/25);
     USB_RST_DEASSERT;
-    
+
     /* needed to complete the reset */
     ata_enable(false);
-    
+
     sleep(HZ/15);       /* 66ms */
-    
+
     ata_enable(true);
-    
+
     sleep(HZ/25);
-    
+
     /* leave chip in low power mode */
     USB_VPLUS_PWR_DEASSERT;
-    
+
     sleep(HZ/25);
 }
 
@@ -90,8 +87,8 @@ void usb_enable(bool on)
     }
 
     /* Make sure USB_CRADLE_BUS pin is an output */
-    GPHCON=( GPGCON&~(1<<17) ) | (1<<16); /* Make the pin an output */
-    GPBUP|=1<<8;  /* Disable pullup in SOC as we are now driving */
+    GPHCON=( GPHCON&~(1<<17) ) | (1<<16); /* Make the pin an output */
+    GPHUP|=1<<8;  /* Disable pullup in SOC as we are now driving */
 
     sleep(HZ/20); // > 50ms for detecting the enable state change
 }

@@ -53,15 +53,7 @@ void ata_enable(bool on)
         USB_ATA_ENABLE;
 
     GPBCON=( GPGCON&~(1<<11) ) | (1<<10); /* Make the pin an output */
-    GPBUP|=1<<5;  /* Disable pullup in SOC as we are now driving */
-
-/* Code was originally: (Does not seem that GPG12 is connected in the F series)
-    if(on)
-        GPGDAT &= 1<<12;
-    else
-        GPGDAT |= 1<<12;
-*/
-
+//    GPBUP|=1<<5;  /* Disable pullup in SOC as we are now driving */
 }
 
 bool ata_is_coldstart(void)
