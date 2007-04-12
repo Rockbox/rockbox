@@ -900,7 +900,7 @@ int show_logo( void )
     lcd_remote_getstringsize((unsigned char *)"A", &font_w, &font_h);
     lcd_remote_putsxy((LCD_REMOTE_WIDTH/2) - ((strlen(version)*font_w)/2),
                        LCD_REMOTE_HEIGHT-font_h, (unsigned char *)version);
-    lcd_setfont(FONT_UI);
+    lcd_remote_setfont(FONT_UI);
     lcd_remote_update();
 #endif
 
