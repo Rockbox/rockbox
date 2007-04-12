@@ -577,7 +577,7 @@ static bool properties(void)
 static bool clipboard_clip(bool copy)
 {
     clipboard_selection[0] = 0;
-    strncpy(clipboard_selection, selected_file, MAX_PATH);
+    strncpy(clipboard_selection, selected_file, sizeof(clipboard_selection));
     clipboard_selection_attr = selected_file_attr;
     clipboard_is_copy = copy;
 
@@ -780,13 +780,12 @@ static bool clipboard_paste(void)
 
     /* Get the name of the current directory */
     cwd = getcwd(NULL, 0);
-    snprintf(target, sizeof target, "%s", cwd[1] ? cwd : "");
 
     /* Figure out the name of the selection */
     nameptr = strrchr(clipboard_selection, '/');
 
-    /* Paste the name on to the current directory to give us our final target */
-    strcat(target, nameptr);
+    /* Final target is current directory plus name of selection  */
+    snprintf(target, sizeof(target), "%s%s", cwd[1] ? cwd : "", nameptr);
 
     /* Check if we're going to overwrite */
     target_fd = open(target, O_RDONLY);

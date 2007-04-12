@@ -107,13 +107,13 @@ static unsigned int rockbox2sim(int opt)
 
 MYDIR *sim_opendir(const char *name)
 {
-    char buffer[256]; /* sufficiently big */
+    char buffer[MAX_PATH]; /* sufficiently big */
     DIR *dir;
 
 #ifndef __PCTOOL__
     if(name[0] == '/') 
     {
-        sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);    
+        snprintf(buffer, sizeof(buffer), "%s%s", SIMULATOR_ARCHOS_ROOT, name);
         dir=(DIR *)opendir(buffer);
     }
     else
@@ -146,9 +146,9 @@ struct sim_dirent *sim_readdir(MYDIR *dir)
 
     /* build file name */
 #ifdef __PCTOOL__
-    sprintf(buffer, "%s/%s", dir->name, x11->d_name);
+    snprintf(buffer, sizeof(buffer), "%s/%s", dir->name, x11->d_name);
 #else
-    sprintf(buffer, SIMULATOR_ARCHOS_ROOT "%s/%s",
+    snprintf(buffer, sizeof(buffer), SIMULATOR_ARCHOS_ROOT "%s/%s",
             dir->name, x11->d_name);
 #endif
     stat(buffer, &s); /* get info */
@@ -178,13 +178,13 @@ void sim_closedir(MYDIR *dir)
 
 int sim_open(const char *name, int o)
 {
-    char buffer[256]; /* sufficiently big */
+    char buffer[MAX_PATH]; /* sufficiently big */
     int opts = rockbox2sim(o);
 
 #ifndef __PCTOOL__
     if(name[0] == '/') 
     {
-        sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
+        snprintf(buffer, sizeof(buffer), "%s%s", SIMULATOR_ARCHOS_ROOT, name);
 
         debugf("We open the real file '%s'\n", buffer);
         return open(buffer, opts, 0666);
@@ -202,16 +202,15 @@ int sim_open(const char *name, int o)
 int sim_creat(const char *name)
 {
 #ifndef __PCTOOL__
-    char buffer[256]; /* sufficiently big */
+    char buffer[MAX_PATH]; /* sufficiently big */
     if(name[0] == '/')
     {
-        sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
+        snprintf(buffer, sizeof(buffer), "%s%s", SIMULATOR_ARCHOS_ROOT, name);
         
         debugf("We create the real file '%s'\n", buffer);
         return open(buffer, O_BINARY | O_WRONLY | O_CREAT | O_TRUNC, 0666);
     }
-    fprintf(stderr, "WARNING, bad file name lacks slash: %s\n",
-            name);
+    fprintf(stderr, "WARNING, bad file name lacks slash: %s\n", name);
     return -1;
 #else
     return open(name, O_BINARY | O_WRONLY | O_CREAT | O_TRUNC, 0666);
@@ -227,10 +226,10 @@ int sim_mkdir(const char *name)
     return mkdir(name, 0777);
 # endif
 #else
-    char buffer[256]; /* sufficiently big */
+    char buffer[MAX_PATH]; /* sufficiently big */
 
-    sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
-        
+    snprintf(buffer, sizeof(buffer), "%s%s", SIMULATOR_ARCHOS_ROOT, name);
+
     debugf("We create the real directory '%s'\n", buffer);
 #ifdef WIN32
     /* since we build with -DNOCYGWIN we have the plain win32 version */
@@ -246,11 +245,11 @@ int sim_rmdir(const char *name)
 #ifdef __PCTOOL__
     return rmdir(name);
 #else
-    char buffer[256]; /* sufficiently big */
+    char buffer[MAX_PATH]; /* sufficiently big */
     if(name[0] == '/') 
     {
-        sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
-        
+        snprintf(buffer, sizeof(buffer), "%s%s", SIMULATOR_ARCHOS_ROOT, name);
+
         debugf("We remove the real directory '%s'\n", buffer);
         return rmdir(buffer);
     }
@@ -263,14 +262,14 @@ int sim_remove(const char *name)
 #ifdef __PCTOOL__
     return remove(name);
 #else
-    char buffer[256]; /* sufficiently big */
+    char buffer[MAX_PATH]; /* sufficiently big */
 
 #ifdef HAVE_DIRCACHE
     dircache_remove(name);
 #endif
 
     if(name[0] == '/') {
-        sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
+        snprintf(buffer, sizeof(buffer), "%s%s", SIMULATOR_ARCHOS_ROOT, name);
 
         debugf("We remove the real file '%s'\n", buffer);
         return remove(buffer);
@@ -284,16 +283,18 @@ int sim_rename(const char *oldpath, const char* newpath)
 #ifdef __PCTOOL__
     return rename(oldpath, newpath);
 #else
-    char buffer1[256];
-    char buffer2[256];
+    char buffer1[MAX_PATH];
+    char buffer2[MAX_PATH];
 
 #ifdef HAVE_DIRCACHE
     dircache_rename(oldpath, newpath);
 #endif
 
     if(oldpath[0] == '/') {
-        sprintf(buffer1, "%s%s", SIMULATOR_ARCHOS_ROOT, oldpath);
-        sprintf(buffer2, "%s%s", SIMULATOR_ARCHOS_ROOT, newpath);
+        snprintf(buffer1, sizeof(buffer1), "%s%s", SIMULATOR_ARCHOS_ROOT,
+                                                   oldpath);
+        snprintf(buffer2, sizeof(buffer2), "%s%s", SIMULATOR_ARCHOS_ROOT,
+                                                   newpath);
 
         debugf("We rename the real file '%s' to '%s'\n", buffer1, buffer2);
         return rename(buffer1, buffer2);
@@ -384,7 +385,7 @@ void *sim_codec_load_ram(char* codecptr, int size,
     int copy_n;
     int codec_count;
 #ifdef WIN32
-    char buf[256];
+    char buf[MAX_PATH];
 #endif
 
     *pd = NULL;
@@ -395,7 +396,7 @@ void *sim_codec_load_ram(char* codecptr, int size,
        to find an unused filename */
     for (codec_count = 0; codec_count < 10; codec_count++)
     {
-        sprintf(path, TEMP_CODEC_FILE, codec_count);
+        snprintf(path, sizeof(path), TEMP_CODEC_FILE, codec_count);
 
         fd = open(path, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRWXU);
         if (fd >= 0)
@@ -453,13 +454,13 @@ void sim_codec_close(void *pd)
 void *sim_plugin_load(char *plugin, void **pd)
 {
     void *hdr;
-    char path[256];
+    char path[MAX_PATH];
 #ifdef WIN32
-    char buf[256];
+    char buf[MAX_PATH];
 #endif
 
-    snprintf(path, sizeof path, "archos%s", plugin);
-    
+    snprintf(path, sizeof(path), "archos%s", plugin);
+
     *pd = NULL;
 
     *pd = dlopen(path, RTLD_NOW);
@@ -467,7 +468,7 @@ void *sim_plugin_load(char *plugin, void **pd)
         DEBUGF("failed to load %s\n", plugin);
 #ifdef WIN32
         FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), 0,
-                      buf, sizeof buf, NULL);
+                      buf, sizeof(buf), NULL);
         DEBUGF("dlopen(%s): %s\n", path, buf);
 #else
         DEBUGF("dlopen(%s): %s\n", path, dlerror());
