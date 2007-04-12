@@ -577,7 +577,8 @@ int plugin_load(const char* plugin, void* parameter)
     plugin_size = hdr->end_addr - pluginbuf;
 
     /* zero out bss area only, above guards end of pluginbuf */
-    memset(pluginbuf + readsize, 0, plugin_size - readsize);
+    if (plugin_size > readsize)
+        memset(pluginbuf + readsize, 0, plugin_size - readsize);
 #endif
 
     plugin_loaded = true;
