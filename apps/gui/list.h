@@ -69,36 +69,37 @@ typedef char * list_get_name(int selected_item,
 
 struct gui_list
 {
-    int nb_items;
-    int selected_item;
-    bool cursor_flash_state;
-    int start_item; /* the item that is displayed at the top of the screen */
-
-#ifdef HAVE_LCD_BITMAP
-    int offset_position; /* the list's screen scroll placement in pixels */
-#endif
-    list_get_icon *callback_get_item_icon;
-    list_get_name *callback_get_item_name;
-
-    struct screen * display;
     /* defines wether the list should stop when reaching the top/bottom
      * or should continue (by going to bottom/top) */
     bool limit_scroll;
     /* wether the text of the whole items of the list have to be
      * scrolled or only for the selected item */
     bool scroll_all;
+    bool cursor_flash_state;
+
+    int nb_items;
+    int selected_item;
+    int start_item; /* the item that is displayed at the top of the screen */
     /* the number of lines that are selected at the same time */
     int selected_size;
-    /* The data that will be passed to the callback function YOU implement */
-    void * data;
     /* These are used to calculate how much of the screen content we need
        to redraw. */
     int last_displayed_selected_item;
     int last_displayed_start_item;
-    /* The optional title, set to NULL for none */
-    char *title;
+#ifdef HAVE_LCD_BITMAP
+    int offset_position; /* the list's screen scroll placement in pixels */
+#endif
     /* Cache the width of the title string in pixels/characters */
     int title_width;
+
+    list_get_icon *callback_get_item_icon;
+    list_get_name *callback_get_item_name;
+
+    struct screen * display;
+    /* The data that will be passed to the callback function YOU implement */
+    void * data;
+    /* The optional title, set to NULL for none */
+    char * title;
     /* Optional title icon */
     ICON title_icon;
 };
@@ -166,7 +167,6 @@ extern void gui_list_screen_scroll_out_of_view(bool enable);
 struct gui_synclist
 {
     struct gui_list gui_list[NB_SCREENS];
-    struct gui_list *last_displayed[NB_SCREENS];
 };
 
 extern void gui_synclist_init(
