@@ -40,7 +40,7 @@
 #define CONFIG_CODEC MAS3587F
 
 /* Enable this if you have done the backlight mod */
-//#define CONFIG_BACKLIGHT BL_PA14_HI
+//#define HAVE_BACKLIGHT
 
 #define BATTERY_CAPACITY_DEFAULT 1000 /* default battery capacity */
 

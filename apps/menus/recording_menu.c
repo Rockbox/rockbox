@@ -822,7 +822,7 @@ MAKE_MENU(recording_setting_menu, ID2P(LANG_RECORDING_SETTINGS), NULL, Icon_Reco
             &filesplitoptionsmenu,
             &rec_prerecord_time,
             &recdirectory,
-#if CONFIG_BACKLIGHT
+#ifdef HAVE_BACKLIGHT
             &cliplight,
 #endif
             &rectrigger_item,

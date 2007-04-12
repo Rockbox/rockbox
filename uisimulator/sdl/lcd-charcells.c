@@ -71,7 +71,7 @@ void lcd_update(void)
                         LCD_HEIGHT*CHAR_HEIGHT*CHAR_PIXEL);
 }
 
-#if CONFIG_BACKLIGHT
+#ifdef HAVE_BACKLIGHT
 void sim_backlight(int value)
 {
     if (value > 0) {

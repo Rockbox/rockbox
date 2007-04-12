@@ -55,8 +55,7 @@
 #define AB_REPEAT_ENABLE 1
 
 /* Define this for LCD backlight available */
-#define CONFIG_BACKLIGHT BL_TPJ1022 /* TODO: figure this out, probably not necessary
-                                       because of 'target' stuff */
+#define HAVE_BACKLIGHT
 
 #define BATTERY_CAPACITY_DEFAULT 1550 /* default battery capacity
                                         TODO: check this, probably different

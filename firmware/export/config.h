@@ -113,24 +113,6 @@
 #define RGB565 565
 #define RGB565SWAPPED 3553
 
-/* CONFIG_BACKLIGHT */
-#define BL_PA14_LO       1 /* Player, PA14 low active */
-#define BL_RTC           2 /* Recorder, RTC square wave output */
-#define BL_PA14_HI       3 /* Ondio, PA14 high active */
-#define BL_IRIVER_H100   4 /* IRiver GPIO */
-#define BL_IPOD4G        5 /* Apple iPod 4G */
-#define BL_IPODNANO      6 /* Apple iPod Nano and iPod Video*/
-#define BL_IPOD3G        7 /* Apple iPod 3g with dock */
-#define BL_IRIVER_H300   8 /* IRiver PWM */
-#define BL_IRIVER_IFP7XX 9 /* IRiver GPIO */
-#define BL_IPODMINI      10 /* Apple iPod Mini */
-#define BL_GIGABEAT      11 /* Toshiba Gigabeat */
-#define BL_H10           12 /* iriver H10 */
-#define BL_X5            13 /* iAudio X5 PCF50606 I2C */
-#define BL_H10_5GB       14 /* iriver H10 5/6GB */
-#define BL_TPJ1022       15 /* Tatung Elio TPJ-1022 */
-#define BL_M5            16 /* iAudio M5 PCF50606 I2C */
-
 /* CONFIG_I2C */
 #define I2C_PLAYREC  1 /* Archos Player/Recorder style */
 #define I2C_ONDIO    2 /* Ondio style */
@@ -233,10 +215,6 @@
 
 #ifndef CONFIG_LED
 #define CONFIG_LED 0
-#endif
-
-#ifndef CONFIG_BACKLIGHT
-#define CONFIG_BACKLIGHT 0
 #endif
 
 #ifndef CONFIG_CHARGING

@@ -77,7 +77,7 @@
 #define ROM_START 0x00000000
 
 /* Define this for LCD backlight available */
-#define CONFIG_BACKLIGHT BL_IRIVER_IFP7XX /* port controlled */
+#define HAVE_BACKLIGHT
 
 /* Define this to the CPU frequency */
 #define CPU_FREQ      48000000

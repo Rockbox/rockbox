@@ -107,7 +107,7 @@ static void rectime_formatter(char *buffer, int buffer_size,
 
 #endif /* HAVE_RECORDING */
 
-#if CONFIG_BACKLIGHT
+#ifdef HAVE_BACKLIGHT
 static const char backlight_times_conf [] =
                   "off,on,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90";
 static const int backlight_times[] = 
@@ -405,7 +405,7 @@ const struct settings_list settings[] = {
             { lcd_set_contrast, UNIT_INT, MIN_CONTRAST_SETTING,
                 MAX_CONTRAST_SETTING, 1, NULL, NULL}}}},
 #endif
-#if CONFIG_BACKLIGHT
+#ifdef HAVE_BACKLIGHT
     INT_SETTING_W_CFGVALS(F_FLIPLIST, backlight_timeout, LANG_BACKLIGHT, 6,
         "backlight timeout", backlight_times_conf, UNIT_SEC,
         0, 18, 1, backlight_formatter, backlight_getlang, 
@@ -417,7 +417,7 @@ const struct settings_list settings[] = {
         0, 18, 1, backlight_formatter, backlight_getlang, 
         backlight_set_timeout_plugged),
 #endif
-#endif /* CONFIG_BACKLIGHT */
+#endif /* HAVE_BACKLIGHT */
 #ifdef HAVE_LCD_BITMAP
     BOOL_SETTING(0, invert, LANG_INVERT, false ,"invert", off_on,
         LANG_INVERT_LCD_INVERSE, LANG_INVERT_LCD_NORMAL, lcd_set_invert_display),
@@ -512,7 +512,7 @@ const struct settings_list settings[] = {
 #endif
 #endif
 
-#if CONFIG_BACKLIGHT
+#ifdef HAVE_BACKLIGHT
     OFFON_SETTING(0,bl_filter_first_keypress,
         LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS, false,
         "backlight filters first keypress", NULL),
@@ -521,18 +521,18 @@ const struct settings_list settings[] = {
         LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS, false,
         "backlight filters first remote keypress", NULL),
 #endif
-#endif /* CONFIG_BACKLIGHT */
+#endif /* HAVE_BACKLIGHT */
 
 /** End of old RTC config block **/
 
-#if CONFIG_BACKLIGHT
+#ifdef HAVE_BACKLIGHT
     OFFON_SETTING(0,caption_backlight, LANG_CAPTION_BACKLIGHT, 
         false,"caption backlight",NULL),
 #ifdef HAVE_REMOTE_LCD
     OFFON_SETTING(0,remote_caption_backlight, LANG_CAPTION_BACKLIGHT, 
         false,"remote caption backlight",NULL),
 #endif
-#endif /* CONFIG_BACKLIGHT */
+#endif /* HAVE_BACKLIGHT */
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
     INT_SETTING(0, brightness, LANG_BRIGHTNESS, DEFAULT_BRIGHTNESS_SETTING,
         "brightness",UNIT_INT, MIN_BRIGHTNESS_SETTING, MAX_BRIGHTNESS_SETTING, 1,
@@ -759,7 +759,7 @@ const struct settings_list settings[] = {
                 UNIT_SEC, 0, 30, 1, rectime_formatter, rectime_getlang, NULL),
     {F_T_INT,&global_settings.rec_directory,LANG_RECORD_DIRECTORY,
         INT(0),"rec directory",REC_BASE_DIR ",current",UNUSED},
-#if CONFIG_BACKLIGHT
+#ifdef HAVE_BACKLIGHT
     CHOICE_SETTING(0, cliplight, LANG_CLIP_LIGHT, 0 ,
         "cliplight", "off,main,both,remote", NULL, 
 #ifdef HAVE_REMOTE_LCD
@@ -974,7 +974,7 @@ const struct settings_list settings[] = {
         LANG_WARN_ERASEDYNPLAYLIST_MENU,false,
         "warn when erasing dynamic playlist",NULL),
 
-#if CONFIG_BACKLIGHT
+#ifdef HAVE_BACKLIGHT
 #ifdef HAS_BUTTON_HOLD
     CHOICE_SETTING(0, backlight_on_button_hold,
         LANG_BACKLIGHT_ON_BUTTON_HOLD, 0, "backlight on button hold",
@@ -991,7 +991,7 @@ const struct settings_list settings[] = {
         TALK_ID(15, UNIT_SEC), TALK_ID(20, UNIT_SEC), TALK_ID(30, UNIT_SEC),
         TALK_ID(45, UNIT_SEC),TALK_ID(60, UNIT_SEC), TALK_ID(90, UNIT_SEC)),
 #endif
-#endif /* CONFIG_BACKLIGHT */
+#endif /* HAVE_BACKLIGHT */
 
 #ifdef HAVE_WM8758
     OFFON_SETTING(0,eq_hw_enabled,LANG_EQUALIZER_HARDWARE_ENABLED,false,

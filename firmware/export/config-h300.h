@@ -51,7 +51,7 @@
 #define HAVE_REMOTE_LCD
 
 /* Define this for LCD backlight available */
-#define CONFIG_BACKLIGHT BL_IRIVER_H300 /* port controlled PWM */
+#define HAVE_BACKLIGHT
 
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF

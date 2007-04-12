@@ -69,8 +69,7 @@
 #define CONFIG_TUNER_XTAL  32768 *//* TODO: what is this? */
 
 /* Define this for LCD backlight available */
-#define CONFIG_BACKLIGHT BL_H10 /* TODO: figure this out, probably not necessary
-                                   because of 'target' stuff */
+#define HAVE_BACKLIGHT
 
 #define BATTERY_CAPACITY_DEFAULT 750    /* default battery capacity */
 

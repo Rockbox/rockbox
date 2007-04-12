@@ -38,7 +38,7 @@
 #include "lcd-remote.h"
 
 
-#if CONFIG_BACKLIGHT
+#ifdef HAVE_BACKLIGHT
 int filterfirstkeypress_callback(int action,const struct menu_item_ex *this_item)
 {
     (void)this_item;
@@ -77,7 +77,7 @@ int flipdisplay_callback(int action,const struct menu_item_ex *this_item)
 
 /***********************************/
 /*    LCD MENU                     */
-#if CONFIG_BACKLIGHT
+#ifdef HAVE_BACKLIGHT
 MENUITEM_SETTING(backlight_timeout, &global_settings.backlight_timeout, NULL);
 #if CONFIG_CHARGING
 MENUITEM_SETTING(backlight_timeout_plugged, 
@@ -102,7 +102,7 @@ MENUITEM_SETTING(lcd_sleep_after_backlight_off,
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
 MENUITEM_SETTING(brightness_item, &global_settings.brightness, NULL);
 #endif
-#endif /* CONFIG_BACKLIGHT */
+#endif /* HAVE_BACKLIGHT */
 #ifdef HAVE_LCD_CONTRAST
 MENUITEM_SETTING(contrast, &global_settings.contrast, NULL);
 #endif
@@ -173,7 +173,7 @@ MENUITEM_FUNCTION(reset_colors, 0, ID2P(LANG_RESET_COLORS),
 /* now the actual menu */
 MAKE_MENU(lcd_settings,ID2P(LANG_LCD_MENU),
             NULL, Icon_Display_menu
-#if CONFIG_BACKLIGHT
+#ifdef HAVE_BACKLIGHT
             ,&backlight_timeout
 # if CONFIG_CHARGING
             ,&backlight_timeout_plugged
@@ -192,7 +192,7 @@ MAKE_MENU(lcd_settings,ID2P(LANG_LCD_MENU),
 # ifdef HAVE_BACKLIGHT_BRIGHTNESS
             ,&brightness_item
 # endif
-#endif /* CONFIG_BACKLIGHT */
+#endif /* HAVE_BACKLIGHT */
 #ifdef HAVE_LCD_CONTRAST
             ,&contrast
 #endif

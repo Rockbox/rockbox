@@ -61,7 +61,7 @@
 #define ACTION_WPSAB_SINGLE ACTION_WPS_BROWSE
 
 /* Define this for LCD backlight available */
-#define CONFIG_BACKLIGHT BL_IPODNANO /* port controlled */
+#define HAVE_BACKLIGHT
 
 /* We can fade the backlight by using PWM */
 #define HAVE_BACKLIGHT_PWM_FADING

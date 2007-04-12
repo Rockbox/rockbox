@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Barry Wardell
+ * Copyright (C) 2007 by Jens Arnold
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,14 +16,24 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
-/* Taken from the x5's implementation */
-
 #ifndef BACKLIGHT_TARGET_H
 #define BACKLIGHT_TARGET_H
 
+#include "config.h"
+#include "rtc.h"
+
 #define __backlight_init() true
-void __backlight_on(void);
-void __backlight_off(void);
+
+static inline void __backlight_on(void)
+{
+    /* Enable square wave */
+    rtc_write(0x0a, rtc_read(0x0a) | 0x40);
+}
+
+static inline void __backlight_off(void)
+{
+    /* Disable square wave */
+    rtc_write(0x0a, rtc_read(0x0a) & ~0x40);
+}
 
 #endif

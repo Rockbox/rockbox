@@ -64,7 +64,7 @@
 #define HAVE_SW_TONE_CONTROLS
 
 /* Define this for LCD backlight available */
-#define CONFIG_BACKLIGHT BL_IPOD3G /* port controlled */
+#define HAVE_BACKLIGHT
 
 #define BATTERY_CAPACITY_DEFAULT 630 /* default battery capacity */
 

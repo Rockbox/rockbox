@@ -37,7 +37,7 @@
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
-#if defined(TARGET_TREE) && !defined(SIMULATOR)
+#ifndef SIMULATOR
 #include "backlight-target.h"
 #endif
 
@@ -58,39 +58,9 @@ static inline void __backlight_set_brightness(int val)
     (void)val;
 }
 #endif
-
-#else
-/* Basic low-level code that simply switches backlight on or off. Probably
- * a nice candidate for inclusion in the target/ dir. */
-#ifndef TARGET_TREE
-static inline void __backlight_on(void)
-{
-#if CONFIG_BACKLIGHT == BL_RTC
-    /* Enable square wave */
-    rtc_write(0x0a, rtc_read(0x0a) | 0x40);
-#elif CONFIG_BACKLIGHT == BL_PA14_LO /* Player */
-    and_b(~0x40, &PADRH); /* drive and set low */
-    or_b(0x40, &PAIORH);
-#elif CONFIG_BACKLIGHT == BL_PA14_HI /* Ondio */
-    or_b(0x40, &PADRH); /* drive it high */
-#endif
-}
-
-static inline void __backlight_off(void)
-{
-#if CONFIG_BACKLIGHT == BL_RTC
-    /* Disable square wave */
-    rtc_write(0x0a, rtc_read(0x0a) & ~0x40);
-#elif CONFIG_BACKLIGHT == BL_PA14_LO /* Player */
-    and_b(~0x40, &PAIORH); /* let it float (up) */
-#elif CONFIG_BACKLIGHT == BL_PA14_HI /* Ondio */
-    and_b(~0x40, &PADRH); /* drive it low */
-#endif
-}
-#endif
 #endif /* SIMULATOR */
 
-#if CONFIG_BACKLIGHT && !defined(BOOTLOADER)
+#if defined(HAVE_BACKLIGHT) && !defined(BOOTLOADER)
 
 const signed char backlight_timeout_value[19] =
 {
@@ -558,23 +528,15 @@ void backlight_init(void)
     queue_init(&backlight_queue, true);
     queue_set_irq_safe(&backlight_queue, true);
     
-#ifdef SIMULATOR
-    /* do nothing */
-#elif defined(__BACKLIGHT_INIT)
-    /* Remove the __BACKLIGHT_INIT references when __backlight_init is
-       available on all backlighted targets. Take them out of the
-       backlight-target.h files as well */
+#ifndef SIMULATOR
     if (__backlight_init())
     {
-# if defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)
+# ifdef HAVE_BACKLIGHT_PWM_FADING
         /* If backlight is already on, don't fade in. */
         bl_dim_current = BL_PWM_COUNT;
         bl_dim_target = BL_PWM_COUNT;
 # endif
     }
-#elif CONFIG_BACKLIGHT == BL_PA14_LO || CONFIG_BACKLIGHT == BL_PA14_HI
-    PACR1 &= ~0x3000;    /* Set PA14 (backlight control) to GPIO */
-    or_b(0x40, &PAIORH); /* ..and output */
 #endif
     backlight_on();
 #ifdef HAVE_REMOTE_LCD
@@ -806,16 +768,14 @@ void backlight_set_brightness(int val)
 }
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 
-#else /* (CONFIG_BACKLIGHT == 0) || defined(BOOTLOADER)
+#else /* !defined(HAVE_BACKLIGHT) || defined(BOOTLOADER)
     -- no backlight, empty dummy functions */
 
-#if defined(BOOTLOADER) && CONFIG_BACKLIGHT
+#if defined(BOOTLOADER) && defined(HAVE_BACKLIGHT)
 void backlight_init(void)
 {
-#ifdef __BACKLIGHT_INIT
     __backlight_init();
     __backlight_on();
-#endif
 }
 #endif
 
@@ -832,4 +792,4 @@ bool is_remote_backlight_on(void) {return true;}
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
 void backlight_set_brightness(int val) { (void)val; }
 #endif
-#endif /* CONFIG_BACKLIGHT && !defined(BOOTLOADER) */
+#endif /* defined(HAVE_BACKLIGHT) && !defined(BOOTLOADER) */

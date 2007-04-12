@@ -626,7 +626,7 @@ struct user_settings
 #endif
     bool party_mode;    /* party mode - unstoppable music */
     
-#if CONFIG_BACKLIGHT
+#ifdef HAVE_BACKLIGHT
     bool bl_filter_first_keypress;   /* filter first keypress when dark? */
 #ifdef HAVE_REMOTE_LCD
     bool remote_bl_filter_first_keypress; /* filter first remote keypress when remote dark? */
@@ -639,7 +639,7 @@ struct user_settings
     int lcd_sleep_after_backlight_off; /* when to put lcd to sleep after backlight
                                           has turned off */
 #endif
-#endif /* CONFIG_BACKLIGHT */
+#endif /* HAVE_BACKLIGHT */
 
 #ifdef HAVE_LCD_BITMAP
     unsigned char kbd_file[MAX_FILENAME+1]; /* last keyboard */

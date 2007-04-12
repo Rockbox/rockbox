@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Barry Wardell
+ * Copyright (C) 2007 by Jens Arnold
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,14 +16,29 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
-/* Taken from the x5's implementation */
-
 #ifndef BACKLIGHT_TARGET_H
 #define BACKLIGHT_TARGET_H
 
-#define __backlight_init() true
-void __backlight_on(void);
-void __backlight_off(void);
+#include "config.h"
+#include "cpu.h"
+
+static inline bool __backlight_init(void)
+{
+    PACR1 &= ~0x3000;    /* Set PA14 (backlight control) to GPIO */
+    and_b(~0x40, &PADRH); /* drive and set low */
+    or_b(0x40, &PAIORH); /* ..and output */
+    return true;
+}
+
+static inline void __backlight_on(void)
+{
+    and_b(~0x40, &PADRH); /* drive and set low */
+    or_b(0x40, &PAIORH);
+}
+
+static inline void __backlight_off(void)
+{
+    and_b(~0x40, &PAIORH); /* let it float (up) */
+}
 
 #endif

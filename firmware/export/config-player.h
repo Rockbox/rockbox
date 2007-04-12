@@ -25,7 +25,7 @@
 #define HAVE_DAC3550A
 
 /* Define this for LCD backlight available */
-#define CONFIG_BACKLIGHT BL_PA14_LO /* port PA14, low active */
+#define HAVE_BACKLIGHT
 
 #define BATTERY_CAPACITY_DEFAULT 1500 /* default battery capacity */
 

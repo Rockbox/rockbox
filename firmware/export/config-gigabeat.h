@@ -42,7 +42,7 @@
 #define CONFIG_RTC RTC_S3C2440
 
 /* Define this for LCD backlight available */
-#define CONFIG_BACKLIGHT BL_GIGABEAT /* port controlled PWM */
+#define HAVE_BACKLIGHT
 
 #define HAVE_LCD_ENABLE
 

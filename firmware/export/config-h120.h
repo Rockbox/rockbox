@@ -51,7 +51,7 @@
 #define CONFIG_LCD LCD_S1D15E06
 
 /* Define this for LCD backlight available */
-#define CONFIG_BACKLIGHT BL_IRIVER_H100 /* port controlled */
+#define HAVE_BACKLIGHT
 
 /* We can fade the backlight by using PWM */
 #define HAVE_BACKLIGHT_PWM_FADING

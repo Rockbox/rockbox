@@ -708,7 +708,7 @@ static int runcurrent(void)
         current = CURRENT_USB;
     }
 
-#if CONFIG_BACKLIGHT && !defined(BOOTLOADER)
+#if defined(HAVE_BACKLIGHT) && !defined(BOOTLOADER)
     if (backlight_get_current_timeout() == 0) /* LED always on */
         current += CURRENT_BACKLIGHT;
 #endif

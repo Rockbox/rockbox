@@ -34,7 +34,7 @@
 #include "peakmeter.h"
 #include "audio.h"
 #include "screen_access.h"
-#if CONFIG_BACKLIGHT
+#ifdef HAVE_BACKLIGHT
 #include "backlight.h"
 #endif
 #include "action.h"
@@ -1008,7 +1008,7 @@ void peak_meter_draw(struct screen *display, struct meter_scales *scales,
     
 #ifdef HAVE_RECORDING
 
-#if CONFIG_BACKLIGHT
+#ifdef HAVE_BACKLIGHT
     /* cliplight */
     if ((pm_clip_left || pm_clip_right) && 
         global_settings.cliplight &&
@@ -1032,7 +1032,7 @@ void peak_meter_draw(struct screen *display, struct meter_scales *scales,
         }
 #endif /* HAVE_REMOTE_LCD */
     }
-#endif /* CONFIG_BACKLIGHT */
+#endif /* HAVE_BACKLIGHT */
 
     if (trig_status != TRIG_OFF) {
         int start_trigx, stop_trigx, ycenter;

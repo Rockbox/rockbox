@@ -1901,7 +1901,7 @@ bool gui_wps_refresh(struct gui_wps *gwps,
 
     display->update();
 
-#if CONFIG_BACKLIGHT
+#ifdef HAVE_BACKLIGHT
     if (global_settings.caption_backlight && state->id3)
     {
         /* turn on backlight n seconds before track ends, and turn it off n

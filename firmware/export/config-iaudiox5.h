@@ -66,7 +66,7 @@
 #define CONFIG_LCD LCD_X5
 
 /* Define this for LCD backlight available */
-#define CONFIG_BACKLIGHT BL_X5 /* PCF50606 I2C */
+#define HAVE_BACKLIGHT
 #define HAVE_BACKLIGHT_BRIGHTNESS
 
 /* Define this if you have a software controlled poweroff */

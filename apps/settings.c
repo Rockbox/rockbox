@@ -699,7 +699,7 @@ void settings_apply(void)
     remote_backlight_set_on_button_hold(global_settings.remote_backlight_on_button_hold);
 #endif
 #endif /* HAVE_REMOTE_LCD */
-#if CONFIG_BACKLIGHT
+#ifdef HAVE_BACKLIGHT
     backlight_set_timeout(global_settings.backlight_timeout);
 #if CONFIG_CHARGING
     backlight_set_timeout_plugged(global_settings.backlight_timeout_plugged);
@@ -836,7 +836,7 @@ void settings_apply(void)
     spdif_power_enable(global_settings.spdif_enable);
 #endif
 
-#if CONFIG_BACKLIGHT
+#ifdef HAVE_BACKLIGHT
     set_backlight_filter_keypress(global_settings.bl_filter_first_keypress);
 #ifdef HAVE_REMOTE_LCD
     set_remote_backlight_filter_keypress(global_settings.remote_bl_filter_first_keypress);
@@ -847,7 +847,7 @@ void settings_apply(void)
 #ifdef HAVE_LCD_SLEEP
     lcd_set_sleep_after_backlight_off(global_settings.lcd_sleep_after_backlight_off);
 #endif
-#endif /* CONFIG_BACKLIGHT */
+#endif /* HAVE_BACKLIGHT */
 
     /* This should stay last */
 #if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
