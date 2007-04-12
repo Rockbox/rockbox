@@ -493,8 +493,8 @@ void sound_set_balance(int value)
    || defined(HAVE_AS3514)
     current_balance = value * VOLUME_RANGE / 100; /* tenth of dB */
     set_prescaled_volume();
-#elif CONFIG_CPU == PNX0101 || defined(HAVE_AS3514)
-    /* TODO: implement for iFP and Sansa */
+#elif CONFIG_CPU == PNX0101
+    /* TODO: implement for iFP */
     (void)value;
 #endif
 }
