@@ -477,6 +477,12 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
         {
             list_stop_handler();
         }
+        else if (action == ACTION_STD_CONTEXT &&
+                 menu == &root_menu_)
+        {
+            ret = GO_TO_ROOTITEM_CONTEXT;
+            done = true;
+        } 
         else if (action == ACTION_STD_MENU)
         {
             if ((menu->flags&MENU_TYPE_MASK) == MT_OLD_MENU)

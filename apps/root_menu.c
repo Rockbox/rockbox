@@ -70,6 +70,7 @@
 struct root_items {
     int (*function)(void* param);
     void* param;
+    const struct menu_item_ex *context_menu;
 };
 static int last_screen = GO_TO_ROOT; /* unfortunatly needed so we can resume
                                         or goto current track based on previous
@@ -250,23 +251,31 @@ static int load_bmarks(void* param)
     bookmark_mrb_load();
     return GO_TO_PREVIOUS;
 }
-
+/* These are all static const'd from apps/menus/ *.c
+   so little hack so we can use them */
+extern struct menu_item_ex 
+        file_menu, 
+        tagcache_menu,
+        manage_settings,
+        recording_setting_menu,
+        bookmark_settings_menu,
+        system_menu;
 static const struct root_items items[] = {
-    [GO_TO_FILEBROWSER] =   { browser, (void*)GO_TO_FILEBROWSER },
-    [GO_TO_DBBROWSER] =     { browser, (void*)GO_TO_DBBROWSER },
-    [GO_TO_WPS] =           { wpsscrn, NULL },
-    [GO_TO_MAINMENU] =      { menu, NULL },
+    [GO_TO_FILEBROWSER] =   { browser, (void*)GO_TO_FILEBROWSER, &file_menu},
+    [GO_TO_DBBROWSER] =     { browser, (void*)GO_TO_DBBROWSER, &tagcache_menu },
+    [GO_TO_WPS] =           { wpsscrn, NULL, &playback_menu_item },
+    [GO_TO_MAINMENU] =      { menu, NULL, &manage_settings },
     
 #ifdef HAVE_RECORDING
-    [GO_TO_RECSCREEN] =     {  recscrn, NULL },
+    [GO_TO_RECSCREEN] =     {  recscrn, NULL, &recording_setting_menu },
 #endif
     
 #if CONFIG_TUNER
-    [GO_TO_FM] =            { radio, NULL },
+    [GO_TO_FM] =            { radio, NULL, NULL },
 #endif
     
-    [GO_TO_RECENTBMARKS] =  { load_bmarks, NULL }, 
-    [GO_TO_BROWSEPLUGINS] = { browser, (void*)GO_TO_BROWSEPLUGINS }, 
+    [GO_TO_RECENTBMARKS] =  { load_bmarks, NULL, &bookmark_settings_menu }, 
+    [GO_TO_BROWSEPLUGINS] = { browser, (void*)GO_TO_BROWSEPLUGINS, NULL }, 
     
 };
 static const int nb_items = sizeof(items)/sizeof(*items);
@@ -392,7 +401,25 @@ static inline int load_screen(int screen)
         last_screen = old_previous;
     return ret_val;
 }
-
+static int load_context_screen(int selection)
+{
+    const struct menu_item_ex *context_menu = NULL;
+    if (root_menu__[selection]->flags&MT_RETURN_VALUE)
+    {
+        int item = root_menu__[selection]->value;
+        context_menu = items[item].context_menu;
+    }
+    /* special cases */
+    else if (root_menu__[selection] == &info_menu)
+    {
+        context_menu = &system_menu;
+    }
+    
+    if (context_menu)
+        return do_menu(context_menu, NULL);
+    else
+        return GO_TO_PREVIOUS;
+}
 void root_menu(void)
 {
     int previous_browser = GO_TO_FILEBROWSER;
@@ -455,7 +482,9 @@ void root_menu(void)
             case GO_TO_PREVIOUS_MUSIC:
                 next_screen = previous_music;
                 break;
-                
+            case GO_TO_ROOTITEM_CONTEXT:
+                next_screen = load_context_screen(selected);
+                break;
             default:
                 if (next_screen == GO_TO_FILEBROWSER 
 #ifdef HAVE_TAGCACHE
