@@ -425,13 +425,22 @@ static void wait_for_voice_swap_in(void)
 #endif /* PLAYBACK_VOICE */
 }
 
+/* This sends a stop message and the audio thread will dump all it's
+   subsequenct messages */
+static void audio_hard_stop(void)
+{
+    /* Stop playback */
+    LOGFQUEUE("audio >| audio Q_AUDIO_STOP: 1");
+    queue_send(&audio_queue, Q_AUDIO_STOP, 1);
+}
+
 unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size)
 {
     unsigned char *buf, *end;
 
     if (audio_is_initialized)
     {
-        audio_stop();
+        audio_hard_stop();
         wait_for_voice_swap_in();
         voice_stop();
     }
@@ -488,7 +497,7 @@ unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size)
 void audio_iram_steal(void)
 {
     /* We need to stop audio playback in order to use codec IRAM */
-    audio_stop();
+    audio_hard_stop();
 
 #ifdef PLAYBACK_VOICE
     if (NULL != iram_buf)
@@ -527,7 +536,7 @@ unsigned char *audio_get_recording_buffer(size_t *buffer_size)
 
     /* Stop audio and voice. Wait for voice to swap in and be clear
        of pending events to ensure trouble-free operation of encoders */
-    audio_stop();
+    audio_hard_stop();
     wait_for_voice_swap_in();
     voice_stop();
     talk_buffer_steal();
@@ -3636,6 +3645,8 @@ static void audio_thread(void)
             case Q_AUDIO_STOP:
                 LOGFQUEUE("audio < Q_AUDIO_STOP");
                 audio_stop_playback();
+                if (ev.data != 0)
+                    queue_clear(&audio_queue);
                 break ;
 
             case Q_AUDIO_PAUSE:
