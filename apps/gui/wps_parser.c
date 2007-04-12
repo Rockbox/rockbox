@@ -234,6 +234,7 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_DATABASE_RATING,          "rr",  WPS_REFRESH_DYNAMIC, NULL },
 #if CONFIG_CODEC == SWCODEC
     { WPS_TOKEN_REPLAYGAIN,               "rg",  WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_CROSSFADE,                "xf",  WPS_REFRESH_DYNAMIC, NULL },
 #endif
 
     { WPS_NO_TOKEN,                       "s",   WPS_REFRESH_SCROLL,  NULL },
@@ -378,50 +379,51 @@ static int parse_image_load(const char *wps_bufptr,
 
     ptr = strchr(ptr, '|') + 1;
     pos = strchr(ptr, '|');
-    if (pos)
+
+    if (!pos)
+        return 0;
+
+    /* get the image ID */
+    n = get_image_id(*ptr);
+
+    /* check the image number and load state */
+    if(n < 0 || n >= MAX_IMAGES || wps_data->img[n].loaded)
     {
-        /* get the image ID */
-        n = get_image_id(*ptr);
-
-        /* check the image number and load state */
-        if(n < 0 || n >= MAX_IMAGES || wps_data->img[n].loaded)
-        {
-            /* Skip the rest of the line */
-            return skip_end_of_line(wps_bufptr);
-        }
-
-        ptr = pos + 1;
-
-        /* get image name */
-        bmp_names[n] = ptr;
-
-        pos = strchr(ptr, '|');
-        ptr = pos + 1;
-
-        /* get x-position */
-        pos = strchr(ptr, '|');
-        if (pos)
-            wps_data->img[n].x = atoi(ptr);
-        else
-        {
-            /* weird syntax, bail out */
-            return skip_end_of_line(wps_bufptr);
-        }
-
-        /* get y-position */
-        ptr = pos + 1;
-        pos = strchr(ptr, '|');
-        if (pos)
-            wps_data->img[n].y = atoi(ptr);
-        else
-        {
-            /* weird syntax, bail out */
-            return skip_end_of_line(wps_bufptr);
-        }
-
-        if (token->type == WPS_TOKEN_IMAGE_DISPLAY)
-            wps_data->img[n].always_display = true;
+        /* Skip the rest of the line */
+        return 0;
     }
+
+    ptr = pos + 1;
+
+    /* get image name */
+    bmp_names[n] = ptr;
+
+    pos = strchr(ptr, '|');
+    ptr = pos + 1;
+
+    /* get x-position */
+    pos = strchr(ptr, '|');
+    if (pos)
+        wps_data->img[n].x = atoi(ptr);
+    else
+    {
+        /* weird syntax, bail out */
+        return 0;
+    }
+
+    /* get y-position */
+    ptr = pos + 1;
+    pos = strchr(ptr, '|');
+    if (pos)
+        wps_data->img[n].y = atoi(ptr);
+    else
+    {
+        /* weird syntax, bail out */
+        return 0;
+    }
+
+    if (token->type == WPS_TOKEN_IMAGE_DISPLAY)
+        wps_data->img[n].always_display = true;
 
     /* Skip the rest of the line */
     return skip_end_of_line(wps_bufptr);

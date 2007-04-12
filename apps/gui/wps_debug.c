@@ -188,6 +188,16 @@ void dump_wps_tokens(struct wps_data *data)
                 break;
 #endif
 
+#if (CONFIG_CODEC == SWCODEC)
+            case WPS_TOKEN_CROSSFADE:
+                snprintf(buf, sizeof(buf), "crossfade");
+                break;
+
+            case WPS_TOKEN_REPLAYGAIN:
+                snprintf(buf, sizeof(buf), "replaygain");
+                break;
+#endif
+
 #ifdef HAVE_LCD_BITMAP
             case WPS_TOKEN_IMAGE_BACKDROP:
                 snprintf(buf, sizeof(buf), "backdrop image");

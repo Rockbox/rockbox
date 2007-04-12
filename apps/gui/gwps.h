@@ -125,6 +125,7 @@ enum wps_token_type {
 #endif
 #if (CONFIG_CODEC == SWCODEC)
     WPS_TOKEN_REPLAYGAIN,
+    WPS_TOKEN_CROSSFADE,
 #endif
 
 #if CONFIG_RTC

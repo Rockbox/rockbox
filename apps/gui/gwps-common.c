@@ -1176,6 +1176,12 @@ static char *get_token_value(struct gui_wps *gwps,
             return buf;
 
 #if (CONFIG_CODEC == SWCODEC)
+        case WPS_TOKEN_CROSSFADE:
+            if (intval)
+                *intval = global_settings.crossfade + 1;
+            snprintf(buf, buf_size, "%d", global_settings.crossfade);
+            return buf;
+
         case WPS_TOKEN_REPLAYGAIN:
         {
             int val;
@@ -1216,7 +1222,7 @@ static char *get_token_value(struct gui_wps *gwps,
             }
             return buf;
         }
-#endif
+#endif  /* (CONFIG_CODEC == SWCODEC) */
 
 #if (CONFIG_CODEC != MAS3507D)
         case WPS_TOKEN_SOUND_PITCH:
