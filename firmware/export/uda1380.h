@@ -133,10 +133,10 @@ extern void audiohw_set_monitor(int enable);
 #define EQ_MODE_FLAT        (0 << 14)
 #define EQ_MODE_MIN         (1 << 14)
 #define EQ_MODE_MAX         (3 << 14)
-#define BASSL(x)            (((x) & 0xF) << 8)
-#define BASSR(x)            (((x) & 0xF) << 0)
-#define TREBLEL(x)          (((x) & 0x3) << 12)
-#define TREBLER(x)          (((x) & 0x3) << 4)
+#define BASSL(x)            (((x) & 0x1E) << 7)
+#define BASSR(x)            (((x) & 0x1E) >> 1)
+#define TREBLEL(x)          (((x) & 0x6) << 11)
+#define TREBLER(x)          (((x) & 0x6) << 3)
 #define BASS_MASK           0x0F0F
 #define TREBLE_MASK         0x3030
 

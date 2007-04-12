@@ -514,11 +514,7 @@ void sound_set_bass(int value)
     mas_writereg(MAS_REG_KBASS, bass_table[value+15]);
     current_bass = value * 10;
     set_prescaled_volume();
-#elif defined(HAVE_UDA1380)
-    audiohw_set_bass(value >> 1);
-    current_bass = value * 10;
-    set_prescaled_volume();
-#elif defined HAVE_WM8975 || defined HAVE_WM8758 \
+#elif defined HAVE_WM8975 || defined HAVE_WM8758 || defined(HAVE_UDA1380) \
     || defined HAVE_WM8731 || defined(HAVE_WM8721) || defined(HAVE_WM8751)
     current_bass = value * 10;
     audiohw_set_bass(value);
@@ -544,11 +540,7 @@ void sound_set_treble(int value)
     mas_writereg(MAS_REG_KTREBLE, treble_table[value+15]);
     current_treble = value * 10;
     set_prescaled_volume();
-#elif defined(HAVE_UDA1380)
-    audiohw_set_treble(value >> 1);
-    current_treble = value * 10;
-    set_prescaled_volume();
-#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) \
+#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_UDA1380) \
    || defined(HAVE_WM8731) || defined(HAVE_WM8721) || defined(HAVE_WM8751)
     audiohw_set_treble(value);
     current_treble = value * 10;
