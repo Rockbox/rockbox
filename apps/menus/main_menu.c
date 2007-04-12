@@ -27,6 +27,7 @@
 #include "settings.h"
 #include "powermgmt.h"
 #include "menu.h"
+#include "misc.h"
 #include "settings_menu.h"
 #include "exported_menus.h"
 #include "tree.h"
@@ -115,7 +116,14 @@ MAKE_MENU(manage_settings, ID2P(LANG_MANAGE_MENU), NULL, Icon_Config,
 
 static bool show_credits(void)
 {
-    plugin_load(PLUGIN_DIR "/credits.rock",NULL);
+    if (plugin_load(PLUGIN_DIR "/credits.rock",NULL) != PLUGIN_OK)
+    {
+        /* show the rockbox logo and version untill a button is pressed */
+        action_signalscreenchange();
+        show_logo();
+        get_action(CONTEXT_STD, TIMEOUT_BLOCK);
+        action_signalscreenchange();
+    }
     return false;
 }
 
