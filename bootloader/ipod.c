@@ -35,7 +35,7 @@
 #include "disk.h"
 #include "font.h"
 #include "adc.h"
-#include "backlight.h"
+#include "backlight-target.h"
 #include "panic.h"
 #include "power.h"
 #include "file.h"
@@ -237,27 +237,7 @@ void* main(void)
 
     /* Turn on the backlight */
 
-#if CONFIG_BACKLIGHT==BL_IPOD4G
-    /* brightness full */
-    outl(0x80000000 | (0xff << 16), 0x7000a010);
-
-    /* set port B03 on */
-    outl(((0x100 | 1) << 3), 0x6000d824);
-
-#elif CONFIG_BACKLIGHT==BL_IPODMINI
-    /* set port B03 on */
-    outl(((0x100 | 1) << 3), 0x6000d824);
-
-#elif CONFIG_BACKLIGHT==BL_IPODNANO
-
-    /* set port B03 on */
-    outl(((0x100 | 1) << 3), 0x6000d824);
-
-    /* set port L07 on */
-    GPIOL_OUTPUT_VAL = ((0x100 | 1) << 7);
-#elif CONFIG_BACKLIGHT==BL_IPOD3G
-    outl(inl(IPOD_LCD_BASE) | 0x2, IPOD_LCD_BASE);
-#endif
+    __backlight_on();
 
     TMP_IPOD_HW_REVISION = IPOD_HW_REVISION;
     ipod_hw_rev = IPOD_HW_REVISION;
