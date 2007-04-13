@@ -34,6 +34,8 @@ static inline void udelay(unsigned usecs)
 
 unsigned int current_core(void);
 
+#if CONFIG_CPU != PP5002
+
 #define HAVE_INVALIDATE_ICACHE
 static inline void invalidate_icache(void)
 {
@@ -47,3 +49,5 @@ static inline void flush_icache(void)
     outl(inl(0xf000f044) | 0x2, 0xf000f044);
     while ((CACHE_CTL & 0x8000) != 0);
 }
+
+#endif /* CONFIG_CPU */
