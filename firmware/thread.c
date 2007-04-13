@@ -132,7 +132,7 @@ static void start_thread(void (*thread_func)(void), const void* addr) __attribut
 static void start_thread(void (*thread_func)(void), const void* addr)
 {
     /* r0 = thread_func, r1 = addr */
-#if NUM_CORES > 1
+#if NUM_CORES > 1 && CONFIG_CPU != PP5002
     asm volatile (
         "mov    r2, #0           \n"
         "str    r2, [r1, #40]    \n"
