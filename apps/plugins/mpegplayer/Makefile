@@ -32,9 +32,17 @@ OUTPUT = $(OUTDIR)/mpegplayer.rock
 
 all: $(OUTPUT)
 
+.PHONY: libmad-mpegplayer
+
+$(BUILDDIR)/libmad-mpegplayer.a: libmad-mpegplayer
+
+libmad-mpegplayer:
+	$(SILENT)mkdir -p $(OBJDIR)/libmad-mpegplayer
+	$(call PRINTS,MAKE in libmad for mpegplayer)$(MAKE) -C $(APPSDIR)/codecs/libmad MPEGPLAYER=1 OBJDIR=$(OBJDIR)/libmad-mpegplayer OUTPUT=$(BUILDDIR)/libmad-mpegplayer.a
+
 ifndef SIMVER
-$(OBJDIR)/mpegplayer.elf: $(OBJS) $(LINKFILE)
-	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lmad -lgcc\
+$(OBJDIR)/mpegplayer.elf: $(OBJS) $(LINKFILE) $(BUILDDIR)/libmad-mpegplayer.a
+	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lmad-mpegplayer -lgcc\
            -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/mpegplayer.map
 
 $(OUTPUT): $(OBJDIR)/mpegplayer.elf
@@ -45,8 +53,8 @@ ifeq ($(SIMVER), x11)
 ###################################################
 # This is the X11 simulator version
 
-$(OUTPUT): $(OBJS)
-	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin -lmad -o $@
+$(OUTPUT): $(OBJS) $(BUILDDIR)/libmad-mpegplayer.a
+	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin -lmad-mpegplayer -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
@@ -60,8 +68,8 @@ ifeq ($(SIMVER), sdl)
 ###################################################
 # This is the SDL simulator version
 
-$(OUTPUT): $(OBJS)
-	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin -lmad -o $@
+$(OUTPUT): $(OBJS) $(BUILDDIR)/libmad-mpegplayer.a
+	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin -lmad-mpegplayer -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
@@ -76,7 +84,7 @@ else # end of sdl-simulator
 DLLTOOLFLAGS = --export-all
 DLLWRAPFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin
 
-$(OUTPUT): $(OBJS)
+$(OUTPUT): $(OBJS) $(BUILDDIR)/libmad-mpegplayer.a
 	$(call PRINTS,DLL $(@F))$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $(OBJS)
 	$(SILENT)@$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $(OBJS) \
                 $(BUILDDIR)/libplugin.a -o $@

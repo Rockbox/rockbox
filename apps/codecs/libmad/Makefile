@@ -24,6 +24,11 @@ else
    MADOPTS += -O2
 endif
 
+# We build libmad separately for mpegplayer
+ifdef MPEGPLAYER
+EXTRA_DEFINES += -DMPEGPLAYER
+endif
+
 CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET_INC) $(MADOPTS) $(TARGET)	\
 $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE} $(PROFILE_OPTS)
 
