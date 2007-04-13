@@ -7,7 +7,8 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2007 by Greg White
+ * Copyright (C) 2002 by Alan Korr
+ * Copyright (C) 2007 by Michael Sevakis
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -17,15 +18,32 @@
  *
  ****************************************************************************/
 
-#include "mmu-meg-fx.h"
+#define inl(a) (*(volatile unsigned long *) (a))
+#define outl(a,b) (*(volatile unsigned long *) (b) = (a))
+#define inb(a) (*(volatile unsigned char *) (a))
+#define outb(a,b) (*(volatile unsigned char *) (b) = (a))
+#define inw(a) (*(volatile unsigned short *) (a))
+#define outw(a,b) (*(volatile unsigned short *) (b) = (a))
+extern unsigned int ipod_hw_rev;
 
-static inline void invalidate_icache(void)
+static inline void udelay(unsigned usecs)
 {
-    clean_dcache();
-    asm volatile(
-        "mov r0, #0 \n"
-        "mcr p15, 0, r0, c7, c5, 0 \n"
-        : : : "r0"
-    );
+    unsigned stop = USEC_TIMER + usecs;
+    while (TIME_BEFORE(USEC_TIMER, stop));
 }
 
+unsigned int current_core(void);
+
+#define HAVE_INVALIDATE_ICACHE
+static inline void invalidate_icache(void)
+{
+    outl(inl(0xf000f044) | 0x6, 0xf000f044);
+    while ((CACHE_CTL & 0x8000) != 0);
+}
+
+#define HAVE_FLUSH_ICACHE
+static inline void flush_icache(void)
+{
+    outl(inl(0xf000f044) | 0x2, 0xf000f044);
+    while ((CACHE_CTL & 0x8000) != 0);
+}

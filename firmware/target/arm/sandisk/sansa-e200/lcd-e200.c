@@ -112,16 +112,6 @@ static inline void lcd_write_reg(unsigned int reg, unsigned int data)
     lcd_send_msg(0x72, data);
 }
 
-static inline void cache_flush(void)
-{
-#ifndef BOOTLOADER
-    outl(inl(0xf000f044) | 0x2, 0xf000f044);
-    while ((CACHE_CTL & 0x8000) != 0)
-    {
-    }
-#endif
-}
-
 /* The LCD controller gets passed the address of the framebuffer, but can only
    use the physical, not the remapped, address.  This is a quick and dirty way
    of correcting it */
@@ -271,7 +261,7 @@ inline void lcd_update_rect(int x, int y, int width, int height)
     memcpy(((char*)&lcd_driver_framebuffer)+(y * sizeof(fb_data) * LCD_WIDTH),
            ((char *)&lcd_framebuffer)+(y * sizeof(fb_data) * LCD_WIDTH),
            ((height * sizeof(fb_data) * LCD_WIDTH)));
-    cache_flush();
+    flush_icache();
 
     /* Restart DMA */
     LCD_REG_6 |= 1;
@@ -287,7 +277,7 @@ inline void lcd_update(void)
 
     /* Copy the Rockbox framebuffer to the second framebuffer */
     memcpy(lcd_driver_framebuffer, lcd_framebuffer, sizeof(fb_data) * LCD_WIDTH * LCD_HEIGHT);
-    cache_flush();
+    flush_icache();
 
     /* Restart DMA */
     LCD_REG_6 |= 1;

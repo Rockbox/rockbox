@@ -29,24 +29,6 @@ extern void system_init(void);
 
 extern long cpu_frequency;
 
-#ifdef CPU_PP
-#define inl(a) (*(volatile unsigned long *) (a))
-#define outl(a,b) (*(volatile unsigned long *) (b) = (a))
-#define inb(a) (*(volatile unsigned char *) (a))
-#define outb(a,b) (*(volatile unsigned char *) (b) = (a))
-#define inw(a) (*(volatile unsigned short *) (a))
-#define outw(a,b) (*(volatile unsigned short *) (b) = (a))
-extern unsigned int ipod_hw_rev;
-
-static inline void udelay(unsigned usecs)
-{
-    unsigned stop = USEC_TIMER + usecs;
-    while (TIME_BEFORE(USEC_TIMER, stop));
-}
-
-unsigned int current_core(void);
-#endif
-
 struct flash_header {
     unsigned long magic;
     unsigned long length;
@@ -173,10 +155,6 @@ int get_cpu_boost_counter(void);
 #define H_TO_BE32(x) (x)
 #endif
 
-
-#define nop \
-  asm volatile ("nop")
-
 /* gcc 3.4 changed the format of the constraints */
 #if (__GNUC__ >= 3) && (__GNUC_MINOR__ > 3) || (__GNUC__ >= 4)
 #define I_CONSTRAINT "I08"
@@ -196,141 +174,7 @@ enum {
 };
 
 #ifndef SIMULATOR
-#if defined(CPU_COLDFIRE) || (CONFIG_CPU == S3C2440) || (CONFIG_CPU == SH7034)
 #include "system-target.h"
-#endif
-#endif
-
-#ifndef SIMULATOR
-
-#if defined(CPU_ARM)
-
-/* TODO: Implement set_irq_level and check CPU frequencies */
-
-#if CONFIG_CPU == S3C2440
-
-#define CPUFREQ_DEFAULT 98784000
-#define CPUFREQ_NORMAL  98784000
-#define CPUFREQ_MAX    296352000
-
-#elif CONFIG_CPU == PNX0101
-
-#define CPUFREQ_DEFAULT 12000000
-#define CPUFREQ_NORMAL  48000000
-#define CPUFREQ_MAX     60000000
-
-#else
-
-#define CPUFREQ_DEFAULT_MULT 8
-#define CPUFREQ_DEFAULT 24000000
-#define CPUFREQ_NORMAL_MULT 10
-#define CPUFREQ_NORMAL 30000000
-#define CPUFREQ_MAX_MULT 25
-#define CPUFREQ_MAX 75000000
-
-#endif
-
-static inline uint16_t swap16(uint16_t value)
-    /*
-      result[15..8] = value[ 7..0];
-      result[ 7..0] = value[15..8];
-    */
-{
-    return (value >> 8) | (value << 8);
-}
-
-static inline uint32_t swap32(uint32_t value)
-    /*
-      result[31..24] = value[ 7.. 0];
-      result[23..16] = value[15.. 8];
-      result[15.. 8] = value[23..16];
-      result[ 7.. 0] = value[31..24];
-    */
-{
-    uint32_t tmp;
-
-    asm volatile (
-        "eor %1, %0, %0, ror #16 \n\t"
-        "bic %1, %1, #0xff0000   \n\t"
-        "mov %0, %0, ror #8      \n\t"
-        "eor %0, %0, %1, lsr #8  \n\t"
-        : "+r" (value), "=r" (tmp)
-    );
-    return value;
-}
-
-static inline uint32_t swap_odd_even32(uint32_t value)
-{
-    /*
-      result[31..24],[15.. 8] = value[23..16],[ 7.. 0]
-      result[23..16],[ 7.. 0] = value[31..24],[15.. 8]
-    */
-    uint32_t tmp;
-
-    asm volatile (                    /* ABCD      */
-        "bic %1, %0, #0x00ff00  \n\t" /* AB.D      */
-        "bic %0, %0, #0xff0000  \n\t" /* A.CD      */
-        "mov %0, %0, lsr #8     \n\t" /* .A.C      */
-        "orr %0, %0, %1, lsl #8 \n\t" /* B.D.|.A.C */
-        : "+r" (value), "=r" (tmp)    /* BADC      */
-    );
-    return value;
-}
-
-#define HIGHEST_IRQ_LEVEL (1)
-
-static inline int set_irq_level(int level)
-{
-    unsigned long cpsr;
-    /* Read the old level and set the new one */
-    asm volatile ("mrs %0,cpsr" : "=r" (cpsr));
-    asm volatile ("msr cpsr_c,%0"
-                  : : "r" ((cpsr & ~0x80) | (level << 7)));
-    return (cpsr >> 7) & 1;
-}
-
-static inline void set_fiq_handler(void(*fiq_handler)(void))
-{
-    /* Install the FIQ handler */
-    *((unsigned int*)(15*4)) = (unsigned int)fiq_handler;
-}
-
-static inline void enable_fiq(void)
-{
-    /* Clear FIQ disable bit */
-    asm volatile (
-        "mrs     r0, cpsr         \n"\
-        "bic     r0, r0, #0x40    \n"\
-        "msr     cpsr_c, r0         "
-        : : : "r0"
-    );
-}
-
-static inline void disable_fiq(void)
-{
-    /* Set FIQ disable bit */
-    asm volatile (
-        "mrs     r0, cpsr         \n"\
-        "orr     r0, r0, #0x40    \n"\
-        "msr     cpsr_c, r0         "
-        : : : "r0"
-    );
-}
-
-#if CONFIG_CPU != S3C2440
-#define invalidate_icache()
-#endif
-
-#if CONFIG_CPU == PNX0101
-typedef void (*interrupt_handler_t)(void);
-
-void irq_set_int_handler(int n, interrupt_handler_t handler);
-void irq_enable_int(int n);
-void irq_disable_int(int n);
-#endif
-
-#endif
-
 #else /* SIMULATOR */
 
 static inline uint16_t swap16(uint16_t value)
@@ -365,8 +209,15 @@ static inline uint32_t swap_odd_even32(uint32_t value)
     return (t >> 8) | ((t ^ value) << 8);
 }
 
-#define invalidate_icache()
-
 #endif /* !SIMULATOR */
+
+/* Just define these as empty if not declared */
+#ifndef HAVE_INVALIDATE_ICACHE
+#define invalidate_icache()
+#endif
+
+#ifndef HAVE_FLUSH_ICACHE
+#define flush_icache()
+#endif
 
 #endif /* __SYSTEM_H__ */

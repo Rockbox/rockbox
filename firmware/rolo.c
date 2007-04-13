@@ -49,8 +49,7 @@ void rolo_restart_cop(void) ICODE_ATTR;
 void rolo_restart_cop(void)
 {
     /* Invalidate cache */
-    outl(inl(0xf000f044) | 0x6, 0xf000f044);
-    while ((CACHE_CTL & 0x8000) != 0) {}
+    invalidate_icache();
     
     /* Disable cache */
     CACHE_CTL = CACHE_DISABLE;
@@ -119,8 +118,7 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
     cpu_message = 0;
 
     /* Flush cache */
-    outl(inl(0xf000f044) | 0x2, 0xf000f044);
-    while ((CACHE_CTL & 0x8000) != 0) {}
+    flush_icache();
 
     /* Disable cache */
     CACHE_CTL = CACHE_DISABLE;

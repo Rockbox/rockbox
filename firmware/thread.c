@@ -64,12 +64,15 @@ int *cop_stackend = stackend;
 #endif
 
 #if NUM_CORES > 1
+#if 0
 static long cores_locked IBSS_ATTR;
 
 #define LOCK(...) do { } while (test_and_set(&cores_locked, 1))
 #define UNLOCK(...) cores_locked = 0
+#endif
 
 #warning "Core locking mechanism should be fixed on H10/4G!"
+
 inline void lock_cores(void)
 {
 #if 0
@@ -125,15 +128,47 @@ static inline void store_context(void* addr)
  * Load non-volatile context.
  *---------------------------------------------------------------------------
  */
+static void start_thread(void (*thread_func)(void), const void* addr) __attribute__((naked));
+static void start_thread(void (*thread_func)(void), const void* addr)
+{
+    /* r0 = thread_func, r1 = addr */
+#if NUM_CORES > 1
+    asm volatile (
+        "mov    r2, #0           \n"
+        "str    r2, [r1, #40]    \n"
+        "ldr    r1, =0xf000f044  \n" /* invalidate this core's cache */
+        "ldr    r2, [r1]         \n"
+        "orr    r2, r2, #6       \n"
+        "str    r2, [r1]         \n"
+        "ldr    r1, =0x6000c000  \n"
+    "1:                          \n"
+        "ldr    r2, [r1]         \n"
+        "tst    r2, #0x8000      \n"
+        "bne    1b               \n"
+        "mov    pc, r0           \n"
+        : : : "r1", "r2"
+    );
+#else
+    asm volatile (
+        "mov    r2, #0           \n"
+        "str    r2, [r1, #40]    \n"
+        "mov    pc, r0           \n"
+        : : : "r1", "r2"
+    );
+#endif
+    (void)thread_func;
+    (void)addr;
+    (void)start_thread;
+}
+
 static inline void load_context(const void* addr)
 {
     asm volatile(
-        "ldmia  %0, { r4-r11, sp, lr }\n" /* load regs r4 to r14 from context */
-        "ldr    r0, [%0, #40]    \n" /* load start pointer */
-        "mov    r1, #0           \n"
-        "cmp    r0, r1           \n" /* check for NULL */
-        "strne  r1, [%0, #40]    \n" /* if it's NULL, we're already running */
-        "movne  pc, r0           \n" /* not already running, so jump to start */
+        "ldmia  %0, { r4-r11, sp, lr } \n" /* load regs r4 to r14 from context */
+        "ldr    r0, [%0, #40]          \n" /* load start pointer */
+        "cmp    r0, #0                 \n" /* check for NULL */
+        "movne  r1, %0                 \n" /* if not already running, jump to start */
+        "ldrne  pc, =start_thread      \n" 
         : : "r" (addr) : "r0", "r1"
     );
 }

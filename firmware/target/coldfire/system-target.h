@@ -19,6 +19,9 @@
 #ifndef SYSTEM_TARGET_H
 #define SYSTEM_TARGET_H
 
+#define nop \
+    asm volatile ("trapf")
+
 #define or_l(mask, address) \
   asm                       \
     ("or.l %0,(%1)"         \
@@ -147,6 +150,7 @@ static inline uint32_t swap_odd_even32(uint32_t value)
     return value;
 }
 
+#define HAVE_INVALIDATE_ICACHE
 static inline void invalidate_icache(void)
 {
    asm volatile ("move.l #0x01000000,%d0\n"
