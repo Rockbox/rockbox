@@ -72,16 +72,24 @@ void font_init(void)
     memset(&font_ui, 0, sizeof(struct font));
 }
 
-static int readshort(unsigned short *sp)
+/* Check if we have x bytes left in the file buffer */
+#define HAVEBYTES(x) (fileptr + (x) <= eofptr)
+
+/* Helper functions to read big-endian unaligned short or long from
+   the file buffer.  Bounds-checking must be done in the calling
+   function.
+ */
+
+static short readshort(void)
 {
     unsigned short s;
 
     s = *fileptr++ & 0xff;
-    *sp = (*fileptr++ << 8) | s;
-    return (fileptr <= eofptr);
+    s |= (*fileptr++ << 8);
+    return s;
 }
 
-static long readlong(unsigned long *lp)
+static long readlong(void)
 {
     unsigned long l;
 
@@ -89,18 +97,14 @@ static long readlong(unsigned long *lp)
     l |= *fileptr++ << 8;
     l |= ((unsigned long)(*fileptr++)) << 16;
     l |= ((unsigned long)(*fileptr++)) << 24;
-    *lp = l;
-    return (fileptr <= eofptr);
+    return l;
 }
 
 /* read count bytes*/
-static int readstr(char *buf, int count)
+static void readstr(char *buf, int count)
 {
-    int n = count;
-
-    while (--n >= 0)
+    while (count--)
         *buf++ = *fileptr++;
-    return (fileptr <= eofptr)? count: 0;
 }
 
 void font_reset(void)
@@ -111,44 +115,30 @@ void font_reset(void)
 static struct font*  font_load_header(struct font *pf)
 {
     char version[4+1];
-    unsigned short maxwidth, height, ascent, pad;
-    unsigned long firstchar, defaultchar, size;
-    unsigned long nbits;
+
+    /* Check we have enough data */
+    if (!HAVEBYTES(28))
+        return NULL;
 
     /* read magic and version #*/
     memset(version, 0, sizeof(version));
-    if (readstr(version, 4) != 4)
-        return NULL;
+    readstr(version, 4);
+
     if (strcmp(version, VERSION) != 0)
         return NULL;
 
     /* font info*/
-    if (!readshort(&maxwidth))
-        return NULL;
-    pf->maxwidth = maxwidth;
-    if (!readshort(&height))
-        return NULL;
-    pf->height = height;
-    if (!readshort(&ascent))
-        return NULL;
-    pf->ascent = ascent;
-    if (!readshort(&pad))
-        return NULL;
-    if (!readlong(&firstchar))
-        return NULL;
-    pf->firstchar = firstchar;
-    if (!readlong(&defaultchar))
-        return NULL;
-    pf->defaultchar = defaultchar;
-    if (!readlong(&size))
-        return NULL;
-    pf->size = size;
+    pf->maxwidth = readshort();
+    pf->height = readshort();
+    pf->ascent = readshort();
+    fileptr += 2; /* Skip padding */
+    pf->firstchar = readlong();
+    pf->defaultchar = readlong();
+    pf->size = readlong();
 
     /* get variable font data sizes*/
     /* # words of bitmap_t*/
-    if (!readlong(&nbits))
-        return NULL;
-    pf->bits_size = nbits;
+    pf->bits_size = readlong();
 
     return pf;
 }
@@ -157,13 +147,14 @@ struct font* font_load_in_memory(struct font* pf)
 {
     long i, noffset, nwidth;
 
-    /* # longs of offset*/
-    if (!readlong(&noffset))
+    if (!HAVEBYTES(4))
         return NULL;
 
+    /* # longs of offset*/
+    noffset = readlong();
+
     /* # bytes of width*/
-    if (!readlong(&nwidth))
-        return NULL;
+    nwidth = readlong();
 
     /* variable font data*/
     pf->bits = (unsigned char *)fileptr;
@@ -186,24 +177,28 @@ struct font* font_load_in_memory(struct font* pf)
         {
             long_offset = 0;
             pf->offset = (unsigned short *)fileptr;
+
+            /* Check we have sufficient buffer */
+            if (!HAVEBYTES(noffset * sizeof(short)))
+                return NULL;
+
             for (i=0; i<noffset; ++i)
             {
-                unsigned short offset;
-                if (!readshort(&offset))
-                    return NULL;
-                ((unsigned short*)(pf->offset))[i] = (unsigned short)offset;
+                ((unsigned short*)(pf->offset))[i] = (unsigned short)readshort();
             }
         }
         else
         {
             long_offset = 1;
             pf->offset = (unsigned short *)fileptr;
+
+            /* Check we have sufficient buffer */
+            if (!HAVEBYTES(noffset * sizeof(long)))
+                return NULL;
+
             for (i=0; i<noffset; ++i)
             {
-                unsigned long offset;
-                if (!readlong(&offset))
-                    return NULL;
-                ((unsigned long*)(pf->offset))[i] = (unsigned long)offset;
+                ((unsigned long*)(pf->offset))[i] = (unsigned long)readlong();
             }
         }
     }
@@ -229,13 +224,14 @@ struct font* font_load_cached(struct font* pf)
     unsigned long noffset, nwidth;
     unsigned char* oldfileptr = fileptr;
 
-    /* # longs of offset*/
-    if (!readlong(&noffset))
+    if (!HAVEBYTES(2 * sizeof(long)))
         return NULL;
 
+    /* # longs of offset*/
+    noffset = readlong();
+
     /* # bytes of width*/
-    if (!readlong(&nwidth))
-        return NULL;
+    nwidth = readlong();
 
     /* We are now at the bitmap data, this is fixed at 36.. */
     pf->bits = NULL;
