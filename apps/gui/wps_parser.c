@@ -570,6 +570,7 @@ static int parse_token(const char *wps_bufptr, struct wps_data *wps_data)
         case '|':
         case '>':
         case ';':
+        case '#':
             /* escaped characters */
             token->type = WPS_TOKEN_CHARACTER;
             token->value.c = *wps_bufptr;
@@ -728,7 +729,7 @@ condlistend:  /* close a conditional. sometimes we want to close them even when
                     *current_string++ = *(wps_bufptr - 1);
 
                     /* continue until we hit something that ends the string */
-                    while(wps_bufptr &&
+                    while(wps_bufptr && *wps_bufptr != '#' &&
                           *wps_bufptr != '%' && *wps_bufptr != ';' &&
                           *wps_bufptr != '<' && *wps_bufptr != '>' &&
                           *wps_bufptr != '|' && *wps_bufptr != '\n')
