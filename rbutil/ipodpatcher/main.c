@@ -76,6 +76,7 @@ void print_usage(void)
     fprintf(stderr,"  -r,   --read-partition     bootpartition.bin\n");
     fprintf(stderr,"  -w,   --write-partition    bootpartition.bin\n");
     fprintf(stderr,"  -rf,  --read-firmware      filename.ipod\n");
+    fprintf(stderr,"  -rfb, --read-firmware-bin  filename.bin\n");
     fprintf(stderr,"  -wf,  --write-firmware     filename.ipod\n");
     fprintf(stderr,"  -wfb, --write-firmware-bin filename.bin\n");
     fprintf(stderr,"  -a,   --add-bootloader     filename.ipod\n");
@@ -234,6 +235,15 @@ int main(int argc, char* argv[])
         } else if ((strcmp(argv[i],"-rf")==0) || 
                    (strcmp(argv[i],"--read-firmware")==0)) {
             action = READ_FIRMWARE;
+            type = FILETYPE_DOT_IPOD;
+            i++;
+            if (i == argc) { print_usage(); return 1; }
+            filename=argv[i];
+            i++;
+        } else if ((strcmp(argv[i],"-rfb")==0) || 
+                   (strcmp(argv[i],"--read-firmware-bin")==0)) {
+            action = READ_FIRMWARE;
+            type = FILETYPE_DOT_BIN;
             i++;
             if (i == argc) { print_usage(); return 1; }
             filename=argv[i];
@@ -399,7 +409,7 @@ int main(int argc, char* argv[])
             fprintf(stderr,"[ERR]  --write-firmware failed.\n");
         }
     } else if (action==READ_FIRMWARE) {
-        if (read_firmware(&ipod, filename)==0) {
+        if (read_firmware(&ipod, filename, type)==0) {
             fprintf(stderr,"[INFO] Firmware read to file %s.\n",filename);
         } else {
             fprintf(stderr,"[ERR]  --read-firmware failed.\n");

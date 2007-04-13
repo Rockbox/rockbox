@@ -885,7 +885,7 @@ int write_firmware(struct ipod_t* ipod, char* filename, int type)
     return 0;
 }
 
-int read_firmware(struct ipod_t* ipod, char* filename)
+int read_firmware(struct ipod_t* ipod, char* filename, int type)
 {
     int length;
     int i;
@@ -921,22 +921,25 @@ int read_firmware(struct ipod_t* ipod, char* filename)
         return -1;
     }
 
-    chksum = ipod->modelnum;
-    for (i = 0; i < length; i++) {
-         /* add 8 unsigned bits but keep a 32 bit sum */
-         chksum += sectorbuf[i];
-    }
-
-    int2be(chksum,header);
-    memcpy(header+4, ipod->modelname,4);
-
     outfile = open(filename,O_CREAT|O_TRUNC|O_WRONLY|O_BINARY,0666);
     if (outfile < 0) {
         fprintf(stderr,"[ERR]  Couldn't open file %s\n",filename);
         return -1;
     }
 
-    write(outfile,header,8);
+    if (type == FILETYPE_DOT_IPOD) {
+        chksum = ipod->modelnum;
+        for (i = 0; i < length; i++) {
+            /* add 8 unsigned bits but keep a 32 bit sum */
+            chksum += sectorbuf[i];
+        }
+
+        int2be(chksum,header);
+        memcpy(header+4, ipod->modelname,4);
+
+        write(outfile,header,8);
+    }
+
     write(outfile,sectorbuf,length);
     close(outfile);
 

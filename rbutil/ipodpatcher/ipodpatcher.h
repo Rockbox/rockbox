@@ -41,7 +41,7 @@ int diskmove(struct ipod_t* ipod, int delta);
 int add_bootloader(struct ipod_t* ipod, char* filename, int type);
 int delete_bootloader(struct ipod_t* ipod);
 int write_firmware(struct ipod_t* ipod, char* filename, int type);
-int read_firmware(struct ipod_t* ipod, char* filename);
+int read_firmware(struct ipod_t* ipod, char* filename, int type);
 int read_directory(struct ipod_t* ipod);
 int list_images(struct ipod_t* ipod);
 int getmodel(struct ipod_t* ipod, int ipod_version);
