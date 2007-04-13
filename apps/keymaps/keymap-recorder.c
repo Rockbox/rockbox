@@ -80,7 +80,7 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_F3,      BUTTON_F3,                BUTTON_NONE },
     { ACTION_WPS_ABSETB_NEXTDIR, BUTTON_ON|BUTTON_RIGHT,  BUTTON_NONE },
     { ACTION_WPS_ABSETA_PREVDIR, BUTTON_ON|BUTTON_LEFT,   BUTTON_NONE },
-    { ACTION_WPSAB_RESET,        BUTTON_ON|BUTTON_OFF,    BUTTON_ON },
+    { ACTION_WPS_ABRESET,        BUTTON_ON|BUTTON_OFF,    BUTTON_ON },
     
 
     LAST_ITEM_IN_LIST

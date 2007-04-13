@@ -222,7 +222,7 @@ long gui_wps_show(void)
                         button = ACTION_WPS_ABSETB_NEXTDIR;
                         break;
                     case 2:
-                        button = ACTION_WPSAB_RESET;
+                        button = ACTION_WPS_ABRESET;
                         break;
                 }
                 wps_ab_state = (wps_ab_state+1) % 3;
@@ -552,7 +552,7 @@ long gui_wps_show(void)
 
 #ifdef AB_REPEAT_ENABLE
             /* reset A&B markers */
-            case ACTION_WPSAB_RESET:
+            case ACTION_WPS_ABRESET:
                 if (ab_repeat_mode_enabled())
                 {
                     ab_reset_markers();

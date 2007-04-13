@@ -86,7 +86,7 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_MENU,          BUTTON_MODE|BUTTON_REL,         BUTTON_MODE },
     { ACTION_WPS_CONTEXT,       BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_SELECT },
     { ACTION_WPS_BROWSE,        BUTTON_SELECT|BUTTON_REL,       BUTTON_SELECT },
-    { ACTION_WPSAB_RESET,       BUTTON_ON|BUTTON_SELECT,        BUTTON_ON },
+    { ACTION_WPS_ABRESET,       BUTTON_ON|BUTTON_SELECT,        BUTTON_ON },
     { ACTION_WPS_ID3SCREEN,     BUTTON_ON|BUTTON_MODE,          BUTTON_NONE },
     
     LAST_ITEM_IN_LIST
@@ -348,12 +348,12 @@ static const struct button_mapping button_context_wps_remotescommon[]  = {
 
 
 static const struct button_mapping button_context_wps_h100remote[] = {
-    { ACTION_WPSAB_RESET,           BUTTON_RC_ON|BUTTON_RC_MENU,        BUTTON_RC_ON },
+    { ACTION_WPS_ABRESET,           BUTTON_RC_ON|BUTTON_RC_MENU,        BUTTON_RC_ON },
     { ACTION_WPS_ID3SCREEN,         BUTTON_RC_ON|BUTTON_RC_MODE,        BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 };
 static const struct button_mapping button_context_wps_h300lcdremote[] = {
-    { ACTION_WPSAB_RESET,           BUTTON_RC_MENU|BUTTON_RC_ON,        BUTTON_RC_MENU },
+    { ACTION_WPS_ABRESET,           BUTTON_RC_MENU|BUTTON_RC_ON,        BUTTON_RC_MENU },
     { ACTION_WPS_ID3SCREEN,         BUTTON_RC_MENU|BUTTON_RC_MODE,      BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 };

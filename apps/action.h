@@ -118,7 +118,7 @@ enum {
 #endif
     ACTION_WPS_ABSETA_PREVDIR, /* these should be safe to put together seen as */
     ACTION_WPS_ABSETB_NEXTDIR, /* you shouldnt want to change dir in ab-mode */
-    ACTION_WPSAB_RESET,
+    ACTION_WPS_ABRESET,
     
     /* list and tree page up/down */    
     ACTION_LISTTREE_PGUP,/* optional */
