@@ -276,16 +276,6 @@ void irq(void)
 #endif
 #endif /* BOOTLOADER */
 
-unsigned int current_core(void)
-{
-    if((PROCESSOR_ID & 0xff) == PROC_ID_CPU)
-    {
-        return CPU;
-    }
-    return COP;
-}
-
-
 /* TODO: The following two function have been lifted straight from IPL, and
    hence have a lot of numeric addresses used straight. I'd like to use
    #defines for these, but don't know what most of them are for or even what

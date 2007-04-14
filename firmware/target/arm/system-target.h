@@ -36,7 +36,27 @@ static inline void udelay(unsigned usecs)
     while (TIME_BEFORE(USEC_TIMER, stop));
 }
 
+#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
+static inline unsigned int current_core(void)
+{
+    /*
+     * PROCESSOR_ID seems to be 32-bits:
+     * CPU = 0x55555555 = |01010101|01010101|01010101|01010101|
+     * COP = 0xaaaaaaaa = |10101010|10101010|10101010|10101010|
+     *                                                ^
+     */
+    unsigned int core;
+    asm volatile (
+        "ldr    %0, =0x60000000 \r\n" /* PROCESSOR_ID      */
+        "ldrb   %0, [%0]        \r\n" /* Just load the LSB */
+        "mov    %0, %0, lsr #7  \r\n" /* Bit 7 => index    */
+        : "=&r"(core)                 /* CPU=0, COP=1      */
+    );
+    return core;
+}
+#else
 unsigned int current_core(void);
+#endif
 
 #if CONFIG_CPU != PP5002
 
