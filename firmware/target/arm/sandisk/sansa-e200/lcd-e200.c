@@ -52,7 +52,8 @@
 /* We don't know how to receive a DMA finished signal from the LCD controller
  * To avoid problems with flickering, we double-buffer the framebuffer and turn
  * off DMA while updates are taking place */
-static fb_data lcd_driver_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH];
+static fb_data lcd_driver_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH]
+    __attribute__((aligned(16))); /* Same alignment as in lcd-16bit.c */
 
 static inline void lcd_init_gpio(void)
 {
@@ -334,7 +335,7 @@ void lcd_yuv_blit(unsigned char * const src[3],
 {
     /* Caches for chroma data so it only need be recaculated every other
        line */
-    unsigned char chroma_buf[LCD_HEIGHT/2*3]; /* 480 bytes */
+    static unsigned char chroma_buf[LCD_HEIGHT/2*3]; /* 330 bytes */
     unsigned char const * yuv_src[3];
     off_t z;
 
