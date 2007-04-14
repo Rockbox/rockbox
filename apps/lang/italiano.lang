@@ -736,10 +736,10 @@
     *: "Bookmarking"
   </source>
   <dest>
-    *: "Impostazioni segnalibri"
+    *: "Segnalibri"
   </dest>
   <voice>
-    *: "Impostazioni Segnalibri"
+    *: "Segnalibri"
   </voice>
 </phrase>
 <phrase>
@@ -837,6 +837,7 @@
     x5: "SELECT = Yes"
     h10: "NEXT = Yes"
     gigabeat: "SELECT = Yes"
+    e200: "SELECT = Yes"
   </source>
   <dest>
     *: "PLAY = Si"
@@ -845,6 +846,7 @@
     x5: "SELECT = Si"
     h10: "NEXT = Si"
     gigabeat: "SELECT = Si"
+    e200: "SELECT = Si"
   </dest>
   <voice>
     *: ""
@@ -2370,10 +2372,10 @@
     *: "Voice Menus"
   </source>
   <dest>
-    *: "Pronuncia menù"
+    *: "Pronuncia menu"
   </dest>
   <voice>
-    *: "Pronuncia Menù"
+    *: "Pronuncia Menu"
   </voice>
 </phrase>
 <phrase>
@@ -6820,13 +6822,13 @@
 </phrase>
 <phrase>
   id: LANG_END_PLAYLIST_PLAYER
-  desc: when playlist has finished
+  desc: DEPRECATED
   user:
   <source>
-    *: "End of List"
+    *: ""
   </source>
   <dest>
-    *: "Fine della playlist"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -6838,9 +6840,11 @@
   user:
   <source>
     *: "End of Song List"
+    player: "End of List"
   </source>
   <dest>
-    *: "Fine della playlist"
+    *: "Fine lista brani"
+    player: "Fine della lista"
   </dest>
   <voice>
     *: ""
@@ -10652,9 +10656,59 @@ LANG_RECORDING_AGC_PRESET: The phrase is not used. Skipped
     *: "Start Screen"
   </source>
   <dest>
-    *: "Schermata in Avvio"
+    *: "Schermata d'avvio"
   </dest>
   <voice>
-    *: "Schermata in Avvio"
+    *: "Schermata d'avvio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_WAKEUP_SCREEN
+  desc: in alarm menu setting
+  user:
+  <source>
+    *: "Alarm Wake up Screen"
+  </source>
+  <dest>
+    *: "Schermata Allarme Sveglia"
+  </dest>
+  <voice>
+    *: "Schermata Allarme Sveglia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUILDING_DATABASE
+  desc: splash database building progress
+  user:
+  <source>
+    *: "Building database... %d found (OFF to return)"
+    h100,h120,h300: "Building database... %d found (STOP to return)"
+    ipod*: "Building database... %d found (PLAY/PAUSE to return)"
+    x5: "Building database... %d found (Long PLAY to return)"
+    h10: "Building database... %d found (PREV to return)"
+  </source>
+  <dest>
+    *: "Costruzione database... %d trovato (OFF per uscire)"
+    h100,h120,h300: "Costruzione database... %d trovato (STOP per uscire)"
+    ipod*: "Costruzione database... %d trovato (PLAY/PAUSE per uscire)"
+    x5: "Costruzione database... %d trovato (Long PLAY per uscire)"
+    h10: "Costruzione database... %d trovato (PREV per uscire)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_MENU_TITLE
+  desc: title for the onplay menus
+  user:
+  <source>
+    *: "Context Menu"
+  </source>
+  <dest>
+    *: "Menu contestuale"
+  </dest>
+  <voice>
+    *: "Menu contestuale"
   </voice>
 </phrase>
