@@ -603,7 +603,7 @@ static int picture_display_ext (mpeg2dec_t * mpeg2dec)
     return 0;
 }
 
-void mpeg2_header_picture_finalize (mpeg2dec_t * mpeg2dec, uint32_t accels)
+void mpeg2_header_picture_finalize (mpeg2dec_t * mpeg2dec)
 {
     mpeg2_decoder_t * decoder = &(mpeg2dec->decoder);
     int old_type_b = (decoder->coding_type == B_TYPE);
@@ -661,7 +661,7 @@ void mpeg2_header_picture_finalize (mpeg2dec_t * mpeg2dec, uint32_t accels)
                 mpeg2dec->convert (MPEG2_CONVERT_START,
                                    mpeg2dec->decoder.convert_id,
                                    &(mpeg2dec->sequence),
-                                   mpeg2dec->convert_stride, accels,
+                                   mpeg2dec->convert_stride,
                                    mpeg2dec->convert_arg, &convert_init);
                 mpeg2dec->convert_start = convert_init.start;
                 mpeg2dec->decoder.convert = convert_init.copy;

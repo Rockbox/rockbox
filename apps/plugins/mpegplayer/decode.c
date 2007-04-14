@@ -31,8 +31,6 @@ extern struct plugin_api* rb;
 #include "attributes.h"
 #include "mpeg2_internal.h"
 
-static int mpeg2_accels = 0;
-
 #define BUFFER_SIZE (1194 * 1024)
 
 const mpeg2_info_t * mpeg2_info (mpeg2dec_t * mpeg2dec)
@@ -270,7 +268,7 @@ mpeg2_state_t mpeg2_parse_header (mpeg2dec_t * mpeg2dec)
 	    break;
 	case RECEIVED (0x01, STATE_PICTURE):
 	case RECEIVED (0x01, STATE_PICTURE_2ND):
-	    mpeg2_header_picture_finalize (mpeg2dec, mpeg2_accels);
+	    mpeg2_header_picture_finalize (mpeg2dec);
 	    mpeg2dec->action = mpeg2_header_slice_start;
 	    break;
 
@@ -302,7 +300,7 @@ int mpeg2_convert (mpeg2dec_t * mpeg2dec, mpeg2_convert_t convert, void * arg)
     int error;
 
     error = convert (MPEG2_CONVERT_SET, NULL, &(mpeg2dec->sequence), 0,
-		     mpeg2_accels, arg, &convert_init);
+		     arg, &convert_init);
     if (!error) {
 	mpeg2dec->convert = convert;
 	mpeg2dec->convert_arg = arg;
@@ -323,7 +321,7 @@ int mpeg2_stride (mpeg2dec_t * mpeg2dec, int stride)
 
 	stride = mpeg2dec->convert (MPEG2_CONVERT_STRIDE, NULL,
 				    &(mpeg2dec->sequence), stride,
-				    mpeg2_accels, mpeg2dec->convert_arg,
+				    mpeg2dec->convert_arg,
 				    &convert_init);
 	mpeg2dec->convert_id_size = convert_init.id_size;
 	mpeg2dec->convert_stride = stride;
@@ -382,19 +380,6 @@ void mpeg2_tag_picture (mpeg2dec_t * mpeg2dec, uint32_t tag, uint32_t tag2)
     mpeg2dec->bytes_since_tag = 0;
 }
 
-uint32_t mpeg2_accel (uint32_t accel)
-{
-    if (!mpeg2_accels) {
-	if (accel & MPEG2_ACCEL_DETECT)
-	    accel |= mpeg2_detect_accel ();
-	mpeg2_accels = accel |= MPEG2_ACCEL_DETECT;
-	mpeg2_cpu_state_init (accel);
-	mpeg2_idct_init (accel);
-	mpeg2_mc_init (accel);
-    }
-    return mpeg2_accels & ~MPEG2_ACCEL_DETECT;
-}
-
 void mpeg2_reset (mpeg2dec_t * mpeg2dec, int full_reset)
 {
     mpeg2dec->buf_start = mpeg2dec->buf_end = NULL;
@@ -420,7 +405,7 @@ mpeg2dec_t * mpeg2_init (void)
 {
     mpeg2dec_t * mpeg2dec;
 
-    mpeg2_accel (MPEG2_ACCEL_DETECT);
+    mpeg2_idct_init ();
 
     mpeg2dec = (mpeg2dec_t *) mpeg2_malloc (sizeof (mpeg2dec_t),
 					    MPEG2_ALLOC_MPEG2DEC);

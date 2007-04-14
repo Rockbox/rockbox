@@ -244,58 +244,18 @@ int mpeg2_header_extension (mpeg2dec_t * mpeg2dec);
 int mpeg2_header_user_data (mpeg2dec_t * mpeg2dec);
 void mpeg2_header_sequence_finalize (mpeg2dec_t * mpeg2dec);
 void mpeg2_header_gop_finalize (mpeg2dec_t * mpeg2dec);
-void mpeg2_header_picture_finalize (mpeg2dec_t * mpeg2dec, uint32_t accels);
+void mpeg2_header_picture_finalize (mpeg2dec_t * mpeg2dec);
 mpeg2_state_t mpeg2_header_slice_start (mpeg2dec_t * mpeg2dec);
 mpeg2_state_t mpeg2_header_end (mpeg2dec_t * mpeg2dec);
 void mpeg2_set_fbuf (mpeg2dec_t * mpeg2dec, int b_type);
 
 /* idct.c */
-void mpeg2_idct_init (uint32_t accel);
-
-/* idct_mmx.c */
-void mpeg2_idct_copy_mmxext (int16_t * block, uint8_t * dest, int stride);
-void mpeg2_idct_add_mmxext (int last, int16_t * block,
-			    uint8_t * dest, int stride);
-void mpeg2_idct_copy_mmx (int16_t * block, uint8_t * dest, int stride);
-void mpeg2_idct_add_mmx (int last, int16_t * block,
-			 uint8_t * dest, int stride);
-void mpeg2_idct_mmx_init (void);
-
-/* idct_altivec.c */
-void mpeg2_idct_copy_altivec (int16_t * block, uint8_t * dest, int stride);
-void mpeg2_idct_add_altivec (int last, int16_t * block,
-			     uint8_t * dest, int stride);
-void mpeg2_idct_altivec_init (void);
-
-/* idct_alpha.c */
-void mpeg2_idct_copy_mvi (int16_t * block, uint8_t * dest, int stride);
-void mpeg2_idct_add_mvi (int last, int16_t * block,
-			 uint8_t * dest, int stride);
-void mpeg2_idct_copy_alpha (int16_t * block, uint8_t * dest, int stride);
-void mpeg2_idct_add_alpha (int last, int16_t * block,
-			   uint8_t * dest, int stride);
-void mpeg2_idct_alpha_init (void);
+void mpeg2_idct_init (void);
 
 /* motion_comp.c */
-void mpeg2_mc_init (uint32_t accel);
+void mpeg2_mc_init (void);
 
 typedef struct {
     mpeg2_mc_fct * put [8];
     mpeg2_mc_fct * avg [8];
 } mpeg2_mc_t;
-
-#define MPEG2_MC_EXTERN(x) mpeg2_mc_t mpeg2_mc_##x = {			  \
-    {MC_put_o_16_##x, MC_put_x_16_##x, MC_put_y_16_##x, MC_put_xy_16_##x, \
-     MC_put_o_8_##x,  MC_put_x_8_##x,  MC_put_y_8_##x,  MC_put_xy_8_##x}, \
-    {MC_avg_o_16_##x, MC_avg_x_16_##x, MC_avg_y_16_##x, MC_avg_xy_16_##x, \
-     MC_avg_o_8_##x,  MC_avg_x_8_##x,  MC_avg_y_8_##x,  MC_avg_xy_8_##x}  \
-};
-
-extern mpeg2_mc_t mpeg2_mc_c;
-extern mpeg2_mc_t mpeg2_mc_mmx;
-extern mpeg2_mc_t mpeg2_mc_mmxext;
-extern mpeg2_mc_t mpeg2_mc_3dnow;
-extern mpeg2_mc_t mpeg2_mc_altivec;
-extern mpeg2_mc_t mpeg2_mc_alpha;
-extern mpeg2_mc_t mpeg2_mc_vis;
-extern mpeg2_mc_t mpeg2_mc_arm;

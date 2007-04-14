@@ -1,14 +1,17 @@
 alloc.c
-cpu_accel.c
-cpu_state.c
 decode.c
 header.c
 idct.c
+
 motion_comp.c
+
 #ifdef CPU_ARM
-motion_comp_arm.c
+motion_comp_arm_c.c
 motion_comp_arm_s.S
-#endif
+#else  /* other CPU or SIM */
+motion_comp_c.c
+#endif /* CPU_* */
+
 slice.c
 video_out_rockbox.c
 mpeg_settings.c

@@ -144,24 +144,12 @@ typedef enum {
 } mpeg2_convert_stage_t;
 typedef int mpeg2_convert_t (int stage, void * id,
 			     const mpeg2_sequence_t * sequence, int stride,
-			     uint32_t accel, void * arg,
-			     mpeg2_convert_init_t * result);
+			     void * arg, mpeg2_convert_init_t * result);
 int mpeg2_convert (mpeg2dec_t * mpeg2dec, mpeg2_convert_t convert, void * arg);
 int mpeg2_stride (mpeg2dec_t * mpeg2dec, int stride);
 void mpeg2_set_buf (mpeg2dec_t * mpeg2dec, uint8_t * buf[3], void * id);
 void mpeg2_custom_fbuf (mpeg2dec_t * mpeg2dec, int custom_fbuf);
 
-#define MPEG2_ACCEL_X86_MMX 1
-#define MPEG2_ACCEL_X86_3DNOW 2
-#define MPEG2_ACCEL_X86_MMXEXT 4
-#define MPEG2_ACCEL_PPC_ALTIVEC 1
-#define MPEG2_ACCEL_ALPHA 1
-#define MPEG2_ACCEL_ALPHA_MVI 2
-#define MPEG2_ACCEL_SPARC_VIS 1
-#define MPEG2_ACCEL_SPARC_VIS2 2
-#define MPEG2_ACCEL_DETECT 0x80000000
-
-uint32_t mpeg2_accel (uint32_t accel);
 mpeg2dec_t * mpeg2_init (void);
 const mpeg2_info_t * mpeg2_info (mpeg2dec_t * mpeg2dec);
 void mpeg2_close (mpeg2dec_t * mpeg2dec);

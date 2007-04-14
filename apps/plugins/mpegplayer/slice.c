@@ -34,8 +34,6 @@ extern mpeg2_mc_t mpeg2_mc;
 extern void (* mpeg2_idct_copy) (int16_t * block, uint8_t * dest, int stride);
 extern void (* mpeg2_idct_add) (int last, int16_t * block,
                                 uint8_t * dest, int stride);
-extern void (* mpeg2_cpu_state_save) (cpu_state_t * state);
-extern void (* mpeg2_cpu_state_restore) (cpu_state_t * state);
 
 #include "vlc.h"
 
@@ -1554,39 +1552,36 @@ static void motion_fi_conceal (mpeg2_decoder_t * const decoder)
 #undef bits
 #undef bit_ptr
 
-#define MOTION_CALL(routine,direction)                                \
-do {                                                                \
-    if ((direction) & MACROBLOCK_MOTION_FORWARD)                \
-        routine (decoder, &(decoder->f_motion), mpeg2_mc.put);        \
-    if ((direction) & MACROBLOCK_MOTION_BACKWARD)                \
-        routine (decoder, &(decoder->b_motion),                        \
-                 ((direction) & MACROBLOCK_MOTION_FORWARD ?        \
-                  mpeg2_mc.avg : mpeg2_mc.put));                \
+#define MOTION_CALL(routine,direction)                         \
+do {                                                           \
+    if ((direction) & MACROBLOCK_MOTION_FORWARD)               \
+        routine (decoder, &(decoder->f_motion), mpeg2_mc.put); \
+    if ((direction) & MACROBLOCK_MOTION_BACKWARD)              \
+        routine (decoder, &(decoder->b_motion),                \
+                 ((direction) & MACROBLOCK_MOTION_FORWARD ?    \
+                  mpeg2_mc.avg : mpeg2_mc.put));               \
 } while (0)
 
-#define NEXT_MACROBLOCK                                                        \
-do {                                                                        \
-    decoder->offset += 16;                                                \
-    if (decoder->offset == decoder->width) {                                \
-        do { /* just so we can use the break statement */                \
-            if (decoder->convert) {                                        \
-                decoder->convert (decoder->convert_id, decoder->dest,        \
-                                  decoder->v_offset);                        \
-                if (decoder->coding_type == B_TYPE)                        \
-                    break;                                                \
-            }                                                                \
-            decoder->dest[0] += decoder->slice_stride;                        \
-            decoder->dest[1] += decoder->slice_uv_stride;                \
-            decoder->dest[2] += decoder->slice_uv_stride;                \
-        } while (0);                                                        \
-        decoder->v_offset += 16;                                        \
-        if (decoder->v_offset > decoder->limit_y) {                        \
-            if (mpeg2_cpu_state_restore)                                \
-                mpeg2_cpu_state_restore (&cpu_state);                        \
-            return;                                                        \
-        }                                                                \
-        decoder->offset = 0;                                                \
-    }                                                                        \
+#define NEXT_MACROBLOCK                                               \
+do {                                                                  \
+    decoder->offset += 16;                                            \
+    if (decoder->offset == decoder->width) {                          \
+        do { /* just so we can use the break statement */             \
+            if (decoder->convert) {                                   \
+                decoder->convert (decoder->convert_id, decoder->dest, \
+                                  decoder->v_offset);                 \
+                if (decoder->coding_type == B_TYPE)                   \
+                    break;                                            \
+            }                                                         \
+            decoder->dest[0] += decoder->slice_stride;                \
+            decoder->dest[1] += decoder->slice_uv_stride;             \
+            decoder->dest[2] += decoder->slice_uv_stride;             \
+        } while (0);                                                  \
+        decoder->v_offset += 16;                                      \
+        if (decoder->v_offset > decoder->limit_y)                     \
+            return;                                                   \
+        decoder->offset = 0;                                          \
+    }                                                                 \
 } while (0)
 
 void mpeg2_init_fbuf (mpeg2_decoder_t * decoder, uint8_t * current_fbuf[3],
@@ -1780,15 +1775,11 @@ void mpeg2_slice (mpeg2_decoder_t * const decoder, const int code,
 #define bit_buf (decoder->bitstream_buf)
 #define bits (decoder->bitstream_bits)
 #define bit_ptr (decoder->bitstream_ptr)
-    cpu_state_t cpu_state;
 
     bitstream_init (decoder, buffer);
 
     if (slice_init (decoder, code))
         return;
-
-    if (mpeg2_cpu_state_save)
-        mpeg2_cpu_state_save (&cpu_state);
 
     while (1) {
         int macroblock_modes;
@@ -2028,8 +2019,6 @@ void mpeg2_slice (mpeg2_decoder_t * const decoder, const int code,
                 NEEDBITS (bit_buf, bits, bit_ptr);
                 continue;
             default:        /* end of slice, or error */
-                if (mpeg2_cpu_state_restore)
-                    mpeg2_cpu_state_restore (&cpu_state);
                 return;
             }
         }
