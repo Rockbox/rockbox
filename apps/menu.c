@@ -719,12 +719,12 @@ static void init_oldmenu(const struct menu_item_ex *menu,
                         (void*)(intptr_t)menu->value, false, 1);
     gui_synclist_set_nb_items(lists, MENU_GET_COUNT(menu->flags));
     gui_synclist_limit_scroll(lists, true);
-    gui_synclist_select_item(lists, selected);
 #ifdef HAVE_LCD_BITMAP
     gui_synclist_set_title(lists, menus[menu->value].title,
                            bitmap_icons_6x8[Icon_Submenu_Entered]);
     gui_synclist_set_icon_callback(lists, oldmenu_get_icon);
 #endif
+    gui_synclist_select_item(lists, selected);
 }
 
 static void menu_talk_selected(int m)
