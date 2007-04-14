@@ -144,16 +144,21 @@ void audiohw_postinit(void)
 /* Silently enable / disable audio output */
 void audiohw_enable_output(bool enable)
 {
+
+    int curr;
+
+    curr = as3514_regs[HPH_OUT_L];
+
     if (enable)
     {
         /* reset the I2S controller into known state */
         i2s_reset();
 
-        as3514_write(HPH_OUT_L, 0xc0); /* Mute off, power on */
+        as3514_write(HPH_OUT_L, curr | 0xc0); /* Mute off, power on */
         audiohw_mute(0);
     } else {
         audiohw_mute(1);
-        as3514_write(HPH_OUT_L, 0x80); /* Mute on, power off */
+        as3514_write(HPH_OUT_L, curr | 0x80); /* Mute on, power off */
     }
 }
 
