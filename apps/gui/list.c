@@ -943,9 +943,7 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists,
         case ACTION_STD_PREV:
         case ACTION_STD_PREVREPEAT:
             gui_synclist_select_previous(lists);
-#ifndef SIMULATOR
             if (queue_count(&button_queue) < FRAMEDROP_TRIGGER)
-#endif
                 gui_synclist_draw(lists);
             yield();
             return ACTION_STD_PREV;
@@ -953,9 +951,7 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists,
         case ACTION_STD_NEXT:
         case ACTION_STD_NEXTREPEAT:
             gui_synclist_select_next(lists);
-#ifndef SIMULATOR
             if (queue_count(&button_queue) < FRAMEDROP_TRIGGER)
-#endif
                 gui_synclist_draw(lists);
             yield();
             return ACTION_STD_NEXT;

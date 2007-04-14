@@ -281,6 +281,11 @@ void queue_remove_from_head(struct event_queue *q, long id)
     set_irq_level(oldlevel);
 }
 
+int queue_count(const struct event_queue *q)
+{
+    return q->write - q->read;
+}
+
 void switch_thread(bool save_context, struct thread_entry **blocked_list)
 {
     (void)save_context;

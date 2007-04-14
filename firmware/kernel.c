@@ -345,7 +345,7 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
 {
     int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
     unsigned int wr;
-    
+
     lock_cores();
     
     wr = q->write++ & QUEUE_LENGTH_MASK;
@@ -495,23 +495,20 @@ void queue_remove_from_head(struct event_queue *q, long id)
 int queue_count(const struct event_queue *q)
 {
     int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-    int result = 0;
+    int result;
     
 #if NUM_CORES > 1
     if (!q->irq_safe)
         lock_cores();
 #endif
     
-    if (q->read <= q->write)
-        result = q->write - q->read;
-    else
-        result = QUEUE_LENGTH - (q->read - q->write);
-    
+    result = q->write - q->read;
+
 #if NUM_CORES > 1
     if (!q->irq_safe)
         unlock_cores();
 #endif
-    
+
     set_irq_level(oldlevel);
     
     return result;
