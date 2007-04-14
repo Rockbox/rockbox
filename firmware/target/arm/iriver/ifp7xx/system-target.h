@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2007 by Greg White
+ * Copyright (C) 2002 by Alan Korr
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,17 +16,19 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef SYSTEM_TARGET_H
+#define SYSTEM_TARGET_H
 
-#include "mmu-meg-fx.h"
+#include "system-arm.h"
 
-#define HAVE_INVALIDATE_ICACHE
-static inline void invalidate_icache(void)
-{
-    clean_dcache();
-    asm volatile(
-        "mov r0, #0 \n"
-        "mcr p15, 0, r0, c7, c5, 0 \n"
-        : : : "r0"
-    );
-}
+#define CPUFREQ_DEFAULT 12000000
+#define CPUFREQ_NORMAL  48000000
+#define CPUFREQ_MAX     60000000
 
+typedef void (*interrupt_handler_t)(void);
+
+void irq_set_int_handler(int n, interrupt_handler_t handler);
+void irq_enable_int(int n);
+void irq_disable_int(int n);
+
+#endif /* SYSTEM_TARGET_H */
