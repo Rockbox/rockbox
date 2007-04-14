@@ -47,7 +47,7 @@ static inline unsigned int current_core(void)
      */
     unsigned int core;
     asm volatile (
-        "ldr    %0, =0x60000000 \r\n" /* PROCESSOR_ID      */
+        "mov    %0, #0x60000000 \r\n" /* PROCESSOR_ID      */
         "ldrb   %0, [%0]        \r\n" /* Just load the LSB */
         "mov    %0, %0, lsr #7  \r\n" /* Bit 7 => index    */
         : "=&r"(core)                 /* CPU=0, COP=1      */
