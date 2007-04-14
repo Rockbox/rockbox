@@ -357,6 +357,14 @@ static int parse_image_display(const char *wps_bufptr,
                                struct wps_data *wps_data)
 {
     int n = get_image_id(*wps_bufptr);
+
+    if (n == -1)
+    {
+        /* invalid picture display tag */
+        token->type = WPS_TOKEN_UNKNOWN;
+        return 0;
+    }
+
     token->value.i = n;
 
     /* if the image is in a conditional, remember it */
