@@ -110,7 +110,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 52
+#define PLUGIN_API_VERSION 53
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -599,6 +599,12 @@ struct plugin_api {
     bool (*detect_original_firmware)(void);
     bool (*detect_flashed_ramimage)(void);
     bool (*detect_flashed_romimage)(void);
+#endif
+
+#if NUM_CORES > 1
+    void (*spinlock_init)(struct mutex *m);
+    void (*spinlock_lock)(struct mutex *m);
+    void (*spinlock_unlock)(struct mutex *m);
 #endif
 };
 

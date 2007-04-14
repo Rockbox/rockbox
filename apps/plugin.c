@@ -486,6 +486,12 @@ static const struct plugin_api rockbox_api = {
     detect_flashed_ramimage,
     detect_flashed_romimage,
 #endif
+
+#if NUM_CORES > 1
+    spinlock_init,
+    spinlock_lock,
+    spinlock_unlock,
+#endif
 };
 
 int plugin_load(const char* plugin, void* parameter)

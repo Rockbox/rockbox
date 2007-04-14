@@ -224,9 +224,28 @@ static Stream video_str IBSS_ATTR;
 /* NOTE: Putting the following variables in IRAM cause audio corruption
    on the ipod (reason unknown)
 */
-static uint8_t *disk_buf, *disk_buf_end;
+static uint8_t *disk_buf IBSS_ATTR;
+static uint8_t *disk_buf_end IBSS_ATTR;
 static uint8_t *disk_buf_tail IBSS_ATTR;
-static size_t buffer_size IBSS_ATTR;
+static size_t   buffer_size IBSS_ATTR;
+#if NUM_CORES > 1
+/* Some stream variables are shared between cores */
+struct mutex stream_lock IBSS_ATTR;
+static inline void init_stream_lock(void)
+    { rb->spinlock_init(&stream_lock); }
+static inline void lock_stream(void)
+    { rb->spinlock_lock(&stream_lock); }
+static inline void unlock_stream(void)
+    { rb->spinlock_unlock(&stream_lock); }
+#else
+/* No RMW issue here */
+static inline void init_stream_lock(void)
+    { }
+static inline void lock_stream(void)
+    { }
+static inline void unlock_stream(void)
+    { }
+#endif
 
 /* Events */
 static struct event_queue msg_queue IBSS_ATTR;
@@ -558,7 +577,7 @@ static void get_next_data( Stream* str )
             /* Problem */
             //rb->splash( HZ*3, "missing packet start code prefix : %X%X at %X", *p, *(p+2), p-disk_buf );
             str->curr_packet_end = str->curr_packet = NULL;
-            return;
+            break;
             //++p;
             //break;
         }
@@ -574,7 +593,7 @@ static void get_next_data( Stream* str )
             if (stream == 0xB9)
             {
                 str->curr_packet_end = str->curr_packet = NULL;
-                return;
+                break;
             }
 
             /* It's not the packet we're looking for, skip it */
@@ -667,6 +686,8 @@ static void get_next_data( Stream* str )
 
             if (str->curr_packet != NULL)
             {
+                lock_stream();
+
                 if (str->curr_packet < str->prev_packet)
                 {
                     str->buffer_remaining -= (disk_buf_end - str->prev_packet) +
@@ -679,6 +700,8 @@ static void get_next_data( Stream* str )
                     str->buffer_remaining -= (str->curr_packet - str->prev_packet);
                 }
 
+                unlock_stream();
+
                 str->prev_packet = str->curr_packet;
             }
 
@@ -689,8 +712,6 @@ static void get_next_data( Stream* str )
                 str->guard_bytes = str->curr_packet_end - disk_buf_end;
                 rb->memcpy(disk_buf_end, disk_buf, str->guard_bytes);
             }
-
-            return;
         }
 
         break;
@@ -1250,9 +1271,9 @@ static void video_thread(void)
     mpeg2dec = mpeg2_init();
     if (mpeg2dec == NULL)
     {
-        videostatus = STREAM_ERROR;
         rb->splash(0, "mpeg2_init failed");
         /* Commit suicide */
+        videostatus = THREAD_TERMINATED;
         rb->remove_thread(NULL);
     }
 
@@ -1282,6 +1303,8 @@ static void video_thread(void)
         else if (videostatus == PLEASE_PAUSE)
         {
             videostatus = STREAM_PAUSING;
+            flush_icache();
+
             while (videostatus == STREAM_PAUSING)
                 rb->sleep(HZ/10);
         }
@@ -1533,6 +1556,8 @@ static void video_thread(void)
     }
 
 done:
+    flush_icache();
+
     videostatus = STREAM_DONE;
 
     while (videostatus != PLEASE_STOP)
@@ -1550,10 +1575,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int audiosize;
     int in_file;
     uint8_t* buffer;
-    size_t audio_remaining, video_remaining;
-    size_t bytes_to_read;
     size_t file_remaining;
-    size_t n;
     size_t disk_buf_len;
 #ifndef HAVE_LCD_COLOR
     long graysize;
@@ -1692,6 +1714,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     gray_show(true);
 #endif
 
+    init_stream_lock();
+
     /* We put the video thread on the second processor for multi-core targets. */
     if ((videothread_id = rb->create_thread(video_thread,
         (uint8_t*)video_stack,VIDEO_STACKSIZE,"mpgvideo" IF_PRIO(,PRIORITY_PLAYBACK)
@@ -1711,32 +1735,39 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->lcd_setfont(FONT_SYSFIXED);
 
         /* Wait until both threads have finished their work */
-        while ((audiostatus != STREAM_DONE) || (videostatus != STREAM_DONE)) {
-            audio_remaining = audio_str.buffer_remaining;
-            video_remaining = video_str.buffer_remaining;
+        while ((audiostatus != STREAM_DONE) || (videostatus != STREAM_DONE))
+        {
+            size_t audio_remaining = audio_str.buffer_remaining;
+            size_t video_remaining = video_str.buffer_remaining;
+
             if (MIN(audio_remaining,video_remaining) < MPEG_LOW_WATERMARK) {
 
-                // TODO: Add mutex when updating the A/V buffer_remaining variables.
-                bytes_to_read = buffer_size - MPEG_GUARDBUF_SIZE - MAX(audio_remaining,video_remaining);
+                size_t bytes_to_read = buffer_size - MPEG_GUARDBUF_SIZE -
+                                       MAX(audio_remaining,video_remaining);
 
                 bytes_to_read = MIN(bytes_to_read,(size_t)(disk_buf_end-disk_buf_tail));
 
                 while (( bytes_to_read > 0) && (file_remaining > 0) &&
                        ((audiostatus != STREAM_DONE) || (videostatus != STREAM_DONE))) {
-                    n = rb->read(in_file, disk_buf_tail, MIN(32*1024,bytes_to_read));
+                    size_t n = rb->read(in_file, disk_buf_tail, MIN(32*1024,bytes_to_read));
 
                     bytes_to_read -= n;
                     file_remaining -= n;
+
+                    lock_stream();
                     audio_str.buffer_remaining += n;
                     video_str.buffer_remaining += n;
+                    unlock_stream();
+
                     disk_buf_tail += n;
+
                     rb->yield();
                 }
 
                 if (disk_buf_tail == disk_buf_end)
                     disk_buf_tail = buffer;
-
             }
+
             rb->sleep(HZ/10);
         }
 
