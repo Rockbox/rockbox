@@ -31,19 +31,14 @@ extern void audiohw_enable_output(bool enable);
 extern int audiohw_set_master_vol(int vol_l, int vol_r);
 extern int audiohw_set_lineout_vol(int vol_l, int vol_r);
 extern int audiohw_set_mixer_vol(int channel1, int channel2);
-extern void audiohw_set_bass(int value);
-extern void audiohw_set_treble(int value);
 extern int audiohw_mute(int mute);
 extern void audiohw_close(void);
-extern void audiohw_set_nsorder(int order);
 extern void audiohw_set_sample_rate(int sampling_control);
 
 extern void audiohw_enable_recording(bool source_mic);
 extern void audiohw_disable_recording(void);
 extern void audiohw_set_recvol(int left, int right, int type);
 extern void audiohw_set_monitor(int enable);
-
-extern void audiohw_set_equalizer_band(int band, int freq, int bw, int gain);
 
 /* Register Descriptions */
 #define LINE_OUT_R 0x00
