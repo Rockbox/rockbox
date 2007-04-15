@@ -166,6 +166,7 @@ enum wps_token_type {
     /* Database */
     WPS_TOKEN_DATABASE_PLAYCOUNT,
     WPS_TOKEN_DATABASE_RATING,
+    WPS_TOKEN_DATABASE_AUTOSCORE,
 
     /* File */
     WPS_TOKEN_FILE_BITRATE,
