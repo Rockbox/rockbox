@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2007 by Jens Arnold
+ * Based on the work of Alan Korr and others
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
