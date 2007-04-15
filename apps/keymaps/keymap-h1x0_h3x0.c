@@ -439,10 +439,6 @@ static const struct button_mapping button_context_settings_h100remote[]  = {
     { ACTION_SETTINGS_INCREPEAT,    BUTTON_RC_REW|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_SETTINGS_DEC,          BUTTON_RC_FF,                   BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,    BUTTON_RC_FF|BUTTON_REPEAT,     BUTTON_NONE },
-    { ACTION_STD_PREV,              BUTTON_RC_SOURCE,                  BUTTON_NONE },
-    { ACTION_STD_PREVREPEAT,        BUTTON_RC_SOURCE|BUTTON_REPEAT,    BUTTON_NONE },
-    { ACTION_STD_NEXT,              BUTTON_RC_BITRATE,                   BUTTON_NONE },
-    { ACTION_STD_NEXTREPEAT,        BUTTON_RC_BITRATE|BUTTON_REPEAT,     BUTTON_NONE },
 /*    { ACTION_NONE,                  BUTTON_RC_ON,                   BUTTON_NONE },
     { ACTION_NONE,                  BUTTON_RC_STOP,                 BUTTON_NONE },
     { ACTION_NONE,                  BUTTON_RC_MENU|BUTTON_REL,      BUTTON_NONE },
@@ -455,11 +451,8 @@ static const struct button_mapping button_context_settings_h300lcdremote[]  = {
     { ACTION_SETTINGS_INCREPEAT,    BUTTON_RC_VOL_UP|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_SETTINGS_DEC,          BUTTON_RC_VOL_DOWN,             BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,    BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,   BUTTON_NONE },
-    { ACTION_STD_PREV,              BUTTON_RC_REW,                  BUTTON_NONE },
-    { ACTION_STD_PREVREPEAT,        BUTTON_RC_REW|BUTTON_REPEAT,    BUTTON_NONE },
-    { ACTION_STD_NEXT,              BUTTON_RC_FF,                   BUTTON_NONE },
-    { ACTION_STD_NEXTREPEAT,        BUTTON_RC_FF|BUTTON_REPEAT,     BUTTON_NONE },
-    { ACTION_SETTINGS_RESET,        BUTTON_RC_ON,                   BUTTON_NONE },
+    { ACTION_NONE,                  BUTTON_RC_REW,                  BUTTON_NONE },
+    { ACTION_NONE,                  BUTTON_RC_FF,                   BUTTON_NONE },
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings */

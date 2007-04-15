@@ -33,7 +33,6 @@
 #include "action.h" /* for keys_locked */
 #include "statusbar.h"
 #ifdef HAVE_RECORDING
-#include "recording.h"
 #include "audio.h"
 #include "recording.h"
 #endif
@@ -114,11 +113,7 @@
 #define STATUSBAR_LOCKR_WIDTH                   5
 
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
-#ifdef HAVE_MMC
 #define STATUSBAR_DISK_WIDTH                    12
-#else
-#define STATUSBAR_DISK_WIDTH                    7
-#endif
 #define STATUSBAR_DISK_X_POS(statusbar_width)   statusbar_width - \
                                                 STATUSBAR_DISK_WIDTH
 #else
@@ -126,15 +121,6 @@
 #endif
 #define STATUSBAR_TIME_X_END(statusbar_width)   statusbar_width - 1 - \
                                                 STATUSBAR_DISK_WIDTH
-#ifdef HAVE_RECORDING
-#define TIMER_ICON_WIDTH 7
-#if CONFIG_RTC
-#define CLOCK_WIDTH 35
-#else
-#define CLOCK_WIDTH 0
-#endif
-#endif
-
 struct gui_syncstatusbar statusbars;
 
 /* Prototypes */
@@ -154,11 +140,9 @@ static void gui_statusbar_led(struct screen * display);
 #endif
 #ifdef HAVE_RECORDING
 static void gui_statusbar_icon_recording_info(struct screen * display);
-static void gui_statusbar_timer(struct screen * display, int dy, int hr, int mn,                                  int sc, bool recscreen);
-static void gui_statusbar_timer_rep(struct screen * display);
 #endif
 #if CONFIG_RTC
-static void gui_statusbar_time(struct screen * display, int hour, int minute, bool timer_display);
+static void gui_statusbar_time(struct screen * display, int hour, int minute);
 #endif
 #endif
 
@@ -261,21 +245,6 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
         bar->info.minute = tm->tm_min;
     }
 #endif /* CONFIG_RTC */
-#ifdef HAVE_RECORDING
-    struct timer* timer = get_timerstat();
-    bar->info.timer_day = timer->days;
-    bar->info.timer_hour = timer->hrs;
-    bar->info.timer_min = timer->mins;
-    /* avoid an update every second unless less than one
-       minute remains on the timer */
-    if (!bar->info.timer_day && !bar->info.timer_hour && !bar->info.timer_min)
-        bar->info.timer_sec = timer->secs;
-    else
-        bar->info.timer_sec = 0;
-
-    bar->info.timer_display = timer->timer_display;
-    bar->info.timer_repeat = timer->repeater;
-#endif
 
     /* only redraw if forced to, or info has changed */
     if (force_redraw || bar->redraw_volume ||
@@ -347,16 +316,8 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
         if (bar->info.keylockremote)
             gui_statusbar_icon_lock_remote(display);
 #endif
-#ifdef HAVE_RECORDING
-        if (bar->info.timer_display)
-            gui_statusbar_timer(display, bar->info.timer_day, bar->info.timer_hour,
-                                   bar->info.timer_min, bar->info.timer_sec, recscreen_on);
-        else if ((bar->info.timer_repeat) && (recscreen_on))
-            gui_statusbar_timer_rep(display);
-#endif
 #if CONFIG_RTC
-        gui_statusbar_time(display, bar->info.hour, bar->info.minute,
-                               bar->info.timer_display);
+        gui_statusbar_time(display, bar->info.hour, bar->info.minute);
 #endif /* CONFIG_RTC */
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
         if(!display->has_disk_led && bar->info.led)
@@ -616,8 +577,7 @@ static void gui_statusbar_led(struct screen * display)
 /*
  * Print time to status bar
  */
-static void gui_statusbar_time(struct screen * display, int hour, int minute,
-                           bool timer_display)
+static void gui_statusbar_time(struct screen * display, int hour, int minute)
 {
     unsigned char buffer[6];
     unsigned int width, height;
@@ -639,73 +599,15 @@ static void gui_statusbar_time(struct screen * display, int hour, int minute,
     display->setfont(FONT_SYSFIXED);
     display->getstringsize(buffer, &width, &height);
     if (height <= STATUSBAR_HEIGHT) {
-#ifdef HAVE_RECORDING
-        if (timer_display)
-            display->set_drawmode(DRMODE_INVERSEVID);
-#else
-    (void)timer_display;
-#endif
         display->putsxy(STATUSBAR_TIME_X_END(display->width) - width,
                         STATUSBAR_Y_POS, buffer);
     }
-    display->set_drawmode(DRMODE_SOLID);
     display->setfont(FONT_UI);
 
 }
 #endif
 
 #ifdef HAVE_RECORDING
-static void gui_statusbar_timer(struct screen * display, int dy, int hr, int mn,
-                                   int sc, bool recscreen)
-{
-    unsigned char buffer[8];
-    int width, height;
-
-    /* vary the display depending on the remaining time to save space */
-    if (dy)
-        snprintf(buffer, sizeof(buffer), " %dd%02dh", hr > 58 ? dy + 1 : dy,
-                    hr > 58 ? 0 : hr + 1);
-    else if (!hr && !mn)
-        snprintf(buffer, sizeof(buffer), "%02ds", sc);
-    else
-        snprintf(buffer, sizeof(buffer), "%02dh%02dm", mn > 58 ? hr + 1: hr,
-                    mn > 58 ? 0 : mn + 1);
-
-    display->setfont(FONT_SYSFIXED);
-    display->getstringsize(buffer, &width, &height);
-
-    if (height <= STATUSBAR_HEIGHT)
-    {
-        if(((display->width) >= (STATUSBAR_LOCKR_X_POS + STATUSBAR_LOCKR_WIDTH +
-                                  STATUSBAR_DISK_WIDTH + width + CLOCK_WIDTH + 1))
-                                  && !recscreen)
-            display->putsxy(STATUSBAR_TIME_X_END(display->width) - width -
-                                CLOCK_WIDTH, STATUSBAR_Y_POS, buffer);
-        /* display only an icon for small screens or when in recording screen*/
-        else if ((display->width) >= (STATUSBAR_LOCKR_X_POS +
-                                           STATUSBAR_LOCKR_WIDTH +
-                                           STATUSBAR_DISK_WIDTH +
-                                           TIMER_ICON_WIDTH + CLOCK_WIDTH + 1))
-            display->mono_bitmap(bitmap_icons_7x7[Icon_Timer],
-                                       STATUSBAR_TIME_X_END(display->width) -
-                                       TIMER_ICON_WIDTH - CLOCK_WIDTH,
-                                       STATUSBAR_Y_POS,
-                                       TIMER_ICON_WIDTH, STATUSBAR_HEIGHT);
-    }
-
-    display->setfont(FONT_UI);
-
-}
-
-static void gui_statusbar_timer_rep(struct screen * display)
-{
-    display->mono_bitmap(bitmap_icons_7x7[Icon_Timer_rep],
-                               STATUSBAR_TIME_X_END(display->width) -
-                               TIMER_ICON_WIDTH - CLOCK_WIDTH,
-                               STATUSBAR_Y_POS,
-                               TIMER_ICON_WIDTH, STATUSBAR_HEIGHT);
-}
-
 #if CONFIG_CODEC == SWCODEC
 /**
  * Write a number to the display using bitmaps and return new position

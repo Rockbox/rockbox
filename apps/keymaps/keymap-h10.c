@@ -121,10 +121,7 @@ static const struct button_mapping button_context_settings[] = {
     { ACTION_STD_PREVREPEAT,    BUTTON_LEFT|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_STD_NEXT,          BUTTON_RIGHT,                     BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,    BUTTON_RIGHT|BUTTON_REPEAT,       BUTTON_NONE },
-    { ACTION_SETTINGS_RESET,    BUTTON_POWER,                        BUTTON_NONE },
-    { ACTION_NONE,              BUTTON_LEFT|BUTTON_REL,           BUTTON_LEFT },
-    { ACTION_NONE,              BUTTON_RIGHT|BUTTON_REL,          BUTTON_RIGHT },
-    { ACTION_STD_OK,            BUTTON_PLAY,                      BUTTON_NONE },
+    { ACTION_SETTINGS_RESET,    BUTTON_PLAY,                      BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_settings */
@@ -306,8 +303,6 @@ static const struct button_mapping button_context_bmark[]  = {
 
 const struct button_mapping button_context_recscreen[]  = {
     { ACTION_REC_PAUSE,             BUTTON_PLAY,                BUTTON_NONE },
-    { ACTION_STD_CANCEL,            BUTTON_REW,                 BUTTON_NONE },
-
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
 }; /* button_context_recscreen */

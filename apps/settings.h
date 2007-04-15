@@ -247,12 +247,6 @@ struct opt_items {
     unsigned const char* string;
     long voice_id;
 };
-
-struct opt_settings {
-    int* setting;
-    int setting_max;
-};
-
 const struct settings_list* find_setting(void* variable, int *id);
 bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len);
 void talk_setting(void *global_settings_variable);
@@ -270,9 +264,6 @@ bool set_int(const unsigned char* string, const char* unit, int voice_unit,
              int* variable,
              void (*function)(int), int step, int min, int max, 
              void (*formatter)(char*, int, int, const char*) );
-bool set_multi_int(const char* string, const struct opt_items * names,
-                   struct opt_settings * variable, int varcount,
-                   bool * changes_accepted);
 /* use this one if you need to create a lang from the value (i.e with TALK_ID()) */
 bool set_int_ex(const unsigned char* string, const char* unit, int voice_unit,
              int* variable,

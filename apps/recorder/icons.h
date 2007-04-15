@@ -49,12 +49,6 @@ enum icons_5x8 {
     Icon5x8Last
 };
 
-enum icons_7x7 {
-    Icon_Timer,
-    Icon_Timer_rep,
-    Icon7x7Last
-};
-
 /* If any icons are added to this enum, they must be
    added to the unused_but_needed enum in ../player/icons.h */
 enum icons_6x8 {
@@ -150,7 +144,6 @@ extern const unsigned char bitmap_formats_18x8[Format_18x8Last][18];
 #endif /* CONFIG_CODEC == SWCODEC && defined (HAVE_RECORDING) */
 
 extern const unsigned char bitmap_icons_5x8[Icon5x8Last][5];
-extern const unsigned char bitmap_icons_7x7[Icon7x7Last][7];
 extern const unsigned char bitmap_icons_6x8[Icon6x8Last][6];
 extern const unsigned char bitmap_icons_7x8[Icon7x8Last][7];
 extern const unsigned char bitmap_icon_disk[];
