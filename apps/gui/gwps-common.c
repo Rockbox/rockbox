@@ -1279,8 +1279,7 @@ static int find_conditional_end(struct wps_data *data, int index)
     }
 
     int ret = index;
-    while (data->tokens[ret].value.i != 0
-           && data->tokens[data->tokens[ret].value.i].type != WPS_TOKEN_CONDITIONAL_END)
+    while (data->tokens[ret].type != WPS_TOKEN_CONDITIONAL_END)
         ret = data->tokens[ret].value.i;
 
     /* ret now is the index to the end token for the conditional. */
