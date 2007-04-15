@@ -77,7 +77,7 @@ static const struct sound_settings_info sound_settings_table[] = {
 #elif (CONFIG_CPU == PNX0101)
     [SOUND_VOLUME]        = {"dB", 0,  1, -48,  15,   0, sound_set_volume},
 #elif defined(HAVE_AS3514)
-    [SOUND_VOLUME]        = {"dB", 0,  1, -45,   1, -25, sound_set_volume},
+    [SOUND_VOLUME]        = {"dB", 0,  1, -40,   6, -25, sound_set_volume},
 #else /* MAS3507D */
     [SOUND_VOLUME]        = {"dB", 0,  1, -78,  18, -18, sound_set_volume},
     [SOUND_BASS]          = {"dB", 0,  1, -15,  15,   7, sound_set_bass},

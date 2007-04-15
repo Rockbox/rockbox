@@ -69,9 +69,9 @@ extern void audiohw_set_monitor(int enable);
 #define ADC_0      0x2e
 #define ADC_1      0x2f
 
-/* Headphone volume goes from -45.43 - 1.07dB */
-#define VOLUME_MIN -454
-#define VOLUME_MAX 10
+/* Headphone volume goes from -40.5 - 6dB */
+#define VOLUME_MIN -405
+#define VOLUME_MAX 60
 
 #ifdef SANSA_E200
 #define AS3514_I2C_ADDR 0x46

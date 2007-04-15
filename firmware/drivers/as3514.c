@@ -47,11 +47,11 @@ static void as3514_write(int reg, int value)
 /* convert tenth of dB volume to master volume register value */
 int tenthdb2master(int db)
 {
-    /* +1..07 to -45.43dB in 1.5dB steps == 32 levels = 5 bits */
-    /* 11111 == +1.07dB  (0x1f) = 31) */
-    /* 11110 == -0.43dB  (0x1e) = 30) */
-    /* 00001 == -43.93dB (0x01) */
-    /* 00000 == -45.43dB (0x00) */
+    /* +6 to -45.43dB in 1.5dB steps == 32 levels = 5 bits */
+    /* 11111 == +6dB  (0x1f) = 31) */
+    /* 11110 == -4.5dB  (0x1e) = 30) */
+    /* 00001 == -39dB (0x01) */
+    /* 00000 == -40.5dB (0x00) */
 
     if (db < VOLUME_MIN) {
         return 0x0;
