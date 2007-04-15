@@ -1279,9 +1279,9 @@ static int find_conditional_end(struct wps_data *data, int index)
     }
 
     int ret = index;
-    do
+    while (data->tokens[ret].value.i != 0
+           && data->tokens[data->tokens[ret].value.i].type != WPS_TOKEN_CONDITIONAL_END)
         ret = data->tokens[ret].value.i;
-    while (data->tokens[ret].type != WPS_TOKEN_CONDITIONAL_END);
 
     /* ret now is the index to the end token for the conditional. */
     return ret;
@@ -1306,6 +1306,10 @@ static int evaluate_conditional(struct gui_wps *gwps, int cond_index)
     while (data->tokens[cond_start].type != WPS_TOKEN_CONDITIONAL_START
            && cond_start < data->num_tokens)
         cond_start++;
+
+    /* if the number of options is 0, the conditional is invalid */
+    if (num_options == 0)
+        return cond_start;
 
     /* treat ?xx<true> constructs as if they had 2 options. */
     if (num_options < 2)

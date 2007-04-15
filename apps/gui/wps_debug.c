@@ -398,13 +398,16 @@ void print_line_info(struct wps_data *data)
 void print_wps_strings(struct wps_data *data)
 {
     DEBUGF("Strings:\n");
-    int i, len = 0;
-    for (i=0; i < data->num_strings; i++)
+    int i, len = 0, buf_used = 0;
+    for (i = 0; i < data->num_strings; i++)
     {
         len += strlen(data->strings[i]);
-        DEBUGF("%2d: '%s'\n", i, data->strings[i]);
+        buf_used += strlen(data->strings[i]) + 1;
+        DEBUGF("%2d: (%2d) '%s'\n", i, strlen(data->strings[i]), data->strings[i]);
     }
-    DEBUGF("Total length: %d\n", len);
+    DEBUGF("\n");
+    DEBUGF("Total string length: %d\n", len);
+    DEBUGF("String buffer used: %d out of %d bytes\n", buf_used, STRING_BUFFER_SIZE);
     DEBUGF("\n");
 }
 
@@ -413,7 +416,7 @@ void print_img_cond_indexes(struct wps_data *data)
 {
     DEBUGF("Image conditional indexes:\n");
     int i;
-    for (i=0; i < MAX_IMAGES; i++)
+    for (i = 0; i < MAX_IMAGES; i++)
     {
         if (data->img[i].cond_index)
             DEBUGF("%2d: %d\n", i, data->img[i].cond_index);

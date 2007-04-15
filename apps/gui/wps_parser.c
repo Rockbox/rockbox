@@ -270,10 +270,27 @@ static int skip_end_of_line(const char *wps_bufptr)
 }
 
 /* Starts a new subline in the current line during parsing */
-static void wps_start_new_subline(struct wps_data *data) {
+static void wps_start_new_subline(struct wps_data *data)
+{
     data->num_sublines++;
     data->sublines[data->num_sublines].first_token_idx = data->num_tokens;
     data->lines[data->num_lines].num_sublines++;
+}
+
+static void close_conditionals(struct wps_data *data, int n)
+{
+    int i;
+    for (i = 0; i < n; i++)
+    {
+        data->tokens[data->num_tokens].type = WPS_TOKEN_CONDITIONAL_END;
+        if (lastcond[level])
+            data->tokens[lastcond[level]].value.i = data->num_tokens;
+
+        lastcond[level] = 0;
+        data->num_tokens++;
+        data->tokens[condindex[level]].value.i = numoptions[level];
+        level--;
+    }
 }
 
 #ifdef HAVE_LCD_BITMAP
@@ -638,6 +655,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
         return false;
 
     char *current_string = data->string_buffer;
+    int stringbuf_used = 0;
 
     while(*wps_bufptr && data->num_tokens < WPS_MAX_TOKENS - 1
           && data->num_lines < WPS_MAX_LINES)
@@ -652,6 +670,9 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
 
             /* Alternating sublines separator */
             case ';':
+                if (level >= 0)
+                    close_conditionals(data, level + 1);
+
                 if (data->num_sublines+1 < WPS_MAX_SUBLINES)
                     wps_start_new_subline(data);
                 else
@@ -670,17 +691,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
                 if (level < 0) /* not in a conditional, ignore the char */
                     break;
 
-condlistend:  /* close a conditional. sometimes we want to close them even when
-                 we don't have a closing token, e.g. at the end of a line. */
-
-                data->tokens[data->num_tokens].type = WPS_TOKEN_CONDITIONAL_END;
-                if (lastcond[level])
-                    data->tokens[lastcond[level]].value.i = data->num_tokens;
-
-                lastcond[level] = 0;
-                data->num_tokens++;
-                data->tokens[condindex[level]].value.i = numoptions[level];
-                level--;
+                close_conditionals(data, 1);
                 break;
 
             /* Conditional list option */
@@ -699,19 +710,17 @@ condlistend:  /* close a conditional. sometimes we want to close them even when
 
             /* Comment */
             case '#':
+                if (level >= 0)
+                    close_conditionals(data, level + 1);
+
                 wps_bufptr += skip_end_of_line(wps_bufptr);
                 break;
 
             /* End of this line */
             case '\n':
                 if (level >= 0)
-                {
-                    /* We have unclosed conditionals, so we
-                       close them before adding the EOL token */
-                    wps_bufptr--;
-                    goto condlistend;
-                    break;
-                }
+                    close_conditionals(data, level + 1);
+
                 wps_start_new_subline(data);
                 data->num_lines++; /* Start a new line */
 
@@ -726,29 +735,36 @@ condlistend:  /* close a conditional. sometimes we want to close them even when
 
             /* String */
             default:
-                if (data->num_strings < WPS_MAX_STRINGS)
+                if (data->num_strings < WPS_MAX_STRINGS
+                    && stringbuf_used < STRING_BUFFER_SIZE - 1)
                 {
                     data->tokens[data->num_tokens].type = WPS_TOKEN_STRING;
                     data->strings[data->num_strings] = current_string;
-                    data->tokens[data->num_tokens].value.i = data->num_strings++;
+                    data->tokens[data->num_tokens].value.i = data->num_strings;
                     data->num_tokens++;
 
                     /* Copy the first byte */
                     *current_string++ = *(wps_bufptr - 1);
+                    stringbuf_used++;
 
-                    /* continue until we hit something that ends the string */
+                    /* continue until we hit something that ends the string
+                       or we run out of memory */
                     while(wps_bufptr && *wps_bufptr != '#' &&
                           *wps_bufptr != '%' && *wps_bufptr != ';' &&
                           *wps_bufptr != '<' && *wps_bufptr != '>' &&
-                          *wps_bufptr != '|' && *wps_bufptr != '\n')
+                          *wps_bufptr != '|' && *wps_bufptr != '\n' &&
+                          stringbuf_used < STRING_BUFFER_SIZE - 1)
                     {
                         *current_string++ = *wps_bufptr++;
+                        stringbuf_used++;
                     }
 
                     /* null terminate the string */
                     *current_string++ = '\0';
-                }
+                    stringbuf_used++;
 
+                    data->num_strings++;
+                }
                 break;
         }
     }
