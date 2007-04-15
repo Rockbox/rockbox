@@ -42,6 +42,7 @@
 #include "sound.h"
 #ifdef HAVE_RECORDING
 #include "audio.h"
+#include "recording.h"
 #if CONFIG_TUNER
 #include "radio.h"
 #endif
@@ -305,12 +306,78 @@ MENUITEM_SETTING(rec_quality, &global_settings.rec_quality, NULL);
 MENUITEM_SETTING(rec_editable, &global_settings.rec_editable, NULL);
 #endif
 
+/* Displays a menu for changing the countdown timer settings */
+static int countdown_timer_func(void)
+{
+    bool retval;
+    bool changed = false;
+    struct timer* timer = get_timerstat();
+
+    static const struct opt_items names[] = {
+        { STR(LANG_TIMER_DAYS) },
+        { STR(LANG_TIMER_HRS) },
+        { STR(LANG_TIMER_MINS) }
+    };
+
+    struct opt_settings settings[] = {
+        { &timer->days, 6 },
+        { &timer->hrs, 23 },
+        { &timer->mins, 59 }
+    };
+
+    retval = set_multi_int(str(LANG_TIMER_SET), names, settings, 3, &changed);
+
+    if (changed)
+    {
+        timer->countdown = false;
+        timer->secs = 0;
+        timer->timer_display = false;
+    }
+
+    return retval;
+}
+
+static int countdown_timer_repeat_func(void)
+{
+    struct timer* timer = get_timerstat();
+    bool retval;
+
+    static const struct opt_items names[] = {
+        { STR(LANG_TIMER_DAYS) },
+        { STR(LANG_TIMER_HRS) },
+        { STR(LANG_TIMER_MINS) }
+    };
+
+    struct opt_settings settings[] = {
+        { &timer->days_rpt, 6 },
+        { &timer->hrs_rpt, 23 },
+        { &timer->mins_rpt, 59 }
+    };
+    retval = set_multi_int(str(LANG_TIMER_REPEAT), names, settings, 3, NULL);
+
+    /* automatically select settings necessary for repeated recording */
+    if (timer->days_rpt || timer->hrs_rpt || timer->mins_rpt)
+    {
+        global_settings.rec_split_type = 1;   /* Stop */
+        global_settings.rec_split_method = 0; /* Time */
+        global_settings.rec_trigger_mode = 0; /* The repeat timer isn't
+                                                 compatible with the trigger */
+    }
+
+    return retval;
+}
+
+MENUITEM_FUNCTION(countdown_timer, 0, ID2P(LANG_TIMER_SET),
+                    countdown_timer_func, NULL, NULL, Icon_Menu_setting);
+MENUITEM_FUNCTION(countdown_timer_repeat, 0, ID2P(LANG_TIMER_REPEAT),
+                    countdown_timer_repeat_func, NULL, NULL, Icon_Menu_setting);
 MENUITEM_SETTING(rec_split_type, &global_settings.rec_split_type, NULL);
 MENUITEM_SETTING(rec_split_method, &global_settings.rec_split_method, NULL);
 MENUITEM_SETTING(rec_timesplit, &global_settings.rec_timesplit, NULL);
 MENUITEM_SETTING(rec_sizesplit, &global_settings.rec_sizesplit, NULL);
-MAKE_MENU(filesplitoptionsmenu, ID2P(LANG_RECORD_TIMESPLIT), NULL, Icon_NOICON,
-            &rec_split_method, &rec_split_type, &rec_timesplit, &rec_sizesplit);
+MAKE_MENU(timermenu, ID2P(LANG_RECORD_TIMESPLIT), NULL, Icon_NOICON,
+            &countdown_timer, &countdown_timer_repeat, &rec_split_method,
+            &rec_split_type, &rec_timesplit, &rec_sizesplit);
 
 
 MENUITEM_SETTING(rec_prerecord_time, &global_settings.rec_prerecord_time, NULL);
@@ -819,7 +886,7 @@ MAKE_MENU(recording_setting_menu, ID2P(LANG_RECORDING_SETTINGS), NULL, Icon_Reco
 #if CONFIG_CODEC == MAS3587F
             &rec_editable,
 #endif
-            &filesplitoptionsmenu,
+            &timermenu,
             &rec_prerecord_time,
             &recdirectory,
 #ifdef HAVE_BACKLIGHT

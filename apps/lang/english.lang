@@ -2720,16 +2720,16 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_TIMESPLIT
-  desc: Record split menu
+  desc: Record timer menu
   user:
   <source>
     *: "File Split Options"
   </source>
   <dest>
-    *: "File Split Options"
+    *: "Timer Options"
   </dest>
   <voice>
-    *: "File Split Options"
+    *: "Timer Options"
   </voice>
 </phrase>
 <phrase>
@@ -10739,5 +10739,99 @@
   </dest>
   <voice>
     *: "Context Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MULTIINT_CONFIRM
+  desc: Confirm string for multi_int settings
+  user:
+  <source>
+    *: "Press PLAY to confirm"
+  </source>
+  <dest>
+    *: "Press PLAY to confirm"
+    h100,h120,h300: "Press NAVI to confirm"
+    ipod*,x5,gigabeat: "Press SELECT to confirm"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMER_SET
+  desc: Recording timer menu
+  <source>
+    *: "Set countdown timer"
+  </source>
+  <dest>
+    *: "Set countdown timer"
+  </dest>
+  <voice>
+    *: "Set countdown timer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMER_REPEAT
+  desc: Recording timer menu
+  <source>
+    *: "Record repeat timer"
+  </source>
+  <dest>
+    *: "Record repeat timer"
+  </dest>
+  <voice>
+    *: "Record repeat timer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMER_DAYS
+  desc: recording timer settings string
+  <source>
+    *: "Days"
+  </source>
+  <dest>
+    *: "Days"
+  </dest>
+  <voice>
+    *: "Days"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMER_HRS
+  desc: recording timer settings string
+  <source>
+    *: "Hrs"
+  </source>
+  <dest>
+    *: "Hrs"
+  </dest>
+  <voice>
+    *: "Hours"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMER_MINS
+  desc: recording timer settings string
+  <source>
+    *: "Mins"
+  </source>
+  <dest>
+    *: "Mins"
+  </dest>
+  <voice>
+    *: "Minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_TIMER
+  desc: recording screen timer string
+  <source>
+    *: "Timer"
+  </source>
+  <dest>
+    *: "Timer"
+  </dest>
+  <voice>
+    *: "Timer"
   </voice>
 </phrase>

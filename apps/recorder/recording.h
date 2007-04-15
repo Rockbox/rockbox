@@ -25,6 +25,22 @@ bool recording_screen(bool no_source);
 char *rec_create_filename(char *buf);
 int rec_create_directory(void);
 
+struct timer
+{
+    bool countdown;
+    bool timer_display;
+    unsigned int days;
+    unsigned int hrs;
+    unsigned int mins;
+    unsigned int secs;
+    unsigned int days_rpt;
+    unsigned int hrs_rpt;
+    unsigned int mins_rpt;
+    bool repeater;
+};
+
+struct timer *get_timerstat(void);
+
 /* If true, start recording automatically when recording_sreen() is entered */
 extern bool recording_start_automatic;
 
@@ -33,6 +49,7 @@ extern bool recording_start_automatic;
 void rec_set_source(int source, unsigned flags);
 #endif /* CONFIG_CODEC == SW_CODEC */
 
+struct audio_recording_options;
 /* Initializes a recording_options structure with global settings.
    pass returned data to audio_set_recording_options or 
    rec_set_recording_options */

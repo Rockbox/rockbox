@@ -37,6 +37,14 @@ struct status_info {
     int hour;
     int minute;
 #endif
+#ifdef HAVE_RECORDING
+    int timer_day;
+    int timer_hour;
+    int timer_min;
+    int timer_sec;
+    int timer_repeat;
+#endif
+    int timer_display;
 
 #if CONFIG_CHARGING
     bool inserted;

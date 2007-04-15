@@ -1245,6 +1245,194 @@ bool set_int(const unsigned char* string,
     return set_int_ex(string, unit, voice_unit, variable, function,
                       step, min, max, formatter, NULL);
 }
+
+/* Useful for time and other multi integer settings */
+bool set_multi_int(const char* string,
+                   const struct opt_items * names,
+                   struct opt_settings * variable,
+                   int varcount,
+                   bool *changes_accepted)
+{
+    int i, j, w, h;
+    char buf[32];
+    long button;
+    int cursor = 0;
+    bool done = false;
+    int value[varcount];
+    int pos = 0;
+
+    /* store current values in temp array */
+    for(j = 0; j < varcount; j++)
+        value[j] = *(int*)variable[j].setting;
+
+    /* initialize screen */
+    FOR_NB_SCREENS(i)
+    {
+        screens[i].clear_display();
+#ifdef HAVE_LCD_BITMAP
+        screens[i].setmargins(0, 8);
+#endif
+    }
+
+    gui_syncstatusbar_draw(&statusbars, true);
+
+    FOR_NB_SCREENS(i)
+        screens[i].getstringsize("3", &w, &h);
+
+    /* print title */
+    snprintf(buf, sizeof(buf), "%s", string);
+    FOR_NB_SCREENS(i)
+        screens[i].puts(0, 0, buf);
+
+    /* print variable names */
+    for(j = 0; j < varcount ; j++)
+    {
+        if (j > 0)
+        {
+            snprintf(buf, sizeof(buf), ":");
+            FOR_NB_SCREENS(i)
+                screens[i].puts(pos - 2, 1, buf);
+        }
+
+        snprintf(buf, sizeof(buf), "%s", P2STR(names[j].string));
+        FOR_NB_SCREENS(i)
+            screens[i].puts(pos, 1, buf);
+
+        pos += strlen(buf) + 3;
+    }
+
+    /* print button instructions */
+    snprintf(buf, sizeof(buf), "%s", str(LANG_MULTIINT_CONFIRM));
+    FOR_NB_SCREENS(i)
+        screens[i].puts(0, 5, buf);
+
+    while(!done)
+    {
+        pos = 0;
+
+        /* print variables */
+        for(j = 0; j < varcount; j++)
+        {
+            if (j > 0)
+            {
+                snprintf(buf, sizeof(buf), " :");
+                FOR_NB_SCREENS(i)
+                screens[i].puts(pos - 3, 3, buf);
+            }
+
+            snprintf(buf, sizeof(buf), "%d", value[j]);
+
+            FOR_NB_SCREENS(i)
+                 screens[i].puts(pos, 3, buf);
+
+            snprintf(buf, sizeof(buf), "%d", variable[j].setting_max);
+
+#ifdef HAVE_LCD_BITMAP
+            /* highlight currently selected integer */
+            if (cursor == j)
+            {
+                FOR_NB_SCREENS(i)
+                {
+                    screens[i].set_drawmode(DRMODE_COMPLEMENT);
+                    screens[i].fillrect(pos * w - 1, 8 + 3 * h,
+                                            strlen(buf)*w + 1, h);
+                    screens[i].set_drawmode(DRMODE_SOLID);
+                }
+            }
+#endif
+
+            pos += strlen(buf) + 3;
+        }
+
+#ifdef HAVE_LCD_BITMAP
+       FOR_NB_SCREENS(i)
+           screens[i].update();
+#endif
+
+        button = get_action(CONTEXT_SETTINGS, TIMEOUT_BLOCK);
+
+        switch (button)
+        {
+            case ACTION_STD_NEXT:
+                cursor ++;
+
+                if (cursor >= varcount)
+                    cursor = varcount - 1;
+
+                if (global_settings.talk_menu)
+                    talk_id(names[cursor].voice_id, false);
+                break;
+
+            case ACTION_STD_PREV:
+                /* cancel if pressing left when cursor
+                   is already at the far left */
+                if (cursor == 0)
+                {
+                    *changes_accepted = false;
+                    gui_syncsplash(HZ/2, str(LANG_MENU_SETTING_CANCEL));
+                    done = true;
+                }
+                else
+                {
+                    cursor --;
+
+                    if (cursor < 0)
+                        cursor = 0;
+
+                    if (global_settings.talk_menu)
+                        talk_id(names[cursor].voice_id, false);
+                }
+                break;
+
+            case ACTION_SETTINGS_INC:
+            case ACTION_SETTINGS_INCREPEAT:
+                value[cursor] += 1;
+
+                if (value[cursor] > variable[cursor].setting_max)
+                    value[cursor] = 0;
+
+                if (global_settings.talk_menu)
+                    talk_unit(INT, value[cursor], NULL);
+                break;
+
+            case ACTION_SETTINGS_DEC:
+            case ACTION_SETTINGS_DECREPEAT:
+                value[cursor] -= 1;
+
+                if (value[cursor] < 0)
+                    value[cursor] = variable[cursor].setting_max;
+
+                if (global_settings.talk_menu)
+                    talk_unit(INT, value[cursor], NULL);
+                break;
+
+            case ACTION_STD_OK:
+                *changes_accepted = true;
+                done = true;
+                break;
+
+            case ACTION_STD_CANCEL:
+                *changes_accepted = false;
+                gui_syncsplash(HZ/2, str(LANG_MENU_SETTING_CANCEL));
+                done = true;
+
+            default:
+                if (default_event_handler(button) == SYS_USB_CONNECTED)
+                    return true;
+        }
+    }
+    /* store values if accepted */
+    if(*changes_accepted)
+    {
+        for(j = 0; j < varcount; j++)
+           *(int*)variable[j].setting = value[j];  
+    }
+
+    action_signalscreenchange();
+
+    return false;
+}
+
 /* NOTE: the 'type' parameter specifies the actual type of the variable
    that 'variable' points to. not the value within. Only variables with
    type 'bool' should use parameter BOOL.
