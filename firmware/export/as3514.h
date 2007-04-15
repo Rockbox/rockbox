@@ -23,14 +23,12 @@
 #include <stdbool.h>
 
 extern int tenthdb2master(int db);
-extern int tenthdb2mixer(int db);
 
 extern void audiohw_reset(void);
 extern int audiohw_init(void);
 extern void audiohw_enable_output(bool enable);
 extern int audiohw_set_master_vol(int vol_l, int vol_r);
 extern int audiohw_set_lineout_vol(int vol_l, int vol_r);
-extern int audiohw_set_mixer_vol(int channel1, int channel2);
 extern int audiohw_mute(int mute);
 extern void audiohw_close(void);
 extern void audiohw_set_sample_rate(int sampling_control);

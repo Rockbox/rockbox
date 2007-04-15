@@ -19,21 +19,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "lcd.h"
 #include "cpu.h"
-#include "kernel.h"
-#include "thread.h"
-#include "power.h"
 #include "debug.h"
 #include "system.h"
-#include "sprintf.h"
-#include "button.h"
-#include "string.h"
-#include "file.h"
-#include "buffer.h"
-#include "audio.h"
-#include "backlight.h"
-#include "logf.h"
 
 #include "as3514.h"
 #include "i2s.h"
@@ -74,19 +62,6 @@ int tenthdb2master(int db)
     }
 }
 
-/* convert tenth of dB volume (-405..60) to mixer volume register value */
-int tenthdb2mixer(int db)
-{
-    /* FIXME: Make this sensible */
-    if (db < -405) {
-        return 0x0;
-    } else if (db >= 60) {
-        return 0x1f;
-    } else {
-        return((db+405)/15);
-    }
-}
-
 void audiohw_reset(void);
 
 /*
@@ -122,10 +97,10 @@ int audiohw_init(void)
     i2s_reset();
 
     /* Set ADC off, mixer on, DAC on, line out off, line in off, mic off */
-    as3514_write(AUDIOSET1, 0x60); /* Turn on DAC and mixer */
+    as3514_write(AUDIOSET1, 0x20); /* Turn on DAC */
     as3514_write(AUDIOSET3, 0x5); /* Set HPCM off, ZCU off*/
     as3514_write(HPH_OUT_R, 0xc0 | 0x16); /* set vol and set speaker over-current to 0 */
-    as3514_write(HPH_OUT_L, 0x40 | 0x16); /* set default vol for headphone */
+    as3514_write(HPH_OUT_L, 0x16); /* set default vol for headphone */
     as3514_write(PLLMODE, 0x04);
 
     /* read all reg values */
@@ -144,9 +119,7 @@ void audiohw_postinit(void)
 /* Silently enable / disable audio output */
 void audiohw_enable_output(bool enable)
 {
-
     int curr;
-
     curr = as3514_regs[HPH_OUT_L];
 
     if (enable)
@@ -154,11 +127,11 @@ void audiohw_enable_output(bool enable)
         /* reset the I2S controller into known state */
         i2s_reset();
 
-        as3514_write(HPH_OUT_L, curr | 0xc0); /* Mute off, power on */
+        as3514_write(HPH_OUT_L, curr | 0x40); /* power on */
         audiohw_mute(0);
     } else {
         audiohw_mute(1);
-        as3514_write(HPH_OUT_L, curr | 0x80); /* Mute on, power off */
+        as3514_write(HPH_OUT_L, curr & ~(0x40)); /* power off */
     }
 }
 
@@ -186,19 +159,11 @@ int audiohw_set_lineout_vol(int vol_l, int vol_r)
     return 0;
 }
 
-int audiohw_set_mixer_vol(int channel1, int channel2)
-{
-    (void)channel1;
-    (void)channel2;
-
-    return 0;
-}
-
 int audiohw_mute(int mute)
 {
     int curr;
-
     curr = as3514_regs[HPH_OUT_L];
+
     if (mute)
     {
         as3514_write(HPH_OUT_L, curr | 0x80);
@@ -214,9 +179,6 @@ void audiohw_close(void)
 {
     /* mute headphones */
     audiohw_mute(1);
-
-    /* mute mixer */
-    as3514_write(AUDIOSET1, 0x0);
 
     /* turn off everything */
     as3514_write(AUDIOSET1, 0x0);
@@ -234,7 +196,6 @@ void audiohw_enable_recording(bool source_mic)
 
 void audiohw_disable_recording(void)
 {
-    int curr;
 }
 
 void audiohw_set_recvol(int left, int right, int type)
