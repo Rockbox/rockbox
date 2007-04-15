@@ -16,13 +16,18 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _ADC_H_
-#define _ADC_H_
+#ifndef _ADC_TARGET_H_
+#define _ADC_TARGET_H_
 
-#include "config.h"
-#include "adc-target.h"
+#define NUM_ADC_CHANNELS 8
 
-unsigned short adc_read(int channel);
-void adc_init(void);
+#define ADC_BUTTON_LEFT         0
+#define ADC_BUTTON_MENU         1
+#define ADC_BUTTON_RIGHT        2 
+#define ADC_BUTTON_PLAY         3
+#define ADC_UNREG_POWER         6 /* Battery voltage with a better scaling */
+#define ADC_EXT_POWER           7 /* The external power voltage, 0v or 2.7v */
 
-#endif /* _ADC_H_ */
+#define EXT_SCALE_FACTOR 14800
+
+#endif /* _ADC_TARGET_H_ */

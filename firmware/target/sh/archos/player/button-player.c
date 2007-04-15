@@ -54,13 +54,13 @@ int button_read_device(void)
     int data;
 
     /* buttons are active low */
-    if (adc_read(0) < 0x180)
+    if (adc_read(ADC_BUTTON_LEFT) < 0x180)
         btn = BUTTON_LEFT;
-    if (adc_read(1) < 0x180)
+    if (adc_read(ADC_BUTTON_MENU) < 0x180)
         btn |= BUTTON_MENU;
-    if (adc_read(2) < 0x180)
+    if (adc_read(ADC_BUTTON_RIGHT) < 0x180)
         btn |= BUTTON_RIGHT;
-    if (adc_read(3) < 0x180)
+    if (adc_read(ADC_BUTTON_PLAY) < 0x180)
         btn |= BUTTON_PLAY;
 
     /* check port A pins for ON and STOP */

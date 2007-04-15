@@ -23,9 +23,7 @@
 #include "thread.h"
 #include "string.h"
 #include "adc.h"
-#include "pcf50606.h"
 
-#if CONFIG_CPU == SH7034
 /**************************************************************************
  ** The A/D conversion is done every tick, in three steps:
  **
@@ -108,5 +106,3 @@ void adc_init(void)
     
     sleep(2);    /* Ensure valid readings when adc_init returns */
 }
-
-#endif

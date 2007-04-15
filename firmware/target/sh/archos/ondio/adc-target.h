@@ -16,13 +16,20 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _ADC_H_
-#define _ADC_H_
+#ifndef _ADC_TARGET_H_
+#define _ADC_TARGET_H_
 
-#include "config.h"
-#include "adc-target.h"
+#define NUM_ADC_CHANNELS 8
 
-unsigned short adc_read(int channel);
-void adc_init(void);
+#define ADC_MMC_SWITCH          0 /* low values if MMC inserted */
+#define ADC_USB_POWER           1 /* USB, reads 0x000 when USB is inserted */
+#define ADC_BUTTON_OPTION       2 /* the option button, low value if pressed */
+#define ADC_BUTTON_ONOFF        3 /* the on/off button, high value if pressed */
+#define ADC_BUTTON_ROW1         4 /* Used for scanning the keys, different
+                                     voltages for different keys */
+#define ADC_USB_ACTIVE          5 /* USB bridge activity */
+#define ADC_UNREG_POWER         7 /* Battery voltage */
 
-#endif /* _ADC_H_ */
+#define EXT_SCALE_FACTOR 14800
+
+#endif /* _ADC_TARGET_H_ */

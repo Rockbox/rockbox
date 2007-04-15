@@ -93,7 +93,6 @@ drivers/lcd-remote-2bit-vi.c
 /* Misc. */
 drivers/led.c
 #ifndef TARGET_TREE
-drivers/adc.c
 drivers/power.c
 #endif /* TARGET_TREE */
 #ifndef SIMULATOR
@@ -232,6 +231,7 @@ drivers/arcotg_udc.c
 bitswap.S
 descramble.S
 drivers/i2c.c
+target/sh/adc-sh.c
 target/sh/crt0.S
 target/sh/memcpy-sh.S
 target/sh/memmove-sh.S
@@ -328,7 +328,7 @@ target/sh/archos/player/usb-player.c
 target/sh/archos/ata-archos.c
 target/sh/archos/ata-as-archos.S
 target/sh/archos/lcd-archos-bitmap.c
-target/sh/archos/lcd-as-archos-bitmap.S
+target/sh/archos/lcd-as-archos-bitmap.S   
 target/sh/archos/recorder/button-recorder.c
 target/sh/archos/recorder/usb-recorder.c
 #endif /* SIMULATOR */
