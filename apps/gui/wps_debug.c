@@ -397,13 +397,15 @@ void print_line_info(struct wps_data *data)
 
 void print_wps_strings(struct wps_data *data)
 {
+    int i, len, total_len = 0, buf_used = 0;
+
     DEBUGF("Strings:\n");
-    int i, len = 0, buf_used = 0;
     for (i = 0; i < data->num_strings; i++)
     {
-        len += strlen(data->strings[i]);
-        buf_used += strlen(data->strings[i]) + 1;
-        DEBUGF("%2d: (%2d) '%s'\n", i, strlen(data->strings[i]), data->strings[i]);
+        len = strlen(data->strings[i]);
+        total_len += len;
+        buf_used += len + 1;
+        DEBUGF("%2d: (%2d) '%s'\n", i, len, data->strings[i]);
     }
     DEBUGF("\n");
     DEBUGF("Total string length: %d\n", len);
