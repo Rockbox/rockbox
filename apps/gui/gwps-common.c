@@ -1175,6 +1175,13 @@ static char *get_token_value(struct gui_wps *gwps,
             snprintf(buf, buf_size, "%d", id3->rating);
             return buf;
 
+        case WPS_TOKEN_DATABASE_SCORE:
+            if (intval)
+                *intval = id3->score + 1;
+            
+            snprintf(buf, buf_size, "%d", id3->score);
+            return buf;
+
 #if (CONFIG_CODEC == SWCODEC)
         case WPS_TOKEN_CROSSFADE:
             if (intval)

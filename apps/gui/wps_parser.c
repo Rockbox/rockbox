@@ -232,6 +232,7 @@ static const struct wps_tag all_tags[] = {
 
     { WPS_TOKEN_DATABASE_PLAYCOUNT,       "rp",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_DATABASE_RATING,          "rr",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_DATABASE_SCORE,           "rs",  WPS_REFRESH_DYNAMIC, NULL },
 #if CONFIG_CODEC == SWCODEC
     { WPS_TOKEN_REPLAYGAIN,               "rg",  WPS_REFRESH_STATIC,  NULL },
     { WPS_TOKEN_CROSSFADE,                "xf",  WPS_REFRESH_DYNAMIC, NULL },
