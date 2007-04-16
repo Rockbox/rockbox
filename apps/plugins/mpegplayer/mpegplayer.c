@@ -1452,7 +1452,7 @@ static void video_thread(void)
             if (frame_drop_level > 1 || offset > CLOCK_RATE*167/1000)
             {
                 /* Frame type: I/P/B/D */
-                int type = info->display_picture->flags & PIC_MASK_CODING_TYPE;
+                int type = info->current_picture->flags & PIC_MASK_CODING_TYPE;
 
                 /* Things are running a bit late or all frames are being
                    dropped until a key frame */
