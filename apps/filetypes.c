@@ -75,12 +75,33 @@ static char *filetypes_strdup(char* string)
 static void read_builtin_types(void);
 static void read_config(char* config_file);
 #ifdef HAVE_LCD_BITMAP
+
+static void reset_icons(void)
+{
+    int i, j, count;
+    const struct filetype *types;
+    tree_get_filetypes(&types, &count);
+    for (i=1; i<filetype_count; i++) /* 0 is folders */
+    {
+        filetypes[i].icon = Icon_Questionmark;
+        for (j=0; j<count; j++)
+        {
+            if (filetypes[i].extension &&
+                !strcmp(filetypes[i].extension, types[j].extension))
+            {
+                filetypes[i].icon = types[j].icon;
+                break;
+            }
+        }
+    }
+}
 void read_viewer_theme_file(void)
 {
     char buffer[MAX_PATH];
     int fd;
     char *ext, *icon;
     int i;
+    reset_icons();
     snprintf(buffer, MAX_PATH, "%s/%s.icons", ICON_DIR, 
              global_settings.viewers_icon_file);
     fd = open(buffer, O_RDONLY);
@@ -264,6 +285,8 @@ char* filetype_get_plugin(const struct entry* file)
     static char plugin_name[MAX_PATH];
     int index = find_attr(file->attr);
     if (index < 0)
+        return NULL;
+    if (filetypes[index].viewer == NULL)
         return NULL;
     snprintf(plugin_name, MAX_PATH, "%s/%s.%s", 
              filetypes[index].viewer? VIEWERS_DIR: PLUGIN_DIR,

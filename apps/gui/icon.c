@@ -42,7 +42,7 @@
 #define DEFAULT_VIEWER_BMP          ICON_DIR "/viewers.bmp"
 #define DEFAULT_REMOTE_VIEWER_BMP   ICON_DIR "/remote_viewers.bmp"
 
-/* These should robably be moved to config-<target>.h */
+/* These should probably be moved to config-<target>.h */
 #define MAX_ICON_HEIGHT 24
 #define MAX_ICON_WIDTH 24
 
@@ -213,9 +213,9 @@ static void load_icons(const char* filename, enum Iconset iconset)
             break;
 #ifdef HAVE_REMOTE_LCD
         case Iconset_Remotescreen:
-            loaded_ok = &custom_icons_loaded[SCREEN_MAIN];
-            bmp = &user_iconset[SCREEN_MAIN];
-            bmp->data = icon_buffer[SCREEN_MAIN];
+            loaded_ok = &custom_icons_loaded[SCREEN_REMOTE];
+            bmp = &user_iconset[SCREEN_REMOTE];
+            bmp->data = icon_buffer[SCREEN_REMOTE];
             break;
         case Iconset_Remotescreen_viewers:
             loaded_ok = &viewer_icons_loaded[SCREEN_REMOTE];
