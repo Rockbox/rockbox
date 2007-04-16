@@ -134,8 +134,8 @@ void screen_put_iconxy(struct screen * display,
     else if (icon >= Icon_Last_Themeable)
     {
         icon -= Icon_Last_Themeable;
-        if (!viewer_icons_loaded[screen] || 
-           (icon*ICON_HEIGHT(screen) > viewer_iconset[screen].height))
+        if (!viewer_icons_loaded[screen]/* || 
+           (icon*ICON_HEIGHT(screen) > viewer_iconset[screen].height)*/)
         {
             screen_clear_area(display, xpos, ypos,
                           ICON_WIDTH(screen), ICON_HEIGHT(screen));
@@ -270,7 +270,7 @@ void icons_init(void)
         load_icons(path, Iconset_Remotescreen_viewers);
     }
     else
-        load_icons(DEFAULT_REMOTE_VIEWER_BMP, Iconset_Mainscreen_viewers);
+        load_icons(DEFAULT_REMOTE_VIEWER_BMP, Iconset_Remotescreen_viewers);
 #endif
 }
 

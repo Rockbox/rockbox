@@ -75,33 +75,12 @@ static char *filetypes_strdup(char* string)
 static void read_builtin_types(void);
 static void read_config(char* config_file);
 #ifdef HAVE_LCD_BITMAP
-
-static void reset_icons(void)
-{
-    int i, j, count;
-    const struct filetype *types;
-    tree_get_filetypes(&types, &count);
-    for (i=1; i<filetype_count; i++) /* 0 is folders */
-    {
-        filetypes[i].icon = Icon_Questionmark;
-        for (j=0; j<count; j++)
-        {
-            if (filetypes[i].extension &&
-                !strcmp(filetypes[i].extension, types[j].extension))
-            {
-                filetypes[i].icon = types[j].icon;
-                break;
-            }
-        }
-    }
-}
 void read_viewer_theme_file(void)
 {
     char buffer[MAX_PATH];
     int fd;
     char *ext, *icon;
     int i;
-    reset_icons();
     snprintf(buffer, MAX_PATH, "%s/%s.icons", ICON_DIR, 
              global_settings.viewers_icon_file);
     fd = open(buffer, O_RDONLY);
@@ -119,7 +98,8 @@ void read_viewer_theme_file(void)
                     filetypes[i].icon = atoi(icon+1);
                 else if (*icon == '-')
                     filetypes[i].icon = Icon_NOICON;
-                else filetypes[i].icon = Icon_Last_Themeable + atoi(icon);
+                else if (*icon >= '0' && *icon <= '9')
+                    filetypes[i].icon = Icon_Last_Themeable + atoi(icon);
                 break;
             }
         }
@@ -234,7 +214,8 @@ static void read_config(char* config_file)
             filetypes[filetype_count].icon = atoi(s+1);
         else if (*s == '-')
             filetypes[filetype_count].icon = Icon_NOICON;
-        else filetypes[filetype_count].icon = Icon_Last_Themeable + atoi(s);
+        else if (*s >= '0' && *s <= '9')
+            filetypes[filetype_count].icon = Icon_Last_Themeable + atoi(s);
 #else
         filetypes[filetype_count].icon = Icon_NOICON;
 #endif
