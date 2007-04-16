@@ -39,8 +39,8 @@
 #include <remote_default_icons.h>
 #endif
 
-#define DEFAULT_VIEWER_BMP          ICON_DIR "/viewers.bmp"
-#define DEFAULT_REMOTE_VIEWER_BMP   ICON_DIR "/remote_viewers.bmp"
+#define DEFAULT_VIEWER_BMP          "/viewers.bmp"
+#define DEFAULT_REMOTE_VIEWER_BMP   "/remote_viewers.bmp"
 
 /* These should probably be moved to config-<target>.h */
 #define MAX_ICON_HEIGHT 24
@@ -123,19 +123,20 @@ void screen_put_iconxy(struct screen * display,
 {
     fb_data *data;
     int screen = display->screen_type;
+    int width = ICON_WIDTH(screen);
+    int height = ICON_HEIGHT(screen);
     lcd_draw_func draw_func = NULL;
     
     if (icon == Icon_NOICON)
     {
-        screen_clear_area(display, xpos, ypos,
-                          ICON_WIDTH(screen), ICON_HEIGHT(screen));
+        screen_clear_area(display, xpos, ypos, width, height);
         return;
     }
     else if (icon >= Icon_Last_Themeable)
     {
         icon -= Icon_Last_Themeable;
         if (!viewer_icons_loaded[screen] || 
-           (icon*ICON_HEIGHT(screen) > viewer_iconset[screen].height))
+           (icon * height > viewer_iconset[screen].height))
         {
 #ifdef HAVE_REMOTE_LCD
             if (screen == SCREEN_REMOTE)
@@ -144,8 +145,7 @@ void screen_put_iconxy(struct screen * display,
                 return;
             }
 #endif
-            screen_clear_area(display, xpos, ypos,
-                          ICON_WIDTH(screen), ICON_HEIGHT(screen));
+            screen_clear_area(display, xpos, ypos,  width, height);
             return;
         }
         data = (fb_data *)viewer_iconset[screen].data;
@@ -177,9 +177,8 @@ void screen_put_iconxy(struct screen * display,
 #endif /* LCD_DEPTH == 16 */
     
     draw_func(  (const fb_data *)data,
-                0, ICON_HEIGHT(screen)*icon, 
-                ICON_WIDTH(screen), xpos, ypos, 
-                ICON_WIDTH(screen), ICON_HEIGHT(screen));
+                0, height * icon, width, xpos, ypos, 
+                 width, height);
 }
 
 void screen_put_cursorxy(struct screen * display, int x, int y, bool on)
@@ -200,11 +199,17 @@ enum Iconset {
 #endif
 };
 
-static void load_icons(const char* filename, enum Iconset iconset)
+static void load_icons(const char* filename, enum Iconset iconset, 
+    bool allow_disable)
 {
     int size_read;
     bool *loaded_ok = NULL;
     struct bitmap *bmp = NULL;
+    
+    if (!(*filename))
+    {
+        return;
+    }
     
     switch (iconset)
     {
@@ -233,9 +238,12 @@ static void load_icons(const char* filename, enum Iconset iconset)
     }
     
     *loaded_ok = false;
-    if (filename != NULL)
+    if (!allow_disable || *filename != '-')
     {
-        size_read = read_bmp_file((char*)filename, bmp, IMG_BUFSIZE,
+        char path[MAX_PATH];
+        
+        snprintf(path, sizeof(path), "%s/%s.bmp", ICON_DIR, filename);
+        size_read = read_bmp_file(path, bmp, IMG_BUFSIZE,
                                   FORMAT_NATIVE | FORMAT_DITHER);
         if (size_read > 0)
         {
@@ -247,41 +255,33 @@ static void load_icons(const char* filename, enum Iconset iconset)
 
 void icons_init(void)
 {
-    char path[MAX_PATH];
-    if (global_settings.icon_file[0])
+    load_icons(global_settings.icon_file, Iconset_Mainscreen, true);
+    
+    if (*global_settings.viewers_icon_file)
     {
-        snprintf(path, MAX_PATH, "%s/%s.bmp",
-                 ICON_DIR, global_settings.icon_file);
-        load_icons((global_settings.icon_file[0] == '-')?NULL:path,
-                    Iconset_Mainscreen);
-    }
-    if (global_settings.viewers_icon_file[0])
-    {
-        snprintf(path, MAX_PATH, "%s/%s.bmp",
-                 ICON_DIR, global_settings.viewers_icon_file);
-        load_icons((global_settings.viewers_icon_file[0] == '-')?NULL:path,
-                    Iconset_Mainscreen_viewers);
+        load_icons(global_settings.viewers_icon_file, 
+                   Iconset_Mainscreen_viewers, true);
         read_viewer_theme_file();
     }
     else
-        load_icons(DEFAULT_VIEWER_BMP, Iconset_Mainscreen_viewers);
-#ifdef HAVE_REMOTE_LCD
-    if (global_settings.remote_icon_file[0])
     {
-        snprintf(path, MAX_PATH, "%s/%s.bmp",
-                 ICON_DIR, global_settings.remote_icon_file);
-        load_icons((global_settings.remote_icon_file[0] == '-')?NULL:path,
-                    Iconset_Remotescreen);
+        load_icons(DEFAULT_VIEWER_BMP, Iconset_Mainscreen_viewers, false);
     }
-    if (global_settings.remote_viewers_icon_file[0])
+
+#ifdef HAVE_REMOTE_LCD
+    load_icons(global_settings.remote_icon_file, 
+               Iconset_Remotescreen, true);
+    
+    if (*global_settings.remote_viewers_icon_file)
     {
-        snprintf(path, MAX_PATH, "%s/%s.bmp",
-                 ICON_DIR, global_settings.remote_viewers_icon_file);
-        load_icons((global_settings.remote_viewers_icon_file[0] == '-')?NULL:path,
-                    Iconset_Remotescreen_viewers);
+        load_icons(global_settings.remote_viewers_icon_file,
+                   Iconset_Remotescreen_viewers, true);
     }
     else
-        load_icons(DEFAULT_REMOTE_VIEWER_BMP, Iconset_Remotescreen_viewers);
+    {
+        load_icons(DEFAULT_REMOTE_VIEWER_BMP,
+                   Iconset_Remotescreen_viewers, false);
+    }
 #endif
 }
 
