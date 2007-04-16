@@ -81,7 +81,7 @@ Codec: CONFIG_CODEC
 #ifdef HAVE_REMOTE_LCD
 Remote Depth: LCD_REMOTE_DEPTH
 Remote Icon Width: CONFIG_REMOTE_DEFAULT_ICON_WIDTH
-Remote Icon Height: CONFIG_REMOTE_DEFAULT_ICON_WIDTH
+Remote Icon Height: CONFIG_REMOTE_DEFAULT_ICON_HEIGHT
 #else
 Remote Depth: 0
 #endif
