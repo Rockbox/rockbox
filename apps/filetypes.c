@@ -286,7 +286,7 @@ char* filetype_get_plugin(const struct entry* file)
     int index = find_attr(file->attr);
     if (index < 0)
         return NULL;
-    if (filetypes[index].viewer == NULL)
+    if (filetypes[index].plugin == NULL)
         return NULL;
     snprintf(plugin_name, MAX_PATH, "%s/%s.%s", 
              filetypes[index].viewer? VIEWERS_DIR: PLUGIN_DIR,
