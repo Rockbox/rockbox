@@ -46,6 +46,11 @@ enum screen_type {
 #define MAX_LINES_ON_SCREEN 2
 #endif
 
+typedef void screen_bitmap_part_func(const void *src, int src_x, int src_y,
+                              int stride, int x, int y, int width, int height);
+typedef void screen_bitmap_func(const void *src, int x, int y, int width,
+                              int height);
+
 struct screen
 {
     int width, height;
@@ -79,13 +84,13 @@ struct screen
                         int x, int y, int width, int height);
     void (*mono_bitmap_part)(const unsigned char *src, int src_x, int src_y,
                           int stride, int x, int y, int width, int height);
-    void (*bitmap)(const fb_data *src,
+    void (*bitmap)(const void *src,
                    int x, int y, int width, int height);
-    void (*bitmap_part)(const fb_data *src, int src_x, int src_y,
+    void (*bitmap_part)(const void *src, int src_x, int src_y,
                           int stride, int x, int y, int width, int height);
-    void (*transparent_bitmap)(const fb_data *src,
+    void (*transparent_bitmap)(const void *src,
                                int x, int y, int width, int height);
-    void (*transparent_bitmap_part)(const fb_data *src, int src_x, int src_y,
+    void (*transparent_bitmap_part)(const void *src, int src_x, int src_y,
                                     int stride, int x, int y, int width, int height);
     void (*set_drawmode)(int mode);
 #if defined(HAVE_LCD_COLOR) && defined(LCD_REMOTE_DEPTH) && LCD_REMOTE_DEPTH > 1

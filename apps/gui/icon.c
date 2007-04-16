@@ -116,16 +116,14 @@ void screen_put_icon_with_offset(struct screen * display,
 }
 
 /* x,y in pixels */
-typedef void (*lcd_draw_func)(const fb_data *src, int src_x, int src_y,
-                      int stride, int x, int y, int width, int height);
-void screen_put_iconxy(struct screen * display, 
+void screen_put_iconxy(struct screen * display,
                        int xpos, int ypos, enum themable_icons icon)
 {
-    fb_data *data;
+    const void *data;
     int screen = display->screen_type;
     int width = ICON_WIDTH(screen);
     int height = ICON_HEIGHT(screen);
-    lcd_draw_func draw_func = NULL;
+    screen_bitmap_part_func *draw_func = NULL;
     
     if (icon == Icon_NOICON)
     {
@@ -148,37 +146,28 @@ void screen_put_iconxy(struct screen * display,
             screen_clear_area(display, xpos, ypos,  width, height);
             return;
         }
-        data = (fb_data *)viewer_iconset[screen].data;
+        data = viewer_iconset[screen].data;
     }
     else if (custom_icons_loaded[screen])
     {
-        data = (fb_data *)user_iconset[screen].data;
+        data = user_iconset[screen].data;
     }
     else
     {
-        data = (fb_data *)inbuilt_icons[screen];
+        data = inbuilt_icons[screen];
     }
     /* add some left padding to the icons if they are on the edge */
     if (xpos == 0)
         xpos++;
     
-#ifdef HAVE_REMOTE_LCD
-    if (display->screen_type == SCREEN_REMOTE)
-    {
-        /* Quick and Dirty hack untill lcd bitmap drawing is fixed */
-        draw_func = (lcd_draw_func)lcd_remote_bitmap_part;
-    }
+#if (LCD_DEPTH == 16) || (LCD_REMOTE_DEPTH == 16)
+    if (display->depth == 16)
+        draw_func = display->transparent_bitmap_part;
     else
 #endif
-#if LCD_DEPTH == 16
-        draw_func = display->transparent_bitmap_part;
-#else /* LCD_DEPTH < 16 */
         draw_func = display->bitmap_part;
-#endif /* LCD_DEPTH == 16 */
-    
-    draw_func(  (const fb_data *)data,
-                0, height * icon, width, xpos, ypos, 
-                 width, height);
+
+    draw_func(data, 0, height * icon, width, xpos, ypos, width, height);
 }
 
 void screen_put_cursorxy(struct screen * display, int x, int y, bool on)
