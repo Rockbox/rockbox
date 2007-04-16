@@ -108,10 +108,6 @@ FPS     | 27Mhz   | 100Hz          | 44.1KHz   | 48KHz
 #include "mpeg2.h"
 #include "mpeg_settings.h"
 #include "video_out.h"
-#ifndef ATTR_ALIGN
-#define ATTR_ALIGN(a) __attribute__((aligned (a)))
-#endif
-#include "mpeg2_internal.h"
 #include "../../codecs/libmad/mad.h"
 
 PLUGIN_HEADER
@@ -493,12 +489,13 @@ static void init_mad(void* mad_frame_overlap)
 #define SYSTEM_HEADER_START_CODE    0x000001bbul
 
 /* p = base pointer, b0 - b4 = byte offsets from p */
+/* We only care about the MS 32 bits of the 33 and so the ticks are 45kHz */
 #define TS_FROM_HEADER(p, b0, b1, b2, b3, b4) \
-    ((uint32_t)(((p)[b0] >> 1 << 30) | \
-                ((p)[b1]      << 22) | \
-                ((p)[b2] >> 1 << 15) | \
-                ((p)[b3]      <<  7) | \
-                ((p)[b4] >> 1      )))
+    ((uint32_t)(((p)[b0] >> 1 << 29) | \
+                ((p)[b1]      << 21) | \
+                ((p)[b2] >> 1 << 14) | \
+                ((p)[b3]      <<  6) | \
+                ((p)[b4] >> 2      )))
 
 /* This function demuxes the streams and gives the next stream data pointer */
 static void get_next_data( Stream* str )
@@ -612,10 +609,12 @@ static void get_next_data( Stream* str )
             /* header points to the mpeg2 pes header */
             if (header[7] & 0x80)
             {
+                /* header has a pts */
                 uint32_t pts = TS_FROM_HEADER(header, 9, 10, 11, 12, 13);
 
                 if (stream >= 0xe0)
                 {
+                    /* video stream - header may have a dts as well */
                     uint32_t dts = (header[7] & 0x40) == 0 ?
                         pts : TS_FROM_HEADER(header, 14, 15, 16, 17, 18);
 
@@ -659,10 +658,12 @@ static void get_next_data( Stream* str )
 
             if ((ptsbuf[-1] & 0xe0) == 0x20)
             {
+                /* header has a pts */
                 uint32_t pts = TS_FROM_HEADER(ptsbuf, -1, 0, 1, 2, 3);
 
                 if (stream >= 0xe0)
                 {
+                    /* video stream - header may have a dts as well */
                     uint32_t dts = (ptsbuf[-1] & 0xf0) != 0x30 ?
                         pts : TS_FROM_HEADER(ptsbuf, 4, 5, 6, 7, 18);
 
@@ -723,8 +724,8 @@ static void get_next_data( Stream* str )
 
 /* For simple lowpass filtering of sync variables */
 #define AVERAGE(var, x, count) (((var) * (count-1) + (x)) / (count))
-/* Convert 90kHz PTS/DTS ticks to our clock ticks */
-#define TS_TO_TICKS(pts) ((uint64_t)CLOCK_RATE*(pts) / 90000)
+/* Convert 45kHz PTS/DTS ticks to our clock ticks */
+#define TS_TO_TICKS(pts) ((uint64_t)CLOCK_RATE*(pts) / 45000)
 /* Convert 27MHz ticks to our clock ticks */
 #define TIME_TO_TICKS(stamp) ((uint64_t)CLOCK_RATE*(stamp) / 27000000)
 
@@ -737,26 +738,20 @@ static bool init_mpabuf(void)
     return mpa_buffer != NULL;
 }
 
-#define PTS_QUEUE_LEN  (1 << 4) /* 16 should be way more than sufficient -
+#define PTS_QUEUE_LEN  (1 << 5) /* 32 should be way more than sufficient -
                                    if not, the case is handled */
 #define PTS_QUEUE_MASK (PTS_QUEUE_LEN-1)
 struct pts_queue_slot
 {
     uint32_t pts;   /* Time stamp for packet          */
     ssize_t  size;  /* Number of bytes left in packet */
-} pts_queue[PTS_QUEUE_MASK+1];
+} pts_queue[PTS_QUEUE_LEN];
 
  /* This starts out wr == rd but will never be emptied to zero during
     streaming again in order to support initializing the first packet's
     pts value without a special case */
 static unsigned pts_queue_rd;
 static unsigned pts_queue_wr;
-
-/* Resets the pts queue - call when starting and seeking */
-static void pts_queue_reset(void)
-{
-    pts_queue_rd = pts_queue_wr;
-}
 
 /* Increments the queue head postion - should be used to preincrement */
 static bool pts_queue_add_head(void)
@@ -788,6 +783,16 @@ static struct pts_queue_slot * pts_queue_head(void)
 static struct pts_queue_slot * pts_queue_tail(void)
 {
     return &pts_queue[pts_queue_rd & PTS_QUEUE_MASK];
+}
+
+/* Resets the pts queue - call when starting and seeking */
+static void pts_queue_reset(void)
+{
+    struct pts_queue_slot *pts;
+    pts_queue_rd = pts_queue_wr;
+    pts = pts_queue_tail();
+    pts->pts = 0;
+    pts->size = 0;    
 }
 
 struct pcm_frame_header     /* Header added to pcm data every time a decoded
@@ -992,6 +997,21 @@ static void audio_thread(void)
         if (audiostatus == PLEASE_STOP)
            goto done;
 
+        if (pts->size <= 0)
+        {
+            /* Carry any overshoot to the next size since we're technically
+               -pts->size bytes into it already. If size is negative an audio
+               frame was split accross packets. Old has to be saved before
+               moving the tail. */
+            if (pts_queue_remove_tail())
+            {
+                struct pts_queue_slot *old = pts;
+                pts = pts_queue_tail();
+                pts->size += old->size;
+                old->size = 0;
+            }
+        }
+
         /** Buffering **/
         if (mpabuf_used >= MPA_MAX_FRAME_SIZE + MAD_BUFFER_GUARD)
         {
@@ -999,46 +1019,53 @@ static void audio_thread(void)
         }
         else if (audio_str.curr_packet != NULL)
         {
-            /* Get data from next audio packet */
-            len = audio_str.curr_packet_end - audio_str.curr_packet;
-
-            if (audio_str.tagged)
+            do
             {
-                struct pts_queue_slot *stamp = pts;
+                /* Get data from next audio packet */
+                len = audio_str.curr_packet_end - audio_str.curr_packet;
 
-                if (pts_queue_add_head())
+                if (audio_str.tagged)
                 {
-                    stamp = pts_queue_head();
-                    stamp->pts = TS_TO_TICKS(audio_str.curr_pts);
-                    /* pts->size should have been zeroed when slot was freed */
+                    struct pts_queue_slot *stamp = pts;
+
+                    if (pts_queue_add_head())
+                    {
+                        stamp = pts_queue_head();
+                        stamp->pts = TS_TO_TICKS(audio_str.curr_pts);
+                        /* pts->size should have been zeroed when slot was
+                           freed */
+                    }
+                    /* else queue full - just count up from the last to make
+                       it look like more data in the same packet */
+                    stamp->size += len;
+                    audio_str.tagged = 0;
                 }
-                /* else queue full - just count up from the last to make it look
-                   like more data in the same packet */
-                stamp->size += len;
-                audio_str.tagged = 0;
+                else
+                {
+                    /* Add to the one just behind the head - this may be the
+                       tail or the previouly added head - whether or not we'll
+                       ever reach this is quite in question since audio always
+                       seems to have every packet timestamped */
+                    pts_queue_head()->size += len;
+                }
+
+                /* Slide any remainder over to beginning - avoid function
+                   call overhead if no data remaining as well */
+                if (mpabuf > mpa_buffer && mpabuf_used > 0)
+                    rb->memmove(mpa_buffer, mpabuf, mpabuf_used);
+
+                /* Splice this packet onto any remainder */
+                rb->memcpy(mpa_buffer + mpabuf_used, audio_str.curr_packet,
+                           len);
+
+                mpabuf_used += len;
+                mpabuf = mpa_buffer;
+
+                /* Get data from next audio packet */
+                get_next_data(&audio_str);
             }
-            else
-            {
-                /* Add to the one just behind the head - this may be the tail or
-                   the previouly added head - whether or not we'll ever reach this
-                   is quite in question since audio always seems to have every
-                   packet timestamped */
-                pts_queue_head()->size += len;
-            }
-
-            /* Slide any remainder over to beginning - avoid function call overhead if
-               no data remaining as well */
-            if (mpabuf > mpa_buffer && mpabuf_used > 0)
-                rb->memmove(mpa_buffer, mpabuf, mpabuf_used);
-
-            /* Splice this packet onto any remainder */
-            rb->memcpy(mpa_buffer + mpabuf_used, audio_str.curr_packet, len);
-
-            mpabuf_used += len;
-            mpabuf = mpa_buffer;
-
-            /* Move stream position to the next packet */
-            get_next_data(&audio_str);
+            while (audio_str.curr_packet != NULL &&
+                   mpabuf_used < MPA_MAX_FRAME_SIZE + MAD_BUFFER_GUARD);
         }
         else if (mpabuf_used <= 0)
         {
@@ -1051,6 +1078,13 @@ static void audio_thread(void)
 
         mad_stat = mad_frame_decode(&frame, &stream);
 
+        if (stream.next_frame == NULL)
+        {
+            /* What to do here? (This really is fatal) */
+            DEBUGF("/* What to do here? */\n");
+            break;
+        }
+
         /* Next mad stream buffer is the next frame postion */
         mpabuf = (uint8_t *)stream.next_frame;
 
@@ -1058,25 +1092,6 @@ static void audio_thread(void)
         len = stream.next_frame - stream.this_frame;
         mpabuf_used -= len;
         pts->size -= len;
-
-        if (pts->size <= 0)
-        {
-            /* Carry any overshoot to the next size since we're technically
-               -pts->size bytes into it already. If size is negative an audio
-               frame was split accross packets. Old has to be saved before
-               moving the tail. */
-            struct pts_queue_slot *old = pts;
-
-            if (pts_queue_remove_tail())
-            {
-                pts = pts_queue_tail();
-                pts->size += old->size;
-            }
-
-            /* Zero the size of the last slot to simplify stamping code and ensure
-               that it is never negative if the tail didn't move */
-            old->size = 0;
-        }
 
         if (mad_stat != 0)
         {
@@ -1112,13 +1127,6 @@ static void audio_thread(void)
 
         /* Generate the pcm samples */
         mad_synth_frame(&synth, &frame);
-
-        if (stream.next_frame == NULL)
-        {
-            /* What to do here? */
-            DEBUGF("/* What to do here? */\n");
-            break;
-        }
 
         /** Output **/
 
@@ -1257,6 +1265,7 @@ static void video_thread(void)
     char str[80];
     int dither_index = 0;
     uint32_t curr_time = 0;
+    uint32_t period = 0; /* Frame period in clock ticks */
     uint32_t eta_audio = UINT_MAX, eta_video = 0;
     int32_t eta_early = 0, eta_late = 0;
     int frame_drop_level = 0;
@@ -1307,6 +1316,8 @@ static void video_thread(void)
 
             while (videostatus == STREAM_PAUSING)
                 rb->sleep(HZ/10);
+
+            continue;
         }
 
         state = mpeg2_parse (mpeg2dec);
@@ -1336,7 +1347,6 @@ static void video_thread(void)
         case STATE_PICTURE:
         {
             /* A new picture is available - see if we should draw it */
-            uint32_t period; /* Frame period in clock ticks */
             int32_t offset;  /* Tick adjustment to keep sync */
 
             /* No limiting => no dropping so simply make sure skipping is off
@@ -1344,12 +1354,12 @@ static void video_thread(void)
             if (!settings.limitfps)
                 goto picture_done;
 
-            period = TIME_TO_TICKS(info->sequence->frame_period);
-
             /* Get presentation times in audio samples - quite accurate
-               enough */
-            curr_time = (info->current_picture->flags & PIC_FLAG_TAGS) ?
-                TS_TO_TICKS(info->current_picture->tag) : (curr_time + period);
+               enough - add previous frame duration if not stamped */
+            curr_time = (info->display_picture->flags & PIC_FLAG_TAGS) ?
+                TS_TO_TICKS(info->display_picture->tag) : (curr_time + period);
+
+            period = TIME_TO_TICKS(info->sequence->frame_period);
 
             eta_video = curr_time;
             eta_audio = get_stream_time();
@@ -1442,21 +1452,32 @@ static void video_thread(void)
             if (frame_drop_level > 1 || offset > CLOCK_RATE*167/1000)
             {
                 /* Frame type: I/P/B/D */
-                int type = info->current_picture->flags & PIC_MASK_CODING_TYPE;
+                int type = info->display_picture->flags & PIC_MASK_CODING_TYPE;
 
                 /* Things are running a bit late or all frames are being
                    dropped until a key frame */
-
-                if (frame_drop_level > 1 && (type == I_TYPE || type == D_TYPE))
-                    frame_drop_level = 0; /* This frame can be drawn */
+                if (frame_drop_level > 1)
+                {
+                    switch (type)
+                    {
+                    case PIC_FLAG_CODING_TYPE_I:
+                    case PIC_FLAG_CODING_TYPE_D:
+                        frame_drop_level = 0; /* This frame can be drawn */
+                    }
+                }
 
                 if (frame_drop_level <= 1 && offset > CLOCK_RATE*250/1000)
                 {
                     /* Things are very, very late. Resort to stronger measures
                        to keep sync by dropping a I/D/P frame. Drawing cannot
                        take place again until the next key frame. */
-                    if (type == I_TYPE || type == D_TYPE || type == P_TYPE)
+                    switch (type)
+                    {
+                    case PIC_FLAG_CODING_TYPE_I:
+                    case PIC_FLAG_CODING_TYPE_P:
+                    case PIC_FLAG_CODING_TYPE_D:
                         frame_drop_level = 2;
+                    }
                 }
 
                 drop_frame = 1 << frame_drop_level;
@@ -1466,12 +1487,18 @@ static void video_thread(void)
                     /* Timeout has expired and this frame will be drawn if it
                        is available. This may reverse the decision to drop a
                        key frame above. */
-                    if (frame_drop_level <= 1 || type == I_TYPE || type == D_TYPE)
+                    switch (type)
                     {
-                        drop_frame = 0;
+                    default:
+                        if (frame_drop_level <= 1)
+                        {
+                    case PIC_FLAG_CODING_TYPE_I:
+                    case PIC_FLAG_CODING_TYPE_D:
+                            drop_frame = 0;
+                        }
                     }
                 }
-                else if (type == B_TYPE)
+                else if (type == PIC_FLAG_CODING_TYPE_B)
                 {
                     /* We want to drop something, so this B frame won't even be
                        decoded. Drawing can happen on the next frame if so
@@ -1538,7 +1565,7 @@ static void video_thread(void)
                 if (clock_ticks != 0)
                     fps = num_drawn*CLOCK_RATE*10ll / clock_ticks;
 
-                rb->snprintf(str, sizeof(str), "%d.%d %d %d",
+                rb->snprintf(str, sizeof(str), "%d.%d %d %d    ",
                              fps / 10, fps % 10, num_skipped,
                              info->display_picture->temporal_reference);
                 rb->lcd_putsxy(0, 0, str);
