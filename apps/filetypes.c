@@ -84,7 +84,8 @@ void read_viewer_theme_file(void)
     char *ext, *icon;
     int i;
     custom_icons_loaded = false;
-    for (i=0; i<filetype_count; i++)
+    custom_filetype_icons[0] = Icon_Folder;
+    for (i=1; i<filetype_count; i++)
         custom_filetype_icons[i] = Icon_Questionmark;
     
     snprintf(buffer, MAX_PATH, "%s/%s.icons", ICON_DIR, 
