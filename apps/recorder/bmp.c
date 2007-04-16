@@ -215,13 +215,6 @@ int read_bmp_file(char* filename,
     }
 
     height = readlong(&bmph.height);
-    if (height > LCD_HEIGHT) {
-        DEBUGF("read_bmp_file: Bitmap too high (%d pixels, max is %d)\n",
-                        height, LCD_HEIGHT);
-        close(fd);
-        return -5;
-    }
-
     depth = readshort(&bmph.bit_count);
     padded_width = ((width * depth + 31) >> 3) & ~3;  /* 4-byte boundary aligned */
 

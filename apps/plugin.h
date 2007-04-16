@@ -274,7 +274,7 @@ struct plugin_api {
     void (*gui_synclist_flash)(struct gui_synclist * lists);
     unsigned (*gui_synclist_do_button)(struct gui_synclist * lists,
                                          unsigned button,enum list_wrap wrap);
-    void (*gui_synclist_set_title)(struct gui_synclist *lists, char* title, ICON icon);
+    void (*gui_synclist_set_title)(struct gui_synclist *lists, char* title, int icon);
 
     /* button */
     long (*button_get)(bool block);

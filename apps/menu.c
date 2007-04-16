@@ -136,7 +136,7 @@ static char * get_menu_item_name(int selected_item,void * data, char *buffer)
     return P2STR(menu->callback_and_desc->desc);
 }
 #ifdef HAVE_LCD_BITMAP
-static void menu_get_icon(int selected_item, void * data, ICON * icon)
+static int menu_get_icon(int selected_item, void * data)
 {
     const struct menu_item_ex *menu = (const struct menu_item_ex *)data;
     int menu_icon = Icon_NOICON;
@@ -144,8 +144,7 @@ static void menu_get_icon(int selected_item, void * data, ICON * icon)
     
     if ((menu->flags&MENU_TYPE_MASK) == MT_RETURN_ID)
     {
-        *icon = bitmap_icons_6x8[Icon_Menu_functioncall];
-        return;
+        return Icon_Menu_functioncall;
     }
     menu = menu->submenus[selected_item];
     if (menu->flags&MENU_HAS_DESC)
@@ -153,28 +152,24 @@ static void menu_get_icon(int selected_item, void * data, ICON * icon)
     else if (menu->flags&MENU_DYNAMIC_DESC)
         menu_icon = menu->menu_get_name_and_icon->icon_id;
     
-    switch (menu->flags&MENU_TYPE_MASK)
+    if (menu_icon == Icon_NOICON)
     {
-        case MT_SETTING:
-        case MT_SETTING_W_TEXT:
-            *icon = bitmap_icons_6x8[Icon_Menu_setting];
-            break;
-        case MT_MENU:
-            if (menu_icon == Icon_NOICON)
-                *icon = bitmap_icons_6x8[Icon_Submenu];
-            else
-                *icon = bitmap_icons_6x8[menu_icon];
-            break;
-        case MT_FUNCTION_CALL:
-        case MT_RETURN_VALUE:
-            if (menu_icon == Icon_NOICON)
-                *icon = bitmap_icons_6x8[Icon_Menu_functioncall];
-            else 
-                *icon = bitmap_icons_6x8[menu_icon];
-            break;
-        default:
-            *icon = NOICON;
+        switch (menu->flags&MENU_TYPE_MASK)
+        {
+            case MT_SETTING:
+            case MT_SETTING_W_TEXT:
+                menu_icon = Icon_Menu_setting;
+                break;
+            case MT_MENU:
+                    menu_icon = Icon_Submenu;
+                break;
+            case MT_FUNCTION_CALL:
+            case MT_RETURN_VALUE:
+                menu_icon = Icon_Menu_functioncall;
+                break;
+        }
     }
+    return menu_icon;
 }
 #endif
 
@@ -184,7 +179,7 @@ static void init_menu_lists(const struct menu_item_ex *menu,
     int i, count = MENU_GET_COUNT(menu->flags);
     int type = (menu->flags&MENU_TYPE_MASK);
     menu_callback_type menu_callback = NULL;
-    ICON icon = NOICON;
+    int icon;
     current_subitems_count = 0;
 
     if (type == MT_OLD_MENU)
@@ -220,9 +215,9 @@ static void init_menu_lists(const struct menu_item_ex *menu,
     gui_synclist_init(lists,get_menu_item_name,(void*)menu,false,1);
 #ifdef HAVE_LCD_BITMAP
     if (menu->callback_and_desc->icon_id == Icon_NOICON)
-        icon = bitmap_icons_6x8[Icon_Submenu_Entered];
+        icon = Icon_Submenu_Entered;
     else
-        icon = bitmap_icons_6x8[menu->callback_and_desc->icon_id];
+        icon = menu->callback_and_desc->icon_id;
     gui_synclist_set_title(lists, P2STR(menu->callback_and_desc->desc), icon);  
     gui_synclist_set_icon_callback(lists, menu_get_icon);
 #else
@@ -704,10 +699,10 @@ static char* oldmenuwrapper_getname(int selected_item,
 }
 
 #ifdef HAVE_LCD_BITMAP
-static void oldmenu_get_icon(int selected_item, void * data, ICON * icon)
+static int oldmenu_get_icon(int selected_item, void * data)
 {
     (void)data; (void)selected_item;
-    *icon = bitmap_icons_6x8[Icon_Menu_functioncall];
+    return Icon_Menu_functioncall;
 }
 #endif
 
@@ -721,7 +716,7 @@ static void init_oldmenu(const struct menu_item_ex *menu,
     gui_synclist_limit_scroll(lists, true);
 #ifdef HAVE_LCD_BITMAP
     gui_synclist_set_title(lists, menus[menu->value].title,
-                           bitmap_icons_6x8[Icon_Submenu_Entered]);
+                           Icon_Submenu_Entered);
     gui_synclist_set_icon_callback(lists, oldmenu_get_icon);
 #endif
     gui_synclist_select_item(lists, selected);

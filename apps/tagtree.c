@@ -1686,20 +1686,12 @@ int tagtree_get_attr(struct tree_context* c)
     return attr;
 }
 
-#ifdef HAVE_LCD_BITMAP
-const unsigned char* tagtree_get_icon(struct tree_context* c)
-#else
-int   tagtree_get_icon(struct tree_context* c)
-#endif
+int tagtree_get_icon(struct tree_context* c)
 {
     int icon = Icon_Folder;
 
     if (tagtree_get_attr(c) == TREE_ATTR_MPA)
         icon = Icon_Audio;
 
-#ifdef HAVE_LCD_BITMAP
-    return bitmap_icons_6x8[icon];
-#else
     return icon;
-#endif
 }

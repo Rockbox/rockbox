@@ -61,6 +61,8 @@ while(1) {
 
 
 my $firmdir="$ROOT/firmware";
+my $appsdir="$ROOT/apps";
+my $viewer_bmpdir="$ROOT/apps/plugins/bitmaps/viewer_defaults";
 
 my $cppdef = $target;
 
@@ -72,8 +74,17 @@ sub gettargetinfo {
 #ifdef HAVE_LCD_BITMAP
 Bitmap: yes
 Depth: LCD_DEPTH
+Icon Width: CONFIG_DEFAULT_ICON_WIDTH
+Icon Height: CONFIG_DEFAULT_ICON_HEIGHT
 #endif
 Codec: CONFIG_CODEC
+#ifdef HAVE_REMOTE_LCD
+Remote Depth: LCD_REMOTE_DEPTH
+Remote Icon Width: CONFIG_REMOTE_DEFAULT_ICON_WIDTH
+Remote Icon Height: CONFIG_REMOTE_DEFAULT_ICON_WIDTH
+#else
+Remote Depth: 0
+#endif
 STOP
 ;
     close(GCC);
@@ -84,7 +95,9 @@ STOP
 
     open(TARGET, "$c|");
 
-    my ($bitmap, $depth, $swcodec);
+    my ($bitmap, $depth, $swcodec, $icon_h, $icon_w);
+    my ($remote_depth, $remote_icon_h, $remote_icon_w);
+    $icon_count = 1;
     while(<TARGET>) {
         # print STDERR "DATA: $_";
         if($_ =~ /^Bitmap: (.*)/) {
@@ -93,15 +106,31 @@ STOP
         elsif($_ =~ /^Depth: (\d*)/) {
             $depth = $1;
         }
+        elsif($_ =~ /^Icon Width: (\d*)/) {
+            $icon_w = $1;
+        }
+        elsif($_ =~ /^Icon Height: (\d*)/) {
+            $icon_h = $1;
+        }
         elsif($_ =~ /^Codec: (\d*)/) {
             # SWCODEC is 1, the others are HWCODEC
             $swcodec = ($1 == 1);
+        }
+        elsif($_ =~ /^Remote Depth: (\d*)/) {
+            $remote_depth = $1;
+        }
+        elsif($_ =~ /^Remote Icon Width: (\d*)/) {
+            $remote_icon_w = $1;
+        }
+        elsif($_ =~ /^Remote Icon Height: (\d*)/) {
+            $remote_icon_h = $1;
         }
     }
     close(TARGET);
     unlink("gcctemp");
 
-    return ($bitmap, $depth, $swcodec);
+    return ($bitmap, $depth, $icon_w, $icon_h,
+            $swcodec, $remote_depth, $remote_icon_w, $remote_icon_h);
 }
 
 sub filesize {
@@ -130,7 +159,8 @@ sub buildlangs {
 sub buildzip {
     my ($zip, $image, $fonts)=@_;
 
-    my ($bitmap, $depth, $swcodec) = &gettargetinfo();
+    my ($bitmap, $depth, $icon_w, $icon_h, $swcodec,
+        $remote_depth, $remote_icon_w, $remote_icon_h) = &gettargetinfo();
 
     # print "Bitmap: $bitmap\nDepth: $depth\nSwcodec: $swcodec\n";
 
@@ -260,6 +290,14 @@ sub buildzip {
         }
     }
     close VIEWERS;
+    
+    if ($bitmap) {
+        mkdir ".rockbox/icons", 0777;
+        `cp $viewer_bmpdir/viewers.${icon_w}x${icon_h}x$depth.bmp .rockbox/icons/viewers.bmp`;
+        if ($remote_depth) {
+            `cp $viewer_bmpdir/remote_viewers.${remote_icon_w}x${remote_icon_h}x$remote_depth.bmp .rockbox/icons/remote_viewers.bmp`;
+        }
+    }
     
     `cp $ROOT/apps/tagnavi.config .rockbox/`;
       

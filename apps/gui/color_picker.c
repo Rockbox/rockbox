@@ -31,7 +31,7 @@
 #include "lang.h"
 #include "splash.h"
 #include "action.h"
-#include "icons.h"
+#include "icon.h"
 
 /* structure for color info */
 struct rgb_pick
@@ -220,13 +220,11 @@ static void draw_screen(struct screen *display, char *title,
                 /* Draw ">    <" around sliders */
                 int top = text_top + (display->char_height -
                                       SELECTOR_HEIGHT) / 2;
-                display->mono_bitmap(bitmap_icons_6x8[Icon_Cursor],
-                                     MARGIN_LEFT, top,
-                                     SELECTOR_WIDTH, SELECTOR_HEIGHT);
-                display->mono_bitmap(bitmap_icons_6x8[Icon_Reverse_Cursor],
-                                     display->width - MARGIN_RIGHT -
-                                     SELECTOR_WIDTH, top, SELECTOR_WIDTH,
-                                     SELECTOR_HEIGHT);
+                screen_put_iconxy(display, MARGIN_LEFT, top, Icon_Cursor);
+                screen_put_iconxy(display, 
+                                  display->width - MARGIN_RIGHT -
+                                          get_icon_width(display->screen_type), 
+                                          top, Icon_Cursor);
             }
 
             if (display->depth >= 16)

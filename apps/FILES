@@ -47,6 +47,7 @@ plugins/bitmaps/mono/*
 plugins/bitmaps/native/*
 plugins/bitmaps/remote_mono/*
 plugins/bitmaps/remote_native/*
+plugins/bitmaps/viewer_defaults/*
 plugins/chessbox/Makefile
 plugins/chessbox/*.lds
 plugins/chessbox/*.[ch]

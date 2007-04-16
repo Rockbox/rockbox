@@ -49,9 +49,7 @@ enum list_wrap {
  *           the icon after the function returns.
  * Note : we use the ICON type because the real type depends of the plateform
  */
-typedef void list_get_icon(int selected_item,
-                           void * data,
-                           ICON * icon);
+typedef enum themable_icons list_get_icon(int selected_item, void * data);
 /*
  * Text callback
  *  - selected_item : an integer that tells the number of the item to display
@@ -101,7 +99,7 @@ struct gui_list
     /* The optional title, set to NULL for none */
     char * title;
     /* Optional title icon */
-    ICON title_icon;
+    enum themable_icons title_icon;
 };
 
 /*
@@ -190,7 +188,7 @@ extern void gui_synclist_del_item(struct gui_synclist * lists);
 extern void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll);
 extern void gui_synclist_flash(struct gui_synclist * lists);
 extern void gui_synclist_set_title(struct gui_synclist * lists, char * title,
-                                   ICON icon);
+                                   int icon);
 
 /*
  * Do the action implied by the given button,

@@ -25,10 +25,11 @@
 /* init the filetypes structs.
    uses audio buffer for storage, so call early in init... */
 void  filetype_init(void);
+void read_viewer_theme_file(void);
 
 /* Return the attribute (TREE_ATTR_*) of the file */
 int filetype_get_attr(const char* file);
-ICON filetype_get_icon(int attr);
+int filetype_get_icon(int attr);
 /* return the plugin filename associated with the file */
 char* filetype_get_plugin(const struct entry* file);
 

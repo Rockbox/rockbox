@@ -92,7 +92,7 @@ static void gui_list_init(struct gui_list * gui_list,
     gui_list->selected_size=selected_size;
     gui_list->title = NULL;
     gui_list->title_width = 0;
-    gui_list->title_icon = NOICON;
+    gui_list->title_icon = Icon_NOICON;
 
     gui_list->last_displayed_selected_item = -1 ;
     gui_list->last_displayed_start_item = -1 ;
@@ -230,8 +230,6 @@ static int gui_list_get_item_offset(struct gui_list * gui_list, int item_width,
 static void gui_list_draw_smart(struct gui_list *gui_list)
 {
     struct screen * display=gui_list->display;
-    int cursor_pos = 0;
-    int icon_pos = 1;
     int text_pos;
     bool draw_icons = (gui_list->callback_get_item_icon != NULL && global_settings.show_icons);
     bool draw_cursor;
@@ -288,9 +286,9 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
     {
         if (gui_list->title_icon != NOICON && draw_icons)
         {
-            screen_put_iconxy(display, 0, 0, gui_list->title_icon);
+            screen_put_icon(display, 0, 0, gui_list->title_icon);
 #ifdef HAVE_LCD_BITMAP
-            text_pos = 8; /* pixels */
+            text_pos = get_icon_width(display->screen_type)+2; /* pixels */
 #else
             text_pos = 1; /* chars */
 #endif
@@ -327,17 +325,13 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
     if(draw_scrollbar || SHOW_LIST_TITLE) /* indent if there's
                                              a title */
     {
-        cursor_pos++;
-        icon_pos++;
         text_pos += SCROLLBAR_WIDTH;
     }
-    if(!draw_cursor)
-        icon_pos--;
-    else
-        text_pos += CURSOR_WIDTH;
+    if(draw_cursor)
+        text_pos += get_icon_width(display->screen_type) + 2;
 
     if(draw_icons)
-        text_pos += 8;
+        text_pos += get_icon_width(display->screen_type) + 2;
 #else
     draw_cursor = true;
     if(draw_icons)
@@ -413,7 +407,12 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
 #endif
 
             if (draw_cursor)
-                screen_put_cursorxy(display, cursor_pos, i, true);
+            {
+                screen_put_icon_with_offset(display, 0, i,
+                                           (draw_scrollbar || SHOW_LIST_TITLE)?
+                                                   SCROLLBAR_WIDTH: 0,
+                                           0, Icon_Cursor);
+            }
         }
         else
         {/* normal item */
@@ -437,12 +436,19 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
         /* Icons display */
         if(draw_icons)
         {
-            ICON icon;
-            gui_list->callback_get_item_icon(current_item,
-                                             gui_list->data,
-                                             &icon);
-            if(icon)
-                screen_put_iconxy(display, icon_pos, i, icon);
+            enum themable_icons icon;
+            icon = gui_list->callback_get_item_icon(current_item, gui_list->data);
+            if(icon > Icon_NOICON)
+            {
+#ifdef HAVE_LCD_BITMAP
+                int x = draw_cursor?1:0;
+                int x_off = (draw_scrollbar || SHOW_LIST_TITLE) ? SCROLLBAR_WIDTH: 0;
+                screen_put_icon_with_offset(display, x, i,
+                                           x_off, 0, icon);
+#else
+                screen_put_icon(display, 1, i, icon);
+#endif
+            }
         }
     }
 
@@ -737,7 +743,8 @@ void gui_list_screen_scroll_out_of_view(bool enable)
  * Set the title and title icon of the list. Setting title to NULL disables
  * both the title and icon. Use NOICON if there is no icon.
  */
-static void gui_list_set_title(struct gui_list * gui_list, char * title, ICON icon)
+static void gui_list_set_title(struct gui_list * gui_list, 
+                               char * title, enum themable_icons icon)
 {
     gui_list->title = title;
     gui_list->title_icon = icon;
@@ -870,7 +877,7 @@ void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll)
 }
 
 void gui_synclist_set_title(struct gui_synclist * lists,
-                            char * title, ICON icon)
+                            char * title, enum themable_icons icon)
 {
     int i;
     FOR_NB_SCREENS(i)

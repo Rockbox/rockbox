@@ -31,7 +31,7 @@
 #include "logf.h"
 #include "hangul.h"
 #include "action.h"
-#include "icons.h"
+#include "icon.h"
 
 #ifndef O_BINARY
 #define O_BINARY 0
@@ -654,10 +654,9 @@ int kbd_input(char* text, int buflen)
                 /* Draw nicer bitmap arrow if room, else settle for "<". */
                 if (text_w >= 6 && pm->font_h >= 8)
                 {
-                    sc->mono_bitmap(bitmap_icons_6x8[Icon_Reverse_Cursor],
-                                    (text_w - 6) / 2,
-                                    pm->main_y + (pm->font_h - 8) / 2 ,
-                                    6, 8);
+                    screen_put_iconxy(sc, (text_w - 6) / 2,
+                                      pm->main_y + (pm->font_h - 8) / 2 ,
+                                      Icon_Reverse_Cursor);
                 }
                 else
                 {
@@ -672,10 +671,9 @@ int kbd_input(char* text, int buflen)
                 /* Draw nicer bitmap arrow if room, else settle for ">". */
                 if (text_w >= 6 && pm->font_h >= 8)
                 {
-                    sc->mono_bitmap(bitmap_icons_6x8[Icon_Cursor],
-                                    sc->width - text_w + (text_w - 6) / 2,
-                                    pm->main_y + (pm->font_h - 8) / 2,
-                                    6, 8);
+                    screen_put_iconxy(sc, sc->width - text_w + (text_w - 6) / 2,
+                                      pm->main_y + (pm->font_h - 8) / 2,
+                                      Icon_Cursor);
                 }
                 else
                 {

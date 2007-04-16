@@ -40,4 +40,11 @@ usblogo.104x27x1.bmp
 #endif
 #endif
 
+/* List Icons */
+#if LCD_DEPTH == 16
+default_icons.6x8x16.bmp
+#else
+default_icons.6x8x1.bmp
+#endif
+
 #endif /* HAVE_LCD_BITMAP */

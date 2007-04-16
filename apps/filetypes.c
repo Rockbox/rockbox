@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "string.h"
+#include "atoi.h"
 #include <ctype.h>
 
 #include "sprintf.h"
@@ -55,7 +56,7 @@
 #define ROCK_EXTENSION "rock"
 
 struct file_type {
-    ICON_NO_CONST  icon; /* the icon which shall be used for it, NOICON if unknown */
+    int  icon; /* the icon which shall be used for it, NOICON if unknown */
     bool  viewer; /* true if the rock is in viewers, false if in rocks */
     unsigned char  attr; /* FILETYPES_MASK >> 8 */ 
     char* plugin; /* Which plugin to use, NULL if unknown, or builtin */
@@ -73,6 +74,38 @@ static char *filetypes_strdup(char* string)
 }
 static void read_builtin_types(void);
 static void read_config(char* config_file);
+#ifdef HAVE_LCD_BITMAP
+void read_viewer_theme_file(void)
+{
+    char buffer[MAX_PATH];
+    int fd;
+    char *ext, *icon;
+    int i;
+    snprintf(buffer, MAX_PATH, "%s/%s.icons", ICON_DIR, 
+             global_settings.viewers_icon_file);
+    fd = open(buffer, O_RDONLY);
+    if (fd < 0)
+        return;
+    while (read_line(fd, buffer, MAX_PATH) > 0)
+    {
+        if (!settings_parseline(buffer, &ext, &icon))
+            continue;
+        for (i=0; i<filetype_count; i++)
+        {
+            if (filetypes[i].extension && !strcasecmp(ext, filetypes[i].extension))
+            {
+                if (*icon == '*')
+                    filetypes[i].icon = atoi(icon+1);
+                else if (*icon == '-')
+                    filetypes[i].icon = Icon_NOICON;
+                else filetypes[i].icon = Icon_Last_Themeable + atoi(icon);
+                break;
+            }
+        }
+    }
+    close(fd);
+}
+#endif
 
 void  filetype_init(void)
 {
@@ -80,15 +113,14 @@ void  filetype_init(void)
     filetypes[0].extension = NULL;
     filetypes[0].plugin = NULL;
     filetypes[0].attr   = 0;
-    filetypes[0].icon   = 
-#ifdef HAVE_LCD_BITMAP
-                            (ICON_NO_CONST)&bitmap_icons_6x8[Icon_Folder];
-#else
-                            (ICON_NO_CONST)Icon_Folder;
-#endif
+    filetypes[0].icon   = Icon_Folder;
+    
     filetype_count = 1;
     read_builtin_types();
     read_config(VIEWERS_CONFIG);
+#ifdef HAVE_LCD_BITMAP
+    read_viewer_theme_file();
+#endif
 }
 
 /* remove all white spaces from string */
@@ -119,12 +151,7 @@ static void read_builtin_types(void)
         filetypes[filetype_count].attr   = types[i].tree_attr>>8;
         if (filetypes[filetype_count].attr > heighest_attr)
             heighest_attr = filetypes[filetype_count].attr;
-        filetypes[filetype_count].icon   = 
-#ifdef HAVE_LCD_BITMAP
-                            (ICON_NO_CONST)&bitmap_icons_6x8[types[i].icon];
-#else
-                            (ICON_NO_CONST)types[i].icon;
-#endif
+        filetypes[filetype_count].icon   = types[i].icon;
         filetype_count++;
     }
 }
@@ -133,10 +160,6 @@ static void read_config(char* config_file)
 {
     char line[64], *s, *e;
     char extension[8], plugin[32];
-#ifdef HAVE_LCD_BITMAP
-    char icon[ICON_LENGTH];
-    int good_icon;
-#endif
     bool viewer;
     int fd = open(config_file, O_RDONLY);
     if (fd < 0)
@@ -181,44 +204,18 @@ static void read_config(char* config_file)
         filetypes[filetype_count].plugin = filetypes_strdup(plugin);
         filetypes[filetype_count].viewer = viewer;
         filetypes[filetype_count].attr = heighest_attr +1;
+        filetypes[filetype_count].icon = Icon_Questionmark;
         heighest_attr++;
         /* get the icon */
 #ifdef  HAVE_LCD_BITMAP
         s = e+1;
-        good_icon = 1;
-        if (strlen(s) == 12)
-        {
-            int i, j;
-            char val[2]; 
-            for (i = 0; good_icon && i < ICON_LENGTH; i++)
-            {
-                for (j=0; good_icon && j<2; j++)
-                {
-                    val[j] = tolower(s[i*2+j]);
-                    if (val[j] >= 'a' && val[j] <= 'f')
-                    {
-                        val[j] = val[j] - 'a' + 10;
-                    }
-                    else if (val[j] >= '0' && val[j] <= '9')
-                    {
-                        val[j] = val[j] - '0';
-                    }
-                    else 
-                        good_icon = 0;
-                }
-                icon[i]=((val[0]<<4) | val[1]);
-            }
-        }
-        if (good_icon)
-        {
-            filetypes[filetype_count].icon = 
-                                (ICON_NO_CONST)buffer_alloc(ICON_LENGTH);
-            memcpy(filetypes[filetype_count].icon, icon, ICON_LENGTH);
-        }
-        else 
-            filetypes[filetype_count].icon = NOICON;
+        if (*s == '*')
+            filetypes[filetype_count].icon = atoi(s+1);
+        else if (*s == '-')
+            filetypes[filetype_count].icon = Icon_NOICON;
+        else filetypes[filetype_count].icon = Icon_Last_Themeable + atoi(s);
 #else
-        filetypes[filetype_count].icon = Icon_Unknown;
+        filetypes[filetype_count].icon = Icon_NOICON;
 #endif
         filetype_count++;
     }
@@ -254,12 +251,12 @@ static int find_attr(int attr)
     return -1;
 }
 
-ICON filetype_get_icon(int attr)
+int filetype_get_icon(int attr)
 {
     int index = find_attr(attr);
     if (index < 0)
-        return NOICON;
-    return (ICON)filetypes[index].icon;
+        return Icon_NOICON;
+    return filetypes[index].icon;
 }
 
 char* filetype_get_plugin(const struct entry* file)

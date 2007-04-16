@@ -219,20 +219,20 @@ static char * tree_get_filename(int selected_item, void * data, char *buffer)
 }
 
 
-static void tree_get_fileicon(int selected_item, void * data, ICON * icon)
+static int tree_get_fileicon(int selected_item, void * data)
 {
     struct tree_context * local_tc=(struct tree_context *)data;
 #ifdef HAVE_TAGCACHE
     bool id3db = *(local_tc->dirfilter) == SHOW_ID3DB;
     if (id3db) {
-        *icon = (ICON)tagtree_get_icon(&tc);
+        return tagtree_get_icon(&tc);
     }
     else
 #endif
         {
         struct entry* dc = local_tc->dircache;
         struct entry* e = &dc[selected_item];
-        *icon = (ICON)filetype_get_icon(e->attr);
+        return filetype_get_icon(e->attr);
     }
 }
 

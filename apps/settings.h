@@ -55,6 +55,7 @@
 #define LANG_DIR    ROCKBOX_DIR "/langs"
 #define WPS_DIR     ROCKBOX_DIR "/wps"
 #define THEME_DIR   ROCKBOX_DIR "/themes"
+#define ICON_DIR    ROCKBOX_DIR "/icons"
 #define PLUGIN_DIR  ROCKBOX_DIR "/rocks"
 #define VIEWERS_DIR  ROCKBOX_DIR "/viewers"
 #define BACKDROP_DIR ROCKBOX_DIR "/backdrops"
@@ -706,7 +707,13 @@ struct user_settings
     (defined(HAVE_RECORDING) || CONFIG_TUNER)
     int alarm_wake_up_screen;
 #endif
-
+    /* customizable icons */
+    unsigned char icon_file[MAX_FILENAME+1];
+    unsigned char viewers_icon_file[MAX_FILENAME+1];
+#ifdef HAVE_REMOTE_LCD
+    unsigned char remote_icon_file[MAX_FILENAME+1];
+    unsigned char remote_viewers_icon_file[MAX_FILENAME+1];
+#endif
 };
 
 /** global variables **/

@@ -570,7 +570,7 @@ static char *playlist_callback_name(int selected_item, void *data, char *buffer)
 }
 
 
-static void playlist_callback_icons(int selected_item, void *data, ICON * icon)
+static int playlist_callback_icons(int selected_item, void *data)
 {
     struct playlist_viewer * local_viewer=(struct playlist_viewer *)data;
     struct playlist_entry *track=
@@ -578,36 +578,20 @@ static void playlist_callback_icons(int selected_item, void *data, ICON * icon)
     if (track->index == local_viewer->current_playing_track)
     {
         /* Current playing track */
-#ifdef HAVE_LCD_BITMAP
-        *icon=bitmap_icons_6x8[Icon_Audio];
-#else
-        *icon=Icon_Audio;
-#endif
+        return Icon_Audio;
     }
     else if (track->index == local_viewer->move_track)
     {
         /* Track we are moving */
-#ifdef HAVE_LCD_BITMAP
-        *icon=bitmap_icons_6x8[Icon_Moving];
-#else
-        *icon=Icon_Moving;
-#endif
+        return Icon_Moving;
     }
     else if (track->queued)
     {
         /* Queued track */
-#ifdef HAVE_LCD_BITMAP
-        *icon=bitmap_icons_6x8[Icon_Queued];
-#else
-        *icon=Icon_Queued;
-#endif
+        return Icon_Queued;
     }
     else
-#ifdef HAVE_LCD_BITMAP
-        *icon=0;
-#else
-        *icon=-1;
-#endif
+        return Icon_NOICON;
 }
 
 /* Main viewer function.  Filename identifies playlist to be viewed.  If NULL,
@@ -627,13 +611,7 @@ bool playlist_viewer_ex(char* filename)
                   &playlist_callback_icons:NULL);
     gui_synclist_set_nb_items(&playlist_lists, viewer.num_tracks);
     gui_synclist_select_item(&playlist_lists, viewer.selected_track);
-    gui_synclist_set_title(&playlist_lists, str(LANG_PLAYLIST_MENU), 
-#ifdef HAVE_LCD_BITMAP
-                            bitmap_icons_6x8[Icon_Playlist]
-#else
-                            NOICON
-#endif
-                          );
+    gui_synclist_set_title(&playlist_lists, str(LANG_PLAYLIST_MENU), Icon_Playlist);
     gui_synclist_draw(&playlist_lists);
     action_signalscreenchange();
     while (!exit)
@@ -800,17 +778,6 @@ static char *playlist_search_callback_name(int selected_item, void * data, char 
     return(buffer);
 }
 
-
-static void playlist_search_callback_icons(int selected_item, void * data, ICON * icon)
-{
-    (void)selected_item;
-    (void)data;
-#ifdef HAVE_LCD_BITMAP
-        *icon=0;
-#else
-        *icon=-1;
-#endif
-}
 bool search_playlist(void)
 {
     char search_str[32] = "";
@@ -851,9 +818,7 @@ bool search_playlist(void)
     backlight_on();
     gui_synclist_init(&playlist_lists, playlist_search_callback_name,
                                 found_indicies, false, 1);
-    gui_synclist_set_icon_callback(&playlist_lists,
-                  global_settings.playlist_viewer_icons?
-                  &playlist_search_callback_icons:NULL);
+    gui_synclist_set_icon_callback(&playlist_lists, NULL);
     gui_synclist_set_nb_items(&playlist_lists, found_indicies_count);
     gui_synclist_select_item(&playlist_lists, 0);
     gui_synclist_draw(&playlist_lists);

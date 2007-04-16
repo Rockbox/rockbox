@@ -48,7 +48,9 @@ screen_access.c
 gui/buttonbar.c
 gui/gwps.c
 gui/gwps-common.c
+#ifdef HAVE_LCD_BITMAP
 gui/icon.c
+#endif
 gui/list.c
 gui/option_select.c
 gui/quickscreen.c

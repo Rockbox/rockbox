@@ -32,10 +32,6 @@
 #include <remote_rockboxlogo.h>
 #endif
 
-/*
- * Icons of size 6x8 pixels
- */
-
 
 /* Symbolic names for icons */
 enum icons_5x8 {
@@ -47,46 +43,6 @@ enum icons_5x8 {
     Icon_q,
 #endif
     Icon5x8Last
-};
-
-/* If any icons are added to this enum, they must be
-   added to the unused_but_needed enum in ../player/icons.h */
-enum icons_6x8 {
-    Icon_Audio,
-    Icon_Folder,
-    Icon_Playlist,
-    Icon_Cursor,
-    Icon_Wps,
-    Icon_Firmware,
-    Icon_Font,
-    Icon_Language,
-    Icon_Config,
-    Icon_Plugin,
-    Icon_Bookmark,
-    Icon_Preset,
-    Icon_Queued,
-    Icon_Moving,
-    Icon_Keyboard,
-    Icon_Reverse_Cursor,
-    Icon_Questionmark,
-    Icon_Menu_setting,
-    Icon_Menu_functioncall,
-    Icon_Submenu,
-    Icon_Submenu_Entered,
-    Icon_Recording,
-    Icon_Voice,
-    Icon_General_settings_menu,
-    Icon_System_menu,
-    Icon_Playback_menu,
-    Icon_Display_menu,
-    Icon_Remote_Display_menu,
-#if CONFIG_TUNER
-    Icon_Radio_screen,
-#endif
-    Icon_file_view_menu,
-    Icon_EQ,
-    Icon_Rockbox,
-    Icon6x8Last,
 };
 
 enum icons_7x8 {
@@ -144,7 +100,6 @@ extern const unsigned char bitmap_formats_18x8[Format_18x8Last][18];
 #endif /* CONFIG_CODEC == SWCODEC && defined (HAVE_RECORDING) */
 
 extern const unsigned char bitmap_icons_5x8[Icon5x8Last][5];
-extern const unsigned char bitmap_icons_6x8[Icon6x8Last][6];
 extern const unsigned char bitmap_icons_7x8[Icon7x8Last][7];
 extern const unsigned char bitmap_icon_disk[];
 

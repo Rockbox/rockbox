@@ -46,11 +46,7 @@ struct tagentry* tagtree_get_entry(struct tree_context *c, int id);
 bool tagtree_insert_selection_playlist(int position, bool queue);
 char *tagtree_get_title(struct tree_context* c);
 int tagtree_get_attr(struct tree_context* c);
-#ifdef HAVE_LCD_BITMAP
-const unsigned char* tagtree_get_icon(struct tree_context* c);
-#else
-int   tagtree_get_icon(struct tree_context* c);
-#endif
+int tagtree_get_icon(struct tree_context* c);
 int tagtree_get_filename(struct tree_context* c, char *buf, int buflen);
 
 #endif

@@ -3,9 +3,11 @@
 #if (LCD_REMOTE_DEPTH == 1)
 remote_rockboxlogo.128x42x1.bmp
 remote_usblogo.104x27x1.bmp
+remote_default_icons.6x8x1.bmp
 #elif (LCD_REMOTE_DEPTH == 2)
 remote_rockboxlogo.128x42x2.bmp
 remote_usblogo.104x27x2.bmp
+remote_default_icons.6x8x2.bmp
 #endif
 
 #endif /* HAVE_REMOTE_LCD */

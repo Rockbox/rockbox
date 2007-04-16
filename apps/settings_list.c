@@ -1160,6 +1160,21 @@ const struct settings_list settings[] = {
     {F_T_INT, &global_settings.alarm_wake_up_screen, LANG_ALARM_WAKEUP_SCREEN,
         INT(ALARM_START_WPS), "alarm wakeup screen", ALARM_SETTING_TEXT, UNUSED},
 #endif /* HAVE_RTC_ALARM */
+            
+    /* Customizable icons */
+#ifdef HAVE_LCD_BITMAP
+    FILENAME_SETTING(F_THEMESETTING, icon_file, "iconset", "",
+                     ICON_DIR "/", ".bmp", MAX_FILENAME+1),
+    FILENAME_SETTING(F_THEMESETTING, viewers_icon_file, "viewers iconset", "",
+                     ICON_DIR "/", ".bmp", MAX_FILENAME+1),
+#ifdef HAVE_REMOTE_LCD
+    FILENAME_SETTING(F_THEMESETTING, remote_icon_file, "remote iconset", "",
+                     ICON_DIR "/", ".bmp", MAX_FILENAME+1),
+    FILENAME_SETTING(F_THEMESETTING, remote_viewers_icon_file,
+                     "remote viewers iconset", "",
+                     ICON_DIR "/", ".bmp", MAX_FILENAME+1),
+#endif
+#endif /* HAVE_REMOTE_LCD */
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);
