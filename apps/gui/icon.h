@@ -24,15 +24,14 @@
  * char-based displays and bitmap displays */
 #ifdef HAVE_LCD_BITMAP
 typedef const unsigned char * ICON;
-#define NOICON Icon_NOICON
 #else
 typedef long ICON;
-#define NOICON Icon_NOICON
 #endif
 
+#define NOICON Icon_NOICON
 #define FORCE_INBUILT_ICON 0x80000000
 /* Don't #ifdef icon values, or we wont be able to use the same 
-   cmp for every target. */
+   bmp for every target. */
 enum themable_icons {
     Icon_NOICON = -1, /* Dont put this in a .bmp */
     Icon_Audio,

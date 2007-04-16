@@ -708,8 +708,10 @@ struct user_settings
     int alarm_wake_up_screen;
 #endif
     /* customizable icons */
+#ifdef HAVE_LCD_BITMAP
     unsigned char icon_file[MAX_FILENAME+1];
     unsigned char viewers_icon_file[MAX_FILENAME+1];
+#endif
 #ifdef HAVE_REMOTE_LCD
     unsigned char remote_icon_file[MAX_FILENAME+1];
     unsigned char remote_viewers_icon_file[MAX_FILENAME+1];

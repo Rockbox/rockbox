@@ -74,11 +74,11 @@ static const int default_height[NB_SCREENS] = {
 
 #define IMG_BUFSIZE (MAX_ICON_HEIGHT * MAX_ICON_WIDTH * \
                      Icon_Last_Themeable *LCD_DEPTH/8)
-static unsigned char icon_buffer[IMG_BUFSIZE][NB_SCREENS];
+static unsigned char icon_buffer[NB_SCREENS][IMG_BUFSIZE];
 static bool custom_icons_loaded[NB_SCREENS] = {false};
 static struct bitmap user_iconset[NB_SCREENS];
 
-static unsigned char viewer_icon_buffer[IMG_BUFSIZE][NB_SCREENS];
+static unsigned char viewer_icon_buffer[NB_SCREENS][IMG_BUFSIZE];
 static bool viewer_icons_loaded[NB_SCREENS] = {false};
 static struct bitmap viewer_iconset[NB_SCREENS];
 
@@ -252,13 +252,15 @@ void icons_init(void)
     {
         snprintf(path, MAX_PATH, "%s/%s.bmp",
                  ICON_DIR, global_settings.icon_file);
-        load_icons(path, Iconset_Mainscreen);
+        load_icons((global_settings.icon_file[0] == '-')?NULL:path,
+                    Iconset_Mainscreen);
     }
     if (global_settings.viewers_icon_file[0])
     {
         snprintf(path, MAX_PATH, "%s/%s.bmp",
                  ICON_DIR, global_settings.viewers_icon_file);
-        load_icons(path, Iconset_Mainscreen_viewers);
+        load_icons((global_settings.viewers_icon_file[0] == '-')?NULL:path,
+                    Iconset_Mainscreen_viewers);
         read_viewer_theme_file();
     }
     else
@@ -268,13 +270,15 @@ void icons_init(void)
     {
         snprintf(path, MAX_PATH, "%s/%s.bmp",
                  ICON_DIR, global_settings.remote_icon_file);
-        load_icons(path, Iconset_Remotescreen);
+        load_icons((global_settings.remote_icon_file[0] == '-')?NULL:path,
+                    Iconset_Remotescreen);
     }
     if (global_settings.remote_viewers_icon_file[0])
     {
         snprintf(path, MAX_PATH, "%s/%s.bmp",
                  ICON_DIR, global_settings.remote_viewers_icon_file);
-        load_icons(path, Iconset_Remotescreen_viewers);
+        load_icons((global_settings.remote_viewers_icon_file[0] == '-')?NULL:path,
+                    Iconset_Remotescreen_viewers);
     }
     else
         load_icons(DEFAULT_REMOTE_VIEWER_BMP, Iconset_Remotescreen_viewers);

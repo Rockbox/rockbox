@@ -1167,13 +1167,13 @@ const struct settings_list settings[] = {
                      ICON_DIR "/", ".bmp", MAX_FILENAME+1),
     FILENAME_SETTING(F_THEMESETTING, viewers_icon_file, "viewers iconset", "",
                      ICON_DIR "/", ".bmp", MAX_FILENAME+1),
+#endif
 #ifdef HAVE_REMOTE_LCD
     FILENAME_SETTING(F_THEMESETTING, remote_icon_file, "remote iconset", "",
                      ICON_DIR "/", ".bmp", MAX_FILENAME+1),
     FILENAME_SETTING(F_THEMESETTING, remote_viewers_icon_file,
                      "remote viewers iconset", "",
                      ICON_DIR "/", ".bmp", MAX_FILENAME+1),
-#endif
 #endif /* HAVE_REMOTE_LCD */
 };
 

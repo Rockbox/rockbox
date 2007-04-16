@@ -209,6 +209,23 @@ sub buildzip {
 
     mkdir ".rockbox/wps", 0777;
     mkdir ".rockbox/themes", 0777;
+    if ($bitmap) {
+        open(THEME, ">.rockbox/themes/rockbox_default_icons.cfg");
+        print THEME <<STOP
+# this config file was auto-generated to make it
+# easy to reset the icons back to default
+iconset: -
+# taken from apps/gui/icon.c
+viewers iconset: /.rockbox/icons/viewers.bmp
+remote iconset: -
+# taken from apps/gui/icon.c
+remote viewers iconset: /.rockbox/icons/remote_viewers.bmp
+
+STOP
+;
+        close(THEME);
+    }
+    
     mkdir ".rockbox/codepages", 0777;
 
     if($bitmap) {

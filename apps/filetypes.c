@@ -63,6 +63,8 @@ struct file_type {
     char* extension; /* NULL for none */
 };
 static struct file_type filetypes[MAX_FILETYPES];
+static int custom_filetype_icons[MAX_FILETYPES];
+static bool custom_icons_loaded = false;
 static int filetype_count = 0;
 static unsigned char heighest_attr = 0;
 
@@ -81,6 +83,10 @@ void read_viewer_theme_file(void)
     int fd;
     char *ext, *icon;
     int i;
+    custom_icons_loaded = false;
+    for (i=0; i<filetype_count; i++)
+        custom_filetype_icons[i] = Icon_Questionmark;
+    
     snprintf(buffer, MAX_PATH, "%s/%s.icons", ICON_DIR, 
              global_settings.viewers_icon_file);
     fd = open(buffer, O_RDONLY);
@@ -95,16 +101,17 @@ void read_viewer_theme_file(void)
             if (filetypes[i].extension && !strcasecmp(ext, filetypes[i].extension))
             {
                 if (*icon == '*')
-                    filetypes[i].icon = atoi(icon+1);
+                    custom_filetype_icons[i] = atoi(icon+1);
                 else if (*icon == '-')
-                    filetypes[i].icon = Icon_NOICON;
+                    custom_filetype_icons[i] = Icon_NOICON;
                 else if (*icon >= '0' && *icon <= '9')
-                    filetypes[i].icon = Icon_Last_Themeable + atoi(icon);
+                    custom_filetype_icons[i] = Icon_Last_Themeable + atoi(icon);
                 break;
             }
         }
     }
     close(fd);
+    custom_icons_loaded = true;
 }
 #endif
 
@@ -258,6 +265,8 @@ int filetype_get_icon(int attr)
     int index = find_attr(attr);
     if (index < 0)
         return Icon_NOICON;
+    if (custom_icons_loaded)
+        return custom_filetype_icons[index];
     return filetypes[index].icon;
 }
 
