@@ -196,11 +196,6 @@ static void load_icons(const char* filename, enum Iconset iconset,
     struct bitmap *bmp = NULL;
     int bmpformat = (FORMAT_NATIVE|FORMAT_DITHER);
     
-    if (!(*filename))
-    {
-        return;
-    }
-    
     switch (iconset)
     {
         case Iconset_Mainscreen:
@@ -230,7 +225,7 @@ static void load_icons(const char* filename, enum Iconset iconset,
     }
     
     *loaded_ok = false;
-    if (!allow_disable || *filename != '-')
+    if (!allow_disable || (filename[0] && filename[0] != '-'))
     {
         char path[MAX_PATH];
         

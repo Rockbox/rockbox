@@ -268,7 +268,6 @@ static void init(void)
     sleep(HZ/2);
     tree_init();
     filetype_init();
-    icons_init();
     playlist_init();
 
 #if CONFIG_CODEC != SWCODEC
@@ -503,7 +502,6 @@ static void init(void)
     playlist_init();
     tree_init();
     filetype_init();
-    icons_init();
     scrobbler_init();
     cuesheet_init();
 
