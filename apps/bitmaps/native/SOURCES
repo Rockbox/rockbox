@@ -43,6 +43,8 @@ usblogo.104x27x1.bmp
 /* List Icons */
 #if LCD_DEPTH == 16
 default_icons.6x8x16.bmp
+#elif LCD_DEPTH > 1 /* greyscale */
+default_icons.6x8x2.bmp
 #else
 default_icons.6x8x1.bmp
 #endif
