@@ -194,6 +194,7 @@ static void load_icons(const char* filename, enum Iconset iconset,
     int size_read;
     bool *loaded_ok = NULL;
     struct bitmap *bmp = NULL;
+    int bmpformat = (FORMAT_NATIVE|FORMAT_DITHER);
     
     if (!(*filename))
     {
@@ -217,11 +218,13 @@ static void load_icons(const char* filename, enum Iconset iconset,
             loaded_ok = &custom_icons_loaded[SCREEN_REMOTE];
             bmp = &user_iconset[SCREEN_REMOTE];
             bmp->data = icon_buffer[SCREEN_REMOTE];
+            bmpformat |= FORMAT_REMOTE;
             break;
         case Iconset_Remotescreen_viewers:
             loaded_ok = &viewer_icons_loaded[SCREEN_REMOTE];
             bmp = &viewer_iconset[SCREEN_REMOTE];
             bmp->data = viewer_icon_buffer[SCREEN_REMOTE];
+            bmpformat |= FORMAT_REMOTE;
             break;
 #endif
     }
@@ -232,8 +235,7 @@ static void load_icons(const char* filename, enum Iconset iconset,
         char path[MAX_PATH];
         
         snprintf(path, sizeof(path), "%s/%s.bmp", ICON_DIR, filename);
-        size_read = read_bmp_file(path, bmp, IMG_BUFSIZE,
-                                  FORMAT_NATIVE | FORMAT_DITHER);
+        size_read = read_bmp_file(path, bmp, IMG_BUFSIZE, bmpformat);
         if (size_read > 0)
         {
             *loaded_ok = true;
