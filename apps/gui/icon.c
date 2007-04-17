@@ -39,8 +39,8 @@
 #include <remote_default_icons.h>
 #endif
 
-#define DEFAULT_VIEWER_BMP          "/viewers.bmp"
-#define DEFAULT_REMOTE_VIEWER_BMP   "/remote_viewers.bmp"
+#define DEFAULT_VIEWER_BMP          "viewers"
+#define DEFAULT_REMOTE_VIEWER_BMP   "remote_viewers"
 
 /* These should probably be moved to config-<target>.h */
 #define MAX_ICON_HEIGHT 24
