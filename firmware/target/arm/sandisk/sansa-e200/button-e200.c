@@ -166,7 +166,7 @@ int button_read_device(void)
         /* only trigger once per click */
         if ((new_wheel_value == 0x00) || (new_wheel_value == 0xc0))
         {
-            btn = BUTTON_NONE;
+            btn = btn&(~(BUTTON_SCROLL_UP|BUTTON_SCROLL_DOWN));
         }
         if(wheel_backlight_timer==0){
             wheel_backlight_on(true);
