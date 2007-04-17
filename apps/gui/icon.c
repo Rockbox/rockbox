@@ -28,17 +28,12 @@
 #include "bmp.h"
 #include "filetypes.h"
 
-/* Quick and Dirty hack untill lcd bitmap drawing is fixed */
-#ifdef HAVE_REMOTE_LCD
-#include "lcd-remote.h"
-#endif
-
-
 #include <default_icons.h>
 #ifdef HAVE_REMOTE_LCD
 #include <remote_default_icons.h>
 #endif
 
+/* These are just the file names, the full path is snprint'ed when used */
 #define DEFAULT_VIEWER_BMP          "viewers"
 #define DEFAULT_REMOTE_VIEWER_BMP   "remote_viewers"
 
