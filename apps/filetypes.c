@@ -86,7 +86,12 @@ void read_viewer_theme_file(void)
     custom_icons_loaded = false;
     custom_filetype_icons[0] = Icon_Folder;
     for (i=1; i<filetype_count; i++)
-        custom_filetype_icons[i] = Icon_Questionmark;
+    {
+        if (filetypes[i].icon < Icon_Last_Themeable)
+            custom_filetype_icons[i] = filetypes[i].icon;
+        else
+            custom_filetype_icons[i] = Icon_Questionmark;
+    }
     
     snprintf(buffer, MAX_PATH, "%s/%s.icons", ICON_DIR, 
              global_settings.viewers_icon_file);
