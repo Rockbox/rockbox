@@ -72,7 +72,7 @@ int button_read_device(void)
     unsigned char state;
     static bool hold_button = false;
     bool hold_button_old;
-    unsigned int new_wheel_value;
+    unsigned int new_wheel_value = 0; /* read later, but this stops a warning */
 
     /* Hold */
     hold_button_old = hold_button;
@@ -163,6 +163,11 @@ int button_read_device(void)
     }
     
     if( (btn & BUTTON_SCROLL_UP) || (btn & BUTTON_SCROLL_DOWN) ){
+        /* only trigger once per click */
+        if ((new_wheel_value == 0x00) || (new_wheel_value == 0xc0))
+        {
+            btn = BUTTON_NONE;
+        }
         if(wheel_backlight_timer==0){
             wheel_backlight_on(true);
         }
