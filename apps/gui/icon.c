@@ -160,7 +160,7 @@ void screen_put_iconxy(struct screen * display,
     if (xpos == 0)
         xpos++;
     
-#if (LCD_DEPTH == 16) || (LCD_REMOTE_DEPTH == 16)
+#if (LCD_DEPTH == 16) || defined(LCD_REMOTE_DEPTH) && (LCD_REMOTE_DEPTH == 16)
     if (display->depth == 16)
         draw_func = display->transparent_bitmap_part;
     else
