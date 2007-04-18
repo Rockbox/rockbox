@@ -1256,20 +1256,15 @@ static uint32_t video_stack[VIDEO_STACKSIZE / sizeof(uint32_t)] IBSS_ATTR;
 
 static void video_thread(void)
 {
-    /* Time dither to maximally spread frame drops in time to best
-       approximate the appearance of a lower frame rate */
-    static const uint32_t time_dither[8] =
-        { 1, 4, 7, 2, 5, 8, 3, 6 };
     const mpeg2_info_t * info;
     mpeg2_state_t state;
     char str[80];
-    int dither_index = 0;
     uint32_t curr_time = 0;
     uint32_t period = 0; /* Frame period in clock ticks */
     uint32_t eta_audio = UINT_MAX, eta_video = 0;
     int32_t eta_early = 0, eta_late = 0;
     int frame_drop_level = 0;
-    int drop_frame = 0;
+    int skip_level = 0;
     int num_skipped = 0;
     int num_drawn = 0;
     /* Used to decide when to display FPS */
@@ -1293,6 +1288,10 @@ static void video_thread(void)
 
     /* Request the first packet data */
     get_next_data( &video_str );
+
+    if (video_str.curr_packet == NULL)
+        goto done;
+
     mpeg2_buffer (mpeg2dec, video_str.curr_packet, video_str.curr_packet_end);
     total_offset += video_str.curr_packet_end - video_str.curr_packet;
 
@@ -1346,13 +1345,67 @@ static void video_thread(void)
 
         case STATE_PICTURE:
         {
-            /* A new picture is available - see if we should draw it */
+            int skip = 0; /* Assume no skip */
+
+            if (frame_drop_level >= 1 || skip_level > 0)
+            {
+                /* A frame will be dropped in the decoder */
+
+                /* Frame type: I/P/B/D */
+                int type = info->current_picture->flags & PIC_MASK_CODING_TYPE;
+
+                switch (type)
+                {
+                case PIC_FLAG_CODING_TYPE_I:
+                case PIC_FLAG_CODING_TYPE_D:
+                    /* Level 5: Things are extremely late and all frames will be
+                       dropped until the next key frame */
+                    if (frame_drop_level >= 1)
+                        frame_drop_level = 0; /* Key frame - reset drop level */
+                    if (skip_level >= 5)
+                    {
+                        frame_drop_level = 1;
+                        skip_level = 0; /* reset */
+                    }
+                    break;
+                case PIC_FLAG_CODING_TYPE_P:
+                    /* Level 4: Things are very late and all frames will be
+                       dropped until the next key frame */
+                    if (skip_level >= 4)
+                    {
+                        frame_drop_level = 1;
+                        skip_level = 0; /* reset */
+                    }
+                    break;
+                case PIC_FLAG_CODING_TYPE_B:
+                    /* We want to drop something, so this B frame won't even
+                       be decoded. Drawing can happen on the next frame if so
+                       desired. Bring the level down as skips are done. */
+                    skip = 1;
+                    if (skip_level > 0)
+                        skip_level--;
+                }
+
+                skip |= frame_drop_level;
+            }
+
+            mpeg2_skip(mpeg2dec, skip);
+            break;  
+            }
+
+        case STATE_SLICE:
+        case STATE_END:
+        case STATE_INVALID_END:
+        {
             int32_t offset;  /* Tick adjustment to keep sync */
 
-            /* No limiting => no dropping so simply make sure skipping is off
-               in the decoder and the frame will be drawn */
+            /* draw current picture */
+            if (!info->display_fbuf)
+                break;
+
+            /* No limiting => no dropping - draw this frame */
             if (!settings.limitfps)
-                goto picture_done;
+                goto picture_draw;
 
             /* Get presentation times in audio samples - quite accurate
                enough - add previous frame duration if not stamped */
@@ -1383,7 +1436,7 @@ static void video_thread(void)
                     offset = eta_video;
 
                 eta_video -= offset;
-                goto picture_done;
+                goto picture_draw;
             }
 
             /** Possibly skip this frame **/
@@ -1444,115 +1497,67 @@ static void video_thread(void)
                 }
             }
 
-            /* If we are more than 167ms behind schedule and it's
-               been less than 1/2 second since the last frame, skip frame. */
-            dither_index = (dither_index + 1) & 7;
-            offset += time_dither[dither_index]*period >> 3;
-
-            if (frame_drop_level > 1 || offset > CLOCK_RATE*167/1000)
+            if (info->display_picture->flags & PIC_FLAG_SKIP)
             {
-                /* Frame type: I/P/B/D */
-                int type = info->current_picture->flags & PIC_MASK_CODING_TYPE;
-
-                /* Things are running a bit late or all frames are being
-                   dropped until a key frame */
-                if (frame_drop_level > 1)
-                {
-                    switch (type)
-                    {
-                    case PIC_FLAG_CODING_TYPE_I:
-                    case PIC_FLAG_CODING_TYPE_D:
-                        frame_drop_level = 0; /* This frame can be drawn */
-                    }
-                }
-
-                if (frame_drop_level <= 1 && offset > CLOCK_RATE*250/1000)
-                {
-                    /* Things are very, very late. Resort to stronger measures
-                       to keep sync by dropping a I/D/P frame. Drawing cannot
-                       take place again until the next key frame. */
-                    switch (type)
-                    {
-                    case PIC_FLAG_CODING_TYPE_I:
-                    case PIC_FLAG_CODING_TYPE_P:
-                    case PIC_FLAG_CODING_TYPE_D:
-                        frame_drop_level = 2;
-                    }
-                }
-
-                drop_frame = 1 << frame_drop_level;
-
-                if (*rb->current_tick - last_render >= HZ/2)
-                {
-                    /* Timeout has expired and this frame will be drawn if it
-                       is available. This may reverse the decision to drop a
-                       key frame above. */
-                    switch (type)
-                    {
-                    default:
-                        if (frame_drop_level <= 1)
-                        {
-                    case PIC_FLAG_CODING_TYPE_I:
-                    case PIC_FLAG_CODING_TYPE_D:
-                            drop_frame = 0;
-                        }
-                    }
-                }
-                else if (type == PIC_FLAG_CODING_TYPE_B)
-                {
-                    /* We want to drop something, so this B frame won't even be
-                       decoded. Drawing can happen on the next frame if so
-                       desired. Drop level is not affected. */
-                    drop_frame |= 1 << 1;
-                }
-
-                if (drop_frame != 0)
-                {
-                    num_skipped++;
-                    eta_early = INT32_MIN; /* Indicate a dropped frame */
-                }
+                /* This frame was set to skip so skip it after having updated
+                   timing information */
+                num_skipped++;
+                eta_early = INT32_MIN;
+                goto picture_skip;
             }
 
-        picture_done:
-            mpeg2_skip(mpeg2dec, drop_frame >> 1);
-            break;
-            }
-        case STATE_SLICE:
-        case STATE_END:
-        case STATE_INVALID_END:
-            /* draw current picture */
-            if (!info->display_fbuf)
-                break;
-
-            if (settings.limitfps)
+            if (skip_level == 3 && TIME_BEFORE(*rb->current_tick, last_render + HZ/2))
             {
-                /* Framerate regulation is turned on - drop it if STATE_PICTURE said
-                   or wait for it if it's too early to draw it. */
-                if (drop_frame != 0)
-                {
-                    drop_frame = 0;
-                    break;
-                }
-
-                /* Wait until audio catches up */
-                while (eta_video > eta_audio)
-                {
-                    rb->priority_yield();
-
-                    /* Make sure not to get stuck waiting here forever */
-                    if (videostatus != STREAM_PLAYING)
-                        goto rendering_finished;
-
-                    eta_audio = get_stream_time();
-                }
-
-                /* Record last frame time */
-                last_render = *rb->current_tick;
+                /* Render drop was set previously but nothing was dropped in the
+                   decoder or it's been to long since drawing the last frame. */
+                skip_level = 0;
+                num_skipped++;
+                eta_early = INT32_MIN;
+                goto picture_skip;
             }
+
+            /* At this point a frame _will_ be drawn  - a skip may happen on
+               the next however */
+            skip_level = 0;
+
+            if (offset > CLOCK_RATE*110/1000)
+            {
+                /* Decide which skip level is needed in order to catch up */
+
+                /* TODO: Calculate this rather than if...else - this is rather
+                   exponential though */
+                if (offset > CLOCK_RATE*367/1000)
+                    skip_level = 5; /* Decoder skip: I/D */
+                if (offset > CLOCK_RATE*233/1000)
+                    skip_level = 4; /* Decoder skip: P */
+                else if (offset > CLOCK_RATE*167/1000)
+                    skip_level = 3; /* Render skip */
+                else if (offset > CLOCK_RATE*133/1000)
+                    skip_level = 2; /* Decoder skip: B */
+                else
+                    skip_level = 1; /* Decoder skip: B */
+            }
+
+            /* Wait until audio catches up */
+            while (eta_video > eta_audio)
+            {
+                rb->priority_yield();
+
+                /* Make sure not to get stuck waiting here forever */
+                if (videostatus != STREAM_PLAYING)
+                    goto rendering_finished;
+
+                eta_audio = get_stream_time();
+            }
+
+        picture_draw:
+            /* Record last frame time */
+            last_render = *rb->current_tick;
 
             vo_draw_frame(info->display_fbuf->buf);
             num_drawn++;
 
+        picture_skip:
             if (!settings.showfps)
                 break;
 
@@ -1574,6 +1579,8 @@ static void video_thread(void)
                 last_showfps = *rb->current_tick;
             }
             break;
+            }
+
         default:
             break;
         }
