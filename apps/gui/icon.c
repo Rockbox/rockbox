@@ -29,7 +29,7 @@
 #include "filetypes.h"
 
 #include <default_icons.h>
-#ifdef HAVE_REMOTE_LCD
+#if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
 #include <remote_default_icons.h>
 #endif
 
@@ -47,14 +47,14 @@
    so storing them as void* is ok. (stops compile warning) */
 static const void * inbuilt_icons[NB_SCREENS] = {
         (void*)default_icons
-#ifdef HAVE_REMOTE_LCD
+#if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
       , (void*)remote_default_icons
 #endif
 };
 
 static const int default_width[NB_SCREENS] = {
       BMPWIDTH_default_icons
-#ifdef HAVE_REMOTE_LCD
+#if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
     , BMPWIDTH_remote_default_icons
 #endif
 };
@@ -62,7 +62,7 @@ static const int default_width[NB_SCREENS] = {
 /* height of whole file */
 static const int default_height[NB_SCREENS] = {
       BMPHEIGHT_default_icons
-#ifdef HAVE_REMOTE_LCD
+#if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
     , BMPHEIGHT_remote_default_icons
 #endif
 };
@@ -131,7 +131,7 @@ void screen_put_iconxy(struct screen * display,
         if (!viewer_icons_loaded[screen] || 
            (icon * height > viewer_iconset[screen].height))
         {
-#ifdef HAVE_REMOTE_LCD
+#if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
             if (screen == SCREEN_REMOTE)
             {
                 screen_put_iconxy(display, xpos, ypos, Icon_Questionmark);
@@ -177,7 +177,7 @@ void screen_put_cursorxy(struct screen * display, int x, int y, bool on)
 enum Iconset {
     Iconset_Mainscreen,
     Iconset_Mainscreen_viewers,
-#ifdef HAVE_REMOTE_LCD
+#if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
     Iconset_Remotescreen,
     Iconset_Remotescreen_viewers,
 #endif
@@ -203,7 +203,7 @@ static void load_icons(const char* filename, enum Iconset iconset,
             bmp = &viewer_iconset[SCREEN_MAIN];
             bmp->data = viewer_icon_buffer[SCREEN_MAIN];
             break;
-#ifdef HAVE_REMOTE_LCD
+#if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
         case Iconset_Remotescreen:
             loaded_ok = &custom_icons_loaded[SCREEN_REMOTE];
             bmp = &user_iconset[SCREEN_REMOTE];
@@ -249,7 +249,7 @@ void icons_init(void)
         load_icons(DEFAULT_VIEWER_BMP, Iconset_Mainscreen_viewers, false);
     }
 
-#ifdef HAVE_REMOTE_LCD
+#if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
     load_icons(global_settings.remote_icon_file, 
                Iconset_Remotescreen, true);
     
