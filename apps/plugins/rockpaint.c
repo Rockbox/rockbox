@@ -2903,25 +2903,28 @@ static int load_bitmap( char *file )
 {
     struct bitmap bm;
     bool ret;
+    int l;
+
     bm.data = (char*)save_buffer;
     ret = rb->read_bmp_file( file, &bm, ROWS*COLS*sizeof( fb_data ),
-                              FORMAT_NATIVE );
-    if( bm.width < COLS )
+                             FORMAT_NATIVE );
+
+    if((bm.width > COLS ) || ( bm.height > ROWS ))
+        return -1;
+
+    for( l = bm.height-1; l > 0; l-- )
     {
-        int l;
-        for( l = bm.height-1; l > 0; l-- )
-        {
-            rb->memmove( save_buffer+l*COLS, save_buffer+l*bm.width,
-                         sizeof( fb_data )*bm.width );
-        }
-        for( l = 0; l < bm.height; l++ )
-        {
-            rb->memset( save_buffer+l*COLS+bm.width, rp_colors[ bgdrawcolor ],
-                        sizeof( fb_data )*(COLS-bm.width) );
-        }
-        rb->memset( save_buffer+COLS*bm.height, rp_colors[ bgdrawcolor ],
-                    sizeof( fb_data )*COLS*(ROWS-bm.height) );
+        rb->memmove( save_buffer+l*COLS, save_buffer+l*bm.width,
+                        sizeof( fb_data )*bm.width );
     }
+    for( l = 0; l < bm.height; l++ )
+    {
+        rb->memset( save_buffer+l*COLS+bm.width, rp_colors[ bgdrawcolor ],
+                    sizeof( fb_data )*(COLS-bm.width) );
+    }
+    rb->memset( save_buffer+COLS*bm.height, rp_colors[ bgdrawcolor ],
+                sizeof( fb_data )*COLS*(ROWS-bm.height) );
+
     return ret;
 }
 
@@ -2953,7 +2956,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     {
         if( load_bitmap( parameter ) <= 0 )
         {
-            rb->splash( 1*HZ, "Error");
+            rb->splash( 1*HZ, "File Open Error");
             clear_drawing();
         }
         else
