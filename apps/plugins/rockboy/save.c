@@ -1,7 +1,4 @@
-
-
 #include "rockmacros.h"
-#include <stdio.h>
 
 #include "defs.h"
 #include "cpu-gb.h"
@@ -12,8 +9,6 @@
 #include "rtc-gb.h"
 #include "mem.h"
 #include "sound.h"
-
-
 
 #ifdef ROCKBOX_LITTLE_ENDIAN
 #define LIL(x) (x)

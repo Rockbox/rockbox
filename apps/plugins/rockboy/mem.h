@@ -1,19 +1,18 @@
 #ifndef __MEM_H__
 #define __MEM_H__
 
-
 #include "defs.h"
 
-
-
-#define MBC_NONE 0
-#define MBC_MBC1 1
-#define MBC_MBC2 2
-#define MBC_MBC3 3
-#define MBC_MBC5 5
-#define MBC_RUMBLE 15
-#define MBC_HUC1 0xC1
-#define MBC_HUC3 0xC3
+#define MBC_NONE    0
+#define MBC_MBC1    1
+#define MBC_MBC2    2
+#define MBC_MBC3    4
+#define MBC_MBC5    8
+#define MBC_RUMBLE  16
+#define MBC_HUC1    32
+#define MBC_HUC3    64
+#define MBC_RTC     128
+#define MBC_BAT     256
 
 struct mbc
 {

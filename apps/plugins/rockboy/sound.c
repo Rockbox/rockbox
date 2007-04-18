@@ -1,6 +1,3 @@
-
-
-
 #include "rockmacros.h"
 #include "defs.h"
 #include "pcm.h"
@@ -125,7 +122,6 @@ void sound_reset(void)
 
 void sound_mix(void)
 {
-    if(!options.sound) return;
     int s, l, r, f, n;
 
     if (!RATE || cpu.snd < RATE) return;

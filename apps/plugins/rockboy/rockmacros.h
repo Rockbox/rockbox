@@ -31,7 +31,6 @@ extern int shut,cleanshut;
 void vid_init(void);
 inline void vid_begin(void);
 void die(char *message, ...);
-void setmallocpos(void *pointer);
 void *sys_timer(void);
 int  sys_elapsed(long *oldtick);
 int  pcm_submit(void);
@@ -121,6 +120,8 @@ struct options {
    int sound, fullscreen, showstats;
    int pal;
 };
+
+bool plugbuf;
 
 extern struct options options;
 #define savedir "/.rockbox/rockboy"

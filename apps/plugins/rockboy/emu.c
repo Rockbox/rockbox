@@ -41,23 +41,21 @@ void emu_run(void)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif
+
     while(!shut)
     {
         cpu_emulate(2280);
         while (R_LY > 0 && R_LY < 144)
             emu_step();
 
-        /* rtc_tick(); */  /* RTC support not implemented */
+        rtc_tick();   /* RTC support not implemented */
         
-        if(options.sound)
-        {
+        if(options.sound || !plugbuf)
             sound_mix();
-            pcm_submit();
-        }
-        
+
         doevents();
         vid_begin();
-        
+
         if (!(R_LCDC & 0x80))
             cpu_emulate(32832);
         
@@ -70,11 +68,11 @@ void emu_run(void)
         frames++;
         framesin++;
 
-        if(*rb->current_tick-timeten>=20)
+        if(*rb->current_tick-timeten>=10)
         {
             timeten=*rb->current_tick;
-            if(framesin<12) options.frameskip++;
-            if(framesin>12) options.frameskip--;
+            if(framesin<6) options.frameskip++;
+            if(framesin>6) options.frameskip--;
             if(options.frameskip>options.maxskip) options.frameskip=options.maxskip;
             if(options.frameskip<0) options.frameskip=0;
             framesin=0;

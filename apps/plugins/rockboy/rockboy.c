@@ -65,12 +65,6 @@ void* memcpy(void* dst, const void* src, size_t size)
     return rb->memcpy(dst, src, size);
 }
 
-void setmallocpos(void *pointer)
-{
-    audio_bufferpointer = pointer;
-    audio_buffer_free = audio_bufferpointer - audio_bufferbase;
-}
-
 void setoptions (void)
 {
    int fd;
@@ -197,9 +191,18 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->splash(HZ*3, "Play gameboy ROM file! (.gb/.gbc)");
         return PLUGIN_OK;
     }
-
-    audio_bufferbase = audio_bufferpointer
-        = rb->plugin_get_audio_buffer((int *)&audio_buffer_free);
+    if(rb->audio_status())
+    {
+        audio_bufferbase = audio_bufferpointer
+            = rb->plugin_get_buffer((int *)&audio_buffer_free);
+        plugbuf=true;
+    }
+    else
+    {
+        audio_bufferbase = audio_bufferpointer
+            = rb->plugin_get_audio_buffer((int *)&audio_buffer_free);
+        plugbuf=false;
+    }
 #if MEM <= 8 && !defined(SIMULATOR)
     /* loaded as an overlay plugin, protect from overwriting ourselves */
     if ((unsigned)(plugin_start_addr - (unsigned char *)audio_bufferbase)
@@ -226,7 +229,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->splash(HZ/2, errormsg);
         return PLUGIN_ERROR;
     }
-    pcm_close();
+    if(!rb->audio_status())
+        pcm_close();
     rb->splash(HZ/2, "Shutting down");
 
     savesettings();
