@@ -495,22 +495,22 @@ target/arm/usb-pp.c
 #ifdef GIGABEAT_F
 #ifndef SIMULATOR
 drivers/generic_i2c.c
-target/arm/gigabeat/meg-fx/adc-meg-fx.c
-target/arm/gigabeat/meg-fx/ata-meg-fx.c
-target/arm/gigabeat/meg-fx/backlight-meg-fx.c
-target/arm/gigabeat/meg-fx/button-meg-fx.c
-target/arm/gigabeat/meg-fx/i2c-meg-fx.c
-target/arm/gigabeat/meg-fx/lcd-as-meg-fx.S
-target/arm/gigabeat/meg-fx/lcd-meg-fx.c
-target/arm/gigabeat/meg-fx/power-meg-fx.c
-target/arm/gigabeat/meg-fx/sc606-meg-fx.c
-target/arm/gigabeat/meg-fx/usb-meg-fx.c
-target/arm/gigabeat/meg-fx/wmcodec-meg-fx.c
-target/arm/gigabeat/meg-fx/dma_start.c
-target/arm/gigabeat/meg-fx/system-meg-fx.c
-target/arm/gigabeat/meg-fx/mmu-meg-fx.c
+target/arm/s3c2440/gigabeat-fx/adc-meg-fx.c
+target/arm/s3c2440/gigabeat-fx/ata-meg-fx.c
+target/arm/s3c2440/gigabeat-fx/backlight-meg-fx.c
+target/arm/s3c2440/gigabeat-fx/button-meg-fx.c
+target/arm/s3c2440/gigabeat-fx/i2c-meg-fx.c
+target/arm/s3c2440/gigabeat-fx/lcd-as-meg-fx.S
+target/arm/s3c2440/gigabeat-fx/lcd-meg-fx.c
+target/arm/s3c2440/gigabeat-fx/power-meg-fx.c
+target/arm/s3c2440/gigabeat-fx/sc606-meg-fx.c
+target/arm/s3c2440/gigabeat-fx/usb-meg-fx.c
+target/arm/s3c2440/gigabeat-fx/wmcodec-meg-fx.c
+target/arm/s3c2440/gigabeat-fx/dma_start.c
+target/arm/s3c2440/gigabeat-fx/system-meg-fx.c
+target/arm/s3c2440/gigabeat-fx/mmu-meg-fx.c
 #ifndef BOOTLOADER
-target/arm/gigabeat/meg-fx/pcm-meg-fx.c
+target/arm/s3c2440/gigabeat-fx/pcm-meg-fx.c
 #endif
 #endif /* SIMULATOR */
 #endif /* GIGABEAT_F */

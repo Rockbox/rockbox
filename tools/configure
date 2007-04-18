@@ -1129,8 +1129,8 @@ EOF
     bootoutput="FWIMG01.DAT"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
-    t_manufacturer="gigabeat"
-    t_model="meg-fx"
+    t_manufacturer="s3c2440"
+    t_model="gigabeat-fx"
     ;;
 
    26|ipodmini2g)
