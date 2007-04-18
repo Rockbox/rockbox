@@ -29,12 +29,6 @@ struct entry {
     char *name;
 };
 
-struct filetype {
-    char* extension;
-    int tree_attr;
-    int icon;
-    int voiceclip;
-};
 
 /* browser context for file or db */
 struct tree_context {
@@ -75,28 +69,6 @@ struct tree_context {
     bool dirfull;
 };
 
-/* using attribute bits not used by FAT (FAT uses lower 7) */
-
-#define TREE_ATTR_THUMBNAIL 0x0080 /* corresponding .talk file exists */
-
-/* (this also reflects the sort order if by type) */
-#define TREE_ATTR_BMARK 0x0100 /* book mark file */
-#define TREE_ATTR_M3U   0x0200 /* playlist */
-#define TREE_ATTR_MPA   0x0300 /* mpeg audio file */
-#define TREE_ATTR_CFG   0x0400 /* config file */
-#define TREE_ATTR_WPS   0x0500 /* wps config file */
-#define TREE_ATTR_FONT  0x0600 /* font file */
-#define TREE_ATTR_LNG   0x0700 /* binary lang file */
-#define TREE_ATTR_ROCK  0x0800 /* binary rockbox plugin */
-#define TREE_ATTR_MOD   0x0900 /* firmware file */
-#define TREE_ATTR_RWPS  0x1000 /* remote-wps config file */
-#define TREE_ATTR_BMP   0x1100 /* backdrop bmp file */
-#define TREE_ATTR_KBD   0x1200 /* keyboard file */
-#define TREE_ATTR_FMR   0x1300 /* preset file */
-#define TREE_ATTR_CUE   0x1400 /* cuesheet file */
-#define TREE_ATTR_MASK  0xFF00 /* which bits tree.c uses for file types */
-
-void tree_get_filetypes(const struct filetype**, int*);
 void tree_init(void);
 void browse_root(void);
 void get_current_file(char* buffer, int buffer_len);

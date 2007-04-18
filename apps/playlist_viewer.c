@@ -32,7 +32,7 @@
 #include "menu.h"
 #include "plugin.h"
 #include "keyboard.h"
-#include "tree.h"
+#include "filetypes.h"
 #include "onplay.h"
 #include "talk.h"
 #include "misc.h"
@@ -487,7 +487,7 @@ static int onplay_menu(int index)
             case 2: /* add to catalog */
             case 3: /* add to a new one */
                 catalog_add_to_a_playlist(current_track->name,
-                                          TREE_ATTR_MPA,
+                                          FILE_ATTR_AUDIO,
                                           result==3 );
                 ret = 0;
                 break;

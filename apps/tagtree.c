@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "config.h"
 #include "system.h"
 #include "kernel.h"
 #include "splash.h"
@@ -43,6 +44,7 @@
 #include "playback.h"
 #include "yesno.h"
 #include "misc.h"
+#include "filetypes.h"
 
 #define FILE_SEARCH_INSTRUCTIONS ROCKBOX_DIR "/tagnavi.config"
 
@@ -1669,13 +1671,13 @@ int tagtree_get_attr(struct tree_context* c)
     {
         case navibrowse:
             if (csi->tagorder[c->currextra] == tag_title)
-                attr = TREE_ATTR_MPA;
+                attr = FILE_ATTR_AUDIO;
             else
                 attr = ATTR_DIRECTORY;
             break;
 
         case allsubentries:
-            attr = TREE_ATTR_MPA;
+            attr = FILE_ATTR_AUDIO;
             break;
         
         default:
@@ -1690,7 +1692,7 @@ int tagtree_get_icon(struct tree_context* c)
 {
     int icon = Icon_Folder;
 
-    if (tagtree_get_attr(c) == TREE_ATTR_MPA)
+    if (tagtree_get_attr(c) == FILE_ATTR_AUDIO)
         icon = Icon_Audio;
 
     return icon;

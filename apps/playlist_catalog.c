@@ -37,6 +37,7 @@
 #include "sprintf.h"
 #include "tree.h"
 #include "yesno.h"
+#include "filetypes.h"
 
 #define PLAYLIST_CATALOG_CFG ROCKBOX_DIR "/playlist_catalog.config"
 #define PLAYLIST_CATALOG_DEFAULT_DIR "/Playlists"
@@ -167,7 +168,7 @@ static int create_playlist_list(char** playlists, int num_items,
 
     for (i=0; i<num_files && index<num_items; i++)
     {
-        if (files[i].attr & TREE_ATTR_M3U)
+        if (files[i].attr & FILE_ATTR_M3U)
         {
             if (most_recent && !strncmp(files[i].name, most_recent_playlist,
                 sizeof(most_recent_playlist)))
@@ -287,7 +288,7 @@ static int display_playlists(char* playlist, bool view)
                     snprintf(playlist, MAX_PATH, "%s/%s", playlist_dir,
                         sel_file);
 
-                    if (onplay(playlist, TREE_ATTR_M3U,
+                    if (onplay(playlist, FILE_ATTR_M3U,
                             CONTEXT_TREE) != ONPLAY_OK)
                     {
                         result = 0;
@@ -358,13 +359,13 @@ static int add_to_playlist(const char* playlist, char* sel, int sel_attr)
     /* In case we're in the playlist directory */
     reload_directory();
 
-    if ((sel_attr & TREE_ATTR_MASK) == TREE_ATTR_MPA)
+    if ((sel_attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO)
     {
         /* append the selected file */
         if (fdprintf(fd, "%s\n", sel) > 0)
             result = 0;
     }
-    else if ((sel_attr & TREE_ATTR_MASK) == TREE_ATTR_M3U)
+    else if ((sel_attr & FILE_ATTR_MASK) == FILE_ATTR_M3U)
     {
         /* append playlist */
         int f, fs, i;

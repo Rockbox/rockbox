@@ -28,7 +28,7 @@
 #include "backlight.h"
 #include "action.h"
 #include "kernel.h"
-#include "tree.h"
+#include "filetypes.h"
 #include "debug.h"
 #include "sprintf.h"
 #include "settings.h"
@@ -236,7 +236,7 @@ long gui_wps_show(void)
                 show_main_backdrop();
 #endif
                 action_signalscreenchange();
-                if (onplay(wps_state.id3->path, TREE_ATTR_MPA, CONTEXT_WPS)
+                if (onplay(wps_state.id3->path, FILE_ATTR_AUDIO, CONTEXT_WPS)
                      == ONPLAY_MAINMENU)
                     return GO_TO_ROOT;
 #if LCD_DEPTH > 1

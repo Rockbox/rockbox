@@ -63,7 +63,7 @@ int ft_build_playlist(struct tree_context* c, int start_index)
 
     for(i = 0;i < c->filesindir;i++)
     {
-        if((dircache[i].attr & TREE_ATTR_MASK) == TREE_ATTR_MPA)
+        if((dircache[i].attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO)
         {
             DEBUGF("Adding %s\n", dircache[i].name);
             if (playlist_add(dircache[i].name) < 0)
@@ -101,11 +101,11 @@ static void check_file_thumbnails(struct tree_context* c)
             &dircache[i].name[strlen(dircache[i].name)
                               - strlen(file_thumbnail_ext)]))
         {   /* no .talk file */
-            dircache[i].attr &= ~TREE_ATTR_THUMBNAIL; /* clear */
+            dircache[i].attr &= ~FILE_ATTR_THUMBNAIL; /* clear */
         }
         else
         {   /* .talk file, we later let them speak themselves */
-            dircache[i].attr |= TREE_ATTR_THUMBNAIL; /* set */
+            dircache[i].attr |= FILE_ATTR_THUMBNAIL; /* set */
         }
     }
 
@@ -130,7 +130,7 @@ static void check_file_thumbnails(struct tree_context* c)
         {
             if (!strcasecmp(dircache[i].name, (char *)entry->d_name))
             {   /* match */
-                dircache[i].attr |= TREE_ATTR_THUMBNAIL; /* set the flag */
+                dircache[i].attr |= FILE_ATTR_THUMBNAIL; /* set the flag */
                 break; /* exit search loop, because we found it */
             }
         }
@@ -171,8 +171,8 @@ static int compare(const void* p1, const void* p2)
     {
         case 3: /* sort type */
         {
-            int t1 = e1->attr & TREE_ATTR_MASK;
-            int t2 = e2->attr & TREE_ATTR_MASK;
+            int t1 = e1->attr & FILE_ATTR_MASK;
+            int t2 = e2->attr & FILE_ATTR_MASK;
 
             if (!t1) /* unknown type */
                 t1 = INT_MAX; /* gets a high number, to sort after known */
@@ -262,23 +262,23 @@ int ft_load(struct tree_context* c, const char* tempdir)
         /* filter out non-visible files */
         if ((!(dptr->attr & ATTR_DIRECTORY) && (
             (*c->dirfilter == SHOW_PLAYLIST &&
-             (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_M3U) ||
+             (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_M3U) ||
             ((*c->dirfilter == SHOW_MUSIC &&
-             (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_MPA) &&
-             (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_M3U) ||
+             (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_AUDIO) &&
+             (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_M3U) ||
             (*c->dirfilter == SHOW_SUPPORTED && !filetype_supported(dptr->attr)))) ||
-            (*c->dirfilter == SHOW_WPS && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_WPS) ||
+            (*c->dirfilter == SHOW_WPS && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_WPS) ||
 #ifdef HAVE_REMOTE_LCD
-            (*c->dirfilter == SHOW_RWPS && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_RWPS) ||
+            (*c->dirfilter == SHOW_RWPS && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_RWPS) ||
 #endif
 #if CONFIG_TUNER
-            (*c->dirfilter == SHOW_FMR && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_FMR) ||
+            (*c->dirfilter == SHOW_FMR && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_FMR) ||
 #endif
-            (*c->dirfilter == SHOW_CFG && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_CFG) ||
-            (*c->dirfilter == SHOW_LNG && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_LNG) ||
-            (*c->dirfilter == SHOW_MOD && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_MOD) ||
-            (*c->dirfilter == SHOW_FONT && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_FONT) ||
-            (*c->dirfilter == SHOW_PLUGINS && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_ROCK))
+            (*c->dirfilter == SHOW_CFG && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_CFG) ||
+            (*c->dirfilter == SHOW_LNG && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_LNG) ||
+            (*c->dirfilter == SHOW_MOD && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_MOD) ||
+            (*c->dirfilter == SHOW_FONT && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_FONT) ||
+            (*c->dirfilter == SHOW_PLUGINS && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_ROCK))
         {
             i--;
             continue;
@@ -340,8 +340,8 @@ int ft_enter(struct tree_context* c)
         bool play = false;
         int start_index=0;
 
-        switch ( file->attr & TREE_ATTR_MASK ) {
-            case TREE_ATTR_M3U:
+        switch ( file->attr & FILE_ATTR_MASK ) {
+            case FILE_ATTR_M3U:
                 if (global_settings.party_mode) {
                     gui_syncsplash(HZ, str(LANG_PARTY_MODE));
                     break;
@@ -374,7 +374,7 @@ int ft_enter(struct tree_context* c)
                 }
                 break;
 
-            case TREE_ATTR_MPA:
+            case FILE_ATTR_AUDIO:
                 if (bookmark_autoload(c->currdir))
                     break;
 
@@ -420,7 +420,7 @@ int ft_enter(struct tree_context* c)
 
 #if CONFIG_TUNER
                 /* fmr preset file */
-            case TREE_ATTR_FMR:
+            case FILE_ATTR_FMR:
 
                 gui_syncsplash(0, str(LANG_WAIT));
 
@@ -448,7 +448,7 @@ int ft_enter(struct tree_context* c)
 
 
                 /* wps config file */
-            case TREE_ATTR_WPS:
+            case FILE_ATTR_WPS:
                 gui_syncsplash(0, str(LANG_WAIT));
 #if LCD_DEPTH > 1
                 unload_wps_backdrop();
@@ -460,7 +460,7 @@ int ft_enter(struct tree_context* c)
 
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
                 /* remote-wps config file */
-            case TREE_ATTR_RWPS:
+            case FILE_ATTR_RWPS:
                 gui_syncsplash(0, str(LANG_WAIT));
                 wps_data_load(gui_wps[1].data, buf, true);
                 set_file(buf, (char *)global_settings.rwps_file,
@@ -468,20 +468,20 @@ int ft_enter(struct tree_context* c)
                 break;
 #endif
 
-            case TREE_ATTR_CFG:
+            case FILE_ATTR_CFG:
                 gui_syncsplash(0, str(LANG_WAIT));
                 if (!settings_load_config(buf,true))
                     break;
                 gui_syncsplash(HZ, str(LANG_SETTINGS_LOADED));
                 break;
 
-            case TREE_ATTR_BMARK:
+            case FILE_ATTR_BMARK:
                 gui_syncsplash(0, str(LANG_WAIT));
                 bookmark_load(buf, false);
                 reload_dir = true;
                 break;
 
-            case TREE_ATTR_LNG:
+            case FILE_ATTR_LNG:
                 gui_syncsplash(0, str(LANG_WAIT));
                 if(!lang_load(buf)) {
                     set_file(buf, (char *)global_settings.lang_file,
@@ -492,13 +492,13 @@ int ft_enter(struct tree_context* c)
                 break;
 
 #ifdef HAVE_LCD_BITMAP
-            case TREE_ATTR_FONT:
+            case FILE_ATTR_FONT:
                 gui_syncsplash(0, str(LANG_WAIT));
                 font_load(buf);
                 set_file(buf, (char *)global_settings.font_file, MAX_FILENAME);
                 break;
 
-            case TREE_ATTR_KBD:
+            case FILE_ATTR_KBD:
                 gui_syncsplash(0, str(LANG_WAIT));
                 if (!load_kbd(buf))
                     gui_syncsplash(HZ, str(LANG_KEYBOARD_LOADED));
@@ -508,14 +508,14 @@ int ft_enter(struct tree_context* c)
 
 #ifndef SIMULATOR
                 /* firmware file */
-            case TREE_ATTR_MOD:
+            case FILE_ATTR_MOD:
                 gui_syncsplash(0, str(LANG_WAIT));
                 rolo_load(buf);
                 break;
 #endif
 
                 /* plugin file */
-            case TREE_ATTR_ROCK:
+            case FILE_ATTR_ROCK:
                 if (global_settings.party_mode) {
                     gui_syncsplash(HZ, str(LANG_PARTY_MODE));
                     break;
@@ -534,7 +534,7 @@ int ft_enter(struct tree_context* c)
                 }
                 break;
 
-            case TREE_ATTR_CUE:
+            case FILE_ATTR_CUE:
                 display_cuesheet_content(buf);
                 break;
 

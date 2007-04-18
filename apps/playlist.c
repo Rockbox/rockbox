@@ -91,6 +91,7 @@
 #include "dircache.h"
 #include "thread.h"
 #include "usb.h"
+#include "filetypes.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #endif
@@ -1536,7 +1537,7 @@ static int check_subdir_for_music(char *dir, char *subdir)
     {
         if (files[i].attr & ATTR_DIRECTORY)
             has_subdir = true;
-        else if ((files[i].attr & TREE_ATTR_MASK) == TREE_ATTR_MPA)
+        else if ((files[i].attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO)
         {
             has_music = true;
             break;
@@ -3568,7 +3569,7 @@ int playlist_directory_tracksearch(const char* dirname, bool recurse,
             else
                 continue;
         }
-        else if ((files[i].attr & TREE_ATTR_MASK) == TREE_ATTR_MPA)
+        else if ((files[i].attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO)
         {
             snprintf(buf, sizeof(buf), "%s/%s", dirname, files[i].name);
 

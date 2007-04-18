@@ -171,7 +171,7 @@ static bool add_to_playlist(int position, bool queue)
     else
 #endif
     {
-        if ((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_MPA)
+        if ((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO)
             playlist_insert_track(NULL, selected_file, position, queue, true);
         else if (selected_file_attr & ATTR_DIRECTORY)
         {
@@ -188,7 +188,7 @@ static bool add_to_playlist(int position, bool queue)
             playlist_insert_directory(NULL, selected_file, position, queue,
                                       recurse);
         }
-        else if ((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_M3U)
+        else if ((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_M3U)
             playlist_insert_playlist(NULL, selected_file, position, queue);
     }
     
@@ -273,7 +273,7 @@ static bool playlist_options(void)
     int m, i=0, pstart=0, result;
     bool ret = false;
 
-    if ((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_M3U &&
+    if ((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_M3U &&
         context == CONTEXT_TREE)
     {
         items[i].desc = ID2P(LANG_VIEW);
@@ -355,7 +355,7 @@ static bool playlist_options(void)
             args[i].queue = false;
             i++;
         }
-        else if (((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_MPA) ||
+        else if (((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO) ||
                  (selected_file_attr & ATTR_DIRECTORY))
         {
             items[i].desc = ID2P(LANG_INSERT);

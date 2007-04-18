@@ -48,8 +48,66 @@
 #define MAX_FILETYPES 48
 #endif
 
-/* number of bytes for the binary icon */
-#define ICON_LENGTH 6
+/* a table for the know file types */
+const struct filetype inbuilt_filetypes[] = {
+    { "mp3", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "mp2", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "mpa", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+#if CONFIG_CODEC == SWCODEC
+    /* Temporary hack to allow playlist creation */
+    { "mp1", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "ogg", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "wma", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "wav", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "flac",FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "ac3", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "a52", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "mpc", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "wv",  FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "m4a", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "m4b", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "mp4", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "shn", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "aif", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "aiff",FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "spx" ,FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "sid", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "adx", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "nsf", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "nsfe",FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "spc", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+#endif
+    { "m3u", FILE_ATTR_M3U, Icon_Playlist, LANG_PLAYLIST },
+    { "m3u8",FILE_ATTR_M3U, Icon_Playlist, LANG_PLAYLIST },
+    { "cfg", FILE_ATTR_CFG, Icon_Config,   VOICE_EXT_CFG },
+    { "wps", FILE_ATTR_WPS, Icon_Wps,      VOICE_EXT_WPS },
+#ifdef HAVE_REMOTE_LCD
+    { "rwps",FILE_ATTR_RWPS, Icon_Wps,     VOICE_EXT_RWPS },
+#endif
+#if LCD_DEPTH > 1
+    { "bmp", FILE_ATTR_BMP, Icon_Wps, VOICE_EXT_WPS },
+#endif
+#if CONFIG_TUNER
+    { "fmr", FILE_ATTR_FMR, Icon_Preset, LANG_FMR },
+#endif
+    { "lng", FILE_ATTR_LNG, Icon_Language, LANG_LANGUAGE },
+    { "rock",FILE_ATTR_ROCK,Icon_Plugin,   VOICE_EXT_ROCK },
+#ifdef HAVE_LCD_BITMAP
+    { "fnt", FILE_ATTR_FONT,Icon_Font,     VOICE_EXT_FONT },
+    { "kbd", FILE_ATTR_KBD, Icon_Keyboard, VOICE_EXT_KBD },
+#endif
+    { "bmark",FILE_ATTR_BMARK, Icon_Bookmark,  VOICE_EXT_BMARK },
+    { "cue",  FILE_ATTR_CUE,   Icon_Bookmark,  LANG_CUESHEET },
+#ifdef BOOTFILE_EXT
+    { BOOTFILE_EXT, FILE_ATTR_MOD, Icon_Firmware, VOICE_EXT_AJZ },
+#endif /* #ifndef SIMULATOR */
+};
+
+void tree_get_filetypes(const struct filetype** types, int* count)
+{
+    *types = inbuilt_filetypes;
+    *count = sizeof(inbuilt_filetypes) / sizeof(*inbuilt_filetypes);
+}
 
 /* mask for dynamic filetype info in attribute */
 #define FILETYPES_MASK 0xFF00
@@ -155,17 +213,15 @@ static void rm_whitespaces(char* str)
 
 static void read_builtin_types(void)
 {
-    const struct filetype *types;
-    int count, i;
-    tree_get_filetypes(&types, &count);
+    int count = sizeof(inbuilt_filetypes)/sizeof(*inbuilt_filetypes), i;
     for(i=0; i<count && (filetype_count < MAX_FILETYPES); i++)
     {
-        filetypes[filetype_count].extension = types[i].extension;
+        filetypes[filetype_count].extension = inbuilt_filetypes[i].extension;
         filetypes[filetype_count].plugin = NULL;
-        filetypes[filetype_count].attr   = types[i].tree_attr>>8;
+        filetypes[filetype_count].attr   = inbuilt_filetypes[i].tree_attr>>8;
         if (filetypes[filetype_count].attr > heighest_attr)
             heighest_attr = filetypes[filetype_count].attr;
-        filetypes[filetype_count].icon   = types[i].icon;
+        filetypes[filetype_count].icon   = inbuilt_filetypes[i].icon;
         filetype_count++;
     }
 }
@@ -247,7 +303,7 @@ int filetype_get_attr(const char* file)
     {
         if (filetypes[i].extension && 
             !strcasecmp(extension, filetypes[i].extension))
-            return (filetypes[i].attr<<8)&TREE_ATTR_MASK;
+            return (filetypes[i].attr<<8)&FILE_ATTR_MASK;
     }
     return 0;
 }

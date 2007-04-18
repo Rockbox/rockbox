@@ -85,60 +85,8 @@
 #include "backdrop.h"
 #endif
 
-/* a table for the know file types */
-const struct filetype filetypes[] = {
-    { "mp3", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { "mp2", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { "mpa", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-#if CONFIG_CODEC == SWCODEC
-    /* Temporary hack to allow playlist creation */
-    { "mp1", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { "ogg", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { "wma", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { "wav", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { "flac",TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { "ac3", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { "a52", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { "mpc", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { "wv",  TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { "m4a", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { "m4b", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { "mp4", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { "shn", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { "aif", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { "aiff",TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { "spx" ,TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { "sid", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { "adx", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { "nsf", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { "nsfe", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { "spc", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-#endif
-    { "m3u", TREE_ATTR_M3U, Icon_Playlist, LANG_PLAYLIST },
-    { "m3u8", TREE_ATTR_M3U, Icon_Playlist, LANG_PLAYLIST },
-    { "cfg", TREE_ATTR_CFG, Icon_Config, VOICE_EXT_CFG },
-    { "wps", TREE_ATTR_WPS, Icon_Wps, VOICE_EXT_WPS },
-#ifdef HAVE_REMOTE_LCD
-    { "rwps", TREE_ATTR_RWPS, Icon_Wps, VOICE_EXT_RWPS },
-#endif
-#if LCD_DEPTH > 1
-    { "bmp", TREE_ATTR_BMP, Icon_Wps, VOICE_EXT_WPS },
-#endif
-#if CONFIG_TUNER
-    { "fmr", TREE_ATTR_FMR, Icon_Preset, LANG_FMR },
-#endif
-    { "lng", TREE_ATTR_LNG, Icon_Language, LANG_LANGUAGE },
-    { "rock",TREE_ATTR_ROCK,Icon_Plugin, VOICE_EXT_ROCK },
-#ifdef HAVE_LCD_BITMAP
-    { "fnt", TREE_ATTR_FONT,Icon_Font, VOICE_EXT_FONT },
-    { "kbd", TREE_ATTR_KBD, Icon_Keyboard, VOICE_EXT_KBD },
-#endif
-    { "bmark",TREE_ATTR_BMARK, Icon_Bookmark, VOICE_EXT_BMARK },
-    { "cue", TREE_ATTR_CUE, Icon_Bookmark, LANG_CUESHEET },
-#ifdef BOOTFILE_EXT
-    { BOOTFILE_EXT, TREE_ATTR_MOD, Icon_Firmware, VOICE_EXT_AJZ },
-#endif /* #ifndef SIMULATOR */
-};
+static const struct filetype *filetypes;
+static int filetypes_count;
 
 struct gui_synclist tree_lists;
 
@@ -279,11 +227,7 @@ void browse_root(void)
     root_menu();
 }
 
-void tree_get_filetypes(const struct filetype** types, int* count)
-{
-    *types = filetypes;
-    *count = sizeof(filetypes) / sizeof(*filetypes);
-}
+
 
 struct tree_context* tree_get_context(void)
 {
@@ -710,9 +654,9 @@ static int dirbrowse()
 #ifdef HAVE_TAGCACHE
                     if (id3db)
                     {
-                        if (tagtree_get_attr(&tc) == TREE_ATTR_MPA)
+                        if (tagtree_get_attr(&tc) == FILE_ATTR_AUDIO)
                         {
-                            attr = TREE_ATTR_MPA;
+                            attr = FILE_ATTR_AUDIO;
                             tagtree_get_filename(&tc, buf, sizeof(buf));
                         }
                         else
@@ -931,7 +875,7 @@ static int dirbrowse()
                             case 1: /* files as numbers */
                                 ft_play_filenumber(
                                     tc.selected_item-tc.dirsindir+1,
-                                    attr & TREE_ATTR_MASK);
+                                    attr & FILE_ATTR_MASK);
                                 break;
 
                             case 2: /* files spelled */
@@ -941,7 +885,7 @@ static int dirbrowse()
                             case 3: /* thumbnail clip */
                                 /* "schedule" a thumbnail, to have a little
                                    delay */
-                                if (attr & TREE_ATTR_THUMBNAIL)
+                                if (attr & FILE_ATTR_THUMBNAIL)
                                     thumbnail_time = current_tick + HOVER_DELAY;
                                 else
                                     /* spell the number as fallback */
@@ -1003,15 +947,15 @@ static bool add_dir(char* dirname, int len, int fd)
         }
         else {
             int x = strlen((char *)entry->d_name);
-            unsigned int i;
+            int i;
             char *cp = strrchr((char *)entry->d_name,'.');
 
             if (cp) {
                 cp++;
 
                 /* add all supported audio files to playlists */
-                for (i=0; i < sizeof(filetypes)/sizeof(struct filetype); i++) {
-                    if (filetypes[i].tree_attr == TREE_ATTR_MPA) {
+                for (i=0; i < filetypes_count; i++) {
+                    if (filetypes[i].tree_attr == FILE_ATTR_AUDIO) {
                         if (!strcasecmp(cp, filetypes[i].extension)) {
                             char buf[8];
                             int i;
@@ -1147,6 +1091,7 @@ void tree_init(void)
 
     tc.dircache_size = max_files * sizeof(struct entry);
     tc.dircache = buffer_alloc(tc.dircache_size);
+    tree_get_filetypes(&filetypes, &filetypes_count);
 }
 
 void bookmark_play(char *resume_file, int index, int offset, int seed,
@@ -1230,9 +1175,9 @@ void bookmark_play(char *resume_file, int index, int offset, int seed,
 static int ft_play_filenumber(int pos, int attr)
 {
     /* try to find a voice ID for the extension, if known */
-    unsigned int j;
+    int j;
     int ext_id = -1; /* default to none */
-    for (j=0; j<sizeof(filetypes)/sizeof(*filetypes); j++)
+    for (j=0; j<filetypes_count; j++)
     {
         if (attr == filetypes[j].tree_attr)
         {
