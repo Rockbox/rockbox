@@ -367,7 +367,8 @@ void pcm_rec_dma_start(void *addr, size_t size)
 
     /* Start the DMA transfer.. */
 #ifdef HAVE_SPDIF_IN
-    INTERRUPTCLEAR = 0x03c00000;
+    /* clear: ebu1cnew, valnogood, symbolerr, parityerr */
+    INTERRUPTCLEAR = (1 << 25) | (1 << 24) | (1 << 23) | (1 << 22);
 #endif
 
     SAR1          = (unsigned long)&PDIR2; /* Source address        */
@@ -464,9 +465,11 @@ void DMA1(void)
     }
 #ifdef HAVE_SPDIF_IN
     else if (DATAINCONTROL == 0xc038 &&
-        (INTERRUPTSTAT & 0x01c00000)) /* valnogood, symbolerr, parityerr */
+        (INTERRUPTSTAT & ((1 << 24) | (1 << 23) | (1 << 22))))
     {
-        INTERRUPTCLEAR = 0x03c00000;
+        /* reason: valnogood, symbolerr, parityerr */
+        /* clear: ebu1cnew, valnogood, symbolerr, parityerr */
+        INTERRUPTCLEAR = (1 << 25) | (1 << 24) | (1 << 23) | (1 << 22);
         status = DMA_REC_ERROR_SPDIF;
         logf("spdif err");
     }
