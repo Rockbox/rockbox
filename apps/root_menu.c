@@ -255,14 +255,18 @@ static int load_bmarks(void* param)
    so little hack so we can use them */
 extern struct menu_item_ex 
         file_menu, 
+#ifdef HAVE_TAGCACHE
         tagcache_menu,
+#endif
         manage_settings,
         recording_setting_menu,
         bookmark_settings_menu,
         system_menu;
 static const struct root_items items[] = {
     [GO_TO_FILEBROWSER] =   { browser, (void*)GO_TO_FILEBROWSER, &file_menu},
+#ifdef HAVE_TAGCACHE
     [GO_TO_DBBROWSER] =     { browser, (void*)GO_TO_DBBROWSER, &tagcache_menu },
+#endif
     [GO_TO_WPS] =           { wpsscrn, NULL, &playback_menu_item },
     [GO_TO_MAINMENU] =      { menu, NULL, &manage_settings },
     
