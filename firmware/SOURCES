@@ -196,17 +196,17 @@ drivers/mas.c
 /* Audio codec */
 #ifndef SIMULATOR
 #if defined(HAVE_UDA1380)
-drivers/uda1380.c
+drivers/audio/uda1380.c
 #elif defined(HAVE_WM8975) || defined(HAVE_WM8751)
-drivers/wm8975.c
+drivers/audio/wm8975.c
 #elif defined(HAVE_WM8758)
-drivers/wm8758.c
+drivers/audio/wm8758.c
 #elif defined(HAVE_WM8731) || defined(HAVE_WM8721)
-drivers/wm8731l.c
+drivers/audio/wm8731l.c
 #elif defined(HAVE_AS3514)
-drivers/as3514.c
+drivers/audio/as3514.c
 #elif defined(HAVE_TLV320)
-drivers/tlv320.c
+drivers/audio/tlv320.c
 #endif /* defined(HAVE_*) */
 #endif /* SIMULATOR */
 

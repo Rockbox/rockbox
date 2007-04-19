@@ -10,6 +10,7 @@ decompressor/Makefile
 decompressor/*.[chS]
 decompressor/*.lds
 drivers/*.[chS]
+drivers/audio/*.[chS]
 drivers/rtc/*.[chS]
 export/*.h
 include/*.h
