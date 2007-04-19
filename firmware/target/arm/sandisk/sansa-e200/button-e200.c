@@ -78,14 +78,12 @@ int button_read_device(void)
     hold_button_old = hold_button;
     hold_button = button_hold();
 
-#if 0
 #ifndef BOOTLOADER
     /* light handling */
     if (hold_button != hold_button_old)
     {
         backlight_hold_changed(hold_button);
     }
-#endif
 #endif
 
     /* device buttons */
