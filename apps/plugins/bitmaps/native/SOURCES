@@ -45,7 +45,7 @@ brickmania_menu_bg.160x128x16.bmp
 brickmania_pads.160x128x16.bmp
 brickmania_powerups.160x128x16.bmp
 brickmania_break.160x128x16.bmp
-#elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 132) && (LCD_DEPTH == 16)
+#elif (LCD_WIDTH == 176)/* && (LCD_HEIGHT == 132) */&& (LCD_DEPTH == 16)
 brickmania_menu_items.176x132x16.bmp
 brickmania_ball.176x132x16.bmp
 brickmania_bricks.176x132x16.bmp

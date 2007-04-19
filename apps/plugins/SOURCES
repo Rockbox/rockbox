@@ -52,7 +52,7 @@ bubbles.c
 invadrox.c
 #endif
 
-#if LCD_WIDTH != 128  && !defined(SANSA_E200)
+#if LCD_WIDTH != 128
 /* These need adjusting for the iRiver if'p screen */
 brickmania.c
 #endif

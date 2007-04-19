@@ -123,6 +123,8 @@ PLUGIN_HEADER
 #define SELECT BUTTON_SELECT
 #define UP BUTTON_SCROLL_UP
 #define DOWN BUTTON_SCROLL_DOWN
+#define SCROLL_FWD(x) (0)
+#define SCROLL_BACK(x) (0)
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD /* grayscale at the moment */
 
@@ -416,18 +418,24 @@ extern const fb_data brickmania_bricks[];
 #define STRINGPOS_navi 44
 #define STRINGPOS_flipsides 44
 
-#elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 132) && (LCD_DEPTH==16)
+/* nano and sansa */
+#elif (LCD_WIDTH == 176) && (LCD_HEIGHT >= 132) && (LCD_DEPTH==16)
 /* The time (in ms) for one iteration through the game loop - decrease this
    to speed up the game - note that current_tick is (currently) only accurate
    to 10ms.
 */
+
 #define CYCLETIME 30
 
+#if (LCD_HEIGHT == 220)
+#define GAMESCREEN_HEIGHT 132
+#else
 #define GAMESCREEN_HEIGHT LCD_HEIGHT
+#endif
 
 #define PAD_WIDTH 40
 #define PAD_HEIGHT 5
-#define PAD_POS_Y LCD_HEIGHT - 7
+#define PAD_POS_Y GAMESCREEN_HEIGHT - 7
 #define BRICK_HEIGHT 7
 #define BRICK_WIDTH 17
 #define BALL 5
@@ -1278,6 +1286,11 @@ int game_loop(void)
             rb->lcd_set_drawmode(DRMODE_SOLID);
             rb->lcd_clear_display();
             rb->lcd_set_background(LCD_BLACK);
+#if LCD_HEIGHT > GAMESCREEN_HEIGHT
+            rb->lcd_set_foreground(rb->global_settings->bg_color);
+            rb->lcd_fillrect(0, GAMESCREEN_HEIGHT, LCD_WIDTH,
+                             LCD_HEIGHT - GAMESCREEN_HEIGHT);
+#endif
             rb->lcd_set_foreground(LCD_WHITE);
 #else
             rb->lcd_clear_display();
