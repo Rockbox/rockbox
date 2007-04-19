@@ -1105,8 +1105,8 @@ EOF
     # this particular target.
     toolset=$genericbitmaptools
     t_cpu="arm"
-    t_manufacturer="iriver"
-    t_model="ifp7xx"
+    t_manufacturer="pnx0101"
+    t_model="iriver-ifp7xx"
     ;;
 
    40|gigabeatf)

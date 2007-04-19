@@ -279,7 +279,7 @@ drivers/i2c-pnx0101.c
 /* no i2c driver yet */
 #endif
 #if CONFIG_CPU == PNX0101
-target/arm/system-pnx0101.c
+target/arm/pnx0101/system-pnx0101.c
 #endif
 #if defined(CPU_PP)
 #ifdef BOOTLOADER
@@ -290,7 +290,7 @@ target/arm/audio-pp.c
 target/arm/crt0-pp.S
 #endif
 #elif CONFIG_CPU == PNX0101
-target/arm/crt0-pnx0101.S
+target/arm/pnx0101/crt0-pnx0101.S
 #elif defined(CPU_ARM)
 target/arm/crt0.S
 #endif /* defined(CPU_*) */
@@ -642,12 +642,12 @@ target/arm/usb-pp.c
 #endif /* IPOD_MINI2G */
 
 #ifdef IRIVER_IFP7XX
-target/arm/iriver/ifp7xx/power-ifp7xx.c
+target/arm/pnx0101/iriver-ifp7xx/power-ifp7xx.c
 #ifndef SIMULATOR
-target/arm/iriver/ifp7xx/adc-ifp7xx.c
-target/arm/iriver/ifp7xx/backlight-ifp7xx.c
-target/arm/iriver/ifp7xx/button-ifp7xx.c
-target/arm/iriver/ifp7xx/lcd-ifp7xx.c
-target/arm/iriver/ifp7xx/usb-ifp7xx.c
+target/arm/pnx0101/iriver-ifp7xx/adc-ifp7xx.c
+target/arm/pnx0101/iriver-ifp7xx/backlight-ifp7xx.c
+target/arm/pnx0101/iriver-ifp7xx/button-ifp7xx.c
+target/arm/pnx0101/iriver-ifp7xx/lcd-ifp7xx.c
+target/arm/pnx0101/iriver-ifp7xx/usb-ifp7xx.c
 #endif
 #endif
