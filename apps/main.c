@@ -253,6 +253,9 @@ static void init(void)
     button_init();
     backlight_init();
     lang_init();
+#ifdef DEBUG
+    debug_init();
+#endif
     /* Must be done before any code uses the multi-screen APi */
     screen_access_init();
     gui_syncstatusbar_init(&statusbars);

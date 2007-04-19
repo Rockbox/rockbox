@@ -57,6 +57,75 @@
 #define O_BINARY 0
 #endif
 
+/* Unicode compatibility for win32 */
+#if defined __MINGW32__
+/* Rockbox unicode functions */
+extern const unsigned char* utf8decode(const unsigned char *utf8,
+                                       unsigned short *ucs);
+extern unsigned char* utf8encode(unsigned long ucs, unsigned char *utf8);
+
+/* UTF-8 <-> UCS2 conversion. Note that these functions aren't thread safe
+ * due to the use of static buffers. */
+static wchar_t* utf8_to_ucs2(const unsigned char *utf8, int index)
+{
+    static wchar_t wbuffer[2][MAX_PATH];
+    wchar_t *ucs = wbuffer[index];
+
+    while (*utf8)
+        utf8 = utf8decode(utf8, ucs++);
+        
+    *ucs = 0;
+    return wbuffer[index];
+}
+static unsigned char *ucs2_to_utf8(const wchar_t *ucs)
+{
+    static unsigned char buffer[3*MAX_PATH];
+    unsigned char *utf8 = buffer;
+    
+    while (*ucs)
+        utf8 = utf8encode(*ucs++, utf8);
+        
+    *utf8 = 0;
+    return buffer;
+}
+
+#define UTF8_TO_OS(a)  utf8_to_ucs2(a,0)
+#define OS_TO_UTF8(a)  ucs2_to_utf8(a)
+#define DIR_T       _WDIR
+#define DIRENT_T    struct _wdirent
+#define STAT_T      struct _stat
+extern int _wmkdir(const wchar_t*);
+extern int _wrmdir(const wchar_t*);
+#define MKDIR(a,b)  (_wmkdir)(UTF8_TO_OS(a))
+#define RMDIR(a)    (_wrmdir)(UTF8_TO_OS(a))
+#define OPENDIR(a)  (_wopendir)(UTF8_TO_OS(a))
+#define READDIR(a)  (_wreaddir)(a)
+#define CLOSEDIR(a) (_wclosedir)(a)
+#define STAT(a,b)   (_wstat)(UTF8_TO_OS(a),b)
+#define OPEN(a,b,c) (_wopen)(UTF8_TO_OS(a),b,c)
+#define REMOVE(a)   (_wremove)(UTF8_TO_OS(a))
+#define RENAME(a,b) (_wrename)(UTF8_TO_OS(a),utf8_to_ucs2(b,1))
+
+#else  /* !__MINGW32__ */
+
+#define UTF8_TO_OS(a) (a)
+#define OS_TO_UTF8(a) (a)
+#define DIR_T       DIR
+#define DIRENT_T    struct dirent
+#define STAT_T      struct stat
+#define MKDIR(a,b)  (mkdir)(a,b)
+#define RMDIR(a)    (rmdir)(a)
+#define OPENDIR(a)  (opendir)(a)
+#define READDIR(a)  (readdir)(a)
+#define CLOSEDIR(a) (closedir)(a)
+#define STAT(a,b)   (stat)(a,b)
+#define OPEN(a,b,c) (open)(a,b,c)
+#define REMOVE(a)   (remove)(a)
+#define RENAME(a,b) (rename)(a,b)
+
+#endif /* !__MINGW32__ */
+
+
 #ifdef HAVE_DIRCACHE
 void dircache_remove(const char *name);
 void dircache_rename(const char *oldpath, const char *newpath);
@@ -79,7 +148,7 @@ struct dirstruct {
 } SIM_DIR;
 
 struct mydir {
-    DIR *dir;
+    DIR_T *dir;
     char *name;
 };
 
@@ -108,18 +177,18 @@ static unsigned int rockbox2sim(int opt)
 MYDIR *sim_opendir(const char *name)
 {
     char buffer[MAX_PATH]; /* sufficiently big */
-    DIR *dir;
+    DIR_T *dir;
 
 #ifndef __PCTOOL__
-    if(name[0] == '/') 
+    if(name[0] == '/')
     {
         snprintf(buffer, sizeof(buffer), "%s%s", SIMULATOR_ARCHOS_ROOT, name);
-        dir=(DIR *)opendir(buffer);
+        dir=(DIR_T *)OPENDIR(buffer);
     }
     else
 #endif
-        dir=(DIR *)opendir(name);
-    
+        dir=(DIR_T *)OPENDIR(name);
+
     if(dir) {
         MYDIR *my = (MYDIR *)malloc(sizeof(MYDIR));
         my->dir = dir;
@@ -135,23 +204,23 @@ struct sim_dirent *sim_readdir(MYDIR *dir)
 {
     char buffer[512]; /* sufficiently big */
     static struct sim_dirent secret;
-    struct stat s;
-    struct dirent *x11 = (readdir)(dir->dir);
+    STAT_T s;
+    DIRENT_T *x11 = READDIR(dir->dir);
     struct tm* tm;
 
     if(!x11)
         return (struct sim_dirent *)0;
 
-    strcpy((char *)secret.d_name, x11->d_name);
+    strcpy((char *)secret.d_name, OS_TO_UTF8(x11->d_name));
 
     /* build file name */
 #ifdef __PCTOOL__
-    snprintf(buffer, sizeof(buffer), "%s/%s", dir->name, x11->d_name);
+    snprintf(buffer, sizeof(buffer), "%s/%s", dir->name, secret.d_name);
 #else
     snprintf(buffer, sizeof(buffer), SIMULATOR_ARCHOS_ROOT "%s/%s",
-            dir->name, x11->d_name);
+            dir->name, secret.d_name);
 #endif
-    stat(buffer, &s); /* get info */
+    STAT(buffer, &s); /* get info */
 
 #define ATTR_DIRECTORY 0x10
     
@@ -171,7 +240,7 @@ struct sim_dirent *sim_readdir(MYDIR *dir)
 void sim_closedir(MYDIR *dir)
 {
     free(dir->name);
-    closedir(dir->dir);
+    CLOSEDIR(dir->dir);
 
     free(dir);
 }
@@ -187,14 +256,14 @@ int sim_open(const char *name, int o)
         snprintf(buffer, sizeof(buffer), "%s%s", SIMULATOR_ARCHOS_ROOT, name);
 
         debugf("We open the real file '%s'\n", buffer);
-        return open(buffer, opts, 0666);
+        return OPEN(buffer, opts, 0666);
     }
     
     fprintf(stderr, "WARNING, bad file name lacks slash: %s\n",
             name);
     return -1;
 #else
-    return open(name, opts, 0666);
+    return OPEN(name, opts, 0666);
 #endif
     
 }
@@ -208,42 +277,33 @@ int sim_creat(const char *name)
         snprintf(buffer, sizeof(buffer), "%s%s", SIMULATOR_ARCHOS_ROOT, name);
         
         debugf("We create the real file '%s'\n", buffer);
-        return open(buffer, O_BINARY | O_WRONLY | O_CREAT | O_TRUNC, 0666);
+        return OPEN(buffer, O_BINARY | O_WRONLY | O_CREAT | O_TRUNC, 0666);
     }
     fprintf(stderr, "WARNING, bad file name lacks slash: %s\n", name);
     return -1;
 #else
-    return open(name, O_BINARY | O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    return OPEN(name, O_BINARY | O_WRONLY | O_CREAT | O_TRUNC, 0666);
 #endif
 }      
 
 int sim_mkdir(const char *name)
 {
 #ifdef __PCTOOL__
-# ifdef WIN32
-    return mkdir(name);
-# else
-    return mkdir(name, 0777);
-# endif
+    return MKDIR(name, 0777);
 #else
     char buffer[MAX_PATH]; /* sufficiently big */
 
     snprintf(buffer, sizeof(buffer), "%s%s", SIMULATOR_ARCHOS_ROOT, name);
 
     debugf("We create the real directory '%s'\n", buffer);
-#ifdef WIN32
-    /* since we build with -DNOCYGWIN we have the plain win32 version */
-    return mkdir(buffer);
-#else
-    return mkdir(buffer, 0777);
-#endif
+    return MKDIR(buffer, 0777);
 #endif
 }
 
 int sim_rmdir(const char *name)
 {
 #ifdef __PCTOOL__
-    return rmdir(name);
+    return RMDIR(name);
 #else
     char buffer[MAX_PATH]; /* sufficiently big */
     if(name[0] == '/') 
@@ -251,16 +311,16 @@ int sim_rmdir(const char *name)
         snprintf(buffer, sizeof(buffer), "%s%s", SIMULATOR_ARCHOS_ROOT, name);
 
         debugf("We remove the real directory '%s'\n", buffer);
-        return rmdir(buffer);
+        return RMDIR(buffer);
     }
-    return rmdir(name);
+    return RMDIR(name);
 #endif
 }
 
 int sim_remove(const char *name)
 {
 #ifdef __PCTOOL__
-    return remove(name);
+    return REMOVE(name);
 #else
     char buffer[MAX_PATH]; /* sufficiently big */
 
@@ -272,16 +332,16 @@ int sim_remove(const char *name)
         snprintf(buffer, sizeof(buffer), "%s%s", SIMULATOR_ARCHOS_ROOT, name);
 
         debugf("We remove the real file '%s'\n", buffer);
-        return remove(buffer);
+        return REMOVE(buffer);
     }
-    return remove(name);
+    return REMOVE(name);
 #endif
 }
 
 int sim_rename(const char *oldpath, const char* newpath)
 {
 #ifdef __PCTOOL__
-    return rename(oldpath, newpath);
+    return RENAME(oldpath, newpath);
 #else
     char buffer1[MAX_PATH];
     char buffer2[MAX_PATH];
@@ -297,7 +357,7 @@ int sim_rename(const char *oldpath, const char* newpath)
                                                    newpath);
 
         debugf("We rename the real file '%s' to '%s'\n", buffer1, buffer2);
-        return rename(buffer1, buffer2);
+        return RENAME(buffer1, buffer2);
     }
     return -1;
 #endif
@@ -366,7 +426,7 @@ int sim_fsync(int fd)
 
 #ifdef WIN32
 /* sim-win32 */
-#define dlopen(_x_, _y_) LoadLibrary(_x_)
+#define dlopen(_x_, _y_) LoadLibraryW(UTF8_TO_OS(_x_))
 #define dlsym(_x_, _y_) (void *)GetProcAddress(_x_, _y_)
 #define dlclose(_x_) FreeLibrary(_x_)
 #else
@@ -398,7 +458,7 @@ void *sim_codec_load_ram(char* codecptr, int size,
     {
         snprintf(path, sizeof(path), TEMP_CODEC_FILE, codec_count);
 
-        fd = open(path, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRWXU);
+        fd = OPEN(path, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRWXU);
         if (fd >= 0)
             break;  /* Created a file ok */
     }
@@ -430,8 +490,8 @@ void *sim_codec_load_ram(char* codecptr, int size,
     if (*pd == NULL) {
         DEBUGF("failed to load %s\n", path); 
 #ifdef WIN32
-        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), 0,
-                      buf, sizeof buf, NULL);
+        FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), 0,
+                       buf, sizeof buf, NULL);
         DEBUGF("dlopen(%s): %s\n", path, buf);
 #else
         DEBUGF("dlopen(%s): %s\n", path, dlerror());
@@ -467,8 +527,8 @@ void *sim_plugin_load(char *plugin, void **pd)
     if (*pd == NULL) {
         DEBUGF("failed to load %s\n", plugin);
 #ifdef WIN32
-        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), 0,
-                      buf, sizeof(buf), NULL);
+        FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), 0,
+                       buf, sizeof(buf), NULL);
         DEBUGF("dlopen(%s): %s\n", path, buf);
 #else
         DEBUGF("dlopen(%s): %s\n", path, dlerror());
@@ -488,13 +548,29 @@ void sim_plugin_close(void *pd)
     dlclose(pd);
 }
 
-#if !defined(WIN32) || defined(SDL)
-/* the win32 version is in debug-win32.c */
+#ifdef WIN32
+static unsigned old_cp;
 
+void debug_exit(void)
+{
+    /* Reset console output codepage */
+    SetConsoleOutputCP(old_cp);
+}
+
+void debug_init(void)
+{
+    old_cp = GetConsoleOutputCP();
+    /* Set console output codepage to UTF8. Only works
+     * correctly when the console uses a truetype font. */
+    SetConsoleOutputCP(65001);
+    atexit(debug_exit);
+}
+#else
 void debug_init(void)
 {
     /* nothing to be done */
 }
+#endif
 
 void debugf(const char *fmt, ...)
 {
@@ -512,8 +588,6 @@ void ldebugf(const char* file, int line, const char *fmt, ...)
     vfprintf( stderr, fmt, ap );
     va_end( ap );
 }
-
-#endif
 
 /* rockbox off_t may be different from system off_t */
 int sim_ftruncate(int fd, long length)
