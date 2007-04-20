@@ -1,5 +1,4 @@
 FILES
-README
 common/*.[ch]
 common/Makefile
 common/SOURCES
