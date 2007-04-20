@@ -358,6 +358,9 @@ STOP
         print STDERR "No wps module present, can't do the WPS magic!\n";
     }
 
+    # and the info file
+    system("cp rockbox-info.txt .rockbox/");
+
     # now copy the file made for reading on the unit:
     #if($notplayer) {
     #    `cp $webroot/docs/Help-JBR.txt .rockbox/docs/`;

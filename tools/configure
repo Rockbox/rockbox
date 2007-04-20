@@ -1645,6 +1645,7 @@ all: tools
 	@SIMUL2@
 	\$(SILENT)\$(MAKE) -C \$(FIRMDIR) OBJDIR=\$(BUILDDIR)/firmware
 	\$(SILENT)\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@
+	\$(SILENT)\$(TOOLSDIR)/mkinfo.pl \$(BUILDDIR)/rockbox-info.txt
 
 bin: tools
 	@SIMUL1@
