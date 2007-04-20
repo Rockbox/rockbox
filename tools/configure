@@ -549,6 +549,14 @@ fi
 # get our current directory
 pwd=`pwd`;
 
+if { echo $pwd | grep " "; } then
+  echo "You're running this script in a path that contains space. The build"
+  echo "system is unfortunately not clever enough to deal with this. Please"
+  echo "run the script from a different path, rename the path or fix the build"
+  echo "system!"
+  exit
+fi
+
 if [ -z "$rootdir" ]; then
   ##################################################################
   # Figure out where the source code root is!
