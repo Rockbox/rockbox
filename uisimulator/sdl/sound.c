@@ -19,8 +19,6 @@
 
 #include "autoconf.h"
 
-#ifdef ROCKBOX_HAS_SIMSOUND /* play sound in sim enabled */
-
 #include <stdlib.h>
 #include <stdbool.h>
 #include <memory.h>
@@ -320,5 +318,4 @@ void pcm_postinit(void)
 {
 }
 
-#endif /* ROCKBOX_HAS_SIMSOUND */
 

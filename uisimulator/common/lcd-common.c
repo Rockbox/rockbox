@@ -21,16 +21,8 @@
  ****************************************************************************/
 
 #include "lcd-common.h"
-
 #include "lcd.h"
-
-#if defined(SDL)
 #include "lcd-sdl.h"
-#elif defined(WIN32)
-#include "lcd-win32.h"
-#else
-#include "lcd-x11.h"
-#endif
 
 void lcd_blit(const fb_data* p_data, int x, int y, int width, int height,
               int stride)

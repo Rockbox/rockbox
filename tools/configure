@@ -72,6 +72,7 @@ simcc () {
  # default tool setup for native building
  prefixtools ""
 
+ simver=sdl
  GCCOPTS='-W -Wall -g -fno-builtin'
 
  output="rockboxui" # use this as default output binary name
@@ -133,6 +134,8 @@ simcc () {
  if [ "`uname -m`" = "x86_64" ]; then
    GCCOPTS="$GCCOPTS -fPIC"  # needed to make shared objects link
  fi
+
+ GCCOPTS="$GCCOPTS -I\$(SIMDIR)"
 
  if test "X$crosscompile" != "Xyes"; then
    id=$$
@@ -1557,6 +1560,7 @@ sed > Makefile \
  -e "s,@FIRMDIR@,${firmdir},g" \
  -e "s,@TOOLSDIR@,${toolsdir},g" \
  -e "s,@APPS@,${apps},g" \
+ -e "s,@SIMVER@,${simver},g" \
  -e "s,@GCCVER@,${gccver},g" \
  -e "s,@GCCNUM@,${gccnum},g" \
  -e "s,@UNAME@,${uname},g" \
@@ -1619,10 +1623,11 @@ export DLLTOOL=@DLLTOOL@
 export DLLWRAP=@DLLWRAP@
 export RANLIB=@RANLIB@
 export PROFILE_OPTS=@PROFILE_OPTS@
+export SIMVER=@SIMVER@
+export SIMDIR=\$(ROOTDIR)/uisimulator/sdl
 export GCCOPTS=@GCCOPTS@
 export TARGET_INC=@TARGET_INC@
 export LOADADDRESS=@LOADADDRESS@
-export SIMDIR=\$(ROOTDIR)/uisimulator/sdl
 export SHARED_FLAG=@SHARED_FLAG@
 export LDOPTS=@LDOPTS@
 export GCCVER=@GCCVER@
