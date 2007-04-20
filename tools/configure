@@ -1526,6 +1526,8 @@ sed > Makefile \
  -e "s,@MEMORY@,${memory},g" \
  -e "s,@TARGET_ID@,${target_id},g" \
  -e "s,@TARGET@,${target},g" \
+ -e "s,@CPU@,${t_cpu},g" \
+ -e "s,@MANUFACTURER@,${t_manufacturer},g" \
  -e "s,@ARCHOS@,${archos},g" \
  -e "s,@LANGUAGE@,${language},g" \
  -e "s,@PWD@,${pwd},g" \
@@ -1596,6 +1598,8 @@ export ARCHOSROM=@ARCHOSROM@
 export FLASHFILE=@FLASHFILE@
 export TARGET_ID=@TARGET_ID@
 export TARGET=@TARGET@
+export CPU=@CPU@
+export MANUFACTURER=@MANUFACTURER@
 export OBJDIR=@PWD@
 export BUILDDIR=@PWD@
 export LANGUAGE=@LANGUAGE@
@@ -1638,14 +1642,18 @@ export MANUALDEV=@MANUALDEV@
 # Do not print "Entering directory ..."
 MAKEFLAGS += --no-print-directory
 
-.PHONY: all clean tags zip tools manual
+.PHONY: all clean tags zip tools manual bin build info
 
-all: tools
+all: build info
+
+info:
+	\$(SILENT)\$(TOOLSDIR)/mkinfo.pl \$(BUILDDIR)/rockbox-info.txt
+
+build: tools
 	@SIMUL1@
 	@SIMUL2@
 	\$(SILENT)\$(MAKE) -C \$(FIRMDIR) OBJDIR=\$(BUILDDIR)/firmware
 	\$(SILENT)\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@
-	\$(SILENT)\$(TOOLSDIR)/mkinfo.pl \$(BUILDDIR)/rockbox-info.txt
 
 bin: tools
 	@SIMUL1@

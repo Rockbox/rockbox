@@ -41,6 +41,8 @@ printf O ("Target: %s\n", $ENV{'ARCHOS'});
 printf O ("Target id: %d\n", $ENV{'TARGET_ID'});
 printf O ("Target define: %s\n", $ENV{'TARGET'});
 printf O ("Memory: %d\n", $ENV{'MEMORYSIZE'});
+printf O ("CPU: %s\n", $ENV{'CPU'});
+printf O ("Manufacturer: %s\n", $ENV{'MANUFACTURER'});
 
 # Variables identifying Rockbox and bootloader properties. Possibly changing
 # every software upgrade.
