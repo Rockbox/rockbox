@@ -64,24 +64,25 @@ extern const unsigned char* utf8decode(const unsigned char *utf8,
                                        unsigned short *ucs);
 extern unsigned char* utf8encode(unsigned long ucs, unsigned char *utf8);
 
-/* UTF-8 <-> UCS2 conversion. Note that these functions aren't thread safe
- * due to the use of static buffers. */
-static wchar_t* utf8_to_ucs2(const unsigned char *utf8, int index)
+/* Static buffers for the conversion results. This isn't thread safe,
+ * but it's sufficient for rockbox. */
+static unsigned char convbuf1[3*MAX_PATH];
+static unsigned char convbuf2[3*MAX_PATH];
+
+static wchar_t* utf8_to_ucs2(const unsigned char *utf8, void *buffer)
 {
-    static wchar_t wbuffer[2][MAX_PATH];
-    wchar_t *ucs = wbuffer[index];
+    wchar_t *ucs = buffer;
 
     while (*utf8)
         utf8 = utf8decode(utf8, ucs++);
         
     *ucs = 0;
-    return wbuffer[index];
+    return buffer;
 }
-static unsigned char *ucs2_to_utf8(const wchar_t *ucs)
+static unsigned char *ucs2_to_utf8(const wchar_t *ucs, unsigned char *buffer)
 {
-    static unsigned char buffer[3*MAX_PATH];
     unsigned char *utf8 = buffer;
-    
+
     while (*ucs)
         utf8 = utf8encode(*ucs++, utf8);
         
@@ -89,8 +90,8 @@ static unsigned char *ucs2_to_utf8(const wchar_t *ucs)
     return buffer;
 }
 
-#define UTF8_TO_OS(a)  utf8_to_ucs2(a,0)
-#define OS_TO_UTF8(a)  ucs2_to_utf8(a)
+#define UTF8_TO_OS(a)  utf8_to_ucs2(a,convbuf1)
+#define OS_TO_UTF8(a)  ucs2_to_utf8(a,convbuf1)
 #define DIR_T       _WDIR
 #define DIRENT_T    struct _wdirent
 #define STAT_T      struct _stat
@@ -104,7 +105,7 @@ extern int _wrmdir(const wchar_t*);
 #define STAT(a,b)   (_wstat)(UTF8_TO_OS(a),b)
 #define OPEN(a,b,c) (_wopen)(UTF8_TO_OS(a),b,c)
 #define REMOVE(a)   (_wremove)(UTF8_TO_OS(a))
-#define RENAME(a,b) (_wrename)(UTF8_TO_OS(a),utf8_to_ucs2(b,1))
+#define RENAME(a,b) (_wrename)(UTF8_TO_OS(a),utf8_to_ucs2(b,convbuf2))
 
 #else  /* !__MINGW32__ */
 
