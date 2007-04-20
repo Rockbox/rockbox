@@ -141,6 +141,7 @@ static int set_fg_color(void)
                      &global_settings.fg_color,global_settings.bg_color);
 
     screens[SCREEN_MAIN].set_foreground(global_settings.fg_color);
+    settings_save();
     return res;
 }
 
@@ -151,6 +152,7 @@ static int set_bg_color(void)
                      &global_settings.bg_color,global_settings.fg_color);
 
     screens[SCREEN_MAIN].set_background(global_settings.bg_color);
+    settings_save();
     return res;
 }
 static int reset_color(void)
@@ -160,6 +162,7 @@ static int reset_color(void)
 
     screens[SCREEN_MAIN].set_foreground(global_settings.fg_color);
     screens[SCREEN_MAIN].set_background(global_settings.bg_color);
+    settings_save();
     return 0;
 }
 MENUITEM_FUNCTION(set_bg_col, 0, ID2P(LANG_BACKGROUND_COLOR),
