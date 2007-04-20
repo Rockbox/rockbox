@@ -616,7 +616,7 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
     output="ajbrec.ajz"
     appextra="recorder:gui"
-    archosrom="$pwd/rombox.ucl"
+    archosrom=""#"$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
     codecs=""
@@ -639,7 +639,7 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
     output="ajbrec.ajz"
     appextra="recorder:gui"
-    archosrom="$pwd/rombox.ucl"
+    archosrom=""#"$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
     codecs=""
@@ -662,7 +662,7 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
     output="ajbrec.ajz"
     appextra="recorder:gui"
-    archosrom="$pwd/rombox.ucl"
+    archosrom=""#"$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
     codecs=""
@@ -708,7 +708,7 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
     output="ajbrec.ajz"
     appextra="recorder:gui"
-    archosrom="$pwd/rombox.ucl"
+    archosrom=""#"$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
     codecs=""
@@ -1644,9 +1644,9 @@ MAKEFLAGS += --no-print-directory
 
 .PHONY: all clean tags zip tools manual bin build info
 
-all: build info
+all: info
 
-info:
+info: build
 	\$(SILENT)\$(TOOLSDIR)/mkinfo.pl \$(BUILDDIR)/rockbox-info.txt
 
 build: tools
