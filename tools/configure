@@ -12,7 +12,6 @@
 CCOPTS="-W -Wall -Wundef -O -nostdlib -ffreestanding -Wstrict-prototypes"
 
 use_logf="#undef ROCKBOX_HAS_LOGF"
-use_simsound="#undef ROCKBOX_HAS_SIMSOUND"
 
 scriptver=`echo '$Revision$' | sed -e 's:\\$::g' -e 's/Revision: //'`
 
@@ -52,16 +51,6 @@ crosswincc () {
  endian="little" # windows is little endian
 }
 
-checksoundcard () {
-    if test -n "$codecs"; then
-        if test -f "/usr/include/sys/soundcard.h"; then
-         # We have a header file so we can build the sound code
-            use_simsound="#define ROCKBOX_HAS_SIMSOUND 1"
-            echo "Enabled PCM sound playback in simulator"
-        fi # header file present
-    fi # has codecs
-}
-
 # scan the $PATH for the given command
 findtool(){
   file="$1"
@@ -87,69 +76,44 @@ simcc () {
 
  output="rockboxui" # use this as default output binary name
 
- if [ "$simver" = "sdl" ]; then
-     # generic sdl-config checker
-     sdl=`findtool sdl-config`
+ # generic sdl-config checker
+ sdl=`findtool sdl-config`
 
-     if [ -z "$sdl" ]; then
-         echo "configure didn't find sdl-config, which indicates that you"
-         echo "don't have SDL (properly) installed. Please correct and"
-         echo "re-run configure!"
-         exit
-     fi
+ if [ -z "$sdl" ]; then
+     echo "configure didn't find sdl-config, which indicates that you"
+     echo "don't have SDL (properly) installed. Please correct and"
+     echo "re-run configure!"
+     exit
  fi
+
+ # default share option, override below if needed
+ SHARED_FLAG="-shared"
 
  case $uname in
    CYGWIN*)
    echo "Cygwin host detected"
 
-   SHARED_FLAG="-shared"
-   if [ "$simver" = "win32" ]; then
-       # win32 version
-       GCCOPTS="$GCCOPTS -mno-cygwin -DNOCYGWIN"
-       LDOPTS="-lgdi32 -luser32 -mno-cygwin"
-   elif [ "$simver" = "sdl" ]; then
-       # sdl version
-       GCCOPTS="$GCCOPTS `sdl-config --cflags`"
-       LDOPTS="`sdl-config --libs` -mconsole"
-       checksoundcard
-   else
-       # x11 version
-       GCCOPTS="$GCCOPTS"
-       LDOPTS='-L/usr/X11R6/lib -lSM -lICE -lXt -lX11 -lXmu -lSM -lICE -lX11 -lpthread'
-       checksoundcard
-   fi
+   # sdl version
+   GCCOPTS="$GCCOPTS `sdl-config --cflags`"
+   LDOPTS="`sdl-config --libs` -mconsole"
+
    output="rockboxui.exe" # use this as output binary name
    ;;
 
    Linux)
    echo "Linux host detected"
    GCCOPTS="$GCCOPTS"
-   SHARED_FLAG="-shared"
-   if [ "$simver" = "win32" ]; then
-       LDOPTS='-L/usr/X11R6/lib -lX11 -lm -lXt -lXmu -lnsl -ldl -lpthread'
-       crosswincc # setup cross-compiler
-   elif [ "$simver" = "sdl" ]; then
-       if [ "0" != `sdl-config --libs |grep -c mwindows` ]; then
-           # Enable crosscompiling if sdl-config is from Windows SDL
-           crosswincc
-       fi
-       GCCOPTS="$GCCOPTS `sdl-config --cflags`"
-       LDOPTS="`sdl-config --libs`"
-       checksoundcard
-   else
-       LDOPTS='-L/usr/X11R6/lib -lX11 -lm -lXt -lXmu -lnsl -ldl -lpthread'
-       checksoundcard
-   fi # not a cross-compiler
+   if [ "0" != `sdl-config --libs |grep -c mwindows` ]; then
+       # Enable crosscompiling if sdl-config is from Windows SDL
+       crosswincc
+   fi
+   GCCOPTS="$GCCOPTS `sdl-config --cflags`"
+   LDOPTS="`sdl-config --libs`"
    ;;
 
    FreeBSD)
    echo "FreeBSD host detected"
    LDOPTS='-L/usr/X11R6/lib -lX11 -lm -lXt -lXmu -dl -lpthread'
-   SHARED_FLAG="-shared"
-   if [ "$simver" = "win32" ]; then
-     crosswincc # setup cross-compiler
-   fi
    ;;
 
    Darwin)
@@ -158,8 +122,6 @@ simcc () {
    GCCOPTS="$GCCOPTS `sdl-config --cflags`"
    LDOPTS="`sdl-config --libs`"
    SHARED_FLAG="-dynamiclib -Wl\,-single_module"
-   use_simsound="#define ROCKBOX_HAS_SIMSOUND 1"
-   echo "Enabled PCM sound playback in simulator"
    ;;
 
    *)
@@ -322,51 +284,11 @@ whichadvanced () {
   if [ "yes" = "$simulator" ]; then
     debug="-DDEBUG"
     extradefines="$extradefines -DSIMULATOR"
-    whichsim
   fi
   if [ "yes" = "$profile" ]; then
     extradefines="$extradefines -DRB_PROFILE"
     PROFILE_OPTS="-finstrument-functions"
   fi
-}
-
-whichsim () {
-
-if [ -z "$simver" ]; then
-
-  ##################################################################
-  # Figure out what simulator version
-  #
-  # x11 is deprecated so hide it from the question
-  # win32 is also deprecated
-  #
-  echo ""
-  echo "Build (S)DL version? (S)"
-
-  option=`input`;
-
-  case $option in
-   [Ww])
-     simver="win32"
-
-     WINDRES=windres
-     DLLTOOL=dlltool
-     DLLWRAP=dllwrap
-
-     # make sure the code knows this is for win32
-     extradefines="$extradefines -DWIN32"
-     ;;
-   [Xx])
-     simver="x11"
-     extradefines="$extradefines -DX11"
-     ;;
-   [Ss]|*)
-     simver="sdl"
-     extradefines="$extradefines -DSDL"
-     ;;
-   esac
-   echo "Selected $simver simulator"
-fi
 }
 
 voiceconfig () {
@@ -1380,7 +1302,6 @@ fi
       simulator="yes"
       extradefines="-DSIMULATOR"
       echo "Simulator build selected"
-      whichsim
       ;;
     [Aa])
       echo "Advanced build selected"
@@ -1559,7 +1480,6 @@ fi
 sed > autoconf.h \
  -e "s,@ENDIAN@,${defendian},g" \
  -e "s,^#undef ROCKBOX_HAS_LOGF,$use_logf,g" \
- -e "s,@SIMSOUND@,$use_simsound,g" \
  -e "s,@config_rtc@,$config_rtc,g" \
  -e "s,@have_rtc_alarm@,$have_rtc_alarm,g" \
 <<EOF
@@ -1572,10 +1492,6 @@ sed > autoconf.h \
 
 /* Define this if you build rockbox to support the logf logging and display */
 #undef ROCKBOX_HAS_LOGF
-
-/* Define this if you have the linux/soundcard.h header and thus can compile
-   the sound-playing code in the X11 sim */
-@SIMSOUND@
 
 /* optional defines for RTC mod for h1x0 */
 @config_rtc@
@@ -1641,7 +1557,6 @@ sed > Makefile \
  -e "s,@FIRMDIR@,${firmdir},g" \
  -e "s,@TOOLSDIR@,${toolsdir},g" \
  -e "s,@APPS@,${apps},g" \
- -e "s,@SIMVER@,${simver},g" \
  -e "s,@GCCVER@,${gccver},g" \
  -e "s,@GCCNUM@,${gccnum},g" \
  -e "s,@UNAME@,${uname},g" \
@@ -1707,8 +1622,7 @@ export PROFILE_OPTS=@PROFILE_OPTS@
 export GCCOPTS=@GCCOPTS@
 export TARGET_INC=@TARGET_INC@
 export LOADADDRESS=@LOADADDRESS@
-export SIMVER=@SIMVER@
-export SIMDIR=\$(ROOTDIR)/uisimulator/\$(SIMVER)
+export SIMDIR=\$(ROOTDIR)/uisimulator/sdl
 export SHARED_FLAG=@SHARED_FLAG@
 export LDOPTS=@LDOPTS@
 export GCCVER=@GCCVER@
