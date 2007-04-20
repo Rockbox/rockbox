@@ -22,22 +22,38 @@ sub filesize {
     return $size;
 }
 
+sub cmd1line {
+    my ($c)=@_;
+    my @out=`$c 2>/dev/null`;
+    chomp $out[0];
+    return $out[0];
+}
+
 if(!$output) {
     print "Usage: mkinfo.pl <filename>\n";
     exit;
 }
 open(O, ">$output") || die "couldn't open $output for writing";
 
+# Variables identifying the target, that should remain the same as long
+# as the hardware is unmodified
 printf O ("Target: %s\n", $ENV{'ARCHOS'});
 printf O ("Target id: %d\n", $ENV{'TARGET_ID'});
 printf O ("Target define: %s\n", $ENV{'TARGET'});
+printf O ("Memory: %d\n", $ENV{'MEMORYSIZE'});
+
+# Variables identifying Rockbox and bootloader properties. Possibly changing
+# every software upgrade.
 printf O ("Version: %s\n", $ENV{'VERSION'});
 printf O ("Binary: %s\n", $ENV{'BINARY'});
 printf O ("Binary size: %s\n", filesize($ENV{'BINARY'}));
 printf O ("Actual size: %s\n", filesize("apps/rockbox.bin"));
 
-my @out=`$ENV{'CC'} --version`;
-chomp $out[0];
-printf O ("gcc: %s\n", $out[0]);
+# Variables identifying tool and build environment details
+printf O ("gcc: %s\n", cmd1line("$ENV{'CC'} --version"));
+printf O ("ld: %s\n", cmd1line("$ENV{'LD'} --version"));
+printf O ("Host gcc: %s\n", cmd1line("$ENV{'HOSTCC'} --version"));
+printf O ("Host system: %s\n", $ENV{'UNAME'});
 
 close(O);
+
