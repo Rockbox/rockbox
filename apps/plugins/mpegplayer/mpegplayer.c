@@ -1436,7 +1436,7 @@ static void video_thread(void)
                     offset = eta_video;
 
                 eta_video -= offset;
-                goto picture_draw;
+                goto picture_wait;
             }
 
             /** Possibly skip this frame **/
@@ -1538,6 +1538,7 @@ static void video_thread(void)
                     skip_level = 1; /* Decoder skip: B */
             }
 
+        picture_wait:
             /* Wait until audio catches up */
             while (eta_video > eta_audio)
             {
