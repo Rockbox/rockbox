@@ -31,20 +31,20 @@
  * system.h, CPUFREQ_xxx_MULT        |
  *              |                    |
  *              V                    V
- *                              Refreshtim.                         IDECONFIG1/IDECONFIG2
- * CPUCLK/Hz  MULT    PLLCR     16MB  32MB  CSCR0   CSCR1   CSCR3   CS2Pre CS2Post CS2Wait
+ *                   PLLCR &    Refreshtim.                         IDECONFIG1/IDECONFIG2
+ * CPUCLK/Hz  MULT ~0x70400000  16MB  32MB  CSCR0   CSCR1   CSCR3   CS2Pre CS2Post CS2Wait
  * ---------------------------------------------------------------------------------------
- *  11289600    1   0x10c00200    4     1   0x0180  0x0180  0x0180     1      0       0
- *  22579200    2   0x15c9e025   10     4   0x0180  0x0180  0x0180     1      0       0
- *  33868800    3   0x13c8e025   15     7   0x0180  0x0180  0x0180     1      0       0
- *  45158400    4   0x15c9e021   21    10   0x0580  0x0180  0x0580     1      0       0
- *  56448000    5   0x12c9e025   26    12   0x0580          0x0980
- *  67737600    6   0x13c8e021   32    15   0x0980          0x0d80
- *  79027200    7   0x13ca6021   37    18   0x0980          0x1180
- *  90316800    8   0x13cbe021   43    21   0x0d80          0x1580
- * 101606400    9   0x11c92025   48    23   0x0d80          0x1980
- * 112896000   10   0x11c9e025   54    26   0x1180          0x1d80
- * 124185600   11   0x11cae025   59    29   0x1180  0x1180  0x2180     2      1       2
+ *  11289600    1   0x00800200    4     1   0x0180  0x0180  0x0180     1      1       0
+ *  22579200    2   0x0589e025   10     4   0x0180  0x0180  0x0180     1      1       0
+ *  33868800    3   0x0388e025   15     7   0x0180  0x0180  0x0180     1      1       0
+ *  45158400    4   0x0589e021   21    10   0x0580  0x0180  0x0580     1      1       0
+ *  56448000    5   0x0289e025   26    12   0x0580  0x0580  0x0980     2      1       0
+ *  67737600    6   0x0388e021   32    15   0x0980  0x0980  0x0d80     2      1       0
+ *  79027200    7   0x038a6021   37    18   0x0980  0x0d80  0x1180     2      1       0
+ *  90316800    8   0x038be021   43    21   0x0d80  0x0d80  0x1580     2      1       0
+ * 101606400    9   0x01892025   48    23   0x0d80  0x1180  0x1980     2      1       0
+ * 112896000   10   0x0189e025   54    26   0x1180  0x1580  0x1d80     3      1       0
+ * 124185600   11   0x018ae025   59    29   0x1180  0x1580  0x2180     3      1       1
  */
 
 #if MEM < 32
@@ -93,9 +93,9 @@ void set_cpu_frequency(long frequency)
         timers_adjust_prescale(CPUFREQ_MAX_MULT, true);
         DCR = (0x8200 | MAX_REFRESH_TIMER);          /* Refresh timer */
         cpu_frequency = CPUFREQ_MAX;
-        IDECONFIG1 = 0x10100000 | (1 << 13) | (2 << 10);
+        IDECONFIG1 = 0x10100000 | (1 << 13) | (3 << 10);
         /* SRE active on write (H300 USBOTG) | BUFEN2 enable | CS2Post | CS2Pre */
-        IDECONFIG2 = 0x40000 | (2 << 8); /* TA enable + CS2wait */
+        IDECONFIG2 = 0x40000 | (1 << 8); /* TA enable + CS2wait */
 
 #ifdef HAVE_SERIAL
         UBG10 = BAUDRATE_DIV_MAX >> 8;
@@ -109,7 +109,7 @@ void set_cpu_frequency(long frequency)
         PLLCR &= ~1;  /* Bypass mode */
         timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, false);
         RECALC_DELAYS(CPUFREQ_NORMAL);
-        PLLCR = 0x038be025 | (PLLCR & 0x70400000);
+        PLLCR = 0x0589e021 | (PLLCR & 0x70400000);
         CSCR0 = 0x00000580; /* Flash: 1 wait state */
         CSCR1 = 0x00000180; /* LCD: 0 wait states */
 #if CONFIG_USBOTG == USBOTG_ISP1362
@@ -120,7 +120,7 @@ void set_cpu_frequency(long frequency)
         timers_adjust_prescale(CPUFREQ_NORMAL_MULT, true);
         DCR = (0x8000 | NORMAL_REFRESH_TIMER);       /* Refresh timer */
         cpu_frequency = CPUFREQ_NORMAL;
-        IDECONFIG1 = 0x10100000 | (0 << 13) | (1 << 10);
+        IDECONFIG1 = 0x10100000 | (1 << 13) | (1 << 10);
         /* SRE active on write (H300 USBOTG) | BUFEN2 enable | CS2Post | CS2Pre */
         IDECONFIG2 = 0x40000 | (0 << 8); /* TA enable + CS2wait */
 
@@ -144,7 +144,7 @@ void set_cpu_frequency(long frequency)
 #endif
         DCR = (0x8000 | DEFAULT_REFRESH_TIMER);       /* Refresh timer */
         cpu_frequency = CPUFREQ_DEFAULT;
-        IDECONFIG1 = 0x10100000 | (0 << 13) | (1 << 10);
+        IDECONFIG1 = 0x10100000 | (1 << 13) | (1 << 10);
         /* SRE active on write (H300 USBOTG) | BUFEN2 enable | CS2Post | CS2Pre */
         IDECONFIG2 = 0x40000 | (0 << 8); /* TA enable + CS2wait */
 
