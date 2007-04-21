@@ -667,7 +667,7 @@ int plugin_load(const char* plugin, void* parameter)
 
 /* Returns a pointer to the portion of the plugin buffer that is not already
    being used.  If no plugin is loaded, returns the entire plugin buffer */
-void* plugin_get_buffer(int* buffer_size)
+void* plugin_get_buffer(size_t *buffer_size)
 {
     int buffer_pos;
 
@@ -692,10 +692,10 @@ void* plugin_get_buffer(int* buffer_size)
    Playback gets stopped, to avoid conflicts.
    Talk buffer is stolen as well.
  */
-void* plugin_get_audio_buffer(int* buffer_size)
+void* plugin_get_audio_buffer(size_t *buffer_size)
 {
 #if CONFIG_CODEC == SWCODEC
-    return audio_get_buffer(true, (size_t *)buffer_size);
+    return audio_get_buffer(true, buffer_size);
 #else
     audio_stop();
     talk_buffer_steal(); /* we use the mp3 buffer, need to tell */

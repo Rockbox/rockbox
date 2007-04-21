@@ -552,7 +552,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int t_disp = 0;
 #ifdef USE_GSLIB
     unsigned char *gbuf;
-    unsigned int gbuf_size = 0;
+    size_t gbuf_size = 0;
     bool mode_switch = true;
 #endif
 

@@ -312,7 +312,7 @@ static void browse_cuesheet(struct cuesheet *cue)
 
 bool display_cuesheet_content(char* filename)
 {
-    unsigned int bufsize = 0;
+    size_t bufsize = 0;
     struct cuesheet *cue = (struct cuesheet *)plugin_get_buffer(&bufsize);
     if (!cue || bufsize < sizeof(struct cuesheet))
         return false;

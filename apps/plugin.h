@@ -545,8 +545,8 @@ struct plugin_api {
     int (*kbd_input)(char* buffer, int buflen);
     struct tm* (*get_time)(void);
     int  (*set_time)(const struct tm *tm);
-    void* (*plugin_get_buffer)(int* buffer_size);
-    void* (*plugin_get_audio_buffer)(int* buffer_size);
+    void* (*plugin_get_buffer)(size_t *buffer_size);
+    void* (*plugin_get_audio_buffer)(size_t *buffer_size);
     void (*plugin_tsr)(bool (*exit_callback)(bool reenter));
 #ifdef IRAM_STEAL
     void (*plugin_iram_init)(char *iramstart, char *iramcopy, size_t iram_size,
@@ -653,8 +653,8 @@ extern unsigned char plugin_end_addr[];
 #endif /* PLUGIN */
 
 int plugin_load(const char* plugin, void* parameter);
-void* plugin_get_buffer(int *buffer_size);
-void* plugin_get_audio_buffer(int *buffer_size);
+void* plugin_get_buffer(size_t *buffer_size);
+void* plugin_get_audio_buffer(size_t *buffer_size);
 #ifdef IRAM_STEAL
 void plugin_iram_init(char *iramstart, char *iramcopy, size_t iram_size,
                       char *iedata, size_t iedata_size);

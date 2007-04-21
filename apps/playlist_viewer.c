@@ -276,7 +276,7 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
                                  char* filename, bool reload)
 {
     char* buffer;
-    int buffer_size;
+    ssize_t buffer_size;
     bool is_playing = audio_status() & AUDIO_STATUS_PLAY;
 
     if (!filename && !is_playing)
@@ -294,7 +294,7 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
         /* Viewing playlist on disk */
         char *dir, *file, *temp_ptr;
         char *index_buffer = NULL;
-        int  index_buffer_size = 0;
+        ssize_t index_buffer_size = 0;
 
         viewer->playlist = &temp_playlist;
 

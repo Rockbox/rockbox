@@ -62,10 +62,10 @@ void init_screen(void)
 
 /* global vars for pl_malloc() */
 void *bufptr;
-int bufleft;
+ssize_t bufleft;
 
 /* simple function to "allocate" memory in pluginbuffer. */
-void *pl_malloc(int size)
+void *pl_malloc(ssize_t size)
 {
     void *ptr;
     ptr = bufptr;

@@ -25,7 +25,7 @@
 #ifndef SIMULATOR /* only for target */
 
 unsigned char *audiobuf;
-int audiobuf_size;
+ssize_t audiobuf_size;
 
 #if defined(IRIVER_H120)
 #define PLATFORM_ID ID_IRIVER_H100

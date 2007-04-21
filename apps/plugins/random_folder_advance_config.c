@@ -27,7 +27,7 @@ static int dirs_count;
 static int lasttick;
 #define RFA_FILE ROCKBOX_DIR "/folder_advance_list.dat"
 char *buffer = NULL;
-int buffer_size;
+ssize_t buffer_size;
 struct file_format {
     int count;
     char folder[][MAX_PATH];

@@ -52,7 +52,7 @@ static int previous_state;
 
 #ifdef USE_GRAY
 static unsigned char *gbuf;
-static unsigned int gbuf_size = 0;
+static size_t         gbuf_size = 0;
 #endif
 
 long video_frames IBSS_ATTR = 0 ;

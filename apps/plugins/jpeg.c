@@ -1874,7 +1874,7 @@ unsigned char* buf; /* up to here currently used by image(s) */
 /* the remaining free part of the buffer for compressed+uncompressed images */
 unsigned char* buf_images;
 
-int buf_size, buf_images_size;
+ssize_t buf_size, buf_images_size;
 /* the root of the images, hereafter are decompresed ones */
 unsigned char* buf_root;
 int root_size;

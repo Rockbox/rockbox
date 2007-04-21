@@ -37,7 +37,7 @@ static unsigned char cooling_map[LCD_HEIGHT][LCD_WIDTH];
 
 #ifndef HAVE_LCD_COLOR
 static unsigned char *gbuf;
-static unsigned int gbuf_size = 0;
+static size_t gbuf_size = 0;
 static unsigned char draw_buffer[8*LCD_WIDTH];
 #endif
 

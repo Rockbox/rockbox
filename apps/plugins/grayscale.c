@@ -75,7 +75,7 @@ PLUGIN_HEADER
 static struct plugin_api* rb; /* global api struct pointer */
 static char pbuf[32];         /* global printf buffer */
 static unsigned char *gbuf;
-static unsigned int gbuf_size = 0;
+static size_t gbuf_size = 0;
 
 /**************************** main function ********************************/
 

@@ -1607,7 +1607,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int status = PLUGIN_ERROR; /* assume failure */
     void* audiobuf;
-    int audiosize;
+    ssize_t audiosize;
     int in_file;
     uint8_t* buffer;
     size_t file_remaining;
@@ -1652,7 +1652,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     buffer_size = audiosize - (PCMBUFFER_SIZE+PCMBUFFER_GUARD_SIZE+
                                MPABUF_SIZE+LIBMPEG2BUFFER_SIZE);
 
-    DEBUGF("audiosize=%d, buffer_size=%ld\n",audiosize,buffer_size);
+    DEBUGF("audiosize=%ld, buffer_size=%ld\n",audiosize,buffer_size);
     buffer = mpeg2_malloc(buffer_size,-1);
 
     if (buffer == NULL)

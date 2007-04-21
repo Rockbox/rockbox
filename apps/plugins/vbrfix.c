@@ -22,8 +22,8 @@ PLUGIN_HEADER
 
 static struct plugin_api* rb;
 
-static char *audiobuf;
-static int audiobuflen;
+static char   *audiobuf;
+static ssize_t audiobuflen;
 
 static void xingupdate(int percent)
 {

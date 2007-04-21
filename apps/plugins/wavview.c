@@ -60,7 +60,7 @@ struct peakstruct
 
 /* global vars */
 static char *audiobuf;
-static int audiobuflen;
+static ssize_t audiobuflen;
 static uint32_t mempeakcount = 0;
 static uint32_t filepeakcount = 0;
 static uint32_t fppmp = 0; /* file peaks per mem peaks */

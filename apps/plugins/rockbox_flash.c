@@ -645,7 +645,7 @@ void DoUserDialog(char* filename)
     int rc; /* generic return code */
     UINT32 space, aligned_size, true_size;
     UINT8* pos;
-    int memleft;
+    ssize_t memleft;
     UINT32 crc;
     bool show_greet = false;
     
@@ -849,7 +849,7 @@ void DoUserDialog(char* filename)
     int rc; /* generic return code */
     UINT32 space, aligned_size, true_size;
     UINT8* pos;
-    int memleft;
+    ssize_t memleft;
     UINT32 crc;
 
     /* this can only work if Rockbox runs in DRAM, not flash ROM */

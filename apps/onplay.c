@@ -597,7 +597,8 @@ static bool clipboard_copy(void)
 /* Paste a file to a new directory. Will overwrite always. */
 static bool clipboard_pastefile(const char *src, const char *target, bool copy)
 {
-    int src_fd, target_fd, buffersize, size, bytesread, byteswritten;
+    int src_fd, target_fd;
+    ssize_t buffersize, size, bytesread, byteswritten;
     char *buffer;
     bool result = false;
 

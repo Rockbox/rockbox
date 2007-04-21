@@ -19,7 +19,7 @@ int my_putc(char c , int fd){
 void *my_malloc(size_t size)
 {
     static char *offset = NULL;
-    static int totalSize = 0;
+    static ssize_t totalSize = 0;
     char *ret;
 
     int remainder = size % 4;

@@ -947,7 +947,7 @@ bool wps_data_load(struct wps_data *wps_data,
             return false;
 
         /* get buffer space from the plugin buffer */
-        unsigned int buffersize = 0;
+        size_t buffersize = 0;
         char *wps_buffer = (char *)plugin_get_buffer(&buffersize);
 
         if (!wps_buffer)

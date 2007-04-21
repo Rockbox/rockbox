@@ -63,7 +63,7 @@ void sim_codec_close(void *pd);
 extern unsigned char codecbuf[];
 #endif
 
-extern void* plugin_get_audio_buffer(int *buffer_size);
+extern void* plugin_get_audio_buffer(size_t *buffer_size);
 
 struct codec_api ci_voice;
 

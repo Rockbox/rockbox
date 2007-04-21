@@ -880,7 +880,7 @@ void DoUserDialog(char* filename)
     char default_filename[32];
     int button;
     int rc; /* generic return code */
-    int memleft;
+    ssize_t memleft;
     tCheckROM result;
     bool is_romless;
 

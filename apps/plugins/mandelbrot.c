@@ -179,7 +179,7 @@ static unsigned max_iter;
 
 #ifdef USEGSLIB
 static unsigned char *gbuf;
-static unsigned int gbuf_size = 0;
+static size_t  gbuf_size = 0;
 static unsigned char imgbuffer[LCD_HEIGHT];
 #else
 static fb_data imgbuffer[LCD_HEIGHT];

@@ -1143,7 +1143,7 @@ int main(void* parameter)
 #ifdef DEBUG
     int button;
 #endif
-    int stacksize;
+    ssize_t stacksize;
     void* stack;
 
     mbus_init(); /* init the M-Bus layer */

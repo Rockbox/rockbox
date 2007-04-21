@@ -44,7 +44,7 @@ struct options options;
 
 void *audio_bufferbase;
 void *audio_bufferpointer;
-unsigned int audio_buffer_free;
+size_t audio_buffer_free;
 
 void *my_malloc(size_t size)
 {
@@ -194,13 +194,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     if(rb->audio_status())
     {
         audio_bufferbase = audio_bufferpointer
-            = rb->plugin_get_buffer((int *)&audio_buffer_free);
+            = rb->plugin_get_buffer(&audio_buffer_free);
         plugbuf=true;
     }
     else
     {
         audio_bufferbase = audio_bufferpointer
-            = rb->plugin_get_audio_buffer((int *)&audio_buffer_free);
+            = rb->plugin_get_audio_buffer(&audio_buffer_free);
         plugbuf=false;
     }
 #if MEM <= 8 && !defined(SIMULATOR)

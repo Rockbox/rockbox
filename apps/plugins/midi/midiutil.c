@@ -146,7 +146,7 @@ int midimain(void * filename);
 void *alloc(int size)
 {
     static char *offset = NULL;
-    static int totalSize = 0;
+    static ssize_t totalSize = 0;
     char *ret;
 
     int remainder = size % 4;
@@ -186,7 +186,7 @@ void *alloc(int size)
 void *alloc(int size)
 {
     static char *offset = NULL;
-    static int totalSize = 0;
+    static ssize_t totalSize = 0;
     char *ret;
 
 

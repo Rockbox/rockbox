@@ -25,7 +25,7 @@ PLUGIN_HEADER
 
 void *audio_bufferbase;
 void *audio_bufferpointer;
-unsigned int audio_buffer_free;
+size_t audio_buffer_free;
 struct plugin_api* rb;
 int w, h, y;
 

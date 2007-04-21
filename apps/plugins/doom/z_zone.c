@@ -231,7 +231,7 @@ void Z_Close(void)
 
 void Z_Init(void)
 {
-   unsigned int size;
+   size_t size;
 #ifdef INSTRUMENTED
    if (!(HEADER_SIZE >= sizeof(memblock_t) && MIN_RAM > LEAVE_ASIDE))
       I_Error("Z_Init: Sanity check failed");

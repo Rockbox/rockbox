@@ -47,7 +47,7 @@ enum plugin_status run_overlay(struct plugin_api* rb, void* parameter,
                                unsigned char *filename, unsigned char *name)
 {
     int fd, readsize;
-    int audiobuf_size;
+    ssize_t audiobuf_size;
     unsigned char *audiobuf;
     static struct plugin_header header;
 

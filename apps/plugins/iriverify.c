@@ -27,7 +27,7 @@ PLUGIN_HEADER
 
 static struct plugin_api* rb;
 
-int buf_size;
+ssize_t buf_size;
 static char *filename;
 static int readsize;
 static char *stringbuffer;

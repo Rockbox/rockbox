@@ -272,7 +272,7 @@ struct codec_api {
     int (*kbd_input)(char* buffer, int buflen);
     struct tm* (*get_time)(void);
     int  (*set_time)(const struct tm *tm);
-    void* (*plugin_get_audio_buffer)(int* buffer_size);
+    void* (*plugin_get_audio_buffer)(size_t* buffer_size);
     int (*round_value_to_list32)(unsigned long value,
                                  const unsigned long list[],
                                  int count,

@@ -573,7 +573,7 @@ static int copy_file(
     unsigned char *buffer;
     unsigned int i = 0;
     ssize_t bytes_read = 1; /* ensure the for loop is executed */
-    unsigned int buffer_size;
+    size_t buffer_size;
     buffer = rb->plugin_get_buffer(&buffer_size);
 
     for (i = 0; i < bytes && bytes_read > 0; i += bytes_read)

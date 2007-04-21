@@ -38,7 +38,7 @@ void *memcpy(void *dest, const void *src, size_t n) {
 }
 
 static char *audiobuf;
-static int audiobuflen;
+static ssize_t audiobuflen;
 
 static struct wav_header {
     char ckID [4];                      /* RIFF chuck header */

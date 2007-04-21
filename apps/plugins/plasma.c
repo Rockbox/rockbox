@@ -45,7 +45,7 @@ static int redphase = 0, greenphase = 50, bluephase = 100;
 static unsigned char colours[256]; /* Smooth transition of shades */
 static unsigned char graybuffer[LCD_HEIGHT*LCD_WIDTH]; /* off screen buffer */
 static unsigned char *gbuf;
-static unsigned int gbuf_size = 0;
+static size_t        gbuf_size = 0;
 #endif
 static unsigned char sp1, sp2, sp3, sp4; /* Speed of plasma */
 static int plasma_frequency;

@@ -327,7 +327,7 @@ int load_all_levels(void)
 {
     int linecnt = 0;
     int fd;
-    int size;
+    ssize_t size;
     char buf[64]; /* Larger than WIDTH, to allow for whitespace after the
                      lines */
 

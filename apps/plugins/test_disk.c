@@ -32,7 +32,7 @@ PLUGIN_HEADER
 
 static struct plugin_api* rb;
 static unsigned char* audiobuf;
-static int audiobufsize;
+static ssize_t audiobufsize;
 
 static unsigned short frnd_buffer;
 static int line = 0;
