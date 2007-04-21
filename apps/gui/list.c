@@ -124,7 +124,7 @@ static void gui_list_flash(struct gui_list * gui_list)
 {
     struct screen * display=gui_list->display;
     gui_list->cursor_flash_state=!gui_list->cursor_flash_state;
-    int selected_line=gui_list->selected_item-gui_list->start_item;
+    int selected_line=gui_list->selected_item-gui_list->start_item+SHOW_LIST_TITLE;
 #ifdef HAVE_LCD_BITMAP
     int line_ypos=display->getymargin()+display->char_height*selected_line;
     if (global_settings.invert_cursor)
