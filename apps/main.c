@@ -336,12 +336,8 @@ static void init(void)
     lcd_remote_init();
 #endif
     font_init();
-    
-#if !defined(TOSHIBA_GIGABEAT_F) || defined(SIMULATOR)
+
     show_logo();
-#else
-    sleep(1);  /* Weird.  We crash w/o this tiny delay. */
-#endif    
     lang_init();
 
 #ifdef DEBUG

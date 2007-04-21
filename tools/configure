@@ -1048,7 +1048,7 @@ EOF
     target="-DGIGABEAT_F"
     memory=32 # always
     arm9tdmicc
-    tool="cp"
+    tool="$rootdir/tools/scramble -add=giga"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.gigabeat"

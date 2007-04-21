@@ -3,7 +3,6 @@
 #include "mmu-meg-fx.h"
 #include "panic.h"
 
-void map_memory(void);
 static void enable_mmu(void);
 static void set_ttb(void);
 static void set_page_tables(void);
@@ -15,7 +14,7 @@ static void map_section(unsigned int pa, unsigned int va, int mb, int cache_flag
 #define BUFFERED (1 << 2)
 #define MB (1 << 20)
 
-void map_memory(void) {
+void memory_init(void) {
     set_ttb();
     set_page_tables();
     enable_mmu();
@@ -69,6 +68,20 @@ void map_section(unsigned int pa, unsigned int va, int mb, int cache_flags) {
 }
 
 static void enable_mmu(void) {
+    int regread;
+
+    asm volatile(
+        "MRC p15, 0, %r0, c1, c0, 0\n"  /* Read reg1, control register */
+    : /* outputs */
+        "=r"(regread)
+    : /* inputs */
+    : /* clobbers */
+        "r0"
+    );
+
+    if ( !(regread & 0x04) || !(regread & 0x00001000) ) /* Was the ICache or DCache Enabled? */
+        clean_dcache(); /* If so we need to clean the DCache before invalidating below */
+
     asm volatile("mov r0, #0\n"
         "mcr p15, 0, r0, c8, c7, 0\n" /* invalidate TLB */
 

@@ -32,4 +32,4 @@ void dump_dcache_range(const void *base, unsigned int size);
 /* Cleans entire DCache */
 void clean_dcache(void);
 
-
+void memory_init(void);

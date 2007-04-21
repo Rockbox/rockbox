@@ -44,7 +44,7 @@ inline bool usb_detect(void)
 void usb_init_device(void)
 {
     /* Input is the default configuration, only pullups need to be disabled */
-    GPFUP|=0x02;
+/*    GPFUP|=0x02;  */
 
     USB_VPLUS_PWR_ASSERT;
     GPBCON=( GPBCON&~(1<<13) ) | (1 << 12);

@@ -52,8 +52,8 @@ void ata_enable(bool on)
     else
         USB_ATA_ENABLE;
 
-    GPBCON=( GPGCON&~(1<<11) ) | (1<<10); /* Make the pin an output */
-//    GPBUP|=1<<5;  /* Disable pullup in SOC as we are now driving */
+    GPBCON=( GPBCON&~(1<<11) ) | (1<<10); /* Make the pin an output */
+    GPBUP|=1<<5;  /* Disable pullup in SOC as we are now driving */
 }
 
 bool ata_is_coldstart(void)

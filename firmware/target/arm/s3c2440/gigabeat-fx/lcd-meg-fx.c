@@ -53,6 +53,23 @@ unsigned int LCDBASEL(unsigned int address)
 /* LCD init */
 void lcd_init_device(void)
 {
+#ifdef BOOTLOADER
+    /* When the Rockbox bootloader starts, we are changing framebuffer address,
+       but we don't want what's shown on the LCD to change until we do an
+       lcd_update(), so copy the data from the old framebuffer to the new one */
+    int i;
+    unsigned short *buf = (unsigned short*)FRAME;
+
+    memcpy(FRAME, (short *)((LCDSADDR1)<<1), 320*240*2);
+
+    /* The Rockbox bootloader is transitioning from RGB555I to RGB565 mode
+       so convert the frambuffer data accordingly */
+    for(i=0; i< 320*240; i++){
+        *buf = ((*buf>>1) & 0x1F) | (*buf & 0xffc0);
+        buf++;
+    }
+#endif
+
     LCDSADDR1 = (LCDBANK((unsigned)FRAME) << 21) | (LCDBASEU((unsigned)FRAME));
     LCDSADDR2 = LCDBASEL((unsigned)FRAME);
     LCDSADDR3 = 0x000000F0;

@@ -1,6 +1,7 @@
 #include "kernel.h"
 #include "system.h"
 #include "panic.h"
+#include "mmu-meg-fx.h"
 
 #include "lcd.h"
 #include <stdio.h>
@@ -11,6 +12,7 @@ const int DMA0_MASK   = (1 << 17);
 const int DMA1_MASK   = (1 << 18);
 const int DMA2_MASK   = (1 << 19);
 const int DMA3_MASK   = (1 << 20);
+const int ALARM_MASK  = (1 << 30);
 
 int system_memory_guard(int newmode)
 {
