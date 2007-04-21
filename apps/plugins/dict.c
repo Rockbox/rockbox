@@ -84,7 +84,7 @@ void *pl_malloc(ssize_t size)
 /* init function for pl_malloc() */
 void pl_malloc_init(void)
 {
-    bufptr = rb->plugin_get_buffer(&bufleft);
+    bufptr = rb->plugin_get_buffer((size_t *)&bufleft);
 }
 
 /* for endian problems */

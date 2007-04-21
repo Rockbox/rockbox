@@ -777,7 +777,7 @@ void DoUserDialog(char* filename)
         return ;
     }
     
-    audiobuf = rb->plugin_get_audio_buffer(&audiobuf_size);
+    audiobuf = rb->plugin_get_audio_buffer((size_t *)&audiobuf_size);
     
     if (rb->strcasestr(filename, "/rockbox.iriver"))
         flash_rockbox(filename, SECT_RAMIMAGE);

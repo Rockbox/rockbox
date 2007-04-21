@@ -28,7 +28,7 @@ void *my_malloc(size_t size)
 
     if (offset == NULL)
     {
-        offset = rb->plugin_get_audio_buffer(&totalSize);
+        offset = rb->plugin_get_audio_buffer((size_t *)&totalSize);
     }
 
     if (size + 4 > abs(totalSize) )

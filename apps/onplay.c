@@ -604,7 +604,7 @@ static bool clipboard_pastefile(const char *src, const char *target, bool copy)
 
     if (copy) {
         /* See if we can get the plugin buffer for the file copy buffer */
-        buffer = (char *) plugin_get_buffer(&buffersize);
+        buffer = (char *) plugin_get_buffer((size_t *)&buffersize);
         if (buffer == NULL || buffersize < 512) {
             /* Not large enough, try for a disk sector worth of stack instead */
             buffersize = 512;

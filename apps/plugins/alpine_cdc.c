@@ -1157,7 +1157,7 @@ int main(void* parameter)
 #endif
 
     /* init the worker thread */
-    stack = rb->plugin_get_buffer(&stacksize); /* use the rest as stack */
+    stack = rb->plugin_get_buffer((size_t *)&stacksize); /* use the rest as stack */
     stack = (void*)(((unsigned int)stack + 100) & ~3); /* a bit away, 32 bit align */
     stacksize = (stacksize - 100) & ~3;
     if (stacksize < DEFAULT_STACK_SIZE)

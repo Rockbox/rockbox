@@ -640,7 +640,7 @@ void DoUserDialog(char* filename)
     char default_filename[32];
     int button;
     int rc; /* generic return code */
-    int memleft;
+    ssize_t memleft;
     tCheckROM result;
     bool is_romless;
 
@@ -687,7 +687,7 @@ void DoUserDialog(char* filename)
     }
 
     /* "allocate" memory */
-    sector = rb->plugin_get_buffer(&memleft);
+    sector = rb->plugin_get_buffer((size_t *)&memleft);
     if (memleft < SEC_SIZE) /* need buffer for a flash sector */
     {
         rb->splash(HZ*3, "Out of memory");
@@ -927,7 +927,7 @@ void DoUserDialog(char* filename)
     }
 
     /* "allocate" memory */
-    sector = rb->plugin_get_buffer(&memleft);
+    sector = rb->plugin_get_buffer((size_t *)&memleft);
     if (memleft < SEC_SIZE) /* need buffer for a flash sector */
     {
         rb->splash(HZ*3, "Out of memory");

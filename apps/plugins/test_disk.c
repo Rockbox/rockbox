@@ -308,7 +308,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     (void)parameter;
     rb = api;
-    audiobuf = rb->plugin_get_audio_buffer(&audiobufsize);
+    audiobuf = rb->plugin_get_audio_buffer((size_t *)&audiobufsize);
     rb->srand(*rb->current_tick);
 
     if (rb->global_settings->backlight_timeout > 0)

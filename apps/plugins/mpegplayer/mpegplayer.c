@@ -1672,7 +1672,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
 
     buffer_size &= ~(0x7ff);  /* Round buffer down to nearest 2KB */
-    DEBUGF("audiosize=%d, buffer_size=%ld\n",audiosize,buffer_size);
+    DEBUGF("audiosize=%ld, buffer_size=%ld\n",audiosize,buffer_size);
 
     if (!init_mpabuf())
         return PLUGIN_ERROR;

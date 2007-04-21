@@ -2298,9 +2298,9 @@ void get_pic_list(void)
     tree = rb->tree_get_context();
 
 #if PLUGIN_BUFFER_SIZE >= MIN_MEM
-    file_pt = rb->plugin_get_buffer(&buf_size);
+    file_pt = rb->plugin_get_buffer((size_t *)&buf_size);
 #else
-    file_pt = rb->plugin_get_audio_buffer(&buf_size);
+    file_pt = rb->plugin_get_audio_buffer((size_t *)&buf_size);
 #endif
 
     for(i = 0; i < tree->filesindir; i++)
@@ -3029,8 +3029,8 @@ int load_and_show(char* filename)
                 {
                     case JPEG_ZOOM_IN:
                         plug_buf = false;
-                        buf_images =
-                                rb->plugin_get_audio_buffer(&buf_images_size);
+                        buf_images = rb->plugin_get_audio_buffer(
+                                        (size_t *)&buf_images_size);
                         /*try again this file, now using the audio buffer */
                         return PLUGIN_OTHER;
 #ifdef JPEG_RC_MENU
@@ -3250,13 +3250,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #if (PLUGIN_BUFFER_SIZE >= MIN_MEM) && !defined(SIMULATOR)
     if(rb->audio_status())
     {
-        buf = rb->plugin_get_buffer(&buf_size) +
+        buf = rb->plugin_get_buffer((size_t *)&buf_size) +
              (entries * sizeof(char**));
         buf_size -= (entries * sizeof(char**));
         plug_buf = true;
     }
     else
-        buf = rb->plugin_get_audio_buffer(&buf_size);
+        buf = rb->plugin_get_audio_buffer((size_t *)&buf_size);
 #else
     buf = rb->plugin_get_audio_buffer(&buf_size) +
                (entries * sizeof(char**));

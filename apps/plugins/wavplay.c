@@ -3666,7 +3666,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         return PLUGIN_ERROR;
     }
 
-    aud_buf = rb->plugin_get_audio_buffer(&aud_size);
+    aud_buf = rb->plugin_get_audio_buffer((size_t *)&aud_size);
 
     switch (play_file((char*)parameter))
     {

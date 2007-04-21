@@ -333,7 +333,7 @@ int load_all_levels(void)
 
     /* Init the level_cache pointer and
        calculate how many levels that will fit */
-    level_cache = rb->plugin_get_buffer(&size);
+    level_cache = rb->plugin_get_buffer((size_t *)&size);
     max_levels = size / (HEIGHT*WIDTH);
 
     num_levels = 0;

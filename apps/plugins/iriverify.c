@@ -139,7 +139,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     rb = api;
 
-    buf = rb->plugin_get_audio_buffer(&buf_size); /* start munching memory */
+    buf = rb->plugin_get_audio_buffer((size_t *)&buf_size); /* start munching memory */
 
     stringbuffer = buf;
 

@@ -160,7 +160,7 @@ void edit_list(void)
     fd = rb->open(RFA_FILE,O_RDONLY);
     if (fd < 0)
         return;
-    buffer = rb->plugin_get_audio_buffer(&buffer_size);
+    buffer = rb->plugin_get_audio_buffer((size_t *)&buffer_size);
     if (!buffer)
         return;
     rb->read(fd,buffer,buffer_size);

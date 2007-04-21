@@ -283,7 +283,7 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
         /* Nothing is playing, exit */
         return false;
 
-    buffer = plugin_get_buffer(&buffer_size);
+    buffer = plugin_get_buffer((size_t *)&buffer_size);
     if (!buffer)
         return false;
 

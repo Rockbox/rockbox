@@ -664,7 +664,7 @@ void DoUserDialog(char* filename)
     }
     
     /* "allocate" memory */
-    sector = rb->plugin_get_buffer(&memleft);
+    sector = rb->plugin_get_buffer((size_t *)&memleft);
     if (memleft < SECTORSIZE) /* need buffer for a flash sector */
     {
         rb->splash(HZ*3, "Out of memory");
@@ -867,7 +867,7 @@ void DoUserDialog(char* filename)
     }
     
     /* "allocate" memory */
-    sector = rb->plugin_get_buffer(&memleft);
+    sector = rb->plugin_get_buffer((size_t *)&memleft);
     if (memleft < SECTORSIZE) /* need buffer for a flash sector */
     {
         rb->splash(HZ*3, "Out of memory");

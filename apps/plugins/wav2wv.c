@@ -307,7 +307,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void *parameter)
     if (!parameter)
         return PLUGIN_ERROR;
 
-    audiobuf = rb->plugin_get_audio_buffer(&audiobuflen);
+    audiobuf = rb->plugin_get_audio_buffer((size_t *)&audiobuflen);
 
     if (audiobuflen < 0x200000) {
         rb->splash(HZ*2, "not enough memory!");

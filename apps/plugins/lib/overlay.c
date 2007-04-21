@@ -78,7 +78,7 @@ enum plugin_status run_overlay(struct plugin_api* rb, void* parameter,
         return PLUGIN_ERROR;
     }
 
-    audiobuf = rb->plugin_get_audio_buffer(&audiobuf_size);
+    audiobuf = rb->plugin_get_audio_buffer((size_t *)&audiobuf_size);
     if (header.load_addr < audiobuf ||
         header.end_addr > audiobuf + audiobuf_size)
     {
