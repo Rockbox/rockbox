@@ -88,10 +88,6 @@
 #endif
 #include "hwcompat.h"
 
-#if CONFIG_CPU == S3C2440
-#include "s3c2440.h"
-#endif
-
 #ifndef SIMULATOR
 static bool dbg_list(char *title, int count, int selection_size,
                      int (*action_callback)(int btn, struct gui_synclist *lists), 
@@ -1139,7 +1135,7 @@ bool dbg_ports(void)
     }
 #elif CONFIG_CPU == S3C2440
     char buf[128];
-    int line, fd;
+    int line;
 
     lcd_setmargins(0, 0);
     lcd_clear_display();
