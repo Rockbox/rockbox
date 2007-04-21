@@ -1275,16 +1275,6 @@ static char *get_token_value(struct gui_wps *gwps,
 */
 static int find_conditional_end(struct wps_data *data, int index)
 {
-    int type = data->tokens[index].type;
-
-    if (type != WPS_TOKEN_CONDITIONAL_START
-        && type != WPS_TOKEN_CONDITIONAL_OPTION)
-    {
-        /* this function should only be used with "index" pointing to a
-           WPS_TOKEN_CONDITIONAL_START or a WPS_TOKEN_CONDITIONAL_OPTION */
-        return index + 1;
-    }
-
     int ret = index;
     while (data->tokens[ret].type != WPS_TOKEN_CONDITIONAL_END)
         ret = data->tokens[ret].value.i;
@@ -1304,18 +1294,8 @@ static int evaluate_conditional(struct gui_wps *gwps, int cond_index)
     struct wps_data *data = gwps->data;
 
     int ret, i;
-    int num_options = data->tokens[cond_index].value.i;
     char result[128], *value;
-    int cond_start = cond_index;
-
-    /* find the index of the conditional start token */
-    while (data->tokens[cond_start].type != WPS_TOKEN_CONDITIONAL_START
-           && cond_start < data->num_tokens)
-        cond_start++;
-
-    /* if the number of options is 0, the conditional is invalid */
-    if (num_options == 0)
-        return cond_start;
+    int num_options = data->tokens[cond_index].value.i;
 
     /* treat ?xx<true> constructs as if they had 2 options. */
     if (num_options < 2)
@@ -1334,7 +1314,7 @@ static int evaluate_conditional(struct gui_wps *gwps, int cond_index)
         intval = num_options;
 
     /* skip to the right enum case */
-    int next = cond_start;
+    int next = cond_index + 2;
     for (i = 1; i < intval; i++)
     {
         next = data->tokens[next].value.i;
