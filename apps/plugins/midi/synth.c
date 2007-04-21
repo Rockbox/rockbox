@@ -91,7 +91,7 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
 
         if(mf->tracks[a] == NULL)
         {
-            printf("\nNULL TRACK !!!");
+            printf("NULL TRACK !!!");
             rb->splash(HZ*2, "Null Track in loader.");
             return -1;
         }
@@ -110,10 +110,10 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
     int file = rb->open(filename, O_RDONLY);
     if(file < 0)
     {
-        printf("\n");
-        printf("\nNo MIDI patchset found.");
-        printf("\nPlease install the instruments.");
-        printf("\nSee Rockbox page for more info.");
+        printf("");
+        printf("No MIDI patchset found.");
+        printf("Please install the instruments.");
+        printf("See Rockbox page for more info.");
 
         rb->splash(HZ*2, "No Instruments");
         return -1;
@@ -125,7 +125,7 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
     /* Scan our config file and load the right patches as needed    */
     int c = 0;
     name[0] = '\0';
-    printf("\nLoading instruments");
+    printf("Loading instruments");
     for(a=0; a<128; a++)
     {
         while(readChar(file)!=' ' && !eof(file));
@@ -157,7 +157,7 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
     /* Scan our config file and load the drum data  */
     int idx=0;
     char number[30];
-    printf("\nLoading drums");
+    printf("Loading drums");
     while(!eof(file))
     {
         readTextBlock(file, number);
@@ -195,12 +195,12 @@ void setPoint(struct SynthObject * so, int pt)
 
     if(so->wf==NULL)
     {
-        printf("\nCrap... null waveform...");
+        printf("Crap... null waveform...");
         exit(1);
     }
     if(so->wf->envRate==NULL)
     {
-        printf("\nWaveform has no envelope set");
+        printf("Waveform has no envelope set");
         exit(1);
     }
 

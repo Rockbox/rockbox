@@ -133,7 +133,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->cpu_boost(true);
 #endif
 
-    printf("\n%s", parameter);
+    printf("%s", parameter);
     /*   rb->splash(HZ, true, parameter); */
 
 #ifdef RB_PROFILE
@@ -218,12 +218,12 @@ int midimain(void * filename)
 {
     int notesUsed = 0;
     int a=0;
-    printf("\nLoading file");
+    printf("Loading file");
     mf= loadFile(filename);
 
     if(mf == NULL)
     {
-        printf("\nError loading file.");
+        printf("Error loading file.");
         return -1;
     }
 
@@ -245,7 +245,7 @@ int midimain(void * filename)
         * This seems to work quite well. On a laptop, anyway.
         */
 
-    printf("\nOkay, starting sequencing");
+    printf("Okay, starting sequencing");
 
     bpm=mf->div*1000000/tempo;
     numberOfSamples=SAMPLE_RATE/bpm;

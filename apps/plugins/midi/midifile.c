@@ -30,7 +30,7 @@ struct MIDIfile * loadFile(char * filename)
 
     if(file==-1)
     {
-        printf("Could not open file\n");
+        printf("Could not open file");
         return NULL;
     }
 
@@ -39,7 +39,7 @@ struct MIDIfile * loadFile(char * filename)
     if(mfload==NULL)
     {
         rb->close(file);
-        printf("Could not allocate memory for MIDIfile struct\n");
+        printf("Could not allocate memory for MIDIfile struct");
         return NULL;
     }
 
@@ -50,8 +50,8 @@ struct MIDIfile * loadFile(char * filename)
     {
         if(fileID == ID_RIFF)
         {
-            printf("\nDetected RMID file");
-            printf("\nLooking for MThd header");
+            printf("Detected RMID file");
+            printf("Looking for MThd header");
             char dummy[17];
             rb->read(file, &dummy, 16);
             if(readID(file) != ID_MTHD)
@@ -88,7 +88,7 @@ struct MIDIfile * loadFile(char * filename)
 
     int track=0;
 
-    printf("\nFile has %d tracks.", mfload->numTracks);
+    printf("File has %d tracks.", mfload->numTracks);
 
     while(! eof(file) && track < mfload->numTracks)
     {
@@ -99,7 +99,7 @@ struct MIDIfile * loadFile(char * filename)
         {
             if(mfload->numTracks != track)
             {
-                printf("\nError: file claims to have %d tracks.\n I only see %d here.\n",     mfload->numTracks, track);
+                printf("Error: file claims to have %d tracks. I only see %d here.",     mfload->numTracks, track);
                 mfload->numTracks = track;
             }
             return mfload;
@@ -111,7 +111,7 @@ struct MIDIfile * loadFile(char * filename)
             track++;
         } else
         {
-            printf("\n SKIPPING TRACK");
+            printf("SKIPPING TRACK");
             int len = readFourBytes(file);
             while(--len)
                 readChar(file);
@@ -223,7 +223,7 @@ struct Track * readTrack(int file)
     {
         if(trackSize < dataPtr-trk->dataBlock)
         {
-            printf("\nTrack parser memory out of bounds");
+            printf("Track parser memory out of bounds");
             exit(1);
         }
         dataPtr+=sizeof(struct Event);
@@ -245,7 +245,7 @@ int readID(int file)
         id[a]=readChar(file);
     if(eof(file))
     {
-        printf("\nEnd of file reached.");
+        printf("End of file reached.");
         return ID_EOF;
     }
     if(rb->strcmp(id, "MThd")==0)

@@ -230,7 +230,7 @@ void pressNote(int ch, int note, int vol)
         if(drumSet[note]!=NULL)
         {
                     if(note<35)
-                printf("\nNOTE LESS THAN 35, AND A DRUM PATCH EXISTS FOR THIS? WHAT THE HELL?");
+                printf("NOTE LESS THAN 35, AND A DRUM PATCH EXISTS FOR THIS? WHAT THE HELL?");
 
             struct GWaveform * wf = drumSet[note]->waveforms[0];
             voices[a].wf=wf;
@@ -328,7 +328,7 @@ int tick(void)
         struct Track * tr = mf->tracks[a];
 
         if(tr == NULL)
-            printf("\nNULL TRACK: %d", a);
+            printf("NULL TRACK: %d", a);
 
 
         //BIG DEBUG STATEMENT

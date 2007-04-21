@@ -160,13 +160,13 @@ void *alloc(int size)
 
     if (size + 4 > totalSize)
     {
-        printf("\nMALLOC BARF");
-        printf("\nMALLOC BARF");
-        printf("\nMALLOC BARF");
-        printf("\nMALLOC BARF");
-        printf("\nMALLOC BARF");
-        printf("\nMALLOC BARF");
-        printf("\nMALLOC BARF");
+        printf("MALLOC BARF");
+        printf("MALLOC BARF");
+        printf("MALLOC BARF");
+        printf("MALLOC BARF");
+        printf("MALLOC BARF");
+        printf("MALLOC BARF");
+        printf("MALLOC BARF");
         /* We've made our point. */
 
         return NULL;
