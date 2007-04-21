@@ -387,21 +387,22 @@ bool bookmark_autoload(const char* file)
         FOR_NB_SCREENS(i)
             screens[i].clear_display();
         
-        gui_syncstatusbar_draw(&statusbars, false);
+        gui_syncstatusbar_draw(&statusbars, true);
         
         FOR_NB_SCREENS(i)
         {
 #ifdef HAVE_LCD_BITMAP
-            screens[i].setmargins(0, STATUSBAR_HEIGHT);
+            screens[i].setmargins(0, global_settings.statusbar
+                ? STATUSBAR_HEIGHT : 0);
             screens[i].puts_scroll(0,0, str(LANG_BOOKMARK_AUTOLOAD_QUERY));
             screens[i].puts(0,1, str(LANG_CONFIRM_WITH_PLAY_RECORDER));
             screens[i].puts(0,2, str(LANG_BOOKMARK_SELECT_LIST_BOOKMARKS));
             screens[i].puts(0,3, str(LANG_CANCEL_WITH_ANY_RECORDER));
-            screens[i].update();
 #else
             screens[i].puts_scroll(0,0, str(LANG_BOOKMARK_AUTOLOAD_QUERY));
             screens[i].puts(0,1,str(LANG_RESUME_CONFIRM_PLAYER));
 #endif
+            screens[i].update();
         }
 
         /* Wait for a key to be pushed */
@@ -739,6 +740,7 @@ static void display_bookmark(const char* bookmark,
     {
         screens[i].puts_scroll(0,0,global_temp_buffer);
         screens[i].puts(0,1,str(LANG_RESUME_CONFIRM_PLAYER));
+        screens[i].update();
     }
 #endif
 }
