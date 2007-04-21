@@ -276,14 +276,14 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
                                  char* filename, bool reload)
 {
     char* buffer;
-    ssize_t buffer_size;
+    size_t buffer_size;
     bool is_playing = audio_status() & AUDIO_STATUS_PLAY;
 
     if (!filename && !is_playing)
         /* Nothing is playing, exit */
         return false;
 
-    buffer = plugin_get_buffer((size_t *)&buffer_size);
+    buffer = plugin_get_buffer(&buffer_size);
     if (!buffer)
         return false;
 
