@@ -614,13 +614,24 @@ long gui_wps_show(void)
             FOR_NB_SCREENS(i)
             {
                 if(update(&gui_wps[i]))
-                    update_failed = true;
-            }
-            if (update_failed)
-            {
-                return GO_TO_ROOT;
+                    exit = true;
             }
             update_track = false;
+        }
+
+        if (restore &&
+            ((restoretimer == 0) ||
+             (restoretimer < current_tick)))
+        {
+            restore = false;
+            restoretimer = 0;
+            if (gui_wps_display()) {
+                exit = true;
+            }
+            else if (wps_state.id3){
+                FOR_NB_SCREENS(i)
+                    gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_NON_STATIC);
+            }
         }
 
         if (exit) {
@@ -646,23 +657,6 @@ long gui_wps_show(void)
 
         if ( button )
             ata_spin();
-
-        if (restore &&
-            ((restoretimer == 0) ||
-             (restoretimer < current_tick)))
-        {
-            restore = false;
-            restoretimer = 0;
-            if (gui_wps_display())
-            {
-                return GO_TO_ROOT;
-            }
-
-            if (wps_state.id3){
-                FOR_NB_SCREENS(i)
-                    gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_NON_STATIC);
-            }
-        }
     }
     return GO_TO_ROOT; /* unreachable - just to reduce compiler warnings */
 }
