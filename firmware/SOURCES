@@ -282,6 +282,11 @@ target/arm/pnx0101/i2c-pnx0101.c
 target/arm/pnx0101/system-pnx0101.c
 #endif
 #if defined(CPU_PP)
+#if CONFIG_CPU == PP5002
+target/arm/system-pp5002.c
+#elif (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5024)
+target/arm/system-pp502x.c
+#endif
 #ifdef BOOTLOADER
 target/arm/crt0-pp-bl.S
 #else
