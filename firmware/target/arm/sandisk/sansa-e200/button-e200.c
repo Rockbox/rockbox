@@ -146,7 +146,9 @@ int button_read_device(void)
         {
             btn = btn&(~(BUTTON_SCROLL_UP|BUTTON_SCROLL_DOWN));
         }
+#ifndef BOOTLOADER
         button_backlight_on();
+#endif
     }
     
     return btn;
