@@ -610,7 +610,6 @@ long gui_wps_show(void)
 
         if (update_track)
         {
-            bool update_failed = false;
             FOR_NB_SCREENS(i)
             {
                 if(update(&gui_wps[i]))
