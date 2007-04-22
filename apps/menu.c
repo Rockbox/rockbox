@@ -754,7 +754,7 @@ int menu_show(int m)
         case GO_TO_PREVIOUS:
             return MENU_SELECTED_EXIT;
         default:
-            if (value < 0)
+            if (value >= 0)
                 return menus[m].current_selection;
             else return value;
     }
