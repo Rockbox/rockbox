@@ -16,17 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <stdio.h>
-#include "config.h"
-#include <stdbool.h>
-#include "lcd.h"
-#include "font.h"
 #include "system.h"
-#include "kernel.h"
-#include "thread.h"
-#include "timer.h"
-#include "inttypes.h"
-#include "string.h"
 
 unsigned int ipod_hw_rev;
 #ifndef BOOTLOADER
