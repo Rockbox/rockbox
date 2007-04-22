@@ -24,4 +24,6 @@ void __backlight_on(void);
 void __backlight_off(void);
 void __backlight_set_brightness(int brightness);
 
+void __button_backlight_on(void);
+void __button_backlight_off(void);
 #endif

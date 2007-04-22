@@ -75,6 +75,10 @@ const signed char backlight_timeout_value[19] =
 #ifdef HAVE_LCD_SLEEP
 #define LCD_SLEEP 6
 #endif
+#ifdef HAVE_BUTTON_LIGHT
+#define BUTTON_LIGHT_ON 7
+#define BUTTON_LIGHT_OFF 8
+#endif
 
 static void backlight_thread(void);
 static long backlight_stack[DEFAULT_STACK_SIZE/sizeof(long)];
@@ -91,6 +95,60 @@ static int backlight_timeout_plugged = 5*HZ;
 #endif
 #ifdef HAS_BUTTON_HOLD
 static int backlight_on_button_hold = 0;
+#endif
+
+#ifdef HAVE_BUTTON_LIGHT
+static int button_backlight_timer;
+static int button_backlight_timeout = 5*HZ;
+
+/* external interface */
+void button_backlight_on(void)
+{
+    queue_remove_from_head(&backlight_queue, BUTTON_LIGHT_ON);
+    queue_post(&backlight_queue, BUTTON_LIGHT_ON, 0);
+}
+
+void button_backlight_off(void)
+{
+    queue_post(&backlight_queue, BUTTON_LIGHT_OFF, 0);
+}
+
+void button_backlight_set_timeout(int index)
+{
+    if((unsigned)index >= sizeof(backlight_timeout_value))
+        /* if given a weird value, use default */
+        index = 6;
+    button_backlight_timeout = HZ * backlight_timeout_value[index];
+    if (index == 0) /* off */
+        button_backlight_off();
+    else if (index == 1) /* on */
+        button_backlight_on();
+    
+    if (button_backlight_timer)
+        button_backlight_timer = button_backlight_timeout;
+}
+
+/* internal interface */
+static void _button_backlight_on(void)
+{
+    if (button_backlight_timeout < 0)
+        return;
+    button_backlight_timer = button_backlight_timeout;
+#ifndef SIMULATOR
+    __button_backlight_on();
+#endif
+}
+
+static void _button_backlight_off(void)
+{
+    if (button_backlight_timeout == 0)
+        return;
+    button_backlight_timer = 0;
+#ifndef SIMULATOR
+    __button_backlight_off();
+#endif
+}
+
 #endif
 
 #ifdef HAVE_REMOTE_LCD
@@ -444,6 +502,14 @@ void backlight_thread(void)
                 lcd_sleep();
                 break;
 #endif
+#ifdef HAVE_BUTTON_LIGHT
+            case BUTTON_LIGHT_ON:
+                _button_backlight_on();
+                break;
+            case BUTTON_LIGHT_OFF:
+                _button_backlight_off();
+                break;
+#endif
 
 #ifdef X5_BACKLIGHT_SHUTDOWN
             case BACKLIGHT_QUIT:
@@ -521,6 +587,16 @@ static void backlight_tick(void)
         }
     }
 #endif /* HAVE_REMOVE_LCD */
+#ifdef HAVE_BUTTON_LIGHT
+    if (button_backlight_timer)
+    {
+        button_backlight_timer--;
+        if (button_backlight_timer == 0)
+        {
+            button_backlight_off();
+        }
+    }
+#endif /* HAVE_BUTTON_LIGHT */
 }
 
 void backlight_init(void)
@@ -541,6 +617,9 @@ void backlight_init(void)
     backlight_on();
 #ifdef HAVE_REMOTE_LCD
     remote_backlight_on();
+#endif
+#ifdef HAVE_BUTTON_LIGHT
+    button_backlight_on();
 #endif
     
     create_thread(backlight_thread, backlight_stack,

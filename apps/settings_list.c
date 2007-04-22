@@ -1175,6 +1175,13 @@ const struct settings_list settings[] = {
                      "remote viewers iconset", "",
                      ICON_DIR "/", ".bmp", MAX_FILENAME+1),
 #endif /* HAVE_REMOTE_LCD */
+#ifdef HAVE_BUTTON_LIGHT
+    INT_SETTING_W_CFGVALS(F_FLIPLIST, button_light_timeout,
+                          LANG_BUTTONLIGHT_TIMEOUT, 6,
+        "button light timeout", backlight_times_conf, UNIT_SEC,
+        0, 18, 1, backlight_formatter, backlight_getlang, 
+        button_backlight_set_timeout),
+#endif
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

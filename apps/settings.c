@@ -709,6 +709,9 @@ void settings_apply(void)
     backlight_set_fade_out(global_settings.backlight_fade_out);
 #endif
 #endif
+#ifdef HAVE_BUTTON_LIGHT
+    button_backlight_set_timeout(global_settings.button_light_timeout);
+#endif
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
     backlight_set_brightness(global_settings.brightness);
 #endif

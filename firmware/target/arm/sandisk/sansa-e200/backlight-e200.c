@@ -39,3 +39,14 @@ void __backlight_off(void)
 {
     pp_i2c_send( 0x46, 0x23, 0x0);
 }
+
+
+void __button_backlight_on(void)
+{
+    GPIOG_OUTPUT_VAL |=0x80;
+}
+
+void __button_backlight_off(void)
+{
+    GPIOG_OUTPUT_VAL &=~ 0x80;
+}

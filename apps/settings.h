@@ -717,6 +717,9 @@ struct user_settings
     unsigned char remote_icon_file[MAX_FILENAME+1];
     unsigned char remote_viewers_icon_file[MAX_FILENAME+1];
 #endif
+#ifdef HAVE_BUTTON_LIGHT
+    int button_light_timeout;
+#endif
 };
 
 /** global variables **/

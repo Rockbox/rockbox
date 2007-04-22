@@ -31,18 +31,6 @@
 static unsigned int old_wheel_value = 0;
 static unsigned int wheel_repeat = BUTTON_NONE;
 
-/* Wheel backlight control */
-#define WHEEL_BACKLIGHT_TIMEOUT 5*HZ;
-static unsigned int wheel_backlight_timer;
-
-void wheel_backlight_on(bool enable)
-{
-    if(enable)
-        GPIOG_OUTPUT_VAL |=0x80;
-    else
-        GPIOG_OUTPUT_VAL &=~ 0x80;
-}
-
 void button_init_device(void)
 {
     /* Enable all buttons */
@@ -52,7 +40,6 @@ void button_init_device(void)
     /* Scrollwheel light - enable control through GPIOG pin 7 and set timeout */
     GPIOG_ENABLE = 0x80;
     GPIOG_OUTPUT_EN |= 0x80;
-    wheel_backlight_timer = WHEEL_BACKLIGHT_TIMEOUT;
     
     /* Read initial wheel value (bit 6-7 of GPIOH) */
     old_wheel_value = GPIOH_INPUT_VAL & 0xc0;
@@ -153,23 +140,13 @@ int button_read_device(void)
         old_wheel_value = new_wheel_value;
     }
     
-    if(wheel_backlight_timer>0){
-        wheel_backlight_timer--;
-        if(wheel_backlight_timer==0){
-            wheel_backlight_on(false);
-        }
-    }
-    
     if( (btn & BUTTON_SCROLL_UP) || (btn & BUTTON_SCROLL_DOWN) ){
         /* only trigger once per click */
         if ((new_wheel_value == 0x00) || (new_wheel_value == 0xc0))
         {
             btn = btn&(~(BUTTON_SCROLL_UP|BUTTON_SCROLL_DOWN));
         }
-        if(wheel_backlight_timer==0){
-            wheel_backlight_on(true);
-        }
-        wheel_backlight_timer = WHEEL_BACKLIGHT_TIMEOUT;
+        button_backlight_on();
     }
     
     return btn;

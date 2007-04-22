@@ -10741,3 +10741,20 @@
     *: "Context Menu"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_BUTTONLIGHT_TIMEOUT
+  desc: in settings_menu
+  user:
+  <source>
+    *: ""
+    e200: "Wheel Light Timeout"
+  </source>
+  <dest>
+    *: ""
+    e200: "Wheel Light Timeout"
+  </dest>
+  <voice>
+    *: ""
+    e200: "Wheel Light Timeout"
+  </voice>
+</phrase>

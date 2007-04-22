@@ -80,4 +80,10 @@ void sim_remote_backlight(int value);
 void backlight_set_brightness(int val);
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 
+#ifdef HAVE_BUTTON_LIGHT
+void button_backlight_on(void);
+void button_backlight_off(void);
+void button_backlight_set_timeout(int index);
+#endif
+
 #endif /* BACKLIGHT_H */
