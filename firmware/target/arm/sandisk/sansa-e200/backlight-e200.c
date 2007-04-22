@@ -16,7 +16,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "config.h"
 #include "backlight-target.h"
 #include "system.h"
 #include "backlight.h"

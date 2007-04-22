@@ -19,14 +19,9 @@
 
 /* Taken from button-h10.c by Barry Wardell and reverse engineering by MrH. */
 
-#include <stdlib.h>
-#include "config.h"
-#include "cpu.h"
 #include "system.h"
 #include "button.h"
-#include "kernel.h"
 #include "backlight.h"
-#include "system.h"
 
 static unsigned int old_wheel_value = 0;
 static unsigned int wheel_repeat = BUTTON_NONE;

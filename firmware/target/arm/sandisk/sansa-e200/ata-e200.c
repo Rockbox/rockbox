@@ -16,16 +16,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "lcd.h"
 #include "ata.h"
 #include "ata-target.h"
 #include "ata_idle_notify.h"
-#include "cpu.h"
 #include "system.h"
-#include <stdio.h>
-#include <stdbool.h>
 #include <string.h>
-#include "kernel.h"
 #include "thread.h"
 
 #define NOINLINE_ATTR __attribute__((noinline)) /* don't inline the loops */
