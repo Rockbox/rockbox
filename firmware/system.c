@@ -395,13 +395,13 @@ void system_init(void)
         ipod_hw_rev = (*((volatile unsigned long*)(0x01fffffc)));
 
         /* disable all irqs */
-        outl(-1, 0x60001138);
-        outl(-1, 0x60001128);
-        outl(-1, 0x6000111c);
-
-        outl(-1, 0x60001038);
-        outl(-1, 0x60001028);
-        outl(-1, 0x6000101c);
+        COP_HI_INT_CLR      = -1;
+        CPU_HI_INT_CLR      = -1;
+        HI_INT_FORCED_CLR   = -1;
+        
+        COP_INT_CLR         = -1;
+        CPU_INT_CLR         = -1;
+        INT_FORCED_CLR      = -1;
         
 # if NUM_CORES > 1 && defined(HAVE_ADJUSTABLE_CPU_FREQ)
         spinlock_init(&boostctrl_mtx);

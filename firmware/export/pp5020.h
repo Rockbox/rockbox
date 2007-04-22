@@ -40,7 +40,7 @@
 #define COP_REPLY        (*(volatile unsigned long *)(0x6000100c))
 
 /* Interrupts */
-#define CPU_INT_STAT        (*(volatile unsigned long*)(0x64004000))
+#define CPU_INT_STAT        (*(volatile unsigned long*)(0x60004000))
 #define COP_INT_STAT        (*(volatile unsigned long*)(0x60004004))
 #define CPU_FIQ_STAT        (*(volatile unsigned long*)(0x60004008))
 #define COP_FIQ_STAT        (*(volatile unsigned long*)(0x6000400c))
@@ -60,7 +60,7 @@
 #define COP_INT_CLR         (*(volatile unsigned long*)(0x60004038))
 #define COP_INT_PRIORITY    (*(volatile unsigned long*)(0x6000403c))
 
-#define CPU_HI_INT_STAT     (*(volatile unsigned long*)(0x64004100))
+#define CPU_HI_INT_STAT     (*(volatile unsigned long*)(0x60004100))
 #define COP_HI_INT_STAT     (*(volatile unsigned long*)(0x60004104))
 #define CPU_HI_FIQ_STAT     (*(volatile unsigned long*)(0x60004108))
 #define COP_HI_FIQ_STAT     (*(volatile unsigned long*)(0x6000410c))
