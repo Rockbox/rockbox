@@ -145,10 +145,7 @@ void read_viewer_theme_file(void)
     custom_filetype_icons[0] = Icon_Folder;
     for (i=1; i<filetype_count; i++)
     {
-        if (filetypes[i].icon < Icon_Last_Themeable)
-            custom_filetype_icons[i] = filetypes[i].icon;
-        else
-            custom_filetype_icons[i] = Icon_Questionmark;
+        custom_filetype_icons[i] = filetypes[i].icon;
     }
     
     snprintf(buffer, MAX_PATH, "%s/%s.icons", ICON_DIR, 
@@ -181,6 +178,7 @@ void read_viewer_theme_file(void)
 
 void  filetype_init(void)
 {
+    int i;
     /* set the directory item first */
     filetypes[0].extension = NULL;
     filetypes[0].plugin = NULL;
@@ -193,6 +191,14 @@ void  filetype_init(void)
 #ifdef HAVE_LCD_BITMAP
     read_viewer_theme_file();
 #endif
+    /* figure out how many viewer icons have been loaded */
+    global_status.viewer_icon_count = Icon_Last_Themeable;
+    for (i=1; i<filetype_count; i++)
+    {
+        if (custom_filetype_icons[i] > global_status.viewer_icon_count)
+            global_status.viewer_icon_count = custom_filetype_icons[i];
+    }
+    global_status.viewer_icon_count -= Icon_Last_Themeable;
 }
 
 /* remove all white spaces from string */

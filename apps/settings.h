@@ -300,6 +300,7 @@ struct system_status
                             relative to MIN_FREQ */
 #endif
     char last_screen;
+    int  viewer_icon_count;
 };
 
 struct user_settings

@@ -129,16 +129,11 @@ void screen_put_iconxy(struct screen * display,
     {
         icon -= Icon_Last_Themeable;
         if (!viewer_icons_loaded[screen] || 
+           (global_status.viewer_icon_count*height
+             > viewer_iconset[screen].height) ||
            (icon * height > viewer_iconset[screen].height))
         {
-#if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
-            if (screen == SCREEN_REMOTE)
-            {
-                screen_put_iconxy(display, xpos, ypos, Icon_Questionmark);
-                return;
-            }
-#endif
-            screen_clear_area(display, xpos, ypos,  width, height);
+            screen_put_iconxy(display, xpos, ypos, Icon_Questionmark);
             return;
         }
         data = viewer_iconset[screen].data;
