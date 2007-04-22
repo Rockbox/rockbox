@@ -30,6 +30,10 @@
 
 unsigned int ipod_hw_rev;
 
+#if NUM_CORES > 1
+struct mutex boostctrl_mtx NOCACHEBSS_ATTR;
+#endif
+
 #ifndef BOOTLOADER
 extern void TIMER1(void);
 extern void TIMER2(void);

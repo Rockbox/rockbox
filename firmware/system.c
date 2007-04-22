@@ -36,10 +36,6 @@ long cpu_frequency NOCACHEBSS_ATTR = CPU_FREQ;
 static int boost_counter NOCACHEBSS_ATTR = 0;
 static bool cpu_idle NOCACHEBSS_ATTR = false;
 
-#if NUM_CORES > 1
-struct mutex boostctrl_mtx NOCACHEBSS_ATTR;
-#endif
-
 int get_cpu_boost_counter(void)
 {
     return boost_counter;
