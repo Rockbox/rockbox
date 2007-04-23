@@ -98,8 +98,8 @@ next_track:
         /* chunkSize */
         i = ((buf[4]<<24)|(buf[5]<<16)|(buf[6]<<8)|buf[7]);
         if (memcmp(buf, "COMM", 4) == 0) {
-            if (i != 18) {
-                DEBUGF("CODEC_ERROR: 'COMM' chunk size=%lu != 18\n",
+            if (i < 18) {
+                DEBUGF("CODEC_ERROR: 'COMM' chunk size=%lu < 18\n",
                        (unsigned long)i);
                 i = CODEC_ERROR;
                 goto done;
