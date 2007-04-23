@@ -1448,7 +1448,24 @@ int solitaire( void )
                 else
                 {
                     /* try moving cards */
-                    move_card( cur_col, sel_card );
+                    /* the code in the else seems to not like moveing kings
+                       so if the selected card is a king do it the simple way */
+                    if (deck[sel_card].num == CARDS_PER_SUIT - 1)
+                    {
+                        if (move_card( cur_col, sel_card ) == MOVE_NOT_OK)
+                            sel_card = NOT_A_CARD;
+                    }
+                    else
+                    {
+                        int retval;
+                        do {
+                            retval = move_card( cur_col, sel_card );
+                            if (retval == MOVE_NOT_OK)
+                            {
+                                sel_card = find_prev_card(sel_card);
+                            }
+                        } while ((retval == MOVE_NOT_OK) && (sel_card != NOT_A_CARD));
+                    }
                 }
                 break;
 
