@@ -16,6 +16,9 @@
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR
 
+/* define this if you have LCD enable function */
+#define HAVE_LCD_ENABLE
+
 #define HAVE_BACKLIGHT_BRIGHTNESS
 /* Main LCD backlight brightness range and defaults */
 #define MIN_BRIGHTNESS_SETTING           1
@@ -125,7 +128,7 @@
 #define CONFIG_LED LED_VIRTUAL
 
 /* Define this if you have adjustable CPU frequency */
-/*#define HAVE_ADJUSTABLE_CPU_FREQ Let's say we don't for now*/
+/*#define HAVE_ADJUSTABLE_CPU_FREQ*/
 
 #define BOOTFILE_EXT    "mi4"
 #define BOOTFILE        "rockbox." BOOTFILE_EXT

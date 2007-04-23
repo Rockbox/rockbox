@@ -123,11 +123,13 @@
 #define DEV_SER1        0x80
 #define DEV_I2S         0x800
 #define DEV_I2C         0x1000
+#define DEV_ATA         0x4000
 #define DEV_OPTO        0x10000
 #define DEV_PIEZO       0x10000
 #define DEV_USB         0x400000
 #define DEV_FIREWIRE    0x800000
 #define DEV_IDE0        0x2000000
+#define DEV_LCD         0x4000000
 
 /* Processors Control */
 #define CPU_CTL          (*(volatile unsigned long *)(0x60007000))

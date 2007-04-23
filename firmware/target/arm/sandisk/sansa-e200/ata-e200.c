@@ -22,6 +22,7 @@
 #include "system.h"
 #include <string.h>
 #include "thread.h"
+#include "pp5024.h"
 
 #define NOINLINE_ATTR __attribute__((noinline)) /* don't inline the loops */
 
@@ -359,9 +360,9 @@ void sd_init_device(void)
     GPIOD_ENABLE |= (0x1f);
     GPIOD_OUTPUT_EN |= (0x1f);
     GPIOD_OUTPUT_VAL |= (0x1f);
-    DEV_EN |= (1 << 14); /* Enable controller */
-    DEV_RS |= (1 << 14); /* Reset controller */
-    DEV_RS &=~(1 << 14); /* Clear Reset */
+    DEV_EN |= DEV_ATA; /* Enable controller */
+    DEV_RS |= DEV_ATA; /* Reset controller */
+    DEV_RS &=~DEV_ATA; /* Clear Reset */
     outl(0, 0x6000b000);
     outl(0, 0x6000a000); /* Init DMA controller? */
 
@@ -478,6 +479,7 @@ int ata_read_sectors(IF_MV2(int drive,)
     last_disk_activity = current_tick;
     spinup_start = current_tick;
 
+    ata_enable(true);
     ata_led(true);
 
     timeout = current_tick + READ_TIMEOUT;
@@ -528,6 +530,7 @@ int ata_read_sectors(IF_MV2(int drive,)
         break;
     }
     ata_led(false);
+    ata_enable(false);
 
     mutex_unlock(&sd_mtx);
 
@@ -551,6 +554,7 @@ int ata_write_sectors(IF_MV2(int drive,)
     tSDCardInfo *card = &card_info[current_card];
 
     mutex_lock(&sd_mtx);
+    ata_enable(true);
     ata_led(true);
     if(current_card == 0)
     {
@@ -603,8 +607,10 @@ retry:
     sd_read_response(&response, 1);
 
     sd_wait_for_state(card, TRAN);
-    mutex_unlock(&sd_mtx);
     ata_led(false);
+    ata_enable(false);
+    mutex_unlock(&sd_mtx);
+
     return ret;
 }
 
@@ -667,7 +673,14 @@ int ata_soft_reset(void)
 
 void ata_enable(bool on)
 {
-    (void)on;
+    if(on)
+    {
+        DEV_EN |= DEV_ATA; /* Enable controller */
+    }
+    else
+    {
+        DEV_EN &= ~DEV_ATA; /* Disable controller */
+    }
 }
 
 unsigned short* ata_get_identify(void)

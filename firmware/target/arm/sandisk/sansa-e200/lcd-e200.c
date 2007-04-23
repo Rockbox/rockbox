@@ -23,6 +23,8 @@
 #include "lcd.h"
 #include "system.h"
 #include <string.h>
+#include "backlight-target.h"
+#include "pp5024.h"
 
 #define LCD_DATA_IN_GPIO GPIOB_INPUT_VAL
 #define LCD_DATA_IN_PIN 6
@@ -141,12 +143,12 @@ inline void lcd_init_device(void)
     outl(((inl(0x70000010) & (0x03ffffff)) | (0x15 << 26)), 0x70000010);
     outl(((inl(0x70000014) & (0x0fffffff)) | (0x5 << 28)), 0x70000014);
     outl((inl(0x70000020) & ~(0x3 << 10)), 0x70000020);
-    DEV_EN |= (1 << 26); /* Enable controller */
+    DEV_EN |= DEV_LCD; /* Enable controller */
     outl(0x6, 0x600060d0);
-    DEV_RS |= (1 << 26); /* Reset controller */
+    DEV_RS |= DEV_LCD; /* Reset controller */
     outl((inl(0x70000020) & ~(1 << 14)), 0x70000020);
     lcd_bus_idle();
-    DEV_RS &=~(1 << 26); /* Clear reset */
+    DEV_RS &=~DEV_LCD; /* Clear reset */
     udelay(1000);
 
     LCD_REG_0 = (LCD_REG_0 & (0x00ffffff)) | (0x22 << 24);
@@ -247,40 +249,66 @@ inline void lcd_init_device(void)
     lcd_send_msg(0x70, 34);
 }
 
+void lcd_enable(bool on)
+{
+    if(on)
+    {
+        DEV_EN |= DEV_LCD; /* Enable LCD controller */
+        LCD_REG_6 |= 1;    /* Enable DMA */
+    }
+    else
+    {
+        if(DEV_EN & DEV_LCD)
+        {
+            LCD_REG_6 &= ~1;    /* Disable DMA */
+            udelay(20000);      /* Wait for dma end (assuming 50Hz) */
+            DEV_EN &= ~DEV_LCD; /* Disable LCD controller */
+        }
+    }
+}
+
 inline void lcd_update_rect(int x, int y, int width, int height)
 {
     (void)x;
     (void)width;
-    /* Turn off DMA and wait for the transfer to complete */
-    /* TODO: Work out the proper delay */
-    LCD_REG_6 &= ~1;
-    udelay(1000);
 
-    /* Copy the Rockbox framebuffer to the second framebuffer */
-    /* TODO: Move the second framebuffer into uncached SDRAM */
-    memcpy(((char*)&lcd_driver_framebuffer)+(y * sizeof(fb_data) * LCD_WIDTH),
-           ((char *)&lcd_framebuffer)+(y * sizeof(fb_data) * LCD_WIDTH),
-           ((height * sizeof(fb_data) * LCD_WIDTH)));
-    flush_icache();
+    if(__backlight_is_on())
+    {
+        /* Turn off DMA and wait for the transfer to complete */
+        /* TODO: Work out the proper delay */
+        LCD_REG_6 &= ~1;
+        udelay(1000);
 
-    /* Restart DMA */
-    LCD_REG_6 |= 1;
+        /* Copy the Rockbox framebuffer to the second framebuffer */
+        /* TODO: Move the second framebuffer into uncached SDRAM */
+        memcpy(((char*)&lcd_driver_framebuffer)+(y * sizeof(fb_data) * LCD_WIDTH),
+               ((char *)&lcd_framebuffer)+(y * sizeof(fb_data) * LCD_WIDTH),
+               ((height * sizeof(fb_data) * LCD_WIDTH)));
+        flush_icache();
+
+        /* Restart DMA */
+        LCD_REG_6 |= 1;
+    }
 }
 
 inline void lcd_update(void)
 {
-    /* TODO: It may be faster to swap the addresses of lcd_driver_framebuffer
-     * and lcd_framebuffer */
-    /* Turn off DMA and wait for the transfer to complete */
-    LCD_REG_6 &= ~1;
-    udelay(1000);
+    if(__backlight_is_on())
+    {
+        /* TODO: It may be faster to swap the addresses of lcd_driver_framebuffer
+         * and lcd_framebuffer */
+        /* Turn off DMA and wait for the transfer to complete */
+        LCD_REG_6 &= ~1;
+        udelay(1000);
 
-    /* Copy the Rockbox framebuffer to the second framebuffer */
-    memcpy(lcd_driver_framebuffer, lcd_framebuffer, sizeof(fb_data) * LCD_WIDTH * LCD_HEIGHT);
-    flush_icache();
+        /* Copy the Rockbox framebuffer to the second framebuffer */
+        memcpy(lcd_driver_framebuffer, lcd_framebuffer,
+               sizeof(fb_data) * LCD_WIDTH * LCD_HEIGHT);
+        flush_icache();
 
-    /* Restart DMA */
-    LCD_REG_6 |= 1;
+        /* Restart DMA */
+        LCD_REG_6 |= 1;
+    }
 }
 
 

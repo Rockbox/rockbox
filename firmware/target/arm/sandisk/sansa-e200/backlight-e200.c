@@ -18,25 +18,37 @@
  ****************************************************************************/
 #include "backlight-target.h"
 #include "system.h"
+#include "lcd.h"
 #include "backlight.h"
 #include "i2c-pp.h"
 
 static unsigned short backlight_brightness;
+static bool backlight_is_on;
+
+int __backlight_is_on(void)
+{
+    return (int)backlight_is_on;
+}
 
 void __backlight_set_brightness(int brightness)
 {
     backlight_brightness = brightness;
     pp_i2c_send( 0x46, 0x23, backlight_brightness);
+    backlight_is_on = true;
 }
 
 void __backlight_on(void)
 {
+    lcd_enable(true); /* power on lcd */
     pp_i2c_send( 0x46, 0x23, backlight_brightness);
+    backlight_is_on = true;
 }
 
 void __backlight_off(void)
 {
     pp_i2c_send( 0x46, 0x23, 0x0);
+    lcd_enable(false); /* power off lcd */
+    backlight_is_on = false;
 }
 
 
