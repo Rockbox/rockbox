@@ -31,9 +31,6 @@ extern struct plugin_api* rb;
 #include "mpeg2.h"
 #include "video_out.h"
 
-#define CSUB_X 2
-#define CSUB_Y 2
-
 static int image_width;
 static int image_height;
 static int image_chroma_x;
@@ -119,11 +116,11 @@ static void yuv_bitmap_part(unsigned char * const src[3],
             g = y + guv;
             b = y + bu;
 
-            if ((unsigned)(r | g | b) > 63*256)
+            if ((unsigned)(r | g | b) > 64*256-1)
             {
-                r = clamp(r, 0, 63*256);
-                g = clamp(g, 0, 63*256);
-                b = clamp(b, 0, 63*256);
+                r = clamp(r, 0, 64*256-1);
+                g = clamp(g, 0, 64*256-1);
+                b = clamp(b, 0, 64*256-1);
             }
 
             *dst = LCD_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
@@ -139,11 +136,11 @@ static void yuv_bitmap_part(unsigned char * const src[3],
             g = y + guv;
             b = y + bu;
 
-            if ((unsigned)(r | g | b) > 63*256)
+            if ((unsigned)(r | g | b) > 64*256-1)
             {
-                r = clamp(r, 0, 63*256);
-                g = clamp(g, 0, 63*256);
-                b = clamp(b, 0, 63*256);
+                r = clamp(r, 0, 64*256-1);
+                g = clamp(g, 0, 64*256-1);
+                b = clamp(b, 0, 64*256-1);
             }
 
             *dst = LCD_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
@@ -184,11 +181,11 @@ static void yuv_bitmap_part(unsigned char * const src[3],
             g = y + guv;
             b = y + bu;
 
-            if ((unsigned)(r | g | b) > 63*256)
+            if ((unsigned)(r | g | b) > 64*256-1)
             {
-                r = clamp(r, 0, 63*256);
-                g = clamp(g, 0, 63*256);
-                b = clamp(b, 0, 63*256);
+                r = clamp(r, 0, 64*256-1);
+                g = clamp(g, 0, 64*256-1);
+                b = clamp(b, 0, 64*256-1);
             }
 
             *dst = LCD_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
@@ -204,11 +201,11 @@ static void yuv_bitmap_part(unsigned char * const src[3],
             g = y + guv;
             b = y + bu;
 
-            if ((unsigned)(r | g | b) > 63*256)
+            if ((unsigned)(r | g | b) > 64*256-1)
             {
-                r = clamp(r, 0, 63*256);
-                g = clamp(g, 0, 63*256);
-                b = clamp(b, 0, 63*256);
+                r = clamp(r, 0, 64*256-1);
+                g = clamp(g, 0, 64*256-1);
+                b = clamp(b, 0, 64*256-1);
             }
 
             *dst = LCD_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
