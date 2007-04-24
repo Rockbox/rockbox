@@ -55,7 +55,7 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->bitmap=(screen_bitmap_func*)&lcd_remote_bitmap;
             screen->bitmap_part=(screen_bitmap_part_func*)&lcd_remote_bitmap_part;
             screen->set_drawmode=&lcd_remote_set_drawmode;
-#if LCD_DEPTH <= 2
+#if LCD_REMOTE_DEPTH <= 2
             /* No transparency yet for grayscale and mono lcd */
             screen->transparent_bitmap=(screen_bitmap_func*)&lcd_remote_bitmap;
             screen->transparent_bitmap_part=(screen_bitmap_part_func*)&lcd_remote_bitmap_part;
