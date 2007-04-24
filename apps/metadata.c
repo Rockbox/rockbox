@@ -1255,14 +1255,17 @@ static bool read_mp4_esds(int fd, struct mp3entry* id3,
         unsigned long bits;
         unsigned int length;
         unsigned int index;
-        int type;
+        unsigned int type;
         
         /* Read the (leading part of the) decoder config. */
         length = read_mp4_length(fd, size);
         length = MIN(length, *size);
         length = MIN(length, sizeof(buf));
+        memset(buf, 0, sizeof(buf));
         read(fd, buf, length);
         *size -= length;
+        
+        /* Maybe time to write a simple read_bits function... */
 
         /* Decoder config format:
          * Object type           - 5 bits
@@ -1270,9 +1273,9 @@ static bool read_mp4_esds(int fd, struct mp3entry* id3,
          * Channel configuration - 4 bits
          */
         bits = get_long_be(buf);
-        type = bits >> 27;
-        index = (bits >> 23) & 0xf;
-    
+        type = bits >> 27;              /* Object type - 5 bits */
+        index = (bits >> 23) & 0xf;     /* Frequency index - 4 bits */
+
         if (index < (sizeof(sample_rates) / sizeof(*sample_rates)))
         {
             id3->frequency = sample_rates[index];
@@ -1280,29 +1283,65 @@ static bool read_mp4_esds(int fd, struct mp3entry* id3,
     
         if (type == 5)
         {
+            DEBUGF("MP4: SBR\n");
+            unsigned int old_index = index;
+
             sbr = true;
-            /* Extended frequency index - 4 bits */
-            index = (bits >> 15) & 0xf;
+            index = (bits >> 15) & 0xf; /* Frequency index - 4 bits */
     
             if (index == 15)
             {
                 /* 17 bits read so far... */
                 bits = get_long_be(&buf[2]);
-                id3->frequency = (bits >> 7) & 0x00FFFFFF;
+                id3->frequency = (bits >> 7) & 0x00ffffff;
             }
             else if (index < (sizeof(sample_rates) / sizeof(*sample_rates)))
             {
                 id3->frequency = sample_rates[index];
             }
+            
+            if (old_index == index)
+            {
+                /* Downsampled SBR */
+                id3->frequency *= 2;
+            }
         }
-        else if (id3->frequency < 24000)
+        /* TODO: Should check that there is at least 16 bits left  */
+        /* Skip 13 bits from above, plus 3 bits, then read 11 bits */
+        else if (((bits >> 5) & 0x7ff) == 0x2b7) /* extensionAudioObjectType */
         {
-            /* SBR not indicated, but the file might still contain SBR. 
-             * MPEG specification says that one should assume SBR if
-             * samplerate <= 24000 Hz.
-             */
-            id3->frequency *= 2;
-            sbr = true;
+            DEBUGF("MP4: extensionAudioType\n");
+            type = bits & 0x1f;         /* Object type - 5 bits*/
+            bits = get_long_be(&buf[4]);
+            
+            if (type == 5)
+            {
+                sbr = bits >> 31;
+
+                if (sbr)
+                {
+                    unsigned int old_index = index;
+                    
+                    /* 1 bit read so far */
+                    index = (bits >> 27) & 0xf; /* Frequency index - 4 bits */
+
+                    if (index == 15)
+                    {
+                        /* 5 bits read so far */
+                        id3->frequency = (bits >> 3) & 0x00ffffff;
+                    }
+                    else if (index < (sizeof(sample_rates) / sizeof(*sample_rates)))
+                    {
+                        id3->frequency = sample_rates[index];
+                    }
+
+                    if (old_index == index)
+                    {
+                        /* Downsampled SBR */
+                        id3->frequency *= 2;
+                    }
+                }
+            }
         }
     }
     
