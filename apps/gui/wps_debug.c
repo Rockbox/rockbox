@@ -24,11 +24,19 @@
 #include "gwps.h"
 #include "debug.h"
 
+#define PARSE_FAIL_UNCLOSED_COND     1
+#define PARSE_FAIL_INVALID_CHAR      2
+#define PARSE_FAIL_COND_SYNTAX_ERROR 3
+
+#ifdef SIMULATOR
+extern bool debug_wps;
+#endif
+
 static char *next_str(bool next) {
-    return next ? "next" : "";
+    return next ? "next " : "";
 }
 
-void dump_wps_tokens(struct wps_data *data)
+static void dump_wps_tokens(struct wps_data *data)
 {
     struct wps_token *token;
     int i, j;
@@ -358,7 +366,7 @@ void dump_wps_tokens(struct wps_data *data)
     DEBUGF("\n");
 }
 
-void print_line_info(struct wps_data *data)
+static void print_line_info(struct wps_data *data)
 {
     int i, j;
     struct wps_line *line;
@@ -395,7 +403,7 @@ void print_line_info(struct wps_data *data)
     DEBUGF("\n");
 }
 
-void print_wps_strings(struct wps_data *data)
+static void print_wps_strings(struct wps_data *data)
 {
     int i, len, total_len = 0, buf_used = 0;
 
@@ -414,7 +422,7 @@ void print_wps_strings(struct wps_data *data)
 }
 
 #ifdef HAVE_LCD_BITMAP
-void print_img_cond_indexes(struct wps_data *data)
+static void print_img_cond_indexes(struct wps_data *data)
 {
     DEBUGF("Image conditional indexes:\n");
     int i;
@@ -426,5 +434,40 @@ void print_img_cond_indexes(struct wps_data *data)
     DEBUGF("\n");
 }
 #endif /*HAVE_LCD_BITMAP */
+
+void print_debug_info(struct wps_data *data, int fail, int line)
+{
+#ifdef SIMULATOR
+    if (debug_wps)
+    {
+        dump_wps_tokens(data);
+        print_line_info(data);
+        print_wps_strings(data);
+#ifdef HAVE_LCD_BITMAP
+        print_img_cond_indexes(data);
+#endif
+    }
+#endif /* SIMULATOR */
+
+    if (fail)
+    {
+        DEBUGF("Failed parsing on line %d : ", line);
+        switch (fail)
+        {
+            case PARSE_FAIL_UNCLOSED_COND:
+                DEBUGF("Unclosed conditional");
+                break;
+
+            case PARSE_FAIL_INVALID_CHAR:
+                DEBUGF("Invalid conditional char (not in an open conditional)");
+                break;
+
+            case PARSE_FAIL_COND_SYNTAX_ERROR:
+                DEBUGF("Conditional syntax error");
+                break;
+        }
+        DEBUGF("\n");
+    }
+}
 
 #endif /* DEBUG */

@@ -55,6 +55,8 @@ char having_new_lcd = true;               /* Used for player simulator */
 
 bool debug_audio = false;
 
+bool debug_wps = false;
+
 long start_tick;
 
 Uint32 tick_timer(Uint32 interval, void *param)
@@ -200,6 +202,9 @@ int main(int argc, char *argv[])
             if (!strcmp("--debugaudio", argv[x])) {
                 debug_audio = true;
                 printf("Writing debug audio file.\n");
+            } else if (!strcmp("--debugwps", argv[x])) {
+                debug_wps = true;
+                printf("WPS debug mode enabled.\n");
             } else if (!strcmp("--background", argv[x])) {
                 background = true;
                 printf("Using background image.\n");
@@ -217,9 +222,10 @@ int main(int argc, char *argv[])
                 printf("rockboxui\n");
                 printf("Arguments:\n");
                 printf("  --debugaudio \t Write raw PCM data to audiodebug.raw\n");
+                printf("  --debugwps \t Print advanced WPS debug info\n");
                 printf("  --background \t Use background image of hardware\n");
                 printf("  --old_lcd \t [Player] simulate old playermodel (ROM version<4.51)\n");
-                printf("  --zoom \t window zoom (will disable backgrounds)\n");
+                printf("  --zoom [VAL]\t window zoom (will disable backgrounds)\n");
                 exit(0);
             }
         }

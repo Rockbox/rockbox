@@ -69,11 +69,8 @@ static const char *backdrop_bmp_name;
 #endif
 
 #ifdef DEBUG
-/* debugging functions */
-extern void dump_wps_tokens(struct wps_data *data);
-extern void print_line_info(struct wps_data *data);
-extern void print_img_cond_indexes(struct wps_data *data);
-extern void print_wps_strings(struct wps_data *data);
+/* debugging function */
+extern void print_debug_info(struct wps_data *data, int fail, int line);
 #endif
 
 static void wps_reset(struct wps_data *data);
@@ -795,36 +792,8 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
     }
 
 #ifdef DEBUG
-
-#if 0 /* optional debugging code */
-    dump_wps_tokens(data);
-    print_line_info(data);
-    print_wps_strings(data);
-#ifdef HAVE_LCD_BITMAP
-    print_img_cond_indexes(data);
+    print_debug_info(data, fail, line);
 #endif
-#endif
-
-    if (fail)
-    {
-        DEBUGF("Failed parsing on line %d : ", line);
-        switch (fail)
-        {
-            case PARSE_FAIL_UNCLOSED_COND:
-                DEBUGF("Unclosed conditional");
-                break;
-
-            case PARSE_FAIL_INVALID_CHAR:
-                DEBUGF("Invalid conditional char (not in an open conditional)");
-                break;
-
-            case PARSE_FAIL_COND_SYNTAX_ERROR:
-                DEBUGF("Conditional syntax error");
-                break;
-        }
-        DEBUGF("\n");
-    }
-#endif /* DEBUG */
 
     if (fail)
         wps_reset(data);
