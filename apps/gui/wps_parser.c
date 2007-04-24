@@ -38,6 +38,10 @@
 #define WPS_DEFAULTCFG WPS_DIR "/rockbox_default.wps"
 #define RWPS_DEFAULTCFG WPS_DIR "/rockbox_default.rwps"
 
+#define PARSE_FAIL_UNCLOSED_COND     1
+#define PARSE_FAIL_INVALID_CHAR      2
+#define PARSE_FAIL_COND_SYNTAX_ERROR 3
+
 /* level of current conditional.
    -1 means we're not in a conditional. */
 static int level = -1;
@@ -51,6 +55,9 @@ static int condindex[WPS_MAX_COND_LEVEL];
 
 /* number of condtional options in current level */
 static int numoptions[WPS_MAX_COND_LEVEL];
+
+/* the current line in the file */
+static int line;
 
 #ifdef HAVE_LCD_BITMAP
 /* pointers to the bitmap filenames in the WPS source */
@@ -68,6 +75,8 @@ extern void print_line_info(struct wps_data *data);
 extern void print_img_cond_indexes(struct wps_data *data);
 extern void print_wps_strings(struct wps_data *data);
 #endif
+
+static void wps_reset(struct wps_data *data);
 
 /* Function for parsing of details for a token. At the moment the
    function is called, the token type has already been set. The
@@ -264,6 +273,7 @@ static const struct wps_tag all_tags[] = {
    immediately after the first eol, i.e. to the start of the next line */
 static int skip_end_of_line(const char *wps_bufptr)
 {
+    line++;
     int skip = 0;
     while(*(wps_bufptr + skip) != '\n')
         skip++;
@@ -639,9 +649,11 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
 
     char *current_string = data->string_buffer;
     int stringbuf_used = 0;
+    int fail = 0;
+    line = 1;
     level = -1;
 
-    while(*wps_bufptr && data->num_tokens < WPS_MAX_TOKENS - 1
+    while(*wps_bufptr && !fail && data->num_tokens < WPS_MAX_TOKENS - 1
           && data->num_lines < WPS_MAX_LINES)
     {
         switch(*wps_bufptr++)
@@ -655,7 +667,10 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
             /* Alternating sublines separator */
             case ';':
                 if (level >= 0) /* there are unclosed conditionals */
-                    return false;
+                {
+                    fail = PARSE_FAIL_UNCLOSED_COND;
+                    break;
+                }
 
                 if (data->num_sublines+1 < WPS_MAX_SUBLINES)
                     wps_start_new_subline(data);
@@ -667,7 +682,10 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
             /* Conditional list start */
             case '<':
                 if (data->tokens[data->num_tokens-2].type != WPS_TOKEN_CONDITIONAL)
-                    return false;
+                {
+                    fail = PARSE_FAIL_COND_SYNTAX_ERROR;
+                    break;
+                }
 
                 data->tokens[data->num_tokens].type = WPS_TOKEN_CONDITIONAL_START;
                 lastcond[level] = data->num_tokens++;
@@ -676,7 +694,10 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
             /* Conditional list end */
             case '>':
                 if (level < 0) /* not in a conditional, invalid char */
-                    return false;
+                {
+                    fail = PARSE_FAIL_INVALID_CHAR;
+                    break;
+                }
 
                 data->tokens[data->num_tokens].type = WPS_TOKEN_CONDITIONAL_END;
                 if (lastcond[level])
@@ -691,7 +712,10 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
             /* Conditional list option */
             case '|':
                 if (level < 0) /* not in a conditional, invalid char */
-                    return false;
+                {
+                    fail = PARSE_FAIL_INVALID_CHAR;
+                    break;
+                }
 
                 data->tokens[data->num_tokens].type = WPS_TOKEN_CONDITIONAL_OPTION;
                 if (lastcond[level])
@@ -705,7 +729,10 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
             /* Comment */
             case '#':
                 if (level >= 0) /* there are unclosed conditionals */
-                    return false;
+                {
+                    fail = PARSE_FAIL_UNCLOSED_COND;
+                    break;
+                }
 
                 wps_bufptr += skip_end_of_line(wps_bufptr);
                 break;
@@ -713,8 +740,12 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
             /* End of this line */
             case '\n':
                 if (level >= 0) /* there are unclosed conditionals */
-                    return false;
+                {
+                    fail = PARSE_FAIL_UNCLOSED_COND;
+                    break;
+                }
 
+                line++;
                 wps_start_new_subline(data);
                 data->num_lines++; /* Start a new line */
 
@@ -764,19 +795,41 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
     }
 
 #ifdef DEBUG
-    /* debugging code */
-    if (false)
-    {
-        dump_wps_tokens(data);
-        print_line_info(data);
-        print_wps_strings(data);
+
+#if 0 /* optional debugging code */
+    dump_wps_tokens(data);
+    print_line_info(data);
+    print_wps_strings(data);
 #ifdef HAVE_LCD_BITMAP
-        print_img_cond_indexes(data);
+    print_img_cond_indexes(data);
 #endif
-    }
 #endif
 
-    return true;
+    if (fail)
+    {
+        DEBUGF("Failed parsing on line %d : ", line);
+        switch (fail)
+        {
+            case PARSE_FAIL_UNCLOSED_COND:
+                DEBUGF("Unclosed conditional");
+                break;
+
+            case PARSE_FAIL_INVALID_CHAR:
+                DEBUGF("Invalid conditional char (not in an open conditional)");
+                break;
+
+            case PARSE_FAIL_COND_SYNTAX_ERROR:
+                DEBUGF("Conditional syntax error");
+                break;
+        }
+        DEBUGF("\n");
+    }
+#endif /* DEBUG */
+
+    if (fail)
+        wps_reset(data);
+
+    return (fail == 0);
 }
 
 #ifdef HAVE_LCD_BITMAP
@@ -972,11 +1025,7 @@ bool wps_data_load(struct wps_data *wps_data,
 
         /* parse the WPS source */
         if (!wps_parse(wps_data, wps_buffer))
-        {
-            DEBUGF("Failed parsing of %s\n", buf);
-            wps_reset(wps_data);
             return false;
-        }
 
         wps_data->wps_loaded = true;
 
