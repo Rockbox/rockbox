@@ -45,147 +45,197 @@ static int output_height;
 
 #if defined(SIMULATOR) && defined(HAVE_LCD_COLOR)
 
-#define RYFAC (31*257)
-#define GYFAC (63*257)
-#define BYFAC (31*257)
-#define RVFAC 11170     /* 31 * 257 *  1.402    */
-#define GVFAC (-11563)  /* 63 * 257 * -0.714136 */
-#define GUFAC (-5572)   /* 63 * 257 * -0.344136 */
-#define BUFAC 14118     /* 31 * 257 *  1.772    */
+/**
+ * |R|   |1.000000 -0.000001  1.402000| |Y'|
+ * |G| = |1.000000 -0.334136 -0.714136| |Pb|
+ * |B|   |1.000000  1.772000  0.000000| |Pr|
+ * Scaled, normalized, rounded and tweaked to yield RGB 565:
+ * |R|   |74   0 101| |Y' -  16| >> 9
+ * |G| = |74 -24 -51| |Cb - 128| >> 8
+ * |B|   |74 128   0| |Cr - 128| >> 9
+ */
+#define YFAC    (74)
+#define RVFAC   (101)
+#define GUFAC   (-24)
+#define GVFAC   (-51)
+#define BUFAC   (128)
 
-#define ROUNDOFFS (127*257)
+static inline int clamp(int val, int min, int max)
+{
+    if (val < min)
+        val = min;
+    else if (val > max)
+        val = max;
+    return val;
+}
 
-/* Draw a partial YUV colour bitmap - taken from the Rockbox JPEG viewer */
+/* Draw a partial YUV colour bitmap - similiar behavior to lcd_yuv_blit
+   in the core */
 static void yuv_bitmap_part(unsigned char * const src[3],
                             int src_x, int src_y, int stride,
                             int x, int y, int width, int height)
 {
-    fb_data *dst, *dst_end;
+    const unsigned char *ysrc, *usrc, *vsrc;
+    fb_data *dst, *row_end;
+    off_t z;
 
-    /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
-        || (x + width <= 0) || (y + height <= 0))
-        return;
+    /* width and height must be >= 2 and an even number */
+    width &= ~1;
+    height >>= 1;
 
-    /* clipping */
-    if (x < 0)
-    {
-        width += x;
-        src_x -= x;
-        x = 0;
-    }
-    if (y < 0)
-    {
-        height += y;
-        src_y -= y;
-        y = 0;
-    }
-    if (x + width > LCD_WIDTH)
-        width = LCD_WIDTH - x;
-    if (y + height > LCD_HEIGHT)
-        height = LCD_HEIGHT - y;
+#if LCD_WIDTH >= LCD_HEIGHT
+    dst     = rb->lcd_framebuffer + LCD_WIDTH * y + x;
+    row_end = dst + width;
+#else
+    dst     = rb->lcd_framebuffer + x * LCD_WIDTH + (LCD_WIDTH - y) - 1;
+    row_end = dst + LCD_WIDTH * width;
+#endif
 
-    dst = rb->lcd_framebuffer + LCD_WIDTH * y + x;
-    dst_end = dst + LCD_WIDTH * height;
+    z    = stride * src_y;
+    ysrc = src[0] + z + src_x;
+    usrc = src[1] + (z >> 2) + (src_x >> 1);
+    vsrc = src[2] + (usrc - src[1]);
+
+    /* stride => amount to jump from end of last row to start of next */
+    stride -= width;
+
+    /* upsampling, YUV->RGB conversion and reduction to RGB565 in one go */
 
     do
     {
-        fb_data *dst_row = dst;
-        fb_data *row_end = dst_row + width;
-        const unsigned char *ysrc = src[0] + stride * src_y + src_x;
-        int y, u, v;
-        int red, green, blue;
-        unsigned rbits, gbits, bbits;
-
-        if (CSUB_Y) /* colour */
+        do
         {
-            /* upsampling, YUV->RGB conversion and reduction to RGB565 in one go */
-            const unsigned char *usrc = src[1] + (stride/CSUB_X) * (src_y/CSUB_Y)
-                                               + (src_x/CSUB_X);
-            const unsigned char *vsrc = src[2] + (stride/CSUB_X) * (src_y/CSUB_Y)
-                                               + (src_x/CSUB_X);
-            int xphase = src_x % CSUB_X;
-            int rc, gc, bc;
+            int y, cb, cr, rv, guv, bu, r, g, b;
 
-            u = *usrc++ - 128;
-            v = *vsrc++ - 128;
-            rc = RVFAC * v + ROUNDOFFS;
-            gc = GVFAC * v + GUFAC * u + ROUNDOFFS;
-            bc = BUFAC * u + ROUNDOFFS;
+            y  = YFAC*(*ysrc++ - 16);
+            cb = *usrc++ - 128;
+            cr = *vsrc++ - 128;
 
-            do
+            rv  =            RVFAC*cr;
+            guv = GUFAC*cb + GVFAC*cr;
+            bu  = BUFAC*cb;
+
+            r = y + rv;
+            g = y + guv;
+            b = y + bu;
+
+            if ((unsigned)(r | g | b) > 63*256)
             {
-                y = *ysrc++;
-                red   = RYFAC * y + rc;
-                green = GYFAC * y + gc;
-                blue  = BYFAC * y + bc;
+                r = clamp(r, 0, 63*256);
+                g = clamp(g, 0, 63*256);
+                b = clamp(b, 0, 63*256);
+            }
 
-                if ((unsigned)red > (RYFAC*255+ROUNDOFFS))
-                {
-                    if (red < 0)
-                        red = 0;
-                    else
-                        red = (RYFAC*255+ROUNDOFFS);
-                }
-                if ((unsigned)green > (GYFAC*255+ROUNDOFFS))
-                {
-                    if (green < 0)
-                        green = 0;
-                    else
-                        green = (GYFAC*255+ROUNDOFFS);
-                }
-                if ((unsigned)blue > (BYFAC*255+ROUNDOFFS))
-                {
-                    if (blue < 0)
-                        blue = 0;
-                    else
-                        blue = (BYFAC*255+ROUNDOFFS);
-                }
-                rbits = ((unsigned)red) >> 16 ;
-                gbits = ((unsigned)green) >> 16 ;
-                bbits = ((unsigned)blue) >> 16 ;
-#if LCD_PIXELFORMAT == RGB565
-                *dst_row++ = (rbits << 11) | (gbits << 5) | bbits;
-#elif LCD_PIXELFORMAT == RGB565SWAPPED
-                *dst_row++ = swap16((rbits << 11) | (gbits << 5) | bbits);
+            *dst = LCD_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
+
+#if LCD_WIDTH >= LCD_HEIGHT
+            dst++;            
+#else
+            dst += LCD_WIDTH;
 #endif
 
-                if (++xphase >= CSUB_X)
-                {
-                    u = *usrc++ - 128;
-                    v = *vsrc++ - 128;
-                    rc = RVFAC * v + ROUNDOFFS;
-                    gc = GVFAC * v + GUFAC * u + ROUNDOFFS;
-                    bc = BUFAC * u + ROUNDOFFS;
-                    xphase = 0;
-                }
-            }
-            while (dst_row < row_end);
-        }
-        else /* monochrome */
-        {
-            do
-            {
-                y = *ysrc++;
-                red   = RYFAC * y + ROUNDOFFS;  /* blue == red */
-                green = GYFAC * y + ROUNDOFFS;
-                rbits = ((unsigned)red) >> 16;
-                gbits = ((unsigned)green) >> 16;
-#if LCD_PIXELFORMAT == RGB565
-                *dst_row++ = (rbits << 11) | (gbits << 5) | rbits;
-#elif LCD_PIXELFORMAT == RGB565SWAPPED
-                *dst_row++ = swap16((rbits << 11) | (gbits << 5) | rbits);
-#endif
-            }
-            while (dst_row < row_end);
-        }
+            y = YFAC*(*ysrc++ - 16);
+            r = y + rv;
+            g = y + guv;
+            b = y + bu;
 
-        src_y++;
-        dst += LCD_WIDTH;
+            if ((unsigned)(r | g | b) > 63*256)
+            {
+                r = clamp(r, 0, 63*256);
+                g = clamp(g, 0, 63*256);
+                b = clamp(b, 0, 63*256);
+            }
+
+            *dst = LCD_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
+
+#if LCD_WIDTH >= LCD_HEIGHT
+            dst++;            
+#else
+            dst += LCD_WIDTH;
+#endif
+        }
+        while (dst < row_end);
+
+        ysrc    += stride;
+        usrc    -= width >> 1;
+        vsrc    -= width >> 1;
+
+#if LCD_WIDTH >= LCD_HEIGHT
+        row_end += LCD_WIDTH;
+        dst     += LCD_WIDTH - width;
+#else
+        row_end -= 1;
+        dst     -= LCD_WIDTH*width + 1;
+#endif
+
+        do
+        {
+            int y, cb, cr, rv, guv, bu, r, g, b;
+
+            y  = YFAC*(*ysrc++ - 16);
+            cb = *usrc++ - 128;
+            cr = *vsrc++ - 128;
+
+            rv  =            RVFAC*cr;
+            guv = GUFAC*cb + GVFAC*cr;
+            bu  = BUFAC*cb;
+
+            r = y + rv;
+            g = y + guv;
+            b = y + bu;
+
+            if ((unsigned)(r | g | b) > 63*256)
+            {
+                r = clamp(r, 0, 63*256);
+                g = clamp(g, 0, 63*256);
+                b = clamp(b, 0, 63*256);
+            }
+
+            *dst = LCD_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
+
+#if LCD_WIDTH >= LCD_HEIGHT
+            dst++;            
+#else
+            dst += LCD_WIDTH;
+#endif
+
+            y = YFAC*(*ysrc++ - 16);
+            r = y + rv;
+            g = y + guv;
+            b = y + bu;
+
+            if ((unsigned)(r | g | b) > 63*256)
+            {
+                r = clamp(r, 0, 63*256);
+                g = clamp(g, 0, 63*256);
+                b = clamp(b, 0, 63*256);
+            }
+
+            *dst = LCD_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
+
+#if LCD_WIDTH >= LCD_HEIGHT
+            dst++;            
+#else
+            dst += LCD_WIDTH;
+#endif
+        }
+        while (dst < row_end);
+
+        ysrc    += stride;
+        usrc    += stride >> 1;
+        vsrc    += stride >> 1;
+
+#if LCD_WIDTH >= LCD_HEIGHT
+        row_end += LCD_WIDTH;
+        dst     += LCD_WIDTH - width;
+#else
+        row_end -= 1;
+        dst     -= LCD_WIDTH*width + 1;
+#endif
     }
-    while (dst < dst_end);
+    while (--height > 0);
 }
-#endif
+#endif /* defined(SIMULATOR) && defined(HAVE_LCD_COLOR) */
 
 void vo_draw_frame (uint8_t * const * buf)
 {
@@ -193,7 +243,11 @@ void vo_draw_frame (uint8_t * const * buf)
 #ifdef SIMULATOR
     yuv_bitmap_part(buf,0,0,image_width,
                     output_x,output_y,output_width,output_height);
+#if LCD_WIDTH >= LCD_HEIGHT
     rb->lcd_update_rect(output_x,output_y,output_width,output_height);
+#else
+    rb->lcd_update_rect(output_y,output_x,output_height,output_width);
+#endif
 #else
     rb->lcd_yuv_blit(buf,
                     0,0,image_width,
