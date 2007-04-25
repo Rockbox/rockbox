@@ -494,7 +494,7 @@ MAKE_MENU(viewer_settings_menu, ID2P(LANG_PLAYLISTVIEWER_SETTINGS),
           &show_icons, &show_indices, &track_display, &save_playlist_item);
 static bool viewer_menu(void)
 {
-    return do_menu(&viewer_settings_menu, NULL) == SYS_USB_CONNECTED;
+    return do_menu(&viewer_settings_menu, NULL) == MENU_ATTACHED_USB;
 }
 
 /* Save playlist to disk */
