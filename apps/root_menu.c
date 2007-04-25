@@ -377,7 +377,7 @@ static int get_selection(int last_screen)
     unsigned int i;
     for(i=0; i< sizeof(root_menu__)/sizeof(*root_menu__); i++)
     {
-        if ((root_menu__[i]->flags&MT_RETURN_VALUE) && 
+        if (((root_menu__[i]->flags&MENU_TYPE_MASK) == MT_RETURN_VALUE) && 
             (root_menu__[i]->value == last_screen))
         {
             return i;
@@ -408,7 +408,7 @@ static inline int load_screen(int screen)
 static int load_context_screen(int selection)
 {
     const struct menu_item_ex *context_menu = NULL;
-    if (root_menu__[selection]->flags&MT_RETURN_VALUE)
+    if ((root_menu__[selection]->flags&MENU_TYPE_MASK) == MT_RETURN_VALUE)
     {
         int item = root_menu__[selection]->value;
         context_menu = items[item].context_menu;
