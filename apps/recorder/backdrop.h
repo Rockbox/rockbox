@@ -36,4 +36,11 @@ void show_wps_backdrop(void);
 
 #endif /* LCD_DEPTH > 1 */
 
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+bool load_remote_wps_backdrop(char* filename);
+void unload_remote_wps_backdrop(void);
+void show_remote_wps_backdrop(void);
+void show_remote_main_backdrop(void); /* only clears the wps backdrop */
+#endif
+
 #endif /* _BACKDROP_H */

@@ -234,6 +234,9 @@ static int wpsscrn(void* param)
 #if LCD_DEPTH > 1
     show_main_backdrop();
 #endif
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+    show_remote_main_backdrop();
+#endif
     return ret_val;
 }
 #if CONFIG_TUNER

@@ -89,6 +89,9 @@ void usb_screen(void)
 #ifdef HAVE_LCD_COLOR
     show_main_backdrop();
 #endif
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+    show_remote_main_backdrop();
+#endif
 
     FOR_NB_SCREENS(i)
         screens[i].backlight_on();

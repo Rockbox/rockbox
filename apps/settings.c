@@ -742,6 +742,9 @@ void settings_apply(void)
 #if LCD_DEPTH > 1
     unload_wps_backdrop();
 #endif
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+    unload_remote_wps_backdrop();
+#endif
     if ( global_settings.wps_file[0] &&
          global_settings.wps_file[0] != 0xff ) {
         snprintf(buf, sizeof buf, WPS_DIR "/%s.wps",
@@ -766,6 +769,9 @@ void settings_apply(void)
         unload_main_backdrop();
     }
     show_main_backdrop();
+#endif
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+    show_remote_main_backdrop();
 #endif
 
 #ifdef HAVE_LCD_COLOR

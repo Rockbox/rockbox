@@ -257,7 +257,7 @@ static const struct wps_tag all_tags[] = {
 
     { WPS_TOKEN_IMAGE_DISPLAY,            "x",   0,       parse_image_load },
     { WPS_TOKEN_IMAGE_PROGRESS_BAR,       "P",   0,    parse_image_special },
-#if LCD_DEPTH > 1
+#if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
     { WPS_TOKEN_IMAGE_BACKDROP,           "X",   0,    parse_image_special },
 #endif
 #endif
@@ -908,17 +908,22 @@ static void load_wps_bitmaps(struct wps_data *wps_data, char *bmpdir)
         }
     }
 
-#if LCD_DEPTH > 1
+#if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
+    if (backdrop_bmp_name)
+    {
+        get_image_filename(backdrop_bmp_name, bmpdir,
+                            img_path, sizeof(img_path));
 #ifdef HAVE_REMOTE_LCD
-    if (!wps_data->remote_wps)
+        if (wps_data->remote_wps)
+#if LCD_REMOTE_DEPTH > 1
+            load_remote_wps_backdrop(img_path)
 #endif
-        if (backdrop_bmp_name)
-        {
-            get_image_filename(backdrop_bmp_name, bmpdir,
-                               img_path, sizeof(img_path));
+            ;
+        else
+#endif /* HAVE_REMOTE_LCD */
             load_wps_backdrop(img_path);
-        }
-#endif
+    }
+#endif /* has backdrop support */
 }
 
 #endif /* HAVE_LCD_BITMAP */

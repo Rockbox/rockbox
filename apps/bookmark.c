@@ -181,6 +181,9 @@ bool bookmark_autobookmark(void)
 #if LCD_DEPTH > 1
     show_main_backdrop(); /* switch to main backdrop as we may come from wps */
 #endif
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+    show_remote_main_backdrop();
+#endif
     gui_syncstatusbar_draw(&statusbars, false);
     if(gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
     {

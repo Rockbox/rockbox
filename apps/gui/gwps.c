@@ -119,6 +119,10 @@ long gui_wps_show(void)
 #endif /* LCD_DEPTH > 1 */
 #endif
 
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+    show_remote_wps_backdrop();
+#endif
+
 #ifdef AB_REPEAT_ENABLE
     ab_repeat_init();
     ab_reset_markers();
@@ -235,12 +239,18 @@ long gui_wps_show(void)
 #if LCD_DEPTH > 1
                 show_main_backdrop();
 #endif
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+                show_remote_main_backdrop();
+#endif
                 action_signalscreenchange();
                 if (onplay(wps_state.id3->path, FILE_ATTR_AUDIO, CONTEXT_WPS)
                      == ONPLAY_MAINMENU)
                     return GO_TO_ROOT;
 #if LCD_DEPTH > 1
                 show_wps_backdrop();
+#endif
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+                show_remote_wps_backdrop();
 #endif
 #ifdef HAVE_LCD_BITMAP
                 FOR_NB_SCREENS(i)
@@ -501,10 +511,16 @@ long gui_wps_show(void)
 #if LCD_DEPTH > 1
                 show_main_backdrop();
 #endif
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+                show_remote_main_backdrop();
+#endif
                 if (quick_screen_quick(button))
                     return SYS_USB_CONNECTED;
 #if LCD_DEPTH > 1
                 show_wps_backdrop();
+#endif
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+                show_remote_wps_backdrop();
 #endif
 #ifdef HAVE_LCD_BITMAP
                 FOR_NB_SCREENS(i)
@@ -521,6 +537,9 @@ long gui_wps_show(void)
             case ACTION_F3:
 #if LCD_DEPTH > 1
                 show_main_backdrop();
+#endif
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+                show_remote_main_backdrop();
 #endif
                 if (quick_screen_f3(BUTTON_F3))
                     return SYS_USB_CONNECTED;
@@ -540,11 +559,17 @@ long gui_wps_show(void)
 #if LCD_DEPTH > 1
                 show_main_backdrop();
 #endif
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+                show_remote_main_backdrop();
+#endif
                 action_signalscreenchange();
                 if (1 == pitch_screen())
                     return SYS_USB_CONNECTED;
 #if LCD_DEPTH > 1
                 show_wps_backdrop();
+#endif
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+                show_remote_wps_backdrop();
 #endif
                 restore = true;
                 break;
@@ -572,9 +597,15 @@ long gui_wps_show(void)
 #if LCD_DEPTH > 1
                 show_main_backdrop();
 #endif
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+                show_remote_main_backdrop();
+#endif
                 browse_id3();
 #if LCD_DEPTH > 1
                 show_wps_backdrop();
+#endif
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+                show_remote_wps_backdrop();
 #endif
 #ifdef HAVE_LCD_BITMAP
                 FOR_NB_SCREENS(i)
@@ -597,6 +628,9 @@ long gui_wps_show(void)
                 bookmark_autobookmark();
 #if LCD_DEPTH > 1
                 show_main_backdrop();
+#endif
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+                show_remote_main_backdrop();
 #endif
                 default_event_handler(SYS_POWEROFF);
                 break;
@@ -750,5 +784,8 @@ void gui_sync_wps_init(void)
     }
 #if LCD_DEPTH > 1
     unload_wps_backdrop();
+#endif
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+    unload_remote_wps_backdrop();
 #endif
 }

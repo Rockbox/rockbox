@@ -181,6 +181,8 @@ extern void     lcd_remote_set_background(unsigned background);
 extern unsigned lcd_remote_get_background(void);
 extern void     lcd_remote_set_drawinfo(int mode, unsigned foreground,
                                         unsigned background);
+void lcd_remote_set_backdrop(fb_remote_data* backdrop);
+fb_remote_data* lcd_remote_get_backdrop(void);
 
 extern void lcd_remote_mono_bitmap_part(const unsigned char *src, int src_x,
                                         int src_y, int stride, int x, int y,

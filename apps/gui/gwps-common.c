@@ -337,6 +337,9 @@ bool gui_wps_display(void)
                      /* set the default wps for the remote-screen */
                      else if(i == 1)
                      {
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+                         unload_remote_wps_backdrop();
+#endif
                          wps_data_load(gui_wps[i].data,
                                        "%s%?ia<%ia|%?d2<%d2|(root)>>\n"
                                        "%s%?it<%?in<%in. |>%it|%fn>\n"
