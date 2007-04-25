@@ -125,10 +125,7 @@ static void format_line(const struct playlist_entry* track, char* str,
 static bool update_playlist(bool force);
 static int  onplay_menu(int index);
 static bool viewer_menu(void);
-static bool show_icons(void);
-static bool show_indices(void);
-static bool track_display(void);
-static bool save_playlist(void);
+static int save_playlist_func(void);
 
 static void playlist_buffer_init(struct playlist_buffer *pb, char *names_buffer,
                                  int names_buffer_size)
@@ -422,26 +419,15 @@ static bool update_playlist(bool force)
    changed. */
 static int onplay_menu(int index)
 {
-    struct menu_item items[4]; /* increase this if you add entries! */
-    int m, i=0, result, ret = 0;
+    int result, ret = 0;
     struct playlist_entry * current_track=
         playlist_buffer_get_track(&viewer.buffer, index);
+    MENUITEM_STRINGLIST(menu_items, ID2P(LANG_PLAYLIST_MENU), NULL, 
+                        ID2P(LANG_REMOVE), ID2P(LANG_MOVE),
+                        ID2P(LANG_CATALOG_ADD_TO), ID2P(LANG_CATALOG_ADD_TO_NEW));
     bool current = (current_track->index == viewer.current_playing_track);
 
-    items[i].desc = ID2P(LANG_REMOVE);
-    i++;
-
-    items[i].desc = ID2P(LANG_MOVE);
-    i++;
-
-    items[i].desc = ID2P(LANG_CATALOG_ADD_TO);
-    i++;
-    
-    items[i].desc = ID2P(LANG_CATALOG_ADD_TO_NEW);
-    i++;
-
-    m = menu_init(items, i, NULL, str(LANG_PLAYLIST_MENU), NULL, NULL);
-    result = menu_show(m);
+    result = do_menu(&menu_items, NULL);
     if (result == MENU_ATTACHED_USB)
     {
         ret = -1;
@@ -493,65 +479,29 @@ static int onplay_menu(int index)
                 break;
         }
     }
-    menu_exit(m);
     return ret;
 }
 
 /* Menu of viewer options.  Invoked via F1(r) or Menu(p). */
+MENUITEM_SETTING(show_icons, &global_settings.playlist_viewer_icons, NULL);
+MENUITEM_SETTING(show_indices, &global_settings.playlist_viewer_indices, NULL);
+MENUITEM_SETTING(track_display, 
+                 &global_settings.playlist_viewer_track_display, NULL);
+MENUITEM_FUNCTION(save_playlist_item, 0, ID2P(LANG_SAVE_DYNAMIC_PLAYLIST),
+                  save_playlist_func, 0, NULL, Icon_NOICON);
+MAKE_MENU(viewer_settings_menu, ID2P(LANG_PLAYLISTVIEWER_SETTINGS), 
+          NULL, Icon_Playlist,
+          &show_icons, &show_indices, &track_display, &save_playlist_item);
 static bool viewer_menu(void)
 {
-    int m;
-    bool result;
-
-    static const struct menu_item items[] = {
-        { ID2P(LANG_SHOW_ICONS),             show_icons },
-        { ID2P(LANG_SHOW_INDICES),           show_indices },
-        { ID2P(LANG_TRACK_DISPLAY),          track_display },
-        { ID2P(LANG_SAVE_DYNAMIC_PLAYLIST),  save_playlist },
-    };
-
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
-                 NULL, NULL, NULL );
-    result = menu_run(m);
-    menu_exit(m);
-
-    settings_save();
-
-    return result;
-}
-
-/* Show icons in viewer? */
-static bool show_icons(void)
-{
-    return set_bool((char *)str(LANG_SHOW_ICONS),
-                    &global_settings.playlist_viewer_icons);
-}
-
-/* Show indices of tracks? */
-static bool show_indices(void)
-{
-    return set_bool((char *)str(LANG_SHOW_INDICES),
-                    &global_settings.playlist_viewer_indices);
-}
-
-/* How to display a track */
-static bool track_display(void)
-{
-    static const struct opt_items names[] = {
-        { STR(LANG_DISPLAY_TRACK_NAME_ONLY) },
-        { STR(LANG_DISPLAY_FULL_PATH) }
-    };
-
-    return set_option((char *)str(LANG_TRACK_DISPLAY),
-                      &global_settings.playlist_viewer_track_display, INT, names, 2,
-                      NULL);
+    return do_menu(&viewer_settings_menu, NULL) == SYS_USB_CONNECTED;
 }
 
 /* Save playlist to disk */
-static bool save_playlist(void)
+static int save_playlist_func(void)
 {
     save_playlist_screen(viewer.playlist);
-    return false;
+    return 0;
 }
 
 /* View current playlist */
