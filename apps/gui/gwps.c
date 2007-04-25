@@ -741,6 +741,9 @@ void gui_sync_wps_init(void)
     FOR_NB_SCREENS(i)
     {
         wps_data_init(&wps_datas[i]);
+#ifdef HAVE_REMOTE_LCD
+        wps_datas[i].remote_wps = (i != 0);
+#endif
         gui_wps_init(&gui_wps[i]);
         gui_wps_set_data(&gui_wps[i], &wps_datas[i]);
         gui_wps_set_statusbar(&gui_wps[i], &statusbars.statusbars[i]);

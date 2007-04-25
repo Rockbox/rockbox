@@ -751,6 +751,9 @@ void settings_apply(void)
     else
     {
         wps_data_init(gui_wps[0].data);
+#ifdef HAVE_REMOTE_LCD
+        gui_wps[0].data->remote_wps = false;
+#endif
     }
 
 #if LCD_DEPTH > 1
@@ -777,7 +780,10 @@ void settings_apply(void)
         wps_data_load(gui_wps[1].data, buf, true);
     }
     else
+    {
         wps_data_init(gui_wps[1].data);
+        gui_wps[1].data->remote_wps = true;
+    }
 #endif
 
 #ifdef HAVE_LCD_BITMAP

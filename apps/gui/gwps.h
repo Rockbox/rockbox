@@ -312,6 +312,11 @@ struct wps_data
     unsigned short wps_progress_pat[8];
     bool full_line_progressbar;
 #endif
+
+#ifdef HAVE_REMOTE_LCD
+    bool remote_wps;
+#endif
+
     /* Number of lines in the WPS. During WPS parsing, this is
        the index of the line being parsed. */
     int num_lines;

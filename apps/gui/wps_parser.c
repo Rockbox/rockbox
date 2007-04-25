@@ -311,9 +311,17 @@ static bool load_bitmap(struct wps_data *wps_data,
                         char* filename,
                         struct bitmap *bm)
 {
+    int format;
+#ifdef HAVE_REMOTE_LCD
+    if (wps_data->remote_wps)
+        format = FORMAT_ANY|FORMAT_REMOTE;
+    else
+#endif
+        format = FORMAT_ANY|FORMAT_TRANSPARENT;
+
     int ret = read_bmp_file(filename, bm,
                             wps_data->img_buf_free,
-                            FORMAT_ANY|FORMAT_TRANSPARENT);
+                            format);
 
     if (ret > 0)
     {
@@ -840,9 +848,14 @@ void wps_data_init(struct wps_data *wps_data)
 
 static void wps_reset(struct wps_data *data)
 {
+#ifdef HAVE_REMOTE_LCD
+    bool rwps = data->remote_wps; /* remember whether the data is for a RWPS */
+#endif
     memset(data, 0, sizeof(*data));
-    data->wps_loaded = false;
     wps_data_init(data);
+#ifdef HAVE_REMOTE_LCD
+    data->remote_wps = rwps;
+#endif
 }
 
 #ifdef HAVE_LCD_BITMAP
@@ -896,12 +909,15 @@ static void load_wps_bitmaps(struct wps_data *wps_data, char *bmpdir)
     }
 
 #if LCD_DEPTH > 1
-    if (backdrop_bmp_name)
-    {
-        get_image_filename(backdrop_bmp_name, bmpdir,
-                           img_path, sizeof(img_path));
-        load_wps_backdrop(img_path);
-    }
+#ifdef HAVE_REMOTE_LCD
+    if (!wps_data->remote_wps)
+#endif
+        if (backdrop_bmp_name)
+        {
+            get_image_filename(backdrop_bmp_name, bmpdir,
+                               img_path, sizeof(img_path));
+            load_wps_backdrop(img_path);
+        }
 #endif
 }
 

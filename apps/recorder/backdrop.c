@@ -26,13 +26,8 @@
 static fb_data main_backdrop[LCD_HEIGHT][LCD_WIDTH]  __attribute__ ((aligned (16)));
 static fb_data wps_backdrop[LCD_HEIGHT][LCD_WIDTH]  __attribute__ ((aligned (16)));
 #elif LCD_DEPTH == 2
-#if LCD_PIXELFORMAT == VERTICAL_PACKING
-static fb_data main_backdrop[(LCD_HEIGHT+3)/4][LCD_WIDTH];
-static fb_data wps_backdrop[(LCD_HEIGHT+3)/4][LCD_WIDTH];
-#else
-static fb_data main_backdrop[LCD_HEIGHT][LCD_FBWIDTH];
-static fb_data wps_backdrop[LCD_HEIGHT][LCD_FBWIDTH];
-#endif
+static fb_data main_backdrop[LCD_FBHEIGHT][LCD_FBWIDTH];
+static fb_data wps_backdrop[LCD_FBHEIGHT][LCD_FBWIDTH];
 #endif
 
 static bool main_backdrop_valid = false;
