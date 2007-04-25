@@ -181,13 +181,12 @@ static bool on_end_file(struct enc_file_event_data *data)
     hdr.ssnd_size         = htobe32(data_size + 8);
 
     if (ci->lseek(data->rec_file, 0, SEEK_SET) != 0 ||
-        ci->write(data->rec_file, &hdr, sizeof (hdr)) != sizeof (hdr))
+        ci->write(data->rec_file, &hdr, sizeof (hdr)) != sizeof (hdr) ||
+        ci->close(data->rec_file) != 0)
     {
         return false;
     }
 
-    ci->fsync(data->rec_file);
-    ci->close(data->rec_file);
     data->rec_file = -1;
 
     return true;

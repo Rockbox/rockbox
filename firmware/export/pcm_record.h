@@ -45,15 +45,17 @@
 #define PCMREC_E_ENCODER                0x80002000
 /* filename queue has desynced from stream markers */
 #define PCMREC_E_FNQ_DESYNC             0x80004000
+/* I/O error has occurred */
+#define PCMREC_E_IO                     0x80008000
 #ifdef PCMREC_PARANOID
 /* encoder has written past end of allotted space */
-#define PCMREC_E_CHUNK_OVF              0x80008000
+#define PCMREC_E_CHUNK_OVF              0x80010000
 /* chunk header incorrect */
-#define PCMREC_E_BAD_CHUNK              0x80010000
+#define PCMREC_E_BAD_CHUNK              0x80020000
 /* encoder read position changed outside of recording control */
-#define PCMREC_E_ENC_RD_INDEX_TRASHED   0x80020000
+#define PCMREC_E_ENC_RD_INDEX_TRASHED   0x80040000
 /* encoder write position changed outside of recording control */
-#define PCMREC_E_ENC_WR_INDEX_TRASHED   0x80040000
+#define PCMREC_E_ENC_WR_INDEX_TRASHED   0x80080000
 #endif /* PCMREC_PARANOID */
 
 /**

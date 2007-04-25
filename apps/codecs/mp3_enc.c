@@ -2329,11 +2329,9 @@ static bool on_start_file(struct enc_file_event_data *data)
 
 static bool on_end_file(struct enc_file_event_data *data)
 {
-    if (!is_file_data_ok(data))
+    if (!is_file_data_ok(data) || ci->close(data->rec_file) != 0)
         return false;
 
-    ci->fsync(data->rec_file);
-    ci->close(data->rec_file);
     data->rec_file = -1;
 
     return true;

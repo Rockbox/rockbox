@@ -294,13 +294,12 @@ static bool on_end_file(struct enc_file_event_data *data)
         ci->write(data->rec_file, &h.wpmdh, sizeof (h.wpmdh))
             != sizeof (h.wpmdh) ||
         ci->write(data->rec_file, &h.rhdr, sizeof (h.rhdr))
-            != sizeof (h.rhdr))
+            != sizeof (h.rhdr) ||
+        ci->close(data->rec_file) != 0 )
     {
         return false;
     }
 
-    ci->fsync(data->rec_file);
-    ci->close(data->rec_file);
     data->rec_file = -1;
 
     return true;

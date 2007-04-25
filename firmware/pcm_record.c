@@ -653,7 +653,9 @@ static void pcmrec_close_file(int *fd_p)
     if (*fd_p < 0)
         return; /* preserve error */
 
-    close(*fd_p);
+    if (close(*fd_p) != 0)
+        errors |= PCMREC_E_IO;
+
     *fd_p = -1;
 } /* pcmrec_close_file */
 
@@ -1042,8 +1044,8 @@ static void pcmrec_flush(unsigned flush_num)
     } /* end while */
 
     /* sync file */
-    if (rec_fdata.rec_file >= 0)
-        fsync(rec_fdata.rec_file);
+    if (rec_fdata.rec_file >= 0 && fsync(rec_fdata.rec_file) != 0)
+        errors |= PCMREC_E_IO;
 
     cpu_boost(false);
 
@@ -1239,12 +1241,12 @@ static void pcmrec_init(void)
 {
     unsigned char *buffer;
 
-    pcmrec_close_file(&rec_fdata.rec_file);
-    rec_fdata.rec_file = -1;
-
     /* warings and errors */
     warnings          =
     errors            = 0;
+
+    pcmrec_close_file(&rec_fdata.rec_file);
+    rec_fdata.rec_file = -1;
 
     /* pcm FIFO */
     dma_lock          = true;
