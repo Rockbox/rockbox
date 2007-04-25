@@ -72,7 +72,7 @@
 #include "dsp.h"
 #endif
 
-#ifdef HAVE_LCD_COLOR
+#if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
 #include "backdrop.h"
 #endif
 

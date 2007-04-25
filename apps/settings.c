@@ -61,7 +61,8 @@
 #include "splash.h"
 #include "list.h"
 #include "settings_list.h"
-#if LCD_DEPTH > 1
+
+#if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
 #include "backdrop.h"
 #endif
 

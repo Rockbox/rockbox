@@ -30,9 +30,10 @@
 
 #ifdef HAVE_LCD_BITMAP
 #include "bmp.h"
-#if LCD_DEPTH > 1
-#include "backdrop.h"
 #endif
+
+#if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
+#include "backdrop.h"
 #endif
 
 #define WPS_DEFAULTCFG WPS_DIR "/rockbox_default.wps"

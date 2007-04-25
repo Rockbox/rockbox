@@ -49,12 +49,13 @@
 #include "bmp.h"
 #include "atoi.h"
 #endif
-#if LCD_DEPTH > 1
-#include "backdrop.h"
-#endif
 #include "dsp.h"
 #include "action.h"
 #include "cuesheet.h"
+
+#if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
+#include "backdrop.h"
+#endif
 
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
                                 /* 3% of 30min file == 54s step size */

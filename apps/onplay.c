@@ -50,9 +50,6 @@
 #include "action.h"
 #include "splash.h"
 #include "yesno.h"
-#if LCD_DEPTH > 1
-#include "backdrop.h"
-#endif
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #endif
@@ -65,6 +62,10 @@
 #include "playlist_catalog.h"
 #ifdef HAVE_TAGCACHE
 #include "tagtree.h"
+#endif
+
+#if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
+#include "backdrop.h"
 #endif
 
 static int context;

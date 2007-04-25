@@ -62,6 +62,10 @@ gui/yesno.c
 gui/wps_debug.c
 gui/wps_parser.c
 
+#if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
+gui/backdrop.c
+#endif
+
 #ifdef HAVE_LCD_CHARCELLS
 player/icons.c
 player/keyboard.c
@@ -71,9 +75,6 @@ recorder/bmp.c
 recorder/icons.c
 recorder/keyboard.c
 recorder/peakmeter.c
-#if LCD_DEPTH > 1
-recorder/backdrop.c
-#endif
 #ifdef HAVE_LCD_COLOR
 gui/color_picker.c
 #endif

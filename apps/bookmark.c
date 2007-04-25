@@ -51,7 +51,7 @@
 #include "splash.h"
 #include "yesno.h"
 
-#if LCD_DEPTH > 1
+#if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
 #include "backdrop.h"
 #endif
 
