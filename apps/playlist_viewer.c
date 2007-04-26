@@ -631,11 +631,11 @@ bool playlist_viewer_ex(char* filename)
                 if (viewer.move_track >= 0)
                 {
                     /* Move track */
-                    int ret;
+                    int ret_val;
 
-                    ret = playlist_move(viewer.playlist, viewer.move_track,
+                    ret_val = playlist_move(viewer.playlist, viewer.move_track,
                         current_track->index);
-                    if (ret < 0)
+                    if (ret_val < 0)
                         gui_syncsplash(HZ, str(LANG_MOVE_FAILED));
 
                     update_playlist(true);
@@ -666,11 +666,11 @@ bool playlist_viewer_ex(char* filename)
             case ACTION_STD_CONTEXT:
             {
                 /* ON+PLAY menu */
-                int ret;
+                int ret_val;
 
-                ret = onplay_menu(viewer.selected_track);
+                ret_val = onplay_menu(viewer.selected_track);
 
-                if (ret < 0)
+                if (ret_val < 0)
                 {
                     ret = true;
                     goto exit;
