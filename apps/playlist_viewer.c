@@ -274,11 +274,19 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
 {
     char* buffer;
     size_t buffer_size;
-    bool is_playing = audio_status() & AUDIO_STATUS_PLAY;
-
-    if (!filename && !is_playing)
-        /* Nothing is playing, exit */
+    bool is_playing = audio_status() & (AUDIO_STATUS_PLAY | AUDIO_STATUS_PAUSE);
+    bool have_list = filename || is_playing;
+    if (!have_list && (global_status.resume_index != -1))
+    {
+        /* Try to restore the list from control file */
+        have_list = (playlist_resume() != -1);
+    }
+    if (!have_list)
+    {
+        /* Nothing to view, exit */
+        gui_syncsplash(HZ, str(LANG_CATALOG_NO_PLAYLISTS));
         return false;
+    }
 
     buffer = plugin_get_buffer(&buffer_size);
     if (!buffer)
@@ -567,14 +575,10 @@ bool playlist_viewer_ex(char* filename)
     while (!exit)
     {
         int track;
-        if (!viewer.playlist && !(audio_status() & AUDIO_STATUS_PLAY))
+        if (global_status.resume_index == -1)
         {
             /* Play has stopped */
-#ifdef HAVE_LCD_CHARCELLS
-            gui_syncsplash(HZ, str(LANG_END_PLAYLIST_PLAYER));
-#else
             gui_syncsplash(HZ, str(LANG_END_PLAYLIST_RECORDER));
-#endif
             goto exit;
         }
 
