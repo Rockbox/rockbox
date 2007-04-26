@@ -501,7 +501,7 @@ static int readwrite(int fd, void* buf, long count, bool write)
 
         if (offs + headbytes == SECTOR_SIZE) {
             if (file->dirty) {
-                int rc = flush_cache(fd);
+                rc = flush_cache(fd);
                 if ( rc < 0 ) {
                     errno = EIO;
                     return rc * 10 - 2;
@@ -524,7 +524,7 @@ static int readwrite(int fd, void* buf, long count, bool write)
     /* read/write whole sectors right into/from the supplied buffer */
     sectors = count / SECTOR_SIZE;
     if ( sectors ) {
-        int rc = fat_readwrite(&(file->fatfile), sectors,
+        rc = fat_readwrite(&(file->fatfile), sectors,
             (unsigned char*)buf+nread, write );
         if ( rc < 0 ) {
             DEBUGF("Failed read/writing %ld sectors\n",sectors);
@@ -561,7 +561,6 @@ static int readwrite(int fd, void* buf, long count, bool write)
         if (write) {
             if ( file->fileoffset + nread < file->size ) {
                 /* sector is only partially filled. copy-back from disk */
-                int rc;
                 LDEBUGF("Copy-back tail cache\n");
                 rc = fat_readwrite(&(file->fatfile), 1, file->cache, false );
                 if ( rc < 0 ) {
