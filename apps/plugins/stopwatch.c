@@ -22,16 +22,13 @@
 PLUGIN_HEADER
 
 #ifdef HAVE_LCD_BITMAP
-#define LAP_LINES 6
 #define TIMER_Y 1
 #else
-#define LAP_LINES 1
 #define TIMER_Y 0
 #endif
 
 #define LAP_Y TIMER_Y+1
-#define MAX_LAPS 10
-#define MAX_SCROLL (MAX_LAPS - LAP_LINES)
+#define MAX_LAPS 64
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
@@ -148,9 +145,30 @@ static void ticks_to_string(int ticks,int lap,int buflen, char * buf)
     }
     else
     {
-        rb->snprintf(buf, buflen,
-                     "%2d %2d:%02d:%02d.%02d",
-                     lap, hours, minutes, seconds, cs);
+
+        if (lap > 1)
+        {
+            int last_ticks, last_hours, last_minutes, last_seconds, last_cs;
+            last_ticks = lap_times[(lap-1)%MAX_LAPS] - lap_times[(lap-2)%MAX_LAPS];
+            last_hours = last_ticks / (HZ * 3600);
+            last_ticks -= (HZ * last_hours * 3600);
+            last_minutes = last_ticks / (HZ * 60);
+            last_ticks -= (HZ * last_minutes * 60);
+            last_seconds = last_ticks / HZ;
+            last_ticks -= (HZ * last_seconds);
+            last_cs = last_ticks;
+
+            rb->snprintf(buf, buflen,
+                         "%2d %2d:%02d:%02d.%02d [%2d:%02d:%02d.%02d]",
+                         lap, hours, minutes, seconds, cs, last_hours,
+                         last_minutes, last_seconds, last_cs);
+        }
+        else
+        {
+            rb->snprintf(buf, buflen,
+                         "%2d %2d:%02d:%02d.%02d",
+                         lap, hours, minutes, seconds, cs);
+        }
     }
 }
 
@@ -161,16 +179,21 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int lap;
     int done = false;
     bool update_lap = true;
+    int lines, h;
 
     (void)parameter;
     rb = api;
 
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_setfont(FONT_UI);
+    rb->lcd_getstringsize("M", NULL, &h);
+    lines = (LCD_HEIGHT / h) - (LAP_Y);
+#else
+    lines = 1;
 #endif
 
     rb->lcd_clear_display();
-
+    
     while (!done)
     {
         if (counting)
@@ -188,7 +211,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         if(update_lap)
         {
             lap_start = curr_lap - lap_scroll;
-            for (lap = lap_start; lap > lap_start - LAP_LINES; lap--)
+            for (lap = lap_start; lap > lap_start - lines; lap--)
             {
                 if (lap > 0)
                 {
@@ -272,8 +295,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
             /* Scroll Lap timer down */
             case STOPWATCH_SCROLL_DOWN:
-                 if ((lap_scroll < curr_lap - LAP_LINES) &&
-                     (lap_scroll < MAX_SCROLL) )
+                 if ((lap_scroll < curr_lap - lines) &&
+                     (lap_scroll < (MAX_LAPS - lines)) )
                  {
                      lap_scroll ++;
                      update_lap = true;
