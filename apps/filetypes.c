@@ -141,6 +141,7 @@ void read_viewer_theme_file(void)
     int fd;
     char *ext, *icon;
     int i;
+    global_status.viewer_icon_count = 0;
     custom_icons_loaded = false;
     custom_filetype_icons[0] = Icon_Folder;
     for (i=1; i<filetype_count; i++)
@@ -166,7 +167,12 @@ void read_viewer_theme_file(void)
                 else if (*icon == '-')
                     custom_filetype_icons[i] = Icon_NOICON;
                 else if (*icon >= '0' && *icon <= '9')
-                    custom_filetype_icons[i] = Icon_Last_Themeable + atoi(icon);
+                {
+                    int number = atoi(icon);
+                    if (number > global_status.viewer_icon_count)
+                        global_status.viewer_icon_count++;
+                    custom_filetype_icons[i] = Icon_Last_Themeable + number;
+                }
                 break;
             }
         }
@@ -178,7 +184,6 @@ void read_viewer_theme_file(void)
 
 void  filetype_init(void)
 {
-    int i;
     /* set the directory item first */
     filetypes[0].extension = NULL;
     filetypes[0].plugin = NULL;
@@ -191,14 +196,6 @@ void  filetype_init(void)
 #ifdef HAVE_LCD_BITMAP
     read_viewer_theme_file();
 #endif
-    /* figure out how many viewer icons have been loaded */
-    global_status.viewer_icon_count = Icon_Last_Themeable;
-    for (i=1; i<filetype_count; i++)
-    {
-        if (custom_filetype_icons[i] > global_status.viewer_icon_count)
-            global_status.viewer_icon_count = custom_filetype_icons[i];
-    }
-    global_status.viewer_icon_count -= Icon_Last_Themeable;
 }
 
 /* remove all white spaces from string */
