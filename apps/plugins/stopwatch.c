@@ -179,12 +179,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int lap;
     int done = false;
     bool update_lap = true;
-    int lines, h;
+    int lines;
 
     (void)parameter;
     rb = api;
 
 #ifdef HAVE_LCD_BITMAP
+    int h;
     rb->lcd_setfont(FONT_UI);
     rb->lcd_getstringsize("M", NULL, &h);
     lines = (LCD_HEIGHT / h) - (LAP_Y);
