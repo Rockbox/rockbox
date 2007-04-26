@@ -1306,10 +1306,10 @@ static bool read_mp4_esds(int fd, struct mp3entry* id3,
                 id3->frequency *= 2;
             }
         }
-        /* TODO: Should check that there is at least 16 bits left  */
         /* Skip 13 bits from above, plus 3 bits, then read 11 bits */
-        else if (((bits >> 5) & 0x7ff) == 0x2b7) /* extensionAudioObjectType */
+        else if ((length >= 4) && (((bits >> 5) & 0x7ff) == 0x2b7))
         {
+            /* extensionAudioObjectType */
             DEBUGF("MP4: extensionAudioType\n");
             type = bits & 0x1f;         /* Object type - 5 bits*/
             bits = get_long_be(&buf[4]);
@@ -1342,6 +1342,17 @@ static bool read_mp4_esds(int fd, struct mp3entry* id3,
                     }
                 }
             }
+        }
+        
+        if (!sbr && (id3->frequency <= 24000) && (length <= 2))
+        {
+            /* Double the frequency for low-frequency files without a "long" 
+             * DecSpecificConfig header. The file may or may not contain SBR,
+             * but here we guess it does if the header is short. This can
+             * fail on some files, but it's the best we can do, short of 
+             * decoding (parts of) the file.
+             */
+            id3->frequency *= 2;
         }
     }
     
