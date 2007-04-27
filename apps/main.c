@@ -83,7 +83,9 @@
 #endif
 
 #ifdef BUTTON_REC
-#define SETTINGS_RESET BUTTON_REC
+    #define SETTINGS_RESET BUTTON_REC
+#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
+    #define SETTINGS_RESET BUTTON_A
 #endif
 
 #if CONFIG_TUNER
@@ -459,9 +461,10 @@ static void init(void)
     }
 
 #if defined(SETTINGS_RESET) || (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-    (CONFIG_KEYPAD == IRIVER_H10_PAD) || (CONFIG_KEYPAD == GIGABEAT_PAD)
+    (CONFIG_KEYPAD == IRIVER_H10_PAD)
 #ifdef SETTINGS_RESET
-    /* Reset settings if holding the rec button. */
+    /* Reset settings if holding the reset button. (Rec on Archos,
+       A on Gigabeat) */
     if ((button_status() & SETTINGS_RESET) == SETTINGS_RESET)
 #else
     /* Reset settings if the hold button is turned on */
