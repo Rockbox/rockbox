@@ -17,10 +17,8 @@ rolo.c
 thread.c
 timer.c
 #endif /* SIMULATOR */
-#if !defined(WIN32) || defined(SDL)
 panic.c
 debug.c
-#endif /* !defined(WIN32) || defined(SDL) */
 
 /* Common */
 common/atoi.c
