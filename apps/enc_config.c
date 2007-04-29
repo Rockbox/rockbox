@@ -20,6 +20,7 @@
 #include <sprintf.h>
 #include <string.h>
 #include "config.h"
+#include "action.h"
 #include "atoi.h"
 #include "lang.h"
 #include "misc.h"
@@ -34,18 +35,21 @@
 #include "enc_config.h"
 #include "splash.h"
 
-#define MENU_ITEM_FN(fn) \
-    ((bool (*)(void))fn)
-
-#define ENC_MENU_ITEM_FN(fn) \
-    ((bool (*)(struct encoder_config *))fn)
 
 #define CALL_FN_(fn, ...) \
     if (fn) fn(__VA_ARGS__)
 
-static bool enc_run_menu(int m, const struct menu_item items[],
-                         struct encoder_config *cfg, bool global);
+static int enc_menuitem_callback(int action,
+                                  const struct menu_item_ex *this_item);
+static int enc_menuitem_enteritem(int action,
+                                  const struct menu_item_ex *this_item);
 static void enc_rec_settings_changed(struct encoder_config *cfg);
+/* this is used by all encoder menu items,
+   MUST be initialised before the call to do_menu() */
+struct menucallback_data {
+    struct encoder_config *cfg;
+    bool global;
+} menu_callback_data;
 
 /** Function definitions for each codec - add these to enc_data
     list following the definitions **/
@@ -116,8 +120,9 @@ static void mp3_enc_convert_config(struct encoder_config *cfg,
 } /* mp3_enc_convert_config */
 
 /* mp3_enc: show the bitrate setting options */
-static bool mp3_enc_bitrate(struct encoder_config *cfg)
+static bool mp3_enc_bitrate(struct menucallback_data *data)
 {
+    struct encoder_config *cfg = data->cfg;
     static const struct opt_items items[] =
     {
                             /* Available in MPEG Version: */
@@ -175,31 +180,29 @@ static bool mp3_enc_bitrate(struct encoder_config *cfg)
     return res;
 } /* mp3_enc_bitrate */
 
-/* mp3_enc: show the configuration menu */
-static bool mp3_enc_menu(struct encoder_config *cfg, bool global)
-{
-    static const struct menu_item items[] =
-    {
-        { ID2P(LANG_BITRATE), MENU_ITEM_FN(mp3_enc_bitrate) }
-    };
+/* mp3_enc configuration menu */
+MENUITEM_FUNCTION(mp3_bitrate, MENU_FUNC_USEPARAM, ID2P(LANG_BITRATE),
+                   mp3_enc_bitrate,
+                   &menu_callback_data, enc_menuitem_callback, Icon_NOICON);
+MAKE_MENU( mp3_enc_menu, ID2P(LANG_ENCODER_SETTINGS),
+           enc_menuitem_enteritem, Icon_NOICON,
+           &mp3_bitrate);
 
-    bool result;
-    int m = menu_init(items, ARRAYLEN(items), NULL, NULL, NULL, NULL);
-    result = enc_run_menu(m, items, cfg, global);
-    menu_exit(m);
-    return result;
-} /* mp3_enc_menu */
 
 /** wav_enc.codec **/
 /* wav_enc: show the configuration menu */
 #if 0
-static bool wav_enc_menu(struct encoder_config *cfg, bool global);
+MAKE_MENU( wav_enc_menu, ID2P(LANG_ENCODER_SETTINGS),
+           enc_menuitem_enteritem, Icon_NOICON,
+           );
 #endif
 
 /** wavpack_enc.codec **/
 /* wavpack_enc: show the configuration menu */
 #if 0
-static bool wavpack_enc_menu(struct encoder_config *cfg, bool global);
+MAKE_MENU( wavpack_enc_menu, ID2P(LANG_ENCODER_SETTINGS),
+           enc_menuitem_enteritem, Icon_NOICON,
+           );
 #endif
 
 /** config function pointers and/or data for each codec **/
@@ -209,7 +212,7 @@ static const struct encoder_data
                        struct encoder_caps *caps, bool for_config);
     void   (*default_cfg)(struct encoder_config *cfg);
     void   (*convert_cfg)(struct encoder_config *cfg , bool global);
-    bool   (*menu)(struct encoder_config *cfg , bool global);
+    const struct menu_item_ex *menu;
 } enc_data[REC_NUM_FORMATS] =
 {
     /* aiff_enc.codec */
@@ -224,7 +227,7 @@ static const struct encoder_data
         mp3_enc_get_caps,
         mp3_enc_default_config,
         mp3_enc_convert_config,
-        mp3_enc_menu,
+        &mp3_enc_menu,
     },
     /* wav_enc.codec */
     [REC_FORMAT_PCM_WAV] = {
@@ -246,45 +249,44 @@ static inline bool rec_format_ok(int rec_format)
 {
     return (unsigned)rec_format < REC_NUM_FORMATS;
 }
-
-static bool enc_run_menu(int m, const struct menu_item items[],
-                         struct encoder_config *cfg, bool global)
+/* This is called before entering the menu with the encoder settings
+   Its needed to make sure the settings can take effect. */
+static int enc_menuitem_enteritem(int action,
+                                  const struct menu_item_ex *this_item)
 {
-    while (1)
+    (void)this_item;
+    /* this struct must be init'ed before calling do_menu() so this is safe */
+    struct menucallback_data *data = &menu_callback_data;
+    if (action == ACTION_STD_OK) /* entering the item */
     {
-        int selected = menu_show(m);
-
-        switch (selected)
-        {
-        case MENU_SELECTED_EXIT:
-            return false;
-
-        case MENU_ATTACHED_USB:
-            return true;
-
-        default:
-            if (items[selected].function == NULL)
-                break;
-
-            /* If the setting being configured is global, it must be placed
+        if (data->global)
+            global_to_encoder_config(data->cfg);
+    }
+    return action;
+}
+/* this is called when a encoder setting is exited
+   It is used to update the status bar and save the setting */
+static int enc_menuitem_callback(int action,
+                                  const struct menu_item_ex *this_item)
+{
+    struct menucallback_data *data = 
+            (struct menucallback_data*)this_item->function->param;
+    
+    if (action == ACTION_EXIT_MENUITEM)
+    {
+        /* If the setting being configured is global, it must be placed
                in global_settings before updating the status bar for the
                change to show upon exiting the item. */
-            if (global)
-                global_to_encoder_config(cfg);
-
-            if (ENC_MENU_ITEM_FN(items[selected].function)(cfg))
-                return true;
-
-            if (global)
-            {
-                enc_rec_settings_changed(cfg);
-                encoder_config_to_global(cfg);
-            }
-
-            gui_syncstatusbar_draw(&statusbars, true);
+        if (data->global)
+        {
+            enc_rec_settings_changed(data->cfg);
+            encoder_config_to_global(data->cfg);
         }
+
+        gui_syncstatusbar_draw(&statusbars, true);
     }
-} /* enc_run_menu */
+    return action;
+}
 
 /* update settings dependent upon encoder settings */
 static void enc_rec_settings_changed(struct encoder_config *cfg)
@@ -382,7 +384,10 @@ bool enc_config_menu(struct encoder_config *cfg)
         return false;
     if (enc_data[cfg->rec_format].menu)
     {
-        return enc_data[cfg->rec_format].menu(cfg, false);
+        menu_callback_data.cfg = &cfg;
+        menu_callback_data.global = false;
+        return do_menu(enc_data[cfg->rec_format].menu, NULL)
+                == MENU_ATTACHED_USB;
     }
     else
     {
@@ -437,7 +442,10 @@ bool enc_global_config_menu(void)
 
     if (enc_data[cfg.rec_format].menu)
     {
-        return enc_data[cfg.rec_format].menu(&cfg, true);
+        menu_callback_data.cfg = &cfg;
+        menu_callback_data.global = true;
+        return do_menu(enc_data[cfg.rec_format].menu, NULL)
+                == MENU_ATTACHED_USB;
     }
     else
     {
