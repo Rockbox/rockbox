@@ -32,6 +32,7 @@
 #include "audio.h"
 #include "pcm_record.h"
 #include "enc_config.h"
+#include "splash.h"
 
 #define MENU_ITEM_FN(fn) \
     ((bool (*)(void))fn)
@@ -44,7 +45,6 @@
 
 static bool enc_run_menu(int m, const struct menu_item items[],
                          struct encoder_config *cfg, bool global);
-static bool enc_no_config_menu(struct encoder_config *cfg, bool global);
 static void enc_rec_settings_changed(struct encoder_config *cfg);
 
 /** Function definitions for each codec - add these to enc_data
@@ -217,7 +217,7 @@ static const struct encoder_data
         NULL,
         NULL,
         NULL,
-        enc_no_config_menu,
+        NULL,
     },
     /* mp3_enc.codec */
     [REC_FORMAT_MPA_L3] = {
@@ -231,14 +231,14 @@ static const struct encoder_data
         NULL,
         NULL,
         NULL,
-        enc_no_config_menu,
+        NULL,
     },
     /* wavpack_enc.codec */
     [REC_FORMAT_WAVPACK] = {
         NULL,
         NULL,
         NULL,
-        enc_no_config_menu,
+        NULL,
     },
 };
 
@@ -285,25 +285,6 @@ static bool enc_run_menu(int m, const struct menu_item items[],
         }
     }
 } /* enc_run_menu */
-
-/* menu created when encoder has no configuration options */
-static bool enc_no_config_menu(struct encoder_config *cfg, bool global)
-{
-    static const struct menu_item items[] =
-    {
-        { ID2P(LANG_NO_SETTINGS), NULL }
-    };
-    int m;
-    bool result;
-
-    m = menu_init(items, ARRAYLEN(items), NULL, NULL, NULL, NULL);
-    result = enc_run_menu(m, items, NULL, false);
-    menu_exit(m);
-
-    return result;
-    (void)cfg;
-    (void)global;
-} /* enc_no_config_menu */
 
 /* update settings dependent upon encoder settings */
 static void enc_rec_settings_changed(struct encoder_config *cfg)
@@ -446,5 +427,13 @@ bool enc_global_config_menu(void)
 
     cfg.rec_format = global_settings.rec_format;
 
-    return enc_data[cfg.rec_format].menu(&cfg, true);
+    if (enc_data[cfg.rec_format].menu)
+    {
+        return enc_data[cfg.rec_format].menu(&cfg, true);
+    }
+    else
+    {
+        gui_syncsplash(HZ, str(LANG_NO_SETTINGS));
+        return false;
+    }
 } /* enc_global_config_menu */
