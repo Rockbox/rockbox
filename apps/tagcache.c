@@ -3073,7 +3073,7 @@ static bool delete_entry(long idx_id)
     
 #ifdef HAVE_TC_RAMCACHE
     /* At first mark the entry removed from ram cache. */
-    if (hdr)
+    if (tc_stat.ramcache)
         hdr->indices[idx_id].flag |= FLAG_DELETED;
 #endif
     
@@ -3106,15 +3106,26 @@ static bool delete_entry(long idx_id)
     lseek(fd, sizeof(struct master_header), SEEK_SET);
     for (i = 0; i < myhdr.tch.entry_count; i++)
     {
-        if (ecread(fd, &idx, 1, index_entry_ec, tc_stat.econ)
-            != sizeof(struct index_entry))
+        struct index_entry *idxp;
+        
+#ifdef HAVE_TC_RAMCACHE
+        /* Use RAM DB if available for greater speed */
+        if (tc_stat.ramcache)
+            idxp = &hdr->indices[i];
+        else
+#endif
         {
-            logf("delete_entry(): read error #2");
-            close(fd);
-            return false;
+            if (ecread(fd, &idx, 1, index_entry_ec, tc_stat.econ)
+                != sizeof(struct index_entry))
+            {
+                logf("delete_entry(): read error #2");
+                close(fd);
+                return false;
+            }
+            idxp = &idx;
         }
         
-        if (idx.flag & FLAG_DELETED)
+        if (idxp->flag & FLAG_DELETED)
             continue;
         
         for (tag = 0; tag < TAG_COUNT; tag++)
@@ -3122,7 +3133,7 @@ static bool delete_entry(long idx_id)
             if (tagcache_is_numeric_tag(tag))
                 continue;
             
-            if (idx.tag_seek[tag] == myidx.tag_seek[tag])
+            if (idxp->tag_seek[tag] == myidx.tag_seek[tag])
                 in_use[tag]++;
         }
     }
@@ -3140,6 +3151,15 @@ static bool delete_entry(long idx_id)
             logf("in use: %d/%d", tag, in_use[tag]);
             continue;
         }
+        
+#ifdef HAVE_TC_RAMCACHE
+        /* Delete from ram. */
+        if (tc_stat.ramcache && tag != tag_filename)
+        {
+            struct tagfile_entry *tagentry = get_tag(&myidx, tag);
+            tagentry->tag_data[0] = '\0';
+        }
+#endif
         
         /* Open the index file, which contains the tag names. */
         snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, tag);
