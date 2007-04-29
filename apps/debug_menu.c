@@ -2373,7 +2373,7 @@ static const struct the_menu_item menuitems[] = {
         {"cpu_boost log",cpu_boost_log},
 #endif
     };
-int menu_action_callback(int btn, struct gui_synclist *lists)
+static int menu_action_callback(int btn, struct gui_synclist *lists)
 {
     if (btn == ACTION_STD_OK)
     {
@@ -2382,7 +2382,7 @@ int menu_action_callback(int btn, struct gui_synclist *lists)
     }
     return btn;
 }
-char* dbg_menu_getname(int item, void * data, char *buffer)
+static char* dbg_menu_getname(int item, void * data, char *buffer)
 {
     (void)data; (void)buffer;
     return menuitems[item].desc;
