@@ -380,7 +380,15 @@ bool enc_config_menu(struct encoder_config *cfg)
 {
     if (!rec_format_ok(cfg->rec_format))
         return false;
-    return enc_data[cfg->rec_format].menu(cfg, false);
+    if (enc_data[cfg->rec_format].menu)
+    {
+        return enc_data[cfg->rec_format].menu(cfg, false);
+    }
+    else
+    {
+        gui_syncsplash(HZ, str(LANG_NO_SETTINGS));
+        return false;
+    }
 } /* enc_config_menu */
 #endif
 
