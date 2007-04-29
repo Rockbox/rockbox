@@ -88,7 +88,6 @@
 #endif
 #include "hwcompat.h"
 
-#ifndef SIMULATOR
 static bool dbg_list(char *title, int count, int selection_size,
                      int (*action_callback)(int btn, struct gui_synclist *lists), 
                      char* (*dbg_getname)(int item, void * data, char *buffer))
@@ -118,7 +117,6 @@ static bool dbg_list(char *title, int count, int selection_size,
     action_signalscreenchange();
     return false;
 }
-#endif /* SIMULATOR */
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
 /*---------------------------------------------------*/
@@ -2293,12 +2291,15 @@ static bool cpu_boost_log(void)
     return false;
 }
 #endif
-bool debug_menu(void)
-{
-    int m;
-    bool result;
 
-    static const struct menu_item items[] = {
+
+
+/****** The menu *********/
+struct the_menu_item {
+    unsigned char *desc; /* string or ID */
+    bool (*function) (void); /* return true if USB was connected */
+};
+static const struct the_menu_item menuitems[] = {
 #if defined(TOSHIBA_GIGABEAT_F) && !defined(SIMULATOR)
         { "LCD Power Off", dbg_lcd_power_off },
         { "Button Light modes", dbg_buttonlights },
@@ -2372,11 +2373,24 @@ bool debug_menu(void)
         {"cpu_boost log",cpu_boost_log},
 #endif
     };
-
-    m=menu_init( items, sizeof items / sizeof(struct menu_item), NULL,
-                 "Debug Menu", NULL, NULL);
-    result = menu_run(m);
-    menu_exit(m);
-
-    return result;
+int menu_action_callback(int btn, struct gui_synclist *lists)
+{
+    if (btn == ACTION_STD_OK)
+    {
+        menuitems[gui_synclist_get_sel_pos(lists)].function();
+        gui_synclist_draw(lists);
+    }
+    return btn;
+}
+char* dbg_menu_getname(int item, void * data, char *buffer)
+{
+    (void)data; (void)buffer;
+    return menuitems[item].desc;
+}
+bool debug_menu(void)
+{
+    dbg_list("Debug Menu",ARRAYLEN(menuitems) , 1,
+                     menu_action_callback, 
+                     dbg_menu_getname);
+    return false;
 }

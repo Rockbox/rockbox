@@ -242,6 +242,9 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
     int start, end;
     bool partial_draw = false;
 
+#ifdef HAVE_LCD_BITMAP
+    display->setfont(FONT_UI);
+#endif
     /* Speed up UI by drawing the changed contents only. */
     if (gui_list == last_list_displayed[gui_list->display->screen_type]
         && gui_list->last_displayed_start_item == gui_list->start_item
@@ -313,7 +316,6 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
 
     /* Adjust the position of icon, cursor, text for the list */
 #ifdef HAVE_LCD_BITMAP
-    display->setfont(FONT_UI);
     gui_textarea_update_nblines(display);
     bool draw_scrollbar;
 
