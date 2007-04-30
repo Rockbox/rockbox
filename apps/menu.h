@@ -53,13 +53,14 @@ struct menu_func {
 /* these next two are mutually exclusive */
 #define MENU_HAS_DESC   0x10
 #define MENU_DYNAMIC_DESC 0x20
+#define MENU_EXITAFTERTHISMENU 0x40
 
 /* Flags for MT_FUNCTION_CALL */
-#define MENU_FUNC_USEPARAM 0x40
-#define MENU_FUNC_CHECK_RETVAL 0x80
+#define MENU_FUNC_USEPARAM 0x80
+#define MENU_FUNC_CHECK_RETVAL 0x100
 
 #define MENU_COUNT_MASK 0xFFF
-#define MENU_COUNT_SHIFT 8
+#define MENU_COUNT_SHIFT 12
 #define MENU_ITEM_COUNT(c) ((c&MENU_COUNT_MASK)<<MENU_COUNT_SHIFT)
 #define MENU_GET_COUNT(flags) ((flags>>MENU_COUNT_SHIFT)&MENU_COUNT_MASK)
 

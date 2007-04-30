@@ -429,8 +429,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
     
     talk_menu_item(menu, &lists);
     
-    gui_synclist_draw(&lists);
-    gui_syncstatusbar_draw(&statusbars, true);
     action_signalscreenchange();
     
     /* load the callback, and only reload it if menu changes */
@@ -438,6 +436,8 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
     
     while (!done)
     {
+        gui_syncstatusbar_draw(&statusbars, true);
+        gui_synclist_draw(&lists);
         action = get_action(CONTEXT_MAINMENU,HZ); 
         /* HZ so the status bar redraws corectly */
         if (action == ACTION_NONE)
@@ -494,10 +494,14 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
             if (menu_callback)
                 menu_callback(ACTION_EXIT_MENUITEM, menu);
             
+            if (menu->flags&MENU_EXITAFTERTHISMENU)
+                done = true;
             if (stack_top > 0)
             {
                 stack_top--;
                 menu = menu_stack[stack_top];
+                if (menu->flags&MENU_EXITAFTERTHISMENU)
+                    done = true;
                 init_menu_lists(menu, &lists, 
                                  menu_stack_selected_item[stack_top], false);
                 talk_menu_item(menu, &lists);
@@ -600,12 +604,21 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                     done = true;
                     break;
             }
-            if (type != MT_MENU && menu_callback)
-                menu_callback(ACTION_EXIT_MENUITEM,temp);
+            if (type != MT_MENU)
+            {
+                if (menu_callback)
+                    menu_callback(ACTION_EXIT_MENUITEM,temp);
+            }
             if (current_submenus_menu != menu)
                 init_menu_lists(menu,&lists,selected,true);
             /* callback was changed, so reload the menu's callback */
             get_menu_callback(menu, &menu_callback);
+            if ((menu->flags&MENU_EXITAFTERTHISMENU) && 
+                !(temp->flags&MENU_EXITAFTERTHISMENU))
+            {
+                done = true;
+                break;
+            }
 #ifdef HAS_BUTTONBAR
             gui_buttonbar_set(&buttonbar, "<<<", "", "");
             gui_buttonbar_draw(&buttonbar);
@@ -616,8 +629,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
             ret = MENU_ATTACHED_USB;
             done = true;
         }
-        gui_syncstatusbar_draw(&statusbars, true);
-        gui_synclist_draw(&lists);
     }
     action_signalscreenchange();
     if (start_selected)
