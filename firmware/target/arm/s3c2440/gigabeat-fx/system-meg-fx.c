@@ -6,13 +6,16 @@
 #include "lcd.h"
 #include <stdio.h>
 
-const int TIMER4_MASK = (1 << 14);
-const int LCD_MASK   =  (1 << 16);
-const int DMA0_MASK   = (1 << 17);
-const int DMA1_MASK   = (1 << 18);
-const int DMA2_MASK   = (1 << 19);
-const int DMA3_MASK   = (1 << 20);
-const int ALARM_MASK  = (1 << 30);
+enum
+{
+    TIMER4_MASK = (1 << 14),
+    LCD_MASK   =  (1 << 16),
+    DMA0_MASK   = (1 << 17),
+    DMA1_MASK   = (1 << 18),
+    DMA2_MASK   = (1 << 19),
+    DMA3_MASK   = (1 << 20),
+    ALARM_MASK  = (1 << 30),
+};
 
 int system_memory_guard(int newmode)
 {
@@ -21,7 +24,7 @@ int system_memory_guard(int newmode)
 }
 
 extern void timer4(void);
-extern void dma0(void);
+extern void dma0(void); /* free */
 extern void dma1(void);
 extern void dma3(void);
 
@@ -35,8 +38,6 @@ void irq(void)
     /* Timer 4 */
     if ((intpending & TIMER4_MASK) != 0)
         timer4();
-    else if ((intpending & DMA0_MASK) != 0)
-        dma0();
     else
     {
         /* unexpected interrupt */

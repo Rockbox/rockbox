@@ -20,6 +20,7 @@
 #include "cpu.h"
 #include <stdbool.h>
 #include "kernel.h"
+#include "thread.h"
 #include "system.h"
 #include "power.h"
 #include "panic.h"
@@ -117,27 +118,20 @@ void copy_read_sectors(unsigned char* buf, int wordcount)
 		DIDST0 += 0x30000000;
     DIDSTC0 = 0;
 
-    /* DACK/DREQ Sync to AHB, Int on Transfer complete, Whole service, No reload, 16-bit transfers */
-    DCON0 = ((1 << 30) | (1<< 29) | (1<<27) | (1<<22) | (1<<20)) | wordcount;
+    /* DACK/DREQ Sync to AHB, Whole service, No reload, 16-bit transfers */
+    DCON0 = ((1 << 30) | (1<<27) | (1<<22) | (1<<20)) | wordcount;
 
     /* Activate the channel */
     DMASKTRIG0 = 0x2;
 
     invalidate_dcache_range((void *)buf, wordcount*2);
 
-    INTMSK &= ~(1<<17);      /* unmask the interrupt */
-    SRCPND = (1<<17);       /* clear any pending interrupts */
     /* Start DMA */
     DMASKTRIG0 |= 0x1;
 
     /* Wait for transfer to complete */
     while((DSTAT0 & 0x000fffff))
-        yield();
+        priority_yield();
     /* Dump cache for the buffer  */
 }
 #endif
-void dma0(void)
-{
-}
-
-
