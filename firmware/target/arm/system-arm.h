@@ -87,16 +87,22 @@ static inline uint32_t swap_odd_even32(uint32_t value)
     return value;
 }
 
-#define HIGHEST_IRQ_LEVEL (1)
+#define HIGHEST_IRQ_LEVEL (0x80)
 
 static inline int set_irq_level(int level)
 {
     unsigned long cpsr;
+    int oldlevel;
     /* Read the old level and set the new one */
-    asm volatile ("mrs %0,cpsr" : "=r" (cpsr));
-    asm volatile ("msr cpsr_c,%0"
-                  : : "r" ((cpsr & ~0x80) | (level << 7)));
-    return (cpsr >> 7) & 1;
+    asm volatile (
+        "mrs    %1, cpsr        \n"
+        "bic    %0, %1, #0x80   \n"
+        "and    %2, %2, #0x80   \n"
+        "orr    %0, %0, %2      \n"
+        "msr    cpsr_c, %0      \n"
+        : "=&r"(cpsr), "=&r"(oldlevel), "+&r"(level)
+    );
+    return oldlevel;
 }
 
 static inline void set_fiq_handler(void(*fiq_handler)(void))
