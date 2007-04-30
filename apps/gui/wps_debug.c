@@ -43,6 +43,7 @@ static void dump_wps_tokens(struct wps_data *data)
     int indent = 0;
     char buf[64];
     bool next;
+    int num_string_tokens = 0;
 
     if (data->num_tokens > WPS_MAX_TOKENS) {
         DEBUGF("Number of tokens is too high (%d)!!!\n", data->num_tokens);
@@ -65,6 +66,7 @@ static void dump_wps_tokens(struct wps_data *data)
             case WPS_TOKEN_STRING:
                 snprintf(buf, sizeof(buf), "String '%s'",
                          data->strings[token->value.i]);
+                num_string_tokens++;
                 break;
 
 #ifdef HAVE_LCD_BITMAP
@@ -364,6 +366,9 @@ static void dump_wps_tokens(struct wps_data *data)
         DEBUGF("[%3d] = (%2d) %s\n", i, token->type, buf);
     }
     DEBUGF("\n");
+
+    DEBUGF("Number of string tokens: %d\n", num_string_tokens);
+    DEBUGF("\n");
 }
 
 static void print_line_info(struct wps_data *data)
@@ -416,7 +421,8 @@ static void print_wps_strings(struct wps_data *data)
         DEBUGF("%2d: (%2d) '%s'\n", i, len, data->strings[i]);
     }
     DEBUGF("\n");
-    DEBUGF("Total string length: %d\n", len);
+    DEBUGF("Number of strings: %d out of an allowed %d\n", data->num_strings, WPS_MAX_STRINGS);
+    DEBUGF("Total string length: %d\n", total_len);
     DEBUGF("String buffer used: %d out of %d bytes\n", buf_used, STRING_BUFFER_SIZE);
     DEBUGF("\n");
 }
@@ -441,8 +447,8 @@ void print_debug_info(struct wps_data *data, int fail, int line)
     if (debug_wps)
     {
         dump_wps_tokens(data);
-        print_line_info(data);
         print_wps_strings(data);
+        print_line_info(data);
 #ifdef HAVE_LCD_BITMAP
         print_img_cond_indexes(data);
 #endif

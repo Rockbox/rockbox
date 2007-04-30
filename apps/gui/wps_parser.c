@@ -653,7 +653,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
     if (!data || !wps_bufptr || !*wps_bufptr)
         return false;
 
-    char *current_string = data->string_buffer;
+    char *stringbuf = data->string_buffer;
     int stringbuf_used = 0;
     int fail = 0;
     line = 1;
@@ -770,13 +770,9 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
                     && stringbuf_used < STRING_BUFFER_SIZE - 1)
                 {
                     data->tokens[data->num_tokens].type = WPS_TOKEN_STRING;
-                    data->strings[data->num_strings] = current_string;
-                    data->tokens[data->num_tokens].value.i = data->num_strings;
-                    data->num_tokens++;
 
-                    /* Copy the first byte */
-                    *current_string++ = *(wps_bufptr - 1);
-                    stringbuf_used++;
+                    unsigned int len = 1;
+                    const char *string_start = wps_bufptr - 1;
 
                     /* continue until we hit something that ends the string
                        or we run out of memory */
@@ -786,15 +782,38 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
                           *wps_bufptr != '|' && *wps_bufptr != '\n' &&
                           stringbuf_used < STRING_BUFFER_SIZE - 1)
                     {
-                        *current_string++ = *wps_bufptr++;
-                        stringbuf_used++;
+                        wps_bufptr++;
+                        len++;
                     }
 
-                    /* null terminate the string */
-                    *current_string++ = '\0';
-                    stringbuf_used++;
+                    /* look if we already have that string */
+                    char **str;
+                    int i;
+                    bool found;
+                    for (i = 0, str = data->strings, found = false;
+                         i < data->num_strings
+                         && !(found = (strlen(*str) == len && strncmp(string_start, *str, len) == 0));
+                         i++, str++) ;
+                    /* If a matching string is found, found is true and i is the
+                       index of the string. If not, found is false */
 
-                    data->num_strings++;
+                    if (!found)
+                    {
+                        /* new string */
+                        strncpy(stringbuf, string_start, len);
+                        data->strings[data->num_strings] = stringbuf;
+                        stringbuf += len + 1;
+                        stringbuf_used += len + 1;
+                        data->tokens[data->num_tokens].value.i = data->num_strings;
+                        data->num_strings++;
+                    }
+                    else
+                    {
+                        /* another ocurrence of an existing string */
+                        data->tokens[data->num_tokens].value.i = i;
+                    }
+
+                    data->num_tokens++;
                 }
                 break;
         }
