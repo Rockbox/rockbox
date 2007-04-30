@@ -97,10 +97,9 @@ static inline int set_irq_level(int level)
     asm volatile (
         "mrs    %1, cpsr        \n"
         "bic    %0, %1, #0x80   \n"
-        "and    %2, %2, #0x80   \n"
         "orr    %0, %0, %2      \n"
         "msr    cpsr_c, %0      \n"
-        : "=&r"(cpsr), "=&r"(oldlevel), "+&r"(level)
+        : "=&r,r"(cpsr), "=&r,r"(oldlevel) : "r,i"(level & 0x80)
     );
     return oldlevel;
 }
