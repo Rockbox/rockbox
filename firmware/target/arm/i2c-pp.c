@@ -26,6 +26,7 @@
 
 #include "cpu.h"
 #include "kernel.h"
+#include "thread.h"
 #include "logf.h"
 #include "system.h"
 #include "i2c-pp.h"
@@ -42,7 +43,7 @@ static int pp_i2c_wait_not_busy(void)
          if (!(I2C_STATUS & I2C_BUSY)) {
             return 0;
          }
-         yield();
+         priority_yield();
     }
 
     return -1;
@@ -136,13 +137,13 @@ static struct mutex i2c_mutex;
 int i2c_readbytes(unsigned int dev_addr, int addr, int len, unsigned char *data) {
     unsigned int temp;
     int i;
-    mutex_lock(&i2c_mutex);
+    spinlock_lock(&i2c_mutex);
     pp_i2c_send_byte(dev_addr, addr);
     for (i = 0; i < len; i++) {
         pp_i2c_read_byte(dev_addr, &temp);
         data[i] = temp;
     }
-    mutex_unlock(&i2c_mutex);
+    spinlock_unlock(&i2c_mutex);
     return i;
 }
 
@@ -150,10 +151,10 @@ int i2c_readbyte(unsigned int dev_addr, int addr)
 {
     int data;
 
-    mutex_lock(&i2c_mutex);
+    spinlock_lock(&i2c_mutex);
     pp_i2c_send_byte(dev_addr, addr);
     pp_i2c_read_byte(dev_addr, &data);
-    mutex_unlock(&i2c_mutex);
+    spinlock_unlock(&i2c_mutex);
 
     return data;
 }
@@ -166,9 +167,9 @@ int pp_i2c_send(unsigned int addr, int data0, int data1)
     data[0] = data0;
     data[1] = data1;
 
-    mutex_lock(&i2c_mutex);
+    spinlock_lock(&i2c_mutex);
     retval = pp_i2c_send_bytes(addr, 2, data);
-    mutex_unlock(&i2c_mutex);
+    spinlock_unlock(&i2c_mutex);
 
     return retval;
 }
@@ -198,7 +199,7 @@ void i2c_init(void)
     outl(0x80 | (0 << 8), 0x600060a4);
 #endif
 
-    mutex_init(&i2c_mutex);
+    spinlock_init(&i2c_mutex);
 
     i2c_readbyte(0x8, 0);
 }
