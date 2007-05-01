@@ -38,6 +38,7 @@ enum menu_item_type {
     MT_OLD_MENU, /* used so we can wrap the old menu api 
                     around the new api. Noone else should use this */
 };
+#define MENU_TYPE_MASK 0xF /* MT_* type */
 
 typedef int (*menu_function)(void);
 struct menu_func {
@@ -49,11 +50,13 @@ struct menu_func {
     void *param; /* passed to function_w_param */
 };
 
-#define MENU_TYPE_MASK 0xF /* MT_* type */
 /* these next two are mutually exclusive */
 #define MENU_HAS_DESC   0x10
-#define MENU_DYNAMIC_DESC 0x20
-#define MENU_EXITAFTERTHISMENU 0x40
+#define MENU_DYNAMIC_DESC 0x20 /* the name of this menu item is set by the  \
+                                  list_get_name callback */
+
+#define MENU_EXITAFTERTHISMENU 0x40 /* do_menu() will exiting out of any    \
+                                       menu item with this flag set */
 
 /* Flags for MT_FUNCTION_CALL */
 #define MENU_FUNC_USEPARAM 0x80
@@ -118,17 +121,19 @@ bool do_setting_from_menu(const struct menu_item_ex *temp);
 /*  Use this for settings which have a differnt title in their
     setting screen than in the menu (e.g scroll options */
 #define MENUITEM_SETTING_W_TEXT(name, var, str, callback )              \
-    static const struct menu_callback_with_desc name##__ = {callback,str, Icon_NOICON};\
+    static const struct menu_callback_with_desc name##__ =              \
+                {callback,str, Icon_NOICON};                            \
     static const struct menu_item_ex name =                             \
-        {MT_SETTING_W_TEXT|MENU_HAS_DESC, {.variable = (void*)var },     \
+        {MT_SETTING_W_TEXT|MENU_HAS_DESC, {.variable = (void*)var },    \
             {.callback_and_desc = & name##__}};
 
-/*  Use this To create a list of NON-XLATABLE (for the time being) Strings
+/*  Use this To create a list of Strings (or ID2P()'s )
     When the user enters this list and selects one, the menu will exits
     and its return value will be the index of the chosen item */
 #define MENUITEM_STRINGLIST(name, str, callback, ... )                  \
     static const char *name##_[] = {__VA_ARGS__};                       \
-    static const struct menu_callback_with_desc name##__ = {callback,str, Icon_NOICON};\
+    static const struct menu_callback_with_desc name##__ =              \
+            {callback,str, Icon_NOICON};                                \
     static const struct menu_item_ex name =                             \
         {MT_RETURN_ID|MENU_HAS_DESC|                                    \
          MENU_ITEM_COUNT(sizeof( name##_)/sizeof(*name##_)),            \
@@ -137,54 +142,57 @@ bool do_setting_from_menu(const struct menu_item_ex *temp);
             
 /* returns a value associated with the item */
 #define MENUITEM_RETURNVALUE(name, str, val, cb, icon)                      \
-     static const struct menu_callback_with_desc name##_ = {cb,str,icon};     \
-     static const struct menu_item_ex name   =                                  \
-         { MT_RETURN_VALUE|MENU_HAS_DESC, { .value = val},             \
+     static const struct menu_callback_with_desc name##_ = {cb,str,icon};   \
+     static const struct menu_item_ex name   =                              \
+         { MT_RETURN_VALUE|MENU_HAS_DESC, { .value = val},                  \
          {.callback_and_desc = & name##_}};
          
 /* same as above, except the item name is dynamic */
-#define MENUITEM_RETURNVALUE_DYNTEXT(name, val, cb, text_callback, text_cb_data, icon)                      \
-     static const struct menu_get_name_and_icon name##_                       \
-                                = {cb,text_callback,text_cb_data,icon}; \
+#define MENUITEM_RETURNVALUE_DYNTEXT(name, val, cb, text_callback,          \
+                                     text_cb_data, icon)                    \
+     static const struct menu_get_name_and_icon name##_                     \
+                                = {cb,text_callback,text_cb_data,icon};     \
      static const struct menu_item_ex name   =                              \
         { MT_RETURN_VALUE|MENU_DYNAMIC_DESC, { .value = val},               \
         {.menu_get_name_and_icon = & name##_}};
         
 /*  Use this to put a function call into the menu.
     When the user selects this item the function will be run,
-    unless MENU_FUNC_IGNORE_RETVAL is set, the return value
-    will be checked, returning 1 will exit do_menu();                  */
-#define MENUITEM_FUNCTION(name, flags, str, func, param,                   \
-                              callback, icon)                         \
+    if MENU_FUNC_CHECK_RETVAL is set, the return value
+    will be checked, returning 1 will exit do_menu();
+    if MENU_FUNC_USEPARAM is set, param will be passed to the function */
+#define MENUITEM_FUNCTION(name, flags, str, func, param,                       \
+                              callback, icon)                                  \
     static const struct menu_callback_with_desc name##_ = {callback,str,icon}; \
-    static const struct menu_func name##__ = {{(void*)func}, param}; \
-    /* should be const, but recording_settings wont let us do that */           \
-    const struct menu_item_ex name   =                                  \
+    static const struct menu_func name##__ = {{(void*)func}, param};           \
+    /* should be const, but recording_settings wont let us do that */          \
+    const struct menu_item_ex name   =                                         \
         { MT_FUNCTION_CALL|MENU_HAS_DESC|flags,                                \
          { .function = & name##__}, {.callback_and_desc = & name##_}};
             
 /* As above, except the text is dynamic */
-#define MENUITEM_FUNCTION_DYNTEXT(name, flags, func, param,   \
-                                  text_callback, text_cb_data, callback, icon)    \
+#define MENUITEM_FUNCTION_DYNTEXT(name, flags, func, param,                    \
+                                  text_callback, text_cb_data, callback, icon) \
     static const struct menu_get_name_and_icon name##_                         \
                                 = {callback,text_callback,text_cb_data,icon};  \
-    static const struct menu_func name##__ = {{(void*)func}, param}; \
+    static const struct menu_func name##__ = {{(void*)func}, param};           \
     static const struct menu_item_ex name   =                                  \
         { MT_FUNCTION_CALL|MENU_DYNAMIC_DESC|flags,                            \
          { .function = & name##__}, {.menu_get_name_and_icon = & name##_}};
 
 /*  Use this to actually create a menu. the ... argument is a list of pointers 
-    to any of the above macro'd variables. (It can also have other menus in the list. */
-#define MAKE_MENU( name, str, callback, icon, ... )                           \
-    static const struct menu_item_ex *name##_[]  = {__VA_ARGS__};       \
+    to any of the above macro'd variables. 
+    (It can also have other menus in the list.) */
+#define MAKE_MENU( name, str, callback, icon, ... )                            \
+    static const struct menu_item_ex *name##_[]  = {__VA_ARGS__};              \
     static const struct menu_callback_with_desc name##__ = {callback,str,icon};\
-    const struct menu_item_ex name =                                    \
-        {MT_MENU|MENU_HAS_DESC|                                         \
-         MENU_ITEM_COUNT(sizeof( name##_)/sizeof(*name##_)),            \
+    const struct menu_item_ex name =                                           \
+        {MT_MENU|MENU_HAS_DESC|                                                \
+         MENU_ITEM_COUNT(sizeof( name##_)/sizeof(*name##_)),                   \
             { (void*)name##_},{.callback_and_desc = & name##__}};
             
 
-/* OLD API - only use if you really have to.. Ideally this will be dropped */
+/* OLD API - This is only here for plugin compatability now, will be dropped ASAP */
 struct menu_item {
     unsigned char *desc; /* string or ID */
     bool (*function) (void); /* return true if USB was connected */
