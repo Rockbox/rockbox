@@ -766,21 +766,16 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
 
             /* String */
             default:
-                if (data->num_strings < WPS_MAX_STRINGS
-                    && stringbuf_used < STRING_BUFFER_SIZE - 1)
                 {
-                    data->tokens[data->num_tokens].type = WPS_TOKEN_STRING;
-
                     unsigned int len = 1;
                     const char *string_start = wps_bufptr - 1;
 
                     /* continue until we hit something that ends the string
                        or we run out of memory */
-                    while(wps_bufptr && *wps_bufptr != '#' &&
+                    while (wps_bufptr && *wps_bufptr != '#' &&
                           *wps_bufptr != '%' && *wps_bufptr != ';' &&
                           *wps_bufptr != '<' && *wps_bufptr != '>' &&
-                          *wps_bufptr != '|' && *wps_bufptr != '\n' &&
-                          stringbuf_used < STRING_BUFFER_SIZE - 1)
+                          *wps_bufptr != '|' && *wps_bufptr != '\n')
                     {
                         wps_bufptr++;
                         len++;
@@ -791,29 +786,43 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
                     int i;
                     bool found;
                     for (i = 0, str = data->strings, found = false;
-                         i < data->num_strings
-                         && !(found = (strlen(*str) == len && strncmp(string_start, *str, len) == 0));
-                         i++, str++) ;
-                    /* If a matching string is found, found is true and i is the
-                       index of the string. If not, found is false */
+                         i < data->num_strings &&
+                         !(found = (strlen(*str) == len &&
+                           strncmp(string_start, *str, len) == 0));
+                         i++, str++);
+                    /* If a matching string is found, found is true and i is
+                       the index of the string. If not, found is false */
 
-                    if (!found)
+                    /* If it's NOT a duplicate, do nothing if we already have
+                       too many unique strings */
+                    if (found ||
+                       (stringbuf_used < STRING_BUFFER_SIZE - 1 &&
+                        data->num_strings < WPS_MAX_STRINGS))
                     {
-                        /* new string */
-                        strncpy(stringbuf, string_start, len);
-                        data->strings[data->num_strings] = stringbuf;
-                        stringbuf += len + 1;
-                        stringbuf_used += len + 1;
-                        data->tokens[data->num_tokens].value.i = data->num_strings;
-                        data->num_strings++;
+                        if (!found)
+                        {
+                            /* new string */
+                            /* truncate?  */
+                            if (stringbuf_used + len > STRING_BUFFER_SIZE - 1)
+                                len = STRING_BUFFER_SIZE - stringbuf_used - 1;
+                            
+                            strncpy(stringbuf, string_start, len);
+                        
+                            data->strings[data->num_strings] = stringbuf;
+                            stringbuf += len + 1;
+                            stringbuf_used += len + 1;
+                            data->tokens[data->num_tokens].value.i =
+                                                        data->num_strings;
+                            data->num_strings++;
+                        }
+                        else
+                        {
+                            /* another ocurrence of an existing string */
+                            data->tokens[data->num_tokens].value.i = i;
+                        }
+                        data->tokens[data->num_tokens].type = WPS_TOKEN_STRING;
+                        data->num_tokens++;
                     }
-                    else
-                    {
-                        /* another ocurrence of an existing string */
-                        data->tokens[data->num_tokens].value.i = i;
-                    }
-
-                    data->num_tokens++;
                 }
                 break;
         }
