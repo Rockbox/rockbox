@@ -326,33 +326,33 @@ static int treeplaylist_callback(int action,
                                  const struct menu_item_ex *this_item);
 
 /* insert items */
-MENUITEM_FUNCTION(i_pl_item, 0, ID2P(LANG_INSERT),
+MENUITEM_FUNCTION(i_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT),
                   playlist_insert_func, (intptr_t*)PLAYLIST_INSERT,
                   treeplaylist_callback, Icon_Playlist);
-MENUITEM_FUNCTION(i_first_pl_item, 0, ID2P(LANG_INSERT_FIRST),
+MENUITEM_FUNCTION(i_first_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT_FIRST),
                   playlist_insert_func, (intptr_t*)PLAYLIST_INSERT_FIRST,
                   treeplaylist_wplayback_callback, Icon_Playlist);
-MENUITEM_FUNCTION(i_last_pl_item, 0, ID2P(LANG_INSERT_LAST),
+MENUITEM_FUNCTION(i_last_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT_LAST),
                   playlist_insert_func, (intptr_t*)PLAYLIST_INSERT_LAST,
                   treeplaylist_wplayback_callback, Icon_Playlist);
-MENUITEM_FUNCTION(i_shuf_pl_item, 0, ID2P(LANG_INSERT_SHUFFLED),
+MENUITEM_FUNCTION(i_shuf_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT_SHUFFLED),
                   playlist_insert_func, (intptr_t*)PLAYLIST_INSERT_SHUFFLED,
                   treeplaylist_callback, Icon_Playlist);
 /* queue items */
-MENUITEM_FUNCTION(q_pl_item, 0, ID2P(LANG_QUEUE),
+MENUITEM_FUNCTION(q_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_QUEUE),
                   playlist_queue_func, (intptr_t*)PLAYLIST_INSERT,
                   treeplaylist_wplayback_callback, Icon_Playlist);
-MENUITEM_FUNCTION(q_first_pl_item, 0, ID2P(LANG_QUEUE_FIRST),
+MENUITEM_FUNCTION(q_first_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_QUEUE_FIRST),
                   playlist_queue_func, (intptr_t*)PLAYLIST_INSERT_FIRST,
                   treeplaylist_wplayback_callback, Icon_Playlist);
-MENUITEM_FUNCTION(q_last_pl_item, 0, ID2P(LANG_QUEUE_LAST),
+MENUITEM_FUNCTION(q_last_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_QUEUE_LAST),
                   playlist_queue_func, (intptr_t*)PLAYLIST_INSERT_LAST,
                   treeplaylist_wplayback_callback, Icon_Playlist);
-MENUITEM_FUNCTION(q_shuf_pl_item, 0, ID2P(LANG_QUEUE_SHUFFLED),
+MENUITEM_FUNCTION(q_shuf_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_QUEUE_SHUFFLED),
                   playlist_queue_func, (intptr_t*)PLAYLIST_INSERT_SHUFFLED,
                   treeplaylist_wplayback_callback, Icon_Playlist);
 /* replace playlist */
-MENUITEM_FUNCTION(replace_pl_item, 0, ID2P(LANG_REPLACE),
+MENUITEM_FUNCTION(replace_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_REPLACE),
                   playlist_insert_func, (intptr_t*)PLAYLIST_REPLACE,
                   treeplaylist_wplayback_callback, Icon_Playlist);
 /* others */
