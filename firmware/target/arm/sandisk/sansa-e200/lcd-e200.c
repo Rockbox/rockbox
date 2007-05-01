@@ -50,6 +50,47 @@
 #define LCD_REG_9 (*(volatile unsigned long *)(0xc2000024))
 #define LCD_FB_BASE_REG (*(volatile unsigned long *)(0xc2000028))
 
+/* Taken from HD66789 datasheet and seems similar enough.
+   Definitely a Renesas chip though with a perfect register index
+   match but at least one bit seems to be set that that datasheet
+   doesn't show. It says T.B.D. on the regmap anyway. */
+#define R_START_OSC             0x00
+#define R_DRV_OUTPUT_CONTROL    0x01
+#define R_DRV_WAVEFORM_CONTROL  0x02
+#define R_ENTRY_MODE            0x03
+#define R_COMPARE_REG1          0x04
+#define R_COMPARE_REG2          0x05
+#define R_DISP_CONTROL1         0x07
+#define R_DISP_CONTROL2         0x08
+#define R_DISP_CONTROL3         0x09
+#define R_FRAME_CYCLE_CONTROL   0x0b
+#define R_EXT_DISP_INTF_CONTROL 0x0c
+#define R_POWER_CONTROL1        0x10
+#define R_POWER_CONTROL2        0x11
+#define R_POWER_CONTROL3        0x12
+#define R_POWER_CONTROL4        0x13
+#define R_RAM_ADDR_SET          0x21
+#define R_RAM_READ_DATA         0x21
+#define R_RAM_WRITE_DATA        0x22
+#define R_RAM_WRITE_DATA_MASK1  0x23
+#define R_RAM_WRITE_DATA_MASK2  0x24
+#define R_GAMMA_FINE_ADJ_POS1   0x30
+#define R_GAMMA_FINE_ADJ_POS2   0x31
+#define R_GAMMA_FINE_ADJ_POS3   0x32
+#define R_GAMMA_GRAD_ADJ_POS    0x33
+#define R_GAMMA_FINE_ADJ_NEG1   0x34
+#define R_GAMMA_FINE_ADJ_NEG2   0x35
+#define R_GAMMA_FINE_ADJ_NEG3   0x36
+#define R_GAMMA_GRAD_ADJ_NEG    0x37
+#define R_GAMMA_AMP_ADJ_POS     0x38
+#define R_GAMMA_AMP_ADJ_NEG     0x39
+#define R_GATE_SCAN_START_POS   0x40
+#define R_VERT_SCROLL_CONTROL   0x41
+#define R_1ST_SCR_DRIVE_POS     0x42
+#define R_2ND_SCR_DRIVE_POS     0x43
+#define R_HORIZ_RAM_ADDR_POS    0x44
+#define R_VERT_RAM_ADDR_POS     0x45
+
 /* We don't know how to receive a DMA finished signal from the LCD controller
  * To avoid problems with flickering, we double-buffer the framebuffer and turn
  * off DMA while updates are taking place */
@@ -186,67 +227,73 @@ inline void lcd_init_device(void)
     udelay(100000);
 
 /* LCD init */
+
+    /* TODO: Eliminate some of this outside the bootloader since this
+       will already be setup and that will eliminate white-screen */
+
+    /* Pull RESET low, then high */
     outl((inl(0x70000080) & ~(1 << 28)), 0x70000080);
     udelay(10000);
     outl((inl(0x70000080) | (1 << 28)), 0x70000080);
     udelay(10000);
 
-    lcd_write_reg(16, 0x4444);
-    lcd_write_reg(17, 0x0001);
-    lcd_write_reg(18, 0x0003);
-    lcd_write_reg(19, 0x1119);
-    lcd_write_reg(18, 0x0013);
+    lcd_write_reg(R_POWER_CONTROL1, 0x4444);
+    lcd_write_reg(R_POWER_CONTROL2, 0x0001);
+    lcd_write_reg(R_POWER_CONTROL3, 0x0003);
+    lcd_write_reg(R_POWER_CONTROL4, 0x1119);
+    lcd_write_reg(R_POWER_CONTROL3, 0x0013);
     udelay(50000);
 
-    lcd_write_reg(16, 0x4440);
-    lcd_write_reg(19, 0x3119);
+    lcd_write_reg(R_POWER_CONTROL1, 0x4440);
+    lcd_write_reg(R_POWER_CONTROL4, 0x3119);
     udelay(150000);
 
-    lcd_write_reg(1, 0x101b);
-    lcd_write_reg(2, 0x0700);
-    lcd_write_reg(3, 0x6020);
-    lcd_write_reg(4, 0x0000);
-    lcd_write_reg(5, 0x0000);
-    lcd_write_reg(8, 0x0102);
-    lcd_write_reg(9, 0x0000);
-    lcd_write_reg(11, 0x4400);
-    lcd_write_reg(12, 0x0110);
+    lcd_write_reg(R_DRV_OUTPUT_CONTROL, 0x101b);
+    lcd_write_reg(R_DRV_WAVEFORM_CONTROL, 0x0700);
+    lcd_write_reg(R_ENTRY_MODE, 0x6020);
+    lcd_write_reg(R_COMPARE_REG1, 0x0000);
+    lcd_write_reg(R_COMPARE_REG2, 0x0000);
+    lcd_write_reg(R_DISP_CONTROL2, 0x0102);
+    lcd_write_reg(R_DISP_CONTROL3, 0x0000);
+    lcd_write_reg(R_FRAME_CYCLE_CONTROL, 0x4400);
+    lcd_write_reg(R_EXT_DISP_INTF_CONTROL, 0x0110);
 
-    lcd_write_reg(64, 0x0000);
-    lcd_write_reg(65, 0x0000);
-    lcd_write_reg(66, (219 << 8)); /* Screen resolution? */
-    lcd_write_reg(67, 0x0000);
-    lcd_write_reg(68, (175 << 8));
-    lcd_write_reg(69, (219 << 8));
+    lcd_write_reg(R_GATE_SCAN_START_POS, 0x0000);
+    lcd_write_reg(R_VERT_SCROLL_CONTROL, 0x0000);
+    lcd_write_reg(R_1ST_SCR_DRIVE_POS, (219 << 8));
+    lcd_write_reg(R_2ND_SCR_DRIVE_POS, 0x0000);
+    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (175 << 8));
+    lcd_write_reg(R_VERT_RAM_ADDR_POS, (219 << 8));
 
-    lcd_write_reg(48, 0x0000);
-    lcd_write_reg(49, 0x0704);
-    lcd_write_reg(50, 0x0107);
-    lcd_write_reg(51, 0x0704);
-    lcd_write_reg(52, 0x0107);
-    lcd_write_reg(53, 0x0002);
-    lcd_write_reg(54, 0x0707);
-    lcd_write_reg(55, 0x0503);
-    lcd_write_reg(56, 0x0000);
-    lcd_write_reg(57, 0x0000);
+    lcd_write_reg(R_GAMMA_FINE_ADJ_POS1, 0x0000);
+    lcd_write_reg(R_GAMMA_FINE_ADJ_POS2, 0x0704);
+    lcd_write_reg(R_GAMMA_FINE_ADJ_POS3, 0x0107);
+    lcd_write_reg(R_GAMMA_GRAD_ADJ_POS, 0x0704);
+    lcd_write_reg(R_GAMMA_FINE_ADJ_NEG1, 0x0107);
+    lcd_write_reg(R_GAMMA_FINE_ADJ_NEG2, 0x0002);
+    lcd_write_reg(R_GAMMA_FINE_ADJ_NEG3, 0x0707);
+    lcd_write_reg(R_GAMMA_GRAD_ADJ_NEG, 0x0503);
+    lcd_write_reg(R_GAMMA_AMP_ADJ_POS, 0x0000);
+    lcd_write_reg(R_GAMMA_AMP_ADJ_NEG, 0x0000);
 
-    lcd_write_reg(33, 175);
+    lcd_write_reg(R_RAM_ADDR_SET, 175);
 
-    lcd_write_reg(12, 0x0110);
+    lcd_write_reg(R_EXT_DISP_INTF_CONTROL, 0x0110);
 
-    lcd_write_reg(16, 0x4740);
+    lcd_write_reg(R_POWER_CONTROL1, 0x4740);
 
-    lcd_write_reg(7, 0x0045);
-
-    udelay(50000);
-
-    lcd_write_reg(7, 0x0065);
-    lcd_write_reg(7, 0x0067);
+    lcd_write_reg(R_DISP_CONTROL1, 0x0045);
 
     udelay(50000);
 
-    lcd_write_reg(7, 0x0077);
-    lcd_send_msg(0x70, 34);
+    lcd_write_reg(R_DISP_CONTROL1, 0x0065);
+    lcd_write_reg(R_DISP_CONTROL1, 0x0067);
+
+    udelay(50000);
+
+    lcd_write_reg(R_DISP_CONTROL1, 0x0077);
+
+    lcd_send_msg(0x70, R_RAM_WRITE_DATA);
 }
 
 void lcd_enable(bool on)
