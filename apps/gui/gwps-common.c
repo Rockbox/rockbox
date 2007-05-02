@@ -1311,9 +1311,9 @@ static int evaluate_conditional(struct gui_wps *gwps, int cond_index)
                             result, sizeof(result), &intval);
 
     /* intval is now the number of the enum option we want to read,
-       starting from 1. If intval is -1, we check on the nullity of value. */
+       starting from 1. If intval is -1, we check if value is empty. */
     if (intval == -1)
-        intval = value ? 1 : num_options;
+        intval = value && strlen(value) ? 1 : num_options;
     else if (intval > num_options || intval < 1)
         intval = num_options;
 
