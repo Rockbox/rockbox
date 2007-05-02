@@ -132,4 +132,23 @@ static inline void disable_fiq(void)
     );
 }
 
+/* This one returns the old status */
+#define FIQ_ENABLED  0x00
+#define FIQ_DISABLED 0x40
+static inline int set_fiq_status(int status)
+{
+    unsigned long cpsr;
+    int oldstatus;
+    /* Read the old level and set the new one */
+    asm volatile (
+        "mrs    %1, cpsr        \n"
+        "bic    %0, %1, #0x40   \n"
+        "orr    %0, %0, %2      \n"
+        "msr    cpsr_c, %0      \n"
+        : "=&r,r"(cpsr), "=&r,r"(oldstatus) : "r,i"(status & 0x40)
+    );
+    return oldstatus;
+}
+
+
 #endif /* SYSTEM_ARM_H */

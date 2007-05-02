@@ -16,6 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <stdlib.h>
 #include "system.h"
 #include "kernel.h"
 #include "logf.h"
@@ -24,20 +25,14 @@
 #include "file.h"
 #include "mmu-meg-fx.h"
 
+#define GIGABEAT_8000HZ      (0x02 << 1)
+#define GIGABEAT_11025HZ     (0x19 << 1)
+#define GIGABEAT_22050HZ     (0x1b << 1)
+#define GIGABEAT_44100HZ     (0x11 << 1)
+#define GIGABEAT_88200HZ     (0x1f << 1)
+
 static int pcm_freq = HW_SAMPR_DEFAULT; /* 44.1 is default */
-
-#define GIGABEAT_8000HZ      0x4d
-#define GIGABEAT_11025HZ     0x32
-#define GIGABEAT_12000HZ     0x61
-#define GIGABEAT_16000HZ     0x55
-#define GIGABEAT_22050HZ     0x36
-#define GIGABEAT_24000HZ     0x79
-#define GIGABEAT_32000HZ     0x59
-#define GIGABEAT_44100HZ     0x22
-#define GIGABEAT_48000HZ     0x41
-#define GIGABEAT_88200HZ     0x3e
-#define GIGABEAT_96000HZ     0x5d
-
+static int sr_ctrl = GIGABEAT_44100HZ;
 #define FIFO_COUNT ((IISFCON >> 6) & 0x01F)
 
 /* number of bytes in FIFO */
@@ -49,50 +44,28 @@ static int pcm_freq = HW_SAMPR_DEFAULT; /* 44.1 is default */
 unsigned short * p;
 size_t p_size;
 
-
-
 /* DMA count has hit zero - no more data */
 /* Get more data from the callback and top off the FIFO */
 //void fiq(void) __attribute__ ((interrupt ("naked")));
 void fiq(void) ICODE_ATTR __attribute__ ((interrupt ("FIQ")));
-void fiq(void)
+
+static void _pcm_apply_settings(void)
 {
-    /* clear any pending interrupt */
-    SRCPND = (1<<19);
+    static int last_freqency = 0;
 
-    /* Buffer empty.  Try to get more. */
-    if (pcm_callback_for_more)
+    if (pcm_freq != last_freqency)
     {
-        pcm_callback_for_more((unsigned char**)&p, &p_size);
+        last_freqency = pcm_freq;
+        audiohw_set_frequency(sr_ctrl);
     }
-    else
-    {
-        /* callback func is missing? */
-        pcm_play_dma_stop();
-        return;
-    }
-
-    if (p_size)
-    {
-        /* Flush any pending cache writes */
-        clean_dcache_range(p, p_size);
-
-        /* set the new DMA values */
-        DCON2 = DMA_CONTROL_SETUP | (p_size >> 1);
-        DISRC2 = (int)p + 0x30000000;
-
-        /* Re-Activate the channel */
-        DMASKTRIG2 = 0x2;
-    }
-    else
-    {
-        /* No more DMA to do */
-        pcm_play_dma_stop();
-    }
-
 }
 
-
+void pcm_apply_settings(void)
+{
+    int oldstatus = set_fiq_status(FIQ_DISABLED);
+    _pcm_apply_settings();
+    set_fiq_status(oldstatus);
+}
 
 void pcm_init(void)
 {
@@ -103,8 +76,6 @@ void pcm_init(void)
     audiohw_init();
     audiohw_enable_output(true);
 
-    /* cannot use the WM8975 defaults since our clock is not the same */
-    /* the input master clock is 16.9344MHz - we can divide exact for that */
     pcm_set_frequency(SAMPR_44);
 
     /* init GPIO */
@@ -129,6 +100,8 @@ void pcm_play_dma_start(const void *addr, size_t size)
 {
     /* sanity check: bad pointer or too small file */
     if (NULL == addr || size <= IIS_FIFO_SIZE) return;
+
+    disable_fiq();
 
     p = (unsigned short *)addr;
     p_size = size;
@@ -163,8 +136,11 @@ void pcm_play_dma_start(const void *addr, size_t size)
     /* clear pending DMA interrupt */
     SRCPND = 1<<19;
 
+    pcm_playing = true;
+
+    _pcm_apply_settings();
+
     set_fiq_handler(fiq);
-    enable_fiq();
 
     /* unmask the DMA interrupt */
     INTMSK &= ~(1<<19);
@@ -178,17 +154,13 @@ void pcm_play_dma_start(const void *addr, size_t size)
     /* turn off the idle */
     IISCON &= ~(1<<3);
 
-    pcm_playing = true;
-
     /* start the IIS */
     IISCON |= (1<<0);
 
+    enable_fiq();
 }
 
-
-
-/* Disconnect the DMA and wait for the FIFO to clear */
-void pcm_play_dma_stop(void)
+static void pcm_play_dma_stop_fiq(void)
 {
     /* mask the DMA interrupt */
     INTMSK |= (1<<19);
@@ -207,17 +179,59 @@ void pcm_play_dma_stop(void)
 
     /* Disconnect the IIS clock */
     CLKCON &= ~(1<<17);
+}
 
-    disable_fiq();
+void fiq(void)
+{
+    /* clear any pending interrupt */
+    SRCPND = (1<<19);
+
+    /* Buffer empty.  Try to get more. */
+    if (pcm_callback_for_more)
+    {
+        pcm_callback_for_more((unsigned char**)&p, &p_size);
+    }
+    else
+    {
+        /* callback func is missing? */
+        pcm_play_dma_stop_fiq();
+        return;
+    }
+
+    if (p_size)
+    {
+        /* Flush any pending cache writes */
+        clean_dcache_range(p, p_size);
+
+        /* set the new DMA values */
+        DCON2 = DMA_CONTROL_SETUP | (p_size >> 1);
+        DISRC2 = (int)p + 0x30000000;
+
+        /* Re-Activate the channel */
+        DMASKTRIG2 = 0x2;
+    }
+    else
+    {
+        /* No more DMA to do */
+        pcm_play_dma_stop_fiq();
+    }
 
 }
 
+/* Disconnect the DMA and wait for the FIFO to clear */
+void pcm_play_dma_stop(void)
+{
+    disable_fiq();
+    pcm_play_dma_stop_fiq();
+}
 
 
 void pcm_play_pause_pause(void)
 {
     /* stop servicing refills */
+    int oldstatus = set_fiq_status(FIQ_DISABLED);
     INTMSK |= (1<<19);
+    set_fiq_status(oldstatus);
 }
 
 
@@ -225,13 +239,14 @@ void pcm_play_pause_pause(void)
 void pcm_play_pause_unpause(void)
 {
     /* refill buffer and keep going */
+    int oldstatus = set_fiq_status(FIQ_DISABLED);
+    _pcm_apply_settings();
     INTMSK &= ~(1<<19);
+    set_fiq_status(oldstatus);
 }
 
 void pcm_set_frequency(unsigned int frequency)
 {
-    int sr_ctrl;
-
     switch(frequency)
     {
         case SAMPR_8:
@@ -240,38 +255,19 @@ void pcm_set_frequency(unsigned int frequency)
         case SAMPR_11:
             sr_ctrl = GIGABEAT_11025HZ;
             break;
-        case SAMPR_12:
-            sr_ctrl = GIGABEAT_12000HZ;
-            break;
-        case SAMPR_16:
-            sr_ctrl = GIGABEAT_16000HZ;
-            break;
         case SAMPR_22:
             sr_ctrl = GIGABEAT_22050HZ;
-            break;
-        case SAMPR_24:
-            sr_ctrl = GIGABEAT_24000HZ;
-            break;
-        case SAMPR_32:
-            sr_ctrl = GIGABEAT_32000HZ;
             break;
         default:
             frequency = SAMPR_44;
         case SAMPR_44:
             sr_ctrl = GIGABEAT_44100HZ;
             break;
-        case SAMPR_48:
-            sr_ctrl = GIGABEAT_48000HZ;
-            break;
         case SAMPR_88:
             sr_ctrl = GIGABEAT_88200HZ;
             break;
-        case SAMPR_96:
-            sr_ctrl = GIGABEAT_96000HZ;
-            break;
     }
 
-    audiohw_set_sample_rate(sr_ctrl);
     pcm_freq = frequency;
 }
 
@@ -282,17 +278,12 @@ size_t pcm_get_bytes_waiting(void)
     return (DSTAT2 & 0xFFFFF) * 2;
 }
 
-
-
-/* dummy functions for those not actually supporting all this yet */
-void pcm_apply_settings(void)
-{
-}
-
+#if 0
 void pcm_set_monitor(int monitor)
 {
     (void)monitor;
 }
+#endif
 /** **/
 
 void pcm_mute(bool mute)
@@ -302,75 +293,79 @@ void pcm_mute(bool mute)
         sleep(HZ/16);
 }
 
-/*
- * This function goes directly into the DMA buffer to calculate the left and
- * right peak values. To avoid missing peaks it tries to look forward two full
- * peek periods (2/HZ sec, 100% overlap), although it's always possible that
- * the entire period will not be visible. To reduce CPU load it only looks at
- * every third sample, and this can be reduced even further if needed (even
- * every tenth sample would still be pretty accurate).
+/**
+ * Return playback peaks - Peaks ahead in the DMA buffer based upon the
+ *                         calling period to attempt to compensate for
+ *                         delay.
  */
-
-/* Check for a peak every PEAK_STRIDE samples */
-#define PEAK_STRIDE   3
-/* Up to 1/50th of a second of audio for peak calculation */
-/* This should use NATIVE_FREQUENCY, or eventually an adjustable freq. value */
-#define PEAK_SAMPLES  (44100/50)
 void pcm_calculate_peaks(int *left, int *right)
 {
-    short *addr;
-    short *end;
+    static unsigned long last_peak_tick = 0;
+    static unsigned long frame_period   = 0;
+    static int peaks_l = 0, peaks_r = 0;
+
+    /* Throttled peak ahead based on calling period */
+    unsigned long period = current_tick - last_peak_tick;
+
+    /* Keep reasonable limits on period */
+    if (period < 1)
+        period = 1;
+    else if (period > HZ/5)
+        period = HZ/5;
+
+    frame_period = (3*frame_period + period) >> 2;
+
+    last_peak_tick = current_tick;
+
+    if (pcm_playing && !pcm_paused)
     {
-        size_t samples = p_size / 4;
-        addr = p;
+        unsigned long *addr = (unsigned long *)DCSRC2;
+        long samples = DSTAT2;
+        long samp_frames;
 
-        if (samples > PEAK_SAMPLES)
-            samples = PEAK_SAMPLES - (PEAK_STRIDE - 1);
-        else
-            samples -= MIN(PEAK_STRIDE - 1, samples);
+        samples    &= 0xFFFFE;
+        samp_frames = frame_period*pcm_freq/(HZ/2);
+        samples     = MIN(samp_frames, samples) >> 1;
 
-        end = &addr[samples * 2];
-    }
+        if (samples > 0)
+        {
+            long peak_l   = 0, peak_r   = 0;
+            long peaksq_l = 0, peaksq_r = 0;
 
-    if (left && right) {
-        int left_peak = 0, right_peak = 0;
+            addr -= 0x30000000 >> 2;
+            addr = (long *)((long)addr & ~3);
 
-        while (addr < end) {
-            int value;
-            if ((value = addr [0]) > left_peak)
-                left_peak = value;
-            else if (-value > left_peak)
-                left_peak = -value;
+            do
+            {
+                long value = *addr;
+                long ch, chsq;
 
-            if ((value = addr [PEAK_STRIDE | 1]) > right_peak)
-                right_peak = value;
-            else if (-value > right_peak)
-                right_peak = -value;
+                ch   = (int16_t)value;
+                chsq = ch*ch;
+                if (chsq > peaksq_l)
+                    peak_l = ch, peaksq_l = chsq;
 
-            addr = &addr[PEAK_STRIDE * 2];
+                ch   = value >> 16;
+                chsq = ch*ch;
+                if (chsq > peaksq_r)
+                    peak_r = ch, peaksq_r = chsq;
+
+                addr += 4;
+            }
+            while ((samples -= 4) > 0);
+
+            peaks_l = abs(peak_l);
+            peaks_r = abs(peak_r);
         }
-
-        *left = left_peak;
-        *right = right_peak;
     }
-    else if (left || right) {
-        int peak_value = 0, value;
-
-        if (right)
-            addr += (PEAK_STRIDE | 1);
-
-        while (addr < end) {
-            if ((value = addr [0]) > peak_value)
-                peak_value = value;
-            else if (-value > peak_value)
-                peak_value = -value;
-
-            addr += PEAK_STRIDE * 2;
-        }
-
-        if (left)
-            *left = peak_value;
-        else
-            *right = peak_value;
+    else
+    {
+        peaks_l = peaks_r = 0;
     }
-}
+
+    if (left)
+        *left = peaks_l;
+
+    if (right)
+        *right = peaks_r;
+} /* pcm_calculate_peaks */

@@ -1,0 +1,195 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * Driver for WM8751 audio codec
+ *
+ * Based on code from the ipodlinux project - http://ipodlinux.org/
+ * Adapted for Rockbox in December 2005
+ *
+ * Original file: linux/arch/armnommu/mach-ipod/audio.c
+ *
+ * Copyright (c) 2003-2005 Bernard Leach (leachbj@bouncycastle.org)
+ *
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+#include "kernel.h"
+#include "wmcodec.h"
+#include "i2s.h"
+#include "audio.h"
+#include "sound.h"
+
+/* Flags used in combination with settings */
+
+/* use zero crossing to reduce clicks during volume changes */
+#define LOUT1_BITS      (LOUT1_LO1ZC)
+/* latch left volume first then update left+right together */
+#define ROUT1_BITS      (ROUT1_RO1ZC | ROUT1_RO1VU)
+#define LOUT2_BITS      (LOUT2_LO2ZC)
+#define ROUT2_BITS      (ROUT2_RO2ZC | ROUT2_RO2VU)
+/* We use linear bass control with 200 Hz cutoff */
+#define BASSCTRL_BITS   (BASSCTRL_BC)
+/* We use linear treble control with 4 kHz cutoff */
+#define TREBCTRL_BITS   (TREBCTRL_TC)
+
+/* convert tenth of dB volume (-730..60) to master volume register value */
+int tenthdb2master(int db)
+{
+    /* +6 to -73dB 1dB steps (plus mute == 80levels) 7bits */
+    /* 1111111 ==  +6dB  (0x7f)                            */
+    /* 1111001 ==   0dB  (0x79)                            */
+    /* 0110000 == -73dB  (0x30)                            */
+    /* 0101111..0000000 == mute  (<= 0x2f)                 */
+    if (db < VOLUME_MIN)
+        return 0x0;
+    else
+        return (db / 10) + 73 + 0x30;
+}
+
+/* convert tenth of dB volume (-780..0) to mixer volume register value */
+int tenthdb2mixer(int db)
+{
+    (void)db;
+    return 0;
+}
+
+static int tone_tenthdb2hw(int value)
+{
+    /* -6.0db..+0db..+9.0db step 1.5db - translate -60..+0..+90 step 15
+        to 10..6..0 step -1.
+    */
+    value = 10 - (value + 60) / 15;
+
+    if (value == 6)
+        value = 0xf; /* 0db -> off */
+
+    return value;
+}
+
+void audiohw_reset(void);
+
+/* Silently enable / disable audio output */
+void audiohw_enable_output(bool enable)
+{
+    if (enable) 
+    {
+        /* reset the I2S controller into known state */
+        i2s_reset();
+
+        /*
+         * 1. Switch on power supplies.
+         *    By default the WM87551L is in Standby Mode, the DAC is
+         *    digitally muted and the Audio Interface, Line outputs
+         *    and Headphone outputs are all OFF (DACMU = 1 Power
+         *    Management registers 1 and 2 are all zeros).
+         */
+        wmcodec_write(RESET, RESET_RESET);    /*Reset*/
+
+         /* 2. Enable Vmid and VREF. */
+        wmcodec_write(PWRMGMT1, PWRMGMT1_VREF | PWRMGMT1_VMIDSEL_500K);
+
+        /* From app notes: allow Vref to stabilize to reduce clicks */
+        sleep(HZ/2);
+
+         /* 3. Enable DACs as required. */
+        wmcodec_write(PWRMGMT2, PWRMGMT2_DACL | PWRMGMT2_DACR);
+    
+         /* 4. Enable line and / or headphone output buffers as required. */
+        wmcodec_write(PWRMGMT2, PWRMGMT2_DACL | PWRMGMT2_DACR |
+                      PWRMGMT2_LOUT1 | PWRMGMT2_ROUT1 | PWRMGMT2_LOUT2 |
+                      PWRMGMT2_ROUT2);
+    
+        /* BCLKINV=0(Dont invert BCLK) MS=1(Enable Master) LRSWAP=0 LRP=0 */
+        /* IWL=00(16 bit) FORMAT=10(I2S format) */
+        wmcodec_write(AINTFCE, AINTFCE_MS | AINTFCE_WL_16 |
+                      AINTFCE_FORMAT_I2S);
+
+        /* Keep it quiet */
+        wmcodec_write(LOUT1, LOUT1_BITS | OUTPUT_MUTED);
+        wmcodec_write(ROUT1, ROUT1_BITS | OUTPUT_MUTED);
+        wmcodec_write(LOUT2, LOUT2_BITS | OUTPUT_MUTED);
+        wmcodec_write(ROUT2, ROUT2_BITS | OUTPUT_MUTED);
+
+        wmcodec_write(LEFTMIX1, LEFTMIX1_LD2LO | LEFTMIX1_LI2LO_DEFAULT);
+        wmcodec_write(RIGHTMIX2, RIGHTMIX2_RD2RO | RIGHTMIX2_RI2RO_DEFAULT);
+    }
+
+    audiohw_mute(!enable);
+}
+
+int audiohw_set_master_vol(int vol_l, int vol_r)
+{
+    /* +6 to -73dB 1dB steps (plus mute == 80levels) 7bits */
+    /* 1111111 ==  +6dB                                    */
+    /* 1111001 ==   0dB                                    */
+    /* 0110000 == -73dB                                    */
+    /* 0101111 == mute (0x2f)                              */
+
+    wmcodec_write(LOUT1, LOUT1_BITS | LOUT1_LOUT1VOL(vol_l));
+    wmcodec_write(ROUT1, ROUT1_BITS | ROUT1_ROUT1VOL(vol_r));
+    return 0;
+}
+
+int audiohw_set_lineout_vol(int vol_l, int vol_r)
+{
+    wmcodec_write(LOUT2, LOUT2_BITS | LOUT2_LOUT2VOL(vol_l));
+    wmcodec_write(ROUT2, ROUT2_BITS | ROUT2_ROUT2VOL(vol_r));
+    return 0;
+}
+
+int audiohw_set_mixer_vol(int channel1, int channel2)
+{
+    (void)channel1;
+    (void)channel2;
+
+    return 0;
+}
+
+void audiohw_set_bass(int value)
+{
+    wmcodec_write(BASSCTRL, BASSCTRL_BITS |
+        BASSCTRL_BASS(tone_tenthdb2hw(value)));
+}
+
+void audiohw_set_treble(int value)
+{
+    wmcodec_write(TREBCTRL, TREBCTRL_BITS |
+        TREBCTRL_TREB(tone_tenthdb2hw(value)));
+}
+
+int audiohw_mute(int mute)
+{
+    /* Mute:   Set DACMU = 1 to soft-mute the audio DACs. */
+    /* Unmute: Set DACMU = 0 to soft-un-mute the audio DACs. */
+    wmcodec_write(DACCTRL, mute ? DACCTRL_DACMU : 0);
+    return 0;
+}
+
+/* Nice shutdown of WM8751 codec */
+void audiohw_close(void)
+{
+    /* 1. Set DACMU = 1 to soft-mute the audio DACs. */
+    audiohw_mute(true);
+
+    /* 2. Disable all output buffers. */
+    wmcodec_write(PWRMGMT2, 0x0);
+
+    /* 3. Switch off the power supplies. */
+    wmcodec_write(PWRMGMT1, 0x0);
+}
+
+/* Note: Disable output before calling this function */
+void audiohw_set_frequency(int fsel)
+{
+    wmcodec_write(CLOCKING, fsel);
+}

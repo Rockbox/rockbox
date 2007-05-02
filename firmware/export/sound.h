@@ -22,7 +22,9 @@
 #include <inttypes.h>
 #ifdef HAVE_UDA1380
 #include "uda1380.h"
-#elif defined(HAVE_WM8975) || defined(HAVE_WM8751)
+#elif defined(HAVE_WM8751)
+#include "wm8751.h"
+#elif defined(HAVE_WM8975)
 #include "wm8975.h"
 #elif defined(HAVE_WM8758)
 #include "wm8758.h"

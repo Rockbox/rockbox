@@ -195,7 +195,9 @@ drivers/mas.c
 #ifndef SIMULATOR
 #if defined(HAVE_UDA1380)
 drivers/audio/uda1380.c
-#elif defined(HAVE_WM8975) || defined(HAVE_WM8751)
+#elif defined(HAVE_WM8751)
+drivers/audio/wm8751.c
+#elif defined(HAVE_WM8975)
 drivers/audio/wm8975.c
 #elif defined(HAVE_WM8758)
 drivers/audio/wm8758.c
