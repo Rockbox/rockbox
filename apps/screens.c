@@ -1228,9 +1228,7 @@ static char * id3_get_info(int selected_item, void* data, char *buffer)
                 info=id3->path;
                 break;
         }
-        if(info==NULL)
-            return(str(LANG_ID3_NO_INFO));
-        return(info);
+        return info && *info ? info : (char*) str(LANG_ID3_NO_INFO);
     }
 }
 
