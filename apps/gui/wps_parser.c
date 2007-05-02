@@ -770,12 +770,11 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
                     unsigned int len = 1;
                     const char *string_start = wps_bufptr - 1;
 
-                    /* continue until we hit something that ends the string
-                       or we run out of memory */
+                    /* find the length of the string */
                     while (wps_bufptr && *wps_bufptr != '#' &&
-                          *wps_bufptr != '%' && *wps_bufptr != ';' &&
-                          *wps_bufptr != '<' && *wps_bufptr != '>' &&
-                          *wps_bufptr != '|' && *wps_bufptr != '\n')
+                           *wps_bufptr != '%' && *wps_bufptr != ';' &&
+                           *wps_bufptr != '<' && *wps_bufptr != '>' &&
+                           *wps_bufptr != '|' && *wps_bufptr != '\n')
                     {
                         wps_bufptr++;
                         len++;
@@ -788,7 +787,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
                     for (i = 0, str = data->strings, found = false;
                          i < data->num_strings &&
                          !(found = (strlen(*str) == len &&
-                           strncmp(string_start, *str, len) == 0));
+                                    strncmp(string_start, *str, len) == 0));
                          i++, str++);
                     /* If a matching string is found, found is true and i is
                        the index of the string. If not, found is false */
@@ -796,23 +795,24 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
                     /* If it's NOT a duplicate, do nothing if we already have
                        too many unique strings */
                     if (found ||
-                       (stringbuf_used < STRING_BUFFER_SIZE - 1 &&
-                        data->num_strings < WPS_MAX_STRINGS))
+                        (stringbuf_used < STRING_BUFFER_SIZE - 1 &&
+                         data->num_strings < WPS_MAX_STRINGS))
                     {
                         if (!found)
                         {
                             /* new string */
-                            /* truncate?  */
+
+                            /* truncate? */
                             if (stringbuf_used + len > STRING_BUFFER_SIZE - 1)
                                 len = STRING_BUFFER_SIZE - stringbuf_used - 1;
-                            
+
                             strncpy(stringbuf, string_start, len);
-                        
+                            *(stringbuf + len) = '\0';
+
                             data->strings[data->num_strings] = stringbuf;
                             stringbuf += len + 1;
                             stringbuf_used += len + 1;
-                            data->tokens[data->num_tokens].value.i =
-                                                        data->num_strings;
+                            data->tokens[data->num_tokens].value.i = data->num_strings;
                             data->num_strings++;
                         }
                         else
@@ -827,6 +827,9 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
                 break;
         }
     }
+
+    if (level >= 0) /* there are unclosed conditionals */
+        fail = PARSE_FAIL_UNCLOSED_COND;
 
 #ifdef DEBUG
     print_debug_info(data, fail, line);
