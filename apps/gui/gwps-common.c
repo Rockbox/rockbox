@@ -769,8 +769,8 @@ static char *get_token_value(struct gui_wps *gwps,
 #if CONFIG_RTC
     struct tm* tm = NULL;
 
-    /* if the token is an RTC one, update the time and do the necessary checks */
-
+    /* if the token is an RTC one, update the time
+       and do the necessary checks */
     if (token->type >= WPS_TOKENS_RTC_BEGIN
         && token->type <= WPS_TOKENS_RTC_END)
     {
@@ -1313,7 +1313,7 @@ static int evaluate_conditional(struct gui_wps *gwps, int cond_index)
     /* intval is now the number of the enum option we want to read,
        starting from 1. If intval is -1, we check if value is empty. */
     if (intval == -1)
-        intval = value && strlen(value) ? 1 : num_options;
+        intval = (value && *value) ? 1 : num_options;
     else if (intval > num_options || intval < 1)
         intval = num_options;
 
@@ -1543,12 +1543,14 @@ static bool update_curr_subline(struct gui_wps *gwps, int line)
 
             /* if back where we started after search or
                 only one subline is defined on the line */
-            if (((search > 0) && (data->lines[line].curr_subline == search_start)) ||
+            if (((search > 0) &&
+                 (data->lines[line].curr_subline == search_start)) ||
                 only_one_subline)
             {
                 /* no other subline with a time > 0 exists */
                 data->lines[line].subline_expire_time = (reset_subline ?
-                    current_tick : data->lines[line].subline_expire_time) + 100 * HZ;
+                    current_tick :
+                    data->lines[line].subline_expire_time) + 100 * HZ;
                 break;
             }
             else
@@ -1565,7 +1567,7 @@ static bool update_curr_subline(struct gui_wps *gwps, int line)
                     new_subline_refresh = true;
                     data->lines[line].subline_expire_time = (reset_subline ?
                         current_tick : data->lines[line].subline_expire_time) +
-                        BASE_SUBLINE_TIME * data->sublines[subline_idx].time_mult;
+                        BASE_SUBLINE_TIME*data->sublines[subline_idx].time_mult;
                     break;
                 }
             }
@@ -1820,7 +1822,8 @@ bool gui_wps_refresh(struct gui_wps *gwps,
         /* get current subline for the line */
         new_subline_refresh = update_curr_subline(gwps, line);
 
-        subline_idx = wps_subline_index(data, line, data->lines[line].curr_subline);
+        subline_idx = wps_subline_index(data, line,
+                                        data->lines[line].curr_subline);
         flags = data->sublines[subline_idx].line_type;
 
         if (refresh_mode == WPS_REFRESH_ALL || (flags & refresh_mode)

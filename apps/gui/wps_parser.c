@@ -136,23 +136,23 @@ static const struct wps_tag all_tags[] = {
 #endif
 
 #if CONFIG_RTC
-    { WPS_TOKEN_RTC_DAY_OF_MONTH,              "cd", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED, "ce", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_HOUR_24_ZERO_PADDED,       "cH", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_HOUR_24,                   "ck", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_HOUR_12_ZERO_PADDED,       "cI", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_HOUR_12,                   "cl", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_MONTH,                     "cm", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_MINUTE,                    "cM", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_SECOND,                    "cS", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_YEAR_2_DIGITS,             "cy", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_YEAR_4_DIGITS,             "cY", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_AM_PM_UPPER,               "cP", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_AM_PM_LOWER,               "cp", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_WEEKDAY_NAME,              "ca", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_MONTH_NAME,                "cb", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_DAY_OF_WEEK_START_MON,     "cu", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_DAY_OF_WEEK_START_SUN,     "cw", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_DAY_OF_MONTH,             "cd", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED,"ce", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_HOUR_24_ZERO_PADDED,      "cH", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_HOUR_24,                  "ck", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_HOUR_12_ZERO_PADDED,      "cI", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_HOUR_12,                  "cl", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_MONTH,                    "cm", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_MINUTE,                   "cM", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_SECOND,                   "cS", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_YEAR_2_DIGITS,            "cy", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_YEAR_4_DIGITS,            "cY", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_AM_PM_UPPER,              "cP", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_AM_PM_LOWER,              "cp", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_WEEKDAY_NAME,             "ca", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_MONTH_NAME,               "cb", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_DAY_OF_WEEK_START_MON,    "cu", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RTC_DAY_OF_WEEK_START_SUN,    "cw", WPS_REFRESH_DYNAMIC, NULL },
 #endif
 
     /* current file */
@@ -164,7 +164,8 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_FILE_PATH,                "fp",  WPS_REFRESH_STATIC,  NULL },
     { WPS_TOKEN_FILE_SIZE,                "fs",  WPS_REFRESH_STATIC,  NULL },
     { WPS_TOKEN_FILE_VBR,                 "fv",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_FILE_DIRECTORY,           "d",   WPS_REFRESH_STATIC, parse_dir_level },
+    { WPS_TOKEN_FILE_DIRECTORY,           "d",   WPS_REFRESH_STATIC,
+                                                           parse_dir_level },
 
     /* next file */
     { WPS_TOKEN_FILE_BITRATE,             "Fb",  WPS_REFRESH_DYNAMIC, NULL },
@@ -175,7 +176,8 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_FILE_PATH,                "Fp",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_FILE_SIZE,                "Fs",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_FILE_VBR,                 "Fv",  WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_FILE_DIRECTORY,           "D",   WPS_REFRESH_DYNAMIC, parse_dir_level },
+    { WPS_TOKEN_FILE_DIRECTORY,           "D",   WPS_REFRESH_DYNAMIC,
+                                                           parse_dir_level },
 
     /* current metadata */
     { WPS_TOKEN_METADATA_ARTIST,          "ia",  WPS_REFRESH_STATIC,  NULL },
@@ -187,13 +189,13 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_METADATA_TRACK_TITLE,     "it",  WPS_REFRESH_STATIC,  NULL },
     { WPS_TOKEN_METADATA_VERSION,         "iv",  WPS_REFRESH_STATIC,  NULL },
     { WPS_TOKEN_METADATA_YEAR,            "iy",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_METADATA_COMMENT,         "iC",  WPS_REFRESH_STATIC, NULL },
+    { WPS_TOKEN_METADATA_COMMENT,         "iC",  WPS_REFRESH_STATIC,  NULL },
 
     /* next metadata */
     { WPS_TOKEN_METADATA_ARTIST,          "Ia",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_METADATA_COMPOSER,        "Ic",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_METADATA_ALBUM,           "Id",  WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_METADATA_ALBUM_ARTIST,    "IA",  WPS_REFRESH_DYNAMIC,  NULL },
+    { WPS_TOKEN_METADATA_ALBUM_ARTIST,    "IA",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_METADATA_GENRE,           "Ig",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_METADATA_TRACK_NUMBER,    "In",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_METADATA_TRACK_TITLE,     "It",  WPS_REFRESH_DYNAMIC, NULL },
@@ -220,11 +222,13 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_PLAYBACK_STATUS,          "mp",  WPS_REFRESH_DYNAMIC, NULL },
 
 #ifdef HAVE_LCD_BITMAP
-    { WPS_TOKEN_PEAKMETER,                "pm",  WPS_REFRESH_PEAK_METER, NULL },
+    { WPS_TOKEN_PEAKMETER,                "pm", WPS_REFRESH_PEAK_METER, NULL },
 #else
-    { WPS_TOKEN_PLAYER_PROGRESSBAR,       "pf",  WPS_REFRESH_DYNAMIC | WPS_REFRESH_PLAYER_PROGRESS, parse_progressbar },
+    { WPS_TOKEN_PLAYER_PROGRESSBAR,       "pf",
+      WPS_REFRESH_DYNAMIC | WPS_REFRESH_PLAYER_PROGRESS, parse_progressbar },
 #endif
-    { WPS_TOKEN_PROGRESSBAR,              "pb",  WPS_REFRESH_PLAYER_PROGRESS, parse_progressbar },
+    { WPS_TOKEN_PROGRESSBAR,              "pb",  WPS_REFRESH_PLAYER_PROGRESS,
+                                                         parse_progressbar },
 
     { WPS_TOKEN_VOLUME,                   "pv",  WPS_REFRESH_DYNAMIC, NULL },
 
@@ -254,7 +258,8 @@ static const struct wps_tag all_tags[] = {
 
     { WPS_NO_TOKEN,                       "xl",  0,       parse_image_load },
 
-    { WPS_TOKEN_IMAGE_PRELOAD_DISPLAY,    "xd",  WPS_REFRESH_STATIC, parse_image_display },
+    { WPS_TOKEN_IMAGE_PRELOAD_DISPLAY,    "xd",  WPS_REFRESH_STATIC,
+                                                       parse_image_display },
 
     { WPS_TOKEN_IMAGE_DISPLAY,            "x",   0,       parse_image_load },
     { WPS_TOKEN_IMAGE_PROGRESS_BAR,       "P",   0,    parse_image_special },
@@ -622,7 +627,8 @@ static int parse_token(const char *wps_bufptr, struct wps_data *wps_data)
 
             taglen = (tag->type != WPS_TOKEN_UNKNOWN) ? strlen(tag->name) : 2;
             token->type = tag->type;
-            wps_data->sublines[wps_data->num_sublines].line_type |= tag->refresh_type;
+            wps_data->sublines[wps_data->num_sublines].line_type |=
+                                                            tag->refresh_type;
 
             /* if the tag has a special parsing function, we call it */
             if (tag->parse_func)
@@ -633,7 +639,8 @@ static int parse_token(const char *wps_bufptr, struct wps_data *wps_data)
                 break;
 
             /* tags that start with 'F', 'I' or 'D' are for the next file */
-            if ( *(tag->name) == 'I' || *(tag->name) == 'F' || *(tag->name) == 'D')
+            if ( *(tag->name) == 'I' || *(tag->name) == 'F' ||
+                 *(tag->name) == 'D')
                 token->next = true;
 
             wps_data->num_tokens++;
@@ -758,8 +765,11 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
                 if ((data->num_lines < WPS_MAX_LINES) &&
                     (data->num_sublines < WPS_MAX_SUBLINES))
                 {
-                    data->lines[data->num_lines].first_subline_idx = data->num_sublines;
-                    data->sublines[data->num_sublines].first_token_idx = data->num_tokens;
+                    data->lines[data->num_lines].first_subline_idx =
+                        data->num_sublines;
+
+                    data->sublines[data->num_sublines].first_token_idx =
+                        data->num_tokens;
                 }
 
                 break;
@@ -771,7 +781,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
                     const char *string_start = wps_bufptr - 1;
 
                     /* find the length of the string */
-                    while (wps_bufptr && *wps_bufptr != '#' &&
+                    while (*wps_bufptr && *wps_bufptr != '#' &&
                            *wps_bufptr != '%' && *wps_bufptr != ';' &&
                            *wps_bufptr != '<' && *wps_bufptr != '>' &&
                            *wps_bufptr != '|' && *wps_bufptr != '\n')
@@ -812,7 +822,8 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
                             data->strings[data->num_strings] = stringbuf;
                             stringbuf += len + 1;
                             stringbuf_used += len + 1;
-                            data->tokens[data->num_tokens].value.i = data->num_strings;
+                            data->tokens[data->num_tokens].value.i =
+                                data->num_strings;
                             data->num_strings++;
                         }
                         else
@@ -1021,7 +1032,8 @@ bool wps_data_load(struct wps_data *wps_data,
         if (!wps_buffer)
             return false;
 
-        /* copy the file's content to the buffer for parsing */
+        /* copy the file's content to the buffer for parsing,
+           ensuring that every line ends with a newline char. */
         unsigned int start = 0;
         while(read_line(fd, wps_buffer + start, buffersize - start) > 0)
         {

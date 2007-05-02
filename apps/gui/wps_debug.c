@@ -149,7 +149,8 @@ static void dump_wps_tokens(struct wps_data *data)
                 snprintf(buf, sizeof(buf), "rtc: day of month (01..31)");
                 break;
             case WPS_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED:
-                snprintf(buf, sizeof(buf), "rtc: day of month, blank padded ( 1..31)");
+                snprintf(buf, sizeof(buf),
+                         "rtc: day of month, blank padded ( 1..31)");
                 break;
             case WPS_TOKEN_RTC_HOUR_24_ZERO_PADDED:
                 snprintf(buf, sizeof(buf), "rtc: hour (00..23)");
@@ -173,28 +174,35 @@ static void dump_wps_tokens(struct wps_data *data)
                 snprintf(buf, sizeof(buf), "rtc: second (00..59)");
                 break;
             case WPS_TOKEN_RTC_YEAR_2_DIGITS:
-                snprintf(buf, sizeof(buf), "rtc: last two digits of year (00..99)");
+                snprintf(buf, sizeof(buf),
+                         "rtc: last two digits of year (00..99)");
                 break;
             case WPS_TOKEN_RTC_YEAR_4_DIGITS:
                 snprintf(buf, sizeof(buf), "rtc: year (1970...)");
                 break;
             case WPS_TOKEN_RTC_AM_PM_UPPER:
-                snprintf(buf, sizeof(buf), "rtc: upper case AM or PM indicator");
+                snprintf(buf, sizeof(buf),
+                         "rtc: upper case AM or PM indicator");
                 break;
             case WPS_TOKEN_RTC_AM_PM_LOWER:
-                snprintf(buf, sizeof(buf), "rtc: lower case am or pm indicator");
+                snprintf(buf, sizeof(buf),
+                         "rtc: lower case am or pm indicator");
                 break;
             case WPS_TOKEN_RTC_WEEKDAY_NAME:
-                snprintf(buf, sizeof(buf), "rtc: abbreviated weekday name (Sun..Sat)");
+                snprintf(buf, sizeof(buf),
+                         "rtc: abbreviated weekday name (Sun..Sat)");
                 break;
             case WPS_TOKEN_RTC_MONTH_NAME:
-                snprintf(buf, sizeof(buf), "rtc: abbreviated month name (Jan..Dec)");
+                snprintf(buf, sizeof(buf),
+                         "rtc: abbreviated month name (Jan..Dec)");
                 break;
             case WPS_TOKEN_RTC_DAY_OF_WEEK_START_MON:
-                snprintf(buf, sizeof(buf), "rtc: day of week (1..7); 1 is Monday");
+                snprintf(buf, sizeof(buf),
+                         "rtc: day of week (1..7); 1 is Monday");
                 break;
             case WPS_TOKEN_RTC_DAY_OF_WEEK_START_SUN:
-                snprintf(buf, sizeof(buf), "rtc: day of week (0..6); 0 is Sunday");
+                snprintf(buf, sizeof(buf),
+                         "rtc: day of week (0..6); 0 is Sunday");
                 break;
 #endif
 
@@ -265,31 +273,38 @@ static void dump_wps_tokens(struct wps_data *data)
                 break;
 
             case WPS_TOKEN_METADATA_ARTIST:
-                snprintf(buf, sizeof(buf), "%strack artist", next_str(next));
+                snprintf(buf, sizeof(buf), "%strack artist",
+                         next_str(next));
                 break;
 
             case WPS_TOKEN_METADATA_COMPOSER:
-                snprintf(buf, sizeof(buf), "%strack composer", next_str(next));
+                snprintf(buf, sizeof(buf), "%strack composer",
+                         next_str(next));
                 break;
 
             case WPS_TOKEN_METADATA_ALBUM:
-                snprintf(buf, sizeof(buf), "%strack album", next_str(next));
+                snprintf(buf, sizeof(buf), "%strack album",
+                         next_str(next));
                 break;
 
             case WPS_TOKEN_METADATA_GENRE:
-                snprintf(buf, sizeof(buf), "%strack genre", next_str(next));
+                snprintf(buf, sizeof(buf), "%strack genre",
+                         next_str(next));
                 break;
 
             case WPS_TOKEN_METADATA_TRACK_NUMBER:
-                snprintf(buf, sizeof(buf), "%strack number", next_str(next));
+                snprintf(buf, sizeof(buf), "%strack number",
+                         next_str(next));
                 break;
 
             case WPS_TOKEN_METADATA_TRACK_TITLE:
-                snprintf(buf, sizeof(buf), "%strack title", next_str(next));
+                snprintf(buf, sizeof(buf), "%strack title",
+                         next_str(next));
                 break;
 
             case WPS_TOKEN_METADATA_VERSION:
-                snprintf(buf, sizeof(buf), "%strack ID3 version", next_str(next));
+                snprintf(buf, sizeof(buf), "%strack ID3 version",
+                         next_str(next));
                 break;
 
             case WPS_TOKEN_METADATA_YEAR:
@@ -325,7 +340,8 @@ static void dump_wps_tokens(struct wps_data *data)
                 break;
 
             case WPS_TOKEN_FILE_FREQUENCY:
-                snprintf(buf, sizeof(buf), "%sfile audio frequency", next_str(next));
+                snprintf(buf, sizeof(buf), "%sfile audio frequency",
+                         next_str(next));
                 break;
 
             case WPS_TOKEN_FILE_NAME:
@@ -333,7 +349,8 @@ static void dump_wps_tokens(struct wps_data *data)
                 break;
 
             case WPS_TOKEN_FILE_NAME_WITH_EXTENSION:
-                snprintf(buf, sizeof(buf), "%sfile name with extension", next_str(next));
+                snprintf(buf, sizeof(buf), "%sfile name with extension",
+                         next_str(next));
                 break;
 
             case WPS_TOKEN_FILE_PATH:
@@ -349,8 +366,8 @@ static void dump_wps_tokens(struct wps_data *data)
                 break;
 
             case WPS_TOKEN_FILE_DIRECTORY:
-                snprintf(buf, sizeof(buf), "%sfile directory, level: %d", next_str(next),
-                         token->value.i);
+                snprintf(buf, sizeof(buf), "%sfile directory, level: %d",
+                         next_str(next), token->value.i);
                 break;
 
             default:
@@ -421,9 +438,11 @@ static void print_wps_strings(struct wps_data *data)
         DEBUGF("%2d: (%2d) '%s'\n", i, len, data->strings[i]);
     }
     DEBUGF("\n");
-    DEBUGF("Number of strings: %d out of an allowed %d\n", data->num_strings, WPS_MAX_STRINGS);
+    DEBUGF("Number of strings: %d out of an allowed %d\n",
+           data->num_strings, WPS_MAX_STRINGS);
     DEBUGF("Total string length: %d\n", total_len);
-    DEBUGF("String buffer used: %d out of %d bytes\n", buf_used, STRING_BUFFER_SIZE);
+    DEBUGF("String buffer used: %d out of %d bytes\n",
+           buf_used, STRING_BUFFER_SIZE);
     DEBUGF("\n");
 }
 
