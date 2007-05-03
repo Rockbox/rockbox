@@ -23,6 +23,7 @@
 #ifndef BOOTLOADERS_H_INCLUDED
 #define BOOTLOADERS_H_INCLUDED
 
+#include <wx/string.h>
 
 extern "C" {
     // Ipodpatcher
@@ -31,11 +32,11 @@ extern "C" {
 
 
 bool initIpodpatcher();
-bool ipodpatcher(int mode);
-bool gigabeatf(int mode);
-bool iaudiox5(int mode);
-bool fwpatcher(int mode);
-bool h10(int mode);
+bool ipodpatcher(int mode,wxString bootloadername);
+bool gigabeatf(int mode,wxString bootloadername,wxString deviceDir);
+bool iaudiox5(int mode,wxString bootloadername,wxString deviceDir);
+bool fwpatcher(int mode,wxString bootloadername,wxString deviceDir,wxString firmware);
+bool h10(int mode,wxString bootloadername,wxString deviceDir);
 
 
 #endif // BOOTLOADERS_H_INCLUDED

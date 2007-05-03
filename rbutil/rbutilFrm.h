@@ -41,7 +41,7 @@
 #include <wx/richtext/richtextctrl.h>
 
 #include "rbutil.h"
-#include "wizard_pages.h"
+#include "rbutilCtrls.h"
 
 class rbutilFrm : public wxFrame
 {
@@ -56,6 +56,7 @@ public:
             wxMINIMIZE_BOX | wxCLOSE_BOX);
     virtual ~rbutilFrm();
 public:
+	   DeviceSelectorCtrl* myDeviceSelector;
 		wxMenuBar *WxMenuBar1;
 		wxStaticText *WxStaticText3;
 		wxBitmapButton *WxBitmapButton2;
@@ -107,7 +108,7 @@ public:
 	void OnBootloaderBtn(wxCommandEvent& event);
 	void OnPortableInstall(wxCommandEvent& event);
 	void OnBootloaderRemoveBtn(wxCommandEvent& event);
-
+	
 };
 
 #endif

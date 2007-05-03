@@ -80,6 +80,7 @@ bool rbutilFrmApp::OnInit()
 
     rbutilFrm *myFrame = new  rbutilFrm(NULL);
     SetTopWindow(myFrame);
+	     
     myFrame->Show(TRUE);
 
     initIpodpatcher();             // reserve mem for ipodpatcher
@@ -171,12 +172,6 @@ bool rbutilFrmApp::ReadGlobalConfig(rbutilFrm* myFrame)
         gv->GlobalConfig->Read(buf.Format(wxT("/%s/bootloadername"),
             cur.c_str()), &tmpstr);
         gv->plat_bootloadername.Add(tmpstr);
-        gv->GlobalConfig->Read(buf.Format(wxT("/%s/autodetect"),
-            cur.c_str()), &tmpstr);
-        gv->plat_autodetect.Add( (tmpstr == wxT("yes")) ? true : false ) ;
-        gv->GlobalConfig->Read(buf.Format(wxT("/%s/combinedname"),
-            cur.c_str()), &tmpstr);
-        gv->plat_combinedname.Add(tmpstr);
         gv->GlobalConfig->Read(buf.Format(wxT("/%s/resolution"),
             cur.c_str()), &tmpstr);
         gv->plat_resolution.Add(tmpstr);
@@ -187,9 +182,6 @@ bool rbutilFrmApp::ReadGlobalConfig(rbutilFrm* myFrame)
     gv->GlobalConfig->SetPath(wxT("/general"));
     gv->GlobalConfig->Read(wxT("default_platform"), &tmpstr, wxT("cthulhu"));
 
-    for (i=0; i< gv->plat_id.GetCount(); i++) {
-        if (gv->plat_id[i] == tmpstr) gv->curplatnum  = i;
-    }
 
     gv->GlobalConfig->Read(wxT("last_release"), &tmpstr);
     gv->last_release = tmpstr;
@@ -255,6 +247,7 @@ void rbutilFrmApp::ReadUserConfig()
     gv->UserConfig->SetPath(wxT("/defaults"));
     if (gv->UserConfig->Read(wxT("curdestdir"), &str) ) gv->curdestdir = str;
     if (gv->UserConfig->Read(wxT("curplatform"), &str) ) gv->curplat = str;
+    if (gv->UserConfig->Read(wxT("curfirmware"), &str) ) gv->curfirmware = str;
     gv->UserConfig->SetPath(stack);
 }
 
@@ -263,6 +256,7 @@ void rbutilFrmApp::WriteUserConfig()
     gv->UserConfig->SetPath(wxT("/defaults"));
     gv->UserConfig->Write(wxT("curdestdir"), gv->curdestdir);
     gv->UserConfig->Write(wxT("curplatform"), gv->curplat);
+     gv->UserConfig->Write(wxT("curfirmware"), gv->curfirmware);
 
     delete gv->UserConfig;
 

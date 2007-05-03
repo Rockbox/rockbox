@@ -51,6 +51,12 @@
 #include <wx/file.h>
 #include <wx/wizard.h>
 #include <wx/event.h>
+#include <wx/statline.h>
+#include <wx/valgen.h>
+#include <wx/thread.h>
+#include <wx/regex.h>
+#include <wx/tokenzr.h>
+#include <wx/notebook.h>
 
 #ifdef __WXMSW__
 #define PATH_SEP "\\"
@@ -88,8 +94,6 @@ public:
     wxArrayInt              plat_needsbootloader;
     wxArrayString           plat_bootloadermethod;
     wxArrayString           plat_bootloadername;
-    wxArrayInt              plat_autodetect;
-    wxArrayString           plat_combinedname;
     wxArrayString           plat_resolution;
     wxString                download_url;
     wxString                daily_url;
@@ -103,15 +107,13 @@ public:
 
     // User configuration data.
     wxString                curplat;
-    unsigned int            curplatnum;
+   // unsigned int            curplatnum;
     wxString                curdestdir;
+    wxString                curfirmware;
     unsigned int            curbuild;
     bool                    curisfull;
     bool                    nocache;
     bool                    portable;
-    wxString                curbootloadermethod;
-    wxString                curbootloader;
-    wxString                curfirmware;
     wxString                curresolution;
     wxArrayString           themesToInstall;
 
@@ -154,5 +156,6 @@ bool rm_rf(wxString file);
 
 #define BOOTLOADER_ADD      0
 #define BOOTLOADER_REM      1
+
 
 #endif

@@ -125,8 +125,9 @@ int DownloadURL(wxString src, wxString dest)
                 buf, 100, NULL, wxPD_APP_MODAL |
                 wxPD_AUTO_HIDE | wxPD_SMOOTH | wxPD_ELAPSED_TIME |
                 wxPD_REMAINING_TIME | wxPD_CAN_ABORT);
-    progress->Update(0);
     progress->SetSize(500,200);
+    progress->Update(0);
+
 
     input = true;
     wxURL* in_http = new wxURL(src);
@@ -749,4 +750,5 @@ bool rm_rf(wxString file)
     wxLogVerbose(wxT("=== end rm-rf"));
     return rc ? true : false;
 }
+
 

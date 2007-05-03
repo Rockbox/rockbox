@@ -101,6 +101,8 @@
 		<Unit filename="h120sums.h" />
 		<Unit filename="h300sums.h" />
 		<Unit filename="install_3d.xpm" />
+		<Unit filename="install_dialogs.cpp" />
+		<Unit filename="install_dialogs.h" />
 		<Unit filename="installlog.cpp" />
 		<Unit filename="installlog.h" />
 		<Unit filename="ipodpatcher\ipodio-win32.c">
@@ -136,8 +138,6 @@
 		<Unit filename="uninstall_3d.xpm" />
 		<Unit filename="untools2_3d.xpm" />
 		<Unit filename="wizard.xpm" />
-		<Unit filename="wizard_pages.cpp" />
-		<Unit filename="wizard_pages.h" />
 		<Unit filename="wx_pch.h" />
 		<Extensions>
 			<code_completion />
