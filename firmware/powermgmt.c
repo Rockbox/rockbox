@@ -40,17 +40,7 @@
 #if CONFIG_TUNER
 #include "fmradio.h"
 #endif
-#ifdef HAVE_UDA1380
-#include "uda1380.h"
-#elif defined(HAVE_TLV320)
-#include "tlv320.h"
-#elif defined(HAVE_WM8758)
-#include "wm8758.h"
-#elif defined(HAVE_WM8975)
-#include "wm8975.h"
-#elif defined(HAVE_WM8731)
-#include "wm8731l.h"
-#endif
+#include "sound.h"
 #ifdef HAVE_LCD_BITMAP
 #include "font.h"
 #endif
@@ -1323,15 +1313,10 @@ void shutdown_hw(void)
 
 #if CONFIG_CODEC != SWCODEC
     mp3_shutdown();
+#else
+    audiohw_close();
 #endif
 
-#ifdef HAVE_UDA1380
-    audiohw_close();
-#elif defined(HAVE_TLV320)
-    audiohw_close();
-#elif defined(HAVE_WM8758) || defined(HAVE_WM8975) | defined(HAVE_WM8731)
-    audiohw_close();
-#endif
     /* If HD is still active we try to wait for spindown, otherwise the
        shutdown_timeout in power_thread_sleep will force a power off */
     while(ata_disk_is_active())

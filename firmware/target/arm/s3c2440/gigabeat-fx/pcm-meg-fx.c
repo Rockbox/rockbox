@@ -31,8 +31,8 @@
 #define GIGABEAT_44100HZ     (0x11 << 1)
 #define GIGABEAT_88200HZ     (0x1f << 1)
 
-static int pcm_freq = HW_SAMPR_DEFAULT; /* 44.1 is default */
-static int sr_ctrl = GIGABEAT_44100HZ;
+static int pcm_freq = 0; /* 44.1 is default */
+static int sr_ctrl = 0;
 #define FIFO_COUNT ((IISFCON >> 6) & 0x01F)
 
 /* number of bytes in FIFO */
@@ -71,10 +71,9 @@ void pcm_init(void)
     pcm_paused = false;
     pcm_callback_for_more = NULL;
 
-    audiohw_init();
-    audiohw_enable_output(true);
-
     pcm_set_frequency(SAMPR_44);
+
+    audiohw_init();
 
     /* init GPIO */
     GPCCON = (GPCCON & ~(3<<14)) | (1<<14);
@@ -92,6 +91,7 @@ void pcm_init(void)
 void pcm_postinit(void)
 {
     audiohw_postinit();
+    pcm_apply_settings();
 }
 
 void pcm_play_dma_start(const void *addr, size_t size)

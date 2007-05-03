@@ -78,53 +78,45 @@ static int tone_tenthdb2hw(int value)
 
 void audiohw_reset(void);
 
-/* Silently enable / disable audio output */
-void audiohw_enable_output(bool enable)
+/* Reset and power up the WM8751 */
+void audiohw_preinit(void)
 {
-    if (enable) 
-    {
-        /* reset the I2S controller into known state */
-        i2s_reset();
+    /*
+     * 1. Switch on power supplies.
+     *    By default the WM8751 is in Standby Mode, the DAC is
+     *    digitally muted and the Audio Interface, Line outputs
+     *    and Headphone outputs are all OFF (DACMU = 1 Power
+     *    Management registers 1 and 2 are all zeros).
+     */
+    wmcodec_write(RESET, RESET_RESET);    /*Reset*/
 
-        /*
-         * 1. Switch on power supplies.
-         *    By default the WM87551L is in Standby Mode, the DAC is
-         *    digitally muted and the Audio Interface, Line outputs
-         *    and Headphone outputs are all OFF (DACMU = 1 Power
-         *    Management registers 1 and 2 are all zeros).
-         */
-        wmcodec_write(RESET, RESET_RESET);    /*Reset*/
+     /* 2. Enable Vmid and VREF. */
+    wmcodec_write(PWRMGMT1, PWRMGMT1_VREF | PWRMGMT1_VMIDSEL_5K);
 
-         /* 2. Enable Vmid and VREF. */
-        wmcodec_write(PWRMGMT1, PWRMGMT1_VREF | PWRMGMT1_VMIDSEL_500K);
+    /* BCLKINV=0(Dont invert BCLK) MS=1(Enable Master) LRSWAP=0 LRP=0 */
+    /* IWL=00(16 bit) FORMAT=10(I2S format) */
+    wmcodec_write(AINTFCE, AINTFCE_MS | AINTFCE_WL_16 |
+                  AINTFCE_FORMAT_I2S);
+}
 
-        /* From app notes: allow Vref to stabilize to reduce clicks */
-        sleep(HZ/2);
+/* Enable DACs and audio output after a short delay */
+void audiohw_postinit(void)
+{
+    /* From app notes: allow Vref to stabilize to reduce clicks */
+    sleep(HZ);
 
-         /* 3. Enable DACs as required. */
-        wmcodec_write(PWRMGMT2, PWRMGMT2_DACL | PWRMGMT2_DACR);
-    
-         /* 4. Enable line and / or headphone output buffers as required. */
-        wmcodec_write(PWRMGMT2, PWRMGMT2_DACL | PWRMGMT2_DACR |
-                      PWRMGMT2_LOUT1 | PWRMGMT2_ROUT1 | PWRMGMT2_LOUT2 |
-                      PWRMGMT2_ROUT2);
-    
-        /* BCLKINV=0(Dont invert BCLK) MS=1(Enable Master) LRSWAP=0 LRP=0 */
-        /* IWL=00(16 bit) FORMAT=10(I2S format) */
-        wmcodec_write(AINTFCE, AINTFCE_MS | AINTFCE_WL_16 |
-                      AINTFCE_FORMAT_I2S);
+     /* 3. Enable DACs as required. */
+    wmcodec_write(PWRMGMT2, PWRMGMT2_DACL | PWRMGMT2_DACR);
 
-        /* Keep it quiet */
-        wmcodec_write(LOUT1, LOUT1_BITS | OUTPUT_MUTED);
-        wmcodec_write(ROUT1, ROUT1_BITS | OUTPUT_MUTED);
-        wmcodec_write(LOUT2, LOUT2_BITS | OUTPUT_MUTED);
-        wmcodec_write(ROUT2, ROUT2_BITS | OUTPUT_MUTED);
+     /* 4. Enable line and / or headphone output buffers as required. */
+    wmcodec_write(PWRMGMT2, PWRMGMT2_DACL | PWRMGMT2_DACR |
+                  PWRMGMT2_LOUT1 | PWRMGMT2_ROUT1 | PWRMGMT2_LOUT2 |
+                  PWRMGMT2_ROUT2);
 
-        wmcodec_write(LEFTMIX1, LEFTMIX1_LD2LO | LEFTMIX1_LI2LO_DEFAULT);
-        wmcodec_write(RIGHTMIX2, RIGHTMIX2_RD2RO | RIGHTMIX2_RI2RO_DEFAULT);
-    }
+    wmcodec_write(LEFTMIX1, LEFTMIX1_LD2LO | LEFTMIX1_LI2LO_DEFAULT);
+    wmcodec_write(RIGHTMIX2, RIGHTMIX2_RD2RO | RIGHTMIX2_RI2RO_DEFAULT);
 
-    audiohw_mute(!enable);
+    audiohw_mute(false);
 }
 
 int audiohw_set_master_vol(int vol_l, int vol_r)

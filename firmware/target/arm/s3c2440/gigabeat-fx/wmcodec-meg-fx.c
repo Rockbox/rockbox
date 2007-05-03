@@ -23,33 +23,14 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "lcd.h"
 #include "cpu.h"
 #include "kernel.h"
-#include "thread.h"
-#include "power.h"
-#include "debug.h"
-#include "system.h"
-#include "sprintf.h"
-#include "button.h"
-#include "string.h"
-#include "file.h"
-#include "buffer.h"
-#include "audio.h"
+#include "sound.h"
 #include "i2c.h"
 #include "i2c-meg-fx.h"
-/*
- * Reset the I2S BIT.FORMAT I2S, 16bit, FIFO.FORMAT 32bit
- */
-void i2s_reset(void)
-{
-}
 
-/*
- * Initialise the WM8975 for playback via headphone and line out.
- * Note, I'm using the WM8750 datasheet as its apparently close.
- */
-int audiohw_init(void) {
+int audiohw_init(void)
+{
     /* reset I2C */
     i2c_init();
     
@@ -58,11 +39,9 @@ int audiohw_init(void) {
     GPCCON |= (1 << 10);
     GPCDAT |= (1 << 5);
 
-    return 0;
-}
+    audiohw_preinit();
 
-void audiohw_postinit(void)
-{
+    return 0;
 }
 
 void wmcodec_write(int reg, int data)
