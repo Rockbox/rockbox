@@ -58,38 +58,11 @@ static off_t filesize(int fd) {
 #define MAX_SECTOR_SIZE 2048
 #define SECTOR_SIZE 512
 
-unsigned short static inline le2ushort(unsigned char* buf)
-{
-   unsigned short res = (buf[1] << 8) | buf[0];
-
-   return res;
-}
-
 int static inline le2int(unsigned char* buf)
 {
    int32_t res = (buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8) | buf[0];
 
    return res;
-}
-
-int static inline be2int(unsigned char* buf)
-{
-   int32_t res = (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
-
-   return res;
-}
-
-int static inline getint16le(char* buf)
-{
-   int16_t res = (buf[1] << 8) | buf[0];
-
-   return res;
-}
-
-void static inline short2le(unsigned short val, unsigned char* addr)
-{
-    addr[0] = val & 0xFF;
-    addr[1] = (val >> 8) & 0xff;
 }
 
 void static inline int2le(unsigned int val, unsigned char* addr)
@@ -99,15 +72,6 @@ void static inline int2le(unsigned int val, unsigned char* addr)
     addr[2] = (val >> 16) & 0xff;
     addr[3] = (val >> 24) & 0xff;
 }
-
-void int2be(unsigned int val, unsigned char* addr)
-{
-    addr[0] = (val >> 24) & 0xff;
-    addr[1] = (val >> 16) & 0xff;
-    addr[2] = (val >> 8) & 0xff;
-    addr[3] = val & 0xFF;
-}
-
 
 #define BYTES2INT32(array,pos)\
     ((long)array[pos] | ((long)array[pos+1] << 8 ) |\
