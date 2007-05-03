@@ -48,7 +48,7 @@
         %fbk
 %?fv<%xdl|%xdm>
 %?pv<%xdx|%xdy|%xdz|%xdA|%xdB|%xdC|%xdD|%xdE|%xdF|%xdG>
-%?bp<%xdM|%ac%t0.25%?bl<%xdH|%xdI|%xdJ|%xdK|%xdL>;%ac%t0.25%?bl<|%xdI|%xdJ|%xdK|%xdL>;%ac%t0.25%?bl<%xdH||%xdJ|%xdK|%xdL>;%ac%t0.25%?bl<||%xdJ|%xdK|%xdL>>
+%t0.2%?bp<%xdM|%?bl<%xdH|%xdI|%xdJ|%xdK|%xdL>>;%t0.2%?bp<%xdM|%?bl<|%xdI|%xdJ|%xdK|%xdL>>;%t0.2%?bp<%xdM|%?bl<%xdH||%xdJ|%xdK|%xdL>>;%t0.2%?bp<%xdM|%?bl<||%xdJ|%xdK|%xdL>>
 %?mm<|%xdn|%xdo|%xdp>
 %?mp<%xdq|%xdr|%xds|%xdt|%xdu>
 %?ps<%xdN|>
