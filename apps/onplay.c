@@ -380,7 +380,8 @@ static int treeplaylist_callback(int action,
             if (this_item == &tree_playlist_menu)
             {
                 if (((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO) ||
-                          (selected_file_attr & ATTR_DIRECTORY))
+                    ((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_M3U)||
+                     (selected_file_attr & ATTR_DIRECTORY))
                 {
                     return action;
                 }
@@ -405,7 +406,9 @@ static int treeplaylist_callback(int action,
                     return action;
                 }
                 else if ((this_item == &i_shuf_pl_item) && 
-                        (selected_file_attr & ATTR_DIRECTORY))
+                        ((selected_file_attr & ATTR_DIRECTORY) ||
+                        ((selected_file_attr & FILE_ATTR_MASK) ==
+                            FILE_ATTR_M3U)))
                 {
                     return action;
                 }
