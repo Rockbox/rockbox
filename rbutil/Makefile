@@ -11,8 +11,8 @@
 
 CXX=$(shell $(PREFIX)wx-config --cxx)
 INC =
-CFLAGS = -Wall -Wundef
-OBJS=rbutil.o rbutilApp.o rbutilFrm.o rbutilCtrls.o install_dialogs.o bootloaders.o installlog.o ipodpatcher/ipodpatcher.o ipodpatcher/ipodio-posix.o irivertools.o md5sum.o
+CFLAGS = -Wall -Wundef -DRBUTIL
+OBJS=rbutil.o rbutilApp.o rbutilFrm.o rbutilCtrls.o install_dialogs.o bootloaders.o installlog.o ipodpatcher/ipodpatcher.o ipodpatcher/ipodio-posix.o sansapatcher/sansapatcher.o sansapatcher/sansaio-posix.o irivertools.o md5sum.o
 
 # Install into /usr/local by default
 ifndef DESTDIR

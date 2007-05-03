@@ -71,7 +71,7 @@ void rbutilFrm::CreateGUIControls(void)
 	wxBoxSizer* WxBoxSizer1 = new wxBoxSizer(wxVERTICAL);
 	this->SetSizer(WxBoxSizer1);
 	this->SetAutoLayout(TRUE);
-	
+
 	wxPanel* mainPanel = new wxPanel(this,wxID_ANY);
 	WxBoxSizer1->Add(mainPanel,0,wxALL,0);
 	wxBoxSizer* WxBoxSizer0 = new wxBoxSizer(wxVERTICAL);
@@ -87,24 +87,24 @@ void rbutilFrm::CreateGUIControls(void)
 	myDeviceSelector->setDefault();
 	WxBoxSizer0->Add(myDeviceSelector,0,wxALL,5);
 
-   wxNotebook* tabwindow = new wxNotebook(mainPanel,wxID_ANY); 
+   wxNotebook* tabwindow = new wxNotebook(mainPanel,wxID_ANY);
    WxBoxSizer0->Add(tabwindow,0,wxALL,5);
-     
+
    wxPanel* installpage = new wxPanel(tabwindow,wxID_ANY);
    wxPanel* themepage = new wxPanel(tabwindow,wxID_ANY);
    wxPanel* uninstallpage = new wxPanel(tabwindow,wxID_ANY);
    tabwindow->AddPage(installpage,wxT("Installation"),true);
    tabwindow->AddPage(themepage,wxT("Themes"));
    tabwindow->AddPage(uninstallpage,wxT("Uninstallation"));
-   
+
 	/*********************
 	Install Page
-	***********************/   
-   
+	***********************/
+
 	wxBoxSizer* WxBoxSizer2 = new wxBoxSizer(wxVERTICAL);
 	installpage->SetSizer(WxBoxSizer2);
 	installpage->SetAutoLayout(TRUE);
-	
+
 	wxStaticBox* WxStaticBoxSizer3_StaticBoxObj = new wxStaticBox(installpage,
         wxID_ANY, wxT("Please choose an option"));
 	wxStaticBoxSizer* WxStaticBoxSizer3 =
@@ -153,13 +153,13 @@ void rbutilFrm::CreateGUIControls(void)
 	wxBoxSizer* WxBoxSizer3 = new wxBoxSizer(wxVERTICAL);
 	themepage->SetSizer(WxBoxSizer3);
 	themepage->SetAutoLayout(TRUE);
-	
+
 	wxStaticBox* WxStaticBoxSizer4_StaticBoxObj = new wxStaticBox(themepage,
         wxID_ANY, wxT("Please choose an option"));
 	wxStaticBoxSizer* WxStaticBoxSizer4 =
         new wxStaticBoxSizer(WxStaticBoxSizer4_StaticBoxObj,wxHORIZONTAL);
 	WxBoxSizer3->Add(WxStaticBoxSizer4,1,wxALIGN_CENTER_HORIZONTAL | wxALL, 5);
-	
+
 	wxFlexGridSizer* WxFlexGridSizer2 = new wxFlexGridSizer(2,2,0,0);
 	WxStaticBoxSizer4->Add(WxFlexGridSizer2,0,wxGROW | wxALL,0);
 
@@ -193,24 +193,24 @@ void rbutilFrm::CreateGUIControls(void)
         wxT("Install more Themes for Rockbox.\n\n"));
 	WxFlexGridSizer2->Add(WxStaticText6, 0,
         wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL,5);
-        
+
    /* ********************+
 	Uninstall Page
 	***********************/
 
 	wxBoxSizer* WxBoxSizer4 = new wxBoxSizer(wxVERTICAL);
 	uninstallpage->SetSizer(WxBoxSizer4);
-	uninstallpage->SetAutoLayout(TRUE);	
-	
+	uninstallpage->SetAutoLayout(TRUE);
+
 	wxStaticBox* WxStaticBoxSizer5_StaticBoxObj = new wxStaticBox(uninstallpage,
         wxID_ANY, wxT("Please choose an option"));
 	wxStaticBoxSizer* WxStaticBoxSizer5 =
         new wxStaticBoxSizer(WxStaticBoxSizer5_StaticBoxObj,wxHORIZONTAL);
 	WxBoxSizer4->Add(WxStaticBoxSizer5,1,wxALIGN_CENTER_HORIZONTAL | wxALL, 5);
-	
+
 	wxFlexGridSizer* WxFlexGridSizer3 = new wxFlexGridSizer(2,2,0,0);
 	WxStaticBoxSizer5->Add(WxFlexGridSizer3,0,wxGROW | wxALL,0);
-        
+
 	wxBitmap WxBitmapButton2_BITMAP (uninstall_3d_xpm);
 	WxBitmapButton2 = new wxBitmapButton(uninstallpage, ID_REMOVE_BTN,
         WxBitmapButton2_BITMAP, wxPoint(0,0), wxSize(64,54),
@@ -270,7 +270,7 @@ void rbutilFrm::CreateGUIControls(void)
 	wxIcon rbutilFrm_ICON (rbutilFrm_XPM);
 	this->SetIcon(rbutilFrm_XPM);
 	this->SetToolTip(wxT("Install Rockbox"));
-	
+
     wxLogVerbose(wxT("=== end rbutilFrm::CreateGUIControls"));
 }
 
@@ -374,6 +374,17 @@ void rbutilFrm::OnBootloaderRemoveBtn(wxCommandEvent& event)
                 MESG_DIALOG(wxT("The Uninstallation failed.") );
             }
         }
+        if(bootloadermethod == wxT("sansapatcher"))
+        {
+            if(sansapatcher(BOOTLOADER_REM,gv->plat_bootloadername[index]))
+            {
+                MESG_DIALOG(wxT("The Bootloader has been uninstalled.") );
+            }
+            else
+            {
+                MESG_DIALOG(wxT("The Uninstallation failed.") );
+            }
+        }
         else if(bootloadermethod== wxT("gigabeatf"))
         {
 
@@ -438,6 +449,18 @@ void rbutilFrm::OnBootloaderBtn(wxCommandEvent& event)
             {
                 MESG_DIALOG(wxT("The installation has failed.") );
             }
+        }
+        if(bootloadermethod == wxT("sansapatcher"))
+        {
+            if(sansapatcher(BOOTLOADER_ADD,gv->plat_bootloadername[index]))
+            {
+               MESG_DIALOG(wxT("The Bootloader has been installed on your device.") );
+            }
+            else
+            {
+               MESG_DIALOG(wxT("The installation has failed.") );
+            }
+
         }
         else if(bootloadermethod== wxT("gigabeatf"))
         {

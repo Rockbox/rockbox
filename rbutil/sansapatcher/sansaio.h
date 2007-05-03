@@ -38,7 +38,7 @@
 
 #endif
 
-struct partinfo_t {
+struct sansa_partinfo_t {
     unsigned long start; /* first sector (LBA) */
     unsigned long size;  /* number of sectors */
     int type;
@@ -57,7 +57,7 @@ struct sansa_t {
     HANDLE dh;
     char diskname[4096];
     int sector_size;
-    struct partinfo_t pinfo[4];
+    struct sansa_partinfo_t pinfo[4];
     int hasoldbootloader;
     loff_t start;  /* Offset in bytes of firmware partition from start of disk */
 };

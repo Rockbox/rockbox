@@ -28,14 +28,16 @@
 
 #include "sansaio.h"
 #include "sansapatcher.h"
-#include "bootimg.h"
 
+#ifndef RBUTIL
+    #include "bootimg.h"
+#endif
 /* The offset of the MI4 image header in the firmware partition */
 #define PPMI_OFFSET 0x80000
 
 extern int verbose;
 
-/* Windows requires the buffer for disk I/O to be aligned in memory on a 
+/* Windows requires the buffer for disk I/O to be aligned in memory on a
    multiple of the disk volume size - so we use a single global variable
    and initialise it with sansa_alloc_buf() in main().
 */
@@ -369,8 +371,8 @@ int is_e200(struct sansa_t* sansa)
     sansa->hasoldbootloader = 0;
     if (memcmp(sectorbuf+0x1f8,"RBBL",4)==0) {
         /* Look for an original firmware after the first image */
-        if (sansa_seek_and_read(sansa, 
-                                sansa->start + PPMI_OFFSET + 0x200 + ppmi_length, 
+        if (sansa_seek_and_read(sansa,
+                                sansa->start + PPMI_OFFSET + 0x200 + ppmi_length,
                                 sectorbuf, 512) < 0) {
             return -7;
         }
@@ -461,14 +463,14 @@ static int load_original_firmware(struct sansa_t* sansa, unsigned char* buf, str
 
     if (get_mi4header(buf,mi4header)==0) {
         /* We have a valid MI4 file after a bootloader, so we use this. */
-        if ((n = sansa_seek_and_read(sansa, 
+        if ((n = sansa_seek_and_read(sansa,
                                      sansa->start + PPMI_OFFSET + 0x200 + ppmi_length,
                                      buf, mi4header->mi4size)) < 0) {
             return -1;
         }
     } else {
         /* No valid MI4 file, so read the first image. */
-        if ((n = sansa_seek_and_read(sansa, 
+        if ((n = sansa_seek_and_read(sansa,
                                      sansa->start + PPMI_OFFSET + 0x200,
                                      buf, ppmi_length)) < 0) {
             return -1;
@@ -571,7 +573,9 @@ int sansa_add_bootloader(struct sansa_t* sansa, char* filename, int type)
 
         bl_length = filesize(infile);
     } else {
+        #ifndef RBUTIL
         bl_length = LEN_bootimg;
+        #endif
     }
 
     /* Create PPMI header */
@@ -595,7 +599,9 @@ int sansa_add_bootloader(struct sansa_t* sansa, char* filename, int type)
             return -1;
         }
     } else {
+        #ifndef RBUTIL
         memcpy(sectorbuf+0x200,bootimg,LEN_bootimg);
+        #endif
     }
 
     /* Load original firmware from Sansa to the space after the bootloader */

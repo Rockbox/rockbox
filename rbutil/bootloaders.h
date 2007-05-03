@@ -28,11 +28,15 @@
 extern "C" {
     // Ipodpatcher
     #include "ipodpatcher/ipodpatcher.h"
+    // Sansapatcher
+    #include "sansapatcher/sansapatcher.h"
 };
 
 
 bool initIpodpatcher();
+bool initSansaPatcher();
 bool ipodpatcher(int mode,wxString bootloadername);
+bool sansapatcher(int mode,wxString bootloadername);
 bool gigabeatf(int mode,wxString bootloadername,wxString deviceDir);
 bool iaudiox5(int mode,wxString bootloadername,wxString deviceDir);
 bool fwpatcher(int mode,wxString bootloadername,wxString deviceDir,wxString firmware);

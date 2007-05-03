@@ -80,10 +80,12 @@ bool rbutilFrmApp::OnInit()
 
     rbutilFrm *myFrame = new  rbutilFrm(NULL);
     SetTopWindow(myFrame);
-	     
+
     myFrame->Show(TRUE);
 
     initIpodpatcher();             // reserve mem for ipodpatcher
+    initSansaPatcher();            // reserve mem for sansapatcher
+
     wxInitAllImageHandlers();       //init Image handlers
 
     wxLogVerbose(wxT("=== end rbUtilFrmApp::OnInit()"));

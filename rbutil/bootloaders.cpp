@@ -26,8 +26,7 @@
 #include "installlog.h"
 
 
-// for ipodpatcher
-int verbose = 0;
+int verbose =0;
 // reserves memory for ipodpatcher
 bool initIpodpatcher()
 {
@@ -159,6 +158,108 @@ bool ipodpatcher(int mode,wxString bootloadername)
     }
 
     ipod_close(&ipod);
+    return true;
+}
+
+// reserves memory for sansapatcher
+bool initSansaPatcher()
+{
+      if (sansa_alloc_buffer(&sectorbuf,BUFFER_SIZE) < 0) return true;
+      else return false;
+}
+
+
+// sansainstallation
+bool sansapatcher(int mode,wxString bootloadername)
+{
+    wxString src,dest,buf;
+
+    struct sansa_t sansa;
+
+    int n = sansa_scan(&sansa);
+    if (n == 0)
+    {
+         ERR_DIALOG(wxT("[ERR]  No Sansa found."), wxT("Scanning for Sansa"));
+         return false;
+    }
+    if (n > 1)
+    {
+         ERR_DIALOG(wxT("[ERR]  to many Sansa found."), wxT("Scanning for Sansa"));
+         return false;
+    }
+
+      // downloading files
+    if(mode == BOOTLOADER_ADD)
+    {
+        src.Printf(wxT("%s/sandisk-sansa/e200/%s"),gv->bootloader_url.c_str(),bootloadername.c_str());
+        dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s"),
+                    gv->stdpaths->GetUserDataDir().c_str(),bootloadername.c_str());
+        if ( DownloadURL(src, dest) )
+        {
+            wxRemoveFile(dest);
+            buf.Printf(wxT("Unable to download %s"), src.c_str() );
+            ERR_DIALOG(buf, wxT("Download"));
+            return false;
+        }
+    }
+
+    if (sansa_open(&sansa, 0) < 0)
+    {
+       ERR_DIALOG(wxT("[ERR] could not open sansa"), wxT("open Sansa"));
+       return false;
+    }
+
+    if (sansa_read_partinfo(&sansa,0) < 0)
+    {
+       ERR_DIALOG(wxT("[ERR] could not read partitiontable"), wxT("reading partitiontable"));
+       return false;
+    }
+
+    int i = is_e200(&sansa);
+    if (i < 0) {
+        ERR_DIALOG(wxT("[ERR]  Disk is not an E200 (%d), aborting.\n"), wxT("Checking Disk"));
+        return false;
+    }
+
+    if (sansa.hasoldbootloader)
+    {
+        ERR_DIALOG(wxT("[ERR]  ************************************************************************\n"
+                      "[ERR]  *** OLD ROCKBOX INSTALLATION DETECTED, ABORTING.\n"
+                      "[ERR]  *** You must reinstall the original Sansa firmware before running\n"
+                      "[ERR]  *** sansapatcher for the first time.\n"
+                      "[ERR]  *** See http://www.rockbox.org/twiki/bin/view/Main/SansaE200Install\n"
+                      "[ERR]  ************************************************************************\n"),wxT("Checking Disk"));
+        return false;
+    }
+
+    if(mode == BOOTLOADER_ADD)
+    {
+        if (sansa_reopen_rw(&sansa) < 0) {
+              ERR_DIALOG(wxT("[ERR] Could not open Sansa in RW mode"), wxT("Bootloader add"));
+          return false;
+        }
+
+        if (sansa_add_bootloader(&sansa, (char*)dest.c_str(), FILETYPE_MI4)==0) {
+
+        } else {
+           ERR_DIALOG(wxT("[ERR] failed to add Bootloader"), wxT("Bootloader add"));
+        }
+
+    }
+    else if(mode == BOOTLOADER_REM)
+    {
+         if (sansa_reopen_rw(&sansa) < 0) {
+             ERR_DIALOG(wxT("[ERR] Could not open Sansa in RW mode"), wxT("Bootloader Remove"));
+         }
+
+         if (sansa_delete_bootloader(&sansa)==0) {
+
+         } else {
+             ERR_DIALOG(wxT("[ERR] failed to remove Bootloader"), wxT("Bootloader remove"));
+         }
+    }
+
+    sansa_close(&sansa);
     return true;
 }
 

@@ -144,7 +144,7 @@ void ThemeCtrl::Init()
 
 void ThemeCtrl::setDevice(wxString device)
 {
-  
+
     int index = gv->plat_id.Index(device);
     if(index  == -1) return;
 
@@ -210,13 +210,13 @@ void ThemeCtrl::setDevice(wxString device)
 
         m_themeList->Append(m_Themes.Last());
     }
-    
+
     this->GetSizer()->Layout();
     this->GetSizer()->Fit(this);
     this->GetSizer()->SetSizeHints(this);
     m_parent->GetSizer()->Layout();
     m_parent->GetSizer()->Fit(m_parent);
-    m_parent->GetSizer()->SetSizeHints(m_parent);   
+    m_parent->GetSizer()->SetSizeHints(m_parent);
 }
 
 
@@ -265,10 +265,10 @@ void ThemeCtrl::OnThemesLst(wxCommandEvent& event)
     this->GetSizer()->Layout();
     this->GetSizer()->Fit(this);
     this->GetSizer()->SetSizeHints(this);
-    
+
     m_parent->GetSizer()->Layout();
     m_parent->GetSizer()->Fit(m_parent);
-    m_parent->GetSizer()->SetSizeHints(m_parent);  
+    m_parent->GetSizer()->SetSizeHints(m_parent);
 
 }
 
@@ -369,7 +369,7 @@ void DeviceSelectorCtrl::CreateControls()
 
     m_deviceCbx = new wxComboBox(this, ID_DEVICE_CBX,wxT(""),
             wxDefaultPosition,wxDefaultSize,gv->plat_name,wxCB_READONLY);
-   
+
     m_deviceCbx->SetToolTip(wxT("Select your Device."));
     m_deviceCbx->SetHelpText(wxT("Select your Device."));
 
@@ -413,23 +413,38 @@ void DeviceSelectorCtrl::OnAutoDetect(wxCommandEvent& event)
     int n = ipod_scan(&ipod);
     if(n == 1)
     {
-    	  wxString temp(ipod.targetname,wxConvUTF8); 	
-        int index = gv->plat_bootloadername.Index(temp);
+    	wxString temp(ipod.targetname,wxConvUTF8);
+        int index = gv->plat_bootloadername.Index(temp);   // use the bootloader names..
         m_deviceCbx->SetValue(gv->plat_name[index]);
         gv->curplat=gv->plat_id[index];
+        return;
     }
     else if (n > 1)
     {
-        WARN_DIALOG(wxT("More then one device Ipod detected, please connect only One"),
+        WARN_DIALOG(wxT("More then one Ipod device detected, please connect only One"),
                 wxT("Detecting a Device"));
         return;
     }
-    else
+
+    struct sansa_t sansa;
+    int n2 = sansa_scan(&sansa);
+    if(n2==1)
     {
-         WARN_DIALOG(wxT("No Device detected. (This function currently only works for Ipods)."),
+        int index = gv->plat_id.Index(wxT("sansae200"));
+        m_deviceCbx->SetValue(gv->plat_name[index]);
+        gv->curplat=gv->plat_id[index];
+        return;
+    }
+    else if (n2 > 1)
+    {
+        WARN_DIALOG(wxT("More then one Sansa device detected, please connect only One"),
                 wxT("Detecting a Device"));
         return;
     }
+
+    WARN_DIALOG(wxT("No Device detected. (This function currently only works for Ipods and Sansas)."),
+                wxT("Detecting a Device"));
+    return;
 
 }
 

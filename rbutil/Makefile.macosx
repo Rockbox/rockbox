@@ -25,7 +25,7 @@ LDFLAGS_GUI =
 CXX = g++
 CXXFLAGS = -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386 -Wall -Wundef -Wno-ctor-dtor-privacy -O2 -fno-strict-aliasing -fno-common
 CPPFLAGS = -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -I${wx_top_builddir}/lib/wx/include/mac-ansi-release-static-2.8 -I${top_srcdir}/include -fpascal-strings -I${top_srcdir}/src/mac/carbon/morefilex -I/Developer/Headers/FlatCarbon
-RBUTIL_CFLAGS = $(CXXFLAGS) -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -I${wx_top_builddir}/lib/wx/include/mac-ansi-release-static-2.8 -I${top_srcdir}/include -fpascal-strings -I${top_srcdir}/src/mac/carbon/morefilex -I/Developer/Headers/FlatCarbon
+RBUTIL_CFLAGS = $(CXXFLAGS) -DRBUTIL -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -I${wx_top_builddir}/lib/wx/include/mac-ansi-release-static-2.8 -I${top_srcdir}/include -fpascal-strings -I${top_srcdir}/src/mac/carbon/morefilex -I/Developer/Headers/FlatCarbon
 LDFLAGS = -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386   -framework QuickTime -framework IOKit -framework Carbon -framework Cocoa -framework System 
 WX_LIB_FLAVOUR = 
 TOOLKIT = MAC
@@ -51,6 +51,7 @@ RBUTIL_OBJECTS =  \
 	$(__rbutil_os2_lib_res) \
         rbutil.o rbutilApp.o rbutilFrm.o install_dialogs.o bootloaders.o installlog.o \
         rbutilCtrls.o ipodpatcher/ipodpatcher.o ipodpatcher/ipodio-posix.o \
+        sansapatcher/sansapatcher.o sansapatcher/sansaio-posix.o \
         md5sum.o irivertools.o \
 	$(__rbutil___win32rc)
 

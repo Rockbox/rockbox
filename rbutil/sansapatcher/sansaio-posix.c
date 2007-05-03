@@ -42,10 +42,12 @@
 
 #include "sansaio.h"
 
+#ifndef RBUTIL
 void print_error(char* msg)
 {
     perror(msg);
 }
+#endif
 
 int sansa_open(struct sansa_t* sansa, int silent)
 {
