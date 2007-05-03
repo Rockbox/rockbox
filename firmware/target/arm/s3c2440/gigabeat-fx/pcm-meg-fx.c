@@ -41,13 +41,11 @@ static int sr_ctrl = GIGABEAT_44100HZ;
 /* Setup for the DMA controller */
 #define DMA_CONTROL_SETUP  ((1<<31) | (1<<29) | (1<<23) | (1<<22) | (1<<20))
 
-unsigned short * p;
-size_t p_size;
-
 /* DMA count has hit zero - no more data */
 /* Get more data from the callback and top off the FIFO */
-//void fiq(void) __attribute__ ((interrupt ("naked")));
-void fiq(void) ICODE_ATTR __attribute__ ((interrupt ("FIQ")));
+/* Uses explicitly coded prologue/epilogue code to get around complier bugs
+   in order to be able to use the stack */
+void fiq_handler(void) __attribute__((naked));
 
 static void _pcm_apply_settings(void)
 {
@@ -98,13 +96,13 @@ void pcm_postinit(void)
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
+    addr = (void *)((unsigned long)addr & ~3); /* Align data */
+    size &= ~3; /* Size must be multiple of 4 */
+
     /* sanity check: bad pointer or too small file */
     if (NULL == addr || size <= IIS_FIFO_SIZE) return;
 
     disable_fiq();
-
-    p = (unsigned short *)addr;
-    p_size = size;
 
     /* Enable the IIS clock */
     CLKCON |= (1<<17);
@@ -127,10 +125,10 @@ void pcm_play_dma_start(const void *addr, size_t size)
     /* How many transfers to make - we transfer half-word at a time = 2 bytes */
     /* DMA control: CURR_TC int, single service mode, I2SSDO int, HW trig */
     /*     no auto-reload, half-word (16bit) */
-    DCON2 = DMA_CONTROL_SETUP | (p_size / 2);
+    DCON2 = DMA_CONTROL_SETUP | (size / 2);
 
     /* set DMA source and options */
-    DISRC2 = (int)p + 0x30000000;
+    DISRC2 = (unsigned long)addr + 0x30000000;
     DISRCC2 = 0x00;  /* memory is on AHB bus, increment addresses */
 
     /* clear pending DMA interrupt */
@@ -139,8 +137,6 @@ void pcm_play_dma_start(const void *addr, size_t size)
     pcm_playing = true;
 
     _pcm_apply_settings();
-
-    set_fiq_handler(fiq);
 
     /* unmask the DMA interrupt */
     INTMSK &= ~(1<<19);
@@ -181,41 +177,52 @@ static void pcm_play_dma_stop_fiq(void)
     CLKCON &= ~(1<<17);
 }
 
-void fiq(void)
+void fiq_handler(void)
 {
+    /* r0-r7 are probably not all used by GCC but there's no way to know
+       otherwise this whole thing must be assembly */
+    asm volatile ("stmfd sp!, {r0-r7, ip, lr} \n"   /* Store context */
+                  "sub   sp, sp, #8           \n"); /* Reserve stack */
+    register pcm_more_callback_type get_more;   /* No stack for this */
+    unsigned char                  *next_start; /* sp + #0 */
+    size_t                          next_size;  /* sp + #4 */
+
     /* clear any pending interrupt */
     SRCPND = (1<<19);
 
     /* Buffer empty.  Try to get more. */
-    if (pcm_callback_for_more)
+    get_more = pcm_callback_for_more;
+    if (get_more == NULL)
     {
-        pcm_callback_for_more((unsigned char**)&p, &p_size);
-    }
-    else
-    {
-        /* callback func is missing? */
+        /* Callback missing */
         pcm_play_dma_stop_fiq();
-        return;
+        goto fiq_exit;
     }
 
-    if (p_size)
-    {
-        /* Flush any pending cache writes */
-        clean_dcache_range(p, p_size);
+    next_size = 0;
+    get_more(&next_start, &next_size);
 
-        /* set the new DMA values */
-        DCON2 = DMA_CONTROL_SETUP | (p_size >> 1);
-        DISRC2 = (int)p + 0x30000000;
-
-        /* Re-Activate the channel */
-        DMASKTRIG2 = 0x2;
-    }
-    else
+    if (next_size == 0)
     {
         /* No more DMA to do */
         pcm_play_dma_stop_fiq();
+        goto fiq_exit;
     }
 
+    /* Flush any pending cache writes */
+    clean_dcache_range(next_start, next_size);
+
+    /* set the new DMA values */
+    DCON2 = DMA_CONTROL_SETUP | (next_size >> 1);
+    DISRC2 = (unsigned long)next_start + 0x30000000;
+
+    /* Re-Activate the channel */
+    DMASKTRIG2 = 0x2;
+
+fiq_exit:
+    asm volatile("add   sp, sp, #8           \n"   /* Cleanup stack   */
+                 "ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */
+                 "subs  pc, lr, #4           \n"); /* Return from FIQ */
 }
 
 /* Disconnect the DMA and wait for the FIFO to clear */

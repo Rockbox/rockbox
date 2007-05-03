@@ -193,14 +193,6 @@ prefetch_abort_handler:
     mov    r1, #1
     b      UIE
 
-fiq_handler:
-    @ Branch straight to FIQ handler in pcm_playback.c. This also handles the
-    @ the correct return sequence.
-    stmfd sp!, {r0-r7, r12, lr}
-    bl    fiq
-    ldmfd sp!, {r0-r7, r12, lr}
-    subs pc, lr, #4
-
 data_abort_handler:
     sub    r0, lr, #8 
     mov    r1, #2
