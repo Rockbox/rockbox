@@ -42,7 +42,7 @@ extern int verbose;
    and initialise it with sansa_alloc_buf() in main().
 */
 
-unsigned char* sectorbuf;
+extern unsigned char* sectorbuf;
 
 static off_t filesize(int fd) {
     struct stat buf;

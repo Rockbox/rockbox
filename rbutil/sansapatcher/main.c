@@ -32,6 +32,8 @@
 
 #define VERSION "0.2 with r12896 bootloader"
 
+unsigned char* sectorbuf;
+
 int verbose = 0;
 
 enum {
