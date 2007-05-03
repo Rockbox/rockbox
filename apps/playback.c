@@ -695,12 +695,9 @@ void audio_play(long offset)
 void audio_stop(void)
 {
     /* Stop playback */
-    LOGFQUEUE("audio > audio Q_AUDIO_STOP");
-    queue_post(&audio_queue, Q_AUDIO_STOP, 0);
-
+    LOGFQUEUE("audio >| audio Q_AUDIO_STOP");
     /* Don't return until playback has actually stopped */
-    while(playing || !queue_empty(&audio_queue))
-        yield();
+    queue_send(&audio_queue, Q_AUDIO_STOP, 0);
 }
 
 void audio_pause(void)
@@ -3644,7 +3641,8 @@ static void audio_thread(void)
 
             case Q_AUDIO_STOP:
                 LOGFQUEUE("audio < Q_AUDIO_STOP");
-                audio_stop_playback();
+                if (playing)
+                    audio_stop_playback();
                 if (ev.data != 0)
                     queue_clear(&audio_queue);
                 break ;
