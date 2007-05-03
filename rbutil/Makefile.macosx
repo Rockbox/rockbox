@@ -49,8 +49,8 @@ RBUTIL_CXXFLAGS = -D__WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p) \
 	-I$(srcdir) $(__DLLFLAG_p) $(CPPFLAGS) $(CXXFLAGS)
 RBUTIL_OBJECTS =  \
 	$(__rbutil_os2_lib_res) \
-        rbutil.o rbutilApp.o rbutilFrm.o wizard_pages.o bootloaders.o installlog.o \
-        ipodpatcher/ipodpatcher.o ipodpatcher/ipodio-posix.o \
+        rbutil.o rbutilApp.o rbutilFrm.o install_dialogs.o bootloaders.o installlog.o \
+        rbutilCtrls.o ipodpatcher/ipodpatcher.o ipodpatcher/ipodio-posix.o \
         md5sum.o irivertools.o \
 	$(__rbutil___win32rc)
 
