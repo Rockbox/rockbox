@@ -21,7 +21,7 @@
 #define PCM_SAMPR_H
 
 #ifndef HW_SAMPR_CAPS
-#define HW_SAMPR_CAPS 0 /* if not defined, we define to 0 */
+#define HW_SAMPR_CAPS SAMPR_CAP_44 /* if not defined, default to 44100 */
 #endif
 
 /* These must be macros for comparison with SAMPR_CAP_* flags by the
@@ -117,9 +117,13 @@ enum hw_freq_indexes
 #define HW_HAVE_48_(...)
 #endif
 /* 44100 */
+#if (HW_SAMPR_CAPS & SAMPR_CAP_44)
     HW_FREQ_44,
 #define HW_HAVE_44
 #define HW_HAVE_44_(...) __VA_ARGS__
+#else
+#define HW_HAVE_44_(...)
+#endif
 /* 32000 */
 #if (HW_SAMPR_CAPS & SAMPR_CAP_32)
     HW_FREQ_32,
