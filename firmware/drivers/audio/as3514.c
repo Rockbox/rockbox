@@ -28,7 +28,7 @@
 #include "i2c-pp.h"
 
 /* Shadow registers */
-int as3514_regs[0x1D];
+int as3514_regs[0x1E]; /* last audio register: PLLMODE 0x1d */
 
 /*
  * little helper method to set register values.
@@ -41,7 +41,15 @@ static void as3514_write(int reg, int value)
     {
         DEBUGF("as3514 error reg=0x%x", reg);
     }
-    as3514_regs[reg] = value;
+
+    if ((unsigned int)reg < sizeof(as3514_regs) / sizeof(int))
+    {
+        as3514_regs[reg] = value;
+    }
+    else
+    {
+        DEBUGF("as3514 error reg=0x%x", reg);
+    }
 }
 
 /* convert tenth of dB volume to master volume register value */
@@ -104,7 +112,7 @@ int audiohw_init(void)
     as3514_write(PLLMODE, 0x04);
 
     /* read all reg values */
-    for (i = 0; i < sizeof(as3514_regs); i++) 
+    for (i = 0; i < sizeof(as3514_regs) / sizeof(int); i++)
     {
         as3514_regs[i] = i2c_readbyte(AS3514_I2C_ADDR, i);
     }
