@@ -25,7 +25,6 @@
 #include "file.h"
 #include "mmu-meg-fx.h"
 
-#define GIGABEAT_8000HZ      (0x02 << 1)
 #define GIGABEAT_11025HZ     (0x19 << 1)
 #define GIGABEAT_22050HZ     (0x1b << 1)
 #define GIGABEAT_44100HZ     (0x11 << 1)
@@ -256,9 +255,6 @@ void pcm_set_frequency(unsigned int frequency)
 {
     switch(frequency)
     {
-        case SAMPR_8:
-            sr_ctrl = GIGABEAT_8000HZ;
-            break;
         case SAMPR_11:
             sr_ctrl = GIGABEAT_11025HZ;
             break;

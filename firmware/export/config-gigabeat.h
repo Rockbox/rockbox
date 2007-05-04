@@ -70,6 +70,9 @@
 
 #define BATTERY_CAPACITY_DEFAULT 2000 /* default battery capacity */
 
+#define HW_SAMPR_CAPS (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | \
+                       SAMPR_CAP_11)
+
 #ifndef SIMULATOR
 
 /* The LCD on a Gigabeat is 240x320 - it is portrait */
@@ -132,8 +135,5 @@
 #define BOOTFILE_EXT "gigabeat"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
-
-#define HW_SAMPR_CAPS (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | \
-                       SAMPR_CAP_11 | SAMPR_CAP_8)
 
 #endif
