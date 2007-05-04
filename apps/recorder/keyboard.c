@@ -71,6 +71,8 @@
 #define KBD_MORSE_INPUT
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
+#define KBD_CURSOR_KEYS
+#define KBD_MODES
 #define KBD_MORSE_INPUT
 #endif
 
