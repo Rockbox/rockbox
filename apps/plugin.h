@@ -110,12 +110,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 53
+#define PLUGIN_API_VERSION 54
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 52
+#define PLUGIN_MIN_API_VERSION 54
 
 /* plugin return codes */
 enum plugin_status {
@@ -404,7 +404,7 @@ struct plugin_api {
     int (*utf8seek)(const unsigned char* utf8, int offset);
 
     /* sound */
-#if CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING)
+#if CONFIG_CODEC == SWCODEC
     int (*sound_default)(int setting);
 #endif
     void (*sound_set)(int setting, int value);
@@ -424,9 +424,7 @@ struct plugin_api {
 #if CONFIG_CODEC == SWCODEC
     const unsigned long *audio_master_sampr_list;
     const unsigned long *hw_freq_sampr;
-#ifndef SIMULATOR
     void (*pcm_apply_settings)(void);
-#endif
     void (*pcm_play_data)(pcm_more_callback_type get_more,
             unsigned char* start, size_t size);
     void (*pcm_play_stop)(void);
@@ -438,7 +436,6 @@ struct plugin_api {
     void (*pcm_calculate_peaks)(int *left, int *right);
 #ifdef HAVE_RECORDING
     const unsigned long *rec_freq_sampr;
-#ifndef SIMULATOR
     void (*pcm_init_recording)(void);
     void (*pcm_close_recording)(void);
     void (*pcm_record_data)(pcm_more_callback_type2 more_ready,
@@ -449,7 +446,6 @@ struct plugin_api {
     void (*audio_set_recording_gain)(int left, int right, int type);
     void (*audio_set_output_source)(int monitor);
     void (*rec_set_source)(int source, unsigned flags);
-#endif
 #endif /* HAVE_RECORDING */
 
 #endif

@@ -198,10 +198,14 @@ void play_waveform(void)
     rb->audio_stop();
     rb->sound_set(SOUND_VOLUME, rb->sound_default(SOUND_VOLUME));
 
+#ifdef HAVE_RECORDING
     /* Select playback */
     rb->rec_set_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
+#endif
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
+#endif
 
     rb->pcm_set_frequency(rb->hw_freq_sampr[freq]);
 
@@ -223,7 +227,9 @@ void play_waveform(void)
     while (rb->pcm_is_playing())
         rb->yield();
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
+#endif
 
     /* restore default - user of apis is responsible for restoring
        default state - normally playback at 44100Hz */

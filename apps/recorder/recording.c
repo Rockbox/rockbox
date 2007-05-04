@@ -2100,6 +2100,12 @@ void audio_set_recording_gain(int left, int right, int type)
     type = type;
 }
 
+void audio_set_output_source(int source)
+{
+    source = source;
+}
+
+
 void audio_record(const char *filename)
 {
     filename = filename;
@@ -2115,19 +2121,6 @@ void audio_pause_recording(void)
 
 void audio_resume_recording(void)
 {
-}
-
-void pcm_calculate_rec_peaks(int *left, int *right)
-{
-    if (left)
-        *left = 0;
-    if (right)
-        *right = 0;
-}
-
-unsigned long pcm_rec_status(void)
-{
-    return 0;
 }
 
 #endif /* #ifdef SIMULATOR */

@@ -309,7 +309,7 @@ static const struct plugin_api rockbox_api = {
     utf8seek,
 
     /* sound */
-#if CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING)
+#if CONFIG_CODEC == SWCODEC
     sound_default,
 #endif
     sound_set,
@@ -329,9 +329,7 @@ static const struct plugin_api rockbox_api = {
 #if CONFIG_CODEC == SWCODEC
     &audio_master_sampr_list[0],
     &hw_freq_sampr[0],
-#ifndef SIMULATOR
     pcm_apply_settings,
-#endif
     pcm_play_data,
     pcm_play_stop,
     pcm_set_frequency,
@@ -342,7 +340,6 @@ static const struct plugin_api rockbox_api = {
     pcm_calculate_peaks,
 #ifdef HAVE_RECORDING
     &rec_freq_sampr[0],
-#ifndef SIMULATOR
     pcm_init_recording,
     pcm_close_recording,
     pcm_record_data,
@@ -352,7 +349,6 @@ static const struct plugin_api rockbox_api = {
     audio_set_recording_gain,
     audio_set_output_source,
     rec_set_source,
-#endif
 #endif /* HAVE_RECORDING */
 
 #endif

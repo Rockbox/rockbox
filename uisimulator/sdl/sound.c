@@ -25,34 +25,71 @@
 #include "debug.h"
 #include "kernel.h"
 #include "sound.h"
+#include "pcm_sampr.h"
 #include "SDL.h"
 
 static bool pcm_playing;
 static bool pcm_paused;
+static int cvt_status = -1;
+static unsigned long pcm_frequency = SAMPR_44;
+static unsigned long pcm_curr_frequency = SAMPR_44;
 
 static Uint8* pcm_data;
 static size_t pcm_data_size;
+static size_t pcm_sample_bytes;
+static size_t pcm_channel_bytes;
+
+struct pcm_udata
+{
+    Uint8 *stream;
+    Uint32 num_in;
+    Uint32 num_out;
+    FILE  *debug;
+} udata;
 
 static SDL_AudioSpec obtained;
 static SDL_AudioCVT cvt;
 
 extern bool debug_audio;
 
-static void sdl_dma_start(const void *addr, size_t size)
-{
-    pcm_playing = true;
+#ifndef MIN
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#endif
 
+static void pcm_apply_settings_nolock(void)
+{
+    cvt_status = SDL_BuildAudioCVT(&cvt, AUDIO_S16SYS, 2, pcm_frequency,
+                    obtained.format, obtained.channels, obtained.freq);
+
+    pcm_curr_frequency = pcm_frequency;
+
+    if (cvt_status < 0) {
+        cvt.len_ratio = (double)obtained.freq / (double)pcm_curr_frequency;
+    }
+}
+
+void pcm_apply_settings(void)
+{
     SDL_LockAudio();
-    
+    pcm_apply_settings_nolock();
+    SDL_UnlockAudio();
+}
+
+static void sdl_dma_start_nolock(const void *addr, size_t size)
+{
+    pcm_playing = false;
+
+    pcm_apply_settings_nolock();
+
     pcm_data = (Uint8 *) addr;
     pcm_data_size = size;
 
-    SDL_UnlockAudio();
-    
+    pcm_playing = true;
+
     SDL_PauseAudio(0);
 }
 
-static void sdl_dma_stop(void) 
+static void sdl_dma_stop_nolock(void) 
 {
     pcm_playing = false;
 
@@ -65,18 +102,20 @@ static void (*callback_for_more)(unsigned char**, size_t*) = NULL;
 void pcm_play_data(void (*get_more)(unsigned char** start, size_t* size),
         unsigned char* start, size_t size)
 {
+    SDL_LockAudio();
+
     callback_for_more = get_more;
 
     if (!(start && size)) {
         if (get_more)
             get_more(&start, &size);
-        else
-            return;
     }
 
     if (start && size) {
-        sdl_dma_start(start, size);
+        sdl_dma_start_nolock(start, size);
     }
+
+    SDL_UnlockAudio();
 }
 
 size_t pcm_get_bytes_waiting(void)
@@ -91,24 +130,29 @@ void pcm_mute(bool mute)
 
 void pcm_play_stop(void)
 {
+    SDL_LockAudio();
     if (pcm_playing) {
-        sdl_dma_stop();
+        sdl_dma_stop_nolock();
     }
+    SDL_UnlockAudio();
 }
 
 void pcm_play_pause(bool play)
 {
     size_t next_size;
     Uint8 *next_start;
+
+    SDL_LockAudio();
     
     if (!pcm_playing) {
+        SDL_UnlockAudio();
         return;
     }
 
     if(pcm_paused && play) {
         if (pcm_get_bytes_waiting()) {
             printf("unpause\n");
-
+            pcm_apply_settings_nolock();
             SDL_PauseAudio(0);
         } else {
             printf("unpause, no data waiting\n");
@@ -120,9 +164,9 @@ void pcm_play_pause(bool play)
             }
 
             if (next_start && next_size) {
-                sdl_dma_start(next_start, next_size);
+                sdl_dma_start_nolock(next_start, next_size);
             } else {
-                sdl_dma_stop();
+                sdl_dma_stop_nolock();
                 printf("unpause attempted, no data\n");
             }
         }
@@ -133,6 +177,8 @@ void pcm_play_pause(bool play)
     }
 
     pcm_paused = !play;
+
+    SDL_UnlockAudio();
 }
 
 bool pcm_is_paused(void)
@@ -147,9 +193,26 @@ bool pcm_is_playing(void)
 
 void pcm_set_frequency(unsigned int frequency)
 {
-    // FIXME: Check return values
-    SDL_BuildAudioCVT(&cvt, AUDIO_S16SYS, 2, frequency,
-                        obtained.format, obtained.channels, obtained.freq);
+    switch (frequency)
+    {
+    HW_HAVE_8_( case SAMPR_8:)
+    HW_HAVE_11_(case SAMPR_11:)
+    HW_HAVE_12_(case SAMPR_12:)
+    HW_HAVE_16_(case SAMPR_16:)
+    HW_HAVE_22_(case SAMPR_22:)
+    HW_HAVE_24_(case SAMPR_24:)
+    HW_HAVE_32_(case SAMPR_32:)
+    /* 44100 implied */
+    HW_HAVE_48_(case SAMPR_48:)
+    HW_HAVE_64_(case SAMPR_64:)
+    HW_HAVE_88_(case SAMPR_88:)
+    HW_HAVE_96_(case SAMPR_96:)
+        break;
+    default:
+        frequency = SAMPR_44;
+    }
+
+    pcm_frequency = frequency;
 }
 
 /*
@@ -216,83 +279,174 @@ void pcm_calculate_peaks(int *left, int *right)
     }
 }
 
-static long write_to_soundcard(Uint8 *stream, int len, FILE *debug) {
-    Uint32 written = (((Uint32) len) > pcm_data_size) ? pcm_data_size : (Uint32) len;
-
+void write_to_soundcard(struct pcm_udata *udata) {
     if (cvt.needed) {
-        cvt.buf = (Uint8 *) malloc(written * cvt.len_mult);
-        cvt.len = written;
+        Uint32 rd = udata->num_in;
+        Uint32 wr = (double)rd * cvt.len_ratio;
 
-        memcpy(cvt.buf, pcm_data, written);
+        if (wr > udata->num_out) {
+            wr = udata->num_out;
+            rd = (double)wr / cvt.len_ratio;
 
-        SDL_ConvertAudio(&cvt);
-        
-        memcpy(stream, cvt.buf, cvt.len_cvt);
-
-        if (debug != NULL) {
-           fwrite(cvt.buf, sizeof(Uint8), cvt.len_cvt, debug);
+            if (rd > udata->num_in)
+            {
+                rd = udata->num_in;
+                wr = (double)rd * cvt.len_ratio;
+            }
         }
 
-        free(cvt.buf);
+        if (wr == 0 || rd == 0)
+        {
+            udata->num_out = udata->num_in = 0;
+            return;
+        }
+
+        if (cvt_status > 0) {
+            cvt.len = rd * pcm_sample_bytes;
+            cvt.buf = (Uint8 *) malloc(cvt.len * cvt.len_mult);
+
+            memcpy(cvt.buf, pcm_data, cvt.len);
+
+            SDL_ConvertAudio(&cvt);
+
+            memcpy(udata->stream, cvt.buf, cvt.len_cvt);
+
+            udata->num_in = cvt.len / pcm_sample_bytes;
+            udata->num_out = cvt.len_cvt / pcm_sample_bytes;
+
+            if (udata->debug != NULL) {
+               fwrite(cvt.buf, sizeof(Uint8), cvt.len_cvt, udata->debug);
+            }
+
+            free(cvt.buf);
+        }
+        else {
+            /* Convert is bad, so do silence */
+            Uint32 num = wr*obtained.channels;
+            udata->num_in = rd;
+            udata->num_out = wr;
+
+            switch (pcm_channel_bytes)
+            {
+            case 1:
+            {
+                Uint8 *stream = udata->stream;
+                while (num-- > 0)
+                    *stream++ = obtained.silence;
+                break;
+                }
+            case 2:
+            {
+                Uint16 *stream = (Uint16 *)udata->stream;
+                while (num-- > 0)
+                    *stream++ = obtained.silence;
+                break;
+                }
+            }
+
+            if (udata->debug != NULL) {
+               fwrite(udata->stream, sizeof(Uint8), wr, udata->debug);
+            }
+        }
     } else {
-        memcpy(stream, pcm_data, written);
+        udata->num_in = udata->num_out = MIN(udata->num_in, udata->num_out);
+        memcpy(udata->stream, pcm_data, udata->num_out * pcm_sample_bytes);
         
-        if (debug != NULL) {
-           fwrite(pcm_data, sizeof(Uint8), written, debug);
+        if (udata->debug != NULL) {
+           fwrite(pcm_data, sizeof(Uint8), udata->num_out * pcm_sample_bytes,
+                  udata->debug);
         }
     }
-    
-    return written;
 }
 
-void sdl_audio_callback(void *udata, Uint8 *stream, int len)
+void sdl_audio_callback(struct pcm_udata *udata, Uint8 *stream, int len)
 {
-    Uint32 have_now;
-    FILE *debug = (FILE *) udata;
-
-    /* At all times we need to write a full 'len' bytes to stream. */
+    udata->stream = stream;
 
     /* Write what we have in the PCM buffer */
-    if (pcm_data_size > 0) {
-        have_now = write_to_soundcard(stream, len, debug);
-        
-        stream += have_now;
-        len -= have_now;
-        pcm_data += have_now;
-        pcm_data_size -= have_now;
-    }
+    if (pcm_data_size > 0)
+        goto start;
 
     /* Audio card wants more? Get some more then. */
     while (len > 0) {
-        if (callback_for_more) {
-            callback_for_more(&pcm_data, &pcm_data_size);
-        } else {
-            pcm_data = NULL;
+        if ((ssize_t)pcm_data_size <= 0) {
             pcm_data_size = 0;
+
+            if (callback_for_more)
+                callback_for_more(&pcm_data, &pcm_data_size);
         }
 
         if (pcm_data_size > 0) {
-            have_now = write_to_soundcard(stream, len, debug);
-            
-            stream += have_now;
-            len -= have_now;
-            pcm_data += have_now;
-            pcm_data_size -= have_now;
+    start:
+            udata->num_in  = pcm_data_size / pcm_sample_bytes;
+            udata->num_out = len / pcm_sample_bytes;
+
+            write_to_soundcard(udata);
+
+            udata->num_in  *= pcm_sample_bytes;
+            udata->num_out *= pcm_sample_bytes;
+
+            pcm_data      += udata->num_in;
+            pcm_data_size -= udata->num_in;
+            udata->stream += udata->num_out;
+            len           -= udata->num_out;
         } else {
             DEBUGF("sdl_audio_callback: No Data.\n");
-            sdl_dma_stop();
+            sdl_dma_stop_nolock();
             break;
         }
     }
 }
 
+#ifdef HAVE_RECORDING
+void pcm_init_recording(void)
+{
+}
+
+void pcm_close_recording(void)
+{
+}
+
+void pcm_record_data(void (*more_ready)(void* start, size_t size),
+                     void *start, size_t size)
+{
+    (void)more_ready;
+    (void)start;
+    (void)size;
+}
+
+void pcm_stop_recording(void)
+{
+}
+
+void pcm_record_more(void *start, size_t size)
+{
+    (void)start;
+    (void)size;
+}
+
+void pcm_calculate_rec_peaks(int *left, int *right)
+{
+    if (left)
+        *left = 0;
+    if (right)
+        *right = 0;
+}
+
+unsigned long pcm_rec_status(void)
+{
+    return 0;
+}
+
+#endif /* HAVE_RECORDING */
+
 int pcm_init(void)
 {
     SDL_AudioSpec wanted_spec;
-    FILE *debug = NULL;
+    udata.debug = NULL;
 
     if (debug_audio) {
-        debug = fopen("audiodebug.raw", "wb");
+        udata.debug = fopen("audiodebug.raw", "wb");
     }
 
     /* Set 16-bit stereo audio at 44Khz */
@@ -300,8 +454,10 @@ int pcm_init(void)
     wanted_spec.format = AUDIO_S16SYS;
     wanted_spec.channels = 2;
     wanted_spec.samples = 2048;
-    wanted_spec.callback = sdl_audio_callback;
-    wanted_spec.userdata = debug;
+    wanted_spec.callback =
+        (void (SDLCALL *)(void *userdata,
+            Uint8 *stream, int len))sdl_audio_callback;
+    wanted_spec.userdata = &udata;
 
     /* Open the audio device and start playing sound! */
     if(SDL_OpenAudio(&wanted_spec, &obtained) < 0) {
@@ -309,7 +465,29 @@ int pcm_init(void)
         return -1;
     }
 
-    sdl_dma_stop();
+    switch (obtained.format)
+    {
+    case AUDIO_U8:
+    case AUDIO_S8:
+        pcm_channel_bytes = 1;
+        break;
+    case AUDIO_U16LSB:
+    case AUDIO_S16LSB:
+    case AUDIO_U16MSB:
+    case AUDIO_S16MSB:
+        pcm_channel_bytes = 2;
+        break;
+    default:
+        fprintf(stderr, "Unknown sample format obtained: %u\n",
+                (unsigned)obtained.format);
+        return -1;
+    }
+
+    pcm_sample_bytes = obtained.channels * pcm_channel_bytes;
+
+    pcm_apply_settings_nolock();
+
+    sdl_dma_stop_nolock();
 
     return 0;
 }
@@ -317,5 +495,3 @@ int pcm_init(void)
 void pcm_postinit(void)
 {
 }
-
-
