@@ -68,13 +68,13 @@ int rtc_read_datetime(unsigned char* buf)
     year = 1980;
     while(seconds>=LEAP_YEAR_SECONDS)
     {
-        year++;
-        
         if(is_leapyear(year)){
             seconds -= LEAP_YEAR_SECONDS;
         } else {
             seconds -= YEAR_SECONDS;
         }
+
+        year++;
     }
     
     if(is_leapyear(year)) {
@@ -102,6 +102,7 @@ int rtc_read_datetime(unsigned char* buf)
     /* Month Day */
     buf[4] = seconds/DAY_SECONDS;
     seconds -= buf[4]*DAY_SECONDS;
+    buf[4]++; /* 1 ... 31 */
 
     /* Hour */
     buf[2] = seconds/HOUR_SECONDS;
@@ -146,7 +147,7 @@ int rtc_write_datetime(unsigned char* buf)
     }
     
     /* Number of days in years gone by since 1-Jan-1980 */
-    year_days = 365*(buf[6]+20) + buf[6]/4 + 6;
+    year_days = 365*(buf[6]+20) + (buf[6]-1)/4 + 6;
 
     /* Convert to seconds since 1-Jan-1980 */
     seconds = buf[0]
