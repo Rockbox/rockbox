@@ -25,6 +25,13 @@
 #include "debug.h"
 #include "kernel.h"
 #include "sound.h"
+
+#ifdef HAVE_RECORDING
+#ifndef REC_SAMPR_CAPS
+#define REC_SAMPR_CAPS  SAMPR_CAP_44
+#endif
+#endif
+
 #include "pcm_sampr.h"
 #include "SDL.h"
 
@@ -202,7 +209,7 @@ void pcm_set_frequency(unsigned int frequency)
     HW_HAVE_22_(case SAMPR_22:)
     HW_HAVE_24_(case SAMPR_24:)
     HW_HAVE_32_(case SAMPR_32:)
-    /* 44100 implied */
+    HW_HAVE_44_(case SAMPR_44:)
     HW_HAVE_48_(case SAMPR_48:)
     HW_HAVE_64_(case SAMPR_64:)
     HW_HAVE_88_(case SAMPR_88:)
