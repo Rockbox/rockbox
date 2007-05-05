@@ -1076,7 +1076,7 @@ void radio_load_presets(char *filename)
 
 static int radio_add_preset(void)
 {
-    char buf[MAX_FMPRESET_LEN];
+    char buf[MAX_FMPRESET_LEN + 1];
 
     if(num_presets < MAX_PRESETS)
     {
