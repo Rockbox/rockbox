@@ -57,6 +57,8 @@
 #include <wx/regex.h>
 #include <wx/tokenzr.h>
 #include <wx/notebook.h>
+#include <wx/html/htmlwin.h>
+#include <wx/hyperlink.h>
 
 #ifdef __WXMSW__
 #define PATH_SEP "\\"
@@ -104,6 +106,7 @@ public:
     wxString                prog_name;
     wxString                bootloader_url;
     wxString                themes_url;
+    wxString                manual_url;
 
     // User configuration data.
     wxString                curplat;

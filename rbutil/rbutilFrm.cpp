@@ -51,6 +51,9 @@ BEGIN_EVENT_TABLE(rbutilFrm,wxFrame)
 	EVT_MENU(ID_FILE_ABOUT, rbutilFrm::OnFileAbout)
 	EVT_MENU(ID_FILE_WIPECACHE, rbutilFrm::OnFileWipeCache)
 	EVT_MENU(ID_PORTABLE_INSTALL, rbutilFrm::OnPortableInstall)
+
+	EVT_UPDATE_UI   (ID_MANUAL, rbutilFrm::OnManualUpdate)
+
 END_EVENT_TABLE()
 
 rbutilFrm::rbutilFrm( wxWindow *parent, wxWindowID id, const wxString &title,
@@ -78,24 +81,26 @@ void rbutilFrm::CreateGUIControls(void)
 	mainPanel->SetSizer(WxBoxSizer0);
 	mainPanel->SetAutoLayout(TRUE);
 
-   wxBitmap rockboxbmp(rblogo_xpm);
-   ImageCtrl* rockboxbmpCtrl = new ImageCtrl(mainPanel,wxID_ANY);
-   rockboxbmpCtrl->SetBitmap(rockboxbmp);
-   WxBoxSizer0->Add(rockboxbmpCtrl,0,wxALIGN_CENTER_HORIZONTAL | wxALL,5);
+    wxBitmap rockboxbmp(rblogo_xpm);
+    ImageCtrl* rockboxbmpCtrl = new ImageCtrl(mainPanel,wxID_ANY);
+    rockboxbmpCtrl->SetBitmap(rockboxbmp);
+    WxBoxSizer0->Add(rockboxbmpCtrl,0,wxALIGN_CENTER_HORIZONTAL | wxALL,5);
 
 	myDeviceSelector = new DeviceSelectorCtrl(mainPanel,wxID_ANY);
 	myDeviceSelector->setDefault();
 	WxBoxSizer0->Add(myDeviceSelector,0,wxALL,5);
 
-   wxNotebook* tabwindow = new wxNotebook(mainPanel,wxID_ANY);
-   WxBoxSizer0->Add(tabwindow,0,wxALL,5);
+    wxNotebook* tabwindow = new wxNotebook(mainPanel,wxID_ANY);
+    WxBoxSizer0->Add(tabwindow,0,wxALL,5);
 
-   wxPanel* installpage = new wxPanel(tabwindow,wxID_ANY);
-   wxPanel* themepage = new wxPanel(tabwindow,wxID_ANY);
-   wxPanel* uninstallpage = new wxPanel(tabwindow,wxID_ANY);
-   tabwindow->AddPage(installpage,wxT("Installation"),true);
-   tabwindow->AddPage(themepage,wxT("Themes"));
-   tabwindow->AddPage(uninstallpage,wxT("Uninstallation"));
+    wxPanel* installpage = new wxPanel(tabwindow,wxID_ANY);
+    wxPanel* themepage = new wxPanel(tabwindow,wxID_ANY);
+    wxPanel* uninstallpage = new wxPanel(tabwindow,wxID_ANY);
+    wxPanel* manualpage = new wxPanel(tabwindow,wxID_ANY);
+    tabwindow->AddPage(installpage,wxT("Installation"),true);
+    tabwindow->AddPage(themepage,wxT("Themes"));
+    tabwindow->AddPage(uninstallpage,wxT("Uninstallation"));
+    tabwindow->AddPage(manualpage,wxT("Manual"));
 
 	/*********************
 	Install Page
@@ -114,16 +119,16 @@ void rbutilFrm::CreateGUIControls(void)
 	wxFlexGridSizer* WxFlexGridSizer1 = new wxFlexGridSizer(2,2,0,0);
 	WxStaticBoxSizer3->Add(WxFlexGridSizer1,0,wxGROW | wxALL,0);
 
-   wxBitmap BootloaderInstallButton (tools2_3d_xpm);
-   WxBitmapButton4 = new wxBitmapButton(installpage, ID_BOOTLOADER_BTN,
+    wxBitmap BootloaderInstallButton (tools2_3d_xpm);
+    WxBitmapButton4 = new wxBitmapButton(installpage, ID_BOOTLOADER_BTN,
         BootloaderInstallButton, wxPoint(0,0), wxSize(64,54),
         wxRAISED_BORDER | wxBU_AUTODRAW);
-   WxBitmapButton4->SetToolTip(wxT("Instructions for installing the "
+    WxBitmapButton4->SetToolTip(wxT("Instructions for installing the "
         "Rockbox bootloader on your audio device"));
-   WxFlexGridSizer1->Add(WxBitmapButton4, 0,
+    WxFlexGridSizer1->Add(WxBitmapButton4, 0,
         wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL | wxALL,5);
 
-   wxStaticText* WxStaticText5 =  new wxStaticText(installpage, wxID_ANY,
+    wxStaticText* WxStaticText5 =  new wxStaticText(installpage, wxID_ANY,
         wxT("Bootloader installation instructions\n\n"
         "Before Rockbox can be installed on your audio player, you "
         "may have to\ninstall a bootloader.  This can not currently "
@@ -239,6 +244,26 @@ void rbutilFrm::CreateGUIControls(void)
 	WxFlexGridSizer3->Add(WxStaticText4,0,
         wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL,5);
 
+
+    /*****************
+    * Manual Page
+    ******************/
+
+    wxBoxSizer* WxBoxSizer5 = new wxBoxSizer(wxVERTICAL);
+	manualpage->SetSizer(WxBoxSizer5);
+	manualpage->SetAutoLayout(TRUE);
+
+    manuallink = new wxHyperlinkCtrl(manualpage,wxID_ANY,wxT("Rockbox PDF Manual"),wxT("http://www.rockbox.org"));
+    WxBoxSizer5->Add(manuallink,1,wxGROW | wxALL, 5);
+
+    manual =new wxHtmlWindow(manualpage,ID_MANUAL);
+    WxBoxSizer5->Add(manual,10,wxGROW | wxALL, 5);
+
+
+    /**********
+    ** rest of the controls
+    **********/
+
 	WxMenuBar1 =  new wxMenuBar();
 	wxMenu *ID_FILE_MENU_Mnu_Obj = new wxMenu(0);
 	WxMenuBar1->Append(ID_FILE_MENU_Mnu_Obj, wxT("&File"));
@@ -273,6 +298,32 @@ void rbutilFrm::CreateGUIControls(void)
 
     wxLogVerbose(wxT("=== end rbutilFrm::CreateGUIControls"));
 }
+
+
+void  rbutilFrm::OnManualUpdate(wxUpdateUIEvent& event)
+{
+    wxString tmp = gv->curplat;
+
+    if(tmp == wxT("h120")) tmp = wxT("h100");   //h120 has the h100 manual
+
+    if( tmp == curManualDevice)
+        return;
+
+    curManualDevice = tmp;
+
+    // construct link to pdf
+    wxString pdflink;
+    pdflink.Printf(wxT("%s%s.pdf"),gv->manual_url.c_str(),curManualDevice.c_str());
+    manuallink->SetURL(pdflink);
+
+    // construct link to html
+    wxString htmllink;
+    htmllink.Printf(wxT("%s%s/rockbox-build.html"),gv->manual_url.c_str(),curManualDevice.c_str());
+    manual->LoadPage(htmllink);
+
+
+}
+
 
 void rbutilFrm::rbutilFrmClose(wxCloseEvent& event)
 {

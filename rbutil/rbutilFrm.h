@@ -57,7 +57,11 @@ public:
     virtual ~rbutilFrm();
 public:
 	   DeviceSelectorCtrl* myDeviceSelector;
-		wxMenuBar *WxMenuBar1;
+	   wxHyperlinkCtrl* manuallink;
+	   wxHtmlWindow* manual;
+       wxString curManualDevice;
+
+  	   wxMenuBar *WxMenuBar1;
 		wxStaticText *WxStaticText3;
 		wxBitmapButton *WxBitmapButton2;
 		wxStaticText *WxStaticText2;
@@ -92,6 +96,8 @@ public:
             ID_BOOTLOADER_BTN = 1129,
 			ID_WXPANEL1 = 1064,
 
+            ID_MANUAL = 1065,
+
             ID_DUMMY_VALUE_
    }; //End of Enum
 public:
@@ -108,7 +114,9 @@ public:
 	void OnBootloaderBtn(wxCommandEvent& event);
 	void OnPortableInstall(wxCommandEvent& event);
 	void OnBootloaderRemoveBtn(wxCommandEvent& event);
-	
+
+    void OnManualUpdate(wxUpdateUIEvent& event);
+
 };
 
 #endif

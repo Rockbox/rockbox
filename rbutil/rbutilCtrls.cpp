@@ -402,7 +402,11 @@ void DeviceSelectorCtrl::setDefault()
 void DeviceSelectorCtrl::OnComboBox(wxCommandEvent& event)
 {
     int index = gv->plat_name.Index(m_deviceCbx->GetValue());
-    if(index == -1) m_currentDevice = wxT("");
+    if(index == -1)
+    {
+        m_currentDevice = wxT("");
+        return;
+    }
 
     gv->curplat = gv->plat_id[index];
 }
