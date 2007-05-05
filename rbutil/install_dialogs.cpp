@@ -106,20 +106,21 @@ bool bootloaderInstallDlg::TransferDataFromWindow()
             return false;
         }
     }
-    return true;
+
+
 }
 
 // tranver data to the controls
 bool bootloaderInstallDlg::TransferDataToWindow()
-{	
+{
     if(gv->curplat == wxT(""))
     {
         WARN_DIALOG(wxT("You have not selected a audio device"),
                 wxT("Select a Device"));
         return false;
     }
-	 int index = gv->plat_id.Index(gv->curplat);    
-    
+	 int index = gv->plat_id.Index(gv->curplat);
+
     if(!gv->plat_needsbootloader[index])
     {
     	 WARN_DIALOG(wxT("This Device doesnt need a Bootloader"),
@@ -147,90 +148,6 @@ bool bootloaderInstallDlg::TransferDataToWindow()
     return true;
 }
 
-////////////////////////////////////////////////
-//// Bootloader Deinstallation
-/////////////////////////////////////////////////
-
-IMPLEMENT_CLASS( bootloaderDeInstallDlg, wxDialog )
-
-BEGIN_EVENT_TABLE( bootloaderDeInstallDlg, wxDialog )
-
-END_EVENT_TABLE()
-
-bootloaderDeInstallDlg::bootloaderDeInstallDlg( )
-{
-    Init();
-}
-
-bootloaderDeInstallDlg::bootloaderDeInstallDlg( wxWindow* parent,
-    wxWindowID id, const wxString& caption,
-    const wxPoint& pos, const wxSize& size, long style )
-{
-    Init();
-    Create(parent, id, caption, pos, size, style);
-}
-
-void bootloaderDeInstallDlg::CreateControls()
-{
-    // A top-level sizer
-    wxBoxSizer* topSizer = new wxBoxSizer(wxVERTICAL);
-    this->SetSizer(topSizer);
-
-    wxBoxSizer* wxBoxSizer2 = new wxBoxSizer(wxHORIZONTAL);
-    topSizer->Add(wxBoxSizer2, 0, wxALIGN_LEFT|wxALL, 5);
-
-    // bitmap
-    wxBitmap sidebmp(wizard_xpm);
-
-    ImageCtrl* sideimage = new ImageCtrl(this,wxID_ANY);
-    sideimage->SetBitmap(sidebmp);
-    wxBoxSizer2->Add(sideimage,0,wxALIGN_LEFT | wxALL,5);
-
-    wxBoxSizer* wxBoxSizer3 = new wxBoxSizer(wxVERTICAL);
-    wxBoxSizer2->Add(wxBoxSizer3, 0, wxALIGN_LEFT|wxALL, 5);
-    
- // controls at the bottom
-    OkCancelCtrl* okCancel = new OkCancelCtrl(this,wxID_ANY);
-    topSizer->Add(okCancel, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
-}
-
-//init the local variables
-void bootloaderDeInstallDlg::Init()
-{
-
-}
-
-// create the window
-bool bootloaderDeInstallDlg::Create( wxWindow* parent,
-    wxWindowID id, const wxString& caption,
-    const wxPoint& pos, const wxSize& size, long style )
-{
-    if (!wxDialog::Create( parent, id, caption, pos, size, style ))
-        return false;
-    CreateControls();
-    GetSizer()->Fit(this);
-    GetSizer()->SetSizeHints(this);
-    Centre();
-    return true;
-}
-
-// tranver data from the controls
-bool bootloaderDeInstallDlg::TransferDataFromWindow()
-{
-    return true;
-}
-
-// tranver data to the controls
-bool bootloaderDeInstallDlg::TransferDataToWindow()
-{
-    if(gv->curplat == wxT(""))
-    {
-        WARN_DIALOG(wxT("You have not selected a audio device"),
-                wxT("Select a Device"));
-        return false;
-    }
-    return true;
-}
 
 ////////////////////////////////////////////////
 //// Font Installation
@@ -451,7 +368,7 @@ bool rockboxDeInstallDlg::TransferDataToWindow()
 IMPLEMENT_CLASS( themesInstallDlg, wxDialog )
 
 BEGIN_EVENT_TABLE( themesInstallDlg, wxDialog )
-  
+
 END_EVENT_TABLE()
 
 themesInstallDlg::themesInstallDlg( )
@@ -524,7 +441,7 @@ bool themesInstallDlg::Create( wxWindow* parent,
 // tranver data from the controls
 bool themesInstallDlg::TransferDataFromWindow()
 {
-    
+
     gv->curdestdir = m_devicepos->getDevicePos();
     if(!wxDirExists(gv->curdestdir))
     {
@@ -555,7 +472,7 @@ bool themesInstallDlg::TransferDataToWindow()
                 wxT("Select a Device"));
         return false;
     }
-    
+
     m_devicepos->setDefault();
     m_theme->setDevice(gv->curplat);
     return true;
@@ -724,18 +641,18 @@ bool rockboxInstallDlg::TransferDataFromWindow()
 bool rockboxInstallDlg::TransferDataToWindow()
 {
     m_devicepos->setDefault();
-	
+
 	 if(gv->curplat == wxT(""))
     {
         WARN_DIALOG(wxT("You have not selected a audio device"),
                 wxT("Select a Device"));
         return false;
-    }     
-   
+    }
+
     wxRadioBox* BuildRadioBox = (wxRadioBox*) FindWindow(ID_BUILD_BOX);
 
     int index =gv->plat_id.Index(gv->curplat);
-        
+
     wxCommandEvent updateradiobox(wxEVT_COMMAND_RADIOBOX_SELECTED,
         ID_BUILD_BOX);
 

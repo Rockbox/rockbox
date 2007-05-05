@@ -139,12 +139,12 @@
 		<Unit filename="sansapatcher\parttypes.h" />
 		<Unit filename="sansapatcher\sansaio-win32.c">
 			<Option compilerVar="CC" />
-			<Option compiler="gcc" use="1" buildCommand="mingw32-gcc.exe -W -g -pipe -mthreads -Winvalid-pch  -D__GNUWIN32__ -D__WXMSW__ -DUSE_PCH -g   -I.\ -IC:\Dev-Cpp\include  -c $file -o .objs\sansapatcher\sansaio-win32.o" />
+			<Option compiler="gcc" use="1" buildCommand="mingw32-gcc.exe -W -g -pipe -mthreads -Winvalid-pch  -D__GNUWIN32__ -D__WXMSW__ -DUSE_PCH -DRBUTIL -g   -I.\ -IC:\Dev-Cpp\include  -c $file -o .objs\sansapatcher\sansaio-win32.o" />
 		</Unit>
 		<Unit filename="sansapatcher\sansaio.h" />
 		<Unit filename="sansapatcher\sansapatcher.c">
 			<Option compilerVar="CC" />
-			<Option compiler="gcc" use="1" buildCommand="mingw32-gcc.exe -W -g -pipe -mthreads -Winvalid-pch  -D__GNUWIN32__ -D__WXMSW__ -DUSE_PCH -g  -I.\ -IC:\Dev-Cpp\include  -c $file -o .objs\sansapatcher\sansapatcher.o" />
+			<Option compiler="gcc" use="1" buildCommand="mingw32-gcc.exe -W -g -pipe -mthreads -Winvalid-pch  -D__GNUWIN32__ -D__WXMSW__ -DUSE_PCH -g  -DRBUTIL -I.\ -IC:\Dev-Cpp\include  -c $file -o .objs\sansapatcher\sansapatcher.o" />
 		</Unit>
 		<Unit filename="sansapatcher\sansapatcher.h" />
 		<Unit filename="themes_3d.xpm" />

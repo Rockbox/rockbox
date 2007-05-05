@@ -109,7 +109,7 @@ void rbutilFrm::CreateGUIControls(void)
         wxID_ANY, wxT("Please choose an option"));
 	wxStaticBoxSizer* WxStaticBoxSizer3 =
         new wxStaticBoxSizer(WxStaticBoxSizer3_StaticBoxObj,wxHORIZONTAL);
-	WxBoxSizer2->Add(WxStaticBoxSizer3,1,wxALIGN_CENTER_HORIZONTAL | wxALL, 5);
+	WxBoxSizer2->Add(WxStaticBoxSizer3,1,wxALIGN_CENTER_HORIZONTAL|wxGROW | wxALL, 5);
 
 	wxFlexGridSizer* WxFlexGridSizer1 = new wxFlexGridSizer(2,2,0,0);
 	WxStaticBoxSizer3->Add(WxFlexGridSizer1,0,wxGROW | wxALL,0);
@@ -146,7 +146,7 @@ void rbutilFrm::CreateGUIControls(void)
 	WxFlexGridSizer1->Add(WxStaticText2,0,
         wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL,5);
 
-/* ********************+
+    /*********************+
 	Theme Page
 	***********************/
 
@@ -158,7 +158,7 @@ void rbutilFrm::CreateGUIControls(void)
         wxID_ANY, wxT("Please choose an option"));
 	wxStaticBoxSizer* WxStaticBoxSizer4 =
         new wxStaticBoxSizer(WxStaticBoxSizer4_StaticBoxObj,wxHORIZONTAL);
-	WxBoxSizer3->Add(WxStaticBoxSizer4,1,wxALIGN_CENTER_HORIZONTAL | wxALL, 5);
+	WxBoxSizer3->Add(WxStaticBoxSizer4,1,wxALIGN_CENTER_HORIZONTAL |wxGROW| wxALL, 5);
 
 	wxFlexGridSizer* WxFlexGridSizer2 = new wxFlexGridSizer(2,2,0,0);
 	WxStaticBoxSizer4->Add(WxFlexGridSizer2,0,wxGROW | wxALL,0);
@@ -194,7 +194,7 @@ void rbutilFrm::CreateGUIControls(void)
 	WxFlexGridSizer2->Add(WxStaticText6, 0,
         wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL,5);
 
-   /* ********************+
+   /*********************+
 	Uninstall Page
 	***********************/
 
@@ -206,7 +206,7 @@ void rbutilFrm::CreateGUIControls(void)
         wxID_ANY, wxT("Please choose an option"));
 	wxStaticBoxSizer* WxStaticBoxSizer5 =
         new wxStaticBoxSizer(WxStaticBoxSizer5_StaticBoxObj,wxHORIZONTAL);
-	WxBoxSizer4->Add(WxStaticBoxSizer5,1,wxALIGN_CENTER_HORIZONTAL | wxALL, 5);
+	WxBoxSizer4->Add(WxStaticBoxSizer5,1,wxALIGN_CENTER_HORIZONTAL|wxGROW | wxALL, 5);
 
 	wxFlexGridSizer* WxFlexGridSizer3 = new wxFlexGridSizer(2,2,0,0);
 	WxStaticBoxSizer5->Add(WxFlexGridSizer3,0,wxGROW | wxALL,0);
@@ -353,74 +353,80 @@ void rbutilFrm::OnBootloaderRemoveBtn(wxCommandEvent& event)
 {
     wxLogVerbose(wxT("=== begin rbutilFrm::OnBootloaderRemoveBtn(event)"));
 
-    bootloaderDeInstallDlg dialog(NULL, wxID_ANY,
-        wxT("Bootloader Deinstallation"));
+    int index = gv->plat_id.Index(gv->curplat);
+    wxString bootloadermethod = gv->plat_bootloadermethod[index];
 
-    if (dialog.ShowModal() == wxID_OK)
+    if(!gv->plat_needsbootloader[index])
     {
-        int index = gv->plat_id.Index(gv->curplat);
-        wxString bootloadermethod = gv->plat_bootloadermethod[index];
+    	 WARN_DIALOG(wxT("This Device doesnt need a Bootloader"),
+                wxT("Bootloader"));
+        return;
+    }
 
-        if(bootloadermethod == wxT("ipodpatcher"))
-        {
-            wxString bootloadername = wxT("bootloader-");
-            bootloadername.Append(gv->plat_bootloadername[index] );
-            if(ipodpatcher(BOOTLOADER_REM,bootloadername))
-            {
-                MESG_DIALOG(wxT("The Bootloader has been uninstalled.") );
-            }
-            else
-            {
-                MESG_DIALOG(wxT("The Uninstallation failed.") );
-            }
-        }
-        if(bootloadermethod == wxT("sansapatcher"))
-        {
-            if(sansapatcher(BOOTLOADER_REM,gv->plat_bootloadername[index]))
-            {
-                MESG_DIALOG(wxT("The Bootloader has been uninstalled.") );
-            }
-            else
-            {
-                MESG_DIALOG(wxT("The Uninstallation failed.") );
-            }
-        }
-        else if(bootloadermethod== wxT("gigabeatf"))
-        {
+    // really deinstall ?
+    wxMessageDialog msg(this,wxT("Do you really want to deinstall the Bootloader ?"),wxT("Bootloader deinstallation"),wxOK|wxCANCEL);
+    if(msg.ShowModal() != wxID_OK )
+        return;
 
-            if(gigabeatf(BOOTLOADER_REM,gv->plat_bootloadername[index],gv->curdestdir))
-            {
-               MESG_DIALOG(wxT("The Bootloader has been uninstalled."));
-            }
-            else
-                MESG_DIALOG(wxT("The Uninstallation failed.") );
-        }
-        else if(bootloadermethod == wxT("iaudio") )
+
+    if(bootloadermethod == wxT("ipodpatcher"))
+    {
+        wxString bootloadername = wxT("bootloader-");
+        bootloadername.Append(gv->plat_bootloadername[index] );
+        if(ipodpatcher(BOOTLOADER_REM,bootloadername))
         {
-           MESG_DIALOG(wxT("To uninstall the Bootloader on this Device,\n"
-                    "you need to download and install an Original Firmware from the Manufacturer."));
-        }
-        else if(bootloadermethod == wxT("fwpatcher"))
-        {
-           MESG_DIALOG(wxT("To uninstall the Bootloader on this Device,\n"
-                         "you need to download and install an original Firmware from the Manufacturer.\n"
-                         "To do this, you need to boot into the original Firmware."));
-        }
-        else if(bootloadermethod == wxT("h10"))
-        {
-            if(h10(BOOTLOADER_REM,gv->plat_bootloadername[index],gv->curdestdir))
-            {
-               MESG_DIALOG(wxT("The Bootloader has been uninstalled."));
-            }
-            else
-              MESG_DIALOG(wxT("The Uninstallation failed.") );
+            MESG_DIALOG(wxT("The Bootloader has been uninstalled.") );
         }
         else
         {
-            MESG_DIALOG(wxT("Unsupported Bootloader Uninstall method.") );
+            MESG_DIALOG(wxT("The Uninstallation failed.") );
         }
     }
+    if(bootloadermethod == wxT("sansapatcher"))
+    {
+        if(sansapatcher(BOOTLOADER_REM,gv->plat_bootloadername[index]))
+        {
+            MESG_DIALOG(wxT("The Bootloader has been uninstalled.") );
+        }
+        else
+        {
+            MESG_DIALOG(wxT("The Uninstallation failed.") );
+        }
+    }
+    else if(bootloadermethod== wxT("gigabeatf"))
+    {
 
+        if(gigabeatf(BOOTLOADER_REM,gv->plat_bootloadername[index],gv->curdestdir))
+        {
+           MESG_DIALOG(wxT("The Bootloader has been uninstalled."));
+        }
+        else
+            MESG_DIALOG(wxT("The Uninstallation failed.") );
+    }
+    else if(bootloadermethod == wxT("iaudio") )
+    {
+       MESG_DIALOG(wxT("To uninstall the Bootloader on this Device,\n"
+                "you need to download and install an Original Firmware from the Manufacturer."));
+    }
+    else if(bootloadermethod == wxT("fwpatcher"))
+    {
+       MESG_DIALOG(wxT("To uninstall the Bootloader on this Device,\n"
+                     "you need to download and install an original Firmware from the Manufacturer.\n"
+                     "To do this, you need to boot into the original Firmware."));
+    }
+    else if(bootloadermethod == wxT("h10"))
+    {
+        if(h10(BOOTLOADER_REM,gv->plat_bootloadername[index],gv->curdestdir))
+        {
+           MESG_DIALOG(wxT("The Bootloader has been uninstalled."));
+        }
+        else
+          MESG_DIALOG(wxT("The Uninstallation failed.") );
+    }
+    else
+    {
+        MESG_DIALOG(wxT("Unsupported Bootloader Uninstall method.") );
+    }
 
     wxLogVerbose(wxT("=== end rbutilFrm::OnBootloaderRemoveBtn"));
 }
@@ -429,84 +435,100 @@ void rbutilFrm::OnBootloaderBtn(wxCommandEvent& event)
 {
     wxLogVerbose(wxT("=== begin rbutilFrm::OnBootloaderBtn(event)"));
 
-    bootloaderInstallDlg dialog(NULL, wxID_ANY,
-        wxT("Bootloader Installation"));
+    int index = gv->plat_id.Index(gv->curplat);
+    wxString bootloadermethod = gv->plat_bootloadermethod[index];
 
-    if (dialog.ShowModal() == wxID_OK)
+    if(!gv->plat_needsbootloader[index])
     {
-        int index = gv->plat_id.Index(gv->curplat);
-        wxString bootloadermethod = gv->plat_bootloadermethod[index];
-
-        if(bootloadermethod == wxT("ipodpatcher"))
-        {
-            wxString bootloadername = wxT("bootloader-");
-            bootloadername.Append(gv->plat_bootloadername[index] );
-            if(ipodpatcher(BOOTLOADER_ADD,bootloadername))
-            {
-                MESG_DIALOG(wxT("The Bootloader has been installed on your device.") );
-            }
-            else
-            {
-                MESG_DIALOG(wxT("The installation has failed.") );
-            }
-        }
-        if(bootloadermethod == wxT("sansapatcher"))
-        {
-            if(sansapatcher(BOOTLOADER_ADD,gv->plat_bootloadername[index]))
-            {
-               MESG_DIALOG(wxT("The Bootloader has been installed on your device.") );
-            }
-            else
-            {
-               MESG_DIALOG(wxT("The installation has failed.") );
-            }
-
-        }
-        else if(bootloadermethod== wxT("gigabeatf"))
-        {
-
-            if(gigabeatf(BOOTLOADER_ADD,gv->plat_bootloadername[index],gv->curdestdir))
-            {
-               MESG_DIALOG(wxT("The Bootloader has been installed on your device."));
-            }
-            else
-                MESG_DIALOG(wxT("The installation has failed.") );
-        }
-        else if(bootloadermethod == wxT("iaudio") )
-        {
-            if(iaudiox5(BOOTLOADER_ADD,gv->plat_bootloadername[index],gv->curdestdir))
-            {
-                MESG_DIALOG(wxT("The Bootloader has been installed on your device.\n"
-                             "Now turn OFF your Device, unplug USB,and insert Charger\n"
-                             "Your Device will automatically upgrade the flash with the Rockbox bootloader"));
-            }
-            else
-                MESG_DIALOG(wxT("The installation has failed.") );
-        }
-        else if(bootloadermethod == wxT("fwpatcher"))
-        {
-            if(fwpatcher(BOOTLOADER_ADD,gv->plat_bootloadername[index],gv->curdestdir,gv->curfirmware))
-            {
-              MESG_DIALOG(wxT("The Bootloader has been patched and copied on your device.\n"
-                             "Now use the Firmware upgrade option of your Device\n"));
-            }
-            else
-                MESG_DIALOG(wxT("The installation has failed.") );
-        }
-        else if(bootloadermethod == wxT("h10"))
-        {
-            if(h10(BOOTLOADER_ADD,gv->plat_bootloadername[index],gv->curdestdir))
-            {
-               MESG_DIALOG(wxT("The Bootloader has been patched and copied on your device.\n"));
-            }
-            else
-              MESG_DIALOG(wxT("The installation has failed.") );
-        }
-        else
-        {
-            MESG_DIALOG(wxT("Unsupported Bootloader Install method.") );
-        }
+    	 WARN_DIALOG(wxT("This Device doesnt need a Bootloader"),
+                wxT("Bootloader"));
+        return;
     }
+
+    // Bootloader dialog
+    if(bootloadermethod != wxT("ipodpatcher") && bootloadermethod != wxT("sansapatcher") )
+    {
+        bootloaderInstallDlg dialog(NULL, wxID_ANY,wxT("Bootloader Installation"));
+        if (dialog.ShowModal() != wxID_OK)
+            return;
+    }
+
+    // really install ?
+    wxMessageDialog msg(this,wxT("Do you really want to install the Bootloader ?"),wxT("Bootloader installation"),wxOK|wxCANCEL);
+    if(msg.ShowModal() != wxID_OK )
+       return;
+
+
+    if(bootloadermethod == wxT("ipodpatcher"))
+    {
+       wxString bootloadername = wxT("bootloader-");
+       bootloadername.Append(gv->plat_bootloadername[index] );
+       if(ipodpatcher(BOOTLOADER_ADD,bootloadername))
+       {
+           MESG_DIALOG(wxT("The Bootloader has been installed on your device.") );
+       }
+       else
+       {
+           MESG_DIALOG(wxT("The installation has failed.") );
+       }
+    }
+    if(bootloadermethod == wxT("sansapatcher"))
+    {
+       if(sansapatcher(BOOTLOADER_ADD,gv->plat_bootloadername[index]))
+       {
+          MESG_DIALOG(wxT("The Bootloader has been installed on your device.") );
+       }
+       else
+       {
+          MESG_DIALOG(wxT("The installation has failed.") );
+       }
+
+    }
+    else if(bootloadermethod== wxT("gigabeatf"))
+    {
+
+       if(gigabeatf(BOOTLOADER_ADD,gv->plat_bootloadername[index],gv->curdestdir))
+       {
+          MESG_DIALOG(wxT("The Bootloader has been installed on your device."));
+       }
+       else
+           MESG_DIALOG(wxT("The installation has failed.") );
+    }
+    else if(bootloadermethod == wxT("iaudio") )
+    {
+       if(iaudiox5(BOOTLOADER_ADD,gv->plat_bootloadername[index],gv->curdestdir))
+       {
+           MESG_DIALOG(wxT("The Bootloader has been installed on your device.\n"
+                        "Now turn OFF your Device, unplug USB,and insert Charger\n"
+                        "Your Device will automatically upgrade the flash with the Rockbox bootloader"));
+       }
+       else
+           MESG_DIALOG(wxT("The installation has failed.") );
+    }
+    else if(bootloadermethod == wxT("fwpatcher"))
+    {
+       if(fwpatcher(BOOTLOADER_ADD,gv->plat_bootloadername[index],gv->curdestdir,gv->curfirmware))
+       {
+         MESG_DIALOG(wxT("The Bootloader has been patched and copied on your device.\n"
+                        "Now use the Firmware upgrade option of your Device\n"));
+       }
+       else
+           MESG_DIALOG(wxT("The installation has failed.") );
+    }
+    else if(bootloadermethod == wxT("h10"))
+    {
+       if(h10(BOOTLOADER_ADD,gv->plat_bootloadername[index],gv->curdestdir))
+       {
+          MESG_DIALOG(wxT("The Bootloader has been patched and copied on your device.\n"));
+       }
+       else
+         MESG_DIALOG(wxT("The installation has failed.") );
+    }
+    else
+    {
+       MESG_DIALOG(wxT("Unsupported Bootloader Install method.") );
+    }
+
 
 
     wxLogVerbose(wxT("=== end rbutilFrm::OnBootloaderBtn"));
@@ -523,101 +545,108 @@ void rbutilFrm::OnInstallBtn(wxCommandEvent& event)
     wxFileConfig* buildinfo;
     wxDateSpan oneday;
 
+    // rockbox install dialog
     rockboxInstallDlg dialog(NULL, wxID_ANY,
         wxT("Rockbox Installation"));
+    if (dialog.ShowModal() != wxID_OK)
+        return;
 
-    if (dialog.ShowModal() == wxID_OK)
+    // really install
+    wxMessageDialog msg(this,wxT("Do you really want to install Rockbox ?"),wxT("rockbox installation"),wxOK|wxCANCEL);
+    if(msg.ShowModal() != wxID_OK )
+        return;
+
+
+    switch (gv->curbuild)
     {
-        switch (gv->curbuild)
-        {
-            case BUILD_RELEASE:
-                // This is a URL - don't use PATH_SEP
-                src.Printf(wxT("%s%s-%s-%s.zip"),
-                    gv->download_url.c_str(), gv->prog_name.c_str(),
-                    gv->last_release.c_str(), gv->curplat.c_str());
-                dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s-%s-%s.zip"),
-                    gv->stdpaths->GetUserDataDir().c_str(),
-                    gv->prog_name.c_str(), gv->last_release.c_str(),
-                    gv->curplat.c_str());
-                break;
-            case BUILD_DAILY:
-                dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "build-info"),
-                    gv->stdpaths->GetUserDataDir().c_str());
-                if (DownloadURL(gv->server_conf_url, dest)) {
-                    WARN_DIALOG(wxT("Unable to download build status."),
-                    wxT("Install"));
-                    buf = wxT("");
-                } else
-                {
-                    buildinfo = new wxFileConfig(wxEmptyString,
-                        wxEmptyString, dest);
-                    buf = buildinfo->Read(wxT("/dailies/date"));
-                    buildinfo->DeleteAll();
-
-                    if (buf.Len() != 8) {
-                        dest.Printf(wxT("Invalid build date: %s"), buf.c_str());
-                        WARN_DIALOG(dest, wxT("Install"));
-                        buf = wxT("");
-                    }
-                }
-
-                if (buf == wxT("")) {
-                    WARN_DIALOG(wxT("Can't get date of latest build from "
-                        "server.  Using yesterday's date."), wxT("Install") );
-                    date = wxDateTime::Now();
-                    date.Subtract(oneday.Day());
-                    buf = date.Format(wxT("%Y%m%d")); // yes, we want UTC
-                }
-
-                src.Printf(wxT("%s%s/%s-%s-%s.zip"),
-                    gv->daily_url.c_str(), gv->curplat.c_str(),
-                    gv->prog_name.c_str(), gv->curplat.c_str(),
-                    buf.c_str() );
-
-                dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s-%s-%s.zip"),
-                    gv->stdpaths->GetUserDataDir().c_str(),
-                    gv->prog_name.c_str(),
-                    gv->curplat.c_str(), buf.c_str() );
-                break;
-            case BUILD_BLEEDING:
-                 src.Printf(wxT("%s%s/%s.zip"),
-                    gv->bleeding_url.c_str(), gv->curplat.c_str(),
-                    gv->prog_name.c_str() );
-                dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s.zip"),
-                    gv->stdpaths->GetUserDataDir().c_str(),
-                    gv->prog_name.c_str() );
-                break;
-            default:
-                ERR_DIALOG(wxT("Something seriously odd has happened."),
-                    wxT("Install"));
-                return;
-                break;
-        }
-
-        if (gv->nocache || ( ! wxFileExists(dest) ) )
-        {
-            if ( DownloadURL(src, dest) )
+        case BUILD_RELEASE:
+            // This is a URL - don't use PATH_SEP
+            src.Printf(wxT("%s%s-%s-%s.zip"),
+                gv->download_url.c_str(), gv->prog_name.c_str(),
+                gv->last_release.c_str(), gv->curplat.c_str());
+            dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s-%s-%s.zip"),
+                gv->stdpaths->GetUserDataDir().c_str(),
+                gv->prog_name.c_str(), gv->last_release.c_str(),
+                gv->curplat.c_str());
+            break;
+        case BUILD_DAILY:
+            dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "build-info"),
+                gv->stdpaths->GetUserDataDir().c_str());
+            if (DownloadURL(gv->server_conf_url, dest)) {
+                WARN_DIALOG(wxT("Unable to download build status."),
+                wxT("Install"));
+                buf = wxT("");
+            } else
             {
-                wxRemoveFile(dest);
-                buf.Printf(wxT("Unable to download %s"), src.c_str() );
-                ERR_DIALOG(buf, wxT("Install"));
-                return;
-            }
-        }
+                buildinfo = new wxFileConfig(wxEmptyString,
+                    wxEmptyString, dest);
+                buf = buildinfo->Read(wxT("/dailies/date"));
+                buildinfo->DeleteAll();
 
-        if ( !UnzipFile(dest, gv->curdestdir, true) )
-        {
-            wxMessageDialog* msg = new wxMessageDialog(this, wxT("Rockbox has been installed on your device.")
-                            ,wxT("Installation"), wxOK |wxICON_INFORMATION);
-            msg->ShowModal();
-            delete msg;
-        } else
+                if (buf.Len() != 8) {
+                    dest.Printf(wxT("Invalid build date: %s"), buf.c_str());
+                    WARN_DIALOG(dest, wxT("Install"));
+                    buf = wxT("");
+                }
+            }
+
+            if (buf == wxT("")) {
+                WARN_DIALOG(wxT("Can't get date of latest build from "
+                    "server.  Using yesterday's date."), wxT("Install") );
+                date = wxDateTime::Now();
+                date.Subtract(oneday.Day());
+                buf = date.Format(wxT("%Y%m%d")); // yes, we want UTC
+            }
+
+            src.Printf(wxT("%s%s/%s-%s-%s.zip"),
+                gv->daily_url.c_str(), gv->curplat.c_str(),
+                gv->prog_name.c_str(), gv->curplat.c_str(),
+                buf.c_str() );
+
+            dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s-%s-%s.zip"),
+                gv->stdpaths->GetUserDataDir().c_str(),
+                gv->prog_name.c_str(),
+                gv->curplat.c_str(), buf.c_str() );
+            break;
+        case BUILD_BLEEDING:
+             src.Printf(wxT("%s%s/%s.zip"),
+                gv->bleeding_url.c_str(), gv->curplat.c_str(),
+                gv->prog_name.c_str() );
+            dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s.zip"),
+                gv->stdpaths->GetUserDataDir().c_str(),
+                gv->prog_name.c_str() );
+            break;
+        default:
+            ERR_DIALOG(wxT("Something seriously odd has happened."),
+                wxT("Install"));
+            return;
+            break;
+    }
+
+    if (gv->nocache || ( ! wxFileExists(dest) ) )
+    {
+        if ( DownloadURL(src, dest) )
         {
             wxRemoveFile(dest);
-            buf.Printf(wxT("Unable to unzip %s"), dest.c_str() );
+            buf.Printf(wxT("Unable to download %s"), src.c_str() );
             ERR_DIALOG(buf, wxT("Install"));
+            return;
         }
     }
+
+    if ( !UnzipFile(dest, gv->curdestdir, true) )
+    {
+        wxMessageDialog* msg = new wxMessageDialog(this, wxT("Rockbox has been installed on your device.")
+                        ,wxT("Installation"), wxOK |wxICON_INFORMATION);
+        msg->ShowModal();
+        delete msg;
+    } else
+    {
+        wxRemoveFile(dest);
+        buf.Printf(wxT("Unable to unzip %s"), dest.c_str() );
+        ERR_DIALOG(buf, wxT("Install"));
+    }
+
 
     wxLogVerbose(wxT("=== end rbutilFrm::OnInstallBtn"));
 }
@@ -632,81 +661,87 @@ void rbutilFrm::OnFontBtn(wxCommandEvent& event)
     wxFileConfig* buildinfo;
     wxDateSpan oneday;
 
+    // font install dialog
     fontInstallDlg dialog(NULL, wxID_ANY,
         wxT("Font Installation"));
+    if (dialog.ShowModal() != wxID_OK)
+        return;
 
-    if (dialog.ShowModal() == wxID_OK)
+    // really install ?
+    wxMessageDialog msg(this,wxT("Do you really want to install the Fonts ?"),wxT("Font installation"),wxOK|wxCANCEL);
+    if(msg.ShowModal() != wxID_OK )
+        return;
+
+
+    buf.Printf(wxT("%s" PATH_SEP ".rockbox"), gv->curdestdir.c_str()) ;
+    if (! wxDirExists(buf) )
     {
+        buf.Printf(wxT("Rockbox is not yet installed on %s - install "
+            "Rockbox first."), buf.c_str() );
+        WARN_DIALOG(buf, wxT("Can't install fonts") );
+        return;
+    }
 
-        buf.Printf(wxT("%s" PATH_SEP ".rockbox"), gv->curdestdir.c_str()) ;
-        if (! wxDirExists(buf) )
-        {
-            buf.Printf(wxT("Rockbox is not yet installed on %s - install "
-                "Rockbox first."), buf.c_str() );
-            WARN_DIALOG(buf, wxT("Can't install fonts") );
-            return;
-        }
+    dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "build-info"),
+    gv->stdpaths->GetUserDataDir().c_str());
+    if (DownloadURL(gv->server_conf_url, dest))
+    {
+        WARN_DIALOG(wxT("Unable to download build status."),
+            wxT("Font Install"));
+            buf = wxT("");
+    } else
+    {
+        buildinfo = new wxFileConfig(wxEmptyString,
+            wxEmptyString, dest);
+        buf = buildinfo->Read(wxT("/dailies/date"));
+            buildinfo->DeleteAll();
 
-        dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "build-info"),
-        gv->stdpaths->GetUserDataDir().c_str());
-        if (DownloadURL(gv->server_conf_url, dest))
-        {
-            WARN_DIALOG(wxT("Unable to download build status."),
-                wxT("Font Install"));
-                buf = wxT("");
-        } else
-        {
-            buildinfo = new wxFileConfig(wxEmptyString,
-                wxEmptyString, dest);
-            buf = buildinfo->Read(wxT("/dailies/date"));
-                buildinfo->DeleteAll();
-
-            if (buf.Len() != 8) {
-                dest.Printf(wxT("Invalid build date: %s"), buf.c_str());
-                WARN_DIALOG(dest, wxT("Font Install"));
-                buf = wxT("");
-            }
-        }
-
-        if (buf == wxT("")) {
-            WARN_DIALOG(wxT("Can't get date of latest build from "
-                "server.  Using yesterday's date."),
-                wxT("Font Install") );
-            date = wxDateTime::Now();
-            date.Subtract(oneday.Day());
-             buf = date.Format(wxT("%Y%m%d")); // yes, we want UTC
-        }
-
-        src.Printf(wxT("%s%s.zip"), gv->font_url.c_str(), buf.c_str() );
-
-        dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP
-            "rockbox-fonts-%s.zip"), gv->stdpaths->GetUserDataDir().c_str(),
-            buf.c_str() );
-
-        if ( ! wxFileExists(dest)  )
-        {
-            if ( DownloadURL(src, dest) )
-            {
-                wxRemoveFile(dest);
-                buf.Printf(wxT("Unable to download %s"), src.c_str() );
-                ERR_DIALOG(buf, wxT("Font Install"));
-                return;
-            }
-        }
-
-        if ( !UnzipFile(dest, gv->curdestdir, true) )
-        {
-            wxMessageDialog* msg = new wxMessageDialog(this, wxT("The Rockbox fonts have been installed on your device.")
-                            ,wxT("Installation"), wxOK |wxICON_INFORMATION);
-            msg->ShowModal();
-            delete msg;
-        } else
-        {
-            wxRemoveFile(dest);
-            buf.Printf(wxT("Unable to unzip %s"), dest.c_str() );
-            ERR_DIALOG(buf, wxT("Font Install"));
+        if (buf.Len() != 8) {
+            dest.Printf(wxT("Invalid build date: %s"), buf.c_str());
+            WARN_DIALOG(dest, wxT("Font Install"));
+            buf = wxT("");
         }
     }
+
+    if (buf == wxT("")) {
+        WARN_DIALOG(wxT("Can't get date of latest build from "
+            "server.  Using yesterday's date."),
+            wxT("Font Install") );
+        date = wxDateTime::Now();
+        date.Subtract(oneday.Day());
+         buf = date.Format(wxT("%Y%m%d")); // yes, we want UTC
+    }
+
+    src.Printf(wxT("%s%s.zip"), gv->font_url.c_str(), buf.c_str() );
+
+    dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP
+        "rockbox-fonts-%s.zip"), gv->stdpaths->GetUserDataDir().c_str(),
+        buf.c_str() );
+
+    if ( ! wxFileExists(dest)  )
+    {
+        if ( DownloadURL(src, dest) )
+        {
+            wxRemoveFile(dest);
+            buf.Printf(wxT("Unable to download %s"), src.c_str() );
+            ERR_DIALOG(buf, wxT("Font Install"));
+            return;
+        }
+    }
+
+    if ( !UnzipFile(dest, gv->curdestdir, true) )
+    {
+        wxMessageDialog* msg = new wxMessageDialog(this, wxT("The Rockbox fonts have been installed on your device.")
+                        ,wxT("Installation"), wxOK |wxICON_INFORMATION);
+        msg->ShowModal();
+        delete msg;
+    } else
+    {
+        wxRemoveFile(dest);
+        buf.Printf(wxT("Unable to unzip %s"), dest.c_str() );
+        ERR_DIALOG(buf, wxT("Font Install"));
+    }
+
     wxLogVerbose(wxT("=== end rbutilFrm::OnFontBtn"));
 }
 
@@ -716,26 +751,30 @@ void rbutilFrm::OnThemesBtn(wxCommandEvent& event)
     wxString src, dest, buf;
     wxLogVerbose(wxT("=== begin rbutilFrm::OnThemesBtn(event)"));
 
-
+    // Theme install dialog
     themesInstallDlg dialog(NULL, wxID_ANY,
         wxT("Theme Installation"));
+    if (dialog.ShowModal() != wxID_OK)
+        return;
 
-    if (dialog.ShowModal() == wxID_OK)
+    // really install ?
+    wxMessageDialog msg(this,wxT("Do you really want to install the selected Themes ?"),wxT("Theme installation"),wxOK|wxCANCEL);
+    if(msg.ShowModal() != wxID_OK )
+        return;
+
+    bool success=true;
+    for(unsigned int i=0 ;i < gv->themesToInstall.GetCount();i++)
     {
-        bool success=true;
-        for(unsigned int i=0 ;i < gv->themesToInstall.GetCount();i++)
+        if(!InstallTheme(gv->themesToInstall[i]))
         {
-            if(!InstallTheme(gv->themesToInstall[i]))
-            {
-                MESG_DIALOG(wxT("The Themes installation has failed") );
-                success=false;
-                break;
-            }
+            MESG_DIALOG(wxT("The Themes installation has failed") );
+            success=false;
+            break;
         }
-        if(success)
-        {
-            MESG_DIALOG(wxT("The Theme installation completed successfully.") );
-        }
+    }
+    if(success)
+    {
+        MESG_DIALOG(wxT("The Theme installation completed successfully.") );
     }
 
 
@@ -747,23 +786,29 @@ void rbutilFrm::OnRemoveBtn(wxCommandEvent& event)
 {
     wxLogVerbose(wxT("=== begin rbutilFrm::OnRemoveBtn(event)"));
 
+    // Rockbox deinstall dialog
     rockboxDeInstallDlg dialog(NULL, wxID_ANY,
         wxT("Rockbox Deinstallation"));
+    if (dialog.ShowModal() != wxID_OK)
+        return;
 
-    if (dialog.ShowModal() == wxID_OK)
+    // really install ?
+    wxMessageDialog msg(this,wxT("Do you really want to deinstall Rockbox ?"),wxT("Rockbox deinstallation"),wxOK|wxCANCEL);
+    if(msg.ShowModal() != wxID_OK )
+        return;
+
+
+    if (Uninstall(gv->curdestdir, gv->curisfull) )
     {
-        if (Uninstall(gv->curdestdir, gv->curisfull) )
-        {
-           MESG_DIALOG(
-           wxT("The uninstallation wizard was cancelled or completed with "
-             "some errors.") );
-        } else {
-            wxMessageDialog* msg = new wxMessageDialog(this, wxT("The uninstall wizard completed successfully\n"
-                          "Depending on which Device you own, you also have to uninstall the Bootloader")
-                            ,wxT("Uninstallation"), wxOK |wxICON_INFORMATION);
-            msg->ShowModal();
-            delete msg;
-        }
+       MESG_DIALOG(
+       wxT("The uninstallation wizard was cancelled or completed with "
+         "some errors.") );
+    } else {
+        wxMessageDialog* msg = new wxMessageDialog(this, wxT("The uninstall wizard completed successfully\n"
+                      "Depending on which Device you own, you also have to uninstall the Bootloader")
+                        ,wxT("Uninstallation"), wxOK |wxICON_INFORMATION);
+        msg->ShowModal();
+        delete msg;
     }
 
     wxLogVerbose(wxT("=== end rbutilFrm::OnRemoveBtn"));
@@ -776,19 +821,24 @@ void rbutilFrm::OnPortableInstall(wxCommandEvent& event)
     wxFileSystem fs;
     wxDateSpan oneday;
 
+    //portable install dialog ( reused font dialog)
     fontInstallDlg dialog(NULL, wxID_ANY,
         wxT("Rockbox Utility Portable Installation"));
+    if (dialog.ShowModal() != wxID_OK)
+        return;
 
-    if (dialog.ShowModal() == wxID_OK)
+     // really install ?
+    wxMessageDialog msg(this,wxT("Do you really want a portable install of rbutil ?"),wxT("rbutil installation"),wxOK|wxCANCEL);
+    if(msg.ShowModal() != wxID_OK )
+        return;
+
+    if ( InstallRbutil(gv->curdestdir) )
     {
-        if ( InstallRbutil(gv->curdestdir) )
-        {
-            MESG_DIALOG(wxT("The Rockbox Utility has been installed on your device."));
+        MESG_DIALOG(wxT("The Rockbox Utility has been installed on your device."));
 
-        } else
-        {
-            ERR_DIALOG(wxT("Installation failed"), wxT("Portable Install"));
-        }
+    } else
+    {
+        ERR_DIALOG(wxT("Installation failed"), wxT("Portable Install"));
     }
 
     wxLogVerbose(wxT("=== end rbutilFrm::OnUnstallPortable"));

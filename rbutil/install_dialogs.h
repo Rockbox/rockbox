@@ -32,7 +32,7 @@ public:
         long style = wxDEFAULT_DIALOG_STYLE |wxRESIZE_BORDER );
     // Creates the controls and sizers
     void CreateControls();
-   
+
     bool TransferDataFromWindow();
     bool TransferDataToWindow();
 
@@ -42,42 +42,6 @@ private:
     FirmwarePositionCtrl* m_firmwarepos;
 
 
-};
-
-class bootloaderDeInstallDlg : public wxDialog
-{
-    DECLARE_CLASS( bootloaderDeInstallDlg )
-    DECLARE_EVENT_TABLE()
-public:
-enum {
-			ID_DEVICE = 1001,
-
-     }; //End of Enum
-public:
-	bootloaderDeInstallDlg( );
-    bootloaderDeInstallDlg( wxWindow* parent,
-            wxWindowID id = wxID_ANY,
-            const wxString& caption = wxT("Bootloader Deinstallation"),
-            const wxPoint& pos = wxDefaultPosition,
-            const wxSize& size = wxDefaultSize,
-            long style = wxDEFAULT_DIALOG_STYLE |wxRESIZE_BORDER );
-    /// Member initialization
-    void Init();
-    /// Creation
-    bool Create( wxWindow* parent,
-        wxWindowID id = wxID_ANY,
-        const wxString& caption = wxT("Bootloader Deinstallation"),
-        const wxPoint& pos = wxDefaultPosition,
-        const wxSize& size = wxDefaultSize,
-        long style =wxDEFAULT_DIALOG_STYLE |wxRESIZE_BORDER );
-    /// Creates the controls and sizers
-    void CreateControls();
-
-    bool TransferDataFromWindow();
-    bool TransferDataToWindow();
-
-private:
-   DeviceSelectorCtrl* m_deviceselector;
 };
 
 
