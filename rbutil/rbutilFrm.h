@@ -97,6 +97,7 @@ public:
 			ID_WXPANEL1 = 1064,
 
             ID_MANUAL = 1065,
+            ID_FILE_PROXY = 1066,
 
             ID_DUMMY_VALUE_
    }; //End of Enum
@@ -116,6 +117,7 @@ public:
 	void OnBootloaderRemoveBtn(wxCommandEvent& event);
 
     void OnManualUpdate(wxUpdateUIEvent& event);
+    void OnFileProxy(wxCommandEvent& event);
 
 };
 

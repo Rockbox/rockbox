@@ -131,6 +131,10 @@ int DownloadURL(wxString src, wxString dest)
 
     input = true;
     wxURL* in_http = new wxURL(src);
+
+    if(gv->proxy_url != wxT(""))
+        in_http->SetProxy(gv->proxy_url);
+
     if (in_http->GetError() == wxURL_NOERR)
     {
 

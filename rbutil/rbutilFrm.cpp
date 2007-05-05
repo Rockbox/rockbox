@@ -51,6 +51,7 @@ BEGIN_EVENT_TABLE(rbutilFrm,wxFrame)
 	EVT_MENU(ID_FILE_ABOUT, rbutilFrm::OnFileAbout)
 	EVT_MENU(ID_FILE_WIPECACHE, rbutilFrm::OnFileWipeCache)
 	EVT_MENU(ID_PORTABLE_INSTALL, rbutilFrm::OnPortableInstall)
+	EVT_MENU(ID_FILE_PROXY, rbutilFrm::OnFileProxy)
 
 	EVT_UPDATE_UI   (ID_MANUAL, rbutilFrm::OnManualUpdate)
 
@@ -275,6 +276,8 @@ void rbutilFrm::CreateGUIControls(void)
         ID_FILE_MENU_Mnu_Obj->Append(ID_PORTABLE_INSTALL,
             wxT("&Install Rockbox Utility on device"), wxT(""), wxITEM_NORMAL);
     }
+    ID_FILE_MENU_Mnu_Obj->Append(ID_FILE_PROXY, wxT("Set &Proxy"), wxT(""),
+        wxITEM_NORMAL);
     ID_FILE_MENU_Mnu_Obj->Append(ID_FILE_ABOUT, wxT("&About"), wxT(""),
         wxITEM_NORMAL);
     ID_FILE_MENU_Mnu_Obj->Append(ID_FILE_EXIT, wxT("E&xit\tCtrl+X"), wxT(""),
@@ -319,8 +322,22 @@ void  rbutilFrm::OnManualUpdate(wxUpdateUIEvent& event)
     // construct link to html
     wxString htmllink;
     htmllink.Printf(wxT("%s%s/rockbox-build.html"),gv->manual_url.c_str(),curManualDevice.c_str());
-    manual->LoadPage(htmllink);
+    if(!manual->LoadPage(htmllink))
+        manual->SetPage(wxT("<p>unable to display manual -- please use the PDF link above</p>"));
 
+
+}
+
+
+void rbutilFrm::OnFileProxy(wxCommandEvent& event)
+{
+
+    wxTextEntryDialog proxydlg(this,wxT("Please enter your Proxy in the Format: URL:PORT"),wxT("Proxy Configuration"));
+
+    if(proxydlg.ShowModal() == wxID_OK)
+    {
+        gv->proxy_url = proxydlg.GetValue();
+    }
 
 }
 

@@ -253,6 +253,7 @@ void rbutilFrmApp::ReadUserConfig()
     if (gv->UserConfig->Read(wxT("curdestdir"), &str) ) gv->curdestdir = str;
     if (gv->UserConfig->Read(wxT("curplatform"), &str) ) gv->curplat = str;
     if (gv->UserConfig->Read(wxT("curfirmware"), &str) ) gv->curfirmware = str;
+    if (gv->UserConfig->Read(wxT("proxy_url"), &str) ) gv->proxy_url = str;
     gv->UserConfig->SetPath(stack);
 }
 
@@ -261,7 +262,8 @@ void rbutilFrmApp::WriteUserConfig()
     gv->UserConfig->SetPath(wxT("/defaults"));
     gv->UserConfig->Write(wxT("curdestdir"), gv->curdestdir);
     gv->UserConfig->Write(wxT("curplatform"), gv->curplat);
-     gv->UserConfig->Write(wxT("curfirmware"), gv->curfirmware);
+    gv->UserConfig->Write(wxT("curfirmware"), gv->curfirmware);
+    gv->UserConfig->Write(wxT("proxy_url"), gv->proxy_url);
 
     delete gv->UserConfig;
 
