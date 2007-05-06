@@ -383,8 +383,8 @@ static bool read_vorbis_tags(int fd, struct mp3entry *id3,
     long tag_remaining)
 {
     char *buf = id3->id3v2buf;
-    long comment_count;
-    long len;
+    int32_t comment_count;
+    int32_t len;
     int buf_remaining = sizeof(id3->id3v2buf) + sizeof(id3->id3v1buf);
     int i;
 
@@ -411,7 +411,7 @@ static bool read_vorbis_tags(int fd, struct mp3entry *id3,
     {
         char name[TAG_NAME_LENGTH];
         char value[TAG_VALUE_LENGTH];
-        long read_len;
+        int32_t read_len;
 
         if (tag_remaining < 4) 
         {
