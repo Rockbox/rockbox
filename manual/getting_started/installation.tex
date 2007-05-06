@@ -140,8 +140,9 @@ software.
 
   \end{description}
 
-  \subsection{Installing the firmware}\label{sec:installing_firmware}
 }
+
+\subsection{Choosing a Rockbox version}\label{sec:choosing_version}
 
 There are three different types of firmware binaries from Rockbox website:
 \label{Version}
@@ -195,6 +196,8 @@ project development, you can try development builds and help by reporting
 bugs. Just be aware that these are development builds that are highly
 functional, but not perfect!
 
+\subsection{Installing the firmware}\label{sec:installing_firmware}
+
 \opt{sansa}{\warn{The following steps require you to change the setting in
   \setting{Settings $\rightarrow$ USB Mode} to \setting{MSC} from within the
   original firmware. Never extract files to your \dap{} while it is in
@@ -205,16 +208,26 @@ functional, but not perfect!
 \opt{gigabeat}{\warn{During installation, do not connect your \dap{}
   using the cradle but plug the USB cable directly to the \dap{}.}}
 
-After downloading the Rockbox package connect your \dap{} to the computer via
-USB as described in the manual that came with your \dap{}. Take the file that
-you downloaded above, and extract its contents to your \daps{} drive.
+\begin{enumerate}
 
-Use the ``Extract all'' command of your unzip program to extract the files in
-the \fname{.zip} file onto your \dap{}. Note that the entire contents of the
-\fname{.zip} file should be extracted directly to the root of your \daps{}
-drive. Do not try to create a separate directory or folder on your \dap{} for
-the Rockbox files! The \fname{.zip} file already contains the internal
-directory structure that Rockbox needs.
+\item Download your chosen version of Rockbox from the links in the
+  previous section.
+
+\item Connect your \dap{} to the computer via USB
+  \opt{ipod3g,ipod4g,ipodmini,ipodcolor}{ or Firewire} as described in
+  the manual that came with your \dap{}.
+
+\item Take the file that you downloaded above, and use the ``Extract
+  all'' command of your unzip program to extract the files in the
+  \fname{.zip} file onto your \dap{}.
+
+Note that the entire contents of the \fname{.zip} file should be
+extracted directly to the root of your \daps{} drive. Do not try to
+create a separate directory or folder on your \dap{} for the Rockbox
+files! The \fname{.zip} file already contains the internal directory
+structure that Rockbox needs.
+
+\end{enumerate}
 
 \opt{archos}{
   \note{
