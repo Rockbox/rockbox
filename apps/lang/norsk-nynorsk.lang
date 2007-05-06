@@ -284,13 +284,13 @@
   desc: in the main menu
   user:
   <source>
-    *: "Playlist Options"
+    *: "Playlist"
   </source>
   <dest>
-    *: "Spelelisteval"
+    *: "Speleliste"
   </dest>
   <voice>
-    *: "Spelelisteval"
+    *: "Speleliste"
   </voice>
 </phrase>
 <phrase>
@@ -298,7 +298,7 @@
   desc: in the main menu
   user:
   <source>
-    *: "Browse Plugins"
+    *: "Plugins"
   </source>
   <dest>
     *: "Program"
@@ -312,13 +312,13 @@
   desc: in the main menu
   user:
   <source>
-    *: "Info"
+    *: "System"
   </source>
   <dest>
-    *: "Info"
+    *: "System"
   </dest>
   <voice>
-    *: "Info"
+    *: "System"
   </voice>
 </phrase>
 <phrase>
@@ -821,6 +821,8 @@
     ipod*: "SELECT = Yes"
     x5: "SELECT = Yes"
     h10: "NEXT = Yes"
+    gigabeat: "SELECT = Yes"
+    e200: "SELECT = Yes"
   </source>
   <dest>
     *: "SPEL = ja"
@@ -828,6 +830,8 @@
     ipod*: "VEL = ja"
     x5: "VEL = ja"
     h10: "NESTE = ja"
+    gigabeat: "VEL = ja"
+    e200: "VEL = ja"
   </dest>
   <voice>
     *: ""
@@ -964,13 +968,13 @@
   desc: in the recording sub menu
   user:
   <source>
-    *: "Recording Screen"
+    *: "Recording"
   </source>
   <dest>
-    *: "Opptaksbilete"
+    *: "Opptaksskjerm"
   </dest>
   <voice>
-    *: "Opptaksbilete"
+    *: "Opptaksskjerm"
   </voice>
 </phrase>
 <phrase>
@@ -1423,10 +1427,10 @@
 </phrase>
 <phrase>
   id: LANG_RESUME
-  desc: in settings_menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Resume on Startup"
+    *: ""
   </source>
   <dest>
     *: "Hald fram ved oppstart"
@@ -2728,10 +2732,10 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_STARTUP
-  desc: Start Rockbox in Recording Screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "Show Recording Screen on Startup"
+    *: ""
   </source>
   <dest>
     *: "Vis opptaksskjerm ved oppstart"
@@ -4658,6 +4662,7 @@
     ipod*: "PLAY/PAUSE = Exit"
     x5: "RECORD = Exit"
     h10: "PREV = Exit"
+    gigabeat: "A = Exit"
   </source>
   <dest>
     *: "AV = avslutt"
@@ -4665,6 +4670,7 @@
     ipod*: "SPEL/PAUSE = avslutt"
     x5: "OPPTAK = avslutt"
     h10: "FØRRE = avslutt"
+    gigabeat: "A = avslutt"
   </dest>
   <voice>
     *: ""
@@ -4722,6 +4728,7 @@
     ipod*: "SELECT = Select"
     x5: "SELECT = Select"
     h10: "NEXT = Select"
+    gigabeat: "SELECT = Select"
   </source>
   <dest>
     *: "SPEL = vel"
@@ -4729,6 +4736,7 @@
     ipod*: "VEL = vel"
     x5: "VEL = vel"
     h10: "NESTE = vel"
+    gigabeat: "VEL = vel"
   </dest>
   <voice>
     *: ""
@@ -4744,6 +4752,7 @@
     ipod*: "Long MENU = Delete"
     x5: "Long RECORD = Delete"
     h10: "REWIND = Delete"
+    gigabeat: "POWER = Delete"
   </source>
   <dest>
     *: "PÅ+SPEL = slett"
@@ -4751,6 +4760,7 @@
     ipod*: "MENY lenge = slett"
     x5: "OPPTAK lenge = slett"
     h10: "BAKOVER = slett"
+    gigabeat: "PÅ/AV = slett"
   </dest>
   <voice>
     *: ""
@@ -4831,11 +4841,12 @@
   desc: used in set_time()
   user:
   <source>
-    *: "ON To Set"
+    *: "ON = Set"
     h100,h120,h300: "NAVI = Set"
     ipod*: "SELECT = Set"
     x5: "SELECT = Set"
     h10: "NEXT = Set"
+    gigabeat: "SELECT = Set"
   </source>
   <dest>
     *: "PÅ for å velja"
@@ -4843,6 +4854,7 @@
     ipod*: "VEL = vel"
     x5: "VEL = vel"
     h10: "NESTE = vel"
+    gigabeat: "VEL = vel"
   </dest>
   <voice>
     *: ""
@@ -4853,18 +4865,20 @@
   desc: used in set_time()
   user:
   <source>
-    *: "OFF To Revert"
+    *: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
     ipod*: "MENU = Revert"
     x5: "RECORD = Revert"
     h10: "PREV = Revert"
+    gigabeat: "POWER = Revert"
   </source>
   <dest>
-    *: "AV for å tilbakestilla"
+    *: "AV = tilbakestill"
     h100,h120,h300: "STOPP = tilbakestill"
     ipod*: "MENY = tilbakestill"
     x5: "OPPTAK = tilbakestill"
     h10: "FØRRE = tilbakestill"
+    gigabeat: "PÅ/AV = tilbakestill"
   </dest>
   <voice>
     *: ""
@@ -5284,9 +5298,11 @@
   user:
   <source>
     *: "PLAY=Set OFF=Cancel"
+    ipod*: "SELECT=Set MENU=Cancel"
   </source>
   <dest>
-    *: "SPEL = set – AV = avbryt"
+    *: "SPEL = vel – AV = avbryt"
+    ipod*: "VEL = vel  – MENY = avbryt"
   </dest>
   <voice>
     *: ""
@@ -7198,10 +7214,10 @@
 </phrase>
 <phrase>
   id: LANG_END_PLAYLIST_PLAYER
-  desc: when playlist has finished
+  desc: DEPRECATED
   user:
   <source>
-    *: "End of List"
+    *: ""
   </source>
   <dest>
     *: "Lista er ferdig"
@@ -7216,9 +7232,11 @@
   user:
   <source>
     *: "End of Song List"
+    player: "End of List"
   </source>
   <dest>
     *: "Spelelista er ferdig"
+    player: "Lista er ferdig"
   </dest>
   <voice>
     *: ""
@@ -10473,5 +10491,254 @@
   </dest>
   <voice>
     *: "Starttype"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUILDING_DATABASE
+  desc: splash database building progress
+  user:
+  <source>
+    *: "Building database... %d found (OFF to return)"
+    h100,h120,h300: "Building database... %d found (STOP to return)"
+    ipod*: "Building database... %d found (PLAY/PAUSE to return)"
+    x5: "Building database... %d found (Long PLAY to return)"
+    h10: "Building database... %d found (PREV to return)"
+  </source>
+  <dest>
+    *: "Byggjer database … Fann %d. (AV for å gå tilbake.)"
+    h100,h120,h300: "Byggjer database … Fann %d. (STOPP for å gå tilbake.)"
+    ipod*: "Byggjer database … Fann %d. (SPEL/PAUSE for å gå tilbake.)"
+    x5: "Byggjer database … Fann %d. (SPEL (lenge) for å gå tilbake.)"
+    h10: "Byggjer database … Fann %d. (FØRRE for å gå tilbake.)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIR_BROWSER
+  desc: in root menu
+  user:
+  <source>
+    *: "Files"
+  </source>
+  <dest>
+    *: "Filer"
+  </dest>
+  <voice>
+    *: "Filer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_POWEROFF
+  desc: DEPRECATED
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: deprecated
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOW_PLAYING
+  desc: in root menu
+  user:
+  <source>
+    *: "Now Playing"
+  </source>
+  <dest>
+    *: "Spelar no"
+  </dest>
+  <voice>
+    *: "Spelar no"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_MENU
+  desc: in root menu
+  user:
+  <source>
+    *: "Settings"
+  </source>
+  <dest>
+    *: "Oppsett"
+  </dest>
+  <voice>
+    *: "Oppsett"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Main Menu"
+  </source>
+  <dest>
+    *: "Hovudmeny"
+  </dest>
+  <voice>
+    *: "Hovudmeny"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_WAKEUP_SCREEN
+  desc: in alarm menu setting
+  user:
+  <source>
+    *: "Alarm Wake up Screen"
+  </source>
+  <dest>
+    *: "Vekkjarurskjerm"
+  </dest>
+  <voice>
+    *: "Vekkjarurskjerm"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_PLAYBACK
+  desc: in root menu
+  user:
+  <source>
+    *: "Resume Playback"
+  </source>
+  <dest>
+    *: "Hald fram med å spela"
+  </dest>
+  <voice>
+    *: "Hald fram med å spela"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ROCKBOX_TITLE
+  desc: in root menu
+  user:
+  <source>
+    *: "Rockbox"
+  </source>
+  <dest>
+    *: "Rockbox"
+  </dest>
+  <voice>
+    *: "Rockbox"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVIOUS_SCREEN
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Previous Screen"
+  </source>
+  <dest>
+    *: "Siste skjerm"
+  </dest>
+  <voice>
+    *: "Siste skjerm"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_SCREEN
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Start Screen"
+  </source>
+  <dest>
+    *: "Startskjerm"
+  </dest>
+  <voice>
+    *: "Startskjerm"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FIRMWARE
+  desc: DEPRECATED
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: deprecated
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRCACHE_REBOOT
+  desc: DEPRECATED
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_MENU
+  desc: fm menu title
+  user:
+  <source>
+    *: "FM Radio Menu"
+  </source>
+  <dest>
+    *: "Radiomeny"
+  </dest>
+  <voice>
+    *: "Radiomeny"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLISTVIEWER_SETTINGS
+  desc: title for the playlist viewer settings menus
+  user:
+  <source>
+    *: "Playlist Viewer Settings"
+  </source>
+  <dest>
+    *: "Val for spelelistevising"
+  </dest>
+  <voice>
+    *: "Val for spelelistevising"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_MENU_TITLE
+  desc: title for the onplay menus
+  user:
+  <source>
+    *: "Context Menu"
+  </source>
+  <dest>
+    *: "Kontekstmeny"
+  </dest>
+  <voice>
+    *: "Kontekstmeny"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONLIGHT_TIMEOUT
+  desc: in settings_menu
+  user:
+  <source>
+    *: ""
+    e200: "Wheel Light Timeout"
+  </source>
+  <dest>
+    *: ""
+    e200: "Avbrotstid for hjullys"
+  </dest>
+  <voice>
+    *: ""
+    e200: "Avbrotstid for hjullys"
   </voice>
 </phrase>
