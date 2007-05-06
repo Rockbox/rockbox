@@ -22,8 +22,8 @@
 #include "backlight.h"
 #include "i2c-pp.h"
 
-static unsigned short backlight_brightness;
-static bool backlight_is_on;
+static unsigned short backlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
+static bool backlight_is_on = false;
 
 int __backlight_is_on(void)
 {
