@@ -231,6 +231,7 @@ static void init_menu_lists(const struct menu_item_ex *menu,
     get_menu_callback(menu,&menu_callback);
     if (callback && menu_callback)
         menu_callback(ACTION_ENTER_MENUITEM,menu);
+    gui_synclist_draw(lists);
 }
 
 static void talk_menu_item(const struct menu_item_ex *menu,
