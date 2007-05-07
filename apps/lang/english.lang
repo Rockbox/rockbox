@@ -10760,16 +10760,19 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Button Light Timeout"
+    *: ""
     e200: "Wheel Light Timeout"
+    gigabeat: "Button Light Timeout"
   </source>
   <dest>
-    *: "Button Light Timeout"
+    *: ""
     e200: "Wheel Light Timeout"
+    gigabeat: "Button Light Timeout"
   </dest>
   <voice>
-    *: "Button Light Timeout"
+    *: ""
     e200: "Wheel Light Timeout"
+    gigabeat: "Button Light Timeout"
   </voice>
 </phrase>
 <phrase>
