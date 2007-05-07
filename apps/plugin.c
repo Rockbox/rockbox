@@ -493,6 +493,7 @@ static const struct plugin_api rockbox_api = {
     codec_load_file,
     get_metadata,
     get_codec_filename,
+    steal_codec_stack,
 #endif
 };
 

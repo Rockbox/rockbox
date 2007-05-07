@@ -30,11 +30,11 @@ static char str[40];
 /* Our local implementation of the codec API */
 static struct codec_api ci;
 
-
 static struct track_info track;
-
 static bool taginfo_ready = true;
 
+static volatile unsigned int elapsed;
+static volatile bool codec_playing;
 
 /* Returns buffer to malloc array. Only codeclib should need this. */
 static void* get_codec_memory(size_t *size)
@@ -43,7 +43,6 @@ static void* get_codec_memory(size_t *size)
    *size = 512*1024;
    return codec_mallocbuf;
 }
-
 
 /* Insert PCM data into audio buffer for playback. Playback will start
    automatically. */
@@ -58,18 +57,10 @@ static bool pcmbuf_insert(const void *ch1, const void *ch2, int count)
 }
 
 
-static unsigned int prev_value = 0;
-
 /* Set song position in WPS (value in ms). */
 static void set_elapsed(unsigned int value)
 {
-    if ((value - prev_value) > 2000)
-    {
-        rb->snprintf(str,sizeof(str),"%d of %d",value,(int)track.id3.length);
-        rb->lcd_puts(0,0,str);
-        rb->lcd_update();
-        prev_value = value;
-    }
+    elapsed = value;
 }
 
 
@@ -230,17 +221,36 @@ static void init_ci(void)
 #endif
 }
 
+static void codec_thread(void)
+{
+    const char* codecname;
+    int res;
+
+    codecname = rb->get_codec_filename(track.id3.codectype);
+
+    /* Load the codec and start decoding. */
+    res = rb->codec_load_file(codecname,&ci);
+
+    /* Signal to the main thread that we are done */
+    codec_playing = false;
+
+    /* Commit suicide */
+    rb->remove_thread(NULL);
+}
+
 /* plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     size_t n;
     int fd;
-    const char* codecname;
-    int res;
     unsigned long starttick;
     unsigned long ticks;
     unsigned long speed;
     unsigned long duration;
+    unsigned char* codec_stack;
+    unsigned char* codec_stack_copy;
+    size_t codec_stack_size;
+    struct thread_entry* codecthread_id;
 
     rb = api;
 
@@ -250,10 +260,16 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         return PLUGIN_ERROR;
     }
 
+    rb->steal_codec_stack(&codec_stack,&codec_stack_size);
+
     codec_mallocbuf = rb->plugin_get_audio_buffer(&audiosize);
-    audiobuf = codec_mallocbuf + 512*1024;
-    audiosize -= 512*1024;
-    
+    codec_stack_copy = codec_mallocbuf + 512*1024;
+    audiobuf = codec_stack_copy + codec_stack_size;
+    audiosize -= 512*1024 + codec_stack_size;
+
+    /* Backup the codec thread's stack */
+    rb->memcpy(codec_stack_copy,codec_stack,codec_stack_size);    
+
     fd = rb->open(parameter,O_RDONLY);
     if (fd < 0)
     {
@@ -298,8 +314,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     ci.new_track = 0;
     ci.seek_time = 0;
 
-    codecname = rb->get_codec_filename(track.id3.codectype);
-
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif
@@ -311,9 +325,24 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     starttick = *rb->current_tick;
 
-    /* Load the codec and start decoding. */
-    res = rb->codec_load_file(codecname,&ci);
+    codec_playing = true;
 
+    if ((codecthread_id = rb->create_thread(codec_thread,
+        (uint8_t*)codec_stack, codec_stack_size, "testcodec" IF_PRIO(,PRIORITY_PLAYBACK)
+        IF_COP(, CPU, false))) == NULL)
+    {
+        rb->splash(HZ, "Cannot create codec thread!");
+        goto exit;
+    }
+
+    /* Wait for codec thread to die */
+    while (codec_playing)
+    {
+        rb->sleep(HZ);
+        rb->snprintf(str,sizeof(str),"%d of %d",elapsed,(int)track.id3.length);
+        rb->lcd_puts(0,0,str);
+        rb->lcd_update();
+    }
 
     /* Display benchmark information */
 
@@ -336,6 +365,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_update();
 
     while (rb->button_get(true) != BUTTON_SELECT);
+
+exit:
+    /* Restore the codec thread's stack */
+    rb->memcpy(codec_stack, codec_stack_copy, codec_stack_size);    
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
