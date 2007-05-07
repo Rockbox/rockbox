@@ -90,12 +90,12 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 17
+#define CODEC_API_VERSION 18
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 17
+#define CODEC_MIN_API_VERSION 18
 
 /* codec return codes */
 enum codec_status {
@@ -166,117 +166,21 @@ struct codec_api {
     /* Configure different codec buffer parameters. */
     void (*configure)(int setting, intptr_t value);
 
-    void (*splash)(int ticks, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
-
-    /* file */
-    int (*PREFIX(open))(const char* pathname, int flags);
-    int (*close)(int fd);
-    ssize_t (*read)(int fd, void* buf, size_t count);
-    off_t (*PREFIX(lseek))(int fd, off_t offset, int whence);
-    int (*PREFIX(creat))(const char *pathname);
-    ssize_t (*write)(int fd, const void* buf, size_t count);
-    int (*PREFIX(remove))(const char* pathname);
-    int (*PREFIX(rename))(const char* path, const char* newname);
-    int (*PREFIX(ftruncate))(int fd, off_t length);
-    int (*PREFIX(fsync))(int fd);
-
-    int (*fdprintf)(int fd, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
-    int (*read_line)(int fd, char* buffer, int buffer_size);
-    bool (*settings_parseline)(char* line, char** name, char** value);
-#ifndef SIMULATOR
-    void (*ata_sleep)(void);
-#endif
-    
-    /* dir */
-    DIR* (*PREFIX(opendir))(const char* name);
-    int (*PREFIX(closedir))(DIR* dir);
-    struct dirent* (*PREFIX(readdir))(DIR* dir);
-    int (*PREFIX(mkdir))(const char *name);
-
     /* kernel/ system */
     void (*PREFIX(sleep))(int ticks);
     void (*yield)(void);
-    long* current_tick;
-    long (*default_event_handler)(long event);
-    long (*default_event_handler_ex)(long event, void (*callback)(void *), void *parameter);
-    struct thread_entry* (*create_thread)(void (*function)(void), 
-                                          void* stack, int stack_size, const char *name
-                                          IF_PRIO(, int priority)
-					  IF_COP(, unsigned int core, bool fallback));
-    void (*remove_thread)(struct thread_entry *thread);
-    void (*reset_poweroff_timer)(void);
-#ifndef SIMULATOR
-    int (*system_memory_guard)(int newmode);
-    long *cpu_frequency;
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-#ifdef CPU_BOOST_LOGGING
-    void (*cpu_boost_)(bool on_off,char*location,int line);
-#else
-    void (*cpu_boost)(bool on_off);
-#endif
-#endif
-#endif
 
     /* strings and memory */
-    int (*snprintf)(char *buf, size_t size, const char *fmt, ...)
-                    ATTRIBUTE_PRINTF(3, 4);
     char* (*strcpy)(char *dst, const char *src);
     char* (*strncpy)(char *dst, const char *src, size_t length);
     size_t (*strlen)(const char *str);
-    char * (*strrchr)(const char *s, int c);
     int (*strcmp)(const char *, const char *);
-    int (*strcasecmp)(const char *, const char *);
-    int (*strncasecmp)(const char *s1, const char *s2, size_t n);
+    char *(*strcat)(char *s1, const char *s2);
     void* (*memset)(void *dst, int c, size_t length);
     void* (*memcpy)(void *out, const void *in, size_t n);
     void* (*memmove)(void *out, const void *in, size_t n);
-    const char *_ctype_;
-    int (*atoi)(const char *str);
-    char *(*strchr)(const char *s, int c);
-    char *(*strcat)(char *s1, const char *s2);
     int (*memcmp)(const void *s1, const void *s2, size_t n);
-    char *(*strcasestr) (const char* phaystack, const char* pneedle);
     void *(*memchr)(const void *s1, int c, size_t n);
-
-    /* sound */
-    void (*sound_set)(int setting, int value);
-#ifndef SIMULATOR
-    void (*mp3_play_data)(const unsigned char* start,
-        int size, void (*get_more)(unsigned char** start, int* size));
-    void (*mp3_play_pause)(bool play);
-    void (*mp3_play_stop)(void);
-    bool (*mp3_is_playing)(void);
-#endif /* !SIMULATOR */
-
-    /* playback control */
-    void (*PREFIX(audio_play))(long offset);
-    void (*audio_stop)(void);
-    void (*audio_pause)(void);
-    void (*audio_resume)(void);
-    void (*audio_next)(void);
-    void (*audio_prev)(void);
-    void (*audio_ff_rewind)(long newtime);
-    struct mp3entry* (*audio_next_track)(void);
-    int (*playlist_amount)(void);
-    int (*audio_status)(void);
-    bool (*audio_has_changed_track)(void);
-    struct mp3entry* (*audio_current_track)(void);
-    void (*audio_flush_and_reload_tracks)(void);
-    int (*audio_get_file_pos)(void);
-
-    /* misc */
-    void (*srand)(unsigned int seed);
-    int  (*rand)(void);
-    void (*qsort)(void *base, size_t nmemb, size_t size,
-                  int(*compar)(const void *, const void *));
-    int (*kbd_input)(char* buffer, int buflen);
-    struct tm* (*get_time)(void);
-    int  (*set_time)(const struct tm *tm);
-    void* (*plugin_get_audio_buffer)(size_t* buffer_size);
-    int (*round_value_to_list32)(unsigned long value,
-                                 const unsigned long list[],
-                                 int count,
-                                 bool signd);
 
 #if defined(DEBUG) || defined(SIMULATOR)
     void (*debugf)(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2);
@@ -284,18 +188,13 @@ struct codec_api {
 #ifdef ROCKBOX_HAS_LOGF
     void (*logf)(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2);
 #endif
+
+    /* Tremor requires qsort */
+    void (*qsort)(void *base, size_t nmemb, size_t size,
+                  int(*compar)(const void *, const void *));
+
+    /* The ADX codec accesses global_settings to test for REPEAT_ONE mode */
     struct user_settings* global_settings;
-    bool (*mp3info)(struct mp3entry *entry, const char *filename, bool v1first);
-    int (*count_mp3_frames)(int fd, int startpos, int filesize,
-                            void (*progressfunc)(int));
-    int (*create_xing_header)(int fd, long startpos, long filesize,
-                              unsigned char *buf, unsigned long num_frames,
-                              unsigned long rec_time, unsigned long header_template,
-                              void (*progressfunc)(int), bool generate_toc);
-    unsigned long (*find_next_frame)(int fd, long *offset,
-                                     long max_offset, unsigned long last_header);
-    int (*battery_level)(void);
-    bool (*battery_level_safe)(void);
 
 #ifdef RB_PROFILE
     void (*profile_thread)(void);
@@ -314,6 +213,28 @@ struct codec_api {
     int             (*enc_pcm_buf_near_empty)(void);
     unsigned char * (*enc_get_pcm_data)(size_t size);
     size_t          (*enc_unget_pcm_data)(size_t size);
+
+    /* file */
+    int (*PREFIX(open))(const char* pathname, int flags);
+    int (*close)(int fd);
+    ssize_t (*read)(int fd, void* buf, size_t count);
+    off_t (*PREFIX(lseek))(int fd, off_t offset, int whence);
+    ssize_t (*write)(int fd, const void* buf, size_t count);
+    
+    /* Encoder codecs adjust CPU boost themselves */
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+#ifdef CPU_BOOST_LOGGING
+    void (*cpu_boost_)(bool on_off,char*location,int line);
+#else
+    void (*cpu_boost)(bool on_off);
+#endif
+#endif
+
+    int (*round_value_to_list32)(unsigned long value,
+                                 const unsigned long list[],
+                                 int count,
+                                 bool signd);
+
 #endif
 
     /* new stuff at the end, sort into place next time

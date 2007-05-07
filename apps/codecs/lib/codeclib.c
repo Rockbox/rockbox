@@ -104,11 +104,6 @@ int strcmp(const char *s1, const char *s2)
     return(ci->strcmp(s1,s2));
 }
 
-int strncasecmp(const char *s1, const char *s2, size_t n)
-{
-    return(ci->strncasecmp(s1,s2,n));
-}
-
 void *memcpy(void *dest, const void *src, size_t n)
 {
     return(ci->memcpy(dest,src,n));

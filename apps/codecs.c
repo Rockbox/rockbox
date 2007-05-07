@@ -91,107 +91,21 @@ struct codec_api ci = {
     NULL, /* set_offset */
     NULL, /* configure */
     
-    gui_syncsplash,
-
-    /* file */
-    (open_func)PREFIX(open),
-    close,
-    (read_func)read,
-    PREFIX(lseek),
-    (creat_func)PREFIX(creat),
-    (write_func)write,
-    PREFIX(remove),
-    PREFIX(rename),
-    PREFIX(ftruncate),
-    PREFIX(fsync),
-    fdprintf,
-    read_line,
-    settings_parseline,
-#ifndef SIMULATOR
-    ata_sleep,
-#endif
-
-    /* dir */
-    PREFIX(opendir),
-    PREFIX(closedir),
-    PREFIX(readdir),
-    PREFIX(mkdir),
-
     /* kernel/ system */
     PREFIX(sleep),
     yield,
-    &current_tick,
-    default_event_handler,
-    default_event_handler_ex,
-    create_thread,
-    remove_thread,
-    reset_poweroff_timer,
-#ifndef SIMULATOR
-    system_memory_guard,
-    &cpu_frequency,
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-#ifdef CPU_BOOST_LOGGING
-    cpu_boost_,
-#else
-    cpu_boost,
-#endif
-#endif
-#endif
 
     /* strings and memory */
-    snprintf,
     strcpy,
     strncpy,
     strlen,
-    strrchr,
     strcmp,
-    strcasecmp,
-    strncasecmp,
+    strcat,
     memset,
     memcpy,
     memmove,
-    _ctype_,
-    atoi,
-    strchr,
-    strcat,
     memcmp,
-    strcasestr,
     memchr,
-
-    /* sound */
-    sound_set,
-#ifndef SIMULATOR
-    mp3_play_data,
-    mp3_play_pause,
-    mp3_play_stop,
-    mp3_is_playing,
-#endif
-
-    /* playback control */
-    PREFIX(audio_play),
-    audio_stop,
-    audio_pause,
-    audio_resume,
-    audio_next,
-    audio_prev,
-    audio_ff_rewind,
-    audio_next_track,
-    playlist_amount,
-    audio_status,
-    audio_has_changed_track,
-    audio_current_track,
-    audio_flush_and_reload_tracks,
-    audio_get_file_pos,
-
-    /* misc */
-    srand,
-    rand,
-    (qsort_func)qsort,
-    kbd_input,
-    get_time,
-    set_time,
-    plugin_get_audio_buffer,
-    round_value_to_list32,
 
 #if defined(DEBUG) || defined(SIMULATOR)
     debugf,
@@ -199,13 +113,9 @@ struct codec_api ci = {
 #ifdef ROCKBOX_HAS_LOGF
     logf,
 #endif
+
+    (qsort_func)qsort,
     &global_settings,
-    mp3info,
-    count_mp3_frames,
-    create_xing_header,
-    find_next_frame,
-    battery_level,
-    battery_level_safe,
 
 #ifdef RB_PROFILE
     profile_thread,
@@ -224,6 +134,24 @@ struct codec_api ci = {
     enc_pcm_buf_near_empty,
     enc_get_pcm_data,
     enc_unget_pcm_data,
+
+    /* file */
+    (open_func)PREFIX(open),
+    close,
+    (read_func)read,
+    PREFIX(lseek),
+    (write_func)write,
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+#ifdef CPU_BOOST_LOGGING
+    cpu_boost_,
+#else
+    cpu_boost,
+#endif
+#endif
+
+    round_value_to_list32,
+
 #endif
 
     /* new stuff at the end, sort into place next time

@@ -47,7 +47,6 @@ size_t strlen(const char *s);
 char *strcpy(char *dest, const char *src);
 char *strcat(char *dest, const char *src);
 int strcmp(const char *, const char *);
-int strcasecmp(const char *, const char *);
 
 void qsort(void *base, size_t nmemb, size_t size, int(*compar)(const void *, const void *));
 
