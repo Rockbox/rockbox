@@ -864,7 +864,7 @@
     h100,h120,h300: "NAVI = Yes"
     ipod*: "SELECT = Yes"
     x5: "SELECT = Yes"
-    h10: "NEXT = Yes"
+    h10,h10_5gb: "SELECT = Yes"
     gigabeat: "SELECT = Yes"
     e200: "SELECT = Yes"
   </source>
@@ -873,7 +873,7 @@
     h100,h120,h300: "NAVI = Yes"
     ipod*: "SELECT = Yes"
     x5: "SELECT = Yes"
-    h10: "NEXT = Yes"
+    h10,h10_5gb: "SELECT = Yes"
     gigabeat: "SELECT = Yes"
     e200: "SELECT = Yes"
   </dest>
@@ -4733,16 +4733,18 @@
     h100,h120,h300: "STOP = Exit"
     ipod*: "PLAY/PAUSE = Exit"
     x5: "RECORD = Exit"
-    h10: "PREV = Exit"
+    h10,h10_5gb: "PREV = Exit"
     gigabeat: "A = Exit"
+    e200: "POWER = Exit"
   </source>
   <dest>
     *: "OFF = Exit"
     h100,h120,h300: "STOP = Exit"
     ipod*: "PLAY/PAUSE = Exit"
     x5: "RECORD = Exit"
-    h10: "PREV = Exit"
+    h10,h10_5gb: "PREV = Exit"
     gigabeat: "A = Exit"
+    e200: "POWER = Exit"
   </dest>
   <voice>
     *: ""
@@ -4799,16 +4801,18 @@
     h100,h120,h300: "NAVI = Select"
     ipod*: "SELECT = Select"
     x5: "SELECT = Select"
-    h10: "NEXT = Select"
+    h10,h10_5gb: "SELECT = Select"
     gigabeat: "SELECT = Select"
+    e200: "SELECT = Select"
   </source>
   <dest>
     *: "PLAY = Select"
     h100,h120,h300: "NAVI = Select"
     ipod*: "SELECT = Select"
     x5: "SELECT = Select"
-    h10: "NEXT = Select"
+    h10,h10_5gb: "SELECT = Select"
     gigabeat: "SELECT = Select"
+    e200: "SELECT = Select"
   </dest>
   <voice>
     *: ""
@@ -4823,16 +4827,18 @@
     h100,h120,h300: "RECORD = Delete"
     ipod*: "Long MENU = Delete"
     x5: "Long RECORD = Delete"
-    h10: "REWIND = Delete"
+    h10,h10_5gb: "REWIND = Delete"
     gigabeat: "POWER = Delete"
+    e200: "PLAY = Delete"
   </source>
   <dest>
     *: "ON+Play = Delete"
     h100,h120,h300: "RECORD = Delete"
     ipod*: "Long MENU = Delete"
     x5: "Long RECORD = Delete"
-    h10: "REWIND = Delete"
+    h10,h10_5gb: "REWIND = Delete"
     gigabeat: "POWER = Delete"
+    e200: "PLAY = Delete"
   </dest>
   <voice>
     *: ""
@@ -4917,16 +4923,18 @@
     h100,h120,h300: "NAVI = Set"
     ipod*: "SELECT = Set"
     x5: "SELECT = Set"
-    h10: "NEXT = Set"
+    h10,h10_5gb: "SELECT = Set"
     gigabeat: "SELECT = Set"
+    e200: "SELECT = Set"
   </source>
   <dest>
     *: "ON = Set"
     h100,h120,h300: "NAVI = Set"
     ipod*: "SELECT = Set"
     x5: "SELECT = Set"
-    h10: "NEXT = Set"
+    h10,h10_5gb: "SELECT = Set"
     gigabeat: "SELECT = Set"
+    e200: "SELECT = Set"
   </dest>
   <voice>
     *: ""
@@ -4941,16 +4949,18 @@
     h100,h120,h300: "STOP = Revert"
     ipod*: "MENU = Revert"
     x5: "RECORD = Revert"
-    h10: "PREV = Revert"
+    h10,h10_5gb: "PREV = Revert"
     gigabeat: "POWER = Revert"
+    e200: "PREV = Revert"
   </source>
   <dest>
     *: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
     ipod*: "MENU = Revert"
     x5: "RECORD = Revert"
-    h10: "PREV = Revert"
+    h10,h10_5gb: "PREV = Revert"
     gigabeat: "POWER = Revert"
+    e200: "PREV = Revert"
   </dest>
   <voice>
     *: ""
@@ -7925,14 +7935,16 @@
     h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5: "Long PLAY to abort"
-    h10: "PREV to abort"
+    h10,h10_5gb: "PREV to abort"
+    e200: "PREV to abort"
   </source>
   <dest>
     *: "OFF to abort"
     h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5: "Long PLAY to abort"
-    h10: "PREV to abort"
+    h10,h10_5gb: "PREV to abort"
+    e200: "PREV to abort"
   </dest>
   <voice>
     *: ""
@@ -10714,14 +10726,16 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PLAY/PAUSE to return)"
     x5: "Building database... %d found (Long PLAY to return)"
-    h10: "Building database... %d found (PREV to return)"
+    h10,h10_5gb: "Building database... %d found (PREV to return)"
+    e200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PLAY/PAUSE to return)"
     x5: "Building database... %d found (Long PLAY to return)"
-    h10: "Building database... %d found (PREV to return)"
+    h10,h10_5gb: "Building database... %d found (PREV to return)"
+    e200: "Building database... %d found (PREV to return)"
   </dest>
   <voice>
     *: ""
