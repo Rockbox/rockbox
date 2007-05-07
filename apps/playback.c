@@ -275,7 +275,6 @@ static size_t high_watermark = 0; /* High watermark for rebuffer (A/V/other) */
 
 /* Multiple threads */
 static void set_current_codec(int codec_idx);
-static const char *get_codec_filename(int enc_spec); /* (A-/C-/V-) */
 /* Set the watermark to trigger buffer fill (A/C) FIXME */
 static void set_filebuf_watermark(int seconds);
 
@@ -995,7 +994,7 @@ static void set_filebuf_watermark(int seconds)
     conf_watermark = bytes;
 }
 
-static const char * get_codec_filename(int cod_spec)
+const char * get_codec_filename(int cod_spec)
 {
     const char *fname;
 

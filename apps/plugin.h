@@ -59,6 +59,9 @@
 #include "misc.h"
 #if (CONFIG_CODEC == SWCODEC)
 #include "dsp.h"
+#include "codecs.h"
+#include "playback.h"
+#include "metadata.h"
 #ifdef HAVE_RECORDING
 #include "recording.h"
 #endif
@@ -110,7 +113,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 54
+#define PLUGIN_API_VERSION 55
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -601,6 +604,13 @@ struct plugin_api {
     void (*spinlock_init)(struct mutex *m);
     void (*spinlock_lock)(struct mutex *m);
     void (*spinlock_unlock)(struct mutex *m);
+#endif
+
+#if (CONFIG_CODEC == SWCODEC)
+    int (*codec_load_file)(const char* codec, struct codec_api *api);
+    bool (*get_metadata)(struct track_info* track, int fd, const char* trackname,
+                         bool v1first);
+    const char *(*get_codec_filename)(int cod_spec);
 #endif
 };
 

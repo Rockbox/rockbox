@@ -57,6 +57,7 @@ struct track_info {
 };
 
 /* Functions */
+const char * get_codec_filename(int cod_spec);
 void audio_set_track_changed_event(void (*handler)(struct mp3entry *id3));
 void audio_set_track_buffer_event(void (*handler)(struct mp3entry *id3,
                                                   bool last_track));

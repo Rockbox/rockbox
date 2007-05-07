@@ -488,6 +488,12 @@ static const struct plugin_api rockbox_api = {
     spinlock_lock,
     spinlock_unlock,
 #endif
+
+#if (CONFIG_CODEC == SWCODEC)
+    codec_load_file,
+    get_metadata,
+    get_codec_filename,
+#endif
 };
 
 int plugin_load(const char* plugin, void* parameter)
