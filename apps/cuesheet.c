@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <atoi.h>
+#include <ctype.h>
 #include <string.h>
 #include "system.h"
 #include "audio.h"

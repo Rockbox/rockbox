@@ -20,8 +20,6 @@
 #ifndef _PLAYBACK_H
 #define _PLAYBACK_H
 
-#include <stdlib.h>
-#include <ctype.h>
 #include <stdbool.h>
 
 #include "id3.h"

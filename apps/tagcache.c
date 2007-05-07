@@ -54,6 +54,8 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
 #include "config.h"
 #include "thread.h"
 #include "kernel.h"
@@ -78,7 +80,6 @@
 #endif
 
 #ifdef __PCTOOL__
-#include <ctype.h>
 #define yield() do { } while(0)
 #define sim_sleep(timeout) do { } while(0)
 #define do_timed_yield() do { } while(0)

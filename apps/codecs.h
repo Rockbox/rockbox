@@ -30,32 +30,23 @@
 #endif
 
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
 #include "config.h"
-#include "dir.h"
 #include "kernel.h"
-#include "font.h"
 #include "system.h"
 #include "id3.h"
-#include "mpeg.h"
 #include "audio.h"
-#include "mp3_playback.h"
 #ifdef RB_PROFILE
 #include "profile.h"
+#include "thread.h"
 #endif
 #if (CONFIG_CODEC == SWCODEC)
 #if !defined(SIMULATOR) && defined(HAVE_RECORDING)
 #include "pcm_record.h"
 #endif
 #include "dsp.h"
-#include "playback.h"
 #endif
 #include "settings.h"
-#include "thread.h"
-#include "playlist.h"
-#include "sound.h"
 
 #ifdef CODEC
 
