@@ -91,8 +91,6 @@ bool charger_inserted(void)
 #elif defined (HAVE_FMADC)
     /* FM or V2, can also charge from the USB port */
     return (adc_read(ADC_CHARGE_REGULATOR) < 0x1FF);
-#elif defined(TOSHIBA_GIGABEAT_F)
-    return false;
 #else
     /* Player */
     return (PADR & 1) == 0;
@@ -136,9 +134,6 @@ void ide_power_enable(bool on)
 {
     (void)on;
 
-#if defined(TOSHIBA_GIGABEAT_F)
-    /* Gigabeat TODO */
-#else /* SH1 based archos */
     bool touched = false;
 #ifdef NEEDS_ATA_POWER_ON
     if(on)
@@ -175,15 +170,11 @@ void ide_power_enable(bool on)
         PACR2 &= 0xFBFF; /* GPIO for PA5 */
 #endif
     }
-#endif /* SH1 based archos */
 }
 
 
 bool ide_powered(void)
 {
-#if defined(TOSHIBA_GIGABEAT_F)
-    return false;
-#else /* SH1 based archos */
 #if defined(NEEDS_ATA_POWER_ON) || defined(HAVE_ATA_POWER_OFF)
 #ifdef ATA_POWER_PLAYERSTYLE
     /* This is not correct for very old players, since these are unable to
@@ -202,7 +193,6 @@ bool ide_powered(void)
 #else /* !defined(NEEDS_ATA_POWER_ON) && !defined(HAVE_ATA_POWER_OFF) */
     return true; /* pretend always powered if not controlable */
 #endif
-#endif
 }
 #endif /* !HAVE_MMC */
 
@@ -210,9 +200,6 @@ bool ide_powered(void)
 void power_off(void)
 {
     set_irq_level(HIGHEST_IRQ_LEVEL);
-#if defined(TOSHIBA_GIGABEAT_F)
-    /* FIXME: Can we turn the device off, or only enter sleep mode? */
-#else
 #ifdef HAVE_POWEROFF_ON_PBDR
     and_b(~0x10, &PBDRL);
     or_b(0x10, &PBIORL);
@@ -225,7 +212,6 @@ void power_off(void)
 
     and_b(~0x08, &PADRH);
     or_b(0x08, &PAIORH);
-#endif
 #endif
     while(1)
         yield();

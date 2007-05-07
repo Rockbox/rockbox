@@ -18,7 +18,6 @@
  ****************************************************************************/
 #include "config.h"
 #include "cpu.h"
-#include <stdbool.h>
 #include "kernel.h"
 #include "thread.h"
 #include "system.h"
@@ -48,13 +47,12 @@ void ata_reset(void)
 /* This function is called before enabling the USB bus */
 void ata_enable(bool on)
 {
+    GPBCON=( GPBCON&~(1<<11) ) | (1<<10); /* Make the pin an output */
+    GPBUP|=1<<5;  /* Disable pullup in SOC as we are now driving */
     if(on)
         USB_ATA_DISABLE;
     else
         USB_ATA_ENABLE;
-
-    GPBCON=( GPBCON&~(1<<11) ) | (1<<10); /* Make the pin an output */
-    GPBUP|=1<<5;  /* Disable pullup in SOC as we are now driving */
 }
 
 bool ata_is_coldstart(void)
@@ -65,10 +63,10 @@ bool ata_is_coldstart(void)
 
 void ata_device_init(void)
 {
-    /* ATA reset */
-    ATA_RESET_DISABLE; /* Set the pin to disable an active low reset */
     GPGCON=( GPGCON&~(1<<21) ) | (1<<20); /* Make the pin an output */
     GPGUP |= 1<<10;  /* Disable pullup in SOC as we are now driving */
+    /* ATA reset */
+    ATA_RESET_DISABLE; /* Set the pin to disable an active low reset */
 }
 
 #if !defined(BOOTLOADER)

@@ -4,7 +4,6 @@
 #include "mmu-meg-fx.h"
 
 #include "lcd.h"
-#include <stdio.h>
 
 enum
 {
@@ -65,9 +64,15 @@ void system_init(void)
 
     /* Turn off USB host */
     CLKCON &= ~(1 << 6);
+    
+    /* Turn off USB device */
+    CLKCON &= ~(1 << 7);
 
     /* Turn off NAND flash controller */
     CLKCON &= ~(1 << 4);
+    
+    /* Turn off the USB PLL */
+    CLKSLOW |= (1 << 7);
 
 }
 

@@ -17,7 +17,6 @@
  *
  ****************************************************************************/
 
-#include <stdlib.h>
 #include "config.h"
 #include "cpu.h"
 #include "system.h"
@@ -44,23 +43,15 @@ static int const remote_buttons[] =
     BUTTON_NONE,    /* Nothing in the headphone socket */
 };
 
-
-
-
-
 void button_init_device(void)
 {
     /* Power, Remote Play & Hold switch */
 }
 
-
-
 inline bool button_hold(void)
 {
     return (GPGDAT & (1 << 15));
 }
-
-
 
 int button_read_device(void)
 {
@@ -91,6 +82,7 @@ int button_read_device(void)
         /* if the buttons dont agree twice in a row, then its none */
         lastbutton = btn;
         btn = BUTTON_NONE;
+        button_backlight_on();
     }
 
     /* Check for hold first - exit if asserted with no button pressed */
@@ -115,6 +107,7 @@ int button_read_device(void)
 
         if (buttons & (1 << 4))
             btn |= BUTTON_A;
+        button_backlight_on();
     }
     
     /* the touchpad */
@@ -135,12 +128,11 @@ int button_read_device(void)
 
         if (touchpad & (1 << 3))
             btn |= BUTTON_SELECT;
+        button_backlight_on();
     }
     
     return btn;
 }
-
-
 
 bool headphones_inserted(void)
 {

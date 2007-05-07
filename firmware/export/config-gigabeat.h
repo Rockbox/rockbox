@@ -32,7 +32,6 @@
 #define LCD_DEPTH  16   /* 65k colours */
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
 
-
 #define CONFIG_KEYPAD GIGABEAT_PAD
 
 /* Define this if you do software codec */
@@ -44,13 +43,14 @@
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 
+#define HAVE_BUTTON_LIGHT
+
 #define HAVE_LCD_ENABLE
 
 #define HAVE_BACKLIGHT_BRIGHTNESS
 
 /* Main LCD backlight brightness range and defaults */
 #define MIN_BRIGHTNESS_SETTING          0   /* 0.5 mA */
-#define MIN_ACTIVE_BRIGHTNESS_SETTING   16  /* lowest active brightness */
 #define MAX_DIM_BRIGHTNESS_SETTING      15  /* highest 'dimness' */
 #define MAX_BRIGHTNESS_SETTING          63  /* 32 mA */
 #define DEFAULT_BRIGHTNESS_SETTING      39  /* 20 mA */

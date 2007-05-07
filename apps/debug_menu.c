@@ -1132,7 +1132,7 @@ bool dbg_ports(void)
             return false;
     }
 #elif CONFIG_CPU == S3C2440
-    char buf[128];
+    char buf[50];
     int line;
 
     lcd_setmargins(0, 0);
@@ -1142,28 +1142,36 @@ bool dbg_ports(void)
     while(1)
     {
         line = 0;
-        snprintf(buf, sizeof(buf), "GPACON: %08x GPBCON: %08x", GPACON, GPBCON); lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPADAT: %08x GPBDAT: %08x", GPADAT, GPBDAT); lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPAUP:  %08x GPBUP:  %08x", 0, GPBUP); lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPCCON: %08x GPDCON: %08x", GPCCON, GPDCON); lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPCDAT: %08x GPDDAT: %08x", GPCDAT, GPDDAT); lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPCUP:  %08x GPDUP:  %08x", GPCUP, GPDUP); lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "[Ports and Registers]");                        lcd_puts(0, line++, buf);
 
-        snprintf(buf, sizeof(buf), "GPCCON: %08x GPDCON: %08x", GPCCON, GPDCON); lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPCDAT: %08x GPDDAT: %08x", GPCDAT, GPDDAT); lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPCUP:  %08x GPDUP:  %08x", GPCUP, GPDUP); lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPACON: %08x GPBCON: %08x", GPACON, GPBCON);    lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPADAT: %08x GPBDAT: %08x", GPADAT, GPBDAT);    lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPAUP:  %08x GPBUP:  %08x", 0, GPBUP);          lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPCCON: %08x GPDCON: %08x", GPCCON, GPDCON);    lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPCDAT: %08x GPDDAT: %08x", GPCDAT, GPDDAT);    lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPCUP:  %08x GPDUP:  %08x", GPCUP, GPDUP);      lcd_puts(0, line++, buf);
 
-        snprintf(buf, sizeof(buf), "GPECON: %08x GPFCON: %08x", GPECON, GPFCON); lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPEDAT: %08x GPFDAT: %08x", GPEDAT, GPFDAT); lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPEUP:  %08x GPFUP:  %08x", GPEUP, GPFUP); lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPCCON: %08x GPDCON: %08x", GPCCON, GPDCON);    lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPCDAT: %08x GPDDAT: %08x", GPCDAT, GPDDAT);    lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPCUP:  %08x GPDUP:  %08x", GPCUP, GPDUP);      lcd_puts(0, line++, buf);
 
-        snprintf(buf, sizeof(buf), "GPGCON: %08x GPHCON: %08x", GPGCON, GPHCON); lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPGDAT: %08x GPHDAT: %08x", GPGDAT, GPHDAT); lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPGUP:  %08x GPHUP:  %08x", GPGUP, GPHUP); lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPECON: %08x GPFCON: %08x", GPECON, GPFCON);    lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPEDAT: %08x GPFDAT: %08x", GPEDAT, GPFDAT);    lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPEUP:  %08x GPFUP:  %08x", GPEUP, GPFUP);      lcd_puts(0, line++, buf);
+
+        snprintf(buf, sizeof(buf), "GPGCON: %08x GPHCON: %08x", GPGCON, GPHCON);    lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPGDAT: %08x GPHDAT: %08x", GPGDAT, GPHDAT);    lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPGUP:  %08x GPHUP:  %08x", GPGUP, GPHUP);      lcd_puts(0, line++, buf);
+
+        snprintf(buf, sizeof(buf), "GPJCON: %08x", GPJCON);                         lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPJDAT: %08x", GPJDAT);                         lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPJUP:  %08x", GPJUP);                          lcd_puts(0, line++, buf);
         
-        snprintf(buf, sizeof(buf), "GPJCON: %08x", GPJCON); lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPJDAT: %08x", GPJDAT); lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPJUP:  %08x", GPJUP); lcd_puts(0, line++, buf);
+        line++;
+
+        snprintf(buf, sizeof(buf), "SRCPND:  %08x INTMOD:  %08x", SRCPND, INTMOD);  lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "INTMSK:  %08x INTPND:  %08x", INTMSK, INTPND);  lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "CLKCON:  %08x CLKSLOW: %08x", CLKCON, CLKSLOW); lcd_puts(0, line++, buf);
         lcd_update();
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
             return false;
@@ -2093,112 +2101,6 @@ static bool dbg_lcd_power_off(void)
     }
     return false;
 }
-
-#include "backlight-target.h"
-
-static bool dbg_buttonlights(void)
-{
-    unsigned short mode_changed = 1, mode = 0;
-    enum buttonlight_selection which_led = BUTTONLIGHT_LED_ALL;
-    unsigned short brightness = DEFAULT_BRIGHTNESS_SETTING;
-    
-    lcd_setmargins(0, 0);
-    for (;;)
-    {
-        int button;
-
-        if (mode_changed)
-        {
-            lcd_clear_display();
-            lcd_puts(0, 0, "Button light support");
-            lcd_puts(0, 1, "Press UP for mode change");
-            lcd_puts(0, 2, "Press DOWN for buttonlight selection");
-
-            switch (mode)
-            {
-                case 0: 
-                lcd_puts(1, 3, "Off");
-                __buttonlight_mode(BUTTONLIGHT_OFF, which_led, brightness);
-                break;
-                
-                case 1: 
-                lcd_puts(1, 3, "On - Set to brightness");
-                __buttonlight_mode(BUTTONLIGHT_ON, which_led, brightness);
-                break;
-                
-                case 2: 
-                lcd_puts(1, 3, "Faint - Always on at lowest brightness");
-                __buttonlight_mode(BUTTONLIGHT_FAINT, which_led, brightness);
-                break;
-                
-                case 3: 
-                lcd_puts(1, 3, "Flicker on disk access");
-                __buttonlight_mode(BUTTONLIGHT_FLICKER, which_led, brightness);
-                break;
-                
-                case 4: 
-                lcd_puts(1, 3, "Solid on disk access");
-                __buttonlight_mode(BUTTONLIGHT_SIGNAL, which_led, brightness);
-                break;
-                
-                case 5: 
-                lcd_puts(1, 3, "Follows backlight");
-                __buttonlight_mode(BUTTONLIGHT_FOLLOW, which_led, brightness);
-                break;
-                
-                case 6: 
-                lcd_puts(1, 3, "Shows 'battery charging'");
-                __buttonlight_mode(BUTTONLIGHT_CHARGING, which_led, brightness);
-                break;
-                
-            }
-            mode_changed = 0;
-            lcd_update();
-        }
-        
-
-
-        /* does nothing unless in flicker mode */
-        /* the parameter sets the brightness */
-        __buttonlight_trigger(); 
-        button = get_action(CONTEXT_STD,HZ/5);
-        switch(button)
-        {
-            case ACTION_STD_PREV:
-            if (++mode > 6) mode = 0;
-            mode_changed = 1;
-            break;
-
-            case ACTION_STD_NEXT:
-            if (which_led == BUTTONLIGHT_LED_ALL)
-            {
-                which_led = BUTTONLIGHT_LED_MENU;
-            }
-            else
-            {
-                which_led = BUTTONLIGHT_LED_ALL;
-            }
-            mode_changed = 1;
-
-            break;
-
-                
-            case ACTION_STD_OK:
-            case ACTION_STD_CANCEL:
-            action_signalscreenchange();
-            return false;
-
-            default:
-            sleep(HZ/10);
-            break;
-        }
-    }
-    return false;
-}
-
-
-
-
 #endif
 
 #if defined(HAVE_EEPROM) && !defined(HAVE_EEPROM_SETTINGS)
@@ -2302,8 +2204,6 @@ struct the_menu_item {
 static const struct the_menu_item menuitems[] = {
 #if defined(TOSHIBA_GIGABEAT_F) && !defined(SIMULATOR)
         { "LCD Power Off", dbg_lcd_power_off },
-        { "Button Light modes", dbg_buttonlights },
-            
 #endif
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || \
     (defined(CPU_PP) && !defined(SANSA_E200))

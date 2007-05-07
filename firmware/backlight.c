@@ -124,8 +124,7 @@ void button_backlight_set_timeout(int index)
     else if (index == 1) /* on */
         button_backlight_on();
     
-    if (button_backlight_timer)
-        button_backlight_timer = button_backlight_timeout;
+    button_backlight_timer = button_backlight_timeout;
 }
 
 /* internal interface */

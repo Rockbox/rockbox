@@ -17,7 +17,6 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include <stdbool.h>
 #include "cpu.h"
 #include "system.h"
 #include "kernel.h"
@@ -46,14 +45,14 @@ void usb_init_device(void)
     /* Input is the default configuration, only pullups need to be disabled */
 /*    GPFUP|=0x02;  */
 
-    USB_VPLUS_PWR_ASSERT;
     GPBCON=( GPBCON&~(1<<13) ) | (1 << 12);
+    USB_VPLUS_PWR_ASSERT;
 
     sleep(HZ/20);
 
     /* Reset the usb port */
-    USB_RST_ASSERT;
     GPBCON = (GPBCON & ~0x200) | 0x100; /* Make sure reset line is an output */
+    USB_RST_ASSERT;
 
     sleep(HZ/25);
     USB_RST_DEASSERT;
@@ -75,6 +74,9 @@ void usb_init_device(void)
 
 void usb_enable(bool on)
 {
+    GPHCON=( GPHCON&~(1<<17) ) | (1<<16); /* Make the pin an output */
+    GPHUP|=1<<8;  /* Disable pullup in SOC as we are now driving */
+    
     if (on)
     {
         USB_VPLUS_PWR_ASSERT;
@@ -85,10 +87,6 @@ void usb_enable(bool on)
         if(USB_CRADLE_IS_PRESENT) USB_CRADLE_BUS_DISABLE;
         USB_VPLUS_PWR_DEASSERT;
     }
-
-    /* Make sure USB_CRADLE_BUS pin is an output */
-    GPHCON=( GPHCON&~(1<<17) ) | (1<<16); /* Make the pin an output */
-    GPHUP|=1<<8;  /* Disable pullup in SOC as we are now driving */
 
     sleep(HZ/20); // > 50ms for detecting the enable state change
 }

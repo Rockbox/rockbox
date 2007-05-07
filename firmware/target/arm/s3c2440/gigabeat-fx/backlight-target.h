@@ -19,18 +19,6 @@
 #ifndef BACKLIGHT_TARGET_H
 #define BACKLIGHT_TARGET_H
 
-
-/* select the led */
-enum buttonlight_selection
-{
-    /* all leds */
-    BUTTONLIGHT_LED_ALL,
-
-    /* only the menu/power led (two buttons for one LED) */
-    BUTTONLIGHT_LED_MENU
-};
-
-
 /* Use these to set the buttonlight mode */
 enum buttonlight_mode
 {
@@ -40,46 +28,26 @@ enum buttonlight_mode
     /* buttonlights always off */
     BUTTONLIGHT_OFF,
 
-    /* buttonlights always on but set at lowest brightness */
-    BUTTONLIGHT_FAINT,
-
-    /* buttonlights flicker when triggered - continues to flicker
-     * even if the flicker is still asserted.
-     */
-    BUTTONLIGHT_FLICKER,
-
-    /* buttonlights solid for as long as triggered */
-    BUTTONLIGHT_SIGNAL,
-    
     /* buttonlights follow backlight */
-    BUTTONLIGHT_FOLLOW,
-    
-    /* buttonlights show battery charging */
-    BUTTONLIGHT_CHARGING,
+    BUTTONLIGHT_FOLLOW
 };
-
 
 /* Call this to flicker or signal the button lights. Only is effective for
  * modes that take a trigger input.
  */
 void __buttonlight_trigger(void);
 
-
-/* select which led to use on the button lights. Other combinations are
- * possible, but don't look very good.
- */
-
 /* map the mode from the command into the state machine entries */
 /* See enum buttonlight_mode for available functions */
-void __buttonlight_mode(enum buttonlight_mode mode, 
-                        enum buttonlight_selection selection,
-                        unsigned short brightness);
-
+void __buttonlight_mode(enum buttonlight_mode mode);
 
 bool __backlight_init(void);
 void __backlight_on(void);
 void __backlight_off(void);
 void __backlight_set_brightness(int val);
+
+void __button_backlight_on(void);
+void __button_backlight_off(void);
 
 /* true: backlight fades off - false: backlight fades on */
 void __backlight_dim(bool dim);

@@ -1,6 +1,5 @@
 #include "config.h"
 #include "cpu.h"
-#include <stdbool.h>
 #include "kernel.h"
 #include "system.h"
 #include "logf.h"
@@ -9,146 +8,131 @@
 
 #define SLAVE_ADDRESS 0xCC
 
-#define SDA_LO     (GPHDAT &= ~(1 << 9))
-#define SDA_HI     (GPHDAT |= (1 << 9))
-#define SDA_INPUT  (GPHCON &= ~(3 << 18))
-#define SDA_OUTPUT (GPHCON |= (1 << 18))
+#define USE_ASM
+
+/* This I2C driver tristates the outputs instead of driving logic high's */
 #define SDA        (GPHDAT & (1 << 9))
+#define SDA_LO_OUT (GPHCON |= (1 << 18));(GPHDAT &= ~(1 << 9));
+#define SDA_HI_IN  (GPHCON &= ~(3 << 18))
 
-#define SCL_LO     (GPHDAT &= ~(1 << 10))
-#define SCL_HI     (GPHDAT |= (1 << 10))
-#define SCL_INPUT  (GPHCON &= ~(3 << 20))
-#define SCL_OUTPUT (GPHCON |= (1 << 20))
 #define SCL        (GPHDAT & (1 << 10))
+#define SCL_LO_OUT (GPHCON |= (1 << 20));(GPHDAT &= ~(1 << 10));
+#define SCL_HI_IN  (GPHCON &= ~(3 << 20));while(!SCL);
 
-#define SCL_SDA_HI (GPHDAT |= (3 << 9))
+/* The SC606 can clock at 400KHz:
+ * Clock period high is 600nS and low is 1300nS
+ * The high and low times are different enough to need different timings
+ * cycles delayed = 2 + 4 * loops
+ * 100MHz = 10nS per cycle: LO:1300nS=130:33  HI:600nS=60:15
+ * 300MHz = 3.33nS per cycle:
+ *          LO:1300nS=394:99
+ *          HI:600nS=182:21 
+ *          MID(50/50):950(1900/2)ns=288:72
+ */
 
-/* The SC606 can clock at 400KHz: */
-/* Clock period high is 600nS and low is 1300nS */
-/* The high and low times are different enough to need different timings */
-/* cycles delayed = 30 + 7 * loops */
-/* 100MHz = 10nS per cycle: LO:1300nS=130:14  HI:600nS=60:9 */
-/* 300MHz = 3.36nS per cycle: LO:1300nS=387:51  HI:600nS=179:21 */
-#define DELAY_LO do{int x;for(x=51;x;x--);} while (0)
-#define DELAY    do{int x;for(x=35;x;x--);} while (0)
-#define DELAY_HI do{int x;for(x=21;x;x--);} while (0)
+#ifdef USE_ASM
 
+#define DELAY_LO    99
+#define DELAY_MID   72
+#define DELAY_HI    46
+/* This delay loop takes 4 cycles/loop to execute plus 2 for setup */
+#define DELAY(dly)                             \
+    asm volatile(   "mov  r0,%0     \n"        \
+                    "1:             \n"        \
+                    "subs  r0,r0,#1  \n"        \
+                    "bhi  1b         \n"        \
+    : : "r"((dly)) : "r0" );
+    
+#else
 
+#define DELAY_LO    51
+#define DELAY_MID   35
+#define DELAY_HI    21
+#define DELAY(dly) do{int x;for(x=(dly);x;x--);} while (0)
+
+#endif
 
 static void sc606_i2c_start(void)
 {
-    SCL_SDA_HI;
-    DELAY;
-    SDA_LO;
-    DELAY;
-    SCL_LO;
-}
-
-static void sc606_i2c_restart(void)
-{
-    SCL_SDA_HI;
-    DELAY;
-    SDA_LO;
-    DELAY;
-    SCL_LO;
+    SDA_HI_IN;
+    SCL_HI_IN;
+    DELAY(DELAY_MID);
+    SDA_LO_OUT;
+    DELAY(DELAY_MID);
+    SCL_LO_OUT;
 }
 
 static void sc606_i2c_stop(void)
 {
-    SDA_LO;
-    SCL_HI;
-    DELAY_HI;
-    SDA_HI;
+    SDA_LO_OUT;
+    SCL_HI_IN;
+    DELAY(DELAY_HI);
+    SDA_HI_IN;
 }
 
 static void sc606_i2c_ack(void)
 {
+    SDA_HI_IN;
+    SCL_HI_IN;
 
-    SDA_LO;
-    SCL_HI;
-    DELAY_HI;
-    SCL_LO;
+    DELAY(DELAY_HI);
+    SCL_LO_OUT;
 }
 
-
-
-static int sc606_i2c_getack(void)
+static bool sc606_i2c_getack(void)
 {
-    int ret;
+    bool ret;
 
-    /* Don't need a delay since follows a data bit with a delay on the end */
-    SDA_INPUT;   /* And set to input */
-    DELAY;
-    SCL_HI;
+    SDA_HI_IN;
+    DELAY(DELAY_MID);
+    SCL_HI_IN;
 
-    ret = (SDA != 0);   /* ack failed if SDA is not low */
-    DELAY_HI;
+    ret = !SDA;
 
-    SCL_LO;
-    DELAY_LO;
-
-    SDA_HI;
-    SDA_OUTPUT;
-    DELAY_LO;
+    SCL_LO_OUT;
+    DELAY(DELAY_LO);
 
     return ret;
 }
-
-
 
 static void sc606_i2c_outb(unsigned char byte)
 {
     int i;
 
     /* clock out each bit, MSB first */
-    for (i = 0x80; i; i >>= 1)
+    for ( i=0x80; i; i>>=1 )
     {
-        if (i & byte)
-        {
-            SDA_HI;
-        }
+        if ( i & byte )
+            SDA_HI_IN;
         else
-        {
-            SDA_LO;
-        }
-        DELAY;
-
-        SCL_HI;
-        DELAY_HI;
-
-        SCL_LO;
-        DELAY_LO;
+            SDA_LO_OUT;
+        DELAY(DELAY_MID);
+        SCL_HI_IN;
+        DELAY(DELAY_HI);
+        SCL_LO_OUT;
     }
-
-    SDA_HI;
-
 }
-
-
 
 static unsigned char sc606_i2c_inb(void)
 {
-   int i;
-   unsigned char byte = 0;
+    int i;
+    unsigned char byte = 0;
 
-   SDA_INPUT;   /* And set to input */
-   /* clock in each bit, MSB first */
-   for (i = 0x80; i; i >>= 1) {
-       SCL_HI;
+    /* clock in each bit, MSB first */
+    SDA_HI_IN;
+    for ( i=0x80; i; i>>=1 )
+    {
+        SCL_HI_IN;
+        DELAY(DELAY_HI);
+        if ( SDA )
+            byte |= i;
+        SCL_LO_OUT;
+        DELAY(DELAY_LO);
+    }
 
-       if (SDA)
-           byte |= i;
-
-       SCL_LO;
-   }
-   SDA_OUTPUT;
-
-   sc606_i2c_ack();
-
-   return byte;
+    sc606_i2c_ack();
+    return byte;
 }
-
-
 
 /* returns number of acks that were bad */
 int sc606_write(unsigned char reg, unsigned char data)
@@ -163,7 +147,7 @@ int sc606_write(unsigned char reg, unsigned char data)
     sc606_i2c_outb(reg);
     x += sc606_i2c_getack();
 
-    sc606_i2c_restart();
+    sc606_i2c_start();
 
     sc606_i2c_outb(SLAVE_ADDRESS);
     x += sc606_i2c_getack();
@@ -176,8 +160,6 @@ int sc606_write(unsigned char reg, unsigned char data)
     return x;
 }
 
-
-
 int sc606_read(unsigned char reg, unsigned char* data)
 {
     int x;
@@ -189,7 +171,7 @@ int sc606_read(unsigned char reg, unsigned char* data)
     sc606_i2c_outb(reg);
     x += sc606_i2c_getack();
 
-    sc606_i2c_restart();
+    sc606_i2c_start();
     sc606_i2c_outb(SLAVE_ADDRESS | 1);
     x += sc606_i2c_getack();
 
@@ -198,8 +180,6 @@ int sc606_read(unsigned char reg, unsigned char* data)
 
     return x;
 }
-
-
 
 void sc606_init(void)
 {
@@ -214,12 +194,11 @@ void sc606_init(void)
 
     /* About 400us - needs 350us */
     for (i = 200; i; i--)
-    {
-        DELAY_LO;
-    }
+        DELAY(DELAY_LO);
 
     /* Set GPH9 (SDA) and GPH10 (SCL) to 1 */
     GPHUP &= ~(3<<9);
-    GPHCON = (GPHCON & ~(0xF<<18)) | 5<<18;
+    SCL_HI_IN;
+    SDA_HI_IN;
 }
 

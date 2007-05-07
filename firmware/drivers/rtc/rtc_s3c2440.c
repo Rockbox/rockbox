@@ -21,7 +21,6 @@
 #include "rtc.h"
 #include "kernel.h"
 #include "system.h"
-#include <stdbool.h>
 
 void rtc_init(void)
 {
@@ -55,7 +54,7 @@ int rtc_write_datetime(unsigned char* buf)
     return 1;
 }
 
-#ifdef HAVE_RTC_ALARM 
+#ifdef HAVE_RTC_ALARM
 /*  This alarm code works in that it at least triggers INT_RTC.  I am guessing
  *  that the OF bootloader for the Gigabeat detects the startup by alarm and shuts down.
  *  This code is available for use once the OF bootloader is no longer required.
@@ -110,13 +109,16 @@ void rtc_get_alarm(int *h, int *m)
  */
 bool rtc_enable_alarm(bool enable)
 {
-    /* Note: The interupt for the alarm is normally masked.  May want to enable ( INTMSK&=~(1<<30); )
-     *  it here if an alarm handler is desired (while the unit is not in sleep).
-     */
     if (enable)
+    {
         RTCALM=0x46;
+        INTMSK&=~(1<<30);
+    }
     else
+    {
         RTCALM=0x00;
+        INTMSK|=(1<<30);
+    }
 
     return false; /* all ok */
 }

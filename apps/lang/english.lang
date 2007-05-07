@@ -10760,15 +10760,15 @@
   desc: in settings_menu
   user:
   <source>
-    *: ""
+    *: "Button Light Timeout"
     e200: "Wheel Light Timeout"
   </source>
   <dest>
-    *: ""
+    *: "Button Light Timeout"
     e200: "Wheel Light Timeout"
   </dest>
   <voice>
-    *: ""
+    *: "Button Light Timeout"
     e200: "Wheel Light Timeout"
   </voice>
 </phrase>
