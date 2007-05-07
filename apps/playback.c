@@ -299,13 +299,6 @@ struct thread_entry *codec_thread_p; /* For modifying thread priority later. */
 
 static volatile int current_codec IDATA_ATTR; /* Current codec (normal/voice) */
 
-/* test_codec steals the codec stack */
-void steal_codec_stack(unsigned char** stack, size_t* size)
-{
-    *stack = (unsigned char*)codec_stack;
-    *size = sizeof(codec_stack);
-}
-
 /* Voice thread */
 #ifdef PLAYBACK_VOICE
 

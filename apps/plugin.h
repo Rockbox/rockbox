@@ -611,8 +611,8 @@ struct plugin_api {
     bool (*get_metadata)(struct track_info* track, int fd, const char* trackname,
                          bool v1first);
     const char *(*get_codec_filename)(int cod_spec);
-    void (*steal_codec_stack)(unsigned char** stack, size_t* size);
 #endif
+    struct thread_entry* threads;
 };
 
 /* plugin header */

@@ -243,6 +243,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     size_t n;
     int fd;
+    int i;
     unsigned long starttick;
     unsigned long ticks;
     unsigned long speed;
@@ -260,7 +261,23 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         return PLUGIN_ERROR;
     }
 
-    rb->steal_codec_stack(&codec_stack,&codec_stack_size);
+    /* Borrow the codec thread's stack (in IRAM on most targets) */
+    codec_stack = NULL;
+    for (i = 0; i < MAXTHREADS; i++)
+    {
+        if (rb->strcmp(rb->threads[i].name,"codec")==0)
+        {
+            codec_stack = rb->threads[i].stack;
+            codec_stack_size = rb->threads[i].stack_size;
+            break;
+        }
+    }
+
+    if (codec_stack == NULL)
+    {
+        rb->splash(HZ*2, "No codec thread!");
+        return PLUGIN_ERROR;
+    }
 
     codec_mallocbuf = rb->plugin_get_audio_buffer(&audiosize);
     codec_stack_copy = codec_mallocbuf + 512*1024;

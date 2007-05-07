@@ -62,6 +62,8 @@ static int  plugin_size = 0;
 static bool (*pfn_tsr_exit)(bool reenter) = NULL; /* TSR exit callback */
 static char current_plugin[MAX_PATH];
 
+extern struct thread_entry threads[MAXTHREADS];
+
 static const struct plugin_api rockbox_api = {
 
     /* lcd */
@@ -493,8 +495,8 @@ static const struct plugin_api rockbox_api = {
     codec_load_file,
     get_metadata,
     get_codec_filename,
-    steal_codec_stack,
 #endif
+    threads,
 };
 
 int plugin_load(const char* plugin, void* parameter)
