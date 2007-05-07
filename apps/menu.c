@@ -433,19 +433,18 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
     
     /* load the callback, and only reload it if menu changes */
     get_menu_callback(menu, &menu_callback);
+    gui_synclist_draw(&lists);
     
     while (!done)
     {
         gui_syncstatusbar_draw(&statusbars, true);
-        gui_synclist_draw(&lists);
         action = get_action(CONTEXT_MAINMENU,HZ); 
         /* HZ so the status bar redraws corectly */
         if (action == ACTION_NONE)
         {
-            gui_syncstatusbar_draw(&statusbars, true);
             continue;
         }
-
+        gui_synclist_draw(&lists);
         
         if (menu_callback)
         {
