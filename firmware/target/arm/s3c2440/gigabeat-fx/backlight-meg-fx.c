@@ -55,16 +55,9 @@ static enum sc606_states
 enum buttonlight_states
 {
     BUTTONLIGHT_CONTROL_IDLE,
-
-    /* turn button lights off */
     BUTTONLIGHT_CONTROL_OFF,
-
-    /* turns button lights on to setting */
     BUTTONLIGHT_CONTROL_ON,
-    
-    /* buttonlights follow the backlight settings */
     BUTTONLIGHT_CONTROL_FADE,
-
 } buttonlight_control;
 
 static unsigned short buttonlight_trigger_now;
@@ -134,8 +127,6 @@ void __buttonlight_mode(enum buttonlight_mode mode)
         default:
         return; /* unknown mode */
     }
-
-
 }
 
 /*
@@ -162,7 +153,7 @@ static void led_control_service(void)
         sc606regCONFval=3;
 
     static bool sc606_changed=true;
-    
+
     if(sc606_changed==false)
     {
         switch (backlight_control)
@@ -186,6 +177,12 @@ static void led_control_service(void)
                 backlight_control = BACKLIGHT_CONTROL_ON;
                 break;
             case BACKLIGHT_CONTROL_FADE:
+                /* Was this mode set while the backlight is already on/off? */
+                if(backlight_target==sc606regAval)
+                {
+                    backlight_control = BACKLIGHT_CONTROL_IDLE;
+                    break;
+                }
                 sc606_changed=true;
                 sc606regCONFval |= 0x03;
                 if(backlight_target>sc606regAval)
@@ -222,6 +219,12 @@ static void led_control_service(void)
                 buttonlight_control=BUTTONLIGHT_CONTROL_IDLE;
                 break;
             case BUTTONLIGHT_CONTROL_FADE:
+                /* Was this mode set while the button light is already on/off? */
+                if(buttonlight_target==sc606regBval)
+                {
+                    buttonlight_control=BUTTONLIGHT_CONTROL_IDLE;
+                    break;
+                }
                 sc606_changed=true;
                 sc606regCONFval |= 0x3C;
                 if(buttonlight_target>sc606regBval)
@@ -275,7 +278,7 @@ static void led_control_service(void)
             sc606_control=SC606_CONTROL_A12;
             break;
     }
-    
+
     if(sc606regCONFval&0x03)
         lcd_enable(true);
     else
