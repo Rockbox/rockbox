@@ -859,6 +859,7 @@ void backlight_init(void)
 
 void backlight_on(void) {}
 void backlight_off(void) {}
+void button_backlight_on(void) {}
 void backlight_set_timeout(int index) {(void)index;}
 bool is_backlight_on(void) {return true;}
 #ifdef HAVE_REMOTE_LCD
