@@ -24,21 +24,19 @@ SECTIONS
     } > OVERLAY_RAM
 
     .text : {
-        *(.text)
+        *(.text*)
     } > OVERLAY_RAM
 
     .rodata : {
-        *(.rodata)
-        *(.rodata.str1.1)
-        *(.rodata.str1.4)
+        *(.rodata*)
     } > OVERLAY_RAM
 
     .data : {
-        *(.data)
+        *(.data*)
     } > OVERLAY_RAM
 
     .bss : {
-        *(.bss)
+        *(.bss*)
         *(COMMON)
         . = ALIGN(0x4);
         _plugin_end_addr = .;
