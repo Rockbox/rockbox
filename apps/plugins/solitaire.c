@@ -36,6 +36,7 @@ use F3 to put card on top of the remains' stack on one of the 4 final stacks
 #include "configfile.h"
 #include "button.h"
 #include "lcd.h"
+#include "oldmenuapi.h"
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -612,10 +613,10 @@ int solitaire_menu(bool in_game)
 
     create_draw_option_string();
     create_unhide_option_string();
-    m = rb->menu_init(items, i, NULL, NULL, NULL, NULL);
+    m = menu_init(rb, items, i, NULL, NULL, NULL, NULL);
     while (result < 0)
     {
-        switch (rb->menu_show(m))
+        switch (menu_show(m))
         {
             case MENU_SELECTED_EXIT:
                 result = MENU_RESUME;
@@ -662,7 +663,7 @@ int solitaire_menu(bool in_game)
                 break;
         }
     }
-    rb->menu_exit(m);
+    menu_exit(m);
     rb->lcd_setmargins(0, 0);
     return result;
 }

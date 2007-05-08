@@ -35,8 +35,6 @@ enum menu_item_type {
     MT_FUNCTION_CALL, /* call a function from the menus */
     MT_RETURN_ID, /* returns the position of the selected item (starting at 0)*/
     MT_RETURN_VALUE, /* returns a value associated with an item */
-    MT_OLD_MENU, /* used so we can wrap the old menu api 
-                    around the new api. Noone else should use this */
 };
 #define MENU_TYPE_MASK 0xF /* MT_* type */
 
@@ -191,23 +189,5 @@ bool do_setting_from_menu(const struct menu_item_ex *temp);
          MENU_ITEM_COUNT(sizeof( name##_)/sizeof(*name##_)),                   \
             { (void*)name##_},{.callback_and_desc = & name##__}};
             
-
-/* OLD API - This is only here for plugin compatability now, will be dropped ASAP */
-struct menu_item {
-    unsigned char *desc; /* string or ID */
-    bool (*function) (void); /* return true if USB was connected */
-};
-
-/* if button2 == button3 == NULL, button1 is the menu title */
-int menu_init(const struct menu_item* mitems, int count,
-                int (*callback)(int, int),
-                const char *button1, const char *button2, const char *button3);
-void menu_exit(int menu);
-
- /* Returns MENU_* define from root_menu.h, or number of selected menu item*/
-int menu_show(int m);
-
-bool menu_run(int menu);
-int menu_count(int menu);
 
 #endif /* End __MENU_H__ */

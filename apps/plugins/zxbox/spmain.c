@@ -20,6 +20,7 @@
 #include "misc.h"
 #include "zxconfig.h"
 #include "lib/configfile.h"
+#include "lib/oldmenuapi.h"
 
 #include "spperif.h"
 #include "z80.h"
@@ -142,13 +143,13 @@ static void set_keys(void){
         { "Map Fire/Jump key", NULL },
        };
 
-    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+    m = menu_init(rb,items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
 
     rb->button_clear_queue();
 
     while (!menu_quit) {
-        result=rb->menu_show(m);
+        result=menu_show(m);
 
         switch(result)
         {
@@ -188,7 +189,7 @@ static void set_keys(void){
         }
     }
 
-    rb->menu_exit(m);
+    menu_exit(m);
 }
 
 /* select predefined keymap */
@@ -202,13 +203,13 @@ static void select_keymap(void){
         { "7658S", NULL },
        };
 
-    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+    m = menu_init(rb,items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
 
     rb->button_clear_queue();
 
     while (!menu_quit) {
-        result=rb->menu_show(m);
+        result=menu_show(m);
 
         switch(result)
         {
@@ -230,7 +231,7 @@ static void select_keymap(void){
         }
     }
 
-    rb->menu_exit(m);
+    menu_exit(m);
 }
 
 /* options menu */
@@ -267,13 +268,13 @@ static void options_menu(void){
        };
         
 
-    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+    m = menu_init(rb,items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
 
     rb->button_clear_queue();
 
     while (!menu_quit) {
-        result=rb->menu_show(m);
+        result=menu_show(m);
 
         switch(result)
         {
@@ -336,7 +337,7 @@ static void options_menu(void){
         }
     }
 
-    rb->menu_exit(m);
+    menu_exit(m);
 }
 
 /* menu */
@@ -361,13 +362,13 @@ static bool zxbox_menu(void)
         { "Quit", NULL },
     };
     
-    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+    m = menu_init(rb,items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
 
     rb->button_clear_queue();
 
     while (!menu_quit) {
-        result=rb->menu_show(m);
+        result=menu_show(m);
 
         switch(result)
         {
@@ -411,7 +412,7 @@ static bool zxbox_menu(void)
         }
     }
 
-    rb->menu_exit(m);
+    menu_exit(m);
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
     rb->cpu_boost(true);
 #endif

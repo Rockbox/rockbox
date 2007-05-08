@@ -27,6 +27,7 @@
 #include "pacbox.h"
 #include "pacbox_lcd.h"
 #include "lib/configfile.h"
+#include "lib/oldmenuapi.h"
 
 PLUGIN_HEADER
 PLUGIN_IRAM_DECLARE
@@ -178,13 +179,13 @@ static bool pacbox_menu(void)
         { "Quit", NULL },
     };
     
-    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+    m = menu_init(rb, items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
 
     rb->button_clear_queue();
 
     while (!menu_quit) {
-        result=rb->menu_show(m);
+        result=menu_show(m);
 
         switch(result)
         {
@@ -238,7 +239,7 @@ static bool pacbox_menu(void)
         }
     }
 
-    rb->menu_exit(m);
+    menu_exit(m);
 
     if (need_restart) {
         init_PacmanMachine(settings_to_dip(settings));

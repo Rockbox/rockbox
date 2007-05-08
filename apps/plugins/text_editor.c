@@ -18,6 +18,7 @@
  ****************************************************************************/
 #include "plugin.h"
 #include "action.h"
+#include "oldmenuapi.h"
 
 #if PLUGIN_BUFFER_SIZE > 0x45000
 #define MAX_CHARS    0x40000 /* 128 kiB */
@@ -228,10 +229,10 @@ int do_item_menu(int cur_sel, char* copy_buffer)
             { "", NULL },
             { "Save", NULL },
     };
-    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+    m = menu_init(rb, items, sizeof(items) / sizeof(*items),
     NULL, NULL, NULL, NULL);
 
-    switch (rb->menu_show(m))
+    switch (menu_show(m))
     {
         case 0: /* cut */
             rb->strcpy(copy_buffer,&buffer[do_action(ACTION_GET,0,cur_sel)]);
@@ -279,7 +280,7 @@ int do_item_menu(int cur_sel, char* copy_buffer)
             ret = MENU_RET_NO_UPDATE;
         break;
     }
-    rb->menu_exit(m);
+    menu_exit(m);
     return ret;
 }
 /* this is the plugin entry point */
@@ -409,10 +410,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                             { "Ignore Changes and Exit", NULL },
                     };
 
-                    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+                    m = menu_init(rb, items, sizeof(items) / sizeof(*items),
                     NULL, NULL, NULL, NULL);
 
-                    result=rb->menu_show(m);
+                    result=menu_show(m);
 
                     switch (result)
                     {
@@ -435,7 +436,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                             exit=1;
                         break;
                     }
-                    rb->menu_exit(m);
+                    menu_exit(m);
                 }
                 else exit=1;
             break;

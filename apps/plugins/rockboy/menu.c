@@ -7,6 +7,7 @@
 #include "button.h"
 #include "rockmacros.h"
 #include "mem.h"
+#include "lib/oldmenuapi.h"
 
 #if (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define MENU_BUTTON_UP BUTTON_SCROLL_BACK
@@ -101,11 +102,11 @@ int do_user_menu(void) {
 
     pcm_init();
 
-    m = rb->menu_init(items, sizeof(items) / sizeof(*items), NULL, NULL, NULL, NULL);
+    m = menu_init(rb,items, sizeof(items) / sizeof(*items), NULL, NULL, NULL, NULL);
 
     while(!done)
     {
-        result=rb->menu_show(m);
+        result=menu_show(m);
 
         switch (result)
         {
@@ -128,7 +129,7 @@ int do_user_menu(void) {
         }
     }
 
-    rb->menu_exit(m);
+    menu_exit(m);
 
     rb->lcd_setfont(0); /* Reset the font */
     rb->lcd_clear_display(); /* Clear display for screen size changes */
@@ -303,18 +304,18 @@ static void do_slot_menu(bool is_load) {
     for (i = 0; i < num_items; i++)
         slot_info(buf[i], 20, i);
 
-    m = rb->menu_init(items, num_items, NULL, NULL, NULL, NULL);
+    m = menu_init(rb,items, num_items, NULL, NULL, NULL, NULL);
 
     while(!done)
     {
-        result=rb->menu_show(m);
+        result=menu_show(m);
     
         if (result<num_items && result >= 0 )
             done = do_slot(result, is_load);
         else
             done = true;
     }
-    rb->menu_exit(m);
+    menu_exit(m);
 }
 
 static void do_opt_menu(void)
@@ -374,12 +375,12 @@ static void do_opt_menu(void)
 #endif
     };
 
-    m = rb->menu_init(items, sizeof(items) / sizeof(*items), NULL, NULL, NULL, NULL);
+    m = menu_init(rb,items, sizeof(items) / sizeof(*items), NULL, NULL, NULL, NULL);
 
     while(!done)
     {
         
-        result=rb->menu_show(m);
+        result=menu_show(m);
     
         switch (result)
         {
@@ -414,5 +415,5 @@ static void do_opt_menu(void)
                 break;
         }
     }
-    rb->menu_exit(m);
+    menu_exit(m);
 }

@@ -57,6 +57,7 @@ Example ".ss" file, and one with a saved state:
 */
 
 #include "plugin.h"
+#include "lib/oldmenuapi.h"
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -1007,10 +1008,10 @@ bool sudoku_menu(struct sudoku_state_t* state)
         { "Quit", NULL },
     };
     
-    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+    m = menu_init(rb,items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
 
-    result=rb->menu_show(m);
+    result=menu_show(m);
 
     switch (result) {
         case 0: /* Audio playback */
@@ -1044,7 +1045,7 @@ bool sudoku_menu(struct sudoku_state_t* state)
 
         case 7: /* Quit */
             save_sudoku(state);
-            rb->menu_exit(m);
+            menu_exit(m);
             return true;
             break;
 
@@ -1052,7 +1053,7 @@ bool sudoku_menu(struct sudoku_state_t* state)
             break;
     }
 
-    rb->menu_exit(m);
+    menu_exit(m);
 
     return (result==MENU_ATTACHED_USB);
 }
@@ -1068,10 +1069,10 @@ int sudoku_edit_menu(struct sudoku_state_t* state)
         { "Quit", NULL },
     };
     
-    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+    m = menu_init(rb,items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
 
-    result=rb->menu_show(m);
+    result=menu_show(m);
 
     switch (result) {
         case 0: /* Save new game */
@@ -1090,7 +1091,7 @@ int sudoku_edit_menu(struct sudoku_state_t* state)
             break;
     }
 
-    rb->menu_exit(m);
+    menu_exit(m);
 
     return result;
 }

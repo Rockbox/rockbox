@@ -20,6 +20,7 @@
 #include "plugin.h"
 #include <ctype.h>
 #include "playback_control.h"
+#include "oldmenuapi.h"
 
 PLUGIN_HEADER
 
@@ -1283,11 +1284,11 @@ static bool viewer_options_menu(void)
         {"Scroll Mode",       scroll_mode_setting},
         {"Auto-Scroll Speed", autoscroll_speed_setting },
     };
-    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+    m = menu_init(rb, items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
 
-    result = rb->menu_run(m);
-    rb->menu_exit(m);
+    result = menu_run(m);
+    menu_exit(m);
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_setmargins(0,0);
 
@@ -1310,13 +1311,13 @@ static void viewer_menu(void)
         {"Return", NULL },
     };
 
-    m = rb->menu_init(items, sizeof(items) / sizeof(*items), NULL, NULL, NULL, NULL);
-    result=rb->menu_show(m);
+    m = menu_init(rb, items, sizeof(items) / sizeof(*items), NULL, NULL, NULL, NULL);
+    result=menu_show(m);
     switch (result)
     {
         case 0: /* quit */
             rb->splash(1, "Saving Settings");
-            rb->menu_exit(m);
+            menu_exit(m);
             viewer_exit(NULL);
             done = true;
             break;
@@ -1329,7 +1330,7 @@ static void viewer_menu(void)
         case 3: /* return */
             break;
     }
-    rb->menu_exit(m);
+    menu_exit(m);
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_setmargins(0,0);
 #endif

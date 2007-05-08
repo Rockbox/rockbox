@@ -1,5 +1,6 @@
 #include "plugin.h"
 #include "lib/configfile.h"
+#include "lib/oldmenuapi.h"
 
 #include "mpeg_settings.h"
 
@@ -41,13 +42,13 @@ bool mpeg_menu(void)
         { "Quit mpegplayer", NULL },
     };
 
-    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+    m = menu_init(rb, items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
 
     rb->button_clear_queue();
 
     while (!menu_quit) {
-        result=rb->menu_show(m);
+        result=menu_show(m);
 
         switch(result)
         {
@@ -71,7 +72,7 @@ bool mpeg_menu(void)
         }
     }
 
-    rb->menu_exit(m);
+    menu_exit(m);
 
     rb->lcd_clear_display();
     rb->lcd_update();

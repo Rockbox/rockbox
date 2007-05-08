@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
+#include "oldmenuapi.h"
 
 PLUGIN_HEADER
 
@@ -303,14 +304,14 @@ void fireworks_menu(void)
     rb->lcd_clear_display();
     rb->lcd_update();
 
-    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+    m = menu_init(rb, items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
 
     rb->button_clear_queue();
 
     while(!menu_quit)
     {
-        result = rb->menu_show(m);
+        result = menu_show(m);
 
         switch(result)
         {
@@ -360,7 +361,7 @@ void fireworks_menu(void)
         }
     }
 
-    rb->menu_exit(m);
+    menu_exit(m);
 }
 
 /* this is the plugin entry point */

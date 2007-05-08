@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
+#include "oldmenuapi.h"
 
 PLUGIN_HEADER
 
@@ -271,12 +272,12 @@ enum plugin_status plugin_start(struct plugin_api *api, void *parameter)
     talk_menu = rb->global_settings->talk_menu;
     rb->global_settings->talk_menu = false;
 
-    m = rb->menu_init(items, ARRAYLEN(items),
+    m = menu_init(rb, items, ARRAYLEN(items),
                       NULL, NULL, NULL, NULL);
 
     while (!exit)
     {
-        int result = rb->menu_show(m);
+        int result = menu_show(m);
 
         switch (result)
         {
@@ -292,7 +293,7 @@ enum plugin_status plugin_start(struct plugin_api *api, void *parameter)
         }
     }
 
-    rb->menu_exit(m);
+    menu_exit(m);
 
     rb->global_settings->talk_menu = talk_menu;
 

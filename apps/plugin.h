@@ -74,6 +74,7 @@
 #ifdef HAVE_LCD_BITMAP
 #include "scrollbar.h"
 #endif
+#include "statusbar.h"
 #include "menu.h"
 #include "rbunicode.h"
 #include "list.h"
@@ -113,12 +114,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 55
+#define PLUGIN_API_VERSION 56
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 54
+#define PLUGIN_MIN_API_VERSION 56
 
 /* plugin return codes */
 enum plugin_status {
@@ -495,15 +496,12 @@ struct plugin_api {
 
     /* menu */
     int (*do_menu)(const struct menu_item_ex *menu, int *start_selected);
-    /* OLD API - dont use unless you have to */
-    int (*menu_init)(const struct menu_item* mitems, int count,
-               int (*callback)(int, int),
-               const char *button1, const char *button2, const char *button3);
-    void (*menu_exit)(int menu);
-    int (*menu_show)(int m);
-    bool (*menu_run)(int menu);
-    int (*menu_count)(int menu);
 
+    /* scroll bar */
+    struct gui_syncstatusbar *statusbars;
+    void (*gui_syncstatusbar_draw)(struct gui_syncstatusbar * bars, bool force_redraw);
+    
+    /* options */
     bool (*set_option)(const char* string, void* variable,
                        enum optiontype type, const struct opt_items* options,
                        int numoptions, void (*function)(int));

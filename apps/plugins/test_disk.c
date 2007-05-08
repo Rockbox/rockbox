@@ -18,6 +18,7 @@
  ****************************************************************************/
 
 #include "plugin.h"
+#include "oldmenuapi.h"
 
 PLUGIN_HEADER
 
@@ -314,10 +315,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     if (rb->global_settings->backlight_timeout > 0)
         rb->backlight_set_timeout(1); /* keep the light on */
 
-    m = rb->menu_init(items, sizeof(items) / sizeof(*items), NULL,
+    m = menu_init(rb, items, sizeof(items) / sizeof(*items), NULL,
                       NULL, NULL, NULL);
-    rb->menu_run(m);
-    rb->menu_exit(m);
+    menu_run(m);
+    menu_exit(m);
 
     /* restore normal backlight setting */
     rb->backlight_set_timeout(rb->global_settings->backlight_timeout);

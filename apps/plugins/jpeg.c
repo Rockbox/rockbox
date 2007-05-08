@@ -26,6 +26,7 @@
 
 #include "plugin.h"
 #include "playback_control.h"
+#include "oldmenuapi.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "gray.h"
@@ -2415,10 +2416,10 @@ static void display_options(void)
         { "Dithering", set_option_dithering },
     };
 
-    int m = rb->menu_init(items, ARRAYLEN(items),
+    int m = menu_init(rb, items, ARRAYLEN(items),
                           NULL, NULL, NULL, NULL);
-    rb->menu_run(m);
-    rb->menu_exit(m);
+    menu_run(m);
+    menu_exit(m);
 }
 #endif /* HAVE_LCD_COLOR */
 
@@ -2490,14 +2491,14 @@ int show_menu(void) /* return 1 to quit */
         { "20 seconds", -1 },
     };
 
-    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+    m = menu_init(rb, items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
-    result=rb->menu_show(m);
+    result=menu_show(m);
 
     switch (result)
     {
         case MIID_QUIT:
-            rb->menu_exit(m);
+            menu_exit(m);
             return 1;
             break;
         case MIID_TOGGLE_SS_MODE:
@@ -2561,7 +2562,7 @@ int show_menu(void) /* return 1 to quit */
     rb->lcd_set_background(LCD_BLACK);
 #endif
     rb->lcd_clear_display();
-    rb->menu_exit(m);
+    menu_exit(m);
     return 0;
 }
 /* interactively scroll around the image */

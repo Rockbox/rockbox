@@ -57,21 +57,8 @@
 #include "list.h"
 #include "statusbar.h"
 #include "buttonbar.h"
-/* needed for the old menu system */
-struct menu {
-    struct menu_item* items;
-    char *title;
-    int count;
-    int (*callback)(int, int);
-    int current_selection;
-};
-#define MAX_MENUS 6
-static struct menu menus[MAX_MENUS];
-static bool inuse[MAX_MENUS] = { false };
-static void init_oldmenu(const struct menu_item_ex *menu,
-                     struct gui_synclist *lists, int selected, bool callback);
-static void menu_talk_selected(int m);
 
+#define MAX_MENUS 8
 /* used to allow for dynamic menus */
 #define MAX_MENU_SUBITEMS 64
 static struct menu_item_ex *current_submenus_menu;
@@ -182,11 +169,6 @@ static void init_menu_lists(const struct menu_item_ex *menu,
     int icon;
     current_subitems_count = 0;
 
-    if (type == MT_OLD_MENU)
-    {
-        init_oldmenu(menu, lists, selected, callback);
-        return;
-    }
     if (type == MT_RETURN_ID)
         get_menu_callback(menu, &menu_callback);
 
@@ -244,13 +226,6 @@ static void talk_menu_item(const struct menu_item_ex *menu,
     
     if (global_settings.talk_menu)
     {
-        if ((menu->flags&MENU_TYPE_MASK) == MT_OLD_MENU)
-        {
-            menus[menu->value].current_selection = 
-                gui_synclist_get_sel_pos(lists);
-            menu_talk_selected(menu->value);
-            return;
-        }
         sel = get_menu_selection(gui_synclist_get_sel_pos(lists),menu);
         if ((menu->flags&MENU_TYPE_MASK) == MT_MENU)
         {
@@ -480,8 +455,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
         } 
         else if (action == ACTION_STD_MENU)
         {
-            if ((menu->flags&MENU_TYPE_MASK) == MT_OLD_MENU)
-                return MENU_SELECTED_EXIT;
             if (menu != &root_menu_)
                 ret = GO_TO_ROOT;
             else
@@ -521,13 +494,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
             gui_buttonbar_unset(&buttonbar);
             gui_buttonbar_draw(&buttonbar);
 #endif
-            if ((menu->flags&MENU_TYPE_MASK) == MT_OLD_MENU)
-            {
-                selected = gui_synclist_get_sel_pos(&lists);
-                menus[menu->value].current_selection = selected;
-                action_signalscreenchange();
-                return selected;
-            }
             selected = get_menu_selection(gui_synclist_get_sel_pos(&lists), menu);
             temp = menu->submenus[selected];
             if (in_stringlist)
@@ -641,171 +607,5 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
 int main_menu(void)
 {
     return do_menu(NULL, 0) == MENU_ATTACHED_USB;
-}
-
-/* wrappers for the old menu system to work with the new system */
-
-
-static int menu_find_free(void)
-{
-    int i;
-    /* Tries to find an unused slot to put the new menu */
-    for ( i=0; i<MAX_MENUS; i++ ) {
-        if ( !inuse[i] ) {
-            inuse[i] = true;
-            break;
-        }
-    }
-    if ( i == MAX_MENUS ) {
-        DEBUGF("Out of menus!\n");
-        return -1;
-    }
-    return(i);
-}
-
-int menu_init(const struct menu_item* mitems, int count, int (*callback)(int, int),
-              const char *button1, const char *button2, const char *button3)
-{
-    int menu=menu_find_free();
-    if(menu==-1)/* Out of menus */
-        return -1;
-    menus[menu].items = (struct menu_item*)mitems; /* de-const */
-    menus[menu].count = count;
-    menus[menu].callback = callback;
-    menus[menu].current_selection = 0;
-    if ((button2 == NULL) && (button3 == NULL))
-        menus[menu].title = (char*)button1;
-    else menus[menu].title = NULL;
-    return menu;
-}
-
-void menu_exit(int m)
-{
-    inuse[m] = false;
-}
-
-
-
-static int oldmenuwrapper_callback(int action, 
-                                    const struct menu_item_ex *this_item)
-{
-    if (menus[this_item->value].callback)
-    {
-        int val = menus[this_item->value].callback(action, this_item->value);
-        switch (val)
-        {
-            case MENU_SELECTED_EXIT:
-                return ACTION_EXIT_MENUITEM;
-        }
-        return val;
-    }
-    return action;
-}
-
-static char* oldmenuwrapper_getname(int selected_item,
-                                    void * data, char *buffer)
-{
-    (void)buffer;
-    unsigned char* desc = menus[(intptr_t)data].items[selected_item].desc;
-    return P2STR(desc);
-}
-
-#ifdef HAVE_LCD_BITMAP
-static int oldmenu_get_icon(int selected_item, void * data)
-{
-    (void)data; (void)selected_item;
-    return Icon_Menu_functioncall;
-}
-#endif
-
-static void init_oldmenu(const struct menu_item_ex *menu,
-                     struct gui_synclist *lists, int selected, bool callback)
-{
-    (void)callback;
-    gui_synclist_init(lists, oldmenuwrapper_getname, 
-                        (void*)(intptr_t)menu->value, false, 1);
-    gui_synclist_set_nb_items(lists, MENU_GET_COUNT(menu->flags));
-    gui_synclist_limit_scroll(lists, true);
-#ifdef HAVE_LCD_BITMAP
-    gui_synclist_set_title(lists, menus[menu->value].title,
-                           Icon_Submenu_Entered);
-    gui_synclist_set_icon_callback(lists, oldmenu_get_icon);
-#endif
-    gui_synclist_select_item(lists, selected);
-}
-
-static void menu_talk_selected(int m)
-{
-    int selected = menus[m].current_selection;
-    int voice_id = P2ID(menus[m].items[selected].desc);
-    if (voice_id >= 0) /* valid ID given? */
-        talk_id(voice_id, false); /* say it */
-}
-
-int menu_show(int m)
-{
-    int value;
-    struct menu_item_ex menu;
-    struct menu_get_name_and_icon menu_info = 
-    {
-        oldmenuwrapper_callback, 
-        oldmenuwrapper_getname,
-        (void*)(intptr_t)m, Icon_Submenu
-    };
-
-    menu.flags = (MENU_TYPE_MASK&MT_OLD_MENU) | MENU_DYNAMIC_DESC |
-                 MENU_ITEM_COUNT(menus[m].count);
-    menu.value = m;
-    menu.menu_get_name_and_icon = &menu_info;
-    value = do_menu(&menu, &menus[m].current_selection);
-    switch (value)
-    {
-        case MENU_ATTACHED_USB:
-        case GO_TO_ROOT:
-            return MENU_ATTACHED_USB;
-        case GO_TO_PREVIOUS:
-            return MENU_SELECTED_EXIT;
-        default:
-            if (value >= 0)
-                return menus[m].current_selection;
-            else return value;
-    }
-}
-
-
-bool menu_run(int m)
-{
-    int selected;
-    while (1) {
-        switch (selected=menu_show(m))
-        {
-            case MENU_SELECTED_EXIT:
-                return false;
-
-            case MENU_ATTACHED_USB:
-                return true;
-
-            default:
-            {
-                if (selected >= 0 && selected < menus[m].count)
-                {
-                    if (menus[m].items[selected].function &&
-                        menus[m].items[selected].function())
-                        return  true;
-                }
-                gui_syncstatusbar_draw(&statusbars, true);
-            }
-        }
-    }
-    return false;
-}
-
-/*
- *  Property function - return the "count" of menu items in "menu"
- */
-
-int menu_count(int menu)
-{
-    return menus[menu].count;
 }
 

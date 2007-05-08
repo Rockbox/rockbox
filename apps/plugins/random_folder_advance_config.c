@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
+#include "oldmenuapi.h"
 
 PLUGIN_HEADER
 
@@ -194,10 +195,10 @@ void edit_list(void)
                     { "Remove Folder", NULL },
                     { "Remove Folder Tree", NULL },
                 };
-                m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+                m = menu_init(rb, items, sizeof(items) / sizeof(*items),
                                   NULL, NULL, NULL, NULL);
 
-                switch (rb->menu_show(m))
+                switch (menu_show(m))
                 {
                     case 0:
                         list->folder[selection][0] = ' ';
@@ -219,7 +220,7 @@ void edit_list(void)
                     }
                         break;
                 }
-                rb->menu_exit(m);
+                menu_exit(m);
             }
             break;
             case ACTION_STD_CANCEL:
@@ -229,10 +230,10 @@ void edit_list(void)
                     { "Save and Exit", NULL },
                     { "Ignore Changes and Exit", NULL },
                 };
-                m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+                m = menu_init(rb, items, sizeof(items) / sizeof(*items),
                                   NULL, NULL, NULL, NULL);
 
-                switch (rb->menu_show(m))
+                switch (menu_show(m))
                 {
                     case 0:
                         exit = true;
@@ -259,7 +260,7 @@ void edit_list(void)
                     case 1:
                         exit = true;
                 }
-                rb->menu_exit(m);
+                menu_exit(m);
             }
                 break;
         }
@@ -273,10 +274,10 @@ int main_menu(void)
         { "Edit Folder List", NULL },
         { "Quit", NULL },
     };
-    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+    m = menu_init(rb, items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
 
-    switch (rb->menu_show(m))
+    switch (menu_show(m))
     {
         case 0: /* generate */
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -305,10 +306,10 @@ int main_menu(void)
             rb->backlight_on();
             break;
         case 2:
-            rb->menu_exit(m);
+            menu_exit(m);
             return 1;
     }
-    rb->menu_exit(m);
+    menu_exit(m);
     return 0;
 }
 

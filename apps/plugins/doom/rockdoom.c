@@ -37,6 +37,7 @@
 #include "i_system.h"
 #include "hu_stuff.h"
 #include "st_stuff.h"
+#include "lib/oldmenuapi.h"
 
 PLUGIN_HEADER
 PLUGIN_IRAM_DECLARE
@@ -490,12 +491,12 @@ int Oset_keys()
       { "Game Automap", NULL },
    };
 
-   m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+   m = menu_init(rb, items, sizeof(items) / sizeof(*items),
                 NULL, NULL, NULL, NULL);
 
     while(!menuquit)
     {
-        result=rb->menu_show(m);
+        result=menu_show(m);
         if(result<0)
             menuquit=1;
         else
@@ -506,7 +507,7 @@ int Oset_keys()
         }
    }
 
-   rb->menu_exit(m);
+   menu_exit(m);
 
    return (1);
 }
@@ -554,12 +555,12 @@ static bool Doptions()
 #endif
     };
 
-    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+    m = menu_init(rb, items, sizeof(items) / sizeof(*items),
         NULL, NULL, NULL, NULL);
 
     while(!menuquit)
     {
-        result=rb->menu_show(m);
+        result=menu_show(m);
         if(result==0) 
             Oset_keys();
         else if (result > 0)
@@ -568,7 +569,7 @@ static bool Doptions()
             menuquit=1;
     }
 
-    rb->menu_exit(m);
+    menu_exit(m);
 
     return (1);
 }
@@ -577,10 +578,10 @@ int menuchoice(struct menu_item *menu, int items)
 {
    int m, result;
    
-   m = rb->menu_init(menu, items,NULL, NULL, NULL, NULL);
+   m = menu_init(rb, menu, items,NULL, NULL, NULL, NULL);
 
-   result= rb->menu_show(m);
-   rb->menu_exit(m);
+   result= menu_show(m);
+   menu_exit(m);
    if(result<items && result>=0)
       return result;
    return 0;
@@ -627,12 +628,12 @@ int doom_menu()
     while (rb->button_get(false) != BUTTON_NONE) 
         rb->yield();
 
-   m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+   m = menu_init(rb, items, sizeof(items) / sizeof(*items),
                 NULL, NULL, NULL, NULL);
 
    while(!menuquit)
    {
-      result=rb->menu_show(m);
+      result=menu_show(m);
       switch (result) {
          case 0: /* Game picker */
             rb->set_option("Game WAD", &gamever, INT, names, status, NULL );
@@ -664,7 +665,7 @@ int doom_menu()
       }
    }
 
-   rb->menu_exit(m);
+   menu_exit(m);
 
    return (gamever);
 }

@@ -92,6 +92,7 @@ Original release, featuring analog/digital modes and a few options.
 #include "time.h"
 #include "checkbox.h"
 #include "xlcd.h"
+#include "oldmenuapi.h"
 
 PLUGIN_HEADER
 
@@ -1177,12 +1178,12 @@ void analog_settings_menu(void)
     rb->lcd_set_foreground(LCD_BLACK);
 #endif
 
-    m = rb->menu_init(analog_items, sizeof(analog_items) / sizeof(*analog_items),
+    m = menu_init(rb, analog_items, sizeof(analog_items) / sizeof(*analog_items),
                       NULL, NULL, NULL, NULL);
 
     while(!done)
     {
-        result = rb->menu_show(m);
+        result = menu_show(m);
 
         switch(result)
         {
@@ -1204,7 +1205,7 @@ void analog_settings_menu(void)
                 break;
         }
 
-        rb->menu_exit(m);
+        menu_exit(m);
     }
 }
 
@@ -1222,12 +1223,12 @@ void digital_settings_menu(void)
     rb->lcd_set_foreground(LCD_BLACK);
 #endif
 
-    m = rb->menu_init(digital_items, sizeof(digital_items) / sizeof(*digital_items),
+    m = menu_init(rb, digital_items, sizeof(digital_items) / sizeof(*digital_items),
                       NULL, NULL, NULL, NULL);
 
     while(!done)
     {
-        result = rb->menu_show(m);
+        result = menu_show(m);
 
         switch(result)
         {
@@ -1253,7 +1254,7 @@ void digital_settings_menu(void)
                 break;
         }
 
-        rb->menu_exit(m);
+        menu_exit(m);
     }
 }
 
@@ -1271,12 +1272,12 @@ void fullscreen_settings_menu(void)
     rb->lcd_set_foreground(LCD_BLACK);
 #endif
 
-    m = rb->menu_init(fullscreen_items, sizeof(fullscreen_items) / sizeof(*fullscreen_items),
+    m = menu_init(rb, fullscreen_items, sizeof(fullscreen_items) / sizeof(*fullscreen_items),
                       NULL, NULL, NULL, NULL);
 
     while(!done)
     {
-        result = rb->menu_show(m);
+        result = menu_show(m);
 
         switch(result)
         {
@@ -1294,7 +1295,7 @@ void fullscreen_settings_menu(void)
                 break;
         }
 
-        rb->menu_exit(m);
+        menu_exit(m);
     }
 }
 
@@ -1312,12 +1313,12 @@ void binary_settings_menu(void)
     rb->lcd_set_foreground(LCD_BLACK);
 #endif
 
-    m = rb->menu_init(binary_items, sizeof(binary_items) / sizeof(*binary_items),
+    m = menu_init(rb,binary_items, sizeof(binary_items) / sizeof(*binary_items),
                       NULL, NULL, NULL, NULL);
 
     while(!done)
     {
-        result = rb->menu_show(m);
+        result = menu_show(m);
 
         switch(result)
         {
@@ -1331,7 +1332,7 @@ void binary_settings_menu(void)
                 break;
         }
 
-        rb->menu_exit(m);
+        menu_exit(m);
     }
 }
 
@@ -1349,12 +1350,12 @@ void plain_settings_menu(void)
     rb->lcd_set_foreground(LCD_BLACK);
 #endif
 
-    m = rb->menu_init(plain_items, sizeof(plain_items) / sizeof(*plain_items),
+    m = menu_init(rb,plain_items, sizeof(plain_items) / sizeof(*plain_items),
                       NULL, NULL, NULL, NULL);
 
     while(!done)
     {
-        result = rb->menu_show(m);
+        result = menu_show(m);
 
         switch(result)
         {
@@ -1380,7 +1381,7 @@ void plain_settings_menu(void)
                 break;
         }
 
-        rb->menu_exit(m);
+        menu_exit(m);
     }
 }
 
@@ -1434,12 +1435,12 @@ void general_settings(void)
 
     set_standard_colors();
 
-    m = rb->menu_init(general_settings_items, sizeof(general_settings_items) / sizeof(*general_settings_items),
+    m = menu_init(rb,general_settings_items, sizeof(general_settings_items) / sizeof(*general_settings_items),
                       NULL, NULL, NULL, NULL);
 
     while(!done)
     {
-        result = rb->menu_show(m);
+        result = menu_show(m);
 
         switch(result)
         {
@@ -1481,7 +1482,7 @@ void general_settings(void)
                 break;
         }
 
-        rb->menu_exit(m);
+        menu_exit(m);
     }
 
     set_digital_colors();
@@ -1700,12 +1701,12 @@ void mode_selector(void)
 
     set_standard_colors();
 
-    m = rb->menu_init(mode_selector_items, sizeof(mode_selector_items) / sizeof(*mode_selector_items),
+    m = menu_init(rb,mode_selector_items, sizeof(mode_selector_items) / sizeof(*mode_selector_items),
                   NULL, NULL, NULL, NULL);
 
     while(!done)
     {
-        result = rb->menu_show(m);
+        result = menu_show(m);
 
         /* check for this, so if the user exits the menu without
          * making a selection, it won't change to some weird value. */
@@ -1714,7 +1715,7 @@ void mode_selector(void)
 
         done = true;
 
-        rb->menu_exit(m);
+        menu_exit(m);
     }
 
     set_digital_colors();
@@ -1830,12 +1831,12 @@ void main_menu(void)
 
     set_standard_colors();
 
-    m = rb->menu_init(main_menu_items, sizeof(main_menu_items) / sizeof(*main_menu_items),
+    m = menu_init(rb,main_menu_items, sizeof(main_menu_items) / sizeof(*main_menu_items),
                   NULL, NULL, NULL, NULL);
 
     while(!done)
     {
-        result = rb->menu_show(m);
+        result = menu_show(m);
 
         switch(result)
         {
@@ -1866,7 +1867,7 @@ void main_menu(void)
                 break;
         }
 
-        rb->menu_exit(m);
+        menu_exit(m);
     }
 
     rb->lcd_setfont(FONT_SYSFIXED);

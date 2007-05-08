@@ -397,12 +397,10 @@ static const struct plugin_api rockbox_api = {
 
     /* menu */
     do_menu,
-    /* OLD API - dont use unless you have to */
-    menu_init,
-    menu_exit,
-    menu_show,
-    menu_run,
-    menu_count,
+    /* statusbars */
+    &statusbars,
+    gui_syncstatusbar_draw,
+    /* options */
     set_option,
     set_int,
     set_bool,

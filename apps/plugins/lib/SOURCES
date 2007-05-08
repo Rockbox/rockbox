@@ -1,3 +1,4 @@
+oldmenuapi.c
 configfile.c
 fixedpoint.c
 playback_control.c
