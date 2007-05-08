@@ -669,7 +669,7 @@ void audio_play(long offset)
 
     /* Start playback */
     LOGFQUEUE("audio >| audio Q_AUDIO_PLAY: %l", offset);
-    /* Don't return until playback has actually stopped */
+    /* Don't return until playback has actually started */
     queue_send(&audio_queue, Q_AUDIO_PLAY, offset);
 }
 
