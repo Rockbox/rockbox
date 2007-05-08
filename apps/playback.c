@@ -109,15 +109,15 @@
 #endif
 
 #ifdef PLAYBACK_LOGQUEUES
-#define LOGFQUEUE(s) logf("%s", s)
+#define LOGFQUEUE logf
 #else
-#define LOGFQUEUE(s)
+#define LOGFQUEUE(...)
 #endif
 
 #ifdef PLAYBACK_LOGQUEUES_SYS_TIMEOUT
-#define LOGFQUEUE_SYS_TIMEOUT(s) logf("%s", s)
+#define LOGFQUEUE_SYS_TIMEOUT logf
 #else
-#define LOGFQUEUE_SYS_TIMEOUT(s)
+#define LOGFQUEUE_SYS_TIMEOUT(...)
 #endif
 
 
