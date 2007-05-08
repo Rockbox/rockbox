@@ -3348,6 +3348,7 @@ static void audio_play_start(size_t offset)
     playlist_end = false;
 
     playing = true;
+    paused = false;
     ci.new_track = 0;
     ci.seek_time = 0;
     wps_offset = 0;
@@ -3648,6 +3649,8 @@ static void audio_thread(void)
 
             case Q_AUDIO_PAUSE:
                 LOGFQUEUE("audio < Q_AUDIO_PAUSE");
+                if (!playing)
+                    break;
                 pcmbuf_pause((bool)ev.data);
                 paused = (bool)ev.data;
                 break ;
