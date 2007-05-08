@@ -713,6 +713,9 @@ void settings_apply(void)
 #ifdef HAVE_BUTTON_LIGHT
     button_backlight_set_timeout(global_settings.button_light_timeout);
 #endif
+#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+    buttonlight_set_brightness(global_settings.buttonlight_brightness);
+#endif
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
     backlight_set_brightness(global_settings.brightness);
 #endif

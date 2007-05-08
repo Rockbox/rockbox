@@ -10776,6 +10776,23 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_BUTTONLIGHT_BRIGHTNESS
+  desc: in settings_menu
+  user:
+  <source>
+    *: ""
+    gigabeatf: "Button Light Brightness"
+  </source>
+  <dest>
+    *: ""
+    gigabeatf: "Button Light Brightness"
+  </dest>
+  <voice>
+    *: ""
+    gigabeatf: "Button Light Brightness"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_PLAYLISTVIEWER_SETTINGS
   desc: title for the playlist viewer settings menus
   user:

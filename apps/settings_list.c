@@ -1183,6 +1183,11 @@ const struct settings_list settings[] = {
         0, 18, 1, backlight_formatter, backlight_getlang, 
         button_backlight_set_timeout),
 #endif
+#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+    INT_SETTING(0, buttonlight_brightness, LANG_BUTTONLIGHT_BRIGHTNESS, DEFAULT_BRIGHTNESS_SETTING,
+        "button light brightness",UNIT_INT, MIN_BRIGHTNESS_SETTING, MAX_BRIGHTNESS_SETTING, 1,
+        NULL, NULL, buttonlight_set_brightness),
+#endif
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

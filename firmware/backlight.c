@@ -58,6 +58,14 @@ static inline void __backlight_set_brightness(int val)
     (void)val;
 }
 #endif
+
+#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+static inline void __buttonlight_set_brightness(int val)
+{
+    (void)val;
+}
+#endif
+
 #endif /* SIMULATOR */
 
 #if defined(HAVE_BACKLIGHT) && !defined(BOOTLOADER)
@@ -846,6 +854,18 @@ void backlight_set_brightness(int val)
 }
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 
+#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+void buttonlight_set_brightness(int val)
+{
+    if (val < MIN_BRIGHTNESS_SETTING)
+        val = MIN_BRIGHTNESS_SETTING;
+    else if (val > MAX_BRIGHTNESS_SETTING)
+        val = MAX_BRIGHTNESS_SETTING;
+
+    __buttonlight_set_brightness(val);
+}
+#endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
+
 #else /* !defined(HAVE_BACKLIGHT) || defined(BOOTLOADER)
     -- no backlight, empty dummy functions */
 
@@ -870,5 +890,8 @@ bool is_remote_backlight_on(void) {return true;}
 #endif /* HAVE_REMOTE_LCD */
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
 void backlight_set_brightness(int val) { (void)val; }
+#endif
+#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+void buttonlight_set_brightness(int val) { (void)val; }
 #endif
 #endif /* defined(HAVE_BACKLIGHT) && !defined(BOOTLOADER) */

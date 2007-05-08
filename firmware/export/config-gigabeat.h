@@ -49,6 +49,8 @@
 
 #define HAVE_BACKLIGHT_BRIGHTNESS
 
+#define HAVE_BUTTONLIGHT_BRIGHTNESS
+
 /* Main LCD backlight brightness range and defaults */
 #define MIN_BRIGHTNESS_SETTING          0   /* 0.5 mA */
 #define MAX_DIM_BRIGHTNESS_SETTING      15  /* highest 'dimness' */

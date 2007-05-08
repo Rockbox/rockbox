@@ -323,6 +323,10 @@ MENUITEM_SETTING(start_screen, &global_settings.start_in_screen, NULL);
 MENUITEM_SETTING(button_light_timeout, &global_settings.button_light_timeout, NULL);
 #endif
 
+#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+MENUITEM_SETTING(buttonlight_brightness, &global_settings.buttonlight_brightness, NULL);
+#endif
+
 MAKE_MENU(system_menu, ID2P(LANG_SYSTEM), 
           0, Icon_System_menu,
             &start_screen,
@@ -351,6 +355,9 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #endif
 #ifdef HAVE_BUTTON_LIGHT
             &button_light_timeout,
+#endif
+#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+            &buttonlight_brightness
 #endif
          );
 

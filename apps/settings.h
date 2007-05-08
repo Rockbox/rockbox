@@ -720,6 +720,9 @@ struct user_settings
 #ifdef HAVE_BUTTON_LIGHT
     int button_light_timeout;
 #endif
+#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+    int buttonlight_brightness;
+#endif
 };
 
 /** global variables **/
