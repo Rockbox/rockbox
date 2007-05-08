@@ -44,7 +44,9 @@ void __buttonlight_mode(enum buttonlight_mode mode);
 bool __backlight_init(void);
 void __backlight_on(void);
 void __backlight_off(void);
-void __backlight_set_brightness(int val);
+void __backlight_set_brightness(int brightness);
+
+void __buttonlight_set_brightness(int brightness);
 
 void __button_backlight_on(void);
 void __button_backlight_off(void);
