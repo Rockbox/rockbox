@@ -865,7 +865,7 @@
     ipod*: "SELECT = Yes"
     x5: "SELECT = Yes"
     h10,h10_5gb: "SELECT = Yes"
-    gigabeat: "SELECT = Yes"
+    gigabeatf: "SELECT = Yes"
     e200: "SELECT = Yes"
   </source>
   <dest>
@@ -874,7 +874,7 @@
     ipod*: "SELECT = Yes"
     x5: "SELECT = Yes"
     h10,h10_5gb: "SELECT = Yes"
-    gigabeat: "SELECT = Yes"
+    gigabeatf: "SELECT = Yes"
     e200: "SELECT = Yes"
   </dest>
   <voice>
@@ -4734,7 +4734,7 @@
     ipod*: "PLAY/PAUSE = Exit"
     x5: "RECORD = Exit"
     h10,h10_5gb: "PREV = Exit"
-    gigabeat: "A = Exit"
+    gigabeatf: "A = Exit"
     e200: "POWER = Exit"
   </source>
   <dest>
@@ -4743,7 +4743,7 @@
     ipod*: "PLAY/PAUSE = Exit"
     x5: "RECORD = Exit"
     h10,h10_5gb: "PREV = Exit"
-    gigabeat: "A = Exit"
+    gigabeatf: "A = Exit"
     e200: "POWER = Exit"
   </dest>
   <voice>
@@ -4802,7 +4802,7 @@
     ipod*: "SELECT = Select"
     x5: "SELECT = Select"
     h10,h10_5gb: "SELECT = Select"
-    gigabeat: "SELECT = Select"
+    gigabeatf: "SELECT = Select"
     e200: "SELECT = Select"
   </source>
   <dest>
@@ -4811,7 +4811,7 @@
     ipod*: "SELECT = Select"
     x5: "SELECT = Select"
     h10,h10_5gb: "SELECT = Select"
-    gigabeat: "SELECT = Select"
+    gigabeatf: "SELECT = Select"
     e200: "SELECT = Select"
   </dest>
   <voice>
@@ -4828,7 +4828,7 @@
     ipod*: "Long MENU = Delete"
     x5: "Long RECORD = Delete"
     h10,h10_5gb: "REWIND = Delete"
-    gigabeat: "POWER = Delete"
+    gigabeatf: "POWER = Delete"
     e200: "PLAY = Delete"
   </source>
   <dest>
@@ -4837,7 +4837,7 @@
     ipod*: "Long MENU = Delete"
     x5: "Long RECORD = Delete"
     h10,h10_5gb: "REWIND = Delete"
-    gigabeat: "POWER = Delete"
+    gigabeatf: "POWER = Delete"
     e200: "PLAY = Delete"
   </dest>
   <voice>
@@ -4924,7 +4924,7 @@
     ipod*: "SELECT = Set"
     x5: "SELECT = Set"
     h10,h10_5gb: "SELECT = Set"
-    gigabeat: "SELECT = Set"
+    gigabeatf: "SELECT = Set"
     e200: "SELECT = Set"
   </source>
   <dest>
@@ -4933,7 +4933,7 @@
     ipod*: "SELECT = Set"
     x5: "SELECT = Set"
     h10,h10_5gb: "SELECT = Set"
-    gigabeat: "SELECT = Set"
+    gigabeatf: "SELECT = Set"
     e200: "SELECT = Set"
   </dest>
   <voice>
@@ -4950,7 +4950,7 @@
     ipod*: "MENU = Revert"
     x5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
-    gigabeat: "POWER = Revert"
+    gigabeatf: "POWER = Revert"
     e200: "PREV = Revert"
   </source>
   <dest>
@@ -4959,7 +4959,7 @@
     ipod*: "MENU = Revert"
     x5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
-    gigabeat: "POWER = Revert"
+    gigabeatf: "POWER = Revert"
     e200: "PREV = Revert"
   </dest>
   <voice>
@@ -10762,17 +10762,17 @@
   <source>
     *: ""
     e200: "Wheel Light Timeout"
-    gigabeat: "Button Light Timeout"
+    gigabeatf: "Button Light Timeout"
   </source>
   <dest>
     *: ""
     e200: "Wheel Light Timeout"
-    gigabeat: "Button Light Timeout"
+    gigabeatf: "Button Light Timeout"
   </dest>
   <voice>
     *: ""
     e200: "Wheel Light Timeout"
-    gigabeat: "Button Light Timeout"
+    gigabeatf: "Button Light Timeout"
   </voice>
 </phrase>
 <phrase>
