@@ -112,11 +112,14 @@ void fade(bool fade_in)
             sleep(1);
         }
         audio_pause();
+
+#if CONFIG_CODEC != SWCODEC
 #ifndef SIMULATOR
         /* let audio thread run and wait for the mas to run out of data */
         while (!mp3_pause_done())
 #endif
             sleep(HZ/10);
+#endif
 
         /* reset volume to what it was before the fade */
         sound_set_volume(global_settings.volume);

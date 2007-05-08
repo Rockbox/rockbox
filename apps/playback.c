@@ -138,7 +138,7 @@ enum {
     Q_AUDIO_FLUSH,
     Q_AUDIO_TRACK_CHANGED,
     Q_AUDIO_DIR_SKIP,
-    Q_AUDIO_NEW_PLAYLIST,
+    Q_AUDIO_UNUSED_0, /* Free. Previously Q_AUDIO_NEW_PLAYLIST */
     Q_AUDIO_POSTINIT,
     Q_AUDIO_FILL_BUFFER,
 #if MEM > 8
@@ -398,11 +398,6 @@ void mp3_play_pause(bool play)
 bool mp3_is_playing(void)
 {
     return voice_is_playing;
-}
-
-bool mp3_pause_done(void)
-{
-    return pcm_is_paused();
 }
 
 void mpeg_id3_options(bool _v1first)
@@ -673,22 +668,9 @@ void audio_play(long offset)
 #endif
 
     /* Start playback */
-    if (playing && offset <= 0)
-    {
-        LOGFQUEUE("audio > audio Q_AUDIO_NEW_PLAYLIST");
-        queue_post(&audio_queue, Q_AUDIO_NEW_PLAYLIST, 0);
-    }
-    else
-    {
-        LOGFQUEUE("audio > audio Q_AUDIO_STOP");
-        queue_post(&audio_queue, Q_AUDIO_STOP, 0);
-        LOGFQUEUE("audio > audio Q_AUDIO_PLAY");
-        queue_post(&audio_queue, Q_AUDIO_PLAY, offset);
-    }
-
-    /* Don't return until playback has actually started */
-    while (!playing)
-        yield();
+    LOGFQUEUE("audio >| audio Q_AUDIO_PLAY: %l", offset);
+    /* Don't return until playback has actually stopped */
+    queue_send(&audio_queue, Q_AUDIO_PLAY, offset);
 }
 
 void audio_stop(void)
@@ -701,14 +683,16 @@ void audio_stop(void)
 
 void audio_pause(void)
 {
-    LOGFQUEUE("audio > audio Q_AUDIO_PAUSE");
-    queue_post(&audio_queue, Q_AUDIO_PAUSE, true);
+    LOGFQUEUE("audio >| audio Q_AUDIO_PAUSE");
+    /* Don't return until playback has actually paused */
+    queue_send(&audio_queue, Q_AUDIO_PAUSE, true);
 }
 
 void audio_resume(void)
 {
-    LOGFQUEUE("audio > audio Q_AUDIO_PAUSE resume");
-    queue_post(&audio_queue, Q_AUDIO_PAUSE, false);
+    LOGFQUEUE("audio >| audio Q_AUDIO_PAUSE resume");
+    /* Don't return until playback has actually resumed */
+    queue_send(&audio_queue, Q_AUDIO_PAUSE, false);
 }
 
 void audio_next(void)
@@ -3342,13 +3326,14 @@ static void audio_play_start(size_t offset)
 #endif
 
     /* Wait for any previously playing audio to flush - TODO: Not necessary? */
+    paused = false;
     audio_stop_codec_flush();
 
     track_changed = true;
     playlist_end = false;
 
     playing = true;
-    paused = false;
+
     ci.new_track = 0;
     ci.seek_time = 0;
     wps_offset = 0;
@@ -3367,6 +3352,9 @@ static void audio_play_start(size_t offset)
     memset(tracks, 0, sizeof(struct track_info) * MAX_TRACK);
     
     last_peek_offset = -1;
+
+    /* Officially playing */
+    queue_reply(&audio_queue, 1);
 
     audio_fill_file_buffer(true, false, offset);
 }
@@ -3420,6 +3408,10 @@ static void audio_new_playlist(void)
     /* Signal the codec to initiate a track change forward */
     new_playlist = true;
     ci.new_track = 1;
+
+    /* Officially playing */
+    queue_reply(&audio_queue, 1);
+
     audio_fill_file_buffer(false, true, 0);
 }
 
@@ -3635,8 +3627,13 @@ static void audio_thread(void)
 
             case Q_AUDIO_PLAY:
                 LOGFQUEUE("audio < Q_AUDIO_PLAY");
-                audio_clear_track_entries(false);
-                audio_play_start((size_t)ev.data);
+                if (playing && ev.data <= 0)
+                    audio_new_playlist();
+                else
+                {
+                    audio_stop_playback();
+                    audio_play_start((size_t)ev.data);
+                }
                 break ;
 
             case Q_AUDIO_STOP:
@@ -3688,11 +3685,6 @@ static void audio_thread(void)
                 LOGFQUEUE("audio < Q_AUDIO_DIR_SKIP");
                 playlist_end = false;
                 audio_initiate_dir_change(ev.data);
-                break;
-
-            case Q_AUDIO_NEW_PLAYLIST:
-                LOGFQUEUE("audio < Q_AUDIO_NEW_PLAYLIST");
-                audio_new_playlist();
                 break;
 
             case Q_AUDIO_FLUSH:
