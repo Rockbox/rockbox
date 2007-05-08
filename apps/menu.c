@@ -623,6 +623,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
             gui_buttonbar_set(&buttonbar, "<<<", "", "");
             gui_buttonbar_draw(&buttonbar);
 #endif
+            gui_synclist_draw(&lists);
         }
         else if(default_event_handler(action) == SYS_USB_CONNECTED)
         {
