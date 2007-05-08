@@ -188,17 +188,19 @@ static void led_control_service(void)
             case BACKLIGHT_CONTROL_FADE:
                 sc606_changed=true;
                 sc606regCONFval |= 0x03;
-                /* The SC606 LED driver can set the brightness in 64 steps */
-                if(backlight_target==sc606regAval)
-                    if(sc606regAval)
+                if(backlight_target>sc606regAval)
+                {
+                    sc606regAval++;
+                    if(backlight_target==sc606regAval)
                         backlight_control = BACKLIGHT_CONTROL_ON;
-                    else
-                        backlight_control = BACKLIGHT_CONTROL_OFF;
+                }
                 else
-                    if(backlight_target>sc606regAval)
-                        sc606regAval++;
-                    else
-                        sc606regAval--;
+                {
+                    sc606regAval--;
+                    if(backlight_target==sc606regAval)
+                        backlight_control = BACKLIGHT_CONTROL_OFF;
+                }
+
                 break;
             default:
                 break;
@@ -222,16 +224,19 @@ static void led_control_service(void)
             case BUTTONLIGHT_CONTROL_FADE:
                 sc606_changed=true;
                 sc606regCONFval |= 0x3C;
-                if(buttonlight_target==sc606regBval)
-                    if(sc606regBval)
+                if(buttonlight_target>sc606regBval)
+                {
+                    sc606regCval=++sc606regBval;
+                    if(buttonlight_target==sc606regBval)
                         buttonlight_control = BUTTONLIGHT_CONTROL_ON;
-                    else
-                        buttonlight_control = BUTTONLIGHT_CONTROL_OFF;
+                }
                 else
-                    if(buttonlight_target>sc606regBval)
-                        sc606regCval=++sc606regBval;
-                    else
-                        sc606regCval=--sc606regBval;
+                {
+                    sc606regCval=--sc606regBval;
+                    if(buttonlight_target==sc606regBval)
+                        buttonlight_control = BUTTONLIGHT_CONTROL_OFF;
+                }
+
                 break;
             default:
                 break;
@@ -261,7 +266,10 @@ static void led_control_service(void)
         case SC606_CONTROL_CONF:
             sc606_write(SC606_REG_CONF , sc606regCONFval);
             sc606_changed=false;
-            sc606_control=SC606_CONTROL_IDLE;
+            if(backlight_control != BACKLIGHT_CONTROL_IDLE && buttonlight_control != BUTTONLIGHT_CONTROL_IDLE)
+                sc606_control=SC606_CONTROL_A12;
+            else
+                sc606_control=SC606_CONTROL_IDLE;
             break;
         default:
             sc606_control=SC606_CONTROL_A12;
