@@ -101,11 +101,11 @@
 
 /* macros to enable logf for queues
    logging on SYS_TIMEOUT can be disabled */
-#if 1//def SIMULATOR
+#ifdef SIMULATOR
 /* Define this for logf output of all queuing except SYS_TIMEOUT */
 #define PLAYBACK_LOGQUEUES
 /* Define this to logf SYS_TIMEOUT messages */
-//#define PLAYBACK_LOGQUEUES_SYS_TIMEOUT
+#define PLAYBACK_LOGQUEUES_SYS_TIMEOUT
 #endif
 
 #ifdef PLAYBACK_LOGQUEUES
