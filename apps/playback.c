@@ -101,11 +101,11 @@
 
 /* macros to enable logf for queues
    logging on SYS_TIMEOUT can be disabled */
-#ifdef SIMULATOR
+#if 1//def SIMULATOR
 /* Define this for logf output of all queuing except SYS_TIMEOUT */
 #define PLAYBACK_LOGQUEUES
 /* Define this to logf SYS_TIMEOUT messages */
-#define PLAYBACK_LOGQUEUES_SYS_TIMEOUT
+//#define PLAYBACK_LOGQUEUES_SYS_TIMEOUT
 #endif
 
 #ifdef PLAYBACK_LOGQUEUES
@@ -138,14 +138,10 @@ enum {
     Q_AUDIO_FLUSH,
     Q_AUDIO_TRACK_CHANGED,
     Q_AUDIO_DIR_SKIP,
-    Q_AUDIO_UNUSED_0, /* Free. Previously Q_AUDIO_NEW_PLAYLIST */
     Q_AUDIO_POSTINIT,
     Q_AUDIO_FILL_BUFFER,
 #if MEM > 8
     Q_AUDIO_FILL_BUFFER_IF_ACTIVE_ATA,
-#endif
-#if 0
-    Q_CODEC_REQUEST_PENDING,
 #endif
     Q_CODEC_REQUEST_COMPLETE,
     Q_CODEC_REQUEST_FAILED,
@@ -668,7 +664,7 @@ void audio_play(long offset)
 #endif
 
     /* Start playback */
-    LOGFQUEUE("audio >| audio Q_AUDIO_PLAY: %l", offset);
+    LOGFQUEUE("audio >| audio Q_AUDIO_PLAY: %ld", offset);
     /* Don't return until playback has actually started */
     queue_send(&audio_queue, Q_AUDIO_PLAY, offset);
 }
@@ -1579,11 +1575,14 @@ static void codec_advance_buffer_callback(size_t amount)
 
     if (amount > CUR_TI->available) 
     {
-        intptr_t result;
-        LOGFQUEUE("codec >| audio Q_AUDIO_REBUFFER_SEEK");
-        
-        result = queue_send(&audio_queue, Q_AUDIO_REBUFFER_SEEK,
-                            ci.curpos + amount);
+        intptr_t result = Q_CODEC_REQUEST_FAILED;
+
+        if (!ci.stop_codec)
+        {
+            LOGFQUEUE("codec >| audio Q_AUDIO_REBUFFER_SEEK");
+            result = queue_send(&audio_queue, Q_AUDIO_REBUFFER_SEEK,
+                                ci.curpos + amount);
+        }
 
         switch (result)
         {
@@ -1722,10 +1721,14 @@ static bool codec_seek_buffer_callback(size_t newpos)
     /* We need to reload the song. */
     if (newpos < CUR_TI->start_pos)
     {
-        intptr_t result;
-        
-        LOGFQUEUE("codec >| audio Q_AUDIO_REBUFFER_SEEK");
-        result = queue_send(&audio_queue, Q_AUDIO_REBUFFER_SEEK, newpos);
+        intptr_t result = Q_CODEC_REQUEST_FAILED;
+
+        if (!ci.stop_codec)
+        {
+            LOGFQUEUE("codec >| audio Q_AUDIO_REBUFFER_SEEK");
+            result = queue_send(&audio_queue, Q_AUDIO_REBUFFER_SEEK,
+                                newpos);
+        }
         
         switch (result)
         {
@@ -1862,7 +1865,7 @@ static void codec_track_skip_done(bool was_manual)
 
 static bool codec_load_next_track(void) 
 {
-    intptr_t result;
+    intptr_t result = Q_CODEC_REQUEST_FAILED;
 
     prev_track_elapsed = CUR_TI->id3.elapsed;
 
@@ -1880,24 +1883,13 @@ static bool codec_load_next_track(void)
         ci.new_track++;
         automatic_skip = true;
     }
-    
-    trigger_cpu_boost();
-    LOGFQUEUE("codec >| audio Q_AUDIO_CHECK_NEW_TRACK");
-    result = queue_send(&audio_queue, Q_AUDIO_CHECK_NEW_TRACK, 0);
 
-#if 0 /* Q_CODEC_REQUEST_PENDING never posted anyway */
-    while (1) 
+    if (!ci.stop_codec)
     {
-        queue_wait(&codec_callback_queue, &ev);
-        if (ev.id == Q_CODEC_REQUEST_PENDING)
-        {
-            if (!automatic_skip)
-                pcmbuf_play_stop();
-        }
-        else
-            break;
+        trigger_cpu_boost();
+        LOGFQUEUE("codec >| audio Q_AUDIO_CHECK_NEW_TRACK");
+        result = queue_send(&audio_queue, Q_AUDIO_CHECK_NEW_TRACK, 0);
     }
-#endif
 
     switch (result)
     {
@@ -3003,27 +2995,6 @@ static void audio_rebuffer(void)
 {
     logf("Forcing rebuffer");
 
-#if 0
-    /* Notify the codec that this will take a while */
-    /* Currently this can cause some problems (logf in reverse order):
-     * Codec load error:-1
-     * Codec load disk
-     * Codec: Unsupported
-     * Codec finished
-     * New codec:0/3
-     * Clearing tracks:7/7, 1
-     * Forcing rebuffer
-     * Check new track buffer
-     * Request new track
-     * Clearing tracks:5/5, 0
-     * Starting buffer fill
-     * Clearing tracks:5/5, 1
-     * Re-buffering song w/seek
-     */
-    if (!filling)
-        queue_post(&codec_callback_queue, Q_CODEC_REQUEST_PENDING, 0);
-#endif
-    
     /* Stop in progress fill, and clear open file descriptor */
     if (current_fd >= 0)
     {
@@ -3272,8 +3243,10 @@ static void audio_stop_codec_flush(void)
 {
     ci.stop_codec = true;
     pcmbuf_pause(true);
+
     while (audio_codec_loaded)
         yield();
+
     /* If the audio codec is not loaded any more, and the audio is still
      * playing, it is now and _only_ now safe to call this function from the
      * audio thread */
@@ -3287,9 +3260,18 @@ static void audio_stop_playback(void)
     /* If we were playing, save resume information */
     if (playing)
     {
+        struct mp3entry *id3 = NULL;
+
+        if (!playlist_end || !ci.stop_codec)
+        {
+            /* Set this early, the outside code yields and may allow the codec
+               to try to wait for a reply on a buffer wait */
+            ci.stop_codec = true;
+            id3 = audio_current_track();
+        }
+
         /* Save the current playing spot, or NULL if the playlist has ended */
-        playlist_update_resume_info(
-            (playlist_end && ci.stop_codec)?NULL:audio_current_track());
+        playlist_update_resume_info(id3);
 
         /* Increment index so runtime info is saved in audio_clear_track_entries().
          * Done here, as audio_stop_playback() may be called more than once.
@@ -3703,7 +3685,8 @@ static void audio_thread(void)
 #ifndef SIMULATOR
             case SYS_USB_CONNECTED:
                 LOGFQUEUE("audio < SYS_USB_CONNECTED");
-                audio_stop_playback();
+                if (playing)
+                    audio_stop_playback();
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 usb_wait_for_disconnect(&audio_queue);
                 break ;
