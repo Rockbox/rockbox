@@ -27,7 +27,11 @@ static bool backlight_is_on = false;
 
 int __backlight_is_on(void)
 {
+#ifdef BOOTLOADER
+    return (int)true;
+#else
     return (int)backlight_is_on;
+#endif
 }
 
 void __backlight_set_brightness(int brightness)
