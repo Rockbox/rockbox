@@ -44,7 +44,7 @@ typedef int fixed_t;
 
 inline static int FixedMul( int a, int b )
 {
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE)
    // Code contributed by Thom Johansen
    register int result;
    asm (

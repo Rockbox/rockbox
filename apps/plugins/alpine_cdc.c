@@ -32,7 +32,7 @@
 #include "plugin.h"
 
 /* Only build for (correct) target */
-#if !defined(SIMULATOR) && CONFIG_CPU==SH7034 && !defined(HAVE_MMC)
+#if CONFIG_CPU==SH7034 && !defined(HAVE_MMC)
 
 PLUGIN_HEADER
 
@@ -1201,4 +1201,4 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     return (main(parameter)==0) ? PLUGIN_OK : PLUGIN_ERROR;
 }
 
-#endif /* #ifndef SIMULATOR, etc. */
+#endif /* CONFIG_CPU==SH7034 && !defined(HAVE_MMC) */

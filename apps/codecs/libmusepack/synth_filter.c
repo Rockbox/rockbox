@@ -343,7 +343,7 @@ static void Synthese_Filter_float_internal(MPC_SAMPLE_FORMAT * OutData,MPC_SAMPL
 
             
             
-            #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+            #if defined(CPU_COLDFIRE)
             for ( k = 0; k < 32; k++, D += 16, V++ ) {
                 asm volatile (
                     "movem.l (%[D]), %%d0-%%d3                    \n\t"
@@ -372,7 +372,7 @@ static void Synthese_Filter_float_internal(MPC_SAMPLE_FORMAT * OutData,MPC_SAMPL
                     : [Data] "+a" (Data)
                     : [V] "a" (V), [D] "a" (D)
                     : "d0", "d1", "d2", "d3", "a5");
-            #elif defined(CPU_ARM) && !defined(SIMULATOR)
+            #elif defined(CPU_ARM)
             for ( k = 0; k < 32; k++, V++ ) {
                 asm volatile (
                     "ldmia %[D]!, { r0-r3 } \n\t"

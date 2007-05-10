@@ -526,7 +526,7 @@ byte *ds_source IBSS_ATTR;
 
 void R_DrawSpan (void)
 {
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#ifdef CPU_COLDFIRE
    // only slightly faster
    asm volatile (
       "tst %[count]                             \n"

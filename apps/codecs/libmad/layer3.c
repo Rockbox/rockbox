@@ -46,7 +46,7 @@
 # include "layer3.h"
 
 /* depending on the cpu "leftshift32" may be supported or not */
-# if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+# if defined(CPU_COLDFIRE)
 #define MAXLSHIFT 32
 #else
 #define MAXLSHIFT 31
@@ -1569,7 +1569,7 @@ void III_aliasreduce(mad_fixed_t xr[576], int lines)
 # if defined(ASO_ZEROCHECK)
       if (a | b) {
 # endif
-# if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+# if defined(CPU_COLDFIRE)
       (void)hi, (void)lo;
       asm volatile ("mac.l %[a], %[csi], %%acc0\n\t"
                     "msac.l %[b], %[cai], %%acc0\n\t"
@@ -1796,7 +1796,7 @@ void imdct36(mad_fixed_t const x[18], mad_fixed_t y[36])
  * DESCRIPTION:	perform X[18]->x[36] IMDCT
  */
 
-# if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+# if defined(CPU_COLDFIRE)
 /* emac optimized imdct36, it is very ugly and i hope to replace it soon.
  * for now it is actually somewhat faster than the stock implementation. 
  */
@@ -2813,7 +2813,7 @@ void III_imdct_l(mad_fixed_t const X[18], mad_fixed_t z[36],
  * DESCRIPTION:	perform IMDCT and windowing for short blocks
  */
 
-# if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+# if defined(CPU_COLDFIRE)
 void III_imdct_s(mad_fixed_t const X[18], mad_fixed_t z[36]);
 #else
 

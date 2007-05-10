@@ -58,7 +58,7 @@ a52_state_t * a52_init (uint32_t mm_accel)
     a52_state_t * state;
     int i;
 
-    #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+    #if defined(CPU_COLDFIRE)
     coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_ROUND | EMAC_SATURATE);
     #endif
     /* 

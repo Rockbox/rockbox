@@ -95,7 +95,7 @@ NeAACDecHandle NEAACDECAPI NeAACDecOpen(void)
     uint8_t i;
     NeAACDecHandle hDecoder = NULL;
 
-    #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+    #if defined(CPU_COLDFIRE)
     coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
     #endif
 

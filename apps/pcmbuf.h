@@ -52,7 +52,7 @@ void pcmbuf_play_stop(void);
 bool pcmbuf_is_crossfade_active(void);
 
 /* These functions are for playing chained buffers of PCM data */
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ) && !defined(SIMULATOR)
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
 void pcmbuf_boost(bool state);
 void pcmbuf_set_boost_mode(bool state);
 #else

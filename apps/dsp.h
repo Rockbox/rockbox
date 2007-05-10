@@ -60,7 +60,7 @@ enum {
 };
 
 /* A bunch of fixed point assembler helper macros */
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE)
 /* These macros use the Coldfire EMAC extension and need the MACSR flags set
  * to fractional mode with no rounding.
  */
@@ -133,7 +133,7 @@ enum {
 
 #define ACC_INIT(acc, x, y) ACC(acc, x, y)
 
-#elif defined(CPU_ARM) && !defined(SIMULATOR)
+#elif defined(CPU_ARM)
 
 /* Multiply two S.31 fractional integers and return the sign bit and the
  * 31 most significant bits of the result.

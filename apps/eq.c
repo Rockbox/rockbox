@@ -322,7 +322,7 @@ void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
  * implementations.
  */
 
-#if (!defined(CPU_COLDFIRE) && !defined(CPU_ARM)) || defined(SIMULATOR)
+#if (!defined(CPU_COLDFIRE) && !defined(CPU_ARM))
 void eq_filter(int32_t **x, struct eqfilter *f, unsigned num,
                unsigned channels, unsigned shift)
 {

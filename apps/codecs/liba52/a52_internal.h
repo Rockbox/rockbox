@@ -141,7 +141,7 @@ typedef int16_t quantizer_t;
 #if 0
 #define MUL(a,b) ((int)(((int64_t)(a) * (b) + (1 << 29)) >> 30))
 #define MUL_L(a,b) ((int)(((int64_t)(a) * (b) + (1 << 25)) >> 26))
-#elif defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#elif defined(CPU_COLDFIRE)
 /* loses 1 bit of accuracy */
 #define MUL(a, b) \
 ({ \

@@ -583,7 +583,7 @@ void I_InitGraphics(void)
    gray_show(true);
 #endif
 
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#ifdef CPU_COLDFIRE
    coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
    d_screens[0] = fastscreen;
 #else

@@ -82,7 +82,7 @@ static unsigned int get_uint(ShortenContext *s, int k)
     return get_ur_golomb_shorten(&s->gb, k);
 }
 
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE)
 static void coldfire_lshift_samples(int n, int shift, int32_t *samples) ICODE_ATTR_FLAC;
 static void coldfire_lshift_samples(int n, int shift, int32_t *samples)
 {
@@ -132,7 +132,7 @@ static inline void fix_bitshift(ShortenContext *s, int32_t *samples)
     /* Wrapped samples don't get bitshifted, so we'll do them during
        the next iteration. */
     if (s->bitshift != 0) {
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE)
         coldfire_lshift_samples(s->blocksize, s->bitshift, samples - s->nwrap);
 #else
         for (i = -s->nwrap; i < (s->blocksize - s->nwrap); i++)
@@ -349,7 +349,7 @@ int shorten_decode_frames(ShortenContext *s, int *nsamples,
 
         /* Scale the samples for the pcmbuf */
         int scale = SHN_OUTPUT_DEPTH - s->bits_per_sample;
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE)
         coldfire_lshift_samples(*nsamples, scale, decoded0 + s->nwrap);
         coldfire_lshift_samples(*nsamples, scale, decoded1 + s->nwrap);
 #else

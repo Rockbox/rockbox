@@ -68,7 +68,7 @@ typedef mpc_int64_t MPC_SAMPLE_FORMAT_MULTIPLY;
 #define MAKE_MPC_SAMPLE(X) (MPC_SAMPLE_FORMAT)((double)(X) * (double)(((mpc_int64_t)1)<<MPC_FIXED_POINT_FRACTPART))
 #define MAKE_MPC_SAMPLE_EX(X,Y) (MPC_SAMPLE_FORMAT)((double)(X) * (double)(((mpc_int64_t)1)<<(Y)))
 
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE)
 
 #define MPC_MULTIPLY(X,Y) mpc_multiply((X), (Y))
 #define MPC_MULTIPLY_EX(X,Y,Z) mpc_multiply_ex((X), (Y), (Z))
@@ -158,7 +158,7 @@ static inline MPC_SAMPLE_FORMAT MPC_MULTIPLY_EX(MPC_SAMPLE_FORMAT item1,MPC_SAMP
 #ifdef MPC_HAVE_MULHIGH
 #define MPC_MULTIPLY_FRACT(X,Y) _MulHigh(X,Y)
 #else
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE)
 /* loses one bit of accuracy.
    the rest of the macros won't be as easy as this... */
 #define MPC_MULTIPLY_FRACT(X,Y) \

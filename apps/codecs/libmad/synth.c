@@ -42,7 +42,7 @@ void mad_synth_init(struct mad_synth *synth)
   synth->pcm.samplerate = 0;
   synth->pcm.channels   = 0;
   synth->pcm.length     = 0;
-  #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+  #if defined(CPU_COLDFIRE)
   /* init the emac unit here, since this function should always be called
      before using libmad */
   coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE | EMAC_ROUND);

@@ -43,7 +43,7 @@ struct scan scan IBSS_ATTR;
 #define WV (scan.wv)
 
 byte patpix[4096][8][8]
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE)
      __attribute__ ((aligned(16))) /* to profit from burst mode */
 #endif
      ;
@@ -62,7 +62,7 @@ fb_data *vdest;
 void updatepatpix(void)
 {
     int i, j;
-#if ((CONFIG_CPU != SH7034) && !defined(CPU_COLDFIRE)) || defined(SIMULATOR)
+#if ((CONFIG_CPU != SH7034) && !defined(CPU_COLDFIRE))
     int k, a, c;
 #endif
     byte *vram = lcd.vbank[0];
@@ -76,7 +76,7 @@ void updatepatpix(void)
         patdirty[i] = 0;
         for (j = 0; j < 8; j++)
         {
-#if CONFIG_CPU == SH7034 && !defined(SIMULATOR)
+#if CONFIG_CPU == SH7034
             asm volatile (
                 "mov.w   @%2,r1         \n"
                 "swap.b  r1,r2          \n"
@@ -145,7 +145,7 @@ void updatepatpix(void)
                 : /* clobbers */
                 "r0", "r1", "r2"
             );
-#elif defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#elif defined(CPU_COLDFIRE)
             asm volatile (
                 "move.b  (%2),%%d2      \n"
                 "move.b  (1,%2),%%d1    \n"
@@ -222,7 +222,7 @@ void updatepatpix(void)
                     patpix[i+1024][j][7-k];
 #endif
         }
-#if CONFIG_CPU == SH7034 && !defined(SIMULATOR)
+#if CONFIG_CPU == SH7034
         asm volatile (
             "mov.l   @%0,r0         \n"
             "mov.l   @(4,%0),r1     \n"
@@ -300,7 +300,7 @@ void updatepatpix(void)
             : /* clobbers */
             "r0", "r1"
         );
-#elif defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#elif defined(CPU_COLDFIRE)
         asm volatile (
             "movem.l (%0),%%d0-%%d3     \n"
             "move.l  %%d0,%%d4          \n"
@@ -486,7 +486,7 @@ void bg_scan(void)
     if (cnt <= 0) return;
     while (cnt >= 8)
     {
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE)
       asm volatile (
          "move.l (%1)+,(%0)+ \n"
          "move.l (%1)+,(%0)+ \n"
@@ -521,7 +521,7 @@ void wnd_scan(void)
 
     while (cnt >= 8)
     {
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE)
       asm volatile (
          "move.l (%1)+,(%0)+ \n"
          "move.l (%1)+,(%0)+ \n"
@@ -629,7 +629,7 @@ void bg_scan_color(void)
     while (cnt >= 8)
     {
         src = patpix[*(tile++)][V];
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE)
       asm volatile (
          "move.l (%2)+,%%d1 \n"
 

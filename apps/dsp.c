@@ -1124,7 +1124,7 @@ int dsp_process(char *dst, const char *src[], int count)
     int written = 0;
     int samples;
 
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE)
     /* set emac unit for dsp processing, and save old macsr, we're running in
        codec thread context at this point, so can't clobber it */
     unsigned long old_macsr = coldfire_get_macsr();
@@ -1177,7 +1177,7 @@ int dsp_process(char *dst, const char *src[], int count)
         yield();
     }
 
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE)
     /* set old macsr again */
     coldfire_set_macsr(old_macsr);
 #endif

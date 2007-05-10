@@ -24,9 +24,9 @@
 # ifndef LIBMAD_GLOBAL_H
 # define LIBMAD_GLOBAL_H
 
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE)
 #define FPM_COLDFIRE_EMAC
-#elif defined(CPU_ARM) && !defined(SIMULATOR)
+#elif defined(CPU_ARM)
 #define FPM_ARM
 #define ASO_IMDCT
 #else

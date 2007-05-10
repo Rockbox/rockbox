@@ -59,7 +59,7 @@ typedef int32_t real_t;
 #define Q2_PRECISION (1 << Q2_BITS)
 #define Q2_CONST(A) (((A) >= 0) ? ((real_t)((A)*(Q2_PRECISION)+0.5)) : ((real_t)((A)*(Q2_PRECISION)-0.5)))
 
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE)
 
 static INLINE real_t MUL_F(real_t A, real_t B)
 {

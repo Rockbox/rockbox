@@ -23,8 +23,6 @@
 #define _DSP_ASM_H
 
 /* Set the appropriate #defines based on CPU or whatever matters */
-#ifndef SIMULATOR
-
 #if defined(CPU_ARM)
 #define DSP_HAVE_ASM_RESAMPLING
 #define DSP_HAVE_ASM_CROSSFEED
@@ -38,8 +36,6 @@
 #define DSP_HAVE_ASM_SAMPLE_OUTPUT_MONO
 #define DSP_HAVE_ASM_SAMPLE_OUTPUT_STEREO
 #endif /* CPU_COLDFIRE */
-
-#endif /* SIMULATOR */
 
 /* Declare prototypes based upon what's #defined above */
 #ifdef DSP_HAVE_ASM_CROSSFEED

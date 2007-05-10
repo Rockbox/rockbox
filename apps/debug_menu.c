@@ -342,7 +342,7 @@ static bool dbg_audio_thread(void)
 #endif /* HAVE_LCD_BITMAP */
 
 
-#if (CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE)) && !defined(SIMULATOR)
+#if (CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE))
 /* Tool function to read the flash manufacturer and type, if available.
    Only chips which could be reprogrammed in system will return values.
    (The mode switch addresses vary between flash manufacturers, hence addr1/2) */
@@ -396,7 +396,7 @@ static bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
     }
     return false; /* fail */
 }
-#endif /* (CONFIG_CPU == SH7034 || CPU_COLDFIRE) && !SIMULATOR */
+#endif /* (CONFIG_CPU == SH7034 || CPU_COLDFIRE) */
 
 #ifndef SIMULATOR
 #ifdef HAVE_LCD_BITMAP

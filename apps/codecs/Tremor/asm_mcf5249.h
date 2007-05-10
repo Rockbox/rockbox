@@ -19,7 +19,7 @@
 
 #include "os_types.h"
 
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE)
 
 /* attribute for 16-byte alignment */
 #define LINE_ATTR   __attribute__ ((aligned (16)))

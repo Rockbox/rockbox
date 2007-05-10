@@ -21,7 +21,7 @@
 ****************************************************************************/
 #include "plugin.h"
 
-#if !defined(SIMULATOR) && (CONFIG_CPU == SH7034) /* Only for SH targets */
+#if (CONFIG_CPU == SH7034) /* Only for SH targets */
 
 PLUGIN_HEADER
 
@@ -1038,4 +1038,4 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 }
 
 
-#endif /* !SIMULATOR or a SH-target */
+#endif /* SH-target */

@@ -1492,7 +1492,7 @@ void mpc_decoder_setup(mpc_decoder *d, mpc_reader *r)
   d->Y_L = Y_L;
   d->Y_R = Y_R;
 
-  #if defined(CPU_COLDFIRE)&& !defined(SIMULATOR)
+  #if defined(CPU_COLDFIRE)
   coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
   #endif
 }

@@ -7,7 +7,7 @@
 /* #undef ARM4_ASM */
 
 /* Make use of ARM5E assembly optimizations */
-#if defined(CPU_ARM) && !defined(SIMULATOR)
+#if defined(CPU_ARM)
 #define ARM4_ASM
 #endif
 
