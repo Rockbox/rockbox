@@ -835,8 +835,8 @@
     h100,h120,h300: "NAVI = Yes"
     ipod*: "SELECT = Yes"
     x5: "SELECT = Yes"
-    h10: "NEXT = Yes"
-    gigabeat: "SELECT = Yes"
+    h10,h10_5gb: "SELECT = Yes"
+    gigabeatf: "SELECT = Yes"
     e200: "SELECT = Yes"
   </source>
   <dest>
@@ -844,8 +844,8 @@
     h100,h120,h300: "NAVI = Si"
     ipod*: "SELECT = Si"
     x5: "SELECT = Si"
-    h10: "NEXT = Si"
-    gigabeat: "SELECT = Si"
+    h10,h10_5gb: "NEXT = Si"
+    gigabeatf: "SELECT = Si"
     e200: "SELECT = Si"
   </dest>
   <voice>
@@ -4339,16 +4339,18 @@
     h100,h120,h300: "STOP = Exit"
     ipod*: "PLAY/PAUSE = Exit"
     x5: "RECORD = Exit"
-    h10: "PREV = Exit"
-    gigabeat: "A = Exit"
+    h10,h10_5gb: "PREV = Exit"
+    gigabeatf: "A = Exit"
+    e200: "POWER = Exit"
   </source>
   <dest>
     *: "OFF = Esci"
     h100,h120,h300: "STOP = Esci"
     ipod*: "PLAY/PAUSE = Esci"
     x5: "RECORD = Esci"
-    h10: "PREV = Esci"
-    gigabeat: "A = Esci"
+    h10,h10_5gb: "PREV = Esci"
+    gigabeatf: "A = Esci"
+    e200: "POWER = Esci"
   </dest>
   <voice>
     *: ""
@@ -4405,16 +4407,18 @@
     h100,h120,h300: "NAVI = Select"
     ipod*: "SELECT = Select"
     x5: "SELECT = Select"
-    h10: "NEXT = Select"
-    gigabeat: "SELECT = Select"
+    h10,h10_5gb: "SELECT = Select"
+    gigabeatf: "SELECT = Select"
+    e200: "SELECT = Select"
   </source>
   <dest>
     *: "Play = Seleziona"
     h100,h120,h300: "NAVI = Seleziona"
     ipod*: "SELECT = Seleziona"
     x5: "SELECT = Seleziona"
-    h10: "NEXT = Seleziona"
-    gigabeat: "SELECT = Seleziona"
+    h10,h10_5gb: "NEXT = Seleziona"
+    gigabeatf: "SELECT = Seleziona"
+    e200: "SELECT = Seleziona"
   </dest>
   <voice>
     *: ""
@@ -4429,16 +4433,18 @@
     h100,h120,h300: "RECORD = Delete"
     ipod*: "Long MENU = Delete"
     x5: "Long RECORD = Delete"
-    h10: "REWIND = Delete"
-    gigabeat: "POWER = Delete"
+    h10,h10_5gb: "REWIND = Delete"
+    gigabeatf: "POWER = Delete"
+    e200: "PLAY = Delete"
   </source>
   <dest>
     *: "ON+Play = Cancella"
     h100,h120,h300: "RECORD = Cancella"
     ipod*: "MENU Lungo = Cancella"
     x5: "RECORD LUNGO = Cancella"
-    h10: "REWIND = Cancella"
-    gigabeat: "POWER = Cancella"
+    h10,h10_5gb: "REWIND = Cancella"
+    gigabeatf: "POWER = Cancella"
+    e200: "PLAY = Cancella"
   </dest>
   <voice>
     *: ""
@@ -4523,16 +4529,18 @@
     h100,h120,h300: "NAVI = Set"
     ipod*: "SELECT = Set"
     x5: "SELECT = Set"
-    h10: "NEXT = Set"
-    gigabeat: "SELECT = Set"
+    h10,h10_5gb: "SELECT = Set"
+    gigabeatf: "SELECT = Set"
+    e200: "SELECT = Set"
   </source>
   <dest>
     *: "ON = salva"
     h100,h120,h300: "NAVI = Salva"
     ipod*: "SELECT = Salva"
     x5: "SELECT = Salva"
-    h10: "NEXT = Salva"
-    gigabeat: "SELECT = Salva"
+    h10,h10_5gb: "NEXT = Salva"
+    gigabeatf: "SELECT = Salva"
+    e200: "SELECT = Salva"
   </dest>
   <voice>
     *: ""
@@ -4547,16 +4555,18 @@
     h100,h120,h300: "STOP = Revert"
     ipod*: "MENU = Revert"
     x5: "RECORD = Revert"
-    h10: "PREV = Revert"
-    gigabeat: "POWER = Revert"
+    h10,h10_5gb: "PREV = Revert"
+    gigabeatf: "POWER = Revert"
+    e200: "PREV = Revert"
   </source>
   <dest>
     *: "OFF = Annulla"
     h100,h120,h300: "STOP = Annulla"
     ipod*: "MENU = Annulla"
     x5: "RECORD = Annulla"
-    h10: "PREV = Annulla"
-    gigabeat: "POWER = Annulla"
+    h10,h10_5gb: "PREV = Annulla"
+    gigabeatf: "POWER = Annulla"
+    e200: "PREV = Annulla"
   </dest>
   <voice>
     *: ""
@@ -7461,14 +7471,16 @@
     h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5: "Long PLAY to abort"
-    h10: "PREV to abort"
+    h10,h10_5gb: "PREV to abort"
+    e200: "PREV to abort"
   </source>
   <dest>
     *: "OFF = Annulla"
     h100,h120,h300: "STOP = Annulla"
     ipod*: "PLAY/PAUSA = Annulla"
     x5: "PLAY LUNGO = Annulla"
-    h10: "PREV = Annulla"
+    h10,h10_5gb: "PREV = Annulla"
+    e200: "PREV = Annulla"
   </dest>
   <voice>
     *: ""
@@ -10685,14 +10697,16 @@ LANG_RECORDING_AGC_PRESET: The phrase is not used. Skipped
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PLAY/PAUSE to return)"
     x5: "Building database... %d found (Long PLAY to return)"
-    h10: "Building database... %d found (PREV to return)"
+    h10,h10_5gb: "Building database... %d found (PREV to return)"
+    e200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Costruzione database... %d trovato (OFF per uscire)"
     h100,h120,h300: "Costruzione database... %d trovato (STOP per uscire)"
     ipod*: "Costruzione database... %d trovato (PLAY/PAUSE per uscire)"
     x5: "Costruzione database... %d trovato (Long PLAY per uscire)"
-    h10: "Costruzione database... %d trovato (PREV per uscire)"
+    h10,h10_5gb: "Costruzione database... %d trovato (PREV per uscire)"
+    e200: "Costruzione database... %d trovato (PREV per uscire)"
   </dest>
   <voice>
     *: ""
@@ -10710,5 +10724,55 @@ LANG_RECORDING_AGC_PRESET: The phrase is not used. Skipped
   </dest>
   <voice>
     *: "Menu contestuale"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONLIGHT_TIMEOUT
+  desc: in settings_menu
+  user:
+  <source>
+    *: ""
+    e200: "Wheel Light Timeout"
+    gigabeatf: "Button Light Timeout"
+  </source>
+  <dest>
+    *: ""
+    e200: "Tempo di spegnimento illuminazione rotella"
+    gigabeatf: "Tempo di spegnimento illuminazione tasti"
+  </dest>
+  <voice>
+    *: ""
+    e200: "Tempo di spegnimento illuminazione rotella"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLISTVIEWER_SETTINGS
+  desc: title for the playlist viewer settings menus
+  user:
+  <source>
+    *: "Playlist Viewer Settings"
+  </source>
+  <dest>
+    *: "Impostazioni Visualizzatore Playlist"
+  </dest>
+  <voice>
+    *: "Impostazioni Visualizzatore Playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONLIGHT_BRIGHTNESS
+  desc: in settings_menu
+  user:
+  <source>
+    *: ""
+    gigabeatf: "Button Light Brightness"
+  </source>
+  <dest>
+    *: ""
+    gigabeatf: "Luminosit√ Tasti"
+  </dest>
+  <voice>
+    *: ""
+    gigabeatf: "Luminosit√ Tasti""
   </voice>
 </phrase>
