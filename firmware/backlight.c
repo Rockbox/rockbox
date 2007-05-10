@@ -109,6 +109,45 @@ static int backlight_on_button_hold = 0;
 static int button_backlight_timer;
 static int button_backlight_timeout = 5*HZ;
 
+/* internal interface */
+static void _button_backlight_on(void)
+{
+#ifndef SIMULATOR
+#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+    __button_backlight_dim(false);
+#else
+    __button_backlight_on();
+#endif
+#endif
+}
+
+void _button_backlight_off(void)
+{
+#ifndef SIMULATOR
+#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+    if(button_backlight_timeout>0)
+        __button_backlight_dim(true);
+    else
+#endif
+        __button_backlight_off();
+#endif
+}
+
+/* Update state of buttonlight according to timeout setting */
+static void buttonlight_update_state(void)
+{
+    button_backlight_timer = button_backlight_timeout;
+
+    /* Buttonlight == OFF in the setting? */
+    if (button_backlight_timer < 0)
+    {
+        button_backlight_timer = 0; /* Disable the timeout */
+        _button_backlight_off();
+    }
+    else
+        _button_backlight_on();
+}
+
 /* external interface */
 void button_backlight_on(void)
 {
@@ -127,33 +166,7 @@ void button_backlight_set_timeout(int index)
         /* if given a weird value, use default */
         index = 6;
     button_backlight_timeout = HZ * backlight_timeout_value[index];
-    if (index == 0) /* off */
-        button_backlight_off();
-    else if (index == 1) /* on */
-        button_backlight_on();
-    
-    button_backlight_timer = button_backlight_timeout;
-}
-
-/* internal interface */
-static void _button_backlight_on(void)
-{
-    if (button_backlight_timeout < 0)
-        return;
-    button_backlight_timer = button_backlight_timeout;
-#ifndef SIMULATOR
-    __button_backlight_on();
-#endif
-}
-
-static void _button_backlight_off(void)
-{
-    if (button_backlight_timeout == 0)
-        return;
-    button_backlight_timer = 0;
-#ifndef SIMULATOR
-    __button_backlight_off();
-#endif
+    buttonlight_update_state();
 }
 
 #endif
@@ -511,9 +524,10 @@ void backlight_thread(void)
 #endif
 #ifdef HAVE_BUTTON_LIGHT
             case BUTTON_LIGHT_ON:
-                _button_backlight_on();
+                buttonlight_update_state();
                 break;
             case BUTTON_LIGHT_OFF:
+                button_backlight_timer = 0;
                 _button_backlight_off();
                 break;
 #endif
@@ -796,7 +810,6 @@ void remote_backlight_hold_changed(bool rc_hold_button)
         remote_backlight_off(); /* setting == Off */
     else  /* setting == On, Normal, no hold button, or anything else */
         remote_backlight_on();
-
 }
 
 void remote_backlight_set_on_button_hold(int index)
@@ -863,6 +876,8 @@ void buttonlight_set_brightness(int val)
         val = MAX_BRIGHTNESS_SETTING;
 
     __buttonlight_set_brightness(val);
+    if(button_backlight_timeout<0)
+        _button_backlight_off();
 }
 #endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
 

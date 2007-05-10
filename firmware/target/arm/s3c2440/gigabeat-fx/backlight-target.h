@@ -53,5 +53,6 @@ void __button_backlight_off(void);
 
 /* true: backlight fades off - false: backlight fades on */
 void __backlight_dim(bool dim);
+void __button_backlight_dim(bool dim_now);
 
 #endif

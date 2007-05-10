@@ -69,6 +69,7 @@ unsigned char charging_leds[] = { 0x00, 0x20, 0x38, 0x3C };
 
 bool __backlight_init(void)
 {
+    buttonlight_brightness=DEFAULT_BRIGHTNESS_SETTING;
     backlight_brightness=DEFAULT_BRIGHTNESS_SETTING;
     backlight_control = BACKLIGHT_CONTROL_IDLE;
 
@@ -152,9 +153,9 @@ static void led_control_service(void)
         sc606regAval=DEFAULT_BRIGHTNESS_SETTING,
         sc606regBval=DEFAULT_BRIGHTNESS_SETTING,
         sc606regCval=DEFAULT_BRIGHTNESS_SETTING,
-        sc606regCONFval=3;
+        sc606regCONFval=0x03;
 
-    static bool sc606_changed=true;
+    static bool sc606_changed=false;
 
     if(sc606_changed==false)
     {
@@ -174,9 +175,9 @@ static void led_control_service(void)
                 backlight_control = BACKLIGHT_CONTROL_IDLE;
                 break;
             case BACKLIGHT_CONTROL_SET:
-                sc606regAval=backlight_brightness;
                 sc606_changed=true;
-                backlight_control = BACKLIGHT_CONTROL_ON;
+                sc606regAval=backlight_brightness;
+                backlight_control = BACKLIGHT_CONTROL_IDLE;
                 break;
             case BACKLIGHT_CONTROL_FADE:
                 /* Was this mode set while the backlight is already on/off? */
@@ -212,24 +213,25 @@ static void led_control_service(void)
             case BUTTONLIGHT_CONTROL_OFF:
                 sc606_changed=true;
                 sc606regCONFval &= ~0x3C;
+                sc606regBval=sc606regCval=0;
                 buttonlight_control=BUTTONLIGHT_CONTROL_IDLE;
                 break;
             case BUTTONLIGHT_CONTROL_ON:
                 sc606_changed=true;
-                sc606regBval=sc606regCval=buttonlight_brightness;
                 sc606regCONFval |= 0x3C;
+                sc606regBval=sc606regCval=buttonlight_brightness;
                 buttonlight_control=BUTTONLIGHT_CONTROL_IDLE;
                 break;
             case BUTTONLIGHT_CONTROL_SET:
-                sc606regBval=sc606regCval=buttonlight_brightness;
                 sc606_changed=true;
-                buttonlight_control = BUTTONLIGHT_CONTROL_ON;
+                sc606regBval=sc606regCval=buttonlight_brightness;
+                buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
                 break;
             case BUTTONLIGHT_CONTROL_FADE:
                 /* Was this mode set while the button light is already on/off? */
                 if(buttonlight_target==sc606regBval)
                 {
-                    buttonlight_control=BUTTONLIGHT_CONTROL_IDLE;
+                    buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
                     break;
                 }
                 sc606_changed=true;
@@ -243,7 +245,7 @@ static void led_control_service(void)
                 else
                 {
                     sc606regCval=--sc606regBval;
-                    if(buttonlight_target==sc606regBval)
+                    if(sc606regBval==0)
                         buttonlight_control = BUTTONLIGHT_CONTROL_OFF;
                 }
 
@@ -294,20 +296,25 @@ static void led_control_service(void)
 
 void __button_backlight_on(void)
 {
-    buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
-    buttonlight_target = buttonlight_brightness;
-    if(buttonlight_brightness==0)
-        buttonlight_control = BUTTONLIGHT_CONTROL_ON;
-    else
-        buttonlight_control = BUTTONLIGHT_CONTROL_FADE;
+    buttonlight_control = BUTTONLIGHT_CONTROL_ON;
 }
 
 void __button_backlight_off(void)
 {
+    buttonlight_control = BUTTONLIGHT_CONTROL_OFF;
+}
+
+void __button_backlight_dim(bool dim_now)
+{
     buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
-    buttonlight_target = 0;
-    if(buttonlight_brightness==0)
-        buttonlight_control = BUTTONLIGHT_CONTROL_OFF;
+    buttonlight_target = (dim_now == true) ? 0 : buttonlight_brightness;
+    if(buttonlight_target==0 && buttonlight_brightness==0)
+    {
+        if(dim_now == false)
+            buttonlight_control = BUTTONLIGHT_CONTROL_ON;
+        else
+            buttonlight_control = BUTTONLIGHT_CONTROL_OFF;
+    }
     else
         buttonlight_control = BUTTONLIGHT_CONTROL_FADE;
 }
@@ -330,7 +337,6 @@ void __backlight_dim(bool dim_now)
 
 void __buttonlight_set_brightness(int brightness)
 {
-    /* stop the interrupt from messing us up */
     buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
     buttonlight_brightness = brightness;
     buttonlight_control = BUTTONLIGHT_CONTROL_SET;
