@@ -56,12 +56,21 @@ void irq(void)
 /* TODO: this should really be in the target tree, but moving it there caused
    crt0.S not to find it while linking */
 /* TODO: Even if it isn't in the target tree, this should be the default case */
+extern void button_int(void);
+extern void clickwheel_int(void);
+
 void irq(void)
 {
-    if(CURRENT_CORE == CPU)
-    {
-        if (CPU_INT_STAT & TIMER1_MASK)
+    if(CURRENT_CORE == CPU) {
+        if (CPU_INT_STAT & TIMER1_MASK) {
+#ifdef SANSA_E200
+            if (GPIOF_INT_STAT & 0xff)
+                button_int();
+            if (GPIOH_INT_STAT & 0xc0)
+                clickwheel_int();
+#endif
             TIMER1();
+        }
         else if (CPU_INT_STAT & TIMER2_MASK)
             TIMER2();
     } else {
@@ -222,7 +231,20 @@ void system_init(void)
         COP_INT_CLR         = -1;
         CPU_INT_CLR         = -1;
         INT_FORCED_CLR      = -1;
-        
+
+        GPIOA_INT_EN        = 0;
+        GPIOB_INT_EN        = 0;
+        GPIOC_INT_EN        = 0;
+        GPIOD_INT_EN        = 0;
+        GPIOE_INT_EN        = 0;
+        GPIOF_INT_EN        = 0;
+        GPIOG_INT_EN        = 0;
+        GPIOH_INT_EN        = 0;
+        GPIOI_INT_EN        = 0;
+        GPIOJ_INT_EN        = 0;
+        GPIOK_INT_EN        = 0;
+        GPIOL_INT_EN        = 0;
+
 # if NUM_CORES > 1 && defined(HAVE_ADJUSTABLE_CPU_FREQ)
         spinlock_init(&boostctrl_mtx);
 # endif

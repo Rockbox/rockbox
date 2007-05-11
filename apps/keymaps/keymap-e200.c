@@ -31,9 +31,9 @@
  * Insert LAST_ITEM_IN_LIST at the end of each mapping 
  */
 static const struct button_mapping button_context_standard[]  = {
-    { ACTION_STD_PREV,        BUTTON_SCROLL_UP|BUTTON_REL,      BUTTON_NONE },
+    { ACTION_STD_PREV,        BUTTON_SCROLL_UP,                 BUTTON_NONE },
     { ACTION_STD_PREVREPEAT,  BUTTON_SCROLL_UP|BUTTON_REPEAT,   BUTTON_NONE },
-    { ACTION_STD_NEXT,        BUTTON_SCROLL_DOWN|BUTTON_REL,    BUTTON_NONE },
+    { ACTION_STD_NEXT,        BUTTON_SCROLL_DOWN,               BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,  BUTTON_SCROLL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
 
     { ACTION_STD_MENU,        BUTTON_POWER|BUTTON_REL,          BUTTON_POWER },
@@ -159,9 +159,9 @@ static const struct button_mapping button_context_quickscreen[]  = {
 }; /* button_context_quickscreen */
 
 static const struct button_mapping button_context_settings_right_is_inc[]  = {
-    { ACTION_SETTINGS_INC,       BUTTON_SCROLL_DOWN|BUTTON_REL,     BUTTON_NONE },
-    { ACTION_SETTINGS_INCREPEAT, BUTTON_SCROLL_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
-    { ACTION_SETTINGS_DEC,       BUTTON_SCROLL_UP|BUTTON_REL,   BUTTON_NONE },
+    { ACTION_SETTINGS_INC,       BUTTON_SCROLL_DOWN,               BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT, BUTTON_SCROLL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,       BUTTON_SCROLL_UP,                 BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT, BUTTON_SCROLL_UP|BUTTON_REPEAT,BUTTON_NONE },
 
     { ACTION_STD_PREV,           BUTTON_UP|BUTTON_REL,            BUTTON_NONE },

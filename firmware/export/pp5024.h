@@ -23,4 +23,10 @@
    completely */
 #include "pp5020.h"
 
+#undef GPIO_IRQ
+#define GPIO_IRQ    (32+6)
+
+#undef GPIO_MASK
+#define GPIO_MASK   (1 << (GPIO_IRQ-32))
+
 #endif
