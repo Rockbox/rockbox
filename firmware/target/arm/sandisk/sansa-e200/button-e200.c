@@ -39,7 +39,9 @@ static unsigned long next_backlight_on = 0;
 #endif
 /* Buttons */
 static bool hold_button     = false;
+#ifndef BOOTLOADER
 static bool hold_button_old = false;
+#endif
 static int  int_btn         = BUTTON_NONE;
 
 void button_init_device(void)
