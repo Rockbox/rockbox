@@ -403,6 +403,8 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
                     display->puts_offset(0, i, entry_name,item_offset);
                 else
                     display->puts_scroll_offset(0, i, entry_name,item_offset);
+                if (current_item % gui_list->selected_size != 0)
+                    draw_cursor = false;
             }
 #else
             display->puts_scroll(text_pos, i, entry_name);
