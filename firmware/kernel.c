@@ -100,8 +100,6 @@ void yield(void)
 static void queue_fetch_sender(struct queue_sender_list *send,
                                unsigned int i)
 {
-    /* Disable interrupts to protect against collision in this slot */
-    int old_level = set_irq_level(HIGHEST_IRQ_LEVEL);
     struct thread_entry **spp = &send->senders[i];
 
     if (*spp)
@@ -109,8 +107,6 @@ static void queue_fetch_sender(struct queue_sender_list *send,
         send->curr_sender = *spp;
         *spp = NULL;
     }
-    
-    set_irq_level(old_level);
 }
 
 /* Puts the specified return value in the waiting thread's return value
@@ -208,8 +204,18 @@ void queue_delete(struct event_queue *q)
     int i;
     bool found = false;
 
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
     lock_cores();
+
+    /* Release theads waiting on queue */
     wakeup_thread(&q->thread);
+
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+    /* Release waiting threads and reply to any dequeued message
+       waiting for one. */
+    queue_release_all_senders(q);
+    queue_reply(q, 0);
+#endif
     
     /* Find the queue to be deleted */
     for(i = 0;i < num_queues;i++)
@@ -223,14 +229,6 @@ void queue_delete(struct event_queue *q)
 
     if(found)
     {
-#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
-        /* Release waiting threads and reply to any dequeued message
-           waiting for one. */
-        int level = set_irq_level(HIGHEST_IRQ_LEVEL);
-        queue_release_all_senders(q);
-        queue_reply(q, NULL);
-        set_irq_level(level);
-#endif
         /* Move the following queues up in the list */
         for(;i < num_queues-1;i++)
         {
@@ -241,17 +239,21 @@ void queue_delete(struct event_queue *q)
     }
     
     unlock_cores();
+    set_irq_level(oldlevel);
 }
 
 void queue_wait(struct event_queue *q, struct event *ev)
 {
+    int oldlevel;
     unsigned int rd;
 
+    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);    
     lock_cores();
     
     if (q->read == q->write)
     {
-        block_thread(&q->thread);
+        set_irq_level_and_block_thread(&q->thread, oldlevel);
+        oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
         lock_cores();
     } 
 
@@ -267,15 +269,18 @@ void queue_wait(struct event_queue *q, struct event *ev)
 #endif
     
     unlock_cores();
+    set_irq_level(oldlevel);
 }
 
 void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks)
 {
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
     lock_cores();
     
     if (q->read == q->write && ticks > 0)
     {
-        block_thread_w_tmo(&q->thread, ticks);
+        set_irq_level_and_block_thread_w_tmo(&q->thread, ticks, oldlevel);
+        oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
         lock_cores();
     }
 
@@ -298,6 +303,7 @@ void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks)
     }
     
     unlock_cores();
+    set_irq_level(oldlevel);
 }
 
 void queue_post(struct event_queue *q, long id, intptr_t data)
@@ -388,14 +394,10 @@ bool queue_in_queue_send(struct event_queue *q)
 void queue_reply(struct event_queue *q, intptr_t retval)
 {
     lock_cores();
+    /* No IRQ lock here since IRQs cannot change this */
     if(q->send && q->send->curr_sender)
     {
-        int level = set_irq_level(HIGHEST_IRQ_LEVEL);
-        if(q->send->curr_sender)
-        {
-            queue_release_sender(&q->send->curr_sender, retval);
-        }
-        set_irq_level(level);
+        queue_release_sender(&q->send->curr_sender, retval);
     }
     unlock_cores();
 }

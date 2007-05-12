@@ -211,6 +211,11 @@ static inline uint32_t swap_odd_even32(uint32_t value)
 
 #endif /* !SIMULATOR */
 
+/* Declare this as HIGHEST_IRQ_LEVEL if they don't differ */
+#ifndef DISABLE_INTERRUPTS
+#define DISABLE_INTERRUPTS  HIGHEST_IRQ_LEVEL
+#endif
+
 /* Just define these as empty if not declared */
 #ifndef HAVE_INVALIDATE_ICACHE
 #define invalidate_icache()

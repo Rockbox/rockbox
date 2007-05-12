@@ -20,6 +20,7 @@
 #include <stdbool.h>
 #include "thread.h"
 #include "panic.h"
+#include "sprintf.h"
 #include "system.h"
 #include "kernel.h"
 #include "cpu.h"
@@ -71,7 +72,7 @@ static long cores_locked IBSS_ATTR;
 #define UNLOCK(...) cores_locked = 0
 #endif
 
-#warning "Core locking mechanism should be fixed on H10/4G!"
+/* #warning "Core locking mechanism should be fixed on H10/4G!" */
 
 inline void lock_cores(void)
 {
@@ -110,6 +111,7 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
 static inline void store_context(void* addr) __attribute__ ((always_inline));
 static inline void load_context(const void* addr)
     __attribute__ ((always_inline));
+static inline void core_sleep(void) __attribute__((always_inline));
 
 #if defined(CPU_ARM)
 /*---------------------------------------------------------------------------
@@ -173,6 +175,30 @@ static inline void load_context(const void* addr)
     );
 }
 
+#if defined (CPU_PP)
+static inline void core_sleep(void)
+{
+    unlock_cores();
+
+    /* This should sleep the CPU. It appears to wake by itself on
+       interrupts */
+    if (CURRENT_CORE == CPU)
+        CPU_CTL = PROC_SLEEP;
+    else
+        COP_CTL = PROC_SLEEP;
+
+    lock_cores();
+}
+#elif CONFIG_CPU == S3C2440
+static inline void core_sleep(void)
+{
+    int i;
+    CLKCON |= (1 << 2); /* set IDLE bit */
+    for(i=0; i<10; i++); /* wait for IDLE */
+    CLKCON &= ~(1 << 2); /* reset IDLE bit when wake up */
+}
+#endif
+
 #elif defined(CPU_COLDFIRE)
 /*---------------------------------------------------------------------------
  * Store non-volatile context.
@@ -204,6 +230,11 @@ static inline void load_context(const void* addr)
     "1:                          \n"
         : : "a" (addr) : "d0" /* only! */
     );
+}
+
+static inline void core_sleep(void)
+{
+    asm volatile ("stop #0x2000");
 }
 
 /* Set EMAC unit to fractional mode with saturation for each new thread,
@@ -263,12 +294,52 @@ static inline void load_context(const void* addr)
     );
 }
 
+static inline void core_sleep(void)
+{
+    and_b(0x7F, &SBYCR);
+    asm volatile ("sleep");
+}
+
 #endif
 
 #ifndef THREAD_CPU_INIT
 /* No cpu specific init - make empty */
 #define THREAD_CPU_INIT(core, thread)
 #endif
+
+#ifdef THREAD_EXTRA_CHECKS
+static void thread_panicf_format_name(char *buffer, struct thread_entry *thread)
+{
+    *buffer = '\0';
+    if (thread)
+    {
+        /* Display thread name if one or ID if none */
+        const char *fmt = thread->name ? " %s" : " %08lX";
+        intptr_t name = thread->name ?
+            (intptr_t)thread->name : (intptr_t)thread;
+        snprintf(buffer, 16, fmt, name);
+    }
+}
+
+static void thread_panicf(const char *msg,
+    struct thread_entry *thread1, struct thread_entry *thread2)
+{
+    static char thread1_name[16], thread2_name[16];
+    thread_panicf_format_name(thread1_name, thread1);
+    thread_panicf_format_name(thread2_name, thread2);
+    panicf ("%s%s%s", msg, thread1_name, thread2_name);
+}
+#else
+static void thread_stkov(void)
+{
+    /* Display thread name if one or ID if none */
+    struct thread_entry *current = cores[CURRENT_CORE].running;
+    const char *fmt = current->name ? "%s %s" : "%s %08lX";
+    intptr_t name = current->name ?
+            (intptr_t)current->name : (intptr_t)current;
+    panicf(fmt, "Stkov", name);
+}
+#endif /* THREAD_EXTRA_CHECKS */
 
 static void add_to_list(struct thread_entry **list, struct thread_entry *thread)
 {
@@ -392,10 +463,6 @@ static void wake_list_awaken(void)
 
 static inline void sleep_core(void)
 {
-#if CONFIG_CPU == S3C2440
-    int i;
-#endif
-
     for (;;)
     {
         /* We want to do these ASAP as it may change the decision to sleep
@@ -416,28 +483,7 @@ static inline void sleep_core(void)
             break;
 
         /* Enter sleep mode to reduce power usage, woken up on interrupt */
-#ifdef CPU_COLDFIRE
-        asm volatile ("stop #0x2000");
-#elif CONFIG_CPU == SH7034
-        and_b(0x7F, &SBYCR);
-        asm volatile ("sleep");
-#elif defined (CPU_PP)
-        unlock_cores();
-        
-        /* This should sleep the CPU. It appears to wake by itself on
-           interrupts */
-        if (CURRENT_CORE == CPU)
-            CPU_CTL = PROC_SLEEP;
-        else
-            COP_CTL = PROC_SLEEP;
-        
-        lock_cores();
-#elif CONFIG_CPU == S3C2440
-        CLKCON |= (1 << 2); /* set IDLE bit */
-        for(i=0; i<10; i++); /* wait for IDLE */
-        CLKCON &= ~(1 << 2); /* reset IDLE bit when wake up */
-#endif
-        
+        core_sleep();
     }
 }
 
@@ -521,12 +567,15 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
         /* Check if the current thread stack is overflown */
         stackptr = cores[CURRENT_CORE].running->stack;
         if(stackptr[0] != DEADBEEF)
-            panicf("Stkov %s", cores[CURRENT_CORE].running->name);
+#ifdef THREAD_EXTRA_CHECKS
+            thread_panicf("Stkov", cores[CURRENT_CORE].running, NULL);
+#else
+            thread_stkov();
+#endif
     
         /* Rearrange thread lists as needed */
         change_thread_state(blocked_list);
 
-#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
         /* This has to be done after the scheduler is finished with the
            blocked_list pointer so that an IRQ can't kill us by attempting
            a wake but before attempting any core sleep. */
@@ -536,7 +585,6 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
             cores[CURRENT_CORE].switch_to_irq_level = STAY_IRQ_LEVEL;
             set_irq_level(level);
         }
-#endif
     }
     
     /* Go through the list of sleeping task to check if we need to wake up
@@ -626,7 +674,7 @@ void block_thread(struct thread_entry **list)
 #ifdef THREAD_EXTRA_CHECKS
     /* We are not allowed to mix blocking types in one queue. */
     if (*list && GET_STATE((*list)->statearg) == STATE_BLOCKED_W_TMO)
-        panicf("Blocking violation B->*T");
+        thread_panicf("Blocking violation B->*T", current, *list);
 #endif
     
     /* Set the state to blocked and ask the scheduler to switch tasks,
@@ -669,7 +717,7 @@ void block_thread_w_tmo(struct thread_entry **list, int timeout)
     /* We can store only one thread to the "list" if thread is used
      * in other list (such as core's list for sleeping tasks). */
     if (*list)
-        panicf("Blocking violation T->*B");
+        thread_panicf("Blocking violation T->*B", current, NULL);
 #endif
     
     /* Set the state to blocked with the specified timeout */
@@ -686,14 +734,13 @@ void block_thread_w_tmo(struct thread_entry **list, int timeout)
     *list = NULL;
 }
 
-#if defined(HAVE_EXTENDED_MESSAGING_AND_NAME) && !defined(SIMULATOR)
+#if !defined(SIMULATOR)
 void set_irq_level_and_block_thread(struct thread_entry **list, int level)
 {
     cores[CURRENT_CORE].switch_to_irq_level = level;
     block_thread(list);
 }
 
-#if 0
 void set_irq_level_and_block_thread_w_tmo(struct thread_entry **list,
                                           int timeout, int level)
 {
@@ -701,7 +748,6 @@ void set_irq_level_and_block_thread_w_tmo(struct thread_entry **list,
     block_thread_w_tmo(list, timeout);
 }
 #endif
-#endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
 
 void wakeup_thread(struct thread_entry **list)
 {

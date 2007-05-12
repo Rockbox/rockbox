@@ -131,10 +131,8 @@ struct core_entry {
     volatile bool kernel_running;
 #endif
     long last_tick;
-#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     int switch_to_irq_level;
     #define STAY_IRQ_LEVEL -1
-#endif
 };
 
 #ifdef HAVE_PRIORITY_SCHEDULING
@@ -205,13 +203,9 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list);
 void sleep_thread(int ticks);
 void block_thread(struct thread_entry **thread);
 void block_thread_w_tmo(struct thread_entry **thread, int timeout);
-#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
 void set_irq_level_and_block_thread(struct thread_entry **thread, int level);
-#if 0
 void set_irq_level_and_block_thread_w_tmo(struct thread_entry **list,
-                                          int timeout, int level)
-#endif
-#endif
+                                          int timeout, int level);
 void wakeup_thread(struct thread_entry **thread);
 void wakeup_thread_irq_safe(struct thread_entry **thread);
 #ifdef HAVE_PRIORITY_SCHEDULING

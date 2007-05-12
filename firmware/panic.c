@@ -45,12 +45,12 @@ void panicf( const char *fmt, ...)
 #endif
 
     /* Disable interrupts */
-#if CONFIG_CPU == SH7034
-    asm volatile ("ldc\t%0,sr" : : "r"(15<<4));
-#elif defined(CPU_COLDFIRE)
-    asm volatile ("move.w #0x2700,%sr");
+#ifdef CPU_ARM
+    disable_fiq();
 #endif
-#endif
+
+    set_irq_level(DISABLE_INTERRUPTS);
+#endif /* SIMULATOR */
 
     va_start( ap, fmt );
     vsnprintf( panic_buf, sizeof(panic_buf), fmt, ap );
@@ -99,7 +99,16 @@ void panicf( const char *fmt, ...)
 #endif
 
         /* try to restart firmware if ON is pressed */
-#ifdef IRIVER_H100_SERIES
+#if defined (CPU_PP)
+        /* For now, just sleep the core */
+        if (CURRENT_CORE == CPU)
+            CPU_CTL = PROC_SLEEP;
+        else
+            COP_CTL = PROC_SLEEP;
+        #define system_reboot() nop
+#elif defined (TOSHIBA_GIGABEAT_F)
+        if ((GPGDAT & (1 << 0)) != 0)
+#elif defined (IRIVER_H100_SERIES)
         if ((GPIO1_READ & 0x22) == 0) /* check for ON button and !hold */
 #elif defined(IRIVER_H300_SERIES)
         if ((GPIO1_READ & 0x22) == 0) /* check for ON button and !hold */
