@@ -529,11 +529,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     rb->lcd_clear_display();
 
-    DEBUGF("Calling menu\n");
     result=rb->do_menu(&menu,&result);
-    DEBUGF("Done\n");
 
-    if (result==1) {
+    if (result==0) {
+        wavinfo.fd = -1;
+    } else if (result==1) {
         init_wav("/test.wav");
         if (wavinfo.fd < 0) {
             rb->splash(HZ*2, "Cannot create /test.wav");
