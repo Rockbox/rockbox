@@ -833,16 +833,18 @@
     h100,h120,h300: "NAVI = Yes"
     ipod*: "SELECT = Yes"
     x5: "SELECT = Yes"
-    h10: "NEXT = Yes"
-    gigabeat: "SELECT = Yes"
+    h10,h10_5gb: "SELECT = Yes"
+    gigabeatf: "SELECT = Yes"
+    e200: "SELECT = Yes"
   </source>
   <dest>
     *: "SPILL = Ja"
     h100,h120,h300: "NAVI = Ja"
     ipod*: "VELG = Ja"
     x5: "VELG = Ja"
-    h10: "NESTE = Ja"
-    gigabeat: "VELG = Ja"
+    h10,h10_5gb: "VELG = Ja"
+    gigabeatf: "VELG = Ja"
+    e200: "VELG = Ja"
   </dest>
   <voice>
     *: ""
@@ -4054,16 +4056,18 @@
     h100,h120,h300: "STOP = Exit"
     ipod*: "PLAY/PAUSE = Exit"
     x5: "RECORD = Exit"
-    h10: "PREV = Exit"
-    gigabeat: "A = Exit"
+    h10,h10_5gb: "PREV = Exit"
+    gigabeatf: "A = Exit"
+    e200: "POWER = Exit"
   </source>
   <dest>
     *: "AV = Avslutt"
     h100,h120,h300: "STOPP = Avslutt"
     ipod*: "SPILL/PAUSE = Avslutt"
     x5: "OPPTAK = Avslutt"
-    h10: "FORRIGE = Avslutt"
-    gigabeat: "A = Avslutt"
+    h10,h10_5gb: "FORRIGE = Avslutt"
+    gigabeatf: "A = Avslutt"
+    e200: "POWER = Avslutt"
   </dest>
   <voice>
     *: ""
@@ -4120,16 +4124,18 @@
     h100,h120,h300: "NAVI = Select"
     ipod*: "SELECT = Select"
     x5: "SELECT = Select"
-    h10: "NEXT = Select"
-    gigabeat: "SELECT = Select"
+    h10,h10_5gb: "SELECT = Select"
+    gigabeatf: "SELECT = Select"
+    e200: "SELECT = Select"
   </source>
   <dest>
     *: "SPILL = Velg"
     h100,h120,h300: "NAVI = Velg"
     ipod*: "VELG = Velg"
     x5: "VELG = Velg"
-    h10: "NESTE = Velg"
-    gigabeat: "VELG = Velg"
+    h10,h10_5gb: "VELG = Velg"
+    gigabeatf: "VELG = Velg"
+    e200: "VELG = Velg"
   </dest>
   <voice>
     *: ""
@@ -4144,16 +4150,18 @@
     h100,h120,h300: "RECORD = Delete"
     ipod*: "Long MENU = Delete"
     x5: "Long RECORD = Delete"
-    h10: "REWIND = Delete"
-    gigabeat: "POWER = Delete"
+    h10,h10_5gb: "REWIND = Delete"
+    gigabeatf: "POWER = Delete"
+    e200: "PLAY = Delete"
   </source>
   <dest>
     *: "PÅ+Spill = Slett"
     h100,h120,h300: "OPPTAK = Slett"
     ipod*: "Lang MENY = Slett"
     x5: "Lang OPPTAK = Slett"
-    h10: "SPOL TILBAKE = Slett"
-    gigabeat: "POWER = Slett"
+    h10,h10_5gb: "SPOL TILBAKE = Slett"
+    gigabeatf: "POWER = Slett"
+    e200: "SPILL AV = Slett"
   </dest>
   <voice>
     *: ""
@@ -4238,16 +4246,18 @@
     h100,h120,h300: "NAVI = Set"
     ipod*: "SELECT = Set"
     x5: "SELECT = Set"
-    h10: "NEXT = Set"
-    gigabeat: "SELECT = Set"
+    h10,h10_5gb: "SELECT = Set"
+    gigabeatf: "SELECT = Set"
+    e200: "SELECT = Set"
   </source>
   <dest>
     *: "PÅ for å stille"
     h100,h120,h300: "NAVI = Still"
     ipod*: "VELG = Still"
     x5: "VELG = Still"
-    h10: "NESTE = Still"
-    gigabeat: "VELG = Still"
+    h10,h10_5gb: "VELG = Still"
+    gigabeatf: "VELG = Still"
+    e200: "VELG = Still"
   </dest>
   <voice>
     *: ""
@@ -4262,16 +4272,18 @@
     h100,h120,h300: "STOP = Revert"
     ipod*: "MENU = Revert"
     x5: "RECORD = Revert"
-    h10: "PREV = Revert"
-    gigabeat: "POWER = Revert"
+    h10,h10_5gb: "PREV = Revert"
+    gigabeatf: "POWER = Revert"
+    e200: "PREV = Revert"
   </source>
   <dest>
     *: "AV for å tilbakestille"
     h100,h120,h300: "STOPP = Tilbakestill"
     ipod*: "MENY = Tilbakestill"
     x5: "OPPTAK = Tilbakestill"
-    h10: "FORRIGE = Tilbakestill"
-    gigabeat: "POWER = Tilbakestill"
+    h10,h10_5gb: "FORRIGE = Tilbakestill"
+    gigabeatf: "POWER = Tilbakestill"
+    e200: "FORRIGE = Tilbakestill"
   </dest>
   <voice>
     *: ""
@@ -6509,13 +6521,13 @@
 </phrase>
 <phrase>
   id: LANG_END_PLAYLIST_PLAYER
-  desc: when playlist has finished
+  desc: DEPRECATED
   user:
   <source>
-    *: "End of List"
+    *: ""
   </source>
   <dest>
-    *: "Listen er ferdig"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -6527,9 +6539,11 @@
   user:
   <source>
     *: "End of Song List"
+    player: "End of List"
   </source>
   <dest>
-    *: "Spillelisten er ferdig"
+    *: "Spillelista er ferdig"
+    player: "Lista er ferdig"
   </dest>
   <voice>
     *: ""
@@ -7132,14 +7146,16 @@
     h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5: "Long PLAY to abort"
-    h10: "PREV to abort"
+    h10,h10_5gb: "PREV to abort"
+    e200: "PREV to abort"
   </source>
   <dest>
     *: "AV for å avbryte"
     h100,h120,h300: "STOPP for å avbryte"
     ipod*: "SPILL/PAUSE for å avbryte"
     x5: "Lang SPILL for å avbryte"
-    h10: "FORRIGE for å avbryte"
+    h10,h10_5gb: "FORRIGE for å avbryte"
+    e200: "FORRIGE for å avbryte"
   </dest>
   <voice>
     *: ""
@@ -10453,14 +10469,16 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PLAY/PAUSE to return)"
     x5: "Building database... %d found (Long PLAY to return)"
-    h10: "Building database... %d found (PREV to return)"
+    h10,h10_5gb: "Building database... %d found (PREV to return)"
+    e200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Bygger database... %d funnet (AV for å gå tilbake)"
     h100,h120,h300: "Bygger database... %d funnet (STOPP for å gå tilbake)"
     ipod*: "Bygger database... %d funnet (SPILL/PAUSE for å gå tilbake)"
     x5: "Bygger database... %d funnet (Lang SPILL for å gå tilbake)"
-    h10: "Bygger database... %d funnet (FORRIGE to for å gå tilbake)"
+    h10,h10_5gb: "Bygger database... %d funnet (FORRIGE to for å gå tilbake)"
+    e200: "Bygger database... %d funnet (FORRIGE to for å gå tilbake)"
   </dest>
   <voice>
     *: ""
@@ -10688,5 +10706,70 @@
   </dest>
   <voice>
     *: "FM Radio Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLISTVIEWER_SETTINGS
+  desc: title for the playlist viewer settings menus
+  user:
+  <source>
+    *: "Playlist Viewer Settings"
+  </source>
+  <dest>
+    *: "Innstillinger for spillelistevisning"
+  </dest>
+  <voice>
+    *: "Playlist Viewer Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_MENU_TITLE
+  desc: title for the onplay menus
+  user:
+  <source>
+    *: "Context Menu"
+  </source>
+  <dest>
+    *: "Kontekstmeny"
+  </dest>
+  <voice>
+    *: "Context Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONLIGHT_BRIGHTNESS
+  desc: in settings_menu
+  user:
+  <source>
+    *: ""
+    gigabeatf: "Button Light Brightness"
+  </source>
+  <dest>
+    *: ""
+    gigabeatf: "Lysstyrke på knapper"
+  </dest>
+  <voice>
+    *: ""
+    gigabeatf: "Button Light Brightness"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONLIGHT_TIMEOUT
+  desc: in settings_menu
+  user:
+  <source>
+    *: ""
+    e200: "Wheel Light Timeout"
+    gigabeatf: "Button Light Timeout"
+  </source>
+  <dest>
+    *: ""
+    e200: "Tid før lys på hjul slukker"
+    gigabeatf: "Tid før lys på knapper slukker"
+  </dest>
+  <voice>
+    *: ""
+    e200: "Wheel Light Timeout"
+    gigabeatf: "Button Light Timeout"
   </voice>
 </phrase>
