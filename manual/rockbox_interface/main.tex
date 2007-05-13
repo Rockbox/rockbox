@@ -167,60 +167,6 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
 
 \label{ref:Safeshutdown}On shutdown, Rockbox automatically saves its settings.
 
-\nopt{gigabeat,x5,archos}
-  {
-  \opt{ipod}
-    {  
-    Rockbox has a dual-boot feature.  To boot into the original firmware, shut 
-    down the device as described above.  Turn on the ``hold'' switch 
-    immediately after turning the player on. Once Rockbox displays the 
-    message ``Loading original firmware ...'' you may turn the ``hold'' 
-    switch off.  Rockbox will boot into the original firmware. 
-    
-    \note{The described method of dual-booting works with Rockbox bootloader 
-    version 2, which was released 16 December 2006.  If you have the older 
-    bootloader, boot the original firmware by pressing \ButtonMenu{} 
-    immediately after turning on your Ipod.  Do not release the 
-    \ButtonMenu{} button until you see the ``Loading original firmware...'' 
-    message on the screen.} 
-    
-    Regardless of which method you use to boot to the original firmware, you can 
-    return to Rockbox by pressing and holding \ButtonMenu{} and \ButtonSelect{} 
-    simultaneously until the player reboots.
-    }
-
-  \opt{h1xx}
-    {
-    Rockbox has a dual-boot feature.  To boot into the original firmware, 
-    press and hold the \ButtonRec{} button, and then press the \ButtonOn{} 
-    button.
-    }
-  
-  \opt{h300} 
-    { 
-    Rockbox has a dual-boot feature.  To boot into the original firmware, 
-    press and hold the \ButtonRec{} button, and then press and hold the 
-    \ButtonOn{} button.
-    }
-  
-  \opt{h10,h10_5gb}
-    {
-    Rockbox has a dual-boot feature.  To boot into the original firmware, 
-    press and hold the \ButtonRew{} button while turning on the player.
-    \note{The iriver firmware doesn't shut down properly when you turn it off, 
-    it only goes to sleep. To get back into Rockbox when exiting from the 
-    iriver firmware, you will need to reset the player by \opt{h10}{inserting a
-    pin in the reset hole}\opt{h10_5gb}{taking out battery}.}
-    }
-    
-  \opt{e200}
-    {
-    Rockbox has a dual-boot feature.  To boot into the original firmware, 
-    press and hold the \ButtonLeft{} button while turning on the player.
-    }
-  }
-
-
 \opt{PLAYER_PAD,RECORDER_PAD,ONDIO_PAD}{%
   In the unlikely event of a software failure, a hardware power off can be
   performed by holding down
@@ -229,6 +175,55 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
   until the \nopt{ondiosp,ondiofm}{\dap{} power light}%
   \opt{ondiosp,ondiofm}{\daps{} display} goes off.%
 }
+
+\nopt{gigabeat,x5,archos}
+  {
+  \subsection{Starting the original firmware}
+  \label{ref:Dualboot}
+  \opt{ipod}
+    {
+    Rockbox has a dual-boot feature. To boot into the original firmware, shut
+    down the device as described above. Turn on the ``hold'' switch
+    immediately after turning the player on. Once Rockbox displays the
+    message ``Loading original firmware ...'' you may turn the ``hold''
+    switch off. Rockbox will boot into the original firmware.
+    
+    \note{The described method of dual-booting works with Rockbox bootloader
+    version 2, which was released 16 December 2006. If you have the older
+    bootloader, boot the original firmware by pressing \ButtonMenu{}
+    immediately after turning on your Ipod.  Do not release the
+    \ButtonMenu{} button until you see the ``Loading original firmware...''
+    message on the screen.}
+    
+    Regardless of which method you use to boot to the original firmware, you can
+    return to Rockbox by pressing and holding \ButtonMenu{} and \ButtonSelect{}
+    simultaneously until the player reboots.
+    }
+
+  \opt{h1xx,h300}
+    {
+    Rockbox has a dual-boot feature. To boot into the original firmware,
+    when the \dap{} is turned off, press and hold the \ButtonRec{} button,
+    and then press the \ButtonOn{} button.
+    }
+
+  \opt{h10,h10_5gb}
+    {
+    Rockbox has a dual-boot feature. To boot into the original firmware,
+    press and hold the \ButtonRew{} button while turning on the player.
+    \note{The iriver firmware doesn't shut down properly when you turn it off,
+    it only goes to sleep. To get back into Rockbox when exiting from the
+    iriver firmware, you will need to reset the player by \opt{h10}{inserting a
+    pin in the reset hole}\opt{h10_5gb}{taking out battery}.}
+    }
+    
+  \opt{e200}
+    {
+    Rockbox has a dual-boot feature. To boot into the original firmware,
+    press and hold the \ButtonLeft{} button while turning on the player.
+    }
+  }
+
 \subsection{The first contact}
 
 After you have first started the \dap{} you'll be presented by the
