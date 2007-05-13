@@ -105,10 +105,12 @@ int audiohw_init(void)
     i2s_reset();
 
     /* Set ADC off, mixer on, DAC on, line out off, line in off, mic off */
-    as3514_write(AUDIOSET1, 0x20); /* Turn on DAC */
+    as3514_write(AUDIOSET1, 0x64); /* Turn on SUM, DAC, LineIn 1 */
     as3514_write(AUDIOSET3, 0x5); /* Set HPCM off, ZCU off*/
     as3514_write(HPH_OUT_R, 0xc0 | 0x16); /* set vol and set speaker over-current to 0 */
     as3514_write(HPH_OUT_L, 0x16); /* set default vol for headphone */
+    as3514_write(LINE_IN1_R, 0x36); /* unmute lineIn 1 and set gain */
+    as3514_write(LINE_IN1_L, 0x36); /* unmute lineIn 1 and set gain */
     as3514_write(PLLMODE, 0x04);
 
     /* read all reg values */
