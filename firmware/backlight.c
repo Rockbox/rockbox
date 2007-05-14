@@ -642,7 +642,7 @@ void backlight_init(void)
 #ifdef HAVE_BUTTON_LIGHT
     button_backlight_on();
 #endif
-    
+
     create_thread(backlight_thread, backlight_stack,
                   sizeof(backlight_stack), backlight_thread_name 
                   IF_PRIO(, PRIORITY_SYSTEM)
@@ -876,8 +876,6 @@ void buttonlight_set_brightness(int val)
         val = MAX_BRIGHTNESS_SETTING;
 
     __buttonlight_set_brightness(val);
-    if(button_backlight_timeout<0)
-        _button_backlight_off();
 }
 #endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
 
