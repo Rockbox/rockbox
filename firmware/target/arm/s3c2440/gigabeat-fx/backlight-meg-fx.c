@@ -25,15 +25,14 @@
 #include "sc606-meg-fx.h"
 #include "power.h"
 
-#define FLICKER_PERIOD 15
 #define BUTTONLIGHT_MENU (SC606_LED_B1)
 #define BUTTONLIGHT_ALL  (SC606_LED_B1 | SC606_LED_B2 | SC606_LED_C1 | SC606_LED_C2)
 
 static void led_control_service(void);
-static unsigned short backlight_brightness;
-static unsigned short buttonlight_brightness;
-static unsigned short backlight_target;
-static unsigned short buttonlight_target;
+static unsigned char backlight_brightness;
+static unsigned char buttonlight_brightness;
+static unsigned char backlight_target;
+static unsigned char buttonlight_target;
 
 static enum backlight_states
 {
@@ -64,16 +63,20 @@ enum buttonlight_states
 
 static unsigned short buttonlight_trigger_now;
 
-#define CHARGING_LED_COUNT 60
-unsigned char charging_leds[] = { 0x00, 0x20, 0x38, 0x3C };
-
 bool __backlight_init(void)
 {
-    buttonlight_brightness=DEFAULT_BRIGHTNESS_SETTING;
-    backlight_brightness=DEFAULT_BRIGHTNESS_SETTING;
-    backlight_control = BACKLIGHT_CONTROL_IDLE;
+    buttonlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
+    backlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
 
     buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
+    backlight_control = BACKLIGHT_CONTROL_ON;
+
+    /* Set the backlight up in a known state */
+    sc606_init();
+    sc606_write(SC606_REG_A , DEFAULT_BRIGHTNESS_SETTING);
+    sc606_write(SC606_REG_B , 0);
+    sc606_write(SC606_REG_C , 0);
+    sc606_write(SC606_REG_CONF , 0x03);
 
     /* put the led control on the tick list */
     tick_add_task(led_control_service);
@@ -132,11 +135,6 @@ void __buttonlight_mode(enum buttonlight_mode mode)
     }
 }
 
-/*
- * The button lights have 'modes' of operation. Each mode must setup and
- * execute its own operation - taking care that this is all done in an ISR.
- */
-
 /* led_control_service runs in interrupt context - be brief!
  * This service is called once per interrupt timer tick - 100 times a second.
  *
@@ -151,11 +149,11 @@ static void led_control_service(void)
 {
     static unsigned char
         sc606regAval=DEFAULT_BRIGHTNESS_SETTING,
-        sc606regBval=DEFAULT_BRIGHTNESS_SETTING,
-        sc606regCval=DEFAULT_BRIGHTNESS_SETTING,
+        sc606regBval=0,
+        sc606regCval=0,
         sc606regCONFval=0x03;
 
-    static bool sc606_changed=false;
+    static bool sc606_changed=false, sc606_CONF_changed=false;
 
     if(sc606_changed==false)
     {
@@ -166,15 +164,21 @@ static void led_control_service(void)
                 break;
             case BACKLIGHT_CONTROL_OFF:
                 sc606_changed=true;
+                sc606_CONF_changed=true;
                 sc606regCONFval &= ~0x03;
+                sc606regAval=0;
                 backlight_control = BACKLIGHT_CONTROL_IDLE;
                 break;
             case BACKLIGHT_CONTROL_ON:
                 sc606_changed=true;
+                sc606_CONF_changed=true;
                 sc606regCONFval |= 0x03;
+                sc606regAval=backlight_brightness;
                 backlight_control = BACKLIGHT_CONTROL_IDLE;
                 break;
             case BACKLIGHT_CONTROL_SET:
+                if(!(sc606regCONFval&0x03))
+                    break;
                 sc606_changed=true;
                 sc606regAval=backlight_brightness;
                 backlight_control = BACKLIGHT_CONTROL_IDLE;
@@ -187,22 +191,29 @@ static void led_control_service(void)
                     break;
                 }
                 sc606_changed=true;
-                sc606regCONFval |= 0x03;
+                if(!(sc606regCONFval&0x03))
+                {
+                    sc606_CONF_changed=true;
+                    sc606regCONFval |= 0x03;
+                }
                 if(backlight_target>sc606regAval)
                 {
                     sc606regAval++;
                     if(backlight_target==sc606regAval)
-                        backlight_control = BACKLIGHT_CONTROL_ON;
+                        backlight_control = BACKLIGHT_CONTROL_IDLE;
                 }
                 else
                 {
                     sc606regAval--;
-                    if(backlight_target==sc606regAval)
+                    if(sc606regAval==0)
                         backlight_control = BACKLIGHT_CONTROL_OFF;
+                    else if (backlight_target==sc606regAval)
+                        backlight_control = BACKLIGHT_CONTROL_IDLE;
                 }
 
                 break;
             default:
+                backlight_control = BACKLIGHT_CONTROL_IDLE;
                 break;
         }
         switch (buttonlight_control)
@@ -212,45 +223,56 @@ static void led_control_service(void)
                 break;
             case BUTTONLIGHT_CONTROL_OFF:
                 sc606_changed=true;
-                sc606regCONFval &= ~0x3C;
+                sc606_CONF_changed=true;
+                sc606regCONFval &= ~BUTTONLIGHT_ALL;
                 sc606regBval=sc606regCval=0;
                 buttonlight_control=BUTTONLIGHT_CONTROL_IDLE;
                 break;
             case BUTTONLIGHT_CONTROL_ON:
                 sc606_changed=true;
-                sc606regCONFval |= 0x3C;
+                sc606_CONF_changed=true;
+                sc606regCONFval |= BUTTONLIGHT_ALL;
                 sc606regBval=sc606regCval=buttonlight_brightness;
                 buttonlight_control=BUTTONLIGHT_CONTROL_IDLE;
                 break;
             case BUTTONLIGHT_CONTROL_SET:
+                if(!(sc606regCONFval&BUTTONLIGHT_ALL))
+                    break;
                 sc606_changed=true;
                 sc606regBval=sc606regCval=buttonlight_brightness;
                 buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
                 break;
             case BUTTONLIGHT_CONTROL_FADE:
-                /* Was this mode set while the button light is already on/off? */
+                /* Was this mode set while the button light is already on? */
                 if(buttonlight_target==sc606regBval)
                 {
                     buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
                     break;
                 }
                 sc606_changed=true;
-                sc606regCONFval |= 0x3C;
+                if(!(sc606regCONFval&BUTTONLIGHT_ALL))
+                {
+                    sc606_CONF_changed=true;
+                    sc606regCONFval |= BUTTONLIGHT_ALL;
+                }
                 if(buttonlight_target>sc606regBval)
                 {
                     sc606regCval=++sc606regBval;
                     if(buttonlight_target==sc606regBval)
-                        buttonlight_control = BUTTONLIGHT_CONTROL_ON;
+                        buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
                 }
                 else
                 {
                     sc606regCval=--sc606regBval;
                     if(sc606regBval==0)
                         buttonlight_control = BUTTONLIGHT_CONTROL_OFF;
+                    else if (buttonlight_target==sc606regBval)
+                        backlight_control = BACKLIGHT_CONTROL_IDLE;
                 }
 
                 break;
             default:
+                buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
                 break;
         }
     }
@@ -263,28 +285,55 @@ static void led_control_service(void)
             else
                 sc606_control=SC606_CONTROL_IDLE;
             break;
+
         case SC606_CONTROL_A12:
             sc606_write(SC606_REG_A , sc606regAval);
             sc606_control=SC606_CONTROL_B12;
             break;
+
         case SC606_CONTROL_B12:
             sc606_write(SC606_REG_B , sc606regBval);
             sc606_control=SC606_CONTROL_C12;
             break;
+
         case SC606_CONTROL_C12:
             sc606_write(SC606_REG_C , sc606regCval);
-            sc606_control=SC606_CONTROL_CONF;
+            if(sc606_CONF_changed!=true)
+            {
+                sc606_changed=false;
+                if(backlight_control != BACKLIGHT_CONTROL_IDLE ||
+                    buttonlight_control != BUTTONLIGHT_CONTROL_IDLE)
+                {
+                    sc606_control=SC606_CONTROL_A12;
+                }
+                else
+                {
+                    sc606_control=SC606_CONTROL_IDLE;
+                }
+            }
+            else
+            {
+                sc606_control=SC606_CONTROL_CONF;
+            }
             break;
+
         case SC606_CONTROL_CONF:
             sc606_write(SC606_REG_CONF , sc606regCONFval);
             sc606_changed=false;
-            if(backlight_control != BACKLIGHT_CONTROL_IDLE && buttonlight_control != BUTTONLIGHT_CONTROL_IDLE)
+            sc606_CONF_changed=false;
+            if(backlight_control != BACKLIGHT_CONTROL_IDLE ||
+                buttonlight_control != BUTTONLIGHT_CONTROL_IDLE)
+            {
                 sc606_control=SC606_CONTROL_A12;
+            }
             else
+            {
                 sc606_control=SC606_CONTROL_IDLE;
+            }
             break;
+
         default:
-            sc606_control=SC606_CONTROL_A12;
+            sc606_control=SC606_CONTROL_IDLE;
             break;
     }
 
