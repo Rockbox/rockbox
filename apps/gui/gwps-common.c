@@ -837,10 +837,25 @@ static char *get_token_value(struct gui_wps *gwps,
             snprintf(buf, buf_size, "%d", global_settings.volume);
             if (intval)
             {
-                *intval = limit * (global_settings.volume
-                                    - sound_min(SOUND_VOLUME))
-                                    / (sound_max(SOUND_VOLUME)
-                                        - sound_min(SOUND_VOLUME)) + 1;
+                if (global_settings.volume == sound_min(SOUND_VOLUME))
+                {
+                    *intval = 1;
+                }
+                else if (global_settings.volume == 0)
+                {
+                    *intval = limit - 1;
+                }
+                else if (global_settings.volume > 0)
+                {
+                    *intval = limit;
+                }
+                else
+                {
+                    *intval = (limit - 3) * (global_settings.volume
+                                             - sound_min(SOUND_VOLUME))
+                               / (sound_max(SOUND_VOLUME)
+                                  - sound_min(SOUND_VOLUME)) + 2;
+                }
             }
             return buf;
 
