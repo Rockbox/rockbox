@@ -10806,3 +10806,17 @@
     *: "Playlist Viewer Settings"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_BROWSE_CUESHEET
+  desc:
+  user:
+  <source>
+    *: "Browse Cuesheet"
+  </source>
+  <dest>
+    *: "Browse Cuesheet"
+  </dest>
+  <voice>
+    *: "Browse Cuesheet"
+  </voice>
+</phrase>

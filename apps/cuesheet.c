@@ -253,7 +253,7 @@ static char *list_get_name_cb(int selected_item,
     return buffer;
 }
 
-static void browse_cuesheet(struct cuesheet *cue)
+void browse_cuesheet(struct cuesheet *cue)
 {
     struct gui_synclist lists;
     int action;

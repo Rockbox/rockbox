@@ -66,7 +66,10 @@ bool parse_cuesheet(char *file, struct cuesheet *cue);
 /* reads a cuesheet to find the audio track associated to it */
 bool get_trackname_from_cuesheet(char *filename, char *buf);
 
-/* displays a cuesheet to the screen (it is stored in the plugin buffer) */
+/* display a cuesheet struct */
+void browse_cuesheet(struct cuesheet *cue);
+
+/* display a cuesheet file after parsing and loading it to the plugin buffer */
 bool display_cuesheet_content(char* filename);
 
 /* finds the index of the current track played within a cuesheet */

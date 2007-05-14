@@ -64,6 +64,7 @@
 #ifdef HAVE_TAGCACHE
 #include "tagtree.h"
 #endif
+#include "cuesheet.h"
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
 #include "backdrop.h"
@@ -925,6 +926,32 @@ MENUITEM_FUNCTION_DYNTEXT(rating_item, 0, set_rating_inline,
                           ratingitem_callback, Icon_Questionmark);
 #endif
 
+static bool view_cue(void)
+{
+    struct mp3entry* id3 = audio_current_track();
+    if(id3 && cuesheet_is_enabled() && id3->cuesheet_type)
+    {
+        browse_cuesheet(curr_cue);
+    }
+    return false;
+}
+static int view_cue_item_callback(int action,const struct menu_item_ex *this_item)
+{
+    (void)this_item;
+    struct mp3entry* id3 = audio_current_track();
+    switch (action)
+    {
+        case ACTION_REQUEST_MENUITEM:
+            if (!selected_file || !cuesheet_is_enabled()
+                || !id3 || !id3->cuesheet_type)
+                return ACTION_EXIT_MENUITEM;
+            break;
+    }
+    return action;
+}
+MENUITEM_FUNCTION(view_cue_item, 0, ID2P(LANG_BROWSE_CUESHEET),
+                  view_cue, NULL, view_cue_item_callback, Icon_NOICON);
+
 /* CONTEXT_WPS items */
 MENUITEM_FUNCTION(browse_id3_item, 0, ID2P(LANG_MENU_SHOW_ID3_INFO),
                   browse_id3, NULL, NULL, Icon_NOICON);
@@ -1038,7 +1065,7 @@ MAKE_ONPLAYMENU( wps_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
 #ifdef HAVE_TAGCACHE
            &rating_item, 
 #endif
-           &bookmark_menu, &browse_id3_item,
+           &bookmark_menu, &browse_id3_item, &view_cue_item,
 #ifdef HAVE_PITCHSCREEN
            &pitch_screen_item,
 #endif
