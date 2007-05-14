@@ -323,9 +323,12 @@ static bool dbg_audio_thread(void)
         lcd_puts(0, line++, buf);
 #endif
 
-        snprintf(buf, sizeof(buf), "boost ratio: %3d%%",
-                 boost_ticks * 100 / ticks);
-        lcd_puts(0, line++, buf);
+        if (ticks > 0)
+        {
+            snprintf(buf, sizeof(buf), "boost ratio: %3d%%",
+                     boost_ticks * 100 / ticks);
+            lcd_puts(0, line++, buf);
+        }
 
         snprintf(buf, sizeof(buf), "pcmbufdesc: %2d/%2d",
                 pcmbuf_used_descs(), pcmbufdescs);
