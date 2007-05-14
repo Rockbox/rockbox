@@ -700,6 +700,9 @@ void settings_apply(void)
     remote_backlight_set_on_button_hold(global_settings.remote_backlight_on_button_hold);
 #endif
 #endif /* HAVE_REMOTE_LCD */
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+    backlight_set_brightness(global_settings.brightness);
+#endif
 #ifdef HAVE_BACKLIGHT
     backlight_set_timeout(global_settings.backlight_timeout);
 #if CONFIG_CHARGING
@@ -710,14 +713,11 @@ void settings_apply(void)
     backlight_set_fade_out(global_settings.backlight_fade_out);
 #endif
 #endif
-#ifdef HAVE_BUTTON_LIGHT
-    button_backlight_set_timeout(global_settings.button_light_timeout);
-#endif
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
     buttonlight_set_brightness(global_settings.buttonlight_brightness);
 #endif
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS
-    backlight_set_brightness(global_settings.brightness);
+#ifdef HAVE_BUTTON_LIGHT
+    button_backlight_set_timeout(global_settings.button_light_timeout);
 #endif
     ata_spindown(global_settings.disk_spindown);
 #if (CONFIG_CODEC == MAS3507D) && !defined(SIMULATOR)
