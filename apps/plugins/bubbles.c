@@ -102,7 +102,7 @@ PLUGIN_HEADER
 #define XOFS          64
 #define ROW_HEIGHT    18
 #define ROW_INDENT    11
-#define MAX_FPS       20
+#define MAX_FPS       30
 
 /* 16x16 bubbles (H300, iPod Color) */
 #elif (LCD_HEIGHT == 176) && (LCD_WIDTH == 220)
