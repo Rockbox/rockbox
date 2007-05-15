@@ -105,24 +105,20 @@ int lcd_get_drawmode(void)
     return drawmode;
 }
 
-#if !defined(TOSHIBA_GIGABEAT_F) || defined(SIMULATOR)
 void lcd_set_foreground(unsigned color)
 {
     fg_pattern = color;
 }
-#endif
 
 unsigned lcd_get_foreground(void)
 {
     return fg_pattern;
 }
 
-#if !defined(TOSHIBA_GIGABEAT_F) || defined(SIMULATOR)
 void lcd_set_background(unsigned color)
 {
     bg_pattern = color;
 }
-#endif
 
 unsigned lcd_get_background(void)
 {
@@ -221,7 +217,6 @@ void lcd_set_backdrop(fb_data* backdrop)
         lcd_backdrop_offset = 0;
         lcd_fastpixelfuncs = lcd_fastpixelfuncs_bgcolor;
     }
-    lcd_device_prepare_backdrop(backdrop);
 }
 
 fb_data* lcd_get_backdrop(void)
@@ -232,7 +227,6 @@ fb_data* lcd_get_backdrop(void)
 /*** drawing functions ***/
 
 /* Clear the whole display */
-#if !defined(TOSHIBA_GIGABEAT_F) || defined(SIMULATOR)
 void lcd_clear_display(void)
 {
     fb_data *dst = LCDADDR(0, 0);
@@ -250,7 +244,6 @@ void lcd_clear_display(void)
     }
     scrolling_lines = 0;
 }
-#endif
 
 /* Set a single pixel */
 void lcd_drawpixel(int x, int y)

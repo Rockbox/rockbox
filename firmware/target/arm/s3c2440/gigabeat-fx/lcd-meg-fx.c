@@ -13,11 +13,6 @@
 #include "bidi.h"
 
 #define LCDADDR(x, y) (&lcd_framebuffer[(y)][(x)])
-/*
-** We prepare foreground and background fills ahead of time - DMA fills in 16 byte groups
-*/
-unsigned long fg_pattern_blit[4];
-unsigned long bg_pattern_blit[4];
 
 volatile bool use_dma_blit = false;
 static volatile bool lcd_on = true;
@@ -77,11 +72,6 @@ void lcd_init_device(void)
     LCDCON5 |= 1 << 11;     /* Switch from 555I mode to 565 mode */
 
 #if !defined(BOOTLOADER)
-    memset16(fg_pattern_blit, fg_pattern, sizeof(fg_pattern_blit)/2);
-    memset16(bg_pattern_blit, bg_pattern, sizeof(bg_pattern_blit)/2);
-    clean_dcache_range((void *)fg_pattern_blit, sizeof(fg_pattern_blit));
-    clean_dcache_range((void *)bg_pattern_blit, sizeof(bg_pattern_blit));
-    use_dma_blit = true;
     lcd_poweroff = false;
 #endif
 }
@@ -154,101 +144,6 @@ void lcd_enable(bool state)
         }
     }
 }
-
-void lcd_set_foreground(unsigned color)
-{
-    fg_pattern = color;
-
-    memset16(fg_pattern_blit, fg_pattern, sizeof(fg_pattern_blit)/2);
-    invalidate_dcache_range((void *)fg_pattern_blit, sizeof(fg_pattern_blit));
-}
-
-void lcd_set_background(unsigned color)
-{
-    bg_pattern = color;
-    memset16(bg_pattern_blit, bg_pattern, sizeof(bg_pattern_blit)/2);
-    invalidate_dcache_range((void *)bg_pattern_blit, sizeof(bg_pattern_blit));
-}
-
-void lcd_device_prepare_backdrop(fb_data* backdrop)
-{
-    if(backdrop)
-        invalidate_dcache_range((void *)backdrop, (LCD_HEIGHT * sizeof(fb_data) * LCD_WIDTH));
-}
-
-void lcd_clear_display_dma(void)
-{
-    void *src;
-    bool inc = false;
-
-    if(!lcd_on) {
-        sleep(200);
-    }
-    if (lcd_get_drawmode() & DRMODE_INVERSEVID)
-        src = fg_pattern_blit;
-    else
-    {
-        fb_data* lcd_backdrop = lcd_get_backdrop();
-
-        if (!lcd_backdrop)
-            src = bg_pattern_blit;
-        else
-        {
-            src = lcd_backdrop;
-            inc = true;
-        }
-    }
-    /* Wait for any pending transfer to complete */
-    while((DSTAT3 & 0x000fffff))
-        CLKCON |= (1 << 2); /* set IDLE bit */
-    DMASKTRIG3 |= 0x4; /* Stop controller */
-    DIDST3 = ((int) &lcd_framebuffer[0][0]) + 0x30000000; /* set DMA dest, physical address */
-    DIDSTC3 = 0; /* Dest on AHB, increment */
-
-    DISRC3 = ((int) src) + 0x30000000; /* Set source, in physical space */
-    DISRCC3 = inc ? 0x00 : 0x01;  /* memory is on AHB bus, increment addresses based on backdrop */
-
-    /* Handshake on AHB, Burst mode, whole service mode, no reload, move 32-bits */
-    DCON3 = ((1<<30) | (1<<28) | (1<<27) | (1<<22) | (2<<20)) | ((LCD_WIDTH*LCD_HEIGHT*sizeof(fb_data)) >> 4);
-
-    /* Dump DCache for dest, we are about to overwrite it with DMA */
-    invalidate_dcache_range((void *)lcd_framebuffer, sizeof(lcd_framebuffer));
-    /* Activate the channel */
-    DMASKTRIG3 = 2;
-    /* Start DMA */
-    DMASKTRIG3 |= 1;
-
-    /* Wait for transfer to complete */
-    while((DSTAT3 & 0x000fffff))
-        CLKCON |= (1 << 2); /* set IDLE bit */
-}
-
-void lcd_clear_display(void)
-{
-    lcd_stop_scroll();
-
-    if(use_dma_blit)
-    {
-        lcd_clear_display_dma();
-        return;
-    }
-
-    fb_data *dst = &lcd_framebuffer[0][0];
-
-    if (lcd_get_drawmode() & DRMODE_INVERSEVID)
-    {
-        memset16(dst, fg_pattern, LCD_WIDTH*LCD_HEIGHT);
-    }
-    else
-    {
-        fb_data* lcd_backdrop = lcd_get_backdrop();
-        if (!lcd_backdrop)
-            memset16(dst, bg_pattern, LCD_WIDTH*LCD_HEIGHT);
-        else
-            memcpy(dst, lcd_backdrop, sizeof(lcd_framebuffer));
-    }
-}
-
 
 /* Update the display.
    This must be called after all other LCD functions that change the display. */
