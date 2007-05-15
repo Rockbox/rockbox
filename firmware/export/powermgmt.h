@@ -98,21 +98,22 @@ extern charger_input_state_type charger_input_state;
 # define CURRENT_NORMAL     80  /* 16h playback on 1300mAh battery */
 # define CURRENT_BACKLIGHT  23  /* from IriverBattery twiki page */
 # define CURRENT_SPDIF_OUT  10  /* optical SPDIF output on */
-#else
-#  define CURRENT_NORMAL    145  /* usual current in mA when using the AJB including some disk/backlight/... activity */
-# define CURRENT_BACKLIGHT  30  /* additional current when backlight always on */
-#endif /* not IRIVER_H100_SERIES */
-#define CURRENT_USB        500  /* usual current in mA in USB mode */
-#ifdef IRIVER_H100_SERIES
 # define CURRENT_RECORD    105  /* additional current while recording */
 #elif defined(IRIVER_H300_SERIES)
-# define CURRENT_RECORD    110
-#elif defined(HAVE_RECORDING)
+# define CURRENT_NORMAL     80  /* 16h playback on 1300mAh battery from IriverRuntime wiki page */
+# define CURRENT_BACKLIGHT  23  /* FIXME: This needs to be measured, copied from H100 */
+# define CURRENT_RECORD    110  /* additional current while recording */
+#else /* Not iriver H1x0, H3x0, nor Archos Ondio */
+# define CURRENT_NORMAL    145  /* usual current in mA when using the AJB including some disk/backlight/... activity */
+# define CURRENT_BACKLIGHT  30  /* additional current when backlight always on */
+#if defined(HAVE_RECORDING)
 # define CURRENT_RECORD     35  /* FIXME: this needs adjusting */
 #endif
+#endif /* Not Archos Ondio */
+#define CURRENT_USB        500  /* usual current in mA in USB mode */
 #ifdef HAVE_REMOTE_LCD
 # define CURRENT_REMOTE      8  /* add. current when H100-remote connected */
-#endif
+#endif /* HAVE_MMC */
 
 # define CURRENT_MIN_CHG    70  /* minimum charge current */
 # define MIN_CHG_V        8500  /* at 8.5v charger voltage get CURRENT_MIN_CHG */
