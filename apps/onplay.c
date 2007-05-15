@@ -93,7 +93,8 @@ static bool clipboard_is_copy = false;
 /* interface function.                                                     */
 /* ----------------------------------------------------------------------- */
 
-static int bookmark_menu_callback(int action,const struct menu_item_ex *this_item);
+static int bookmark_menu_callback(int action,
+                                  const struct menu_item_ex *this_item);
 MENUITEM_FUNCTION(bookmark_create_menu_item, 0, 
                   ID2P(LANG_BOOKMARK_MENU_CREATE), 
                   bookmark_create_menu, NULL, NULL, Icon_Bookmark);
@@ -103,7 +104,8 @@ MENUITEM_FUNCTION(bookmark_load_menu_item, 0,
                   bookmark_menu_callback, Icon_Bookmark);
 MAKE_MENU(bookmark_menu, ID2P(LANG_BOOKMARK_MENU), bookmark_menu_callback,
           Icon_Bookmark, &bookmark_create_menu_item, &bookmark_load_menu_item);
-static int bookmark_menu_callback(int action,const struct menu_item_ex *this_item)
+static int bookmark_menu_callback(int action,
+                                  const struct menu_item_ex *this_item)
 {
     (void)this_item;
     switch (action)
@@ -243,9 +245,11 @@ static bool cat_add_to_a_new_playlist(void)
 }
 
 
-static int cat_playlist_callback(int action,const struct menu_item_ex *this_item);
+static int cat_playlist_callback(int action,
+                                 const struct menu_item_ex *this_item);
 MENUITEM_FUNCTION(cat_view_lists, 0, ID2P(LANG_CATALOG_VIEW),
-                  catalog_view_playlists, 0, cat_playlist_callback, Icon_Playlist);
+                  catalog_view_playlists, 0, cat_playlist_callback,
+                  Icon_Playlist);
 MENUITEM_FUNCTION(cat_add_to_list, 0, ID2P(LANG_CATALOG_ADD_TO), 
                   cat_add_to_a_playlist, 0, NULL, Icon_Playlist);
 MENUITEM_FUNCTION(cat_add_to_new, 0, ID2P(LANG_CATALOG_ADD_TO_NEW), 
@@ -254,7 +258,8 @@ MAKE_MENU( cat_playlist_menu, ID2P(LANG_CATALOG), cat_playlist_callback,
            Icon_Playlist, &cat_view_lists, 
            &cat_add_to_list, &cat_add_to_new );
         
-static int cat_playlist_callback(int action,const struct menu_item_ex *this_item)
+static int cat_playlist_callback(int action,
+                                 const struct menu_item_ex *this_item)
 {
     switch (action)
     {
@@ -264,7 +269,8 @@ static int cat_playlist_callback(int action,const struct menu_item_ex *this_item
                 if (context == CONTEXT_WPS)
                     return action;
             }
-            else if (selected_file && /* set before calling this menu, so safe */
+            else if (selected_file && /* set before calling this menu,
+                                         so safe */
                      ((audio_status() & AUDIO_STATUS_PLAY &&
                       context == CONTEXT_WPS) ||
                       context == CONTEXT_TREE))
@@ -308,7 +314,8 @@ static int playlist_queue_func(void *param)
     return 0;
 }
 static int treeplaylist_wplayback_callback(int action,
-                                           const struct menu_item_ex *this_item)
+                                           const struct menu_item_ex* 
+                                                this_item)
 {
     (void)this_item;
     switch (action)
@@ -327,18 +334,22 @@ static int treeplaylist_callback(int action,
                                  const struct menu_item_ex *this_item);
 
 /* insert items */
+MENUITEM_FUNCTION(i_pl_item_no_play, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT),
+                  playlist_insert_func, (intptr_t*)PLAYLIST_INSERT_LAST,
+                  treeplaylist_callback, Icon_Playlist);
 MENUITEM_FUNCTION(i_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT),
                   playlist_insert_func, (intptr_t*)PLAYLIST_INSERT,
-                  treeplaylist_callback, Icon_Playlist);
+                  treeplaylist_wplayback_callback, Icon_Playlist);
 MENUITEM_FUNCTION(i_first_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT_FIRST),
                   playlist_insert_func, (intptr_t*)PLAYLIST_INSERT_FIRST,
                   treeplaylist_wplayback_callback, Icon_Playlist);
 MENUITEM_FUNCTION(i_last_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT_LAST),
                   playlist_insert_func, (intptr_t*)PLAYLIST_INSERT_LAST,
                   treeplaylist_wplayback_callback, Icon_Playlist);
-MENUITEM_FUNCTION(i_shuf_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT_SHUFFLED),
-                  playlist_insert_func, (intptr_t*)PLAYLIST_INSERT_SHUFFLED,
-                  treeplaylist_callback, Icon_Playlist);
+MENUITEM_FUNCTION(i_shuf_pl_item, MENU_FUNC_USEPARAM,
+                  ID2P(LANG_INSERT_SHUFFLED), playlist_insert_func,
+                  (intptr_t*)PLAYLIST_INSERT_SHUFFLED, treeplaylist_callback,
+                  Icon_Playlist);
 /* queue items */
 MENUITEM_FUNCTION(q_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_QUEUE),
                   playlist_queue_func, (intptr_t*)PLAYLIST_INSERT,
@@ -349,8 +360,9 @@ MENUITEM_FUNCTION(q_first_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_QUEUE_FIRST),
 MENUITEM_FUNCTION(q_last_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_QUEUE_LAST),
                   playlist_queue_func, (intptr_t*)PLAYLIST_INSERT_LAST,
                   treeplaylist_wplayback_callback, Icon_Playlist);
-MENUITEM_FUNCTION(q_shuf_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_QUEUE_SHUFFLED),
-                  playlist_queue_func, (intptr_t*)PLAYLIST_INSERT_SHUFFLED,
+MENUITEM_FUNCTION(q_shuf_pl_item, MENU_FUNC_USEPARAM,
+                  ID2P(LANG_QUEUE_SHUFFLED), playlist_queue_func,
+                  (intptr_t*)PLAYLIST_INSERT_SHUFFLED,
                   treeplaylist_wplayback_callback, Icon_Playlist);
 /* replace playlist */
 MENUITEM_FUNCTION(replace_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_REPLACE),
@@ -363,11 +375,19 @@ MENUITEM_FUNCTION(view_playlist_item, 0, ID2P(LANG_VIEW),
                   treeplaylist_callback, Icon_Playlist);
 
 MAKE_ONPLAYMENU( tree_playlist_menu, ID2P(LANG_PLAYLIST_MENU), 
-                 treeplaylist_callback, Icon_Playlist, &view_playlist_item,
+                 treeplaylist_callback, Icon_Playlist,
+                 
+                 /* view */
+                 &view_playlist_item,
+                 
                  /* insert */
-                 &i_pl_item, &i_first_pl_item, &i_last_pl_item, &i_shuf_pl_item, 
+                 &i_pl_item_no_play, &i_pl_item, &i_first_pl_item,
+                 &i_last_pl_item, &i_shuf_pl_item,
+                 
                  /* queue */
-                 &q_pl_item, &q_first_pl_item, &q_last_pl_item, &q_shuf_pl_item,
+                 &q_pl_item, &q_first_pl_item, &q_last_pl_item,
+                 &q_shuf_pl_item,
+                 
                  /* replace */
                  &replace_pl_item
                );
@@ -380,7 +400,8 @@ static int treeplaylist_callback(int action,
         case ACTION_REQUEST_MENUITEM:
             if (this_item == &tree_playlist_menu)
             {
-                if (((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO) ||
+                if (((selected_file_attr & FILE_ATTR_MASK) == 
+                        FILE_ATTR_AUDIO) ||
                     ((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_M3U)||
                      (selected_file_attr & ATTR_DIRECTORY))
                 {
@@ -397,8 +418,15 @@ static int treeplaylist_callback(int action,
                 else 
                     return ACTION_EXIT_MENUITEM;
             }
-            if (this_item == &i_pl_item)
-                return action;
+            else if (this_item == &i_pl_item_no_play)
+            {
+                if (!(audio_status() & AUDIO_STATUS_PLAY))
+                {
+                    return action;
+                }
+                else 
+                    return ACTION_EXIT_MENUITEM;
+            }
             else if (this_item == &i_shuf_pl_item)
             {
                 
@@ -539,7 +567,8 @@ static bool set_backdrop(void)
     /* load the image */
     if(load_main_backdrop(selected_file)) {
         gui_syncsplash(HZ, str(LANG_BACKDROP_LOADED));
-        set_file(selected_file, (char *)global_settings.backdrop_file, MAX_FILENAME);
+        set_file(selected_file, (char *)global_settings.backdrop_file,
+            MAX_FILENAME);
         show_main_backdrop();
         return true;
     } else {
@@ -642,7 +671,8 @@ static bool clipboard_pastefile(const char *src, const char *target, bool copy)
         /* See if we can get the plugin buffer for the file copy buffer */
         buffer = (char *) plugin_get_buffer(&buffersize);
         if (buffer == NULL || buffersize < 512) {
-            /* Not large enough, try for a disk sector worth of stack instead */
+            /* Not large enough, try for a disk sector worth of stack
+               instead */
             buffersize = 512;
             buffer = (char *) __builtin_alloca(buffersize);
         }
@@ -651,7 +681,8 @@ static bool clipboard_pastefile(const char *src, const char *target, bool copy)
             return false;
         }
 
-        buffersize &= ~0x1ff;  /* Round buffer size to multiple of sector size */
+        buffersize &= ~0x1ff;  /* Round buffer size to multiple of sector
+                                  size */
 
         src_fd = open(src, O_RDONLY);
 
@@ -705,7 +736,8 @@ static bool clipboard_pastefile(const char *src, const char *target, bool copy)
 #ifdef HAVE_MULTIVOLUME
         if (!result) {
             if (errno == EXDEV) {
-                /* Failed because cross volume rename doesn't work. Copy instead */
+                /* Failed because cross volume rename doesn't work. Copy
+                   instead */
                 result = clipboard_pastefile(src, target, true);
 
                 if (result) {
@@ -719,8 +751,10 @@ static bool clipboard_pastefile(const char *src, const char *target, bool copy)
     return result;
 }
 
-/* Paste a directory to a new location. Designed to be called by clipboard_paste */
-static bool clipboard_pastedirectory(char *src, int srclen, char *target, int targetlen, bool copy)
+/* Paste a directory to a new location. Designed to be called by
+   clipboard_paste */
+static bool clipboard_pastedirectory(char *src, int srclen, char *target,
+                                     int targetlen, bool copy)
 {
     DIR *srcdir;
     int srcdirlen = strlen(src);
@@ -740,7 +774,8 @@ static bool clipboard_pastedirectory(char *src, int srclen, char *target, int ta
 #ifdef HAVE_MULTIVOLUME
             if (!result && errno == EXDEV) {
                 /* Try a copy as we're going across devices */
-                result = clipboard_pastedirectory(src, srclen, target, targetlen, true);
+                result = clipboard_pastedirectory(src, srclen, target,
+                    targetlen, true);
 
                 /* If it worked, remove the source directory */
                 if (result) {
@@ -776,7 +811,8 @@ static bool clipboard_pastedirectory(char *src, int srclen, char *target, int ta
 
         /* append name to current directory */
         snprintf(src+srcdirlen, srclen-srcdirlen, "/%s", entry->d_name);
-        snprintf(target+targetdirlen, targetlen-targetdirlen, "/%s", entry->d_name);
+        snprintf(target+targetdirlen, targetlen-targetdirlen, "/%s",
+            entry->d_name);
 
         DEBUGF("Copy %s to %s\n", src, target);
 
@@ -786,7 +822,8 @@ static bool clipboard_pastedirectory(char *src, int srclen, char *target, int ta
                 !strcmp((char *)entry->d_name, ".."))
                 continue; /* skip these */
 
-            result = clipboard_pastedirectory(src, srclen, target, targetlen, copy); /* recursion */
+            result = clipboard_pastedirectory(src, srclen, target, targetlen,
+                copy); /* recursion */
         }
         else
         {   /* copy/move a file */
@@ -841,7 +878,8 @@ static bool clipboard_paste(void)
         char targetpath[MAX_PATH];
         if (!strncmp(clipboard_selection, target, strlen(clipboard_selection)))
         {
-            /* Do not allow the user to paste a directory into a dir they are copying */
+            /* Do not allow the user to paste a directory into a dir they are
+               copying */
             success = 0;
         }
         else
@@ -853,7 +891,8 @@ static bool clipboard_paste(void)
                              target, sizeof(targetpath), clipboard_is_copy);
         }
     } else {
-        success = clipboard_pastefile(clipboard_selection, target, clipboard_is_copy);
+        success = clipboard_pastefile(clipboard_selection, target,
+            clipboard_is_copy);
     }
 
     /* Did it work? */
@@ -935,7 +974,8 @@ static bool view_cue(void)
     }
     return false;
 }
-static int view_cue_item_callback(int action,const struct menu_item_ex *this_item)
+static int view_cue_item_callback(int action,
+                                  const struct menu_item_ex *this_item)
 {
     (void)this_item;
     struct mp3entry* id3 = audio_current_track();
@@ -1088,7 +1128,7 @@ int onplay(char* file, int attr, int from)
 {
     int menu_result;
     int selected_item = 0; /* this is a bit of a hack to reopen 
-                              the menu if certain items are selected */ 
+                              the menu if certain items are selected */
     onplay_result = ONPLAY_OK;
     context = from;
     selected_file = file;
