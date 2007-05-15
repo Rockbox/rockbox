@@ -30,6 +30,10 @@
 
 void power_init(void)
 {
+    /* Initialize IDE power pin */
+    GPGCON=( GPGCON&~(1<<23) ) | (1<<22); /* Make the pin an output */
+    GPGUP |= 1<<11;  /* Disable pullup in SOC as we are now driving */
+    ide_power_enable(true);
     /* Charger detect */
 }
 
