@@ -1391,6 +1391,7 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
         char buffer[MAX_PATH];
         int folder_count = 0,i;
         srand(current_tick);
+        *(tc->dirfilter) = SHOW_MUSIC;
         if (fd >= 0)
         {
             read(fd,&folder_count,sizeof(int));
@@ -1404,6 +1405,8 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
             }
             strcpy(dir,buffer);
             close(fd);
+            *(tc->dirfilter) = dirfilter;
+            reload_directory();
             return 0;
         }
     }
