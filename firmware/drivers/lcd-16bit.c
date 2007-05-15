@@ -33,11 +33,6 @@
 #include "font.h"
 #include "rbunicode.h"
 #include "bidi.h"
-#if defined(TOSHIBA_GIGABEAT_F)
-#define NON_GB_STATIC
-#else
-#define NON_GB_STATIC static
-#endif
 
 #define SCROLLABLE_LINES ((LCD_HEIGHT+4)/5 < 32 ? (LCD_HEIGHT+4)/5 : 32)
 
@@ -54,8 +49,8 @@ fb_data lcd_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH] IRAM_LCDFRAMEBUFFER __attribu
 static fb_data* lcd_backdrop = NULL;
 static long lcd_backdrop_offset IDATA_ATTR = 0;
 
-NON_GB_STATIC unsigned fg_pattern IDATA_ATTR = LCD_DEFAULT_FG;
-NON_GB_STATIC unsigned bg_pattern IDATA_ATTR = LCD_DEFAULT_BG;
+static unsigned fg_pattern IDATA_ATTR = LCD_DEFAULT_FG;
+static unsigned bg_pattern IDATA_ATTR = LCD_DEFAULT_BG;
 static int drawmode = DRMODE_SOLID;
 static int xmargin = 0;
 static int ymargin = 0;

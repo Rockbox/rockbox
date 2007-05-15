@@ -14,7 +14,6 @@
 
 #define LCDADDR(x, y) (&lcd_framebuffer[(y)][(x)])
 
-volatile bool use_dma_blit = false;
 static volatile bool lcd_on = true;
 volatile bool lcd_poweroff = false;
 /*
@@ -89,40 +88,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         sleep(200);
         return;
     }
-    if (use_dma_blit)
-    {
-        /* Wait for this controller to stop pending transfer */
-        while((DSTAT1 & 0x000fffff))
-            CLKCON |= (1 << 2); /* set IDLE bit */
-
-        /* Flush DCache */
-        invalidate_dcache_range((void *)(((int) &lcd_framebuffer[0][0])+(y * sizeof(fb_data) * LCD_WIDTH)), (height * sizeof(fb_data) * LCD_WIDTH));
-
-        /* set DMA dest */
-        DIDST1 = ((int) FRAME) + (y * sizeof(fb_data) * LCD_WIDTH);
-
-        /* FRAME on AHB buf, increment */
-        DIDSTC1 = 0;
-        /* Handshake on AHB, Burst transfer, Whole service, Don't reload, transfer 32-bits */
-        DCON1 = ((1<<30) | (1<<28) |  (1<<27) | (1<<22) | (2<<20)) | ((height * sizeof(fb_data) * LCD_WIDTH) >> 4);
-
-        /* set DMA source  */
-        DISRC1 = ((int) &lcd_framebuffer[0][0]) + (y * sizeof(fb_data) * LCD_WIDTH) + 0x30000000;
-        /* memory is on AHB bus, increment addresses */
-        DISRCC1 = 0x00;
-
-        /* Activate the channel */
-        DMASKTRIG1 = 0x2;
-
-        /* Start DMA */
-        DMASKTRIG1 |= 0x1;
-
-        /* Wait for transfer to complete */
-        while((DSTAT1 & 0x000fffff))
-            CLKCON |= (1 << 2); /* set IDLE bit */
-    }
-    else
-        memcpy(((char*)FRAME) + (y * sizeof(fb_data) * LCD_WIDTH), ((char *)&lcd_framebuffer) + (y * sizeof(fb_data) * LCD_WIDTH), ((height * sizeof(fb_data) * LCD_WIDTH)));
+    memcpy(((char*)FRAME) + (y * sizeof(fb_data) * LCD_WIDTH), ((char *)&lcd_framebuffer) + (y * sizeof(fb_data) * LCD_WIDTH), ((height * sizeof(fb_data) * LCD_WIDTH)));
 }
 
 
