@@ -325,10 +325,10 @@ void  rbutilFrm::OnManualUpdate(wxUpdateUIEvent& event)
     wxString tmp = gv->curplat;
 
     if(tmp == wxT("h120")) tmp = wxT("h100");   //h120 has the h100 manual
-	 if(tmp == wxT("fmrecorder8mb")) tmp = wxT("fmrecorder");   
+	 if(tmp == wxT("fmrecorder8mb")) tmp = wxT("fmrecorder");
 	 if(tmp == wxT("ipodmini1g")) tmp = wxT("ipodmini2g");
-	 if(tmp == wxT("recorder8mb")) tmp = wxT("recorderg");
-	 	  
+	 if(tmp == wxT("recorder8mb")) tmp = wxT("recorder");
+
     if( tmp == curManualDevice)
         return;
 
