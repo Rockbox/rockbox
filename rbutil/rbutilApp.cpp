@@ -215,6 +215,9 @@ bool rbutilFrmApp::ReadGlobalConfig(rbutilFrm* myFrame)
     gv->GlobalConfig->Read(wxT("manual_url"), &tmpstr);
     gv->manual_url = tmpstr;
 
+    gv->GlobalConfig->Read(wxT("doom_url"), &tmpstr);
+    gv->doom_url = tmpstr;
+
 #ifdef __WXMSW__
     gv->curdestdir = wxT("D:\\");
 #else

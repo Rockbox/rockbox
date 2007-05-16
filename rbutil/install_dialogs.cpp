@@ -106,7 +106,8 @@ bool bootloaderInstallDlg::TransferDataFromWindow()
             return false;
         }
     }
-
+	
+	return true;
 
 }
 
@@ -652,7 +653,7 @@ bool rockboxInstallDlg::TransferDataToWindow()
     wxRadioBox* BuildRadioBox = (wxRadioBox*) FindWindow(ID_BUILD_BOX);
 
     int index =gv->plat_id.Index(gv->curplat);
-
+   
     wxCommandEvent updateradiobox(wxEVT_COMMAND_RADIOBOX_SELECTED,
         ID_BUILD_BOX);
 

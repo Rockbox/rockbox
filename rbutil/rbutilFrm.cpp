@@ -29,6 +29,7 @@
 #include "rblogo.xpm"
 #include "untools2_3d.xpm"
 #include "themes_3d.xpm"
+#include "doom_3d.xpm"
 
 #include "bootloaders.h"
 #include "install_dialogs.h"
@@ -45,12 +46,15 @@ BEGIN_EVENT_TABLE(rbutilFrm,wxFrame)
 	EVT_BUTTON      (ID_THEMES_BTN, rbutilFrm::OnThemesBtn)
 	EVT_BUTTON      (ID_BOOTLOADER_BTN, rbutilFrm::OnBootloaderBtn)
 	EVT_BUTTON      (ID_BOOTLOADERREMOVE_BTN, rbutilFrm::OnBootloaderRemoveBtn)
+	EVT_BUTTON      (ID_DOOM_BTN, rbutilFrm::OnDoomBtn)
+
 
 	EVT_CLOSE(rbutilFrm::rbutilFrmClose)
 	EVT_MENU(ID_FILE_EXIT, rbutilFrm::OnFileExit)
 	EVT_MENU(ID_FILE_ABOUT, rbutilFrm::OnFileAbout)
 	EVT_MENU(ID_FILE_WIPECACHE, rbutilFrm::OnFileWipeCache)
 	EVT_MENU(ID_PORTABLE_INSTALL, rbutilFrm::OnPortableInstall)
+
 	EVT_MENU(ID_FILE_PROXY, rbutilFrm::OnFileProxy)
 
 	EVT_UPDATE_UI   (ID_MANUAL, rbutilFrm::OnManualUpdate)
@@ -99,7 +103,7 @@ void rbutilFrm::CreateGUIControls(void)
     wxPanel* uninstallpage = new wxPanel(tabwindow,wxID_ANY);
     wxPanel* manualpage = new wxPanel(tabwindow,wxID_ANY);
     tabwindow->AddPage(installpage,wxT("Installation"),true);
-    tabwindow->AddPage(themepage,wxT("Themes"));
+    tabwindow->AddPage(themepage,wxT("Extras"));
     tabwindow->AddPage(uninstallpage,wxT("Uninstallation"));
     tabwindow->AddPage(manualpage,wxT("Manual"));
 
@@ -153,7 +157,7 @@ void rbutilFrm::CreateGUIControls(void)
         wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL,5);
 
     /*********************+
-	Theme Page
+	Extras Page
 	***********************/
 
 	wxBoxSizer* WxBoxSizer3 = new wxBoxSizer(wxVERTICAL);
@@ -198,6 +202,20 @@ void rbutilFrm::CreateGUIControls(void)
     wxStaticText* WxStaticText6 =  new wxStaticText(themepage, wxID_ANY,
         wxT("Install more Themes for Rockbox.\n\n"));
 	WxFlexGridSizer2->Add(WxStaticText6, 0,
+        wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL,5);
+
+
+    wxBitmap DoomInstallButton (doom_3d_xpm);
+    WxBitmapButton6 = new wxBitmapButton(themepage, ID_DOOM_BTN,
+        DoomInstallButton, wxPoint(0,0), wxSize(64,54),
+        wxRAISED_BORDER | wxBU_AUTODRAW);
+    WxBitmapButton6->SetToolTip(wxT("Download freedoom wad files."));
+    WxFlexGridSizer2->Add(WxBitmapButton6, 0,
+        wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL | wxALL,5);
+
+    wxStaticText* WxStaticText7 =  new wxStaticText(themepage, wxID_ANY,
+        wxT("Install the freedoom wad files.\n\n"));
+	WxFlexGridSizer2->Add(WxStaticText7, 0,
         wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL,5);
 
    /*********************+
@@ -302,13 +320,15 @@ void rbutilFrm::CreateGUIControls(void)
     wxLogVerbose(wxT("=== end rbutilFrm::CreateGUIControls"));
 }
 
-
 void  rbutilFrm::OnManualUpdate(wxUpdateUIEvent& event)
 {
     wxString tmp = gv->curplat;
 
     if(tmp == wxT("h120")) tmp = wxT("h100");   //h120 has the h100 manual
-
+	 if(tmp == wxT("fmrecorder8mb")) tmp = wxT("fmrecorder");   
+	 if(tmp == wxT("ipodmini1g")) tmp = wxT("ipodmini2g");
+	 if(tmp == wxT("recorder8mb")) tmp = wxT("recorderg");
+	 	  
     if( tmp == curManualDevice)
         return;
 
@@ -811,6 +831,64 @@ void rbutilFrm::OnFontBtn(wxCommandEvent& event)
     }
 
     wxLogVerbose(wxT("=== end rbutilFrm::OnFontBtn"));
+}
+
+void rbutilFrm::OnDoomBtn(wxCommandEvent& event)
+{
+    wxString src, dest, buf;
+    wxLogVerbose(wxT("=== begin rbutilFrm::OnDoomBtn(event)"));
+
+     // font install dialog, reused
+    fontInstallDlg dialog(NULL, wxID_ANY,
+        wxT("Freedoom wad file Installation"));
+    if (dialog.ShowModal() != wxID_OK)
+        return;
+
+    // really install ?
+    wxMessageDialog msg(this,wxT("Do you really want to install the Freedoom wads ?"),wxT("Freedoom installation"),wxOK|wxCANCEL);
+    if(msg.ShowModal() != wxID_OK )
+        return;
+
+    buf.Printf(wxT("%s" PATH_SEP ".rockbox"), gv->curdestdir.c_str()) ;
+    if (! wxDirExists(buf) )
+    {
+        buf.Printf(wxT("Rockbox is not yet installed on %s - install "
+            "Rockbox first."), buf.c_str() );
+        WARN_DIALOG(buf, wxT("Can't install freedoom wads") );
+        return;
+    }
+
+    src = gv->doom_url;
+
+    dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP
+        "rockdoom.zip"), gv->stdpaths->GetUserDataDir().c_str());
+
+    if ( ! wxFileExists(dest)  )
+    {
+        if ( DownloadURL(src, dest) )
+        {
+            wxRemoveFile(dest);
+            buf.Printf(wxT("Unable to download %s"), src.c_str() );
+            ERR_DIALOG(buf, wxT("Freedoom Install"));
+            return;
+        }
+    }
+
+    if ( !UnzipFile(dest, gv->curdestdir, true) )
+    {
+        wxMessageDialog* msg = new wxMessageDialog(this, wxT("The Freedoom wads have been installed on your device.")
+                        ,wxT("Installation"), wxOK |wxICON_INFORMATION);
+        msg->ShowModal();
+        delete msg;
+    } else
+    {
+        wxRemoveFile(dest);
+        buf.Printf(wxT("Unable to unzip %s"), dest.c_str() );
+        ERR_DIALOG(buf, wxT("Freedoom Install"));
+    }
+
+
+    wxLogVerbose(wxT("=== end rbutilFrm::OnDoomBtn"));
 }
 
 

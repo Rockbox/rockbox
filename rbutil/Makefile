@@ -9,7 +9,7 @@
 
 # Unix-style Makefile for rbutil
 
-CXX=$(shell $(PREFIX)wx-config --cxx)
+CXX=$(shell $(PREFIX)wx-config --version=2.8 --cxx)
 INC =
 CFLAGS = -Wall -Wundef -DRBUTIL
 OBJS=rbutil.o rbutilApp.o rbutilFrm.o rbutilCtrls.o install_dialogs.o bootloaders.o installlog.o ipodpatcher/ipodpatcher.o ipodpatcher/ipodio-posix.o sansapatcher/sansapatcher.o sansapatcher/sansaio-posix.o irivertools.o md5sum.o
@@ -32,16 +32,16 @@ endif
 all: rbutil$(EXT)
 
 .cpp.o :
-	$(CXX) $(CFLAGS) $(INC) -c `$(PREFIX)wx-config --cxxflags` -o $@ $<
+	$(CXX) $(CFLAGS) $(INC) -c `$(PREFIX)wx-config --version=2.8 --cxxflags` -o $@ $<
 
 .c.o :
-	$(CC) $(CFLAGS) $(INC) -c `$(PREFIX)wx-config --cxxflags` -o $@ $<
+	$(CC) $(CFLAGS) $(INC) -c `$(PREFIX)wx-config --version=2.8 --cxxflags` -o $@ $<
 
 rbutil-rc.o: rbutil-rc.rc
-	$(WINDRES) `$(PREFIX)wx-config --cxxflags` -O coff -F pe-i386 -o $@ $<
+	$(WINDRES) `$(PREFIX)wx-config --version=2.8 --cxxflags` -O coff -F pe-i386 -o $@ $<
 
 rbutil$(EXT): $(OBJS)
-	$(CXX) -o $@ $(OBJS) `$(PREFIX)wx-config --libs`
+	$(CXX) -o $@ $(OBJS) `$(PREFIX)wx-config --version=2.8 --libs`
 
 .PHONY: clean
 clean:

@@ -107,7 +107,9 @@ public:
     wxString                bootloader_url;
     wxString                themes_url;
     wxString                manual_url;
+    wxString                doom_url;
     wxString                proxy_url;
+
 
     // User configuration data.
     wxString                curplat;
