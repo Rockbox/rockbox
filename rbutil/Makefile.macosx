@@ -111,6 +111,7 @@ __WXLIB_BASE_p = $(COND_MONOLITHIC_0___WXLIB_BASE_p)
 
 __WXLIB_ADV_p = -lwx_mac_adv$(WXDEBUGFLAG)$(WX_LIB_FLAVOUR)-$(WX_RELEASE)$(HOST_SUFFIX)
 __WXLIB_NET_p = -lwx_base_carbon_net-$(WX_RELEASE)$(HOST_SUFFIX)
+__WXLIB_HTML_p = -lwx_mac_html-$(WX_RELEASE)$(HOST_SUFFIX)
 
 #__rbutil___win32rc = rbutil_rc.o
 COND_MONOLITHIC_1___WXLIB_MONO_p = \
@@ -161,7 +162,7 @@ distclean: clean
 	rm -f config.cache config.log config.status bk-deps bk-make-pch shared-ld-sh Makefile
 
 rbutil$(EXEEXT): $(RBUTIL_OBJECTS) $(__rbutil___win32rc)
-	$(CXX) -o $@ $(RBUTIL_OBJECTS) $(LDFLAGS)   -L$(LIBDIRNAME) $(LDFLAGS_GUI) $(SAMPLES_RPATH_FLAG)  $(LIBS) $(__WXLIB_CORE_p)  $(__WXLIB_BASE_p)  $(__WXLIB_MONO_p) $(__LIB_TIFF_p) $(__WXLIB_ADV_p) $(__WXLIB_NET_p) $(__LIB_JPEG_p) $(__LIB_PNG_p) $(EXTRALIBS_FOR_GUI) $(__LIB_ZLIB_p) $(__LIB_ODBC_p) $(__LIB_REGEX_p) $(__LIB_EXPAT_p) $(EXTRALIBS_FOR_BASE)
+	$(CXX) -o $@ $(RBUTIL_OBJECTS) $(LDFLAGS)   -L$(LIBDIRNAME) $(LDFLAGS_GUI) $(SAMPLES_RPATH_FLAG)  $(LIBS) $(__WXLIB_CORE_p)  $(__WXLIB_BASE_p)  $(__WXLIB_MONO_p) $(__LIB_TIFF_p) $(__WXLIB_ADV_p) $(__WXLIB_NET_p) $(__WXLIB_HTML_p) $(__LIB_JPEG_p) $(__LIB_PNG_p) $(EXTRALIBS_FOR_GUI) $(__LIB_ZLIB_p) $(__LIB_ODBC_p) $(__LIB_REGEX_p) $(__LIB_EXPAT_p) $(EXTRALIBS_FOR_BASE)
 	$(__rbutil___mac_rezcmd)
 	$(__rbutil___mac_setfilecmd)
 	$(__rbutil___os2_emxbindcmd)
