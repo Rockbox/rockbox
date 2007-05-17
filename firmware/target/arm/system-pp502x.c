@@ -215,6 +215,13 @@ void system_init(void)
 #ifndef BOOTLOADER
     if (CURRENT_CORE == CPU)
     {
+#ifdef SANSA_E200
+        /* Reset all devices */
+        DEV_RS = 0x3bfffef8;
+        outl(0xffffffff, 0x60006008);
+        DEV_RS = 0;
+        outl(0x00000000, 0x60006008);
+#endif
         /* Remap the flash ROM from 0x00000000 to 0x20000000. */
         MMAP3_LOGICAL  = 0x20000000 | 0x3a00;
         MMAP3_PHYSICAL = 0x00000000 | 0x3f84;
