@@ -620,6 +620,22 @@ void* main(void)
         error(0, 0);
 
     } else {
+#if 0 /* e200: enable to be able to dump the hidden partition */
+        if(btn & BUTTON_UP)
+        {
+            int fd;
+            pinfo = disk_partinfo(1);
+            fd = open("/part.bin", O_CREAT|O_RDWR);
+            char sector[512];
+            for(i=0; i<40960; i++){
+                printf("dumping sector %d", i);
+                lcd_update();
+                ata_read_sectors(pinfo->start + i,1 , sector);
+                write(fd,sector,512);
+            }
+            close(fd);
+        }
+#endif
         printf("Loading Rockbox...");
         rc=load_mi4(loadbuffer, BOOTFILE, MAX_LOADSIZE);
         if (rc < EOK) {
