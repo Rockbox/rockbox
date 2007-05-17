@@ -225,6 +225,7 @@ static void init_tagcache(void)
             snprintf(buf, sizeof(buf), " DB [%d/%d]", ret, 
                 tagcache_get_max_commit_step());
             lcd_puts(0, 1, buf);
+            lcd_update();
 #endif
             clear = true;
         }
