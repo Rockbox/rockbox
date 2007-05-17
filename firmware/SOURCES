@@ -271,7 +271,7 @@ common/strlen.c
 target/arm/memset-arm.S
 target/arm/memset16-arm.S
 target/arm/memswap128-arm.S
-#if CONFIG_I2C == I2C_PP5020 || CONFIG_I2C == I2C_PP5002
+#if CONFIG_I2C == I2C_PP5024 || CONFIG_I2C == I2C_PP5020 || CONFIG_I2C == I2C_PP5002
 target/arm/i2c-pp.c
 #elif CONFIG_I2C == I2C_PNX0101
 target/arm/pnx0101/i2c-pnx0101.c

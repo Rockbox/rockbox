@@ -197,6 +197,11 @@ void i2c_init(void)
 #if CONFIG_I2C == I2C_PP5020
     outl(0x0, 0x600060a4);
     outl(0x80 | (0 << 8), 0x600060a4);
+#elif CONFIG_I2C == I2C_PP5024
+    /* Sansa OF sets this to 0x20 first, communicates with the AS3514
+       then sets it to 0x23 - this still works fine though */
+    outl(0x0, 0x600060a4);
+    outl(0x23, 0x600060a4);
 #endif
 
     spinlock_init(&i2c_mutex);

@@ -84,8 +84,8 @@
 /* Define this if you have a PortalPlayer PP5024 */
 #define CONFIG_CPU PP5024
 
-/* Define this if you want to use the PP5020 i2c interface */
-#define CONFIG_I2C I2C_PP5020
+/* Define this if you want to use the PP5024 i2c interface */
+#define CONFIG_I2C I2C_PP5024
 
 /* Type of mobile power */
 #define CONFIG_BATTERY BATT_LIION750

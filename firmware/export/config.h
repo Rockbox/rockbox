@@ -121,6 +121,7 @@
 #define I2C_PP5020   5 /* PP5020 style */
 #define I2C_PNX0101  6 /* PNX0101 style */
 #define I2C_S3C2440  7
+#define I2C_PP5024   8 /* PP5024 style */
 
 /* CONFIG_LED */
 #define LED_REAL     1 /* SW controlled LED (Archos recorders, player) */
