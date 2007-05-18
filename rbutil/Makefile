@@ -11,7 +11,7 @@
 
 CXX=$(shell $(PREFIX)wx-config --version=2.8 --cxx)
 INC =
-CFLAGS = -Wall -Wundef -DRBUTIL
+CFLAGS = -Wall -Wundef -DRBUTIL -D_LARGEFILE64_SOURCE
 OBJS=rbutil.o rbutilApp.o rbutilFrm.o rbutilCtrls.o install_dialogs.o bootloaders.o installlog.o ipodpatcher/ipodpatcher.o ipodpatcher/ipodio-posix.o sansapatcher/sansapatcher.o sansapatcher/sansaio-posix.o irivertools.o md5sum.o
 
 # Install into /usr/local by default
