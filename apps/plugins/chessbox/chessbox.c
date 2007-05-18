@@ -49,7 +49,7 @@ PLUGIN_HEADER
 #define CB_PLAY    (BUTTON_SELECT | BUTTON_PLAY)
 #define CB_LEVEL   (BUTTON_SELECT | BUTTON_RIGHT)
 #define CB_RESTART (BUTTON_SELECT | BUTTON_LEFT)
-#define CB_QUIT    (BUTTON_SELECT | BUTTON_MENU)
+#define CB_MENU    (BUTTON_SELECT | BUTTON_MENU)
 
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 #define CB_SELECT  BUTTON_SELECT
@@ -60,7 +60,7 @@ PLUGIN_HEADER
 #define CB_PLAY    BUTTON_PLAY
 #define CB_LEVEL   BUTTON_REC
 #define CB_RESTART (BUTTON_SELECT | BUTTON_PLAY)
-#define CB_QUIT    BUTTON_POWER
+#define CB_MENU    BUTTON_POWER
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define CB_SELECT  BUTTON_SELECT
@@ -71,7 +71,7 @@ PLUGIN_HEADER
 #define CB_PLAY    BUTTON_ON
 #define CB_LEVEL   BUTTON_MODE
 #define CB_RESTART BUTTON_REC
-#define CB_QUIT    BUTTON_OFF
+#define CB_MENU    BUTTON_OFF
 
 #define CB_RC_QUIT BUTTON_RC_STOP
 
@@ -83,7 +83,7 @@ PLUGIN_HEADER
 #define CB_RIGHT   BUTTON_RIGHT
 #define CB_PLAY    BUTTON_PLAY
 #define CB_LEVEL   BUTTON_EQ
-#define CB_QUIT    BUTTON_MODE
+#define CB_MENU    BUTTON_MODE
 
 #elif CONFIG_KEYPAD == RECORDER_PAD
 #define CB_SELECT  BUTTON_PLAY
@@ -94,7 +94,7 @@ PLUGIN_HEADER
 #define CB_PLAY    BUTTON_ON
 #define CB_LEVEL   BUTTON_F1
 #define CB_RESTART BUTTON_F3
-#define CB_QUIT    BUTTON_OFF
+#define CB_MENU    BUTTON_OFF
 
 #elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
 #define CB_SELECT  BUTTON_SELECT
@@ -105,7 +105,7 @@ PLUGIN_HEADER
 #define CB_PLAY    BUTTON_ON
 #define CB_LEVEL   BUTTON_F1
 #define CB_RESTART BUTTON_F3
-#define CB_QUIT    BUTTON_OFF
+#define CB_MENU    BUTTON_OFF
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define CB_SELECT_PRE BUTTON_MENU
@@ -118,7 +118,7 @@ PLUGIN_HEADER
 #define CB_PLAY    (BUTTON_MENU|BUTTON_REPEAT)
 #define CB_LEVEL   (BUTTON_MENU|BUTTON_OFF)
 #define CB_RESTART (BUTTON_MENU|BUTTON_LEFT)
-#define CB_QUIT    BUTTON_OFF
+#define CB_MENU    BUTTON_OFF
 
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
 #define CB_SELECT  BUTTON_SELECT
@@ -128,7 +128,7 @@ PLUGIN_HEADER
 #define CB_RIGHT   BUTTON_RIGHT
 #define CB_PLAY    BUTTON_POWER
 #define CB_LEVEL   BUTTON_MENU
-#define CB_QUIT    BUTTON_A
+#define CB_MENU    BUTTON_A
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #define CB_SELECT  BUTTON_REW
@@ -139,7 +139,7 @@ PLUGIN_HEADER
 #define CB_PLAY    BUTTON_PLAY
 #define CB_LEVEL   BUTTON_FF
 #define CB_RESTART (BUTTON_REW | BUTTON_PLAY)
-#define CB_QUIT    BUTTON_POWER
+#define CB_MENU    BUTTON_POWER
 
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
 #define CB_SELECT  BUTTON_SELECT
@@ -150,7 +150,7 @@ PLUGIN_HEADER
 #define CB_PLAY    (BUTTON_SELECT | BUTTON_RIGHT)
 #define CB_LEVEL   BUTTON_REC
 #define CB_RESTART (BUTTON_SELECT | BUTTON_REPEAT)
-#define CB_QUIT    BUTTON_POWER
+#define CB_MENU    BUTTON_POWER
 
 #else
     #error CHESSBOX: Unsupported keypad
@@ -196,10 +196,12 @@ PLUGIN_HEADER
 #define COMMAND_MOVE       1
 #define COMMAND_PLAY       2
 #define COMMAND_LEVEL      3
-#ifdef CB_RESTART
-    #define COMMAND_RESTART    4
-#endif
+#define COMMAND_RESTART    4
 #define COMMAND_QUIT       5
+#define COMMAND_MENU       6
+#define COMMAND_SAVE       7
+#define COMMAND_RESTORE    8
+#define COMMAND_RESUME     9
 
 /* level+1's string */
 const char *level_string[] = { "Level 1: 60 moves / 5 min" ,
@@ -317,9 +319,12 @@ void cb_wt_callback ( void ) {
     switch (button) {
 #ifdef CB_RC_QUIT
         case CB_RC_QUIT:
-#endif
-        case CB_QUIT:
             wt_command = COMMAND_QUIT;
+            timeout = true;
+            break;
+#endif
+        case CB_MENU:
+            wt_command = COMMAND_MENU;
             timeout = true;
             break;
         case CB_PLAY:
@@ -510,6 +515,46 @@ void cb_restoreposition ( void ) {
     Sdepth = 0;
 }
 
+/* ---- show menu ---- */
+static int cb_menu(void)
+{
+    int selection;
+    int result;
+    bool menu_quit = false;
+
+    MENUITEM_STRINGLIST(menu,"Chessbox Menu",NULL,"New Game","Resume Game",
+                        "Save Game", "Restore Game", "Quit");
+
+    while(!menu_quit)
+    {
+        selection = rb->do_menu(&menu, &selection);
+        switch(selection)
+        {
+            case 0:
+                menu_quit = true;
+                result = COMMAND_RESTART;
+                break;
+            case 1:
+                result = COMMAND_RESUME;
+                menu_quit = true;
+                break;
+            case 2:
+                result = COMMAND_SAVE;
+                menu_quit = true;
+                break;
+            case 3:
+                result = COMMAND_RESTORE;
+                menu_quit = true;
+                break;
+            case 4:
+                result = COMMAND_QUIT;
+                menu_quit = true;
+                break;
+        }
+    }
+    return result;
+}
+
 /* ---- main user loop ---- */
 struct cb_command cb_getcommand (void) {
     static short x = 4 , y = 3 ;
@@ -526,9 +571,11 @@ struct cb_command cb_getcommand (void) {
         switch (button) {
 #ifdef CB_RC_QUIT
             case CB_RC_QUIT:
-#endif
-            case CB_QUIT:
                 result.type = COMMAND_QUIT;
+                return result;
+#endif
+            case CB_MENU:
+                result.type = cb_menu();
                 return result;
 #ifdef CB_RESTART
             case CB_RESTART:
@@ -707,8 +754,32 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
                 cb_drawboard();
                 break;
 #endif
+            case COMMAND_RESUME:
+                cb_drawboard();
+                break;
+            case COMMAND_SAVE:
+                cb_saveposition();
+                cb_drawboard();
+                break;
+            case COMMAND_RESTORE:
+                /* watch out, it will reset the game if no previous game was saved! */
+
+                /* init board */
+                GNUChess_Initialize();
+
+                /* restore saved position, if saved */
+                cb_restoreposition();
+
+                cb_drawboard();
+                break;
             case COMMAND_PLAY:
-                opponent = !opponent; computer = !computer;
+                if (opponent == white) {
+                    opponent = black;
+                    computer = white;
+                } else {
+                    opponent = white;
+                    computer = black;
+                }
                 rb->splash ( 0 , "Thinking..." );
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
                 rb->cpu_boost ( true );
