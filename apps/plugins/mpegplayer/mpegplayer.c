@@ -1322,6 +1322,9 @@ static void video_thread(void)
         state = mpeg2_parse (mpeg2dec);
         rb->yield();
 
+        /* Prevent idle poweroff */
+        rb->reset_poweroff_timer();
+        
         switch (state)
         {
         case STATE_BUFFER:
