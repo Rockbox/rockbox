@@ -50,7 +50,6 @@
 #include "mp3_playback.h"
 #include "usb.h"
 #include "status.h"
-#include "main_menu.h"
 #include "ata.h"
 #include "screens.h"
 #include "playlist.h"

@@ -31,7 +31,6 @@
 #include "kernel.h"
 #include "usb.h"
 #include "tree.h"
-#include "main_menu.h"
 #include "sprintf.h"
 #include "audio.h"
 #include "playlist.h"

@@ -54,7 +54,6 @@
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #endif
-#include "main_menu.h"
 #include "sound_menu.h"
 #if CONFIG_CODEC == SWCODEC
 #include "menus/eq_menu.h"

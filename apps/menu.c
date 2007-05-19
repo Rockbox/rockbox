@@ -65,7 +65,7 @@ static struct menu_item_ex *current_submenus_menu;
 static int current_subitems[MAX_MENU_SUBITEMS];
 static int current_subitems_count = 0;
 
-void get_menu_callback(const struct menu_item_ex *m,
+static void get_menu_callback(const struct menu_item_ex *m,
                         menu_callback_type *menu_callback) 
 {
     if (m->flags&(MENU_HAS_DESC|MENU_DYNAMIC_DESC))
@@ -602,10 +602,5 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
         *start_selected = get_menu_selection(
                             gui_synclist_get_sel_pos(&lists), menu);
     return ret;
-}
-
-int main_menu(void)
-{
-    return do_menu(NULL, 0) == MENU_ATTACHED_USB;
 }
 

@@ -49,7 +49,6 @@
 #include "action.h"
 #include "yesno.h"
 
-#include "main_menu.h"
 #include "tree.h"
 #if CONFIG_TUNER
 #include "radio.h"
