@@ -23,15 +23,11 @@
 #include "i2c-pp.h"
 
 static unsigned short backlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
-static bool backlight_is_on = false;
+static bool backlight_is_on = true;
 
 int __backlight_is_on(void)
 {
-#ifdef BOOTLOADER
-    return (int)true;
-#else
     return (int)backlight_is_on;
-#endif
 }
 
 void __backlight_set_brightness(int brightness)
