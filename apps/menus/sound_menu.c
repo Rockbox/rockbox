@@ -108,10 +108,4 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
          ,&mdb_harmonics,&mdb_center,&mdb_shape
 #endif
          );
-/*    SOUND MENU                   */
-/***********************************/
 
-bool sound_menu(void)
-{
-    return do_menu(&sound_settings, 0) == MENU_ATTACHED_USB;
-}

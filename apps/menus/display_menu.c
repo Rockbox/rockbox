@@ -25,7 +25,6 @@
 #include "action.h"
 #include "settings.h"
 #include "menu.h"
-#include "settings_menu.h"
 #include "tree.h"
 #include "list.h"
 #ifdef HAVE_LCD_BITMAP

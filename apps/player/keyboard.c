@@ -21,7 +21,6 @@
 #include "kernel.h"
 #include "system.h"
 #include "version.h"
-#include "debug_menu.h"
 #include "sprintf.h"
 #include <string.h>
 #include "settings.h"

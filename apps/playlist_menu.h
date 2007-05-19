@@ -21,7 +21,6 @@
 
 #include "playlist.h"
 
-bool playlist_menu(void);
 int save_playlist_screen(struct playlist_info* playlist);
 
 #endif

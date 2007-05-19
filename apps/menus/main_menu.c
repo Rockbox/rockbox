@@ -28,7 +28,6 @@
 #include "powermgmt.h"
 #include "menu.h"
 #include "misc.h"
-#include "settings_menu.h"
 #include "exported_menus.h"
 #include "tree.h"
 #ifdef HAVE_RECORDING

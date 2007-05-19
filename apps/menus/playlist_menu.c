@@ -82,7 +82,3 @@ MAKE_MENU(playlist_options, ID2P(LANG_PLAYLIST_MENU), NULL,
           Icon_Playlist,
           &create_playlist_item, &view_playlist, &save_playlist, &catalog);
 
-bool playlist_menu(void)
-{
-    return do_menu(&playlist_options, NULL) == MENU_ATTACHED_USB;
-}
