@@ -3524,9 +3524,7 @@ static int record_file(char *filename)
     rb->lcd_puts(0, 0, filename);
     rb->snprintf(buf, sizeof(buf), "%sHz 16bit %s",
                  samplerate_str[reccfg.samplerate], channel_str[reccfg.channels]);
-    rb->lcd_puts(0, 1, buf);
-    rb->lcd_update();
-    
+
     switch (reccfg.source)
     {
         case SRC_LINE:
@@ -3545,10 +3543,14 @@ static int record_file(char *filename)
 #ifdef HAVE_SPDIF_IN
         case SRC_SPDIF:
             rb->mas_codec_writereg(0, 0x01);
+            rb->snprintf(buf, sizeof(buf), "16bit %s",
+                         channel_str[reccfg.channels]);
             break;
 #endif
     }
-
+    rb->lcd_puts(0, 1, buf);
+    rb->lcd_update();
+    
     mas = 0x0060                /* no framing, little endian */
         | ((reccfg.channels == 0) ? 0x10 : 0) /* mono/stereo */
         | sampr[reccfg.samplerate][0];
@@ -3569,6 +3571,10 @@ static int record_file(char *filename)
         mas = 0x2125;   /* recording, ADC input, validate */
     rb->mas_writemem(MAS_BANK_D0, PCM_MAIN_IO_CONTROL, &mas, 1);
     
+    mas = 0x80001; /* avoid distortion (overflow on full-range input samples) */
+    rb->mas_writemem(MAS_BANK_D0, PCM_VOL_IN_LL, &mas, 1); /* LL */
+    rb->mas_writemem(MAS_BANK_D0, PCM_VOL_IN_RR, &mas, 1); /* RR */
+
     hijack_interrupts(true);
     rec_tick_enable(true);
 	recording = true;
