@@ -277,6 +277,9 @@ int midimain(void * filename)
     #endif
         rb->yield();
 
+        /* Prevent idle poweroff */
+        rb->reset_poweroff_timer();
+
         /* Code taken from Oscilloscope plugin */
         switch(rb->button_get(false))
         {
