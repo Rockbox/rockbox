@@ -1,0 +1,22 @@
+This is a list of known "issues" in the current Rockbox.
+
+These are flaws/bugs we know of that are not likely to be fixed within a
+reasonable time so we list them here and close the bug tracker entries for
+them.
+
+FS#894 - When the complete playlist fits in the mpeg buffer, and the playlist
+  is played multiple times, the tracks are reloaded from disk multiple times
+  instead of loaded only once.
+
+FS#2147 - It's a bug in the MAS. It starts bitshifting data on occasion. High
+  load on the MAS makes this behaviour more likely (high recording level, high
+  quality setting, high sample rate). It's impossible to avoid, but there are
+  plans to implement a recording 'framewalker' that checks recorded data and
+  restarts recording when the MAS starts delivering bitshifted data.
+
+FS#4937 - A constant rhythmic ticking noise occurs in the right
+  channel. Believed to be related to our slow I2C implementation, and occurs
+  when the battery status and/or realtime clock are updated (the battery is
+  read at up-to 2.5hz and the clock at up-to 1hz). Nothing is going to change
+  with it until someone spends a lot of time analyzing the portalplayer's I2C
+  control registers, or finds a datasheet for the damned thing.
