@@ -216,6 +216,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
 static void pcm_play_dma_stop_irq(void)
 {
     pcm_playing = false;
+    pcm_paused = false;
 
     DSR0 = 1;
     DCR0 = 0;
@@ -223,8 +224,6 @@ static void pcm_play_dma_stop_irq(void)
     /* Place TX FIFO in reset condition if playback monitoring is on.
        Recording monitoring something else should not be stopped. */
     iis_play_reset_if_playback(true);
-
-    pcm_playing = false;    
 } /* pcm_play_dma_stop_irq */
 
 void pcm_play_dma_stop(void)

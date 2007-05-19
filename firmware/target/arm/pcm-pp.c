@@ -248,6 +248,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
 void pcm_play_dma_stop(void)
 {
     pcm_playing = false;
+    pcm_paused = false;
 
 #if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
 
