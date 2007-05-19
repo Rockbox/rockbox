@@ -8,11 +8,7 @@
 #
 # The weird grep -v thing in here is due to Apple's stupidities and is needed
 # to make this do right when used on Mac OS X.
-#
-# The usage of ls is only to make sure that we only output existing file names
-# to not confuse make and to produce a fairly decent error message to the
-# terminal.
 
 SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
 $(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -include "config.h" - | \
-grep -v "^\#" | xargs ls)
+grep -v "^\#")
