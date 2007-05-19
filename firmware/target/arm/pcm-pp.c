@@ -127,6 +127,8 @@ void fiq(void)
     ".dma_stop:               \n\t" /* no more data, do dma_stop() and exit */
         "ldr r10, =pcm_playing\n\t"
         "strb r8, [r10]       \n\t" /* pcm_playing = false (r8=0, look above) */
+        "ldr r10, =pcm_paused \n\t"
+        "strb r8, [r10]       \n\t" /* pcm_paused = false (r8=0, look above) */
         "ldr r10, [r12]       \n\t"
 #if CONFIG_CPU == PP5002
         "bic r10, r10, #0x4\n\t" /* disable playback FIFO */
