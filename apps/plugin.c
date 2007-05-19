@@ -495,6 +495,7 @@ static const struct plugin_api rockbox_api = {
     get_codec_filename,
 #endif
     threads,
+    create_numbered_filename,
 };
 
 int plugin_load(const char* plugin, void* parameter)

@@ -114,7 +114,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 56
+#define PLUGIN_API_VERSION 57
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -611,6 +611,10 @@ struct plugin_api {
     const char *(*get_codec_filename)(int cod_spec);
 #endif
     struct thread_entry* threads;
+    
+    char *(*create_numbered_filename)(char *buffer, const char *path,
+                                      const char *prefix, const char *suffix,
+                                      int numberlen IF_CNFN_NUM_(, int *num));
 };
 
 /* plugin header */

@@ -27,6 +27,9 @@ metronome.c
 #if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)) && !defined(SIMULATOR)
 wavplay.c
 #endif
+#if (CONFIG_CODEC == MAS3587F) && !defined(SIMULATOR)
+wavrecord.c
+#endif
 
 #ifndef IRIVER_IFP7XX_SERIES       /* Temporarily disable plugins for iFP7xx */
 dice.c
