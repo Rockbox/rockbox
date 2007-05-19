@@ -1212,8 +1212,6 @@ bool recording_screen(bool no_source)
                     }
                     else
                     {
-                        settings_save();
-
 #ifdef HAVE_FMRADIO_IN
                         /* If input changes away from FM Radio, radio will
                            remain off when recording screen closes. */
@@ -1793,6 +1791,9 @@ bool recording_screen(bool no_source)
 #if (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)
     ata_set_led_enabled(true);
 #endif
+
+	settings_save();
+
     return been_in_usb_mode;
 } /* recording_screen */
 
