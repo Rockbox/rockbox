@@ -20,3 +20,23 @@ FS#4937 - A constant rhythmic ticking noise occurs in the right
   read at up-to 2.5hz and the clock at up-to 1hz). Nothing is going to change
   with it until someone spends a lot of time analyzing the portalplayer's I2C
   control registers, or finds a datasheet for the damned thing.
+
+FS#5796 - Early encoders such as this one employed a floor of type '0', as
+  opposed to the more efficient/cheaper floor type '1' which has been used in
+  all encoders from libvorbis 1.0 onwards, I believe.
+
+  The problem appears to be that most DAP decoders can only handle a floor of
+  type '1'.
+
+  While floor '0' type files like mine are, it turns out, pretty rare, they
+  still conform to the standards, as can be seen in the documention linked
+  below:
+
+  http://www.xiph.org/vorbis/doc/Vorbis_I_spec.pdf
+
+  which specifically states that "Floor 0 is not to be considered
+  deprecated..."
+
+  Files like these require quite a bit of memory to decode, more than what
+  Rockbox has set aside for the purpose. Adding a real malloc for the codecs
+  might help...
