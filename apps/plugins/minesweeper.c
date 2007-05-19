@@ -98,9 +98,9 @@ enum minesweeper_status {
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
 #   define MINESWP_UP       BUTTON_UP
 #   define MINESWP_DOWN     BUTTON_DOWN
-#   define MINESWP_QUIT     BUTTON_A
+#   define MINESWP_QUIT     BUTTON_POWER
 #   define MINESWP_START    BUTTON_SELECT
-#   define MINESWP_TOGGLE   BUTTON_POWER
+#   define MINESWP_TOGGLE   BUTTON_A
 #   define MINESWP_DISCOVER BUTTON_SELECT
 #   define MINESWP_INFO     BUTTON_MENU
 

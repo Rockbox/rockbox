@@ -107,10 +107,10 @@ static struct plugin_api* rb;
 #define MAZEZAM_RIGHT               BUTTON_RIGHT
 #define MAZEZAM_SELECT              BUTTON_SELECT
 
-#define MAZEZAM_RETRY               BUTTON_MENU
-#define MAZEZAM_RETRY_KEYNAME       "[MENU]"
-#define MAZEZAM_QUIT                BUTTON_A
-#define MAZEZAM_QUIT_KEYNAME        "[A]"
+#define MAZEZAM_RETRY               BUTTON_A
+#define MAZEZAM_RETRY_KEYNAME       "[A]"
+#define MAZEZAM_QUIT                BUTTON_POWER
+#define MAZEZAM_QUIT_KEYNAME        "[POWER]"
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD)
 #define MAZEZAM_UP                  BUTTON_UP

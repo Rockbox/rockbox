@@ -107,8 +107,8 @@ static struct plugin_api* rb; /* global api struct pointer */
 #define AST_FIRE_REP (BUTTON_SELECT | BUTTON_REPEAT)
 
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
-#define AST_PAUSE BUTTON_POWER
-#define AST_QUIT BUTTON_A
+#define AST_PAUSE BUTTON_A
+#define AST_QUIT BUTTON_POWER
 #define AST_THRUST_REP BUTTON_UP | BUTTON_REPEAT
 #define AST_THRUST BUTTON_UP
 #define AST_HYPERSPACE BUTTON_DOWN

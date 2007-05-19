@@ -120,7 +120,7 @@ void setoptions (void)
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
       options.A=BUTTON_VOL_UP;
       options.B=BUTTON_VOL_DOWN;
-      options.START=BUTTON_POWER;
+      options.START=BUTTON_A;
       options.SELECT=BUTTON_SELECT;
       options.MENU=BUTTON_MENU;
       

@@ -51,8 +51,8 @@ PLUGIN_IRAM_DECLARE
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
 #define BTN_QUIT         BUTTON_POWER
 #define BTN_RIGHT        BUTTON_RIGHT
-#define BTN_UP           BUTTON_VOL_UP
-#define BTN_DOWN         BUTTON_VOL_DOWN
+#define BTN_UP           BUTTON_UP
+#define BTN_DOWN         BUTTON_DOWN
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD)
 #define BTN_QUIT         BUTTON_POWER

@@ -92,7 +92,7 @@ PLUGIN_HEADER
 #define JEWELS_LEFT   BUTTON_LEFT
 #define JEWELS_RIGHT  BUTTON_RIGHT
 #define JEWELS_SELECT BUTTON_SELECT
-#define JEWELS_CANCEL BUTTON_A
+#define JEWELS_CANCEL BUTTON_POWER
 
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
 #define JEWELS_UP     BUTTON_UP
@@ -1306,7 +1306,7 @@ static int jewels_main(struct game_context* bj) {
                 rb->lcd_puts(0, 8, "Directions to move");
                 rb->lcd_puts(0, 9, "SELECT to select");
                 rb->lcd_puts(0, 10, "Long SELECT to show menu");
-                rb->lcd_puts(0, 11, "A to cancel");
+                rb->lcd_puts(0, 11, "POWER to cancel");
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
                 rb->lcd_puts(0, 2, "Swap pairs of jewels to");
                 rb->lcd_puts(0, 3, "form connected segments");

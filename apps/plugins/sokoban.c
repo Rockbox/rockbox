@@ -136,11 +136,11 @@ enum {
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
 #define SOKOBAN_UP BUTTON_UP
 #define SOKOBAN_DOWN BUTTON_DOWN
-#define SOKOBAN_QUIT BUTTON_A
+#define SOKOBAN_QUIT BUTTON_POWER
 #define SOKOBAN_UNDO BUTTON_SELECT
-#define SOKOBAN_REDO BUTTON_POWER
-#define SOKOBAN_LEVEL_UP (BUTTON_MENU | BUTTON_UP)
-#define SOKOBAN_LEVEL_DOWN (BUTTON_MENU | BUTTON_DOWN)
+#define SOKOBAN_REDO BUTTON_A
+#define SOKOBAN_LEVEL_UP BUTTON_VOL_UP
+#define SOKOBAN_LEVEL_DOWN BUTTON_VOL_DOWN
 #define SOKOBAN_LEVEL_REPEAT BUTTON_MENU
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD)
@@ -967,12 +967,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_putsxy(3, 26, "[REC] Down a Level");
     rb->lcd_putsxy(3, 36, "[PLAY] Up Level");
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
-    rb->lcd_putsxy(3,  6, "[A] Quit");
+    rb->lcd_putsxy(3,  6, "[POWER] Quit");
     rb->lcd_putsxy(3, 16, "[SELECT] Undo");
-    rb->lcd_putsxy(3, 26, "[POWER] Redo");
-    rb->lcd_putsxy(3, 36, "[MENU+DOWN] Down a Level");
+    rb->lcd_putsxy(3, 26, "[A] Redo");
+    rb->lcd_putsxy(3, 36, "[VOL-] Down a Level");
     rb->lcd_putsxy(3, 46, "[MENU] Restart Level");
-    rb->lcd_putsxy(3, 56, "[MENU+UP] Up Level");
+    rb->lcd_putsxy(3, 56, "[VOL+] Up Level");
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
     rb->lcd_putsxy(3,  6, "[POWER] Quit");
     rb->lcd_putsxy(3, 16, "[SELECT] Undo");

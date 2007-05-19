@@ -100,11 +100,11 @@ PLUGIN_HEADER
 
 #define FLIPIT_UP           BUTTON_UP
 #define FLIPIT_DOWN         BUTTON_DOWN
-#define FLIPIT_QUIT         BUTTON_A
-#define FLIPIT_SHUFFLE      (BUTTON_POWER | BUTTON_LEFT)
-#define FLIPIT_SOLVE        (BUTTON_POWER | BUTTON_RIGHT)
-#define FLIPIT_STEP_BY_STEP (BUTTON_POWER | BUTTON_UP)
-#define FLIPIT_TOGGLE       BUTTON_MENU
+#define FLIPIT_QUIT         BUTTON_POWER
+#define FLIPIT_SHUFFLE      BUTTON_MENU
+#define FLIPIT_SOLVE        BUTTON_VOL_UP
+#define FLIPIT_STEP_BY_STEP BUTTON_VOL_DOWN
+#define FLIPIT_TOGGLE       BUTTON_SELECT
 
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
 
@@ -510,11 +510,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_putsxy(2, 38, "[PLAY..] solution");
     rb->lcd_putsxy(2, 48, "[PLAY] step by step");
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
-    rb->lcd_putsxy(2, 8, "[A] to stop");
-    rb->lcd_putsxy(2, 18, "[MENU] toggle");
-    rb->lcd_putsxy(2, 28, "[P-LEFT] shuffle");
-    rb->lcd_putsxy(2, 38, "[P-RIGHT] solution");
-    rb->lcd_putsxy(2, 48, "[P-UP] step by step");
+    rb->lcd_putsxy(2, 8, "[POWER] to stop");
+    rb->lcd_putsxy(2, 18, "[SELECT] toggle");
+    rb->lcd_putsxy(2, 28, "[MENU] shuffle");
+    rb->lcd_putsxy(2, 38, "[VOL+] solution");
+    rb->lcd_putsxy(2, 48, "[VOL-] step by step");
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
     rb->lcd_putsxy(2, 8, "[POWER] to stop");
     rb->lcd_putsxy(2, 18, "[REW] toggle");
