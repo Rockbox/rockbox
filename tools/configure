@@ -550,6 +550,8 @@ EOF
   #            have to be the menu number. Just use the currently highest
   #            number+1 when you add a new target.
   # archos:    short model name used all over to identify this target
+  # memory:    number of megabytes of RAM this target has. If the amount can
+  #            be selected by the size prompt, let memory be unset here
   # target:    -Ddefine passed to the build commands to make the correct
   #            config-*.h file get included etc
   # tool:      the tool that takes a plain binary and converts that into a
@@ -582,7 +584,6 @@ EOF
     target_id=1
     archos="player"
     target="-DARCHOS_PLAYER"
-    memory="2"
     shcc
     tool="$rootdir/tools/scramble"
     output="archos.mod"
@@ -609,7 +610,6 @@ EOF
     target_id=2
     archos="recorder"
     target="-DARCHOS_RECORDER"
-    memory="2"
     shcc
     tool="$rootdir/tools/scramble"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -632,7 +632,6 @@ EOF
     target_id=3
     archos="fmrecorder"
     target="-DARCHOS_FMRECORDER"
-    memory="2"
     shcc
     tool="$rootdir/tools/scramble -fm"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -655,7 +654,6 @@ EOF
     target_id=4
     archos="recorderv2"
     target="-DARCHOS_RECORDERV2"
-    memory="2"
     shcc
     tool="$rootdir/tools/scramble -v2"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -678,7 +676,6 @@ EOF
     target_id=7
     archos="ondiosp"
     target="-DARCHOS_ONDIOSP"
-    memory="2"
     shcc
     tool="$rootdir/tools/scramble -osp"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -701,7 +698,6 @@ EOF
     target_id=8
     archos="ondiofm"
     target="-DARCHOS_ONDIOFM"
-    memory="2"
     shcc
     tool="$rootdir/tools/scramble -ofm"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -923,7 +919,6 @@ EOF
     target_id=15
     archos="ipodvideo"
     target="-DIPOD_VIDEO"
-    memory=32 # 30GB models have 32MB, 60GB have 64MB
     arm7tdmicc
     tool="$rootdir/tools/scramble -add=ipvd"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -1236,26 +1231,42 @@ EOF
 
 #remove start
 ############################################################################
-# Amount of memory, for those that can differ.
+# Amount of memory, for those that can differ. They have $memory unset at
+# this point.
 #
 
-if [ "$memory" = "2" ]; then
-  size="2"
-  if [ -z "$update" ]; then
-    echo "Enter size of your RAM (in MB): (defaults to 2)"
-    size=`input`;
-  fi
+echo "$memory memory!"
+if [ -z "$memory" ]; then
 
-  case $size in
-   8)
-    memory="8"
-    ;;
-   *)
-    memory="2"
-    ;;
+  	case $target_id in
+	15)
+  	   	echo "Enter size of your RAM (in MB): (Defaults to 32)"
+    		size=`input`;
+     		case $size in
+     		60|64)
+	   	  	memory="64"
+  	 	  	;;
+	  	  *)
+                        memory="32"
+	  	   	;;
+                esac
+                ;;	
+				
+   	*)
+                echo "Enter size of your RAM (in MB): (defaults to 2)"
+                size=`input`;
+    		case $size in
+		8)
+  		memory="8"
+    		;;
+   		*)
+    		memory="2"
+    		;;
+		esac
+                ;;
+   	esac
 
-  esac
-  echo "Memory size selected: $memory MB"
+	echo "Memory size selected: $memory MB"
 fi
 #remove end
 

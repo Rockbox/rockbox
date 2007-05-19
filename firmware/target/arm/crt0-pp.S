@@ -88,7 +88,12 @@ pad_skip:
     ldr    r3, =0x3f84     /* r3 and r1 values here are magic, don't touch */
     orr    r3, r3, r5      /* adjust for execute address */
     ldr    r2, =0xf000f014
+#if MEM > 32
+    mov    r1, #0x7400     /* r1 appears to indicate how much memory (not in
+                              bytes) is remapped */
+#else
     mov    r1, #0x3a00
+#endif
     ldr    r0, =0xf000f010
     mov    pc, #0x40000000 
 
