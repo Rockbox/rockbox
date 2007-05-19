@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 1996-1998 Szeredi Miklos
  * Email: mszeredi@inf.bme.hu
  *
@@ -19,7 +19,7 @@
  */
 
 /* #define DEBUG_KEYS */
-#include "misc.h"
+#include "zxmisc.h"
 
 #include "spkey.h"
 #include "spkey_p.h"

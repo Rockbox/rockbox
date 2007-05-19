@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 1996-1998 Szeredi Miklos 2006 Anton Romanov
  * Email: mszeredi@inf.bme.hu
  *
@@ -25,7 +25,7 @@
 #include "zxconfig.h"
 #include "spperif.h"
 #include "z80.h"
-#include "misc.h"
+#include "zxmisc.h"
 #include "interf.h"
 #include "spmain.h"
 

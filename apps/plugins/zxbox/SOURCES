@@ -3,7 +3,7 @@ helpers.c
 interf.c
 keynames.c
 loadim.c
-misc.c
+zxmisc.c
 rom_imag.c
 snapshot.c
 spconf.c

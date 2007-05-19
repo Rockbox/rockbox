@@ -18,7 +18,7 @@
  *
  */
 
-#include "misc.h"
+#include "zxmisc.h"
 #include "zxconfig.h"
 #include <stdio.h>
 #include <string.h>

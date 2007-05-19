@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 1996-1998 Szeredi Miklos
  * Email: mszeredi@inf.bme.hu
  *
@@ -18,7 +18,7 @@
  *
  */
 
-#include "misc.h"
+#include "zxmisc.h"
 #include "helpers.h"
 #include "spperif.h"
 #include "z80.h"

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 1996-1998 Szeredi Miklos
  * Email: mszeredi@inf.bme.hu
  *
@@ -17,7 +17,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  */
-#include "misc.h"
+#include "zxmisc.h"
 #include "zxconfig.h"
 #include "lib/configfile.h"
 #include "lib/oldmenuapi.h"
@@ -361,7 +361,7 @@ static bool zxbox_menu(void)
         { "Options", NULL },
         { "Quit", NULL },
     };
-    
+
     m = menu_init(rb,items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
 
