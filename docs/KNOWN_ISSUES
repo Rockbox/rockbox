@@ -40,3 +40,6 @@ FS#5796 - Early encoders such as this one employed a floor of type '0', as
   Files like these require quite a bit of memory to decode, more than what
   Rockbox has set aside for the purpose. Adding a real malloc for the codecs
   might help...
+
+FS#6411 - Resuming a playlist after having deleted one or more files makes
+  the resume point end up on the wrong song.
