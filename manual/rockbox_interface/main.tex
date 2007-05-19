@@ -19,6 +19,9 @@ for approximately 1 second. In detail the buttons are described in the following
 paragraph.
 
 \blind{
+  Additional information is available for blind users on the Rockbox website at 
+  \wikilink{BlindFAQ}.
+  
   %
   \opt{h1xx}{ 
   If you lay the \dap{} on the table with the joystick pointing 
@@ -26,7 +29,7 @@ paragraph.
   if you start from the top-right corner and follow the side of the \dap{} in a
   clockwise direction:
   On the right side the buttons \ButtonOn{}, \ButtonOff{}, \ButtonMode{} and
-  the hold switch. Next comes on the bottom the USB port,
+  the \ButtonHold{} switch. Next comes on the bottom the USB port,
   a small hole for resetting the \dap{}, charger plug. On the left side located
   is the button \ButtonRec{}. At least the top has headphone mini-jack plug,
   remote port, optical/line in and optical/line out.
@@ -61,10 +64,10 @@ paragraph.
 
   The top of the player will have the following, from left to 
   right:
-  \opt{ipod4g, ipod3g ,ipodcolor}{remote connector, headphone jack, hold 
+  \opt{ipod4g, ipod3g ,ipodcolor}{remote connector, headphone jack, \ButtonHold{} 
     switch.}
-  \opt{ipodvideo}{hold switch, headphone jack.}
-  \opt{ipodmini}{hold switch, remote connector, headphone jack.}	
+  \opt{ipodvideo}{\ButtonHold{} switch, headphone jack.}
+  \opt{ipodmini}{\ButtonHold{} switch, remote connector, headphone jack.}	
 
   The dock connector that is used to connect your \dap{} to your computer is on 
   the bottom panel of the \dap{}.
@@ -78,16 +81,16 @@ paragraph.
   counterclockwise. Note that the wheel is sensitive, so you will need to move
   slowly at first and get a feel for how it works.
   
-  Note that when the hold switch is pushed toward the center of the \dap{}, 
-  ``hold'' is on, and none of the other controls do anything.  Be sure ``hold'' 
-  is off before trying to use your player. 
+  Note that when the \ButtonHold{} switch is pushed toward the center of the \dap{}, 
+  hold is on, and none of the other controls do anything.  Be sure
+  \ButtonHold{} is off before trying to use your player. 
   }
   %
   \opt{ipodnano}{
   The main controls on the \dap{} are a slightly indented wheel with a
   flat round button in the center. Hold the \dap{} with these controls on the
-  top surface. There is a Hold switch at one end, and headphone and USB jacks
-  at the other; be sure the end with the switch is facing away from you.
+  top surface. There is a \ButtonHold{} switch at one end, and headphone and USB
+  jacks at the other; be sure the end with the switch is facing away from you.
 
   The button in the middle of the wheel is called \ButtonSelect{}. You can
   operate the wheel by pressing the top, bottom, left or right sections,
@@ -98,8 +101,8 @@ paragraph.
   counterclockwise. Note that the wheel is sensitive, so you will need to move
   slowly at first and get a feel for how it works.
 
-  Note that when the Hold switch is pushed toward the center of the \dap{},
-  Hold is on, and none of the other controls do anything; be sure Hold is
+  Note that when the \ButtonHold{} switch is pushed toward the center of the \dap{},
+  hold is on, and none of the other controls do anything; be sure \ButtonHold{} is
   off before trying to use your player.
   }
   %
@@ -132,12 +135,36 @@ paragraph.
   hand side is the \ButtonPower{} button.
 
   On the top panel of the \dap{}, from left to right, you can find the 
-  following: hold switch, \opt{h10}{reset pin hole, }remote port and headphone
-  mini jack plug. 
+  following: \ButtonHold() switch, \opt{h10}{reset pin hole, }remote port and
+  headphone mini jack plug. 
   
   On the bottom panel of the \dap{}, is the data cable port.}
   %
-  \nopt{h1xx,h300,ipodnano,ipodvideo,ipodmini,ipod4g,ipod3g,ipodcolor,ondio,h10,h10_5gb}
+  \opt{gigabeatf}{
+  Hold the \dap{} with the screen on top and the controls on the right hand side.  
+  Below the screen is a cross-shaped touch sensitive pad which contains the 
+  \ButtonUp{}, \ButtonDown{}, \ButtonLeft{} and \ButtonRight{} controls.  On the
+  top of the unit from left to right are the power socket, the \ButtonHold{} 
+  switch, and the headphone socket.  The \ButtonHold{} switch puts the \dap{} into
+  hold mode when it is switched to the right 
+  of the unit.  THe buttons will have no effect when this is the case.  
+  
+  Starting from the left hand side on the bottom of the unit, nearer to the front
+  than the back, is a recessed switch which 
+  controls whether the battery is on or off.  When this swtich is to the lwft,
+  the battery is disconnected.  This can be used for a hard reset of the unit,
+  or if the \dap{} is being placed in storage.  Next to that is a connector for
+  the docking station and finally on the right hand side of the bottom of the
+  unit is a mini USB socket for connecting directly to USB.
+  
+  Finally on the right hand side of the unit are some control buttons.  Going from
+  the bottom of the unit to the top there is a small round \ButtonA{} buttton then a
+  rocker volume switch with of the \ButttonVolDown{} button below the \ButtonVolUp{}
+  button.  Above that is are two more small round buttons, the \ButtonMenu{} 
+  button and nearest to the top of the unit the \ButtonPower{} button, which is held
+  down to turn the \dap{} on or off.}
+  %
+  \nopt{h1xx,h300,ipodnano,ipodvideo,ipodmini,ipod4g,ipod3g,ipodcolor,ondio,h10,h10_5gb,gigabeatf}
   {
     \fixme{Write a section describing the \dap{} for blind users.}
   }
@@ -183,9 +210,9 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
   \opt{ipod}
     {
     Rockbox has a dual-boot feature. To boot into the original firmware, shut
-    down the device as described above. Turn on the ``hold'' switch
+    down the device as described above. Turn on the \ButtonHold{} switch
     immediately after turning the player on. Once Rockbox displays the
-    message ``Loading original firmware ...'' you may turn the ``hold''
+    message ``Loading original firmware ...'' you may turn the \ButtonHold{}
     switch off. Rockbox will boot into the original firmware.
     
     \note{The described method of dual-booting works with Rockbox bootloader
