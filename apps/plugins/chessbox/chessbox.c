@@ -519,7 +519,7 @@ void cb_restoreposition ( void ) {
 static int cb_menu(void)
 {
     int selection;
-    int result;
+    int result = 0;
     bool menu_quit = false;
 
     MENUITEM_STRINGLIST(menu,"Chessbox Menu",NULL,"New Game","Resume Game",
