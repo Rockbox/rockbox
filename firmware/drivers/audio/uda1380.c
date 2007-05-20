@@ -16,20 +16,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "lcd.h"
-#include "cpu.h"
-#include "kernel.h"
-#include "thread.h"
-#include "power.h"
-#include "debug.h"
-#include "system.h"
-#include "sprintf.h"
-#include "button.h"
-#include "string.h"
-#include "file.h"
-#include "buffer.h"
-#include "audio.h"
 #include "logf.h"
+#include "system.h"
+#include "string.h"
+#include "audio.h"
+#include "debug.h"
 
 #include "i2c-coldfire.h"
 #include "uda1380.h"
