@@ -599,8 +599,17 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
     }
     action_signalscreenchange();
     if (start_selected)
+    {
+        /* make sure the start_selected variable is set to
+           the selected item from the menu do_menu() was called from */
+        if (stack_top > 0)
+        {
+            menu = menu_stack[0];
+            init_menu_lists(menu,&lists,menu_stack_selected_item[0],true);
+        }
         *start_selected = get_menu_selection(
                             gui_synclist_get_sel_pos(&lists), menu);
+    }
     return ret;
 }
 
