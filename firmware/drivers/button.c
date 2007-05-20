@@ -236,7 +236,11 @@ static void button_tick(void)
                     }
                     else
 #endif
-                        if (!filter_first_keypress || is_backlight_on())
+                        if (!filter_first_keypress || is_backlight_on()
+#if BUTTON_REMOTE
+                                || (btn&BUTTON_REMOTE)
+#endif
+                           )
                             queue_post(&button_queue, btn, 0);
                         else
                             skip_release = true;
