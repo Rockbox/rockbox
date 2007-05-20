@@ -529,8 +529,12 @@ static bool delete_handler(bool is_dir)
 
     struct text_message message={lines, 2};
     struct text_message yes_message={yes_lines, 2};
+
     if(gui_syncyesno_run(&message, &yes_message, NULL)!=YESNO_YES)
         return false;
+
+    gui_syncsplash(0, str(LANG_DELETING));
+
     int res;
     if (is_dir)
     {
@@ -870,7 +874,16 @@ static bool clipboard_paste(void)
         return false;
     }
 
+    if (clipboard_is_copy) {
+        gui_syncsplash(0, str(LANG_COPYING));
+    }
+    else
+    {
+        gui_syncsplash(0, str(LANG_MOVING));
+    }
+
     /* Now figure out what we're doing */
+    cpu_boost(true);
     if (clipboard_selection_attr & ATTR_DIRECTORY) {
         /* Recursion. Set up external stack */
         char srcpath[MAX_PATH];
@@ -893,6 +906,7 @@ static bool clipboard_paste(void)
         success = clipboard_pastefile(clipboard_selection, target,
             clipboard_is_copy);
     }
+    cpu_boost(false);
 
     /* Did it work? */
     if (success) {
