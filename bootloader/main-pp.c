@@ -406,6 +406,17 @@ int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
 }
 
 #ifdef SANSA_E200
+struct OFDB_info {
+    char *version;
+    int version_length;
+    int sector;
+    int offset;
+} OFDatabaseOffsets[] = {
+    { "PP5022AF-05.51-S301-01.11-S301.01.11A-D", 39, 0x3c08, 0xe1 },
+    { "PP5022AF-05.51-S301-00.12-S301.00.12E-D", 39, 0x3c5c, 0x2 },
+    { "PP5022AF-05.51-S301-00.12-S301.00.12A-D", 39, 0x3c08, 0xe1 },
+};
+
 /* Load mi4 firmware from a hidden disk partition */
 int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
                   unsigned int buffer_size, bool disable_rebuild)
@@ -464,27 +475,26 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
     {
         char block[512];
         int  sector = 0, offset = 0;
-    
+        unsigned int i;
         /* check which known version we have */
         /* These are taken from the PPPS section, 0x00780240 */
         ata_read_sectors(pinfo->start + 0x3C01, 1, block);
-        if (!memcmp(&block[0x40], 
-            "PP5022AF-05.51-S301-01.11-S301.01.11A-D", 39))
-        {   /* American e200, OF version 1.01.11A */
-            sector = pinfo->start + 0x3c08;
-            offset  = 0xe1;
+        for (i=0; i<sizeof(OFDatabaseOffsets)/sizeof(*OFDatabaseOffsets); i++)
+        {
+            if (!memcmp(&block[0x40], OFDatabaseOffsets[i].version,
+                                      OFDatabaseOffsets[i].version_length))
+            {
+                sector = pinfo->start + OFDatabaseOffsets[i].sector;
+                offset  = OFDatabaseOffsets[i].offset;
+                break;
+            }
         }
-        else if (!memcmp(&block[0x40], 
-                "PP5022AF-05.51-S301-00.12-S301.00.12E-D", 39))
-        {   /* European e200, OF version 1.00.12 */
-            sector = pinfo->start + 0x3c5c;
-            offset  = 0x2;
+        if (sector && offset)
+        {
+            ata_read_sectors(sector, 1, block);
+            block[offset] = 0;
+            ata_write_sectors(sector, 1, block);
         }
-        else 
-            return EOK;
-        ata_read_sectors(sector, 1, block);
-        block[offset] = 0;
-        ata_write_sectors(sector, 1, block);
     }
     return EOK;
 }
@@ -628,8 +638,10 @@ void* main(void)
             fd = open("/part.bin", O_CREAT|O_RDWR);
             char sector[512];
             for(i=0; i<40960; i++){
-                printf("dumping sector %d", i);
-                lcd_update();
+                if (!(i%100))
+                {
+                    printf("dumping sector %d", i);
+                }
                 ata_read_sectors(pinfo->start + i,1 , sector);
                 write(fd,sector,512);
             }
