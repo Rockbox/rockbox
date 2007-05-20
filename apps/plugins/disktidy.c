@@ -355,8 +355,7 @@ int tidy_lcd_menu(void)
                       
     while (!menu_quit)
     {    
-        selection = rb->do_menu(&menu,&selection);
-        switch(selection)
+        switch(rb->do_menu(&menu, &selection))
         {
          
             case 0:

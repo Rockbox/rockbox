@@ -98,8 +98,25 @@ struct menu_item_ex {
 
 typedef int (*menu_callback_type)(int action,
                                   const struct menu_item_ex *this_item);
-int do_menu(const struct menu_item_ex *menu, int *start_selected);
 bool do_setting_from_menu(const struct menu_item_ex *temp);
+
+/* 
+   int do_menu(const struct menu_item_ex *menu, int *start_selected)
+    
+   Return value - usually one of the GO_TO_* values from root_menu.h,
+   however, some of the following defines can cause this to 
+   return a different value.
+   
+   *menu - The menu to run, can be a pointer to a MAKE_MENU() variable,
+            MENUITEM_STRINGLIST() or MENUITEM_RETURNVALUE() variable.
+            
+   *start_selected - the item to select when the menu is first run.
+                     When do_menu() returns, this will be set to the 
+                     index of the selected item at the time of the exit.
+                     This is always set, even if the menu was cancelled.
+                     If NULL it is ignored and the firs item starts selected
+*/
+int do_menu(const struct menu_item_ex *menu, int *start_selected);
 
 /* In all the following macros the argument names are as follows:
     - name: The name for the variable (so it can be used in a MAKE_MENU()
@@ -126,8 +143,9 @@ bool do_setting_from_menu(const struct menu_item_ex *temp);
             {.callback_and_desc = & name##__}};
 
 /*  Use this To create a list of Strings (or ID2P()'s )
-    When the user enters this list and selects one, the menu will exits
-    and its return value will be the index of the chosen item */
+    When the user enters this list and selects one, the menu will exit
+    and do_menu() will return value the index of the chosen item.
+    if the user cancels, GO_TO_PREVIOUS will be returned */
 #define MENUITEM_STRINGLIST(name, str, callback, ... )                  \
     static const char *name##_[] = {__VA_ARGS__};                       \
     static const struct menu_callback_with_desc name##__ =              \
@@ -138,7 +156,7 @@ bool do_setting_from_menu(const struct menu_item_ex *temp);
             { .strings = name##_},{.callback_and_desc = & name##__}};
 
             
-/* returns a value associated with the item */
+/* causes do_menu() to return a value associated with the item */
 #define MENUITEM_RETURNVALUE(name, str, val, cb, icon)                      \
      static const struct menu_callback_with_desc name##_ = {cb,str,icon};   \
      static const struct menu_item_ex name   =                              \

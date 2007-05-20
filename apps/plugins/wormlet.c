@@ -2533,9 +2533,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->button_clear_queue();
 
     while (!menu_quit) {
-        result = rb->do_menu(&menu, &result);
-
-        switch(result)
+        switch(rb->do_menu(&menu, &result))
         {
             case 0:
                 rb->lcd_setfont(FONT_SYSFIXED);

@@ -410,8 +410,7 @@ enum minesweeper_status menu( void )
 #endif
 
     while (!menu_quit) {
-        selection=rb->do_menu(&menu,&selection);
-        switch(selection)
+        switch(rb->do_menu(&menu, &selection))
         {
             case 0:
                 result = MINESWEEPER_WIN; /* start playing */

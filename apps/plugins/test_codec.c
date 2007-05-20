@@ -452,7 +452,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     unsigned char* codec_stack_copy;
     size_t codec_stack_size;
     struct thread_entry* codecthread_id;
-    int result;
+    int result, selection = 0;
     char* ch;
     int line = 0;
 
@@ -529,7 +529,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     rb->lcd_clear_display();
 
-    result=rb->do_menu(&menu,&result);
+    result=rb->do_menu(&menu,&selection);
 
     if (result==0) {
         wavinfo.fd = -1;

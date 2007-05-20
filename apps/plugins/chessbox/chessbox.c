@@ -528,8 +528,7 @@ static int cb_menu(void)
 
     while(!menu_quit)
     {
-        selection = rb->do_menu(&menu, &selection);
-        switch(selection)
+        switch(rb->do_menu(&menu, &selection))
         {
             case 0:
                 menu_quit = true;

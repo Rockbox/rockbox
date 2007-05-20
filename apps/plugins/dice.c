@@ -235,8 +235,7 @@ static bool dice_menu(int *num_dice, int *side_index) {
     };
                       
     while (!menu_quit) {
-        selection = rb->do_menu(&menu, &selection);
-        switch(selection)
+        switch(rb->do_menu(&menu, &selection))
         {
             case 0:
                 menu_quit = true;
