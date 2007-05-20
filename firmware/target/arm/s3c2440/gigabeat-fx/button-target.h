@@ -44,6 +44,15 @@ int button_read_device(void);
 #define BUTTON_SELECT       0x00000100
 #define BUTTON_A            0x00000200
 
+/* Remote control buttons */
+
+#define BUTTON_RC_VOL_UP    0x00000400
+#define BUTTON_RC_VOL_DOWN  0x00000800
+#define BUTTON_RC_FF        0x00001000
+#define BUTTON_RC_REW       0x00002000
+
+#define BUTTON_RC_PLAY      0x00004000
+#define BUTTON_RC_DSP       0x00008000
 
 /* Toshiba Gigabeat specific remote button ADC values */
 /* The remote control uses ADC 1 to emulate button pushes
@@ -80,8 +89,8 @@ int button_read_device(void);
                 |BUTTON_UP|BUTTON_DOWN|BUTTON_VOL_UP|BUTTON_VOL_DOWN\
                 |BUTTON_SELECT|BUTTON_A)
 
-
-#define BUTTON_REMOTE 0
+#define BUTTON_REMOTE (BUTTON_RC_VOL_UP|BUTTON_RC_VOL_DOWN|BUTTON_RC_FF\
+                |BUTTON_RC_REW|BUTTON_RC_PLAY|BUTTON_RC_DSP)
 
 #define POWEROFF_BUTTON BUTTON_POWER
 #define POWEROFF_COUNT 10

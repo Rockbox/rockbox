@@ -32,15 +32,15 @@ static bool hold_button        = false;
 
 static int const remote_buttons[] =
 {
-    BUTTON_NONE,    /* Headphones connected - remote disconnected */
-    BUTTON_SELECT,
-    BUTTON_MENU,    /* could be changed to BUTTON_A */
-    BUTTON_LEFT,
-    BUTTON_RIGHT,
-    BUTTON_UP,      /* could be changed to BUTTON_VOL_UP */
-    BUTTON_DOWN,    /* could be changed to BUTTON_VOL_DOWN */
-    BUTTON_NONE,    /* Remote control attached - no buttons pressed */
-    BUTTON_NONE,    /* Nothing in the headphone socket */
+    BUTTON_NONE,        /* Headphones connected - remote disconnected */
+    BUTTON_RC_PLAY,
+    BUTTON_RC_DSP,
+    BUTTON_RC_REW,
+    BUTTON_RC_FF,
+    BUTTON_RC_VOL_UP,
+    BUTTON_RC_VOL_DOWN,
+    BUTTON_NONE,        /* Remote control attached - no buttons pressed */
+    BUTTON_NONE,        /* Nothing in the headphone socket */
 };
 
 void button_init_device(void)
