@@ -13,7 +13,8 @@
 #    Modifié par Manuel Dejonghe (lImbus) <lImbus AT users.soureforge.net> - February 2005
 #
 #    Refonte totale du fichier par Mustapha Senhaji (Moos) <moos75 AT gmail.com>
-#    Nov 2005, Avr 2006, Mai 2006, Juil 2006, Oct 2006, Dec 2006, Mars 2007
+#    Nov 2005, Avr 2006, Mai 2006, Juil 2006, Oct 2006, Dec 2006, Mars 2007,
+#    Mai 2007
 #
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -303,10 +304,10 @@
     *: "Playlist"
   </source>
   <dest>
-    *: "Options Listes de Lecture"
+    *: "Listes de Lecture"
   </dest>
   <voice>
-    *: "Options listes de lecture"
+    *: "Listes de lecture"
   </voice>
 </phrase>
 <phrase>
@@ -317,10 +318,10 @@
     *: "Plugins"
   </source>
   <dest>
-    *: "Liste des Modules d'Extension"
+    *: "Modules d'Extension"
   </dest>
   <voice>
-    *: "Liste des modules d'extension"
+    *: "Modules d'extension"
   </voice>
 </phrase>
 <phrase>
@@ -847,11 +848,12 @@
   user:
   <source>
     *: "PLAY = Yes"
-    h100,h120,h300: "NAVI = Oui"
-    ipod*: "SELECT = Oui"
-    x5: "SELECT = Oui"
-    h10: "NEXT = Oui"
-    gigabeat: "SELECT = Oui"
+    h100,h120,h300: "NAVI = Yes"
+    ipod*: "SELECT = Yes"
+    x5: "SELECT = Yes"
+    h10: "NEXT = Yes"
+    gigabeatf: "SELECT = Yes"
+    e200: "SELECT = Yes"
   </source>
   <dest>
     *: "PLAY = Oui"
@@ -859,7 +861,8 @@
     ipod*: "SELECT = Oui"
     x5: "SELECT = Oui"
     h10: "NEXT = Oui"
-    gigabeat: "SELECT = Oui"
+    gigabeatf: "SELECT = Oui"
+    e200: "SELECT = Oui"
   </dest>
   <voice>
     *: ""
@@ -996,13 +999,13 @@
   desc: in the recording sub menu
   user:
   <source>
-    *: "Recording Screen"
+    *: "Recording"
   </source>
   <dest>
-    *: "Ecran d'Enregistrement"
+    *: "Enregistrement"
   </dest>
   <voice>
-    *: "Ecran d'enregistrement"
+    *: "Enregistrement"
   </voice>
 </phrase>
 <phrase>
@@ -1268,7 +1271,7 @@
     *: "Voir la Liste Courante"
   </dest>
   <voice>
-    *: "Voir liste de lecture courante"
+    *: "Voir la liste courante"
   </voice>
 </phrase>
 <phrase>
@@ -1282,7 +1285,7 @@
     *: "Enregistrer la Liste Courante"
   </dest>
   <voice>
-    *: "Enregistrer liste de lecture courante"
+    *: "Enregistrer la liste courante"
   </voice>
 </phrase>
 <phrase>
@@ -4717,16 +4720,18 @@
     h100,h120,h300: "STOP = Exit"
     ipod*: "PLAY/PAUSE = Exit"
     x5: "RECORD = Exit"
-    h10: "PREV = Exit"
-    gigabeat: "A = Exit"
+    h10,h10_5gb: "PREV = Exit"
+    gigabeatf: "A = Exit"
+    e200: "POWER = Exit"
   </source>
   <dest>
     *: "OFF = Quitter"
     h100,h120,h300: "STOP = Quitter"
     ipod*: "PLAY/PAUSE = Quitter"
     x5: "RECORD = Quitter"
-    h10: "PREV = Quitter"
+    h10,h10_5gb: "PREV = Quitter"
     gigabeat: "A = Quitter"
+    e200: "POWER = Quitter"
   </dest>
   <voice>
     *: ""
@@ -4783,16 +4788,18 @@
     h100,h120,h300: "NAVI = Select"
     ipod*: "SELECT = Select"
     x5: "SELECT = Select"
-    h10: "NEXT = Select"
-    gigabeat: "SELECT = Select"
+    h10,h10_5gb: "SELECT = Select"
+    gigabeatf: "SELECT = Select"
+    e200: "SELECT = Select"
   </source>
   <dest>
     *: "PLAY = Sélect."
     h100,h120,h300: "NAVI = Sélect."
     ipod*: "SELECT = Sélect."
     x5: "SELECT = Sélect."
-    h10: "NEXT = Sélect."
-    gigabeat: "SELECT = Sélect."
+    h10,h10_5gb: "SELECT = Sélect."
+    gigabeatf: "SELECT = Sélect."
+    e200: "SELECT = Sélect."
   </dest>
   <voice>
     *: ""
@@ -4807,16 +4814,18 @@
     h100,h120,h300: "RECORD = Delete"
     ipod*: "Long MENU = Delete"
     x5: "Long RECORD = Delete"
-    h10: "REWIND = Delete"
-    gigabeat: "POWER = Delete"
+    h10,h10_5gb: "REWIND = Delete"
+    gigabeatf: "POWER = Delete"
+    e200: "PLAY = Delete"
   </source>
   <dest>
     *: "ON+PLAY = Suppr."
     h100,h120,h300: "RECORD = Suppr."
     ipod*: "Long MENU = Suppr."
     x5: "Long RECORD = Suppr."
-    h10: "REWIND = Suppr."
-    gigabeat: "POWER = Suppr."
+    h10,h10_5gb: "REWIND = Suppr."
+    gigabeatf: "POWER = Suppr."
+    e200: "PLAY = Suppr."
   </dest>
   <voice>
     *: ""
@@ -4901,16 +4910,18 @@
     h100,h120,h300: "NAVI = Set"
     ipod*: "SELECT = Set"
     x5: "SELECT = Set"
-    h10: "NEXT = Set"
-    gigabeat: "SELECT = Set"
+    h10,h10_5gb: "SELECT = Set"
+    gigabeatf: "SELECT = Set"
+    e200: "SELECT = Set"
   </source>
   <dest>
     *: "ON = Valider"
     h100,h120,h300: "NAVI = Valider"
     ipod*: "SELECT = Valider"
     x5: "SELECT = Valider"
-    h10: "NEXT = Valider"
-    gigabeat: "SELECT = Valider"
+    h10,h10_5gb: "SELECT = Valider"
+    gigabeatf: "SELECT = Valider"
+    e200: "SELECT = Valider"
   </dest>
   <voice>
     *: ""
@@ -4925,16 +4936,18 @@
     h100,h120,h300: "STOP = Revert"
     ipod*: "MENU = Revert"
     x5: "RECORD = Revert"
-    h10: "PREV = Revert"
-    gigabeat: "POWER = Revert"
+    h10,h10_5gb: "PREV = Revert"
+    gigabeatf: "POWER = Revert"
+    e200: "PREV = Revert"
   </source>
   <dest>
     *: "OFF = Annuler"
     h100,h120,h300: "STOP = Annuler"
     ipod*: "MENU = Annuler"
     x5: "RECORD = Annuler"
-    h10: "PREV = Annuler"
-    gigabeat: "POWER = Annuler"
+    h10,h10_5gb: "PREV = Annuler"
+    gigabeatf: "POWER = Annuler"
+    e200: "PREV = Annuler"
   </dest>
   <voice>
     *: ""
@@ -7195,7 +7208,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Firmware"
+    *: "Micrologiciel"
   </voice>
 </phrase>
 <phrase>
@@ -7209,7 +7222,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Fichier config. écran de lecture pour télécommande"
+    *: "Fichier config. écran de lecture télécommande"
   </voice>
 </phrase>
 <phrase>
@@ -7270,13 +7283,13 @@
 </phrase>
 <phrase>
   id: LANG_END_PLAYLIST_PLAYER
-  desc: when playlist has finished
+  desc: DEPRECATED
   user:
   <source>
-    *: "End of List"
+    *: ""
   </source>
   <dest>
-    *: "Fin Liste de Lecture"
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -7288,9 +7301,11 @@
   user:
   <source>
     *: "End of Song List"
+    player: "Fin Liste de Lecture"
   </source>
   <dest>
     *: "Fin Liste de Lecture"
+    player: "Fin Liste de Lecture"
   </dest>
   <voice>
     *: ""
@@ -7907,14 +7922,16 @@
     h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5: "Long PLAY to abort"
-    h10: "PREV to abort"
+    h10,h10_5gb: "PREV to abort"
+    e200: "PREV to abort"
   </source>
   <dest>
     *: "OFF pour Annuler"
     h100,h120,h300: "STOP pour Annuler"
     ipod*: "PLAY/PAUSE pour Annuler"
     x5: "Long PLAY pour Annuler"
-    h10: "PREV pour Annuler"
+    h10,h10_5gb: "PREV pour Annuler"
+    e200: "PREV pour Annuler"
   </dest>
   <voice>
     *: ""
@@ -10485,10 +10502,10 @@
     *: "Charge During USB Connection"
   </source>
   <dest>
-    *: "Charger Durant la Connection USB"
+    *: "Charger quand USB Connecté"
   </dest>
   <voice>
-    *: "Charger durant la connection U S B"
+    *: "Charger quand U S B connecté"
   </voice>
 </phrase>
 <phrase>
@@ -10685,5 +10702,150 @@
   </dest>
   <voice>
     *: "Ecran d'alarme,réveil"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUILDING_DATABASE
+  desc: splash database building progress
+  user:
+  <source>
+    *: "Building database... %d found (OFF to return)"
+    h100,h120,h300: "Building database... %d found (STOP to return)"
+    ipod*: "Building database... %d found (PLAY/PAUSE to return)"
+    x5: "Building database... %d found (Long PLAY to return)"
+    h10,h10_5gb: "Building database... %d found (PREV to return)"
+    e200: "Building database... %d found (PREV to return)"
+  </source>
+  <dest>
+    *: "Création base de données... %d trouvés (OFF pour retour)"
+    h100,h120,h300: "Création base de données... %d trouvés (STOP pour retour)"
+    ipod*: "Création base de données... %d trouvés (PLAY/PAUSE pour retour)"
+    x5: "Création base de données... %d trouvés (Long PLAY pour retour)"
+    h10,h10_5gb: "Création base de données... %d trouvés (PREV pour retour)"
+    e200: "Création base de données... %d trouvés (PREV pour retour)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_MENU_TITLE
+  desc: title for the onplay menus
+  user:
+  <source>
+    *: "Context Menu"
+  </source>
+  <dest>
+    *: "Menu contextuel"
+  </dest>
+  <voice>
+    *: "Menu contextuel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONLIGHT_TIMEOUT
+  desc: in settings_menu
+  user:
+  <source>
+    *: ""
+    e200: "Wheel Light Timeout"
+    gigabeatf: "Button Light Timeout"
+  </source>
+  <dest>
+    *: ""
+    e200: "Durée de l'éclairage de la molette"
+    gigabeatf: "Durée de l'éclairage des boutons"
+  </dest>
+  <voice>
+    *: ""
+    e200: "Durée de l'éclairage de la molette"
+    gigabeatf: "Durée de l'éclairage des boutons"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONLIGHT_BRIGHTNESS
+  desc: in settings_menu
+  user:
+  <source>
+    *: ""
+    gigabeatf: "Button Light Brightness"
+  </source>
+  <dest>
+    *: ""
+    gigabeatf: "Luminosité de l'éclairage des touches"
+  </dest>
+  <voice>
+    *: ""
+    gigabeatf: "Luminosité de l'éclairage des touches"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLISTVIEWER_SETTINGS
+  desc: title for the playlist viewer settings menus
+  user:
+  <source>
+    *: "Playlist Viewer Settings"
+  </source>
+  <dest>
+    *: "Options de la visionneuse liste de lecture"
+  </dest>
+  <voice>
+    *: "Options de la visionneuse de la liste de lecture"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSE_CUESHEET
+  desc:
+  user:
+  <source>
+    *: "Browse Cuesheet"
+  </source>
+  <dest>
+    *: "Visualiser le fichier Cuesheet"
+  </dest>
+  <voice>
+    *: "Visualiser le fichier Cuesheet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COPYING
+  desc:
+  user:
+  <source>
+    *: "Copying..."
+  </source>
+  <dest>
+    *: "Copie en cours..."
+  </dest>
+  <voice>
+    *: "Copie en cours"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETING
+  desc:
+  user:
+  <source>
+    *: "Deleting..."
+  </source>
+  <dest>
+    *: "Supression en cours..."
+  </dest>
+  <voice>
+    *: "Supression en cours"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVING
+  desc:
+  user:
+  <source>
+    *: "Moving..."
+  </source>
+  <dest>
+    *: "Déplacement en cours..."
+  </dest>
+  <voice>
+    *: "Déplacement en cours"
   </voice>
 </phrase>
