@@ -3164,6 +3164,16 @@ struct riff_header
 #define PCM_DEPTH_BYTES             2
 #define PCM_DEPTH_BITS             16
 
+/* Define our own source constants since REC_SRC_FMRADIO will intrude on the count */
+enum {   
+  WAV_SRC_LINE = 0,   
+  WAV_SRC_MIC,   
+#ifdef HAVE_SPDIF_REC
+  WAV_SRC_SPDIF,   
+#endif   
+  WAV_NUM_SRC,   
+}; 
+
 void rec_tick(void) __attribute__((interrupt_handler));
 
 /* variables */
@@ -3185,18 +3195,13 @@ static char *samplerate_str[9]  =  { "8000", "11025", "12000",
                                      "16000", "22050", "24000",
                                      "32000", "44100", "48000" };
 static char *channel_str[2] =      { "mono", "stereo" };
-static char *source_str[REC_NUM_SOURCES] = {
-    [REC_SRC_LINEIN] = "line in",
-    [REC_SRC_MIC]    = "mic",
-#ifdef HAVE_SPDIF_REC
-    [REC_SRC_SPDIF]  = "spdif",
-#endif
-  };
+static char *source_str[WAV_NUM_SRC] = { "line in", "mic",
+                                         HAVE_SPDIF_REC_("spdif",) };
 
 struct configdata disk_config[] = {
    { TYPE_ENUM, 0, 9, &reccfg_disk.samplerate, "sample rate", samplerate_str, NULL },
    { TYPE_ENUM, 0, 2, &reccfg_disk.channels, "channels", channel_str, NULL },
-   { TYPE_ENUM, 0, REC_NUM_SOURCES, &reccfg_disk.source, "source", source_str, NULL },
+   { TYPE_ENUM, 0, WAV_NUM_SRC, &reccfg_disk.source, "source", source_str, NULL },
 };
 
 static char recfilename[MAX_PATH];
@@ -3520,21 +3525,21 @@ static int record_file(char *filename)
 
     switch (reccfg.source)
     {
-        case REC_SRC_LINEIN:
+        case WAV_SRC_LINE:
             rb->mas_codec_writereg(0, (rb->global_settings->rec_left_gain << 12)
                                     | (rb->global_settings->rec_right_gain << 8)
                                     | 0x07);
             rb->mas_codec_writereg(8, 0);
             break;
 
-        case REC_SRC_MIC:
+        case WAV_SRC_MIC:
             rb->mas_codec_writereg(0, (rb->global_settings->rec_mic_gain << 4)
                                     | 0x0d);
             rb->mas_codec_writereg(8, 0x8000); /* Copy left channel to right */
             break;
 
 #ifdef HAVE_SPDIF_REC
-        case REC_SRC_SPDIF:
+        case WAV_SRC_SPDIF:
             rb->mas_codec_writereg(0, 0x01);
             rb->snprintf(buf, sizeof(buf), "16bit %s",
                          channel_str[reccfg.channels]);
@@ -3698,11 +3703,11 @@ static int recording_menu(void)
         { "Mono", -1 },
         { "Stereo", -1 },
     };
-    static const struct opt_items srcs[REC_NUM_SOURCES] = {
-        [REC_SRC_LINEIN] = { "Line In", -1 },
-        [REC_SRC_MIC]    = { "Microphone", -1 },
+    static const struct opt_items srcs[WAV_NUM_SRC] = {
+        { "Line In", -1 },
+        { "Microphone", -1 },
 #ifdef HAVE_SPDIF_REC
-        [REC_SRC_SPDIF]  = { "S/PDIF", -1 },
+        { "S/PDIF", -1 },
 #endif
     };
 
@@ -3722,7 +3727,7 @@ static int recording_menu(void)
                 break;
 
             case 2: /* Set source */
-                rb->set_option("Source", &reccfg.source, INT, srcs, REC_NUM_SOURCES, NULL);
+                rb->set_option("Source", &reccfg.source, INT, srcs, WAV_NUM_SRC, NULL);
                 break;
 
             case 3: /* Start recording */
