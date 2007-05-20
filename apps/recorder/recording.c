@@ -183,7 +183,7 @@ static void set_gain(void)
     }
     else
     {
-        /* AUDIO_SRC_LINEIN, AUDIO_SRC_SPDIF, AUDIO_SRC_FMRADIO */
+        /* AUDIO_SRC_LINEIN, AUDIO_SRC_FMRADIO, AUDIO_SRC_SPDIF */
         audio_set_recording_gain(global_settings.rec_left_gain,
                                  global_settings.rec_right_gain,
                                  AUDIO_GAIN_LINEIN);
@@ -235,13 +235,12 @@ static bool agc_gain_is_max(bool left, bool right)
 
     switch (global_settings.rec_source)
     {
-    case AUDIO_SRC_LINEIN:
-#ifdef HAVE_FMRADIO_IN
-    case AUDIO_SRC_FMRADIO:
-#endif
+    HAVE_LINE_REC_(case AUDIO_SRC_LINEIN:)
+    HAVE_FMRADIO_REC_(case AUDIO_SRC_FMRADIO:)
         gain_current_l = global_settings.rec_left_gain;
         gain_current_r = global_settings.rec_right_gain;
         break;
+    case AUDIO_SRC_MIC:
     default:
         gain_current_l = global_settings.rec_mic_gain;
         gain_current_r = global_settings.rec_mic_gain;
@@ -257,14 +256,12 @@ static void change_recording_gain(bool increment, bool left, bool right)
 
     switch (global_settings.rec_source)
     {
-    case AUDIO_SRC_LINEIN:
-#ifdef HAVE_FMRADIO_IN
-    case AUDIO_SRC_FMRADIO:
-#endif
-        if(left) global_settings.rec_left_gain += factor;
+    HAVE_LINE_REC_(case AUDIO_SRC_LINEIN:)
+    HAVE_FMRADIO_REC_(case AUDIO_SRC_FMRADIO:)
+        if (left) global_settings.rec_left_gain += factor;
         if (right) global_settings.rec_right_gain += factor;
         break;
-    default:
+    case AUDIO_SRC_MIC:
          global_settings.rec_mic_gain += factor;
     }
 }
@@ -469,31 +466,27 @@ static void adjust_cursor(void)
 #ifdef HAVE_AGC
     switch(global_settings.rec_source)
     {
-    case AUDIO_SRC_MIC:
+    case REC_SRC_MIC:
         if(cursor == 2)
             cursor = 4;
         else if(cursor == 3)
             cursor = 1;
-    case AUDIO_SRC_LINEIN:
-#ifdef HAVE_FMRADIO_IN
-    case AUDIO_SRC_FMRADIO:
-#endif
+    HAVE_LINE_REC_(case AUDIO_SRC_LINEIN:)
+    HAVE_FMRADIO_REC_(case AUDIO_SRC_FMRADIO:)
         max_cursor = 5;
         break;
     default:
         max_cursor = 0;
         break;
     }
-#else
+#else /* !HAVE_AGC */
     switch(global_settings.rec_source)
     {
     case AUDIO_SRC_MIC:
         max_cursor = 1;
         break;
-    case AUDIO_SRC_LINEIN:
-#ifdef HAVE_FMRADIO_IN
-    case AUDIO_SRC_FMRADIO:
-#endif
+    HAVE_LINE_REC_(case AUDIO_SRC_LINEIN:)
+    HAVE_FMRADIO_REC_(case AUDIO_SRC_FMRADIO:)
         max_cursor = 3;
         break;
     default:
@@ -556,7 +549,7 @@ int rec_create_directory(void)
 
 #if CONFIG_CODEC == SWCODEC && !defined(SIMULATOR)
 
-# ifdef HAVE_SPDIF_IN
+# ifdef HAVE_SPDIF_REC
 #  ifdef HAVE_ADJUSTABLE_CPU_FREQ
 static void rec_boost(bool state)
 {
@@ -588,7 +581,7 @@ void rec_set_source(int source, unsigned flags)
     /** Do power up/down of associated device(s) **/
 
     /** SPDIF **/
-#ifdef HAVE_SPDIF_IN
+#ifdef HAVE_SPDIF_REC
     /* Always boost for SPDIF */
     rec_boost(source == AUDIO_SRC_SPDIF);
 #endif /* HAVE_SPDIF_IN */
@@ -766,7 +759,7 @@ bool recording_screen(bool no_source)
     int warning_counter = 0;
     #define WARNING_PERIOD 7
 #endif
-#ifdef HAVE_FMRADIO_IN
+#ifdef HAVE_FMRADIO_REC
     /* Radio is left on if:
      *   1) Is was on at the start and the initial source is FM Radio
      *   2) 1) and the source was never changed to something else
@@ -849,7 +842,7 @@ bool recording_screen(bool no_source)
         agc_preset = global_settings.rec_agc_preset_line;
         agc_maxgain = global_settings.rec_agc_maxgain_line;
     }
-#endif
+#endif /* HAVE_AGC */
 
     FOR_NB_SCREENS(i)
     {
@@ -1117,7 +1110,7 @@ bool recording_screen(bool no_source)
                             global_settings.rec_agc_maxgain_line = agc_maxgain;
                         }
                         break;
-#endif
+#endif /* HAVE_AGC */
                 }
                 set_gain();
                 update_countdown = 1; /* Update immediately */
@@ -1185,7 +1178,7 @@ bool recording_screen(bool no_source)
                             global_settings.rec_agc_maxgain_line = agc_maxgain;
                         }
                         break;
-#endif
+#endif /* HAVE_AGC */
                 }
                 set_gain();
                 update_countdown = 1; /* Update immediately */
@@ -1194,7 +1187,7 @@ bool recording_screen(bool no_source)
             case ACTION_STD_MENU:
                 if(audio_stat != AUDIO_STATUS_RECORD)
                 {
-#ifdef HAVE_FMRADIO_IN
+#ifdef HAVE_FMRADIO_REC
                     const int prev_rec_source = global_settings.rec_source;
 #endif
 
@@ -1206,13 +1199,13 @@ bool recording_screen(bool no_source)
                     {
                         done = true;
                         been_in_usb_mode = true;
-#ifdef HAVE_FMRADIO_IN
+#ifdef HAVE_FMRADIO_REC
                         radio_status = FMRADIO_OFF;
 #endif
                     }
                     else
                     {
-#ifdef HAVE_FMRADIO_IN
+#ifdef HAVE_FMRADIO_REC
                         /* If input changes away from FM Radio, radio will
                            remain off when recording screen closes. */
                         if (global_settings.rec_source != prev_rec_source
@@ -1306,7 +1299,7 @@ bool recording_screen(bool no_source)
                     default_event_handler(SYS_USB_CONNECTED);
                     done = true;
                     been_in_usb_mode = true;
-#ifdef HAVE_FMRADIO_IN
+#ifdef HAVE_FMRADIO_REC
                     radio_status = FMRADIO_OFF;
 #endif
                 }
@@ -1493,11 +1486,10 @@ bool recording_screen(bool no_source)
                                             PM_HEIGHT + 3, buf);
                 }
             }
-            else if(global_settings.rec_source == AUDIO_SRC_LINEIN
-#ifdef HAVE_FMRADIO_IN
-                    || global_settings.rec_source == AUDIO_SRC_FMRADIO
-#endif
-                    )
+            else if(0
+                HAVE_LINE_REC_( || global_settings.rec_source == AUDIO_SRC_LINEIN)
+                HAVE_FMRADIO_REC_( || global_settings.rec_source == AUDIO_SRC_FMRADIO)
+            )
             {
                 /* Draw LINE or FMRADIO recording gain */
                 snprintf(buf, sizeof(buf), "%s:%s",
@@ -1541,16 +1533,14 @@ bool recording_screen(bool no_source)
             {
                 switch (global_settings.rec_source)
                 {
-                case AUDIO_SRC_LINEIN:
-#ifdef HAVE_FMRADIO_IN
-                case AUDIO_SRC_FMRADIO:
-#endif
+                HAVE_LINE_REC_(case AUDIO_SRC_LINEIN:)
+                HAVE_FMRADIO_REC_(case AUDIO_SRC_FMRADIO:)
                     line[i] = 5;
                     break;
                 case AUDIO_SRC_MIC:
                     line[i] = 4;
                     break;
-#ifdef HAVE_SPDIF_IN
+#ifdef HAVE_SPDIF_REC
                 case AUDIO_SRC_SPDIF:
                     line[i] = 3;
                     break;
@@ -1615,12 +1605,11 @@ bool recording_screen(bool no_source)
                     screens[i].puts_style_offset(0, filename_offset[i] + 
                                         PM_HEIGHT + line[i], buf, STYLE_INVERT,0);
             }
-            else if (global_settings.rec_source == AUDIO_SRC_MIC
-                    || global_settings.rec_source == AUDIO_SRC_LINEIN
-#ifdef HAVE_FMRADIO_IN
-                    || global_settings.rec_source == AUDIO_SRC_FMRADIO
-#endif
-                    )    
+            else if (
+                global_settings.rec_source == AUDIO_SRC_MIC
+                HAVE_LINE_REC_(|| global_settings.rec_source == AUDIO_SRC_LINEIN)
+                HAVE_FMRADIO_REC_(|| global_settings.rec_source == AUDIO_SRC_FMRADIO)
+                )    
             {
                 for(i = 0; i < screen_update; i++) {
                     if (display_agc[i]) {
@@ -1629,7 +1618,7 @@ bool recording_screen(bool no_source)
                     }
                 }
             }
-            
+
             if (global_settings.rec_source == AUDIO_SRC_MIC)
             {
                 if(agc_maxgain < (global_settings.rec_mic_gain))
@@ -1642,7 +1631,7 @@ bool recording_screen(bool no_source)
                 if(agc_maxgain < (global_settings.rec_right_gain))
                     change_recording_gain(false, false, true);
             }
-#else
+#else  /* !HAVE_AGC */
             }
 #endif /* HAVE_AGC */
 
@@ -1758,7 +1747,7 @@ bool recording_screen(bool no_source)
     audio_stop_recording(); 
     audio_close_recording();
 
-#ifdef HAVE_FMRADIO_IN
+#ifdef HAVE_FMRADIO_REC
     if (radio_status != FMRADIO_OFF)
         /* Restore radio playback - radio_status should be unchanged if started
            through fm radio screen (barring usb connect) */

@@ -680,7 +680,7 @@ static void gui_statusbar_write_samplerate_info(struct screen * display)
 #ifdef SIMULATOR
     samprk = 44100;
 #else
-#ifdef HAVE_SPDIF_IN
+#ifdef HAVE_SPDIF_REC
     if (global_settings.rec_source == AUDIO_SRC_SPDIF)
         /* Use rate in use, not current measured rate if it changed */
         samprk = pcm_rec_sample_rate();
@@ -731,7 +731,7 @@ static void gui_statusbar_icon_recording_info(struct screen * display)
     gui_statusbar_write_samplerate_info(display);
 #else /* !SWCODEC */
     /* hwcodec targets have sysfont characters */ 
-#ifdef HAVE_SPDIF_IN
+#ifdef HAVE_SPDIF_REC
     if (global_settings.rec_source == AUDIO_SRC_SPDIF)
     {
         /* Can't measure S/PDIF sample rate on Archos/Sim yet */

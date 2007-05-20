@@ -127,32 +127,37 @@ enum rec_channel_modes
 #define CHN_CAP_ALL     (CHN_CAP_STEREO | CHN_CAP_MONO)
 #endif /* CONFIG_CODEC == SWCODEC */
 
-/* audio sources */
 enum audio_sources
 {
-    AUDIO_SRC_PLAYBACK = -1,    /* for audio playback (default) */
-    AUDIO_SRC_MIC,              /* monitor mic */
-    AUDIO_SRC_LINEIN,           /* monitor line in */
-#ifdef HAVE_SPDIF_IN
-    AUDIO_SRC_SPDIF,            /* monitor spdif */
-#endif
-#if defined(HAVE_FMRADIO_IN) || CONFIG_TUNER
-    AUDIO_SRC_FMRADIO,          /* monitor fm radio */
-#endif
-    /* define new audio sources above this line */
-    AUDIO_SOURCE_LIST_END,
-    /* AUDIO_SRC_FMRADIO must be declared #if CONFIG_TUNER but is not in
-       the list of recordable sources. HAVE_FMRADIO_IN implies CONFIG_TUNER. */
-#if defined(HAVE_FMRADIO_IN) || (CONFIG_TUNER == 0)
-    AUDIO_NUM_SOURCES = AUDIO_SOURCE_LIST_END,
-#else
-    AUDIO_NUM_SOURCES = AUDIO_SOURCE_LIST_END-1,
-#endif
-    AUDIO_SRC_MAX = AUDIO_NUM_SOURCES-1
+    AUDIO_SRC_PLAYBACK = -1, /* Virtual source */
+    HAVE_MIC_IN_(AUDIO_SRC_MIC,)
+    HAVE_LINE_IN_(AUDIO_SRC_LINEIN,)
+    HAVE_SPDIF_IN_(AUDIO_SRC_SPDIF,)
+    HAVE_FMRADIO_IN_(AUDIO_SRC_FMRADIO,)
+    AUDIO_NUM_SOURCES,
+    AUDIO_SRC_MAX = AUDIO_NUM_SOURCES-1,
+    AUDIO_SRC_DEFAULT = AUDIO_SRC_PLAYBACK
 };
 
+#ifdef HAVE_RECORDING
+/* Recordable source implies it has the input as well */
+
+/* For now there's no restrictions on any targets with which inputs
+   are recordable so define them as equivalent - if they do differ,
+   special handling is needed right now. */
+enum rec_sources
+{
+    __REC_SRC_FIRST = -1,
+    HAVE_MIC_REC_(REC_SRC_MIC,)
+    HAVE_LINE_REC_(REC_SRC_LINEIN,)
+    HAVE_SPDIF_REC_(REC_SRC_SPDIF,)
+    HAVE_FMRADIO_REC_(REC_SRC_FMRADIO,)
+    REC_NUM_SOURCES
+};
+#endif /* HAVE_RECORDING */
+
 #if CONFIG_CODEC == SWCODEC
-/* selects an audio source for recording or playback */
+/* selects a source to monitor for recording or playback */
 #define SRCF_PLAYBACK         0x0000    /* default */
 #define SRCF_RECORDING        0x1000
 #if CONFIG_TUNER

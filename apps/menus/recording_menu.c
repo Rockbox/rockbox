@@ -67,21 +67,21 @@ int recmenu_callback(int action,const struct menu_item_ex *this_item);
 
 static int recsource_func(void)
 {
-    int n_opts = AUDIO_NUM_SOURCES;
+    int n_opts = REC_NUM_SOURCES;
 
     static const struct opt_items names[AUDIO_NUM_SOURCES] = {
-        [AUDIO_SRC_MIC]     = { STR(LANG_RECORDING_SRC_MIC) },
-        [AUDIO_SRC_LINEIN]  = { STR(LANG_RECORDING_SRC_LINE) },
-#ifdef HAVE_SPDIF_IN
-        [AUDIO_SRC_SPDIF]   = { STR(LANG_RECORDING_SRC_DIGITAL) },
-#endif
-#ifdef HAVE_FMRADIO_IN
-        [AUDIO_SRC_FMRADIO] = { STR(LANG_FM_RADIO) }
-#endif
+        HAVE_MIC_REC_([AUDIO_SRC_MIC]
+            = { STR(LANG_RECORDING_SRC_MIC) },)
+        HAVE_LINE_REC_([AUDIO_SRC_LINEIN]
+            = { STR(LANG_RECORDING_SRC_LINE) },)
+        HAVE_SPDIF_REC_([AUDIO_SRC_SPDIF]
+            = { STR(LANG_RECORDING_SRC_DIGITAL) },)
+        HAVE_FMRADIO_REC_([AUDIO_SRC_FMRADIO]
+            = { STR(LANG_FM_RADIO) },)
     };
 
     /* caveat: assumes it's the last item! */
-#ifdef HAVE_FMRADIO_IN
+#ifdef HAVE_FMRADIO_REC
     if (!radio_hardware_present())
         n_opts--;
 #endif
@@ -145,15 +145,15 @@ static int recfrequency_func(void)
     int              rec_frequency;
     bool             ret;
 
-#ifdef HAVE_SPDIF_IN
-    if (global_settings.rec_source == AUDIO_SRC_SPDIF)
+#ifdef HAVE_SPDIF_REC
+    if (global_settings.rec_source == REC_SRC_SPDIF)
     {
         /* Inform user that frequency follows the source's frequency */
         opts[0].string    = ID2P(LANG_SOURCE_FREQUENCY);
         opts[0].voice_id  = LANG_SOURCE_FREQUENCY;
         n_opts            = 1;
         rec_frequency     = 0;
-}
+    }
     else
 #endif
     {
@@ -189,9 +189,7 @@ static int recfrequency_func(void)
                      &rec_frequency, INT, opts, n_opts, NULL );
 
     if (!ret
-#ifdef HAVE_SPDIF_IN
-        && global_settings.rec_source != AUDIO_SRC_SPDIF
-#endif
+        HAVE_SPDIF_REC_( && global_settings.rec_source != REC_SRC_SPDIF)
     )
     {
         /* Translate back to full index */

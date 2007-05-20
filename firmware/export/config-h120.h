@@ -75,6 +75,11 @@
 /* define this if you have recording possibility */
 #define HAVE_RECORDING
 
+/* Define bitmask of input sources - recordable bitmask can be defined
+   explicitly if different */
+#define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_LINEIN | \
+                        SRC_CAP_FMRADIO | SRC_CAP_SPDIF)
+
 /* define hardware samples rate caps mask */
 #define HW_SAMPR_CAPS   (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11)
 
@@ -150,17 +155,11 @@
 
 #endif /* !SIMULATOR */
 
-/* Define this for S/PDIF input available */
-#define HAVE_SPDIF_IN
-
 /* Define this for S/PDIF output available */
 #define HAVE_SPDIF_OUT
 
 /* Define this if you can control the S/PDIF power */
 #define HAVE_SPDIF_POWER
-
-/* Define this for FM radio input available */
-#define HAVE_FMRADIO_IN
 
 /* Define this if you have a serial port */
 /*#define HAVE_SERIAL*/

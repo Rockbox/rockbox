@@ -40,7 +40,6 @@ void audio_set_source(int source, unsigned flags)
     {
         default:                        /* playback - no recording */
             source = AUDIO_SRC_PLAYBACK;
-#ifdef HAVE_RECORDING
         case AUDIO_SRC_PLAYBACK:
             if (source != last_source)
             {
@@ -48,6 +47,7 @@ void audio_set_source(int source, unsigned flags)
                 audiohw_set_monitor(false);
             }
         break;
+#ifdef HAVE_MIC_REC
         case AUDIO_SRC_MIC:             /* recording only */
             if (source != last_source)
             {
@@ -55,7 +55,8 @@ void audio_set_source(int source, unsigned flags)
                 audiohw_set_monitor(false);
             }
         break;
-
+#endif
+#ifdef HAVE_LINEIN_REC
         case AUDIO_SRC_LINEIN:          /* recording only */
             if (source != last_source)
             {
@@ -64,7 +65,7 @@ void audio_set_source(int source, unsigned flags)
             }
         break;
 #endif
-#if CONFIG_TUNER
+#ifdef HAVE_FMRADIO_REC
         case AUDIO_SRC_FMRADIO:         /* recording and playback */
             if (!recording)
                 audiohw_set_recvol(0, 0, AUDIO_GAIN_LINEIN);

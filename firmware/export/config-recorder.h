@@ -1,6 +1,10 @@
 /* define this if you have recording possibility */
 #define HAVE_RECORDING
 
+/* Define bitmask of input sources - recordable bitmask can be defined
+   explicitly if different */
+#define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_LINEIN | SRC_CAP_SPDIF)
+
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP
 
@@ -41,9 +45,6 @@
 
 /* Define this if you have a MAS3587F */
 #define CONFIG_CODEC MAS3587F
-
-/* Define this for S/PDIF input available */
-#define HAVE_SPDIF_IN
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT

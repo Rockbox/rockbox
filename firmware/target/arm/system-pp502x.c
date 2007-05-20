@@ -62,6 +62,11 @@ extern void clickwheel_int(void);
 void irq(void)
 {
     if(CURRENT_CORE == CPU) {
+        if (CPU_HI_INT_STAT)
+        {
+            gui_syncsplash(0, "%08X %08X", inl(0x6000414c), CPU_HI_INT_STAT);
+        }
+
         if (CPU_INT_STAT & TIMER1_MASK) {
 #ifdef SANSA_E200
             if (GPIOF_INT_STAT & 0xff)
@@ -238,6 +243,11 @@ void system_init(void)
         COP_INT_CLR         = -1;
         CPU_INT_CLR         = -1;
         INT_FORCED_CLR      = -1;
+
+        outl(0, 0x6000414c);
+        outl(0, 0x60004144);
+
+//        outl(0x80000, 0x6000414c);
 
         GPIOA_INT_EN        = 0;
         GPIOB_INT_EN        = 0;

@@ -156,8 +156,10 @@
 
 #endif /* !SIMULATOR */
 
-/* Define this for S/PDIF input available */
-#define HAVE_SPDIF_IN
+/* Define bitmask of input sources - recordable bitmask can be defined
+   explicitly if different */
+#define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_LINEIN | \
+                        SRC_CAP_FMRADIO | SRC_CAP_SPDIF)
 
 /* Define this for S/PDIF output available */
 #define HAVE_SPDIF_OUT

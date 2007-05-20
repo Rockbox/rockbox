@@ -204,6 +204,9 @@
 /* no known platform */
 #endif
 
+/* setup basic macros from capability masks */
+#include "config_caps.h"
+
 /* now set any CONFIG_ defines correctly if they are not used,
    No need to do this on CONFIG_'s which are compulsary (e.g CONFIG_CODEC ) */
 #ifndef CONFIG_TUNER

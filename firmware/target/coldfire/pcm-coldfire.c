@@ -22,7 +22,7 @@
 #include "logf.h"
 #include "audio.h"
 #include "sound.h"
-#if defined(HAVE_SPDIF_IN) || defined(HAVE_SPDIF_OUT)
+#if defined(HAVE_SPDIF_REC) || defined(HAVE_SPDIF_OUT)
 #include "spdif.h"
 #endif
 
@@ -276,7 +276,7 @@ void pcm_init(void)
     audiohw_set_frequency(freq_ent[FPARM_FSEL]);
     coldfire_set_pllcr_audio_bits(PLLCR_SET_AUDIO_BITS_DEFPARM);
 
-#if defined(HAVE_SPDIF_IN) || defined(HAVE_SPDIF_OUT)
+#if defined(HAVE_SPDIF_REC) || defined(HAVE_SPDIF_OUT)
     spdif_init();
 #endif
     /* Enable interrupt at level 6, priority 0 */
@@ -365,7 +365,7 @@ void pcm_rec_dma_start(void *addr, size_t size)
     _pcm_apply_settings(!is_playback_monitoring());
 
     /* Start the DMA transfer.. */
-#ifdef HAVE_SPDIF_IN
+#ifdef HAVE_SPDIF_REC
     /* clear: ebu1cnew, valnogood, symbolerr, parityerr */
     INTERRUPTCLEAR = (1 << 25) | (1 << 24) | (1 << 23) | (1 << 22);
 #endif
@@ -462,7 +462,7 @@ void DMA1(void)
         logf("  DCR1: %08x", DCR1);
 #endif
     }
-#ifdef HAVE_SPDIF_IN
+#ifdef HAVE_SPDIF_REC
     else if (DATAINCONTROL == 0xc038 &&
         (INTERRUPTSTAT & ((1 << 24) | (1 << 23) | (1 << 22))))
     {

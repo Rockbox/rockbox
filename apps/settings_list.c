@@ -747,14 +747,12 @@ const struct settings_list settings[] = {
         "rec split method", "Time,Filesize", NULL, 2,
         ID2P(LANG_REC_TIME), ID2P(LANG_REC_SIZE)),
     {F_T_INT,&global_settings.rec_source,LANG_RECORDING_SOURCE,INT(0),
-        "rec source","mic,line"
-#ifdef HAVE_SPDIF_IN
-        ",spdif"
-#endif
-#ifdef HAVE_FMRADIO_IN
-        ",fmradio"
-#endif
-    ,UNUSED},
+        "rec source",
+        &HAVE_MIC_REC_(",mic")
+         HAVE_LINE_REC_(",line")
+         HAVE_SPDIF_REC_(",spdif")
+         HAVE_FMRADIO_REC_(",fmradio")[1]
+        ,UNUSED},
     INT_SETTING(0, rec_prerecord_time, LANG_RECORD_PRERECORD_TIME,
                 0, "prerecording time",
                 UNIT_SEC, 0, 30, 1, rectime_formatter, rectime_getlang, NULL),

@@ -1429,7 +1429,7 @@ static int scan_presets(void)
 
 #ifdef HAVE_RECORDING
 
-#if defined(HAVE_FMRADIO_IN) && CONFIG_CODEC == SWCODEC
+#if defined(HAVE_FMRADIO_REC) && CONFIG_CODEC == SWCODEC
 #define FM_RECORDING_SCREEN
 static int fm_recording_screen(void)
 {
@@ -1450,9 +1450,9 @@ static int fm_recording_screen(void)
     return ret;
 }
 
-#endif /* defined(HAVE_FMRADIO_IN) && CONFIG_CODEC == SWCODEC */
+#endif /* defined(HAVE_FMRADIO_REC) && CONFIG_CODEC == SWCODEC */
 
-#if defined(HAVE_FMRADIO_IN) || CONFIG_CODEC != SWCODEC
+#if defined(HAVE_FMRADIO_REC) || CONFIG_CODEC != SWCODEC
 #define FM_RECORDING_SETTINGS
 static int fm_recording_settings(void)
 {
@@ -1471,7 +1471,7 @@ static int fm_recording_settings(void)
     return ret;
 }
 
-#endif /* defined(HAVE_FMRADIO_IN) || CONFIG_CODEC != SWCODEC */
+#endif /* defined(HAVE_FMRADIO_REC) || CONFIG_CODEC != SWCODEC */
 #endif /* HAVE_RECORDING */
 
 #ifdef FM_RECORDING_SCREEN

@@ -21,7 +21,7 @@
 #define PCM_RECORD_H
 
 #define DMA_REC_ERROR_DMA       (-1)
-#ifdef HAVE_SPDIF_IN
+#ifdef HAVE_SPDIF_REC
 #define DMA_REC_ERROR_SPDIF     (-2)
 #endif
 
