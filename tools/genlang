@@ -182,6 +182,8 @@ if($english) {
     open(ENG, "<$english") || die "can't open $english";
     my @phrase;
     my $id;
+    my $maybeid;
+    my $withindest;
     while(<ENG>) {
 
         # get rid of DOS newlines
@@ -191,28 +193,54 @@ if($english) {
             # this is the start of a phrase
         }
         elsif($_ =~ /^ *\<\/phrase\>/) {
-            # this is the end of a phrase, add it to the english hash
-            $english{$id}=join("", @phrase);
+
+            # if id is something, when we count and store this phrase
+            if($id) {
+                # voice-only entries get a difference range
+                if($id =~ /^VOICE_/) {
+                    # Assign an ID number to this entry
+                    $idmap{$id}=$vidnum;
+                    $vidnum++;
+                }
+                else {
+                    # Assign an ID number to this entry
+                    $idmap{$id}=$idnum;
+                    $idnum++;
+                    print STDERR "DEST: bumped idnum to $idnum\n";
+                }
+
+                # this is the end of a phrase, add it to the english hash
+                $english{$id}=join("", @phrase);
+            }
             undef @phrase;
+            $id="";
         }
         elsif($_ ne "\n") {
             # gather everything related to this phrase
             push @phrase, $_;
+            if($_ =~ /^ *\<dest\>/i) {
+                $withindest=1;
+            }
+            elsif($withindest && ($_ =~ /^ *\<\/dest\>/i)) {
+                $withindest=0;
+            }
+            elsif($withindest && ($_ =~ / *([^:]+): *(.*)/)) {
+                my ($name, $val)=($1, $2);
+                $dest=""; # in case it is left untouched for when the
+                # model name isn't "our"
+                dest($_, $name, $val);
+
+                print STDERR "DEST: \"$dest\" for $name / $id\n";
+
+                if($dest && ($dest ne "none")) {
+                    $id = $maybeid;
+                    print STDERR "DEST: use this id $id\n";
+                }
+            }
         }
 
         if($_ =~ /^ *id: ([^ \t\n]+)/i) {
-            $id=$1;
-            # voice-only entries get a difference range
-            if($id =~ /^VOICE_/) {
-                # Assign an ID number to this entry
-                $idmap{$id}=$vidnum;
-                $vidnum++;
-            }
-            else {
-                # Assign an ID number to this entry
-                $idmap{$id}=$idnum;
-                $idnum++;
-            }
+            $maybeid=$1;
         }
     }
     close(ENG);
