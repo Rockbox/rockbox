@@ -55,16 +55,11 @@ static void as3514_write(int reg, int value)
 /* convert tenth of dB volume to master volume register value */
 int tenthdb2master(int db)
 {
-    /* +6 to -40.43dB in 1.5dB steps == 32 levels = 5 bits */
-    /* 11111 == +6dB  (0x1f) = 31) */
-    /* 11110 == -4.5dB  (0x1e) = 30) */
-    /* 00001 == -39dB (0x01) */
-    /* 00000 == -40.5dB (0x00) */
-
+    /* +6 to -73.5dB in 1.5dB steps == 53 levels */
     if (db < VOLUME_MIN) {
         return 0x0;
     } else if (db >= VOLUME_MAX) {
-        return 0x1f;
+        return 0x35;
     } else {
         return((db-VOLUME_MIN)/15); /* VOLUME_MIN is negative */
     }
@@ -147,16 +142,35 @@ void audiohw_enable_output(bool enable)
 
 int audiohw_set_master_vol(int vol_l, int vol_r)
 {
-    vol_l &= 0x1f;
-    vol_r &= 0x1f;
+    int hph_r = as3514_regs[HPH_OUT_R] & ~0x1f;
+    int hph_l = as3514_regs[HPH_OUT_L] & ~0x1f;
 
     /* we are controling dac volume instead of headphone volume,
        as the volume is bigger.
        HDP: 1.07 dB gain
        DAC: 6 dB gain
     */
-    as3514_write(DAC_R, vol_r);
-    as3514_write(DAC_L, 0x40 | vol_l);
+    if(vol_r <= 0x16)
+    {
+        as3514_write(DAC_R, vol_r);
+        as3514_write(HPH_OUT_R, hph_r);  /* set 0 */
+    }
+    else
+    {
+        as3514_write(DAC_R, 0x16);
+        as3514_write(HPH_OUT_R, hph_r + (vol_r - 0x16));
+    }
+
+    if(vol_l <= 0x16)
+    {
+        as3514_write(DAC_L, 0x40 + vol_l);
+        as3514_write(HPH_OUT_L, hph_l);  /* set 0 */
+    }
+    else
+    {
+        as3514_write(DAC_L, 0x40 + 0x16);
+        as3514_write(HPH_OUT_L, hph_l + (vol_l - 0x16));
+    }
 
     return 0;
 }
