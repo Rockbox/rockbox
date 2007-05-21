@@ -340,7 +340,12 @@ static void dump_wps_tokens(struct wps_data *data)
                 break;
 
             case WPS_TOKEN_FILE_FREQUENCY:
-                snprintf(buf, sizeof(buf), "%sfile audio frequency",
+                snprintf(buf, sizeof(buf), "%sfile audio frequency in Hz",
+                         next_str(next));
+                break;
+
+            case WPS_TOKEN_FILE_FREQUENCY_KHZ:
+                snprintf(buf, sizeof(buf), "%sfile audio frequency in KHz",
                          next_str(next));
                 break;
 

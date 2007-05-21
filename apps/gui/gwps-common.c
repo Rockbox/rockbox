@@ -943,6 +943,16 @@ static char *get_token_value(struct gui_wps *gwps,
             snprintf(buf, buf_size, "%ld", id3->frequency);
             return buf;
 
+        case WPS_TOKEN_FILE_FREQUENCY_KHZ:
+            /* ignore remainders < 100, so 22050 Hz becomes just 22k */
+            if ((id3->frequency % 1000) < 100)
+                snprintf(buf, buf_size, "%ld", id3->frequency / 1000);
+            else
+                snprintf(buf, buf_size, "%ld.%d",
+                        id3->frequency / 1000,
+                        (id3->frequency % 1000) / 100);
+            return buf;
+
         case WPS_TOKEN_FILE_NAME:
             if (get_dir(buf, buf_size, id3->path, 0)) {
                 /* Remove extension */
