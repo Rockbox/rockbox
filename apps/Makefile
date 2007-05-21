@@ -171,7 +171,7 @@ endif
 ifeq ($(UNAME), Darwin)
 SIMULATOR_MAP=
 else
-SIMULATOR_MAP=-Wl,-Map,$(OBJDIR)/rockbox.map
+#SIMULATOR_MAP=-Wl,-Map,$(OBJDIR)/rockbox.map
 endif
 
 $(BUILDDIR)/$(BINARY) : $(OBJS) $(DEPFILE) $(BUILDDIR)/libsim.a \
