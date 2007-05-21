@@ -66,11 +66,18 @@ Statusbar: on
 
 <wps>
 Name: zezayer.wps
-RWPS: rockbox_default.rwps
+RWPS: zezayer.rwps
 Author: Jake Owen
 Font: nedore-8.fnt
 Statusbar: on
 </wps>
+
+<rwps>
+Name: zezayer.rwps
+Author: Dominik Riebeling
+Font: nedore-8.fnt
+Statusbar: on
+</rwps>
 
 <rwps>
 Name: rockbox_default.rwps
