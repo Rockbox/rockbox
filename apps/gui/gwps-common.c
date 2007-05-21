@@ -1106,6 +1106,8 @@ static char *get_token_value(struct gui_wps *gwps,
 
         case WPS_TOKEN_RTC_MONTH:
             /* m: month (01..12) */
+            if (intval)
+                *intval = tm->tm_mon + 1;
             snprintf(buf, buf_size, "%02d", tm->tm_mon + 1);
             return buf;
 
@@ -1151,11 +1153,15 @@ static char *get_token_value(struct gui_wps *gwps,
 
         case WPS_TOKEN_RTC_DAY_OF_WEEK_START_MON:
             /* u: day of week (1..7); 1 is Monday */
+            if (intval)
+                *intval = (tm->tm_wday == 0) ? 7 : tm->tm_wday;
             snprintf(buf, buf_size, "%1d", tm->tm_wday + 1);
             return buf;
 
         case WPS_TOKEN_RTC_DAY_OF_WEEK_START_SUN:
             /* w: day of week (0..6); 0 is Sunday */
+            if (intval)
+                *intval = tm->tm_wday + 1;
             snprintf(buf, buf_size, "%1d", tm->tm_wday);
             return buf;
 #endif
