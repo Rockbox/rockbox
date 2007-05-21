@@ -9,18 +9,16 @@
 # This is the Korean language file.
 # 이 파일은 한국어 언어 파일입니다.
 #
-# Translated by Jeong Taek In, David J. Song
-#
+# Translated by Jeong Taek In.
+# Base on english.lang 13441 (2007 May 20)
 #
 # *알립니다*
 #
 # 만약 새로운 스트링을 추가하고 싶으시다면, 이 파일 하단에 추가해 주시기 바랍니다.
-# 만약 기본의 스트링을 제거하고 싶으시다면, 실제로 제거하지 마시고, 그냥 빈칸으로 놔두시기 바랍니다.
+# 만약 기본의 스트링을 제거하고 싶으시다면, 실제로 제거하지 말고 빈칸으로 놔두시기 바랍니다.
 #
 # 만약 코드들을 다시 정리하거나 스트링을 제거하려면,
 # 'genlang' 도구와 언어 로더 코드 양쪽 모두를 이진 언어 파일 버전 번호로 변경하여야 합니다.
-#
-# 'voice'에는 언어 UI에 우리가 원하는 문장의 발음을 어떻게 말해야 하는지를 담고있습니다.
 #
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -114,7 +112,7 @@
     *: "Loading..."
   </source>
   <dest>
-    *: "불러오는 중입니다..."
+    *: "불러오고 있습니다..."
   </dest>
   <voice>
     *: ""
@@ -128,7 +126,7 @@
     *: "Press OFF to shut down"
   </source>
   <dest>
-    *: "[정지] 버튼을 누르면 종료합니다."
+    *: "[꺼짐] 버튼을 누르면 종료합니다."
   </dest>
   <voice>
     *: ""
@@ -307,7 +305,7 @@
   desc: in the main menu
   user:
   <source>
-    *: "Playlist Options"
+    *: "Playlist"
   </source>
   <dest>
     *: "재생목록 관리"
@@ -321,7 +319,7 @@
   desc: in the main menu
   user:
   <source>
-    *: "Browse Plugins"
+    *: "Plugins"
   </source>
   <dest>
     *: "플러그인 보기"
@@ -335,7 +333,7 @@
   desc: in the main menu
   user:
   <source>
-    *: "Info"
+    *: "System"
   </source>
   <dest>
     *: "시스템 정보"
@@ -352,10 +350,10 @@
     *: "Shut down"
   </source>
   <dest>
-    *: "종료"
+    *: "시스템 종료"
   </dest>
   <voice>
-    *: "종료"
+    *: "시스템 종료"
   </voice>
 </phrase>
 <phrase>
@@ -422,10 +420,10 @@
     *: "Channels"
   </source>
   <dest>
-    *: "채널 선택"
+    *: "채널"
   </dest>
   <voice>
-    *: "채널 선택"
+    *: "채널"
   </voice>
 </phrase>
 <phrase>
@@ -439,7 +437,7 @@
     *: "채널 선택"
   </dest>
   <voice>
-    *: ""
+    *: "채널 선택"
   </voice>
 </phrase>
 <phrase>
@@ -520,10 +518,10 @@
     *: "Karaoke"
   </source>
   <dest>
-    *: "노래방"
+    *: "음성 제거"
   </dest>
   <voice>
-    *: "노래방"
+    *: "음성 제거"
   </voice>
 </phrase>
 <phrase>
@@ -632,10 +630,10 @@
     *: "MDB Harmonics"
   </source>
   <dest>
-    *: "MDB 하모니"
+    *: "MDB 조화"
   </dest>
   <voice>
-    *: "MDB 하모니"
+    *: "MDB 조화"
   </voice>
 </phrase>
 <phrase>
@@ -660,10 +658,10 @@
     *: "MDB Shape"
   </source>
   <dest>
-    *: "MDB 모양"
+    *: "MDB 형태"
   </dest>
   <voice>
-    *: "MDB 모양"
+    *: "MDB 형태"
   </voice>
 </phrase>
 <phrase>
@@ -808,16 +806,16 @@
 </phrase>
 <phrase>
   id: LANG_FIRMWARE
-  desc: in the main menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Browse Firmwares"
+    *: ""
   </source>
   <dest>
-    *: "펌웨어 보기"
+    *: deprecated
   </dest>
   <voice>
-    *: "펌웨어 보기"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -842,7 +840,7 @@
     *: "Are You Sure?"
   </source>
   <dest>
-    *: "이 설정대로 하시겠습니까?"
+    *: "정말 초기화 하시겠습니까?"
   </dest>
   <voice>
     *: ""
@@ -855,10 +853,20 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
+    ipod*: "SELECT = Yes"
+    x5: "SELECT = Yes"
+    h10,h10_5gb: "SELECT = Yes"
+    gigabeatf: "SELECT = Yes"
+    e200: "SELECT = Yes"
   </source>
   <dest>
     *: "[재생]: 예"
     h100,h120,h300: "[NAVI]: 예"
+    ipod*: "[선택]: 예"
+    x5: "[선택]: 예"
+    h10,h10_5gb: "[선택]: 예"
+    gigabeatf: "[선택]: 예"
+    e200: "[선택]: 예"
   </dest>
   <voice>
     *: ""
@@ -995,13 +1003,13 @@
   desc: in the recording sub menu
   user:
   <source>
-    *: "Recording Screen"
+    *: "Recording"
   </source>
   <dest>
-    *: "녹음 하기"
+    *: "녹음"
   </dest>
   <voice>
-    *: "녹음 하기"
+    *: "녹음"
   </voice>
 </phrase>
 <phrase>
@@ -1043,7 +1051,7 @@
     *: "그래픽 EQ"
   </dest>
   <voice>
-    *: "그래픽 EQ"
+    *: "그래픽 이퀄라이저"
   </voice>
 </phrase>
 <phrase>
@@ -1071,7 +1079,7 @@
     *: "간단 EQ 설정"
   </dest>
   <voice>
-    *: "간단 EQ 설정"
+    *: "간단 이퀄라이저 설정"
   </voice>
 </phrase>
 <phrase>
@@ -1085,7 +1093,7 @@
     *: "고급 EQ 설정"
   </dest>
   <voice>
-    *: "고급 EQ 설정"
+    *: "고급 이퀄라이저 설정"
   </voice>
 </phrase>
 <phrase>
@@ -1099,7 +1107,7 @@
     *: "EQ 설정 저장"
   </dest>
   <voice>
-    *: "EQ 설정 저장"
+    *: "이퀄라이저 설정 저장"
   </voice>
 </phrase>
 <phrase>
@@ -1113,7 +1121,7 @@
     *: "EQ 설정 보기"
   </dest>
   <voice>
-    *: "EQ 설정 보기"
+    *: "이퀄라이저 설정 보기"
   </voice>
 </phrase>
 <phrase>
@@ -1138,7 +1146,7 @@
     *: "%d Hz Band Gain"
   </source>
   <dest>
-    *: "%d Hz 대역 증폭"
+    *: "%dHz 밴드 조정"
   </dest>
   <voice>
     *: ""
@@ -1152,10 +1160,10 @@
     *: "Low Shelf Filter"
   </source>
   <dest>
-    *: "저주파수 대역"
+    *: "저단 밴드 조정"
   </dest>
   <voice>
-    *: "저주파수 대역"
+    *: "저단 밴드 조정"
   </voice>
 </phrase>
 <phrase>
@@ -1166,10 +1174,10 @@
     *: "Peak Filter %d"
   </source>
   <dest>
-    *: "%d번 주파수 대역"
+    *: "%d번 밴드 조정"
   </dest>
   <voice>
-    *: "중주파수 대역"
+    *: "밴드 조정"
   </voice>
 </phrase>
 <phrase>
@@ -1180,10 +1188,10 @@
     *: "High Shelf Filter"
   </source>
   <dest>
-    *: "고주파수 대역"
+    *: "고단 밴드 조정"
   </dest>
   <voice>
-    *: "고주파수 대역"
+    *: "고단 밴드 조정"
   </voice>
 </phrase>
 <phrase>
@@ -1197,7 +1205,7 @@
     *: "Cutoff Frequency"
   </dest>
   <voice>
-    *: "차단 주파수"
+    *: "주파수 차단"
   </voice>
 </phrase>
 <phrase>
@@ -1306,10 +1314,10 @@
     *: "Warn When Erasing Dynamic Playlist"
   </source>
   <dest>
-    *: "현재 재생목록 삭제시 경고"
+    *: "현재 재생목록 삭제시 알림"
   </dest>
   <voice>
-    *: "현재 재생목록 삭제시 경고" 
+    *: "현재 재생목록 삭제시 알림"
   </voice>
 </phrase>
 <phrase>
@@ -1348,10 +1356,10 @@
     *: "Debug (Keep Out!)"
   </source>
   <dest>
-    *: "디버깅 모드 (만지지 말 것)"
+    *: "디버깅 모드 (접근금지)"
   </dest>
   <voice>
-    *: "디버깅 모드, 만지지 말 것"
+    *: "디버깅 모드 (접근금지)"
   </voice>
 </phrase>
 <phrase>
@@ -1362,7 +1370,7 @@
     *: "USB (Sim)"
   </source>
   <dest>
-    *: "USB (Sim)"
+    *: "USB (시뮬레이터용)"
   </dest>
   <voice>
     *: ""
@@ -1454,16 +1462,16 @@
 </phrase>
 <phrase>
   id: LANG_RESUME
-  desc: in settings_menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Resume on Startup"
+    *: ""
   </source>
   <dest>
-    *: "시작시 자동 재생"
+    *: deprecated
   </dest>
   <voice>
-    *: "시작시 자동 재생"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1502,10 +1510,10 @@
     *: "Fade on Stop/Pause"
   </source>
   <dest>
-    *: "정지/일시정지시 페이드 인"
+    *: "음악 정지시 페이드 인"
   </dest>
   <voice>
-    *: "정지/일시정지시 페이드 인"
+    *: "음악 정지시 페이드 인"
   </voice>
 </phrase>
 <phrase>
@@ -1628,10 +1636,10 @@
     *: "ID3 Tag Priority"
   </source>
   <dest>
-    *: "ID3 태그 중요도"
+    *: "ID3 태그 우선순위"
   </dest>
   <voice>
-    *: "ID3 태그 중요도"
+    *: "ID3 태그 우선순위"
   </voice>
 </phrase>
 <phrase>
@@ -1642,10 +1650,10 @@
     *: "V1 then V2"
   </source>
   <dest>
-    *: "V2보다 V1 우선"
+    *: "V1 우선"
   </dest>
   <voice>
-    *: "V2보다 V1 우선"
+    *: "버전 2 보다 버전 1 우선"
   </voice>
 </phrase>
 <phrase>
@@ -1656,10 +1664,10 @@
     *: "V2 then V1"
   </source>
   <dest>
-    *: "V1보다 V2 우선"
+    *: "V2 우선"
   </dest>
   <voice>
-    *: "V1보다 V2 우선"
+    *: "버전 1 보다 버전 2 우선"
   </voice>
 </phrase>
 <phrase>
@@ -1670,10 +1678,10 @@
     *: "Auto-Change Directory"
   </source>
   <dest>
-    *: "폴더 간 자동으로 이동"
+    *: "폴더 간 자동 이동"
   </dest>
   <voice>
-    *: "폴더 간 자동으로 이동"
+    *: "폴더 간 자동 이동"
   </voice>
 </phrase>
 <phrase>
@@ -1681,13 +1689,13 @@
   desc: in settings menu
   user:
   <source>
-    *: "Tag Cache"
+    *: "Database"
   </source>
   <dest>
-    *: "태그 캐시"
+    *: "음악 DB"
   </dest>
   <voice>
-    *: "태그 캐시"
+    *: "음악 DB"
   </voice>
 </phrase>
 <phrase>
@@ -1751,10 +1759,10 @@
   desc: while initializing tagcache on boot
   user:
   <source>
-    *: "Committing tagcache"
+    *: "Committing database"
   </source>
   <dest>
-    *: "태그 캐시 적용 중..."
+    *: "음악 DB 업데이트 중..."
   </dest>
   <voice>
     *: ""
@@ -1824,10 +1832,10 @@
     *: "Alphabetical"
   </source>
   <dest>
-    *: "알파벳 순으로 정렬"
+    *: "이름"
   </dest>
   <voice>
-    *: "알파벳 순으로 정렬"
+    *: "이름"
   </voice>
 </phrase>
 <phrase>
@@ -1838,10 +1846,10 @@
     *: "By Date"
   </source>
   <dest>
-    *: "날짜 순으로 정렬"
+    *: "날짜"
   </dest>
   <voice>
-    *: "날짜 순으로 정렬"
+    *: "날짜"
   </voice>
 </phrase>
 <phrase>
@@ -1852,10 +1860,10 @@
     *: "By Newest Date"
   </source>
   <dest>
-    *: "수정한 날짜 순으로 정렬"
+    *: "수정한 날짜"
   </dest>
   <voice>
-    *: "수정한 날짜 순으로 정렬"
+    *: "수정한 날짜"
   </voice>
 </phrase>
 <phrase>
@@ -1866,10 +1874,10 @@
     *: "By Type"
   </source>
   <dest>
-    *: "종류별로 정렬"
+    *: "형식"
   </dest>
   <voice>
-    *: "종류별로 정렬"
+    *: "형식"
   </voice>
 </phrase>
 <phrase>
@@ -1947,13 +1955,13 @@
   desc: show ID3 Database
   user:
   <source>
-    *: "ID3 Database"
+    *: "Database"
   </source>
   <dest>
-    *: "ID3 데이터베이스"
+    *: "음악 DB"
   </dest>
   <voice>
-    *: "ID3 데이터베이스"
+    *: "음악 DB"
   </voice>
 </phrase>
 <phrase>
@@ -1964,10 +1972,10 @@
     *: "Follow Playlist"
   </source>
   <dest>
-    *: "재생중인 파일의 폴더로 이동"
+    *: "재생중인 폴더로 이동"
   </dest>
   <voice>
-    *: "재생중인 파일의 폴더로 이동"
+    *: "재생중인 폴더로 이동"
   </voice>
 </phrase>
 <phrase>
@@ -1978,10 +1986,10 @@
     *: "Show Icons"
   </source>
   <dest>
-    *: "파일명 앞에 아이콘 표시"
+    *: "아이콘 표시"
   </dest>
   <voice>
-    *: "파일명 앞에 아이콘 표시"
+    *: "아이콘 표시"
   </voice>
 </phrase>
 <phrase>
@@ -2009,7 +2017,7 @@
     *: "WPS 선택"
   </dest>
   <voice>
-    *: "WPS 선택"
+    *: "재생화면 선택"
   </voice>
 </phrase>
 <phrase>
@@ -2023,7 +2031,7 @@
     *: "리모컨 WPS 선택"
   </dest>
   <voice>
-    *: "리모컨 WPS 선택"
+    *: "리모컨 재생화면 선택"
   </voice>
 </phrase>
 <phrase>
@@ -2076,10 +2084,10 @@
     *: "Status-/Scrollbar"
   </source>
   <dest>
-    *: "정보/스크롤바 설정"
+    *: "정보/스크롤 바 설정"
   </dest>
   <voice>
-    *: "정보/스크롤바 설정"
+    *: "정보/스크롤 바 설정"
   </voice>
 </phrase>
 <phrase>
@@ -2454,10 +2462,10 @@
     *: "Ask - Recent only"
   </source>
   <dest>
-    *: "최근의 북마크만 매회 묻기"
+    *: "최근의 북마크만 매번 확인"
   </dest>
   <voice>
-    *: "최근의 북마크만 매회 묻기"
+    *: "최근의 북마크만 매번 확인"
   </voice>
 </phrase>
 <phrase>
@@ -2468,10 +2476,10 @@
     *: "Load Last Bookmark"
   </source>
   <dest>
-    *: "마지막 북마크 열기"
+    *: "최근 북마크 열기"
   </dest>
   <voice>
-    *: "마지막 북마크 열기"
+    *: "최근 북마크 열기"
   </voice>
 </phrase>
 <phrase>
@@ -2594,10 +2602,10 @@
     *: "Quality"
   </source>
   <dest>
-    *: "음질"
+    *: "녹음 품질"
   </dest>
   <voice>
-    *: "음질"
+    *: "녹음 품질"
   </voice>
 </phrase>
 <phrase>
@@ -2608,10 +2616,10 @@
     *: "Frequency"
   </source>
   <dest>
-    *: "오디오 샘플 속도"
+    *: "비트 전송률"
   </dest>
   <voice>
-    *: "오디오 샘플 속도"
+    *: "비트 전송률"
   </voice>
 </phrase>
 <phrase>
@@ -2634,12 +2642,15 @@
   user:
   <source>
     *: "Mic"
+    h100,h120,h300: "내장 마이크"
   </source>
   <dest>
     *: "마이크"
+    h100,h120,h300: "내장 마이크"
   </dest>
   <voice>
     *: "마이크"
+    h100,h120,h300: "내장 마이크"
   </voice>
 </phrase>
 <phrase>
@@ -2692,24 +2703,24 @@
     *: "Independent Frames"
   </source>
   <dest>
-    *: "독립적인 프레임"
+    *: "독립 프레임"
   </dest>
   <voice>
-    *: "독립적인 프레임"
+    *: "독립 프레임"
   </voice>
 </phrase>
 <phrase>
   id: LANG_RECORD_TIMESPLIT
-  desc: Prompt for record timer interval setting, in the record settings menu
+  desc: Record split menu
   user:
   <source>
-    *: "Time Split"
+    *: "File Split Options"
   </source>
   <dest>
-    *: "녹음 시간 분할 설정"
+    *: "분할 녹음 설정"
   </dest>
   <voice>
-    *: "녹음 시간 분할 설정"
+    *: "분할 녹음 설정"
   </voice>
 </phrase>
 <phrase>
@@ -2720,10 +2731,10 @@
     *: "Prerecord Time"
   </source>
   <dest>
-    *: "녹음 시간 미리 설정"
+    *: "녹음 시간 설정"
   </dest>
   <voice>
-    *: "녹음 시간 미리 설정"
+    *: "녹음 시간 설정"
   </voice>
 </phrase>
 <phrase>
@@ -2734,10 +2745,10 @@
     *: "Directory"
   </source>
   <dest>
-    *: "저장폴더 선택"
+    *: "저장 폴더 선택"
   </dest>
   <voice>
-    *: "저장폴더 선택"
+    *: "저장 폴더 선택"
   </voice>
 </phrase>
 <phrase>
@@ -2748,24 +2759,24 @@
     *: "Current Directory"
   </source>
   <dest>
-    *: "현재 폴더에 저장"
+    *: "현재 폴더"
   </dest>
   <voice>
-    *: "현재 폴더에 저장"
+    *: "현재 폴더"
   </voice>
 </phrase>
 <phrase>
   id: LANG_RECORD_STARTUP
-  desc: Start Rockbox in Recording Screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "Show Recording Screen on Startup"
+    *: ""
   </source>
   <dest>
-    *: "녹음 화면에서 시작하기"
+    *: deprecated
   </dest>
   <voice>
-    *: "녹음 화면에서 시작하기"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2804,10 +2815,10 @@
     *: "Main Unit Only"
   </source>
   <dest>
-    *: "본체만"
+    *: "본체만 켜기"
   </dest>
   <voice>
-    *: "본체만"
+    *: "본체만 켜기"
   </voice>
 </phrase>
 <phrase>
@@ -2818,10 +2829,10 @@
     *: "Remote Unit Only"
   </source>
   <dest>
-    *: "리모컨만"
+    *: "리모컨만 켜기"
   </dest>
   <voice>
-    *: "리모컨만"
+    *: "리모컨만 켜기"
   </voice>
 </phrase>
 <phrase>
@@ -2832,10 +2843,10 @@
     *: "Main and Remote Unit"
   </source>
   <dest>
-    *: "본체와 리모컨 모두"
+    *: "모두 켜기"
   </dest>
   <voice>
-    *: "본체와 리모컨 모두"
+    *: "모두 켜기"
   </voice>
 </phrase>
 <phrase>
@@ -2849,7 +2860,7 @@
     *: "되/빨리감기 범위"
   </dest>
   <voice>
-    *: "범위"
+    *: "최소 범위"
   </voice>
 </phrase>
 <phrase>
@@ -2888,10 +2899,10 @@
     *: "Track Skip Only"
   </source>
   <dest>
-    *: "곡 변경시에만"
+    *: "곡 변경시에만 사용"
   </dest>
   <voice>
-    *: "곡 변경시에만"
+    *: "곡 변경시에만 사용"
   </voice>
 </phrase>
 <phrase>
@@ -3000,10 +3011,10 @@
     *: "Prevent Clipping"
   </source>
   <dest>
-    *: "볼륨 자동조정 막기"
+    *: "소리 깨짐 방지"
   </dest>
   <voice>
-    *: "볼륨 자동조정 막기"
+    *: "소리 깨짐 방지"
   </voice>
 </phrase>
 <phrase>
@@ -3112,10 +3123,10 @@
     *: "Caption Backlight"
   </source>
   <dest>
-    *: "음악 시작/종료시 조명켜기"
+    *: "음악 시작/종료시 조명 켜기"
   </dest>
   <voice>
-    *: "음악 시작/종료시 조명켜기"
+    *: "음악 시작/종료시 조명 켜기"
   </voice>
 </phrase>
 <phrase>
@@ -3182,10 +3193,10 @@
     *: "First Keypress Enables Backlight Only"
   </source>
   <dest>
-    *: "버튼 한번 누르면 조명 켜지기"
+    *: "버튼 한번 누르면 조명 켜기"
   </dest>
   <voice>
-    *: "버튼 한번 누르면 조명 켜지기"
+    *: "버튼 한번 누르면 조명 켜기"
   </voice>
 </phrase>
 <phrase>
@@ -3266,10 +3277,10 @@
     *: "Pointer"
   </source>
   <dest>
-    *: "화살표로 표시"
+    *: "화살표"
   </dest>
   <voice>
-    *: "화살표로 표시"
+    *: "화살표"
   </voice>
 </phrase>
 <phrase>
@@ -3280,10 +3291,10 @@
     *: "Bar (Inverse)"
   </source>
   <dest>
-    *: "줄 형태로 표시 (반전)"
+    *: "선택 막대 (반전)"
   </dest>
   <voice>
-    *: "줄 형태로 반전 표시"
+    *: "반전된 선택 막대"
   </voice>
 </phrase>
 <phrase>
@@ -3350,10 +3361,10 @@
     *: "Reduce Ticking"
   </source>
   <dest>
-    *: "딸깍 소리 줄이기"
+    *: "리모컨 효과음 내기"
   </dest>
   <voice>
-    *: "딸깍 소리 줄이기"
+    *: "리모컨 효과음 내기"
   </voice>
 </phrase>
 <phrase>
@@ -3378,7 +3389,7 @@
     *: "Scroll Speed Setting Example"
   </source>
   <dest>
-    *: "[문자 흐름 속도 설정을 미리보기 위한 예시입니다.]"
+    *: "[문자 흐름 속도 설정을 미리보기 위한 예시입니다]"
   </dest>
   <voice>
     *: ""
@@ -3392,10 +3403,10 @@
     *: "Scroll Start Delay"
   </source>
   <dest>
-    *: "문자 흐름 시작 지연시간"
+    *: "문자 흐름 지연시간"
   </dest>
   <voice>
-    *: "문자 흐름 시작 지연시간"
+    *: "문자 흐름 지연시간"
   </voice>
 </phrase>
 <phrase>
@@ -3420,7 +3431,7 @@
     *: "Scroll Step Size Setting Example Text"
   </source>
   <dest>
-    *: "[문자 흐름 크기 설정을 미리보기 위한 예시입니다.]"
+    *: "[문자 흐름 크기 설정을 미리보기 위한 예시입니다]"
   </dest>
   <voice>
     *: ""
@@ -3504,10 +3515,10 @@
     *: "Screen Scroll Step Size"
   </source>
   <dest>
-    *: "긴 문자 흐름 크기"
+    *: "화면 이동 크기"
   </dest>
   <voice>
-    *: "긴 문자 흐름 크기"
+    *: "화면 이동 크기"
   </voice>
 </phrase>
 <phrase>
@@ -3518,10 +3529,10 @@
     *: "Paged Scrolling"
   </source>
   <dest>
-    *: "빠른 페이지 넘김"
+    *: "빠른 페이지 넘김 사용"
   </dest>
   <voice>
-    *: "빠른 페이지 넘김"
+    *: "빠른 페이지 넘김 사용"
   </voice>
 </phrase>
 <phrase>
@@ -3602,10 +3613,10 @@
     *: "Graphic"
   </source>
   <dest>
-    *: "그림으로 표시"
+    *: "그림"
   </dest>
   <voice>
-    *: "그림으로 표시"
+    *: "그림"
   </voice>
 </phrase>
 <phrase>
@@ -3616,10 +3627,10 @@
     *: "Numeric"
   </source>
   <dest>
-    *: "숫자로 표시"
+    *: "숫자"
   </dest>
   <voice>
-    *: "숫자로 표시"
+    *: "숫자"
   </voice>
 </phrase>
 <phrase>
@@ -3630,10 +3641,10 @@
     *: "Peak Release"
   </source>
   <dest>
-    *: "피크 미터 속도 설정"
+    *: "피크 미터 속도"
   </dest>
   <voice>
-    *: "피크 미터 속도 설정"
+    *: "피크 미터 속도"
   </voice>
 </phrase>
 <phrase>
@@ -3658,10 +3669,10 @@
     *: "Peak Hold Time"
   </source>
   <dest>
-    *: "피크 미터 시간 설정"
+    *: "피크 미터 시간"
   </dest>
   <voice>
-    *: "피크 미터 시간 설정"
+    *: "피크 미터 시간"
   </voice>
 </phrase>
 <phrase>
@@ -3672,10 +3683,10 @@
     *: "Clip Hold Time"
   </source>
   <dest>
-    *: "고음 표시 시간 설정"
+    *: "고음 표시 시간"
   </dest>
   <voice>
-    *: "고음 표시 시간 설정"
+    *: "고음 표시 시간"
   </voice>
 </phrase>
 <phrase>
@@ -3798,10 +3809,10 @@
     *: "Alkaline"
   </source>
   <dest>
-    *: "알카라인 배터리"
+    *: "알카라인 건전지"
   </dest>
   <voice>
-    *: "알카라인 배터리"
+    *: "알카라인 건전지"
   </voice>
 </phrase>
 <phrase>
@@ -3812,10 +3823,10 @@
     *: "NiMH"
   </source>
   <dest>
-    *: "니켈 수소 전지"
+    *: "니켈수소 충전지"
   </dest>
   <voice>
-    *: "니켈 수소 전지"
+    *: "Nickel metal hydride"
   </voice>
 </phrase>
 <phrase>
@@ -3834,16 +3845,16 @@
 </phrase>
 <phrase>
   id: LANG_POWEROFF
-  desc: disk poweroff flag
+  desc: DEPRECATED
   user:
   <source>
-    *: "Disk Poweroff"
+    *: ""
   </source>
   <dest>
-    *: "디스크 대기시간"
+    *: deprecated
   </dest>
   <voice>
-    *: "디스크 대기시간"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3854,10 +3865,10 @@
     *: "Directory Cache"
   </source>
   <dest>
-    *: "디렉토리 캐시"
+    *: "디렉토리 캐시 사용"
   </dest>
   <voice>
-    *: "디렉토리 캐시"
+    *: "디렉토리 캐시 사용"
   </voice>
 </phrase>
 <phrase>
@@ -3910,10 +3921,10 @@
     *: "Time Format"
   </source>
   <dest>
-    *: "시간 표시 방식"
+    *: "시간표시 방식"
   </dest>
   <voice>
-    *: "시간 표시 방식"
+    *: "시간표시 방식"
   </voice>
 </phrase>
 <phrase>
@@ -3924,10 +3935,10 @@
     *: "12 Hour Clock"
   </source>
   <dest>
-    *: "12시간 단위"
+    *: "12시간 기준"
   </dest>
   <voice>
-    *: "12시간 단위"
+    *: "12시간 기준"
   </voice>
 </phrase>
 <phrase>
@@ -3938,10 +3949,10 @@
     *: "24 Hour Clock"
   </source>
   <dest>
-    *: "24시간 단위"
+    *: "24시간 기준"
   </dest>
   <voice>
-    *: "24시간 단위"
+    *: "24시간 기준"
   </voice>
 </phrase>
 <phrase>
@@ -3952,10 +3963,10 @@
     *: "Max Files in Dir Browser"
   </source>
   <dest>
-    *: "한 폴더의 최대 파일 수"
+    *: "폴더 내 최대 파일 수"
   </dest>
   <voice>
-    *: "한 폴더의 최대 파일 수"
+    *: "폴더 내 최대 파일 수"
   </voice>
 </phrase>
 <phrase>
@@ -4106,7 +4117,7 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "같은 이름의 파일/폴더가 있습니다. 덮어 쓰시겠습니까?"
+    *: "같은 이름이 존재합니다. 덮어 쓰시겠습니까?"
   </dest>
   <voice>
     *: ""
@@ -4148,10 +4159,10 @@
     *: "Delete Directory"
   </source>
   <dest>
-    *: "폴더 삭제"
+    *: "삭제하기"
   </dest>
   <voice>
-    *: "폴더 삭제"
+    *: "삭제하기"
   </voice>
 </phrase>
 <phrase>
@@ -4218,10 +4229,10 @@
     *: "Pitch"
   </source>
   <dest>
-    *: "재생속도 변경"
+    *: "재생속도 조절"
   </dest>
   <voice>
-    *: "재생속도 변경"
+    *: "재생속도 조절"
   </voice>
 </phrase>
 <phrase>
@@ -4260,10 +4271,10 @@
     *: "Insert"
   </source>
   <dest>
-    *: "현재 재생목록에 삽입"
+    *: "재생목록에 삽입"
   </dest>
   <voice>
-    *: "현재 재생목록에 삽입"
+    *: "재생목록에 삽입"
   </voice>
 </phrase>
 <phrase>
@@ -4274,10 +4285,10 @@
     *: "Insert next"
   </source>
   <dest>
-    *: "현재 재생목록 다음에 삽입"
+    *: "다음곡으로 삽입"
   </dest>
   <voice>
-    *: "현재 재생목록 다음에 삽입"
+    *: "다음곡으로 삽입"
   </voice>
 </phrase>
 <phrase>
@@ -4288,10 +4299,10 @@
     *: "Insert last"
   </source>
   <dest>
-    *: "현재 재생목록 마지막에 삽입"
+    *: "마지막곡에 삽입"
   </dest>
   <voice>
-    *: "현재 재생목록 마지막에 삽입"
+    *: "마지막곡에 삽입"
   </voice>
 </phrase>
 <phrase>
@@ -4302,10 +4313,10 @@
     *: "Insert shuffled"
   </source>
   <dest>
-    *: "무작위 순서로 재생목록에 삽입"
+    *: "임의순서로 삽입"
   </dest>
   <voice>
-    *: "무작위 순서로 재생목록에 삽입"
+    *: "임의순서로 삽입"
   </voice>
 </phrase>
 <phrase>
@@ -4316,10 +4327,10 @@
     *: "Queue"
   </source>
   <dest>
-    *: "현재 재생목록에 예약"
+    *: "재생목록에 예약"
   </dest>
   <voice>
-    *: "현재 재생목록에 예약"
+    *: "재생목록에 예약"
   </voice>
 </phrase>
 <phrase>
@@ -4330,10 +4341,10 @@
     *: "Queue next"
   </source>
   <dest>
-    *: "현재 재생목록 다음에 예약"
+    *: "다음곡으로 예약"
   </dest>
   <voice>
-    *: "현재 재생목록 다음에 예약"
+    *: "다음곡으로 예약"
   </voice>
 </phrase>
 <phrase>
@@ -4344,10 +4355,10 @@
     *: "Queue last"
   </source>
   <dest>
-    *: "현재 재생목록 마지막에 예약"
+    *: "마지막곡에 예약"
   </dest>
   <voice>
-    *: "현재 재생목록 마지막에 예약"
+    *: "마지막곡에 예약"
   </voice>
 </phrase>
 <phrase>
@@ -4358,10 +4369,10 @@
     *: "Queue shuffled"
   </source>
   <dest>
-    *: "무작위 순서로 재생목록에 예약"
+    *: "임의순서로 예약"
   </dest>
   <voice>
-    *: "무작위 순서로 재생목록에 예약"
+    *: "임의순서로 예약"
   </voice>
 </phrase>
 <phrase>
@@ -4473,7 +4484,7 @@
     *: "배터리 충전 중입니다."
   </dest>
   <voice>
-    *: ""
+    *: "배터리 충전 중입니다."
   </voice>
 </phrase>
 <phrase>
@@ -4487,7 +4498,7 @@
     *: "외장 배터리팩 사용 중입니다."
   </dest>
   <voice>
-    *: ""
+    *: "외장 배터리팩 사용 중입니다."
   </voice>
 </phrase>
 <phrase>
@@ -4501,7 +4512,7 @@
     *: "배터리 미완충 상태입니다."
   </dest>
   <voice>
-    *: ""
+    *: "배터리 미완충 상태입니다."
   </voice>
 </phrase>
 <phrase>
@@ -4509,10 +4520,14 @@
   desc: battery level in % and estimated time remaining
   user:
   <source>
-    *: "%d%% %dh %dm"
+    *: "Battery: %d%% %dh %dm"
+    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
-    *: "배터리: %d%% (약 %d시간 %d분 남음)"
+    *: "배터리: %d%% (%d시간 %d분)"
+    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %d시간 %d분"
+    h10,ipodmini,ipodmini2g: "배터리: %d%% %d시간 %d분"
   </dest>
   <voice>
     *: "배터리 레벨"
@@ -4585,7 +4600,7 @@
     *: ""
   </dest>
   <voice>
-    *: "현재 시각:"
+    *: "현재 시각"
   </voice>
 </phrase>
 <phrase>
@@ -4638,7 +4653,7 @@
     *: "Mode:"
   </source>
   <dest>
-    *: "모드: "
+    *: "모드:"
   </dest>
   <voice>
     *: ""
@@ -4694,7 +4709,7 @@
     *: "Down = List"
   </source>
   <dest>
-    *: "[아래]: 리스트"
+    *: "[아래]: 목록"
   </dest>
   <voice>
     *: ""
@@ -4705,12 +4720,22 @@
   desc: From the bookmark list screen, allows user to exit
   user:
   <source>
-    *: "[꺼짐]: 나가기"
-    h100,h120,h300: "[정지]: 나가기"
+    *: "OFF = Exit"
+    h100,h120,h300: "STOP = Exit"
+    ipod*: "PLAY/PAUSE = Exit"
+    x5: "RECORD = Exit"
+    h10,h10_5gb: "PREV = Exit"
+    gigabeatf: "A = Exit"
+    e200: "POWER = Exit"
   </source>
   <dest>
-    *: "OFF = Exit"
+    *: "[꺼짐]: 나가기"
     h100,h120,h300: "[정지]: 나가기"
+    ipod*: "[재생/일시정지]: 나가기"
+    x5: "[녹음]: 나가기"
+    h10,h10_5gb: "[이전]: 나가기"
+    gigabeatf: "[A버튼]: 나가기"
+    e200: "[전원]: 나가기"
   </dest>
   <voice>
     *: ""
@@ -4724,7 +4749,7 @@
     *: "Bookmark"
   </source>
   <dest>
-    *: "북마크"
+    *: "북마크 수"
   </dest>
   <voice>
     *: ""
@@ -4738,10 +4763,10 @@
     *: "Index"
   </source>
   <dest>
-    *: "색인"
+    *: "순서"
   </dest>
   <voice>
-    *: "색인"
+    *: "순서"
   </voice>
 </phrase>
 <phrase>
@@ -4765,10 +4790,20 @@
   <source>
     *: "PLAY = Select"
     h100,h120,h300: "NAVI = Select"
+    ipod*: "SELECT = Select"
+    x5: "SELECT = Select"
+    h10,h10_5gb: "SELECT = Select"
+    gigabeatf: "SELECT = Select"
+    e200: "SELECT = Select"
   </source>
   <dest>
     *: "[재생]: 선택"
     h100,h120,h300: "[NAVI]: 선택"
+    ipod*: "[선택]: 선택"
+    x5: "[선택]: 선택"
+    h10,h10_5gb: "[선택]: 선택"
+    gigabeatf: "[선택]: 선택"
+    e200: "[선택]: 선택"
   </dest>
   <voice>
     *: ""
@@ -4781,10 +4816,20 @@
   <source>
     *: "ON+Play = Delete"
     h100,h120,h300: "RECORD = Delete"
+    ipod*: "Long MENU = Delete"
+    x5: "Long RECORD = Delete"
+    h10,h10_5gb: "REWIND = Delete"
+    gigabeatf: "POWER = Delete"
+    e200: "PLAY = Delete"
   </source>
   <dest>
     *: "[켜짐]+[재생]: 삭제"
     h100,h120,h300: "[녹음]: 삭제"
+    ipod*: "[메뉴버튼 길게]: 삭제"
+    x5: "[녹음버튼 길게]: 삭제"
+    h10,h10_5gb: "[되감기]: 삭제"
+    gigabeatf: "[전원]: 삭제"
+    e200: "[재생]: 삭제"
   </dest>
   <voice>
     *: ""
@@ -4798,7 +4843,7 @@
     *: "Load Last Bookmark?"
   </source>
   <dest>
-    *: "마지막 북마크를 여시겠습니까?"
+    *: "최근 북마크를 여시겠습니까?"
   </dest>
   <voice>
     *: ""
@@ -4854,7 +4899,7 @@
     *: "Bookmark Empty"
   </source>
   <dest>
-    *: "북마크 파일이 없습니다."
+    *: "북마크가 없습니다."
   </dest>
   <voice>
     *: ""
@@ -4865,12 +4910,22 @@
   desc: used in set_time()
   user:
   <source>
-    *: "ON To Set"
+    *: "ON = Set"
     h100,h120,h300: "NAVI = Set"
+    ipod*: "SELECT = Set"
+    x5: "SELECT = Set"
+    h10,h10_5gb: "SELECT = Set"
+    gigabeatf: "SELECT = Set"
+    e200: "SELECT = Set"
   </source>
   <dest>
     *: "[재생]: 설정 저장"
     h100,h120,h300: "[NAVI]: 설정 저장"
+    ipod*: "[선택]: 설정 저장"
+    x5: "[선택]: 설정 저장"
+    h10,h10_5gb: "[선택]: 설정 저장"
+    gigabeatf: "[선택]: 설정 저장"
+    e200: "[선택]: 설정 저장"
   </dest>
   <voice>
     *: ""
@@ -4881,12 +4936,22 @@
   desc: used in set_time()
   user:
   <source>
-    *: "[꺼짐]: 원상태 복구"
-    h100,h120,h300: "[정지]: 원상태 복구"
+    *: "OFF = Revert"
+    h100,h120,h300: "STOP = Revert"
+    ipod*: "MENU = Revert"
+    x5: "RECORD = Revert"
+    h10,h10_5gb: "PREV = Revert"
+    gigabeatf: "POWER = Revert"
+    e200: "PREV = Revert"
   </source>
   <dest>
-    *: "OFF To Revert"
+    *: "[꺼짐]: 원상태 복구"
     h100,h120,h300: "[정지]: 원상태 복구"
+    ipod*: "[메뉴]: 원상태 복구"
+    x5: "[녹음]: 원상태 복구"
+    h10,h10_5gb: "[이전]: 원상태 복구"
+    gigabeatf: "[전원]: 원상태 복구"
+    e200: "[이전]: 원상태 복구"
   </dest>
   <voice>
     *: ""
@@ -4956,7 +5021,7 @@
     *: "Time:"
   </source>
   <dest>
-    *: "시간:"
+    *: "녹음 시간:"
   </dest>
   <voice>
     *: ""
@@ -4984,7 +5049,7 @@
     *: "Size:"
   </source>
   <dest>
-    *: "용량:"
+    *: "파일 크기:"
   </dest>
   <voice>
     *: ""
@@ -5140,7 +5205,7 @@
     *: "Start Above"
   </source>
   <dest>
-    *: "설정값 이상일 때 녹음 시작"
+    *: "녹음 시작 볼륨"
   </dest>
   <voice>
     *: ""
@@ -5154,7 +5219,7 @@
     *: "for at least"
   </source>
   <dest>
-    *: "적어도 설정값까지 녹음"
+    *: "지속 시간"
   </dest>
   <voice>
     *: ""
@@ -5168,7 +5233,7 @@
     *: "Stop Below"
   </source>
   <dest>
-    *: "설정값 이하일 때 녹음 정지"
+    *: "녹음 정지 볼륨"
   </dest>
   <voice>
     *: ""
@@ -5182,7 +5247,7 @@
     *: "for at least"
   </source>
   <dest>
-    *: "적어도 설정값까지 녹음"
+    *: "지속 시간"
   </dest>
   <voice>
     *: ""
@@ -5196,7 +5261,7 @@
     *: "Presplit Gap"
   </source>
   <dest>
-    *: "격차 미리 분할"
+    *: "분할 공백설정"
   </dest>
   <voice>
     *: ""
@@ -5232,7 +5297,7 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_TRIGGER_ACTIVE
-  desc: 
+  desc:
   user:
   <source>
     *: "Trigger Active"
@@ -5306,9 +5371,11 @@
   user:
   <source>
     *: "PLAY=Set OFF=Cancel"
+    ipod*: "SELECT=Set MENU=Cancel"
   </source>
   <dest>
-    *: "[재생]: 설정   [꺼짐]: 취소"
+    *: "PLAY=Set OFF=Cancel"
+    ipod*: "[재생]: 설정   [꺼짐]: 취소"
   </dest>
   <voice>
     *: ""
@@ -5392,7 +5459,7 @@
     *: "[Artist]"
   </source>
   <dest>
-    *: "[가수명]"
+    *: "[음악가]"
   </dest>
   <voice>
     *: ""
@@ -5406,7 +5473,7 @@
     *: "[Album]"
   </source>
   <dest>
-    *: "[앨범명]"
+    *: "[앨범]"
   </dest>
   <voice>
     *: ""
@@ -5574,7 +5641,7 @@
     *: "[Path]"
   </source>
   <dest>
-    *: "[경로]"
+    *: "[파일 위치]"
   </dest>
   <voice>
     *: ""
@@ -5700,7 +5767,7 @@
     *: "Jan"
   </source>
   <dest>
-    *: "1월"
+    *: "01"
   </dest>
   <voice>
     *: "1월"
@@ -5714,7 +5781,7 @@
     *: "Feb"
   </source>
   <dest>
-    *: "2월"
+    *: "02"
   </dest>
   <voice>
     *: "2월"
@@ -5728,7 +5795,7 @@
     *: "Mar"
   </source>
   <dest>
-    *: "3월"
+    *: "03"
   </dest>
   <voice>
     *: "3월"
@@ -5742,7 +5809,7 @@
     *: "Apr"
   </source>
   <dest>
-    *: "4월"
+    *: "04"
   </dest>
   <voice>
     *: "4월"
@@ -5756,7 +5823,7 @@
     *: "May"
   </source>
   <dest>
-    *: "5월"
+    *: "05"
   </dest>
   <voice>
     *: "5월"
@@ -5770,7 +5837,7 @@
     *: "Jun"
   </source>
   <dest>
-    *: "6월"
+    *: "06"
   </dest>
   <voice>
     *: "6월"
@@ -5784,7 +5851,7 @@
     *: "Jul"
   </source>
   <dest>
-    *: "7월"
+    *: "07"
   </dest>
   <voice>
     *: "7월"
@@ -5798,7 +5865,7 @@
     *: "Aug"
   </source>
   <dest>
-    *: "8월"
+    *: "08"
   </dest>
   <voice>
     *: "8월"
@@ -5812,7 +5879,7 @@
     *: "Sep"
   </source>
   <dest>
-    *: "9월"
+    *: "09"
   </dest>
   <voice>
     *: "9월"
@@ -5826,7 +5893,7 @@
     *: "Oct"
   </source>
   <dest>
-    *: "10월"
+    *: "10"
   </dest>
   <voice>
     *: "10월"
@@ -5840,7 +5907,7 @@
     *: "Nov"
   </source>
   <dest>
-    *: "11월"
+    *: "11"
   </dest>
   <voice>
     *: "11월"
@@ -5854,7 +5921,7 @@
     *: "Dec"
   </source>
   <dest>
-    *: "12월"
+    *: "12"
   </dest>
   <voice>
     *: "12월"
@@ -6291,7 +6358,7 @@
     *: ""
   </dest>
   <voice>
-    *: "100만"
+    *: "백만"
   </voice>
 </phrase>
 <phrase>
@@ -6305,7 +6372,7 @@
     *: ""
   </dest>
   <voice>
-    *: "10억"
+    *: "십억"
   </voice>
 </phrase>
 <phrase>
@@ -6347,7 +6414,7 @@
     *: ""
   </dest>
   <voice>
-    *: "1000분의 1초"
+    *: "밀리세컨드"
   </voice>
 </phrase>
 <phrase>
@@ -6417,7 +6484,7 @@
     *: ""
   </dest>
   <voice>
-    *: "시"
+    *: "시간"
   </voice>
 </phrase>
 <phrase>
@@ -6431,7 +6498,7 @@
     *: ""
   </dest>
   <voice>
-    *: "시"
+    *: "시간"
   </voice>
 </phrase>
 <phrase>
@@ -6487,7 +6554,7 @@
     *: ""
   </dest>
   <voice>
-    *: "mAh"
+    *: "밀리암페어아워"
   </voice>
 </phrase>
 <phrase>
@@ -6515,7 +6582,7 @@
     *: ""
   </dest>
   <voice>
-    *: "분의 초"
+    *: "초당"
   </voice>
 </phrase>
 <phrase>
@@ -7033,7 +7100,7 @@
     *: ""
   </dest>
   <voice>
-    *: "음악"
+    *: "오디오 파일"
   </voice>
 </phrase>
 <phrase>
@@ -7047,7 +7114,7 @@
     *: ""
   </dest>
   <voice>
-    *: "설정"
+    *: "설정 파일"
   </voice>
 </phrase>
 <phrase>
@@ -7061,7 +7128,7 @@
     *: ""
   </dest>
   <voice>
-    *: "재생 화면"
+    *: "재생 화면 파일"
   </voice>
 </phrase>
 <phrase>
@@ -7075,7 +7142,7 @@
     *: ""
   </dest>
   <voice>
-    *: "텍스트"
+    *: "텍스트 파일"
   </voice>
 </phrase>
 <phrase>
@@ -7089,7 +7156,7 @@
     *: ""
   </dest>
   <voice>
-    *: "플러그인"
+    *: "플러그인 파일"
   </voice>
 </phrase>
 <phrase>
@@ -7103,7 +7170,7 @@
     *: ""
   </dest>
   <voice>
-    *: "폰트"
+    *: "폰트 파일"
   </voice>
 </phrase>
 <phrase>
@@ -7117,7 +7184,7 @@
     *: ""
   </dest>
   <voice>
-    *: "북마크"
+    *: "북마크 파일"
   </voice>
 </phrase>
 <phrase>
@@ -7131,7 +7198,7 @@
     *: ""
   </dest>
   <voice>
-    *: "플래시"
+    *: "플래시 파일"
   </voice>
 </phrase>
 <phrase>
@@ -7145,7 +7212,7 @@
     *: ""
   </dest>
   <voice>
-    *: "펌웨어"
+    *: "펌웨어 파일"
   </voice>
 </phrase>
 <phrase>
@@ -7159,7 +7226,7 @@
     *: ""
   </dest>
   <voice>
-    *: "리모컨 재생 화면"
+    *: "리모컨 재생 화면 파일"
   </voice>
 </phrase>
 <phrase>
@@ -7173,7 +7240,7 @@
     *: ""
   </dest>
   <voice>
-    *: "키보드"
+    *: "키보드 파일"
   </voice>
 </phrase>
 <phrase>
@@ -7184,7 +7251,7 @@
     *: "Loading..."
   </source>
   <dest>
-    *: "불러오는 중입니다..."
+    *: "불러오고 있습니다..."
   </dest>
   <voice>
     *: ""
@@ -7212,7 +7279,7 @@
     *: "Playlist Buffer Full"
   </source>
   <dest>
-    *: "재생목록 버퍼가 꽉 찼습니다."
+    *: "재생목록 버퍼의 공간이 부족합니다."
   </dest>
   <voice>
     *: ""
@@ -7220,13 +7287,13 @@
 </phrase>
 <phrase>
   id: LANG_END_PLAYLIST_PLAYER
-  desc: when playlist has finished
+  desc: DEPRECATED
   user:
   <source>
-    *: "End of List"
+    *: ""
   </source>
   <dest>
-    *: "목록의 끝입니다."
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -7238,9 +7305,11 @@
   user:
   <source>
     *: "End of Song List"
+    player: "End of List"
   </source>
   <dest>
     *: "목록의 끝입니다."
+    player: "목록의 끝입니다."
   </dest>
   <voice>
     *: ""
@@ -7254,7 +7323,7 @@
     *: "Creating"
   </source>
   <dest>
-    *: "만드는 중입니다..."
+    *: "생성하고 있습니다..."
   </dest>
   <voice>
     *: ""
@@ -7520,7 +7589,7 @@
     *: "Menu"
   </source>
   <dest>
-    *: "메뉴"
+    *: "Menu"
   </dest>
   <voice>
     *: ""
@@ -7534,7 +7603,7 @@
     *: "Exit"
   </source>
   <dest>
-    *: "나가기"
+    *: "Exit"
   </dest>
   <voice>
     *: ""
@@ -7548,7 +7617,7 @@
     *: "Action"
   </source>
   <dest>
-    *: "작동"
+    *: "Action"
   </dest>
   <voice>
     *: ""
@@ -7562,7 +7631,7 @@
     *: "Preset"
   </source>
   <dest>
-    *: "채널 설정"
+    *: "Preset"
   </dest>
   <voice>
     *: ""
@@ -7576,7 +7645,7 @@
     *: "Add"
   </source>
   <dest>
-    *: "추가"
+    *: "Add"
   </dest>
   <voice>
     *: ""
@@ -7590,7 +7659,7 @@
     *: "Record"
   </source>
   <dest>
-    *: "녹음"
+    *: "Record"
   </dest>
   <voice>
     *: ""
@@ -7618,7 +7687,7 @@
     *: "Screen frozen!"
   </source>
   <dest>
-    *: "화면 멈춤!"
+    *: "화면 정지"
   </dest>
   <voice>
     *: ""
@@ -7632,10 +7701,10 @@
     *: "Auto-Scan Presets"
   </source>
   <dest>
-    *: "채널 자동저장"
+    *: "채널 자동 저장"
   </dest>
   <voice>
-    *: "채널 자동저장"
+    *: "채널 자동 저장"
   </voice>
 </phrase>
 <phrase>
@@ -7646,7 +7715,7 @@
     *: "Clear Current Presets?"
   </source>
   <dest>
-    *: "현재 설정된 채널들을 초기화합니까?"
+    *: "채널을 초기화 하시겠습니까?"
   </dest>
   <voice>
     *: ""
@@ -7688,7 +7757,7 @@
     *: "Mode:"
   </source>
   <dest>
-    *: "모드: "
+    *: "모드:"
   </dest>
   <voice>
     *: ""
@@ -7730,7 +7799,7 @@
     *: "Menu"
   </source>
   <dest>
-    *: "메뉴"
+    *: "Menu"
   </dest>
   <voice>
     *: ""
@@ -7744,7 +7813,7 @@
     *: "Option"
   </source>
   <dest>
-    *: "설정"
+    *: "Option"
   </dest>
   <voice>
     *: ""
@@ -7772,7 +7841,7 @@
     *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "폴더 버퍼의 공간이 부족합니다!"
+    *: "폴더 버퍼의 공간이 부족합니다."
   </dest>
   <voice>
     *: ""
@@ -7855,10 +7924,18 @@
   <source>
     *: "OFF to abort"
     h100,h120,h300: "STOP to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    x5: "Long PLAY to abort"
+    h10,h10_5gb: "PREV to abort"
+    e200: "PREV to abort"
   </source>
   <dest>
     *: "[꺼짐]: 취소"
     h100,h120,h300: "[정지]: 취소"
+    ipod*: "[재생/일시정지]: 취소"
+    x5: "[재생버튼 길게]: 취소"
+    h10,h10_5gb: "[이전]: 나가기"
+    e200: "[이전]: 나가기"
   </dest>
   <voice>
     *: ""
@@ -7942,7 +8019,7 @@
     *: "Artists"
   </source>
   <dest>
-    *: "가수별"
+    *: "음악가"
   </dest>
   <voice>
     *: ""
@@ -7956,7 +8033,7 @@
     *: "Albums"
   </source>
   <dest>
-    *: "앨범별"
+    *: "앨범"
   </dest>
   <voice>
     *: ""
@@ -7970,7 +8047,7 @@
     *: "Songs"
   </source>
   <dest>
-    *: "제목별"
+    *: "제목"
   </dest>
   <voice>
     *: ""
@@ -7984,7 +8061,7 @@
     *: "Genres"
   </source>
   <dest>
-    *: "장르별"
+    *: "장르"
   </dest>
   <voice>
     *: ""
@@ -7998,7 +8075,7 @@
     *: "Search"
   </source>
   <dest>
-    *: "검색하기"
+    *: "검색"
   </dest>
   <voice>
     *: ""
@@ -8012,7 +8089,7 @@
     *: "Search Artists"
   </source>
   <dest>
-    *: "가수명 검색"
+    *: "음악가 검색"
   </dest>
   <voice>
     *: ""
@@ -8026,7 +8103,7 @@
     *: "Search Albums"
   </source>
   <dest>
-    *: "앨범명 검색"
+    *: "앨범 검색"
   </dest>
   <voice>
     *: ""
@@ -8110,10 +8187,10 @@
     *: "Show Indices"
   </source>
   <dest>
-    *: "색인 보기"
+    *: "순서 보기"
   </dest>
   <voice>
-    *: "색인 보기"
+    *: "순서 보기"
   </voice>
 </phrase>
 <phrase>
@@ -8138,10 +8215,10 @@
     *: "Track Name Only"
   </source>
   <dest>
-    *: "트랙 이름만"
+    *: "트랙 이름만 보기"
   </dest>
   <voice>
-    *: "트랙 이름만"
+    *: "트랙 이름만 보기"
   </voice>
 </phrase>
 <phrase>
@@ -8261,7 +8338,7 @@
   desc: Extension array full
   user:
   <source>
-    *: "Extension array full"
+    *: "확장자의 길이가 너무 깁니다."
   </source>
   <dest>
     *: "확장자의 길이가 너무 깁니다."
@@ -8303,7 +8380,7 @@
   desc: Filetype string buffer empty
   user:
   <source>
-    *: "Filetype string buffer empty"
+    *: "파일형식 스트링 버퍼가 없습니다."
   </source>
   <dest>
     *: "파일형식 스트링 버퍼가 없습니다."
@@ -8387,10 +8464,10 @@
   desc: When you run the radio without an fmr file in settings
   user:
   <source>
-    *: "No Settings found, AutoScan?"
+    *: "No settings found. Autoscan?"
   </source>
   <dest>
-    *: "설정된 채널이 없습니다. 자동으로 저장하시겠습니까?"
+    *: "자동 선국하시겠습니까?"
   </dest>
   <voice>
     *: ""
@@ -8437,17 +8514,17 @@
   <voice>
     *: "직접 증폭"
   </voice>
-</phrase>   
+</phrase>
 <phrase>
   id: LANG_CROSSFEED_CROSS_GAIN
   desc: in crossfeed settings
-  <source>  
+  <source>
     *: "Cross Gain"
   </source>
-  <dest>  
+  <dest>
     *: "교차 증폭"
   </dest>
-  <voice>  
+  <voice>
     *: "교차 증폭"
   </voice>
 </phrase>
@@ -8494,13 +8571,13 @@
   id: LANG_TAGCACHE_BUSY
   desc: when trying to shutdown and tagcache is committing
   <source>
-    *: "Tagcache is not ready"
+    *: "Database is not ready"
   </source>
   <dest>
-    *: "태그 캐시가 준비되지 않았습니다."
+    *: "음악 DB가 없습니다."
   </dest>
   <voice>
-    *: "태그 캐시가 준비되지 않았습니다."
+    *: "음악 DB가 없습니다."
   </voice>
 </phrase>
 <phrase>
@@ -8511,7 +8588,7 @@
     *: "<All tracks>"
   </source>
   <dest>
-    *: "모든 음악"
+    *: "<모든 음악>"
   </dest>
   <voice>
     *: "모든 음악"
@@ -8544,13 +8621,13 @@
   <voice>
     *: "리모컨 문자 흐름 설정"
   </voice>
-</phrase>   
+</phrase>
 <phrase>
   id: LANG_TAGCACHE_UPDATE
   desc: in tag cache settings
   user:
   <source>
-    *: "Update now"
+    *: "Update Now"
   </source>
   <dest>
     *: "지금 업데이트하기"
@@ -8564,7 +8641,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Auto update"
+    *: "Auto Update"
   </source>
   <dest>
     *: "자동 업데이트"
@@ -8578,13 +8655,13 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Export modifications"
+    *: "Export Modifications"
   </source>
   <dest>
-    *: "변경사항 내보내기"
+    *: "변경 사항 내보내기"
   </dest>
   <voice>
-    *: "변경사항 내보내기"
+    *: "변경 사항 내보내기"
   </voice>
 </phrase>
 <phrase>
@@ -8592,13 +8669,13 @@
   desc: in onplay menu
   user:
   <source>
-    *: "Playlist catalog"
+    *: "Playlist Catalog"
   </source>
   <dest>
-    *: "재생목록 모음 관리"
+    *: "재생목록 모음"
   </dest>
   <voice>
-    *: "재생목록 모음 관리"
+    *: "재생목록 모음"
   </voice>
 </phrase>
 <phrase>
@@ -8606,7 +8683,7 @@
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "Add to playlist"
+    *: "Add to Playlist"
   </source>
   <dest>
     *: "재생목록에 추가"
@@ -8620,7 +8697,7 @@
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "Add to new playlist"
+    *: "Add to New Playlist"
   </source>
   <dest>
     *: "새 재생목록에 추가"
@@ -8634,7 +8711,7 @@
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "View catalog"
+    *: "View Catalog"
   </source>
   <dest>
     *: "재생목록들 보기"
@@ -8651,7 +8728,7 @@
     *: "%s doesn't exist"
   </source>
   <dest>
-    *: "%s 폴더가 존재하지 않습니다."
+    *: "%s가 존재하지 않습니다."
   </dest>
   <voice>
     *: ""
@@ -8662,7 +8739,7 @@
   desc: error message when no playlists for playlist catalog
   user:
   <source>
-    *: "No playlists"
+    *: "No Playlists"
   </source>
   <dest>
     *: "재생목록이 없습니다."
@@ -8676,13 +8753,13 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Import modifications"
+    *: "Import Modifications"
   </source>
   <dest>
-    *: "변경사항 들여오기"
+    *: "변경 사항 들여오기"
   </dest>
   <voice>
-    *: "변경사항 들여오기"
+    *: "변경 사항 들여오기"
   </voice>
 </phrase>
 <phrase>
@@ -8705,10 +8782,10 @@
     *: "What to do when Splitting"
   </source>
   <dest>
-    *: "분할시 기능 설정"
+    *: "분할 기능 설정"
   </dest>
   <voice>
-    *: "분할시 기능 설정"
+    *: "분할 기능 설정"
   </voice>
 </phrase>
 <phrase>
@@ -8745,10 +8822,10 @@
     *: "Time"
   </source>
   <dest>
-    *: "시간 기준으로 분할"
+    *: "시간"
   </dest>
   <voice>
-    *: "시간 기준으로 분할"
+    *: "시간"
   </voice>
 </phrase>
 <phrase>
@@ -8759,10 +8836,10 @@
     *: "Filesize"
   </source>
   <dest>
-    *: "파일 크기 기준으로 분할"
+    *: "파일 크기"
   </dest>
   <voice>
-    *: "파일 크기 기준으로 분할"
+    *: "파일 크기"
   </voice>
 </phrase>
 <phrase>
@@ -8773,10 +8850,10 @@
     *: "Start new file"
   </source>
   <dest>
-    *: "새로운 파일로 다시 시작"
+    *: "새로운 파일로 시작"
   </dest>
   <voice>
-    *: "새로운 파일로 다시 시작"
+    *: "새로운 파일로 시작"
   </voice>
 </phrase>
 <phrase>
@@ -8804,7 +8881,7 @@
     *: "리모컨 조명 끄기"
   </dest>
   <voice>
-    *: "Remote Display OFF"
+    *: "리모컨 조명 끄기"
   </voice>
 </phrase>
 <phrase>
@@ -8888,7 +8965,7 @@
     *: "Yes"
   </dest>
   <voice>
-    *: "Yes"
+    *: "예"
   </voice>
 </phrase>
 <phrase>
@@ -8902,7 +8979,7 @@
     *: "No"
   </dest>
   <voice>
-    *: "No"
+    *: "아니오"
   </voice>
 </phrase>
 <phrase>
@@ -8916,7 +8993,7 @@
     *: "On"
   </dest>
   <voice>
-    *: "On"
+    *: "사용"
   </voice>
 </phrase>
 <phrase>
@@ -8930,7 +9007,7 @@
     *: "Off"
   </dest>
   <voice>
-    *: "Off"
+    *: "사용안함"
   </voice>
 </phrase>
 <phrase>
@@ -8944,7 +9021,7 @@
     *: "Volume"
   </dest>
   <voice>
-    *: "Volume"
+    *: "볼륨 조절"
   </voice>
 </phrase>
 <phrase>
@@ -8958,7 +9035,7 @@
     *: "Stereo"
   </dest>
   <voice>
-    *: "Stereo"
+    *: "스테레오"
   </voice>
 </phrase>
 <phrase>
@@ -8972,7 +9049,7 @@
     *: "Mono"
   </dest>
   <voice>
-    *: "Mono"
+    *: "모노"
   </voice>
 </phrase>
 <phrase>
@@ -9000,7 +9077,7 @@
     *: "Cutoff Frequency"
   </dest>
   <voice>
-    *: "Cutoff Frequency"
+    *: "차단 주파수"
   </voice>
 </phrase>
 <phrase>
@@ -9014,7 +9091,7 @@
     *: "Gain"
   </dest>
   <voice>
-    *: "Gain"
+    *: "증폭"
   </voice>
 </phrase>
 <phrase>
@@ -9028,7 +9105,7 @@
     *: "Shuffle"
   </dest>
   <voice>
-    *: "Shuffle"
+    *: "임의 재생"
   </voice>
 </phrase>
 <phrase>
@@ -9042,7 +9119,7 @@
     *: "Repeat"
   </dest>
   <voice>
-    *: "Repeat"
+    *: "반복 재생"
   </voice>
 </phrase>
 <phrase>
@@ -9056,7 +9133,7 @@
     *: "All"
   </dest>
   <voice>
-    *: "All"
+    *: "모두"
   </voice>
 </phrase>
 <phrase>
@@ -9070,7 +9147,7 @@
     *: "One"
   </dest>
   <voice>
-    *: "One"
+    *: "한 곡"
   </voice>
 </phrase>
 <phrase>
@@ -9084,7 +9161,7 @@
     *: "A-B"
   </dest>
   <voice>
-    *: "A-B"
+    *: "A-B 구간반복"
   </voice>
 </phrase>
 <phrase>
@@ -9098,7 +9175,7 @@
     *: "Show Files"
   </dest>
   <voice>
-    *: "Show Files"
+    *: "파일 표시 설정"
   </voice>
 </phrase>
 <phrase>
@@ -9112,7 +9189,7 @@
     *: "All"
   </dest>
   <voice>
-    *: "All"
+    *: "모든 파일"
   </voice>
 </phrase>
 <phrase>
@@ -9126,7 +9203,7 @@
     *: "Supported"
   </dest>
   <voice>
-    *: "Supported"
+    *: "지원 파일"
   </voice>
 </phrase>
 <phrase>
@@ -9140,7 +9217,7 @@
     *: "Music"
   </dest>
   <voice>
-    *: "Music"
+    *: "음악 파일"
   </voice>
 </phrase>
 <phrase>
@@ -9154,7 +9231,7 @@
     *: "Playlists"
   </dest>
   <voice>
-    *: "Playlists"
+    *: "재생목록 파일"
   </voice>
 </phrase>
 <phrase>
@@ -9162,13 +9239,13 @@
   desc: show ID3 Database
   user:
   <source>
-    *: "ID3 Database"
+    *: "Database"
   </source>
   <dest>
-    *: "ID3 Database"
+    *: "Database"
   </dest>
   <voice>
-    *: "ID3 Database"
+    *: "음악 DB"
   </voice>
 </phrase>
 <phrase>
@@ -9182,7 +9259,7 @@
     *: "Quality"
   </dest>
   <voice>
-    *: "Quality"
+    *: "음질"
   </voice>
 </phrase>
 <phrase>
@@ -9196,7 +9273,7 @@
     *: "Frequency"
   </dest>
   <voice>
-    *: "Frequency"
+    *: "오디오 샘플 속도"
   </voice>
 </phrase>
 <phrase>
@@ -9210,7 +9287,7 @@
     *: "Source"
   </dest>
   <voice>
-    *: "Source"
+    *: "녹음 방식"
   </voice>
 </phrase>
 <phrase>
@@ -9218,13 +9295,13 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Mic"
+    *: "Int. Mic"
   </source>
   <dest>
-    *: "Mic"
+    *: "Int. Mic"
   </dest>
   <voice>
-    *: "Microphone"
+    *: "내장 마이크"
   </voice>
 </phrase>
 <phrase>
@@ -9238,7 +9315,7 @@
     *: "Line In"
   </dest>
   <voice>
-    *: "Line In"
+    *: "라인 입력"
   </voice>
 </phrase>
 <phrase>
@@ -9252,7 +9329,7 @@
     *: "Digital"
   </dest>
   <voice>
-    *: "Digital"
+    *: "디지털"
   </voice>
 </phrase>
 <phrase>
@@ -9266,7 +9343,7 @@
     *: "Channels"
   </dest>
   <voice>
-    *: "Channels"
+    *: "채널 선택"
   </voice>
 </phrase>
 <phrase>
@@ -9280,7 +9357,7 @@
     *: "Trigger"
   </dest>
   <voice>
-    *: "Trigger"
+    *: "음성 자동 감지"
   </voice>
 </phrase>
 <phrase>
@@ -9294,7 +9371,7 @@
     *: "Upside Down"
   </dest>
   <voice>
-    *: "Upside Down"
+    *: "화면상하 반전"
   </voice>
 </phrase>
 <phrase>
@@ -9308,7 +9385,7 @@
     *: "Scroll Bar"
   </dest>
   <voice>
-    *: "Scroll Bar"
+    *: "스크롤 바 사용"
   </voice>
 </phrase>
 <phrase>
@@ -9322,7 +9399,7 @@
     *: "Status Bar"
   </dest>
   <voice>
-    *: "Status Bar"
+    *: "상태 표시줄 사용"
   </voice>
 </phrase>
 <phrase>
@@ -9333,7 +9410,7 @@
     *: "Pitch"
   </source>
   <dest>
-    *: "재생속도 변경"
+    *: "Pitch"
   </dest>
   <voice>
     *: "재생속도 변경"
@@ -9347,7 +9424,7 @@
     *: "Pitch Up"
   </source>
   <dest>
-    *: "빠르게"
+    *: "Pitch Up"
   </dest>
   <voice>
     *: ""
@@ -9361,7 +9438,7 @@
     *: "Pitch Down"
   </source>
   <dest>
-    *: "느리게"
+    *: "Pitch Down"
   </dest>
   <voice>
     *: ""
@@ -9547,7 +9624,7 @@
     *: "Split Filesize"
   </dest>
   <voice>
-    *: "Split Filesize"
+    *: "분할 파일 크기"
   </voice>
 </phrase>
 <phrase>
@@ -9656,10 +9733,10 @@
     *: "Current Directory Only"
   </source>
   <dest>
-    *: "현재 폴더명만 표시"
+    *: "현재 폴더명만"
   </dest>
   <voice>
-    *: "현재 폴더명만 표시"
+    *: "현재 폴더명만"
   </voice>
 </phrase>
 <phrase>
@@ -9670,10 +9747,10 @@
     *: "Full Path"
   </source>
   <dest>
-    *: "전체 경로 표시"
+    *: "전체 경로"
   </dest>
   <voice>
-    *: "전체 경로 표시"
+    *: "전체 경로"
   </voice>
 </phrase>
 <phrase>
@@ -9686,7 +9763,7 @@
     *: "자동 이득 제어 (AGC)"
   </dest>
   <voice>
-    *: "자동 이득 제어 (AGC)"
+    *: "자동 이득 제어"
   </voice>
 </phrase>
 <phrase>
@@ -9696,10 +9773,10 @@
     *: "Safety (clip)"
   </source>
   <dest>
-    *: "Safety (clip)"
+    *: "무난하게 (자르기)"
   </dest>
   <voice>
-    *: "Safety (clip)"
+    *: "무난하게 (자르기)"
   </voice>
 </phrase>
 <phrase>
@@ -9709,10 +9786,10 @@
     *: "Live (slow)"
   </source>
   <dest>
-    *: "Live (slow)"
+    *: "라이브 (천천히)"
   </dest>
   <voice>
-    *: "Live (slow)"
+    *: "라이브 (천천히)"
   </voice>
 </phrase>
 <phrase>
@@ -9722,10 +9799,10 @@
     *: "DJ-Set (slow)"
   </source>
   <dest>
-    *: "DJ-Set (slow)"
+    *: "DJ-Set (천천히)"
   </dest>
   <voice>
-    *: "DJ set (slow)"
+    *: "DJ set (천천히)"
   </voice>
 </phrase>
 <phrase>
@@ -9735,10 +9812,10 @@
     *: "Medium"
   </source>
   <dest>
-    *: "Medium"
+    *: "중간"
   </dest>
   <voice>
-    *: "Medium"
+    *: "중간"
   </voice>
 </phrase>
 <phrase>
@@ -9748,10 +9825,10 @@
     *: "Voice (fast)"
   </source>
   <dest>
-    *: "Voice (fast)"
+    *: "보이스 (빠르게)"
   </dest>
   <voice>
-    *: "Voice (fast)"
+    *: "보이스 (빠르게)"
   </voice>
 </phrase>
 <phrase>
@@ -9761,10 +9838,10 @@
     *: "AGC clip time"
   </source>
   <dest>
-    *: "AGC 다듬기 시간"
+    *: "AGC 보정 시간"
   </dest>
   <voice>
-    *: "AGC 다듬기 시간"
+    *: "AGC 보정 시간"
   </voice>
 </phrase>
 <phrase>
@@ -9787,15 +9864,15 @@
     *: "AGC max. gain"
   </source>
   <dest>
-    *: "AGC max. gain"
+    *: "AGC 최대 증폭"
   </dest>
   <voice>
-    *: "AGC maximum gain"
+    *: "AGC 최대 증폭"
   </voice>
 </phrase>
 <phrase>
   id: VOICE_KBIT_PER_SEC
-  desc: spoken only, for file extension
+  desc: spoken only, a unit postfix
   user:
   <source>
     *: ""
@@ -9804,7 +9881,7 @@
     *: ""
   </dest>
   <voice>
-    *: "초 분의 킬로바이트"
+    *: "초당 킬로바이트"
   </voice>
 </phrase>
 <phrase>
@@ -9826,13 +9903,13 @@
   desc: in settings_menu.
   user:
   <source>
-    *: "Pause on headphone unplug"
+    *: "Pause on Headphone Unplug"
   </source>
   <dest>
-    *: "이어폰 미연결시 음악 일시정지"
+    *: "이어폰 해제시 음악 일시정지"
   </dest>
   <voice>
-    *: "이어폰 미연결시 음악 일시정지"
+    *: "이어폰 해제시 음악 일시정지"
   </voice>
 </phrase>
 <phrase>
@@ -9854,7 +9931,7 @@
   desc: in pause_phones_menu.
   user:
   <source>
-    *: "Duration to rewind"
+    *: "Duration to Rewind"
   </source>
   <dest>
     *: "되감기시에도 지속"
@@ -9868,13 +9945,13 @@
   desc: in pause_phones_menu.
   user:
   <source>
-    *: "Disable auto-resume if phones not present"
+    *: "Disable resume on startup if phones unplugged"
   </source>
   <dest>
-    *: "이어폰이 없으면 자동으로 사용 안함"
+    *: "이어폰 해제시 자동으로 사용 안함"
   </dest>
   <voice>
-    *: "이어폰이 없으면 자동으로 사용 안함"
+    *: "이어폰 해제시 자동으로 사용 안함"
   </voice>
 </phrase>
 <phrase>
@@ -9884,10 +9961,10 @@
     *: "Region"
   </source>
   <dest>
-    *: "라디오 지역"
+    *: "지역 설정"
   </dest>
   <voice>
-    *: "라디오 지역"
+    *: "지역 설정"
   </voice>
 </phrase>
 <phrase>
@@ -9936,10 +10013,10 @@
     *: "Korea"
   </source>
   <dest>
-    *: "한국"
+    *: "대한민국"
   </dest>
   <voice>
-    *: "한국"
+    *: "대한민국"
   </voice>
 </phrase>
 <phrase>
@@ -9977,7 +10054,7 @@
     *: "Please reboot to enable"
   </source>
   <dest>
-    *: "캐시를 사용하려면 다시 시작해주세요."
+    *: "사용하려면 다시 시작해주세요."
   </dest>
   <voice>
     *: ""
@@ -9998,6 +10075,240 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_SYSFONT_PITCH_UP_SEMITONE
+  desc: in wps
+  user:
+  <source>
+    *: "Semitone Up"
+  </source>
+  <dest>
+    *: "반음 올리기"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PITCH_DOWN_SEMITONE
+  desc: in wps
+  user:
+  <source>
+    *: "Semitone Down"
+  </source>
+  <dest>
+    *: "반음 내리기"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_FORMAT
+  desc: audio format item in recording menu
+  user:
+  <source>
+    *: "Format"
+  </source>
+  <dest>
+    *: "파일 저장 형식"
+  </dest>
+  <voice>
+    *: "파일 저장 형식"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_MPA_L3
+  desc: audio format description
+  user:
+  <source>
+    *: "MPEG Layer 3"
+  </source>
+  <dest>
+    *: "MPEG Layer 3"
+  </dest>
+  <voice>
+    *: "MPEG Layer 3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_PCM_WAV
+  desc: audio format description
+  user:
+  <source>
+    *: "PCM Wave"
+  </source>
+  <dest>
+    *: "PCM Wave"
+  </dest>
+  <voice>
+    *: "PCM Wave"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_WAVPACK
+  desc: audio format description
+  user:
+  <source>
+    *: "WavPack"
+  </source>
+  <dest>
+    *: "WavPack"
+  </dest>
+  <voice>
+    *: "WavPack"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENCODER_SETTINGS
+  desc: encoder settings
+  user:
+  <source>
+    *: "Encoder Settings"
+  </source>
+  <dest>
+    *: "인코더 설정"
+  </dest>
+  <voice>
+    *: "인코더 설정"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_SETTINGS
+  desc: when something has settings in a certain context
+  user:
+  <source>
+    *: "(No Settings)"
+  </source>
+  <dest>
+    *: "설정이 없습니다."
+  </dest>
+  <voice>
+    *: "사용 가능한 설정이 없습니다."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOURCE_FREQUENCY
+  desc: when recording source frequency setting must follow source
+  user:
+  <source>
+    *: "(Same As Source)"
+  </source>
+  <dest>
+    *: "녹음 방식과 같습니다."
+  </dest>
+  <voice>
+    *: "녹음 방식과 같습니다."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BITRATE
+  desc: bits-kilobits per unit time
+  user:
+  <source>
+    *: "Bitrate"
+  </source>
+  <dest>
+    *: "비트 전송률"
+  </dest>
+  <voice>
+    *: "비트 전송률"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_TYPE
+  desc: in recording trigger menu
+  <source>
+    *: "Trigtype"
+  </source>
+  <dest>
+    *: "녹음 시작 후 동작"
+  </dest>
+  <voice>
+    *: "녹음 시작 후 동작"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_STOP
+  desc: trigger types
+  <source>
+    *: "Stop"
+  </source>
+  <dest>
+    *: "정지"
+  </dest>
+  <voice>
+    *: "정지"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_PAUSE
+  desc: trigger types
+  <source>
+    *: "Pause"
+  </source>
+  <dest>
+    *: "일시정지"
+  </dest>
+  <voice>
+    *: "일시정지"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_NEWFILESTP
+  desc: trigger types
+  <source>
+    *: "New file"
+  </source>
+  <dest>
+    *: "새 파일"
+  </dest>
+  <voice>
+    *: "새 파일"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARNING_BATTERY_LOW
+  desc: general warning
+  user:
+  <source>
+    *: "WARNING! Low Battery!"
+  </source>
+  <dest>
+    *: "주의! 배터리가 부족합니다!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARNING_BATTERY_EMPTY
+  desc: general warning
+  user:
+  <source>
+    *: "Battery empty! RECHARGE!"
+  </source>
+  <dest>
+    *: "배터리가 없습니다! 충전해주세요!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_AIFF
+  desc: audio format description
+  user:
+  <source>
+    *: "AIFF"
+  </source>
+  <dest>
+    *: "AIFF"
+  </dest>
+  <voice>
+    *: "AIFF"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_SYSFONT_AGC_SAFETY
   desc: AGC preset
   <source>
@@ -10007,7 +10318,7 @@
     *: "Safety (clip)"
   </dest>
   <voice>
-    *: "Safety (clip)"
+    *: "무난하게 (자르기)"
   </voice>
 </phrase>
 <phrase>
@@ -10020,7 +10331,7 @@
     *: "Live (slow)"
   </dest>
   <voice>
-    *: "Live (slow)"
+    *: "라이브 (천천히)"
   </voice>
 </phrase>
 <phrase>
@@ -10033,7 +10344,7 @@
     *: "DJ-Set (slow)"
   </dest>
   <voice>
-    *: "DJ set (slow)"
+    *: "DJ set (천천히)"
   </voice>
 </phrase>
 <phrase>
@@ -10046,7 +10357,7 @@
     *: "Medium"
   </dest>
   <voice>
-    *: "Medium"
+    *: "중간"
   </voice>
 </phrase>
 <phrase>
@@ -10059,7 +10370,7 @@
     *: "Voice (fast)"
   </dest>
   <voice>
-    *: "Voice (fast)"
+    *: "보이스 (빠르게)"
   </voice>
 </phrase>
 <phrase>
@@ -10072,6 +10383,473 @@
     *: "AGC max. gain"
   </dest>
   <voice>
-    *: "AGC maximum gain"
+    *: "AGC 최대 증폭"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES
+  desc: browser file/dir properties
+  user:
+  <source>
+    *: "Properties"
+  </source>
+  <dest>
+    *: "속성"
+  </dest>
+  <voice>
+    *: "속성"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_TRACKSKIP
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Shuffle and Track Skip"
+  </source>
+  <dest>
+    *: "임의 재생과 트랙 넘기기"
+  </dest>
+  <voice>
+    *: "임의 재생과 트랙 넘기기"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUNNING_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Running Time"
+  </source>
+  <dest>
+    *: "작동 시간"
+  </dest>
+  <voice>
+    *: "작동 시간"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Current Time"
+  </source>
+  <dest>
+    *: "현재 시간"
+  </dest>
+  <voice>
+    *: "현재 시간"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Top Time"
+  </source>
+  <dest>
+    *: "누적 시간"
+  </dest>
+  <voice>
+    *: "누적 시간"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Clear Time?"
+  </source>
+  <dest>
+    *: "초기화 하시겠습니까?"
+  </dest>
+  <voice>
+    *: "초기화 하시겠습니까?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLACE
+  desc: in onplay menu.  Replace the current playlist with a new one.
+  user:
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "다음곡으로 재생"
+  </dest>
+  <voice>
+    *: "다음곡으로 재생"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_THEME
+  desc: save a theme file
+  user:
+  <source>
+    *: "Save Theme Settings"
+  </source>
+  <dest>
+    *: "테마 설정 저장"
+  </dest>
+  <voice>
+    *: "테마 설정 저장"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_CHARGING
+  desc: in Battery menu
+  user:
+  <source>
+    *: "Charge During USB Connection"
+  </source>
+  <dest>
+    *: "USB 연결 중 충전"
+  </dest>
+  <voice>
+    *: "USB 연결 중 충전"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUMARTIST
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Album Artist]"
+  </source>
+  <dest>
+    *: "[앨범 음악가]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMMENT
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Comment]"
+  </source>
+  <dest>
+    *: "[설명]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUESHEET
+  desc:
+  user:
+  <source>
+    *: "Cuesheet"
+  </source>
+  <dest>
+    *: "큐 시트"
+  </dest>
+  <voice>
+    *: "큐 시트"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUESHEET_ENABLE
+  desc: cuesheet support option
+  user:
+  <source>
+    *: "Cuesheet Support"
+  </source>
+  <dest>
+    *: "큐 시트 지원"
+  </dest>
+  <voice>
+    *: "큐 시트 지원"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_MENU
+  desc: fm menu title
+  user:
+  <source>
+    *: "FM Radio Menu"
+  </source>
+  <dest>
+    *: "FM 라디오 메뉴"
+  </dest>
+  <voice>
+    *: "FM 라디오 메뉴"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIR_BROWSER
+  desc: in root menu
+  user:
+  <source>
+    *: "Files"
+  </source>
+  <dest>
+    *: "파일 보기"
+  </dest>
+  <voice>
+    *: "파일 보기"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_MENU
+  desc: in root menu
+  user:
+  <source>
+    *: "Settings"
+  </source>
+  <dest>
+    *: "설정"
+  </dest>
+  <voice>
+    *: "설정"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOW_PLAYING
+  desc: in root menu
+  user:
+  <source>
+    *: "Now Playing"
+  </source>
+  <dest>
+    *: "지금 재생 중"
+  </dest>
+  <voice>
+    *: "지금 재생 중"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_PLAYBACK
+  desc: in root menu
+  user:
+  <source>
+    *: "Resume Playback"
+  </source>
+  <dest>
+    *: "재생 계속하기"
+  </dest>
+  <voice>
+    *: "재생 계속하기"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_SCREEN
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Start Screen"
+  </source>
+  <dest>
+    *: "시작화면 설정"
+  </dest>
+  <voice>
+    *: "시작화면 설정"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ROCKBOX_TITLE
+  desc: in root menu
+  user:
+  <source>
+    *: "Rockbox"
+  </source>
+  <dest>
+    *: "Rockbox 메뉴"
+  </dest>
+  <voice>
+    *: "Rockbox 메뉴"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Main Menu"
+  </source>
+  <dest>
+    *: "메인 메뉴"
+  </dest>
+  <voice>
+    *: "메인 메뉴"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVIOUS_SCREEN
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Previous Screen"
+  </source>
+  <dest>
+    *: "이전 화면"
+  </dest>
+  <voice>
+    *: "이전 화면"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_WAKEUP_SCREEN
+  desc: in alarm menu setting
+  user:
+  <source>
+    *: "Alarm Wake up Screen"
+  </source>
+  <dest>
+    *: "알람시 화면"
+  </dest>
+  <voice>
+    *: "알람시 화면"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUILDING_DATABASE
+  desc: splash database building progress
+  user:
+  <source>
+    *: "Building database... %d found (OFF to return)"
+    h100,h120,h300: "Building database... %d found (STOP to return)"
+    ipod*: "Building database... %d found (PLAY/PAUSE to return)"
+    x5: "Building database... %d found (Long PLAY to return)"
+    h10,h10_5gb: "Building database... %d found (PREV to return)"
+    e200: "Building database... %d found (PREV to return)"
+  </source>
+  <dest>
+    *: "음악 DB 생성 중... %d개 완료 ([꺼짐]: 취소)"
+    h100,h120,h300: "음악 DB 생성 중... %d개 완료 ([정지]: 취소)"
+    ipod*: "음악 DB 생성 중... %d개 완료 ([재생/일시정지]: 취소)"
+    x5: "음악 DB 생성 중... %d개 완료 ([재생버튼 길게]: 취소)"
+    h10,h10_5gb: "음악 DB 생성 중... %d개 완료 ([이전]: 취소)"
+    e200: "음악 DB 생성 중... %d개 완료 ([이전]: 취소)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_MENU_TITLE
+  desc: title for the onplay menus
+  user:
+  <source>
+    *: "Context Menu"
+  </source>
+  <dest>
+    *: "재생 메뉴"
+  </dest>
+  <voice>
+    *: "재생 메뉴"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONLIGHT_TIMEOUT
+  desc: in settings_menu
+  user:
+  <source>
+    *: ""
+    e200: "Wheel Light Timeout"
+    gigabeatf: "Button Light Timeout"
+  </source>
+  <dest>
+    *: ""
+    e200: "휠버튼 조명 시간"
+    gigabeatf: "버튼 조명 시간"
+  </dest>
+  <voice>
+    *: ""
+    e200: "휠버튼 조명 시간"
+    gigabeatf: "버튼 조명 시간"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONLIGHT_BRIGHTNESS
+  desc: in settings_menu
+  user:
+  <source>
+    *: ""
+    gigabeatf: "Button Light Brightness"
+  </source>
+  <dest>
+    *: ""
+    gigabeatf: "버튼 조명 밝기"
+  </dest>
+  <voice>
+    *: ""
+    gigabeatf: "버튼 조명 밝기"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLISTVIEWER_SETTINGS
+  desc: title for the playlist viewer settings menus
+  user:
+  <source>
+    *: "Playlist Viewer Settings"
+  </source>
+  <dest>
+    *: "재생목록 보기 설정"
+  </dest>
+  <voice>
+    *: "재생목록 보기 설정"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSE_CUESHEET
+  desc:
+  user:
+  <source>
+    *: "Browse Cuesheet"
+  </source>
+  <dest>
+    *: "큐 시트 보기"
+  </dest>
+  <voice>
+    *: "큐 시트 보기"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COPYING
+  desc:
+  user:
+  <source>
+    *: "Copying..."
+  </source>
+  <dest>
+    *: "복사하고 있습니다..."
+  </dest>
+  <voice>
+    *: "복사 중입니다."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETING
+  desc:
+  user:
+  <source>
+    *: "Deleting..."
+  </source>
+  <dest>
+    *: "삭제하고 있습니다..."
+  </dest>
+  <voice>
+    *: "삭제 중입니다."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVING
+  desc:
+  user:
+  <source>
+    *: "Moving..."
+  </source>
+  <dest>
+    *: "이동하고 있습니다..."
+  </dest>
+  <voice>
+    *: "이동 중입니다."
   </voice>
 </phrase>
