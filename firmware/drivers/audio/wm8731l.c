@@ -23,6 +23,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
 #include "logf.h"
 #include "system.h"
 #include "string.h"
@@ -45,9 +46,11 @@ const struct sound_settings_info audiohw_settings[] = {
     [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
     [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
     [SOUND_STEREO_WIDTH]  = {"%",  0,  1,   0, 255, 100},
+#ifdef HAVE_RECORDING
     [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-128,  96,   0},
     [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-128,  96,   0},
     [SOUND_MIC_GAIN]      = {"dB", 1,  1,-128, 108,  16},
+#endif
 };
 
 /* convert tenth of dB volume (-730..60) to master volume register value */
