@@ -457,16 +457,20 @@ static int loopit(void)
         if(timeout) {
             switch(b) {
                 case BUTTON_LEFT:
+                case BUTTON_LEFT|BUTTON_REPEAT:
                   values[show].num--;
                   break;
                 case BUTTON_RIGHT:
+                case BUTTON_RIGHT|BUTTON_REPEAT:
                   values[show].num++;
                   break;
                 case BOUNCE_UP:
+                case BOUNCE_UP|BUTTON_REPEAT:
                   if(++show == NUM_LAST)
                       show=0;
                   break;
                 case BOUNCE_DOWN:
+                case BOUNCE_DOWN|BUTTON_REPEAT:
                   if(--show < 0)
                       show=NUM_LAST-1;
                   break;

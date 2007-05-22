@@ -179,6 +179,9 @@ void I_ShutdownGraphics(void)
 #define DOOMBUTTON_ENTER   BUTTON_REW
 #define DOOMBUTTON_WEAPON  BUTTON_FF
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
+#define DOOMBUTTON_SCROLLWHEEL
+#define DOOMBUTTON_SCROLLWHEEL_CC   BUTTON_SCROLL_UP
+#define DOOMBUTTON_SCROLLWHEEL_CW   BUTTON_SCROLL_DOWN
 #define DOOMBUTTON_UP      BUTTON_UP
 #define DOOMBUTTON_DOWN    BUTTON_DOWN
 #define DOOMBUTTON_LEFT    BUTTON_LEFT
@@ -186,8 +189,8 @@ void I_ShutdownGraphics(void)
 #define DOOMBUTTON_SHOOT   BUTTON_SELECT
 #define DOOMBUTTON_OPEN    BUTTON_REC
 #define DOOMBUTTON_ESC     BUTTON_POWER
-#define DOOMBUTTON_ENTER   BUTTON_SCROLL_UP
-#define DOOMBUTTON_WEAPON  BUTTON_SCROLL_DOWN
+#define DOOMBUTTON_ENTER   BUTTON_SELECT
+#define DOOMBUTTON_WEAPON  DOOMBUTTON_SCROLLWHEEL_CW
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
 #define DOOMBUTTON_UP      BUTTON_UP
 #define DOOMBUTTON_DOWN    BUTTON_DOWN
@@ -209,6 +212,27 @@ void I_ShutdownGraphics(void)
 #define DOOMBUTTON_ESC     BUTTON_OFF
 #define DOOMBUTTON_ENTER   BUTTON_SELECT
 #define DOOMBUTTON_WEAPON  BUTTON_ON
+#endif
+
+#ifdef DOOMBUTTON_SCROLLWHEEL
+/* Scrollwheel events are posted directly and not polled by the button
+   driver - synthesize polling */
+static inline unsigned int read_scroll_wheel(void)
+{
+    unsigned int buttons = BUTTON_NONE;
+    unsigned int btn;
+
+    /* Empty out the button queue and see if any scrollwheel events were
+       posted */
+    do
+    {
+        btn = rb->button_get_w_tmo(0);
+        buttons |= btn;
+    }
+    while (btn != BUTTON_NONE);
+
+    return buttons & (DOOMBUTTON_SCROLLWHEEL_CC | DOOMBUTTON_SCROLLWHEEL_CW);
+}
 #endif
 
 inline void getkey()
@@ -247,6 +271,10 @@ inline void getkey()
 #endif
 
    newbuttonstate = rb->button_status();
+#ifdef DOOMBUTTON_SCROLLWHEEL
+   newbuttonstate |= read_scroll_wheel();
+#endif
+
    if(newbuttonstate==oldbuttonstate) /* Don't continue, nothing left to do */
       return;
    released = ~newbuttonstate & oldbuttonstate;

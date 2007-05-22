@@ -126,16 +126,18 @@ PLUGIN_HEADER
 #define JPEG_PREVIOUS (BUTTON_A | BUTTON_LEFT)
 
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
-#define JPEG_ZOOM_PRE BUTTON_SELECT
-#define JPEG_ZOOM_IN (BUTTON_SELECT | BUTTON_REL)
-#define JPEG_ZOOM_OUT (BUTTON_SELECT | BUTTON_REPEAT)
-#define JPEG_UP BUTTON_UP
-#define JPEG_DOWN BUTTON_DOWN
-#define JPEG_LEFT BUTTON_LEFT
-#define JPEG_RIGHT BUTTON_RIGHT
-#define JPEG_MENU BUTTON_REC
-#define JPEG_NEXT BUTTON_SCROLL_DOWN
-#define JPEG_PREVIOUS BUTTON_SCROLL_UP
+#define JPEG_ZOOM_PRE           BUTTON_SELECT
+#define JPEG_ZOOM_IN            (BUTTON_SELECT | BUTTON_REL)
+#define JPEG_ZOOM_OUT           (BUTTON_SELECT | BUTTON_REPEAT)
+#define JPEG_UP                 BUTTON_UP
+#define JPEG_DOWN               BUTTON_DOWN
+#define JPEG_LEFT               BUTTON_LEFT
+#define JPEG_RIGHT              BUTTON_RIGHT
+#define JPEG_MENU               BUTTON_REC
+#define JPEG_NEXT               BUTTON_SCROLL_DOWN
+#define JPEG_NEXT_REPEAT        (BUTTON_SCROLL_DOWN|BUTTON_REPEAT)
+#define JPEG_PREVIOUS           BUTTON_SCROLL_UP
+#define JPEG_PREVIOUS_REPEAT    (BUTTON_SCROLL_UP|BUTTON_REPEAT)
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #define JPEG_ZOOM_PRE BUTTON_PLAY
@@ -2715,11 +2717,17 @@ int scroll_bmp(struct t_disp* pdisp)
             if (entries > 0)
                 return change_filename(DIR_NEXT);
             break;
+#ifdef JPEG_NEXT_REPEAT
+        case JPEG_NEXT_REPEAT:
+#endif
         case JPEG_NEXT:
             if (entries > 0)
                 return change_filename(DIR_NEXT);
             break;
 
+#ifdef JPEG_PREVIOUS_REPEAT
+        case JPEG_PREVIOUS_REPEAT:
+#endif
         case JPEG_PREVIOUS:
             if (entries > 0)
                 return change_filename(DIR_PREV);

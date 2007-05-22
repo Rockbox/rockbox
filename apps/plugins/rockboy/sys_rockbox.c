@@ -38,6 +38,16 @@
 #define ROCKBOY_PAD_UP BUTTON_SCROLL_UP
 #define ROCKBOY_PAD_DOWN BUTTON_SCROLL_DOWN
 
+#elif (CONFIG_KEYPAD == SANSA_E200_PAD)
+
+#define ROCKBOY_SCROLLWHEEL
+#define ROCKBOY_SCROLLWHEEL_CC  BUTTON_SCROLL_UP
+#define ROCKBOY_SCROLLWHEEL_CW  BUTTON_SCROLL_DOWN
+#define ROCKBOY_PAD_LEFT BUTTON_LEFT
+#define ROCKBOY_PAD_RIGHT BUTTON_RIGHT
+#define ROCKBOY_PAD_UP BUTTON_UP
+#define ROCKBOY_PAD_DOWN BUTTON_DOWN
+
 #else
 
 #define ROCKBOY_PAD_LEFT BUTTON_LEFT
@@ -69,10 +79,35 @@ static int wheelmap[8] = {
 
 int released, pressed;
 
+
+#ifdef ROCKBOY_SCROLLWHEEL
+/* Scrollwheel events are posted directly and not polled by the button
+   driver - synthesize polling */
+static inline unsigned int read_scroll_wheel(void)
+{
+    unsigned int buttons = BUTTON_NONE;
+    unsigned int btn;
+
+    /* Empty out the button queue and see if any scrollwheel events were
+       posted */
+    do
+    {
+        btn = rb->button_get_w_tmo(0);
+        buttons |= btn;
+    }
+    while (btn != BUTTON_NONE);
+
+    return buttons & (ROCKBOY_SCROLLWHEEL_CC | ROCKBOY_SCROLLWHEEL_CW);
+}
+#endif
+
 void ev_poll(void)
 {
     event_t ev;
     newbuttonstate = rb->button_status();
+#ifdef ROCKBOY_SCROLLWHEEL
+    newbuttonstate |= read_scroll_wheel();
+#endif
     released = ~newbuttonstate & oldbuttonstate;
     pressed = newbuttonstate & ~oldbuttonstate;
     oldbuttonstate = newbuttonstate;

@@ -102,8 +102,8 @@ PLUGIN_HEADER
 #define VUMETER_MENU_EXIT2 BUTTON_POWER
 #define VUMETER_LEFT BUTTON_LEFT
 #define VUMETER_RIGHT BUTTON_RIGHT
-#define VUMETER_UP BUTTON_UP
-#define VUMETER_DOWN BUTTON_DOWN
+#define VUMETER_UP BUTTON_SCROLL_DOWN
+#define VUMETER_DOWN BUTTON_SCROLL_UP
 
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 #define VUMETER_QUIT BUTTON_POWER
@@ -480,10 +480,12 @@ void change_settings(void)
                 break;
 
             case VUMETER_UP:
+            case VUMETER_UP|BUTTON_REPEAT:
                 selected_setting == 3 ? selected_setting=0 : selected_setting++;
                 break;
 
             case VUMETER_DOWN:
+            case VUMETER_DOWN|BUTTON_REPEAT:
                 selected_setting == 0 ? selected_setting=3 : selected_setting--;
         }
     }
