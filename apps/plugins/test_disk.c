@@ -22,22 +22,27 @@
 
 PLUGIN_HEADER
 
-#define TEST_FILE "/test_disk.tmp"
-#define FRND_SEED 0x78C3     /* arbirary */
+#define TESTBASEDIR "/__TEST__"
+#define TEST_FILE   TESTBASEDIR "/test_disk.tmp"
+#define FRND_SEED   0x78C3     /* arbirary */
 
 #ifdef HAVE_MMC
 #define TEST_SIZE (20*1024*1024)
 #else
 #define TEST_SIZE (300*1024*1024)
 #endif
+#define TEST_TIME 10 /* in seconds */
 
 static struct plugin_api* rb;
 static unsigned char* audiobuf;
-static ssize_t audiobufsize;
+static ssize_t audiobuflen;
 
 static unsigned short frnd_buffer;
 static int line = 0;
 static int max_line = 0;
+static int log_fd;
+static char logfilename[MAX_PATH];
+static const char testbasedir[] = TESTBASEDIR;
 
 static void mem_fill_frnd(unsigned char *addr, int len)
 {
@@ -67,46 +72,59 @@ static bool mem_cmp_frnd(unsigned char *addr, int len)
     return true;
 }
 
-static void log_init(void)
+static bool log_init(void)
 {
     int h;
 
+    rb->lcd_setmargins(0, 0);
     rb->lcd_getstringsize("A", NULL, &h);
     max_line = LCD_HEIGHT / h;
     line = 0;
     rb->lcd_clear_display();
     rb->lcd_update();
+    
+    rb->create_numbered_filename(logfilename, "/", "test_disk_log_", ".txt",
+                                 2 IF_CNFN_NUM_(, NULL));
+    log_fd = rb->open(logfilename, O_RDWR|O_CREAT|O_TRUNC);
+    return log_fd >= 0;
 }
 
-static void log_lcd(char *text, bool advance)
+static void log_text(char *text, bool advance)
 {
     rb->lcd_puts(0, line, text);
     rb->lcd_update();
     if (advance)
+    {
         if (++line >= max_line)
             line = 0;
+        rb->fdprintf(log_fd, "%s\n", text);
+    }
+}
+
+static void log_close(void)
+{
+    rb->close(log_fd);
 }
 
 static bool test_fs(void)
 {
     unsigned char text_buf[32];
-    unsigned char *buf_start;
-    int align, buf_len;
-    int total, current;
+    int total, current, align;
     int fd;
 
-    align = (-(int)audiobuf) & 3;
-    buf_start = audiobuf + align;
-    buf_len = (audiobufsize - align - 4) & ~3;
-
     log_init();
-    rb->snprintf(text_buf, sizeof text_buf, "FS stress test: %dKB", (TEST_SIZE>>10));
-    log_lcd(text_buf, true);
+    log_text("test_disk WRITE&VERIFY", true);
+    rb->snprintf(text_buf, sizeof(text_buf), "CPU clock: %ld Hz",
+                 *rb->cpu_frequency);
+    log_text(text_buf, true);
+    log_text("----------------------", true);
+    rb->snprintf(text_buf, sizeof text_buf, "Data size: %dKB", (TEST_SIZE>>10));
+    log_text(text_buf, true);
 
     fd = rb->creat(TEST_FILE);
     if (fd < 0)
     {
-        rb->splash(0, "Couldn't create testfile.");
+        rb->splash(HZ, "creat() failed.");
         goto error;
     }
 
@@ -114,17 +132,17 @@ static bool test_fs(void)
     total = TEST_SIZE;
     while (total > 0)
     {
-        current = rb->rand() % buf_len;
+        current = rb->rand() % (audiobuflen - 4);
         current = MIN(current, total);
         align = rb->rand() & 3;
         rb->snprintf(text_buf, sizeof text_buf, "Wrt %dKB, %dKB left",
                      current >> 10, total >> 10);
-        log_lcd(text_buf, false);
+        log_text(text_buf, false);
 
-        mem_fill_frnd(buf_start + align, current);
-        if (current != rb->write(fd, buf_start + align, current))
+        mem_fill_frnd(audiobuf + align, current);
+        if (current != rb->write(fd, audiobuf + align, current))
         {
-            rb->splash(0, "Write error.");
+            rb->splash(0, "write() failed.");
             rb->close(fd);
             goto error;
         }
@@ -135,7 +153,7 @@ static bool test_fs(void)
     fd = rb->open(TEST_FILE, O_RDONLY);
     if (fd < 0)
     {
-        rb->splash(0, "Couldn't open testfile.");
+        rb->splash(0, "open() failed.");
         goto error;
     }
 
@@ -143,33 +161,34 @@ static bool test_fs(void)
     total = TEST_SIZE;
     while (total > 0)
     {
-        current = rb->rand() % buf_len;
+        current = rb->rand() % (audiobuflen - 4);
         current = MIN(current, total);
         align = rb->rand() & 3;
         rb->snprintf(text_buf, sizeof text_buf, "Cmp %dKB, %dKB left",
                      current >> 10, total >> 10);
-        log_lcd(text_buf, false);
+        log_text(text_buf, false);
 
-        if (current != rb->read(fd, buf_start + align, current))
+        if (current != rb->read(fd, audiobuf + align, current))
         {
-            rb->splash(0, "Read error.");
+            rb->splash(0, "read() failed.");
             rb->close(fd);
             goto error;
         }
-        if (!mem_cmp_frnd(buf_start + align, current))
+        if (!mem_cmp_frnd(audiobuf + align, current))
         {
-            log_lcd(text_buf, true);
-            log_lcd("Compare error.", true);
+            log_text(text_buf, true);
+            log_text("Compare error.", true);
             rb->close(fd);
             goto error;
         }
         total -= current;
     }
     rb->close(fd);
-    log_lcd(text_buf, true);
-    log_lcd("Test passed.", true);
+    log_text(text_buf, true);
+    log_text("Test passed.", true);
 
 error:
+    log_close();
     rb->remove(TEST_FILE);
     rb->button_clear_queue();
     rb->button_get(true);
@@ -177,123 +196,204 @@ error:
     return false;
 }
 
-static bool test_speed(void)
+static bool file_speed(int chunksize, bool align)
 {
-    unsigned char text_buf[32];
-    unsigned char *buf_start;
-    long time;
-    int buf_len;
+    unsigned char text_buf[64];
     int fd;
+    long filesize = 0;
+    long size, time;
+    
+    if (chunksize >= audiobuflen)
+        return false;
 
-    buf_len = (-(int)audiobuf) & 3;
-    buf_start = audiobuf + buf_len;
-    buf_len = (audiobufsize - buf_len) & ~3;
-    rb->memset(buf_start, 'T', buf_len);
-    buf_len -= 2;
+    log_text("--------------------", true);
 
-    log_init();
-    log_lcd("Disk speed test", true);
-
+    /* File creation write speed */
     fd = rb->creat(TEST_FILE);
     if (fd < 0)
     {
-        rb->splash(0, "Couldn't create testfile.");
+        rb->splash(HZ, "creat() failed.");
         goto error;
     }
     time = *rb->current_tick;
-    if (buf_len != rb->write(fd, buf_start, buf_len))
+    while (TIME_BEFORE(*rb->current_tick, time + TEST_TIME*HZ))
     {
-        rb->splash(0, "Write error.");
-        rb->close(fd);
-        goto error;
+        if (chunksize != rb->write(fd, audiobuf + (align ? 0 : 1), chunksize))
+        {
+            rb->splash(HZ, "write() failed.");
+            rb->close(fd);
+            goto error;
+        }
+        filesize += chunksize;
     }
     time = *rb->current_tick - time;
-    rb->snprintf(text_buf, sizeof text_buf, "Create: %ld KByte/s",
-                 (25 * buf_len / time) >> 8);
-    log_lcd(text_buf, true);
     rb->close(fd);
+    rb->snprintf(text_buf, sizeof text_buf, "Create (%d,%c): %ld KB/s",
+                 chunksize, align ? 'A' : 'U', (25 * filesize / time) >> 8);
+    log_text(text_buf, true);
 
+    /* Existing file write speed */
     fd = rb->open(TEST_FILE, O_WRONLY);
     if (fd < 0)
     {
-        rb->splash(0, "Couldn't open testfile.");
+        rb->splash(0, "open() failed.");
         goto error;
     }
     time = *rb->current_tick;
-    if (buf_len != rb->write(fd, buf_start, buf_len))
+    for (size = filesize; size > 0; size -= chunksize)
     {
-        rb->splash(0, "Write error.");
-        rb->close(fd);
-        goto error;
+        if (chunksize != rb->write(fd, audiobuf + (align ? 0 : 1), chunksize))
+        {
+            rb->splash(0, "write() failed.");
+            rb->close(fd);
+            goto error;
+        }
     }
     time = *rb->current_tick - time;
-    rb->snprintf(text_buf, sizeof text_buf, "Write A: %ld KByte/s",
-                 (25 * buf_len / time) >> 8);
-    log_lcd(text_buf, true);
     rb->close(fd);
+    rb->snprintf(text_buf, sizeof text_buf, "Write  (%d,%c): %ld KB/s",
+                 chunksize, align ? 'A' : 'U', (25 * filesize / time) >> 8);
+    log_text(text_buf, true);
     
-    fd = rb->open(TEST_FILE, O_WRONLY);
-    if (fd < 0)
-    {
-        rb->splash(0, "Couldn't open testfile.");
-        goto error;
-    }
-    time = *rb->current_tick;
-    if (buf_len != rb->write(fd, buf_start + 1, buf_len))
-    {
-        rb->splash(0, "Write error.");
-        rb->close(fd);
-        goto error;
-    }
-    time = *rb->current_tick - time;
-    rb->snprintf(text_buf, sizeof text_buf, "Write U: %ld KByte/s",
-                 (25 * buf_len / time) >> 8);
-    log_lcd(text_buf, true);
-    rb->close(fd);
-    
+    /* File read speed */
     fd = rb->open(TEST_FILE, O_RDONLY);
     if (fd < 0)
     {
-        rb->splash(0, "Couldn't open testfile.");
+        rb->splash(0, "open() failed.");
         goto error;
     }
     time = *rb->current_tick;
-    if (buf_len != rb->read(fd, buf_start, buf_len))
+    for (size = filesize; size > 0; size -= chunksize)
     {
-        rb->splash(0, "Read error.");
-        rb->close(fd);
-        goto error;
+        if (chunksize != rb->read(fd, audiobuf + (align ? 0 : 1), chunksize))
+        {
+            rb->splash(0, "read() failed.");
+            rb->close(fd);
+            goto error;
+        }
     }
     time = *rb->current_tick - time;
-    rb->snprintf(text_buf, sizeof text_buf, "Read A: %ld KByte/s",
-                 (25 * buf_len / time) >> 8);
-    log_lcd(text_buf, true);
     rb->close(fd);
-    
-    fd = rb->open(TEST_FILE, O_RDONLY);
-    if (fd < 0)
-    {
-        rb->splash(0, "Couldn't open testfile.");
-        goto error;
-    }
-    time = *rb->current_tick;
-    if (buf_len != rb->read(fd, buf_start + 1, buf_len))
-    {
-        rb->splash(0, "Read error.");
-        rb->close(fd);
-        goto error;
-    }
-    time = *rb->current_tick - time;
-    rb->snprintf(text_buf, sizeof text_buf, "Read U: %ld KByte/s",
-                 (25 * buf_len / time) >> 8);
-    log_lcd(text_buf, true);
-    rb->close(fd);
-
-error:
+    rb->snprintf(text_buf, sizeof text_buf, "Read   (%d,%c): %ld KB/s",
+                 chunksize, align ? 'A' : 'U', (25 * filesize / time) >> 8);
+    log_text(text_buf, true);
     rb->remove(TEST_FILE);
+    return true;
+
+  error:
+    rb->remove(TEST_FILE);
+    return false;
+}
+
+static bool test_speed(void)
+{
+    unsigned char text_buf[64];
+    DIR *dir = NULL;
+    struct dirent *entry = NULL;
+    int fd, last_file;
+    int i, n;
+    long time;
+
+    rb->memset(audiobuf, 'T', audiobuflen);
+    log_init();
+    log_text("test_disk SPEED TEST", true);
+    rb->snprintf(text_buf, sizeof(text_buf), "CPU clock: %ld Hz",
+                 *rb->cpu_frequency);
+    log_text(text_buf, true);
+    log_text("--------------------", true);
+
+    /* File creation speed */
+    time = *rb->current_tick + TEST_TIME*HZ;
+    for (i = 0; TIME_BEFORE(*rb->current_tick, time); i++)
+    {
+        rb->snprintf(text_buf, sizeof(text_buf), TESTBASEDIR "/%08x.tmp", i);
+        fd = rb->creat(text_buf);
+        if (fd < 0)
+        {
+            last_file = i;
+            rb->splash(HZ, "creat() failed.");
+            goto error;
+        }
+        rb->close(fd);
+    }
+    last_file = i;
+    rb->snprintf(text_buf, sizeof(text_buf), "Create:  %d files/s",
+                 last_file / TEST_TIME);
+    log_text(text_buf, true);
+    
+    /* File open speed */
+    time = *rb->current_tick + TEST_TIME*HZ;
+    for (n = 0, i = 0; TIME_BEFORE(*rb->current_tick, time); n++, i++)
+    {
+        if (i >= last_file)
+            i = 0;
+        rb->snprintf(text_buf, sizeof(text_buf), TESTBASEDIR "/%08x.tmp", i);
+        fd = rb->open(text_buf, O_RDONLY);
+        if (fd < 0)
+        {
+            rb->splash(HZ, "open() failed.");
+            goto error;
+        }
+        rb->close(fd);
+    }
+    rb->snprintf(text_buf, sizeof(text_buf), "Open:    %d files/s", n / TEST_TIME);
+    log_text(text_buf, true);
+
+    /* Directory scan speed */
+    time = *rb->current_tick + TEST_TIME*HZ;
+    for (n = 0; TIME_BEFORE(*rb->current_tick, time); n++)
+    {
+        if (entry == NULL)
+        {
+            if (dir != NULL)
+                rb->closedir(dir);
+            dir = rb->opendir(testbasedir);
+            if (dir == NULL)
+            {
+                rb->splash(HZ, "opendir() failed.");
+                goto error;
+            }
+        }
+        entry = rb->readdir(dir);
+    }
+    rb->closedir(dir);
+    rb->snprintf(text_buf, sizeof(text_buf), "Dirscan: %d files/s", n / TEST_TIME);
+    log_text(text_buf, true);
+
+    /* File delete speed */
+    time = *rb->current_tick;
+    for (i = 0; i < last_file; i++)
+    {
+        rb->snprintf(text_buf, sizeof(text_buf), TESTBASEDIR "/%08x.tmp", i);
+        rb->remove(text_buf);
+    }
+    rb->snprintf(text_buf, sizeof(text_buf), "Delete:  %ld files/s",
+                 last_file * HZ / (*rb->current_tick - time));
+    log_text(text_buf, true);
+    
+    if (file_speed(512, true)
+        && file_speed(512, false)
+        && file_speed(4096, true)
+        && file_speed(4096, false)
+        && file_speed(1048576, true))
+        file_speed(1048576, false);
+
+    log_text("DONE", false);
+    log_close();
     rb->button_clear_queue();
     rb->button_get(true);
+    return false;
 
+  error:
+    for (i = 0; i < last_file; i++)
+    {
+        rb->snprintf(text_buf, sizeof(text_buf), TESTBASEDIR "/%08x.tmp", i);
+        rb->remove(text_buf);
+    }
+    log_text("DONE", false);
+    log_close();
+    rb->button_clear_queue();
+    rb->button_get(true);
     return false;
 }
 
@@ -303,13 +403,34 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     static const struct menu_item items[] = {
         { "Disk speed",     test_speed  },
-        { "FS stress test", test_fs     },
+        { "Write & verify", test_fs     },
     };
     int m;
+    int align;
+    DIR *dir;
 
     (void)parameter;
     rb = api;
-    audiobuf = rb->plugin_get_audio_buffer((size_t *)&audiobufsize);
+
+    if ((dir = rb->opendir(testbasedir)) == NULL)
+    {
+        if (rb->mkdir(testbasedir) < 0)
+        {
+            rb->splash(HZ*2, "Can't create test directory.");
+            return PLUGIN_ERROR;
+        }
+    }
+    else
+    {
+        rb->closedir(dir);
+    }
+
+    audiobuf = rb->plugin_get_audio_buffer((size_t *)&audiobuflen);
+    /* align start and length to 32 bit */
+    align = (-(int)audiobuf) & 3;
+    audiobuf += align;
+    audiobuflen = (audiobuflen - align) & ~3;
+
     rb->srand(*rb->current_tick);
 
     if (rb->global_settings->backlight_timeout > 0)
@@ -322,6 +443,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     /* restore normal backlight setting */
     rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+    
+    rb->rmdir(testbasedir);
 
     return PLUGIN_OK;
 }
