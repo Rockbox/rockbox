@@ -114,8 +114,10 @@ int audiohw_init(void)
     as3514_write(AUDIOSET3, 0x5); /* Set HPCM off, ZCU off*/
     as3514_write(HPH_OUT_R, 0xc0 | 0x16); /* set vol and set speaker over-current to 0 */
     as3514_write(HPH_OUT_L, 0x16); /* set default vol for headphone */
+#if 0
     as3514_write(LINE_IN1_R, 0x36); /* unmute lineIn 1 and set gain */
     as3514_write(LINE_IN1_L, 0x36); /* unmute lineIn 1 and set gain */
+#endif
     as3514_write(PLLMODE, 0x00);
 
     /* read all reg values */
