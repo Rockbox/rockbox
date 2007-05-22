@@ -22,6 +22,4 @@
 #ifndef _MAS35XX_H
 #define _MAS35XX_H
 
-#include "audiohw.h"
-
 #endif /* _MAS35XX_H */

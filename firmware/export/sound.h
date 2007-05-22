@@ -20,26 +20,7 @@
 #define SOUND_H
 
 #include <inttypes.h>
-#ifdef HAVE_UDA1380
-#include "uda1380.h"
-#elif defined(HAVE_WM8751)
-#include "wm8751.h"
-#elif defined(HAVE_WM8975)
-#include "wm8975.h"
-#elif defined(HAVE_WM8758)
-#include "wm8758.h"
-#elif defined(HAVE_WM8731) || defined(HAVE_WM8721)
-#include "wm8731l.h"
-#elif defined(HAVE_TLV320)
-#include "tlv320.h"
-#elif defined(HAVE_AS3514)
-#include "as3514.h"
-#elif defined(HAVE_MAS35XX)
-#include "mas35xx.h"
-#else
-/* For targets without audio */
-#include "audiohw.h"
-#endif
+#include <audiohw.h>
 
 extern void audiohw_postinit(void);
 

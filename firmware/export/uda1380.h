@@ -20,8 +20,6 @@
 #ifndef _UDA1380_H
 #define _UDA1380_H
 
-#include "audiohw.h"
-
 /* volume/balance/treble/bass interdependency */
 #define VOLUME_MIN -840
 #define VOLUME_MAX  0

@@ -21,7 +21,6 @@
 #define _AS3514_H
 
 #include <stdbool.h>
-#include "audiohw.h"
 
 extern int tenthdb2master(int db);
 
