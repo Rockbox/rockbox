@@ -172,12 +172,6 @@ int read_partinfo(struct ipod_t* ipod, int silent)
 
     if ((sectorbuf[510] == 0x55) && (sectorbuf[511] == 0xaa)) {
         /* DOS partition table */
-        if ((memcmp(&sectorbuf[71],"iPod",4) != 0) &&
-            (memcmp(&sectorbuf[0x40],"This is your Apple iPod. You probably do not want to boot from it!",66) != 0) ) {
-            if (!silent) fprintf(stderr,"[ERR]  Drive is not an iPod, aborting\n");
-            return -1;
-        }
-
         ipod->macpod = 0;
         /* parse partitions */
         for ( i = 0; i < 4; i++ ) {
@@ -256,6 +250,16 @@ int read_partinfo(struct ipod_t* ipod, int silent)
         }
     } else {
         if (!silent) fprintf(stderr,"[ERR]  Bad boot sector signature\n");
+        return -1;
+    }
+
+    /* Check that the partition table looks like an ipod:
+           1) Partition 1 is of type 0 (Empty) but isn't empty.
+           2) Partition 2 is of type 0xb (winpod) or -1 (macpod)
+    */
+    if ((ipod->pinfo[0].type != 0) || (ipod->pinfo[0].size == 0) || 
+        ((ipod->pinfo[1].type != 0xb) && (ipod->pinfo[1].type != -1))) {
+        if (!silent) fprintf(stderr,"[ERR]  Partition layout is not an ipod\n");
         return -1;
     }
 
