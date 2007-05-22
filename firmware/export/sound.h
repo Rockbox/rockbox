@@ -36,6 +36,9 @@
 #include "as3514.h"
 #elif defined(HAVE_MAS35XX)
 #include "mas35xx.h"
+#else
+/* For targets without audio */
+#include "audiohw.h"
 #endif
 
 extern void audiohw_postinit(void);
