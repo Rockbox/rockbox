@@ -201,6 +201,7 @@ void fatal_error(void)
     printf("reboot then SELECT+PLAY");
     printf("for disk mode");
 #endif
+    lcd_update();
 
     while (1) {
         if (button_hold() != holdstatus) {
