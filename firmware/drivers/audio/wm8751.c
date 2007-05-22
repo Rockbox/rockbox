@@ -27,7 +27,7 @@
 #include "wmcodec.h"
 #include "i2s.h"
 #include "audio.h"
-#include "sound.h"
+#include "audiohw.h"
 
 const struct sound_settings_info audiohw_settings[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25},

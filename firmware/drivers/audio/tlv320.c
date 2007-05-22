@@ -22,7 +22,7 @@
 #include "audio.h"
 
 #include "i2c-coldfire.h"
-#include "tlv320.h"
+#include "audiohw.h"
 
 const struct sound_settings_info audiohw_settings[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1, -73,   6, -20},

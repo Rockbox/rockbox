@@ -23,7 +23,7 @@
 #include "debug.h"
 
 #include "i2c-coldfire.h"
-#include "uda1380.h"
+#include "audiohw.h"
 #include "pcf50606.h"
 
 const struct sound_settings_info audiohw_settings[] = {

@@ -23,7 +23,7 @@
 #include "debug.h"
 #include "system.h"
 
-#include "as3514.h"
+#include "audiohw.h"
 #include "i2s.h"
 #include "i2c-pp.h"
 

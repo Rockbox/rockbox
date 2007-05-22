@@ -28,7 +28,7 @@
 #include "audio.h"
 
 #include "wmcodec.h"
-#include "wm8758.h"
+#include "audiohw.h"
 #include "i2s.h"
 
 const struct sound_settings_info audiohw_settings[] = {

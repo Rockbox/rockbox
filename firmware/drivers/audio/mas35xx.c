@@ -21,7 +21,7 @@
  ****************************************************************************/
 
 #include "config.h"
-#include "mas35xx.h"
+#include "audiohw.h"
 
 const struct sound_settings_info audiohw_settings[] = {
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)

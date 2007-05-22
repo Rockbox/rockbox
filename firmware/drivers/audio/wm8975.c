@@ -29,7 +29,7 @@
 #include "audio.h"
 
 #include "wmcodec.h"
-#include "wm8975.h"
+#include "audiohw.h"
 #include "i2s.h"
 
 /* use zero crossing to reduce clicks during volume changes */
