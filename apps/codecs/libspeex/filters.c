@@ -34,6 +34,7 @@
 #include "config-speex.h"
 #endif
 
+#include "filters.h"
 #include "stack_alloc.h"
 #include "misc.h"
 #include "math_approx.h"
@@ -46,8 +47,6 @@
 #include "filters_arm4.h"
 #elif defined (BFIN_ASM)
 #include "filters_bfin.h"
-#else
-#include "filters.h"
 #endif
 
 
@@ -60,6 +59,24 @@ void bw_lpc(spx_word16_t gamma, const spx_coef_t *lpc_in, spx_coef_t *lpc_out, i
    {
       lpc_out[i] = MULT16_16_P15(tmp,lpc_in[i]);
       tmp = MULT16_16_P15(tmp, gamma);
+   }
+}
+
+void sanitize_values32(spx_word32_t *vec, spx_word32_t min_val, spx_word32_t max_val, int len)
+{
+   int i;
+   for (i=0;i<len;i++)
+   {
+      /* It's important we do the test that way so we can catch NaNs, which are neither greater nor smaller */
+      if (!(vec[i]>=min_val && vec[i] <= max_val))
+      {
+         if (vec[i] < min_val)
+            vec[i] = min_val;
+         else if (vec[i] > max_val)
+            vec[i] = max_val;
+         else /* Has to be NaN */
+            vec[i] = 0;
+      }
    }
 }
 

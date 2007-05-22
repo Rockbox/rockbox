@@ -155,6 +155,10 @@ extern "C" {
 /** Get status of input/output high-pass filtering */
 #define SPEEX_GET_HIGHPASS 45
 
+/** Get "activity level" of the last decoded frame, i.e.
+    now much damage we cause if we remove the frame */
+#define SPEEX_GET_ACTIVITY 47
+
 
 /* Preserving compatibility:*/
 /** Equivalent to SPEEX_SET_ENH */
@@ -297,7 +301,7 @@ typedef struct SpeexMode {
  * encode, you need one state per channel.
  *
  * @param mode The mode to use (either speex_nb_mode or speex_wb.mode) 
- * @return A newly created encoder
+ * @return A newly created encoder state or NULL if state allocation fails
  */
 void *speex_encoder_init(const SpeexMode *mode);
 
@@ -330,7 +334,7 @@ int speex_encode_int(void *state, spx_int16_t *in, SpeexBits *bits);
  * @param state Encoder state
  * @param request ioctl-type request (one of the SPEEX_* macros)
  * @param ptr Data exchanged to-from function
- * @return 0 if no error, -1 if request in unknown
+ * @return 0 if no error, -1 if request in unknown, -2 for invalid parameter
  */
 int speex_encoder_ctl(void *state, int request, void *ptr);
 
@@ -341,7 +345,7 @@ int speex_encoder_ctl(void *state, int request, void *ptr);
  * decode, you need one state per channel.
  *
  * @param mode Speex mode (one of speex_nb_mode or speex_wb_mode)
- * @return A newly created decoder state
+ * @return A newly created decoder state or NULL if state allocation fails
  */ 
 void *speex_decoder_init(const SpeexMode *mode);
 
@@ -376,7 +380,7 @@ int speex_decode_int(void *state, SpeexBits *bits, spx_int16_t *out);
  * @param state Decoder state
  * @param request ioctl-type request (one of the SPEEX_* macros)
  * @param ptr Data exchanged to-from function
- * @return 0 if no error, -1 if request in unknown
+ * @return 0 if no error, -1 if request in unknown, -2 for invalid parameter
  */
 int speex_decoder_ctl(void *state, int request, void *ptr);
 
@@ -386,12 +390,14 @@ int speex_decoder_ctl(void *state, int request, void *ptr);
  * @param mode Speex mode
  * @param request ioctl-type request (one of the SPEEX_* macros)
  * @param ptr Data exchanged to-from function
+ * @return 0 if no error, -1 if request in unknown, -2 for invalid parameter
  */
 int speex_mode_query(const SpeexMode *mode, int request, void *ptr);
 
 /** Functions for controlling the behavior of libspeex
  * @param request ioctl-type request (one of the SPEEX_LIB_* macros)
  * @param ptr Data exchanged to-from function
+ * @return 0 if no error, -1 if request in unknown, -2 for invalid parameter
  */
 int speex_lib_ctl(int request, void *ptr);
 

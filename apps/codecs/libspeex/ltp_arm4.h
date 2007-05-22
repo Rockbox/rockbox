@@ -171,7 +171,7 @@ void pitch_xcorr(const spx_word16_t *_x, const spx_word16_t *_y, spx_word32_t *c
                "\tstr %7, %14 \n"
 
             : "+r" (y0), "+r" (y1), "+r" (y2), "+r" (y3),
-              "=r" (part1),  "=r" (part2),  "=r" (part3),  "=r" (part4),
+         "=r" (part1),  "=r" (part2),  "=r" (part3),  "=r" (part4),
               "+r" (x), "+r" (y), "=r" (x0), "+m" (sum1),
               "+m" (sum2), "+m" (sum3), "+m" (sum4), "=r" (dead1)
             :

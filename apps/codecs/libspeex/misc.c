@@ -63,30 +63,6 @@ long long spx_mips=0;
 #endif
 
 
-spx_uint32_t be_int(spx_uint32_t i)
-{
-   spx_uint32_t ret=i;
-#ifndef WORDS_BIGENDIAN
-   ret =  i>>24;
-   ret += (i>>8)&0x0000ff00;
-   ret += (i<<8)&0x00ff0000;
-   ret += (i<<24);
-#endif
-   return ret;
-}
-
-spx_uint32_t le_int(spx_uint32_t i)
-{
-   spx_uint32_t ret=i;
-#ifdef WORDS_BIGENDIAN
-   ret =  i>>24;
-   ret += (i>>8)&0x0000ff00;
-   ret += (i<<8)&0x00ff0000;
-   ret += (i<<24);
-#endif
-   return ret;
-}
-
 #ifndef OVERRIDE_SPEEX_ALLOC
 void *speex_alloc (int size)
 {
@@ -132,7 +108,7 @@ void *speex_move (void *dest, void *src, int n)
 #ifndef OVERRIDE_SPEEX_ERROR
 void speex_error(const char *str)
 {
-   fprintf (stderr, "Fatal error: %s\n", str);
+   fprintf (stderr, "Fatal (internal) error: %s\n", str);
    exit(1);
 }
 #endif
@@ -140,14 +116,27 @@ void speex_error(const char *str)
 #ifndef OVERRIDE_SPEEX_WARNING
 void speex_warning(const char *str)
 {
+#ifndef DISABLE_WARNINGS
    fprintf (stderr, "warning: %s\n", str);
+#endif
 }
 #endif
 
 #ifndef OVERRIDE_SPEEX_WARNING_INT
 void speex_warning_int(const char *str, int val)
 {
+#ifndef DISABLE_WARNINGS
    fprintf (stderr, "warning: %s %d\n", str, val);
+#endif
+}
+#endif
+
+#ifndef OVERRIDE_SPEEX_NOTIFY
+void speex_notify(const char *str)
+{
+#ifndef DISABLE_NOTIFICATIONS
+   fprintf (stderr, "notification: %s\n", str);
+#endif
 }
 #endif
 

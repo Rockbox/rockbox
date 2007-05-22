@@ -41,8 +41,8 @@
    double-talk is achieved using a variable learning rate as described in:
    
    Valin, J.-M., On Adjusting the Learning Rate in Frequency Domain Echo 
-   Cancellation With Double-Talk. To appear in IEEE Transactions on Audio,
-   Speech and Language Processing, 2006.
+   Cancellation With Double-Talk. IEEE Transactions on Audio,
+   Speech and Language Processing, Vol. 15, No. 3, pp. 1030-1034, 2007.
    http://people.xiph.org/~jm/papers/valin_taslp2006.pdf
    
    There is no explicit double-talk detection, but a continuous variation
@@ -360,12 +360,36 @@ static inline void mdf_adjust_prop(const spx_word32_t *W, int N, int M, spx_word
    /*printf ("\n");*/
 }
 
+#ifdef DUMP_ECHO_CANCEL_DATA
+#include <stdio.h>
+static FILE *rFile=NULL, *pFile=NULL, *oFile=NULL;
+
+static void dump_audio(const spx_int16_t *rec, const spx_int16_t *play, const spx_int16_t *out, int len)
+{
+   if (!(rFile && pFile && oFile))
+   {
+      speex_error("Dump files not open");
+   }
+   fwrite(rec, sizeof(spx_int16_t), len, rFile);
+   fwrite(play, sizeof(spx_int16_t), len, pFile);
+   fwrite(out, sizeof(spx_int16_t), len, oFile);
+}
+#endif
+
 /** Creates a new echo canceller state */
 SpeexEchoState *speex_echo_state_init(int frame_size, int filter_length)
 {
    int i,N,M;
    SpeexEchoState *st = (SpeexEchoState *)speex_alloc(sizeof(SpeexEchoState));
 
+#ifdef DUMP_ECHO_CANCEL_DATA
+   if (rFile || pFile || oFile)
+      speex_error("Opening dump files twice");
+   rFile = fopen("aec_rec.sw", "w");
+   pFile = fopen("aec_play.sw", "w");
+   oFile = fopen("aec_out.sw", "w");
+#endif
+   
    st->frame_size = frame_size;
    st->window_size = 2*frame_size;
    N = st->window_size;
@@ -553,6 +577,13 @@ void speex_echo_state_destroy(SpeexEchoState *st)
 #endif
    speex_free(st->play_buf);
    speex_free(st);
+   
+#ifdef DUMP_ECHO_CANCEL_DATA
+   fclose(rFile);
+   fclose(pFile);
+   fclose(oFile);
+   rFile = pFile = oFile = NULL;
+#endif
 }
 
 void speex_echo_capture(SpeexEchoState *st, const spx_int16_t *rec, spx_int16_t *out)
@@ -701,8 +732,8 @@ void speex_echo_cancellation(SpeexEchoState *st, const spx_int16_t *in, const sp
    spectral_mul_accum16(st->X, st->foreground, st->Y, N, M);   
    spx_ifft(st->fft_table, st->Y, st->e);
    for (i=0;i<st->frame_size;i++)
-      st->x[i+st->frame_size] = SUB16(st->input[i], st->e[i+st->frame_size]);
-   Sff = mdf_inner_prod(st->x+st->frame_size, st->x+st->frame_size, st->frame_size);
+      st->e[i] = SUB16(st->input[i], st->e[i+st->frame_size]);
+   Sff = mdf_inner_prod(st->e, st->e, st->frame_size);
 #endif
    
    /* Adjust proportional adaption rate */
@@ -762,13 +793,13 @@ void speex_echo_cancellation(SpeexEchoState *st, const spx_int16_t *in, const sp
 #ifdef TWO_PATH
    /* Difference in response, this is used to estimate the variance of our residual power estimate */
    for (i=0;i<st->frame_size;i++)
-      st->x[i+st->frame_size] = SUB16(st->e[i+st->frame_size], st->y[i+st->frame_size]);
-   Dbf = 10+mdf_inner_prod(st->x+st->frame_size, st->x+st->frame_size, st->frame_size);
+      st->e[i] = SUB16(st->e[i+st->frame_size], st->y[i+st->frame_size]);
+   Dbf = 10+mdf_inner_prod(st->e, st->e, st->frame_size);
 #endif
 
    for (i=0;i<st->frame_size;i++)
-      st->x[i+st->frame_size] = SUB16(st->input[i], st->y[i+st->frame_size]);
-   See = mdf_inner_prod(st->x+st->frame_size, st->x+st->frame_size, st->frame_size);
+      st->e[i] = SUB16(st->input[i], st->y[i+st->frame_size]);
+   See = mdf_inner_prod(st->e, st->e, st->frame_size);
 #ifndef TWO_PATH
    Sff = See;
 #endif
@@ -828,7 +859,7 @@ void speex_echo_cancellation(SpeexEchoState *st, const spx_int16_t *in, const sp
          for (i=0;i<st->frame_size;i++)
             st->y[i+st->frame_size] = st->e[i+st->frame_size];
          for (i=0;i<st->frame_size;i++)
-            st->x[i+st->frame_size] = SUB16(st->input[i], st->y[i+st->frame_size]);
+            st->e[i] = SUB16(st->input[i], st->y[i+st->frame_size]);
          See = Sff;
          st->Davg1 = st->Davg2 = 0;
          st->Dvar1 = st->Dvar2 = FLOAT_ZERO;
@@ -861,12 +892,16 @@ void speex_echo_cancellation(SpeexEchoState *st, const spx_int16_t *in, const sp
       out[i] = (spx_int16_t)tmp_out;
       st->memE = tmp_out;
    }
-
+   
+#ifdef DUMP_ECHO_CANCEL_DATA
+   dump_audio(in, far_end, out, st->frame_size);
+#endif
+   
    /* Compute error signal (filter update version) */ 
    for (i=0;i<st->frame_size;i++)
    {
+      st->e[i+st->frame_size] = st->e[i];
       st->e[i] = 0;
-      st->e[i+st->frame_size] = st->x[i+st->frame_size];
    }
 
    /* Compute a bunch of correlations */

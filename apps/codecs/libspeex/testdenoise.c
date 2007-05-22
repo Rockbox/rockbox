@@ -1,5 +1,5 @@
 #ifdef HAVE_CONFIG_H
-#include "config-speex.h"
+#include "config.h"
 #endif
 
 #include <speex/speex_preprocess.h>

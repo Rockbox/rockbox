@@ -192,16 +192,18 @@ void *sb_encoder_init(const SpeexMode *m)
    st = (SBEncState*)speex_alloc(sizeof(SBEncState));
    if (!st)
       return NULL;
-#if defined(VAR_ARRAYS) || defined (USE_ALLOCA)
-   st->stack = NULL;
-#else
-   st->stack = (char*)speex_alloc_scratch(SB_ENC_STACK);
-#endif
    st->mode = m;
    mode = (const SpeexSBMode*)m->mode;
 
 
    st->st_low = speex_encoder_init(mode->nb_mode);
+#if defined(VAR_ARRAYS) || defined (USE_ALLOCA)
+   st->stack = NULL;
+#else
+   /*st->stack = (char*)speex_alloc_scratch(SB_ENC_STACK);*/
+   speex_encoder_ctl(st->st_low, SPEEX_GET_STACK, &st->stack);
+#endif
+
    st->full_frame_size = 2*mode->frameSize;
    st->frame_size = mode->frameSize;
    st->subframeSize = mode->subframeSize;
@@ -275,7 +277,7 @@ void sb_encoder_destroy(void *state)
 
    speex_encoder_destroy(st->st_low);
 #if !(defined(VAR_ARRAYS) || defined (USE_ALLOCA))
-   speex_free_scratch(st->stack);
+   /*speex_free_scratch(st->stack);*/
 #endif
 
    speex_free(st->high);
@@ -629,7 +631,11 @@ int sb_encode(void *state, void *vin, SpeexBits *bits)
                quant=31;
             speex_bits_pack(bits, quant, 5);
          }
-
+         if (st->innov_rms_save)
+         {
+            st->innov_rms_save[sub] = eh;
+         }
+         st->exc_rms[sub] = eh;
       } else {
          spx_word16_t gc;       /*Q7*/
          spx_word32_t scale;    /*Q14*/
@@ -716,11 +722,11 @@ int sb_encode(void *state, void *vin, SpeexBits *bits)
          {
             st->innov_rms_save[sub] = MULT16_16_Q15(QCONST16(.70711f, 15), compute_rms(innov, st->subframeSize));
          }
+         st->exc_rms[sub] = compute_rms16(exc, st->subframeSize);
          
 
       }
 
-      st->exc_rms[sub] = compute_rms16(exc, st->subframeSize);
       
       /*Keep the previous memory*/
       for (i=0;i<st->lpcSize;i++)
@@ -754,20 +760,18 @@ void *sb_decoder_init(const SpeexMode *m)
    st = (SBDecState*)speex_alloc(sizeof(SBDecState));
    if (!st)
       return NULL;
+   st->mode = m;
+   mode=(const SpeexSBMode*)m->mode;
+   st->encode_submode = 1;
+
+   st->st_low = speex_decoder_init(mode->nb_mode);
 #if defined(VAR_ARRAYS) || defined (USE_ALLOCA)
    st->stack = NULL;
 #else
-   st->stack = (char*)speex_alloc_scratch(SB_DEC_STACK);
+   /*st->stack = (char*)speex_alloc_scratch(SB_DEC_STACK);*/
+   speex_decoder_ctl(st->st_low, SPEEX_GET_STACK, &st->stack);
 #endif
-   st->mode = m;
-   mode=(const SpeexSBMode*)m->mode;
 
-   st->encode_submode = 1;
-
-
-
-
-   st->st_low = speex_decoder_init(mode->nb_mode);
    st->full_frame_size = 2*mode->frameSize;
    st->frame_size = mode->frameSize;
    st->subframeSize = mode->subframeSize;
@@ -813,7 +817,7 @@ void sb_decoder_destroy(void *state)
    st = (SBDecState*)state;
    speex_decoder_destroy(st->st_low);
 #if !(defined(VAR_ARRAYS) || defined (USE_ALLOCA))
-   speex_free_scratch(st->stack);
+   /*speex_free_scratch(st->stack);*/
 #endif
 
    speex_free(st->g0_mem);
@@ -882,6 +886,8 @@ int sb_decode(void *state, SpeexBits *bits, void *vout)
    const SpeexSBMode *mode;
    spx_word16_t *out = (spx_word16_t*)vout;
    spx_word16_t *low_innov_alias;
+   spx_word32_t exc_ener_sum = 0;
+   
    st = (SBDecState*)state;
    stack=st->stack;
    mode = (const SpeexSBMode*)(st->mode->mode);
@@ -925,7 +931,7 @@ int sb_decode(void *state, SpeexBits *bits, void *vout)
       }
       if (st->submodeID != 0 && st->submodes[st->submodeID] == NULL)
       {
-         speex_warning("Invalid mode encountered: corrupted stream?");
+         speex_notify("Invalid mode encountered. The stream is corrupted.");
          return -2;
       }
    }
@@ -1006,8 +1012,8 @@ int sb_decode(void *state, SpeexBits *bits, void *vout)
          rh = LPC_SCALING;
          for (i=0;i<st->lpcSize;i+=2)
          {
-            rh += st->interp_qlpc[i+1] - st->interp_qlpc[i];
-            st->pi_gain[sub] += st->interp_qlpc[i] + st->interp_qlpc[i+1];
+            rh += ak[i+1] - ak[i];
+            st->pi_gain[sub] += ak[i] + ak[i+1];
          }
 
          rl = low_pi_gain[sub];
@@ -1083,9 +1089,9 @@ int sb_decode(void *state, SpeexBits *bits, void *vout)
       for (i=0;i<st->lpcSize;i++)
          st->interp_qlpc[i] = ak[i];
       st->exc_rms[sub] = compute_rms16(st->excBuf, st->subframeSize);
-
+      exc_ener_sum = ADD32(exc_ener_sum, DIV32(MULT16_16(st->exc_rms[sub],st->exc_rms[sub]), st->nbSubframes));
    }
-   st->last_ener = compute_rms16(out+st->frame_size, st->frame_size);
+   st->last_ener = spx_sqrt(exc_ener_sum);
    
    qmf_synth(out, out+st->frame_size, h0, out, st->full_frame_size, QMF_ORDER, st->g0_mem, st->g1_mem, stack);
    for (i=0;i<st->lpcSize;i++)
@@ -1335,7 +1341,9 @@ int sb_encoder_ctl(void *state, int request, void *ptr)
    case SPEEX_SET_WIDEBAND:
       speex_encoder_ctl(st->st_low, SPEEX_SET_WIDEBAND, ptr);
       break;
-
+   case SPEEX_GET_STACK:
+      *((char**)ptr) = st->stack;
+      break;
    default:
       speex_warning_int("Unknown nb_ctl request: ", request);
       return -1;
@@ -1433,7 +1441,9 @@ int sb_decoder_ctl(void *state, int request, void *ptr)
    case SPEEX_GET_HIGHPASS:
       speex_decoder_ctl(st->st_low, SPEEX_GET_HIGHPASS, ptr);
       break;
-
+   case SPEEX_GET_ACTIVITY:
+      speex_decoder_ctl(st->st_low, SPEEX_GET_ACTIVITY, ptr);
+      break;
    case SPEEX_GET_PI_GAIN:
       {
          int i;
@@ -1458,7 +1468,9 @@ int sb_decoder_ctl(void *state, int request, void *ptr)
    case SPEEX_SET_WIDEBAND:
       speex_decoder_ctl(st->st_low, SPEEX_SET_WIDEBAND, ptr);
       break;
-
+   case SPEEX_GET_STACK:
+      *((char**)ptr) = st->stack;
+      break;
    default:
       speex_warning_int("Unknown nb_ctl request: ", request);
       return -1;

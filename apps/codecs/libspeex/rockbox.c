@@ -81,6 +81,11 @@ void speex_warning_int(const char *str, int val)
     DEBUGF("warning: %s %d\n", str, val);
 }
 
+void speex_notify(const char *str)
+{
+    DEBUGF("notice: %s\n", str);
+}
+
 void _speex_putc(int ch, void *file)
 {
     //FILE *f = (FILE *)file;
