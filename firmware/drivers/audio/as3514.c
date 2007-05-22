@@ -106,7 +106,7 @@ int audiohw_init(void)
     as3514_write(HPH_OUT_L, 0x16); /* set default vol for headphone */
     as3514_write(LINE_IN1_R, 0x36); /* unmute lineIn 1 and set gain */
     as3514_write(LINE_IN1_L, 0x36); /* unmute lineIn 1 and set gain */
-    as3514_write(PLLMODE, 0x04);
+    as3514_write(PLLMODE, 0x00);
 
     /* read all reg values */
     for (i = 0; i < sizeof(as3514_regs) / sizeof(int); i++)

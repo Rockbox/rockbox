@@ -93,13 +93,7 @@ void fiq(void)
         "bls .fifo_full       \n\t" /* FIFO full, exit */
         "ldr r10, [r9], #4    \n\t" /* load two samples */
 #ifdef HAVE_AS3514
-        /* The AS3514 reads 3 bytes at a time, it seems, ignoring the lowest.
-        This code seems to work well, but we may have to mask off the extra
-        bits - at the expense of a few extra cycles in the FIQ */
-        "mov r10, r10, ror #2\n\t" /* put left sample at the top bits */
-        "str r10, [r12, #0x40]\n\t" /* write top sample, lower sample ignored */
-        "mov r10, r10, ror #16\n\t" /* put left sample at the top bits */
-        "str r10, [r12, #0x40]\n\t" /* then write it */
+        "str r10, [r12, #0x40]\n\t" /* write them */
 #else
         "mov r10, r10, ror #16\n\t" /* put left sample at the top bits */
         "str r10, [r12, #0x40]\n\t" /* write top sample, lower sample ignored */
@@ -184,8 +178,13 @@ void fiq(void)
                 return;
             }
 
+#ifdef HAVE_AS3514
+            IISFIFO_WR = *(int32_t *)p;
+            p += 2;
+#else
             IISFIFO_WR = (*(p++))<<16;
             IISFIFO_WR = (*(p++))<<16;
+#endif
             p_size-=4;
         }
 
@@ -240,8 +239,13 @@ void pcm_play_dma_start(const void *addr, size_t size)
             return;
         }
 
+#ifdef HAVE_AS3514
+        IISFIFO_WR = *(int32_t *)p;
+        p += 2;
+#else
         IISFIFO_WR = (*(p++))<<16;
         IISFIFO_WR = (*(p++))<<16;
+#endif
         p_size-=4;
     }
 }
@@ -315,8 +319,13 @@ void pcm_play_pause_unpause(void)
             return;
         }
 
+#ifdef HAVE_AS3514
+        IISFIFO_WR = *(int32_t *)p;
+        p += 2;
+#else
         IISFIFO_WR = (*(p++))<<16;
         IISFIFO_WR = (*(p++))<<16;
+#endif
         p_size-=4;
     }
 }
