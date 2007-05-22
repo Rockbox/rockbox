@@ -253,6 +253,11 @@
 #endif
 #endif
 
+/* Add one HAVE_ define for all mas35xx targets */
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3507D) || (CONFIG_CODEC == MAS3539F)
+#define HAVE_MAS35XX
+#endif
+
 #if CONFIG_CODEC == SWCODEC && !defined(BOOTLOADER)
 #define HAVE_EXTENDED_MESSAGING_AND_NAME
 #endif

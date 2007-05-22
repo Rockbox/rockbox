@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2005 by Linus Nielsen Feltzing
+ * Copyright (C) 2007 by Christian Gmeiner
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -43,132 +44,113 @@ extern unsigned shadow_codec_reg0;
 #endif
 #endif /* SIMULATOR */
 
-struct sound_settings_info {
-    const char *unit;
-    int numdecimals;
-    int steps;
-    int minval;
-    int maxval;
-    int defaultval;
-    sound_set_type *setfn;
+#ifdef SIMULATOR
+/* dummy for sim */
+const struct sound_settings_info audiohw_settings[] = {
+    [SOUND_VOLUME]        = {"dB", 0,  1, -40,   6, -25},
+    [SOUND_BASS]          = {"dB", 0,  1, -24,  24,   0},
+    [SOUND_TREBLE]        = {"dB", 0,  1, -24,  24,   0},
+    [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
+    [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
+    [SOUND_STEREO_WIDTH]  = {"%",  0,  1,   0, 255, 100},
 };
-
-static const struct sound_settings_info sound_settings_table[] = {
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    [SOUND_VOLUME]        = {"dB", 0,  1,-100,  12, -25, sound_set_volume},
-    [SOUND_BASS]          = {"dB", 0,  1, -12,  12,   6, sound_set_bass},
-    [SOUND_TREBLE]        = {"dB", 0,  1, -12,  12,   6, sound_set_treble},
-#elif defined(HAVE_UDA1380)
-    [SOUND_VOLUME]        = {"dB", 0,  1, -84,   0, -25, sound_set_volume},
-    [SOUND_BASS]          = {"dB", 0,  2,   0,  24,   0, sound_set_bass},
-    [SOUND_TREBLE]        = {"dB", 0,  2,   0,   6,   0, sound_set_treble},
-#elif defined(HAVE_TLV320)
-    [SOUND_VOLUME]        = {"dB", 0,  1, -73,   6, -20, sound_set_volume},
-#elif defined(HAVE_WM8751)
-    [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25, sound_set_volume},
-    [SOUND_BASS]          = {"dB", 1, 15, -60,  90,   0, sound_set_bass},
-    [SOUND_TREBLE]        = {"dB", 1, 15, -60,  90,   0, sound_set_treble},
-#elif defined(HAVE_WM8975)
-    [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25, sound_set_volume},
-    [SOUND_BASS]          = {"dB", 0,  1,  -6,   9,   0, sound_set_bass},
-    [SOUND_TREBLE]        = {"dB", 0,  1,  -6,   9,   0, sound_set_treble},
-#elif defined(HAVE_WM8758)
-    [SOUND_VOLUME]        = {"dB", 0,  1, -58,   6, -25, sound_set_volume},
-    [SOUND_BASS]          = {"dB", 0,  1,  -6,   9,   0, sound_set_bass},
-    [SOUND_TREBLE]        = {"dB", 0,  1,  -6,   9,   0, sound_set_treble},
-#elif defined(HAVE_WM8731) || defined(HAVE_WM8721)
-    [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25, sound_set_volume},
-#elif (CONFIG_CPU == PNX0101)
-    [SOUND_VOLUME]        = {"dB", 0,  1, -48,  15,   0, sound_set_volume},
-#elif defined(HAVE_AS3514)
-    [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25, sound_set_volume},
-#else /* MAS3507D */
-    [SOUND_VOLUME]        = {"dB", 0,  1, -78,  18, -18, sound_set_volume},
-    [SOUND_BASS]          = {"dB", 0,  1, -15,  15,   7, sound_set_bass},
-    [SOUND_TREBLE]        = {"dB", 0,  1, -15,  15,   7, sound_set_treble},
 #endif
-/* Override any other potentially existing treble/bass controllers if wanted */
-#ifdef HAVE_SW_TONE_CONTROLS
-    [SOUND_BASS]          = {"dB", 0,  1, -24,  24,   0, sound_set_bass},
-    [SOUND_TREBLE]        = {"dB", 0,  1, -24,  24,   0, sound_set_treble},
-#endif
-    [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0, sound_set_balance},
-    [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0, sound_set_channels},
-    [SOUND_STEREO_WIDTH]  = {"%",  0,  1,   0, 255, 100, sound_set_stereo_width},
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    [SOUND_LOUDNESS]      = {"dB", 0,  1,   0,  17,   0, sound_set_loudness},
-    [SOUND_AVC]           = {"",   0,  1,  -1,   4,   0, sound_set_avc},
-    [SOUND_MDB_STRENGTH]  = {"dB", 0,  1,   0, 127,  48, sound_set_mdb_strength},
-    [SOUND_MDB_HARMONICS] = {"%",  0,  1,   0, 100,  50, sound_set_mdb_harmonics},
-    [SOUND_MDB_CENTER]    = {"Hz", 0, 10,  20, 300,  60, sound_set_mdb_center},
-    [SOUND_MDB_SHAPE]     = {"Hz", 0, 10,  50, 300,  90, sound_set_mdb_shape},
-    [SOUND_MDB_ENABLE]    = {"",   0,  1,   0,   1,   0, sound_set_mdb_enable},
-    [SOUND_SUPERBASS]     = {"",   0,  1,   0,   1,   0, sound_set_superbass},
-#endif
-#if CONFIG_CODEC == MAS3587F
-    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,   0,  15,   8, NULL},
-    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,   0,  15,   8, NULL},
-    [SOUND_MIC_GAIN]      = {"dB", 1,  1,   0,  15,   2, NULL},
-#elif defined(HAVE_UDA1380)
-    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-128,  96,   0, NULL},
-    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-128,  96,   0, NULL},
-    [SOUND_MIC_GAIN]      = {"dB", 1,  1,-128, 108,  16, NULL},
-#elif defined(HAVE_TLV320)
-    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,   0,  31,  23, NULL},
-    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,   0,  31,  23, NULL},
-    [SOUND_MIC_GAIN]      = {"dB", 1,  1,   0,   1,   1, NULL},
-#elif defined(HAVE_WM8975)
-    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-128,  96,   0, NULL},
-    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-128,  96,   0, NULL},
-    [SOUND_MIC_GAIN]      = {"dB", 1,  1,-128, 108,  16, NULL},
-#elif defined(HAVE_WM8758)
-    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-128,  96,   0, NULL},
-    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-128,  96,   0, NULL},
-    [SOUND_MIC_GAIN]      = {"dB", 1,  1,-128, 108,  16, NULL},
-#elif defined(HAVE_WM8731)
-    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-128,  96,   0, NULL},
-    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-128,  96,   0, NULL},
-    [SOUND_MIC_GAIN]      = {"dB", 1,  1,-128, 108,  16, NULL},
-#endif
-};
 
 const char *sound_unit(int setting)
 {
-    return sound_settings_table[setting].unit;
+    return audiohw_settings[setting].unit;
 }
 
 int sound_numdecimals(int setting)
 {
-    return sound_settings_table[setting].numdecimals;
+    return audiohw_settings[setting].numdecimals;
 }
 
 int sound_steps(int setting)
 {
-    return sound_settings_table[setting].steps;
+    return audiohw_settings[setting].steps;
 }
 
 int sound_min(int setting)
 {
-    return sound_settings_table[setting].minval;
+    return audiohw_settings[setting].minval;
 }
 
 int sound_max(int setting)
 {
-    return sound_settings_table[setting].maxval;
+    return audiohw_settings[setting].maxval;
 }
 
 int sound_default(int setting)
 {
-    return sound_settings_table[setting].defaultval;
+    return audiohw_settings[setting].defaultval;
 }
 
 sound_set_type* sound_get_fn(int setting)
 {
-    if ((unsigned)setting < (sizeof(sound_settings_table)
-                             / sizeof(struct sound_settings_info)))
-        return sound_settings_table[setting].setfn;
-    else
-        return NULL;
+    sound_set_type* result = NULL;
+
+    switch (setting) {
+        case SOUND_VOLUME:
+            result = sound_set_volume;
+            break;
+
+        case SOUND_BASS:
+            result = sound_set_bass;
+            break;
+
+        case SOUND_TREBLE:
+            result = sound_set_treble;
+            break;
+
+        case SOUND_BALANCE:
+            result = sound_set_balance;
+            break;
+
+        case SOUND_CHANNELS:
+            result = sound_set_channels;
+            break;
+
+        case SOUND_STEREO_WIDTH:
+            result = sound_set_stereo_width;
+            break;
+
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+        case SOUND_LOUDNESS:
+            result = sound_set_loudness;
+            break;
+
+        case SOUND_AVC:
+            result = sound_set_avc;
+            break;
+
+        case SOUND_MDB_STRENGTH:
+            result = sound_set_mdb_strength;
+            break;
+
+        case SOUND_MDB_HARMONICS:
+            result = sound_set_mdb_harmonics;
+            break;
+
+        case SOUND_MDB_CENTER:
+            result = sound_set_mdb_center;
+            break;
+
+        case SOUND_MDB_SHAPE:
+            result = sound_set_mdb_shape;
+            break;
+
+        case SOUND_MDB_ENABLE:
+            result = sound_set_mdb_enable;
+            break;
+
+        case SOUND_SUPERBASS:
+            result = sound_set_superbass;
+            break;
+#endif
+    }
+
+    return result;
 }
 
 #if CONFIG_CODEC == SWCODEC

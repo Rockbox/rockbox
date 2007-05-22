@@ -24,6 +24,8 @@
 #define VOLUME_MIN -570
 #define VOLUME_MAX  60
 
+#include "audiohw.h"
+
 extern int tenthdb2master(int db);
 extern int tenthdb2mixer(int db);
 

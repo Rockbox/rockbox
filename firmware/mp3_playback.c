@@ -33,6 +33,7 @@
 #include "dac.h"
 #include "system.h"
 #endif
+#include "audiohw.h"
 
 /* hacking into mpeg.c, recording is still there */
 #if CONFIG_CODEC == MAS3587F

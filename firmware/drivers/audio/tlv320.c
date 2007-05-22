@@ -24,6 +24,19 @@
 #include "i2c-coldfire.h"
 #include "tlv320.h"
 
+const struct sound_settings_info audiohw_settings[] = {
+    [SOUND_VOLUME]        = {"dB", 0,  1, -73,   6, -20},
+    /* HAVE_SW_TONE_CONTROLS */
+    [SOUND_BASS]          = {"dB", 0,  1, -24,  24,   0},
+    [SOUND_TREBLE]        = {"dB", 0,  1, -24,  24,   0},
+    [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
+    [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
+    [SOUND_STEREO_WIDTH]  = {"%",  0,  1,   0, 255, 100},
+    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,   0,  31,  23},
+    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,   0,  31,  23},
+    [SOUND_MIC_GAIN]      = {"dB", 1,  1,   0,   1,   1},
+};
+
 /* convert tenth of dB volume (-840..0) to master volume register value */
 int tenthdb2master(int db)
 {

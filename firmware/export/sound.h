@@ -34,44 +34,11 @@
 #include "tlv320.h"
 #elif defined(HAVE_AS3514)
 #include "as3514.h"
+#elif defined(HAVE_MAS35XX)
+#include "mas35xx.h"
 #endif
 
 extern void audiohw_postinit(void);
-
-enum {
-    SOUND_VOLUME = 0,
-    SOUND_BASS,
-    SOUND_TREBLE,
-    SOUND_BALANCE,
-    SOUND_CHANNELS,
-    SOUND_STEREO_WIDTH,
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    SOUND_LOUDNESS,
-    SOUND_AVC,
-    SOUND_MDB_STRENGTH,
-    SOUND_MDB_HARMONICS,
-    SOUND_MDB_CENTER,
-    SOUND_MDB_SHAPE,
-    SOUND_MDB_ENABLE,
-    SOUND_SUPERBASS,
-#endif
-#if CONFIG_CODEC == MAS3587F || defined(HAVE_UDA1380) || defined(HAVE_TLV320)\
-    || defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8731)
-    SOUND_LEFT_GAIN,
-    SOUND_RIGHT_GAIN,
-    SOUND_MIC_GAIN,
-#endif
-};
-
-enum {
-    SOUND_CHAN_STEREO = 0,
-    SOUND_CHAN_MONO,
-    SOUND_CHAN_CUSTOM,
-    SOUND_CHAN_MONO_LEFT,
-    SOUND_CHAN_MONO_RIGHT,
-    SOUND_CHAN_KARAOKE,
-    SOUND_CHAN_NUM_MODES
-};
 
 typedef void sound_set_type(int value);
 

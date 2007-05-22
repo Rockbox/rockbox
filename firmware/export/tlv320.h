@@ -23,6 +23,8 @@
 #define VOLUME_MIN -730
 #define VOLUME_MAX  60
 
+#include "audiohw.h"
+
 extern int tenthdb2master(int db);
 
 /*** definitions ***/
