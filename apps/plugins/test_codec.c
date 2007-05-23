@@ -20,6 +20,14 @@
 
 PLUGIN_HEADER
 
+/* All swcodec targets have BUTTON_SELECT apart from the H10 */
+
+#if CONFIG_KEYPAD == IRIVER_H10_PAD
+#define TESTCODEC_EXITBUTTON BUTTON_RIGHT
+#else
+#define TESTCODEC_EXITBUTTON BUTTON_SELECT
+#endif
+
 static struct plugin_api* rb;
 
 struct wavinfo_t
@@ -631,7 +639,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
     rb->lcd_update();
 
-    while (rb->button_get(true) != BUTTON_SELECT);
+    while (rb->button_get(true) != TESTCODEC_EXITBUTTON);
 
 exit:
 #ifndef SIMULATOR
