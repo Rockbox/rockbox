@@ -194,10 +194,10 @@ void fatal_error(void)
 
     /* System font is 6 pixels wide */
 #if LCD_WIDTH >= (30*6)
-    printf("Press MENU+SELECT to reboot");
+    printf("Hold MENU+SELECT to reboot");
     printf("then SELECT+PLAY for disk mode");
 #else
-    printf("Press MENU+SELECT to");
+    printf("Hold MENU+SELECT to");
     printf("reboot then SELECT+PLAY");
     printf("for disk mode");
 #endif
