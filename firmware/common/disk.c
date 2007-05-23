@@ -152,10 +152,10 @@ int disk_mount(int drive)
        real problem. */
     for (i=0; volume != -1 && i<4; i++)
     {
-#ifdef MAX_SECTOR_SIZE
+#ifdef MAX_LOG_SECTOR_SIZE
         int j;
 
-        for (j = 1; j <= (MAX_SECTOR_SIZE/SECTOR_SIZE); j <<= 1)
+        for (j = 1; j <= (MAX_LOG_SECTOR_SIZE/SECTOR_SIZE); j <<= 1)
         {
             if (!fat_mount(IF_MV2(volume,) IF_MV2(drive,) pinfo[i].start * j))
             {

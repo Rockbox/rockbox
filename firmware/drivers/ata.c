@@ -92,6 +92,18 @@ long last_disk_activity = -1;
 static int multisectors; /* number of supported multisectors */
 static unsigned short identify_info[SECTOR_SIZE];
 
+#ifdef MAX_PHYS_SECTOR_SIZE
+struct sector_cache_entry {
+    bool inuse;
+    unsigned long sectornum;  /* logical sector */
+    unsigned char data[MAX_PHYS_SECTOR_SIZE];
+};
+/* buffer for reading and writing large physical sectors */
+#define NUMCACHES 2
+static struct sector_cache_entry sector_cache;
+static int phys_sector_mult = 1;
+#endif
+
 static int ata_power_on(void);
 static int perform_soft_reset(void);
 static int set_multiple_mode(int sectors);
@@ -201,10 +213,16 @@ STATICIRAM void copy_read_sectors(unsigned char* buf, int wordcount)
 }
 #endif /* !ATA_OPTIMIZED_READING */
 
+#ifdef MAX_PHYS_SECTOR_SIZE
+static int _read_sectors(unsigned long start,
+                         int incount,
+                         void* inbuf)
+#else
 int ata_read_sectors(IF_MV2(int drive,)
                      unsigned long start,
                      int incount,
                      void* inbuf)
+#endif
 {
     int ret = 0;
     long timeout;
@@ -212,10 +230,12 @@ int ata_read_sectors(IF_MV2(int drive,)
     void* buf;
     long spinup_start;
 
+#ifndef MAX_PHYS_SECTOR_SIZE
 #ifdef HAVE_MULTIVOLUME
     (void)drive; /* unused for now */
 #endif
     spinlock_lock(&ata_mtx);
+#endif
 
     last_disk_activity = current_tick;
     spinup_start = current_tick;
@@ -318,9 +338,6 @@ int ata_read_sectors(IF_MV2(int drive,)
             /* read the status register exactly once per loop */
             status = ATA_STATUS;
 
-            /* if destination address is odd, use byte copying,
-               otherwise use word copying */
-
             if (count >= multisectors )
                 sectors = multisectors;
             else
@@ -358,7 +375,9 @@ int ata_read_sectors(IF_MV2(int drive,)
     }
     ata_led(false);
 
+#ifndef MAX_PHYS_SECTOR_SIZE
     spinlock_unlock(&ata_mtx);
+#endif
 
     return ret;
 }
@@ -401,22 +420,30 @@ STATICIRAM void copy_write_sectors(const unsigned char* buf, int wordcount)
 }
 #endif /* !ATA_OPTIMIZED_WRITING */
 
+#ifdef MAX_PHYS_SECTOR_SIZE
+static int _write_sectors(unsigned long start,
+                          int count,
+                          const void* buf)
+#else
 int ata_write_sectors(IF_MV2(int drive,)
                       unsigned long start,
                       int count,
                       const void* buf)
+#endif
 {
     int i;
     int ret = 0;
     long spinup_start;
 
-#ifdef HAVE_MULTIVOLUME
-    (void)drive; /* unused for now */
-#endif
     if (start == 0)
         panicf("Writing on sector 0\n");
 
+#ifndef MAX_PHYS_SECTOR_SIZE
+#ifdef HAVE_MULTIVOLUME
+    (void)drive; /* unused for now */
+#endif
     spinlock_lock(&ata_mtx);
+#endif
     
     last_disk_activity = current_tick;
     spinup_start = current_tick;
@@ -506,10 +533,185 @@ int ata_write_sectors(IF_MV2(int drive,)
 
     ata_led(false);
 
+#ifndef MAX_PHYS_SECTOR_SIZE
     spinlock_unlock(&ata_mtx);
+#endif
 
     return ret;
 }
+
+#ifdef MAX_PHYS_SECTOR_SIZE
+static int cache_sector(unsigned long sector)
+{
+    int rc;
+
+    sector &= ~(phys_sector_mult - 1); 
+              /* round down to physical sector boundary */
+
+    /* check whether the sector is already cached */
+    if (sector_cache.inuse && (sector_cache.sectornum == sector))
+        return 0;
+
+    /* not found: read the sector */
+    sector_cache.inuse = false;
+    rc = _read_sectors(sector, phys_sector_mult, sector_cache.data);
+    if (!rc)
+    {    
+        sector_cache.sectornum = sector;
+        sector_cache.inuse = true;
+    }
+    return rc;
+}
+
+static inline int flush_current_sector(void)
+{
+    return _write_sectors(sector_cache.sectornum, phys_sector_mult,
+                          sector_cache.data);
+}
+
+int ata_read_sectors(IF_MV2(int drive,)
+                     unsigned long start,
+                     int incount,
+                     void* inbuf)
+{
+    int rc = 0;
+    int offset;
+
+#ifdef HAVE_MULTIVOLUME
+    (void)drive; /* unused for now */
+#endif
+    spinlock_lock(&ata_mtx);
+    
+    offset = start & (phys_sector_mult - 1);
+    
+    if (offset) /* first partial sector */
+    {
+        int partcount = MIN(incount, phys_sector_mult - offset);
+        
+        rc = cache_sector(start);
+        if (rc)
+        {
+            rc = rc * 10 - 1;
+            goto error;
+        }                          
+        memcpy(inbuf, sector_cache.data + offset * SECTOR_SIZE,
+               partcount * SECTOR_SIZE);
+
+        start += partcount;
+        inbuf += partcount * SECTOR_SIZE;
+        incount -= partcount;
+    }
+    if (incount)
+    {
+        offset = incount & (phys_sector_mult - 1);
+        incount -= offset;
+        
+        if (incount)
+        {
+            rc = _read_sectors(start, incount, inbuf);
+            if (rc)
+            {
+                rc = rc * 10 - 2;
+                goto error;
+            }
+            start += incount;
+            inbuf += incount * SECTOR_SIZE;
+        }
+        if (offset)
+        {
+            rc = cache_sector(start);
+            if (rc)
+            {
+                rc = rc * 10 - 3;
+                goto error;
+            }
+            memcpy(inbuf, sector_cache.data, offset * SECTOR_SIZE);
+        }
+    }
+
+  error:
+    spinlock_unlock(&ata_mtx);
+
+    return rc;
+}
+
+int ata_write_sectors(IF_MV2(int drive,)
+                      unsigned long start,
+                      int count,
+                      const void* buf)
+{
+    int rc = 0;
+    int offset;
+
+#ifdef HAVE_MULTIVOLUME
+    (void)drive; /* unused for now */
+#endif
+    spinlock_lock(&ata_mtx);
+    
+    offset = start & (phys_sector_mult - 1);
+    
+    if (offset) /* first partial sector */
+    {
+        int partcount = MIN(count, phys_sector_mult - offset);
+
+        rc = cache_sector(start);
+        if (rc)
+        {
+            rc = rc * 10 - 1;
+            goto error;
+        }                          
+        memcpy(sector_cache.data + offset * SECTOR_SIZE, buf,
+               partcount * SECTOR_SIZE);
+        rc = flush_current_sector();
+        if (rc)
+        {
+            rc = rc * 10 - 2;
+            goto error;
+        }                          
+        start += partcount;
+        buf += partcount * SECTOR_SIZE;
+        count -= partcount;
+    }
+    if (count)
+    {
+        offset = count & (phys_sector_mult - 1);
+        count -= offset;
+        
+        if (count)
+        {
+            rc = _write_sectors(start, count, buf);
+            if (rc)
+            {
+                rc = rc * 10 - 3;
+                goto error;
+            }
+            start += count;
+            buf += count * SECTOR_SIZE;
+        }
+        if (offset)
+        {
+            rc = cache_sector(start);
+            if (rc)
+            {
+                rc = rc * 10 - 4;
+                goto error;
+            }
+            memcpy(sector_cache.data, buf, offset * SECTOR_SIZE); 
+            rc = flush_current_sector();
+            if (rc)
+            {
+                rc = rc * 10 - 5;
+                goto error;
+            }
+        }
+    }
+
+  error:
+    spinlock_unlock(&ata_mtx);
+
+    return rc;
+}
+#endif /* MAX_PHYS_SECTOR_SIZE */
 
 static int check_registers(void)
 {
@@ -941,6 +1143,9 @@ int ata_init(void)
     ata_device_init();
     sleeping = false;
     ata_enable(true);
+#ifdef MAX_PHYS_SECTOR_SIZE
+    memset(&sector_cache, 0, sizeof(sector_cache));
+#endif
 
     if ( !initialized ) {
         if (!ide_powered()) /* somebody has switched it off */
@@ -966,7 +1171,24 @@ int ata_init(void)
             return -40 + rc;
 
         multisectors = identify_info[47] & 0xff;
+        if (multisectors == 0) /* Invalid multisector info, try with 16 */
+            multisectors = 16;
+
         DEBUGF("ata: %d sectors per ata request\n",multisectors);
+
+#ifdef MAX_PHYS_SECTOR_SIZE
+        /* Find out the physical sector size */
+        if((identify_info[106] & 0xe000) == 0x6000)
+            phys_sector_mult = 1 << (identify_info[106] & 0x000f);
+        else
+            phys_sector_mult = 1;
+
+        DEBUGF("ata: %d logical sectors per phys sector", phys_sector_mult);
+
+        if (phys_sector_mult > (MAX_PHYS_SECTOR_SIZE/SECTOR_SIZE))
+            panicf("Unsupported physical sector size: %d",
+                   phys_sector_mult * SECTOR_SIZE);
+#endif
 
 #ifdef HAVE_LBA48
         if (identify_info[83] & 0x0400 /* 48 bit address support */
