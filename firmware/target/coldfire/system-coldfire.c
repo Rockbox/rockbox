@@ -149,7 +149,7 @@ default_interrupt (CDROMNEWBLK); /* CD-ROM New block */
 #endif
 
 static void system_display_exception_info(unsigned long format,
-                                          unsigned long pc) __attribute__ ((noreturn));
+                                          unsigned long pc) __attribute__ ((noreturn, used));
 static void system_display_exception_info(unsigned long format,
                                           unsigned long pc)
 {
