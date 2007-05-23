@@ -138,7 +138,7 @@ _copy_read_sectors:
  * Writing is not unrolled as much as reading, for several reasons:
  *
  * - a similar instruction sequence is faster for writing than for reading
- *   because the auto-incrementing load inctructions can be used
+ *   because the auto-incrementing load instructions can be used
  * - writing profits from warp mode
  *
  * Both of these add up to have writing faster than the more unrolled reading.
