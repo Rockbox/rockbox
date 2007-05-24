@@ -45,8 +45,6 @@ struct tree_context {
     int firstpos; /* which dir entry is on first
                      position in dir buffer */
     int pos_history[MAX_DIR_LEVELS];
-    int dirpos[MAX_DIR_LEVELS]; /* the dirstart history */
-    int cursorpos[MAX_DIR_LEVELS]; /* the dircursor history */
 
     int *dirfilter; /* file use */
     int filesindir; /* The number of files in the dircache */
