@@ -55,7 +55,6 @@ static void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * di
     #define PUTSXY_CENTER (display->height/2)
     #define PUTSXY_BOTTOM (display->height)
 
-    char buffer[30];
     const unsigned char *option;
     const unsigned char *title;
     int w, font_h;
@@ -71,8 +70,7 @@ static void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * di
     display->getstringsize("A", NULL, &font_h);
 
     /* Displays the first line of text */
-    option=(unsigned char *)option_select_get_text(qs->left_option, buffer,
-                                                   sizeof buffer);
+    option=(unsigned char *)option_select_get_text(qs->left_option);
     title=(unsigned char *)qs->left_option->title;
     display->puts_scroll(2, PUTS_CENTER-4+!statusbar, title);
     display->puts_scroll(2, PUTS_CENTER-3+!statusbar, option);
@@ -80,8 +78,7 @@ static void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * di
                          PUTSXY_CENTER-(font_h*3), 7, 8);
 
     /* Displays the second line of text */
-    option=(unsigned char *)option_select_get_text(qs->right_option, buffer,
-                                                   sizeof buffer);
+    option=(unsigned char *)option_select_get_text(qs->right_option);
     title=(unsigned char *)qs->right_option->title;
     display->getstringsize(title, &w, NULL);
     if(w > display->width - 8)
@@ -103,8 +100,7 @@ static void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * di
         display->putsxy(display->width -w-12, PUTSXY_CENTER, option);
 
     /* Displays the third line of text */
-    option=(unsigned char *)option_select_get_text(qs->bottom_option, buffer,
-                                                   sizeof buffer);
+    option=(unsigned char *)option_select_get_text(qs->bottom_option);
     title=(unsigned char *)qs->bottom_option->title;
 
     display->getstringsize(title, &w, NULL);

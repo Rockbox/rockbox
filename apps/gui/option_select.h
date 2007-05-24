@@ -21,42 +21,14 @@
 #define _GUI_OPTION_SELECT_H_
 #include "settings.h"
 
-typedef void option_formatter(char* dest, int dest_length,
-                              int variable, const char* unit);
-
 struct option_select
 {
     const char * title;
     int min_value;
     int max_value;
-    int step;
     int option;
-    const char * extra_string;
-    /* In the case the option is a number */
-    option_formatter *formatter;
     const struct opt_items * items;
-    bool limit_loop;
 };
-
-/*
- * Initializes an option containing a numeric values
- *  - title : the title of the option
- *  - init_value : the initial value the number will be
- *  - min_value, max_value : bounds to the value
- *  - step : the ammount you want to add / withdraw to the initial number
- *           each time a key is pressed
- *  - unit : the unit in which the value is  (ex "s", "bytes", ...)
- *  - formatter : a callback function that generates a string
- *                from the number it gets
- */
-extern void option_select_init_numeric(struct option_select * opt,
-                                       const char * title,
-                                       int init_value,
-                                       int min_value,
-                                       int max_value,
-                                       int step,
-                                       const char * unit,
-                                       option_formatter *formatter);
 
 /*
  * Initializes an option containing a list of choices
@@ -74,12 +46,9 @@ extern void option_select_init_items(struct option_select * opt,
 /*
  * Gets the selected option
  *  - opt : the option struct
- *  - buffer : a buffer to eventually format the option
  * Returns the selected option
  */
-extern const char * option_select_get_text(struct option_select * opt,
-                                           char * buffer,
-                                           int buffersize);
+extern const char * option_select_get_text(struct option_select * opt);
 
 /*
  * Selects the next value

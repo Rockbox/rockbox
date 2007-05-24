@@ -22,26 +22,6 @@
 #include "kernel.h"
 #include "lang.h"
 
-void option_select_init_numeric(struct option_select * opt,
-                                const char * title,
-                                int init_value,
-                                int min_value,
-                                int max_value,
-                                int step,
-                                const char * unit,
-                                option_formatter *formatter)
-{
-    opt->title=title;
-    opt->min_value=min_value;
-    opt->max_value=max_value+1;
-    opt->option=init_value;
-    opt->step=step;
-    opt->extra_string=unit;
-    opt->formatter=formatter;
-    opt->items=NULL;
-    opt->limit_loop=true;
-}
-
 void option_select_init_items(struct option_select * opt,
                               const char * title,
                               int selected,
@@ -52,31 +32,25 @@ void option_select_init_items(struct option_select * opt,
     opt->min_value=0;
     opt->max_value=nb_items;
     opt->option=selected;
-    opt->step=1;
-    opt->formatter=NULL;
     opt->items=items;
-    opt->limit_loop=false;
 }
 
 void option_select_next(struct option_select * opt)
 {
-    if(opt->option + opt->step >= opt->max_value)
+    if(opt->option + 1 >= opt->max_value)
     {
-        if(!opt->limit_loop)
-        {
             if(opt->option==opt->max_value-1)
                 opt->option=opt->min_value;
             else
                 opt->option=opt->max_value-1;
-        }
     }
     else
-        opt->option+=opt->step;
+        opt->option+=1;
 }
 
 void option_select_prev(struct option_select * opt)
 {
-    if(opt->option - opt->step < opt->min_value)
+    if(opt->option - 1 < opt->min_value)
     {
         /* the dissimilarity to option_select_next() arises from the 
          * sleep timer problem (bug #5000 and #5001): 
@@ -85,21 +59,15 @@ void option_select_prev(struct option_select * opt)
          * We need to be able to set timer to 0 (= Off) nevertheless. */
         if(opt->option!=opt->min_value)
             opt->option=opt->min_value;
-        else if(!opt->limit_loop)
+        else
             opt->option=opt->max_value-1;
     }
     else
-        opt->option-=opt->step;
+        opt->option-=1;
 }
 
-const char * option_select_get_text(struct option_select * opt, char * buffer,
-                                    int buffersize)
+const char * option_select_get_text(struct option_select * opt/*, char * buffer,
+                                    int buffersize*/)
 {
-    if(opt->items)
         return(P2STR(opt->items[opt->option].string));
-    if(!opt->formatter)
-        snprintf(buffer, buffersize,"%d %s", opt->option, opt->extra_string);
-    else
-        opt->formatter(buffer, buffersize, opt->option, opt->extra_string);
-    return(buffer);
 }
