@@ -66,8 +66,7 @@ void option_select_prev(struct option_select * opt)
         opt->option-=1;
 }
 
-const char * option_select_get_text(struct option_select * opt/*, char * buffer,
-                                    int buffersize*/)
+const char * option_select_get_text(struct option_select * opt)
 {
         return(P2STR(opt->items[opt->option].string));
 }
