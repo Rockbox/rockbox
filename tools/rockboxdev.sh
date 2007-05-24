@@ -28,6 +28,10 @@ fi
 
 ##############################################################################
 
+#
+# These are the tools this script requires and depends upon.
+reqtools="gcc bzip2 make patch"
+
 
 findtool(){
   file="$1"
@@ -72,6 +76,15 @@ getfile() {
   
 
 }
+
+for t in $reqtools; do
+  tool=`findtool $t`
+  if test -z "$tool"; then
+    echo "ROCKBOXDEV: $t is required for this script to work. Please"
+    echo "ROCKBOXDEV: install and re-run the script."
+    exit
+  fi
+done
 
 ###########################################################################
 # Verify download directory or create it
