@@ -1235,7 +1235,6 @@ EOF
 # this point.
 #
 
-echo "$memory memory!"
 if [ -z "$memory" ]; then
 
   	case $target_id in
