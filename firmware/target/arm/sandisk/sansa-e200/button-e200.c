@@ -28,20 +28,18 @@
 #define WHEEL_FAST_OFF_INTERVAL 6
 
 /* Clickwheel */
+#ifndef BOOTLOADER
 static unsigned int  old_wheel_value   = 0;
 static unsigned int  wheel_repeat      = BUTTON_NONE;
 static unsigned int  wheel_click_count = 0;
 static          int  wheel_fast_mode   = 0;
 static unsigned long last_wheel_tick   = 0;
 static unsigned long last_wheel_post   = 0;
-#ifndef BOOTLOADER
 static unsigned long next_backlight_on = 0;
-#endif
 /* Buttons */
 static bool hold_button     = false;
-#ifndef BOOTLOADER
 static bool hold_button_old = false;
-#endif
+#endif /* BOOTLOADER */
 static int  int_btn         = BUTTON_NONE;
 
 void button_init_device(void)
@@ -54,6 +52,7 @@ void button_init_device(void)
     GPIOG_OUTPUT_EN |= 0x80;
     GPIOG_ENABLE = 0x80;
 
+#ifndef BOOTLOADER
     GPIOH_ENABLE |= 0xc0;
     GPIOH_OUTPUT_EN &= ~0xc0;
 
@@ -85,13 +84,20 @@ void button_init_device(void)
 
     last_wheel_tick = current_tick;
     last_wheel_post = current_tick;
+#endif /* BOOTLOADER */
 }
 
 bool button_hold(void)
 {
+#ifdef BOOTLOADER
+    return (GPIOF_INPUT_VAL & 0x80) != 0;
+#else
     return hold_button;
+#endif /* BOOTLOADER */
 }
 
+/* clickwheel */
+#ifndef BOOTLOADER
 void clickwheel_int(void)
 {
     /* Read wheel 
@@ -157,14 +163,13 @@ void clickwheel_int(void)
                     btn = BUTTON_NONE;
             }
 
-#ifndef BOOTLOADER
             if (TIME_AFTER(current_tick, next_backlight_on))
             {
                 next_backlight_on = current_tick + HZ/4;
                 backlight_on();
                 button_backlight_on();
             }
-#endif
+
             if (btn != BUTTON_NONE)
             {
                 wheel_click_count = 0;
@@ -185,23 +190,27 @@ void clickwheel_int(void)
 
     old_wheel_value = wheel_value;
 }
+#endif /* BOOTLOADER */
 
+/* device buttons */
 void button_int(void)
 {
     unsigned char state;
 
-    GPIOF_INT_CLR = GPIOF_INT_STAT;
+    int_btn = BUTTON_NONE;
 
     state = GPIOF_INPUT_VAL & 0xff;
 
+#ifndef BOOTLOADER
+    GPIOF_INT_CLR = GPIOF_INT_STAT;
     GPIOF_INT_LEV = (GPIOF_INT_LEV & ~0xff) | (state ^ 0xff);
-
-    int_btn = BUTTON_NONE;
 
     hold_button = (state & 0x80) != 0;
 
-    /* device buttons */
     if (!hold_button)
+#else
+    if (button_hold())
+#endif /* BOOTLOADER */
     {
         /* Read normal buttons */
         if ((state & 0x01) == 0) int_btn |= BUTTON_REC;
@@ -219,15 +228,17 @@ void button_int(void)
  */
 int button_read_device(void)
 {
-    /* Hold */
-#ifndef BOOTLOADER
+#ifdef BOOTLOADER
+    /* Read buttons directly in the bootloader */
+    button_int();
+#else
     /* light handling */
     if (hold_button != hold_button_old)
     {
         hold_button_old = hold_button;
         backlight_hold_changed(hold_button);
     }
-#endif
+#endif /* BOOTLOADER */
 
     /* The int_btn variable is set in the button interrupt handler */
     return int_btn;
