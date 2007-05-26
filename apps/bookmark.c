@@ -822,9 +822,9 @@ static void say_bookmark(const char* bookmark,
 #endif
     talk_id(VOICE_EXT_BMARK, enqueue);
     talk_number(bookmark_id + 1, true);
-    talk_id(LANG_BOOKMARK_SELECT_INDEX_TEXT, true);
+    talk_id(VOICE_BOOKMARK_SELECT_INDEX_TEXT, true);
     talk_number(resume_index + 1, true);
-    talk_id(LANG_BOOKMARK_SELECT_TIME_TEXT, true);
+    talk_id(VOICE_BOOKMARK_SELECT_TIME_TEXT, true);
     if (ms / 60000)
         talk_value(ms / 60000, UNIT_MIN, true);
     talk_value((ms % 60000) / 1000, UNIT_SEC, true);
