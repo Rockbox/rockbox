@@ -56,7 +56,7 @@ void blit_display(fb_data* lcd_framebuffer, unsigned char* vbuf)
             }
         }
 #elif (LCD_WIDTH >= 216) && (LCD_HEIGHT >= 168)
-        /* 0.75 scaling - display 3 out of 4 pixels = 216x168 
+        /* 0.75 scaling - display 3 out of 4 pixels - rotated = 216x168 
            Skipping pixel #2 out of 4 seems to give the most legible display 
          */
         next_dst=&lcd_framebuffer[YOFS*LCD_WIDTH+XOFS+((ScreenHeight*3)/4)-1];
@@ -74,8 +74,27 @@ void blit_display(fb_data* lcd_framebuffer, unsigned char* vbuf)
                 vbuf+=ScreenWidth;
             }
         }
+#elif (LCD_WIDTH >= 168) && (LCD_HEIGHT >= 216)
+        /* 0.75 scaling - display 3 out of 4 pixels - = 168x216
+           Skipping pixel #2 out of 4 seems to give the most legible display 
+         */
+        (void)next_dst;
+        dst=&lcd_framebuffer[YOFS*LCD_WIDTH+XOFS];
+        for (y=0;y<ScreenHeight;y++) {
+            if ((y & 3) != 1) {
+                for (x=0;x<ScreenWidth;x++) {
+                    if ((x & 3) == 1) { vbuf++; }
+                    else {
+                        *(dst++) = palette[*(vbuf++)];
+                    }
+                }
+                dst += XOFS*2;
+            } else {
+                vbuf+=ScreenWidth;
+            }
+        }
 #elif (LCD_WIDTH >= 144) && (LCD_HEIGHT >= 112)
-        /* 0.5 scaling - display every other pixel = 144x112 */
+        /* 0.5 scaling - display every other pixel - rotated = 144x112 */
         next_dst=&lcd_framebuffer[YOFS*LCD_WIDTH+XOFS+ScreenHeight/2-1];
         for (y=(ScreenHeight/2)-1;y >= 0; y--) {
             dst = (next_dst--);
