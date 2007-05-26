@@ -219,10 +219,8 @@ static const struct button_mapping button_context_keyboard[]  = {
 
 static const struct button_mapping button_context_bmark[]  = {
     { ACTION_BMS_DELETE,       BUTTON_UP,         BUTTON_NONE },
-    { ACTION_BMS_SELECT,       BUTTON_SELECT,     BUTTON_NONE },
-    { ACTION_BMS_EXIT,         BUTTON_POWER,      BUTTON_NONE },
 
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),
 }; /* button_context_bmark */
 
 /* get_context_mapping returns a pointer to one of the above defined arrays depending on the context */

@@ -178,9 +178,7 @@ enum {
     ACTION_SETTINGS_RESET,
     
     /* bookmark screen */
-    ACTION_BMS_SELECT,
     ACTION_BMS_DELETE,
-    ACTION_BMS_EXIT,
     
     /* alarm menu screen */    
         

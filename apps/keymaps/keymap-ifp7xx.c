@@ -102,8 +102,7 @@ static const struct button_mapping button_context_yesno[]  = {
 
 static const struct button_mapping button_context_bmark[]  = {
     { ACTION_BMS_DELETE,      BUTTON_MODE,     BUTTON_NONE },
-    { ACTION_STD_OK,            BUTTON_SELECT,   BUTTON_NONE },
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_SETTINGS),
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),
 }; /* button_context_settings_bmark */
 
 static const struct button_mapping button_context_quickscreen[]  = {

@@ -174,7 +174,7 @@ static const struct button_mapping button_context_yesno[]  = {
 static const struct button_mapping button_context_colorchooser[]  = {
     { ACTION_STD_OK,            BUTTON_ON|BUTTON_REL,   BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_SETTINGS),
-}; /* button_context_settings_bmark */
+}; /* button_context_settings_colorchooser */
 
 static const struct button_mapping button_context_eq[]  = {
     { ACTION_STD_OK,                BUTTON_SELECT|BUTTON_REL,               BUTTON_NONE },
@@ -186,13 +186,11 @@ static const struct button_mapping button_context_eq[]  = {
     { ACTION_SETTINGS_DECBIGSTEP,   BUTTON_LEFT|BUTTON_REL,                 BUTTON_ON|BUTTON_LEFT },
     { ACTION_SETTINGS_DECBIGSTEP,   BUTTON_ON|BUTTON_LEFT|BUTTON_REPEAT,    BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_SETTINGS),
-}; /* button_context_settings_bmark */
+}; /* button_context_settings_context_eq */
 
 static const struct button_mapping button_context_bmark[]  = {
     { ACTION_BMS_DELETE,       BUTTON_REC,      BUTTON_NONE },
-    { ACTION_BMS_SELECT,       BUTTON_SELECT,   BUTTON_NONE },
-    { ACTION_BMS_EXIT,         BUTTON_OFF,      BUTTON_NONE },
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_SETTINGS),
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),
 }; /* button_context_settings_bmark */
 
 static const struct button_mapping button_context_time[]  = {
@@ -493,11 +491,9 @@ static const struct button_mapping button_context_yesno_h100remote[]  = {
 static const struct button_mapping *button_context_yesno_h300lcdremote =
                 button_context_yesno_h100remote;
 
-static const struct button_mapping button_context_bmark_h100remote[]  = {
+static const struct button_mapping button_context_bmark_h100remote[] = {
     { ACTION_BMS_DELETE,      BUTTON_RC_REC,    BUTTON_NONE },
-    { ACTION_BMS_SELECT,      BUTTON_RC_MENU,     BUTTON_NONE },
-    {  ACTION_BMS_EXIT,       BUTTON_RC_STOP,    BUTTON_NONE },
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST)
 }; /* button_context_settings_bmark */
 
 static const struct button_mapping *button_context_bmark_h300lcdremote =

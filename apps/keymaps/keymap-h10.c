@@ -296,9 +296,7 @@ static const struct button_mapping button_context_keyboard[]  = {
 
 static const struct button_mapping button_context_bmark[]  = {
     { ACTION_BMS_DELETE,       BUTTON_REW,       BUTTON_NONE },
-    { ACTION_BMS_SELECT,       BUTTON_RIGHT,     BUTTON_NONE },
-    { ACTION_BMS_EXIT,         BUTTON_LEFT,      BUTTON_NONE },
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),
 }; /* button_context_bmark */
 
 const struct button_mapping button_context_recscreen[]  = {

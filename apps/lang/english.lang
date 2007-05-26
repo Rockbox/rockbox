@@ -4712,13 +4712,13 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
-  desc: From the auto-load screen, allows user to list all bookmarks
+  desc: DEPRECATED
   user:
   <source>
-    *: "Down = List"
+    *: ""
   </source>
   <dest>
-    *: "Down = List"
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -4726,25 +4726,13 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_EXIT
-  desc: From the bookmark list screen, allows user to exit
+  desc: DEPRECATED
   user:
   <source>
-    *: "OFF = Exit"
-    h100,h120,h300: "STOP = Exit"
-    ipod*: "PLAY/PAUSE = Exit"
-    x5: "RECORD = Exit"
-    h10,h10_5gb: "PREV = Exit"
-    gigabeatf: "A = Exit"
-    e200: "POWER = Exit"
+    *: ""
   </source>
   <dest>
-    *: "OFF = Exit"
-    h100,h120,h300: "STOP = Exit"
-    ipod*: "PLAY/PAUSE = Exit"
-    x5: "RECORD = Exit"
-    h10,h10_5gb: "PREV = Exit"
-    gigabeatf: "A = Exit"
-    e200: "POWER = Exit"
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -4752,13 +4740,13 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
-  desc: Used on the bookmark select window to label bookmark number
+  desc: DEPRECATED
   user:
   <source>
-    *: "Bookmark"
+    *: ""
   </source>
   <dest>
-    *: "Bookmark"
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -4766,53 +4754,41 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_INDEX_TEXT
-  desc: Used on the bookmark select window to label index number
+  desc: DEPRECATED
   user:
   <source>
-    *: "Index"
+    *: ""
   </source>
   <dest>
-    *: "Index"
+    *: deprecated
   </dest>
   <voice>
-    *: "Index"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_TIME_TEXT
-  desc: Used on the bookmark select window to label elapsed time
+  desc: DEPRECATED
   user:
   <source>
-    *: "Time"
+    *: ""
   </source>
   <dest>
-    *: "Time"
+    *: deprecated
   </dest>
   <voice>
-    *: "Time"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_PLAY
-  desc: Used on the bookmark select window to indicated the play option
+  desc: DEPRECATED
   user:
   <source>
-    *: "PLAY = Select"
-    h100,h120,h300: "NAVI = Select"
-    ipod*: "SELECT = Select"
-    x5: "SELECT = Select"
-    h10,h10_5gb: "SELECT = Select"
-    gigabeatf: "SELECT = Select"
-    e200: "SELECT = Select"
+    *: ""
   </source>
   <dest>
-    *: "PLAY = Select"
-    h100,h120,h300: "NAVI = Select"
-    ipod*: "SELECT = Select"
-    x5: "SELECT = Select"
-    h10,h10_5gb: "SELECT = Select"
-    gigabeatf: "SELECT = Select"
-    e200: "SELECT = Select"
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -4820,25 +4796,13 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_DELETE
-  desc: Used on the bookmark select window to indicated the bookmark delete option
+  desc: DEPRECATED
   user:
   <source>
-    *: "ON+Play = Delete"
-    h100,h120,h300: "RECORD = Delete"
-    ipod*: "Long MENU = Delete"
-    x5: "Long RECORD = Delete"
-    h10,h10_5gb: "REWIND = Delete"
-    gigabeatf: "POWER = Delete"
-    e200: "PLAY = Delete"
+    *: ""
   </source>
   <dest>
-    *: "ON+Play = Delete"
-    h100,h120,h300: "RECORD = Delete"
-    ipod*: "Long MENU = Delete"
-    x5: "Long RECORD = Delete"
-    h10,h10_5gb: "REWIND = Delete"
-    gigabeatf: "POWER = Delete"
-    e200: "PLAY = Delete"
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -4846,13 +4810,13 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_AUTOLOAD_QUERY
-  desc: prompt for user to decide to create a bookmark
+  desc: DEPRECATED
   user:
   <source>
-    *: "Load Last Bookmark?"
+    *: ""
   </source>
   <dest>
-    *: "Load Last Bookmark?"
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -10862,4 +10826,129 @@
     *: "Moving"
   </voice>
 </phrase>
-
+<phrase>
+  id: LANG_BOOKMARK_SELECT_BOOKMARK
+  desc: bookmark selection list title
+  user:
+  <source>
+    *: "Select Bookmark"
+  </source>
+  <dest>
+    *: "Select Bookmark"
+  </dest>
+  <voice>
+    *: "Select Bookmark"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_DONT_RESUME
+  desc: top item in the list when asking user about bookmark auto load
+  user:
+  <source>
+    *: "<Don't Resume>"
+  </source>
+  <dest>
+    *: "<Don't Resume>"
+  </dest>
+  <voice>
+    *: "Do Not Resume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SHUFFLE
+  desc: bookmark selection list, bookmark enables shuffle
+  user:
+  <source>
+    *: ", Shuffle"
+  </source>
+  <dest>
+    *: ", Shuffle"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_INVALID
+  desc: bookmark selection list, bookmark couldn't be parsed
+  user:
+  <source>
+    *: "<Invalid Bookmark>"
+  </source>
+  <dest>
+    *: "<Invalid Bookmark>"
+  </dest>
+  <voice>
+    *: "Invalid Bookmark"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_MENU
+  desc: bookmark selection list context menu
+  user:
+  <source>
+    *: "Bookmark Actions"
+  </source>
+  <dest>
+    *: "Bookmark Actions"
+  </dest>
+  <voice>
+    *: "Bookmark Actions"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_RESUME
+  desc: bookmark context menu, resume this bookmark
+  user:
+  <source>
+    *: "Resume"
+  </source>
+  <dest>
+    *: "Resume"
+  </dest>
+  <voice>
+    *: "Resume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_DELETE
+  desc: bookmark context menu, delete this bookmark
+  user:
+  <source>
+    *: "Delete"
+  </source>
+  <dest>
+    *: "Delete"
+  </dest>
+  <voice>
+    *: "Delete"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BOOKMARK_SELECT_INDEX_TEXT
+  desc: voice only, used in the bookmark list to label index number
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Index"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BOOKMARK_SELECT_TIME_TEXT
+  desc: voice only, used in the bookmark select list to label elapsed time
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Time"
+  </voice>
+</phrase>

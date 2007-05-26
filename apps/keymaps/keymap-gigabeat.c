@@ -192,27 +192,25 @@ static const struct button_mapping button_context_yesno[]  = {
 static const struct button_mapping button_context_colorchooser[]  = {
     { ACTION_STD_OK,            BUTTON_A|BUTTON_REL,   BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_SETTINGS),
-}; /* button_context_settings_bmark */
+}; /* button_context_colorchooser */
 
 static const struct button_mapping button_context_eq[]  = {
     { ACTION_STD_OK,            BUTTON_SELECT|BUTTON_REL,   BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_SETTINGS),
-}; /* button_context_settings_bmark */
+}; /* button_context_eq */
 
 /** Bookmark Screen **/
 static const struct button_mapping button_context_bmark[]  = {
     { ACTION_BMS_DELETE,       BUTTON_A, BUTTON_NONE },
-    { ACTION_BMS_SELECT,       BUTTON_SELECT,            BUTTON_NONE },
-    { ACTION_BMS_EXIT,         BUTTON_POWER,    BUTTON_NONE },
 
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_SETTINGS),
-}; /* button_context_settings_bmark */
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),
+}; /* button_context_bmark */
 
 static const struct button_mapping button_context_time[]  = {
     { ACTION_STD_CANCEL,       BUTTON_POWER,  BUTTON_NONE },
     { ACTION_STD_OK,           BUTTON_A,   BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS),
-}; /* button_context_settings_bmark */
+}; /* button_context_time */
 
 static const struct button_mapping button_context_quickscreen[]  = {
     { ACTION_QS_DOWNINV,    BUTTON_UP,                      BUTTON_NONE },

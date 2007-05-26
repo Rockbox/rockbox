@@ -198,10 +198,8 @@ static const struct button_mapping button_context_keyboard[]  = {
 static const struct button_mapping button_context_bmark[]  = {
     { ACTION_BMS_DELETE,    BUTTON_SELECT|BUTTON_ON,   BUTTON_SELECT },
     { ACTION_BMS_DELETE,    BUTTON_SELECT|BUTTON_ON,   BUTTON_ON },
-    { ACTION_BMS_EXIT,      BUTTON_OFF,                BUTTON_NONE },
-    { ACTION_BMS_SELECT,    BUTTON_SELECT|BUTTON_REL,  BUTTON_SELECT },
 
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),
     
 }; /* button_context_settings_bmark */
 

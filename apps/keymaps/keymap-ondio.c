@@ -113,10 +113,8 @@ static const struct button_mapping button_context_yesno[] = {
 static const struct button_mapping button_context_bmark[]  = {
     { ACTION_NONE,              BUTTON_LEFT,                 BUTTON_NONE },
     { ACTION_BMS_DELETE,      BUTTON_LEFT|BUTTON_REPEAT,   BUTTON_LEFT },
-    { ACTION_BMS_EXIT,        BUTTON_LEFT|BUTTON_REL,      BUTTON_LEFT },
-    { ACTION_BMS_SELECT,       BUTTON_RIGHT,   BUTTON_NONE },
 
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),
 }; /* button_context_settings_bmark */
 
 static const struct button_mapping button_context_pitchscreen[]  = {

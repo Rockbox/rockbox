@@ -76,10 +76,8 @@ static const struct button_mapping remote_button_context_standard[]  = {
 /** Bookmark Screen **/
 static const struct button_mapping button_context_bmark[]  = {
     { ACTION_BMS_DELETE,       BUTTON_REC|BUTTON_REPEAT, BUTTON_REC },
-    { ACTION_BMS_SELECT,       BUTTON_SELECT,            BUTTON_NONE },
-    { ACTION_BMS_EXIT,         BUTTON_REC|BUTTON_REL,    BUTTON_REC },
 
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_SETTINGS),
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),
 }; /* button_context_settings_bmark */
 
 /** FM Radio Screen **/

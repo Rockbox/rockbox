@@ -16,7 +16,6 @@
  *
  ****************************************************************************/
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -50,6 +49,8 @@
 #include "abrepeat.h"
 #include "splash.h"
 #include "yesno.h"
+#include "list.h"
+#include "plugin.h"
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
 #include "backdrop.h"
@@ -59,19 +60,28 @@
 #define MAX_BOOKMARK_SIZE  350
 #define RECENT_BOOKMARK_FILE ROCKBOX_DIR "/most-recent.bmark"
 
+/* Used to buffer bookmarks while displaying the bookmark list. */
+struct bookmark_list
+{
+    const char* filename;
+    size_t buffer_size;
+    int start;
+    int count;
+    int total_count;
+    bool show_dont_resume;
+    bool reload;
+    char* items[];
+};
+
 static bool  add_bookmark(const char* bookmark_file_name, const char* bookmark, 
                           bool most_recent);
 static bool  check_bookmark(const char* bookmark);
 static char* create_bookmark(void);
 static bool  delete_bookmark(const char* bookmark_file_name, int bookmark_id);
-static void  display_bookmark(const char* bookmark,
-                              int bookmark_id, 
-                              int bookmark_count);
 static void  say_bookmark(const char* bookmark,
                           int bookmark_id);
 static bool play_bookmark(const char* bookmark);
 static bool  generate_bookmark_file_name(const char *in);
-static char* get_bookmark(const char* bookmark_file, int bookmark_count);
 static const char* skip_token(const char* s);
 static const char* int_token(const char* s, int* dest);
 static const char* long_token(const char* s, long* dest);
@@ -87,15 +97,20 @@ static bool  parse_bookmark(const char *bookmark,
                             int * repeat_mode,
                             bool *shuffle,
                             char* file_name);
-static char* select_bookmark(const char* bookmark_file_name);
+static int buffer_bookmarks(struct bookmark_list* bookmarks, int first_line);
+static char* get_bookmark_info(int list_index, void* data, char *buffer);
+static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resume);
 static bool  system_check(void);
 static bool  write_bookmark(bool create_bookmark_file);
 static int   get_bookmark_count(const char* bookmark_file_name);
 
 static char global_temp_buffer[MAX_PATH+1];
+/* File name created by generate_bookmark_file_name */
 static char global_bookmark_file_name[MAX_PATH];
 static char global_read_buffer[MAX_BOOKMARK_SIZE];
+/* Bookmark created by create_bookmark*/
 static char global_bookmark[MAX_BOOKMARK_SIZE];
+/* Filename from parsed bookmark (can be made local where needed) */
 static char global_filename[MAX_PATH];
 
 /* ----------------------------------------------------------------------- */
@@ -121,7 +136,7 @@ bool bookmark_load_menu(void)
                                        sizeof(global_temp_buffer));
         if (generate_bookmark_file_name(name))
         {
-            char* bookmark = select_bookmark(global_bookmark_file_name);
+            char* bookmark = select_bookmark(global_bookmark_file_name, false);
             
             if (bookmark != NULL)
             {
@@ -139,7 +154,7 @@ bool bookmark_load_menu(void)
 /* ----------------------------------------------------------------------- */
 bool bookmark_mrb_load()
 {
-    char* bookmark = select_bookmark(RECENT_BOOKMARK_FILE);
+    char* bookmark = select_bookmark(RECENT_BOOKMARK_FILE, false);
 
     if (bookmark != NULL)
     {
@@ -364,9 +379,7 @@ static bool check_bookmark(const char* bookmark)
 /* ------------------------------------------------------------------------*/
 bool bookmark_autoload(const char* file)
 {
-    int  key;
     int  fd;
-    int i;
 
     if(global_settings.autoloadbookmark == BOOKMARK_NO)
         return false;
@@ -386,43 +399,11 @@ bool bookmark_autoload(const char* file)
     }
     else
     {
-        /* Prompting user to confirm bookmark load */
-        FOR_NB_SCREENS(i)
-            screens[i].clear_display();
+        char* bookmark = select_bookmark(global_bookmark_file_name, true);
         
-        gui_syncstatusbar_draw(&statusbars, true);
-        
-        FOR_NB_SCREENS(i)
+        if (bookmark)
         {
-#ifdef HAVE_LCD_BITMAP
-            screens[i].setmargins(0, global_settings.statusbar
-                ? STATUSBAR_HEIGHT : 0);
-            screens[i].puts_scroll(0,0, str(LANG_BOOKMARK_AUTOLOAD_QUERY));
-            screens[i].puts(0,1, str(LANG_CONFIRM_WITH_PLAY_RECORDER));
-            screens[i].puts(0,2, str(LANG_BOOKMARK_SELECT_LIST_BOOKMARKS));
-            screens[i].puts(0,3, str(LANG_CANCEL_WITH_ANY_RECORDER));
-#else
-            screens[i].puts_scroll(0,0, str(LANG_BOOKMARK_AUTOLOAD_QUERY));
-            screens[i].puts(0,1,str(LANG_RESUME_CONFIRM_PLAYER));
-#endif
-            screens[i].update();
-        }
-
-        /* Wait for a key to be pushed */
-        key = get_action(CONTEXT_BOOKMARKSCREEN,TIMEOUT_BLOCK);
-        switch(key)
-        {
-#ifdef HAVE_LCD_BITMAP
-            case ACTION_STD_NEXT:
-                action_signalscreenchange();
-                return bookmark_load(global_bookmark_file_name, false);
-#endif
-            case ACTION_BMS_SELECT:
-                action_signalscreenchange();
-                return bookmark_load(global_bookmark_file_name, true);
-
-            default:
-                break;
+            return bookmark_load(global_bookmark_file_name, true);
         }
 
         action_signalscreenchange();
@@ -452,7 +433,7 @@ bool bookmark_load(const char* file, bool autoload)
     else
     {
         /* This is not an auto-load, so list the bookmarks */
-        bookmark = select_bookmark(file);
+        bookmark = select_bookmark(file, false);
     }
 
     if (bookmark != NULL)
@@ -480,119 +461,289 @@ static int get_bookmark_count(const char* bookmark_file_name)
     
     close(file);
     return read_count;
- 
+}
+
+static int buffer_bookmarks(struct bookmark_list* bookmarks, int first_line)
+{
+    char* dest = ((char*) bookmarks) + bookmarks->buffer_size - 1;
+    int read_count = 0;
+    int file = open(bookmarks->filename, O_RDONLY);
+
+    if (file < 0)
+    {
+        return -1;
+    }
+
+    if ((first_line != 0) && ((size_t) filesize(file) < bookmarks->buffer_size
+            - sizeof(*bookmarks) - (sizeof(char*) * bookmarks->total_count)))
+    {
+        /* Entire file fits in buffer */
+        first_line = 0;
+    }
     
+    bookmarks->start = first_line;
+    bookmarks->count = 0;
+    bookmarks->reload = false;
+    
+    while(read_line(file, global_read_buffer, sizeof(global_read_buffer)) > 0)
+    {
+        read_count++;
+        
+        if (read_count >= first_line)
+        {
+            dest -= strlen(global_read_buffer) + 1;
+            
+            if (dest < ((char*) bookmarks) + sizeof(*bookmarks)
+                + (sizeof(char*) * (bookmarks->count + 1)))
+            {
+                break;
+            }
+            
+            strcpy(dest, global_read_buffer);
+            bookmarks->items[bookmarks->count] = dest;
+            bookmarks->count++;
+        }
+    }
+
+    close(file);
+    return bookmarks->start + bookmarks->count;
+}
+
+static char* get_bookmark_info(int list_index, void* data, char *buffer)
+{
+    struct bookmark_list* bookmarks = (struct bookmark_list*) data;
+    int     index = list_index / 2;
+    int     resume_index = 0;
+    long    resume_time = 0;
+    bool    shuffle = false;
+
+    if (bookmarks->show_dont_resume)
+    {
+        if (index == 0)
+        {
+            return list_index % 2 == 0 
+                ? (char*) str(LANG_BOOKMARK_DONT_RESUME) : " ";
+        }
+        
+        index--;
+    }
+
+    if (bookmarks->reload || (index >= bookmarks->start + bookmarks->count) 
+        || (index < bookmarks->start))
+    {
+        int read_index = index;
+        
+        /* Using count as a guide on how far to move could possibly fail
+         * sometimes. Use byte count if that is a problem?
+         */
+        
+        if (read_index != 0)
+        {
+            /* Move count * 3 / 4 items in the direction the user is moving,
+             * but don't go too close to the end.
+             */
+            int offset = bookmarks->count;
+            int max = bookmarks->total_count - (bookmarks->count / 2);
+            
+            if (read_index < bookmarks->start)
+            {
+                offset *= 3;
+            }
+         
+            read_index = index - offset / 4;
+
+            if (read_index > max)
+            {
+                read_index = max;
+            }
+            
+            if (read_index < 0)
+            {
+                read_index = 0;
+            }
+        }
+        
+        if (buffer_bookmarks(bookmarks, read_index) <= index)
+        {
+            return "";
+        }
+    }
+    
+    if (!parse_bookmark(bookmarks->items[index - bookmarks->start],
+        &resume_index, NULL, NULL, NULL, NULL, 0, &resume_time, NULL, 
+        &shuffle, global_filename))
+    {
+        return list_index % 2 == 0 ? (char*) str(LANG_BOOKMARK_INVALID) : " ";
+    }
+
+    if (list_index % 2 == 0)
+    {
+        char* dot = strrchr(global_filename, '.');
+
+        if (dot)
+        {
+            *dot = '\0';
+        }
+
+        return global_filename;
+    }
+    else
+    {
+        char time_buf[32];
+
+        format_time(time_buf, sizeof(time_buf), resume_time);
+        snprintf(buffer, MAX_PATH, "%s, %d%s", time_buf, resume_index + 1,
+            shuffle ? (char*) str(LANG_BOOKMARK_SHUFFLE) : "");
+        return buffer;
+    }
 }
 
 /* ----------------------------------------------------------------------- */
 /* This displays a the bookmarks in a file and allows the user to          */
 /* select one to play.                                                     */
 /* ------------------------------------------------------------------------*/
-static char* select_bookmark(const char* bookmark_file_name)
+static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resume)
 {
-    int bookmark_id = 0;
-    int bookmark_id_prev = -1;
-    int key;
-    char* bookmark = NULL;
-    int bookmark_count = 0;
+    struct bookmark_list* bookmarks;
+    struct gui_synclist list;
+    int last_item = -2;
+    int item = 0;
+    int action;
+    size_t size;
+    bool exit = false;
+    bool refresh = true;
 
-#ifdef HAVE_LCD_BITMAP
-    int i;
-
-    FOR_NB_SCREENS(i)
-        screens[i].setmargins(0, global_settings.statusbar
-            ? STATUSBAR_HEIGHT : 0);
-#endif
-
-    bookmark_count = get_bookmark_count(bookmark_file_name);
-    if (bookmark_count < 1) /* error opening file, or empty file */
-    {
-        gui_syncsplash(HZ, str(LANG_BOOKMARK_LOAD_EMPTY));
-        return NULL;
-    }
+    bookmarks = plugin_get_buffer(&size);
+    bookmarks->buffer_size = size;
+    bookmarks->show_dont_resume = show_dont_resume;
+    bookmarks->filename = bookmark_file_name;
+    bookmarks->start = 0;
+    gui_synclist_init(&list, &get_bookmark_info, (void*) bookmarks, false, 2);
+    gui_synclist_set_title(&list, str(LANG_BOOKMARK_SELECT_BOOKMARK), 
+        Icon_Bookmark);
+    gui_syncstatusbar_draw(&statusbars, true);
     action_signalscreenchange();
-    while(true)
-    {
-        if(bookmark_id < 0)
-            bookmark_id = bookmark_count -1;
-        if(bookmark_id >= bookmark_count)
-            bookmark_id = 0;
 
-        if (bookmark_id != bookmark_id_prev)
-        {
-            bookmark = get_bookmark(bookmark_file_name, bookmark_id);
-            bookmark_id_prev = bookmark_id;
-        }
+    while (!exit)
+    {
+        gui_syncstatusbar_draw(&statusbars, false);
         
-        if (!bookmark)
+        if (refresh)
         {
-            /* if there were no bookmarks in the file, delete the file and exit. */
-            if(bookmark_id <= 0)
+            int count = get_bookmark_count(bookmark_file_name);
+            bookmarks->total_count = count;
+
+            if (bookmarks->total_count < 1)
             {
+                /* No more bookmarks, delete file and exit */
                 gui_syncsplash(HZ, str(LANG_BOOKMARK_LOAD_EMPTY));
                 remove(bookmark_file_name);
                 action_signalscreenchange();
                 return NULL;
             }
+
+            if (bookmarks->show_dont_resume)
+            {
+                count++;
+                item++;
+            }
+
+            gui_synclist_set_nb_items(&list, count * 2);
+
+            if (item >= count)
+            {
+                /* Selected item has been deleted */
+                item = count - 1;
+                gui_synclist_select_item(&list, item * 2);
+            }
+
+            buffer_bookmarks(bookmarks, bookmarks->start);
+            gui_synclist_draw(&list);
+            refresh = false;
+        }
+
+        action = get_action(CONTEXT_BOOKMARKSCREEN, HZ / 2);
+        gui_synclist_do_button(&list, action, LIST_WRAP_UNLESS_HELD);
+        item = gui_synclist_get_sel_pos(&list) / 2;
+
+        if (bookmarks->show_dont_resume)
+        {
+            item--;
+        }
+        
+        if (item != last_item && global_settings.talk_menu)
+        {
+            last_item = item;
+            
+            if (item == -1)
+            {
+                talk_id(LANG_BOOKMARK_DONT_RESUME, true);
+            }
             else
             {
-               bookmark_id_prev = bookmark_id;
-               bookmark_id--;
-               continue;
+                say_bookmark(bookmarks->items[item - bookmarks->start], item);
             }
         }
-        else
+        
+        if (action == ACTION_STD_CONTEXT)
         {
-            display_bookmark(bookmark, bookmark_id, bookmark_count);
-            if (global_settings.talk_menu) /* for voice UI */
-                say_bookmark(bookmark, bookmark_id);
+            MENUITEM_STRINGLIST(menu_items, ID2P(LANG_BOOKMARK_CONTEXT_MENU),
+                NULL, ID2P(LANG_BOOKMARK_CONTEXT_RESUME), 
+                ID2P(LANG_BOOKMARK_CONTEXT_DELETE));
+            static const int menu_actions[] = 
+            {
+                ACTION_STD_OK, ACTION_BMS_DELETE
+            };
+            int selection = do_menu(&menu_items, NULL);
+            
+            refresh = true;
+
+            if (selection >= 0 && selection <= 
+                (int) (sizeof(menu_actions) / sizeof(menu_actions[0])))
+            {
+                action = menu_actions[selection];
+            }
         }
 
-        /* waiting for the user to click a button */
-        key = get_action(CONTEXT_BOOKMARKSCREEN,TIMEOUT_BLOCK);
-        switch(key)
+        switch (action)
         {
-            case ACTION_BMS_SELECT:
-                /* User wants to use this bookmark */
+        case ACTION_STD_OK:
+            if (item >= 0)
+            {
                 action_signalscreenchange();
-                return bookmark;
+                return bookmarks->items[item - bookmarks->start];
+            }
+            
+            /* Else fall through */
 
-            case ACTION_BMS_DELETE:
-                /* User wants to delete this bookmark */
-                delete_bookmark(bookmark_file_name, bookmark_id);
-                bookmark_id_prev=-2;
-                bookmark_count--;
-                if(bookmark_id >= bookmark_count)
-                    bookmark_id = bookmark_count -1;
-                break;
+        case ACTION_TREE_WPS:
+        case ACTION_STD_CANCEL:
+            exit = true;
+            break;
 
-            case ACTION_STD_PREV:
-            case ACTION_STD_PREVREPEAT:
-                bookmark_id--;
-                break;
+        case ACTION_BMS_DELETE:
+            if (item >= 0)
+            {
+                delete_bookmark(bookmark_file_name, item);
+                bookmarks->reload = true;
+                refresh = true;
+                last_item = -2;
+            }
+            break;
 
-            case ACTION_STD_NEXT:
-            case ACTION_STD_NEXTREPEAT:
-                bookmark_id++;
-                break;
+        default:
+            if (default_event_handler(action) == SYS_USB_CONNECTED)
+            {
+                exit = true;
+            }
 
-            case ACTION_BMS_EXIT:
-                action_signalscreenchange();
-                return NULL;
-
-            default:
-                if(default_event_handler(key) == SYS_USB_CONNECTED)
-                {
-                    action_signalscreenchange();
-                    return NULL;
-                }
-                break;
+            break;
         }
     }
+
     action_signalscreenchange();
     return NULL;
 }
-
 
 /* ----------------------------------------------------------------------- */
 /* This function takes a location in a bookmark file and deletes that      */
@@ -639,117 +790,6 @@ static bool delete_bookmark(const char* bookmark_file_name, int bookmark_id)
 }
 
 /* ----------------------------------------------------------------------- */
-/* This function parses a bookmark and displays it for the user.           */
-/* ------------------------------------------------------------------------*/
-static void display_bookmark(const char* bookmark,
-                             int bookmark_id,
-                             int bookmark_count)
-{
-    int  resume_index = 0;
-    long  ms = 0;
-    int  repeat_mode = 0;
-    bool playlist_shuffle = false;
-    char *dot;
-    char time_buf[32];
-    int i;
-
-    /* getting the index and the time into the file */
-    parse_bookmark(bookmark,
-                   &resume_index, NULL, NULL, NULL, NULL, 0,
-                   &ms, &repeat_mode, &playlist_shuffle,
-                   global_filename);
-
-    FOR_NB_SCREENS(i)
-        screens[i].clear_display();
-
-#ifdef HAVE_LCD_BITMAP
-    /* bookmark shuffle and repeat states*/
-    switch (repeat_mode)
-    {
-#ifdef AB_REPEAT_ENABLE
-        case REPEAT_AB:
-            statusbar_icon_play_mode(Icon_RepeatAB);
-            break;
-#endif
-
-        case REPEAT_ONE:
-            statusbar_icon_play_mode(Icon_RepeatOne);
-            break;
-
-        case REPEAT_ALL:
-            statusbar_icon_play_mode(Icon_Repeat);
-            break;
-    }
-    if(playlist_shuffle)
-        statusbar_icon_shuffle();
-
-    /* File Name */
-    dot = strrchr(global_filename, '.');
-
-    if (dot)
-        *dot='\0';
-
-    FOR_NB_SCREENS(i)
-        screens[i].puts_scroll(0, 0, (unsigned char *)global_filename);
-
-    if (dot)
-        *dot='.';
-
-    /* bookmark number */
-    snprintf(global_temp_buffer, sizeof(global_temp_buffer), "%s: %d/%d",
-             str(LANG_BOOKMARK_SELECT_BOOKMARK_TEXT),
-             bookmark_id + 1, bookmark_count);
-    FOR_NB_SCREENS(i)
-        screens[i].puts_scroll(0, 1, (unsigned char *)global_temp_buffer);
-
-    /* bookmark resume index */
-    snprintf(global_temp_buffer, sizeof(global_temp_buffer), "%s: %d",
-             str(LANG_BOOKMARK_SELECT_INDEX_TEXT), resume_index+1);
-    FOR_NB_SCREENS(i)
-        screens[i].puts_scroll(0, 2, (unsigned char *)global_temp_buffer);
-
-    /* elapsed time*/
-    format_time(time_buf, sizeof(time_buf), ms);
-    snprintf(global_temp_buffer, sizeof(global_temp_buffer), "%s: %s",
-             str(LANG_BOOKMARK_SELECT_TIME_TEXT), time_buf);
-    FOR_NB_SCREENS(i)
-        screens[i].puts_scroll(0, 3, (unsigned char *)global_temp_buffer);
-
-    /* commands */
-    FOR_NB_SCREENS(i)
-    {
-        screens[i].puts_scroll(0, 4, str(LANG_BOOKMARK_SELECT_PLAY));
-        screens[i].puts_scroll(0, 5, str(LANG_BOOKMARK_SELECT_EXIT));
-        screens[i].puts_scroll(0, 6, str(LANG_BOOKMARK_SELECT_DELETE));
-        screens[i].update();
-    }
-#else
-    dot = strrchr(global_filename, '.');
-
-    if (dot)
-        *dot='\0';
-
-    format_time(time_buf, sizeof(time_buf), ms);
-    snprintf(global_temp_buffer, sizeof(global_temp_buffer), 
-             "%d/%d, %s, %s", (bookmark_id + 1), bookmark_count, 
-             time_buf, global_filename);
-
-    if (dot)
-        *dot='.';
-
-    gui_syncstatusbar_draw(&statusbars, false);
-    
-    FOR_NB_SCREENS(i)
-    {
-        screens[i].puts_scroll(0,0,global_temp_buffer);
-        screens[i].puts(0,1,str(LANG_RESUME_CONFIRM_PLAYER));
-        screens[i].update();
-    }
-#endif
-}
-
-
-/* ----------------------------------------------------------------------- */
 /* This function parses a bookmark, says the voice UI part of it.          */
 /* ------------------------------------------------------------------------*/
 static void say_bookmark(const char* bookmark,
@@ -760,12 +800,13 @@ static void say_bookmark(const char* bookmark,
     char dir[MAX_PATH];
     bool enqueue = false; /* only the first voice is not queued */
 
-    parse_bookmark(bookmark,
-                   &resume_index, 
-                   NULL, NULL, NULL, 
-                   dir, sizeof(dir),
-                   &ms, NULL, NULL,
-                   NULL);
+    if (!parse_bookmark(bookmark, &resume_index, NULL, NULL, NULL, 
+        dir, sizeof(dir), &ms, NULL, NULL, NULL))
+    {
+        talk_id(LANG_BOOKMARK_INVALID, true);
+        return;
+    }
+
 /* disabled, because transition between talkbox and voice UI clip is not nice */
 #if 0 
     if (global_settings.talk_dir >= 3)
@@ -816,44 +857,6 @@ static bool play_bookmark(const char* bookmark)
     }
     
     return false;
-}
-
-/* ----------------------------------------------------------------------- */
-/* This function retrieves a given bookmark from a file.                   */
-/* If the bookmark requested is beyond the number of bookmarks available   */
-/* in the file, it will return the last one.                               */
-/* It also returns the index number of the bookmark in the file            */
-/* ------------------------------------------------------------------------*/
-static char* get_bookmark(const char* bookmark_file, int bookmark_count)
-{
-    int read_count = -1;
-    int result = 0;
-    int file = open(bookmark_file, O_RDONLY);
-
-    if (file < 0)
-        return NULL;
-
-    /* Get the requested bookmark */
-    while (read_count < bookmark_count)
-    {
-        /*Reading in a single bookmark */
-        result = read_line(file,
-                           global_read_buffer,
-                           sizeof(global_read_buffer));
-
-        /* Reading past the last bookmark in the file
-           causes the loop to stop */
-        if (result <= 0)
-            break;
-
-        read_count++;
-    }
-
-    close(file);
-    if ((read_count >= 0) && (read_count == bookmark_count))
-        return global_read_buffer;
-    else
-        return NULL;
 }
 
 static const char* skip_token(const char* s)
