@@ -53,7 +53,7 @@ public:
         const wxPoint& pos = wxDefaultPosition,
         const wxSize& size = wxDefaultSize,
         long style = wxCAPTION | wxRESIZE_BORDER | wxSYSTEM_MENU |
-            wxMINIMIZE_BOX | wxCLOSE_BOX);
+            wxMINIMIZE_BOX|wxMAXIMIZE_BOX | wxCLOSE_BOX);
     virtual ~rbutilFrm();
 public:
 	   DeviceSelectorCtrl* myDeviceSelector;

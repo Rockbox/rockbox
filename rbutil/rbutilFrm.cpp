@@ -81,7 +81,7 @@ void rbutilFrm::CreateGUIControls(void)
 	this->SetAutoLayout(TRUE);
 
 	wxPanel* mainPanel = new wxPanel(this,wxID_ANY);
-	WxBoxSizer1->Add(mainPanel,0,wxALL,0);
+	WxBoxSizer1->Add(mainPanel,1,wxGROW|wxALL,0);
 	wxBoxSizer* WxBoxSizer0 = new wxBoxSizer(wxVERTICAL);
 	mainPanel->SetSizer(WxBoxSizer0);
 	mainPanel->SetAutoLayout(TRUE);
@@ -93,10 +93,10 @@ void rbutilFrm::CreateGUIControls(void)
 
 	myDeviceSelector = new DeviceSelectorCtrl(mainPanel,wxID_ANY);
 	myDeviceSelector->setDefault();
-	WxBoxSizer0->Add(myDeviceSelector,0,wxALL,5);
+	WxBoxSizer0->Add(myDeviceSelector,0,wxGROW|wxALL,5);
 
     wxNotebook* tabwindow = new wxNotebook(mainPanel,wxID_ANY);
-    WxBoxSizer0->Add(tabwindow,0,wxALL,5);
+    WxBoxSizer0->Add(tabwindow,1,wxGROW|wxALL,5);
 
     wxPanel* installpage = new wxPanel(tabwindow,wxID_ANY);
     wxPanel* themepage = new wxPanel(tabwindow,wxID_ANY);
@@ -442,6 +442,13 @@ void rbutilFrm::OnBootloaderRemoveBtn(wxCommandEvent& event)
     wxLogVerbose(wxT("=== begin rbutilFrm::OnBootloaderRemoveBtn(event)"));
 
     int index = gv->plat_id.Index(gv->curplat);
+    if(index < 0)
+    {
+        WARN_DIALOG(wxT("No Device selected"),
+                wxT("Select a Device"));
+        return;
+    }
+
     wxString bootloadermethod = gv->plat_bootloadermethod[index];
 
     if(!gv->plat_needsbootloader[index])
@@ -524,6 +531,12 @@ void rbutilFrm::OnBootloaderBtn(wxCommandEvent& event)
     wxLogVerbose(wxT("=== begin rbutilFrm::OnBootloaderBtn(event)"));
 
     int index = gv->plat_id.Index(gv->curplat);
+    if(index < 0)
+    {
+        WARN_DIALOG(wxT("No Device selected"),
+                wxT("Select a Device"));
+        return;
+    }
     wxString bootloadermethod = gv->plat_bootloadermethod[index];
 
     if(!gv->plat_needsbootloader[index])
@@ -632,6 +645,14 @@ void rbutilFrm::OnInstallBtn(wxCommandEvent& event)
     wxFileSystem fs;
     wxFileConfig* buildinfo;
     wxDateSpan oneday;
+
+    int index = gv->plat_id.Index(gv->curplat);
+    if(index < 0)
+    {
+        WARN_DIALOG(wxT("No Device selected"),
+                wxT("Select a Device"));
+        return;
+    }
 
     // rockbox install dialog
     rockboxInstallDlg dialog(NULL, wxID_ANY,
@@ -749,6 +770,14 @@ void rbutilFrm::OnFontBtn(wxCommandEvent& event)
     wxFileConfig* buildinfo;
     wxDateSpan oneday;
 
+    int index = gv->plat_id.Index(gv->curplat);
+    if(index < 0)
+    {
+        WARN_DIALOG(wxT("No Device selected"),
+                wxT("Select a Device"));
+        return;
+    }
+
     // font install dialog
     fontInstallDlg dialog(NULL, wxID_ANY,
         wxT("Font Installation"));
@@ -838,6 +867,14 @@ void rbutilFrm::OnDoomBtn(wxCommandEvent& event)
     wxString src, dest, buf;
     wxLogVerbose(wxT("=== begin rbutilFrm::OnDoomBtn(event)"));
 
+    int index = gv->plat_id.Index(gv->curplat);
+    if(index < 0)
+    {
+        WARN_DIALOG(wxT("No Device selected"),
+                wxT("Select a Device"));
+        return;
+    }
+
      // font install dialog, reused
     fontInstallDlg dialog(NULL, wxID_ANY,
         wxT("Freedoom wad file Installation"));
@@ -897,6 +934,14 @@ void rbutilFrm::OnThemesBtn(wxCommandEvent& event)
     wxString src, dest, buf;
     wxLogVerbose(wxT("=== begin rbutilFrm::OnThemesBtn(event)"));
 
+    int index = gv->plat_id.Index(gv->curplat);
+    if(index < 0)
+    {
+        WARN_DIALOG(wxT("No Device selected"),
+                wxT("Select a Device"));
+        return;
+    }
+
     // Theme install dialog
     themesInstallDlg dialog(NULL, wxID_ANY,
         wxT("Theme Installation"));
@@ -932,6 +977,14 @@ void rbutilFrm::OnRemoveBtn(wxCommandEvent& event)
 {
     wxLogVerbose(wxT("=== begin rbutilFrm::OnRemoveBtn(event)"));
 
+    int index = gv->plat_id.Index(gv->curplat);
+    if(index < 0)
+    {
+        WARN_DIALOG(wxT("No Device selected"),
+                wxT("Select a Device"));
+        return;
+    }
+
     // Rockbox deinstall dialog
     rockboxDeInstallDlg dialog(NULL, wxID_ANY,
         wxT("Rockbox Deinstallation"));
@@ -966,6 +1019,14 @@ void rbutilFrm::OnPortableInstall(wxCommandEvent& event)
     wxLogVerbose(wxT("=== begin rbutilFrm::OnPortableInstall(event)"));
     wxFileSystem fs;
     wxDateSpan oneday;
+
+    int index = gv->plat_id.Index(gv->curplat);
+    if(index < 0)
+    {
+        WARN_DIALOG(wxT("No Device selected"),
+                wxT("Select a Device"));
+        return;
+    }
 
     //portable install dialog ( reused font dialog)
     fontInstallDlg dialog(NULL, wxID_ANY,
