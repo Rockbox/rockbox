@@ -177,6 +177,22 @@ static void poweroff_idle_timer_formatter(char *buffer, int buffer_size,
         snprintf(buffer, buffer_size, "%dm", poweroff_idle_timer_times[val]);
 }
 
+static long listaccel_getlang(int value)
+{
+    if (value == 0)
+        return LANG_OFF;
+    return TALK_ID((HZ/2)*value, UNIT_MS);
+}
+static void listaccel_formatter(char *buffer, int buffer_size, 
+        int val, const char *unit)
+{
+    (void)unit;
+    if (val == 0)
+        strcpy(buffer, str(LANG_OFF));
+    else
+        snprintf(buffer, buffer_size, "%d ms", 5*HZ*val);
+}
+
 #define NVRAM(bytes) (bytes<<F_NVRAM_MASK_SHIFT)
 /** NOTE: NVRAM_CONFIG_VERSION is in settings_list.h
      and you may need to update it if you edit this file */
@@ -1186,6 +1202,12 @@ const struct settings_list settings[] = {
         "button light brightness",UNIT_INT, MIN_BRIGHTNESS_SETTING, MAX_BRIGHTNESS_SETTING, 1,
         NULL, NULL, buttonlight_set_brightness),
 #endif
+    INT_SETTING(0, list_accel_start_delay, LANG_LISTACCEL_START_DELAY,
+                2, "list_accel_start_delay", UNIT_MS, 0, 10, 1,
+                listaccel_formatter, listaccel_getlang, NULL),
+    INT_SETTING(0, list_accel_wait, LANG_LISTACCEL_ACCEL_SPEED,
+                3, "list_accel_wait", UNIT_SEC, 1, 10, 1, 
+                scanaccel_formatter, scanaccel_getlang, NULL),
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

@@ -303,6 +303,7 @@ MENUITEM_SETTING(remote_scroll_delay, &global_settings.remote_scroll_delay, NULL
 MENUITEM_SETTING_W_TEXT(remote_scroll_step, &global_settings.remote_scroll_step,
                         ID2P(LANG_SCROLL_STEP_EXAMPLE), NULL);
 MENUITEM_SETTING(remote_bidir_limit, &global_settings.remote_bidir_limit, NULL);
+
 MAKE_MENU(remote_scroll_sets, ID2P(LANG_REMOTE_SCROLL_SETS), 0, Icon_NOICON,
           &remote_scroll_speed, &remote_scroll_delay,
           &remote_scroll_step, &remote_bidir_limit);
@@ -311,6 +312,10 @@ MAKE_MENU(remote_scroll_sets, ID2P(LANG_REMOTE_SCROLL_SETS), 0, Icon_NOICON,
 MENUITEM_SETTING(jump_scroll, &global_settings.jump_scroll, NULL);
 MENUITEM_SETTING(jump_scroll_delay, &global_settings.jump_scroll_delay, NULL);
 #endif
+/* list acceleration */
+MENUITEM_SETTING(list_accel_start_delay,
+                 &global_settings.list_accel_start_delay, NULL);
+MENUITEM_SETTING(list_accel_wait, &global_settings.list_accel_wait, NULL);
 #ifdef HAVE_LCD_BITMAP
 int screenscroll_callback(int action,const struct menu_item_ex *this_item)
 {
@@ -344,7 +349,8 @@ MAKE_MENU(scroll_settings_menu, ID2P(LANG_SCROLL_MENU), 0, Icon_NOICON,
 #ifdef HAVE_LCD_BITMAP
           &offset_out_of_view, &screen_scroll_step,
 #endif
-          &scroll_paginated
+          &scroll_paginated,
+          &list_accel_start_delay, &list_accel_wait
           );
 /*    SCROLL MENU                  */
 /***********************************/

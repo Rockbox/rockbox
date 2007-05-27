@@ -10952,3 +10952,31 @@
     *: "Time"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_LISTACCEL_START_DELAY
+  desc: Delay before list starts accelerating
+  user:
+  <source>
+    *: "List Acceleration Start Delay"
+  </source>
+  <dest>
+    *: "List Acceleration Start Delay"
+  </dest>
+  <voice>
+    *: "List Acceleration Start Delay"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LISTACCEL_ACCEL_SPEED
+  desc: list acceleration speed
+  user:
+  <source>
+    *: "List Acceleration Speed"
+  </source>
+  <dest>
+    *: "List Acceleration Speed"
+  </dest>
+  <voice>
+    *: "List Acceleration Speed"
+  </voice>
+</phrase>
