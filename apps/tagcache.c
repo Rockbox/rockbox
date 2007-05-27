@@ -547,9 +547,24 @@ static bool write_index(int masterfd, int idxid, struct index_entry *idx)
     }
     
 #ifdef HAVE_TC_RAMCACHE
+    /* Only update numeric data. Writing the whole index to RAM by memcpy
+     * destroys dircache pointers!
+     */
     if (tc_stat.ramcache)
     {
-        memcpy(&hdr->indices[idxid], idx, sizeof(struct index_entry));
+        int tag;
+        struct index_entry *idx_ram = &hdr->indices[idxid];
+        
+        for (tag = 0; tag < TAG_COUNT; tag++)
+        {
+            if (tagcache_is_numeric_tag(tag))
+            {
+                idx_ram->tag_seek[tag] = idx->tag_seek[tag];
+            }
+        }
+        
+        /* Don't touch the dircache flag. */
+        idx_ram->flag = idx->flag | (idx_ram->flag & FLAG_DIRCACHE);
     }
 #endif
     
