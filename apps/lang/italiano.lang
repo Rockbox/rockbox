@@ -10776,3 +10776,59 @@ LANG_RECORDING_AGC_PRESET: The phrase is not used. Skipped
     gigabeatf: "Luminosit√ Tasti""
   </voice>
 </phrase>
+<phrase>
+  id: LANG_BROWSE_CUESHEET
+  desc:
+  user:
+  <source>
+    *: "Browse Cuesheet"
+  </source>
+  <dest>
+    *: "Scegli Cuesheet"
+  </dest>
+  <voice>
+    *: "Scegli Cuesheet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETING
+  desc:
+  user:
+  <source>
+    *: "Deleting..."
+  </source>
+  <dest>
+    *: "Cancellazione..."
+  </dest>
+  <voice>
+    *: "Cancellazione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVING
+  desc:
+  user:
+  <source>
+    *: "Moving..."
+  </source>
+  <dest>
+    *: "Spostamento..."
+  </dest>
+  <voice>
+    *: "Spostamento"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COPYING
+  desc:
+  user:
+  <source>
+    *: "Copying..."
+  </source>
+  <dest>
+    *: "Copia..."
+  </dest>
+  <voice>
+    *: "Copia"
+  </voice>
+</phrase>
