@@ -2369,7 +2369,7 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
     /* We have successfully read the metadata from the file */
 
 #ifndef __PCTOOL__
-    if (cuesheet_is_enabled() && look_for_cuesheet_file(trackname))
+    if (cuesheet_is_enabled() && look_for_cuesheet_file(trackname, NULL))
     {
         track->id3.cuesheet_type = 1;
     }

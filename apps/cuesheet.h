@@ -58,7 +58,7 @@ bool cuesheet_is_enabled(void);
 void cuesheet_init(void);
 
 /* looks if there is a cuesheet file that has a name matching "trackpath" */
-bool look_for_cuesheet_file(const char *trackpath);
+bool look_for_cuesheet_file(const char *trackpath, char *found_cue_path);
 
 /* parse cuesheet "file" and store the information in "cue" */
 bool parse_cuesheet(char *file, struct cuesheet *cue);

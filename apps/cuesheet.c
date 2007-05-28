@@ -41,11 +41,13 @@
 #include "playback.h"
 #include "cuesheet.h"
 
+#define CUE_DIR ROCKBOX_DIR "/cue"
+
 #if CONFIG_CODEC != SWCODEC
 /* special trickery because the hwcodec playback engine is in firmware/ */
 static bool cuesheet_handler(const char *filename)
 {
-    return cuesheet_is_enabled() && look_for_cuesheet_file(filename);
+    return cuesheet_is_enabled() && look_for_cuesheet_file(filename, NULL);
 }
 #endif
 
@@ -68,8 +70,9 @@ bool cuesheet_is_enabled(void)
     return (curr_cue != NULL);
 }
 
-bool look_for_cuesheet_file(const char *trackpath)
+bool look_for_cuesheet_file(const char *trackpath, char *found_cue_path)
 {
+    DEBUGF("look for cue file\n");
     char cuepath[MAX_PATH];
     strncpy(cuepath, trackpath, MAX_PATH);
     char *dot = strrchr(cuepath, '.');
@@ -78,13 +81,22 @@ bool look_for_cuesheet_file(const char *trackpath)
     int fd = open(cuepath,O_RDONLY);
     if (fd < 0)
     {
-        return false;
+        strcpy(cuepath, CUE_DIR);
+        strcat(cuepath, strrchr(trackpath, '/'));
+        char *dot = strrchr(cuepath, '.');
+        strcpy(dot, ".cue");
+        fd = open(cuepath,O_RDONLY);
+        if (fd < 0)
+        {
+            if (found_cue_path)
+                found_cue_path = NULL;
+            return false;
+        }
     }
-    else
-    {
-        close(fd);
-        return true;
-    }
+    close(fd);
+    if (found_cue_path)
+        strncpy(found_cue_path, cuepath, MAX_PATH);
+    return true;
 }
 
 static char *skip_whitespace(char* buf)
@@ -122,6 +134,7 @@ bool parse_cuesheet(char *file, struct cuesheet *cue)
     char line[MAX_PATH];
     char *s;
 
+    DEBUGF("cue parse\n");
     int fd = open(file,O_RDONLY);
     if (fd < 0)
     {
@@ -271,9 +284,7 @@ void browse_cuesheet(struct cuesheet *cue)
 
     if (id3 && *id3->path && strcmp(id3->path, "No file!"))
     {
-        strncpy(cuepath, id3->path, MAX_PATH);
-        dot = strrchr(cuepath, '.');
-        strcpy(dot, ".cue");
+        look_for_cuesheet_file(id3->path, cuepath);
     }
 
     if (id3 && id3->cuesheet_type && !strcmp(cue->path, cuepath))
@@ -294,9 +305,7 @@ void browse_cuesheet(struct cuesheet *cue)
                 id3 = audio_current_track();
                 if (id3 && *id3->path && strcmp(id3->path, "No file!"))
                 {
-                    strncpy(cuepath, id3->path, MAX_PATH);
-                    dot = strrchr(cuepath, '.');
-                    strcpy(dot, ".cue");
+                    look_for_cuesheet_file(id3->path, cuepath);
                     if (id3->cuesheet_type && !strcmp(cue->path, cuepath))
                     {
                         sel = gui_synclist_get_sel_pos(&lists);

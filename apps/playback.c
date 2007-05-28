@@ -2762,13 +2762,11 @@ static bool audio_load_track(int offset, bool start_play, bool rebuffer)
     if (cuesheet_is_enabled() && tracks[track_widx].id3.cuesheet_type == 1)
     {
         char cuepath[MAX_PATH];
-        strncpy(cuepath, trackname, MAX_PATH);
-        char *dot = strrchr(cuepath, '.');
-        strcpy(dot, ".cue");
 
         struct cuesheet *cue = start_play ? curr_cue : temp_cue;
 
-        if (parse_cuesheet(cuepath, cue))
+        if (look_for_cuesheet_file(trackname, cuepath) &&
+            parse_cuesheet(cuepath, cue))
         {
             strcpy((cue)->audio_filename, trackname);
             if (start_play)

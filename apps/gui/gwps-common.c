@@ -389,11 +389,9 @@ bool update(struct gui_wps *gwps)
                 /* We need to parse the new cuesheet */
 
                 char cuepath[MAX_PATH];
-                strncpy(cuepath, gwps->state->id3->path, MAX_PATH);
-                char *dot = strrchr(cuepath, '.');
-                strcpy(dot, ".cue");
 
-                if (parse_cuesheet(cuepath, curr_cue))
+                if (look_for_cuesheet_file(gwps->state->id3->path, cuepath) &&
+                    parse_cuesheet(cuepath, curr_cue))
                 {
                     gwps->state->id3->cuesheet_type = 1;
                     strcpy(curr_cue->audio_filename, gwps->state->id3->path);
