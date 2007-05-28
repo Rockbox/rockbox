@@ -178,10 +178,10 @@ static const struct button_mapping button_context_settings_right_is_inc[]  = {
 }; /* button_context_settings_right_is_inc */
 
 static const struct button_mapping button_context_pitchscreen[]  = {
-    { ACTION_PS_INC_SMALL,      BUTTON_UP,                 BUTTON_NONE },
-    { ACTION_PS_INC_BIG,        BUTTON_UP|BUTTON_REPEAT,   BUTTON_NONE },
-    { ACTION_PS_DEC_SMALL,      BUTTON_DOWN,               BUTTON_NONE },
-    { ACTION_PS_DEC_BIG,        BUTTON_DOWN|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_PS_INC_SMALL,      BUTTON_SCROLL_DOWN,                 BUTTON_NONE },
+    { ACTION_PS_INC_BIG,        BUTTON_SCROLL_DOWN|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_PS_DEC_SMALL,      BUTTON_SCROLL_UP,               BUTTON_NONE },
+    { ACTION_PS_DEC_BIG,        BUTTON_SCROLL_UP|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_PS_NUDGE_LEFT,     BUTTON_LEFT,               BUTTON_NONE },
     { ACTION_PS_NUDGE_LEFTOFF,  BUTTON_LEFT|BUTTON_REL,    BUTTON_NONE },
     { ACTION_PS_NUDGE_RIGHT,    BUTTON_RIGHT,              BUTTON_NONE },
