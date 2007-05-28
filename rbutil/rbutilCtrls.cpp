@@ -560,7 +560,7 @@ void FirmwarePositionCtrl::CreateControls()
 
     //Device Selection
     m_desc = new wxStaticText( this, wxID_STATIC,
-        wxT("Select original Firmware form the Manufacturer"), wxDefaultPosition,
+        wxT("Select original Firmware from the Manufacturer"), wxDefaultPosition,
         wxDefaultSize, 0 );
     topSizer->Add(m_desc, 0, wxALIGN_LEFT|wxALL, 5);
 
