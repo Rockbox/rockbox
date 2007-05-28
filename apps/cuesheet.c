@@ -274,7 +274,6 @@ void browse_cuesheet(struct cuesheet *cue)
     int sel;
     char title[MAX_PATH];
     char cuepath[MAX_PATH];
-    char *dot;
     struct mp3entry *id3 = audio_current_track();
 
     snprintf(title, MAX_PATH, "%s: %s", cue->performer, cue->title);
