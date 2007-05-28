@@ -136,8 +136,7 @@ void rbutilFrm::CreateGUIControls(void)
     wxStaticText* WxStaticText5 =  new wxStaticText(installpage, wxID_ANY,
         wxT("Bootloader installation instructions\n\n"
         "Before Rockbox can be installed on your audio player, you "
-        "may have to\ninstall a bootloader.  This can not currently "
-        "be done automatically, but is\nonly necessary the first time "
+        "may have to\ninstall a bootloader.\nThis is only necessary the first time "
         "Rockbox is installed."));
 	WxFlexGridSizer1->Add(WxStaticText5, 0,
         wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL,5);
@@ -184,8 +183,7 @@ void rbutilFrm::CreateGUIControls(void)
 
     wxStaticText* WxStaticText4 =  new wxStaticText(themepage, wxID_ANY,
         wxT("Install the Rockbox fonts package\n\n"
-        "This step is only needed if you have installed "
-        "a daily build and want\nthe full set of Rockbox fonts.  You "
+        "This step is needed for many Themes. You "
         "will not need to download these\nagain unless you uninstall "
         "Rockbox."));
 	WxFlexGridSizer2->Add(WxStaticText4, 0,

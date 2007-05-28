@@ -89,7 +89,7 @@ protected:
     wxStaticText* m_desc;
     wxListBox* m_themeList;
     wxStaticText* m_size;
-    wxStaticText* m_themedesc;
+    wxTextCtrl* m_themedesc;
     ImageCtrl* m_PreviewBitmap;
 
     wxArrayString m_Themes;

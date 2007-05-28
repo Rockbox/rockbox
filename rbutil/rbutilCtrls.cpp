@@ -123,7 +123,7 @@ void ThemeCtrl::CreateControls()
     wxStaticText* desc_desc= new wxStaticText(this,wxID_ANY,wxT("Description:"));
     styleSizer->Add(desc_desc,0,wxGROW | wxALL,5);
 
-    m_themedesc= new wxStaticText(this,ID_DESC,wxT(""));
+    m_themedesc= new wxTextCtrl(this,ID_DESC,wxT(""),wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY);
     styleSizer->Add(m_themedesc,0,wxGROW | wxALL,5);
 
     topSizer->Fit(this);
@@ -156,7 +156,7 @@ void ThemeCtrl::setDevice(wxString device)
     // load the themelist
     Init();
     m_size->SetLabel(wxT(""));
-    m_themedesc->SetLabel(wxT(""));
+    m_themedesc->SetValue(wxT(""));
     m_themeList->Clear();
 
      //get correct Themes list
@@ -231,8 +231,8 @@ void ThemeCtrl::OnThemesLst(wxCommandEvent& event)
     int index = selected[0];
 
     m_size->SetLabel(m_Themes_size[index]);
-    m_themedesc->SetLabel(m_Themes_desc[index]);
-    m_themedesc->Wrap(200);                       // wrap desc
+    m_themedesc->SetValue(m_Themes_desc[index]);
+   // m_themedesc->Wrap(200);                       // wrap desc
 
     wxString src,dest;
 
