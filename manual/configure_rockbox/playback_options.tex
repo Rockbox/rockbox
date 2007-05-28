@@ -40,6 +40,12 @@ related to audio playback.
       This option is more complicated to use than the others as the \dap\
       must first be placed into A-B repeat mode and then the start and end
       points defined.\\
+      \opt{RECORDER_PAD}{
+          To set the Start Point (A) hold \ButtonOn{} and press \ButtonLeft{}.
+          Setting the End Point (B) is done accordingly using
+          \ButtonOn{} and \ButtonRight{}.
+          To reset the markers hold \ButtonOn{} and press \ButtonOff{}.
+      }
       \opt{h10,h10_5gb}{
           Hold \ButtonPower{} and press \ButtonRew{} to set the Start Point (A).
           For setting the End Point (B) hold \ButtonPower{} and press \ButtonFF{}.
@@ -56,10 +62,16 @@ related to audio playback.
           \ButtonOn{} and \ButtonRight{}.
           To reset the markers hold \ButtonOn{} and press \ButtonSelect{}.
       }
-      \nopt{h1xx,h300,h10,h10_5gb,ipod,x5}{
+      \opt{e200}{
+          To set the Start Point (A) hold \ButtonPower{} and press \ButtonLeft{}.
+          Setting the End Point (B) is done accordingly using
+          \ButtonPower{} and \ButtonRight{}.
+          To reset the markers hold \ButtonPower{} and press \ButtonUp{}.
+      }
+      \nopt{h1xx,h300,h10,h10_5gb,ipod,x5,e200,RECORDER_PAD}{
         \fixme{
-          Hold Play and press Left  --- Sets Start Point (A)\\
-          Hold Play and press Right --- Sets End Point (B)\\
+          --- Sets Start Point (A)\\
+          --- Sets End Point (B)\\
         }
       }
     }
