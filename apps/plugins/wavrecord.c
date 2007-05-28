@@ -3684,7 +3684,7 @@ static int record_file(char *filename)
 
 static int recording_menu(void)
 {
-    int result;
+    int menupos = 3;
     int rc = 0;
     bool done = false;
 
@@ -3716,7 +3716,7 @@ static int recording_menu(void)
 
     while (!done)
     {
-        switch (rb->do_menu(&menu, &result))
+        switch (rb->do_menu(&menu, &menupos))
         {
             case 0: /* Set sample rate */
                 rb->set_option("Sample rate", &reccfg.samplerate, INT, freqs, 9, NULL);
