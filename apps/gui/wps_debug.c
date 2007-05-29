@@ -22,13 +22,17 @@
 #include <stdio.h>
 #include <string.h>
 #include "gwps.h"
+#ifdef __PCTOOL__
+#define DEBUGF printf
+#else
 #include "debug.h"
+#endif
 
 #define PARSE_FAIL_UNCLOSED_COND     1
 #define PARSE_FAIL_INVALID_CHAR      2
 #define PARSE_FAIL_COND_SYNTAX_ERROR 3
 
-#ifdef SIMULATOR
+#if defined(SIMULATOR) || defined(__PCTOOL__)
 extern bool debug_wps;
 #endif
 
@@ -467,7 +471,7 @@ static void print_img_cond_indexes(struct wps_data *data)
 
 void print_debug_info(struct wps_data *data, int fail, int line)
 {
-#ifdef SIMULATOR
+#if defined(SIMULATOR) || defined(__PCTOOL__)
     if (debug_wps)
     {
         dump_wps_tokens(data);

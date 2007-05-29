@@ -1969,29 +1969,3 @@ bool gui_wps_refresh(struct gui_wps *gwps,
     return true;
 }
 
-int wps_subline_index(struct wps_data *data, int line, int subline)
-{
-    return data->lines[line].first_subline_idx + subline;
-}
-
-int wps_first_token_index(struct wps_data *data, int line, int subline)
-{
-    int first_subline_idx = data->lines[line].first_subline_idx;
-    return data->sublines[first_subline_idx + subline].first_token_idx;
-}
-
-int wps_last_token_index(struct wps_data *data, int line, int subline)
-{
-    int first_subline_idx = data->lines[line].first_subline_idx;
-    int idx = first_subline_idx + subline;
-    if (idx < data->num_sublines - 1)
-    {
-        /* This subline ends where the next begins */
-        return data->sublines[idx+1].first_token_idx - 1;
-    }
-    else
-    {
-        /* The last subline goes to the end */
-        return data->num_tokens - 1;
-    }
-}
