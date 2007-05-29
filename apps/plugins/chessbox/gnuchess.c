@@ -1003,7 +1003,7 @@ register int sq;
 /* ............    MOVE GENERATION & SEARCH ROUTINES    .............. */
 
 
-int SelectMove( short side, short iop , void (*callback)(void))
+int SelectMove( short side, short iop , void (*callback)(void), char* move_buffer)
 
 /*
    Select a move by calling function search() at progressively deeper 
@@ -1114,6 +1114,13 @@ static short i,alpha,beta,score,tempb,tempc,tempsf,tempst,xside,rpt;
     }
   else mvstr1[0] = '\0';
   /*OutputMove();*/
+
+  short index;
+  for (index=0;index<4;index++){
+    move_buffer[index] = mvstr1[index];
+  }
+  move_buffer[index] = '\0';
+
   if (score == -9999 || score == 9998) mate = true;
   if (mate) hint = 0;
   if (root->flags & cstlmask) Game50 = GameCnt;

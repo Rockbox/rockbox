@@ -50,7 +50,7 @@ extern struct plugin_api* rb;
 void SetTimeControl(void);
 void GNUChess_Initialize(void);
 int  VerifyMove(char s[],short iop,unsigned short *mv);
-int  SelectMove ( short side, short iop , void (*callback)(void) );
+int  SelectMove ( short side, short iop , void (*callback)(void), char *move_buffer );
 void InitializeStats ( void );
 
 #endif

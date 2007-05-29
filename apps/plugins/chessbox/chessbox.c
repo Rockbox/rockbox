@@ -25,6 +25,7 @@
 
 #include "gnuchess.h"
 #include "opening.h"
+#include "chessbox_pgn.h"
 
 /* type definitions */
 struct cb_command {
@@ -51,6 +52,11 @@ PLUGIN_HEADER
 #define CB_RESTART (BUTTON_SELECT | BUTTON_LEFT)
 #define CB_MENU    (BUTTON_SELECT | BUTTON_MENU)
 
+#define CB_SCROLL_UP     (BUTTON_SCROLL_FWD|BUTTON_REPEAT)
+#define CB_SCROLL_DOWN   (BUTTON_SCROLL_BACK|BUTTON_REPEAT)
+#define CB_SCROLL_LEFT   (BUTTON_LEFT|BUTTON_REPEAT)
+#define CB_SCROLL_RIGHT  (BUTTON_RIGHT|BUTTON_REPEAT)
+
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 #define CB_SELECT  BUTTON_SELECT
 #define CB_UP      BUTTON_UP
@@ -61,6 +67,11 @@ PLUGIN_HEADER
 #define CB_LEVEL   BUTTON_REC
 #define CB_RESTART (BUTTON_SELECT | BUTTON_PLAY)
 #define CB_MENU    BUTTON_POWER
+
+#define CB_SCROLL_UP     (BUTTON_UP|BUTTON_REPEAT)
+#define CB_SCROLL_DOWN   (BUTTON_DOWN|BUTTON_REPEAT)
+#define CB_SCROLL_LEFT   (BUTTON_LEFT|BUTTON_REPEAT)
+#define CB_SCROLL_RIGHT  (BUTTON_RIGHT|BUTTON_REPEAT)
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define CB_SELECT  BUTTON_SELECT
@@ -75,6 +86,11 @@ PLUGIN_HEADER
 
 #define CB_RC_QUIT BUTTON_RC_STOP
 
+#define CB_SCROLL_UP     (BUTTON_UP|BUTTON_REPEAT)
+#define CB_SCROLL_DOWN   (BUTTON_DOWN|BUTTON_REPEAT)
+#define CB_SCROLL_LEFT   (BUTTON_LEFT|BUTTON_REPEAT)
+#define CB_SCROLL_RIGHT  (BUTTON_RIGHT|BUTTON_REPEAT)
+
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
 #define CB_SELECT  BUTTON_SELECT
 #define CB_UP      BUTTON_UP
@@ -84,6 +100,11 @@ PLUGIN_HEADER
 #define CB_PLAY    BUTTON_PLAY
 #define CB_LEVEL   BUTTON_EQ
 #define CB_MENU    BUTTON_MODE
+
+#define CB_SCROLL_UP     (BUTTON_UP|BUTTON_REPEAT)
+#define CB_SCROLL_DOWN   (BUTTON_DOWN|BUTTON_REPEAT)
+#define CB_SCROLL_LEFT   (BUTTON_LEFT|BUTTON_REPEAT)
+#define CB_SCROLL_RIGHT  (BUTTON_RIGHT|BUTTON_REPEAT)
 
 #elif CONFIG_KEYPAD == RECORDER_PAD
 #define CB_SELECT  BUTTON_PLAY
@@ -96,6 +117,11 @@ PLUGIN_HEADER
 #define CB_RESTART BUTTON_F3
 #define CB_MENU    BUTTON_OFF
 
+#define CB_SCROLL_UP     (BUTTON_UP|BUTTON_REPEAT)
+#define CB_SCROLL_DOWN   (BUTTON_DOWN|BUTTON_REPEAT)
+#define CB_SCROLL_LEFT   (BUTTON_LEFT|BUTTON_REPEAT)
+#define CB_SCROLL_RIGHT  (BUTTON_RIGHT|BUTTON_REPEAT)
+
 #elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
 #define CB_SELECT  BUTTON_SELECT
 #define CB_UP      BUTTON_UP
@@ -106,6 +132,11 @@ PLUGIN_HEADER
 #define CB_LEVEL   BUTTON_F1
 #define CB_RESTART BUTTON_F3
 #define CB_MENU    BUTTON_OFF
+
+#define CB_SCROLL_UP     (BUTTON_UP|BUTTON_REPEAT)
+#define CB_SCROLL_DOWN   (BUTTON_DOWN|BUTTON_REPEAT)
+#define CB_SCROLL_LEFT   (BUTTON_LEFT|BUTTON_REPEAT)
+#define CB_SCROLL_RIGHT  (BUTTON_RIGHT|BUTTON_REPEAT)
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define CB_SELECT_PRE BUTTON_MENU
@@ -120,16 +151,25 @@ PLUGIN_HEADER
 #define CB_RESTART (BUTTON_MENU|BUTTON_LEFT)
 #define CB_MENU    BUTTON_OFF
 
+#define CB_SCROLL_UP     (BUTTON_UP|BUTTON_REPEAT)
+#define CB_SCROLL_DOWN   (BUTTON_DOWN|BUTTON_REPEAT)
+#define CB_SCROLL_LEFT   (BUTTON_LEFT|BUTTON_REPEAT)
+#define CB_SCROLL_RIGHT  (BUTTON_RIGHT|BUTTON_REPEAT)
+
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
 #define CB_SELECT  BUTTON_SELECT
 #define CB_UP      BUTTON_UP
 #define CB_DOWN    BUTTON_DOWN
 #define CB_LEFT    BUTTON_LEFT
 #define CB_RIGHT   BUTTON_RIGHT
-#define CB_PLAY    BUTTON_A
-#define CB_LEVEL   BUTTON_VOL_UP
-#define CB_RESTART BUTTON_VOL_DOWN
-#define CB_MENU    BUTTON_MENU
+#define CB_PLAY    BUTTON_POWER
+#define CB_LEVEL   BUTTON_MENU
+#define CB_MENU    BUTTON_A
+
+#define CB_SCROLL_UP     (BUTTON_UP|BUTTON_REPEAT)
+#define CB_SCROLL_DOWN   (BUTTON_DOWN|BUTTON_REPEAT)
+#define CB_SCROLL_LEFT   (BUTTON_LEFT|BUTTON_REPEAT)
+#define CB_SCROLL_RIGHT  (BUTTON_RIGHT|BUTTON_REPEAT)
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #define CB_SELECT  BUTTON_REW
@@ -142,6 +182,11 @@ PLUGIN_HEADER
 #define CB_RESTART (BUTTON_REW | BUTTON_PLAY)
 #define CB_MENU    BUTTON_POWER
 
+#define CB_SCROLL_UP     (BUTTON_SCROLL_UP|BUTTON_REPEAT)
+#define CB_SCROLL_DOWN   (BUTTON_SCROLL_DOWN|BUTTON_REPEAT)
+#define CB_SCROLL_LEFT   (BUTTON_LEFT|BUTTON_REPEAT)
+#define CB_SCROLL_RIGHT  (BUTTON_RIGHT|BUTTON_REPEAT)
+
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
 #define CB_SELECT  BUTTON_SELECT
 #define CB_UP      BUTTON_UP
@@ -152,6 +197,11 @@ PLUGIN_HEADER
 #define CB_LEVEL   BUTTON_REC
 #define CB_RESTART (BUTTON_SELECT | BUTTON_REPEAT)
 #define CB_MENU    BUTTON_POWER
+
+#define CB_SCROLL_UP     (BUTTON_SCROLL_UP|BUTTON_REPEAT)
+#define CB_SCROLL_DOWN   (BUTTON_SCROLL_DOWN|BUTTON_REPEAT)
+#define CB_SCROLL_LEFT   (BUTTON_LEFT|BUTTON_REPEAT)
+#define CB_SCROLL_RIGHT  (BUTTON_RIGHT|BUTTON_REPEAT)
 
 #else
     #error CHESSBOX: Unsupported keypad
@@ -203,6 +253,11 @@ PLUGIN_HEADER
 #define COMMAND_SAVE       7
 #define COMMAND_RESTORE    8
 #define COMMAND_RESUME     9
+#define COMMAND_SELECT    10
+#define COMMAND_NEXT      11
+#define COMMAND_PREV      12
+
+short plugin_mode;
 
 /* level+1's string */
 const char *level_string[] = { "Level 1: 60 moves / 5 min" ,
@@ -516,16 +571,219 @@ void cb_restoreposition ( void ) {
     Sdepth = 0;
 }
 
+/* ---- show menu in viewer mode---- */
+static int cb_menu_viewer(void)
+{
+    int selection;
+    int result = 0;
+    bool menu_quit = false;
+    
+    MENUITEM_STRINGLIST(menu,"Chessbox Menu",NULL,"Restart Game",
+                        "Select Other Game", "Quit");                  
+    
+    while(!menu_quit)
+    {
+        switch(rb->do_menu(&menu, &selection))
+        {
+            case 0:
+                menu_quit = true;
+                result = COMMAND_RESTART;
+                break;
+            case 1:
+                result = COMMAND_SELECT;
+                menu_quit = true;
+                break;
+            case 2:
+                result = COMMAND_QUIT;
+                menu_quit = true;
+                break;
+        }
+    }
+    return result;
+}
+
+/* ---- get a command in game mode ---- */
+struct cb_command cb_get_viewer_command (void) {
+    int button;
+    struct cb_command result = { 0, {0,0,0,0,0}, 0 };
+    
+    /* main loop */
+    while ( true ) {
+        button = rb->button_get(true);
+        switch (button) {
+#ifdef CB_RC_QUIT
+            case CB_RC_QUIT:
+                result.type = COMMAND_QUIT;
+                return result;
+#endif
+            case CB_MENU:
+                result.type = cb_menu_viewer();
+                return result;
+            case CB_LEFT:
+                result.type = COMMAND_PREV;
+                return result;
+            case CB_RIGHT:
+                result.type = COMMAND_NEXT;
+                return result;
+        }
+    }
+
+}
+
+/* ---- viewer main loop ---- */
+void cb_start_viewer(char* filename){
+    struct pgn_game_node *first_game, *selected_game;
+    struct pgn_ply_node *curr_ply;
+    bool exit_game = false;
+    bool exit_viewer = false;
+    struct cb_command command;
+
+    first_game = pgn_list_games(rb, filename);
+    if (first_game == NULL){
+        rb->splash ( 200 , "No games found !" );
+        return;
+    }
+
+    do {
+        selected_game = pgn_show_game_list(rb, first_game);
+        if (selected_game == NULL){
+            break;
+        }
+
+        pgn_parse_game(rb, filename, selected_game);
+        if (selected_game->first_ply != NULL) {
+
+            /* init board */
+            GNUChess_Initialize();
+    
+            /* draw the board */
+            cb_drawboard();
+
+            curr_ply = selected_game->first_ply;
+            exit_game = false;
+
+            do {
+                command = cb_get_viewer_command ();
+                switch (command.type) {
+                    case COMMAND_PREV:
+                        /* unapply the previous ply */
+                        if (curr_ply->prev_node != NULL){
+                            curr_ply = curr_ply->prev_node;
+                        } else {
+                            rb->splash ( 200 , "At the begining of the game" );
+                            cb_drawboard();
+                            break;
+                        }
+                        board[locn[curr_ply->row_from][curr_ply->column_from]] 
+                            = board[locn[curr_ply->row_to][curr_ply->column_to]];
+                        color[locn[curr_ply->row_from][curr_ply->column_from]]
+                            = color[locn[curr_ply->row_to][curr_ply->column_to]];
+                        board[locn[curr_ply->row_to][curr_ply->column_to]] = no_piece;
+                        color[locn[curr_ply->row_to][curr_ply->column_to]] = neutral;
+                        if (curr_ply->taken_piece != no_piece && !curr_ply->enpassant){
+                            board[locn[curr_ply->row_to][curr_ply->column_to]]
+                                = curr_ply->taken_piece;
+                            color[locn[curr_ply->row_to][curr_ply->column_to]]
+                                = ((curr_ply->player==white)?black:white);
+                        }
+                        if (curr_ply->castle){
+                            if (curr_ply->column_to == 6){
+                                /* castling kingside */
+                                board[locn[curr_ply->row_to][7]] = rook;
+                                color[locn[curr_ply->row_to][7]] = curr_ply->player;
+                                board[locn[curr_ply->row_to][5]] = no_piece;
+                                color[locn[curr_ply->row_to][5]] = neutral;
+                            } else {
+                                /* castling queenside */
+                                board[locn[curr_ply->row_to][0]] = rook;
+                                color[locn[curr_ply->row_to][0]] = curr_ply->player;
+                                board[locn[curr_ply->row_to][3]] = no_piece;
+                                color[locn[curr_ply->row_to][3]] = neutral;
+                            }
+                        }
+                        if (curr_ply->enpassant){
+                            board[locn[curr_ply->row_from][curr_ply->column_to]] = pawn;
+                            color[locn[curr_ply->row_from][curr_ply->column_to]]
+                                = ((curr_ply->player==white)?black:white);
+                        }
+                        if (curr_ply->promotion){
+                            board[locn[curr_ply->row_from][curr_ply->column_from]] = pawn;
+                            color[locn[curr_ply->row_from][curr_ply->column_from]]
+                                = curr_ply->player;
+                        }
+
+                        cb_drawboard();
+                        break;
+                    case COMMAND_NEXT:
+                        /* apply the current move */
+                        if (curr_ply->player == neutral){
+                            rb->splash ( 200 , "At the end of the game" );
+                            break;
+                        }
+                        board[locn[curr_ply->row_to][curr_ply->column_to]]
+                            = board[locn[curr_ply->row_from][curr_ply->column_from]];
+                        color[locn[curr_ply->row_to][curr_ply->column_to]]
+                            = color[locn[curr_ply->row_from][curr_ply->column_from]];
+                        board[locn[curr_ply->row_from][curr_ply->column_from]] = no_piece;
+                        color[locn[curr_ply->row_from][curr_ply->column_from]] = neutral;
+                        if (curr_ply->castle){
+                            if (curr_ply->column_to == 6){
+                                /* castling kingside */
+                                board[locn[curr_ply->row_to][5]] = rook;
+                                color[locn[curr_ply->row_to][5]] = curr_ply->player;
+                                board[locn[curr_ply->row_to][7]] = no_piece;
+                                color[locn[curr_ply->row_to][7]] = neutral;
+                            } else {
+                                /* castling queenside */
+                                board[locn[curr_ply->row_to][3]] = rook;
+                                color[locn[curr_ply->row_to][3]] = curr_ply->player;
+                                board[locn[curr_ply->row_to][0]] = no_piece;
+                                color[locn[curr_ply->row_to][0]] = neutral;
+                            }
+                        }
+                        if (curr_ply->enpassant){
+                            board[locn[curr_ply->row_from][curr_ply->column_to]] = no_piece;
+                            color[locn[curr_ply->row_from][curr_ply->column_to]] = neutral;
+                        }
+                        if (curr_ply->promotion){
+                            board[locn[curr_ply->row_to][curr_ply->column_to]]
+                                = curr_ply->promotion_piece;
+                            color[locn[curr_ply->row_to][curr_ply->column_to]]
+                                = curr_ply->player;
+                        }
+                        if (curr_ply->next_node != NULL){
+                            curr_ply = curr_ply->next_node;
+                        }
+                        cb_drawboard();
+                        break;
+                    case COMMAND_RESTART:
+                        GNUChess_Initialize();
+                        cb_drawboard();
+                        curr_ply = selected_game->first_ply;
+                    case COMMAND_SELECT:
+                        exit_game = true;
+                        break;
+                    case COMMAND_QUIT:
+                        exit_viewer = true;
+                        break;
+                }
+            } while (!exit_game && !exit_viewer);
+        } else {
+            rb->splash ( 200 , "Error parsing game !");
+        }
+    } while (!exit_viewer);
+}
+
 /* ---- show menu ---- */
 static int cb_menu(void)
 {
     int selection;
     int result = 0;
     bool menu_quit = false;
-
+    
     MENUITEM_STRINGLIST(menu,"Chessbox Menu",NULL,"New Game","Resume Game",
-                        "Save Game", "Restore Game", "Quit");
-
+                        "Save Game", "Restore Game", "Quit");                  
+    
     while(!menu_quit)
     {
         switch(rb->do_menu(&menu, &selection))
@@ -555,7 +813,7 @@ static int cb_menu(void)
     return result;
 }
 
-/* ---- main user loop ---- */
+/* ---- get a command in game mode ---- */
 struct cb_command cb_getcommand (void) {
     static short x = 4 , y = 3 ;
     short c , r , l;
@@ -690,21 +948,13 @@ struct cb_command cb_getcommand (void) {
 
 }
 
-/*****************************************************************************
-* plugin entry point.
-******************************************************************************/
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
+/* ---- game main loop ---- */
+void cb_play_game(void) {
     struct cb_command command;
+    char move_buffer[10];
+
     /* init status */
     bool exit = false;
-    
-    /* plugin init */
-    (void)parameter;
-    rb = api;
-#if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
-#endif
-    /* end of plugin init */
 
     /* load opening book, soon */
 
@@ -717,7 +967,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     /* draw the board */
     /* I don't like configscreens, start game inmediatly */
     cb_drawboard();
-    
+
     while (!exit) {
         if ( mate ) {
             rb->splash ( 500 , "Checkmate!" );
@@ -737,7 +987,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
                     rb->cpu_boost ( true );
 #endif
-                    SelectMove ( computer , 0 , cb_wt_callback );
+                    SelectMove ( computer , 0 , cb_wt_callback, move_buffer);
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
                     rb->cpu_boost ( false );
 #endif
@@ -766,7 +1016,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
 
                 /* init board */
                 GNUChess_Initialize();
-
+    
                 /* restore saved position, if saved */
                 cb_restoreposition();
 
@@ -784,7 +1034,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
                 rb->cpu_boost ( true );
 #endif
-                SelectMove ( computer , 0 , cb_wt_callback );
+                SelectMove ( computer , 0 , cb_wt_callback , move_buffer );
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
                 rb->cpu_boost ( false );
 #endif
@@ -806,6 +1056,32 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     
     cb_saveposition();
     rb->lcd_setfont(FONT_UI);
+
+}
+
+/*****************************************************************************
+* plugin entry point.
+******************************************************************************/
+enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
+    
+    /* plugin init */
+
+    rb = api;
+#if LCD_DEPTH > 1
+    rb->lcd_set_backdrop(NULL);
+#endif
+
+    /* end of plugin init */
+
+    /* if the plugin was invoked as a viewer, parse the file and show the game list 
+     * else, start playing a game
+     */
+    if (parameter != NULL) {
+        cb_start_viewer((char *)parameter);
+     } else {
+        cb_play_game();
+    }
+
     return PLUGIN_OK;
 }
 
