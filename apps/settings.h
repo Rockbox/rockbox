@@ -61,7 +61,8 @@
 #define BACKDROP_DIR ROCKBOX_DIR "/backdrops"
 #define REC_BASE_DIR "/recordings"
 #define EQS_DIR     ROCKBOX_DIR "/eqs"
-#define CODECS_DIR  ROCKBOX_DIR"/codecs"
+#define CODECS_DIR  ROCKBOX_DIR "/codecs"
+#define RECPRESETS_DIR  ROCKBOX_DIR "/recpresets"
 #define FMPRESET_PATH ROCKBOX_DIR "/fmpresets"
 
 #define VIEWERS_CONFIG      ROCKBOX_DIR "/viewers.config"
@@ -231,9 +232,14 @@ bool settings_load_config(const char* file, bool apply);
 void status_save( void );
 int settings_save(void);
 /* defines for the options paramater */
-#define SETTINGS_SAVE_CHANGED 0
-#define SETTINGS_SAVE_ALL 1
-#define SETTINGS_SAVE_THEME 2
+enum {
+    SETTINGS_SAVE_CHANGED = 0,
+    SETTINGS_SAVE_ALL,
+    SETTINGS_SAVE_THEME,
+#ifdef HAVE_RECORDING
+    SETTINGS_SAVE_RECPRESETS,
+#endif
+};
 bool settings_save_config(int options);
 
 void settings_reset(void);

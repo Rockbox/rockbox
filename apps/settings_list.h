@@ -91,7 +91,8 @@ struct choice_setting {
 #define F_MAX_ISFUNC    0x200000 /* max(above) is function pointer to above type */
 #define F_DEF_ISFUNC    0x400000 /* default_val is function pointer to above type */
 
-#define F_THEMESETTING  0x800000
+#define F_THEMESETTING  0x0800000
+#define F_RECSETTING    0x1000000
 
 #define F_NVRAM_BYTES_MASK     0xE000 /*0-4 bytes can be stored */
 #define F_NVRAM_MASK_SHIFT     13
@@ -102,10 +103,10 @@ struct choice_setting {
 - a NVRAM setting is removed
 */
 #define F_TEMPVAR    0x400 /* used if the setting should be set using a temp var */
-#define F_FLIPLIST     0x800 /* used if the order in the setting screen is backwards */
+#define F_FLIPLIST   0x800 /* used if the order in the setting screen is backwards */
 
 struct settings_list {
-    uint32_t             flags;   /* ____ ____ TFFF ____ NNN_ FTVC IFRB STTT */
+    uint32_t             flags;   /* ____ ___R TFFF ____ NNN_ FTVC IFRB STTT */
     void                *setting;
     int                  lang_id; /* -1 for none */
     union storage_type   default_val;

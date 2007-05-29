@@ -62,6 +62,7 @@
 #endif
 #include "action.h"
 
+
 static bool no_source_in_menu = true;
 int recmenu_callback(int action,const struct menu_item_ex *this_item);
 
@@ -803,9 +804,24 @@ MENUITEM_FUNCTION(rectrigger_item, 0, ID2P(LANG_RECORD_TRIGGER),
 
 
 
+/* from main_menu.c */
+struct browse_folder_info {
+    const char* dir;
+    int show_options;
+};
+static struct browse_folder_info rec_config_browse = {RECPRESETS_DIR, SHOW_CFG};
+int browse_folder(void *param);
+MENUITEM_FUNCTION(browse_recconfigs, MENU_FUNC_USEPARAM, ID2P(LANG_CUSTOM_CFG), 
+                  browse_folder, (void*)&rec_config_browse, NULL, Icon_Config);
+static int write_settings_file(void)
+{
+    return settings_save_config(SETTINGS_SAVE_RECPRESETS);
+}
+MENUITEM_FUNCTION(save_recpresets_item, 0, ID2P(LANG_SAVE_SETTINGS), 
+                  write_settings_file, NULL, NULL, Icon_Config);
 
-
-MAKE_MENU(recording_setting_menu, ID2P(LANG_RECORDING_SETTINGS), NULL, Icon_Recording,
+MAKE_MENU(recording_setting_menu, ID2P(LANG_RECORDING_SETTINGS),
+            NULL, Icon_Recording,
 #if CONFIG_CODEC == MAS3587F
             &rec_quality,
 #endif
@@ -827,6 +843,7 @@ MAKE_MENU(recording_setting_menu, ID2P(LANG_RECORDING_SETTINGS), NULL, Icon_Reco
 #ifdef HAVE_AGC
             &agc_preset, &agc_cliptime,
 #endif
+            &browse_recconfigs, &save_recpresets_item
 );
 
 bool recording_menu(bool no_source)

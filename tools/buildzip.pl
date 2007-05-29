@@ -200,6 +200,7 @@ sub buildzip {
 
     mkdir ".rockbox/langs", 0777;
     mkdir ".rockbox/rocks", 0777;
+    mkdir ".rockbox/recpresets", 0777;
 
     if($swcodec) {
         mkdir ".rockbox/eqs", 0777;

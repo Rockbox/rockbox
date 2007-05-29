@@ -459,7 +459,11 @@ static bool settings_write_config(char* filename, int options)
         else if ((options == SETTINGS_SAVE_THEME) &&
                  ((settings[i].flags&F_THEMESETTING) == 0))
             continue;
-        
+#ifdef HAVE_RECORDING
+        else if ((options == SETTINGS_SAVE_RECPRESETS) &&
+                 ((settings[i].flags&F_RECSETTING) == 0))
+            continue;
+#endif
         switch (settings[i].flags&F_T_MASK)
         {
             case F_T_INT:
@@ -582,8 +586,21 @@ int settings_save( void )
 bool settings_save_config(int options)
 {
     char filename[MAX_PATH];
-
-    create_numbered_filename(filename, ROCKBOX_DIR, "config", ".cfg", 2
+    char *folder;
+    switch (options)
+    {
+        case SETTINGS_SAVE_THEME:
+            folder = THEME_DIR;
+            break;
+#ifdef HAVE_RECORDING
+        case SETTINGS_SAVE_RECPRESETS:
+            folder = RECPRESETS_DIR;
+            break;
+#endif
+        default:
+            folder = ROCKBOX_DIR;
+    }
+    create_numbered_filename(filename, folder, "config", ".cfg", 2
                              IF_CNFN_NUM_(, NULL));
 
     /* allow user to modify filename */

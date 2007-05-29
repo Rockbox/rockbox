@@ -54,7 +54,7 @@ struct browse_folder_info {
 };
 static struct browse_folder_info theme = {THEME_DIR, SHOW_CFG};
 static struct browse_folder_info config = {ROCKBOX_DIR, SHOW_CFG};
-static int browse_folder(void *param)
+int browse_folder(void *param)
 {
     const struct browse_folder_info *info =
             (const struct browse_folder_info*)param;

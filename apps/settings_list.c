@@ -733,7 +733,7 @@ const struct settings_list settings[] = {
 
 #ifdef HAVE_RECORDING
     /* recording */
-    STRINGCHOICE_SETTING(0, rec_timesplit, LANG_SPLIT_TIME, 0,
+    STRINGCHOICE_SETTING(F_RECSETTING, rec_timesplit, LANG_SPLIT_TIME, 0,
         "rec timesplit",
         "off,00:05,00:10,00:15,00:30,01:00,01:14,01:20,02:00,"
         "04:00,06:00,08:00,10:00,12:00,18:00,24:00",
@@ -744,7 +744,7 @@ const struct settings_list settings[] = {
         TALK_ID(6, UNIT_HOUR), TALK_ID(8, UNIT_HOUR), TALK_ID(10, UNIT_HOUR), 
         TALK_ID(12, UNIT_HOUR), TALK_ID(18, UNIT_HOUR), TALK_ID(20, UNIT_HOUR), 
         TALK_ID(24, UNIT_HOUR)),
-    STRINGCHOICE_SETTING(0, rec_sizesplit, LANG_SPLIT_SIZE, 0,
+    STRINGCHOICE_SETTING(F_RECSETTING, rec_sizesplit, LANG_SPLIT_SIZE, 0,
         "rec sizesplit",
         "off,5MB,10MB,15MB,32MB,64MB,75MB,100MB,128MB,"
         "256MB,512MB,650MB,700MB,1GB,1.5GB,1.75GB",
@@ -754,28 +754,30 @@ const struct settings_list settings[] = {
         TALK_ID(100, UNIT_MB), TALK_ID(128, UNIT_MB), TALK_ID(256, UNIT_MB), 
         TALK_ID(512, UNIT_MB), TALK_ID(650, UNIT_MB), TALK_ID(700, UNIT_MB), 
         TALK_ID(1024, UNIT_MB), TALK_ID(1536, UNIT_MB), TALK_ID(1792, UNIT_MB)),
-    {F_T_INT,&global_settings.rec_channels,LANG_RECORDING_CHANNELS,INT(0),
+    {F_T_INT|F_RECSETTING, &global_settings.rec_channels,
+        LANG_RECORDING_CHANNELS, INT(0),
         "rec channels","stereo,mono",UNUSED},
-    CHOICE_SETTING(0, rec_split_type, LANG_SPLIT_TYPE, 0 ,
+    CHOICE_SETTING(F_RECSETTING, rec_split_type, LANG_SPLIT_TYPE, 0 ,
         "rec split type", "Split, Stop", NULL, 2,
         ID2P(LANG_START_NEW_FILE), ID2P(LANG_STOP_RECORDING)),
-    CHOICE_SETTING(0, rec_split_method, LANG_SPLIT_MEASURE, 0 ,
+    CHOICE_SETTING(F_RECSETTING, rec_split_method, LANG_SPLIT_MEASURE, 0 ,
         "rec split method", "Time,Filesize", NULL, 2,
         ID2P(LANG_REC_TIME), ID2P(LANG_REC_SIZE)),
-    {F_T_INT,&global_settings.rec_source,LANG_RECORDING_SOURCE,INT(0),
+    {F_T_INT|F_RECSETTING, &global_settings.rec_source,
+        LANG_RECORDING_SOURCE, INT(0),
         "rec source",
         &HAVE_MIC_REC_(",mic")
          HAVE_LINE_REC_(",line")
          HAVE_SPDIF_REC_(",spdif")
          HAVE_FMRADIO_REC_(",fmradio")[1]
         ,UNUSED},
-    INT_SETTING(0, rec_prerecord_time, LANG_RECORD_PRERECORD_TIME,
+        INT_SETTING(F_RECSETTING, rec_prerecord_time, LANG_RECORD_PRERECORD_TIME,
                 0, "prerecording time",
                 UNIT_SEC, 0, 30, 1, rectime_formatter, rectime_getlang, NULL),
-    {F_T_INT,&global_settings.rec_directory,LANG_RECORD_DIRECTORY,
+        {F_T_INT|F_RECSETTING,&global_settings.rec_directory,LANG_RECORD_DIRECTORY,
         INT(0),"rec directory",REC_BASE_DIR ",current",UNUSED},
 #ifdef HAVE_BACKLIGHT
-    CHOICE_SETTING(0, cliplight, LANG_CLIP_LIGHT, 0 ,
+    CHOICE_SETTING(F_RECSETTING, cliplight, LANG_CLIP_LIGHT, 0 ,
         "cliplight", "off,main,both,remote", NULL, 
 #ifdef HAVE_REMOTE_LCD
         4,
@@ -787,34 +789,41 @@ const struct settings_list settings[] = {
         , ID2P(LANG_REMOTE_MAIN), ID2P(LANG_REMOTE_UNIT)
 #endif
         ),
-    {F_T_INT,&global_settings.cliplight,LANG_CLIP_LIGHT,INT(0),
+    {F_T_INT|F_RECSETTING,&global_settings.cliplight,LANG_CLIP_LIGHT,INT(0),
         "cliplight","off,main,both,remote",UNUSED},
 #endif
-    {F_T_INT,&global_settings.rec_mic_gain,LANG_RECORDING_GAIN,INT(DEFAULT_REC_MIC_GAIN),
+    {F_T_INT|F_RECSETTING,&global_settings.rec_mic_gain,
+        LANG_RECORDING_GAIN,INT(DEFAULT_REC_MIC_GAIN),
         "rec mic gain",NULL,UNUSED},
-    {F_T_INT,&global_settings.rec_left_gain,LANG_RECORDING_LEFT,INT(DEFAULT_REC_LEFT_GAIN),
+    {F_T_INT|F_RECSETTING,&global_settings.rec_left_gain,
+        LANG_RECORDING_LEFT,INT(DEFAULT_REC_LEFT_GAIN),
         "rec left gain",NULL,UNUSED},
-    {F_T_INT,&global_settings.rec_right_gain,LANG_RECORDING_RIGHT,
+    {F_T_INT|F_RECSETTING,&global_settings.rec_right_gain,LANG_RECORDING_RIGHT,
         INT(DEFAULT_REC_RIGHT_GAIN),
         "rec right gain",NULL,UNUSED},
 #if CONFIG_CODEC == MAS3587F
-    {F_T_INT,&global_settings.rec_frequency,LANG_RECORDING_FREQUENCY,
+    {F_T_INT|F_RECSETTING,&global_settings.rec_frequency,
+        LANG_RECORDING_FREQUENCY,
         INT(0),"rec frequency","44,48,32,22,24,16",UNUSED},
-    INT_SETTING(0, rec_quality, LANG_RECORDING_QUALITY, 5, "rec quality",
-                    UNIT_INT, 0, 7, 1, NULL, NULL, NULL),
-    OFFON_SETTING(0,rec_editable,LANG_RECORDING_EDITABLE,
+    INT_SETTING(F_RECSETTING, rec_quality, LANG_RECORDING_QUALITY, 
+                5, "rec quality",
+                UNIT_INT, 0, 7, 1, NULL, NULL, NULL),
+    OFFON_SETTING(F_RECSETTING,rec_editable,LANG_RECORDING_EDITABLE,
                     false,"editable recordings",NULL),
 #endif /* CONFIG_CODEC == MAS3587F */
 #if CONFIG_CODEC == SWCODEC
-    {F_T_INT,&global_settings.rec_frequency,LANG_RECORDING_FREQUENCY,INT(REC_FREQ_DEFAULT),
+    {F_T_INT|F_RECSETTING,&global_settings.rec_frequency,
+        LANG_RECORDING_FREQUENCY,INT(REC_FREQ_DEFAULT),
         "rec frequency",REC_FREQ_CFG_VAL_LIST,UNUSED},
-    {F_T_INT,&global_settings.rec_format,LANG_RECORDING_FORMAT,INT(REC_FORMAT_DEFAULT),
+    {F_T_INT|F_RECSETTING,&global_settings.rec_format,
+        LANG_RECORDING_FORMAT,INT(REC_FORMAT_DEFAULT),
         "rec format",REC_FORMAT_CFG_VAL_LIST,UNUSED},
     /** Encoder settings start - keep these together **/
     /* aiff_enc */
     /* (no settings yet) */
     /* mp3_enc */
-    {F_T_INT,&global_settings.mp3_enc_config.bitrate,-1,INT(MP3_ENC_BITRATE_CFG_DEFAULT),
+    {F_T_INT|F_RECSETTING, &global_settings.mp3_enc_config.bitrate,-1,
+        INT(MP3_ENC_BITRATE_CFG_DEFAULT),
         "mp3_enc bitrate",MP3_ENC_BITRATE_CFG_VALUE_LIST,UNUSED},
     /* wav_enc */
     /* (no settings yet) */
@@ -823,17 +832,23 @@ const struct settings_list settings[] = {
     /** Encoder settings end **/
 #endif /* CONFIG_CODEC == SWCODEC */
     /* values for the trigger */
-    {F_T_INT,&global_settings.rec_start_thres,LANG_RECORD_START_THRESHOLD,INT(-35),
+    {F_T_INT|F_RECSETTING,&global_settings.rec_start_thres,
+        LANG_RECORD_START_THRESHOLD, INT(-35),
         "trigger start threshold",NULL,UNUSED},
-    {F_T_INT,&global_settings.rec_stop_thres,LANG_RECORD_STOP_THRESHOLD,INT(-45),
+    {F_T_INT|F_RECSETTING,&global_settings.rec_stop_thres,
+        LANG_RECORD_STOP_THRESHOLD,INT(-45),
         "trigger stop threshold",NULL,UNUSED},
-    {F_T_INT,&global_settings.rec_start_duration,LANG_RECORD_MIN_DURATION,INT(0),
+    {F_T_INT|F_RECSETTING,&global_settings.rec_start_duration,
+        LANG_RECORD_MIN_DURATION,INT(0),
         "trigger start duration",trig_durations_conf,UNUSED},
-    {F_T_INT,&global_settings.rec_stop_postrec,LANG_RECORD_STOP_POSTREC,INT(2),
+    {F_T_INT|F_RECSETTING,&global_settings.rec_stop_postrec,
+        LANG_RECORD_STOP_POSTREC,INT(2),
         "trigger stop postrec",trig_durations_conf,UNUSED},
-    {F_T_INT,&global_settings.rec_stop_gap,LANG_RECORD_STOP_GAP,INT(1),
+    {F_T_INT|F_RECSETTING,&global_settings.rec_stop_gap,
+        LANG_RECORD_STOP_GAP,INT(1),
         "trigger min gap",trig_durations_conf,UNUSED},
-    {F_T_INT,&global_settings.rec_trigger_mode,LANG_RECORD_TRIGGER_MODE,INT(0),
+    {F_T_INT|F_RECSETTING,&global_settings.rec_trigger_mode,
+        LANG_RECORD_TRIGGER_MODE,INT(0),
         "trigger mode","off,once,repeat",UNUSED},
 #endif /* HAVE_RECORDING */
 
@@ -1111,7 +1126,8 @@ const struct settings_list settings[] = {
         false,"Last.fm Logging",NULL),
 
 #ifdef HAVE_RECORDING
-    {F_T_INT,&global_settings.rec_trigger_type,LANG_RECORD_TRIGGER_TYPE,
+    {F_T_INT|F_RECSETTING,&global_settings.rec_trigger_type,
+        LANG_RECORD_TRIGGER_TYPE,
         INT(0),"trigger type","stop,pause,nf stp",UNUSED},
 #endif
 
