@@ -504,9 +504,16 @@ static void gui_list_select_at_offset(struct gui_list * gui_list, int offset)
     int nb_lines = gui_list->display->nb_lines;
     if (SHOW_LIST_TITLE)
         nb_lines--;
-    offset *= gui_list->selected_size;
-    gui_list->selected_item += offset;
+    
 
+    if (gui_list->selected_size > 1)
+    {
+        offset *= gui_list->selected_size;
+        /* always select the first item of multi-line lists */
+        offset -= offset%gui_list->selected_size;
+    }
+    gui_list->selected_item += offset;
+        
     if (offset < 0) /* moving up the list */
     {
         if (gui_list->selected_item < 0)
