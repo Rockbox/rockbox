@@ -3,8 +3,20 @@
 \screenshot{plugins/images/ss-chessbox}{Chessbox}{img:chessbox}
 Chessbox is a chess game with computer AI. The chess engine is a port of 
 GNU Chess 2 by John Stanback.
+
+It also works as a PGN file viewer. Instead of executing the game from the
+plugin menu, look for any file with \fname{.pgn} extension in the file browser
+and execute it. Chessbox will show the list of matches included in the file
+and allow you to select the one you want to watch. After that, you can scroll
+back and forth through the moves of the game. If the menu is invoked while in
+the viewer, the user is allowed to select a new match from the same file or
+quit the game.
+
 When you quit the game the current state will be saved and restored when
-you resume the game. 
+you resume the game. The menu also allows the user to reload the last game
+saved, save the current position and start a new game without having to quit
+the game.
+
 \opt{recorder,recorderv2fm,ondio}{
 \note{This plugin will stop playback.}
 }
@@ -45,6 +57,6 @@ you resume the game.
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonMenu}
     \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD}{\ButtonPower}
-    & Quit\\
+    & Show the menu\\
     \end{btnmap}
 \end{table}
