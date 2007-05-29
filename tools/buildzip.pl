@@ -85,6 +85,9 @@ Remote Icon Height: CONFIG_REMOTE_DEFAULT_ICON_HEIGHT
 #else
 Remote Depth: 0
 #endif
+#ifdef HAVE_RECORDING
+Recording: yes
+#endif
 STOP
 ;
     close(GCC);
@@ -97,6 +100,7 @@ STOP
 
     my ($bitmap, $depth, $swcodec, $icon_h, $icon_w);
     my ($remote_depth, $remote_icon_h, $remote_icon_w);
+    my ($recording);
     $icon_count = 1;
     while(<TARGET>) {
         # print STDERR "DATA: $_";
@@ -125,11 +129,14 @@ STOP
         elsif($_ =~ /^Remote Icon Height: (\d*)/) {
             $remote_icon_h = $1;
         }
+        if($_ =~ /^Recording: (.*)/) {
+            $recording = $1;
+        }
     }
     close(TARGET);
     unlink("gcctemp");
 
-    return ($bitmap, $depth, $icon_w, $icon_h,
+    return ($bitmap, $depth, $icon_w, $icon_h, $recording,
             $swcodec, $remote_depth, $remote_icon_w, $remote_icon_h);
 }
 
@@ -159,7 +166,7 @@ sub buildlangs {
 sub buildzip {
     my ($zip, $image, $fonts)=@_;
 
-    my ($bitmap, $depth, $icon_w, $icon_h, $swcodec,
+    my ($bitmap, $depth, $icon_w, $icon_h, $recording, $swcodec,
         $remote_depth, $remote_icon_w, $remote_icon_h) = &gettargetinfo();
 
     # print "Bitmap: $bitmap\nDepth: $depth\nSwcodec: $swcodec\n";
@@ -200,7 +207,9 @@ sub buildzip {
 
     mkdir ".rockbox/langs", 0777;
     mkdir ".rockbox/rocks", 0777;
-    mkdir ".rockbox/recpresets", 0777;
+    if ($recording) {
+        mkdir ".rockbox/recpresets", 0777;
+    }
 
     if($swcodec) {
         mkdir ".rockbox/eqs", 0777;
