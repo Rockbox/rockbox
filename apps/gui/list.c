@@ -173,7 +173,8 @@ static void gui_list_put_selection_in_screen(struct gui_list * gui_list,
     {
         gui_list->start_item = 0;
     }
-    else if (gui_list->nb_items - gui_list->selected_item < nb_lines)
+    else if (global_settings.scroll_paginated && 
+             gui_list->nb_items - gui_list->selected_item < nb_lines)
     {
         gui_list->start_item = gui_list->nb_items - nb_lines;
     }
