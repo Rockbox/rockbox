@@ -178,13 +178,11 @@ static void gui_list_put_selection_in_screen(struct gui_list * gui_list,
     }
     else
     {
-        int list_start = gui_list->selected_item - SCROLL_LIMIT + 1;
-        if(list_start + nb_lines > gui_list->nb_items)
-            list_start = gui_list->nb_items - nb_lines;
+        int list_start = gui_list->selected_item - SCROLL_LIMIT - 1;
         gui_list->start_item = list_start;
+        if(gui_list->start_item < 0)
+            gui_list->start_item = 0;
     }
-    if(gui_list->start_item < 0)
-        gui_list->start_item = 0;
 }
 
 #ifdef HAVE_LCD_BITMAP
