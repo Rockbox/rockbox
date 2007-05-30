@@ -34,6 +34,7 @@
 #include "textarea.h"
 #include "lang.h"
 #include "sound.h"
+#include "misc.h"
 
 #ifdef HAVE_LCD_CHARCELLS
 #define SCROLL_LIMIT 1
