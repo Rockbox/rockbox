@@ -557,7 +557,8 @@ static void gui_list_select_at_offset(struct gui_list * gui_list, int offset)
             {
                 if (gui_list->nb_items >= nb_lines)
                     gui_list->start_item = gui_list->nb_items - nb_lines;
-                gui_list->selected_item = gui_list->nb_items - 1;
+                gui_list->selected_item = gui_list->nb_items - 
+                                          gui_list->selected_size;
             }
             else
             {
