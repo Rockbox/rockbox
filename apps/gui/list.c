@@ -876,13 +876,7 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists,
             /* up two because the falthrough brings it down one */
         case ACTION_LIST_VOLDOWN:
             global_settings.volume--;
-            
-            if (global_settings.volume < sound_min(SOUND_VOLUME))
-                global_settings.volume = sound_min(SOUND_VOLUME);
-            if (global_settings.volume > sound_max(SOUND_VOLUME))
-                global_settings.volume = sound_max(SOUND_VOLUME);
-            sound_set_volume(global_settings.volume);
-            settings_save();
+            setvol();
             return button;
 #endif
         case ACTION_STD_PREV:

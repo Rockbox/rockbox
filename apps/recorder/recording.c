@@ -1052,10 +1052,8 @@ bool recording_screen(bool no_source)
                 switch(cursor)
                 {
                     case 0:
-                        if(global_settings.volume <
-                           sound_max(SOUND_VOLUME))
-                            global_settings.volume++;
-                        sound_set_volume(global_settings.volume);
+                        global_settings.volume++;
+                        setvol();
                         break;
                     case 1:
                         if(global_settings.rec_source == AUDIO_SRC_MIC)
@@ -1120,10 +1118,8 @@ bool recording_screen(bool no_source)
                 switch(cursor)
                 {
                     case 0:
-                        if(global_settings.volume >
-                           sound_min(SOUND_VOLUME))
-                            global_settings.volume--;
-                        sound_set_volume(global_settings.volume);
+                        global_settings.volume--;
+                        setvol();
                         break;
                     case 1:
                         if(global_settings.rec_source == AUDIO_SRC_MIC)

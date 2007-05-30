@@ -47,6 +47,7 @@
 #include "splash.h"
 #include "tagcache.h"
 #include "scrobbler.h"
+#include "sound.h"
 #ifdef HAVE_MMC
 #include "ata_mmc.h"
 #endif
@@ -969,3 +970,17 @@ void check_bootfile(bool do_rolo)
 }
 #endif
 #endif
+
+/* check range, set volume and save settings */
+void setvol(void)
+{
+    const int min_vol = sound_min(SOUND_VOLUME);
+    const int max_vol = sound_max(SOUND_VOLUME);
+    if (global_settings.volume < min_vol)
+        global_settings.volume = min_vol;
+    if (global_settings.volume > max_vol)
+        global_settings.volume = max_vol;
+    sound_set_volume(global_settings.volume);
+    settings_save();
+}
+

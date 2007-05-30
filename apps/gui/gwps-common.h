@@ -25,7 +25,6 @@
 
 void fade(bool fade_in);
 bool gui_wps_display(void);
-void setvol(void);
 bool update_onvol_change(struct gui_wps * gwps);
 bool update(struct gui_wps *gwps);
 bool ffwd_rew(int button);

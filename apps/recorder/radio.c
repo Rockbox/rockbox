@@ -657,21 +657,15 @@ int radio_screen(void)
             case ACTION_SETTINGS_INC:
             case ACTION_SETTINGS_INCREPEAT:
                 global_settings.volume++;
-                if(global_settings.volume > sound_max(SOUND_VOLUME))
-                    global_settings.volume = sound_max(SOUND_VOLUME);
-                sound_set_volume(global_settings.volume);
+                setvol();
                 update_screen = true;
-                settings_save();
                 break;
 
             case ACTION_SETTINGS_DEC:
             case ACTION_SETTINGS_DECREPEAT:
                 global_settings.volume--;
-                if(global_settings.volume < sound_min(SOUND_VOLUME))
-                    global_settings.volume = sound_min(SOUND_VOLUME);
-                sound_set_volume(global_settings.volume);
+                setvol();
                 update_screen = true;
-                settings_save();
                 break;
 
             case ACTION_FM_PLAY:

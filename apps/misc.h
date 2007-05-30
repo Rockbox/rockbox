@@ -106,4 +106,7 @@ void check_bootfile(bool do_rolo);
 #endif
 #endif
 
+/* check range, set volume and save settings */
+void setvol(void);
+
 #endif /* MISC_H */

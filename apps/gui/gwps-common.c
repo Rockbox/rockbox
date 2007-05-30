@@ -126,16 +126,6 @@ void fade(bool fade_in)
     }
 }
 
-/* set volume */
-void setvol(void)
-{
-    if (global_settings.volume < sound_min(SOUND_VOLUME))
-        global_settings.volume = sound_min(SOUND_VOLUME);
-    if (global_settings.volume > sound_max(SOUND_VOLUME))
-        global_settings.volume = sound_max(SOUND_VOLUME);
-    sound_set_volume(global_settings.volume);
-    settings_save();
-}
 /* return true if screen restore is needed
    return false otherwise
 */
