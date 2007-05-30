@@ -169,7 +169,15 @@ static void gui_list_put_selection_in_screen(struct gui_list * gui_list,
     int nb_lines=gui_list->display->nb_lines;
     if (SHOW_LIST_TITLE)
         nb_lines--;
-    if(put_from_end)
+    if (gui_list->nb_items < nb_lines)
+    {
+        gui_list->start_item = 0;
+    }
+    else if (gui_list->nb_items - gui_list->selected_item < nb_lines)
+    {
+        gui_list->start_item = gui_list->nb_items - nb_lines;
+    }
+    else if(put_from_end)
     {
         int list_end = gui_list->selected_item + SCROLL_LIMIT;
         if(list_end >= gui_list->nb_items)
@@ -562,6 +570,8 @@ static void gui_list_select_at_offset(struct gui_list * gui_list, int offset)
             if (gui_list->selected_item - gui_list->start_item >= nb_lines)
             {
                 gui_list->start_item = gui_list->selected_item;
+                if (gui_list->nb_items - gui_list->start_item < nb_lines)
+                    gui_list->start_item = gui_list->nb_items - nb_lines;
             }
         }
         else if (nb_lines - (gui_list->selected_item - gui_list->start_item) <= SCROLL_LIMIT)
