@@ -166,17 +166,21 @@ struct mp3entry {
     unsigned long length;   /* song length in ms */
     unsigned long elapsed;  /* ms played */
 
+#if CONFIG_CODEC == SWCODEC
     int lead_trim;          /* Number of samples to skip at the beginning */
     int tail_trim;          /* Number of samples to remove from the end */
 
     /* Added for Vorbis */
     unsigned long samples;  /* number of samples in track */
+#endif
 
     /* MP3 stream specific info */
     unsigned long frame_count; /* number of frames in the file (if VBR) */
 
+#if CONFIG_CODEC == SWCODEC
     /* Used for A52/AC3 */
     unsigned long bytesperframe; /* number of bytes per frame (if CBR) */
+#endif
 
     /* Xing VBR fields */
     bool vbr;
@@ -190,12 +194,6 @@ struct mp3entry {
     /* resume related */
     unsigned long offset;  /* bytes played */
     int index;             /* playlist index */
-
-    /* FileEntry fields */
-    long fileentryoffset;
-    long filehash;
-    long songentryoffset;
-    long rundbentryoffset;
 
     /* runtime database fields */
     short rating;
