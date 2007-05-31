@@ -114,7 +114,9 @@ simcc () {
 
    FreeBSD)
    echo "FreeBSD host detected"
-   LDOPTS='-L/usr/X11R6/lib -lX11 -lm -lXt -lXmu -dl -lpthread'
+   # sdl version
+   GCCOPTS="$GCCOPTS `sdl-config --cflags`"
+   LDOPTS="`sdl-config --libs`"
    ;;
 
    Darwin)
