@@ -2459,8 +2459,8 @@ static int bubbles(struct game_context* bb) {
             rb->lcd_puts(0, 8, "UP/DOWN to change level");
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
             rb->lcd_puts(0, 2, "PLAY to start/pause");
-            rb->lcd_puts(0, 3, "LEFT+RIGHT to save/resume");
-            rb->lcd_puts(0, 4, "MENU to exit");
+            rb->lcd_puts(0, 3, "MENU to save/resume");
+            rb->lcd_puts(0, 4, "MENU+SELECT to exit");
             rb->lcd_puts(0, 5, "SELECT to fire");
             rb->lcd_puts(0, 6, " and show high scores");
             rb->lcd_puts(0, 7, "SCROLL to aim");
