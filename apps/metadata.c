@@ -1046,10 +1046,10 @@ static bool get_wave_metadata(int fd, struct mp3entry* id3)
             if (i >= 4)
             {
                 /* get rest of chunk */
-                if ((read_bytes = read(fd, buf, 2)) < 2)
+                if ((read_bytes = read(fd, buf, 4)) < 4)
                     return false;
 
-                i -= 2;
+                i -= 4;
                 totalsamples = get_long_le(buf);
             }
         }
