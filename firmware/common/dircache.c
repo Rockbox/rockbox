@@ -536,6 +536,7 @@ static int dircache_do_rebuild(void)
     if (pdir == NULL)
     {
         logf("Failed to open rootdir");
+        dircache_initializing = false;
         return -3;
     }
 #else
