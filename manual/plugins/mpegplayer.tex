@@ -1,0 +1,43 @@
+% $Id$ %
+\subsection{MPEG Player}
+The Mpeg Player is a video player plugin capable of playing back MPEG-1 and 
+MPEG-2 video streams with MPEG audio multiplexed into \fname{.mpg} files.
+
+To play a video file, you just select it in the Rockbox \setting{File Browser}.
+If your file does not have the \fname{.mpg} extension but is encoded in the
+supported format, you will need to use the \setting{Open With...} context menu
+option and choose \setting{mpegplayer}.
+
+\begin{table}
+\begin{btnmap}{}{}
+    \ActionWpsPlay & Pause/Resume\\
+    \ActionWpsStop & Stop\\
+    \ActionWpsVolUp{} / \ActionWpsVolDown & Adjust volume up / down\\
+    \opt{IRIVER_H300_PAD}{\ButtonMode}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,GIGABEAT_PAD}{\ButtonMenu}
+    \opt{IAUDIO_X5_PAD}{\ButtonRec}
+    \opt{IRIVER_H10_PAD}{\ButtonRew}
+    \opt{SANSA_E200_PAD}{\ButtonSelect}
+    & Open the MPEG Player menu\\
+\end{btnmap}
+\end{table}
+
+The menu has the following entries.
+
+\begin{description}
+\item[Show FPS] This option displays (once a second - if your video is
+    full-screen this means it will get overwritten by the video and appear to
+    flash once per second) the average number of frames decoded per second,
+    the total number of frames skipped (see the Skip Frames option), the
+    current time (in 100Hz ticks) and the time the current frame is due to be
+    displayed.
+\item[Limit FPS] With this option disabled, mpegplayer will display the video
+    as fast as it can. Useful for benchmarking.
+\item[Skip frames] This option causes mpegplayer to attempt to maintain
+    realtime playback by skipping the display of frames - but these frames are
+    still decoded. Disabling this option can cause loss of A/V sync.
+\end{description}
+
+See this page in the Rockbox wiki for information on how to encode your videos
+to the supported format. \wikilink{PluginMpegplayer}
+
