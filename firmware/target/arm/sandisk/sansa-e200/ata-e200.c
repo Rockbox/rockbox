@@ -363,8 +363,6 @@ void sd_init_device(void)
     DEV_EN |= DEV_ATA; /* Enable controller */
     DEV_RS |= DEV_ATA; /* Reset controller */
     DEV_RS &=~DEV_ATA; /* Clear Reset */
-    outl(0, 0x6000b000);
-    outl(0, 0x6000a000); /* Init DMA controller? */
 
 /* Init NAND */
     REG_11 |= (1 << 15);

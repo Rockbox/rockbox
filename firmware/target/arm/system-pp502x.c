@@ -194,6 +194,8 @@ void set_cpu_frequency(long frequency)
 #elif !defined(BOOTLOADER)
 void ipod_set_cpu_frequency(void)
 {
+/* For e200, just use clocking set up by OF loader for now */
+#ifndef SANSA_E200
     /* Enable PLL? */
     outl(inl(0x70000020) | (1<<30), 0x70000020);
 
@@ -207,6 +209,7 @@ void ipod_set_cpu_frequency(void)
 
     /* Select PLL as clock source? */
     outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);
+#endif /* SANSA_E200 */
 }
 #endif
 
@@ -252,6 +255,14 @@ void system_init(void)
         GPIOK_INT_EN        = 0;
         GPIOL_INT_EN        = 0;
 
+#ifdef SANSA_E200
+        /* outl(0x00000000, 0x6000b000); */
+        outl(inl(0x6000a000) | 0x80000000, 0x6000a000); /* Init DMA controller? */
+    }
+
+    ipod_init_cache();
+#else /* !sansa E200 */
+
 # if NUM_CORES > 1 && defined(HAVE_ADJUSTABLE_CPU_FREQ)
         spinlock_init(&boostctrl_mtx);
 # endif
@@ -267,7 +278,10 @@ void system_init(void)
     }
 #endif
     ipod_init_cache();
-#endif
+
+#endif /* SANSA_E200 */
+
+#endif /* BOOTLOADER */
 }
 
 void system_reboot(void)
