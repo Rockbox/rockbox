@@ -29,7 +29,7 @@
 #include "ipodpatcher.h"
 #include "ipodio.h"
 
-#define VERSION "1.0 with v1.1 bootloaders"
+#define VERSION "1.1-svn"
 
 int verbose = 0;
 
@@ -79,6 +79,9 @@ void print_usage(void)
     fprintf(stderr,"  -rfb, --read-firmware-bin  filename.bin\n");
     fprintf(stderr,"  -wf,  --write-firmware     filename.ipod\n");
     fprintf(stderr,"  -wfb, --write-firmware-bin filename.bin\n");
+#ifdef WITH_BOOTOBJS
+    fprintf(stderr,"  -we,  --write-embedded\n");
+#endif
     fprintf(stderr,"  -a,   --add-bootloader     filename.ipod\n");
     fprintf(stderr,"  -ab,  --add-bootloader-bin filename.bin\n");
     fprintf(stderr,"  -d,   --delete-bootloader\n");
@@ -248,6 +251,14 @@ int main(int argc, char* argv[])
             if (i == argc) { print_usage(); return 1; }
             filename=argv[i];
             i++;
+#ifdef WITH_BOOTOBJS
+        } else if ((strcmp(argv[i],"-we")==0) || 
+                   (strcmp(argv[i],"--write-embedded")==0)) {
+            action = WRITE_FIRMWARE;
+            type = FILETYPE_INTERNAL;
+            filename="[embedded bootloader]";  /* Only displayed for user */
+            i++;
+#endif
         } else if ((strcmp(argv[i],"-wf")==0) || 
                    (strcmp(argv[i],"--write-firmware")==0)) {
             action = WRITE_FIRMWARE;

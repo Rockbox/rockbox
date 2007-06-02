@@ -765,34 +765,45 @@ int write_firmware(struct ipod_t* ipod, char* filename, int type)
     unsigned long filechksum=0;
     unsigned char header[8];  /* Header for .ipod file */
 
-    /* First check that the input file is the correct type for this ipod. */
-    infile=open(filename,O_RDONLY);
-    if (infile < 0) {
-        fprintf(stderr,"[ERR]  Couldn't open input file %s\n",filename);
-        return -1;
-    }
-
-    if (type==FILETYPE_DOT_IPOD) {
-        n = read(infile,header,8);
-        if (n < 8) {
-            fprintf(stderr,"[ERR]  Failed to read header from %s\n",filename);
-            close(infile);
+#ifdef WITH_BOOTOBJS
+    if (type == FILETYPE_INTERNAL) {
+        fprintf(stderr,"[INFO] Using internal bootloader - %d bytes\n",ipod->bootloader_len);
+        length = ipod->bootloader_len;
+        infile = -1;
+    } 
+    else 
+#endif
+    {
+        /* First check that the input file is the correct type for this ipod. */
+        infile=open(filename,O_RDONLY);
+        if (infile < 0) {
+            fprintf(stderr,"[ERR]  Couldn't open input file %s\n",filename);
             return -1;
         }
-
-        if (memcmp(header+4, ipod->modelname,4)!=0) {
-            fprintf(stderr,"[ERR]  Model name in input file (%c%c%c%c) doesn't match ipod model (%s)\n",
-                    header[4],header[5],header[6],header[7], ipod->modelname);
-            close(infile);
-            return -1;
+    
+        if (type==FILETYPE_DOT_IPOD) {
+            n = read(infile,header,8);
+            if (n < 8) {
+                fprintf(stderr,"[ERR]  Failed to read header from %s\n",filename);
+                close(infile);
+                return -1;
+            }
+    
+            if (memcmp(header+4, ipod->modelname,4)!=0) {
+                fprintf(stderr,"[ERR]  Model name in input file (%c%c%c%c) doesn't match ipod model (%s)\n",
+                        header[4],header[5],header[6],header[7], ipod->modelname);
+                close(infile);
+                return -1;
+            }
+    
+            filechksum = be2int(header);
+    
+            length = filesize(infile)-8;
+        } else {
+            length = filesize(infile);
         }
-
-        filechksum = be2int(header);
-
-        length = filesize(infile)-8;
-    } else {
-        length = filesize(infile);
     }
+
     newsize=(length+ipod->sector_size-1)&~(ipod->sector_size-1);
 
     fprintf(stderr,"[INFO] Padding input file from 0x%08x to 0x%08x bytes\n",
@@ -800,7 +811,7 @@ int write_firmware(struct ipod_t* ipod, char* filename, int type)
 
     if (newsize > BUFFER_SIZE) {
         fprintf(stderr,"[ERR]  Input file too big for buffer\n");
-        close(infile);
+        if (infile >= 0) close(infile);
         return -1;
     }
 
@@ -818,16 +829,26 @@ int write_firmware(struct ipod_t* ipod, char* filename, int type)
         }
     }
 
-    fprintf(stderr,"[INFO] Reading input file...\n");
-    /* We now know we have enough space, so write it. */
-    memset(sectorbuf+length,0,newsize-length);
-    n = read(infile,sectorbuf,length);
-    if (n < 0) {
-        fprintf(stderr,"[ERR]  Couldn't read input file\n");
+#ifdef WITH_BOOTOBJS
+    if (type == FILETYPE_INTERNAL) {
+        memcpy(sectorbuf,ipod->bootloader,ipod->bootloader_len);
+    } 
+    else
+#endif
+    {
+        fprintf(stderr,"[INFO] Reading input file...\n");
+        /* We now know we have enough space, so write it. */
+        n = read(infile,sectorbuf,length);
+        if (n < 0) {
+            fprintf(stderr,"[ERR]  Couldn't read input file\n");
+            close(infile);
+            return -1;
+        }
         close(infile);
-        return -1;
     }
-    close(infile);
+
+    /* Pad the data with zeros */
+    memset(sectorbuf+length,0,newsize-length);
 
     if (type==FILETYPE_DOT_IPOD) {
         chksum = ipod->modelnum;
