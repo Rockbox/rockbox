@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2006 Eli Sherer
+ *               2007 Antoine Cellerier
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -107,18 +108,35 @@ PLUGIN_HEADER
 #define MOVE_LT 3               /*    2    */
 #define MOVE_RT 4
 
-#define MOVE_UUR 0              /* ball movement (12 ways) */
-#define MOVE_UR  1
-#define MOVE_URR 2
-#define MOVE_DRR 3              /*    UUL110UUR    */
-#define MOVE_DR  4              /*   UL10    1UR   */
-#define MOVE_DDR 5              /* ULL9   .   2URR */
-#define MOVE_DDL 6              /* DLL8       3DRR */
-#define MOVE_DL  7              /*   DL7     4DR   */
-#define MOVE_DLL 8              /*    DDL6 5DDR    */
-#define MOVE_ULL 9
-#define MOVE_UL  10
-#define MOVE_UUL 11
+/* ball movement (12 ways) */
+/*    UUL   UR    */
+/*   UL       UR   */
+/* ULL    .    URR */
+/* DLL         DRR */
+/*   DL       DR   */
+/*    DDL   DDR    */
+
+#define DIR_UU (1<<7)
+#define DIR_U  (1<<6)
+#define DIR_RR (1<<5)
+#define DIR_R  (1<<4)
+#define DIR_DD (1<<3)
+#define DIR_D  (1<<2)
+#define DIR_LL (1<<1)
+#define DIR_L  (1<<0)
+
+#define MOVE_UUR ( DIR_UU | DIR_R  )
+#define MOVE_UR  ( DIR_U  | DIR_R  )
+#define MOVE_URR ( DIR_U  | DIR_RR )
+#define MOVE_DRR ( DIR_D  | DIR_RR )
+#define MOVE_DR  ( DIR_D  | DIR_R  )
+#define MOVE_DDR ( DIR_DD | DIR_R  )
+#define MOVE_DDL ( DIR_DD | DIR_L  )
+#define MOVE_DL  ( DIR_D  | DIR_L  )
+#define MOVE_DLL ( DIR_D  | DIR_LL )
+#define MOVE_ULL ( DIR_U  | DIR_LL )
+#define MOVE_UL  ( DIR_U  | DIR_L  )
+#define MOVE_UUL ( DIR_UU | DIR_L  )
 
 #define CUBE_SIZE 8             /* 8x22=176 */
 #define STARTING_QIXES 2
@@ -160,38 +178,40 @@ PLUGIN_HEADER
 static struct plugin_api *rb;
 static bool quit = false;
 
-static unsigned short board[BOARD_H][BOARD_W],
+static unsigned int board[BOARD_H][BOARD_W],
     testboard[BOARD_H][BOARD_W], boardcopy[BOARD_H][BOARD_W];
 
 /*
-   00001000 0x08 - 01110111 0x77
-   00011100 0x1c - 01110111 0x77
-   00111110 0x3e - 01100011 0x63
-   01111111 0x7f - 00000000 0x00
-   00111110 0x3e - 01100011 0x63
-   00011100 0x1c - 01110111 0x77
-   00001000 0x08 - 01110111 0x77
-   00000000 0x00 - 00000000 0x00
+   00011000 0x18 - 11100111 0xe7
+   00111100 0x3c - 11100111 0xe7
+   01111110 0x7e - 11000011 0xc3
+   11111111 0xff - 00000000 0x00
+   11111111 0xff - 00000000 0x00
+   01111110 0x7e - 11000011 0xc3
+   00111100 0x3c - 11100111 0xe7
+   00011000 0x18 - 11100111 0xe7
  */
 const unsigned char pics[2][8] = {
-    {0x08, 0x1c, 0x3e, 0x7f, 0x3e, 0x1c, 0x08, 0x00},   /* Alien (QIX) */
-    {0x77, 0x77, 0x63, 0x00, 0x63, 0x77, 0x77, 0x00}    /* Player (XONIX) */
+    {0x18, 0x3c, 0x7e, 0xff, 0xff, 0x7e, 0x3c, 0x18},   /* Alien (QIX) */
+    {0xe7, 0xe7, 0xc3, 0x00, 0x00, 0xc3, 0xe7, 0xe7}    /* Player (XONIX) */
 };
 
 static struct qix
 {
-    short velocity;             /* velocity */
-    short x, y;                 /* position on screen */
-    short angle;                /* angle */
+    int velocity;             /* velocity */
+    int x, y;                 /* position on screen */
+    int angle;                /* angle */
 } qixes[MAX_QIXES];             /* black_qix */
 
 static struct splayer
 {
-    short i, j;                 /* position on board */
-    short move, score, level, lives;
+    int i, j;                 /* position on board */
+    int move, score, level, lives;
     bool drawing;
     bool gameover;
 } player;
+
+static int percentage_cache;
 
 /*************************** STACK STUFF **********************/
 
@@ -204,8 +224,13 @@ static struct pos
 static int stackPointer;
 
 #define div(a,b) (((a)/(b)))
+#if CUBE_SIZE == 8
+#   define pos(a) ((a)>>3)
+#else
+#   define pos(a) div((a),CUBE_SIZE)
+#endif
 
-static bool pop (struct pos *p)
+static inline bool pop (struct pos *p)
 {
     if (stackPointer > 0) {
         p->x = stack[stackPointer].x;
@@ -216,7 +241,7 @@ static bool pop (struct pos *p)
         return false;           /* SE */
 }
 
-static bool push (struct pos *p)
+static inline bool push (struct pos *p)
 {
     if (stackPointer < STACK_SIZE - 1) {
         stackPointer++;
@@ -227,47 +252,38 @@ static bool push (struct pos *p)
         return false;           /* SOF */
 }
 
-static void emptyStack (void)
+static inline void emptyStack (void)
 {
     stackPointer = 0;
-    /* int x, y;
-       while(pop(&x, &y)); */
 }
 
 /*********************** END OF STACK STUFF *********************/
 
 
 /* calculate the new x coordinate of the ball according to angle and speed */
-static int get_newx (int x, int len, int deg)
+static inline int get_newx (int x, int len, int deg)
 {
-    int dx;
-    if ((deg == MOVE_DRR) || (deg == MOVE_URR))
-        dx = 2;
-    else if ((deg == MOVE_DDR) || (deg == MOVE_UUR) || (deg == MOVE_DR)
-             || (deg == MOVE_UR))
-        dx = 1;
-    else if ((deg == MOVE_DDL) || (deg == MOVE_UUL) || (deg == MOVE_DL)
-             || (deg == MOVE_UL))
-        dx = -1;
-    else
-        dx = -2;
-    return x + dx * len;
+    if (deg & DIR_R)
+        return x + len;
+    else if (deg & DIR_L)
+        return x - len;
+    else if (deg & DIR_RR)
+        return x + len * 2;
+    else /* (def & DIR_LL) */
+        return x - len * 2;
 }
 
 /* calculate the new y coordinate of the ball according to angle and speed */
-static int get_newy (int y, int len, int deg)
+static inline int get_newy (int y, int len, int deg)
 {
-    int dy;
-    if ((deg == MOVE_DRR) || (deg == MOVE_DLL) || (deg == MOVE_DR)
-        || (deg == MOVE_DL))
-        dy = 1;
-    else if ((deg == MOVE_DDR) || (deg == MOVE_DDL))
-        dy = 2;
-    else if ((deg == MOVE_UUR) || (deg == MOVE_UUL))
-        dy = -2;
-    else
-        dy = -1;
-    return y + dy * len;
+    if (deg & DIR_D)
+        return y + len;
+    else if (deg & DIR_U)
+        return y - len;
+    else if (deg & DIR_DD)
+        return y + len * 2;
+    else /* (deg & DIR_UU) */
+        return y - len * 2;
 }
 
 /* make random function get it's value from the device ticker */
@@ -285,10 +301,10 @@ static int t_rand (int range)
 /* initializes the test help board */
 static void init_testboard (void)
 {
-    int i, j;                   /* testboard */
+    int j;                   /* testboard */
     for (j = 0; j < BOARD_H; j++)
-        for (i = 0; i < BOARD_W; i++)
-            testboard[j][i] = UNCHECKED;
+        /* UNCHEKED == (int)0 */
+        rb->memset( testboard[j], 0, BOARD_W * sizeof( int ) );
 }
 
 /* initializes the game board on with the player,qix's and black qix */
@@ -315,7 +331,25 @@ static void init_board (void)
             BOARD_Y + t_rand (((BOARD_H - 6) * CUBE_SIZE) - 2 * CUBE_SIZE) +
             3 * CUBE_SIZE;
 
-        qixes[j].angle = t_rand (12);
+        switch( t_rand (12) ) {
+#define ANGLE_CASE(a,b)                         \
+            case a:                             \
+                qixes[j].angle = MOVE_ ## b;    \
+                break;
+            ANGLE_CASE(0,UR);
+            ANGLE_CASE(1,URR);
+            ANGLE_CASE(2,DRR);
+            ANGLE_CASE(3,DR);
+            ANGLE_CASE(4,DDR);
+            ANGLE_CASE(5,DDL);
+            ANGLE_CASE(6,DL);
+            ANGLE_CASE(7,DLL);
+            ANGLE_CASE(8,ULL);
+            ANGLE_CASE(9,UL);
+            ANGLE_CASE(10,UUL);
+            ANGLE_CASE(11,UUR);
+#undef ANGLE_CASE
+        }
     }
     /*black_qix.velocity=1;
        black_qix.x=BOARD_X+(BOARD_W*CUBE_SIZE)/2-CUBE_SIZE/2;
@@ -325,6 +359,8 @@ static void init_board (void)
     player.drawing = false;
     player.i = BOARD_W / 2;
     player.j = 1;
+
+    percentage_cache = 0;
 }
 
 /* calculates the percentage of the screen filling */
@@ -370,7 +406,7 @@ static void refresh_board (void)
     rb->lcd_set_background (CLR_LTBLUE);
     rb->snprintf (str, sizeof (str), "Level %d", player.level + 1);
     rb->lcd_putsxy (BOARD_X, BOARD_Y, str);
-    rb->snprintf (str, sizeof (str), "%d%%", percentage ());
+    rb->snprintf (str, sizeof (str), "%d%%", percentage_cache);
     rb->lcd_putsxy (BOARD_X + CUBE_SIZE * BOARD_W - 24, BOARD_Y, str);
     rb->snprintf (str, sizeof (str), "Score: %d", player.score);
     rb->lcd_putsxy (BOARD_X, BOARD_Y + CUBE_SIZE * BOARD_H - 8, str);
@@ -383,10 +419,12 @@ static void refresh_board (void)
     rb->lcd_mono_bitmap (pics[PIC_PLAYER], player.i * CUBE_SIZE + BOARD_X,
                          player.j * CUBE_SIZE + BOARD_Y, CUBE_SIZE, CUBE_SIZE);
     rb->lcd_set_background (EMPTIED);
+    rb->lcd_set_drawmode (DRMODE_FG);
     rb->lcd_set_foreground (LCD_WHITE);
     for (j = 0; j < player.level + STARTING_QIXES; j++)
         rb->lcd_mono_bitmap (pics[PIC_QIX], qixes[j].x + BOARD_X,
                              qixes[j].y + BOARD_Y, CUBE_SIZE, CUBE_SIZE);
+    rb->lcd_set_drawmode (DRMODE_SOLID);
     rb->lcd_set_foreground (LCD_BLACK);
 
     rb->lcd_update ();
@@ -394,7 +432,7 @@ static void refresh_board (void)
 
 static inline int infested_area (int i, int j)
 {
-    struct pos p, p1, p2, p3, p4;
+    struct pos p;
     bool hit = false;
     p.x = i;
     p.y = j;
@@ -407,37 +445,41 @@ static inline int infested_area (int i, int j)
         testboard[p.y][p.x] = CHECKED;
         if (hit)
             return true;        /*save some time and space */
-        p1.x = p.x + 1;
-        p1.y = p.y;
-        p2.x = p.x - 1;
-        p2.y = p.y;
-        p3.x = p.x;
-        p3.y = p.y + 1;
-        p4.x = p.x;
-        p4.y = p.y - 1;
-        if ((p1.x < BOARD_W) && (testboard[p1.y][p1.x] == UNCHECKED))
-            if (board[p1.y][p1.x] != FILLED)
-                if (!push (&p1))
-                    return -1;
-        if ((p2.x >= 0) && (testboard[p2.y][p2.x] == UNCHECKED))
-            if (board[p2.y][p2.x] != FILLED)
-                if (!push (&p2))
-                    return -1;
-        if ((p3.y < BOARD_H) && (testboard[p3.y][p3.x] == UNCHECKED))
-            if (board[p3.y][p3.x] != FILLED)
-                if (!push (&p3))
-                    return -1;
-        if ((p4.y >= 0) && (testboard[p4.y][p4.x] == UNCHECKED))
-            if (board[p4.y][p4.x] != FILLED)
-                if (!push (&p4))
-                    return -1;
+        {
+            struct pos p1 = { p.x+1, p.y };
+            if ((p1.x < BOARD_W) && (testboard[p1.y][p1.x] == UNCHECKED))
+                if (board[p1.y][p1.x] != FILLED)
+                    if (!push (&p1))
+                        return -1;
+        }
+        {
+            struct pos p1 = { p.x-1, p.y };
+            if ((p1.x >= 0) && (testboard[p1.y][p1.x] == UNCHECKED))
+                if (board[p1.y][p1.x] != FILLED)
+                    if (!push (&p1))
+                        return -1;
+        }
+        {
+            struct pos p1 = { p.x, p.y+1 };
+            if ((p1.y < BOARD_H) && (testboard[p1.y][p1.x] == UNCHECKED))
+                if (board[p1.y][p1.x] != FILLED)
+                    if (!push (&p1))
+                        return -1;
+        }
+        {
+            struct pos p1 = { p.x, p.y-1 };
+            if ((p1.y >= 0) && (testboard[p1.y][p1.x] == UNCHECKED))
+                if (board[p1.y][p1.x] != FILLED)
+                    if (!push (&p1))
+                        return -1;
+        }
     }
     return (hit ? 1 : 0);
 }
 
 static inline int fill_area (int i, int j)
 {
-    struct pos p, p1, p2, p3, p4;
+    struct pos p;
     p.x = i;
     p.y = j;
     emptyStack ();
@@ -447,30 +489,34 @@ static inline int fill_area (int i, int j)
     while (pop (&p)) {
         board[p.y][p.x] = FILLED;
         testboard[p.y][p.x] = CHECKED;
-        p1.x = p.x + 1;
-        p1.y = p.y;
-        p2.x = p.x - 1;
-        p2.y = p.y;
-        p3.x = p.x;
-        p3.y = p.y + 1;
-        p4.x = p.x;
-        p4.y = p.y - 1;
-        if ((p1.x < BOARD_W) && (testboard[p1.y][p1.x] == UNCHECKED))
-            if (board[p1.y][p1.x] == EMPTIED)
-                if (!push (&p1))
-                    return -1;
-        if ((p2.x >= 0) && (testboard[p2.y][p2.x] == UNCHECKED))
-            if (board[p2.y][p2.x] == EMPTIED)
-                if (!push (&p2))
-                    return -1;
-        if ((p3.y < BOARD_H) && (testboard[p3.y][p3.x] == UNCHECKED))
-            if (board[p3.y][p3.x] == EMPTIED)
-                if (!push (&p3))
-                    return -1;
-        if ((p4.y >= 0) && (testboard[p4.y][p4.x] == UNCHECKED))
-            if (board[p4.y][p4.x] == EMPTIED)
-                if (!push (&p4))
-                    return -1;
+        {
+            struct pos p1 = { p.x+1, p.y };
+            if ((p1.x < BOARD_W) && (testboard[p1.y][p1.x] == UNCHECKED))
+                if (board[p1.y][p1.x] == EMPTIED)
+                    if (!push (&p1))
+                        return -1;
+        }
+        {
+            struct pos p1 = { p.x-1, p.y };
+            if ((p1.x >= 0) && (testboard[p1.y][p1.x] == UNCHECKED))
+                if (board[p1.y][p1.x] == EMPTIED)
+                    if (!push (&p1))
+                        return -1;
+        }
+        {
+            struct pos p1 = { p.x, p.y+1 };
+            if ((p1.y < BOARD_H) && (testboard[p1.y][p1.x] == UNCHECKED))
+                if (board[p1.y][p1.x] == EMPTIED)
+                    if (!push (&p1))
+                        return -1;
+        }
+        {
+            struct pos p1 = { p.x, p.y-1 };
+            if ((p1.y >= 0) && (testboard[p1.y][p1.x] == UNCHECKED))
+                if (board[p1.y][p1.x] == EMPTIED)
+                    if (!push (&p1))
+                        return -1;
+        }
     }
     return 1;
 }
@@ -480,7 +526,7 @@ static inline int fill_area (int i, int j)
 static void complete_trail (int fill)
 {
     int i, j, ret;
-    for (j = 0; j < BOARD_H; j++)
+    for (j = 0; j < BOARD_H; j++) {
         for (i = 0; i < BOARD_W; i++) {
             if (board[j][i] == TRAIL) {
                 if (fill)
@@ -488,30 +534,34 @@ static void complete_trail (int fill)
                 else
                     board[j][i] = EMPTIED;
             }
-            boardcopy[j][i] = board[j][i];
+            /*boardcopy[j][i] = board[j][i];*/
         }
+        rb->memcpy( boardcopy[j], board[j], BOARD_W * sizeof( int ) );
+    }
 
     if (fill) {
         for (i = 0; i < player.level + STARTING_QIXES; i++) /* add qixes to board */
-            boardcopy[div(qixes[i].y - BOARD_Y, CUBE_SIZE)]
-                     [div(qixes[i].x - BOARD_X, CUBE_SIZE)] = QIX;
+            boardcopy[pos(qixes[i].y - BOARD_Y)]
+                     [pos(qixes[i].x - BOARD_X)] = QIX;
 
+        init_testboard();
         for (j = 1; j < BOARD_H - 1; j++)
             for (i = 0; i < BOARD_W - 0; i++)
-                if (board[j][i] != FILLED) {
+                if (board[j][i] != FILLED && testboard[j][i] != CHECKED /* testboard[i][j] == CHECKED means that this is part of an infested area tested on the previous run */ ) {
                     ret = infested_area (i, j);
                     if (ret < 0 || ( ret == 0 && fill_area (i, j) < 0 ) )
                         quit = true;
                 }
+        percentage_cache = percentage();
      }
 
      rb->button_clear_queue();
 }
 
 /* returns the color the real pixel(x,y) on the lcd is pointing at */
-static unsigned short getpixel (int x, int y)
+static inline unsigned int getpixel (int x, int y)
 {
-    int a = div (x - BOARD_X, CUBE_SIZE), b = div (y - BOARD_Y, CUBE_SIZE);
+    const int a = pos (x - BOARD_X), b = pos (y - BOARD_Y);
     if ((a > 0) && (a < BOARD_W) && (b > 0) && (b < BOARD_H))   /* if inside board */
         return board[b][a];
     else
@@ -523,7 +573,7 @@ static unsigned short getpixel (int x, int y)
    are a trail (cause it's a lose life situation) and 2nd  |    |
    if it's filled so it needs to bounce.                   *____*
  */
-static inline unsigned short next_hit (int newx, int newy)
+static inline unsigned int next_hit (int newx, int newy)
 {
     if ((getpixel (newx, newy) == TRAIL)
         || (getpixel (newx, newy + CUBE_SIZE - 1) == TRAIL)
@@ -538,33 +588,6 @@ static inline unsigned short next_hit (int newx, int newy)
         return FILLED;
     else
         return EMPTIED;
-}
-
-/* returns true if the (side) of the block          -***-
-   starting from (newx,newy) has any filled pixels  *   *
-   -***-
- */
-static bool line_check (int newx, int newy, int side)
-{
-    int i = 0;
-    bool filled = false;
-    for (i = 3; ((i < CUBE_SIZE - 3) && (!filled)); i++) {
-        switch (side) {
-            case MOVE_LT:
-                filled = getpixel (newx, newy + i) == FILLED;
-                break;
-            case MOVE_RT:
-                filled = getpixel (newx + CUBE_SIZE - 1, newy + i) == FILLED;
-                break;
-            case MOVE_UP:
-                filled = getpixel (newx + i, newy) == FILLED;
-                break;
-            case MOVE_DN:
-                filled = getpixel (newx + i, newy + CUBE_SIZE - 1) == FILLED;
-                break;
-        }
-    }
-    return filled;
 }
 
 static void die (void)
@@ -583,10 +606,51 @@ static void die (void)
     }
 }
 
-static void move_qix (struct qix *q)
+/* returns true if the (side) of the block          -***-
+   starting from (newx,newy) has any filled pixels  *   *
+   -***-
+ */
+static inline bool line_check_lt (int newx, int newy)
 {
-    int newx, newy, dir;
-    unsigned short nexthit;
+    int i = 0;
+    for (i = 3; i < CUBE_SIZE - 3; i++) {
+        if (getpixel (newx, newy + i) != FILLED)
+            return false;
+    }
+    return true;
+}
+static inline bool line_check_rt (int newx, int newy)
+{
+    int i = 0;
+    for (i = 3; i < CUBE_SIZE - 3; i++) {
+        if (getpixel (newx + CUBE_SIZE - 1, newy + i) != FILLED)
+            return false;
+    }
+    return true;
+}
+static inline bool line_check_up (int newx, int newy)
+{
+    int i = 0;
+    for (i = 3; i < CUBE_SIZE - 3; i++) {
+        if (getpixel (newx + i, newy) != FILLED)
+            return false;
+    }
+    return true;
+}
+static inline bool line_check_dn (int newx, int newy)
+{
+    int i = 0;
+    for (i = 3; i < CUBE_SIZE - 3; i++) {
+        if (getpixel (newx + i, newy + CUBE_SIZE - 1) != FILLED)
+            return false;
+    }
+    return true;
+}
+
+static inline void move_qix (struct qix *q)
+{
+    int newx, newy;
+    unsigned int nexthit;
     newx = get_newx (q->x, q->velocity, q->angle);
     newy = get_newy (q->y, q->velocity, q->angle);
     nexthit = next_hit (newx, newy);
@@ -594,55 +658,29 @@ static void move_qix (struct qix *q)
         q->x = newx;
         q->y = newy;
     } else if (nexthit == FILLED) {
-        dir = q->angle;
-        switch (dir) {
-            case MOVE_URR:
-            case MOVE_UUR:
-            case MOVE_UR:      /* up-right (can hit ceiling or right wall) */
-                if (line_check (newx, newy, MOVE_UP)
-                    && line_check (newx, newy, MOVE_RT))
-                    q->angle = q->angle + 6;
-                else if (line_check (newx, newy, MOVE_UP))
-                    q->angle = 5 - q->angle;    /* 5=180/(360/12)-1 */
-                else
-                    q->angle = 11 - q->angle;   /* 11=360/(360/12)-1 */
-                break;
-            case MOVE_ULL:
-            case MOVE_UUL:
-            case MOVE_UL:      /* up-left (can hit ceiling or left wall) */
-                if (line_check (newx, newy, MOVE_UP)
-                    && line_check (newx, newy, MOVE_LT))
-                    q->angle = q->angle - 6;
-                else if (line_check (newx, newy, MOVE_UP))
-                    q->angle = 17 - q->angle;   /* 17=540/(360/12)-1 */
-                else
-                    q->angle = 11 - q->angle;   /* 11=360/(360/12)-1 */
-                break;
-            case MOVE_DLL:
-            case MOVE_DDL:
-            case MOVE_DL:      /* down-left (can hit floor or left wall) */
-                if (line_check (newx, newy, MOVE_DN)
-                    && line_check (newx, newy, MOVE_LT))
-                    q->angle = q->angle - 6;
-                else if (line_check (newx, newy, MOVE_DN))
-                    q->angle = 17 - q->angle;   /* 17=540/(360/12)-1 */
-                else
-                    q->angle = 11 - q->angle;   /* 11=360/(360/12)-1 */
-                break;
-            case MOVE_DRR:
-            case MOVE_DDR:
-            case MOVE_DR:      /* down-right (can hit floor or right wall) */
-                if (line_check (newx, newy, MOVE_DN)
-                    && line_check (newx, newy, MOVE_RT))
-                    q->angle = q->angle + 6;
-                else if (line_check (newx, newy, MOVE_DN))
-                    q->angle = 5 - q->angle;    /* 5=180/(360/12)-1 */
-                else
-                    q->angle = 11 - q->angle;   /* 11=360/(360/12)-1 */
-                break;
-        }
-        q->x = newx;
-        q->y = newy;
+        const int a = q->angle;
+        q->angle =
+        ((a&(DIR_UU|DIR_U))
+            ? (line_check_up (newx, newy) ? ((a&(DIR_UU|DIR_U))>>4)
+                                          : (a&(DIR_UU|DIR_U)))
+            : 0)
+        |
+        ((a&(DIR_RR|DIR_R))
+            ? (line_check_rt (newx, newy) ? ((a&(DIR_RR|DIR_R))>>4)
+                                          : (a&(DIR_RR|DIR_R)))
+            : 0)
+        |
+        ((a&(DIR_DD|DIR_D))
+            ? (line_check_dn (newx, newy) ? ((a&(DIR_DD|DIR_D))<<4)
+                                          : (a&(DIR_DD|DIR_D)))
+            : 0)
+        |
+        ((a&(DIR_LL|DIR_L))
+            ? (line_check_lt (newx, newy) ? ((a&(DIR_LL|DIR_L))<<4)
+                                          : (a&(DIR_LL|DIR_L)))
+            : 0);
+        q->x = get_newx (q->x, q->velocity, q->angle);
+        q->y = get_newy (q->y, q->velocity, q->angle);
     } else if (nexthit == TRAIL) {
         die();
     }
@@ -699,7 +737,7 @@ static inline void move_board (void)
         player.i = newi;
         player.j = newj;
     }
-    j = percentage ();
+    j = percentage_cache;
     if (j > 75) {               /* finished level */
         rb->splash (HZ * 2, "Level %d finished", player.level+1);
         player.score += j;
@@ -836,7 +874,7 @@ enum plugin_status plugin_start (struct plugin_api *api, void *parameter)
     /* Permanently enable the backlight (unless the user has turned it off) */
     if (rb->global_settings->backlight_timeout > 0)
         rb->backlight_set_timeout (1);
-        
+
     quit = false;
 
     randomize ();
