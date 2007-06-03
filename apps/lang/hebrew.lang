@@ -1,10 +1,8 @@
-﻿<phrase>
+<phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
   user:
   <source>
-  id: LANG_SET_BOOL_YES
-  user:
     *: "Yes"
   </source>
   <dest>
@@ -14,7 +12,7 @@
     *: "Yes"
   </voice>
 </phrase>
-<phrase>
+<phrase>	
   id: LANG_SET_BOOL_NO
   desc: bool false representation
   user:
@@ -257,10 +255,10 @@
   desc: in the main menu
   user:
   <source>
-    *: "Playlist Options"
+    *: "Playlist"
   </source>
   <dest>
-    *: "אפשרויות רשימת שירים"
+    *: "רשימת שירים"
   </dest>
   <voice>
     *: "Playlist Options"
@@ -271,10 +269,10 @@
   desc: in the main menu
   user:
   <source>
-    *: "Browse Plugins"
+    *: "Plugins"
   </source>
   <dest>
-    *: "הצג התקנים"
+    *: "התקנים"
   </dest>
   <voice>
     *: "Browse Plugins"
@@ -285,10 +283,10 @@
   desc: in the main menu
   user:
   <source>
-    *: "Info"
+    *: "System"
   </source>
   <dest>
-    *: "מידע"
+    *: "מערכת"
   </dest>
   <voice>
     *: "Info"
@@ -730,10 +728,10 @@
 </phrase>
 <phrase>
   id: LANG_FIRMWARE
-  desc: in the main menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Browse Firmwares"
+    *: ""
   </source>
   <dest>
     *: "הצג קושחות"
@@ -779,14 +777,18 @@
     h100,h120,h300: "NAVI = Yes"
     ipod*: "SELECT = Yes"
     x5: "SELECT = Yes"
-    h10: "NEXT = Yes"
+    h10,h10_5gb: "SELECT = Yes"
+    gigabeatf: "SELECT = Yes"
+    e200: "SELECT = Yes"
   </source>
   <dest>
     *: "נגן = כן"
     h100,h120,h300: "בחר = כן"
     ipod*: "בחר = כן"
     x5: "בחר = כן"
-    h10: "הבא = כן"
+    h10,h10_5gb: "בחר = כן"
+    gigabeatf: "בחר = כן"
+    e200: "בחר = כן"
   </dest>
   <voice>
     *: ""
@@ -923,10 +925,10 @@
   desc: in the recording sub menu
   user:
   <source>
-    *: "Recording Screen"
+    *: "Recording"
   </source>
   <dest>
-    *: "מסך הקלטה"
+    *: "הקלטה"
   </dest>
   <voice>
     *: "Recording screen"
@@ -1144,10 +1146,10 @@
 </phrase>
 <phrase>
   id: LANG_RESUME
-  desc: in settings_menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Resume on Startup"
+    *: ""
   </source>
   <dest>
     *: "המשך מאותו מקום באתחול המערכת"
@@ -1542,7 +1544,7 @@
     *: "Database"
   </source>
   <dest>
-    *: "ID3 מסד נתוני"
+    *: "מסד נתונים"
   </dest>
   <voice>
     *: "ID3 database"
@@ -2016,9 +2018,11 @@
   user:
   <source>
     *: "Mic"
+    h100,h120,h300: "Internal Mic"
   </source>
   <dest>
     *: "מיקרופון"
+    h100,h120,h300: "מיקרופון פנימי"
   </dest>
   <voice>
     *: "Microphone"
@@ -2138,10 +2142,10 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_STARTUP
-  desc: Start Rockbox in Recording Screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "Show Recording Screen on Startup"
+    *: ""
   </source>
   <dest>
     *: "הצג מסך הקלטה באתחול המערכת"
@@ -2908,10 +2912,10 @@
 </phrase>
 <phrase>
   id: LANG_POWEROFF
-  desc: disk poweroff flag
+  desc: DEPRECATED
   user:
   <source>
-    *: "Disk Poweroff"
+    *: ""
   </source>
   <dest>
     *: "כיבוי הכונן"
@@ -3415,7 +3419,9 @@
   desc: battery level in % and estimated time remaining
   user:
   <source>
-    *: "%d%% %dh %dm"
+    *: "Battery: %d%% %dh %dm"
+    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "%d%% %dh %dm"
@@ -3594,10 +3600,10 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
-  desc: From the auto-load screen, allows user to list all bookmarks
+  desc: DEPRECATED
   user:
   <source>
-    *: "Down = List"
+    *: ""
   </source>
   <dest>
     *: "למטה = רשימה"
@@ -3608,21 +3614,17 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_EXIT
-  desc: From the bookmark list screen, allows user to exit
+  desc: DEPRECATED
   user:
   <source>
-    *: "OFF = Exit"
-    h100,h120,h300: "STOP = Exit"
-    ipod*: "PLAY/PAUSE = Exit"
-    x5: "RECORD = Exit"
-    h10: "PREV = Exit"
+    *: ""
   </source>
   <dest>
     *: "כבה = יציאה"
     h100,h120,h300: "עצור = יציאה"
     ipod*: "נגן\עצור = יציאה"
     x5: "הקלטה = יציאה"
-    h10: "הקודם = יציאה"
+    h10: "אחורה = יציאה"
   </dest>
   <voice>
     *: ""
@@ -3630,10 +3632,10 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
-  desc: Used on the bookmark select window to label bookmark number
+  desc: DEPRECATED
   user:
   <source>
-    *: "Bookmark"
+    *: ""
   </source>
   <dest>
     *: "סימניה"
@@ -3644,10 +3646,10 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_INDEX_TEXT
-  desc: Used on the bookmark select window to label index number
+  desc: DEPRECATED
   user:
   <source>
-    *: "Index"
+    *: ""
   </source>
   <dest>
     *: "מפתח"
@@ -3658,10 +3660,10 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_TIME_TEXT
-  desc: Used on the bookmark select window to label elapsed time
+  desc: DEPRECATED
   user:
   <source>
-    *: "Time"
+    *: ""
   </source>
   <dest>
     *: "זמן"
@@ -3672,14 +3674,10 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_PLAY
-  desc: Used on the bookmark select window to indicated the play option
+  desc: DEPRECATED
   user:
   <source>
-    *: "PLAY = Select"
-    h100,h120,h300: "NAVI = Select"
-    ipod*: "SELECT = Select"
-    x5: "SELECT = Select"
-    h10: "NEXT = Select"
+    *: ""
   </source>
   <dest>
     *: "נגן = בחירה"
@@ -3694,21 +3692,17 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_DELETE
-  desc: Used on the bookmark select window to indicated the bookmark delete option
+  desc: DEPRECATED
   user:
   <source>
-    *: "ON+Play = Delete"
-    h100,h120,h300: "RECORD = Delete"
-    ipod*: "Long MENU = Delete"
-    x5: "Long RECORD = Delete"
-    h10: "REWIND = Delete"
+    *: ""
   </source>
   <dest>
     *: "הפעל+נגן = מחיקה"
     h100,h120,h300: "הקלטה = מחיקה"
     ipod*: "החזק תפריט = מחיקה"
     x5: "החזק הקלטה = מחיקה"
-    h10: "הקודם = מחיקה"
+    h10: "אחורה = מחיקה"
   </dest>
   <voice>
     *: ""
@@ -3716,10 +3710,10 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_AUTOLOAD_QUERY
-  desc: prompt for user to decide to create a bookmark
+  desc: DEPRECATED
   user:
   <source>
-    *: "Load Last Bookmark?"
+    *: ""
   </source>
   <dest>
     *: "?לטעון סימניה אחרונה"
@@ -3789,18 +3783,22 @@
   desc: used in set_time()
   user:
   <source>
-    *: "ON To Set"
+    *: "ON = Set"
     h100,h120,h300: "NAVI = Set"
     ipod*: "SELECT = Set"
     x5: "SELECT = Set"
-    h10: "NEXT = Set"
+    h10,h10_5gb: "SELECT = Set"
+    gigabeatf: "SELECT = Set"
+    e200: "SELECT = Set"
   </source>
   <dest>
-    *: "הפעל = קביעה"
-    h100,h120,h300: "בחר = קביעה"
-    ipod*: "בחר = קביעה"
-    x5: "בחר = קביעה"
-    h10: "הבא = קביעה"
+    *: "הפעל = אישור"
+    h100,h120,h300: "בחר = אישור"
+    ipod*: "בחר = אישור"
+    x5: "בחר = אישור"
+    h10,h10_5gb: "הבא = אישור"
+    gigabeatf: "בחר = אישור"
+    e200: "בחר = אישור"
   </dest>
   <voice>
     *: ""
@@ -3811,18 +3809,22 @@
   desc: used in set_time()
   user:
   <source>
-    *: "OFF To Revert"
+    *: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
     ipod*: "MENU = Revert"
     x5: "RECORD = Revert"
-    h10: "PREV = Revert"
+    h10,h10_5gb: "PREV = Revert"
+    gigabeatf: "POWER = Revert"
+    e200: "PREV = Revert"
   </source>
   <dest>
     *: "כבה = ביטול"
     h100,h120,h300: "עצור = ביטול"
     ipod*: "תפריט = ביטול"
     x5: "הקלטה = ביטול"
-    h10: "הקודם = ביטול"
+    h10,h10_5gb: "אחורה = ביטול"
+    gigabeatf: "הפעל = ביטול"
+    e200: "אחורה = ביטול"
   </dest>
   <voice>
     *: ""
@@ -4214,9 +4216,11 @@
   user:
   <source>
     *: "PLAY=Set OFF=Cancel"
+    ipod*: "SELECT=Set MENU=Cancel"
   </source>
   <dest>
     *: "נגן=אישור כבה=ביטול"
+    ipod*: "בחר=אישור תפריט=ביטול"
   </dest>
   <voice>
     *: ""
@@ -6044,10 +6048,10 @@
 </phrase>
 <phrase>
   id: LANG_END_PLAYLIST_PLAYER
-  desc: when playlist has finished
+  desc: DEPRECATED
   user:
   <source>
-    *: "End of List"
+    *: ""
   </source>
   <dest>
     *: "סוף הרשימה"
@@ -6062,9 +6066,11 @@
   user:
   <source>
     *: "End of Song List"
+    player: "End of List"
   </source>
   <dest>
     *: "סוף רשימת השירים"
+    player: "סוף הרשימה"
   </dest>
   <voice>
     *: ""
@@ -6218,7 +6224,7 @@
     *: "Playlist control file is invalid"
   </source>
   <dest>
-    *: "קובץ השליטה ברשימת השירים לא חוקי"
+    *: "קובץ השליטה ברשימת השירים פגום"
   </dest>
   <voice>
     *: ""
@@ -6541,14 +6547,16 @@
     h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5: "Long PLAY to abort"
-    h10: "PREV to abort"
+    h10,h10_5gb: "PREV to abort"
+    e200: "PREV to abort"
   </source>
   <dest>
     *: "כבה כדי לבטל"
     h100,h120,h300: "עצור כדי לבטל"
     ipod*: "נגן\עצור כדי לבטל"
     x5: "החזק נגן כדי לבטל"
-    h10: "הקודם כדי לבטל"
+    h10,h10_5gb: "אחורה כדי לבטל"
+    e200: "אחורה כדי לבטל"
   </dest>
   <voice>
     *: ""
@@ -6999,7 +7007,7 @@
     *: "הזהר לפני מחיקת רשימת השירים הנוכחית"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7111,7 +7119,7 @@
     *: "%d.%02d MHz"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7279,7 +7287,7 @@
     *: "למחוק רשימת שירים נוכחית?"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7471,7 +7479,7 @@
     *: "Load to RAM"
   </source>
   <dest>
-    *: "טען לזיכרון RAM"
+    *: "טען לזיכרון מהיר"
   </dest>
   <voice>
     *: "Load to RAM"
@@ -7865,7 +7873,7 @@
     *: "...טוען"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7943,10 +7951,10 @@
   desc: When you run the radio without an fmr file in settings
   user:
   <source>
-    *: "No Settings found, AutoScan?"
+    *: "No settings found. Autoscan?"
   </source>
   <dest>
-    *: " לא נמצאו תחנות מוגדרות. סרוק אוטומטית?"
+    *: "לא נמצאו תחנות מוגדרות. סרוק אוטומטית?"
   </dest>
   <voice>
     *: ""
@@ -7963,7 +7971,7 @@
     *: "RGB"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8199,7 +8207,7 @@
     *: "RGB: %02X%02X%02X"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8612,10 +8620,10 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Mic"
+    *: "Int. Mic"
   </source>
   <dest>
-    *: "Mic"
+    *: "Int. Mic"
   </dest>
   <voice>
     *: "Microphone"
@@ -8894,10 +8902,10 @@
   desc: show ID3 Database
   user:
   <source>
-    *: "ID3 Database"
+    *: "Database"
   </source>
   <dest>
-    *: "ID3 Database"
+    *: "Database"
   </dest>
   <voice>
     *: "ID3 Database"
@@ -9230,7 +9238,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Import modifications"
+    *: "Import Modifications"
   </source>
   <dest>
     *: "טען שינויים"
@@ -9272,7 +9280,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Auto update"
+    *: "Auto Update"
   </source>
   <dest>
     *: "עדכון אוטומטי"
@@ -9300,7 +9308,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Update now"
+    *: "Update Now"
   </source>
   <dest>
     *: "עדכן עכשיו"
@@ -9314,7 +9322,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Export modifications"
+    *: "Export Modifications"
   </source>
   <dest>
     *: "ייצא שינויים"
@@ -9369,7 +9377,7 @@
   desc: in onplay menu
   user:
   <source>
-    *: "Playlist catalog"
+    *: "Playlist Catalog"
   </source>
   <dest>
     *: "קטלוג רשימות שירים"
@@ -9396,7 +9404,7 @@
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "Add to new playlist"
+    *: "Add to New Playlist"
   </source>
   <dest>
     *: "הוסף לרשימת שירים חדשה"
@@ -9423,7 +9431,7 @@
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "Add to playlist"
+    *: "Add to Playlist"
   </source>
   <dest>
     *: "הוסף לרשימת שירים"
@@ -9464,7 +9472,7 @@
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "View catalog"
+    *: "View Catalog"
   </source>
   <dest>
     *: "הצג קטלוג"
@@ -9492,7 +9500,7 @@
   desc: error message when no playlists for playlist catalog
   user:
   <source>
-    *: "No playlists"
+    *: "No Playlists"
   </source>
   <dest>
     *: "אין רשימות שירים"
@@ -9652,7 +9660,6 @@
     *: "Same As Source"
   </voice>
 </phrase>
-
 <phrase>
   id: LANG_SYSFONT_PITCH_UP_SEMITONE
   desc: in wps
@@ -9755,7 +9762,7 @@
   desc: in pause_phones_menu.
   user:
   <source>
-    *: "Duration to rewind"
+    *: "Duration to Rewind"
   </source>
   <dest>
     *: "משך זמן להעביר אחורה"
@@ -9877,10 +9884,10 @@
   desc: in settings_menu.
   user:
   <source>
-    *: "Pause on headphone unplug"
+    *: "Pause on Headphone Unplug"
   </source>
   <dest>
-    *: "עצור בניתוק אוזניות"
+    *: "עצור השמעה בניתוק אוזניות"
   </dest>
   <voice>
     *: "Pause on headphone unplug"
@@ -10052,10 +10059,10 @@
   desc: in pause_phones_menu.
   user:
   <source>
-    *: "Disable auto-resume if phones not present"
+    *: "Disable resume on startup if phones unplugged"
   </source>
   <dest>
-    *: "בטל חזרה אוטומטית אם האוזניות לא מחוברות"
+    *: "עצור השמעה בהפעלה מחדש אם האוזניות לא מחוברות"
   </dest>
   <voice>
     *: "Disable auto-resume if phones not present"
@@ -10143,7 +10150,6 @@
     *: "Pause and Resume"
   </voice>
 </phrase>
-###
 <phrase>
   id: LANG_RECORD_AGC_CLIPTIME
   desc: in record settings
@@ -10331,4 +10337,628 @@
     *: "AGC maximum gain"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_BUILDING_DATABASE
+  desc: splash database building progress
+  user:
+  <source>
+    *: "Building database... %d found (OFF to return)"
+    h100,h120,h300: "Building database... %d found (STOP to return)"
+    ipod*: "Building database... %d found (PLAY/PAUSE to return)"
+    x5: "Building database... %d found (Long PLAY to return)"
+    h10,h10_5gb: "Building database... %d found (PREV to return)"
+    e200: "Building database... %d found (PREV to return)"
+  </source>
+  <dest>
+    *: " בונה מסד נתונים... %d (כבה כדי לחזור) נמצאו"
+    h100,h120,h300: "בונה מסד נתונים... %d (נגן\עצור כדי לחזור) נמצאו"
+    ipod*: "בונה מסד נתונים... %d (עצור כדי לחזור) נמצאו"
+    x5: "בונה מסד נתונים... %d (החזק נגן כדי לחזור) נמצאו"
+    h10,h10_5gb: " בונה מסד נתונים... %d (אחורה כדי לחזור) נמצאו"
+    e200: " בונה מסד נתונים... %d (אחורה כדי לחזור) נמצאו"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIR_BROWSER
+  desc: in root menu
+  user:
+  <source>
+    *: "Files"
+  </source>
+  <dest>
+    *: "קבצים"
+  </dest>
+  <voice>
+    *: "Files"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMMENT
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Comment]"
+  </source>
+  <dest>
+    *: "[הערה]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETING
+  desc:
+  user:
+  <source>
+    *: "Deleting..."
+  </source>
+  <dest>
+    *: "מוחק..."
+  </dest>
+  <voice>
+    *: "Deleting"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_CHARGING
+  desc: in Battery menu
+  user:
+  <source>
+    *: "Charge During USB Connection"
+  </source>
+  <dest>
+    *: "USB הטען בזמן חיבור"
+  </dest>
+  <voice>
+    *: "Charge During U S B Connection"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_RESUME
+  desc: bookmark context menu, resume this bookmark
+  user:
+  <source>
+    *: "Resume"
+  </source>
+  <dest>
+    *: "המשך"
+  </dest>
+  <voice>
+    *: "Resume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLISTVIEWER_SETTINGS
+  desc: title for the playlist viewer settings menus
+  user:
+  <source>
+    *: "Playlist Viewer Settings"
+  </source>
+  <dest>
+    *: "הגדרות רשימת שירים"
+  </dest>
+  <voice>
+    *: "Playlist Viewer Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOW_PLAYING
+  desc: in root menu
+  user:
+  <source>
+    *: "Now Playing"
+  </source>
+  <dest>
+    *: "מנגן עכשיו"
+  </dest>
+  <voice>
+    *: "Now Playing"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LISTACCEL_ACCEL_SPEED
+  desc: list acceleration speed
+  user:
+  <source>
+    *: "List Acceleration Speed"
+  </source>
+  <dest>
+    *: "מהירות האצה בגלילת רשימות"
+  </dest>
+  <voice>
+    *: "List Acceleration Speed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_MENU
+  desc: bookmark selection list context menu
+  user:
+  <source>
+    *: "Bookmark Actions"
+  </source>
+  <dest>
+    *: "פעולות סימניה"
+  </dest>
+  <voice>
+    *: "Bookmark Actions"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_TRACKSKIP
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Shuffle and Track Skip"
+  </source>
+  <dest>
+    *: "בערבוב ובדילוג על שיר"
+  </dest>
+  <voice>
+    *: "Shuffle and Track Skip"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSE_CUESHEET
+  desc:
+  user:
+  <source>
+    *: "Browse Cuesheet"
+  </source>
+  <dest>
+    *: "הצג גליונות סימנים"
+  </dest>
+  <voice>
+    *: "Browse Cuesheet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Top Time"
+  </source>
+  <dest>
+    *: "הזמן הממושך ביותר"
+  </dest>
+  <voice>
+    *: "Top Time"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BOOKMARK_SELECT_TIME_TEXT
+  desc: voice only, used in the bookmark select list to label elapsed time
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_MENU
+  desc: in root menu
+  user:
+  <source>
+    *: "Settings"
+  </source>
+  <dest>
+    *: "הגדרות"
+  </dest>
+  <voice>
+    *: "Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Main Menu"
+  </source>
+  <dest>
+    *: "תפריט ראשי"
+  </dest>
+  <voice>
+    *: "Main Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_WAKEUP_SCREEN
+  desc: in alarm menu setting
+  user:
+  <source>
+    *: "Alarm Wake up Screen"
+  </source>
+  <dest>
+    *: "שעון מעורר"
+  </dest>
+  <voice>
+    *: "Alarm Wake up Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_THEME
+  desc: save a theme file
+  user:
+  <source>
+    *: "Save Theme Settings"
+  </source>
+  <dest>
+    *: "שמור הגדרות תצורת נושא"
+  </dest>
+  <voice>
+    *: "Save Theme Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_PLAYBACK
+  desc: in root menu
+  user:
+  <source>
+    *: "Resume Playback"
+  </source>
+  <dest>
+    *: "המשך השמעה"
+  </dest>
+  <voice>
+    *: "Resume Playback"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLACE
+  desc: in onplay menu.  Replace the current playlist with a new one.
+  user:
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "נגן הבא"
+  </dest>
+  <voice>
+    *: "Play Next"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUNNING_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Running Time"
+  </source>
+  <dest>
+    *: "זמן פעולה"
+  </dest>
+  <voice>
+    *: "Running Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ROCKBOX_TITLE
+  desc: in root menu
+  user:
+  <source>
+    *: "Rockbox"
+  </source>
+  <dest>
+    *: "רוקבוקס"
+  </dest>
+  <voice>
+    *: "Rockbox"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BOOKMARK_SELECT_INDEX_TEXT
+  desc: voice only, used in the bookmark list to label index number
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Index"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_MENU_TITLE
+  desc: title for the onplay menus
+  user:
+  <source>
+    *: "Context Menu"
+  </source>
+  <dest>
+    *: "תפריט"
+  </dest>
+  <voice>
+    *: "Context Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVIOUS_SCREEN
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Previous Screen"
+  </source>
+  <dest>
+    *: "מסך קודם"
+  </dest>
+  <voice>
+    *: "Previous Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONLIGHT_BRIGHTNESS
+  desc: in settings_menu
+  user:
+  <source>
+    *: ""
+    gigabeatf: "Button Light Brightness"
+  </source>
+  <dest>
+    *: ""
+    gigabeatf: "בהירות אור הכפתורים"
+  </dest>
+  <voice>
+    *: ""
+    gigabeatf: "Button Light Brightness"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUESHEET_ENABLE
+  desc: cuesheet support option
+  user:
+  <source>
+    *: "Cuesheet Support"
+  </source>
+  <dest>
+    *: "תמיכה בגליונות סימנים"
+  </dest>
+  <voice>
+    *: "Cuesheet Support"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_SCREEN
+  desc: in root menu setting
+  user:
+  <source>
+    *: "Start Screen"
+  </source>
+  <dest>
+    *: "מסך התחלה"
+  </dest>
+  <voice>
+    *: "Start Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_DELETE
+  desc: bookmark context menu, delete this bookmark
+  user:
+  <source>
+    *: "Delete"
+  </source>
+  <dest>
+    *: "מחק"
+  </dest>
+  <voice>
+    *: "Delete"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_DONT_RESUME
+  desc: top item in the list when asking user about bookmark auto load
+  user:
+  <source>
+    *: "<Don't Resume>"
+  </source>
+  <dest>
+    *: "<אל תמשיך>"
+  </dest>
+  <voice>
+    *: "Do Not Resume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUESHEET
+  desc:
+  user:
+  <source>
+    *: "Cuesheet"
+  </source>
+  <dest>
+    *: "גליון סימנים"
+  </dest>
+  <voice>
+    *: "Cuesheet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SELECT_BOOKMARK
+  desc: bookmark selection list title
+  user:
+  <source>
+    *: "Select Bookmark"
+  </source>
+  <dest>
+    *: "בחר סימניה"
+  </dest>
+  <voice>
+    *: "Select Bookmark"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LISTACCEL_START_DELAY
+  desc: Delay before list starts accelerating
+  user:
+  <source>
+    *: "List Acceleration Start Delay"
+  </source>
+  <dest>
+    *: "השהיה לפי האצה בגלילת רשימות"
+  </dest>
+  <voice>
+    *: "List Acceleration Start Delay"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVING
+  desc:
+  user:
+  <source>
+    *: "Moving..."
+  </source>
+  <dest>
+    *: "מעביר..."
+  </dest>
+  <voice>
+    *: "Moving"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES
+  desc: browser file/dir properties
+  user:
+  <source>
+    *: "Properties"
+  </source>
+  <dest>
+    *: "מאפיינים"
+  </dest>
+  <voice>
+    *: "Properties"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SHUFFLE
+  desc: bookmark selection list, bookmark enables shuffle
+  user:
+  <source>
+    *: ", Shuffle"
+  </source>
+  <dest>
+    *: ", ערבוב"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_INVALID
+  desc: bookmark selection list, bookmark couldn't be parsed
+  user:
+  <source>
+    *: "<Invalid Bookmark>"
+  </source>
+  <dest>
+    *: "<סימניה פגומה>"
+  </dest>
+  <voice>
+    *: "Invalid Bookmark"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONLIGHT_TIMEOUT
+  desc: in settings_menu
+  user:
+  <source>
+    *: ""
+    e200: "Wheel Light Timeout"
+    gigabeatf: "Button Light Timeout"
+  </source>
+  <dest>
+    *: ""
+    e200: "זמן תאורת הגלגל"
+    gigabeatf: "זמן תאורת כפתורים"
+  </dest>
+  <voice>
+    *: ""
+    e200: "Wheel Light Timeout"
+    gigabeatf: "Button Light Timeout"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUMARTIST
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Album Artist]"
+  </source>
+  <dest>
+    *: "[אמן האלבום]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Current Time"
+  </source>
+  <dest>
+    *: "זמן נוכחי"
+  </dest>
+  <voice>
+    *: "Current Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Clear Time?"
+  </source>
+  <dest>
+    *: "?לאפס זמנים"
+  </dest>
+  <voice>
+    *: "Clear Time?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COPYING
+  desc:
+  user:
+  <source>
+    *: "Copying..."
+  </source>
+  <dest>
+    *: "מעתיק..."
+  </dest>
+  <voice>
+    *: "Copying"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_MENU
+  desc: fm menu title
+  user:
+  <source>
+    *: "FM Radio Menu"
+  </source>
+  <dest>
+    *: "תפריט רדיו"
+  </dest>
+  <voice>
+    *: "FM Radio Menu"
+  </voice>
+</phrase>
+
+
+
 
