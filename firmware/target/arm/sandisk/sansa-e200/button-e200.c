@@ -45,6 +45,8 @@ static bool hold_button_old = false;
 #endif /* BOOTLOADER */
 static int  int_btn         = BUTTON_NONE;
 
+void button_int(void);
+
 void button_init_device(void)
 {
     /* Enable all buttons */
@@ -56,6 +58,11 @@ void button_init_device(void)
     GPIOG_ENABLE = 0x80;
 
 #ifndef BOOTLOADER
+    /* Mask these before performing init ... because init has possibly
+       occurred before */
+    GPIOF_INT_EN &= ~0xff;
+    GPIOH_INT_EN &= ~0xc0;
+
     /* Get current tick before enabling button interrupts */
     last_wheel_tick = current_tick;
     last_wheel_post = current_tick;
@@ -63,21 +70,18 @@ void button_init_device(void)
     GPIOH_ENABLE |= 0xc0;
     GPIOH_OUTPUT_EN &= ~0xc0;
 
-    GPIOF_INT_CLR = 0xff;
-    GPIOH_INT_CLR = 0xc0;
-
     /* Read initial buttons */
-    old_wheel_value = GPIOF_INPUT_VAL & 0xff;
-    GPIOF_INT_LEV = (GPIOF_INT_LEV & ~0xff) | (old_wheel_value ^ 0xff);
-    hold_button = (GPIOF_INPUT_VAL & 0x80) != 0;
+    button_int();
+    GPIOF_INT_CLR = 0xff;
 
     /* Read initial wheel value (bit 6-7 of GPIOH) */
     old_wheel_value = GPIOH_INPUT_VAL & 0xc0;
     GPIOH_INT_LEV = (GPIOH_INT_LEV & ~0xc0) | (old_wheel_value ^ 0xc0);
+    GPIOH_INT_CLR = 0xc0;
 
     /* Enable button interrupts */
-    GPIOF_INT_EN = 0xff;
-    GPIOH_INT_EN = 0xc0;
+    GPIOF_INT_EN |= 0xff;
+    GPIOH_INT_EN |= 0xc0;
 
     CPU_INT_EN = HI_MASK;
     CPU_HI_INT_EN = GPIO_MASK;
