@@ -371,7 +371,7 @@ static int percentage (void)
         for (i = 1; i < BOARD_W - 1; i++)
             if (board[j][i] == FILLED)
                 filled++;
-    return filled * 100 / ((BOARD_W - 2) * (BOARD_H - 4));
+    return (filled * 100) / ((BOARD_W - 2) * (BOARD_H - 4));
 }
 
 /* draw the board on with all the game figures */
@@ -381,7 +381,6 @@ static void refresh_board (void)
     char str[25];
 
     rb->lcd_set_background (LCD_BLACK);
-    rb->lcd_clear_display ();
     for (j = 0; j < BOARD_H; j++)
     {
         unsigned last_color = board[j][0];
@@ -402,6 +401,7 @@ static void refresh_board (void)
                           BOARD_Y + CUBE_SIZE * j,
                           CUBE_SIZE * (i - last_i), CUBE_SIZE);
     }
+
     rb->lcd_set_foreground (LCD_BLACK);
     rb->lcd_set_background (CLR_LTBLUE);
     rb->snprintf (str, sizeof (str), "Level %d", player.level + 1);
@@ -418,6 +418,7 @@ static void refresh_board (void)
     rb->lcd_set_background (board[player.j][player.i]);
     rb->lcd_mono_bitmap (pics[PIC_PLAYER], player.i * CUBE_SIZE + BOARD_X,
                          player.j * CUBE_SIZE + BOARD_Y, CUBE_SIZE, CUBE_SIZE);
+
     rb->lcd_set_background (EMPTIED);
     rb->lcd_set_drawmode (DRMODE_FG);
     rb->lcd_set_foreground (LCD_WHITE);
