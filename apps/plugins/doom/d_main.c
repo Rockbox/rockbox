@@ -82,7 +82,7 @@ boolean clfastparm;     // checkparm of -fast
 boolean nomonsters;     // working -nomonsters
 boolean respawnparm;    // working -respawn
 boolean fastparm;       // working -fast
-boolean dehout=false;
+boolean dehout=true;
 
 boolean singletics = false; // debug flag to cancel adaptiveness
 
@@ -731,7 +731,7 @@ void D_DoomMainSetup(void)
    W_Init();
 
 	if ((p = W_CheckNumForName("DEHACKED")) != -1) // cph - add dehacked-in-a-wad support
-		ProcessDehFile(NULL, dehout ? NULL : "/dehlog.txt", p);
+		ProcessDehFile(NULL, dehout ? "/dehlog.txt" : NULL, p);
 
    V_InitColorTranslation(); //jff 4/24/98 load color translation lumps
 

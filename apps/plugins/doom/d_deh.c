@@ -85,7 +85,7 @@ char *dehfgets(char *buf, size_t n, DEHFILE *fp)
 
    p = buf;
 
-   while (--n > 0)
+   while (n-- > 0)
    {
       unsigned char c = *fp->inp++;
       fp->size--;
@@ -111,7 +111,7 @@ int dehfeof(DEHFILE *fp)
       return (size <= 0 || offset < 0 || offset >= size) ? 1 : 0;
    }
 
-   return (fp->size == 0 || *fp->inp == '\0') ? 1 : 0;
+   return (fp->size <= 0 || *fp->inp == '\0') ? 1 : 0;
 }
 
 int dehfgetc(DEHFILE *fp)
@@ -1509,6 +1509,7 @@ void ProcessDehFile(const char *filename, const char *outfilename, int lumpnum)
       int size = W_LumpLength(lumpnum);
       infile.size = (size < 0) ? 0 : (ssize_t)size;
       infile.inp  = W_CacheLumpNum(lumpnum);
+      infile.fd=-1;
       filename = "(WAD)";
    }
 
@@ -1983,7 +1984,7 @@ void deh_procPointer(DEHFILE *fpin, int fpout, char *line) // done
    // NOTE: different format from normal
 
    // killough 8/98: allow hex numbers in input, fix error case:
-   if (sscanf(inbuffer,"%*s %*i (%s %i)",key, &indexnum) != 2)
+   if (sscanf(inbuffer,"%*s %*d (%s %d)",key, &indexnum) != 2)
    {
       if (fpout) fdprintf(fpout,"Bad data pair in '%s'\n",inbuffer);
       return;
@@ -2122,7 +2123,7 @@ void deh_procAmmo(DEHFILE *fpin, int fpout, char *line)
    strncpy(inbuffer,line,DEH_BUFFERMAX);
 
    // killough 8/98: allow hex numbers in input:
-   sscanf(inbuffer,"%s %i",key, &indexnum);
+   sscanf(inbuffer,"%s %d",key, &indexnum);
    if (fpout) fdprintf(fpout,"Processing Ammo at index %d: %s\n",
                          indexnum, key);
    if (indexnum < 0 || indexnum >= NUMAMMO)

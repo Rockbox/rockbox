@@ -103,6 +103,7 @@ struct plugin_api* rb;
 
 bool noprintf=0;  // Variable disables printf lcd updates to protect grayscale lib/direct lcd updates
 
+#ifndef SIMULATOR
 // Here is a hacked up printf command to get the output from the game.
 int printf(const char *fmt, ...)
 {
@@ -129,6 +130,7 @@ int printf(const char *fmt, ...)
    }
    return 1;
 }
+#endif
 
 char *my_strtok( char * s, const char * delim )
 {

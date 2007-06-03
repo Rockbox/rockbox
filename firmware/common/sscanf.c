@@ -27,7 +27,7 @@ static int parse_dec(int (*peek)(void *userp),
     int n = 0;
     int minus = 0;
     char ch;
-    
+
     if ((*peek)(userp) == '-')
     {
         (*pop)(userp);
@@ -54,19 +54,24 @@ static int parse_dec(int (*peek)(void *userp),
 static int parse_chars(int (*peek)(void *userp),
                        void (*pop)(void *userp),
                        void *userp,
-                       char *vp)
+                       char *vp,
+                       bool fake)
 {
     int n = 0;
+
     char *pt=vp;
 
     while (!isspace((*peek)(userp)))
     {
-        *(pt++) = (*peek)(userp);
+        if(fake==false)
+            *(pt++) = (*peek)(userp);
+
         n++;
         (*pop)(userp);
     } 
 
-    (*pt)='\0';
+    if(fake==false)
+        (*pt)='\0';
 
     return n;
 }
@@ -125,15 +130,26 @@ static int scan(int (*peek)(void *userp),
     int n_chars = 0;
     int r;
     long lval;
+    bool skip=false;
     unsigned long ulval;
 
     while ((ch = *fmt++) != '\0')
     {
         bool literal = false;
-        
+
         if (ch == '%')
         {
             ch = *fmt++;
+
+            if(ch== '*')  /* We should process this, but not store it in an arguement */
+            {
+                ch=*fmt++;
+                skip=true;
+            }
+            else
+            {
+                skip=false;
+            }
 
             switch (ch)
             {
@@ -141,8 +157,11 @@ static int scan(int (*peek)(void *userp),
                     n_chars += skip_spaces(peek, pop, userp);
                     if ((r = parse_hex(peek, pop, userp, &ulval)) >= 0)
                     {
-                        *(va_arg(ap, unsigned int *)) = ulval;
-                        n++;
+                        if(skip==false)
+                        {
+                            *(va_arg(ap, unsigned int *)) = ulval;
+                            n++;
+                        }
                         n_chars += r;
                     }
                     else
@@ -152,16 +171,22 @@ static int scan(int (*peek)(void *userp),
                     n_chars += skip_spaces(peek, pop, userp);
                     if ((r = parse_dec(peek, pop, userp, &lval)) >= 0)
                     {
-                        *(va_arg(ap, int *)) = lval;
-                        n++;
+                        if(skip==false)
+                        {
+                            *(va_arg(ap, int *)) = lval;
+                            n++;
+                        }
                         n_chars += r;
                     }
                     else
                         return n;
                     break;
                 case 'n':
-                    *(va_arg(ap, int *)) = n_chars;
-                    n++;
+                    if(skip==false)
+                    {
+                        *(va_arg(ap, int *)) = n_chars;
+                        n++;
+                    }
                     break;
                 case 'l':
                     n_chars += skip_spaces(peek, pop, userp);
@@ -171,8 +196,11 @@ static int scan(int (*peek)(void *userp),
                         case 'x':
                             if ((r = parse_hex(peek, pop, userp, &ulval)) >= 0)
                             {
-                                *(va_arg(ap, unsigned long *)) = ulval;
-                                n++;
+                                if(skip==false)
+                                {
+                                    *(va_arg(ap, unsigned long *)) = ulval;
+                                    n++;
+                                }
                                 n_chars += r;
                             }
                             else
@@ -181,8 +209,11 @@ static int scan(int (*peek)(void *userp),
                         case 'd':
                             if ((r = parse_dec(peek, pop, userp, &lval)) >= 0)
                             {
-                                *(va_arg(ap, long *)) = lval;
-                                n++;
+                                if(skip==false)
+                                {
+                                    *(va_arg(ap, long *)) = lval;
+                                    n++;
+                                }    
                                 n_chars += r;
                             }
                             else
@@ -195,10 +226,13 @@ static int scan(int (*peek)(void *userp),
                             break;
                     }
                     break;
-					 case 's':
-						  n_chars += skip_spaces(peek, pop, userp);
-						  n_chars += parse_chars(peek,pop, userp,va_arg(ap, char *) );
-                    n++;
+                case 's':
+                    n_chars += skip_spaces(peek, pop, userp);
+                    n_chars += parse_chars(peek,pop, userp,skip?0:va_arg(ap, char *), skip );
+                    if(skip==false)
+                    {
+                        n++;
+                    }
                     break;
                 case '\0':
                     return n;
@@ -239,7 +273,7 @@ int sscanf(const char *s, const char *fmt, ...)
     int r;
     va_list ap;
     const char *p;
-    
+
     p = s;
     va_start(ap, fmt);
     r = scan(sspeek, sspop, &p, fmt, ap);
