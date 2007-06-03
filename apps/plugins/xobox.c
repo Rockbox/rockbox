@@ -433,7 +433,6 @@ static void refresh_board (void)
 static inline int infested_area (int i, int j)
 {
     struct pos p;
-    bool hit = false;
     p.x = i;
     p.y = j;
     emptyStack ();
@@ -441,10 +440,9 @@ static inline int infested_area (int i, int j)
     if (!push (&p))
         return -1;
     while (pop (&p)) {
-        hit = (boardcopy[p.y][p.x] == QIX);
         testboard[p.y][p.x] = CHECKED;
-        if (hit)
-            return true;        /*save some time and space */
+        if ((boardcopy[p.y][p.x] == QIX))
+            return 1;
         {
             struct pos p1 = { p.x+1, p.y };
             if ((p1.x < BOARD_W) && (testboard[p1.y][p1.x] == UNCHECKED))
@@ -474,7 +472,7 @@ static inline int infested_area (int i, int j)
                         return -1;
         }
     }
-    return (hit ? 1 : 0);
+    return 0;
 }
 
 static inline int fill_area (int i, int j)
@@ -650,39 +648,44 @@ static inline bool line_check_dn (int newx, int newy)
 static inline void move_qix (struct qix *q)
 {
     int newx, newy;
-    unsigned int nexthit;
     newx = get_newx (q->x, q->velocity, q->angle);
     newy = get_newy (q->y, q->velocity, q->angle);
-    nexthit = next_hit (newx, newy);
-    if (nexthit == EMPTIED) {
-        q->x = newx;
-        q->y = newy;
-    } else if (nexthit == FILLED) {
-        const int a = q->angle;
-        q->angle =
-        ((a&(DIR_UU|DIR_U))
-            ? (line_check_up (newx, newy) ? ((a&(DIR_UU|DIR_U))>>4)
-                                          : (a&(DIR_UU|DIR_U)))
-            : 0)
-        |
-        ((a&(DIR_RR|DIR_R))
-            ? (line_check_rt (newx, newy) ? ((a&(DIR_RR|DIR_R))>>4)
-                                          : (a&(DIR_RR|DIR_R)))
-            : 0)
-        |
-        ((a&(DIR_DD|DIR_D))
-            ? (line_check_dn (newx, newy) ? ((a&(DIR_DD|DIR_D))<<4)
-                                          : (a&(DIR_DD|DIR_D)))
-            : 0)
-        |
-        ((a&(DIR_LL|DIR_L))
-            ? (line_check_lt (newx, newy) ? ((a&(DIR_LL|DIR_L))<<4)
-                                          : (a&(DIR_LL|DIR_L)))
-            : 0);
-        q->x = get_newx (q->x, q->velocity, q->angle);
-        q->y = get_newy (q->y, q->velocity, q->angle);
-    } else if (nexthit == TRAIL) {
-        die();
+    switch (next_hit (newx, newy))
+    {
+        case EMPTIED:
+            q->x = newx;
+            q->y = newy;
+            break;
+        case FILLED:
+        {
+            const int a = q->angle;
+            q->angle =
+                ((a&(DIR_UU|DIR_U))
+                    ? (line_check_up (newx, newy) ? ((a&(DIR_UU|DIR_U))>>4)
+                                                  : (a&(DIR_UU|DIR_U)))
+                    : 0)
+                |
+                ((a&(DIR_RR|DIR_R))
+                    ? (line_check_rt (newx, newy) ? ((a&(DIR_RR|DIR_R))>>4)
+                                                  : (a&(DIR_RR|DIR_R)))
+                    : 0)
+                |
+                ((a&(DIR_DD|DIR_D))
+                    ? (line_check_dn (newx, newy) ? ((a&(DIR_DD|DIR_D))<<4)
+                                                  : (a&(DIR_DD|DIR_D)))
+                    : 0)
+                |
+                ((a&(DIR_LL|DIR_L))
+                    ? (line_check_lt (newx, newy) ? ((a&(DIR_LL|DIR_L))<<4)
+                                                  : (a&(DIR_LL|DIR_L)))
+                    : 0);
+                q->x = get_newx (q->x, q->velocity, q->angle);
+                q->y = get_newy (q->y, q->velocity, q->angle);
+            break;
+        }
+        case TRAIL:
+            die();
+            break;
     }
 }
 
@@ -737,10 +740,9 @@ static inline void move_board (void)
         player.i = newi;
         player.j = newj;
     }
-    j = percentage_cache;
-    if (j > 75) {               /* finished level */
+    if (percentage_cache > 75) {               /* finished level */
         rb->splash (HZ * 2, "Level %d finished", player.level+1);
-        player.score += j;
+        player.score += percentage_cache;
         if (player.level < MAX_LEVEL)
             player.level++;
         init_board ();
