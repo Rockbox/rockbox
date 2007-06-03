@@ -399,18 +399,19 @@ enum minesweeper_status menu( void )
 {
     int selection, result = MINESWEEPER_QUIT;
     bool menu_quit = false;
-     
-    MENUITEM_STRINGLIST(menu, "Minesweeper Menu",NULL,"Play Minesweeper",
-                        "Mine Percentage", "Number of Rows", "Number of Columns",
-                        "Quit");
-                      
+
+    MENUITEM_STRINGLIST( menu, "Minesweeper Menu", NULL, "Play Minesweeper",
+                         "Mine Percentage", "Number of Rows",
+                         "Number of Columns", "Quit" );
+
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(rb->global_settings->fg_color);
-    rb->lcd_set_background(rb->global_settings->bg_color);
+    rb->lcd_set_foreground( rb->global_settings->fg_color );
+    rb->lcd_set_background( rb->global_settings->bg_color );
 #endif
 
-    while (!menu_quit) {
-        switch(rb->do_menu(&menu, &selection))
+    while( !menu_quit )
+    {
+        switch( rb->do_menu( &menu, &selection ) )
         {
             case 0:
                 result = MINESWEEPER_WIN; /* start playing */
@@ -418,20 +419,20 @@ enum minesweeper_status menu( void )
                 break;
 
             case 1:
-                rb->set_int("Mine Percentage", "%", UNIT_INT, &p, NULL, 1, 2, 
-                        98, NULL );
+                rb->set_int( "Mine Percentage", "%", UNIT_INT, &p, NULL,
+                             1, 2, 98, NULL );
                 break;
 
             case 2:
-                rb->set_int("Number of Rows", "", UNIT_INT, &height, NULL, 1, 1, 
-                        MAX_HEIGHT, NULL );
+                rb->set_int( "Number of Rows", "", UNIT_INT, &height, NULL,
+                             1, 1, MAX_HEIGHT, NULL );
                 break;
-                
+
             case 3:
-                rb->set_int("Number of Columns", "", UNIT_INT, &width, NULL, 1, 1, 
-                        MAX_WIDTH, NULL );
+                rb->set_int( "Number of Columns", "", UNIT_INT, &width, NULL,
+                             1, 1, MAX_WIDTH, NULL );
                 break;
-                
+
             default:
                 result = MINESWEEPER_QUIT; /* quit program */
                 menu_quit = true;
