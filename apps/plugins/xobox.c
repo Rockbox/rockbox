@@ -173,7 +173,9 @@ PLUGIN_HEADER
    to speed up the game - note that current_tick is (currently) only accurate
    to 10ms.
 */
-#define CYCLETIME 50
+static int speed = 6; /* CYCLETIME = (11-speed)*10 ms */
+static int difficulty = 75; /* Percentage of screen that needs to be filled
+                             * in order to win the game */
 
 static struct plugin_api *rb;
 static bool quit = false;
@@ -741,7 +743,7 @@ static inline void move_board (void)
         player.i = newi;
         player.j = newj;
     }
-    if (percentage_cache > 75) {               /* finished level */
+    if (percentage_cache > difficulty) {               /* finished level */
         rb->splash (HZ * 2, "Level %d finished", player.level+1);
         player.score += percentage_cache;
         if (player.level < MAX_LEVEL)
@@ -755,7 +757,8 @@ static inline void move_board (void)
 /* the main menu */
 static int game_menu (void)
 {
-    MENUITEM_STRINGLIST(menu, "XOBOX Menu", NULL, "Start New Game", "Quit");
+    MENUITEM_STRINGLIST(menu, "XOBOX Menu", NULL, "Start New Game",
+                        "Speed","Difficulty","Quit");
     int selection = 0;
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground (rb->global_settings->fg_color);
@@ -764,9 +767,17 @@ static int game_menu (void)
     rb->lcd_set_foreground(LCD_BLACK);
     rb->lcd_set_background(LCD_WHITE);
 #endif
-    selection = rb->do_menu(&menu, NULL);
-    if (selection < 0)
-    {
+    for (;;) {
+        rb->do_menu(&menu,&selection);
+        if (selection==1)
+            rb->set_int ("Speed", "", UNIT_INT, &speed, NULL, 1, 1, 11, NULL);
+        else if (selection==2)
+            rb->set_int ("Difficulty", "", UNIT_INT, &difficulty, NULL,
+                         5, 50, 95, NULL);
+        else
+            break;
+    }
+    if (selection != MENU_START) {
         selection = MENU_QUIT;
     }
     return selection;
@@ -794,7 +805,7 @@ static int xobox_loop (void)
     int end;
 
     while (!quit) {
-        end = *rb->current_tick + (CYCLETIME * HZ) / 1000;
+        end = *rb->current_tick + ((11-speed)*HZ)/100;
 
 #ifdef HAS_BUTTON_HOLD
         if (rb->button_hold()) {
