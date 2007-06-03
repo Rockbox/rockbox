@@ -4911,20 +4911,18 @@
   <source>
     *: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*: "MENU = Revert"
+    ipod*,e200: "MENU = Revert"
     x5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "POWER = Revert"
-    e200: "PREV = Revert"
   </source>
   <dest>
     *: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*: "MENU = Revert"
+    ipod*,e200: "MENU = Revert"
     x5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "POWER = Revert"
-    e200: "PREV = Revert"
   </dest>
   <voice>
     *: ""
