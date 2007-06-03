@@ -39,6 +39,9 @@ static unsigned long next_backlight_on = 0;
 /* Buttons */
 static bool hold_button     = false;
 static bool hold_button_old = false;
+#define _button_hold() hold_button
+#else
+#define _button_hold() ((GPIOF_INPUT_VAL & 0x80) != 0)
 #endif /* BOOTLOADER */
 static int  int_btn         = BUTTON_NONE;
 
@@ -47,22 +50,19 @@ void button_init_device(void)
     /* Enable all buttons */
     GPIOF_OUTPUT_EN &= ~0xff;
     GPIOF_ENABLE |= 0xff;
-    
+
     /* Scrollwheel light - enable control through GPIOG pin 7 and set timeout */
     GPIOG_OUTPUT_EN |= 0x80;
     GPIOG_ENABLE = 0x80;
 
 #ifndef BOOTLOADER
+    /* Get current tick before enabling button interrupts */
+    last_wheel_tick = current_tick;
+    last_wheel_post = current_tick;
+
     GPIOH_ENABLE |= 0xc0;
     GPIOH_OUTPUT_EN &= ~0xc0;
 
-#if 0
-    CPU_INT_PRIORITY &= ~HI_MASK;
-    CPU_HI_INT_PRIORITY &= ~GPIO_MASK;
-
-    CPU_INT_CLR = HI_MASK;
-    CPU_HI_INT_CLR = GPIO_MASK;
-#endif
     GPIOF_INT_CLR = 0xff;
     GPIOH_INT_CLR = 0xc0;
 
@@ -75,25 +75,18 @@ void button_init_device(void)
     old_wheel_value = GPIOH_INPUT_VAL & 0xc0;
     GPIOH_INT_LEV = (GPIOH_INT_LEV & ~0xc0) | (old_wheel_value ^ 0xc0);
 
+    /* Enable button interrupts */
     GPIOF_INT_EN = 0xff;
     GPIOH_INT_EN = 0xc0;
-#if 0
-    CPU_HI_INT_EN = GPIO_MASK;
-    CPU_INT_EN = HI_MASK;
-#endif
 
-    last_wheel_tick = current_tick;
-    last_wheel_post = current_tick;
+    CPU_INT_EN = HI_MASK;
+    CPU_HI_INT_EN = GPIO_MASK;
 #endif /* BOOTLOADER */
 }
 
 bool button_hold(void)
 {
-#ifdef BOOTLOADER
-    return (GPIOF_INPUT_VAL & 0x80) != 0;
-#else
-    return hold_button;
-#endif /* BOOTLOADER */
+    return _button_hold();
 }
 
 /* clickwheel */
@@ -118,10 +111,9 @@ void clickwheel_int(void)
 
     unsigned int wheel_value;
 
-    GPIOH_INT_CLR = GPIOH_INT_STAT & 0xc0;
-
     wheel_value = GPIOH_INPUT_VAL & 0xc0;
     GPIOH_INT_LEV = (GPIOH_INT_LEV & ~0xc0) | (wheel_value ^ 0xc0);
+    GPIOH_INT_CLR = GPIOH_INT_STAT & 0xc0;
 
     if (!hold_button)
     {
@@ -202,15 +194,13 @@ void button_int(void)
     state = GPIOF_INPUT_VAL & 0xff;
 
 #ifndef BOOTLOADER
-    GPIOF_INT_CLR = GPIOF_INT_STAT;
     GPIOF_INT_LEV = (GPIOF_INT_LEV & ~0xff) | (state ^ 0xff);
+    GPIOF_INT_CLR = GPIOF_INT_STAT;
 
     hold_button = (state & 0x80) != 0;
+#endif
 
-    if (!hold_button)
-#else
-    if (button_hold())
-#endif /* BOOTLOADER */
+    if (!_button_hold())
     {
         /* Read normal buttons */
         if ((state & 0x01) == 0) int_btn |= BUTTON_REC;

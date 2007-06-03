@@ -20,11 +20,11 @@
  ****************************************************************************/
 
 /* We believe is this quite similar to the 5020 and for how we just use that
-   completely */
+   completely and redifine any minor differences */
 #include "pp5020.h"
 
 #undef GPIO_IRQ
-#define GPIO_IRQ    (32+6)
+#define GPIO_IRQ    (32+1)
 
 #undef GPIO_MASK
 #define GPIO_MASK   (1 << (GPIO_IRQ-32))
