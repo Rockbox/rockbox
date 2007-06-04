@@ -30,6 +30,14 @@
 #include "string.h"
 #include "buffer.h"
 
+#ifdef MI4_FORMAT
+#include "crc32-mi4.h"
+#undef FIRMWARE_OFFSET_FILE_CRC
+#undef FIRMWARE_OFFSET_FILE_DATA
+#define FIRMWARE_OFFSET_FILE_CRC     0xC
+#define FIRMWARE_OFFSET_FILE_DATA    0x200
+#endif
+
 #if !defined(IRIVER_IFP7XX_SERIES) && \
     (CONFIG_CPU != PP5002) && (CONFIG_CPU != S3C2440)
 /* FIX: this doesn't work on iFP, 3rd Gen ipods */
@@ -152,7 +160,9 @@ int rolo_load(const char* filename)
     int fd;
     long length;
 #if defined(CPU_COLDFIRE) || defined(CPU_PP)
+#if !defined(MI4_FORMAT)
     int i;
+#endif
     unsigned long checksum,file_checksum;
 #else
     long file_length;
@@ -189,8 +199,11 @@ int rolo_load(const char* filename)
         return -1;
     }
 
+#if !defined(MI4_FORMAT)
     /* Rockbox checksums are big-endian */
     file_checksum = betoh32(file_checksum);
+#endif
+
 #ifdef CPU_PP
     cpu_message = COP_REBOOT;
     COP_CTL = PROC_WAKE;
@@ -208,11 +221,17 @@ int rolo_load(const char* filename)
         return -1;
     }
 
+#ifdef MI4_FORMAT
+    /* Check CRC32 to see if we have a valid file */
+    chksum_crc32gentab();
+    checksum = chksum_crc32 (audiobuf, length);
+#else
     checksum = MODEL_NUMBER;
     
     for(i = 0;i < length;i++) {
         checksum += audiobuf[i];
     }
+#endif
 
     /* Verify checksum against file header */
     if (checksum != file_checksum) {

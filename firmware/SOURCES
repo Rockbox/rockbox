@@ -23,6 +23,9 @@ debug.c
 /* Common */
 common/atoi.c
 common/crc32.c
+#ifdef MI4_FORMAT
+common/crc32-mi4.c
+#endif
 common/ctype.c
 #ifndef SIMULATOR
 common/dir.c
