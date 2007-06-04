@@ -1,3 +1,13 @@
+#             __________               __   ___.
+#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+#   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+#                     \/            \/     \/    \/            \/
+# $Id$
+#
+# Swedish language file.
+#
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -415,7 +425,7 @@
     *: "Kanalkonfiguration"
   </dest>
   <voice>
-    *: ""
+    *: "Channel Configuration"
   </voice>
 </phrase>
 <phrase>
@@ -833,15 +843,18 @@
     h100,h120,h300: "NAVI = Yes"
     ipod*: "SELECT = Yes"
     x5: "SELECT = Yes"
-    h10: "NEXT = Yes"
+    h10,h10_5gb: "SELECT = Yes"
+    gigabeatf: "SELECT = Yes"
+    e200: "SELECT = Yes"
   </source>
   <dest>
     *: "SPELA = Ja"
     h100,h120,h300: "VÄLJ = Ja"
     ipod*: "VÄLJ = Ja"
     x5: "VÄLJ = Ja"
-    h10: "NÄSTA = Ja"
-    gigabeat: "VÄLJ = Ja"
+    h10,h10_5gb: "VÄLJ = Ja"
+    gigabeatf: "VÄLJ = Ja"
+    e200: "VÄLJ = Ja"
   </dest>
   <voice>
     *: ""
@@ -3042,7 +3055,7 @@
     *: "Track Gain if Shuffling"
   </source>
   <dest>
-    *: "Spårvolymutjämning vid blandning"
+    *: "Per spår vid blandning"
   </dest>
   <voice>
     *: "Track Gain if Shuffling"
@@ -3238,7 +3251,7 @@
     *: "Line Selector"
   </source>
   <dest>
-    *: "Radväljare"
+    *: "Radmarkör"
   </dest>
   <voice>
     *: "Line Selector"
@@ -3854,7 +3867,7 @@
     *: ""
   </source>
   <dest>
-    *: ""
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -4106,7 +4119,7 @@
     *: "Delete"
   </source>
   <dest>
-    *: "Radera"
+    *: "Ta bort"
   </dest>
   <voice>
     *: "Delete"
@@ -4148,7 +4161,7 @@
     *: "Delete?"
   </source>
   <dest>
-    *: "Radera?"
+    *: "Ta bort?"
   </dest>
   <voice>
     *: ""
@@ -4162,7 +4175,7 @@
     *: "Deleted"
   </source>
   <dest>
-    *: "Raderad"
+    *: "Borttagen"
   </dest>
   <voice>
     *: ""
@@ -4678,13 +4691,13 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
-  desc: From the auto-load screen, allows user to list all bookmarks
+  desc: DEPRECATED
   user:
   <source>
-    *: "Down = List"
+    *: ""
   </source>
   <dest>
-    *: "NER = Lista"
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -4692,23 +4705,13 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_EXIT
-  desc: From the bookmark list screen, allows user to exit
+  desc: DEPRECATED
   user:
   <source>
-    *: "OFF = Exit"
-    h100,h120,h300: "STOP = Exit"
-    ipod*: "PLAY/PAUSE = Exit"
-    x5: "RECORD = Exit"
-    h10: "PREV = Exit"
-    gigabeat: "A = Exit"
+    *: ""
   </source>
   <dest>
-    *: "AV = Avsluta"
-    h100,h120,h300: "STOPP = Avsluta"
-    ipod*: "SPELA/PAUSA = Avsluta"
-    x5: "SPELA IN = Avsluta"
-    h10: "FÖREGÅENDE = Avsluta"
-    gigabeat: "A = Avsluta"
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -4716,13 +4719,13 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
-  desc: Used on the bookmark select window to label bookmark number
+  desc: DEPRECATED
   user:
   <source>
-    *: "Bookmark"
+    *: ""
   </source>
   <dest>
-    *: "Bokmärke"
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -4730,51 +4733,41 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_INDEX_TEXT
-  desc: Used on the bookmark select window to label index number
+  desc: DEPRECATED
   user:
   <source>
-    *: "Index"
+    *: ""
   </source>
   <dest>
-    *: "Index"
+    *: deprecated
   </dest>
   <voice>
-    *: "Index"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_TIME_TEXT
-  desc: Used on the bookmark select window to label elapsed time
+  desc: DEPRECATED
   user:
   <source>
-    *: "Time"
+    *: ""
   </source>
   <dest>
-    *: "Tid"
+    *: deprecated
   </dest>
   <voice>
-    *: "Time"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_PLAY
-  desc: Used on the bookmark select window to indicated the play option
+  desc: DEPRECATED
   user:
   <source>
-    *: "PLAY = Select"
-    h100,h120,h300: "NAVI = Select"
-    ipod*: "SELECT = Select"
-    x5: "SELECT = Select"
-    h10: "NEXT = Select"
-    gigabeat: "SELECT = Select"
+    *: ""
   </source>
   <dest>
-    *: "SPELA = Välj"
-    h100,h120,h300: "VÄLJ = Välj"
-    ipod*: "VÄLJ = Välj"
-    x5: "VÄLJ = Välj"
-    h10: "NÄSTA = Välj"
-    gigabeat: "VÄLJ = Välj"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -4782,23 +4775,13 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_DELETE
-  desc: Used on the bookmark select window to indicated the bookmark delete option
+  desc: DEPRECATED
   user:
   <source>
-    *: "ON+Play = Delete"
-    h100,h120,h300: "RECORD = Delete"
-    ipod*: "Long MENU = Delete"
-    x5: "Long RECORD = Delete"
-    h10: "REWIND = Delete"
-    gigabeat: "POWER = Delete"
+    *: ""
   </source>
   <dest>
-    *: "PÅ+SPELA = Ta bort"
-    h100,h120,h300: "SPELA IN = Ta bort"
-    ipod*: "Lång MENY = Ta bort"
-    x5: "Lång SPELA IN = Ta bort"
-    h10: "SPOLA BAK = Ta bort"
-    gigabeat: "PÅ = Ta bort"
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -4806,13 +4789,13 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_AUTOLOAD_QUERY
-  desc: prompt for user to decide to create a bookmark
+  desc: DEPRECATED
   user:
   <source>
-    *: "Load Last Bookmark?"
+    *: ""
   </source>
   <dest>
-    *: "Starta vid bokmärket?"
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -4879,20 +4862,22 @@
   desc: used in set_time()
   user:
   <source>
-    *: "ON To Set"
+    *: "ON = Set"
     h100,h120,h300: "NAVI = Set"
     ipod*: "SELECT = Set"
     x5: "SELECT = Set"
-    h10: "NEXT = Set"
-    gigabeat: "SELECT = Set"
+    h10,h10_5gb: "SELECT = Set"
+    gigabeatf: "SELECT = Set"
+    e200: "SELECT = Set"
   </source>
   <dest>
     *: "PÅ = Ställ"
     h100,h120,h300: "VÄLJ = Ställ"
     ipod*: "VÄLJ = Ställ"
     x5: "VÄLJ = Ställ"
-    h10: "NÄSTA = Ställ"
-    gigabeat: "VÄLJ = Ställ"
+    h10,h10_5gb: "VÄLJ = Ställ"
+    gigabeatf: "VÄLJ = Ställ"
+    e200: "VÄLJ = Ställ"
   </dest>
   <voice>
     *: ""
@@ -4903,20 +4888,20 @@
   desc: used in set_time()
   user:
   <source>
-    *: "OFF To Revert"
+    *: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*: "MENU = Revert"
+    ipod*,e200: "MENU = Revert"
     x5: "RECORD = Revert"
-    h10: "PREV = Revert"
-    gigabeat: "POWER = Revert"
+    h10,h10_5gb: "PREV = Revert"
+    gigabeatf: "POWER = Revert"
   </source>
   <dest>
     *: "AV = Avbryt"
     h100,h120,h300: "STOPP = Avbryt"
-    ipod*: "MENY = Avbryt"
+    ipod*,e200: "MENY = Avbryt"
     x5: "SPELA IN = Avbryt"
-    h10: "FÖREGÅENDE = Avbryt"
-    gigabeat: "PÅ = Avbryt"
+    h10,h10_5gb: "FÖREGÅENDE = Avbryt"
+    gigabeatf: "PÅ = Avbryt"
   </dest>
   <voice>
     *: ""
@@ -7252,13 +7237,13 @@
 </phrase>
 <phrase>
   id: LANG_END_PLAYLIST_PLAYER
-  desc: when playlist has finished
+  desc: DEPRECATED
   user:
   <source>
-    *: "End of List"
+    *: ""
   </source>
   <dest>
-    *: "Listan slut"
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -7270,9 +7255,11 @@
   user:
   <source>
     *: "End of Song List"
+    player: "End of List"
   </source>
   <dest>
     *: "Slut på spellistan"
+    player: "Listan slut"
   </dest>
   <voice>
     *: ""
@@ -7889,14 +7876,16 @@
     h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5: "Long PLAY to abort"
-    h10: "PREV to abort"
+    h10,h10_5gb: "PREV to abort"
+    e200: "PREV to abort"
   </source>
   <dest>
     *: "AV = avbryt"
     h100,h120,h300: "STOPP = Avbryt"
     ipod*: "SPELA/PAUSA = Avbryt"
     x5: "Lång SPELA = Avbryt"
-    h10: "FÖREGÅENDE = Avbryt"
+    h10,h10_5gb: "FÖREGÅENDE = Avbryt"
+    e200: "FÖREGÅENDE = Avbryt"
   </dest>
   <voice>
     *: ""
@@ -10653,5 +10642,318 @@
   </dest>
   <voice>
     *: "Previous Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_WAKEUP_SCREEN
+  desc: in alarm menu setting
+  user:
+  <source>
+    *: "Alarm Wake up Screen"
+  </source>
+  <dest>
+    *: "Väckningsskärm"
+  </dest>
+  <voice>
+    *: "Alarm Wake up Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUILDING_DATABASE
+  desc: splash database building progress
+  user:
+  <source>
+    *: "Building database... %d found (OFF to return)"
+    h100,h120,h300: "Building database... %d found (STOP to return)"
+    ipod*: "Building database... %d found (PLAY/PAUSE to return)"
+    x5: "Building database... %d found (Long PLAY to return)"
+    h10,h10_5gb: "Building database... %d found (PREV to return)"
+    e200: "Building database... %d found (PREV to return)"
+  </source>
+  <dest>
+    *: "Skapar databas... %d hittade (AV = Återgå)"
+    h100,h120,h300: "Skapar databas... %d hittade (STOPP = Återgå)"
+    ipod*: "Skapar databas... %d hittade (SPELA/PAUS = Återgå)"
+    x5: "Skapar databas... %d hittade (Lång SPELA = Återgå)"
+    h10,h10_5gb: "Skapar databas... %d hittade (FÖREGÅENDE = Återgå)"
+    e200: "Skapar databas... %d hittade (FÖREGÅENDE = Återgå)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_MENU_TITLE
+  desc: title for the onplay menus
+  user:
+  <source>
+    *: "Context Menu"
+  </source>
+  <dest>
+    *: "Snabbmeny"
+  </dest>
+  <voice>
+    *: "Context Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONLIGHT_TIMEOUT
+  desc: in settings_menu
+  user:
+  <source>
+    *: ""
+    e200: "Wheel Light Timeout"
+    gigabeatf: "Button Light Timeout"
+  </source>
+  <dest>
+    *: ""
+    e200: "Hjulbelysning"
+    gigabeatf: "Knappbelysning"
+  </dest>
+  <voice>
+    *: ""
+    e200: "Wheel Light Timeout"
+    gigabeatf: "Button Light Timeout"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONLIGHT_BRIGHTNESS
+  desc: in settings_menu
+  user:
+  <source>
+    *: ""
+    gigabeatf: "Button Light Brightness"
+  </source>
+  <dest>
+    *: ""
+    gigabeatf: "Knappljusstyrka"
+  </dest>
+  <voice>
+    *: ""
+    gigabeatf: "Button Light Brightness"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLISTVIEWER_SETTINGS
+  desc: title for the playlist viewer settings menus
+  user:
+  <source>
+    *: "Playlist Viewer Settings"
+  </source>
+  <dest>
+    *: "Spellistevisare"
+  </dest>
+  <voice>
+    *: "Playlist Viewer Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSE_CUESHEET
+  desc:
+  user:
+  <source>
+    *: "Browse Cuesheet"
+  </source>
+  <dest>
+    *: "Lista cuesheet"
+  </dest>
+  <voice>
+    *: "Browse Cuesheet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COPYING
+  desc:
+  user:
+  <source>
+    *: "Copying..."
+  </source>
+  <dest>
+    *: "Kopierar..."
+  </dest>
+  <voice>
+    *: "Copying"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETING
+  desc:
+  user:
+  <source>
+    *: "Deleting..."
+  </source>
+  <dest>
+    *: "Tar bort..."
+  </dest>
+  <voice>
+    *: "Deleting"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVING
+  desc:
+  user:
+  <source>
+    *: "Moving..."
+  </source>
+  <dest>
+    *: "Flyttar..."
+  </dest>
+  <voice>
+    *: "Moving"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SELECT_BOOKMARK
+  desc: bookmark selection list title
+  user:
+  <source>
+    *: "Select Bookmark"
+  </source>
+  <dest>
+    *: "Välj bokmärke"
+  </dest>
+  <voice>
+    *: "Select Bookmark"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_DONT_RESUME
+  desc: top item in the list when asking user about bookmark auto load
+  user:
+  <source>
+    *: "<Don't Resume>"
+  </source>
+  <dest>
+    *: "<Återuppta inte>"
+  </dest>
+  <voice>
+    *: "Do Not Resume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SHUFFLE
+  desc: bookmark selection list, bookmark enables shuffle
+  user:
+  <source>
+    *: ", Shuffle"
+  </source>
+  <dest>
+    *: ", blanda"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_INVALID
+  desc: bookmark selection list, bookmark couldn't be parsed
+  user:
+  <source>
+    *: "<Invalid Bookmark>"
+  </source>
+  <dest>
+    *: "<Felaktigt bokmärke>"
+  </dest>
+  <voice>
+    *: "Invalid Bookmark"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_MENU
+  desc: bookmark selection list context menu
+  user:
+  <source>
+    *: "Bookmark Actions"
+  </source>
+  <dest>
+    *: "Bokmärke"
+  </dest>
+  <voice>
+    *: "Bookmark Actions"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_RESUME
+  desc: bookmark context menu, resume this bookmark
+  user:
+  <source>
+    *: "Resume"
+  </source>
+  <dest>
+    *: "Återuppta"
+  </dest>
+  <voice>
+    *: "Resume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_DELETE
+  desc: bookmark context menu, delete this bookmark
+  user:
+  <source>
+    *: "Delete"
+  </source>
+  <dest>
+    *: "Ta bort"
+  </dest>
+  <voice>
+    *: "Delete"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BOOKMARK_SELECT_INDEX_TEXT
+  desc: voice only, used in the bookmark list to label index number
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Index"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BOOKMARK_SELECT_TIME_TEXT
+  desc: voice only, used in the bookmark select list to label elapsed time
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LISTACCEL_START_DELAY
+  desc: Delay before list starts accelerating
+  user:
+  <source>
+    *: "List Acceleration Start Delay"
+  </source>
+  <dest>
+    *: "Listaccelerationsstart"
+  </dest>
+  <voice>
+    *: "List Acceleration Start Delay"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LISTACCEL_ACCEL_SPEED
+  desc: list acceleration speed
+  user:
+  <source>
+    *: "List Acceleration Speed"
+  </source>
+  <dest>
+    *: "Listaccelerationssteg"
+  </dest>
+  <voice>
+    *: "List Acceleration Speed"
   </voice>
 </phrase>
