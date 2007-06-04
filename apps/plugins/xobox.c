@@ -770,7 +770,7 @@ static int game_menu (void)
     for (;;) {
         rb->do_menu(&menu,&selection);
         if (selection==1)
-            rb->set_int ("Speed", "", UNIT_INT, &speed, NULL, 1, 1, 11, NULL);
+            rb->set_int ("Speed", "", UNIT_INT, &speed, NULL, 1, 1, 10, NULL);
         else if (selection==2)
             rb->set_int ("Difficulty", "", UNIT_INT, &difficulty, NULL,
                          5, 50, 95, NULL);
