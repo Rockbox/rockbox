@@ -1,16 +1,9 @@
 #include "config.h"
-#include <string.h>
 #include "cpu.h"
+#include "string.h"
 #include "lcd.h"
 #include "kernel.h"
-#include "system.h"
-#include "mmu-meg-fx.h"
-#include <stdlib.h>
-#include "memory.h"
 #include "lcd-target.h"
-#include "font.h"
-#include "rbunicode.h"
-#include "bidi.h"
 
 #define LCDADDR(x, y) (&lcd_framebuffer[(y)][(x)])
 
@@ -47,11 +40,11 @@ unsigned int LCDBASEL(unsigned int address)
 /* LCD init */
 void lcd_init_device(void)
 {
+    int i;
 #ifdef BOOTLOADER
     /* When the Rockbox bootloader starts, we are changing framebuffer address,
        but we don't want what's shown on the LCD to change until we do an
        lcd_update(), so copy the data from the old framebuffer to the new one */
-    int i;
     unsigned short *buf = (unsigned short*)FRAME;
 
     memcpy(FRAME, (short *)((LCDSADDR1)<<1), 320*240*2);
@@ -68,11 +61,62 @@ void lcd_init_device(void)
     LCDSADDR2 = LCDBASEL((unsigned)FRAME);
     LCDSADDR3 = 0x000000F0;
 
-    LCDCON5 |= 1 << 11;     /* Switch from 555I mode to 565 mode */
-
 #if !defined(BOOTLOADER)
     lcd_poweroff = false;
 #endif
+
+    /* ENVID = 1, BPPMODE = 16 bpp, PNRMODE = TFT, MMODE = Each Frame, CLKVAL = 8 */
+    LCDCON1 = 0x879;
+
+    /* VCPW = 1, VFPD = 5, LINEVAL = 319, VBPD = 7 */
+    LCDCON2 = 0x74FC141;
+    
+    /* HFPD = 9, HOZVAL = 239, HBPD = 7 */
+    LCDCON3 = 0x38EF09;
+
+    /* HSPW = 7 */
+    LCDCON4 = 7;
+    
+    /* HWSWP = 1, INVVFRAM = 1, INVVLINE = 1, FRM565 = 1, All others = 0 */
+    LCDCON5 = 0xB01;
+
+    /* LCD controller reset */
+    GPBCON = (GPBCON & ~((1<<15)|(1<<17))) | (1<<16)|(1<<14); /* GPB7=OUT, GPB8=OUT */
+    GPBDAT |= (1<<7);               /* LCD reset */
+    GPBUP  |= (1<<8) | (1<<7) | 1;  /* pullup GPB8, GPB7, GPB0(?) */
+    CLKCON |= (1<<5);               /* enable LCD clock */
+
+    /* SPI bus transfer */
+    GPBDAT &= ~(1<<8);  /* LCD CS off */
+
+    /* Start the SPI interface */
+    CLKCON |= 1<<18;    /* enable SPI clock */
+    SPCON0 = 0x3E;      /* enable iterrupt mode, master,active low,format B    */
+    SPPRE0 = 0x18;      /* Baud rate = PCLK(50MHz) / 2 / (Prescaler value + 1) */
+
+    /* SPI data - Right now we are not sure what each of these SPI writes is actually
+     *    telling the lcd.  Many thanks to Alex Gerchanovsky for discovering them.
+     */
+    const unsigned char initbuf[] = {
+        0,0x0F,1,0x01, 0,0x09,1,0x06, 0,0x16,1,0xA6, 0,0x1E,1,0x49, 0,0x1F,1,0x26, 
+        0,0x0B,1,0x2F, 0,0x0C,1,0x2B, 0,0x19,1,0x5E, 0,0x1A,1,0x15, 0,0x1B,1,0x15, 
+        0,0x1D,1,0x01, 0,0x00,1,0x03, 0,0x01,1,0x10, 0,0x02,1,0x0A, 0,0x06,1,0x04, 
+        0,0x08,1,0x2E, 0,0x24,1,0x12, 0,0x25,1,0x3F, 0,0x26,1,0x0B, 0,0x27,1,0x00,
+        0,0x28,1,0x00, 0,0x29,1,0xF6, 0,0x2A,1,0x03, 0,0x2B,1,0x0A, 0,0x04,1,0x01};
+
+    /* Send the SPI data */
+    for (i=0;i<(int)sizeof(initbuf);i++)
+    {
+        while ((SPSTA0&1)==0);
+        SPRDAT0 = initbuf[i];
+        do{int x;for(x=1000*51/2;x;x--);} while (0);
+    }
+
+    /* Stop the SPI interface */
+    SPPRE0 = 0;
+    SPCON0 = 0;
+    CLKCON &= ~(1<<18); /* disable SPI clock */
+    GPBDAT |= (1<<8);   /* LCD CS on */
 }
 
 /* Update a fraction of the display. */
@@ -91,19 +135,21 @@ void lcd_update_rect(int x, int y, int width, int height)
     memcpy(((char*)FRAME) + (y * sizeof(fb_data) * LCD_WIDTH), ((char *)&lcd_framebuffer) + (y * sizeof(fb_data) * LCD_WIDTH), ((height * sizeof(fb_data) * LCD_WIDTH)));
 }
 
-
 void lcd_enable(bool state)
 {
     if(!lcd_poweroff)
         return;
-    if(state) {
-        if(!lcd_on) {
+    if(state)
+    {
+        if(!lcd_on)
+        {
             lcd_on = true;
             memcpy(FRAME, lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT*2);
             LCDCON1 |= 1;
         }
     }
-    else {
+    else 
+    {
         if(lcd_on) {
             lcd_on = false;
             LCDCON1 &= ~1;
