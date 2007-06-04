@@ -34,6 +34,9 @@ static int last_button = BUTTON_NONE;
 static int last_action = ACTION_NONE;
 static bool repeated = false;
 
+#define REPEAT_WINDOW_TICKS HZ/10
+static int last_action_tick = 0;
+
 /* software keylock stuff */
 #ifndef HAS_BUTTON_HOLD
 static bool keys_locked = false;
@@ -186,13 +189,15 @@ static int get_action_worker(int context, int timeout,
         return ACTION_REDRAW;
     }
 #endif
-    if (ret == last_action)
+    if ((current_tick - last_action_tick < REPEAT_WINDOW_TICKS) 
+         && (ret == last_action))
         repeated = true;
     else 
         repeated = false;
 
     last_button = button;
     last_action = ret;
+    last_action_tick = current_tick;
     return ret;
 }
 
