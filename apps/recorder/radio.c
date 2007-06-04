@@ -1098,7 +1098,7 @@ static int radio_add_preset(void)
 static int selected_preset = -1;
 static int radio_edit_preset(void)
 {
-    char buf[MAX_FMPRESET_LEN];
+    char buf[MAX_FMPRESET_LEN + 1];
 
     if (num_presets > 0)
     {
@@ -1357,7 +1357,7 @@ static int scan_presets(void)
     {
         const struct fm_region_setting * const fmr =
             &fm_region[global_settings.fm_region];
-        char buf[MAX_FMPRESET_LEN];
+        char buf[MAX_FMPRESET_LEN + 1];
         int i;
 
         curr_freq = fmr->freq_min;
