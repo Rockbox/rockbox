@@ -69,13 +69,6 @@ struct align_pos {
 #ifdef HAVE_LCD_BITMAP
 
 #define MAX_IMAGES (26*2) /* a-z and A-Z */
-
-#if LCD_DEPTH > 1
-#define MAX_BITMAPS MAX_IMAGES+2 /* WPS images + pbar bitmap + backdrop */
-#else
-#define MAX_BITMAPS MAX_IMAGES+1 /* WPS images + pbar bitmap */
-#endif
-
 #define IMG_BUFSIZE ((LCD_HEIGHT*LCD_WIDTH*LCD_DEPTH/8) \
                    + (2*LCD_HEIGHT*LCD_WIDTH/8))
 

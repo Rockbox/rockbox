@@ -64,9 +64,20 @@ static int numoptions[WPS_MAX_COND_LEVEL];
 static int line;
 
 #ifdef HAVE_LCD_BITMAP
+
+#if LCD_DEPTH > 1
+#define MAX_BITMAPS MAX_IMAGES+2 /* WPS images + pbar bitmap + backdrop */
+#else
+#define MAX_BITMAPS MAX_IMAGES+1 /* WPS images + pbar bitmap */
+#endif
+
+#define PROGRESSBAR_BMP MAX_IMAGES
+#define BACKDROP_BMP    MAX_IMAGES+1
+
 /* pointers to the bitmap filenames in the WPS source */
 static const char *bmp_names[MAX_BITMAPS];
-#endif
+
+#endif /* HAVE_LCD_BITMAP */
 
 #ifdef DEBUG
 /* debugging function */
@@ -468,13 +479,13 @@ static int parse_image_special(const char *wps_bufptr,
     if (token->type == WPS_TOKEN_IMAGE_PROGRESS_BAR)
     {
         /* format: %P|filename.bmp| */
-        bmp_names[MAX_IMAGES] = wps_bufptr + 1;
+        bmp_names[PROGRESSBAR_BMP] = wps_bufptr + 1;
     }
 #if LCD_DEPTH > 1
     else if (token->type == WPS_TOKEN_IMAGE_BACKDROP)
     {
         /* format: %X|filename.bmp| */
-        bmp_names[MAX_IMAGES + 1] = wps_bufptr + 1;
+        bmp_names[BACKDROP_BMP] = wps_bufptr + 1;
     }
 #endif
 
@@ -921,14 +932,14 @@ static void load_wps_bitmaps(struct wps_data *wps_data, char *bmpdir)
     bool *loaded;
 
     int n;
-    for (n = 0; n < MAX_BITMAPS - 1; n++)
+    for (n = 0; n < BACKDROP_BMP; n++)
     {
         if (bmp_names[n])
         {
             get_image_filename(bmp_names[n], bmpdir,
                                img_path, sizeof(img_path));
 
-            if (n == MAX_IMAGES) {
+            if (n == PROGRESSBAR_BMP) {
                 /* progressbar bitmap */
                 bitmap = &wps_data->progressbar.bm;
                 loaded = &wps_data->progressbar.have_bitmap_pb;
@@ -948,9 +959,9 @@ static void load_wps_bitmaps(struct wps_data *wps_data, char *bmpdir)
     }
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
-    if (bmp_names[MAX_IMAGES + 1])
+    if (bmp_names[BACKDROP_BMP])
     {
-        get_image_filename(bmp_names[MAX_IMAGES + 1], bmpdir,
+        get_image_filename(bmp_names[BACKDROP_BMP], bmpdir,
                             img_path, sizeof(img_path));
 #ifdef HAVE_REMOTE_LCD
         if (wps_data->remote_wps)
