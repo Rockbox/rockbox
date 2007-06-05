@@ -97,8 +97,8 @@ rockboy.c
 /* not support recorder models for now */
 #if (LCD_WIDTH > 112) && (LCD_HEIGHT > 64)
 fireworks.c
-xobox.c
 #endif
+xobox.c
 spacerocks.c
 #if LCD_DEPTH >= 16
 rockpaint.c

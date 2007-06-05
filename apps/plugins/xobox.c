@@ -30,7 +30,6 @@ PLUGIN_HEADER
 #define PAUSE BUTTON_MODE
 #define UP BUTTON_UP
 #define DOWN BUTTON_DOWN
-#define SELECT BUTTON_SELECT
 
 #define RC_QUIT BUTTON_RC_STOP
 
@@ -42,7 +41,6 @@ PLUGIN_HEADER
 #define PAUSE BUTTON_ON
 #define UP BUTTON_UP
 #define DOWN BUTTON_DOWN
-#define SELECT BUTTON_SELECT
 
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_4G_PAD)
@@ -51,7 +49,6 @@ PLUGIN_HEADER
 #define LEFT BUTTON_LEFT
 #define RIGHT BUTTON_RIGHT
 #define PAUSE BUTTON_SELECT
-#define SELECT BUTTON_SELECT
 #define MENU_UP BUTTON_SCROLL_FWD
 #define MENU_DOWN BUTTON_SCROLL_BACK
 #define UP BUTTON_MENU
@@ -62,7 +59,6 @@ PLUGIN_HEADER
 #define QUIT BUTTON_POWER
 #define LEFT BUTTON_LEFT
 #define RIGHT BUTTON_RIGHT
-#define SELECT BUTTON_SELECT
 #define UP BUTTON_UP
 #define DOWN BUTTON_DOWN
 #define PAUSE BUTTON_PLAY
@@ -72,7 +68,6 @@ PLUGIN_HEADER
 #define QUIT BUTTON_POWER
 #define LEFT BUTTON_LEFT
 #define RIGHT BUTTON_RIGHT
-#define SELECT BUTTON_SELECT
 #define UP BUTTON_UP
 #define DOWN BUTTON_DOWN
 #define PAUSE BUTTON_A
@@ -82,7 +77,6 @@ PLUGIN_HEADER
 #define QUIT BUTTON_POWER
 #define LEFT BUTTON_LEFT
 #define RIGHT BUTTON_RIGHT
-#define SELECT BUTTON_SELECT
 #define UP BUTTON_UP
 #define DOWN BUTTON_DOWN
 #define PAUSE BUTTON_REC
@@ -93,10 +87,27 @@ PLUGIN_HEADER
 #define QUIT BUTTON_POWER
 #define LEFT BUTTON_LEFT
 #define RIGHT BUTTON_RIGHT
-#define SELECT BUTTON_REW
 #define UP BUTTON_SCROLL_UP
 #define DOWN BUTTON_SCROLL_DOWN
 #define PAUSE BUTTON_PLAY
+
+#elif CONFIG_KEYPAD == RECORDER_PAD
+
+#define QUIT BUTTON_OFF
+#define LEFT BUTTON_LEFT
+#define RIGHT BUTTON_RIGHT
+#define DOWN BUTTON_DOWN
+#define UP BUTTON_UP
+#define PAUSE BUTTON_PLAY
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+
+#define QUIT BUTTON_OFF
+#define LEFT BUTTON_LEFT
+#define RIGHT BUTTON_RIGHT
+#define DOWN BUTTON_DOWN
+#define UP BUTTON_UP
+#define PAUSE BUTTON_MENU
 
 #else
 #error Unsupported keypad
@@ -138,7 +149,14 @@ PLUGIN_HEADER
 #define MOVE_UL  ( DIR_U  | DIR_L  )
 #define MOVE_UUL ( DIR_UU | DIR_L  )
 
-#define CUBE_SIZE 8             /* 8x22=176 */
+#if (LCD_WIDTH>112) && (LCD_HEIGHT>64)
+#   define CUBE_SIZE 8             /* 8x22=176 */
+#   define pos(a) ((a)>>3)
+#else
+#   define CUBE_SIZE 4
+#   define pos(a) ((a)>>2)
+#endif
+
 #define STARTING_QIXES 2
 #define MAX_LEVEL 10
 #define MAX_QIXES MAX_LEVEL+STARTING_QIXES
@@ -151,16 +169,23 @@ PLUGIN_HEADER
 #define CLR_RED  LCD_RGBPACK(255,0,0)         /* used to imply danger */
 #define CLR_LTBLUE LCD_RGBPACK(125, 145, 180) /* used for frame and filling */
 #define PLR_COL  LCD_WHITE                    /* color used for the player */
-#else
+#elif LCD_DEPTH>=2
 #define CLR_RED  LCD_DARKGRAY     /* used to imply danger */
 #define CLR_LTBLUE LCD_LIGHTGRAY  /* used for frame and filling */
 #define PLR_COL  LCD_BLACK        /* color used for the player */
 #endif
 
+#if LCD_DEPTH>=2
 #define EMPTIED LCD_BLACK       /* empty spot */
 #define FILLED  CLR_LTBLUE      /* filled spot */
 #define TRAIL   CLR_RED         /* the red trail of the player */
 #define QIX     LCD_WHITE
+#else
+#define EMPTIED 0
+#define FILLED 1
+#define TRAIL 2
+#define QIX 3
+#endif
 #define UNCHECKED 0
 #define CHECKED 1
 #define PAINTED -1
@@ -184,6 +209,7 @@ static bool quit = false;
 static unsigned int board[BOARD_H][BOARD_W];
 static int testboard[BOARD_H][BOARD_W];
 
+#if CUBE_SIZE == 8
 /*
    00011000 0x18 - 11100111 0xe7
    00111100 0x3c - 11100111 0xe7
@@ -198,6 +224,20 @@ const unsigned char pics[2][8] = {
     {0x18, 0x3c, 0x7e, 0xff, 0xff, 0x7e, 0x3c, 0x18},   /* Alien (QIX) */
     {0xe7, 0xe7, 0xc3, 0x00, 0x00, 0xc3, 0xe7, 0xe7}    /* Player (XONIX) */
 };
+#elif CUBE_SIZE == 4
+/*
+   01100000 0x18 - 10010000 0xe7
+   11110100 0x3c - 01100000 0xe7
+   11110000 0x7e - 01100000 0xc3
+   01100000 0xff - 10010000 0x00
+ */
+const unsigned char pics[2][4] = {
+    {0x60, 0xf0, 0xf0, 0x60},   /* Alien (QIX) */
+    {0x90, 0x60, 0x60, 0x90}    /* Player (XONIX) */
+};
+#else
+#error Incorrect CUBE_SIZE value.
+#endif
 
 static struct qix
 {
@@ -225,13 +265,6 @@ static struct pos
     int x, y;                   /* position on board */
 } stack[STACK_SIZE];
 static int stackPointer;
-
-#define div(a,b) (((a)/(b)))
-#if CUBE_SIZE == 8
-#   define pos(a) ((a)>>3)
-#else
-#   define pos(a) div((a),CUBE_SIZE)
-#endif
 
 static inline bool pop (struct pos *p)
 {
@@ -368,7 +401,11 @@ static void refresh_board (void)
     int i, j;
     char str[25];
 
+#if LCD_DEPTH>=2
     rb->lcd_set_background (LCD_BLACK);
+#else
+    rb->lcd_clear_display ();
+#endif
     for (j = 0; j < BOARD_H; j++)
     {
         unsigned last_color = board[j][0];
@@ -376,7 +413,11 @@ static void refresh_board (void)
         for (i = 1; i < BOARD_W; i++) {
             if( last_color != board[j][i] )
             {
+#if LCD_DEPTH>=2
                 rb->lcd_set_foreground (last_color);
+#else
+                if (last_color != EMPTIED)
+#endif
                 rb->lcd_fillrect (BOARD_X + CUBE_SIZE * (last_i),
                                   BOARD_Y + CUBE_SIZE * j,
                                   CUBE_SIZE  * (i - last_i), CUBE_SIZE );
@@ -384,14 +425,22 @@ static void refresh_board (void)
                 last_i = i;
             }
         }
+#if LCD_DEPTH>=2
         rb->lcd_set_foreground (last_color);
+#else
+        if (last_color != EMPTIED)
+#endif
         rb->lcd_fillrect (BOARD_X + CUBE_SIZE * (last_i),
                           BOARD_Y + CUBE_SIZE * j,
                           CUBE_SIZE * (i - last_i), CUBE_SIZE);
     }
 
+#if LCD_DEPTH>=2
     rb->lcd_set_foreground (LCD_BLACK);
     rb->lcd_set_background (CLR_LTBLUE);
+#else
+    rb->lcd_set_drawmode (DRMODE_COMPLEMENT);
+#endif
     rb->snprintf (str, sizeof (str), "Level %d", player.level + 1);
     rb->lcd_putsxy (BOARD_X, BOARD_Y, str);
     rb->snprintf (str, sizeof (str), "%d%%", percentage_cache);
@@ -399,22 +448,37 @@ static void refresh_board (void)
     rb->snprintf (str, sizeof (str), "Score: %d", player.score);
     rb->lcd_putsxy (BOARD_X, BOARD_Y + CUBE_SIZE * BOARD_H - 8, str);
     rb->snprintf (str, sizeof (str), "%d Lives", player.lives);
+#if LCD_DEPTH>=2
     rb->lcd_putsxy (BOARD_X + CUBE_SIZE * BOARD_W - 60,
                     BOARD_Y + CUBE_SIZE * BOARD_H - 8, str);
+#else
+    rb->lcd_putsxy (BOARD_X + CUBE_SIZE * BOARD_W - 40,
+                    BOARD_Y + CUBE_SIZE * BOARD_H - 8, str);
+#endif
 
+#if LCD_DEPTH>=2
     rb->lcd_set_foreground (PLR_COL);
     rb->lcd_set_background (board[player.j][player.i]);
+#else
+    rb->lcd_set_drawmode (DRMODE_SOLID);
+#endif
     rb->lcd_mono_bitmap (pics[PIC_PLAYER], player.i * CUBE_SIZE + BOARD_X,
                          player.j * CUBE_SIZE + BOARD_Y, CUBE_SIZE, CUBE_SIZE);
 
+#if LCD_DEPTH>=2
     rb->lcd_set_background (EMPTIED);
-    rb->lcd_set_drawmode (DRMODE_FG);
     rb->lcd_set_foreground (LCD_WHITE);
+    rb->lcd_set_drawmode (DRMODE_FG);
+#else
+    rb->lcd_set_drawmode (DRMODE_SOLID|DRMODE_INVERSEVID);
+#endif
     for (j = 0; j < player.level + STARTING_QIXES; j++)
         rb->lcd_mono_bitmap (pics[PIC_QIX], qixes[j].x + BOARD_X,
                              qixes[j].y + BOARD_Y, CUBE_SIZE, CUBE_SIZE);
-    rb->lcd_set_drawmode (DRMODE_SOLID);
+#if LCD_DEPTH>=2
     rb->lcd_set_foreground (LCD_BLACK);
+#endif
+    rb->lcd_set_drawmode (DRMODE_SOLID);
 
     rb->lcd_update ();
 }
@@ -608,7 +672,7 @@ static void die (void)
 static inline bool line_check_lt (int newx, int newy)
 {
     int i = 0;
-    for (i = 3; i < CUBE_SIZE - 3; i++) {
+    for (i = ((CUBE_SIZE/2)-1); i < CUBE_SIZE - ((CUBE_SIZE/2)-1); i++) {
         if (getpixel (newx, newy + i) != FILLED)
             return false;
     }
@@ -617,7 +681,7 @@ static inline bool line_check_lt (int newx, int newy)
 static inline bool line_check_rt (int newx, int newy)
 {
     int i = 0;
-    for (i = 3; i < CUBE_SIZE - 3; i++) {
+    for (i = ((CUBE_SIZE/2)-1); i < CUBE_SIZE - ((CUBE_SIZE/2)-1); i++) {
         if (getpixel (newx + CUBE_SIZE - 1, newy + i) != FILLED)
             return false;
     }
@@ -626,7 +690,7 @@ static inline bool line_check_rt (int newx, int newy)
 static inline bool line_check_up (int newx, int newy)
 {
     int i = 0;
-    for (i = 3; i < CUBE_SIZE - 3; i++) {
+    for (i = ((CUBE_SIZE/2)-1); i < CUBE_SIZE - ((CUBE_SIZE/2)-1); i++) {
         if (getpixel (newx + i, newy) != FILLED)
             return false;
     }
@@ -635,7 +699,7 @@ static inline bool line_check_up (int newx, int newy)
 static inline bool line_check_dn (int newx, int newy)
 {
     int i = 0;
-    for (i = 3; i < CUBE_SIZE - 3; i++) {
+    for (i = ((CUBE_SIZE/2)-1); i < CUBE_SIZE - ((CUBE_SIZE/2)-1); i++) {
         if (getpixel (newx + i, newy + CUBE_SIZE - 1) != FILLED)
             return false;
     }
@@ -757,7 +821,7 @@ static int game_menu (void)
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground (rb->global_settings->fg_color);
     rb->lcd_set_background (rb->global_settings->bg_color);
-#else
+#elif LCD_DEPTH>=2
     rb->lcd_set_foreground(LCD_BLACK);
     rb->lcd_set_background(LCD_WHITE);
 #endif
@@ -877,7 +941,9 @@ enum plugin_status plugin_start (struct plugin_api *api, void *parameter)
     rb = api;
 
     rb->lcd_setfont (FONT_SYSFIXED);
+#if LCD_DEPTH>=2
     rb->lcd_set_backdrop(NULL);
+#endif
 
     /* Permanently enable the backlight (unless the user has turned it off) */
     if (rb->global_settings->backlight_timeout > 0)
