@@ -130,7 +130,7 @@ static inline void store_context(void* addr)
  * Load non-volatile context.
  *---------------------------------------------------------------------------
  */
-static void start_thread(void (*thread_func)(void), const void* addr) __attribute__((naked));
+static void start_thread(void (*thread_func)(void), const void* addr) __attribute__((naked,used));
 static void start_thread(void (*thread_func)(void), const void* addr)
 {
     /* r0 = thread_func, r1 = addr */
@@ -160,7 +160,6 @@ static void start_thread(void (*thread_func)(void), const void* addr)
 #endif
     (void)thread_func;
     (void)addr;
-    (void)start_thread;
 }
 
 static inline void load_context(const void* addr)
@@ -386,9 +385,8 @@ static void remove_from_list(struct thread_entry **list,
     thread->next->prev = thread->prev;
 }
 
-/* Compiler trick: Don't declare as static to prevent putting 
- * function in IRAM. */
-void check_sleepers(void)
+static void check_sleepers(void) __attribute__ ((noinline));
+static void check_sleepers(void)
 {
     struct thread_entry *current, *next;
     
@@ -428,6 +426,7 @@ void check_sleepers(void)
 
 /* Safely finish waking all threads potentialy woken by interrupts -
  * statearg already zeroed in wakeup_thread. */
+static void wake_list_awaken(void) __attribute__ ((noinline));
 static void wake_list_awaken(void)
 {
     int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
@@ -506,9 +505,8 @@ void profile_thread(void) {
 }
 #endif
 
-/* Compiler trick: Don't declare as static to prevent putting 
- * function in IRAM. */
-void change_thread_state(struct thread_entry **blocked_list)
+static void change_thread_state(struct thread_entry **blocked_list) __attribute__ ((noinline));
+static void change_thread_state(struct thread_entry **blocked_list)
 {
     struct thread_entry *old;
     unsigned long new_state;
