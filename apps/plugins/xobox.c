@@ -163,6 +163,7 @@ PLUGIN_HEADER
 #define QIX     LCD_WHITE
 #define UNCHECKED 0
 #define CHECKED 1
+#define PAINTED -1
 #define PIC_QIX 0
 #define PIC_PLAYER 1
 
@@ -180,8 +181,8 @@ static int difficulty = 75; /* Percentage of screen that needs to be filled
 static struct plugin_api *rb;
 static bool quit = false;
 
-static unsigned int board[BOARD_H][BOARD_W],
-    testboard[BOARD_H][BOARD_W], boardcopy[BOARD_H][BOARD_W];
+static unsigned int board[BOARD_H][BOARD_W];
+static int testboard[BOARD_H][BOARD_W];
 
 /*
    00011000 0x18 - 11100111 0xe7
@@ -333,25 +334,10 @@ static void init_board (void)
             BOARD_Y + t_rand (((BOARD_H - 6) * CUBE_SIZE) - 2 * CUBE_SIZE) +
             3 * CUBE_SIZE;
 
-        switch( t_rand (12) ) {
-#define ANGLE_CASE(a,b)                         \
-            case a:                             \
-                qixes[j].angle = MOVE_ ## b;    \
-                break;
-            ANGLE_CASE(0,UR);
-            ANGLE_CASE(1,URR);
-            ANGLE_CASE(2,DRR);
-            ANGLE_CASE(3,DR);
-            ANGLE_CASE(4,DDR);
-            ANGLE_CASE(5,DDL);
-            ANGLE_CASE(6,DL);
-            ANGLE_CASE(7,DLL);
-            ANGLE_CASE(8,ULL);
-            ANGLE_CASE(9,UL);
-            ANGLE_CASE(10,UUL);
-            ANGLE_CASE(11,UUR);
-#undef ANGLE_CASE
-        }
+        const int angle_table[] = {
+            MOVE_UUR, MOVE_UR, MOVE_URR, MOVE_DRR, MOVE_DR, MOVE_DDR,
+            MOVE_UUL, MOVE_UL, MOVE_ULL, MOVE_DLL, MOVE_DL, MOVE_DDL };
+        qixes[j].angle = angle_table[t_rand (12)];
     }
     /*black_qix.velocity=1;
        black_qix.x=BOARD_X+(BOARD_W*CUBE_SIZE)/2-CUBE_SIZE/2;
@@ -433,46 +419,48 @@ static void refresh_board (void)
     rb->lcd_update ();
 }
 
-static inline int infested_area (int i, int j)
+static inline int infested_area (int i, int j, int v)
 {
     struct pos p;
     p.x = i;
     p.y = j;
     emptyStack ();
-    init_testboard ();
     if (!push (&p))
         return -1;
     while (pop (&p)) {
-        testboard[p.y][p.x] = CHECKED;
-        if ((boardcopy[p.y][p.x] == QIX))
-            return 1;
+        if (testboard[p.y][p.x] == v) continue;
+        if (testboard[p.y][p.x] > UNCHECKED)
+            return 1; /* This area was previously flagged as infested */
+        testboard[p.y][p.x] = v;
+        if (board[p.y][p.x] == QIX)
+            return 1; /* Infested area */
         {
             struct pos p1 = { p.x+1, p.y };
-            if ((p1.x < BOARD_W) && (testboard[p1.y][p1.x] == UNCHECKED))
-                if (board[p1.y][p1.x] != FILLED)
-                    if (!push (&p1))
-                        return -1;
+            if ((p1.x < BOARD_W)
+             && (board[p1.y][p1.x] != FILLED)
+             && (!push (&p1)))
+                return -1;
         }
         {
             struct pos p1 = { p.x-1, p.y };
-            if ((p1.x >= 0) && (testboard[p1.y][p1.x] == UNCHECKED))
-                if (board[p1.y][p1.x] != FILLED)
-                    if (!push (&p1))
-                        return -1;
+            if ((p1.x >= 0)
+             && (board[p1.y][p1.x] != FILLED)
+             && (!push (&p1)))
+                return -1;
         }
         {
             struct pos p1 = { p.x, p.y+1 };
-            if ((p1.y < BOARD_H) && (testboard[p1.y][p1.x] == UNCHECKED))
-                if (board[p1.y][p1.x] != FILLED)
-                    if (!push (&p1))
-                        return -1;
+            if ((p1.y < BOARD_H)
+             && (board[p1.y][p1.x] != FILLED)
+             && (!push (&p1)))
+                return -1;
         }
         {
             struct pos p1 = { p.x, p.y-1 };
-            if ((p1.y >= 0) && (testboard[p1.y][p1.x] == UNCHECKED))
-                if (board[p1.y][p1.x] != FILLED)
-                    if (!push (&p1))
-                        return -1;
+            if ((p1.y >= 0)
+             && (board[p1.y][p1.x] != FILLED)
+             && (!push (&p1)))
+                return -1;
         }
     }
     return 0;
@@ -483,43 +471,43 @@ static inline int fill_area (int i, int j)
     struct pos p;
     p.x = i;
     p.y = j;
+    int v = testboard[p.y][p.x];
     emptyStack ();
-    init_testboard ();
     if (!push (&p))
         return -1;
     while (pop (&p)) {
         board[p.y][p.x] = FILLED;
-        testboard[p.y][p.x] = CHECKED;
+        testboard[p.y][p.x] = PAINTED;
         {
             struct pos p1 = { p.x+1, p.y };
-            if ((p1.x < BOARD_W) && (testboard[p1.y][p1.x] == UNCHECKED))
-                if (board[p1.y][p1.x] == EMPTIED)
-                    if (!push (&p1))
-                        return -1;
+            if ((p1.x < BOARD_W)
+             && (testboard[p1.y][p1.x] == v)
+             && (!push (&p1)))
+                return -1;
         }
         {
             struct pos p1 = { p.x-1, p.y };
-            if ((p1.x >= 0) && (testboard[p1.y][p1.x] == UNCHECKED))
-                if (board[p1.y][p1.x] == EMPTIED)
-                    if (!push (&p1))
-                        return -1;
+            if ((p1.x >= 0)
+             && (testboard[p1.y][p1.x] == v)
+             && (!push (&p1)))
+                return -1;
         }
         {
             struct pos p1 = { p.x, p.y+1 };
-            if ((p1.y < BOARD_H) && (testboard[p1.y][p1.x] == UNCHECKED))
-                if (board[p1.y][p1.x] == EMPTIED)
-                    if (!push (&p1))
-                        return -1;
+            if ((p1.y < BOARD_H)
+             && (testboard[p1.y][p1.x] == v)
+             && (!push (&p1)))
+                return -1;
         }
         {
             struct pos p1 = { p.x, p.y-1 };
-            if ((p1.y >= 0) && (testboard[p1.y][p1.x] == UNCHECKED))
-                if (board[p1.y][p1.x] == EMPTIED)
-                    if (!push (&p1))
-                        return -1;
+            if ((p1.y >= 0)
+             && (testboard[p1.y][p1.x] == v)
+             && (!push (&p1)))
+                return -1;
         }
     }
-    return 1;
+    return 0;
 }
 
 
@@ -535,24 +523,30 @@ static void complete_trail (int fill)
                 else
                     board[j][i] = EMPTIED;
             }
-            /*boardcopy[j][i] = board[j][i];*/
         }
-        rb->memcpy( boardcopy[j], board[j], BOARD_W * sizeof( int ) );
     }
 
     if (fill) {
+        int v = CHECKED;
         for (i = 0; i < player.level + STARTING_QIXES; i++) /* add qixes to board */
-            boardcopy[pos(qixes[i].y - BOARD_Y)]
-                     [pos(qixes[i].x - BOARD_X)] = QIX;
+            board[pos(qixes[i].y - BOARD_Y)]
+                 [pos(qixes[i].x - BOARD_X)] = QIX;
 
         init_testboard();
-        for (j = 1; j < BOARD_H - 1; j++)
-            for (i = 0; i < BOARD_W - 0; i++)
-                if (board[j][i] != FILLED && testboard[j][i] != CHECKED /* testboard[i][j] == CHECKED means that this is part of an infested area tested on the previous run */ ) {
-                    ret = infested_area (i, j);
-                    if (ret < 0 || ( ret == 0 && fill_area (i, j) < 0 ) )
+        for (j = 1; j < BOARD_H - 1; j++) {
+            for (i = 0; i < BOARD_W - 0; i++) {
+                if (board[j][i] != FILLED) {
+                    ret = infested_area (i, j, v);
+                    if (ret < 0 || ( ret == 0 && fill_area (i, j) ) )
                         quit = true;
+                    v++;
                 }
+            }
+        }
+
+        for (i = 0; i < player.level + STARTING_QIXES; i++) /* add qixes to board */
+            board[pos(qixes[i].y - BOARD_Y)]
+                 [pos(qixes[i].x - BOARD_X)] = EMPTIED;
         percentage_cache = percentage();
      }
 
@@ -609,7 +603,7 @@ static void die (void)
 
 /* returns true if the (side) of the block          -***-
    starting from (newx,newy) has any filled pixels  *   *
-   -***-
+                                                    -***-
  */
 static inline bool line_check_lt (int newx, int newy)
 {
