@@ -1529,10 +1529,12 @@ bool recording_screen(bool no_source)
             {
                 switch (global_settings.rec_source)
                 {
+#if defined(HAVE_LINE_REC) || defined(HAVE_FMRADIO_REC)
                 HAVE_LINE_REC_(case AUDIO_SRC_LINEIN:)
                 HAVE_FMRADIO_REC_(case AUDIO_SRC_FMRADIO:)
                     line[i] = 5;
                     break;
+#endif
                 case AUDIO_SRC_MIC:
                     line[i] = 4;
                     break;

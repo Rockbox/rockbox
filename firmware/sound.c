@@ -743,7 +743,7 @@ void sound_set(int setting, int value)
         sound_set_val(value);
 }
 
-#ifndef HAVE_AS3514
+#if !defined(HAVE_AS3514) || defined(SIMULATOR)
 int sound_val2phys(int setting, int value)
 {
 #if CONFIG_CODEC == MAS3587F
@@ -800,12 +800,30 @@ int sound_val2phys(int setting, int value)
             break;
     }
     return result;
+#elif defined(HAVE_AS3514)
+    /* This is here for the sim only and the audio driver has its own */
+    int result;
+
+    switch(setting)
+    {
+    case SOUND_LEFT_GAIN:
+    case SOUND_RIGHT_GAIN:
+    case SOUND_MIC_GAIN:
+        result = (value - 23) * 15;
+        break;
+
+    default:
+        result = value;
+        break;
+    }
+
+    return result;
 #else
     (void)setting;
     return value;
 #endif
 }
-#endif /* HAVE_AS3514 */
+#endif /* !defined(HAVE_AS3514) || defined(SIMULATOR) */
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 #ifndef SIMULATOR
