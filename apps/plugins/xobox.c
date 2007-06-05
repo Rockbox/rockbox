@@ -226,14 +226,14 @@ const unsigned char pics[2][8] = {
 };
 #elif CUBE_SIZE == 4
 /*
-   01100000 0x18 - 10010000 0xe7
-   11110100 0x3c - 01100000 0xe7
-   11110000 0x7e - 01100000 0xc3
-   01100000 0xff - 10010000 0x00
+   0110 0x6 - 1001 0x9
+   1111 0xf - 0110 0x6
+   1111 0xf - 0110 0x6
+   0110 0x6 - 1001 0x9
  */
 const unsigned char pics[2][4] = {
-    {0x60, 0xf0, 0xf0, 0x60},   /* Alien (QIX) */
-    {0x90, 0x60, 0x60, 0x90}    /* Player (XONIX) */
+    {0x6, 0xf, 0xf, 0x6},   /* Alien (QIX) */
+    {0x9, 0x6, 0x6, 0x9}    /* Player (XONIX) */
 };
 #else
 #error Incorrect CUBE_SIZE value.
@@ -459,8 +459,6 @@ static void refresh_board (void)
 #if LCD_DEPTH>=2
     rb->lcd_set_foreground (PLR_COL);
     rb->lcd_set_background (board[player.j][player.i]);
-#else
-    rb->lcd_set_drawmode (DRMODE_SOLID);
 #endif
     rb->lcd_mono_bitmap (pics[PIC_PLAYER], player.i * CUBE_SIZE + BOARD_X,
                          player.j * CUBE_SIZE + BOARD_Y, CUBE_SIZE, CUBE_SIZE);
@@ -470,7 +468,7 @@ static void refresh_board (void)
     rb->lcd_set_foreground (LCD_WHITE);
     rb->lcd_set_drawmode (DRMODE_FG);
 #else
-    rb->lcd_set_drawmode (DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_set_drawmode (DRMODE_SOLID);
 #endif
     for (j = 0; j < player.level + STARTING_QIXES; j++)
         rb->lcd_mono_bitmap (pics[PIC_QIX], qixes[j].x + BOARD_X,
