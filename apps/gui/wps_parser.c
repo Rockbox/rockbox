@@ -65,11 +65,7 @@ static int line;
 
 #ifdef HAVE_LCD_BITMAP
 /* pointers to the bitmap filenames in the WPS source */
-static const char *bmp_names[MAX_IMAGES];
-static const char *pb_bmp_name;
-#if LCD_DEPTH > 1
-static const char *backdrop_bmp_name;
-#endif
+static const char *bmp_names[MAX_BITMAPS];
 #endif
 
 #ifdef DEBUG
@@ -472,13 +468,13 @@ static int parse_image_special(const char *wps_bufptr,
     if (token->type == WPS_TOKEN_IMAGE_PROGRESS_BAR)
     {
         /* format: %P|filename.bmp| */
-        pb_bmp_name = wps_bufptr + 1;
+        bmp_names[MAX_IMAGES] = wps_bufptr + 1;
     }
 #if LCD_DEPTH > 1
     else if (token->type == WPS_TOKEN_IMAGE_BACKDROP)
     {
         /* format: %X|filename.bmp| */
-        backdrop_bmp_name = wps_bufptr + 1;
+        bmp_names[MAX_IMAGES + 1] = wps_bufptr + 1;
     }
 #endif
 
@@ -912,54 +908,49 @@ static void wps_reset(struct wps_data *data)
 static void clear_bmp_names(void)
 {
     int n;
-    for (n = 0; n < MAX_IMAGES; n++)
+    for (n = 0; n < MAX_BITMAPS; n++)
     {
         bmp_names[n] = NULL;
     }
-    pb_bmp_name = NULL;
-#if LCD_DEPTH > 1
-    backdrop_bmp_name = NULL;
-#endif
 }
 
 static void load_wps_bitmaps(struct wps_data *wps_data, char *bmpdir)
 {
     char img_path[MAX_PATH];
+    struct bitmap *bitmap;
+    bool *loaded;
 
     int n;
-    for (n = 0; n < MAX_IMAGES; n++)
+    for (n = 0; n < MAX_BITMAPS - 1; n++)
     {
         if (bmp_names[n])
         {
             get_image_filename(bmp_names[n], bmpdir,
                                img_path, sizeof(img_path));
 
+            if (n == MAX_IMAGES) {
+                /* progressbar bitmap */
+                bitmap = &wps_data->progressbar.bm;
+                loaded = &wps_data->progressbar.have_bitmap_pb;
+            } else {
+                /* regular bitmap */
+                bitmap = &wps_data->img[n].bm;
+                loaded = &wps_data->img[n].loaded;
+            }
+
             /* load the image */
-            wps_data->img[n].bm.data = wps_data->img_buf_ptr;
-            if (load_bitmap(wps_data, img_path, &wps_data->img[n].bm))
+            bitmap->data = wps_data->img_buf_ptr;
+            if (load_bitmap(wps_data, img_path, bitmap))
             {
-                wps_data->img[n].loaded = true;
+                *loaded = true;
             }
         }
     }
 
-    if (pb_bmp_name)
-    {
-        get_image_filename(pb_bmp_name, bmpdir, img_path, sizeof(img_path));
-
-        /* load the image */
-        wps_data->progressbar.bm.data = wps_data->img_buf_ptr;
-        if (load_bitmap(wps_data, img_path, &wps_data->progressbar.bm)
-            && wps_data->progressbar.bm.width <= LCD_WIDTH)
-        {
-            wps_data->progressbar.have_bitmap_pb = true;
-        }
-    }
-
 #if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
-    if (backdrop_bmp_name)
+    if (bmp_names[MAX_IMAGES + 1])
     {
-        get_image_filename(backdrop_bmp_name, bmpdir,
+        get_image_filename(bmp_names[MAX_IMAGES + 1], bmpdir,
                             img_path, sizeof(img_path));
 #ifdef HAVE_REMOTE_LCD
         if (wps_data->remote_wps)
