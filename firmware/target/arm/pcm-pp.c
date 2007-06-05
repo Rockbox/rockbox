@@ -160,7 +160,7 @@ void fiq(void)
 {
     /* Clear interrupt */
 #if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
-    IISCONFIG &= ~0x2;
+    IISCONFIG &= ~(1 << 1);
 #elif CONFIG_CPU == PP5002
     inl(0xcf001040);
     IISFIFO_CFG &= ~(1<<9);
@@ -171,7 +171,7 @@ void fiq(void)
             if (FIFO_FREE_COUNT < 2) {
                 /* Enable interrupt */
 #if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
-                IISCONFIG |= 0x2;
+                IISCONFIG |= (1 << 1);
 #elif CONFIG_CPU == PP5002
                 IISFIFO_CFG |= (1<<9);
 #endif
@@ -221,7 +221,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
 
     /* Enable playback FIFO */
 #if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
-    IISCONFIG |= 0x20000000;
+    IISCONFIG |= (1 << 29);
 #elif CONFIG_CPU == PP5002
     IISCONFIG |= 0x4;
 #endif
@@ -232,7 +232,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
         if (FIFO_FREE_COUNT < 2) {
             /* Enable interrupt */
 #if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
-            IISCONFIG |= 0x2;
+            IISCONFIG |= (1 << 1);
 #elif CONFIG_CPU == PP5002
             IISFIFO_CFG |= (1<<9);
 #endif
@@ -257,13 +257,8 @@ void pcm_play_dma_stop(void)
     pcm_paused = false;
 
 #if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
-
-    /* Disable playback FIFO */
-    IISCONFIG &= ~0x20000000;
-
-    /* Disable the interrupt */
-    IISCONFIG &= ~0x2;
-
+    /* Disable playback FIFO and interrupt */
+    IISCONFIG &= ~((1 << 29) | (1 << 1));
 #elif CONFIG_CPU == PP5002
 
     /* Disable playback FIFO */
@@ -279,10 +274,8 @@ void pcm_play_dma_stop(void)
 void pcm_play_pause_pause(void)
 {
 #if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
-    /* Disable the interrupt */
-    IISCONFIG &= ~0x2;
-    /* Disable playback FIFO */
-    IISCONFIG &= ~0x20000000;
+    /* Disable playback FIFO and interrupt */
+    IISCONFIG &= ~((1 << 29) | (1 << 1));
 #elif CONFIG_CPU == PP5002
     /* Disable the interrupt */
     IISFIFO_CFG &= ~(1<<9);
@@ -301,7 +294,7 @@ void pcm_play_pause_unpause(void)
 
     /* Enable playback FIFO */
 #if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
-    IISCONFIG |= 0x20000000;
+    IISCONFIG |= (1 << 29);
 #elif CONFIG_CPU == PP5002
     IISCONFIG |= 0x4;
 #endif
@@ -312,7 +305,7 @@ void pcm_play_pause_unpause(void)
         if (FIFO_FREE_COUNT < 2) {
             /* Enable interrupt */
 #if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
-            IISCONFIG |= 0x2;
+            IISCONFIG |= (1 << 1);
 #elif CONFIG_CPU == PP5002
             IISFIFO_CFG |= (1<<9);
 #endif
@@ -369,6 +362,79 @@ void pcm_postinit(void)
  ** Recording DMA transfer
  **/
 #ifdef HAVE_RECORDING
+
+#ifdef HAVE_AS3514
+void fiq_record(void) ICODE_ATTR __attribute__((naked));
+void fiq_record(void)
+{
+    register pcm_more_callback_type2 more_ready;
+    register int32_t value1, value2;
+
+    asm volatile ("stmfd sp!, {r0-r7, ip, lr} \n");   /* Store context */
+
+    IISCONFIG &= ~(1 << 0);
+
+    if (audio_channels == 2) {
+        /* RX is stereo */
+        while (p_size > 0) {
+            if (FIFO_FREE_COUNT < 2) {
+                /* enable interrupt */
+                IISCONFIG |= (1 << 0);
+                goto fiq_record_exit;
+            }
+
+            /* Discard every other sample since ADC clock is 1/2 LRCK */
+            value1 = IISFIFO_RD;
+            value2 = IISFIFO_RD;
+
+            *(int32_t *)p = value1;
+            p += 2;
+            p_size -= 4;
+
+            /* TODO: Figure out how to do IIS loopback */
+            if (audio_output_source != AUDIO_SRC_PLAYBACK) {
+                IISFIFO_WR = value1;
+                IISFIFO_WR = value1;
+            }
+        }
+    }
+    else {
+        /* RX is left channel mono */
+        while (p_size > 0) {
+            if (FIFO_FREE_COUNT < 2) {
+                /* enable interrupt */
+                IISCONFIG |= (1 << 0);
+                goto fiq_record_exit;
+            }
+
+            /* Discard every other sample since ADC clock is 1/2 LRCK */
+            value1 = IISFIFO_RD;
+            value2 = IISFIFO_RD;
+            *p++ = value1;
+            *p++ = value1;
+            p_size -= 4;
+
+            if (audio_output_source != AUDIO_SRC_PLAYBACK) {
+                value1 = *((int32_t *)p - 1);
+                IISFIFO_WR = value1;
+                IISFIFO_WR = value1;
+            }
+        }
+    }
+
+    more_ready = pcm_callback_more_ready;
+
+    if (more_ready == NULL || more_ready(0) < 0) {
+        /* Finished recording */
+        pcm_rec_dma_stop();
+    }
+
+fiq_record_exit:
+    asm volatile("ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */
+                 "subs  pc, lr, #4           \n"); /* Return from FIQ */
+}
+
+#else
 static short peak_l, peak_r IBSS_ATTR;
 
 void fiq_record(void) ICODE_ATTR __attribute__ ((interrupt ("FIQ")));
@@ -380,7 +446,7 @@ void fiq_record(void)
 
     /* Clear interrupt */
 #if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
-    IISCONFIG &= ~0x01;
+    IISCONFIG &= ~(1 << 0);
 #elif CONFIG_CPU == PP5002
     /* TODO */
 #endif
@@ -389,12 +455,13 @@ void fiq_record(void)
         if (FIFO_FREE_COUNT < 2) {
             /* enable interrupt */
 #if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
-            IISCONFIG |= 0x01;
+            IISCONFIG |= (1 << 0);
 #elif CONFIG_CPU == PP5002
             /* TODO */
 #endif
             return;
         }
+
         value = (unsigned short)(IISFIFO_RD >> 16);
         if (value > peak_l) peak_l = value;
         else if (-value > peak_l) peak_l = -value;
@@ -424,16 +491,18 @@ void fiq_record(void)
     pcm_rec_dma_stop();
 }
 
+#endif /* HAVE_AS3514 */
+
 /* Continue transferring data in */
 void pcm_record_more(void *start, size_t size)
 {
-    rec_peak_addr = (unsigned long *)start; /* Start peaking at dest */
-    p             = start;
-    p_size        = size;    /* Bytes to transfer   */
+    rec_peak_addr = start; /* Start peaking at dest */
+    p             = start; /* Start of RX buffer    */
+    p_size        = size;  /* Bytes to transfer     */
 #if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
-            IISCONFIG |= 0x01;
+    IISCONFIG |= (1 << 0);
 #elif CONFIG_CPU == PP5002
-            /* TODO */
+    /* TODO */
 #endif
 }
 
@@ -441,10 +510,13 @@ void pcm_rec_dma_stop(void)
 {
     logf("pcm_rec_dma_stop");
 
-    /* disable fifo */
-    IISCONFIG &= ~0x10000000;
-
     disable_fiq();
+
+    /* clear interrupt, disable fifo */
+    IISCONFIG &= ~((1 << 28) | (1 << 0));
+
+    /* clear rx fifo */
+    IISFIFO_CFG |= (1 << 12);
 
     pcm_recording = false;
 }
@@ -455,7 +527,10 @@ void pcm_rec_dma_start(void *addr, size_t size)
 
     pcm_recording = true;
 
+#ifndef HAVE_AS3514
     peak_l = peak_r = 0;
+#endif
+
     p_size = size;
     p = addr;
 
@@ -463,11 +538,8 @@ void pcm_rec_dma_start(void *addr, size_t size)
     CPU_INT_PRIORITY |= I2S_MASK;
     CPU_INT_EN = I2S_MASK;
 
-    /* interrupt on full fifo */
-    IISCONFIG |= 0x1;
-
-    /* enable record fifo */
-    IISCONFIG |= 0x10000000;
+    /* interrupt on full fifo, enable record fifo */
+    IISCONFIG |= (1 << 28) | (1 << 0);
 
     set_fiq_handler(fiq_record);
     enable_fiq();
@@ -476,18 +548,7 @@ void pcm_rec_dma_start(void *addr, size_t size)
 void pcm_close_recording(void)
 {
     logf("pcm_close_recording");
-
     pcm_rec_dma_stop();
-
-#if (CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024)
-    disable_fiq();
-
-    /* disable fifo */
-    IISCONFIG &= ~0x10000000;
-
-    /* Clear interrupt */
-    IISCONFIG &= ~0x01;
-#endif
 } /* pcm_close_recording */
 
 void pcm_init_recording(void)
@@ -505,7 +566,7 @@ void pcm_init_recording(void)
     GPIOA_OUTPUT_VAL &= ~0x4;
 #endif
     /* Setup the recording FIQ handler */
-    *((unsigned int*)(15*4)) = (unsigned int)&fiq_record;
+    set_fiq_handler(fiq_record);
 #endif
 
     pcm_rec_dma_stop();
@@ -513,10 +574,57 @@ void pcm_init_recording(void)
 
 void pcm_calculate_rec_peaks(int *left, int *right)
 {
-    *left = rec_peak_left;
-    *right = rec_peak_right;
+#ifdef HAVE_AS3514
+    if (pcm_recording)
+    {
+        unsigned long *start = rec_peak_addr;
+        unsigned long *end = (unsigned long *)p;
+
+        if (start < end)
+        {
+            unsigned long *addr = start;
+            long peak_l   = 0, peak_r   = 0;
+            long peaksq_l = 0, peaksq_r = 0;
+
+            do
+            {
+                long value = *addr;
+                long ch, chsq;
+
+                ch = (int16_t)value;
+                chsq = ch*ch;
+                if (chsq > peaksq_l)
+                    peak_l = ch, peaksq_l = chsq;
+
+                ch = value >> 16;
+                chsq = ch*ch;
+                if (chsq > peaksq_r)
+                    peak_r = ch, peaksq_r = chsq;
+
+                addr += 4;
+            }
+            while (addr < end);
+
+            if (start == rec_peak_addr)
+                rec_peak_addr = end;
+
+            rec_peak_left  = abs(peak_l);
+            rec_peak_right = abs(peak_r);
+        }
+    }
+    else
+    {
+        rec_peak_left = rec_peak_right = 0;
+    }
+#endif /* HAVE_AS3514 */
+
+    if (left)
+        *left = rec_peak_left;
+
+    if (right)
+        *right = rec_peak_right;
 }
-#endif
+#endif /* HAVE_RECORDING */
 
 /*
  * This function goes directly into the DMA buffer to calculate the left and

@@ -292,17 +292,12 @@ enum rec_freq_indexes
 #define REC_HAVE_8_(...)
 #endif
     REC_NUM_FREQ,
-    /* This should always come out I reckon */
-    REC_FREQ_DEFAULT      = REC_FREQ_44,
-    /* Get the minimum bitcount needed to save the range of values */
-    REC_FREQ_CFG_NUM_BITS = (REC_NUM_FREQ > 8 ?
-                             4 : (REC_NUM_FREQ > 4 ?
-                                  3 : (REC_NUM_FREQ > 2 ?
-                                       2 : 1
-                                      )
-                                 )
-                            ),
 }; /* enum rec_freq_indexes */
+
+/* Default to 44.1kHz if not otherwise specified */
+#ifndef REC_FREQ_DEFAULT
+#define REC_FREQ_DEFAULT REC_FREQ_44
+#endif
 
 #define REC_FREQ_CFG_VAL_LIST  &REC_HAVE_96_(",96") REC_HAVE_88_(",88") \
                                 REC_HAVE_64_(",64") REC_HAVE_48_(",48") \

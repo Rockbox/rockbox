@@ -223,6 +223,7 @@ void sd_wait_for_state(tSDCardInfo* card, unsigned int state)
     while(((response >> 9) & 0xf) != state)
     {
         sd_send_command(SEND_STATUS, (card->rca) << 16, 1);
+        priority_yield();
         sd_read_response(&response, 1);
         /* TODO: Add a timeout and error handling */
     }
@@ -442,7 +443,7 @@ void sd_init_device(void)
             dataptr += (FIFO_SIZE*2); /* Advance one chunk of 16 words */
         }
     }
-    mutex_init(&sd_mtx);
+    spinlock_init(&sd_mtx);
 }
 
 /* API Functions */
@@ -472,7 +473,7 @@ int ata_read_sectors(IF_MV2(int drive,)
 #ifdef HAVE_MULTIVOLUME
     (void)drive; /* unused for now */
 #endif
-    mutex_lock(&sd_mtx);
+    spinlock_lock(&sd_mtx);
 
     last_disk_activity = current_tick;
     spinup_start = current_tick;
@@ -530,7 +531,7 @@ int ata_read_sectors(IF_MV2(int drive,)
     ata_led(false);
     ata_enable(false);
 
-    mutex_unlock(&sd_mtx);
+    spinlock_unlock(&sd_mtx);
 
     return ret;
 }
@@ -551,7 +552,7 @@ int ata_write_sectors(IF_MV2(int drive,)
     long timeout;
     tSDCardInfo *card = &card_info[current_card];
 
-    mutex_lock(&sd_mtx);
+    spinlock_lock(&sd_mtx);
     ata_enable(true);
     ata_led(true);
     if(current_card == 0)
@@ -607,7 +608,7 @@ retry:
     sd_wait_for_state(card, TRAN);
     ata_led(false);
     ata_enable(false);
-    mutex_unlock(&sd_mtx);
+    spinlock_unlock(&sd_mtx);
 
     return ret;
 }

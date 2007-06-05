@@ -139,6 +139,9 @@ enum audio_sources
     AUDIO_SRC_DEFAULT = AUDIO_SRC_PLAYBACK
 };
 
+extern int audio_channels;
+extern int audio_output_source;
+
 #ifdef HAVE_RECORDING
 /* Recordable source implies it has the input as well */
 

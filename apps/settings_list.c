@@ -792,15 +792,21 @@ const struct settings_list settings[] = {
     {F_T_INT|F_RECSETTING,&global_settings.cliplight,LANG_CLIP_LIGHT,INT(0),
         "cliplight","off,main,both,remote",UNUSED},
 #endif
+#ifdef DEFAULT_REC_MIC_GAIN
     {F_T_INT|F_RECSETTING,&global_settings.rec_mic_gain,
         LANG_RECORDING_GAIN,INT(DEFAULT_REC_MIC_GAIN),
         "rec mic gain",NULL,UNUSED},
+#endif /* DEFAULT_REC_MIC_GAIN */
+#ifdef DEFAULT_REC_LEFT_GAIN
     {F_T_INT|F_RECSETTING,&global_settings.rec_left_gain,
         LANG_RECORDING_LEFT,INT(DEFAULT_REC_LEFT_GAIN),
         "rec left gain",NULL,UNUSED},
+#endif /* DEFAULT_REC_LEFT_GAIN */
+#ifdef DEFAULT_REC_RIGHT_GAIN
     {F_T_INT|F_RECSETTING,&global_settings.rec_right_gain,LANG_RECORDING_RIGHT,
         INT(DEFAULT_REC_RIGHT_GAIN),
         "rec right gain",NULL,UNUSED},
+#endif /* DEFAULT_REC_RIGHT_GAIN */
 #if CONFIG_CODEC == MAS3587F
     {F_T_INT|F_RECSETTING,&global_settings.rec_frequency,
         LANG_RECORDING_FREQUENCY,

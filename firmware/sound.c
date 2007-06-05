@@ -743,6 +743,7 @@ void sound_set(int setting, int value)
         sound_set_val(value);
 }
 
+#ifndef HAVE_AS3514
 int sound_val2phys(int setting, int value)
 {
 #if CONFIG_CODEC == MAS3587F
@@ -804,6 +805,7 @@ int sound_val2phys(int setting, int value)
     return value;
 #endif
 }
+#endif /* HAVE_AS3514 */
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 #ifndef SIMULATOR
