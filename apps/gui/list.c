@@ -25,6 +25,7 @@
 #include "string.h"
 #include "settings.h"
 #include "kernel.h"
+#include "system.h"
 
 #include "action.h"
 #include "screen_access.h"
@@ -39,7 +40,7 @@
 #ifdef HAVE_LCD_CHARCELLS
 #define SCROLL_LIMIT 1
 #else
-#define SCROLL_LIMIT ((nb_lines/4)<2?2:nb_lines/4)
+#define SCROLL_LIMIT (nb_lines<3?1:2)
 #endif
 
 /* The minimum number of pending button events in queue before starting
@@ -57,9 +58,7 @@ static struct gui_list* last_list_displayed[NB_SCREENS];
 #define SHOW_LIST_TITLE ((gui_list->title != NULL) && \
                          (gui_list->display->nb_lines > 2))
 
-static void gui_list_put_selection_in_screen(struct gui_list * gui_list,
-                                             bool put_from_end);
-
+static void gui_list_select_at_offset(struct gui_list * gui_list, int offset);
 
 /*
  * Initializes a scrolling list
@@ -113,7 +112,7 @@ static void gui_list_set_display(struct gui_list * gui_list, struct screen * dis
 #ifdef HAVE_LCD_CHARCELLS
     display->double_height(false);
 #endif
-    gui_list_put_selection_in_screen(gui_list, false);
+    gui_list_select_at_offset(gui_list, 0);
 }
 
 /*
@@ -153,51 +152,6 @@ static void gui_list_flash(struct gui_list * gui_list)
 #endif
 }
 
-/*
- * Puts the selection in the screen
- *  - gui_list : the list structure
- *  - put_from_end : if true, selection will be put as close from
- *                   the end of the list as possible, else, it's
- *                   from the beginning
- */
-static void gui_list_put_selection_in_screen(struct gui_list * gui_list,
-                                      bool put_from_end)
-{
-#ifdef HAVE_LCD_BITMAP
-    gui_list->display->setfont(FONT_UI);
-#endif
-    gui_textarea_update_nblines(gui_list->display);
-    int nb_lines=gui_list->display->nb_lines;
-    if (SHOW_LIST_TITLE)
-        nb_lines--;
-    if (gui_list->nb_items < nb_lines)
-    {
-        gui_list->start_item = 0;
-    }
-    else if (global_settings.scroll_paginated && 
-             gui_list->nb_items - gui_list->selected_item < nb_lines)
-    {
-        gui_list->start_item = gui_list->nb_items - nb_lines;
-    }
-    else if(put_from_end)
-    {
-        int list_end = gui_list->selected_item + SCROLL_LIMIT;
-        if(list_end >= gui_list->nb_items)
-            list_end = gui_list->nb_items;
-        gui_list->start_item = list_end - nb_lines;
-    }
-    else if (gui_list->nb_items-gui_list->selected_item < nb_lines)
-    {
-        gui_list->start_item = gui_list->nb_items - nb_lines;
-    }
-    else
-    {
-        int list_start = gui_list->selected_item - SCROLL_LIMIT - 1;
-        gui_list->start_item = list_start;
-        if(gui_list->start_item < 0)
-            gui_list->start_item = 0;
-    }
-}
 
 #ifdef HAVE_LCD_BITMAP
 static int gui_list_get_item_offset(struct gui_list * gui_list, int item_width,
@@ -505,85 +459,116 @@ static void gui_list_select_item(struct gui_list * gui_list, int item_number)
     if( item_number > gui_list->nb_items-1 || item_number < 0 )
         return;
     gui_list->selected_item = item_number;
-    gui_list_put_selection_in_screen(gui_list, false);
+    gui_list_select_at_offset(gui_list, 0);
 }
 
-static void gui_list_select_at_offset(struct gui_list * gui_list, int offset)
+/* select an item above the current one */
+static void gui_list_select_above(struct gui_list * gui_list, int items)
 {
     int nb_lines = gui_list->display->nb_lines;
     if (SHOW_LIST_TITLE)
         nb_lines--;
     
+    gui_list->selected_item -= items;
+    /* in bottom "3rd" of the screen, so dont move the start item.
+       by 3rd I mean above SCROLL_LIMIT lines above the end of the screen */
+    if (items && gui_list->start_item + SCROLL_LIMIT < gui_list->selected_item)
+        return;
+    if (gui_list->selected_item < 0)
+    {
+        if(gui_list->limit_scroll)
+        {
+            gui_list->selected_item = 0;
+            gui_list->start_item = 0;
+        }
+        else
+        {
+            gui_list->selected_item += gui_list->nb_items;
+            if (global_settings.scroll_paginated)
+            {
+                gui_list->start_item = gui_list->nb_items - nb_lines;
+            }
+        }
+    }
+    if (gui_list->nb_items > nb_lines)
+    {
+        if (global_settings.scroll_paginated)
+        {
+            if (gui_list->start_item > gui_list->selected_item)
+                gui_list->start_item = MAX(0, gui_list->start_item - nb_lines);
+        }
+        else
+        {
+            int top_of_screen = gui_list->selected_item - SCROLL_LIMIT;
+            int temp = MIN(top_of_screen, gui_list->nb_items - nb_lines);
+            gui_list->start_item = MAX(0, temp);
+        }
+    }
+    else gui_list->start_item = 0;
+    if (gui_list->selected_size > 1)
+    {
+        if (gui_list->start_item + nb_lines == gui_list->selected_item)
+            gui_list->start_item++;
+    }
+}
+/* select an item below the current one */
+static void gui_list_select_below(struct gui_list * gui_list, int items)
+{
+    int nb_lines = gui_list->display->nb_lines;
+    if (SHOW_LIST_TITLE)
+        nb_lines--;
+    
+    gui_list->selected_item += items;
+    /* in top "3rd" of the screen, so dont move the start item */
+    if (items && 
+        (gui_list->start_item + nb_lines - SCROLL_LIMIT > gui_list->selected_item)
+        && (gui_list->selected_item < gui_list->nb_items))
+        return;
+    
+    if (gui_list->selected_item >= gui_list->nb_items)
+    {
+        if(gui_list->limit_scroll)
+        {
+            gui_list->selected_item = gui_list->nb_items-gui_list->selected_size;
+            gui_list->start_item = MAX(0,gui_list->nb_items - nb_lines);
+        }
+        else
+        {
+            gui_list->selected_item = 0;
+            gui_list->start_item = 0;
+        }
+        return;
+    }
+    int bottom = gui_list->nb_items - nb_lines;
+    if (gui_list->nb_items > nb_lines)
+    {
+        if (global_settings.scroll_paginated)
+        {
+            if (gui_list->start_item + nb_lines <= gui_list->selected_item)
+                gui_list->start_item = MIN(bottom, gui_list->selected_item);
+        }
+        else
+        {
+            int top_of_screen = gui_list->selected_item + SCROLL_LIMIT - nb_lines;
+            int temp = MAX(0, top_of_screen);
+            gui_list->start_item = MIN(bottom, temp);
+        }
+    }
+    else gui_list->start_item = 0;
+}
 
+static void gui_list_select_at_offset(struct gui_list * gui_list, int offset)
+{
     if (gui_list->selected_size > 1)
     {
         offset *= gui_list->selected_size;
         /* always select the first item of multi-line lists */
         offset -= offset%gui_list->selected_size;
     }
-    gui_list->selected_item += offset;
-        
-    if (offset < 0) /* moving up the list */
-    {
-        if (gui_list->selected_item < 0)
-        {
-            if(gui_list->limit_scroll)
-            {
-                gui_list->selected_item = 0;
-                gui_list->start_item = 0;
-            }
-            else
-            {
-                gui_list->selected_item = gui_list->nb_items - 
-                                            gui_list->selected_size;
-                if (gui_list->nb_items >= nb_lines )
-                    gui_list->start_item = gui_list->selected_item - 
-                                            nb_lines + gui_list->selected_size;
-            }
-            return;
-        }
-        if (global_settings.scroll_paginated)
-        {
-            if (gui_list->selected_item < gui_list->start_item)
-            {
-                gui_list->start_item -= nb_lines;
-                if (gui_list->start_item < 0)
-                    gui_list->start_item = 0;
-            }
-        }
-        else if (gui_list->selected_item - gui_list->start_item <= SCROLL_LIMIT)
-            gui_list_put_selection_in_screen(gui_list, false);
-    }
-    else /* moving down */
-    {
-        if (gui_list->selected_item >= gui_list->nb_items)
-        {
-            if(gui_list->limit_scroll)
-            {
-                if (gui_list->nb_items >= nb_lines)
-                    gui_list->start_item = gui_list->nb_items - nb_lines;
-                gui_list->selected_item = gui_list->nb_items - 
-                                          gui_list->selected_size;
-            }
-            else
-            {
-                gui_list->selected_item = 0;
-                gui_list->start_item = 0;
-            }
-            return;
-        }
-        if (global_settings.scroll_paginated)
-        {
-            if (gui_list->selected_item - gui_list->start_item >= nb_lines)
-            {
-                gui_list->start_item = gui_list->selected_item;
-                if (gui_list->nb_items - gui_list->start_item < nb_lines)
-                    gui_list->start_item = gui_list->nb_items - nb_lines;
-            }
-        }
-        else if (nb_lines - (gui_list->selected_item - gui_list->start_item) <= SCROLL_LIMIT)
-            gui_list_put_selection_in_screen(gui_list, true);
-    }
+    if (offset < 0)
+        gui_list_select_above(gui_list, -offset);
+    else
+        gui_list_select_below(gui_list, offset);
 }
 
 /*
