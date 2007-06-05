@@ -107,6 +107,9 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* SPC700 Save State */
     [AFMT_SPC] =
         AFMT_ENTRY("SPC",  "spc",     NULL,          "spc\0"      ),
+    /* APE (Monkey's Audio) */
+    [AFMT_APE] =
+        AFMT_ENTRY("APE",  "ape",     NULL,          "ape\0mac\0"      ),
 #endif
 };
 

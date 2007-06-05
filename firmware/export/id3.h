@@ -53,6 +53,7 @@ enum
     AFMT_NSF,          /* NESM (NES Sound Format) */
     AFMT_SPEEX,        /* Ogg Speex speech */
     AFMT_SPC,          /* SPC700 save state */
+    AFMT_APE,          /* Monkey's Audio (APE) */
 #endif
 
     /* add new formats at any index above this line to have a sensible order -

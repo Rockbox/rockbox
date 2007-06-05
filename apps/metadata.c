@@ -982,6 +982,56 @@ static bool get_flac_metadata(int fd, struct mp3entry* id3)
     return true;
 }
 
+static bool get_monkeys_metadata(int fd, struct mp3entry* id3)
+{
+    /* Use the trackname part of the id3 structure as a temporary buffer */
+    unsigned char* buf = (unsigned char *)id3->path;
+    unsigned char* header;
+    bool rc = false;
+    uint32_t descriptorlength;
+    uint32_t totalsamples;
+    uint32_t blocksperframe, finalframeblocks, totalframes;
+
+    lseek(fd, 0, SEEK_SET);
+
+    if (read(fd, buf, 4) < 4)
+    {
+        return rc;
+    }
+    
+    if (memcmp(buf, "MAC ", 4) != 0) 
+    {
+        return rc;
+    }
+
+    read(fd, buf + 4, MAX_PATH - 4);
+
+    descriptorlength = buf[8] | (buf[9] << 8) | 
+                     (buf[10] << 16) | (buf[11] << 24);
+
+    header = buf + descriptorlength;
+
+    blocksperframe = header[4] | (header[5] << 8) | 
+                     (header[6] << 16) | (header[7] << 24);
+    finalframeblocks = header[8] | (header[9] << 8) | 
+                       (header[10] << 16) | (header[11] << 24);
+    totalframes = header[12] | (header[13] << 8) | 
+                  (header[14] << 16) | (header[15] << 24);
+
+    id3->vbr = true;   /* All FLAC files are VBR */
+    id3->filesize = filesize(fd);
+    id3->frequency = header[20] | (header[21] << 8) | 
+                     (header[22] << 16) | (header[23] << 24);
+
+    totalsamples = finalframeblocks;
+    if (totalframes > 1)
+        totalsamples += blocksperframe * (totalframes-1);
+
+    id3->length = ((int64_t) totalsamples * 1000) / id3->frequency;
+    id3->bitrate = (id3->filesize * 8) / id3->length;
+    return true;
+}
+
 static bool get_wave_metadata(int fd, struct mp3entry* id3)
 {
     /* Use the trackname part of the id3 structure as a temporary buffer */
@@ -2150,6 +2200,14 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
             return false;
         }
 
+        break;
+
+    case AFMT_APE:
+        if (!get_monkeys_metadata(fd, &(track->id3)))
+        {
+            return false;
+        }
+        read_ape_tags(fd, &(track->id3));
         break;
 
     case AFMT_MPC:

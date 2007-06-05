@@ -11,6 +11,7 @@ alac.c
 #if MEMORYSIZE > 1
 aac.c
 #endif
+ape.c
 shorten.c
 aiff.c
 speex.c
