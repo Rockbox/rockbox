@@ -26,6 +26,10 @@
 static int frequency = 0;
 static bool mono = false;
 
+#ifdef HAVE_TUNER_PWR_CTRL
+static bool powered = false;
+#endif
+
 int radio_set(int setting, int value)
 {
     switch(setting)
@@ -80,5 +84,14 @@ int radio_get(int setting)
     }
     return val;
 }
+
+#ifdef HAVE_TUNER_PWR_CTRL
+bool radio_power(bool status)
+{
+    bool oldstatus = powered;
+    powered = status;
+    return oldstatus;
+}
+#endif
 
 #endif
