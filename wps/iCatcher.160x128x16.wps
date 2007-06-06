@@ -72,4 +72,5 @@
 %xl|X|codec-aac.bmp|115|85|
 %xl|Y|codec-shorten.bmp|115|85|
 %xl|Z|codec-unknown.bmp|115|85|
-%?fc<%xdr|%xds|%xdt|%xdu|%xdv|%xdw|%xdx|%xdy|%xdz|%xdV|%xdW|%xdX|%xdY|%xdZ>
+%xl|Q|codec-ape.bmp|115|85|
+%?fc<%xdr|%xds|%xdt|%xdu|%xdv|%xdw|%xdx|%xdy|%xdz|%xdV|%xdW|%xdX|%xdY|%xdZ|%xdZ|%xdZ|%xdZ|%xdZ|%xdQ>

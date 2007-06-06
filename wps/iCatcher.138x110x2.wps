@@ -1,4 +1,5 @@
 %wd
+%X|bg-138x110x2.bmp|
 
 
 
@@ -68,8 +69,5 @@
 %xl|X|codec-aac-g.bmp|95|66|
 %xl|Y|codec-shorten-g.bmp|95|66|
 %xl|Z|codec-unknown-g.bmp|95|66|
-%?fc<%xdr|%xds|%xdt|%xdu|%xdv|%xdw|%xdx|%xdy|%xdz|%xdV|%xdW|%xdX|%xdY|%xdZ>
-%xl|F|upbar-138.bmp|0|0|
-%xl|J|bottomline-138.bmp|0|92|
-%xl|Q|batlevel.bmp|4|32|
-%xdF%xdJ%xdQ
+%xl|Q|codec-ape-g.bmp|95|66|
+%?fc<%xdr|%xds|%xdt|%xdu|%xdv|%xdw|%xdx|%xdy|%xdz|%xdV|%xdW|%xdX|%xdY|%xdZ|%xdZ|%xdZ|%xdZ|%xdZ|%xdQ>
