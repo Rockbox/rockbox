@@ -402,7 +402,6 @@ void audiohw_set_monitor(int enable)
 
     if (enable) {
         source = SOURCE_LINE_IN1_ANALOG;
-        audiohw_set_master_vol(as3514.vol_l, as3514.vol_r);
 
         /* LI1R_Mute_off */
         line_in1_r |= (1 << 5);
@@ -415,4 +414,7 @@ void audiohw_set_monitor(int enable)
     as3514_write(AUDIOSET1, audioset1);
     as3514_write(LINE_IN1_R, line_in1_r);
     as3514_write(LINE_IN1_L, line_in1_l);
+
+    /* Sync mixer volume */
+    audiohw_set_master_vol(as3514.vol_l, as3514.vol_r);
 }

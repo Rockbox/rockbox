@@ -156,6 +156,9 @@ tuner_samsung.c
 drivers/fmradio_i2c.c
 tuner_philips.c
 #endif /* (CONFIG_TUNER & TEA5767) */
+#if (CONFIG_TUNER & LV24020LP)
+tuner_sanyo.c
+#endif /* (CONFIG_TUNER & LV24020LP) */
 #endif /*SIMULATOR */
 #endif /* CONFIG_TUNER */
 

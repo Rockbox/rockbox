@@ -219,6 +219,17 @@ static const struct button_mapping button_context_recscreen[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_recscreen */
 
+/** FM Radio Screen **/
+static const struct button_mapping button_context_radio[]  = {
+    { ACTION_FM_MENU,        BUTTON_DOWN,                       BUTTON_NONE },
+    { ACTION_FM_PRESET,      BUTTON_SELECT,                     BUTTON_NONE },
+    { ACTION_FM_STOP,        BUTTON_UP|BUTTON_REPEAT,           BUTTON_UP  },
+    { ACTION_FM_MODE,        BUTTON_REC,                        BUTTON_NONE },
+    { ACTION_FM_EXIT,        BUTTON_POWER,                      BUTTON_NONE },
+    { ACTION_FM_PLAY,        BUTTON_UP|BUTTON_REL,              BUTTON_UP },
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
+}; /* button_context_radio */
+
 static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_LEFT,         BUTTON_LEFT,                      BUTTON_NONE },
     { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,        BUTTON_NONE },
@@ -283,7 +294,9 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_settings_time;
 
         case CONTEXT_YESNOSCREEN:
-            return button_context_yesno;            
+            return button_context_yesno;
+        case CONTEXT_FM:
+            return button_context_radio;
         case CONTEXT_BOOKMARKSCREEN:
             return button_context_bmark;
         case CONTEXT_QUICKSCREEN:

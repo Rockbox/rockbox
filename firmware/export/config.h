@@ -29,6 +29,7 @@
 /* CONFIG_TUNER (note these are combineable bit-flags) */
 #define S1A0903X01 0x01 /* Samsung */
 #define TEA5767    0x02 /* Philips */
+#define LV24020LP  0x04 /* Sanyo */
 
 /* CONFIG_CODEC */
 #define MAS3587F 3587

@@ -1990,16 +1990,48 @@ static bool dbg_fm_radio(void)
 
     lcd_setmargins(0, 0);
 
+    fm_detected = radio_hardware_present();
+
     while(1)
     {
         int row = 0;
 
         lcd_clear_display();
-        fm_detected = radio_hardware_present();
 
         snprintf(buf, sizeof buf, "HW detected: %s", fm_detected?"yes":"no");
         lcd_puts(0, row++, buf);
+#if (CONFIG_TUNER & LV24020LP)
+        if (fm_detected)
+        {
+            snprintf(buf, sizeof buf, "CTRL_STAT: %02X",
+                     sanyo_get(RADIO_ALL) );
+            lcd_puts(0, row++, buf);
 
+            snprintf(buf, sizeof buf, "RADIO_STAT: %02X",
+                     sanyo_get(RADIO_REG_STAT));
+            lcd_puts(0, row++, buf);
+
+            snprintf(buf, sizeof buf, "MSS_FM: %d kHz",
+                     (sanyo_get(RADIO_MSS_FM) ) );
+            lcd_puts(0, row++, buf);
+
+            snprintf(buf, sizeof buf, "MSS_IF: %d Hz",
+                     (sanyo_get(RADIO_MSS_IF) ) );
+            lcd_puts(0, row++, buf);
+
+            snprintf(buf, sizeof buf, "MSS_SD: %d Hz",
+                     (sanyo_get(RADIO_MSS_SD) ) );
+            lcd_puts(0, row++, buf);
+
+            snprintf(buf, sizeof buf, "if_set: %d Hz",
+                     (sanyo_get(RADIO_IF_SET) ) );
+            lcd_puts(0, row++, buf);
+
+            snprintf(buf, sizeof buf, "sd_set: %d Hz",
+                     (sanyo_get(RADIO_SD_SET) ) );
+            lcd_puts(0, row++, buf);
+        }
+#endif
 #if (CONFIG_TUNER & S1A0903X01)
         snprintf(buf, sizeof buf, "Samsung regs: %08X",
                  samsung_get(RADIO_ALL));

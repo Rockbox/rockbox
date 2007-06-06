@@ -42,11 +42,8 @@ void audio_set_output_source(int source)
 void audio_set_source(int source, unsigned flags)
 {
     static int last_source = AUDIO_SRC_PLAYBACK;
-#if 0
     static bool last_recording = false;
     bool recording = flags & SRCF_RECORDING;
-#endif
-    (void)flags;
 
     switch (source)
     {
@@ -70,12 +67,8 @@ void audio_set_source(int source, unsigned flags)
             }
             break;
 
-#if 0
         case AUDIO_SRC_FMRADIO:         /* recording and playback */
             audio_channels = 2;
-
-            if (!recording)
-                audiohw_set_recvol(23, 23, AUDIO_GAIN_LINEIN);
 
             if (source == last_source && recording == last_recording)
                 break;
@@ -92,9 +85,7 @@ void audio_set_source(int source, unsigned flags)
                 audiohw_disable_recording();
                 audiohw_set_monitor(true); /* line 1 analog audio path */
             }
-
             break;
-#endif
     } /* end switch */
 
     last_source = source;

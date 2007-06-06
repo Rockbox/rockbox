@@ -90,6 +90,13 @@
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define FM_RECORD_DBLPRE
 #define FM_RECORD
+#elif (CONFIG_KEYPAD == SANSA_E200_PAD)
+#define FM_MENU     
+#define FM_PRESET    
+#define FM_STOP
+#define FM_MODE
+#define FM_EXIT
+#define FM_PLAY
 #endif
 
 #define RADIO_SCAN_MODE 0
@@ -97,10 +104,14 @@
 
 static const struct fm_region_setting fm_region[] = {
     /* Note: Desriptive strings are just for display atm and are not compiled. */
-    FM_REGION_ENTRY("Europe",    87500000, 108000000,  50000, 0, 0),
-    FM_REGION_ENTRY("US/Canada", 87900000, 107900000, 200000, 1, 0),
-    FM_REGION_ENTRY("Japan",     76000000,  90000000, 100000, 0, 1),
-    FM_REGION_ENTRY("Korea",     87500000, 108000000, 100000, 0, 0),
+    [REGION_EUROPE] =
+        FM_REGION_ENTRY("Europe",    87500000, 108000000,  50000, 0, 0),
+    [REGION_US_CANADA] =
+        FM_REGION_ENTRY("US/Canada", 87900000, 107900000, 200000, 1, 0),
+    [REGION_JAPAN] =
+        FM_REGION_ENTRY("Japan",     76000000,  90000000, 100000, 0, 1),
+    [REGION_KOREA] =
+        FM_REGION_ENTRY("Korea",     87500000, 108000000, 100000, 0, 0),
     };
 
 static int curr_preset = -1;
@@ -158,13 +169,18 @@ bool in_radio_screen(void)
     return in_screen;   
 } 
 
+/* TODO: Move some more of the control functionality to an HAL and clean up the
+   mess */
+
 /* secret flag for starting paused - prevents unmute */
 #define FMRADIO_START_PAUSED 0x8000
 void radio_start(void)
 {
     const struct fm_region_setting *fmr;
     bool start_paused;
+#if CONFIG_TUNER != LV24020LP
     int mute_timeout;
+#endif
 
     if(radio_status == FMRADIO_PLAYING)
         return;
@@ -182,7 +198,13 @@ void radio_start(void)
         * fmr->freq_step + fmr->freq_min;
 
     radio_set(RADIO_SLEEP, 0); /* wake up the tuner */
+#if (CONFIG_TUNER & LV24020LP)
+    radio_set(RADIO_REGION, global_settings.fm_region);
+    radio_set(RADIO_FORCE_MONO, global_settings.fm_force_mono);
+#endif
     radio_set(RADIO_FREQUENCY, curr_freq);
+
+#if CONFIG_TUNER != LV24020LP
 
     if(radio_status == FMRADIO_OFF)
     {
@@ -209,6 +231,7 @@ void radio_start(void)
              break;
         yield();
     }
+#endif /* CONFIG_TUNER != LV24020LP */
 
     /* keep radio from sounding initially */
     if(!start_paused)
@@ -1311,6 +1334,9 @@ void toggle_mono_mode(bool mono)
 
 void set_radio_region(int region)
 {
+#if (CONFIG_TUNER & LV24020LP)
+    radio_set(RADIO_REGION, global_settings.fm_region);
+#endif
 #if (CONFIG_TUNER & TEA5767)
     radio_set(RADIO_SET_DEEMPHASIS, 
         fm_region[region].deemphasis);
