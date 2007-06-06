@@ -2,7 +2,7 @@
 
 libdemac - A Monkey's Audio decoder
 
-$Id:$
+$Id$
 
 Copyright (C) Dave Chapman 2007
 
@@ -70,39 +70,71 @@ int ape_parseheaderbuf(unsigned char* buf, struct ape_ctx_t* ape_ctx)
 
     if (ape_ctx->fileversion >= 3980)
     {
-    ape_ctx->padding1 = get_int16(buf + 6);
-    ape_ctx->descriptorlength = get_uint32(buf + 8);
-    ape_ctx->headerlength = get_uint32(buf + 12);
-    ape_ctx->seektablelength = get_uint32(buf + 16);
-    ape_ctx->wavheaderlength = get_uint32(buf + 20);
-    ape_ctx->audiodatalength = get_uint32(buf + 24);
-    ape_ctx->audiodatalength_high = get_uint32(buf + 28);
-    ape_ctx->wavtaillength = get_uint32(buf + 32);
-    memcpy(ape_ctx->md5, buf + 36, 16);
+        ape_ctx->padding1 = get_int16(buf + 6);
+        ape_ctx->descriptorlength = get_uint32(buf + 8);
+        ape_ctx->headerlength = get_uint32(buf + 12);
+        ape_ctx->seektablelength = get_uint32(buf + 16);
+        ape_ctx->wavheaderlength = get_uint32(buf + 20);
+        ape_ctx->audiodatalength = get_uint32(buf + 24);
+        ape_ctx->audiodatalength_high = get_uint32(buf + 28);
+        ape_ctx->wavtaillength = get_uint32(buf + 32);
+        memcpy(ape_ctx->md5, buf + 36, 16);
 
-    header = buf + ape_ctx->descriptorlength;
+        header = buf + ape_ctx->descriptorlength;
 
-    /* Read header data */
-    ape_ctx->compressiontype = get_uint16(header + 0);
-    ape_ctx->formatflags = get_uint16(header + 2);
-    ape_ctx->blocksperframe = get_uint32(header + 4);
-    ape_ctx->finalframeblocks = get_uint32(header + 8);
-    ape_ctx->totalframes = get_uint32(header + 12);
-    ape_ctx->bps = get_uint16(header + 16);
-    ape_ctx->channels = get_uint16(header + 18);
-    ape_ctx->samplerate = get_uint32(header + 20);
+        /* Read header data */
+        ape_ctx->compressiontype = get_uint16(header + 0);
+        ape_ctx->formatflags = get_uint16(header + 2);
+        ape_ctx->blocksperframe = get_uint32(header + 4);
+        ape_ctx->finalframeblocks = get_uint32(header + 8);
+        ape_ctx->totalframes = get_uint32(header + 12);
+        ape_ctx->bps = get_uint16(header + 16);
+        ape_ctx->channels = get_uint16(header + 18);
+        ape_ctx->samplerate = get_uint32(header + 20);
 
-    ape_ctx->firstframe = ape_ctx->junklength + ape_ctx->descriptorlength +
-                           ape_ctx->headerlength + ape_ctx->seektablelength +
-                           ape_ctx->wavheaderlength;
+        ape_ctx->firstframe = ape_ctx->junklength + ape_ctx->descriptorlength +
+                              ape_ctx->headerlength + ape_ctx->seektablelength +
+                              ape_ctx->wavheaderlength;
     } else {
+        ape_ctx->headerlength = 32;
         ape_ctx->compressiontype = get_uint16(buf + 6);
         ape_ctx->formatflags = get_uint16(buf + 8);
         ape_ctx->channels = get_uint16(buf + 10);
-        ape_ctx->samplerate = get_uint32(buf + 14);
-        ape_ctx->wavheaderlength = get_uint32(buf + 18);
-        ape_ctx->totalframes = get_uint32(buf + 26);
-        ape_ctx->finalframeblocks = get_uint32(buf + 30);
+        ape_ctx->samplerate = get_uint32(buf + 12);
+        ape_ctx->wavheaderlength = get_uint32(buf + 16);
+        ape_ctx->totalframes = get_uint32(buf + 24);
+        ape_ctx->finalframeblocks = get_uint32(buf + 28);
+
+        if (ape_ctx->formatflags & MAC_FORMAT_FLAG_HAS_PEAK_LEVEL)
+        {
+            ape_ctx->headerlength += 4;
+        }
+
+        if (ape_ctx->formatflags & MAC_FORMAT_FLAG_HAS_SEEK_ELEMENTS)
+        {
+            ape_ctx->seektablelength = get_uint32(buf + ape_ctx->headerlength);
+            ape_ctx->seektablelength *= sizeof(int32_t);
+            ape_ctx->headerlength += 4;
+        } else {
+            ape_ctx->seektablelength = ape_ctx->totalframes * sizeof(int32_t);
+        }
+
+        if (ape_ctx->formatflags & MAC_FORMAT_FLAG_8_BIT)
+            ape_ctx->bps = 8;
+        else if (ape_ctx->formatflags & MAC_FORMAT_FLAG_24_BIT)
+            ape_ctx->bps = 24;
+        else
+            ape_ctx->bps = 16;
+
+        if (ape_ctx->fileversion >= 3950)
+            ape_ctx->blocksperframe = 73728 * 4;
+        else if ((ape_ctx->fileversion >= 3900) || (ape_ctx->fileversion >= 3800 && ape_ctx->compressiontype >= 4000))
+            ape_ctx->blocksperframe = 73728;
+        else
+            ape_ctx->blocksperframe = 9216;
+
+        ape_ctx->firstframe = ape_ctx->junklength + ape_ctx->headerlength + 
+                              ape_ctx->seektablelength + ape_ctx->wavheaderlength;
     }
 
     ape_ctx->totalsamples = ape_ctx->finalframeblocks;

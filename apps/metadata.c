@@ -183,6 +183,14 @@ static unsigned long get_long_le(void* buf)
     return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
 }
 
+/* Read an unaligned 16-bit little endian short from buffer. */
+static unsigned short get_short_le(void* buf)
+{
+    unsigned char* p = (unsigned char*) buf;
+
+    return p[0] | (p[1] << 8);
+}
+
 /* Read an unaligned 32-bit big endian long from buffer. */
 static unsigned long get_long_be(void* buf)
 {
@@ -991,6 +999,7 @@ static bool get_monkeys_metadata(int fd, struct mp3entry* id3)
     uint32_t descriptorlength;
     uint32_t totalsamples;
     uint32_t blocksperframe, finalframeblocks, totalframes;
+    int fileversion;
 
     lseek(fd, 0, SEEK_SET);
 
@@ -1006,22 +1015,36 @@ static bool get_monkeys_metadata(int fd, struct mp3entry* id3)
 
     read(fd, buf + 4, MAX_PATH - 4);
 
-    descriptorlength = buf[8] | (buf[9] << 8) | 
-                     (buf[10] << 16) | (buf[11] << 24);
+    fileversion = get_short_le(buf+4);
+    if (fileversion < 3970)
+    {
+        /* Not supported */
+        return false;
+    }
 
-    header = buf + descriptorlength;
+    if (fileversion >= 3980)
+    {
+        descriptorlength = get_long_le(buf+8);
 
-    blocksperframe = header[4] | (header[5] << 8) | 
-                     (header[6] << 16) | (header[7] << 24);
-    finalframeblocks = header[8] | (header[9] << 8) | 
-                       (header[10] << 16) | (header[11] << 24);
-    totalframes = header[12] | (header[13] << 8) | 
-                  (header[14] << 16) | (header[15] << 24);
+        header = buf + descriptorlength;
+
+        blocksperframe = get_long_le(header+4);
+        finalframeblocks = get_long_le(header+8);
+        totalframes = get_long_le(header+12);
+        id3->frequency = get_long_le(header+20);
+    } 
+    else 
+    {
+        /* v3.95 and later files all have a fixed framesize */
+        blocksperframe = 73728 * 4;
+
+        finalframeblocks = get_long_le(buf+30);
+        totalframes = get_long_le(buf+26);
+        id3->frequency = get_long_le(buf+14);
+    }
 
     id3->vbr = true;   /* All FLAC files are VBR */
     id3->filesize = filesize(fd);
-    id3->frequency = header[20] | (header[21] << 8) | 
-                     (header[22] << 16) | (header[23] << 24);
 
     totalsamples = finalframeblocks;
     if (totalframes > 1)
