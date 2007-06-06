@@ -160,8 +160,8 @@ PLUGIN_HEADER
 #define STARTING_QIXES 2
 #define MAX_LEVEL 10
 #define MAX_QIXES MAX_LEVEL+STARTING_QIXES
-#define BOARD_W ((int)LCD_WIDTH/CUBE_SIZE)
-#define BOARD_H ((int)LCD_HEIGHT/CUBE_SIZE)
+#define BOARD_W ((int)(LCD_WIDTH/CUBE_SIZE))
+#define BOARD_H ((int)(LCD_HEIGHT/CUBE_SIZE))
 #define BOARD_X (LCD_WIDTH-BOARD_W*CUBE_SIZE)/2
 #define BOARD_Y (LCD_HEIGHT-BOARD_H*CUBE_SIZE)/2
 
@@ -259,7 +259,7 @@ static int percentage_cache;
 /*************************** STACK STUFF **********************/
 
 /* the stack */
-#define STACK_SIZE BOARD_W*BOARD_H
+#define STACK_SIZE (2*BOARD_W*BOARD_H)
 static struct pos
 {
     int x, y;                   /* position on board */
@@ -355,22 +355,24 @@ static void init_board (void)
             else
                 board[j][i] = EMPTIED;
         }
+
     /* (level+2) is the number of qixes */
     for (j = 0; j < player.level + STARTING_QIXES; j++) {
         qixes[j].velocity = t_rand (2) + 1;     /* 1 or 2 pix-per-sec */
 
         /* not on frame */
-        qixes[j].x =
-            BOARD_X + t_rand (((BOARD_W - 4) * CUBE_SIZE) - 2 * CUBE_SIZE) +
-            2 * CUBE_SIZE;
-        qixes[j].y =
-            BOARD_Y + t_rand (((BOARD_H - 6) * CUBE_SIZE) - 2 * CUBE_SIZE) +
-            3 * CUBE_SIZE;
+        qixes[j].x = CUBE_SIZE*2 + 2*t_rand (((BOARD_W-4)*CUBE_SIZE)/2);
+        qixes[j].y = CUBE_SIZE*2 + 2*t_rand (((BOARD_H-4)*CUBE_SIZE)/2);
 
         const int angle_table[] = {
             MOVE_UUR, MOVE_UR, MOVE_URR, MOVE_DRR, MOVE_DR, MOVE_DDR,
             MOVE_UUL, MOVE_UL, MOVE_ULL, MOVE_DLL, MOVE_DL, MOVE_DDL };
         qixes[j].angle = angle_table[t_rand (12)];
+#if CUBE_SIZE == 4
+        /* Work arround a nasty bug. FIXME */
+        if( qixes[j].angle & (DIR_LL|DIR_RR|DIR_UU|DIR_DD) )
+            qixes[j].velocity = 1;
+#endif
     }
     /*black_qix.velocity=1;
        black_qix.x=BOARD_X+(BOARD_W*CUBE_SIZE)/2-CUBE_SIZE/2;
@@ -669,39 +671,23 @@ static void die (void)
  */
 static inline bool line_check_lt (int newx, int newy)
 {
-    int i = 0;
-    for (i = ((CUBE_SIZE/2)-1); i < CUBE_SIZE - ((CUBE_SIZE/2)-1); i++) {
-        if (getpixel (newx, newy + i) != FILLED)
-            return false;
-    }
-    return true;
+    return    getpixel (newx, newy + CUBE_SIZE/2-1) == FILLED
+           && getpixel (newx, newy + CUBE_SIZE/2  ) == FILLED;
 }
 static inline bool line_check_rt (int newx, int newy)
 {
-    int i = 0;
-    for (i = ((CUBE_SIZE/2)-1); i < CUBE_SIZE - ((CUBE_SIZE/2)-1); i++) {
-        if (getpixel (newx + CUBE_SIZE - 1, newy + i) != FILLED)
-            return false;
-    }
-    return true;
+    return    getpixel (newx + CUBE_SIZE-1, newy + CUBE_SIZE/2-1) == FILLED
+           && getpixel (newx + CUBE_SIZE-1, newy + CUBE_SIZE/2  ) == FILLED;
 }
 static inline bool line_check_up (int newx, int newy)
 {
-    int i = 0;
-    for (i = ((CUBE_SIZE/2)-1); i < CUBE_SIZE - ((CUBE_SIZE/2)-1); i++) {
-        if (getpixel (newx + i, newy) != FILLED)
-            return false;
-    }
-    return true;
+    return    getpixel (newx + CUBE_SIZE/2-1, newy) == FILLED
+           && getpixel (newx + CUBE_SIZE/2  , newy) == FILLED;
 }
 static inline bool line_check_dn (int newx, int newy)
 {
-    int i = 0;
-    for (i = ((CUBE_SIZE/2)-1); i < CUBE_SIZE - ((CUBE_SIZE/2)-1); i++) {
-        if (getpixel (newx + i, newy + CUBE_SIZE - 1) != FILLED)
-            return false;
-    }
-    return true;
+    return    getpixel (newx + CUBE_SIZE/2-1, newy + CUBE_SIZE-1) == FILLED
+           && getpixel (newx + CUBE_SIZE/2  , newy + CUBE_SIZE-1) == FILLED;
 }
 
 static inline void move_qix (struct qix *q)
