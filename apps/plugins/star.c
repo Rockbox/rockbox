@@ -514,26 +514,31 @@ void star_display_text(char *str, bool waitkey)
 /* FIXME: this crashes on the Gigabeat but not in the sim */
 static void star_transition_update(void)
 {
-    int center_x = LCD_WIDTH / 2;
-    int center_y = LCD_HEIGHT / 2;
+    const int center_x = LCD_WIDTH / 2;
+    const int center_y = LCD_HEIGHT / 2;
     int x = 0;
     int y = 0;
 #if LCD_WIDTH >= LCD_HEIGHT
-    int lcd_demi_width = LCD_WIDTH / 2;
+#if defined(IPOD_VIDEO)
+    const int step = 4;
+#else
+    const int step = 1;
+#endif
+    const int lcd_demi_width = LCD_WIDTH / 2;
     int var_y = 0;
 
-    for (; x < lcd_demi_width ; x++)
+    for (; x < lcd_demi_width ; x+=step)
     {
         var_y += LCD_HEIGHT;
         if (var_y > LCD_WIDTH)
         {
             var_y -= LCD_WIDTH;
-            y++;
+            y+=step;
         }
-        rb->lcd_update_rect(center_x - x, center_y - y, x * 2, 1);
-        rb->lcd_update_rect(center_x - x, center_y - y, 1, y * 2);
-        rb->lcd_update_rect(center_x + x - 1, center_y - y, 1, y * 2);
-        rb->lcd_update_rect(center_x - x, center_y + y - 1, x * 2, 1);
+        rb->lcd_update_rect(center_x - x, center_y - y, x*2, step);
+        rb->lcd_update_rect(center_x - x, center_y - y, step, y*2);
+        rb->lcd_update_rect(center_x + x - step, center_y - y, step, y*2);
+        rb->lcd_update_rect(center_x - x, center_y + y - step, x*2, step);
         STAR_SLEEP
     }
 #else
@@ -577,7 +582,7 @@ static void star_display_board_info(int current_level)
         label_pos_y = LCD_HEIGHT - char_height;
         tile_pos_y = label_pos_y + (char_height - TILE_HEIGHT) / 2;
     }
-    
+
     rb->snprintf(str_info, sizeof(str_info), "L:%02d", current_level + 1);
     rb->lcd_putsxy(STAR_OFFSET_X, label_pos_y, str_info);
     rb->snprintf(str_info, sizeof(str_info), "S:%02d", star_count);
@@ -602,12 +607,12 @@ static int star_load_level(int current_level)
 {
     int x, y;
     char *ptr_tab;
-    
+
     if (current_level < 0)
         current_level = 0;
     else if (current_level > STAR_LEVEL_COUNT-1)
         current_level = STAR_LEVEL_COUNT-1;
-        
+
 
     ptr_tab = levels + current_level * STAR_LEVEL_SIZE;
     control = STAR_CONTROL_BALL;
@@ -671,7 +676,7 @@ static void star_animate_tile(int tile_no, int start_x, int start_y,
                               int delta_x, int delta_y)
 {
     int i;
-    
+
     if (delta_x != 0) /* horizontal */
     {
         for (i = 1 ; i <= TILE_WIDTH ; i++)
@@ -849,7 +854,7 @@ static int star_run_game(int current_level)
                 rb->lcd_clear_display();
                 star_display_text("Congratulations!", true);
                 rb->lcd_update();
-                
+
                 /* There is no such level as STAR_LEVEL_COUNT so it can't be the
                  * current_level */
                 current_level--;
@@ -867,13 +872,13 @@ static int star_menu(void)
 {
     int selection, level=1;
     bool menu_quit = false;
-    
+
     /* get the size of char */
     rb->lcd_getstringsize("a", &char_width, &char_height);
-                      
+
     MENUITEM_STRINGLIST(menu,"Star Menu",NULL,"Play","Choose Level",
-                        "Information","Keys","Quit");                  
-    
+                        "Information","Keys","Quit");
+
     while(!menu_quit)
     {
         switch(rb->do_menu(&menu, &selection))
@@ -882,7 +887,7 @@ static int star_menu(void)
                 menu_quit = true;
                 break;
             case 1:
-                rb->set_int("Level", "", UNIT_INT, &level, 
+                rb->set_int("Level", "", UNIT_INT, &level,
                             NULL, 1, 1, STAR_LEVEL_COUNT, NULL );
                 break;
             case 2:
@@ -950,7 +955,7 @@ static int star_menu(void)
                 break;
         }
     }
-        
+
     if (selection == MENU_START)
     {
         rb->lcd_setfont(FONT_SYSFIXED);
@@ -958,7 +963,7 @@ static int star_menu(void)
         level--;
         star_run_game(level);
     }
-        
+
     return PLUGIN_OK;
 }
 
