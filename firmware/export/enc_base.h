@@ -75,15 +75,17 @@ struct aiff_enc_config
 #define MPEG2_5_BITR_CAPS   MPEG2_BITR_CAPS
 #endif
 
-/* Assume 44100 is always available and therefore MPEG1 */
-
 /* HAVE_MPEG* defines mainly apply to the bitrate menu */
-#if (REC_SAMPR_CAPS & MPEG2_SAMPR_CAPS) || defined (HAVE_SPDIF_IN)
+#if (REC_SAMPR_CAPS & MPEG1_SAMPR_CAPS) || defined (HAVE_SPDIF_REC)
+#define HAVE_MPEG1_SAMPR
+#endif
+
+#if (REC_SAMPR_CAPS & MPEG2_SAMPR_CAPS) || defined (HAVE_SPDIF_REC)
 #define HAVE_MPEG2_SAMPR
 #endif
 
 #if 0
-#if (REC_SAMPR_CAPS & MPEG2_5_SAMPR_CAPS) || defined (HAVE_SPDIF_IN)
+#if (REC_SAMPR_CAPS & MPEG2_5_SAMPR_CAPS) || defined (HAVE_SPDIF_REC)
 #define HAVE_MPEG2_5_SAMPR
 #endif
 #endif /* 0 */

@@ -134,7 +134,7 @@ static bool mp3_enc_bitrate(struct menucallback_data *data)
         /* mono only */
         { "16 kBit/s",  TALK_ID(16,  UNIT_KBIT) }, /*   2 */
         { "24 kBit/s",  TALK_ID(24,  UNIT_KBIT) }, /*   2 */
-#endif
+#endif /* HAVE_MPEG2_SAMPR */
         /* stereo/mono */
         { "32 kBit/s",  TALK_ID(32,  UNIT_KBIT) }, /* 1,2 */
         { "40 kBit/s",  TALK_ID(40,  UNIT_KBIT) }, /* 1,2 */
@@ -145,16 +145,19 @@ static bool mp3_enc_bitrate(struct menucallback_data *data)
         { "96 kBit/s",  TALK_ID(96,  UNIT_KBIT) }, /* 1,2 */
         { "112 kBit/s", TALK_ID(112, UNIT_KBIT) }, /* 1,2 */
         { "128 kBit/s", TALK_ID(128, UNIT_KBIT) }, /* 1,2 */
-#if 0
+        /* Leave out 144 when there is both MPEG 1 and 2  */
+#if defined(HAVE_MPEG2_SAMPR) && !defined (HAVE_MPEG1_SAMPR)
         /* oddball MPEG2-only rate stuck in the middle */
         { "144 kBit/s", TALK_ID(144, UNIT_KBIT) }, /*   2 */
 #endif
         { "160 kBit/s", TALK_ID(160, UNIT_KBIT) }, /* 1,2 */
+#ifdef HAVE_MPEG1_SAMPR
         /* stereo only */
         { "192 kBit/s", TALK_ID(192, UNIT_KBIT) }, /* 1   */
         { "224 kBit/s", TALK_ID(224, UNIT_KBIT) }, /* 1   */
         { "256 kBit/s", TALK_ID(256, UNIT_KBIT) }, /* 1   */
         { "320 kBit/s", TALK_ID(320, UNIT_KBIT) }, /* 1   */
+#endif
     };
 
     unsigned long rate_list[ARRAYLEN(items)];
@@ -163,10 +166,17 @@ static bool mp3_enc_bitrate(struct menucallback_data *data)
        storing and maintaining yet another list of numbers */
     int n_rates = make_list_from_caps32(
             MPEG1_BITR_CAPS | MPEG2_BITR_CAPS, mp3_enc_bitr,
-            MPEG1_BITR_CAPS
-#ifdef HAVE_MPEG2_SAMPR
-            | (MPEG2_BITR_CAPS & ~(MP3_BITR_CAP_144 | MP3_BITR_CAP_8))
+            0
+#ifdef HAVE_MPEG1_SAMPR
+            | MPEG1_BITR_CAPS
 #endif
+#ifdef HAVE_MPEG2_SAMPR
+#ifdef HAVE_MPEG1_SAMPR
+            | (MPEG2_BITR_CAPS & ~(MP3_BITR_CAP_144 | MP3_BITR_CAP_8))
+#else
+            | (MPEG2_BITR_CAPS & ~(MP3_BITR_CAP_8))
+#endif
+#endif /* HAVE_MPEG2_SAMPR */
             , rate_list);
 
     int index = round_value_to_list32(cfg->mp3_enc.bitrate, rate_list,
