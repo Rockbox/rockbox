@@ -470,7 +470,7 @@ static void refresh_board (void)
     rb->lcd_set_foreground (LCD_WHITE);
     rb->lcd_set_drawmode (DRMODE_FG);
 #else
-    rb->lcd_set_drawmode (DRMODE_SOLID);
+    rb->lcd_set_drawmode (DRMODE_FG);
 #endif
     for (j = 0; j < player.level + STARTING_QIXES; j++)
         rb->lcd_mono_bitmap (pics[PIC_QIX], qixes[j].x + BOARD_X,
