@@ -86,7 +86,7 @@ void usb_screen(void)
     /* nothing here! */
 #else
     int i;
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
     show_main_backdrop();
 #endif
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
