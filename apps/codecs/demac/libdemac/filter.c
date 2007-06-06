@@ -2,7 +2,7 @@
 
 libdemac - A Monkey's Audio decoder
 
-$Id:$
+$Id$
 
 Copyright (C) Dave Chapman 2007
 
@@ -70,6 +70,8 @@ struct filter_t {
 
 /* Some macros to handle the fixed-point stuff */
 
+/* Convert from (32-FRACBITS).FRACBITS fixed-point format to an
+   integer (rounding to nearest). */
 #define FP_HALF  (1 << (FRACBITS - 1))   /* 0.5 in fixed-point format. */
 #define FP_TO_INT(x) ((x + FP_HALF) >> FRACBITS);  /* round(x) */
 
@@ -91,9 +93,6 @@ static inline void do_apply_filter_3980(struct filter_t* f, int32_t* data, int c
         else if (*data > 0)
             vector_sub(f->coeffs, f->adaptcoeffs - ORDER);
 
-        /* Convert res from (32-FRACBITS).FRACBITS fixed-point format to an
-           integer (rounding to nearest) and add the input value to
-           it */
         res += *data;
 
         *data++ = res;
