@@ -96,6 +96,15 @@ static void gui_list_init(struct gui_list * gui_list,
 
     gui_list->last_displayed_selected_item = -1 ;
     gui_list->last_displayed_start_item = -1 ;
+    gui_list->show_selection_marker = true;
+}
+
+/* this toggles the selection bar or cursor */
+void gui_synclist_hide_selection_marker(struct gui_synclist * lists, bool hide)
+{
+    int i;
+    FOR_NB_SCREENS(i)
+        lists->gui_list[i].show_selection_marker = !hide;
 }
 
 /*
@@ -285,7 +294,8 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
     draw_scrollbar = (global_settings.scrollbar &&
                 lines < gui_list->nb_items);
 
-    draw_cursor = !global_settings.invert_cursor;
+    draw_cursor = !global_settings.invert_cursor && 
+                    gui_list->show_selection_marker;
     text_pos = 0; /* here it's in pixels */
     if(draw_scrollbar || SHOW_LIST_TITLE) /* indent if there's
                                              a title */
@@ -340,7 +350,8 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
         item_offset = gui_list_get_item_offset(gui_list, item_width, text_pos);
 #endif
 
-        if(current_item >= gui_list->selected_item &&
+        if(gui_list->show_selection_marker &&
+           current_item >= gui_list->selected_item &&
            current_item <  gui_list->selected_item + gui_list->selected_size)
         {/* The selected item must be displayed scrolling */
 #ifdef HAVE_LCD_BITMAP
@@ -470,10 +481,19 @@ static void gui_list_select_above(struct gui_list * gui_list, int items)
         nb_lines--;
     
     gui_list->selected_item -= items;
+    
     /* in bottom "3rd" of the screen, so dont move the start item.
        by 3rd I mean above SCROLL_LIMIT lines above the end of the screen */
     if (items && gui_list->start_item + SCROLL_LIMIT < gui_list->selected_item)
+    {
+        if (gui_list->show_selection_marker == false)
+        {
+            gui_list->start_item -= items;
+            if (gui_list->start_item < 0)
+                gui_list->start_item = 0;
+        }
         return;
+    }
     if (gui_list->selected_item < 0)
     {
         if(gui_list->limit_scroll)
@@ -515,15 +535,36 @@ static void gui_list_select_above(struct gui_list * gui_list, int items)
 static void gui_list_select_below(struct gui_list * gui_list, int items)
 {
     int nb_lines = gui_list->display->nb_lines;
+    int bottom;
     if (SHOW_LIST_TITLE)
         nb_lines--;
     
     gui_list->selected_item += items;
+    bottom = gui_list->nb_items - nb_lines;
+    
+    /* always move the screen if selection isnt "visible" */
+    if (items && gui_list->show_selection_marker == false)
+    {
+        if (bottom < 0)
+            bottom = 0;
+        gui_list->start_item = MIN(bottom, gui_list->start_item +
+                                           items);
+        return;
+    }
     /* in top "3rd" of the screen, so dont move the start item */
     if (items && 
         (gui_list->start_item + nb_lines - SCROLL_LIMIT > gui_list->selected_item)
         && (gui_list->selected_item < gui_list->nb_items))
+    {
+        if (gui_list->show_selection_marker == false)
+        {
+            if (bottom < 0)
+                bottom = 0;
+            gui_list->start_item = MIN(bottom, 
+                                       gui_list->start_item + items);
+        }
         return;
+    }
     
     if (gui_list->selected_item >= gui_list->nb_items)
     {
@@ -539,7 +580,7 @@ static void gui_list_select_below(struct gui_list * gui_list, int items)
         }
         return;
     }
-    int bottom = gui_list->nb_items - nb_lines;
+    
     if (gui_list->nb_items > nb_lines)
     {
         if (global_settings.scroll_paginated)

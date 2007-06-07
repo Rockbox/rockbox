@@ -88,6 +88,7 @@
 #endif
 #include "hwcompat.h"
 
+static char* dbg_menu_getname(int item, void * data, char *buffer);
 static bool dbg_list(char *title, int count, int selection_size,
                      int (*action_callback)(int btn, struct gui_synclist *lists), 
                      char* (*dbg_getname)(int item, void * data, char *buffer))
@@ -99,6 +100,8 @@ static bool dbg_list(char *title, int count, int selection_size,
     gui_synclist_set_title(&lists, title, NOICON);
     gui_synclist_set_icon_callback(&lists, NULL);
     gui_synclist_set_nb_items(&lists, count*selection_size);
+    if (dbg_getname != dbg_menu_getname)
+        gui_synclist_hide_selection_marker(&lists, true);
     action_signalscreenchange();
     gui_synclist_draw(&lists);
     while(1)
@@ -659,7 +662,7 @@ static char* dbg_partitions_getname(int selected_item, void * data, char *buffer
     struct partinfo* p = disk_partinfo(partition);
     if (selected_item%2)
     {
-        snprintf(buffer, MAX_PATH, "T:%x %ld MB", p->type, p->size / 2048);
+        snprintf(buffer, MAX_PATH, "   T:%x %ld MB", p->type, p->size / 2048);
     }
     else
     {
