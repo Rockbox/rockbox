@@ -307,7 +307,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
 
     /* If thumbnail talking is enabled, make an extra run to mark files with
        associated thumbnails, so we don't do unsuccessful spinups later. */
-    if (global_settings.talk_file == 3)
+    if (global_settings.talk_file_clip)
         check_file_thumbnails(c); /* map .talk to ours */
 
     return 0;
