@@ -45,6 +45,7 @@
 #if defined(SIMULATOR) && defined(ROCKBOX_HAS_LOGF)
 #include "logfdisp.h"
 #endif
+#include "version.h"
 
 
 
@@ -231,11 +232,22 @@ static bool show_info(void)
 #endif
         }
 #ifdef HAVE_LCD_BITMAP
-        y += 2;
+        y++;
 #endif
-
 #ifdef HAVE_LCD_CHARCELLS
         if (page == 0)
+#endif
+        {
+            snprintf(s, sizeof(s), "%s: %s", str(LANG_VERSION), appsversion);
+            FOR_NB_SCREENS(i)
+                screens[i].puts_scroll(0, y, (unsigned char *)s);
+#ifdef HAVE_LCD_BITMAP
+            y += 2;
+#endif
+        }
+
+#ifdef HAVE_LCD_CHARCELLS
+        if (page == 1)
 #endif
         {
             int integer = buflen / 1000;
@@ -271,7 +283,7 @@ static bool show_info(void)
         }
 
 #ifdef HAVE_LCD_CHARCELLS
-        if (page == 1)
+        if (page == 2)
 #endif
         {
 #ifdef HAVE_MULTIVOLUME
@@ -319,8 +331,12 @@ static bool show_info(void)
 
 #ifdef HAVE_LCD_CHARCELLS
             case ACTION_STD_NEXT:
+                page = (page+1)%3;
+                break;
             case ACTION_STD_PREV:
-                page = (page == 0) ? 1 : 0;
+                page--;
+                if (page < 0)
+                    page = 2;
                 break;
 #endif
 
