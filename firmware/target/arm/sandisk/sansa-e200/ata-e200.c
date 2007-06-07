@@ -107,7 +107,7 @@ static int current_card = 0;
 
 static struct mutex sd_mtx;
 
-static long sd_stack [(DEFAULT_STACK_SIZE*2)/sizeof(long)];
+static long sd_stack [(DEFAULT_STACK_SIZE*2 + 0x800)/sizeof(long)];
 
 static const char sd_thread_name[] = "sd";
 static struct event_queue sd_queue;
