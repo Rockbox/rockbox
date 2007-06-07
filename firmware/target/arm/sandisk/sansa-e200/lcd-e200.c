@@ -294,14 +294,20 @@ inline void lcd_init_device(void)
     lcd_write_reg(R_DISP_CONTROL1, 0x0077);
 
     lcd_send_msg(0x70, R_RAM_WRITE_DATA);
+
+    LCD_REG_6 |= 1; /* Start DMA */
 }
 
 void lcd_enable(bool on)
 {
     if(on)
     {
-        DEV_EN |= DEV_LCD; /* Enable LCD controller */
-        LCD_REG_6 |= 1;    /* Enable DMA */
+        if(!(DEV_EN & DEV_LCD))
+        {
+            DEV_EN |= DEV_LCD; /* Enable LCD controller */
+            lcd_update();      /* Resync display */
+            LCD_REG_6 |= 1;    /* Restart DMA */
+        }
     }
     else
     {
@@ -314,47 +320,51 @@ void lcd_enable(bool on)
     }
 }
 
-inline void lcd_update_rect(int x, int y, int width, int height)
+void lcd_update_rect(int x, int y, int width, int height)
 {
     (void)x;
     (void)width;
 
-    if(__backlight_is_on())
+    if(DEV_EN & DEV_LCD)
     {
+#if 0
         /* Turn off DMA and wait for the transfer to complete */
         /* TODO: Work out the proper delay */
         LCD_REG_6 &= ~1;
         udelay(1000);
-
+#endif
         /* Copy the Rockbox framebuffer to the second framebuffer */
         /* TODO: Move the second framebuffer into uncached SDRAM */
         memcpy(((char*)&lcd_driver_framebuffer)+(y * sizeof(fb_data) * LCD_WIDTH),
                ((char *)&lcd_framebuffer)+(y * sizeof(fb_data) * LCD_WIDTH),
                ((height * sizeof(fb_data) * LCD_WIDTH)));
         flush_icache();
-
+#if 0
         /* Restart DMA */
         LCD_REG_6 |= 1;
+#endif
     }
 }
 
-inline void lcd_update(void)
+void lcd_update(void)
 {
-    if(__backlight_is_on())
+    if(DEV_EN & DEV_LCD)
     {
         /* TODO: It may be faster to swap the addresses of lcd_driver_framebuffer
          * and lcd_framebuffer */
+#if 0
         /* Turn off DMA and wait for the transfer to complete */
         LCD_REG_6 &= ~1;
         udelay(1000);
-
+#endif
         /* Copy the Rockbox framebuffer to the second framebuffer */
         memcpy(lcd_driver_framebuffer, lcd_framebuffer,
                sizeof(fb_data) * LCD_WIDTH * LCD_HEIGHT);
         flush_icache();
-
+#if 0
         /* Restart DMA */
         LCD_REG_6 |= 1;
+#endif
     }
 }
 
@@ -407,32 +417,35 @@ void lcd_yuv_blit(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
-    /* Caches for chroma data so it only need be recaculated every other
-       line */
-    static unsigned char chroma_buf[LCD_HEIGHT/2*3]; /* 330 bytes */
-    unsigned char const * yuv_src[3];
-    off_t z;
-
-    /* Sorry, but width and height must be >= 2 or else */
-    width &= ~1;
-    height >>= 1;
-
-    fb_data *dst = (fb_data*)lcd_driver_framebuffer + 
-                   x * LCD_WIDTH + (LCD_WIDTH - y) - 1;
-
-    z = stride*src_y;
-    yuv_src[0] = src[0] + z + src_x;
-    yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
-    yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
-
-    do
+    if(DEV_EN & DEV_LCD)
     {
-        lcd_write_yuv420_lines(dst, chroma_buf, yuv_src, width,
-                               stride);
-        yuv_src[0] += stride << 1; /* Skip down two luma lines */
-        yuv_src[1] += stride >> 1; /* Skip down one chroma line */
-        yuv_src[2] += stride >> 1;
-        dst -= 2;
+        /* Caches for chroma data so it only need be recaculated every other
+           line */
+        static unsigned char chroma_buf[LCD_HEIGHT/2*3]; /* 330 bytes */
+        unsigned char const * yuv_src[3];
+        off_t z;
+
+        /* Sorry, but width and height must be >= 2 or else */
+        width &= ~1;
+        height >>= 1;
+
+        fb_data *dst = (fb_data*)lcd_driver_framebuffer + 
+                       x * LCD_WIDTH + (LCD_WIDTH - y) - 1;
+
+        z = stride*src_y;
+        yuv_src[0] = src[0] + z + src_x;
+        yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
+        yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
+
+        do
+        {
+            lcd_write_yuv420_lines(dst, chroma_buf, yuv_src, width,
+                                   stride);
+            yuv_src[0] += stride << 1; /* Skip down two luma lines */
+            yuv_src[1] += stride >> 1; /* Skip down one chroma line */
+            yuv_src[2] += stride >> 1;
+            dst -= 2;
+        }
+        while (--height > 0);
     }
-    while (--height > 0);
 }
