@@ -785,7 +785,7 @@ static inline void move_board (void)
         player.i = newi;
         player.j = newj;
     }
-    if (percentage_cache > difficulty) {               /* finished level */
+    if (percentage_cache >= difficulty) {               /* finished level */
         rb->splash (HZ * 2, "Level %d finished", player.level+1);
         player.score += percentage_cache;
         if (player.level < MAX_LEVEL)
