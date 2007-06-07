@@ -722,9 +722,19 @@ static int dirbrowse()
                         DEBUGF("Playing directory thumbnail: %s", currdir);
                         res = ft_play_dirname(name);
                         if (res < 0) /* failed, not existing */
-                        {   /* say the number instead, as a fallback */
-                            talk_id(VOICE_DIR, false);
-                            talk_number(lasti+1, true);
+                        {   
+                            /* say the number or spell if required as a fallback */
+                            switch (global_settings.talk_dir) 
+                            {
+                            case 1: /* dirs as numbers */
+                                talk_id(VOICE_DIR, false);
+                                talk_number(lasti+1, true);
+                                break;
+
+                            case 2: /* dirs spelled */
+                                talk_spell(name, false);
+                                break;
+                            }
                         }
                     }
                     else
@@ -847,8 +857,14 @@ static int dirbrowse()
                     /* Directory? */
                     if (attr & ATTR_DIRECTORY)
                     {
-                        /* play directory thumbnail */
-                        switch (global_settings.talk_dir) {
+                        /* schedule thumbnail playback if required */
+                        if (global_settings.talk_dir_clip)
+                            thumbnail_time = current_tick + HOVER_DELAY;
+                        else
+                        {
+                            /* talk directly */
+                            switch (global_settings.talk_dir) 
+                            {
                             case 1: /* dirs as numbers */
                                 talk_id(VOICE_DIR, false);
                                 talk_number(tc.selected_item+1, true);
@@ -857,20 +873,19 @@ static int dirbrowse()
                             case 2: /* dirs spelled */
                                 talk_spell(name, false);
                                 break;
-
-                            case 3: /* thumbnail clip */
-                                /* "schedule" a thumbnail, to have a little
-                                   delay */
-                                thumbnail_time = current_tick + HOVER_DELAY;
-                                break;
-
-                            default:
-                                break;
+                            }
                         }
                     }
                     else /* file */
                     {
-                        switch (global_settings.talk_file) {
+                        /* schedule thumbnail playback if required */
+                        if (global_settings.talk_file_clip && (attr & FILE_ATTR_THUMBNAIL))
+                            thumbnail_time = current_tick + HOVER_DELAY;
+                        else
+                        {
+                            /* talk directly */
+                            switch (global_settings.talk_file) 
+                            {
                             case 1: /* files as numbers */
                                 ft_play_filenumber(
                                     tc.selected_item-tc.dirsindir+1,
@@ -880,19 +895,7 @@ static int dirbrowse()
                             case 2: /* files spelled */
                                 talk_spell(name, false);
                                 break;
-
-                            case 3: /* thumbnail clip */
-                                /* "schedule" a thumbnail, to have a little
-                                   delay */
-                                if (attr & FILE_ATTR_THUMBNAIL)
-                                    thumbnail_time = current_tick + HOVER_DELAY;
-                                else
-                                    /* spell the number as fallback */
-                                    talk_spell(name, false);
-                                break;
-
-                            default:
-                                break;
+                            }
                         }
                     }
                 }

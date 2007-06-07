@@ -524,8 +524,10 @@ struct user_settings
 
     /* voice UI settings */
     bool talk_menu; /* enable voice UI */
-    int talk_dir; /* talkbox mode: 0=off 1=number 2=clip@enter 3=clip@hover */
-    int talk_file; /* voice filename mode: 0=off, 1=number, other t.b.d. */ 
+    int talk_dir; /* voiced directories mode: 0=off 1=number 2=spell */
+    bool talk_dir_clip; /* use directory .talk clips */
+    int talk_file; /* voice file mode: 0=off, 1=number, 2=spell */ 
+    bool talk_file_clip; /* use file .talk clips */
 
     /* file browser sorting */
     int sort_file; /* 0=alpha, 1=date, 2=date (new first), 3=type */

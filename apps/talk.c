@@ -539,8 +539,8 @@ void talk_init(void)
 bool talk_voice_required(void)
 {
     return (voicefile_size != 0) /* Voice file is available */
-        || (global_settings.talk_dir == 3)  /* Thumbnail clips are required */
-        || (global_settings.talk_file == 3);
+        || (global_settings.talk_dir_clip)  /* Thumbnail clips are required */
+        || (global_settings.talk_file_clip);
 }
 #endif
 

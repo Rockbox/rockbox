@@ -50,7 +50,7 @@
 /* some sets of values which are used more than once, to save memory */
 static const char off_on[] = "off,on";
 static const char off_on_ask[] = "off,on,ask";
-static const char off_number_spell_hover[] = "off,number,spell,hover";
+static const char off_number_spell[] = "off,number,spell";
 #ifdef HAVE_LCD_BITMAP
 static const char graphic_numeric[] = "graphic,numeric";
 #endif
@@ -708,15 +708,17 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0,line_in,LANG_LINE_IN,false,"line in",NULL),
 #endif
     /* voice */
-    CHOICE_SETTING(0, talk_dir, LANG_VOICE_DIR, 0,
-        "talk dir", off_number_spell_hover, NULL, 4,
-        ID2P(LANG_OFF), ID2P(LANG_VOICE_NUMBER),
-        ID2P(LANG_VOICE_SPELL), ID2P(LANG_VOICE_DIR_HOVER)),
-    CHOICE_SETTING(0, talk_file, LANG_VOICE_FILE, 0,
-        "talk file", off_number_spell_hover, NULL, 4,
-        ID2P(LANG_OFF), ID2P(LANG_VOICE_NUMBER),
-        ID2P(LANG_VOICE_SPELL), ID2P(LANG_VOICE_DIR_HOVER)),
     OFFON_SETTING(F_TEMPVAR, talk_menu, LANG_VOICE_MENU, true, "talk menu", NULL),
+    CHOICE_SETTING(0, talk_dir, LANG_VOICE_DIR, 0,
+        "talk dir", off_number_spell, NULL, 3,
+        ID2P(LANG_OFF), ID2P(LANG_VOICE_NUMBER),
+        ID2P(LANG_VOICE_SPELL)),
+    OFFON_SETTING(F_TEMPVAR, talk_dir_clip, LANG_VOICE_DIR_TALK, false, "talk dir clip", NULL),
+    CHOICE_SETTING(0, talk_file, LANG_VOICE_FILE, 0,
+        "talk file", off_number_spell, NULL, 3,
+        ID2P(LANG_OFF), ID2P(LANG_VOICE_NUMBER),
+        ID2P(LANG_VOICE_SPELL)),
+    OFFON_SETTING(F_TEMPVAR, talk_file_clip, LANG_VOICE_FILE_TALK, false, "talk file clip", NULL),
 
     /* file sorting */
     CHOICE_SETTING(0, sort_file, LANG_SORT_FILE, 0 ,
