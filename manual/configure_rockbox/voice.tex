@@ -3,15 +3,14 @@
 
   \begin{description}
   \item[Voice Menus.]
-    This option turns on the Voice User Interface, which will read out menu
-    items and settings as they are selected by the cursor.  In order for this
-    to work, a voice file must be present in the \fname{/.rockbox/langs/}
-    directory on the \dap.  Voice files are large (1.5MB) and are not 
-    shipped with Rockbox by default.
+    This option conttols the voicing of menus/settings as they are selected
+    by the cursor. In order for this to work, a voice file must be present 
+    in the \fname{/.rockbox/langs/} directory on the \dap.  Voice files are large
+    and are not  shipped with Rockbox by default.
     The voice file is the name of the language for which it is made, followed
     by the extension \fname{.voice}.  So for English, the file name would be 
     \fname{english.voice}.
-    This option is on by default.  It will do nothing unless the 
+    This option is on by default, but will do nothing unless the 
     appropriate voice file is installed in the correct place on the \dap.
     The Voice Menus have several limitations:
     \begin{itemize}
@@ -22,13 +21,12 @@
     \end{itemize}
 
   \item[Voice Directories.]
-    This option turns on the speaking of directory names.  The \dap{} 
-    is not powerful enough to produce these voices in real time, so a number 
-    of options are available.
+    This option controls voicing of directory names. A voice file must be present 
+    for this to work. Several options are available.
     \begin{description}
     \item[Spell.]
       Speak the directory name by spelling it out letter by letter.  Support
-      is provided only for the most common letters and punctuation.
+      is provided only for the most common letters, numbers and punctuation.
     \item[Numbers.]
       Each directory is assigned a number based upon its position in the
       file list.  They are then announced as ``Directory 1'', ``Directory 2''
@@ -36,35 +34,44 @@
     \item[Off.]
       No attempt will be made to speak directory names.
     \end{description}
+    You can also use pre-generated .talk clips to have  directory names spoken 
+    properly, but you must enable this explicitly (see below).
 
   \item[Use Directory .talk Clips.]
-    This option turns on the use of .talk clips for directories. .talk clips take
-    precedence over the method set under \setting{Voice Directories} above.
+    This option turns on the use of .talk clips for directories. When .talk clips
+    are used, they take precedence over the method set under \setting{Voice Directories} 
+    above.
 
     \begin{description}
     \item[On.]
       Use special pre-recorded MP3 files (\fname{\_dirname.talk}) in each 
-      directory.  These must be generated in advance, and are typically 
-      produced synthetically using a text to speech engine on a PC.
+      directory. These must be generated in advance, and are typically 
+      produced synthetically using a text-to-speech engine on a PC.
     \item[Off.]
       No checking is made for directory .talk clips; they are not used even if present.
+      This can reduce disk activity.
     \end{description}
 
   \item[Voice Filenames.]
-    This option turns on the speaking of filenames.  The options provided
-    are \setting{Spell}, \setting{Numbers}, and \setting{Off} which function
-    the same as for \setting{Voice Directories}.
+    This option controls voicing of filenames. Again, a voice file must be present 
+    for this to work. The options provided are \setting{Spell}, \setting{Numbers}, 
+    and \setting{Off} which function the same as for \setting{Voice Directories}.
+    You can also use .talk clips to have filenames spoken properly, but you must
+    enable this explicitly (see below).
 
   \item[Use File .talk Clips.]
-    This option turns on the use of .talk clips for files.
+    This option enables the use of .talk clips for files. When .talk clips are used,
+    they take precedence over the method set under \setting{Voice Filenames} 
+    above.
     \begin{description}
     \item[On.]
-      Use special pre-recorded MP3 files (\fname{\_dirname.talk}) for each file.
-      This functions as above except that the files are named with the same
-      name as the music file (e.g. \fname{Punkadiddle.mp3} would require a
-      file called \fname{Punkadiddle.mp3.talk}).
+      Use special pre-recorded MP3 files for each file.
+      This functions the same as for directories except that the .talk clip file 
+      must have the same name as the music file with an extra .talk extension 
+      (e.g. \fname{Punkadiddle.mp3} would require a file called \fname{Punkadiddle.mp3.talk}).
     \item[Off.]
-     No checking is made for file .talk clips; they are not used even if present.
+      No checking is made for file .talk clips; they are not used even if present.
+      This can reduce disk activity.
     \end{description}
 
   \end{description}
