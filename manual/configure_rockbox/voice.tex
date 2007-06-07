@@ -26,12 +26,6 @@
     is not powerful enough to produce these voices in real time, so a number 
     of options are available.
     \begin{description}
-    \item[.talk mp3 clip.]
-      Use special pre-recorded MP3 files (\fname{\_dirname.talk}) in each 
-      directory.  These must be generated in advance, and are typically 
-      produced synthetically using a text to speech engine on a PC.
-      If no such file exists, the output is as for the \setting{numbers}
-      option below.
     \item[Spell.]
       Speak the directory name by spelling it out letter by letter.  Support
       is provided only for the most common letters and punctuation.
@@ -43,13 +37,35 @@
       No attempt will be made to speak directory names.
     \end{description}
 
+  \item[Use Directory .talk Clips.]
+    This option turns on the use of .talk clips for directories. .talk clips take
+    precedence over the method set under \setting{Voice Directories} above.
+
+    \begin{description}
+    \item[On.]
+      Use special pre-recorded MP3 files (\fname{\_dirname.talk}) in each 
+      directory.  These must be generated in advance, and are typically 
+      produced synthetically using a text to speech engine on a PC.
+    \item[Off.]
+      No checking is made for directory .talk clips; they are not used even if present.
+    \end{description}
+
   \item[Voice Filenames.]
     This option turns on the speaking of filenames.  The options provided
-    are \setting{Spell}, \setting{Numbers}, and \setting{Off} which function 
-    the same as for \setting{Voice Directories} and \setting{.talk mp3 clip},
-    which functions as above except that the files are named with the same
-    name as the music file (e.g. \fname{Punkadiddle.mp3} would require a
-    file called \fname{Punkadiddle.mp3.talk}).
+    are \setting{Spell}, \setting{Numbers}, and \setting{Off} which function
+    the same as for \setting{Voice Directories}.
+
+  \item[Use File .talk Clips.]
+    This option turns on the use of .talk clips for files.
+    \begin{description}
+    \item[On.]
+      Use special pre-recorded MP3 files (\fname{\_dirname.talk}) for each file.
+      This functions as above except that the files are named with the same
+      name as the music file (e.g. \fname{Punkadiddle.mp3} would require a
+      file called \fname{Punkadiddle.mp3.talk}).
+    \item[Off.]
+     No checking is made for file .talk clips; they are not used even if present.
+    \end{description}
 
   \end{description}
 
