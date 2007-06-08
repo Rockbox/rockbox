@@ -526,6 +526,7 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
         bootloader_buf = malloc(length);
         if (bootloader_buf == NULL) {
             fprintf(stderr,"[ERR]  Can not allocate memory for bootloader\n");
+            return -1;
         }
         /* Now read our bootloader - we need to check it before modifying the partition*/
         n = read(infile,bootloader_buf,length);
