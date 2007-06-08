@@ -35,7 +35,7 @@ void audio_set_output_source(int source)
     set_irq_level(level);
 } /* audio_set_output_source */
 
-void audio_set_source(int source, unsigned flags)
+void audio_input_mux(int source, unsigned flags)
 {
     /* Prevent pops from unneeded switching */
     static int last_source = AUDIO_SRC_PLAYBACK;
@@ -109,5 +109,5 @@ void audio_set_source(int source, unsigned flags)
     or_l((1 << 29), &GPIO_FUNCTION);
 
     last_source = source;
-} /* audio_set_source */
+} /* audio_input_mux */
 

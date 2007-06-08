@@ -199,9 +199,9 @@ void play_waveform(void)
     rb->audio_stop();
     rb->sound_set(SOUND_VOLUME, rb->sound_default(SOUND_VOLUME));
 
-#ifdef HAVE_RECORDING
+#ifdef INPUT_SRC_CAPS != 0
     /* Select playback */
-    rb->rec_set_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
+    rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
 #endif
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -210,7 +210,7 @@ void play_waveform(void)
 
     rb->pcm_set_frequency(rb->hw_freq_sampr[freq]);
 
-#ifdef HAVE_RECORDING
+#ifdef INPUT_SRC_CAPS != 0
     /* Recordable targets can play back from other sources */
     rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif

@@ -509,9 +509,9 @@ int radio_screen(void)
 
     /* turn on radio */
 #if CONFIG_CODEC == SWCODEC
-    rec_set_source(AUDIO_SRC_FMRADIO,
-                   (radio_status == FMRADIO_PAUSED) ?
-                       SRCF_FMRADIO_PAUSED : SRCF_FMRADIO_PLAYING);
+    audio_set_input_source(AUDIO_SRC_FMRADIO,
+                           (radio_status == FMRADIO_PAUSED) ?
+                               SRCF_FMRADIO_PAUSED : SRCF_FMRADIO_PLAYING);
 #else
     if (radio_status == FMRADIO_OFF)
         radio_start();
@@ -985,7 +985,7 @@ int radio_screen(void)
     else
     {
 #if CONFIG_CODEC == SWCODEC
-        rec_set_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
+        audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
 #else
         radio_stop();
 #endif

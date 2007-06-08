@@ -39,7 +39,7 @@ void audio_set_output_source(int source)
     set_fiq_status(oldmode);
 } /* audio_set_output_source */
 
-void audio_set_source(int source, unsigned flags)
+void audio_input_mux(int source, unsigned flags)
 {
     static int last_source = AUDIO_SRC_PLAYBACK;
     static bool last_recording = false;
@@ -89,6 +89,4 @@ void audio_set_source(int source, unsigned flags)
     } /* end switch */
 
     last_source = source;
-} /* audio_set_source */
-
-
+} /* audio_input_mux */

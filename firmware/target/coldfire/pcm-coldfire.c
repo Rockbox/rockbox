@@ -271,7 +271,7 @@ void pcm_init(void)
     /* Initialize default register values. */
     audiohw_init();
 
-    audio_set_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
+    audio_input_mux(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
 
     audiohw_set_frequency(freq_ent[FPARM_FSEL]);
     coldfire_set_pllcr_audio_bits(PLLCR_SET_AUDIO_BITS_DEFPARM);

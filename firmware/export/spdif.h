@@ -20,6 +20,12 @@
 #ifndef SPDIF_H
 #define SPDIF_H
 
+#ifdef HAVE_SPDIF_POWER
+#define IF_SPDIF_POWER_(...)    __VA_ARGS__
+#else
+#define IF_SPDIF_POWER_(...)
+#endif
+
 /* Initialize the S/PDIF driver */
 void spdif_init(void);
 /* Return the S/PDIF frequency in herz - unrounded */
@@ -27,7 +33,7 @@ unsigned long spdif_measure_frequency(void);
 #ifdef HAVE_SPDIF_OUT
 /* Set the S/PDIF audio feed - Use AUDIO_SRC_* values -
    will be off if not powered or !on */
-void spdif_set_output_source(int source, bool on);
+void spdif_set_output_source(int source IF_SPDIF_POWER_(, bool on));
 /* Return the last set S/PDIF audio source - literally the last value passed
    to spdif_set_monitor regardless of power state */
 int spdif_get_output_source(bool *src_on);

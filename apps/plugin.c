@@ -349,11 +349,12 @@ static const struct plugin_api rockbox_api = {
     pcm_stop_recording,
     pcm_calculate_rec_peaks,
     audio_set_recording_gain,
-    audio_set_output_source,
-    rec_set_source,
 #endif /* HAVE_RECORDING */
-
+#if INPUT_SRC_CAPS != 0
+    audio_set_output_source,
+    audio_set_input_source,
 #endif
+#endif /* CONFIG_CODEC == SWCODEC */
 
     /* playback control */
     playlist_amount,

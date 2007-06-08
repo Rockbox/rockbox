@@ -29,7 +29,7 @@ int rec_create_directory(void);
 extern bool recording_start_automatic;
 
 #if CONFIG_CODEC == SWCODEC
-/* handles device powerup and sets audio source */
+/* handles device powerup, sets audio source and peakmeter mode */
 void rec_set_source(int source, unsigned flags);
 #endif /* CONFIG_CODEC == SW_CODEC */
 
@@ -47,4 +47,4 @@ void rec_record(void);
 /* creates unique filename and starts recording */
 void rec_new_file(void);
 
-#endif
+#endif /* RECORDING_H */

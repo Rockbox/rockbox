@@ -86,6 +86,9 @@ recorder/radio.c
 recorder/recording.c
 #endif
 #if CONFIG_CODEC == SWCODEC
+#if INPUT_SRC_CAPS != 0
+audio_path.c
+#endif /* INPUT_SRC_CAPS != 0 */
 pcmbuf.c
 playback.c
 codecs.c

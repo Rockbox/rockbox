@@ -448,11 +448,12 @@ struct plugin_api {
     void (*pcm_stop_recording)(void);
     void (*pcm_calculate_rec_peaks)(int *left, int *right);
     void (*audio_set_recording_gain)(int left, int right, int type);
-    void (*audio_set_output_source)(int monitor);
-    void (*rec_set_source)(int source, unsigned flags);
 #endif /* HAVE_RECORDING */
-
+#if INPUT_SRC_CAPS != 0
+    void (*audio_set_output_source)(int monitor);
+    void (*audio_set_input_source)(int source, unsigned flags);
 #endif
+#endif /* CONFIG_CODEC == SWCODC */
 
     /* playback control */
     int (*playlist_amount)(void);

@@ -481,6 +481,14 @@ void audio_record(const char *filename)
 } /* audio_record */
 
 /**
+ * audio_record wrapper for API compatibility with HW codec
+ */
+void audio_new_file(const char *filename)
+{
+    audio_record(filename);
+} /* audio_new_file */
+
+/**
  * Stop current recording if recording
  */
 void audio_stop_recording(void)
@@ -551,22 +559,6 @@ unsigned long audio_num_recorded_bytes(void)
     return num_rec_bytes;
 } /* audio_num_recorded_bytes */
     
-#ifdef HAVE_SPDIF_IN
-/**
- * Return SPDIF sample rate index in audio_master_sampr_list. Since we base
- * our reading on the actual SPDIF sample rate (which might be a bit
- * inaccurate), we round off to the closest sample rate that is supported by
- * SPDIF.
- */
-int audio_get_spdif_sample_rate(void)
-{
-    unsigned long measured_rate = spdif_measure_frequency();
-    /* Find which SPDIF sample rate we're closest to. */
-    return round_value_to_list32(measured_rate, audio_master_sampr_list,
-                                 SAMPR_NUM_FREQ, false);
-} /* audio_get_spdif_sample_rate */
-#endif /* HAVE_SPDIF_IN */
-
 /***************************************************************************/
 /*                                                                         */
 /*         Functions that execute in the context of pcmrec_thread          */
@@ -1756,7 +1748,7 @@ void enc_set_parameters(struct enc_parameters *params)
     fnq_size  *= MAX_PATH;
     logf("fnq files:%ld", fnq_size / MAX_PATH);
 
-#if 1
+#if 0
     logf("ab :%08lX", (uintptr_t)audiobuf);
     logf("pcm:%08lX", (uintptr_t)pcm_buffer);
     logf("enc:%08lX", (uintptr_t)enc_buffer);

@@ -29,7 +29,7 @@ void audio_set_output_source(int source)
         source = AUDIO_SRC_PLAYBACK;
 } /* audio_set_output_source */
 
-void audio_set_source(int source, unsigned flags)
+void audio_input_mux(int source, unsigned flags)
 {
     (void)flags;
     /* Prevent pops from unneeded switching */
@@ -87,6 +87,6 @@ void audio_set_source(int source, unsigned flags)
     } /* end switch */
 
     last_source = source;
-} /* audio_set_source */
+} /* audio_input_mux */
 
 

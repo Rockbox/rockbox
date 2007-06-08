@@ -89,7 +89,8 @@ void spdif_power_enable(bool on)
 
 #ifndef BOOTLOADER
     /* Make sure the feed is reset */
-    spdif_set_output_source(spdif_get_output_source(NULL), true);
+    spdif_set_output_source(spdif_get_output_source(NULL)
+        IF_SPDIF_POWER_(, true));
 #endif
 }
 

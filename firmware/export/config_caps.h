@@ -66,6 +66,10 @@
     #define HAVE_FMRADIO_IN_(...)
 #endif
 
+#if INPUT_SRC_CAPS != 0 && (INPUT_SRC_CAPS & (INPUT_SRC_CAPS-1)) != 0
+#define HAVE_MULTI_INPUT_SRC
+#endif
+
 #ifdef HAVE_RECORDING
 /* Recordable source implies it has the input as well */
 
@@ -104,4 +108,9 @@
 #else
     #define HAVE_FMRADIO_REC_(...)
 #endif
+
+#if REC_SRC_CAPS != 0 && (REC_SRC_CAPS & (REC_SRC_CAPS-1)) != 0
+#define HAVE_MULTI_REC_SRC
+#endif
+
 #endif /* HAVE_RECORDING */

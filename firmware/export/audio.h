@@ -194,12 +194,7 @@ void audio_record(const char *filename);
 void audio_stop_recording(void);
 void audio_pause_recording(void);
 void audio_resume_recording(void);
-#if CONFIG_CODEC == SWCODEC
-static inline void audio_new_file(const char *filename)
-    { audio_record(filename); }
-#else
 void audio_new_file(const char *filename);
-#endif /* CONFIG_CODEC == SWCODEC */
 void audio_set_recording_options(struct audio_recording_options *options);
 void audio_set_recording_gain(int left, int right, int type);
 unsigned long audio_recorded_time(void);
@@ -211,10 +206,21 @@ unsigned long audio_num_recorded_bytes(void);
 bool audio_load_encoder(int afmt);
 void audio_remove_encoder(void);
 unsigned char *audio_get_recording_buffer(size_t *buffer_size);
-void audio_set_source(int source, unsigned flags);
-void audio_set_output_source(int source);
 #endif /* CONFIG_CODEC == SWCODEC */
+
 #endif /* HAVE_RECORDING */
+
+#if CONFIG_CODEC == SWCODEC
+/* SWCODEC misc. audio functions */
+#if INPUT_SRC_CAPS != 0
+/* audio.c */
+void audio_set_input_source(int source, unsigned flags);
+/* audio_input_mux: target-specific implementation used by audio_set_source
+   to set hardware inputs and audio paths */
+void audio_input_mux(int source, unsigned flags);
+void audio_set_output_source(int source);
+#endif /* INPUT_SRC_CAPS */
+#endif /* CONFIG_CODEC == SWCODEC */
 
 #ifdef HAVE_SPDIF_IN
 /* returns index into rec_master_sampr_list */

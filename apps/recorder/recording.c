@@ -547,80 +547,6 @@ int rec_create_directory(void)
     return 0;
 }
 
-#if CONFIG_CODEC == SWCODEC && !defined(SIMULATOR)
-
-# ifdef HAVE_SPDIF_REC
-#  ifdef HAVE_ADJUSTABLE_CPU_FREQ
-static void rec_boost(bool state)
-{
-    static bool cpu_boosted = false;
-
-    if (state != cpu_boosted)
-    {
-        cpu_boost(state);
-        cpu_boosted = state;
-    }
-}
-#  endif
-# endif
-
-/**
- * Selects an audio source for recording or playback
- * powers/unpowers related devices and sets up monitoring.
- * Here because it calls app code and used only for HAVE_RECORDING atm.
- * Would like it in pcm_record.c.
- *
- * Behaves like a firmware function in that it does not use global settings
- * to determine the state.
- *
- * The order of setting monitoring may need tweaking dependent upon the
- * selected source to get the smoothest transition.
- */
-void rec_set_source(int source, unsigned flags)
-{
-    /** Do power up/down of associated device(s) **/
-
-    /** SPDIF **/
-#ifdef HAVE_SPDIF_REC
-    /* Always boost for SPDIF */
-    rec_boost(source == AUDIO_SRC_SPDIF);
-#endif /* HAVE_SPDIF_IN */
-
-#ifdef HAVE_SPDIF_POWER
-    /* Check if S/PDIF output power should be switched off or on. NOTE: assumes
-       both optical in and out is controlled by the same power source, which is
-       the case on H1x0. */
-    spdif_power_enable((source == AUDIO_SRC_SPDIF) ||
-                       global_settings.spdif_enable);
-    /* Set the appropriate feed for spdif output */
-#ifdef HAVE_SPDIF_OUT
-    spdif_set_output_source(source, global_settings.spdif_enable);
-#endif
-#else /* !HAVE_SPDIF_POWER */
-#ifdef HAVE_SPDIF_OUT
-    spdif_set_output_source(source, true);
-#endif
-#endif /* !HAVE_SPDIF_POWER */
-
-    /** Tuner **/
-#if CONFIG_TUNER
-    /* Switch radio off or on per source and flags. */
-    if (source != AUDIO_SRC_FMRADIO)
-        radio_stop();
-    else if (flags & SRCF_FMRADIO_PAUSED)
-        radio_pause();
-    else
-        radio_start();
-#endif
-
-    /* set hardware inputs */
-    audio_set_source(source, flags);
-
-    peak_meter_playback((flags & SRCF_RECORDING) == 0);
-    peak_meter_enabled = true;
-} /* rec_set_source */
-#endif /* CONFIG_CODEC == SWCODEC && !defined(SIMULATOR) */
-
 void rec_init_recording_options(struct audio_recording_options *options)
 {
     options->rec_source            = global_settings.rec_source;
@@ -636,6 +562,18 @@ void rec_init_recording_options(struct audio_recording_options *options)
     options->rec_editable          = global_settings.rec_editable;
 #endif
 }
+
+#if CONFIG_CODEC == SWCODEC && !defined (SIMULATOR)
+void rec_set_source(int source, unsigned flags)
+{
+    /* Set audio input source, power up/down devices */
+    audio_set_input_source(source, flags);
+
+    /* Set peakmeters for recording or reset to playback */
+    peak_meter_playback((flags & SRCF_RECORDING) == 0);
+    peak_meter_enabled = true;
+}
+#endif /* CONFIG_CODEC == SWCODEC && !defined (SIMULATOR) */
 
 void rec_set_recording_options(struct audio_recording_options *options)
 {
@@ -2062,20 +2000,6 @@ void rec_set_source(int source, unsigned flags)
     flags = flags;
 }
 
-#ifdef HAVE_SPDIF_IN
-#ifdef HAVE_SPDIF_POWER
-void audio_set_spdif_power_setting(bool on)
-{
-    on = on;
-}
-
-bool audio_get_spdif_power_setting(void)
-{
-    return true;
-}
-#endif /* HAVE_SPDIF_POWER */
-#endif /* HAVE_SPDIF_IN */
-
 void audio_set_recording_options(struct audio_recording_options *options)
 {
     options = options;
@@ -2088,13 +2012,12 @@ void audio_set_recording_gain(int left, int right, int type)
     type = type;
 }
 
-void audio_set_output_source(int source)
+void audio_record(const char *filename)
 {
-    source = source;
+    filename = filename;
 }
 
-
-void audio_record(const char *filename)
+void audio_new_file(const char *filename)
 {
     filename = filename;
 }

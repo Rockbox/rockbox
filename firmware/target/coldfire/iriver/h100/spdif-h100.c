@@ -33,7 +33,8 @@ void spdif_init(void)
 {
     /* PHASECONFIG setup: gain = 3*2^13, source = EBUIN */
     PHASECONFIG = (6 << 3) | (4 << 0);
-    spdif_set_output_source(AUDIO_SRC_PLAYBACK, true);
+    spdif_set_output_source(AUDIO_SRC_PLAYBACK
+        IF_SPDIF_POWER_(, true));
 }
 
 /* Return the S/PDIF frequency in herz - unrounded */

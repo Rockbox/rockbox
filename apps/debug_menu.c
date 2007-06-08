@@ -693,7 +693,7 @@ static bool dbg_spdif(void)
     bool done = false;
     bool spdif_src_on;
     int spdif_source = spdif_get_output_source(&spdif_src_on);
-    spdif_set_output_source(AUDIO_SRC_SPDIF, true);
+    spdif_set_output_source(AUDIO_SRC_SPDIF IF_SPDIF_POWER_(, true));
 
     lcd_setmargins(0, 0);
     lcd_clear_display();
@@ -844,7 +844,7 @@ static bool dbg_spdif(void)
             break;
     }
 
-    spdif_set_output_source(spdif_source, spdif_src_on);
+    spdif_set_output_source(spdif_source IF_SPDIF_POWER_(, spdif_src_on));
 
 #ifdef HAVE_SPDIF_POWER
     spdif_power_enable(global_settings.spdif_enable);
