@@ -14,7 +14,13 @@ ifdef APPEXTRA
    INCLUDES += $(patsubst %,-I$(APPSDIR)/%,$(subst :, ,$(APPEXTRA)))
 endif
 
-TREMOROPTS = -O2
+# Tremor is slightly faster on coldfire with -O3
+ifeq ($(CPU),coldfire)
+    TREMOROPTS = -O3
+else
+    TREMOROPTS = -O2
+endif
+
 CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET_INC) $(TREMOROPTS) $(TARGET)	\
 $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE} ${PROFILE_OPTS}
 
