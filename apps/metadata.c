@@ -1038,9 +1038,9 @@ static bool get_monkeys_metadata(int fd, struct mp3entry* id3)
         /* v3.95 and later files all have a fixed framesize */
         blocksperframe = 73728 * 4;
 
-        finalframeblocks = get_long_le(buf+30);
-        totalframes = get_long_le(buf+26);
-        id3->frequency = get_long_le(buf+14);
+        finalframeblocks = get_long_le(buf+28);
+        totalframes = get_long_le(buf+24);
+        id3->frequency = get_long_le(buf+12);
     }
 
     id3->vbr = true;   /* All FLAC files are VBR */
