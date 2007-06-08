@@ -92,6 +92,10 @@ int ape_parseheaderbuf(unsigned char* buf, struct ape_ctx_t* ape_ctx)
         ape_ctx->channels = get_uint16(header + 18);
         ape_ctx->samplerate = get_uint32(header + 20);
 
+        ape_ctx->seektablefilepos = ape_ctx->junklength + 
+                                    ape_ctx->descriptorlength +
+                                    ape_ctx->headerlength;
+
         ape_ctx->firstframe = ape_ctx->junklength + ape_ctx->descriptorlength +
                               ape_ctx->headerlength + ape_ctx->seektablelength +
                               ape_ctx->wavheaderlength;
@@ -133,15 +137,19 @@ int ape_parseheaderbuf(unsigned char* buf, struct ape_ctx_t* ape_ctx)
         else
             ape_ctx->blocksperframe = 9216;
 
-        ape_ctx->firstframe = ape_ctx->junklength + ape_ctx->headerlength + 
-                              ape_ctx->seektablelength + ape_ctx->wavheaderlength;
+        ape_ctx->seektablefilepos = ape_ctx->junklength + ape_ctx->headerlength +
+                                    ape_ctx->wavheaderlength;
+
+        ape_ctx->firstframe = ape_ctx->junklength + ape_ctx->headerlength +
+                              ape_ctx->wavheaderlength + ape_ctx->seektablelength;
     }
 
     ape_ctx->totalsamples = ape_ctx->finalframeblocks;
     if (ape_ctx->totalframes > 1)
         ape_ctx->totalsamples += ape_ctx->blocksperframe * (ape_ctx->totalframes-1);
 
-    /* TODO: Parse and store seektable */
+    ape_ctx->numseekpoints = MAX(ape_ctx->maxseekpoints,
+                                 ape_ctx->seektablelength / sizeof(int32_t));
 
     return 0;
 }

@@ -2,7 +2,7 @@
 
 libdemac - A Monkey's Audio decoder
 
-$Id:$
+$Id$
 
 Copyright (C) Dave Chapman 2007
 
@@ -119,7 +119,10 @@ struct ape_ctx_t
     uint32_t      samplerate;
 
     /* Seektable */
-    uint32_t*     seektable;
+    uint32_t*     seektable;        /* Seektable buffer */
+    uint32_t      maxseekpoints;    /* Max seekpoints we can store (size of seektable buffer) */
+    uint32_t      numseekpoints;    /* Number of seekpoints */
+    int           seektablefilepos; /* Location in .ape file of seektable */
 
     /* Decoder state */
     uint32_t      CRC;
