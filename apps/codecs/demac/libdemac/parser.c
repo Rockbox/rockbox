@@ -35,6 +35,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 #include "parser.h"
 
+#ifdef APE_MAX
+#undef APE_MAX
+#endif
+#define APE_MAX(a,b) ((a)>(b)?(a):(b))
+
 
 static inline int16_t get_int16(unsigned char* buf)
 {
@@ -148,8 +153,8 @@ int ape_parseheaderbuf(unsigned char* buf, struct ape_ctx_t* ape_ctx)
     if (ape_ctx->totalframes > 1)
         ape_ctx->totalsamples += ape_ctx->blocksperframe * (ape_ctx->totalframes-1);
 
-    ape_ctx->numseekpoints = MAX(ape_ctx->maxseekpoints,
-                                 ape_ctx->seektablelength / sizeof(int32_t));
+    ape_ctx->numseekpoints = APE_MAX(ape_ctx->maxseekpoints,
+                                     ape_ctx->seektablelength / sizeof(int32_t));
 
     return 0;
 }
