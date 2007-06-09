@@ -606,7 +606,12 @@ static void gui_list_select_at_offset(struct gui_list * gui_list, int offset)
         /* always select the first item of multi-line lists */
         offset -= offset%gui_list->selected_size;
     }
-    if (offset < 0)
+    if (offset == 0 && global_settings.scroll_paginated &&
+        (gui_list->nb_items > gui_list->display->nb_lines - SHOW_LIST_TITLE))
+    {
+        gui_list->selected_item = gui_list->selected_item;
+    }
+    else if (offset < 0)
         gui_list_select_above(gui_list, -offset);
     else
         gui_list_select_below(gui_list, offset);
