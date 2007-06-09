@@ -56,12 +56,12 @@ public:
             wxMINIMIZE_BOX|wxMAXIMIZE_BOX | wxCLOSE_BOX);
     virtual ~rbutilFrm();
 public:
-	   DeviceSelectorCtrl* myDeviceSelector;
-	   wxHyperlinkCtrl* manuallink;
-	   wxHtmlWindow* manual;
-       wxString curManualDevice;
+	    DeviceSelectorCtrl* myDeviceSelector;
+	    wxHyperlinkCtrl* manuallink;
+	    wxHtmlWindow* manual;
+        wxString curManualDevice;
 
-  	   wxMenuBar *WxMenuBar1;
+  	    wxMenuBar *WxMenuBar1;
 		wxStaticText *WxStaticText3;
 		wxBitmapButton *WxBitmapButton2;
 		wxStaticText *WxStaticText2;
@@ -91,16 +91,16 @@ public:
 			ID_WXSTATICTEXT2 = 1029,
 			ID_INSTALL_BTN = 1028,
 			ID_WXSTATICBITMAP1 = 1053,
-         ID_FONT_BTN = 1128,
-         ID_THEMES_BTN = 1139,
-         ID_DOOM_BTN = 1140,
-         ID_BOOTLOADER_BTN = 1129,
+            ID_FONT_BTN = 1128,
+            ID_THEMES_BTN = 1139,
+            ID_DOOM_BTN = 1140,
+            ID_BOOTLOADER_BTN = 1129,
 			ID_WXPANEL1 = 1064,
 
-         ID_MANUAL = 1065,
-         ID_FILE_PROXY = 1066,
+            ID_MANUAL = 1065,
+            ID_FILE_PROXY = 1066,
 
-         ID_DUMMY_VALUE_
+            ID_DUMMY_VALUE_
    }; //End of Enum
 public:
     void rbutilFrmClose(wxCloseEvent& event);
@@ -116,9 +116,9 @@ public:
 	void OnBootloaderBtn(wxCommandEvent& event);
 	void OnPortableInstall(wxCommandEvent& event);
 	void OnBootloaderRemoveBtn(wxCommandEvent& event);
-   void OnManualUpdate(wxUpdateUIEvent& event);
-   void OnFileProxy(wxCommandEvent& event);
-   void OnDoomBtn(wxCommandEvent& event);
+    void OnManualUpdate(wxUpdateUIEvent& event);
+    void OnFileProxy(wxCommandEvent& event);
+    void OnDoomBtn(wxCommandEvent& event);
 
 };
 

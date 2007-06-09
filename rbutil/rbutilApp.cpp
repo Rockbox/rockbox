@@ -123,20 +123,19 @@ bool rbutilFrmApp::ReadGlobalConfig(rbutilFrm* myFrame)
     wxLogVerbose(wxT("=== begin rbutilFrmApp::ReadGlobalConfig(%p)"),
         (void*) myFrame);
 
-    // Cross-platform compatibility: look for rbutil.ini in the same dir as the
-    // executable before trying the standard data directory.  On Windows these
-    // are of course the same directory.
-    buf.Printf(wxT("%s" PATH_SEP "rbutil.ini"), gv->AppDir.c_str() );
+    // Cross-platform compatibility: look for rbutil.ini in then in the app dir
+    //  then in the user config dir (linux ~/) and
+    //  then config dir (linux /etc/ )
 
-//    if (! wxFileExists(buf) )
-//    {
-//        gv->ResourceDir = gv->stdpaths->GetResourcesDir();
-//        buf.Printf(wxT("%s" PATH_SEP "rbutil.ini"),
-//            gv->ResourceDir.c_str() );
-//    } else
-//    {
-//        gv->ResourceDir = gv->AppDir;
-//    }
+    buf.Printf(wxT("%s" PATH_SEP "rbutil.ini"), gv->AppDir.c_str() );
+    if (! wxFileExists(buf) )
+    {
+        buf.Printf(wxT("%s" PATH_SEP ".rbutil" PATH_SEP "rbutil.ini"), gv->stdpaths->GetUserConfigDir().c_str() );
+        if (! wxFileExists(buf) )
+        {
+            buf.Printf(wxT("%s" PATH_SEP "rbutil.ini"), gv->stdpaths->GetConfigDir().c_str() );
+        }
+    }
 
     wxFileInputStream* cfgis = new wxFileInputStream(buf);
 

@@ -52,17 +52,17 @@ wxSize ImageCtrl::DoGetBestSize() const
 //// Theme Control
 //////////////////////////////////////////////
 
-BEGIN_EVENT_TABLE(ThemeCtrl, wxControl)
+BEGIN_EVENT_TABLE(ThemeCtrl, wxPanel)
     EVT_LISTBOX(ID_THEME_LST, ThemeCtrl::OnThemesLst)
 END_EVENT_TABLE()
 
-IMPLEMENT_DYNAMIC_CLASS(ThemeCtrl, wxControl)
+IMPLEMENT_DYNAMIC_CLASS(ThemeCtrl, wxPanel)
 
 bool ThemeCtrl::Create(wxWindow* parent, wxWindowID id,
     const wxPoint& pos, const wxSize& size, long style,
-    const wxValidator& validator)
+    const wxString title )
 {
-    if (!wxControl::Create(parent, id, pos, size, style, validator)) return false;
+    if (!wxPanel::Create(parent, id, pos, size, style, title)) return false;
 
     CreateControls();
 
@@ -291,17 +291,17 @@ void ThemeCtrl::OnThemesLst(wxCommandEvent& event)
 //// Ok Cancel Control
 //////////////////////////////////////////////
 
-BEGIN_EVENT_TABLE(OkCancelCtrl, wxControl)
+BEGIN_EVENT_TABLE(OkCancelCtrl, wxPanel)
 
 END_EVENT_TABLE()
 
-IMPLEMENT_DYNAMIC_CLASS(OkCancelCtrl, wxControl)
+IMPLEMENT_DYNAMIC_CLASS(OkCancelCtrl, wxPanel)
 
 bool OkCancelCtrl::Create(wxWindow* parent, wxWindowID id,
     const wxPoint& pos, const wxSize& size, long style,
-    const wxValidator& validator)
+    const wxString title)
 {
-    if (!wxControl::Create(parent, id, pos, size, style, validator)) return false;
+    if (!wxPanel::Create(parent, id, pos, size, style, title)) return false;
 
     CreateControls();
     GetSizer()->Fit(this);
@@ -333,23 +333,23 @@ void OkCancelCtrl::CreateControls()
 //// Device Selector
 //////////////////////////////////////////////
 
-BEGIN_EVENT_TABLE(DeviceSelectorCtrl, wxControl)
+BEGIN_EVENT_TABLE(DeviceSelectorCtrl, wxPanel)
     EVT_BUTTON(ID_AUTODETECT_BTN, DeviceSelectorCtrl::OnAutoDetect)
     EVT_COMBOBOX(ID_DEVICE_CBX,DeviceSelectorCtrl::OnComboBox)
 END_EVENT_TABLE()
 
-IMPLEMENT_DYNAMIC_CLASS(DeviceSelectorCtrl, wxControl)
+IMPLEMENT_DYNAMIC_CLASS(DeviceSelectorCtrl, wxPanel)
 
 bool DeviceSelectorCtrl::Create(wxWindow* parent, wxWindowID id,
     const wxPoint& pos, const wxSize& size, long style,
-    const wxValidator& validator)
+    const wxString title)
 {
-    if (!wxControl::Create(parent, id, pos, size, style, validator)) return false;
+    if (!wxPanel::Create(parent, id, pos, size, style, title)) return false;
 
     CreateControls();
     GetSizer()->Fit(this);
     GetSizer()->SetSizeHints(this);
-return true;
+    return true;
 }
 
 void DeviceSelectorCtrl::CreateControls()
@@ -358,8 +358,7 @@ void DeviceSelectorCtrl::CreateControls()
     wxBoxSizer* topSizer = new wxBoxSizer(wxVERTICAL);
     this->SetSizer(topSizer);
 
-    //Device Selection
-
+     //Device Selection
     wxBoxSizer* horizontalSizer = new wxBoxSizer(wxHORIZONTAL);
     topSizer->Add(horizontalSizer, 0, wxALIGN_LEFT|wxALL, 5);
 	 m_desc = new wxStaticText( this, wxID_STATIC,
@@ -367,7 +366,7 @@ void DeviceSelectorCtrl::CreateControls()
         wxDefaultSize, 0 );
     horizontalSizer->Add(m_desc, 0, wxALIGN_LEFT|wxALL, 5);
 
-    m_deviceCbx = new wxComboBox(this, ID_DEVICE_CBX,wxT(""),
+    m_deviceCbx = new wxComboBox(this, ID_DEVICE_CBX,wxT("Select your Device"),
             wxDefaultPosition,wxDefaultSize,gv->plat_name,wxCB_READONLY);
 
     m_deviceCbx->SetToolTip(wxT("Select your Device."));
@@ -379,8 +378,9 @@ void DeviceSelectorCtrl::CreateControls()
          wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator,
          wxT("AutodetectBtn"));
 
-    m_autodetectBtn->SetToolTip(wxT("Autodetection of the Device."));
+    m_autodetectBtn->SetToolTip(wxT("Click here to autodetect your Device."));
     m_autodetectBtn->SetHelpText(wxT("Autodetection of the Device."));
+   // m_autodetectBtn->SetFocus();
 
     horizontalSizer->Add(m_autodetectBtn,0,wxGROW | wxALL,5);
     Layout();
@@ -457,17 +457,17 @@ void DeviceSelectorCtrl::OnAutoDetect(wxCommandEvent& event)
 //// DevicePosition Selector
 //////////////////////////////////////////////
 
-BEGIN_EVENT_TABLE(DevicePositionCtrl, wxControl)
+BEGIN_EVENT_TABLE(DevicePositionCtrl, wxPanel)
     EVT_BUTTON(ID_BROWSE_BTN, DevicePositionCtrl::OnBrowseBtn)
 END_EVENT_TABLE()
 
-IMPLEMENT_DYNAMIC_CLASS(DevicePositionCtrl, wxControl)
+IMPLEMENT_DYNAMIC_CLASS(DevicePositionCtrl, wxPanel)
 
 bool DevicePositionCtrl::Create(wxWindow* parent, wxWindowID id,
     const wxPoint& pos, const wxSize& size, long style,
-    const wxValidator& validator)
+    const wxString title)
 {
-    if (!wxControl::Create(parent, id, pos, size, style, validator)) return false;
+    if (!wxPanel::Create(parent, id, pos, size, style, title)) return false;
 
     CreateControls();
     GetSizer()->Fit(this);
@@ -491,8 +491,8 @@ void DevicePositionCtrl::CreateControls()
     topSizer->Add(horizontalSizer, 0, wxGROW|wxALL, 5);
 
     m_devicePos = new wxTextCtrl(this,wxID_ANY,gv->curdestdir);
-    m_devicePos->SetToolTip(wxT("Select your Devicefolder"));
-    m_devicePos->SetHelpText(wxT("Select your Devicefolder"));
+    m_devicePos->SetToolTip(wxT("Type the folder where your Device is here"));
+    m_devicePos->SetHelpText(wxT("Type the folder where your Device is here"));
     horizontalSizer->Add(m_devicePos,0,wxGROW | wxALL,5);
 
     m_browseBtn = new wxButton(this, ID_BROWSE_BTN, wxT("Browse"),
@@ -534,7 +534,7 @@ void DevicePositionCtrl::OnBrowseBtn(wxCommandEvent& event)
 //// FirmwarePosition Selector
 //////////////////////////////////////////////
 
-BEGIN_EVENT_TABLE(FirmwarePositionCtrl, wxControl)
+BEGIN_EVENT_TABLE(FirmwarePositionCtrl, wxPanel)
     EVT_BUTTON(ID_BROWSE_BTN, FirmwarePositionCtrl::OnBrowseBtn)
 END_EVENT_TABLE()
 
@@ -542,9 +542,9 @@ IMPLEMENT_DYNAMIC_CLASS(FirmwarePositionCtrl, wxControl)
 
 bool FirmwarePositionCtrl::Create(wxWindow* parent, wxWindowID id,
     const wxPoint& pos, const wxSize& size, long style,
-    const wxValidator& validator)
+    const wxString title)
 {
-    if (!wxControl::Create(parent, id, pos, size, style, validator)) return false;
+    if (!wxPanel::Create(parent, id, pos, size, style, title)) return false;
 
     CreateControls();
     GetSizer()->Fit(this);
@@ -568,8 +568,8 @@ void FirmwarePositionCtrl::CreateControls()
     topSizer->Add(horizontalSizer, 0, wxALIGN_LEFT|wxALL, 5);
 
     m_firmwarePos = new wxTextCtrl(this,wxID_ANY,gv->curdestdir);
-    m_firmwarePos->SetToolTip(wxT("Select the original Firmware"));
-    m_firmwarePos->SetHelpText(wxT("Select the original Firmware"));
+    m_firmwarePos->SetToolTip(wxT("Type the folder where the original Firmware is here"));
+    m_firmwarePos->SetHelpText(wxT("Type the folder where the original Firmware is here"));
     horizontalSizer->Add(m_firmwarePos,0,wxGROW | wxALL,5);
 
     m_browseBtn = new wxButton(this, ID_BROWSE_BTN, wxT("Browse"),

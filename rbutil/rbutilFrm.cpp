@@ -89,11 +89,14 @@ void rbutilFrm::CreateGUIControls(void)
     wxBitmap rockboxbmp(rblogo_xpm);
     ImageCtrl* rockboxbmpCtrl = new ImageCtrl(mainPanel,wxID_ANY);
     rockboxbmpCtrl->SetBitmap(rockboxbmp);
+
     WxBoxSizer0->Add(rockboxbmpCtrl,0,wxALIGN_CENTER_HORIZONTAL | wxALL,5);
 
 	myDeviceSelector = new DeviceSelectorCtrl(mainPanel,wxID_ANY);
 	myDeviceSelector->setDefault();
 	WxBoxSizer0->Add(myDeviceSelector,0,wxGROW|wxALL,5);
+
+
 
     wxNotebook* tabwindow = new wxNotebook(mainPanel,wxID_ANY);
     WxBoxSizer0->Add(tabwindow,1,wxGROW|wxALL,5);
@@ -128,8 +131,7 @@ void rbutilFrm::CreateGUIControls(void)
     WxBitmapButton4 = new wxBitmapButton(installpage, ID_BOOTLOADER_BTN,
         BootloaderInstallButton, wxPoint(0,0), wxSize(64,54),
         wxRAISED_BORDER | wxBU_AUTODRAW);
-    WxBitmapButton4->SetToolTip(wxT("Instructions for installing the "
-        "Rockbox bootloader on your audio device"));
+    WxBitmapButton4->SetToolTip(wxT("Click here to install the Rockbox bootloader"));
     WxFlexGridSizer1->Add(WxBitmapButton4, 0,
         wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL | wxALL,5);
 
@@ -146,7 +148,7 @@ void rbutilFrm::CreateGUIControls(void)
         WxBitmapButton1_BITMAP, wxPoint(0,0), wxSize(64,54),
         wxRAISED_BORDER | wxBU_AUTODRAW, wxDefaultValidator,
         wxT("WxBitmapButton1"));
-	WxBitmapButton1->SetToolTip(wxT("Install Rockbox"));
+	WxBitmapButton1->SetToolTip(wxT("Click here to install Rockbox"));
 	WxFlexGridSizer1->Add(WxBitmapButton1,0,
         wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL | wxALL,5);
 
@@ -176,7 +178,7 @@ void rbutilFrm::CreateGUIControls(void)
     WxBitmapButton3 = new wxBitmapButton(themepage, ID_FONT_BTN,
         FontInstallButton, wxPoint(0,0), wxSize(64,54),
         wxRAISED_BORDER | wxBU_AUTODRAW);
-    WxBitmapButton3->SetToolTip(wxT("Download the most up to date "
+    WxBitmapButton3->SetToolTip(wxT("Click here to install the most up to date "
         "Rockbox fonts."));
     WxFlexGridSizer2->Add(WxBitmapButton3, 0,
         wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL | wxALL,5);
@@ -193,7 +195,7 @@ void rbutilFrm::CreateGUIControls(void)
     WxBitmapButton5 = new wxBitmapButton(themepage, ID_THEMES_BTN,
         ThemesInstallButton, wxPoint(0,0), wxSize(64,54),
         wxRAISED_BORDER | wxBU_AUTODRAW);
-    WxBitmapButton5->SetToolTip(wxT("Download other Themes for Rockbox."));
+    WxBitmapButton5->SetToolTip(wxT("Click here to install themes for Rockbox."));
     WxFlexGridSizer2->Add(WxBitmapButton5, 0,
         wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL | wxALL,5);
 
@@ -207,7 +209,7 @@ void rbutilFrm::CreateGUIControls(void)
     WxBitmapButton6 = new wxBitmapButton(themepage, ID_DOOM_BTN,
         DoomInstallButton, wxPoint(0,0), wxSize(64,54),
         wxRAISED_BORDER | wxBU_AUTODRAW);
-    WxBitmapButton6->SetToolTip(wxT("Download freedoom wad files."));
+    WxBitmapButton6->SetToolTip(wxT("Click here to install the freedoom wad files."));
     WxFlexGridSizer2->Add(WxBitmapButton6, 0,
         wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL | wxALL,5);
 
@@ -238,7 +240,7 @@ void rbutilFrm::CreateGUIControls(void)
         WxBitmapButton2_BITMAP, wxPoint(0,0), wxSize(64,54),
         wxRAISED_BORDER | wxBU_AUTODRAW, wxDefaultValidator,
         wxT("WxBitmapButton2"));
-	WxBitmapButton2->SetToolTip(wxT("Uninstall Rockbox"));
+	WxBitmapButton2->SetToolTip(wxT("Click here to uninstall Rockbox"));
 	WxFlexGridSizer3->Add(WxBitmapButton2,0,
         wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL | wxALL,5);
 
@@ -252,7 +254,7 @@ void rbutilFrm::CreateGUIControls(void)
         WxBitmapButton4_BITMAP, wxPoint(0,0), wxSize(64,54),
         wxRAISED_BORDER | wxBU_AUTODRAW, wxDefaultValidator,
         wxT("WxBitmapButton4"));
-	WxBitmapButton4->SetToolTip(wxT("Uninstall Bootloader"));
+	WxBitmapButton4->SetToolTip(wxT("Click here to uninstall the Bootloader"));
 	WxFlexGridSizer3->Add(WxBitmapButton4,0,
         wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL | wxALL,5);
 
