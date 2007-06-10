@@ -68,24 +68,28 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 #define HISTORY_SIZE 512
 #define PREDICTOR_ORDER 8
+/* Total size of all predictor histories - 50 * sizeof(int32_t) */
+#define PREDICTOR_SIZE 50
 
 struct predictor_t
 {
-    /* Adaption co-efficients */
-    int32_t coeffsA[4];
-    int32_t coeffsB[5];
-
     /* Filter histories */
-    int32_t historybuffer[HISTORY_SIZE + PREDICTOR_ORDER * 4];
-    int32_t* delayA;
-    int32_t* delayB;
-    int32_t* adaptcoeffsA;
-    int32_t* adaptcoeffsB;
+    int32_t* buf;
 
-    int32_t lastA;
+    int32_t YlastA;
+    int32_t XlastA;
 
-    int32_t filterA;
-    int32_t filterB;
+    int32_t YfilterA;
+    int32_t XfilterA;
+    int32_t YfilterB;
+    int32_t XfilterB;
+
+    /* Adaption co-efficients */
+    int32_t YcoeffsA[4];
+    int32_t XcoeffsA[4];
+    int32_t YcoeffsB[5];
+    int32_t XcoeffsB[5];
+    int32_t historybuffer[HISTORY_SIZE + PREDICTOR_SIZE];
 };
 
 struct ape_ctx_t
@@ -129,8 +133,7 @@ struct ape_ctx_t
     int           frameflags;
     int           currentframeblocks;
     int           blocksdecoded;
-    struct predictor_t predictorY;
-    struct predictor_t predictorX;
+    struct predictor_t predictor;
 };
 
 int ape_parseheader(int fd, struct ape_ctx_t* ape_ctx);

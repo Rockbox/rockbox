@@ -37,160 +37,230 @@ static const int32_t initial_coeffs[4] = {
   360, 317, -109, 98
 };
 
-static void init_predictor(struct predictor_t* p)
+#define YDELAYA (18 + PREDICTOR_ORDER*4)
+#define YDELAYB (18 + PREDICTOR_ORDER*3)
+#define XDELAYA (18 + PREDICTOR_ORDER*2)
+#define XDELAYB (18 + PREDICTOR_ORDER)
+
+#define YADAPTCOEFFSA (18)
+#define XADAPTCOEFFSA (14)
+#define YADAPTCOEFFSB (10)
+#define XADAPTCOEFFSB (5)
+
+void init_predictor_decoder(struct predictor_t* p)
 {
     /* Zero the history buffers */
-    memset(p->historybuffer, 0, (PREDICTOR_ORDER*4) * sizeof(int32_t));
-    p->delayA = p->historybuffer + PREDICTOR_ORDER*4;
-    p->delayB = p->historybuffer + PREDICTOR_ORDER*3;
-    p->adaptcoeffsA = p->historybuffer + PREDICTOR_ORDER*2;
-    p->adaptcoeffsB = p->historybuffer + PREDICTOR_ORDER;
+    memset(p->historybuffer, 0, PREDICTOR_SIZE * sizeof(int32_t));
+    p->buf = p->historybuffer;
 
     /* Initialise and zero the co-efficients */
-    memcpy(p->coeffsA, initial_coeffs, sizeof(initial_coeffs));
-    memset(p->coeffsB, 0, sizeof(p->coeffsB));
+    memcpy(p->YcoeffsA, initial_coeffs, sizeof(initial_coeffs));
+    memcpy(p->XcoeffsA, initial_coeffs, sizeof(initial_coeffs));
+    memset(p->YcoeffsB, 0, sizeof(p->YcoeffsB));
+    memset(p->XcoeffsB, 0, sizeof(p->XcoeffsB));
 
-    p->filterA = 0;
-    p->filterB = 0;
-    
-    p->lastA = 0;
+    p->YfilterA = 0;
+    p->YfilterB = 0;
+    p->YlastA = 0;
+
+    p->XfilterA = 0;
+    p->XfilterB = 0;
+    p->XlastA = 0;
 }
 
-static int do_predictor_decode(struct predictor_t* p, int32_t A, int32_t B)
+#ifdef CPU_COLDFIRE
+/* Putting this in IRAM makes a small speedup (e.g. 186% -> 187%
+   realtime for a -c1000 file on Coldfire, but is slower on PP. */
+int predictor_decode_stereo(struct predictor_t* p, int32_t* decoded0, int32_t* decoded1, int count) ICODE_ATTR;
+#endif
+
+int predictor_decode_stereo(struct predictor_t* p, int32_t* decoded0, int32_t* decoded1, int count)
 {
-    int32_t predictionA, predictionB, currentA;
+    int32_t predictionA, predictionB;
 
-    p->delayA[0] = p->lastA;
-    p->delayA[-1] = p->delayA[0] - p->delayA[-1];
-
-    predictionA = scalarproduct4_rev32(p->coeffsA,p->delayA);
-
-    /*  Apply a scaled first-order filter compression */
-    p->delayB[0] = B - ((p->filterB * 31) >> 5);
-    p->filterB = B;
-
-    p->delayB[-1] = p->delayB[0] - p->delayB[-1];
-
-    predictionB = scalarproduct5_rev32(p->coeffsB,p->delayB);
-
-    currentA = A + ((predictionA + (predictionB >> 1)) >> 10);
-
-    p->adaptcoeffsA[0] = SIGN(p->delayA[0]);
-    p->adaptcoeffsA[-1] = SIGN(p->delayA[-1]);
-
-    p->adaptcoeffsB[0] = SIGN(p->delayB[0]);
-    p->adaptcoeffsB[-1] = SIGN(p->delayB[-1]);
-
-    if (A > 0) 
-    {
-        vector_sub4_rev32(p->coeffsA, p->adaptcoeffsA);
-        vector_sub5_rev32(p->coeffsB, p->adaptcoeffsB);
-    }
-    else if (A < 0) 
-    {
-        vector_add4_rev32(p->coeffsA, p->adaptcoeffsA);
-        vector_add5_rev32(p->coeffsB, p->adaptcoeffsB);
-    }
-
-    p->delayA++;
-    p->delayB++;
-    p->adaptcoeffsA++;
-    p->adaptcoeffsB++;
-
-    /* Have we filled the history buffer? */
-    if (p->delayA == p->historybuffer + HISTORY_SIZE + (PREDICTOR_ORDER*4)) {
-        memmove(p->historybuffer, p->delayA - (PREDICTOR_ORDER*4), 
-                (PREDICTOR_ORDER*4) * sizeof(int32_t));
-        p->delayA = p->historybuffer + PREDICTOR_ORDER*4;
-        p->delayB = p->historybuffer + PREDICTOR_ORDER*3;
-        p->adaptcoeffsA = p->historybuffer + PREDICTOR_ORDER*2;
-        p->adaptcoeffsB = p->historybuffer + PREDICTOR_ORDER;
-    }
-
-    p->lastA = currentA;
-    p->filterA =  currentA + ((p->filterA * 31) >> 5);
-
-    return p->filterA;
-}
-
-static int32_t X;
-
-void init_predictor_decoder(struct ape_ctx_t* ape_ctx)
-{
-    X = 0;
-
-    init_predictor(&ape_ctx->predictorY);
-    init_predictor(&ape_ctx->predictorX);
-}
-
-int predictor_decode_stereo(struct ape_ctx_t* ape_ctx, int32_t* decoded0, int32_t* decoded1, int count) ICODE_ATTR;
-int predictor_decode_stereo(struct ape_ctx_t* ape_ctx, int32_t* decoded0, int32_t* decoded1, int count)
-{
     while (count--)
     {
-        *decoded0 = do_predictor_decode(&ape_ctx->predictorY, *decoded0, X);
-        X = do_predictor_decode(&ape_ctx->predictorX, *decoded1, *(decoded0)++);
-        *(decoded1++) = X;
+        /* Predictor Y */
+        p->buf[YDELAYA] = p->YlastA;
+        p->buf[YADAPTCOEFFSA] = SIGN(p->buf[YDELAYA]);
+
+        p->buf[YDELAYA-1] = p->buf[YDELAYA] - p->buf[YDELAYA-1];
+        p->buf[YADAPTCOEFFSA-1] = SIGN(p->buf[YDELAYA-1]);
+
+        predictionA = (p->buf[YDELAYA] * p->YcoeffsA[0]) + 
+                      (p->buf[YDELAYA-1] * p->YcoeffsA[1]) + 
+                      (p->buf[YDELAYA-2] * p->YcoeffsA[2]) + 
+                      (p->buf[YDELAYA-3] * p->YcoeffsA[3]);
+
+        /*  Apply a scaled first-order filter compression */
+        p->buf[YDELAYB] = p->XfilterA - ((p->YfilterB * 31) >> 5);
+        p->buf[YADAPTCOEFFSB] = SIGN(p->buf[YDELAYB]);
+        p->YfilterB = p->XfilterA;
+
+        p->buf[YDELAYB-1] = p->buf[YDELAYB] - p->buf[YDELAYB-1];
+        p->buf[YADAPTCOEFFSB-1] = SIGN(p->buf[YDELAYB-1]);
+
+        predictionB = (p->buf[YDELAYB] * p->YcoeffsB[0]) + 
+                      (p->buf[YDELAYB-1] * p->YcoeffsB[1]) + 
+                      (p->buf[YDELAYB-2] * p->YcoeffsB[2]) + 
+                      (p->buf[YDELAYB-3] * p->YcoeffsB[3]) + 
+                      (p->buf[YDELAYB-4] * p->YcoeffsB[4]);
+
+        p->YlastA = *decoded0 + ((predictionA + (predictionB >> 1)) >> 10);
+        p->YfilterA =  p->YlastA + ((p->YfilterA * 31) >> 5);
+
+        /* Predictor X */
+
+        p->buf[XDELAYA] = p->XlastA;
+        p->buf[XADAPTCOEFFSA] = SIGN(p->buf[XDELAYA]);
+        p->buf[XDELAYA-1] = p->buf[XDELAYA] - p->buf[XDELAYA-1];
+        p->buf[XADAPTCOEFFSA-1] = SIGN(p->buf[XDELAYA-1]);
+
+        predictionA = (p->buf[XDELAYA] * p->XcoeffsA[0]) + 
+                      (p->buf[XDELAYA-1] * p->XcoeffsA[1]) + 
+                      (p->buf[XDELAYA-2] * p->XcoeffsA[2]) + 
+                      (p->buf[XDELAYA-3] * p->XcoeffsA[3]);
+
+        /*  Apply a scaled first-order filter compression */
+        p->buf[XDELAYB] = p->YfilterA - ((p->XfilterB * 31) >> 5);
+        p->buf[XADAPTCOEFFSB] = SIGN(p->buf[XDELAYB]);
+        p->XfilterB = p->YfilterA;
+        p->buf[XDELAYB-1] = p->buf[XDELAYB] - p->buf[XDELAYB-1];
+        p->buf[XADAPTCOEFFSB-1] = SIGN(p->buf[XDELAYB-1]);
+
+        predictionB = (p->buf[XDELAYB] * p->XcoeffsB[0]) + 
+                      (p->buf[XDELAYB-1] * p->XcoeffsB[1]) + 
+                      (p->buf[XDELAYB-2] * p->XcoeffsB[2]) + 
+                      (p->buf[XDELAYB-3] * p->XcoeffsB[3]) + 
+                      (p->buf[XDELAYB-4] * p->XcoeffsB[4]);
+
+        p->XlastA = *decoded1 + ((predictionA + (predictionB >> 1)) >> 10); 
+        p->XfilterA =  p->XlastA + ((p->XfilterA * 31) >> 5);
+
+        if (*decoded0 > 0) 
+        {
+            p->YcoeffsA[0] -= p->buf[YADAPTCOEFFSA];
+            p->YcoeffsA[1] -= p->buf[YADAPTCOEFFSA-1];
+            p->YcoeffsA[2] -= p->buf[YADAPTCOEFFSA-2];
+            p->YcoeffsA[3] -= p->buf[YADAPTCOEFFSA-3];
+
+            p->YcoeffsB[0] -= p->buf[YADAPTCOEFFSB];
+            p->YcoeffsB[1] -= p->buf[YADAPTCOEFFSB-1];
+            p->YcoeffsB[2] -= p->buf[YADAPTCOEFFSB-2];
+            p->YcoeffsB[3] -= p->buf[YADAPTCOEFFSB-3];
+            p->YcoeffsB[4] -= p->buf[YADAPTCOEFFSB-4];
+        }
+        else if (*decoded0 < 0) 
+        {
+            p->YcoeffsA[0] += p->buf[YADAPTCOEFFSA];
+            p->YcoeffsA[1] += p->buf[YADAPTCOEFFSA-1];
+            p->YcoeffsA[2] += p->buf[YADAPTCOEFFSA-2];
+            p->YcoeffsA[3] += p->buf[YADAPTCOEFFSA-3];
+
+            p->YcoeffsB[0] += p->buf[YADAPTCOEFFSB];
+            p->YcoeffsB[1] += p->buf[YADAPTCOEFFSB-1];
+            p->YcoeffsB[2] += p->buf[YADAPTCOEFFSB-2];
+            p->YcoeffsB[3] += p->buf[YADAPTCOEFFSB-3];
+            p->YcoeffsB[4] += p->buf[YADAPTCOEFFSB-4];
+        }
+
+        *(decoded0++) = p->YfilterA;
+
+        if (*decoded1 > 0) 
+        {
+            p->XcoeffsA[0] -= p->buf[XADAPTCOEFFSA];
+            p->XcoeffsA[1] -= p->buf[XADAPTCOEFFSA-1];
+            p->XcoeffsA[2] -= p->buf[XADAPTCOEFFSA-2];
+            p->XcoeffsA[3] -= p->buf[XADAPTCOEFFSA-3];
+
+            p->XcoeffsB[0] -= p->buf[XADAPTCOEFFSB];
+            p->XcoeffsB[1] -= p->buf[XADAPTCOEFFSB-1];
+            p->XcoeffsB[2] -= p->buf[XADAPTCOEFFSB-2];
+            p->XcoeffsB[3] -= p->buf[XADAPTCOEFFSB-3];
+            p->XcoeffsB[4] -= p->buf[XADAPTCOEFFSB-4];
+        }
+        else if (*decoded1 < 0) 
+        {
+            p->XcoeffsA[0] += p->buf[XADAPTCOEFFSA];
+            p->XcoeffsA[1] += p->buf[XADAPTCOEFFSA-1];
+            p->XcoeffsA[2] += p->buf[XADAPTCOEFFSA-2];
+            p->XcoeffsA[3] += p->buf[XADAPTCOEFFSA-3];
+
+            p->XcoeffsB[0] += p->buf[XADAPTCOEFFSB];
+            p->XcoeffsB[1] += p->buf[XADAPTCOEFFSB-1];
+            p->XcoeffsB[2] += p->buf[XADAPTCOEFFSB-2];
+            p->XcoeffsB[3] += p->buf[XADAPTCOEFFSB-3];
+            p->XcoeffsB[4] += p->buf[XADAPTCOEFFSB-4];
+        }
+
+        *(decoded1++) = p->XfilterA;
+
+        /* Combined */
+        p->buf++;
+
+        /* Have we filled the history buffer? */
+        if (p->buf == p->historybuffer + HISTORY_SIZE) {
+            memmove(p->historybuffer, p->buf, 
+                    PREDICTOR_SIZE * sizeof(int32_t));
+            p->buf = p->historybuffer;
+        }
     }
 
     return 0;
 }
 
-int predictor_decode_mono(struct ape_ctx_t* ape_ctx, int32_t* decoded0, int count)
+int predictor_decode_mono(struct predictor_t* p, int32_t* decoded0, int count)
 {
-    struct predictor_t* p = &ape_ctx->predictorY;
     int32_t predictionA, currentA, A;
 
-    currentA = p->lastA;
+    currentA = p->YlastA;
 
     while (count--)
     {
         A = *decoded0;
 
-        p->delayA[0] = currentA;
-        p->delayA[-1] = p->delayA[0] - p->delayA[-1];
+        p->buf[YDELAYA] = currentA;
+        p->buf[YDELAYA-1] = p->buf[YDELAYA] - p->buf[YDELAYA-1];
 
-        predictionA = (p->delayA[0] * p->coeffsA[0]) + 
-                      (p->delayA[-1] * p->coeffsA[1]) + 
-                      (p->delayA[-2] * p->coeffsA[2]) + 
-                      (p->delayA[-3] * p->coeffsA[3]);
+        predictionA = (p->buf[YDELAYA] * p->YcoeffsA[0]) + 
+                      (p->buf[YDELAYA-1] * p->YcoeffsA[1]) + 
+                      (p->buf[YDELAYA-2] * p->YcoeffsA[2]) + 
+                      (p->buf[YDELAYA-3] * p->YcoeffsA[3]);
 
         currentA = A + (predictionA >> 10);
 
-        p->adaptcoeffsA[0] = SIGN(p->delayA[0]);
-        p->adaptcoeffsA[-1] = SIGN(p->delayA[-1]);
+        p->buf[YADAPTCOEFFSA] = SIGN(p->buf[YDELAYA]);
+        p->buf[YADAPTCOEFFSA-1] = SIGN(p->buf[YDELAYA-1]);
         
         if (A > 0) 
         {
-            p->coeffsA[0] -= p->adaptcoeffsA[0];
-            p->coeffsA[1] -= p->adaptcoeffsA[-1];
-            p->coeffsA[2] -= p->adaptcoeffsA[-2];
-            p->coeffsA[3] -= p->adaptcoeffsA[-3];
+            p->YcoeffsA[0] -= p->buf[YADAPTCOEFFSA];
+            p->YcoeffsA[1] -= p->buf[YADAPTCOEFFSA-1];
+            p->YcoeffsA[2] -= p->buf[YADAPTCOEFFSA-2];
+            p->YcoeffsA[3] -= p->buf[YADAPTCOEFFSA-3];
         }
         else if (A < 0) 
         {
-            p->coeffsA[0] += p->adaptcoeffsA[0];
-            p->coeffsA[1] += p->adaptcoeffsA[-1];
-            p->coeffsA[2] += p->adaptcoeffsA[-2];
-            p->coeffsA[3] += p->adaptcoeffsA[-3];
+            p->YcoeffsA[0] += p->buf[YADAPTCOEFFSA];
+            p->YcoeffsA[1] += p->buf[YADAPTCOEFFSA-1];
+            p->YcoeffsA[2] += p->buf[YADAPTCOEFFSA-2];
+            p->YcoeffsA[3] += p->buf[YADAPTCOEFFSA-3];
         }
 
-        p->delayA++;
-        p->adaptcoeffsA++;
+        p->buf++;
 
         /* Have we filled the history buffer? */
-        if (p->delayA == p->historybuffer + HISTORY_SIZE + (PREDICTOR_ORDER*4)) {
-            memmove(p->historybuffer, p->delayA - (PREDICTOR_ORDER*4), 
-                    (PREDICTOR_ORDER*4) * sizeof(int32_t));
-            p->delayA = p->historybuffer + PREDICTOR_ORDER*4;
-            p->adaptcoeffsA = p->historybuffer + PREDICTOR_ORDER*2;
+        if (p->buf == p->historybuffer + HISTORY_SIZE) {
+            memmove(p->historybuffer, p->buf, 
+                    PREDICTOR_SIZE * sizeof(int32_t));
+            p->buf = p->historybuffer;
         }
 
-        p->filterA =  currentA + ((p->filterA * 31) >> 5);
-        *(decoded0++) = p->filterA;
+        p->YfilterA =  currentA + ((p->YfilterA * 31) >> 5);
+        *(decoded0++) = p->YfilterA;
     }
 
-    p->lastA = currentA;
+    p->YlastA = currentA;
 
     return 0;
 }

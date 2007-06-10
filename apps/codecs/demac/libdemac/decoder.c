@@ -47,7 +47,7 @@ void init_frame_decoder(struct ape_ctx_t* ape_ctx,
     //printf("CRC=0x%08x\n",ape_ctx->CRC);
     //printf("Flags=0x%08x\n",ape_ctx->frameflags);
 
-    init_predictor_decoder(ape_ctx);
+    init_predictor_decoder(&ape_ctx->predictor);
 
     switch (ape_ctx->compressiontype)
     {
@@ -117,7 +117,7 @@ int decode_chunk(struct ape_ctx_t* ape_ctx,
         }
 
         /* Now apply the predictor decoding */
-        predictor_decode_mono(ape_ctx,decoded0,count);
+        predictor_decode_mono(&ape_ctx->predictor,decoded0,count);
 
         if (ape_ctx->channels==2) {
             /* Pseudo-stereo - just copy left channel to right channel */
@@ -163,7 +163,7 @@ int decode_chunk(struct ape_ctx_t* ape_ctx,
         }
 
         /* Now apply the predictor decoding */
-	predictor_decode_stereo(ape_ctx,decoded0,decoded1,count);
+	predictor_decode_stereo(&ape_ctx->predictor,decoded0,decoded1,count);
 
         if (ape_ctx->bps == 8) {
             /* TODO: Handle 8-bit streams */

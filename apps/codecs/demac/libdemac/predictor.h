@@ -2,7 +2,7 @@
 
 libdemac - A Monkey's Audio decoder
 
-$Id:$
+$Id$
 
 Copyright (C) Dave Chapman 2007
 
@@ -29,8 +29,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #include "parser.h"
 #include "filter.h"
 
-void init_predictor_decoder(struct ape_ctx_t* ape_ctx);
-int predictor_decode_stereo(struct ape_ctx_t* ape_ctx, int32_t* decoded0, int32_t* decoded1, int count);
-int predictor_decode_mono(struct ape_ctx_t* ape_ctx, int32_t* decoded0, int count);
+void init_predictor_decoder(struct predictor_t* p);
+int predictor_decode_stereo(struct predictor_t* p, int32_t* decoded0, int32_t* decoded1, int count);
+int predictor_decode_mono(struct predictor_t* p, int32_t* decoded0, int count);
 
 #endif
