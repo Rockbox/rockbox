@@ -474,12 +474,9 @@ static void gui_list_select_item(struct gui_list * gui_list, int item_number)
 }
 
 /* select an item above the current one */
-static void gui_list_select_above(struct gui_list * gui_list, int items)
+static void gui_list_select_above(struct gui_list * gui_list,
+                                  int items, int nb_lines)
 {
-    int nb_lines = gui_list->display->nb_lines;
-    if (SHOW_LIST_TITLE)
-        nb_lines--;
-    
     gui_list->selected_item -= items;
     
     /* in bottom "3rd" of the screen, so dont move the start item.
@@ -532,12 +529,10 @@ static void gui_list_select_above(struct gui_list * gui_list, int items)
     }
 }
 /* select an item below the current one */
-static void gui_list_select_below(struct gui_list * gui_list, int items)
+static void gui_list_select_below(struct gui_list * gui_list, 
+                                  int items, int nb_lines)
 {
-    int nb_lines = gui_list->display->nb_lines;
     int bottom;
-    if (SHOW_LIST_TITLE)
-        nb_lines--;
     
     gui_list->selected_item += items;
     bottom = gui_list->nb_items - nb_lines;
@@ -600,6 +595,11 @@ static void gui_list_select_below(struct gui_list * gui_list, int items)
 
 static void gui_list_select_at_offset(struct gui_list * gui_list, int offset)
 {
+    /* do this here instead of in both select_above and select_below */
+    int nb_lines = gui_list->display->nb_lines;
+    if (SHOW_LIST_TITLE)
+        nb_lines--;
+    
     if (gui_list->selected_size > 1)
     {
         offset *= gui_list->selected_size;
@@ -607,14 +607,15 @@ static void gui_list_select_at_offset(struct gui_list * gui_list, int offset)
         offset -= offset%gui_list->selected_size;
     }
     if (offset == 0 && global_settings.scroll_paginated &&
-        (gui_list->nb_items > gui_list->display->nb_lines - SHOW_LIST_TITLE))
+        (gui_list->nb_items > nb_lines))
     {
-        gui_list->start_item = gui_list->selected_item;
+        int bottom = gui_list->nb_items - nb_lines;
+        gui_list->start_item = MIN(gui_list->selected_item, bottom);
     }
     else if (offset < 0)
-        gui_list_select_above(gui_list, -offset);
+        gui_list_select_above(gui_list, -offset, nb_lines);
     else
-        gui_list_select_below(gui_list, offset);
+        gui_list_select_below(gui_list, offset, nb_lines);
 }
 
 /*
