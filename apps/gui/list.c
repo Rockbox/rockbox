@@ -609,7 +609,7 @@ static void gui_list_select_at_offset(struct gui_list * gui_list, int offset)
     if (offset == 0 && global_settings.scroll_paginated &&
         (gui_list->nb_items > gui_list->display->nb_lines - SHOW_LIST_TITLE))
     {
-        gui_list->selected_item = gui_list->selected_item;
+        gui_list->start_item = gui_list->selected_item;
     }
     else if (offset < 0)
         gui_list_select_above(gui_list, -offset);
