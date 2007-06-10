@@ -45,11 +45,12 @@ DECLARE_DYNAMIC_CLASS(ThemeCtrl)
 DECLARE_EVENT_TABLE()
 public:
 enum {
-			ID_DESC = 10001,
-			ID_FILESIZE= 10002,
-			ID_INSTALLCHECKBOX= 10003,
-			ID_PREVIEW_BITMAP = 10004,
-			ID_THEME_LST = 10005,
+            ID_DESC = 10001,
+            ID_FILESIZE= 10002,
+            ID_INSTALLCHECKBOX= 10003,
+            ID_PREVIEW_BITMAP = 10004,
+            ID_THEME_LST = 10005,
+            ID_THEME_SELECT_ALL = 10006
      }; //End of Enum
 
 public:
@@ -77,17 +78,21 @@ public:
    void Init();
    // Event handlers
    void OnThemesLst(wxCommandEvent& event);
+   void OnSelectAll(wxCommandEvent& event);
    void OnCheckBox(wxCommandEvent& event);
 
    void setDevice(wxString device);
    wxArrayString getThemesToInstall();
 
 protected:
+    void ThemePreview(void);
+
     wxString m_currentimage;
     wxString m_currentResolution;
 
     wxStaticText* m_desc;
     wxListBox* m_themeList;
+    wxButton* m_selectAllThemes;
     wxStaticText* m_size;
     wxTextCtrl* m_themedesc;
     ImageCtrl* m_PreviewBitmap;
@@ -141,8 +146,8 @@ DECLARE_DYNAMIC_CLASS(DeviceSelectorCtrl)
 DECLARE_EVENT_TABLE()
 public:
 enum {
-			ID_DEVICE_CBX = 10001,
-			ID_AUTODETECT_BTN= 10002,
+            ID_DEVICE_CBX = 10001,
+            ID_AUTODETECT_BTN= 10002,
      }; //End of Enum
 
 public:
@@ -187,7 +192,7 @@ DECLARE_DYNAMIC_CLASS(DevicePositionCtrl)
 DECLARE_EVENT_TABLE()
 public:
 enum {
-			ID_BROWSE_BTN = 10003,
+            ID_BROWSE_BTN = 10003,
      }; //End of Enum
 
 public:
@@ -234,7 +239,7 @@ DECLARE_DYNAMIC_CLASS(FirmwarePositionCtrl)
 DECLARE_EVENT_TABLE()
 public:
 enum {
-			ID_BROWSE_BTN = 10004,
+            ID_BROWSE_BTN = 10004,
      }; //End of Enum
 
 public:

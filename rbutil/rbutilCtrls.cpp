@@ -54,6 +54,7 @@ wxSize ImageCtrl::DoGetBestSize() const
 
 BEGIN_EVENT_TABLE(ThemeCtrl, wxPanel)
     EVT_LISTBOX(ID_THEME_LST, ThemeCtrl::OnThemesLst)
+    EVT_BUTTON(ID_THEME_SELECT_ALL, ThemeCtrl::OnSelectAll)
 END_EVENT_TABLE()
 
 IMPLEMENT_DYNAMIC_CLASS(ThemeCtrl, wxPanel)
@@ -82,7 +83,7 @@ void ThemeCtrl::CreateControls()
     topSizer->Add(horizontalSizer, 0, wxALIGN_LEFT|wxALL, 5);
 
     //Device Selection
-     wxBoxSizer* wxBoxSizer7 = new wxBoxSizer(wxVERTICAL);
+    wxBoxSizer* wxBoxSizer7 = new wxBoxSizer(wxVERTICAL);
     horizontalSizer->Add(wxBoxSizer7,0,wxGROW | wxALL,0);
 
     wxStaticText* m_desc = new wxStaticText( this, wxID_STATIC,
@@ -93,6 +94,10 @@ void ThemeCtrl::CreateControls()
     m_themeList = new wxListBox(this,ID_THEME_LST,wxDefaultPosition,
             wxDefaultSize,0,NULL,wxLB_EXTENDED);
     wxBoxSizer7->Add(m_themeList, 0, wxALIGN_LEFT|wxALL, 5);
+
+    m_selectAllThemes = new wxButton(this, ID_THEME_SELECT_ALL,
+            wxT("Select All"));
+    wxBoxSizer7->Add(m_selectAllThemes, 0, wxALIGN_LEFT|wxALL, 5);
 
     // Preview Picture
     wxBoxSizer* wxBoxSizer9 = new wxBoxSizer(wxVERTICAL);
@@ -222,6 +227,11 @@ void ThemeCtrl::setDevice(wxString device)
 
 void ThemeCtrl::OnThemesLst(wxCommandEvent& event)
 {
+    ThemePreview();
+}
+
+void ThemeCtrl::ThemePreview()
+{
   //  wxCriticalSectionLocker locker(m_ThemeSelectSection);
 
     wxArrayInt selected;
@@ -261,7 +271,7 @@ void ThemeCtrl::OnThemesLst(wxCommandEvent& event)
     bmp.LoadFile(m_currentimage,wxBITMAP_TYPE_PNG);
     m_PreviewBitmap->SetBitmap(bmp);
 
-	 Refresh();
+    Refresh();
     this->GetSizer()->Layout();
     this->GetSizer()->Fit(this);
     this->GetSizer()->SetSizeHints(this);
@@ -272,9 +282,15 @@ void ThemeCtrl::OnThemesLst(wxCommandEvent& event)
 
 }
 
+void ThemeCtrl::OnSelectAll(wxCommandEvent& event)
+{
+    for(unsigned int i=0; i < m_themeList->GetCount(); i++)
+        m_themeList->Select(i);
+    ThemePreview();
+}
 
- wxArrayString ThemeCtrl::getThemesToInstall()
- {
+wxArrayString ThemeCtrl::getThemesToInstall()
+{
     wxArrayString themes;
     wxArrayInt selected;
     int numSelected = m_themeList->GetSelections(selected);
@@ -361,7 +377,7 @@ void DeviceSelectorCtrl::CreateControls()
      //Device Selection
     wxBoxSizer* horizontalSizer = new wxBoxSizer(wxHORIZONTAL);
     topSizer->Add(horizontalSizer, 0, wxALIGN_LEFT|wxALL, 5);
-	 m_desc = new wxStaticText( this, wxID_STATIC,
+    m_desc = new wxStaticText( this, wxID_STATIC,
         wxT("Device:"), wxDefaultPosition,
         wxDefaultSize, 0 );
     horizontalSizer->Add(m_desc, 0, wxALIGN_LEFT|wxALL, 5);
@@ -405,9 +421,9 @@ void DeviceSelectorCtrl::OnComboBox(wxCommandEvent& event)
 
     if(index == -1)
     {
-      m_currentDevice = wxT("");
-		return;
-	 }
+        m_currentDevice = wxT("");
+        return;
+    }
 
     gv->curplat = gv->plat_id[index];
 }
@@ -418,7 +434,7 @@ void DeviceSelectorCtrl::OnAutoDetect(wxCommandEvent& event)
     int n = ipod_scan(&ipod);
     if(n == 1)
     {
-    	wxString temp(ipod.targetname,wxConvUTF8);
+        wxString temp(ipod.targetname,wxConvUTF8);
         int index = gv->plat_bootloadername.Index(temp);   // use the bootloader names..
         m_deviceCbx->SetValue(gv->plat_name[index]);
         gv->curplat=gv->plat_id[index];
