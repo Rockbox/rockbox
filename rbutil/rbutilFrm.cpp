@@ -441,13 +441,9 @@ void rbutilFrm::OnBootloaderRemoveBtn(wxCommandEvent& event)
 {
     wxLogVerbose(wxT("=== begin rbutilFrm::OnBootloaderRemoveBtn(event)"));
 
-    int index = gv->plat_id.Index(gv->curplat);
+    int index = GetDeviceId();
     if(index < 0)
-    {
-        WARN_DIALOG(wxT("No Device selected"),
-                wxT("Select a Device"));
         return;
-    }
 
     wxString bootloadermethod = gv->plat_bootloadermethod[index];
 
@@ -530,13 +526,10 @@ void rbutilFrm::OnBootloaderBtn(wxCommandEvent& event)
 {
     wxLogVerbose(wxT("=== begin rbutilFrm::OnBootloaderBtn(event)"));
 
-    int index = gv->plat_id.Index(gv->curplat);
+    int index = GetDeviceId();
     if(index < 0)
-    {
-        WARN_DIALOG(wxT("No Device selected"),
-                wxT("Select a Device"));
         return;
-    }
+
     wxString bootloadermethod = gv->plat_bootloadermethod[index];
 
     if(!gv->plat_needsbootloader[index])
@@ -646,13 +639,9 @@ void rbutilFrm::OnInstallBtn(wxCommandEvent& event)
     wxFileConfig* buildinfo;
     wxDateSpan oneday;
 
-    int index = gv->plat_id.Index(gv->curplat);
+    int index = GetDeviceId();
     if(index < 0)
-    {
-        WARN_DIALOG(wxT("No Device selected"),
-                wxT("Select a Device"));
         return;
-    }
 
     // rockbox install dialog
     rockboxInstallDlg dialog(NULL, wxID_ANY,
@@ -770,13 +759,9 @@ void rbutilFrm::OnFontBtn(wxCommandEvent& event)
     wxFileConfig* buildinfo;
     wxDateSpan oneday;
 
-    int index = gv->plat_id.Index(gv->curplat);
+    int index = GetDeviceId();
     if(index < 0)
-    {
-        WARN_DIALOG(wxT("No Device selected"),
-                wxT("Select a Device"));
         return;
-    }
 
     // font install dialog
     fontInstallDlg dialog(NULL, wxID_ANY,
@@ -867,13 +852,9 @@ void rbutilFrm::OnDoomBtn(wxCommandEvent& event)
     wxString src, dest, buf;
     wxLogVerbose(wxT("=== begin rbutilFrm::OnDoomBtn(event)"));
 
-    int index = gv->plat_id.Index(gv->curplat);
+    int index = GetDeviceId();
     if(index < 0)
-    {
-        WARN_DIALOG(wxT("No Device selected"),
-                wxT("Select a Device"));
         return;
-    }
 
      // font install dialog, reused
     fontInstallDlg dialog(NULL, wxID_ANY,
@@ -934,13 +915,9 @@ void rbutilFrm::OnThemesBtn(wxCommandEvent& event)
     wxString src, dest, buf;
     wxLogVerbose(wxT("=== begin rbutilFrm::OnThemesBtn(event)"));
 
-    int index = gv->plat_id.Index(gv->curplat);
+    int index = GetDeviceId();
     if(index < 0)
-    {
-        WARN_DIALOG(wxT("No Device selected"),
-                wxT("Select a Device"));
         return;
-    }
 
     // Theme install dialog
     themesInstallDlg dialog(NULL, wxID_ANY,
@@ -977,13 +954,9 @@ void rbutilFrm::OnRemoveBtn(wxCommandEvent& event)
 {
     wxLogVerbose(wxT("=== begin rbutilFrm::OnRemoveBtn(event)"));
 
-    int index = gv->plat_id.Index(gv->curplat);
+    int index = GetDeviceId();
     if(index < 0)
-    {
-        WARN_DIALOG(wxT("No Device selected"),
-                wxT("Select a Device"));
         return;
-    }
 
     // Rockbox deinstall dialog
     rockboxDeInstallDlg dialog(NULL, wxID_ANY,
@@ -1020,13 +993,9 @@ void rbutilFrm::OnPortableInstall(wxCommandEvent& event)
     wxFileSystem fs;
     wxDateSpan oneday;
 
-    int index = gv->plat_id.Index(gv->curplat);
+    int index = GetDeviceId();
     if(index < 0)
-    {
-        WARN_DIALOG(wxT("No Device selected"),
-                wxT("Select a Device"));
         return;
-    }
 
     //portable install dialog ( reused font dialog)
     fontInstallDlg dialog(NULL, wxID_ANY,
@@ -1049,6 +1018,40 @@ void rbutilFrm::OnPortableInstall(wxCommandEvent& event)
     }
 
     wxLogVerbose(wxT("=== end rbutilFrm::OnUnstallPortable"));
+}
+
+int rbutilFrm::GetDeviceId()
+{
+    int index = gv->plat_id.Index(gv->curplat);
+    if(index < 0)
+    {
+        if( wxMessageBox(wxT("No device selected. Do you want to autodetect "
+                         "the device?"),
+                         wxT("Warning"), wxYES_NO ) == wxYES )
+        {
+            myDeviceSelector->AutoDetect();
+            index = gv->plat_id.Index(gv->curplat);
+            if(index < 0)
+            {
+                WARN_DIALOG( wxT("Aborting"), wxT("Auto detection failed") );
+                return index;
+            }
+            else
+            {
+                if( wxMessageBox(wxT("Found ") + gv->plat_name[index] +
+                                 wxT(". Do you want to continue?"),
+                                 wxT("Device found"), wxYES_NO ) == wxYES )
+                    return index;
+                else
+                    return -1;
+            }
+        }
+        else
+        {
+            return -1;
+        }
+    }
+    return index;
 }
 
 AboutDlg::AboutDlg(rbutilFrm* parent)

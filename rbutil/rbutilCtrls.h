@@ -177,6 +177,8 @@ public:
    wxString getDevice();
    void setDefault();
 
+   void AutoDetect();
+
 protected:
     wxString m_currentDevice;
     wxComboBox* m_deviceCbx;

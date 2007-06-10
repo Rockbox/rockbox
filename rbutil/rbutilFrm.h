@@ -61,7 +61,7 @@ public:
 	    wxHtmlWindow* manual;
         wxString curManualDevice;
 
-  	    wxMenuBar *WxMenuBar1;
+        wxMenuBar *WxMenuBar1;
 		wxStaticText *WxStaticText3;
 		wxBitmapButton *WxBitmapButton2;
 		wxStaticText *WxStaticText2;
@@ -119,6 +119,8 @@ public:
     void OnManualUpdate(wxUpdateUIEvent& event);
     void OnFileProxy(wxCommandEvent& event);
     void OnDoomBtn(wxCommandEvent& event);
+
+    int GetDeviceId();
 
 };
 

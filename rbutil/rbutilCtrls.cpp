@@ -430,6 +430,11 @@ void DeviceSelectorCtrl::OnComboBox(wxCommandEvent& event)
 
 void DeviceSelectorCtrl::OnAutoDetect(wxCommandEvent& event)
 {
+    AutoDetect();
+}
+
+void DeviceSelectorCtrl::AutoDetect()
+{
     struct ipod_t ipod;
     int n = ipod_scan(&ipod);
     if(n == 1)
