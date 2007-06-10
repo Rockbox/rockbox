@@ -167,9 +167,9 @@ void ThemeCtrl::setDevice(wxString device)
      //get correct Themes list
     wxString src,dest,err;
 
-    src.Printf(wxT("%srbutil.php?res=%s"),gv->themes_url.c_str(),m_currentResolution.c_str());
-    dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s.list"),
-        gv->stdpaths->GetUserDataDir().c_str(),m_currentResolution.c_str());
+    src = gv->themes_url + wxT("rbutil.php?res=") + m_currentResolution;
+    dest = gv->stdpaths->GetUserDataDir() + wxT("" PATH_SEP "download" PATH_SEP)
+           + m_currentResolution + wxT(".list");
 
     if(DownloadURL(src, dest))
     {
@@ -249,16 +249,18 @@ void ThemeCtrl::ThemePreview()
     int pos = m_Themes_image[index].Find('/',true);
     wxString filename = m_Themes_image[index](pos+1,m_Themes_image[index].Length());
 
-    dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s"),
-            gv->stdpaths->GetUserDataDir().c_str(),m_currentResolution.c_str());
+    dest = gv->stdpaths->GetUserDataDir()
+           + wxT(""  PATH_SEP "download" PATH_SEP)
+           + m_currentResolution;
 
     if(!wxDirExists(dest))
         wxMkdir(dest);
 
     //this is a URL no PATH_SEP
-    src.Printf(wxT("%s/data/%s/%s"),gv->themes_url.c_str(),m_currentResolution.c_str(),filename.c_str());
-    dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s" PATH_SEP "%s"),
-        gv->stdpaths->GetUserDataDir().c_str(),m_currentResolution.c_str(),filename.c_str());
+    src = gv->themes_url + wxT("/data/") + m_currentResolution + wxT("/")
+          + filename;
+    dest = gv->stdpaths->GetUserDataDir() + wxT("" PATH_SEP "download" PATH_SEP)
+           + m_currentResolution + wxT("" PATH_SEP) + filename;
 
     if(DownloadURL(src, dest))
     {

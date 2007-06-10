@@ -55,14 +55,14 @@ bool ipodpatcher(int mode,wxString bootloadername)
      // downloading files
     if(mode == BOOTLOADER_ADD)
     {
-        src.Printf(wxT("%s/ipod/%s.ipod"),gv->bootloader_url.c_str(),bootloadername.c_str());
-        dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s"),
-                    gv->stdpaths->GetUserDataDir().c_str(),bootloadername.c_str());
+        src = gv->bootloader_url + wxT("/ipod/")
+              + bootloadername + wxT(".ipod");
+        dest = gv->stdpaths->GetUserDataDir()
+               + wxT("" PATH_SEP "download" PATH_SEP) + bootloadername;
         if ( DownloadURL(src, dest) )
         {
             wxRemoveFile(dest);
-            buf.Printf(wxT("Unable to download %s"), src.c_str() );
-            ERR_DIALOG(buf, wxT("Install"));
+            ERR_DIALOG(wxT("Unable to download ") + src, wxT("Install"));
             return false;
         }
     }
@@ -191,14 +191,14 @@ bool sansapatcher(int mode,wxString bootloadername)
       // downloading files
     if(mode == BOOTLOADER_ADD)
     {
-        src.Printf(wxT("%s/sandisk-sansa/e200/%s"),gv->bootloader_url.c_str(),bootloadername.c_str());
-        dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s"),
-                    gv->stdpaths->GetUserDataDir().c_str(),bootloadername.c_str());
+        src = gv->bootloader_url + wxT("/sandisk-sansa/e200/")
+              + bootloadername;
+        dest = gv->stdpaths->GetUserDataDir()
+               + wxT("" PATH_SEP "download" PATH_SEP) + bootloadername;
         if ( DownloadURL(src, dest) )
         {
             wxRemoveFile(dest);
-            buf.Printf(wxT("Unable to download %s"), src.c_str() );
-            ERR_DIALOG(buf, wxT("Download"));
+            ERR_DIALOG(wxT("Unable to download ") + src, wxT("Download"));
             return false;
         }
     }
@@ -270,27 +270,26 @@ bool gigabeatf(int mode,wxString bootloadername,wxString deviceDir)
    wxString err;
    wxString src,dest;
 
-   path1.Printf(wxT("%s" PATH_SEP "GBSYSTEM" PATH_SEP "FWIMG" PATH_SEP "FWIMG01.DAT"),deviceDir.c_str());
+   path1 = deviceDir
+         + wxT("" PATH_SEP "GBSYSTEM" PATH_SEP "FWIMG" PATH_SEP "FWIMG01.DAT");
 
     if(mode == BOOTLOADER_ADD)
     {
         //Files downloaden
-        src.Printf(wxT("%s/gigabeat/%s"), gv->bootloader_url.c_str(),bootloadername.c_str());
-        dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s"),
-                    gv->stdpaths->GetUserDataDir().c_str(),bootloadername.c_str());
+        src = gv->bootloader_url + wxT("/gigabeat/") + bootloadername;
+        dest = gv->stdpaths->GetUserDataDir()
+               + wxT("" PATH_SEP "download" PATH_SEP) + bootloadername;
          if( DownloadURL(src, dest) )
          {
               wxRemoveFile(dest);
-              err.Printf(wxT("Unable to download %s"), src.c_str() );
-              ERR_DIALOG(err, wxT("Install"));
+              ERR_DIALOG(wxT("Unable to download ") + src, wxT("Install"));
               return false;
          }
 
 
       if(!wxFileExists(path1))
       {
-          err.Printf(wxT("[ERR] Coud not find %s"),path1.c_str());
-          ERR_DIALOG(err, wxT("Bootloader add"));
+          ERR_DIALOG(wxT("[ERR] Coud not find ")+path1, wxT("Bootloader add"));
           return false;
       }
       path2 = path1;
@@ -299,8 +298,8 @@ bool gigabeatf(int mode,wxString bootloadername,wxString deviceDir)
       {
          if(!wxRenameFile(path1,path2,false))
          {
-           err.Printf(wxT("[ERR] Coud not rename %s to %s"),path1.c_str(),path2.c_str());
-           ERR_DIALOG(err, wxT("Bootloader add"));
+            ERR_DIALOG(wxT("[ERR] Coud not rename ") + path1 + wxT(" to ")
+                       + path2, wxT("Bootloader add"));
            return false;
          }
       }
@@ -308,8 +307,8 @@ bool gigabeatf(int mode,wxString bootloadername,wxString deviceDir)
 
       if(!wxCopyFile(dest,path1))
       {
-         err.Printf(wxT("[ERR] Coud not copy %s to %s"),dest.c_str(),path2.c_str());
-         ERR_DIALOG(err, wxT("Bootloader add"));
+         ERR_DIALOG(wxT("[ERR] Coud not copy ") + dest + wxT(" to ")
+                    + path2, wxT("Bootloader add"));
          return false;
       }
     }
@@ -319,14 +318,14 @@ bool gigabeatf(int mode,wxString bootloadername,wxString deviceDir)
       path2.Append(wxT(".ORIG"));
       if(!wxFileExists(path2))
       {
-          err.Printf(wxT("[ERR] Coud not find %s"),path1.c_str());
-          ERR_DIALOG(err, wxT("Bootloader del"));
+          ERR_DIALOG(wxT("[ERR] Coud not find ") + path1,
+                     wxT("Bootloader del"));
           return false;
       }
       if(!wxRenameFile(path2,path1,true))
       {
-         err.Printf(wxT("[ERR] Coud not rename %s to %s"),path1.c_str(),path2.c_str());
-         ERR_DIALOG(err, wxT("Bootloader del"));
+         ERR_DIALOG(wxT("[ERR] Coud not rename ") + path1 + wxT(" to ")
+                    + path2, wxT("Bootloader del"));
          return false;
       }
     }
@@ -340,27 +339,27 @@ bool iaudiox5(int mode,wxString bootloadername,wxString deviceDir)
     wxString err;
     wxString src,dest;
 
-    path1.Printf(wxT("%s" PATH_SEP "FIRMWARE" PATH_SEP "%s"),deviceDir.c_str(),bootloadername.c_str());
+    path1 = deviceDir + wxT("" PATH_SEP "FIRMWARE" PATH_SEP)
+            + bootloadername;
 
     if(mode == BOOTLOADER_ADD)
     {
         //Files downloaden
-        src.Printf(wxT("%s/iaudio/%s"),gv->bootloader_url.c_str(),bootloadername.c_str());
-        dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s"),
-                    gv->stdpaths->GetUserDataDir().c_str(),bootloadername.c_str());
+        src = gv->bootloader_url + wxT("/iaudio/") + bootloadername;
+        dest = gv->stdpaths->GetUserDataDir()
+               + wxT("" PATH_SEP "download" PATH_SEP) + bootloadername;
          if( DownloadURL(src, dest) )
          {
               wxRemoveFile(dest);
-              err.Printf(wxT("Unable to download %s"), src.c_str() );
-              ERR_DIALOG(err, wxT("Install"));
+              ERR_DIALOG(wxT("Unable to download ") + src, wxT("Install"));
               return false;
          }
 
          // copy file
          if(!wxCopyFile(dest,path1))
          {
-            err.Printf(wxT("[ERR] Coud not copy %s to %s"),dest.c_str(),path2.c_str());
-            ERR_DIALOG(err, wxT("Bootloader add"));
+            ERR_DIALOG(wxT("[ERR] Coud not copy ")+dest+wxT(" to ")+path2,
+                       wxT("Bootloader add"));
             return false;
          }
 
@@ -383,27 +382,26 @@ bool h10(int mode,wxString bootloadername,wxString deviceDir)
   if(mode == BOOTLOADER_ADD)
   {
      //Files downloaden
-     src.Printf(wxT("%s/iriver/%s"), gv->bootloader_url.c_str(),bootloadername.c_str());
-     dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s"),
-                  gv->stdpaths->GetUserDataDir().c_str(),firmwarename.c_str());
+     src = gv->bootloader_url + wxT("/iriver/") + bootloadername;
+     dest = gv->stdpaths->GetUserDataDir()
+            + wxT("" PATH_SEP "download" PATH_SEP) + firmwarename;
      if( DownloadURL(src, dest) )
      {
            wxRemoveFile(dest);
-           err.Printf(wxT("Unable to download %s"), src.c_str() );
-           ERR_DIALOG(err, wxT("Install"));
+           ERR_DIALOG(wxT("Unable to download ") + src, wxT("Install"));
            return false;
      }
 
-     path1.Printf(wxT("%sSYSTEM" PATH_SEP "%s"),deviceDir.c_str(),firmwarename.c_str());
-     path2.Printf(wxT("%sSYSTEM" PATH_SEP "Original.mi4"),deviceDir.c_str());
+     path1 = deviceDir + wxT("SYSTEM" PATH_SEP) + firmwarename;
+     path2 = deviceDir + wxT("SYSTEM" PATH_SEP "Original.mi4");
 
      if(!wxFileExists(path1))  //Firmware dosent exists on player
      {
-        path1.Printf(wxT("%sSYSTEM" PATH_SEP "H10EMP.mi4"),deviceDir.c_str());   //attempt other firmwarename
+        path1 = deviceDir + wxT("SYSTEM" PATH_SEP "H10EMP.mi4");   //attempt other firmwarename
         if(!wxFileExists(path1))  //Firmware dosent exists on player
         {
-            err.Printf(wxT("[ERR] File %s does not Exist"),path1.c_str());
-            ERR_DIALOG(err, wxT("Bootloader add"));
+            ERR_DIALOG(wxT("[ERR] File ") + path1 + wxT(" does not Exist"),
+                       wxT("Bootloader add"));
             return false;
         }
      }
@@ -411,16 +409,16 @@ bool h10(int mode,wxString bootloadername,wxString deviceDir)
      {
         if(!wxRenameFile(path1,path2,false))  //rename Firmware to Original
         {
-           err.Printf(wxT("[ERR] Coud not rename %s to %s"),path1.c_str(),path2.c_str());
-           ERR_DIALOG(err, wxT("Bootloader add"));
+           ERR_DIALOG(wxT("[ERR] Coud not rename ") + path1 + wxT(" to ")
+                      + path2, wxT("Bootloader add"));
            return false;
         }
      }
 
      if(!wxCopyFile(dest,path1))  // copy file
      {
-        err.Printf(wxT("[ERR] Coud not copy %s to %s"),dest.c_str(),path1.c_str());
-        ERR_DIALOG(err,wxT("Bootloader add"));
+        ERR_DIALOG(wxT("[ERR] Coud not copy ") + dest + wxT(" to ") + path1,
+                   wxT("Bootloader add"));
         return false;
      }
 
@@ -429,30 +427,30 @@ bool h10(int mode,wxString bootloadername,wxString deviceDir)
   }
   else if(mode == BOOTLOADER_REM)
   {
-     path1.Printf(wxT("%sSYSTEM" PATH_SEP "%s"),deviceDir.c_str(),firmwarename.c_str());
-     path2.Printf(wxT("%sSYSTEM" PATH_SEP "Original.mi4"),gv->curdestdir.c_str());
+     path1 = deviceDir + wxT("SYSTEM" PATH_SEP) + firmwarename;
+     path2 = gv->curdestdir + wxT("SYSTEM" PATH_SEP "Original.mi4");
      if(!wxFileExists(path1))  //Firmware dosent exists on player
      {
-         path1.Printf(wxT("%s" PATH_SEP "SYSTEM" PATH_SEP "H10EMP.mi4"),deviceDir.c_str());   //attempt other firmwarename
+         path1 = deviceDir + wxT("" PATH_SEP "SYSTEM" PATH_SEP "H10EMP.mi4");   //attempt other firmwarename
          if(!wxFileExists(path1))  //Firmware dosent exists on player
          {
-            err.Printf(wxT("[ERR] File %s does not Exist"),path1.c_str());
-            ERR_DIALOG(err, wxT("Bootloader rem"));
+            ERR_DIALOG(wxT("[ERR] File ") + path1 + wxT(" does not Exist"),
+                       wxT("Bootloader rem"));
             return false;
          }
      }
 
      if(!wxFileExists(path2))  //Original Firmware dosent exists on player
      {
-         err.Printf(wxT("[ERR] File %s does not Exist"),path2.c_str());
-         ERR_DIALOG(err, wxT("Bootloader rem"));
+         ERR_DIALOG(wxT("[ERR] File ") + path2 + wxT(" does not Exist"),
+                    wxT("Bootloader rem"));
          return false;
      }
 
      if(!wxRenameFile(path2,path1,true))  //rename Firmware to Original
      {
-         err.Printf(wxT("[ERR] Coud not rename %s to %s"),path2.c_str(),path1.c_str());
-         ERR_DIALOG(err, wxT("Bootloader add"));
+         ERR_DIALOG(wxT("[ERR] Coud not rename ") + path2 + wxT(" to ")
+                    + path1, wxT("Bootloader add"));
          return false;
      }
 
@@ -503,38 +501,42 @@ bool fwpatcher(int mode,wxString bootloadername,wxString deviceDir,wxString firm
                 else
                 {
                     //Download bootloader
-                    src.Printf(wxT("%s/iriver/%s"), gv->bootloader_url.c_str(),bootloadername.c_str());
-                    dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s"),
-                            gv->stdpaths->GetUserDataDir().c_str(),bootloadername.c_str());
+                    src = gv->bootloader_url + wxT("/iriver/")
+                          + bootloadername;
+                    dest = gv->stdpaths->GetUserDataDir()
+                           + wxT("" PATH_SEP "download" PATH_SEP)
+                           + bootloadername;
                     if( DownloadURL(src, dest) )
                     {
                         wxRemoveFile(dest);
-                        err.Printf(wxT("Unable to download %s"), src.c_str() );
-                        ERR_DIALOG(err, wxT("Install"));
+                        ERR_DIALOG(wxT("Unable to download ") + src,
+                                   wxT("Install"));
                         return false;
                     }
 
                     if(!PatchFirmware(firmware,dest,series, table_entry))  // Patch firmware
                     {
-                        ERR_DIALOG(wxT("Patching Firmware failed"), wxT("Patching Firmware"));
+                        ERR_DIALOG(wxT("Patching Firmware failed"),
+                                   wxT("Patching Firmware"));
                         return false;
                     }
                 }
 
                 // Load patched Firmware to player
-                src.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "new.hex"),
-                        gv->stdpaths->GetUserDataDir().c_str());
+                src = gv->stdpaths->GetUserDataDir()
+                      + wxT("" PATH_SEP "download" PATH_SEP "new.hex");
 
                 if(gv->curplat == wxT("h100"))
-                    dest.Printf(wxT("%s" PATH_SEP "ihp_100.hex"),deviceDir.c_str());
+                    dest = deviceDir + wxT("" PATH_SEP "ihp_100.hex");
                 else if(gv->curplat == wxT("h120"))
-                    dest.Printf(wxT("%s" PATH_SEP "ihp_120.hex"),deviceDir.c_str());
+                    dest = deviceDir + wxT("" PATH_SEP "ihp_120.hex");
                 else if(gv->curplat == wxT("h300"))
-                dest.Printf(wxT("%s" PATH_SEP "H300.hex"),deviceDir.c_str());
+                    dest = deviceDir + wxT("" PATH_SEP "H300.hex");
 
                 if(!wxRenameFile(src,dest))
                 {
-                     ERR_DIALOG(wxT("Copying Firmware to Device failed"), wxT("Copying Firmware"));
+                     ERR_DIALOG(wxT("Copying Firmware to Device failed"),
+                                wxT("Copying Firmware"));
                      return false;
                 }
                 else

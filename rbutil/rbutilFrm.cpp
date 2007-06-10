@@ -336,12 +336,12 @@ void  rbutilFrm::OnManualUpdate(wxUpdateUIEvent& event)
 
     // construct link to pdf
     wxString pdflink;
-    pdflink.Printf(wxT("%s%s.pdf"),gv->manual_url.c_str(),curManualDevice.c_str());
+    pdflink = gv->manual_url + curManualDevice + wxT(".pdf");
     manuallink->SetURL(pdflink);
 
     // construct link to html
     wxString htmllink;
-    htmllink.Printf(wxT("%s%s/rockbox-build.html"),gv->manual_url.c_str(),curManualDevice.c_str());
+    htmllink = gv->manual_url + curManualDevice + wxT("/rockbox-build.html");
     if(!manual->LoadPage(htmllink))
         manual->SetPage(wxT("<p>unable to display manual -- please use the PDF link above</p>"));
 
@@ -420,8 +420,7 @@ void rbutilFrm::OnFileWipeCache(wxCommandEvent& event)
         return;
     }
 
-    cacheloc.Printf(wxT("%s" PATH_SEP "download"),
-        datadir.c_str());
+    cacheloc = datadir + wxT("" PATH_SEP "download");
 
     if (! rm_rf(cacheloc) )
     {
@@ -659,17 +658,15 @@ void rbutilFrm::OnInstallBtn(wxCommandEvent& event)
     {
         case BUILD_RELEASE:
             // This is a URL - don't use PATH_SEP
-            src.Printf(wxT("%s%s-%s-%s.zip"),
-                gv->download_url.c_str(), gv->prog_name.c_str(),
-                gv->last_release.c_str(), gv->curplat.c_str());
-            dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s-%s-%s.zip"),
-                gv->stdpaths->GetUserDataDir().c_str(),
-                gv->prog_name.c_str(), gv->last_release.c_str(),
-                gv->curplat.c_str());
+            src = gv->download_url + gv->prog_name + wxT("-")
+                  + gv->last_release + wxT("-") + gv->curplat + wxT(".zip");
+            dest = gv->stdpaths->GetUserDataDir() + wxT("download" PATH_SEP)
+                   + gv->prog_name + wxT("-") + gv->last_release + wxT("-")
+                   + gv->curplat + wxT(".zip");
             break;
         case BUILD_DAILY:
-            dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "build-info"),
-                gv->stdpaths->GetUserDataDir().c_str());
+            dest = gv->stdpaths->GetUserDataDir()
+                   + PATH_SEP + wxT("download") + PATH_SEP + wxT("build-info");
             if (DownloadURL(gv->server_conf_url, dest)) {
                 WARN_DIALOG(wxT("Unable to download build status."),
                 wxT("Install"));
@@ -682,7 +679,7 @@ void rbutilFrm::OnInstallBtn(wxCommandEvent& event)
                 buildinfo->DeleteAll();
 
                 if (buf.Len() != 8) {
-                    dest.Printf(wxT("Invalid build date: %s"), buf.c_str());
+                    dest = wxT("Invalid build date: ") + buf;
                     WARN_DIALOG(dest, wxT("Install"));
                     buf = wxT("");
                 }
@@ -696,23 +693,19 @@ void rbutilFrm::OnInstallBtn(wxCommandEvent& event)
                 buf = date.Format(wxT("%Y%m%d")); // yes, we want UTC
             }
 
-            src.Printf(wxT("%s%s/%s-%s-%s.zip"),
-                gv->daily_url.c_str(), gv->curplat.c_str(),
-                gv->prog_name.c_str(), gv->curplat.c_str(),
-                buf.c_str() );
+            src = gv->daily_url + gv->curplat + wxT("/") + gv->prog_name
+                  + wxT("-") + gv->curplat + wxT("-") + buf + wxT(".zip");
 
-            dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s-%s-%s.zip"),
-                gv->stdpaths->GetUserDataDir().c_str(),
-                gv->prog_name.c_str(),
-                gv->curplat.c_str(), buf.c_str() );
+            dest = gv->stdpaths->GetUserDataDir() + PATH_SEP wxT("download")
+                   + gv->prog_name + wxT("-") + gv->curplat + wxT("-")
+                   + buf + wxT(".zip");
             break;
         case BUILD_BLEEDING:
-             src.Printf(wxT("%s%s/%s.zip"),
-                gv->bleeding_url.c_str(), gv->curplat.c_str(),
-                gv->prog_name.c_str() );
-            dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "%s.zip"),
-                gv->stdpaths->GetUserDataDir().c_str(),
-                gv->prog_name.c_str() );
+            src = gv->bleeding_url + gv->curplat + wxT("/")
+                  + gv->prog_name + wxT(".zip");
+            dest = gv->stdpaths->GetUserDataDir()
+                   + PATH_SEP wxT("download") PATH_SEP
+                   + gv->prog_name + wxT(".zip");
             break;
         default:
             ERR_DIALOG(wxT("Something seriously odd has happened."),
@@ -726,8 +719,7 @@ void rbutilFrm::OnInstallBtn(wxCommandEvent& event)
         if ( DownloadURL(src, dest) )
         {
             wxRemoveFile(dest);
-            buf.Printf(wxT("Unable to download %s"), src.c_str() );
-            ERR_DIALOG(buf, wxT("Install"));
+            ERR_DIALOG(wxT("Unable to download ")+src, wxT("Install"));
             return;
         }
     }
@@ -741,8 +733,7 @@ void rbutilFrm::OnInstallBtn(wxCommandEvent& event)
     } else
     {
         wxRemoveFile(dest);
-        buf.Printf(wxT("Unable to unzip %s"), dest.c_str() );
-        ERR_DIALOG(buf, wxT("Install"));
+        ERR_DIALOG(wxT("Unable to unzip ")+dest, wxT("Install"));
     }
 
 
@@ -775,17 +766,17 @@ void rbutilFrm::OnFontBtn(wxCommandEvent& event)
         return;
 
 
-    buf.Printf(wxT("%s" PATH_SEP ".rockbox"), gv->curdestdir.c_str()) ;
+    buf = gv->curdestdir + wxT("" PATH_SEP ".rockbox");
     if (! wxDirExists(buf) )
     {
-        buf.Printf(wxT("Rockbox is not yet installed on %s - install "
-            "Rockbox first."), buf.c_str() );
-        WARN_DIALOG(buf, wxT("Can't install fonts") );
+        WARN_DIALOG(wxT("Rockbox is not yet installed on ") + buf
+                    + wxT(" - install Rockbox first."),
+                    wxT("Can't install fonts") );
         return;
     }
 
-    dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "build-info"),
-    gv->stdpaths->GetUserDataDir().c_str());
+    dest = gv->stdpaths->GetUserDataDir()
+           + wxT( "" PATH_SEP "download" PATH_SEP "build-info");
     if (DownloadURL(gv->server_conf_url, dest))
     {
         WARN_DIALOG(wxT("Unable to download build status."),
@@ -799,8 +790,7 @@ void rbutilFrm::OnFontBtn(wxCommandEvent& event)
             buildinfo->DeleteAll();
 
         if (buf.Len() != 8) {
-            dest.Printf(wxT("Invalid build date: %s"), buf.c_str());
-            WARN_DIALOG(dest, wxT("Font Install"));
+            WARN_DIALOG(wxT("Invalid build date: ") + buf, wxT("Font Install"));
             buf = wxT("");
         }
     }
@@ -814,19 +804,17 @@ void rbutilFrm::OnFontBtn(wxCommandEvent& event)
          buf = date.Format(wxT("%Y%m%d")); // yes, we want UTC
     }
 
-    src.Printf(wxT("%s%s.zip"), gv->font_url.c_str(), buf.c_str() );
+    src = gv->font_url + buf + wxT(".zip");
 
-    dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP
-        "rockbox-fonts-%s.zip"), gv->stdpaths->GetUserDataDir().c_str(),
-        buf.c_str() );
+    dest = gv->stdpaths->GetUserDataDir() + wxT( "" PATH_SEP "download"
+           PATH_SEP "rockbox-fonts-") + buf + wxT(".zip");
 
     if ( ! wxFileExists(dest)  )
     {
         if ( DownloadURL(src, dest) )
         {
             wxRemoveFile(dest);
-            buf.Printf(wxT("Unable to download %s"), src.c_str() );
-            ERR_DIALOG(buf, wxT("Font Install"));
+            ERR_DIALOG(wxT("Unable to download ") + src, wxT("Font Install"));
             return;
         }
     }
@@ -840,8 +828,7 @@ void rbutilFrm::OnFontBtn(wxCommandEvent& event)
     } else
     {
         wxRemoveFile(dest);
-        buf.Printf(wxT("Unable to unzip %s"), dest.c_str() );
-        ERR_DIALOG(buf, wxT("Font Install"));
+        ERR_DIALOG(wxT("Unable to unzip ") + dest, wxT("Font Install"));
     }
 
     wxLogVerbose(wxT("=== end rbutilFrm::OnFontBtn"));
@@ -867,27 +854,27 @@ void rbutilFrm::OnDoomBtn(wxCommandEvent& event)
     if(msg.ShowModal() != wxID_OK )
         return;
 
-    buf.Printf(wxT("%s" PATH_SEP ".rockbox"), gv->curdestdir.c_str()) ;
+    buf = gv->curdestdir + wxT("" PATH_SEP ".rockbox");
     if (! wxDirExists(buf) )
     {
-        buf.Printf(wxT("Rockbox is not yet installed on %s - install "
-            "Rockbox first."), buf.c_str() );
-        WARN_DIALOG(buf, wxT("Can't install freedoom wads") );
+        WARN_DIALOG(wxT("Rockbox is not yet installed on ") + buf
+                    + wxT(" - install Rockbox first."),
+                    wxT("Can't install freedoom wads") );
         return;
     }
 
     src = gv->doom_url;
 
-    dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP
-        "rockdoom.zip"), gv->stdpaths->GetUserDataDir().c_str());
+    dest = gv->stdpaths->GetUserDataDir() + wxT("" PATH_SEP "download" PATH_SEP
+           "rockdoom.zip");
 
     if ( ! wxFileExists(dest)  )
     {
         if ( DownloadURL(src, dest) )
         {
             wxRemoveFile(dest);
-            buf.Printf(wxT("Unable to download %s"), src.c_str() );
-            ERR_DIALOG(buf, wxT("Freedoom Install"));
+            ERR_DIALOG(wxT("Unable to download ") + src,
+                       wxT("Freedoom Install"));
             return;
         }
     }
@@ -901,8 +888,7 @@ void rbutilFrm::OnDoomBtn(wxCommandEvent& event)
     } else
     {
         wxRemoveFile(dest);
-        buf.Printf(wxT("Unable to unzip %s"), dest.c_str() );
-        ERR_DIALOG(buf, wxT("Freedoom Install"));
+        ERR_DIALOG(wxT("Unable to unzip ") + dest, wxT("Freedoom Install"));
     }
 
 

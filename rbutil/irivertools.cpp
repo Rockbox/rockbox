@@ -61,8 +61,7 @@ bool mkboot(wxString infile, wxString outfile,wxString bootloader,int origin)
     wxFile f;
     if(!f.Open(infile))
     {
-        err.Printf(wxT("Could not open: %s"),infile.c_str());
-        ERR_DIALOG(err, wxT("mkboot"));
+        ERR_DIALOG(wxT("Could not open: ") + infile, wxT("mkboot"));
         return false;
     }
     i = f.Read(image,16);
@@ -88,8 +87,7 @@ bool mkboot(wxString infile, wxString outfile,wxString bootloader,int origin)
     /* Now, read the boot loader into the image */
     if(!f.Open(bootloader))
     {
-        err.Printf(wxT("Could not open: %s"),bootloader.c_str());
-        ERR_DIALOG(err, wxT("mkboot"));
+        ERR_DIALOG(wxT("Could not open: ") + bootloader, wxT("mkboot"));
         return false;
     }
 
@@ -105,8 +103,7 @@ bool mkboot(wxString infile, wxString outfile,wxString bootloader,int origin)
 
     if(!f.Open(outfile,wxFile::write))
     {
-        err.Printf(wxT("Could not open: %s"),outfile.c_str());
-        ERR_DIALOG(err, wxT("mkboot"));
+        ERR_DIALOG(wxT("Could not open: ") + outfile, wxT("mkboot"));
         return false;
     }
 
@@ -230,14 +227,13 @@ int iriver_decode(wxString infile_name, wxString outfile_name, unsigned int modi
 
     if(!infile.Open(infile_name))
     {
-        err.Printf(wxT("Could not open: %s"),infile_name.c_str());
-        ERR_DIALOG(err, wxT("iriver_decode"));
+        ERR_DIALOG(wxT("Could not open: ") + infile_name, wxT("iriver_decode"));
         return -1;
     }
     if(!outfile.Open(outfile_name,wxFile::write))
     {
-        err.Printf(wxT("Could not open: %s"),outfile_name.c_str());
-        ERR_DIALOG(err, wxT("iriver_decode"));
+        ERR_DIALOG(wxT("Could not open: ") + outfile_name,
+                   wxT("iriver_decode"));
         return -1;
     }
     lenread = infile.Read( headerdata, 512);
@@ -417,14 +413,13 @@ int iriver_encode(wxString infile_name, wxString outfile_name, unsigned int modi
 
     if(!infile.Open(infile_name,wxFile::read))
     {
-        err.Printf(wxT("Could not open: %s"),infile_name.c_str());
-        ERR_DIALOG(err, wxT("iriver_decode"));
+        ERR_DIALOG(wxT("Could not open: ") + infile_name, wxT("iriver_decode"));
         return -1;
     }
     if(!outfile.Open(outfile_name,wxFile::write))
     {
-        err.Printf(wxT("Could not open: %s"),outfile_name.c_str());
-        ERR_DIALOG(err, wxT("iriver_decode"));
+        ERR_DIALOG(wxT("Could not open: ") + outfile_name,
+                   wxT("iriver_decode"));
         return -1;
     }
 
@@ -562,14 +557,14 @@ bool PatchFirmware(wxString firmware,wxString bootloader,int series, int table_e
             break;
     }
 
-    name1.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "firmware.bin"),
-                        gv->stdpaths->GetUserDataDir().c_str());
+    name1 = gv->stdpaths->GetUserDataDir()
+            + wxT("" PATH_SEP "download" PATH_SEP "firmware.bin"),
                                         /* descrambled file */
-    name2.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "new.bin"),
-                        gv->stdpaths->GetUserDataDir().c_str());
+    name2 = gv->stdpaths->GetUserDataDir()
+            + wxT("" PATH_SEP "download" PATH_SEP "new.bin");
                                     /* patched file */
-    name3.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "new.hex"),
-                       gv->stdpaths->GetUserDataDir().c_str());
+    name3 = gv->stdpaths->GetUserDataDir()
+            + wxT("" PATH_SEP "download" PATH_SEP "new.hex");
     if (iriver_decode(firmware, name1, FALSE, STRIP_NONE) == -1) {
         ERR_DIALOG(wxT("Error in descramble"), wxT("Descramble Firmware"));
         wxRemoveFile(name1);

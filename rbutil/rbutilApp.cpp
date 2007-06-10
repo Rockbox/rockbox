@@ -127,13 +127,15 @@ bool rbutilFrmApp::ReadGlobalConfig(rbutilFrm* myFrame)
     //  then in the user config dir (linux ~/) and
     //  then config dir (linux /etc/ )
 
-    buf.Printf(wxT("%s" PATH_SEP "rbutil.ini"), gv->AppDir.c_str() );
+    buf = gv->AppDir + wxT("" PATH_SEP "rbutil.ini");
     if (! wxFileExists(buf) )
     {
-        buf.Printf(wxT("%s" PATH_SEP ".rbutil" PATH_SEP "rbutil.ini"), gv->stdpaths->GetUserConfigDir().c_str() );
+        buf = gv->stdpaths->GetUserConfigDir()
+              + wxT("" PATH_SEP ".rbutil" PATH_SEP "rbutil.ini");
         if (! wxFileExists(buf) )
         {
-            buf.Printf(wxT("%s" PATH_SEP "rbutil.ini"), gv->stdpaths->GetConfigDir().c_str() );
+            buf = gv->stdpaths->GetConfigDir()
+                  + wxT("" PATH_SEP "rbutil.ini");
         }
     }
 
@@ -232,8 +234,7 @@ void rbutilFrmApp::ReadUserConfig()
 {
     wxString buf, str, stack;
 
-    buf.Printf(wxT("%s" PATH_SEP "RockboxUtility.cfg"),
-         gv->AppDir.c_str());
+    buf = gv->AppDir + wxT("" PATH_SEP "RockboxUtility.cfg");
 
     if (wxFileExists(buf) )
     {
@@ -242,8 +243,8 @@ void rbutilFrmApp::ReadUserConfig()
     else
     {
         gv->portable = false;
-        buf.Printf(wxT("%s" PATH_SEP "%s"),
-            gv->stdpaths->GetUserDataDir().c_str(), wxT("RockboxUtility.cfg"));
+        buf = gv->stdpaths->GetUserDataDir()
+              + wxT("" PATH_SEP "RockboxUtility.cfg");
     }
 
     gv->UserConfig = new wxFileConfig(wxEmptyString, wxEmptyString, buf);

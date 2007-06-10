@@ -33,8 +33,7 @@ InstallLog::InstallLog(wxString logname, bool CreateLog)
 
     if (!logfile)
     {
-        buf.Printf(_("Failed to create install log file: %s"), logname.c_str());
-        wxLogWarning(buf);
+        wxLogWarning(_("Failed to create install log file: ") + logname);
         return;
     }
 
@@ -42,8 +41,7 @@ InstallLog::InstallLog(wxString logname, bool CreateLog)
     if (logfile->Exists(wxT("Version")) &&
         logfile->Read(wxT("Version"), 0l) != LOGFILE_VERSION )
     {
-        buf.Printf(_("Logfile version mismatch: %s"), logname.c_str() );
-        wxLogWarning(buf);
+        wxLogWarning(_("Logfile version mismatch: ") + logname);
         delete logfile;
         return;
     }
@@ -122,14 +120,14 @@ void InstallLog::EnumerateCurDir(wxString curdir)
     wxString curname, buf, buf2, pathcache;
     long dummy;
 
-    buf.Printf(wxT("/FilePaths/%s"), curdir.c_str());
+    buf = wxT("/FilePaths/") + curdir;
     pathcache = logfile->GetPath();
     logfile->SetPath(buf);
 
     contflag = logfile->GetFirstGroup(curname, dummy);
     while (contflag)
     {
-        buf.Printf(wxT("%s/%s"), curdir.c_str(), curname.c_str() );
+        buf = curdir + wxT("/") + curname;
         buf2 = buf; buf2.Replace(wxT("/"), PATH_SEP);
         workingAS.Add(buf2);
         EnumerateCurDir(buf);
@@ -141,9 +139,8 @@ void InstallLog::EnumerateCurDir(wxString curdir)
     {
         if (curname != wxT(DIRECTORY_KLUDGE) )
         {
-            buf.Printf(wxT("%s/%s"), curdir.c_str(), curname.c_str() );
-            buf2 = buf; buf2.Replace(wxT("/"), PATH_SEP);
-            workingAS.Add(buf2);
+            buf = curdir + wxT("" PATH_SEP) + curname;
+            workingAS.Add(buf);
         }
         contflag = logfile->GetNextEntry(curname, dummy);
     }

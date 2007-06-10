@@ -528,9 +528,7 @@ void rockboxInstallDlg::CreateControls()
     wxBoxSizer3->Add(WxStaticText1,0,wxGROW | wxALL,5);
 
     wxArrayString array;
-    wxString buf;
-    buf.Printf(wxT("Rockbox stable version (%s)") , gv->last_release.c_str());
-    array.Add(buf);
+    array.Add(wxT("Rockbox stable version (") + gv->last_release + wxT(")"));
     array.Add(wxT("Archived Build"));
     array.Add(wxT("Current Build "));
 
