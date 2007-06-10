@@ -33,8 +33,8 @@ static const wxString rbutil_developers[] = {
 };
 
 #define RBUTIL_WEBSITE "http://www.rockbox.org/"
-#define RBUTIL_COPYRIGHT wxT("(C) 2005-7 The Rockbox Team\n" \
-        "released under the GNU Public License v2")
+#define RBUTIL_COPYRIGHT wxT("© 2005-2007 The Rockbox Team\n" \
+        "Released under the GNU General Public License v2.")
 #define RBUTIL_DESCRIPTION wxT("Installer and housekeeping utility for " \
         "the Rockbox open source digital audio player firmware.")
 
