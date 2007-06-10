@@ -904,6 +904,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
 #else
 #define PLA_ARRAY_COUNT 2
 #endif
+    enum plugin_status status;
 
     (void)parameter;
     rb = api;
@@ -915,7 +916,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
     rb->bitswap(sound, sizeof(sound));
 #else
     prepare_tock();
-    rb->pcm_set_frequency(44100);
+#if INPUT_SRC_CAPS != 0
+    /* Select playback */
+    rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
+    rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
+#endif
+    rb->pcm_set_frequency(SAMPR_44);
 #endif
 
     calc_period();
@@ -944,7 +950,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
             case METRONOME_QUIT:
                 /* get out of here */
                 cleanup(NULL);
-                return PLUGIN_OK;
+                status = PLUGIN_OK;
+                goto metronome_exit;
 
 #if CONFIG_KEYPAD == ONDIO_PAD
             case METRONOME_PLAY_TAP:
@@ -1013,7 +1020,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
             default:
                 if (rb->default_event_handler_ex(button, cleanup, NULL)
                     == SYS_USB_CONNECTED)
-                    return PLUGIN_USB_CONNECTED;
+                {
+                    status = PLUGIN_USB_CONNECTED;
+                    goto metronome_exit;
+                }
                 reset_tap = false;
                 break;
 
@@ -1022,5 +1032,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
             tap_count = 0;
         }
     }
+
+metronome_exit:
+    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+    return status;
 }
 

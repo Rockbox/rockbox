@@ -56,9 +56,9 @@
 #define MIXBUFFERSIZE  (SAMPLECOUNT*BUFMUL)
 
 #ifdef HW_HAVE_11
-#define SAMPLERATE  11025  // 44100 22050 11025
+#define SAMPLERATE  SAMPR_11 // 44100 22050 11025
 #else
-#define SAMPLERATE  44100  // 44100 22050 11025
+#define SAMPLERATE  SAMPR_44 // 44100 22050 11025
 #endif
 #define SAMPLESIZE  2      // 16bit
 
@@ -481,7 +481,7 @@ void I_SubmitSound(void)
 void I_ShutdownSound(void)
 {
    rb->pcm_play_stop();
-   rb->pcm_set_frequency(44100); // 44100
+   rb->pcm_set_frequency(HW_SAMPR_DEFAULT); // 44100
 }
 
 void I_InitSound()
@@ -491,6 +491,12 @@ void I_InitSound()
    // Initialize external data (all sounds) at start, keep static.
    printf( "I_InitSound: ");
    rb->pcm_play_stop();
+
+#if INPUT_SRC_CAPS != 0
+   /* Select playback */
+   rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
+   rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
+#endif
    rb->pcm_set_frequency(SAMPLERATE);
 
    vol_lookup=malloc(128*256*sizeof(int));

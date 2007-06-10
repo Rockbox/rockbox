@@ -80,11 +80,11 @@ PLUGIN_IRAM_DECLARE
 #define FRACTSIZE 10
 
 #ifndef SIMULATOR
-	#define SAMPLE_RATE 22050  // 44100 22050 11025
+	#define SAMPLE_RATE SAMPR_22  // 44100 22050 11025
 	#define MAX_VOICES 20   // Note: 24 midi channels is the minimum general midi
                          // spec implementation
 #else	// Simulator requires 44100, and we can afford to use more voices
-	#define SAMPLE_RATE 44100
+	#define SAMPLE_RATE SAMPR_44
 	#define MAX_VOICES 48
 #endif
 
@@ -232,6 +232,11 @@ int midimain(void * filename)
 
 //#ifndef SIMULATOR
     rb->pcm_play_stop();
+#if INPUT_SRC_CAPS != 0
+    /* Select playback */
+    rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
+    rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
+#endif
     rb->pcm_set_frequency(SAMPLE_RATE); // 44100 22050 11025
 //#endif
 

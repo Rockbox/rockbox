@@ -3303,6 +3303,7 @@ static void audio_play_start(size_t offset)
 {
 #if INPUT_SRC_CAPS != 0
     audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
+    audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
 
     /* Wait for any previously playing audio to flush - TODO: Not necessary? */

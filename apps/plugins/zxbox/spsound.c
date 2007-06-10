@@ -106,8 +106,12 @@ static void open_snd(void)
     sndstate = SPS_OPENED;
     sound_avail=1;
    rb->pcm_play_stop();
-   rb->pcm_set_frequency(44100);
-   
+#if INPUT_SRC_CAPS != 0
+    /* Select playback */
+    rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
+    rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
+#endif
+    rb->pcm_set_frequency(SAMPR_44);
 }
 
 static void close_snd(int normal)
@@ -115,7 +119,7 @@ static void close_snd(int normal)
     (void)normal;
     sound_avail = 0;
     rb->pcm_play_stop();    
-    rb->pcm_set_frequency(44100);
+    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
 }
 
 

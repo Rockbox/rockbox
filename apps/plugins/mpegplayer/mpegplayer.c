@@ -1636,6 +1636,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     audiobuf = rb->plugin_get_audio_buffer(&audiosize);
 
+#if INPUT_SRC_CAPS != 0
+    /* Select playback */
+    rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
+    rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
+#endif
+
+    rb->pcm_set_frequency(SAMPR_44);
+
     /* Set disk pointers to NULL */
     disk_buf_end = disk_buf = NULL;
 
@@ -1846,6 +1854,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
 
     save_settings();  /* Save settings (if they have changed) */
+
+    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
 
 #ifdef HAVE_BACKLIGHT
     /* reset backlight settings */
