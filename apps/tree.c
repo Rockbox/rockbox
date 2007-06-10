@@ -202,7 +202,8 @@ bool check_rockboxdir(void)
     return true;
 }
 
-void browse_root(void)
+/* do this really late in the init sequence */
+void tree_gui_init(void)
 {
     gui_sync_wps_screen_init();
 
@@ -222,8 +223,6 @@ void browse_root(void)
 #endif
     gui_synclist_init(&tree_lists, &tree_get_filename, &tc, false, 1);
     gui_synclist_set_icon_callback(&tree_lists, &tree_get_fileicon);
-    /* not the best place for this call... but... */
-    root_menu();
 }
 
 
@@ -1078,7 +1077,7 @@ int rockbox_browse(const char *root, int dirfilter)
     return ret_val;
 }
 
-void tree_init(void)
+void tree_mem_init(void)
 {
     /* We copy the settings value in case it is changed by the user. We can't
        use it until the next reboot. */

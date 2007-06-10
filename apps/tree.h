@@ -67,8 +67,8 @@ struct tree_context {
     bool dirfull;
 };
 
-void tree_init(void);
-void browse_root(void);
+void tree_mem_init(void);
+void tree_gui_init(void);
 void get_current_file(char* buffer, int buffer_len);
 int rockbox_browse(const char *root, int dirfilter);
 bool create_playlist(void);

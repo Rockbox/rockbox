@@ -122,7 +122,8 @@ static void app_main(void)
 #endif
 {
     init();
-    browse_root();
+    tree_gui_init();
+    root_menu();
 }
 
 static int init_dircache(bool preinit)
@@ -272,7 +273,7 @@ static void init(void)
     init_tagcache();
 #endif
     sleep(HZ/2);
-    tree_init();
+    tree_mem_init();
     filetype_init();
     playlist_init();
 
@@ -503,7 +504,7 @@ static void init(void)
 #endif
     status_init();
     playlist_init();
-    tree_init();
+    tree_mem_init();
     filetype_init();
     scrobbler_init();
     cuesheet_init();
