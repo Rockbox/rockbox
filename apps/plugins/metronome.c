@@ -1034,7 +1034,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
     }
 
 metronome_exit:
+#if CONFIG_CODEC == SWCODEC
     rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+#endif
     return status;
 }
 
