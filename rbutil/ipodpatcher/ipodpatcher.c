@@ -255,10 +255,11 @@ int read_partinfo(struct ipod_t* ipod, int silent)
 
     /* Check that the partition table looks like an ipod:
            1) Partition 1 is of type 0 (Empty) but isn't empty.
-           2) Partition 2 is of type 0xb (winpod) or -1 (macpod)
+           2) Partition 2 is of type 0xb or 0xc (winpod) or -1 (macpod)
     */
     if ((ipod->pinfo[0].type != 0) || (ipod->pinfo[0].size == 0) || 
-        ((ipod->pinfo[1].type != 0xb) && (ipod->pinfo[1].type != -1))) {
+        ((ipod->pinfo[1].type != 0xb) && (ipod->pinfo[1].type != 0xc) && 
+         (ipod->pinfo[1].type != -1))) {
         if (!silent) fprintf(stderr,"[ERR]  Partition layout is not an ipod\n");
         return -1;
     }
