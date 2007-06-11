@@ -247,6 +247,19 @@ int talk_spell(char* spell, bool enqueue)
     return 0;
 }
 
+bool talk_menus_enabled(void)
+{
+    return false;
+}
+
+void talk_enable_menus(void)
+{
+}
+
+void talk_disable_menus(void)
+{
+}
+
 const char* const dir_thumbnail_name = "_dirname.talk";
 const char* const file_thumbnail_ext = ".talk";
 #endif
