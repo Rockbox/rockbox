@@ -190,7 +190,7 @@ static void kbd_spellchar(unsigned short c)
 {
     static char spell_char[2] = "\0\0"; /* store char to pass to talk_spell */
 
-    if (global_settings.talk_menu && c < 128) /* voice UI? */
+    if (talk_menus_enabled() && c < 128) /* voice UI? */
     {
         spell_char[0] = (char)c;
         talk_spell(spell_char, false);
@@ -510,7 +510,7 @@ int kbd_input(char* text, int buflen)
     /* Initial edit position is after last character */
     editpos = utf8length(text);
 
-    if (global_settings.talk_menu) /* voice UI? */
+    if (talk_menus_enabled()) /* voice UI? */
         talk_spell(text, true); /* spell initial text */
 
     action_signalscreenchange();
@@ -1087,7 +1087,7 @@ int kbd_input(char* text, int buflen)
                     kbd_inschar(text, buflen, &editpos, ch);
                 }
 
-                if (global_settings.talk_menu) /* voice UI? */
+                if (talk_menus_enabled()) /* voice UI? */
                     talk_spell(text, false);
 
                 /* speak revised text */
@@ -1116,7 +1116,7 @@ int kbd_input(char* text, int buflen)
                     kbd_inschar(text, buflen, &editpos, ch);
                 }
 
-                if (global_settings.talk_menu) /* voice UI? */
+                if (talk_menus_enabled()) /* voice UI? */
                     talk_spell(text, false);   /* speak revised text */
                 break;
 
@@ -1167,7 +1167,7 @@ int kbd_input(char* text, int buflen)
                         param[l].hangul = false;
                     kbd_inschar(text, buflen, &editpos, morse_alphabets[j]);
 
-                    if (global_settings.talk_menu) /* voice UI? */
+                    if (talk_menus_enabled()) /* voice UI? */
                         talk_spell(text, false);   /* speak revised text */
                 }
 #endif /* KBD_MORSE_INPUT */

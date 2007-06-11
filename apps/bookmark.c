@@ -671,7 +671,7 @@ static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resu
             item--;
         }
         
-        if (item != last_item && global_settings.talk_menu)
+        if (item != last_item && talk_menus_enabled())
         {
             last_item = item;
             

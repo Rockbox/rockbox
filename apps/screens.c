@@ -155,7 +155,7 @@ int mmc_remove_request(void)
     FOR_NB_SCREENS(i)
         screens[i].clear_display();
     gui_syncsplash(1, str(LANG_REMOVE_MMC));
-    if (global_settings.talk_menu)
+    if (talk_menus_enabled())
         talk_id(LANG_REMOVE_MMC, false);
 
     while (1)
@@ -821,7 +821,7 @@ static void say_time(int cursorpos, const struct tm *tm)
     static const int unit[] = { UNIT_HOUR, UNIT_MIN, UNIT_SEC, 0, 0, 0 };
     int value = 0;
 
-    if (!global_settings.talk_menu)
+    if (!talk_menus_enabled())
         return;
 
     switch(cursorpos)

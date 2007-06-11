@@ -127,6 +127,7 @@ static unsigned char* p_lastclip; /* address of latest clip, for silence add */
 static unsigned long voicefile_size = 0; /* size of the loaded voice file */
 static unsigned char last_lang[MAX_FILENAME+1]; /* name of last used lang file (in talk_init) */
 static bool talk_initialized; /* true if talk_init has been called */
+static int talk_menu_disable; /* if non-zero, temporarily disable voice UI (not saved) */
 
 /***************** Private prototypes *****************/
 
@@ -498,6 +499,7 @@ static void reset_state(void)
 
 void talk_init(void)
 {
+    talk_menu_disable = 0;
     if (talk_initialized && !strcasecmp(last_lang, global_settings.lang_file))
     {
         /* not a new file, nothing to do */
@@ -818,4 +820,20 @@ int talk_spell(const char* spell, bool enqueue)
     }
 
     return 0;
+}
+
+bool talk_menus_enabled(void)
+{
+    return (global_settings.talk_menu && talk_menu_disable == 0);
+}
+
+
+void talk_disable_menus(void)
+{
+    talk_menu_disable++;
+}
+
+void talk_enable_menus(void)
+{    
+    talk_menu_disable--;
 }

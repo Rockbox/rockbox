@@ -952,7 +952,7 @@ const struct settings_list* find_setting(void* variable, int *id)
 void talk_setting(void *global_settings_variable)
 {
     const struct settings_list *setting;
-    if (global_settings.talk_menu == 0)
+    if (!talk_menus_enabled())
         return;
     setting = find_setting(global_settings_variable, NULL);
     if (setting == NULL)
@@ -1043,7 +1043,7 @@ bool set_bool_options(const char* string, bool* variable,
 
 static void talk_unit(int unit, int value, long (*get_talk_id)(int value))
 {
-    if (global_settings.talk_menu)
+    if (talk_menus_enabled())
     {
         if (get_talk_id)
         {
@@ -1121,11 +1121,12 @@ static bool do_set_setting(const unsigned char* string, void *variable,
     gui_synclist_limit_scroll(&lists,true);
     gui_synclist_select_item(&lists, selected);
 
-    if (global_settings.talk_menu)
+    if (talk_menus_enabled())
     {
         if (cb_data->type == INT && !cb_data->options)
             talk_unit(cb_data->voice_unit, *(int*)variable, cb_data->get_talk_id);
-        else talk_id(cb_data->options[selected].voice_id, false);
+        else 
+            talk_id(cb_data->options[selected].voice_id, false);
     }
 
     gui_synclist_draw(&lists);
@@ -1139,7 +1140,7 @@ static bool do_set_setting(const unsigned char* string, void *variable,
         if (gui_synclist_do_button(&lists,action,
                                    allow_wrap?LIST_WRAP_UNLESS_HELD:LIST_WRAP_OFF))
         {
-            if (global_settings.talk_menu)
+            if (talk_menus_enabled())
             {
                 int value;
                 if (cb_data->type == INT && !cb_data->options)

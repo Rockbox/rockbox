@@ -705,7 +705,6 @@ bool recording_screen(bool no_source)
     int radio_status = (global_settings.rec_source != AUDIO_SRC_FMRADIO) ?
                             FMRADIO_OFF : get_radio_status();
 #endif
-    int talk_menu = global_settings.talk_menu;
 #if (CONFIG_LED == LED_REAL)
     bool led_state = false;
     int led_countdown = 2;
@@ -741,9 +740,8 @@ bool recording_screen(bool no_source)
 #endif
 
 #if CONFIG_CODEC == SWCODEC
-    /* recording_menu gets messed up: so reset talk_menu */
-    talk_menu = global_settings.talk_menu;
-    global_settings.talk_menu = 0;
+    /* recording_menu gets messed up: so prevent manus talking */
+    talk_disable_menus();
     /* audio_init_recording stops anything playing when it takes the audio
        buffer */
 #else
@@ -931,8 +929,9 @@ bool recording_screen(bool no_source)
                         have_recorded = true;
                         rec_record();
                         last_seconds = 0;
-                        if (talk_menu)
-                        {   /* no voice possible here, but a beep */
+                        if (global_settings.talk_menu)
+                        {   
+                            /* no voice possible here, but a beep */
                             audio_beep(HZ/2); /* longer beep on start */
                         }
                     }
@@ -960,8 +959,9 @@ bool recording_screen(bool no_source)
                         if(audio_stat & AUDIO_STATUS_PAUSE)
                         {
                             audio_resume_recording();
-                            if (talk_menu)
-                            {   /* no voice possible here, but a beep */
+                            if (global_settings.talk_menu)
+                            {   
+                                /* no voice possible here, but a beep */
                                 audio_beep(HZ/4); /* short beep on resume */
                             }
                         }
@@ -1695,7 +1695,7 @@ bool recording_screen(bool no_source)
         rec_set_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
 
     /* restore talk_menu setting */
-    global_settings.talk_menu = talk_menu;
+    talk_enable_menus();
 #else /* !SWCODEC */
     audio_init_playback();
 #endif /* CONFIG_CODEC == SWCODEC */
