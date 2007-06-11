@@ -89,4 +89,11 @@ struct sound_settings_info {
  * its audio settings. Keep in mind that the order must be correct! */
 extern const struct sound_settings_info audiohw_settings[];
 
+/* All usable functions implemented by a audio codec drivers. Most of
+ * the function in sound settings are only called, when in audio codecs
+ * .h file suitable defines are added.
+ */
+
+void audiohw_mute(int mute);
+
 #endif /* _AUDIOHW_H_ */

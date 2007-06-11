@@ -219,10 +219,10 @@ void audiohw_set_recvol(int left, int right, int type)
 }
 
 /**
- * Mute (mute=true) or enable sound (mute=false)
+ * Mute (mute=1) or enable sound (mute=0)
  *
  */
-void audiohw_mute(bool mute)
+void audiohw_mute(int mute)
 {
     unsigned value_dap = tlv320_regs[REG_DAP];
     unsigned value_l, value_r;

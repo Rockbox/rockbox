@@ -267,15 +267,13 @@ int audiohw_set_lineout_vol(int vol_l, int vol_r)
     return 0;
 }
 
-int audiohw_mute(int mute)
+void audiohw_mute(int mute)
 {
     if (mute) {
         as3514_write_or(HPH_OUT_L, (1 << 7));
     } else {
         as3514_write_and(HPH_OUT_L, ~(1 << 7));
     }
-
-    return 0;
 }
 
 /* Nice shutdown of WM8758 codec */

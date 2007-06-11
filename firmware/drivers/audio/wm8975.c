@@ -190,7 +190,7 @@ void audiohw_set_treble(int value)
     }
 }
 
-int audiohw_mute(int mute)
+void audiohw_mute(int mute)
 {
     if (mute)
     {
@@ -200,8 +200,6 @@ int audiohw_mute(int mute)
         /* Set DACMU = 0 to soft-un-mute the audio DACs. */
         wmcodec_write(DACCTRL, 0x0);
     }
-
-    return 0;
 }
 
 /* Nice shutdown of WM8975 codec */

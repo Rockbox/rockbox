@@ -29,7 +29,6 @@ extern int audiohw_init(void);
 extern void audiohw_enable_output(bool enable);
 extern int audiohw_set_master_vol(int vol_l, int vol_r);
 extern int audiohw_set_lineout_vol(int vol_l, int vol_r);
-extern int audiohw_mute(int mute);
 extern void audiohw_close(void);
 extern void audiohw_set_sample_rate(int sampling_control);
 

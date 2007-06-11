@@ -163,7 +163,7 @@ void audiohw_set_treble(int value)
  * Mute (mute=1) or enable sound (mute=0)
  *
  */
-int audiohw_mute(int mute)
+void audiohw_mute(int mute)
 {
     unsigned int value = uda1380_regs[REG_MUTE];
 
@@ -172,7 +172,7 @@ int audiohw_mute(int mute)
     else
         value = value & ~MUTE_MASTER;
 
-    return uda1380_write_reg(REG_MUTE, value);
+    uda1380_write_reg(REG_MUTE, value);
 }
 
 /* Returns 0 if successful or -1 if some register failed */

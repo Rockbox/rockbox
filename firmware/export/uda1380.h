@@ -34,7 +34,6 @@ extern int audiohw_set_master_vol(int vol_l, int vol_r);
 extern int audiohw_set_mixer_vol(int channel1, int channel2);
 extern void audiohw_set_bass(int value);
 extern void audiohw_set_treble(int value);
-extern int audiohw_mute(int mute);
 extern void audiohw_close(void);
 /**
  * Sets frequency settings for DAC and ADC relative to MCLK

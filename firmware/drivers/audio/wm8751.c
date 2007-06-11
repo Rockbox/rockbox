@@ -168,12 +168,11 @@ void audiohw_set_treble(int value)
         TREBCTRL_TREB(tone_tenthdb2hw(value)));
 }
 
-int audiohw_mute(int mute)
+void audiohw_mute(int mute)
 {
     /* Mute:   Set DACMU = 1 to soft-mute the audio DACs. */
     /* Unmute: Set DACMU = 0 to soft-un-mute the audio DACs. */
     wmcodec_write(DACCTRL, mute ? DACCTRL_DACMU : 0);
-    return 0;
 }
 
 /* Nice shutdown of WM8751 codec */
