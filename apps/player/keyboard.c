@@ -75,7 +75,7 @@ static void kbd_spellchar(char c)
 {
     static char spell_char[2] = "\0\0"; /* store char to pass to talk_spell */
 
-    if (global_settings.talk_menu) /* voice UI? */
+    if (talk_menus_enabled()) /* voice UI? */
     {
         spell_char[0] = c; 
         talk_spell(spell_char, false);
@@ -100,7 +100,7 @@ int kbd_input(char* text, int buflen)
 
     editpos = utf8length(text);
 
-    if (global_settings.talk_menu) /* voice UI? */
+    if (talk_menus_enabled()) /* voice UI? */
         talk_spell(text, true); /* spell initial text */ 
 
     while (!done)
@@ -270,7 +270,7 @@ int kbd_input(char* text, int buflen)
                         editpos++;
                     }
                 }
-                if (global_settings.talk_menu) /* voice UI? */
+                if (talk_menus_enabled()) /* voice UI? */
                     talk_spell(text, false); /* speak revised text */
                 break;
 
