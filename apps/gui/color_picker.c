@@ -116,7 +116,7 @@ static inline unsigned get_black_or_white(const struct rgb_pick *rgb)
 #define SELECTOR_LR_MARGIN      0 /* Margin between ">" and text          */
 #define SELECTOR_TB_MARGIN      1 /* Margin on top and bottom of selector */
 #define SWATCH_TOP_MARGIN       4 /* Space between last slider and swatch */
-#define SELECTOR_WIDTH          6 /* Width of > and < bitmaps             */
+#define SELECTOR_WIDTH          get_icon_width(display->screen_type)
 #define SELECTOR_HEIGHT         8 /* Height of > and < bitmaps            */
 
 /* dunno why lcd_set_drawinfo should be left out of struct screen */
