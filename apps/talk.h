@@ -72,6 +72,6 @@ int talk_number(long n, bool enqueue); /* say a number */
 int talk_value(long n, int unit, bool enqueue); /* say a numeric value */
 int talk_spell(const char* spell, bool enqueue); /* spell a string */
 bool talk_menus_enabled(void); /* returns true if menus should be voiced */
-void talk_disable_menus(void);
-void talk_enable_menus(void);
+void talk_disable_menus(void); /* disable voice menus (temporarily, not persisted) */
+void talk_enable_menus(void); /* re-enable voice menus */
 #endif /* __TALK_H__ */
