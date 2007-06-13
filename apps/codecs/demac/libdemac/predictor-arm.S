@@ -2,7 +2,7 @@
 
 libdemac - A Monkey's Audio decoder
 
-$Id: predictor.c 13597 2007-06-08 22:35:26Z dave $
+$Id$
 
 Copyright (C) Dave Chapman 2007
 
