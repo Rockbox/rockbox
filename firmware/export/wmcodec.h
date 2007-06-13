@@ -17,6 +17,5 @@
  *
  ****************************************************************************/
 
-int audiohw_init(void);
 void wmcodec_write(int reg, int data);
 
