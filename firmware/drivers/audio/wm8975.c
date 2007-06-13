@@ -190,7 +190,7 @@ void audiohw_set_treble(int value)
     }
 }
 
-void audiohw_mute(int mute)
+void audiohw_mute(bool mute)
 {
     if (mute)
     {

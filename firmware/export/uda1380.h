@@ -28,13 +28,12 @@ extern int tenthdb2master(int db);
 extern int tenthdb2mixer(int db);
 
 extern void audiohw_reset(void);
-extern int audiohw_init(void);
 extern void audiohw_enable_output(bool enable);
 extern int audiohw_set_master_vol(int vol_l, int vol_r);
 extern int audiohw_set_mixer_vol(int channel1, int channel2);
 extern void audiohw_set_bass(int value);
 extern void audiohw_set_treble(int value);
-extern void audiohw_close(void);
+
 /**
  * Sets frequency settings for DAC and ADC relative to MCLK
  *

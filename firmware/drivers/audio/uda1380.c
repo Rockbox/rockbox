@@ -159,11 +159,7 @@ void audiohw_set_treble(int value)
                               | TREBLEL(value) | TREBLER(value));
 }
 
-/**
- * Mute (mute=1) or enable sound (mute=0)
- *
- */
-void audiohw_mute(int mute)
+void audiohw_mute(bool mute)
 {
     unsigned int value = uda1380_regs[REG_MUTE];
 
@@ -260,17 +256,18 @@ void audiohw_set_frequency(unsigned fsel)
 }
 
 /* Initialize UDA1380 codec with default register values (uda1380_defaults) */
-int audiohw_init(void)
+void audiohw_init(void)
 {
     recgain_mic = 0;
     recgain_line = 0;
 
     audiohw_reset();
-    
-    if (audiohw_set_regs() == -1)
-        return -1;
 
-    return 0;
+    if (audiohw_set_regs() == -1)
+    {
+        /* this shoud never (!) happen. */
+        logf("uda1380: audiohw_init failed")
+    }
 }
 
 void audiohw_postinit(void)

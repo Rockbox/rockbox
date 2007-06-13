@@ -21,6 +21,7 @@
 #define _AUDIOHW_H_
 
 #include "config.h"
+#include <stdbool.h>
 
 #ifdef HAVE_UDA1380
 #include "uda1380.h"
@@ -94,6 +95,20 @@ extern const struct sound_settings_info audiohw_settings[];
  * .h file suitable defines are added.
  */
 
-void audiohw_mute(int mute);
+/**
+ * Initialize audio codec to a well defined state.
+ */
+void audiohw_init(void);
+
+/**
+ * Close audio codec.
+ */
+void audiohw_close(void);
+
+/**
+ * Mute or enable sound.
+ * @param mute true or false
+ */
+void audiohw_mute(bool mute);
 
 #endif /* _AUDIOHW_H_ */

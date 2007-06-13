@@ -130,7 +130,7 @@ void audiohw_reset(void);
 /*
  * Initialise the PP I2C and I2S.
  */
-int audiohw_init(void)
+void audiohw_init(void)
 {
     unsigned int i;
 
@@ -188,8 +188,6 @@ int audiohw_init(void)
     {
         as3514.regs[i] = i2c_readbyte(AS3514_I2C_ADDR, i);
     }
-
-    return 0;
 }
 
 void audiohw_postinit(void)
@@ -267,7 +265,7 @@ int audiohw_set_lineout_vol(int vol_l, int vol_r)
     return 0;
 }
 
-void audiohw_mute(int mute)
+void audiohw_mute(bool mute)
 {
     if (mute) {
         as3514_write_or(HPH_OUT_L, (1 << 7));

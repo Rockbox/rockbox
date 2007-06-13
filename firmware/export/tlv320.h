@@ -27,7 +27,6 @@ extern int tenthdb2master(int db);
 
 /*** definitions ***/
 
-extern void audiohw_init(void);
 extern void audiohw_reset(void);
 /**
  * Sets internal sample rate for DAC and ADC relative to MCLK
@@ -42,7 +41,6 @@ extern void audiohw_set_frequency(unsigned fsel);
 extern void audiohw_enable_output(bool enable);
 extern void audiohw_set_headphone_vol(int vol_l, int vol_r);
 extern void audiohw_set_recvol(int left, int right, int type);
-extern void audiohw_close(void);
 extern void audiohw_enable_recording(bool source_mic);
 extern void audiohw_disable_recording(void);
 extern void audiohw_set_monitor(bool enable);

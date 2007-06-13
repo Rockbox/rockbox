@@ -82,7 +82,7 @@ int tenthdb2mixer(int db)
         return -db * 2 / 5;
 }
 
-void audiohw_mute(int mute)
+void audiohw_mute(bool mute)
 {
     if (mute)
     {
