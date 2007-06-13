@@ -29,19 +29,17 @@
 #include "i2c.h"
 #include "i2c-meg-fx.h"
 
-int audiohw_init(void)
+void audiohw_init(void)
 {
     /* reset I2C */
     i2c_init();
-    
+
     /* GPC5 controls headphone output */
     GPCCON &= ~(0x3 << 10);
     GPCCON |= (1 << 10);
     GPCDAT |= (1 << 5);
 
     audiohw_preinit();
-
-    return 0;
 }
 
 void wmcodec_write(int reg, int data)
