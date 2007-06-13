@@ -19,6 +19,7 @@
  ****************************************************************************/
 
 #include "plugin.h"
+#include "mem_function_wrappers.h"
 
 PLUGIN_HEADER
 
@@ -204,6 +205,9 @@ static int difficulty = 75; /* Percentage of screen that needs to be filled
                              * in order to win the game */
 
 static struct plugin_api *rb;
+
+MEM_FUNCTION_WRAPPERS(rb);
+
 static bool quit = false;
 
 static unsigned int board[BOARD_H][BOARD_W];
@@ -294,7 +298,6 @@ static inline void emptyStack (void)
 }
 
 /*********************** END OF STACK STUFF *********************/
-
 
 /* calculate the new x coordinate of the ball according to angle and speed */
 static inline int get_newx (int x, int len, int deg)

@@ -17,10 +17,13 @@
  *
  ****************************************************************************/
 #include "plugin.h"
+#include "mem_function_wrappers.h"
 
 PLUGIN_HEADER
 
 static struct plugin_api* rb;
+
+MEM_FUNCTION_WRAPPERS(rb);
 
 bool its_a_dir = false;
 
@@ -247,7 +250,6 @@ char * get_props(int selected_item, void* data, char *buffer)
 enum plugin_status plugin_start(struct plugin_api* api, void* file)
 {
     rb = api;
-
     struct gui_synclist properties_lists;
     int button;
     bool prev_show_statusbar;

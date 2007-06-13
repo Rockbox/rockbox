@@ -1470,6 +1470,11 @@ if test "$CC" = "sh-elf-gcc"; then
   fi
 fi
 
+if test "$CC" = "m68k-elf-gcc"; then
+  # convert -O to -Os to get smaller binaries!
+  GCCOPTS=`echo $GCCOPTS | sed 's/ -O / -Os /'`
+fi
+
 if test "$1" = "--ccache"; then
   echo "Enable ccache for building"
   ccache="ccache"

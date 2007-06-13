@@ -12,11 +12,14 @@
  *  Library General Public License for more details. */
 
 #include "plugin.h"
+#include "mem_function_wrappers.h"
 
 PLUGIN_HEADER
 PLUGIN_IRAM_DECLARE
 
 static struct plugin_api* rb;
+
+MEM_FUNCTION_WRAPPERS(rb);
 
 #define SAMP_PER_FRAME       1152
 #define SAMPL2                576

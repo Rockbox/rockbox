@@ -423,7 +423,7 @@ void timer4_isr(void)
 
 
 /* ISR function to get more mp3 data */
-void GetMoreMp3(unsigned char** start, int* size)
+void GetMoreMp3(unsigned char** start, size_t* size)
 {
     int available;
     int advance;

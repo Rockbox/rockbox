@@ -27,6 +27,7 @@
 #include "plugin.h"
 #include "playback_control.h"
 #include "oldmenuapi.h"
+#include "mem_function_wrappers.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "gray.h"
@@ -186,6 +187,7 @@ PLUGIN_HEADER
 /******************************* Globals ***********************************/
 
 static struct plugin_api* rb;
+MEM_FUNCTION_WRAPPERS(rb);
 
 /* for portability of below JPEG code */
 #define MEMSET(p,v,c) rb->memset(p,v,c)

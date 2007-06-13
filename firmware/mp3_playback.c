@@ -61,7 +61,7 @@ static long playstart_tick;
 static long cumulative_ticks;
 
 /* the registered callback function to ask for more mp3 data */
-static void (*callback_for_more)(unsigned char**, int*);
+static void (*callback_for_more)(unsigned char**, size_t*);
 #endif /* #ifndef SIMULATOR */
 
 /* list of tracks in memory */
@@ -167,7 +167,7 @@ void DEI3(void) __attribute__((interrupt_handler));
 void DEI3(void)
 {
     unsigned char* start;
-    int size = 0;
+    size_t size = 0;
 
     if (callback_for_more != NULL)
     {
@@ -502,7 +502,7 @@ void mp3_play_init(void)
 }
 
 void mp3_play_data(const unsigned char* start, int size,
-    void (*get_more)(unsigned char** start, int* size) /* callback fn */
+    void (*get_more)(unsigned char** start, size_t* size) /* callback fn */
 )
 {
     /* init DMA */

@@ -20,6 +20,7 @@
 #include "plugin.h"
 #include "card_deck.h"
 #include "card_back.h"
+#include "mem_function_wrappers.h"
 
 PLUGIN_HEADER
 
@@ -212,6 +213,8 @@ extern const fb_data card_back[];
 
 /* global rockbox api */
 static struct plugin_api* rb;
+
+MEM_FUNCTION_WRAPPERS(rb);
 
 /* dealer and player card positions */
 unsigned int dealer_x, dealer_y, player_x, player_y;
@@ -1399,7 +1402,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
 
     (void)parameter;
     rb = api;
-    
+
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif

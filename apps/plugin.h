@@ -114,12 +114,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 57
+#define PLUGIN_API_VERSION 58
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 56
+#define PLUGIN_MIN_API_VERSION 58
 
 /* plugin return codes */
 enum plugin_status {
@@ -417,7 +417,7 @@ struct plugin_api {
     int (*sound_min)(int setting);
     int (*sound_max)(int setting);
 #ifndef SIMULATOR
-    void (*mp3_play_data)(const unsigned char* start, int size, void (*get_more)(unsigned char** start, int* size));
+    void (*mp3_play_data)(const unsigned char* start, int size, void (*get_more)(unsigned char** start, size_t* size));
     void (*mp3_play_pause)(bool play);
     void (*mp3_play_stop)(void);
     bool (*mp3_is_playing)(void);

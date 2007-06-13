@@ -132,7 +132,7 @@ static int talk_menu_disable; /* if non-zero, temporarily disable voice UI (not 
 /***************** Private prototypes *****************/
 
 static void load_voicefile(void);
-static void mp3_callback(unsigned char** start, int* size);
+static void mp3_callback(unsigned char** start, size_t* size);
 static int shutup(void);
 static int queue_clip(unsigned char* buf, long size, bool enqueue);
 static int open_voicefile(void);
@@ -262,7 +262,7 @@ load_err:
 
 
 /* called in ISR context if mp3 data got consumed */
-static void mp3_callback(unsigned char** start, int* size)
+static void mp3_callback(unsigned char** start, size_t* size)
 {
     queue[queue_read].len -= sent; /* we completed this */
     queue[queue_read].buf += sent;

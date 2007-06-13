@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
+#include "mem_function_wrappers.h"
 
 PLUGIN_HEADER
 
@@ -153,6 +154,7 @@ PLUGIN_HEADER
    it's nice not to have to pass the api pointer in all function calls
    in the plugin */
 static struct plugin_api* rb;
+MEM_FUNCTION_WRAPPERS(rb);
 #define MAX_PLAYERS 10
 
 static struct {
@@ -192,7 +194,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     
     (void)parameter;
     rb=api;
-
     rb->memset(&settings, 0, sizeof(settings));
     
     /* now go ahead and have fun! */

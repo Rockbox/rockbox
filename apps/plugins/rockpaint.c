@@ -30,6 +30,7 @@
 #include "errno.h"
 #include "lib/bmp.h"
 #include "lib/rgb_hsv.h"
+#include "mem_function_wrappers.h"
 
 PLUGIN_HEADER
 
@@ -223,6 +224,8 @@ int errno;
 #endif
 
 static struct plugin_api* rb;
+
+MEM_FUNCTION_WRAPPERS(rb);
 
 static int drawcolor=0; /* Current color (in palette) */
 static int bgdrawcolor=9; /* Current background color (in palette) */

@@ -18,6 +18,7 @@
  ****************************************************************************/
 #include "plugin.h"
 #include "pluginlib_actions.h"
+#include "mem_function_wrappers.h"
 
 PLUGIN_HEADER
 
@@ -69,6 +70,8 @@ static const struct button_mapping iriver_syncaction[] =
 
 
 static struct plugin_api* rb;
+
+MEM_FUNCTION_WRAPPERS(rb);
 
 static int bpm      = 120;
 static int period   = 0;
@@ -159,7 +162,7 @@ static unsigned char sound[] = {
  85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85,
     85, 85, 85};
     
-void callback(unsigned char** start, int* size){
+void callback(unsigned char** start, size_t* size){
     (void)start; /* unused parameter, avoid warning */
     *size = NULL; /* end of data */
     sound_active = false;

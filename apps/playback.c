@@ -332,7 +332,7 @@ static struct mutex mutex_codecthread NOCACHEBSS_ATTR;
 static volatile bool voice_thread_start = false; /* Triggers voice playback (A/V) */
 static volatile bool voice_is_playing NOCACHEBSS_ATTR = false; /* Is voice currently playing? (V) */
 static volatile bool voice_codec_loaded NOCACHEBSS_ATTR = false; /* Is voice codec loaded (V/A-) */
-static char *voicebuf = NULL;
+static unsigned char *voicebuf = NULL;
 static size_t voice_remaining = 0;
 
 #ifdef IRAM_STEAL
@@ -340,12 +340,12 @@ static size_t voice_remaining = 0;
 static bool voice_iram_stolen = false;
 #endif
 
-static void (*voice_getmore)(unsigned char** start, int* size) = NULL;
+static void (*voice_getmore)(unsigned char** start, size_t* size) = NULL;
 
 struct voice_info {
-    void (*callback)(unsigned char **start, int *size);
-    int size;
-    char *buf;
+    void (*callback)(unsigned char **start, size_t* size);
+    size_t size;
+    unsigned char *buf;
 };
 static void voice_thread(void);
 static void voice_stop(void);
@@ -355,12 +355,12 @@ static void voice_stop(void);
 /* --- External interfaces --- */
 
 void mp3_play_data(const unsigned char* start, int size,
-                   void (*get_more)(unsigned char** start, int* size))
+                   void (*get_more)(unsigned char** start, size_t* size))
 {
 #ifdef PLAYBACK_VOICE
     static struct voice_info voice_clip;
     voice_clip.callback = get_more;
-    voice_clip.buf = (char *)start;
+    voice_clip.buf = (unsigned char*)start;
     voice_clip.size = size;
     LOGFQUEUE("mp3 > voice Q_VOICE_STOP");
     queue_post(&voice_queue, Q_VOICE_STOP, 0);
@@ -1238,7 +1238,7 @@ voice_play_clip:
     if (voice_remaining == 0 || voicebuf == NULL)
     {
         if (voice_getmore)
-            voice_getmore((unsigned char **)&voicebuf, (int *)&voice_remaining);
+            voice_getmore((unsigned char **)&voicebuf, &voice_remaining);
 
         /* If this clip is done */
         if (voice_remaining == 0)

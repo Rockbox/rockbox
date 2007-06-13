@@ -20,6 +20,7 @@
 #ifndef SIMULATOR /* not for the simulator */
 
 #include "plugin.h"
+#include "mem_function_wrappers.h"
 PLUGIN_HEADER
 
 #define BATTERY_LOG "/battery_bench.txt"
@@ -98,6 +99,7 @@ PLUGIN_HEADER
 
 /****************************** Plugin Entry Point ****************************/
 static struct plugin_api* rb;
+MEM_FUNCTION_WRAPPERS(rb);
 int main(void);
 bool exit_tsr(bool);
 void thread(void);

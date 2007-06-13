@@ -65,10 +65,12 @@ static bool volume(void)
 
 static bool shuffle(void)
 {
-    struct opt_items names[] = {
-        { "No", -1 },
-        { "Yes", -1 }
-    };
+    struct opt_items names[2];
+        names[0].string = "No";
+        names[0].voice_id = -1;
+        names[1].string = "Yes";
+        names[1].voice_id = -1;
+
     return api->set_option("Shuffle", &api->global_settings->playlist_shuffle,
                            BOOL, names, 2,NULL);
 }

@@ -810,7 +810,7 @@ static void reset_mp3_buffer(void)
 }
 
  /* DMA transfer end interrupt callback */
-static void transfer_end(unsigned char** ppbuf, int* psize)
+static void transfer_end(unsigned char** ppbuf, size_t* psize)
 {
     if(playing && !paused)
     {

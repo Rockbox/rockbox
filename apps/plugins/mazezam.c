@@ -20,11 +20,14 @@
  ****************************************************************************/
 #include "plugin.h"
 #include "configfile.h"
+#include "mem_function_wrappers.h"
 
 /* Include standard plugin macro */
 PLUGIN_HEADER
 
 static struct plugin_api* rb;
+
+MEM_FUNCTION_WRAPPERS(rb);
 
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define MAZEZAM_UP                  BUTTON_UP
