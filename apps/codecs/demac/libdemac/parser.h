@@ -71,6 +71,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 /* Total size of all predictor histories - 50 * sizeof(int32_t) */
 #define PREDICTOR_SIZE 50
 
+
+/* NOTE: This struct is used in predictor-arm.S - any updates need to
+   be reflected there. */
+
 struct predictor_t
 {
     /* Filter histories */
@@ -79,10 +83,12 @@ struct predictor_t
     int32_t YlastA;
     int32_t XlastA;
 
-    int32_t YfilterA;
-    int32_t XfilterA;
+    /* NOTE: The order of the next four fields is important for
+       predictor-arm.S */
     int32_t YfilterB;
+    int32_t XfilterA;
     int32_t XfilterB;
+    int32_t YfilterA;
 
     /* Adaption co-efficients */
     int32_t YcoeffsA[4];

@@ -74,6 +74,7 @@ void init_predictor_decoder(struct predictor_t* p)
 int predictor_decode_stereo(struct predictor_t* p, int32_t* decoded0, int32_t* decoded1, int count) ICODE_ATTR;
 #endif
 
+#ifndef CPU_ARM
 int predictor_decode_stereo(struct predictor_t* p, int32_t* decoded0, int32_t* decoded1, int count)
 {
     int32_t predictionA, predictionB;
@@ -208,6 +209,7 @@ int predictor_decode_stereo(struct predictor_t* p, int32_t* decoded0, int32_t* d
 
     return 0;
 }
+#endif
 
 int predictor_decode_mono(struct predictor_t* p, int32_t* decoded0, int count)
 {
