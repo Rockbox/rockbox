@@ -679,4 +679,24 @@ void plugin_tsr(bool (*exit_callback)(bool reenter));
 enum plugin_status plugin_start(struct plugin_api* rockbox, void* parameter)
     NO_PROF_ATTR;
 
+/* Use this macro in plugins where gcc tries to optimize by calling
+ * these functions directly */
+#define MEM_FUNCTION_WRAPPERS(api) \
+        void *memcpy(void *dest, const void *src, size_t n) \
+        { \
+            return (api)->memcpy(dest, src, n); \
+        } \
+        void *memset(void *dest, int c, size_t n) \
+        { \
+            return (api)->memset(dest, c, n); \
+        } \
+        void *memmove(void *dest, const void *src, size_t n) \
+        { \
+            return (api)->memmove(dest, src, n); \
+        } \
+        int memcmp(const void *s1, const void *s2, size_t n) \
+        { \
+            return (api)->memcmp(s1, s2, n); \
+        }
+
 #endif

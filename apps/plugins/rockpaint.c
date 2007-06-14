@@ -30,7 +30,6 @@
 #include "errno.h"
 #include "lib/bmp.h"
 #include "lib/rgb_hsv.h"
-#include "mem_function_wrappers.h"
 
 PLUGIN_HEADER
 

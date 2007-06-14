@@ -19,7 +19,6 @@
  ****************************************************************************/
 
 #include "plugin.h"
-#include "mem_function_wrappers.h"
 
 PLUGIN_HEADER
 

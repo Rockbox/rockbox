@@ -20,7 +20,6 @@
 #include "plugin.h"
 #include "card_deck.h"
 #include "card_back.h"
-#include "mem_function_wrappers.h"
 
 PLUGIN_HEADER
 

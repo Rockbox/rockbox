@@ -27,7 +27,6 @@
 #include "plugin.h"
 #include "playback_control.h"
 #include "oldmenuapi.h"
-#include "mem_function_wrappers.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "gray.h"

@@ -20,7 +20,6 @@
 #ifndef SIMULATOR /* not for the simulator */
 
 #include "plugin.h"
-#include "mem_function_wrappers.h"
 PLUGIN_HEADER
 
 #define BATTERY_LOG "/battery_bench.txt"

@@ -20,7 +20,6 @@
  ****************************************************************************/
 #include "plugin.h"
 #include "configfile.h"
-#include "mem_function_wrappers.h"
 
 /* Include standard plugin macro */
 PLUGIN_HEADER
