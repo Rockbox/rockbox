@@ -298,19 +298,19 @@ static inline long muls32_asr26(long a, long b)
 {
     long r, t1;
     asm (
-        "mac.l   %[a],%[b],%%acc0\n" /* multiply */
-        "mulu.l  %[a],%[b]       \n" /* get lower half */
-        "movclr.l %%acc0,%[r]    \n" /* get higher half */
-        "asl.l   #5,%[r]         \n" /* hi <<= 5, plus one free */
-        "moveq.l #26,%[t1]       \n"
-        "lsr.l   %[t1],%[b]      \n" /* (unsigned)lo >>= 26 */
-        "or.l    %[b],%[r]       \n" /* combine result */
+        "mac.l   %[a], %[b], %%acc0  \n" /* multiply */
+        "move.l  %%accext01, %[t1]   \n" /* get low part */
+        "movclr.l %%acc0, %[r]       \n" /* get high part */
+        "asl.l   #5, %[r]            \n" /* hi <<= 5, plus one free */
+        "lsr.l   #3, %[t1]           \n" /* lo >>= 3 */
+        "and.l   #0x1f, %[t1]        \n" /* mask out unrelated bits */
+        "or.l    %[t1], %[r]         \n" /* combine result */
         : /* outputs */
-        [r]"=&d"(r),
-        [t1]"=&d"(t1),
-        [b] "+d" (b)
+        [r] "=d"(r),
+        [t1]"=d"(t1)
         : /* inputs */
-        [a] "d"  (a)
+        [a] "d" (a),
+        [b] "d" (b)
     );
     return r;
 }
