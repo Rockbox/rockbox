@@ -28,8 +28,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #include "parser.h"
 #include "predictor.h"
 
-#include "vector_math32.h"
-
 /* Return 0 if x is zero, -1 if x is positive, 1 if x is negative */
 #define SIGN(x) (x) ? (((x) > 0) ? -1 : 1) : 0
 
