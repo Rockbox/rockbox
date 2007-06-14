@@ -114,7 +114,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 58
+#define PLUGIN_API_VERSION 59
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -616,6 +616,11 @@ struct plugin_api {
     char *(*create_numbered_filename)(char *buffer, const char *path,
                                       const char *prefix, const char *suffix,
                                       int numberlen IF_CNFN_NUM_(, int *num));
+
+    bool (*set_bool_options)(const char* string, bool* variable,
+                             const char* yes_str, int yes_voice,
+                             const char* no_str, int no_voice,
+                             void (*function)(bool));
 };
 
 /* plugin header */

@@ -28,8 +28,6 @@ PLUGIN_HEADER
 #define VUMETER_MENU BUTTON_F1
 #define VUMETER_MENU_EXIT BUTTON_F1
 #define VUMETER_MENU_EXIT2 BUTTON_OFF
-#define VUMETER_LEFT BUTTON_LEFT
-#define VUMETER_RIGHT BUTTON_RIGHT
 #define VUMETER_UP BUTTON_UP
 #define VUMETER_DOWN BUTTON_DOWN
 
@@ -39,8 +37,6 @@ PLUGIN_HEADER
 #define VUMETER_MENU BUTTON_F1
 #define VUMETER_MENU_EXIT BUTTON_F1
 #define VUMETER_MENU_EXIT2 BUTTON_OFF
-#define VUMETER_LEFT BUTTON_LEFT
-#define VUMETER_RIGHT BUTTON_RIGHT
 #define VUMETER_UP BUTTON_UP
 #define VUMETER_DOWN BUTTON_DOWN
 
@@ -52,8 +48,6 @@ PLUGIN_HEADER
 #define VUMETER_MENU (BUTTON_MENU | BUTTON_REPEAT)
 #define VUMETER_MENU_EXIT BUTTON_MENU
 #define VUMETER_MENU_EXIT2 BUTTON_OFF
-#define VUMETER_LEFT BUTTON_LEFT
-#define VUMETER_RIGHT BUTTON_RIGHT
 #define VUMETER_UP BUTTON_UP
 #define VUMETER_DOWN BUTTON_DOWN
 
@@ -62,10 +56,9 @@ PLUGIN_HEADER
 #define VUMETER_QUIT BUTTON_OFF
 #define VUMETER_HELP BUTTON_ON
 #define VUMETER_MENU BUTTON_SELECT
+#define VUMETER_MENU2 BUTTON_MODE
 #define VUMETER_MENU_EXIT BUTTON_SELECT
 #define VUMETER_MENU_EXIT2 BUTTON_OFF
-#define VUMETER_LEFT BUTTON_LEFT
-#define VUMETER_RIGHT BUTTON_RIGHT
 #define VUMETER_UP BUTTON_UP
 #define VUMETER_DOWN BUTTON_DOWN
 
@@ -78,8 +71,6 @@ PLUGIN_HEADER
 #define VUMETER_MENU BUTTON_SELECT
 #define VUMETER_MENU_EXIT BUTTON_SELECT
 #define VUMETER_MENU_EXIT2 BUTTON_MENU
-#define VUMETER_LEFT BUTTON_LEFT
-#define VUMETER_RIGHT BUTTON_RIGHT
 #define VUMETER_UP BUTTON_SCROLL_FWD
 #define VUMETER_DOWN BUTTON_SCROLL_BACK
 
@@ -89,8 +80,6 @@ PLUGIN_HEADER
 #define VUMETER_MENU BUTTON_MENU
 #define VUMETER_MENU_EXIT BUTTON_MENU
 #define VUMETER_MENU_EXIT2 BUTTON_POWER
-#define VUMETER_LEFT BUTTON_LEFT
-#define VUMETER_RIGHT BUTTON_RIGHT
 #define VUMETER_UP BUTTON_UP
 #define VUMETER_DOWN BUTTON_DOWN
 
@@ -100,8 +89,6 @@ PLUGIN_HEADER
 #define VUMETER_MENU BUTTON_SELECT
 #define VUMETER_MENU_EXIT BUTTON_SELECT
 #define VUMETER_MENU_EXIT2 BUTTON_POWER
-#define VUMETER_LEFT BUTTON_LEFT
-#define VUMETER_RIGHT BUTTON_RIGHT
 #define VUMETER_UP BUTTON_SCROLL_DOWN
 #define VUMETER_DOWN BUTTON_SCROLL_UP
 
@@ -111,8 +98,6 @@ PLUGIN_HEADER
 #define VUMETER_MENU BUTTON_SELECT
 #define VUMETER_MENU_EXIT BUTTON_SELECT
 #define VUMETER_MENU_EXIT2 BUTTON_POWER
-#define VUMETER_LEFT BUTTON_LEFT
-#define VUMETER_RIGHT BUTTON_RIGHT
 #define VUMETER_UP BUTTON_UP
 #define VUMETER_DOWN BUTTON_DOWN
 
@@ -122,8 +107,6 @@ PLUGIN_HEADER
 #define VUMETER_MENU BUTTON_REW
 #define VUMETER_MENU_EXIT BUTTON_REW
 #define VUMETER_MENU_EXIT2 BUTTON_POWER
-#define VUMETER_LEFT BUTTON_LEFT
-#define VUMETER_RIGHT BUTTON_RIGHT
 #define VUMETER_UP BUTTON_SCROLL_UP
 #define VUMETER_DOWN BUTTON_SCROLL_DOWN
 
@@ -171,8 +154,8 @@ const int digital_lead = (LCD_WIDTH - (((int)(LCD_WIDTH / 11))*11) ) / 2;
 
 const int digital_block_height = (LCD_HEIGHT - 54) / 2 ;
 
-#define ANALOG 1 /* The two meter types */
-#define DIGITAL 2
+#define ANALOG 0 /* The two meter types */
+#define DIGITAL 1
 
 int left_needle_top_y;
 int left_needle_top_x;
@@ -360,135 +343,88 @@ void change_volume(int delta) {
     }
 }
 
-void change_settings(void)
+static bool vu_meter_menu(void)
 {
-    int selected_setting=0;
-    bool quit=false;
-    while(!quit)
-    {
-        rb->lcd_clear_display();
+    int selection;
+    bool menu_quit = false;
+    bool exit = false;
+    
+    MENUITEM_STRINGLIST(menu,"VU Meter Menu",NULL,"Meter Type","Scale",
+                        "Minimeters","Decay Speed","Quit");
+    
+    static const struct opt_items meter_type_option[2] = {
+        { "Analog", -1 },
+        { "Digital", -1 },
+    };
 
-        rb->lcd_putsxy(33, 0, "Settings");
+    static const struct opt_items decay_speed_option[7] = {
+        { "No Decay", -1 },
+        { "Very Fast", -1 },
+        { "Fast", -1 },
+        { "Medium", -1 },
+        { "Medium-Slow", -1 },
+        { "Slow", -1 },
+        { "Very Slow", -1 },
+    };
 
-        rb->lcd_putsxy(0, 8, "Meter type:");
-        if(settings.meter_type==ANALOG)
-            rb->lcd_putsxy(67, 8, "Analog");
-        else
-            rb->lcd_putsxy(67, 8, "Digital");
-
-        if(settings.meter_type==ANALOG) {
-            rb->lcd_putsxy(0, 16, "Scale:");
-            if(settings.analog_use_db_scale)
-                rb->lcd_putsxy(36, 16, "dBfs");
-            else
-                rb->lcd_putsxy(36, 16, "Linear");
-
-            rb->lcd_putsxy(0, 24, "Minimeters:");
-            if(settings.analog_minimeters)
-                rb->lcd_putsxy(65, 24, "On");
-            else
-                rb->lcd_putsxy(65, 24, "Off");
-
-            rb->lcd_putsxy(0, 32, "Decay Speed:");
-            switch(settings.analog_decay) {
-                case 0: rb->lcd_putsxy(10, 40, "No Decay");    break;
-                case 1: rb->lcd_putsxy(10, 40, "Very Fast");   break;
-                case 2: rb->lcd_putsxy(10, 40, "Fast");        break;
-                case 3: rb->lcd_putsxy(10, 40, "Medium");      break;
-                case 4: rb->lcd_putsxy(10, 40, "Medium-Slow"); break;
-                case 5: rb->lcd_putsxy(10, 40, "Slow");        break;
-                case 6: rb->lcd_putsxy(10, 40, "Very Slow");   break;
-            }
-        }
-        else {
-            rb->lcd_putsxy(0, 16, "Scale:");
-            if(settings.digital_use_db_scale)
-                rb->lcd_putsxy(36, 16, "dBfs");
-            else
-                rb->lcd_putsxy(36, 16, "Linear");
-
-            rb->lcd_putsxy(0, 24, "Minimeters:");
-            if(settings.digital_minimeters)
-                rb->lcd_putsxy(65, 24, "On");
-            else
-                rb->lcd_putsxy(65, 24, "Off");
-
-            rb->lcd_putsxy(0, 32, "Decay Speed:");
-            switch(settings.digital_decay) {
-                case 0: rb->lcd_putsxy(10, 40, "No Decay");    break;
-                case 1: rb->lcd_putsxy(10, 40, "Very Fast");   break;
-                case 2: rb->lcd_putsxy(10, 40, "Fast");        break;
-                case 3: rb->lcd_putsxy(10, 40, "Medium");      break;
-                case 4: rb->lcd_putsxy(10, 40, "Medium-Slow"); break;
-                case 5: rb->lcd_putsxy(10, 40, "Slow");        break;
-                case 6: rb->lcd_putsxy(10, 40, "Very Slow");   break;
-            }
-        }
-
-        rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-        rb->lcd_fillrect(0, selected_setting*8+8,111,8);
-        rb->lcd_set_drawmode(DRMODE_SOLID);
-        rb->lcd_update();
-
-        switch(rb->button_get_w_tmo(1))
+    while (!menu_quit) {
+        switch(rb->do_menu(&menu, &selection))
         {
-            case VUMETER_MENU_EXIT:
-            case VUMETER_MENU_EXIT2:
-                quit = true;
+            case 0:
+                rb->set_option("Meter Type", &settings.meter_type, INT,
+                               meter_type_option, 2, NULL);
                 break;
-
-            case VUMETER_LEFT:
-                if(selected_setting==0)
-                    settings.meter_type == DIGITAL ? settings.meter_type = ANALOG : settings.meter_type++;
-                if(settings.meter_type==ANALOG) {
-                    if(selected_setting==1)
-                        settings.analog_use_db_scale = !settings.analog_use_db_scale;
-                    if(selected_setting==2)
-                        settings.analog_minimeters = !settings.analog_minimeters;
-                    if(selected_setting==3)
-                        settings.analog_decay == 0 ? settings.analog_decay = 6 : settings.analog_decay--;
+                
+            case 1:
+                if(settings.meter_type==ANALOG)
+                {
+                    rb->set_bool_options("Scale", &settings.analog_use_db_scale,
+                                         "dBfs", -1, "Linear", -1, NULL);
                 }
-                else {
-                    if(selected_setting==1)
-                        settings.digital_use_db_scale = !settings.digital_use_db_scale;    
-                    if(selected_setting==2)
-                        settings.digital_minimeters = !settings.digital_minimeters;
-                    if(selected_setting==3)
-                        settings.digital_decay == 0 ? settings.digital_decay = 6 : settings.digital_decay--;
+                else
+                {
+                    rb->set_bool_options("Scale", &settings.digital_use_db_scale,
+                                         "dBfs", -1, "Linear", -1, NULL);
                 }
                 break;
-
-            case VUMETER_RIGHT:
-                if(selected_setting==0)
-                    settings.meter_type == DIGITAL ? settings.meter_type = ANALOG : settings.meter_type++;
-                if(settings.meter_type==ANALOG) {
-                    if(selected_setting==1)
-                        settings.analog_use_db_scale = !settings.analog_use_db_scale;
-                    if(selected_setting==2)
-                        settings.analog_minimeters = !settings.analog_minimeters;
-                    if(selected_setting==3)
-                        settings.analog_decay == 6 ? settings.analog_decay = 0 : settings.analog_decay++;
+                
+            case 2:
+                if(settings.meter_type==ANALOG)
+                {
+                    rb->set_bool("Enable Minimeters",
+                                 &settings.analog_minimeters);
                 }
-                else {
-                    if(selected_setting==1)
-                        settings.digital_use_db_scale = !settings.digital_use_db_scale;
-                    if(selected_setting==2)
-                        settings.digital_minimeters = !settings.digital_minimeters;
-                    if(selected_setting==3)
-                        settings.digital_decay == 6 ? settings.digital_decay = 0 : settings.digital_decay++;
+                else
+                {
+                    rb->set_bool("Enable Minimeters",
+                                 &settings.digital_minimeters);
+                }
+                break;
+                
+            case 3:
+                if(settings.meter_type==ANALOG)
+                {
+                    rb->set_option("Decay Speed", &settings.analog_decay, INT, 
+                               decay_speed_option, 7, NULL);
+                }
+                else
+                {
+                    rb->set_option("Decay Speed", &settings.digital_decay, INT, 
+                               decay_speed_option, 7, NULL);
                 }
                 break;
 
-            case VUMETER_UP:
-            case VUMETER_UP|BUTTON_REPEAT:
-                selected_setting == 3 ? selected_setting=0 : selected_setting++;
+            case 4:
+                exit = true;
+                /* fall through to exit the menu */
+            default:
+                menu_quit = true;
                 break;
-
-            case VUMETER_DOWN:
-            case VUMETER_DOWN|BUTTON_REPEAT:
-                selected_setting == 0 ? selected_setting=3 : selected_setting--;
         }
     }
+    /* the menu uses the userfont, set it back to sysfont */
+    rb->lcd_setfont(FONT_SYSFIXED);
+    return exit;
 }
 
 void draw_analog_minimeters(void) {
@@ -708,11 +644,17 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
                 break;
 
             case VUMETER_MENU:
+
+#ifdef VUMETER_MENU2
+            case VUMETER_MENU2:
+#endif
+
 #ifdef VUMETER_MENU_PRE
                 if (lastbutton != VUMETER_MENU_PRE)
                     break;
 #endif
-                change_settings();
+                if(vu_meter_menu())
+                    return PLUGIN_OK;
                 break;
 
             case VUMETER_UP:
