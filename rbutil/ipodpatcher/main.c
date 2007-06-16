@@ -46,7 +46,8 @@ enum {
    READ_FIRMWARE,
    WRITE_FIRMWARE,
    READ_PARTITION,
-   WRITE_PARTITION
+   WRITE_PARTITION,
+   FORMAT_PARTITION
 };
 
 void print_macpod_warning(void)
@@ -85,6 +86,7 @@ void print_usage(void)
     fprintf(stderr,"  -a,   --add-bootloader     filename.ipod\n");
     fprintf(stderr,"  -ab,  --add-bootloader-bin filename.bin\n");
     fprintf(stderr,"  -d,   --delete-bootloader\n");
+    fprintf(stderr,"  -f,   --format\n");
     fprintf(stderr,"\n");
 
 #ifdef __WIN32__
@@ -128,9 +130,7 @@ void display_partinfo(struct ipod_t* ipod)
 
 int main(int argc, char* argv[])
 {
-#ifdef WITH_BOOTOBJS
     char yesno[4];
-#endif
     int i;
     int n;
     int infile, outfile;
@@ -292,6 +292,10 @@ int main(int argc, char* argv[])
         } else if ((strcmp(argv[i],"-v")==0) || 
                    (strcmp(argv[i],"--verbose")==0)) {
             verbose++;
+            i++;
+        } else if ((strcmp(argv[i],"-f")==0) || 
+                   (strcmp(argv[i],"--format")==0)) {
+            action = FORMAT_PARTITION;
             i++;
         } else {
             print_usage(); return 1;
@@ -465,6 +469,23 @@ int main(int argc, char* argv[])
         }
 
         close(infile);
+    } else if (action==FORMAT_PARTITION) {
+        printf("WARNING!!! YOU ARE ABOUT TO USE AN EXPERIMENTAL FORMATTING FEATURE.\n");
+        printf("Are you sure you want to continue? (y/n):");
+        
+        if (fgets(yesno,4,stdin)) {
+            if (yesno[0]=='y') {
+                if (ipod_reopen_rw(&ipod) < 0) {
+                    return 5;
+                }
+
+                if (format_partition(&ipod,1) < 0) {
+                    fprintf(stderr,"[ERR]  Format failed.\n");
+                }
+            } else {
+                fprintf(stderr,"[INFO] Format cancelled.\n");
+            }
+        }
     }
 
     ipod_close(&ipod);

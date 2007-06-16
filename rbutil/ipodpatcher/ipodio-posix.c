@@ -26,21 +26,55 @@
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 
+#include "ipodio.h"
+
 #if defined(linux) || defined (__linux)
 #include <sys/mount.h>
+#include <linux/hdreg.h>
 #define IPOD_SECTORSIZE_IOCTL BLKSSZGET
+
+static void get_geometry(struct ipod_t* ipod)
+{
+    struct hd_geometry geometry;
+
+    if (!ioctl(ipod->dh, HDIO_GETGEO, &geometry)) {
+        /* never use geometry.cylinders - it is truncated */
+        ipod->num_heads = geometry.heads;
+        ipod->sectors_per_track = geometry.sectors;
+    } else {
+        ipod->num_heads = 0;
+        ipod->sectors_per_track = 0;
+    }
+}
+
 #elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) \
       || defined(__bsdi__) || defined(__DragonFly__)
 #include <sys/disk.h>
 #define IPOD_SECTORSIZE_IOCTL DIOCGSECTORSIZE
+
+/* TODO: Implement this function for BSD */
+static void get_geometry(struct ipod_t* ipod)
+{
+    /* Are these universal for all ipods? */
+    ipod->num_heads = 255;
+    ipod->sectors_per_track = 63;
+}
+
 #elif defined(__APPLE__) && defined(__MACH__)
 #include <sys/disk.h>
 #define IPOD_SECTORSIZE_IOCTL DKIOCGETBLOCKSIZE
+
+/* TODO: Implement this function for Mac OS X */
+static void get_geometry(struct ipod_t* ipod)
+{
+    /* Are these universal for all ipods? */
+    ipod->num_heads = 255;
+    ipod->sectors_per_track = 63;
+}
+
 #else
     #error No sector-size detection implemented for this platform
 #endif
-
-#include "ipodio.h"
 
 void print_error(char* msg)
 {
@@ -55,6 +89,8 @@ int ipod_open(struct ipod_t* ipod, int silent)
         return -1;
     }
 
+    /* Read information about the disk */
+
     if(ioctl(ipod->dh,IPOD_SECTORSIZE_IOCTL,&ipod->sector_size) < 0) {
         ipod->sector_size=512;
         if (!silent) {
@@ -62,6 +98,9 @@ int ipod_open(struct ipod_t* ipod, int silent)
                    ,ipod->sector_size);
 	}
     }
+
+    get_geometry(ipod);
+
     return 0;
 }
 

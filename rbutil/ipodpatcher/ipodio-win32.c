@@ -86,6 +86,10 @@ int ipod_open(struct ipod_t* ipod, int silent)
         return -1;
     }
 
+    /* Defaults */
+    ipod->num_heads = 0;
+    ipod->sectors_per_track = 0;
+
     if (!DeviceIoControl(ipod->dh,
                          IOCTL_DISK_GET_DRIVE_GEOMETRY_EX,
                          NULL,
@@ -105,10 +109,14 @@ int ipod_open(struct ipod_t* ipod, int silent)
             if (!silent) print_error(" Error reading disk geometry: ");
             return -1;
         } else {
-            ipod->sector_size=diskgeometry.BytesPerSector;
+            ipod->sector_size = diskgeometry.BytesPerSector;
+            ipod->num_heads = diskgeometry.TracksPerCylinder;
+            ipod->sectors_per_track = diskgeometry.SectorsPerTrack;
         }
     } else {
-        ipod->sector_size=diskgeometry_ex.Geometry.BytesPerSector;
+        ipod->sector_size = diskgeometry_ex.Geometry.BytesPerSector;
+        ipod->num_heads = diskgeometry_ex.Geometry.TracksPerCylinder;
+        ipod->sectors_per_track = diskgeometry_ex.Geometry.SectorsPerTrack;
     }
 
     return 0;

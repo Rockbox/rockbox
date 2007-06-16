@@ -62,6 +62,8 @@ struct ipod_t {
     HANDLE dh;
     char diskname[4096];
     int sector_size;
+    int sectors_per_track;
+    int num_heads;
     struct ipod_directory_t ipod_directory[MAX_IMAGES];
     int nimages;
     off_t diroffset;
@@ -87,5 +89,8 @@ int ipod_seek(struct ipod_t* ipod, unsigned long pos);
 int ipod_read(struct ipod_t* ipod, unsigned char* buf, int nbytes);
 int ipod_write(struct ipod_t* ipod, unsigned char* buf, int nbytes);
 int ipod_alloc_buffer(unsigned char** sectorbuf, int bufsize);
+
+/* In fat32format.c */
+int format_partition(struct ipod_t* ipod, int partition);
 
 #endif
