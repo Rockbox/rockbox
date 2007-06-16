@@ -475,6 +475,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #ifdef SIMULATOR
     /* The simulator thread implementation doesn't have stack buffers */
     (void)i;
+    codec_stack_size = 0;
 #else
     /* Borrow the codec thread's stack (in IRAM on most targets) */
     codec_stack = NULL;
