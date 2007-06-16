@@ -126,6 +126,12 @@ static int parse_image_load(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 #endif /*HAVE_LCD_BITMAP */
 
+#ifdef CONFIG_RTC
+#define WPS_RTC_REFRESH WPS_REFRESH_DYNAMIC
+#else
+#define WPS_RTC_REFRESH WPS_REFRESH_STATIC
+#endif
+
 /* array of available tags - those with more characters have to go first
    (e.g. "xl" and "xd" before "x"). It needs to end with the unknown token. */
 static const struct wps_tag all_tags[] = {
@@ -145,25 +151,23 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_BATTERY_CHARGER_CONNECTED,"bp",  WPS_REFRESH_DYNAMIC, NULL },
 #endif
 
-#if CONFIG_RTC
-    { WPS_TOKEN_RTC_DAY_OF_MONTH,             "cd", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED,"ce", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_HOUR_24_ZERO_PADDED,      "cH", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_HOUR_24,                  "ck", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_HOUR_12_ZERO_PADDED,      "cI", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_HOUR_12,                  "cl", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_MONTH,                    "cm", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_MINUTE,                   "cM", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_SECOND,                   "cS", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_YEAR_2_DIGITS,            "cy", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_YEAR_4_DIGITS,            "cY", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_AM_PM_UPPER,              "cP", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_AM_PM_LOWER,              "cp", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_WEEKDAY_NAME,             "ca", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_MONTH_NAME,               "cb", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_DAY_OF_WEEK_START_MON,    "cu", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RTC_DAY_OF_WEEK_START_SUN,    "cw", WPS_REFRESH_DYNAMIC, NULL },
-#endif
+    { WPS_TOKEN_RTC_DAY_OF_MONTH,             "cd", WPS_RTC_REFRESH, NULL },
+    { WPS_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED,"ce", WPS_RTC_REFRESH, NULL },
+    { WPS_TOKEN_RTC_HOUR_24_ZERO_PADDED,      "cH", WPS_RTC_REFRESH, NULL },
+    { WPS_TOKEN_RTC_HOUR_24,                  "ck", WPS_RTC_REFRESH, NULL },
+    { WPS_TOKEN_RTC_HOUR_12_ZERO_PADDED,      "cI", WPS_RTC_REFRESH, NULL },
+    { WPS_TOKEN_RTC_HOUR_12,                  "cl", WPS_RTC_REFRESH, NULL },
+    { WPS_TOKEN_RTC_MONTH,                    "cm", WPS_RTC_REFRESH, NULL },
+    { WPS_TOKEN_RTC_MINUTE,                   "cM", WPS_RTC_REFRESH, NULL },
+    { WPS_TOKEN_RTC_SECOND,                   "cS", WPS_RTC_REFRESH, NULL },
+    { WPS_TOKEN_RTC_YEAR_2_DIGITS,            "cy", WPS_RTC_REFRESH, NULL },
+    { WPS_TOKEN_RTC_YEAR_4_DIGITS,            "cY", WPS_RTC_REFRESH, NULL },
+    { WPS_TOKEN_RTC_AM_PM_UPPER,              "cP", WPS_RTC_REFRESH, NULL },
+    { WPS_TOKEN_RTC_AM_PM_LOWER,              "cp", WPS_RTC_REFRESH, NULL },
+    { WPS_TOKEN_RTC_WEEKDAY_NAME,             "ca", WPS_RTC_REFRESH, NULL },
+    { WPS_TOKEN_RTC_MONTH_NAME,               "cb", WPS_RTC_REFRESH, NULL },
+    { WPS_TOKEN_RTC_DAY_OF_WEEK_START_MON,    "cu", WPS_RTC_REFRESH, NULL },
+    { WPS_TOKEN_RTC_DAY_OF_WEEK_START_SUN,    "cw", WPS_RTC_REFRESH, NULL },
 
     /* current file */
     { WPS_TOKEN_FILE_BITRATE,             "fb",  WPS_REFRESH_STATIC,  NULL },

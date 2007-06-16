@@ -148,7 +148,6 @@ static void dump_wps_tokens(struct wps_data *data)
                 snprintf(buf, sizeof(buf), "mode playback");
                 break;
 
-#if CONFIG_RTC
             case WPS_TOKEN_RTC_DAY_OF_MONTH:
                 snprintf(buf, sizeof(buf), "rtc: day of month (01..31)");
                 break;
@@ -208,7 +207,6 @@ static void dump_wps_tokens(struct wps_data *data)
                 snprintf(buf, sizeof(buf),
                          "rtc: day of week (0..6); 0 is Sunday");
                 break;
-#endif
 
 #if (CONFIG_CODEC == SWCODEC)
             case WPS_TOKEN_CROSSFADE:

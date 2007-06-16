@@ -1162,6 +1162,32 @@ static char *get_token_value(struct gui_wps *gwps,
                 *intval = tm->tm_wday + 1;
             snprintf(buf, buf_size, "%1d", tm->tm_wday);
             return buf;
+#else
+        case WPS_TOKEN_RTC_DAY_OF_MONTH:
+        case WPS_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED:
+        case WPS_TOKEN_RTC_HOUR_24_ZERO_PADDED:
+        case WPS_TOKEN_RTC_HOUR_24:
+        case WPS_TOKEN_RTC_HOUR_12_ZERO_PADDED:
+        case WPS_TOKEN_RTC_HOUR_12:
+        case WPS_TOKEN_RTC_MONTH:
+        case WPS_TOKEN_RTC_MINUTE:
+        case WPS_TOKEN_RTC_SECOND:
+        case WPS_TOKEN_RTC_AM_PM_UPPER:
+        case WPS_TOKEN_RTC_AM_PM_LOWER:
+        case WPS_TOKEN_RTC_YEAR_2_DIGITS:
+            strncpy(buf, "--", buf_size);
+            return buf;
+        case WPS_TOKEN_RTC_YEAR_4_DIGITS:
+            strncpy(buf, "----", buf_size);
+            return buf;
+        case WPS_TOKEN_RTC_WEEKDAY_NAME:
+        case WPS_TOKEN_RTC_MONTH_NAME:
+            strncpy(buf, "---", buf_size);
+            return buf;
+        case WPS_TOKEN_RTC_DAY_OF_WEEK_START_MON:
+        case WPS_TOKEN_RTC_DAY_OF_WEEK_START_SUN:
+            strncpy(buf, "-", buf_size);
+            return buf;
 #endif
 
 #ifdef HAVE_LCD_CHARCELLS

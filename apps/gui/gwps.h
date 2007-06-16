@@ -128,7 +128,6 @@ enum wps_token_type {
     WPS_TOKEN_CROSSFADE,
 #endif
 
-#if CONFIG_RTC
     /* Time */
 
     /* The begin/end values allow us to know if a token is an RTC one.
@@ -155,7 +154,6 @@ enum wps_token_type {
     WPS_TOKEN_RTC_DAY_OF_WEEK_START_SUN,
 
     WPS_TOKENS_RTC_END,     /* just the end marker, not an actual token */
-#endif
 
     /* Conditional */
     WPS_TOKEN_CONDITIONAL,
