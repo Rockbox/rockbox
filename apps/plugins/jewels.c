@@ -203,15 +203,22 @@ PLUGIN_HEADER
 /* animation frame rate */
 #define MAX_FPS 20
 
+/* Game types */
+enum game_type {
+    GAME_TYPE_NORMAL,
+    GAME_TYPE_PUZZLE
+};
+
 /* menu values */
 #define FONT_HEIGHT 8
-#define MAX_MITEMS  5
+#define MAX_MITEMS  6
 #define MENU_WIDTH  100
 
 /* menu results */
 enum menu_result {
     MRES_NONE,
     MRES_NEW,
+    MRES_PUZZLE,
     MRES_SAVE,
     MRES_RESUME,
     MRES_SCORES,
@@ -240,8 +247,9 @@ struct jewels_menu {
         enum menu_result res;
     } items[MAX_MITEMS];
 } bjmenu[] = {
-    {"Jewels", false, 0, 5,
+    {"Jewels", false, 0, 6,
         {{"New Game",    MRES_NEW},
+         {"Puzzle",      MRES_PUZZLE},
          {"Resume Game", MRES_RESUME},
          {"High Scores", MRES_SCORES},
          {"Help",        MRES_HELP},
@@ -283,19 +291,76 @@ struct tile {
  * score is the current level score
  * segments is the number of cleared segments in the current run
  * level is the current level
+ * type is the game type (normal or puzzle)
  * highscores is the list of high scores
  * resume denotes whether to resume the currently loaded game
  * dirty denotes whether the high scores are out of sync with the saved file
  * playboard is the game playing board (first row is hidden)
+ * num_jewels is the number of different jewels to use
  */
 struct game_context {
     unsigned int score;
     unsigned int segments;
     unsigned int level;
+    unsigned int type;
     unsigned int highscores[NUM_SCORES];
     bool resume;
     bool dirty;
     struct tile playboard[BJ_HEIGHT][BJ_WIDTH];
+    unsigned int num_jewels;
+};
+
+#define MAX_NUM_JEWELS 7
+
+#define MAX_PUZZLE_TILES 4
+#define NUM_PUZZLE_LEVELS 10
+
+struct puzzle_tile {
+    int x;
+    int y;
+    int tile_type;
+};
+
+struct puzzle_level {
+    unsigned int num_jewels;
+    unsigned int num_tiles;
+    struct puzzle_tile tiles[MAX_PUZZLE_TILES];
+};
+
+#define PUZZLE_TILE_UP      1
+#define PUZZLE_TILE_DOWN    2
+#define PUZZLE_TILE_LEFT    4
+#define PUZZLE_TILE_RIGHT   8
+
+struct puzzle_level puzzle_levels[NUM_PUZZLE_LEVELS] = {
+    { 5, 2, { {3, 3, PUZZLE_TILE_RIGHT},
+              {4, 2, PUZZLE_TILE_LEFT} } },
+    { 5, 2, { {3, 2, PUZZLE_TILE_DOWN},
+              {3, 4, PUZZLE_TILE_UP} } },
+    { 6, 3, { {3, 2, PUZZLE_TILE_DOWN},
+              {3, 4, PUZZLE_TILE_UP|PUZZLE_TILE_DOWN},
+              {3, 6, PUZZLE_TILE_UP} } },
+    { 6, 3, { {3, 2, PUZZLE_TILE_RIGHT},
+              {4, 3, PUZZLE_TILE_LEFT|PUZZLE_TILE_RIGHT},
+              {5, 4, PUZZLE_TILE_LEFT} } },
+    { 6, 2, { {3, 4, PUZZLE_TILE_RIGHT},
+              {4, 2, PUZZLE_TILE_LEFT} } },
+    { 6, 2, { {3, 2, PUZZLE_TILE_DOWN},
+              {4, 4, PUZZLE_TILE_UP} } },
+    { 7, 4, { {3, 2, PUZZLE_TILE_LEFT|PUZZLE_TILE_DOWN},
+              {4, 3, PUZZLE_TILE_LEFT|PUZZLE_TILE_UP},
+              {3, 4, PUZZLE_TILE_RIGHT|PUZZLE_TILE_DOWN},
+              {4, 4, PUZZLE_TILE_RIGHT|PUZZLE_TILE_UP} } },
+    { 6, 3, { {3, 2, PUZZLE_TILE_DOWN},
+              {4, 4, PUZZLE_TILE_UP|PUZZLE_TILE_DOWN},
+              {3, 6, PUZZLE_TILE_UP} } },
+    { 7, 3, { {2, 2, PUZZLE_TILE_RIGHT},
+              {4, 1, PUZZLE_TILE_LEFT|PUZZLE_TILE_RIGHT},
+              {5, 4, PUZZLE_TILE_LEFT} } },
+    { 7, 4, { {3, 0, PUZZLE_TILE_LEFT|PUZZLE_TILE_DOWN},
+              {5, 0, PUZZLE_TILE_LEFT|PUZZLE_TILE_UP},
+              {2, 7, PUZZLE_TILE_RIGHT|PUZZLE_TILE_DOWN},
+              {4, 7, PUZZLE_TILE_RIGHT|PUZZLE_TILE_UP} } },
 };
 
 /*****************************************************************************
@@ -574,7 +639,7 @@ static void jewels_putjewels(struct game_context* bj){
         done = true;
         for(j=0; j<BJ_WIDTH; j++) {
             if(bj->playboard[1][j].type == 0) {
-                bj->playboard[0][j].type = rb->rand()%7+1;
+                bj->playboard[0][j].type = rb->rand()%bj->num_jewels+1;
             }
             for(i=BJ_HEIGHT-2; i>=0; i--) {
                 if(!mark && bj->playboard[i+1][j].type == 0) {
@@ -584,7 +649,7 @@ static void jewels_putjewels(struct game_context* bj){
                 if(mark) bj->playboard[i][j].falling = true;
             }
             /*if(bj->playboard[1][j].falling) {
-                bj->playboard[0][j].type = rb->rand()%7+1;
+                bj->playboard[0][j].type = rb->rand()%bj->num_jewels+1;
                 bj->playboard[0][j].falling = true;
             }*/
             mark = false;
@@ -697,7 +762,8 @@ static unsigned int jewels_clearjewels(struct game_context* bj) {
         run = 1;
         for(j=0; j<BJ_WIDTH; j++) {
             if(bj->playboard[i][j].type == last &&
-               bj->playboard[i][j].type != 0) {
+               bj->playboard[i][j].type != 0 &&
+               bj->playboard[i][j].type <= MAX_NUM_JEWELS) {
                 run++;
 
                 if(run == 3) {
@@ -723,7 +789,8 @@ static unsigned int jewels_clearjewels(struct game_context* bj) {
         run = 1;
         for(i=1; i<BJ_HEIGHT; i++) {
             if(bj->playboard[i][j].type != 0 &&
-               bj->playboard[i][j].type == last) {
+               bj->playboard[i][j].type == last &&
+               bj->playboard[i][j].type <= MAX_NUM_JEWELS) {
                 run++;
 
                 if(run == 3) {
@@ -930,6 +997,7 @@ static bool jewels_movesavail(struct game_context* bj) {
     for(i=1; i<BJ_HEIGHT; i++) {
         for(j=0; j<BJ_WIDTH; j++) {
             mytype = bj->playboard[i][j].type;
+            if(mytype == 0 || mytype > MAX_NUM_JEWELS) continue;
 
             /* check horizontal patterns */
             if(j <= BJ_WIDTH-3) {
@@ -1015,6 +1083,91 @@ static bool jewels_movesavail(struct game_context* bj) {
 }
 
 /*****************************************************************************
+* jewels_puzzle_is_finished(bj) checks if the puzzle is finished.
+******************************************************************************/
+static int jewels_puzzle_is_finished(struct game_context* bj) {
+    unsigned int i, j;
+    for(i=0; i<BJ_HEIGHT; i++) {
+        for(j=0; j<BJ_WIDTH; j++) {
+            int mytype = bj->playboard[i][j].type;
+            if(mytype>MAX_NUM_JEWELS) {
+                mytype -= MAX_NUM_JEWELS;
+                if(mytype&PUZZLE_TILE_UP) {
+                    if(i==0 || bj->playboard[i-1][j].type<=MAX_NUM_JEWELS ||
+                       !((bj->playboard[i-1][j].type-MAX_NUM_JEWELS)
+                         &PUZZLE_TILE_DOWN))
+                        return 0;
+                }
+                if(mytype&PUZZLE_TILE_DOWN) {
+                    if(i==BJ_HEIGHT-1 ||
+                       bj->playboard[i+1][j].type<=MAX_NUM_JEWELS ||
+                       !((bj->playboard[i+1][j].type-MAX_NUM_JEWELS)
+                         &PUZZLE_TILE_UP))
+                        return 0;
+                }
+                if(mytype&PUZZLE_TILE_LEFT) {
+                    if(j==0 || bj->playboard[i][j-1].type<=MAX_NUM_JEWELS ||
+                       !((bj->playboard[i][j-1].type-MAX_NUM_JEWELS)
+                         &PUZZLE_TILE_RIGHT))
+                        return 0;
+                }
+                if(mytype&PUZZLE_TILE_RIGHT) {
+                    if(j==BJ_WIDTH-1 ||
+                       bj->playboard[i][j+1].type<=MAX_NUM_JEWELS ||
+                       !((bj->playboard[i][j+1].type-MAX_NUM_JEWELS)
+                         &PUZZLE_TILE_LEFT))
+                        return 0;
+                }
+            }
+        }
+    }
+    return 1;
+}
+
+/*****************************************************************************
+* jewels_initlevel() initialises a level.
+******************************************************************************/
+static unsigned int jewels_initlevel(struct game_context* bj) {
+    unsigned int points = 0;
+
+    switch(bj->type) {
+        case GAME_TYPE_NORMAL:
+            bj->num_jewels = MAX_NUM_JEWELS;
+            break;
+
+        case GAME_TYPE_PUZZLE:
+        {
+            unsigned int i, j;
+            struct puzzle_tile *tile;
+
+            bj->num_jewels = puzzle_levels[bj->level-1].num_jewels;
+
+            for(i=0; i<BJ_HEIGHT; i++) {
+                for(j=0; j<BJ_WIDTH; j++) {
+                    bj->playboard[i][j].type = (rand()%bj->num_jewels)+1;
+                    bj->playboard[i][j].falling = false;
+                    bj->playboard[i][j].delete = false;
+                }
+            }
+            jewels_runboard(bj);
+            tile = puzzle_levels[bj->level-1].tiles;
+            for(i=0; i<puzzle_levels[bj->level-1].num_tiles; i++, tile++) {
+                bj->playboard[tile->y][tile->x].type = MAX_NUM_JEWELS
+                                                       +tile->tile_type;
+            }
+        }
+        break;
+    }
+
+    jewels_drawboard(bj);
+
+    /* run the play board */
+    jewels_putjewels(bj);
+    points += jewels_runboard(bj);
+    return points;
+}
+
+/*****************************************************************************
 * jewels_nextlevel() advances the game to the next level and returns
 *     points earned.
 ******************************************************************************/
@@ -1022,30 +1175,34 @@ static unsigned int jewels_nextlevel(struct game_context* bj) {
     int i, x, y;
     unsigned int points = 0;
 
-    /* roll over score, change and display level */
-    while(bj->score >= LEVEL_PTS) {
-        bj->score -= LEVEL_PTS;
-        bj->level++;
-        rb->splash(HZ*2, "Level %d", bj->level);
-        jewels_drawboard(bj);
+    switch(bj->type) {
+        case GAME_TYPE_NORMAL:
+            /* roll over score, change and display level */
+            while(bj->score >= LEVEL_PTS) {
+                bj->score -= LEVEL_PTS;
+                bj->level++;
+                rb->splash(HZ*2, "Level %d", bj->level);
+                jewels_drawboard(bj);
+            }
+
+            /* randomly clear some jewels */
+            for(i=0; i<16; i++) {
+                x = rb->rand()%8;
+                y = rb->rand()%8;
+
+                if(bj->playboard[y][x].type != 0) {
+                    points++;
+                    bj->playboard[y][x].type = 0;
+                }
+            }
+            break;
+
+        case GAME_TYPE_PUZZLE:
+            bj->level++;
+            break;
     }
 
-    /* randomly clear some jewels */
-    for(i=0; i<16; i++) {
-        x = rb->rand()%8;
-        y = rb->rand()%8;
-
-        if(bj->playboard[y][x].type != 0) {
-            points++;
-            bj->playboard[y][x].type = 0;
-        }
-    }
-    jewels_drawboard(bj);
-
-    /* run the play board */
-    jewels_putjewels(bj);
-    points += jewels_runboard(bj);
-    return points;
+    return jewels_initlevel(bj);
 }
 
 /*****************************************************************************
@@ -1207,6 +1364,12 @@ static int jewels_main(struct game_context* bj) {
         switch(res) {
             case MRES_NEW:
                 startgame = true;
+                bj->type = GAME_TYPE_NORMAL;
+                continue;
+
+            case MRES_PUZZLE:
+                startgame = true;
+                bj->type = GAME_TYPE_PUZZLE;
                 continue;
 
             case MRES_RESUME:
@@ -1396,9 +1559,7 @@ static int jewels_main(struct game_context* bj) {
     /********************
     *  setup the board  *
     ********************/
-    jewels_drawboard(bj);
-    jewels_putjewels(bj);
-    bj->score += jewels_runboard(bj);
+    bj->score += jewels_initlevel(bj);
     if (!jewels_movesavail(bj)) return BJ_LOSE;
 
     /**********************
@@ -1572,7 +1733,16 @@ static int jewels_main(struct game_context* bj) {
                 break;
         }
 
-        if(bj->score >= LEVEL_PTS) bj->score = jewels_nextlevel(bj);
+        switch(bj->type) {
+            case GAME_TYPE_NORMAL:
+                if(bj->score >= LEVEL_PTS) bj->score = jewels_nextlevel(bj);
+                break;
+
+            case GAME_TYPE_PUZZLE:
+                if(jewels_puzzle_is_finished(bj))
+                    bj->score += jewels_nextlevel(bj);
+                break;
+        }
     }
 }
 
