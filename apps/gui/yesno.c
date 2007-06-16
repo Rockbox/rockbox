@@ -121,6 +121,8 @@ enum yesno_res gui_syncyesno_run(struct text_message * main_message,
                 result=YESNO_YES;
                 break;
             case ACTION_NONE:
+            case SYS_CHARGER_DISCONNECTED:
+                /* ignore some SYS events that can happen */
                 continue;
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
