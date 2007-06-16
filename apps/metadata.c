@@ -206,6 +206,43 @@ static long get_slong(void* buf)
 
     return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
 }
+
+static char* skip_space(char* str)
+{
+    while (isspace(*str)) 
+    {
+        str++;
+    }
+    
+    return str;
+}
+
+static unsigned long get_itunes_int32(char* value, int count)
+{
+    static const char hexdigits[] = "0123456789ABCDEF";
+    const char* c;
+    int r = 0;
+    
+    while (count-- > 0)
+    {
+        value = skip_space(value);
+        
+        while (*value && !isspace(*value))
+        {
+            value++;
+        }
+    }
+    
+    value = skip_space(value);
+    
+    while (*value && ((c = strchr(hexdigits, toupper(*value))) != NULL))
+    {
+        r = (r << 4) | (c - hexdigits);
+        value++;
+    }
+    
+    return r;
+}
  
 /* Parse the tag (the name-value pair) and fill id3 and buffer accordingly.
  * String values to keep are written to buf. Returns number of bytes written
@@ -1520,6 +1557,19 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                 {
                     read_mp4_tag_string(fd, size, &buffer, &buffer_left, 
                         &id3->composer);
+                }   
+                else if (strcasecmp(tag_name, "iTunSMPB") == 0)
+                {
+                    char value[TAG_VALUE_LENGTH];
+                    char* value_p = value;
+                    char* any;
+                    unsigned int length = sizeof(value);
+
+                    read_mp4_tag_string(fd, size, &value_p, &length, &any);
+                    id3->lead_trim = get_itunes_int32(value, 1);
+                    id3->tail_trim = get_itunes_int32(value, 2);
+                    DEBUGF("AAC: lead_trim %d, tail_trim %d\n", 
+                        id3->lead_trim, id3->tail_trim);
                 }
                 else
                 {

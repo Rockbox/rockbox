@@ -42,6 +42,8 @@ enum codec_status codec_main(void)
     uint32_t sample_duration;
     uint32_t sample_byte_size;
     int file_offset;
+    int framelength;
+    int lead_trim = 0;
     unsigned int i;
     unsigned char* buffer;
     static NeAACDecFrameInfo frame_info;
@@ -117,6 +119,11 @@ next_track:
             sound_samples_done = 0;
         }
     }
+    
+    if (i == 0) 
+    {
+        lead_trim = ci->id3->lead_trim;
+    }
 
     /* The main decoding loop */
     while (i < demux_res.num_sample_byte_sizes) {
@@ -133,6 +140,11 @@ next_track:
                           &sound_samples_done, (int*) &i)) {
                 elapsed_time = (sound_samples_done * 10) / (ci->id3->frequency / 100);
                 ci->set_elapsed(elapsed_time);
+            
+                if (i == 0) 
+                {
+                    lead_trim = ci->id3->lead_trim;
+                }
             }
             ci->seek_complete();
         }
@@ -183,8 +195,46 @@ next_track:
 
         /* Output the audio */
         ci->yield();
-        ci->pcmbuf_insert(decoder->time_out[0], decoder->time_out[1],
-                          frame_info.samples >> 1);
+        
+        framelength = (frame_info.samples >> 1) - lead_trim;
+        
+        if (i == demux_res.num_sample_byte_sizes - 1 && framelength > 0)
+        {
+            /* Currently limited to at most one frame of tail_trim.
+             * Seems to be enough.
+             */
+            if (ci->id3->tail_trim == 0 
+                && sample_duration < (frame_info.samples >> 1))
+            {
+                /* Subtract lead_trim just in case we decode a file with
+                 * only one audio frame with actual data.
+                 */
+                framelength = sample_duration - lead_trim;
+            }
+            else
+            {
+                framelength -= ci->id3->tail_trim;
+            }
+        }
+
+        if (framelength > 0)
+        {
+            ci->pcmbuf_insert(&decoder->time_out[0][lead_trim],
+                              &decoder->time_out[1][lead_trim],
+                              framelength);
+        } 
+        
+        if (lead_trim > 0)
+        {
+            /* frame_info.samples can be 0 for the first frame */
+            lead_trim -= (i > 0 || frame_info.samples)
+                ? (frame_info.samples >> 1) : sample_duration;
+
+            if (lead_trim < 0 || ci->id3->lead_trim == 0)
+            {
+                lead_trim = 0;
+            }
+        }
 
         /* Update the elapsed-time indicator */
         sound_samples_done += sample_duration;
