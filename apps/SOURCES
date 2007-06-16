@@ -115,9 +115,9 @@ metadata/flac.c
 metadata/monkeys.c
 metadata/mp4.c
 metadata/mpc.c
+metadata/ogg.c
 metadata/sid.c
 metadata/spc.c
-metadata/speex.c
 metadata/vorbis.c
 metadata/wave.c
 #endif
