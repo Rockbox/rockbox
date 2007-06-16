@@ -35,6 +35,7 @@ gui/*.[ch]
 keymaps/*.[ch]
 lang/*.lang
 menus/*.[ch]
+metadata/*.[ch]
 player/*.[ch]
 plugins/*.[ch]
 plugins/*.pl

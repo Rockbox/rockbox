@@ -106,6 +106,21 @@ eq_arm.S
 #endif
 #endif
 metadata.c
+#if CONFIG_CODEC == SWCODEC
+metadata/metadata_common.c
+metadata/aiff.c
+metadata/ape.c
+metadata/adx.c
+metadata/flac.c
+metadata/monkeys.c
+metadata/mp4.c
+metadata/mpc.c
+metadata/sid.c
+metadata/spc.c
+metadata/speex.c
+metadata/vorbis.c
+metadata/wave.c
+#endif
 #ifdef HAVE_TAGCACHE
 tagcache.c
 #endif
