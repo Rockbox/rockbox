@@ -1144,7 +1144,7 @@ static unsigned int jewels_initlevel(struct game_context* bj) {
 
             for(i=0; i<BJ_HEIGHT; i++) {
                 for(j=0; j<BJ_WIDTH; j++) {
-                    bj->playboard[i][j].type = (rand()%bj->num_jewels)+1;
+                    bj->playboard[i][j].type = (rb->rand()%bj->num_jewels)+1;
                     bj->playboard[i][j].falling = false;
                     bj->playboard[i][j].delete = false;
                 }
