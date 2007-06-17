@@ -435,6 +435,29 @@ void DeviceSelectorCtrl::OnAutoDetect(wxCommandEvent& event)
     AutoDetect();
 }
 
+#if !(defined( __WXMSW__ ) || defined( __DARWIN__))
+wxString resolve_mount_point( const wxString device )
+{
+    FILE *fp = fopen( "/proc/mounts", "r" );
+    if( !fp ) return wxT("");
+    char *dev, *dir;
+    while( fscanf( fp, "%as %as %*s %*s %*s %*s", &dev, &dir ) != EOF )
+    {
+        if( wxString( dev, wxConvUTF8 ) == device )
+        {
+            wxString directory = wxString( dir, wxConvUTF8 );
+            free( dev );
+            free( dir );
+            return directory;
+        }
+        free( dev );
+        free( dir );
+    }
+    fclose( fp );
+    return wxT("");
+}
+#endif
+
 void DeviceSelectorCtrl::AutoDetect()
 {
     struct ipod_t ipod;
@@ -445,6 +468,12 @@ void DeviceSelectorCtrl::AutoDetect()
         int index = gv->plat_bootloadername.Index(temp);   // use the bootloader names..
         m_deviceCbx->SetValue(gv->plat_name[index]);
         gv->curplat=gv->plat_id[index];
+
+#if !(defined( __WXMSW__ ) || defined( __DARWIN__))
+        wxString tmp = resolve_mount_point(wxString(ipod.diskname,wxConvUTF8)+wxT("2"));
+        if( tmp != wxT("") )
+            gv->curdestdir = tmp;
+#endif
         return;
     }
     else if (n > 1)
@@ -461,6 +490,12 @@ void DeviceSelectorCtrl::AutoDetect()
         int index = gv->plat_id.Index(wxT("sansae200"));
         m_deviceCbx->SetValue(gv->plat_name[index]);
         gv->curplat=gv->plat_id[index];
+
+#if !(defined( __WXMSW__ ) || defined( __DARWIN__))
+        wxString tmp = resolve_mount_point(wxString(ipod.diskname,wxConvUTF8)+wxT("1"));
+        if( tmp != wxT("") )
+            gv->curdestdir = tmp;
+#endif
         return;
     }
     else if (n2 > 1)
@@ -544,7 +579,8 @@ void DevicePositionCtrl::setDefault()
 void DevicePositionCtrl::OnBrowseBtn(wxCommandEvent& event)
 {
      const wxString& temp = wxDirSelector(
-        wxT("Please select the location of your audio device"), gv->curdestdir);
+        wxT("Please select the location of your audio device"), gv->curdestdir,
+        0, wxDefaultPosition, this);
 
     if (!temp.empty())
     {
