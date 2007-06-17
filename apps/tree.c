@@ -171,7 +171,7 @@ static int tree_get_filecolor(int selected_item, void * data)
     struct tree_context * local_tc=(struct tree_context *)data;
     struct entry* dc = local_tc->dircache;
     struct entry* e = &dc[selected_item];
-    return filetype_get_color(e->attr);
+    return filetype_get_color(e->name, e->attr);
 }
 #endif
 

@@ -39,6 +39,7 @@
 #include "splash.h"
 #include "buffer.h"
 #include "icons.h"
+#include "logf.h"
 
 /* max filetypes (plugins & icons stored here) */
 #if CONFIG_CODEC == SWCODEC
@@ -160,7 +161,12 @@ void read_color_theme_file(void) {
     {
         if (!settings_parseline(buffer, &ext, &color))
             continue;
-        for (i=0; i<filetype_count; i++)
+        if (!strcasecmp(ext, "folder"))
+        {
+            custom_colors[0] = hex_to_rgb(color);
+            continue;
+        }
+        for (i=1; i<filetype_count; i++)
         {
             if (filetypes[i].extension &&
                 !strcasecmp(ext, filetypes[i].extension))
@@ -369,12 +375,23 @@ static int find_attr(int attr)
 }
 
 #ifdef HAVE_LCD_COLOR
-int filetype_get_color(int attr)
+int filetype_get_color(const char * name, int attr)
 {
-    int index = find_attr(attr);
-    if (index < 0)
+    char *extension;
+    int i;
+    if ((attr & ATTR_DIRECTORY)==ATTR_DIRECTORY)
+        return custom_colors[0];
+    extension = strrchr(name, '.');
+    if (!extension)
         return -1;
-    return custom_colors[index];
+    extension++;
+    logf("%s %s",name,extension);
+    for (i=1; i<filetype_count; i++)
+    {
+        if (filetypes[i].extension && 
+            !strcasecmp(extension, filetypes[i].extension))
+            return custom_colors[i];
+    }
     return -1;
 }
 #endif
