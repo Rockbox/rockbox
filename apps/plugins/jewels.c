@@ -347,20 +347,20 @@ struct puzzle_level puzzle_levels[NUM_PUZZLE_LEVELS] = {
               {4, 2, PUZZLE_TILE_LEFT} } },
     { 6, 2, { {3, 2, PUZZLE_TILE_DOWN},
               {4, 4, PUZZLE_TILE_UP} } },
-    { 7, 4, { {3, 2, PUZZLE_TILE_LEFT|PUZZLE_TILE_DOWN},
-              {4, 3, PUZZLE_TILE_LEFT|PUZZLE_TILE_UP},
-              {3, 4, PUZZLE_TILE_RIGHT|PUZZLE_TILE_DOWN},
-              {4, 4, PUZZLE_TILE_RIGHT|PUZZLE_TILE_UP} } },
+    { 7, 4, { {3, 2, PUZZLE_TILE_RIGHT|PUZZLE_TILE_DOWN},
+              {4, 3, PUZZLE_TILE_LEFT|PUZZLE_TILE_DOWN},
+              {3, 4, PUZZLE_TILE_RIGHT|PUZZLE_TILE_UP},
+              {4, 4, PUZZLE_TILE_LEFT|PUZZLE_TILE_UP} } },
     { 6, 3, { {3, 2, PUZZLE_TILE_DOWN},
               {4, 4, PUZZLE_TILE_UP|PUZZLE_TILE_DOWN},
               {3, 6, PUZZLE_TILE_UP} } },
     { 7, 3, { {2, 2, PUZZLE_TILE_RIGHT},
               {4, 1, PUZZLE_TILE_LEFT|PUZZLE_TILE_RIGHT},
               {5, 4, PUZZLE_TILE_LEFT} } },
-    { 7, 4, { {3, 0, PUZZLE_TILE_LEFT|PUZZLE_TILE_DOWN},
-              {5, 0, PUZZLE_TILE_LEFT|PUZZLE_TILE_UP},
-              {2, 7, PUZZLE_TILE_RIGHT|PUZZLE_TILE_DOWN},
-              {4, 7, PUZZLE_TILE_RIGHT|PUZZLE_TILE_UP} } },
+    { 7, 4, { {3, 0, PUZZLE_TILE_RIGHT|PUZZLE_TILE_DOWN},
+              {5, 0, PUZZLE_TILE_LEFT|PUZZLE_TILE_DOWN},
+              {2, 7, PUZZLE_TILE_RIGHT|PUZZLE_TILE_UP},
+              {4, 7, PUZZLE_TILE_LEFT|PUZZLE_TILE_UP} } },
 };
 
 /*****************************************************************************
@@ -1152,8 +1152,8 @@ static unsigned int jewels_initlevel(struct game_context* bj) {
             jewels_runboard(bj);
             tile = puzzle_levels[bj->level-1].tiles;
             for(i=0; i<puzzle_levels[bj->level-1].num_tiles; i++, tile++) {
-                bj->playboard[tile->y][tile->x].type = MAX_NUM_JEWELS
-                                                       +tile->tile_type;
+                bj->playboard[tile->y+1][tile->x].type = MAX_NUM_JEWELS
+                                                         +tile->tile_type;
             }
         }
         break;
@@ -1199,6 +1199,12 @@ static unsigned int jewels_nextlevel(struct game_context* bj) {
 
         case GAME_TYPE_PUZZLE:
             bj->level++;
+            if(bj->level>NUM_PUZZLE_LEVELS) {
+                rb->splash(HZ*2, "You win!");
+                bj->level = 1;
+            } else {
+                rb->splash(HZ*2, "Level %d", bj->level);
+            }
             break;
     }
 
@@ -1560,12 +1566,26 @@ static int jewels_main(struct game_context* bj) {
     *  setup the board  *
     ********************/
     bj->score += jewels_initlevel(bj);
-    if (!jewels_movesavail(bj)) return BJ_LOSE;
+    if (!jewels_movesavail(bj)) {
+        switch(bj->type) {
+            case GAME_TYPE_NORMAL:
+                return BJ_LOSE;
+
+            case GAME_TYPE_PUZZLE:
+                do {
+                    rb->splash(2*HZ, "No more moves!");
+                    bj->score += jewels_initlevel(bj);
+                } while(!jewels_movesavail(bj));
+                break;
+        }
+    }
 
     /**********************
     *        play         *
     **********************/
     while(true) {
+        int no_movesavail = false;
+
         if(!inmenu) {
             /* refresh the board */
             jewels_drawboard(bj);
@@ -1623,7 +1643,7 @@ static int jewels_main(struct game_context* bj) {
                     if(selected) {
                         bj->score += jewels_swapjewels(bj, x, y, SWAP_LEFT);
                         selected = false;
-                        if (!jewels_movesavail(bj)) return BJ_LOSE;
+                        if (!jewels_movesavail(bj)) no_movesavail = true;
                     } else {
                         x = (x+BJ_WIDTH-1)%BJ_WIDTH;
                     }
@@ -1636,7 +1656,7 @@ static int jewels_main(struct game_context* bj) {
                     if(selected) {
                         bj->score += jewels_swapjewels(bj, x, y, SWAP_RIGHT);
                         selected = false;
-                        if (!jewels_movesavail(bj)) return BJ_LOSE;
+                        if (!jewels_movesavail(bj)) no_movesavail = true;
                     } else {
                         x = (x+1)%BJ_WIDTH;
                     }
@@ -1651,7 +1671,7 @@ static int jewels_main(struct game_context* bj) {
                     if(selected) {
                         bj->score += jewels_swapjewels(bj, x, y, SWAP_DOWN);
                         selected = false;
-                        if (!jewels_movesavail(bj)) return BJ_LOSE;
+                        if (!jewels_movesavail(bj)) no_movesavail = true;
                     } else {
                         y = (y+1)%(BJ_HEIGHT-1);
                     }
@@ -1666,7 +1686,7 @@ static int jewels_main(struct game_context* bj) {
                     if(selected) {
                         bj->score += jewels_swapjewels(bj, x, y, SWAP_UP);
                         selected = false;
-                        if (!jewels_movesavail(bj)) return BJ_LOSE;
+                        if (!jewels_movesavail(bj)) no_movesavail = true;
                     } else {
                         y = (y+(BJ_HEIGHT-1)-1)%(BJ_HEIGHT-1);
                     }
@@ -1731,6 +1751,20 @@ static int jewels_main(struct game_context* bj) {
                    (void*) bj) == SYS_USB_CONNECTED)
                     return BJ_USB;
                 break;
+        }
+
+        if (no_movesavail) {
+            switch(bj->type) {
+                case GAME_TYPE_NORMAL:
+                    return BJ_LOSE;
+
+                case GAME_TYPE_PUZZLE:
+                    do {
+                        rb->splash(2*HZ, "No more moves!");
+                        bj->score += jewels_initlevel(bj);
+                    } while(!jewels_movesavail(bj));
+                    break;
+            }
         }
 
         switch(bj->type) {
