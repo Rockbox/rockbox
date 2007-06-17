@@ -68,7 +68,7 @@ void irq(void)
         else if (CPU_INT_STAT & TIMER2_MASK)
             TIMER2();
 #ifdef SANSA_E200
-        else if (CPU_HI_INT_STAT & GPIO_MASK)
+        else if (CPU_HI_INT_STAT & GPIO1_MASK)
         {
             if (GPIOF_INT_STAT & 0xff)
                 button_int();

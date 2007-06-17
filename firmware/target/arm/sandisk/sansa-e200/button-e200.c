@@ -84,7 +84,7 @@ void button_init_device(void)
     GPIOH_INT_EN |= 0xc0;
 
     CPU_INT_EN = HI_MASK;
-    CPU_HI_INT_EN = GPIO_MASK;
+    CPU_HI_INT_EN = GPIO1_MASK;
 #endif /* BOOTLOADER */
 }
 
