@@ -267,10 +267,6 @@ void pcm_mute(bool mute)
 #define PEAK_SAMPLES  (44100/50)
 void pcm_calculate_peaks(int *left, int *right)
 {
-#if (CONFIG_CPU == S3C2440)
-    (void)left;
-    (void)right;
-#else
     short *addr;
     short *end;
     {
@@ -331,7 +327,6 @@ void pcm_calculate_peaks(int *left, int *right)
 #endif
 }
 #endif
-#endif /* CPU_COLDFIRE */
 
 /****************************************************************************
  * Functions that do not require targeted implementation but only a targeted
