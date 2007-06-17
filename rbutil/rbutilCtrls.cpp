@@ -1,6 +1,7 @@
 
 #include "rbutilCtrls.h"
 #include "bootloaders.h"
+#include "autodetection.h"
 
 /////////////////////////////////////////////////////////////
 //// Controls
@@ -435,79 +436,39 @@ void DeviceSelectorCtrl::OnAutoDetect(wxCommandEvent& event)
     AutoDetect();
 }
 
-#if !(defined( __WXMSW__ ) || defined( __DARWIN__))
-wxString resolve_mount_point( const wxString device )
-{
-    FILE *fp = fopen( "/proc/mounts", "r" );
-    if( !fp ) return wxT("");
-    char *dev, *dir;
-    while( fscanf( fp, "%as %as %*s %*s %*s %*s", &dev, &dir ) != EOF )
-    {
-        if( wxString( dev, wxConvUTF8 ) == device )
-        {
-            wxString directory = wxString( dir, wxConvUTF8 );
-            free( dev );
-            free( dir );
-            return directory;
-        }
-        free( dev );
-        free( dir );
-    }
-    fclose( fp );
-    return wxT("");
-}
-#endif
 
 void DeviceSelectorCtrl::AutoDetect()
 {
-    struct ipod_t ipod;
-    int n = ipod_scan(&ipod);
-    if(n == 1)
-    {
-        wxString temp(ipod.targetname,wxConvUTF8);
-        int index = gv->plat_bootloadername.Index(temp);   // use the bootloader names..
-        m_deviceCbx->SetValue(gv->plat_name[index]);
-        gv->curplat=gv->plat_id[index];
 
-#if !(defined( __WXMSW__ ) || defined( __DARWIN__))
-        wxString tmp = resolve_mount_point(wxString(ipod.diskname,wxConvUTF8)+wxT("2"));
-        if( tmp != wxT("") )
-            gv->curdestdir = tmp;
-#endif
-        return;
-    }
-    else if (n > 1)
+
+    UsbDeviceInfo device = detectDevicesViaPatchers();
+
+    if( device.status == NODEVICE)
     {
-        WARN_DIALOG(wxT("More then one Ipod device detected, please connect only One"),
+        WARN_DIALOG(wxT("No Device detected. (This function currently only works for Ipods and Sansas)."),
                 wxT("Detecting a Device"));
         return;
     }
 
-    struct sansa_t sansa;
-    int n2 = sansa_scan(&sansa);
-    if(n2==1)
+    if( device.status == TOMANYDEVICES)
     {
-        int index = gv->plat_id.Index(wxT("sansae200"));
-        m_deviceCbx->SetValue(gv->plat_name[index]);
-        gv->curplat=gv->plat_id[index];
-
-#if !(defined( __WXMSW__ ) || defined( __DARWIN__))
-        wxString tmp = resolve_mount_point(wxString(sansa.diskname,wxConvUTF8)+wxT("1"));
-        if( tmp != wxT("") )
-            gv->curdestdir = tmp;
-#endif
-        return;
-    }
-    else if (n2 > 1)
-    {
-        WARN_DIALOG(wxT("More then one Sansa device detected, please connect only One"),
+         WARN_DIALOG(wxT("More then one device detected, please connect only One"),
                 wxT("Detecting a Device"));
         return;
+
     }
 
-    WARN_DIALOG(wxT("No Device detected. (This function currently only works for Ipods and Sansas)."),
-                wxT("Detecting a Device"));
-    return;
+    if (device.status == 0 )   /* everything is ok */
+    {
+        m_deviceCbx->SetValue(gv->plat_name[device.device_index]);
+        gv->curplat=gv->plat_id[device.device_index];
+
+        if(device.path != wxT(""))
+        {
+            gv->curdestdir = device.path;
+        }
+
+    }
 
 }
 

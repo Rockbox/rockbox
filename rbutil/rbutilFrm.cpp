@@ -96,8 +96,6 @@ void rbutilFrm::CreateGUIControls(void)
 	myDeviceSelector->setDefault();
 	WxBoxSizer0->Add(myDeviceSelector,0,wxGROW|wxALL,5);
 
-
-
     wxNotebook* tabwindow = new wxNotebook(mainPanel,wxID_ANY);
     WxBoxSizer0->Add(tabwindow,1,wxGROW|wxALL,5);
 
@@ -130,7 +128,7 @@ void rbutilFrm::CreateGUIControls(void)
     wxBitmap BootloaderInstallButton (tools2_3d_xpm);
     WxBitmapButton4 = new wxBitmapButton(installpage, ID_BOOTLOADER_BTN,
         BootloaderInstallButton, wxPoint(0,0), wxSize(64,54),
-        wxRAISED_BORDER | wxBU_AUTODRAW);
+        wxRAISED_BORDER | wxBU_AUTODRAW, wxDefaultValidator,wxT("Bootloader Installation"));
     WxBitmapButton4->SetToolTip(wxT("Click here to install the Rockbox bootloader"));
     WxFlexGridSizer1->Add(WxBitmapButton4, 0,
         wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL | wxALL,5);
@@ -147,7 +145,7 @@ void rbutilFrm::CreateGUIControls(void)
 	WxBitmapButton1 = new wxBitmapButton(installpage, ID_INSTALL_BTN,
         WxBitmapButton1_BITMAP, wxPoint(0,0), wxSize(64,54),
         wxRAISED_BORDER | wxBU_AUTODRAW, wxDefaultValidator,
-        wxT("WxBitmapButton1"));
+        wxT("Rockbox Installation"));
 	WxBitmapButton1->SetToolTip(wxT("Click here to install Rockbox"));
 	WxFlexGridSizer1->Add(WxBitmapButton1,0,
         wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL | wxALL,5);
@@ -177,7 +175,7 @@ void rbutilFrm::CreateGUIControls(void)
     wxBitmap FontInstallButton (fonts_3d_xpm);
     WxBitmapButton3 = new wxBitmapButton(themepage, ID_FONT_BTN,
         FontInstallButton, wxPoint(0,0), wxSize(64,54),
-        wxRAISED_BORDER | wxBU_AUTODRAW);
+        wxRAISED_BORDER | wxBU_AUTODRAW,wxDefaultValidator, wxT("Font installation"));
     WxBitmapButton3->SetToolTip(wxT("Click here to install the most up to date "
         "Rockbox fonts."));
     WxFlexGridSizer2->Add(WxBitmapButton3, 0,
@@ -194,7 +192,7 @@ void rbutilFrm::CreateGUIControls(void)
     wxBitmap ThemesInstallButton (themes_3d_xpm);
     WxBitmapButton5 = new wxBitmapButton(themepage, ID_THEMES_BTN,
         ThemesInstallButton, wxPoint(0,0), wxSize(64,54),
-        wxRAISED_BORDER | wxBU_AUTODRAW);
+        wxRAISED_BORDER | wxBU_AUTODRAW,wxDefaultValidator, wxT("Theme installation"));
     WxBitmapButton5->SetToolTip(wxT("Click here to install themes for Rockbox."));
     WxFlexGridSizer2->Add(WxBitmapButton5, 0,
         wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL | wxALL,5);
@@ -208,7 +206,7 @@ void rbutilFrm::CreateGUIControls(void)
     wxBitmap DoomInstallButton (doom_3d_xpm);
     WxBitmapButton6 = new wxBitmapButton(themepage, ID_DOOM_BTN,
         DoomInstallButton, wxPoint(0,0), wxSize(64,54),
-        wxRAISED_BORDER | wxBU_AUTODRAW);
+        wxRAISED_BORDER | wxBU_AUTODRAW,wxDefaultValidator, wxT("Freedoom installation"));
     WxBitmapButton6->SetToolTip(wxT("Click here to install the freedoom wad files."));
     WxFlexGridSizer2->Add(WxBitmapButton6, 0,
         wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL | wxALL,5);
@@ -238,8 +236,7 @@ void rbutilFrm::CreateGUIControls(void)
 	wxBitmap WxBitmapButton2_BITMAP (uninstall_3d_xpm);
 	WxBitmapButton2 = new wxBitmapButton(uninstallpage, ID_REMOVE_BTN,
         WxBitmapButton2_BITMAP, wxPoint(0,0), wxSize(64,54),
-        wxRAISED_BORDER | wxBU_AUTODRAW, wxDefaultValidator,
-        wxT("WxBitmapButton2"));
+        wxRAISED_BORDER | wxBU_AUTODRAW,wxDefaultValidator, wxT("Rockbox uninstallation"));
 	WxBitmapButton2->SetToolTip(wxT("Click here to uninstall Rockbox"));
 	WxFlexGridSizer3->Add(WxBitmapButton2,0,
         wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL | wxALL,5);
@@ -253,7 +250,7 @@ void rbutilFrm::CreateGUIControls(void)
 	WxBitmapButton4 = new wxBitmapButton(uninstallpage, ID_BOOTLOADERREMOVE_BTN,
         WxBitmapButton4_BITMAP, wxPoint(0,0), wxSize(64,54),
         wxRAISED_BORDER | wxBU_AUTODRAW, wxDefaultValidator,
-        wxT("WxBitmapButton4"));
+        wxT("Bootloader uninstallation"));
 	WxBitmapButton4->SetToolTip(wxT("Click here to uninstall the Bootloader"));
 	WxFlexGridSizer3->Add(WxBitmapButton4,0,
         wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL | wxALL,5);
