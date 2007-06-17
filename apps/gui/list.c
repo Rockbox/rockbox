@@ -348,7 +348,6 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
         unsigned char *entry_name;
         int current_item = gui_list->start_item +
                            (SHOW_LIST_TITLE ? i-1 : i);
-        int style = STYLE_DEFAULT;
 
         /* When there are less items to display than the
          * current available space on the screen, we stop*/
@@ -360,6 +359,7 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
         entry_name = P2STR(s);
         
 #ifdef HAVE_LCD_BITMAP
+        int style = STYLE_DEFAULT;
         /* position the string at the correct offset place */
         int item_width,h;
         display->getstringsize(entry_name, &item_width, &h);
