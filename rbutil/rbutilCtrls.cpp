@@ -492,7 +492,7 @@ void DeviceSelectorCtrl::AutoDetect()
         gv->curplat=gv->plat_id[index];
 
 #if !(defined( __WXMSW__ ) || defined( __DARWIN__))
-        wxString tmp = resolve_mount_point(wxString(ipod.diskname,wxConvUTF8)+wxT("1"));
+        wxString tmp = resolve_mount_point(wxString(sansa.diskname,wxConvUTF8)+wxT("1"));
         if( tmp != wxT("") )
             gv->curdestdir = tmp;
 #endif
