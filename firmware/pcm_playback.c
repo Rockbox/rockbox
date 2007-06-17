@@ -23,7 +23,7 @@
 #include "sound.h"
 #if CONFIG_CPU == PNX0101
 #include "string.h"
-#endif
+#endif /* CONFIG_CPU == PNX0101 */
 
 /**
  * APIs implemented in the target-specific portion:
@@ -273,7 +273,7 @@ void pcm_calculate_peaks(int *left, int *right)
 #if CONFIG_CPU == PNX0101
         size_t samples = p_size / 4;
         addr = p;
-#endif
+#endif /* CONFIG_CPU */.
 
         if (samples > PEAK_SAMPLES)
             samples = PEAK_SAMPLES - (PEAK_STRIDE - 1);
@@ -324,9 +324,10 @@ void pcm_calculate_peaks(int *left, int *right)
         else
             *right = peak_value;
     }
-#endif
 }
-#endif
+#endif /* !defined(CPU_PP) */
+
+#endif /* !defined(CPU_COLDFIRE) && (CONFIG_CPU != S3C2440) */
 
 /****************************************************************************
  * Functions that do not require targeted implementation but only a targeted
