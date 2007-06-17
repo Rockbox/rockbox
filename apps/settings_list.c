@@ -1214,6 +1214,10 @@ const struct settings_list settings[] = {
                      "remote viewers iconset", "",
                      ICON_DIR "/", ".bmp", MAX_FILENAME+1),
 #endif /* HAVE_REMOTE_LCD */
+#ifdef HAVE_LCD_COLOR
+    FILENAME_SETTING(F_THEMESETTING, colors_file, "filetype colors", "",
+                     THEME_DIR "/", ".colors", MAX_FILENAME+1),
+#endif
 #ifdef HAVE_BUTTON_LIGHT
     INT_SETTING_W_CFGVALS(F_FLIPLIST, button_light_timeout,
                           LANG_BUTTONLIGHT_TIMEOUT, 6,

@@ -165,6 +165,15 @@ static char * tree_get_filename(int selected_item, void * data, char *buffer)
     return(name);
 }
 
+#ifdef HAVE_LCD_COLOR
+static int tree_get_filecolor(int selected_item, void * data)
+{
+    struct tree_context * local_tc=(struct tree_context *)data;
+    struct entry* dc = local_tc->dircache;
+    struct entry* e = &dc[selected_item];
+    return filetype_get_color(e->attr);
+}
+#endif
 
 static int tree_get_fileicon(int selected_item, void * data)
 {
@@ -223,6 +232,10 @@ void tree_gui_init(void)
 #endif
     gui_synclist_init(&tree_lists, &tree_get_filename, &tc, false, 1);
     gui_synclist_set_icon_callback(&tree_lists, &tree_get_fileicon);
+#ifdef HAVE_LCD_COLOR
+    gui_list_set_color_callback(&tree_lists.gui_list[SCREEN_MAIN],
+                                &tree_get_filecolor);
+#endif
 }
 
 

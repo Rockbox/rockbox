@@ -34,12 +34,11 @@
 #include "plugin.h"
 #include "filetypes.h"
 #include "screens.h"
-#include "icons.h"
 #include "dir.h"
 #include "file.h"
-#include "icons.h"
 #include "splash.h"
 #include "buffer.h"
+#include "icons.h"
 
 /* max filetypes (plugins & icons stored here) */
 #if CONFIG_CODEC == SWCODEC
@@ -125,6 +124,9 @@ struct file_type {
 static struct file_type filetypes[MAX_FILETYPES];
 static int custom_filetype_icons[MAX_FILETYPES];
 static bool custom_icons_loaded = false;
+#ifdef HAVE_LCD_COLOR
+static int custom_colors[MAX_FILETYPES];
+#endif
 static int filetype_count = 0;
 static unsigned char heighest_attr = 0;
 
@@ -136,6 +138,41 @@ static char *filetypes_strdup(char* string)
 }
 static void read_builtin_types(void);
 static void read_config(char* config_file);
+#ifdef HAVE_LCD_COLOR
+/* Colors file format is similar to icons:
+ * ext:hex_color
+ * load a colors file from a theme with:
+ * filetype colors: filename.colors */
+void read_color_theme_file(void) {
+    char buffer[MAX_PATH];
+    int fd;
+    char *ext, *color;
+    int i;
+    for (i = 0; i < filetype_count; i++) {
+        custom_colors[i] = -1;
+    }
+    snprintf(buffer, MAX_PATH, "%s/%s.colors", THEME_DIR, 
+             global_settings.colors_file);
+    fd = open(buffer, O_RDONLY);
+    if (fd < 0)
+        return;
+    while (read_line(fd, buffer, MAX_PATH) > 0)
+    {
+        if (!settings_parseline(buffer, &ext, &color))
+            continue;
+        for (i=0; i<filetype_count; i++)
+        {
+            if (filetypes[i].extension &&
+                !strcasecmp(ext, filetypes[i].extension))
+            {
+                custom_colors[i] = hex_to_rgb(color);
+                break;
+            }
+        }
+    }
+    close(fd);
+}
+#endif
 #ifdef HAVE_LCD_BITMAP
 void read_viewer_theme_file(void)
 {
@@ -162,7 +199,8 @@ void read_viewer_theme_file(void)
             continue;
         for (i=0; i<filetype_count; i++)
         {
-            if (filetypes[i].extension && !strcasecmp(ext, filetypes[i].extension))
+            if (filetypes[i].extension &&
+                !strcasecmp(ext, filetypes[i].extension))
             {
                 if (*icon == '*')
                     custom_filetype_icons[i] = atoi(icon+1);
@@ -197,6 +235,9 @@ void  filetype_init(void)
     read_config(VIEWERS_CONFIG);
 #ifdef HAVE_LCD_BITMAP
     read_viewer_theme_file();
+#endif
+#ifdef HAVE_LCD_COLOR
+    read_color_theme_file();
 #endif
 }
 
@@ -326,6 +367,17 @@ static int find_attr(int attr)
     }
     return -1;
 }
+
+#ifdef HAVE_LCD_COLOR
+int filetype_get_color(int attr)
+{
+    int index = find_attr(attr);
+    if (index < 0)
+        return -1;
+    return custom_colors[index];
+    return -1;
+}
+#endif
 
 int filetype_get_icon(int attr)
 {

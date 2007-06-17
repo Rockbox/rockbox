@@ -24,8 +24,10 @@
 #include "cpu.h"
 #include "config.h"
 
-#define STYLE_DEFAULT 0
-#define STYLE_INVERT  1
+#define STYLE_DEFAULT    0x00000000
+#define STYLE_INVERT     0x20000000
+#define STYLE_COLORED    0x10000000
+#define STYLE_COLOR_MASK 0x0000FFFF
 
 #ifdef SIMULATOR
 #ifndef MAX_PATH

@@ -227,38 +227,6 @@ void settings_load(int which)
         settings_load_config(FIXEDSETTINGSFILE,false);
     }
 }
-#ifdef HAVE_LCD_COLOR
-/*
- * Helper function to convert a string of 6 hex digits to a native colour
- */
-
-#define hex2dec(c) (((c) >= '0' && ((c) <= '9')) ? (toupper(c)) - '0' : \
-                                                   (toupper(c)) - 'A' + 10)
-
-static int hex_to_rgb(const char* hex)
-{   int ok = 1;
-    int i;
-    int red, green, blue;
-
-    if (strlen(hex) == 6) {
-        for (i=0; i < 6; i++ ) {
-           if (!isxdigit(hex[i])) {
-              ok=0;
-              break;
-           }
-        }
-
-        if (ok) {
-            red = (hex2dec(hex[0]) << 4) | hex2dec(hex[1]);
-            green = (hex2dec(hex[2]) << 4) | hex2dec(hex[3]);
-            blue = (hex2dec(hex[4]) << 4) | hex2dec(hex[5]);
-            return LCD_RGBPACK(red,green,blue);
-        }
-    }
-
-    return 0;
-}
-#endif /* HAVE_LCD_COLOR */
 
 static bool cfg_string_to_int(int setting_id, int* out, char* str)
 {
@@ -891,6 +859,11 @@ void settings_apply(void)
 #endif
     /* load the icon set */
     icons_init();
+
+#ifdef HAVE_LCD_COLOR
+    if (global_settings.colors_file)
+        read_color_theme_file();
+#endif
     
 }
 

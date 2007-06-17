@@ -53,9 +53,15 @@ void tree_get_filetypes(const struct filetype**, int*);
    uses audio buffer for storage, so call early in init... */
 void  filetype_init(void);
 void read_viewer_theme_file(void);
+#ifdef HAVE_LCD_COLOR
+void read_color_theme_file(void);
+#endif
 
 /* Return the attribute (FILE_ATTR_*) of the file */
 int filetype_get_attr(const char* file);
+#ifdef HAVE_LCD_COLOR
+int filetype_get_color(int attr);
+#endif
 int filetype_get_icon(int attr);
 /* return the plugin filename associated with the file */
 char* filetype_get_plugin(const struct entry* file);

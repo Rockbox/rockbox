@@ -807,6 +807,7 @@ void lcd_puts_style_offset(int x, int y, const unsigned char *str, int style,
 {
     int xpos,ypos,w,h,xrect;
     int lastmode = drawmode;
+    int oldcolor = fg_pattern;
 
     /* make sure scrolling is turned off on the line we are updating */
     scrolling_lines &= ~(1 << y);
@@ -819,11 +820,15 @@ void lcd_puts_style_offset(int x, int y, const unsigned char *str, int style,
     ypos = ymargin + y*h;
     drawmode = (style & STYLE_INVERT) ?
                (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
+    if (drawmode == DRMODE_SOLID && style & STYLE_COLORED) {
+        fg_pattern = style & STYLE_COLOR_MASK;
+    }
     lcd_putsxyofs(xpos, ypos, offset, str);
     drawmode ^= DRMODE_INVERSEVID;
     xrect = xpos + MAX(w - offset, 0);
     lcd_fillrect(xrect, ypos, LCD_WIDTH - xrect, h);
     drawmode = lastmode;
+    fg_pattern = oldcolor;
 }
 
 /*** scrolling ***/
@@ -896,10 +901,8 @@ void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
     s->invert = false;
     if (style & STYLE_INVERT) {
         s->invert = true;
-        lcd_puts_style_offset(x,y,string,STYLE_INVERT,offset);
     }
-    else
-        lcd_puts_offset(x,y,string,offset);
+    lcd_puts_style_offset(x,y,string,style,offset);
 
     lcd_getstringsize(string, &w, &h);
 

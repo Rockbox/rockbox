@@ -36,34 +36,43 @@ enum list_wrap {
  * The gui_list is based on callback functions, if you want the list
  * to display something you have to provide it a function that
  * tells it what to display.
- * There are two callback function :
- * one to get the text and one to get the icon
+ * There are three callback function :
+ * one to get the text, one to get the icon and one to get the color
  */
 
 /*
  * Icon callback
  *  - selected_item : an integer that tells the number of the item to display
- *  - data : a void pointer to the data you gave to the list when
- *           you initialized it
- *  - icon : a pointer to the icon, the value inside it is used to display
- *           the icon after the function returns.
+ *  - data : a void pointer to the data you gave to the list when you
+ *           initialized it
+ *  Returns a pointer to the icon, the value inside it is used to display the
+ *          icon after the function returns.
  * Note : we use the ICON type because the real type depends of the plateform
  */
 typedef enum themable_icons list_get_icon(int selected_item, void * data);
 /*
  * Text callback
  *  - selected_item : an integer that tells the number of the item to display
- *  - data : a void pointer to the data you gave to the list when
- *           you initialized it
+ *  - data : a void pointer to the data you gave to the list when you
+ *           initialized it
  *  - buffer : a buffer to put the resulting text on it
  *             (The content of the buffer may not be used by the list, we use
  *             the return value of the function in all cases to avoid filling
  *             a buffer when it's not necessary)
  * Returns a pointer to a string that contains the text to display
  */
-typedef char * list_get_name(int selected_item,
-                             void * data,
-                             char *buffer);
+typedef char * list_get_name(int selected_item, void * data, char * buffer);
+#ifdef HAVE_LCD_COLOR
+/*
+ * Color callback
+ *  - selected_item : an integer that tells the number of the item to display
+ *  - data : a void pointer to the data you gave to the list when you
+ *           initialized it
+ *  Returns an int with the lower 16 bits representing the color to display the
+ *          selected item, negative value for default coloring.
+ */
+typedef int list_get_color(int selected_item, void * data);
+#endif
 
 struct gui_list
 {
@@ -101,6 +110,11 @@ struct gui_list
     /* Optional title icon */
     enum themable_icons title_icon;
     bool show_selection_marker; /* set to true by default */
+
+#ifdef HAVE_LCD_COLOR
+    int title_color;
+    list_get_color *callback_get_item_color;
+#endif
 };
 
 /*
@@ -126,6 +140,16 @@ struct gui_list
  */
 #define gui_list_set_icon_callback(gui_list, _callback) \
     (gui_list)->callback_get_item_icon=_callback
+
+#ifdef HAVE_LCD_COLOR
+/*
+ * Sets the color callback function
+ *  - gui_list : the list structure
+ *  - _callback : the callback function
+ */
+#define gui_list_set_color_callback(gui_list, _callback) \
+    (gui_list)->callback_get_item_color=_callback
+#endif
 
 /*
  * Gives the position of the selected item

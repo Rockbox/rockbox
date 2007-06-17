@@ -43,8 +43,8 @@ int remote_type(void);
 extern struct event_queue remote_scroll_queue;
 #endif
 
-#define STYLE_DEFAULT 0
-#define STYLE_INVERT  1
+#define STYLE_DEFAULT    0x00000000
+#define STYLE_INVERT     0x20000000
 
 #if LCD_REMOTE_DEPTH <= 8
 #if (LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED) \

@@ -63,11 +63,11 @@ static void gui_list_select_at_offset(struct gui_list * gui_list, int offset);
 /*
  * Initializes a scrolling list
  *  - gui_list : the list structure to initialize
- *  - callback_get_item_icon : pointer to a function that associates an icon
- *    to a given item number
  *  - callback_get_item_name : pointer to a function that associates a label
  *    to a given item number
  *  - data : extra data passed to the list callback
+ *  - scroll_all : 
+ *  - selected_size : 
  */
 static void gui_list_init(struct gui_list * gui_list,
     list_get_name callback_get_item_name,
@@ -97,6 +97,11 @@ static void gui_list_init(struct gui_list * gui_list,
     gui_list->last_displayed_selected_item = -1 ;
     gui_list->last_displayed_start_item = -1 ;
     gui_list->show_selection_marker = true;
+
+#ifdef HAVE_LCD_COLOR
+    gui_list->title_color = -1;
+    gui_list->callback_get_item_color = NULL;
+#endif
 }
 
 /* this toggles the selection bar or cursor */
@@ -274,13 +279,23 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
         }
 
 #ifdef HAVE_LCD_BITMAP
+        int title_style = STYLE_DEFAULT;
+#ifdef HAVE_LCD_COLOR
+        if (gui_list->title_color >= 0)
+        {
+            title_style |= STYLE_COLORED;
+            title_style |= gui_list->title_color;
+        }
+#endif
         screen_set_xmargin(display, text_pos); /* margin for title */
         item_offset = gui_list_get_item_offset(gui_list, gui_list->title_width,
                                                text_pos);
         if (item_offset > gui_list->title_width - (display->width - text_pos))
-            display->puts_offset(0, 0, gui_list->title, item_offset);
+            display->puts_style_offset(0, 0, gui_list->title,
+                                       title_style, item_offset);
         else
-            display->puts_scroll_offset(0, 0, gui_list->title, item_offset);
+            display->puts_scroll_style_offset(0, 0, gui_list->title,
+                                              title_style, item_offset);
 #else
         display->puts_scroll(text_pos, 0, gui_list->title);
 #endif
@@ -333,6 +348,7 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
         unsigned char *entry_name;
         int current_item = gui_list->start_item +
                            (SHOW_LIST_TITLE ? i-1 : i);
+        int style = STYLE_DEFAULT;
 
         /* When there are less items to display than the
          * current available space on the screen, we stop*/
@@ -350,6 +366,21 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
         item_offset = gui_list_get_item_offset(gui_list, item_width, text_pos);
 #endif
 
+#ifdef HAVE_LCD_COLOR
+        /* if the list has a color callback */
+        if (gui_list->callback_get_item_color)
+        {
+            int color = gui_list->callback_get_item_color(current_item,
+                                                          gui_list->data);
+            /* if color selected */
+            if (color >= 0)
+            {
+                style |= STYLE_COLORED;
+                style |= color;
+            }
+        }
+#endif
+
         if(gui_list->show_selection_marker &&
            current_item >= gui_list->selected_item &&
            current_item <  gui_list->selected_item + gui_list->selected_size)
@@ -357,28 +388,24 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
 #ifdef HAVE_LCD_BITMAP
             if (global_settings.invert_cursor)/* Display inverted-line-style*/
             {
-                /* if text got out of view */
-                if (item_offset > item_width - (display->width - text_pos))
-                {
-                    /* don't scroll */
-                    display->puts_style_offset(0, i, entry_name,
-                                               STYLE_INVERT,item_offset);
-                }
-                else
-                {
-                    display->puts_scroll_style_offset(0, i, entry_name,
-                                                      STYLE_INVERT,
-                                                      item_offset);
-                }
+                style |= STYLE_INVERT;
             }
             else  /*  if (!global_settings.invert_cursor) */
             {
-                if (item_offset > item_width - (display->width - text_pos))
-                    display->puts_offset(0, i, entry_name,item_offset);
-                else
-                    display->puts_scroll_offset(0, i, entry_name,item_offset);
                 if (current_item % gui_list->selected_size != 0)
                     draw_cursor = false;
+            }
+            /* if the text is smaller than the viewport size */
+            if (item_offset > item_width - (display->width - text_pos))
+            {
+                /* don't scroll */
+                display->puts_style_offset(0, i, entry_name,
+                                           style, item_offset);
+            }
+            else
+            {
+                display->puts_scroll_style_offset(0, i, entry_name,
+                                                  style, item_offset);
             }
 #else
             display->puts_scroll(text_pos, i, entry_name);
@@ -397,7 +424,8 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
             if(gui_list->scroll_all)
             {
 #ifdef HAVE_LCD_BITMAP
-                display->puts_scroll_offset(0, i, entry_name,item_offset);
+                display->puts_scroll_style_offset(0, i, entry_name,
+                                                  style, item_offset);
 #else
                 display->puts_scroll(text_pos, i, entry_name);
 #endif
@@ -405,7 +433,8 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
             else
             {
 #ifdef HAVE_LCD_BITMAP
-                display->puts_offset(0, i, entry_name,item_offset);
+                display->puts_style_offset(0, i, entry_name,
+                                           style, item_offset);
 #else
                 display->puts(text_pos, i, entry_name);
 #endif

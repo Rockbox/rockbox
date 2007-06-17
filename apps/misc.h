@@ -109,4 +109,8 @@ void check_bootfile(bool do_rolo);
 /* check range, set volume and save settings */
 void setvol(void);
 
+#ifdef HAVE_LCD_COLOR
+int hex_to_rgb(const char* hex);
+#endif
+
 #endif /* MISC_H */
