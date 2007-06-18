@@ -1,0 +1,9 @@
+# this line sets the mpeg icon to the 4th icon in the viewers bmp file
+# 0 is the first icon
+mpeg: 3
+
+# this one sets bmp to the 5th icon of the main iconset (0 is the first one again)
+bmp: *5
+
+# This sets no icon for wav
+wav: -

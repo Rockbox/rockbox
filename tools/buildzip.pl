@@ -356,8 +356,17 @@ STOP
     mkdir ".rockbox/docs", 0777;
     for(("COPYING",
          "LICENSES",
+         "KNOWN_ISSUES"
         )) {
         `cp $ROOT/docs/$_ .rockbox/docs/$_.txt`;
+    }
+    if ($fonts) {
+        `cp $ROOT/docs/profontdoc.txt .rockbox/docs/`;
+    }
+    for(("sample.colors",
+         "sample.icons"
+        )) {
+        `cp $ROOT/docs/$_ .rockbox/docs/`;
     }
 
     # Now do the WPS dance
