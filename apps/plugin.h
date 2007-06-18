@@ -79,6 +79,7 @@
 #include "rbunicode.h"
 #include "list.h"
 #include "tree.h"
+#include "color_picker.h"
 
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
@@ -621,6 +622,10 @@ struct plugin_api {
                              const char* yes_str, int yes_voice,
                              const char* no_str, int no_voice,
                              void (*function)(bool));
+#ifdef HAVE_LCD_COLOR
+    bool (*set_color)(struct screen *display, char *title, unsigned *color,
+                   unsigned banned_color);
+#endif
 };
 
 /* plugin header */

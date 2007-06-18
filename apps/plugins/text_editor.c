@@ -283,6 +283,39 @@ int do_item_menu(int cur_sel, char* copy_buffer)
     menu_exit(m);
     return ret;
 }
+
+#ifdef HAVE_LCD_COLOR
+/* in misc.h but no need to polute the api */
+#define toupper(c) (((c >= 'a') && (c <= 'z'))?c+'A':c)
+#define isxdigit(c) ((c>='a' && c<= 'f') || (c>='A' && c<= 'F') \
+                    || (c>='0' && c<= '9'))
+#define hex2dec(c) (((c) >= '0' && ((c) <= '9')) ? (toupper(c)) - '0' : \
+                                                   (toupper(c)) - 'A' + 10)
+int hex_to_rgb(const char* hex)
+{   int ok = 1;
+    int i;
+    int red, green, blue;
+
+    if (rb->strlen(hex) == 6) {
+        for (i=0; i < 6; i++ ) {
+            if (!isxdigit(hex[i])) {
+                ok=0;
+                break;
+            }
+        }
+
+        if (ok) {
+            red = (hex2dec(hex[0]) << 4) | hex2dec(hex[1]);
+            green = (hex2dec(hex[2]) << 4) | hex2dec(hex[3]);
+            blue = (hex2dec(hex[4]) << 4) | hex2dec(hex[5]);
+            return LCD_RGBPACK(red,green,blue);
+        }
+    }
+
+    return 0;
+}
+#endif /* HAVE_LCD_COLOR */
+
 /* this is the plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
@@ -296,6 +329,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int cur_sel=0;
     static char copy_buffer[MAX_LINE_LEN];
     bool prev_show_statusbar;
+#ifdef HAVE_LCD_COLOR
+    bool edit_icons_file = false;
+#endif
 
     rb = api;
 
@@ -308,6 +344,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
     if (parameter)
     {
+#ifdef HAVE_LCD_COLOR
+        char *c = NULL;
+#endif
         rb->strcpy(filename,(char*)parameter);
         if (!get_eol_string(filename))
         {
@@ -319,6 +358,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             rb->splash(HZ*2,"Couldnt open file: %s",(char*)parameter);
             return PLUGIN_ERROR;
         }
+#ifdef HAVE_LCD_COLOR
+        c = rb->strchr(filename, '.');
+        if (c && rb->strcmp(c, ".icons"))
+            edit_icons_file = true;
+#endif
         /* read in the file */
         while (rb->read_line(fd,temp_line,MAX_LINE_LEN))
         {
@@ -353,9 +397,50 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         {
             case ACTION_STD_OK:
             {
+                bool edit_text = true;
+#ifdef HAVE_LCD_COLOR
+                int color;
+#endif
                 if (line_count)
                     rb->strcpy(temp_line,&buffer[do_action(ACTION_GET,0,cur_sel)]);
-                if (!rb->kbd_input(temp_line,MAX_LINE_LEN))
+#ifdef HAVE_LCD_COLOR
+                if (edit_icons_file)
+                {
+                    char *name = temp_line, *value = NULL;
+                    char extension[MAX_LINE_LEN];
+                    rb->settings_parseline(temp_line, &name, &value);
+                    if (line_count)
+                    {
+                        MENUITEM_STRINGLIST(menu, "Edit What?", NULL, 
+                                            "Extension", "Color",);
+                        switch (rb->do_menu(&menu, NULL))
+                        {
+                            case 0:
+                                edit_text = true;
+                                break;
+                            case 1:
+                                edit_text = false;
+                                if (value)
+                                    color = hex_to_rgb(value);
+                                else color = 0;
+                                rb->strcpy(extension, name);
+                                rb->set_color(rb->screens[SCREEN_MAIN], name, &color, -1);
+                                rb->snprintf(temp_line, MAX_LINE_LEN, "%s: %02X%02X%02X",
+                                             extension, RGB_UNPACK_RED(color),
+                                             RGB_UNPACK_GREEN(color),
+                                             RGB_UNPACK_BLUE(color));
+                                if (line_count)
+                                {
+                                    do_action(ACTION_UPDATE,temp_line,cur_sel);
+                                }
+                                else do_action(ACTION_INSERT,temp_line,cur_sel);
+                                changed = true;
+                                break;
+                        }
+                    }
+                }
+#endif
+                if (edit_text &&!rb->kbd_input(temp_line,MAX_LINE_LEN))
                 {
                     if (line_count)
                     {

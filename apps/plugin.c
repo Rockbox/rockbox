@@ -498,6 +498,9 @@ static const struct plugin_api rockbox_api = {
     threads,
     create_numbered_filename,
     set_bool_options,
+#ifdef HAVE_LCD_COLOR
+    set_color,
+#endif
 };
 
 int plugin_load(const char* plugin, void* parameter)
