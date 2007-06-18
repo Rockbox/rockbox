@@ -330,7 +330,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     static char copy_buffer[MAX_LINE_LEN];
     bool prev_show_statusbar;
 #ifdef HAVE_LCD_COLOR
-    bool edit_icons_file = false;
+    bool edit_colors_file = false;
 #endif
 
     rb = api;
@@ -359,9 +359,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             return PLUGIN_ERROR;
         }
 #ifdef HAVE_LCD_COLOR
-        c = rb->strchr(filename, '.');
-        if (c && rb->strcmp(c, ".icons"))
-            edit_icons_file = true;
+        c = rb->strrchr(filename, '.');
+        if (c && !rb->strcmp(c, ".colors"))
+            edit_colors_file = true;
 #endif
         /* read in the file */
         while (rb->read_line(fd,temp_line,MAX_LINE_LEN))
@@ -404,7 +404,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 if (line_count)
                     rb->strcpy(temp_line,&buffer[do_action(ACTION_GET,0,cur_sel)]);
 #ifdef HAVE_LCD_COLOR
-                if (edit_icons_file)
+                if (edit_colors_file)
                 {
                     char *name = temp_line, *value = NULL;
                     char extension[MAX_LINE_LEN];
