@@ -742,7 +742,6 @@ bool radio_power(bool status)
     {
         /* init mystery amplification device */
         outl(inl(0x70000084) | 0x1, 0x70000084);
-        outl(inl(0x70000080) | 0x4, 0x70000080);
         udelay(5);
 
         /* When power up, host should initialize the 3-wire bus in host read
