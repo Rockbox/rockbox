@@ -126,7 +126,7 @@ static struct file_type filetypes[MAX_FILETYPES];
 static int custom_filetype_icons[MAX_FILETYPES];
 static bool custom_icons_loaded = false;
 #ifdef HAVE_LCD_COLOR
-static short custom_colors[MAX_FILETYPES];
+static fb_data custom_colors[MAX_FILETYPES];
 #endif
 static int filetype_count = 0;
 static unsigned char heighest_attr = 0;
