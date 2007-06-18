@@ -126,7 +126,7 @@ static struct file_type filetypes[MAX_FILETYPES];
 static int custom_filetype_icons[MAX_FILETYPES];
 static bool custom_icons_loaded = false;
 #ifdef HAVE_LCD_COLOR
-static int custom_colors[MAX_FILETYPES];
+static int custom_colors[MAX_FILETYPES+1];
 #endif
 static int filetype_count = 0;
 static unsigned char heighest_attr = 0;
@@ -164,6 +164,11 @@ void read_color_theme_file(void) {
         if (!strcasecmp(ext, "folder"))
         {
             custom_colors[0] = hex_to_rgb(color);
+            continue;
+        }
+        if (!strcasecmp(ext, "???"))
+        {
+            custom_colors[MAX_FILETYPES] = hex_to_rgb(color);
             continue;
         }
         for (i=1; i<filetype_count; i++)
@@ -383,7 +388,7 @@ int filetype_get_color(const char * name, int attr)
         return custom_colors[0];
     extension = strrchr(name, '.');
     if (!extension)
-        return -1;
+        return custom_colors[MAX_FILETYPES];
     extension++;
     logf("%s %s",name,extension);
     for (i=1; i<filetype_count; i++)
@@ -392,7 +397,7 @@ int filetype_get_color(const char * name, int attr)
             !strcasecmp(extension, filetypes[i].extension))
             return custom_colors[i];
     }
-    return -1;
+    return custom_colors[MAX_FILETYPES];
 }
 #endif
 
