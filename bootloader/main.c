@@ -565,7 +565,7 @@ void main(void)
     printf("Loading firmware");
     i = load_firmware((unsigned char *)DRAM_START, BOOTFILE, MAX_LOADSIZE);
     if(i < 0)
-        printf("Error: %d", strerror(i));
+        printf("Error: %s", strerror(i));
 
     if (i == EOK)
         start_firmware();
