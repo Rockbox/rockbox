@@ -79,7 +79,7 @@ bool get_monkeys_metadata(int fd, struct mp3entry* id3)
         id3->frequency = get_long_le(buf+12);
     }
 
-    id3->vbr = true;   /* All FLAC files are VBR */
+    id3->vbr = true;   /* All APE files are VBR */
     id3->filesize = filesize(fd);
 
     totalsamples = finalframeblocks;
