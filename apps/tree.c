@@ -168,6 +168,8 @@ static char * tree_get_filename(int selected_item, void * data, char *buffer)
 #ifdef HAVE_LCD_COLOR
 static int tree_get_filecolor(int selected_item, void * data)
 {
+    if (*tc.dirfilter == SHOW_ID3DB)
+        return -1;
     struct tree_context * local_tc=(struct tree_context *)data;
     struct entry* dc = local_tc->dircache;
     struct entry* e = &dc[selected_item];
