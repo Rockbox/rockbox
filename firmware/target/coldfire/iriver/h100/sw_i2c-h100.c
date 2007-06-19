@@ -42,7 +42,7 @@
 #define SDA_HI     and_l(~0x00002000, &GPIO1_ENABLE)
 
 /* delay loop to achieve 400kHz at 120MHz CPU frequency */
-#define DELAY    do { int _x; for(_x=0;_x<22;_x++);} while(0)
+#define DELAY    do { volatile int _x; for(_x=0;_x<22;_x++);} while(0)
 
 void sw_i2c_init(void)
 {
