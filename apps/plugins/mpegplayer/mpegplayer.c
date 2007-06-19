@@ -166,6 +166,8 @@ struct plugin_api* rb;
 
 static mpeg2dec_t * mpeg2dec;
 static int total_offset = 0;
+static int num_drawn = 0;
+static int count_start = 0;
 
 /* Utility */
 
@@ -906,6 +908,8 @@ static void button_loop(void)
             gray_show(false);
 #endif
             result = mpeg_menu();
+            count_start = get_playback_time();
+            num_drawn = 0;
 
 #ifndef HAVE_LCD_COLOR
             gray_show(true);
@@ -1266,7 +1270,6 @@ static void video_thread(void)
     int frame_drop_level = 0;
     int skip_level = 0;
     int num_skipped = 0;
-    int num_drawn = 0;
     /* Used to decide when to display FPS */
     unsigned long last_showfps = *rb->current_tick - HZ;
     /* Used to decide whether or not to force a frame update */
@@ -1568,7 +1571,7 @@ static void video_thread(void)
             /* Calculate and display fps */
             if (TIME_AFTER(*rb->current_tick, last_showfps + HZ))
             {
-                uint32_t clock_ticks = get_playback_time();
+                uint32_t clock_ticks = get_playback_time() - count_start;
                 int fps = 0;
 
                 if (clock_ticks != 0)
