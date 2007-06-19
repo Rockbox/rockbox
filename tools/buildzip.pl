@@ -363,7 +363,7 @@ STOP
     if ($fonts) {
         `cp $ROOT/docs/profontdoc.txt .rockbox/docs/`;
     }
-    for(("sample.colors",
+    for(("sample.colours",
          "sample.icons"
         )) {
         `cp $ROOT/docs/$_ .rockbox/docs/`;

@@ -360,7 +360,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         }
 #ifdef HAVE_LCD_COLOR
         c = rb->strrchr(filename, '.');
-        if (c && !rb->strcmp(c, ".colors"))
+        if (c && !rb->strcmp(c, ".colours"))
             edit_colors_file = true;
 #endif
         /* read in the file */

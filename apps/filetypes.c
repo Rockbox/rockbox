@@ -143,7 +143,7 @@ static void read_config(char* config_file);
 /* Colors file format is similar to icons:
  * ext:hex_color
  * load a colors file from a theme with:
- * filetype colors: filename.colors */
+ * filetype colours: filename.colours */
 void read_color_theme_file(void) {
     char buffer[MAX_PATH];
     int fd;
@@ -152,7 +152,7 @@ void read_color_theme_file(void) {
     for (i = 0; i < filetype_count; i++) {
         custom_colors[i] = -1;
     }
-    snprintf(buffer, MAX_PATH, "%s/%s.colors", THEME_DIR, 
+    snprintf(buffer, MAX_PATH, "%s/%s.colours", THEME_DIR, 
              global_settings.colors_file);
     fd = open(buffer, O_RDONLY);
     if (fd < 0)
