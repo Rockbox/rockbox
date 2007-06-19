@@ -149,7 +149,7 @@ void read_color_theme_file(void) {
     int fd;
     char *ext, *color;
     int i;
-    for (i = 0; i < filetype_count; i++) {
+    for (i = 0; i < MAX_FILETYPES+1; i++) {
         custom_colors[i] = -1;
     }
     snprintf(buffer, MAX_PATH, "%s/%s.colours", THEME_DIR, 
