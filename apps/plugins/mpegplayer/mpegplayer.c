@@ -283,113 +283,6 @@ volatile int videostatus IBSS_ATTR;
 
 static void pcm_playback_play_pause(bool play);
 
-static void button_loop(void)
-{
-    bool result;
-    int vol, minvol, maxvol;
-    int button = rb->button_get(false);
-
-    switch (button)
-    {
-        case MPEG_VOLUP:
-        case MPEG_VOLUP|BUTTON_REPEAT:
-#ifdef MPEG_VOLUP2
-        case MPEG_VOLUP2:
-        case MPEG_VOLUP2|BUTTON_REPEAT:
-#endif
-            vol = rb->global_settings->volume;
-            maxvol = rb->sound_max(SOUND_VOLUME);
-
-            if (vol < maxvol) {
-                vol++;
-                rb->sound_set(SOUND_VOLUME, vol);
-                rb->global_settings->volume = vol;
-            }
-            break;
-
-        case MPEG_VOLDOWN:
-        case MPEG_VOLDOWN|BUTTON_REPEAT:
-#ifdef MPEG_VOLDOWN2
-        case MPEG_VOLDOWN2:
-        case MPEG_VOLDOWN2|BUTTON_REPEAT:
-#endif
-            vol = rb->global_settings->volume;
-            minvol = rb->sound_min(SOUND_VOLUME);
-
-            if (vol > minvol) {
-                vol--;
-                rb->sound_set(SOUND_VOLUME, vol);
-                rb->global_settings->volume = vol;
-            }
-            break;
-
-        case MPEG_MENU:
-            pcm_playback_play_pause(false);
-            if (videostatus != STREAM_DONE) {
-                videostatus=PLEASE_PAUSE;
-
-                /* Wait for video thread to stop */
-                while (videostatus == PLEASE_PAUSE) { rb->sleep(HZ/25); }
-            }
-
-#ifndef HAVE_LCD_COLOR
-            gray_show(false);
-#endif
-            result = mpeg_menu();
-
-#ifndef HAVE_LCD_COLOR
-            gray_show(true);
-#endif
-
-            /* The menu can change the font, so restore */
-            rb->lcd_setfont(FONT_SYSFIXED);
-
-            if (result) {
-                audiostatus = PLEASE_STOP;
-                if (videostatus != STREAM_DONE) videostatus = PLEASE_STOP;
-            } else {
-                if (videostatus != STREAM_DONE) videostatus = STREAM_PLAYING;
-                pcm_playback_play_pause(true);
-            }
-            break;
-
-        case MPEG_STOP:
-            audiostatus = PLEASE_STOP;
-            if (videostatus != STREAM_DONE) videostatus = PLEASE_STOP;
-            break;
-
-        case MPEG_PAUSE:
-            if (videostatus != STREAM_DONE) videostatus=PLEASE_PAUSE;
-            pcm_playback_play_pause(false);
-
-            button = BUTTON_NONE;
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-            rb->cpu_boost(false);
-#endif
-            do {
-                button = rb->button_get(true);
-                if (button == MPEG_STOP) {
-                    audiostatus = PLEASE_STOP;
-                    if (videostatus != STREAM_DONE) videostatus = PLEASE_STOP;
-                    return;
-                }
-            } while (button != MPEG_PAUSE);
-
-            if (videostatus != STREAM_DONE) videostatus = STREAM_PLAYING;
-            pcm_playback_play_pause(true);
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-            rb->cpu_boost(true);
-#endif
-            break;
-
-        default:
-            if(rb->default_event_handler(button) == SYS_USB_CONNECTED) {
-                audiostatus = PLEASE_STOP;
-                if (videostatus != STREAM_DONE) videostatus = PLEASE_STOP;
-            }
-    }
-}
-
 /* libmad related functions/definitions */
 #define INPUT_CHUNK_SIZE 8192
 
@@ -958,6 +851,113 @@ static inline int32_t clip_sample(int32_t sample)
         sample = 0x7fff ^ (sample >> 31);
 
     return sample;
+}
+
+static void button_loop(void)
+{
+    bool result;
+    int vol, minvol, maxvol;
+    int button = rb->button_get(false);
+
+    switch (button)
+    {
+        case MPEG_VOLUP:
+        case MPEG_VOLUP|BUTTON_REPEAT:
+#ifdef MPEG_VOLUP2
+        case MPEG_VOLUP2:
+        case MPEG_VOLUP2|BUTTON_REPEAT:
+#endif
+            vol = rb->global_settings->volume;
+            maxvol = rb->sound_max(SOUND_VOLUME);
+
+            if (vol < maxvol) {
+                vol++;
+                rb->sound_set(SOUND_VOLUME, vol);
+                rb->global_settings->volume = vol;
+            }
+            break;
+
+        case MPEG_VOLDOWN:
+        case MPEG_VOLDOWN|BUTTON_REPEAT:
+#ifdef MPEG_VOLDOWN2
+        case MPEG_VOLDOWN2:
+        case MPEG_VOLDOWN2|BUTTON_REPEAT:
+#endif
+            vol = rb->global_settings->volume;
+            minvol = rb->sound_min(SOUND_VOLUME);
+
+            if (vol > minvol) {
+                vol--;
+                rb->sound_set(SOUND_VOLUME, vol);
+                rb->global_settings->volume = vol;
+            }
+            break;
+
+        case MPEG_MENU:
+            pcm_playback_play_pause(false);
+            if (videostatus != STREAM_DONE) {
+                videostatus=PLEASE_PAUSE;
+
+                /* Wait for video thread to stop */
+                while (videostatus == PLEASE_PAUSE) { rb->sleep(HZ/25); }
+            }
+
+#ifndef HAVE_LCD_COLOR
+            gray_show(false);
+#endif
+            result = mpeg_menu();
+
+#ifndef HAVE_LCD_COLOR
+            gray_show(true);
+#endif
+
+            /* The menu can change the font, so restore */
+            rb->lcd_setfont(FONT_SYSFIXED);
+
+            if (result) {
+                audiostatus = PLEASE_STOP;
+                if (videostatus != STREAM_DONE) videostatus = PLEASE_STOP;
+            } else {
+                if (videostatus != STREAM_DONE) videostatus = STREAM_PLAYING;
+                pcm_playback_play_pause(true);
+            }
+            break;
+
+        case MPEG_STOP:
+            audiostatus = PLEASE_STOP;
+            if (videostatus != STREAM_DONE) videostatus = PLEASE_STOP;
+            break;
+
+        case MPEG_PAUSE:
+            if (videostatus != STREAM_DONE) videostatus=PLEASE_PAUSE;
+            pcm_playback_play_pause(false);
+
+            button = BUTTON_NONE;
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+            rb->cpu_boost(false);
+#endif
+            do {
+                button = rb->button_get(true);
+                if (button == MPEG_STOP) {
+                    audiostatus = PLEASE_STOP;
+                    if (videostatus != STREAM_DONE) videostatus = PLEASE_STOP;
+                    return;
+                }
+            } while (button != MPEG_PAUSE);
+
+            if (videostatus != STREAM_DONE) videostatus = STREAM_PLAYING;
+            pcm_playback_play_pause(true);
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+            rb->cpu_boost(true);
+#endif
+            break;
+
+        default:
+            if(rb->default_event_handler(button) == SYS_USB_CONNECTED) {
+                audiostatus = PLEASE_STOP;
+                if (videostatus != STREAM_DONE) videostatus = PLEASE_STOP;
+            }
+    }
 }
 
 static void audio_thread(void)
