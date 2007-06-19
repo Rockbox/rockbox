@@ -30,6 +30,52 @@ PLUGIN_HEADER
 
 static struct plugin_api* rb;
 
+/* Log functions copied from test_disk.c */
+static int line = 0;
+static int max_line = 0;
+static int log_fd = -1;
+static char logfilename[MAX_PATH];
+
+static bool log_init(bool use_logfile)
+{
+    int h;
+
+    rb->lcd_setmargins(0, 0);
+    rb->lcd_getstringsize("A", NULL, &h);
+    max_line = LCD_HEIGHT / h;
+    line = 0;
+    rb->lcd_clear_display();
+    rb->lcd_update();
+
+    if (use_logfile) {
+        rb->create_numbered_filename(logfilename, "/", "test_codec_log_", ".txt",
+                                     2 IF_CNFN_NUM_(, NULL));
+        log_fd = rb->open(logfilename, O_RDWR|O_CREAT|O_TRUNC);
+        return log_fd >= 0;
+    }
+
+    return true;
+}
+
+static void log_text(char *text, bool advance)
+{
+    rb->lcd_puts(0, line, text);
+    rb->lcd_update();
+    if (advance)
+    {
+        if (++line >= max_line)
+            line = 0;
+        if (log_fd >= 0)
+            rb->fdprintf(log_fd, "%s\n", text);
+    }
+}
+
+static void log_close(void)
+{
+    if (log_fd >= 0)
+        rb->close(log_fd);
+}
+
 struct wavinfo_t
 {
   int fd;
@@ -43,7 +89,7 @@ struct wavinfo_t
 static void* audiobuf;
 static void* codec_mallocbuf;
 static size_t audiosize;
-static char str[40];
+static char str[MAX_PATH];
 
 /* Our local implementation of the codec API */
 static struct codec_api ci;
@@ -149,6 +195,9 @@ static bool pcmbuf_insert_null(const void *ch1, const void *ch2, int count)
     (void)ch2;
     (void)count;
 
+    /* Prevent idle poweroff */
+    rb->reset_poweroff_timer();
+
     return true;
 }
 
@@ -173,6 +222,9 @@ static bool pcmbuf_insert_wav(const void *ch1, const void *ch2, int count)
     const int32_t* data2_32;
     unsigned char* p = wavbuffer;
     int scale = wavinfo.sampledepth - 15;
+
+    /* Prevent idle poweroff */
+    rb->reset_poweroff_timer();
 
     if (wavinfo.sampledepth <= 16) {
         data1_16 = ch1;
@@ -445,24 +497,145 @@ static void codec_thread(void)
     rb->remove_thread(NULL);
 }
 
-/* plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+static unsigned char* codec_stack;
+static size_t codec_stack_size;
+
+static enum plugin_status test_track(char* filename)
 {
     size_t n;
     int fd;
-    int i;
     enum plugin_status res = PLUGIN_OK;
     unsigned long starttick;
     unsigned long ticks;
     unsigned long speed;
     unsigned long duration;
-    unsigned char* codec_stack;
-    unsigned char* codec_stack_copy;
-    size_t codec_stack_size;
     struct thread_entry* codecthread_id;
-    int result, selection = 0;
     char* ch;
-    int line = 0;
+
+    /* Display filename (excluding any path)*/
+    ch = rb->strrchr(filename, '/');
+    if (ch==NULL)
+       ch = filename; 
+    else
+       ch++;
+
+    rb->snprintf(str,sizeof(str),"%s",ch);
+    log_text(str,true);
+
+    log_text("Loading...",false);
+
+    fd = rb->open(filename,O_RDONLY);
+    if (fd < 0)
+    {
+        log_text("Cannot open file",true);
+        return PLUGIN_ERROR;
+    }
+
+    track.filesize = rb->filesize(fd);
+
+    /* Clear the id3 struct */
+    rb->memset(&track.id3, 0, sizeof(struct mp3entry));
+
+    if (!rb->get_metadata(&track, fd, filename,
+		      rb->global_settings->id3_v1_first))
+    {
+        log_text("Cannot read metadata",true);
+        return PLUGIN_ERROR;
+    }
+    
+    if (track.filesize > audiosize)
+    {
+        log_text("File too large",true);
+        return PLUGIN_ERROR;
+    }
+
+    n = rb->read(fd, audiobuf, track.filesize);
+
+    if (n != track.filesize)
+    {
+        log_text("Read failed.",true);
+        res = PLUGIN_ERROR;
+        goto exit;
+    }
+
+    /* Initialise the function pointers in the codec API */
+    init_ci();
+
+    /* Prepare the codec struct for playing the whole file */
+    ci.filesize = track.filesize;
+    ci.id3 = &track.id3;
+    ci.taginfo_ready = &taginfo_ready;
+    ci.curpos = 0;
+    ci.stop_codec = false;
+    ci.new_track = 0;
+    ci.seek_time = 0;
+
+    starttick = *rb->current_tick;
+
+    codec_playing = true;
+
+    if ((codecthread_id = rb->create_thread(codec_thread,
+        (uint8_t*)codec_stack, codec_stack_size, "testcodec" IF_PRIO(,PRIORITY_PLAYBACK)
+        IF_COP(, CPU, false))) == NULL)
+    {
+        log_text("Cannot create codec thread!",true);
+        goto exit;
+    }
+
+    /* Wait for codec thread to die */
+    while (codec_playing)
+    {
+        rb->sleep(HZ);
+        rb->snprintf(str,sizeof(str),"%d of %d",elapsed,(int)track.id3.length);
+        log_text(str,false);
+    }
+    /* Save the current time before we spin up the disk to access the log */
+    ticks = *rb->current_tick - starttick;
+
+    log_text(str,true);
+    
+    /* Close WAV file (if there was one) */
+    if (wavinfo.fd >= 0) {
+        close_wav();
+        log_text("Wrote /test.wav",true);
+    } else {
+        /* Display benchmark information */
+        rb->snprintf(str,sizeof(str),"Decode time - %d.%02ds",(int)ticks/100,(int)ticks%100);
+        log_text(str,true);
+
+        duration = track.id3.length / 10;
+        rb->snprintf(str,sizeof(str),"File duration - %d.%02ds",(int)duration/100,(int)duration%100);
+        log_text(str,true);
+
+        if (ticks > 0)
+            speed = duration * 10000 / ticks;
+        else
+            speed = 0;
+
+        rb->snprintf(str,sizeof(str),"%d.%02d%% realtime",(int)speed/100,(int)speed%100);
+        log_text(str,true);
+    }
+
+    /* Write an empty line to the log */
+    log_text("",true);
+
+exit:
+    return res;
+}
+
+/* plugin entry point */
+enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+{
+    unsigned char* codec_stack_copy;
+    int result, selection = 0;
+    enum plugin_status res = PLUGIN_OK;
+    int scandir;
+    int i;
+    struct dirent *entry;
+    DIR* dir;
+    char* ch;
+    char dirpath[MAX_PATH];
+    char filename[MAX_PATH];
 
     rb = api;
 
@@ -506,43 +679,40 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->memcpy(codec_stack_copy,codec_stack,codec_stack_size);    
 #endif
 
-    fd = rb->open(parameter,O_RDONLY);
-    if (fd < 0)
-    {
-        rb->splash(HZ*2, "Cannot open file");
-        return PLUGIN_ERROR;
-    }
-
-    track.filesize = rb->filesize(fd);
-
-    if (!rb->get_metadata(&track, fd, parameter,
-		      rb->global_settings->id3_v1_first))
-    {
-        rb->splash(HZ*2, "Cannot read metadata");
-        return PLUGIN_ERROR;
-    }
-    
-    if (track.filesize > audiosize)
-    {
-        rb->splash(HZ*2, "File too large");
-        return PLUGIN_ERROR;
-    }
-
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif
     rb->lcd_clear_display();
     rb->lcd_update();
 
-    MENUITEM_STRINGLIST(menu,"test_codec",NULL,"Speed test","Write WAV");
+    MENUITEM_STRINGLIST(
+        menu, "test_codec", NULL,
+        "Speed test",
+        "Speed test folder",
+        "Write WAV",
+    );
 
     rb->lcd_clear_display();
 
     result=rb->do_menu(&menu,&selection);
 
+    scandir = 0;
+
     if (result==0) {
         wavinfo.fd = -1;
+        log_init(false);
     } else if (result==1) {
+        wavinfo.fd = -1;
+        scandir = 1;
+
+        /* Only create a log file when we are testing a folder */
+        if (!log_init(true)) {
+            rb->splash(HZ*2, "Cannot create logfile");
+            res = PLUGIN_ERROR;
+            goto exit;
+        }
+    } else if (result==2) {
+        log_init(false);
         init_wav("/test.wav");
         if (wavinfo.fd < 0) {
             rb->splash(HZ*2, "Cannot create /test.wav");
@@ -557,92 +727,38 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         goto exit;
     }
 
-    rb->lcd_clear_display();
-    rb->splash(0, "Loading...");
-    rb->lcd_clear_display();
+    if (scandir) {
+        /* Test all files in the same directory as the file selected by the
+           user */
 
-    n = rb->read(fd, audiobuf, track.filesize);
+        rb->strncpy(dirpath,parameter,sizeof(dirpath));
+        ch = rb->strrchr(dirpath,'/');
+        ch[1]=0;
 
-    if (n != track.filesize)
-    {
-        rb->splash(HZ*2, "Read failed.");
-        res = PLUGIN_ERROR;
-        goto exit;
-    }
+        DEBUGF("Scanning directory \"%s\"\n",dirpath);
+        dir = rb->opendir(dirpath);
+        if (dir) {
+            entry = rb->readdir(dir);
+            while (entry) {
+                if (!(entry->attribute & ATTR_DIRECTORY)) {
+                    rb->snprintf(filename,sizeof(filename),"%s%s",dirpath,entry->d_name);
+                    test_track(filename);
+                }
 
-    /* Initialise the function pointers in the codec API */
-    init_ci();
-
-    /* Prepare the codec struct for playing the whole file */
-    ci.filesize = track.filesize;
-    ci.id3 = &track.id3;
-    ci.taginfo_ready = &taginfo_ready;
-    ci.curpos = 0;
-    ci.stop_codec = false;
-    ci.new_track = 0;
-    ci.seek_time = 0;
-
-    starttick = *rb->current_tick;
-
-    codec_playing = true;
-
-    if ((codecthread_id = rb->create_thread(codec_thread,
-        (uint8_t*)codec_stack, codec_stack_size, "testcodec" IF_PRIO(,PRIORITY_PLAYBACK)
-        IF_COP(, CPU, false))) == NULL)
-    {
-        rb->splash(HZ, "Cannot create codec thread!");
-        goto exit;
-    }
-
-    /* Display filename (excluding any path)*/
-    ch = rb->strrchr(parameter, '/');
-    if (ch==NULL)
-       ch = parameter; 
-    else
-       ch++;
-
-    rb->snprintf(str,sizeof(str),"%s",ch);
-    rb->lcd_puts(0,line++,str);
-
-    /* Wait for codec thread to die */
-    while (codec_playing)
-    {
-        rb->sleep(HZ);
-        rb->snprintf(str,sizeof(str),"%d of %d",elapsed,(int)track.id3.length);
-        rb->lcd_puts(0,line,str);
-        rb->lcd_update();
-    }
-    line++;
-    
-    /* Close WAV file (if there was one) */
-    if (wavinfo.fd >= 0) {
-        close_wav();
-        rb->lcd_puts(0,line++,"Wrote /test.wav");
+                /* Read next entry */
+                entry = rb->readdir(dir);
+            }
+        }
     } else {
-        /* Display benchmark information */
+        /* Just test the file */
+        res = test_track(parameter);
 
-        ticks = *rb->current_tick - starttick;
-        rb->snprintf(str,sizeof(str),"Decode time - %d.%02ds",(int)ticks/100,(int)ticks%100);
-        rb->lcd_puts(0,line++,str);
-
-        duration = track.id3.length / 10;
-        rb->snprintf(str,sizeof(str),"File duration - %d.%02ds",(int)duration/100,(int)duration%100);
-        rb->lcd_puts(0,line++,str);
-
-        if (ticks > 0)
-            speed = duration * 10000 / ticks;
-        else
-            speed = 0;
-
-        rb->snprintf(str,sizeof(str),"%d.%02d%% realtime",(int)speed/100,(int)speed%100);
-        rb->lcd_puts(0,line++,str);
-
+        while (rb->button_get(true) != TESTCODEC_EXITBUTTON);
     }
-    rb->lcd_update();
-
-    while (rb->button_get(true) != TESTCODEC_EXITBUTTON);
 
 exit:
+    log_close();
+
 #ifndef SIMULATOR
     /* Restore the codec thread's stack */
     rb->memcpy(codec_stack, codec_stack_copy, codec_stack_size);    
