@@ -391,6 +391,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
     int stack_top = 0;
     bool in_stringlist, done = false;
     menu_callback_type menu_callback = NULL;
+    bool talk_item = false;
     if (start_menu == NULL)
         menu = &main_menu_;
     else menu = start_menu;
@@ -413,6 +414,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
     
     while (!done)
     {
+        talk_item = false;
         gui_syncstatusbar_draw(&statusbars, true);
         action = get_action(CONTEXT_MAINMENU,HZ); 
         /* HZ so the status bar redraws corectly */
@@ -436,7 +438,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
 
         if (gui_synclist_do_button(&lists,action,LIST_WRAP_UNLESS_HELD))
         {
-            talk_menu_item(menu, &lists);
+            talk_item = true;
         }
         else if (action == ACTION_TREE_WPS)
         {
@@ -477,9 +479,9 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                     done = true;
                 init_menu_lists(menu, &lists, 
                                  menu_stack_selected_item[stack_top], false);
-                talk_menu_item(menu, &lists);
                 /* new menu, so reload the callback */
                 get_menu_callback(menu, &menu_callback);
+                talk_item = true;
             }
             else if (menu != &root_menu_)
             {
@@ -519,12 +521,13 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                         stack_top++;
                         init_menu_lists(temp, &lists, 0, true);
                         menu = temp;
-                        talk_menu_item(menu, &lists);
+                        talk_item = true;
                     }
                     break;
                 case MT_FUNCTION_CALL:
                 {
                     int return_value;
+                    talk_item = true;
                     action_signalscreenchange();
                     if (temp->flags&MENU_FUNC_USEPARAM)
                         return_value = temp->function->function_w_param(
@@ -546,6 +549,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                 {
                     if (do_setting_from_menu(temp))
                         init_menu_lists(menu, &lists, 0, true);
+                    talk_item = true;
                     break;
                 }
                 case MT_RETURN_ID:
@@ -562,6 +566,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                         stack_top++;
                         menu = temp;
                         init_menu_lists(menu,&lists,0,false);
+                        talk_item = true;
                         in_stringlist = true;
                     }
                     break;
@@ -596,6 +601,8 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
             ret = MENU_ATTACHED_USB;
             done = true;
         }
+        if (talk_item && !done)
+            talk_menu_item(menu, &lists);
     }
     action_signalscreenchange();
     if (start_selected)
