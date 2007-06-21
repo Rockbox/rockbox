@@ -212,6 +212,7 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
     bool draw_cursor;
     int i;
     int lines;
+    static int last_lines[NB_SCREENS] = {0};
 #ifdef HAVE_LCD_BITMAP
     int item_offset;
     int old_margin = display->getxmargin();
@@ -221,6 +222,7 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
 
 #ifdef HAVE_LCD_BITMAP
     display->setfont(FONT_UI);
+    gui_textarea_update_nblines(display);
 #endif
     /* Speed up UI by drawing the changed contents only. */
     if (gui_list == last_list_displayed[gui_list->display->screen_type]
@@ -230,10 +232,12 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
         partial_draw = true;
     }
 
-    if (SHOW_LIST_TITLE)
-        lines = display->nb_lines - 1;
-    else
-        lines = display->nb_lines;
+    lines = display->nb_lines - SHOW_LIST_TITLE;
+    if (last_lines[display->screen_type] != lines)
+    {
+        gui_list_select_at_offset(gui_list, 0);
+        last_lines[display->screen_type] = lines;
+    }
 
     if (partial_draw)
     {
