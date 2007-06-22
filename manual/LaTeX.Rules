@@ -117,6 +117,7 @@ END_FILE  := $(shell ls $(DOCUMENT).end 2>/dev/null)
 TEX_FILES := $(DOCUMENT).tex
 OTHER_FILES := $(DOCUMENT).blg $(DOCUMENT).log $(DOCUMENT).out
 INDEX_ARGS := -s mkidx.ist
+LATEXOPTS := -interaction=nonstopmode
 
 # grab the contents of \bibliograph{} commands
 ifeq ($(BIB_FILES),)
@@ -215,13 +216,13 @@ check_for_sources :
 #
 
 define run-latex
-	@function saveold () { for file ; do [ -f $${file} ] && cp -fp $${file} $${file}.old ; done ; true ; } ; \
-	function restoreold () { for file ; do [ -f $${file}.old ] && mv -f $${file}.old $${file} ; done ; true ; } ; \
-	function deleteold ()  { for file ; do rm -f $${file}.old ; done ; true ; } ; \
-	function makeobsolete () { touch -r $$(ls *.old | tail -n 1) $${1} ; true ; } ; \
-	function nochange () { for file ; do [ ! -f $${1} ] || cmp $${1} $${1}.old >/dev/null || return ; done ; true ; } ; \
+	@saveold() { for file ; do [ -f $${file} ] && cp -fp $${file} $${file}.old ; done ; true ; } ; \
+	restoreold() { for file ; do [ -f $${file}.old ] && mv -f $${file}.old $${file} ; done ; true ; } ; \
+	deleteold()  { for file ; do rm -f $${file}.old ; done ; true ; } ; \
+	makeobsolete() { touch -r $$(ls *.old | tail -n 1) $${1} ; true ; } ; \
+	nochange() { for file ; do [ ! -f $${1} ] || cmp $${1} $${1}.old >/dev/null || return ; done ; true ; } ; \
 	saveold $(MONITOR_FILES) ; \
-	if $(LATEX) $* ; then \
+	if $(LATEX) $(LATEXOPTS) $* ; then \
 	   if nochange $(MONITOR_FILES) ; then \
 	      echo "$(MAKE): LaTeX auxiliary files did not change (processing is complete)" ; \
 	      restoreold $(MONITOR_FILES) ; \
