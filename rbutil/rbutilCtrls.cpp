@@ -439,35 +439,33 @@ void DeviceSelectorCtrl::OnAutoDetect(wxCommandEvent& event)
 
 void DeviceSelectorCtrl::AutoDetect()
 {
+    UsbDeviceInfo device;
 
-
-    UsbDeviceInfo device = detectDevicesViaPatchers();
-
-    if( device.status == NODEVICE)
+    if(detectDevices(&device))
     {
-        WARN_DIALOG(wxT("No Device detected. (This function currently only works for Ipods and Sansas)."),
-                wxT("Detecting a Device"));
-        return;
-    }
 
-    if( device.status == TOMANYDEVICES)
-    {
-         WARN_DIALOG(wxT("More then one device detected, please connect only One"),
-                wxT("Detecting a Device"));
-        return;
-
-    }
-
-    if (device.status == 0 )   /* everything is ok */
-    {
-        m_deviceCbx->SetValue(gv->plat_name[device.device_index]);
-        gv->curplat=gv->plat_id[device.device_index];
-
-        if(device.path != wxT(""))
+        if(device.status == DEVICEFOUND)
         {
-            gv->curdestdir = device.path;
-        }
+            m_deviceCbx->SetValue(gv->plat_name[device.device_index]);
+            gv->curplat=gv->plat_id[device.device_index];
 
+            if(device.path != wxT(""))
+            {
+                gv->curdestdir = device.path;
+            }
+        }
+        else if(device.status == TOMANYDEVICES)
+        {
+             WARN_DIALOG(wxT("More then one device detected, please connect only One"),
+                wxT("Detecting a Device"));
+              return;
+        }
+    }
+    else
+    {
+        WARN_DIALOG(wxT("No Device detected. (This function only works if you have already installed rockbox or if you use a ipod or a sansa)."),
+                wxT("Detecting a Device"));
+        return;
     }
 
 }

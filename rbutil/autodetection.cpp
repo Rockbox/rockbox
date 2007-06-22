@@ -24,72 +24,137 @@
 * General autodetection code
 ****************************************************/
 
-
-UsbDeviceInfo detectDevicesViaPatchers()
+bool ipodpatcherDetect(UsbDeviceInfo* tempdevice)
 {
-    UsbDeviceInfo tempdevice;
-    tempdevice.device_index= 0;
-    tempdevice.path=wxT("");
-    tempdevice.status =0;
-
-    /* scann for ipods */
-
+   /* use ipodpatcher for ipod detecting */
     struct ipod_t ipod;
     int n = ipod_scan(&ipod);
-    if(n == 1)
+    if(n == 1)  /* we found an ipod */
     {
         wxString temp(ipod.targetname,wxConvUTF8);
         int index = gv->plat_bootloadername.Index(temp);   // use the bootloader names..
-        tempdevice.device_index = index;
+        tempdevice->device_index = index;
+        tempdevice->status=DEVICEFOUND;
+
         /* find mount point if possible */
 #if !(defined( __WXMSW__ ) || defined( __DARWIN__))          //linux code
         wxString tmp = resolve_mount_point(wxString(ipod.diskname,wxConvUTF8)+wxT("2"));
         if( tmp != wxT("") )
-            tempdevice.path = tmp;
+            tempdevice->path = tmp;
 #endif
-#if defined( __WXMSW__ )                                 //Windows code
-        wxString tmp = guess_mount_point();
-        if( tmp != wxT("") )
-           tempdevice.path = tmp;
-#endif
-        return tempdevice;
+        return true;
+
     }
-    else if (n > 1)
+    else if (n > 1)  /* to many ipods */
     {
-        tempdevice.status = TOMANYDEVICES;
-        return tempdevice;
+        tempdevice->status = TOMANYDEVICES;
+        return true;
+    }
+    else  /* no ipod */
+    {
+        return false;
     }
 
-    /* scann for sansas */
+}
+
+bool sansapatcherDetect(UsbDeviceInfo* tempdevice)
+{
+   /* scann for sansas */
     struct sansa_t sansa;
-    int n2 = sansa_scan(&sansa);
-    if(n2==1)
+    int n = sansa_scan(&sansa);
+    if(n==1)
     {
-        tempdevice.device_index = gv->plat_id.Index(wxT("sansae200"));
+        tempdevice->device_index = gv->plat_id.Index(wxT("sansae200"));
+        tempdevice->status = DEVICEFOUND;
        /* find mount point if possible */
 #if !(defined( __WXMSW__ ) || defined( __DARWIN__))    //linux code
         wxString tmp = resolve_mount_point(wxString(ipod.diskname,wxConvUTF8)+wxT("1"));
         if( tmp != wxT("") )
-           tempdevice.path = tmp;
+           tempdevice->path = tmp;
 #endif
-#if defined( __WXMSW__ )                              // windows code
-        wxString tmp = guess_mount_point();
-        if( tmp != wxT("") )
-           tempdevice.path = tmp;
-#endif
-        return tempdevice;
+        return true;
     }
     else if (n > 1)
     {
-        tempdevice.status = TOMANYDEVICES;
-        return tempdevice;
+        tempdevice->status = TOMANYDEVICES;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+
+bool rockboxinfoDetect(wxString filename,UsbDeviceInfo* tempdevice)
+{
+    wxTextFile rockboxinfo(filename);
+    rockboxinfo.Open();
+    wxString line = rockboxinfo.GetFirstLine();
+    wxString targetstring;
+    if(line.StartsWith(wxT("Target: "), &targetstring))
+    {
+        int index = gv->plat_id.Index(targetstring);
+        if(index < 0) return false;
+
+        tempdevice->device_index = index;
+        wxString myPath;
+        if(filename.EndsWith(wxT(".rockbox" PATH_SEP "rockbox-info.txt"),&myPath));
+            tempdevice->path = myPath;
+
+        tempdevice->status = DEVICEFOUND;
+
+        return true;
+    }
+    else
+    {
+        return false;
     }
 
 
-    tempdevice.status = NODEVICE;
-    return tempdevice;
-
 }
+
+
+bool detectDevices(UsbDeviceInfo* tempdevice)
+{
+    tempdevice->device_index= 0;
+    tempdevice->path=wxT("");
+    tempdevice->status =NODEVICE;
+
+    /* try ipodpatcher */
+    if(ipodpatcherDetect(tempdevice))
+    {
+        return true;
+    }
+
+    /* try sansapatcher */
+    if(sansapatcherDetect(tempdevice))
+    {
+        return true;
+    }
+
+    /*try via files on the devices */
+    wxArrayString mountpoints = getPossibleMountPoints();
+
+    for(unsigned int i=0;i<mountpoints.GetCount();i++)
+    {
+        if(wxDir::Exists(mountpoints[i]))
+        {
+            /*check for rockbox-info.txt */
+            wxString filename;
+            filename.Printf("%s" PATH_SEP ".rockbox" PATH_SEP "rockbox-info.txt",mountpoints[i].c_str());
+            if(wxFile::Exists(filename))
+            {
+                if(rockboxinfoDetect(filename,tempdevice))
+                     return true;
+            }
+
+        }
+    }
+
+    return false;
+}
+
 
 
 
@@ -99,103 +164,37 @@ UsbDeviceInfo detectDevicesViaPatchers()
 ****************************************************/
 #if defined( __WXMSW__ )
 
-wxString guess_mount_point()
+wxArrayString getPossibleMountPoints()
 {
-   wxString mountpoint = wxT("");
-   TCHAR szDrvName[33];
-   DWORD maxDriveSet, curDriveSet;
-   DWORD drive;
-   TCHAR szBuf[300];
-   HANDLE hDevice;
-   PSTORAGE_DEVICE_DESCRIPTOR pDevDesc;
+    wxArrayString tempList;
+    tempList.Add(wxT("D:\\"));
+    tempList.Add(wxT("E:\\"));
+    tempList.Add(wxT("F:\\"));
+    tempList.Add(wxT("G:\\"));
+    tempList.Add(wxT("H:\\"));
+    tempList.Add(wxT("I:\\"));
+    tempList.Add(wxT("J:\\"));
+    tempList.Add(wxT("K:\\"));
+    tempList.Add(wxT("L:\\"));
+    tempList.Add(wxT("M:\\"));
+    tempList.Add(wxT("N:\\"));
+    tempList.Add(wxT("O:\\"));
+    tempList.Add(wxT("P:\\"));
+    tempList.Add(wxT("Q:\\"));
+    tempList.Add(wxT("R:\\"));
+    tempList.Add(wxT("S:\\"));
+    tempList.Add(wxT("T:\\"));
+    tempList.Add(wxT("U:\\"));
+    tempList.Add(wxT("V:\\"));
+    tempList.Add(wxT("W:\\"));
+    tempList.Add(wxT("X:\\"));
+    tempList.Add(wxT("Y:\\"));
+    tempList.Add(wxT("Z:\\"));
 
-   maxDriveSet = GetLogicalDrives();
-   curDriveSet = maxDriveSet;
-   for ( drive = 0; drive < 32; ++drive )
-   {
-      if ( maxDriveSet & (1 << drive) )
-      {
-          DWORD temp = 1<<drive;
-          _stprintf( szDrvName, _T("%c:\\"), 'A'+drive );
-		  switch ( GetDriveType( szDrvName ) )
-          {
-             case 0:					// The drive type cannot be determined.
-			 case 1:					// The root directory does not exist.
-             case DRIVE_CDROM:		    // The drive is a CD-ROM drive.
-             case DRIVE_REMOTE:		    // The drive is a remote (network) drive.
-			 case DRIVE_RAMDISK:		// The drive is a RAM disk.
-             case DRIVE_REMOVABLE:	    // The drive can be removed from the drive.
-            	break;
-			 case DRIVE_FIXED:		    // The disk cannot be removed from the drive.
-				sprintf(szBuf, "\\\\?\\%c:", 'A'+drive);
-				hDevice = CreateFile(szBuf, GENERIC_READ,
-							FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, NULL, NULL);
-
-				if (hDevice != INVALID_HANDLE_VALUE)
-				{
-					pDevDesc = (PSTORAGE_DEVICE_DESCRIPTOR)new BYTE[sizeof(STORAGE_DEVICE_DESCRIPTOR) + 512 - 1];
-					pDevDesc->Size = sizeof(STORAGE_DEVICE_DESCRIPTOR) + 512 - 1;
-
-					if(GetDisksProperty(hDevice, pDevDesc))
-					{
-						if(pDevDesc->BusType == BusTypeUsb)
-						{
-							mountpoint.Printf(wxT("%c:\\"), chFirstDriveFromMask(temp));
-						}
-					}
-					delete pDevDesc;
-					CloseHandle(hDevice);
-				}
-				break;
- 		  }
-      }
-   }
-   return mountpoint;
-
+    return tempList;
 }
 
 
-
-/****************************************************************************
-*    FUNCTION: GetDisksProperty(HANDLE hDevice, PSTORAGE_DEVICE_DESCRIPTOR pDevDesc)
-*    PURPOSE:  get the info of specified device
-*****************************************************************************/
-BOOL GetDisksProperty(HANDLE hDevice, PSTORAGE_DEVICE_DESCRIPTOR pDevDesc)
-{
-	STORAGE_PROPERTY_QUERY	Query;	// input param for query
-	DWORD dwOutBytes;				// IOCTL output length
-	BOOL bResult;					// IOCTL return val
-
-	// specify the query type
-	Query.PropertyId = StorageDeviceProperty;
-	Query.QueryType = PropertyStandardQuery;
-
-	// Query using IOCTL_STORAGE_QUERY_PROPERTY
-	bResult = ::DeviceIoControl(hDevice,			// device handle
-			IOCTL_STORAGE_QUERY_PROPERTY,			// info of device property
-			&Query, sizeof(STORAGE_PROPERTY_QUERY),	// input data buffer
-			pDevDesc, pDevDesc->Size,				// output data buffer
-			&dwOutBytes,							// out's length
-			(LPOVERLAPPED)NULL);
-
-	return bResult;
-}
-
-/*********************************************
-* Converts the driveMask to a drive letter
-*******************************************/
-char chFirstDriveFromMask (ULONG unitmask)
-{
-
-      char i;
-      for (i = 0; i < 26; ++i)
-      {
-           if (unitmask & 0x1)
-				break;
-            unitmask = unitmask >> 1;
-      }
-    return (i + 'A');
-}
 #endif /* windows code */
 
 /**********************************************************
@@ -203,7 +202,22 @@ char chFirstDriveFromMask (ULONG unitmask)
 *******************************************************/
 #if !(defined( __WXMSW__ ) || defined( __DARWIN__))
 
+wxArrayString getPossibleMountPoints()
+{
+    wxArrayString tempList;
 
+    FILE *fp = fopen( "/proc/mounts", "r" );
+    if( !fp ) return wxT("");
+    char *dev, *dir;
+    while( fscanf( fp, "%as %as %*s %*s %*s %*s", &dev, &dir ) != EOF )
+    {
+        wxString directory = wxString( dir, wxConvUTF8 );
+        tempList.Add(directory);
+        free( dev );
+        free( dir );
+    }
+    fclose( fp );
+}
 
 wxString resolve_mount_point( const wxString device )
 {
@@ -228,4 +242,31 @@ wxString resolve_mount_point( const wxString device )
 
 
 
-#endif
+#endif /* linux code */
+
+/**********************************************************
+* MAC  code for autodetection
+*******************************************************/
+#if  defined( __DARWIN__)
+
+wxArrayString getPossibleMountPoints()
+{
+    wxArrayString tempList;
+
+    wxDir volumes;
+
+    if(volumes.Open(wxT("/Volumes")))
+    {
+        wxString filename;
+        bool cont = volumes.GetFirst(&filename, wxEmptyString, wxDIR_DIRS);
+        while ( cont )
+        {
+            tempList.Add(filename);
+            cont = dir.GetNext(&filename);
+        }
+    }
+    return tempList;
+
+}
+
+#endif /* Mac Code */

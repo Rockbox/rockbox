@@ -93,6 +93,8 @@
 		</Linker>
 		<Unit filename="Makefile" />
 		<Unit filename="archos.ico" />
+		<Unit filename="autodetection.cpp" />
+		<Unit filename="autodetection.h" />
 		<Unit filename="bootloaders.cpp" />
 		<Unit filename="bootloaders.h" />
 		<Unit filename="copying.txt" />
