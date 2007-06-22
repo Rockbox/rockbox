@@ -115,12 +115,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 59
+#define PLUGIN_API_VERSION 60
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 58
+#define PLUGIN_MIN_API_VERSION 60
 
 /* plugin return codes */
 enum plugin_status {
@@ -179,6 +179,7 @@ struct plugin_api {
                             int stride, int x, int y, int width, int height);
     void (*lcd_bitmap)(const fb_data *src, int x, int y, int width,
                        int height);
+    fb_data* (*lcd_get_backdrop)(void);
     void (*lcd_set_backdrop)(fb_data* backdrop);
 #endif
 #if LCD_DEPTH == 16
@@ -310,6 +311,9 @@ struct plugin_api {
 #endif
     void (*ata_spindown)(int seconds);
     void (*reload_directory)(void);
+    char *(*create_numbered_filename)(char *buffer, const char *path,
+                                      const char *prefix, const char *suffix,
+                                      int numberlen IF_CNFN_NUM_(, int *num));
 
     /* dir */
     DIR* (*PREFIX(opendir))(const char* name);
@@ -333,6 +337,7 @@ struct plugin_api {
     long* current_tick;
     long (*default_event_handler)(long event);
     long (*default_event_handler_ex)(long event, void (*callback)(void *), void *parameter);
+    struct thread_entry* threads;
     struct thread_entry* (*create_thread)(void (*function)(void), void* stack,
                                           int stack_size, const char *name
                                           IF_PRIO(, int priority)
@@ -507,11 +512,19 @@ struct plugin_api {
     bool (*set_option)(const char* string, void* variable,
                        enum optiontype type, const struct opt_items* options,
                        int numoptions, void (*function)(int));
+    bool (*set_bool_options)(const char* string, bool* variable,
+                             const char* yes_str, int yes_voice,
+                             const char* no_str, int no_voice,
+                             void (*function)(bool));
     bool (*set_int)(const unsigned char* string, const char* unit, int voice_unit,
                     int* variable, void (*function)(int), int step, int min,
                     int max, void (*formatter)(char*, int, int, const char*) );
     bool (*set_bool)(const char* string, bool* variable );
 
+#ifdef HAVE_LCD_COLOR
+    bool (*set_color)(struct screen *display, char *title, unsigned *color,
+                   unsigned banned_color);
+#endif
     /* action handling */
     int (*get_custom_action)(int context,int timeout,
                           const struct button_mapping* (*get_context_map)(int));
@@ -587,11 +600,6 @@ struct plugin_api {
     int (*wheel_status)(void);
     void (*wheel_send_events)(bool send);
 #endif
-#if LCD_DEPTH > 1
-    fb_data* (*lcd_get_backdrop)(void);
-#endif
-    /* new stuff at the end, sort into place next time
-       the API gets incompatible */
 
 #ifdef IRIVER_H100_SERIES
     /* Routines for the iriver_flash -plugin. */
@@ -599,6 +607,8 @@ struct plugin_api {
     bool (*detect_flashed_ramimage)(void);
     bool (*detect_flashed_romimage)(void);
 #endif
+    /* new stuff at the end, sort into place next time
+       the API gets incompatible */
 
 #if NUM_CORES > 1
     void (*spinlock_init)(struct mutex *m);
@@ -608,23 +618,9 @@ struct plugin_api {
 
 #if (CONFIG_CODEC == SWCODEC)
     int (*codec_load_file)(const char* codec, struct codec_api *api);
+    const char *(*get_codec_filename)(int cod_spec);
     bool (*get_metadata)(struct track_info* track, int fd, const char* trackname,
                          bool v1first);
-    const char *(*get_codec_filename)(int cod_spec);
-#endif
-    struct thread_entry* threads;
-    
-    char *(*create_numbered_filename)(char *buffer, const char *path,
-                                      const char *prefix, const char *suffix,
-                                      int numberlen IF_CNFN_NUM_(, int *num));
-
-    bool (*set_bool_options)(const char* string, bool* variable,
-                             const char* yes_str, int yes_voice,
-                             const char* no_str, int no_voice,
-                             void (*function)(bool));
-#ifdef HAVE_LCD_COLOR
-    bool (*set_color)(struct screen *display, char *title, unsigned *color,
-                   unsigned banned_color);
 #endif
 };
 

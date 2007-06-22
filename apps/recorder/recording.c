@@ -70,11 +70,20 @@
 #include "radio.h"
 #ifdef HAVE_RECORDING
 
-static bool in_screen = false;   
-     
+/* recording screen status flags */
+enum rec_status_flags
+{
+    RCSTAT_IN_RECSCREEN      = 0x00000001,
+    RCSTAT_BEEN_IN_USB_MODE  = 0x00000002,
+    RCSTAT_CREATED_DIRECTORY = 0x00000004,
+    RCSTAT_HAVE_RECORDED     = 0x00000008,
+};
+
+static int rec_status = 0;
+
 bool in_recording_screen(void)   
 {   
-    return in_screen;   
+    return (rec_status & RCSTAT_IN_RECSCREEN) != 0;
 } 
 
 #define PM_HEIGHT ((LCD_HEIGHT >= 72) ? 2 : 1)
@@ -92,13 +101,13 @@ static bool remote_display_on = true;
 #endif
 
 /** File name creation **/
-#if CONFIG_CODEC == SWCODEC
-
-#ifdef IF_CNFN_NUM
+#if CONFIG_RTC == 0
 /* current file number to assist in creating unique numbered filenames
    without actually having to create the file on disk */
 static int file_number = -1;
-#endif /* IF_CNFN_NUM */
+#endif /* CONFIG_RTC */
+
+#if CONFIG_CODEC == SWCODEC
 
 #define REC_FILE_ENDING(rec_format) \
     (audio_formats[rec_format_afmt[rec_format]].ext_list)
@@ -511,15 +520,25 @@ char *rec_create_filename(char *buffer)
     snprintf(ext, sizeof(ext), ".%s",
              REC_FILE_ENDING(global_settings.rec_format));
 
-#if CONFIG_RTC 
+#if CONFIG_RTC == 0
+    return create_numbered_filename(buffer, buffer, "rec_", ext, 4,
+                                    &file_number);
+#else
     /* We'll wait at least up to the start of the next second so no duplicate
        names are created */
     return create_datetime_filename(buffer, buffer, "R", ext, true);
-#else
-    return create_numbered_filename(buffer, buffer, "rec_", ext, 4
-                                    IF_CNFN_NUM_(, &file_number));
 #endif
 }
+
+#if CONFIG_RTC == 0
+/* Hit disk to get a starting filename for the type */
+void rec_init_filename(void)
+{
+    file_number = -1;
+    rec_create_filename(path_buffer);
+    file_number--;
+}
+#endif
 
 int rec_create_directory(void)
 {
@@ -594,7 +613,6 @@ void rec_record(void)
 #if CONFIG_CODEC != SWCODEC
     talk_buffer_steal(); /* we use the mp3 buffer */
 #endif
-    IF_CNFN_NUM_(file_number = -1;) /* Hit disk for number   */
     audio_record(rec_create_filename(path_buffer));
 }
 
@@ -617,12 +635,15 @@ static void trigger_listener(int trigger_status)
     switch (trigger_status)
     {
         case TRIG_GO:
-            if((audio_status() & AUDIO_STATUS_RECORD) != AUDIO_STATUS_RECORD)
+            if(!(audio_status() & AUDIO_STATUS_RECORD))
             {
+                rec_status |= RCSTAT_HAVE_RECORDED;
                 rec_record();
+#if CONFIG_CODEC != SWCODEC
                 /* give control to mpeg thread so that it can start
                    recording */
                 yield(); yield(); yield();
+#endif
             }
 
             /* if we're already recording this is a retrigger */
@@ -648,11 +669,7 @@ static void trigger_listener(int trigger_status)
                 switch(global_settings.rec_trigger_type)
                 {
                     case 0: /* Stop */
-#if CONFIG_CODEC == SWCODEC
                         audio_stop_recording();
-#else
-                        audio_stop();
-#endif
                         break;
 
                     case 1: /* Pause */
@@ -686,11 +703,9 @@ bool recording_screen(bool no_source)
     char buf2[32];
     int w, h;
     int update_countdown = 1;
-    bool have_recorded = false;
     unsigned int seconds;
     int hours, minutes;
     char filename[13];
-    bool been_in_usb_mode = false;
     int last_audio_stat = -1;
     int audio_stat;
 #if CONFIG_CODEC == SWCODEC
@@ -733,7 +748,7 @@ bool recording_screen(bool no_source)
 
     struct audio_recording_options rec_options;
 
-    in_screen = true;
+    rec_status = RCSTAT_IN_RECSCREEN;
     cursor = 0;
 #if (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)
     ata_set_led_enabled(false);
@@ -761,6 +776,15 @@ bool recording_screen(bool no_source)
     rec_set_recording_options(&rec_options);
 
     set_gain();
+
+    if(rec_create_directory() > 0)
+        rec_status |= RCSTAT_CREATED_DIRECTORY;
+
+#if CONFIG_RTC == 0
+    /* Create new filename for recording start */
+    rec_init_filename();
+#endif
+
     settings_apply_trigger();
 
 #ifdef HAVE_AGC
@@ -788,9 +812,7 @@ bool recording_screen(bool no_source)
         filename_offset[i] = ((screens[i].height >= 80) ? 1 : 0);
         pm_y[i] = 8 + h * (2 + filename_offset[i]);
     }
-    
-    if(rec_create_directory() > 0)
-        have_recorded = true;
+
 #ifdef HAVE_REMOTE_LCD
     if (!remote_display_on)
     {
@@ -859,9 +881,9 @@ bool recording_screen(bool no_source)
 
         if (last_audio_stat != audio_stat)
         {
-            if (audio_stat == AUDIO_STATUS_RECORD)
+            if (audio_stat & AUDIO_STATUS_RECORD)
             {
-                have_recorded = true;
+                rec_status |= RCSTAT_HAVE_RECORDED;
             }
             last_audio_stat = audio_stat;
         }
@@ -926,7 +948,7 @@ bool recording_screen(bool no_source)
                         (peak_meter_trigger_status() != TRIG_OFF))
                     {
                         /* manual recording */
-                        have_recorded = true;
+                        rec_status |= RCSTAT_HAVE_RECORDED;
                         rec_record();
                         last_seconds = 0;
                         if (global_settings.talk_menu)
@@ -1119,7 +1141,11 @@ bool recording_screen(bool no_source)
                 break;
                 
             case ACTION_STD_MENU:
+#if CONFIG_CODEC == SWCODEC
+                if(!(audio_stat & AUDIO_STATUS_RECORD))
+#else
                 if(audio_stat != AUDIO_STATUS_RECORD)
+#endif
                 {
 #ifdef HAVE_FMRADIO_REC
                     const int prev_rec_source = global_settings.rec_source;
@@ -1132,7 +1158,7 @@ bool recording_screen(bool no_source)
                     if (recording_menu(no_source))
                     {
                         done = true;
-                        been_in_usb_mode = true;
+                        rec_status |= RCSTAT_BEEN_IN_USB_MODE;
 #ifdef HAVE_FMRADIO_REC
                         radio_status = FMRADIO_OFF;
 #endif
@@ -1152,11 +1178,18 @@ bool recording_screen(bool no_source)
                         audio_close_recording();
                         audio_init_recording(0);
 #endif
+
                         rec_init_recording_options(&rec_options);
                         rec_set_recording_options(&rec_options);
 
                         if(rec_create_directory() > 0)
-                            have_recorded = true;
+                            rec_status |= RCSTAT_CREATED_DIRECTORY;
+
+#if CONFIG_CODEC == SWCODEC && CONFIG_RTC == 0
+                        /* If format changed, a new number is required */
+                        rec_init_filename();
+#endif
+
 #ifdef HAVE_AGC
                         if (global_settings.rec_source == AUDIO_SRC_MIC) {
                             agc_preset = global_settings.rec_agc_preset_mic;
@@ -1192,7 +1225,7 @@ bool recording_screen(bool no_source)
 #endif
                     if (f2_rec_screen())
                     {
-                        have_recorded = true;
+                        rec_status |= RCSTAT_HAVE_RECORDED;
                         done = true;
                     }
                     else
@@ -1208,31 +1241,28 @@ bool recording_screen(bool no_source)
                 }
                 else
                 {
-                    if(audio_stat != AUDIO_STATUS_RECORD)
-                    {
 #if (CONFIG_LED == LED_REAL)
-                        /* led is restored at begin of loop / end of function */
-                        led(false);
+                    /* led is restored at begin of loop / end of function */
+                    led(false);
 #endif
-                        if (f3_rec_screen())
-                        {
-                            have_recorded = true;
-                            done = true;
-                        }
-                        else
-                            update_countdown = 1; /* Update immediately */
+                    if (f3_rec_screen())
+                    {
+                        rec_status |= RCSTAT_HAVE_RECORDED;
+                        done = true;
                     }
+                    else
+                        update_countdown = 1; /* Update immediately */
                 }
                 break;
 #endif /*  CONFIG_KEYPAD == RECORDER_PAD */
 
             case SYS_USB_CONNECTED:
                 /* Only accept USB connection when not recording */
-                if(audio_stat != AUDIO_STATUS_RECORD)
+                if(!(audio_stat & AUDIO_STATUS_RECORD))
                 {
                     default_event_handler(SYS_USB_CONNECTED);
                     done = true;
-                    been_in_usb_mode = true;
+                    rec_status |= RCSTAT_BEEN_IN_USB_MODE;
 #ifdef HAVE_FMRADIO_REC
                     radio_status = FMRADIO_OFF;
 #endif
@@ -1467,12 +1497,11 @@ bool recording_screen(bool no_source)
             {
                 switch (global_settings.rec_source)
                 {
-#if defined(HAVE_LINE_REC) || defined(HAVE_FMRADIO_REC)
                 HAVE_LINE_REC_(case AUDIO_SRC_LINEIN:)
                 HAVE_FMRADIO_REC_(case AUDIO_SRC_FMRADIO:)
                     line[i] = 5;
                     break;
-#endif
+
                 case AUDIO_SRC_MIC:
                     line[i] = 4;
                     break;
@@ -1678,7 +1707,7 @@ bool recording_screen(bool no_source)
                 break;
         }
     }
-    
+
 #if CONFIG_CODEC == SWCODEC
     audio_stop_recording(); 
     audio_close_recording();
@@ -1704,13 +1733,15 @@ bool recording_screen(bool no_source)
     peak_meter_trigger(false);
     peak_meter_set_trigger_listener(NULL);
 
-    in_screen = false;
+    rec_status &= ~RCSTAT_IN_RECSCREEN;
     sound_settings_apply();
 
     FOR_NB_SCREENS(i)
         screens[i].setfont(FONT_UI);
 
-    if (have_recorded)
+    /* if the directory was created or recording happened, make sure the
+       browser is updated */
+    if (rec_status & (RCSTAT_CREATED_DIRECTORY | RCSTAT_HAVE_RECORDED))
         reload_directory();
 
 #if (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)
@@ -1719,7 +1750,7 @@ bool recording_screen(bool no_source)
 
 	settings_save();
 
-    return been_in_usb_mode;
+    return (rec_status & RCSTAT_BEEN_IN_USB_MODE) != 0;
 } /* recording_screen */
 
 #if CONFIG_KEYPAD == RECORDER_PAD

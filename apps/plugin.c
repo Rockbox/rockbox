@@ -104,6 +104,7 @@ static const struct plugin_api rockbox_api = {
     lcd_get_background,
     lcd_bitmap_part,
     lcd_bitmap,
+    lcd_get_backdrop,
     lcd_set_backdrop,
 #endif
 #if LCD_DEPTH == 16
@@ -217,6 +218,7 @@ static const struct plugin_api rockbox_api = {
 #endif
     ata_spindown,
     reload_directory,
+    create_numbered_filename,
 
     /* dir */
     PREFIX(opendir),
@@ -241,6 +243,7 @@ static const struct plugin_api rockbox_api = {
     &current_tick,
     default_event_handler,
     default_event_handler_ex,
+    threads,
     create_thread,
     remove_thread,
     reset_poweroff_timer,
@@ -403,8 +406,12 @@ static const struct plugin_api rockbox_api = {
     gui_syncstatusbar_draw,
     /* options */
     set_option,
+    set_bool_options,
     set_int,
     set_bool,
+#ifdef HAVE_LCD_COLOR
+    set_color,
+#endif
 
     /* action handling */
     get_custom_action,
@@ -470,12 +477,6 @@ static const struct plugin_api rockbox_api = {
     wheel_status,
     wheel_send_events,
 #endif
-#if LCD_DEPTH > 1
-    lcd_get_backdrop,
-#endif
-
-    /* new stuff at the end, sort into place next time
-       the API gets incompatible */
 
 #ifdef IRIVER_H100_SERIES
     /* Routines for the iriver_flash -plugin. */
@@ -483,7 +484,8 @@ static const struct plugin_api rockbox_api = {
     detect_flashed_ramimage,
     detect_flashed_romimage,
 #endif
-
+    /* new stuff at the end, sort into place next time
+       the API gets incompatible */
 #if NUM_CORES > 1
     spinlock_init,
     spinlock_lock,
@@ -492,14 +494,8 @@ static const struct plugin_api rockbox_api = {
 
 #if (CONFIG_CODEC == SWCODEC)
     codec_load_file,
-    get_metadata,
     get_codec_filename,
-#endif
-    threads,
-    create_numbered_filename,
-    set_bool_options,
-#ifdef HAVE_LCD_COLOR
-    set_color,
+    get_metadata,
 #endif
 };
 
