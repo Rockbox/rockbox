@@ -68,7 +68,7 @@ bool sansapatcherDetect(UsbDeviceInfo* tempdevice)
         tempdevice->status = DEVICEFOUND;
        /* find mount point if possible */
 #if !(defined( __WXMSW__ ) || defined( __DARWIN__))    //linux code
-        wxString tmp = resolve_mount_point(wxString(ipod.diskname,wxConvUTF8)+wxT("1"));
+        wxString tmp = resolve_mount_point(wxString(sansa.diskname,wxConvUTF8)+wxT("1"));
         if( tmp != wxT("") )
            tempdevice->path = tmp;
 #endif
