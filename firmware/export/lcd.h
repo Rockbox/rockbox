@@ -392,6 +392,9 @@ struct scrollinfo {
     bool backward; /* scroll presently forward or backward? */
     bool bidir;
     long start_tick;
+#ifdef HAVE_LCD_COLOR
+    int line_colour;
+#endif
 };
 
 #endif /* __LCD_H__ */

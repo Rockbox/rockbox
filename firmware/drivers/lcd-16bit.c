@@ -807,7 +807,8 @@ void lcd_puts_style_offset(int x, int y, const unsigned char *str, int style,
 {
     int xpos,ypos,w,h,xrect;
     int lastmode = drawmode;
-    int oldcolor = fg_pattern;
+    int oldfgcolor = fg_pattern;
+    int oldbgcolor = bg_pattern;
 
     /* make sure scrolling is turned off on the line we are updating */
     scrolling_lines &= ~(1 << y);
@@ -820,15 +821,19 @@ void lcd_puts_style_offset(int x, int y, const unsigned char *str, int style,
     ypos = ymargin + y*h;
     drawmode = (style & STYLE_INVERT) ?
                (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
-    if (drawmode == DRMODE_SOLID && style & STYLE_COLORED) {
-        fg_pattern = style & STYLE_COLOR_MASK;
+    if (style & STYLE_COLORED) {
+        if (drawmode == DRMODE_SOLID)
+            fg_pattern = style & STYLE_COLOR_MASK;
+        else
+            bg_pattern = style & STYLE_COLOR_MASK;
     }
     lcd_putsxyofs(xpos, ypos, offset, str);
     drawmode ^= DRMODE_INVERSEVID;
     xrect = xpos + MAX(w - offset, 0);
     lcd_fillrect(xrect, ypos, LCD_WIDTH - xrect, h);
     drawmode = lastmode;
-    fg_pattern = oldcolor;
+    fg_pattern = oldfgcolor;
+    bg_pattern = oldbgcolor;
 }
 
 /*** scrolling ***/
@@ -938,6 +943,8 @@ void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
         s->offset = offset;
         s->startx = xmargin + x * s->width / s->len;
         s->backward = false;
+        s->line_colour = (style&STYLE_COLORED)?
+                            (style&STYLE_COLOR_MASK): -1;
         scrolling_lines |= (1<<y);
     }
     else
@@ -952,6 +959,7 @@ static void scroll_thread(void)
     int index;
     int xpos, ypos;
     int lastmode;
+    unsigned old_bgcolour, old_fgcolour;
 
     /* initialize scroll struct array */
     scrolling_lines = 0;
@@ -961,17 +969,31 @@ static void scroll_thread(void)
             sleep(scroll_ticks);
             continue;
         }
+        old_fgcolour = lcd_get_foreground();
+        old_bgcolour = lcd_get_background();
         for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
             /* really scroll? */
             if ( !(scrolling_lines&(1<<index)) )
                 continue;
 
             s = &scroll[index];
-
             /* check pause */
             if (TIME_BEFORE(current_tick, s->start_tick))
                 continue;
-
+            if (s->line_colour >= 0)
+            {
+                if (s->invert)
+                {
+                    lcd_set_foreground(old_fgcolour);
+                    lcd_set_background(s->line_colour);
+                }
+                else
+                {
+                    lcd_set_foreground(s->line_colour);
+                    lcd_set_background(old_bgcolour);
+                }
+            }
+            
             if (s->backward)
                 s->offset -= scroll_step;
             else
@@ -1008,7 +1030,8 @@ static void scroll_thread(void)
             drawmode = lastmode;
             lcd_update_rect(xpos, ypos, LCD_WIDTH - xpos, pf->height);
         }
-
+        lcd_set_foreground(old_fgcolour);
+        lcd_set_background(old_bgcolour);
         sleep(scroll_ticks);
     }
 }
