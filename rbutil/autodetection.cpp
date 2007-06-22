@@ -207,7 +207,7 @@ wxArrayString getPossibleMountPoints()
     wxArrayString tempList;
 
     FILE *fp = fopen( "/proc/mounts", "r" );
-    if( !fp ) return wxT("");
+    if( !fp ) return tempList;
     char *dev, *dir;
     while( fscanf( fp, "%as %as %*s %*s %*s %*s", &dev, &dir ) != EOF )
     {
@@ -217,6 +217,8 @@ wxArrayString getPossibleMountPoints()
         free( dir );
     }
     fclose( fp );
+
+    return tempList;
 }
 
 wxString resolve_mount_point( const wxString device )
