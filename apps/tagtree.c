@@ -69,6 +69,7 @@ enum variables {
 static long *uniqbuf;
 
 #define MAX_TAGS 5
+#define MAX_MENU_ID_SIZE 32
 
 static struct tagcache_search tcs, tcs2;
 static bool sort_inverse;
@@ -122,9 +123,8 @@ struct menu_entry {
 
 struct root_menu {
     char title[64];
-    char id[32];
+    char id[MAX_MENU_ID_SIZE];
     int itemcount;
-    struct root_menu *parent;
     struct menu_entry *items[TAGMENU_MAX_ITEMS];
 };
 
@@ -517,6 +517,7 @@ static bool parse_search(struct menu_entry *entry, const char *str)
     struct search_instruction *inst = entry->si;
     char buf[MAX_PATH];
     int i;
+    struct root_menu *new_menu;
     
     strp = str;
     
@@ -542,12 +543,25 @@ static bool parse_search(struct menu_entry *entry, const char *str)
             if (!strcasecmp(menus[i]->id, buf))
             {
                 entry->link = i;
-                menus[i]->parent = menu;
                 return true;
             }
         }
         
-        return false;
+        if (menu_count >= TAGMENU_MAX_MENUS)
+        {
+            logf("max menucount reached");
+            return false;
+        }
+        
+        /* Allocate a new menu unless link is found. */
+        menus[menu_count] = buffer_alloc(sizeof(struct root_menu));
+        new_menu = menus[menu_count];
+        memset(new_menu, 0, sizeof(struct root_menu));
+        strncpy(new_menu->id, buf, MAX_MENU_ID_SIZE-1);
+        entry->link = menu_count;
+        ++menu_count;
+        
+        return true;
     }
     
     if (entry->type != menu_next)
@@ -738,7 +752,6 @@ static int parse_line(int n, const char *buf, void *parameters)
         if (read_menu)
         {
             /* End the menu */
-            menu_count++;
             read_menu = false;
         }
         return 0;
@@ -779,21 +792,36 @@ static int parse_line(int n, const char *buf, void *parameters)
                     return 0;
                 }
             
-                menus[menu_count] = buffer_alloc(sizeof(struct root_menu));
-                menu = menus[menu_count];
-                memset(menu, 0, sizeof(struct root_menu));
-                if (get_token_str(menu->id, sizeof(menu->id)) < 0)
+                if (get_token_str(data, sizeof data) < 0)
                 {
                     logf("%%menu_start id empty");
                     return 0;
                 }
+            
+                menu = NULL;
+                for (i = 0; i < menu_count; i++)
+                {
+                    if (!strcasecmp(menus[i]->id, data))
+                    {
+                        menu = menus[i];
+                    }
+                }
+            
+                if (menu == NULL) 
+                {
+                    menus[menu_count] = buffer_alloc(sizeof(struct root_menu));
+                    menu = menus[menu_count];
+                    ++menu_count;
+                    memset(menu, 0, sizeof(struct root_menu));
+                    strncpy(menu->id, data, MAX_MENU_ID_SIZE-1);
+                }
+            
                 if (get_token_str(menu->title, sizeof(menu->title)) < 0)
                 {
                     logf("%%menu_start title empty");
                     return 0;
                 }
                 logf("menu: %s", menu->title);
-                menu->itemcount = 0;
                 read_menu = true;
                 break;
                 
