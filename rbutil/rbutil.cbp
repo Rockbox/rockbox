@@ -91,6 +91,9 @@
 			<Add directory="$(#WX.lib)" />
 			<Add directory=".\" />
 		</Linker>
+		<ExtraCommands>
+			<Add before="cmd /c icons\bin2c.exe icons\*.png" />
+		</ExtraCommands>
 		<Unit filename="Makefile" />
 		<Unit filename="archos.ico" />
 		<Unit filename="autodetection.cpp" />
@@ -103,6 +106,32 @@
 		<Unit filename="h100sums.h" />
 		<Unit filename="h120sums.h" />
 		<Unit filename="h300sums.h" />
+		<Unit filename="icons\bin2c.c">
+			<Option compilerVar="CC" />
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="icons\bootloader_btn.cpp" />
+		<Unit filename="icons\bootloader_btn.h" />
+		<Unit filename="icons\bootloader_btn.png" />
+		<Unit filename="icons\doom_btn.cpp" />
+		<Unit filename="icons\doom_btn.h" />
+		<Unit filename="icons\doom_btn.png" />
+		<Unit filename="icons\font_btn.cpp" />
+		<Unit filename="icons\font_btn.h" />
+		<Unit filename="icons\font_btn.png" />
+		<Unit filename="icons\rbinstall_btn.cpp" />
+		<Unit filename="icons\rbinstall_btn.h" />
+		<Unit filename="icons\rbinstall_btn.png" />
+		<Unit filename="icons\rembootloader_btn.cpp" />
+		<Unit filename="icons\rembootloader_btn.h" />
+		<Unit filename="icons\rembootloader_btn.png" />
+		<Unit filename="icons\remrb_btn.cpp" />
+		<Unit filename="icons\remrb_btn.h" />
+		<Unit filename="icons\remrb_btn.png" />
+		<Unit filename="icons\themes_btn.cpp" />
+		<Unit filename="icons\themes_btn.h" />
+		<Unit filename="icons\themes_btn.png" />
 		<Unit filename="install_3d.xpm" />
 		<Unit filename="install_dialogs.cpp" />
 		<Unit filename="install_dialogs.h" />

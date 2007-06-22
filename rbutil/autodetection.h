@@ -41,7 +41,7 @@ struct UsbDeviceInfo
 
 bool detectDevices(UsbDeviceInfo* tempdevice);
 
-wxArrayString getPossibleMountPoints(); /* this funktion has to be implemented for every OS
+wxArrayString getPossibleMountPoints(); /* this funktion has to be implemented for every OS */
 
 
 /********************************

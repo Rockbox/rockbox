@@ -59,6 +59,7 @@
 #include <wx/notebook.h>
 #include <wx/html/htmlwin.h>
 #include <wx/hyperlink.h>
+#include <wx/mstream.h>
 
 #ifdef __WXMSW__
 #define PATH_SEP "\\"
@@ -132,6 +133,7 @@ public:
 
 extern GlobalVars* gv;
 
+
 wxString wxFindAppPath(const wxString& argv0, const wxString& cwd,
     const wxString& appVariableName);
 int DownloadURL(wxString src, wxString dest);
@@ -142,6 +144,8 @@ bool InstallTheme(wxString src);
 bool checkZip(wxString zipname);
 wxString stream_err_str(int errnum);
 bool rm_rf(wxString file);
+
+wxBitmap wxGetBitmapFromMemory(const unsigned char *data,int length);
 
 
 #define ERR_DIALOG(msg, title) \

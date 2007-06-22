@@ -21,6 +21,12 @@
 #include "rbutil.h"
 #include "installlog.h"
 
+/* this function gets a Bitmap from embedded memory */
+wxBitmap wxGetBitmapFromMemory(const unsigned char *data,int length)
+{
+    wxMemoryInputStream istream( data,length);
+    return wxBitmap(wxImage(istream, wxBITMAP_TYPE_ANY, -1), -1);
+}
 
 // This class allows us to return directories as well as files to
 // wxDir::Traverse

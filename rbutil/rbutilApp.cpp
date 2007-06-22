@@ -78,6 +78,8 @@ bool rbutilFrmApp::OnInit()
     }
     ReadUserConfig();
 
+    wxInitAllImageHandlers();       //init Image handlers
+
     rbutilFrm *myFrame = new  rbutilFrm(NULL);
     SetTopWindow(myFrame);
 
@@ -85,8 +87,6 @@ bool rbutilFrmApp::OnInit()
 
     initIpodpatcher();             // reserve mem for ipodpatcher
     initSansaPatcher();            // reserve mem for sansapatcher
-
-    wxInitAllImageHandlers();       //init Image handlers
 
     wxLogVerbose(wxT("=== end rbUtilFrmApp::OnInit()"));
     return TRUE;

@@ -22,17 +22,19 @@
 #include "credits.h"
 
 #include "rbutilFrm_XPM.xpm"
-#include "install_3d.xpm"
-#include "uninstall_3d.xpm"
-#include "fonts_3d.xpm"
-#include "tools2_3d.xpm"
+#include "icons/rbinstall_btn.h"
+#include "icons/remrb_btn.h"
+#include "icons/font_btn.h"
+#include "icons/bootloader_btn.h"
+#include "icons/rembootloader_btn.h"
+#include "icons/themes_btn.h"
+#include "icons/doom_btn.h"
+
 #include "rblogo.xpm"
-#include "untools2_3d.xpm"
-#include "themes_3d.xpm"
-#include "doom_3d.xpm"
 
 #include "bootloaders.h"
 #include "install_dialogs.h"
+
 
 
 //----------------------------------------------------------------------------
@@ -125,7 +127,8 @@ void rbutilFrm::CreateGUIControls(void)
 	wxFlexGridSizer* WxFlexGridSizer1 = new wxFlexGridSizer(2,2,0,0);
 	WxStaticBoxSizer3->Add(WxFlexGridSizer1,0,wxGROW | wxALL,0);
 
-    wxBitmap BootloaderInstallButton (tools2_3d_xpm);
+
+    wxBitmap BootloaderInstallButton (wxGetBitmapFromMemory(bootloader_btn_png,bootloader_btn_png_length));
     WxBitmapButton4 = new wxBitmapButton(installpage, ID_BOOTLOADER_BTN,
         BootloaderInstallButton, wxPoint(0,0), wxSize(64,54),
         wxRAISED_BORDER | wxBU_AUTODRAW, wxDefaultValidator,wxT("Bootloader Installation"));
@@ -141,7 +144,7 @@ void rbutilFrm::CreateGUIControls(void)
 	WxFlexGridSizer1->Add(WxStaticText5, 0,
         wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL,5);
 
-	wxBitmap WxBitmapButton1_BITMAP (install_3d_xpm);
+	wxBitmap WxBitmapButton1_BITMAP (wxGetBitmapFromMemory(rbinstall_btn_png,rbinstall_btn_png_length));
 	WxBitmapButton1 = new wxBitmapButton(installpage, ID_INSTALL_BTN,
         WxBitmapButton1_BITMAP, wxPoint(0,0), wxSize(64,54),
         wxRAISED_BORDER | wxBU_AUTODRAW, wxDefaultValidator,
@@ -172,7 +175,7 @@ void rbutilFrm::CreateGUIControls(void)
 	wxFlexGridSizer* WxFlexGridSizer2 = new wxFlexGridSizer(2,2,0,0);
 	WxStaticBoxSizer4->Add(WxFlexGridSizer2,0,wxGROW | wxALL,0);
 
-    wxBitmap FontInstallButton (fonts_3d_xpm);
+    wxBitmap FontInstallButton (wxGetBitmapFromMemory(font_btn_png,font_btn_png_length));
     WxBitmapButton3 = new wxBitmapButton(themepage, ID_FONT_BTN,
         FontInstallButton, wxPoint(0,0), wxSize(64,54),
         wxRAISED_BORDER | wxBU_AUTODRAW,wxDefaultValidator, wxT("Font installation"));
@@ -189,7 +192,7 @@ void rbutilFrm::CreateGUIControls(void)
 	WxFlexGridSizer2->Add(WxStaticText4, 0,
         wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL,5);
 
-    wxBitmap ThemesInstallButton (themes_3d_xpm);
+    wxBitmap ThemesInstallButton (wxGetBitmapFromMemory(themes_btn_png,themes_btn_png_length));
     WxBitmapButton5 = new wxBitmapButton(themepage, ID_THEMES_BTN,
         ThemesInstallButton, wxPoint(0,0), wxSize(64,54),
         wxRAISED_BORDER | wxBU_AUTODRAW,wxDefaultValidator, wxT("Theme installation"));
@@ -203,7 +206,7 @@ void rbutilFrm::CreateGUIControls(void)
         wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL,5);
 
 
-    wxBitmap DoomInstallButton (doom_3d_xpm);
+    wxBitmap DoomInstallButton (wxGetBitmapFromMemory(doom_btn_png,doom_btn_png_length));
     WxBitmapButton6 = new wxBitmapButton(themepage, ID_DOOM_BTN,
         DoomInstallButton, wxPoint(0,0), wxSize(64,54),
         wxRAISED_BORDER | wxBU_AUTODRAW,wxDefaultValidator, wxT("Freedoom installation"));
@@ -233,7 +236,7 @@ void rbutilFrm::CreateGUIControls(void)
 	wxFlexGridSizer* WxFlexGridSizer3 = new wxFlexGridSizer(2,2,0,0);
 	WxStaticBoxSizer5->Add(WxFlexGridSizer3,0,wxGROW | wxALL,0);
 
-	wxBitmap WxBitmapButton2_BITMAP (uninstall_3d_xpm);
+	wxBitmap WxBitmapButton2_BITMAP (wxGetBitmapFromMemory(remrb_btn_png,remrb_btn_png_length));
 	WxBitmapButton2 = new wxBitmapButton(uninstallpage, ID_REMOVE_BTN,
         WxBitmapButton2_BITMAP, wxPoint(0,0), wxSize(64,54),
         wxRAISED_BORDER | wxBU_AUTODRAW,wxDefaultValidator, wxT("Rockbox uninstallation"));
@@ -246,7 +249,7 @@ void rbutilFrm::CreateGUIControls(void)
 	WxFlexGridSizer3->Add(WxStaticText3,0,
         wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL,5);
 
-    wxBitmap WxBitmapButton4_BITMAP (untools2_3d_xpm);
+    wxBitmap WxBitmapButton4_BITMAP (wxGetBitmapFromMemory(rembootloader_btn_png,rembootloader_btn_png_length));
 	WxBitmapButton4 = new wxBitmapButton(uninstallpage, ID_BOOTLOADERREMOVE_BTN,
         WxBitmapButton4_BITMAP, wxPoint(0,0), wxSize(64,54),
         wxRAISED_BORDER | wxBU_AUTODRAW, wxDefaultValidator,
