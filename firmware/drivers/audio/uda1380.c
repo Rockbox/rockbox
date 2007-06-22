@@ -266,7 +266,7 @@ void audiohw_init(void)
     if (audiohw_set_regs() == -1)
     {
         /* this shoud never (!) happen. */
-        logf("uda1380: audiohw_init failed")
+        logf("uda1380: audiohw_init failed");
     }
 }
 
