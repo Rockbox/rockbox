@@ -10,9 +10,13 @@
 # Unix-style Makefile for rbutil
 
 CXX=$(shell $(PREFIX)wx-config --version=2.8 --cxx)
-INC =
+INC = `$(PREFIX)wx-config --version=2.8 --cxxflags`
+LIBS = `$(PREFIX)wx-config --version=2.8 --libs`
 CFLAGS = -Wall -Wundef -DRBUTIL -D_LARGEFILE64_SOURCE
-OBJS=rbutil.o rbutilApp.o rbutilFrm.o rbutilCtrls.o install_dialogs.o bootloaders.o installlog.o ipodpatcher/ipodpatcher.o ipodpatcher/ipodio-posix.o sansapatcher/sansapatcher.o sansapatcher/sansaio-posix.o irivertools.o md5sum.o autodetection.o
+OBJS=rbutil.o rbutilApp.o rbutilFrm.o rbutilCtrls.o install_dialogs.o bootloaders.o installlog.o ipodpatcher/ipodpatcher.o ipodpatcher/ipodio-posix.o sansapatcher/sansapatcher.o sansapatcher/sansaio-posix.o irivertools.o md5sum.o autodetection.o 
+EXTRAOBJS = $(wildcard icons/*.o)
+
+SILENT = @
 
 # Install into /usr/local by default
 ifndef DESTDIR
@@ -29,23 +33,31 @@ ifdef WIN
 endif
 
 .PHONY: all
-all: rbutil$(EXT)
-
+all: icons rbutil$(EXT)
+	
 .cpp.o :
-	$(CXX) $(CFLAGS) $(INC) -c `$(PREFIX)wx-config --version=2.8 --cxxflags` -o $@ $<
+	$(SILENT) echo CXX $<
+	$(SILENT) $(CXX) $(CFLAGS) $(INC) -c -o $@ $<
 
 .c.o :
-	$(CC) $(CFLAGS) $(INC) -c `$(PREFIX)wx-config --version=2.8 --cxxflags` -o $@ $<
+	$(SILENT) echo CC $<
+	$(SILENT) $(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
 rbutil-rc.o: rbutil-rc.rc
-	$(WINDRES) `$(PREFIX)wx-config --version=2.8 --cxxflags` -O coff -F pe-i386 -o $@ $<
+	$(WINDRES) -O coff -F pe-i386 -o $@ $<
 
-rbutil$(EXT): $(OBJS)
-	$(CXX) -o $@ $(OBJS) `$(PREFIX)wx-config --version=2.8 --libs`
+rbutil$(EXT): $(OBJS) 
+	$(SILENT) echo CXX $<
+	$(SILENT) $(CXX) -o $@ $(OBJS) $(EXTRAOBJS) $(LIBS)
+
+.PHONY: icons
+icons:
+	$(SILENT) $(MAKE) -C icons
 
 .PHONY: clean
 clean:
 	rm -f rbutil rbutil.exe $(OBJS) *~
+	make -C icons clean
 
 .PHONY: install
 	install -D rbutil$(EXT) $(DESTDIR)/bin/rbutil$(EXT)
