@@ -352,7 +352,7 @@ void  rbutilFrm::OnManualUpdate(wxUpdateUIEvent& event)
 void rbutilFrm::OnFileProxy(wxCommandEvent& event)
 {
 
-    wxTextEntryDialog proxydlg(this,wxT("Please enter your Proxy in the Format: URL:PORT"),wxT("Proxy Configuration"));
+    wxTextEntryDialog proxydlg(this,wxT("Please enter your Proxy in the Format: URL:PORT"),wxT("Proxy Configuration"), gv->proxy_url);
 
     if(proxydlg.ShowModal() == wxID_OK)
     {
