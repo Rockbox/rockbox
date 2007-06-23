@@ -50,7 +50,7 @@
  		if ((cp3 = strrchr(ofname, '\\')) != NULL)
  			++cp3;
  		else
- 			cp3 = ofname;
+ 			cp3 = (char*) ofname;
  	}
  	
  	strcpy(buf2, cp3);
