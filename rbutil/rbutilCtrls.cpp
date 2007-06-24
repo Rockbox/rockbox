@@ -466,12 +466,7 @@ bool DeviceSelectorCtrl::AutoDetect()
               return true;
         }
     }
-    else
-    {
-
-        return false;
-    }
-
+    return false;
 }
 
 /////////////////////////////////////////////
