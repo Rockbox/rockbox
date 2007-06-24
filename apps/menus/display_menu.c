@@ -427,6 +427,10 @@ static int peak_meter_scale(void) {
             /* we only store -dBfs */
             global_settings.peak_meter_min = -peak_meter_get_min() / 100;
             global_settings.peak_meter_max = -peak_meter_get_max() / 100;
+            
+            /* limit the returned value to the allowed range */
+            if(global_settings.peak_meter_min > 89)
+                global_settings.peak_meter_min = 89;
         } else {
             int max;
 
