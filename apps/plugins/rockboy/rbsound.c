@@ -7,6 +7,8 @@ struct pcm pcm IBSS_ATTR;
 #define N_BUFS 2
 #define BUF_SIZE 2048
 
+#if CONFIG_CODEC == SWCODEC
+
 bool doneplay=1;
 bool bufnum=0;
 
@@ -80,3 +82,26 @@ int pcm_submit(void)
     return 1;
 }
 
+#else
+
+void pcm_init(void)
+{
+    pcm.hz = 44100;
+    pcm.stereo = 1;
+    pcm.buf = NULL;
+    pcm.len = 0;
+    pcm.pos = 0;
+}
+
+void pcm_close(void)
+{
+    memset(&pcm, 0, sizeof pcm);
+}
+
+int pcm_submit(void)
+{
+    pcm.pos =0;
+    return 0;
+}
+
+#endif
