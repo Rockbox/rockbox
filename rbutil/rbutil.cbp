@@ -18,6 +18,7 @@
 				<Option compiler="gcc" />
 				<Option projectResourceIncludeDirsRelation="0" />
 				<ExtraCommands>
+					<Add before="cmd /c cd icons &amp;&amp; bin2c.exe *.png" />
 					<Add after="upx --best --compress-icons=0  rbutil.exe" />
 				</ExtraCommands>
 				<MakeCommands>
@@ -91,9 +92,6 @@
 			<Add directory="$(#WX.lib)" />
 			<Add directory=".\" />
 		</Linker>
-		<ExtraCommands>
-			<Add before="cmd /c cd icons &amp;&amp; bin2c.exe *.png" />
-		</ExtraCommands>
 		<Unit filename="Makefile" />
 		<Unit filename="archos.ico" />
 		<Unit filename="autodetection.cpp" />

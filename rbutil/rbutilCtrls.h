@@ -177,7 +177,7 @@ public:
    wxString getDevice();
    void setDefault();
 
-   void AutoDetect();
+   bool AutoDetect();
 
 protected:
     wxString m_currentDevice;

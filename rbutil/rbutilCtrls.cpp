@@ -433,11 +433,15 @@ void DeviceSelectorCtrl::OnComboBox(wxCommandEvent& event)
 
 void DeviceSelectorCtrl::OnAutoDetect(wxCommandEvent& event)
 {
-    AutoDetect();
+    if(!AutoDetect())
+    {
+        WARN_DIALOG(wxT("No Device detected. If you have a Device connected, select the correct one manually."),
+                wxT("Detecting a Device"));
+    }
 }
 
 
-void DeviceSelectorCtrl::AutoDetect()
+bool DeviceSelectorCtrl::AutoDetect()
 {
     UsbDeviceInfo device;
 
@@ -453,19 +457,19 @@ void DeviceSelectorCtrl::AutoDetect()
             {
                 gv->curdestdir = device.path;
             }
+            return true;
         }
         else if(device.status == TOMANYDEVICES)
         {
              WARN_DIALOG(wxT("More then one device detected, please connect only One"),
                 wxT("Detecting a Device"));
-              return;
+              return true;
         }
     }
     else
     {
-        WARN_DIALOG(wxT("No Device detected. If you have a Device connected, select the correct one manually."),
-                wxT("Detecting a Device"));
-        return;
+
+        return false;
     }
 
 }
