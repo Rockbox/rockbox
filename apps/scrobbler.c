@@ -139,7 +139,7 @@ static bool scrobbler_flush_callback(void)
     return true;
 }
 
-static void add_to_cache(void)
+static void add_to_cache(unsigned long play_length)
 {
     if ( cache_pos >= SCROBBLER_MAX_CACHE )
         write_cache();
@@ -149,8 +149,7 @@ static void add_to_cache(void)
 
     logf("SCROBBLER: add_to_cache[%d]", cache_pos);
 
-    if ( audio_prev_elapsed() >
-        (scrobbler_entry.length/2) )
+    if ( play_length > (scrobbler_entry.length/2) )
         rating = 'L'; /* Listened */
 
     if (scrobbler_entry.tracknum > 0)
@@ -193,7 +192,7 @@ void scrobbler_change_event(struct mp3entry *id)
 {
     /* add entry using the previous scrobbler_entry and timestamp */
     if (pending)
-        add_to_cache();
+        add_to_cache(audio_prev_elapsed());
 
     /*  check if track was resumed > %50 played
         check for blank artist or track name */
@@ -219,7 +218,7 @@ void scrobbler_change_event(struct mp3entry *id)
 int scrobbler_init(void)
 {
     logf("SCROBBLER: init %d", global_settings.audioscrobbler);
-    
+
     if(!global_settings.audioscrobbler)
         return -1;
 
@@ -239,8 +238,8 @@ void scrobbler_flush_cache(void)
     {
         /* Add any pending entries to the cache */
         if(pending)
-            add_to_cache();
-        
+            add_to_cache(audio_prev_elapsed());
+
         /* Write the cache to disk if needed */
         if (cache_pos)
             write_cache();
@@ -257,11 +256,26 @@ void scrobbler_shutdown(void)
 #endif
 
     scrobbler_flush_cache();
-    
+
     if (scrobbler_initialised)
     {
         audio_set_track_changed_event(NULL);
         scrobbler_initialised = false;
+    }
+}
+
+void scrobbler_poweroff(void)
+{
+    if (scrobbler_initialised && pending)
+    {
+        if ( audio_status() )
+            add_to_cache(audio_current_track()->elapsed);
+        else
+            add_to_cache(audio_prev_elapsed());
+
+        /* scrobbler_shutdown is called later, the cache will be written
+        *  make sure the final track isn't added twice when that happens */
+        pending = false;
     }
 }
 

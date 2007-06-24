@@ -21,4 +21,5 @@ void scrobbler_change_event(struct mp3entry *id);
 int scrobbler_init(void);
 void scrobbler_flush_cache(void);
 void scrobbler_shutdown(void);
+void scrobbler_poweroff(void);
 bool scrobbler_is_enabled(void);

@@ -605,6 +605,8 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 #else
     int i;
 
+    scrobbler_poweroff();
+
 #if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING)
     if(!charger_inserted())
 #endif

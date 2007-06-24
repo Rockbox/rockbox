@@ -3271,6 +3271,8 @@ static void audio_stop_playback(void)
         /* Save the current playing spot, or NULL if the playlist has ended */
         playlist_update_resume_info(id3);
 
+        prev_track_elapsed = CUR_TI->id3.elapsed;
+
         /* Increment index so runtime info is saved in audio_clear_track_entries().
          * Done here, as audio_stop_playback() may be called more than once.
          * Don't update runtime unless playback is stopped because of end of playlist.

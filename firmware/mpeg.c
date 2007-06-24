@@ -2727,6 +2727,11 @@ void audio_play(long offset)
 void audio_stop(void)
 {
 #ifndef SIMULATOR
+    if (playing)
+    {
+        struct trackdata *track = get_trackdata(0);
+        prev_track_elapsed = track->id3.elapsed;
+    }
     mpeg_stop_done = false;
     queue_post(&mpeg_queue, MPEG_STOP, 0);
     while(!mpeg_stop_done)
