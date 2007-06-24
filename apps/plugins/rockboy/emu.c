@@ -35,7 +35,7 @@ void emu_run(void)
     /*void *timer = sys_timer();*/
     int framesin=0,frames=0,timeten=*rb->current_tick, timehun=*rb->current_tick;
 
-    setvidmode(options.fullscreen);
+    setvidmode();
     vid_begin();
     lcd_begin();
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -49,9 +49,19 @@ void emu_run(void)
             emu_step();
 
         rtc_tick();   /* RTC support not implemented */
-        
-        if(options.sound || !plugbuf)
+
+        if (options.sound || !plugbuf)
+		{
             sound_mix();
+            pcm_submit();
+		}
+		else
+		{
+/*			delay = framelen - sys_elapsed(timer);
+			sys_sleep(delay);
+			sys_elapsed(timer);
+*/
+        }      
 
         doevents();
         vid_begin();

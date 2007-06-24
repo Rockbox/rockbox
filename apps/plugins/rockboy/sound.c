@@ -7,26 +7,41 @@
 #include "regs.h"
 #include "noise.h"
 
+static const byte dmgwave[16] =
+{
+	0xac, 0xdd, 0xda, 0x48,
+	0x36, 0x02, 0xcf, 0x16,
+	0x2c, 0x04, 0xe5, 0x2c,
+	0xac, 0xdd, 0xda, 0x48
+};
+
+static const byte cgbwave[16] =
+{
+	0x00, 0xff, 0x00, 0xff,
+	0x00, 0xff, 0x00, 0xff,
+	0x00, 0xff, 0x00, 0xff,
+	0x00, 0xff, 0x00, 0xff,
+};
 
 static const byte sqwave[4][8] =
-    {
-        {  0, 0,-1, 0, 0, 0, 0, 0 },
-        {  0,-1,-1, 0, 0, 0, 0, 0 },
-        {  0,-1,-1,-1,-1, 0, 0, 0 },
-        { -1, 0, 0,-1,-1,-1,-1,-1 }
-    };
+{
+    {  0, 0,-1, 0, 0, 0, 0, 0 },
+    {  0,-1,-1, 0, 0, 0, 0, 0 },
+    { -1,-1,-1,-1, 0, 0, 0, 0 },
+    { -1, 0, 0,-1,-1,-1,-1,-1 }
+};
 
 static const int freqtab[8] =
-    {
-        (1<<18)*2,
-        (1<<18),
-        (1<<18)/2,
-        (1<<18)/3,
-        (1<<18)/4,
-        (1<<18)/5,
-        (1<<18)/6,
-        (1<<18)/7
-    };
+{
+    (1<<14)*2,
+    (1<<14),
+    (1<<14)/2,
+    (1<<14)/3,
+    (1<<14)/4,
+    (1<<14)/5,
+    (1<<14)/6,
+    (1<<14)/7
+};
 
 struct snd snd IBSS_ATTR;
 
@@ -58,13 +73,14 @@ static void s2_freq(void)
 static void s3_freq(void)
 {
     int d = 2048 - (((R_NR34&7)<<8) + R_NR33);
-    if (RATE > d) S3.freq = 0;
+    if (RATE > (d<<3)) S3.freq = 0;
     else S3.freq = (RATE << 21)/d;
 }
 
 static void s4_freq(void)
 {
     S4.freq = (freqtab[R_NR43&7] >> (R_NR43 >> 4)) * RATE;
+    if (S4.freq >> 18) S4.freq = 1<<18;
 }
 
 void sound_dirty(void)
@@ -74,13 +90,13 @@ void sound_dirty(void)
     S1.envol = R_NR12 >> 4;
     S1.endir = (R_NR12>>3) & 1;
     S1.endir |= S1.endir - 1;
-    S1.enlen = (R_NR12 & 3) << 15;
+    S1.enlen = (R_NR12 & 7) << 15;
     s1_freq();
     S2.len = (64-(R_NR21&63)) << 13;
     S2.envol = R_NR22 >> 4;
     S2.endir = (R_NR22>>3) & 1;
     S2.endir |= S2.endir - 1;
-    S2.enlen = (R_NR22 & 3) << 15;
+    S2.enlen = (R_NR22 & 7) << 15;
     s2_freq();
     S3.len = (256-R_NR31) << 20;
     s3_freq();
@@ -88,13 +104,12 @@ void sound_dirty(void)
     S4.envol = R_NR42 >> 4;
     S4.endir = (R_NR42>>3) & 1;
     S4.endir |= S4.endir - 1;
-    S4.enlen = (R_NR42 & 3) << 15;
+    S4.enlen = (R_NR42 & 7) << 15;
     s4_freq();
 }
 
-void sound_reset(void)
+void sound_off(void)
 {
-    int i;
     memset(&snd, 0, sizeof snd);
     if (pcm.hz) snd.rate = (1<<21) / pcm.hz;
     else snd.rate = 0;
@@ -115,9 +130,20 @@ void sound_reset(void)
     R_NR44 = 0xBF;
     R_NR50 = 0x77;
     R_NR51 = 0xF3;
-    R_NR52 = 0xF1;
-    for (i = 0; i < 16; i++) WAVE[i] = -(i&1);
+    R_NR52 = 0x70;
+//    for (i = 0; i < 16; i++) WAVE[i] = -(i&1);
     sound_dirty();
+}
+
+void sound_reset()
+{
+	memset(&snd, 0, sizeof snd);
+	if (pcm.hz) snd.rate = (1<<21) / pcm.hz;
+	else snd.rate = 0;
+	memcpy(WAVE, hw.cgb ? cgbwave : dmgwave, 16);
+	memcpy(ram.hi+0x30, WAVE, 16);
+	sound_off();
+	R_NR52 = 0xF1;
 }
 
 void sound_mix(void)
@@ -145,7 +171,8 @@ void sound_mix(void)
             }
             if (S1.swlen && (S1.swcnt += RATE) >= S1.swlen)
             {
-                f = ((R_NR14 & 7) << 8) + R_NR13;
+                S1.swcnt -= S1.swlen;
+                f = S1.swfreq;
                 n = (R_NR10 & 7);
                 if (R_NR10 & 8) f -= (f >> n);
                 else f += (f >> n);
@@ -153,14 +180,15 @@ void sound_mix(void)
                     S1.on = 0;
                 else
                 {
+                    S1.swfreq = f;
                     R_NR13 = f;
                     R_NR14 = (R_NR14 & 0xF8) | (f>>8);
                     s1_freq_d(2048 - f);
                 }
             }
             s <<= 2;
-            if (R_NR51 & 1) l += s;
-            if (R_NR51 & 16) r += s;
+            if (R_NR51 & 1) r += s;
+            if (R_NR51 & 16) l += s;
         }
 
         if (S2.on)
@@ -177,8 +205,8 @@ void sound_mix(void)
                 if (S2.envol > 15) S2.envol = 15;
             }
             s <<= 2;
-            if (R_NR51 & 2) l += s;
-            if (R_NR51 & 32) r += s;
+            if (R_NR51 & 2) r += s;
+            if (R_NR51 & 32) l += s;
         }
 
         if (S3.on)
@@ -192,16 +220,16 @@ void sound_mix(void)
                 S3.on = 0;
             if (R_NR32 & 96) s <<= (3 - ((R_NR32>>5)&3));
             else s = 0;
-            if (R_NR51 & 4) l += s;
-            if (R_NR51 & 64) r += s;
+            if (R_NR51 & 4) r += s;
+            if (R_NR51 & 64) l += s;
         }
 
         if (S4.on)
         {
             if (R_NR43 & 8) s = 1 & (noise7[
-                                             (S4.pos>>24)&15] >> ((S4.pos>>21)&7));
+                (S4.pos>>20)&15] >> (7-((S4.pos>>17)&7)));
             else s = 1 & (noise15[
-                                  (S4.pos>>24)&4095] >> ((S4.pos>>21)&7));
+                (S4.pos>>20)&4095] >> (7-((S4.pos>>17)&7)));
             s = (-s) & S4.envol;
             S4.pos += S4.freq;
             if ((R_NR44 & 64) && ((S4.cnt += RATE) >= S4.len))
@@ -213,9 +241,9 @@ void sound_mix(void)
                 if (S4.envol < 0) S4.envol = 0;
                 if (S4.envol > 15) S4.envol = 15;
             }
-            s <<= 2;
-            if (R_NR51 & 8) l += s;
-            if (R_NR51 & 128) r += s;
+            s += s << 1;
+            if (R_NR51 & 8) r += s;
+            if (R_NR51 & 128) l += s;
         }
 
         l *= (R_NR50 & 0x07);
@@ -234,10 +262,10 @@ void sound_mix(void)
                 pcm_submit();
             if (pcm.stereo)
             {
-                pcm.buf[pcm.pos++] = l+128;
-                pcm.buf[pcm.pos++] = r+128;
+                pcm.buf[pcm.pos++] = ((signed char)(l))<<7;
+                pcm.buf[pcm.pos++] = ((signed char)(r))<<7;
             }
-            else pcm.buf[pcm.pos++] = ((l+r)>>1)+128;
+            else pcm.buf[pcm.pos++] = ((signed char)((l+r)>>1))<<7;
         }
     }
     R_NR52 = (R_NR52&0xf0) | S1.on | (S2.on<<1) | (S3.on<<2) | (S4.on<<3);
@@ -256,12 +284,13 @@ byte sound_read(byte r)
 void s1_init(void)
 {
     S1.swcnt = 0;
+    S1.swfreq = ((R_NR14&7)<<8) + R_NR13;
     S1.envol = R_NR12 >> 4;
     S1.endir = (R_NR12>>3) & 1;
     S1.endir |= S1.endir - 1;
     S1.enlen = (R_NR12 & 7) << 15;
+    if (!S1.on) S1.pos = 0;
     S1.on = 1;
-    S1.pos = 0;
     S1.cnt = 0;
     S1.encnt = 0;
 }
@@ -272,17 +301,20 @@ void s2_init(void)
     S2.endir = (R_NR22>>3) & 1;
     S2.endir |= S2.endir - 1;
     S2.enlen = (R_NR22 & 7) << 15;
+    if (!S2.on) S2.pos = 0;
     S2.on = 1;
-    S2.pos = 0;
     S2.cnt = 0;
     S2.encnt = 0;
 }
 
 void s3_init(void)
 {
-    S3.pos = 0;
+    int i;
+    if (!S3.on) S3.pos = 0;
     S3.cnt = 0;
     S3.on = R_NR30 >> 7;
+    if (S3.on) for (i = 0; i < 16; i++)
+		ram.hi[i+0x30] = 0x13 ^ ram.hi[i+0x31];
 }
 
 void s4_init(void)
@@ -306,7 +338,8 @@ void sound_write(byte r, byte b)
     if ((r & 0xF0) == 0x30)
     {
         if (S3.on) sound_mix();
-        if (!S3.on) WAVE[r - 0x30] = b;
+        if (!S3.on) 
+            WAVE[r-0x30] = ram.hi[r] = b;
         return;
     }
     sound_mix();
@@ -314,6 +347,8 @@ void sound_write(byte r, byte b)
     {
     case RI_NR10:
         R_NR10 = b;
+        S1.swlen = ((R_NR10>>4) & 7) << 14;
+        S1.swfreq = ((R_NR14&7)<<8) + R_NR13;
         break;
     case RI_NR11:
         R_NR11 = b;
@@ -361,7 +396,7 @@ void sound_write(byte r, byte b)
         break;
     case RI_NR31:
         R_NR31 = b;
-        S3.len = (256-R_NR31) << 20;
+        S3.len = (256-R_NR31) << 13;
         break;
     case RI_NR32:
         R_NR32 = b;
@@ -403,13 +438,9 @@ void sound_write(byte r, byte b)
     case RI_NR52:
         R_NR52 = b;
         if (!(R_NR52 & 128))
-            sound_reset();
+            sound_off();
         break;
     default:
         return;
     }
 }
-
-
-
-

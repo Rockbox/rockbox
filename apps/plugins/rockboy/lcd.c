@@ -833,40 +833,67 @@ void spr_scan(void)
 #define DY  ((LCD_HEIGHT<<16)   /   144)
 #define DYI ((144<<16)          /   LCD_HEIGHT)
 
+#define DXR  ((LCD_WIDTH<<16)    /   144)
+#define DXIR ((144<<16)          /   LCD_WIDTH)
+#define DYR  ((LCD_HEIGHT<<16)   /   160)
+#define DYIR ((160<<16)          /   LCD_HEIGHT)
+
 void lcd_begin(void)
 {
 
 #if (LCD_WIDTH>=160) && (LCD_HEIGHT>=144)
 #define S1  ((LCD_HEIGHT-144)/2)*LCD_WIDTH + ((LCD_WIDTH-160)/2)
 #define S2  0
+#define S1R ((LCD_HEIGHT-160)/2)*LCD_WIDTH + ((LCD_WIDTH-144)/2)+144
+#define S2R (LCD_WIDTH-1)
 
 #elif (LCD_WIDTH>=160) && (LCD_HEIGHT<=144)
-#define S1  ((LCD_WIDTH-160)/2)
-#define S2  ((LCD_WIDTH-160)/2)
+#define S1  0
+#define S2  0
+#define S1R LCD_WIDTH-1
+#define S2R LCD_WIDTH-1
 
 #elif (LCD_WIDTH<=160) && (LCD_HEIGHT>=144)
 #define S1  ((LCD_HEIGHT-144)/2)*LCD_WIDTH
 #define S2  ((LCD_HEIGHT-144)/2)*LCD_WIDTH
+#define S1R LCD_WIDTH-1
+#define S2R LCD_WIDTH-1
 
 #else
 #define S1  0
 #define S2  0
+#define S1R LCD_WIDTH-1
+#define S2R LCD_WIDTH-1
 #endif
 
 #if (LCD_WIDTH>LCD_HEIGHT)
-#define S3  ((LCD_WIDTH-(160*LCD_HEIGHT/144))/2)
+#define S3  ((LCD_WIDTH-((160*DY)>>16))/2)
+#define S3R  LCD_WIDTH-1
 #else
-#define S3  ((LCD_HEIGHT-(144*LCD_WIDTH/160))/2)*LCD_WIDTH
+#define S3  ((LCD_HEIGHT-((144*DX)>>16))/2)*LCD_WIDTH
+#define S3R ((LCD_HEIGHT-((160*DXR)>>16))/2)*LCD_WIDTH+LCD_WIDTH-1
 #endif
-    
+
     set_pal();
 
-    if(options.fullscreen == 0)
-        vdest=fb.ptr+S1;
-    else if (options.fullscreen == 1)
-        vdest=fb.ptr+S2;
+    if(options.rotate)
+    {
+        if(options.fullscreen == 0)
+            vdest=fb.ptr+S2R;
+        else if (options.fullscreen == 1)
+            vdest=fb.ptr+S3R;
+        else
+            vdest=fb.ptr+S1R;
+    }
     else
-        vdest=fb.ptr+S3;
+    {
+        if(options.fullscreen == 0)
+            vdest=fb.ptr+S2;
+        else if (options.fullscreen == 1)
+            vdest=fb.ptr+S3;
+        else
+            vdest=fb.ptr+S1;
+    }
     WY = R_WY;
 }
 
@@ -874,50 +901,63 @@ int SCALEWL IDATA_ATTR=1<<16;
 int SCALEWS IDATA_ATTR=1<<16;
 int SCALEHL IDATA_ATTR=1<<16;
 int SCALEHS IDATA_ATTR=1<<16;
-int swidth IDATA_ATTR=160;
+int swidth  IDATA_ATTR=160;
 int sremain IDATA_ATTR=LCD_WIDTH-160;
 
-void setvidmode(int mode)
+void setvidmode(void)
 {
-    switch(mode)
+    switch(options.fullscreen)
     {
-        case 1:
-#if (LCD_WIDTH>=160) && (LCD_HEIGHT>=144) /* Full screen scale */
-            SCALEWL=DX;
-            SCALEWS=DXI;
-            SCALEHL=DY;
-            SCALEHS=DYI;
-#elif (LCD_WIDTH>=160) && (LCD_HEIGHT<144) /* scale the height */
-            SCALEWL=1<<16;
-            SCALEWS=1<<16;
-            SCALEHL=DY;
-            SCALEHS=DYI;
-#elif (LCD_WIDTH<160) && (LCD_HEIGHT>=144) /* scale the width */
-            SCALEWL=DX;
-            SCALEWS=DXI;
-            SCALEHL=1<<16;
-            SCALEHS=1<<16;            
-#else
-            SCALEWL=DX;
-            SCALEWS=DXI;
-            SCALEHL=DY;
-            SCALEHS=DYI;
-#endif
-            break;
-        case 2: /* Maintain Ratio */
-            if (DY<DX)
+        case 0:
+            if(options.rotate)
             {
-                SCALEWL=DY;
-                SCALEWS=DYI;
-                SCALEHL=DY;
-                SCALEHS=DYI;
+                SCALEWL=DYR;
+                SCALEWS=DYIR;
+                SCALEHL=DXR;
+                SCALEHS=DXIR;
             }
             else
             {
                 SCALEWL=DX;
                 SCALEWS=DXI;
-                SCALEHL=DX;
-                SCALEHS=DXI;
+                SCALEHL=DY;
+                SCALEHS=DYI;
+            }
+            break;
+        case 1: /* Maintain Ratio */
+            if(options.rotate)
+            {
+                if (DYR<DXR)
+                {
+                    SCALEWL=DYR;
+                    SCALEWS=DYIR;
+                    SCALEHL=DYR;
+                    SCALEHS=DYIR;
+                }
+                else
+                {
+                    SCALEWL=DXR;
+                    SCALEWS=DXIR;
+                    SCALEHL=DXR;
+                    SCALEHS=DXIR;
+                }
+            }
+            else
+            {
+                if (DY<DX)
+                {
+                    SCALEWL=DY;
+                    SCALEWS=DYI;
+                    SCALEHL=DY;
+                    SCALEHS=DYI;
+                }
+                else
+                {
+                    SCALEWL=DX;
+                    SCALEWS=DXI;
+                    SCALEHL=DX;
+                    SCALEHS=DXI;
+                }
             }
             break;
         default:
@@ -927,7 +967,11 @@ void setvidmode(int mode)
             SCALEHS=1<<16;
     }
     swidth=(160*SCALEWL)>>16;
-    sremain=LCD_WIDTH-swidth;
+    
+    if(options.rotate)
+        sremain=-(((160*SCALEWL)>>16)*LCD_WIDTH+1);
+    else
+        sremain=LCD_WIDTH-swidth;
 }
 
 void lcd_refreshline(void)
@@ -1015,24 +1059,14 @@ void lcd_refreshline(void)
         register unsigned int remain=sremain;
         while(wcount--)
         {
-#if LCD_HEIGHT<144  /* cut off the bottom part of the screen that won't fit */
-            if (options.fullscreen==0 && (hpt>>16)>LCD_HEIGHT)
-                break;
-#endif
+            *vdest = PAL[BUF[srcpt>>16]];
+            if (options.rotate)
+                vdest+=LCD_WIDTH;
+            else
+                vdest++;
 
-#if LCD_WIDTH<160 /* cut off the right part of the screen that won't fit */
-            if(options.fullscreen==0 && wcount<(160-LCD_WIDTH)) {
-                vdest+=wcount;
-                wcount = 0;
-            }
-#endif
-                
-            *vdest++ = PAL[BUF[srcpt>>16]];
             srcpt+=SCALEWS;
         }
-#if LCD_HEIGHT<144
-        if (options.fullscreen!=0 || (hpt>>16)<(LCD_HEIGHT))
-#endif
         vdest+=remain;
     }
 

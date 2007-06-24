@@ -79,70 +79,101 @@ void setoptions (void)
 
    snprintf(optionsave, sizeof(optionsave), "%s/%s", savedir, optionname);
 
-   fd = open(optionsave, O_RDONLY);
-   if(fd < 0) /* no options to read, set defaults */
-   {
+    fd = open(optionsave, O_RDONLY);
+    if(fd < 0) /* no options to read, set defaults */
+    {
+        options.LEFT=BUTTON_LEFT;
+        options.RIGHT=BUTTON_RIGHT;
+
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD)
-      options.A=BUTTON_ON;
-      options.B=BUTTON_OFF;
-      options.START=BUTTON_REC;
-      options.SELECT=BUTTON_SELECT;
-      options.MENU=BUTTON_MODE;
+        options.UP=BUTTON_UP;
+        options.DOWN=BUTTON_DOWN;
+
+        options.A=BUTTON_ON;
+        options.B=BUTTON_OFF;
+        options.START=BUTTON_REC;
+        options.SELECT=BUTTON_SELECT;
+        options.MENU=BUTTON_MODE;
 
 #elif (CONFIG_KEYPAD == IRIVER_H300_PAD)
-      options.A=BUTTON_REC;
-      options.B=BUTTON_MODE;
-      options.START=BUTTON_ON;
-      options.SELECT=BUTTON_SELECT;
-      options.MENU=BUTTON_OFF;
+        options.UP=BUTTON_UP;
+        options.DOWN=BUTTON_DOWN;
+
+        options.A=BUTTON_REC;
+        options.B=BUTTON_MODE;
+        options.START=BUTTON_ON;
+        options.SELECT=BUTTON_SELECT;
+        options.MENU=BUTTON_OFF;
 
 #elif CONFIG_KEYPAD == RECORDER_PAD
-      options.A=BUTTON_F1;
-      options.B=BUTTON_F2;
-      options.START=BUTTON_F3;
-      options.SELECT=BUTTON_PLAY;
-      options.MENU=BUTTON_OFF;
+        options.UP=BUTTON_UP;
+        options.DOWN=BUTTON_DOWN;
+
+        options.A=BUTTON_F1;
+        options.B=BUTTON_F2;
+        options.START=BUTTON_F3;
+        options.SELECT=BUTTON_PLAY;
+        options.MENU=BUTTON_OFF;
 
 #elif CONFIG_KEYPAD == IPOD_4G_PAD
-      options.A=BUTTON_NONE;
-      options.B=BUTTON_NONE;
-      options.START=BUTTON_SELECT;
-      options.SELECT=BUTTON_NONE;
-      options.MENU=(BUTTON_SELECT | BUTTON_REPEAT);
+        options.UP=BUTTON_MENU;
+        options.DOWN=BUTTON_PLAY;
+
+        options.A=BUTTON_NONE;
+        options.B=BUTTON_NONE;
+        options.START=BUTTON_SELECT;
+        options.SELECT=BUTTON_NONE;
+        options.MENU=(BUTTON_SELECT | BUTTON_REPEAT);
 
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-      options.A=BUTTON_PLAY;
-      options.B=BUTTON_EQ;
-      options.START=BUTTON_MODE;
-      options.SELECT=(BUTTON_SELECT | BUTTON_REL);
-      options.MENU=(BUTTON_SELECT | BUTTON_REPEAT);
+        options.UP=BUTTON_UP;
+        options.DOWN=BUTTON_DOWN;
+
+        options.A=BUTTON_PLAY;
+        options.B=BUTTON_EQ;
+        options.START=BUTTON_MODE;
+        options.SELECT=(BUTTON_SELECT | BUTTON_REL);
+        options.MENU=(BUTTON_SELECT | BUTTON_REPEAT);
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
-      options.A=BUTTON_VOL_UP;
-      options.B=BUTTON_VOL_DOWN;
-      options.START=BUTTON_A;
-      options.SELECT=BUTTON_SELECT;
-      options.MENU=BUTTON_MENU;
+        options.UP=BUTTON_UP;
+        options.DOWN=BUTTON_DOWN;
+
+        options.A=BUTTON_VOL_UP;
+        options.B=BUTTON_VOL_DOWN;
+        options.START=BUTTON_A;
+        options.SELECT=BUTTON_SELECT;
+        options.MENU=BUTTON_MENU;
       
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
-      options.A=BUTTON_SELECT;
-      options.B=BUTTON_REC;
-      options.START=BUTTON_SCROLL_UP;
-      options.SELECT=BUTTON_SCROLL_DOWN;
-      options.MENU=BUTTON_POWER;
+        options.UP=BUTTON_UP;
+        options.DOWN=BUTTON_DOWN;
+
+        options.A=BUTTON_SELECT;
+        options.B=BUTTON_REC;
+        options.START=BUTTON_SCROLL_UP;
+        options.SELECT=BUTTON_SCROLL_DOWN;
+        options.MENU=BUTTON_POWER;
+
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
-      options.A=BUTTON_PLAY;
-      options.B=BUTTON_REC;
-      options.START=BUTTON_SELECT;
-      options.SELECT=BUTTON_NONE;
-      options.MENU=BUTTON_POWER;  
+        options.UP=BUTTON_UP;
+        options.DOWN=BUTTON_DOWN;
+
+        options.A=BUTTON_PLAY;
+        options.B=BUTTON_REC;
+        options.START=BUTTON_SELECT;
+        options.SELECT=BUTTON_NONE;
+        options.MENU=BUTTON_POWER;  
       
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
-      options.A=BUTTON_PLAY;
-      options.B=BUTTON_FF;
-      options.START=BUTTON_REW;
-      options.SELECT=BUTTON_NONE;
-      options.MENU=BUTTON_POWER;
+        options.UP=BUTTON_SCROLL_UP;
+        options.DOWN=BUTTON_SCROLL_DOWN;
+
+        options.A=BUTTON_PLAY;
+        options.B=BUTTON_FF;
+        options.START=BUTTON_REW;
+        options.SELECT=BUTTON_NONE;
+        options.MENU=BUTTON_POWER;
 #endif
 
       options.maxskip=4;
@@ -164,13 +195,17 @@ void setoptions (void)
 
 void savesettings(void)
 {
-   int fd;
-   char optionsave[sizeof(savedir)+sizeof(optionname)];
+    int fd;
+    char optionsave[sizeof(savedir)+sizeof(optionname)];
 
-   snprintf(optionsave, sizeof(optionsave), "%s/%s", savedir, optionname);
-   fd = open(optionsave, O_WRONLY|O_CREAT|O_TRUNC);
-   write(fd,&options, sizeof(options));
-   close(fd);
+    if(options.dirty)
+    {
+        options.dirty=0;
+        snprintf(optionsave, sizeof(optionsave), "%s/%s", savedir, optionname);
+        fd = open(optionsave, O_WRONLY|O_CREAT|O_TRUNC);
+        write(fd,&options, sizeof(options));
+        close(fd);
+    }
 }
 
 /* this is the plugin entry point */
@@ -231,12 +266,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
     if(!rb->audio_status())
         pcm_close();
-    rb->splash(HZ/2, "Shutting down");
+    rb->splash(HZ/2, "Closing Rockboy");
 
     savesettings();
 
     cleanup();
-
 
     return PLUGIN_OK;
 }

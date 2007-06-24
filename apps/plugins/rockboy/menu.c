@@ -38,11 +38,14 @@ static void munge_name(char *buf, size_t bufsiz);
 
 int getbutton(char *text)
 {
-    rb->lcd_putsxy(0, 0, text);
+    int fw, fh;
+    rb->lcd_clear_display();
+    rb->font_getstringsize(text, &fw, &fh,0);
+    rb->lcd_putsxy(LCD_WIDTH/2-fw/2, LCD_HEIGHT/2-fh/2, text);
     rb->lcd_update();
     rb->sleep(30);
 
-    while (rb->button_get(false) != BUTTON_NONE) 
+    while (rb->button_get(false) != BUTTON_NONE)
         rb->yield();
 
     int button;
@@ -51,31 +54,24 @@ int getbutton(char *text)
         button = rb->button_get(true);
         button=button&0x00000FFF;
 
-        switch(button)
-        {
-            case MENU_BUTTON_LEFT:
-            case MENU_BUTTON_RIGHT:
-            case MENU_BUTTON_UP:
-            case MENU_BUTTON_DOWN:
-                break;
-            default:
-                return button;
-                break;
-        }
+        return button;
     }
 }
 
 void setupkeys(void)
 {
-    options.A=getbutton("Press A");
+    options.UP=getbutton    ("Press Up");
+    options.DOWN=getbutton  ("Press Down");
+    options.LEFT=getbutton  ("Press Left");
+    options.RIGHT=getbutton ("Press Right");
 
-    options.B=getbutton("Press B");
+    options.A=getbutton     ("Press A");
+    options.B=getbutton     ("Press B");
 
-    options.START=getbutton("Press Start");
-
+    options.START=getbutton ("Press Start");
     options.SELECT=getbutton("Press Select");
 
-    options.MENU=getbutton("Press Menu");
+    options.MENU=getbutton  ("Press Menu");
 }
 
 /*
@@ -330,12 +326,17 @@ static void do_opt_menu(void)
     };
 
     static const struct opt_items fullscreen[]= {
-        { "Unscaled", -1 },
         { "Scaled", -1 },
         { "Scaled - Maintain Ratio", -1 },
+#if (LCD_WIDTH>=160) && (LCD_HEIGHT>=144)
+        { "Unscaled", -1 },
+#endif
     };
 
     static const struct opt_items frameskip[]= {
+        { "0 Max", -1 },
+        { "1 Max", -1 },
+        { "2 Max", -1 },
         { "3 Max", -1 },
         { "4 Max", -1 },
         { "5 Max", -1 },
@@ -368,7 +369,8 @@ static void do_opt_menu(void)
         { "Max Frameskip", NULL },
         { "Sound"        , NULL },
         { "Stats"        , NULL },
-        { "Screen Options"  , NULL },
+        { "Screen Size"  , NULL },
+        { "Screen Rotate"  , NULL },
         { "Set Keys (Buggy)", NULL },
 #ifdef HAVE_LCD_COLOR
         { "Set Palette"  , NULL },
@@ -376,6 +378,8 @@ static void do_opt_menu(void)
     };
 
     m = menu_init(rb,items, sizeof(items) / sizeof(*items), NULL, NULL, NULL, NULL);
+
+    options.dirty=1; /* Just assume that the settings have been changed */
 
     while(!done)
     {
@@ -385,9 +389,8 @@ static void do_opt_menu(void)
         switch (result)
         {
             case 0: /* Frameskip */
-                options.maxskip-=3;
-                rb->set_option(items[0].desc, &options.maxskip, INT, frameskip, 4, NULL );
-                options.maxskip+=3;
+                rb->set_option(items[0].desc, &options.maxskip, INT, frameskip, 
+                    sizeof(frameskip)/sizeof(*frameskip), NULL );
                 break;
             case 1: /* Sound */
                 if(options.sound>1) options.sound=1;
@@ -397,16 +400,21 @@ static void do_opt_menu(void)
             case 2: /* Stats */
                 rb->set_option(items[2].desc, &options.showstats, INT, onoff, 2, NULL );
                 break;
-            case 3: /* Fullscreen */
-                rb->set_option(items[3].desc, &options.fullscreen, INT, fullscreen, 3, NULL );
-                setvidmode(options.fullscreen);
+            case 3: /* Screen Size */
+                rb->set_option(items[3].desc, &options.fullscreen, INT, fullscreen,
+                    sizeof(fullscreen)/sizeof(*fullscreen), NULL );
+                setvidmode();
                 break;
-            case 4: /* Keys */
+            case 4: /* Screen rotate */
+                rb->set_option(items[4].desc, &options.rotate, INT, onoff, 2, NULL );
+                setvidmode();
+                break;
+            case 5: /* Keys */
                 setupkeys();
                 break;
 #ifdef HAVE_LCD_COLOR                
-            case 5: /* Palette */
-                rb->set_option(items[5].desc, &options.pal, INT, palette, 17, NULL );
+            case 6: /* Palette */
+                rb->set_option(items[6].desc, &options.pal, INT, palette, 17, NULL );
                 set_pal();
                 break;
 #endif                

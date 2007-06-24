@@ -41,7 +41,7 @@ void ev_poll(void);
 int do_user_menu(void);
 void loadstate(int fd);
 void savestate(int fd);
-void setvidmode(int mode);
+void setvidmode(void);
 void set_pal(void);
 #if !defined(HAVE_LCD_COLOR)
 void vid_update(int scanline);
@@ -116,9 +116,12 @@ void* memcpy(void* dst, const void* src, size_t size) ICODE_ATTR;
 
 struct options {
    int A, B, START, SELECT, MENU;
+   int UP, DOWN, LEFT, RIGHT;
    int frameskip, fps, maxskip;
    int sound, fullscreen, showstats;
+   int rotate;
    int pal;
+   int dirty;
 };
 
 bool plugbuf;

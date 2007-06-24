@@ -24,36 +24,11 @@
 #include "hw.h"
 #include "config.h"
 
-#if (CONFIG_KEYPAD == IPOD_4G_PAD)
-
-#define ROCKBOY_PAD_LEFT BUTTON_LEFT
-#define ROCKBOY_PAD_RIGHT BUTTON_RIGHT
-#define ROCKBOY_PAD_UP BUTTON_MENU
-#define ROCKBOY_PAD_DOWN BUTTON_PLAY
-
-#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
-
-#define ROCKBOY_PAD_LEFT BUTTON_LEFT
-#define ROCKBOY_PAD_RIGHT BUTTON_RIGHT
-#define ROCKBOY_PAD_UP BUTTON_SCROLL_UP
-#define ROCKBOY_PAD_DOWN BUTTON_SCROLL_DOWN
-
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD)
+#if (CONFIG_KEYPAD == SANSA_E200_PAD)
 
 #define ROCKBOY_SCROLLWHEEL
 #define ROCKBOY_SCROLLWHEEL_CC  BUTTON_SCROLL_UP
 #define ROCKBOY_SCROLLWHEEL_CW  BUTTON_SCROLL_DOWN
-#define ROCKBOY_PAD_LEFT BUTTON_LEFT
-#define ROCKBOY_PAD_RIGHT BUTTON_RIGHT
-#define ROCKBOY_PAD_UP BUTTON_UP
-#define ROCKBOY_PAD_DOWN BUTTON_DOWN
-
-#else
-
-#define ROCKBOY_PAD_LEFT BUTTON_LEFT
-#define ROCKBOY_PAD_RIGHT BUTTON_RIGHT
-#define ROCKBOY_PAD_UP BUTTON_UP
-#define ROCKBOY_PAD_DOWN BUTTON_DOWN
 
 #endif
 
@@ -159,10 +134,10 @@ void ev_poll(void)
 #else
     if(released) {
         ev.type = EV_RELEASE;
-        if(released & ROCKBOY_PAD_LEFT) { ev.code=PAD_LEFT; ev_postevent(&ev); }
-        if(released & ROCKBOY_PAD_RIGHT) {ev.code=PAD_RIGHT; ev_postevent(&ev);}
-        if(released & ROCKBOY_PAD_DOWN) { ev.code=PAD_DOWN; ev_postevent(&ev); }
-        if(released & ROCKBOY_PAD_UP) { ev.code=PAD_UP; ev_postevent(&ev); }
+        if(released & options.LEFT) { ev.code=PAD_LEFT; ev_postevent(&ev); }
+        if(released & options.RIGHT) {ev.code=PAD_RIGHT; ev_postevent(&ev);}
+        if(released & options.DOWN) { ev.code=PAD_DOWN; ev_postevent(&ev); }
+        if(released & options.UP) { ev.code=PAD_UP; ev_postevent(&ev); }
         if(released & options.A) { ev.code=PAD_A; ev_postevent(&ev); }
         if(released & options.B) { ev.code=PAD_B; ev_postevent(&ev); }
         if(released & options.START) {
@@ -176,10 +151,10 @@ void ev_poll(void)
     }
     if(pressed) { /* button press */
         ev.type = EV_PRESS;
-        if(pressed & ROCKBOY_PAD_LEFT) { ev.code=PAD_LEFT; ev_postevent(&ev); }
-        if(pressed & ROCKBOY_PAD_RIGHT) { ev.code=PAD_RIGHT; ev_postevent(&ev);}
-        if(pressed & ROCKBOY_PAD_DOWN) { ev.code=PAD_DOWN; ev_postevent(&ev); }
-        if(pressed & ROCKBOY_PAD_UP) { ev.code=PAD_UP; ev_postevent(&ev); }
+        if(pressed & options.LEFT) { ev.code=PAD_LEFT; ev_postevent(&ev); }
+        if(pressed & options.RIGHT) { ev.code=PAD_RIGHT; ev_postevent(&ev);}
+        if(pressed & options.DOWN) { ev.code=PAD_DOWN; ev_postevent(&ev); }
+        if(pressed & options.UP) { ev.code=PAD_UP; ev_postevent(&ev); }
         if(pressed & options.A) { ev.code=PAD_A; ev_postevent(&ev); }
         if(pressed & options.B) { ev.code=PAD_B; ev_postevent(&ev); }
         if(pressed & options.START) {

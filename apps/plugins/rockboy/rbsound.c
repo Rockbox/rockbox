@@ -5,21 +5,20 @@
 struct pcm pcm IBSS_ATTR;
 
 #define N_BUFS 2
-#define BUF_SIZE 1024
-
-#if CONFIG_CODEC == SWCODEC && !defined(SIMULATOR)
+#define BUF_SIZE 2048
 
 bool doneplay=1;
+bool bufnum=0;
 
-static unsigned char *buf=0;
-static unsigned short *gmbuf;
+static unsigned short *buf=0;
 
 static bool newly_started;
 
 void get_more(unsigned char** start, size_t* size)
 {
-    *start = (unsigned char*)(&gmbuf[pcm.len*doneplay]);
+    *start = (unsigned char*)(&buf[pcm.len*doneplay]);
     *size = BUF_SIZE*sizeof(short);
+    doneplay=1;
 }
 
 void pcm_init(void)
@@ -29,19 +28,17 @@ void pcm_init(void)
 
     newly_started = true;
     
-    pcm.hz = 11025;
+    pcm.hz = SAMPR_44;
     pcm.stereo = 1;
 
     pcm.len = BUF_SIZE;
     if(!buf)
     {
-        buf = my_malloc(pcm.len * N_BUFS);
-        gmbuf = my_malloc(pcm.len * N_BUFS*sizeof (short));
+        buf = my_malloc(pcm.len * N_BUFS *sizeof(short));
 
         pcm.buf = buf;
         pcm.pos = 0;
-        memset(gmbuf, 0, pcm.len * N_BUFS *sizeof(short));
-        memset(buf, 0,  pcm.len * N_BUFS);
+        memset(buf, 0,  pcm.len * N_BUFS*sizeof(short));
     }
 
     rb->pcm_play_stop();
@@ -52,7 +49,7 @@ void pcm_init(void)
     rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
    
-    rb->pcm_set_frequency(SAMPR_11); /* 44100 22050 11025 */
+    rb->pcm_set_frequency(pcm.hz); /* 44100 22050 11025 */
 }
 
 void pcm_close(void)
@@ -65,22 +62,8 @@ void pcm_close(void)
 
 int pcm_submit(void)
 {
-    register int i;
-
+    if (!pcm.buf) return 0;
     if (pcm.pos < pcm.len) return 1;
-
-    doneplay=!doneplay;
-
-    if(doneplay)
-        pcm.buf = buf + pcm.len;
-    else
-        pcm.buf = buf;
-
-    pcm.pos = 0;
-
-    /* gotta convert the 8 bit buffer to 16 */
-    for(i=0; i<pcm.len;i++)
-        gmbuf[i+pcm.len*doneplay] = (pcm.buf[i]<<8)-0x8000;
 
     if(newly_started)
     {
@@ -88,27 +71,12 @@ int pcm_submit(void)
         newly_started = false;
     }
 
-   return 1;
-}
-#else
-static byte buf1_unal[(BUF_SIZE / sizeof(short)) + 2]; /* 4 byte aligned */
-void pcm_init(void)
-{
-    pcm.hz = 11025;
-    pcm.stereo = 1;
-    pcm.buf = buf1_unal;
-    pcm.len = (BUF_SIZE / sizeof(short));
-    pcm.pos = 0;
-}
+    while (!doneplay)
+    {rb->yield();}
 
-void pcm_close(void)
-{
-    memset(&pcm, 0, sizeof pcm);
+    doneplay=0;
+
+    pcm.pos = 0;
+    return 1;
 }
-int pcm_submit(void)
-{
-    pcm.pos =0;
-    return 0;
-}
-#endif
 
