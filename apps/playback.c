@@ -3340,6 +3340,9 @@ static void audio_play_start(size_t offset)
     queue_reply(&audio_queue, 1);
 
     audio_fill_file_buffer(true, false, offset);
+
+    LOGFQUEUE("audio > audio Q_AUDIO_TRACK_CHANGED");
+    queue_post(&audio_queue, Q_AUDIO_TRACK_CHANGED, 0);
 }
 
 
