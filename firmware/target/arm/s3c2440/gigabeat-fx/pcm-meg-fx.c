@@ -34,9 +34,6 @@ static int pcm_freq = 0; /* 44.1 is default */
 static int sr_ctrl = 0;
 #define FIFO_COUNT ((IISFCON >> 6) & 0x01F)
 
-/* number of bytes in FIFO */
-#define IIS_FIFO_SIZE 64
-
 /* Setup for the DMA controller */
 #define DMA_CONTROL_SETUP  ((1<<31) | (1<<29) | (1<<23) | (1<<22) | (1<<20))
 
@@ -72,6 +69,9 @@ void pcm_init(void)
 
     pcm_set_frequency(SAMPR_44);
 
+    /* slave */
+    IISMOD |= (1<<8);
+
     audiohw_init();
 
     /* init GPIO */
@@ -84,7 +84,6 @@ void pcm_init(void)
     INTMSK |= (1<<19);      /* mask the interrupt */
     SRCPND = (1<<19);       /* clear any pending interrupts */
     INTMOD |= (1<<19);      /* connect to FIQ */
-
 }
 
 void pcm_postinit(void)
@@ -99,7 +98,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
     size &= ~3; /* Size must be multiple of 4 */
 
     /* sanity check: bad pointer or too small file */
-    if (NULL == addr || size <= IIS_FIFO_SIZE) return;
+    if (NULL == addr || size == 0) return;
 
     disable_fiq();
 
@@ -109,8 +108,9 @@ void pcm_play_dma_start(const void *addr, size_t size)
     /* IIS interface setup and set to idle */
     IISCON = (1<<5) | (1<<3);
 
-    /* slave, transmit mode, 16 bit samples - 384fs - use 16.9344Mhz */
-    IISMOD = (1<<9) | (1<<8) | (2<<6) | (1<<3) | (1<<2);
+    /* slave, transmit mode, 16 bit samples - MCLK 384fs - use 16.9344Mhz -
+       BCLK 32fs */
+    IISMOD = (1<<9) | (1<<8) | (2<<6) | (1<<3) | (1<<2) | (1<<0);
 
     /* connect DMA to the FIFO and enable the FIFO */
     IISFCON = (1<<15) | (1<<13);
@@ -157,8 +157,9 @@ void pcm_play_dma_start(const void *addr, size_t size)
 
 static void pcm_play_dma_stop_fiq(void)
 {
-    /* mask the DMA interrupt */
-    INTMSK |= (1<<19);
+    INTMSK |= (1<<19); /* mask the DMA interrupt */
+    IISCON &= ~(1<<5); /* disable fifo request */
+    DMASKTRIG2 = 0x4; /* De-Activate the DMA channel */
 
     /* are we playing? wait for the chunk to finish */
     if (pcm_playing)
@@ -169,9 +170,6 @@ static void pcm_play_dma_stop_fiq(void)
         pcm_playing = false;
         pcm_paused = false;
     }
-
-    /* De-Activate the DMA channel */
-    DMASKTRIG2 = 0x4;
 
     /* Disconnect the IIS clock */
     CLKCON &= ~(1<<17);
@@ -232,23 +230,39 @@ void pcm_play_dma_stop(void)
     pcm_play_dma_stop_fiq();
 }
 
-
 void pcm_play_pause_pause(void)
 {
     /* stop servicing refills */
     int oldstatus = set_fiq_status(FIQ_DISABLED);
-    INTMSK |= (1<<19);
+    INTMSK |= (1<<19);  /* mask interrupt request */
+    IISCON &= ~(1<<5);  /* turn off FIFO request */
+    DMASKTRIG2 = 0x4;  /* stop DMA at end of atomic transfer */
+
+    if (pcm_playing)
+    {
+        /* playing - wait for the FIFO to empty */
+        while (IISCON & (1<<7))  ;
+    }
+
     set_fiq_status(oldstatus);
 }
-
-
 
 void pcm_play_pause_unpause(void)
 {
     /* refill buffer and keep going */
     int oldstatus = set_fiq_status(FIQ_DISABLED);
     _pcm_apply_settings();
-    INTMSK &= ~(1<<19);
+    if (pcm_playing)
+    {
+        /* make sure we're aligned on left channel - skip any right channel
+           sample left waiting */
+        DISRC2 = (DCSRC2 + 2) & ~0x3;
+        DCON2  = (DSTAT2 & 0xFFFFE);
+
+        SRCPND = (1<<19);   /* clear pending DMA interrupt */
+        INTMSK &= ~(1<<19); /* unmask interrupt request */
+        IISCON |= (1<<5);   /* enable FIFO request */
+    }
     set_fiq_status(oldstatus);
 }
 
@@ -275,19 +289,12 @@ void pcm_set_frequency(unsigned int frequency)
     pcm_freq = frequency;
 }
 
-
-
 size_t pcm_get_bytes_waiting(void)
 {
-    return (DSTAT2 & 0xFFFFF) * 2;
+    /* lie a little and only return full pairs */
+    return (DSTAT2 & 0xFFFFE) * 2;
 }
 
-#if 0
-void pcm_set_monitor(int monitor)
-{
-    (void)monitor;
-}
-#endif
 /** **/
 
 void pcm_mute(bool mute)
@@ -327,6 +334,7 @@ void pcm_calculate_peaks(int *left, int *right)
         long samples = DSTAT2;
         long samp_frames;
 
+        addr        = (unsigned long *)((unsigned long)addr & ~3);
         samples    &= 0xFFFFE;
         samp_frames = frame_period*pcm_freq/(HZ/2);
         samples     = MIN(samp_frames, samples) >> 1;
