@@ -76,9 +76,9 @@ rbutilFrm::~rbutilFrm() {}
 
 void rbutilFrm::CreateGUIControls(void)
 {
-   wxLogVerbose(wxT("=== begin rbutilFrm::CreateGUIControls()"));
+    wxLogVerbose(wxT("=== begin rbutilFrm::CreateGUIControls()"));
 
-	wxBoxSizer* WxBoxSizer1 = new wxBoxSizer(wxVERTICAL);
+  	wxBoxSizer* WxBoxSizer1 = new wxBoxSizer(wxVERTICAL);
 	this->SetSizer(WxBoxSizer1);
 	this->SetAutoLayout(TRUE);
 
@@ -96,7 +96,9 @@ void rbutilFrm::CreateGUIControls(void)
 
 	myDeviceSelector = new DeviceSelectorCtrl(mainPanel,wxID_ANY);
 	myDeviceSelector->setDefault();
+	myDeviceSelector->AutoDetect();
 	WxBoxSizer0->Add(myDeviceSelector,0,wxGROW|wxALL,5);
+
 
     wxNotebook* tabwindow = new wxNotebook(mainPanel,wxID_ANY);
     WxBoxSizer0->Add(tabwindow,1,wxGROW|wxALL,5);

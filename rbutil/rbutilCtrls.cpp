@@ -463,7 +463,7 @@ void DeviceSelectorCtrl::AutoDetect()
     }
     else
     {
-        WARN_DIALOG(wxT("No Device detected. (This function only works if you have already installed rockbox or if you use a ipod or a sansa)."),
+        WARN_DIALOG(wxT("No Device detected. If you have a Device connected, select the correct one manually."),
                 wxT("Detecting a Device"));
         return;
     }
