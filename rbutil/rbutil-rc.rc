@@ -1,8 +1,8 @@
 #define RBUTIL 1
 #include <wx/msw/wx.rc>
 RBUTIL VERSIONINFO
-FILEVERSION 0,3,2,4
-PRODUCTVERSION 0,3,2,4
+FILEVERSION 0,3,2,5
+PRODUCTVERSION 0,3,2,5
 FILEOS 0x00000004
 FILETYPE 0x00000001
 BEGIN
@@ -10,8 +10,8 @@ BEGIN
   BEGIN
     BLOCK "FFFF0000"
     BEGIN
-      VALUE "FileVersion", "0.3.2.4\0"
-      VALUE "ProductVersion", "0.3.2.4\0"
+      VALUE "FileVersion", "0.3.2.5\0"
+      VALUE "ProductVersion", "0.3.2.5\0"
       VALUE "CompanyName", "Rockbox Team\0"
       VALUE "FileDescription", "Rockbox Utility\0"
       VALUE "InternalName", "rbutil\0"

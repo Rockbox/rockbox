@@ -22,7 +22,7 @@
 #define CREDITS_H_INCLUDED
 
 #define RBUTIL_FULLNAME "The Rockbox Utility"
-#define RBUTIL_VERSION "Version 0.3.2.4"
+#define RBUTIL_VERSION "Version 0.3.2.5"
 
 static const wxString rbutil_developers[] = {
     wxT("Christi Alice Scarborough"),

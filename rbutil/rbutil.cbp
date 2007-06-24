@@ -92,7 +92,7 @@
 			<Add directory=".\" />
 		</Linker>
 		<ExtraCommands>
-			<Add before="cmd /c icons\bin2c.exe icons\*.png" />
+			<Add before="cmd /c cd icons &amp;&amp; bin2c.exe *.png" />
 		</ExtraCommands>
 		<Unit filename="Makefile" />
 		<Unit filename="archos.ico" />
