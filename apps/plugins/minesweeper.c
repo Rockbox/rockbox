@@ -36,10 +36,9 @@ enum minesweeper_status {
 #   define MINESWP_UP       BUTTON_UP
 #   define MINESWP_DOWN     BUTTON_DOWN
 #   define MINESWP_QUIT     BUTTON_OFF
-#   define MINESWP_START    BUTTON_ON
-#   define MINESWP_TOGGLE   BUTTON_PLAY
+#   define MINESWP_TOGGLE   BUTTON_ON
 #   define MINESWP_TOGGLE2  BUTTON_F1
-#   define MINESWP_DISCOVER BUTTON_ON
+#   define MINESWP_DISCOVER BUTTON_PLAY
 #   define MINESWP_DISCOVER2 BUTTON_F2
 #   define MINESWP_INFO     BUTTON_F3
 
@@ -47,10 +46,9 @@ enum minesweeper_status {
 #   define MINESWP_UP       BUTTON_UP
 #   define MINESWP_DOWN     BUTTON_DOWN
 #   define MINESWP_QUIT     BUTTON_OFF
-#   define MINESWP_START    BUTTON_ON
-#   define MINESWP_TOGGLE   BUTTON_SELECT
+#   define MINESWP_TOGGLE   BUTTON_ON
 #   define MINESWP_TOGGLE2  BUTTON_F1
-#   define MINESWP_DISCOVER BUTTON_ON
+#   define MINESWP_DISCOVER BUTTON_SELECT
 #   define MINESWP_DISCOVER2 BUTTON_F2
 #   define MINESWP_INFO     BUTTON_F3
 
@@ -58,7 +56,6 @@ enum minesweeper_status {
 #   define MINESWP_UP       BUTTON_UP
 #   define MINESWP_DOWN     BUTTON_DOWN
 #   define MINESWP_QUIT     BUTTON_OFF
-#   define MINESWP_START    BUTTON_MENU
 #   define MINESWP_TOGGLE_PRE BUTTON_MENU
 #   define MINESWP_TOGGLE   (BUTTON_MENU | BUTTON_REL)
 #   define MINESWP_DISCOVER (BUTTON_MENU | BUTTON_REPEAT)
@@ -69,8 +66,8 @@ enum minesweeper_status {
 #   define MINESWP_UP       BUTTON_UP
 #   define MINESWP_DOWN     BUTTON_DOWN
 #   define MINESWP_QUIT     BUTTON_OFF
-#   define MINESWP_START    BUTTON_SELECT
 #   define MINESWP_TOGGLE   BUTTON_ON
+#   define MINESWP_TOGGLE2  BUTTON_REC
 #   define MINESWP_DISCOVER BUTTON_SELECT
 #   define MINESWP_INFO     BUTTON_MODE
 
@@ -78,37 +75,40 @@ enum minesweeper_status {
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
-#   define MINESWP_UP       BUTTON_SCROLL_BACK
-#   define MINESWP_DOWN     BUTTON_SCROLL_FWD
-#   define MINESWP_QUIT     BUTTON_MENU
-#   define MINESWP_START    BUTTON_SELECT
-#   define MINESWP_TOGGLE   BUTTON_PLAY
-#   define MINESWP_DISCOVER (BUTTON_SELECT | BUTTON_PLAY)
-#   define MINESWP_INFO     (BUTTON_SELECT | BUTTON_MENU)
+#   define MINESWP_SCROLLWHEEL
+#   define MINESWP_UP         BUTTON_MENU
+#   define MINESWP_DOWN       BUTTON_PLAY
+#   define MINESWP_NEXT       BUTTON_SCROLL_FWD
+#   define MINESWP_PREV       BUTTON_SCROLL_BACK
+#   define MINESWP_QUIT       (BUTTON_SELECT | BUTTON_MENU)
+#   define MINESWP_TOGGLE_PRE BUTTON_SELECT
+#   define MINESWP_TOGGLE     (BUTTON_SELECT | BUTTON_REL)
+#   define MINESWP_DISCOVER   (BUTTON_SELECT | BUTTON_REPEAT)
+#   define MINESWP_INFO       (BUTTON_SELECT | BUTTON_PLAY)
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
-#   define MINESWP_UP       BUTTON_UP
-#   define MINESWP_DOWN     BUTTON_DOWN
-#   define MINESWP_QUIT     BUTTON_POWER
-#   define MINESWP_START    BUTTON_REC
-#   define MINESWP_TOGGLE   BUTTON_PLAY
-#   define MINESWP_DISCOVER BUTTON_SELECT
-#   define MINESWP_INFO     (BUTTON_REC | BUTTON_PLAY)
+#   define MINESWP_UP         BUTTON_UP
+#   define MINESWP_DOWN       BUTTON_DOWN
+#   define MINESWP_QUIT       BUTTON_POWER
+#   define MINESWP_TOGGLE     BUTTON_PLAY
+#   define MINESWP_DISCOVER   BUTTON_SELECT
+#   define MINESWP_INFO       BUTTON_REC
 
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
 #   define MINESWP_UP       BUTTON_UP
 #   define MINESWP_DOWN     BUTTON_DOWN
 #   define MINESWP_QUIT     BUTTON_POWER
-#   define MINESWP_START    BUTTON_SELECT
 #   define MINESWP_TOGGLE   BUTTON_A
 #   define MINESWP_DISCOVER BUTTON_SELECT
 #   define MINESWP_INFO     BUTTON_MENU
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD)
+#   define MINESWP_SCROLLWHEEL
 #   define MINESWP_UP       BUTTON_UP
 #   define MINESWP_DOWN     BUTTON_DOWN
 #   define MINESWP_QUIT     BUTTON_POWER
-#   define MINESWP_START    BUTTON_SELECT
+#   define MINESWP_NEXT     BUTTON_SCROLL_DOWN
+#   define MINESWP_PREV     BUTTON_SCROLL_UP
 #   define MINESWP_TOGGLE   BUTTON_REC
 #   define MINESWP_DISCOVER BUTTON_SELECT
 #   define MINESWP_INFO     (BUTTON_REC|BUTTON_REPEAT)
@@ -117,7 +117,6 @@ enum minesweeper_status {
 #   define MINESWP_UP       BUTTON_SCROLL_UP
 #   define MINESWP_DOWN     BUTTON_SCROLL_DOWN
 #   define MINESWP_QUIT     BUTTON_POWER
-#   define MINESWP_START    BUTTON_FF
 #   define MINESWP_TOGGLE   BUTTON_PLAY
 #   define MINESWP_DISCOVER BUTTON_REW
 #   define MINESWP_INFO     (BUTTON_REW | BUTTON_PLAY)
@@ -197,6 +196,9 @@ int p = 16;
 
 /* number of tiles left on the game */
 int tiles_left;
+
+/* number of used flags on the game */
+int flags_used;
 
 /* Because mines are set after the first move... */
 bool no_mines = true;
@@ -394,6 +396,17 @@ int count_tiles_left( void )
     return tiles_left;
 }
 
+int count_flags( void )
+{
+    int flags_used = 0;
+    int i, j;
+    for( i = 0; i < height; i++ )
+        for( j = 0; j < width; j++ )
+             if( minefield[i][j].flag == 1 )
+                flags_used++;
+    return flags_used;
+}
+
 /* welcome screen where player can chose mine percentage */
 enum minesweeper_status menu( void )
 {
@@ -540,6 +553,24 @@ enum minesweeper_status minesweeper( void )
                 y = ( y + height - 1 )%height;
                 break;
 
+            /*move cursor though the entire field*/
+#ifdef MINESWP_SCROLLWHEEL
+            case MINESWP_NEXT:
+            case MINESWP_NEXT|BUTTON_REPEAT:
+                if (x == width -1 ) {
+                    y = ( y + 1 )%height;
+                }
+                x = ( x + 1 )%width;
+                break;
+
+            case MINESWP_PREV:
+            case MINESWP_PREV|BUTTON_REPEAT:
+                if (x == 0) {
+                    y = ( y + height - 1 )%height;
+                }
+                x = ( x + width - 1 )%width;
+                break;
+#endif
             /* discover a tile (and it's neighbors if .neighbors == 0) */
             case MINESWP_DISCOVER:
 #ifdef MINESWP_DISCOVER2
@@ -582,9 +613,16 @@ enum minesweeper_status minesweeper( void )
             case MINESWP_INFO:
                 if( no_mines )
                     break;
-                tiles_left = count_tiles_left();
-                rb->splash( HZ*2, "You found %d mines out of %d",
-                            tiles_left, mine_num );
+                flags_used = count_flags();
+                if (flags_used == 1) {
+                    rb->splash( HZ*2, "You marked 1 field. There are %d mines.",
+                                mine_num );
+                }
+                else
+                {
+                    rb->splash( HZ*2, "You marked %d fields. There are %d mines.",
+                                flags_used, mine_num );
+                }
                 break;
 
             default:
