@@ -227,9 +227,8 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_VLED_HDD,                 "lh",  WPS_REFRESH_DYNAMIC, NULL },
 #endif
 
-#ifdef HAS_BUTTON_HOLD
     { WPS_TOKEN_MAIN_HOLD,                "mh",  WPS_REFRESH_DYNAMIC, NULL },
-#endif
+
 #ifdef HAS_REMOTE_BUTTON_HOLD
     { WPS_TOKEN_REMOTE_HOLD,              "mr",  WPS_REFRESH_DYNAMIC, NULL },
 #endif

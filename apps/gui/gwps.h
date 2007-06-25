@@ -203,9 +203,8 @@ enum wps_token_type {
     WPS_TOKEN_REPEAT_MODE,
     WPS_TOKEN_PLAYBACK_STATUS,
 
-#ifdef HAS_BUTTON_HOLD
     WPS_TOKEN_MAIN_HOLD,
-#endif
+
 #ifdef HAS_REMOTE_BUTTON_HOLD
     WPS_TOKEN_REMOTE_HOLD,
 #endif

@@ -1293,13 +1293,16 @@ static char *get_token_value(struct gui_wps *gwps,
         }
 #endif
 
-#ifdef HAS_BUTTON_HOLD
         case WPS_TOKEN_MAIN_HOLD:
+#ifdef HAS_BUTTON_HOLD
             if (button_hold())
+#else
+            if (is_keys_locked())
+#endif /*hold switch or softlock*/
                 return "h";
             else
                 return NULL;
-#endif
+
 #ifdef HAS_REMOTE_BUTTON_HOLD
         case WPS_TOKEN_REMOTE_HOLD:
             if (remote_button_hold())
