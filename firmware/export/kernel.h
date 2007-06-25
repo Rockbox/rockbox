@@ -93,7 +93,7 @@ struct mutex
    the current_tick variable */
 #define current_tick (signed)(USEC_TIMER/10000)
 #else
-extern long current_tick;
+extern volatile long current_tick;
 #endif
 
 #ifdef SIMULATOR

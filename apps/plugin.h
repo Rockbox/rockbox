@@ -334,7 +334,7 @@ struct plugin_api {
 #ifdef HAVE_PRIORITY_SCHEDULING
     void (*priority_yield)(void);
 #endif
-    long* current_tick;
+    volatile long* current_tick;
     long (*default_event_handler)(long event);
     long (*default_event_handler_ex)(long event, void (*callback)(void *), void *parameter);
     struct thread_entry* threads;

@@ -26,7 +26,7 @@
 #include "panic.h"
 
 #if !defined(CPU_PP) || !defined(BOOTLOADER) 
-long current_tick NOCACHEDATA_ATTR = 0;
+volatile long current_tick NOCACHEDATA_ATTR = 0;
 #endif
 
 static void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
