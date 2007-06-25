@@ -54,26 +54,40 @@ void system_reboot(void)
 
 void system_init(void)
 {
-    /* Turn off un-needed devices */
+    /* Turn off currently-not or never-needed devices  */
 
-    /* Turn off all of the UARTS */
-    CLKCON &= ~( (1<<10) | (1<<11) |(1<<12) );
+    CLKCON &= ~(
+        /* Turn off AC97 and Camera */
+        (1<<19) | (1<<20)
 
-    /* Turn off AC97 and Camera */
-    CLKCON &= ~( (1<<19) | (1<<20) );
+        /* Turn off SPI */
+        | (1 << 18)
 
-    /* Turn off USB host */
-    CLKCON &= ~(1 << 6);
+        /* Turn off IIS */
+        | (1 << 17)
+
+        /* Turn off I2C */
+        | (1 << 16)
+
+        /* Turn off all of the UARTS */
+        | ( (1<<10) | (1<<11) |(1<<12) )
+
+        /* Turn off MMC/SD/SDIO Controller (SDI) */
+        | (1 << 9)
+
+        /* Turn off USB device */
+        | (1 << 7)
+
+        /* Turn off USB host */
+        | (1 << 6)
+
+        /* Turn off NAND flash controller */
+        | (1 << 4)
     
-    /* Turn off USB device */
-    CLKCON &= ~(1 << 7);
-
-    /* Turn off NAND flash controller */
-    CLKCON &= ~(1 << 4);
+        );
     
     /* Turn off the USB PLL */
     CLKSLOW |= (1 << 7);
-
 }
 
 
