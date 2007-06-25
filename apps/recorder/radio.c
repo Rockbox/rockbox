@@ -1496,11 +1496,11 @@ static int fm_recording_settings(void)
 
 #ifdef FM_RECORDING_SCREEN
 MENUITEM_FUNCTION(recscreen_item, 0, ID2P(LANG_RECORDING_MENU), 
-                    fm_recording_screen, NULL, NULL, Icon_NOICON);
+                    fm_recording_screen, NULL, NULL, Icon_Recording);
 #endif
 #ifdef FM_RECORDING_SETTINGS
 MENUITEM_FUNCTION(recsettings_item, 0, ID2P(LANG_RECORDING_SETTINGS), 
-                    fm_recording_settings, NULL, NULL, Icon_NOICON);
+                    fm_recording_settings, NULL, NULL, Icon_Recording);
 #endif
 #ifndef FM_PRESET
 MENUITEM_FUNCTION(radio_presets_item, 0, ID2P(LANG_FM_BUTTONBAR_PRESETS), 

@@ -853,4 +853,4 @@ bool recording_menu(bool no_source)
 };
 
 MENUITEM_FUNCTION(recording_settings, MENU_FUNC_USEPARAM, ID2P(LANG_RECORDING_SETTINGS),
-                          (int (*)(void*))recording_menu, 0, NULL, Icon_NOICON);
+                          (int (*)(void*))recording_menu, 0, NULL, Icon_Recording);
