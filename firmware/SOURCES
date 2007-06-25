@@ -250,13 +250,13 @@ target/sh/system-sh.c
 
 #elif defined(CPU_COLDFIRE)
 
-common/strlen.c
 #ifndef SIMULATOR
 target/coldfire/crt0.S
 target/coldfire/memcpy-coldfire.S
 target/coldfire/memmove-coldfire.S
 target/coldfire/memset-coldfire.S
 target/coldfire/memswap128-coldfire.S
+target/coldfire/strlen-coldfire.S
 #if defined(HAVE_LCD_COLOR) \
  || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED)
 target/coldfire/memset16-coldfire.S
