@@ -33,6 +33,7 @@
 #define MP4_ID(a, b, c, d)  (((a) << 24) | ((b) << 16) | ((c) << 8) | (d))
 
 #define MP4_3gp6 MP4_ID('3', 'g', 'p', '6')
+#define MP4_aART MP4_ID('a', 'A', 'R', 'T')
 #define MP4_alac MP4_ID('a', 'l', 'a', 'c')
 #define MP4_calb MP4_ID(0xa9, 'a', 'l', 'b')
 #define MP4_cART MP4_ID(0xa9, 'A', 'R', 'T')
@@ -365,6 +366,11 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
         case MP4_cART:
             read_mp4_tag_string(fd, size, &buffer, &buffer_left, 
                 &id3->artist);
+            break;
+
+        case MP4_aART:
+            read_mp4_tag_string(fd, size, &buffer, &buffer_left,
+                &id3->albumartist);
             break;
 
         case MP4_calb:
