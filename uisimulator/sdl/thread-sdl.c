@@ -28,7 +28,7 @@
 
 SDL_Thread          *threads[256];
 int                 threadCount = 0;
-long                current_tick = 0;
+volatile long       current_tick = 0;
 SDL_mutex *m;
 
 void yield(void)
