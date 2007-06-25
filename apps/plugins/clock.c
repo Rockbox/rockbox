@@ -1474,7 +1474,7 @@ void general_settings(void)
 
             case 5:
                 rb->set_option("Idle Poweroff (temporary)", &idle_poweroff,
-                               INT, idle_poweroff_text, 2, NULL);
+                               BOOL, idle_poweroff_text, 2, NULL);
                 break;
 
             default:
