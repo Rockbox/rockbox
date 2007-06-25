@@ -1595,6 +1595,7 @@ static void add_tagcache(char *path)
     char tracknumfix[3];
     int offset = 0;
     int path_length = strlen(path);
+    bool has_albumartist;
 
     if (cachefd < 0)
         return ;
@@ -1685,6 +1686,9 @@ static void add_tagcache(char *path)
     entry.tag_offset[tag_bitrate] = track.id3.bitrate;
     
     /* String tags. */
+    has_albumartist = track.id3.albumartist != NULL
+        && strlen(track.id3.albumartist) > 0;
+
     ADD_TAG(entry, tag_filename, &path);
     ADD_TAG(entry, tag_title, &track.id3.title);
     ADD_TAG(entry, tag_artist, &track.id3.artist);
@@ -1692,7 +1696,14 @@ static void add_tagcache(char *path)
     ADD_TAG(entry, tag_genre, &track.id3.genre_string);
     ADD_TAG(entry, tag_composer, &track.id3.composer);
     ADD_TAG(entry, tag_comment, &track.id3.comment);
-    ADD_TAG(entry, tag_albumartist, &track.id3.albumartist);
+    if (has_albumartist)
+    {
+        ADD_TAG(entry, tag_albumartist, &track.id3.albumartist);
+    }
+    else
+    {
+        ADD_TAG(entry, tag_albumartist, &track.id3.artist);
+    }
     entry.data_length = offset;
     
     /* Write the header */
@@ -1706,7 +1717,14 @@ static void add_tagcache(char *path)
     write_item(track.id3.genre_string);
     write_item(track.id3.composer);
     write_item(track.id3.comment);
-    write_item(track.id3.albumartist);
+    if (has_albumartist)
+    {
+        write_item(track.id3.albumartist);
+    }
+    else
+    {
+        write_item(track.id3.artist);
+    }
     total_entry_count++;    
 }
 
