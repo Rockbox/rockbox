@@ -325,14 +325,6 @@ static void do_opt_menu(void)
         { "On" , -1 },
     };
 
-    static const struct opt_items fullscreen[]= {
-        { "Scaled", -1 },
-        { "Scaled - Maintain Ratio", -1 },
-#if (LCD_WIDTH>=160) && (LCD_HEIGHT>=144)
-        { "Unscaled", -1 },
-#endif
-    };
-
     static const struct opt_items frameskip[]= {
         { "0 Max", -1 },
         { "1 Max", -1 },
@@ -343,7 +335,15 @@ static void do_opt_menu(void)
         { "6 Max", -1 },
     };
     
-#ifdef HAVE_LCD_COLOR    
+#ifdef HAVE_LCD_COLOR
+    static const struct opt_items fullscreen[]= {
+        { "Scaled", -1 },
+        { "Scaled - Maintain Ratio", -1 },
+#if (LCD_WIDTH>=160) && (LCD_HEIGHT>=144)
+        { "Unscaled", -1 },
+#endif
+    };
+
     static const struct opt_items palette[]= {
         { "Brown (Default)", -1 },
         { "Gray", -1 },
@@ -369,17 +369,17 @@ static void do_opt_menu(void)
         { "Max Frameskip", NULL },
         { "Sound"        , NULL },
         { "Stats"        , NULL },
-        { "Screen Size"  , NULL },
-        { "Screen Rotate"  , NULL },
         { "Set Keys (Buggy)", NULL },
 #ifdef HAVE_LCD_COLOR
+        { "Screen Size"  , NULL },
+        { "Screen Rotate"  , NULL },
         { "Set Palette"  , NULL },
 #endif
     };
 
     m = menu_init(rb,items, sizeof(items) / sizeof(*items), NULL, NULL, NULL, NULL);
 
-    options.dirty=1; /* Just assume that the settings have been changed */
+    options.dirty=1; /* Assume that the settings have been changed */
 
     while(!done)
     {
@@ -400,19 +400,19 @@ static void do_opt_menu(void)
             case 2: /* Stats */
                 rb->set_option(items[2].desc, &options.showstats, INT, onoff, 2, NULL );
                 break;
-            case 3: /* Screen Size */
-                rb->set_option(items[3].desc, &options.fullscreen, INT, fullscreen,
+            case 3: /* Keys */
+                setupkeys();
+                break;
+#ifdef HAVE_LCD_COLOR
+            case 4: /* Screen Size */
+                rb->set_option(items[4].desc, &options.fullscreen, INT, fullscreen,
                     sizeof(fullscreen)/sizeof(*fullscreen), NULL );
                 setvidmode();
                 break;
-            case 4: /* Screen rotate */
-                rb->set_option(items[4].desc, &options.rotate, INT, onoff, 2, NULL );
+            case 5: /* Screen rotate */
+                rb->set_option(items[5].desc, &options.rotate, INT, onoff, 2, NULL );
                 setvidmode();
                 break;
-            case 5: /* Keys */
-                setupkeys();
-                break;
-#ifdef HAVE_LCD_COLOR                
             case 6: /* Palette */
                 rb->set_option(items[6].desc, &options.pal, INT, palette, 17, NULL );
                 set_pal();

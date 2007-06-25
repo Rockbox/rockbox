@@ -876,6 +876,7 @@ void lcd_begin(void)
 
     set_pal();
 
+#ifdef HAVE_LCD_COLOR
     if(options.rotate)
     {
         if(options.fullscreen == 0)
@@ -894,18 +895,22 @@ void lcd_begin(void)
         else
             vdest=fb.ptr+S1;
     }
+#endif
     WY = R_WY;
 }
 
+#ifdef HAVE_LCD_COLOR
 int SCALEWL IDATA_ATTR=1<<16;
 int SCALEWS IDATA_ATTR=1<<16;
 int SCALEHL IDATA_ATTR=1<<16;
 int SCALEHS IDATA_ATTR=1<<16;
 int swidth  IDATA_ATTR=160;
 int sremain IDATA_ATTR=LCD_WIDTH-160;
+#endif
 
 void setvidmode(void)
 {
+#ifdef HAVE_LCD_COLOR
     switch(options.fullscreen)
     {
         case 0:
@@ -972,6 +977,7 @@ void setvidmode(void)
         sremain=-(((160*SCALEWL)>>16)*LCD_WIDTH+1);
     else
         sremain=LCD_WIDTH-swidth;
+#endif
 }
 
 void lcd_refreshline(void)
