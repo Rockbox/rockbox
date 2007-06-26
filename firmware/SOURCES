@@ -512,7 +512,6 @@ target/arm/usb-pp.c
 
 #ifdef GIGABEAT_F
 #ifndef SIMULATOR
-drivers/generic_i2c.c
 target/arm/s3c2440/gigabeat-fx/adc-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/ata-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/backlight-meg-fx.c

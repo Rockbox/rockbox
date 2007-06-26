@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Linus Nielsen Feltzing
+ * Copyright (C) 2007 by Michael Sevakis
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,119 +16,110 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "config.h"
-#include "cpu.h"
-#include <stdbool.h>
-#include "kernel.h"
 #include "system.h"
-#include "logf.h"
-#include "debug.h"
-#include "string.h"
-#include "generic_i2c.h"
+#include "i2c-meg-fx.h"
 
-static void i2c_sda_output(void)
+/* Only implements sending bytes for now. Adding receiving bytes should be
+   straightforward if needed. No yielding is present since the calls only
+   involve setting audio codec registers - a very rare event. */
+
+/* Wait for a condition on the bus, optionally returning it */
+#define COND_RET    _c;
+#define COND_VOID
+#define WAIT_COND(cond, ret)                        \
+    ({                                              \
+        int _t = current_tick + 2;                  \
+        bool _c;                                    \
+        while (1) {                                 \
+            _c = !!(cond);                          \
+            if (_c || TIME_AFTER(current_tick, _t)) \
+                break;                              \
+        }                                           \
+        ret                                         \
+    })
+
+static int i2c_getack(void)
 {
-    GPECON |= (1 << 30);
+    /* Wait for ACK: 0 = ack received, 1 = ack not received */
+    WAIT_COND(IICCON & I2C_TXRX_INTPND, COND_VOID);
+    return IICSTAT & I2C_ACK_L;
 }
 
-static void i2c_sda_input(void)
+static int i2c_start(void)
 {
-    GPECON &= ~(3 << 30);
+    /* Generate START */
+    IICSTAT = I2C_MODE_MASTER | I2C_MODE_TX | I2C_START | I2C_RXTX_ENB;
+    return i2c_getack();
 }
 
-static void i2c_sda_lo(void)
+static void i2c_stop(void)
 {
-    GPEDAT &= ~(1 << 15);
+    /* Generate STOP */
+    IICSTAT = I2C_MODE_MASTER | I2C_MODE_TX | I2C_RXTX_ENB;
+    /* Clear pending interrupt to continue */
+    IICCON &= ~I2C_TXRX_INTPND;
 }
 
-static void i2c_sda_hi(void)
+static int i2c_outb(unsigned char byte)
 {
-    GPEDAT |= (1 << 15);
+    /* Write byte to shift register */
+    IICDS = byte;
+    /* Clear pending interrupt to continue */
+    IICCON &= ~I2C_TXRX_INTPND;
+    return i2c_getack();
 }
 
-static int i2c_sda(void)
+void i2c_write(int addr, const unsigned char *buf, int count)
 {
-    return GPEDAT & (1 << 15);
-}
+    /* Turn on I2C clock */
+    CLKCON |= (1 << 16);
 
-static void i2c_scl_output(void)
-{
-    GPECON |= (1 << 28);
-}
+    /* Set mode to master transmitter and enable lines */
+    IICSTAT = I2C_MODE_MASTER | I2C_MODE_TX | I2C_RXTX_ENB;
 
-static void i2c_scl_input(void)
-{
-    GPECON &= ~(3 << 28);
-}
-
-static void i2c_scl_lo(void)
-{
-    GPEDAT &= ~(1 << 14);
-}
-
-static int i2c_scl(void)
-{
-    return GPEDAT & (1 << 14);
-}
-
-static void i2c_scl_hi(void)
-{
-    i2c_scl_input();
-    while(!i2c_scl());
-    GPEDAT |= (1 << 14);
-    i2c_scl_output();
-}
-
-
-
-static void i2c_delay(void)
-{
-     unsigned _x;
-
-    /* The i2c can clock at 500KHz: 2uS period -> 1uS half period */
-    /* about 30 cycles overhead + X * 7 */
-    /* 300MHz: 1000nS @3.36nS/cyc = 297cyc: X = 38*/
-    /* 100MHz: 1000nS @10nS/cyc = 100cyc : X = 10 */
-    for (_x = 38; _x; _x--)
+    /* Wait for bus to be available */
+    if (WAIT_COND(!(IICSTAT & I2C_BUSY), COND_RET))
     {
-        /* burn CPU cycles */
-        /* gcc makes it an inc loop - check with objdump for asm timing */
+        /* Send slave address and then data */
+        IICCON &= ~I2C_TXRX_INTPND;
+        IICCON |= I2C_TXRX_INTENB;
+
+        IICDS = addr & 0xfe;
+
+        if (i2c_start() == 0)
+            while (count-- > 0 && i2c_outb(*buf++) == 0);
+
+        i2c_stop();
+
+        IICCON &= ~I2C_TXRX_INTENB;
     }
+
+    /* Go back to slave receive mode and disable lines */
+    IICSTAT = 0;
+
+    /* Turn off I2C clock */
+    CLKCON &= ~(1 << 16);
 }
-
-
-
-struct i2c_interface s3c2440_i2c = {
-    0x34, /* Address */
-
-    /* Bit-banged interface definitions */
-    i2c_scl_hi,  /* Drive SCL high, might sleep on clk stretch */
-    i2c_scl_lo,  /* Drive SCL low */
-    i2c_sda_hi,  /* Drive SDA high */
-    i2c_sda_lo,  /* Drive SDA low */
-    i2c_sda_input,  /* Set SDA as input */
-    i2c_sda_output, /* Set SDA as output */
-    i2c_scl_input,  /* Set SCL as input */
-    i2c_scl_output, /* Set SCL as output */
-    i2c_scl,      /* Read SCL, returns 0 or nonzero */
-    i2c_sda,      /* Read SDA, returns 0 or nonzero */
-
-    i2c_delay,  /* START SDA hold time (tHD:SDA) */
-    i2c_delay,  /* SDA hold time (tHD:DAT) */
-    i2c_delay,  /* SDA setup time (tSU:DAT) */
-    i2c_delay,  /* STOP setup time (tSU:STO) */
-    i2c_delay,  /* Rep. START setup time (tSU:STA) */
-    i2c_delay,  /* SCL high period (tHIGH) */
-};
 
 void i2c_init(void)
 {
-    /* Set GPE15 (SDA) and GPE14 (SCL) to 1 */
-    GPECON = (GPECON & ~(0xF<<28)) | 5<<28;
-    i2c_add_node(&s3c2440_i2c);
-}
+    /* We poll I2C interrupts */
+    INTMSK |= (1 << 27);
 
-void i2c_send(int bus_address, int reg_address, const unsigned char buf)
-{
-    i2c_write_data(bus_address, reg_address, &buf, 1);
+    /* Turn on I2C clock */
+    CLKCON |= (1 << 16);
+
+    /* Set GPE15 (IICSDA) and GPE14 (IICSCL) to IIC */
+    GPECON = (GPECON & ~((3 << 30) | (3 << 28))) |
+                ((2 << 30) | (2 << 28));
+
+    /* Bus ACK, IICCLK: fPCLK / 16, Rx/Tx Int: Disable, Tx clock: IICCLK/8 */
+    /* OF PCLK: 49.1568MHz / 16 / 8 = 384.0375 kHz */
+    IICCON = (7 << 0);
+
+    /* SDA line delayed 0 PCLKs */
+    IICLC = (0 << 0);
+
+    /* Turn off I2C clock */
+    CLKCON &= ~(1 << 16);
 }

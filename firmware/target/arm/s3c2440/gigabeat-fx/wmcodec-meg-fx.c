@@ -26,7 +26,6 @@
 #include "cpu.h"
 #include "kernel.h"
 #include "sound.h"
-#include "i2c.h"
 #include "i2c-meg-fx.h"
 
 void audiohw_init(void)
@@ -44,5 +43,8 @@ void audiohw_init(void)
 
 void wmcodec_write(int reg, int data)
 {
-    i2c_send(0x34, (reg<<1) | ((data&0x100)>>8), data&0xff);
+    unsigned char d[2];
+    d[0] = (reg << 1) | ((data & 0x100) >> 8);
+    d[1] = data;
+    i2c_write(0x34, d, 2);
 }
