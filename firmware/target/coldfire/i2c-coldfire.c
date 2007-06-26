@@ -30,7 +30,7 @@
 static int i2c_start(volatile unsigned char *iface);
 static int i2c_wait_for_slave(volatile unsigned char *iface);
 static int i2c_outb(volatile unsigned char *iface, unsigned char byte);
-inline void i2c_stop(volatile unsigned char *iface);
+static inline void i2c_stop(volatile unsigned char *iface);
 
 
 /* --- Public functions - implementation --- */
@@ -76,6 +76,12 @@ void i2c_close(void)
     MBCR2 = 0;
 }
 
+/* End I2C session on the given interface. */
+static inline void i2c_stop(volatile unsigned char *iface)
+{
+    iface[O_MBCR] &= ~MSTA;
+}
+
 /*
  * Writes bytes to a I2C device.
  *
@@ -86,7 +92,7 @@ int i2c_write(volatile unsigned char *iface, unsigned char addr,
 {
     int i, rc;
 
-    if ( ! count)
+    if (count <= 0)
         return 0;
    
     rc = i2c_start(iface);
@@ -118,7 +124,7 @@ int i2c_read(volatile unsigned char *iface, unsigned char addr,
 {
     int i, rc;
 
-    if ( ! count)
+    if (count <= 0)
         return 0;
    
     rc = i2c_start(iface);
@@ -131,23 +137,25 @@ int i2c_read(volatile unsigned char *iface, unsigned char addr,
 
     /* Switch to Rx mode */
     iface[O_MBCR] &= ~MTX;
-    iface[O_MBCR] &= ~TXAK;
+
+    /* Turn on ACK generation if reading multiple bytes */
+    if (count > 1)
+        iface[O_MBCR] &= ~TXAK;
  
     /* Dummy read */
     rc = (int) iface[O_MBDR];
   
-    for (i = 0; i < count; i++)
+    for (i = count; i > 0; i--)
     {
         rc = i2c_wait_for_slave(iface);
         if (rc < 0)
             return rc;
 
-        if (i == count-2)
-            /* Don't ACK the next-to-last byte */
+        if (i == 2)
+            /* Don't ACK the last byte to be read from the slave */
             iface[O_MBCR] |= TXAK;
-    
-        if (i == count-1)
-            /* Generate STOP before reading last byte */
+        else if (i == 1)
+            /* Generate STOP before reading last byte received */
             i2c_stop(iface); 
 
         *buf++ = iface[O_MBDR];
@@ -232,10 +240,4 @@ int i2c_outb(volatile unsigned char *iface, unsigned char byte)
     }
     
     return 0;
-}
-
-/* End I2C session on the given interface. */
-inline void i2c_stop(volatile unsigned char *iface)
-{
-    iface[O_MBCR] &= ~MSTA;
 }
