@@ -80,7 +80,17 @@ int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
 #endif
 
 /* delay loop to achieve 400kHz at 120MHz CPU frequency */
-#define DELAY   do { volatile int _x; for(_x=0;_x<22;_x++);} while (0)
+#define DELAY   \
+    ({                                \
+        int _x_;                      \
+        asm volatile (                \
+            "move.l #21, %[_x_] \r\n" \
+        "1:                     \r\n" \
+            "subq.l #1, %[_x_]  \r\n" \
+            "bhi.b  1b          \r\n" \
+            : [_x_]"=&d"(_x_)         \
+        );                            \
+    })
 
 static void fmradio_i2c_start(void)
 {
@@ -102,8 +112,8 @@ static void fmradio_i2c_stop(void)
    SDA_HI;
 }
 
-
-static void fmradio_i2c_ack(void)
+/* Generate ACK or NACK */
+static void fmradio_i2c_ack(bool nack)
 {
     /* Here's the deal. The slave is slow, and sometimes needs to wait
        before it can receive the acknowledge. Therefore it forces the clock
@@ -114,7 +124,11 @@ static void fmradio_i2c_ack(void)
        we have to drive the SCL high repeatedly to simulate a pullup. */
     
     SCL_LO;      /* Set the clock low */
-    SDA_LO;
+
+    if (nack)
+        SDA_HI;
+    else
+        SDA_LO;
     
     SCL_INPUT;   /* Set the clock to input */
     while(!SCL)  /* and wait for the slave to release it */
@@ -248,8 +262,7 @@ int fmradio_i2c_read(int address, unsigned char* buf, int count)
         for (i=count; i>0; i--)
         {
             *buf++ = fmradio_i2c_inb();
-            if (i != 1)
-                fmradio_i2c_ack();
+            fmradio_i2c_ack(i == 1);
         }
     }
     else
@@ -275,7 +288,7 @@ int fmradio_i2c_read(int address, unsigned char* buf, int count)
 #define SCL     (PBDR & 0x0002)
 
 /* arbitrary delay loop */
-#define DELAY   do { volatile int _x; for(_x=0;_x<20;_x++);} while (0)
+#define DELAY   do { int _x; for(_x=0;_x<20;_x++);} while (0)
 
 static void fmradio_i2c_start(void)
 {
@@ -296,7 +309,7 @@ static void fmradio_i2c_stop(void)
 }
 
 
-static void fmradio_i2c_ack(void)
+static void fmradio_i2c_ack(bool nack)
 {
     /* Here's the deal. The slave is slow, and sometimes needs to wait
        before it can receive the acknowledge. Therefore it forces the clock
@@ -304,7 +317,11 @@ static void fmradio_i2c_ack(void)
        high before we release the ack. */
     
     SCL_LO;      /* Set the clock low */
-    SDA_LO;
+
+    if (nack)
+        SDA_HI;
+    else
+        SDA_LO;
     
     SCL_INPUT;   /* Set the clock to input */
     while(!SCL)  /* and wait for the slave to release it */
@@ -416,8 +433,7 @@ int fmradio_i2c_read(int address, unsigned char* buf, int count)
         for (i=count; i>0; i--)
         {
             *buf++ = fmradio_i2c_inb();
-            if (i != 1)
-               fmradio_i2c_ack();
+            fmradio_i2c_ack(i == 1);
         }
     }
     else
