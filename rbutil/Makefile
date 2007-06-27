@@ -60,4 +60,5 @@ clean:
 	make -C icons clean
 
 .PHONY: install
+install:
 	install -D rbutil$(EXT) $(DESTDIR)/bin/rbutil$(EXT)
