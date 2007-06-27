@@ -80,8 +80,7 @@ int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
 #endif
 
 /* delay loop to achieve 400kHz at 120MHz CPU frequency */
-#define DELAY    do { int _x; for(_x=0;_x<22;_x++);} while(0)
-
+#define DELAY   do { volatile int _x; for(_x=0;_x<22;_x++);} while (0)
 
 static void fmradio_i2c_start(void)
 {
@@ -207,8 +206,6 @@ static unsigned char fmradio_i2c_inb(void)
        SDA_OUTPUT;
    }
 
-   fmradio_i2c_ack();
-   
    return byte;
 }
 
@@ -248,9 +245,11 @@ int fmradio_i2c_read(int address, unsigned char* buf, int count)
 
     if (fmradio_i2c_getack())
     {
-        for (i=0; i<count; i++)
+        for (i=count; i>0; i--)
         {
-            buf[i] = fmradio_i2c_inb();
+            *buf++ = fmradio_i2c_inb();
+            if (i != 1)
+                fmradio_i2c_ack();
         }
     }
     else
@@ -276,8 +275,7 @@ int fmradio_i2c_read(int address, unsigned char* buf, int count)
 #define SCL     (PBDR & 0x0002)
 
 /* arbitrary delay loop */
-#define DELAY   do { int _x; for(_x=0;_x<20;_x++);} while (0)
-
+#define DELAY   do { volatile int _x; for(_x=0;_x<20;_x++);} while (0)
 
 static void fmradio_i2c_start(void)
 {
@@ -370,7 +368,7 @@ static void fmradio_i2c_outb(unsigned char byte)
    SDA_HI;
 }
 
-static unsigned char fmradio_i2c_inb(int ack)
+static unsigned char fmradio_i2c_inb(void)
 {
    int i;
    unsigned char byte = 0;
@@ -384,8 +382,6 @@ static unsigned char fmradio_i2c_inb(int ack)
        SCL_LO;
        SDA_OUTPUT;
    }
-   
-   fmradio_i2c_ack(ack);
    
    return byte;
 }
@@ -424,8 +420,11 @@ int fmradio_i2c_read(int address, unsigned char* buf, int count)
     fmradio_i2c_start();
     fmradio_i2c_outb(address | 1);
     if (fmradio_i2c_getack()) {
-        for (i=0; i<count; i++) {
-            buf[i] = fmradio_i2c_inb(0);
+        for (i=count; i>0; i--)
+        {
+            *buf++ = fmradio_i2c_inb();
+            if (i != 1)
+               fmradio_i2c_ack(ack);
         }
     }
     else
