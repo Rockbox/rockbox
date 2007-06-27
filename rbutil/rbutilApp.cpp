@@ -138,6 +138,13 @@ bool rbutilFrmApp::ReadGlobalConfig(rbutilFrm* myFrame)
         }
     }
 
+    if (! wxFileExists(buf) )
+    {
+        gv->ErrStr = new wxString(wxT("Configuration file doesnt exist!"));
+        return false;
+    }
+
+
     wxFileInputStream* cfgis = new wxFileInputStream(buf);
 
     if (!cfgis->CanRead()) {
