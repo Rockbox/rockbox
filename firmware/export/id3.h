@@ -23,6 +23,8 @@
 #include "config.h"
 #include "file.h"
 
+#define ID3V2_BUF_SIZE 300
+
 /* Audio file types. */
 /* NOTE: The values of the AFMT_* items are used for the %fc tag in the WPS
          - so new entries MUST be added to the end to maintain compatibility.
@@ -185,7 +187,7 @@ struct mp3entry {
     unsigned char toc[100]; /* table of contents */
 
     /* these following two fields are used for local buffering */
-    char id3v2buf[300];
+    char id3v2buf[ID3V2_BUF_SIZE];
     char id3v1buf[4][92];
 
     /* resume related */
