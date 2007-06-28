@@ -34,8 +34,7 @@ struct status_info {
     int playmode;
     int repeat;
 #if CONFIG_RTC
-    int hour;
-    int minute;
+    struct tm *time;
 #endif
 
 #if CONFIG_CHARGING
