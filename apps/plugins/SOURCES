@@ -37,6 +37,7 @@ disktidy.c
 flipit.c
 
 #ifdef HAVE_LCD_BITMAP             /* Not for the Player */
+maze.c
 mazezam.c
 text_editor.c
 wavview.c
