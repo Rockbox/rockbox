@@ -331,11 +331,13 @@ sokoban_tiles.14x14.bmp
 #elif (LCD_HEIGHT >= 144) && (LCD_WIDTH >= 212) || \
       (LCD_HEIGHT >= 169) && (LCD_WIDTH >= 180-4)
 sokoban_tiles.9x9.bmp
-#else
-/* LCD_HEIGHT >= 96~121 && LCD_WIDTH >= 152~120 */
+#elif (LCD_HEIGHT >= 96 && LCD_WIDTH >= 152) || \
+      (LCD_HEIGHT >= 121 && LCD_WIDTH >= 120)
 sokoban_tiles.6x6.bmp
 #endif
-#elif LCD_DEPTH >= 2
+#elif LCD_DEPTH >= 2 && \
+      ((LCD_HEIGHT >= 96 && LCD_WIDTH >= 152) || \
+      (LCD_HEIGHT >= 121 && LCD_WIDTH >= 120))
 sokoban_tiles.6x6x2.bmp
 #endif
 
