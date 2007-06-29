@@ -33,19 +33,36 @@
 
 PLUGIN_HEADER
 
-#define MAZE_NEW   PLA_START
-#define MAZE_QUIT  PLA_QUIT
-#define MAZE_SOLVE PLA_FIRE
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_3G_PAD)
+#   undef __PLUGINLIB_ACTIONS_H__
+#   define MAZE_NEW      (BUTTON_SELECT | BUTTON_REPEAT)
+#   define MAZE_NEW_PRE  BUTTON_SELECT
+#   define MAZE_QUIT     (BUTTON_SELECT | BUTTON_MENU)
+#   define MAZE_SOLVE    (BUTTON_SELECT | BUTTON_PLAY)
+#   define MAZE_RIGHT    BUTTON_RIGHT
+#   define MAZE_LEFT     BUTTON_LEFT
+#   define MAZE_UP       BUTTON_MENU
+#   define MAZE_DOWN     BUTTON_PLAY
+#   define MAZE_RRIGHT   (BUTTON_RIGHT | BUTTON_REPEAT)
+#   define MAZE_RLEFT    (BUTTON_LEFT | BUTTON_REPEAT)
+#   define MAZE_RUP      (BUTTON_MENU | BUTTON_REPEAT)
+#   define MAZE_RDOWN    (BUTTON_PLAY | BUTTON_REPEAT)
 
-#define MAZE_RIGHT PLA_RIGHT
-#define MAZE_LEFT  PLA_LEFT
-#define MAZE_UP    PLA_UP
-#define MAZE_DOWN  PLA_DOWN
-#define MAZE_RRIGHT PLA_RIGHT_REPEAT
-#define MAZE_RLEFT  PLA_LEFT_REPEAT
-#define MAZE_RUP    PLA_UP_REPEAT
-#define MAZE_RDOWN  PLA_DOWN_REPEAT
+#else
+#   define MAZE_NEW      PLA_START
+#   define MAZE_QUIT     PLA_QUIT
+#   define MAZE_SOLVE    PLA_FIRE
+#   define MAZE_RIGHT    PLA_RIGHT
+#   define MAZE_LEFT     PLA_LEFT
+#   define MAZE_UP       PLA_UP
+#   define MAZE_DOWN     PLA_DOWN
+#   define MAZE_RRIGHT   PLA_RIGHT_REPEAT
+#   define MAZE_RLEFT    PLA_LEFT_REPEAT
+#   define MAZE_RUP      PLA_UP_REPEAT
+#   define MAZE_RDOWN    PLA_DOWN_REPEAT
 
+#endif
 
 /* propertie bits of the cell */
 #define WALL_N    0x00000001
@@ -61,8 +78,11 @@ PLUGIN_HEADER
 #define PATH      0x00000100
 
 static struct plugin_api* rb;
+
+#ifdef __PLUGINLIB_ACTIONS_H__
 const struct button_mapping *plugin_contexts[]
 = {generic_directions, generic_actions};
+#endif
 
 #if ( LCD_WIDTH == 112 )
 #define MAZE_WIDTH  16
@@ -360,7 +380,7 @@ void solve_maze(void){
 /**********************************/
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    int button = 0;
+    int button, lastbutton = BUTTON_NONE;
     int quit = 0;
 
     (void)parameter;
@@ -370,6 +390,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
     rb->lcd_set_background(LCD_DEFAULT_BG);
+#if LCD_DEPTH >= 16
+    rb->lcd_set_foreground( LCD_RGBPACK( 0, 0, 0));
+#elif LCD_DEPTH == 2
+    rb->lcd_set_foreground(0);
+#endif
 #endif
 
     init_maze();
@@ -377,9 +402,17 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     show_maze();
 
     while(!quit) {
+#ifdef __PLUGINLIB_ACTIONS_H__
         button = pluginlib_getaction(rb, TIMEOUT_BLOCK, plugin_contexts, 2);
+#else
+        button = rb->button_get(true);
+#endif
         switch(button) {
         case MAZE_NEW:
+#ifdef MAZE_NEW_PRE
+            if(lastbutton != MAZE_NEW_PRE)
+                break;
+#endif
             solved = false;
             init_maze();
             generate_maze();
@@ -430,6 +463,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             }
             break;
         }
+        if( button != BUTTON_NONE )
+            lastbutton = button;
         rb->yield();
     }
     rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
