@@ -143,11 +143,6 @@ bool battery_level_safe(void)
     return battery_level() >= 10;
 }
 
-bool battery_level_critical(void)
-{
-    return false;
-}
-
 void set_poweroff_timeout(int timeout)
 {
     (void)timeout;
@@ -420,12 +415,6 @@ int battery_adc_voltage(void)
 bool battery_level_safe(void)
 {
     return battery_centivolts > battery_level_dangerous[battery_type];
-}
-
-/* Tells if the battery is in critical powersaving state */
-bool battery_level_critical(void)
-{
-    return ((battery_capacity * battery_percent / BATTERY_CAPACITY_MIN) < 10);
 }
 
 void set_poweroff_timeout(int timeout)
@@ -1291,7 +1280,7 @@ void shutdown_hw(void)
     }
 #endif
     audio_stop();
-    if (!battery_level_critical()) { /* do not save on critical battery */
+    if (battery_level_safe()) { /* do not save on critical battery */
 #ifdef HAVE_LCD_BITMAP
         glyph_cache_save();
 #endif

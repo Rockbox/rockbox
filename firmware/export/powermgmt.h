@@ -144,9 +144,6 @@ void battery_read_info(int *adc, int *voltage, int *level);
 /* Tells if the battery level is safe for disk writes */
 bool battery_level_safe(void);
 
-/* Tells if battery is in critical power saving state */
-bool battery_level_critical(void);
-
 void set_poweroff_timeout(int timeout);
 void set_battery_capacity(int capacity); /* set local battery capacity value */
 void set_battery_type(int type);         /* set local battery type */

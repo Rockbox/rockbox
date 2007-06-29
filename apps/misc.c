@@ -611,7 +611,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
     if(!charger_inserted())
 #endif
     {
-        bool batt_crit = battery_level_critical();
+        bool batt_safe = battery_level_safe();
         int audio_stat = audio_status();
 
         FOR_NB_SCREENS(i)
@@ -619,15 +619,8 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 #ifdef X5_BACKLIGHT_SHUTDOWN
         x5_backlight_shutdown();
 #endif
-        if (!battery_level_safe())
-            gui_syncsplash(3*HZ, "%s %s",
-                           str(LANG_WARNING_BATTERY_EMPTY),
-                           str(LANG_SHUTTINGDOWN));
-        else if (battery_level_critical())
-            gui_syncsplash(3*HZ, "%s %s",
-                           str(LANG_WARNING_BATTERY_LOW),
-                           str(LANG_SHUTTINGDOWN));
-        else {
+        if (batt_safe)
+        {
 #ifdef HAVE_TAGCACHE
             if (!tagcache_prepare_shutdown())
             {
@@ -636,44 +629,60 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
                 return false;
             }
 #endif
-            gui_syncsplash(0, str(LANG_SHUTTINGDOWN));
+            if (battery_level() > 10)
+                gui_syncsplash(0, str(LANG_SHUTTINGDOWN));
+            else
+                gui_syncsplash(0, "%s %s",
+                               str(LANG_WARNING_BATTERY_LOW),
+                               str(LANG_SHUTTINGDOWN));
+        }
+        else
+        {
+            gui_syncsplash(0, "%s %s",
+                           str(LANG_WARNING_BATTERY_EMPTY),
+                           str(LANG_SHUTTINGDOWN));
         }
         
-        if (global_settings.fade_on_stop 
+        if (global_settings.fade_on_stop
             && (audio_stat & AUDIO_STATUS_PLAY))
         {
             fade(0);
         }
 
-#if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
-        if (!batt_crit && (audio_stat & AUDIO_STATUS_RECORD))
+        if (batt_safe) /* do not save on critical battery */
         {
-            audio_stop_recording();
-            while(audio_status() & AUDIO_STATUS_RECORD)
-                sleep(1);
-        }
-            
-        audio_close_recording();
+#if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
+            if (audio_stat & AUDIO_STATUS_RECORD)
+                audio_stop_recording();
 #endif
-        /* audio_stop_recording == audio_stop for HWCODEC */
+            /* audio_stop_recording == audio_stop for HWCODEC */
+            audio_stop();
 
-        audio_stop();
-        while (audio_status())
-            sleep(1);
-        
-        if (callback != NULL)
-            callback(parameter);
+            if (callback != NULL)
+                callback(parameter);
 
-        if (!batt_crit) /* do not save on critical battery */
+            /* wait for audio_stop or audio_stop_recording to complete */
+            while (audio_status())
+                sleep(1);
+
+#if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
+            audio_close_recording();       
+#endif
             system_flush();
 #ifdef HAVE_EEPROM_SETTINGS
-        if (firmware_settings.initialized)
-        {
-            firmware_settings.disk_clean = true;
-            firmware_settings.bl_version = 0;
-            eeprom_settings_store();
-        }
+            if (firmware_settings.initialized)
+            {
+                firmware_settings.disk_clean = true;
+                firmware_settings.bl_version = 0;
+                eeprom_settings_store();
+            }
 #endif
+        }
+#ifdef HAVE_DIRCACHE
+        else
+            dircache_disable();
+#endif
+
         shutdown_hw();
     }
 #endif
