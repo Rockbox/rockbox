@@ -1272,6 +1272,7 @@ static bool sokoban_loop(void)
                 break;
 #endif
 
+#ifdef SOKOBAN_LEVEL_UP
             case SOKOBAN_LEVEL_UP:
             case SOKOBAN_LEVEL_UP | BUTTON_REPEAT:
                 /* next level */
@@ -1281,7 +1282,9 @@ static bool sokoban_loop(void)
 
                 draw_level();
                 break;
+#endif
 
+#ifdef SOKOBAN_LEVEL_DOWN
             case SOKOBAN_LEVEL_DOWN:
             case SOKOBAN_LEVEL_DOWN | BUTTON_REPEAT:
                 /* previous level */
@@ -1291,6 +1294,7 @@ static bool sokoban_loop(void)
 
                 draw_level();
                 break;
+#endif
 
 #ifdef SOKOBAN_LEVEL_REPEAT
             case SOKOBAN_LEVEL_REPEAT:
