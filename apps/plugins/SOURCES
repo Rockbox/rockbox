@@ -105,6 +105,7 @@ spacerocks.c
 rockpaint.c
 #endif
 
+rocklife.c
 #endif /* HAVE_LCD_BITMAP */
 
 #ifdef HAVE_LCD_CHARCELLS          /* Player model only */
