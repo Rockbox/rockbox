@@ -267,6 +267,7 @@ static struct BufferedBoards {
 
 
 static struct plugin_api* rb;
+MEM_FUNCTION_WRAPPERS(rb);
 
 static char buf[ROWS*(COLS + 1)]; /* Enough for a whole board or a filename */
 
