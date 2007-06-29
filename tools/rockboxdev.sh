@@ -152,6 +152,13 @@ case $1 in
         gccpatch="gcc-3.4.6.patch"
         ;;
       Linux)
+        machine=`uname -m`
+        case $machine in
+          x86_64)
+            gccurl="http://www.rockbox.org/twiki/pub/Main/CrossCompiler"
+            gccpatch="gcc-3.4.6-amd64.patch"
+            ;;
+        esac
         ;;
       *)
         ;;
