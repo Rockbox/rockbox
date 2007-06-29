@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: helloworld.c 8349 2006-01-15 18:20:18Z amiconn $
+ * $Id$
  *
  * Copyright (C) 2007 Matthias Wientapper
  *
