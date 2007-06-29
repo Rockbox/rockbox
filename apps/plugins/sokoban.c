@@ -33,8 +33,9 @@ extern const fb_data sokoban_tiles[];
 
 #define SOKOBAN_TITLE        "Sokoban"
 
-#define SOKOBAN_LEVELS_FILE  PLUGIN_DIR "/sokobanlevels.sok"
-#define SOKOBAN_SAVE_FILE    PLUGIN_DIR "/sokobansave.sok"
+#define SOKOBAN_LEVELS_FILE  PLUGIN_DIR "/sokoban.levels"
+#define SOKOBAN_SAVE_FILE    PLUGIN_DIR "/sokoban.save"
+#define SOKOBAN_SAVE_FOLDER  "/games"
 
 /* Magnify is the number of pixels for each block.
  * Set dynamically so all targets can support levels
@@ -112,6 +113,7 @@ extern const fb_data sokoban_tiles[];
 #define SOKOBAN_LEVEL_DOWN BUTTON_F1
 #define SOKOBAN_LEVEL_REPEAT BUTTON_F2
 #define SOKOBAN_LEVEL_UP BUTTON_F3
+#define SOKOBAN_PAUSE BUTTON_PLAY
 #define BUTTON_SAVE BUTTON_ON
 #define BUTTON_SAVE_NAME "ON"
 
@@ -125,6 +127,7 @@ extern const fb_data sokoban_tiles[];
 #define SOKOBAN_LEVEL_DOWN (BUTTON_MENU | BUTTON_LEFT)
 #define SOKOBAN_LEVEL_REPEAT (BUTTON_MENU | BUTTON_UP)
 #define SOKOBAN_LEVEL_UP (BUTTON_MENU | BUTTON_RIGHT)
+#define SOKOBAN_PAUSE BUTTON_MENU
 #define BUTTON_SAVE BUTTON_MENU
 #define BUTTON_SAVE_NAME "MENU"
 
@@ -138,10 +141,11 @@ extern const fb_data sokoban_tiles[];
 #define SOKOBAN_LEVEL_DOWN (BUTTON_ON | BUTTON_DOWN)
 #define SOKOBAN_LEVEL_REPEAT BUTTON_ON
 #define SOKOBAN_LEVEL_UP (BUTTON_ON | BUTTON_UP)
+#define SOKOBAN_PAUSE BUTTON_ON
 #define BUTTON_SAVE BUTTON_MODE
 #define BUTTON_SAVE_NAME "MODE"
 
-#define SOKOBAN_RC_QUIT BUTTON_RC_STOP
+#define SOKOBAN_RC_MENU BUTTON_RC_STOP
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
@@ -153,19 +157,21 @@ extern const fb_data sokoban_tiles[];
 #define SOKOBAN_REDO (BUTTON_SELECT | BUTTON_PLAY)
 #define SOKOBAN_LEVEL_DOWN (BUTTON_SELECT | BUTTON_LEFT)
 #define SOKOBAN_LEVEL_UP (BUTTON_SELECT | BUTTON_RIGHT)
+#define SOKOBAN_PAUSE BUTTON_SELECT
 #define BUTTON_SAVE BUTTON_SELECT
 #define BUTTON_SAVE_NAME "SELECT"
 
-/* FIXME: if/when simultaneous button presses work for X5,
- * add redo & level repeat */
+/* FIXME: if/when simultaneous button presses work for X5/M5,
+ * add level up/down */
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 #define SOKOBAN_UP BUTTON_UP
 #define SOKOBAN_DOWN BUTTON_DOWN
 #define SOKOBAN_MENU BUTTON_POWER
 #define SOKOBAN_UNDO_PRE BUTTON_SELECT
 #define SOKOBAN_UNDO (BUTTON_SELECT | BUTTON_REL)
-#define SOKOBAN_LEVEL_DOWN BUTTON_REC
-#define SOKOBAN_LEVEL_UP BUTTON_PLAY
+#define SOKOBAN_LEVEL_REPEAT BUTTON_REC
+#define SOKOBAN_REDO BUTTON_PLAY
+#define SOKOBAN_PAUSE BUTTON_PLAY
 #define BUTTON_SAVE BUTTON_SELECT
 #define BUTTON_SAVE_NAME "SELECT"
 
@@ -179,6 +185,7 @@ extern const fb_data sokoban_tiles[];
 #define SOKOBAN_LEVEL_DOWN (BUTTON_PLAY | BUTTON_SCROLL_DOWN)
 #define SOKOBAN_LEVEL_REPEAT (BUTTON_PLAY | BUTTON_RIGHT)
 #define SOKOBAN_LEVEL_UP (BUTTON_PLAY | BUTTON_SCROLL_UP)
+#define SOKOBAN_PAUSE BUTTON_PLAY
 #define BUTTON_SAVE BUTTON_PLAY
 #define BUTTON_SAVE_NAME "PLAY"
 
@@ -191,6 +198,7 @@ extern const fb_data sokoban_tiles[];
 #define SOKOBAN_LEVEL_DOWN BUTTON_VOL_DOWN
 #define SOKOBAN_LEVEL_REPEAT BUTTON_MENU
 #define SOKOBAN_LEVEL_UP BUTTON_VOL_UP
+#define SOKOBAN_PAUSE BUTTON_SELECT
 #define BUTTON_SAVE BUTTON_SELECT
 #define BUTTON_SAVE_NAME "SELECT"
 
@@ -204,6 +212,7 @@ extern const fb_data sokoban_tiles[];
 #define SOKOBAN_LEVEL_DOWN (BUTTON_SELECT | BUTTON_DOWN)
 #define SOKOBAN_LEVEL_REPEAT (BUTTON_SELECT | BUTTON_RIGHT)
 #define SOKOBAN_LEVEL_UP (BUTTON_SELECT | BUTTON_UP)
+#define SOKOBAN_PAUSE BUTTON_SELECT
 #define BUTTON_SAVE BUTTON_SELECT
 #define BUTTON_SAVE_NAME "SELECT"
 
@@ -218,7 +227,7 @@ extern const fb_data sokoban_tiles[];
 
 /* Level data & stats */
 struct LevelInfo {
-    short index;             /* Level index (level number - 1) */
+    int index;               /* Level index (level number - 1) */
     int moves;               /* Moves & pushes for the stats */
     int pushes;
     short boxes_to_go;       /* Number of unplaced boxes remaining in level */
@@ -294,7 +303,7 @@ static void get_delta(char direction, short *d_r, short *d_c)
     }
 }
 
-static void undo(void)
+static bool undo(void)
 {
     char undo;
     short r, c;
@@ -304,7 +313,7 @@ static void undo(void)
 
     /* If no more undos or we've wrapped all the way around, quit */
     if (undo_info.count == 0 || undo_info.current - 1 == undo_info.max)
-        return;
+        return false;
 
     /* Move to previous undo in the list */
     if (undo_info.current == 0 && undo_info.count > 1)
@@ -356,7 +365,7 @@ static void undo(void)
 
     current_info.level.moves--;
 
-    return;
+    return true;
 }
 
 static void add_undo(char undo)
@@ -844,8 +853,21 @@ static void draw_level(void)
 static bool save(char *filename, bool solution)
 {
     int fd;
+    char *loc;
+    DIR *dir;
+    char dirname[MAX_PATH];
 
     rb->splash(0, "Saving...");
+
+    /* Create dir if it doesn't exist */
+    if ((loc = rb->strrchr(filename, '/')) != NULL) {
+        rb->strncpy(dirname, filename, loc - filename);
+        dirname[loc - filename] = '\0';
+        if(!(dir = rb->opendir(dirname)))
+            rb->mkdir(dirname);
+        else
+            rb->closedir(dir);
+    }
 
     if (filename[0] == '\0' ||
         (fd = rb->open(filename, O_WRONLY|O_CREAT|O_TRUNC)) < 0) {
@@ -874,11 +896,13 @@ static bool save(char *filename, bool solution)
 static bool load(char *filename, bool silent)
 {
     int fd;
-    int i = 0, n;
+    int i, n;
     int len;
-    bool play_solution;
     int button;
-    int step_delay = HZ/4;
+    bool play_solution;
+    bool paused = false;
+    unsigned short speed = 2;
+    int delay[] = {HZ/2, HZ/3, HZ/4, HZ/6, HZ/8, HZ/12, HZ/16, HZ/25};
 
     if (filename[0] == '\0' || (fd = rb->open(filename, O_RDONLY)) < 0) {
         if (!silent)
@@ -934,11 +958,12 @@ static bool load(char *filename, bool silent)
             n = n*10 + buf[i] - '0';
         current_info.level.index = n - 1;
 
-        /* Get current undo index */
+        /* Get undo index */
         for (n = 0, i++; buf[i] >= '0' && buf[i] <= '9' && i < 21; i++)
             n = n*10 + buf[i] - '0';
         if (n > len)
             n = len;
+        undo_info.max = len;
 
         if (current_info.level.index < 0) {
             if (!silent)
@@ -958,40 +983,78 @@ static bool load(char *filename, bool silent)
         if (play_solution) {
             rb->lcd_clear_display();
             update_screen();
-            rb->sleep(2*step_delay);
+            rb->sleep(2*delay[speed]);
 
-            /* Replay solution until the end or quit button is pressed */
-            for (i = 0; i < len; i++) {
-                if (!move(undo_info.history[i], true)) {
-                    n = i;
-                    break;
-                }
+            /* Replay solution until menu button is pressed */
+            i = 0;
+            while (true) {
+                if (i < len) {
+                    if (!move(undo_info.history[i], true)) {
+                        n = i;
+                        break;
+                    }
+                    rb->lcd_clear_display();
+                    update_screen();
+                    i++;
+                } else
+                    paused = true;
 
-                rb->lcd_clear_display();
-                update_screen();
-                rb->sleep(step_delay);
+                rb->sleep(delay[speed]);
 
-                /* Ignore keypresses except for quit & changing speed */
-                while ((button = rb->button_get(false)) != BUTTON_NONE) {
+                while ((button = rb->button_get(false)) || paused) {
                     switch (button) {
                         case SOKOBAN_MENU:
                             /* Pretend the level is complete so we'll quit */
                             current_info.level.boxes_to_go = 0;
                             return true;
 
+                        case SOKOBAN_PAUSE:
+                            /* Toggle pause state */
+                            paused = !paused;
+                            break;
+
+                        case BUTTON_LEFT:
+                        case BUTTON_LEFT | BUTTON_REPEAT:
+                            /* Go back one move */
+                            if (paused) {
+                                if (undo())
+                                    i--;
+                                rb->lcd_clear_display();
+                                update_screen();
+                            }
+                            break;
+
+                        case BUTTON_RIGHT:
+                        case BUTTON_RIGHT | BUTTON_REPEAT:
+                            /* Go forward one move */
+                            if (paused) {
+                                if (redo())
+                                    i++;
+                                rb->lcd_clear_display();
+                                update_screen();
+                            }
+                            break;
+
                         case SOKOBAN_UP:
-                            if (step_delay > HZ/12)
-                                step_delay = 5*step_delay/6;
+                        case SOKOBAN_UP | BUTTON_REPEAT:
+                            /* Speed up */
+                            if (speed < sizeof(delay)/sizeof(int) - 1)
+                                speed++;
                             break;
 
                         case SOKOBAN_DOWN:
-                            if (step_delay < 3*HZ/4)
-                                step_delay = 6*step_delay/5;
+                        case SOKOBAN_DOWN | BUTTON_REPEAT:
+                            /* Slow down */
+                            if (speed > 0)
+                                speed--;
                     }
+
+                    if (paused)
+                        rb->sleep(HZ/33);
                 }
             }
 
-            /* If level complete, wait for keypress before quitting */
+            /* If level is complete, wait for keypress before quitting */
             if (current_info.level.boxes_to_go == 0)
                 rb->button_get(true);
 
@@ -1008,7 +1071,6 @@ static bool load(char *filename, bool silent)
             rb->lcd_clear_display();
         }
 
-        undo_info.max = len;
         undo_info.current = n;
     }
 
@@ -1022,9 +1084,10 @@ static int sokoban_menu(void)
     int i;
     bool menu_quit;
     int start_selected = 0;
+    int prev_level = current_info.level.index;
 
     MENUITEM_STRINGLIST(menu, "Sokoban Menu", NULL,
-                        "Resume", "Audio Playback", "Keys",
+                        "Resume", "Select Level", "Audio Playback", "Keys",
                         "Load Default Level Set", "Quit Without Saving",
                         "Save Progress & Quit");
 
@@ -1036,12 +1099,25 @@ static int sokoban_menu(void)
             case 0: /* Resume */
                 break;
 
-            case 1: /* Audio playback control */
+            case 1: /* Select level */
+                current_info.level.index++;
+                rb->set_int("Select Level", "", UNIT_INT,
+                            &current_info.level.index, NULL, 1, 1,
+                            current_info.max_level, NULL);
+                current_info.level.index--;
+                if (prev_level != current_info.level.index) {
+                    init_undo();
+                    draw_level();
+                } else
+                    menu_quit = false;
+                break;
+
+            case 2: /* Audio playback control */
                 playback_control(rb);
                 menu_quit = false;
                 break;
 
-            case 2: /* Keys */
+            case 3: /* Keys */
                 FOR_NB_SCREENS(i)
                     rb->screens[i]->clear_display();
                 rb->lcd_setfont(SOKOBAN_FONT);
@@ -1079,8 +1155,8 @@ static int sokoban_menu(void)
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
                 rb->lcd_putsxy(3,  6, "[POWER] Menu");
                 rb->lcd_putsxy(3, 16, "[SELECT] Undo");
-                rb->lcd_putsxy(3, 26, "[REC] Previous Level");
-                rb->lcd_putsxy(3, 36, "[PLAY] Next Level");
+                rb->lcd_putsxy(3, 26, "[PLAY] Redo");
+                rb->lcd_putsxy(3, 36, "[REC] Restart Level");
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
                 rb->lcd_putsxy(3,  6, "[POWER] Menu");
                 rb->lcd_putsxy(3, 16, "[REW] Undo");
@@ -1117,17 +1193,17 @@ static int sokoban_menu(void)
                 menu_quit = false;
                 break;
 
-            case 3: /* Load default levelset */
+            case 4: /* Load default levelset */
                 init_boards();
                 if (!read_levels(true))
-                    return 4;
+                    return 5; /* Quit */
                 load_level();
                 break;
 
-            case 4: /* Quit */
+            case 5: /* Quit */
                 break;
 
-            case 5: /* Save & quit */
+            case 6: /* Save & quit */
                 save(SOKOBAN_SAVE_FILE, false);
                 rb->reload_directory();
         }
@@ -1163,13 +1239,13 @@ static bool sokoban_loop(void)
 
         switch(button)
         {
-#ifdef SOKOBAN_RC_QUIT
-            case SOKOBAN_RC_QUIT:
+#ifdef SOKOBAN_RC_MENU
+            case SOKOBAN_RC_MENU:
 #endif
             case SOKOBAN_MENU:
                 switch (sokoban_menu()) {
-                    case 4: /* Quit */
-                    case 5: /* Save & quit */
+                    case 5: /* Quit */
+                    case 6: /* Save & quit */
                         return PLUGIN_OK;
                 }
                 update_screen();
@@ -1292,7 +1368,7 @@ static bool sokoban_loop(void)
                 rb->button_clear_queue();
 
                 /* Display for 4 seconds or until new keypress */
-                for (i = 0; i < 75; i++) {
+                for (i = 0; i < 80; i++) {
                     rb->sleep(HZ/20);
                     button = rb->button_get(false);
                     if (button && !(button & BUTTON_REL) &&
@@ -1302,16 +1378,25 @@ static bool sokoban_loop(void)
 
                 if (button == BUTTON_SAVE) {
                     if (undo_info.count < MAX_UNDOS) {
-                        /* Default filename to current levelset plus
-                         * level number and .sok extension */
-                        loc = rb->strrchr(buffered_boards.filename, '.');
-                        if (loc != NULL)
-                            *loc = '\0';
-                        rb->snprintf(buf, sizeof(buf), "%s.%d.sok",
-                                     buffered_boards.filename,
-                                     current_info.level.index + 1);
-                        if (loc != NULL)
-                            *loc = '.';
+                        /* Set filename to current levelset plus level number
+                         * and .sok extension. Use SAVE_FOLDER if using the
+                         * default levelset, since it's in a hidden folder. */
+                        if (rb->strcmp(buffered_boards.filename,
+                                       SOKOBAN_LEVELS_FILE) == 0) {
+                            rb->snprintf(buf, sizeof(buf),
+                                         "%s/sokoban.%d.sok",
+                                         SOKOBAN_SAVE_FOLDER,
+                                         current_info.level.index + 1);
+                        } else {
+                            if ((loc = rb->strrchr(buffered_boards.filename,
+                                                   '.')) != NULL)
+                                *loc = '\0';
+                            rb->snprintf(buf, sizeof(buf), "%s.%d.sok",
+                                         buffered_boards.filename,
+                                         current_info.level.index + 1);
+                            if (loc != NULL)
+                                *loc = '.';
+                        }
 
                         if (!rb->kbd_input(buf, MAX_PATH))
                             save(buf, true);
@@ -1355,8 +1440,8 @@ static bool sokoban_loop(void)
                 current_info.level.index = 0;
 
                 switch (sokoban_menu()) {
-                    case 4: /* Quit */
-                    case 5: /* Save & quit */
+                    case 5: /* Quit */
+                    case 6: /* Save & quit */
                         return PLUGIN_OK;
                 }
             }

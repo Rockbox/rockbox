@@ -13,12 +13,14 @@ information about the level format, see
 
 \begin{table}
 \begin{btnmap}{}{}
+\multicolumn{2}{c}{\textbf{In game}} \\
+\hline
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,GIGABEAT_PAD,SANSA_E200_PAD}
-    {\ButtonUp, \ButtonDown,}
-\opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu, \ButtonPlay,}
-\opt{IRIVER_H10_PAD}{\ButtonScrollUp, \ButtonScrollDown,}
+    {\ButtonUp, \ButtonDown, }%
+\opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu, \ButtonPlay, }%
+\opt{IRIVER_H10_PAD}{\ButtonScrollUp, \ButtonScrollDown, }%
     \ButtonLeft, \ButtonRight
-    & Move the ``sokoban'' up, down, left or right\\
+    & Move the ``sokoban'' up, down, left, or right\\
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonMenu}
 \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,GIGABEAT_PAD,SANSA_E200_PAD}{\ButtonPower}
@@ -29,11 +31,10 @@ information about the level format, see
 \opt{IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,GIGABEAT_PAD,SANSA_E200_PAD}{\ButtonSelect}
 \opt{IRIVER_H10_PAD}{\ButtonRew}
     & Undo last movement \\
-\opt{RECORDER_PAD,ARCHOS_AV300_PAD}{\ButtonPlay}
+\opt{RECORDER_PAD,ARCHOS_AV300_PAD,IAUDIO_X5_PAD}{\ButtonPlay}
 \opt{ONDIO_PAD}{\ButtonMenu+\ButtonDown}
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonPlay}
-\opt{IAUDIO_X5_PAD}{n/a}
 \opt{IRIVER_H10_PAD}{\ButtonFF}
 \opt{GIGABEAT_PAD}{\ButtonA}
 \opt{SANSA_E200_PAD}{\ButtonRec}
@@ -42,7 +43,7 @@ information about the level format, see
 \opt{ONDIO_PAD}{\ButtonMenu+\ButtonLeft}
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonDown}
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonLeft}
-\opt{IAUDIO_X5_PAD}{\ButtonRec}
+\opt{IAUDIO_X5_PAD}{n/a}
 \opt{IRIVER_H10_PAD}{\ButtonPlay+\ButtonScrollDown}
 \opt{GIGABEAT_PAD}{\ButtonVolDown}
 \opt{SANSA_E200_PAD}{\ButtonSelect+\ButtonDown}
@@ -50,7 +51,8 @@ information about the level format, see
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD}{\ButtonFTwo}
 \opt{ONDIO_PAD}{\ButtonMenu+\ButtonUp}
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
-\opt{IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD}{n/a}
+\opt{IPOD_4G_PAD,IPOD_3G_PAD}{n/a}
+\opt{IAUDIO_X5_PAD}{\ButtonRec}
 \opt{IRIVER_H10_PAD}{\ButtonPlay+\ButtonRight}
 \opt{GIGABEAT_PAD}{\ButtonMenu}
 \opt{SANSA_E200_PAD}{\ButtonSelect+\ButtonRight}
@@ -59,16 +61,30 @@ information about the level format, see
 \opt{ONDIO_PAD}{\ButtonMenu+\ButtonRight}
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonUp}
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonRight}
-\opt{IAUDIO_X5_PAD}{\ButtonPlay}
+\opt{IAUDIO_X5_PAD}{n/a}
 \opt{IRIVER_H10_PAD}{\ButtonPlay+\ButtonScrollUp}
 \opt{GIGABEAT_PAD}{\ButtonVolUp}
 \opt{SANSA_E200_PAD}{\ButtonSelect+\ButtonUp}
     & Go to next level \\
+\hline
+\multicolumn{2}{c}{\textbf{Solution playback}} \\
+\hline
+\opt{RECORDER_PAD,ARCHOS_AV300_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPlay}
+\opt{ONDIO_PAD}{\ButtonMenu}
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+\opt{IPOD_4G_PAD,IPOD_3G_PAD,GIGABEAT_PAD,SANSA_E200_PAD}{\ButtonSelect}
+    & Pause/resume \\
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,GIGABEAT_PAD,SANSA_E200_PAD}
-    {\ButtonUp/\ButtonDown,}
-\opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu/\ButtonPlay,}
-\opt{IRIVER_H10_PAD}{\ButtonScrollUp/\ButtonScrollDown,}
-    & Increase/decrease solution playback speed
+    {\ButtonUp/\ButtonDown}
+\opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu/\ButtonPlay}
+\opt{IRIVER_H10_PAD}{\ButtonScrollUp/\ButtonScrollDown}
+    & Increase/decrease playback speed \\
+    \ButtonLeft/\ButtonRight
+    & Go backward/forward (while paused) \\
+\opt{RECORDER_PAD,ARCHOS_AV300_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+\opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonMenu}
+\opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,GIGABEAT_PAD,SANSA_E200_PAD}{\ButtonPower}
+    & Quit \\
 \end{btnmap}
 \end{table}
 
@@ -77,3 +93,5 @@ Some places where can you can find level sets:
 \item \url{http://www.sourcecode.se/sokoban/levels.php}
 \item \url{http://sokobano.de/en/levels.php}
 \end{itemize}
+Note that some level sets may contain levels that are too large for this
+version of Sokoban and are unplayable as a result.
