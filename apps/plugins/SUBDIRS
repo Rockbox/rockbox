@@ -12,6 +12,7 @@ rockboy
 #ifdef HAVE_LCD_BITMAP
 chessbox
 sudoku
+reversi
 #endif
 
 /* For all 2bpp and colour targets */
