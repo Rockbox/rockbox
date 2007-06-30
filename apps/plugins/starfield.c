@@ -33,30 +33,35 @@ static struct plugin_api* rb; /* global api struct pointer */
 #define STARFIELD_DECREASE_ZMOVE BUTTON_SCROLL_BACK
 #define STARFIELD_INCREASE_NB_STARS BUTTON_RIGHT
 #define STARFIELD_DECREASE_NB_STARS BUTTON_LEFT
+#define STARFIELD_TOGGLE_COLOR BUTTON_PLAY
 #elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
 #define STARFIELD_QUIT BUTTON_POWER
 #define STARFIELD_INCREASE_ZMOVE BUTTON_UP
 #define STARFIELD_DECREASE_ZMOVE BUTTON_DOWN
 #define STARFIELD_INCREASE_NB_STARS BUTTON_RIGHT
 #define STARFIELD_DECREASE_NB_STARS BUTTON_LEFT
+#define STARFIELD_TOGGLE_COLOR BUTTON_PLAY
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
 #define STARFIELD_QUIT BUTTON_POWER
 #define STARFIELD_INCREASE_ZMOVE BUTTON_SCROLL_UP
 #define STARFIELD_DECREASE_ZMOVE BUTTON_SCROLL_DOWN
 #define STARFIELD_INCREASE_NB_STARS BUTTON_RIGHT
 #define STARFIELD_DECREASE_NB_STARS BUTTON_LEFT
+#define STARFIELD_TOGGLE_COLOR BUTTON_PLAY
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
 #define STARFIELD_QUIT BUTTON_POWER
 #define STARFIELD_INCREASE_ZMOVE BUTTON_UP
 #define STARFIELD_DECREASE_ZMOVE BUTTON_DOWN
 #define STARFIELD_INCREASE_NB_STARS BUTTON_RIGHT
 #define STARFIELD_DECREASE_NB_STARS BUTTON_LEFT
+#define STARFIELD_TOGGLE_COLOR BUTTON_SELECT
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD)
 #define STARFIELD_QUIT BUTTON_POWER
 #define STARFIELD_INCREASE_ZMOVE BUTTON_UP
 #define STARFIELD_DECREASE_ZMOVE BUTTON_DOWN
 #define STARFIELD_INCREASE_NB_STARS BUTTON_RIGHT
 #define STARFIELD_DECREASE_NB_STARS BUTTON_LEFT
+#define STARFIELD_TOGGLE_COLOR BUTTON_SELECT
 
 #else
 #define STARFIELD_QUIT BUTTON_OFF
@@ -64,6 +69,7 @@ static struct plugin_api* rb; /* global api struct pointer */
 #define STARFIELD_DECREASE_ZMOVE BUTTON_DOWN
 #define STARFIELD_INCREASE_NB_STARS BUTTON_RIGHT
 #define STARFIELD_DECREASE_NB_STARS BUTTON_LEFT
+#define STARFIELD_TOGGLE_COLOR BUTTON_SELECT
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define STARFIELD_RC_QUIT BUTTON_RC_STOP
 #endif
@@ -109,28 +115,40 @@ struct star
 {
     int x,y,z;
     int velocity;
+#if LCD_DEPTH > 1
+    int color;
+#endif
 };
 
-static inline void star_init(struct star * star, int z_move)
+static inline void star_init(struct star * star, int z_move, bool color)
 {
     star->velocity=rb->rand() % STAR_MAX_VELOCITY+1;
     /* choose x between -MAX_INIT_STAR_X and MAX_INIT_STAR_X */
     star->x=rb->rand() % (2*MAX_INIT_STAR_X)-MAX_INIT_STAR_X;
     star->y=rb->rand() % (2*MAX_INIT_STAR_Y)-MAX_INIT_STAR_Y;
+#if LCD_DEPTH > 1
+    if(color)
+        star->color=LCD_RGBPACK(rb->rand()%128+128,rb->rand()%128+128,
+                                rb->rand()%128+128);
+    else
+        star->color=LCD_WHITE;
+#else
+    (void)color;
+#endif
     if(z_move>=0)
         star->z=Z_MAX_DIST;
     else
         star->z=rb->rand() %Z_MAX_DIST/2+1;
 }
 
-static inline void star_move(struct star * star, int z_move)
+static inline void star_move(struct star * star, int z_move, bool color)
 {
     star->z -= z_move*star->velocity;
     if (star->z <= 0 || star->z > Z_MAX_DIST)
-        star_init(star, z_move);
+        star_init(star, z_move, color);
 }
 
-static inline void star_draw(struct star * star, int z_move)
+static inline void star_draw(struct star * star, int z_move, bool color)
 {
     int x_draw, y_draw;
     /*
@@ -140,15 +158,19 @@ static inline void star_draw(struct star * star, int z_move)
     x_draw = star->x / star->z + LCD_CENTER_X;
     if (x_draw < 1 || x_draw >= LCD_WIDTH)
     {
-        star_init(star, z_move);
+        star_init(star, z_move, color);
         return;
     }
     y_draw  = star->y / star->z + LCD_CENTER_Y;
     if (y_draw < 1 || y_draw >= LCD_HEIGHT)
     {
-        star_init(star, z_move);
+        star_init(star, z_move, color);
         return;
     }
+
+#if LCD_DEPTH > 1
+    rb->lcd_set_foreground(star->color);
+#endif
 
     rb->lcd_drawpixel(x_draw, y_draw);
     if(star->z<5*Z_MAX_DIST/6)
@@ -171,12 +193,14 @@ struct starfield
     struct star tab[MAX_STARS];
     int nb_stars;
     int z_move;
+    bool color;
 };
 
 static inline void starfield_init(struct starfield * starfield)
 {
     starfield->nb_stars=0;
     starfield->z_move=INIT_SPACE_SPEED;
+    starfield->color=false;
 }
 
 static inline void starfield_add_stars(struct starfield * starfield,
@@ -191,7 +215,7 @@ static inline void starfield_add_stars(struct starfield * starfield,
 
     for( i=old_nb_stars ; i < starfield->nb_stars ; ++i )
     {
-        star_init( &(starfield->tab[i]), starfield->z_move );
+        star_init( &(starfield->tab[i]), starfield->z_move, starfield->color );
     }
 }
 
@@ -208,8 +232,8 @@ static inline void starfield_move_and_draw(struct starfield * starfield)
     int i;
     for(i=0;i<starfield->nb_stars;++i)
     {
-        star_move(&(starfield->tab[i]), starfield->z_move);
-        star_draw(&(starfield->tab[i]), starfield->z_move);
+        star_move(&(starfield->tab[i]), starfield->z_move, starfield->color);
+        star_draw(&(starfield->tab[i]), starfield->z_move, starfield->color);
     }
 }
 
@@ -274,7 +298,7 @@ int plugin_main(void)
 
         } /* if pulse */
 #else
-        (void) avg_peak;        
+        (void) avg_peak;
 #endif
         starfield_move_and_draw(&starfield);
 
@@ -290,6 +314,9 @@ int plugin_main(void)
                          "star:%d speed:%d",
                          starfield.nb_stars,
                          starfield.z_move);
+#if LCD_DEPTH > 1
+            rb->lcd_set_foreground(LCD_WHITE);
+#endif
             rb->lcd_putsxy(0, LCD_HEIGHT-font_h, str_buffer);
         }
         rb->lcd_update();
@@ -318,6 +345,9 @@ int plugin_main(void)
             case(STARFIELD_DECREASE_NB_STARS | BUTTON_REPEAT):
                 starfield_del_stars(&starfield, STARFIELD_INCREASE_STEP);
                 t_disp=MSG_DISP_TIME;
+                break;
+            case(STARFIELD_TOGGLE_COLOR):
+                starfield.color=!starfield.color;
                 break;
 #ifdef STARFIELD_RC_QUIT
             case STARFIELD_RC_QUIT:
