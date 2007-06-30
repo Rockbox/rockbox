@@ -166,12 +166,12 @@ static struct font* font_load_in_memory(struct font* pf)
     if ( pf->bits_size < 0xFFDB )
     {
         /* pad to 16-bit boundary */
-        fileptr = (unsigned char *)(((int32_t)fileptr + 1) & ~1);
+        fileptr = (unsigned char *)(((intptr_t)fileptr + 1) & ~1);
     }
     else
     {
         /* pad to 32-bit boundary*/
-        fileptr = (unsigned char *)(((int32_t)fileptr + 3) & ~3);
+        fileptr = (unsigned char *)(((intptr_t)fileptr + 3) & ~3);
     }
 
     if (noffset)
@@ -246,13 +246,13 @@ static struct font* font_load_cached(struct font* pf)
     {
         long_offset = 0;
         /* pad to 16-bit boundary */
-        fileptr = (unsigned char *)(((int32_t)fileptr + 1) & ~1);
+        fileptr = (unsigned char *)(((intptr_t)fileptr + 1) & ~1);
     }
     else
     {
         long_offset = 1;
         /* pad to 32-bit boundary*/
-        fileptr = (unsigned char *)(((int32_t)fileptr + 3) & ~3);
+        fileptr = (unsigned char *)(((intptr_t)fileptr + 3) & ~3);
     }
 
     if (noffset)
