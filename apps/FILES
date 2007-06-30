@@ -42,7 +42,7 @@ plugins/*.pl
 plugins/Makefile
 plugins/plugin.lds
 plugins/snake2.levels
-plugins/sokobanlevels.sok
+plugins/sokoban.levels
 plugins/viewers.config
 plugins/SOURCES
 plugins/SUBDIRS
