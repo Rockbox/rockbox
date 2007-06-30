@@ -69,7 +69,11 @@ static struct plugin_api* rb; /* global api struct pointer */
 #define STARFIELD_DECREASE_ZMOVE BUTTON_DOWN
 #define STARFIELD_INCREASE_NB_STARS BUTTON_RIGHT
 #define STARFIELD_DECREASE_NB_STARS BUTTON_LEFT
+#ifdef BUTTON_SELECT
 #define STARFIELD_TOGGLE_COLOR BUTTON_SELECT
+#else
+#define STARFIELD_TOGGLE_COLOR BUTTON_PLAY
+#endif
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define STARFIELD_RC_QUIT BUTTON_RC_STOP
 #endif
@@ -115,7 +119,7 @@ struct star
 {
     int x,y,z;
     int velocity;
-#if LCD_DEPTH > 1
+#ifdef HAVE_LCD_COLOR
     int color;
 #endif
 };
@@ -126,7 +130,7 @@ static inline void star_init(struct star * star, int z_move, bool color)
     /* choose x between -MAX_INIT_STAR_X and MAX_INIT_STAR_X */
     star->x=rb->rand() % (2*MAX_INIT_STAR_X)-MAX_INIT_STAR_X;
     star->y=rb->rand() % (2*MAX_INIT_STAR_Y)-MAX_INIT_STAR_Y;
-#if LCD_DEPTH > 1
+#ifdef HAVE_LCD_COLOR
     if(color)
         star->color=LCD_RGBPACK(rb->rand()%128+128,rb->rand()%128+128,
                                 rb->rand()%128+128);
@@ -168,7 +172,7 @@ static inline void star_draw(struct star * star, int z_move, bool color)
         return;
     }
 
-#if LCD_DEPTH > 1
+#ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(star->color);
 #endif
 
@@ -346,9 +350,11 @@ int plugin_main(void)
                 starfield_del_stars(&starfield, STARFIELD_INCREASE_STEP);
                 t_disp=MSG_DISP_TIME;
                 break;
+#ifdef HAVE_LCD_COLOR
             case(STARFIELD_TOGGLE_COLOR):
                 starfield.color=!starfield.color;
                 break;
+#endif
 #ifdef STARFIELD_RC_QUIT
             case STARFIELD_RC_QUIT:
 #endif
