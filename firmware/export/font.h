@@ -19,6 +19,8 @@
 #ifndef _FONT_H
 #define _FONT_H
 
+#include "inttypes.h"
+
 /*
  * Incore font and image definitions
  */
@@ -99,7 +101,7 @@ struct font {
     const unsigned short *offset;	/* offsets into bitmap data*/
     const unsigned char *width;	/* character widths or NULL if fixed*/
     int		defaultchar;	/* default char (not glyph index)*/
-    long       bits_size;       /* # bytes of glyph bits*/
+    int32_t       bits_size;       /* # bytes of glyph bits*/
 };
 
 /* font routines*/
@@ -111,7 +113,6 @@ int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber)
 int font_get_width(struct font* ft, unsigned short ch);
 const unsigned char * font_get_bits(struct font* ft, unsigned short ch);
 void glyph_cache_save(void);
-void glyph_cache_load(void);
 
 #else /* HAVE_LCD_BITMAP */
 

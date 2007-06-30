@@ -28,6 +28,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include "inttypes.h"
 #include "lcd.h"
 #include "font.h"
 #include "file.h"
@@ -60,12 +61,14 @@ static unsigned char *eofptr;
 /* Font cache structures */
 static struct font_cache font_cache_ui;
 static int fnt_file = -1;           /* >=0 if font is cached   */
-unsigned long file_width_offset;    /* offset to file width data    */
-unsigned long file_offset_offset;   /* offset to file offset data   */
+uint32_t file_width_offset;    /* offset to file width data    */
+uint32_t file_offset_offset;   /* offset to file offset data   */
 static void cache_create(int maxwidth, int height);
 static int long_offset = 0;
 static int glyph_file;
 /* End Font cache structures */
+
+static void glyph_cache_load(void);
 
 void font_init(void)
 {
@@ -89,14 +92,14 @@ static short readshort(void)
     return s;
 }
 
-static long readlong(void)
+static int32_t readlong(void)
 {
-    unsigned long l;
+    uint32_t l;
 
     l = *fileptr++ & 0xff;
     l |= *fileptr++ << 8;
-    l |= ((unsigned long)(*fileptr++)) << 16;
-    l |= ((unsigned long)(*fileptr++)) << 24;
+    l |= ((uint32_t)(*fileptr++)) << 16;
+    l |= ((uint32_t)(*fileptr++)) << 24;
     return l;
 }
 
@@ -143,9 +146,9 @@ static struct font*  font_load_header(struct font *pf)
     return pf;
 }
 /* Load memory font */
-struct font* font_load_in_memory(struct font* pf)
+static struct font* font_load_in_memory(struct font* pf)
 {
-    long i, noffset, nwidth;
+    int32_t i, noffset, nwidth;
 
     if (!HAVEBYTES(4))
         return NULL;
@@ -163,12 +166,12 @@ struct font* font_load_in_memory(struct font* pf)
     if ( pf->bits_size < 0xFFDB )
     {
         /* pad to 16-bit boundary */
-        fileptr = (unsigned char *)(((long)fileptr + 1) & ~1);
+        fileptr = (unsigned char *)(((int32_t)fileptr + 1) & ~1);
     }
     else
     {
         /* pad to 32-bit boundary*/
-        fileptr = (unsigned char *)(((long)fileptr + 3) & ~3);
+        fileptr = (unsigned char *)(((int32_t)fileptr + 3) & ~3);
     }
 
     if (noffset)
@@ -193,12 +196,12 @@ struct font* font_load_in_memory(struct font* pf)
             pf->offset = (unsigned short *)fileptr;
 
             /* Check we have sufficient buffer */
-            if (!HAVEBYTES(noffset * sizeof(long)))
+            if (!HAVEBYTES(noffset * sizeof(int32_t)))
                 return NULL;
 
             for (i=0; i<noffset; ++i)
             {
-                ((unsigned long*)(pf->offset))[i] = (unsigned long)readlong();
+                ((uint32_t*)(pf->offset))[i] = (uint32_t)readlong();
             }
         }
     }
@@ -219,12 +222,12 @@ struct font* font_load_in_memory(struct font* pf)
 }
 
 /* Load cached font */
-struct font* font_load_cached(struct font* pf)
+static struct font* font_load_cached(struct font* pf)
 {
-    unsigned long noffset, nwidth;
+    uint32_t noffset, nwidth;
     unsigned char* oldfileptr = fileptr;
 
-    if (!HAVEBYTES(2 * sizeof(long)))
+    if (!HAVEBYTES(2 * sizeof(int32_t)))
         return NULL;
 
     /* # longs of offset*/
@@ -243,17 +246,17 @@ struct font* font_load_cached(struct font* pf)
     {
         long_offset = 0;
         /* pad to 16-bit boundary */
-        fileptr = (unsigned char *)(((long)fileptr + 1) & ~1);
+        fileptr = (unsigned char *)(((int32_t)fileptr + 1) & ~1);
     }
     else
     {
         long_offset = 1;
         /* pad to 32-bit boundary*/
-        fileptr = (unsigned char *)(((long)fileptr + 3) & ~3);
+        fileptr = (unsigned char *)(((int32_t)fileptr + 3) & ~3);
     }
 
     if (noffset)
-        file_offset_offset = (unsigned long)(fileptr - freeptr);
+        file_offset_offset = (uint32_t)(fileptr - freeptr);
     else
         file_offset_offset = 0;
 
@@ -261,10 +264,10 @@ struct font* font_load_cached(struct font* pf)
     if ( pf->bits_size < 0xFFDB )
         fileptr += noffset * sizeof(unsigned short);
     else
-        fileptr += noffset * sizeof(unsigned long);
+        fileptr += noffset * sizeof(uint32_t);
 
     if (nwidth)
-        file_width_offset = (unsigned long)(fileptr - freeptr);
+        file_width_offset = (uint32_t)(fileptr - freeptr);
     else
         file_width_offset = 0;
 
@@ -416,11 +419,11 @@ load_cache_entry(struct font_cache_entry* p, void* callback_data)
         p->width = pf->maxwidth;
     }
  
-    long bitmap_offset = 0;
+    int32_t bitmap_offset = 0;
 
     if (file_offset_offset)
     {
-        long offset = file_offset_offset + char_code * (long_offset ? sizeof(long) : sizeof(short));
+        int32_t offset = file_offset_offset + char_code * (long_offset ? sizeof(int32_t) : sizeof(short));
         lseek(fnt_file, offset, SEEK_SET);
         read (fnt_file, tmp, 2);
         bitmap_offset = tmp[0] | (tmp[1] << 8);
@@ -434,7 +437,7 @@ load_cache_entry(struct font_cache_entry* p, void* callback_data)
         bitmap_offset = ((pf->height + 7) / 8) * p->width * char_code;
     }
 
-    long file_offset = FONT_HEADER_SIZE + bitmap_offset;
+    int32_t file_offset = FONT_HEADER_SIZE + bitmap_offset;
     lseek(fnt_file, file_offset, SEEK_SET);
 
     int src_bytes = p->width * ((pf->height + 7) / 8);
@@ -492,7 +495,7 @@ const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
     return bits;
 }
 
-void glyph_file_write(void* data)
+static void glyph_file_write(void* data)
 {
     struct font_cache_entry* p = data;
     struct font* pf = &font_ui;
@@ -530,7 +533,7 @@ void glyph_cache_save(void)
     return;
 }
 
-void glyph_cache_load(void)
+static void glyph_cache_load(void)
 {
     if (fnt_file >= 0) {
 
