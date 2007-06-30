@@ -253,6 +253,9 @@ int plugin_main(void)
     starfield_init(&starfield);
     starfield_add_stars(&starfield, INIT_STARS);
 
+#if LCD_DEPTH > 1
+     rb->lcd_set_backdrop(NULL);
+#endif
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_background(LCD_BLACK);
     rb->lcd_set_foreground(LCD_WHITE);
