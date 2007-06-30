@@ -56,8 +56,11 @@ void irq(void)
 /* TODO: this should really be in the target tree, but moving it there caused
    crt0.S not to find it while linking */
 /* TODO: Even if it isn't in the target tree, this should be the default case */
+#ifdef SANSA_E200
 extern void button_int(void);
 extern void clickwheel_int(void);
+extern void microsd_int(void);
+#endif
 
 void irq(void)
 {
@@ -65,11 +68,15 @@ void irq(void)
         if (CPU_INT_STAT & TIMER1_MASK) {
             TIMER1();
         }
-        else if (CPU_INT_STAT & TIMER2_MASK)
+        else if (CPU_INT_STAT & TIMER2_MASK) {
             TIMER2();
+        }
 #ifdef SANSA_E200
-        else if (CPU_HI_INT_STAT & GPIO1_MASK)
-        {
+        else if (CPU_HI_INT_STAT & GPIO0_MASK) {
+            if (GPIOA_INT_STAT & 0x80)
+                microsd_int();
+        }
+        else if (CPU_HI_INT_STAT & GPIO1_MASK) {
             if (GPIOF_INT_STAT & 0xff)
                 button_int();
             if (GPIOH_INT_STAT & 0xc0)

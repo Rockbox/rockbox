@@ -163,8 +163,8 @@ int mmc_remove_request(void)
         queue_wait_w_tmo(&button_queue, &ev, HZ/2);
         switch (ev.id)
         {
-            case SYS_MMC_EXTRACTED:
-                return SYS_MMC_EXTRACTED;
+            case SYS_HOTSWAP_EXTRACTED:
+                return SYS_HOTSWAP_EXTRACTED;
 
             case SYS_USB_DISCONNECTED:
                 return SYS_USB_DISCONNECTED;

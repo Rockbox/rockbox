@@ -352,7 +352,7 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
     unsigned long sum;
     
     /* Read header to find out how long the mi4 file is. */
-    ata_read_sectors(pinfo->start + PPMI_SECTOR_OFFSET,
+    ata_read_sectors(IF_MV2(0,) pinfo->start + PPMI_SECTOR_OFFSET,
                             PPMI_SECTORS, &ppmi_header);
     
     /* The first four characters at 0x80000 (sector 1024) should be PPMI*/
@@ -362,7 +362,7 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
     printf("BL mi4 size: %x", ppmi_header.length);
     
     /* Read mi4 header of the OF */
-    ata_read_sectors(pinfo->start + PPMI_SECTOR_OFFSET + PPMI_SECTORS 
+    ata_read_sectors(IF_MV2(0,) pinfo->start + PPMI_SECTOR_OFFSET + PPMI_SECTORS 
                        + (ppmi_header.length/512), MI4_HEADER_SECTORS, &mi4header);
     
     /* We don't support encrypted mi4 files yet */
@@ -385,7 +385,7 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
     printf("Binary type: %.4s", mi4header.type);
 
     /* Load firmware */
-    ata_read_sectors(pinfo->start + PPMI_SECTOR_OFFSET + PPMI_SECTORS
+    ata_read_sectors(IF_MV2(0,) pinfo->start + PPMI_SECTOR_OFFSET + PPMI_SECTORS
                         + (ppmi_header.length/512) + MI4_HEADER_SECTORS,
                         (mi4header.mi4size-MI4_HEADER_SIZE)/512, buf);
 
@@ -404,7 +404,7 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
         unsigned int i;
         /* check which known version we have */
         /* These are taken from the PPPS section, 0x00780240 */
-        ata_read_sectors(pinfo->start + 0x3C01, 1, block);
+        ata_read_sectors(IF_MV2(0,) pinfo->start + 0x3C01, 1, block);
         for (i=0; i<sizeof(OFDatabaseOffsets)/sizeof(*OFDatabaseOffsets); i++)
         {
             if (!memcmp(&block[0x40], OFDatabaseOffsets[i].version,
@@ -417,9 +417,9 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
         }
         if (sector && offset)
         {
-            ata_read_sectors(sector, 1, block);
+            ata_read_sectors(IF_MV2(0,) sector, 1, block);
             block[offset] = 0;
-            ata_write_sectors(sector, 1, block);
+            ata_write_sectors(IF_MV2(0,) sector, 1, block);
         }
     }
     return EOK;
@@ -428,12 +428,14 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
 
 void* main(void)
 {
+#ifndef SANSA_E200
     char buf[256];
+    unsigned short* identify_info;
+#endif
     int i;
     int btn;
     int rc;
     int num_partitions;
-    unsigned short* identify_info;
     struct partinfo* pinfo;
 #ifdef SANSA_E200
     int usb_retry = 0;
@@ -475,6 +477,7 @@ void* main(void)
     printf(MODEL_NAME);
 
     i=ata_init();
+#ifndef SANSA_E200
     if (i==0) {
         identify_info=ata_get_identify();
         /* Show model */
@@ -489,8 +492,9 @@ void* main(void)
     } else {
         error(EATA, i);
     }
+#endif
 
-    disk_init();
+    disk_init(IF_MV(0));
     num_partitions = disk_mount_all();
     if (num_partitions<=0)
     {

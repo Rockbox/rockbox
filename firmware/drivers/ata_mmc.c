@@ -397,26 +397,6 @@ static int receive_cxd(unsigned char *buf)
     return 0;
 }
 
-/* helper function to extract n (<=32) bits from an arbitrary position.
-   counting from MSB to LSB */
-unsigned long mmc_extract_bits(
-    const unsigned long *p, /* the start of the bitfield array */
-    unsigned int start,     /* bit no. to start reading  */
-    unsigned int size)      /* how many bits to read */
-{
-    unsigned int long_index = start / 32;
-    unsigned int bit_index = start % 32;
-    unsigned long result;
-    
-    result = p[long_index] << bit_index;
-
-    if (bit_index + size > 32)    /* crossing longword boundary */
-        result |= p[long_index+1] >> (32 - bit_index);
-        
-    result >>= 32 - size;
-
-    return result;
-}
 
 static int initialize_card(int card_no)
 {
@@ -470,9 +450,9 @@ static int initialize_card(int card_no)
         return rc * 10 - 6;
 
     /* check block sizes */
-    card->block_exp = mmc_extract_bits(card->csd, 44, 4);
+    card->block_exp = card_extract_bits(card->csd, 44, 4);
     card->blocksize = 1 << card->block_exp;
-    if ((mmc_extract_bits(card->csd, 102, 4) != card->block_exp)
+    if ((card_extract_bits(card->csd, 102, 4) != card->block_exp)
         || card->blocksize > MAX_BLOCK_SIZE)
     {
         return -7;
@@ -486,16 +466,16 @@ static int initialize_card(int card_no)
     }
 
     /* max transmission speed, clock divider */
-    temp = mmc_extract_bits(card->csd, 29, 3);
+    temp = card_extract_bits(card->csd, 29, 3);
     temp = (temp > 3) ? 3 : temp;
-    card->speed = mantissa[mmc_extract_bits(card->csd, 25, 4)]
+    card->speed = mantissa[card_extract_bits(card->csd, 25, 4)]
                 * exponent[temp + 4];
     card->bitrate_register = (FREQ/4-1) / card->speed;
 
     /* NSAC, TSAC, read timeout */
-    card->nsac = 100 * mmc_extract_bits(card->csd, 16, 8);
-    card->tsac = mantissa[mmc_extract_bits(card->csd, 9, 4)];
-    temp = mmc_extract_bits(card->csd, 13, 3);
+    card->nsac = 100 * card_extract_bits(card->csd, 16, 8);
+    card->tsac = mantissa[card_extract_bits(card->csd, 9, 4)];
+    temp = card_extract_bits(card->csd, 13, 3);
     card->read_timeout = ((FREQ/4) / (card->bitrate_register + 1)
                          * card->tsac / exponent[9 - temp]
                          + (10 * card->nsac));
@@ -503,7 +483,7 @@ static int initialize_card(int card_no)
     card->tsac = card->tsac * exponent[temp] / 10;
 
     /* r2w_factor, write timeout */
-    card->r2w_factor = 1 << mmc_extract_bits(card->csd, 99, 3);
+    card->r2w_factor = 1 << card_extract_bits(card->csd, 99, 3);
     if (card->r2w_factor > 32)    /* dirty MMC spec violation */
     {
         card->read_timeout *= 4;  /* add safety factor */
@@ -513,8 +493,8 @@ static int initialize_card(int card_no)
         card->write_timeout = card->read_timeout * card->r2w_factor;
 
     /* card size */
-    card->numblocks = (mmc_extract_bits(card->csd, 54, 12) + 1)
-                      * (1 << (mmc_extract_bits(card->csd, 78, 3) + 2));
+    card->numblocks = (card_extract_bits(card->csd, 54, 12) + 1)
+            * (1 << (card_extract_bits(card->csd, 78, 3) + 2));
     card->size = card->numblocks * card->blocksize;
 
     /* switch to full speed */
@@ -993,12 +973,12 @@ static void mmc_thread(void)
                 break;
 
 #ifdef HAVE_HOTSWAP
-            case SYS_MMC_INSERTED:
+            case SYS_HOTSWAP_INSERTED:
                 disk_mount(1); /* mount MMC */
                 queue_broadcast(SYS_FS_CHANGED, 0);
                 break;
 
-            case SYS_MMC_EXTRACTED:
+            case SYS_HOTSWAP_EXTRACTED:
                 disk_unmount(1); /* release "by force" */
                 queue_broadcast(SYS_FS_CHANGED, 0);
                 break;
@@ -1097,11 +1077,11 @@ static void mmc_tick(void)
             {
                 if (current_status)
                 {
-                    queue_broadcast(SYS_MMC_INSERTED, 0);
+                    queue_broadcast(SYS_HOTSWAP_INSERTED, 0);
                 }
                 else
                 {
-                    queue_broadcast(SYS_MMC_EXTRACTED, 0);
+                    queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
                     mmc_status = MMC_UNTOUCHED;
                     card_info[1].initialized = false;
                 }

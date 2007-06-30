@@ -247,7 +247,7 @@
 /* Enable the directory cache and tagcache in RAM if we have
  * plenty of RAM. Both features can be enabled independently. */
 #if ((defined(MEMORYSIZE) && (MEMORYSIZE > 8)) || MEM > 8) && \
- !defined(BOOTLOADER)
+ !defined(BOOTLOADER) && !defined(SANSA_E200)
 #define HAVE_DIRCACHE
 #ifdef HAVE_TAGCACHE
 #define HAVE_TC_RAMCACHE

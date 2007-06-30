@@ -20,8 +20,8 @@
 #include "ata.h"
 #include "debug.h"
 #include "fat.h"
-#ifdef HAVE_MMC
-#include "ata_mmc.h"
+#ifdef HAVE_HOTSWAP
+#include "hotswap.h"
 #endif
 #include "file.h" /* for release_dirs() */
 #include "dir.h" /* for release_files() */
@@ -101,8 +101,8 @@ int disk_mount_all(void)
     int mounted;
     int i;
     
-#if defined(HAVE_MMC) && defined(HAVE_HOTSWAP)
-    mmc_enable_monitoring(false);
+#ifdef HAVE_MMC
+    card_enable_monitoring(false);
 #endif
 
     fat_init(); /* reset all mounted partitions */
@@ -110,13 +110,13 @@ int disk_mount_all(void)
         vol_drive[i] = -1; /* mark all as unassigned */
 
     mounted = disk_mount(0);
-#ifdef HAVE_MMC
-    if (mmc_detect()) /* for Ondio, only if card detected */
+#ifdef HAVE_HOTSWAP
+    if (card_detect())
     {
         mounted += disk_mount(1); /* try 2nd "drive", too */
     }
-#ifdef HAVE_HOTSWAP
-    mmc_enable_monitoring(true);
+#ifdef HAVE_MMC
+    card_enable_monitoring(true);
 #endif
 #endif
 

@@ -33,6 +33,11 @@
 /* define this if you have LCD enable function */
 #define HAVE_LCD_ENABLE
 
+#ifndef SIMULATOR
+#define HAVE_HOTSWAP
+#define HAVE_MULTIVOLUME
+#endif
+
 #define HAVE_BACKLIGHT_BRIGHTNESS
 /* Main LCD backlight brightness range and defaults */
 #define MIN_BRIGHTNESS_SETTING           1

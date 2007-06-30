@@ -17,14 +17,16 @@
  *
  ****************************************************************************/
 #include "ata.h"
+#include "hotswap-target.h"
 #include "ata-target.h"
 #include "ata_idle_notify.h"
 #include "system.h"
 #include <string.h>
 #include "thread.h"
+#include "led.h"
+#include "disk.h"
 #include "pp5024.h"
-
-#define NOINLINE_ATTR __attribute__((noinline)) /* don't inline the loops */
+#include "panic.h"
 
 #define BLOCK_SIZE      (512)
 #define SECTOR_SIZE     (512)
@@ -48,6 +50,7 @@
 #define DATA_DONE       (1 << 12)
 #define CMD_DONE        (1 << 13)
 #define ERROR_BITS      (0x3f)
+#define READY_FOR_DATA  (1 << 8)
 #define FIFO_FULL       (1 << 7)
 #define FIFO_EMPTY      (1 << 6)
 
@@ -65,370 +68,481 @@
 #define FIFO_SIZE       16          /* FIFO is 16 words deep */
 
 /* SD Commands */
-#define GO_IDLE_STATE   0
-#define ALL_SEND_CID    2
-#define SEND_RELATIVE_ADDR  3
-#define SET_DSR         4
-#define SWITCH_FUNC     6
-#define SELECT_CARD     7
-#define DESELECT_CARD   7
-#define SEND_CSD        9
-#define SEND_CID        10
-#define STOP_TRANSMISSION   12
-#define SEND_STATUS     13
-#define GO_INACTIVE_STATE   15
-#define SET_BLOCKLEN    16
-#define READ_SINGLE_BLOCK   17
-#define READ_MULTIPLE_BLOCK 18
-#define WRITE_BLOCK     24
-#define WRITE_MULTIPLE_BLOCK    25
-#define ERASE_WR_BLK_START  32
-#define ERASE_WR_BLK_END    33
-#define ERASE           38
+#define GO_IDLE_STATE         0
+#define ALL_SEND_CID          2
+#define SEND_RELATIVE_ADDR    3
+#define SET_DSR               4
+#define SWITCH_FUNC           6
+#define SELECT_CARD           7
+#define DESELECT_CARD         7
+#define SEND_CSD              9
+#define SEND_CID             10
+#define STOP_TRANSMISSION    12
+#define SEND_STATUS          13
+#define GO_INACTIVE_STATE    15
+#define SET_BLOCKLEN         16
+#define READ_SINGLE_BLOCK    17
+#define READ_MULTIPLE_BLOCK  18
+#define SEND_NUM_WR_BLOCKS   22
+#define WRITE_BLOCK          24
+#define WRITE_MULTIPLE_BLOCK 25
+#define ERASE_WR_BLK_START   32
+#define ERASE_WR_BLK_END     33
+#define ERASE                38
+#define APP_CMD              55
+
+#define EC_POWER_UP             1 /* error code */
+#define EC_READ_TIMEOUT         2 /* error code */
+#define EC_WRITE_TIMEOUT        3 /* error code */
+#define EC_TRAN_SEL_BANK        4 /* error code */
+#define EC_TRAN_READ_ENTRY      5 /* error code */
+#define EC_TRAN_READ_EXIT       6 /* error code */
+#define EC_TRAN_WRITE_ENTRY     7 /* error code */
+#define EC_TRAN_WRITE_EXIT      8 /* error code */
+#define DO_PANIC               32 /* marker     */
+#define NO_PANIC                0 /* marker     */
+#define EC_COMMAND             10 /* error code */
+#define EC_FIFO_SEL_BANK_EMPTY 11 /* error code */
+#define EC_FIFO_SEL_BANK_DONE  12 /* error code */
+#define EC_FIFO_ENA_BANK_EMPTY 13 /* error code */
+#define EC_FIFO_READ_FULL      14 /* error code */
+#define EC_FIFO_WR_EMPTY       15 /* error code */
+#define EC_FIFO_WR_DONE        16 /* error code */
 
 /* Application Specific commands */
 #define SET_BUS_WIDTH   6
 #define SD_APP_OP_COND  41
 
-#define READ_TIMEOUT    5*HZ
-#define WRITE_TIMEOUT   0.5*HZ
-
-static unsigned short identify_info[SECTOR_SIZE];
+/* for compatibility */
 int ata_spinup_time = 0;
-long last_disk_activity = -1;
-static bool initialized = false;
 
-static unsigned char current_bank = 0; /* The bank that we are working with */
+long last_disk_activity = -1;
+
+static bool initialized = false;
+static int  sd1_status  = 0x00;  /* 0x00:inserted, 0x80:not inserted */
 
 static tSDCardInfo card_info[2];
+static tSDCardInfo *currcard; /* current active card */
 
-/* For multi volume support */
-static int current_card = 0;
-
-static struct mutex sd_mtx;
-
-static long sd_stack [(DEFAULT_STACK_SIZE*2 + 0x800)/sizeof(long)];
-
-static const char sd_thread_name[] = "sd";
+/* Shoot for around 75% usage */
+static long sd_stack [(DEFAULT_STACK_SIZE*2 + 0x1c0)/sizeof(long)];
+static const char         sd_thread_name[] = "ata/sd";
+static struct mutex       sd_mtx;
 static struct event_queue sd_queue;
 
+/* Posted when card plugged status has changed */
+#define SD_HOTSWAP    1
 
 /* Private Functions */
 
-bool sd_send_command(unsigned int cmd, unsigned long arg1, unsigned int arg2)
+static unsigned int check_time[10];
+
+static inline void sd_check_timeout(unsigned int timeout, int id)
 {
-    bool result = false;
-    do
+    if (USEC_TIMER > check_time[id] + timeout)
+        panicf("Error SDCard: %d", id);
+}
+
+static inline bool sd_poll_status(unsigned int trigger, unsigned int timeout,
+                                  int id)
+{
+    unsigned int t = USEC_TIMER;
+
+    while ((STATUS_REG & trigger) == 0)
+    {
+        if (USEC_TIMER > t + timeout)
+        {
+            if(id & DO_PANIC)
+                panicf("Error SDCard: %d", id & 31);
+
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static bool sd_command(unsigned int cmd, unsigned long arg1,
+                       unsigned int *response, unsigned int type)
+{
+    int i, words; /* Number of 16 bit words to read from RESPONSE_REG */
+    unsigned int data[9];
+
+    while (1)
     {
         CMD_REG0 = cmd;
         CMD_REG1 = (unsigned int)((arg1 & 0xffff0000) >> 16);
         CMD_REG2 = (unsigned int)((arg1 & 0xffff));
-        UNKNOWN = arg2;
-        while ((STATUS_REG & CMD_DONE) == 0)
-        {
-            /* Busy wait */
-        }
-        if ((STATUS_REG & ERROR_BITS) == 0)
-        {
-            result = true;
-        } 
-    } while ((STATUS_REG & ERROR_BITS) != 0);
-    return result;
-}
+        UNKNOWN  = type;
 
-void sd_read_response(unsigned int *response, int type)
-{
-    int i;
-    int words; /* Number of 16 bit words to read from RESPONSE_REG */
-    unsigned int response_from_card[9];
-    if(type == 2)
-    {
-        words = 9; /* R2 types are 8.5 16-bit words long */
-    } else {
-        words = 3;
+        sd_poll_status(CMD_DONE, 100000, EC_COMMAND | DO_PANIC);
+
+        if ((STATUS_REG & ERROR_BITS) == 0)
+            break;
+
+        priority_yield();
     }
+
+    if (cmd == GO_IDLE_STATE)  return true; /* no response here */
+
+    words = (type == 2) ? 9 : 3;
 
     for (i = 0; i < words; i++) /* RESPONSE_REG is read MSB first */
     {
-            response_from_card[i] = RESPONSE_REG; /* Read most significant 16-bit word */
+        data[i] = RESPONSE_REG; /* Read most significant 16-bit word */
     }
 
-    switch (type)
+    if (type == 2)
     {
-        case 1:
-            /* Response type 1 has the following structure:
-                Start bit
-                Transmission bit
-                Command index (6 bits)
-                Card Status (32 bits)
-                CRC7 (7 bits)
-                Stop bit
-            */
-            /* TODO: Sanity checks */
-            response[0] = ((response_from_card[0] & 0xff) << 24)
-                       + (response_from_card[1] << 8)
-                       + ((response_from_card[2] & 0xff00) >> 8);
-            break;
-        case 2:
-            /* Response type 2 has the following structure:
-                Start bit
-                Transmission bit
-                Reserved (6 bits)
-                CSD/CID register (127 bits)
-                Stop bit
-            */
-            response[3] = ((response_from_card[0]&0xff)<<24) +
-                           (response_from_card[1]<<8) +
-                           ((response_from_card[2]&0xff00)>>8);
-            response[2] = ((response_from_card[2]&0xff)<<24) +
-                           (response_from_card[3]<<8) +
-                           ((response_from_card[4]&0xff00)>>8);
-            response[1] = ((response_from_card[4]&0xff)<<24) +
-                           (response_from_card[5]<<8) +
-                           ((response_from_card[6]&0xff00)>>8);
-            response[0] = ((response_from_card[6]&0xff)<<24) +
-                           (response_from_card[7]<<8) +
-                           ((response_from_card[8]&0xff00)>>8);
-            break;
-        case 3:
-            /* Response type 3 has the following structure:
-                Start bit
-                Transmission bit
-                Reserved (6 bits)
-                OCR register (32 bits)
-                Reserved (7 bits)
-                Stop bit
-            */
-            response[0] = ((response_from_card[0] & 0xff) << 24)
-                       + (response_from_card[1] << 8)
-                       + ((response_from_card[2] & 0xff00) >> 8);
-        /* Types 4-6 not supported yet */
+        /* Response type 2 has the following structure:
+         * [135:135] Start Bit - '0'
+         * [134:134] Transmission bit - '0'
+         * [133:128] Reserved - '111111'
+         * [127:001] CID or CSD register including internal CRC7
+         * [000:000] End Bit - '1'
+         */
+        response[3] = (data[0]<<24) + (data[1]<<8) + ((data[2]&0xff00)>>8);
+        response[2] = (data[2]<<24) + (data[3]<<8) + ((data[4]&0xff00)>>8);
+        response[1] = (data[4]<<24) + (data[5]<<8) + ((data[6]&0xff00)>>8);
+        response[0] = (data[6]<<24) + (data[7]<<8) + ((data[8]&0xff00)>>8);
     }
-}
+    else
+    {
+        /* Response types 1, 1b, 3, 6 have the following structure:
+         * Types 4 and 5 are not supported.
+         *
+         *     [47] Start bit - '0'
+         *     [46] Transmission bit - '0'
+         *  [45:40] R1, R1b, R6: Command index
+         *          R3: Reserved - '111111'
+         *   [39:8] R1, R1b: Card Status
+         *          R3: OCR Register
+         *          R6: [31:16] RCA
+         *              [15: 0] Card Status Bits 23, 22, 19, 12:0
+         *                     [23] COM_CRC_ERROR
+         *                     [22] ILLEGAL_COMMAND
+         *                     [19] ERROR
+         *                   [12:9] CURRENT_STATE
+         *                      [8] READY_FOR_DATA
+         *                    [7:6]
+         *                      [5] APP_CMD
+         *                      [4]
+         *                      [3] AKE_SEQ_ERROR
+         *                      [2] Reserved
+         *                    [1:0] Reserved for test mode
+         *    [7:1] R1, R1b: CRC7
+         *          R3: Reserved - '1111111'
+         *      [0] End Bit - '1'
+         */
+        response[0] = (data[0]<<24) + (data[1]<<8) + ((data[2]&0xff00)>>8);
+    }
 
-bool sd_send_acommand(unsigned int cmd, unsigned long arg1, unsigned int arg2)
-{
-    unsigned int returncode;
-    if (sd_send_command(55, (card_info[current_card].rca)<<16, 1) == false)
-        return false;
-    sd_read_response(&returncode, 1);
-    if (sd_send_command(cmd, arg1, arg2) == false)
-        return false;
     return true;
 }
 
-void sd_wait_for_state(tSDCardInfo* card, unsigned int state)
+static void sd_wait_for_state(unsigned int state, unsigned int id)
 {
     unsigned int response = 0;
-    while(((response >> 9) & 0xf) != state)
+
+    check_time[id] = USEC_TIMER;
+
+    while (1)
     {
-        sd_send_command(SEND_STATUS, (card->rca) << 16, 1);
+        sd_command(SEND_STATUS, currcard->rca, &response, 1);
+        sd_check_timeout(0x80000, id);
+
+        if (((response >> 9) & 0xf) == state)
+            break;
+
         priority_yield();
-        sd_read_response(&response, 1);
-        /* TODO: Add a timeout and error handling */
     }
+
     SD_STATE_REG = state;
 }
 
-
-STATICIRAM void copy_read_sectors(unsigned char* buf, int wordcount)
-                NOINLINE_ATTR ICODE_ATTR;
-
-STATICIRAM void copy_read_sectors(unsigned char* buf, int wordcount)
+static inline void copy_read_sectors_fast(unsigned char **buf)
 {
-    unsigned int tmp = 0;
-
-    if ( (unsigned long)buf & 1)
-    {   /* not 16-bit aligned, copy byte by byte */
-        unsigned char* bufend = buf + wordcount*2;
-        do
-        {
-            tmp = DATA_REG;
-            *buf++ = tmp & 0xff;
-            *buf++ = tmp >> 8;
-        } while (buf < bufend); /* tail loop is faster */
-    }
-    else
-    {   /* 16-bit aligned, can do faster copy */
-        unsigned short* wbuf = (unsigned short*)buf;
-        unsigned short* wbufend = wbuf + wordcount;
-        do
-        {
-            *wbuf = DATA_REG;
-        } while (++wbuf < wbufend); /* tail loop is faster */
+    /* Copy one chunk of 16 words using best method for start alignment */
+    switch ( (intptr_t)*buf & 3 )
+    {
+    case 0:
+        asm volatile (
+            "ldmia  %[data], { r2-r9 }          \r\n"
+            "orr    r2, r2, r3, lsl #16         \r\n"
+            "orr    r4, r4, r5, lsl #16         \r\n"
+            "orr    r6, r6, r7, lsl #16         \r\n"
+            "orr    r8, r8, r9, lsl #16         \r\n"
+            "stmia  %[buf]!, { r2, r4, r6, r8 } \r\n"
+            "ldmia  %[data], { r2-r9 }          \r\n"
+            "orr    r2, r2, r3, lsl #16         \r\n"
+            "orr    r4, r4, r5, lsl #16         \r\n"
+            "orr    r6, r6, r7, lsl #16         \r\n"
+            "orr    r8, r8, r9, lsl #16         \r\n"
+            "stmia  %[buf]!, { r2, r4, r6, r8 } \r\n"
+            : [buf]"+&r"(*buf)
+            : [data]"r"(&DATA_REG)
+            : "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9"
+        );
+        break;
+    case 1:
+        asm volatile (
+            "ldmia  %[data], { r2-r9 }          \r\n"
+            "orr    r3, r2, r3, lsl #16         \r\n"
+            "strb   r3, [%[buf]], #1            \r\n"
+            "mov    r3, r3, lsr #8              \r\n"
+            "strh   r3, [%[buf]], #2            \r\n"
+            "mov    r3, r3, lsr #16             \r\n"
+            "orr    r3, r3, r4, lsl #8          \r\n"
+            "orr    r3, r3, r5, lsl #24         \r\n"
+            "mov    r5, r5, lsr #8              \r\n"
+            "orr    r5, r5, r6, lsl #8          \r\n"
+            "orr    r5, r5, r7, lsl #24         \r\n"
+            "mov    r7, r7, lsr #8              \r\n"
+            "orr    r7, r7, r8, lsl #8          \r\n"
+            "orr    r7, r7, r9, lsl #24         \r\n"
+            "mov    r2, r9, lsr #8              \r\n"
+            "stmia  %[buf]!, { r3, r5, r7 }     \r\n"
+            "ldmia  %[data], { r3-r10 }         \r\n"
+            "orr    r2, r2, r3, lsl #8          \r\n"
+            "orr    r2, r2, r4, lsl #24         \r\n"
+            "mov    r4, r4, lsr #8              \r\n"
+            "orr    r4, r4, r5, lsl #8          \r\n"
+            "orr    r4, r4, r6, lsl #24         \r\n"
+            "mov    r6, r6, lsr #8              \r\n"
+            "orr    r6, r6, r7, lsl #8          \r\n"
+            "orr    r6, r6, r8, lsl #24         \r\n"
+            "mov    r8, r8, lsr #8              \r\n"
+            "orr    r8, r8, r9, lsl #8          \r\n"
+            "orr    r8, r8, r10, lsl #24        \r\n"
+            "mov    r10, r10, lsr #8            \r\n"
+            "stmia  %[buf]!, { r2, r4, r6, r8 } \r\n"
+            "strb   r10, [%[buf]], #1           \r\n"
+            : [buf]"+&r"(*buf)
+            : [data]"r"(&DATA_REG)
+            : "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10"
+        );
+        break;
+    case 2:
+        asm volatile (
+            "ldmia  %[data], { r2-r9 }          \r\n"
+            "strh   r2, [%[buf]], #2            \r\n"
+            "orr    r3, r3, r4, lsl #16         \r\n"
+            "orr    r5, r5, r6, lsl #16         \r\n"
+            "orr    r7, r7, r8, lsl #16         \r\n"
+            "stmia  %[buf]!, { r3, r5, r7 }     \r\n"
+            "ldmia  %[data], { r2-r8, r10 }     \r\n"
+            "orr    r2, r9, r2, lsl #16         \r\n"
+            "orr    r3, r3, r4, lsl #16         \r\n"
+            "orr    r5, r5, r6, lsl #16         \r\n"
+            "orr    r7, r7, r8, lsl #16         \r\n"
+            "stmia  %[buf]!, { r2, r3, r5, r7 } \r\n"
+            "strh   r10, [%[buf]], #2           \r\n"
+            : [buf]"+&r"(*buf)
+            : [data]"r"(&DATA_REG)
+            : "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10"
+        );
+        break;
+    case 3:
+        asm volatile (
+            "ldmia  %[data], { r2-r9 }          \r\n"
+            "orr    r3, r2, r3, lsl #16         \r\n"
+            "strb   r3, [%[buf]], #1            \r\n"
+            "mov    r3, r3, lsr #8              \r\n"
+            "orr    r3, r3, r4, lsl #24         \r\n"
+            "mov    r4, r4, lsr #8              \r\n"
+            "orr    r5, r4, r5, lsl #8          \r\n"
+            "orr    r5, r5, r6, lsl #24         \r\n"
+            "mov    r6, r6, lsr #8              \r\n"
+            "orr    r7, r6, r7, lsl #8          \r\n"
+            "orr    r7, r7, r8, lsl #24         \r\n"
+            "mov    r8, r8, lsr #8              \r\n"
+            "orr    r2, r8, r9, lsl #8          \r\n"
+            "stmia  %[buf]!, { r3, r5, r7 }     \r\n"
+            "ldmia  %[data], { r3-r10 }         \r\n"
+            "orr    r2, r2, r3, lsl #24         \r\n"
+            "mov    r3, r3, lsr #8              \r\n"
+            "orr    r4, r3, r4, lsl #8          \r\n"
+            "orr    r4, r4, r5, lsl #24         \r\n"
+            "mov    r5, r5, lsr #8              \r\n"
+            "orr    r6, r5, r6, lsl #8          \r\n"
+            "orr    r6, r6, r7, lsl #24         \r\n"
+            "mov    r7, r7, lsr #8              \r\n"
+            "orr    r8, r7, r8, lsl #8          \r\n"
+            "orr    r8, r8, r9, lsl #24         \r\n"
+            "mov    r9, r9, lsr #8              \r\n"
+            "orr    r10, r9, r10, lsl #8        \r\n"
+            "stmia  %[buf]!, { r2, r4, r6, r8 } \r\n"
+            "strh   r10, [%[buf]], #2           \r\n"
+            "mov    r10, r10, lsr #16           \r\n"
+            "strb   r10, [%[buf]], #1           \r\n"
+            : [buf]"+&r"(*buf)
+            : [data]"r"(&DATA_REG)
+            : "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10"
+        );
+        break;
     }
 }
 
-STATICIRAM void copy_write_sectors(const unsigned char* buf, int wordcount)
-                NOINLINE_ATTR ICODE_ATTR;
+static inline void copy_read_sectors_slow(unsigned char** buf)
+{
+    int cnt = FIFO_SIZE;
+    int t;
 
-STATICIRAM void copy_write_sectors(const unsigned char* buf, int wordcount)
+    /* Copy one chunk of 16 words */
+    asm volatile (
+    "1:                                     \r\n"
+        "ldrh   %[t], [%[data]]             \r\n"
+        "strb   %[t], [%[buf]], #1          \r\n"
+        "mov    %[t], %[t], lsr #8          \r\n"
+        "strb   %[t], [%[buf]], #1          \r\n"
+        "subs   %[cnt], %[cnt], #1          \r\n"
+        "bgt    1b                          \r\n"
+        : [cnt]"+&r"(cnt), [buf]"+&r"(*buf),
+          [t]"=&r"(t)
+        : [data]"r"(&DATA_REG)
+    );
+}
+
+/* Writes have to be kept slow for now */
+static inline void copy_write_sectors(const unsigned char* buf)
 {
     unsigned short tmp = 0;
-    const unsigned char* bufend = buf + wordcount*2;
+    const unsigned char* bufend = buf + FIFO_SIZE*2;
+
     do
     {
-        tmp = (unsigned short) *buf++;
+        tmp  = (unsigned short) *buf++;
         tmp |= (unsigned short) *buf++ << 8;
         DATA_REG = tmp;
     } while (buf < bufend); /* tail loop is faster */
 }
 
-
-void sd_select_bank(unsigned char bank)
+static void sd_select_bank(unsigned char bank)
 {
     unsigned int response;
     unsigned char card_data[512];
     unsigned char* write_buf;
     int i;
-    tSDCardInfo *card = &card_info[0]; /* Bank selection will only be done on
-                                        the onboard flash */
-    if (current_bank != bank)
+
+    memset(card_data, 0, 512);
+    sd_wait_for_state(TRAN, EC_TRAN_SEL_BANK);
+    BLOCK_SIZE_REG = 512;
+    BLOCK_COUNT_REG = 1;
+    sd_command(35, 0, &response, 0x1c0d); /* CMD35 is vendor specific */
+    SD_STATE_REG = PRG;
+
+    card_data[0] = bank;
+
+    /* Write the card data */
+    write_buf = card_data;
+    for (i = 0; i < BLOCK_SIZE / 2; i += FIFO_SIZE)
     {
-        memset(card_data, 0, 512);
-        sd_wait_for_state(card, TRAN);
-        BLOCK_SIZE_REG = 512;
-        BLOCK_COUNT_REG = 1;
-        sd_send_command(35, 0, 0x1c0d); /* CMD35 is vendor specific */
-        sd_read_response(&response, 1);
-        SD_STATE_REG = PRG;
+        /* Wait for the FIFO to empty */
+        sd_poll_status(FIFO_EMPTY, 10000, EC_FIFO_SEL_BANK_EMPTY | DO_PANIC);
 
-        card_data[0] = bank;
+        copy_write_sectors(write_buf); /* Copy one chunk of 16 words */
 
-        /* Write the card data */
-        write_buf = card_data;
-        for (i = 0; i < BLOCK_SIZE / 2; i += FIFO_SIZE)
-        {
-            /* Wait for the FIFO to be empty */
-            while((STATUS_REG & FIFO_EMPTY) == 0) {} /* Erm... is this right? */
-
-            copy_write_sectors(write_buf, FIFO_SIZE);
-
-            write_buf += FIFO_SIZE*2; /* Advance one chunk of 16 words */
-        }
-
-        while((STATUS_REG & DATA_DONE) == 0) {}
-        current_bank = bank;
+        write_buf += FIFO_SIZE*2; /* Advance one chunk of 16 words */
     }
+
+    sd_poll_status(DATA_DONE, 10000, EC_FIFO_SEL_BANK_DONE | DO_PANIC);
+
+    currcard->current_bank = bank;
 }
 
-void sd_init_device(void)
+/* lock must already be aquired */
+static void sd_init_device(int card_no)
 {
 /* SD Protocol registers */
-    unsigned int dummy;
-    int i;
-
-    static unsigned int read_bl_len = 0;
-    static unsigned int c_size = 0;
-    static unsigned int c_size_mult = 0;
-    static unsigned long mult = 0;
-
+    unsigned int  i, dummy;
+    unsigned int  c_size = 0;
+    unsigned long c_mult = 0;
     unsigned char carddata[512];
     unsigned char *dataptr;
-    tSDCardInfo *card = &card_info[0]; /* Init onboard flash only */
-
-/* Initialise card data as blank */
-    card->initialized = false;
-    card->ocr = 0;
-    card->csd[0] = 0;
-    card->csd[1] = 0;
-    card->csd[2] = 0;
-    card->cid[0] = 0;
-    card->cid[1] = 0;
-    card->cid[2] = 0;
-    card->rca = 0;
-
-    card->capacity = 0;
-    card->numblocks = 0;
-    card->block_size = 0;
-    card->block_exp = 0;
 
 /* Enable and initialise controller */
-    GPIOG_ENABLE |= (0x3 << 5);
-    GPIOG_OUTPUT_EN |= (0x3 << 5);
-    GPIOG_OUTPUT_VAL |= (0x3 << 5);
-    outl(inl(0x70000088) & ~(0x4), 0x70000088);
-    outl(inl(0x7000008c) & ~(0x4), 0x7000008c);
-    outl(inl(0x70000080) | 0x4, 0x70000080);
-    outl(inl(0x70000084) | 0x4, 0x70000084);
     REG_1 = 6;
-    outl(inl(0x70000014) & ~(0x3ffff), 0x70000014);
-    outl((inl(0x70000014) & ~(0x3ffff)) | 0x255aa, 0x70000014);
-    outl(0x1010, 0x70000034);
 
-    GPIOA_ENABLE |= (1 << 7);
-    GPIOA_OUTPUT_EN &= ~(1 << 7);
-    GPIOD_ENABLE |= (0x1f);
-    GPIOD_OUTPUT_EN |= (0x1f);
-    GPIOD_OUTPUT_VAL |= (0x1f);
+    currcard = &card_info[card_no];
+
+/* Initialise card data as blank */
+    memset(currcard, 0, sizeof(*currcard));
+
+    if (card_no == 0)
+    {
+        outl(inl(0x70000080) | 0x4, 0x70000080);
+
+        GPIOA_ENABLE     &= ~0x7a;
+        GPIOA_OUTPUT_EN  &= ~0x7a;
+        GPIOD_ENABLE     |=  0x1f;
+        GPIOD_OUTPUT_VAL |=  0x1f;
+        GPIOD_OUTPUT_EN  |=  0x1f;
+
+        outl((inl(0x70000014) & ~(0x3ffff)) | 0x255aa, 0x70000014);
+    }
+    else
+    {
+        outl(inl(0x70000080) & ~0x4, 0x70000080);
+
+        GPIOD_ENABLE     &= ~0x1f;
+        GPIOD_OUTPUT_EN  &= ~0x1f;
+        GPIOA_ENABLE     |=  0x7a;
+        GPIOA_OUTPUT_VAL |=  0x7a;
+        GPIOA_OUTPUT_EN  |=  0x7a;
+
+        outl(inl(0x70000014) & ~(0x3ffff), 0x70000014);
+    }
+
+    /* Init NAND */
+    REG_11 |=  (1 << 15);
+    REG_12 |=  (1 << 15);
+    REG_12 &= ~(3 << 12);
+    REG_12 |=  (1 << 13);
+    REG_11 &= ~(3 << 12);
+    REG_11 |=  (1 << 13);
+
     DEV_EN |= DEV_ATA; /* Enable controller */
     DEV_RS |= DEV_ATA; /* Reset controller */
     DEV_RS &=~DEV_ATA; /* Clear Reset */
 
-/* Init NAND */
-    REG_11 |= (1 << 15);
-    REG_12 |= (1 << 15);
-    REG_12 &= ~(3 << 12);
-    REG_12 |= (1 << 13);
-    REG_11 &= ~(3 << 12);
-    REG_11 |= (1 << 13);
-
     SD_STATE_REG = TRAN;
+
     REG_5 = 0xf;
-
-    sd_send_command(GO_IDLE_STATE, 0, 256);
-    while ((card->ocr & (1 << 31)) == 0) /* Loop until the card is powered up */
+    sd_command(GO_IDLE_STATE, 0, &dummy, 256);
+    check_time[EC_POWER_UP] = USEC_TIMER;
+    while ((currcard->ocr & (1 << 31)) == 0) /* until card is powered up */
     {
-        sd_send_acommand(SD_APP_OP_COND, 0x100000, 3);
-        sd_read_response(&(card->ocr), 3);
-
-        if (card->ocr == 0)
-        {
-            /* TODO: Handle failure */
-            while (1) {};
-        }
+        sd_command(APP_CMD, currcard->rca, &dummy, 1);
+        sd_command(SD_APP_OP_COND, 0x100000, &currcard->ocr, 3);
+        sd_check_timeout(5000000, EC_POWER_UP);
     }
 
-    sd_send_command(ALL_SEND_CID, 0, 2);
-    sd_read_response(card->cid, 2);
-    sd_send_command(SEND_RELATIVE_ADDR, 0, 1);
-    sd_read_response(&card->rca, 1);
-    card->rca >>= 16; /* The Relative Card Address is the top 16 bits of the
-                        32 bits returned.  Whenever it is used, it gets
-                        shifted left by 16 bits, so this step could possibly
-                        be skipped. */
+    sd_command(ALL_SEND_CID,         0, currcard->cid, 2);
+    sd_command(SEND_RELATIVE_ADDR,  0, &currcard->rca, 1);
+    sd_command(SEND_CSD, currcard->rca, currcard->csd, 2);
 
-    sd_send_command(SEND_CSD, card->rca << 16, 2);
-    sd_read_response(card->csd, 2);
-
-    /* Parse disk geometry */
     /* These calculations come from the Sandisk SD card product manual */
-    read_bl_len = ((card->csd[2] >> 16) & 0xf);
-    c_size = ((card->csd[2] & (0x3ff)) << 2) +
-        ((card->csd[1] & (0xc0000000)) >> 30);
-    c_size_mult = ((card->csd[1] >> 15) & 0x7);
-    mult = (1<<(c_size_mult + 2));
-    card->max_read_bl_len = (1<<read_bl_len);
-    card->block_size = BLOCK_SIZE;     /* Always use 512 byte blocks */
-    card->numblocks = (c_size + 1) * mult * (card->max_read_bl_len / 512);
-    card->capacity = card->numblocks * card->block_size;
+    c_size = ((currcard->csd[2] & 0x3ff) << 2) + (currcard->csd[1] >> 30) + 1;
+    c_mult = 4 << ((currcard->csd[1] >> 15) & 7);
+    currcard->max_read_bl_len = 1 << ((currcard->csd[2] >> 16) & 15);
+    currcard->block_size = BLOCK_SIZE;     /* Always use 512 byte blocks */
+    currcard->numblocks = c_size * c_mult * (currcard->max_read_bl_len / 512);
+    currcard->capacity = currcard->numblocks * currcard->block_size;
 
     REG_1 = 0;
-    sd_send_command(SELECT_CARD, card->rca << 16, 129);
-    sd_read_response(&dummy, 1); /* I don't think we use the result from this */
-    sd_send_acommand(SET_BUS_WIDTH, (card->rca << 16) | 2, 1);
-    sd_read_response(&dummy, 1); /* 4 bit wide bus */
-    sd_send_command(SET_BLOCKLEN, card->block_size, 1);
-    sd_read_response(&dummy, 1);
-    BLOCK_SIZE_REG = card->block_size;
+
+    sd_command(SELECT_CARD,   currcard->rca       , &dummy, 129);
+    sd_command(APP_CMD,       currcard->rca       , &dummy, 1);
+    sd_command(SET_BUS_WIDTH, currcard->rca | 2   , &dummy, 1); /* 4 bit */
+    sd_command(SET_BLOCKLEN,  currcard->block_size, &dummy, 1);
+    BLOCK_SIZE_REG = currcard->block_size;
 
     /* If this card is > 4Gb, then we need to enable bank switching */
-    if(card->numblocks >= BLOCKS_PER_BANK)
+    if(currcard->numblocks >= BLOCKS_PER_BANK)
     {
         SD_STATE_REG = TRAN;
         BLOCK_COUNT_REG = 1;
-        sd_send_command(SWITCH_FUNC, 0x80ffffef, 0x1c05);
-        sd_read_response(&dummy, 1);
+        sd_command(SWITCH_FUNC, 0x80ffffef, &dummy, 0x1c05);
         /* Read 512 bytes from the card.
         The first 512 bits contain the status information
         TODO: Do something useful with this! */
@@ -436,206 +550,216 @@ void sd_init_device(void)
         for (i = 0; i < BLOCK_SIZE / 2; i += FIFO_SIZE)
         {
             /* Wait for the FIFO to be full */
-            while((STATUS_REG & FIFO_FULL) == 0) {}
-
-            copy_read_sectors(dataptr, FIFO_SIZE);
-
-            dataptr += (FIFO_SIZE*2); /* Advance one chunk of 16 words */
+            sd_poll_status(FIFO_FULL, 100000,
+                           EC_FIFO_ENA_BANK_EMPTY | DO_PANIC);
+            copy_read_sectors_slow(&dataptr);
         }
     }
-    spinlock_init(&sd_mtx);
+
+    currcard->initialized = true;
 }
 
 /* API Functions */
 
 void ata_led(bool onoff)
 {
-    (void)onoff;
+    led(onoff);
 }
 
-int ata_read_sectors(IF_MV2(int drive,)
-                     unsigned long start,
-                     int incount,
+int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
                      void* inbuf)
 {
-    int ret = 0;
-    long timeout;
-    int count;
-    void* buf;
-    long spinup_start;
+    int  ret = 0;
+    unsigned char *buf, *buf_end;
     unsigned int dummy;
-    unsigned int response;
-    unsigned int i;
-    tSDCardInfo *card = &card_info[current_card];
-
+    int bank;
+    
     /* TODO: Add DMA support. */
 
-#ifdef HAVE_MULTIVOLUME
-    (void)drive; /* unused for now */
-#endif
     spinlock_lock(&sd_mtx);
 
-    last_disk_activity = current_tick;
-    spinup_start = current_tick;
-
-    ata_enable(true);
     ata_led(true);
 
-    timeout = current_tick + READ_TIMEOUT;
-
-    /* TODO: Select device */
-    if(current_card == 0)
+    if (drive != 0 && (GPIOA_INPUT_VAL & 0x80) != 0)
     {
-        if(start >= BLOCKS_PER_BANK)
-        {
-            sd_select_bank(1);
-            start -= BLOCKS_PER_BANK;
-        } else {
-            sd_select_bank(0);
-        }
+        /* no external sd-card inserted */
+        ret = -9;
+        goto ata_read_error;
     }
 
-    buf = inbuf;
-    count = incount;
-    while (TIME_BEFORE(current_tick, timeout)) {
-        ret = 0;
-        last_disk_activity = current_tick;
+    if (&card_info[drive] != currcard || !card_info[drive].initialized)
+        sd_init_device(drive);
 
-        SD_STATE_REG = TRAN;
-        BLOCK_COUNT_REG = count;
-        sd_send_command(READ_MULTIPLE_BLOCK, start * BLOCK_SIZE, 0x1c25);
-        sd_read_response(&dummy, 1);
-        /* TODO: Don't assume BLOCK_SIZE == SECTOR_SIZE */
+    last_disk_activity = current_tick;
 
-        for (i = 0; i < count * card->block_size / 2; i += FIFO_SIZE)
-        {
-            /* Wait for the FIFO to be full */
-            while((STATUS_REG & FIFO_FULL) == 0) {}
+    bank = start / BLOCKS_PER_BANK;
 
-            copy_read_sectors(buf, FIFO_SIZE);
+    if (currcard->current_bank != bank)
+        sd_select_bank(bank);
 
-            buf += FIFO_SIZE*2; /* Advance one chunk of 16 words */
+    start -= bank * BLOCKS_PER_BANK;
 
-            /* TODO: Switch bank if necessary */
+    sd_wait_for_state(TRAN, EC_TRAN_READ_ENTRY);
+    BLOCK_COUNT_REG = incount;
+    sd_command(READ_MULTIPLE_BLOCK, start * BLOCK_SIZE, &dummy, 0x1c25);
+    /* TODO: Don't assume BLOCK_SIZE == SECTOR_SIZE */
 
-            last_disk_activity = current_tick;
-        }
-        udelay(75);
-        sd_send_command(STOP_TRANSMISSION, 0, 1);
-        sd_read_response(&dummy, 1);
+    buf_end = (unsigned char *)inbuf + incount * currcard->block_size;
+    for (buf = inbuf; buf < buf_end;)
+    {
+        /* Wait for the FIFO to be full */
+        sd_poll_status(FIFO_FULL, 0x80000, EC_FIFO_READ_FULL | DO_PANIC);
+        copy_read_sectors_fast(&buf); /* Copy one chunk of 16 words */
 
-        response = 0;
-        sd_wait_for_state(card, TRAN);
-        break;
+        /* TODO: Switch bank if necessary */
     }
+
+    last_disk_activity = current_tick;
+#if 0
+    udelay(75);
+#endif
+    sd_command(STOP_TRANSMISSION, 0, &dummy, 1);
+    sd_wait_for_state(TRAN, EC_TRAN_READ_EXIT);
+
+ata_read_error:
     ata_led(false);
-    ata_enable(false);
 
     spinlock_unlock(&sd_mtx);
 
     return ret;
 }
 
-
-int ata_write_sectors(IF_MV2(int drive,)
-                      unsigned long start,
-                      int count,
-                      const void* buf)
+int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
+                      const void* outbuf)
 {
 /* Write support is not finished yet */
-/* TODO: The standard suggests using ACMD23 prior to writing multiple blocks 
+/* TODO: The standard suggests using ACMD23 prior to writing multiple blocks
    to improve performance */
     unsigned int response;
-    void const* write_buf;
+    void const* buf, *buf_end;
     int ret = 0;
-    unsigned int i;
-    long timeout;
-    tSDCardInfo *card = &card_info[current_card];
+    int bank;
 
     spinlock_lock(&sd_mtx);
-    ata_enable(true);
+
     ata_led(true);
-    if(current_card == 0)
+
+    if (drive != 0 && (GPIOA_INPUT_VAL & 0x80) != 0)
     {
-        if(start < BLOCKS_PER_BANK)
-        {
-            sd_select_bank(0);
-        } else {
-            sd_select_bank(1);
-            start -= BLOCKS_PER_BANK;
-        }
+        /* no external sd-card inserted */
+        ret = -9;
+        goto error;
     }
 
-retry:
-    sd_wait_for_state(card, TRAN);
+    if (&card_info[drive] != currcard || !card_info[drive].initialized)
+        sd_init_device(drive);
+
+    bank = start / BLOCKS_PER_BANK;
+
+    if (currcard->current_bank != bank)
+        sd_select_bank(bank);
+
+    start -= bank * BLOCKS_PER_BANK;
+
+    check_time[EC_WRITE_TIMEOUT] = USEC_TIMER;
+    sd_wait_for_state(TRAN, EC_TRAN_WRITE_ENTRY);
     BLOCK_COUNT_REG = count;
-    sd_send_command(WRITE_MULTIPLE_BLOCK, start * SECTOR_SIZE, 0x1c2d);
-    sd_read_response(&response, 1);
-    write_buf = buf;
-    for (i = 0; i < count * card->block_size / 2; i += FIFO_SIZE)
+    sd_command(WRITE_MULTIPLE_BLOCK, start * SECTOR_SIZE, &response, 0x1c2d);
+
+    buf_end = outbuf + count * currcard->block_size;
+    for (buf = outbuf; buf < buf_end; buf += 2 * FIFO_SIZE)
     {
-        if(i >= (count * card->block_size / 2)-FIFO_SIZE)
+        if (buf >= buf_end - 2 * FIFO_SIZE)
         {
             /* Set SD_STATE_REG to PRG for the last buffer fill */
             SD_STATE_REG = PRG;
         }
 
-        /* Wait for the FIFO to be empty */
-        while((STATUS_REG & FIFO_EMPTY) == 0) {}
-        /* Perhaps we could use bit 8 of card status (READY_FOR_DATA)? */
+        udelay(2); /* needed here (loop is too fast :-) */
 
-        copy_write_sectors(write_buf, FIFO_SIZE);
+        /* Wait for the FIFO to empty */
+        sd_poll_status(FIFO_EMPTY, 0x80000, EC_FIFO_WR_EMPTY | DO_PANIC);
 
-        write_buf += FIFO_SIZE*2; /* Advance one chunk of 16 words */
+        copy_write_sectors(buf); /* Copy one chunk of 16 words */
+
         /* TODO: Switch bank if necessary */
-
-        last_disk_activity = current_tick;
     }
 
-    timeout = current_tick + WRITE_TIMEOUT;
+    last_disk_activity = current_tick;
 
-    while((STATUS_REG & DATA_DONE) == 0) {
-        if(current_tick >= timeout)
-        {
-            sd_send_command(STOP_TRANSMISSION, 0, 1);
-            sd_read_response(&response, 1);
-            goto retry;
-        }
-    }
-    sd_send_command(STOP_TRANSMISSION, 0, 1);
-    sd_read_response(&response, 1);
+    sd_poll_status(DATA_DONE, 0x80000, EC_FIFO_WR_DONE | DO_PANIC);
+    sd_check_timeout(0x80000, EC_WRITE_TIMEOUT);
 
-    sd_wait_for_state(card, TRAN);
+    sd_command(STOP_TRANSMISSION, 0, &response, 1);
+    sd_wait_for_state(TRAN, EC_TRAN_WRITE_EXIT);
+
+  error:
     ata_led(false);
-    ata_enable(false);
     spinlock_unlock(&sd_mtx);
 
     return ret;
 }
 
+static void sd_thread(void) __attribute__((noreturn));
 static void sd_thread(void)
 {
     struct event ev;
     bool idle_notified = false;
     
-    while (1) {
+    while (1)
+    {
         queue_wait_w_tmo(&sd_queue, &ev, HZ);
+
         switch ( ev.id ) 
         {
-            default:
-                if (TIME_BEFORE(current_tick, last_disk_activity+(3*HZ)))
-                {
-                    idle_notified = false;
-                }
-                else
-                {
-                    if (!idle_notified)
-                    {
-                        call_ata_idle_notifys(false);
-                        idle_notified = true;
-                    }
-                }
-                break;
+        case SD_HOTSWAP:
+        {
+            int status = 0;
+            enum { SD_UNMOUNTED = 0x1, SD_MOUNTED = 0x2 };
+
+            /* Delay on insert and remove to prevent reading state if it is
+               just bouncing back and forth while card is sliding - delay on
+               insert is also required for the card to stabilize and accept
+               commands */
+            sleep(HZ/10);
+
+            /* Lock to keep us from messing with this variable while an init
+               may be in progress */
+            spinlock_lock(&sd_mtx);
+            card_info[1].initialized = false;
+            spinlock_unlock(&sd_mtx);
+
+            /* Either unmount because the card was pulled or unmount and
+               remount if already mounted since multiple messages may be
+               generated for the same event - like someone inserting a new
+               card before anything detects the old one pulled :) */
+            if (disk_unmount(1) != 0)  /* release "by force" */
+                status |= SD_UNMOUNTED;
+
+            if (card_detect_target() && disk_mount(1) != 0) /* mount SD-CARD */
+                status |= SD_MOUNTED;
+
+            if (status & SD_UNMOUNTED)
+                queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
+
+            if (status & SD_MOUNTED)
+                queue_broadcast(SYS_HOTSWAP_INSERTED, 0);
+
+            if (status)
+                queue_broadcast(SYS_FS_CHANGED, 0);
+            break;
+            } /* SD_HOTSWAP */
+        case SYS_TIMEOUT:
+            if (TIME_BEFORE(current_tick, last_disk_activity+(3*HZ)))
+            {
+                idle_notified = false;
+            }
+            else if (!idle_notified)
+            {
+                call_ata_idle_notifys(false);
+                idle_notified = true;
+            }
+            break;
         }
     }
 }
@@ -648,7 +772,7 @@ void ata_spindown(int seconds)
 
 bool ata_disk_is_active(void)
 {
-  return 0;
+    return 0;
 }
 
 void ata_sleep(void)
@@ -662,12 +786,12 @@ void ata_spin(void)
 /* Hardware reset protocol as specified in chapter 9.1, ATA spec draft v5 */
 int ata_hard_reset(void)
 {
-  return 0;
+    return 0;
 }
 
 int ata_soft_reset(void)
 {
-  return 0;
+    return 0;
 }
 
 void ata_enable(bool on)
@@ -682,22 +806,113 @@ void ata_enable(bool on)
     }
 }
 
-unsigned short* ata_get_identify(void)
-{
-    return identify_info;
-}
-
 int ata_init(void)
 {
-    sd_init_device();
-    if ( !initialized ) 
+    ata_led(false);
+
+    /* NOTE: This init isn't dual core safe */
+    if (!initialized)
     {
-        queue_init(&sd_queue, true);
-        create_thread(sd_thread, sd_stack,
-                      sizeof(sd_stack), sd_thread_name IF_PRIO(, PRIORITY_SYSTEM)
-		      IF_COP(, CPU, false));
         initialized = true;
+
+        spinlock_init(&sd_mtx);
+
+        spinlock_lock(&sd_mtx);
+
+        /* init controller */
+        outl(inl(0x70000088) & ~(0x4), 0x70000088);
+        outl(inl(0x7000008c) & ~(0x4), 0x7000008c);
+        outl(inl(0x70000084) | 0x4, 0x70000084);
+        outl(0x1010, 0x70000034);
+
+        GPIOG_ENABLE     |= (0x3 << 5);
+        GPIOG_OUTPUT_EN  |= (0x3 << 5);
+        GPIOG_OUTPUT_VAL |= (0x3 << 5);
+
+        /* enable card detection port - mask interrupt first */
+        GPIOA_INT_EN     &= ~0x80;
+
+        GPIOA_OUTPUT_EN  &= ~0x80;
+        GPIOA_ENABLE     |=  0x80;
+
+        sd_init_device(0);
+
+        queue_init(&sd_queue, true);
+        create_thread(sd_thread, sd_stack, sizeof(sd_stack),
+            sd_thread_name IF_PRIO(, PRIORITY_SYSTEM) IF_COP(, CPU, false));
+
+        /* enable interupt for the mSD card */
+        sleep(HZ/10);
+
+        CPU_INT_EN = HI_MASK;
+        CPU_HI_INT_EN = GPIO0_MASK;
+
+        sd1_status = GPIOA_INPUT_VAL & 0x80;
+        GPIOA_INT_LEV = (GPIOA_INT_LEV & ~0x80) | (sd1_status ^ 0x80);
+
+        GPIOA_INT_CLR = 0x80;
+        GPIOA_INT_EN |= 0x80;
+
+        spinlock_unlock(&sd_mtx);
     }
 
     return 0;
+}
+
+/* move the sd-card info to mmc struct */
+tCardInfo *card_get_info_target(int card_no)
+{
+    int i, temp;
+    static tCardInfo card;
+    static const char mantissa[] = {  /* *10 */
+        0,  10, 12, 13, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80 };
+    static const int exponent[] = {  /* use varies */
+      1,10,100,1000,10000,100000,1000000,10000000,100000000,1000000000 };
+
+    card.initialized  = card_info[card_no].initialized;
+    card.ocr          = card_info[card_no].ocr;
+    for(i=0; i<4; i++)  card.csd[i] = card_info[card_no].csd[3-i];
+    for(i=0; i<4; i++)  card.cid[i] = card_info[card_no].cid[3-i];
+    card.numblocks    = card_info[card_no].numblocks;
+    card.blocksize    = card_info[card_no].block_size;
+    card.size         = card_info[card_no].capacity < 0xffffffff ?
+                        card_info[card_no].capacity : 0xffffffff;
+    card.block_exp    = card_info[card_no].block_exp;
+    temp              = card_extract_bits(card.csd, 29, 3);
+    card.speed        = mantissa[card_extract_bits(card.csd, 25, 4)]
+                      * exponent[temp > 2 ? 7 : temp + 4];
+    card.nsac         = 100 * card_extract_bits(card.csd, 16, 8);
+    temp              = card_extract_bits(card.csd, 13, 3);
+    card.tsac         = mantissa[card_extract_bits(card.csd, 9, 4)]
+                      * exponent[temp] / 10;
+    card.cid[0]       = htobe32(card.cid[0]); /* ascii chars here */
+    card.cid[1]       = htobe32(card.cid[1]); /* ascii chars here */
+    temp = *((char*)card.cid+13); /* adjust year<=>month, 1997 <=> 2000 */
+    *((char*)card.cid+13) = (unsigned char)((temp >> 4) | (temp << 4)) + 3;
+
+    return &card;
+}
+
+bool card_detect_target(void)
+{
+    /* 0x00:inserted, 0x80:not inserted */
+    return (GPIOA_INPUT_VAL & 0x80) == 0;
+}
+
+/* called on insertion/removal interrupt */
+void microsd_int(void)
+{
+    int status = GPIOA_INPUT_VAL & 0x80;
+    
+    GPIOA_INT_LEV = (GPIOA_INT_LEV & ~0x80) | (status ^ 0x80);
+    GPIOA_INT_CLR = 0x80;
+
+    if (status == sd1_status)
+        return;
+
+    sd1_status = status;
+
+    /* Take final state only - insert/remove is bouncy */
+    queue_remove_from_head(&sd_queue, SD_HOTSWAP);
+    queue_post(&sd_queue, SD_HOTSWAP, status);
 }

@@ -71,6 +71,10 @@ typedef struct {
 #endif
 } DIR;
 
+#ifdef HAVE_HOTSWAP
+char *get_volume_name(int volume);
+#endif
+
 #ifndef DIRFUNCTIONS_DEFINED
 
 extern DIR* opendir(const char* name);

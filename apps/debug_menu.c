@@ -59,7 +59,7 @@
 #include "fat.h"
 #include "mas.h"
 #include "eeprom_24cxx.h"
-#ifdef HAVE_MMC
+#if defined(HAVE_MMC) || defined(HAVE_HOTSWAP)
 #include "ata_mmc.h"
 #endif
 #if CONFIG_TUNER
@@ -1524,8 +1524,8 @@ static bool view_battery(void)
 #endif
 
 #ifndef SIMULATOR
-#ifdef HAVE_MMC
-static bool dbg_mmc_info(void)
+#if defined(HAVE_MMC) || defined(HAVE_HOTSWAP)
+static bool dbg_card_info(void)
 {
     bool done = false;
     int currval = 0;
@@ -1548,7 +1548,7 @@ static bool dbg_mmc_info(void)
 
     while (!done)
     {
-        card = mmc_card_info(currval / 2);
+        card = card_get_info(currval / 2);
 
         line = 0;
         lcd_clear_display();
@@ -1564,29 +1564,29 @@ static bool dbg_mmc_info(void)
 
                 strncpy(card_name, ((unsigned char*)card->cid) + 3, 6);
                 snprintf(pbuf, sizeof(pbuf), "%s Rev %d.%d", card_name,
-                         (int) mmc_extract_bits(card->cid, 72, 4),
-                         (int) mmc_extract_bits(card->cid, 76, 4));
+                         (int) card_extract_bits(card->cid, 72, 4),
+                         (int) card_extract_bits(card->cid, 76, 4));
                 lcd_puts(0, line++, pbuf);
                 snprintf(pbuf, sizeof(pbuf), "Prod: %d/%d",
-                         (int) mmc_extract_bits(card->cid, 112, 4),
-                         (int) mmc_extract_bits(card->cid, 116, 4) + 1997);
+                         (int) card_extract_bits(card->cid, 112, 4),
+                         (int) card_extract_bits(card->cid, 116, 4) + 1997);
                 lcd_puts(0, line++, pbuf);
                 snprintf(pbuf, sizeof(pbuf), "Ser#: 0x%08lx",
-                         mmc_extract_bits(card->cid, 80, 32));
+                         card_extract_bits(card->cid, 80, 32));
                 lcd_puts(0, line++, pbuf);
                 snprintf(pbuf, sizeof(pbuf), "M=%02x, O=%04x",
-                         (int) mmc_extract_bits(card->cid, 0, 8),
-                         (int) mmc_extract_bits(card->cid, 8, 16));
+                         (int) card_extract_bits(card->cid, 0, 8),
+                         (int) card_extract_bits(card->cid, 8, 16));
                 lcd_puts(0, line++, pbuf);
-                temp = mmc_extract_bits(card->csd, 2, 4);
+                temp = card_extract_bits(card->csd, 2, 4);
                 snprintf(pbuf, sizeof(pbuf), "MMC v%s", temp < 5 ?
                          spec_vers[temp] : "?.?");
                 lcd_puts(0, line++, pbuf);
                 snprintf(pbuf, sizeof(pbuf), "Blocks: 0x%06lx", card->numblocks);
                 lcd_puts(0, line++, pbuf);
                 snprintf(pbuf, sizeof(pbuf), "Blksz.: %d P:%c%c", card->blocksize,
-                         mmc_extract_bits(card->csd, 48, 1) ? 'R' : '-',
-                         mmc_extract_bits(card->csd, 106, 1) ? 'W' : '-');
+                         card_extract_bits(card->csd, 48, 1) ? 'R' : '-',
+                         card_extract_bits(card->csd, 106, 1) ? 'W' : '-');
                 lcd_puts(0, line++, pbuf);
             }
             else                  /* Technical details */
@@ -1606,12 +1606,12 @@ static bool dbg_mmc_info(void)
                 snprintf(pbuf, sizeof(pbuf), "R2W: *%d", card->r2w_factor);
                 lcd_puts(0, line++, pbuf);
                 snprintf(pbuf, sizeof(pbuf), "IRmax: %d..%d mA",
-                         i_vmin[mmc_extract_bits(card->csd, 66, 3)],
-                         i_vmax[mmc_extract_bits(card->csd, 69, 3)]);
+                         i_vmin[card_extract_bits(card->csd, 66, 3)],
+                         i_vmax[card_extract_bits(card->csd, 69, 3)]);
                 lcd_puts(0, line++, pbuf);
                 snprintf(pbuf, sizeof(pbuf), "IWmax: %d..%d mA",
-                         i_vmin[mmc_extract_bits(card->csd, 72, 3)],
-                         i_vmax[mmc_extract_bits(card->csd, 75, 3)]);
+                         i_vmin[card_extract_bits(card->csd, 72, 3)],
+                         i_vmax[card_extract_bits(card->csd, 75, 3)]);
                 lcd_puts(0, line++, pbuf);
             }
         }
@@ -1642,7 +1642,7 @@ static bool dbg_mmc_info(void)
     action_signalscreenchange();
     return false;
 }
-#else /* !HAVE_MMC */
+#else /* !defined(HAVE_MMC) && !defined(HAVE_HOTSWAP) */
 static bool dbg_disk_info(void)
 {
     char buf[128];
@@ -1799,7 +1799,7 @@ static bool dbg_disk_info(void)
     action_signalscreenchange();
     return false;
 }
-#endif /* !HAVE_MMC */
+#endif /* !defined(HAVE_MMC) && !defined(HAVE_HOTSWAP) */
 #endif /* !SIMULATOR */
 
 #ifdef HAVE_DIRCACHE
@@ -2278,8 +2278,10 @@ static const struct the_menu_item menuitems[] = {
         { "View partitions", dbg_partitions },
 #endif
 #ifndef SIMULATOR
-#ifdef HAVE_MMC
-        { "View MMC info", dbg_mmc_info },
+#if defined(HAVE_MMC)
+        { "View MMC info", dbg_card_info },
+#elif defined(HAVE_HOTSWAP)
+        { "View microSD info", dbg_card_info },
 #else
         { "View disk info", dbg_disk_info },
 #endif

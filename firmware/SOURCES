@@ -116,6 +116,9 @@ drivers/ata.c
 #endif /* HAVE_FLASH_DISK */
 #endif /* HAVE_MMC */
 drivers/fat.c
+#ifdef HAVE_HOTSWAP
+hotswap.c
+#endif
 #endif /* SIMULATOR */
 
 /* EEPROM */

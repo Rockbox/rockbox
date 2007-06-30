@@ -37,6 +37,9 @@ static DIR opendirs[MAX_OPEN_DIRS];
 #ifdef HAVE_MMC
 static const char* vol_names = "<MMC%d>";
 #define VOL_ENUM_POS 4 /* position of %d, to avoid runtime calculation */
+#elif defined(HAVE_HOTSWAP)
+static const char* vol_names = "<microSD%d>";
+#define VOL_ENUM_POS 8 /* position of %d, to avoid runtime calculation */
 #else
 static const char* vol_names = "<HD%d>";
 #define VOL_ENUM_POS 3

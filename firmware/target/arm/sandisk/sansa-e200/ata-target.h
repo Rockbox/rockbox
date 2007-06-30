@@ -19,25 +19,4 @@
 #ifndef ATA_TARGET_H
 #define ATA_TARGET_H
 
-#include "inttypes.h"
-
-typedef struct
-{
-    bool initialized;
-
-    unsigned int ocr;            /* OCR register */
-    unsigned int csd[4];         /* CSD register */
-    unsigned int cid[4];         /* CID register */
-    unsigned int rca;
-
-    uint64_t capacity;           /* size in bytes */
-    unsigned long numblocks;     /* size in flash blocks */
-    unsigned int block_size;     /* block size in bytes */
-    unsigned int max_read_bl_len;/* max read data block length */
-    unsigned int block_exp;      /* block size exponent */
-} tSDCardInfo;
-
-tSDCardInfo *sd_card_info(int card_no);
-bool sd_touched(void);
-
 #endif

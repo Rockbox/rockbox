@@ -828,7 +828,8 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
             if (callback != NULL)
                 callback(parameter);
 #ifdef HAVE_MMC
-            if (!mmc_touched() || (mmc_remove_request() == SYS_MMC_EXTRACTED))
+            if (!mmc_touched() ||
+                (mmc_remove_request() == SYS_HOTSWAP_EXTRACTED))
 #endif
             {
                 scrobbler_flush_cache();

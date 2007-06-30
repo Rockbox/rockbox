@@ -24,7 +24,7 @@
 #include "pp5020.h"
 
 #undef GPIO_IRQ
-/* Ports A, ?? */
+/* Ports A, B, ?? */
 #define GPIO0_IRQ   (32+0)
 /* Ports F, H, ?? */
 #define GPIO1_IRQ   (32+1)

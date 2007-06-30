@@ -255,8 +255,8 @@ static void usb_thread(void)
                 break;
 
 #ifdef HAVE_MMC
-            case SYS_MMC_INSERTED:
-            case SYS_MMC_EXTRACTED:
+            case SYS_HOTSWAP_INSERTED:
+            case SYS_HOTSWAP_EXTRACTED:
                 if(usb_state == USB_INSERTED)
                 {
                     usb_enable(false);
