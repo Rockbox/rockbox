@@ -190,13 +190,13 @@ static int cur_player;
 static cursor_wrap_mode_t cursor_wrap_mode;
 
 static bool quit_plugin;
+static bool game_finished;
 
 
 /* Initialises the state of the game (starts a new game) */
 static void reversi_gui_init(void) {
     reversi_init_game(&game);
-    white_strategy = &strategy_human;
-    black_strategy = &strategy_human;
+    game_finished = false;
     cur_player = BLACK;
 
     /* Place the cursor so that WHITE can make a move */
@@ -330,9 +330,10 @@ static struct opt_items strategy_settings[] = {
     { "Human", NULL },
     { "Naive robot", NULL },
     { "Simple robot", NULL },
+    //{ "AB robot", NULL },
 };
 static const game_strategy_t * const strategy_values[] = {
-    &strategy_human, &strategy_naive, &strategy_simple };
+    &strategy_human, &strategy_naive, &strategy_simple, /*&strategy_ab*/ };
 
 
 /* Sets the strategy for the specified player. 'player' is the
@@ -353,6 +354,9 @@ static bool reversi_gui_choose_strategy(
     }
     result = rb->set_option(prompt, &index, INT, strategy_settings, num_items, NULL);
     (*player) = strategy_values[index];
+
+    if((*player)->init_func)
+        (*player)->init_func(&game);
 
     return result;
 }
@@ -557,6 +561,8 @@ enum plugin_status plugin_start(struct plugin_api *api, void *parameter) {
 
     game.rb = rb;
     rb->srand(*rb->current_tick); /* Some AIs use rand() */
+    white_strategy = &strategy_human;
+    black_strategy = &strategy_human;
 
     reversi_gui_init();
     cursor_wrap_mode = WRAP_FLAT;
@@ -580,21 +586,21 @@ enum plugin_status plugin_start(struct plugin_api *api, void *parameter) {
                 break;
         }
 
-        if(cur_strategy->is_robot) {
-            /* TODO: Check move validity */
+        if(cur_strategy->is_robot && !game_finished) {
             move_t m = cur_strategy->move_func(&game, cur_player);
             reversi_make_move(&game, MOVE_ROW(m), MOVE_COL(m), cur_player);
             cur_player = reversi_flipped_color(cur_player);
             draw_screen = true;
             /* TODO: Add some delay to prevent it from being too fast ? */
             /* TODO: Don't duplicate end of game check */
-            if (reversi_game_is_finished(&game)) {
+            if (reversi_game_is_finished(&game, cur_player)) {
                 reversi_count_occupied_cells(&game, &w_cnt, &b_cnt);
                 rb->snprintf(msg_buf, sizeof(msg_buf),
                         "Game over. %s have won.",
                         (w_cnt>b_cnt?"WHITE":"BLACK"));
                 rb->splash(HZ*2, msg_buf);
                 draw_screen = true; /* Must update screen after splash */
+                game_finished = true;
             }
             continue;
         }
@@ -618,17 +624,19 @@ enum plugin_status plugin_start(struct plugin_api *api, void *parameter) {
                         && (lastbutton != REVERSI_BUTTON_MAKE_MOVE_PRE))
                     break;
 #endif
+                if (game_finished) break;
                 if (reversi_make_move(&game, cur_row, cur_col, cur_player) > 0) {
                     /* Move was made. Global changes on the board are possible */
                     draw_screen = true; /* Redraw the screen next time */
                     cur_player = reversi_flipped_color(cur_player);
-                    if (reversi_game_is_finished(&game)) {
+                    if (reversi_game_is_finished(&game, cur_player)) {
                         reversi_count_occupied_cells(&game, &w_cnt, &b_cnt);
                         rb->snprintf(msg_buf, sizeof(msg_buf),
                                 "Game over. %s have won.",
                                 (w_cnt>b_cnt?"WHITE":"BLACK"));
                         rb->splash(HZ*2, msg_buf);
                         draw_screen = true; /* Must update screen after splash */
+                        game_finished = true;
                     }
                 } else {
                     /* An attempt to make an invalid move */

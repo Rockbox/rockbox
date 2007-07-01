@@ -23,5 +23,6 @@
 /* Strategy that requires interaction with the user */
 const game_strategy_t strategy_human = {
     false,
+    NULL,
     NULL
 };

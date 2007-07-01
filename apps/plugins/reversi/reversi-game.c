@@ -120,24 +120,9 @@ static int reversi_count_free_cells(const reversi_board_t *game) {
  * can make a move. Note that the implementation is not correct
  * as a game may be finished even if there are free cells
  */
-bool reversi_game_is_finished(const reversi_board_t *game) {
-    return (reversi_count_free_cells(game) == 0);
-}
-
-
-/* Finds out who should place the next stone. It's the partner
- * of the last move or WHITE if the game is just started.
- *
- * Returns WHITE or BLACK.
- */
-int reversi_get_turn(const reversi_board_t *game) {
-    int moves;
-    moves = reversi_count_moves(game);
-    if (moves == 0) {
-        return WHITE;
-    } else {
-        return reversi_flipped_color(MOVE_PLAYER(game->history[moves-1]));
-    }
+bool reversi_game_is_finished(const reversi_board_t *game, int player) {
+    return (reversi_count_free_cells(game) == 0)
+           || (reversi_count_passes(game,player) == 2);
 }
 
 
@@ -165,6 +150,7 @@ static int reversi_count_player_moves(const reversi_board_t *game,
     return cnt;
 }
 
+/* Returns the number of moves available for the specified player */
 int reversi_count_player_available_moves(const reversi_board_t *game,
         const int player) {
     int cnt = 0, row, col;
@@ -176,6 +162,17 @@ int reversi_count_player_available_moves(const reversi_board_t *game,
     return cnt;
 }
 
+/* Returns the number of players who HAVE to pass (2 == game is stuck) */
+int reversi_count_passes(const reversi_board_t *game, const int player) {
+    if(reversi_count_player_available_moves(game,player)==0) {
+        if(reversi_count_player_available_moves(game,
+                    reversi_flipped_color(player))==0) {
+            return 2;
+        }
+        return 1;
+    }
+    return 0;
+}
 
 /* Returns the number of moves made by WHITE so far */
 int reversi_count_white_moves(const reversi_board_t *game) {

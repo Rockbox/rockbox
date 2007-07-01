@@ -23,11 +23,11 @@
 #include <stdbool.h>
 #include "plugin.h"
 
-#define WHITE 1       /* WHITE constant, it always plays first (as in chess) */
-#define BLACK 2       /* BLACK constant */
-#define FREE  0       /* Free place constant */
+#define WHITE  1      /* WHITE constant, it always plays first (as in chess) */
+#define BLACK -1      /* BLACK constant */
+#define FREE   0      /* Free place constant */
 
-#define BOARD_SIZE 8
+#define BOARD_SIZE  8
 #define INIT_STONES 4
 
 /* Description of a move. A move is stored as a byte in the following format:
@@ -50,7 +50,7 @@ typedef unsigned char move_t;
 /* State of a board */
 typedef struct _reversi_board_t {
     /* The current state of the game (BLACK/WHITE/FREE) */
-    char board[BOARD_SIZE][BOARD_SIZE];
+    int board[BOARD_SIZE][BOARD_SIZE];
 
     /* Game history. First move (mostly, but not necessarily, black) is stored
      * in history[0], second move (mostly, but not necessarily, white) is
@@ -64,8 +64,7 @@ typedef struct _reversi_board_t {
 
 void reversi_init_game(reversi_board_t *game);
 int reversi_flipped_color(const int color);
-bool reversi_game_is_finished(const reversi_board_t *game);
-int reversi_get_turn(const reversi_board_t *game);
+bool reversi_game_is_finished(const reversi_board_t *game, int cur_player);
 int reversi_count_occupied_cells(const reversi_board_t *game,
         int *white_count, int *black_count);
 int reversi_count_moves(const reversi_board_t *game);
@@ -77,6 +76,7 @@ int reversi_is_valid_move(const reversi_board_t *game,
         const int row, const int col, const int player);
 int reversi_count_player_available_moves(const reversi_board_t *game,
         const int player);
+int reversi_count_passes(const reversi_board_t *game, const int player);
 
 
 #endif

@@ -33,7 +33,7 @@ static void reversi_copy_board(reversi_board_t *dst,
     dst->rb->memcpy(dst->history,src->history,
                     (BOARD_SIZE*BOARD_SIZE - INIT_STONES)*sizeof(move_t));
     for(i=0;i<BOARD_SIZE;i++) {
-        dst->rb->memcpy(dst->board[i],src->board[i],BOARD_SIZE);
+        dst->rb->memcpy(dst->board[i],src->board[i],BOARD_SIZE*sizeof(int));
     }
 }
 
@@ -113,5 +113,6 @@ static move_t simple_move_func(const reversi_board_t *game, int player) {
 
 const game_strategy_t strategy_simple = {
     true,
+    NULL,
     simple_move_func
 };

@@ -26,9 +26,11 @@
 
 static move_t naive_move_func(const reversi_board_t *game, int player) {
     int num_moves = reversi_count_player_available_moves(game, player);
-    int r = game->rb->rand()%num_moves;
+    int r;
     int row = 0;
     int col = 0;
+    if(!num_moves) return MOVE_INVALID;
+    r = game->rb->rand()%num_moves;
     while(true) {
         if(reversi_is_valid_move(game, row, col, player)) {
             r--;
@@ -49,5 +51,6 @@ static move_t naive_move_func(const reversi_board_t *game, int player) {
 
 const game_strategy_t strategy_naive = {
     true,
+    NULL,
     naive_move_func
 };

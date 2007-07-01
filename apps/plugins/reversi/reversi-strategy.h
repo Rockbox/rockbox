@@ -28,11 +28,13 @@
    a move has been considered or HISTORY_INVALID_ENTRY if no move
    has been considered. The board should not be modified. */
 typedef move_t (*move_func_t)(const reversi_board_t *game, int color);
+typedef void   (*init_func_t)(const reversi_board_t *game);
 
 /* A playing party/strategy */
 typedef struct _game_strategy_t {
     const bool is_robot;     /* Is the player a robot or does it require user input? */
-    move_func_t move_func;   /* Function for advicing a move */
+    init_func_t init_func;   /* Initialise strategy */
+    move_func_t move_func;   /* Make a move */
 } game_strategy_t;
 
 
@@ -40,5 +42,9 @@ typedef struct _game_strategy_t {
 extern const game_strategy_t strategy_human;
 extern const game_strategy_t strategy_naive;
 extern const game_strategy_t strategy_simple;
+//extern const game_strategy_t strategy_ab;
+
+#define CHAOSNOISE 0.05 /**< Changerate of heuristic-value */
+#define CHAOSPROB  0.1  /**< Probability of change of the heuristic-value */
 
 #endif
