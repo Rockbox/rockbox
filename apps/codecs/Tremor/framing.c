@@ -53,11 +53,6 @@ static void _ogg_buffer_destroy(ogg_buffer_state *bs){
     bt=bs->unused_buffers;
     rt=bs->unused_references;
 
-    if(!bs->outstanding){
-      _ogg_free(bs);
-      return;
-    }
-
     while(bt){
       ogg_buffer *b=bt;
       bt=b->ptr.next;
@@ -71,6 +66,10 @@ static void _ogg_buffer_destroy(ogg_buffer_state *bs){
       _ogg_free(r);
     }
     bs->unused_references=0;
+
+    if(!bs->outstanding)
+      _ogg_free(bs);
+
   }
 }
 
@@ -836,6 +835,7 @@ int ogg_stream_destroy(ogg_stream_state *os){
     ogg_buffer_release(os->header_tail);
     ogg_buffer_release(os->body_tail);
     memset(os,0,sizeof(*os));    
+    _ogg_free(os);
   }
   return OGG_SUCCESS;
 } 

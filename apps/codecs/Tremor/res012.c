@@ -187,45 +187,48 @@ static int _01inverse(vorbis_block *vb,vorbis_look_residue *vl,
   /* move all this setup out later */
   int samples_per_partition=info->grouping;
   int partitions_per_word=look->phrasebook->dim;
-  int n=info->end-info->begin;
+  int max=vb->pcmend>>1; 
+  int end=(info->end<max?info->end:max); 
+  int n=end-info->begin;
+
+  if(n>0){
+    int partvals=n/samples_per_partition;
+    int partwords=(partvals+partitions_per_word-1)/partitions_per_word;
+    int ***partword=(int ***)alloca(ch*sizeof(*partword));
   
-  int partvals=n/samples_per_partition;
-  int partwords=(partvals+partitions_per_word-1)/partitions_per_word;
-  int ***partword=(int ***)alloca(ch*sizeof(*partword));
-
-  for(j=0;j<ch;j++)
-    partword[j]=(int **)_vorbis_block_alloc(vb,partwords*sizeof(*partword[j]));
-
-  for(s=0;s<look->stages;s++){
-
-    /* each loop decodes on partition codeword containing 
-       partitions_pre_word partitions */
-    for(i=0,l=0;i<partvals;l++){
-      if(s==0){
-        /* fetch the partition word for each channel */
-        for(j=0;j<ch;j++){
-          int temp=vorbis_book_decode(look->phrasebook,&vb->opb);
-          if(temp==-1)goto eopbreak;
-          partword[j][l]=look->decodemap[temp];
-          if(partword[j][l]==NULL)goto errout;
-        }
-      }
-      
-      /* now we decode residual values for the partitions */
-      for(k=0;k<partitions_per_word && i<partvals;k++,i++)
-        for(j=0;j<ch;j++){
-          long offset=info->begin+i*samples_per_partition;
-          if(info->secondstages[partword[j][l][k]]&(1<<s)){
-            codebook *stagebook=look->partbooks[partword[j][l][k]][s];
-            if(stagebook){
-              if(decodepart(stagebook,in[j]+offset,&vb->opb,
-                            samples_per_partition,-8)==-1)goto eopbreak;
-            }
+    for(j=0;j<ch;j++)
+      partword[j]=(int **)_vorbis_block_alloc(vb,partwords*sizeof(*partword[j]));
+  
+    for(s=0;s<look->stages;s++){
+  
+      /* each loop decodes on partition codeword containing 
+         partitions_pre_word partitions */
+      for(i=0,l=0;i<partvals;l++){
+        if(s==0){
+          /* fetch the partition word for each channel */
+          for(j=0;j<ch;j++){
+            int temp=vorbis_book_decode(look->phrasebook,&vb->opb);
+            if(temp==-1)goto eopbreak;
+            partword[j][l]=look->decodemap[temp];
+            if(partword[j][l]==NULL)goto errout;
           }
         }
+        
+        /* now we decode residual values for the partitions */
+        for(k=0;k<partitions_per_word && i<partvals;k++,i++)
+          for(j=0;j<ch;j++){
+            long offset=info->begin+i*samples_per_partition;
+            if(info->secondstages[partword[j][l][k]]&(1<<s)){
+              codebook *stagebook=look->partbooks[partword[j][l][k]][s];
+              if(stagebook){
+                if(decodepart(stagebook,in[j]+offset,&vb->opb,
+                              samples_per_partition,-8)==-1)goto eopbreak;
+              }
+            }
+          }
+      }
     } 
   }
-  
  errout:
  eopbreak:
   return(0);
@@ -255,8 +258,6 @@ int res1_inverse(vorbis_block *vb,vorbis_look_residue *vl,
     return(0);
 }
 
-
-
 /* duplicate code here as speed is somewhat more important */
 int res2_inverse(vorbis_block *vb,vorbis_look_residue *vl,
                  ogg_int32_t **in,int *nonzero,int ch)
@@ -270,44 +271,48 @@ int res2_inverse(vorbis_block *vb,vorbis_look_residue *vl,
   /* move all this setup out later */
   int samples_per_partition=info->grouping;
   int partitions_per_word=look->phrasebook->dim;
-  int n=info->end-info->begin;
+  int max=(vb->pcmend*ch)>>1;
+  int end=(info->end<max?info->end:max);
+  int n=end-info->begin;
 
-  int partvals=n/samples_per_partition;
-  int partwords=(partvals+partitions_per_word-1)/partitions_per_word;
-  int **partword=(int **)_vorbis_block_alloc(vb,partwords*sizeof(*partword));
-  int beginoff=info->begin/ch;
-
-  for(i=0;i<ch;i++)if(nonzero[i])break;
-  if(i==ch)return(0); /* no nonzero vectors */
-
-  samples_per_partition/=ch;
-
-  for(s=0;s<look->stages;s++){
-    for(i=0,l=0;i<partvals;l++){
-
-      if(s==0){
-        /* fetch the partition word */
-        int temp=vorbis_book_decode(look->phrasebook,&vb->opb);
-        if(temp==-1)goto eopbreak;
-        partword[l]=look->decodemap[temp];
-        if(partword[l]==NULL)goto errout;
-      }
-
-      /* now we decode residual values for the partitions */
-      for(k=0;k<partitions_per_word && i<partvals;k++,i++)
-        if(info->secondstages[partword[l][k]]&(1<<s)){
-          codebook *stagebook=look->partbooks[partword[l][k]][s];
-          if(stagebook){
-            if(vorbis_book_decodevv_add(stagebook,in,
-                                        i*samples_per_partition+beginoff,ch,
-                                        &vb->opb,
-                                        samples_per_partition,-8)==-1)
-              goto eopbreak;
-          }
-        }
-    } 
-  }
+  if(n>0){
+    
+    int partvals=n/samples_per_partition;
+    int partwords=(partvals+partitions_per_word-1)/partitions_per_word;
+    int **partword=(int **)_vorbis_block_alloc(vb,partwords*sizeof(*partword));
+    int beginoff=info->begin/ch;
   
+    for(i=0;i<ch;i++)if(nonzero[i])break;
+    if(i==ch)return(0); /* no nonzero vectors */
+  
+    samples_per_partition/=ch;
+  
+    for(s=0;s<look->stages;s++){
+      for(i=0,l=0;i<partvals;l++){
+  
+        if(s==0){
+          /* fetch the partition word */
+          int temp=vorbis_book_decode(look->phrasebook,&vb->opb);
+          if(temp==-1)goto eopbreak;
+          partword[l]=look->decodemap[temp];
+          if(partword[l]==NULL)goto errout;
+        }
+        
+        /* now we decode residual values for the partitions */
+        for(k=0;k<partitions_per_word && i<partvals;k++,i++)
+          if(info->secondstages[partword[l][k]]&(1<<s)){
+            codebook *stagebook=look->partbooks[partword[l][k]][s];
+            if(stagebook){
+              if(vorbis_book_decodevv_add(stagebook,in,
+                                          i*samples_per_partition+beginoff,ch,
+                                          &vb->opb,
+                                          samples_per_partition,-8)==-1)
+                goto eopbreak;
+            }
+          }
+      } 
+    }
+  }
  errout:
  eopbreak:
   return(0);

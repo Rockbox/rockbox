@@ -148,7 +148,7 @@ static inline ogg_uint32_t bitreverse(register ogg_uint32_t x){
   return((x>> 1)&0x55555555) | ((x<< 1)&0xaaaaaaaa);
 }
 
-static inline long decode_packed_entry_number(codebook *book, 
+STIN long decode_packed_entry_number(codebook *book, 
 					      oggpack_buffer *b){
   int  read=book->dec_maxlength;
   long lo,hi;
@@ -172,7 +172,11 @@ static inline long decode_packed_entry_number(codebook *book,
 
   while(lok<0 && read>1)
     lok = oggpack_look(b, --read);
-  if(lok<0)return -1;
+
+  if(lok<0){
+    oggpack_adv(b,1); /* force eop */
+    return -1;
+  }
 
   /* bisect search for the codeword in the ordered list */
   {
@@ -191,7 +195,7 @@ static inline long decode_packed_entry_number(codebook *book,
     }
   }
   
-  oggpack_adv(b, read);
+  oggpack_adv(b, read+1);
   return(-1);
 }
 
@@ -283,67 +287,73 @@ static inline long decode_packed_block(codebook *book, oggpack_buffer *b,
 
 /* returns the [original, not compacted] entry number or -1 on eof *********/
 long vorbis_book_decode(codebook *book, oggpack_buffer *b){
-  long packed_entry=decode_packed_entry_number(book,b);
-  if(packed_entry>=0)
-    return(book->dec_index[packed_entry]);
-  
+  if(book->used_entries>0){
+    long packed_entry=decode_packed_entry_number(book,b);
+    if(packed_entry>=0)
+      return(book->dec_index[packed_entry]);
+  }
+
   /* if there's no dec_index, the codebook unpacking isn't collapsed */
-  return(packed_entry);
+  return(-1);
 }
 
 /* returns 0 on OK or -1 on eof *************************************/
 long vorbis_book_decodevs_add(codebook *book,ogg_int32_t *a,
 			      oggpack_buffer *b,int n,int point){
-  int step=n/book->dim;
-  long *entry = (long *)alloca(sizeof(*entry)*step);
-  ogg_int32_t **t = (ogg_int32_t **)alloca(sizeof(*t)*step);
-  int i,j,o;
-  int shift=point-book->binarypoint;
-
-  if(shift>=0){
-    for (i = 0; i < step; i++) {
-      entry[i]=decode_packed_entry_number(book,b);
-      if(entry[i]==-1)return(-1);
-      t[i] = book->valuelist+entry[i]*book->dim;
+  if(book->used_entries>0){  
+    int step=n/book->dim;
+    long *entry = (long *)alloca(sizeof(*entry)*step);
+    ogg_int32_t **t = (ogg_int32_t **)alloca(sizeof(*t)*step);
+    int i,j,o;
+    int shift=point-book->binarypoint;
+    
+    if(shift>=0){
+      for (i = 0; i < step; i++) {
+	entry[i]=decode_packed_entry_number(book,b);
+	if(entry[i]==-1)return(-1);
+	t[i] = book->valuelist+entry[i]*book->dim;
+      }
+      for(i=0,o=0;i<book->dim;i++,o+=step)
+	for (j=0;j<step;j++)
+	  a[o+j]+=t[j][i]>>shift;
+    }else{
+      for (i = 0; i < step; i++) {
+	entry[i]=decode_packed_entry_number(book,b);
+	if(entry[i]==-1)return(-1);
+	t[i] = book->valuelist+entry[i]*book->dim;
+      }
+      for(i=0,o=0;i<book->dim;i++,o+=step)
+	for (j=0;j<step;j++)
+	  a[o+j]+=t[j][i]<<-shift;
     }
-    for(i=0,o=0;i<book->dim;i++,o+=step)
-      for (j=0;j<step;j++)
-	a[o+j]+=t[j][i]>>shift;
-  }else{
-    for (i = 0; i < step; i++) {
-      entry[i]=decode_packed_entry_number(book,b);
-      if(entry[i]==-1)return(-1);
-      t[i] = book->valuelist+entry[i]*book->dim;
-    }
-    for(i=0,o=0;i<book->dim;i++,o+=step)
-      for (j=0;j<step;j++)
-	a[o+j]+=t[j][i]<<-shift;
   }
   return(0);
 }
 
 long vorbis_book_decodev_add(codebook *book,ogg_int32_t *a,
 			     oggpack_buffer *b,int n,int point){
-  int i,j,entry;
-  ogg_int32_t *t;
-  int shift=point-book->binarypoint;
-  
-  if(shift>=0){
-    for(i=0;i<n;){
-      entry = decode_packed_entry_number(book,b);
-      if(entry==-1)return(-1);
-      t     = book->valuelist+entry*book->dim;
-      for (j=0;j<book->dim;)
-	a[i++]+=t[j++]>>shift;
-    }
-  }else{
-    shift = -shift;
-    for(i=0;i<n;){
-      entry = decode_packed_entry_number(book,b);
-      if(entry==-1)return(-1);
-      t     = book->valuelist+entry*book->dim;
-      for (j=0;j<book->dim;)
-	a[i++]+=t[j++]<<shift;
+  if(book->used_entries>0){
+    int i,j,entry;
+    ogg_int32_t *t;
+    int shift=point-book->binarypoint;
+    
+    if(shift>=0){
+      for(i=0;i<n;){
+	entry = decode_packed_entry_number(book,b);
+	if(entry==-1)return(-1);
+	t     = book->valuelist+entry*book->dim;
+	for (j=0;j<book->dim;)
+	  a[i++]+=t[j++]>>shift;
+      }
+    }else{
+      shift = -shift;
+      for(i=0;i<n;){
+	entry = decode_packed_entry_number(book,b);
+	if(entry==-1)return(-1);
+	t     = book->valuelist+entry*book->dim;
+	for (j=0;j<book->dim;)
+	  a[i++]+=t[j++]<<shift;
+      }
     }
   }
   return(0);
@@ -351,28 +361,38 @@ long vorbis_book_decodev_add(codebook *book,ogg_int32_t *a,
 
 long vorbis_book_decodev_set(codebook *book,ogg_int32_t *a,
 			     oggpack_buffer *b,int n,int point){
-  int i,j,entry;
-  ogg_int32_t *t;
-  int shift=point-book->binarypoint;
-  
-  if(shift>=0){
-
-    for(i=0;i<n;){
-      entry = decode_packed_entry_number(book,b);
-      if(entry==-1)return(-1);
-      t     = book->valuelist+entry*book->dim;
-      for (j=0;j<book->dim;){
-	a[i++]=t[j++]>>shift;
+  if(book->used_entries>0){
+    int i,j,entry;
+    ogg_int32_t *t;
+    int shift=point-book->binarypoint;
+    
+    if(shift>=0){
+      
+      for(i=0;i<n;){
+	entry = decode_packed_entry_number(book,b);
+	if(entry==-1)return(-1);
+	t     = book->valuelist+entry*book->dim;
+	for (j=0;j<book->dim;){
+	  a[i++]=t[j++]>>shift;
+	}
+      }
+    }else{
+      shift = -shift;
+      for(i=0;i<n;){
+	entry = decode_packed_entry_number(book,b);
+	if(entry==-1)return(-1);
+	t     = book->valuelist+entry*book->dim;
+	for (j=0;j<book->dim;){
+	  a[i++]=t[j++]<<shift;
+	}
       }
     }
   }else{
-    shift = -shift;
+
+    int i,j;
     for(i=0;i<n;){
-      entry = decode_packed_entry_number(book,b);
-      if(entry==-1)return(-1);
-      t     = book->valuelist+entry*book->dim;
       for (j=0;j<book->dim;){
-	a[i++]=t[j++]<<shift;
+	a[i++]=0;
       }
     }
   }
@@ -382,48 +402,50 @@ long vorbis_book_decodev_set(codebook *book,ogg_int32_t *a,
 long vorbis_book_decodevv_add(codebook *book,ogg_int32_t **a,
 			      long offset,int ch,
 			      oggpack_buffer *b,int n,int point){
-  long i,j,k,chunk,read;
-  int chptr=0;
-  int shift=point-book->binarypoint;
-  long entries[32];
+  if(book->used_entries>0){
+    long i,j,k,chunk,read;
+    int chptr=0;
+    int shift=point-book->binarypoint;
+    long entries[32];
 
-  if(shift>=0){
+    if(shift>=0){
     
-    for(i=offset;i<offset+n;){
-      chunk=32;
-      if (chunk*book->dim>(offset+n-i)*ch)
-        chunk=((offset+n-i)*ch+book->dim-1)/book->dim;
-      read = decode_packed_block(book,b,entries,chunk);
-      for(k=0;k<read;k++){
-	const ogg_int32_t *t = book->valuelist+entries[k]*book->dim;
-	for (j=0;j<book->dim;j++){
-	  a[chptr++][i]+=t[j]>>shift;
-	  if(chptr==ch){
-	    chptr=0;
-	    i++;
+      for(i=offset;i<offset+n;){
+        chunk=32;
+        if (chunk*book->dim>(offset+n-i)*ch)
+          chunk=((offset+n-i)*ch+book->dim-1)/book->dim;
+        read = decode_packed_block(book,b,entries,chunk);
+        for(k=0;k<read;k++){
+	  const ogg_int32_t *t = book->valuelist+entries[k]*book->dim;
+	  for (j=0;j<book->dim;j++){
+	    a[chptr++][i]+=t[j]>>shift;
+	    if(chptr==ch){
+	      chptr=0;
+	      i++;
+	    }
 	  }
-	}
+        }
+        if (read<chunk)return-1;
       }
-      if (read<chunk)return-1;
-    }
-  }else{
-    shift = -shift;
-    for(i=offset;i<offset+n;){
-      chunk=32;
-      if (chunk*book->dim>(offset+n-i)*ch)
-        chunk=((offset+n-i)*ch+book->dim-1)/book->dim;
-      read = decode_packed_block(book,b,entries,chunk);
-      for(k=0;k<read;k++){
-	const ogg_int32_t *t = book->valuelist+entries[k]*book->dim;
-	for (j=0;j<book->dim;j++){
-	  a[chptr++][i]+=t[j]<<shift;
-	  if(chptr==ch){
-	    chptr=0;
-	    i++;
+    }else{
+      shift = -shift;
+      for(i=offset;i<offset+n;){
+        chunk=32;
+        if (chunk*book->dim>(offset+n-i)*ch)
+          chunk=((offset+n-i)*ch+book->dim-1)/book->dim;
+        read = decode_packed_block(book,b,entries,chunk);
+        for(k=0;k<read;k++){
+	  const ogg_int32_t *t = book->valuelist+entries[k]*book->dim;
+	  for (j=0;j<book->dim;j++){
+	    a[chptr++][i]+=t[j]<<shift;
+	    if(chptr==ch){
+	      chptr=0;
+	      i++;
+	    }
 	  }
-	}
+        }
+        if (read<chunk)return-1;
       }
-      if (read<chunk)return-1;
     }
   }
   return(0);

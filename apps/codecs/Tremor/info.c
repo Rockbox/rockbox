@@ -97,8 +97,8 @@ void vorbis_comment_clear(vorbis_comment *vc){
     if(vc->user_comments)_ogg_free(vc->user_comments);
 	if(vc->comment_lengths)_ogg_free(vc->comment_lengths);
     if(vc->vendor)_ogg_free(vc->vendor);
+    memset(vc,0,sizeof(*vc));
   }
-  memset(vc,0,sizeof(*vc));
 }
 
 /* blocksize 0 is guaranteed to be short, 1 is guarantted to be long.
@@ -124,13 +124,16 @@ void vorbis_info_clear(vorbis_info *vi){
       if(ci->mode_param[i])_ogg_free(ci->mode_param[i]);
 
     for(i=0;i<ci->maps;i++) /* unpack does the range checking */
-      _mapping_P[ci->map_type[i]]->free_info(ci->map_param[i]);
+      if(ci->map_param[i])
+	_mapping_P[ci->map_type[i]]->free_info(ci->map_param[i]);
 
     for(i=0;i<ci->floors;i++) /* unpack does the range checking */
-      _floor_P[ci->floor_type[i]]->free_info(ci->floor_param[i]);
+      if(ci->floor_param[i])
+	_floor_P[ci->floor_type[i]]->free_info(ci->floor_param[i]);
     
     for(i=0;i<ci->residues;i++) /* unpack does the range checking */
-      _residue_P[ci->residue_type[i]]->free_info(ci->residue_param[i]);
+      if(ci->residue_param[i])
+	_residue_P[ci->residue_type[i]]->free_info(ci->residue_param[i]);
 
     for(i=0;i<ci->books;i++){
       if(ci->book_param[i]){

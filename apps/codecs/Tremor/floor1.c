@@ -286,7 +286,7 @@ static const ogg_int32_t FLOOR_fromdB_LOOKUP[256] ICONST_ATTR = {
   XdB(0x69f80e9a), XdB(0x70dafda8), XdB(0x78307d76), XdB(0x7fffffff),
 };
 
-static void render_line(int x0,register int x1,int y0,int y1,ogg_int32_t *d){
+static void render_line(int n, int x0,register int x1,int y0,int y1,ogg_int32_t *d){
   int dy=y1-y0;
   register int x=x0;
   register int y=y0;
@@ -296,11 +296,13 @@ static void render_line(int x0,register int x1,int y0,int y1,ogg_int32_t *d){
   register int sy=(dy<0?base-1:base+1);
   int err=0;
 
+  if(n>x1)n=x1;
   ady-=abs(base*adx);
 
-  d[x]= MULT31_SHIFT15(d[x],FLOOR_fromdB_LOOKUP[y]);
+  if(x<n)
+    d[x]= MULT31_SHIFT15(d[x],FLOOR_fromdB_LOOKUP[y]);
 
-  while(++x<x1){
+  while(++x<n){
     err=err+ady;
     if(err>=adx){
       err-=adx;
@@ -424,7 +426,7 @@ static int floor1_inverse2(vorbis_block *vb,vorbis_look_floor *in,void *memo,
         hy*=info->mult;
         hx=info->postlist[current];
         
-        render_line(lx,hx,ly,hy,out);
+        render_line(n,lx,hx,ly,hy,out);
         
         lx=hx;
         ly=hy;
