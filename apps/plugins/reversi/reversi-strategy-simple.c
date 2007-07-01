@@ -21,7 +21,8 @@
 
 /**
  * Simple strategy:
- *   A very simple strategy. Makes the highest scoring move.
+ *   A very simple strategy. Makes the highest scoring move taking the other
+ *   player's next best move into account.
  *   From Algorithm by Claudio Clemens in hinversi, simpleClient.c
  */
 
@@ -38,20 +39,44 @@ static void reversi_copy_board(reversi_board_t *dst,
 
 static int reversi_sim_move(const reversi_board_t *game, const int row,
         const int col, const int player) {
-    /* Gruik */
     reversi_board_t game_clone;
     reversi_copy_board(&game_clone,game);
     return reversi_make_move(&game_clone,row,col,player);
 }
 
+static int reversi_get_max_moves(const reversi_board_t *game, int player) {
+    int max = -BOARD_SIZE*BOARD_SIZE;
+    int row, col;
+    for(row=0; row<BOARD_SIZE; row++) {
+        for(col=0; col<BOARD_SIZE; col++) {
+            int v = reversi_sim_move(game,row,col,player);
+            if(v>max)
+                max = v;
+        }
+    }
+    return max;
+}
+
+static int reversi_sim_move2(const reversi_board_t *game, const int row,
+        const int col, const int player) {
+    /* Takes the other player's next best move into account */
+    int score;
+    reversi_board_t game_clone;
+    reversi_copy_board(&game_clone,game);
+    score = reversi_make_move(&game_clone,row,col,player);
+    return score - reversi_get_max_moves(&game_clone,
+                                         reversi_flipped_color(player));
+}
+
+
 static move_t simple_move_func(const reversi_board_t *game, int player) {
-    int max = 0;
+    int max = -BOARD_SIZE*BOARD_SIZE;
     int count = 0;
     int row, col;
     int r;
     for(row=0; row<BOARD_SIZE; row++) {
         for(col=0; col<BOARD_SIZE; col++) {
-            int v = reversi_sim_move(game,row,col,player);
+            int v = reversi_sim_move2(game,row,col,player);
             if(v>max) {
                 max = v;
                 count = 1;
@@ -62,12 +87,14 @@ static move_t simple_move_func(const reversi_board_t *game, int player) {
         }
     }
 
+    if(!count) return MOVE_INVALID;
+
     /* chose one of the moves which scores highest */
     r = game->rb->rand()%count;
     row = 0;
     col = 0;
     while(true) {
-        if(reversi_sim_move(game, row, col, player)==max) {
+        if(reversi_sim_move2(game, row, col, player)==max) {
             r--;
             if(r<0) {
                 return MAKE_MOVE(row,col,player);
