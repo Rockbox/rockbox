@@ -184,6 +184,9 @@ bool rbutilFrmApp::ReadGlobalConfig(rbutilFrm* myFrame)
         gv->GlobalConfig->Read(buf.Format(wxT("/%s/resolution"),
             cur.c_str()), &tmpstr);
         gv->plat_resolution.Add(tmpstr);
+        gv->GlobalConfig->Read(buf.Format(wxT("/%s/manualname"),
+            cur.c_str()), &tmpstr);
+        gv->plat_manualname.Add(tmpstr);
 
         i++;
     }

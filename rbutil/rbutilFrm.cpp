@@ -324,12 +324,11 @@ void rbutilFrm::CreateGUIControls(void)
 
 void  rbutilFrm::OnManualUpdate(wxUpdateUIEvent& event)
 {
-    wxString tmp = gv->curplat;
+    wxString tmp = wxT("/rockbox-") + gv->curplat;
 
-    if(tmp == wxT("h120")) tmp = wxT("h100");   //h120 has the h100 manual
-	 if(tmp == wxT("fmrecorder8mb")) tmp = wxT("fmrecorder");
-	 if(tmp == wxT("ipodmini1g")) tmp = wxT("ipodmini2g");
-	 if(tmp == wxT("recorder8mb")) tmp = wxT("recorder");
+    int index = GetDeviceId();
+    if(gv->plat_manualname[index] != wxT(""))
+        tmp = wxT("/") + gv->plat_manualname[index];
 
     if( tmp == curManualDevice)
         return;
@@ -338,12 +337,12 @@ void  rbutilFrm::OnManualUpdate(wxUpdateUIEvent& event)
 
     // construct link to pdf
     wxString pdflink;
-    pdflink = gv->manual_url + curManualDevice + wxT(".pdf");
+    pdflink = gv->manual_url + tmp + wxT(".pdf");
     manuallink->SetURL(pdflink);
 
     // construct link to html
     wxString htmllink;
-    htmllink = gv->manual_url + curManualDevice + wxT("/rockbox-build.html");
+    htmllink = gv->manual_url + tmp + wxT("/rockbox-build.html");
     if(!manual->LoadPage(htmllink))
         manual->SetPage(wxT("<p>unable to display manual -- please use the PDF link above</p>"));
 

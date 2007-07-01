@@ -98,6 +98,7 @@ public:
     wxArrayString           plat_bootloadermethod;
     wxArrayString           plat_bootloadername;
     wxArrayString           plat_resolution;
+    wxArrayString           plat_manualname;
     wxString                download_url;
     wxString                daily_url;
     wxString                bleeding_url;
