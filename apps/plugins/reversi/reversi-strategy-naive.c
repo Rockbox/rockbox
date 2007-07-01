@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (c) 2006 Alexander Levin
+ * Copyright (c) 2007 Antoine Cellerier
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -18,10 +18,36 @@
  ****************************************************************************/
 
 #include "reversi-strategy.h"
-#include <stddef.h>
 
-/* Strategy that requires interaction with the user */
-const game_strategy_t strategy_human = {
-    false,
-    NULL
+/**
+ * Naive/Stupid strategy:
+ *   Random moves
+ */
+
+static move_t naive_move_func(const reversi_board_t *game, int player) {
+    int num_moves = reversi_count_player_available_moves(game, player);
+    int r = game->rb->rand()%num_moves;
+    int row = 0;
+    int col = 0;
+    while(true) {
+        if(reversi_is_valid_move(game, row, col, player)) {
+            r--;
+            if(r<0) {
+                return MAKE_MOVE(row,col,player);
+            }
+        }
+        col ++;
+        if(col==BOARD_SIZE) {
+            col = 0;
+            row ++;
+            if(row==BOARD_SIZE) {
+                row = 0;
+            }
+        }
+    }
+}
+
+const game_strategy_t strategy_naive = {
+    true,
+    naive_move_func
 };

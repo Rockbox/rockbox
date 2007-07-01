@@ -165,6 +165,17 @@ static int reversi_count_player_moves(const reversi_board_t *game,
     return cnt;
 }
 
+int reversi_count_player_available_moves(const reversi_board_t *game,
+        const int player) {
+    int cnt = 0, row, col;
+    for(row=0;row<BOARD_SIZE;row++) {
+        for(col=0;col<BOARD_SIZE;col++) {
+            if(reversi_is_valid_move(game, row, col, player)) cnt++;
+        }
+    }
+    return cnt;
+}
+
 
 /* Returns the number of moves made by WHITE so far */
 int reversi_count_white_moves(const reversi_board_t *game) {
@@ -273,7 +284,7 @@ static int reversi_is_valid_direction(const reversi_board_t *game,
  * Returns 0 if the move is not valid or, otherwise, the or'd
  * directions in which stones would be captured.
  */
-static int reversi_is_valid_move(const reversi_board_t *game,
+int reversi_is_valid_move(const reversi_board_t *game,
         const int row, const int col, const int player) {
     int dirs, i;
     dirs = 0;

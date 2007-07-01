@@ -1,3 +1,5 @@
 reversi-game.c
-reversi-strategy.c
 reversi-gui.c
+reversi-strategy.c
+reversi-strategy-naive.c
+reversi-strategy-simple.c

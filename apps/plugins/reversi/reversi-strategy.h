@@ -38,7 +38,7 @@ typedef struct _game_strategy_t {
 
 /* --- Possible playing strategies --- */
 extern const game_strategy_t strategy_human;
-extern const game_strategy_t strategy_novice;
-extern const game_strategy_t strategy_expert;
+extern const game_strategy_t strategy_naive;
+extern const game_strategy_t strategy_simple;
 
 #endif

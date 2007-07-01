@@ -328,11 +328,11 @@ static const cursor_wrap_mode_t cursor_wrap_mode_values[3] = {
 
 static struct opt_items strategy_settings[] = {
     { "Human", NULL },
-    { "Silly robot", NULL },
-    { "Smart robot", NULL },
+    { "Naive robot", NULL },
+    { "Simple robot", NULL },
 };
 static const game_strategy_t * const strategy_values[] = {
-    &strategy_human, &strategy_novice, &strategy_expert };
+    &strategy_human, &strategy_naive, &strategy_simple };
 
 
 /* Sets the strategy for the specified player. 'player' is the
@@ -555,6 +555,9 @@ enum plugin_status plugin_start(struct plugin_api *api, void *parameter) {
     /* Avoid compiler warnings */
     (void)parameter;
 
+    game.rb = rb;
+    rb->srand(*rb->current_tick); /* Some AIs use rand() */
+
     reversi_gui_init();
     cursor_wrap_mode = WRAP_FLAT;
 
@@ -563,10 +566,39 @@ enum plugin_status plugin_start(struct plugin_api *api, void *parameter) {
     quit_plugin = false;
     draw_screen = true;
     while (!exit && !quit_plugin) {
+        const game_strategy_t *cur_strategy = NULL;
         if (draw_screen) {
             reversi_gui_display_board();
             draw_screen = false;
         }
+        switch(cur_player) {
+            case BLACK:
+                cur_strategy = black_strategy;
+                break;
+            case WHITE:
+                cur_strategy = white_strategy;
+                break;
+        }
+
+        if(cur_strategy->is_robot) {
+            /* TODO: Check move validity */
+            move_t m = cur_strategy->move_func(&game, cur_player);
+            reversi_make_move(&game, MOVE_ROW(m), MOVE_COL(m), cur_player);
+            cur_player = reversi_flipped_color(cur_player);
+            draw_screen = true;
+            /* TODO: Add some delay to prevent it from being too fast ? */
+            /* TODO: Don't duplicate end of game check */
+            if (reversi_game_is_finished(&game)) {
+                reversi_count_occupied_cells(&game, &w_cnt, &b_cnt);
+                rb->snprintf(msg_buf, sizeof(msg_buf),
+                        "Game over. %s have won.",
+                        (w_cnt>b_cnt?"WHITE":"BLACK"));
+                rb->splash(HZ*2, msg_buf);
+                draw_screen = true; /* Must update screen after splash */
+            }
+            continue;
+        }
+
         button = rb->button_get(true);
 
         switch (button) {

@@ -21,6 +21,7 @@
 #define _REVERSI_GAME_H
 
 #include <stdbool.h>
+#include "plugin.h"
 
 #define WHITE 1       /* WHITE constant, it always plays first (as in chess) */
 #define BLACK 2       /* BLACK constant */
@@ -56,6 +57,8 @@ typedef struct _reversi_board_t {
      * stored in history[1] etc.
      */
     move_t history[BOARD_SIZE*BOARD_SIZE - INIT_STONES];
+
+    struct plugin_api *rb;
 } reversi_board_t;
 
 
@@ -70,6 +73,10 @@ int reversi_count_white_moves(const reversi_board_t *game);
 int reversi_count_black_moves(const reversi_board_t *game);
 int reversi_make_move(reversi_board_t *game, const int row,
         const int col, const int player);
+int reversi_is_valid_move(const reversi_board_t *game,
+        const int row, const int col, const int player);
+int reversi_count_player_available_moves(const reversi_board_t *game,
+        const int player);
 
 
 #endif
