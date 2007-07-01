@@ -565,8 +565,12 @@ enum plugin_status plugin_start(struct plugin_api *api, void *parameter) {
     black_strategy = &strategy_human;
 
     reversi_gui_init();
+#ifdef (CONFIG_KEYPAD == IPOD_4G_PAD) || \
+       (CONFIG_KEYPAD == IPOD_3G_PAD)
+    cursor_wrap_mode = WRAP_TORUS;
+#else
     cursor_wrap_mode = WRAP_FLAT;
-
+#endif
     /* The main game loop */
     exit = false;
     quit_plugin = false;
@@ -646,8 +650,10 @@ enum plugin_status plugin_start(struct plugin_api *api, void *parameter) {
                     rb->button_clear_queue();
                 }
                 break;
-
             /* Move cursor left */
+#ifdef REVERSI_BUTTON_ALT_LEFT
+            case REVERSI_BUTTON_ALT_LEFT:
+#endif
             case REVERSI_BUTTON_LEFT:
             case (REVERSI_BUTTON_LEFT | BUTTON_REPEAT):
                 if (reversi_gui_cursor_pos_hmove(-1, &row, &col)) {
@@ -656,6 +662,9 @@ enum plugin_status plugin_start(struct plugin_api *api, void *parameter) {
                 break;
 
             /* Move cursor right */
+#ifdef REVERSI_BUTTON_ALT_RIGHT
+            case REVERSI_BUTTON_ALT_RIGHT:
+#endif
             case REVERSI_BUTTON_RIGHT:
             case (REVERSI_BUTTON_RIGHT | BUTTON_REPEAT):
                 if (reversi_gui_cursor_pos_hmove(1, &row, &col)) {
