@@ -853,39 +853,49 @@ static void say_time(int cursorpos, const struct tm *tm)
 #define INDEX_X 0
 #define INDEX_Y 1
 #define INDEX_WIDTH 2
-bool set_time_screen(const char* string, struct tm *tm)
+
+#define SEPARATOR ":"
+#define MONTHNAME_LEN 3
+#define DAYNAME_LEN 3
+bool set_time_screen(const char* title, struct tm *tm)
 {
     bool done = false;
     int button;
-    int min = 0, steps = 0;
+    int i;
     int cursorpos = 0;
     int lastcursorpos = !cursorpos;
-    unsigned char buffer[19];
-    int realyear;
-    int julianday;
-    int i;
-    unsigned char reffub[5];
+    unsigned int julianday;
+    unsigned int realyear;
+    unsigned int min = 0, steps = 0;
+    unsigned int statusbar_height;
     unsigned int width, height;
     unsigned int separator_width, weekday_width;
     unsigned int line_height, prev_line_height;
-    int lastmode = lcd_get_drawmode();
+    unsigned char daysinmonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    unsigned char buffer[25];
 
-    char cursor[][3] = {{ 0,  8, 12}, {18,  8, 12}, {36,  8, 12},
-                        {24, 16, 24}, {54, 16, 18}, {78, 16, 12}};
-    char daysinmonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-
-    int monthname_len = 0, dayname_len = 0;
+    /* 6 possible cursor possitions, 3 values stored for each: x, y, width */
+    unsigned char cursor[6][3];
+    memset(cursor, 0, sizeof(cursor));
 
     int *valptr = NULL;
 
+    /* for easy acess in the drawing loop */
+    unsigned char *ptr[6];
+    ptr[0] = buffer;                    /* hours */
+    ptr[1] = buffer + 3;                /* minutes */
+    ptr[2] = buffer + 6;                /* seconds */
+    ptr[3] = buffer + 10 + DAYNAME_LEN; /* year (dayname is before year in the
+                                           buffer but is not drawn in the loop) */
+    ptr[4] = buffer + 15 + DAYNAME_LEN; /* monthname */
+    ptr[5] = buffer + 16 + DAYNAME_LEN + MONTHNAME_LEN;   /* day of month */
+
 #ifdef HAVE_LCD_BITMAP
     if(global_settings.statusbar)
-        lcd_setmargins(0, STATUSBAR_HEIGHT);
+        statusbar_height = STATUSBAR_HEIGHT;
     else
-        lcd_setmargins(0, 0);
 #endif
-    lcd_clear_display();
-    lcd_puts_scroll(0, 0, string);
+        statusbar_height = 0;
 
     while ( !done ) {
         /* calculate the number of days in febuary */
@@ -908,96 +918,98 @@ bool set_time_screen(const char* string, struct tm *tm)
         tm->tm_wday = (realyear + julianday + (realyear - 1) / 4 -
                        (realyear - 1) / 100 + (realyear - 1) / 400 + 7 - 1) % 7;
 
-        snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d ",
-                 tm->tm_hour, tm->tm_min, tm->tm_sec);
-        lcd_puts(0, 1, buffer);
-
+        /* copy all the stuff we want from the tm struct to buffer */
+        snprintf(buffer, sizeof(buffer), "%02d " "%02d " "%02d " "%s " "%04d " "%s " "%02d",
+                 tm->tm_hour, tm->tm_min, tm->tm_sec,
+                 str(dayname[tm->tm_wday]), tm->tm_year+1900,
+                 str(monthname[tm->tm_mon]), tm->tm_mday);
+        
         /* recalculate the positions and offsets */
-        lcd_getstringsize(string, &width, &prev_line_height);
+        lcd_getstringsize(title, &width, &prev_line_height);
         lcd_getstringsize(buffer, &width, &line_height);
-        lcd_getstringsize(":", &separator_width, &height);
+        lcd_getstringsize(SEPARATOR, &separator_width, &height);
+
+        /* convert spaces in the buffer to \0 to make it possible to work
+           directly on the buffer */
+        buffer[2] = '\0';
+        buffer[5] = '\0';
+        buffer[8] = '\0';
+        buffer[9 + DAYNAME_LEN] = '\0';
+        buffer[14 + DAYNAME_LEN] = '\0';
+        buffer[15 + DAYNAME_LEN + MONTHNAME_LEN] = '\0';
 
         /* hour */
-        strncpy(reffub, buffer, 2);
-        reffub[2] = '\0';
-        lcd_getstringsize(reffub, &width, &height);
-        cursor[0][INDEX_X] = 0;
-        cursor[0][INDEX_Y] = prev_line_height;
+        lcd_getstringsize(buffer, &width, &height);
+        /* cursor[0][INDEX_X] is already 0 because of the memset */
+        cursor[0][INDEX_Y] = prev_line_height + statusbar_height;
         cursor[0][INDEX_WIDTH] = width;
 
         /* minute */
-        strncpy(reffub, buffer + 3, 2);
-        reffub[2] = '\0';
-        lcd_getstringsize(reffub, &width, &height);
+        lcd_getstringsize(buffer + 3, &width, &height);
         cursor[1][INDEX_X] = cursor[0][INDEX_WIDTH] + separator_width;
-        cursor[1][INDEX_Y] = prev_line_height;
+        cursor[1][INDEX_Y] = prev_line_height + statusbar_height;
         cursor[1][INDEX_WIDTH] = width;
 
         /* second */
-        strncpy(reffub, buffer + 6, 2);
-        reffub[2] = '\0';
-        lcd_getstringsize(reffub, &width, &height);
+        lcd_getstringsize(buffer + 6, &width, &height);
         cursor[2][INDEX_X] = cursor[0][INDEX_WIDTH] + separator_width +
                              cursor[1][INDEX_WIDTH] + separator_width;
-        cursor[2][INDEX_Y] = prev_line_height;
-        cursor[2][INDEX_WIDTH] = width;
-
-        lcd_getstringsize(buffer, &width, &prev_line_height);
-
-        snprintf(buffer, sizeof(buffer), "%s %04d %s %02d ",
-                 str(dayname[tm->tm_wday]), tm->tm_year+1900,
-                 str(monthname[tm->tm_mon]), tm->tm_mday);
-        lcd_puts(0, 2, buffer);
-
-        /* recalculate the positions and offsets */
-        lcd_getstringsize(buffer, &width, &line_height);
-
-        /* store these 2 to prevent _repeated_ strlen calls */
-        monthname_len = strlen(str(monthname[tm->tm_mon]));
-        dayname_len = strlen(str(dayname[tm->tm_wday]));
+        cursor[2][INDEX_Y] = prev_line_height + statusbar_height;
 
         /* weekday */
-        strncpy(reffub, buffer, dayname_len);
-        reffub[dayname_len] = '\0';
-        lcd_getstringsize(reffub, &weekday_width, &height);
+        lcd_getstringsize(buffer + 9, &weekday_width, &height);
         lcd_getstringsize(" ", &separator_width, &height);
 
         /* year */
-        strncpy(reffub, buffer + dayname_len + 1, 4);
-        reffub[4] = '\0';
-        lcd_getstringsize(reffub, &width, &height);
+        lcd_getstringsize(buffer  + 10 + DAYNAME_LEN, &width, &height);
         cursor[3][INDEX_X] = weekday_width + separator_width;
         cursor[3][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
         cursor[3][INDEX_WIDTH] = width;
 
         /* month */
-        strncpy(reffub, buffer + dayname_len + 6, monthname_len);
-        reffub[monthname_len] = '\0';
-        lcd_getstringsize(reffub, &width, &height);
-        cursor[4][INDEX_X] = weekday_width + separator_width +
-                             cursor[3][INDEX_WIDTH] + separator_width;
+        lcd_getstringsize(buffer + 15 + DAYNAME_LEN, &width, &height);
+        cursor[4][INDEX_X] = weekday_width + 2 * separator_width +
+                             cursor[3][INDEX_WIDTH];
         cursor[4][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
         cursor[4][INDEX_WIDTH] = width;
 
         /* day */
-        strncpy(reffub, buffer + dayname_len + monthname_len + 7, 2);
-        reffub[2] = '\0';
-        lcd_getstringsize(reffub, &width, &height);
-        cursor[5][INDEX_X] = weekday_width + separator_width +
-                             cursor[3][INDEX_WIDTH] + separator_width +
-                             cursor[4][INDEX_WIDTH] + separator_width;
+        lcd_getstringsize(buffer + 16 + DAYNAME_LEN + MONTHNAME_LEN, &width, &height);
+        cursor[5][INDEX_X] = weekday_width + 3 * separator_width +
+                             cursor[3][INDEX_WIDTH] +
+                             cursor[4][INDEX_WIDTH];
         cursor[5][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
-        cursor[5][INDEX_WIDTH] = width;
 
-        lcd_set_drawmode(DRMODE_COMPLEMENT);
-        lcd_fillrect(cursor[cursorpos][INDEX_X],
-                     cursor[cursorpos][INDEX_Y] + lcd_getymargin(),
-                     cursor[cursorpos][INDEX_WIDTH],
-                     line_height);
+        /* draw the screen */
         lcd_set_drawmode(DRMODE_SOLID);
+        lcd_clear_display();
+        /* display the screen title */
+        lcd_puts_scroll(0, 0, title);
 
+        /* these are not selectable, so we draw them outside the loop */
+        lcd_putsxy(0, cursor[3][INDEX_Y], buffer + 9); /* name of the week day */
+        lcd_putsxy(cursor[1][INDEX_X] - separator_width, cursor[0][INDEX_Y],
+                   SEPARATOR);
+        lcd_putsxy(cursor[2][INDEX_X] - separator_width, cursor[0][INDEX_Y],
+                   SEPARATOR);
+
+        /* draw the selected item with drawmode set to
+           DRMODE_SOLID|DRMODE_INVERSEVID, all other selectable
+           items with drawmode DRMODE_SOLID */
+        for(i=0; i<6; i++)
+        {
+            if (cursorpos == i)
+                lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            else
+                lcd_set_drawmode(DRMODE_SOLID);
+
+            lcd_putsxy(cursor[i][INDEX_X], cursor[i][INDEX_Y], ptr[i]);
+        }
+
+        /* print help text */
         lcd_puts(0, 4, str(LANG_TIME_SET));
         lcd_puts(0, 5, str(LANG_TIME_REVERT));
+
 #ifdef HAVE_LCD_BITMAP
         gui_syncstatusbar_draw(&statusbars, true);
 #endif
@@ -1082,7 +1094,6 @@ bool set_time_screen(const char* string, struct tm *tm)
         }
     }
     action_signalscreenchange();
-    lcd_set_drawmode(lastmode);
     return false;
 }
 #endif /* defined(HAVE_LCD_BITMAP) && (CONFIG_RTC != 0) */

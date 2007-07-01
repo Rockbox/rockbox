@@ -43,7 +43,7 @@ extern bool quick_screen_f3(int button_enter);
 extern bool quick_screen_quick(int button_enter);
 
 #if CONFIG_RTC
-bool set_time_screen(const char* string, struct tm *tm);
+bool set_time_screen(const char* title, struct tm *tm);
 #endif
 
 bool shutdown_screen(void);
