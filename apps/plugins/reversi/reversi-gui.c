@@ -653,7 +653,7 @@ enum plugin_status plugin_start(struct plugin_api *api, void *parameter) {
             /* Move cursor left */
 #ifdef REVERSI_BUTTON_ALT_LEFT
             case REVERSI_BUTTON_ALT_LEFT:
-            case (REVERSI_BUTTON_ALT_LEFT | BUTTON_REPEAT):
+            case (REVERSI_BUTTON_ALT_LEFT | BUTTON_REPEAT):
 #endif
             case REVERSI_BUTTON_LEFT:
             case (REVERSI_BUTTON_LEFT | BUTTON_REPEAT):
@@ -665,7 +665,7 @@ enum plugin_status plugin_start(struct plugin_api *api, void *parameter) {
             /* Move cursor right */
 #ifdef REVERSI_BUTTON_ALT_RIGHT
             case REVERSI_BUTTON_ALT_RIGHT:
-            case (REVERSI_BUTTON_ALT_RIGHT | BUTTON_REPEAT):
+            case (REVERSI_BUTTON_ALT_RIGHT | BUTTON_REPEAT):
 #endif
             case REVERSI_BUTTON_RIGHT:
             case (REVERSI_BUTTON_RIGHT | BUTTON_REPEAT):
