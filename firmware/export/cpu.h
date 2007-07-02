@@ -27,7 +27,7 @@
 #if CONFIG_CPU == MCF5250
 #include "mcf5250.h"
 #endif
-#if CONFIG_CPU == PP5020
+#if (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5022)
 #include "pp5020.h"
 #endif
 #if CONFIG_CPU == PP5002

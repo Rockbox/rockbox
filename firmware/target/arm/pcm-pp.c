@@ -30,7 +30,7 @@ static int rec_peak_left, rec_peak_right;
 #endif
 
 /** DMA **/
-#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
+#ifdef CPU_PP502x
 #define FIFO_FREE_COUNT ((IISFIFO_CFG & 0x3f000000) >> 24)
 #elif CONFIG_CPU == PP5002
 #define FIFO_FREE_COUNT ((IISFIFO_CFG & 0x7800000) >> 23)
@@ -52,7 +52,7 @@ size_t p_size IBSS_ATTR;
    actually needs to do so when calling pcm_callback_for_more. C version is
    still included below for reference.
  */
-#ifdef CPU_PP
+#if 1
 void fiq(void) ICODE_ATTR __attribute__((naked));
 void fiq(void)
 {
@@ -154,12 +154,12 @@ void fiq(void)
         "b .exit              \n\t"
     );
 }
-#else /* !(CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002) */
+#else /* C version for reference */
 void fiq(void) ICODE_ATTR __attribute__ ((interrupt ("FIQ")));
 void fiq(void)
 {
     /* Clear interrupt */
-#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
+#ifdef CPU_PP502x
     IISCONFIG &= ~(1 << 1);
 #elif CONFIG_CPU == PP5002
     inl(0xcf001040);
@@ -170,7 +170,7 @@ void fiq(void)
         while (p_size) {
             if (FIFO_FREE_COUNT < 2) {
                 /* Enable interrupt */
-#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
+#ifdef CPU_PP502x
                 IISCONFIG |= (1 << 1);
 #elif CONFIG_CPU == PP5002
                 IISFIFO_CFG |= (1<<9);
@@ -197,7 +197,7 @@ void fiq(void)
     /* No more data, so disable the FIFO/FIQ */
     pcm_play_dma_stop();
 }
-#endif /* CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002 */
+#endif /* ASM / C selection */
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
@@ -206,7 +206,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
 
     pcm_playing = true;
 
-#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
+#ifdef CPU_PP502x
     CPU_INT_PRIORITY |= I2S_MASK;   /* FIQ priority for I2S */
     CPU_INT_EN = I2S_MASK;          /* Enable I2S interrupt */
 #else
@@ -220,7 +220,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
     enable_fiq();
 
     /* Enable playback FIFO */
-#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
+#ifdef CPU_PP502x
     IISCONFIG |= (1 << 29);
 #elif CONFIG_CPU == PP5002
     IISCONFIG |= 0x4;
@@ -231,7 +231,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
     while (p_size > 0) {
         if (FIFO_FREE_COUNT < 2) {
             /* Enable interrupt */
-#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
+#ifdef CPU_PP502x
             IISCONFIG |= (1 << 1);
 #elif CONFIG_CPU == PP5002
             IISFIFO_CFG |= (1<<9);
@@ -256,7 +256,7 @@ void pcm_play_dma_stop(void)
     pcm_playing = false;
     pcm_paused = false;
 
-#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
+#ifdef CPU_PP502x
     /* Disable playback FIFO and interrupt */
     IISCONFIG &= ~((1 << 29) | (1 << 1));
 #elif CONFIG_CPU == PP5002
@@ -273,7 +273,7 @@ void pcm_play_dma_stop(void)
 
 void pcm_play_pause_pause(void)
 {
-#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
+#ifdef CPU_PP502x
     /* Disable playback FIFO and interrupt */
     IISCONFIG &= ~((1 << 29) | (1 << 1));
 #elif CONFIG_CPU == PP5002
@@ -293,7 +293,7 @@ void pcm_play_pause_unpause(void)
     enable_fiq();
 
     /* Enable playback FIFO */
-#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
+#ifdef CPU_PP502x
     IISCONFIG |= (1 << 29);
 #elif CONFIG_CPU == PP5002
     IISCONFIG |= 0x4;
@@ -304,7 +304,7 @@ void pcm_play_pause_unpause(void)
     while (p_size > 0) {
         if (FIFO_FREE_COUNT < 2) {
             /* Enable interrupt */
-#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
+#ifdef CPU_PP502x
             IISCONFIG |= (1 << 1);
 #elif CONFIG_CPU == PP5002
             IISFIFO_CFG |= (1<<9);
@@ -445,7 +445,7 @@ void fiq_record(void)
     int status = 0;
 
     /* Clear interrupt */
-#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
+#ifdef CPU_PP502x
     IISCONFIG &= ~(1 << 0);
 #elif CONFIG_CPU == PP5002
     /* TODO */
@@ -454,7 +454,7 @@ void fiq_record(void)
     while (p_size > 0) {
         if (FIFO_FREE_COUNT < 2) {
             /* enable interrupt */
-#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
+#ifdef CPU_PP502x
             IISCONFIG |= (1 << 0);
 #elif CONFIG_CPU == PP5002
             /* TODO */
@@ -499,7 +499,7 @@ void pcm_record_more(void *start, size_t size)
     rec_peak_addr = start; /* Start peaking at dest */
     p             = start; /* Start of RX buffer    */
     p_size        = size;  /* Bytes to transfer     */
-#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
+#ifdef CPU_PP502x
     IISCONFIG |= (1 << 0);
 #elif CONFIG_CPU == PP5002
     /* TODO */
@@ -558,7 +558,7 @@ void pcm_init_recording(void)
     pcm_recording           = false;
     pcm_callback_more_ready = NULL;
 
-#if (CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024)
+#ifdef CPU_PP502x
 #if defined(IPOD_COLOR) || defined (IPOD_4G)
     /* The usual magic from IPL - I'm guessing this configures the headphone
        socket to be input or output - in this case, input. */

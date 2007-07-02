@@ -76,8 +76,8 @@
 
 #ifndef SIMULATOR
 
-/* Define this if you have a PortalPlayer PP5020 */
-#define CONFIG_CPU PP5020
+/* Define this if you have a PortalPlayer PP5022 */
+#define CONFIG_CPU PP5022
 
 /* Define this if you want to use the PP5020 i2c interface */
 #define CONFIG_I2C I2C_PP5020

@@ -17,7 +17,7 @@
  *
  ****************************************************************************/
 
-#if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
+#ifdef CPU_PP
 
 #if (CONFIG_CPU == PP5002)
 
@@ -26,7 +26,7 @@
 #define ATA_IOBASE      0xc00031e0
 #define ATA_CONTROL     (*((volatile unsigned char*)(0xc00033f8)))
 
-#elif (CONFIG_CPU == PP5020)
+#elif defined CPU_PP502x
 
 /* asm optimized reading and writing */
 #define ATA_OPTIMIZED_READING

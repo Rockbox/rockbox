@@ -405,6 +405,34 @@ static bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
 #endif /* (CONFIG_CPU == SH7034 || CPU_COLDFIRE) */
 
 #ifndef SIMULATOR
+#ifdef CPU_PP502x
+static int perfcheck(void)
+{
+    int result;
+    int old_level = set_irq_level(HIGHEST_IRQ_LEVEL);
+
+    asm (
+        "mov     %[res], #0          \n"
+        "ldr     r0, [%[timr]]       \n"
+        "add     r0, r0, %[tmo]      \n"
+    "1:                              \n"
+        "add     %[res], %[res], #1  \n"
+        "ldr     r1, [%[timr]]       \n"
+        "cmp     r1, r0              \n"
+        "bmi     1b                  \n"
+        :
+        [res]"=&r"(result)
+        :
+        [timr]"r"(&USEC_TIMER),
+        [tmo]"r"(10226)
+        :
+        "r0", "r1"
+    );
+    set_irq_level(old_level);
+    return result;
+}
+#endif
+
 #ifdef HAVE_LCD_BITMAP
 static bool dbg_hw_info(void)
 {
@@ -535,7 +563,7 @@ static bool dbg_hw_info(void)
         if (action_userabort(TIMEOUT_BLOCK))
             return false;
     }
-#elif CONFIG_CPU == PP5020
+#elif defined(CPU_PP502x)
     char buf[32];
     char pp_version[] = { (PP_VER2 >> 24) & 0xff, (PP_VER2 >> 16) & 0xff,
                           (PP_VER2 >> 8) & 0xff, (PP_VER2) & 0xff,
@@ -553,6 +581,10 @@ static bool dbg_hw_info(void)
 
     snprintf(buf, sizeof(buf), "PP version: %s", pp_version);
     lcd_puts(0, 2, buf);
+
+    snprintf(buf, sizeof(buf), "Est. clock (kHz): %d", perfcheck());
+    lcd_puts(0, 3, buf);
+    
     lcd_update();
 
     while(1)
@@ -1020,7 +1052,7 @@ bool dbg_ports(void)
             return false;
     }
 
-#elif CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
+#elif defined(CPU_PP502x)
 
     unsigned int gpio_a, gpio_b, gpio_c, gpio_d;
     unsigned int gpio_e, gpio_f, gpio_g, gpio_h;
@@ -1066,6 +1098,17 @@ bool dbg_ports(void)
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "GPIO_F: %02x GPIO_L: %02x", gpio_f, gpio_l);
         lcd_puts(0, line++, buf);
+        line++;
+        
+        snprintf(buf, sizeof(buf), "CLOCK_SRC:   %08lx", inl(0x60006020));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "PLL_CONTROL: %08lx", inl(0x60006034));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "PLL_STATUS:  %08lx", inl(0x6000603c));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "DEV_PLL:     %08lx", inl(0x70000020));
+        lcd_puts(0, line++, buf);
+
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
         line++;
         snprintf(buf, sizeof(buf), "ADC_BATTERY:   %02x", adc_read(ADC_BATTERY));
@@ -1297,7 +1340,7 @@ static bool dbg_cpufreq(void)
 
         snprintf(buf, sizeof(buf), "boost_counter: %d", get_cpu_boost_counter());
         lcd_puts(0, line++, buf);
-
+        
         lcd_update();
         button = get_action(CONTEXT_STD,HZ/10);
 

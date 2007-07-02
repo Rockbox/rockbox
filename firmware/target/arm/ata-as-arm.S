@@ -25,8 +25,8 @@
      * setup. Needs investigation. */
     .section    .icode,"ax",%progbits
     .equ    .ata_port, 0xc00031e0
-#elif CONFIG_CPU == PP5020
-    /* Verified working on (PP5020, PP5021, PP5022) targets */
+#elif defined CPU_PP502x
+    /* Verified working on (PP5020, PP5022) targets */
     .section    .icode,"ax",%progbits
     .equ    .ata_port, 0xc30001e0
 #elif CONFIG_CPU == S3C2440

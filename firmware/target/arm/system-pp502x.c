@@ -151,7 +151,7 @@ static void ipod_init_cache(void)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 void set_cpu_frequency(long frequency)
 {
-    unsigned long postmult;
+    unsigned long postmult, pll_control;
 
 # if NUM_CORES > 1
     /* Using mutex or spinlock isn't safe here. */
@@ -168,34 +168,23 @@ void set_cpu_frequency(long frequency)
 
     /* Enable PLL? */
     outl(inl(0x70000020) | (1<<30), 0x70000020);
-    
+
     /* Select 24MHz crystal as clock source? */
-    outl((inl(0x60006020) & 0x0fffff0f) | 0x20000020, 0x60006020);
-    
+    outl((inl(0x60006020) & 0x0ffffff0) | 0x10000002, 0x60006020);
+
     /* Clock frequency = (24/8)*postmult */
-    outl(0xaa020000 | 8 | (postmult << 8), 0x60006034);
-    
-    /* Wait for PLL relock? */
-    udelay(2000);
+    pll_control = 0x8a020000 | 8 | (postmult << 8);
+    outl(pll_control, 0x60006034);
+# if CONFIG_CPU == PP5020
+    outl(0xd198, 0x6000603c);     /* magic sequence */
+    outl(pll_control, 0x60006034);
+    udelay(500);                  /* wait for relock */
+# else /* PP5022, PP5024 */
+    while (!(inl(0x6000603c) & 0x80000000)); /* wait for relock */
+# endif
     
     /* Select PLL as clock source? */
     outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);
-    
-# if defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI) || defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
-    /* We don't know why the timer interrupt gets disabled on the PP5020
-     based ipods, but without the following line, the 4Gs will freeze
-     when CPU frequency changing is enabled.
-
-     Note also that a simple "CPU_INT_EN = TIMER1_MASK;" (as used
-     elsewhere to enable interrupts) doesn't work, we need "|=".
-
-     It's not needed on the PP5021 and PP5022 ipods.
-     */
-
-    /* unmask interrupt source */
-    CPU_INT_EN |= TIMER1_MASK;
-    COP_INT_EN |= TIMER1_MASK;
-# endif
     
 # if NUM_CORES > 1
     boostctrl_mtx.locked = 0;
@@ -213,9 +202,9 @@ void ipod_set_cpu_frequency(void)
     outl((inl(0x60006020) & 0x0fffff0f) | 0x20000020, 0x60006020);
 
     /* Clock frequency = (24/8)*25 = 75MHz */
-    outl(0xaa020000 | 8 | (25 << 8), 0x60006034);
+    outl(0x8a020000 | 8 | (25 << 8), 0x60006034);
     /* Wait for PLL relock? */
-    udelay(2000);
+    udelay(500);
 
     /* Select PLL as clock source? */
     outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);

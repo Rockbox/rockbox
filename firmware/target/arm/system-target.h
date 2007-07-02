@@ -36,7 +36,7 @@ static inline void udelay(unsigned usecs)
     while (TIME_BEFORE(USEC_TIMER, stop));
 }
 
-#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
+#ifdef CPU_PP502x
 static inline unsigned int current_core(void)
 {
     /*

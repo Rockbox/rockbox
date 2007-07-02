@@ -105,7 +105,7 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
 {
     long i;
     unsigned char* localdest = dest;
-#if (CONFIG_CPU==PP5020) || (CONFIG_CPU==PP5024)
+#ifdef CPU_PP502x
     unsigned long* memmapregs = (unsigned long*)0xf000f000;
 #endif
 
@@ -120,7 +120,7 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
         "jmp     (%0)        \n"
         : : "a"(dest)
     );
-#elif (CONFIG_CPU==PP5020) || (CONFIG_CPU==PP5024)
+#elif defined(CPU_PP502x)
 
     /* Tell the COP that we've finished loading and started rebooting */
     cpu_message = 0;

@@ -43,7 +43,7 @@ int audiohw_init(void) {
     /* reset I2C */
     i2c_init();
 
-#if CONFIG_CPU == PP5020
+#ifdef CPU_PP502x
     /* normal outputs for CDI and I2S pin groups */
     DEV_INIT &= ~0x300;
 

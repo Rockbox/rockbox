@@ -43,9 +43,10 @@
 #define MCF5250      5250
 #define PP5002       5002
 #define PP5020       5020
+#define PP5022       5022
+#define PP5024       5024
 #define PNX0101       101
 #define S3C2440      2440
-#define PP5024       5024
 #define TMS320DSC25    25
 
 /* CONFIG_KEYPAD */
@@ -279,8 +280,11 @@
 #endif
 
 /* define for all cpus from PP family */
-#if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5024)
+#if (CONFIG_CPU == PP5002)
 #define CPU_PP
+#elif (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5022)  || (CONFIG_CPU == PP5024)
+#define CPU_PP
+#define CPU_PP502x
 #endif
 
 /* define for all cpus from ARM family */

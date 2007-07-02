@@ -41,7 +41,7 @@ static inline bool timer_check(int clock_start, int usecs)
 #if CONFIG_CPU == PP5002
 #define IPOD_LCD_BASE            0xc0001000
 #define IPOD_LCD_BUSY_MASK       0x80000000
-#else /* PP5020 */
+#else /* PP502x */
 #define IPOD_LCD_BASE            0x70003000
 #define IPOD_LCD_BUSY_MASK       0x00008000
 #endif
