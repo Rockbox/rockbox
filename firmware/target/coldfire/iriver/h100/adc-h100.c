@@ -35,15 +35,15 @@ static unsigned char adcdata[NUM_ADC_CHANNELS];
 
 /* delay loop */
 #define DELAY   \
-    ({                               \
-        int _x_;                     \
-        asm volatile (               \
-            "move.l #9, %[_x_] \r\n" \
-        "1:                    \r\n" \
-            "subq.l #1, %[_x_] \r\n" \
-            "bhi.b  1b         \r\n" \
-            : [_x_]"=&d"(_x_)        \
-        );                           \
+    ({                                \
+        int _x_;                      \
+        asm volatile (                \
+            "move.l #11, %[_x_] \r\n" \
+        "1:                     \r\n" \
+            "subq.l #1, %[_x_]  \r\n" \
+            "bhi.b  1b          \r\n" \
+            : [_x_]"=&d"(_x_)         \
+        );                            \
     })
 
 unsigned short adc_scan(int channel)
