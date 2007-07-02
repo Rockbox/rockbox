@@ -890,11 +890,9 @@ bool set_time_screen(const char* title, struct tm *tm)
     ptr[4] = buffer + 15 + DAYNAME_LEN; /* monthname */
     ptr[5] = buffer + 16 + DAYNAME_LEN + MONTHNAME_LEN;   /* day of month */
 
-#ifdef HAVE_LCD_BITMAP
     if(global_settings.statusbar)
         statusbar_height = STATUSBAR_HEIGHT;
     else
-#endif
         statusbar_height = 0;
 
     while ( !done ) {
@@ -919,11 +917,12 @@ bool set_time_screen(const char* title, struct tm *tm)
                        (realyear - 1) / 100 + (realyear - 1) / 400 + 7 - 1) % 7;
 
         /* copy all the stuff we want from the tm struct to buffer */
-        snprintf(buffer, sizeof(buffer), "%02d " "%02d " "%02d " "%s " "%04d " "%s " "%02d",
+        snprintf(buffer, sizeof(buffer),
+                 "%02d " "%02d " "%02d " "%.3s " "%04d " "%.3s " "%02d",
                  tm->tm_hour, tm->tm_min, tm->tm_sec,
                  str(dayname[tm->tm_wday]), tm->tm_year+1900,
                  str(monthname[tm->tm_mon]), tm->tm_mday);
-        
+
         /* recalculate the positions and offsets */
         lcd_getstringsize(title, &width, &prev_line_height);
         lcd_getstringsize(buffer, &width, &line_height);
