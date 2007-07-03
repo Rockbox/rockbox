@@ -96,6 +96,28 @@ static fixed64 Fixed32To64(fixed32 x)
             : "cc");  \
        __result;  \
     })
+#elif defined(CPU_COLDFIRE)
+    static inline int32_t fixmul32(int32_t x, int32_t y)
+    {
+        int32_t t1, t2;
+        asm volatile (
+            "mac.l   %[x],%[y],%%acc0\n" /* multiply */
+            "mulu.l  %[y],%[x]   \n"     /* get lower half, avoid emac stall */
+            "movclr.l %%acc0,%[t1]   \n" /* get higher half */
+            "moveq.l #15,%[t2]   \n"
+            "asl.l   %[t2],%[t1] \n"     /* hi <<= 15, plus one free */
+            "moveq.l #16,%[t2]   \n"
+            "lsr.l   %[t2],%[x]  \n"     /* (unsigned)lo >>= 16 */
+            "or.l    %[x],%[t1]  \n"     /* combine result */
+            : /* outputs */
+            [t1]"=&d"(t1),
+            [t2]"=&d"(t2),
+            [x] "+d" (x)
+            : /* inputs */
+            [y] "d"  (y)
+        );
+        return t1;
+    }
 #else
 fixed32 fixmul32(fixed32 x, fixed32 y)
 {
@@ -136,7 +158,7 @@ fixed32 fixmul32(fixed32 x, fixed32 y)
         : "cc");  \
        __result;  \
     })
-#else
+#elif !defined(CPU_COLDFIRE)
 static fixed32 fixmul32b(fixed32 x, fixed32 y)
 {
     fixed64 temp;
@@ -428,6 +450,26 @@ uint32_t bswap_32(uint32_t x)
     return (b1 >> 24) | (b2 >> 8) | (b3 << 8) | (b4 << 24);
 }
 
+#ifdef CPU_COLDFIRE
+static inline
+void CMUL(fixed32 *x, fixed32 *y,
+          fixed32  a, fixed32  b,
+          fixed32  t, fixed32  v)
+{
+  asm volatile ("mac.l %[a], %[t], %%acc0;"
+                "msac.l %[b], %[v], %%acc0;"
+                "mac.l %[b], %[t], %%acc1;"
+                "mac.l %[a], %[v], %%acc1;"
+                "movclr.l %%acc0, %[a];"
+                "move.l %[a], (%[x]);"
+                "movclr.l %%acc1, %[a];"
+                "move.l %[a], (%[y]);"
+                : [a] "+&r" (a)
+                : [x] "a" (x), [y] "a" (y),
+                  [b] "r" (b), [t] "r" (t), [v] "r" (v)
+                : "cc", "memory");
+}
+#else
 // PJJ : reinstate macro
 void CMUL(fixed32 *pre,
           fixed32 *pim,
@@ -449,7 +491,7 @@ void CMUL(fixed32 *pre,
     *pim = _r3 + _r4;
 
 }
-
+#endif
 
 typedef struct CoefVLCTable
 {
@@ -1191,6 +1233,9 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
     int sample_rate1;
     int coef_vlc_table;
     //    int filehandle;
+    #ifdef CPU_COLDFIRE
+    coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
+    #endif
 
     s->sample_rate = wfx->rate;
     s->nb_channels = wfx->channels;
