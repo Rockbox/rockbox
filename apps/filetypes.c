@@ -58,6 +58,8 @@ const struct filetype inbuilt_filetypes[] = {
     { "mp1", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "ogg", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "wma", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "wmv", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "asf", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "wav", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "flac",FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "ac3", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
