@@ -1172,44 +1172,19 @@ static int write_long_name(struct fat_file* file,
     
     return 0;
 }
-static bool is_char_legal(char c)
-{
-    switch(c)
-    {
-        case 0x22: /* " */
-        case 0x2a: /* * */
-        case 0x2b: /* + */
-        case 0x2c: /* , */
-        case 0x2e: /* . */
-        case 0x3a: /* : */
-        case 0x3b: /* ; */
-        case 0x3c: /* < */
-        case 0x3d: /* = */
-        case 0x3e: /* > */
-        case 0x3f: /* ? */
-        case 0x5b: /* [ */
-        case 0x5c: /* \ */
-        case 0x5d: /* ] */
-        case 0x7c: /* | */
-            return false;
-        default:
-            if(c < 0x20) /* Control Characters */
-                return false;
-    }
-    return true;
-}
+
 static int fat_checkname(const unsigned char* newname)
 {
+    static const char invalid_chars[] = "\"*/:<>?\\|";
     int len = strlen(newname);
     /* More sanity checks are probably needed */
-    if (len > 255 || newname[len - 1] == '.' ||
-        newname[0] == ' ' || newname[len - 1] == ' ' ) 
+    if (len > 255 || newname[len - 1] == '.')
     {
         return -1;
     }
     while (*newname)
     {
-        if (!is_char_legal(*newname))
+        if (*newname < ' ' || strchr(invalid_chars, *newname) != NULL)
             return -1;
         newname++;
     }
@@ -1380,19 +1355,19 @@ static int add_dir_entry(struct fat_dir* dir,
 
 static unsigned char char2dos(unsigned char c, int* randomize)
 {
-    if (!is_char_legal(c))
+    static const char invalid_chars[] = "\"*+,./:;<=>?[\\]|";
+    
+    if (c <= 0x20)
+        c = 0;   /* Illegal char, remove */
+    else if (strchr(invalid_chars, c) != NULL)
     {
-        if(c <= 0x20)
-            c = 0;   /* Illegal char, remove */
-        else
-        {
-            /* Illegal char, replace */
-            c = '_';
-            *randomize = 1; /* as per FAT spec */
-        }
+        /* Illegal char, replace */
+        c = '_';
+        *randomize = 1; /* as per FAT spec */
     }
     else
         c = toupper(c);
+
     return c;
 }
 
