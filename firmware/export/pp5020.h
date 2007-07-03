@@ -131,6 +131,11 @@
 #define DEV_IDE0        0x2000000
 #define DEV_LCD         0x4000000
 
+/* clock control */
+#define CLOCK_SOURCE    (*(volatile unsigned long *)(0x60006020))
+#define PLL_CONTROL     (*(volatile unsigned long *)(0x60006034))
+#define PLL_STATUS      (*(volatile unsigned long *)(0x6000603c))
+
 /* Processors Control */
 #define CPU_CTL          (*(volatile unsigned long *)(0x60007000))
 #define COP_CTL          (*(volatile unsigned long *)(0x60007004))

@@ -152,6 +152,7 @@ static void ipod_init_cache(void)
 void set_cpu_frequency(long frequency)
 {
     unsigned long postmult, pll_control;
+    unsigned long unknown1, unknown2;
 
 # if NUM_CORES > 1
     /* Using mutex or spinlock isn't safe here. */
@@ -166,17 +167,25 @@ void set_cpu_frequency(long frequency)
         postmult = CPUFREQ_DEFAULT_MULT;
     cpu_frequency = frequency;
 
-    /* Enable PLL? */
-    outl(inl(0x70000020) | (1<<30), 0x70000020);
+    unknown2 = inl(0x600060a0);
 
-    /* Select 24MHz crystal as clock source? */
+    outl(inl(0x70000020) | (1<<30), 0x70000020);   /* Enable PLL power */
+
+    /* Set clock source #1 to 24MHz and select it */
     outl((inl(0x60006020) & 0x0ffffff0) | 0x10000002, 0x60006020);
+    
+    outl(unknown2 & 0x3fffffff, 0x600060a0);
+    
+    unknown1 = (138 * postmult + 255) >> 8;
+    if (unknown1 > 15)
+        unknown1 = 15;
+    outl((unknown1 << 8) | unknown1, 0x70000034);
 
-    /* Clock frequency = (24/8)*postmult */
-    pll_control = 0x8a020000 | 8 | (postmult << 8);
+    /* PLL frequency = (24/4)*postmult */
+    pll_control = 0x8a020000 | 4 | (postmult << 8);
     outl(pll_control, 0x60006034);
 # if CONFIG_CPU == PP5020
-    outl(0xd198, 0x6000603c);     /* magic sequence */
+    outl(0xd19b, 0x6000603c);     /* magic sequence */
     outl(pll_control, 0x60006034);
     udelay(500);                  /* wait for relock */
 # else /* PP5022, PP5024 */
@@ -185,6 +194,8 @@ void set_cpu_frequency(long frequency)
     
     /* Select PLL as clock source? */
     outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);
+    
+    outl(unknown2, 0x600060a0);
     
 # if NUM_CORES > 1
     boostctrl_mtx.locked = 0;
@@ -199,7 +210,7 @@ void ipod_set_cpu_frequency(void)
     outl(inl(0x70000020) | (1<<30), 0x70000020);
 
     /* Select 24MHz crystal as clock source? */
-    outl((inl(0x60006020) & 0x0fffff0f) | 0x20000020, 0x60006020);
+    outl((inl(0x60006020) & 0x0ffffff0) | 0x10000002, 0x60006020);
 
     /* Clock frequency = (24/8)*25 = 75MHz */
     outl(0x8a020000 | 8 | (25 << 8), 0x60006034);

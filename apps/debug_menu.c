@@ -1082,7 +1082,6 @@ bool dbg_ports(void)
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "GPIO_C: %02x GPIO_I: %02x", gpio_c, gpio_i);
         lcd_puts(0, line++, buf);
-        line++;
 
         gpio_d = GPIOD_INPUT_VAL;
         gpio_e = GPIOE_INPUT_VAL;
@@ -1102,11 +1101,15 @@ bool dbg_ports(void)
         
         snprintf(buf, sizeof(buf), "CLOCK_SRC:   %08lx", inl(0x60006020));
         lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "CLOCK_0x2C:  %08lx", inl(0x6000602c));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "CLOCK_0xA0:  %08lx", inl(0x600060a0));
+        lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "PLL_CONTROL: %08lx", inl(0x60006034));
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "PLL_STATUS:  %08lx", inl(0x6000603c));
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "DEV_PLL:     %08lx", inl(0x70000020));
+        snprintf(buf, sizeof(buf), "DEV_0x34:    %08lx", inl(0x70000034));
         lcd_puts(0, line++, buf);
 
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
