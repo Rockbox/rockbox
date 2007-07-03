@@ -151,7 +151,7 @@ static int asf_parse_header(int fd, struct mp3entry* id3)
     /* Two reserved bytes - do we need to read them? */
     lseek(fd, 2, SEEK_CUR);
 
-    DEBUGF("Read header - size=%d, subobjects=%lu\n",(int)header.size, subobjects);
+    DEBUGF("Read header - size=%d, subobjects=%d\n",(int)header.size, (int)subobjects);
 
     if (subobjects > 0) {
         header.datalen = header.size - 30;
@@ -328,13 +328,13 @@ static int asf_parse_header(int fd, struct mp3entry* id3)
 
                             case 3: /* 32-bit int */
                                 read_uint32le(fd, &tmp32);
-                                DEBUGF("Value=%lu\n",tmp32);
+                                DEBUGF("Value=%u\n",(unsigned int)tmp32);
                                 lseek(fd,length - 4,SEEK_CUR);
                                 break;
 
                             case 4: /* 64-bit int */
                                 read_uint64le(fd, &tmp64);
-                                DEBUGF("Value=%llu\n",tmp64);
+                                DEBUGF("Value=[64-bit int]\n");
                                 lseek(fd,length - 8,SEEK_CUR);
                                 break;
 

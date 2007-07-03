@@ -28,6 +28,7 @@ codecs/libmusepack/*
 codecs/libspeex/*
 codecs/libspeex/speex/*
 codecs/libwavpack/*
+codecs/libwma/*
 codecs/spc/*
 codecs/Tremor/*
 eqs/*.cfg
