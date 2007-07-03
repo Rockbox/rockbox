@@ -308,16 +308,16 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
         return PLUGIN_OK;
     }
 
-    /* get the info */
-    if(its_a_dir)
+    /* get the info depending on its_a_dir */
+    if(!(its_a_dir ? dir_properties((char*)file):file_properties((char*)file)))
     {
-        if(!dir_properties((char*)file))
-            return  PLUGIN_OK;
-    }
-    else
-    {
-        if(!file_properties((char*)file))
-            return  PLUGIN_OK;
+        /* something went wrong */
+        rb->lcd_clear_display();
+        rb->lcd_puts(0,0,"Failed to gather information");
+        rb->lcd_update();
+
+        rb->action_userabort(TIMEOUT_BLOCK);
+        return PLUGIN_OK;
     }
 
     /* prepare the list for the user */
