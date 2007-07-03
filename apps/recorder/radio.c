@@ -1521,7 +1521,7 @@ MENUITEM_FUNCTION(presetclear_item, 0, ID2P(LANG_FM_PRESET_CLEAR),
 MENUITEM_FUNCTION(scan_presets_item, 0, ID2P(LANG_FM_SCAN_PRESETS), 
                     scan_presets, NULL, NULL, Icon_NOICON);
 
-MAKE_MENU(radio_menu_items, ID2P(LANG_FM_MENU), NULL, 
+MAKE_MENU(radio_settings_menu, ID2P(LANG_FM_MENU), NULL, 
             Icon_Radio_screen, 
 #ifndef FM_PRESET
             &radio_presets_item,
@@ -1545,7 +1545,7 @@ MAKE_MENU(radio_menu_items, ID2P(LANG_FM_MENU), NULL,
 /* main menu of the radio screen */
 static bool radio_menu(void)
 {
-    return do_menu(&radio_menu_items, NULL) == MENU_ATTACHED_USB;
+    return do_menu(&radio_settings_menu, NULL) == MENU_ATTACHED_USB;
 }
 
 #endif

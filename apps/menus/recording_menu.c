@@ -820,7 +820,7 @@ static int write_settings_file(void)
 MENUITEM_FUNCTION(save_recpresets_item, 0, ID2P(LANG_SAVE_SETTINGS), 
                   write_settings_file, NULL, NULL, Icon_Config);
 
-MAKE_MENU(recording_setting_menu, ID2P(LANG_RECORDING_SETTINGS),
+MAKE_MENU(recording_settings_menu, ID2P(LANG_RECORDING_SETTINGS),
             NULL, Icon_Recording,
 #if CONFIG_CODEC == MAS3587F
             &rec_quality,
@@ -849,7 +849,7 @@ MAKE_MENU(recording_setting_menu, ID2P(LANG_RECORDING_SETTINGS),
 bool recording_menu(bool no_source)
 {
     no_source_in_menu = no_source;
-    return do_menu(&recording_setting_menu, NULL) == MENU_ATTACHED_USB;
+    return do_menu(&recording_settings_menu, NULL) == MENU_ATTACHED_USB;
 };
 
 MENUITEM_FUNCTION(recording_settings, MENU_FUNC_USEPARAM, ID2P(LANG_RECORDING_SETTINGS),

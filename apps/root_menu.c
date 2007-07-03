@@ -269,7 +269,8 @@ extern struct menu_item_ex
         tagcache_menu,
 #endif
         manage_settings,
-        recording_setting_menu,
+        recording_settings_menu,
+        radio_settings_menu,
         bookmark_settings_menu,
         system_menu;
 static const struct root_items items[] = {
@@ -281,11 +282,11 @@ static const struct root_items items[] = {
     [GO_TO_MAINMENU] =      { menu, NULL, &manage_settings },
     
 #ifdef HAVE_RECORDING
-    [GO_TO_RECSCREEN] =     {  recscrn, NULL, &recording_setting_menu },
+    [GO_TO_RECSCREEN] =     {  recscrn, NULL, &recording_settings_menu },
 #endif
     
 #if CONFIG_TUNER
-    [GO_TO_FM] =            { radio, NULL, NULL },
+    [GO_TO_FM] =            { radio, NULL, &radio_settings_menu },
 #endif
     
     [GO_TO_RECENTBMARKS] =  { load_bmarks, NULL, &bookmark_settings_menu }, 
