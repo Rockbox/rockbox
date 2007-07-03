@@ -299,7 +299,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
     if(!found)
     {
         /* weird: we couldn't find the entry. This Should Never Happen (TM) */
-		rb->splash(0, "File/Dir not found: %s", (char*)file);
+        rb->splash(0, "File/Dir not found: %s", (char*)file);
         rb->action_userabort(TIMEOUT_BLOCK);
         return PLUGIN_OK;
     }
@@ -308,7 +308,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
     if(!(its_a_dir ? dir_properties((char*)file):file_properties((char*)file)))
     {
         /* something went wrong (to do: tell user what it was (nesting,...) */
-		rb->splash(0, "Failed to gather information");
+        rb->splash(0, "Failed to gather information");
         rb->action_userabort(TIMEOUT_BLOCK);
         return PLUGIN_OK;
     }
