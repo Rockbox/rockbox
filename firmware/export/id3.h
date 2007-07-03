@@ -56,6 +56,7 @@ enum
     AFMT_SPEEX,        /* Ogg Speex speech */
     AFMT_SPC,          /* SPC700 save state */
     AFMT_APE,          /* Monkey's Audio (APE) */
+    AFMT_WMA,          /* WMAV1/V2 in ASF */
 #endif
 
     /* add new formats at any index above this line to have a sensible order -

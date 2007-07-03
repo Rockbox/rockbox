@@ -8,6 +8,7 @@ a52.c
 mpc.c
 wavpack.c
 alac.c
+wma.c
 #if MEMORYSIZE > 1
 aac.c
 #endif

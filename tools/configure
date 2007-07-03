@@ -756,7 +756,7 @@ EOF
     archosrom=""
     flash="$pwd/rombox.iriver"
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
+    codecs="libmad liba52 libffmpegFLAC libwma libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$iriverbitmaptools
@@ -781,7 +781,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
+    codecs="libmad liba52 libffmpegFLAC libwma libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$iriverbitmaptools
@@ -806,7 +806,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
+    codecs="libmad liba52 libffmpegFLAC libwma libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$iriverbitmaptools
@@ -831,7 +831,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
+    codecs="libmad liba52 libffmpegFLAC libwma libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$iaudiobitmaptools"
@@ -857,7 +857,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
+    codecs="libmad liba52 libffmpegFLAC libwma libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$iaudiobitmaptools"
@@ -881,7 +881,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
+    codecs="libmad liba52 libffmpegFLAC libwma libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
     bootoutput="bootloader-$archos.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -906,7 +906,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
+    codecs="libmad liba52 libffmpegFLAC libwma libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
     bootoutput="bootloader-$archos.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -930,7 +930,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
+    codecs="libmad liba52 libffmpegFLAC libwma libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
     bootoutput="bootloader-$archos.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -955,7 +955,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
+    codecs="libmad liba52 libffmpegFLAC libwma libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
     bootoutput="bootloader-$archos.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -980,7 +980,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
+    codecs="libmad liba52 libffmpegFLAC libwma libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
     bootoutput="bootloader-$archos.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -1005,7 +1005,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
+    codecs="libmad liba52 libffmpegFLAC libwma libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
     bootoutput="bootloader-$archos.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -1030,7 +1030,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
+    codecs="libmad liba52 libffmpegFLAC libwma libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$genericbitmaptools
@@ -1053,7 +1053,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
+    codecs="libmad liba52 libffmpegFLAC libwma libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
     toolset=$gigabeatbitmaptools
     boottool="$rootdir/tools/scramble -gigabeat"
     bootoutput="FWIMG01.DAT"
@@ -1077,7 +1077,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
+    codecs="libmad liba52 libffmpegFLAC libwma libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
     bootoutput="bootloader-$archos.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -1102,7 +1102,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
+    codecs="libmad liba52 libffmpegFLAC libwma libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
     boottool="$rootdir/tools/scramble -mi4v3 -model=h10 -type=RBBL"
     bootoutput="H10_20GC.mi4"
     # toolset is the tools within the tools directory that we build for
@@ -1128,7 +1128,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
+    codecs="libmad liba52 libffmpegFLAC libwma libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
     boottool="$rootdir/tools/scramble -mi4v2 -model=h105 -type=RBBL"
     bootoutput="H10.mi4"
     # toolset is the tools within the tools directory that we build for
@@ -1154,7 +1154,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
+    codecs="libmad liba52 libffmpegFLAC libwma libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
     boottool="$rootdir/tools/scramble -mi4v3 -model=e200 -type=RBBL"
     bootoutput="PP5022.mi4"
     # toolset is the tools within the tools directory that we build for
@@ -1183,7 +1183,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
+    codecs="libmad liba52 libffmpegFLAC libwma libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
     boottool="$rootdir/tools/scramble -mi4r -model=e20r -type=RBBL"
     bootoutput="pp5022.mi4"
     # toolset is the tools within the tools directory that we build for
@@ -1209,7 +1209,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
+    codecs="libmad liba52 libffmpegFLAC libwma libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
     boottool="$rootdir/tools/scramble -mi4v2"
     bootoutput="pp5020.mi4"
     # toolset is the tools within the tools directory that we build for

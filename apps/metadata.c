@@ -133,6 +133,13 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
 
         break;
 
+    case AFMT_WMA:
+        if (!get_asf_metadata(fd, &(track->id3)))
+        {
+            return false;
+        }
+        break;
+
     case AFMT_APE:
         if (!get_monkeys_metadata(fd, &(track->id3)))
         {

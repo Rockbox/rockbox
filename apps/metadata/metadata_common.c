@@ -94,14 +94,47 @@ long read_string(int fd, char* buf, long buf_size, int eos, long size)
     return read_bytes;
 }
 
-/* Read an unsigned 32-bit integer from a big-endian file. */
 #ifdef ROCKBOX_LITTLE_ENDIAN
+/* Read an unsigned 32-bit integer from a big-endian file. */
 int read_uint32be(int fd, unsigned int* buf)
 {
   size_t n;
 
   n = read(fd, (char*) buf, 4);
   *buf = betoh32(*buf);
+  return n;
+}
+#else
+/* Read unsigned integers from a little-endian file. */
+int read_uint16le(int fd, uint16_t* buf)
+{
+  size_t n;
+
+  n = read(fd, (char*) buf, 2);
+  *buf = letoh16(*buf);
+  return n;
+}
+int read_uint32le(int fd, uint32_t* buf)
+{
+  size_t n;
+
+  n = read(fd, (char*) buf, 4);
+  *buf = letoh32(*buf);
+  return n;
+}
+int read_uint64le(int fd, uint64_t* buf)
+{
+  size_t n;
+  uint8_t data[8];
+  int i;
+
+  n = read(fd, data, 8);
+
+  for (i=7, *buf=0; i>=0; i--) {
+       *buf <<= 8;
+       *buf |= data[i];
+  }
+
   return n;
 }
 #endif

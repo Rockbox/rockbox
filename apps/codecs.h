@@ -49,7 +49,6 @@
 #include "settings.h"
 
 #ifdef CODEC
-
 #if defined(DEBUG) || defined(SIMULATOR)
 #undef DEBUGF
 #define DEBUGF  ci->debugf

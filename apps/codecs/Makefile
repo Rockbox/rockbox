@@ -17,7 +17,7 @@ ifdef APPEXTRA
 endif
 
 ifdef SOFTWARECODECS
-   CODECLIBS = -lmad -la52 -lffmpegFLAC -lTremor -lwavpack -lmusepack -lalac -lfaad -lm4a -lspeex -ldemac
+   CODECLIBS = -lmad -la52 -lffmpegFLAC -lTremor -lwavpack -lmusepack -lalac -lfaad -lm4a -lspeex -ldemac -lwma
 endif
 
 # we "borrow" the plugin LDS file
@@ -39,7 +39,7 @@ DIRS = .
 
 CODECDEPS = $(LINKCODEC) $(BUILDDIR)/libcodec.a
 
-.PHONY: libmad liba52 libffmpegFLAC libTremor libspeex libwavpack libmusepack libalac libfaad libm4a libdemac
+.PHONY: libmad liba52 libffmpegFLAC libTremor libspeex libwavpack libmusepack libalac libfaad libm4a libdemac libwma
 
 OUTPUT = $(SOFTWARECODECS)
 
@@ -65,6 +65,7 @@ $(OBJDIR)/alac.elf : $(OBJDIR)/alac.o $(BUILDDIR)/libalac.a $(BUILDDIR)/libm4a.a
 $(OBJDIR)/aac.elf : $(OBJDIR)/aac.o $(BUILDDIR)/libfaad.a $(BUILDDIR)/libm4a.a $(OBJDIR)/codec_crt0.o
 $(OBJDIR)/shorten.elf : $(OBJDIR)/shorten.o $(BUILDDIR)/libffmpegFLAC.a $(OBJDIR)/codec_crt0.o
 $(OBJDIR)/ape.elf : $(OBJDIR)/ape.o $(BUILDDIR)/libdemac.a $(OBJDIR)/codec_crt0.o
+$(OBJDIR)/wma.elf : $(OBJDIR)/wma.o $(BUILDDIR)/libwma.a $(OBJDIR)/codec_crt0.o
 $(OBJDIR)/aiff_enc.elf: $(OBJDIR)/aiff_enc.o $(OBJDIR)/codec_crt0.o
 $(OBJDIR)/mp3_enc.elf: $(OBJDIR)/mp3_enc.o $(OBJDIR)/codec_crt0.o
 $(OBJDIR)/wav_enc.elf: $(OBJDIR)/wav_enc.o $(OBJDIR)/codec_crt0.o
@@ -151,6 +152,12 @@ liba52:
 	$(SILENT)mkdir -p $(OBJDIR)/liba52
 	$(call PRINTS,MAKE in liba52)$(MAKE) -C liba52 OBJDIR=$(OBJDIR)/liba52 OUTPUT=$(BUILDDIR)/liba52.a
 
+$(BUILDDIR)/libwma.a: libwma
+
+libwma:
+	$(SILENT)mkdir -p $(OBJDIR)/libwma
+	$(call PRINTS,MAKE in libwma)$(MAKE) -C libwma OBJDIR=$(OBJDIR)/libwma OUTPUT=$(BUILDDIR)/libwma.a
+
 $(BUILDDIR)/libffmpegFLAC.a: libffmpegFLAC
 
 libffmpegFLAC:
@@ -206,7 +213,7 @@ libdemac:
 	$(call PRINTS,MAKE in libdemac)$(MAKE) -C demac/libdemac OBJDIR=$(OBJDIR)/libdemac OUTPUT=$(BUILDDIR)/libdemac.a
 
 clean:
-	$(call PRINTS,cleaning codecs)rm -fr $(OBJDIR)/libmad $(BUILDDIR)/libmad.a $(OBJDIR)/liba52 $(BUILDDIR)/liba52.a $(OBJDIR)/libffmpegFLAC $(BUILDDIR)/libffmpegFLAC.a $(OBJDIR)/Tremor $(BUILDDIR)/libTremor.a $(OBJDIR)/libspeex $(BUILDDIR)/libSpeex.a $(OBJDIR)/libwavpack $(BUILDDIR)/libwavpack.a $(OBJDIR)/libmusepack $(BUILDDIR)/libmusepack.a $(OBJDIR)/libalac $(BUILDDIR)/libalac.a $(OBJDIR)/libfaad $(BUILDDIR)/libfaad.a $(OBJDIR)/libm4a $(BUILDDIR)/libm4a.a $(OBJDIR)/libdemac $(BUILDDIR)/libdemac.a
+	$(call PRINTS,cleaning codecs)rm -fr $(OBJDIR)/libmad $(BUILDDIR)/libmad.a $(OBJDIR)/liba52 $(BUILDDIR)/liba52.a $(OBJDIR)/libffmpegFLAC $(BUILDDIR)/libffmpegFLAC.a $(OBJDIR)/Tremor $(BUILDDIR)/libTremor.a $(OBJDIR)/libspeex $(BUILDDIR)/libSpeex.a $(OBJDIR)/libwavpack $(BUILDDIR)/libwavpack.a $(OBJDIR)/libmusepack $(BUILDDIR)/libmusepack.a $(OBJDIR)/libalac $(BUILDDIR)/libalac.a $(OBJDIR)/libfaad $(BUILDDIR)/libfaad.a $(OBJDIR)/libm4a $(BUILDDIR)/libm4a.a $(OBJDIR)/libdemac $(BUILDDIR)/libdemac.a $(OBJDIR)/libwma $(BUILDDIR)/libwma.a
 	$(SILENT)$(MAKE) -C libmad clean OBJDIR=$(OBJDIR)/libmad
 	$(SILENT)$(MAKE) -C liba52 clean OBJDIR=$(OBJDIR)/liba52
 	$(SILENT)$(MAKE) -C libffmpegFLAC clean OBJDIR=$(OBJDIR)/libffmpegFLAC
@@ -218,6 +225,7 @@ clean:
 	$(SILENT)$(MAKE) -C libfaad clean OBJDIR=$(OBJDIR)/libfaad
 	$(SILENT)$(MAKE) -C libm4a clean OBJDIR=$(OBJDIR)/libm4a
 	$(SILENT)$(MAKE) -C demac/libdemac clean OBJDIR=$(OBJDIR)/libdemac
+	$(SILENT)$(MAKE) -C libwma clean OBJDIR=$(OBJDIR)/libwma
 	$(SILENT)$(MAKE) -C lib clean OBJDIR=$(OBJDIR)/lib
 
 ifneq ($(MAKECMDGOALS),clean)

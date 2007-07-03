@@ -110,6 +110,9 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* APE (Monkey's Audio) */
     [AFMT_APE] =
         AFMT_ENTRY("APE",  "ape",     NULL,          "ape\0mac\0"      ),
+    /* WMA (WMAV1/V2 in ASF) */
+    [AFMT_WMA] =
+        AFMT_ENTRY("WMA",  "wma",     NULL,          "wma\0wmv\0asf"   ),
 #endif
 };
 

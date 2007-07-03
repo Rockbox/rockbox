@@ -110,6 +110,7 @@ metadata.c
 metadata/metadata_common.c
 metadata/aiff.c
 metadata/ape.c
+metadata/asf.c
 metadata/adx.c
 metadata/flac.c
 metadata/monkeys.c
