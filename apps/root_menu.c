@@ -34,6 +34,7 @@
 #include "power.h"
 #include "talk.h"
 #include "audio.h"
+#include "hotswap.h"
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
 #include "backdrop.h"
@@ -100,6 +101,12 @@ static int browser(void* param)
             {
                 strcpy(folder, wps_state.current_track_path);
             }
+#ifdef HAVE_HOTSWAP /* quick hack to stop crashing if you try entering 
+                     the browser from the menu when you were in the card
+                     and it was removed */
+            else if (strchr(last_folder, '<') && (card_detect() == false))
+                strcpy(folder, "/");
+#endif
             else
                 strcpy(folder, last_folder);
         break;
