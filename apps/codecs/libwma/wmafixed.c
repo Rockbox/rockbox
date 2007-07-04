@@ -56,7 +56,7 @@ fixed64 Fixed32To64(fixed32 x)
 
 
 #elif defined(CPU_COLDFIRE)
-static inline int32_t fixmul32(int32_t x, int32_t y)
+inline int32_t fixmul32(int32_t x, int32_t y)
 {
 #if PRECISION != 16
 #warning Coldfire fixmul32() only works for PRECISION == 16
