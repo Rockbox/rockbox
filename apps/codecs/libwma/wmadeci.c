@@ -97,27 +97,27 @@ static fixed64 Fixed32To64(fixed32 x)
        __result;  \
     })
 #elif defined(CPU_COLDFIRE)
-    static inline int32_t fixmul32(int32_t x, int32_t y)
-    {
-        int32_t t1, t2;
-        asm volatile (
-            "mac.l   %[x],%[y],%%acc0\n" /* multiply */
-            "mulu.l  %[y],%[x]   \n"     /* get lower half, avoid emac stall */
-            "movclr.l %%acc0,%[t1]   \n" /* get higher half */
-            "moveq.l #15,%[t2]   \n"
-            "asl.l   %[t2],%[t1] \n"     /* hi <<= 15, plus one free */
-            "moveq.l #16,%[t2]   \n"
-            "lsr.l   %[t2],%[x]  \n"     /* (unsigned)lo >>= 16 */
-            "or.l    %[x],%[t1]  \n"     /* combine result */
-            : /* outputs */
-            [t1]"=&d"(t1),
-            [t2]"=&d"(t2),
-            [x] "+d" (x)
-            : /* inputs */
-            [y] "d"  (y)
-        );
-        return t1;
-    }
+static inline int32_t fixmul32(int32_t x, int32_t y)
+{
+#if PRECISION != 16
+#warning Coldfire fixmul32() only works for PRECISION == 16
+#endif
+    int32_t t1;
+    asm (
+        "mac.l   %[x], %[y], %%acc0  \n" /* multiply */
+        "mulu.l  %[y], %[x]      \n"     /* get lower half, avoid emac stall */
+        "movclr.l %%acc0, %[t1]  \n"     /* get higher half */
+        "lsr.l   #1, %[t1]       \n"
+        "move.w  %[t1], %[x]     \n"
+        "swap    %[x]            \n"
+        : /* outputs */
+        [t1]"=&d"(t1),
+        [x] "+d" (x)
+        : /* inputs */
+        [y] "d"  (y)
+    );
+    return x;
+}
 #else
 fixed32 fixmul32(fixed32 x, fixed32 y)
 {
