@@ -21,15 +21,15 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <atoi.h>
 #include <inttypes.h>
 
 #include "id3.h"
 #include "debug.h"
 #include "rbunicode.h"
 #include "metadata_common.h"
+#include "system.h"
 #include <codecs/libwma/asf.h>
-
-static asf_waveformatex_t wfx;
 
 /* TODO: Just read the GUIDs into a 16-byte array, and use memcmp to compare */
 struct guid_s {
@@ -121,7 +121,105 @@ static void asf_read_object_header(asf_object_t *obj, int fd)
     obj->datalen = 0;
 }
 
-static int asf_parse_header(int fd, struct mp3entry* id3)
+/* Parse an integer from the extended content object - we always
+   convert to an int, regardless of native format.
+*/
+static int asf_intdecode(int fd, int type, int length)
+{
+    uint16_t tmp16;
+    uint32_t tmp32;
+    uint64_t tmp64;
+
+    if (type==3) {
+        read_uint32le(fd, &tmp32);
+        lseek(fd,length - 4,SEEK_CUR);
+        return (int)tmp32;
+    } else if (type==4) {
+        read_uint32le(fd, &tmp64);
+        lseek(fd,length - 8,SEEK_CUR);
+        return (int)tmp64;
+    } else if (type == 5) {
+        read_uint16le(fd, &tmp16);
+        lseek(fd,length - 2,SEEK_CUR);
+        return (int)tmp16;
+    }
+
+    return 0;
+}
+
+/* Decode a LE utf16 string from a disk buffer into a fixed-sized 
+   utf8 buffer.
+*/         
+
+static void asf_utf16LEdecode(int fd,
+                              uint16_t utf16bytes,
+                              unsigned char **utf8,
+                              int* utf8bytes
+                             )
+{
+    unsigned long ucs;
+    int n;
+    unsigned char utf16buf[256];
+    unsigned char* utf16 = utf16buf;
+    unsigned char* newutf8;
+
+    n = read(fd, utf16buf, MIN(sizeof(utf16buf), utf16bytes));
+    utf16bytes -= n;
+
+    while (n > 0) {
+        /* Check for a surrogate pair */
+        if (utf16[1] >= 0xD8 && utf16[1] < 0xE0) {
+            if (n < 4) {
+                /* Run out of utf16 bytes, read some more */
+                utf16buf[0] = utf16[0];
+                utf16buf[1] = utf16[1];
+
+                n = read(fd, utf16buf + 2, MIN(sizeof(utf16buf)-2, utf16bytes));
+                utf16 = utf16buf;
+                utf16bytes -= n;
+                n += 2;
+            }
+
+            if (n < 4) {
+                /* Truncated utf16 string, abort */
+                break;
+            }
+            ucs = 0x10000 + ((utf16[0] << 10) | ((utf16[1] - 0xD8) << 18)
+                             | utf16[2] | ((utf16[3] - 0xDC) << 8));
+            utf16 += 4;
+            n -= 4;
+        } else {
+            ucs = (utf16[0] | (utf16[1] << 8));
+            utf16 += 2;
+            n -= 2;
+        }
+
+        if (*utf8bytes > 6) {
+            newutf8 = utf8encode(ucs, *utf8);
+            *utf8bytes -= (newutf8 - *utf8);
+            *utf8 += (newutf8 - *utf8);
+        }
+
+        /* We have run out of utf16 bytes, read more if available */
+        if ((n == 0) && (utf16bytes > 0)) {
+            n = read(fd, utf16buf, MIN(sizeof(utf16buf), utf16bytes));
+            utf16 = utf16buf;
+            utf16bytes -= n;
+        }
+    }
+
+    *utf8[0] = 0;
+    --*utf8bytes;
+
+    if (utf16bytes > 0) {
+        /* Skip any remaining bytes */
+        lseek(fd, utf16bytes, SEEK_CUR);
+    }
+    return;
+}
+
+static int asf_parse_header(int fd, struct mp3entry* id3, 
+                                    asf_waveformatex_t* wfx)
 {
     asf_object_t current;
     asf_object_t header;
@@ -129,14 +227,11 @@ static int asf_parse_header(int fd, struct mp3entry* id3)
     int i;
     int fileprop = 0;
     uint64_t play_duration;
-    uint64_t tmp64;
-    uint32_t tmp32;
-    uint16_t tmp16;
-    uint8_t tmp8;
     uint16_t flags;
     uint32_t subobjects;
-    uint8_t utf16buf[512];
     uint8_t utf8buf[512];
+    int id3buf_remaining = sizeof(id3->id3v2buf) + sizeof(id3->id3v1buf);
+    unsigned char* id3buf = (unsigned char*)id3->id3v2buf;
 
     asf_read_object_header((asf_object_t *) &header, fd);
 
@@ -193,7 +288,7 @@ static int asf_parse_header(int fd, struct mp3entry* id3)
 
                     /* Read the packet size - uint32_t at offset 68 */
                     lseek(fd, 20, SEEK_CUR);
-                    read_uint32le(fd, &wfx.packet_size);
+                    read_uint32le(fd, &wfx->packet_size);
 
                     /* Skip bytes remaining in object */
                     lseek(fd, current.size - 24 - 72, SEEK_CUR);
@@ -225,7 +320,7 @@ static int asf_parse_header(int fd, struct mp3entry* id3)
                         DEBUGF("Found stream properties for audio stream %d\n",flags&0x7f);
 
                         /* TODO: Check codec_id and find the lowest numbered audio stream in the file */
-                        wfx.audiostream = flags&0x7f;
+                        wfx->audiostream = flags&0x7f;
 
                         if (propdatalen < 18) {
                             return ASF_ERROR_INVALID_LENGTH;
@@ -236,29 +331,25 @@ static int asf_parse_header(int fd, struct mp3entry* id3)
                             return ASF_ERROR_INVALID_LENGTH;
                         }
 #endif
-                        read_uint16le(fd, &wfx.codec_id);
-                        read_uint16le(fd, &wfx.channels);
-                        read_uint32le(fd, &wfx.rate);
-                        read_uint32le(fd, &wfx.bitrate);
-                        wfx.bitrate *= 8;
-                        read_uint16le(fd, &wfx.blockalign);
-                        read_uint16le(fd, &wfx.bitspersample);
-                        read_uint16le(fd, &wfx.datalen);
+                        read_uint16le(fd, &wfx->codec_id);
+                        read_uint16le(fd, &wfx->channels);
+                        read_uint32le(fd, &wfx->rate);
+                        read_uint32le(fd, &wfx->bitrate);
+                        wfx->bitrate *= 8;
+                        read_uint16le(fd, &wfx->blockalign);
+                        read_uint16le(fd, &wfx->bitspersample);
+                        read_uint16le(fd, &wfx->datalen);
 
                         /* Round bitrate to the nearest kbit */
-                        id3->bitrate = (wfx.bitrate + 500) / 1000;
-                        id3->frequency = wfx.rate;
+                        id3->bitrate = (wfx->bitrate + 500) / 1000;
+                        id3->frequency = wfx->rate;
 
-                        if (wfx.codec_id == ASF_CODEC_ID_WMAV1) {
-                            read(fd, wfx.data, 4);
+                        if (wfx->codec_id == ASF_CODEC_ID_WMAV1) {
+                            read(fd, wfx->data, 4);
                             lseek(fd,current.size - 24 - 72 - 4,SEEK_CUR);
-                            /* A hack - copy the wfx struct to the MP3 TOC field in the id3 struct */
-                            memcpy(id3->toc, &wfx, sizeof(wfx));
-                        } else if (wfx.codec_id == ASF_CODEC_ID_WMAV2) {
-                            read(fd, wfx.data, 6);
+                        } else if (wfx->codec_id == ASF_CODEC_ID_WMAV2) {
+                            read(fd, wfx->data, 6);
                             lseek(fd,current.size - 24 - 72 - 6,SEEK_CUR);
-                            /* A hack - copy the wfx struct to the MP3 TOC field in the id3 struct */
-                            memcpy(id3->toc, &wfx, sizeof(wfx));
                         } else {
                             lseek(fd,current.size - 24 - 72,SEEK_CUR);
                         }
@@ -279,13 +370,24 @@ static int asf_parse_header(int fd, struct mp3entry* id3)
                         DEBUGF("strlength = %u\n",strlength[i]);
                     }
 
-                    for (i=0; i<5 ; i++) {
-                        if (strlength[i] > 0) {
-                            read(fd, utf16buf, strlength[i]);
-                            utf16LEdecode(utf16buf, utf8buf, strlength[i]);
-                            DEBUGF("TAG %d = %s\n",i,utf8buf);
-                        }
+                    if (strlength[0] > 0) {  /* 0 - Title */
+                        id3->title = id3buf;
+                        asf_utf16LEdecode(fd, strlength[0], &id3buf, &id3buf_remaining);
                     }
+                           
+                    if (strlength[1] > 0) {  /* 1 - Artist */
+                        id3->artist = id3buf;
+                        asf_utf16LEdecode(fd, strlength[1], &id3buf, &id3buf_remaining);
+                    }
+                    
+                    lseek(fd, strlength[2], SEEK_CUR); /* 2 - copyright */
+
+                    if (strlength[3] > 0) {  /* 3 - description */
+                        id3->comment = id3buf;
+                        asf_utf16LEdecode(fd, strlength[3], &id3buf, &id3buf_remaining);
+                    }
+
+                    lseek(fd, strlength[4], SEEK_CUR); /* 4 - rating */
             } else if (asf_guid_match(&current.guid, &asf_guid_extended_content_description)) {
                     uint16_t count;
                     int i;
@@ -298,55 +400,50 @@ static int asf_parse_header(int fd, struct mp3entry* id3)
 
                     for (i=0; i < count; i++) {
                         uint16_t length, type;
+                        unsigned char* utf8 = utf8buf;
+                        int utf8length = 512;
 
                         read_uint16le(fd, &length);
-                        read(fd, utf16buf, length);
-                        utf16LEdecode(utf16buf, utf8buf, length);
-                        DEBUGF("Key=\"%s\" ",utf8buf);
+                        asf_utf16LEdecode(fd, length, &utf8, &utf8length);
                         bytesleft -= 2 + length;
 
                         read_uint16le(fd, &type);
                         read_uint16le(fd, &length);
-                        switch(type)
-                        {
-                            case 0: /* String */
-                                read(fd, utf16buf, length);
-                                utf16LEdecode(utf16buf, utf8buf, length);
-                                DEBUGF("Value=\"%s\"\n",utf8buf);
-                                break;
 
-                            case 1: /* Hex string */
-                                DEBUGF("Value=NOT YET IMPLEMENTED (HEX STRING)\n");
-                                lseek(fd,length,SEEK_CUR);
-                                break;
-
-                            case 2: /* Bool */
-                                read(fd, &tmp8, 1);
-                                DEBUGF("Value=%s\n",(tmp8 ? "TRUE" : "FALSE"));
-                                lseek(fd,length - 1,SEEK_CUR);
-                                break;
-
-                            case 3: /* 32-bit int */
-                                read_uint32le(fd, &tmp32);
-                                DEBUGF("Value=%u\n",(unsigned int)tmp32);
-                                lseek(fd,length - 4,SEEK_CUR);
-                                break;
-
-                            case 4: /* 64-bit int */
-                                read_uint64le(fd, &tmp64);
-                                DEBUGF("Value=[64-bit int]\n");
-                                lseek(fd,length - 8,SEEK_CUR);
-                                break;
-
-                            case 5: /* 16-bit int */
-                                read_uint16le(fd, &tmp16);
-                                DEBUGF("Value=%u\n",tmp16);
-                                lseek(fd,length - 2,SEEK_CUR);
-                                break;
-
-                            default:
-                                lseek(fd,length,SEEK_CUR);
-                                break;
+                        if (!strcmp("WM/TrackNumber",utf8buf)) {
+                            if (type == 0) {
+                                id3->track_string = id3buf;
+                                asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
+                                id3->tracknum = atoi(id3->track_string);
+                            } else if ((type >=2) && (type <= 5)) {
+                                id3->tracknum = asf_intdecode(fd, type, length);
+                            } else {
+                                lseek(fd, length, SEEK_CUR);
+                            }
+                        } else if ((!strcmp("WM/Genre",utf8buf)) && (type == 0)) {
+                            id3->genre_string = id3buf;
+                            asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
+                        } else if ((!strcmp("WM/AlbumTitle",utf8buf)) && (type == 0)) {
+                            id3->album = id3buf;
+                            asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
+                        } else if ((!strcmp("WM/AlbumArtist",utf8buf)) && (type == 0)) {
+                            id3->albumartist = id3buf;
+                            asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
+                        } else if ((!strcmp("WM/Composer",utf8buf)) && (type == 0)) {
+                            id3->composer = id3buf;
+                            asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
+                        } else if (!strcmp("WM/Year",utf8buf)) {
+                            if (type == 0) {
+                                id3->year_string = id3buf;
+                                asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
+                                id3->year = atoi(id3->year_string);
+                            } else if ((type >=2) && (type <= 5)) {
+                                id3->year = asf_intdecode(fd, type, length);
+                            } else {
+                                lseek(fd, length, SEEK_CUR);
+                            }
+                        } else {
+                            lseek(fd, length, SEEK_CUR);
                         }
                         bytesleft -= 4 + length;
                     }
@@ -386,10 +483,11 @@ bool get_asf_metadata(int fd, struct mp3entry* id3)
 {
     int res;
     asf_object_t obj;
+    asf_waveformatex_t wfx;
 
     wfx.audiostream = -1;
 
-    res = asf_parse_header(fd, id3);
+    res = asf_parse_header(fd, id3, &wfx);
 
     if (res < 0) {
         DEBUGF("ASF: parsing error - %d\n",res);
@@ -418,6 +516,10 @@ bool get_asf_metadata(int fd, struct mp3entry* id3)
        header.
      */
     id3->first_frame_offset = lseek(fd, 0, SEEK_CUR) + 26;
+
+    /* We copy the wfx struct to the MP3 TOC field in the id3 struct so
+       the codec doesn't need to parse the header object again */
+    memcpy(id3->toc, &wfx, sizeof(wfx));
 
     return true;
 }
