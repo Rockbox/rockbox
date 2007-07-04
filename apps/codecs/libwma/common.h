@@ -6,68 +6,8 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-/* only include the following when compiling package */
 #include "ffmpeg_config.h"
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <math.h>
-#include <stddef.h>
 #include <inttypes.h>
-
-#ifndef M_PI
-#define M_PI    3.14159265358979323846
-#endif
-
-#if defined(__GNUC__) && (__GNUC__ > 3 || __GNUC__ == 3 && __GNUC_MINOR__ > 0)
-#    define always_inline __attribute__((always_inline)) inline
-#else
-#    define always_inline inline
-#endif
-
-#ifndef INT64_MAX
-#define INT64_MAX 9223372036854775807LL
-#endif
-
-#    if defined(__MINGW32__) || defined(__CYGWIN__) || \
-        defined(__OS2__) || (defined (__OpenBSD__) && !defined(__ELF__))
-#        define MANGLE(a) "_" #a
-#    else
-#        define MANGLE(a) #a
-#    endif
-
-/* debug stuff */
-
-#    ifndef DEBUG
-#        define NDEBUG
-#    endif
-#    include <assert.h>
-
-/* dprintf macros */
-#    if defined(CONFIG_WIN32) && !defined(__MINGW32__)
-
-inline void dprintf(const char* fmt,...) {}
-
-#    else
-
-#        ifdef DEBUG
-#            define dprintf(fmt,...) printf(fmt, __VA_ARGS__)
-#        else
-#            define dprintf(fmt,...)
-#        endif
-
-#    endif /* !CONFIG_WIN32 */
-
-#    define av_abort()      do { av_log(AV_LOG_ERROR, "Abort at %s:%d\n", __FILE__, __LINE__); abort(); } while (0)
-
-//rounded divison & shift
-#define RSHIFT(a,b) ((a) > 0 ? ((a) + (1<<((b)-1)))>>(b) : ((a) + (1<<((b)-1))-1)>>(b))
-/* assume b>0 */
-#define ROUNDED_DIV(a,b) (((a)>0 ? (a) + ((b)>>1) : (a) - ((b)>>1))/(b))
-
-extern const uint32_t inverse[256];
 
 #define NEG_SSR32(a,s) ((( int32_t)(a))>>(32-(s)))
 #define NEG_USR32(a,s) (((uint32_t)(a))>>(32-(s)))
