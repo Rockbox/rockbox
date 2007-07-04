@@ -85,7 +85,30 @@ long fsincos(unsigned long phase, fixed32 *cos);
     })
 
 
+#elif defined(CPU_COLDFIRE)
+static inline int32_t fixmul32(int32_t x, int32_t y)
+{
+#if PRECISION != 16
+#warning Coldfire fixmul32() only works for PRECISION == 16
+#endif
+    int32_t t1;
+    asm (
+        "mac.l   %[x], %[y], %%acc0  \n" /* multiply */
+        "mulu.l  %[y], %[x]      \n"     /* get lower half, avoid emac stall */
+        "movclr.l %%acc0, %[t1]  \n"     /* get higher half */
+        "lsr.l   #1, %[t1]       \n"
+        "move.w  %[t1], %[x]     \n"
+        "swap    %[x]            \n"
+        : /* outputs */
+        [t1]"=&d"(t1),
+        [x] "+d" (x)
+        : /* inputs */
+        [y] "d"  (y)
+    );
+    return x;
+}
 #else
+
 fixed32 fixmul32(fixed32 x, fixed32 y);
 fixed32 fixmul32b(fixed32 x, fixed32 y);
 #endif
