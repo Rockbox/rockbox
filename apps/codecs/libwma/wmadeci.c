@@ -28,28 +28,6 @@
 #include "wmadec.h"
 #include "wmafixed.c"
 
-
-
-#define ALT_BITSTREAM_READER
-
-#define unaligned32(a) (*(uint32_t*)(a))
-
-uint16_t bswap_16(uint16_t x)
-{
-    uint16_t hi = x & 0xff00;
-    uint16_t lo = x & 0x00ff;
-    return (hi >> 8) | (lo << 8);
-}
-
-uint32_t bswap_32(uint32_t x)
-{
-    uint32_t b1 = x & 0xff000000;
-    uint32_t b2 = x & 0x00ff0000;
-    uint32_t b3 = x & 0x0000ff00;
-    uint32_t b4 = x & 0x000000ff;
-    return (b1 >> 24) | (b2 >> 8) | (b3 << 8) | (b4 << 24);
-}
-
 #ifdef CPU_ARM
 static inline
 void CMUL(fixed32 *x, fixed32 *y,
