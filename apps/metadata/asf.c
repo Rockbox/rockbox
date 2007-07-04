@@ -135,7 +135,7 @@ static int asf_intdecode(int fd, int type, int length)
         lseek(fd,length - 4,SEEK_CUR);
         return (int)tmp32;
     } else if (type==4) {
-        read_uint32le(fd, &tmp64);
+        read_uint64le(fd, &tmp64);
         lseek(fd,length - 8,SEEK_CUR);
         return (int)tmp64;
     } else if (type == 5) {
