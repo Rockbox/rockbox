@@ -50,7 +50,29 @@ uint32_t bswap_32(uint32_t x)
     return (b1 >> 24) | (b2 >> 8) | (b3 << 8) | (b4 << 24);
 }
 
-#ifdef CPU_COLDFIRE
+#ifdef CPU_ARM
+static inline
+void CMUL(fixed32 *x, fixed32 *y,
+          fixed32  a, fixed32  b,
+          fixed32  t, fixed32  v)
+{   
+    /* This version loses one bit of precision. Could be solved at the cost
+     * of 2 extra cycles if it becomes an issue. */
+    int x1, y1, l;
+    asm(
+        "smull    %[l], %[y1], %[b], %[t] \n"
+        "smlal    %[l], %[y1], %[a], %[v] \n"
+        "rsb      %[b], %[b], #0          \n"
+        "smull    %[l], %[x1], %[a], %[t] \n"
+        "smlal    %[l], %[x1], %[b], %[v] \n"
+        : [l] "=&r" (l), [x1]"=&r" (x1), [y1]"=&r" (y1), [b] "+r" (b)
+        : [a] "r" (a),   [t] "r" (t),    [v] "r" (v)
+        : "cc"
+    );
+    *x = x1 << 1;
+    *y = y1 << 1;
+}
+#elif defined CPU_COLDFIRE
 static inline
 void CMUL(fixed32 *x, fixed32 *y,
           fixed32  a, fixed32  b,
