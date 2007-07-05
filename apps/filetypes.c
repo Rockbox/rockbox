@@ -43,7 +43,7 @@
 
 /* max filetypes (plugins & icons stored here) */
 #if CONFIG_CODEC == SWCODEC
-#define MAX_FILETYPES 73
+#define MAX_FILETYPES 75
 #else
 #define MAX_FILETYPES 48
 #endif
