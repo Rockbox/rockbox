@@ -3,44 +3,83 @@
 #include "panic.h"
 #include "mmu-meg-fx.h"
 
-#include "lcd.h"
+#define default_interrupt(name) \
+  extern __attribute__((weak,alias("UIRQ"))) void name (void)
 
-enum
+default_interrupt(EINT0);
+default_interrupt(EINT1);
+default_interrupt(EINT2);
+default_interrupt(EINT3);
+default_interrupt(EINT4_7);
+default_interrupt(EINT8_23);
+default_interrupt(CAM);
+default_interrupt(nBATT_FLT);
+default_interrupt(TICK);
+default_interrupt(WDT_AC97);
+default_interrupt(TIMER0);
+default_interrupt(TIMER1);
+default_interrupt(TIMER2);
+default_interrupt(TIMER3);
+default_interrupt(TIMER4);
+default_interrupt(UART2);
+default_interrupt(LCD);
+default_interrupt(DMA0);
+default_interrupt(DMA1);
+default_interrupt(DMA2);
+default_interrupt(DMA3);
+default_interrupt(SDI);
+default_interrupt(SPI0);
+default_interrupt(UART1);
+default_interrupt(NFCON);
+default_interrupt(USBD);
+default_interrupt(USBH);
+default_interrupt(IIC);
+default_interrupt(UART0);
+default_interrupt(SPI1);
+default_interrupt(RTC);
+default_interrupt(ADC);
+
+static void (* const irqvector[32])(void) =
 {
-    TIMER4_MASK = (1 << 14),
-    LCD_MASK   =  (1 << 16),
-    DMA0_MASK   = (1 << 17),
-    DMA1_MASK   = (1 << 18),
-    DMA2_MASK   = (1 << 19),
-    DMA3_MASK   = (1 << 20),
-    ALARM_MASK  = (1 << 30),
+    EINT0, EINT1, EINT2, EINT3,
+    EINT4_7, EINT8_23, CAM, nBATT_FLT, TICK, WDT_AC97,
+    TIMER0, TIMER1, TIMER2, TIMER3, TIMER4, UART2,
+    LCD, DMA0, DMA1, DMA2, DMA3, SDI,
+    SPI0, UART1, NFCON, USBD, IIC,
+    UART0, SPI1, RTC, ADC,
 };
 
-int system_memory_guard(int newmode)
+static const char * const irqname[32] =
 {
-    (void)newmode;
-    return 0;
+    "EINT0", "EINT1", "EINT2", "EINT3",
+    "EINT4_7", "EINT8_23", "CAM", "nBATT_FLT", "TICK", "WDT_AC97",
+    "TIMER0", "TIMER1", "TIMER2", "TIMER3", "TIMER4", "UART2",
+    "LCD", "DMA0", "DMA1", "DMA2", "DMA3", "SDI",
+    "SPI0", "UART1", "NFCON", "USBD", "USBH", "IIC",
+    "UART0", "SPI1", "RTC", "ADC"
+};
+
+static void UIRQ(void)
+{
+    unsigned int offset = INTOFFSET;
+    panicf("Unhandled IRQ %02X: %s", offset, irqname[offset]);
 }
 
-extern void timer4(void);
-extern void dma0(void); /* free */
-extern void dma1(void);
-extern void dma3(void);
-
-void irq(void)
+void irq_handler(void) __attribute__((interrupt ("IRQ"), naked));
+void irq_handler(void)
 {
-    int intpending = INTPND;
-
-    SRCPND = intpending; /* Clear this interrupt. */
-    INTPND = intpending; /* Clear this interrupt. */
-
-    /* Timer 4 */
-    if ((intpending & TIMER4_MASK) != 0)
-        timer4();
-    else
-    {
-        /* unexpected interrupt */
-    }
+    asm volatile (
+        "sub    lr, lr, #4            \r\n"
+        "stmfd  sp!, {r0-r3, ip, lr}  \r\n"
+        "mov    r0, #0x4a000000       \r\n" /* INTOFFSET = 0x4a000014 */
+        "add    r0, r0, #0x00000014   \r\n"
+        "ldr    r0, [r0]              \r\n"
+        "ldr    r1, =irqvector        \r\n"
+        "ldr    r1, [r1, r0, lsl #2]  \r\n"
+        "mov    lr, pc                \r\n"
+        "bx     r1                    \r\n"
+        "ldmfd  sp!, {r0-r3, ip, pc}^ \r\n"
+    );
 }
 
 void system_reboot(void)
@@ -54,6 +93,17 @@ void system_reboot(void)
 
 void system_init(void)
 {
+    /* Disable interrupts and set all to IRQ mode */
+    INTMSK = -1;
+    INTMOD =  0;
+    SRCPND = -1;
+    INTPND = -1;
+    INTSUBMSK = -1;
+    SUBSRCPND = -1;
+
+    /* TODO: do something with PRIORITY */
+    
+    
     /* Turn off currently-not or never-needed devices  */
 
     CLKCON &= ~(
@@ -90,6 +140,11 @@ void system_init(void)
     CLKSLOW |= (1 << 7);
 }
 
+int system_memory_guard(int newmode)
+{
+    (void)newmode;
+    return 0;
+}
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 

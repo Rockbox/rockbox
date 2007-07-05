@@ -724,8 +724,13 @@ void tick_start(unsigned int interval_in_ms)
     INTMSK &= ~(1 << 14); // timer 4 unmask interrupts
 }
 
-void timer4(void) {
+void TIMER4(void)
+{
     int i;
+
+    SRCPND = TIMER4_MASK;
+    INTPND = TIMER4_MASK;
+
     /* Run through the list of tick tasks */
     for(i = 0; i < MAX_NUM_TICK_TASKS; i++)
     {
@@ -736,9 +741,6 @@ void timer4(void) {
     }
 
     current_tick++;
-
-    /* following needs to be fixed.  */
-    /*wake_up_thread();*/
 }
 #endif
 

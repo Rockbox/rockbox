@@ -16,6 +16,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef __S3C2440_H__
+#define __S3C2440_H__
 
 /* Memory Controllers */
 
@@ -73,6 +75,86 @@
 #define INTOFFSET (*(volatile int *)0x4A000014) /* Interrupt request source offset */
 #define SUBSRCPND (*(volatile int *)0x4A000018) /* Sub source pending */
 #define INTSUBMSK (*(volatile int *)0x4A00001C) /* Interrupt sub mask */
+
+/* Interrupt indexes - INTOFFSET - IRQ mode only */
+/* Arbiter 5 => Arbiter 6 Req 5 */
+#define ADC_OFFSET       31 /* REQ4 */
+#define RTC_OFFSET       30 /* REQ3 */
+#define SPI1_OFFSET      29 /* REQ2 */
+#define UART0_OFFSET     28 /* REQ1 */
+/* Arbiter 4 => Arbiter 6 Req 4 */
+#define IIC_OFFSET       27 /* REQ5 */
+#define USBH_OFFSET      26 /* REQ4 */
+#define USBD_OFFSET      25 /* REQ3 */
+#define NFCON_OFFSET     24 /* REQ2 */
+#define UART1_OFFSET     23 /* REQ1 */
+#define SPI0_OFFSET      22 /* REQ0 */
+/* Arbiter 3 => Arbiter 6 Req 3  */
+#define SDI_OFFSET       21 /* REQ5 */
+#define DMA3_OFFSET      20 /* REQ4 */
+#define DMA2_OFFSET      19 /* REQ3 */
+#define DMA1_OFFSET      18 /* REQ2 */
+#define DMA0_OFFSET      17 /* REQ1 */
+#define LCD_OFFSET       16 /* REQ0 */
+/* Arbiter 2 => Arbiter 6 Req 2 */
+#define UART2_OFFSET     15 /* REQ5 */
+#define TIMER4_OFFSET    14 /* REQ4 */
+#define TIMER3_OFFSET    13 /* REQ3 */
+#define TIMER2_OFFSET    12 /* REQ2 */
+#define TIMER1_OFFSET    11 /* REQ1 */
+#define TIMER0_OFFSET    10 /* REQ0 */
+/* Arbiter 1 => Arbiter 6 Req 1  */
+#define WDT_AC97_OFFSET   9 /* REQ5 */
+#define TICK_OFFSET       8 /* REQ4 */
+#define nBATT_FLT_OFFSET  7 /* REQ3 */
+#define CAM_OFFSET        6 /* REQ2 */
+#define EINT8_23_OFFSET   5 /* REQ1 */
+#define EINT4_7_OFFSET    4 /* REQ0 */
+/* Arbiter 0  => Arbiter 6 Req 0 */
+#define EINT3_OFFSET      3 /* REQ4 */
+#define EINT2_OFFSET      2 /* REQ3 */
+#define EINT1_OFFSET      1 /* REQ2 */
+#define EINT0_OFFSET      0 /* REQ1 */
+
+/* Interrupt bitmasks - SRCPND, INTMOD, INTMSK, INTPND */
+/* Arbiter 5 => Arbiter 6 Req 5 */
+#define ADC_MASK       (1 << 31) /* REQ4 */
+#define RTC_MASK       (1 << 30) /* REQ3 */
+#define SPI1_MASK      (1 << 29) /* REQ2 */
+#define UART0_MASK     (1 << 28) /* REQ1 */
+/* Arbiter 4 => Arbiter 6 Req 4 */
+#define IIC_MASK       (1 << 27) /* REQ5 */
+#define USBH_MASK      (1 << 26) /* REQ4 */
+#define USBD_MASK      (1 << 25) /* REQ3 */
+#define NFCON_MASK     (1 << 24) /* REQ2 */
+#define UART1_MASK     (1 << 23) /* REQ1 */
+#define SPI0_MASK      (1 << 22) /* REQ0 */
+/* Arbiter 3 => Arbiter 6 Req 3  */
+#define SDI_MASK       (1 << 21) /* REQ5 */
+#define DMA3_MASK      (1 << 20) /* REQ4 */
+#define DMA2_MASK      (1 << 19) /* REQ3 */
+#define DMA1_MASK      (1 << 18) /* REQ2 */
+#define DMA0_MASK      (1 << 17) /* REQ1 */
+#define LCD_MASK       (1 << 16) /* REQ0 */
+/* Arbiter 2 => Arbiter 6 Req 2 */
+#define UART2_MASK     (1 << 15) /* REQ5 */
+#define TIMER4_MASK    (1 << 14) /* REQ4 */
+#define TIMER3_MASK    (1 << 13) /* REQ3 */
+#define TIMER2_MASK    (1 << 12) /* REQ2 */
+#define TIMER1_MASK    (1 << 11) /* REQ1 */
+#define TIMER0_MASK    (1 << 10) /* REQ0 */
+/* Arbiter 1 => Arbiter 6 Req 1  */
+#define WDT_AC97_MASK  (1 <<  9) /* REQ5 */
+#define TICK_MASK      (1 <<  8) /* REQ4 */
+#define nBATT_FLT_MASK (1 <<  7) /* REQ3 */
+#define CAM_MASK       (1 <<  6) /* REQ2 */
+#define EINT8_23_MASK  (1 <<  5) /* REQ1 */
+#define EINT4_7_MASK   (1 <<  4) /* REQ0 */
+/* Arbiter 0  => Arbiter 6 Req 0 */
+#define EINT3_MASK     (1 <<  3) /* REQ4 */
+#define EINT2_MASK     (1 <<  2) /* REQ3 */
+#define EINT1_MASK     (1 <<  1) /* REQ2 */
+#define EINT0_MASK     (1 <<  0) /* REQ1 */
 
 /* DMA */
 
@@ -465,3 +547,4 @@
 #define DRAM1 0x31000000
 #define BOOTRAM 0x40000000
 
+#endif /* __S3C2440_H__ */

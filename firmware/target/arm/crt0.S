@@ -198,14 +198,6 @@ data_abort_handler:
     mov    r1, #2
     b      UIE
 
-irq_handler:
-#ifndef STUB
-    stmfd  sp!, {r0-r11, r12, lr}
-    bl     irq
-    ldmfd  sp!, {r0-r11, r12, lr}
-#endif
-    subs   pc, lr, #4
-
 #ifdef STUB
 UIE:
     b UIE
