@@ -89,4 +89,7 @@ plugins/zxbox/ChangeLog
 plugins/zxbox/Makefile
 plugins/zxbox/README*
 plugins/zxbox/SOURCES
+plugins/reversi/*.[ch]
+plugins/reversi/Makefile
+plugins/reversi/SOURCES
 recorder/*.[ch]
