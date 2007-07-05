@@ -473,7 +473,7 @@ void rbutilFrm::OnBootloaderRemoveBtn(wxCommandEvent& event)
             MESG_DIALOG(wxT("The Uninstallation failed.") );
         }
     }
-    if(bootloadermethod == wxT("sansapatcher"))
+    else if(bootloadermethod == wxT("sansapatcher"))
     {
         if(sansapatcher(BOOTLOADER_REM,gv->plat_bootloadername[index]))
         {
