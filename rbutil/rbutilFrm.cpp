@@ -566,7 +566,7 @@ void rbutilFrm::OnBootloaderBtn(wxCommandEvent& event)
            MESG_DIALOG(wxT("The installation has failed.") );
        }
     }
-    if(bootloadermethod == wxT("sansapatcher"))
+    else if(bootloadermethod == wxT("sansapatcher"))
     {
        if(sansapatcher(BOOTLOADER_ADD,gv->plat_bootloadername[index]))
        {
