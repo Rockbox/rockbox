@@ -168,7 +168,8 @@ static void pcm_play_dma_stop_fiq(void)
         while (IISCON & (1<<7))  ;
 
         pcm_playing = false;
-        pcm_paused = false;
+        if (!audio_status())
+            pcm_paused = false;
     }
 
     /* Disconnect the IIS clock */

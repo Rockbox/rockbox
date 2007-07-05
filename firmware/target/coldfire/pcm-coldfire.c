@@ -216,7 +216,8 @@ void pcm_play_dma_start(const void *addr, size_t size)
 static void pcm_play_dma_stop_irq(void)
 {
     pcm_playing = false;
-    pcm_paused = false;
+    if (!audio_status())
+        pcm_paused = false;
 
     DSR0 = 1;
     DCR0 = 0;

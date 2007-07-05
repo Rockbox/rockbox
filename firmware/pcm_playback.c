@@ -78,7 +78,8 @@ void pcm_play_dma_start(const void *addr, size_t size)
 void pcm_play_dma_stop(void)
 {
     pcm_playing = false;
-    pcm_paused = false;
+    if (!audio_status())
+        pcm_paused = false;
 }
 
 void pcm_play_pause_pause(void)
