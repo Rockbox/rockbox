@@ -72,8 +72,7 @@ void irq_handler(void)
         "sub    lr, lr, #4            \r\n"
         "stmfd  sp!, {r0-r3, ip, lr}  \r\n"
         "mov    r0, #0x4a000000       \r\n" /* INTOFFSET = 0x4a000014 */
-        "add    r0, r0, #0x00000014   \r\n"
-        "ldr    r0, [r0]              \r\n"
+        "ldr    r0, [r0, #0x14]       \r\n"
         "ldr    r1, =irqvector        \r\n"
         "ldr    r1, [r1, r0, lsl #2]  \r\n"
         "mov    lr, pc                \r\n"

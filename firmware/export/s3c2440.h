@@ -78,43 +78,43 @@
 
 /* Interrupt indexes - INTOFFSET - IRQ mode only */
 /* Arbiter 5 => Arbiter 6 Req 5 */
-#define ADC_OFFSET       31 /* REQ4 */
-#define RTC_OFFSET       30 /* REQ3 */
-#define SPI1_OFFSET      29 /* REQ2 */
-#define UART0_OFFSET     28 /* REQ1 */
+#define ADC_INTOFFSET       31 /* REQ4 */
+#define RTC_INTOFFSET       30 /* REQ3 */
+#define SPI1_INTOFFSET      29 /* REQ2 */
+#define UART0_INTOFFSET     28 /* REQ1 */
 /* Arbiter 4 => Arbiter 6 Req 4 */
-#define IIC_OFFSET       27 /* REQ5 */
-#define USBH_OFFSET      26 /* REQ4 */
-#define USBD_OFFSET      25 /* REQ3 */
-#define NFCON_OFFSET     24 /* REQ2 */
-#define UART1_OFFSET     23 /* REQ1 */
-#define SPI0_OFFSET      22 /* REQ0 */
+#define IIC_INTOFFSET       27 /* REQ5 */
+#define USBH_INTOFFSET      26 /* REQ4 */
+#define USBD_INTOFFSET      25 /* REQ3 */
+#define NFCON_INTOFFSET     24 /* REQ2 */
+#define UART1_INTOFFSET     23 /* REQ1 */
+#define SPI0_INTOFFSET      22 /* REQ0 */
 /* Arbiter 3 => Arbiter 6 Req 3  */
-#define SDI_OFFSET       21 /* REQ5 */
-#define DMA3_OFFSET      20 /* REQ4 */
-#define DMA2_OFFSET      19 /* REQ3 */
-#define DMA1_OFFSET      18 /* REQ2 */
-#define DMA0_OFFSET      17 /* REQ1 */
-#define LCD_OFFSET       16 /* REQ0 */
+#define SDI_INTOFFSET       21 /* REQ5 */
+#define DMA3_INTOFFSET      20 /* REQ4 */
+#define DMA2_INTOFFSET      19 /* REQ3 */
+#define DMA1_INTOFFSET      18 /* REQ2 */
+#define DMA0_INTOFFSET      17 /* REQ1 */
+#define LCD_INTOFFSET       16 /* REQ0 */
 /* Arbiter 2 => Arbiter 6 Req 2 */
-#define UART2_OFFSET     15 /* REQ5 */
-#define TIMER4_OFFSET    14 /* REQ4 */
-#define TIMER3_OFFSET    13 /* REQ3 */
-#define TIMER2_OFFSET    12 /* REQ2 */
-#define TIMER1_OFFSET    11 /* REQ1 */
-#define TIMER0_OFFSET    10 /* REQ0 */
+#define UART2_INTOFFSET     15 /* REQ5 */
+#define TIMER4_INTOFFSET    14 /* REQ4 */
+#define TIMER3_INTOFFSET    13 /* REQ3 */
+#define TIMER2_INTOFFSET    12 /* REQ2 */
+#define TIMER1_INTOFFSET    11 /* REQ1 */
+#define TIMER0_INTOFFSET    10 /* REQ0 */
 /* Arbiter 1 => Arbiter 6 Req 1  */
-#define WDT_AC97_OFFSET   9 /* REQ5 */
-#define TICK_OFFSET       8 /* REQ4 */
-#define nBATT_FLT_OFFSET  7 /* REQ3 */
-#define CAM_OFFSET        6 /* REQ2 */
-#define EINT8_23_OFFSET   5 /* REQ1 */
-#define EINT4_7_OFFSET    4 /* REQ0 */
+#define WDT_AC97_INTOFFSET   9 /* REQ5 */
+#define TICK_INTOFFSET       8 /* REQ4 */
+#define nBATT_FLT_INTOFFSET  7 /* REQ3 */
+#define CAM_INTOFFSET        6 /* REQ2 */
+#define EINT8_23_INTOFFSET   5 /* REQ1 */
+#define EINT4_7_INTOFFSET    4 /* REQ0 */
 /* Arbiter 0  => Arbiter 6 Req 0 */
-#define EINT3_OFFSET      3 /* REQ4 */
-#define EINT2_OFFSET      2 /* REQ3 */
-#define EINT1_OFFSET      1 /* REQ2 */
-#define EINT0_OFFSET      0 /* REQ1 */
+#define EINT3_INTOFFSET      3 /* REQ4 */
+#define EINT2_INTOFFSET      2 /* REQ3 */
+#define EINT1_INTOFFSET      1 /* REQ2 */
+#define EINT0_INTOFFSET      0 /* REQ1 */
 
 /* Interrupt bitmasks - SRCPND, INTMOD, INTMSK, INTPND */
 /* Arbiter 5 => Arbiter 6 Req 5 */
