@@ -558,33 +558,6 @@ static void init(void)
 #if CONFIG_CHARGING
     car_adapter_mode_init();
 #endif
-
-    int fd = creat("/timer_regs.txt");
-
-    if (fd >= 0)
-    {
-        fdprintf(fd, "TCFG0:  %08X\n", TCFG0);
-        fdprintf(fd, "TCFG1:  %08X\n", TCFG1);
-        fdprintf(fd, "TCON:   %08X\n", TCON);
-        fdprintf(fd, "TCFG0:  %08X\n", TCFG0);
-        fdprintf(fd, "TCNTB0: %08X\n", TCNTB0);
-        fdprintf(fd, "TCMPB0: %08X\n", TCMPB0);
-        fdprintf(fd, "TCNTO0: %08X\n", TCNTO0);
-        fdprintf(fd, "TCNTB1: %08X\n", TCNTB1);
-        fdprintf(fd, "TCMPB1: %08X\n", TCMPB1);
-        fdprintf(fd, "TCNTO1: %08X\n", TCNTO1);
-        fdprintf(fd, "TCNTB2: %08X\n", TCNTB2);
-        fdprintf(fd, "TCMPB2: %08X\n", TCMPB2);
-        fdprintf(fd, "TCNTO2: %08X\n", TCNTO2);
-        fdprintf(fd, "TCNTB3: %08X\n", TCNTB3);
-        fdprintf(fd, "TCMPB3: %08X\n", TCMPB3);
-        fdprintf(fd, "TCNTO3: %08X\n", TCNTO3);
-        fdprintf(fd, "TCNTB4: %08X\n", TCNTB4);
-        fdprintf(fd, "TCNTO4: %08X\n", TCNTO4);
-
-
-        close(fd);
-    }
 }
 
 #ifdef CPU_PP
