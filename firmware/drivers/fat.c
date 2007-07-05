@@ -1863,6 +1863,10 @@ int fat_rename(struct fat_file* file,
     int rc;
     struct fat_dir olddir;
     struct fat_file newfile = *file;
+    unsigned char buf[SECTOR_SIZE];
+    unsigned char* entry = NULL;
+    unsigned short* clusptr = NULL;
+    unsigned int parentcluster;
 #ifdef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[file->volume];
     
@@ -1870,6 +1874,8 @@ int fat_rename(struct fat_file* file,
         DEBUGF("No rename across volumes!\n");
         return -1;
     }
+#else
+    struct bpb* fat_bpb = &fat_bpbs[0];
 #endif
 
     if ( !file->dircluster ) {
@@ -1880,26 +1886,73 @@ int fat_rename(struct fat_file* file,
     /* create a temporary file handle */
     rc = fat_opendir(IF_MV2(file->volume,) &olddir, file->dircluster, NULL);
     if (rc < 0)
-        return rc * 10 - 3;
+        return rc * 10 - 1;
 
     /* create new name */
     rc = add_dir_entry(dir, &newfile, newname, false, false);
     if (rc < 0)
-        return rc * 10 - 4;
+        return rc * 10 - 2;
 
     /* write size and cluster link */
     rc = update_short_entry(&newfile, size, attr);
     if (rc < 0)
-        return rc * 10 - 5;
+        return rc * 10 - 3;
 
     /* remove old name */
     rc = free_direntries(file);
     if (rc < 0)
-        return rc * 10 - 6;
+        return rc * 10 - 4;
 
     rc = flush_fat(IF_MV(fat_bpb));
     if (rc < 0)
-        return rc * 10 - 7;
+        return rc * 10 - 5;
+
+    /* if renaming a directory, update the .. entry to make sure
+       it points to its parent directory (we don't check if it was a move) */
+    if(FAT_ATTR_DIRECTORY == attr) {
+        /* open the dir that was renamed, we re-use the olddir struct */
+        rc = fat_opendir(IF_MV2(file->volume,) &olddir, newfile.firstcluster,
+                                                                          NULL);
+        if (rc < 0)
+            return rc * 10 - 6;
+
+        /* get the first sector of the dir */
+        rc = fat_seek(&olddir.file, 0);
+        if (rc < 0)
+            return rc * 10 - 7;
+
+        rc = fat_readwrite(&olddir.file, 1, buf, false);
+        if (rc < 0)
+            return rc * 10 - 8;
+
+        /* parent cluster is 0 if parent dir is the root - FAT spec (p.29) */
+        if(dir->file.firstcluster == fat_bpb->bpb_rootclus)
+            parentcluster = 0;
+        else
+            parentcluster = dir->file.firstcluster;
+
+        entry = buf + DIR_ENTRY_SIZE;
+        if(strncmp("..         ", entry, 11))
+        {
+            /* .. entry must be second entry according to FAT spec (p.29) */
+            DEBUGF("Second dir entry is not double-dot!\n");
+            return rc * 10 - 9;
+        }
+        clusptr = (short*)(entry + FATDIR_FSTCLUSHI);
+        *clusptr = htole16(parentcluster >> 16);
+
+        clusptr = (short*)(entry + FATDIR_FSTCLUSLO);
+        *clusptr = htole16(parentcluster & 0xffff);
+
+        /* write back this sector */
+        rc = fat_seek(&olddir.file, 0);
+        if (rc < 0)
+            return rc * 10 - 7;
+
+        rc = fat_readwrite(&olddir.file, 1, buf, true);
+        if (rc < 1)
+            return rc * 10 - 8;
+    }
 
     return 0;
 }
