@@ -157,6 +157,10 @@ static void gui_statusbar_init(struct gui_statusbar * bar)
 {
     bar->redraw_volume = true;
     bar->volume_icon_switch_tick = bar->battery_icon_switch_tick = current_tick;
+    memset((void*)&(bar->lastinfo), 0, sizeof(struct status_info));
+#if CONFIG_RTC
+    bar->last_tm_min = 0;
+#endif    
 }
 
 void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
@@ -239,11 +243,14 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
         bar->info.led = led_read(HZ/2); /* delay should match polling interval */
 #endif
 #if CONFIG_RTC
-    bar->info.time = get_time();
+    bar->time = get_time();
 #endif /* CONFIG_RTC */
 
     /* only redraw if forced to, or info has changed */
     if (force_redraw || bar->redraw_volume ||
+#if CONFIG_RTC
+        (bar->time->tm_min != bar->last_tm_min) ||
+#endif
         memcmp(&(bar->info), &(bar->lastinfo), sizeof(struct status_info)))
     {
         display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
@@ -313,7 +320,8 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
             gui_statusbar_icon_lock_remote(display);
 #endif
 #if CONFIG_RTC
-        gui_statusbar_time(display, bar->info.time);
+        gui_statusbar_time(display, bar->time);
+        bar->last_tm_min = bar->time->tm_min;
 #endif /* CONFIG_RTC */
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
         if(!display->has_disk_led && bar->info.led)

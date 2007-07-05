@@ -33,10 +33,6 @@ struct status_info {
     int volume;
     int playmode;
     int repeat;
-#if CONFIG_RTC
-    struct tm *time;
-#endif
-
 #if CONFIG_CHARGING
     bool inserted;
 #endif
@@ -65,7 +61,10 @@ struct gui_statusbar
 
     struct status_info info;
     struct status_info lastinfo;
-
+#if CONFIG_RTC
+    struct tm *time;
+    int	last_tm_min;
+#endif
     struct screen * display;
 };
 
