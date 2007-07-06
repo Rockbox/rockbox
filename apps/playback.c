@@ -603,7 +603,7 @@ struct mp3entry* audio_current_track(void)
 
     memset(&temp_id3, 0, sizeof(struct mp3entry));
     
-    filename = playlist_peek(offset);
+    filename = playlist_peek(0);
     if (!filename)
         filename = "No file!";
 
