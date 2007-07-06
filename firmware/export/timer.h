@@ -25,7 +25,6 @@
 
 #ifndef SIMULATOR
 
-
 #if defined(CPU_PP)
  /* Portalplayer chips use a microsecond timer. */
  #define TIMER_FREQ 1000000
@@ -34,6 +33,8 @@
  #define TIMER_FREQ (CPU_FREQ/2)
 #elif CONFIG_CPU == PNX0101
  #define TIMER_FREQ 3000000
+#elif CONFIG_CPU == S3C2440
+ #include "timer-target.h"
 #else
  #define TIMER_FREQ CPU_FREQ
 #endif
@@ -45,6 +46,10 @@ bool timer_set_period(long cycles);
 void timers_adjust_prescale(int multiplier, bool enable_irq);
 #endif
 void timer_unregister(void);
+
+/* For target-specific interface use */
+extern void (*pfn_timer)(void);
+extern void (*pfn_unregister)(void);
 
 #endif /* !SIMULATOR */
 #endif /* __TIMER_H__ */

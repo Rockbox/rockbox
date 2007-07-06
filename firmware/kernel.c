@@ -29,7 +29,7 @@
 volatile long current_tick NOCACHEDATA_ATTR = 0;
 #endif
 
-static void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
+void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
 
 /* This array holds all queues that are initiated. It is used for broadcast. */
 static struct event_queue *all_queues[32] NOCACHEBSS_ATTR;
@@ -707,40 +707,6 @@ void tick_start(unsigned int interval_in_ms)
     irq_enable_int(IRQ_TIMER0);
 
     TIMER0.ctrl |= 0x80;  /* Enable the counter */
-}
-#elif CONFIG_CPU == S3C2440
-void tick_start(unsigned int interval_in_ms)
-{
-    TCON &= ~(1 << 20); // stop timer 4
-    // TODO: this constant depends on dividers settings inherited from
-    // firmware. Set them explicitly somwhere.
-    TCNTB4 = 12193 * interval_in_ms / 1000;
-    TCON |= 1 << 21; // set manual bit
-    TCON &= ~(1 << 21); // reset manual bit
-    TCON |= 1 << 22; //interval mode
-    TCON |= (1 << 20); // start timer 4
-
-    INTMOD &= ~(1 << 14); // timer 4 to IRQ mode
-    INTMSK &= ~(1 << 14); // timer 4 unmask interrupts
-}
-
-void TIMER4(void)
-{
-    int i;
-
-    SRCPND = TIMER4_MASK;
-    INTPND = TIMER4_MASK;
-
-    /* Run through the list of tick tasks */
-    for(i = 0; i < MAX_NUM_TICK_TASKS; i++)
-    {
-        if(tick_funcs[i])
-        {
-            tick_funcs[i]();
-        }
-    }
-
-    current_tick++;
 }
 #endif
 

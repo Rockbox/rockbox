@@ -87,23 +87,6 @@ static inline uint32_t swap_odd_even32(uint32_t value)
     return value;
 }
 
-#define HIGHEST_IRQ_LEVEL (0x80)
-
-static inline int set_irq_level(int level)
-{
-    unsigned long cpsr;
-    int oldlevel;
-    /* Read the old level and set the new one */
-    asm volatile (
-        "mrs    %1, cpsr        \n"
-        "bic    %0, %1, #0x80   \n"
-        "orr    %0, %0, %2      \n"
-        "msr    cpsr_c, %0      \n"
-        : "=&r,r"(cpsr), "=&r,r"(oldlevel) : "r,i"(level & 0x80)
-    );
-    return oldlevel;
-}
-
 static inline void set_fiq_handler(void(*fiq_handler)(void))
 {
     /* Install the FIQ handler */
@@ -133,22 +116,35 @@ static inline void disable_fiq(void)
 }
 
 /* This one returns the old status */
-#define FIQ_ENABLED  0x00
-#define FIQ_DISABLED 0x40
-static inline int set_fiq_status(int status)
+#define IRQ_ENABLED      0x00
+#define IRQ_DISABLED     0x80
+#define IRQ_STATUS       0x80
+#define FIQ_ENABLED      0x00
+#define FIQ_DISABLED     0x40
+#define FIQ_STATUS       0x40
+#define IRQ_FIQ_ENABLED  0x00
+#define IRQ_FIQ_DISABLED 0xc0
+#define IRQ_FIQ_STATUS   0xc0
+#define HIGHEST_IRQ_LEVEL IRQ_DISABLED
+
+#define set_irq_level(status)  set_interrupt_status((status), IRQ_STATUS)
+#define set_fiq_status(status) set_interrupt_status((status), FIQ_STATUS)
+
+static inline int set_interrupt_status(int status, int mask)
 {
     unsigned long cpsr;
     int oldstatus;
-    /* Read the old level and set the new one */
+    /* Read the old levels and set the new ones */
     asm volatile (
         "mrs    %1, cpsr        \n"
-        "bic    %0, %1, #0x40   \n"
+        "bic    %0, %1, %[mask] \n"
         "orr    %0, %0, %2      \n"
         "msr    cpsr_c, %0      \n"
-        : "=&r,r"(cpsr), "=&r,r"(oldstatus) : "r,i"(status & 0x40)
+        : "=&r,r"(cpsr), "=&r,r"(oldstatus)
+        : "r,i"(status & mask), [mask]"i,i"(mask)
     );
+
     return oldstatus;
 }
-
 
 #endif /* SYSTEM_ARM_H */

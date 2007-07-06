@@ -22,10 +22,11 @@
 #include "cpu.h"
 #include "system.h"
 #include "timer.h"
+#include "logf.h"
 
 static int timer_prio = -1;
-static void (*pfn_timer)(void) = NULL;      /* timer callback */
-static void (*pfn_unregister)(void) = NULL; /* unregister callback */
+void (*pfn_timer)(void) = NULL;      /* timer callback */
+void (*pfn_unregister)(void) = NULL; /* unregister callback */
 #ifdef CPU_COLDFIRE
 static int base_prescale;
 #elif defined CPU_PP || CONFIG_CPU == PNX0101
@@ -123,9 +124,9 @@ static bool timer_set(long cycles, bool start)
     }
     else
         cycles_new = cycles;
-#endif
 
-#if CONFIG_CPU == SH7034
+    return true;
+#elif CONFIG_CPU == SH7034
     if (prescale > 8)
         return false;
 
@@ -150,6 +151,7 @@ static bool timer_set(long cycles, bool start)
         TCNT4 = 0;
     and_b(~0x01, &TSR4); /* clear an eventual interrupt */
 
+    return true;
 #elif defined CPU_COLDFIRE
     if (prescale > 4096/CPUFREQ_MAX_MULT)
         return false;
@@ -186,6 +188,8 @@ static bool timer_set(long cycles, bool start)
     if (start || (TCN1 >= TRR1))
         TCN1 = 0; /* reset the timer */
     TER1 = 0xff;  /* clear all events */
+
+    return true;
 #elif defined(CPU_PP)
     if (cycles > 0x20000000 || cycles < 2)
         return false;
@@ -203,11 +207,10 @@ static bool timer_set(long cycles, bool start)
     else
         cycles_new = cycles;
 
-#elif CONFIG_CPU == S3C2440  /* TODO: Implement for the Gigabeat */
-    (void)start;
-    (void)cycles;
-#endif /* CONFIG_CPU */
     return true;
+#elif CONFIG_CPU == S3C2440
+    return __TIMER_SET(cycles, start);
+#endif /* CONFIG_CPU */
 }
 
 #ifdef CPU_COLDFIRE
@@ -236,16 +239,9 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
     if (reg_prio <= timer_prio || cycles == 0)
         return false;
 
-#if defined(CPU_PP) || (CONFIG_CPU==PNX0101) || (CONFIG_CPU==S3C2440)
-    /* TODO: Implement for PortalPlayer and iFP (if possible) */
-    (void)int_prio;
-#endif
-
 #if CONFIG_CPU == SH7034
     if (int_prio < 1 || int_prio > 15)
         return false;
-#elif defined CPU_COLDFIRE
-    (void)int_prio;
 #endif
 
     if (!timer_set(cycles, true))
@@ -258,18 +254,31 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
 #if CONFIG_CPU == SH7034
     IPRD = (IPRD & 0xFF0F) | int_prio << 4;  /* interrupt priority */
     or_b(0x10, &TSTR); /* start timer 4 */
+    return true;
 #elif defined CPU_COLDFIRE
     ICR2 = 0x90;       /* interrupt on level 4.0 */
     and_l(~(1<<10), &IMR);
     TMR1 |= 1;         /* start timer */
+    return true;
 #elif defined(CPU_PP)
     /* unmask interrupt source */
     CPU_INT_EN = TIMER2_MASK;
+    return true;
 #elif CONFIG_CPU == PNX0101
     irq_set_int_handler(IRQ_TIMER1, TIMER1_ISR);
     irq_enable_int(IRQ_TIMER1);
-#endif
     return true;
+#elif CONFIG_CPU == S3C2440
+    return __TIMER_REGISTER(reg_prio, unregister_callback, cycles,
+                            int_prio, timer_callback);
+#endif
+    /* Cover for targets that don't use all these */
+    (void)reg_prio;
+    (void)unregister_callback;
+    (void)cycles;
+    /* TODO: Implement for PortalPlayer and iFP (if possible) */
+    (void)int_prio;
+    (void)timer_callback; 
 }
 
 bool timer_set_period(long cycles)
@@ -291,6 +300,8 @@ void timer_unregister(void)
 #elif CONFIG_CPU == PNX0101
     TIMER1.ctrl &= ~0x80;  /* disable timer 1 */
     irq_disable_int(5);
+#elif CONFIG_CPU == S3C2440
+    __TIMER_UNREGISTER();
 #endif
     pfn_timer = NULL;
     pfn_unregister = NULL;

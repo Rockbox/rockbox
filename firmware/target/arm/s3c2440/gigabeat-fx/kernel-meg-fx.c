@@ -1,13 +1,49 @@
+#include "config.h"
+#include "system.h"
 #include "kernel.h"
+#include "timer.h"
 #include "thread.h"
-
-#include <stdio.h>
-#include "lcd.h"
 
 extern void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
 
-void timer4(void) {
-	int i;
+void tick_start(unsigned int interval_in_ms)
+{
+    /*
+     * Based on default PCLK of 49.1568MHz - scaling chosen to give
+     * remainder-free result for tick interval of 10ms (100Hz)
+     * Timer input clock frequency =
+     *      fPCLK / {prescaler value+1} / {divider value}
+     * TIMER_FREQ = 49156800 / 2
+     * 13300 = TIMER_FREQ / 231 / 8
+     * 49156800 = 19*(11)*(7)*7*5*5*(3)*2*2*2*2*2*2
+     * 231 = 11*7*3
+     */
+
+    /* stop timer 4 */
+    TCON &= ~(1 << 20);
+    /* Set the count for timer 4 */
+    TCNTB4 = (TIMER_FREQ / 231 / 8) * interval_in_ms / 1000;
+    /* Set the the prescaler value for timers 2,3, and 4 */
+    TCFG0 = (TCFG0 & ~0xff00) | ((231-1) << 8);
+    /* MUX4 = 1/16 */
+    TCFG1 = (TCFG1 & ~0xff0000) | 0x030000;
+    /* set manual bit */
+    TCON |= 1 << 21;
+    /* reset manual bit */
+    TCON &= ~(1 << 21);
+    /* interval mode */
+    TCON |= 1 << 22;
+    /* start timer 4 */
+    TCON |= (1 << 20);
+
+    /* timer 4 unmask interrupts */
+    INTMSK &= ~TIMER4_MASK;
+}
+
+void TIMER4(void)
+{
+    int i;
+
     /* Run through the list of tick tasks */
     for(i = 0; i < MAX_NUM_TICK_TASKS; i++)
     {
@@ -19,7 +55,6 @@ void timer4(void) {
 
     current_tick++;
 
-    /* following needs to be fixed.  */
-    /*wake_up_thread();*/
+    SRCPND = TIMER4_MASK;
+    INTPND = TIMER4_MASK;
 }
-
