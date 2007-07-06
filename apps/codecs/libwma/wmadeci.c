@@ -1192,6 +1192,7 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
     return 0;
 }
 
+#if 0
 /* interpolate values for a bigger or smaller block. The block must
    have multiple sizes */
 static void interpolate_array(fixed32 *scale, int old_size, int new_size)
@@ -1227,7 +1228,7 @@ static void interpolate_array(fixed32 *scale, int old_size, int new_size)
         }
     }
 }
-
+#endif
 /* compute x^-0.25 with an exponent and mantissa table. We use linear
    interpolation to reduce the mantissa table size at a small speed
    expense (linear interpolation approximately doubles the number of
@@ -1397,7 +1398,7 @@ static int decode_exp_vlc(WMADecodeContext *s, int ch)
 static int wma_decode_block(WMADecodeContext *s)
 {
     int n, v, a, ch, code, bsize;
-    int coef_nb_bits, total_gain, parse_exponents;
+    int coef_nb_bits, total_gain;
     //static fixed32 window[BLOCK_MAX_SIZE * 2];        //crap can't do this locally on the device!  its big as the whole stack
     int nb_coefs[MAX_CHANNELS];
     fixed32 mdct_norm;
@@ -1564,15 +1565,8 @@ static int wma_decode_block(WMADecodeContext *s)
         }
     }
 
-    /* exposant can be interpolated in short blocks. */
-    parse_exponents = 1;
-    if (s->block_len_bits != s->frame_len_bits)
-    {
-        parse_exponents = get_bits(&s->gb, 1);
-    }
-
-    if (parse_exponents)
-    {
+ /* exponents can be reused in short blocks. */
+    if ((s->block_len_bits == s->frame_len_bits) || get_bits(&s->gb, 1)) {
 
         for(ch = 0; ch < s->nb_channels; ++ch)
         {
@@ -1589,24 +1583,11 @@ static int wma_decode_block(WMADecodeContext *s)
                 {
                     decode_exp_lsp(s, ch);
                 }
+                s->exponents_bsize[ch] = bsize;
             }
         }
     }
-    else
-    {
-        for(ch = 0; ch < s->nb_channels; ++ch)
-        {
-            if (s->channel_coded[ch])
-            {
-                interpolate_array(s->exponents[ch],
-                                  1 << s->prev_block_len_bits,
-                                  s->block_len);
-            }
-        }
-    }
-//ok up to here!
-//printf("got here!\n");
-//rb->splash(HZ, "in wma_decode_block 2");
+
     /* parse spectral coefficients : just RLE encoding */
     for(ch = 0; ch < s->nb_channels; ++ch)
     {
@@ -1693,8 +1674,6 @@ static int wma_decode_block(WMADecodeContext *s)
     }
 
 
-
-//rb->splash(HZ, "in wma_decode_block 3");
     /* finally compute the MDCT coefficients */
     for(ch = 0; ch < s->nb_channels; ++ch)
     {
@@ -1706,15 +1685,14 @@ static int wma_decode_block(WMADecodeContext *s)
             fixed64 mult;
             fixed64 mult1;
             fixed32 noise;
-            int i, j, n, n1, last_high_band;
-           fixed32 exp_power[HIGH_BAND_MAX_SIZE];
+            int i, j, n, n1, last_high_band, esize;
+            fixed32 exp_power[HIGH_BAND_MAX_SIZE];
 
-            //double test, mul;
-
-    //total_gain, coefs1, mdctnorm are lossless
+            //total_gain, coefs1, mdctnorm are lossless
 
             coefs1 = s->coefs1[ch];
             exponents = s->exponents[ch];
+            esize = s->exponents_bsize[ch];
             mult = fixdiv64(pow_table[total_gain],Fixed32To64(s->max_exponent[ch]));
          //   mul = fixtof64(pow_table[total_gain])/(s->block_len/2)/fixtof64(s->max_exponent[ch]);
 
@@ -1829,13 +1807,14 @@ static int wma_decode_block(WMADecodeContext *s)
 
                 atemp = (fixed32)(coefs1[i]*mult>>16);
                  //atemp= ftofix32(coefs1[i] * fixtof64(exponents[i]) * fixtof64(mult>>16));    //this "works" in the sense that the mdcts converge
-                *coefs++=fixmul32(atemp,exponents[i]);  //this does not work
+
+                //this can still overflow in rare cases
+                //running a full scale value square wave through here does bad things
+
+                *coefs++=fixmul32(atemp,exponents[i<<bsize>>esize]);
 
 
-                //atemp = ftofix32( coefs1[i]*mul* fixtof64(exponents[i]) );    //this doesn't seem to help any at all.
-//                *coefs++=atemp;
-
-               }                                                    //coefs1 could underflow?
+               }
                 n = s->block_len - s->coefs_end[bsize];
                 for(i = 0;i < n; ++i)
                     *coefs++ = 0;

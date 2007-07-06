@@ -124,6 +124,7 @@ typedef struct WMADecodeContext
     int block_pos; /* current position in frame */
     uint8_t ms_stereo; /* true if mid/side stereo mode */
     uint8_t channel_coded[MAX_CHANNELS]; /* true if channel is coded */
+    int exponents_bsize[MAX_CHANNELS];      // log2 ratio frame/exp. length
     fixed32 exponents[MAX_CHANNELS][BLOCK_MAX_SIZE];
     fixed32 max_exponent[MAX_CHANNELS];
     int16_t coefs1[MAX_CHANNELS][BLOCK_MAX_SIZE];
