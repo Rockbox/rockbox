@@ -728,8 +728,9 @@ void wps_state_update_id3_nid3(struct mp3entry *id3, struct mp3entry *nid3)
 
 static void wps_state_update_ctp(const char *path)
 {
-    memcpy(wps_state.current_track_path, path,
+    strncpy(wps_state.current_track_path, path,
            sizeof(wps_state.current_track_path));
+    wps_state.current_track_path[sizeof(wps_state.current_track_path)-1] = '\0';
 }
 /* wps_state end*/
 

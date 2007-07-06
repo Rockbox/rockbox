@@ -378,7 +378,7 @@ struct wps_state
     bool wps_time_countup;
     struct mp3entry* id3;
     struct mp3entry* nid3;
-    char current_track_path[MAX_PATH+1];
+    char current_track_path[MAX_PATH];
 };
 
 

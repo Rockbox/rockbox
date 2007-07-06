@@ -398,8 +398,11 @@ bool update(struct gui_wps *gwps)
         }
 
         if (gwps->state->id3)
-            memcpy(gwps->state->current_track_path, gwps->state->id3->path,
+        {
+            strncpy(gwps->state->current_track_path, gwps->state->id3->path,
                    sizeof(gwps->state->current_track_path));
+            gwps->state->current_track_path[sizeof(gwps->state->current_track_path)-1] = '\0';
+        }
     }
 
     if (gwps->state->id3)
