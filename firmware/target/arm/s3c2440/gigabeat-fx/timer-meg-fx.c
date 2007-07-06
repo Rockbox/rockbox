@@ -53,8 +53,9 @@ bool __timer_set(long cycles, bool start)
     /* Find the minimum factor that puts the counter in range 1-65535 */
     unsigned int prescaler = (cycles + 65534) / 65535;
 
-    /* Maximum divider setting is x / 256 / 16 = x / 4096 */
-    if (prescaler <= 4096)
+    /* Maximum divider setting is x / 256 / 16 = x / 4096 - min divider
+       is x / 2 however */
+    if (prescaler <= 2048)
     {
         int oldlevel;
         unsigned int divider;
