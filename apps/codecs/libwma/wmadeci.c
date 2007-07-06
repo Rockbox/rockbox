@@ -33,7 +33,7 @@ static inline
 void CMUL(fixed32 *x, fixed32 *y,
           fixed32  a, fixed32  b,
           fixed32  t, fixed32  v)
-{   
+{
     /* This version loses one bit of precision. Could be solved at the cost
      * of 2 extra cycles if it becomes an issue. */
     int x1, y1, l;
@@ -684,6 +684,78 @@ void ff_mdct_end(MDCTContext *s)
    // fft_end(&s->fft);
 }
 
+/*
+ * Helper functions for wma_window.
+ * TODO:  Optimize these to work with 1.31 format trig functions
+ *        as was done for the MDCT rotation code
+ */
+
+static void vector_fmul_add_add(fixed32 *dst, const fixed32 *src0, const fixed32 *src1, const fixed32 *src2, int src3, int len, int step){
+    int i;
+    for(i=0; i<len; i++)
+        dst[i*step] = fixmul32(src0[i], src1[i]) + src2[i] + src3;
+}
+
+static void vector_fmul_reverse(fixed32 *dst, const fixed32 *src0, const fixed32 *src1, int len){
+    int i;
+    src1 += len-1;
+    for(i=0; i<len; i++)
+        dst[i] = fixmul32(src0[i], src1[-i]);
+}
+
+/**
+  * Apply MDCT window and add into output.
+  *
+  * We ensure that when the windows overlap their squared sum
+  * is always 1 (MDCT reconstruction rule).
+  */
+ static void wma_window(WMADecodeContext *s, fixed32 *in, fixed32 *out)
+ {
+     //float *in = s->output;
+     int block_len, bsize, n;
+
+     /* left part */
+     if (s->block_len_bits <= s->prev_block_len_bits) {
+         block_len = s->block_len;
+         bsize = s->frame_len_bits - s->block_len_bits;
+
+         vector_fmul_add_add(out, in, s->windows[bsize],
+                                    out, 0, block_len, 1);
+
+     } else {
+         block_len = 1 << s->prev_block_len_bits;
+         n = (s->block_len - block_len) / 2;
+         bsize = s->frame_len_bits - s->prev_block_len_bits;
+
+         vector_fmul_add_add(out+n, in+n, s->windows[bsize],
+                                    out+n, 0, block_len, 1);
+
+         memcpy(out+n+block_len, in+n+block_len, n*sizeof(fixed32));
+     }
+
+     out += s->block_len;
+     in += s->block_len;
+
+     /* right part */
+     if (s->block_len_bits <= s->next_block_len_bits) {
+         block_len = s->block_len;
+         bsize = s->frame_len_bits - s->block_len_bits;
+
+         vector_fmul_reverse(out, in, s->windows[bsize], block_len);
+
+     } else {
+         block_len = 1 << s->next_block_len_bits;
+         n = (s->block_len - block_len) / 2;
+         bsize = s->frame_len_bits - s->next_block_len_bits;
+
+         memcpy(out, in, n*sizeof(fixed32));
+
+         vector_fmul_reverse(out+n, in+n, s->windows[bsize], block_len);
+
+         memset(out+n+block_len, 0, n*sizeof(fixed32));
+     }
+ }
+
 
 
 
@@ -1041,7 +1113,7 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
         for(j=0;j<n;++j)
         {
             fixed32 j2 = itofix32(j) + 0x8000;
-            window[n - j - 1] = fixsin32(fixmul32(j2,alpha));        //alpha between 0 and pi/2
+            window[j] = fixsin32(fixmul32(j2,alpha));        //alpha between 0 and pi/2
 
         }
         //printf("created window\n");
@@ -1326,11 +1398,9 @@ static int wma_decode_block(WMADecodeContext *s)
 {
     int n, v, a, ch, code, bsize;
     int coef_nb_bits, total_gain, parse_exponents;
-    static fixed32 window[BLOCK_MAX_SIZE * 2];        //crap can't do this locally on the device!  its big as the whole stack
+    //static fixed32 window[BLOCK_MAX_SIZE * 2];        //crap can't do this locally on the device!  its big as the whole stack
     int nb_coefs[MAX_CHANNELS];
     fixed32 mdct_norm;
-//int filehandle = rb->open("/mul.txt", O_WRONLY|O_CREAT|O_APPEND);
-//    rb->fdprintf(filehandle,"\nIn wma_decode_block:\n use_variable_block_len %d\n nb_block_sizes %d\n reset_block_lengths %d\n", s->use_variable_block_len, s->nb_block_sizes, s->reset_block_lengths );
 
 //    printf("***decode_block: %d:%d (%d)\n", s->frame_count - 1, s->block_num, s->block_len);
     /* compute current block length */
@@ -1774,7 +1844,7 @@ static int wma_decode_block(WMADecodeContext *s)
     }
 
 
-//rb->splash(HZ, "in wma_decode_block 3b");
+
     if (s->ms_stereo && s->channel_coded[1])
     {
         fixed32 a, b;
@@ -1797,115 +1867,36 @@ static int wma_decode_block(WMADecodeContext *s)
             s->coefs[1][i] = a - b;
         }
     }
-//rb->splash(HZ, "in wma_decode_block 3c");
-    /* build the window : we ensure that when the windows overlap
-       their squared sum is always 1 (MDCT reconstruction rule) */
-    /* XXX: merge with output */
-    {
-        int i, next_block_len, block_len, prev_block_len, n;
-        fixed32 *wptr;
-
-        block_len = s->block_len;
-        prev_block_len = 1 << s->prev_block_len_bits;
-        next_block_len = 1 << s->next_block_len_bits;
-    //rb->splash(HZ, "in wma_decode_block 3d");        //got here
-        /* right part */
-        wptr = window + block_len;
-        if (block_len <= next_block_len)
-        {
-            for(i=0;i<block_len;++i)
-                *wptr++ = s->windows[bsize][i];
-        }
-        else
-        {
-            /* overlap */
-            n = (block_len / 2) - (next_block_len / 2);
-            for(i=0;i<n;++i)
-                *wptr++ = itofix32(1);
-            for(i=0;i<next_block_len;++i)
-                *wptr++ = s->windows[s->frame_len_bits - s->next_block_len_bits][i];
-            for(i=0;i<n;++i)
-                *wptr++ = 0;
-        }
-//rb->splash(HZ, "in wma_decode_block 3e");
-        /* left part */
-        wptr = window + block_len;
-        if (block_len <= prev_block_len)
-        {
-            for(i=0;i<block_len;++i)
-                *--wptr = s->windows[bsize][i];
-        }
-        else
-        {
-            /* overlap */
-            n = (block_len / 2) - (prev_block_len / 2);
-            for(i=0;i<n;++i)
-                *--wptr = itofix32(1);
-            for(i=0;i<prev_block_len;++i)
-                *--wptr = s->windows[s->frame_len_bits - s->prev_block_len_bits][i];
-            for(i=0;i<n;++i)
-                *--wptr = 0;
-        }
-    }
-
 
     for(ch = 0; ch < s->nb_channels; ++ch)
     {
         if (s->channel_coded[ch])
         {
-            static fixed32 output[BLOCK_MAX_SIZE * 2];
-            fixed32 *ptr;
-            int i, n4, index, n;
+            static fixed32  output[BLOCK_MAX_SIZE * 2];
+
+            int n4, index, n;
 
             n = s->block_len;
             n4 = s->block_len >>1;
-        //rb->splash(HZ, "in wma_decode_block 4");
+
             ff_imdct_calc(&s->mdct_ctx[bsize],
                           output,
                           s->coefs[ch],
                           s->mdct_tmp);
 
-            /* XXX: optimize all that by build the window and
-               multipying/adding at the same time */
-            /* multiply by the window */
-//already broken here!
-
-
-
-
-
-            for(i=0;i<n * 2;++i)
-            {
-
-                output[i] = fixmul32(output[i], window[i]);
-                //output[i] *= window[i];
-
-            }
-
 
             /* add in the frame */
             index = (s->frame_len / 2) + s->block_pos - n4;
-            ptr = &s->frame_out[ch][index];
 
-            for(i=0;i<n * 2;++i)
-            {
-                *ptr += output[i];
-                ++ptr;
+		wma_window(s, output, &s->frame_out[ch][index]);
 
-
-            }
 
 
             /* specific fast case for ms-stereo : add to second
                channel if it is not coded */
             if (s->ms_stereo && !s->channel_coded[1])
             {
-                ptr = &s->frame_out[1][index];
-                for(i=0;i<n * 2;++i)
-                {
-                    *ptr += output[i];
-                    ++ptr;
-                }
+                wma_window(s, output, &s->frame_out[1][index]);
             }
         }
     }
@@ -1981,9 +1972,7 @@ static int wma_decode_frame(WMADecodeContext *s, int16_t *samples)
         /* prepare for next block */
         memmove(&s->frame_out[ch][0], &s->frame_out[ch][s->frame_len],
                 s->frame_len * sizeof(fixed32));
-        /* XXX: suppress this */
-        memset(&s->frame_out[ch][s->frame_len], 0,
-               s->frame_len * sizeof(fixed32));
+
     }
 
     return 0;
