@@ -409,9 +409,11 @@ static bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
 static int perfcheck(void)
 {
     int result;
-    int old_level = set_irq_level(HIGHEST_IRQ_LEVEL);
 
     asm (
+        "mrs     r2, CPSR            \n"
+        "orr     r0, r2, #0xc0       \n" /* disable IRQ and FIQ */
+        "msr     CPSR_c, r0          \n"
         "mov     %[res], #0          \n"
         "ldr     r0, [%[timr]]       \n"
         "add     r0, r0, %[tmo]      \n"
@@ -420,15 +422,15 @@ static int perfcheck(void)
         "ldr     r1, [%[timr]]       \n"
         "cmp     r1, r0              \n"
         "bmi     1b                  \n"
+        "msr     CPSR_c, r2          \n" /* reset IRQ and FIQ state */
         :
         [res]"=&r"(result)
         :
         [timr]"r"(&USEC_TIMER),
         [tmo]"r"(10226)
         :
-        "r0", "r1"
+        "r0", "r1", "r2"
     );
-    set_irq_level(old_level);
     return result;
 }
 #endif
