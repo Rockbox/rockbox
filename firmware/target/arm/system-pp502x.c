@@ -175,7 +175,7 @@ void set_cpu_frequency(long frequency)
     outl((inl(0x60006020) & 0x0ffffff0) | 0x10000002, 0x60006020);
     
     outl(unknown2 & 0x3fffffff, 0x600060a0);
-    
+
     unknown1 = (138 * postmult + 255) >> 8;
     if (unknown1 > 15)
         unknown1 = 15;
@@ -189,9 +189,10 @@ void set_cpu_frequency(long frequency)
     outl(pll_control, 0x60006034);
     udelay(500);                  /* wait for relock */
 # else /* PP5022, PP5024 */
+    udelay(250);
     while (!(inl(0x6000603c) & 0x80000000)); /* wait for relock */
 # endif
-    
+
     /* Select PLL as clock source? */
     outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);
     
