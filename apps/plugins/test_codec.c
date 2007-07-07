@@ -618,6 +618,7 @@ static enum plugin_status test_track(char* filename)
 
     /* Write an empty line to the log */
     log_text("",true);
+    rb->backlight_on();
 
 exit:
     return res;
