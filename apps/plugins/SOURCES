@@ -18,6 +18,7 @@ stats.c
 stopwatch.c
 vbrfix.c
 viewer.c
+test_codec.c
 
 /* plugins built for all targets, but not for the simulator */
 #if !defined(SIMULATOR)

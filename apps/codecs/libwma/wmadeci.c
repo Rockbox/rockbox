@@ -630,16 +630,7 @@ void ff_imdct_calc(MDCTContext *s,
         in2 -= 2;
     }
 
-    for(k = 0; k < n4; k++){
-        z[k].re >>=1;
-        z[k].im >>=1;
-    }
-
-    //rb->splash(HZ, "in MDCT calc");
         scale = fft_calc_unscaled(&s->fft, z);
-       //    scale = fft_calc(&s->fft, z);
-
-    //rb->splash(HZ, "in MDCT calc2");
 
     /* post rotation + reordering */
 
@@ -1764,8 +1755,7 @@ static int wma_decode_block(WMADecodeContext *s)
             {
 
                 /* XXX: optimize more */
-                for(i = 0;i < s->coefs_start; ++i)
-                    *coefs++ = 0;            //why do we do this step?!
+
                 n = nb_coefs[ch];
 
 
@@ -1773,15 +1763,17 @@ static int wma_decode_block(WMADecodeContext *s)
 
                 for(i = 0;i < n; ++i)
                 {
+	/*
+	*  Previously the IMDCT was run in 17.15 precision to avoid overflow. However rare files could
+	*  overflow here as well, so switch to 17.15 now.  As a bonus, this saves us a shift later on.
+	*/
 
-                atemp = (fixed32)(coefs1[i]*mult>>16);
-                 //atemp= ftofix32(coefs1[i] * fixtof64(exponents[i]) * fixtof64(mult>>16));    //this "works" in the sense that the mdcts converge
 
-                //this can still overflow in rare cases
-                //running a full scale value square wave through here does bad things
+                  atemp = (fixed32)(coefs1[i]*mult>>17);
+                //this "works" in the sense that the mdcts converge
+                 //atemp= ftofix32(coefs1[i] * fixtof64(exponents[i]) * fixtof64(mult>>16));
 
-                *coefs++=fixmul32(atemp,exponents[i<<bsize>>esize]);
-
+                  *coefs++=fixmul32(atemp,exponents[i<<bsize>>esize]);
 
                }
                 n = s->block_len - s->coefs_end[bsize];
