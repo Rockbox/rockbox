@@ -61,6 +61,21 @@ long fsincos(unsigned long phase, fixed32 *cos);
        __result;  \
     })
 
+
+ #define fixmul32b(x, y)  \
+    ({ int32_t __hi;  \
+       uint32_t __lo;  \
+       int32_t __result;  \
+       asm ("smull   %0, %1, %3, %4\n\t"  \
+            "movs    %0, %0, lsr %5\n\t"  \
+            "adc    %2, %0, %1, lsl %6"  \
+            : "=&r" (__lo), "=&r" (__hi), "=r" (__result)  \
+            : "%r" (x), "r" (y),  \
+              "M" (31), "M" (32 - 31)  \
+            : "cc");  \
+       __result;  \
+    })
+
 #elif defined(CPU_COLDFIRE)
 static inline int32_t fixmul32(int32_t x, int32_t y)
 {

@@ -275,7 +275,7 @@ long fsincos(unsigned long phase, fixed32 *cos)
 
 */
 
-#if 0
+
 fixed32 fixsin32(fixed32 x)
 {
 
@@ -326,4 +326,4 @@ fixed32 fixcos32(fixed32 x)
 {
     return fixsin32(x - (M_PI_F>>1))*-1;
 }
-#endif
+

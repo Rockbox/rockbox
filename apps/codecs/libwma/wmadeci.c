@@ -696,14 +696,14 @@ void ff_mdct_end(MDCTContext *s)
 static void vector_fmul_add_add(fixed32 *dst, const fixed32 *src0, const fixed32 *src1, const fixed32 *src2, int src3, int len, int step){
     int i;
     for(i=0; i<len; i++)
-        dst[i*step] = fixmul32(src0[i], src1[i]) + src2[i] + src3;
+        dst[i*step] = fixmul32b(src0[i], src1[i]) + src2[i] + src3;
 }
 
 static void vector_fmul_reverse(fixed32 *dst, const fixed32 *src0, const fixed32 *src1, int len){
     int i;
     src1 += len-1;
     for(i=0; i<len; i++)
-        dst[i] = fixmul32(src0[i], src1[-i]);
+        dst[i] = fixmul32b(src0[i], src1[-i]);
 }
 
 /**
