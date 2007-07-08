@@ -15,6 +15,12 @@ volatile bool lcd_poweroff = false;
 extern unsigned fg_pattern;
 extern unsigned bg_pattern;
 
+/* Copies a rectangle from one framebuffer to another. Can be used in
+   single transfer mode with width = num pixels, and height = 1 which
+   allows a full-width rectangle to be copied more efficiently. */
+extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
+                                 int width, int height);
+
 bool lcd_enabled()
 {
     return lcd_on;
@@ -35,7 +41,6 @@ unsigned int LCDBASEL(unsigned int address)
     address += 320*240*2;
     return (address & ((1 << 22)-1)) >> 1;
 }
-
 
 /* LCD init */
 void lcd_init_device(void)
@@ -122,17 +127,41 @@ void lcd_init_device(void)
 /* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    (void)x;
-    (void)width;
-    (void)y;
-    (void)height;
+    fb_data *dst, *src;
 
-    if(!lcd_on)
-    {
-        sleep(200);
+    if (!lcd_on)
         return;
+
+    if (x + width > LCD_WIDTH)
+        width = LCD_WIDTH - x; /* Clip right */
+    if (x < 0)
+        width += x, x = 0; /* Clip left */
+    if (width <= 0)
+        return; /* nothing left to do */
+
+    if (y + height > LCD_HEIGHT)
+        height = LCD_HEIGHT - y; /* Clip bottom */
+    if (y < 0)
+        height += y, y = 0; /* Clip top */
+    if (height <= 0)
+        return; /* nothing left to do */
+
+    /* TODO: It may be faster to swap the addresses of lcd_driver_framebuffer
+     * and lcd_framebuffer */
+    dst = (fb_data *)FRAME + LCD_WIDTH*y + x;
+    src = &lcd_framebuffer[y][x];
+
+    /* Copy part of the Rockbox framebuffer to the second framebuffer */
+    if (width < LCD_WIDTH)
+    {
+        /* Not full width - do line-by-line */
+        lcd_copy_buffer_rect(dst, src, width, height);
     }
-    memcpy(((char*)FRAME) + (y * sizeof(fb_data) * LCD_WIDTH), ((char *)&lcd_framebuffer) + (y * sizeof(fb_data) * LCD_WIDTH), ((height * sizeof(fb_data) * LCD_WIDTH)));
+    else
+    {
+        /* Full width - copy as one line */
+        lcd_copy_buffer_rect(dst, src, LCD_WIDTH*height, 1);
+    }
 }
 
 void lcd_enable(bool state)
@@ -144,7 +173,7 @@ void lcd_enable(bool state)
         if(!lcd_on)
         {
             lcd_on = true;
-            memcpy(FRAME, lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT*2);
+            lcd_update();
             LCDCON1 |= 1;
         }
     }
@@ -161,7 +190,11 @@ void lcd_enable(bool state)
    This must be called after all other LCD functions that change the display. */
 void lcd_update(void)
 {
-    lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
+    if (!lcd_on)
+        return;
+
+    lcd_copy_buffer_rect((fb_data *)FRAME, &lcd_framebuffer[0][0],
+                         LCD_WIDTH*LCD_HEIGHT, 1);
 }
 
 void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
@@ -171,28 +204,19 @@ void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
     fb_data *dst, *dst_end;
     unsigned int transcolor;
 
-    /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
-        || (x + width <= 0) || (y + height <= 0))
-        return;
-
-    /* clipping */
-    if (x < 0)
-    {
-        width += x;
-        src_x -= x;
-        x = 0;
-    }
-    if (y < 0)
-    {
-        height += y;
-        src_y -= y;
-        y = 0;
-    }
     if (x + width > LCD_WIDTH)
-        width = LCD_WIDTH - x;
+        width = LCD_WIDTH - x; /* Clip right */
+    if (x < 0)
+        width += x, x = 0; /* Clip left */
+    if (width <= 0)
+        return; /* nothing left to do */
+
     if (y + height > LCD_HEIGHT)
-        height = LCD_HEIGHT - y;
+        height = LCD_HEIGHT - y; /* Clip bottom */
+    if (y < 0)
+        height += y, y = 0; /* Clip top */
+    if (height <= 0)
+        return; /* nothing left to do */
 
     src += stride * src_y + src_x; /* move starting point */
     dst = &lcd_framebuffer[(y)][(x)];
