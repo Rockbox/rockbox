@@ -173,7 +173,8 @@ int mmc_remove_request(void)
 }
 #endif
 
-#if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING)
+/* the charging screen is only used for archos targets */
+#if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING) && defined(CPU_SH)
 
 #ifdef HAVE_LCD_BITMAP
 static void charging_display_info(bool animate)
@@ -367,7 +368,7 @@ int charging_screen(void)
     action_signalscreenchange();
     return rc;
 }
-#endif /* CONFIG_CHARGING && !HAVE_POWEROFF_WHILE_CHARGING */
+#endif /* CONFIG_CHARGING && !HAVE_POWEROFF_WHILE_CHARGING && defined(CPU_SH) */
 
 #ifdef HAVE_PITCHSCREEN
 
@@ -867,7 +868,7 @@ bool set_time_screen(const char* title, struct tm *tm)
     unsigned int julianday;
     unsigned int realyear;
     unsigned int min = 0, steps = 0;
-    unsigned int statusbar_height;
+    unsigned int statusbar_height = 0;
     unsigned int width, height;
     unsigned int separator_width, weekday_width;
     unsigned int line_height, prev_line_height;
@@ -892,8 +893,6 @@ bool set_time_screen(const char* title, struct tm *tm)
 
     if(global_settings.statusbar)
         statusbar_height = STATUSBAR_HEIGHT;
-    else
-        statusbar_height = 0;
 
     while ( !done ) {
         /* calculate the number of days in febuary */
@@ -1009,9 +1008,8 @@ bool set_time_screen(const char* title, struct tm *tm)
         lcd_puts(0, 4, str(LANG_TIME_SET));
         lcd_puts(0, 5, str(LANG_TIME_REVERT));
 
-#ifdef HAVE_LCD_BITMAP
         gui_syncstatusbar_draw(&statusbars, true);
-#endif
+
         lcd_update();
 
         /* calculate the minimum and maximum for the number under cursor */

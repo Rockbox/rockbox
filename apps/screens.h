@@ -24,10 +24,13 @@
 
 struct screen;
 
-void usb_display_info(struct screen * display);
 void usb_screen(void);
+#if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING) && defined(CPU_SH)
 int charging_screen(void);
+#endif
+#if CONFIG_CHARGING || defined(SIMULATOR)
 void charging_splash(void);
+#endif
 
 #ifdef HAVE_MMC
 int mmc_remove_request(void);
