@@ -1292,6 +1292,7 @@ static bool jewels_loadgame(struct game_context* bj) {
     while(true) {
         if(rb->read(fd, &bj->score, sizeof(bj->score)) <= 0) break;
         if(rb->read(fd, &bj->level, sizeof(bj->level)) <= 0) break;
+        if(rb->read(fd, &bj->type, sizeof(bj->type)) <= 0) break;
         if(rb->read(fd, bj->playboard, sizeof(bj->playboard)) <= 0) break;
         bj->resume = true;
         loaded = true;
@@ -1315,6 +1316,7 @@ static void jewels_savegame(struct game_context* bj) {
     fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT);
     rb->write(fd, &bj->score, sizeof(bj->score));
     rb->write(fd, &bj->level, sizeof(bj->level));
+    rb->write(fd, &bj->type, sizeof(bj->type));
     rb->write(fd, bj->playboard, sizeof(bj->playboard));
     rb->close(fd);
 
