@@ -118,7 +118,7 @@ FFTComplex *exparray[5];                                    //these are the fft 
 uint16_t *revarray[5];
 
 FFTComplex  exptab0[512] IBSS_ATTR;//, exptab1[256], exptab2[128], exptab3[64], exptab4[32];    //folded these in!
-uint16_t revtab0[1024], revtab1[512], revtab2[256], revtab3[128], revtab4[64];
+uint16_t revtab0[1024];//, revtab1[512], revtab2[256], revtab3[128], revtab4[64];
 
 uint16_t *runtabarray[2], *levtabarray[2];                                        //these are VLC lookup tables
 
@@ -142,7 +142,7 @@ static VLC_TYPE vlcbuf3[1536][2] IBSS_ATTR;    //small so lets try iram
  */
 int fft_inits(FFTContext *s, int nbits, int inverse)
 {
-    int i, j, m, n;
+    int i, n;
     fixed32 c1, s1;
     int s2;
 
@@ -153,7 +153,9 @@ int fft_inits(FFTContext *s, int nbits, int inverse)
     //s->exptab = av_malloc((n >> 1) * sizeof(FFTComplex));
     //if (!s->exptab)
     //    goto fail;
-    s->revtab = revarray[10-nbits];
+
+    //s->revtab = revarray[10-nbits];
+
     //s->revtab = av_malloc(n * sizeof(uint16_t));
     //if (!s->revtab)
     //    goto fail;
@@ -196,7 +198,7 @@ int fft_inits(FFTContext *s, int nbits, int inverse)
 
 
     /* compute bit reverse table */
-
+/*
     for(i=0;i<n;i++)
     {
         m=0;
@@ -207,7 +209,7 @@ int fft_inits(FFTContext *s, int nbits, int inverse)
         }
 
         s->revtab[i]=m;
-    }
+    } */
     return 0;
 //fail:
  //   av_freep(&s->revtab);
@@ -586,6 +588,7 @@ int ff_mdct_init(MDCTContext *s, int nbits, int inverse)
   }
     if (fft_inits(&s->fft, s->nbits - 2, inverse) < 0)
         goto fail;
+
     return 0;
 fail:
 //    av_freep(&s->tcos);
@@ -605,11 +608,11 @@ void ff_imdct_calc(MDCTContext *s,
                    FFTComplex *tmp)
 {
     int k, n8, n4, n2, n, j,scale;
-    const uint16_t *revtab = s->fft.revtab;
     const fixed32 *tcos = s->tcos;
     const fixed32 *tsin = s->tsin;
     const fixed32 *in1, *in2;
     FFTComplex *z = (FFTComplex *)tmp;
+    int revtabshift = 12 - s->nbits;
 
     n = 1 << s->nbits;
 
@@ -624,7 +627,7 @@ void ff_imdct_calc(MDCTContext *s,
 
     for(k = 0; k < n4; k++)
     {
-        j=revtab[k];
+        j=revtab0[k<<revtabshift];
         CMUL(&z[j].re, &z[j].im, *in2, *in1, tcos[k], tsin[k]);
         in1 += 2;
         in2 -= 2;
@@ -680,14 +683,14 @@ void ff_mdct_end(MDCTContext *s)
 
 /*
  * Helper functions for wma_window.
- * TODO:  Optimize these to work with 1.31 format trig functions
- *        as was done for the MDCT rotation code
+ *
+ *
  */
 
-static void vector_fmul_add_add(fixed32 *dst, const fixed32 *src0, const fixed32 *src1, const fixed32 *src2, int src3, int len, int step){
+static void vector_fmul_add_add(fixed32 *dst, const fixed32 *src0, const fixed32 *src1, int len){
     int i;
     for(i=0; i<len; i++)
-        dst[i*step] = fixmul32b(src0[i], src1[i]) + src2[i] + src3;
+        dst[i] = fixmul32b(src0[i], src1[i]) + dst[i];
 }
 
 static void vector_fmul_reverse(fixed32 *dst, const fixed32 *src0, const fixed32 *src1, int len){
@@ -713,16 +716,14 @@ static void vector_fmul_reverse(fixed32 *dst, const fixed32 *src0, const fixed32
          block_len = s->block_len;
          bsize = s->frame_len_bits - s->block_len_bits;
 
-         vector_fmul_add_add(out, in, s->windows[bsize],
-                                    out, 0, block_len, 1);
+         vector_fmul_add_add(out, in, s->windows[bsize], block_len);
 
      } else {
          block_len = 1 << s->prev_block_len_bits;
          n = (s->block_len - block_len) / 2;
          bsize = s->frame_len_bits - s->prev_block_len_bits;
 
-         vector_fmul_add_add(out+n, in+n, s->windows[bsize],
-                                    out+n, 0, block_len, 1);
+         vector_fmul_add_add(out+n, in+n, s->windows[bsize],  block_len);
 
          memcpy(out+n+block_len, in+n+block_len, n*sizeof(fixed32));
      }
@@ -795,7 +796,7 @@ static void init_coef_vlc(VLC *vlc,
 int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
 {
     //WMADecodeContext *s = avctx->priv_data;
-    int i, flags1, flags2;
+    int i, m, j, flags1, flags2;
     fixed32 *window;
     uint8_t *extradata;
     fixed64 bps1;
@@ -1068,17 +1069,32 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
     }
 
     /* init MDCT */
+    /*TODO:  figure out how to fold this up into one array*/
     tcosarray[0] = tcos0; tcosarray[1] = tcos1; tcosarray[2] = tcos2; tcosarray[3] = tcos3;tcosarray[4] = tcos4;
     tsinarray[0] = tsin0; tsinarray[1] = tsin1; tsinarray[2] = tsin2; tsinarray[3] = tsin3;tsinarray[4] = tsin4;
 
+	/*these are folded up now*/
     exparray[0] = exptab0; //exparray[1] = exptab1; exparray[2] = exptab2; exparray[3] = exptab3; exparray[4] = exptab4;
-    revarray[0]=revtab0; revarray[1]=revtab1; revarray[2]=revtab2; revarray[3]=revtab3; revarray[4]=revtab4;
+    revarray[0]=revtab0; //revarray[1]=revtab1; revarray[2]=revtab2; revarray[3]=revtab3; revarray[4]=revtab4;
 
 	s->mdct_tmp = mdct_tmp; /* temporary storage for imdct */
     for(i = 0; i < s->nb_block_sizes; ++i)
     {
         ff_mdct_init(&s->mdct_ctx[i], s->frame_len_bits - i + 1, 1);
     }
+
+    /* init the MDCT bit reverse table here rather then in fft_init */
+
+	for(i=0;i<1024;i++)		/*hard coded to a 2048 bit rotation*/
+	{					/*smaller sizes can reuse the largest*/
+		 m=0;
+		 for(j=0;j<10;j++)
+		 {
+		     m |= ((i >> j) & 1) << (10-j-1);
+		 }
+
+	 revtab0[i]=m;
+       }
 
     /*ffmpeg uses malloc to only allocate as many window sizes as needed.  However, we're really only interested in the worst case memory usage.
     * In the worst case you can have 5 window sizes, 128 doubling up 2048
