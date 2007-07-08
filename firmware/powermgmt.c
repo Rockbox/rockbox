@@ -1290,12 +1290,12 @@ void shutdown_hw(void)
     while(ata_disk_is_active())
         sleep(HZ/10);
 
-#ifndef IAUDIO_X5
+#if !defined (IAUDIO_X5) && !defined (SANSA_E200)
 #if defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)
     backlight_set_fade_out(0);
 #endif
     backlight_off();
-#endif /* IAUDIO_X5 */
+#endif /* IAUDIO_X5, SANSA_E200 */
 #ifdef HAVE_REMOTE_LCD
     remote_backlight_off();
 #endif

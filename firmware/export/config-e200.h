@@ -33,10 +33,20 @@
 /* define this if you have LCD enable function */
 #define HAVE_LCD_ENABLE
 
+/* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
+   should be defined as well. */
+#define HAVE_LCD_SLEEP
+
 #ifndef SIMULATOR
 #define HAVE_HOTSWAP
 #define HAVE_MULTIVOLUME
 #endif
+
+/* define this if you can invert the colours on your LCD */
+#define HAVE_LCD_INVERT
+
+/* define this if you can flip your LCD */
+#define HAVE_LCD_FLIP
 
 #define HAVE_BACKLIGHT_BRIGHTNESS
 /* Main LCD backlight brightness range and defaults */

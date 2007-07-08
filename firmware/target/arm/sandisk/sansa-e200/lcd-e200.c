@@ -26,6 +26,20 @@
 #include "backlight-target.h"
 #include "pp5024.h"
 
+/* Power and display status */
+static bool power_on   = false; /* Is the power turned on?   */
+static bool display_on NOCACHEBSS_ATTR = false; /* Is the display turned on? */
+
+/* Reverse Flag */
+#define R_DISP_CONTROL_NORMAL 0x0004
+#define R_DISP_CONTROL_REV    0x0000
+static unsigned short r_disp_control_rev = R_DISP_CONTROL_NORMAL;
+
+/* Flipping */
+#define R_DRV_OUTPUT_CONTROL_NORMAL  0x101b
+#define R_DRV_OUTPUT_CONTROL_FLIPPED 0x131b
+static unsigned short r_drv_output_control  = R_DRV_OUTPUT_CONTROL_NORMAL;
+
 #define LCD_DATA_IN_GPIO GPIOB_INPUT_VAL
 #define LCD_DATA_IN_PIN 6
 
@@ -168,7 +182,177 @@ static unsigned long phys_fb_address(unsigned long address)
     }
 }
 
-inline void lcd_init_device(void)
+/* Run the powerup sequence for the driver IC */
+static void lcd_power_on(void)
+{
+    /* Clear standby bit */
+    lcd_write_reg(R_POWER_CONTROL1, 0x0000);
+
+    /** Power ON Sequence **/
+    lcd_write_reg(R_START_OSC, 0x0001);
+    /* 10ms or more for oscillation circuit to stabilize */
+    sleep(HZ/50);
+
+    /* SAP2-0=100, BT2-0=100, AP2-0=100, DK=1, SLP=0, STB=0 */
+    lcd_write_reg(R_POWER_CONTROL1, 0x4444);
+    /* DC12-10=000, DC2-0=000, VC2-0=001 */
+    lcd_write_reg(R_POWER_CONTROL2, 0x0001);
+    /* PON=0, VRH3-0=0011 */
+    lcd_write_reg(R_POWER_CONTROL3, 0x0003);
+    /* VCOMG=0, VDV4-0=10001, VCM3-0=11001 */
+    lcd_write_reg(R_POWER_CONTROL4, 0x1119);
+    /* PON=1, VRH3-0=0011 */
+    lcd_write_reg(R_POWER_CONTROL3, 0x0013);
+    sleep(HZ/25);
+
+    /* SAP2-0=100, BT2-0=100, AP2-0=100, DK=0, SLP=0, STB=0 */
+    lcd_write_reg(R_POWER_CONTROL1, 0x4440);
+    /* VCOMG=1, VDV4-0=10001, VCM3-0=11001 */
+    lcd_write_reg(R_POWER_CONTROL4, 0x3119);
+    sleep(HZ/6);
+
+    /* VSPL=0, HSPL=0, DPL=1, EPL=0, SM=0, GS=x, SS=x, NL4-0=11011 */
+    lcd_write_reg(R_DRV_OUTPUT_CONTROL, r_drv_output_control);
+    /* FLD=0, FLD0=1, B/C=1, EOR=1, NW5-0=000000 */
+    lcd_write_reg(R_DRV_WAVEFORM_CONTROL, 0x0700);
+    /* TRI=0, DFM1-0=11, BGR=0, HWM=1, ID1-0=10, AM=0, LG2-0=000
+     * AM: horizontal update direction
+     * ID1-0: H decrement, V increment
+     */
+    lcd_write_reg(R_ENTRY_MODE, 0x6020);
+    lcd_write_reg(R_COMPARE_REG1, 0x0000);
+    lcd_write_reg(R_COMPARE_REG2, 0x0000);
+    /* FP3-0=0001, BP3-0=0010 */
+    lcd_write_reg(R_DISP_CONTROL2, 0x0102);
+    /* PTG1-0=00 (normal scan), ISC3-0=0000 (ignored) */
+    lcd_write_reg(R_DISP_CONTROL3, 0x0000);
+    /* NO2-0=01, SDT1-0=00, EQ1-0=01, DIV1-0=00, RTN3-0=0000 */
+    lcd_write_reg(R_FRAME_CYCLE_CONTROL, 0x4400);
+    /* RM=1, DM1-0=01, RIM1-0=00 */
+    lcd_write_reg(R_EXT_DISP_INTF_CONTROL, 0x0110);
+    /* SCN4-0=00000 - G1 if GS=0, G240 if GS=1 */
+    lcd_write_reg(R_GATE_SCAN_START_POS, 0x0000);
+    /* VL7-0=00000000 (0 lines) */
+    lcd_write_reg(R_VERT_SCROLL_CONTROL, 0x0000);
+    /* SE17-10=219, SS17-10=0 - 220 gates */
+    lcd_write_reg(R_1ST_SCR_DRIVE_POS, (219 << 8));
+    /* SE27-10=0, SS27-10=0 - no second screen */
+    lcd_write_reg(R_2ND_SCR_DRIVE_POS, 0x0000);
+    /* HEA=175, HSA=0 = H window from 0-175 */
+    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (175 << 8));
+    /* VEA=219, VSA=0 = V window from 0-219 */
+    lcd_write_reg(R_VERT_RAM_ADDR_POS, (219 << 8));
+    /* PKP12-10=000, PKP02-00=000 */
+    lcd_write_reg(R_GAMMA_FINE_ADJ_POS1, 0x0000);
+    /* PKP32-30=111, PKP22-20=100 */
+    lcd_write_reg(R_GAMMA_FINE_ADJ_POS2, 0x0704);
+    /* PKP52-50=001, PKP42-40=111 */
+    lcd_write_reg(R_GAMMA_FINE_ADJ_POS3, 0x0107);
+    /* PRP12-10=111, PRP02-00=100 */
+    lcd_write_reg(R_GAMMA_GRAD_ADJ_POS, 0x0704);
+    /* PKN12-10=001, PKN02-00=111 */
+    lcd_write_reg(R_GAMMA_FINE_ADJ_NEG1, 0x0107);
+    /* PKN32-30=000, PKN22-20=010 */
+    lcd_write_reg(R_GAMMA_FINE_ADJ_NEG2, 0x0002);
+    /* PKN52-50=111, PKN42-40=111 */
+    lcd_write_reg(R_GAMMA_FINE_ADJ_NEG3, 0x0707);
+    /* PRN12-10=101, PRN02-00=011 */
+    lcd_write_reg(R_GAMMA_GRAD_ADJ_NEG, 0x0503);
+    /* VRP14-10=00000, VRP03-00=0000 */
+    lcd_write_reg(R_GAMMA_AMP_ADJ_POS, 0x0000);
+    /* WRN14-10=00000, VRN03-00=0000 */
+    lcd_write_reg(R_GAMMA_AMP_ADJ_NEG, 0x0000);
+    /* AD15-0=175 (upper right corner) */
+    lcd_write_reg(R_RAM_ADDR_SET, 175);
+    /* RM=1, DM1-0=01, RIM1-0=00 */
+    lcd_write_reg(R_EXT_DISP_INTF_CONTROL, 0x0110);
+
+    power_on = true;
+}
+
+/* Run the display on sequence for the driver IC */
+static void lcd_display_on(void)
+{
+    if (!power_on)
+    {
+        /* Power has been turned off so full reinit is needed */
+        lcd_power_on();
+    }
+    else
+    {
+        /* Restore what we fiddled with when turning display off */
+        /* PON=1, VRH3-0=0011 */
+        lcd_write_reg(R_POWER_CONTROL3, 0x0013);
+        /* NO2-0=01, SDT1-0=00, EQ1-0=01, DIV1-0=00, RTN3-0=0000 */
+        lcd_write_reg(R_FRAME_CYCLE_CONTROL, 0x4400);
+        /* VCOMG=1, VDV4-0=10001, VCM3-0=11001 */
+        lcd_write_reg(R_POWER_CONTROL4, 0x3119);
+    }
+
+    /* SAP2-0=100, BT2-0=111, AP2-0=100, DK=1, SLP=0, STB=0 */
+    lcd_write_reg(R_POWER_CONTROL1, 0x4740);
+
+    sleep(HZ/25);
+
+    /* PT1-0=00, VLE2-1=00, SPT=0, IB6(??)=1, GON=0, DTE=0, CL=0,
+       REV=x, D1-0=01 */
+    lcd_write_reg(R_DISP_CONTROL1, 0x0041 | r_disp_control_rev);
+
+    udelay(HZ/20);
+
+    /* PT1-0=00, VLE2-1=00, SPT=0, IB6(??)=1, GON=1, DTE=0, CL=0,
+       REV=x, D1-0=01 */
+    lcd_write_reg(R_DISP_CONTROL1, 0x0061 | r_disp_control_rev);
+    /* PT1-0=00, VLE2-1=00, SPT=0, IB6(??)=1, GON=1, DTE=0, CL=0,
+       REV=x, D1-0=11 */
+    lcd_write_reg(R_DISP_CONTROL1, 0x0063 | r_disp_control_rev);
+
+    udelay(HZ/20);
+
+    /* PT1-0=00, VLE2-1=00, SPT=0, IB6(??)=1, GON=1, DTE=1, CL=0,
+       REV=x, D1-0=11 */
+    lcd_write_reg(R_DISP_CONTROL1, 0x0073 | r_disp_control_rev);
+
+    /* Go into write data mode */
+    lcd_send_msg(0x70, R_RAM_WRITE_DATA);
+
+    /* tell that we're on now */
+    display_on = true;
+}
+
+/* Turn off visible display operations */
+static void lcd_display_off(void)
+{
+    /* block drawing operations and changing of first */
+    display_on = false;
+
+    /* NO2-0=01, SDT1-0=00, EQ1-0=00, DIV1-0=00, RTN3-0=0000 */
+    lcd_write_reg(R_FRAME_CYCLE_CONTROL, 0x4000);
+
+    /* PT1-0=00, VLE2-1=00, SPT=0, IB6(??)=1, GON=1, DTE=1, CL=0,
+       REV=x, D1-0=10 */
+    lcd_write_reg(R_DISP_CONTROL1, 0x0072 | r_disp_control_rev);
+
+    sleep(HZ/25);
+
+    /* PT1-0=00, VLE2-1=00, SPT=0, IB6(??)=1, GON=1, DTE=0, CL=0,
+       REV=x, D1-0=10 */
+    lcd_write_reg(R_DISP_CONTROL1, 0x0062 | r_disp_control_rev);
+
+    sleep(HZ/25);
+
+    /* PT1-0=00, VLE2-1=00, SPT=0, IB6(??)=0, GON=0, DTE=0, CL=0,
+       REV=0, D1-0=00 */
+    lcd_write_reg(R_DISP_CONTROL1, 0x0000);
+    /* SAP2-0=000, BT2-0=000, AP2-0=000, DK=0, SLP=0, STBY=0 */
+    lcd_write_reg(R_POWER_CONTROL1, 0x0000);
+    /* PON=0, VRH3-0=0011 */
+    lcd_write_reg(R_POWER_CONTROL3, 0x0003);
+    /* VCOMG=0, VDV4-0=10001, VCM4-0=11001 */
+    lcd_write_reg(R_POWER_CONTROL4, 0x1119);
+}
+
+void lcd_init_device(void)
 {
 /* All this is magic worked out by MrH */
 
@@ -176,6 +360,7 @@ inline void lcd_init_device(void)
     LCD_REG_6 &= ~1;
     udelay(100000);
 
+#ifdef BOOTLOADER /* Bother at all to do this again? */
 /* Init GPIO ports */
     lcd_init_gpio();
 /* Controller init */
@@ -227,145 +412,128 @@ inline void lcd_init_device(void)
     udelay(100000);
 
 /* LCD init */
-
-    /* TODO: Eliminate some of this outside the bootloader since this
-       will already be setup and that will eliminate white-screen */
-
-    /* Pull RESET low, then high */
+    /* Pull RESET low, then high to reset driver IC */
     outl((inl(0x70000080) & ~(1 << 28)), 0x70000080);
     udelay(10000);
     outl((inl(0x70000080) | (1 << 28)), 0x70000080);
     udelay(10000);
 
-    lcd_write_reg(R_POWER_CONTROL1, 0x4444);
-    lcd_write_reg(R_POWER_CONTROL2, 0x0001);
-    lcd_write_reg(R_POWER_CONTROL3, 0x0003);
-    lcd_write_reg(R_POWER_CONTROL4, 0x1119);
-    lcd_write_reg(R_POWER_CONTROL3, 0x0013);
-    udelay(50000);
+    lcd_display_on();
+#else
+    /* Power and display already ON - switch framebuffer address and reset
+       settings */
+    LCD_FB_BASE_REG = phys_fb_address((unsigned long)lcd_driver_framebuffer);
 
-    lcd_write_reg(R_POWER_CONTROL1, 0x4440);
-    lcd_write_reg(R_POWER_CONTROL4, 0x3119);
-    udelay(150000);
+    power_on = true;
+    display_on = true;
 
-    lcd_write_reg(R_DRV_OUTPUT_CONTROL, 0x101b);
-    lcd_write_reg(R_DRV_WAVEFORM_CONTROL, 0x0700);
-    lcd_write_reg(R_ENTRY_MODE, 0x6020);
-    lcd_write_reg(R_COMPARE_REG1, 0x0000);
-    lcd_write_reg(R_COMPARE_REG2, 0x0000);
-    lcd_write_reg(R_DISP_CONTROL2, 0x0102);
-    lcd_write_reg(R_DISP_CONTROL3, 0x0000);
-    lcd_write_reg(R_FRAME_CYCLE_CONTROL, 0x4400);
-    lcd_write_reg(R_EXT_DISP_INTF_CONTROL, 0x0110);
-
-    lcd_write_reg(R_GATE_SCAN_START_POS, 0x0000);
-    lcd_write_reg(R_VERT_SCROLL_CONTROL, 0x0000);
-    lcd_write_reg(R_1ST_SCR_DRIVE_POS, (219 << 8));
-    lcd_write_reg(R_2ND_SCR_DRIVE_POS, 0x0000);
-    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (175 << 8));
-    lcd_write_reg(R_VERT_RAM_ADDR_POS, (219 << 8));
-
-    lcd_write_reg(R_GAMMA_FINE_ADJ_POS1, 0x0000);
-    lcd_write_reg(R_GAMMA_FINE_ADJ_POS2, 0x0704);
-    lcd_write_reg(R_GAMMA_FINE_ADJ_POS3, 0x0107);
-    lcd_write_reg(R_GAMMA_GRAD_ADJ_POS, 0x0704);
-    lcd_write_reg(R_GAMMA_FINE_ADJ_NEG1, 0x0107);
-    lcd_write_reg(R_GAMMA_FINE_ADJ_NEG2, 0x0002);
-    lcd_write_reg(R_GAMMA_FINE_ADJ_NEG3, 0x0707);
-    lcd_write_reg(R_GAMMA_GRAD_ADJ_NEG, 0x0503);
-    lcd_write_reg(R_GAMMA_AMP_ADJ_POS, 0x0000);
-    lcd_write_reg(R_GAMMA_AMP_ADJ_NEG, 0x0000);
-
-    lcd_write_reg(R_RAM_ADDR_SET, 175);
-
-    lcd_write_reg(R_EXT_DISP_INTF_CONTROL, 0x0110);
-
-    lcd_write_reg(R_POWER_CONTROL1, 0x4740);
-
-    lcd_write_reg(R_DISP_CONTROL1, 0x0045);
-
-    udelay(50000);
-
-    lcd_write_reg(R_DISP_CONTROL1, 0x0065);
-    lcd_write_reg(R_DISP_CONTROL1, 0x0067);
-
-    udelay(50000);
-
-    lcd_write_reg(R_DISP_CONTROL1, 0x0077);
-
-    lcd_send_msg(0x70, R_RAM_WRITE_DATA);
+    lcd_set_invert_display(false);
+    lcd_set_flip(false);
+#endif
 
     LCD_REG_6 |= 1; /* Start DMA */
 }
 
 void lcd_enable(bool on)
 {
-    if(on)
+    if (on == display_on)
+        return;
+
+    if (on)
     {
-        if(!(DEV_EN & DEV_LCD))
-        {
-            DEV_EN |= DEV_LCD; /* Enable LCD controller */
-            lcd_update();      /* Resync display */
-            LCD_REG_6 |= 1;    /* Restart DMA */
-        }
+        DEV_EN |= DEV_LCD; /* Enable LCD controller */
+        lcd_display_on();  /* Turn on display */
+        lcd_update();      /* Resync display */
+        LCD_REG_6 |= 1;    /* Restart DMA */
+        sleep(HZ/25);      /* Wait for a frame to be written by
+                              DMA or a white flash will happen */
     }
     else
     {
-        if(DEV_EN & DEV_LCD)
-        {
-            LCD_REG_6 &= ~1;    /* Disable DMA */
-            udelay(20000);      /* Wait for dma end (assuming 50Hz) */
-            DEV_EN &= ~DEV_LCD; /* Disable LCD controller */
-        }
+        LCD_REG_6 &= ~1;    /* Disable DMA */
+        sleep(HZ/50);       /* Wait for dma end (assuming 50Hz) */
+        lcd_display_off();  /* Turn off display */
+        DEV_EN &= ~DEV_LCD; /* Disable LCD controller */
     }
 }
 
+void lcd_sleep(void)
+{
+    LCD_REG_6 &= ~1;
+    sleep(HZ/50);
+
+    if (power_on)
+    {
+        /* Turn off display */
+        if (display_on)
+            lcd_display_off();
+
+        power_on = false;
+    }
+
+    /* Set standby mode */
+    /* SAP2-0=000, BT2-0=000, AP2-0=000, DK=0, SLP=0, STB=1 */
+    lcd_write_reg(R_POWER_CONTROL1, 0x0001);
+}
+
+/* Copies a rectangle from one framebuffer to another. Can be used in
+   single transfer mode with width = num pixels, and height = 1 which
+   allows a full-width rectangle to be copied more efficiently. */
+extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
+                                 int width, int height);
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    (void)x;
-    (void)width;
+    fb_data *dst, *src;
 
-    if(DEV_EN & DEV_LCD)
+    if (!display_on)
+        return;
+
+    if (x + width > LCD_WIDTH)
+        width = LCD_WIDTH - x; /* Clip right */
+    if (x < 0)
+        width += x, x = 0; /* Clip left */
+    if (width <= 0)
+        return; /* nothing left to do */
+
+    if (y + height > LCD_HEIGHT)
+        height = LCD_HEIGHT - y; /* Clip bottom */
+    if (y < 0)
+        height += y, y = 0; /* Clip top */
+    if (height <= 0)
+        return; /* nothing left to do */
+
+    /* TODO: It may be faster to swap the addresses of lcd_driver_framebuffer
+     * and lcd_framebuffer */
+    dst = &lcd_driver_framebuffer[y][x];
+    src = &lcd_framebuffer[y][x];
+
+    /* Copy part of the Rockbox framebuffer to the second framebuffer */
+    if (width < LCD_WIDTH)
     {
-#if 0
-        /* Turn off DMA and wait for the transfer to complete */
-        /* TODO: Work out the proper delay */
-        LCD_REG_6 &= ~1;
-        udelay(1000);
-#endif
-        /* Copy the Rockbox framebuffer to the second framebuffer */
-        /* TODO: Move the second framebuffer into uncached SDRAM */
-        memcpy(((char*)&lcd_driver_framebuffer)+(y * sizeof(fb_data) * LCD_WIDTH),
-               ((char *)&lcd_framebuffer)+(y * sizeof(fb_data) * LCD_WIDTH),
-               ((height * sizeof(fb_data) * LCD_WIDTH)));
-        flush_icache();
-#if 0
-        /* Restart DMA */
-        LCD_REG_6 |= 1;
-#endif
+        /* Not full width - do line-by-line */
+        lcd_copy_buffer_rect(dst, src, width, height);
     }
+    else
+    {
+        /* Full width - copy as one line */
+        lcd_copy_buffer_rect(dst, src, LCD_WIDTH*height, 1);
+    }
+
+    flush_icache();
 }
 
 void lcd_update(void)
 {
-    if(DEV_EN & DEV_LCD)
-    {
-        /* TODO: It may be faster to swap the addresses of lcd_driver_framebuffer
-         * and lcd_framebuffer */
-#if 0
-        /* Turn off DMA and wait for the transfer to complete */
-        LCD_REG_6 &= ~1;
-        udelay(1000);
-#endif
-        /* Copy the Rockbox framebuffer to the second framebuffer */
-        memcpy(lcd_driver_framebuffer, lcd_framebuffer,
-               sizeof(fb_data) * LCD_WIDTH * LCD_HEIGHT);
-        flush_icache();
-#if 0
-        /* Restart DMA */
-        LCD_REG_6 |= 1;
-#endif
-    }
+    if (!display_on)
+        return;
+
+    /* TODO: It may be faster to swap the addresses of lcd_driver_framebuffer
+     * and lcd_framebuffer */
+    /* Copy the Rockbox framebuffer to the second framebuffer */
+    lcd_copy_buffer_rect(&lcd_driver_framebuffer[0][0],
+                         &lcd_framebuffer[0][0], LCD_WIDTH*LCD_HEIGHT, 1);
+
+    flush_icache();
 }
 
 
@@ -379,15 +547,61 @@ void lcd_set_contrast(int val)
 
 void lcd_set_invert_display(bool yesno)
 {
-    /* TODO: Implement lcd_set_invert_display() */
-    (void)yesno;
+    bool dma_on = LCD_REG_6 & 1;
+
+    if (dma_on)
+    {
+        LCD_REG_6 &= ~1;    /* Disable DMA */
+        sleep(HZ/50);       /* Wait for dma end (assuming 50Hz) */
+        DEV_EN &= ~DEV_LCD; /* Disable LCD controller */
+    }
+
+    r_disp_control_rev = yesno ? R_DISP_CONTROL_REV :
+                                 R_DISP_CONTROL_NORMAL;
+
+    if (display_on)
+    {
+        /* PT1-0=00, VLE2-1=00, SPT=0, IB6(??)=1, GON=1, CL=0,
+           DTE=1, REV=x, D1-0=11 */
+        lcd_write_reg(R_DISP_CONTROL1, 0x0073 | r_disp_control_rev);
+    }
+
+    if (dma_on)
+    {
+        DEV_EN |= DEV_LCD; /* Enable LCD controller */
+        lcd_send_msg(0x70, R_RAM_WRITE_DATA); /* Set to RAM write mode */
+        LCD_REG_6 |= 1;    /* Restart DMA */
+    }
 }
 
 /* turn the display upside down (call lcd_update() afterwards) */
 void lcd_set_flip(bool yesno)
 {
-    /* TODO: Implement lcd_set_flip() */
-    (void)yesno;
+    bool dma_on = LCD_REG_6 & 1;
+
+    if (dma_on)
+    {
+        LCD_REG_6 &= ~1;    /* Disable DMA */
+        sleep(HZ/50);       /* Wait for dma end (assuming 50Hz) */
+        DEV_EN &= ~DEV_LCD; /* Disable LCD controller */
+    }
+
+    r_drv_output_control = yesno ? R_DRV_OUTPUT_CONTROL_FLIPPED :
+                                   R_DRV_OUTPUT_CONTROL_NORMAL;
+
+    if (power_on)
+    {
+        /* VSPL=0, HSPL=0, DPL=1, EPL=0, SM=0, GS=x, SS=x,
+           NL4-0=11011 (G1-G224) */
+        lcd_write_reg(R_DRV_OUTPUT_CONTROL, r_drv_output_control);
+    }
+
+    if (dma_on)
+    {
+        DEV_EN |= DEV_LCD; /* Enable LCD controller */
+        lcd_send_msg(0x70, R_RAM_WRITE_DATA); /* Set to RAM write mode */
+        LCD_REG_6 |= 1;    /* Restart DMA */
+    }
 }
 
 /* Blitting functions */
@@ -417,35 +631,35 @@ void lcd_yuv_blit(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
-    if(DEV_EN & DEV_LCD)
+    /* Caches for chroma data so it only need be recaculated every other
+       line */
+    static unsigned char chroma_buf[LCD_HEIGHT/2*3]; /* 330 bytes */
+    unsigned char const * yuv_src[3];
+    off_t z;
+
+    if (!display_on)
+        return;
+
+    /* Sorry, but width and height must be >= 2 or else */
+    width &= ~1;
+    height >>= 1;
+
+    fb_data *dst = (fb_data*)lcd_driver_framebuffer + 
+                   x * LCD_WIDTH + (LCD_WIDTH - y) - 1;
+
+    z = stride*src_y;
+    yuv_src[0] = src[0] + z + src_x;
+    yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
+    yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
+
+    do
     {
-        /* Caches for chroma data so it only need be recaculated every other
-           line */
-        static unsigned char chroma_buf[LCD_HEIGHT/2*3]; /* 330 bytes */
-        unsigned char const * yuv_src[3];
-        off_t z;
-
-        /* Sorry, but width and height must be >= 2 or else */
-        width &= ~1;
-        height >>= 1;
-
-        fb_data *dst = (fb_data*)lcd_driver_framebuffer + 
-                       x * LCD_WIDTH + (LCD_WIDTH - y) - 1;
-
-        z = stride*src_y;
-        yuv_src[0] = src[0] + z + src_x;
-        yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
-        yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
-
-        do
-        {
-            lcd_write_yuv420_lines(dst, chroma_buf, yuv_src, width,
-                                   stride);
-            yuv_src[0] += stride << 1; /* Skip down two luma lines */
-            yuv_src[1] += stride >> 1; /* Skip down one chroma line */
-            yuv_src[2] += stride >> 1;
-            dst -= 2;
-        }
-        while (--height > 0);
+        lcd_write_yuv420_lines(dst, chroma_buf, yuv_src, width,
+                               stride);
+        yuv_src[0] += stride << 1; /* Skip down two luma lines */
+        yuv_src[1] += stride >> 1; /* Skip down one chroma line */
+        yuv_src[2] += stride >> 1;
+        dst -= 2;
     }
+    while (--height > 0);
 }
