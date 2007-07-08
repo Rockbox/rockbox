@@ -114,7 +114,9 @@ fixed32 tcos0[1024], tcos1[512], tcos2[256], tcos3[128], tcos4[64];        //the
 fixed32 tsin0[1024], tsin1[512], tsin2[256], tsin3[128], tsin4[64];
 
 FFTComplex *exparray[5];                                    //these are the fft lookup tables
+
 uint16_t *revarray[5];
+
 FFTComplex  exptab0[512] IBSS_ATTR;//, exptab1[256], exptab2[128], exptab3[64], exptab4[32];    //folded these in!
 uint16_t revtab0[1024], revtab1[512], revtab2[256], revtab3[128], revtab4[64];
 
@@ -122,6 +124,7 @@ uint16_t *runtabarray[2], *levtabarray[2];                                      
 
 uint16_t runtab0[1336], runtab1[1336], levtab0[1336], levtab1[1336];                //these could be made smaller since only one can be 1336
 
+FFTComplex mdct_tmp[BLOCK_MAX_SIZE] IBSS_ATTR; 			/* temporary storage for imdct */
 
 //may also be too large by ~ 1KB each?
 static VLC_TYPE vlcbuf1[6144][2];
@@ -1080,6 +1083,7 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
     exparray[0] = exptab0; //exparray[1] = exptab1; exparray[2] = exptab2; exparray[3] = exptab3; exparray[4] = exptab4;
     revarray[0]=revtab0; revarray[1]=revtab1; revarray[2]=revtab2; revarray[3]=revtab3; revarray[4]=revtab4;
 
+	s->mdct_tmp = mdct_tmp; /* temporary storage for imdct */
     for(i = 0; i < s->nb_block_sizes; ++i)
     {
         ff_mdct_init(&s->mdct_ctx[i], s->frame_len_bits - i + 1, 1);
@@ -1108,12 +1112,13 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
 
         //fixed32 n2 = itofix32(n<<1);        //2x the window length
         //alpha = fixdiv32(M_PI_F, n2);        //PI / (2x Window length) == PI<<(s->frame_len_bits - i+1)
-        //printf("two values of alpha %16.10lf %16.10lf\n", fixtof64(alpha), fixtof64(M_PI_F>>(s->frame_len_bits - i+1)));
-        alpha = M_PI_F>>(s->frame_len_bits - i+1);
+
+        //alpha = M_PI_F>>(s->frame_len_bits - i+1);
+        alpha = (1<<15)>>(s->frame_len_bits - i+1);	/* this calculates 0.5/(2*n) */
         for(j=0;j<n;++j)
         {
             fixed32 j2 = itofix32(j) + 0x8000;
-            window[j] = fixsin32(fixmul32(j2,alpha));        //alpha between 0 and pi/2
+             window[j] = fsincos(fixmul32(j2,alpha)<<16, 0);        //alpha between 0 and pi/2
 
         }
         //printf("created window\n");
@@ -1192,43 +1197,7 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
     return 0;
 }
 
-#if 0
-/* interpolate values for a bigger or smaller block. The block must
-   have multiple sizes */
-static void interpolate_array(fixed32 *scale, int old_size, int new_size)
-{
-    int i, j, jincr, k;
-    fixed32 v;
 
-
-
-    if (new_size > old_size)
-    {
-        jincr = new_size / old_size;
-        j = new_size;
-        for(i = old_size - 1; i >=0; --i)
-        {
-            v = scale[i];
-            k = jincr;
-            do
-            {
-                scale[--j] = v;
-            }
-            while (--k);
-        }
-    }
-    else if (new_size < old_size)
-    {
-        j = 0;
-        jincr = old_size / new_size;
-        for(i = 0; i < new_size; ++i)
-        {
-            scale[i] = scale[j];
-            j += jincr;
-        }
-    }
-}
-#endif
 /* compute x^-0.25 with an exponent and mantissa table. We use linear
    interpolation to reduce the mantissa table size at a small speed
    expense (linear interpolation approximately doubles the number of
@@ -1958,9 +1927,9 @@ static int wma_decode_frame(WMADecodeContext *s, int16_t *samples)
 }
 
 int wma_decode_superframe(WMADecodeContext* s,
-                                 void *data,
+                                 void *data,	/*output*/
                                  int *data_size,
-                                 uint8_t *buf,
+                                 uint8_t *buf,	/*input*/
                                  int buf_size)
 {
     //WMADecodeContext *s = avctx->priv_data;

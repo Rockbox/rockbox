@@ -68,7 +68,7 @@ fixed32 fixmul32(fixed32 x, fixed32 y)
     return (fixed32)temp;
 }
 
-
+#endif
 /*
 	Special fixmul32 that does a 16.16 x 1.31 multiply that returns a 16.16 value.
 	this is needed because the fft constants are all normalized to be less then 1
@@ -76,7 +76,7 @@ fixed32 fixmul32(fixed32 x, fixed32 y)
 
 
 */
-
+#ifndef CPU_ARM
 fixed32 fixmul32b(fixed32 x, fixed32 y)
 {
     fixed64 temp;
@@ -88,8 +88,8 @@ fixed32 fixmul32b(fixed32 x, fixed32 y)
 
     return (fixed32)temp;
 }
-
 #endif
+
 
 
 /*
@@ -275,6 +275,7 @@ long fsincos(unsigned long phase, fixed32 *cos)
 
 */
 
+#if 0
 fixed32 fixsin32(fixed32 x)
 {
 
@@ -325,3 +326,4 @@ fixed32 fixcos32(fixed32 x)
 {
     return fixsin32(x - (M_PI_F>>1))*-1;
 }
+#endif

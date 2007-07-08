@@ -131,7 +131,7 @@ typedef struct WMADecodeContext
     fixed32 coefs[MAX_CHANNELS][BLOCK_MAX_SIZE];
     MDCTContext mdct_ctx[BLOCK_NB_SIZES];
     fixed32 *windows[BLOCK_NB_SIZES];
-    FFTComplex mdct_tmp[BLOCK_MAX_SIZE]; /* temporary storage for imdct */
+    FFTComplex *mdct_tmp; /* temporary storage for imdct */
     /* output buffer for one frame and the last for IMDCT windowing */
     fixed32 frame_out[MAX_CHANNELS][BLOCK_MAX_SIZE * 2];
     /* last frame info */
