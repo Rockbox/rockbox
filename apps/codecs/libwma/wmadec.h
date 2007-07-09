@@ -158,6 +158,4 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx);
 int wma_decode_superframe(WMADecodeContext* s,
                           void *data, int *data_size,
                           uint8_t *buf, int buf_size);
-int wma_decode_end(WMADecodeContext *s);
-
 #endif
