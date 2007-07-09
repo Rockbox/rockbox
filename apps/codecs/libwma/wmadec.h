@@ -137,6 +137,11 @@ typedef struct WMADecodeContext
     fixed64 lsp_pow_m_table1[(1 << LSP_POW_BITS)];
     fixed64 lsp_pow_m_table2[(1 << LSP_POW_BITS)];
 
+    /* State of current superframe decoding */
+    int bit_offset;
+    int nb_frames;
+    int current_frame;
+
 #ifdef TRACE
 
     int frame_count;
@@ -145,7 +150,9 @@ typedef struct WMADecodeContext
 WMADecodeContext;
 
 int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx);
-int wma_decode_superframe(WMADecodeContext* s,
-                          void *data, int *data_size,
-                          uint8_t *buf, int buf_size);
+int wma_decode_superframe_init(WMADecodeContext* s,
+                               uint8_t *buf, int buf_size);
+int wma_decode_superframe_frame(WMADecodeContext* s,
+                                int16_t *samples,
+                                uint8_t *buf, int buf_size);
 #endif

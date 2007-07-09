@@ -23,15 +23,14 @@
 
 CODEC_HEADER
 
-#define MAX_BLOCKSIZE 2048
+/* The output buffer containing the decoded samples (channels 0 and 1)
+   BLOCK_MAX_SIZE is 2048 (samples) and MAX_CHANNELS is 2.
+ */
 
-/* The output buffers containing the decoded samples (channels 0 and 1) */
+static uint16_t decoded[BLOCK_MAX_SIZE * MAX_CHANNELS];
 
 /* NOTE: WMADecodeContext is 142688 bytes (on x86) */
 static WMADecodeContext wmadec;
-
-/* TODO: Check the size of this */
-#define OUTBUF_SIZE 256*1024
 
 enum asf_error_e {
     ASF_ERROR_INTERNAL       = -1,  /* incorrect input to API calls */
@@ -286,8 +285,8 @@ enum codec_status codec_main(void)
     unsigned char* inbuffer;
     size_t resume_offset;
     size_t n;
-    int wmares, res, padding, outbufsize;
-    uint8_t* outbuf;
+    int i;
+    int wmares, res, padding;
 
     /* Generic codec initialisation */
     ci->configure(CODEC_SET_FILEBUF_WATERMARK, 1024*512);
@@ -312,8 +311,6 @@ enum codec_status codec_main(void)
         retval = CODEC_ERROR;
         goto exit;
     }
-
-    outbuf = codec_malloc(OUTBUF_SIZE);
 
     /* Copy the format metadata we've stored in the id3 TOC field.  This 
        saves us from parsing it again here. */
@@ -355,21 +352,31 @@ enum codec_status codec_main(void)
         if (res > 0) {
             inbuffer = ci->request_buffer(&n, res - padding);
 
-            wmares = wma_decode_superframe(&wmadec,
-                                        outbuf,&outbufsize,
-                                        inbuffer,res - padding);
+            wma_decode_superframe_init(&wmadec,
+                                       inbuffer,res - padding);
 
-            ci->advance_buffer(res);
+            for (i=0; i < wmadec.nb_frames; i++)
+            {
+                wmares = wma_decode_superframe_frame(&wmadec,
+                                                     decoded,
+                                                     inbuffer,res - padding);
 
-            if (wmares > 0) {
-                ci->pcmbuf_insert(outbuf, NULL, outbufsize / (wfx.channels * 2));
-                samplesdone += (outbufsize / (wfx.channels * 2));
-                DEBUGF("Decoded %d samples\n",(outbufsize / (wfx.channels * 2)));
-                elapsedtime = (samplesdone*10)/(wfx.rate/100);
-                ci->set_elapsed(elapsedtime);
+                ci->yield ();
+
+                if (wmares < 0)
+                {
+                    LOGF("WMA decode error %d\n",wmares);
+                    goto done;
+                } else if (wmares > 0) {
+                    ci->pcmbuf_insert(decoded, NULL, wmares);
+                    samplesdone += wmares;
+                    elapsedtime = (samplesdone*10)/(wfx.rate/100);
+                    ci->set_elapsed(elapsedtime);
+                }
+                ci->yield ();
             }
 
-            ci->yield ();
+            ci->advance_buffer(res);
         }
     }
     retval = CODEC_OK;

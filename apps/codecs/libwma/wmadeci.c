@@ -935,6 +935,9 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
     init_coef_vlc(&s->coef_vlc[1], &s->run_table[1], &s->level_table[1],
                   &coef_vlcs[coef_vlc_table * 2 + 1], 1);
 
+    s->last_superframe_len = 0;
+    s->last_bitoffset = 0;
+
     return 0;
 }
 
@@ -1666,42 +1669,67 @@ static int wma_decode_frame(WMADecodeContext *s, int16_t *samples)
     return 0;
 }
 
-int wma_decode_superframe(WMADecodeContext* s,
-                                 void *data,    /*output*/
-                                 int *data_size,
-                                 uint8_t *buf,  /*input*/
-                                 int buf_size)
-{
-    //WMADecodeContext *s = avctx->priv_data;
-    int nb_frames, bit_offset, i, pos, len;
-    uint8_t *q;
-    int16_t *samples;
+/* Initialise the superframe decoding */
 
+int wma_decode_superframe_init(WMADecodeContext* s,
+                               uint8_t *buf,  /*input*/
+                               int buf_size)
+{
     if (buf_size==0)
     {
         s->last_superframe_len = 0;
         return 0;
     }
 
-    samples = data;
+    s->current_frame = 0;
+
     init_get_bits(&s->gb, buf, buf_size*8);
+
     if (s->use_bit_reservoir)
     {
         /* read super frame header */
         get_bits(&s->gb, 4); /* super frame index */
-        nb_frames = get_bits(&s->gb, 4) - 1;
+        s->nb_frames = get_bits(&s->gb, 4);
 
-        bit_offset = get_bits(&s->gb, s->byte_offset_bits + 3);
+        if (s->last_superframe_len == 0)
+            s->nb_frames --;
+        else if (s->nb_frames == 0)
+            s->nb_frames++;
+
+        s->bit_offset = get_bits(&s->gb, s->byte_offset_bits + 3);
+    } else {
+        s->nb_frames = 1;
+    }
+
+    return 1;
+}
+
+
+/* Decode a single frame in the current superframe - return -1 if
+   there was a decoding error, or the number of samples decoded. 
+*/
+
+int wma_decode_superframe_frame(WMADecodeContext* s,
+                                int16_t* samples, /*output*/
+                                uint8_t *buf,  /*input*/
+                                int buf_size)
+{
+    int pos, len;
+    uint8_t *q;
+    int done = 0;
+
+    if ((s->use_bit_reservoir) && (s->current_frame == 0))
+    {
         if (s->last_superframe_len > 0)
         {
-            /* add bit_offset bits to last frame */
-            if ((s->last_superframe_len + ((bit_offset + 7) >> 3)) >
+            /* add s->bit_offset bits to last frame */
+            if ((s->last_superframe_len + ((s->bit_offset + 7) >> 3)) >
                     MAX_CODED_SUPERFRAME_SIZE)
             {
                 goto fail;
             }
             q = s->last_superframe + s->last_superframe_len;
-            len = bit_offset;
+            len = s->bit_offset;
             while (len > 0)
             {
                 *q++ = (get_bits)(&s->gb, 8);
@@ -1712,39 +1740,46 @@ int wma_decode_superframe(WMADecodeContext* s,
                 *q++ = (get_bits)(&s->gb, len) << (8 - len);
             }
 
-            /* XXX: bit_offset bits into last frame */
+            /* XXX: s->bit_offset bits into last frame */
             init_get_bits(&s->gb, s->last_superframe, MAX_CODED_SUPERFRAME_SIZE*8);
             /* skip unused bits */
             if (s->last_bitoffset > 0)
                 skip_bits(&s->gb, s->last_bitoffset);
+
             /* this frame is stored in the last superframe and in the
                current one */
             if (wma_decode_frame(s, samples) < 0)
             {
                 goto fail;
             }
-            samples += s->nb_channels * s->frame_len;
+            done = 1;
         }
 
-        /* read each frame starting from bit_offset */
-        pos = bit_offset + 4 + 4 + s->byte_offset_bits + 3;
+        /* read each frame starting from s->bit_offset */
+        pos = s->bit_offset + 4 + 4 + s->byte_offset_bits + 3;
         init_get_bits(&s->gb, buf + (pos >> 3), (MAX_CODED_SUPERFRAME_SIZE - (pos >> 3))*8);
         len = pos & 7;
         if (len > 0)
             skip_bits(&s->gb, len);
 
         s->reset_block_lengths = 1;
-        for(i=0;i<nb_frames;++i)
-        {
-            if (wma_decode_frame(s, samples) < 0)
-            {
-                goto fail;
-            }
-            samples += s->nb_channels * s->frame_len;
-        }
+    }
 
+    /* If we haven't decoded a frame yet, do it now */
+    if (!done)
+    {
+        if (wma_decode_frame(s, samples) < 0)
+        {
+            goto fail;
+        }
+    }
+
+    s->current_frame++;
+
+    if ((s->use_bit_reservoir) && (s->current_frame == s->nb_frames))
+    {
         /* we copy the end of the frame in the last frame buffer */
-        pos = get_bits_count(&s->gb) + ((bit_offset + 4 + 4 + s->byte_offset_bits + 3) & ~7);
+        pos = get_bits_count(&s->gb) + ((s->bit_offset + 4 + 4 + s->byte_offset_bits + 3) & ~7);
         s->last_bitoffset = pos & 7;
         pos >>= 3;
         len = buf_size - pos;
@@ -1755,21 +1790,11 @@ int wma_decode_superframe(WMADecodeContext* s,
         s->last_superframe_len = len;
         memcpy(s->last_superframe, buf + pos, len);
     }
-    else
-    {
-        /* single frame decode */
-        if (wma_decode_frame(s, samples) < 0)
-        {
-            goto fail;
-        }
-        samples += s->nb_channels * s->frame_len;
-    }
-    *data_size = (int8_t *)samples - (int8_t *)data;
-    return s->block_align;
+
+    return s->frame_len;
+
 fail:
     /* when error, we reset the bit reservoir */
     s->last_superframe_len = 0;
     return -1;
 }
-
-
