@@ -106,6 +106,8 @@ static void wma_lsp_to_curve_init(WMADecodeContext *s, int frame_len);
 int fft_calc(FFTContext *s, FFTComplex *z);
 
 
+fixed32 coefsarray[MAX_CHANNELS][BLOCK_MAX_SIZE] IBSS_ATTR;
+
 //static variables that replace malloced stuff
 fixed32 stat0[2048], stat1[1024], stat2[512], stat3[256], stat4[128];    //these are the MDCT reconstruction windows
 
@@ -754,6 +756,8 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
     s->nb_channels = wfx->channels;
     s->bit_rate = wfx->bitrate;
     s->block_align = wfx->blockalign;
+
+    s->coefs = &coefsarray;
 
     if (wfx->codec_id == ASF_CODEC_ID_WMAV1){
         s->version = 1;
@@ -1612,7 +1616,7 @@ static int wma_decode_block(WMADecodeContext *s)
          //   mul = fixtof64(pow_table[total_gain])/(s->block_len/2)/fixtof64(s->max_exponent[ch]);
 
             mult = fixmul64byfixed(mult, mdct_norm);        //what the hell?  This is actually fixed64*2^16!
-            coefs = s->coefs[ch];                                            //VLC exponenents are used to get MDCT coef here!
+            coefs = (*(s->coefs))[ch];                                            //VLC exponenents are used to get MDCT coef here!
 
         n=0;
 
@@ -1750,16 +1754,16 @@ static int wma_decode_block(WMADecodeContext *s)
            never happen */
         if (!s->channel_coded[0])
         {
-            memset(s->coefs[0], 0, sizeof(fixed32) * s->block_len);
+            memset((*(s->coefs))[0], 0, sizeof(fixed32) * s->block_len);
             s->channel_coded[0] = 1;
         }
 
         for(i = 0; i < s->block_len; ++i)
         {
-            a = s->coefs[0][i];
-            b = s->coefs[1][i];
-            s->coefs[0][i] = a + b;
-            s->coefs[1][i] = a - b;
+            a = (*s->coefs)[0][i];
+            b = (*s->coefs)[1][i];
+            (*s->coefs)[0][i] = a + b;
+            (*s->coefs)[1][i] = a - b;
         }
     }
 
@@ -1776,7 +1780,7 @@ static int wma_decode_block(WMADecodeContext *s)
 
             ff_imdct_calc(&s->mdct_ctx[bsize],
                           output,
-                          s->coefs[ch],
+                          (*(s->coefs))[ch],
                           s->mdct_tmp);
 
 

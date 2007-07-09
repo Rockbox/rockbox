@@ -25,7 +25,7 @@
 #define M_PI    3.14159265358979323846
 
 #define M_PI_F  0x3243f // in fixed 32 format
-#define TWO_M_PI_F  0x6487f	//in fixed 32
+#define TWO_M_PI_F  0x6487f   //in fixed 32
 
 #define MAX_CHANNELS 2
 
@@ -128,7 +128,7 @@ typedef struct WMADecodeContext
     fixed32 exponents[MAX_CHANNELS][BLOCK_MAX_SIZE];
     fixed32 max_exponent[MAX_CHANNELS];
     int16_t coefs1[MAX_CHANNELS][BLOCK_MAX_SIZE];
-    fixed32 coefs[MAX_CHANNELS][BLOCK_MAX_SIZE];
+    fixed32 (*coefs)[MAX_CHANNELS][BLOCK_MAX_SIZE];
     MDCTContext mdct_ctx[BLOCK_NB_SIZES];
     fixed32 *windows[BLOCK_NB_SIZES];
     FFTComplex *mdct_tmp; /* temporary storage for imdct */
