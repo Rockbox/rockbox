@@ -33,16 +33,6 @@
 
 #define LSP_POW_BITS 7
 
-#define VLC_TYPE int16_t
-
-typedef struct VLC
-{
-    int bits;
-    VLC_TYPE (*table)[2]; ///< code, bits
-    int table_size, table_allocated;
-}
-VLC;
-
 #define fixed32         int32_t
 #define fixed64         int64_t
 

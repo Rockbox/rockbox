@@ -22,6 +22,14 @@ typedef struct GetBitContext {
 
 static inline int get_bits_count(GetBitContext *s);
 
+#define VLC_TYPE int16_t
+
+typedef struct VLC {
+    int bits;
+    VLC_TYPE (*table)[2]; ///< code, bits
+    int table_size, table_allocated;
+} VLC;
+
 /* used to avoid missaligned exceptions on some archs (alpha, ...) */
 static inline uint32_t unaligned32(const void *v) {
     struct Unaligned {
@@ -191,6 +199,59 @@ void init_get_bits(GetBitContext *s,
 
 int check_marker(GetBitContext *s, const char *msg);
 void align_get_bits(GetBitContext *s);
+int init_vlc(VLC *vlc, int nb_bits, int nb_codes,
+             const void *bits, int bits_wrap, int bits_size,
+             const void *codes, int codes_wrap, int codes_size);
+
+#define GET_VLC(code, name, gb, table, bits, max_depth)\
+{\
+    int n, index, nb_bits;\
+\
+    index= SHOW_UBITS(name, gb, bits);\
+    code = table[index][0];\
+    n    = table[index][1];\
+\
+    if(max_depth > 1 && n < 0){\
+        LAST_SKIP_BITS(name, gb, bits)\
+        UPDATE_CACHE(name, gb)\
+\
+        nb_bits = -n;\
+\
+        index= SHOW_UBITS(name, gb, nb_bits) + code;\
+        code = table[index][0];\
+        n    = table[index][1];\
+        if(max_depth > 2 && n < 0){\
+            LAST_SKIP_BITS(name, gb, nb_bits)\
+            UPDATE_CACHE(name, gb)\
+\
+            nb_bits = -n;\
+\
+            index= SHOW_UBITS(name, gb, nb_bits) + code;\
+            code = table[index][0];\
+            n    = table[index][1];\
+        }\
+    }\
+    SKIP_BITS(name, gb, n)\
+}
+
+
+// deprecated, dont use get_vlc for new code, use get_vlc2 instead or use GET_VLC directly
+static inline int get_vlc(GetBitContext *s, VLC *vlc)
+{
+    int code;
+    VLC_TYPE (*table)[2]= vlc->table;
+
+    OPEN_READER(re, s)
+    UPDATE_CACHE(re, s)
+
+    GET_VLC(code, re, s, table, vlc->bits, 3)
+
+    CLOSE_READER(re, s)
+    return code;
+}
+
+
+
 
 //#define TRACE
 
