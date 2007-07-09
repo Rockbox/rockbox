@@ -201,8 +201,8 @@ void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
                                  int stride, int x, int y, int width,
                                  int height)
 {
-    fb_data *dst, *dst_end;
-    unsigned int transcolor;
+    int w, px;
+    fb_data *dst;
 
     if (x + width > LCD_WIDTH)
         width = LCD_WIDTH - x; /* Clip right */
@@ -219,26 +219,29 @@ void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
         return; /* nothing left to do */
 
     src += stride * src_y + src_x; /* move starting point */
-    dst = &lcd_framebuffer[(y)][(x)];
-    dst_end = dst + height * LCD_WIDTH;
-    width *= 2;
-    stride *= 2;
-    transcolor = TRANSPARENT_COLOR;
-    asm volatile(
-    "rowstart:  \n"
-        "mov    r0, #0  \n"
-    "nextpixel:  \n"
-        "ldrh   r1, [%0, r0]   \n"  /* Load word src+r0 */
-        "cmp    r1, %5 \n"             /* Compare to transparent color */
-        "strneh r1, [%1, r0]   \n"  /* Store dst+r0 if not transparent */
-        "add    r0, r0, #2  \n"
-        "cmp    r0, %2 \n"             /* r0 == width? */         
-        "bne    nextpixel \n"        /* More in this row? */
-        "add    %0, %0, %4  \n"     /* src += stride */
-        "add    %1, %1, #480 \n"    /* dst += LCD_WIDTH (x2) */
-        "cmp    %1, %3 \n"             
-        "bne    rowstart \n"        /* if(dst != dst_end), keep going */
-        : : "r" (src), "r" (dst), "r" (width), "r" (dst_end), "r" (stride), "r" (transcolor) : "r0", "r1" );
+    dst = &lcd_framebuffer[y][x];
+
+    asm volatile (
+    ".rowstart:                             \r\n"
+        "mov    %[w], %[width]              \r\n" /* Load width for inner loop */
+    ".nextpixel:                            \r\n"
+        "ldrh   %[px], [%[s]], #2           \r\n" /* Load src pixel */
+        "add    %[d], %[d], #2              \r\n" /* Uncoditionally increment dst */
+        "cmp    %[px], %[transcolor]        \r\n" /* Compare to transparent color */
+        "strneh %[px], [%[d], #-2]          \r\n" /* Store dst if not transparent */
+        "subs   %[w], %[w], #1              \r\n" /* Width counter has run down? */
+        "bgt    .nextpixel                  \r\n" /* More in this row? */
+        "add    %[s], %[s], %[sstp], lsl #1 \r\n" /* Skip over to start of next line */
+        "add    %[d], %[d], %[dstp], lsl #1 \r\n"
+        "subs   %[h], %[h], #1              \r\n" /* Height counter has run down? */
+        "bgt    .rowstart                   \r\n" /* More rows? */
+        : [w]"=&r"(w), [h]"+&r"(height), [px]"=&r"(px),
+          [s]"+&r"(src), [d]"+&r"(dst)
+        : [width]"r"(width),
+          [sstp]"r"(stride - width),
+          [dstp]"r"(LCD_WIDTH - width),
+          [transcolor]"r"(TRANSPARENT_COLOR)
+    );
 }
 
 /* Line write helper function for lcd_yuv_blit. Write two lines of yuv420. */
