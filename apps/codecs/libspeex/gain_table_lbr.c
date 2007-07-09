@@ -29,7 +29,9 @@
    POSSIBILITY OF SUCH DAMAGE.
 */
 
-const signed char gain_cdbk_lbr[128] = {
+#include "config-speex.h"
+
+const signed char gain_cdbk_lbr[128] ICONST_ATTR = {
 -32, -32, -32, 0,
 -31, -58, -16, 22,
 -41, -24, -43, 14,

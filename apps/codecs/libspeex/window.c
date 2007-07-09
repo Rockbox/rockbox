@@ -36,7 +36,7 @@
 #include "misc.h"
 
 #ifdef FIXED_POINT
-const spx_word16_t lpc_window[200] = {
+const spx_word16_t lpc_window[200] ICONST_ATTR = {
 1310, 1313, 1321, 1333, 1352, 1375, 1403, 1436,
 1475, 1518, 1567, 1621, 1679, 1743, 1811, 1884,
 1962, 2044, 2132, 2224, 2320, 2421, 2526, 2636,
