@@ -170,7 +170,10 @@ bool detect_original_firmware(void)
 #if defined(CPU_ARM)
 
 static const char* const uiename[] = {
-    "Undefined instruction", "Prefetch abort", "Data abort"
+    "Undefined instruction",
+    "Prefetch abort",
+    "Data abort",
+    "Divide by zero"
 };
 
 /* Unexpected Interrupt or Exception handler. Currently only deals with
@@ -196,6 +199,19 @@ void UIE(unsigned int pc, unsigned int num)
          */
     }
 }
+
+#ifndef STUB
+/* Needs to be here or gcc won't find it */
+void __div0(void) __attribute__((naked));
+void __div0(void)
+{
+    asm volatile (
+        "ldr    r0, [sp] \r\n"
+        "mov    r1, #3   \r\n"
+        "b      UIE      \r\n"
+    );
+}
+#endif
 
 #endif /* CPU_ARM */
 
