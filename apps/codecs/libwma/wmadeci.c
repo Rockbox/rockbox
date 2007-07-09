@@ -117,14 +117,14 @@ FFTComplex *exparray[5];                                    //these are the fft 
 
 uint16_t *revarray[5];
 
-FFTComplex  exptab0[512] IBSS_ATTR;//, exptab1[256], exptab2[128], exptab3[64], exptab4[32];    //folded these in!
-uint16_t revtab0[1024];//, revtab1[512], revtab2[256], revtab3[128], revtab4[64];
+FFTComplex  exptab0[512] IBSS_ATTR;
+uint16_t revtab0[1024];
 
 uint16_t *runtabarray[2], *levtabarray[2];                                        //these are VLC lookup tables
 
 uint16_t runtab0[1336], runtab1[1336], levtab0[1336], levtab1[1336];                //these could be made smaller since only one can be 1336
 
-FFTComplex mdct_tmp[BLOCK_MAX_SIZE] IBSS_ATTR; 			/* temporary storage for imdct */
+FFTComplex mdct_tmp[BLOCK_MAX_SIZE] IBSS_ATTR;              /* temporary storage for imdct */
 
 //may also be too large by ~ 1KB each?
 static VLC_TYPE vlcbuf1[6144][2];
@@ -148,17 +148,7 @@ int fft_inits(FFTContext *s, int nbits, int inverse)
 
     s->nbits = nbits;
     n = 1 << nbits;
-    //s->exptab = exparray[10-nbits];    //not needed
 
-    //s->exptab = av_malloc((n >> 1) * sizeof(FFTComplex));
-    //if (!s->exptab)
-    //    goto fail;
-
-    //s->revtab = revarray[10-nbits];
-
-    //s->revtab = av_malloc(n * sizeof(uint16_t));
-    //if (!s->revtab)
-    //    goto fail;
     s->inverse = inverse;
 
     s2 = inverse ? 1 : -1;
@@ -196,26 +186,7 @@ int fft_inits(FFTContext *s, int nbits, int inverse)
    // s->fft_calc = fft_calc;
     s->exptab1 = NULL;
 
-
-    /* compute bit reverse table */
-/*
-    for(i=0;i<n;i++)
-    {
-        m=0;
-        for(j=0;j<nbits;j++)
-        {
-            m |= ((i >> j) & 1) << (nbits-j-1);
-
-        }
-
-        s->revtab[i]=m;
-    } */
     return 0;
-//fail:
- //   av_freep(&s->revtab);
- //   av_freep(&s->exptab);
- //   av_freep(&s->exptab1);
-    return -1;
 }
 
 /* butter fly op */
@@ -324,15 +295,7 @@ int fft_calc_unscaled(FFTContext *s, FFTComplex *z)
     return 0;
 }
 
-/*
-//needless since we're statically allocated
-void fft_end(FFTContext *s)
-{
-   // av_freep(&s->revtab);
-   // av_freep(&s->exptab);
-   // av_freep(&s->exptab1);
-}
-*/
+
 /* VLC decoding */
 
 #define GET_VLC(code, name, gb, table, bits, max_depth)\
@@ -407,10 +370,7 @@ static int alloc_table(VLC *vlc, int size)
     vlc->table_size += size;
     if (vlc->table_size > vlc->table_allocated)
     {
-       // rb->splash(HZ*10, "OH CRAP, TRIED TO REALLOC A STATIC VLC TABLE!");
         vlc->table_allocated += (1 << vlc->bits);
-       // vlc->table = av_realloc(vlc->table,
-       //                         sizeof(VLC_TYPE) * 2 * vlc->table_allocated);
         if (!vlc->table)
             return -1;
     }
@@ -533,8 +493,6 @@ int init_vlc(VLC *vlc, int nb_bits, int nb_codes,
              const void *codes, int codes_wrap, int codes_size)
 {
     vlc->bits = nb_bits;
-   // vlc->table = NULL;
-   // vlc->table_allocated = 0;
     vlc->table_size = 0;
 
     if (build_table(vlc, nb_bits, nb_codes,
@@ -542,11 +500,9 @@ int init_vlc(VLC *vlc, int nb_bits, int nb_codes,
                     codes, codes_wrap, codes_size,
                     0, 0) < 0)
     {
-       // av_free(vlc->table);
+
         return -1;
     }
-    //dump_table("Tab 1",vlc->table[0],vlc->table_size);
-    //dump_table("Tab 2",vlc->table[1],vlc->table_size);
     return 0;
 }
 
@@ -566,13 +522,6 @@ int ff_mdct_init(MDCTContext *s, int nbits, int inverse)
     n4 = n >> 2;
     s->tcos = tcosarray[12-nbits];
     s->tsin = tsinarray[12-nbits];
-    //s->tcos = av_malloc(n4 * sizeof(fixed32));        //this allocates between 1024 and 64 elements
-    //if (!s->tcos)
-    //    goto fail;
-    //s->tsin = av_malloc(n4 * sizeof(fixed32));
-    //if (!s->tsin)
-    //    goto fail;
-//
     for(i=0;i<n4;i++)
     {
         //fixed32 pi2 = fixmul32(0x20000, M_PI_F);
@@ -672,14 +621,6 @@ void ff_imdct_calc(MDCTContext *s,
 
 }
 
-void ff_mdct_end(MDCTContext *s)
-{
-  (void)s;
-
-   // av_freep(&s->tcos);
-   // av_freep(&s->tsin);
-   // fft_end(&s->fft);
-}
 
 /*
  * Helper functions for wma_window.
@@ -1073,11 +1014,11 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
     tcosarray[0] = tcos0; tcosarray[1] = tcos1; tcosarray[2] = tcos2; tcosarray[3] = tcos3;tcosarray[4] = tcos4;
     tsinarray[0] = tsin0; tsinarray[1] = tsin1; tsinarray[2] = tsin2; tsinarray[3] = tsin3;tsinarray[4] = tsin4;
 
-	/*these are folded up now*/
+      /*these are folded up now*/
     exparray[0] = exptab0; //exparray[1] = exptab1; exparray[2] = exptab2; exparray[3] = exptab3; exparray[4] = exptab4;
     revarray[0]=revtab0; //revarray[1]=revtab1; revarray[2]=revtab2; revarray[3]=revtab3; revarray[4]=revtab4;
 
-	s->mdct_tmp = mdct_tmp; /* temporary storage for imdct */
+      s->mdct_tmp = mdct_tmp; /* temporary storage for imdct */
     for(i = 0; i < s->nb_block_sizes; ++i)
     {
         ff_mdct_init(&s->mdct_ctx[i], s->frame_len_bits - i + 1, 1);
@@ -1085,15 +1026,15 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
 
     /* init the MDCT bit reverse table here rather then in fft_init */
 
-	for(i=0;i<1024;i++)		/*hard coded to a 2048 bit rotation*/
-	{					/*smaller sizes can reuse the largest*/
-		 m=0;
-		 for(j=0;j<10;j++)
-		 {
-		     m |= ((i >> j) & 1) << (10-j-1);
-		 }
+      for(i=0;i<1024;i++)           /*hard coded to a 2048 bit rotation*/
+      {                             /*smaller sizes can reuse the largest*/
+             m=0;
+             for(j=0;j<10;j++)
+             {
+                 m |= ((i >> j) & 1) << (10-j-1);
+             }
 
-	 revtab0[i]=m;
+       revtab0[i]=m;
        }
 
     /*ffmpeg uses malloc to only allocate as many window sizes as needed.  However, we're really only interested in the worst case memory usage.
@@ -1121,7 +1062,7 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
         //alpha = fixdiv32(M_PI_F, n2);        //PI / (2x Window length) == PI<<(s->frame_len_bits - i+1)
 
         //alpha = M_PI_F>>(s->frame_len_bits - i+1);
-        alpha = (1<<15)>>(s->frame_len_bits - i+1);	/* this calculates 0.5/(2*n) */
+        alpha = (1<<15)>>(s->frame_len_bits - i+1);   /* this calculates 0.5/(2*n) */
         for(j=0;j<n;++j)
         {
             fixed32 j2 = itofix32(j) + 0x8000;
@@ -1375,7 +1316,6 @@ static int wma_decode_block(WMADecodeContext *s)
 {
     int n, v, a, ch, code, bsize;
     int coef_nb_bits, total_gain;
-    //static fixed32 window[BLOCK_MAX_SIZE * 2];        //crap can't do this locally on the device!  its big as the whole stack
     int nb_coefs[MAX_CHANNELS];
     fixed32 mdct_norm;
 
@@ -1409,8 +1349,7 @@ static int wma_decode_block(WMADecodeContext *s)
         }
         v = get_bits(&s->gb, n);
 
-        //rb->fdprintf(filehandle,"v %d \n prev_block_len_bits %d\n block_len_bits %d\n", v, s->prev_block_len_bits, s->block_len_bits);
-        //rb->close(filehandle);
+
 
     LOGF("v was %d", v);
         if (v >= s->nb_block_sizes)
@@ -1779,10 +1718,10 @@ static int wma_decode_block(WMADecodeContext *s)
 
                 for(i = 0;i < n; ++i)
                 {
-	/*
-	*  Previously the IMDCT was run in 17.15 precision to avoid overflow. However rare files could
-	*  overflow here as well, so switch to 17.15 now.  As a bonus, this saves us a shift later on.
-	*/
+      /*
+      *  Previously the IMDCT was run in 17.15 precision to avoid overflow. However rare files could
+      *  overflow here as well, so switch to 17.15 now.  As a bonus, this saves us a shift later on.
+      */
 
 
                   atemp = (fixed32)(coefs1[i]*mult>>17);
@@ -1844,7 +1783,7 @@ static int wma_decode_block(WMADecodeContext *s)
             /* add in the frame */
             index = (s->frame_len / 2) + s->block_pos - n4;
 
-		wma_window(s, output, &s->frame_out[ch][index]);
+            wma_window(s, output, &s->frame_out[ch][index]);
 
 
 
@@ -1935,9 +1874,9 @@ static int wma_decode_frame(WMADecodeContext *s, int16_t *samples)
 }
 
 int wma_decode_superframe(WMADecodeContext* s,
-                                 void *data,	/*output*/
+                                 void *data,    /*output*/
                                  int *data_size,
-                                 uint8_t *buf,	/*input*/
+                                 uint8_t *buf,  /*input*/
                                  int buf_size)
 {
     //WMADecodeContext *s = avctx->priv_data;
@@ -2040,36 +1979,4 @@ fail:
     return -1;
 }
 
-/*void free_vlc(VLC *vlc)
-{
-    //av_free(vlc->table);
-}
-*/
-int wma_decode_end(WMADecodeContext *s)
-{
-    (void)s;
-/*    WMADecodeContext *s = avctx->priv_data;
-    int i;
 
-    for(i = 0; i < s->nb_block_sizes; ++i)
-        ff_mdct_end(&s->mdct_ctx[i]);
- //   for(i = 0; i < s->nb_block_sizes; ++i)    //now statically allocated
- //       av_free(s->windows[i]);
-
-    if (s->use_exp_vlc)
-    {
-        free_vlc(&s->exp_vlc);
-    }
-    if (s->use_noise_coding)
-    {
-        free_vlc(&s->hgain_vlc);
-    }
-    for(i = 0;i < 2; ++i)
-    {
-       // free_vlc(&s->coef_vlc[i]);
-      //  av_free(s->run_table[i]);
-       // av_free(s->level_table[i]);
-    }
-*/
-    return 0;
-}
