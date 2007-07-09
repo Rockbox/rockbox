@@ -325,7 +325,10 @@ int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) long startsector)
 
     /* Determine FAT type */
     datasec = fat_bpb->totalsectors - fat_bpb->firstdatasector;
-    fat_bpb->dataclusters = datasec / fat_bpb->bpb_secperclus;
+    if (fat_bpb->bpb_secperclus)
+        fat_bpb->dataclusters = datasec / fat_bpb->bpb_secperclus;
+    else
+       return -2;
 
 #ifdef TEST_FAT
     /*
