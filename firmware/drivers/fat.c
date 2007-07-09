@@ -313,6 +313,8 @@ int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) long startsector)
 
 #ifdef HAVE_FAT16SUPPORT
     fat_bpb->bpb_rootentcnt = BYTES2INT16(buf,BPB_ROOTENTCNT);
+    if (!fat_bpb->bpb_bytspersec)
+        return -2;
     rootdirsectors = secmult * ((fat_bpb->bpb_rootentcnt * DIR_ENTRY_SIZE
                      + fat_bpb->bpb_bytspersec - 1) / fat_bpb->bpb_bytspersec);
 #endif /* #ifdef HAVE_FAT16SUPPORT */
