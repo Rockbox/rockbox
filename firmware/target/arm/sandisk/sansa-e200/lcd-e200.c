@@ -111,7 +111,8 @@ static unsigned short r_drv_output_control  = R_DRV_OUTPUT_CONTROL_NORMAL;
 static fb_data lcd_driver_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH]
     __attribute__((aligned(16))); /* Same alignment as in lcd-16bit.c */
 
-static inline void lcd_init_gpio(void)
+#ifdef BOOTLOADER
+static void lcd_init_gpio(void)
 {
     GPIOB_ENABLE |= (1<<7);
     GPIOB_ENABLE |= (1<<5);
@@ -120,14 +121,15 @@ static inline void lcd_init_gpio(void)
     GPIOD_ENABLE |= (1<<6);
     GPIOD_OUTPUT_EN |= (1<<6);
 }
+#endif
 
-static inline void lcd_bus_idle(void)
+static void lcd_bus_idle(void)
 {
     LCD_CLOCK_GPIO |= (1 << LCD_CLOCK_PIN);
     LCD_DATA_OUT_GPIO |= (1 << LCD_DATA_OUT_PIN);
 }
 
-static inline void lcd_send_byte(unsigned char byte)
+static void lcd_send_byte(unsigned char byte)
 {
 
     int i;
@@ -149,7 +151,7 @@ static inline void lcd_send_byte(unsigned char byte)
     }
 }
 
-static inline void lcd_send_msg(unsigned char cmd, unsigned int data)
+static void lcd_send_msg(unsigned char cmd, unsigned int data)
 {
     lcd_bus_idle();
     udelay(1);
@@ -163,7 +165,7 @@ static inline void lcd_send_msg(unsigned char cmd, unsigned int data)
     lcd_bus_idle();
 }
 
-static inline void lcd_write_reg(unsigned int reg, unsigned int data)
+static void lcd_write_reg(unsigned int reg, unsigned int data)
 {
     lcd_send_msg(0x70, reg);
     lcd_send_msg(0x72, data);
