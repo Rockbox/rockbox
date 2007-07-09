@@ -126,7 +126,7 @@ uint16_t *runtabarray[2], *levtabarray[2];                                      
 
 uint16_t runtab0[1336], runtab1[1336], levtab0[1336], levtab1[1336];                //these could be made smaller since only one can be 1336
 
-FFTComplex mdct_tmp[BLOCK_MAX_SIZE] IBSS_ATTR;              /* temporary storage for imdct */
+FFTComplex mdct_tmp[1] ;              /* dummy var */
 
 //may also be too large by ~ 1KB each?
 static VLC_TYPE vlcbuf1[6144][2];
@@ -555,14 +555,14 @@ fail:
  */
 void ff_imdct_calc(MDCTContext *s,
                    fixed32 *output,
-                   const fixed32 *input,
-                   FFTComplex *tmp)
+                   fixed32 *input)
 {
     int k, n8, n4, n2, n, j,scale;
     const fixed32 *tcos = s->tcos;
     const fixed32 *tsin = s->tsin;
     const fixed32 *in1, *in2;
-    FFTComplex *z = (FFTComplex *)tmp;
+    FFTComplex *z1 = (FFTComplex *)output;
+    FFTComplex *z2 = (FFTComplex *)input;
     int revtabshift = 12 - s->nbits;
 
     n = 1 << s->nbits;
@@ -579,31 +579,31 @@ void ff_imdct_calc(MDCTContext *s,
     for(k = 0; k < n4; k++)
     {
         j=revtab0[k<<revtabshift];
-        CMUL(&z[j].re, &z[j].im, *in2, *in1, tcos[k], tsin[k]);
+        CMUL(&z1[j].re, &z1[j].im, *in2, *in1, tcos[k], tsin[k]);
         in1 += 2;
         in2 -= 2;
     }
 
-        scale = fft_calc_unscaled(&s->fft, z);
+        scale = fft_calc_unscaled(&s->fft, z1);
 
     /* post rotation + reordering */
 
     for(k = 0; k < n4; k++)
     {
-        CMUL(&z[k].re, &z[k].im, (z[k].re), (z[k].im), tcos[k], tsin[k]);
+        CMUL(&z2[k].re, &z2[k].im, (z1[k].re), (z1[k].im), tcos[k], tsin[k]);
     }
 
     for(k = 0; k < n8; k++)
     {
         fixed32 r1,r2,r3,r4,r1n,r2n,r3n;
 
-        r1 = z[n8 + k].im;
+        r1 = z2[n8 + k].im;
         r1n = r1 * -1;
-        r2 = z[n8-1-k].re;
+        r2 = z2[n8-1-k].re;
         r2n = r2 * -1;
-        r3 = z[k+n8].re;
+        r3 = z2[k+n8].re;
         r3n = r3 * -1;
-        r4 = z[n8-k-1].im;
+        r4 = z2[n8-k-1].im;
 
         output[2*k] = r1n;
         output[n2-1-2*k] = r1;
@@ -1748,6 +1748,7 @@ static int wma_decode_block(WMADecodeContext *s)
     {
         fixed32 a, b;
         int i;
+        fixed32 (*coefs)[MAX_CHANNELS][BLOCK_MAX_SIZE]  = (s->coefs);
 
         /* nominal case for ms stereo: we do it before mdct */
         /* no need to optimize this case because it should almost
@@ -1760,10 +1761,10 @@ static int wma_decode_block(WMADecodeContext *s)
 
         for(i = 0; i < s->block_len; ++i)
         {
-            a = (*s->coefs)[0][i];
-            b = (*s->coefs)[1][i];
-            (*s->coefs)[0][i] = a + b;
-            (*s->coefs)[1][i] = a - b;
+            a = (*coefs)[0][i];
+            b = (*coefs)[1][i];
+            (*coefs)[0][i] = a + b;
+            (*coefs)[1][i] = a - b;
         }
     }
 
@@ -1771,7 +1772,7 @@ static int wma_decode_block(WMADecodeContext *s)
     {
         if (s->channel_coded[ch])
         {
-            static fixed32  output[BLOCK_MAX_SIZE * 2];
+            static fixed32  output[BLOCK_MAX_SIZE * 2] IBSS_ATTR;
 
             int n4, index, n;
 
@@ -1780,8 +1781,7 @@ static int wma_decode_block(WMADecodeContext *s)
 
             ff_imdct_calc(&s->mdct_ctx[bsize],
                           output,
-                          (*(s->coefs))[ch],
-                          s->mdct_tmp);
+                          (*(s->coefs))[ch]);
 
 
             /* add in the frame */
