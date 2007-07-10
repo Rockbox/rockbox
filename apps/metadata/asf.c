@@ -235,7 +235,7 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
 
     asf_read_object_header((asf_object_t *) &header, fd);
 
-    DEBUGF("header.size=%d\n",(int)header.size);
+    //DEBUGF("header.size=%d\n",(int)header.size);
     if (header.size < 30) {
         /* invalid size for header object */
         return ASF_ERROR_OBJECT_SIZE;
@@ -246,7 +246,7 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
     /* Two reserved bytes - do we need to read them? */
     lseek(fd, 2, SEEK_CUR);
 
-    DEBUGF("Read header - size=%d, subobjects=%d\n",(int)header.size, (int)subobjects);
+    //DEBUGF("Read header - size=%d, subobjects=%d\n",(int)header.size, (int)subobjects);
 
     if (subobjects > 0) {
         header.datalen = header.size - 30;
@@ -255,16 +255,16 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
         datalen = header.datalen;
 
         for (i=0; i<(int)subobjects; i++) {
-            DEBUGF("Parsing header object %d - datalen=%d\n",i,(int)datalen);
+            //DEBUGF("Parsing header object %d - datalen=%d\n",i,(int)datalen);
             if (datalen < 24) {
-                DEBUGF("not enough data for reading object\n");
+                //DEBUGF("not enough data for reading object\n");
                 break;
             }
 
             asf_read_object_header(&current, fd);
 
             if (current.size > datalen || current.size < 24) {
-                DEBUGF("invalid object size - current.size=%d, datalen=%d\n",(int)current.size,(int)datalen);
+                //DEBUGF("invalid object size - current.size=%d, datalen=%d\n",(int)current.size,(int)datalen);
                 break;
             }
 
@@ -284,7 +284,7 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                     read_uint64le(fd, &play_duration);
                     id3->length = play_duration / 10000;
 
-                    DEBUGF("****** length = %lums\n", id3->length);
+                    //DEBUGF("****** length = %lums\n", id3->length);
 
                     /* Read the packet size - uint32_t at offset 68 */
                     lseek(fd, 20, SEEK_CUR);
@@ -313,11 +313,11 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                     read_uint16le(fd, &flags);
 
                     if (!asf_guid_match(&guid, &asf_guid_stream_type_audio)) {
-                        DEBUGF("Found stream properties for non audio stream, skipping\n");
+                        //DEBUGF("Found stream properties for non audio stream, skipping\n");
                         lseek(fd,current.size - 24 - 50,SEEK_CUR);
                     } else {
                         lseek(fd, 4, SEEK_CUR);
-                        DEBUGF("Found stream properties for audio stream %d\n",flags&0x7f);
+                        //DEBUGF("Found stream properties for audio stream %d\n",flags&0x7f);
 
                         /* TODO: Check codec_id and find the lowest numbered audio stream in the file */
                         wfx->audiostream = flags&0x7f;
@@ -362,12 +362,12 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                     uint16_t strlength[5];
                     int i;
 
-                    DEBUGF("Found GUID_CONTENT_DESCRIPTION - size=%d\n",(int)(current.size - 24));
+                    //DEBUGF("Found GUID_CONTENT_DESCRIPTION - size=%d\n",(int)(current.size - 24));
 
                     /* Read the 5 string lengths - number of bytes included trailing zero */
                     for (i=0; i<5; i++) {
                         read_uint16le(fd, &strlength[i]);
-                        DEBUGF("strlength = %u\n",strlength[i]);
+                        //DEBUGF("strlength = %u\n",strlength[i]);
                     }
 
                     if (strlength[0] > 0) {  /* 0 - Title */
@@ -392,11 +392,11 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                     uint16_t count;
                     int i;
                     int bytesleft = current.size - 24;
-                    DEBUGF("Found GUID_EXTENDED_CONTENT_DESCRIPTION\n");
+                    //DEBUGF("Found GUID_EXTENDED_CONTENT_DESCRIPTION\n");
                     
                     read_uint16le(fd, &count);
                     bytesleft -= 2;
-                    DEBUGF("extended metadata count = %u\n",count);
+                    //DEBUGF("extended metadata count = %u\n",count);
 
                     for (i=0; i < count; i++) {
                         uint16_t length, type;
@@ -450,20 +450,20 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
 
                     lseek(fd, bytesleft, SEEK_CUR);
             } else {
-                DEBUGF("Skipping %d bytes of object\n",(int)(current.size - 24));
+                //DEBUGF("Skipping %d bytes of object\n",(int)(current.size - 24));
                 lseek(fd,current.size - 24,SEEK_CUR);
             }
 
-            DEBUGF("Parsed object - size = %d\n",(int)current.size);
+            //DEBUGF("Parsed object - size = %d\n",(int)current.size);
             datalen -= current.size;
         }
 
         if (i != (int)subobjects || datalen != 0) {
-            DEBUGF("header data doesn't match given subobject count\n");
+            //DEBUGF("header data doesn't match given subobject count\n");
             return ASF_ERROR_INVALID_VALUE;
         }
 
-        DEBUGF("%d subobjects read successfully\n", i);
+        //DEBUGF("%d subobjects read successfully\n", i);
     }
 
 #if 0
@@ -474,7 +474,7 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
     }
 #endif
 
-    DEBUGF("header validated correctly\n");
+    //DEBUGF("header validated correctly\n");
 
     return 0;
 }
@@ -490,24 +490,24 @@ bool get_asf_metadata(int fd, struct mp3entry* id3)
     res = asf_parse_header(fd, id3, &wfx);
 
     if (res < 0) {
-        DEBUGF("ASF: parsing error - %d\n",res);
+        //DEBUGF("ASF: parsing error - %d\n",res);
         return false;
     }
 
     if (wfx.audiostream == -1) {
-        DEBUGF("ASF: No WMA streams found\n");
+        //DEBUGF("ASF: No WMA streams found\n");
         return false;
     }
 
     if (wfx.bitrate < 32000) {
-        DEBUGF("ASF: < 32kbps files not supported\n");
+        //DEBUGF("ASF: < 32kbps files not supported\n");
         return false;
     }
 
     asf_read_object_header(&obj, fd);
 
     if (!asf_guid_match(&obj.guid, &asf_guid_data)) {
-        DEBUGF("ASF: No data object found\n");
+        //DEBUGF("ASF: No data object found\n");
         return false;
     }
 
