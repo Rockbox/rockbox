@@ -96,6 +96,7 @@ void set_cpu_frequency(long frequency)
             postmult = CPUFREQ_DEFAULT_MULT;
         cpu_frequency = frequency;
 
+        outl(0xd19b, 0xcf005038);
         outl(0x02, 0xcf005008);
         outl(0x55, 0xcf00500c);
         outl(0x6000, 0xcf005010);
