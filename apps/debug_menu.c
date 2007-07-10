@@ -405,7 +405,7 @@ static bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
 #endif /* (CONFIG_CPU == SH7034 || CPU_COLDFIRE) */
 
 #ifndef SIMULATOR
-#ifdef CPU_PP502x
+#ifdef CPU_PP
 static int perfcheck(void)
 {
     int result;
@@ -427,7 +427,13 @@ static int perfcheck(void)
         [res]"=&r"(result)
         :
         [timr]"r"(&USEC_TIMER),
-        [tmo]"r"(10226)
+        [tmo]"r"(
+#if CONFIG_CPU == PP5002
+        16000
+#else /* PP5020/5022/5024 */
+        10226
+#endif
+        )
         :
         "r0", "r1", "r2"
     );
@@ -586,7 +592,7 @@ static bool dbg_hw_info(void)
 
     snprintf(buf, sizeof(buf), "Est. clock (kHz): %d", perfcheck());
     lcd_puts(0, 3, buf);
-    
+
     lcd_update();
 
     while(1)
@@ -1179,6 +1185,23 @@ bool dbg_ports(void)
         snprintf(buf, sizeof(buf), "GPIO_A: %02x GPIO_B: %02x", gpio_a, gpio_b);
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "GPIO_C: %02x GPIO_D: %02x", gpio_c, gpio_d);
+        lcd_puts(0, line++, buf);
+
+        snprintf(buf, sizeof(buf), "CLOCK_ENABLE: %08lx", CLOCK_ENABLE);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "CLOCK_SOURCE: %08lx", CLOCK_SOURCE);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "CLOCK_DIV:    %08lx", CLOCK_DIV);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "PLL_DIV:      %08lx", PLL_DIV);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "PLL_MULT:     %08lx", PLL_MULT);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "TIMING1_CTL:  %08lx", TIMING1_CTL);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "TIMING2_CTL:  %08lx", TIMING2_CTL);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "Est. clock (kHz): %d", perfcheck());
         lcd_puts(0, line++, buf);
 
         lcd_update();

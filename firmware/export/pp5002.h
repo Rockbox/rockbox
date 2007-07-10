@@ -116,6 +116,15 @@
 #define SER1_MASK    (1 << SER1_IRQ)
 #define DMA_OUT_MASK (1 << DMA_OUT_IRQ)
 
+#define TIMING1_CTL         (*(volatile unsigned long*)(0xcf004000))
+#define TIMING2_CTL         (*(volatile unsigned long*)(0xcf004008))
+
+#define CLOCK_ENABLE        (*(volatile unsigned long*)(0xcf005008))
+#define CLOCK_SOURCE        (*(volatile unsigned long*)(0xcf00500c))
+#define CLOCK_DIV           (*(volatile unsigned long*)(0xcf005010))
+#define PLL_DIV             (*(volatile unsigned long*)(0xcf005018))
+#define PLL_MULT            (*(volatile unsigned long*)(0xcf00501c))
+
 #define MMAP0_LOGICAL       (*(volatile unsigned long*)(0xf000f000))
 #define MMAP0_PHYSICAL      (*(volatile unsigned long*)(0xf000f004))
 #define MMAP1_LOGICAL       (*(volatile unsigned long*)(0xf000f008))

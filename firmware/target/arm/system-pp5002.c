@@ -100,8 +100,8 @@ void set_cpu_frequency(long frequency)
         outl(0x55, 0xcf00500c);
         outl(0x6000, 0xcf005010);
 
-        /* Clock frequency = (24/8)*postmult */
-        outl(8, 0xcf005018);
+        /* Clock frequency = (24/4)*postmult */
+        outl(4, 0xcf005018);
         outl(postmult, 0xcf00501c);
 
         outl(0xe000, 0xcf005010);
