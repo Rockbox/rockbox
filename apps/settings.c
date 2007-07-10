@@ -77,9 +77,6 @@ void dac_line_in(bool enable);
 struct user_settings global_settings;
 struct system_status global_status;
 
-#ifdef HAVE_RECORDING
-const char rec_base_directory[] = REC_BASE_DIR;
-#endif
 #if CONFIG_CODEC == SWCODEC
 #include "pcmbuf.h"
 #include "pcm_playback.h"

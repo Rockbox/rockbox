@@ -773,11 +773,12 @@ const struct settings_list settings[] = {
          HAVE_SPDIF_REC_(",spdif")
          HAVE_FMRADIO_REC_(",fmradio")[1]
         ,UNUSED},
-        INT_SETTING(F_RECSETTING, rec_prerecord_time, LANG_RECORD_PRERECORD_TIME,
-                0, "prerecording time",
-                UNIT_SEC, 0, 30, 1, rectime_formatter, rectime_getlang, NULL),
-        {F_T_INT|F_RECSETTING,&global_settings.rec_directory,LANG_RECORD_DIRECTORY,
-        INT(0),"rec directory",REC_BASE_DIR ",current",UNUSED},
+    INT_SETTING(F_RECSETTING, rec_prerecord_time, LANG_RECORD_PRERECORD_TIME,
+            0, "prerecording time",
+            UNIT_SEC, 0, 30, 1, rectime_formatter, rectime_getlang, NULL),
+        
+    FILENAME_SETTING(F_RECSETTING, rec_directory, "rec path", 
+                     REC_BASE_DIR, NULL, NULL, MAX_FILENAME+1),
 #ifdef HAVE_BACKLIGHT
     CHOICE_SETTING(F_RECSETTING, cliplight, LANG_CLIP_LIGHT, 0 ,
         "cliplight", "off,main,both,remote", NULL, 

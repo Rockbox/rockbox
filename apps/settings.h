@@ -59,7 +59,7 @@
 #define PLUGIN_DIR  ROCKBOX_DIR "/rocks"
 #define VIEWERS_DIR  ROCKBOX_DIR "/viewers"
 #define BACKDROP_DIR ROCKBOX_DIR "/backdrops"
-#define REC_BASE_DIR "/recordings"
+#define REC_BASE_DIR "/"
 #define EQS_DIR     ROCKBOX_DIR "/eqs"
 #define CODECS_DIR  ROCKBOX_DIR "/codecs"
 #define RECPRESETS_DIR  ROCKBOX_DIR "/recpresets"
@@ -336,7 +336,7 @@ struct user_settings
     int crossfade_fade_out_duration;  /* Fade out duration (0-15s)         */
     int crossfade_fade_out_mixmode;   /* Fade out mode (0=crossfade,1=mix) */
 #endif
-
+#ifdef HAVE_RECORDING
 #if CONFIG_CODEC == SWCODEC
     int rec_format;    /* record format index */
 #else
@@ -370,7 +370,7 @@ struct user_settings
     int rec_split_method; /* time/filesize */
 
     int rec_prerecord_time; /* In seconds, 0-30, 0 means OFF */
-    int rec_directory; /* 0=base dir, 1=current dir */
+    char rec_directory[MAX_FILENAME+1];
     int cliplight; /* 0 = off
                       1 = main lcd
                       2 = main and remote lcd
@@ -403,7 +403,7 @@ struct user_settings
     int rec_agc_maxgain_line; /* AGC maximum line-in gain */
     int rec_agc_cliptime;     /* 0.2, 0.4, 0.6, 0.8, 1s */
 #endif
-
+#endif /* HAVE_RECORDING */
     /* device settings */
 
 #ifdef HAVE_LCD_CONTRAST
@@ -740,8 +740,6 @@ struct user_settings
 
 /** global variables **/
 extern long lasttime;
-/* Recording base directory */
-extern const char rec_base_directory[];
 /* global settings */
 extern struct user_settings global_settings;
 /* global status */

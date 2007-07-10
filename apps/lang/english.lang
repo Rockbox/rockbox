@@ -11006,3 +11006,45 @@
     *: "Use File .talk Clips"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SET_AS_REC_DIR
+  desc:
+  user:
+  <source>
+    *: "Set As Recording Directory"
+  </source>
+  <dest>
+    *: "Set As Recording Directory"
+  </dest>
+  <voice>
+    *: "Set As Recording Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_REC_DIR
+  desc:
+  user:
+  <source>
+    *: "Clear Recording Directory"
+  </source>
+  <dest>
+    *: "Clear Recording Directory"
+  </dest>
+  <voice>
+    *: "Clear Recording Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_DIR_NOT_WRITABLE
+  desc:
+  user:
+  <source>
+    *: "Can't write to recording directory"
+  </source>
+  <dest>
+    *: "Can't write to recording directory"
+  </dest>
+  <voice>
+    *: "Can't write to recording directory"
+  </voice>
+</phrase>

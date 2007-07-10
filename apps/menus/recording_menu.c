@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include "string.h"
 #include "system.h"
 #include "kernel.h"
 #include "lcd.h"
@@ -313,19 +314,16 @@ MAKE_MENU(filesplitoptionsmenu, ID2P(LANG_RECORD_TIMESPLIT), NULL, Icon_NOICON,
 
 
 MENUITEM_SETTING(rec_prerecord_time, &global_settings.rec_prerecord_time, NULL);
-static int recdirectory_func(void)
-{
-    static const struct opt_items names[] = {
-        { rec_base_directory, -1 },
-        { STR(LANG_RECORD_CURRENT_DIR) }
-    };
-    return set_option(str(LANG_RECORD_DIRECTORY),
-                      &global_settings.rec_directory, INT,
-                      names, 2, NULL );
-}
-MENUITEM_FUNCTION(recdirectory, 0, ID2P(LANG_RECORD_DIRECTORY), 
-                    recdirectory_func, NULL, NULL, Icon_Menu_setting);
 
+static int clear_rec_directory(void)
+{
+    strcpy(global_settings.rec_directory, REC_BASE_DIR);
+    gui_syncsplash(HZ, str(LANG_RESET_DONE_CLEAR));
+    return false;
+}
+MENUITEM_FUNCTION(clear_rec_directory_item, 0, ID2P(LANG_CLEAR_REC_DIR), 
+                  clear_rec_directory, NULL, NULL, Icon_Folder);
+                  
 MENUITEM_SETTING(cliplight, &global_settings.cliplight, NULL);
 
 #ifdef HAVE_AGC
@@ -835,7 +833,7 @@ MAKE_MENU(recording_settings_menu, ID2P(LANG_RECORDING_SETTINGS),
 #endif
             &filesplitoptionsmenu,
             &rec_prerecord_time,
-            &recdirectory,
+            &clear_rec_directory_item,
 #ifdef HAVE_BACKLIGHT
             &cliplight,
 #endif

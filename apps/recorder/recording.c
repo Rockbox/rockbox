@@ -508,15 +508,27 @@ static void adjust_cursor(void)
         cursor = max_cursor;
 }
 
+static bool check_dir(char *folder)
+{
+    DIR *dir = opendir(folder);
+    if (!dir && strcmp(folder, "/"))
+    {
+        int rc = mkdir(folder);
+        if(rc < 0)
+            return false;
+        return true;
+    }
+    closedir(dir);
+    return true;
+}
+
 char *rec_create_filename(char *buffer)
 {
     char ext[16];
-
-    if(global_settings.rec_directory)
-        getcwd(buffer, MAX_PATH);
-    else
-        strncpy(buffer, rec_base_directory, MAX_PATH);
-
+    strcpy(buffer,global_settings.rec_directory);
+    if (!check_dir(buffer))
+        return NULL;
+    
     snprintf(ext, sizeof(ext), ".%s",
              REC_FILE_ENDING(global_settings.rec_format));
 
@@ -542,28 +554,7 @@ void rec_init_filename(void)
 
 int rec_create_directory(void)
 {
-    int rc;
-    
-    /* Try to create the base directory if needed */
-    if(global_settings.rec_directory == 0)
-    {
-        rc = mkdir(rec_base_directory);
-        if(rc < 0 && errno != EEXIST)
-        {
-            gui_syncsplash(HZ * 2,
-                   "Can't create the %s directory. Error code %d.",
-                   rec_base_directory, rc);
-            return -1;
-        }
-        else
-        {
-            /* If we have created the directory, we want the dir browser to
-               be refreshed even if we haven't recorded anything */
-            if(errno != EEXIST)
-                return 1;
-        }
-    }
-    return 0;
+    return check_dir(global_settings.rec_directory)?1:0;
 }
 
 void rec_init_recording_options(struct audio_recording_options *options)
@@ -747,7 +738,16 @@ bool recording_screen(bool no_source)
     };
 
     struct audio_recording_options rec_options;
-
+    if (check_dir(global_settings.rec_directory) == false)
+    {
+        do {
+            gui_syncsplash(0, "%s %s", 
+                                     str(LANG_REC_DIR_NOT_WRITABLE), 
+                                     str(LANG_OFF_ABORT));
+        } while (action_userabort(HZ) == false);
+        return false;
+    }
+    
     rec_status = RCSTAT_IN_RECSCREEN;
     cursor = 0;
 #if (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)

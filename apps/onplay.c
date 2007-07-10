@@ -1043,6 +1043,16 @@ MENUITEM_FUNCTION(list_viewers_item, 0, ID2P(LANG_ONPLAY_OPEN_WITH),
 MENUITEM_FUNCTION(set_backdrop_item, 0, ID2P(LANG_SET_AS_BACKDROP),
                   set_backdrop, NULL, clipboard_callback, Icon_NOICON);
 #endif
+#ifdef HAVE_RECORDING
+static bool set_recdir(void)
+{
+    strncpy(global_settings.rec_directory,
+            selected_file, MAX_FILENAME+1);
+    return false;
+}
+MENUITEM_FUNCTION(set_recdir_item, 0, ID2P(LANG_SET_AS_REC_DIR),
+                  set_recdir, NULL, clipboard_callback, Icon_Recording);
+#endif
 
 
 
@@ -1090,6 +1100,10 @@ static int clipboard_callback(int action,const struct menu_item_ex *this_item)
                 if ((this_item == &delete_dir_item)
                     )
                     return action;
+#ifdef HAVE_RECORDING
+                else if (this_item == &set_recdir_item)
+                    return action;
+#endif
             }
             else if (selected_file
 #ifdef HAVE_MULTIVOLUME
@@ -1135,7 +1149,10 @@ MAKE_ONPLAYMENU( tree_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
 #if LCD_DEPTH > 1
            &set_backdrop_item,
 #endif
-           &list_viewers_item, &create_dir_item, &properties_item
+           &list_viewers_item, &create_dir_item, &properties_item,
+#ifdef HAVE_RECORDING
+           &set_recdir_item,
+#endif
          );
 int onplay(char* file, int attr, int from)
 {
