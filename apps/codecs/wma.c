@@ -67,9 +67,10 @@ static unsigned short get_short_le(void* buf)
         (((bits) != 0x03) ? ((bits) != 0x02) ? ((bits) != 0x01) ? \
          0 : *(data) : get_short_le(data) : get_long_le(data))
 
-static int asf_read_packet(int* padding, asf_waveformatex_t* wfx)
+static int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlength, asf_waveformatex_t* wfx)
 {
     uint8_t tmp8, packet_flags, packet_property;
+    int stream_id;
     int ec_length, opaque_data, ec_length_type;
     int datalen;
     uint8_t data[18];
@@ -87,16 +88,19 @@ static int asf_read_packet(int* padding, asf_waveformatex_t* wfx)
     uint32_t media_object_number;
     uint32_t media_object_offset;
     uint32_t bytesread = 0;
+    uint8_t* buf;
+    size_t bufsize;
+    int i;
 
     if (ci->read_filebuf(&tmp8, 1) == 0) {
         return ASF_ERROR_EOF;
     }
     bytesread++;
 
+    //DEBUGF("tmp8=0x%02x\n",tmp8);
     /* TODO: We need a better way to detect endofstream */
     if (tmp8 != 0x82) { return -1; }
 
-    //DEBUGF("tmp8=0x%02x\n",tmp8);
 
     if (tmp8 & 0x80) {
        ec_length = tmp8 & 0x0f;
@@ -188,22 +192,33 @@ static int asf_read_packet(int* padding, asf_waveformatex_t* wfx)
         return ASF_ERROR_INVALID_LENGTH;
     }
 
-    if (ci->read_filebuf(&tmp8, 1) == 0) {
-        return ASF_ERROR_EOF;
+
+    /* We now parse the individual payloads, and move all payloads
+       belonging to our audio stream to a contiguous block, starting at
+       the location of the first payload.
+    */
+
+    *audiobuf = NULL;
+    *audiobufsize = 0;
+    *packetlength = length - bytesread;
+
+    buf = ci->request_buffer(&bufsize, length);
+    datap = buf;
+
+    if (bufsize != length) {
+        /* This should only happen with packets larger than 32KB (the
+           guard buffer size).  All the streams I've seen have
+           relatively small packets less than about 8KB), but I don't
+           know what is expected.
+        */
+        DEBUGF("Could not read packet (%d bytes), aborting\n",(int)length);
+        return -1;
     }
-    //DEBUGF("stream = %u\n",tmp8&0x7f);
-    bytesread++;
 
-    if ((tmp8 & 0x7f) != wfx->audiostream) {
-        /* Not interested in this packet, just skip it */
-        ci->advance_buffer(length - bytesread);
-        return 0;
-    } else {
-        /* We are now at the data */
-        //DEBUGF("Read packet - length=%u, padding_length=%u, send_time=%u, duration=%u, payload_count=%d, bytesread=%d\n",length,padding_length,(int)send_time,duration,payload_count,bytesread);
-
-        /* TODO: Loop through all payloads in this packet - or do we
-           assume that audio streams only have one payload per packet? */
+    for (i=0; i<payload_count; i++) {
+        stream_id = datap[0]&0x7f;
+        datap++;
+        bytesread++;
 
         payload_hdrlen = GETLEN2b(packet_property & 0x03) +
                          GETLEN2b((packet_property >> 2) & 0x03) +
@@ -221,12 +236,7 @@ static int asf_read_packet(int* padding, asf_waveformatex_t* wfx)
             return ASF_ERROR_OUTOFMEM;
         }
 
-        if (ci->read_filebuf(data, payload_hdrlen) == 0) {
-            return ASF_ERROR_EOF;
-        }
         bytesread += payload_hdrlen;
-
-        datap = data;
         media_object_number = GETVALUE2b((packet_property >> 4) & 0x03, datap);
         datap += GETLEN2b((packet_property >> 4) & 0x03);
         media_object_offset = GETVALUE2b((packet_property >> 2) & 0x03, datap);
@@ -236,9 +246,8 @@ static int asf_read_packet(int* padding, asf_waveformatex_t* wfx)
 
         /* TODO: Validate replicated_length */
         /* TODO: Is the content of this important for us? */
-        ci->advance_buffer(replicated_length);
+        datap += replicated_length;
         bytesread += replicated_length;
-
 
         multiple = packet_flags & 0x01;
 
@@ -258,20 +267,36 @@ static int asf_read_packet(int* padding, asf_waveformatex_t* wfx)
                 return ASF_ERROR_INVALID_LENGTH;
             }
 #endif
-            if (ci->read_filebuf(&data, x) == 0) {
-                return ASF_ERROR_EOF;
-            }
+            payload_datalen = GETVALUE2b(payload_length_type, datap);
+            datap += x;
             bytesread += x;
-            payload_datalen = GETVALUE2b(payload_length_type, data);
         } else {
-            payload_datalen = length - bytesread;
+            payload_datalen = length - bytesread - padding_length;
         }
 
-        //DEBUGF("WE HAVE DATA - %d bytes\n", payload_datalen);
-//        lseek(fd, payload_datalen, SEEK_CUR);
-        *padding = padding_length;
-        return payload_datalen;
+        if (stream_id == wfx->audiostream)
+        {
+            if (*audiobuf == NULL) {
+                /* The first payload can stay where it is */
+                *audiobuf = datap;
+                *audiobufsize = payload_datalen;
+            } else {
+                /* The second and subsequent payloads in this packet
+                   that belong to the audio stream need to be moved to be
+                   contiguous with the first payload.
+                */
+                memmove(*audiobuf + *audiobufsize, datap, payload_datalen);
+                *audiobufsize += payload_datalen;
+            }
+        }
+        datap += payload_datalen;
+        bytesread += payload_datalen;
     }
+
+    if (*audiobuf != NULL)
+        return 1;
+    else
+        return 0;
 }
 
 /* this is the codec entry point */
@@ -282,11 +307,12 @@ enum codec_status codec_main(void)
     int retval;
     asf_waveformatex_t wfx;
     uint32_t currentframe;
-    unsigned char* inbuffer;
     size_t resume_offset;
-    size_t n;
     int i;
-    int wmares, res, padding;
+    int wmares, res;
+    uint8_t* audiobuf;
+    int audiobufsize;
+    int packetlength;
 
     /* Generic codec initialisation */
     ci->configure(CODEC_SET_FILEBUF_WATERMARK, 1024*512);
@@ -348,18 +374,16 @@ enum codec_status codec_main(void)
             ci->seek_complete();
         }
 
-        res = asf_read_packet(&padding, &wfx);
+        res = asf_read_packet(&audiobuf, &audiobufsize, &packetlength, &wfx);
         if (res > 0) {
-            inbuffer = ci->request_buffer(&n, res - padding);
-
             wma_decode_superframe_init(&wmadec,
-                                       inbuffer,res - padding);
+                                       audiobuf, audiobufsize);
 
             for (i=0; i < wmadec.nb_frames; i++)
             {
                 wmares = wma_decode_superframe_frame(&wmadec,
                                                      decoded,
-                                                     inbuffer,res - padding);
+                                                     audiobuf, audiobufsize);
 
                 ci->yield ();
 
@@ -375,9 +399,9 @@ enum codec_status codec_main(void)
                 }
                 ci->yield ();
             }
-
-            ci->advance_buffer(res);
         }
+
+        ci->advance_buffer(packetlength);
     }
     retval = CODEC_OK;
 
