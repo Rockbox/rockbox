@@ -10976,3 +10976,45 @@ LANG_RECORDING_AGC_PRESET: The phrase is not used. Skipped
     *: "Usa Cartelle con Clip audio .talk""
   </voice>
 </phrase>
+<phrase>
+  id: LANG_REC_DIR_NOT_WRITABLE
+  desc:
+  user:
+  <source>
+    *: "Can't write to recording directory"
+  </source>
+  <dest>
+    *: "Impossibile scrivere nella cartella di registrazione"
+  </dest>
+  <voice>
+    *: "Impossibile scrivere nella cartella di registrazione""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_REC_DIR
+  desc:
+  user:
+  <source>
+    *: "Clear Recording Directory"
+  </source>
+  <dest>
+    *: "Ripulisci cartella di registrazione"
+  </dest>
+  <voice>
+    *: "Ripulisci cartella di registrazione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_REC_DIR
+  desc:
+  user:
+  <source>
+    *: "Set As Recording Directory"
+  </source>
+  <dest>
+    *: "Imposta come cartella di registrazione"
+  </dest>
+  <voice>
+    *: "Imposta come cartella di registrazione"
+  </voice>
+</phrase>
