@@ -181,7 +181,7 @@ static int browser(void* param)
 #endif
         case GO_TO_BROWSEPLUGINS:
             filter = SHOW_PLUGINS;
-            snprintf(folder, MAX_PATH, "%s/", PLUGIN_DIR);
+            snprintf(folder, MAX_PATH, "%s", PLUGIN_DIR);
         break;
     }
     ret_val = rockbox_browse(folder, filter);

@@ -360,6 +360,12 @@ static int update_dir(void)
                 gui_synclist_set_title(&tree_lists, str(LANG_DIR_BROWSER),
                     filetype_get_icon(ATTR_DIRECTORY));
             }
+            else if(0 == strcasecmp(tc.currdir, PLUGIN_DIR))
+            {
+                /* Display "Plugins" for the rocks dir */
+                gui_synclist_set_title(&tree_lists, str(LANG_PLUGINS),
+                    filetype_get_icon(ATTR_DIRECTORY));
+            }
             else
                 gui_synclist_set_title(&tree_lists, title,
                     filetype_get_icon(ATTR_DIRECTORY));
