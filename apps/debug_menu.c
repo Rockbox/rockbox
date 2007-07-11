@@ -88,6 +88,17 @@
 #endif
 #include "hwcompat.h"
 
+#if defined(HAVE_DIRCACHE) || defined(HAVE_TAGCACHE) || CONFIG_TUNER
+#define MAX_DEBUG_MESSAGES 8
+#define DEBUG_MSG_LEN 32
+char debug_list_messages[MAX_DEBUG_MESSAGES][DEBUG_MSG_LEN];
+static char* dbg_listmessage_getname(int item, void * data, char *buffer)
+{
+    (void)buffer; (void)data;
+    return debug_list_messages[item];
+}
+#endif
+
 static char* dbg_menu_getname(int item, void * data, char *buffer);
 static bool dbg_list(char *title, int count, int selection_size,
                      int (*action_callback)(int btn, struct gui_synclist *lists), 
@@ -1874,103 +1885,62 @@ static bool dbg_disk_info(void)
 #endif /* !SIMULATOR */
 
 #ifdef HAVE_DIRCACHE
+static int dircache_callback(int btn, struct gui_synclist *lists)
+{
+    (void)btn; (void)lists;
+    snprintf(debug_list_messages[0], DEBUG_MSG_LEN, "Cache initialized: %s",
+             dircache_is_enabled() ? "Yes" : "No");
+    snprintf(debug_list_messages[1], DEBUG_MSG_LEN, "Cache size: %d B", 
+             dircache_get_cache_size());
+    snprintf(debug_list_messages[2], DEBUG_MSG_LEN, "Last size: %d B", 
+             global_status.dircache_size);
+    snprintf(debug_list_messages[3], DEBUG_MSG_LEN, "Limit: %d B", 
+             DIRCACHE_LIMIT);
+    snprintf(debug_list_messages[4], DEBUG_MSG_LEN, "Reserve: %d/%d B", 
+             dircache_get_reserve_used(), DIRCACHE_RESERVE);
+    snprintf(debug_list_messages[5], DEBUG_MSG_LEN, "Scanning took: %d s", 
+             dircache_get_build_ticks() / HZ);
+    snprintf(debug_list_messages[6], DEBUG_MSG_LEN, "Entry count: %d", 
+             dircache_get_entry_count());
+    return btn;
+}
+    
 static bool dbg_dircache_info(void)
 {
-    bool done = false;
-    int line;
-    char buf[32];
-
-    lcd_setmargins(0, 0);
-    lcd_setfont(FONT_SYSFIXED);
-
-    while (!done)
-    {
-        line = 0;
-
-        lcd_clear_display();
-        snprintf(buf, sizeof(buf), "Cache initialized: %s",
-                 dircache_is_enabled() ? "Yes" : "No");
-        lcd_puts(0, line++, buf);
-
-        snprintf(buf, sizeof(buf), "Cache size: %d B",
-                 dircache_get_cache_size());
-        lcd_puts(0, line++, buf);
-
-        snprintf(buf, sizeof(buf), "Last size: %d B",
-                 global_status.dircache_size);
-        lcd_puts(0, line++, buf);
-
-        snprintf(buf, sizeof(buf), "Limit: %d B", DIRCACHE_LIMIT);
-        lcd_puts(0, line++, buf);
-
-        snprintf(buf, sizeof(buf), "Reserve: %d/%d B",
-                 dircache_get_reserve_used(), DIRCACHE_RESERVE);
-        lcd_puts(0, line++, buf);
-
-        snprintf(buf, sizeof(buf), "Scanning took: %d s",
-                 dircache_get_build_ticks() / HZ);
-        lcd_puts(0, line++, buf);
-
-        snprintf(buf, sizeof(buf), "Entry count: %d",
-                 dircache_get_entry_count());
-        lcd_puts(0, line++, buf);
-
-        lcd_update();
-
-        if (action_userabort(HZ/2))
-            return false;
-    }
-
+    dircache_callback(0,0);
+    dbg_list("Dircache Info",7, 1, dircache_callback, dbg_listmessage_getname);
     return false;
 }
 
 #endif /* HAVE_DIRCACHE */
 
-#ifdef HAVE_LCD_BITMAP
 #ifdef HAVE_TAGCACHE
+static int database_callback(int btn, struct gui_synclist *lists)
+{
+    (void)btn; (void)lists;
+    struct tagcache_stat *stat = tagcache_get_stat();
+    snprintf(debug_list_messages[0], DEBUG_MSG_LEN, "Initialized: %s",
+             stat->initialized ? "Yes" : "No");
+    snprintf(debug_list_messages[1], DEBUG_MSG_LEN, "DB Ready: %s", 
+             stat->ready ? "Yes" : "No");
+    snprintf(debug_list_messages[2], DEBUG_MSG_LEN, "RAM Cache: %s", 
+             stat->ramcache ? "Yes" : "No");
+    snprintf(debug_list_messages[3], DEBUG_MSG_LEN, "RAM: %d/%d B", 
+             stat->ramcache_used, stat->ramcache_allocated);
+    snprintf(debug_list_messages[4], DEBUG_MSG_LEN, "Progress: %d%% (%d entries)", 
+             stat->progress, stat->processed_entries);
+    snprintf(debug_list_messages[5], DEBUG_MSG_LEN, "Commit step: %d", 
+             stat->commit_step);
+    snprintf(debug_list_messages[6], DEBUG_MSG_LEN, "Commit delayed: %s", 
+             stat->commit_delayed ? "Yes" : "No");
+    return btn;
+}
 static bool dbg_tagcache_info(void)
 {
-    bool done = false;
-    int line;
-    char buf[32];
-    struct tagcache_stat *stat;
-
-    lcd_setmargins(0, 0);
-    lcd_setfont(FONT_SYSFIXED);
-
-    while (!done)
-    {
-        line = 0;
-
-        lcd_clear_display();
-        stat = tagcache_get_stat();
-        snprintf(buf, sizeof(buf), "Initialized: %s", stat->initialized ? "Yes" : "No");
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "DB Ready: %s", stat->ready ? "Yes" : "No");
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "RAM Cache: %s", stat->ramcache ? "Yes" : "No");
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "RAM: %d/%d B",
-                 stat->ramcache_used, stat->ramcache_allocated);
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "Progress: %d%% (%d entries)",
-                 stat->progress, stat->processed_entries);
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "Commit step: %d", stat->commit_step);
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "Commit delayed: %s",
-                 stat->commit_delayed ? "Yes" : "No");
-        lcd_puts(0, line++, buf);
-
-        lcd_update();
-
-        if (action_userabort(HZ/2))
-            return false;
-    }
-
+    database_callback(0,0);
+    dbg_list("Database Info",7, 1, database_callback, dbg_listmessage_getname);
     return false;
 }
-#endif
 #endif
 
 #if CONFIG_CPU == SH7034
@@ -2060,86 +2030,59 @@ static bool dbg_save_roms(void)
 
 #ifndef SIMULATOR
 #if CONFIG_TUNER
-static bool dbg_fm_radio(void)
+int radio_lines = 0;
+static int radio_callback(int btn, struct gui_synclist *lists)
 {
-    char buf[32];
-    bool fm_detected;
-
-    lcd_setmargins(0, 0);
-
-    fm_detected = radio_hardware_present();
-
-    while(1)
+    (void)btn; (void)lists;
+    if (radio_hardware_present())
     {
-        int row = 0;
-
-        lcd_clear_display();
-
-        snprintf(buf, sizeof buf, "HW detected: %s", fm_detected?"yes":"no");
-        lcd_puts(0, row++, buf);
+        snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, 
+                 "HW detected: yes");
 #if (CONFIG_TUNER & LV24020LP)
-        if (fm_detected)
-        {
-            snprintf(buf, sizeof buf, "CTRL_STAT: %02X",
-                     sanyo_get(RADIO_ALL) );
-            lcd_puts(0, row++, buf);
-
-            snprintf(buf, sizeof buf, "RADIO_STAT: %02X",
-                     sanyo_get(RADIO_REG_STAT));
-            lcd_puts(0, row++, buf);
-
-            snprintf(buf, sizeof buf, "MSS_FM: %d kHz",
-                     (sanyo_get(RADIO_MSS_FM) ) );
-            lcd_puts(0, row++, buf);
-
-            snprintf(buf, sizeof buf, "MSS_IF: %d Hz",
-                     (sanyo_get(RADIO_MSS_IF) ) );
-            lcd_puts(0, row++, buf);
-
-            snprintf(buf, sizeof buf, "MSS_SD: %d Hz",
-                     (sanyo_get(RADIO_MSS_SD) ) );
-            lcd_puts(0, row++, buf);
-
-            snprintf(buf, sizeof buf, "if_set: %d Hz",
-                     (sanyo_get(RADIO_IF_SET) ) );
-            lcd_puts(0, row++, buf);
-
-            snprintf(buf, sizeof buf, "sd_set: %d Hz",
-                     (sanyo_get(RADIO_SD_SET) ) );
-            lcd_puts(0, row++, buf);
-        }
+        snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, 
+                 "CTRL_STAT: %02X", sanyo_get(RADIO_ALL) );
+        snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, 
+                 "RADIO_STAT: %02X", sanyo_get(RADIO_REG_STAT));
+        snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, 
+                 "MSS_FM: %d kHz", sanyo_get(RADIO_MSS_FM) );
+        snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN,
+                 "MSS_IF: %d Hz", (sanyo_get(RADIO_MSS_IF) ) );
+        snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, 
+                 "MSS_SD: %d Hz", (sanyo_get(RADIO_MSS_SD) ) );
+        snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, 
+                 "if_set: %d Hz", (sanyo_get(RADIO_IF_SET) ) );
+        snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, 
+                 "sd_set: %d Hz", (sanyo_get(RADIO_SD_SET) ) );
 #endif
 #if (CONFIG_TUNER & S1A0903X01)
-        snprintf(buf, sizeof buf, "Samsung regs: %08X",
-                 samsung_get(RADIO_ALL));
-        lcd_puts(0, row++, buf);
+        snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, 
+                 "Samsung regs: %08X", samsung_get(RADIO_ALL));
 #endif
 #if (CONFIG_TUNER & TEA5767)
-        {
-            struct philips_dbg_info info;
-            philips_dbg_info(&info);
-
-            snprintf(buf, sizeof buf, "Philips regs:");
-            lcd_puts(0, row++, buf);
-
-            snprintf(buf, sizeof buf, "   Read: %02X %02X %02X %02X %02X",
-                (unsigned)info.read_regs[0], (unsigned)info.read_regs[1],
-                (unsigned)info.read_regs[2], (unsigned)info.read_regs[3],
-                (unsigned)info.read_regs[4]);
-            lcd_puts(0, row++, buf);
-
-            snprintf(buf, sizeof buf, "   Write: %02X %02X %02X %02X %02X",
-                (unsigned)info.write_regs[0], (unsigned)info.write_regs[1],
-                (unsigned)info.write_regs[2], (unsigned)info.write_regs[3],
-                (unsigned)info.write_regs[4]);
-            lcd_puts(0, row++, buf);
-        }
+        struct philips_dbg_info info;
+        philips_dbg_info(&info);
+        snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, "Philips regs:");
+        snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, 
+                 "   Read: %02X %02X %02X %02X %02X",
+                 (unsigned)info.read_regs[0], (unsigned)info.read_regs[1],
+                 (unsigned)info.read_regs[2], (unsigned)info.read_regs[3],
+                 (unsigned)info.read_regs[4]);
+        snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, 
+                 "   Write: %02X %02X %02X %02X %02X",
+                 (unsigned)info.write_regs[0], (unsigned)info.write_regs[1],
+                 (unsigned)info.write_regs[2], (unsigned)info.write_regs[3],
+                 (unsigned)info.write_regs[4]);
 #endif
-        lcd_update();
-
-        if (action_userabort(HZ))
-            return false;
     }
+    else
+        snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, "HW detected: no");
+    return btn;
+}
+static bool dbg_fm_radio(void)
+{
+    radio_callback(0,0);
+    dbg_list("FM Radio",radio_lines, 1, 
+             radio_callback, dbg_listmessage_getname);
     return false;
 }
 #endif /* CONFIG_TUNER */
@@ -2360,10 +2303,10 @@ static const struct the_menu_item menuitems[] = {
 #ifdef HAVE_DIRCACHE
         { "View dircache info", dbg_dircache_info },
 #endif
-#ifdef HAVE_LCD_BITMAP
 #ifdef HAVE_TAGCACHE
         { "View database info", dbg_tagcache_info },
 #endif
+#ifdef HAVE_LCD_BITMAP
 #if CONFIG_CODEC == SWCODEC || !defined(SIMULATOR)
         { "View audio thread", dbg_audio_thread },
 #endif
