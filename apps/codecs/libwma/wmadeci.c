@@ -550,8 +550,11 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
 
     if (wfx->codec_id == ASF_CODEC_ID_WMAV1){
         s->version = 1;
-    }else{
+    }else if (wfx->codec_id == ASF_CODEC_ID_WMAV2 ){
         s->version = 2;
+    }else{
+	    /*one of those other wma flavors that don't have GPLed decoders */
+	    return -1;
     }
 
     /* extract flag infos */

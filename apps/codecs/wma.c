@@ -331,18 +331,22 @@ enum codec_status codec_main(void)
     /* Remember the resume position - when the codec is opened, the
        playback engine will reset it. */
     resume_offset = ci->id3->offset;
-        
+
     if (codec_init()) {
         LOGF("WMA: Error initialising codec\n");
         retval = CODEC_ERROR;
         goto exit;
     }
 
-    /* Copy the format metadata we've stored in the id3 TOC field.  This 
+    /* Copy the format metadata we've stored in the id3 TOC field.  This
        saves us from parsing it again here. */
     memcpy(&wfx, ci->id3->toc, sizeof(wfx));
 
-    wma_decode_init(&wmadec,&wfx);
+    if(wma_decode_init(&wmadec,&wfx)< 0){
+    	LOGF("WMA: Unsupported or corrupt file\n");
+      retval = CODEC_ERROR;
+    	goto exit;
+    }
 
     /* Now advance the file position to the first frame */
     ci->seek_buffer(ci->id3->first_frame_offset);
@@ -369,7 +373,7 @@ enum codec_status codec_main(void)
         }
 
         /* Deal with any pending seek requests - ignore them */
-        if (ci->seek_time) 
+        if (ci->seek_time)
         {
             ci->seek_complete();
         }
