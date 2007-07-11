@@ -422,7 +422,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
         {
             continue;
         }
-        gui_synclist_draw(&lists);
         
         if (menu_callback)
         {
@@ -438,9 +437,11 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
 
         if (gui_synclist_do_button(&lists,action,LIST_WRAP_UNLESS_HELD))
         {
-            talk_item = true;
+            talk_menu_item(menu, &lists);
+            continue;
         }
-        else if (action == ACTION_TREE_WPS)
+        
+        if (action == ACTION_TREE_WPS)
         {
             ret = GO_TO_PREVIOUS_MUSIC;
             done = true;
@@ -594,7 +595,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
             gui_buttonbar_set(&buttonbar, "<<<", "", "");
             gui_buttonbar_draw(&buttonbar);
 #endif
-            gui_synclist_draw(&lists);
         }
         else if(default_event_handler(action) == SYS_USB_CONNECTED)
         {
