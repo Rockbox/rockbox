@@ -109,7 +109,7 @@ static bool dbg_list(char *title, int count, int selection_size,
         gui_syncstatusbar_draw(&statusbars, true);
         action = get_action(CONTEXT_STD, HZ/5); 
         if (gui_synclist_do_button(&lists, action, LIST_WRAP_UNLESS_HELD))
-            gui_synclist_draw(&lists);
+            continue;
         if (action_callback)
             action = action_callback(action, &lists);
         if (action == ACTION_STD_CANCEL)
