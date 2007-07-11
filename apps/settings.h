@@ -282,9 +282,6 @@ bool set_int_ex(const unsigned char* string, const char* unit, int voice_unit,
 bool set_time_screen(const char* string, struct tm *tm);
 int read_line(int fd, char* buffer, int buffer_size);
 void set_file(char* filename, char* setting, int maxlen);
-unsigned int rec_timesplit_seconds(void);
-unsigned long rec_sizesplit_bytes(void);
-void settings_apply_trigger(void);
 
 
 /** global_settings and global_status struct definitions **/

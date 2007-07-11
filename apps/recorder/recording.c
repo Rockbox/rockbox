@@ -69,7 +69,86 @@
 #include "action.h"
 #include "radio.h"
 #ifdef HAVE_RECORDING
+/* This array holds the record timer interval lengths, in seconds */
+static const unsigned long rec_timer_seconds[] =
+{
+    0,        /* 0 means OFF */
+    5*60,     /* 00:05 */
+    10*60,    /* 00:10 */
+    15*60,    /* 00:15 */
+    30*60,    /* 00:30 */
+    60*60,    /* 01:00 */
+    74*60,    /* 74:00 */
+    80*60,    /* 80:00 */
+    2*60*60,  /* 02:00 */
+    4*60*60,  /* 04:00 */
+    6*60*60,  /* 06:00 */
+    8*60*60,  /* 08:00 */
+    10L*60*60, /* 10:00 */
+    12L*60*60, /* 12:00 */
+    18L*60*60, /* 18:00 */
+    24L*60*60  /* 24:00 */
+};
 
+static unsigned int rec_timesplit_seconds(void)
+{
+    return rec_timer_seconds[global_settings.rec_timesplit];
+}
+
+/* This array holds the record size interval lengths, in bytes */
+static const unsigned long rec_size_bytes[] =
+{
+    0,               /* 0 means OFF */
+    5*1024*1024,     /* 5MB */
+    10*1024*1024,    /* 10MB */
+    15*1024*1024,    /* 15MB */
+    32*1024*1024,    /* 32MB */
+    64*1024*1024,    /* 64MB */
+    75*1024*1024,    /* 75MB */
+    100*1024*1024,   /* 100MB */
+    128*1024*1024,   /* 128MB */
+    256*1024*1024,   /* 256MB */
+    512*1024*1024,   /* 512MB */
+    650*1024*1024,   /* 650MB */
+    700*1024*1024,   /* 700MB */
+    1024*1024*1024,  /* 1GB */
+    1536*1024*1024,  /* 1.5GB */
+    1792*1024*1024,  /* 1.75GB  */
+};
+
+static unsigned long rec_sizesplit_bytes(void)
+{
+    return rec_size_bytes[global_settings.rec_sizesplit];
+}
+/*
+ * Time strings used for the trigger durations.
+ * Keep synchronous to trigger_times in settings_apply_trigger
+ */
+const char * const trig_durations[TRIG_DURATION_COUNT] =
+{
+    "0s", "1s", "2s", "5s",
+    "10s", "15s", "20s", "25s", "30s",
+    "1min", "2min", "5min", "10min"
+};
+
+void settings_apply_trigger(void)
+{
+    /* Keep synchronous to trig_durations and trig_durations_conf*/
+    static const long trigger_times[TRIG_DURATION_COUNT] = {
+        0, HZ, 2*HZ, 5*HZ,
+        10*HZ, 15*HZ, 20*HZ, 25*HZ, 30*HZ,
+        60*HZ, 2*60*HZ, 5*60*HZ, 10*60*HZ
+    };
+
+    peak_meter_define_trigger(
+        global_settings.rec_start_thres,
+        trigger_times[global_settings.rec_start_duration],
+        MIN(trigger_times[global_settings.rec_start_duration] / 2, 2*HZ),
+        global_settings.rec_stop_thres,
+        trigger_times[global_settings.rec_stop_postrec],
+        trigger_times[global_settings.rec_stop_gap]
+    );
+}
 /* recording screen status flags */
 enum rec_status_flags
 {

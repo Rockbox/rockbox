@@ -32,6 +32,7 @@
 #include "powermgmt.h"
 #include "splash.h"
 #include "logf.h"
+#include "option_select.h"
 
 #if CONFIG_CHARGING
 #include "power.h"
@@ -318,7 +319,6 @@ static const struct plugin_api rockbox_api = {
     sound_default,
 #endif
     sound_set,
-    set_sound,
 
     sound_min,
     sound_max,
@@ -405,6 +405,8 @@ static const struct plugin_api rockbox_api = {
     &statusbars,
     gui_syncstatusbar_draw,
     /* options */
+    find_setting,
+    option_screen,
     set_option,
     set_bool_options,
     set_int,

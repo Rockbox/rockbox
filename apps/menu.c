@@ -36,6 +36,7 @@
 #include "panic.h"
 #include "settings.h"
 #include "settings_list.h"
+#include "option_select.h"
 #include "status.h"
 #include "screens.h"
 #include "talk.h"
@@ -259,120 +260,9 @@ bool do_setting_from_menu(const struct menu_item_ex *temp)
     const struct settings_list *setting = find_setting(
                                                temp->variable,
                                                &setting_id);
-    bool ret_val = false;
-    unsigned char *title;
-    if (setting)
-    {
-        if ((temp->flags&MENU_TYPE_MASK) == MT_SETTING_W_TEXT)
-            title = temp->callback_and_desc->desc;
-        else
-            title = ID2P(setting->lang_id);
-
-        if ((setting->flags&F_BOOL_SETTING) == F_BOOL_SETTING)
-        {
-            bool temp_var, *var;
-            bool show_icons = global_settings.show_icons;
-            if (setting->flags&F_TEMPVAR)
-            {
-                temp_var = *(bool*)setting->setting;
-                var = &temp_var;
-            }
-            else
-            {
-                var = (bool*)setting->setting;
-            }
-            set_bool_options(P2STR(title), var,
-                        STR(setting->bool_setting->lang_yes),
-                        STR(setting->bool_setting->lang_no),
-                        setting->bool_setting->option_callback);
-            if (setting->flags&F_TEMPVAR)
-                *(bool*)setting->setting = temp_var;
-            if (show_icons != global_settings.show_icons)
-                ret_val = true;
-        }
-        else if (setting->flags&F_T_SOUND)
-        {
-            set_sound(P2STR(title), setting->setting,
-                        setting->sound_setting->setting);
-        }
-        else /* other setting, must be an INT type */
-        {
-            int temp_var, *var;
-            if (setting->flags&F_TEMPVAR)
-            {
-                temp_var = *(int*)setting->setting;
-                var = &temp_var;
-            }
-            else
-            {
-                var = (int*)setting->setting;
-            }
-            if (setting->flags&F_INT_SETTING)
-            {
-                int min, max, step;
-                if (setting->flags&F_FLIPLIST)
-                {
-                    min = setting->int_setting->max;
-                    max = setting->int_setting->min;
-                    step = -setting->int_setting->step;
-                }
-                else
-                {
-                    max = setting->int_setting->max;
-                    min = setting->int_setting->min;
-                    step = setting->int_setting->step;
-                }
-                set_int_ex(P2STR(title), NULL,
-                        setting->int_setting->unit,var,
-                        setting->int_setting->option_callback,
-                        step, min, max,
-                        setting->int_setting->formatter,
-                        setting->int_setting->get_talk_id);
-            }
-            else if (setting->flags&F_CHOICE_SETTING)
-            {
-                static struct opt_items options[MAX_OPTIONS];
-                char buffer[256];
-                char *buf_start = buffer;
-                int buf_free = 256;
-                int i,j, count = setting->choice_setting->count;
-                for (i=0, j=0; i<count && i<MAX_OPTIONS; i++)
-                {
-                    if (setting->flags&F_CHOICETALKS)
-                    {
-                        if (cfg_int_to_string(setting_id, i,
-                                            buf_start, buf_free))
-                        {
-                            int len = strlen(buf_start) +1;
-                            options[j].string = buf_start;
-                            buf_start += len;
-                            buf_free -= len;
-                            options[j].voice_id = 
-                                setting->choice_setting->talks[i];
-                            j++;
-                        }
-                    }
-                    else
-                    {
-                        options[j].string =
-                            P2STR(setting->
-                                  choice_setting->desc[i]);
-                        options[j].voice_id = 
-                            P2ID(setting->
-                                  choice_setting->desc[i]);
-                        j++;
-                    }
-                }
-                set_option(P2STR(title), var, INT,
-                            options,j,
-                            setting->
-                               choice_setting->option_callback);
-            }
-            if (setting->flags&F_TEMPVAR)
-                *(int*)setting->setting = temp_var;
-        }
-    }
-    return ret_val;
+    option_screen((struct settings_list *)setting, 
+                   setting->flags&F_TEMPVAR);
+    return false;
 }
 
 int do_menu(const struct menu_item_ex *start_menu, int *start_selected)

@@ -47,6 +47,103 @@
 #include "radio.h"
 #endif
 
+
+#define NVRAM(bytes) (bytes<<F_NVRAM_MASK_SHIFT)
+/** NOTE: NVRAM_CONFIG_VERSION is in settings_list.h
+     and you may need to update it if you edit this file */
+
+#define UNUSED {.RESERVED=NULL}
+#define INT(a) {.int_ = a}
+#define UINT(a) {.uint_ = a}
+#define BOOL(a) {.bool_ = a}
+#define CHARPTR(a) {.charptr = a}
+#define UCHARPTR(a) {.ucharptr = a}
+#define FUNCTYPE(a) {.func = a}
+#define NODEFAULT INT(0)
+
+/* in all the following macros the args are:
+    - flags: bitwise | or the F_ bits in settings_list.h
+    - var: pointer to the variable being changed (usually in global_settings)
+    - lang_ig: LANG_* id to display in menus and setting screens for the settings
+    - default: the default value for the variable, set if settings are reset
+    - name: the name of the setting in config files
+    - cfg_vals: comma seperated list of legal values in cfg files.
+                NULL if a number is written to the file instead.
+    - cb: the callback used by the setting screen.
+*/
+
+/* Use for int settings which use the set_sound() function to set them */
+#define SOUND_SETTING(flags,var,lang_id,name,setting)                   \
+            {flags|F_T_INT|F_T_SOUND, &global_settings.var,             \
+                lang_id, NODEFAULT,name,NULL,                           \
+                {.sound_setting=(struct sound_setting[]){{setting}}} }
+
+/* Use for bool variables which don't use LANG_SET_BOOL_YES and LANG_SET_BOOL_NO,
+                or dont save as "off" or "on" in the cfg */
+#define BOOL_SETTING(flags,var,lang_id,default,name,cfgvals,yes,no,cb)      \
+            {flags|F_BOOL_SETTING, &global_settings.var,                    \
+                lang_id, BOOL(default),name,cfgvals,                        \
+                {.bool_setting=(struct bool_setting[]){{cb,yes,no}}} }
+                
+/* bool setting which does use LANG_YES and _NO and save as "off,on" */
+#define OFFON_SETTING(flags,var,lang_id,default,name,cb)                    \
+            {flags|F_BOOL_SETTING, &global_settings.var,                    \
+                lang_id, BOOL(default),name,off_on,                         \
+                {.bool_setting=(struct bool_setting[])                      \
+                {{cb,LANG_SET_BOOL_YES,LANG_SET_BOOL_NO}}} }
+
+/* int variable which is NOT saved to .cfg files,
+    (Use NVRAM() in the flags to save to the nvram (or nvram.bin file) */
+#define SYSTEM_SETTING(flags,var,default) \
+            {flags|F_T_INT, &global_status.var,-1, INT(default),    \
+                NULL, NULL, UNUSED}
+
+/* setting which stores as a filename in the .cfgvals
+    prefix: The absolute path to not save in the variable, e.g /.rockbox/wps_file
+    suffx:  The file extention (usually...) e.g .wps_file   */
+#define FILENAME_SETTING(flags,var,name,default,prefix,suffix,len)  \
+            {flags|F_T_UCHARPTR, &global_settings.var,-1,           \
+                CHARPTR(default),name,NULL,                         \
+                {.filename_setting=                                        \
+                    (struct filename_setting[]){{prefix,suffix,len}}} }
+
+/*  Used for settings which use the set_option() setting screen.
+    the ... arg is a list of pointers to strings to display in the setting screen.
+    These can either be literal strings, or ID2P(LANG_*) */
+#define CHOICE_SETTING(flags,var,lang_id,default,name,cfg_vals,cb,count,...)  \
+            {flags|F_CHOICE_SETTING|F_T_INT,  &global_settings.var, lang_id,   \
+                INT(default), name, cfg_vals,                     \
+                {.choice_setting = (struct choice_setting[]){    \
+                    {cb, count, {.desc = (unsigned char*[]){__VA_ARGS__}}}}}}
+                    
+/* Similar to above, except the strings to display are taken from cfg_vals,
+   the ... arg is a list of ID's to talk for the strings... can use TALK_ID()'s */
+#define STRINGCHOICE_SETTING(flags,var,lang_id,default,name,cfg_vals,cb,count,...)  \
+            {flags|F_CHOICE_SETTING|F_T_INT|F_CHOICETALKS,                  \
+                &global_settings.var, lang_id,                  \
+                INT(default), name, cfg_vals,                     \
+                {.choice_setting = (struct choice_setting[]){    \
+                    {cb, count, {.talks = (int[]){__VA_ARGS__}}}}}}
+                    
+/*  for settings which use the set_int() setting screen.
+    unit is the UNIT_ define to display/talk.
+    the first one saves a string to the config file,
+    the second one saves the variable value to the config file */    
+#define INT_SETTING_W_CFGVALS(flags, var, lang_id, default, name, cfg_vals, \
+                    unit, min, max, step, formatter, get_talk_id, cb)   \
+            {flags|F_INT_SETTING|F_T_INT, &global_settings.var,         \
+                lang_id, INT(default), name, cfg_vals,                  \
+                 {.int_setting = (struct int_setting[]){                \
+                    {cb, unit, min, max, step, formatter, get_talk_id}}}}
+#define INT_SETTING(flags, var, lang_id, default, name,                      \
+                    unit, min, max, step, formatter, get_talk_id, cb)       \
+            {flags|F_INT_SETTING|F_T_INT, &global_settings.var,         \
+                lang_id, INT(default), name, NULL,                  \
+                 {.int_setting = (struct int_setting[]){                \
+                    {cb, unit, min, max, step, formatter, get_talk_id}}}}
+
+
+
 /* some sets of values which are used more than once, to save memory */
 static const char off_on[] = "off,on";
 static const char off_on_ask[] = "off,on,ask";
@@ -193,100 +290,6 @@ static void listaccel_formatter(char *buffer, int buffer_size,
         snprintf(buffer, buffer_size, "%d ms", 5*HZ*val);
 }
 
-#define NVRAM(bytes) (bytes<<F_NVRAM_MASK_SHIFT)
-/** NOTE: NVRAM_CONFIG_VERSION is in settings_list.h
-     and you may need to update it if you edit this file */
-
-#define UNUSED {.RESERVED=NULL}
-#define INT(a) {.int_ = a}
-#define UINT(a) {.uint_ = a}
-#define BOOL(a) {.bool_ = a}
-#define CHARPTR(a) {.charptr = a}
-#define UCHARPTR(a) {.ucharptr = a}
-#define FUNCTYPE(a) {.func = a}
-#define NODEFAULT INT(0)
-
-/* in all the following macros the args are:
-    - flags: bitwise | or the F_ bits in settings_list.h
-    - var: pointer to the variable being changed (usually in global_settings)
-    - lang_ig: LANG_* id to display in menus and setting screens for the settings
-    - default: the default value for the variable, set if settings are reset
-    - name: the name of the setting in config files
-    - cfg_vals: comma seperated list of legal values in cfg files.
-                NULL if a number is written to the file instead.
-    - cb: the callback used by the setting screen.
-*/
-
-/* Use for int settings which use the set_sound() function to set them */
-#define SOUND_SETTING(flags,var,lang_id,name,setting)                   \
-            {flags|F_T_INT|F_T_SOUND, &global_settings.var,             \
-                lang_id, NODEFAULT,name,NULL,                           \
-                {.sound_setting=(struct sound_setting[]){{setting}}} }
-
-/* Use for bool variables which don't use LANG_SET_BOOL_YES and LANG_SET_BOOL_NO,
-                or dont save as "off" or "on" in the cfg */
-#define BOOL_SETTING(flags,var,lang_id,default,name,cfgvals,yes,no,cb)      \
-            {flags|F_BOOL_SETTING, &global_settings.var,                    \
-                lang_id, BOOL(default),name,cfgvals,                        \
-                {.bool_setting=(struct bool_setting[]){{cb,yes,no}}} }
-                
-/* bool setting which does use LANG_YES and _NO and save as "off,on" */
-#define OFFON_SETTING(flags,var,lang_id,default,name,cb)                    \
-            {flags|F_BOOL_SETTING, &global_settings.var,                    \
-                lang_id, BOOL(default),name,off_on,                         \
-                {.bool_setting=(struct bool_setting[])                      \
-                {{cb,LANG_SET_BOOL_YES,LANG_SET_BOOL_NO}}} }
-
-/* int variable which is NOT saved to .cfg files,
-    (Use NVRAM() in the flags to save to the nvram (or nvram.bin file) */
-#define SYSTEM_SETTING(flags,var,default) \
-            {flags|F_T_INT, &global_status.var,-1, INT(default),    \
-                NULL, NULL, UNUSED}
-
-/* setting which stores as a filename in the .cfgvals
-    prefix: The absolute path to not save in the variable, e.g /.rockbox/wps_file
-    suffx:  The file extention (usually...) e.g .wps_file   */
-#define FILENAME_SETTING(flags,var,name,default,prefix,suffix,len)  \
-            {flags|F_T_UCHARPTR, &global_settings.var,-1,           \
-                CHARPTR(default),name,NULL,                         \
-                {.filename_setting=                                        \
-                    (struct filename_setting[]){{prefix,suffix,len}}} }
-
-/*  Used for settings which use the set_option() setting screen.
-    the ... arg is a list of pointers to strings to display in the setting screen.
-    These can either be literal strings, or ID2P(LANG_*) */
-#define CHOICE_SETTING(flags,var,lang_id,default,name,cfg_vals,cb,count,...)  \
-            {flags|F_CHOICE_SETTING|F_T_INT,  &global_settings.var, lang_id,   \
-                INT(default), name, cfg_vals,                     \
-                {.choice_setting = (struct choice_setting[]){    \
-                    {cb, count, {.desc = (unsigned char*[]){__VA_ARGS__}}}}}}
-                    
-/* Similar to above, except the strings to display are taken from cfg_vals,
-   the ... arg is a list of ID's to talk for the strings... can use TALK_ID()'s */
-#define STRINGCHOICE_SETTING(flags,var,lang_id,default,name,cfg_vals,cb,count,...)  \
-            {flags|F_CHOICE_SETTING|F_T_INT|F_CHOICETALKS,                  \
-                &global_settings.var, lang_id,                  \
-                INT(default), name, cfg_vals,                     \
-                {.choice_setting = (struct choice_setting[]){    \
-                    {cb, count, {.talks = (int[]){__VA_ARGS__}}}}}}
-                    
-/*  for settings which use the set_int() setting screen.
-    unit is the UNIT_ define to display/talk.
-    the first one saves a string to the config file,
-    the second one saves the variable value to the config file */    
-#define INT_SETTING_W_CFGVALS(flags, var, lang_id, default, name, cfg_vals, \
-                    unit, min, max, step, formatter, get_talk_id, cb)   \
-            {flags|F_INT_SETTING|F_T_INT, &global_settings.var,         \
-                lang_id, INT(default), name, cfg_vals,                  \
-                 {.int_setting = (struct int_setting[]){                \
-                    {cb, unit, min, max, step, formatter, get_talk_id}}}}
-#define INT_SETTING(flags, var, lang_id, default, name,                      \
-                    unit, min, max, step, formatter, get_talk_id, cb)       \
-            {flags|F_INT_SETTING|F_T_INT, &global_settings.var,         \
-                lang_id, INT(default), name, NULL,                  \
-                 {.int_setting = (struct int_setting[]){                \
-                    {cb, unit, min, max, step, formatter, get_talk_id}}}}
-                    
 #if CONFIG_CODEC == SWCODEC
 static void crossfeed_format(char* buffer, int buffer_size, int value,
     const char* unit)

@@ -59,46 +59,31 @@ bool nexttrack(void)
 
 static bool volume(void)
 {
-    return api->set_sound("Volume", &api->global_settings->volume,
-                          SOUND_VOLUME);
+    const struct settings_list* vol = 
+        api->find_setting(&api->global_settings->volume, NULL);
+    return api->option_screen((struct settings_list*)vol, false);
 }
 
 static bool shuffle(void)
 {
-    struct opt_items names[2];
-        names[0].string = "No";
-        names[0].voice_id = -1;
-        names[1].string = "Yes";
-        names[1].voice_id = -1;
-
-    return api->set_option("Shuffle", &api->global_settings->playlist_shuffle,
-                           BOOL, names, 2,NULL);
+    const struct settings_list* shuffle = 
+        api->find_setting(&api->global_settings->playlist_shuffle, NULL);
+    return api->option_screen((struct settings_list*)shuffle, false);
 }
 
 static bool repeat_mode(void)
 {
-    bool result;
-    static const struct opt_items names[] = {
-        { "Off", -1 },
-        { "Repeat All", -1 },
-        { "Repeat One", -1 },
-        { "Repeat Shuffle", -1 },
-#ifdef AB_REPEAT_ENABLE
-        { "Repeat A-B", -1 }
-#endif
-    };
-    
+    const struct settings_list* repeat = 
+        api->find_setting(&api->global_settings->repeat_mode, NULL);
     int old_repeat = api->global_settings->repeat_mode;
-
-    result = api->set_option( "Repeat Mode",
-                              &api->global_settings->repeat_mode,
-                              INT, names, NUM_REPEAT_MODES, NULL );
-
+  
+    api->option_screen((struct settings_list*)repeat, false);
+  
     if (old_repeat != api->global_settings->repeat_mode &&
         (api->audio_status() & AUDIO_STATUS_PLAY))
         api->audio_flush_and_reload_tracks();
-
-    return result;
+  
+    return false;
 }
 MENUITEM_FUNCTION(prevtrack_item, 0, "Previous Track",
                   prevtrack, NULL, NULL, Icon_NOICON);

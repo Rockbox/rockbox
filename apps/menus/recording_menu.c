@@ -62,6 +62,7 @@
 #include "general.h"
 #endif
 #include "action.h"
+#include "recording.h"
 
 
 static bool no_source_in_menu = true;

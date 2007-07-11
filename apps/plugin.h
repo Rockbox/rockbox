@@ -115,12 +115,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 61
+#define PLUGIN_API_VERSION 62
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 61
+#define PLUGIN_MIN_API_VERSION 62
 
 /* plugin return codes */
 enum plugin_status {
@@ -418,8 +418,6 @@ struct plugin_api {
     int (*sound_default)(int setting);
 #endif
     void (*sound_set)(int setting, int value);
-    bool (*set_sound)(const unsigned char * string,
-                      int* variable, int setting);
     int (*sound_min)(int setting);
     int (*sound_max)(int setting);
 #ifndef SIMULATOR
@@ -509,6 +507,8 @@ struct plugin_api {
     void (*gui_syncstatusbar_draw)(struct gui_syncstatusbar * bars, bool force_redraw);
     
     /* options */
+    const struct settings_list* (*find_setting)(void* variable, int *id);
+    bool (*option_screen)(struct settings_list *setting, bool use_temp_var);
     bool (*set_option)(const char* string, void* variable,
                        enum optiontype type, const struct opt_items* options,
                        int numoptions, void (*function)(int));
