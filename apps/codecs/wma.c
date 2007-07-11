@@ -342,10 +342,10 @@ enum codec_status codec_main(void)
        saves us from parsing it again here. */
     memcpy(&wfx, ci->id3->toc, sizeof(wfx));
 
-    if(wma_decode_init(&wmadec,&wfx)< 0){
-    	LOGF("WMA: Unsupported or corrupt file\n");
-      retval = CODEC_ERROR;
-    	goto exit;
+    if (wma_decode_init(&wmadec,&wfx) < 0) {
+        LOGF("WMA: Unsupported or corrupt file\n");
+        retval = CODEC_ERROR;
+        goto exit;
     }
 
     /* Now advance the file position to the first frame */
