@@ -342,7 +342,7 @@ MENUITEM_FUNCTION(do_shutdown_item, 0, ID2P(LANG_SHUTDOWN),
                   do_shutdown, NULL, NULL, Icon_NOICON);
 #endif
 MAKE_MENU(root_menu_, ID2P(LANG_ROCKBOX_TITLE),
-            NULL, Icon_Rockbox,
+            item_callback, Icon_Rockbox,
             &bookmarks, &file_browser, 
 #ifdef HAVE_TAGCACHE
             &db_browser,
@@ -365,6 +365,8 @@ int item_callback(int action, const struct menu_item_ex *this_item)
 {
     switch (action)
     {
+        case ACTION_TREE_STOP:
+            return ACTION_REDRAW;
         case ACTION_REQUEST_MENUITEM:
 #if CONFIG_TUNER
             if (this_item == &fm)

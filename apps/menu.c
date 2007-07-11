@@ -382,6 +382,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
     struct gui_synclist lists;
     const struct menu_item_ex *temp, *menu;
     int ret = 0;
+    bool redraw_lists;
 #ifdef HAS_BUTTONBAR
     struct gui_buttonbar buttonbar;
 #endif
@@ -415,6 +416,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
     while (!done)
     {
         talk_item = false;
+        redraw_lists = false;
         gui_syncstatusbar_draw(&statusbars, true);
         action = get_action(CONTEXT_MAINMENU,HZ); 
         /* HZ so the status bar redraws corectly */
@@ -432,6 +434,11 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                 action = old_action;
                 ret = MENU_SELECTED_EXIT; /* will exit after returning
                                              from selection */
+            }
+            else if (action == ACTION_REDRAW)
+            {
+                action = old_action;
+                redraw_lists = true;
             }
         }
 
@@ -603,6 +610,9 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
         }
         if (talk_item && !done)
             talk_menu_item(menu, &lists);
+        
+        if (redraw_lists)
+            gui_synclist_draw(&lists);
     }
     action_signalscreenchange();
     if (start_selected)
