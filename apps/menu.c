@@ -555,8 +555,8 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                 case MT_SETTING:
                 case MT_SETTING_W_TEXT:
                 {
-                    if (do_setting_from_menu(temp))
-                        init_menu_lists(menu, &lists, 0, true);
+                    do_setting_from_menu(temp);
+                    init_menu_lists(menu, &lists, selected, true);
                     talk_item = true;
                     break;
                 }
