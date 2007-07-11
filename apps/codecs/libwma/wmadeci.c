@@ -624,7 +624,8 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
     bps = fixdiv64(tmp, tmp2);
     fixed64 tim = fixmul64byfixed(bps, s->frame_len);
     fixed64 tmpi = fixdiv64(tim,itofix64(8));
-    s->byte_offset_bits = av_log2(fixtoi64(tmpi)) + 2;
+    s->byte_offset_bits = av_log2(fixtoi64(tmpi+0x8000)) + 2;
+
 
     /* compute high frequency value and choose if noise coding should
        be activated */
@@ -1706,7 +1707,7 @@ int wma_decode_superframe_init(WMADecodeContext* s,
 
 
 /* Decode a single frame in the current superframe - return -1 if
-   there was a decoding error, or the number of samples decoded. 
+   there was a decoding error, or the number of samples decoded.
 */
 
 int wma_decode_superframe_frame(WMADecodeContext* s,
