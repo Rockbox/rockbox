@@ -506,6 +506,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
 #endif
             selected = get_menu_selection(gui_synclist_get_sel_pos(&lists), menu);
             temp = menu->submenus[selected];
+            redraw_lists = true;
             if (in_stringlist)
                 type = (menu->flags&MENU_TYPE_MASK);
             else 
@@ -528,6 +529,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                         menu_stack_selected_item[stack_top] = selected;
                         stack_top++;
                         init_menu_lists(temp, &lists, 0, true);
+                        redraw_lists = false; /* above does the redraw */
                         menu = temp;
                         talk_item = true;
                     }
@@ -555,8 +557,11 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                 case MT_SETTING:
                 case MT_SETTING_W_TEXT:
                 {
-                    do_setting_from_menu(temp);
-                    init_menu_lists(menu, &lists, selected, true);
+                    if (do_setting_from_menu(temp))
+                    {
+                        init_menu_lists(menu, &lists, selected, true);
+                        redraw_lists = false; /* above does the redraw */
+                    }
                     talk_item = true;
                     break;
                 }
@@ -574,6 +579,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                         stack_top++;
                         menu = temp;
                         init_menu_lists(menu,&lists,0,false);
+                        redraw_lists = false; /* above does the redraw */
                         talk_item = true;
                         in_stringlist = true;
                     }
