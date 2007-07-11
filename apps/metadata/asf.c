@@ -315,12 +315,9 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                     if (!asf_guid_match(&guid, &asf_guid_stream_type_audio)) {
                         //DEBUGF("Found stream properties for non audio stream, skipping\n");
                         lseek(fd,current.size - 24 - 50,SEEK_CUR);
-                    } else {
+                    } else if (wfx->audiostream == -1) {
                         lseek(fd, 4, SEEK_CUR);
                         //DEBUGF("Found stream properties for audio stream %d\n",flags&0x7f);
-
-                        /* TODO: Check codec_id and find the lowest numbered audio stream in the file */
-                        wfx->audiostream = flags&0x7f;
 
                         if (propdatalen < 18) {
                             return ASF_ERROR_INVALID_LENGTH;
@@ -347,9 +344,11 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                         if (wfx->codec_id == ASF_CODEC_ID_WMAV1) {
                             read(fd, wfx->data, 4);
                             lseek(fd,current.size - 24 - 72 - 4,SEEK_CUR);
+                            wfx->audiostream = flags&0x7f;
                         } else if (wfx->codec_id == ASF_CODEC_ID_WMAV2) {
                             read(fd, wfx->data, 6);
                             lseek(fd,current.size - 24 - 72 - 6,SEEK_CUR);
+                            wfx->audiostream = flags&0x7f;
                         } else {
                             lseek(fd,current.size - 24 - 72,SEEK_CUR);
                         }
@@ -490,24 +489,24 @@ bool get_asf_metadata(int fd, struct mp3entry* id3)
     res = asf_parse_header(fd, id3, &wfx);
 
     if (res < 0) {
-        //DEBUGF("ASF: parsing error - %d\n",res);
+        DEBUGF("ASF: parsing error - %d\n",res);
         return false;
     }
 
     if (wfx.audiostream == -1) {
-        //DEBUGF("ASF: No WMA streams found\n");
+        DEBUGF("ASF: No WMA streams found\n");
         return false;
     }
 
     if (wfx.bitrate < 32000) {
-        //DEBUGF("ASF: < 32kbps files not supported\n");
+        DEBUGF("ASF: < 32kbps files not supported\n");
         return false;
     }
 
     asf_read_object_header(&obj, fd);
 
     if (!asf_guid_match(&obj.guid, &asf_guid_data)) {
-        //DEBUGF("ASF: No data object found\n");
+        DEBUGF("ASF: No data object found\n");
         return false;
     }
 
