@@ -27,6 +27,18 @@
 #include "asf.h"
 #include "wmadec.h"
 #include "wmafixed.c"
+#include "bitstream.h"
+
+
+#define VLCBITS 9
+#define VLCMAX ((22+VLCBITS-1)/VLCBITS)
+
+#define EXPVLCBITS 9
+#define EXPMAX ((19+EXPVLCBITS-1)/EXPVLCBITS)
+
+#define HGAINVLCBITS 9
+#define HGAINMAX ((13+HGAINVLCBITS-1)/HGAINVLCBITS)
+
 
 #ifdef CPU_ARM
 static inline
@@ -500,13 +512,11 @@ static void init_coef_vlc(VLC *vlc,
     int i, l, j, level;
 
 
-    init_vlc(vlc, 9, n, table_bits, 1, 1, table_codes, 4, 4);
+    init_vlc(vlc, VLCBITS, n, table_bits, 1, 1, table_codes, 4, 4, 0);
 
     run_table = runtabarray[tab];
-    //run_table = av_malloc(n * sizeof(uint16_t));            //max n should be 1336
-
     level_table= levtabarray[tab];
-    //level_table = av_malloc(n * sizeof(uint16_t));
+
     p = levels_table;
     i = 2;
     level = 1;
@@ -628,7 +638,6 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
     fixed64 tim = fixmul64byfixed(bps, s->frame_len);
     fixed64 tmpi = fixdiv64(tim,itofix64(8));
     s->byte_offset_bits = av_log2(fixtoi64(tmpi+0x8000)) + 2;
-
 
     /* compute high frequency value and choose if noise coding should
        be activated */
@@ -898,18 +907,21 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
             }
         }
 
-        init_vlc(&s->hgain_vlc, 9, sizeof(hgain_huffbits),
+
+		 init_vlc(&s->hgain_vlc, 9, sizeof(hgain_huffbits),
                  hgain_huffbits, 1, 1,
-                 hgain_huffcodes, 2, 2);
+                 hgain_huffcodes, 2, 2, 0);
     }
 
     if (s->use_exp_vlc)
     {
+
         s->exp_vlc.table = vlcbuf3;
         s->exp_vlc.table_allocated = 1536;
-        init_vlc(&s->exp_vlc, 9, sizeof(scale_huffbits),
-                 scale_huffbits, 1, 1,
-                 scale_huffcodes, 4, 4);
+
+         init_vlc(&s->exp_vlc, 9, sizeof(scale_huffbits),
+        		scale_huffbits, 1, 1,
+                 scale_huffcodes, 4, 4, 0);
     }
     else
     {
@@ -933,6 +945,7 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
     s->coef_vlc[0].table_allocated = 24576/4;
     s->coef_vlc[1].table = vlcbuf2;
     s->coef_vlc[1].table_allocated = 14336/4;
+
 
     init_coef_vlc(&s->coef_vlc[0], &s->run_table[0], &s->level_table[0],
                   &coef_vlcs[coef_vlc_table * 2], 0);
@@ -1084,7 +1097,7 @@ static int decode_exp_vlc(WMADecodeContext *s, int ch)
 
     while (q < q_end)
     {
-        code = get_vlc(&s->gb, &s->exp_vlc);
+        code = get_vlc2(&s->gb, s->exp_vlc.table, EXPVLCBITS, EXPMAX);
         if (code < 0)
         {
             return -1;
@@ -1120,7 +1133,8 @@ static int wma_decode_block(WMADecodeContext *s)
     fixed32 mdct_norm;
 
 //    printf("***decode_block: %d:%d (%d)\n", s->frame_count - 1, s->block_num, s->block_len);
-    /* compute current block length */
+
+   /* compute current block length */
     if (s->use_variable_block_len)
     {
         n = av_log2(s->nb_block_sizes - 1) + 1;
@@ -1151,7 +1165,7 @@ static int wma_decode_block(WMADecodeContext *s)
 
 
 
-    LOGF("v was %d", v);
+
         if (v >= s->nb_block_sizes)
         {
          // rb->splash(HZ*4, "v was %d", v);        //5, 7
@@ -1228,7 +1242,6 @@ static int wma_decode_block(WMADecodeContext *s)
         nb_coefs[ch] = n;
     }
     /* complex coding */
-
     if (s->use_noise_coding)
     {
 
@@ -1266,7 +1279,8 @@ static int wma_decode_block(WMADecodeContext *s)
                         }
                         else
                         {
-                            code = get_vlc(&s->gb, &s->hgain_vlc);
+                            //code = get_vlc(&s->gb, &s->hgain_vlc);
+                            code = get_vlc2(&s->gb, s->hgain_vlc.table, HGAINVLCBITS, HGAINMAX);
                             if (code < 0)
                             {
                                 return -6;
@@ -1328,7 +1342,8 @@ static int wma_decode_block(WMADecodeContext *s)
 
             for(;;)
             {
-                code = get_vlc(&s->gb, coef_vlc);
+                code = get_vlc2(&s->gb, coef_vlc->table, VLCBITS, VLCMAX);
+                //code = get_vlc(&s->gb, coef_vlc);
                 if (code < 0)
                 {
                     return -8;
@@ -1627,7 +1642,7 @@ static int wma_decode_frame(WMADecodeContext *s, int16_t *samples)
         ret = wma_decode_block(s);
         if (ret < 0)
         {
-            LOGF("wma_decode_block: %d",ret);
+
             //rb->splash(HZ*4, "wma_decode_block failed with ret %d", ret);
             return -1;
         }
@@ -1676,8 +1691,8 @@ static int wma_decode_frame(WMADecodeContext *s, int16_t *samples)
 /* Initialise the superframe decoding */
 
 int wma_decode_superframe_init(WMADecodeContext* s,
-                               uint8_t *buf,  /*input*/
-                               int buf_size)
+                                 uint8_t *buf,  /*input*/
+                                 int buf_size)
 {
     if (buf_size==0)
     {
@@ -1771,12 +1786,12 @@ int wma_decode_superframe_frame(WMADecodeContext* s,
 
     /* If we haven't decoded a frame yet, do it now */
     if (!done)
-    {
-        if (wma_decode_frame(s, samples) < 0)
         {
-            goto fail;
+            if (wma_decode_frame(s, samples) < 0)
+            {
+                goto fail;
+            }
         }
-    }
 
     s->current_frame++;
 
@@ -1802,3 +1817,4 @@ fail:
     s->last_superframe_len = 0;
     return -1;
 }
+

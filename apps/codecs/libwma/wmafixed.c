@@ -1,4 +1,3 @@
-//#include "asf.h"
 #include "wmadec.h"
 #include "wmafixed.h"
 #include <codecs.h>
