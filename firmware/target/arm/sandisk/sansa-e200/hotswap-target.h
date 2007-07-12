@@ -24,7 +24,7 @@
 
 typedef struct
 {
-    bool initialized;
+    int initialized;
 
     unsigned int ocr;            /* OCR register */
     unsigned int csd[4];         /* CSD register */

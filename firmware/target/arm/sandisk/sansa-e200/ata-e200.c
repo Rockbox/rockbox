@@ -47,12 +47,16 @@
 #define REG_12          (*(volatile unsigned int *)(0x70008244))
 #define DATA_REG        (*(volatile unsigned int *)(0x70008280))
 
+/* STATUS_REG bits */
 #define DATA_DONE       (1 << 12)
 #define CMD_DONE        (1 << 13)
 #define ERROR_BITS      (0x3f)
 #define READY_FOR_DATA  (1 << 8)
 #define FIFO_FULL       (1 << 7)
 #define FIFO_EMPTY      (1 << 6)
+
+#define CMD_OK          0x0 /* Command was successful */
+#define CMD_ERROR_2     0x2 /* Seen when SD card is not inserted */
 
 /* SD States */
 #define IDLE            0
@@ -168,22 +172,18 @@ static bool sd_command(unsigned int cmd, unsigned long arg1,
     int i, words; /* Number of 16 bit words to read from RESPONSE_REG */
     unsigned int data[9];
 
-    while (1)
-    {
-        CMD_REG0 = cmd;
-        CMD_REG1 = (unsigned int)((arg1 & 0xffff0000) >> 16);
-        CMD_REG2 = (unsigned int)((arg1 & 0xffff));
-        UNKNOWN  = type;
+    CMD_REG0 = cmd;
+    CMD_REG1 = (unsigned int)((arg1 & 0xffff0000) >> 16);
+    CMD_REG2 = (unsigned int)((arg1 & 0xffff));
+    UNKNOWN  = type;
 
-        sd_poll_status(CMD_DONE, 100000, EC_COMMAND | DO_PANIC);
+    sd_poll_status(CMD_DONE, 100000, EC_COMMAND | DO_PANIC);
 
-        if ((STATUS_REG & ERROR_BITS) == 0)
-            break;
+    if ((STATUS_REG & ERROR_BITS) != CMD_OK)
+        return false; /* Error sending command */
 
-        priority_yield();
-    }
-
-    if (cmd == GO_IDLE_STATE)  return true; /* no response here */
+    if (cmd == GO_IDLE_STATE)
+        return true; /* no response here */
 
     words = (type == 2) ? 9 : 3;
 
@@ -417,7 +417,7 @@ static inline void copy_write_sectors(const unsigned char* buf)
     } while (buf < bufend); /* tail loop is faster */
 }
 
-static void sd_select_bank(unsigned char bank)
+static bool sd_select_bank(unsigned char bank)
 {
     unsigned int response;
     unsigned char card_data[512];
@@ -428,7 +428,10 @@ static void sd_select_bank(unsigned char bank)
     sd_wait_for_state(TRAN, EC_TRAN_SEL_BANK);
     BLOCK_SIZE_REG = 512;
     BLOCK_COUNT_REG = 1;
-    sd_command(35, 0, &response, 0x1c0d); /* CMD35 is vendor specific */
+
+    if (!sd_command(35, 0, &response, 0x1c0d)) /* CMD35 is vendor specific */
+        return false;
+
     SD_STATE_REG = PRG;
 
     card_data[0] = bank;
@@ -448,6 +451,8 @@ static void sd_select_bank(unsigned char bank)
     sd_poll_status(DATA_DONE, 10000, EC_FIFO_SEL_BANK_DONE | DO_PANIC);
 
     currcard->current_bank = bank;
+
+    return true;
 }
 
 /* lock must already be aquired */
@@ -508,18 +513,30 @@ static void sd_init_device(int card_no)
     SD_STATE_REG = TRAN;
 
     REG_5 = 0xf;
-    sd_command(GO_IDLE_STATE, 0, &dummy, 256);
+
+    if (!sd_command(GO_IDLE_STATE, 0, &dummy, 256))
+        goto card_init_error;
+
     check_time[EC_POWER_UP] = USEC_TIMER;
     while ((currcard->ocr & (1 << 31)) == 0) /* until card is powered up */
     {
-        sd_command(APP_CMD, currcard->rca, &dummy, 1);
-        sd_command(SD_APP_OP_COND, 0x100000, &currcard->ocr, 3);
+        if (!sd_command(APP_CMD, currcard->rca, &dummy, 1))
+            goto card_init_error;
+
+        if (!sd_command(SD_APP_OP_COND, 0x100000, &currcard->ocr, 3))
+            goto card_init_error;
+
         sd_check_timeout(5000000, EC_POWER_UP);
     }
 
-    sd_command(ALL_SEND_CID,         0, currcard->cid, 2);
-    sd_command(SEND_RELATIVE_ADDR,  0, &currcard->rca, 1);
-    sd_command(SEND_CSD, currcard->rca, currcard->csd, 2);
+    if (!sd_command(ALL_SEND_CID, 0, currcard->cid, 2))
+        goto card_init_error;
+
+    if (!sd_command(SEND_RELATIVE_ADDR, 0, &currcard->rca, 1))
+        goto card_init_error;
+
+    if (!sd_command(SEND_CSD, currcard->rca, currcard->csd, 2))
+        goto card_init_error;
 
     /* These calculations come from the Sandisk SD card product manual */
     c_size = ((currcard->csd[2] & 0x3ff) << 2) + (currcard->csd[1] >> 30) + 1;
@@ -531,10 +548,18 @@ static void sd_init_device(int card_no)
 
     REG_1 = 0;
 
-    sd_command(SELECT_CARD,   currcard->rca       , &dummy, 129);
-    sd_command(APP_CMD,       currcard->rca       , &dummy, 1);
-    sd_command(SET_BUS_WIDTH, currcard->rca | 2   , &dummy, 1); /* 4 bit */
-    sd_command(SET_BLOCKLEN,  currcard->block_size, &dummy, 1);
+    if (!sd_command(SELECT_CARD, currcard->rca, &dummy, 129))
+        goto card_init_error;
+
+    if (!sd_command(APP_CMD, currcard->rca, &dummy, 1))
+        goto card_init_error;
+
+    if (!sd_command(SET_BUS_WIDTH, currcard->rca | 2, &dummy, 1)) /* 4 bit */
+        goto card_init_error;
+
+    if (!sd_command(SET_BLOCKLEN, currcard->block_size, &dummy, 1))
+        goto card_init_error;
+
     BLOCK_SIZE_REG = currcard->block_size;
 
     /* If this card is > 4Gb, then we need to enable bank switching */
@@ -542,7 +567,10 @@ static void sd_init_device(int card_no)
     {
         SD_STATE_REG = TRAN;
         BLOCK_COUNT_REG = 1;
-        sd_command(SWITCH_FUNC, 0x80ffffef, &dummy, 0x1c05);
+
+        if (!sd_command(SWITCH_FUNC, 0x80ffffef, &dummy, 0x1c05))
+            goto card_init_error;
+
         /* Read 512 bytes from the card.
         The first 512 bits contain the status information
         TODO: Do something useful with this! */
@@ -556,7 +584,12 @@ static void sd_init_device(int card_no)
         }
     }
 
-    currcard->initialized = true;
+    currcard->initialized = 1;
+    return;
+
+    /* Card failed to initialize so disable it */
+card_init_error:
+    currcard->initialized = -1;
 }
 
 /* API Functions */
@@ -569,7 +602,7 @@ void ata_led(bool onoff)
 int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
                      void* inbuf)
 {
-    int  ret = 0;
+    int  ret = -9;
     unsigned char *buf, *buf_end;
     unsigned int dummy;
     int bank;
@@ -581,27 +614,32 @@ int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
     ata_led(true);
 
     if (drive != 0 && (GPIOA_INPUT_VAL & 0x80) != 0)
-    {
         /* no external sd-card inserted */
-        ret = -9;
         goto ata_read_error;
-    }
 
-    if (&card_info[drive] != currcard || !card_info[drive].initialized)
+    if (&card_info[drive] != currcard || card_info[drive].initialized == 0)
+    {
         sd_init_device(drive);
+
+        if (card_info[drive].initialized < 0)
+            goto ata_read_error;
+    }
 
     last_disk_activity = current_tick;
 
     bank = start / BLOCKS_PER_BANK;
 
-    if (currcard->current_bank != bank)
-        sd_select_bank(bank);
+    if (currcard->current_bank != bank && !sd_select_bank(bank))
+        goto ata_read_error;
 
     start -= bank * BLOCKS_PER_BANK;
 
     sd_wait_for_state(TRAN, EC_TRAN_READ_ENTRY);
     BLOCK_COUNT_REG = incount;
-    sd_command(READ_MULTIPLE_BLOCK, start * BLOCK_SIZE, &dummy, 0x1c25);
+
+    if (!sd_command(READ_MULTIPLE_BLOCK, start * BLOCK_SIZE, &dummy, 0x1c25))
+        goto ata_read_error;
+
     /* TODO: Don't assume BLOCK_SIZE == SECTOR_SIZE */
 
     buf_end = (unsigned char *)inbuf + incount * currcard->block_size;
@@ -618,8 +656,12 @@ int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
 #if 0
     udelay(75);
 #endif
-    sd_command(STOP_TRANSMISSION, 0, &dummy, 1);
+    if (!sd_command(STOP_TRANSMISSION, 0, &dummy, 1))
+        goto ata_read_error;
+
     sd_wait_for_state(TRAN, EC_TRAN_READ_EXIT);
+
+    ret = 0;
 
 ata_read_error:
     ata_led(false);
@@ -637,7 +679,7 @@ int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
    to improve performance */
     unsigned int response;
     void const* buf, *buf_end;
-    int ret = 0;
+    int ret = -9;
     int bank;
 
     spinlock_lock(&sd_mtx);
@@ -645,26 +687,33 @@ int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
     ata_led(true);
 
     if (drive != 0 && (GPIOA_INPUT_VAL & 0x80) != 0)
-    {
         /* no external sd-card inserted */
-        ret = -9;
-        goto error;
-    }
+        goto ata_write_error;
 
-    if (&card_info[drive] != currcard || !card_info[drive].initialized)
+    if (&card_info[drive] != currcard || card_info[drive].initialized == 0)
+    {
         sd_init_device(drive);
+
+        if (card_info[drive].initialized < 0)
+            goto ata_write_error;
+    }
 
     bank = start / BLOCKS_PER_BANK;
 
-    if (currcard->current_bank != bank)
-        sd_select_bank(bank);
+    if (currcard->current_bank != bank && !sd_select_bank(bank))
+        goto ata_write_error;
 
     start -= bank * BLOCKS_PER_BANK;
 
     check_time[EC_WRITE_TIMEOUT] = USEC_TIMER;
     sd_wait_for_state(TRAN, EC_TRAN_WRITE_ENTRY);
     BLOCK_COUNT_REG = count;
-    sd_command(WRITE_MULTIPLE_BLOCK, start * SECTOR_SIZE, &response, 0x1c2d);
+
+    if (!sd_command(WRITE_MULTIPLE_BLOCK, start * SECTOR_SIZE,
+                    &response, 0x1c2d))
+    {
+        goto ata_write_error;
+    }
 
     buf_end = outbuf + count * currcard->block_size;
     for (buf = outbuf; buf < buf_end; buf += 2 * FIFO_SIZE)
@@ -690,10 +739,14 @@ int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
     sd_poll_status(DATA_DONE, 0x80000, EC_FIFO_WR_DONE | DO_PANIC);
     sd_check_timeout(0x80000, EC_WRITE_TIMEOUT);
 
-    sd_command(STOP_TRANSMISSION, 0, &response, 1);
+    if (!sd_command(STOP_TRANSMISSION, 0, &response, 1))
+        goto ata_write_error;
+
     sd_wait_for_state(TRAN, EC_TRAN_WRITE_EXIT);
 
-  error:
+    ret = 0;
+
+ata_write_error:
     ata_led(false);
     spinlock_unlock(&sd_mtx);
 
@@ -808,6 +861,8 @@ void ata_enable(bool on)
 
 int ata_init(void)
 {
+    int ret = 0;
+
     ata_led(false);
 
     /* NOTE: This init isn't dual core safe */
@@ -837,6 +892,9 @@ int ata_init(void)
 
         sd_init_device(0);
 
+        if (currcard->initialized <= 0)
+            ret = -1;
+
         queue_init(&sd_queue, true);
         create_thread(sd_thread, sd_stack, sizeof(sd_stack),
             sd_thread_name IF_PRIO(, PRIORITY_SYSTEM) IF_COP(, CPU, false));
@@ -856,7 +914,7 @@ int ata_init(void)
         spinlock_unlock(&sd_mtx);
     }
 
-    return 0;
+    return ret;
 }
 
 /* move the sd-card info to mmc struct */
