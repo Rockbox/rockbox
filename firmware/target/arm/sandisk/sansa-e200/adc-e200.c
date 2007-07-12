@@ -17,30 +17,40 @@
  *
  ****************************************************************************/
 #include "adc.h"
+#include "kernel.h"
 #include "i2c-pp.h"
 #include "as3514.h"
+
+static struct mutex adc_mutex NOCACHEBSS_ATTR;
 
 /* Read 10-bit channel data */
 unsigned short adc_read(int channel)
 {
-    unsigned char buf[2];
     unsigned short data = 0;
 
-    /* Select channel */
-    pp_i2c_send( AS3514_I2C_ADDR, ADC_0, (channel << 4));
-    
-    /* Wait for conversion to be complete */
-    pp_i2c_send( AS3514_I2C_ADDR, IRQ_ENRD2, 0x1);
-    while( (i2c_readbyte( AS3514_I2C_ADDR, IRQ_ENRD2) & 0x1) == 0);
+    if ((unsigned)channel < NUM_ADC_CHANNELS)
+    {
+        spinlock_lock(&adc_mutex);
 
-    /* Read data */
-    i2c_readbytes( AS3514_I2C_ADDR, ADC_0, 2, buf);
-    data = (((buf[0] & 0x3) << 8) | buf[1]);
+        /* Select channel */
+        if (pp_i2c_send( AS3514_I2C_ADDR, ADC_0, (channel << 4)) >= 0)
+        {
+            unsigned char buf[2];
+
+            /* Read data */
+            if (i2c_readbytes( AS3514_I2C_ADDR, ADC_0, 2, buf) >= 0)
+            {
+                data = (((buf[0] & 0x3) << 8) | buf[1]);
+            }
+        }
+
+        spinlock_unlock(&adc_mutex);
+    }
     
     return data;
 }
 
 void adc_init(void)
 {
-    /* FIXME: Add initialization of the ADC */
+    spinlock_init(&adc_mutex);
 }
