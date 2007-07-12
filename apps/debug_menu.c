@@ -89,7 +89,7 @@
 #include "hwcompat.h"
 
 #if defined(HAVE_DIRCACHE) || defined(HAVE_TAGCACHE) || CONFIG_TUNER
-#define MAX_DEBUG_MESSAGES 8
+#define MAX_DEBUG_MESSAGES 16
 #define DEBUG_MSG_LEN 32
 char debug_list_messages[MAX_DEBUG_MESSAGES][DEBUG_MSG_LEN];
 static char* dbg_listmessage_getname(int item, void * data, char *buffer)
@@ -1607,278 +1607,187 @@ static bool view_battery(void)
 
 #ifndef SIMULATOR
 #if defined(HAVE_MMC) || defined(HAVE_HOTSWAP)
-static bool dbg_card_info(void)
+static int cardinfo_lines = 0, 
+           current_card = 1; /* the first call changes this card to 0 */
+static int cardinfo_callback(int btn, struct gui_synclist *lists)
 {
-    bool done = false;
-    int currval = 0;
-    int line;
     tCardInfo *card;
-    unsigned char pbuf[32], pbuf2[32];
     unsigned char card_name[7];
-
+    unsigned char pbuf[32];
+    static char listtitle[16];
     static const unsigned char i_vmin[] = { 0, 1, 5, 10, 25, 35, 60, 100 };
     static const unsigned char i_vmax[] = { 1, 5, 10, 25, 35, 45, 80, 200 };
     static const unsigned char *kbit_units[] = { "kBit/s", "MBit/s", "GBit/s" };
     static const unsigned char *nsec_units[] = { "ns", "µs", "ms" };
     static const char *spec_vers[] = { "1.0-1.2", "1.4", "2.0-2.2",
-                                       "3.1-3.31", "4.0" };
-
-    card_name[6] = '\0';
-
-    lcd_setmargins(0, 0);
-    lcd_setfont(FONT_SYSFIXED);
-
-    while (!done)
+        "3.1-3.31", "4.0" };
+    if ((btn == ACTION_STD_OK) || (btn == SYS_FS_CHANGED))/* change cards */
     {
-        card = card_get_info(currval / 2);
-
-        line = 0;
-        lcd_clear_display();
-        snprintf(pbuf, sizeof(pbuf), "[MMC%d p%d]", currval / 2,
-                 (currval % 2) + 1);
-        lcd_puts(0, line++, pbuf);
-
+        if (btn == ACTION_STD_OK)
+            current_card ^= 0x1;
+        cardinfo_lines = 0;
+        card = card_get_info(current_card);
         if (card->initialized)
         {
-            if (!(currval % 2))   /* General info */
-            {
-                int temp;
-
-                strncpy(card_name, ((unsigned char*)card->cid) + 3, 6);
-                snprintf(pbuf, sizeof(pbuf), "%s Rev %d.%d", card_name,
-                         (int) card_extract_bits(card->cid, 72, 4),
-                         (int) card_extract_bits(card->cid, 76, 4));
-                lcd_puts(0, line++, pbuf);
-                snprintf(pbuf, sizeof(pbuf), "Prod: %d/%d",
-                         (int) card_extract_bits(card->cid, 112, 4),
-                         (int) card_extract_bits(card->cid, 116, 4) + 1997);
-                lcd_puts(0, line++, pbuf);
-                snprintf(pbuf, sizeof(pbuf), "Ser#: 0x%08lx",
-                         card_extract_bits(card->cid, 80, 32));
-                lcd_puts(0, line++, pbuf);
-                snprintf(pbuf, sizeof(pbuf), "M=%02x, O=%04x",
-                         (int) card_extract_bits(card->cid, 0, 8),
-                         (int) card_extract_bits(card->cid, 8, 16));
-                lcd_puts(0, line++, pbuf);
-                temp = card_extract_bits(card->csd, 2, 4);
-                snprintf(pbuf, sizeof(pbuf), "MMC v%s", temp < 5 ?
-                         spec_vers[temp] : "?.?");
-                lcd_puts(0, line++, pbuf);
-                snprintf(pbuf, sizeof(pbuf), "Blocks: 0x%06lx", card->numblocks);
-                lcd_puts(0, line++, pbuf);
-                snprintf(pbuf, sizeof(pbuf), "Blksz.: %d P:%c%c", card->blocksize,
-                         card_extract_bits(card->csd, 48, 1) ? 'R' : '-',
-                         card_extract_bits(card->csd, 106, 1) ? 'W' : '-');
-                lcd_puts(0, line++, pbuf);
-            }
-            else                  /* Technical details */
-            {
-                output_dyn_value(pbuf2, sizeof pbuf2, card->speed / 1000,
-                                 kbit_units, false);
-                snprintf(pbuf, sizeof pbuf, "Speed: %s", pbuf2);
-                lcd_puts(0, line++, pbuf);
-
-                output_dyn_value(pbuf2, sizeof pbuf2, card->tsac,
-                                 nsec_units, false);
-                snprintf(pbuf, sizeof pbuf, "Tsac: %s", pbuf2);
-                lcd_puts(0, line++, pbuf);
-
-                snprintf(pbuf, sizeof(pbuf), "Nsac: %d clk", card->nsac);
-                lcd_puts(0, line++, pbuf);
-                snprintf(pbuf, sizeof(pbuf), "R2W: *%d", card->r2w_factor);
-                lcd_puts(0, line++, pbuf);
-                snprintf(pbuf, sizeof(pbuf), "IRmax: %d..%d mA",
-                         i_vmin[card_extract_bits(card->csd, 66, 3)],
-                         i_vmax[card_extract_bits(card->csd, 69, 3)]);
-                lcd_puts(0, line++, pbuf);
-                snprintf(pbuf, sizeof(pbuf), "IWmax: %d..%d mA",
-                         i_vmin[card_extract_bits(card->csd, 72, 3)],
-                         i_vmax[card_extract_bits(card->csd, 75, 3)]);
-                lcd_puts(0, line++, pbuf);
-            }
+            card_name[6] = '\0';
+            strncpy(card_name, ((unsigned char*)card->cid) + 3, 6);
+            snprintf(debug_list_messages[cardinfo_lines++], DEBUG_MSG_LEN, 
+                    "%s Rev %d.%d", card_name,
+                    (int) card_extract_bits(card->cid, 72, 4),
+                    (int) card_extract_bits(card->cid, 76, 4));
+            snprintf(debug_list_messages[cardinfo_lines++], DEBUG_MSG_LEN, 
+                    "Prod: %d/%d",
+                    (int) card_extract_bits(card->cid, 112, 4),
+                    (int) card_extract_bits(card->cid, 116, 4) + 1997);
+            snprintf(debug_list_messages[cardinfo_lines++], DEBUG_MSG_LEN, 
+                    "Ser#: 0x%08lx",
+                    card_extract_bits(card->cid, 80, 32));
+            snprintf(debug_list_messages[cardinfo_lines++], DEBUG_MSG_LEN, 
+                    "M=%02x, O=%04x",
+                    (int) card_extract_bits(card->cid, 0, 8),
+                    (int) card_extract_bits(card->cid, 8, 16));
+            int temp = card_extract_bits(card->csd, 2, 4);
+            snprintf(debug_list_messages[cardinfo_lines++], DEBUG_MSG_LEN, 
+                    "MMC v%s", temp < 5 ?
+                            spec_vers[temp] : "?.?");
+            snprintf(debug_list_messages[cardinfo_lines++], DEBUG_MSG_LEN, 
+                    "Blocks: 0x%06lx", card->numblocks);
+            snprintf(debug_list_messages[cardinfo_lines++], DEBUG_MSG_LEN, 
+                    "Blksz.: %d P:%c%c", card->blocksize,
+                    card_extract_bits(card->csd, 48, 1) ? 'R' : '-',
+                    card_extract_bits(card->csd, 106, 1) ? 'W' : '-');
+            output_dyn_value(pbuf, sizeof pbuf, card->speed / 1000,
+                                            kbit_units, false);
+            snprintf(debug_list_messages[cardinfo_lines++], DEBUG_MSG_LEN, 
+                    "Speed: %s", pbuf);
+            output_dyn_value(pbuf, sizeof pbuf, card->tsac,
+                            nsec_units, false);
+            snprintf(debug_list_messages[cardinfo_lines++], DEBUG_MSG_LEN, 
+                    "Tsac: %s", pbuf);
+            snprintf(debug_list_messages[cardinfo_lines++], DEBUG_MSG_LEN, 
+                    "Nsac: %d clk", card->nsac);
+            snprintf(debug_list_messages[cardinfo_lines++], DEBUG_MSG_LEN, 
+                    "R2W: *%d", card->r2w_factor);
+            snprintf(debug_list_messages[cardinfo_lines++], DEBUG_MSG_LEN, 
+                    "IRmax: %d..%d mA",
+                    i_vmin[card_extract_bits(card->csd, 66, 3)],
+                    i_vmax[card_extract_bits(card->csd, 69, 3)]);
+            snprintf(debug_list_messages[cardinfo_lines++], DEBUG_MSG_LEN, 
+                    "IWmax: %d..%d mA",
+                    i_vmin[card_extract_bits(card->csd, 72, 3)],
+                    i_vmax[card_extract_bits(card->csd, 75, 3)]);
         }
         else
-            lcd_puts(0, line++, "Not found!");
-
-        lcd_update();
-
-        switch (get_action(CONTEXT_SETTINGS,HZ/2))
         {
-            case ACTION_STD_CANCEL:
-                done = true;
-                break;
-
-            case ACTION_SETTINGS_DEC:
-                currval--;
-                if (currval < 0)
-                    currval = 3;
-                break;
-
-            case ACTION_SETTINGS_INC:
-                currval++;
-                if (currval > 3)
-                    currval = 0;
-                break;
+            snprintf(debug_list_messages[cardinfo_lines++], DEBUG_MSG_LEN,
+                     "Not Found!");
+        }
+        if (lists)
+        {
+            snprintf(listtitle, sizeof listtitle, 
+                     "[MMC/microSD %d]", current_card);
+            gui_synclist_set_title(lists, listtitle, NOICON);
+            gui_synclist_select_item(lists, 0);
+            gui_synclist_set_nb_items(lists, cardinfo_lines);
+            gui_synclist_draw(lists);
         }
     }
-    action_signalscreenchange();
+    return btn;
+}
+static bool dbg_disk_info(void)
+{
+    current_card = 1; /* the callback changes this to 0 */
+    cardinfo_callback(ACTION_STD_OK, 0);
+    dbg_list("[MMC/microSD 0]", cardinfo_lines, 1,
+             cardinfo_callback, dbg_listmessage_getname);
     return false;
 }
 #else /* !defined(HAVE_MMC) && !defined(HAVE_HOTSWAP) */
-static bool dbg_disk_info(void)
+static int disklines = 0;
+static int disk_callback(int btn, struct gui_synclist *lists)
 {
-    char buf[128];
-    bool done = false;
     int i;
-    int page = 0;
-    const int max_page = 11;
+    char buf[128];
     unsigned short* identify_info = ata_get_identify();
     bool timing_info_present = false;
-    char pio3[2], pio4[2];
-
-    lcd_setmargins(0, 0);
-
-    while(!done)
-    {
-        int y=0;
-        int key;
-        lcd_clear_display();
-#ifdef HAVE_LCD_BITMAP
-        lcd_puts(0, y++, "Disk info:");
-        y++;
-#endif
-
-        switch (page) {
-            case 0:
-                for (i=0; i < 20; i++)
-                    ((unsigned short*)buf)[i]=htobe16(identify_info[i+27]);
-                buf[40]=0;
-                /* kill trailing space */
-                for (i=39; i && buf[i]==' '; i--)
-                    buf[i] = 0;
-                lcd_puts(0, y++, "Model");
-                lcd_puts_scroll(0, y++, buf);
-                break;
-
-            case 1:
-                for (i=0; i < 4; i++)
-                    ((unsigned short*)buf)[i]=htobe16(identify_info[i+23]);
-                buf[8]=0;
-                lcd_puts(0, y++, "Firmware");
-                lcd_puts(0, y++, buf);
-                break;
-
-            case 2:
-                snprintf(buf, sizeof buf, "%ld MB",
-                         ((unsigned long)identify_info[61] << 16 |
-                          (unsigned long)identify_info[60]) / 2048 );
-                lcd_puts(0, y++, "Size");
-                lcd_puts(0, y++, buf);
-                break;
-
-            case 3: {
-                unsigned long free;
-                fat_size( IF_MV2(0,) NULL, &free );
-                snprintf(buf, sizeof buf, "%ld MB",  free / 1024 );
-                lcd_puts(0, y++, "Free");
-                lcd_puts(0, y++, buf);
-                break;
-            }
-
-            case 4:
-                snprintf(buf, sizeof buf, "%d ms", ata_spinup_time * (1000/HZ));
-                lcd_puts(0, y++, "Spinup time");
-                lcd_puts(0, y++, buf);
-                break;
-
-            case 5:
-                i = identify_info[83] & (1<<3);
-                lcd_puts(0, y++, "Power mgmt:");
-                lcd_puts(0, y++, i ? "enabled" : "unsupported");
-                break;
-
-            case 6:
-                i = identify_info[83] & (1<<9);
-                lcd_puts(0, y++, "Noise mgmt:");
-                lcd_puts(0, y++, i ? "enabled" : "unsupported");
-                break;
-
-            case 7:
-                i = identify_info[82] & (1<<6);
-                lcd_puts(0, y++, "Read-ahead:");
-                lcd_puts(0, y++, i ? "enabled" : "unsupported");
-                break;
-
-            case 8:
-                timing_info_present = identify_info[53] & (1<<1);
-                if(timing_info_present) {
-                    pio3[1] = 0;
-                    pio4[1] = 0;
-                    lcd_puts(0, y++, "PIO modes:");
-                    pio3[0] = (identify_info[64] & (1<<0)) ? '3' : 0;
-                    pio4[0] = (identify_info[64] & (1<<1)) ? '4' : 0;
-                    snprintf(buf, 128, "0 1 2 %s %s", pio3, pio4);
-                    lcd_puts(0, y++, buf);
-                } else {
-                    lcd_puts(0, y++, "No PIO mode info");
-                }
-                break;
-
-            case 9:
-                timing_info_present = identify_info[53] & (1<<1);
-                if(timing_info_present) {
-                    lcd_puts(0, y++, "Cycle times");
-                    snprintf(buf, 128, "%dns/%dns",
-                             identify_info[67],
-                             identify_info[68]);
-                    lcd_puts(0, y++, buf);
-                } else {
-                    lcd_puts(0, y++, "No timing info");
-                }
-                break;
-
-            case 10:
-                timing_info_present = identify_info[53] & (1<<1);
-                if(timing_info_present) {
-                    i = identify_info[49] & (1<<11);
-                    snprintf(buf, 128, "IORDY support: %s", i ? "yes" : "no");
-                    lcd_puts(0, y++, buf);
-                    i = identify_info[49] & (1<<10);
-                    snprintf(buf, 128, "IORDY disable: %s", i ? "yes" : "no");
-                    lcd_puts(0, y++, buf);
-                } else {
-                    lcd_puts(0, y++, "No timing info");
-                }
-                break;
-
-            case 11:
-                lcd_puts(0, y++, "Cluster size");
-                snprintf(buf, 128, "%d bytes", fat_get_cluster_size(IF_MV(0)));
-                lcd_puts(0, y++, buf);
-                break;
-        }
-        lcd_update();
-
-        /* Wait for a key to be pushed */
-        key = get_action(CONTEXT_SETTINGS,HZ/5);
-        switch(key) {
-            case ACTION_STD_CANCEL:
-                done = true;
-                break;
-
-            case ACTION_SETTINGS_DEC:
-                if (--page < 0)
-                    page = max_page;
-                break;
-
-            case ACTION_SETTINGS_INC:
-                if (++page > max_page)
-                    page = 0;
-                break;
-        }
-        lcd_stop_scroll();
+    (void)btn; (void)lists;
+    disklines = 0;
+    for (i=0; i < 20; i++)
+        ((unsigned short*)buf)[i]=htobe16(identify_info[i+27]);
+    buf[40]=0;
+    /* kill trailing space */
+    for (i=39; i && buf[i]==' '; i--)
+        buf[i] = 0;
+    snprintf(debug_list_messages[disklines++], DEBUG_MSG_LEN, 
+            "Model: %s", buf);
+    for (i=0; i < 4; i++)
+        ((unsigned short*)buf)[i]=htobe16(identify_info[i+23]);
+    buf[8]=0;
+    snprintf(debug_list_messages[disklines++], DEBUG_MSG_LEN, 
+             "Firmare: %s", buf);
+    snprintf(buf, sizeof buf, "%ld MB",
+             ((unsigned long)identify_info[61] << 16 |
+              (unsigned long)identify_info[60]) / 2048 );
+    snprintf(debug_list_messages[disklines++], DEBUG_MSG_LEN, 
+             "Size: %s", buf);
+    unsigned long free;
+    fat_size( IF_MV2(0,) NULL, &free );
+    snprintf(debug_list_messages[disklines++], DEBUG_MSG_LEN, 
+             "Free: %ld MB", free / 1024);
+    snprintf(debug_list_messages[disklines++], DEBUG_MSG_LEN, 
+             "Spinup time: %d ms", ata_spinup_time * (1000/HZ));
+    i = identify_info[83] & (1<<3);
+    snprintf(debug_list_messages[disklines++], DEBUG_MSG_LEN, 
+             "Power mgmt: %s", i ? "enabled" : "unsupported");
+    i = identify_info[83] & (1<<9);
+    snprintf(debug_list_messages[disklines++], DEBUG_MSG_LEN, 
+             "Noise mgmt: %s", i ? "enabled" : "unsupported");
+    i = identify_info[82] & (1<<6);
+    snprintf(debug_list_messages[disklines++], DEBUG_MSG_LEN, 
+             "Read-ahead: %s", i ? "enabled" : "unsupported");
+    timing_info_present = identify_info[53] & (1<<1);
+    if(timing_info_present) {
+        char pio3[2], pio4[2];pio3[1] = 0;
+        pio4[1] = 0;
+        pio3[0] = (identify_info[64] & (1<<0)) ? '3' : 0;
+        pio4[0] = (identify_info[64] & (1<<1)) ? '4' : 0;
+        snprintf(debug_list_messages[disklines++], DEBUG_MSG_LEN, 
+                 "PIO modes: 0 1 2 %s %s", pio3, pio4);
     }
-    action_signalscreenchange();
+    else {
+        snprintf(debug_list_messages[disklines++], DEBUG_MSG_LEN, 
+                 "No PIO mode info");
+    }
+    timing_info_present = identify_info[53] & (1<<1);
+    if(timing_info_present) {
+        snprintf(debug_list_messages[disklines++], DEBUG_MSG_LEN, 
+                 "Cycle times %dns/%dns",
+                 identify_info[67],
+                 identify_info[68] );
+    } else {
+        snprintf(debug_list_messages[disklines++], DEBUG_MSG_LEN, 
+                 "No timing info");
+    }
+    timing_info_present = identify_info[53] & (1<<1);
+    if(timing_info_present) {
+        i = identify_info[49] & (1<<11);
+        snprintf(debug_list_messages[disklines++], DEBUG_MSG_LEN, 
+            "IORDY support: %s", i ? "yes" : "no");
+        i = identify_info[49] & (1<<10);
+        snprintf(debug_list_messages[disklines++], DEBUG_MSG_LEN, 
+                "IORDY disable: %s", i ? "yes" : "no");
+    } else {
+        snprintf(debug_list_messages[disklines++], DEBUG_MSG_LEN, 
+                "No timing info");
+    }
+    snprintf(debug_list_messages[disklines++], DEBUG_MSG_LEN, 
+             "Cluster size: %d bytes", fat_get_cluster_size(IF_MV(0)));
+    return btn;
+}
+static bool dbg_disk_info(void)
+{
+    disk_callback(0,0);
+    dbg_list("Disk Info",disklines, 1, disk_callback, dbg_listmessage_getname);
     return false;
 }
 #endif /* !defined(HAVE_MMC) && !defined(HAVE_HOTSWAP) */
@@ -2292,13 +2201,7 @@ static const struct the_menu_item menuitems[] = {
         { "View partitions", dbg_partitions },
 #endif
 #ifndef SIMULATOR
-#if defined(HAVE_MMC)
-        { "View MMC info", dbg_card_info },
-#elif defined(HAVE_HOTSWAP)
-        { "View microSD info", dbg_card_info },
-#else
         { "View disk info", dbg_disk_info },
-#endif
 #endif
 #ifdef HAVE_DIRCACHE
         { "View dircache info", dbg_dircache_info },
