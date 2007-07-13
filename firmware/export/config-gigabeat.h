@@ -71,7 +71,7 @@
 #define HAVE_WM8751
 
 /* Define this if you want to use the adaptive bass capibility of the 8751 */
-#define USE_ADAPTIVE_BASS
+/* #define USE_ADAPTIVE_BASS */
 
 #define BATTERY_CAPACITY_DEFAULT 2000 /* default battery capacity */
 
