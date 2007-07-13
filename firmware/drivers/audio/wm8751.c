@@ -31,7 +31,11 @@
 
 const struct sound_settings_info audiohw_settings[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25},
+#ifdef USE_ADAPTIVE_BASS
+    [SOUND_BASS]          = {"",   0,  1,   0,  15,   0},
+#else
     [SOUND_BASS]          = {"dB", 1, 15, -60,  90,   0},
+#endif
     [SOUND_TREBLE]        = {"dB", 1, 15, -60,  90,   0},
     [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
     [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
@@ -47,7 +51,11 @@ const struct sound_settings_info audiohw_settings[] = {
 #define LOUT2_BITS      (LOUT2_LO2ZC)
 #define ROUT2_BITS      (ROUT2_RO2ZC | ROUT2_RO2VU)
 /* We use linear bass control with 200 Hz cutoff */
+#ifdef USE_ADAPTIVE_BASE
+#define BASSCTRL_BITS   (BASSCTRL_BC | BASSCTRL_BB)
+#else
 #define BASSCTRL_BITS   (BASSCTRL_BC)
+#endif
 /* We use linear treble control with 4 kHz cutoff */
 #define TREBCTRL_BITS   (TREBCTRL_TC)
 
@@ -84,6 +92,18 @@ static int tone_tenthdb2hw(int value)
 
     return value;
 }
+
+
+#ifdef USE_ADAPTIVE_BASS
+static int adaptivebass2hw(int value)
+{
+    /* 0 to 15 step 1 - step -1  0 = off is a 15 in the register */
+    value = 15 - value;
+
+    return value;
+}
+#endif
+
 
 void audiohw_reset(void);
 
@@ -162,7 +182,12 @@ int audiohw_set_mixer_vol(int channel1, int channel2)
 void audiohw_set_bass(int value)
 {
     wmcodec_write(BASSCTRL, BASSCTRL_BITS |
+
+#ifdef USE_ADAPTIVE_BASS
+        BASSCTRL_BASS(adaptivebass2hw(value)));
+#else
         BASSCTRL_BASS(tone_tenthdb2hw(value)));
+#endif
 }
 
 void audiohw_set_treble(int value)

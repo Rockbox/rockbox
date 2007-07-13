@@ -70,6 +70,9 @@
 /* Define this if you have the WM8975 audio codec */
 #define HAVE_WM8751
 
+/* Define this if you want to use the adaptive bass capibility of the 8751 */
+#define USE_ADAPTIVE_BASS
+
 #define BATTERY_CAPACITY_DEFAULT 2000 /* default battery capacity */
 
 #define HW_SAMPR_CAPS (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | \
