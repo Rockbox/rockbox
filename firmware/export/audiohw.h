@@ -27,7 +27,7 @@
 #include "uda1380.h"
 #elif defined(HAVE_WM8751)
 #include "wm8751.h"
-#elif defined(HAVE_WM8975)
+#elif defined(HAVE_WM8975) || defined(HAVE_WM8978)
 #include "wm8975.h"
 #elif defined(HAVE_WM8758)
 #include "wm8758.h"
@@ -60,7 +60,7 @@ enum {
 #endif
 #if CONFIG_CODEC == MAS3587F || defined(HAVE_UDA1380) || defined(HAVE_TLV320)\
     || defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8731) \
-    || defined(HAVE_AS3514)
+    || defined(HAVE_AS3514) || defined(HAVE_WM8978)
     SOUND_LEFT_GAIN,
     SOUND_RIGHT_GAIN,
     SOUND_MIC_GAIN,

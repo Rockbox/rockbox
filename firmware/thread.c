@@ -196,6 +196,11 @@ static inline void core_sleep(void)
     for(i=0; i<10; i++); /* wait for IDLE */
     CLKCON &= ~(1 << 2); /* reset IDLE bit when wake up */
 }
+#elif CONFIG_CPU == IMX31L
+static inline void core_sleep(void)
+{
+    /* TODO */
+}
 #endif
 
 #elif defined(CPU_COLDFIRE)

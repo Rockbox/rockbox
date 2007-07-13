@@ -708,6 +708,12 @@ void tick_start(unsigned int interval_in_ms)
 
     TIMER0.ctrl |= 0x80;  /* Enable the counter */
 }
+#elif CONFIG_CPU == IMX31L
+void tick_start(unsigned int interval_in_ms)
+{
+    (void)interval_in_ms;
+    /* TODO */
+}
 #endif
 
 int tick_add_task(void (*f)(void))

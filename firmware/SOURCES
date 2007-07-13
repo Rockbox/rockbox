@@ -206,7 +206,7 @@ drivers/mas.c
 drivers/audio/uda1380.c
 #elif defined(HAVE_WM8751)
 drivers/audio/wm8751.c
-#elif defined(HAVE_WM8975)
+#elif defined(HAVE_WM8975) || defined(HAVE_WM8978)
 drivers/audio/wm8975.c
 #elif defined(HAVE_WM8758)
 drivers/audio/wm8758.c
@@ -286,7 +286,7 @@ target/arm/memswap128-arm.S
 target/arm/i2c-pp.c
 #elif CONFIG_I2C == I2C_PNX0101
 target/arm/pnx0101/i2c-pnx0101.c
-#elif CONFIG_I2C == I2C_S3C2440
+#elif CONFIG_I2C == I2C_S3C2440 || CONFIG_I2C == I2C_IMX31L
 /* no i2c driver yet */
 #endif
 #if CONFIG_CPU == PNX0101
@@ -536,6 +536,27 @@ target/arm/s3c2440/gigabeat-fx/pcm-meg-fx.c
 #endif
 #endif /* SIMULATOR */
 #endif /* GIGABEAT_F */
+
+#ifdef GIGABEAT_S
+#ifndef SIMULATOR
+target/arm/toshiba/gigabeat-s/adc-imx31.c
+target/arm/toshiba/gigabeat-s/ata-imx31.c
+target/arm/toshiba/gigabeat-s/backlight-imx31.c
+target/arm/toshiba/gigabeat-s/button-imx31.c
+target/arm/toshiba/gigabeat-s/i2c-imx31.c
+target/arm/toshiba/gigabeat-s/lcd-as-imx31.S
+target/arm/toshiba/gigabeat-s/lcd-imx31.c
+target/arm/toshiba/gigabeat-s/power-imx31.c
+target/arm/toshiba/gigabeat-s/usb-imx31.c
+target/arm/toshiba/gigabeat-s/wmcodec-imx31.c
+target/arm/toshiba/gigabeat-s/dma_start.c
+target/arm/toshiba/gigabeat-s/system-imx31.c
+target/arm/toshiba/gigabeat-s/mmu-imx31.c
+#ifndef BOOTLOADER
+target/arm/toshiba/gigabeat-s/pcm-imx31.c
+#endif
+#endif /* SIMULATOR */
+#endif /* GIGABEAT_S */
 
 #ifdef ELIO_TPJ1022
 #ifndef SIMULATOR

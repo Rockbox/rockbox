@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2004 by Linus Nielsen Feltzing
+ * Copyright (C) 2006 by Linus Nielsen Feltzing
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,32 +16,32 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "config.h"
 
-#if CONFIG_CPU == SH7034
-#include "sh7034.h"
-#endif
-#if CONFIG_CPU == MCF5249
-#include "mcf5249.h"
-#endif
-#if CONFIG_CPU == MCF5250
-#include "mcf5250.h"
-#endif
-#if (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5022)
-#include "pp5020.h"
-#endif
-#if CONFIG_CPU == PP5002
-#include "pp5002.h"
-#endif
-#if CONFIG_CPU == PP5024
-#include "pp5024.h"
-#endif
-#if CONFIG_CPU == PNX0101
-#include "pnx0101.h"
-#endif
-#if CONFIG_CPU == S3C2440
-#include "s3c2440.h"
-#endif
-#if CONFIG_CPU == IMX31L
-#include "imx31l.h"
-#endif
+#include "config.h"
+#include "cpu.h"
+#include "system.h"
+#include "button.h"
+#include "kernel.h"
+#include "backlight.h"
+#include "adc.h"
+#include "system.h"
+#include "backlight-target.h"
+
+void button_init_device(void)
+{
+}
+
+inline bool button_hold(void)
+{
+    return false;
+}
+
+int button_read_device(void)
+{
+    return 0;
+}
+
+bool headphones_inserted(void)
+{
+    return true;
+}

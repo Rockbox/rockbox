@@ -31,7 +31,14 @@ start:
  *
  */
 
+#if CONFIG_CPU == IMX31L
+    mrs r0, cpsr
+    bic r0, r0, #0x100
+    add r0,r0,#0xD3
+    msr cpsr, r0
+#else
     msr    cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ */
+#endif  
 
 #ifndef BOOTLOADER
 
@@ -118,6 +125,49 @@ start:
     
 start_loc:
      bl main
+
+#elif CONFIG_CPU == IMX31L
+    mov r0, #0
+    mcr 15, 0, r0, c7, c7, 0        /* invalidate I cache and D cache */
+    mcr 15, 0, r0, c8, c7, 0        /* invalidate TLBs */
+    mcr 15, 0, r0, c7, c10, 4        /* Drain the write buffer */
+
+    /* Also setup the Peripheral Port Remap register inside the core */
+    ldr r0, =0x40000015        /* start from AIPS 2GB region */
+    mcr p15, 0, r0, c15, c2, 4
+
+    /*** L2 Cache setup/invalidation/disable ***/
+    /* Disable L2 cache first */
+    ldr r0, =L2CC_BASE_ADDR
+    ldr r2, [r0, #L2_CACHE_CTL_REG]
+    bic r2, r2, #0x1
+    str r2, [r0, #L2_CACHE_CTL_REG]
+
+
+    /*
+     * Configure L2 Cache:
+     * - 128k size(16k way)
+     * - 8-way associativity
+     * - 0 ws TAG/VALID/DIRTY
+     * - 4 ws DATA R/W
+     */
+    ldr r1, [r0, #L2_CACHE_AUX_CTL_REG]
+    and r1, r1, #0xFE000000
+    ldr r2, =0x00030024
+    orr r1, r1, r2
+    str r1, [r0, #L2_CACHE_AUX_CTL_REG]
+
+    /* Invalidate L2 */
+    ldr r1, =0x000000FF
+    str r1, [r0, #L2_CACHE_INV_WAY_REG]
+L2_loop:
+    /* Poll Invalidate By Way register */
+    ldr r2, [r0, #L2_CACHE_INV_WAY_REG]
+    cmp r2, #0
+    bne L2_loop
+    /*** End of L2 operations ***/
+
+    bl main
 #endif
 
 #else /* BOOTLOADER */

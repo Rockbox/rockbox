@@ -28,7 +28,7 @@
 
 /* TODO: Implement set_irq_level and check CPU frequencies */
 
-#if CONFIG_CPU != S3C2440 && CONFIG_CPU != PNX0101
+#if CONFIG_CPU != S3C2440 && CONFIG_CPU != PNX0101 & CONFIG_CPU != IMX31L
 
 /* TODO: Finish targeting this stuff */
 #define CPUFREQ_DEFAULT_MULT 4
