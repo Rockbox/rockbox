@@ -14,7 +14,7 @@
 #
 #    Refonte totale du fichier par Mustapha Senhaji (Moos) <moos75 AT gmail.com>
 #    Nov 2005, Avr 2006, Mai 2006, Juil 2006, Oct 2006, Dec 2006, Mars 2007,
-#    Mai 2007
+#    Mai 2007,Juin 2007, Juillet 2007
 #
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -10847,5 +10847,229 @@
   </dest>
   <voice>
     *: "Déplacement en cours"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SELECT_BOOKMARK
+  desc: bookmark selection list title
+  user:
+  <source>
+    *: "Select Bookmark"
+  </source>
+  <dest>
+    *: "Choisir un Signet"
+  </dest>
+  <voice>
+    *: "Choisir un signet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_DONT_RESUME
+  desc: top item in the list when asking user about bookmark auto load
+  user:
+  <source>
+    *: "<Don't Resume>"
+  </source>
+  <dest>
+    *: "<Ne pas reprendre>"
+  </dest>
+  <voice>
+    *: "Ne pas reprendre"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SHUFFLE
+  desc: bookmark selection list, bookmark enables shuffle
+  user:
+  <source>
+    *: ", Shuffle"
+  </source>
+  <dest>
+    *: ", Aléatoire"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_INVALID
+  desc: bookmark selection list, bookmark couldn't be parsed
+  user:
+  <source>
+    *: "<Invalid Bookmark>"
+  </source>
+  <dest>
+    *: "<Signet invalide>"
+  </dest>
+  <voice>
+    *: "Signet invalide"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_MENU
+  desc: bookmark selection list context menu
+  user:
+  <source>
+    *: "Bookmark Actions"
+  </source>
+  <dest>
+    *: "Actions signet"
+  </dest>
+  <voice>
+    *: "Actions de signet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_RESUME
+  desc: bookmark context menu, resume this bookmark
+  user:
+  <source>
+    *: "Resume"
+  </source>
+  <dest>
+    *: "Reprendre"
+  </dest>
+  <voice>
+    *: "Reprendre"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_DELETE
+  desc: bookmark context menu, delete this bookmark
+  user:
+  <source>
+    *: "Delete"
+  </source>
+  <dest>
+    *: "Supprimer"
+  </dest>
+  <voice>
+    *: "Supprimer"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BOOKMARK_SELECT_INDEX_TEXT
+  desc: voice only, used in the bookmark list to label index number
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Index"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BOOKMARK_SELECT_TIME_TEXT
+  desc: voice only, used in the bookmark select list to label elapsed time
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Temps"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LISTACCEL_START_DELAY
+  desc: Delay before list starts accelerating
+  user:
+  <source>
+    *: "List Acceleration Start Delay"
+  </source>
+  <dest>
+    *: "Délais avant accélération liste"
+  </dest>
+  <voice>
+    *: "Délais avant accélération de la liste"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LISTACCEL_ACCEL_SPEED
+  desc: list acceleration speed
+  user:
+  <source>
+    *: "List Acceleration Speed"
+  </source>
+  <dest>
+    *: "Vitesse d'accélération liste"
+  </dest>
+  <voice>
+    *: "Vitesse d'accélération de la liste"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_DIR_TALK
+  desc: Item of voice menu, whether to use directory .talk clips
+  user:
+  <source>
+    *: "Use Directory .talk Clips"
+  </source>
+  <dest>
+    *: "Utiliser le dossier .talk Clips"
+  </dest>
+  <voice>
+    *: "Utiliser le dossier .talk Clips"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_FILE_TALK
+  desc: Item of voice menu, whether to use file .talk clips
+  user:
+  <source>
+    *: "Use File .talk Clips"
+  </source>
+  <dest>
+    *: "Utiliser le fichier .talk Clips"
+  </dest>
+  <voice>
+    *: "Utiliser le fichier .talk Clips"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_REC_DIR
+  desc:
+  user:
+  <source>
+    *: "Set As Recording Directory"
+  </source>
+  <dest>
+    *: "Choisir comme dossier d'enreg."
+  </dest>
+  <voice>
+    *: "Choisir comme dossier d'enregistrement"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_REC_DIR
+  desc:
+  user:
+  <source>
+    *: "Clear Recording Directory"
+  </source>
+  <dest>
+    *: "Restaurer le dossier d'enreg. initial"
+  </dest>
+  <voice>
+    *: "Restaurer le dossier enregistrement initial"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_DIR_NOT_WRITABLE
+  desc:
+  user:
+  <source>
+    *: "Can't write to recording directory"
+  </source>
+  <dest>
+    *: "Impossible d'écrire dans dossier d'enreg."
+  </dest>
+  <voice>
+    *: "Impossible d'écrire dans dossier enregistrement"
   </voice>
 </phrase>
