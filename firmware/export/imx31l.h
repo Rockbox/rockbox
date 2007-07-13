@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Marcoen Hirschberg
+ * Copyright (C) 2006 by James Espinoza
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -17,10 +17,12 @@
  *
  ****************************************************************************/
 
- #define L2CC_BASE_ADDR          0x30000000
+/* Most(if not all) of these defines are copied from Nand-Boot v4 provided w/ the Imx31 Linux Bsp*/
+
+#define L2CC_BASE_ADDR          0x30000000
  
 #define LCDSADDR1 (*(volatile int *)0x80100000) /* STN/TFT: frame buffer start address 1 */
-#define FRAME   ((short *)0x84100000)
+#define FRAME   ((short *)0x84100000)			/* STN/TFT: frame buffer start address 2 */
  /*
   * AIPS 1
   */
@@ -365,5 +367,5 @@
  #define         SDRAM_COMPARE_CONST2    0xAAAAAAAA
  #define         UART_FIFO_CTRL          0x881
  #define         TIMEOUT                 1000
- #define writel(v,a)  		(*(volatile int *) (a) = (v))
+ #define         writel(v,a)  		(*(volatile int *) (a) = (v))
 
