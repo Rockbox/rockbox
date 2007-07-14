@@ -150,8 +150,8 @@ drivers/rtc/rtc_as3514.c
 
 /* Tuner */
 #if CONFIG_TUNER
-#ifndef SIMULATOR
 tuner.c
+#ifndef SIMULATOR
 #if (CONFIG_TUNER & LV24020LP)
 drivers/tuner/lv24020lp.c
 #endif /* (CONFIG_TUNER & LV24020LP) */

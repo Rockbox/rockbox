@@ -33,8 +33,8 @@ int s1a0903x01_set(int setting, int value);
 int s1a0903x01_get(int setting);
 
 #ifndef CONFIG_TUNER_MULTI
-#define tuner_set s1a0903x01_get
-#define tuner_get s1a0903x01_set
+#define tuner_get s1a0903x01_get
+#define tuner_set s1a0903x01_set
 #endif
 
 #endif /* _S1A0903X01_H_ */

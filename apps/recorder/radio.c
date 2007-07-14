@@ -1304,9 +1304,12 @@ void toggle_mono_mode(bool mono)
 
 void set_radio_region(int region)
 {
+#ifdef HAVE_RADIO_REGION
     tuner_set(RADIO_REGION, region);
+#endif
     next_station(0);
     remember_frequency();
+    (void)region;
 }
 
 MENUITEM_SETTING(set_region, &global_settings.fm_region, NULL);

@@ -23,22 +23,6 @@
 #include "tuner.h"
 #include "fmradio.h"
 
-#ifdef CONFIG_TUNER_MULTI
-int (*tuner_set)(int setting, int value);
-int (*tuner_get)(int setting);
-
-#define TUNER_TYPE_CASE(type, set, get, region_data) \
-    case type:                                       \
-        tuner_set = set;                             \
-        tuner_get = get;                             \
-        break;
-
-#else
-
-#define TUNER_TYPE_CASE(type, set, get, region_data)
-
-#endif /* CONFIG_TUNER_MULTI */
-
 /* General region information */
 const struct fm_region_data fm_region_data[TUNER_NUM_REGIONS] =
 {
@@ -47,6 +31,8 @@ const struct fm_region_data fm_region_data[TUNER_NUM_REGIONS] =
     [REGION_JAPAN]     = { 76000000,  90000000, 100000 },
     [REGION_KOREA]     = { 87500000, 108000000, 100000 }
 };
+
+#ifndef SIMULATOR
 
 /* Tuner-specific region information */
 
@@ -70,6 +56,18 @@ const struct tea5767_region_data tea5767_region_data[TUNER_NUM_REGIONS] =
     [REGION_KOREA]     = { 0, 0 }, /* 50uS, US/Europe band */ 
 };
 #endif /* (CONFIG_TUNER & TEA5767) */
+
+#ifdef CONFIG_TUNER_MULTI
+int (*tuner_set)(int setting, int value);
+int (*tuner_get)(int setting);
+#define TUNER_TYPE_CASE(type, set, get, region_data) \
+    case type:                                       \
+        tuner_set = set;                             \
+        tuner_get = get;                             \
+        break;
+#else
+#define TUNER_TYPE_CASE(type, set, get, region_data)
+#endif /* CONFIG_TUNER_MULTI */
 
 void tuner_init(void)
 {
@@ -97,3 +95,5 @@ void tuner_init(void)
     #endif
     }
 }
+
+#endif /* SIMULATOR */

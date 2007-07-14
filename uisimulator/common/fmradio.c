@@ -30,6 +30,10 @@ static bool mono = false;
 static bool powered = false;
 #endif
 
+void tuner_init(void)
+{
+}
+
 int tuner_set(int setting, int value)
 {
     switch(setting)
