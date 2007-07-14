@@ -1607,6 +1607,11 @@ static bool view_battery(void)
 
 #ifndef SIMULATOR
 #if defined(HAVE_MMC) || defined(HAVE_HOTSWAP)
+#if defined(HAVE_MMC)
+#define CARDTYPE "MMC"
+#else
+#define CARDTYPE "microSD"
+#endif
 static int cardinfo_lines = 0, 
            current_card = 1; /* the first call changes this card to 0 */
 static int cardinfo_callback(int btn, struct gui_synclist *lists)
@@ -1648,7 +1653,7 @@ static int cardinfo_callback(int btn, struct gui_synclist *lists)
                     (int) card_extract_bits(card->cid, 8, 16));
             int temp = card_extract_bits(card->csd, 2, 4);
             snprintf(debug_list_messages[cardinfo_lines++], DEBUG_MSG_LEN, 
-                    "MMC v%s", temp < 5 ?
+                     CARDTYPE " v%s", temp < 5 ?
                             spec_vers[temp] : "?.?");
             snprintf(debug_list_messages[cardinfo_lines++], DEBUG_MSG_LEN, 
                     "Blocks: 0x%06lx", card->numblocks);
@@ -1685,7 +1690,7 @@ static int cardinfo_callback(int btn, struct gui_synclist *lists)
         if (lists)
         {
             snprintf(listtitle, sizeof listtitle, 
-                     "[MMC/microSD %d]", current_card);
+                     "[" CARDTYPE " %d]", current_card);
             gui_synclist_set_title(lists, listtitle, NOICON);
             gui_synclist_select_item(lists, 0);
             gui_synclist_set_nb_items(lists, cardinfo_lines);
@@ -1698,7 +1703,7 @@ static bool dbg_disk_info(void)
 {
     current_card = 1; /* the callback changes this to 0 */
     cardinfo_callback(ACTION_STD_OK, 0);
-    dbg_list("[MMC/microSD 0]", cardinfo_lines, 1,
+    dbg_list("[" CARDTYPE " 0]", cardinfo_lines, 1,
              cardinfo_callback, dbg_listmessage_getname);
     return false;
 }
@@ -1943,6 +1948,7 @@ int radio_lines = 0;
 static int radio_callback(int btn, struct gui_synclist *lists)
 {
     (void)btn; (void)lists;
+    radio_lines = 0;
     if (radio_hardware_present())
     {
         snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, 
