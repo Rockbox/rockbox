@@ -139,7 +139,7 @@ void rbutilFrm::CreateGUIControls(void)
         wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL | wxALL,5);
 
     wxStaticText* WxStaticText5 =  new wxStaticText(installpage, wxID_ANY,
-        wxT("Bootloader installation instructions\n\n"
+        wxT("Bootloader installation\n\n"
         "Before Rockbox can be installed on your audio player, you "
         "may have to\ninstall a bootloader.\nThis is only necessary the first time "
         "Rockbox is installed."));
