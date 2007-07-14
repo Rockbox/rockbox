@@ -1947,7 +1947,7 @@ static bool dbg_save_roms(void)
 int radio_lines = 0;
 static int radio_callback(int btn, struct gui_synclist *lists)
 {
-    (void)btn; (void)lists;
+    (void)btn;
     radio_lines = 0;
     if (radio_hardware_present())
     {
@@ -1988,6 +1988,7 @@ static int radio_callback(int btn, struct gui_synclist *lists)
                  (unsigned)info.write_regs[2], (unsigned)info.write_regs[3],
                  (unsigned)info.write_regs[4]);
 #endif
+        gui_synclist_draw(lists);
     }
     else
         snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, "HW detected: no");
