@@ -84,12 +84,12 @@ void ide_power_enable(bool on)
 
 static bool powered = false;
 
-bool radio_powered()
+bool tuner_powered()
 {
     return powered;
 }
 
-bool radio_power(bool status)
+bool tuner_power(bool status)
 {
     bool old_status = powered;
     powered = status;

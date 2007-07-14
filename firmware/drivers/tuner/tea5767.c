@@ -23,13 +23,21 @@
 #include <stdlib.h>
 #include "kernel.h"
 #include "tuner.h" /* tuner abstraction interface */
+#include "fmradio.h"
 #include "fmradio_i2c.h" /* physical interface driver */
 
 #define I2C_ADR 0xC0
 static unsigned char write_bytes[5] = { 0x00, 0x00, 0x00, 0x00, 0x00 };
 
+static void tea5767_set_clear(int byte, unsigned char bits, int set)
+{
+    write_bytes[byte] &= ~bits;
+    if (set)
+        write_bytes[byte] |= bits;
+}
+
 /* tuner abstraction layer: set something to the tuner */
-int philips_set(int setting, int value)
+int tea5767_set(int setting, int value)
 {
     switch(setting)
     {
@@ -44,7 +52,7 @@ int philips_set(int setting, int value)
             write_bytes[3] |= (1<<3) | (1<<1); 
 #endif
             /* sleep / standby mode */
-            write_bytes[3] &= ~(1<<6) | (value ? (1<<6) : 0);
+            tea5767_set_clear(3, (1<<6), value);
             break;
 
         case RADIO_FREQUENCY:
@@ -56,38 +64,41 @@ int philips_set(int setting, int value)
                 n = (4 * (value - 225000)) / 50000;
 #endif
                 write_bytes[0] = (write_bytes[0] & 0xC0) | (n >> 8);
-                write_bytes[1] = n & 0xFF;
+                write_bytes[1] = n;
             }
             break;
 
         case RADIO_SCAN_FREQUENCY:
-            philips_set(RADIO_FREQUENCY, value);
+            tea5767_set(RADIO_FREQUENCY, value);
             sleep(HZ/30);
-            return philips_get(RADIO_TUNED);
+            return tea5767_get(RADIO_TUNED);
 
         case RADIO_MUTE:
-            write_bytes[0] = (write_bytes[0] & 0x7F) | (value ? 0x80 : 0);
+            tea5767_set_clear(0, 0x80, value);
             break;
 
+        case RADIO_REGION:
+        {
+            const struct tea5767_region_data *rd =
+                &tea5767_region_data[value];
+
+            tea5767_set_clear(4, (1<<6), rd->deemphasis);
+            tea5767_set_clear(3, (1<<5), rd->band);
+            break;
+            }
         case RADIO_FORCE_MONO:
-            write_bytes[2] = (write_bytes[2] & 0xF7) | (value ? 0x08 : 0);
+            tea5767_set_clear(2, 0x08, value);
             break;
-
-        case RADIO_SET_DEEMPHASIS:
-            write_bytes[4] = (write_bytes[4] & ~(1<<6)) | (value ? (1<<6) : 0);
-            break;
-
-        case RADIO_SET_BAND:
-            write_bytes[3] = (write_bytes[3] & ~(1<<5)) | (value ? (1<<5) : 0);
         default:
             return -1;
     }
+
     fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
     return 1;
 }
 
 /* tuner abstraction layer: read something from the tuner */
-int philips_get(int setting)
+int tea5767_get(int setting)
 {
     unsigned char read_bytes[5];
     int val = -1; /* default for unsupported query */
@@ -113,10 +124,11 @@ int philips_get(int setting)
             val = read_bytes[2] >> 7;
             break;
     }
+
     return val;
 }
 
-void philips_dbg_info(struct philips_dbg_info *info)
+void tea5767_dbg_info(struct tea5767_dbg_info *info)
 {
     fmradio_i2c_read(I2C_ADR, info->read_regs, 5);
     memcpy(info->write_regs, write_bytes, 5);

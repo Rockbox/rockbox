@@ -33,9 +33,10 @@
 
 static int fm_in1;
 static int fm_in2;
+static int fm_present = -1; /* unknown */
 
 /* tuner abstraction layer: set something to the tuner */
-int samsung_set(int setting, int value)
+int s1a0903x01_set(int setting, int value)
 {
     int val = 1;
 
@@ -95,12 +96,13 @@ int samsung_set(int setting, int value)
 
         case RADIO_SCAN_FREQUENCY:
             /* Tune in and delay */
-            samsung_set(RADIO_FREQUENCY, value);
+            s1a0903x01_set(RADIO_FREQUENCY, value);
             sleep(1);
             /* Start IF measurement */
-            samsung_set(RADIO_IF_MEASUREMENT, 1);
+            fm_in1 |= 4;
+            fmradio_set(1, fm_in1);
             sleep(1);
-            val = samsung_get(RADIO_TUNED);
+            val = s1a0903x01_get(RADIO_TUNED);
             break;
 
         case RADIO_MUTE:
@@ -108,20 +110,23 @@ int samsung_set(int setting, int value)
             fmradio_set(1, fm_in1);
             break;
 
-        case RADIO_IF_MEASUREMENT:
-            fm_in1 = (fm_in1 & 0xfffffffb) | (value?4:0);
-            fmradio_set(1, fm_in1);
-            break;
-
-        case RADIO_SENSITIVITY:
-            fm_in2 = (fm_in2 & 0xffff9fff) | ((value & 3) << 13);
-            fmradio_set(2, fm_in2);
-            break;
-
         case RADIO_FORCE_MONO:
             fm_in2 = (fm_in2 & 0xfffffffb) | (value?0:4);
             fmradio_set(2, fm_in2);
             break;
+        /* NOTE: These were only zeroed when starting the tuner from OFF
+                 but the default values already set them to 0. */
+#if 0
+        case S1A0903X01_IF_MEASUREMENT:
+            fm_in1 = (fm_in1 & 0xfffffffb) | (value?4:0);
+            fmradio_set(1, fm_in1);
+            break;
+
+        case S1A0903X01_SENSITIVITY:
+            fm_in2 = (fm_in2 & 0xffff9fff) | ((value & 3) << 13);
+            fmradio_set(2, fm_in2);
+            break;
+#endif
         default:
             val = -1;
     }
@@ -130,14 +135,27 @@ int samsung_set(int setting, int value)
 }
 
 /* tuner abstraction layer: read something from the tuner */
-int samsung_get(int setting)
+int s1a0903x01_get(int setting)
 {
     int val = -1;
     switch(setting)
     {
         case RADIO_PRESENT:
-            fmradio_set(2, 0x140885); /* 5kHz, 7.2MHz crystal, test mode 1 */
-            val = (fmradio_read(0) == 0x140885);
+            if (fm_present == -1)
+            {
+#ifdef HAVE_TUNER_PWR_CTRL
+                bool fmstatus = tuner_power(true);
+#endif
+                /* 5kHz, 7.2MHz crystal, test mode 1 */
+                fmradio_set(2, 0x140885);
+                fm_present = (fmradio_read(0) == 0x140885);
+#ifdef HAVE_TUNER_PWR_CTRL
+                if (!fmstatus)
+                    tuner_power(false);
+#endif
+            }
+
+            val = fm_present;
             break;
 
         case RADIO_TUNED:
@@ -148,6 +166,7 @@ int samsung_get(int setting)
         case RADIO_STEREO:
             val = fmradio_read(3);
             val = ((val & 0x100000) ? true : false);
+            break;
     }
     return val;
 }

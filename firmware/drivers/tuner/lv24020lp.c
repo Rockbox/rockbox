@@ -25,11 +25,9 @@
 #include "kernel.h"
 #include "tuner.h" /* tuner abstraction interface */
 #include "fmradio.h" /* physical interface driver */
-#include "mpeg.h"
 #include "sound.h"
 #include "pp5024.h"
 #include "system.h"
-#include "as3514.h"
 
 #ifndef BOOTLOADER
 
@@ -234,7 +232,7 @@ static int fd_log = -1;
 #define TUNER_PRESENCE_CHECKED  (1 << 3)
 static unsigned tuner_status = 0;
 
-static unsigned char sanyo_regs[0x1c];
+static unsigned char lv24020lp_regs[0x1c];
 
 static const int sw_osc_low  = 10;  /* 30; */
 static const int sw_osc_high = 240; /* 200; */
@@ -253,7 +251,7 @@ static inline bool tuner_awake(void)
 }
 
 /* send a byte to the tuner - expects write mode to be current */
-static void tuner_sanyo_send_byte(unsigned int byte)
+static void lv24020lp_send_byte(unsigned int byte)
 {
     int i;
 
@@ -274,7 +272,7 @@ static void tuner_sanyo_send_byte(unsigned int byte)
 }
 
 /* end a write cycle on the tuner */
-static void tuner_sanyo_end_write(void)
+static void lv24020lp_end_write(void)
 {
     /* switch back to read mode */
     GPIOH_OUTPUT_EN &= ~(1 << FM_DATA_PIN);
@@ -282,7 +280,7 @@ static void tuner_sanyo_end_write(void)
 }
 
 /* prepare a write cycle on the tuner */
-static unsigned int tuner_sanyo_begin_write(unsigned int address)
+static unsigned int lv24020lp_begin_write(unsigned int address)
 {
     /* Get register's block, translate address */
     unsigned int blk = (address >= BLK2_START) ?
@@ -297,29 +295,29 @@ static unsigned int tuner_sanyo_begin_write(unsigned int address)
         udelay(FM_CLK_DELAY);
 
         /* current block == register block? */
-        if (blk == sanyo_regs[BLK_SEL])
+        if (blk == lv24020lp_regs[BLK_SEL])
             return address;
 
         /* switch block */
-        sanyo_regs[BLK_SEL] = blk;
+        lv24020lp_regs[BLK_SEL] = blk;
 
         /* data first */
-        tuner_sanyo_send_byte(blk);
+        lv24020lp_send_byte(blk);
         /* then address */
-        tuner_sanyo_send_byte(BLK_SEL);
+        lv24020lp_send_byte(BLK_SEL);
 
-        tuner_sanyo_end_write();
+        lv24020lp_end_write();
 
         udelay(FM_CLK_DELAY);
     }
 }
 
 /* write a byte to a tuner register */
-static void tuner_sanyo_write(unsigned int address, unsigned int data)
+static void lv24020lp_write(unsigned int address, unsigned int data)
 {
     /* shadow logical values but do logical=>physical remappings on some
        registers' data. */
-    sanyo_regs[address] = data;
+    lv24020lp_regs[address] = data;
 
     switch (address)
     {
@@ -340,39 +338,39 @@ static void tuner_sanyo_write(unsigned int address, unsigned int data)
         break;
     }
 
-    address = tuner_sanyo_begin_write(address);
+    address = lv24020lp_begin_write(address);
 
     /* data first */
-    tuner_sanyo_send_byte(data);
+    lv24020lp_send_byte(data);
     /* then address */
-    tuner_sanyo_send_byte(address);
+    lv24020lp_send_byte(address);
 
-    tuner_sanyo_end_write();
+    lv24020lp_end_write();
 }
 
 /* helpers to set/clear register bits */
-static void tuner_sanyo_write_or(unsigned int address, unsigned int bits)
+static void lv24020lp_write_or(unsigned int address, unsigned int bits)
 {
-    tuner_sanyo_write(address, sanyo_regs[address] | bits);
+    lv24020lp_write(address, lv24020lp_regs[address] | bits);
 }
 
-static void tuner_sanyo_write_and(unsigned int address, unsigned int bits)
+static void lv24020lp_write_and(unsigned int address, unsigned int bits)
 {
-    tuner_sanyo_write(address, sanyo_regs[address] & bits);
+    lv24020lp_write(address, lv24020lp_regs[address] & bits);
 }
 
 /* read a byte from a tuner register */
-static unsigned int tuner_sanyo_read(unsigned int address)
+static unsigned int lv24020lp_read(unsigned int address)
 {
     int i;
     unsigned int toread;
 
-    address = tuner_sanyo_begin_write(address);
+    address = lv24020lp_begin_write(address);
 
     /* address */
-    tuner_sanyo_send_byte(address);
+    lv24020lp_send_byte(address);
 
-    tuner_sanyo_end_write();
+    lv24020lp_end_write();
 
     /* data */
     toread = 0;
@@ -392,7 +390,7 @@ static unsigned int tuner_sanyo_read(unsigned int address)
 /* enables auto frequency centering */
 static void enable_afc(bool enabled)
 {
-    unsigned int radio_ctrl1 = sanyo_regs[RADIO_CTRL1];
+    unsigned int radio_ctrl1 = lv24020lp_regs[RADIO_CTRL1];
 
     if (enabled)
     {
@@ -405,7 +403,7 @@ static void enable_afc(bool enabled)
         radio_ctrl1 &= ~EN_AFC;
     }
 
-    tuner_sanyo_write(RADIO_CTRL1, radio_ctrl1);
+    lv24020lp_write(RADIO_CTRL1, radio_ctrl1);
 }
 
 static int calculate_coef(unsigned fkhz)
@@ -439,25 +437,25 @@ static int tuner_measure(unsigned char type, int scale, int duration)
         return 0;
 
     /* enable measuring */
-    tuner_sanyo_write_or(MSRC_SEL, type);
-    tuner_sanyo_write_and(CNT_CTRL, ~CNT_SEL);
-    tuner_sanyo_write_or(RADIO_CTRL1, EN_MEAS);
+    lv24020lp_write_or(MSRC_SEL, type);
+    lv24020lp_write_and(CNT_CTRL, ~CNT_SEL);
+    lv24020lp_write_or(RADIO_CTRL1, EN_MEAS);
 
     /* reset counter */
-    tuner_sanyo_write_or(CNT_CTRL, CNT1_CLR);
-    tuner_sanyo_write_and(CNT_CTRL, ~CNT1_CLR);
+    lv24020lp_write_or(CNT_CTRL, CNT1_CLR);
+    lv24020lp_write_and(CNT_CTRL, ~CNT1_CLR);
 
     /* start counter, delay for specified time and stop it */
-    tuner_sanyo_write_or(CNT_CTRL, CNT_EN);
+    lv24020lp_write_or(CNT_CTRL, CNT_EN);
     udelay(duration*1000 - 16);
-    tuner_sanyo_write_and(CNT_CTRL, ~CNT_EN);
+    lv24020lp_write_and(CNT_CTRL, ~CNT_EN);
 
     /* read tick count */
-    finval = (tuner_sanyo_read(CNT_H) << 8) | tuner_sanyo_read(CNT_L);
+    finval = (lv24020lp_read(CNT_H) << 8) | lv24020lp_read(CNT_L);
 
     /* restore measure mode */
-    tuner_sanyo_write_and(RADIO_CTRL1, ~EN_MEAS);
-    tuner_sanyo_write_and(MSRC_SEL, ~type);
+    lv24020lp_write_and(RADIO_CTRL1, ~EN_MEAS);
+    lv24020lp_write_and(MSRC_SEL, ~type);
 
     /* convert value */
     if (type == MSS_FM)
@@ -469,7 +467,7 @@ static int tuner_measure(unsigned char type, int scale, int duration)
 }
 
 /* set the FM oscillator frequency */
-static void sanyo_set_frequency(int freq)
+static void set_frequency(int freq)
 {
     int coef, cap_value, osc_value;
     int f1, f2, x1, x2;
@@ -494,7 +492,7 @@ static void sanyo_set_frequency(int freq)
                     coef_00, coef_01);
 
     osc_value = sw_osc_low;
-    tuner_sanyo_write(FM_OSC, osc_value); 
+    lv24020lp_write(FM_OSC, osc_value); 
 
     /* Just in case - don't go into infinite loop */
     for (count = 0; count < 30; count++)
@@ -505,7 +503,7 @@ static void sanyo_set_frequency(int freq)
                                 coef_10, coef_11);
         int coef_fcur, cap_new, coef_cor, range;
          
-        tuner_sanyo_write(FM_CAP, cap_value);
+        lv24020lp_write(FM_CAP, cap_value);
 
         range     = y1 - y0;
         f1        = tuner_measure(MSS_FM, 1, 16);
@@ -554,7 +552,7 @@ static void sanyo_set_frequency(int freq)
     {
         int x2_new;
 
-        tuner_sanyo_write(FM_OSC, x2);
+        lv24020lp_write(FM_OSC, x2);
         f2 = tuner_measure(MSS_FM, 1, 16);
 
         if (abs(f2 - freq) <= 16)
@@ -632,9 +630,9 @@ static void fine_step_tune(int (*setcmp)(int regval), int regval, int step)
 
 static int if_setcmp(int regval)
 {
-    tuner_sanyo_write(IF_OSC, regval);
-    tuner_sanyo_write(IF_CENTER, regval);
-    tuner_sanyo_write(IF_BW, 65*regval/100);
+    lv24020lp_write(IF_OSC, regval);
+    lv24020lp_write(IF_CENTER, regval);
+    lv24020lp_write(IF_BW, 65*regval/100);
 
     if_set = tuner_measure(MSS_IF, 1000, 32);
 
@@ -649,7 +647,7 @@ static int if_setcmp(int regval)
 
 static int sd_setcmp(int regval)
 {
-    tuner_sanyo_write(SD_OSC, regval);
+    lv24020lp_write(SD_OSC, regval);
 
     sd_set = tuner_measure(MSS_SD, 1000, 32);
 
@@ -659,7 +657,7 @@ static int sd_setcmp(int regval)
     return sd_set < 38300 ? -1 : 1;
 }
 
-static void sanyo_sleep(bool sleep)
+static void set_sleep(bool sleep)
 {
     if (sleep || tuner_awake())
         return;
@@ -673,41 +671,41 @@ static void sanyo_sleep(bool sleep)
     enable_afc(false);
 
     /* 2. Calibrate the IF frequency at 110 kHz: */
-    tuner_sanyo_write_and(RADIO_CTRL2, ~IF_PM_L);
+    lv24020lp_write_and(RADIO_CTRL2, ~IF_PM_L);
     fine_step_tune(if_setcmp, 0x80, 8);
-    tuner_sanyo_write_or(RADIO_CTRL2, IF_PM_L);
+    lv24020lp_write_or(RADIO_CTRL2, IF_PM_L);
 
     /* 3. Calibrate the stereo decoder clock at 38.3 kHz: */
-    tuner_sanyo_write_or(STEREO_CTRL, SD_PM);
+    lv24020lp_write_or(STEREO_CTRL, SD_PM);
     fine_step_tune(sd_setcmp, 0x80, 8);
-    tuner_sanyo_write_and(STEREO_CTRL, ~SD_PM);
+    lv24020lp_write_and(STEREO_CTRL, ~SD_PM);
 
     /* calculate FM tuning coefficients */
-    tuner_sanyo_write(FM_CAP, sw_cap_low);
-    tuner_sanyo_write(FM_OSC, sw_osc_low);
+    lv24020lp_write(FM_CAP, sw_cap_low);
+    lv24020lp_write(FM_OSC, sw_osc_low);
     coef_00 = calculate_coef(tuner_measure(MSS_FM, 1, 64));
 
-    tuner_sanyo_write(FM_CAP, sw_cap_high);
+    lv24020lp_write(FM_CAP, sw_cap_high);
     coef_01 = calculate_coef(tuner_measure(MSS_FM, 1, 64));
 
-    tuner_sanyo_write(FM_CAP, sw_cap_low);
-    tuner_sanyo_write(FM_OSC, sw_osc_high);
+    lv24020lp_write(FM_CAP, sw_cap_low);
+    lv24020lp_write(FM_OSC, sw_osc_high);
     coef_10 = calculate_coef(tuner_measure(MSS_FM, 1, 64));
 
-    tuner_sanyo_write(FM_CAP, sw_cap_high);
+    lv24020lp_write(FM_CAP, sw_cap_high);
     coef_11 = calculate_coef(tuner_measure(MSS_FM, 1, 64));
 
     /* set various audio level settings */
-    tuner_sanyo_write(AUDIO_CTRL1, TONE_LVL_SET(0) | VOL_LVL_SET(0));
-    tuner_sanyo_write_or(RADIO_CTRL2, AGCSP);
-    tuner_sanyo_write_or(RADIO_CTRL3, VOLSH);
-    tuner_sanyo_write(STEREO_CTRL, FMCS_SET(7) | AUTOSSR);
-    tuner_sanyo_write(PW_SCTRL, SS_CTRL_SET(3) | SM_CTRL_SET(1) |
-                      PW_RAD);
+    lv24020lp_write(AUDIO_CTRL1, TONE_LVL_SET(0) | VOL_LVL_SET(0));
+    lv24020lp_write_or(RADIO_CTRL2, AGCSP);
+    lv24020lp_write_or(RADIO_CTRL3, VOLSH);
+    lv24020lp_write(STEREO_CTRL, FMCS_SET(7) | AUTOSSR);
+    lv24020lp_write(PW_SCTRL, SS_CTRL_SET(3) | SM_CTRL_SET(1) |
+                    PW_RAD);
 }
 
 /** Public interfaces **/
-bool radio_power(bool status)
+void lv24020lp_power(bool status)
 {
     static const unsigned char tuner_defaults[][2] =
     {
@@ -733,38 +731,13 @@ bool radio_power(bool status)
     };
 
     unsigned i;
-    bool powered = tuner_status & TUNER_POWERED;
-
-    if (status == powered)
-        return powered;
 
     if (status)
     {
-        /* init mystery amplification device */
-        outl(inl(0x70000084) | 0x1, 0x70000084);
-        udelay(5);
-
-        /* When power up, host should initialize the 3-wire bus in host read
-           mode: */
-
-        /* 1. Set direction of the DATA-line to input-mode. */
-        GPIOH_OUTPUT_EN &= ~(1 << FM_DATA_PIN); 
-        GPIOH_ENABLE |= (1 << FM_DATA_PIN); 
-
-        /* 2. Drive NR_W low */
-        GPIOH_OUTPUT_VAL &= ~(1 << FM_NRW_PIN); 
-        GPIOH_OUTPUT_EN |= (1 << FM_NRW_PIN); 
-        GPIOH_ENABLE |= (1 << FM_NRW_PIN); 
-
-        /* 3. Drive CLOCK high */
-        GPIOH_OUTPUT_VAL |= (1 << FM_CLOCK_PIN); 
-        GPIOH_OUTPUT_EN |= (1 << FM_CLOCK_PIN); 
-        GPIOH_ENABLE |= (1 << FM_CLOCK_PIN);
-
-        tuner_status |= TUNER_POWERED;
+        tuner_status |= TUNER_POWERED | TUNER_PRESENCE_CHECKED;
 
         /* if tuner is present, CHIP ID is 0x09 */
-        if (tuner_sanyo_read(CHIP_ID) == 0x09)
+        if (lv24020lp_read(CHIP_ID) == 0x09)
         {
             tuner_status |= TUNER_PRESENT;
 
@@ -772,9 +745,9 @@ bool radio_power(bool status)
                follows: */
 
             /* 1. Write default values to the registers: */
-            sanyo_regs[BLK_SEL] = 0; /* Force a switch on the first */
+            lv24020lp_regs[BLK_SEL] = 0; /* Force a switch on the first */
             for (i = 0; i < ARRAYLEN(tuner_defaults); i++)
-                tuner_sanyo_write(tuner_defaults[i][0], tuner_defaults[i][1]);
+                lv24020lp_write(tuner_defaults[i][0], tuner_defaults[i][1]);
 
             /* Complete the startup calibration if the tuner is woken */
             udelay(100000);
@@ -782,76 +755,55 @@ bool radio_power(bool status)
     }
     else
     {
-        /* Power off and set all as inputs */
+        /* Power off */
         if (tuner_status & TUNER_PRESENT)
-            tuner_sanyo_write_and(PW_SCTRL, ~PW_RAD);
-
-        GPIOH_OUTPUT_EN &= ~((1 << FM_DATA_PIN) | (1 << FM_NRW_PIN) |
-                             (1 << FM_CLOCK_PIN));
-        GPIOH_ENABLE &= ~((1 << FM_DATA_PIN) | (1 << FM_NRW_PIN) |
-                          (1 << FM_CLOCK_PIN)); 
-
-        outl(inl(0x70000084) & ~0x1, 0x70000084);
+            lv24020lp_write_and(PW_SCTRL, ~PW_RAD);
 
         tuner_status &= ~(TUNER_POWERED | TUNER_AWAKE);
     }
-
-    return powered;
 }
 
-bool radio_powered(void)
-{
-    return (tuner_status & TUNER_POWERED) != 0;
-}
-
-int sanyo_set(int setting, int value)
+int lv24020lp_set(int setting, int value)
 {
     int val = 1;
 
     switch(setting)
     {
     case RADIO_SLEEP:
-        sanyo_sleep(value);
+        set_sleep(value);
         break;
 
     case RADIO_FREQUENCY:
-        sanyo_set_frequency(value);
+        set_frequency(value);
         break;
 
     case RADIO_SCAN_FREQUENCY:
         /* TODO: really implement this */
-        sanyo_set_frequency(value);
-        val = sanyo_get(RADIO_TUNED);
+        set_frequency(value);
+        val = lv24020lp_get(RADIO_TUNED);
         break;
 
     case RADIO_MUTE:
         if (value)
-            tuner_sanyo_write_and(RADIO_CTRL3, ~AMUTE_L);
+            lv24020lp_write_and(RADIO_CTRL3, ~AMUTE_L);
         else
-            tuner_sanyo_write_or(RADIO_CTRL3, AMUTE_L);
+            lv24020lp_write_or(RADIO_CTRL3, AMUTE_L);
         break;
 
     case RADIO_REGION:
-        switch (value)
-        {
-        case REGION_EUROPE:
-        case REGION_JAPAN:
-        case REGION_KOREA:
-            tuner_sanyo_write_and(AUDIO_CTRL2, ~DEEMP);
-            break;
-        case REGION_US_CANADA:
-            tuner_sanyo_write_or(AUDIO_CTRL2, DEEMP);
-            break;
-        default:
-            val = -1;
-        }
+    {
+        if (lv24020lp_region_data[value])
+            lv24020lp_write_or(AUDIO_CTRL2, DEEMP);
+        else
+            lv24020lp_write_and(AUDIO_CTRL2, ~DEEMP);
         break;
+        }
 
     case RADIO_FORCE_MONO:
         if (value)
-            tuner_sanyo_write_or(STEREO_CTRL, ST_M);
+            lv24020lp_write_or(STEREO_CTRL, ST_M);
         else
-            tuner_sanyo_write_and(STEREO_CTRL, ~ST_M);
+            lv24020lp_write_and(STEREO_CTRL, ~ST_M);
         break;
 
     default:
@@ -861,45 +813,55 @@ int sanyo_set(int setting, int value)
     return val;
 }
 
-int sanyo_get(int setting)
+int lv24020lp_get(int setting)
 {
     int val = -1;
 
     switch(setting)
     {
-    case RADIO_ALL:
-        return tuner_sanyo_read(CTRL_STAT);
-
     case RADIO_TUNED:
         /* TODO: really implement this */
-        val = RSS_FS(tuner_sanyo_read(RADIO_STAT)) < 0x1f;
+        val = RSS_FS(lv24020lp_read(RADIO_STAT)) < 0x1f;
         break;
 
     case RADIO_STEREO:
-        val = (tuner_sanyo_read(RADIO_STAT) & RSS_MS) != 0;
+        val = (lv24020lp_read(RADIO_STAT) & RSS_MS) != 0;
         break;
 
     case RADIO_PRESENT:
+    {
+        bool fmstatus = true;
+
+        if (!(tuner_status & TUNER_PRESENCE_CHECKED))
+            fmstatus = tuner_power(true);
+
         val = (tuner_status & TUNER_PRESENT) != 0;
+
+        if (!fmstatus)
+            tuner_power(false);
         break;
+        }
 
     /* tuner-specific debug info */
-    case RADIO_REG_STAT:
-        return tuner_sanyo_read(RADIO_STAT);
+    case LV24020LP_CTRL_STAT:
+        return lv24020lp_read(CTRL_STAT);
 
-    case RADIO_MSS_FM:
+    case LV24020LP_REG_STAT:
+        return lv24020lp_read(RADIO_STAT);
+
+    case LV24020LP_MSS_FM:
         return tuner_measure(MSS_FM, 1, 16);
 
-    case RADIO_MSS_IF:
+    case LV24020LP_MSS_IF:
         return tuner_measure(MSS_IF, 1000, 16);
 
-    case RADIO_MSS_SD:
+    case LV24020LP_MSS_SD:
         return tuner_measure(MSS_SD, 1000, 16);
 
-    case RADIO_IF_SET:
+    case LV24020LP_IF_SET:
         return if_set;
 
-    case RADIO_SD_SET:
+    case LV24020LP_SD_SET:
         return sd_set;
     }
 

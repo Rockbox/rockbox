@@ -6,8 +6,9 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  * $Id$
+ * Tuner header for the Philips TEA5767
  *
- * Copyright (C) 2002 by Linus Nielsen Feltzing
+ * Copyright (C) 2007 Michael Sevakis
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,40 +17,34 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _POWER_H_
-#define _POWER_H_
 
-#if CONFIG_CHARGING == CHARGING_CONTROL
-extern bool charger_enabled;
-void charger_enable(bool on);
+#ifndef _TEA5767_H_
+#define _TEA5767_H_
+
+#define HAVE_RADIO_REGION
+#define HAVE_RADIO_MUTE_TIMEOUT
+
+struct tea5767_region_data
+{
+    unsigned char deemphasis; /* 0: 50us, 1: 75us */
+    unsigned char band; /* 0: europe, 1: japan (BL in TEA spec)*/
+} __attribute__((packed));
+
+const struct tea5767_region_data tea5767_region_data[TUNER_NUM_REGIONS];
+
+struct tea5767_dbg_info
+{
+    unsigned char read_regs[5];
+    unsigned char write_regs[5];
+};
+
+int tea5767_set(int setting, int value);
+int tea5767_get(int setting);
+void tea5767_dbg_info(struct tea5767_dbg_info *info);
+
+#ifndef CONFIG_TUNER_MULTI
+#define tuner_set tea5767_set
+#define tuner_get tea5767_get
 #endif
 
-#if CONFIG_CHARGING
-bool charger_inserted(void);
-#endif
-
-void power_off(void);
-void ide_power_enable(bool on);
-
-#ifndef SIMULATOR
-
-void power_init(void);
-
-# if CONFIG_CHARGING == CHARGING_MONITOR
-bool charging_state(void);
-# endif
-
-bool ide_powered(void);
-#endif
-
-#ifdef HAVE_SPDIF_POWER
-void spdif_power_enable(bool on);
-bool spdif_powered(void);
-#endif
-
-#if CONFIG_TUNER
-extern bool tuner_power(bool status);
-extern bool tuner_powered(void);
-#endif
-
-#endif
+#endif /* _TEA5767_H_ */

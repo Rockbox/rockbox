@@ -46,4 +46,11 @@
 bool is_new_player(void);
 #endif
 
+#ifdef CONFIG_TUNER_MULTI
+static inline int tuner_detect_type(void)
+{
+    return (HW_MASK & TUNER_MODEL) ? TEA5767 : S1A0903X01;
+}
+#endif
+
 #endif /* HWCOMPAT_H */

@@ -21,6 +21,7 @@
 #include "system.h"
 #include "cpu.h"
 #include "i2c-pp.h"
+#include "tuner.h"
 
 void power_init(void)
 {
@@ -60,4 +61,61 @@ bool charger_inserted(void)
 void ide_power_enable(bool on)
 {
     (void)on;
+}
+
+/** Tuner **/
+static bool powered = false;
+
+bool tuner_power(bool status)
+{
+    bool old_status = powered;
+
+    if (status != old_status)
+    {
+        if (status)
+        {
+            /* init mystery amplification device */
+            outl(inl(0x70000084) | 0x1, 0x70000084);
+            udelay(5);
+
+            /* When power up, host should initialize the 3-wire bus
+               in host read mode: */
+
+            /* 1. Set direction of the DATA-line to input-mode. */
+            GPIOH_OUTPUT_EN &= ~(1 << 5); 
+            GPIOH_ENABLE |= (1 << 5); 
+
+            /* 2. Drive NR_W low */
+            GPIOH_OUTPUT_VAL &= ~(1 << 3); 
+            GPIOH_OUTPUT_EN |= (1 << 3); 
+            GPIOH_ENABLE |= (1 << 3); 
+
+            /* 3. Drive CLOCK high */
+            GPIOH_OUTPUT_VAL |= (1 << 4); 
+            GPIOH_OUTPUT_EN |= (1 << 4); 
+            GPIOH_ENABLE |= (1 << 4);
+
+            lv24020lp_power(true);
+        }
+        else
+        {
+            lv24020lp_power(false);
+
+            /* set all as inputs */
+            GPIOH_OUTPUT_EN &= ~((1 << 5) | (1 << 3) | (1 << 4));
+            GPIOH_ENABLE &= ~((1 << 5) | (1 << 3) | (1 << 4)); 
+
+            /* turn off mystery amplification device */
+            outl(inl(0x70000084) & ~0x1, 0x70000084);
+        }
+
+        powered = status;
+    }
+
+    return old_status;
+}
+
+bool tuner_powered(void)
+{
+    return powered;
 }

@@ -44,23 +44,6 @@ struct fmstation
     char name[MAX_FMPRESET_LEN+1];
 };
 
-struct fm_region_setting
-{
-    int freq_min;
-    int freq_max;
-    int freq_step;
-#if (CONFIG_TUNER & TEA5767)
-    char deemphasis;    /* 0: 50us, 1: 75us */
-    char band;          /* 0: europe, 1: japan (BL in TEA spec)*/
-    /* Note: "region" parameter is just for display atm and is not compiled. */
-    #define FM_REGION_ENTRY(region, fmin, fmax, fstep, deemph, band) \
-        { fmin, fmax, fstep, deemph, band }
-#else
-    #define FM_REGION_ENTRY(region, fmin, fmax, fstep, deemph, band) \
-        { fmin, fmax, fstep }
-#endif
-};
+#endif /* CONFIG_TUNER */
 
-#endif
-
-#endif
+#endif /* RADIO_H */

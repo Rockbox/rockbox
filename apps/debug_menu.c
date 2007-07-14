@@ -1955,27 +1955,27 @@ static int radio_callback(int btn, struct gui_synclist *lists)
                  "HW detected: yes");
 #if (CONFIG_TUNER & LV24020LP)
         snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, 
-                 "CTRL_STAT: %02X", sanyo_get(RADIO_ALL) );
+                 "CTRL_STAT: %02X", lv24020lp_get(LV24020LP_CTRL_STAT) );
         snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, 
-                 "RADIO_STAT: %02X", sanyo_get(RADIO_REG_STAT));
+                 "RADIO_STAT: %02X", lv24020lp_get(LV24020LP_REG_STAT));
         snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, 
-                 "MSS_FM: %d kHz", sanyo_get(RADIO_MSS_FM) );
+                 "MSS_FM: %d kHz", lv24020lp_get(LV24020LP_MSS_FM) );
         snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN,
-                 "MSS_IF: %d Hz", (sanyo_get(RADIO_MSS_IF) ) );
+                 "MSS_IF: %d Hz", (lv24020lp_get(LV24020LP_MSS_IF) ) );
         snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, 
-                 "MSS_SD: %d Hz", (sanyo_get(RADIO_MSS_SD) ) );
+                 "MSS_SD: %d Hz", (lv24020lp_get(LV24020LP_MSS_SD) ) );
         snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, 
-                 "if_set: %d Hz", (sanyo_get(RADIO_IF_SET) ) );
+                 "if_set: %d Hz", (lv24020lp_get(LV24020LP_IF_SET) ) );
         snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, 
-                 "sd_set: %d Hz", (sanyo_get(RADIO_SD_SET) ) );
+                 "sd_set: %d Hz", (lv24020lp_get(LV24020LP_SD_SET) ) );
 #endif
 #if (CONFIG_TUNER & S1A0903X01)
         snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, 
-                 "Samsung regs: %08X", samsung_get(RADIO_ALL));
+                 "Samsung regs: %08X", s1a0903x01_get(RADIO_ALL));
 #endif
 #if (CONFIG_TUNER & TEA5767)
-        struct philips_dbg_info info;
-        philips_dbg_info(&info);
+        struct tea5767_dbg_info info;
+        tea5767_dbg_info(&info);
         snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, "Philips regs:");
         snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, 
                  "   Read: %02X %02X %02X %02X %02X",

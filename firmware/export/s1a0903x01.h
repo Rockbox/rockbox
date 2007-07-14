@@ -6,8 +6,9 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  * $Id$
+ * Tuner header for the Samsung S1A0903X01
  *
- * Copyright (C) 2002 by Linus Nielsen Feltzing
+ * Copyright (C) 2007 Michael Sevakis
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,40 +17,24 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _POWER_H_
-#define _POWER_H_
 
-#if CONFIG_CHARGING == CHARGING_CONTROL
-extern bool charger_enabled;
-void charger_enable(bool on);
+#ifndef _S1A0903X01_H_
+#define _S1A0903X01_H_
+
+/* Define additional tuner messages here */
+#define HAVE_RADIO_MUTE_TIMEOUT
+
+#if 0
+#define S1A0903X01_IF_MEASUREMENT (RADIO_SET_CHIP_FIRST+0)
+#define S1A0903X01_SENSITIVITY    (RADIO_SET_CHIP_FIRST+1)
 #endif
 
-#if CONFIG_CHARGING
-bool charger_inserted(void);
+int s1a0903x01_set(int setting, int value);
+int s1a0903x01_get(int setting);
+
+#ifndef CONFIG_TUNER_MULTI
+#define tuner_set s1a0903x01_get
+#define tuner_get s1a0903x01_set
 #endif
 
-void power_off(void);
-void ide_power_enable(bool on);
-
-#ifndef SIMULATOR
-
-void power_init(void);
-
-# if CONFIG_CHARGING == CHARGING_MONITOR
-bool charging_state(void);
-# endif
-
-bool ide_powered(void);
-#endif
-
-#ifdef HAVE_SPDIF_POWER
-void spdif_power_enable(bool on);
-bool spdif_powered(void);
-#endif
-
-#if CONFIG_TUNER
-extern bool tuner_power(bool status);
-extern bool tuner_powered(void);
-#endif
-
-#endif
+#endif /* _S1A0903X01_H_ */

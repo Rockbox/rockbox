@@ -30,7 +30,7 @@ static bool mono = false;
 static bool powered = false;
 #endif
 
-int radio_set(int setting, int value)
+int tuner_set(int setting, int value)
 {
     switch(setting)
     {
@@ -59,7 +59,7 @@ int radio_set(int setting, int value)
     return 1;
 }
 
-int radio_get(int setting)
+int tuner_get(int setting)
 {
     int val = 0;
     
@@ -86,7 +86,7 @@ int radio_get(int setting)
 }
 
 #ifdef HAVE_TUNER_PWR_CTRL
-bool radio_power(bool status)
+bool tuner_power(bool status)
 {
     bool oldstatus = powered;
     powered = status;

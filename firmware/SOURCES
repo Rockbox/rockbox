@@ -151,17 +151,18 @@ drivers/rtc/rtc_as3514.c
 /* Tuner */
 #if CONFIG_TUNER
 #ifndef SIMULATOR
+tuner.c
+#if (CONFIG_TUNER & LV24020LP)
+drivers/tuner/lv24020lp.c
+#endif /* (CONFIG_TUNER & LV24020LP) */
 #if (CONFIG_TUNER & S1A0903X01)
 drivers/fmradio.c
-tuner_samsung.c
+drivers/tuner/s1a0903x01.c
 #endif /* (CONFIG_TUNER & S1A0903X01) */
 #if (CONFIG_TUNER & TEA5767)
 drivers/fmradio_i2c.c
-tuner_philips.c
+drivers/tuner/tea5767.c
 #endif /* (CONFIG_TUNER & TEA5767) */
-#if (CONFIG_TUNER & LV24020LP)
-tuner_sanyo.c
-#endif /* (CONFIG_TUNER & LV24020LP) */
 #endif /*SIMULATOR */
 #endif /* CONFIG_TUNER */
 

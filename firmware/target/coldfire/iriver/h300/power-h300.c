@@ -29,12 +29,12 @@
 
 static bool powered = false;
 
-bool radio_powered(void)
+bool tuner_powered(void)
 {
     return powered;
 }
 
-bool radio_power(bool status)
+bool tuner_power(bool status)
 {
     bool old_status = powered;
     powered = status;

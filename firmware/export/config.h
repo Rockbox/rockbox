@@ -245,6 +245,11 @@
 #define CONFIG_REMOTE_DEFAULT_ICON_WIDTH 6
 #endif
 
+#if (CONFIG_TUNER & (CONFIG_TUNER - 1)) != 0
+/* Multiple possible tuners */
+#define CONFIG_TUNER_MULTI
+#endif
+
 /* Enable the directory cache and tagcache in RAM if we have
  * plenty of RAM. Both features can be enabled independently. */
 #if ((defined(MEMORYSIZE) && (MEMORYSIZE > 8)) || MEM > 8) && \
