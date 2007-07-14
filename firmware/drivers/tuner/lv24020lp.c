@@ -479,7 +479,7 @@ static int tuner_measure(unsigned char type, int scale, int duration)
 }
 
 /* set the FM oscillator frequency */
-static bool set_frequency(int freq)
+static void set_frequency(int freq)
 {
     int coef, cap_value, osc_value;
     int f1, f2, x1, x2;
@@ -588,8 +588,6 @@ static bool set_frequency(int freq)
     TUNER_LOG("\n");
 
     TUNER_LOG_SYNC();
-
-    return true;
 }
 
 static void fine_step_tune(int (*setcmp)(int regval), int regval, int step)
