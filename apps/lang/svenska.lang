@@ -2514,7 +2514,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_DIR
-  desc: item of voice menu, set the "talkbox" mode for directories
+  desc: item of voice menu, set the voice mode for directories
   user:
   <source>
     *: "Voice Directories"
@@ -2528,7 +2528,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_FILE
-  desc: item of voice menu, set the voive mode for files
+  desc: item of voice menu, set the voice mode for files
   user:
   <source>
     *: "Voice Filenames"
@@ -10955,5 +10955,75 @@
   </dest>
   <voice>
     *: "List Acceleration Speed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_DIR_TALK
+  desc: Item of voice menu, whether to use directory .talk clips
+  user:
+  <source>
+    *: "Use Directory .talk Clips"
+  </source>
+  <dest>
+    *: "Spela mp3-klipp för kataloger"
+  </dest>
+  <voice>
+    *: "Use Directory .talk Clips"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_FILE_TALK
+  desc: Item of voice menu, whether to use file .talk clips
+  user:
+  <source>
+    *: "Use File .talk Clips"
+  </source>
+  <dest>
+    *: "Spela mp3-klipp för filer"
+  </dest>
+  <voice>
+    *: "Use File .talk Clips"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_REC_DIR
+  desc:
+  user:
+  <source>
+    *: "Set As Recording Directory"
+  </source>
+  <dest>
+    *: "Sätt som inspelningskatalog"
+  </dest>
+  <voice>
+    *: "Set As Recording Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_REC_DIR
+  desc:
+  user:
+  <source>
+    *: "Clear Recording Directory"
+  </source>
+  <dest>
+    *: "Rensa val av inspelningskatalog"
+  </dest>
+  <voice>
+    *: "Clear Recording Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_DIR_NOT_WRITABLE
+  desc:
+  user:
+  <source>
+    *: "Can't write to recording directory"
+  </source>
+  <dest>
+    *: "Kan inte skriva till inspelningskatalog"
+  </dest>
+  <voice>
+    *: "Can't write to recording directory"
   </voice>
 </phrase>
