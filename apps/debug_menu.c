@@ -114,6 +114,9 @@ static bool dbg_list(char *title, int count, int selection_size,
     if (dbg_getname != dbg_menu_getname)
         gui_synclist_hide_selection_marker(&lists, true);
     action_signalscreenchange();
+    
+    if (action_callback)
+        action_callback(ACTION_REDRAW, &lists);
     gui_synclist_draw(&lists);
     while(1)
     {
@@ -125,6 +128,8 @@ static bool dbg_list(char *title, int count, int selection_size,
             action = action_callback(action, &lists);
         if (action == ACTION_STD_CANCEL)
             break;
+        else if (action == ACTION_REDRAW)
+            gui_synclist_draw(&lists);
         else if(default_event_handler(action) == SYS_USB_CONNECTED)
             return true;
     }
@@ -1687,22 +1692,18 @@ static int cardinfo_callback(int btn, struct gui_synclist *lists)
             snprintf(debug_list_messages[cardinfo_lines++], DEBUG_MSG_LEN,
                      "Not Found!");
         }
-        if (lists)
-        {
-            snprintf(listtitle, sizeof listtitle, 
-                     "[" CARDTYPE " %d]", current_card);
-            gui_synclist_set_title(lists, listtitle, NOICON);
-            gui_synclist_select_item(lists, 0);
-            gui_synclist_set_nb_items(lists, cardinfo_lines);
-            gui_synclist_draw(lists);
-        }
+        snprintf(listtitle, sizeof listtitle, 
+                    "[" CARDTYPE " %d]", current_card);
+        gui_synclist_set_title(lists, listtitle, NOICON);
+        gui_synclist_select_item(lists, 0);
+        gui_synclist_set_nb_items(lists, cardinfo_lines);
+        btn = ACTION_REDRAW;
     }
     return btn;
 }
 static bool dbg_disk_info(void)
 {
     current_card = 1; /* the callback changes this to 0 */
-    cardinfo_callback(ACTION_STD_OK, 0);
     dbg_list("[" CARDTYPE " 0]", cardinfo_lines, 1,
              cardinfo_callback, dbg_listmessage_getname);
     return false;
@@ -1791,7 +1792,6 @@ static int disk_callback(int btn, struct gui_synclist *lists)
 }
 static bool dbg_disk_info(void)
 {
-    disk_callback(0,0);
     dbg_list("Disk Info",disklines, 1, disk_callback, dbg_listmessage_getname);
     return false;
 }
@@ -1821,7 +1821,6 @@ static int dircache_callback(int btn, struct gui_synclist *lists)
     
 static bool dbg_dircache_info(void)
 {
-    dircache_callback(0,0);
     dbg_list("Dircache Info",7, 1, dircache_callback, dbg_listmessage_getname);
     return false;
 }
@@ -1851,7 +1850,6 @@ static int database_callback(int btn, struct gui_synclist *lists)
 }
 static bool dbg_tagcache_info(void)
 {
-    database_callback(0,0);
     dbg_list("Database Info",7, 1, database_callback, dbg_listmessage_getname);
     return false;
 }
@@ -1988,8 +1986,7 @@ static int radio_callback(int btn, struct gui_synclist *lists)
                  (unsigned)info.write_regs[2], (unsigned)info.write_regs[3],
                  (unsigned)info.write_regs[4]);
 #endif
-        if (lists)
-            gui_synclist_draw(lists);
+        btn = ACTION_REDRAW;
     }
     else
         snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, "HW detected: no");
@@ -1997,7 +1994,6 @@ static int radio_callback(int btn, struct gui_synclist *lists)
 }
 static bool dbg_fm_radio(void)
 {
-    radio_callback(0,0);
     dbg_list("FM Radio",radio_lines, 1, 
              radio_callback, dbg_listmessage_getname);
     return false;
