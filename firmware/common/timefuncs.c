@@ -131,6 +131,7 @@ int set_time(const struct tm *tm)
 #endif
 }
 
+#if CONFIG_RTC
 /* mktime() code taken from lynx-2.8.5 source, written
  by Philippe De Muyter <phdm@macqel.be> */
 time_t mktime(struct tm *t)
@@ -165,3 +166,4 @@ time_t mktime(struct tm *t)
     result += t->tm_sec;
     return(result);
 }
+#endif
