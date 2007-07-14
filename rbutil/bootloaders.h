@@ -24,6 +24,11 @@
 #define BOOTLOADERS_H_INCLUDED
 
 #include <wx/string.h>
+#include "irivertools.h"
+#include "md5sum.h"
+
+#include "rbutil.h"
+#include "installlog.h"
 
 extern "C" {
     // Ipodpatcher

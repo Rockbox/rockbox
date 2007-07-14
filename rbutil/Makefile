@@ -9,11 +9,25 @@
 
 # Unix-style Makefile for rbutil
 
+#detect cygwin 
+ifneq ($(strip $(shell gcc -v 2>&1 | grep "cygwin")),)
+   __CYGWIN__ := 1
+endif
+
 CXX=$(shell $(PREFIX)wx-config --version=2.8 --cxx)
 INC = `$(PREFIX)wx-config --version=2.8 --cxxflags`
 LIBS = `$(PREFIX)wx-config --version=2.8 --libs`
-CFLAGS = -Wall -Wundef -DRBUTIL -D_LARGEFILE64_SOURCE
-OBJS=rbutil.o rbutilApp.o rbutilFrm.o rbutilCtrls.o install_dialogs.o bootloaders.o installlog.o ipodpatcher/ipodpatcher.o ipodpatcher/ipodio-posix.o sansapatcher/sansapatcher.o sansapatcher/sansaio-posix.o irivertools.o md5sum.o autodetection.o 
+CFLAGS= -Wall -Wundef -DRBUTIL -D_LARGEFILE64_SOURCE
+OBJS=rbutil.o rbutilApp.o rbutilFrm.o rbutilCtrls.o install_dialogs.o bootloaders.o installlog.o ipodpatcher/ipodpatcher.o sansapatcher/sansapatcher.o irivertools.o md5sum.o autodetection.o
+
+ifdef __CYGWIN__
+OBJS+=ipodpatcher/ipodio-win32.o sansapatcher/sansaio-win32.o
+CFLAGS+= -mno-cygwin -mwindows
+else
+OBJS+=ipodpatcher/ipodio-posix.o sansapatcher/sansaio-posix.o
+endif
+
+
 EXTRAOBJS = $(wildcard icons/*.o)
 
 SILENT = @
@@ -34,7 +48,7 @@ endif
 
 .PHONY: all
 all: icons rbutil$(EXT)
-	
+
 .cpp.o :
 	$(SILENT) echo CXX $<
 	$(SILENT) $(CXX) $(CFLAGS) $(INC) -c -o $@ $<
@@ -46,7 +60,7 @@ all: icons rbutil$(EXT)
 rbutil-rc.o: rbutil-rc.rc
 	$(WINDRES) -O coff -F pe-i386 -o $@ $<
 
-rbutil$(EXT): $(OBJS) 
+rbutil$(EXT): $(OBJS)
 	$(SILENT) echo CXX $<
 	$(SILENT) $(CXX) -o $@ $(OBJS) $(EXTRAOBJS) $(LIBS)
 

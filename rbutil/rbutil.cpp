@@ -349,6 +349,7 @@ int UnzipFile(wxString src, wxString destdir, bool isInstall)
         {
             buf = wxT("Can't open file ") + in_str + wxT(" for writing");
             delete out;
+            delete progress;
             return 100;
         } else if (isInstall)
         {
