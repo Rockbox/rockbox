@@ -70,8 +70,6 @@
 /* We can fade the backlight by using PWM */
 #define HAVE_BACKLIGHT_PWM_FADING
 
-#define BATTERY_CAPACITY_DEFAULT 1300 /* default battery capacity */
-
 #ifndef SIMULATOR
 
 /* Define this if you have a PortalPlayer PP5022 */
@@ -81,12 +79,13 @@
 #define CONFIG_I2C I2C_PP5020
 
 /* Type of mobile power */
-#define CONFIG_BATTERY BATT_LIPOL1300
-#define BATTERY_CAPACITY_MIN 1300 /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC 50   /* capacity increment */
-#define BATTERY_TYPES_COUNT  1    /* only one type */
-#define BATTERY_SCALE_FACTOR 5865
+#define CONFIG_BATTERY BATT_LIION300
+#define BATTERY_CAPACITY_DEFAULT 300   /* default battery capacity */
+#define BATTERY_CAPACITY_MIN     200   /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX     600   /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC      20  	/* capacity increment */
+#define BATTERY_TYPES_COUNT        1   /* only one type */
+#define BATTERY_SCALE_FACTOR    5840
 
 /* Hardware controlled charging? FIXME */
 //#define CONFIG_CHARGING CHARGING_SIMPLE

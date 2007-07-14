@@ -175,6 +175,10 @@ static const unsigned int battery_level_dangerous[BATTERY_TYPES_COUNT] =
     105, 115
 #elif CONFIG_BATTERY == BATT_LIPOL1300  /* iRiver H1x0: LiPolymer */
     338
+#elif CONFIG_BATTERY == BATT_LIION300   /* ipod nano */
+    333
+#elif CONFIG_BATTERY == BATT_LIION400   /* iPOD Video 30GB */
+    345
 #elif CONFIG_BATTERY == BATT_LIION750   /* Sansa e200 */
     340
 #elif CONFIG_BATTERY == BATT_LIION830   /* Gigabeat F */
@@ -198,6 +202,10 @@ static const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
     270, 280
 #elif CONFIG_BATTERY == BATT_LIPOL1300  /* iRiver Hxxx */
     302
+#elif CONFIG_BATTERY == BATT_LIION300   /* ipod nano */
+    323
+#elif CONFIG_BATTERY == BATT_LIION400   /* iPOD Video 30GB */
+    345
 #elif CONFIG_BATTERY == BATT_LIION750   /* Sansa e200 */
     330
 #elif CONFIG_BATTERY == BATT_LIION830   /* Gigabeat F */
@@ -246,6 +254,12 @@ static const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 #elif CONFIG_BATTERY == BATT_LIION750
     /* Sansa Li Ion 750mAH FIXME this is a first linear approach */
     { 330, 339, 348, 357, 366, 375, 384, 393, 402, 411, 420 },
+#elif CONFIG_BATTERY == BATT_LIION400  /* iPOD Video 30GB */
+    /* iPOD Video 30GB Li-Ion 400mAh, first approach based upon measurements */
+    { 345, 367, 371, 375, 379, 383, 387, 393, 401, 410, 418 },
+#elif CONFIG_BATTERY == BATT_LIION300
+    /* measured values */
+    { 323, 362, 370, 373, 375, 378, 383, 389, 395, 403, 416 },
 #else /* NiMH */
     /* original values were taken directly after charging, but it should show
        100% after turning off the device for some hours, too */
@@ -264,6 +278,12 @@ static const unsigned short percent_to_volt_charge[11] =
 #if CONFIG_BATTERY == BATT_LIPOL1300
     /* values measured over one full charging cycle */
     354, 386, 393, 398, 400, 402, 404, 408, 413, 418, 423 /* LiPo */
+#elif CONFIG_BATTERY == BATT_LIION300
+    /* measured values */
+    323, 362, 370, 373, 375, 378, 383, 389, 395, 403, 416
+#elif CONFIG_BATTERY == BATT_LIION400
+    /* iPOD Video 30GB Li-Ion 400mAh, first approach based upon measurements */
+    345, 367, 371, 375, 379, 383, 387, 393, 401, 410, 418
 #elif CONFIG_BATTERY == BATT_LIION750
     /* Sansa Li Ion 750mAH FIXME*/
     330, 339, 348, 357, 366, 375, 384, 393, 402, 411, 420 

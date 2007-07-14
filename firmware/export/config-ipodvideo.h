@@ -8,6 +8,9 @@
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 5
 
+/* For battery type (30GB by default, undefine here to use 60/80GB model) */
+#define CONFIG_BATTERY_IPOD_VIDEO_30GB
+
 /* define this if you have recording possibility */
 #define HAVE_RECORDING
 
@@ -70,8 +73,6 @@
 /* We can fade the backlight by using PWM */
 #define HAVE_BACKLIGHT_PWM_FADING
 
-#define BATTERY_CAPACITY_DEFAULT 400 /* default battery capacity for the 30GB model */
-
 #ifndef SIMULATOR
 
 /* Define this if you have a PortalPlayer PP5022 */
@@ -81,12 +82,23 @@
 #define CONFIG_I2C I2C_PP5020
 
 /* Type of mobile power */
-#define CONFIG_BATTERY BATT_LIPOL1300
-#define BATTERY_CAPACITY_MIN 400 /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 1000 /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC 50   /* capacity increment */
-#define BATTERY_TYPES_COUNT  1    /* only one type */
-#define BATTERY_SCALE_FACTOR 5865
+#if (MEM==32)  /* this is the 30GB-model */
+#	define CONFIG_BATTERY BATT_LIION400
+#	define BATTERY_CAPACITY_DEFAULT 400 /* default battery capacity for the 30GB model */
+#	define BATTERY_CAPACITY_MIN     300 /* min. capacity selectable */
+#	define BATTERY_CAPACITY_MAX 	  800 /* max. capacity selectable */
+#	define BATTERY_CAPACITY_INC 	   50 /* capacity increment */
+#	define BATTERY_TYPES_COUNT  	    1 /* only one type */
+#	define BATTERY_SCALE_FACTOR    5865
+#else          /* these are the 60/80GB-models */
+#	define CONFIG_BATTERY BATT_LIION400 /* FIXME: we assume to have same discharge behaviour as 30GB iPOD */
+#	define BATTERY_CAPACITY_DEFAULT 600 /* default battery capacity for the 60/80GB model */
+#	define BATTERY_CAPACITY_MIN     500 /* min. capacity selectable */
+#	define BATTERY_CAPACITY_MAX    1000 /* max. capacity selectable */
+#	define BATTERY_CAPACITY_INC      50 /* capacity increment */
+#	define BATTERY_TYPES_COUNT        1 /* only one type */
+#	define BATTERY_SCALE_FACTOR    5865
+#endif
 
 /* Hardware controlled charging with monitoring */
 #define CONFIG_CHARGING CHARGING_MONITOR

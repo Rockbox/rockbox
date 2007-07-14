@@ -80,6 +80,8 @@
 #define BATT_BP009        820 /* iriver H10 5/6Gb - iriver BP009 */
 #define BATT_LIION830     830 /* Toshiba Gigabeat Fxx and Xxx series MK11-2740 */
 #define BATT_LIION750     750 /* Sansa e200 LiIon 3,7V */
+#define BATT_LIION400     400 /* iPOD 5G/5.5G Video 30GB LiIon 400mAh */
+#define BATT_LIION300     300 /* iPOD nano LiIon 300mAh */
 #define BATT_1AA          333 /* iRiver iFP: Alkaline, NiHM */
 
 /* CONFIG_CHARGING */

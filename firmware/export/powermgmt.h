@@ -103,7 +103,19 @@ extern charger_input_state_type charger_input_state;
 # define CURRENT_NORMAL     80  /* 16h playback on 1300mAh battery from IriverRuntime wiki page */
 # define CURRENT_BACKLIGHT  23  /* FIXME: This needs to be measured, copied from H100 */
 # define CURRENT_RECORD    110  /* additional current while recording */
-#else /* Not iriver H1x0, H3x0, nor Archos Ondio */
+#elif defined(IPOD_ARCH) && (MODEL_NUMBER==4)   /* iPOD Nano */
+# define CURRENT_NORMAL     35  /* 8.5-9.0h playback out of 300mAh battery from IpodRuntime */
+# define CURRENT_BACKLIGHT  20  /* FIXME: estimation took over from iPOD Video */
+#if defined(HAVE_RECORDING)
+# define CURRENT_RECORD     35  /* FIXME: this needs adjusting */
+#endif
+#elif defined(IPOD_ARCH) && (MODEL_NUMBER==5)   /* iPOD Video */
+# define CURRENT_NORMAL     50  /* 8h out of 400mAh battery (30GB) or 11h out of 600mAh (60GB) from IpodRuntime */
+# define CURRENT_BACKLIGHT  20  /* estimation calculated from IpodRuntime measurement */
+#if defined(HAVE_RECORDING)
+# define CURRENT_RECORD     35  /* FIXME: this needs adjusting */
+#endif
+#else /* Not iriver H1x0, H3x0, nor Archos Ondio, nor iPODVideo */
 # define CURRENT_NORMAL    145  /* usual current in mA when using the AJB including some disk/backlight/... activity */
 # define CURRENT_BACKLIGHT  30  /* additional current when backlight always on */
 #if defined(HAVE_RECORDING)
