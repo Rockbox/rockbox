@@ -1988,7 +1988,8 @@ static int radio_callback(int btn, struct gui_synclist *lists)
                  (unsigned)info.write_regs[2], (unsigned)info.write_regs[3],
                  (unsigned)info.write_regs[4]);
 #endif
-        gui_synclist_draw(lists);
+        if (lists)
+            gui_synclist_draw(lists);
     }
     else
         snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, "HW detected: no");
