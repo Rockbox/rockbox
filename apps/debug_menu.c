@@ -1945,7 +1945,7 @@ static bool dbg_save_roms(void)
 int radio_lines = 0;
 static int radio_callback(int btn, struct gui_synclist *lists)
 {
-    (void)btn;
+    (void)btn;(void)lists;
     radio_lines = 0;
     if (radio_hardware_present())
     {
