@@ -1729,7 +1729,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
         ((unsigned short*)buf)[i]=htobe16(identify_info[i+23]);
     buf[8]=0;
     snprintf(debug_list_messages[disklines++], DEBUG_MSG_LEN, 
-             "Firmare: %s", buf);
+             "Firmware: %s", buf);
     snprintf(buf, sizeof buf, "%ld MB",
              ((unsigned long)identify_info[61] << 16 |
               (unsigned long)identify_info[60]) / 2048 );
