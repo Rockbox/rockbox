@@ -219,6 +219,18 @@
  #define ESDCTL_ESDCFG1                  0x0C
  #define ESDCTL_ESDMISC                  0x10
  
+ /* More UART 1 Register defines */
+ #define URXD1 (*(volatile int*)UART1_BASE_ADDR)
+ #define UTXD1 (*(volatile int*)(UART1_BASE_ADDR+0x40))
+ #define UCR1_1 (*(volatile int *)(UART1_BASE_ADDR+0x80))
+ #define UCR2_1 (*(volatile int* )(UART1_BASE_ADDR+0x84))
+ #define UCR3_1 (*(volatile int* )(UART1_BASE_ADDR+0x88))
+ #define UCR4_1 (*(volatile int* )(UART1_BASE_ADDR+0x8C))
+ #define UFCR1 (*(volatile int *)(UART1_BASE_ADDR+ 0x90))
+ #define USR1_1 (*(volatile int *)(UART1_BASE_ADDR+0x94))
+ #define USR2_1 (*(volatile int *)(UART1_BASE_ADDR+0x98))
+ #define UTS1    (*(volatile int *)(UART1_BASE_ADDR+0xB4))
+
  /*
   * UART Control Register 0 Bit Fields.
   */

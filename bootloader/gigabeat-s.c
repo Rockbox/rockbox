@@ -51,8 +51,6 @@ char version[] = APPSVERSION;
 void main(void)
 {
         int rc;
-        INTCNTL |= (NIDIS | FIDIS); /*Disable FIQ,IRQ IMX31 style....*/
-        //Init_UART();
         printscreen(0xFA);
         printf("Hello world!");
         printf("Gigabeat S Rockbox Bootloader v.00000001");          

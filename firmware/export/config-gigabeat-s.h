@@ -131,6 +131,14 @@
 
 #define HAVE_HEADPHONE_DETECTION
 
+#define HAVE_SERIAL
+
+/*Remove Comments from UART_INT to enable the UART interrupts,*/
+/*otherwise iterrupts will be disabled. For now we will test */
+/*UART state by polling the registers, and if necessary update this */
+/*method by using the interrupts instead*/
+//#define UART_INT
+
 /* Define this if you have adjustable CPU frequency */
 /* #define HAVE_ADJUSTABLE_CPU_FREQ */
 
