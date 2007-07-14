@@ -250,7 +250,7 @@ static const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
     { 103, 118, 121, 123, 124, 125, 126, 127, 128, 129, 135 }  /* NiMH */
 #elif CONFIG_BATTERY == BATT_LIION830
     /* Toshiba Gigabeat Li Ion 830mAH figured from discharge curve */
-    { 354, 357, 359, 361, 364, 366, 372, 381, 377, 381, 394 },
+    { 348, 355, 359, 361, 363, 365, 370, 376, 380, 391, 399 },
 #elif CONFIG_BATTERY == BATT_LIION750
     /* Sansa Li Ion 750mAH FIXME this is a first linear approach */
     { 330, 339, 348, 357, 366, 375, 384, 393, 402, 411, 420 },
@@ -289,7 +289,7 @@ static const unsigned short percent_to_volt_charge[11] =
     330, 339, 348, 357, 366, 375, 384, 393, 402, 411, 420 
 #elif CONFIG_BATTERY == BATT_LIION830
     /* Toshiba Gigabeat Li Ion 830mAH */
-    354, 357, 359, 361, 364, 366, 372, 381, 377, 381, 394
+    348, 355, 359, 361, 363, 365, 370, 376, 380, 391, 399
 #elif CONFIG_BATTERY == BATT_LPCS355385
     /* iriver H10 20GB */
     399, 403, 406, 408, 410, 412, 415, 418, 422, 426, 431
