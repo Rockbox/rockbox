@@ -24,12 +24,15 @@
 #include "thread.h"
 #include "kernel.h"
 #include "tuner.h" /* tuner abstraction interface */
+#include "power.h"
 #include "fmradio.h" /* physical interface driver */
 #include "sound.h"
 #include "pp5024.h"
 #include "system.h"
 
 #ifndef BOOTLOADER
+
+static struct mutex tuner_mtx;
 
 #if 0
 /* define to enable tuner logging */
@@ -338,6 +341,10 @@ static void lv24020lp_write(unsigned int address, unsigned int data)
         break;
     }
 
+    /* Check if interface is turned on */
+    if (!(tuner_status & TUNER_POWERED))
+        return;
+
     address = lv24020lp_begin_write(address);
 
     /* data first */
@@ -364,6 +371,10 @@ static unsigned int lv24020lp_read(unsigned int address)
 {
     int i;
     unsigned int toread;
+
+    /* Check if interface is turned on */
+    if (!(tuner_status & TUNER_POWERED))
+        return 0;
 
     address = lv24020lp_begin_write(address);
 
@@ -433,9 +444,6 @@ static int tuner_measure(unsigned char type, int scale, int duration)
 {
     int64_t finval;
 
-    if (!tuner_awake())
-        return 0;
-
     /* enable measuring */
     lv24020lp_write_or(MSRC_SEL, type);
     lv24020lp_write_and(CNT_CTRL, ~CNT_SEL);
@@ -463,18 +471,19 @@ static int tuner_measure(unsigned char type, int scale, int duration)
     else
         finval = scale*finval / duration;
 
+    /* This function takes a loooong time and other stuff needs
+       running by now */
+    yield();
+
     return (int)finval;
 }
 
 /* set the FM oscillator frequency */
-static void set_frequency(int freq)
+static bool set_frequency(int freq)
 {
     int coef, cap_value, osc_value;
     int f1, f2, x1, x2;
     int count;
-
-    if (!tuner_awake())
-        return;
 
     TUNER_LOG_OPEN();
 
@@ -579,6 +588,8 @@ static void set_frequency(int freq)
     TUNER_LOG("\n");
 
     TUNER_LOG_SYNC();
+
+    return true;
 }
 
 static void fine_step_tune(int (*setcmp)(int regval), int regval, int step)
@@ -639,10 +650,10 @@ static int if_setcmp(int regval)
     /* This register is bounces around by a few hundred Hz and doesn't seem
        to be precisely tuneable. Just do 110000 +/- 500 since it's not very
        critical it seems. */
-    if (abs(if_set - 109500) <= 500)
+    if (abs(if_set - 110000) <= 500)
         return 0;
 
-    return if_set < 109500 ? -1 : 1;
+    return if_set < 110000 ? -1 : 1;
 }
 
 static int sd_setcmp(int regval)
@@ -665,8 +676,6 @@ static void set_sleep(bool sleep)
     if ((tuner_status & (TUNER_PRESENT | TUNER_POWERED)) !=
         (TUNER_PRESENT | TUNER_POWERED))
         return;
-
-    tuner_status |= TUNER_AWAKE;
 
     enable_afc(false);
 
@@ -702,9 +711,79 @@ static void set_sleep(bool sleep)
     lv24020lp_write(STEREO_CTRL, FMCS_SET(7) | AUTOSSR);
     lv24020lp_write(PW_SCTRL, SS_CTRL_SET(3) | SM_CTRL_SET(1) |
                     PW_RAD);
+
+    tuner_status |= TUNER_AWAKE;
+}
+
+static int lp24020lp_tuned(void)
+{
+    return RSS_FS(lv24020lp_read(RADIO_STAT)) < 0x1f;
+}
+
+static int lv24020lp_debug_info(int setting)
+{
+    int val = -1;
+
+    if (setting >= LV24020LP_DEBUG_FIRST && setting <= LV24020LP_DEBUG_LAST)
+    {
+        val = 0;
+    
+        if (tuner_awake())
+        {
+            switch (setting)
+            {
+            /* tuner-specific debug info */
+            case LV24020LP_CTRL_STAT:
+                val = lv24020lp_read(CTRL_STAT);
+                break;
+
+            case LV24020LP_REG_STAT:
+                val = lv24020lp_read(RADIO_STAT);
+                break;
+
+            case LV24020LP_MSS_FM:
+                val = tuner_measure(MSS_FM, 1, 16);
+                break;
+
+            case LV24020LP_MSS_IF:
+                val = tuner_measure(MSS_IF, 1000, 16);
+                break;
+
+            case LV24020LP_MSS_SD:
+                val = tuner_measure(MSS_SD, 1000, 16);
+                break;
+
+            case LV24020LP_IF_SET:
+                val = if_set;
+                break;
+
+            case LV24020LP_SD_SET:
+                val = sd_set;
+                break;
+            }
+        }
+    }
+
+    return val;
 }
 
 /** Public interfaces **/
+void lv24020lp_init(void)
+{
+    mutex_init(&tuner_mtx);
+}
+
+void lv24020lp_lock(void)
+{
+    mutex_lock(&tuner_mtx);
+}
+
+void lv24020lp_unlock(void)
+{
+    mutex_unlock(&tuner_mtx);
+}
+
+/* This function expects the driver to be locked externally */
 void lv24020lp_power(bool status)
 {
     static const unsigned char tuner_defaults[][2] =
@@ -734,7 +813,7 @@ void lv24020lp_power(bool status)
 
     if (status)
     {
-        tuner_status |= TUNER_POWERED | TUNER_PRESENCE_CHECKED;
+        tuner_status |= (TUNER_PRESENCE_CHECKED | TUNER_POWERED);
 
         /* if tuner is present, CHIP ID is 0x09 */
         if (lv24020lp_read(CHIP_ID) == 0x09)
@@ -750,22 +829,24 @@ void lv24020lp_power(bool status)
                 lv24020lp_write(tuner_defaults[i][0], tuner_defaults[i][1]);
 
             /* Complete the startup calibration if the tuner is woken */
-            udelay(100000);
+            sleep(HZ/10);
         }
     }
     else
     {
+        tuner_status &= ~(TUNER_POWERED | TUNER_AWAKE);
+
         /* Power off */
         if (tuner_status & TUNER_PRESENT)
             lv24020lp_write_and(PW_SCTRL, ~PW_RAD);
-
-        tuner_status &= ~(TUNER_POWERED | TUNER_AWAKE);
     }
 }
 
 int lv24020lp_set(int setting, int value)
 {
     int val = 1;
+
+    mutex_lock(&tuner_mtx);
 
     switch(setting)
     {
@@ -780,7 +861,7 @@ int lv24020lp_set(int setting, int value)
     case RADIO_SCAN_FREQUENCY:
         /* TODO: really implement this */
         set_frequency(value);
-        val = lv24020lp_get(RADIO_TUNED);
+        val = lp24020lp_tuned();
         break;
 
     case RADIO_MUTE:
@@ -791,13 +872,11 @@ int lv24020lp_set(int setting, int value)
         break;
 
     case RADIO_REGION:
-    {
         if (lv24020lp_region_data[value])
             lv24020lp_write_or(AUDIO_CTRL2, DEEMP);
         else
             lv24020lp_write_and(AUDIO_CTRL2, ~DEEMP);
         break;
-        }
 
     case RADIO_FORCE_MONO:
         if (value)
@@ -807,8 +886,10 @@ int lv24020lp_set(int setting, int value)
         break;
 
     default:
-        val = -1;
+        value = -1;
     }
+
+    mutex_unlock(&tuner_mtx);
 
     return val;
 }
@@ -817,11 +898,13 @@ int lv24020lp_get(int setting)
 {
     int val = -1;
 
+    mutex_lock(&tuner_mtx);
+
     switch(setting)
     {
     case RADIO_TUNED:
         /* TODO: really implement this */
-        val = RSS_FS(lv24020lp_read(RADIO_STAT)) < 0x1f;
+        val = lp24020lp_tuned();
         break;
 
     case RADIO_STEREO:
@@ -833,37 +916,20 @@ int lv24020lp_get(int setting)
         bool fmstatus = true;
 
         if (!(tuner_status & TUNER_PRESENCE_CHECKED))
-            fmstatus = tuner_power(true);
+            fmstatus = tuner_power_nolock(true);
 
         val = (tuner_status & TUNER_PRESENT) != 0;
 
         if (!fmstatus)
-            tuner_power(false);
+            tuner_power_nolock(false);
         break;
         }
 
-    /* tuner-specific debug info */
-    case LV24020LP_CTRL_STAT:
-        return lv24020lp_read(CTRL_STAT);
-
-    case LV24020LP_REG_STAT:
-        return lv24020lp_read(RADIO_STAT);
-
-    case LV24020LP_MSS_FM:
-        return tuner_measure(MSS_FM, 1, 16);
-
-    case LV24020LP_MSS_IF:
-        return tuner_measure(MSS_IF, 1000, 16);
-
-    case LV24020LP_MSS_SD:
-        return tuner_measure(MSS_SD, 1000, 16);
-
-    case LV24020LP_IF_SET:
-        return if_set;
-
-    case LV24020LP_SD_SET:
-        return sd_set;
+    default:
+        val = lv24020lp_debug_info(setting);
     }
+
+    mutex_unlock(&tuner_mtx);
 
     return val;
 }

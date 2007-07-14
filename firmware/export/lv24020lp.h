@@ -32,16 +32,17 @@
 #define LV24020LP_IF_SET    (RADIO_GET_CHIP_FIRST+5)
 #define LV24020LP_SD_SET    (RADIO_GET_CHIP_FIRST+6)
 
-struct lv24020lp_region_data
-{
-    unsigned char deemphasis;
-} __attribute__((packed));
+#define LV24020LP_DEBUG_FIRST LV24020LP_CTRL_STAT
+#define LV24020LP_DEBUG_LAST  LV24020LP_SD_SET
 
 const unsigned char lv24020lp_region_data[TUNER_NUM_REGIONS];
 
 int lv24020lp_set(int setting, int value);
 int lv24020lp_get(int setting);
 void lv24020lp_power(bool status);
+void lv24020lp_init(void);
+void lv24020lp_lock(void);
+void lv24020lp_unlock(void);
 
 #ifndef CONFIG_TUNER_MULTI
 #define tuner_set lv24020lp_set

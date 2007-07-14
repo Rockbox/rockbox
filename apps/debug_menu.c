@@ -1942,11 +1942,10 @@ static bool dbg_save_roms(void)
 
 #ifndef SIMULATOR
 #if CONFIG_TUNER
-int radio_lines = 0;
 static int radio_callback(int btn, struct gui_synclist *lists)
 {
-    (void)btn;(void)lists;
-    radio_lines = 0;
+    int radio_lines = 0;
+
     if (radio_hardware_present())
     {
         snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, 
@@ -1966,10 +1965,14 @@ static int radio_callback(int btn, struct gui_synclist *lists)
                  "if_set: %d Hz", (lv24020lp_get(LV24020LP_IF_SET) ) );
         snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, 
                  "sd_set: %d Hz", (lv24020lp_get(LV24020LP_SD_SET) ) );
+
+        if (btn != ACTION_STD_CANCEL)
+            btn = ACTION_REDRAW;
 #endif
 #if (CONFIG_TUNER & S1A0903X01)
         snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, 
                  "Samsung regs: %08X", s1a0903x01_get(RADIO_ALL));
+        /* This one doesn't return dynamic data atm */
 #endif
 #if (CONFIG_TUNER & TEA5767)
         struct tea5767_dbg_info info;
@@ -1985,16 +1988,21 @@ static int radio_callback(int btn, struct gui_synclist *lists)
                  (unsigned)info.write_regs[0], (unsigned)info.write_regs[1],
                  (unsigned)info.write_regs[2], (unsigned)info.write_regs[3],
                  (unsigned)info.write_regs[4]);
+
+        if (btn != ACTION_STD_CANCEL)
+            btn = ACTION_REDRAW;
 #endif
-        btn = ACTION_REDRAW;
+
+        gui_synclist_set_nb_items(lists, radio_lines);
     }
     else
-        snprintf(debug_list_messages[radio_lines++], DEBUG_MSG_LEN, "HW detected: no");
+        snprintf(debug_list_messages[0], DEBUG_MSG_LEN, "HW detected: no");
+
     return btn;
 }
 static bool dbg_fm_radio(void)
 {
-    dbg_list("FM Radio",radio_lines, 1, 
+    dbg_list("FM Radio", 1, 1, 
              radio_callback, dbg_listmessage_getname);
     return false;
 }

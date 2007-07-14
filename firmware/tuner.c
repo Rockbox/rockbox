@@ -60,13 +60,15 @@ const struct tea5767_region_data tea5767_region_data[TUNER_NUM_REGIONS] =
 #ifdef CONFIG_TUNER_MULTI
 int (*tuner_set)(int setting, int value);
 int (*tuner_get)(int setting);
-#define TUNER_TYPE_CASE(type, set, get, region_data) \
+#define TUNER_TYPE_CASE(type, set, get, ...) \
     case type:                                       \
         tuner_set = set;                             \
         tuner_get = get;                             \
+        __VA_ARGS__;                                 \
         break;
 #else
-#define TUNER_TYPE_CASE(type, set, get, region_data)
+#define TUNER_TYPE_CASE(type, set, get, ...) \
+        __VA_ARGS__;
 #endif /* CONFIG_TUNER_MULTI */
 
 void tuner_init(void)
@@ -79,19 +81,17 @@ void tuner_init(void)
         TUNER_TYPE_CASE(LV24020LP,
                         lv24020lp_set,
                         lv24020lp_get,
-                        lv24020lp_region_data)
+                        lv24020lp_init())
     #endif
     #if (CONFIG_TUNER & TEA5767)
         TUNER_TYPE_CASE(TEA5767,
                         tea5767_set,
-                        tea5767_get,
-                        tea5767_region_data)
+                        tea5767_get)
     #endif
     #if (CONFIG_TUNER & S1A0903X01)
         TUNER_TYPE_CASE(S1A0903X01,
                         s1a0903x01_set,
-                        s1a0903x01_get,
-                        NULL)
+                        s1a0903x01_get)
     #endif
     }
 }

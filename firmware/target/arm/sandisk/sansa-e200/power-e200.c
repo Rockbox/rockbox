@@ -66,9 +66,11 @@ void ide_power_enable(bool on)
 /** Tuner **/
 static bool powered = false;
 
-bool tuner_power(bool status)
+bool tuner_power_nolock(bool status)
 {
-    bool old_status = powered;
+    bool old_status;
+
+    old_status = powered;
 
     if (status != old_status)
     {
@@ -112,6 +114,15 @@ bool tuner_power(bool status)
         powered = status;
     }
 
+    return old_status;
+}
+
+bool tuner_power(bool status)
+{
+    bool old_status;
+    lv24020lp_lock();
+    old_status = tuner_power_nolock(status);
+    lv24020lp_unlock();
     return old_status;
 }
 

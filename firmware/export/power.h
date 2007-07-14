@@ -49,6 +49,7 @@ bool spdif_powered(void);
 
 #if CONFIG_TUNER
 extern bool tuner_power(bool status);
+extern bool tuner_power_nolock(bool status);
 extern bool tuner_powered(void);
 #endif
 
