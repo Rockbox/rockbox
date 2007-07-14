@@ -291,6 +291,7 @@ enum
 #define FORMAT_REMOTE      0x10000000
 
 #define TRANSPARENT_COLOR LCD_RGBPACK(255,0,255)
+#define REPLACEWITHFG_COLOR LCD_RGBPACK(0,255,255)
 
 struct bitmap {
     int width;

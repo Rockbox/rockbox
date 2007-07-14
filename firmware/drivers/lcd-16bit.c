@@ -727,7 +727,9 @@ void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
         int i;
         for(i = 0;i < width;i++)
         {
-            if(src[i] != TRANSPARENT_COLOR)
+            if (src[i] == REPLACEWITHFG_COLOR)
+                dst[i] = fg_pattern;
+            else if(src[i] != TRANSPARENT_COLOR)
                 dst[i] = src[i];
         }
         src += stride;
