@@ -86,44 +86,45 @@ void usb_screen(void)
     /* nothing here! */
 #else
     int i;
+    bool statusbar = global_settings.statusbar; /* force the statusbar */
+    global_settings.statusbar = true;
 #if LCD_DEPTH > 1
     show_main_backdrop();
 #endif
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
     show_remote_main_backdrop();
 #endif
-
     FOR_NB_SCREENS(i)
+    {
         screens[i].backlight_on();
-
-#ifdef HAVE_REMOTE_LCD
-    lcd_remote_clear_display();
-    lcd_remote_bitmap(remote_usblogo,
+        screens[i].clear_display();
+#if NB_SCREENS > 1
+        if (i == SCREEN_REMOTE)
+        {
+            screens[i].bitmap(remote_usblogo,
                       (LCD_REMOTE_WIDTH-BMPWIDTH_remote_usblogo),
                       (LCD_REMOTE_HEIGHT-BMPHEIGHT_remote_usblogo)/2,
                       BMPWIDTH_remote_usblogo, BMPHEIGHT_remote_usblogo);
-    lcd_remote_update();
+        }
+        else 
+        {
 #endif
-
-    lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
-#ifdef HAVE_LCD_COLOR
-    lcd_bitmap_transparent(usblogo, (LCD_WIDTH-BMPWIDTH_usblogo),
-                                    (LCD_HEIGHT-BMPHEIGHT_usblogo)/2,
-                                    BMPWIDTH_usblogo, BMPHEIGHT_usblogo);
-#else
-    lcd_bitmap(usblogo, (LCD_WIDTH-BMPWIDTH_usblogo),
+            screens[i].transparent_bitmap(usblogo, 
+                        (LCD_WIDTH-BMPWIDTH_usblogo),
                         (LCD_HEIGHT-BMPHEIGHT_usblogo)/2,
-                        BMPWIDTH_usblogo, BMPHEIGHT_usblogo);
-#endif  /* HAVE_LCD_COLOR */
+                         BMPWIDTH_usblogo, BMPHEIGHT_usblogo);
 #else
-    lcd_double_height(false);
-    lcd_puts_scroll(0, 0, "[USB Mode]");
-    status_set_param(false);
-    status_set_audio(false);
-    status_set_usb(true);
+            screens[i].puts_scroll(0, 0, "[USB Mode]");
+            status_set_param(false);
+            status_set_audio(false);
+            status_set_usb(true);
 #endif /* HAVE_LCD_BITMAP */
-    lcd_update();
+#if NB_SCREENS > 1
+        }
+#endif
+        screens[i].update();
+    }
 
     gui_syncstatusbar_draw(&statusbars, true);
 #ifdef SIMULATOR
@@ -144,6 +145,7 @@ void usb_screen(void)
 #endif /* HAVE_LCD_CHARCELLS */
     FOR_NB_SCREENS(i)
         screens[i].backlight_on();
+    global_settings.statusbar = statusbar;
 #endif /* USB_NONE */
 }
 
@@ -862,7 +864,7 @@ bool set_time_screen(const char* title, struct tm *tm)
 {
     bool done = false;
     int button;
-    int i;
+    int i, s;
     int cursorpos = 0;
     int lastcursorpos = !cursorpos;
     unsigned int julianday;
@@ -922,10 +924,6 @@ bool set_time_screen(const char* title, struct tm *tm)
                  str(dayname[tm->tm_wday]), tm->tm_year+1900,
                  str(monthname[tm->tm_mon]), tm->tm_mday);
 
-        /* recalculate the positions and offsets */
-        lcd_getstringsize(title, &width, &prev_line_height);
-        lcd_getstringsize(buffer, &width, &line_height);
-        lcd_getstringsize(SEPARATOR, &separator_width, &height);
 
         /* convert spaces in the buffer to \0 to make it possible to work
            directly on the buffer */
@@ -935,82 +933,102 @@ bool set_time_screen(const char* title, struct tm *tm)
         buffer[9 + DAYNAME_LEN] = '\0';
         buffer[14 + DAYNAME_LEN] = '\0';
         buffer[15 + DAYNAME_LEN + MONTHNAME_LEN] = '\0';
-
-        /* hour */
-        lcd_getstringsize(buffer, &width, &height);
-        /* cursor[0][INDEX_X] is already 0 because of the memset */
-        cursor[0][INDEX_Y] = prev_line_height + statusbar_height;
-        cursor[0][INDEX_WIDTH] = width;
-
-        /* minute */
-        lcd_getstringsize(buffer + 3, &width, &height);
-        cursor[1][INDEX_X] = cursor[0][INDEX_WIDTH] + separator_width;
-        cursor[1][INDEX_Y] = prev_line_height + statusbar_height;
-        cursor[1][INDEX_WIDTH] = width;
-
-        /* second */
-        lcd_getstringsize(buffer + 6, &width, &height);
-        cursor[2][INDEX_X] = cursor[0][INDEX_WIDTH] + separator_width +
-                             cursor[1][INDEX_WIDTH] + separator_width;
-        cursor[2][INDEX_Y] = prev_line_height + statusbar_height;
-
-        /* weekday */
-        lcd_getstringsize(buffer + 9, &weekday_width, &height);
-        lcd_getstringsize(" ", &separator_width, &height);
-
-        /* year */
-        lcd_getstringsize(buffer  + 10 + DAYNAME_LEN, &width, &height);
-        cursor[3][INDEX_X] = weekday_width + separator_width;
-        cursor[3][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
-        cursor[3][INDEX_WIDTH] = width;
-
-        /* month */
-        lcd_getstringsize(buffer + 15 + DAYNAME_LEN, &width, &height);
-        cursor[4][INDEX_X] = weekday_width + 2 * separator_width +
-                             cursor[3][INDEX_WIDTH];
-        cursor[4][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
-        cursor[4][INDEX_WIDTH] = width;
-
-        /* day */
-        lcd_getstringsize(buffer + 16 + DAYNAME_LEN + MONTHNAME_LEN, &width, &height);
-        cursor[5][INDEX_X] = weekday_width + 3 * separator_width +
-                             cursor[3][INDEX_WIDTH] +
-                             cursor[4][INDEX_WIDTH];
-        cursor[5][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
-
-        /* draw the screen */
-        lcd_set_drawmode(DRMODE_SOLID);
-        lcd_clear_display();
-        /* display the screen title */
-        lcd_puts_scroll(0, 0, title);
-
-        /* these are not selectable, so we draw them outside the loop */
-        lcd_putsxy(0, cursor[3][INDEX_Y], buffer + 9); /* name of the week day */
-        lcd_putsxy(cursor[1][INDEX_X] - separator_width, cursor[0][INDEX_Y],
-                   SEPARATOR);
-        lcd_putsxy(cursor[2][INDEX_X] - separator_width, cursor[0][INDEX_Y],
-                   SEPARATOR);
-
-        /* draw the selected item with drawmode set to
-           DRMODE_SOLID|DRMODE_INVERSEVID, all other selectable
-           items with drawmode DRMODE_SOLID */
-        for(i=0; i<6; i++)
+        FOR_NB_SCREENS(s)
         {
-            if (cursorpos == i)
-                lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            /* minimum lines needed is 2 + title line */
+            gui_textarea_update_nblines(&screens[s]);
+            if (screens[s].nb_lines < 4)
+            {
+                screens[s].setfont(FONT_SYSFIXED);
+                gui_textarea_update_nblines(&screens[s]);
+            }
+            
+            /* recalculate the positions and offsets */
+            if (screens[s].nb_lines >= 3)
+                screens[s].getstringsize(title, &width, &prev_line_height);
             else
-                lcd_set_drawmode(DRMODE_SOLID);
+                prev_line_height = 0;
+            screens[s].getstringsize(buffer, &width, &line_height);
+            screens[s].getstringsize(SEPARATOR, &separator_width, &height);
+        
+            /* hour */
+            screens[s].getstringsize(buffer, &width, &height);
+            /* cursor[0][INDEX_X] is already 0 because of the memset */
+            cursor[0][INDEX_Y] = prev_line_height + statusbar_height;
+            cursor[0][INDEX_WIDTH] = width;
 
-            lcd_putsxy(cursor[i][INDEX_X], cursor[i][INDEX_Y], ptr[i]);
+            /* minute */
+            screens[s].getstringsize(buffer + 3, &width, &height);
+            cursor[1][INDEX_X] = cursor[0][INDEX_WIDTH] + separator_width;
+            cursor[1][INDEX_Y] = prev_line_height + statusbar_height;
+            cursor[1][INDEX_WIDTH] = width;
+    
+            /* second */
+            screens[s].getstringsize(buffer + 6, &width, &height);
+            cursor[2][INDEX_X] = cursor[0][INDEX_WIDTH] + separator_width +
+                                cursor[1][INDEX_WIDTH] + separator_width;
+            cursor[2][INDEX_Y] = prev_line_height + statusbar_height;
+    
+            /* weekday */
+            screens[s].getstringsize(buffer + 9, &weekday_width, &height);
+            screens[s].getstringsize(" ", &separator_width, &height);
+    
+            /* year */
+            screens[s].getstringsize(buffer  + 10 + DAYNAME_LEN, &width, &height);
+            cursor[3][INDEX_X] = weekday_width + separator_width;
+            cursor[3][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
+            cursor[3][INDEX_WIDTH] = width;
+    
+            /* month */
+            screens[s].getstringsize(buffer + 15 + DAYNAME_LEN, &width, &height);
+            cursor[4][INDEX_X] = weekday_width + 2 * separator_width +
+                                cursor[3][INDEX_WIDTH];
+            cursor[4][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
+            cursor[4][INDEX_WIDTH] = width;
+    
+            /* day */
+            screens[s].getstringsize(buffer + 16 + DAYNAME_LEN + MONTHNAME_LEN,
+                                     &width, &height);
+            cursor[5][INDEX_X] = weekday_width + 3 * separator_width +
+                                cursor[3][INDEX_WIDTH] +
+                                cursor[4][INDEX_WIDTH];
+            cursor[5][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
+    
+            /* draw the screen */
+            screens[s].set_drawmode(DRMODE_SOLID);
+            screens[s].clear_display();
+            /* display the screen title */
+            screens[s].puts_scroll(0, 0, title);
+    
+            /* these are not selectable, so we draw them outside the loop */
+            screens[s].putsxy(0, cursor[3][INDEX_Y], buffer + 9); /* name of the week day */
+            screens[s].putsxy(cursor[1][INDEX_X] - separator_width, 
+                              cursor[0][INDEX_Y], SEPARATOR);
+            screens[s].putsxy(cursor[2][INDEX_X] - separator_width,
+                              cursor[0][INDEX_Y], SEPARATOR);
+
+            /* draw the selected item with drawmode set to
+                DRMODE_SOLID|DRMODE_INVERSEVID, all other selectable
+                items with drawmode DRMODE_SOLID */
+            for(i=0; i<6; i++)
+            {
+                if (cursorpos == i)
+                    screens[s].set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                else
+                    screens[s].set_drawmode(DRMODE_SOLID);
+    
+                screens[s].putsxy(cursor[i][INDEX_X], 
+                                  cursor[i][INDEX_Y], ptr[i]);
+            }
+
+            /* print help text */
+            if (screens[s].nb_lines > 4)
+                screens[s].puts(0, 4, str(LANG_TIME_SET));
+            if (screens[s].nb_lines > 5)
+                screens[s].puts(0, 5, str(LANG_TIME_REVERT));
+            screens[s].update();
         }
-
-        /* print help text */
-        lcd_puts(0, 4, str(LANG_TIME_SET));
-        lcd_puts(0, 5, str(LANG_TIME_REVERT));
-
         gui_syncstatusbar_draw(&statusbars, true);
-
-        lcd_update();
 
         /* calculate the minimum and maximum for the number under cursor */
         if(cursorpos!=lastcursorpos) {
@@ -1050,7 +1068,7 @@ bool set_time_screen(const char* title, struct tm *tm)
             say_time(cursorpos, tm);
         }
 
-        button = get_action(CONTEXT_SETTINGS_TIME,HZ/2);
+        button = get_action(CONTEXT_SETTINGS_TIME, TIMEOUT_BLOCK);
         switch ( button ) {
             case ACTION_STD_PREV:
                 cursorpos = (cursorpos + 6 - 1) % 6;
@@ -1089,6 +1107,11 @@ bool set_time_screen(const char* title, struct tm *tm)
                     return true;
                 break;
         }
+    }
+    FOR_NB_SCREENS(i)
+    {
+        screens[i].setfont(FONT_UI);
+        gui_textarea_update_nblines(&screens[i]);
     }
     action_signalscreenchange();
     return false;
