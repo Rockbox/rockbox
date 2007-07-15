@@ -101,10 +101,12 @@ static void dbg_listmessage_setlines(int lines)
         lines = MAX_DEBUG_MESSAGES;
     debug_listmessage_lines = lines;
 }
+#ifndef SIMULATOR
 static int dbg_listmessage_getlines(void)
 {
     return debug_listmessage_lines;
 }
+#endif
 static void dbg_listmessage_addline(const char *fmt, ...)
 {
     va_list ap;
