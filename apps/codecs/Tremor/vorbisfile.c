@@ -657,15 +657,6 @@ static int _fetch_and_process_packet(OggVorbis_File *vf,
   return ret;
 }
 
-/* if, eg, 64 bit stdio is configured by default, this will build with
-   fseek64 */
-#if 0
-static int _fseek64_wrap(FILE *f,ogg_int64_t off,int whence){
-  if(f==NULL)return(-1);
-  return fseek(f,off,whence);
-}
-#endif
-
 static int _ov_open1(void *f,OggVorbis_File *vf,char *initial,
                      long ibytes, ov_callbacks callbacks){
   int offsettest=(f?callbacks.seek_func(f,0,SEEK_CUR):-1);
@@ -772,148 +763,6 @@ int ov_open_callbacks(void *f,OggVorbis_File *vf,char *initial,long ibytes,
   int ret=_ov_open1(f,vf,initial,ibytes,callbacks);
   if(ret)return ret;
   return _ov_open2(vf);
-}
-
-#if 0
-int ov_open(FILE *f,OggVorbis_File *vf,char *initial,long ibytes){
-  ov_callbacks callbacks = {
-    (size_t (*)(void *, size_t, size_t, void *))  fread,
-    (int (*)(void *, ogg_int64_t, int))              _fseek64_wrap,
-    (int (*)(void *))                             fclose,
-    (long (*)(void *))                            ftell
-  };
-
-  return ov_open_callbacks((void *)f, vf, initial, ibytes, callbacks);
-}
-#endif
-  
-/* Only partially open the vorbis file; test for Vorbisness, and load
-   the headers for the first chain.  Do not seek (although test for
-   seekability).  Use ov_test_open to finish opening the file, else
-   ov_clear to close/free it. Same return codes as open. */
-
-int ov_test_callbacks(void *f,OggVorbis_File *vf,char *initial,long ibytes,
-    ov_callbacks callbacks)
-{
-  return _ov_open1(f,vf,initial,ibytes,callbacks);
-}
-
-#if 0
-int ov_test(FILE *f,OggVorbis_File *vf,char *initial,long ibytes){
-  ov_callbacks callbacks = {
-    (size_t (*)(void *, size_t, size_t, void *))  fread,
-    (int (*)(void *, ogg_int64_t, int))              _fseek64_wrap,
-    (int (*)(void *))                             fclose,
-    (long (*)(void *))                            ftell
-  };
-
-  return ov_test_callbacks((void *)f, vf, initial, ibytes, callbacks);
-}
-#endif
-  
-int ov_test_open(OggVorbis_File *vf){
-  if(vf->ready_state!=PARTOPEN)return(OV_EINVAL);
-  return _ov_open2(vf);
-}
-
-/* How many logical bitstreams in this physical bitstream? */
-long ov_streams(OggVorbis_File *vf){
-  return vf->links;
-}
-
-/* Is the FILE * associated with vf seekable? */
-long ov_seekable(OggVorbis_File *vf){
-  return vf->seekable;
-}
-
-/* returns the bitrate for a given logical bitstream or the entire
-   physical bitstream.  If the file is open for random access, it will
-   find the *actual* average bitrate.  If the file is streaming, it
-   returns the nominal bitrate (if set) else the average of the
-   upper/lower bounds (if set) else -1 (unset).
-
-   If you want the actual bitrate field settings, get them from the
-   vorbis_info structs */
-
-long ov_bitrate(OggVorbis_File *vf,int i){
-  if(vf->ready_state<OPENED)return(OV_EINVAL);
-  if(i>=vf->links)return(OV_EINVAL);
-  if(!vf->seekable && i!=0)return(ov_bitrate(vf,0));
-  if(i<0){
-    ogg_int64_t bits=0;
-    int i;
-    for(i=0;i<vf->links;i++)
-      bits+=(vf->offsets[i+1]-vf->dataoffsets[i])*8;
-    /* This once read: return(rint(bits/ov_time_total(vf,-1)));
-     * gcc 3.x on x86 miscompiled this at optimisation level 2 and above,
-     * so this is slightly transformed to make it work.
-     */
-    return(bits*1000/ov_time_total(vf,-1));
-  }else{
-    if(vf->seekable){
-      /* return the actual bitrate */
-      return((vf->offsets[i+1]-vf->dataoffsets[i])*8000/ov_time_total(vf,i));
-    }else{
-      /* return nominal if set */
-      if(vf->vi[i].bitrate_nominal>0){
-        return vf->vi[i].bitrate_nominal;
-      }else{
-        if(vf->vi[i].bitrate_upper>0){
-          if(vf->vi[i].bitrate_lower>0){
-            return (vf->vi[i].bitrate_upper+vf->vi[i].bitrate_lower)/2;
-          }else{
-            return vf->vi[i].bitrate_upper;
-          }
-        }
-        return(OV_FALSE);
-      }
-    }
-  }
-}
-
-/* returns the actual bitrate since last call.  returns -1 if no
-   additional data to offer since last call (or at beginning of stream),
-   EINVAL if stream is only partially open 
-*/
-long ov_bitrate_instant(OggVorbis_File *vf){
-  int link=(vf->seekable?vf->current_link:0);
-  long ret;
-  if(vf->ready_state<OPENED)return(OV_EINVAL);
-  if(vf->samptrack==0)return(OV_FALSE);
-  ret=vf->bittrack/vf->samptrack*vf->vi[link].rate;
-  vf->bittrack=0;
-  vf->samptrack=0;
-  return(ret);
-}
-
-/* Guess */
-long ov_serialnumber(OggVorbis_File *vf,int i){
-  if(i>=vf->links)return(ov_serialnumber(vf,vf->links-1));
-  if(!vf->seekable && i>=0)return(ov_serialnumber(vf,-1));
-  if(i<0){
-    return(vf->current_serialno);
-  }else{
-    return(vf->serialnos[i]);
-  }
-}
-
-/* returns: total raw (compressed) length of content if i==-1
-            raw (compressed) length of that logical bitstream for i==0 to n
-            OV_EINVAL if the stream is not seekable (we can't know the length)
-            or if stream is only partially open
-*/
-ogg_int64_t ov_raw_total(OggVorbis_File *vf,int i){
-  if(vf->ready_state<OPENED)return(OV_EINVAL);
-  if(!vf->seekable || i>=vf->links)return(OV_EINVAL);
-  if(i<0){
-    ogg_int64_t acc=0;
-    int i;
-    for(i=0;i<vf->links;i++)
-      acc+=ov_raw_total(vf,i);
-    return(acc);
-  }else{
-    return(vf->offsets[i+1]-vf->offsets[i]);
-  }
 }
 
 /* returns: total PCM length (samples) of content if i==-1 PCM length
@@ -1417,44 +1266,11 @@ int ov_time_seek(OggVorbis_File *vf,ogg_int64_t milliseconds){
   }
 }
 
-/* page-granularity version of ov_time_seek 
-   returns zero on success, nonzero on failure */
-int ov_time_seek_page(OggVorbis_File *vf,ogg_int64_t milliseconds){
-  /* translate time to PCM position and call ov_pcm_seek */
-
-  int link=-1;
-  ogg_int64_t pcm_total=ov_pcm_total(vf,-1);
-  ogg_int64_t time_total=ov_time_total(vf,-1);
-
-  if(vf->ready_state<OPENED)return(OV_EINVAL);
-  if(!vf->seekable)return(OV_ENOSEEK);
-  if(milliseconds<0 || milliseconds>time_total)return(OV_EINVAL);
-  
-  /* which bitstream section does this time offset occur in? */
-  for(link=vf->links-1;link>=0;link--){
-    pcm_total-=vf->pcmlengths[link*2+1];
-    time_total-=ov_time_total(vf,link);
-    if(milliseconds>=time_total)break;
-  }
-
-  /* enough information to convert time offset to pcm offset */
-  {
-    ogg_int64_t target=pcm_total+(milliseconds-time_total)*vf->vi[link].rate/1000;
-    return(ov_pcm_seek_page(vf,target));
-  }
-}
-
 /* tell the current stream offset cursor.  Note that seek followed by
    tell will likely not give the set offset due to caching */
 ogg_int64_t ov_raw_tell(OggVorbis_File *vf){
   if(vf->ready_state<OPENED)return(OV_EINVAL);
   return(vf->offset);
-}
-
-/* return PCM offset (sample) of next PCM sample to be read */
-ogg_int64_t ov_pcm_tell(OggVorbis_File *vf){
-  if(vf->ready_state<OPENED)return(OV_EINVAL);
-  return(vf->pcm_offset);
 }
 
 /* return time offset (milliseconds) of next PCM sample to be read */
@@ -1502,108 +1318,6 @@ vorbis_info *ov_info(OggVorbis_File *vf,int link){
         return vf->vi+link;
   }else{
     return vf->vi;
-  }
-}
-
-/* grr, strong typing, grr, no templates/inheritence, grr */
-vorbis_comment *ov_comment(OggVorbis_File *vf,int link){
-  if(vf->seekable){
-    if(link<0)
-      if(vf->ready_state>=STREAMSET)
-        return vf->vc+vf->current_link;
-      else
-        return vf->vc;
-    else
-      if(link>=vf->links)
-        return NULL;
-      else
-        return vf->vc+link;
-  }else{
-    return vf->vc;
-  }
-}
-
-/* up to this point, everything could more or less hide the multiple
-   logical bitstream nature of chaining from the toplevel application
-   if the toplevel application didn't particularly care.  However, at
-   the point that we actually read audio back, the multiple-section
-   nature must surface: Multiple bitstream sections do not necessarily
-   have to have the same number of channels or sampling rate.
-
-   ov_read returns the sequential logical bitstream number currently
-   being decoded along with the PCM data in order that the toplevel
-   application can take action on channel/sample rate changes.  This
-   number will be incremented even for streamed (non-seekable) streams
-   (for seekable streams, it represents the actual logical bitstream
-   index within the physical bitstream.  Note that the accessor
-   functions above are aware of this dichotomy).
-
-   input values: buffer) a buffer to hold packed PCM data for return
-                 length) the byte length requested to be placed into buffer
-
-   return values: <0) error/hole in data (OV_HOLE), partial open (OV_EINVAL)
-                   0) EOF
-                   n) number of bytes of PCM actually returned.  The
-                   below works on a packet-by-packet basis, so the
-                   return length is not related to the 'length' passed
-                   in, just guaranteed to fit.
-
-            *section) set to the logical bitstream number */
-
-long ov_read(OggVorbis_File *vf,char *buffer,int bytes_req,int *bitstream){
-  int i,j;
-
-  ogg_int32_t **pcm;
-  long samples;
-
-  if(vf->ready_state<OPENED)return(OV_EINVAL);
-
-  while(1){
-    if(vf->ready_state==INITSET){
-      samples=vorbis_synthesis_pcmout(&vf->vd,&pcm);
-      if(samples)break;
-    }
-
-    /* suck in another packet */
-    {
-      int ret=_fetch_and_process_packet(vf,1,1);
-      if(ret==OV_EOF)
-        return(0);
-      if(ret<=0)
-        return(ret);
-    }
-
-  }
-
-  if(samples>0){
-  
-    /* yay! proceed to pack data into the byte buffer */
-    
-    long channels=ov_info(vf,-1)->channels;
-
-    if(channels==1){
-      if(samples>(bytes_req/2))
-        samples=bytes_req/2;      
-    }else{
-      if(samples>(bytes_req/4))
-        samples=bytes_req/4;
-    }
-    
-    for(i=0;i<channels;i++) { /* It's faster in this order */
-      ogg_int32_t *src=pcm[i];
-      short *dest=((short *)buffer)+i;
-      for(j=0;j<samples;j++) {
-        *dest=CLIP_TO_15(src[j]>>9);
-        dest+=channels;
-      }
-    }
-    
-    vorbis_synthesis_read(&vf->vd,samples);
-    vf->pcm_offset+=samples;
-    if(bitstream)*bitstream=vf->current_link;
-    return(samples*2*channels);
-  }else{
-    return(samples);
   }
 }
 

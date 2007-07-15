@@ -48,7 +48,6 @@ typedef struct vorbis_info{
   long bitrate_upper;
   long bitrate_nominal;
   long bitrate_lower;
-  long bitrate_window;
 
   void *codec_setup;
 } vorbis_info;
@@ -57,7 +56,6 @@ typedef struct vorbis_info{
    analysis/synthesis state.  The DSP state belongs to a specific
    logical bitstream ****************************************************/
 typedef struct vorbis_dsp_state{
-  int analysisp;
   vorbis_info *vi;
 
   ogg_int32_t **pcm;
@@ -66,7 +64,6 @@ typedef struct vorbis_dsp_state{
   int      pcm_current;
   int      pcm_returned;
 
-  int  preextrapolate;
   int  eofflag;
 
   long lW;
@@ -156,8 +153,6 @@ extern void     vorbis_comment_init(vorbis_comment *vc);
 extern void     vorbis_comment_add(vorbis_comment *vc, char *comment); 
 extern void     vorbis_comment_add_tag(vorbis_comment *vc, 
 				       char *tag, char *contents);
-extern char    *vorbis_comment_query(vorbis_comment *vc, char *tag, int count);
-extern int      vorbis_comment_query_count(vorbis_comment *vc, char *tag);
 extern void     vorbis_comment_clear(vorbis_comment *vc);
 
 extern int      vorbis_block_init(vorbis_dsp_state *v, vorbis_block *vb);

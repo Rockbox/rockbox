@@ -130,11 +130,6 @@ static int _halt_one(oggpack_buffer *b){
   return 0;
 }
 
-int oggpack_eop(oggpack_buffer *b){
-  if(b->headend<0)return -1;
-  return 0;
-}
-
 /* bits <= 32 */
 long oggpack_read(oggpack_buffer *b,int bits) ICODE_ATTR_TREMOR_NOT_MDCT;
 long oggpack_read(oggpack_buffer *b,int bits){
@@ -215,15 +210,5 @@ long oggpack_read(oggpack_buffer *b,int bits){
   ret&=m;
   b->headbit=bits&7;   
   return ret;
-}
-
-long oggpack_bytes(oggpack_buffer *b){
-  return(b->count+b->headptr-b->head->buffer->data-b->head->begin+
-         (b->headbit+7)/8);
-}
-
-long oggpack_bits(oggpack_buffer *b){
-  return((b->count+b->headptr-b->head->buffer->data-b->head->begin)*8+
-         b->headbit);
 }
 

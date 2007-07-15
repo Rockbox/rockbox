@@ -469,36 +469,6 @@ ogg_uint32_t ogg_page_pageno(ogg_page *og){
   return oggbyte_read4(&ob,18);
 }
 
-/* returns the number of packets that are completed on this page (if
-   the leading packet is begun on a previous page, but ends on this
-   page, it's counted */
-
-/* NOTE:
-If a page consists of a packet begun on a previous page, and a new
-packet begun (but not completed) on this page, the return will be:
-  ogg_page_packets(page)   ==1, 
-  ogg_page_continued(page) !=0
-
-If a page happens to be a single packet that was begun on a
-previous page, and spans to the next page (in the case of a three or
-more page packet), the return will be: 
-  ogg_page_packets(page)   ==0, 
-  ogg_page_continued(page) !=0
-*/
-
-int ogg_page_packets(ogg_page *og){
-  int i;
-  int n;
-  int count=0;
-  oggbyte_buffer ob;
-  oggbyte_init(&ob,og->header);
-
-  n=oggbyte_read1(&ob,26);
-  for(i=0;i<n;i++)
-    if(oggbyte_read1(&ob,27+i)<255)count++;
-  return(count);
-}
-
 /* Static CRC calculation table.  See older code in CVS for dead
    run-time initialization code. */
 
@@ -768,45 +738,6 @@ long ogg_sync_pageseek(ogg_sync_state *oy,ogg_page *og){
 
  sync_out:
   return ret;
-}
-
-/* sync the stream and get a page.  Keep trying until we find a page.
-   Supress 'sync errors' after reporting the first.
-
-   return values:
-   OGG_HOLE) recapture (hole in data)
-          0) need more data
-          1) page returned
-
-   Returns pointers into buffered data; invalidated by next call to
-   _stream, _clear, _init, or _buffer */
-
-int ogg_sync_pageout(ogg_sync_state *oy, ogg_page *og){
-
-  /* all we need to do is verify a page at the head of the stream
-     buffer.  If it doesn't verify, we look for the next potential
-     frame */
-
-  while(1){
-    long ret=ogg_sync_pageseek(oy,og);
-    if(ret>0){
-      /* have a page */
-      return 1;
-    }
-    if(ret==0){
-      /* need more data */
-      return 0;
-    }
-    
-    /* head did not start a synced page... skipped some bytes */
-    if(!oy->unsynced){
-      oy->unsynced=1;
-      return OGG_HOLE;
-    }
-
-    /* loop. keep looking */
-
-  }
 }
 
 /* clear things to an initial state.  Good to call, eg, before seeking */
