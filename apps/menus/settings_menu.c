@@ -123,8 +123,12 @@ MAKE_MENU(file_menu, ID2P(LANG_FILE), 0, Icon_file_view_menu,
 
 /* Battery */
 #ifndef SIMULATOR
+#if BATTERY_CAPACITY_INC > 0
 MENUITEM_SETTING(battery_capacity, &global_settings.battery_capacity, NULL);
+#endif
+#if BATTERY_TYPES_COUNT > 1
 MENUITEM_SETTING(battery_type, &global_settings.battery_type, NULL);
+#endif
 #ifdef HAVE_USB_POWER
 #if CONFIG_CHARGING
 static int usbcharging_callback(int action,const struct menu_item_ex *this_item)
@@ -142,7 +146,9 @@ MENUITEM_SETTING(usb_charging, &global_settings.usb_charging, usbcharging_callba
 #endif
 #endif
 MAKE_MENU(battery_menu, ID2P(LANG_BATTERY_MENU), 0, Icon_NOICON,
-          &battery_capacity,
+#if BATTERY_CAPACITY_INC > 0
+            &battery_capacity,
+#endif
 #if BATTERY_TYPES_COUNT > 1
             &battery_type,
 #endif
