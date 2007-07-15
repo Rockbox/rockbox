@@ -111,11 +111,18 @@ bool checkZip(wxString zipname)
     wxString name = entry->GetName();
     if(entry->IsDir())
     {
-        if(name.Contains(wxT(".rockbox")))
-        {
-            return true;
-        }
+       if( 0==name.Cmp(wxT(".rockbox"))
+        || 0==name.Cmp(wxT(".rockbox\\"))
+        || 0==name.Cmp(wxT(".rockbox/")) )
+           return true;
     }
+    else
+    {
+      if( name.StartsWith(wxT(".rockbox/"))
+       || name.StartsWith(wxT(".rockbox\\")) )
+           return true;
+    }
+
     return false;
 }
 
@@ -261,7 +268,7 @@ int DownloadURL(wxString src, wxString dest)
 int UnzipFile(wxString src, wxString destdir, bool isInstall)
 {
     wxZipEntryPtr       entry;
-    wxString            in_str, progress_msg, buf;
+    wxString            in_str, progress_msg, buf,subdir;
     int                 errnum = 0, curfile = 0, totalfiles = 0;
     InstallLog*         log = NULL;
 
@@ -324,7 +331,8 @@ int UnzipFile(wxString src, wxString destdir, bool isInstall)
         curfile++;
         wxString name = entry->GetName();
         progress_msg = wxT("Unpacking ") + name;
-        if (! progress->Update(curfile, progress_msg) ) {
+        if (! progress->Update(curfile, progress_msg) )
+        {
             MESG_DIALOG(wxT("Unpacking cancelled by user"));
             errnum = 1000;
             break;
@@ -332,16 +340,31 @@ int UnzipFile(wxString src, wxString destdir, bool isInstall)
 
         in_str = destdir + wxT("" PATH_SEP) + name;
 
-        if (entry->IsDir() ) {
-            if (!wxDirExists(in_str) ) {
-                if (! wxMkdir(in_str, 0777) ) {
-                    buf = wxT("Unable to create directory ") + in_str;
+        subdir = wxPathOnly(in_str);
+        if(!(wxDirExists(subdir)))
+        {
+            if (! wxMkdir(subdir, 0777) )
+            {
+                buf = wxT("Unable to create directory ") + subdir;
+                errnum = 100;
+                break;
+            }
+            log->WriteFile(subdir, true); // Directory
+        }
+
+        if(entry->IsDir())
+        {
+            if(!wxDirExists(name))
+            {
+                if(!wxMkdir(name, 0777) )
+                {
+                    buf = wxT("Unable to create directory ") + name;
                     errnum = 100;
                     break;
                 }
             }
             log->WriteFile(name, true); // Directory
-            continue;
+            continue; // this is just a directory, nothing else to do
         }
 
         wxFFileOutputStream* out = new wxFFileOutputStream(in_str);
@@ -349,8 +372,8 @@ int UnzipFile(wxString src, wxString destdir, bool isInstall)
         {
             buf = wxT("Can't open file ") + in_str + wxT(" for writing");
             delete out;
-            delete progress;
-            return 100;
+            errnum = 100;
+            break;
         } else if (isInstall)
         {
             log->WriteFile(name);

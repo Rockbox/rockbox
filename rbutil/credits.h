@@ -29,6 +29,7 @@ static const wxString rbutil_developers[] = {
     wxT("Dave Chapman"),
     wxT("Dominik Wenger"),
     wxT("Bryan Childs"),
+    wxT("Dave Hopper"),
     wxT("")
 };
 
