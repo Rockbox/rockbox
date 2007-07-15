@@ -174,7 +174,7 @@ wxDirTraverseResult TalkTraverser::OnDir(const wxString& dirname)
     wxArrayString dirs=fname.GetDirs();
     wxString toSpeak = dirs[dirs.GetCount()-1];
 
-    wxString filename = dirname + wxT(PATH_SEP "_dirname.talk");
+    wxString filename = dirname + wxT("" PATH_SEP "_dirname.talk");
     wxString wavname = filename + wxT(".wav");
 
     if(!wxFileExists(filename) || m_talkcreator->m_overwriteTalk)

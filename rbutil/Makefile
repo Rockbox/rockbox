@@ -18,7 +18,7 @@ CXX=$(shell $(PREFIX)wx-config --version=2.8 --cxx)
 INC = `$(PREFIX)wx-config --version=2.8 --cxxflags`
 LIBS = `$(PREFIX)wx-config --version=2.8 --libs`
 CFLAGS= -Wall -Wundef -DRBUTIL -D_LARGEFILE64_SOURCE
-OBJS=rbutil.o rbutilApp.o rbutilFrm.o rbutilCtrls.o install_dialogs.o bootloaders.o installlog.o ipodpatcher/ipodpatcher.o sansapatcher/sansapatcher.o irivertools.o md5sum.o autodetection.o
+OBJS=rbutil.o rbutilApp.o rbutilFrm.o rbutilCtrls.o install_dialogs.o bootloaders.o installlog.o ipodpatcher/ipodpatcher.o sansapatcher/sansapatcher.o irivertools.o md5sum.o autodetection.o talkfile.o
 
 ifdef __CYGWIN__
 OBJS+=ipodpatcher/ipodio-win32.o sansapatcher/sansaio-win32.o
@@ -32,9 +32,9 @@ EXTRAOBJS = $(wildcard icons/*.o)
 
 SILENT = @
 
-# Install into /usr/local by default
+# Install with / as root by default
 ifndef DESTDIR
-  DESTDIR=/usr/local
+  DESTDIR=""
 endif
 
 # type "make WIN=1" for a Windows build using the Debian mingw cross-compiler
@@ -75,4 +75,4 @@ clean:
 
 .PHONY: install
 install:
-	install -D rbutil$(EXT) $(DESTDIR)/bin/rbutil$(EXT)
+	install -D rbutil$(EXT) $(DESTDIR)/usr/bin/rbutil$(EXT)
