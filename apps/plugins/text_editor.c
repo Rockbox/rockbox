@@ -216,7 +216,7 @@ enum {
 };
 int do_item_menu(int cur_sel, char* copy_buffer)
 {
-    int m, ret = 0;
+    int ret = 0;
     MENUITEM_STRINGLIST(menu, "Line Options", NULL, 
                         "Cut/Delete", "Copy",
                         "Insert Above", "Insert Below",
