@@ -49,8 +49,14 @@ fb_data lcd_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH] IRAM_LCDFRAMEBUFFER __attribu
 static fb_data* lcd_backdrop = NULL;
 static long lcd_backdrop_offset IDATA_ATTR = 0;
 
+#if !defined(TOSHIBA_GIGABEAT_F) || defined(SIMULATOR)
 static unsigned fg_pattern IDATA_ATTR = LCD_DEFAULT_FG;
 static unsigned bg_pattern IDATA_ATTR = LCD_DEFAULT_BG;
+#else
+unsigned fg_pattern IDATA_ATTR = LCD_DEFAULT_FG;
+unsigned bg_pattern IDATA_ATTR = LCD_DEFAULT_BG;
+#endif
+
 static int drawmode = DRMODE_SOLID;
 static int xmargin = 0;
 static int ymargin = 0;
