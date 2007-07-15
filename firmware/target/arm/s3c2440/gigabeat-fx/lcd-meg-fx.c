@@ -227,7 +227,9 @@ void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
     ".nextpixel:                            \r\n"
         "ldrh   %[px], [%[s]], #2           \r\n" /* Load src pixel */
         "add    %[d], %[d], #2              \r\n" /* Uncoditionally increment dst */
-        "cmp    %[px], %[transcolor]        \r\n" /* Compare to transparent color */
+        "cmp    %[px], %[fgcolor]           \r\n" /* Compare to foreground color */
+        "streqh %[fgpat], [%[d], #-2]       \r\n" /* Store foregroud if match */
+        "cmpne  %[px], %[transcolor]        \r\n" /* Compare to transparent color */
         "strneh %[px], [%[d], #-2]          \r\n" /* Store dst if not transparent */
         "subs   %[w], %[w], #1              \r\n" /* Width counter has run down? */
         "bgt    .nextpixel                  \r\n" /* More in this row? */
@@ -240,7 +242,9 @@ void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
         : [width]"r"(width),
           [sstp]"r"(stride - width),
           [dstp]"r"(LCD_WIDTH - width),
-          [transcolor]"r"(TRANSPARENT_COLOR)
+          [transcolor]"r"(TRANSPARENT_COLOR),
+          [fgcolor]"r"(REPLACEWITHFG_COLOR),
+          [fgpat]"r"(fg_pattern)
     );
 }
 
