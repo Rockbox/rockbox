@@ -178,6 +178,10 @@
 		<Unit filename="sansapatcher\sansapatcher.h" />
 		<Unit filename="themes_3d.xpm" />
 		<Unit filename="tools2_3d.xpm" />
+		<Unit filename="tts.cpp">
+			<Option compiler="gcc" use="0" buildCommand="gcc -Wall -g tts.cpp -I$FLITEDIR/include -L$FLITEDIR/lib \n    -lflite_cmu_us_kal -lflite_usenglish -lflite_cmulex -lflite -lm" />
+		</Unit>
+		<Unit filename="tts.h" />
 		<Unit filename="uninstall_3d.xpm" />
 		<Unit filename="untools2_3d.xpm" />
 		<Unit filename="wizard.xpm" />

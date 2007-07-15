@@ -49,7 +49,7 @@ BEGIN_EVENT_TABLE(rbutilFrm,wxFrame)
 	EVT_BUTTON      (ID_BOOTLOADER_BTN, rbutilFrm::OnBootloaderBtn)
 	EVT_BUTTON      (ID_BOOTLOADERREMOVE_BTN, rbutilFrm::OnBootloaderRemoveBtn)
 	EVT_BUTTON      (ID_DOOM_BTN, rbutilFrm::OnDoomBtn)
-
+    EVT_BUTTON      (ID_TALK_BTN, rbutilFrm::OnTalkBtn)
 
 	EVT_CLOSE(rbutilFrm::rbutilFrmClose)
 	EVT_MENU(ID_FILE_EXIT, rbutilFrm::OnFileExit)
@@ -207,7 +207,6 @@ void rbutilFrm::CreateGUIControls(void)
 	WxFlexGridSizer2->Add(WxStaticText6, 0,
         wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL,5);
 
-
     wxBitmap DoomInstallButton (wxGetBitmapFromMemory(doom_btn_png,doom_btn_png_length));
     WxBitmapButton6 = new wxBitmapButton(themepage, ID_DOOM_BTN,
         DoomInstallButton, wxPoint(0,0), wxSize(64,54),
@@ -220,6 +219,21 @@ void rbutilFrm::CreateGUIControls(void)
         wxT("Install the freedoom wad files.\n\n"));
 	WxFlexGridSizer2->Add(WxStaticText7, 0,
         wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL,5);
+
+    wxBitmap TalkInstallButton (wxGetBitmapFromMemory(doom_btn_png,doom_btn_png_length));
+    WxBitmapButton7 = new wxBitmapButton(themepage, ID_TALK_BTN,
+        TalkInstallButton, wxPoint(0,0), wxSize(64,54),
+        wxRAISED_BORDER | wxBU_AUTODRAW,wxDefaultValidator, wxT("Create Talk Files"));
+    WxBitmapButton7->SetToolTip(wxT("Click here to create Talk files."));
+    WxFlexGridSizer2->Add(WxBitmapButton7, 0,
+        wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL | wxALL,5);
+
+    wxStaticText* WxStaticText8 =  new wxStaticText(themepage, wxID_ANY,
+        wxT("Create Talk Files.\n\n"));
+	WxFlexGridSizer2->Add(WxStaticText8, 0,
+        wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL,5);
+
+
 
    /*********************+
 	Uninstall Page
@@ -1005,6 +1019,34 @@ void rbutilFrm::OnPortableInstall(wxCommandEvent& event)
     }
 
     wxLogVerbose(wxT("=== end rbutilFrm::OnUnstallPortable"));
+}
+
+void rbutilFrm::OnTalkBtn(wxCommandEvent& event)
+{
+    wxLogVerbose(wxT("=== begin rbutilFrm::OnTalkBtn(event)"));
+
+    TalkFileCreator talk;
+
+    talkInstallDlg dialog(&talk,NULL,wxID_ANY);
+
+    if (dialog.ShowModal() != wxID_OK)
+       return;
+
+     // really install ?
+    wxMessageDialog msg(this,wxT("Do you really want to create Talkfiles ?"),wxT("Talk file creation"),wxOK|wxCANCEL);
+    if(msg.ShowModal() != wxID_OK )
+        return;
+
+    if(talk.createTalkFiles())
+    {
+          MESG_DIALOG(wxT("Talk files have been successfully created."));
+    }
+    else
+    {
+         ERR_DIALOG(wxT("Talkfile creation failed"), wxT("Talk file creation"));
+    }
+
+    wxLogVerbose(wxT("=== end rbutilFrm::OnTalkBtn"));
 }
 
 int rbutilFrm::GetDeviceId()

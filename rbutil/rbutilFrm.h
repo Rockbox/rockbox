@@ -44,7 +44,6 @@
 #include "rbutilCtrls.h"
 
 
-
 class rbutilFrm : public wxFrame
 {
 private:
@@ -72,6 +71,7 @@ public:
 		wxBitmapButton *WxBitmapButton4;
 		wxBitmapButton *WxBitmapButton5;
 		wxBitmapButton *WxBitmapButton6;
+		wxBitmapButton *WxBitmapButton7;
 		wxFlexGridSizer *WxFlexGridSizer1;
 		wxStaticBoxSizer *WxStaticBoxSizer3;
 		wxStaticBitmap *WxStaticBitmap1;
@@ -96,6 +96,7 @@ public:
             ID_FONT_BTN = 1128,
             ID_THEMES_BTN = 1139,
             ID_DOOM_BTN = 1140,
+            ID_TALK_BTN = 1141,
             ID_BOOTLOADER_BTN = 1129,
 			ID_WXPANEL1 = 1064,
 
@@ -121,6 +122,7 @@ public:
     void OnManualUpdate(wxUpdateUIEvent& event);
     void OnFileProxy(wxCommandEvent& event);
     void OnDoomBtn(wxCommandEvent& event);
+    void OnTalkBtn(wxCommandEvent& event);
 
     int GetDeviceId();
 

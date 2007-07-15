@@ -2,6 +2,7 @@
 #define INSTALL_DIALOGS_H_INCLUDED
 
 #include "rbutil.h"
+#include "talkfile.h"
 
 #include "rbutilCtrls.h"
 class bootloaderInstallDlg : public wxDialog
@@ -41,6 +42,68 @@ private:
     DevicePositionCtrl* m_devicepos;
     FirmwarePositionCtrl* m_firmwarepos;
 
+
+};
+
+class talkInstallDlg : public wxDialog
+{
+    DECLARE_CLASS( talkInstallDlg )
+    DECLARE_EVENT_TABLE()
+public:
+enum {
+			ID_DEVICEPOS = 1002,
+			ID_BROWSE_ENC_BTN = 1003,
+			ID_BROWSE_TTS_BTN = 1004,
+			ID_TTS_CBX = 1005,
+			ID_ENC_CBX = 1006,
+     }; //End of Enum
+public:
+	talkInstallDlg(TalkFileCreator* talkcreator);
+    talkInstallDlg(TalkFileCreator* talkcreator, wxWindow* parent,
+            wxWindowID id = wxID_ANY,
+            const wxString& caption = wxT("Talk file creation"),
+            const wxPoint& pos = wxDefaultPosition,
+            const wxSize& size = wxDefaultSize,
+            long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER  );
+    /// Member initialization
+    void Init();
+    /// Creation
+    bool Create( wxWindow* parent,
+        wxWindowID id = wxID_ANY,
+        const wxString& caption = wxT("Talk file creation"),
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxDefaultSize,
+        long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER  );
+    /// Creates the controls and sizers
+    void CreateControls();
+
+    void OnBrowseEncBtn(wxCommandEvent& event);
+    void OnBrowseTtsBtn(wxCommandEvent& event);
+
+    bool TransferDataFromWindow();
+    bool TransferDataToWindow();
+
+private:
+    TalkFileCreator* m_talkCreator;
+
+     DevicePositionCtrl* m_devicepos;
+
+     wxTextCtrl* m_EncExe;
+     wxButton* m_browseEncBtn;
+     wxTextCtrl* m_EncOpts;
+     wxComboBox* m_Enc;
+
+     wxTextCtrl* m_TtsExe;
+     wxButton* m_browseTtsBtn;
+     wxTextCtrl* m_TtsOpts;
+     wxComboBox* m_Tts;
+
+
+     wxCheckBox* m_OverwriteWave;
+     wxCheckBox* m_OverwriteTalk;
+     wxCheckBox* m_RemoveWave;
+     wxCheckBox* m_Recursive;
+     wxCheckBox* m_StripExtensions;
 
 };
 

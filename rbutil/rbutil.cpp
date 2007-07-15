@@ -101,6 +101,7 @@ bool InstallTheme(wxString Themesrc)
 
 bool checkZip(wxString zipname)
 {
+
     wxZipEntryPtr       entry;
 
     wxFFileInputStream* in_file = new wxFFileInputStream(zipname);
@@ -124,6 +125,7 @@ bool checkZip(wxString zipname)
     }
 
     return false;
+
 }
 
 int DownloadURL(wxString src, wxString dest)
@@ -267,6 +269,7 @@ int DownloadURL(wxString src, wxString dest)
 
 int UnzipFile(wxString src, wxString destdir, bool isInstall)
 {
+
     wxZipEntryPtr       entry;
     wxString            in_str, progress_msg, buf,subdir;
     int                 errnum = 0, curfile = 0, totalfiles = 0;
@@ -328,8 +331,10 @@ int UnzipFile(wxString src, wxString destdir, bool isInstall)
            (entry.reset(in_zip->GetNextEntry()), entry.get() != NULL) )
     {
 
+
         curfile++;
         wxString name = entry->GetName();
+        // set progress
         progress_msg = wxT("Unpacking ") + name;
         if (! progress->Update(curfile, progress_msg) )
         {
@@ -367,6 +372,7 @@ int UnzipFile(wxString src, wxString destdir, bool isInstall)
             continue; // this is just a directory, nothing else to do
         }
 
+        // its a file, copy it
         wxFFileOutputStream* out = new wxFFileOutputStream(in_str);
         if (! out->IsOk() )
         {
@@ -412,6 +418,7 @@ int UnzipFile(wxString src, wxString destdir, bool isInstall)
     if (log) delete log;
     wxLogVerbose(wxT("=== end UnzipFile"));
     return(errnum);
+
 }
 
 int Uninstall(const wxString dir, bool isFullUninstall) {

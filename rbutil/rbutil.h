@@ -124,6 +124,10 @@ public:
     bool                    portable;
     wxString                curresolution;
     wxArrayString           themesToInstall;
+    wxString                pathToTts;
+    wxString                pathToEnc;
+
+
 
     // Global system variables
     wxFFile*                 logfile;
