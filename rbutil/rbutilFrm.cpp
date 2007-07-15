@@ -29,6 +29,7 @@
 #include "icons/rembootloader_btn.h"
 #include "icons/themes_btn.h"
 #include "icons/doom_btn.h"
+#include "icons/talkfile_btn.h"
 
 #include "rblogo.xpm"
 
@@ -220,7 +221,7 @@ void rbutilFrm::CreateGUIControls(void)
 	WxFlexGridSizer2->Add(WxStaticText7, 0,
         wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL,5);
 
-    wxBitmap TalkInstallButton (wxGetBitmapFromMemory(doom_btn_png,doom_btn_png_length));
+    wxBitmap TalkInstallButton (wxGetBitmapFromMemory(talkfile_btn_png,talkfile_btn_png_length));
     WxBitmapButton7 = new wxBitmapButton(themepage, ID_TALK_BTN,
         TalkInstallButton, wxPoint(0,0), wxSize(64,54),
         wxRAISED_BORDER | wxBU_AUTODRAW,wxDefaultValidator, wxT("Create Talk Files"));

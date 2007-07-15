@@ -112,6 +112,9 @@
 		<Unit filename="icons\bootloader_btn.cpp" />
 		<Unit filename="icons\bootloader_btn.h" />
 		<Unit filename="icons\bootloader_btn.png" />
+		<Unit filename="icons\talkfile_btn.cpp" />
+		<Unit filename="icons\talkfile_btn.h" />
+		<Unit filename="icons\talkfile_btn.png" />
 		<Unit filename="icons\doom_btn.cpp" />
 		<Unit filename="icons\doom_btn.h" />
 		<Unit filename="icons\doom_btn.png" />
