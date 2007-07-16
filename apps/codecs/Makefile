@@ -18,6 +18,7 @@ endif
 
 ifdef SOFTWARECODECS
    CODECLIBS = -lspc -lmad -la52 -lffmpegFLAC -lTremor -lwavpack -lmusepack -lalac -lfaad -lm4a -lspeex -ldemac -lwma
+   OUTPUT = libspc libmad liba52 libffmpegFLAC libwma libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac
 endif
 
 # we "borrow" the plugin LDS file
@@ -40,8 +41,6 @@ DIRS = .
 CODECDEPS = $(LINKCODEC) $(BUILDDIR)/libcodec.a
 
 .PHONY: libspc libmad liba52 libffmpegFLAC libTremor libspeex libwavpack libmusepack libalac libfaad libm4a libdemac libwma
-
-OUTPUT = $(SOFTWARECODECS)
 
 all: $(LINKCODEC) $(ROCKS)
 
