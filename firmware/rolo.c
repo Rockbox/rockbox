@@ -98,10 +98,10 @@ extern unsigned short descramble(const unsigned char* source,
 extern void rolo_restart(const unsigned char* source, unsigned char* dest,
                          int length);
 #else
-void rolo_restart(const unsigned char* source, unsigned char* dest,
-                  long length)  __attribute__ ((section (".icode")));
-void rolo_restart(const unsigned char* source, unsigned char* dest,
-                         long length)
+STATICIRAM void rolo_restart(const unsigned char* source, unsigned char* dest,
+                             long length) ICODE_ATTR;
+STATICIRAM void rolo_restart(const unsigned char* source, unsigned char* dest,
+                             long length)
 {
     long i;
     unsigned char* localdest = dest;
@@ -109,6 +109,9 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
     unsigned long* memmapregs = (unsigned long*)0xf000f000;
 #endif
 
+    /* This is the equivalent of a call to memcpy() but this must be done from
+       iram to avoid overwriting itself and we don't want to depend on memcpy()
+       always being in iram */
     for(i = 0;i < length;i++)
         *localdest++ = *source++;
 
