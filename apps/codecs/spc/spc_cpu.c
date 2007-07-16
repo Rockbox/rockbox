@@ -5,6 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
+ * $Id$
  *
  * Copyright (C) 2006-2007 Adam Gashlin (hcs)
  * Copyright (C) 2004-2007 Shay Green (blargg)
@@ -17,9 +18,15 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
- 
+  
 /* The CPU portion (shock!) */
+#include "codec.h"
+#include "codecs.h"
+#include "spc_codec.h"
+#include "spc_profiler.h"
+
+#undef check
+#define check assert
 
 #define READ( addr )            (SPC_read( this, addr, spc_time_ ))
 #define WRITE( addr, value )    (SPC_write( this, addr, value, spc_time_ ))
@@ -103,9 +110,7 @@ enum { st_c = 0x01 };
 #define SET_SP( v )     (sp = RAM + 0x101 + (v))
 #define GET_SP()        (sp - 0x101 - RAM)
 
-static long CPU_run( THIS, long start_time ) ICODE_ATTR;
-
-static long CPU_run( THIS, long start_time )
+long CPU_run( THIS, long start_time )
 {
 #if 0
     ENTER_TIMER(cpu);
@@ -1035,3 +1040,9 @@ out_of_time:
 #endif
     return spc_time_;
 }
+
+void CPU_Init( THIS )
+{
+    ci->memcpy( this->cycle_table, cycle_table, sizeof cycle_table );
+}
+

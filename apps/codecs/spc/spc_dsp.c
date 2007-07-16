@@ -20,196 +20,24 @@
  ****************************************************************************/
 
 /* The DSP portion (awe!) */
+#include "codec.h"
+#include "codecs.h"
+#include "spc_codec.h"
+#include "spc_profiler.h"
 
-enum { voice_count = 8 };
-enum { register_count = 128 };
-
-struct raw_voice_t
-{
-    int8_t  volume [2];
-    uint8_t rate [2];
-    uint8_t waveform;
-    uint8_t adsr [2];   /* envelope rates for attack, decay, and sustain */
-    uint8_t gain;       /* envelope gain (if not using ADSR) */
-    int8_t  envx;       /* current envelope level */
-    int8_t  outx;       /* current sample */
-    int8_t  unused [6];
-};
-    
-struct globals_t
-{
-    int8_t  unused1 [12];
-    int8_t  volume_0;         /* 0C   Main Volume Left (-.7) */
-    int8_t  echo_feedback;    /* 0D   Echo Feedback (-.7) */
-    int8_t  unused2 [14];
-    int8_t  volume_1;         /* 1C   Main Volume Right (-.7) */
-    int8_t  unused3 [15];
-    int8_t  echo_volume_0;    /* 2C   Echo Volume Left (-.7) */
-    uint8_t pitch_mods;       /* 2D   Pitch Modulation on/off for each voice */
-    int8_t  unused4 [14];
-    int8_t  echo_volume_1;    /* 3C   Echo Volume Right (-.7) */
-    uint8_t noise_enables;    /* 3D   Noise output on/off for each voice */
-    int8_t  unused5 [14];
-    uint8_t key_ons;          /* 4C   Key On for each voice */
-    uint8_t echo_ons;         /* 4D   Echo on/off for each voice */
-    int8_t  unused6 [14];
-    uint8_t key_offs;         /* 5C   key off for each voice
-                                      (instantiates release mode) */
-    uint8_t wave_page;        /* 5D   source directory (wave table offsets) */
-    int8_t  unused7 [14];
-    uint8_t flags;            /* 6C   flags and noise freq */
-    uint8_t echo_page;        /* 6D */
-    int8_t  unused8 [14];
-    uint8_t wave_ended;       /* 7C */
-    uint8_t echo_delay;       /* 7D   ms >> 4 */
-    char    unused9 [2];
-};
-
-enum state_t {  /* -1, 0, +1 allows more efficient if statements */
-    state_decay   = -1,
-    state_sustain = 0,
-    state_attack  = +1,
-    state_release = 2
-};
-
-struct cache_entry_t
-{
-    int16_t const* samples;
-    unsigned end; /* past-the-end position */
-    unsigned loop; /* number of samples in loop */
-    unsigned start_addr;
-};
-
-enum { brr_block_size = 16 };
-
-struct voice_t
-{
-#if SPC_BRRCACHE
-    int16_t const* samples;
-    long wave_end;
-    int wave_loop;
-#else
-    int16_t samples [3 + brr_block_size + 1];
-    int block_header; /* header byte from current block */
+#ifdef CPU_COLDFIRE
+static int32_t fir_buf[FIR_BUF_HALF]
+    __attribute__ ((aligned (FIR_BUF_SIZE*2))) IBSS_ATTR;
 #endif
-    uint8_t const* addr;
-    short volume [2];
-    long position;/* position in samples buffer, with 12-bit fraction */
-    short envx;
-    short env_mode;
-    short env_timer;
-    short key_on_delay;
-};
 
 #if SPC_BRRCACHE
 /* a little extra for samples that go past end */
-static int16_t BRRcache [0x20000 + 32];
+int16_t BRRcache [0x20000 + 32];
 #endif
 
-enum { fir_buf_half = 8 };
-
-#ifdef CPU_COLDFIRE
-/* global because of the large aligment requirement for hardware masking -
- * L-R interleaved 16-bit samples for easy loading and mac.w use.
- */
-enum
+void DSP_write( struct Spc_Dsp* this, int i, int data )
 {
-    fir_buf_size = fir_buf_half * sizeof ( int32_t ),
-    fir_buf_mask = ~fir_buf_size
-};
-int32_t fir_buf[fir_buf_half]
-    __attribute__ ((aligned (fir_buf_size*2))) IBSS_ATTR;
-#endif /* CPU_COLDFIRE */
-
-struct Spc_Dsp
-{
-    union
-    {
-        struct raw_voice_t voice [voice_count];
-        uint8_t reg [register_count];
-        struct globals_t g;
-        int16_t align;
-    } r;
-    
-    unsigned echo_pos;
-    int keys_down;
-    int noise_count;
-    uint16_t noise; /* also read as int16_t */
-    
-#ifdef CPU_COLDFIRE
-    /* circularly hardware masked address */
-    int32_t *fir_ptr;
-    /* wrapped address just behind current position -
-       allows mac.w to increment and mask fir_ptr */
-    int32_t *last_fir_ptr;
-    /* copy of echo FIR constants as int16_t for use with mac.w */
-    int16_t fir_coeff[voice_count];
-#else
-    /* fir_buf [i + 8] == fir_buf [i], to avoid wrap checking in FIR code */
-    int fir_pos; /* (0 to 7) */
-    int fir_buf [fir_buf_half * 2] [2];
-    /* copy of echo FIR constants as int, for faster access */
-    int fir_coeff [voice_count]; 
-#endif
-    
-    struct voice_t voice_state [voice_count];
-    
-#if SPC_BRRCACHE
-    uint8_t oldsize;
-    struct cache_entry_t wave_entry     [256];
-    struct cache_entry_t wave_entry_old [256];
-#endif
-};
-
-struct src_dir
-{
-    char start [2];
-    char loop  [2];
-};
-
-static void DSP_reset( struct Spc_Dsp* this )
-{
-    this->keys_down   = 0;
-    this->echo_pos    = 0;
-    this->noise_count = 0;
-    this->noise       = 2;
-    
-    this->r.g.flags   = 0xE0; /* reset, mute, echo off */
-    this->r.g.key_ons = 0;
-    
-    memset( this->voice_state, 0, sizeof this->voice_state );
-    
-    int i;
-    for ( i = voice_count; --i >= 0; )
-    {
-        struct voice_t* v = this->voice_state + i;
-        v->env_mode = state_release;
-        v->addr     = ram.ram;
-    }
-    
-    #if SPC_BRRCACHE
-        this->oldsize = 0;
-        for ( i = 0; i < 256; i++ )
-            this->wave_entry [i].start_addr = -1;
-    #endif
-
-#ifdef CPU_COLDFIRE
-    this->fir_ptr      = fir_buf;
-    this->last_fir_ptr = &fir_buf [7];
-    memset( fir_buf, 0, sizeof fir_buf );
-#else
-    this->fir_pos = 0;
-    memset( this->fir_buf, 0, sizeof this->fir_buf );
-#endif
-
-    assert( offsetof (struct globals_t,unused9 [2]) == register_count );
-    assert( sizeof (this->r.voice) == register_count );
-}
-
-static void DSP_write( struct Spc_Dsp* this, int i, int data ) ICODE_ATTR;
-static void DSP_write( struct Spc_Dsp* this, int i, int data )
-{
-    assert( (unsigned) i < register_count );
+    assert( (unsigned) i < REGISTER_COUNT );
     
     this->r.reg [i] = data;
     int high = i >> 4;
@@ -228,12 +56,6 @@ static void DSP_write( struct Spc_Dsp* this, int i, int data )
     }
 }
 
-static inline int DSP_read( struct Spc_Dsp* this, int i )
-{
-    assert( (unsigned) i < register_count );
-    return this->r.reg [i];
-}
-    
 /* if ( n < -32768 ) out = -32768; */
 /* if ( n >  32767 ) out =  32767; */
 #define CLAMP16( n, out )\
@@ -321,8 +143,8 @@ static void decode_brr( struct Spc_Dsp* this, unsigned start_addr,
             int const left_shift  = left_shifts  [scale];
             
             /* output position */
-            out += brr_block_size;
-            int offset = -brr_block_size << 2;
+            out += BRR_BLOCK_SIZE;
+            int offset = -BRR_BLOCK_SIZE << 2;
             
             do /* decode and filter 16 samples */
             {
@@ -432,10 +254,10 @@ static void key_on(struct Spc_Dsp* const this, struct voice_t* const voice,
         {
             voice->addr = RAM + start_addr;
             /* BRR filter uses previous samples */
-            voice->samples [brr_block_size + 1] = 0;
-            voice->samples [brr_block_size + 2] = 0;
+            voice->samples [BRR_BLOCK_SIZE + 1] = 0;
+            voice->samples [BRR_BLOCK_SIZE + 2] = 0;
             /* decode three samples immediately */
-            voice->position     = (brr_block_size + 3) * 0x1000 - 1;
+            voice->position     = (BRR_BLOCK_SIZE + 3) * 0x1000 - 1;
             voice->block_header = 0; /* "previous" BRR header */
         }
         #else
@@ -460,9 +282,7 @@ static void key_on(struct Spc_Dsp* const this, struct voice_t* const voice,
     }
 }
 
-static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
-    ICODE_ATTR;
-static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
+void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
 {
     #undef RAM
 #ifdef CPU_ARM
@@ -516,7 +336,7 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
     #ifdef ROCKBOX_BIG_ENDIAN
         /* Convert endiannesses before entering loops - these
            get used alot */
-        const uint32_t rates[voice_count] =
+        const uint32_t rates[VOICE_COUNT] =
         {
             GET_LE16A( this->r.voice[0].rate ) & 0x3FFF,
             GET_LE16A( this->r.voice[1].rate ) & 0x3FFF,
@@ -531,7 +351,7 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         #define IF_RBE(...) __VA_ARGS__
     #ifdef CPU_COLDFIRE
         /* Initialize mask register with the buffer address mask */
-        asm volatile ("move.l %[m], %%mask" : : [m]"i"(fir_buf_mask));
+        asm volatile ("move.l %[m], %%mask" : : [m]"i"(FIR_BUF_MASK));
         const int echo_wrap  = (this->r.g.echo_delay & 15) * 0x800;
         const int echo_start = this->r.g.echo_page * 0x100;
     #endif /* CPU_COLDFIRE */
@@ -757,9 +577,9 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
 #endif
             #if !SPC_BRRCACHE
             /* Decode BRR block */
-            if ( voice->position >= brr_block_size * 0x1000 )
+            if ( voice->position >= BRR_BLOCK_SIZE * 0x1000 )
             {
-                voice->position -= brr_block_size * 0x1000;
+                voice->position -= BRR_BLOCK_SIZE * 0x1000;
                 
                 uint8_t const* addr = voice->addr;
                 if ( addr >= RAM + 0x10000 )
@@ -805,13 +625,13 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                 int const left_shift  = left_shifts  [scale];
                 
                 /* previous samples */
-                int smp2 = voice->samples [brr_block_size + 1];
-                int smp1 = voice->samples [brr_block_size + 2];
-                voice->samples [0] = voice->samples [brr_block_size];
+                int smp2 = voice->samples [BRR_BLOCK_SIZE + 1];
+                int smp1 = voice->samples [BRR_BLOCK_SIZE + 2];
+                voice->samples [0] = voice->samples [BRR_BLOCK_SIZE];
                 
                 /* output position */
-                short* out = voice->samples + (1 + brr_block_size);
-                int offset = -brr_block_size << 2;
+                short* out = voice->samples + (1 + BRR_BLOCK_SIZE);
+                int offset = -BRR_BLOCK_SIZE << 2;
                 
                 /* if next block has end flag set,
                    this block ends early (verified) */
@@ -820,9 +640,9 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                     /* arrange for last 9 samples to be skipped */
                     int const skip = 9;
                     out += (skip & 1);
-                    voice->samples [skip] = voice->samples [brr_block_size];
+                    voice->samples [skip] = voice->samples [BRR_BLOCK_SIZE];
                     voice->position += skip * 0x1000;
-                    offset = (-brr_block_size + (skip & ~1)) << 2;
+                    offset = (-BRR_BLOCK_SIZE + (skip & ~1)) << 2;
                     addr -= skip / 2;
                     /* force sample to end on next decode */
                     voice->block_header = 1;
@@ -1026,7 +846,7 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
             "asr.l    %[sh],     %[output]         \r\n"
             "mac.l    %[vvol_0], %[output], %%acc0 \r\n"
             "mac.l    %[vvol_1], %[output], %%acc1 \r\n"
-            : [output]"=&r"(amp_0)
+            : [output]"=&d"(amp_0)
             : [vvol_0]"r"((int)voice->volume[0]),
               [vvol_1]"r"((int)voice->volume[1]),
               [sh]"d"(11)
@@ -1252,12 +1072,12 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         
         /* Keep last 8 samples */
         int (* const fir_ptr) [2] = this->fir_buf + this->fir_pos;
-        this->fir_pos = (this->fir_pos + 1) & (fir_buf_half - 1);
+        this->fir_pos = (this->fir_pos + 1) & (FIR_BUF_HALF - 1);
         fir_ptr [           0] [0] = fb_0;
         fir_ptr [           0] [1] = fb_1;
         /* duplicate at +8 eliminates wrap checking below */
-        fir_ptr [fir_buf_half] [0] = fb_0;
-        fir_ptr [fir_buf_half] [1] = fb_1;
+        fir_ptr [FIR_BUF_HALF] [0] = fb_0;
+        fir_ptr [FIR_BUF_HALF] [1] = fb_1;
         
         /* Apply FIR */
         fb_0 *= this->fir_coeff [0];
@@ -1311,12 +1131,41 @@ static void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
 #endif
 }
 
-static inline void DSP_run( struct Spc_Dsp* this, long count, int32_t* out )
+void DSP_reset( struct Spc_Dsp* this )
 {
-    /* Should we just fill the buffer with silence? Flags won't be cleared */
-    /* during this run so it seems it should keep resetting every sample. */
-    if ( this->r.g.flags & 0x80 )
-        DSP_reset( this );
+    this->keys_down   = 0;
+    this->echo_pos    = 0;
+    this->noise_count = 0;
+    this->noise       = 2;
     
-    DSP_run_( this, count, out );
+    this->r.g.flags   = 0xE0; /* reset, mute, echo off */
+    this->r.g.key_ons = 0;
+    
+    ci->memset( this->voice_state, 0, sizeof this->voice_state );
+    
+    int i;
+    for ( i = VOICE_COUNT; --i >= 0; )
+    {
+        struct voice_t* v = this->voice_state + i;
+        v->env_mode = state_release;
+        v->addr     = ram.ram;
+    }
+    
+    #if SPC_BRRCACHE
+        this->oldsize = 0;
+        for ( i = 0; i < 256; i++ )
+            this->wave_entry [i].start_addr = -1;
+    #endif
+
+#ifdef CPU_COLDFIRE
+    this->fir_ptr      = fir_buf;
+    this->last_fir_ptr = &fir_buf [7];
+    ci->memset( fir_buf, 0, sizeof fir_buf );
+#else
+    this->fir_pos = 0;
+    ci->memset( this->fir_buf, 0, sizeof this->fir_buf );
+#endif
+
+    assert( offsetof (struct globals_t,unused9 [2]) == REGISTER_COUNT );
+    assert( sizeof (this->r.voice) == REGISTER_COUNT );
 }
