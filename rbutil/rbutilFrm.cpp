@@ -341,7 +341,19 @@ void  rbutilFrm::OnManualUpdate(wxUpdateUIEvent& event)
 {
     wxString tmp = wxT("/rockbox-") + gv->curplat;
 
-    int index = GetDeviceId();
+    int index = GetDeviceId(false);
+    if(index < 0) {
+        curManualDevice = tmp;
+        wxString pdflink;
+        pdflink = gv->manual_url;
+        manuallink->SetURL(pdflink);
+        manual->SetPage(wxT("<p><b>no device selected</b> &mdash; "
+            "You can find an overview of available manuals at "
+            "<a href='http://www.rockbox.org/manual.shtml'>"
+            "http://www.rockbox.org/manual.shtml</a></p>"));
+        return;
+    }
+
     if(gv->plat_manualname[index] != wxT(""))
         tmp = wxT("/") + gv->plat_manualname[index];
 
@@ -358,8 +370,10 @@ void  rbutilFrm::OnManualUpdate(wxUpdateUIEvent& event)
     // construct link to html
     wxString htmllink;
     htmllink = gv->manual_url + tmp + wxT("/rockbox-build.html");
-    if(!manual->LoadPage(htmllink))
-        manual->SetPage(wxT("<p>unable to display manual -- please use the PDF link above</p>"));
+    if(gv->proxy_url == wxT(""))
+        if(manual->LoadPage(htmllink)) return;
+    manual->SetPage(wxT("<p>unable to display manual &mdash;"
+        "please use the PDF link above</p>"));
 
 
 }
@@ -456,7 +470,7 @@ void rbutilFrm::OnBootloaderRemoveBtn(wxCommandEvent& event)
 {
     wxLogVerbose(wxT("=== begin rbutilFrm::OnBootloaderRemoveBtn(event)"));
 
-    int index = GetDeviceId();
+    int index = GetDeviceId(true);
     if(index < 0)
         return;
 
@@ -541,7 +555,7 @@ void rbutilFrm::OnBootloaderBtn(wxCommandEvent& event)
 {
     wxLogVerbose(wxT("=== begin rbutilFrm::OnBootloaderBtn(event)"));
 
-    int index = GetDeviceId();
+    int index = GetDeviceId(true);
     if(index < 0)
         return;
 
@@ -654,7 +668,7 @@ void rbutilFrm::OnInstallBtn(wxCommandEvent& event)
     wxFileConfig* buildinfo;
     wxDateSpan oneday;
 
-    int index = GetDeviceId();
+    int index = GetDeviceId(true);
     if(index < 0)
         return;
 
@@ -766,7 +780,7 @@ void rbutilFrm::OnFontBtn(wxCommandEvent& event)
     wxFileConfig* buildinfo;
     wxDateSpan oneday;
 
-    int index = GetDeviceId();
+    int index = GetDeviceId(true);
     if(index < 0)
         return;
 
@@ -855,7 +869,7 @@ void rbutilFrm::OnDoomBtn(wxCommandEvent& event)
     wxString src, dest, buf;
     wxLogVerbose(wxT("=== begin rbutilFrm::OnDoomBtn(event)"));
 
-    int index = GetDeviceId();
+    int index = GetDeviceId(true);
     if(index < 0)
         return;
 
@@ -917,7 +931,7 @@ void rbutilFrm::OnThemesBtn(wxCommandEvent& event)
     wxString src, dest, buf;
     wxLogVerbose(wxT("=== begin rbutilFrm::OnThemesBtn(event)"));
 
-    int index = GetDeviceId();
+    int index = GetDeviceId(true);
     if(index < 0)
         return;
 
@@ -956,7 +970,7 @@ void rbutilFrm::OnRemoveBtn(wxCommandEvent& event)
 {
     wxLogVerbose(wxT("=== begin rbutilFrm::OnRemoveBtn(event)"));
 
-    int index = GetDeviceId();
+    int index = GetDeviceId(true);
     if(index < 0)
         return;
 
@@ -995,7 +1009,7 @@ void rbutilFrm::OnPortableInstall(wxCommandEvent& event)
     wxFileSystem fs;
     wxDateSpan oneday;
 
-    int index = GetDeviceId();
+    int index = GetDeviceId(true);
     if(index < 0)
         return;
 
@@ -1050,10 +1064,10 @@ void rbutilFrm::OnTalkBtn(wxCommandEvent& event)
     wxLogVerbose(wxT("=== end rbutilFrm::OnTalkBtn"));
 }
 
-int rbutilFrm::GetDeviceId()
+int rbutilFrm::GetDeviceId(bool detect)
 {
     int index = gv->plat_id.Index(gv->curplat);
-    if(index < 0)
+    if(index < 0 && detect)
     {
         if( wxMessageBox(wxT("No device selected. Do you want to autodetect "
                          "the device?"),

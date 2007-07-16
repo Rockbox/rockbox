@@ -124,7 +124,7 @@ public:
     void OnDoomBtn(wxCommandEvent& event);
     void OnTalkBtn(wxCommandEvent& event);
 
-    int GetDeviceId();
+    int GetDeviceId(bool);
 
 };
 
