@@ -37,12 +37,12 @@ public:
     void setEncexe(wxString exe){m_EncExec=exe;}
 
     wxArrayString getSupportedTTS(){return m_supportedTTS;}
-    bool setTTsType(wxString tts) {m_curTTS = tts; }
+    void setTTsType(wxString tts) {m_curTTS = tts; }
     wxString getTTsOpts(wxString ttsname);
     void setTTsOpts(wxString opts) {m_TTSOpts=opts;}
 
     wxArrayString getSupportedEnc(){return m_supportedEnc;}
-    bool setEncType(wxString enc) {m_curEnc =enc; }
+    void setEncType(wxString enc) {m_curEnc =enc; }
     wxString getEncOpts(wxString encname);
     void setEncOpts(wxString opts) {m_EncOpts=opts;}
 
