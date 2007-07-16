@@ -521,7 +521,7 @@ bool rectrigger(void)
     while (!exit_request) {
         int button, k;
         const char *str;
-        char option_value[TRIG_OPTION_COUNT][9];
+        char option_value[TRIG_OPTION_COUNT][13];
 
         snprintf(
             option_value[TRIGGER_MODE],
