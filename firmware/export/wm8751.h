@@ -78,17 +78,6 @@ extern void audiohw_set_frequency(int fsel);
 
 #define CLOCKING                    0x08
 #define CLOCKING_SR_USB             (1 << 0)
-/* Register settings for the supported samplerates: */
-#define WM8975_8000HZ               0x4d
-#define WM8975_12000HZ              0x61
-#define WM8975_16000HZ              0x55
-#define WM8975_22050HZ              0x77
-#define WM8975_24000HZ              0x79
-#define WM8975_32000HZ              0x59
-#define WM8975_44100HZ              0x63
-#define WM8975_48000HZ              0x41
-#define WM8975_88200HZ              0x7f
-#define WM8975_96000HZ              0x5d
 #define CLOCKING_SR(x)              ((x) & (0x1f << 1))
 #define CLOCKING_MCLK_DIV2          (1 << 6)
 #define CLOCKING_BCLK_DIV2          (1 << 7)
@@ -103,12 +92,12 @@ extern void audiohw_set_frequency(int fsel);
 
 #define BASSCTRL                    0x0c
 #define BASSCTRL_BASS(x)            ((x) & 0xf)
-#define BASSCTRL_BC                 (1 << 7)
-#define BASSCTRL_BB                 (1 << 8)
+#define BASSCTRL_BC                 (1 << 6)
+#define BASSCTRL_BB                 (1 << 7)
 
 #define TREBCTRL                    0x0d
 #define TREBCTRL_TREB(x)            ((x) & 0xf)
-#define TREBCTRL_TC                 (1 << 7)
+#define TREBCTRL_TC                 (1 << 6)
 
 #define RESET                       0x0f
 #define RESET_RESET                 0x000
@@ -126,11 +115,19 @@ extern void audiohw_set_frequency(int fsel);
 #define ADDITIONAL1_VSEL_DEFAULT2   (2 << 6)
 #define ADDITIONAL1_VSEL_DEFAULT    (3 << 6)
 #define ADDITIONAL1_VSEL(x)         ((x) & (0x3 << 6))
-#define ADDITIONAL1_TSDEN           (1 << 7)
+#define ADDITIONAL1_TSDEN           (1 << 8)
 
 #define ADDITIONAL2                 0x18
-#define ADDITIONAL2_ROUT2INV        (1 << 4)
 #define ADDITIONAL2_DACOSR          (1 << 0)
+#define ADDITIONAL2_HPSWZC          (1 << 3)
+#define ADDITIONAL2_ROUT2INV        (1 << 4)
+#define ADDITIONAL2_HPSWPOL         (1 << 5)
+#define ADDITIONAL2_HPSWEN          (1 << 6)
+#define ADDITIONAL2_OUT3SW_VREF     (0 << 7)
+#define ADDITIONAL2_OUT3SW_ROUT1    (1 << 7)
+#define ADDITIONAL2_OUT3SW_MONOOUT  (2 << 7)
+#define ADDITIONAL2_OUT3SW_R_MIX_OUT (3 << 7)
+#define ADDITIONAL2_OUT3SW(x)       ((x) & (0x3 << 7))
 
 #define PWRMGMT1                    0x19
 #define PWRMGMT1_DIGENB             (1 << 0)
@@ -142,54 +139,54 @@ extern void audiohw_set_frequency(int fsel);
 #define PWRMGMT1_VMIDSEL(x)         ((x) & (0x3 << 7))
 
 #define PWRMGMT2                    0x1a
-#define PWRMGMT2_DACL               (1 << 8)
-#define PWRMGMT2_DACR               (1 << 7)
-#define PWRMGMT2_LOUT1              (1 << 6)
-#define PWRMGMT2_ROUT1              (1 << 5)
-#define PWRMGMT2_LOUT2              (1 << 4)
-#define PWRMGMT2_ROUT2              (1 << 3)
-#define PWRMGMT2_MOUT               (1 << 2)
 #define PWRMGMT2_OUT3               (1 << 1)
+#define PWRMGMT2_MOUT               (1 << 2)
+#define PWRMGMT2_ROUT2              (1 << 3)
+#define PWRMGMT2_LOUT2              (1 << 4)
+#define PWRMGMT2_ROUT1              (1 << 5)
+#define PWRMGMT2_LOUT1              (1 << 6)
+#define PWRMGMT2_DACR               (1 << 7)
+#define PWRMGMT2_DACL               (1 << 8)
 
 #define ADDITIONAL3                 0x1b
 #define ADDITIONAL3_ADCLRM          ((x) & (0x3 << 7))
-#define ADDITIONAL3_VROI            (1 << 6)
 #define ADDITIONAL3_HPFLREN         (1 << 5)
+#define ADDITIONAL3_VROI            (1 << 6)
 
 #define LEFTMIX1                    0x22
-#define LEFTMIX1_LD2LO              (1 << 8)
-#define LEFTMIX1_LI2LO              (1 << 7)
 #define LEFTMIX1_LI2LO_DEFAULT      (5 << 4)
 #define LEFTMIX1_LI2LOVOL(x)        ((x) & (0x7 << 4))
+#define LEFTMIX1_LI2LO              (1 << 7)
+#define LEFTMIX1_LD2LO              (1 << 8)
 
 #define LEFTMIX2                    0x23
-#define LEFTMIX2_RD2LO              (1 << 8)
-#define LEFTMIX2_MI2LO              (1 << 7)
 #define LEFTMIX2_MI2LO_DEFAULT      (5 << 4)
 #define LEFTMIX2_MI2LOVOL(x)        ((x) & (0x7 << 4))
+#define LEFTMIX2_MI2LO              (1 << 7)
+#define LEFTMIX2_RD2LO              (1 << 8)
 
 #define RIGHTMIX1                   0x24
-#define RIGHTMIX1_LD2RO             (1 << 8)
-#define RIGHTMIX1_MI2RO             (1 << 7)
 #define RIGHTMIX1_MI2RO_DEFAULT     (5 << 4)
 #define RIGHTMIX1_MI2ROVOL(x)       ((x) & (0x7 << 4))
+#define RIGHTMIX1_MI2RO             (1 << 7)
+#define RIGHTMIX1_LD2RO             (1 << 8)
 
 #define RIGHTMIX2                   0x25
-#define RIGHTMIX2_RD2RO             (1 << 8)
-#define RIGHTMIX2_RI2RO             (1 << 7)
 #define RIGHTMIX2_RI2RO_DEFAULT     (5 << 4)
 #define RIGHTMIX2_RI2ROVOL(x)       ((x) & (0x7 << 4))
+#define RIGHTMIX2_RI2RO             (1 << 7)
+#define RIGHTMIX2_RD2RO             (1 << 8)
 
 #define MONOMIX1                    0x26
+#define MONOMIX1_DMEN               (1 << 0)
 #define MONOMIX1_LI2MOVOL(x)        ((x) & (0x7 << 4))
 #define MONOMIX1_LI2MO              (1 << 7)
 #define MONOMIX1_LD2MO              (1 << 8)
-#define MONOMIX1_DMEN               (1 << 0)
 
 #define MONOMIX2                    0x27
-#define MONOMIX2_RD2MO              (1 << 8)
-#define MONOMIX2_RI2MO              (1 << 7)
 #define MONOMIX2_RI2MOVOL(x)        ((x) & (0x7 << 4))
+#define MONOMIX2_RI2MO              (1 << 7)
+#define MONOMIX2_RD2MO              (1 << 8)
 
 #define LOUT2                       0x28
 #define LOUT2_LOUT2VOL(x)           ((x) & 0x7f)
