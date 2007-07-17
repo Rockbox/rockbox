@@ -98,10 +98,13 @@ extern unsigned short descramble(const unsigned char* source,
 extern void rolo_restart(const unsigned char* source, unsigned char* dest,
                          int length);
 #else
-STATICIRAM void rolo_restart(const unsigned char* source, unsigned char* dest,
-                             long length) ICODE_ATTR;
-STATICIRAM void rolo_restart(const unsigned char* source, unsigned char* dest,
-                             long length)
+
+/* explicitly put this code in iram, ICODE_ATTR is defined to be null for some
+   targets that are low on iram, like the gigabeat F/X */
+void rolo_restart(const unsigned char* source, unsigned char* dest,
+                  long length) __attribute__ ((section(".icode")));
+void rolo_restart(const unsigned char* source, unsigned char* dest,
+                  long length)
 {
     long i;
     unsigned char* localdest = dest;
