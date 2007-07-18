@@ -29,7 +29,7 @@ CODEC_HEADER
 
 static uint16_t decoded[BLOCK_MAX_SIZE * MAX_CHANNELS];
 
-/* NOTE: WMADecodeContext is 142688 bytes (on x86) */
+/* NOTE: WMADecodeContext is 120152 bytes (on x86) */
 static WMADecodeContext wmadec;
 
 enum asf_error_e {
@@ -211,7 +211,8 @@ static int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlen
            relatively small packets less than about 8KB), but I don't
            know what is expected.
         */
-        DEBUGF("Could not read packet (%d bytes), aborting\n",(int)length);
+        DEBUGF("Could not read packet (requested %d bytes, received %d), curpos=%d, aborting\n",
+               (int)length,(int)bufsize,(int)ci->curpos);
         return -1;
     }
 
