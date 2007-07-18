@@ -22,58 +22,8 @@
 #include "plugin.h"
 
 #ifdef HAVE_LCD_BITMAP
-
+#include "pluginlib_actions.h"
 PLUGIN_HEADER
-
-/* Key assignement */
-#if (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-    (CONFIG_KEYPAD == IPOD_3G_PAD)
-#define DEMYSTIFY_QUIT BUTTON_MENU
-#define DEMYSTIFY_ADD_POLYGON BUTTON_RIGHT
-#define DEMYSTIFY_REMOVE_POLYGON BUTTON_LEFT
-#define DEMYSTIFY_INCREASE_SPEED BUTTON_SCROLL_FWD
-#define DEMYSTIFY_DECREASE_SPEED BUTTON_SCROLL_BACK
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD)
-#define DEMYSTIFY_QUIT                  BUTTON_POWER
-#define DEMYSTIFY_ADD_POLYGON           BUTTON_RIGHT
-#define DEMYSTIFY_REMOVE_POLYGON        BUTTON_LEFT
-#define DEMYSTIFY_INCREASE_SPEED        BUTTON_SCROLL_DOWN
-#define DEMYSTIFY_INCREASE_SPEED_REP    (BUTTON_SCROLL_DOWN|BUTTON_REPEAT)
-#define DEMYSTIFY_DECREASE_SPEED        BUTTON_SCROLL_UP
-#define DEMYSTIFY_DECREASE_SPEED_REP    (BUTTON_SCROLL_UP|BUTTON_REPEAT)
-#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
-#define DEMYSTIFY_QUIT BUTTON_POWER
-#define DEMYSTIFY_ADD_POLYGON BUTTON_RIGHT
-#define DEMYSTIFY_REMOVE_POLYGON BUTTON_LEFT
-#define DEMYSTIFY_INCREASE_SPEED BUTTON_SCROLL_UP
-#define DEMYSTIFY_DECREASE_SPEED BUTTON_SCROLL_DOWN
-#elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
-#define DEMYSTIFY_QUIT BUTTON_POWER
-#define DEMYSTIFY_ADD_POLYGON BUTTON_RIGHT
-#define DEMYSTIFY_REMOVE_POLYGON BUTTON_LEFT
-#define DEMYSTIFY_INCREASE_SPEED BUTTON_UP
-#define DEMYSTIFY_DECREASE_SPEED BUTTON_DOWN
-#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
-#define DEMYSTIFY_QUIT BUTTON_POWER
-#define DEMYSTIFY_ADD_POLYGON BUTTON_RIGHT
-#define DEMYSTIFY_REMOVE_POLYGON BUTTON_LEFT
-#define DEMYSTIFY_INCREASE_SPEED BUTTON_UP
-#define DEMYSTIFY_DECREASE_SPEED BUTTON_DOWN
-#else
-#define DEMYSTIFY_QUIT BUTTON_OFF
-#define DEMYSTIFY_ADD_POLYGON BUTTON_UP
-#define DEMYSTIFY_REMOVE_POLYGON BUTTON_DOWN
-#define DEMYSTIFY_INCREASE_SPEED BUTTON_RIGHT
-#define DEMYSTIFY_DECREASE_SPEED BUTTON_LEFT
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
-      (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define DEMYSTIFY_RC_QUIT BUTTON_RC_STOP
-#define DEMYSTIFY_RC_ADD_POLYGON BUTTON_RC_BITRATE
-#define DEMYSTIFY_RC_REMOVE_POLYGON BUTTON_RC_SOURCE
-#define DEMYSTIFY_RC_INCREASE_SPEED BUTTON_RC_VOL_UP
-#define DEMYSTIFY_RC_DECREASE_SPEED BUTTON_RC_VOL_DOWN
-#endif
-#endif
 
 #define DEFAULT_WAIT_TIME 3
 #define DEFAULT_NB_POLYGONS 7
@@ -83,8 +33,28 @@ PLUGIN_HEADER
 #define MAX_POLYGONS 40
 #define MIN_POLYGONS 1
 
+/* Key assignement */
+#define DEMYSTIFY_QUIT PLA_QUIT
+
+#define DEMYSTIFY_INCREASE_SPEED PLA_RIGHT
+#define DEMYSTIFY_DECREASE_SPEED PLA_LEFT
+#define DEMYSTIFY_INCREASE_SPEED_REPEAT PLA_RIGHT_REPEAT
+#define DEMYSTIFY_DECREASE_SPEED_REPEAT PLA_LEFT_REPEAT
+
+#define DEMYSTIFY_ADD_POLYGON PLA_UP
+#define DEMYSTIFY_REMOVE_POLYGON PLA_DOWN
+#define DEMYSTIFY_ADD_POLYGON_REPEAT PLA_UP_REPEAT
+#define DEMYSTIFY_REMOVE_POLYGON_REPEAT PLA_DOWN_REPEAT
+
+const struct button_mapping *plugin_contexts[]
+= {generic_directions, generic_actions};
+
 #ifdef HAVE_LCD_COLOR
-int r,g,b,rc,gc,bc;
+struct line_color
+{
+    int r,g,b;
+    int current_r,current_g,current_b;
+};
 #endif
 
 /******************************* Globals ***********************************/
@@ -287,31 +257,44 @@ void cleanup(void *parameter)
 }
 
 #ifdef HAVE_LCD_COLOR
-void new_color(void)
+void color_randomize(struct line_color * color)
 {
-    r = rb->rand()%255;
-    g = rb->rand()%255;
-    b = rb->rand()%255;
+    color->r = rb->rand()%255;
+    color->g = rb->rand()%255;
+    color->b = rb->rand()%255;
 }
 
-void change_color(void)
+void color_init(struct line_color * color)
 {
-    if(rc<r)
-        ++rc;
-    else if(rc>r)
-        --rc;
-    if(gc<g)
-        ++gc;
-    else if(gc>g)
-        --gc;
-    if(bc<b)
-        ++bc;
-    else if(bc>b)
-        --bc;
-    rb->lcd_set_foreground(LCD_RGBPACK(rc,gc,bc));
-    if(rc==r && gc==g && bc==b)
-        new_color();
+    color_randomize(color);
+    color->current_r=color->r;
+    color->current_g=color->g;
+    color->current_b=color->b;
 }
+
+void color_change(struct line_color * color)
+{
+    if(color->current_r<color->r)
+        ++color->current_r;
+    else if(color->current_r>color->r)
+        --color->current_r;
+    if(color->current_g<color->g)
+        ++color->current_g;
+    else if(color->current_g>color->g)
+        --color->current_g;
+    if(color->current_b<color->b)
+        ++color->current_b;
+    else if(color->current_b>color->b)
+        --color->current_b;
+
+    if(color->current_r==color->r &&
+       color->current_g==color->g &&
+       color->current_b==color->b)
+        color_randomize(color);
+}
+
+#define COLOR_RGBPACK(color) LCD_RGBPACK((color)->current_r, (color)->current_g, (color)->current_b)
+
 #endif
 
 /*
@@ -320,7 +303,7 @@ void change_color(void)
 
 int plugin_main(void)
 {
-    int button;
+    int action;
     int sleep_time=DEFAULT_WAIT_TIME;
     int nb_wanted_polygons=DEFAULT_NB_POLYGONS;
     int i;
@@ -332,7 +315,7 @@ int plugin_main(void)
     {
 #ifdef HAVE_LCD_COLOR
         struct screen *display = rb->screens[i];
-        if (display->depth > 8)
+        if (display->is_color)
             display->set_background(LCD_BLACK);
 #endif
         fifo_init(&polygons[i]);
@@ -341,10 +324,8 @@ int plugin_main(void)
     }
 
 #ifdef HAVE_LCD_COLOR
-    new_color();
-    rc = r;
-    gc = g;
-    bc = b;
+    struct line_color color;
+    color_init(&color);
 #endif
 
     while (true)
@@ -373,16 +354,18 @@ int plugin_main(void)
             /* Now the drawing part */
 
 #ifdef HAVE_LCD_COLOR
-            if (display->depth > 8)
-                display->set_foreground(SCREEN_COLOR_TO_NATIVE(display,
-                                        LCD_RGBPACK(rc, gc, bc)));
+            if (display->is_color){
+                unsigned foreground=
+                    SCREEN_COLOR_TO_NATIVE(display,COLOR_RGBPACK(&color));
+                display->set_foreground(foreground);
+            }
 #endif
             display->clear_display();
             polygons_draw(&polygons[i], display);
             display->update();
         }
 #ifdef HAVE_LCD_COLOR
-        change_color();
+        color_change(&color);
 #endif
         /* Speed handling*/
         if (sleep_time<0)/* full speed */
@@ -390,55 +373,38 @@ int plugin_main(void)
         else
             rb->sleep(sleep_time);
 
-        /* Handle the user events */
-        button = rb->button_get(false);
-        switch(button)
+        action = pluginlib_getaction(rb, TIMEOUT_NOBLOCK, plugin_contexts, 2);
+        switch(action)
         {
-#ifdef DEMYSTIFY_RC_QUIT
-            case DEMYSTIFY_RC_QUIT :
-#endif
             case DEMYSTIFY_QUIT:
                 cleanup(NULL);
                 return PLUGIN_OK;
-#ifdef DEMYSTIFY_RC_ADD_POLYGON
-            case DEMYSTIFY_RC_ADD_POLYGON:
-#endif
+
             case DEMYSTIFY_ADD_POLYGON:
+            case DEMYSTIFY_ADD_POLYGON_REPEAT:
                 if(nb_wanted_polygons<MAX_POLYGONS)
                     ++nb_wanted_polygons;
                 break;
 
-#ifdef DEMYSTIFY_RC_REMOVE_POLYGON
-            case DEMYSTIFY_RC_REMOVE_POLYGON:
-#endif
             case DEMYSTIFY_REMOVE_POLYGON:
+            case DEMYSTIFY_REMOVE_POLYGON_REPEAT:
                 if(nb_wanted_polygons>MIN_POLYGONS)
                     --nb_wanted_polygons;
                 break;
 
-#ifdef DEMYSTIFY_RC_INCREASE_SPEED
-            case DEMYSTIFY_RC_INCREASE_SPEED:
-#endif
-#ifdef DEMYSTIFY_INCREASE_SPEED_REP
-            case DEMYSTIFY_INCREASE_SPEED_REP:
-#endif
             case DEMYSTIFY_INCREASE_SPEED:
+            case DEMYSTIFY_INCREASE_SPEED_REPEAT:
                 if(sleep_time>=0)
                     --sleep_time;
                 break;
 
-#ifdef DEMYSTIFY_RC_DECREASE_SPEED
-            case DEMYSTIFY_RC_DECREASE_SPEED:
-#endif
-#ifdef DEMYSTIFY_DECREASE_SPEED_REP
-            case DEMYSTIFY_DECREASE_SPEED_REP:
-#endif
             case DEMYSTIFY_DECREASE_SPEED:
+            case DEMYSTIFY_DECREASE_SPEED_REPEAT:
                 ++sleep_time;
                 break;
 
             default:
-                if (rb->default_event_handler_ex(button, cleanup, NULL)
+                if (rb->default_event_handler_ex(action, cleanup, NULL)
                     == SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
                 break;

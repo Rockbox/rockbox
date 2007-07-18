@@ -57,6 +57,7 @@ struct screen
     int nb_lines;
     enum screen_type screen_type;
     int depth;
+    bool is_color;
     int char_width;
     int char_height;
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
