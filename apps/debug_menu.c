@@ -357,9 +357,7 @@ static bool dbg_audio_thread(void)
                 done = true;
                 break;
         }
-        action_signalscreenchange();
         line = 0;
-
         lcd_clear_display();
 
         bufused = bufsize - pcmbuf_free();
@@ -404,6 +402,7 @@ static bool dbg_audio_thread(void)
 
     tick_remove_task(dbg_audio_task);
 
+    action_signalscreenchange();
     return false;
 }
 #endif /* CONFIG_CODEC */
