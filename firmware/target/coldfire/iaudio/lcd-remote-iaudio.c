@@ -172,77 +172,72 @@ static inline void _write_fast(unsigned data)
         "swap    %[data]             \n"  /* Shift data to upper byte */
         "lsl.l   #8, %[data]         \n"
         
+        "move.l  %%d0, %%d1          \n"  /* precalculate opposite state of clock line */
+        "eor.l   %[cbit], %%d1       \n"
+        
         "lsl.l   #1,%[data]          \n"  /* Shift out MSB */
         "bcc.s   1f                  \n"
         "eor.l   %[dbit], %%d0       \n"  /* 1: Flip data bit */
+        "eor.l   %[dbit], %%d1       \n"  /*   for both clock states */
     "1:                              \n"
-        "eor.l   %[cbit], %%d0       \n"  /* Flip clock bit */
-        "move.l  %%d0, (%[gpo0])     \n"  /* Output new state */
-        "eor.l   %[cbit], %%d0       \n"  /* Flip clock bit */
-        "move.l  %%d0, (%[gpo0])     \n"  /* Output new state */
+        "move.l  %%d1, (%[gpo0])     \n"  /* Output new state and set CLK */
+        "move.l  %%d0, (%[gpo0])     \n"  /* reset CLK */
 
         "lsl.l   #1,%[data]          \n"  /* ..unrolled.. */
         "bcc.s   1f                  \n"
         "eor.l   %[dbit], %%d0       \n"
+        "eor.l   %[dbit], %%d1       \n"
     "1:                              \n"
-        "eor.l   %[cbit], %%d0       \n"
-        "move.l  %%d0, (%[gpo0])     \n"
-        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d1, (%[gpo0])     \n"
         "move.l  %%d0, (%[gpo0])     \n"
 
         "lsl.l   #1,%[data]          \n"
         "bcc.s   1f                  \n"
         "eor.l   %[dbit], %%d0       \n"
+        "eor.l   %[dbit], %%d1       \n"
     "1:                              \n"
-        "eor.l   %[cbit], %%d0       \n"
-        "move.l  %%d0, (%[gpo0])     \n"
-        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d1, (%[gpo0])     \n"
         "move.l  %%d0, (%[gpo0])     \n"
 
         "lsl.l   #1,%[data]          \n"
         "bcc.s   1f                  \n"
         "eor.l   %[dbit], %%d0       \n"
+        "eor.l   %[dbit], %%d1       \n"
     "1:                              \n"
-        "eor.l   %[cbit], %%d0       \n"
-        "move.l  %%d0, (%[gpo0])     \n"
-        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d1, (%[gpo0])     \n"
         "move.l  %%d0, (%[gpo0])     \n"
 
         "lsl.l   #1,%[data]          \n"
         "bcc.s   1f                  \n"
         "eor.l   %[dbit], %%d0       \n"
+        "eor.l   %[dbit], %%d1       \n"
     "1:                              \n"
-        "eor.l   %[cbit], %%d0       \n"
-        "move.l  %%d0, (%[gpo0])     \n"
-        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d1, (%[gpo0])     \n"
         "move.l  %%d0, (%[gpo0])     \n"
 
         "lsl.l   #1,%[data]          \n"
         "bcc.s   1f                  \n"
         "eor.l   %[dbit], %%d0       \n"
+        "eor.l   %[dbit], %%d1       \n"
     "1:                              \n"
-        "eor.l   %[cbit], %%d0       \n"
-        "move.l  %%d0, (%[gpo0])     \n"
-        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d1, (%[gpo0])     \n"
         "move.l  %%d0, (%[gpo0])     \n"
 
         "lsl.l   #1,%[data]          \n"
         "bcc.s   1f                  \n"
         "eor.l   %[dbit], %%d0       \n"
+        "eor.l   %[dbit], %%d1       \n"
     "1:                              \n"
-        "eor.l   %[cbit], %%d0       \n"
-        "move.l  %%d0, (%[gpo0])     \n"
-        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d1, (%[gpo0])     \n"
         "move.l  %%d0, (%[gpo0])     \n"
 
         "lsl.l   #1,%[data]          \n"
         "bcc.s   1f                  \n"
         "eor.l   %[dbit], %%d0       \n"
+        "eor.l   %[dbit], %%d1       \n"
     "1:                              \n"
-        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d1, (%[gpo0])     \n"
         "move.l  %%d0, (%[gpo0])     \n"
-        "eor.l   %[cbit], %%d0       \n"
-        "move.l  %%d0, (%[gpo0])     \n"  
 
         "move.w  %%d3, %%sr          \n" /* Restore interrupt level */
         : /* outputs */
