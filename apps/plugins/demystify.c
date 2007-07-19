@@ -47,7 +47,11 @@ PLUGIN_HEADER
 #define DEMYSTIFY_REMOVE_POLYGON_REPEAT PLA_DOWN_REPEAT
 
 const struct button_mapping *plugin_contexts[]
-= {generic_directions, generic_actions};
+= {generic_directions, generic_actions,
+#if defined(HAVE_REMOTE_LCD)
+    remote_directions
+#endif
+};
 
 #ifdef HAVE_LCD_COLOR
 struct line_color
@@ -293,8 +297,17 @@ void color_change(struct line_color * color)
         color_randomize(color);
 }
 
-#define COLOR_RGBPACK(color) LCD_RGBPACK((color)->current_r, (color)->current_g, (color)->current_b)
+#define COLOR_RGBPACK(color) \
+    LCD_RGBPACK((color)->current_r, (color)->current_g, (color)->current_b)
 
+void color_apply(struct line_color * color, struct screen * display)
+{
+    if (display->is_color){
+        unsigned foreground=
+            SCREEN_COLOR_TO_NATIVE(display,COLOR_RGBPACK(color));
+        display->set_foreground(foreground);
+    }
+}
 #endif
 
 /*
@@ -352,13 +365,8 @@ int plugin_main(void)
             polygon_update(&leading_polygon[i], display, &move[i]);
 
             /* Now the drawing part */
-
 #ifdef HAVE_LCD_COLOR
-            if (display->is_color){
-                unsigned foreground=
-                    SCREEN_COLOR_TO_NATIVE(display,COLOR_RGBPACK(&color));
-                display->set_foreground(foreground);
-            }
+            color_apply(&color, display);
 #endif
             display->clear_display();
             polygons_draw(&polygons[i], display);
@@ -373,7 +381,7 @@ int plugin_main(void)
         else
             rb->sleep(sleep_time);
 
-        action = pluginlib_getaction(rb, TIMEOUT_NOBLOCK, plugin_contexts, 2);
+        action = pluginlib_getaction(rb, TIMEOUT_NOBLOCK, plugin_contexts, 3);
         switch(action)
         {
             case DEMYSTIFY_QUIT:
