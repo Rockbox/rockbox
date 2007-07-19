@@ -424,23 +424,18 @@ bool option_screen(struct settings_list *setting, bool use_temp_var)
             function(*variable);
     }
     
-    if (use_temp_var)
+    if (oldvalue != *variable)
     {
-        if (var_type == F_T_INT || var_type == F_T_UINT)
+        if (use_temp_var)
         {
-            if (oldvalue != *variable)
-            {
+            if (var_type == F_T_INT || var_type == F_T_UINT)
                 *(int*)setting->setting = *variable;
-                settings_save();
-            }
+            else 
+                *(bool*)setting->setting = *variable?true:false;
         }
-        else if (oldvalue != *variable)
-        {
-            *(bool*)setting->setting = *variable?true:false;
-            settings_save();
-        }
+        settings_save();
     }
-
+    
     action_signalscreenchange();
     return false;
 }
