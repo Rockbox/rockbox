@@ -52,7 +52,8 @@ const struct button_mapping *plugin_contexts[]
     remote_directions
 #endif
 };
-
+#define NB_ACTION_CONTEXTS \
+    sizeof(plugin_contexts)/sizeof(struct button_mapping*)
 #ifdef HAVE_LCD_COLOR
 struct line_color
 {
@@ -380,8 +381,8 @@ int plugin_main(void)
             rb->yield();
         else
             rb->sleep(sleep_time);
-
-        action = pluginlib_getaction(rb, TIMEOUT_NOBLOCK, plugin_contexts, 3);
+        action = pluginlib_getaction(rb, TIMEOUT_NOBLOCK,
+                                     plugin_contexts, NB_ACTION_CONTEXTS);
         switch(action)
         {
             case DEMYSTIFY_QUIT:
