@@ -12,6 +12,7 @@ decompressor/*.lds
 drivers/*.[chS]
 drivers/audio/*.[chS]
 drivers/rtc/*.[chS]
+drivers/tuner/*.[chS]
 export/*.h
 include/*.h
 include/sys/*.h
