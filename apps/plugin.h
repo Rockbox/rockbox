@@ -610,13 +610,11 @@ struct plugin_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
-#if NUM_CORES > 1
+#if (CONFIG_CODEC == SWCODEC)
     void (*spinlock_init)(struct mutex *m);
     void (*spinlock_lock)(struct mutex *m);
     void (*spinlock_unlock)(struct mutex *m);
-#endif
 
-#if (CONFIG_CODEC == SWCODEC)
     int (*codec_load_file)(const char* codec, struct codec_api *api);
     const char *(*get_codec_filename)(int cod_spec);
     bool (*get_metadata)(struct track_info* track, int fd, const char* trackname,

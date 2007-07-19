@@ -488,13 +488,12 @@ static const struct plugin_api rockbox_api = {
 #endif
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-#if NUM_CORES > 1
+
+#if (CONFIG_CODEC == SWCODEC)
     spinlock_init,
     spinlock_lock,
     spinlock_unlock,
-#endif
 
-#if (CONFIG_CODEC == SWCODEC)
     codec_load_file,
     get_codec_filename,
     get_metadata,

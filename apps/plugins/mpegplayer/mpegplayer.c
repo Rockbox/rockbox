@@ -169,38 +169,16 @@ static int total_offset = 0;
 static int num_drawn = 0;
 static int count_start = 0;
 
-/* Utility */
-
-/* Atomically add one long value to another - not core safe atm if ever needed */
-static inline void locked_add_long(volatile long *value, long amount)
-{
-#if defined (CPU_ARM)
-    /* Disable the fiq - this cuts an instruction out over using the
-       system functions */
-    long cpsr, x;
-    asm volatile (
-        "mrs    %[sr], cpsr           \r\n"
-        "orr    %[sr], %[sr], #0x40   \r\n"
-        "msr    cpsr_c, %[sr]         \r\n"
-        "ldr    %[x], [%[value]]      \r\n"
-        "add    %[x], %[x], %[amount] \r\n"
-        "str    %[x], [%[value]]      \r\n"
-        "bic    %[sr], %[sr], #0x40   \r\n"
-        "msr    cpsr_c, %[sr]         \r\n"
-        : [sr]"=&r"(cpsr), [x]"=&r"(x)
-        : [value]"r"(value), [amount]"r"(amount)
-        );
-#elif defined (CPU_COLDFIRE)
-    add_l(amount, value);
-#else
-    /* Don't know what this is so can't lock it */
-    *value += amount;
-#endif
-}
-
 /* Streams */
 typedef struct
 {
+    struct thread_entry *thread; /* Stream's thread */
+    int      status;             /* Current stream status */
+    struct   event ev;           /* Event sent to steam */
+    int      have_msg;           /* 1=event pending */
+    int      replied;            /* 1=replied to last event */
+    int      reply;              /* reply value */
+    struct mutex msg_lock;       /* serialization for event senders */
     uint8_t* curr_packet;        /* Current stream packet beginning */
     uint8_t* curr_packet_end;    /* Current stream packet end */
 
@@ -218,6 +196,138 @@ typedef struct
 
 static Stream audio_str IBSS_ATTR;
 static Stream video_str IBSS_ATTR;
+
+/* Messages */
+enum
+{
+    STREAM_STOP,
+    STREAM_PLAY,
+    STREAM_PAUSE,
+};
+
+/* Status */
+enum
+{
+    STREAM_ERROR = -4,
+    STREAM_STOPPED = -3,
+    STREAM_TERMINATED = -2,
+    STREAM_DONE = -1,
+    STREAM_PLAYING = 0,
+    STREAM_PAUSED,
+    STREAM_BUFFERING
+};
+
+/* Returns true if a message is waiting */
+static inline bool str_have_msg(Stream *str)
+{
+    return str->have_msg != 0;
+}
+
+/* Waits until a message is sent */
+static void str_wait_msg(Stream *str)
+{
+    /* NOTE: sleep(0) caused a prefectch abort at C0EDBABE on e200 -
+       will look into this oddness */
+#if 0
+    int spin_count = 0;
+#endif
+
+    while (str->have_msg == 0)
+    {
+#if 0
+        if (spin_count < 100)
+        {
+            rb->yield();
+            spin_count++;
+            continue;
+        }
+
+        rb->sleep(0);
+#endif
+        rb->yield();
+    }
+}
+
+/* Returns a message waiting or blocks until one is available - removes the
+   event */
+static bool str_get_msg(Stream *str, struct event *ev)
+{
+    str_wait_msg(str);
+    ev->id   = str->ev.id;
+    ev->data = str->ev.data;
+    str->have_msg = 0;
+    return true;
+}
+
+/* Peeks at the current message without blocking, returns the data but
+   does not remove the event */
+static bool str_look_msg(Stream *str, struct event *ev)
+{
+    if (!str_have_msg(str))
+        return false;
+
+    ev->id = str->ev.id;
+    ev->data = str->ev.data;
+    return true;
+}
+
+/* Replies to the last message pulled - has no effect if last message has not
+   been pulled or already replied */
+static void str_reply_msg(Stream *str, int reply)
+{
+    if (str->replied == 1 || str->have_msg != 0)
+        return;
+
+    str->reply = reply;
+    str->replied = 1;
+}
+
+/* Sends a message to a stream and waits for a reply */
+static intptr_t str_send_msg(Stream *str, int id, intptr_t data)
+{
+    /* NOTE: sleep(0) caused a prefectch abort at C0EDBABE on e200 -
+       will look into this oddness */
+#if 0
+    int spin_count = 0;
+#endif
+
+    intptr_t reply;
+
+#if 0
+    if (str->thread == rb->thread_get_current())
+        return str->dispatch_fn(str, msg);
+#endif
+
+    /* Only one thread at a time, please */
+    rb->spinlock_lock(&str->msg_lock);
+
+    str->ev.id = id;
+    str->ev.data = data;
+    str->reply = 0;
+    str->replied = 0;
+    str->have_msg = 1;
+
+    while (str->replied == 0 && str->status != STREAM_TERMINATED)
+    {
+#if 0
+        if (spin_count < 100)
+        {
+            rb->yield();
+            spin_count++;
+            continue;
+        }
+
+        rb->sleep(0);
+#endif
+        rb->yield();
+    }
+
+    reply = str->reply;
+
+    rb->spinlock_unlock(&str->msg_lock);
+
+    return reply;
+}
 
 /* NOTE: Putting the following variables in IRAM cause audio corruption
    on the ipod (reason unknown)
@@ -250,26 +360,6 @@ static struct event_queue msg_queue IBSS_ATTR;
 
 #define MSG_BUFFER_NEARLY_EMPTY 1
 #define MSG_EXIT_REQUESTED      2
-
-/* Threads */
-static struct thread_entry* audiothread_id;
-static struct thread_entry* videothread_id;
-
-/* Status */
-enum
-{
-    STREAM_PLAYING = 0,
-    STREAM_DONE,
-    STREAM_PAUSING,
-    STREAM_BUFFERING,
-    STREAM_ERROR,
-    PLEASE_STOP,
-    PLEASE_PAUSE,
-    THREAD_TERMINATED,
-};
-
-volatile int audiostatus IBSS_ATTR;
-volatile int videostatus IBSS_ATTR;
 
 /* Various buffers */
 /* TODO: Can we reduce the PCM buffer size? */
@@ -700,7 +790,8 @@ struct pcm_frame_header     /* Header added to pcm data every time a decoded
 
 #define PCMBUF_PLAY_ALL         1l          /* Forces buffer to play back all data */
 #define PCMBUF_PLAY_NONE        LONG_MAX    /* Keeps buffer from playing any data */
-static volatile ssize_t         pcmbuf_used      IBSS_ATTR;
+static volatile uint64_t        pcmbuf_read      IBSS_ATTR;
+static volatile uint64_t        pcmbuf_written   IBSS_ATTR;
 static volatile ssize_t         pcmbuf_threshold IBSS_ATTR;
 static struct pcm_frame_header *pcm_buffer       IBSS_ATTR;
 static struct pcm_frame_header *pcmbuf_end       IBSS_ATTR;
@@ -710,6 +801,11 @@ static struct pcm_frame_header * volatile pcmbuf_tail IBSS_ATTR;
 static volatile uint32_t samplesplayed IBSS_ATTR; /* Our base clock */
 static volatile uint32_t samplestart   IBSS_ATTR; /* Clock at playback start */
 static volatile int32_t  sampleadjust  IBSS_ATTR; /* Clock drift adjustment */
+
+static ssize_t pcmbuf_used(void)
+{
+    return (ssize_t)(pcmbuf_written - pcmbuf_read);
+}
 
 static bool init_pcmbuf(void)
 {
@@ -721,7 +817,8 @@ static bool init_pcmbuf(void)
     pcmbuf_head = pcm_buffer;
     pcmbuf_tail = pcm_buffer;
     pcmbuf_end  = SKIPBYTES(pcm_buffer, PCMBUFFER_SIZE);
-    pcmbuf_used = 0;
+    pcmbuf_read = 0;
+    pcmbuf_written = 0;
 
     return true;
 }
@@ -741,7 +838,7 @@ static void get_more(unsigned char** start, size_t* size)
     static unsigned char silence[4412] __attribute__((aligned (4))) = { 0 };
     size_t sz;
 
-    if (pcmbuf_used >= pcmbuf_threshold)
+    if (pcmbuf_used() >= pcmbuf_threshold)
     {
         uint32_t time = pcmbuf_tail->time;
         sz = pcmbuf_tail->size;
@@ -750,7 +847,7 @@ static void get_more(unsigned char** start, size_t* size)
 
         pcm_advance_buffer(&pcmbuf_tail, sz);
 
-        pcmbuf_used -= sz;
+        pcmbuf_read += sz;
 
         sz -= sizeof (*pcmbuf_tail);
 
@@ -771,8 +868,8 @@ static void get_more(unsigned char** start, size_t* size)
 
     samplesplayed += sz >> 2;
 
-    if (pcmbuf_used < 0)
-        pcmbuf_used = 0;
+    if (pcmbuf_read > pcmbuf_written)
+        pcmbuf_read = pcmbuf_written;
 }
 
 /* Flushes the buffer - clock keeps counting */
@@ -783,7 +880,8 @@ static void pcm_playback_flush(void)
     if (was_playing)
         rb->pcm_play_stop();
 
-    pcmbuf_used = 0;
+    pcmbuf_read = 0;
+    pcmbuf_written = 0;
     pcmbuf_head = pcmbuf_tail;
 
     if (was_playing)
@@ -855,11 +953,30 @@ static inline int32_t clip_sample(int32_t sample)
     return sample;
 }
 
-static void button_loop(void)
+static int button_loop(void)
 {
     bool result;
     int vol, minvol, maxvol;
-    int button = rb->button_get(false);
+    int button;
+
+    if (str_have_msg(&audio_str))
+    {
+        struct event ev;
+        str_get_msg(&audio_str, &ev);
+
+        if (ev.id == STREAM_STOP)
+        {
+            audio_str.status = STREAM_STOPPED;
+            str_reply_msg(&audio_str, 1);
+            goto quit;
+        }
+        else
+        {
+            str_reply_msg(&audio_str, 0);
+        }
+    }
+
+    button = rb->button_get(false);
 
     switch (button)
     {
@@ -897,13 +1014,8 @@ static void button_loop(void)
 
         case MPEG_MENU:
             pcm_playback_play_pause(false);
-            if (videostatus != STREAM_DONE) {
-                videostatus=PLEASE_PAUSE;
-
-                /* Wait for video thread to stop */
-                while (videostatus == PLEASE_PAUSE) { rb->sleep(HZ/25); }
-            }
-
+            audio_str.status = STREAM_PAUSED;
+            str_send_msg(&video_str, STREAM_PAUSE, 0);
 #ifndef HAVE_LCD_COLOR
             gray_show(false);
 #endif
@@ -919,21 +1031,23 @@ static void button_loop(void)
             rb->lcd_setfont(FONT_SYSFIXED);
 
             if (result) {
-                audiostatus = PLEASE_STOP;
-                if (videostatus != STREAM_DONE) videostatus = PLEASE_STOP;
+                str_send_msg(&video_str, STREAM_STOP, 0);
+                audio_str.status = STREAM_STOPPED;
             } else {
-                if (videostatus != STREAM_DONE) videostatus = STREAM_PLAYING;
+                audio_str.status = STREAM_PLAYING;
+                str_send_msg(&video_str, STREAM_PLAY, 0);
                 pcm_playback_play_pause(true);
             }
             break;
 
         case MPEG_STOP:
-            audiostatus = PLEASE_STOP;
-            if (videostatus != STREAM_DONE) videostatus = PLEASE_STOP;
+            str_send_msg(&video_str, STREAM_STOP, 0);
+            audio_str.status = STREAM_STOPPED;
             break;
 
         case MPEG_PAUSE:
-            if (videostatus != STREAM_DONE) videostatus=PLEASE_PAUSE;
+            str_send_msg(&video_str, STREAM_PAUSE, 0);
+            audio_str.status = STREAM_PAUSED;
             pcm_playback_play_pause(false);
 
             button = BUTTON_NONE;
@@ -943,13 +1057,14 @@ static void button_loop(void)
             do {
                 button = rb->button_get(true);
                 if (button == MPEG_STOP) {
-                    audiostatus = PLEASE_STOP;
-                    if (videostatus != STREAM_DONE) videostatus = PLEASE_STOP;
-                    return;
+                    str_send_msg(&video_str, STREAM_STOP, 0);
+                    audio_str.status = STREAM_STOPPED;
+                    goto quit;
                 }
             } while (button != MPEG_PAUSE);
 
-            if (videostatus != STREAM_DONE) videostatus = STREAM_PLAYING;
+            str_send_msg(&video_str, STREAM_PLAY, 0);
+            audio_str.status = STREAM_PLAYING;
             pcm_playback_play_pause(true);
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
             rb->cpu_boost(true);
@@ -958,10 +1073,13 @@ static void button_loop(void)
 
         default:
             if(rb->default_event_handler(button) == SYS_USB_CONNECTED) {
-                audiostatus = PLEASE_STOP;
-                if (videostatus != STREAM_DONE) videostatus = PLEASE_STOP;
+                str_send_msg(&video_str, STREAM_STOP, 0);
+                audio_str.status = STREAM_STOPPED;
             }
     }
+
+quit:
+    return audio_str.status;
 }
 
 static void audio_thread(void)
@@ -996,10 +1114,8 @@ static void audio_thread(void)
         int mad_stat;
         size_t len;
 
-        button_loop();
-
-        if (audiostatus == PLEASE_STOP)
-           goto done;
+        if (button_loop() < 0)
+            goto done;
 
         if (pts->size <= 0)
         {
@@ -1146,10 +1262,21 @@ static void audio_thread(void)
 
             /* Leave at least 32KB free (this will be the currently
                playing chunk) */
-            while (pcmbuf_used + wait_for > PCMBUFFER_SIZE)
+            while (pcmbuf_used() + wait_for > PCMBUFFER_SIZE)
             {
-                if (audiostatus == PLEASE_STOP)
-                    goto done;
+                if (str_have_msg(&audio_str))
+                {
+                    struct event ev;
+                    str_look_msg(&audio_str, &ev);
+
+                    if (ev.id == STREAM_STOP)
+                    {
+                        str_get_msg(&audio_str, &ev);
+                        str_reply_msg(&audio_str, 1);
+                        goto stop_and_wait;
+                    }
+                }
+
                 rb->priority_yield();
             }
 
@@ -1192,56 +1319,56 @@ static void audio_thread(void)
 
             pcm_advance_buffer(&pcmbuf_head, size);
 
-            if (pcmbuf_threshold != PCMBUF_PLAY_ALL && pcmbuf_used >= 64*1024)
+            if (pcmbuf_threshold != PCMBUF_PLAY_ALL && pcmbuf_used() >= 64*1024)
             {
                 /* We've reached our size treshold so start playing back the
                    audio in the buffer and set the buffer to play all data */
-                audiostatus = STREAM_PLAYING;
+                audio_str.status = STREAM_PLAYING;
                 pcmbuf_threshold = PCMBUF_PLAY_ALL;
                 pcm_playback_seek_time(pcmbuf_tail->time);
             }
 
             /* Make this data available to DMA */
-            locked_add_long(&pcmbuf_used, size);
+            pcmbuf_written += size;
         }
 
         rb->yield();
     } /* end decoding loop */
 
 done:
-    if (audiostatus != PLEASE_STOP)
-    {
-        /* Force any residue to play if audio ended before reaching the
-           threshold */
-        if (pcmbuf_threshold != PCMBUF_PLAY_ALL && pcmbuf_used > 0)
-        {
-            pcm_playback_play(pcmbuf_tail->time);
-            pcmbuf_threshold = PCMBUF_PLAY_ALL;
-        }
+    if (audio_str.status == STREAM_STOPPED)
+        goto stop_and_wait;
 
-        if (rb->pcm_is_playing() && !rb->pcm_is_paused())
+    /* Force any residue to play if audio ended before reaching the
+       threshold */
+    if (pcmbuf_threshold != PCMBUF_PLAY_ALL && pcmbuf_used() > 0)
+    {
+        pcm_playback_play(pcmbuf_tail->time);
+        pcmbuf_threshold = PCMBUF_PLAY_ALL;
+    }
+
+    if (rb->pcm_is_playing() && !rb->pcm_is_paused())
+    {
+        /* Wait for audio to finish */
+        while (pcmbuf_used() > 0)
         {
-            /* Wait for audio to finish */
-            while (pcmbuf_used > 0 && audiostatus != PLEASE_STOP)
-            {
-                button_loop();
-                rb->sleep(HZ/10);
-            }
+            if (button_loop() == STREAM_STOPPED)
+                break;
+            rb->sleep(HZ/10);
         }
     }
 
-    audiostatus = STREAM_DONE;
+stop_and_wait:
+
+    audio_str.status = STREAM_DONE;
 
     /* Process events until finished */
-    while (audiostatus != PLEASE_STOP)
-    {
-        button_loop();
+    while (button_loop() != STREAM_STOPPED)
         rb->sleep(HZ/4);
-    }
 
     pcm_playback_stop();
 
-    audiostatus = THREAD_TERMINATED;
+    audio_str.status = STREAM_TERMINATED;
     rb->remove_thread(NULL);
 }
 
@@ -1260,6 +1387,7 @@ static uint32_t video_stack[VIDEO_STACKSIZE / sizeof(uint32_t)] IBSS_ATTR;
 
 static void video_thread(void)
 {
+    struct event ev;
     const mpeg2_info_t * info;
     mpeg2_state_t state;
     char str[80];
@@ -1280,7 +1408,7 @@ static void video_thread(void)
     {
         rb->splash(0, "mpeg2_init failed");
         /* Commit suicide */
-        videostatus = THREAD_TERMINATED;
+        video_str.status = STREAM_TERMINATED;
         rb->remove_thread(NULL);
     }
 
@@ -1302,24 +1430,36 @@ static void video_thread(void)
 
     /* Wait if the audio thread is buffering - i.e. before
        the first frames are decoded */
-    while (audiostatus == STREAM_BUFFERING)
+    while (audio_str.status == STREAM_BUFFERING)
         rb->priority_yield();
 
     while (1)
     {
-        if (videostatus == PLEASE_STOP)
+        /* quickly check mailbox first */
+        if (str_have_msg(&video_str))
         {
-            break;
-        }
-        else if (videostatus == PLEASE_PAUSE)
-        {
-            videostatus = STREAM_PAUSING;
-            flush_icache();
+            while (1)
+            {
+                str_get_msg(&video_str, &ev);
 
-            while (videostatus == STREAM_PAUSING)
-                rb->sleep(HZ/10);
+                switch (ev.id)
+                {
+                case STREAM_STOP:
+                    video_str.status = STREAM_STOPPED;
+                    str_reply_msg(&video_str, 1);
+                    goto done;
+                case STREAM_PAUSE:
+                    flush_icache();
+                    video_str.status = STREAM_PAUSED;
+                    str_reply_msg(&video_str, 1);
+                    continue;
+                }
 
-            continue;
+                break;
+            }
+
+            video_str.status = STREAM_PLAYING;
+            str_reply_msg(&video_str, 1);
         }
 
         state = mpeg2_parse (mpeg2dec);
@@ -1551,8 +1691,16 @@ static void video_thread(void)
                 rb->priority_yield();
 
                 /* Make sure not to get stuck waiting here forever */
-                if (videostatus != STREAM_PLAYING)
-                    goto rendering_finished;
+                if (str_have_msg(&video_str))
+                {
+                    str_look_msg(&video_str, &ev);
+
+                    if (ev.id != STREAM_PLAY)
+                        goto rendering_finished;
+
+                    str_get_msg(&video_str, &ev);
+                    str_reply_msg(&video_str, 1);
+                }
 
                 eta_audio = get_stream_time();
             }
@@ -1599,13 +1747,21 @@ static void video_thread(void)
 done:
     flush_icache();
 
-    videostatus = STREAM_DONE;
+    video_str.status = STREAM_DONE;
 
-    while (videostatus != PLEASE_STOP)
-        rb->sleep(HZ/5);
+    while (1)
+    {
+        str_get_msg(&video_str, &ev);
 
-    videostatus = THREAD_TERMINATED;
+        if (ev.id == STREAM_STOP)
+            break;
+
+        str_reply_msg(&video_str, 0);
+    }
+
     /* Commit suicide */
+    str_reply_msg(&video_str, 1);
+    video_str.status = STREAM_TERMINATED;
     rb->remove_thread(NULL);
 }
 
@@ -1756,8 +1912,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     video_str.buffer_remaining = disk_buf_len;
     audio_str.buffer_remaining = disk_buf_len;
 
-    audiostatus = STREAM_BUFFERING;
-    videostatus = STREAM_PLAYING;
+    rb->spinlock_init(&audio_str.msg_lock);
+    rb->spinlock_init(&video_str.msg_lock);
+    audio_str.status = STREAM_BUFFERING;
+    video_str.status = STREAM_PLAYING;
 
 #ifndef HAVE_LCD_COLOR
     gray_show(true);
@@ -1766,13 +1924,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     init_stream_lock();
 
     /* We put the video thread on the second processor for multi-core targets. */
-    if ((videothread_id = rb->create_thread(video_thread,
+    if ((video_str.thread = rb->create_thread(video_thread,
         (uint8_t*)video_stack,VIDEO_STACKSIZE,"mpgvideo" IF_PRIO(,PRIORITY_PLAYBACK)
         IF_COP(, COP, true))) == NULL)
     {
         rb->splash(HZ, "Cannot create video thread!");
     }
-    else if ((audiothread_id = rb->create_thread(audio_thread,
+    else if ((audio_str.thread = rb->create_thread(audio_thread,
         (uint8_t*)audio_stack,AUDIO_STACKSIZE,"mpgaudio" IF_PRIO(,PRIORITY_PLAYBACK)
         IF_COP(, CPU, false))) == NULL)
     {
@@ -1784,7 +1942,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->lcd_setfont(FONT_SYSFIXED);
 
         /* Wait until both threads have finished their work */
-        while ((audiostatus != STREAM_DONE) || (videostatus != STREAM_DONE))
+        while ((audio_str.status >= 0) || (video_str.status >= 0))
         {
             size_t audio_remaining = audio_str.buffer_remaining;
             size_t video_remaining = video_str.buffer_remaining;
@@ -1797,7 +1955,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 bytes_to_read = MIN(bytes_to_read,(size_t)(disk_buf_end-disk_buf_tail));
 
                 while (( bytes_to_read > 0) && (file_remaining > 0) &&
-                       ((audiostatus != STREAM_DONE) || (videostatus != STREAM_DONE))) {
+                       ((audio_str.status >= 0) || (video_str.status >= 0))) {
                     size_t n = rb->read(in_file, disk_buf_tail, MIN(32*1024,bytes_to_read));
 
                     bytes_to_read -= n;
@@ -1825,19 +1983,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
 
     /* Stop the threads and wait for them to terminate */
-    if (videothread_id != NULL && videostatus != THREAD_TERMINATED)
-    {
-        videostatus = PLEASE_STOP;
-        while (videostatus != THREAD_TERMINATED)
-            rb->yield();
-    }
+    if (video_str.thread != NULL)
+        str_send_msg(&video_str, STREAM_STOP, 0);
 
-    if (audiothread_id != NULL && audiostatus != THREAD_TERMINATED)
-    {
-        audiostatus = PLEASE_STOP;
-        while (audiostatus != THREAD_TERMINATED)
-            rb->yield();
-    }
+    if (audio_str.thread != NULL)
+        str_send_msg(&audio_str, STREAM_STOP, 0);
 
     rb->sleep(HZ/10);
 
