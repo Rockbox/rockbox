@@ -36,7 +36,11 @@ void avic_init(void)
 	{
 		imx31_int[i].name = (char *)&imx31_int_names[i];
 		imx31_int[i].int_type=IRQ;
-		imx31_int[i].addr=(avicstart+(i*4));
+		/*integer i MUST be multiplied by 8 b/c gnu as
+		  generates 2 instructions for each vector instruction
+		  in vector_init(). Hence the value of 8 byte intervals
+		  between each vector start address*/
+		imx31_int[i].addr=(avicstart+(i*8));
 		imx31_int[i].priority=0;
 		imx31_int[i].pInt_Handler=Unhandled_Int;
 	}
