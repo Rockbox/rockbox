@@ -143,7 +143,7 @@ bool dice_menu(struct dices * dice) {
     MENUITEM_STRINGLIST(menu,"Dice Menu",NULL,"Roll Dice","Number of Dice",
                         "Number of Sides","Quit");
 
-    struct opt_items nb_sides_option[8] = {
+    static struct opt_items nb_sides_option[8] = {
         { "3", -1 },
         { "4", -1 },
         { "6", -1 },
@@ -153,7 +153,8 @@ bool dice_menu(struct dices * dice) {
         { "20", -1 },
         { "100", -1 }
     };
-    int nb_sides_values[] = { 3, 4, 6, 8, 10, 12, 20, 100 };
+    static int nb_sides_values[] = { 3, 4, 6, 8, 10, 12, 20, 100 };
+
     while (!menu_quit) {
         switch(rb->do_menu(&menu, &selection)){
             case 0:
