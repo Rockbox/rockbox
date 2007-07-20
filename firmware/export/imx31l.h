@@ -99,6 +99,43 @@
 #define WDOG1_BASE_ADDR       WDOG_BASE_ADDR
 #define CRM_MCU_BASE_ADDR     CCM_BASE_ADDR
 
+/* Timers */
+#define EPITCR1                 (*(volatile long*)EPIT1_BASE_ADDR)
+#define EPITSR1                 (*(volatile long*)(EPIT1_BASE_ADDR+0x04))
+#define EPITLR1                 (*(volatile long*)(EPIT1_BASE_ADDR+0x08))
+#define EPITCMPR1               (*(volatile long*)(EPIT1_BASE_ADDR+0x0C))
+#define EPITCNT1                (*(volatile long*)(EPIT1_BASE_ADDR+0x10))
+#define EPITCR2                 (*(volatile long*)EPIT2_BASE_ADDR)
+#define EPITSR2                 (*(volatile long*)(EPIT2_BASE_ADDR+0x04))
+#define EPITLR2                 (*(volatile long*)(EPIT2_BASE_ADDR+0x08))
+#define EPITCMPR2               (*(volatile long*)(EPIT2_BASE_ADDR+0x0C))
+#define EPITCNT2                (*(volatile long*)(EPIT2_BASE_ADDR+0x10))
+
+/* GPIO */
+#define GPIO1_DR                (*(volatile long*)GPIO1_BASE_ADDR)
+#define GPIO1_GDIR              (*(volatile long*)(GPIO1_BASE_ADDR+0x04))
+#define GPIO1_PSR               (*(volatile long*)(GPIO1_BASE_ADDR+0x08))
+#define GPIO1_ICR1              (*(volatile long*)(GPIO1_BASE_ADDR+0x0C))
+#define GPIO1_ICR2              (*(volatile long*)(GPIO1_BASE_ADDR+0x10))
+#define GPIO1_IMR               (*(volatile long*)(GPIO1_BASE_ADDR+0x14))
+#define GPIO1_ISR               (*(volatile long*)(GPIO1_BASE_ADDR+0x18))
+
+#define GPIO2_DR                (*(volatile long*)GPIO2_BASE_ADDR)
+#define GPIO2_GDIR              (*(volatile long*)(GPIO2_BASE_ADDR+0x04))
+#define GPIO2_PSR               (*(volatile long*)(GPIO2_BASE_ADDR+0x08))
+#define GPIO2_ICR1              (*(volatile long*)(GPIO2_BASE_ADDR+0x0C))
+#define GPIO2_ICR2              (*(volatile long*)(GPIO2_BASE_ADDR+0x10))
+#define GPIO2_IMR               (*(volatile long*)(GPIO2_BASE_ADDR+0x14))
+#define GPIO2_ISR               (*(volatile long*)(GPIO2_BASE_ADDR+0x18))
+
+#define GPIO3_DR                (*(volatile long*)GPIO3_BASE_ADDR)
+#define GPIO3_GDIR              (*(volatile long*)(GPIO3_BASE_ADDR+0x04))
+#define GPIO3_PSR               (*(volatile long*)(GPIO3_BASE_ADDR+0x08))
+#define GPIO3_ICR1              (*(volatile long*)(GPIO3_BASE_ADDR+0x0C))
+#define GPIO3_ICR2              (*(volatile long*)(GPIO3_BASE_ADDR+0x10))
+#define GPIO3_IMR               (*(volatile long*)(GPIO3_BASE_ADDR+0x14))
+#define GPIO3_ISR               (*(volatile long*)(GPIO3_BASE_ADDR+0x18))
+
 /* ROMPATCH and AVIC */
 #define ROMPATCH_BASE_ADDR      0x60000000
 #define AVIC_BASE_ADDR          0x68000000

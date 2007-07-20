@@ -33,7 +33,7 @@ void button_init_device(void)
 
 inline bool button_hold(void)
 {
-    return false;
+    return GPIO3_DR & 0x10;
 }
 
 int button_read_device(void)
