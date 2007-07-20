@@ -144,7 +144,7 @@ FFTComplex mdct_tmp[1] ;              /* dummy var */
 static VLC_TYPE vlcbuf1[6144][2];
 static VLC_TYPE vlcbuf2[3584][2];
 static VLC_TYPE vlcbuf3[1536][2] IBSS_ATTR;    //small so lets try iram
-
+static VLC_TYPE vlcbuf4[540][2];
 
 
 
@@ -560,7 +560,7 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
 
     /* init rate dependant parameters */
     s->use_noise_coding = 1;
-    high_freq = fixmul64byfixed(itofix64(s->sample_rate), 0x8000);
+    high_freq = itofix64(s->sample_rate) >> 1;
 
 
     /* if version 2, then the rates are normalized */
@@ -603,9 +603,9 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
         if (bps1 >= 0x128f6)
             s->use_noise_coding = 0;
         else if (bps1 >= 0xb852)
-            high_freq = fixmul64byfixed(high_freq,0xb333);
+            high_freq = fixmul32(high_freq,0xb333);
         else
-            high_freq = fixmul64byfixed(high_freq,0x999a);
+            high_freq = fixmul32(high_freq,0x999a);
     }
     else if (sample_rate1 == 16000)
     {
@@ -732,12 +732,9 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
             /* max number of coefs */
             s->coefs_end[k] = (s->frame_len - ((s->frame_len * 9) / 100)) >> k;
             /* high freq computation */
-            fixed64 tmp = itofix64(block_len<<2);
-            tmp = fixmul64byfixed(tmp,high_freq);
-            fixed64 tmp2 = itofix64(s->sample_rate);
-            tmp2 += 0x8000;
-            s->high_band_start[k] = fixtoi64(fixdiv64(tmp,tmp2));
 
+            fixed32 tmp = high_freq*2;
+            s->high_band_start[k] = fixtoi32(fixdiv32(tmp, itofix32(s->sample_rate)) *block_len +0x8000);
             /*
             s->high_band_start[k] = (int)((block_len * 2 * high_freq) /
                                           s->sample_rate + 0.5);*/
@@ -854,13 +851,17 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
         if (s->use_exp_vlc)
         {
             s->noise_mult = 0x51f;
+            s->noise_table = noisetable_exp;
         }
         else
         {
             s->noise_mult = 0xa3d;
+			/*LSP values are simply 2x the EXP values*/
+            for (i=0;i<NOISE_TAB_SIZE;++i)
+            	noisetable_exp[i] = noisetable_exp[i]<< 1;
+            s->noise_table = noisetable_exp;
         }
-
-
+#if 0
         {
             unsigned int seed;
             fixed32 norm;
@@ -872,11 +873,13 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
                 s->noise_table[i] = itofix32((int)seed) * norm;
             }
         }
+#endif
 
-
+		 s->hgain_vlc.table = vlcbuf4;
+		 s->hgain_vlc.table_allocated = 540;
 		 init_vlc(&s->hgain_vlc, 9, sizeof(hgain_huffbits),
-                 hgain_huffbits, 1, 1,
-                 hgain_huffcodes, 2, 2, 0);
+					 hgain_huffbits, 1, 1,
+					 hgain_huffcodes, 2, 2, 0);
     }
 
     if (s->use_exp_vlc)
@@ -1380,7 +1383,7 @@ static int wma_decode_block(WMADecodeContext *s)
             fixed32 *coefs, atemp;
             fixed64 mult;
             fixed64 mult1;
-            fixed32 noise;
+            fixed32 noise, temp1, temp2, mult2;
             int i, j, n, n1, last_high_band, esize;
             fixed32 exp_power[HIGH_BAND_MAX_SIZE];
 
@@ -1404,7 +1407,7 @@ static int wma_decode_block(WMADecodeContext *s)
                 /* very low freqs : noise */
                 for(i = 0;i < s->coefs_start; ++i)
                 {
-                    *coefs++ = fixmul32(fixmul32(s->noise_table[s->noise_index],(*exponents++)),Fixed32From64(mult1));
+                    *coefs++ = fixmul32( (fixmul32(s->noise_table[s->noise_index],(*exponents++))>>4),Fixed32From64(mult1)) >>1;
                     s->noise_index = (s->noise_index + 1) & (NOISE_TAB_SIZE - 1);
                 }
 
@@ -1426,9 +1429,9 @@ static int wma_decode_block(WMADecodeContext *s)
                         for(i = 0;i < n; ++i)
                         {
                             v = exp_ptr[i];
-                            e2 += v * v;
+                            e2 += fixmul32(v, v);
                         }
-                        exp_power[j] = fixdiv32(e2,n);
+                         exp_power[j] = e2/n; /*n is an int...*/
                         last_high_band = j;
                     }
                     exp_ptr += n;
@@ -1453,14 +1456,17 @@ static int wma_decode_block(WMADecodeContext *s)
                         fixed32 tmp = fixdiv32(exp_power[j],exp_power[last_high_band]);
                         mult1 = (fixed64)fixsqrt32(tmp);
                         /* XXX: use a table */
-                        mult1 = mult1 * pow_table[s->high_band_values[ch][j]];
-                        mult1 = fixdiv64(mult1,fixmul32(s->max_exponent[ch],s->noise_mult));
-                        mult1 = fixmul64byfixed(mult1,mdct_norm);
+                        mult1 = mult1 * pow_table[s->high_band_values[ch][j]] >> PRECISION;
+
+                        /*this step has a fairly high degree of error for some reason*/
+                   		mult1 = fixdiv64(mult1,fixmul32(s->max_exponent[ch],s->noise_mult));
+
+                         mult1 = mult1*mdct_norm>>PRECISION;
                         for(i = 0;i < n; ++i)
                         {
                             noise = s->noise_table[s->noise_index];
                             s->noise_index = (s->noise_index + 1) & (NOISE_TAB_SIZE - 1);
-                            *coefs++ = fixmul32(fixmul32(*exponents,noise),Fixed32From64(mult1));
+                            *coefs++ = fixmul32((fixmul32(*exponents,noise)>>4),Fixed32From64(mult1)) >>1;
                             ++exponents;
                         }
                     }
@@ -1472,7 +1478,11 @@ static int wma_decode_block(WMADecodeContext *s)
                             // PJJ: check code path
                             noise = s->noise_table[s->noise_index];
                             s->noise_index = (s->noise_index + 1) & (NOISE_TAB_SIZE - 1);
-                            *coefs++ = fixmul32(fixmul32(((*coefs1++) + noise),*exponents),mult);
+
+                           /*don't forget to renormalize the noise*/
+						   temp1 = (((int32_t)*coefs1++)<<16) + (noise>>4);
+						   temp2 = fixmul32(*exponents, mult>>16);
+                            *coefs++ = fixmul32(temp1, temp2)>>1;
                             ++exponents;
                         }
                     }
@@ -1480,10 +1490,12 @@ static int wma_decode_block(WMADecodeContext *s)
 
                 /* very high freqs : noise */
                 n = s->block_len - s->coefs_end[bsize];
-                mult1 = fixmul32(mult,exponents[-1]);
+                mult2 = fixmul32(mult>>16,exponents[-1]) ;  /*the work around for 32.32 vars are getting stupid*/
                 for (i = 0; i < n; ++i)
                 {
-                    *coefs++ = fixmul32(s->noise_table[s->noise_index],Fixed32From64(mult1));
+                    /*renormalize the noise product and then reduce to 17.15 precison*/
+                    *coefs++ = fixmul32(s->noise_table[s->noise_index],mult2) >>5;
+
                     s->noise_index = (s->noise_index + 1) & (NOISE_TAB_SIZE - 1);
                 }
             }
@@ -1493,9 +1505,6 @@ static int wma_decode_block(WMADecodeContext *s)
                 /* XXX: optimize more */
 
                 n = nb_coefs[ch];
-
-
-
 
                 for(i = 0;i < n; ++i)
                 {

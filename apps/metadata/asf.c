@@ -147,9 +147,9 @@ static int asf_intdecode(int fd, int type, int length)
     return 0;
 }
 
-/* Decode a LE utf16 string from a disk buffer into a fixed-sized 
+/* Decode a LE utf16 string from a disk buffer into a fixed-sized
    utf8 buffer.
-*/         
+*/
 
 static void asf_utf16LEdecode(int fd,
                               uint16_t utf16bytes,
@@ -218,7 +218,7 @@ static void asf_utf16LEdecode(int fd,
     return;
 }
 
-static int asf_parse_header(int fd, struct mp3entry* id3, 
+static int asf_parse_header(int fd, struct mp3entry* id3,
                                     asf_waveformatex_t* wfx)
 {
     asf_object_t current;
@@ -373,12 +373,12 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                         id3->title = id3buf;
                         asf_utf16LEdecode(fd, strlength[0], &id3buf, &id3buf_remaining);
                     }
-                           
+
                     if (strlength[1] > 0) {  /* 1 - Artist */
                         id3->artist = id3buf;
                         asf_utf16LEdecode(fd, strlength[1], &id3buf, &id3buf_remaining);
                     }
-                    
+
                     lseek(fd, strlength[2], SEEK_CUR); /* 2 - copyright */
 
                     if (strlength[3] > 0) {  /* 3 - description */
@@ -392,7 +392,7 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                     int i;
                     int bytesleft = current.size - 24;
                     //DEBUGF("Found GUID_EXTENDED_CONTENT_DESCRIPTION\n");
-                    
+
                     read_uint16le(fd, &count);
                     bytesleft -= 2;
                     //DEBUGF("extended metadata count = %u\n",count);
@@ -498,8 +498,8 @@ bool get_asf_metadata(int fd, struct mp3entry* id3)
         return false;
     }
 
-    if (wfx.bitrate < 32000) {
-        DEBUGF("ASF: < 32kbps files not supported\n");
+    if (wfx.bitrate < 20000) {
+        DEBUGF("ASF: < 20kbps files not supported\n");
         return false;
     }
 

@@ -147,7 +147,7 @@ typedef struct WMADecodeContext
     uint8_t last_superframe[MAX_CODED_SUPERFRAME_SIZE + 4]; /* padding added */
     int last_bitoffset;
     int last_superframe_len;
-    fixed32 noise_table[NOISE_TAB_SIZE];
+    fixed32 *noise_table;
     int noise_index;
     fixed32 noise_mult; /* XXX: suppress that and integrate it in the noise array */
     /* lsp_to_curve tables */
