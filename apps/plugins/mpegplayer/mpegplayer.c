@@ -200,9 +200,9 @@ static Stream video_str IBSS_ATTR;
 /* Messages */
 enum
 {
-    STREAM_STOP,
     STREAM_PLAY,
     STREAM_PAUSE,
+    STREAM_QUIT
 };
 
 /* Status */
@@ -250,13 +250,12 @@ static void str_wait_msg(Stream *str)
 
 /* Returns a message waiting or blocks until one is available - removes the
    event */
-static bool str_get_msg(Stream *str, struct event *ev)
+static void str_get_msg(Stream *str, struct event *ev)
 {
     str_wait_msg(str);
     ev->id   = str->ev.id;
     ev->data = str->ev.data;
     str->have_msg = 0;
-    return true;
 }
 
 /* Peeks at the current message without blocking, returns the data but
@@ -964,10 +963,9 @@ static int button_loop(void)
         struct event ev;
         str_get_msg(&audio_str, &ev);
 
-        if (ev.id == STREAM_STOP)
+        if (ev.id == STREAM_QUIT)
         {
             audio_str.status = STREAM_STOPPED;
-            str_reply_msg(&audio_str, 1);
             goto quit;
         }
         else
@@ -1031,7 +1029,7 @@ static int button_loop(void)
             rb->lcd_setfont(FONT_SYSFIXED);
 
             if (result) {
-                str_send_msg(&video_str, STREAM_STOP, 0);
+                str_send_msg(&video_str, STREAM_QUIT, 0);
                 audio_str.status = STREAM_STOPPED;
             } else {
                 audio_str.status = STREAM_PLAYING;
@@ -1041,7 +1039,7 @@ static int button_loop(void)
             break;
 
         case MPEG_STOP:
-            str_send_msg(&video_str, STREAM_STOP, 0);
+            str_send_msg(&video_str, STREAM_QUIT, 0);
             audio_str.status = STREAM_STOPPED;
             break;
 
@@ -1057,7 +1055,7 @@ static int button_loop(void)
             do {
                 button = rb->button_get(true);
                 if (button == MPEG_STOP) {
-                    str_send_msg(&video_str, STREAM_STOP, 0);
+                    str_send_msg(&video_str, STREAM_QUIT, 0);
                     audio_str.status = STREAM_STOPPED;
                     goto quit;
                 }
@@ -1073,7 +1071,7 @@ static int button_loop(void)
 
         default:
             if(rb->default_event_handler(button) == SYS_USB_CONNECTED) {
-                str_send_msg(&video_str, STREAM_STOP, 0);
+                str_send_msg(&video_str, STREAM_QUIT, 0);
                 audio_str.status = STREAM_STOPPED;
             }
     }
@@ -1114,8 +1112,8 @@ static void audio_thread(void)
         int mad_stat;
         size_t len;
 
-        if (button_loop() < 0)
-            goto done;
+        if (button_loop() == STREAM_STOPPED)
+            goto audio_thread_quit;
 
         if (pts->size <= 0)
         {
@@ -1269,12 +1267,8 @@ static void audio_thread(void)
                     struct event ev;
                     str_look_msg(&audio_str, &ev);
 
-                    if (ev.id == STREAM_STOP)
-                    {
-                        str_get_msg(&audio_str, &ev);
-                        str_reply_msg(&audio_str, 1);
-                        goto stop_and_wait;
-                    }
+                    if (ev.id == STREAM_QUIT)
+                        goto audio_thread_quit;
                 }
 
                 rb->priority_yield();
@@ -1337,7 +1331,7 @@ static void audio_thread(void)
 
 done:
     if (audio_str.status == STREAM_STOPPED)
-        goto stop_and_wait;
+        goto audio_thread_quit;
 
     /* Force any residue to play if audio ended before reaching the
        threshold */
@@ -1353,12 +1347,10 @@ done:
         while (pcmbuf_used() > 0)
         {
             if (button_loop() == STREAM_STOPPED)
-                break;
+                goto audio_thread_quit;
             rb->sleep(HZ/10);
         }
     }
-
-stop_and_wait:
 
     audio_str.status = STREAM_DONE;
 
@@ -1366,6 +1358,7 @@ stop_and_wait:
     while (button_loop() != STREAM_STOPPED)
         rb->sleep(HZ/4);
 
+audio_thread_quit:
     pcm_playback_stop();
 
     audio_str.status = STREAM_TERMINATED;
@@ -1444,10 +1437,9 @@ static void video_thread(void)
 
                 switch (ev.id)
                 {
-                case STREAM_STOP:
+                case STREAM_QUIT:
                     video_str.status = STREAM_STOPPED;
-                    str_reply_msg(&video_str, 1);
-                    goto done;
+                    goto video_thread_quit;
                 case STREAM_PAUSE:
                     flush_icache();
                     video_str.status = STREAM_PAUSED;
@@ -1695,9 +1687,11 @@ static void video_thread(void)
                 {
                     str_look_msg(&video_str, &ev);
 
+                    /* If not to play, process up top */
                     if (ev.id != STREAM_PLAY)
                         goto rendering_finished;
 
+                    /* Told to play but already playing */
                     str_get_msg(&video_str, &ev);
                     str_reply_msg(&video_str, 1);
                 }
@@ -1753,14 +1747,16 @@ done:
     {
         str_get_msg(&video_str, &ev);
 
-        if (ev.id == STREAM_STOP)
+        if (ev.id == STREAM_QUIT)
             break;
 
         str_reply_msg(&video_str, 0);
     }
 
+video_thread_quit:
+    flush_icache();
+
     /* Commit suicide */
-    str_reply_msg(&video_str, 1);
     video_str.status = STREAM_TERMINATED;
     rb->remove_thread(NULL);
 }
@@ -1984,10 +1980,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     /* Stop the threads and wait for them to terminate */
     if (video_str.thread != NULL)
-        str_send_msg(&video_str, STREAM_STOP, 0);
+        str_send_msg(&video_str, STREAM_QUIT, 0);
 
     if (audio_str.thread != NULL)
-        str_send_msg(&audio_str, STREAM_STOP, 0);
+        str_send_msg(&audio_str, STREAM_QUIT, 0);
 
     rb->sleep(HZ/10);
 
