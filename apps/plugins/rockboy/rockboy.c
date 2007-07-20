@@ -71,11 +71,11 @@ void setoptions (void)
    DIR* dir;
    char optionsave[sizeof(savedir)+sizeof(optionname)];
 
-    dir=opendir(savedir);
+    dir=rb->opendir(savedir);
     if(!dir)
-      mkdir(savedir);
+      rb->mkdir(savedir);
     else
-      closedir(dir);
+      rb->closedir(dir);
 
    snprintf(optionsave, sizeof(optionsave), "%s/%s", savedir, optionname);
 

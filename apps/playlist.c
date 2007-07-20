@@ -88,7 +88,6 @@
 #include "button.h"
 #include "filetree.h"
 #include "abrepeat.h"
-#include "dircache.h"
 #include "thread.h"
 #include "usb.h"
 #include "filetypes.h"

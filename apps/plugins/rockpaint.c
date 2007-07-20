@@ -688,7 +688,7 @@ static bool browse( char *dst, int dst_size, const char *start )
 
     while( 1 )
     {
-        d = rb->PREFIX(opendir)( bbuf );
+        d = rb->opendir( bbuf );
         if( !d )
         {
             /*
@@ -702,7 +702,7 @@ static bool browse( char *dst, int dst_size, const char *start )
             else if( errno == EACCES || errno == ENOENT )
             {
                 bbuf[0] = '/'; bbuf[1] = '\0';
-                d = rb->PREFIX(opendir)( "/" );
+                d = rb->opendir( "/" );
             }
             else
             {
@@ -714,12 +714,12 @@ static bool browse( char *dst, int dst_size, const char *start )
         li = -1;
         while( i < fvi )
         {
-            rb->PREFIX(readdir)( d );
+            rb->readdir( d );
             i++;
         }
         while( top_inside+(i-fvi)*(fh+LINE_SPACE) < HEIGHT )
         {
-            de = rb->PREFIX(readdir)( d );
+            de = rb->readdir( d );
             if( !de )
             {
                 li = i-1;
@@ -737,12 +737,12 @@ static bool browse( char *dst, int dst_size, const char *start )
         lvi = i-1;
         if( li == -1 )
         {
-            if( !rb->PREFIX(readdir)( d ) )
+            if( !rb->readdir( d ) )
             {
                 li = lvi;
             }
         }
-        rb->PREFIX(closedir)( d );
+        rb->closedir( d );
 
         rb->lcd_update();
 
@@ -863,7 +863,7 @@ static bool browse_fonts( char *dst, int dst_size )
         {
             b_need_redraw = 0;
 
-            d = rb->PREFIX(opendir)( FONT_DIR "/" );
+            d = rb->opendir( FONT_DIR "/" );
             if( !d )
             {
                 return false;
@@ -873,7 +873,7 @@ static bool browse_fonts( char *dst, int dst_size )
             li = -1;
             while( i < fvi )
             {
-                rb->PREFIX(readdir)( d );
+                rb->readdir( d );
                 i++;
             }
             cp = top_inside+LINE_SPACE;
@@ -883,7 +883,7 @@ static bool browse_fonts( char *dst, int dst_size )
 
             while( cp < top+HEIGHT )
             {
-                de = rb->PREFIX(readdir)( d );
+                de = rb->readdir( d );
                 if( !de )
                 {
                     li = i-1;
@@ -920,7 +920,7 @@ static bool browse_fonts( char *dst, int dst_size )
             lvi = i-1;
             if( li == -1 )
             {
-                if( !(de = rb->PREFIX(readdir)( d ) ) )
+                if( !(de = rb->readdir( d ) ) )
                 {
                     li = lvi;
                 }
@@ -936,7 +936,7 @@ static bool browse_fonts( char *dst, int dst_size )
                 }
             }
             rb->font_load( old_font );
-            rb->PREFIX(closedir)( d );
+            rb->closedir( d );
         }
 
         rb->lcd_set_drawmode(DRMODE_COMPLEMENT);

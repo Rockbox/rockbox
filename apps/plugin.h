@@ -37,9 +37,6 @@
 #include "config.h"
 #include "system.h"
 #include "dir.h"
-#ifndef SIMULATOR
-#include "dircache.h"
-#endif
 #include "kernel.h"
 #include "thread.h"
 #include "button.h"
@@ -115,12 +112,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 62
+#define PLUGIN_API_VERSION 63
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 62
+#define PLUGIN_MIN_API_VERSION 63
 
 /* plugin return codes */
 enum plugin_status {
@@ -316,17 +313,11 @@ struct plugin_api {
                                       int numberlen IF_CNFN_NUM_(, int *num));
 
     /* dir */
-    DIR* (*PREFIX(opendir))(const char* name);
-    int (*PREFIX(closedir))(DIR* dir);
-    struct dirent* (*PREFIX(readdir))(DIR* dir);
-    int (*PREFIX(mkdir))(const char *name);
-    int (*PREFIX(rmdir))(const char *name);
-    /* dir, cached */
-#ifdef HAVE_DIRCACHE
-    DIRCACHED* (*opendir_cached)(const char* name);
-    struct dircache_entry* (*readdir_cached)(DIRCACHED* dir);
-    int (*closedir_cached)(DIRCACHED* dir);
-#endif
+    DIR* (*opendir)(const char* name);
+    int (*closedir)(DIR* dir);
+    struct dirent* (*readdir)(DIR* dir);
+    int (*mkdir)(const char *name);
+    int (*rmdir)(const char *name);
 
     /* kernel/ system */
     void (*PREFIX(sleep))(int ticks);

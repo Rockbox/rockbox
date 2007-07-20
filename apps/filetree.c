@@ -38,7 +38,6 @@
 #include "plugin.h"
 #include "rolo.h"
 #include "sprintf.h"
-#include "dircache.h"
 #include "splash.h"
 #include "yesno.h"
 #include "cuesheet.h"
@@ -84,11 +83,11 @@ int ft_build_playlist(struct tree_context* c, int start_index)
 static void check_file_thumbnails(struct tree_context* c)
 {
     int i;
-    struct dircache_entry *entry;
+    struct dirent *entry;
     struct entry* dircache = c->dircache;
-    DIRCACHED *dir;
+    DIR *dir;
 
-    dir = opendir_cached(c->currdir);
+    dir = opendir(c->currdir);
     if(!dir)
         return;
     /* mark all files as non talking, except the .talk ones */
@@ -109,7 +108,7 @@ static void check_file_thumbnails(struct tree_context* c)
         }
     }
 
-    while((entry = readdir_cached(dir)) != 0) /* walk directory */
+    while((entry = readdir(dir)) != 0) /* walk directory */
     {
         int ext_pos;
 
@@ -135,7 +134,7 @@ static void check_file_thumbnails(struct tree_context* c)
             }
         }
     }
-    closedir_cached(dir);
+    closedir(dir);
 }
 
 /* support function for qsort() */
@@ -209,12 +208,12 @@ int ft_load(struct tree_context* c, const char* tempdir)
 {
     int i;
     int name_buffer_used = 0;
-    DIRCACHED *dir;
+    DIR *dir;
 
     if (tempdir)
-        dir = opendir_cached(tempdir);
+        dir = opendir(tempdir);
     else
-        dir = opendir_cached(c->currdir);
+        dir = opendir(c->currdir);
     if(!dir)
         return -1; /* not a directory */
 
@@ -223,7 +222,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
 
     for ( i=0; i < global_settings.max_files_in_dir; i++ ) {
         int len;
-        struct dircache_entry *entry = readdir_cached(dir);
+        struct dirent *entry = readdir(dir);
         struct entry* dptr =
             (struct entry*)(c->dircache + i * sizeof(struct entry));
         if (!entry)
@@ -301,7 +300,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
     }
     c->filesindir = i;
     c->dirlength = i;
-    closedir_cached(dir);
+    closedir(dir);
 
     qsort(c->dircache,i,sizeof(struct entry),compare);
 

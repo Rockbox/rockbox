@@ -222,18 +222,11 @@ static const struct plugin_api rockbox_api = {
     create_numbered_filename,
 
     /* dir */
-    PREFIX(opendir),
-    PREFIX(closedir),
-    PREFIX(readdir),
-    PREFIX(mkdir),
-    PREFIX(rmdir),
-
-    /* dir, cached */
-#ifdef HAVE_DIRCACHE
-    opendir_cached,
-    readdir_cached,
-    closedir_cached,
-#endif
+    opendir,
+    closedir,
+    readdir,
+    mkdir,
+    rmdir,
 
     /* kernel/ system */
     PREFIX(sleep),

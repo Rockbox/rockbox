@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id: dir.c 13741 2007-06-30 02:08:27Z jethead71 $
  *
  * Copyright (C) 2002 by Björn Stenberg
  *
@@ -24,11 +24,11 @@
 #include "dir.h"
 #include "debug.h"
 #include "atoi.h"
-#include "dircache.h"
+//#include "dircache.h"
 
 #define MAX_OPEN_DIRS 8
 
-static DIR opendirs[MAX_OPEN_DIRS];
+static DIR_UNCACHED opendirs[MAX_OPEN_DIRS];
 
 #ifdef HAVE_MULTIVOLUME
 
@@ -78,7 +78,7 @@ static int strip_volume(const char* name, char* namecopy)
 // release all dir handles on a given volume "by force", to avoid leaks
 int release_dirs(int volume)
 {
-    DIR* pdir = opendirs;
+    DIR_UNCACHED* pdir = opendirs;
     int dd;
     int closed = 0;
     for ( dd=0; dd<MAX_OPEN_DIRS; dd++, pdir++)
@@ -93,14 +93,14 @@ int release_dirs(int volume)
 }
 #endif /* #ifdef HAVE_HOTSWAP */
 
-DIR* opendir(const char* name)
+DIR_UNCACHED* opendir_uncached(const char* name)
 {
     char namecopy[MAX_PATH];
     char* part;
     char* end;
     struct fat_direntry entry;
     int dd;
-    DIR* pdir = opendirs;
+    DIR_UNCACHED* pdir = opendirs;
 #ifdef HAVE_MULTIVOLUME
     int volume;
 #endif
@@ -170,16 +170,16 @@ DIR* opendir(const char* name)
     return pdir;
 }
 
-int closedir(DIR* dir)
+int closedir_uncached(DIR_UNCACHED* dir)
 {
     dir->busy=false;
     return 0;
 }
 
-struct dirent* readdir(DIR* dir)
+struct dirent_uncached* readdir_uncached(DIR_UNCACHED* dir)
 {
     struct fat_direntry entry;
-    struct dirent* theent = &(dir->theent);
+    struct dirent_uncached* theent = &(dir->theent);
 
     if (!dir->busy)
         return NULL;
@@ -191,7 +191,7 @@ struct dirent* readdir(DIR* dir)
      && dir->volumecounter < NUM_VOLUMES /* in range */
      && dir->fatdir.file.volume == 0) /* at volume 0 */
     {   /* fake special directories, which don't really exist, but
-           will get redirected upon opendir() */
+           will get redirected upon opendir_uncached() */
         while (++dir->volumecounter < NUM_VOLUMES)
         {
             if (fat_ismounted(dir->volumecounter))
@@ -222,14 +222,14 @@ struct dirent* readdir(DIR* dir)
     return theent;
 }
 
-int mkdir(const char *name)
+int mkdir_uncached(const char *name)
 {
-    DIR *dir;
+    DIR_UNCACHED *dir;
     char namecopy[MAX_PATH];
     char* end;
     char *basename;
     char *parent;
-    struct dirent *entry;
+    struct dirent_uncached *entry;
     struct fat_dir newdir;
     int rc;
 
@@ -253,7 +253,7 @@ int mkdir(const char *name)
         
     DEBUGF("mkdir: parent: %s, name: %s\n", parent, basename);
 
-    dir = opendir(parent);
+    dir = opendir_uncached(parent);
     
     if(!dir) {
         DEBUGF("mkdir: can't open parent dir\n");
@@ -267,11 +267,11 @@ int mkdir(const char *name)
     }
     
     /* Now check if the name already exists */
-    while ((entry = readdir(dir))) {
+    while ((entry = readdir_uncached(dir))) {
         if ( !strcasecmp(basename, entry->d_name) ) {
             DEBUGF("mkdir error: file exists\n");
             errno = EEXIST;
-            closedir(dir);
+            closedir_uncached(dir);
             return - 4;
         }
     }
@@ -279,23 +279,18 @@ int mkdir(const char *name)
     memset(&newdir, sizeof(struct fat_dir), 0);
     
     rc = fat_create_dir(basename, &newdir, &(dir->fatdir));
-#ifdef HAVE_DIRCACHE
-    if (rc >= 0)
-        dircache_mkdir(name);
-#endif
-
-    closedir(dir);
+    closedir_uncached(dir);
     
     return rc;
 }
 
-int rmdir(const char* name)
+int rmdir_uncached(const char* name)
 {
     int rc;
-    DIR* dir;
-    struct dirent* entry;
+    DIR_UNCACHED* dir;
+    struct dirent_uncached* entry;
     
-    dir = opendir(name);
+    dir = opendir_uncached(name);
     if (!dir)
     {
         errno = ENOENT; /* open error */
@@ -303,14 +298,14 @@ int rmdir(const char* name)
     }
 
     /* check if the directory is empty */
-    while ((entry = readdir(dir)))
+    while ((entry = readdir_uncached(dir)))
     {
         if (strcmp(entry->d_name, ".") &&
             strcmp(entry->d_name, ".."))
         {
             DEBUGF("rmdir error: not empty\n");
             errno = ENOTEMPTY;
-            closedir(dir);
+            closedir_uncached(dir);
             return -2;
         }
     }
@@ -321,14 +316,7 @@ int rmdir(const char* name)
         errno = EIO;
         rc = rc * 10 - 3;
     }
-#ifdef HAVE_DIRCACHE
-    else
-    {
-        dircache_rmdir(name);
-    }
-#endif
 
-    closedir(dir);
-    
+    closedir_uncached(dir);
     return rc;
 }

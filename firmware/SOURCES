@@ -28,7 +28,7 @@ common/crc32-mi4.c
 #endif
 common/ctype.c
 #ifndef SIMULATOR
-common/dir.c
+common/dir_uncached.c
 common/file.c
 #endif /* SIMULATOR */
 #ifdef HAVE_DIRCACHE

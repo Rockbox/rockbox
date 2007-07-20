@@ -70,7 +70,7 @@
 #include "crc32.h"
 #include "misc.h"
 #include "settings.h"
-#include "dircache.h"
+#include "dir.h"
 #include "structec.h"
 #ifndef __PCTOOL__
 #include "atoi.h"
@@ -327,7 +327,7 @@ static bool do_timed_yield(void)
 
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
 static long find_entry_ram(const char *filename,
-                           const struct dircache_entry *dc)
+                           const struct dirent *dc)
 {
     static long last_pos = 0;
     int i;
@@ -626,7 +626,7 @@ static bool retrieve(struct tagcache_search *tcs, struct index_entry *idx,
 # ifdef HAVE_DIRCACHE
         if (tag == tag_filename && idx->flag & FLAG_DIRCACHE)
         {
-            dircache_copy_path((struct dircache_entry *)seek,
+            dircache_copy_path((struct dirent *)seek,
                                buf, size);
             return true;
         }
@@ -1329,7 +1329,7 @@ static bool get_next(struct tagcache_search *tcs)
 # ifdef HAVE_DIRCACHE
         if (tcs->type == tag_filename)
         {
-            dircache_copy_path((struct dircache_entry *)tcs->position,
+            dircache_copy_path((struct dirent *)tcs->position,
                                buf, sizeof buf);
             tcs->result = buf;
             tcs->result_len = strlen(buf) + 1;
@@ -1583,7 +1583,7 @@ static int check_if_empty(char **tag)
     offset += entry.tag_length[tag]
     
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-static void add_tagcache(char *path, const struct dircache_entry *dc)
+static void add_tagcache(char *path, const struct dirent *dc)
 #else
 static void add_tagcache(char *path)
 #endif
@@ -3464,7 +3464,7 @@ static bool load_tagcache(void)
             if (tag == tag_filename)
             {
 # ifdef HAVE_DIRCACHE
-                const struct dircache_entry *dc;
+                const struct dirent *dc;
 # endif
                 
                 // FIXME: This is wrong!
@@ -3647,14 +3647,14 @@ static bool check_deleted_files(void)
 
 static bool check_dir(const char *dirname)
 {
-    DIRCACHED *dir;
+    DIR *dir;
     int len;
     int success = false;
 
-    dir = opendir_cached(dirname);
+    dir = opendir(dirname);
     if (!dir)
     {
-        logf("tagcache: opendir_cached() failed");
+        logf("tagcache: opendir() failed");
         return false;
     }
     
@@ -3665,9 +3665,9 @@ static bool check_dir(const char *dirname)
     while (!check_event_queue())
 #endif
     {
-        struct dircache_entry *entry;
+        struct dirent *entry;
 
-        entry = readdir_cached(dir);
+        entry = readdir(dir);
     
         if (entry == NULL)
         {
@@ -3698,7 +3698,7 @@ static bool check_dir(const char *dirname)
         curpath[len] = '\0';
     }
     
-    closedir_cached(dir);
+    closedir(dir);
 
     return success;
 }

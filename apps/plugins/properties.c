@@ -59,30 +59,18 @@ static bool file_properties(char* selected_file)
 {
     bool found = false;
     char tstr[MAX_PATH];
-#ifdef HAVE_DIRCACHE
-    DIRCACHED* dir;
-    struct dircache_entry* entry;
-#else
     DIR* dir;
     struct dirent* entry;
-#endif
+
     char* ptr = rb->strrchr(selected_file, '/') + 1;
     int dirlen = (ptr - selected_file);
     rb->strncpy(tstr, selected_file, dirlen);
     tstr[dirlen] = 0;
 
-#ifdef HAVE_DIRCACHE
-    dir = rb->opendir_cached(tstr);
-#else
     dir = rb->opendir(tstr);
-#endif
     if (dir)
     {
-#ifdef HAVE_DIRCACHE
-        while(0 != (entry = rb->readdir_cached(dir)))
-#else
         while(0 != (entry = rb->readdir(dir)))
-#endif
         {
             if(!rb->strcmp(entry->d_name, selected_file+dirlen))
             {
@@ -103,11 +91,7 @@ static bool file_properties(char* selected_file)
                 break;
             }
         }
-#ifdef HAVE_DIRCACHE
-        rb->closedir_cached(dir);
-#else
         rb->closedir(dir);
-#endif
     }
     return found;
 }
@@ -128,30 +112,17 @@ static bool _dir_properties(DPS* dps)
        and informs the user of the progress */
     bool result;
     int dirlen;
-#ifdef HAVE_DIRCACHE
-    DIRCACHED* dir;
-    struct dircache_entry* entry;
-#else
     DIR* dir;
     struct dirent* entry;
-#endif
 
     result = true;
     dirlen = rb->strlen(dps->dirname);
-#ifdef HAVE_DIRCACHE
-    dir = rb->opendir_cached(dps->dirname);
-#else
     dir = rb->opendir(dps->dirname);
-#endif
     if (!dir)
         return false; /* open error */
 
     /* walk through the directory content */
-#ifdef HAVE_DIRCACHE
-    while(result && (0 != (entry = rb->readdir_cached(dir))))
-#else
     while(result && (0 != (entry = rb->readdir(dir))))
-#endif
     {
         /* append name to current directory */
         rb->snprintf(dps->dirname+dirlen, dps->len-dirlen, "/%s",
@@ -189,12 +160,7 @@ static bool _dir_properties(DPS* dps)
             result = false;
         rb->yield();
     }
-#ifdef HAVE_DIRCACHE
-    rb->closedir_cached(dir);
-#else
     rb->closedir(dir);
-#endif
-
     return result;
 }
 
@@ -256,30 +222,17 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 
     /* determine if it's a file or a directory */
     bool found = false;
-#ifdef HAVE_DIRCACHE
-    DIRCACHED* dir;
-    struct dircache_entry* entry;
-#else
     DIR* dir;
     struct dirent* entry;
-#endif
     char* ptr = rb->strrchr((char*)file, '/') + 1;
     int dirlen = (ptr - (char*)file);
     rb->strncpy(str_dirname, (char*)file, dirlen);
     str_dirname[dirlen] = 0;
 
-#ifdef HAVE_DIRCACHE
-    dir = rb->opendir_cached(str_dirname);
-#else
     dir = rb->opendir(str_dirname);
-#endif
     if (dir)
     {
-#ifdef HAVE_DIRCACHE
-        while(0 != (entry = rb->readdir_cached(dir)))
-#else
         while(0 != (entry = rb->readdir(dir)))
-#endif
         {
             if(!rb->strcmp(entry->d_name, file+dirlen))
             {
@@ -288,11 +241,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 break;
             }
         }
-#ifdef HAVE_DIRCACHE
-        rb->closedir_cached(dir);
-#else
         rb->closedir(dir);
-#endif
     }
     /* now we know if it's a file or a dir or maybe something failed */
     

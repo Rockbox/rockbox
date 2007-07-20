@@ -22,9 +22,9 @@
 #include "fat.h"
 #ifdef HAVE_HOTSWAP
 #include "hotswap.h"
+#include "dir.h" /* for release_dirs() */
+#include "file.h" /* for release_files() */
 #endif
-#include "file.h" /* for release_dirs() */
-#include "dir.h" /* for release_files() */
 #include "disk.h"
 
 /* Partition table entry layout:

@@ -931,20 +931,20 @@ static long pltick;
 static bool add_dir(char* dirname, int len, int fd)
 {
     bool abort = false;
-    DIRCACHED* dir;
+    DIR* dir;
 
     /* check for user abort */
     if (action_userabort(TIMEOUT_NOBLOCK))
         return true;
 
-    dir = opendir_cached(dirname);
+    dir = opendir(dirname);
     if(!dir)
         return true;
 
     while (true) {
-        struct dircache_entry *entry;
+        struct dirent *entry;
 
-        entry = readdir_cached(dir);
+        entry = readdir(dir);
         if (!entry)
             break;
         if (entry->attribute & ATTR_DIRECTORY) {
@@ -1021,7 +1021,7 @@ static bool add_dir(char* dirname, int len, int fd)
             }
         }
     }
-    closedir_cached(dir);
+    closedir(dir);
 
     return abort;
 }
