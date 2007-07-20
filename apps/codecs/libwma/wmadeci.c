@@ -150,58 +150,6 @@ static VLC_TYPE vlcbuf3[1536][2] IBSS_ATTR;    //small so lets try iram
 
 #include "wmadata.h" // PJJ
 
-/**
- * The size of the FFT is 2^nbits. If inverse is TRUE, inverse FFT is
- * done
- */
-int fft_inits(FFTContext *s, int nbits, int inverse)
-{
-    int i, n;
-    fixed32 c1, s1;
-    int s2;
-
-    s->nbits = nbits;
-    n = 1 << nbits;
-
-    s->inverse = inverse;
-
-    s2 = inverse ? 1 : -1;
-
-    if(nbits == 10){        //we folded all these stupid tables into the nbits==10 table, so don't make it for the others!
-                    //should probably just remove exptab building out of this function and do it higher up for neatness
-        for(i=0;i<(n/2);++i)
-        {
-          //we're going to redo this in CORDIC fixed format!     Hold onto your butts
-
-          /*
-          input to cordic is from 0 ->2pi with 0->0 and 2^32-1 ->2pi
-          output, which is what we'll store the variables as is
-            -1->-2^31 and 1->2^31-1
-
-          */
-
-          fixed32 ifix = itofix32(i);
-          fixed32 nfix = itofix32(n);
-          fixed32 res = fixdiv32(ifix,nfix);        //this is really bad here since nfix can be as large as 1024 !
-                            //also, make this a shift, since its a fucking power of two divide
-          //alpha = fixmul32(TWO_M_PI_F, res);
-          //ct = fixcos32(alpha);                    //need to correct alpha for 0->2pi scale
-          //st = fixsin32(alpha);// * s2;
-
-          s1 = fsincos(res<<16, &c1);        //does sin and cos in one pass!
-
-        //I really have my doubts about the correctness of the alpha to cordic mapping here, but it seems to work well enough
-        //double check this later!
-
-          exptab0[i].re = c1;
-          exptab0[i].im = s1*s2;
-        }
-    }
-   // s->fft_calc = fft_calc;
-    s->exptab1 = NULL;
-
-    return 0;
-}
 
 /* butter fly op */
 #define BF(pre, pim, qre, qim, pre1, pim1, qre1, qim1) \
@@ -338,14 +286,13 @@ int ff_mdct_init(MDCTContext *s, int nbits, int inverse)
     s->tsin[i] = - fsincos(ip<<16, &(s->tcos[i]));            //I can't remember why this works, but it seems to agree for ~24 bits, maybe more!
     s->tcos[i] *=-1;
   }
-    if (fft_inits(&s->fft, s->nbits - 2, inverse) < 0)
-        goto fail;
+      s->fft.nbits = s->nbits - 2;
+
+
+    s->fft.inverse = inverse;
 
     return 0;
-fail:
-//    av_freep(&s->tcos);
-//    av_freep(&s->tsin);
-    return -1;
+
 }
 
 /**
@@ -824,11 +771,30 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
     exparray[0] = exptab0; //exparray[1] = exptab1; exparray[2] = exptab2; exparray[3] = exptab3; exparray[4] = exptab4;
     revarray[0]=revtab0; //revarray[1]=revtab1; revarray[2]=revtab2; revarray[3]=revtab3; revarray[4]=revtab4;
 
-      s->mdct_tmp = mdct_tmp; /* temporary storage for imdct */
+    s->mdct_tmp = mdct_tmp; /* temporary storage for imdct */
     for(i = 0; i < s->nb_block_sizes; ++i)
     {
         ff_mdct_init(&s->mdct_ctx[i], s->frame_len_bits - i + 1, 1);
     }
+
+	{
+		int i, n;
+		fixed32 c1, s1, s2;
+
+		n=1<<10;
+		s2 = 1 ? 1 : -1;
+		  for(i=0;i<(n/2);++i)
+		  {
+		    fixed32 ifix = itofix32(i);
+		    fixed32 nfix = itofix32(n);
+		    fixed32 res = fixdiv32(ifix,nfix);
+
+		    s1 = fsincos(res<<16, &c1);
+
+		    exptab0[i].re = c1;
+		    exptab0[i].im = s1*s2;
+		}
+	}
 
     /* init the MDCT bit reverse table here rather then in fft_init */
 
