@@ -56,9 +56,9 @@ void lcd_init_device(void)
     /* When the Rockbox bootloader starts, we are changing framebuffer address,
        but we don't want what's shown on the LCD to change until we do an
        lcd_update(), so copy the data from the old framebuffer to the new one */
-    unsigned short *buf = (unsigned short*)FRAME;
+    unsigned short *buf = (unsigned short*)FRAME1;
 
-    memcpy(FRAME, (short *)((LCDSADDR1)<<1), 320*240*2);
+    memcpy(FRAME1, (short *)((LCDSADDR1)<<1), 320*240*2);
 
     /* The Rockbox bootloader is transitioning from RGB555I to RGB565 mode
        so convert the frambuffer data accordingly */
@@ -83,7 +83,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         sleep(200);
         return;
     }
-    memcpy(((char*)FRAME) + (y * sizeof(fb_data) * LCD_WIDTH), ((char *)&lcd_framebuffer) + (y * sizeof(fb_data) * LCD_WIDTH), ((height * sizeof(fb_data) * LCD_WIDTH)));
+    memcpy(((char*)FRAME2) + (y * sizeof(fb_data) * LCD_WIDTH), ((char *)&lcd_framebuffer) + (y * sizeof(fb_data) * LCD_WIDTH), ((height * sizeof(fb_data) * LCD_WIDTH)));
 }
 
 void lcd_enable(bool state)
@@ -177,7 +177,7 @@ void lcd_yuv_blit(unsigned char * const src[3],
     width &= ~1;
     height >>= 1;
 
-    fb_data *dst = (fb_data*)FRAME + x * LCD_WIDTH + (LCD_WIDTH - y) - 1;
+    fb_data *dst = (fb_data*)FRAME1 + x * LCD_WIDTH + (LCD_WIDTH - y) - 1;
 
     z = stride*src_y;
     yuv_src[0] = src[0] + z + src_x;

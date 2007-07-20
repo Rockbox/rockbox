@@ -35,7 +35,7 @@ start:
     mrs r0, cpsr
     bic r0, r0, #0x100
     add r0,r0,#0xD3
-    msr cpsr, r0
+    msr cpsr_c, r0
 #else
     msr    cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ */
 #endif  
@@ -166,8 +166,43 @@ L2_loop:
     cmp r2, #0
     bne L2_loop
     /*** End of L2 operations ***/
+	
+	/* Set up stack for IRQ mode */ 
+    mrs    r0,cpsr
+    orr    r0,r0,#0xd2
+    msr    cpsr_c,r0
+    ldr    sp, =irq_stack
+    /* Set up stack for FIQ mode */ 
+    mrs    r0,cpsr
+    orr    r0,r0,#0xd1
+    msr    cpsr_c,r0
+    ldr    sp, =fiq_stack
 
+    /* Let abort and undefined modes use IRQ stack */
+    mrs    r0,cpsr
+    orr    r0,r0,#0xd7
+    msr    cpsr_c,r0
+    ldr    sp, =irq_stack
+    mrs    r0,cpsr
+    orr    r0,r0,#0xdb
+    msr    cpsr_c,r0
+    ldr    sp, =irq_stack
+    /* Switch to supervisor mode */
+    mrs    r0,cpsr
+    orr    r0,r0,#0xdb
+    msr    cpsr_c,r0
+    ldr    sp, =stackend
+	
     bl main
+    
+    /* 256 words of IRQ stack */
+    .space 256*4
+	irq_stack:
+
+	/* 256 words of FIQ stack */
+    .space 256*4
+	fiq_stack:
+
 #endif
 
 #else /* BOOTLOADER */

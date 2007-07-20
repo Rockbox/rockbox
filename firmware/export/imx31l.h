@@ -21,9 +21,14 @@
 
 #define L2CC_BASE_ADDR          0x30000000
  
+/*Frame Buffer and TTB defines from gigabeat f/x build*/
 #define LCDSADDR1 (*(volatile int *)0x80100000) /* STN/TFT: frame buffer start address 1 */
-#define FRAME   ((short *)0x84100000)			/* STN/TFT: frame buffer start address 2 */
- /*
+#define FRAME1 ((short *)0x80100000)
+#define FRAME2 ((short *)0x84100000)
+#define LCD_BUFFER_SIZE ((320*240*2))
+#define TTB_SIZE (0x4000)
+#define TTB_BASE (0x80000000 + (32*1024*1024*2)-TTB_SIZE); /*64 megs*/
+/*
   * AIPS 1
   */
  #define AIPS1_BASE_ADDR         0x43F00000
@@ -99,34 +104,35 @@
 #define AVIC_BASE_ADDR          0x68000000
 
 #define INTCNTL                 (*(volatile long*)AVIC_BASE_ADDR)
-#define NIMASK                  (*(volatile long*)AVIC_BASE_ADDR+0x004)
-#define INTENNUM                (*(volatile long*)AVIC_BASE_ADDR+0x008)
-#define INTDISNUM               (*(volatile long*)AVIC_BASE_ADDR+0x00C)
-#define INTENABLEH              (*(volatile long*)AVIC_BASE_ADDR+0x010)
-#define INTENABLEL              (*(volatile long*)AVIC_BASE_ADDR+0x014)
-#define INTTYPEH                (*(volatile long*)AVIC_BASE_ADDR+0x018)
-#define INTTYPEL                (*(volatile long*)AVIC_BASE_ADDR+0x01C)
-#define NIPRIORITY7             (*(volatile long*)AVIC_BASE_ADDR+0x020)
-#define NIPRIORITY6             (*(volatile long*)AVIC_BASE_ADDR+0x024)
-#define NIPRIORITY5             (*(volatile long*)AVIC_BASE_ADDR+0x028)
-#define NIPRIORITY4             (*(volatile long*)AVIC_BASE_ADDR+0x02C)
-#define NIPRIORITY3             (*(volatile long*)AVIC_BASE_ADDR+0x030)
-#define NIPRIORITY2             (*(volatile long*)AVIC_BASE_ADDR+0x034)
-#define NIPRIORITY1             (*(volatile long*)AVIC_BASE_ADDR+0x038)
-#define NIPRIORITY0             (*(volatile long*)AVIC_BASE_ADDR+0x03C)
-#define NIVECSR                 (*(volatile long*)AVIC_BASE_ADDR+0x040)
-#define FIVECSR                 (*(volatile long*)AVIC_BASE_ADDR+0x044)
-#define INTSRCH                 (*(volatile long*)AVIC_BASE_ADDR+0x048)
-#define INTSRCL                 (*(volatile long*)AVIC_BASE_ADDR+0x04C)
-#define INTFRCH                 (*(volatile long*)AVIC_BASE_ADDR+0x050)
-#define INTFRCL                 (*(volatile long*)AVIC_BASE_ADDR+0x054)
-#define NIPNDH                  (*(volatile long*)AVIC_BASE_ADDR+0x058)
-#define NIPNDL                  (*(volatile long*)AVIC_BASE_ADDR+0x05C)
-#define FIPNDH                  (*(volatile long*)AVIC_BASE_ADDR+0x060)
-#define FIPNDL                  (*(volatile long*)AVIC_BASE_ADDR+0x064)
+#define NIMASK                  (*(volatile long*)(AVIC_BASE_ADDR+0x004))
+#define INTENNUM                (*(volatile long*)(AVIC_BASE_ADDR+0x008))
+#define INTDISNUM               (*(volatile long*)(AVIC_BASE_ADDR+0x00C))
+#define INTENABLEH              (*(volatile long*)(AVIC_BASE_ADDR+0x010))
+#define INTENABLEL              (*(volatile long*)(AVIC_BASE_ADDR+0x014))
+#define INTTYPEH                (*(volatile long*)(AVIC_BASE_ADDR+0x018))
+#define INTTYPEL                (*(volatile long*)(AVIC_BASE_ADDR+0x01C))
+#define NIPRIORITY7             (*(volatile long*)(AVIC_BASE_ADDR+0x020))
+#define NIPRIORITY6             (*(volatile long*)(AVIC_BASE_ADDR+0x024))
+#define NIPRIORITY5             (*(volatile long*)(AVIC_BASE_ADDR+0x028))
+#define NIPRIORITY4             (*(volatile long*)(AVIC_BASE_ADDR+0x02C))
+#define NIPRIORITY3             (*(volatile long*)(AVIC_BASE_ADDR+0x030))
+#define NIPRIORITY2             (*(volatile long*)(AVIC_BASE_ADDR+0x034))
+#define NIPRIORITY1             (*(volatile long*)(AVIC_BASE_ADDR+0x038))
+#define NIPRIORITY0             (*(volatile long*)(AVIC_BASE_ADDR+0x03C))
+#define NIVECSR                 (*(volatile long*)(AVIC_BASE_ADDR+0x040))
+#define FIVECSR                 (*(volatile long*)(AVIC_BASE_ADDR+0x044))
+#define INTSRCH                 (*(volatile long*)(AVIC_BASE_ADDR+0x048))
+#define INTSRCL                 (*(volatile long*)(AVIC_BASE_ADDR+0x04C))
+#define INTFRCH                 (*(volatile long*)(AVIC_BASE_ADDR+0x050))
+#define INTFRCL                 (*(volatile long*)(AVIC_BASE_ADDR+0x054))
+#define NIPNDH                  (*(volatile long*)(AVIC_BASE_ADDR+0x058))
+#define NIPNDL                  (*(volatile long*)(AVIC_BASE_ADDR+0x05C))
+#define FIPNDH                  (*(volatile long*)(AVIC_BASE_ADDR+0x060))
+#define FIPNDL                  (*(volatile long*)(AVIC_BASE_ADDR+0x064))
 
 /* The vectors go all the way up to 63. 4 bytes for each */
-#define VECTOR0                 (*(volatile long*)AVIC_BASE_ADDR+0x100)
+#define VECTOR_BASE_ADDR 	AVIC_BASE_ADDR+0x100
+#define VECTOR0                 (*(volatile long*)VECTOR_BASE_ADDR)
 
 #define NIDIS                   (1 << 22)
 #define FIDIS                   (1 << 21)

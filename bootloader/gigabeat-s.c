@@ -43,7 +43,7 @@
 #include "usb.h"
 #include "mmu-imx31.h"
 #include "lcd-target.h"
-
+#include "avic-imx31.h"
 #include <stdarg.h>
 
 char version[] = APPSVERSION;
@@ -54,6 +54,8 @@ void main(void)
         printscreen(0xFA);
         printf("Hello world!");
         printf("Gigabeat S Rockbox Bootloader v.00000001");          
-        for(;;) {}
+        avic_init();
+		imx31_int[UART1].pInt_Handler();
+		for(;;) {}
 }
 

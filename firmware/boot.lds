@@ -160,6 +160,12 @@ SECTIONS
     *(.init.text)
     *(.text*)
   }
+  .avic_int : {
+    _avicstart = .;
+    KEEP(*(.avic_int*));
+    *(.avic_int*);
+    _avicend = .;
+  }
   .data : {
     *(.icode)
     *(.irodata)
