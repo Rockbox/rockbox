@@ -50,7 +50,6 @@ char version[] = APPSVERSION;
 
 void main(void)
 {
-        int rc;
         printscreen(0xFA);
         printf("Hello world!");
         printf("Gigabeat S Rockbox Bootloader v.00000001");          

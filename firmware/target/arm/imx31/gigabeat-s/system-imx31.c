@@ -4,6 +4,8 @@
 #include "mmu-imx31.h"
 #include "system-target.h"
 #include "lcd.h"
+#include "serial-imx31.h"
+#include "debug.h"
 
 int system_memory_guard(int newmode)
 {
@@ -67,12 +69,12 @@ void system_init(void)
 	dprintf("R12=0x%x\tSP=0x%x\tLR=0x%x\tPC=0x%x\n",regs.r12,regs.sp,regs.lr,regs.pc);
 	//dprintf("CPSR=0x%x\t\n",regs.cpsr);
 #endif
-	printf("Register Dump :\n");
-	printf("R0=0x%x\tR1=0x%x\tR2=0x%x\tR3=0x%x\n",regs.r0,regs.r1,regs.r2,regs.r3);
-    printf("R4=0x%x\tR5=0x%x\tR6=0x%x\tR7=0x%x\n",regs.r4,regs.r5,regs.r6,regs.r7);
-	printf("R8=0x%x\tR9=0x%x\tR10=0x%x\tR11=0x%x\n",regs.r8,regs.r9,regs.r10,regs.r11);
-	printf("R12=0x%x\tSP=0x%x\tLR=0x%x\tPC=0x%x\n",regs.r12,regs.sp,regs.lr,regs.pc);
-	//printf("CPSR=0x%x\t\n",regs.cpsr);
+	DEBUGF("Register Dump :\n");
+	DEBUGF("R0=0x%x\tR1=0x%x\tR2=0x%x\tR3=0x%x\n",regs.r0,regs.r1,regs.r2,regs.r3);
+    DEBUGF("R4=0x%x\tR5=0x%x\tR6=0x%x\tR7=0x%x\n",regs.r4,regs.r5,regs.r6,regs.r7);
+	DEBUGF("R8=0x%x\tR9=0x%x\tR10=0x%x\tR11=0x%x\n",regs.r8,regs.r9,regs.r10,regs.r11);
+	DEBUGF("R12=0x%x\tSP=0x%x\tLR=0x%x\tPC=0x%x\n",regs.r12,regs.sp,regs.lr,regs.pc);
+	//DEBUGF("CPSR=0x%x\t\n",regs.cpsr);
     
  }
 

@@ -1,8 +1,26 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * Copyright (C) 2007 by James Espinoza
+ *
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
 #include <stdio.h>
 #include "system.h"
 #include "imx31l.h"
 #include "avic-imx31.h"
-
+#include "debug.h"
 
 void avic_init(void) 
 {
@@ -23,10 +41,8 @@ void avic_init(void)
 		imx31_int[i].pInt_Handler=Unhandled_Int;
 	}
 	
-	
 	/*enable all Interrupts*/
 	avic_enable_int(ALL,IRQ,0);
-	
 	
 	/*Setup all interrupt type IRQ*/
 	avic_set_int_type(ALL,IRQ);
@@ -117,14 +133,14 @@ void avic_set_int_type(enum IMX31_INT_LIST ints, enum INT_TYPE intstype)
 void Unhandled_Int(void) 
 {
 	enum IMX31_INT_LIST ints = 0;
-	printf("Unhandled Interrupt:\n");
-	printf("Name : %s\n",imx31_int[ints].name);
-	printf("Interrupt Type : ");
+	DEBUGF("Unhandled Interrupt:\n");
+	DEBUGF("Name : %s\n",imx31_int[ints].name);
+	DEBUGF("Interrupt Type : ");
 	if(imx31_int[ints].int_type==IRQ)
-		printf("IRQ\n");
-	else printf("FIQ\n");
-	printf("Handler Address : 0x%x\n",imx31_int[ints].addr);
-	printf("Priority : %d",imx31_int[ints].priority);
+		DEBUGF("IRQ\n");
+	else DEBUGF("FIQ\n");
+	DEBUGF("Handler Address : 0x%x\n",imx31_int[ints].addr);
+	DEBUGF("Priority : %d",imx31_int[ints].priority);
 }
 
 void vector_init(void)

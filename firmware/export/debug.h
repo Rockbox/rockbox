@@ -20,6 +20,7 @@
 #define DEBUG_H
 
 #include "../include/_ansi.h"
+#include "config.h"
 
 extern void debug_init(void);
 extern void debugf(const char* fmt,...) ATTRIBUTE_PRINTF(1, 2);
@@ -41,6 +42,9 @@ void breakpoint(void);
 
 #define DEBUGF	debugf
 #define LDEBUGF debugf
+#elif CONFIG_CPU==IMX31L
+#define DEBUGF debugf
+#define LDEBUGF(...)
 #else
 #define DEBUGF(...)
 #define LDEBUGF(...)

@@ -25,6 +25,8 @@
 #ifdef HAVE_GDB_API
 #include "gdb_api.h"
 #endif
+#include "lcd.h"
+extern int line;
 
 #ifdef DEBUG
 static char debugmembuf[200];
@@ -241,7 +243,8 @@ void debugf(const char *fmt, ...)
     va_start(ap, fmt);
     vsnprintf(debugmembuf, sizeof(debugmembuf), fmt, ap);
     va_end(ap);
-    debug(debugmembuf);
+    //debug(debugmembuf);
+    lcd_puts(0,line++,debugmembuf);
 #else
     (void)fmt;
 #endif
