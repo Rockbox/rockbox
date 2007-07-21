@@ -858,45 +858,42 @@ static void say_time(int cursorpos, const struct tm *tm)
 #define INDEX_WIDTH 2
 
 #define SEPARATOR ":"
-#define MONTHNAME_LEN 3
-#define DAYNAME_LEN 3
 bool set_time_screen(const char* title, struct tm *tm)
 {
     bool done = false;
     int button;
-    int i, s;
-    int cursorpos = 0;
-    int lastcursorpos = !cursorpos;
+    unsigned int i, s;
+    unsigned int cursorpos = 0;
+    unsigned int lastcursorpos = 1;
     unsigned int julianday;
     unsigned int realyear;
+    unsigned int width;
     unsigned int min = 0, steps = 0;
     unsigned int statusbar_height = 0;
-    unsigned int width, height;
     unsigned int separator_width, weekday_width;
     unsigned int line_height, prev_line_height;
     unsigned char daysinmonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    unsigned char buffer[25];
+    unsigned char buffer[20];
 
     /* 6 possible cursor possitions, 3 values stored for each: x, y, width */
     unsigned char cursor[6][3];
     memset(cursor, 0, sizeof(cursor));
 
     int *valptr = NULL;
-
-    /* for easy acess in the drawing loop */
     unsigned char *ptr[6];
-    ptr[0] = buffer;                    /* hours */
-    ptr[1] = buffer + 3;                /* minutes */
-    ptr[2] = buffer + 6;                /* seconds */
-    ptr[3] = buffer + 10 + DAYNAME_LEN; /* year (dayname is before year in the
-                                           buffer but is not drawn in the loop) */
-    ptr[4] = buffer + 15 + DAYNAME_LEN; /* monthname */
-    ptr[5] = buffer + 16 + DAYNAME_LEN + MONTHNAME_LEN;   /* day of month */
 
     if(global_settings.statusbar)
         statusbar_height = STATUSBAR_HEIGHT;
 
     while ( !done ) {
+        /* for easy acess in the drawing loop */
+        ptr[0] = buffer;                     /* hours */
+        ptr[1] = buffer + 3;                 /* minutes */
+        ptr[2] = buffer + 6;                 /* seconds */
+        ptr[3] = buffer + 9;                 /* year */
+        ptr[4] = str(monthname[tm->tm_mon]); /* monthname */
+        ptr[5] = buffer + 14;                /* day of month */
+
         /* calculate the number of days in febuary */
         realyear = tm->tm_year + 1900;
         if((realyear % 4 == 0 && !(realyear % 100 == 0)) || realyear % 400 == 0)
@@ -910,29 +907,28 @@ bool set_time_screen(const char* title, struct tm *tm)
 
         /* calculate day of week */
         julianday = 0;
-        for(i = 0; i < tm->tm_mon; i++) {
+        for(i = 0; (int)i < tm->tm_mon; i++) {
            julianday += daysinmonth[i];
         }
         julianday += tm->tm_mday;
         tm->tm_wday = (realyear + julianday + (realyear - 1) / 4 -
                        (realyear - 1) / 100 + (realyear - 1) / 400 + 7 - 1) % 7;
 
-        /* copy all the stuff we want from the tm struct to buffer */
+        /* put all the numbers we want from the tm struct into
+           an easily printable buffer */
         snprintf(buffer, sizeof(buffer),
-                 "%02d " "%02d " "%02d " "%.3s " "%04d " "%.3s " "%02d",
+                 "%02d " "%02d " "%02d " "%04d " "%02d",
                  tm->tm_hour, tm->tm_min, tm->tm_sec,
-                 str(dayname[tm->tm_wday]), tm->tm_year+1900,
-                 str(monthname[tm->tm_mon]), tm->tm_mday);
+                 tm->tm_year+1900, tm->tm_mday);
 
-
-        /* convert spaces in the buffer to \0 to make it possible to work
+        /* convert spaces in the buffer to '\0' to make it possible to work
            directly on the buffer */
-        buffer[2] = '\0';
-        buffer[5] = '\0';
-        buffer[8] = '\0';
-        buffer[9 + DAYNAME_LEN] = '\0';
-        buffer[14 + DAYNAME_LEN] = '\0';
-        buffer[15 + DAYNAME_LEN + MONTHNAME_LEN] = '\0';
+        for(i=0; i < sizeof(buffer); i++)
+        {
+            if(buffer[i] == ' ')
+                buffer[i] = '\0';
+        }
+
         FOR_NB_SCREENS(s)
         {
             /* minimum lines needed is 2 + title line */
@@ -945,63 +941,61 @@ bool set_time_screen(const char* title, struct tm *tm)
             
             /* recalculate the positions and offsets */
             if (screens[s].nb_lines >= 3)
-                screens[s].getstringsize(title, &width, &prev_line_height);
+                screens[s].getstringsize(title, NULL, &prev_line_height);
             else
                 prev_line_height = 0;
-            screens[s].getstringsize(buffer, &width, &line_height);
-            screens[s].getstringsize(SEPARATOR, &separator_width, &height);
-        
+            screens[s].getstringsize(buffer, NULL, &line_height);
+            screens[s].getstringsize(SEPARATOR, &separator_width, NULL);
+
+
+            /* get width for each string except the last one and put them
+               in the cursor array */
+            for(i=0; i < 5; i++)
+            {
+                screens[s].getstringsize(ptr[i], &width, NULL);
+                cursor[i][INDEX_WIDTH] = width;
+            }
+
             /* hour */
-            screens[s].getstringsize(buffer, &width, &height);
             /* cursor[0][INDEX_X] is already 0 because of the memset */
             cursor[0][INDEX_Y] = prev_line_height + statusbar_height;
-            cursor[0][INDEX_WIDTH] = width;
 
             /* minute */
-            screens[s].getstringsize(buffer + 3, &width, &height);
             cursor[1][INDEX_X] = cursor[0][INDEX_WIDTH] + separator_width;
             cursor[1][INDEX_Y] = prev_line_height + statusbar_height;
-            cursor[1][INDEX_WIDTH] = width;
     
             /* second */
-            screens[s].getstringsize(buffer + 6, &width, &height);
             cursor[2][INDEX_X] = cursor[0][INDEX_WIDTH] + separator_width +
                                 cursor[1][INDEX_WIDTH] + separator_width;
             cursor[2][INDEX_Y] = prev_line_height + statusbar_height;
-    
+
             /* weekday */
-            screens[s].getstringsize(buffer + 9, &weekday_width, &height);
-            screens[s].getstringsize(" ", &separator_width, &height);
-    
+            screens[s].getstringsize(str(dayname[tm->tm_wday]), &weekday_width, NULL);
+            screens[s].getstringsize(" ", &separator_width, NULL);
+
             /* year */
-            screens[s].getstringsize(buffer  + 10 + DAYNAME_LEN, &width, &height);
             cursor[3][INDEX_X] = weekday_width + separator_width;
             cursor[3][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
-            cursor[3][INDEX_WIDTH] = width;
-    
+
             /* month */
-            screens[s].getstringsize(buffer + 15 + DAYNAME_LEN, &width, &height);
             cursor[4][INDEX_X] = weekday_width + 2 * separator_width +
                                 cursor[3][INDEX_WIDTH];
             cursor[4][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
-            cursor[4][INDEX_WIDTH] = width;
-    
+
             /* day */
-            screens[s].getstringsize(buffer + 16 + DAYNAME_LEN + MONTHNAME_LEN,
-                                     &width, &height);
             cursor[5][INDEX_X] = weekday_width + 3 * separator_width +
                                 cursor[3][INDEX_WIDTH] +
                                 cursor[4][INDEX_WIDTH];
             cursor[5][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
-    
+
             /* draw the screen */
             screens[s].set_drawmode(DRMODE_SOLID);
             screens[s].clear_display();
             /* display the screen title */
             screens[s].puts_scroll(0, 0, title);
-    
+
             /* these are not selectable, so we draw them outside the loop */
-            screens[s].putsxy(0, cursor[3][INDEX_Y], buffer + 9); /* name of the week day */
+            screens[s].putsxy(0, cursor[3][INDEX_Y], str(dayname[tm->tm_wday])); /* name of the week day */
             screens[s].putsxy(cursor[1][INDEX_X] - separator_width, 
                               cursor[0][INDEX_Y], SEPARATOR);
             screens[s].putsxy(cursor[2][INDEX_X] - separator_width,
