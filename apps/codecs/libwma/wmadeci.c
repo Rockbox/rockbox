@@ -582,7 +582,7 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
     fixed64 tmp = itofix64(s->bit_rate);
     fixed64 tmp2 = itofix64(s->nb_channels * s->sample_rate);
     bps = fixdiv64(tmp, tmp2);
-    fixed64 tim = fixmul64byfixed(bps, s->frame_len);
+    fixed64 tim = bps * s->frame_len;
     fixed64 tmpi = fixdiv64(tim,itofix64(8));
     s->byte_offset_bits = av_log2(fixtoi64(tmpi+0x8000)) + 2;
 
@@ -596,7 +596,7 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
         if (bps1 >= 0x9c29)
             s->use_noise_coding = 0;
         else
-            high_freq = fixmul64byfixed(high_freq,0x6666);
+            high_freq = fixmul32(high_freq,0x6666);
     }
     else if (sample_rate1 == 22050)
     {
@@ -610,19 +610,19 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
     else if (sample_rate1 == 16000)
     {
         if (bps > 0x8000)
-            high_freq = fixmul64byfixed(high_freq,0x8000);
+            high_freq = fixmul32(high_freq,0x8000);
         else
-            high_freq = fixmul64byfixed(high_freq,0x4ccd);
+            high_freq = fixmul32(high_freq,0x4ccd);
     }
     else if (sample_rate1 == 11025)
     {
-        high_freq = fixmul64byfixed(high_freq,0xb3333);
+        high_freq = fixmul32(high_freq,0xb333);
     }
     else if (sample_rate1 == 8000)
     {
         if (bps <= 0xa000)
         {
-            high_freq = fixmul64byfixed(high_freq,0x8000);
+           high_freq = fixmul32(high_freq,0x8000);
         }
         else if (bps > 0xc000)
         {
@@ -630,22 +630,22 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
         }
         else
         {
-            high_freq = fixmul64byfixed(high_freq,0xa666);
+            high_freq = fixmul32(high_freq,0xa666);
         }
     }
     else
     {
         if (bps >= 0xcccd)
         {
-            high_freq = fixmul64byfixed(high_freq,0xc000);
+            high_freq = fixmul32(high_freq,0xc000);
         }
         else if (bps >= 0x999a)
         {
-            high_freq = fixmul64byfixed(high_freq,0x999a);
+            high_freq = fixmul32(high_freq,0x999a);
         }
         else
         {
-            high_freq = fixmul64byfixed(high_freq,0x8000);
+            high_freq = fixmul32(high_freq,0x8000);
         }
     }
 
