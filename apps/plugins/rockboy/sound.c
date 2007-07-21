@@ -66,9 +66,9 @@ static const byte soundWavePattern[4][32] = {
    0x01,0x01,0x01,0x01,
    0xff,0xff,0xff,0xff,
    0xff,0xff,0xff,0xff}
-} ICONST_ATTR;
+};
 
-int soundFreqRatio[8] = {
+int soundFreqRatio[8] ICONST_ATTR= {
   1048576, // 0
   524288,  // 1
   262144,  // 2
@@ -77,9 +77,9 @@ int soundFreqRatio[8] = {
   104858,  // 5
   87381,   // 6
   74898    // 7
-} ICONST_ATTR;
+};
 
-int soundShiftClock[16]= {
+int soundShiftClock[16] ICONST_ATTR= {
       2, // 0
       4, // 1
       8, // 2
@@ -96,19 +96,7 @@ int soundShiftClock[16]= {
   16384, // 13
   1,     // 14
   1      // 15
-} ICONST_ATTR;
-
-static const int freqtab[8] =
-{
-    (1<<14)*2,
-    (1<<14),
-    (1<<14)/2,
-    (1<<14)/3,
-    (1<<14)/4,
-    (1<<14)/5,
-    (1<<14)/6,
-    (1<<14)/7
-} ICONST_ATTR;
+};
 
 struct snd snd IBSS_ATTR;
 
