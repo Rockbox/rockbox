@@ -34,10 +34,9 @@
 # define rmdir rmdir_cached
 #else
 #include "dir_uncached.h"
-#warning no dircache
 # define DIR DIR_UNCACHED
 # define dirent dirent_uncached
-//# define opendir opendir_uncached
+# define opendir opendir_uncached
 # define closedir closedir_uncached
 # define readdir readdir_uncached
 # define closedir closedir_uncached
