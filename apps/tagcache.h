@@ -63,6 +63,11 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 /* Always strict align entries for best performance and binary compatability. */
 #define TAGCACHE_STRICT_ALIGN 1
 
+/* Max events in the internal tagcache command queue. */
+#define TAGCACHE_COMMAND_QUEUE_LENGTH 32
+/* Idle time before committing events in the command queue. */
+#define TAGCACHE_COMMAND_QUEUE_COMMIT_DELAY  HZ*2
+
 #define TAGCACHE_MAX_FILTERS 4
 #define TAGCACHE_MAX_CLAUSES 32
 
@@ -170,6 +175,7 @@ long tagcache_increase_serial(void);
 long tagcache_get_serial(void);
 bool tagcache_import_changelog(void);
 bool tagcache_create_changelog(struct tagcache_search *tcs);
+void tagcache_update_numeric(int idx_id, int tag, long data);
 bool tagcache_modify_numeric_entry(struct tagcache_search *tcs, 
                                    int tag, long data);
 

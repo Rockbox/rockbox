@@ -202,10 +202,12 @@ struct mp3entry {
     long rundbentryoffset;
 
     /* runtime database fields */
+    long tagcache_idx;
     short rating;
     short score;
     long playcount;
     long lastplayed;
+    long playtime;
     
     /* replaygain support */
     

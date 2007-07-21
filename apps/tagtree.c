@@ -624,9 +624,14 @@ static void tagtree_buffer_event(struct mp3entry *id3, bool last_track)
     }
     
     id3->playcount  = tagcache_get_numeric(&tcs, tag_playcount);
-    if(!id3->rating) id3->rating = tagcache_get_numeric(&tcs, tag_rating);
+    if (!id3->rating)
+        id3->rating = tagcache_get_numeric(&tcs, tag_rating);
     id3->lastplayed = tagcache_get_numeric(&tcs, tag_lastplayed);
     id3->score      = tagcache_get_numeric(&tcs, tag_virt_autoscore) / 10;
+    id3->playtime   = tagcache_get_numeric(&tcs, tag_playtime);
+    
+    /* Store our tagcache index pointer. */
+    id3->tagcache_idx = tcs.idx_id;
     
     tagcache_search_finish(&tcs);
 }
@@ -635,7 +640,6 @@ static void tagtree_unbuffer_event(struct mp3entry *id3, bool last_track)
 {
     (void)last_track;
     long playcount;
-    long rating;
     long playtime;
     long lastplayed;
     
@@ -646,6 +650,12 @@ static void tagtree_unbuffer_event(struct mp3entry *id3, bool last_track)
         return;
     }
     
+    if (!id3->tagcache_idx)
+    {
+        logf("No tagcache index pointer found");
+        return;
+    }
+    
     /* Don't process unplayed tracks. */
     if (id3->elapsed == 0)
     {
@@ -653,48 +663,25 @@ static void tagtree_unbuffer_event(struct mp3entry *id3, bool last_track)
         return;
     }
     
-    if (!tagcache_find_index(&tcs, id3->path))
-    {
-        logf("tc stat: not found: %s", id3->path);
-        return;
-    }
-    
-    playcount  = tagcache_get_numeric(&tcs, tag_playcount);
-    playtime   = tagcache_get_numeric(&tcs, tag_playtime);
-    lastplayed = tagcache_get_numeric(&tcs, tag_lastplayed);
-    
-    playcount++;
-    
-    rating   = (long) id3->rating;
-    
+    playcount = id3->playcount + 1;
     lastplayed = tagcache_increase_serial();
     if (lastplayed < 0)
     {
         logf("incorrect tc serial:%ld", lastplayed);
-        tagcache_search_finish(&tcs);
         return;
     }
     
     /* Ignore the last 15s (crossfade etc.) */
-    playtime += MIN(id3->length, id3->elapsed + 15 * 1000);
+    playtime = id3->playtime + MIN(id3->length, id3->elapsed + 15 * 1000);
     
     logf("ube:%s", id3->path);
-    logf("-> %d/%ld/%ld/%ld", last_track, playcount, rating, playtime);
+    logf("-> %d/%ld/%ld", last_track, playcount, playtime);
     logf("-> %ld/%ld/%ld", id3->elapsed, id3->length, MIN(id3->length, id3->elapsed + 15 * 1000));
     
-    /* lastplayed not yet supported. */
-    
-    if (!tagcache_modify_numeric_entry(&tcs, tag_playcount, playcount)
-        || !tagcache_modify_numeric_entry(&tcs, tag_rating, rating)
-        || !tagcache_modify_numeric_entry(&tcs, tag_playtime, playtime)
-        || !tagcache_modify_numeric_entry(&tcs, tag_lastplayed, lastplayed))
-    {
-        logf("tc stat: modify failed!");
-        tagcache_search_finish(&tcs);
-        return;
-    }
-    
-    tagcache_search_finish(&tcs);
+    /* Queue the updates to the tagcache system. */
+    tagcache_update_numeric(id3->tagcache_idx, tag_playcount, playcount);
+    tagcache_update_numeric(id3->tagcache_idx, tag_playtime, playtime);
+    tagcache_update_numeric(id3->tagcache_idx, tag_lastplayed, lastplayed);
 }
 
 bool tagtree_export(void)

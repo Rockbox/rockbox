@@ -953,11 +953,14 @@ char *rating_name(int selected_item, void * data, char *buffer)
 static bool set_rating_inline(void)
 {
     struct mp3entry* id3 = audio_current_track();
-    if(id3) {
-        if(id3->rating<10) 
+    if (id3 && id3->tagcache_idx) 
+    {
+        if (id3->rating<10) 
             id3->rating++;
         else
             id3->rating=0;
+        
+        tagcache_update_numeric(id3->tagcache_idx, tag_rating, id3->rating);
     }
     return false;
 }

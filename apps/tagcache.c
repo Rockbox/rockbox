@@ -136,8 +136,26 @@ enum tagcache_queue {
     Q_IMPORT_CHANGELOG,
     Q_UPDATE,
     Q_REBUILD,
+    
+    /* Internal tagcache command queue. */
+    CMD_UPDATE_MASTER_HEADER,
+    CMD_UPDATE_NUMERIC,
 };
 
+struct tagcache_command_entry {
+    long command;
+    long idx_id;
+    long tag;
+    long data;
+};
+
+static struct tagcache_command_entry command_queue[TAGCACHE_COMMAND_QUEUE_LENGTH];
+static volatile int command_queue_widx = 0;
+static volatile int command_queue_ridx = 0;
+static struct mutex command_queue_mutex;
+/* Timestamp of the last added event, so we can wait a bit before committing the
+ * whole queue at once. */
+static long command_queue_timestamp = 0;
 
 /* Tag database structures. */
 
@@ -2737,33 +2755,6 @@ static void free_tempbuf(void)
     tempbuf_size = 0;
 }
 
-long tagcache_increase_serial(void)
-{
-    long old;
-    
-    if (!tc_stat.ready)
-        return -2;
-    
-    while (read_lock)
-        sleep(1);
-    
-    old = current_tcmh.serial++;
-    if (!update_master_header())
-        return -1;
-    
-    return old;
-}
-
-long tagcache_get_serial(void)
-{
-    return current_tcmh.serial;
-}
-
-long tagcache_get_commitid(void)
-{
-    return current_tcmh.commitid;
-}
-
 static bool modify_numeric_entry(int masterfd, int idx_id, int tag, long data)
 {
     struct index_entry idx;
@@ -2783,6 +2774,7 @@ static bool modify_numeric_entry(int masterfd, int idx_id, int tag, long data)
     return write_index(masterfd, idx_id, &idx);
 }
 
+#if 0
 bool tagcache_modify_numeric_entry(struct tagcache_search *tcs, 
                                    int tag, long data)
 {
@@ -2795,6 +2787,137 @@ bool tagcache_modify_numeric_entry(struct tagcache_search *tcs,
     }
     
     return modify_numeric_entry(tcs->masterfd, tcs->idx_id, tag, data);
+}
+#endif
+
+#define COMMAND_QUEUE_IS_EMPTY (command_queue_ridx == command_queue_widx)
+
+static bool command_queue_is_full(void)
+{
+    int next;
+    
+    next = command_queue_widx + 1;
+    if (next >= TAGCACHE_COMMAND_QUEUE_LENGTH)
+        next = 0;
+    
+    return (next == command_queue_ridx);
+}
+
+void run_command_queue(bool force)
+{
+    struct master_header myhdr;
+    int masterfd;
+    
+    if (COMMAND_QUEUE_IS_EMPTY)
+        return;
+    
+    if (!force && !command_queue_is_full() 
+        && current_tick - TAGCACHE_COMMAND_QUEUE_COMMIT_DELAY 
+           < command_queue_timestamp)
+    {
+        return;
+    }
+        
+    mutex_lock(&command_queue_mutex);
+	
+    if ( (masterfd = open_master_fd(&myhdr, true)) < 0)
+        return;
+    
+    while (command_queue_ridx != command_queue_widx)
+    {
+        struct tagcache_command_entry *ce = &command_queue[command_queue_ridx];
+        
+        switch (ce->command)
+        {
+            case CMD_UPDATE_MASTER_HEADER:
+            {
+                close(masterfd);
+                update_master_header();
+                
+                /* Re-open the masterfd. */
+                if ( (masterfd = open_master_fd(&myhdr, true)) < 0)
+                    return;
+                
+                break;
+            }
+            case CMD_UPDATE_NUMERIC:
+            {
+                modify_numeric_entry(masterfd, ce->idx_id, ce->tag, ce->data);
+                break;
+            }
+        }
+        
+        if (++command_queue_ridx >= TAGCACHE_COMMAND_QUEUE_LENGTH)
+            command_queue_ridx = 0;
+    }
+    
+    close(masterfd);
+    
+    mutex_unlock(&command_queue_mutex);
+}
+
+static void queue_command(int cmd, long idx_id, int tag, long data)
+{
+    while (1)
+    {
+        int next;
+        
+        mutex_lock(&command_queue_mutex);
+        next = command_queue_widx + 1;
+        if (next >= TAGCACHE_COMMAND_QUEUE_LENGTH)
+            next = 0;
+        
+        /* Make sure queue is not full. */
+        if (next != command_queue_ridx)
+        {
+            struct tagcache_command_entry *ce = &command_queue[command_queue_widx];
+            
+            ce->command = cmd;
+            ce->idx_id = idx_id;
+            ce->tag = tag;
+            ce->data = data;
+            
+            command_queue_widx = next;
+            command_queue_timestamp = current_tick;
+            mutex_unlock(&command_queue_mutex);
+            break;
+        }
+        
+        /* Queue is full, try again later... */
+        mutex_unlock(&command_queue_mutex);
+        sleep(1);
+    }
+}
+
+long tagcache_increase_serial(void)
+{
+    long old;
+    
+    if (!tc_stat.ready)
+        return -2;
+    
+    while (read_lock)
+        sleep(1);
+    
+    old = current_tcmh.serial++;
+    queue_command(CMD_UPDATE_MASTER_HEADER, 0, 0, 0);
+    
+    return old;
+}
+
+void tagcache_update_numeric(int idx_id, int tag, long data)
+{
+    queue_command(CMD_UPDATE_NUMERIC, idx_id, tag, data);
+}
+
+long tagcache_get_serial(void)
+{
+    return current_tcmh.serial;
+}
+
+long tagcache_get_commitid(void)
+{
+    return current_tcmh.commitid;
 }
 
 static bool write_tag(int fd, const char *tagstr, const char *datastr)
@@ -3860,6 +3983,8 @@ static void tagcache_thread(void)
     
     while (1)
     {
+        run_command_queue(false);
+        
         queue_wait_w_tmo(&tagcache_queue, &ev, HZ);
 
         switch (ev.id)
@@ -3942,6 +4067,9 @@ bool tagcache_prepare_shutdown(void)
 
 void tagcache_shutdown(void)
 {
+    /* Flush the command queue. */
+    run_command_queue(true);
+    
 #ifdef HAVE_EEPROM_SETTINGS
     if (tc_stat.ramcache)
         tagcache_dumpsave();
@@ -4023,6 +4151,7 @@ void tagcache_init(void)
     write_lock = read_lock = 0;
     
 #ifndef __PCTOOL__
+    mutex_init(&command_queue_mutex);
     queue_init(&tagcache_queue, true);
     create_thread(tagcache_thread, tagcache_stack,
                   sizeof(tagcache_stack), tagcache_thread_name 
