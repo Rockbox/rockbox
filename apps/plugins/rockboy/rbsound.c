@@ -12,13 +12,14 @@ struct pcm pcm IBSS_ATTR;
 bool doneplay=1;
 bool bufnum=0;
 
-static unsigned short *buf=0;
+static unsigned short *buf=0, *hwbuf=0;
 
 static bool newly_started;
 
 void get_more(unsigned char** start, size_t* size)
 {
-    *start = (unsigned char*)(&buf[pcm.len*doneplay]);
+    memcpy(hwbuf, &buf[pcm.len*doneplay], BUF_SIZE*sizeof(short));
+    *start = (unsigned char*)(hwbuf);
     *size = BUF_SIZE*sizeof(short);
     doneplay=1;
 }
@@ -29,14 +30,20 @@ void pcm_init(void)
         return;
 
     newly_started = true;
-    
+
+#if defined(HW_HAVE_11) && !defined(TOSHIBA_GIGABEAT_F)
+    pcm.hz = SAMPR_11;
+#else
     pcm.hz = SAMPR_44;
+#endif
+
     pcm.stereo = 1;
 
     pcm.len = BUF_SIZE;
     if(!buf)
     {
         buf = my_malloc(pcm.len * N_BUFS *sizeof(short));
+        hwbuf = my_malloc(pcm.len *sizeof(short));
 
         pcm.buf = buf;
         pcm.pos = 0;

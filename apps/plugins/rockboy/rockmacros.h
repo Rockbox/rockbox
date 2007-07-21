@@ -35,7 +35,6 @@ void *sys_timer(void);
 int  sys_elapsed(long *oldtick);
 int  pcm_submit(void);
 void pcm_init(void);
-void sound_dirty(void);
 void doevents(void) ICODE_ATTR;
 void ev_poll(void);
 int do_user_menu(void);
