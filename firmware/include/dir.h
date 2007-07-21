@@ -20,6 +20,8 @@
 #ifndef _DIR_H_
 #define _DIR_H_
 
+#include "config.h"
+
 #ifdef HAVE_DIRCACHE
 # include "dircache.h"
 # define DIR DIR_CACHED
@@ -32,9 +34,10 @@
 # define rmdir rmdir_cached
 #else
 #include "dir_uncached.h"
+#warning no dircache
 # define DIR DIR_UNCACHED
 # define dirent dirent_uncached
-# define opendir opendir_uncached
+//# define opendir opendir_uncached
 # define closedir closedir_uncached
 # define readdir readdir_uncached
 # define closedir closedir_uncached
