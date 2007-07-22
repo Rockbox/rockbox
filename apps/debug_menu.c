@@ -152,7 +152,6 @@ static bool dbg_list(struct action_callback_info *info)
     gui_synclist_set_nb_items(&lists, info->count*info->selection_size);
     if (info->dbg_getname != dbg_menu_getname)
         gui_synclist_hide_selection_marker(&lists, true);
-    action_signalscreenchange();
     
     if (info->action_callback)
         info->action_callback(ACTION_REDRAW, info);
@@ -174,7 +173,6 @@ static bool dbg_list(struct action_callback_info *info)
         else if(default_event_handler(action) == SYS_USB_CONNECTED)
             return true;
     }
-    action_signalscreenchange();
     return false;
 }
 /*---------------------------------------------------*/
@@ -402,7 +400,6 @@ static bool dbg_audio_thread(void)
 
     tick_remove_task(dbg_audio_task);
 
-    action_signalscreenchange();
     return false;
 }
 #endif /* CONFIG_CODEC */
@@ -734,7 +731,6 @@ static bool dbg_hw_info(void)
         switch(button)
         {
             case ACTION_STD_CANCEL:
-                action_signalscreenchange();
                 return false;
 
             case ACTION_SETTINGS_DEC:
@@ -1392,7 +1388,6 @@ bool dbg_ports(void)
         switch(button)
         {
             case ACTION_STD_CANCEL:
-            action_signalscreenchange();
             return false;
 
         case ACTION_SETTINGS_DEC:
@@ -1456,7 +1451,6 @@ static bool dbg_cpufreq(void)
                 break;
 
             case ACTION_STD_CANCEL:
-                action_signalscreenchange();
                 return false;
         }
     }
@@ -1651,7 +1645,6 @@ static bool view_battery(void)
                 break;
 
             case ACTION_STD_CANCEL:
-                action_signalscreenchange();
                 return false;
         }
     }
@@ -2136,7 +2129,6 @@ static bool dbg_lcd_power_off(void)
                 break;
             case ACTION_STD_OK:
             case ACTION_STD_CANCEL:
-                action_signalscreenchange();
                 return false;
             default:
                 sleep(HZ/10);
@@ -2214,7 +2206,6 @@ static bool cpu_boost_log(void)
         }
         lcd_update();
         done = false;
-        action_signalscreenchange();
         while (!done)
         {
             switch(get_action(CONTEXT_STD,TIMEOUT_BLOCK))
@@ -2233,7 +2224,6 @@ static bool cpu_boost_log(void)
     }
     get_action(CONTEXT_STD,TIMEOUT_BLOCK);
     lcd_setfont(FONT_UI);
-    action_signalscreenchange();
     return false;
 }
 #endif

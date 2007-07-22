@@ -282,7 +282,6 @@ bool ffwd_rew(int button)
         if (!exit)
             button = get_action(CONTEXT_WPS,TIMEOUT_BLOCK);
     }
-    action_signalscreenchange();
     return usb;
 }
 

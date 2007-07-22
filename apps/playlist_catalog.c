@@ -312,7 +312,6 @@ static int display_playlists(char* playlist, bool view)
                 break;
         }
     }
-    action_signalscreenchange();
     return result;
 }
 

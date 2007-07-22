@@ -364,7 +364,6 @@ bool option_screen(struct settings_list *setting, bool use_temp_var)
     
     gui_synclist_limit_scroll(&lists, true);
     gui_synclist_draw(&lists);
-    action_signalscreenchange();
     /* talk the item */
     option_talk(setting, *variable);
     while (!done)
@@ -436,7 +435,6 @@ bool option_screen(struct settings_list *setting, bool use_temp_var)
         settings_save();
     }
     
-    action_signalscreenchange();
     return false;
 }
 

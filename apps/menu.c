@@ -297,8 +297,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
     
     talk_menu_item(menu, &lists);
     
-    action_signalscreenchange();
-    
     /* load the callback, and only reload it if menu changes */
     get_menu_callback(menu, &menu_callback);
     gui_synclist_draw(&lists);
@@ -428,7 +426,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                 {
                     int return_value;
                     talk_item = true;
-                    action_signalscreenchange();
                     if (temp->flags&MENU_FUNC_USEPARAM)
                         return_value = temp->function->function_w_param(
                                     temp->function->param);
@@ -458,7 +455,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                 case MT_RETURN_ID:
                     if (in_stringlist)
                     {
-                        action_signalscreenchange();
                         done = true;
                         ret =  selected;
                     }
@@ -510,7 +506,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
         if (redraw_lists)
             gui_synclist_draw(&lists);
     }
-    action_signalscreenchange();
     if (start_selected)
     {
         /* make sure the start_selected variable is set to

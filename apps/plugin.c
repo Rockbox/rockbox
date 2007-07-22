@@ -411,7 +411,6 @@ static const struct plugin_api rockbox_api = {
     /* action handling */
     get_custom_action,
     get_action,
-    action_signalscreenchange,
     action_userabort,
 
     /* power */
@@ -515,7 +514,6 @@ int plugin_load(const char* plugin, void* parameter)
 
     if (!p)
         p = plugin;
-    action_signalscreenchange();
 
     if (pfn_tsr_exit != NULL) /* if we have a resident old plugin: */
     {
@@ -611,7 +609,6 @@ int plugin_load(const char* plugin, void* parameter)
     rc = hdr->entry_point((struct plugin_api*) &rockbox_api, parameter);
     /* explicitly casting the pointer here to avoid touching every plugin. */
 
-    action_signalscreenchange();
     button_clear_queue();
 
 #ifdef HAVE_LCD_BITMAP

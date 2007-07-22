@@ -566,7 +566,6 @@ bool eq_menu_graphical(void)
         }
     }
 
-    action_signalscreenchange();
     /* Reset screen settings */
     FOR_NB_SCREENS(i) {
         screens[i].setfont(FONT_UI);

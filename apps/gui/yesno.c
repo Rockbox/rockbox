@@ -111,7 +111,6 @@ enum yesno_res gui_syncyesno_run(struct text_message * main_message,
         gui_yesno_set_display(&(yn[i]), &(screens[i]));
         gui_yesno_draw(&(yn[i]));
     }
-    action_signalscreenchange();
     while (result==-1)
     {
         button = get_action(CONTEXT_YESNOSCREEN,TIMEOUT_BLOCK);
@@ -130,7 +129,6 @@ enum yesno_res gui_syncyesno_run(struct text_message * main_message,
                 result = YESNO_NO;
         }
     }
-    action_signalscreenchange();
     FOR_NB_SCREENS(i)
         result_displayed=gui_yesno_draw_result(&(yn[i]), result);
     if(result_displayed)

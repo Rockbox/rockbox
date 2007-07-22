@@ -1260,7 +1260,6 @@ static int handle_radio_presets(void)
     gui_synclist_set_nb_items(&lists, num_presets);
     gui_synclist_select_item(&lists, curr_preset<0 ? 0 : curr_preset);
 
-    action_signalscreenchange();
     while (result == 0)
     {
         gui_synclist_draw(&lists);
@@ -1293,7 +1292,6 @@ static int handle_radio_presets(void)
                     result = 2;
         }
     }
-    action_signalscreenchange();
     return result - 1;
 }
 
@@ -1423,9 +1421,6 @@ static int fm_recording_screen(void)
     /* switch recording source to FMRADIO for the duration */
     int rec_source = global_settings.rec_source;
     global_settings.rec_source = AUDIO_SRC_FMRADIO;
-
-    /* clearing queue seems to cure a spontaneous abort during record */
-    action_signalscreenchange();
 
     ret = recording_screen(true);
 

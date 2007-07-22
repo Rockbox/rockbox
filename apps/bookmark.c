@@ -406,7 +406,6 @@ bool bookmark_autoload(const char* file)
             return bookmark_load(global_bookmark_file_name, true);
         }
 
-        action_signalscreenchange();
         return false;
     }
 }
@@ -622,7 +621,6 @@ static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resu
     gui_synclist_set_title(&list, str(LANG_BOOKMARK_SELECT_BOOKMARK), 
         Icon_Bookmark);
     gui_syncstatusbar_draw(&statusbars, true);
-    action_signalscreenchange();
 
     while (!exit)
     {
@@ -638,7 +636,6 @@ static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resu
                 /* No more bookmarks, delete file and exit */
                 gui_syncsplash(HZ, str(LANG_BOOKMARK_LOAD_EMPTY));
                 remove(bookmark_file_name);
-                action_signalscreenchange();
                 return NULL;
             }
 
@@ -710,7 +707,6 @@ static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resu
         case ACTION_STD_OK:
             if (item >= 0)
             {
-                action_signalscreenchange();
                 return bookmarks->items[item - bookmarks->start];
             }
             
@@ -741,7 +737,6 @@ static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resu
         }
     }
 
-    action_signalscreenchange();
     return NULL;
 }
 

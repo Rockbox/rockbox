@@ -159,7 +159,6 @@ bool alarm_screen(void)
             break;
         }
     }
-    action_signalscreenchange();
     return false;
 }
 

@@ -571,7 +571,6 @@ bool playlist_viewer_ex(char* filename)
     gui_synclist_select_item(&playlist_lists, viewer.selected_track);
     gui_synclist_set_title(&playlist_lists, str(LANG_PLAYLIST_MENU), Icon_Playlist);
     gui_synclist_draw(&playlist_lists);
-    action_signalscreenchange();
     while (!exit)
     {
         int track;
@@ -719,7 +718,6 @@ bool playlist_viewer_ex(char* filename)
 exit:
     if (viewer.playlist)
         playlist_close(viewer.playlist);
-    action_signalscreenchange();
     return ret;
 }
 
@@ -804,7 +802,6 @@ bool search_playlist(void)
                 break;
         }
     }
-    action_signalscreenchange();
     return ret;
 }
 

@@ -112,12 +112,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 63
+#define PLUGIN_API_VERSION 64
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 63
+#define PLUGIN_MIN_API_VERSION 64
 
 /* plugin return codes */
 enum plugin_status {
@@ -520,7 +520,6 @@ struct plugin_api {
     int (*get_custom_action)(int context,int timeout,
                           const struct button_mapping* (*get_context_map)(int));
     int (*get_action)(int context, int timeout);
-    void (*action_signalscreenchange)(void);
     bool (*action_userabort)(int timeout);
 
     /* power */

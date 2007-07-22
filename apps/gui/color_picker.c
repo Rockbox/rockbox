@@ -408,6 +408,5 @@ bool set_color(struct screen *display, char *title, unsigned *color,
         }
     }
 
-    action_signalscreenchange();
     return false;
 }

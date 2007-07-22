@@ -295,7 +295,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
         }
     }
     rb->global_settings->statusbar = prev_show_statusbar;
-    rb->action_signalscreenchange();
 
     return PLUGIN_OK;
 }

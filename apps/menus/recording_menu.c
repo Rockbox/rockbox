@@ -791,7 +791,6 @@ bool rectrigger(void)
         screens[i].setfont(FONT_UI);
         screens[i].setmargins(old_x_margin[i], old_y_margin[i]);
     }
-    action_signalscreenchange();
     return retval;
 }
 

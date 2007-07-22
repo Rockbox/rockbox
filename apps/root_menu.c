@@ -411,7 +411,6 @@ static inline int load_screen(int screen)
         old_previous = GO_TO_ROOT;
     global_status.last_screen = (char)screen;
     status_save();
-    action_signalscreenchange();
     ret_val = items[screen].function(items[screen].param);
     last_screen = screen;
     if (ret_val == GO_TO_PREVIOUS)

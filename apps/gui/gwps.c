@@ -101,8 +101,6 @@ long gui_wps_show(void)
     bool update_track = false;
     int i;
     long last_left = 0, last_right = 0;
-
-    action_signalscreenchange();
     
     wps_state_init();
 
@@ -242,7 +240,6 @@ long gui_wps_show(void)
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
                 show_remote_main_backdrop();
 #endif
-                action_signalscreenchange();
                 if (onplay(wps_state.id3->path, FILE_ATTR_AUDIO, CONTEXT_WPS)
                      == ONPLAY_MAINMENU)
                     return GO_TO_ROOT;
@@ -268,7 +265,6 @@ long gui_wps_show(void)
 #endif
                 FOR_NB_SCREENS(i)
                     gui_wps[i].display->stop_scroll();
-                action_signalscreenchange();
                 return GO_TO_PREVIOUS_BROWSER;
                 break;
 
@@ -562,7 +558,6 @@ long gui_wps_show(void)
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
                 show_remote_main_backdrop();
 #endif
-                action_signalscreenchange();
                 if (1 == pitch_screen())
                     return SYS_USB_CONNECTED;
 #if LCD_DEPTH > 1
@@ -668,7 +663,6 @@ long gui_wps_show(void)
         }
 
         if (exit) {
-            action_signalscreenchange();
 #ifdef HAVE_LCD_CHARCELLS
             status_set_record(false);
             status_set_audio(false);

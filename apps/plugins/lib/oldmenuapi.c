@@ -95,7 +95,6 @@ int menu_show(int m)
     int key;
 
     rb->gui_synclist_draw(&(menus[m].synclist));
-    rb->action_signalscreenchange();
     rb->gui_syncstatusbar_draw(rb->statusbars, true);
     while (!exit) {
         key = rb->get_action(CONTEXT_MAINMENU,HZ/2);
@@ -111,7 +110,6 @@ int menu_show(int m)
         rb->gui_synclist_do_button(&(menus[m].synclist), key,LIST_WRAP_UNLESS_HELD);
         switch( key ) {
             case ACTION_STD_OK:
-                rb->action_signalscreenchange();
                 return rb->gui_synclist_get_sel_pos(&(menus[m].synclist));
 
 
@@ -127,7 +125,6 @@ int menu_show(int m)
         }
         rb->gui_syncstatusbar_draw(rb->statusbars, false);
     }
-    rb->action_signalscreenchange();
     return MENU_SELECTED_EXIT;
 }
 

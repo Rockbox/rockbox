@@ -316,7 +316,6 @@ void browse_cuesheet(struct cuesheet *cue)
                 done = true;
         }
     }
-    action_signalscreenchange();
 }
 
 bool display_cuesheet_content(char* filename)

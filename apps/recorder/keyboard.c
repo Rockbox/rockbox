@@ -513,7 +513,6 @@ int kbd_input(char* text, int buflen)
     if (talk_menus_enabled()) /* voice UI? */
         talk_spell(text, true); /* spell initial text */
 
-    action_signalscreenchange();
 
     while (!done)
     {
@@ -755,7 +754,6 @@ int kbd_input(char* text, int buflen)
 #ifdef HAS_BUTTONBAR
                 global_settings.buttonbar=buttonbar_config;
 #endif
-                action_signalscreenchange();
                 return -1;
                 break;
 
@@ -1188,7 +1186,6 @@ int kbd_input(char* text, int buflen)
             cur_blink = true;
         }
     }
-    action_signalscreenchange();
 
 #ifdef HAS_BUTTONBAR
     global_settings.buttonbar = buttonbar_config;

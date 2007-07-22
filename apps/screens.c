@@ -367,7 +367,6 @@ int charging_screen(void)
 #ifdef HAVE_LCD_CHARCELLS
     logo_lock_patterns(false);
 #endif
-    action_signalscreenchange();
     return rc;
 }
 #endif /* CONFIG_CHARGING && !HAVE_POWEROFF_WHILE_CHARGING && defined(CPU_SH) */
@@ -541,7 +540,6 @@ bool pitch_screen(void)
     pcmbuf_set_low_latency(true);
 #endif
 
-    action_signalscreenchange();
     while (!exit)
     {
         FOR_NB_SCREENS(i)
@@ -625,7 +623,6 @@ bool pitch_screen(void)
     pcmbuf_set_low_latency(false);
 #endif
     lcd_setfont(FONT_UI);
-    action_signalscreenchange();
     return 0;
 }
 #endif /* HAVE_PITCHSCREEN */
@@ -1107,7 +1104,6 @@ bool set_time_screen(const char* title, struct tm *tm)
         screens[i].setfont(FONT_UI);
         gui_textarea_update_nblines(&screens[i]);
     }
-    action_signalscreenchange();
     return false;
 }
 #endif /* defined(HAVE_LCD_BITMAP) && (CONFIG_RTC != 0) */
@@ -1145,7 +1141,6 @@ bool shutdown_screen(void)
                 break;
         }
     }
-    action_signalscreenchange();
     return false;
 }
 #endif
@@ -1268,14 +1263,12 @@ bool browse_id3(void)
         sizeof(id3_headers)/sizeof(id3_headers[0])*2);
     gui_synclist_draw(&id3_lists);
     gui_syncstatusbar_draw(&statusbars, true);
-    action_signalscreenchange();
     while (true) {
         gui_syncstatusbar_draw(&statusbars, false);
         key = get_action(CONTEXT_LIST,HZ/2);
         if(key!=ACTION_NONE && key!=ACTION_UNKNOWN
         && !gui_synclist_do_button(&id3_lists, key,LIST_WRAP_UNLESS_HELD))
         {
-            action_signalscreenchange();
             return(default_event_handler(key) == SYS_USB_CONNECTED);
         }
     }
@@ -1314,7 +1307,6 @@ bool view_runtime(void)
 #endif
     gui_synclist_set_icon_callback(&lists, NULL);
     gui_synclist_set_nb_items(&lists, 4);
-    action_signalscreenchange();
     while(1)
     {
 #if CONFIG_CHARGING
@@ -1350,7 +1342,6 @@ bool view_runtime(void)
         if(default_event_handler(action) == SYS_USB_CONNECTED)
             return true;
     }
-    action_signalscreenchange();
     return false;
 }
 

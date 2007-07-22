@@ -608,7 +608,6 @@ static int dirbrowse()
                     if (last_cancel && TIME_BEFORE(current_tick, last_cancel+HZ/2))
                     {
                         last_cancel = 0;
-                        action_signalscreenchange(); /* eat the cancel presses */
                         break;
                     }
                     else
@@ -922,7 +921,6 @@ static int dirbrowse()
             }
         }
     }
-    action_signalscreenchange();
     return true;
 }
 
