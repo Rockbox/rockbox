@@ -34,6 +34,7 @@
 
 #if defined(SIMULATOR) || defined(__PCTOOL__)
 extern bool debug_wps;
+extern int wps_verbose_level;
 #endif
 
 static char *next_str(bool next) {
@@ -48,11 +49,6 @@ static void dump_wps_tokens(struct wps_data *data)
     char buf[64];
     bool next;
     int num_string_tokens = 0;
-
-    if (data->num_tokens > WPS_MAX_TOKENS) {
-        DEBUGF("Number of tokens is too high (%d)!!!\n", data->num_tokens);
-        return;
-    }
 
     /* Dump parsed WPS */
     for (i = 0, token = data->tokens; i < data->num_tokens; i++, token++) {
@@ -383,16 +379,22 @@ static void dump_wps_tokens(struct wps_data *data)
                 break;
         }
 
-        for(j = 0; j < indent; j++) {
-            DEBUGF("\t");
+        if (wps_verbose_level > 2)
+        {
+            for(j = 0; j < indent; j++) {
+                DEBUGF("\t");
+            }
+
+            DEBUGF("[%3d] = (%2d) %s\n", i, token->type, buf);
         }
-
-        DEBUGF("[%3d] = (%2d) %s\n", i, token->type, buf);
     }
-    DEBUGF("\n");
 
-    DEBUGF("Number of string tokens: %d\n", num_string_tokens);
-    DEBUGF("\n");
+    if (wps_verbose_level > 0)
+    {
+        DEBUGF("\n");
+        DEBUGF("Number of string tokens: %d\n", num_string_tokens);
+        DEBUGF("\n");
+    }
 }
 
 static void print_line_info(struct wps_data *data)
@@ -401,56 +403,67 @@ static void print_line_info(struct wps_data *data)
     struct wps_line *line;
     struct wps_subline *subline;
 
-    DEBUGF("Number of lines   : %d\n", data->num_lines);
-    DEBUGF("Number of sublines: %d\n", data->num_sublines);
-    DEBUGF("Number of tokens  : %d\n", data->num_tokens);
-    DEBUGF("\n");
-
-    for (i = 0, line = data->lines; i < data->num_lines; i++,line++)
+    if (wps_verbose_level > 0)
     {
-        DEBUGF("Line %2d (num_sublines=%d, first_subline=%d)\n",
-                i, line->num_sublines, line->first_subline_idx);
-
-        for (j = 0, subline = data->sublines + line->first_subline_idx;
-             j < line->num_sublines; j++, subline++)
-        {
-            DEBUGF("    Subline %d: first_token=%3d, last_token=%3d",
-                    j, subline->first_token_idx,
-                    wps_last_token_index(data, i, j));
-
-            if (subline->line_type & WPS_REFRESH_SCROLL)
-                DEBUGF(", scrolled");
-            else if (subline->line_type & WPS_REFRESH_PLAYER_PROGRESS)
-                DEBUGF(", progressbar");
-            else if (subline->line_type & WPS_REFRESH_PEAK_METER)
-                DEBUGF(", peakmeter");
-
-            DEBUGF("\n");
-        }
+        DEBUGF("Number of lines   : %d\n", data->num_lines);
+        DEBUGF("Number of sublines: %d\n", data->num_sublines);
+        DEBUGF("Number of tokens  : %d\n", data->num_tokens);
+        DEBUGF("\n");
     }
 
-    DEBUGF("\n");
+    if (wps_verbose_level > 1)
+    {
+        for (i = 0, line = data->lines; i < data->num_lines; i++,line++)
+        {
+            DEBUGF("Line %2d (num_sublines=%d, first_subline=%d)\n",
+                   i, line->num_sublines, line->first_subline_idx);
+
+            for (j = 0, subline = data->sublines + line->first_subline_idx;
+                 j < line->num_sublines; j++, subline++)
+            {
+                DEBUGF("    Subline %d: first_token=%3d, last_token=%3d",
+                       j, subline->first_token_idx,
+                       wps_last_token_index(data, i, j));
+
+                if (subline->line_type & WPS_REFRESH_SCROLL)
+                    DEBUGF(", scrolled");
+                else if (subline->line_type & WPS_REFRESH_PLAYER_PROGRESS)
+                    DEBUGF(", progressbar");
+                else if (subline->line_type & WPS_REFRESH_PEAK_METER)
+                    DEBUGF(", peakmeter");
+
+                DEBUGF("\n");
+            }
+        }
+
+        DEBUGF("\n");
+    }
 }
 
 static void print_wps_strings(struct wps_data *data)
 {
     int i, len, total_len = 0, buf_used = 0;
 
-    DEBUGF("Strings:\n");
+    if (wps_verbose_level > 1) DEBUGF("Strings:\n");
     for (i = 0; i < data->num_strings; i++)
     {
         len = strlen(data->strings[i]);
         total_len += len;
         buf_used += len + 1;
-        DEBUGF("%2d: (%2d) '%s'\n", i, len, data->strings[i]);
+        if (wps_verbose_level > 1)
+            DEBUGF("%2d: (%2d) '%s'\n", i, len, data->strings[i]);
     }
-    DEBUGF("\n");
-    DEBUGF("Number of strings: %d out of an allowed %d\n",
-           data->num_strings, WPS_MAX_STRINGS);
-    DEBUGF("Total string length: %d\n", total_len);
-    DEBUGF("String buffer used: %d out of %d bytes\n",
-           buf_used, STRING_BUFFER_SIZE);
-    DEBUGF("\n");
+    if (wps_verbose_level > 1) DEBUGF("\n");
+
+    if (wps_verbose_level > 0)
+    {
+        DEBUGF("Number of unique strings: %d (max: %d)\n",
+               data->num_strings, WPS_MAX_STRINGS);
+        DEBUGF("Total string length: %d\n", total_len);
+        DEBUGF("String buffer used: %d out of %d bytes\n",
+               buf_used, STRING_BUFFER_SIZE);
+        DEBUGF("\n");
+    }
 }
 
 #ifdef HAVE_LCD_BITMAP
@@ -470,16 +483,21 @@ static void print_img_cond_indexes(struct wps_data *data)
 void print_debug_info(struct wps_data *data, int fail, int line)
 {
 #if defined(SIMULATOR) || defined(__PCTOOL__)
-    if (debug_wps)
+    if (debug_wps && wps_verbose_level)
     {
         dump_wps_tokens(data);
         print_wps_strings(data);
         print_line_info(data);
 #ifdef HAVE_LCD_BITMAP
-        print_img_cond_indexes(data);
+        if (wps_verbose_level > 2) print_img_cond_indexes(data);
 #endif
     }
 #endif /* SIMULATOR */
+
+    if (data->num_tokens >= WPS_MAX_TOKENS - 1) {
+        DEBUGF("Warning: Max number of tokens was reached (%d)\n",
+               WPS_MAX_TOKENS - 1);
+    }
 
     if (fail)
     {

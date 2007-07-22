@@ -56,6 +56,7 @@ char having_new_lcd = true;               /* Used for player simulator */
 bool debug_audio = false;
 
 bool debug_wps = false;
+int wps_verbose_level = 3;
 
 long start_tick;
 
