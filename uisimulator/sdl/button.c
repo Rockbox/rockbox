@@ -27,6 +27,9 @@
 #include "misc.h"
 
 #include "debug.h"
+
+static intptr_t button_data; /* data value from last message dequeued */
+
 /* how long until repeat kicks in */
 #define REPEAT_START      6
 
@@ -698,6 +701,7 @@ long button_get(bool block)
 
     if ( block || !queue_empty(&button_queue) ) {
         queue_wait(&button_queue, &ev);
+        button_data = ev.data;
         return ev.id;
     }
     return BUTTON_NONE;
@@ -707,8 +711,18 @@ long button_get_w_tmo(int ticks)
 {
     struct event ev;
     queue_wait_w_tmo(&button_queue, &ev, ticks);
-    return (ev.id != SYS_TIMEOUT)? ev.id: BUTTON_NONE;
-} 
+    if (ev.id == SYS_TIMEOUT)
+        ev.id = BUTTON_NONE;
+    else
+        button_data = ev.data;
+
+    return ev.id;
+}
+
+intptr_t button_get_data(void)
+{
+    return button_data;
+}
 
 void button_init(void)
 {
