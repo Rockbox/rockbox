@@ -170,4 +170,10 @@
 
 #define ICODE_ATTR_TREMOR_NOT_MDCT
 
-#endif
+/* define this if the unit uses a scrollwheel for navigation */
+#define HAVE_SCROLLWHEEL
+/* define wheel acceleration scaling factor */
+/* Range for this target: 0xffffff*(0.0-16.000000894069724921567733381255) */
+#define WHEEL_ACCELERATION_FACTOR   (0xffffff*7)
+
+#endif /* SIMULATOR */

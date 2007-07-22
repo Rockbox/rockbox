@@ -731,8 +731,10 @@ struct user_settings
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
     int buttonlight_brightness;
 #endif
+#ifndef HAVE_SCROLLWHEEL
     int list_accel_start_delay; /* ms before we start increaseing step size */
     int list_accel_wait; /* ms between increases */
+#endif
 };
 
 /** global variables **/

@@ -274,6 +274,7 @@ static void poweroff_idle_timer_formatter(char *buffer, int buffer_size,
         snprintf(buffer, buffer_size, "%dm", poweroff_idle_timer_times[val]);
 }
 
+#ifndef HAVE_SCROLLWHEEL
 static long listaccel_getlang(int value)
 {
     if (value == 0)
@@ -289,6 +290,7 @@ static void listaccel_formatter(char *buffer, int buffer_size,
     else
         snprintf(buffer, buffer_size, "%d ms", 5*HZ*val);
 }
+#endif /* HAVE_SCROLLWHEEL */
 
 #if CONFIG_CODEC == SWCODEC
 static void crossfeed_format(char* buffer, int buffer_size, int value,
@@ -1235,12 +1237,14 @@ const struct settings_list settings[] = {
         "button light brightness",UNIT_INT, MIN_BRIGHTNESS_SETTING, MAX_BRIGHTNESS_SETTING, 1,
         NULL, NULL, buttonlight_set_brightness),
 #endif
+#ifndef HAVE_SCROLLWHEEL
     INT_SETTING(0, list_accel_start_delay, LANG_LISTACCEL_START_DELAY,
                 2, "list_accel_start_delay", UNIT_MS, 0, 10, 1,
                 listaccel_formatter, listaccel_getlang, NULL),
     INT_SETTING(0, list_accel_wait, LANG_LISTACCEL_ACCEL_SPEED,
                 3, "list_accel_wait", UNIT_SEC, 1, 10, 1, 
                 scanaccel_formatter, scanaccel_getlang, NULL),
+#endif /* HAVE_SCROLLWHEEL */
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

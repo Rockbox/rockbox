@@ -253,6 +253,8 @@ bool is_keys_locked(void);
 #define ACTION_REPEAT   0x2 /* action was repeated (NOT button) */
 int get_action_statuscode(int *button);
 
+/* returns the data value associated with the last action that is not
+   BUTTON_NONE or flagged with SYS_EVENT */
+intptr_t get_action_data(void);
 
-
-#endif
+#endif /* __ACTION_H__ */

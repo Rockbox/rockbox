@@ -23,19 +23,21 @@
 #include "button.h"
 #include "backlight.h"
 
-#define WHEEL_REPEAT_INTERVAL   30
-#define WHEEL_FAST_ON_INTERVAL  2
-#define WHEEL_FAST_OFF_INTERVAL 6
+#define WHEEL_REPEAT_INTERVAL   300000
+#define WHEEL_FAST_ON_INTERVAL   20000
+#define WHEEL_FAST_OFF_INTERVAL  60000
 
 /* Clickwheel */
 #ifndef BOOTLOADER
 static unsigned int  old_wheel_value   = 0;
 static unsigned int  wheel_repeat      = BUTTON_NONE;
 static unsigned int  wheel_click_count = 0;
+static unsigned int  wheel_delta       = 0;
 static          int  wheel_fast_mode   = 0;
-static unsigned long last_wheel_tick   = 0;
-static unsigned long last_wheel_post   = 0;
-static unsigned long next_backlight_on = 0;
+static unsigned long last_wheel_usec   = 0;
+static unsigned long wheel_velocity    = 0;
+static          long last_wheel_post   = 0;
+static          long next_backlight_on = 0;
 /* Buttons */
 static bool hold_button     = false;
 static bool hold_button_old = false;
@@ -64,8 +66,8 @@ void button_init_device(void)
     GPIOH_INT_EN &= ~0xc0;
 
     /* Get current tick before enabling button interrupts */
-    last_wheel_tick = current_tick;
-    last_wheel_post = current_tick;
+    last_wheel_usec = USEC_TIMER;
+    last_wheel_post = last_wheel_usec;
 
     GPIOH_ENABLE |= 0xc0;
     GPIOH_OUTPUT_EN &= ~0xc0;
@@ -130,38 +132,67 @@ void clickwheel_int(void)
 
         if (btn != BUTTON_NONE)
         {
-            int repeat = 1;
+            int repeat = 1; /* assume repeat */
+            unsigned long usec = USEC_TIMER;
+            unsigned v = (usec - last_wheel_usec) & 0x7fffffff;
+
+            /* wheel velocity in 0.24 fixed point - clicks/uS */
+
+            /* velocity cap to 18 bits to allow up to x16 scaling */
+            v = (v < 0x40) ? 0xffffff / 0x40 : 0xffffff / v;
+
+            /* some velocity filtering to smooth things out */
+            wheel_velocity = (7*wheel_velocity + v) / 8;
 
             if (btn != wheel_repeat)
             {
+                /* direction reversals nullify all fast mode states */
                 wheel_repeat      = btn;
                 repeat            =
                 wheel_fast_mode   =
+                wheel_velocity    =
                 wheel_click_count = 0;
             }
 
-            if (wheel_fast_mode)
+            if (wheel_fast_mode != 0)
             {
-                if (TIME_AFTER(current_tick,
-                    last_wheel_tick + WHEEL_FAST_OFF_INTERVAL))
+                /* fast OFF happens immediately when velocity drops below
+                   threshold */
+                if (TIME_AFTER(usec,
+                        last_wheel_usec + WHEEL_FAST_OFF_INTERVAL))
                 {
-                    if (++wheel_click_count < 2)
-                        btn = BUTTON_NONE;
+                    /* moving out of fast mode */
                     wheel_fast_mode = 0;
+                    /* reset velocity */
+                    wheel_velocity = 0;
+                    /* wheel_delta is always 1 in slow mode */
+                    wheel_delta = 1;
                 }
             }
             else
             {
-                if (repeat && TIME_BEFORE(current_tick,
-                    last_wheel_tick + WHEEL_FAST_ON_INTERVAL))
-                    wheel_fast_mode = 1;
+                /* fast ON gets filtered to avoid inadvertent jumps to fast mode */
+                if (repeat && wheel_velocity > 0xffffff/WHEEL_FAST_ON_INTERVAL)
+                {
+                    /* moving into fast mode */
+                    wheel_fast_mode = 1 << 31;
+                    wheel_click_count = 0;
+                    wheel_velocity = 0xffffff/WHEEL_FAST_OFF_INTERVAL;
+                }
                 else if (++wheel_click_count < 2)
+                {
                     btn = BUTTON_NONE;
+                }
+
+                /* wheel_delta is always 1 in slow mode */
+                wheel_delta = 1;
             }
 
-            if (TIME_AFTER(current_tick, next_backlight_on))
+            if (TIME_AFTER(usec, next_backlight_on))
             {
-                next_backlight_on = current_tick + HZ/4;
+                /* poke backlight to turn it on or maintain it no more often
+                   than every 1/4 second*/
+                next_backlight_on = usec + 1000000/4;
                 backlight_on();
                 button_backlight_on();
             }
@@ -170,17 +201,29 @@ void clickwheel_int(void)
             {
                 wheel_click_count = 0;
 
-                if (repeat && TIME_BEFORE(current_tick,
-                    last_wheel_post + WHEEL_REPEAT_INTERVAL))
+                /* generate repeats if quick enough */
+                if (repeat && TIME_BEFORE(usec,
+                        last_wheel_post + WHEEL_REPEAT_INTERVAL))
                     btn |= BUTTON_REPEAT;
 
-                last_wheel_post = current_tick;
+                last_wheel_post = usec;
 
                 if (queue_empty(&button_queue))
-                    queue_post(&button_queue, btn, 0);
+                {
+                    queue_post(&button_queue, btn, wheel_fast_mode |
+                               (wheel_delta << 24) | wheel_velocity);
+                    /* message posted - reset delta */
+                    wheel_delta = 1;
+                }
+                else
+                {
+                    /* skipped post - increment delta */
+                    if (++wheel_delta > 0x7f)
+                        wheel_delta = 0x7f;
+                }
             }
 
-            last_wheel_tick = current_tick;
+            last_wheel_usec = usec;
         }
     }
 

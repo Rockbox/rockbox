@@ -49,6 +49,7 @@ struct event_queue button_queue;
 
 static long lastbtn;   /* Last valid button status */
 static long last_read; /* Last button status, for debouncing/filtering */
+static intptr_t button_data; /* data value from last message dequeued */
 #ifdef HAVE_LCD_BITMAP
 static bool flipped;  /* buttons can be flipped to match the LCD flip */
 #endif
@@ -309,7 +310,7 @@ long button_get(bool block)
         if (current_tick - ev.tick > MAX_EVENT_AGE)
             return BUTTON_NONE;
 #endif
-        
+        button_data = ev.data;
         return ev.id;
     }
     
@@ -329,7 +330,17 @@ long button_get_w_tmo(int ticks)
 #endif
     
     queue_wait_w_tmo(&button_queue, &ev, ticks);
-    return (ev.id != SYS_TIMEOUT)? ev.id: BUTTON_NONE;
+    if (ev.id == SYS_TIMEOUT)
+        ev.id = BUTTON_NONE;
+    else
+        button_data = ev.data;
+
+    return ev.id;
+}
+
+intptr_t button_get_data(void)
+{
+    return button_data;
 }
 
 void button_init(void)
@@ -470,3 +481,33 @@ void button_clear_queue(void)
 {
     queue_clear(&button_queue);
 }
+
+#ifdef HAVE_SCROLLWHEEL
+/**
+ * data:
+ *    [31] Use acceleration
+ * [30:24] Message post count (skipped + 1) (1-127)
+ *  [23:0] Velocity - clicks/uS - 0.24 fixed point
+ *
+ * factor:
+ * Wheel acceleration scaling factor - x.24 fixed point -
+ * no greater than what will not overflow 64 bits when multiplied
+ * by the driver's maximum velocity in (clicks/usec)^2 in 0.24 
+ */
+int button_apply_acceleration(unsigned int data, unsigned int factor)
+{
+    int delta = (data >> 24) & 0x7f;
+
+    if ((data & (1 << 31)) != 0)
+    {
+        unsigned int v = data & 0xffffff;
+
+        v = factor * (unsigned long long)v*v / 0xffffffffffffull;
+
+        if (v > 1)
+            delta *= v;
+    }
+
+    return delta;
+}
+#endif /* HAVE_SCROLLWHEEL */

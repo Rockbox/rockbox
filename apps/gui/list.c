@@ -887,15 +887,22 @@ static void gui_synclist_scroll_left(struct gui_synclist * lists)
 }
 #endif /* HAVE_LCD_BITMAP */
 
+extern intptr_t get_action_data(void);
+
 unsigned gui_synclist_do_button(struct gui_synclist * lists,
                                 unsigned button,enum list_wrap wrap)
 {
 #ifdef HAVE_LCD_BITMAP
     static bool scrolling_left = false;
 #endif
+    int i;
+
+#ifdef HAVE_SCROLLWHEEL
+    int next_item_modifier = button_apply_acceleration(get_action_data(),
+                                                       WHEEL_ACCELERATION_FACTOR);
+#else
     static int next_item_modifier = 1;
     static int last_accel_tick = 0;
-    int i;
 
     if (global_settings.list_accel_start_delay)
     {
@@ -919,6 +926,7 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists,
             last_accel_tick = 0;
         }
     }
+#endif
 
     switch (wrap)
     {
@@ -953,8 +961,12 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists,
         case ACTION_STD_PREVREPEAT:
             FOR_NB_SCREENS(i)
                 gui_list_select_at_offset(&(lists->gui_list[i]), -next_item_modifier);
+#ifndef HAVE_SCROLLWHEEL
             if (queue_count(&button_queue) < FRAMEDROP_TRIGGER)
+#endif
+            {
                 gui_synclist_draw(lists);
+            }
             yield();
             return ACTION_STD_PREV;
 
@@ -962,8 +974,12 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists,
         case ACTION_STD_NEXTREPEAT:
             FOR_NB_SCREENS(i)
                 gui_list_select_at_offset(&(lists->gui_list[i]), next_item_modifier);
+#ifndef HAVE_SCROLLWHEEL
             if (queue_count(&button_queue) < FRAMEDROP_TRIGGER)
+#endif
+            {
                 gui_synclist_draw(lists);
+            }
             yield();
             return ACTION_STD_NEXT;
 

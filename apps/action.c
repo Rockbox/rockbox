@@ -31,6 +31,7 @@
 
 static int last_button = BUTTON_NONE|BUTTON_REL; /* allow the ipod wheel to 
                                                     work on startup */
+static intptr_t last_data = 0;
 static int last_action = ACTION_NONE;
 static bool repeated = false;
 
@@ -113,6 +114,7 @@ static int get_action_worker(int context, int timeout,
     else
         button = button_get_w_tmo(timeout);
 
+    /* Data from sys events can be pulled with button_get_data */
     if (button == BUTTON_NONE || button&SYS_EVENT)
     {
         return button;
@@ -201,6 +203,7 @@ static int get_action_worker(int context, int timeout,
 
     last_button = button;
     last_action = ret;
+    last_data   = button_get_data();
     last_action_tick = current_tick;
     return ret;
 }
@@ -229,6 +232,11 @@ bool is_keys_locked(void)
     return (screen_has_lock && (keys_locked == true));
 }
 #endif
+
+intptr_t get_action_data(void)
+{
+    return last_data;
+}
 
 int get_action_statuscode(int *button)
 {
