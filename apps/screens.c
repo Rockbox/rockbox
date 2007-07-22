@@ -1128,10 +1128,10 @@ bool shutdown_screen(void)
                 sys_poweroff();
                 break;
 
-            /* do nothing here, because ACTION_UNKNOWN might be caused
+            /* do nothing here, because ACTION_NONE might be caused
              * by timeout or button release. In case of timeout the loop
              * is terminated by TIME_BEFORE */
-            case ACTION_UNKNOWN:
+            case ACTION_NONE:
                 break;
 
             default:
