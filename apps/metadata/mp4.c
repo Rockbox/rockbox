@@ -37,6 +37,7 @@
 #define MP4_alac MP4_ID('a', 'l', 'a', 'c')
 #define MP4_calb MP4_ID(0xa9, 'a', 'l', 'b')
 #define MP4_cART MP4_ID(0xa9, 'A', 'R', 'T')
+#define MP4_cgen MP4_ID(0xa9, 'g', 'e', 'n')
 #define MP4_cnam MP4_ID(0xa9, 'n', 'a', 'm')
 #define MP4_cwrt MP4_ID(0xa9, 'w', 'r', 't')
 #define MP4_esds MP4_ID('e', 's', 'd', 's')
@@ -391,6 +392,11 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                 read_mp4_tag(fd, size, (char*) &genre, sizeof(genre));
                 id3->genre_string = id3_get_num_genre(betoh16(genre) - 1);
             }
+            break;
+        
+        case MP4_cgen:
+            read_mp4_tag_string(fd, size, &buffer, &buffer_left,
+                &id3->genre_string);
             break;
 
         case MP4_trkn:
