@@ -383,6 +383,15 @@ struct mad_synth  synth IBSS_ATTR;
 
 unsigned char mad_main_data[MAD_BUFFER_MDLEN];  /* 2567 bytes */
 
+/* There isn't enough room for this in IRAM on PortalPlayer, but there
+   is for Coldfire. */
+
+#ifdef CPU_COLDFIRE
+static mad_fixed_t mad_frame_overlap[2][32][18] IBSS_ATTR;  /* 4608 bytes */
+#else
+static mad_fixed_t mad_frame_overlap[2][32][18];  /* 4608 bytes */
+#endif
+
 static void init_mad(void* mad_frame_overlap)
 {
     rb->memset(&stream, 0, sizeof(struct mad_stream));
@@ -1774,9 +1783,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     long graysize;
     int grayscales;
 #endif
-
-    /* We define this here so it is on the main stack (in IRAM) */
-    mad_fixed_t mad_frame_overlap[2][32][18];       /* 4608 bytes */
 
     if (parameter == NULL)
     {
