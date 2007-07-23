@@ -3,6 +3,15 @@
   desc: bool true representation
   user:
   <source>
+### The <source> section differs from the english!
+### the previously used one is commented below:
+###     *: "Yes"
+# are *identical* to the <dest> strings within the english.lang file. The
+# when doing updates etc, while the <dest> ones are used when this file is
+# used to simply get the full set of english strings for a particular target.
+#
+  id: LANG_SET_BOOL_YES
+  user:
     *: "Yes"
   </source>
   <dest>
@@ -829,11 +838,20 @@
   desc: Generic recorder string to use to confirm
   user:
   <source>
+### The <source> section differs from the english!
+### the previously used one is commented below:
+###     *: "PLAY = Yes"
+###     h100,h120,h300: "NAVI = Yes"
+###     ipod*: "SELECT = Yes"
+###     x5: "SELECT = Yes"
+###     h10: "NEXT = Yes"
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
     ipod*: "SELECT = Yes"
     x5: "SELECT = Yes"
-    h10: "NEXT = Yes"
+    h10,h10_5gb: "SELECT = Yes"
+    gigabeatf: "SELECT = Yes"
+    e200: "SELECT = Yes"
   </source>
   <dest>
     *: "PLAY = Ja"
@@ -2500,7 +2518,10 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_DIR
-  desc: item of voice menu, set the "talkbox" mode for directories
+### The 'desc' field differs from the english!
+### the previously used desc is commented below:
+### desc: item of voice menu, set the "talkbox" mode for directories
+  desc: item of voice menu, set the voice mode for directories
   user:
   <source>
     *: "Voice Directories"
@@ -2514,7 +2535,10 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_FILE
-  desc: item of voice menu, set the voive mode for files
+### The 'desc' field differs from the english!
+### the previously used desc is commented below:
+### desc: item of voice menu, set the voive mode for files
+  desc: item of voice menu, set the voice mode for files
   user:
   <source>
     *: "Voice Filenames"
@@ -4690,10 +4714,16 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
-  desc: From the auto-load screen, allows user to list all bookmarks
+### The 'desc' field differs from the english!
+### the previously used desc is commented below:
+### desc: From the auto-load screen, allows user to list all bookmarks
+  desc: DEPRECATED
   user:
   <source>
-    *: "Down = List"
+### The <source> section differs from the english!
+### the previously used one is commented below:
+###     *: "Down = List"
+    *: ""
   </source>
   <dest>
     *: "Unten = Liste"
@@ -4704,14 +4734,20 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_EXIT
-  desc: From the bookmark list screen, allows user to exit
+### The 'desc' field differs from the english!
+### the previously used desc is commented below:
+### desc: From the bookmark list screen, allows user to exit
+  desc: DEPRECATED
   user:
   <source>
-    *: "OFF = Exit"
-    h100,h120,h300: "STOP = Exit"
-    ipod*: "PLAY/PAUSE = Exit"
-    x5: "RECORD = Exit"
-    h10: "PREV = Exit"
+### The <source> section differs from the english!
+### the previously used one is commented below:
+###     *: "OFF = Exit"
+###     h100,h120,h300: "STOP = Exit"
+###     ipod*: "PLAY/PAUSE = Exit"
+###     x5: "RECORD = Exit"
+###     h10: "PREV = Exit"
+    *: ""
   </source>
   <dest>
     *: "OFF = Beenden"
@@ -4726,10 +4762,16 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
-  desc: Used on the bookmark select window to label bookmark number
+### The 'desc' field differs from the english!
+### the previously used desc is commented below:
+### desc: Used on the bookmark select window to label bookmark number
+  desc: DEPRECATED
   user:
   <source>
-    *: "Bookmark"
+### The <source> section differs from the english!
+### the previously used one is commented below:
+###     *: "Bookmark"
+    *: ""
   </source>
   <dest>
     *: "Lesezeichen"
@@ -4740,10 +4782,16 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_INDEX_TEXT
-  desc: Used on the bookmark select window to label index number
+### The 'desc' field differs from the english!
+### the previously used desc is commented below:
+### desc: Used on the bookmark select window to label index number
+  desc: DEPRECATED
   user:
   <source>
-    *: "Index"
+### The <source> section differs from the english!
+### the previously used one is commented below:
+###     *: "Index"
+    *: ""
   </source>
   <dest>
     *: "Index"
@@ -4754,10 +4802,16 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_TIME_TEXT
-  desc: Used on the bookmark select window to label elapsed time
+### The 'desc' field differs from the english!
+### the previously used desc is commented below:
+### desc: Used on the bookmark select window to label elapsed time
+  desc: DEPRECATED
   user:
   <source>
-    *: "Time"
+### The <source> section differs from the english!
+### the previously used one is commented below:
+###     *: "Time"
+    *: ""
   </source>
   <dest>
     *: "Zeit"
@@ -4768,14 +4822,20 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_PLAY
-  desc: Used on the bookmark select window to indicated the play option
+### The 'desc' field differs from the english!
+### the previously used desc is commented below:
+### desc: Used on the bookmark select window to indicated the play option
+  desc: DEPRECATED
   user:
   <source>
-    *: "PLAY = Select"
-    h100,h120,h300: "NAVI = Select"
-    ipod*: "SELECT = Select"
-    x5: "SELECT = Select"
-    h10: "NEXT = Select"
+### The <source> section differs from the english!
+### the previously used one is commented below:
+###     *: "PLAY = Select"
+###     h100,h120,h300: "NAVI = Select"
+###     ipod*: "SELECT = Select"
+###     x5: "SELECT = Select"
+###     h10: "NEXT = Select"
+    *: ""
   </source>
   <dest>
     *: "PLAY = Auswählen"
@@ -4790,14 +4850,20 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_DELETE
-  desc: Used on the bookmark select window to indicated the bookmark delete option
+### The 'desc' field differs from the english!
+### the previously used desc is commented below:
+### desc: Used on the bookmark select window to indicated the bookmark delete option
+  desc: DEPRECATED
   user:
   <source>
-    *: "ON+Play = Delete"
-    h100,h120,h300: "RECORD = Delete"
-    ipod*: "Long MENU = Delete"
-    x5: "Long RECORD = Delete"
-    h10: "REWIND = Delete"
+### The <source> section differs from the english!
+### the previously used one is commented below:
+###     *: "ON+Play = Delete"
+###     h100,h120,h300: "RECORD = Delete"
+###     ipod*: "Long MENU = Delete"
+###     x5: "Long RECORD = Delete"
+###     h10: "REWIND = Delete"
+    *: ""
   </source>
   <dest>
     *: "ON+Play = Löschen"
@@ -4812,10 +4878,16 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_AUTOLOAD_QUERY
-  desc: prompt for user to decide to create a bookmark
+### The 'desc' field differs from the english!
+### the previously used desc is commented below:
+### desc: prompt for user to decide to create a bookmark
+  desc: DEPRECATED
   user:
   <source>
-    *: "Load Last Bookmark?"
+### The <source> section differs from the english!
+### the previously used one is commented below:
+###     *: "Load Last Bookmark?"
+    *: ""
   </source>
   <dest>
     *: "Lade letztes Lesezeichen?"
@@ -4885,11 +4957,20 @@
   desc: used in set_time()
   user:
   <source>
-    *: "ON To Set"
+### The <source> section differs from the english!
+### the previously used one is commented below:
+###     *: "ON To Set"
+###     h100,h120,h300: "NAVI = Set"
+###     ipod*: "SELECT = Set"
+###     x5: "SELECT = Set"
+###     h10: "NEXT = Set"
+    *: "ON = Set"
     h100,h120,h300: "NAVI = Set"
     ipod*: "SELECT = Set"
     x5: "SELECT = Set"
-    h10: "NEXT = Set"
+    h10,h10_5gb: "SELECT = Set"
+    gigabeatf: "SELECT = Set"
+    e200: "SELECT = Set"
   </source>
   <dest>
     *: "ON zum Speichern"
@@ -4907,11 +4988,19 @@
   desc: used in set_time()
   user:
   <source>
-    *: "OFF To Revert"
+### The <source> section differs from the english!
+### the previously used one is commented below:
+###     *: "OFF To Revert"
+###     h100,h120,h300: "STOP = Revert"
+###     ipod*: "MENU = Revert"
+###     x5: "RECORD = Revert"
+###     h10: "PREV = Revert"
+    *: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*: "MENU = Revert"
+    ipod*,e200: "MENU = Revert"
     x5: "RECORD = Revert"
-    h10: "PREV = Revert"
+    h10,h10_5gb: "PREV = Revert"
+    gigabeatf: "POWER = Revert"
   </source>
   <dest>
     *: "OFF zum Abbrechen"
@@ -5373,7 +5462,7 @@
     *: "RGB"
   </dest>
   <voice>
-    *: 
+    *:""
   </voice>
 </phrase>
 <phrase>
@@ -5387,7 +5476,7 @@
     *: "RGB: %02X%02X%02X"
   </dest>
   <voice>
-    *: 
+    *:""
   </voice>
 </phrase>
 <phrase>
@@ -7254,10 +7343,16 @@
 </phrase>
 <phrase>
   id: LANG_END_PLAYLIST_PLAYER
-  desc: when playlist has finished
+### The 'desc' field differs from the english!
+### the previously used desc is commented below:
+### desc: when playlist has finished
+  desc: DEPRECATED
   user:
   <source>
-    *: "End of List"
+### The <source> section differs from the english!
+### the previously used one is commented below:
+###     *: "End of List"
+    *: ""
   </source>
   <dest>
     *: "Listenende"
@@ -7271,7 +7366,11 @@
   desc: when playlist has finished
   user:
   <source>
+### The <source> section differs from the english!
+### the previously used one is commented below:
+###     *: "End of Song List"
     *: "End of Song List"
+    player: "End of List"
   </source>
   <dest>
     *: "Playlist zu Ende"
@@ -7361,7 +7460,7 @@
     *: "Dynamische Playlist löschen?"
   </dest>
   <voice>
-    *: 
+    *:""
   </voice>
 </phrase>
 <phrase>
@@ -7887,11 +7986,19 @@
   desc: Used on recorder models
   user:
   <source>
+### The <source> section differs from the english!
+### the previously used one is commented below:
+###     *: "OFF to abort"
+###     h100,h120,h300: "STOP to abort"
+###     ipod*: "PLAY/PAUSE to abort"
+###     x5: "Long PLAY to abort"
+###     h10: "PREV to abort"
     *: "OFF to abort"
     h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5: "Long PLAY to abort"
-    h10: "PREV to abort"
+    h10,h10_5gb: "PREV to abort"
+    e200: "PREV to abort"
   </source>
   <dest>
     *: "OFF zum Abbrechen"
@@ -10641,5 +10748,389 @@
   </dest>
   <voice>
     *: "US/Kanada"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUILDING_DATABASE
+  desc: splash database building progress
+  user:
+  <source>
+    *: "Building database... %d found (OFF to return)"
+    h100,h120,h300: "Building database... %d found (STOP to return)"
+    ipod*: "Building database... %d found (PLAY/PAUSE to return)"
+    x5: "Building database... %d found (Long PLAY to return)"
+    h10,h10_5gb: "Building database... %d found (PREV to return)"
+    e200: "Building database... %d found (PREV to return)"
+  </source>
+  <dest>
+    *: "Erstelle Datenbank... %d found (OFF zum Abbrechen)"
+    h100,h120,h300: "Erstelle Datenbank... %d found (STOP zum Abbrechen)"
+    ipod*: "Erstelle Datenbank... %d found (PLAY/PAUSE zum Abbrechen)"
+    x5: "Erstelle Datenbank... %d found (Langes PLAY zum Abbrechen)"
+    h10,h10_5gb: "Erstelle Datenbank... %d found (PREV zum Abbrechen)"
+    e200: "Erstelle Datenbank... %d found (PREV zum Abbrechen)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETING
+  desc:
+  user:
+  <source>
+    *: "Deleting..."
+  </source>
+  <dest>
+    *: "Lösche..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_RESUME
+  desc: bookmark context menu, resume this bookmark
+  user:
+  <source>
+    *: "Resume"
+  </source>
+  <dest>
+    *: "Abspielen"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLISTVIEWER_SETTINGS
+  desc: title for the playlist viewer settings menus
+  user:
+  <source>
+    *: "Playlist Viewer Settings"
+  </source>
+  <dest>
+    *: "Playlist Viewer Einstellungen"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LISTACCEL_ACCEL_SPEED
+  desc: list acceleration speed
+  user:
+  <source>
+    *: "List Acceleration Speed"
+  </source>
+  <dest>
+    *: "Listenbeschleunigungs Geschwindigkeit"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_MENU
+  desc: bookmark selection list context menu
+  user:
+  <source>
+    *: "Bookmark Actions"
+  </source>
+  <dest>
+    *: "Lesezeichen Optionen"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_DIR_NOT_WRITABLE
+  desc:
+  user:
+  <source>
+    *: "Can't write to recording directory"
+  </source>
+  <dest>
+    *: "Kann nicht in Aufnahmeverzeichnis schreiben"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSE_CUESHEET
+  desc:
+  user:
+  <source>
+    *: "Browse Cuesheet"
+  </source>
+  <dest>
+    *: "Cuesheet durchsuchen"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_FILE_TALK
+  desc: Item of voice menu, whether to use file .talk clips
+  user:
+  <source>
+    *: "Use File .talk Clips"
+  </source>
+  <dest>
+    *: "Datei .talk Clips verwenden"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BOOKMARK_SELECT_TIME_TEXT
+  desc: voice only, used in the bookmark select list to label elapsed time
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_WAKEUP_SCREEN
+  desc: in alarm menu setting
+  user:
+  <source>
+    *: "Alarm Wake up Screen"
+  </source>
+  <dest>
+    *: "Alarm Bildschirm"
+  </dest>
+  <voice>
+    *: "Alarm Wake up Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_REC_DIR
+  desc:
+  user:
+  <source>
+    *: "Clear Recording Directory"
+  </source>
+  <dest>
+    *: "Aufnahmeverzeichnis leeren"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BOOKMARK_SELECT_INDEX_TEXT
+  desc: voice only, used in the bookmark list to label index number
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Index"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_MENU_TITLE
+  desc: title for the onplay menus
+  user:
+  <source>
+    *: "Context Menu"
+  </source>
+  <dest>
+    *: "Kontextmenü"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONLIGHT_BRIGHTNESS
+  desc: in settings_menu
+  user:
+  <source>
+    *: ""
+    gigabeatf: "Button Light Brightness"
+  </source>
+  <dest>
+    *: ""
+    gigabeatf: "Knopfbeleuchtungshelligkeit"
+  </dest>
+  <voice>
+    *: ""
+    gigabeatf: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_DELETE
+  desc: bookmark context menu, delete this bookmark
+  user:
+  <source>
+    *: "Delete"
+  </source>
+  <dest>
+    *: "Löschen"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_DONT_RESUME
+  desc: top item in the list when asking user about bookmark auto load
+  user:
+  <source>
+    *: "<Don't Resume>"
+  </source>
+  <dest>
+    *: "<Nicht fortsetzen>"
+  </dest>
+  <voice>
+    *: "Do Not Resume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SELECT_BOOKMARK
+  desc: bookmark selection list title
+  user:
+  <source>
+    *: "Select Bookmark"
+  </source>
+  <dest>
+    *: "Lesezeichen auswählen"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LISTACCEL_START_DELAY
+  desc: Delay before list starts accelerating
+  user:
+  <source>
+    *: "List Acceleration Start Delay"
+  </source>
+  <dest>
+    *: "Listenbeschleunigungsverzögerung"
+  </dest>
+  <voice>
+    *: "List Acceleration Start Delay"
+  </voice>
+</phrase>
+
+<phrase>
+  id: LANG_MOVING
+  desc:
+  user:
+  <source>
+    *: "Moving..."
+  </source>
+  <dest>
+    *: "Verschiebe..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_DIR_TALK
+  desc: Item of voice menu, whether to use directory .talk clips
+  user:
+  <source>
+    *: "Use Directory .talk Clips"
+  </source>
+  <dest>
+    *: "Ordner .talk Clips verwenden"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SHUFFLE
+  desc: bookmark selection list, bookmark enables shuffle
+  user:
+  <source>
+    *: ", Shuffle"
+  </source>
+  <dest>
+    *: ", Zufallswiedergabe"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_INVALID
+  desc: bookmark selection list, bookmark couldn't be parsed
+  user:
+  <source>
+    *: "<Invalid Bookmark>"
+  </source>
+  <dest>
+    *: "<Ungültiges Lesezeichen>"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONLIGHT_TIMEOUT
+  desc: in settings_menu
+  user:
+  <source>
+    *: ""
+    e200: "Wheel Light Timeout"
+    gigabeatf: "Button Light Timeout"
+  </source>
+  <dest>
+    *: ""
+    e200: "Scrollrad Beleuchtung"
+    gigabeatf: "Knopf Beleuchtung"
+  </dest>
+  <voice>
+    *: ""
+    e200: ""
+    gigabeatf: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COPYING
+  desc:
+  user:
+  <source>
+    *: "Copying..."
+  </source>
+  <dest>
+    *: "Kopiere..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_REC_DIR
+  desc:
+  user:
+  <source>
+    *: "Set As Recording Directory"
+  </source>
+  <dest>
+    *: "Als Aufnahmeverzeichnis festlegen"
+  </dest>
+  <voice>
+    *: ""
   </voice>
 </phrase>
