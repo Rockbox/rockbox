@@ -3,15 +3,6 @@
   desc: bool true representation
   user:
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Yes"
-# are *identical* to the <dest> strings within the english.lang file. The
-# when doing updates etc, while the <dest> ones are used when this file is
-# used to simply get the full set of english strings for a particular target.
-#
-  id: LANG_SET_BOOL_YES
-  user:
     *: "Yes"
   </source>
   <dest>
@@ -838,13 +829,6 @@
   desc: Generic recorder string to use to confirm
   user:
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "PLAY = Yes"
-###     h100,h120,h300: "NAVI = Yes"
-###     ipod*: "SELECT = Yes"
-###     x5: "SELECT = Yes"
-###     h10: "NEXT = Yes"
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
     ipod*: "SELECT = Yes"
@@ -858,7 +842,9 @@
     h100,h120,h300: "NAVI = Ja"
     ipod*: "SELECT = Ja"
     x5: "SELECT = Ja"
-    h10: "NEXT = Ja"
+    h10,h10_5gb: "SELECT = Ja"
+    gigabeatf: "SELECT = Ja"
+    e200: "SELECT = Ja"
   </dest>
   <voice>
     *: ""
@@ -900,7 +886,7 @@
     *: "Cleared"
   </source>
   <dest>
-    *: "Gelöscht"
+    *: "Zurückgesetzt"
   </dest>
   <voice>
     *: ""
@@ -2518,9 +2504,6 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_DIR
-### The 'desc' field differs from the english!
-### the previously used desc is commented below:
-### desc: item of voice menu, set the "talkbox" mode for directories
   desc: item of voice menu, set the voice mode for directories
   user:
   <source>
@@ -2535,9 +2518,6 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_FILE
-### The 'desc' field differs from the english!
-### the previously used desc is commented below:
-### desc: item of voice menu, set the voive mode for files
   desc: item of voice menu, set the voice mode for files
   user:
   <source>
@@ -4714,19 +4694,13 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
-### The 'desc' field differs from the english!
-### the previously used desc is commented below:
-### desc: From the auto-load screen, allows user to list all bookmarks
   desc: DEPRECATED
   user:
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Down = List"
     *: ""
   </source>
   <dest>
-    *: "Unten = Liste"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -4734,27 +4708,13 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_EXIT
-### The 'desc' field differs from the english!
-### the previously used desc is commented below:
-### desc: From the bookmark list screen, allows user to exit
   desc: DEPRECATED
   user:
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "OFF = Exit"
-###     h100,h120,h300: "STOP = Exit"
-###     ipod*: "PLAY/PAUSE = Exit"
-###     x5: "RECORD = Exit"
-###     h10: "PREV = Exit"
     *: ""
   </source>
   <dest>
-    *: "OFF = Beenden"
-    h100,h120,h300: "STOP = Beenden"
-    ipod*: "PLAY/PAUSE = Beenden"
-    x5: "RECORD = Beenden"
-    h10: "PREV = Beenden"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -4762,19 +4722,13 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
-### The 'desc' field differs from the english!
-### the previously used desc is commented below:
-### desc: Used on the bookmark select window to label bookmark number
   desc: DEPRECATED
   user:
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Bookmark"
     *: ""
   </source>
   <dest>
-    *: "Lesezeichen"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -4782,67 +4736,41 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_INDEX_TEXT
-### The 'desc' field differs from the english!
-### the previously used desc is commented below:
-### desc: Used on the bookmark select window to label index number
   desc: DEPRECATED
   user:
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Index"
     *: ""
   </source>
   <dest>
-    *: "Index"
+    *: ""
   </dest>
   <voice>
-    *: "Index"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_TIME_TEXT
-### The 'desc' field differs from the english!
-### the previously used desc is commented below:
-### desc: Used on the bookmark select window to label elapsed time
   desc: DEPRECATED
   user:
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Time"
     *: ""
   </source>
   <dest>
-    *: "Zeit"
+    *: ""
   </dest>
   <voice>
-    *: "Zeit"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_PLAY
-### The 'desc' field differs from the english!
-### the previously used desc is commented below:
-### desc: Used on the bookmark select window to indicated the play option
   desc: DEPRECATED
   user:
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "PLAY = Select"
-###     h100,h120,h300: "NAVI = Select"
-###     ipod*: "SELECT = Select"
-###     x5: "SELECT = Select"
-###     h10: "NEXT = Select"
     *: ""
   </source>
   <dest>
-    *: "PLAY = Auswählen"
-    h100,h120,h300: "NAVI = Auswählen"
-    ipod*: "SELECT = Auswählen"
-    x5: "SELECT = Auswählen"
-    h10: "NEXT = Auswählen"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -4850,27 +4778,13 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SELECT_DELETE
-### The 'desc' field differs from the english!
-### the previously used desc is commented below:
-### desc: Used on the bookmark select window to indicated the bookmark delete option
   desc: DEPRECATED
   user:
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "ON+Play = Delete"
-###     h100,h120,h300: "RECORD = Delete"
-###     ipod*: "Long MENU = Delete"
-###     x5: "Long RECORD = Delete"
-###     h10: "REWIND = Delete"
     *: ""
   </source>
   <dest>
-    *: "ON+Play = Löschen"
-    h100,h120,h300: "RECORD = Löschen"
-    ipod*: "Long MENU = Löschen"
-    x5: "Long RECORD = Löschen"
-    h10: "REWIND = Löschen"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -4878,19 +4792,13 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_AUTOLOAD_QUERY
-### The 'desc' field differs from the english!
-### the previously used desc is commented below:
-### desc: prompt for user to decide to create a bookmark
   desc: DEPRECATED
   user:
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Load Last Bookmark?"
     *: ""
   </source>
   <dest>
-    *: "Lade letztes Lesezeichen?"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -4957,13 +4865,6 @@
   desc: used in set_time()
   user:
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "ON To Set"
-###     h100,h120,h300: "NAVI = Set"
-###     ipod*: "SELECT = Set"
-###     x5: "SELECT = Set"
-###     h10: "NEXT = Set"
     *: "ON = Set"
     h100,h120,h300: "NAVI = Set"
     ipod*: "SELECT = Set"
@@ -4977,7 +4878,9 @@
     h100,h120,h300: "NAVI = Speichern"
     ipod*: "SELECT = Speichern"
     x5: "SELECT = Speichern"
-    h10: "NEXT = Speichern"
+    h10,h10_5gb: "SELECT = Speichern"
+    gigabeatf: "SELECT = Speichern"
+    e200: "SELECT = Speichern"
   </dest>
   <voice>
     *: ""
@@ -4988,13 +4891,6 @@
   desc: used in set_time()
   user:
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "OFF To Revert"
-###     h100,h120,h300: "STOP = Revert"
-###     ipod*: "MENU = Revert"
-###     x5: "RECORD = Revert"
-###     h10: "PREV = Revert"
     *: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
     ipod*,e200: "MENU = Revert"
@@ -5007,7 +4903,8 @@
     h100,h120,h300: "STOP = Abbrechen"
     ipod*: "MENU = Abbrechen"
     x5: "RECORD = Abbrechen"
-    h10: "PREV = Abbrechen"
+    h10,h10_5gb: "PREV = Abbrechen"
+    gigabeatf: "POWER = Abbrechen"
   </dest>
   <voice>
     *: ""
@@ -7343,19 +7240,13 @@
 </phrase>
 <phrase>
   id: LANG_END_PLAYLIST_PLAYER
-### The 'desc' field differs from the english!
-### the previously used desc is commented below:
-### desc: when playlist has finished
   desc: DEPRECATED
   user:
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "End of List"
     *: ""
   </source>
   <dest>
-    *: "Listenende"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -7366,14 +7257,12 @@
   desc: when playlist has finished
   user:
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "End of Song List"
     *: "End of Song List"
     player: "End of List"
   </source>
   <dest>
     *: "Playlist zu Ende"
+    player: "Ende der Liste"    
   </dest>
   <voice>
     *: ""
@@ -7986,13 +7875,6 @@
   desc: Used on recorder models
   user:
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "OFF to abort"
-###     h100,h120,h300: "STOP to abort"
-###     ipod*: "PLAY/PAUSE to abort"
-###     x5: "Long PLAY to abort"
-###     h10: "PREV to abort"
     *: "OFF to abort"
     h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
@@ -8005,7 +7887,8 @@
     h100,h120,h300: "STOP zum Abbrechen"
     ipod*: "PLAY/PAUSE zum Abbrechen"
     x5: "Long PLAY zum Abbrechen"
-    h10: "PREV zum Abbrechen"
+    h10,h10_5gb: "PREV zum Abbrechen"
+    e200: "PREV zum Abbrechen"
   </dest>
   <voice>
     *: ""
@@ -10763,15 +10646,15 @@
     e200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
-    *: "Erstelle Datenbank... %d found (OFF zum Abbrechen)"
-    h100,h120,h300: "Erstelle Datenbank... %d found (STOP zum Abbrechen)"
-    ipod*: "Erstelle Datenbank... %d found (PLAY/PAUSE zum Abbrechen)"
-    x5: "Erstelle Datenbank... %d found (Langes PLAY zum Abbrechen)"
-    h10,h10_5gb: "Erstelle Datenbank... %d found (PREV zum Abbrechen)"
-    e200: "Erstelle Datenbank... %d found (PREV zum Abbrechen)"
+    *: "Erstelle Datenbank... %d gefunden (OFF zum Abbrechen)"
+    h100,h120,h300: "Erstelle Datenbank... %d gefunden (STOP zum Abbrechen)"
+    ipod*: "Erstelle Datenbank... %d gefunden (PLAY/PAUSE zum Abbrechen)"
+    x5: "Erstelle Datenbank... %d gefunden (Langes PLAY zum Abbrechen)"
+    h10,h10_5gb: "Erstelle Datenbank... %d gefunden (PREV zum Abbrechen)"
+    e200: "Erstelle Datenbank... %d gefunden (PREV zum Abbrechen)"
   </dest>
   <voice>
-    *: ""
+    *: "Erstelle Datenbank"
   </voice>
 </phrase>
 <phrase>
@@ -10785,7 +10668,7 @@
     *: "Lösche..."
   </dest>
   <voice>
-    *: ""
+    *: "Lösche"
   </voice>
 </phrase>
 <phrase>
@@ -10799,7 +10682,7 @@
     *: "Abspielen"
   </dest>
   <voice>
-    *: ""
+    *: "Abspielen"
   </voice>
 </phrase>
 <phrase>
@@ -10813,7 +10696,7 @@
     *: "Playlist Viewer Einstellungen"
   </dest>
   <voice>
-    *: ""
+    *: "Playlist Viewer Einstellungen"
   </voice>
 </phrase>
 <phrase>
@@ -10827,7 +10710,7 @@
     *: "Listenbeschleunigungs Geschwindigkeit"
   </dest>
   <voice>
-    *: ""
+    *: "Listenbeschleunigungs Geschwindigkeit"
   </voice>
 </phrase>
 <phrase>
@@ -10841,7 +10724,7 @@
     *: "Lesezeichen Optionen"
   </dest>
   <voice>
-    *: ""
+    *: "Lesezeichen Optionen"
   </voice>
 </phrase>
 <phrase>
@@ -10855,7 +10738,7 @@
     *: "Kann nicht in Aufnahmeverzeichnis schreiben"
   </dest>
   <voice>
-    *: ""
+    *: "Kann nicht in Aufnahmeverzeichnis schreiben"
   </voice>
 </phrase>
 <phrase>
@@ -10869,7 +10752,7 @@
     *: "Cuesheet durchsuchen"
   </dest>
   <voice>
-    *: ""
+    *: "Cuesheet durchsuchen"
   </voice>
 </phrase>
 <phrase>
@@ -10883,7 +10766,7 @@
     *: "Datei .talk Clips verwenden"
   </dest>
   <voice>
-    *: ""
+    *: "Datei talk Clips verwenden"
   </voice>
 </phrase>
 <phrase>
@@ -10897,7 +10780,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Time"
+    *: "Zeit"
   </voice>
 </phrase>
 <phrase>
@@ -10911,7 +10794,7 @@
     *: "Alarm Bildschirm"
   </dest>
   <voice>
-    *: "Alarm Wake up Screen"
+    *: "Alarm Bildschirm"
   </voice>
 </phrase>
 <phrase>
@@ -10922,10 +10805,10 @@
     *: "Clear Recording Directory"
   </source>
   <dest>
-    *: "Aufnahmeverzeichnis leeren"
+    *: "Aufnahmeverzeichnis zurücksetzen"
   </dest>
   <voice>
-    *: ""
+    *: "Aufnahmeverzeichnis zurücksetzen"
   </voice>
 </phrase>
 <phrase>
@@ -10953,7 +10836,7 @@
     *: "Kontextmenü"
   </dest>
   <voice>
-    *: ""
+    *: "Kontextmenü"
   </voice>
 </phrase>
 <phrase>
@@ -10966,11 +10849,11 @@
   </source>
   <dest>
     *: ""
-    gigabeatf: "Knopfbeleuchtungshelligkeit"
+    gigabeatf: "Tastenbeleuchtung: Helligkeit"
   </dest>
   <voice>
     *: ""
-    gigabeatf: ""
+    gigabeatf: "Tastenbeleuchtung: Helligkeit"
   </voice>
 </phrase>
 <phrase>
@@ -10984,7 +10867,7 @@
     *: "Löschen"
   </dest>
   <voice>
-    *: ""
+    *: "Löschen"
   </voice>
 </phrase>
 <phrase>
@@ -10998,7 +10881,7 @@
     *: "<Nicht fortsetzen>"
   </dest>
   <voice>
-    *: "Do Not Resume"
+    *: "Nicht fortsetzen"
   </voice>
 </phrase>
 <phrase>
@@ -11012,7 +10895,7 @@
     *: "Lesezeichen auswählen"
   </dest>
   <voice>
-    *: ""
+    *: "Lesezeichen auswählen"
   </voice>
 </phrase>
 <phrase>
@@ -11026,7 +10909,7 @@
     *: "Listenbeschleunigungsverzögerung"
   </dest>
   <voice>
-    *: "List Acceleration Start Delay"
+    *: "Listenbeschleunigungsverzögerung"
   </voice>
 </phrase>
 
@@ -11041,7 +10924,7 @@
     *: "Verschiebe..."
   </dest>
   <voice>
-    *: ""
+    *: "Verschiebe..."
   </voice>
 </phrase>
 <phrase>
@@ -11055,7 +10938,7 @@
     *: "Ordner .talk Clips verwenden"
   </dest>
   <voice>
-    *: ""
+    *: "Ordner talk Clips verwenden"
   </voice>
 </phrase>
 <phrase>
@@ -11069,7 +10952,7 @@
     *: ", Zufallswiedergabe"
   </dest>
   <voice>
-    *: ""
+    *: "Zufallswiedergabe"
   </voice>
 </phrase>
 <phrase>
@@ -11083,7 +10966,7 @@
     *: "<Ungültiges Lesezeichen>"
   </dest>
   <voice>
-    *: ""
+    *: "Ungültiges Lesezeichen"
   </voice>
 </phrase>
 <phrase>
@@ -11102,8 +10985,8 @@
   </dest>
   <voice>
     *: ""
-    e200: ""
-    gigabeatf: ""
+    e200: "Scrollrad Beleuchtung"
+    gigabeatf: "Knopf Beleuchtung"
   </voice>
 </phrase>
 <phrase>
@@ -11117,7 +11000,7 @@
     *: "Kopiere..."
   </dest>
   <voice>
-    *: ""
+    *: "Kopiere"
   </voice>
 </phrase>
 <phrase>
@@ -11131,6 +11014,6 @@
     *: "Als Aufnahmeverzeichnis festlegen"
   </dest>
   <voice>
-    *: ""
+    *: "Als Aufnahmeverzeichnis festlegen"
   </voice>
 </phrase>
