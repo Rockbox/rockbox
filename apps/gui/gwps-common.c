@@ -842,9 +842,8 @@ static char *get_token_value(struct gui_wps *gwps,
                 else
                 {
                     *intval = (limit - 3) * (global_settings.volume
-                                             - sound_min(SOUND_VOLUME))
-                               / (sound_max(SOUND_VOLUME)
-                                  - sound_min(SOUND_VOLUME)) + 2;
+                                             - sound_min(SOUND_VOLUME) - 1)
+                              / (-1 - sound_min(SOUND_VOLUME)) + 2;
                 }
             }
             return buf;
