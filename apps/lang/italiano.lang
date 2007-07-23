@@ -10926,9 +10926,11 @@ LANG_RECORDING_AGC_PRESET: The phrase is not used. Skipped
   user:
   <source>
     *: "List Acceleration Speed"
+    e200: ""
   </source>
   <dest>
     *: "Velocit√ Accelerazione Lista"
+    e200: ""
   </dest>
   <voice>
     *: "Velocit√ Accelerazione Lista"
@@ -10940,9 +10942,11 @@ LANG_RECORDING_AGC_PRESET: The phrase is not used. Skipped
   user:
   <source>
     *: "List Acceleration Start Delay"
+    e200: ""
   </source>
   <dest>
     *: "Ritardo Iniziale Accelerazione Lista"
+    e200: ""
   </dest>
   <voice>
     *: "Ritardo Iniziale Accelerazione Lista"
