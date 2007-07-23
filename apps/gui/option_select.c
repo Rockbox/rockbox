@@ -276,7 +276,8 @@ static void bool_funcwrapper(int value)
         boolfunction(false);
 }
 
-bool option_screen(struct settings_list *setting, bool use_temp_var)
+bool option_screen(struct settings_list *setting,
+                   bool use_temp_var, unsigned char* option_title)
 {
     int action;
     bool done = false;
@@ -286,7 +287,7 @@ bool option_screen(struct settings_list *setting, bool use_temp_var)
     bool allow_wrap = ((int*)setting->setting != &global_settings.volume);
     int var_type = setting->flags&F_T_MASK;
     void (*function)(int) = NULL;
-    
+    char *title;
     if (var_type == F_T_INT || var_type == F_T_UINT)
     {
         variable = use_temp_var ? &temp_var: (int*)setting->setting;
@@ -303,11 +304,11 @@ bool option_screen(struct settings_list *setting, bool use_temp_var)
     gui_synclist_init(&lists, value_setting_get_name_cb, 
                       (void*)setting, false, 1);
     if (setting->lang_id == -1)
-        gui_synclist_set_title(&lists, 
-                                (char*)setting->cfg_vals, Icon_Questionmark);
+        title = (char*)setting->cfg_vals;
     else
-        gui_synclist_set_title(&lists, 
-                                str(setting->lang_id), Icon_Questionmark);
+        title = P2STR(option_title);
+    
+    gui_synclist_set_title(&lists, title, Icon_Questionmark);
     gui_synclist_set_icon_callback(&lists, NULL);
     
     /* set the number of items and current selection */
@@ -466,7 +467,7 @@ bool set_option(const char* string, void* variable, enum optiontype type,
     data.desc = (void*)strings; /* shutup gcc... */
     data.option_callback = function;
     item.choice_setting = &data;
-    option_screen(&item, false);
+    option_screen(&item, false, NULL);
     if (type == BOOL)
     {
         *(bool*)variable = (temp == 1? true: false);
@@ -496,7 +497,7 @@ bool set_int_ex(const unsigned char* string,
     item.lang_id = -1;
     item.cfg_vals = (char*)string;
     item.setting = variable;
-    return option_screen(&item, false);
+    return option_screen(&item, false, NULL);
 }
 
 /* to be replaced */

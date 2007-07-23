@@ -253,15 +253,19 @@ static void talk_menu_item(const struct menu_item_ex *menu,
     }
 }
 #define MAX_OPTIONS 32
-/* returns true if the menu needs to be redrwan */
 bool do_setting_from_menu(const struct menu_item_ex *temp)
 {
     int setting_id;
     const struct settings_list *setting = find_setting(
                                                temp->variable,
                                                &setting_id);
+    char *title;
+    if ((temp->flags&MENU_TYPE_MASK) == MT_SETTING_W_TEXT)
+        title = temp->callback_and_desc->desc;
+    else
+        title = ID2P(setting->lang_id);
     option_screen((struct settings_list *)setting, 
-                   setting->flags&F_TEMPVAR);
+                  setting->flags&F_TEMPVAR, title);
     return false;
 }
 
