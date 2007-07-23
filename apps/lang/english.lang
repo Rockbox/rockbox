@@ -10955,16 +10955,16 @@
   desc: Delay before list starts accelerating
   user:
   <source>
-    e200: ""
     *: "List Acceleration Start Delay"
+    e200: ""
   </source>
   <dest>
-    e200: ""
     *: "List Acceleration Start Delay"
+    e200: ""
   </dest>
   <voice>
-    e200: ""
     *: "List Acceleration Start Delay"
+    e200: ""
   </voice>
 </phrase>
 <phrase>
@@ -10972,16 +10972,16 @@
   desc: list acceleration speed
   user:
   <source>
-    e200: ""
     *: "List Acceleration Speed"
+    e200: ""
   </source>
   <dest>
-    e200: ""
     *: "List Acceleration Speed"
+    e200: ""
   </dest>
   <voice>
-    e200: ""
     *: "List Acceleration Speed"
+    e200: ""
   </voice>
 </phrase>
 <phrase>
