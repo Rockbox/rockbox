@@ -80,12 +80,21 @@ PLUGIN_IRAM_DECLARE
 #define FRACTSIZE 10
 
 #ifndef SIMULATOR
-	#define SAMPLE_RATE SAMPR_22  // 44100 22050 11025
-	#define MAX_VOICES 20   // Note: 24 midi channels is the minimum general midi
-                         // spec implementation
+
+#if (HW_SAMPR_CAPS & SAMPR_CAP_22)
+#define SAMPLE_RATE SAMPR_22  // 44100 22050 11025
+#else
+#define SAMPLE_RATE SAMPR_44  // 44100 22050 11025
+#endif
+
+#define MAX_VOICES 20   // Note: 24 midi channels is the minimum general midi
+                        // spec implementation
+
 #else	// Simulator requires 44100, and we can afford to use more voices
-	#define SAMPLE_RATE SAMPR_44
-	#define MAX_VOICES 48
+
+#define SAMPLE_RATE SAMPR_44
+#define MAX_VOICES 48
+
 #endif
 
 
