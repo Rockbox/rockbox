@@ -987,7 +987,7 @@ bool set_time_screen(const char* title, struct tm *tm)
 
             /* draw the screen */
             screens[s].set_drawmode(DRMODE_SOLID);
-            screens[s].clear_display();
+            gui_textarea_clear(&screens[s]);
             /* display the screen title */
             screens[s].puts_scroll(0, 0, title);
 
