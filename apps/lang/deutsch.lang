@@ -1978,10 +1978,10 @@
     *: "Browse Fonts"
   </source>
   <dest>
-    *: "Zeige Zeichensätze"
+    *: "Zeige Schriftarten"
   </dest>
   <voice>
-    *: "Zeige Zeichensätze"
+    *: "Zeige Schriftarten"
   </voice>
 </phrase>
 <phrase>
@@ -2062,10 +2062,10 @@
     *: "Status-/Scrollbar"
   </source>
   <dest>
-    *: "Status-/Verlaufsbalken"
+    *: "Status-/Bildlaufleiste"
   </dest>
   <voice>
-    *: "Status- und Verlaufsbalken"
+    *: "Status- und Bildlaufleiste"
   </voice>
 </phrase>
 <phrase>
@@ -2090,10 +2090,10 @@
     *: "Default Codepage"
   </source>
   <dest>
-    *: "Standard-Zeichensatz"
+    *: "Standard-Zeichenkodierung"
   </dest>
   <voice>
-    *: "Standard-Zeichensatz"
+    *: "Standard-Zeichenkodierung"
   </voice>
 </phrase>
 <phrase>
@@ -2104,10 +2104,10 @@
     *: "Latin1 (ISO-8859-1)"
   </source>
   <dest>
-    *: "Latein1 (ISO-8859-1)"
+    *: "Westeuropäisch (ISO-8859-1)"
   </dest>
   <voice>
-    *: "Latein 1"
+    *: "Westeuropäisch"
   </voice>
 </phrase>
 <phrase>
@@ -2202,10 +2202,10 @@
     *: "Latin Extended (ISO-8859-2)"
   </source>
   <dest>
-    *: "Latein Erweitert (ISO-8859-2)"
+    *: "Osteuropäisch (ISO-8859-2)"
   </dest>
   <voice>
-    *: "Latein Erweitert"
+    *: "Osteuropäisch"
   </voice>
 </phrase>
 <phrase>
@@ -2356,10 +2356,10 @@
     *: "Wake-Up Alarm"
   </source>
   <dest>
-    *: "Wecker"
+    *: "Alarm"
   </dest>
   <voice>
-    *: "Wecker"
+    *: "Alarm"
   </voice>
 </phrase>
 <phrase>
@@ -2566,10 +2566,10 @@
     *: ".talk mp3 clip"
   </source>
   <dest>
-    *: ".talk mp3 Datei"
+    *: "Sprachclip"
   </dest>
   <voice>
-    *: "Sprachdatei"
+    *: "Sprachclip"
   </voice>
 </phrase>
 <phrase>
@@ -3268,7 +3268,7 @@
     *: "Bar (Inverse)"
   </source>
   <dest>
-    *: "Balken(invertiert)"
+    *: "Balken (invertiert)"
   </dest>
   <voice>
     *: "Balken"
@@ -3464,7 +3464,7 @@
     *: "Jump Scroll Delay"
   </source>
   <dest>
-    *: "Sprung-Scroll Verzögerung"
+    *: "Sprung-Scroll-Verzögerung"
   </dest>
   <voice>
     *: "Sprung-Scroll Verzögerung"
@@ -3520,10 +3520,10 @@
     *: "Scroll Bar"
   </source>
   <dest>
-    *: "Scrollleiste"
+    *: "Bildlaufleiste"
   </dest>
   <voice>
-    *: "Scrollleiste"
+    *: "Bildlaufleiste"
   </voice>
 </phrase>
 <phrase>
@@ -4010,7 +4010,7 @@
     *: "Show ID3 Info"
   </source>
   <dest>
-    *: "Zeige ID3 Info"
+    *: "Zeige ID3-Info"
   </dest>
   <voice>
     *: "Zeige ID3 Info"
@@ -7123,7 +7123,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Zeichensatz"
+    *: "Schriftart"
   </voice>
 </phrase>
 <phrase>
@@ -7232,7 +7232,7 @@
     *: "Playlist Buffer Full"
   </source>
   <dest>
-    *: "Playlist Puffer voll"
+    *: "Playlist-Puffer voll"
   </dest>
   <voice>
     *: ""
@@ -7864,7 +7864,7 @@
     *: "Reboot now?"
   </source>
   <dest>
-    *: "Jetzt neu booten?"
+    *: "Jetzt neustarten?"
   </dest>
   <voice>
     *: ""
@@ -8882,10 +8882,10 @@
     *: "Scroll Bar"
   </source>
   <dest>
-    *: "Scrollleiste"
+    *: "Bildlaufleiste"
   </dest>
   <voice>
-    *: "Scrollleiste"
+    *: "Bildlaufleiste"
   </voice>
 </phrase>
 <phrase>
@@ -9217,10 +9217,10 @@
     *: "DJ-Set (slow)"
   </source>
   <dest>
-    *: "DJ-Gerät (langsam)"
+    *: "DJ-Set (langsam)"
   </dest>
   <voice>
-    *: "DJ-Gerät (langsam)"
+    *: "DJ-Set (langsam)"
   </voice>
 </phrase>
 <phrase>
@@ -9259,7 +9259,7 @@
     *: "Filesize"
   </source>
   <dest>
-    *: "Filesize"
+    *: "Dateigröße"
   </dest>
   <voice>
     *: "Dateigröße"
@@ -9886,10 +9886,10 @@
     *: "DJ-Set (slow)"
   </source>
   <dest>
-    *: "DJ-Gerät (langsam)"
+    *: "DJ-Set (langsam)"
   </dest>
   <voice>
-    *: "DJ-Gerät (langsam)"
+    *: "DJ-Set (langsam)"
   </voice>
 </phrase>
 <phrase>
@@ -10407,10 +10407,10 @@
     *: "Previous Screen"
   </source>
   <dest>
-    *: "Voriger Bildschirm"
+    *: "Letzter Modus"
   </dest>
   <voice>
-    *: "Voriger Bildschirm"
+    *: "Letzter Modus"
   </voice>
 </phrase>
 <phrase>
@@ -10435,10 +10435,10 @@
     *: "Start Screen"
   </source>
   <dest>
-    *: "Startbildschirm"
+    *: "Startmodus"
   </dest>
   <voice>
-    *: "Startbildschirm"
+    *: "Startmodus"
   </voice>
 </phrase>
 <phrase>
@@ -10693,10 +10693,10 @@
     *: "Playlist Viewer Settings"
   </source>
   <dest>
-    *: "Playlist Viewer Einstellungen"
+    *: "Playlistanzeige-Einstellungen"
   </dest>
   <voice>
-    *: "Playlist Viewer Einstellungen"
+    *: "Playlistanzeige-Einstellungen"
   </voice>
 </phrase>
 <phrase>
@@ -10707,10 +10707,10 @@
     *: "List Acceleration Speed"
   </source>
   <dest>
-    *: "Listenbeschleunigungs Geschwindigkeit"
+    *: "Listenbeschleunigung"
   </dest>
   <voice>
-    *: "Listenbeschleunigungs Geschwindigkeit"
+    *: "Listenbeschleunigung"
   </voice>
 </phrase>
 <phrase>
@@ -10721,10 +10721,10 @@
     *: "Bookmark Actions"
   </source>
   <dest>
-    *: "Lesezeichen Optionen"
+    *: "Lesezeichen-Optionen"
   </dest>
   <voice>
-    *: "Lesezeichen Optionen"
+    *: "Lesezeichen-Optionen"
   </voice>
 </phrase>
 <phrase>
@@ -10763,10 +10763,10 @@
     *: "Use File .talk Clips"
   </source>
   <dest>
-    *: "Datei .talk Clips verwenden"
+    *: "Verwende Sprachclips für Dateien"
   </dest>
   <voice>
-    *: "Datei talk Clips verwenden"
+    *: "Verwende Sprachclips für Dateien"
   </voice>
 </phrase>
 <phrase>
@@ -10791,10 +10791,10 @@
     *: "Alarm Wake up Screen"
   </source>
   <dest>
-    *: "Alarm Bildschirm"
+    *: "Modus bei Alarm"
   </dest>
   <voice>
-    *: "Alarm Bildschirm"
+    *: "Modus bei Alarm"
   </voice>
 </phrase>
 <phrase>
@@ -10906,10 +10906,10 @@
     *: "List Acceleration Start Delay"
   </source>
   <dest>
-    *: "Listenbeschleunigungsverzögerung"
+    *: "Listenbeschleunigungs-Verzögerung"
   </dest>
   <voice>
-    *: "Listenbeschleunigungsverzögerung"
+    *: "Listenbeschleunigungs-Verzögerung"
   </voice>
 </phrase>
 
@@ -10935,10 +10935,10 @@
     *: "Use Directory .talk Clips"
   </source>
   <dest>
-    *: "Ordner .talk Clips verwenden"
+    *: "Verwende Sprachclips für Verzeichnisse"
   </dest>
   <voice>
-    *: "Ordner talk Clips verwenden"
+    *: "Verwende Sprachclips für Verzeichnisse"
   </voice>
 </phrase>
 <phrase>
@@ -10980,13 +10980,13 @@
   </source>
   <dest>
     *: ""
-    e200: "Scrollrad Beleuchtung"
-    gigabeatf: "Knopf Beleuchtung"
+    e200: "Scrollradbeleuchtungsdauer"
+    gigabeatf: "Tastenbeleuchtungsdauer"
   </dest>
   <voice>
     *: ""
-    e200: "Scrollrad Beleuchtung"
-    gigabeatf: "Knopf Beleuchtung"
+    e200: "Scrollradbeleuchtungsdauer"
+    gigabeatf: "Tastenbeleuchtungsdauer"
   </voice>
 </phrase>
 <phrase>
