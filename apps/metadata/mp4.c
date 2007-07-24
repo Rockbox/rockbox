@@ -426,7 +426,7 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                 if (sub_size > sizeof(tag_name) - 1)
                 {
                     read(fd, tag_name, sizeof(tag_name) - 1);
-                    lseek(fd, sub_size - sizeof(tag_name) - 1, SEEK_CUR);
+                    lseek(fd, sub_size - (sizeof(tag_name) - 1), SEEK_CUR);
                     tag_name[sizeof(tag_name) - 1] = 0;
                 }
                 else
@@ -672,8 +672,8 @@ bool get_mp4_metadata(int fd, struct mp3entry* id3)
     else
     {
         logf("MP4 metadata error");
-        DEBUGF("MP4 metadata error. errno %d, length %ld, frequency %ld, filesize %ld\n",
-            errno, id3->length, id3->frequency, id3->filesize);
+        DEBUGF("MP4 metadata error. errno %d, frequency %ld, filesize %ld\n",
+            errno, id3->frequency, id3->filesize);
         return false;
     }
 
