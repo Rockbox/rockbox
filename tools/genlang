@@ -232,7 +232,7 @@ if($english) {
 
                 print STDERR "DEST: \"$dest\" for $name / $id\n";
 
-                if($update || ($dest && ($dest ne "none"))) {
+                if($update || ($dest && ($dest !~ /^none\z/i))) {
                     # we unconditionally always use all IDs when the "update"
                     # feature is used
                     $id = $maybeid;
