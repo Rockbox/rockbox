@@ -1,3 +1,6 @@
 #if defined(SIMULATOR) && defined(__APPLE__)
 osx.dummy.bmp
 #endif
+
+/* Jackpot */
+jackpot_slots_remote.15x210x1.bmp

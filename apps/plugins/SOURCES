@@ -5,6 +5,7 @@ credits.c
 cube.c
 dict.c
 firmware_flash.c
+jackpot.c
 logo.c
 mosaique.c
 properties.c
@@ -110,7 +111,6 @@ rocklife.c
 
 #ifdef HAVE_LCD_CHARCELLS          /* Player model only */
 euroconverter.c
-jackpot.c
 nim.c
 #endif /* HAVE_LCD_CHARCELLS */
 

@@ -56,6 +56,9 @@ brickmania_powerups.176x132x16.bmp
 brickmania_break.176x132x16.bmp
 #endif
 
+/* Jackpot */
+jackpot_slots.30x420x1.bmp
+
 /* Bubbles */
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
 bubbles_emblem.112x64x1.bmp

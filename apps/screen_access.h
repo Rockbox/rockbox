@@ -119,6 +119,7 @@ struct screen
     void (*icon)(int icon, bool enable);
     unsigned long (*get_locked_pattern)(void);
     void (*define_pattern)(unsigned long ucs, const char *pattern);
+    void (*unlock_pattern)(unsigned long ucs);
 #endif
     void (*init)(void);
     void (*putsxy)(int x, int y, const unsigned char *str);

@@ -154,6 +154,8 @@ struct plugin_api {
     void (*lcd_icon)(int icon, bool enable);
     void (*lcd_double_height)(bool on);
 #else
+    void (*screen_clear_area)(struct screen * display, int xstart, int ystart,
+                              int width, int height);
     void (*lcd_set_drawmode)(int mode);
     int  (*lcd_get_drawmode)(void);
     void (*lcd_setfont)(int font);

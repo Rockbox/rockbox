@@ -134,7 +134,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     char *buf;
     int rc;
-
+    int i;
     filename = (char *)parameter;
 
     rb = api;
@@ -143,31 +143,31 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     stringbuffer = buf;
 
-    rb->lcd_clear_display();
+    FOR_NB_SCREENS(i)
+        rb->screens[i]->clear_display();
     rb->splash(0, "Converting...");
     
     rc = read_buffer(0);
+    FOR_NB_SCREENS(i)
+        rb->screens[i]->clear_display();
     if(rc == 0) {
-        rb->lcd_clear_display();
         rb->splash(0, "Writing...");
         rc = write_file();
 
+        FOR_NB_SCREENS(i)
+            rb->screens[i]->clear_display();
         if(rc < 0) {
-            rb->lcd_clear_display();
             rb->splash(HZ, "Can't write file: %d", rc);
         } else {
-            rb->lcd_clear_display();
             rb->splash(HZ, "Done");
         }
     } else {
         if(rc < 0) {
-            rb->lcd_clear_display();
             rb->splash(HZ, "Can't read file: %d", rc);
         } else {
-            rb->lcd_clear_display();
             rb->splash(HZ, "The file is too big");
         }
     }
-    
+
     return PLUGIN_OK;
 }

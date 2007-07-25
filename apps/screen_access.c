@@ -174,6 +174,7 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->putc=&lcd_putc;
             screen->get_locked_pattern=&lcd_get_locked_pattern;
             screen->define_pattern=&lcd_define_pattern;
+            screen->unlock_pattern=&lcd_unlock_pattern;
             screen->icon=&lcd_icon;
 #endif /* HAVE_LCD_CHARCELLS */
 

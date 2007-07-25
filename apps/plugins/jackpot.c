@@ -1,13 +1,13 @@
 /***************************************************************************
- *           __________        __   ___.
+ *             __________               __   ___.
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
  *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
- *                   \/     \/     \/    \/         \/
+ *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2003 Pierre Delore
+ * Copyright (C) 2007 Copyright Kévin Ferrare based on work by Pierre Delore
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,271 +16,336 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-/*
-History:
-* V1.0: 21/07/03
- First version with a dirty definition of the patterns.
-* V1.1: 24/07/03
- Clean definition of the patterns. 
- Init message change
-*/
-                    
-#include "plugin.h"
 
-#ifdef HAVE_LCD_CHARCELLS
+#include "plugin.h"
+#include "pluginlib_actions.h"
 
 PLUGIN_HEADER
 
-/* Jackpot game for the player */
+const struct button_mapping* plugin_contexts[]={generic_actions};
+#define NB_PICTURES 9
+#define NB_SLOTS 3
 
-static unsigned char pattern[]={
-    0x00, 0x0A, 0x1F, 0x1F, 0x1F, 0x0e, 0x04, /* (+00)Coeur */
-    0x00, 0x04, 0x0E, 0x1F, 0x1F, 0x04, 0x0E, /* (+07)Pique */
-    0x00, 0x04, 0x0E, 0x1F, 0x0E, 0x04, 0x00, /* (+14)Carreau */
-    0x00, 0x15, 0x0E, 0x1F, 0x0E, 0x15, 0x00, /* (+21)Treffle */
-    0x03, 0x04, 0x0e, 0x1F, 0x1F, 0x1F, 0x0e, /* (+28)Cerise */
-    0x00, 0x04, 0x04, 0x1F, 0x04, 0x0E, 0x1F, /* (+35)Carreau */
-    0x04, 0x0E, 0x15, 0x04, 0x0A, 0x0A, 0x11, /* (+42)Homme */
-    0x00, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x00, /* (+49)Carre */
+#ifdef HAVE_LCD_CHARCELLS
+#define PICTURE_ROTATION_STEPS 7
+static unsigned char jackpot_slots_patterns[]={
+    0x00, 0x0A, 0x1F, 0x1F, 0x1F, 0x0e, 0x04, /* (+00)Heart */
+    0x00, 0x04, 0x0E, 0x1F, 0x1F, 0x04, 0x0E, /* (+07)Spade */
+    0x00, 0x04, 0x0E, 0x1F, 0x0E, 0x04, 0x00, /* (+14)Diamond */
+    0x00, 0x15, 0x0E, 0x1F, 0x0E, 0x15, 0x00, /* (+21)Club */
+    0x03, 0x04, 0x0e, 0x1F, 0x1F, 0x1F, 0x0e, /* (+28)Cherry */
+    0x00, 0x04, 0x04, 0x1F, 0x04, 0x0E, 0x1F, /* (+35)Cross */
+    0x04, 0x0E, 0x15, 0x04, 0x0A, 0x0A, 0x11, /* (+42)Man */
+    0x00, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x00, /* (+49)Square */
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* (+56)Empty */
-    0x00, 0x0A, 0x1F, 0x1F, 0x1F, 0x0e, 0x04 /* (+63)Coeur */
+    0x00, 0x0A, 0x1F, 0x1F, 0x1F, 0x0e, 0x04  /* (+63)Heart */
+};
+static unsigned long char_patterns[NB_SLOTS];
+#else /* bitmaps LCDs */
+
+#define PICTURE_HEIGHT (BMPHEIGHT_jackpot_slots/(NB_PICTURES+1))
+#if NB_SCREENS==1
+#define PICTURE_ROTATION_STEPS PICTURE_HEIGHT
+#else
+#define REMOTE_PICTURE_HEIGHT (BMPHEIGHT_jackpot_slots_remote/(NB_PICTURES+1))
+#define PICTURE_ROTATION_STEPS (REMOTE_PICTURE_HEIGHT*PICTURE_HEIGHT)
+#endif
+
+struct jackpot_picture{
+    const fb_data* data;
+    int width;
+    int height;
 };
 
-static unsigned char str[12]; /*Containt the first line*/
-static unsigned long h1,h2,h3; /*Handle for the pattern*/
+/* FIXME: would be nice to have better graphics ... */
+#include "jackpot_slots.h"
+#if NB_SCREENS==2
+#include "jackpot_slots_remote.h"
+#endif
 
-/* here is a global api struct pointer. while not strictly necessary,
-   it's nice not to have to pass the api pointer in all function calls
-   in the plugin */
+const struct jackpot_picture jackpot_pictures[]={
+    {
+        jackpot_slots,
+        BMPWIDTH_jackpot_slots,
+        PICTURE_HEIGHT
+    },
+#if NB_SCREENS==2
+    {
+        jackpot_slots_remote,
+        BMPWIDTH_jackpot_slots_remote,
+        REMOTE_PICTURE_HEIGHT
+    }
+#endif
+};
+
+#endif /* HAVE_LCD_CHARCELLS */
+
 static struct plugin_api* rb;
 
-/*Display the first line*/
-static void display_first_line(int g)
+struct jackpot
 {
-    rb->snprintf(str,sizeof(str),"[   ]$%d",g);
-    rb->lcd_puts(0,0,str);
+    /* A slot can display "NB_PICTURES" pictures
+       A picture is moving up, it can take PICTURE_ROTATION_STEPS
+       to move a single picture completely.
+       So values in slot_state are comprised between
+       0 and NB_PICTURES*PICTURE_ROTATION_STEPS
+     */
+    int slot_state[NB_SLOTS];
+    /*
+       The real state of the picture in pixels on each screen
+       Different from slot_state because of the synchronised
+       rotation between different sized bitmaps on remote and main screen
+     */
+    int state_y[NB_SCREENS][NB_SLOTS];
+    int money;
+};
 
-    rb->lcd_putc(1,0, h1);
-    rb->lcd_putc(2,0, h2);
-    rb->lcd_putc(3,0, h3);
+#ifdef HAVE_LCD_CHARCELLS
+void patterns_init(struct screen* display)
+{
+    int i;
+    for(i=0;i<NB_SLOTS;i++)
+        char_patterns[i]=display->get_locked_pattern();
 }
+
+void patterns_deinit(struct screen* display)
+{
+    /* Restore the old pattern */
+    int i;
+    for(i=0;i<NB_SLOTS;i++)
+        display->unlock_pattern(char_patterns[i]);
+}
+#endif /* HAVE_LCD_CHARCELLS */
 
 /*Call when the program exit*/
-static void jackpot_exit(void *parameter)
+void jackpot_exit(void *parameter)
 {
     (void)parameter;
-    
-    /* Restore the old pattern (i don't find another way to do this. Any
-       idea?) */
-    rb->lcd_unlock_pattern(h1);
-    rb->lcd_unlock_pattern(h2);
-    rb->lcd_unlock_pattern(h3);
+#ifdef HAVE_LCD_CHARCELLS
+    patterns_deinit(rb->screens[SCREEN_MAIN]);
+#endif /* HAVE_LCD_CHARCELLS */
+}
 
-    /* Clear the screen */
-    rb->lcd_clear_display();
-    rb->lcd_update();
+void jackpot_init(struct jackpot* game)
+{
+    int i,j;
+    game->money=20;
+    for(i=0;i<NB_SLOTS;i++){
+        game->slot_state[i]=(rb->rand()%NB_PICTURES)*PICTURE_ROTATION_STEPS;
+        FOR_NB_SCREENS(j)
+            game->state_y[j][i]=-1;
+    }
+}
+
+int jackpot_get_result(struct jackpot* game)
+{
+    int i=NB_SLOTS-1;
+    int multiple=1;
+    int result=0;
+    for(;i>=0;i--)
+    {
+        result+=game->slot_state[i]*multiple/PICTURE_ROTATION_STEPS;
+        multiple*=10;
+    }
+    return(result);
+}
+
+int jackpot_get_gain(struct jackpot* game)
+{
+    switch (jackpot_get_result(game))
+    {
+        case 111 : return(20);
+        case 000 : return(15);
+        case 333 : return(10);
+        case 222 : return(8);
+        case 555 : return(5);
+        case 777 : return(4);
+        case 251 : return(4);
+        case 510 : return(4);
+        case 686 : return(3);
+        case 585 : return(3);
+        case 282 : return(3);
+        case 484 : return(3);
+        case 787 : return(2);
+        case 383 : return(2);
+        case 80  : return(2);
+    }
+    return(0);
+}
+
+void jackpot_display_slot_machine(struct jackpot* game, struct screen* display)
+{
+    char str[20];
+    int i;
+    bool changes=false;
+#ifdef HAVE_LCD_CHARCELLS
+    display->putc(0, 0, '[');
+#else
+    const struct jackpot_picture* picture=
+            &(jackpot_pictures[display->screen_type]);
+    int pos_x=(display->width-NB_SLOTS*(picture->width+1))/2;
+    int pos_y=(display->height-(picture->height))/2;
+#endif /* HAVE_LCD_CHARCELLS */
+    for(i=0;i<NB_SLOTS;i++)
+    {
+#ifdef HAVE_LCD_CHARCELLS
+        /* the only charcell lcd is 7 pixel high */
+        int state_y=(game->slot_state[i]*7)/PICTURE_ROTATION_STEPS;
+#else
+        int state_y=
+                (picture->height*game->slot_state[i])/PICTURE_ROTATION_STEPS;
+#endif /* HAVE_LCD_CHARCELLS */
+        int previous_state_y=game->state_y[display->screen_type][i];
+        if(state_y==previous_state_y)
+            continue;/*no need to update the picture
+                       as it's the same as previous displayed one*/
+        changes=true;
+        game->state_y[display->screen_type][i]=state_y;
+#ifdef HAVE_LCD_CHARCELLS
+        char* current_pattern=&(jackpot_slots_patterns[state_y]);
+        display->define_pattern(char_patterns[i],
+                                current_pattern);
+        display->putc(i+1, 0, char_patterns[i]);
+#else
+        display->bitmap_part(
+            picture->data, 
+            /*slice into picture->data */
+            0, state_y,
+            picture->width,
+            /* Position on the screen */
+            pos_x, pos_y, picture->width, picture->height
+        );
+        pos_x+=(picture->width+1);
+#endif
+    }
+    if(changes){
+#ifdef HAVE_LCD_CHARCELLS
+        rb->snprintf(str,sizeof(str),"$%d", game->money);
+        display->putc(++i, 0, ']');
+        display->puts(++i, 0, str);
+#else
+        rb->snprintf(str,sizeof(str),"money : $%d", game->money);
+        display->puts(0, 0, str);
+#endif
+        display->update();
+    }
 }
 
 
-/* this is the plugin entry point */
+void jackpot_info_message(struct screen* display, char* message)
+{
+#ifdef HAVE_LCD_CHARCELLS
+    display->puts_scroll(0,1,message);
+#else
+    int xpos, ypos;
+    int message_height, message_width;
+    display->getstringsize(message, &message_width, &message_height);
+    xpos=(display->width-message_width)/2;
+    ypos=display->height-message_height;
+    rb->screen_clear_area(display, 0, ypos, display->width, message_height);
+    display->putsxy(xpos,ypos,message);
+    display->update();
+#endif /* HAVE_LCD_CHARCELLS */
+}
+
+void jackpot_print_turn_result(struct jackpot* game,
+                               int gain, struct screen* display)
+{
+    char str[20];
+    if (gain==0)
+    {
+        jackpot_info_message(display, "None ...");
+        if (game->money<=0)
+            jackpot_info_message(display, "You lose...STOP to quit");
+    }
+    else
+    {
+        rb->snprintf(str,sizeof(str),"You win %d$",gain);
+        jackpot_info_message(display, str);
+    }
+    display->update();
+}
+
+void jackpot_play_turn(struct jackpot* game)
+{
+    /* How many pattern? */
+    int nb_turns[NB_SLOTS];
+    int i,d,gain,turns_remaining=0;
+    if(game->money<=0)
+        return;
+    game->money--;
+    for(i=0;i<NB_SLOTS;i++)
+    {
+        nb_turns[i]=(rb->rand()%15+5)*PICTURE_ROTATION_STEPS;
+        turns_remaining+=nb_turns[i];
+    }
+    FOR_NB_SCREENS(d)
+    {
+        rb->screens[d]->clear_display();
+        jackpot_info_message(rb->screens[d],"Good luck");
+    }
+    /* Jackpot Animation */
+    while(turns_remaining>0)
+    {
+        for(i=0;i<NB_SLOTS;i++)
+        {
+            if(nb_turns[i]>0)
+            {
+                nb_turns[i]--;
+                game->slot_state[i]++;
+                if(game->slot_state[i]>=PICTURE_ROTATION_STEPS*NB_PICTURES)
+                    game->slot_state[i]=0;
+                turns_remaining--;
+            }
+        }
+        FOR_NB_SCREENS(d)
+            jackpot_display_slot_machine(game, rb->screens[d]);
+        rb->sleep(7*HZ/(24*PICTURE_ROTATION_STEPS));
+    }
+    gain=jackpot_get_gain(game);
+    if(gain!=0)
+        game->money+=gain;
+    FOR_NB_SCREENS(d)
+        jackpot_print_turn_result(game, gain, rb->screens[d]);
+}
+
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    int i,button,w,j;
-    int s[3];
-    int n[3];
-    int g=20;
-    bool exit=false;
-    bool go;
-
-    /* if you don't use the parameter, you can do like
-       this to avoid the compiler warning about it */
-    (void)parameter;
-
-    /* if you are using a global api pointer, don't forget to copy it!
-       otherwise you will get lovely "I04: IllInstr" errors... :-) */
     rb = api;
+    int action, i;
+    struct jackpot game;
+    (void)parameter;
     rb->srand(*rb->current_tick);
+#ifdef HAVE_LCD_CHARCELLS
+    patterns_init(rb->screens[SCREEN_MAIN]);
+#endif /* HAVE_LCD_CHARCELLS */
+    jackpot_init(&game);
 
-    /*Get the pattern handle*/
-    h1=rb->lcd_get_locked_pattern();
-    h2=rb->lcd_get_locked_pattern();
-    h3=rb->lcd_get_locked_pattern();
-
-    /*Init message*/    
-    rb->lcd_define_pattern(h1, pattern);
-    rb->lcd_define_pattern(h2, pattern+7);
-    rb->lcd_define_pattern(h3, pattern+28);
-
-    rb->lcd_puts(0,0,"  Jackpot  ");
-    rb->lcd_putc(0,0,h1); rb->lcd_putc(1,0,h2);
-    rb->lcd_putc(9,0,h2); rb->lcd_putc(10,0,h1);
-    rb->lcd_puts(0,1,"   V1.1    ");
-    rb->lcd_putc(1,1,h3); rb->lcd_putc(9,1,h3);
-    rb->lcd_update();
-    rb->sleep(HZ*2);
-
-    /*First display*/
-    rb->lcd_clear_display();
-    rb->snprintf(str,sizeof(str),"[   ]$%d",g);
-    rb->lcd_puts(0,0,str);
-    rb->lcd_puts_scroll(0,1,"PLAY to begin");
-    rb->lcd_update();
-
+    FOR_NB_SCREENS(i){
+        rb->screens[i]->clear_display();
+        jackpot_display_slot_machine(&game, rb->screens[i]);
+    }
     /*Empty the event queue*/
     rb->button_clear_queue();
-
-    /* Define the start pattern */
-    s[0]=(rb->rand()%9)*7;
-    s[1]=(rb->rand()%9)*7;
-    s[2]=(rb->rand()%9)*7;
-
-    /*Main loop*/
-    while (!exit)
+    while (true)
     {
-        /*Keyboard loop*/
-        go=false;
-        while (!go)
+        action = pluginlib_getaction(rb, TIMEOUT_BLOCK,
+                                     plugin_contexts, 1);
+        switch ( action )
         {
-            button = rb->button_get(true);
-            switch ( button )
-            {
-                case BUTTON_STOP|BUTTON_REL:
-                    exit = true;
-                    go = true;
-                    break;
+            case PLA_QUIT:
+                return PLUGIN_OK;
+            case PLA_FIRE:
+                jackpot_play_turn(&game);
+                break;
 
-                case BUTTON_PLAY|BUTTON_REL:
-                    exit = false;
-                    if (g>0)
-                    {
-                        go = true;
-                        g--;
-                    }
-                    break;
-
-                default:
-                    if (rb->default_event_handler_ex(button, jackpot_exit,
-                                                    NULL) == SYS_USB_CONNECTED)
-                        return PLUGIN_USB_CONNECTED;
-                    break;
-            }
-        }
-
-        /*Clear the Second line*/
-        rb->lcd_puts_scroll(0,1,"Good luck");
-        rb->lcd_update();
-
-        /*GO !!!!*/
-        if ( go && !exit )
-        {
-            /* How many pattern? */
-            n[0]=(rb->rand()%15+5)*7;
-            n[1]=(rb->rand()%15+5)*7;
-            n[2]=(rb->rand()%15+5)*7;
-
-            display_first_line(g);
-            /* Jackpot Animation */
-            while((n[0]>=0) || (n[1]>=0) || (n[2]>=0))
-            {
-                if (n[0]>=0)
-                    rb->lcd_define_pattern(h1, pattern+s[0]);
-                if (n[1]>=0)
-                    rb->lcd_define_pattern(h2, pattern+s[1]);
-                if (n[2]>=0)
-                    rb->lcd_define_pattern(h3, pattern+s[2]);
-                rb->sleep(HZ/24);
-                rb->lcd_putc(1,0, h1);
-                rb->lcd_putc(2,0, h2);
-                rb->lcd_putc(3,0, h3);
-                rb->lcd_update();
-                for(i=0;i<3;i++)
-                {
-                    if (n[i]>=0)
-                    {
-                        n[i]--;
-                        s[i]++;
-                        if (s[i]>=63)
-                            s[i]=0;
-                    }
-                }
-            }
-
-            /* You won? */
-            s[0]--;
-            s[1]--;
-            s[2]--;
-            w=(s[0]/7)*100+(s[1]/7)*10+(s[2]/7);
-
-            j=0;
-            switch (w)
-            {
-                case 111 :
-                    j=20;
-                    break;
-                case 000 :
-                    j=15;
-                    break;
-                case 333 :
-                    j=10;
-                    break;
-                case 222 :
-                    j=8;
-                    break;
-                case 555 :
-                    j=5;
-                    break;
-                case 777 :
-                    j=4;
-                    break;
-                case 251 :
-                    j=4;
-                    break;
-                case 510 :
-                    j=4;
-                    break;
-                case 686 :
-                    j=3;
-                    break;
-                case 585 :
-                    j=3;
-                    break;
-                case 282 :
-                    j=3;
-                    break;
-                case 484 :
-                    j=3;
-                    break;
-                case 787 :
-                    j=2;
-                    break;
-                case 383 :
-                    j=2;
-                    break;
-                case 80 :
-                    j=2;
-                    break;
-            }
-            if (j==0)
-            {
-                rb->lcd_puts(0,1,"None...");
-                if (g<=0)
-                    rb->lcd_puts_scroll(0,1,"You lose...STOP to quit");
-            }
-            else
-            {
-                g+=j;
-                display_first_line(g);
-                rb->snprintf(str,sizeof(str),"You win %d$",j);
-                rb->lcd_puts(0,1,str);
-            }
-            rb->lcd_update();
+            default:
+                if (rb->default_event_handler_ex(action, jackpot_exit, NULL)
+                    == SYS_USB_CONNECTED)
+                    return PLUGIN_USB_CONNECTED;
+                break;
         }
     }
-
-    /* This is the end */
     jackpot_exit(NULL);
-    /* Bye */
     return PLUGIN_OK;
 }
-
-#endif
