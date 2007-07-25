@@ -242,6 +242,10 @@ static void dump_wps_tokens(struct wps_data *data)
                 snprintf(buf, sizeof(buf), "time elapsed in track");
                 break;
 
+            case WPS_TOKEN_TRACK_ELAPSED_PERCENT:
+                snprintf(buf, sizeof(buf), "played percentage of track");
+                break;
+
             case WPS_TOKEN_PLAYLIST_ENTRIES:
                 snprintf(buf, sizeof(buf), "number of entries in playlist");
                 break;

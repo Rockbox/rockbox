@@ -848,6 +848,14 @@ static char *get_token_value(struct gui_wps *gwps,
             }
             return buf;
 
+        case WPS_TOKEN_TRACK_ELAPSED_PERCENT:
+            if (intval)
+            {
+                *intval = limit * (id3->elapsed + state->ff_rewind_count) / id3->length + 1;
+            }
+            snprintf(buf, buf_size, "%d", 100*(id3->elapsed + state->ff_rewind_count) / id3->length);
+            return buf;
+
         case WPS_TOKEN_METADATA_ARTIST:
             return id3->artist;
 
