@@ -117,7 +117,7 @@
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 65
+#define PLUGIN_MIN_API_VERSION 66
 
 /* plugin return codes */
 enum plugin_status {
@@ -154,8 +154,6 @@ struct plugin_api {
     void (*lcd_icon)(int icon, bool enable);
     void (*lcd_double_height)(bool on);
 #else
-    void (*screen_clear_area)(struct screen * display, int xstart, int ystart,
-                              int width, int height);
     void (*lcd_set_drawmode)(int mode);
     int  (*lcd_get_drawmode)(void);
     void (*lcd_setfont)(int font);
@@ -612,6 +610,10 @@ struct plugin_api {
     const char *(*get_codec_filename)(int cod_spec);
     bool (*get_metadata)(struct track_info* track, int fd, const char* trackname,
                          bool v1first);
+#endif
+#ifdef HAVE_LCD_BITMAP
+    void (*screen_clear_area)(struct screen * display, int xstart, int ystart,
+                              int width, int height);
 #endif
 };
 

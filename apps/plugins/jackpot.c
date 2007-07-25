@@ -52,7 +52,7 @@ static unsigned long char_patterns[NB_SLOTS];
 #endif
 
 struct jackpot_picture{
-    const fb_data* data;
+    const void* data;
     int width;
     int height;
 };
