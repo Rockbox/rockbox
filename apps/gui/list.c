@@ -984,6 +984,10 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists,
             return ACTION_STD_NEXT;
 
 #ifdef HAVE_LCD_BITMAP
+        case ACTION_TREE_PGRIGHT:
+            gui_synclist_scroll_right(lists);
+            gui_synclist_draw(lists);
+            return ACTION_TREE_PGRIGHT;
         case ACTION_TREE_ROOT_INIT:
          /* After this button press ACTION_TREE_PGLEFT is allowed
             to skip to root. ACTION_TREE_ROOT_INIT must be defined in the
@@ -995,10 +999,6 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists,
                 scrolling_left = false;
                 return ACTION_STD_CANCEL;
             }
-        case ACTION_TREE_PGRIGHT:
-            gui_synclist_scroll_right(lists);
-            gui_synclist_draw(lists);
-            return ACTION_TREE_PGRIGHT;
         case ACTION_TREE_PGLEFT:
             if(!scrolling_left && (lists->gui_list[0].offset_position == 0))
                 return ACTION_STD_CANCEL;
