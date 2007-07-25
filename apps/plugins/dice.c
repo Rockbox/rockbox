@@ -19,12 +19,17 @@
 
 #include "plugin.h"
 #include "pluginlib_actions.h"
+#include "configfile.h"
 
 #define MAX_DICES 12
 #define INITIAL_NB_DICES 1
+#define INITIAL_NB_SIDES 2 /* corresponds to 6 sides in the array */
 
 #define DICE_QUIT PLA_QUIT
 #define DICE_ROLL PLA_START
+
+
+#define CFG_FILE "dice.cfg"
 
 const struct button_mapping* plugin_contexts[]={generic_actions};
 
@@ -40,6 +45,26 @@ struct dices
 PLUGIN_HEADER
 
 static struct plugin_api* rb;
+static struct dices dice;
+static int sides_index;
+
+static struct opt_items nb_sides_option[8] = {
+    { "3", -1 },
+    { "4", -1 },
+    { "6", -1 },
+    { "8", -1 },
+    { "10", -1 },
+    { "12", -1 },
+    { "20", -1 },
+    { "100", -1 }
+};
+static int nb_sides_values[] = { 3, 4, 6, 8, 10, 12, 20, 100 };
+static char *sides_conf[] = {"3", "4", "6", "8", "10", "12", "20", "100" };
+static struct configdata config[] =
+{
+    {TYPE_INT, 0, MAX_DICES, &dice.nb_dices, "dice count", NULL, NULL},
+    {TYPE_ENUM, 0, 8, &sides_index, "side count", sides_conf, NULL}
+};
 
 void dice_init(struct dices* dice);
 void dice_roll(struct dices* dice);
@@ -51,13 +76,19 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     (void)parameter;
     rb = api;
     int i, action;
-    struct dices dice;
 
     dice_init(&dice);
     rb->srand(*rb->current_tick);
-
+    
+    configfile_init(rb);
+    configfile_load(CFG_FILE, config, 2, 0);
+    dice.nb_sides = nb_sides_values[sides_index];
     if(!dice_menu(&dice))
+    {
+        configfile_save(CFG_FILE, config, 2, 0);
         return PLUGIN_OK;
+    }
+    configfile_save(CFG_FILE, config, 2, 0);
     dice_roll(&dice);
     FOR_NB_SCREENS(i)
         dice_print( &dice, rb->screens[i] );
@@ -78,6 +109,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
 
 void dice_init(struct dices* dice){
     dice->nb_dices=INITIAL_NB_DICES;
+    sides_index=INITIAL_NB_SIDES;
+    
 }
 
 void dice_roll(struct dices* dice) {
@@ -137,23 +170,11 @@ void dice_print(struct dices* dice, struct screen* display){
 
 bool dice_menu(struct dices * dice) {
     int selection;
-    int side_index;
     bool menu_quit = false, result = false;
 
     MENUITEM_STRINGLIST(menu,"Dice Menu",NULL,"Roll Dice","Number of Dice",
                         "Number of Sides","Quit");
 
-    static struct opt_items nb_sides_option[8] = {
-        { "3", -1 },
-        { "4", -1 },
-        { "6", -1 },
-        { "8", -1 },
-        { "10", -1 },
-        { "12", -1 },
-        { "20", -1 },
-        { "100", -1 }
-    };
-    static int nb_sides_values[] = { 3, 4, 6, 8, 10, 12, 20, 100 };
 
     while (!menu_quit) {
         switch(rb->do_menu(&menu, &selection)){
@@ -168,11 +189,10 @@ bool dice_menu(struct dices * dice) {
                 break;
 
             case 2:
-                side_index=6;
-                rb->set_option("Number of Sides", &side_index, INT, 
+                rb->set_option("Number of Sides", &sides_index, INT, 
                                nb_sides_option,
                                sizeof(nb_sides_values)/sizeof(int), NULL);
-                dice->nb_sides=nb_sides_values[side_index];
+                dice->nb_sides=nb_sides_values[sides_index];
                 break;
 
             default:
