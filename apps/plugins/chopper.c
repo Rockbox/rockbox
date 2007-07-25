@@ -579,7 +579,7 @@ static void chopDrawParticle(struct CParticle *mParticle)
 static void chopDrawScene(void)
 {
     char s[30];
-    int w;
+    int w,h;
 #if LCD_DEPTH > 2
     rb->lcd_set_background(LCD_BLACK);
 #elif LCD_DEPTH == 2
@@ -604,19 +604,12 @@ static void chopDrawScene(void)
     rb->lcd_set_foreground(LCD_WHITE);
 #endif
 
-#if LCD_WIDTH <= 128
-    rb->snprintf(s, sizeof(s), "Dist: %d", score);
-    rb->lcd_putsxy(1, 1, s);
-    rb->snprintf(s, sizeof(s), "Hi: %d", highscore);
-    rb->lcd_getstringsize(s, &w, NULL);
-    rb->lcd_putsxy(LCD_WIDTH - 1 - w, 1, s);
-#else
+    
     rb->snprintf(s, sizeof(s), "Distance: %d", score);
     rb->lcd_putsxy(2, 2, s);
     rb->snprintf(s, sizeof(s), "Best: %d", highscore);
-    rb->lcd_getstringsize(s, &w, NULL);
-    rb->lcd_putsxy(LCD_WIDTH - 2 - w, 2, s);
-#endif
+    rb->lcd_getstringsize(s, &w, &h);
+    rb->lcd_putsxy(2, LCD_HEIGHT-h-2, s);
     rb->lcd_set_drawmode(DRMODE_SOLID);
 
     rb->lcd_update();
