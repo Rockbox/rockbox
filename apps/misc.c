@@ -653,7 +653,12 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
         {
 #if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
             if (audio_stat & AUDIO_STATUS_RECORD)
+            {
                 audio_stop_recording();
+                /* wait for stop to complete */
+                while (audio_status() & AUDIO_STATUS_RECORD)
+                    sleep(1);
+            }
 #endif
             /* audio_stop_recording == audio_stop for HWCODEC */
             audio_stop();
@@ -661,9 +666,11 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
             if (callback != NULL)
                 callback(parameter);
 
+#if CONFIG_CODEC != SWCODEC
             /* wait for audio_stop or audio_stop_recording to complete */
             while (audio_status())
                 sleep(1);
+#endif
 
 #if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
             audio_close_recording();       
