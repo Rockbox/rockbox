@@ -1,0 +1,21 @@
+<RCC>
+    <qresource prefix="/docs" >
+        <file>COPYING</file>
+        <file>CREDITS</file>
+    </qresource>
+    <qresource prefix="/icons" >
+        <file>icons/bootloader_btn.png</file>
+        <file>icons/doom_btn.png</file>
+        <file>icons/font_btn.png</file>
+        <file>icons/rbinstall_btn.png</file>
+        <file>icons/rembootloader_btn.png</file>
+        <file>icons/remrb_btn.png</file>
+        <file>icons/themes_btn.png</file>
+        <file>icons/wizard.xpm</file>
+        <file>icons/rblogo.xpm</file>
+        <file>icons/rbutil.xpm</file>
+    </qresource>
+    <qresource prefix="/ini" >
+        <file>rbutil.ini</file>
+    </qresource>
+</RCC>
