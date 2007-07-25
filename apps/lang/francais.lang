@@ -263,7 +263,7 @@
     *: "Browse Themes"
   </source>
   <dest>
-    *: "Listes des thèmes"
+    *: "Liste des thèmes"
   </dest>
   <voice>
     *: "Liste des thèmes"
@@ -319,10 +319,10 @@
     *: "Plugins"
   </source>
   <dest>
-    *: "Liste des modules d'extension"
+    *: "Modules d'extension"
   </dest>
   <voice>
-    *: "Liste des modules d'extension"
+    *: "Modules d'extension"
   </voice>
 </phrase>
 <phrase>
@@ -852,8 +852,8 @@
     h100,h120,h300: "NAVI = Yes"
     ipod*: "SELECT = Yes"
     x5: "SELECT = Yes"
-    h10: "NEXT = Yes"
-    gigabeat: "SELECT = Yes"
+    h10,h10_5gb: "NEXT = Yes"
+    gigabeatf: "SELECT = Yes"
     e200: "SELECT = Yes"
   </source>
   <dest>
@@ -861,8 +861,8 @@
     h100,h120,h300: "NAVI = Oui"
     ipod*: "SELECT = Oui"
     x5: "SELECT = Oui"
-    h10: "NEXT = Oui"
-    gigabeat: "SELECT = Oui"
+    h10,h10_5gb: "NEXT = Oui"
+    gigabeatf: "SELECT = Oui"
     e200: "SELECT = Oui"
   </dest>
   <voice>
@@ -3876,7 +3876,7 @@
     *: ""
   </source>
   <dest>
-    *: ""
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -4114,7 +4114,7 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "Fichier/dossier existant. Ecraser ?"
+    *: "Fichier/dossier existant. Ecraser?"
   </dest>
   <voice>
     *: ""
@@ -4524,7 +4524,7 @@
   <dest>
     *: "Battery: %d%% %dh %dm"
     player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "Batt. : %d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Niveau de la batterie"
@@ -4721,16 +4721,18 @@
     h100,h120,h300: "STOP = Exit"
     ipod*: "PLAY/PAUSE = Exit"
     x5: "RECORD = Exit"
-    h10: "PREV = Exit"
-    gigabeat: "A = Exit"
+    h10,h10_5gb: "PREV = Exit"
+    gigabeatf: "A = Exit"
+    e200: "POWER = Exit"
   </source>
   <dest>
     *: "OFF = Quitter"
     h100,h120,h300: "STOP = Quitter"
     ipod*: "PLAY/PAUSE = Quitter"
     x5: "RECORD = Quitter"
-    h10: "PREV = Quitter"
-    gigabeat: "A = Quitter"
+    h10,h10_5gb: "PREV = Quitter"
+    gigabeatf: "A = Quitter"
+    e200: "POWER = Quitter"
   </dest>
   <voice>
     *: ""
@@ -4787,16 +4789,18 @@
     h100,h120,h300: "NAVI = Select"
     ipod*: "SELECT = Select"
     x5: "SELECT = Select"
-    h10: "NEXT = Select"
-    gigabeat: "SELECT = Select"
+    h10,h10_5gb: "NEXT = Select"
+    gigabeatf: "SELECT = Select"
+    e200: "SELECT = Sélect"
   </source>
   <dest>
     *: "PLAY = Sélect."
     h100,h120,h300: "NAVI = Sélect."
     ipod*: "SELECT = Sélect."
     x5: "SELECT = Sélect."
-    h10: "NEXT = Sélect."
-    gigabeat: "SELECT = Sélect."
+    h10,h10_5gb: "NEXT = Sélect."
+    gigabeatf: "SELECT = Sélect."
+    e200: "SELECT = Sélect."
   </dest>
   <voice>
     *: ""
@@ -4811,16 +4815,18 @@
     h100,h120,h300: "RECORD = Delete"
     ipod*: "Long MENU = Delete"
     x5: "Long RECORD = Delete"
-    h10: "REWIND = Delete"
-    gigabeat: "POWER = Delete"
+    h10,h10_5gb: "REWIND = Delete"
+    gigabeatf: "POWER = Delete"
+    e200: "PLAY = Delete"
   </source>
   <dest>
     *: "ON+PLAY = Suppr."
     h100,h120,h300: "RECORD = Suppr."
     ipod*: "Long MENU = Suppr."
     x5: "Long RECORD = Suppr."
-    h10: "REWIND = Suppr."
-    gigabeat: "POWER = Suppr."
+    h10,h10_5gb: "REWIND = Suppr."
+    gigabeatf: "POWER = Suppr."
+    e200: "PLAY = Suppr."
   </dest>
   <voice>
     *: ""
@@ -4834,7 +4840,7 @@
     *: "Load Last Bookmark?"
   </source>
   <dest>
-    *: "Charger le dernier signet ?"
+    *: "Charger le dernier signet?"
   </dest>
   <voice>
     *: ""
@@ -4848,7 +4854,7 @@
     *: "Create a Bookmark?"
   </source>
   <dest>
-    *: "Créer un signet ?"
+    *: "Créer un signet?"
   </dest>
   <voice>
     *: ""
@@ -4905,16 +4911,18 @@
     h100,h120,h300: "NAVI = Set"
     ipod*: "SELECT = Set"
     x5: "SELECT = Set"
-    h10: "NEXT = Set"
-    gigabeat: "SELECT = Set"
+    h10,h10_5gb: "NEXT = Set"
+    gigabeatf: "SELECT = Set"
+    e200: "SELECT = Set"
   </source>
   <dest>
     *: "ON = Valider"
     h100,h120,h300: "NAVI = Valider"
     ipod*: "SELECT = Valider"
     x5: "SELECT = Valider"
-    h10: "NEXT = Valider"
-    gigabeat: "SELECT = Valider"
+    h10,h10_5gb: "NEXT = Valider"
+    gigabeatf: "SELECT = Valider"
+    e200: "SELECT = Valider"
   </dest>
   <voice>
     *: ""
@@ -4930,15 +4938,17 @@
     ipod*: "MENU = Revert"
     x5: "RECORD = Revert"
     h10: "PREV = Revert"
-    gigabeat: "POWER = Revert"
+    gigabeatf: "POWER = Revert"
+    e200: "PREV = Revert"
   </source>
   <dest>
     *: "OFF = Annuler"
     h100,h120,h300: "STOP = Annuler"
     ipod*: "MENU = Annuler"
     x5: "RECORD = Annuler"
-    h10: "PREV = Annuler"
-    gigabeat: "POWER = Annuler"
+    h10,h10_5gb: "PREV = Annuler"
+    gigabeatf: "POWER = Annuler"
+    e200: "PREV = Annuler"
   </dest>
   <voice>
     *: ""
@@ -7199,7 +7209,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Firmware"
+    *: "Micrologiciel"
   </voice>
 </phrase>
 <phrase>
@@ -7274,13 +7284,13 @@
 </phrase>
 <phrase>
   id: LANG_END_PLAYLIST_PLAYER
-  desc: when playlist has finished
+  desc: DEPRECATED
   user:
   <source>
-    *: "End of List"
+    *: ""
   </source>
   <dest>
-    *: "Fin de la liste de lecture"
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -7295,6 +7305,7 @@
   </source>
   <dest>
     *: "Fin de la liste de lecture"
+    player: "Fin liste de lecture"
   </dest>
   <voice>
     *: ""
@@ -7911,14 +7922,16 @@
     h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5: "Long PLAY to abort"
-    h10: "PREV to abort"
+    h10,h10_5gb: "PREV to abort"
+    e200: "PREV pour Annuler"
   </source>
   <dest>
     *: "OFF pour Annuler"
     h100,h120,h300: "STOP pour Annuler"
     ipod*: "PLAY/PAUSE pour Annuler"
     x5: "Long PLAY pour Annuler"
-    h10: "PREV pour Annuler"
+    h10,h10_5gb: "PREV pour Annuler"
+    e200: "PREV pour Annuler"
   </dest>
   <voice>
     *: ""
@@ -8585,7 +8598,7 @@
     *: "Invalid Filename!"
   </source>
   <dest>
-    *: "Nom de fichier invalide !"
+    *: "Nom de fichier invalide!"
   </dest>
   <voice>
     *: "Nom de fichier invalide"
@@ -10037,7 +10050,7 @@
     *: "Please reboot to enable"
   </source>
   <dest>
-    *: "Redémarrer pour activer "
+    *: "Redémarrer pour activer"
   </dest>
   <voice>
     *: ""
@@ -10271,7 +10284,7 @@
     *: "Battery empty! RECHARGE!"
   </source>
   <dest>
-    *: "Batterie vide ! RECHARGEZ !"
+    *: "Batterie vide! RECHARGEZ!"
   </dest>
   <voice>
     *: ""
@@ -10503,7 +10516,7 @@
     *: "[Album Artist]"
   </source>
   <dest>
-    *: "[Artiste de l'Album]"
+    *: "[Artiste de l'album]"
   </dest>
   <voice>
     *: ""
@@ -10700,14 +10713,16 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PLAY/PAUSE to return)"
     x5: "Building database... %d found (Long PLAY to return)"
-    h10: "Building database... %d found (PREV to return)"
+    h10,h10_5gb: "Building database... %d found (PREV to return)"
+    e200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
-    *: "Sauvegarde base de données... %d trouvés (OFF = retour)"
-    h100,h120,h300: "Sauvegarde base de données... %d trouvés (STOP = retour)"
-    ipod*: "Sauvegarde base de données... %d trouvés (PLAY/PAUSE = retour)"
-    x5: "Sauvegarde base de données... %d trouvés (Long PLAY = retour)"
-    h10: "Sauvegarde base de données... %d trouvés (PREC = retour)"
+    *: "Création base de données... %d trouvés (OFF = retour)"
+    h100,h120,h300: "Création base de données... %d trouvés (STOP = retour)"
+    ipod*: "Création base de données... %d trouvés (PLAY/PAUSE = retour)"
+    x5: "Création base de données... %d trouvés (Long PLAY = retour)"
+    h10,h10_5gb: "Création base de données... %d trouvés (PREC = retour)"
+    e200: "Création base de données... %d trouvés (PREV pour retour)"
   </dest>
   <voice>
     *: ""
