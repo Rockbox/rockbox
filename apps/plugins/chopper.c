@@ -579,7 +579,7 @@ static void chopDrawParticle(struct CParticle *mParticle)
 static void chopDrawScene(void)
 {
     char s[30];
-    int w,h;
+    int w;
 #if LCD_DEPTH > 2
     rb->lcd_set_background(LCD_BLACK);
 #elif LCD_DEPTH == 2
@@ -603,13 +603,26 @@ static void chopDrawScene(void)
 #elif LCD_DEPTH == 2
     rb->lcd_set_foreground(LCD_WHITE);
 #endif
-
     
+#if LCD_WIDTH <= 128
+    rb->snprintf(s, sizeof(s), "Dist: %d", score);
+#else
     rb->snprintf(s, sizeof(s), "Distance: %d", score);
+#endif
+    rb->lcd_getstringsize(s, &w, NULL);
     rb->lcd_putsxy(2, 2, s);
-    rb->snprintf(s, sizeof(s), "Best: %d", highscore);
-    rb->lcd_getstringsize(s, &w, &h);
-    rb->lcd_putsxy(2, LCD_HEIGHT-h-2, s);
+    if (score < highscore)
+    {
+        int w2;
+#if LCD_WIDTH <= 128
+        rb->snprintf(s, sizeof(s), "Hi: %d", highscore);
+#else
+        rb->snprintf(s, sizeof(s), "Best: %d", highscore);
+#endif
+        rb->lcd_getstringsize(s, &w2, NULL);
+        if (LCD_WIDTH - 2 - w2 > w + 2)
+            rb->lcd_putsxy(LCD_WIDTH - 2 - w2, 2, s);
+    }
     rb->lcd_set_drawmode(DRMODE_SOLID);
 
     rb->lcd_update();
@@ -617,7 +630,7 @@ static void chopDrawScene(void)
 
 static int chopMenu(int menunum)
 {
-    int result;
+    int result = (menunum==0)?0:1;
     int res = 0;
     bool menu_quit = false;
 
