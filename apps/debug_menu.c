@@ -1681,7 +1681,7 @@ static int cardinfo_callback(int btn, struct action_callback_info *info)
 
         card = card_get_info(info->cbdata);
 
-        if (card->initialized)
+        if (card->initialized > 0)
         {
             card_name[6] = '\0';
             strncpy(card_name, ((unsigned char*)card->cid) + 3, 6);
@@ -1731,10 +1731,16 @@ static int cardinfo_callback(int btn, struct action_callback_info *info)
                     i_vmin[card_extract_bits(card->csd, 72, 3)],
                     i_vmax[card_extract_bits(card->csd, 75, 3)]);
         }
-        else
+        else if (card->initialized == 0)
         {
             dbg_listmessage_addline("Not Found!");
         }
+#ifndef HAVE_MMC
+        else /* card->initialized < 0 */
+        {
+            dbg_listmessage_addline("Init Error! (%d)", card->initialized);
+        }
+#endif
         snprintf(info->title, 16, "[" CARDTYPE " %d]", (int)info->cbdata);
         gui_synclist_set_nb_items(info->lists, dbg_listmessage_getlines());
         gui_synclist_select_item(info->lists, 0);

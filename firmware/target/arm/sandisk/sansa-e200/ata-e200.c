@@ -27,6 +27,7 @@
 #include "disk.h"
 #include "pp5024.h"
 #include "panic.h"
+#include "usb.h"
 
 #define BLOCK_SIZE      (512)
 #define SECTOR_SIZE     (512)
@@ -69,7 +70,7 @@
 #define PRG             7
 #define DIS             8
 
-#define FIFO_SIZE       16          /* FIFO is 16 words deep */
+#define FIFO_LEN        16          /* FIFO is 16 words deep */
 
 /* SD Commands */
 #define GO_IDLE_STATE         0
@@ -95,38 +96,59 @@
 #define ERASE                38
 #define APP_CMD              55
 
-#define EC_POWER_UP             1 /* error code */
-#define EC_READ_TIMEOUT         2 /* error code */
-#define EC_WRITE_TIMEOUT        3 /* error code */
-#define EC_TRAN_SEL_BANK        4 /* error code */
-#define EC_TRAN_READ_ENTRY      5 /* error code */
-#define EC_TRAN_READ_EXIT       6 /* error code */
-#define EC_TRAN_WRITE_ENTRY     7 /* error code */
-#define EC_TRAN_WRITE_EXIT      8 /* error code */
-#define DO_PANIC               32 /* marker     */
-#define NO_PANIC                0 /* marker     */
-#define EC_COMMAND             10 /* error code */
-#define EC_FIFO_SEL_BANK_EMPTY 11 /* error code */
-#define EC_FIFO_SEL_BANK_DONE  12 /* error code */
-#define EC_FIFO_ENA_BANK_EMPTY 13 /* error code */
-#define EC_FIFO_READ_FULL      14 /* error code */
-#define EC_FIFO_WR_EMPTY       15 /* error code */
-#define EC_FIFO_WR_DONE        16 /* error code */
+#define EC_OK                    0
+#define EC_FAILED                1
+#define EC_NOCARD                2
+#define EC_WAIT_STATE_FAILED     3
+#define EC_CHECK_TIMEOUT_FAILED  4
+#define EC_POWER_UP              5
+#define EC_READ_TIMEOUT          6
+#define EC_WRITE_TIMEOUT         7
+#define EC_TRAN_SEL_BANK         8
+#define EC_TRAN_READ_ENTRY       9
+#define EC_TRAN_READ_EXIT       10
+#define EC_TRAN_WRITE_ENTRY     11
+#define EC_TRAN_WRITE_EXIT      12
+#define EC_FIFO_SEL_BANK_EMPTY  13
+#define EC_FIFO_SEL_BANK_DONE   14
+#define EC_FIFO_ENA_BANK_EMPTY  15
+#define EC_FIFO_READ_FULL       16
+#define EC_FIFO_WR_EMPTY        17
+#define EC_FIFO_WR_DONE         18
+#define EC_COMMAND              19
+#define NUM_EC                  20
 
 /* Application Specific commands */
 #define SET_BUS_WIDTH   6
 #define SD_APP_OP_COND  41
+
+/** global, exported variables **/
 
 /* for compatibility */
 int ata_spinup_time = 0;
 
 long last_disk_activity = -1;
 
+/** static, private data **/ 
 static bool initialized = false;
-static int  sd1_status  = 0x00;  /* 0x00:inserted, 0x80:not inserted */
+
+static long next_yield = 0;
+#define MIN_YIELD_PERIOD 2000
 
 static tSDCardInfo card_info[2];
-static tSDCardInfo *currcard; /* current active card */
+static tSDCardInfo *currcard = NULL; /* current active card */
+
+struct sd_card_status
+{
+    int retry;
+    int retry_max;
+};
+
+static struct sd_card_status sd_status[2] =
+{
+    { 0, 1  },
+    { 0, 10 }
+};
 
 /* Shoot for around 75% usage */
 static long sd_stack [(DEFAULT_STACK_SIZE*2 + 0x1c0)/sizeof(long)];
@@ -136,38 +158,48 @@ static struct event_queue sd_queue;
 
 /* Posted when card plugged status has changed */
 #define SD_HOTSWAP    1
+/* Actions taken by sd_thread when card status has changed */
+enum sd_thread_actions
+{
+    SDA_NONE      = 0x0,
+    SDA_UNMOUNTED = 0x1,
+    SDA_MOUNTED   = 0x2
+};
 
 /* Private Functions */
 
-static unsigned int check_time[10];
+static unsigned int check_time[NUM_EC];
 
-static inline void sd_check_timeout(unsigned int timeout, int id)
+static inline bool sd_check_timeout(long timeout, int id)
 {
-    if (USEC_TIMER > check_time[id] + timeout)
-        panicf("Error SDCard: %d", id);
+    return !TIME_AFTER(USEC_TIMER, check_time[id] + timeout);
 }
 
-static inline bool sd_poll_status(unsigned int trigger, unsigned int timeout,
-                                  int id)
+static bool sd_poll_status(unsigned int trigger, long timeout)
 {
-    unsigned int t = USEC_TIMER;
+    long t = USEC_TIMER;
 
     while ((STATUS_REG & trigger) == 0)
     {
-        if (USEC_TIMER > t + timeout)
-        {
-            if(id & DO_PANIC)
-                panicf("Error SDCard: %d", id & 31);
+        long time = USEC_TIMER;
 
-            return false;
+        if (TIME_AFTER(time, next_yield))
+        {
+            long ty = USEC_TIMER;
+            priority_yield();
+            timeout += USEC_TIMER - ty;
+            next_yield = ty + MIN_YIELD_PERIOD;
         }
+
+        if (TIME_AFTER(time, t + timeout))
+            return false;
     }
 
     return true;
 }
 
-static bool sd_command(unsigned int cmd, unsigned long arg1,
-                       unsigned int *response, unsigned int type)
+static int sd_command(unsigned int cmd, unsigned long arg1,
+                      unsigned int *response, unsigned int type)
 {
     int i, words; /* Number of 16 bit words to read from RESPONSE_REG */
     unsigned int data[9];
@@ -177,22 +209,26 @@ static bool sd_command(unsigned int cmd, unsigned long arg1,
     CMD_REG2 = (unsigned int)((arg1 & 0xffff));
     UNKNOWN  = type;
 
-    sd_poll_status(CMD_DONE, 100000, EC_COMMAND | DO_PANIC);
+    if (!sd_poll_status(CMD_DONE, 100000))
+        return -EC_COMMAND;
 
     if ((STATUS_REG & ERROR_BITS) != CMD_OK)
-        return false; /* Error sending command */
+        /* Error sending command */
+        return -EC_COMMAND - (STATUS_REG & ERROR_BITS)*100;
 
     if (cmd == GO_IDLE_STATE)
-        return true; /* no response here */
+        return 0; /* no response here */
 
     words = (type == 2) ? 9 : 3;
 
     for (i = 0; i < words; i++) /* RESPONSE_REG is read MSB first */
-    {
         data[i] = RESPONSE_REG; /* Read most significant 16-bit word */
-    }
 
-    if (type == 2)
+    if (response == NULL)
+    {
+        /* response discarded */
+    }
+    else if (type == 2)
     {
         /* Response type 2 has the following structure:
          * [135:135] Start Bit - '0'
@@ -201,10 +237,10 @@ static bool sd_command(unsigned int cmd, unsigned long arg1,
          * [127:001] CID or CSD register including internal CRC7
          * [000:000] End Bit - '1'
          */
-        response[3] = (data[0]<<24) + (data[1]<<8) + ((data[2]&0xff00)>>8);
-        response[2] = (data[2]<<24) + (data[3]<<8) + ((data[4]&0xff00)>>8);
-        response[1] = (data[4]<<24) + (data[5]<<8) + ((data[6]&0xff00)>>8);
-        response[0] = (data[6]<<24) + (data[7]<<8) + ((data[8]&0xff00)>>8);
+        response[3] = (data[0]<<24) + (data[1]<<8) + (data[2]>>8);
+        response[2] = (data[2]<<24) + (data[3]<<8) + (data[4]>>8);
+        response[1] = (data[4]<<24) + (data[5]<<8) + (data[6]>>8);
+        response[0] = (data[6]<<24) + (data[7]<<8) + (data[8]>>8);
     }
     else
     {
@@ -234,30 +270,44 @@ static bool sd_command(unsigned int cmd, unsigned long arg1,
          *          R3: Reserved - '1111111'
          *      [0] End Bit - '1'
          */
-        response[0] = (data[0]<<24) + (data[1]<<8) + ((data[2]&0xff00)>>8);
+        response[0] = (data[0]<<24) + (data[1]<<8) + (data[2]>>8);
     }
 
-    return true;
+    return 0;
 }
 
-static void sd_wait_for_state(unsigned int state, unsigned int id)
+static int sd_wait_for_state(unsigned int state, int id)
 {
     unsigned int response = 0;
+    unsigned int timeout = 0x80000;
 
     check_time[id] = USEC_TIMER;
 
     while (1)
     {
-        sd_command(SEND_STATUS, currcard->rca, &response, 1);
-        sd_check_timeout(0x80000, id);
+        int ret = sd_command(SEND_STATUS, currcard->rca, &response, 1);
+        long us;
+
+        if (ret < 0)
+            return ret*100 - id;
 
         if (((response >> 9) & 0xf) == state)
-            break;
+        {
+            SD_STATE_REG = state;
+            return 0;
+        }
 
-        priority_yield();
+        if (!sd_check_timeout(timeout, id))
+            return -EC_WAIT_STATE_FAILED*100 - id;
+
+        us = USEC_TIMER;
+        if (TIME_AFTER(us, next_yield))
+        {
+            priority_yield();
+            timeout += USEC_TIMER - us;
+            next_yield = us + MIN_YIELD_PERIOD;
+        }
     }
-
-    SD_STATE_REG = state;
 }
 
 static inline void copy_read_sectors_fast(unsigned char **buf)
@@ -385,7 +435,7 @@ static inline void copy_read_sectors_fast(unsigned char **buf)
 
 static inline void copy_read_sectors_slow(unsigned char** buf)
 {
-    int cnt = FIFO_SIZE;
+    int cnt = FIFO_LEN;
     int t;
 
     /* Copy one chunk of 16 words */
@@ -404,33 +454,37 @@ static inline void copy_read_sectors_slow(unsigned char** buf)
 }
 
 /* Writes have to be kept slow for now */
-static inline void copy_write_sectors(const unsigned char* buf)
+static inline void copy_write_sectors(const unsigned char** buf)
 {
-    unsigned short tmp = 0;
-    const unsigned char* bufend = buf + FIFO_SIZE*2;
+    int cnt = FIFO_LEN;
+    unsigned t;
 
     do
     {
-        tmp  = (unsigned short) *buf++;
-        tmp |= (unsigned short) *buf++ << 8;
-        DATA_REG = tmp;
-    } while (buf < bufend); /* tail loop is faster */
+        t  = *(*buf)++;
+        t |= *(*buf)++ << 8;
+        DATA_REG = t;
+    } while (--cnt > 0); /* tail loop is faster */
 }
 
-static bool sd_select_bank(unsigned char bank)
+static int sd_select_bank(unsigned char bank)
 {
-    unsigned int response;
     unsigned char card_data[512];
-    unsigned char* write_buf;
-    int i;
+    const unsigned char* write_buf;
+    int i, ret;
 
     memset(card_data, 0, 512);
-    sd_wait_for_state(TRAN, EC_TRAN_SEL_BANK);
+
+    ret = sd_wait_for_state(TRAN, EC_TRAN_SEL_BANK);
+    if (ret < 0)
+        return ret;
+
     BLOCK_SIZE_REG = 512;
     BLOCK_COUNT_REG = 1;
 
-    if (!sd_command(35, 0, &response, 0x1c0d)) /* CMD35 is vendor specific */
-        return false;
+    ret = sd_command(35, 0, NULL, 0x1c0d); /* CMD35 is vendor specific */
+    if (ret < 0)
+        return ret;
 
     SD_STATE_REG = PRG;
 
@@ -438,41 +492,29 @@ static bool sd_select_bank(unsigned char bank)
 
     /* Write the card data */
     write_buf = card_data;
-    for (i = 0; i < BLOCK_SIZE / 2; i += FIFO_SIZE)
+    for (i = 0; i < BLOCK_SIZE/2; i += FIFO_LEN)
     {
         /* Wait for the FIFO to empty */
-        sd_poll_status(FIFO_EMPTY, 10000, EC_FIFO_SEL_BANK_EMPTY | DO_PANIC);
+        if (sd_poll_status(FIFO_EMPTY, 10000))
+        {
+            copy_write_sectors(&write_buf); /* Copy one chunk of 16 words */
+            continue;
+        }
 
-        copy_write_sectors(write_buf); /* Copy one chunk of 16 words */
-
-        write_buf += FIFO_SIZE*2; /* Advance one chunk of 16 words */
+        return -EC_FIFO_SEL_BANK_EMPTY;
     }
 
-    sd_poll_status(DATA_DONE, 10000, EC_FIFO_SEL_BANK_DONE | DO_PANIC);
+    if (!sd_poll_status(DATA_DONE, 10000))
+        return -EC_FIFO_SEL_BANK_DONE;
 
     currcard->current_bank = bank;
 
-    return true;
+    return 0;
 }
 
-/* lock must already be aquired */
-static void sd_init_device(int card_no)
+static void sd_card_mux(int card_no)
 {
-/* SD Protocol registers */
-    unsigned int  i, dummy;
-    unsigned int  c_size = 0;
-    unsigned long c_mult = 0;
-    unsigned char carddata[512];
-    unsigned char *dataptr;
-
-/* Enable and initialise controller */
-    REG_1 = 6;
-
-    currcard = &card_info[card_no];
-
-/* Initialise card data as blank */
-    memset(currcard, 0, sizeof(*currcard));
-
+/* Set the current card mux */
     if (card_no == 0)
     {
         outl(inl(0x70000080) | 0x4, 0x70000080);
@@ -497,8 +539,28 @@ static void sd_init_device(int card_no)
 
         outl(inl(0x70000014) & ~(0x3ffff), 0x70000014);
     }
+}
 
-    /* Init NAND */
+static void sd_init_device(int card_no)
+{
+/* SD Protocol registers */
+    unsigned int  i;
+    unsigned int  c_size;
+    unsigned long c_mult;
+    unsigned char carddata[512];
+    unsigned char *dataptr;
+    int ret;
+
+/* Enable and initialise controller */
+    REG_1 = 6;
+
+/* Initialise card data as blank */
+    memset(currcard, 0, sizeof(*currcard));
+
+/* Switch card mux to card to initialize */
+    sd_card_mux(card_no);
+
+/* Init NAND */
     REG_11 |=  (1 << 15);
     REG_12 |=  (1 << 15);
     REG_12 &= ~(3 << 12);
@@ -514,28 +576,38 @@ static void sd_init_device(int card_no)
 
     REG_5 = 0xf;
 
-    if (!sd_command(GO_IDLE_STATE, 0, &dummy, 256))
+    ret = sd_command(GO_IDLE_STATE, 0, NULL, 256);
+    if (ret < 0)
         goto card_init_error;
 
     check_time[EC_POWER_UP] = USEC_TIMER;
     while ((currcard->ocr & (1 << 31)) == 0) /* until card is powered up */
     {
-        if (!sd_command(APP_CMD, currcard->rca, &dummy, 1))
+        ret = sd_command(APP_CMD, currcard->rca, NULL, 1);
+        if (ret < 0)
             goto card_init_error;
 
-        if (!sd_command(SD_APP_OP_COND, 0x100000, &currcard->ocr, 3))
+        ret = sd_command(SD_APP_OP_COND, 0x100000, &currcard->ocr, 3);
+        if (ret < 0)
             goto card_init_error;
 
-        sd_check_timeout(5000000, EC_POWER_UP);
+        if (!sd_check_timeout(5000000, EC_POWER_UP))
+        {
+            ret = -EC_POWER_UP;
+            goto card_init_error;
+        }
     }
 
-    if (!sd_command(ALL_SEND_CID, 0, currcard->cid, 2))
+    ret = sd_command(ALL_SEND_CID, 0, currcard->cid, 2);
+    if (ret < 0)
         goto card_init_error;
 
-    if (!sd_command(SEND_RELATIVE_ADDR, 0, &currcard->rca, 1))
+    ret = sd_command(SEND_RELATIVE_ADDR, 0, &currcard->rca, 1);
+    if (ret < 0)
         goto card_init_error;
 
-    if (!sd_command(SEND_CSD, currcard->rca, currcard->csd, 2))
+    ret = sd_command(SEND_CSD, currcard->rca, currcard->csd, 2);
+    if (ret < 0)
         goto card_init_error;
 
     /* These calculations come from the Sandisk SD card product manual */
@@ -548,39 +620,49 @@ static void sd_init_device(int card_no)
 
     REG_1 = 0;
 
-    if (!sd_command(SELECT_CARD, currcard->rca, &dummy, 129))
+    ret = sd_command(SELECT_CARD, currcard->rca, NULL, 129);
+    if (ret < 0)
         goto card_init_error;
 
-    if (!sd_command(APP_CMD, currcard->rca, &dummy, 1))
+    ret = sd_command(APP_CMD, currcard->rca, NULL, 1);
+    if (ret < 0)
         goto card_init_error;
 
-    if (!sd_command(SET_BUS_WIDTH, currcard->rca | 2, &dummy, 1)) /* 4 bit */
+    ret = sd_command(SET_BUS_WIDTH, currcard->rca | 2, NULL, 1); /* 4 bit */
+    if (ret < 0)
         goto card_init_error;
 
-    if (!sd_command(SET_BLOCKLEN, currcard->block_size, &dummy, 1))
+    ret = sd_command(SET_BLOCKLEN, currcard->block_size, NULL, 1);
+    if (ret < 0)
         goto card_init_error;
 
     BLOCK_SIZE_REG = currcard->block_size;
 
     /* If this card is > 4Gb, then we need to enable bank switching */
-    if(currcard->numblocks >= BLOCKS_PER_BANK)
+    if (currcard->numblocks >= BLOCKS_PER_BANK)
     {
         SD_STATE_REG = TRAN;
         BLOCK_COUNT_REG = 1;
 
-        if (!sd_command(SWITCH_FUNC, 0x80ffffef, &dummy, 0x1c05))
+        ret = sd_command(SWITCH_FUNC, 0x80ffffef, NULL, 0x1c05);
+        if (ret < 0)
             goto card_init_error;
 
         /* Read 512 bytes from the card.
         The first 512 bits contain the status information
         TODO: Do something useful with this! */
         dataptr = carddata;
-        for (i = 0; i < BLOCK_SIZE / 2; i += FIFO_SIZE)
+        for (i = 0; i < BLOCK_SIZE/2; i += FIFO_LEN)
         {
             /* Wait for the FIFO to be full */
-            sd_poll_status(FIFO_FULL, 100000,
-                           EC_FIFO_ENA_BANK_EMPTY | DO_PANIC);
-            copy_read_sectors_slow(&dataptr);
+            if (sd_poll_status(FIFO_FULL, 100000))
+            {
+                copy_read_sectors_slow(&dataptr);
+                continue;
+            }
+
+            ret = -EC_FIFO_ENA_BANK_EMPTY;
+            goto card_init_error;
         }
     }
 
@@ -589,7 +671,32 @@ static void sd_init_device(int card_no)
 
     /* Card failed to initialize so disable it */
 card_init_error:
-    currcard->initialized = -1;
+    currcard->initialized = ret;
+}
+
+/* lock must already be aquired */
+static void sd_select_device(int card_no)
+{
+    currcard = &card_info[card_no];
+
+    if (card_no == 0)
+    {
+        /* Main card always gets a chance */
+        sd_status[0].retry = 0;
+    }
+
+    if (currcard->initialized > 0)
+    {
+        /* This card is already initialized - switch to it */
+        sd_card_mux(card_no);
+        return;
+    }
+
+    if (currcard->initialized == 0)
+    {
+        /* Card needs (re)init */
+        sd_init_device(card_no);
+    }
 }
 
 /* API Functions */
@@ -599,12 +706,11 @@ void ata_led(bool onoff)
     led(onoff);
 }
 
-int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
+int ata_read_sectors(int drive, unsigned long start, int incount,
                      void* inbuf)
 {
-    int  ret = -9;
+    int ret;
     unsigned char *buf, *buf_end;
-    unsigned int dummy;
     int bank;
     
     /* TODO: Add DMA support. */
@@ -613,31 +719,43 @@ int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
 
     ata_led(true);
 
+ata_read_retry:
     if (drive != 0 && (GPIOA_INPUT_VAL & 0x80) != 0)
-        /* no external sd-card inserted */
-        goto ata_read_error;
-
-    if (&card_info[drive] != currcard || card_info[drive].initialized == 0)
     {
-        sd_init_device(drive);
+        /* no external sd-card inserted */
+        ret = -EC_NOCARD;
+        goto ata_read_error;
+    }
 
-        if (card_info[drive].initialized < 0)
-            goto ata_read_error;
+    sd_select_device(drive);
+
+    if (currcard->initialized < 0)
+    {
+        ret = currcard->initialized;
+        goto ata_read_error;
     }
 
     last_disk_activity = current_tick;
 
     bank = start / BLOCKS_PER_BANK;
 
-    if (currcard->current_bank != bank && !sd_select_bank(bank))
-        goto ata_read_error;
+    if (currcard->current_bank != bank)
+    {
+        ret = sd_select_bank(bank);
+        if (ret < 0)
+            goto ata_read_error;
+    }
 
     start -= bank * BLOCKS_PER_BANK;
 
-    sd_wait_for_state(TRAN, EC_TRAN_READ_ENTRY);
+    ret = sd_wait_for_state(TRAN, EC_TRAN_READ_ENTRY);
+    if (ret < 0)
+        goto ata_read_error;
+
     BLOCK_COUNT_REG = incount;
 
-    if (!sd_command(READ_MULTIPLE_BLOCK, start * BLOCK_SIZE, &dummy, 0x1c25))
+    ret = sd_command(READ_MULTIPLE_BLOCK, start * BLOCK_SIZE, NULL, 0x1c25);
+    if (ret < 0)
         goto ata_read_error;
 
     /* TODO: Don't assume BLOCK_SIZE == SECTOR_SIZE */
@@ -646,79 +764,104 @@ int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
     for (buf = inbuf; buf < buf_end;)
     {
         /* Wait for the FIFO to be full */
-        sd_poll_status(FIFO_FULL, 0x80000, EC_FIFO_READ_FULL | DO_PANIC);
-        copy_read_sectors_fast(&buf); /* Copy one chunk of 16 words */
+        if (sd_poll_status(FIFO_FULL, 0x80000))
+        {
+            copy_read_sectors_fast(&buf); /* Copy one chunk of 16 words */
+            /* TODO: Switch bank if necessary */
+            continue;
+        }
 
-        /* TODO: Switch bank if necessary */
+        ret = -EC_FIFO_READ_FULL;
+        goto ata_read_error;
     }
 
     last_disk_activity = current_tick;
-#if 0
-    udelay(75);
-#endif
-    if (!sd_command(STOP_TRANSMISSION, 0, &dummy, 1))
+
+    ret = sd_command(STOP_TRANSMISSION, 0, NULL, 1);
+    if (ret < 0)
         goto ata_read_error;
 
-    sd_wait_for_state(TRAN, EC_TRAN_READ_EXIT);
+    ret = sd_wait_for_state(TRAN, EC_TRAN_READ_EXIT);
+    if (ret < 0)
+        goto ata_read_error;
 
-    ret = 0;
+    while (1)
+    {
+        ata_led(false);
+        spinlock_unlock(&sd_mtx);
+
+        return ret;
 
 ata_read_error:
-    ata_led(false);
-
-    spinlock_unlock(&sd_mtx);
-
-    return ret;
+        if (sd_status[drive].retry < sd_status[drive].retry_max
+            && ret != -EC_NOCARD)
+        {
+            sd_status[drive].retry++;
+            currcard->initialized = 0;
+            goto ata_read_retry;
+        }
+    }
 }
 
-int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
+int ata_write_sectors(int drive, unsigned long start, int count,
                       const void* outbuf)
 {
 /* Write support is not finished yet */
 /* TODO: The standard suggests using ACMD23 prior to writing multiple blocks
    to improve performance */
-    unsigned int response;
-    void const* buf, *buf_end;
-    int ret = -9;
+    int ret;
+    const unsigned char *buf, *buf_end;
     int bank;
 
     spinlock_lock(&sd_mtx);
 
     ata_led(true);
 
+ata_write_retry:
     if (drive != 0 && (GPIOA_INPUT_VAL & 0x80) != 0)
-        /* no external sd-card inserted */
-        goto ata_write_error;
-
-    if (&card_info[drive] != currcard || card_info[drive].initialized == 0)
     {
-        sd_init_device(drive);
+        /* no external sd-card inserted */
+        ret = -EC_NOCARD;
+        goto ata_write_error;
+    }
 
-        if (card_info[drive].initialized < 0)
-            goto ata_write_error;
+    sd_select_device(drive);
+
+    if (currcard->initialized < 0)
+    {
+        ret = currcard->initialized;
+        goto ata_write_error;
     }
 
     bank = start / BLOCKS_PER_BANK;
 
-    if (currcard->current_bank != bank && !sd_select_bank(bank))
-        goto ata_write_error;
+    if (currcard->current_bank != bank)
+    {
+        ret = sd_select_bank(bank);
+        if (ret < 0)
+            goto ata_write_error;
+    }
 
     start -= bank * BLOCKS_PER_BANK;
 
     check_time[EC_WRITE_TIMEOUT] = USEC_TIMER;
-    sd_wait_for_state(TRAN, EC_TRAN_WRITE_ENTRY);
+
+    ret = sd_wait_for_state(TRAN, EC_TRAN_WRITE_ENTRY);
+    if (ret < 0)
+        goto ata_write_error;
+
     BLOCK_COUNT_REG = count;
 
-    if (!sd_command(WRITE_MULTIPLE_BLOCK, start * SECTOR_SIZE,
-                    &response, 0x1c2d))
-    {
+    ret = sd_command(WRITE_MULTIPLE_BLOCK, start * SECTOR_SIZE,
+                     NULL, 0x1c2d);
+    if (ret < 0)
         goto ata_write_error;
-    }
 
-    buf_end = outbuf + count * currcard->block_size;
-    for (buf = outbuf; buf < buf_end; buf += 2 * FIFO_SIZE)
+    buf_end = outbuf + count * currcard->block_size - 2*FIFO_LEN;
+
+    for (buf = outbuf; buf <= buf_end;)
     {
-        if (buf >= buf_end - 2 * FIFO_SIZE)
+        if (buf == buf_end)
         {
             /* Set SD_STATE_REG to PRG for the last buffer fill */
             SD_STATE_REG = PRG;
@@ -727,30 +870,49 @@ int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
         udelay(2); /* needed here (loop is too fast :-) */
 
         /* Wait for the FIFO to empty */
-        sd_poll_status(FIFO_EMPTY, 0x80000, EC_FIFO_WR_EMPTY | DO_PANIC);
+        if (sd_poll_status(FIFO_EMPTY, 0x80000))
+        {
+            copy_write_sectors(&buf); /* Copy one chunk of 16 words */
+            /* TODO: Switch bank if necessary */
+            continue;
+        }
 
-        copy_write_sectors(buf); /* Copy one chunk of 16 words */
-
-        /* TODO: Switch bank if necessary */
+        ret = -EC_FIFO_WR_EMPTY;
+        goto ata_write_error;
     }
 
     last_disk_activity = current_tick;
 
-    sd_poll_status(DATA_DONE, 0x80000, EC_FIFO_WR_DONE | DO_PANIC);
-    sd_check_timeout(0x80000, EC_WRITE_TIMEOUT);
+    if (!sd_poll_status(DATA_DONE, 0x80000))
+    {
+        ret = -EC_FIFO_WR_DONE;
+        goto ata_write_error;
+    }
 
-    if (!sd_command(STOP_TRANSMISSION, 0, &response, 1))
+    ret = sd_command(STOP_TRANSMISSION, 0, NULL, 1);
+    if (ret < 0)
         goto ata_write_error;
 
-    sd_wait_for_state(TRAN, EC_TRAN_WRITE_EXIT);
+    ret = sd_wait_for_state(TRAN, EC_TRAN_WRITE_EXIT);
+    if (ret < 0)
+        goto ata_write_error;
 
-    ret = 0;
+    while (1)
+    {
+        ata_led(false);
+        spinlock_unlock(&sd_mtx);
+
+        return ret;
 
 ata_write_error:
-    ata_led(false);
-    spinlock_unlock(&sd_mtx);
-
-    return ret;
+        if (sd_status[drive].retry < sd_status[drive].retry_max
+            && ret != -EC_NOCARD)
+        {
+            sd_status[drive].retry++;
+            currcard->initialized = 0;
+            goto ata_write_retry;
+        }
+    }
 }
 
 static void sd_thread(void) __attribute__((noreturn));
@@ -767,19 +929,13 @@ static void sd_thread(void)
         {
         case SD_HOTSWAP:
         {
-            int status = 0;
-            enum { SD_UNMOUNTED = 0x1, SD_MOUNTED = 0x2 };
-
-            /* Delay on insert and remove to prevent reading state if it is
-               just bouncing back and forth while card is sliding - delay on
-               insert is also required for the card to stabilize and accept
-               commands */
-            sleep(HZ/10);
+            int action = SDA_NONE;
 
             /* Lock to keep us from messing with this variable while an init
                may be in progress */
             spinlock_lock(&sd_mtx);
-            card_info[1].initialized = false;
+            card_info[1].initialized = 0;
+            sd_status[1].retry = 0;
             spinlock_unlock(&sd_mtx);
 
             /* Either unmount because the card was pulled or unmount and
@@ -787,18 +943,18 @@ static void sd_thread(void)
                generated for the same event - like someone inserting a new
                card before anything detects the old one pulled :) */
             if (disk_unmount(1) != 0)  /* release "by force" */
-                status |= SD_UNMOUNTED;
+                action |= SDA_UNMOUNTED;
 
-            if (card_detect_target() && disk_mount(1) != 0) /* mount SD-CARD */
-                status |= SD_MOUNTED;
+            if (ev.data != 0 && disk_mount(1) != 0) /* mount SD-CARD */
+                action |= SDA_MOUNTED;
 
-            if (status & SD_UNMOUNTED)
+            if (action & SDA_UNMOUNTED)
                 queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
 
-            if (status & SD_MOUNTED)
+            if (action & SDA_MOUNTED)
                 queue_broadcast(SYS_HOTSWAP_INSERTED, 0);
 
-            if (status)
+            if (action != SDA_NONE)
                 queue_broadcast(SYS_FS_CHANGED, 0);
             break;
             } /* SD_HOTSWAP */
@@ -807,11 +963,22 @@ static void sd_thread(void)
             {
                 idle_notified = false;
             }
-            else if (!idle_notified)
+            else
             {
-                call_ata_idle_notifys(false);
-                idle_notified = true;
+                /* never let a timer wrap confuse us */
+                next_yield = USEC_TIMER;
+
+                if (!idle_notified)
+                {
+                    call_ata_idle_notifys(false);
+                    idle_notified = true;
+                }
             }
+            break;
+        case SYS_USB_CONNECTED:
+            usb_acknowledge(SYS_USB_CONNECTED_ACK);
+            /* Wait until the USB cable is extracted again */
+            usb_wait_for_disconnect(&sd_queue);
             break;
         }
     }
@@ -878,7 +1045,6 @@ int ata_init(void)
         outl(inl(0x70000088) & ~(0x4), 0x70000088);
         outl(inl(0x7000008c) & ~(0x4), 0x7000008c);
         outl(inl(0x70000084) | 0x4, 0x70000084);
-        outl(0x1010, 0x70000034);
 
         GPIOG_ENABLE     |= (0x3 << 5);
         GPIOG_OUTPUT_EN  |= (0x3 << 5);
@@ -890,10 +1056,10 @@ int ata_init(void)
         GPIOA_OUTPUT_EN  &= ~0x80;
         GPIOA_ENABLE     |=  0x80;
 
-        sd_init_device(0);
+        sd_select_device(0);
 
-        if (currcard->initialized <= 0)
-            ret = -1;
+        if (currcard->initialized < 0)
+            ret = currcard->initialized;
 
         queue_init(&sd_queue, true);
         create_thread(sd_thread, sd_stack, sizeof(sd_stack),
@@ -905,8 +1071,7 @@ int ata_init(void)
         CPU_INT_EN = HI_MASK;
         CPU_HI_INT_EN = GPIO0_MASK;
 
-        sd1_status = GPIOA_INPUT_VAL & 0x80;
-        GPIOA_INT_LEV = (GPIOA_INT_LEV & ~0x80) | (sd1_status ^ 0x80);
+        GPIOA_INT_LEV = (GPIOA_INT_LEV & ~0x80) | (~GPIOA_INPUT_VAL & 0x80);
 
         GPIOA_INT_CLR = 0x80;
         GPIOA_INT_EN |= 0x80;
@@ -960,17 +1125,12 @@ bool card_detect_target(void)
 /* called on insertion/removal interrupt */
 void microsd_int(void)
 {
-    int status = GPIOA_INPUT_VAL & 0x80;
-    
-    GPIOA_INT_LEV = (GPIOA_INT_LEV & ~0x80) | (status ^ 0x80);
+    int detect = GPIOA_INPUT_VAL & 0x80;
+
+    GPIOA_INT_LEV = (GPIOA_INT_LEV & ~0x80) | (detect ^ 0x80);
     GPIOA_INT_CLR = 0x80;
-
-    if (status == sd1_status)
-        return;
-
-    sd1_status = status;
 
     /* Take final state only - insert/remove is bouncy */
     queue_remove_from_head(&sd_queue, SD_HOTSWAP);
-    queue_post(&sd_queue, SD_HOTSWAP, status);
+    queue_post(&sd_queue, SD_HOTSWAP, detect == 0);
 }
