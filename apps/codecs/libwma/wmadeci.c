@@ -1428,7 +1428,7 @@ static int wma_decode_block(WMADecodeContext *s)
                         e2 = 0;
                         for(i = 0;i < n; ++i)
                         {
-                            v = exp_ptr[i];
+                            v = exp_ptr[i]>>5;	/*v is noramlized later on so its fixed format is irrelevant*/
                             e2 += fixmul32(v, v);
                         }
                          exp_power[j] = e2/n; /*n is an int...*/
