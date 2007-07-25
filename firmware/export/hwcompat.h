@@ -53,4 +53,12 @@ static inline int tuner_detect_type(void)
 bool is_new_player(void);
 #endif
 
+#ifdef IPOD_ARCH
+#ifdef BOOTLOADER
+#define IPOD_HW_REVISION (*((unsigned long*)(0x00002084)))
+#else
+#define IPOD_HW_REVISION (*((unsigned long*)(0x20002084)))
+#endif
+#endif
+
 #endif /* HWCOMPAT_H */

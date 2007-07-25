@@ -19,8 +19,6 @@
 #include "system.h"
 #include "thread.h"
 
-unsigned int ipod_hw_rev;
-
 #if NUM_CORES > 1
 struct mutex boostctrl_mtx NOCACHEBSS_ATTR;
 #endif
@@ -239,10 +237,6 @@ void system_init(void)
         /* Remap the flash ROM from 0x00000000 to 0x20000000. */
         MMAP3_LOGICAL  = 0x20000000 | 0x3a00;
         MMAP3_PHYSICAL = 0x00000000 | 0x3f84;
-
-        /* The hw revision is written to the last 4 bytes of SDRAM by the
-           bootloader - we save it before Rockbox overwrites it. */
-        ipod_hw_rev = (*((volatile unsigned long*)(0x01fffffc)));
 
         /* disable all irqs */
         COP_HI_INT_CLR      = -1;

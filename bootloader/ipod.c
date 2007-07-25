@@ -40,6 +40,7 @@
 #include "power.h"
 #include "file.h"
 #include "common.h"
+#include "hwcompat.h"
 
 #define XSC(X) #X
 #define SC(X) XSC(X)
@@ -54,12 +55,6 @@ unsigned char *loadbuffer = (unsigned char *)DRAM_START;
 
 /* Bootloader version */
 char version[] = APPSVERSION;
-
-#define IPOD_HW_REVISION (*((volatile unsigned long*)(0x00002084)))
-
-/* We copy the hardware revision to the last four bytes of SDRAM and then
-   re-read it after we have re-mapped SDRAM to 0x0 in Rockbox */
-#define TMP_IPOD_HW_REVISION (*((volatile unsigned long*)(0x11fffffc)))
 
 #define BUTTON_LEFT  1
 #define BUTTON_MENU  2
@@ -240,9 +235,6 @@ void* main(void)
 
     __backlight_on();
 
-    TMP_IPOD_HW_REVISION = IPOD_HW_REVISION;
-    ipod_hw_rev = IPOD_HW_REVISION;
-
     system_init();
     kernel_init();
     lcd_init();
@@ -300,7 +292,6 @@ void* main(void)
     printf("Partition 1: 0x%02x %ld MB", 
            pinfo->type, pinfo->size / 2048);
 
-    
     if (button_was_held || (btn==BUTTON_MENU)) {
         /* If either the hold switch was on, or the Menu button was held, then 
            try the Apple firmware */

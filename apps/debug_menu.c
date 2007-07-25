@@ -630,6 +630,7 @@ static bool dbg_hw_info(void)
             return false;
     }
 #elif defined(CPU_PP502x)
+    int line = 0;
     char buf[32];
     char pp_version[] = { (PP_VER2 >> 24) & 0xff, (PP_VER2 >> 16) & 0xff,
                           (PP_VER2 >> 8) & 0xff, (PP_VER2) & 0xff,
@@ -640,16 +641,25 @@ static bool dbg_hw_info(void)
     lcd_setfont(FONT_SYSFIXED);
     lcd_clear_display();
 
-    lcd_puts(0, 0, "[Hardware info]");
+    lcd_puts(0, line++, "[Hardware info]");
 
-    snprintf(buf, sizeof(buf), "HW rev: 0x%08x", ipod_hw_rev);
-    lcd_puts(0, 1, buf);
+#ifdef IPOD_ARCH
+    snprintf(buf, sizeof(buf), "HW rev: 0x%08lx", IPOD_HW_REVISION);
+    lcd_puts(0, line++, buf);
+#endif
+
+#ifdef IPOD_COLOR
+    extern int lcd_type; /* Defined in lcd-colornano.c */
+
+    snprintf(buf, sizeof(buf), "LCD type: %d", lcd_type);
+    lcd_puts(0, line++, buf);
+#endif
 
     snprintf(buf, sizeof(buf), "PP version: %s", pp_version);
-    lcd_puts(0, 2, buf);
+    lcd_puts(0, line++, buf);
 
     snprintf(buf, sizeof(buf), "Est. clock (kHz): %d", perfcheck());
-    lcd_puts(0, 3, buf);
+    lcd_puts(0, line++, buf);
 
     lcd_update();
 

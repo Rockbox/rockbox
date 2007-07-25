@@ -18,7 +18,6 @@
  ****************************************************************************/
 #include "system.h"
 
-unsigned int ipod_hw_rev;
 #ifndef BOOTLOADER
 extern void TIMER1(void);
 extern void TIMER2(void);
@@ -149,7 +148,6 @@ void system_init(void)
         MMAP3_LOGICAL  = 0x20000000 | 0x3a00;
         MMAP3_PHYSICAL = 0x00000000 | 0x3f84;
 
-        ipod_hw_rev = (*((volatile unsigned long*)(0x01fffffc)));
         outl(-1, 0xcf00101c);
         outl(-1, 0xcf001028);
         outl(-1, 0xcf001038);
