@@ -88,9 +88,16 @@ A: Screens API and GUI widgets
 M: Kévin Ferrare
 
 A: Settings API
+M: Jonathan Gordon
+
 A: Language API
+
 A: Menu API
+M: Jonathan Gordon
+
 A: Button actions
+M: Jonathan Gordon
+
 
 Core code (high-level)
 ----------------------
@@ -110,6 +117,8 @@ A: WPS
 M: Nicolas Pennequin
 
 A: User interface
+M: Jonathan Gordon
+
 
 Metadata parsing
 ----------------
@@ -201,7 +210,10 @@ M: Dave Chapman
 A: plasma
 A: pong
 A: properties
+
 A: random_folder_advance_config
+M: Jonathan Gordon
+
 A: reversi
 A: rockblox
 A: rockbox_flash
@@ -236,7 +248,10 @@ A: test_disk
 A: test_fps
 A: test_sampr
 A: test_scanrate
+
 A: text_editor
+M: Jonathan Gordon
+
 A: vbrfix
 A: video
 A: viewer
@@ -301,6 +316,7 @@ Bootloaders
 A: Iriver H1xx/H3xx
 A: Iaudio X5/M5
 A: PortalPlayer (not ipod)
+
 A: Ipod
 M: Dave Chapman
 
