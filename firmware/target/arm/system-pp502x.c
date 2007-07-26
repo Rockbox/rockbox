@@ -114,12 +114,11 @@ void irq(void)
 #endif
 #endif /* BOOTLOADER */
 
-/* TODO: The following two function have been lifted straight from IPL, and
-   hence have a lot of numeric addresses used straight. I'd like to use
+/* TODO: The following function has been lifted straight from IPL, and
+   hence has a lot of numeric addresses used straight. I'd like to use
    #defines for these, but don't know what most of them are for or even what
    they should be named. Because of this I also have no way of knowing how
-   to extend the funtions to do alternate cache configurations and/or
-   some other CPU frequency scaling. */
+   to extend the funtions to do alternate cache configurations. */
 
 #ifndef BOOTLOADER
 static void ipod_init_cache(void)
@@ -144,93 +143,98 @@ static void ipod_init_cache(void)
     for (i = 0x10000000; i < 0x10002000; i += 16)
         inb(i);
 }
-#endif
 
-/* Not all iPod targets support CPU freq. boosting yet */
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 void set_cpu_frequency(long frequency)
+#else
+static void pp_set_cpu_frequency(long frequency)
+#endif
 {
-    unsigned long postmult, pll_control;
-    unsigned long unknown1, unknown2;
+    unsigned long clcd_clock_src;
+    bool use_pll = true;
 
-# if NUM_CORES > 1
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES > 1)
     /* Using mutex or spinlock isn't safe here. */
     while (test_and_set(&boostctrl_mtx.locked, 1)) ;
-# endif
-
-    if (frequency == CPUFREQ_NORMAL)
-        postmult = CPUFREQ_NORMAL_MULT;
-    else if (frequency == CPUFREQ_MAX)
-        postmult = CPUFREQ_MAX_MULT;
-    else
-        postmult = CPUFREQ_DEFAULT_MULT;
-    cpu_frequency = frequency;
+#endif
 
 #ifdef SANSA_E200
     i2s_scale_attn_level(CPUFREQ_DEFAULT);
 #endif
 
-    unknown2 = inl(0x600060a0);
+    cpu_frequency = frequency;
+    clcd_clock_src = CLCD_CLOCK_SRC; /* save selected color LCD clock source */
 
-    outl(inl(0x70000020) | (1<<30), 0x70000020);   /* Enable PLL power */
+    CLOCK_SOURCE = (CLOCK_SOURCE & ~0xf000000f) | 0x10000002;
+                                /* set clock source 1 to 24MHz and select it */
+    CLCD_CLOCK_SRC &= ~0xc0000000; /* select 24MHz as color LCD clock source */
 
-    /* Set clock source #1 to 24MHz and select it */
-    outl((inl(0x60006020) & 0x0ffffff0) | 0x10000002, 0x60006020);
+    switch (frequency)
+    {
+#if CONFIG_CPU == PP5020
+      case CPUFREQ_MAX:
+        DEV_TIMING1 = 0x00000808;
+        PLL_CONTROL = 0x8a020a03; /* 10/3 * 24MHz */
+        PLL_STATUS  = 0xd19b;     /* unlock frequencies > 66MHz */
+        PLL_CONTROL = 0x8a020a03; /* repeat setup */
+        udelay(500);              /* wait for relock */
+        break;
 
-    outl(inl(0x600060a0) & ~0xc0000000, 0x600060a0);
+      case CPUFREQ_NORMAL:
+        DEV_TIMING1 = 0x00000303;
+        PLL_CONTROL = 0x8a020504; /* 5/4 * 24MHz */
+        udelay(500);              /* wait for relock */
+        break;
 
-    unknown1 = (138 * postmult + 255) >> 8;
-    if (unknown1 > 15)
-        unknown1 = 15;
-    outl((unknown1 << 8) | unknown1, 0x70000034);
+      default:
+        DEV_TIMING1 = 0x00000303;
+        PLL_CONTROL &= ~0x80000000; /* disable PLL */
+        use_pll = false;
+        cpu_frequency = CPUFREQ_DEFAULT;
+        break;
 
-    /* PLL frequency = (24/4)*postmult */
-    pll_control = 0x8a020000 | 4 | (postmult << 8);
-    outl(pll_control, 0x60006034);
-# if CONFIG_CPU == PP5020
-    outl(0xd19b, 0x6000603c);     /* magic sequence */
-    outl(pll_control, 0x60006034);
-    udelay(500);                  /* wait for relock */
-# else /* PP5022, PP5024 */
-    udelay(250);
-    while (!(inl(0x6000603c) & 0x80000000)); /* wait for relock */
-# endif
+#elif (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024)
+      /* Note: The PP5022 PLL must be run at >= 96MHz
+       * Bits 20..21 select the post divider (1/2/4/8).
+       * PP5026 is similar to PP5022 except it doesn't
+       * have this limitation (and the post divider?) */
+      case CPUFREQ_MAX:
+        DEV_TIMING1 = 0x00000808;
+        PLL_CONTROL = 0x8a121403; /* (20/3 * 24MHz) / 2 */
+        udelay(250);
+        while (!(PLL_STATUS & 0x80000000)); /* wait for relock */
+        break;
 
-    /* Select PLL as clock source? */
-    outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);
+      case CPUFREQ_NORMAL:
+        DEV_TIMING1 = 0x00000303;
+        PLL_CONTROL = 0x8a220501; /* (5/1 * 24MHz) / 4 */
+        udelay(250);
+        while (!(PLL_STATUS & 0x80000000)); /* wait for relock */
+        break;
 
-    inl(0x600060a0); /* sync pipeline (?) */
-    outl(unknown2, 0x600060a0);
+      default:
+        DEV_TIMING1 = 0x00000303;
+        PLL_CONTROL &= ~0x80000000; /* disable PLL */
+        use_pll = false;
+        cpu_frequency = CPUFREQ_DEFAULT;
+        break;
+#endif
+    }
+    if (use_pll)                  /* set clock source 2 to PLL and select it */
+        CLOCK_SOURCE = (CLOCK_SOURCE & ~0xf00000f0) | 0x20000070;
+
+    CLCD_CLOCK_SRC;             /* dummy read (to sync the write pipeline??) */
+    CLCD_CLOCK_SRC = clcd_clock_src; /* restore saved value */
 
 #ifdef SANSA_E200
     i2s_scale_attn_level(frequency);
 #endif
 
-# if NUM_CORES > 1
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES > 1)
     boostctrl_mtx.locked = 0;
-# endif
-}
-#elif !defined(BOOTLOADER)
-void ipod_set_cpu_frequency(void)
-{
-/* For e200, just use clocking set up by OF loader for now */
-#ifndef SANSA_E200
-    /* Enable PLL? */
-    outl(inl(0x70000020) | (1<<30), 0x70000020);
-
-    /* Select 24MHz crystal as clock source? */
-    outl((inl(0x60006020) & 0x0ffffff0) | 0x10000002, 0x60006020);
-
-    /* Clock frequency = (24/8)*25 = 75MHz */
-    outl(0x8a020000 | 8 | (25 << 8), 0x60006034);
-    /* Wait for PLL relock? */
-    udelay(500);
-
-    /* Select PLL as clock source? */
-    outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);
-#endif /* SANSA_E200 */
-}
 #endif
+}
+#endif /* !BOOTLOADER */
 
 void system_init(void)
 {
@@ -273,28 +277,19 @@ void system_init(void)
 #ifdef SANSA_E200
         /* outl(0x00000000, 0x6000b000); */
         outl(inl(0x6000a000) | 0x80000000, 0x6000a000); /* Init DMA controller? */
-    }
+#endif 
 
-    ipod_init_cache();
-#else /* !sansa E200 */
+        DEV_INIT |= 1 << 30; /* enable PLL power */
 
-# if NUM_CORES > 1 && defined(HAVE_ADJUSTABLE_CPU_FREQ)
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+#if NUM_CORES > 1
         spinlock_init(&boostctrl_mtx);
-# endif
-        
-#if (!defined HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES == 1)
-        ipod_set_cpu_frequency();
+#endif
+#else
+        pp_set_cpu_frequency(CPUFREQ_MAX);
 #endif
     }
-#if (!defined HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES > 1)
-    else
-    {
-        ipod_set_cpu_frequency();
-    }
-#endif
     ipod_init_cache();
-
-#endif /* SANSA_E200 */
 
 #endif /* BOOTLOADER */
 }

@@ -135,6 +135,7 @@
 #define CLOCK_SOURCE    (*(volatile unsigned long *)(0x60006020))
 #define PLL_CONTROL     (*(volatile unsigned long *)(0x60006034))
 #define PLL_STATUS      (*(volatile unsigned long *)(0x6000603c))
+#define CLCD_CLOCK_SRC  (*(volatile unsigned long *)(0x600060a0))
 
 /* Processors Control */
 #define CPU_CTL          (*(volatile unsigned long *)(0x60007000))
@@ -254,6 +255,8 @@
 #define PP_VER1          (*(volatile unsigned long *)(0x70000000))
 #define PP_VER2          (*(volatile unsigned long *)(0x70000004))
 #define DEV_INIT         (*(volatile unsigned long *)(0x70000020))
+/* some timing that needs to be handled during clock setup */
+#define DEV_TIMING1      (*(volatile unsigned long *)(0x70000034))
 
 #define INIT_USB         0x80000000
 

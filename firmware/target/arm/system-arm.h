@@ -26,20 +26,6 @@
    have conflicts with another system-target.h elsewhere so include a
    subheader from here. */
 
-/* TODO: Implement set_irq_level and check CPU frequencies */
-
-#if CONFIG_CPU != S3C2440 && CONFIG_CPU != PNX0101
-
-/* TODO: Finish targeting this stuff */
-#define CPUFREQ_DEFAULT_MULT 4
-#define CPUFREQ_DEFAULT 24000000
-#define CPUFREQ_NORMAL_MULT 5
-#define CPUFREQ_NORMAL 30000000
-#define CPUFREQ_MAX_MULT 13
-#define CPUFREQ_MAX 78000000
-
-#endif
-
 static inline uint16_t swap16(uint16_t value)
     /*
       result[15..8] = value[ 7..0];
