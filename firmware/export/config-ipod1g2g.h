@@ -1,5 +1,5 @@
 /*
- * This config file is for the Apple iPod 3g
+ * This config file is for the Apple iPod 1g and 2g
  */
 #define TARGET_TREE /* this target is using the target tree system */
 

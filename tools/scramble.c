@@ -226,6 +226,8 @@ int main (int argc, char** argv)
             modelnum = 17;
         else if(!strcmp(&argv[1][5], "giga"))
             modelnum = 18;
+        else if(!strcmp(&argv[1][5], "1g2g"))
+            modelnum = 19;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

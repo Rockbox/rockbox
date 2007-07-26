@@ -632,6 +632,19 @@ target/arm/usb-pp.c
 #endif /* SIMULATOR */
 #endif /* IPOD_3G */
 
+#ifdef IPOD_1G2G
+#ifndef SIMULATOR
+target/arm/ata-pp5002.c
+target/arm/wmcodec-pp.c
+target/arm/i2s-pp.c
+target/arm/ipod/adc-ipod.c
+target/arm/ipod/3g/backlight-3g.c /* FIXME */
+target/arm/ipod/3g/button-3g.c /* FIXME */
+target/arm/ipod/lcd-gray.c
+target/arm/ipod/power-ipod.c
+#endif /* SIMULATOR */
+#endif /* IPOD_1G2G */
+
 #ifdef IPOD_MINI
 #ifndef SIMULATOR
 drivers/pcf50605.c
