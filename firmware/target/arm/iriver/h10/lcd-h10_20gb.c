@@ -188,8 +188,9 @@ void lcd_set_flip(bool yesno)
 /* LCD init */
 void lcd_init_device(void)
 {  
+    CLCD_CLOCK_SRC |= 0xc0000000; /* Set LCD interface clock to PLL */
     power_on = true;
-    display_on = true;    
+    display_on = true;
     y_offset = 0;
     disp_control_rev = 0x0004;
     lcd_contrast     = DEFAULT_CONTRAST_SETTING << 8;
