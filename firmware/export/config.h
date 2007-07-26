@@ -252,6 +252,11 @@
 #define CONFIG_TUNER_MULTI
 #endif
 
+#if defined(BOOTLOADER) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
+/* Bootloaders don't use CPU frequency adjustment */
+#undef HAVE_ADJUSTABLE_CPU_FREQ
+#endif
+
 /* Enable the directory cache and tagcache in RAM if we have
  * plenty of RAM. Both features can be enabled independently. */
 #if ((defined(MEMORYSIZE) && (MEMORYSIZE > 8)) || MEM > 8) && \

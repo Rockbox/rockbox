@@ -24,6 +24,8 @@
 #include "timer.h"
 #include "pcf50606.h"
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+
 /* Settings for all possible clock frequencies (with properly working timers)
  * NOTE: Some 5249 chips don't like having PLLDIV set to 0. We must avoid that!
  *
@@ -155,3 +157,5 @@ void set_cpu_frequency(long frequency)
         break;
     }
 }
+
+#endif /* HAVE_ADJUSTABLE_CPU_FREQ */
