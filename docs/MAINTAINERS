@@ -83,8 +83,10 @@ A: Recording API (HWCODEC)
 A: Fonts and Unicode
 A: Replaygain
 A: Profiling
+
 A: Screens API and GUI widgets
-M: Kévin Ferrare
+M: KÃ©vin Ferrare
+
 A: Settings API
 A: Language API
 A: Menu API
@@ -94,6 +96,7 @@ Core code (high-level)
 ----------------------
 
 A: Bookmarks
+
 A: Cuesheet support
 M: Nicolas Pennequin
 
@@ -102,6 +105,7 @@ A: Playlists
 A: Radio UI
 A: Recording UI
 A: Voice UI
+
 A: WPS
 M: Nicolas Pennequin
 
@@ -153,15 +157,19 @@ A: chopper
 A: clock
 A: credits
 A: cube
+
 A: demystify
-M: Kévin Ferrare
+M: KÃ©vin Ferrare
+
 A: dice
 A: dict
 A: disktidy
 A: doom
 A: euroconverter
+
 A: fire
-M: Kévin Ferrare
+M: KÃ©vin Ferrare
+
 A: fireworks
 A: firmware_flash
 A: flipit
@@ -211,8 +219,10 @@ A: sort
 A: spacerocks
 A: splitedit
 A: star
+
 A: starfield
-M: Kévin Ferrare
+M: KÃ©vin Ferrare
+
 A: stats
 A: stopwatch
 
@@ -251,7 +261,9 @@ M: Dave Chapman
 A: AAC
 A: ADX
 A: AIFF
-A: ALAC - Dave Chapman
+
+A: ALAC
+M: Dave Chapman
 
 A: APE (Monkey's Audio)
 M: Dave Chapman
@@ -303,7 +315,10 @@ M: Daniel Stenberg
 
 A: bdf2bmp
 A: bmp2rb
+
 A: checkwps
+M: Nicolas Pennequin
+
 A: mkboot
 A: database
 A: rdf2binary
@@ -340,5 +355,5 @@ Web site stuff
 
 A: web site scripts and server-side admin
 M: Daniel Stenberg
-M: Björn Stenberg
+M: BjÃ¶rn Stenberg
 M: Linus Nielsen Feltzing
