@@ -29,6 +29,7 @@
 #include "logf.h"
 #include "debug.h"
 #include "replaygain.h"
+#include "atoi.h"
 
 #define MP4_ID(a, b, c, d)  (((a) << 24) | ((b) << 16) | ((c) << 8) | (d))
 
@@ -40,6 +41,8 @@
 #define MP4_cgen MP4_ID(0xa9, 'g', 'e', 'n')
 #define MP4_cnam MP4_ID(0xa9, 'n', 'a', 'm')
 #define MP4_cwrt MP4_ID(0xa9, 'w', 'r', 't')
+#define MP4_ccmt MP4_ID(0xa9, 'c', 'm', 't')
+#define MP4_cday MP4_ID(0xa9, 'd', 'a', 'y')
 #define MP4_esds MP4_ID('e', 's', 'd', 's')
 #define MP4_ftyp MP4_ID('f', 't', 'y', 'p')
 #define MP4_gnre MP4_ID('g', 'n', 'r', 'e')
@@ -383,6 +386,26 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
             read_mp4_tag_string(fd, size, &buffer, &buffer_left,
                 &id3->composer);
             cwrt = false;
+            break;
+
+        case MP4_ccmt:
+            read_mp4_tag_string(fd, size, &buffer, &buffer_left,
+                &id3->comment);
+            break;
+
+        case MP4_cday:
+            read_mp4_tag_string(fd, size, &buffer, &buffer_left,
+                &id3->year_string);
+ 
+            /* Try to parse it as a year, for the benefit of the database.
+             */
+            id3->year = atoi(id3->year_string);
+
+            if (id3->year < 1900)
+            {
+                id3->year = 0;
+            }
+            
             break;
 
         case MP4_gnre:
