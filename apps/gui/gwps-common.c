@@ -280,7 +280,7 @@ bool ffwd_rew(int button)
                 break;
         }
         if (!exit)
-            button = get_action(CONTEXT_WPS,TIMEOUT_BLOCK);
+            button = get_action(CONTEXT_WPS|ALLOW_SOFTLOCK,TIMEOUT_BLOCK);
     }
     return usb;
 }
