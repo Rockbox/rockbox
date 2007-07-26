@@ -18,6 +18,7 @@
  ****************************************************************************/
 #include "plugin.h"
 #include "action.h"
+#include "playback_control.h"
 
 #if PLUGIN_BUFFER_SIZE > 0x45000
 #define MAX_CHARS    0x40000 /* 128 kiB */
@@ -465,27 +466,31 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 if (changed)
                 {
                     MENUITEM_STRINGLIST(menu, "Do What?", NULL, 
-                                        "Return", "Save Changes",
+                                        "Return",
+                                        "Show Playback Menu", "Save Changes",
                                         "Save As...", "Save and Exit",
                                         "Ignore Changes and Exit");
                     switch (rb->do_menu(&menu, NULL))
                     {
                         case 0:
                         break;
-                        case 1: //save to disk
+                        case 1:
+                            playback_control(rb);
+                        break;
+                        case 2: //save to disk
                             save_changes(1);
                             changed = 0;
                         break;
-                        case 2:
+                        case 3:
                             save_changes(0);
                             changed = 0;
                         break;
 
-                        case 3:
+                        case 4:
                             save_changes(1);
                             exit=1;
                         break;
-                        case 4:
+                        case 5:
                             exit=1;
                         break;
                     }

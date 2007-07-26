@@ -2491,8 +2491,13 @@ static void goto_menu(void)
                 break;
 
             case MAIN_MENU_SAVE:
+                if (!filename[0])
+                    rb->strcpy(filename,"/");
                 if( !rb->kbd_input( filename, MAX_PATH ) )
                 {
+                    if(rb->strlen(filename) <= 4 ||
+                    rb->strcasecmp(&filename[rb->strlen(filename)-4], ".bmp"))
+                        rb->strcat(filename, ".bmp");
                     save_bitmap( filename );
                     rb->splash( 1*HZ, "File saved (%s)", filename );
                 }
