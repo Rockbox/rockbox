@@ -2,6 +2,7 @@
     <qresource prefix="/docs" >
         <file>COPYING</file>
         <file>CREDITS</file>
+        <file>gpl-2.0.html</file>
     </qresource>
     <qresource prefix="/icons" >
         <file>icons/bootloader_btn.png</file>
