@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Riebeling
- *   $Id:$
+ *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -162,7 +162,6 @@ void Install::accept()
     getter->setProxy(proxy);
     getter->setFile(&downloadFile);
 
-
     getter->getFile(QUrl(file));
     connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
     connect(dp.buttonAbort, SIGNAL(clicked()), getter, SLOT(abort()));
@@ -232,19 +231,19 @@ void Install::downloadDone(bool error)
     }
 
     dp.listProgress->addItem(tr("creating installation log"));
+    
+       
     QStringList zipContents = uz.fileList();
-    QFile logfile(mountPoint + "/.rockbox/rbutil.log");
-    if(!logfile.open(QIODevice::ReadWrite | QIODevice::Text | QIODevice::Truncate))
-    {
-        dp.listProgress->addItem(tr("creating log failed!"));
-        logfile.close();
-        connect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(close()));
-        return;
-    }
-    QTextStream out(&logfile);
+       
+    QSettings installlog(mountPoint + "/.rockbox/rbutil.log", QSettings::IniFormat, 0); 
+
+    installlog.beginGroup("rockboxbase");
     for(int i = 0; i < zipContents.size(); i++)
-        out << zipContents.at(i) << endl;
-    logfile.close();
+    {
+        installlog.setValue(zipContents.at(i),installlog.value(zipContents.at(i),0).toInt()+1);
+    }
+    installlog.endGroup();
+   
 
     // remove temporary file
     downloadFile.remove();
