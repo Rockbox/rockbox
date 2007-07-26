@@ -35,7 +35,10 @@ A: Archos Recorder v2
 A: Archos Ondio FM
 A: Archos Ondio SP
 A: Iriver H100/H115
+
 A: Iriver H120/H140
+M: Miika Pekkarinen
+
 A: Iriver H320/H340
 
 A: Ipod Color/Photo
@@ -60,6 +63,8 @@ Core code (low-level)
 ---------------------
 
 A: Kernel
+M: Miika Pekkarinen
+
 A: LCD drivers
 A: Button drivers
 A: Rolo
@@ -108,6 +113,8 @@ A: Cuesheet support
 M: Nicolas Pennequin
 
 A: Database
+M: Miika Pekkarinen
+
 A: Playlists
 A: Radio UI
 A: Recording UI
@@ -335,6 +342,8 @@ Bootloaders
 -----------
 
 A: Iriver H1xx/H3xx
+M: Miika Pekkarinen
+
 A: Iaudio X5/M5
 A: PortalPlayer (not ipod)
 
