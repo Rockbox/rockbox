@@ -31,6 +31,7 @@
 #include "ipodpatcher.h"
 
 #ifdef WITH_BOOTOBJS
+#include "ipod1g2g.h"
 #include "ipod3g.h"
 #include "ipod4g.h"
 #include "ipodmini.h"
@@ -1134,6 +1135,16 @@ int list_images(struct ipod_t* ipod)
 int getmodel(struct ipod_t* ipod, int ipod_version)
 {
     switch (ipod_version) {
+        case 0x01:
+            ipod->modelstr="1st or 2nd Generation";
+            ipod->modelnum = 19;
+            ipod->modelname = "1g2g";
+            ipod->targetname = "ipod1g2g";
+#ifdef WITH_BOOTOBJS
+            ipod->bootloader = ipod1g2g;
+            ipod->bootloader_len = LEN_ipod1g2g;
+#endif
+            break;
         case 0x02:
             ipod->modelstr="3rd Generation";
             ipod->modelnum = 7;
