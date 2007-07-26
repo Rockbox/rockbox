@@ -206,14 +206,15 @@ void maze_draw(struct maze* maze, struct screen* display){
                 display->drawline(x*wx, y*wy, x*wx, y*wy+wy);
         }
     }
-#if (LCD_DEPTH > 1) || (defined(LCD_REMOTE_DEPTH) && (LCD_REMOTE_DEPTH > 1))
-    unsigned color;
-    if(display->depth>1){
-        color=(display->depth>=16)?LCD_RGBPACK(127,127,127):1;
-        display->set_foreground(color);
-    }
-#endif
     if(maze->solved){
+#if LCD_DEPTH >= 16
+        if(display->depth>=16)
+            display->set_foreground(LCD_RGBPACK(127,127,127));
+#endif
+#if LCD_DEPTH >= 2
+        if(display->depth==2)
+            display->set_foreground(1);
+#endif
         for(y=0; y<MAZE_HEIGHT; y++){
             for(x=0; x<MAZE_WIDTH; x++){
                 cell = maze->maze[x][y];
@@ -223,13 +224,15 @@ void maze_draw(struct maze* maze, struct screen* display){
                                       point_width, point_height);
             }
         }
-    }
-#if (LCD_DEPTH > 1) || (defined(LCD_REMOTE_DEPTH) && (LCD_REMOTE_DEPTH > 1))
-    if(display->depth>1){
-        color=(display->depth>=16)?LCD_RGBPACK(0,0,0):0;
-        display->set_foreground(color);
-    }
+#if LCD_DEPTH >= 16
+        if(display->depth>=16)
+            display->set_foreground(LCD_RGBPACK(0,0,0));
 #endif
+#if LCD_DEPTH >= 2
+        if(display->depth==2)
+            display->set_foreground(0);
+#endif
+    }
 
     /* mark start and end */
     display->drawline(0, 0, wx, wy);
@@ -453,19 +456,16 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
     rb = api;
 
     rb->backlight_set_timeout(1);
+    
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
-    FOR_NB_SCREENS(i){
-        if(rb->screens[i]->depth>1){
-            rb->screens[i]->set_background(LCD_DEFAULT_BG);
-            if(rb->screens[i]->depth>=16)
-                rb->screens[i]->set_foreground( LCD_RGBPACK( 0, 0, 0));
-            else if(rb->screens[i]->depth==2)
-                rb->screens[i]->set_foreground(0);
-        }
-    }
+    rb->lcd_set_background(LCD_DEFAULT_BG);
+#if LCD_DEPTH >= 16
+    rb->lcd_set_foreground( LCD_RGBPACK( 0, 0, 0));
+#elif LCD_DEPTH == 2
+    rb->lcd_set_foreground(0);
 #endif
-
+#endif
     maze_init(&maze);
     maze_generate(&maze);
     FOR_NB_SCREENS(i)
