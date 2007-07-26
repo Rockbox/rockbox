@@ -58,12 +58,13 @@
 #define IAUDIO_X5M5_PAD     6
 #define IPOD_4G_PAD         7
 #define IPOD_3G_PAD         8
-#define IRIVER_IFP7XX_PAD   9
-#define GIGABEAT_PAD       10
-#define IRIVER_H10_PAD     11
-#define SANSA_E200_PAD     12
-#define ELIO_TPJ1022_PAD   13
-#define ARCHOS_AV300_PAD   14
+#define IPOD_1G2G_PAD       9
+#define IRIVER_IFP7XX_PAD  10
+#define GIGABEAT_PAD       11
+#define IRIVER_H10_PAD     12
+#define SANSA_E200_PAD     13
+#define ELIO_TPJ1022_PAD   14
+#define ARCHOS_AV300_PAD   15
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -184,6 +185,8 @@
 #include "config-ipodnano.h"
 #elif defined(IPOD_VIDEO)
 #include "config-ipodvideo.h"
+#elif defined(IPOD_1G2G)
+#include "config-ipod1g2g.h"
 #elif defined(IPOD_3G)
 #include "config-ipod3g.h"
 #elif defined(IPOD_4G)
@@ -357,7 +360,7 @@
 #define IRAM_LCDFRAMEBUFFER
 #endif
 
-/* Dual core support - not yet working on the 3G iPod */
+/* Dual core support - not yet working on the 1G/2G and 3G iPod */
 #if defined(CPU_PP) && CONFIG_CPU != PP5002
 #define NUM_CORES 2
 #define CURRENT_CORE current_core()

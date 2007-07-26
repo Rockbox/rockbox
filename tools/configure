@@ -521,6 +521,7 @@ cat <<EOF
   4) Ondio SP          14) H10 20Gb           24) 4G Grayscale
   5) Ondio FM          15) H10 5/6Gb          25) Mini 1G
   6) AV300                                    26) Mini 2G
+                                              27) 1G, 2G
 
  ==iAudio==            ==Toshiba==            ==SanDisk==
  30) X5/X5V/X5L        40) Gigabeat F         50) Sansa e200
@@ -815,18 +816,16 @@ EOF
     t_model="h100"
     ;;
 
-   30|x5)
-    target_id=12
-    archos="x5"
-    target="-DIAUDIO_X5"
-    memory=16 # always
-    coldfirecc
-    tool="$rootdir/tools/scramble -add=iax5"
+   13|ifp7xx)
+    target_id=19
+    archos="ifp7xx"
+    target="-DIRIVER_IFP7XX"
+    memory=1
+    arm7tdmicc short
+    tool="cp"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 7"
-    output="rockbox.iaudio"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
+    output="rockbox.wma"
     appextra="recorder:gui"
     archosrom=""
     flash=""
@@ -834,37 +833,62 @@ EOF
     swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset="$iaudiobitmaptools"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="coldfire"
-    t_manufacturer="iaudio"
-    t_model="x5"
+    toolset=$genericbitmaptools
+    t_cpu="arm"
+    t_manufacturer="pnx0101"
+    t_model="iriver-ifp7xx"
     ;;
 
-   31|m5)
-    target_id=28
-    archos="m5"
-    target="-DIAUDIO_M5"
-    memory=16 # always
-    coldfirecc
-    tool="$rootdir/tools/scramble -add=iam5"
+   14|h10)
+    target_id=22
+    archos="h10"
+    target="-DIRIVER_H10"
+    memory=32 # always
+    arm7tdmicc
+    tool="$rootdir/tools/scramble -mi4v3 -model=h10 -type=RBOS"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 2"
-    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 7"
-    output="rockbox.iaudio"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.mi4"
     appextra="recorder:gui"
     archosrom=""
     flash=""
     plugins="yes"
     swcodec="yes"
+    boottool="$rootdir/tools/scramble -mi4v3 -model=h10 -type=RBBL"
+    bootoutput="H10_20GC.mi4"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset="$iaudiobitmaptools"
+    toolset="$genericbitmaptools scramble"
     # architecture, manufacturer and model for the target-tree build
-    t_cpu="coldfire"
-    t_manufacturer="iaudio"
-    t_model="m5"
+    t_cpu="arm"
+    t_manufacturer="iriver"
+    t_model="h10"
+    ;;
+
+   15|h10_5gb)
+    target_id=24
+    archos="h10_5gb"
+    target="-DIRIVER_H10_5GB"
+    memory=32 # always
+    arm7tdmicc
+    tool="$rootdir/tools/scramble -mi4v2 -model=h105 -type=RBOS"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
+    output="rockbox.mi4"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins="yes"
+    swcodec="yes"
+    boottool="$rootdir/tools/scramble -mi4v2 -model=h105 -type=RBBL"
+    bootoutput="H10.mi4"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$genericbitmaptools scramble"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="iriver"
+    t_model="h10"
     ;;
 
    20|ipodcolor)
@@ -1016,53 +1040,6 @@ EOF
     t_model="mini"
     ;;
 
-   13|ifp7xx)
-    target_id=19
-    archos="ifp7xx"
-    target="-DIRIVER_IFP7XX"
-    memory=1
-    arm7tdmicc short
-    tool="cp"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
-    output="rockbox.wma"
-    appextra="recorder:gui"
-    archosrom=""
-    flash=""
-    plugins="yes"
-    swcodec="yes"
-    # toolset is the tools within the tools directory that we build for
-    # this particular target.
-    toolset=$genericbitmaptools
-    t_cpu="arm"
-    t_manufacturer="pnx0101"
-    t_model="iriver-ifp7xx"
-    ;;
-
-   40|gigabeatf)
-    target_id=20
-    archos="gigabeatf"
-    target="-DGIGABEAT_F"
-    memory=32 # always
-    arm9tdmicc
-    tool="$rootdir/tools/scramble -add=giga"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    output="rockbox.gigabeat"
-    appextra="recorder:gui"
-    archosrom=""
-    flash=""
-    plugins="yes"
-    swcodec="yes"
-    toolset=$gigabeatbitmaptools
-    boottool="$rootdir/tools/scramble -gigabeat"
-    bootoutput="FWIMG01.DAT"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="arm"
-    t_manufacturer="s3c2440"
-    t_model="gigabeat-fx"
-    ;;
-
    26|ipodmini2g)
     target_id=21
     archos="ipodmini2g"
@@ -1088,56 +1065,105 @@ EOF
     t_model="mini2g"
     ;;
 
-   14|h10)
-    target_id=22
-    archos="h10"
-    target="-DIRIVER_H10"
+   27|ipod1g2g)
+    target_id=29
+    archos="ipod1g2g"
+    target="-DIPOD_1G2G"
     memory=32 # always
     arm7tdmicc
-    tool="$rootdir/tools/scramble -mi4v3 -model=h10 -type=RBOS"
+    tool="$rootdir/tools/scramble -add=1g2g"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    output="rockbox.mi4"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 6"
+    output="rockbox.ipod"
     appextra="recorder:gui"
     archosrom=""
     flash=""
     plugins="yes"
     swcodec="yes"
-    boottool="$rootdir/tools/scramble -mi4v3 -model=h10 -type=RBBL"
-    bootoutput="H10_20GC.mi4"
+    bootoutput="bootloader-$archos.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset="$genericbitmaptools scramble"
+    toolset=$ipodbitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
-    t_manufacturer="iriver"
-    t_model="h10"
+    t_manufacturer="ipod"
+    t_model="1g2g"
     ;;
 
-   15|h10_5gb)
-    target_id=24
-    archos="h10_5gb"
-    target="-DIRIVER_H10_5GB"
-    memory=32 # always
-    arm7tdmicc
-    tool="$rootdir/tools/scramble -mi4v2 -model=h105 -type=RBOS"
+   30|x5)
+    target_id=12
+    archos="x5"
+    target="-DIAUDIO_X5"
+    memory=16 # always
+    coldfirecc
+    tool="$rootdir/tools/scramble -add=iax5"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
-    output="rockbox.mi4"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 7"
+    output="rockbox.iaudio"
     appextra="recorder:gui"
     archosrom=""
     flash=""
     plugins="yes"
     swcodec="yes"
-    boottool="$rootdir/tools/scramble -mi4v2 -model=h105 -type=RBBL"
-    bootoutput="H10.mi4"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset="$genericbitmaptools scramble"
+    toolset="$iaudiobitmaptools"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="coldfire"
+    t_manufacturer="iaudio"
+    t_model="x5"
+    ;;
+
+   31|m5)
+    target_id=28
+    archos="m5"
+    target="-DIAUDIO_M5"
+    memory=16 # always
+    coldfirecc
+    tool="$rootdir/tools/scramble -add=iam5"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 2"
+    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 7"
+    output="rockbox.iaudio"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins="yes"
+    swcodec="yes"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$iaudiobitmaptools"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="coldfire"
+    t_manufacturer="iaudio"
+    t_model="m5"
+    ;;
+
+   40|gigabeatf)
+    target_id=20
+    archos="gigabeatf"
+    target="-DGIGABEAT_F"
+    memory=32 # always
+    arm9tdmicc
+    tool="$rootdir/tools/scramble -add=giga"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.gigabeat"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins="yes"
+    swcodec="yes"
+    toolset=$gigabeatbitmaptools
+    boottool="$rootdir/tools/scramble -gigabeat"
+    bootoutput="FWIMG01.DAT"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
-    t_manufacturer="iriver"
-    t_model="h10"
+    t_manufacturer="s3c2440"
+    t_model="gigabeat-fx"
     ;;
 
    50|e200)

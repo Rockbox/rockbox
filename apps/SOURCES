@@ -129,7 +129,8 @@ tagcache.c
     || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 keymaps/keymap-h1x0_h3x0.c
 #elif ((CONFIG_KEYPAD == IPOD_4G_PAD) \
-    || (CONFIG_KEYPAD == IPOD_3G_PAD))
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_1G2G_PAD))
 keymaps/keymap-ipod.c
 #elif CONFIG_KEYPAD == RECORDER_PAD
 keymaps/keymap-recorder.c
