@@ -84,6 +84,7 @@ A: Fonts and Unicode
 A: Replaygain
 A: Profiling
 A: Screens API and GUI widgets
+M: Kévin Ferrare
 A: Settings API
 A: Language API
 A: Menu API
@@ -149,12 +150,14 @@ A: clock
 A: credits
 A: cube
 A: demystify
+M: Kévin Ferrare
 A: dice
 A: dict
 A: disktidy
 A: doom
 A: euroconverter
 A: fire
+M: Kévin Ferrare
 A: fireworks
 A: firmware_flash
 A: flipit
@@ -205,6 +208,7 @@ A: spacerocks
 A: splitedit
 A: star
 A: starfield
+M: Kévin Ferrare
 A: stats
 A: stopwatch
 
@@ -332,5 +336,5 @@ Web site stuff
 
 A: web site scripts and server-side admin
 M: Daniel Stenberg
-M: Bj�rn Stenberg
+M: Bj�rn Stenberg
 M: Linus Nielsen Feltzing

@@ -92,232 +92,266 @@ const struct button_mapping *plugin_contexts[]
 #define MAZE_HEIGHT 24
 #endif
 
-unsigned short maze[MAZE_WIDTH][MAZE_HEIGHT];
-unsigned short solved_maze[MAZE_WIDTH][MAZE_HEIGHT];
+struct coord_stack{
+    int data[MAZE_WIDTH*MAZE_HEIGHT];
+    int stp;
+};
 
-int stack[MAZE_WIDTH*MAZE_HEIGHT];
-int solved = false;
-char buf[30];
+void coord_stack_init(struct coord_stack* stack){
+    stack->stp=0;
+}
 
-int sy = 0;
-int sx = 0;
+void coord_stack_push(struct coord_stack* stack, int x, int y){
+    stack->data[stack->stp] = ((x<<8)|y);
+    stack->stp++;
+}
 
+void coord_stack_get(struct coord_stack* stack, int index, int* x, int* y){
+    *y = stack->data[index];
+    *y &= 0xff;
+    *x = (stack->data[index])>>8;
+}
 
-void init_maze(void){
+void coord_stack_pop(struct coord_stack* stack, int* x, int* y){
+    stack->stp--;
+    coord_stack_get(stack, stack->stp, x, y);
+}
+
+int coord_stack_count(struct coord_stack* stack){
+    return(stack->stp);
+}
+
+struct maze{
+    unsigned short maze[MAZE_WIDTH][MAZE_HEIGHT];
+    int solved;
+    int player_x;
+    int player_y;
+};
+
+void maze_init(struct maze* maze){
     int x, y;
-
-    rb->memset(maze, 0, sizeof(maze));
-    sx = 0;
-    sy = 0;
+    rb->memset(maze->maze, 0, sizeof(maze->maze));
+    maze->solved = false;
+    maze->player_x = 0;
+    maze->player_y = 0;
 
     for(y=0; y<MAZE_HEIGHT; y++){
         for(x=0; x<MAZE_WIDTH; x++){
 
             /* all walls are up */
-            maze[x][y] |= WALL_ALL | PATH;
+            maze->maze[x][y] |= WALL_ALL | PATH;
 
             /* setup borders */
             if(x == 0)
-                maze[x][y]|= BORDER_W;
+                maze->maze[x][y]|= BORDER_W;
             if(y == 0)
-                maze[x][y]|= BORDER_N;
+                maze->maze[x][y]|= BORDER_N;
             if(x == MAZE_WIDTH-1)
-                maze[x][y]|= BORDER_E;
+                maze->maze[x][y]|= BORDER_E;
             if(y == MAZE_HEIGHT-1)
-                maze[x][y]|= BORDER_S;
+                maze->maze[x][y]|= BORDER_S;
         }
     }
 }
 
-void show_maze(void){
+void maze_draw(struct maze* maze, struct screen* display){
     int x, y;
     int wx, wy;
+    int point_width, point_height, point_offset_x, point_offset_y;
     unsigned short cell;
 
-    wx = (int) LCD_WIDTH / MAZE_WIDTH;
-    wy = (int) LCD_HEIGHT / MAZE_HEIGHT;
+    wx = (int) display->width / MAZE_WIDTH;
+    wy = (int) display->height / MAZE_HEIGHT;
 
-    rb->lcd_clear_display();
+    if(wx>3){
+        point_width=wx-3;
+        point_offset_x=2;
+    }else{
+        point_width=1;
+        point_offset_x=1;
+    }
+
+    if(wy>3){
+        point_height=wy-3;
+        point_offset_y=2;
+    }else{
+        point_height=1;
+        point_offset_y=1;
+    }
+
+    display->clear_display();
 
     for(y=0; y<MAZE_HEIGHT; y++){
         for(x=0; x<MAZE_WIDTH; x++){
 
-            cell = maze[x][y];
+            cell = maze->maze[x][y];
 
             /* draw walls */
             if(cell & WALL_N)
-                rb->lcd_drawline(x*wx, y*wy, x*wx+wx, y*wy);
+                display->drawline(x*wx, y*wy, x*wx+wx, y*wy);
             if(cell & WALL_E)
-                rb->lcd_drawline(x*wx+wx, y*wy, x*wx+wx, y*wy+wy);
+                display->drawline(x*wx+wx, y*wy, x*wx+wx, y*wy+wy);
             if(cell & WALL_S)
-                rb->lcd_drawline(x*wx, y*wy+wy, x*wx+wx, y*wy+wy);
+                display->drawline(x*wx, y*wy+wy, x*wx+wx, y*wy+wy);
             if(cell & WALL_W)
-                rb->lcd_drawline(x*wx, y*wy, x*wx, y*wy+wy);
+                display->drawline(x*wx, y*wy, x*wx, y*wy+wy);
 
             if(cell & BORDER_N)
-                rb->lcd_drawline(x*wx, y*wy, x*wx+wx, y*wy);
+                display->drawline(x*wx, y*wy, x*wx+wx, y*wy);
             if(cell & BORDER_E)
-                rb->lcd_drawline(x*wx+wx, y*wy, x*wx+wx, y*wy+wy);
+                display->drawline(x*wx+wx, y*wy, x*wx+wx, y*wy+wy);
             if(cell & BORDER_S)
-                rb->lcd_drawline(x*wx, y*wy+wy, x*wx+wx, y*wy+wy);
+                display->drawline(x*wx, y*wy+wy, x*wx+wx, y*wy+wy);
             if(cell & BORDER_W)
-                rb->lcd_drawline(x*wx, y*wy, x*wx, y*wy+wy);
-
-            if(solved){
-                if(cell & PATH){
-#if LCD_DEPTH >= 16
-                    rb->lcd_set_foreground( LCD_RGBPACK( 127, 127, 127 ));
-#elif LCD_DEPTH == 2
-                    rb->lcd_set_foreground(1);
+                display->drawline(x*wx, y*wy, x*wx, y*wy+wy);
+        }
+    }
+#if (LCD_DEPTH > 1) || (defined(LCD_REMOTE_DEPTH) && (LCD_REMOTE_DEPTH > 1))
+    unsigned color;
+    if(display->depth>1){
+        color=(display->depth>=16)?LCD_RGBPACK(127,127,127):1;
+        display->set_foreground(color);
+    }
 #endif
-                    rb->lcd_fillrect(x*wx+2, y*wy+2, wx-3, wy-3);
-#if LCD_DEPTH >= 16
-                    rb->lcd_set_foreground( LCD_RGBPACK( 0, 0, 0));
-#elif LCD_DEPTH == 2
-                    rb->lcd_set_foreground(0);
-#endif
-                }
+    if(maze->solved){
+        for(y=0; y<MAZE_HEIGHT; y++){
+            for(x=0; x<MAZE_WIDTH; x++){
+                cell = maze->maze[x][y];
+                if(cell & PATH)
+                    display->fillrect(x*wx+point_offset_x,
+                                      y*wy+point_offset_y,
+                                      point_width, point_height);
             }
         }
     }
+#if (LCD_DEPTH > 1) || (defined(LCD_REMOTE_DEPTH) && (LCD_REMOTE_DEPTH > 1))
+    if(display->depth>1){
+        color=(display->depth>=16)?LCD_RGBPACK(0,0,0):0;
+        display->set_foreground(color);
+    }
+#endif
 
     /* mark start and end */
-    rb->lcd_drawline(0, 0, wx, wy);
-    rb->lcd_drawline(0, wy, wx, 0);
-    rb->lcd_drawline((MAZE_WIDTH-1)*wx,(MAZE_HEIGHT-1)*wy,
+    display->drawline(0, 0, wx, wy);
+    display->drawline(0, wy, wx, 0);
+    display->drawline((MAZE_WIDTH-1)*wx,(MAZE_HEIGHT-1)*wy,
                      (MAZE_WIDTH-1)*wx+wx, (MAZE_HEIGHT-1)*wy+wy);
-    rb->lcd_drawline((MAZE_WIDTH-1)*wx,(MAZE_HEIGHT-1)*wy+wy,
+    display->drawline((MAZE_WIDTH-1)*wx,(MAZE_HEIGHT-1)*wy+wy,
                      (MAZE_WIDTH-1)*wx+wx, (MAZE_HEIGHT-1)*wy);
 
 
     /* draw current position */
-    rb->lcd_fillrect(sx*wx+2, sy*wy+2, wx-3, wy-3);
+    display->fillrect(maze->player_x*wx+point_offset_x,
+                      maze->player_y*wy+point_offset_y,
+                      point_width, point_height);
 
-    rb->lcd_update();
+    display->update();
 }
 
 
-int random_neighbour_cell_with_walls(int *px, int *py, int *pnx, int *pny){
+int maze_pick_random_neighbour_cell_with_walls(struct maze* maze, 
+                                     int x, int y, int *pnx, int *pny){
 
     int ncount = 0;
-    int neighbours[4];
-    int found_cell;
+    struct coord_stack neighbours;
+    unsigned short current_cell=maze->maze[x][y];
 
-
+    coord_stack_init(&neighbours);
     /* look for neighbour cells with walls */
 
     /* north */
-    if(!(maze[*px][*py] & BORDER_N)){
-        if((maze[*px][*py-1] & WALL_ALL) == WALL_ALL){
-            /* save found cell coordinates */
-            neighbours[ncount]=(*px<<8)|((*py)-1);
-            ncount++;
+    if(!(current_cell & BORDER_N)){
+        if((maze->maze[x][y-1] & WALL_ALL) == WALL_ALL){
+            coord_stack_push(&neighbours, x, y-1);
         }
     }
 
     /* west */
-    if(!(maze[*px][*py] & BORDER_W)){
-        if((maze[*px-1][*py] & WALL_ALL) == WALL_ALL){
-            /* save found cell coordinates */
-            neighbours[ncount]=((*px-1)<<8)|(*py);
-            ncount++;
+    if(!(current_cell & BORDER_W)){
+        if((maze->maze[x-1][y] & WALL_ALL) == WALL_ALL){
+            coord_stack_push(&neighbours, x-1, y);
         }
     }
 
     /* east */
-    if(!(maze[*px][*py] & BORDER_E)){
-        if((maze[*px+1][*py] & WALL_ALL) == WALL_ALL){
-            /* save found cell coordinates */
-            neighbours[ncount]=((*px+1)<<8)|(*py);
-            ncount++;
+    if(!(current_cell & BORDER_E)){
+        if((maze->maze[x+1][y] & WALL_ALL) == WALL_ALL){
+            coord_stack_push(&neighbours, x+1, y);
         }
     }
 
     /* south */
-    if(!(maze[*px][*py] & BORDER_S)){
-        if((maze[*px][*py+1] & WALL_ALL) == WALL_ALL){
-            /* save found cell coordinates */
-            neighbours[ncount]=(*px<<8)|((*py)+1);
-            ncount++;
+    if(!(current_cell & BORDER_S)){
+        if((maze->maze[x][y+1] & WALL_ALL) == WALL_ALL){
+            coord_stack_push(&neighbours, x, y+1);
         }
     }
 
     /* randomly select neighbour cell with walls */
-    if(ncount!=0){
-        found_cell = neighbours[rb->rand()%ncount];
-        *pny = found_cell &0x000000ff;
-        *pnx = (unsigned int) found_cell >> 8;
-    }
+    ncount=coord_stack_count(&neighbours);
+    if(ncount!=0)
+        coord_stack_get(&neighbours, rb->rand()%ncount, pnx, pny);
     return ncount;
 }
 
-void remove_walls(int *px, int *py, int *pnx, int *pny){
-
+/* Removes the wall between the cell (x,y) and the cell (nx,ny) */
+void maze_remove_wall(struct maze* maze, int x, int y, int nx, int ny){
     /* where is our neighbour? */
 
     /* north or south */
-    if(*px==*pnx){
-        if(*py<*pny){
+    if(x==nx){
+        if(y<ny){
             /*south*/
-            maze[*px][*py] &= ~WALL_S;
-            maze[*pnx][*pny] &= ~WALL_N;
+            maze->maze[x][y] &= ~WALL_S;
+            maze->maze[nx][ny] &= ~WALL_N;
         } else {
             /*north*/
-            maze[*px][*py] &= ~WALL_N;
-            maze[*pnx][*pny] &= ~WALL_S;
+            maze->maze[x][y] &= ~WALL_N;
+            maze->maze[nx][ny] &= ~WALL_S;
         }
     } else {
         /* east or west */
-        if(*py==*pny){
-            if(*px<*pnx){
+        if(y==ny){
+            if(x<nx){
                 /* east */
-                maze[*px][*py] &= ~WALL_E;
-                maze[*pnx][*pny] &= ~WALL_W;
-
+                maze->maze[x][y] &= ~WALL_E;
+                maze->maze[nx][ny] &= ~WALL_W;
             } else {
                 /*west*/
-                maze[*px][*py] &= ~WALL_W;
-                maze[*pnx][*pny] &= ~WALL_E;
+                maze->maze[x][y] &= ~WALL_W;
+                maze->maze[nx][ny] &= ~WALL_E;
             }
         }
     }
 }
 
-
-void generate_maze(void){
-    int stp = 0;
+void maze_generate(struct maze* maze){
     int total_cells = MAZE_WIDTH * MAZE_HEIGHT;
     int visited_cells;
-    int neighbour_cell;
+    int available_neighbours;
     int x, y;
     int nx = 0;
     int ny = 0;
-    int *px, *py, *pnx, *pny;
+    struct coord_stack done_cells;
 
-    px = &x;
-    py = &y;
-    pnx = &nx;
-    pny = &ny;
+    coord_stack_init(&done_cells);
 
     x = rb->rand()%MAZE_WIDTH;
     y = rb->rand()%MAZE_HEIGHT;
 
     visited_cells = 1;
     while (visited_cells < total_cells){
-        neighbour_cell = random_neighbour_cell_with_walls(px, py, pnx, pny);
-        if(neighbour_cell == 0){
-
+        available_neighbours =
+            maze_pick_random_neighbour_cell_with_walls(maze, x, y, &nx, &ny);
+        if(available_neighbours == 0){
             /* pop from stack */
-            stp--;
-            *py = stack[stp];
-            *py &= 0xff;
-            *px = (stack[stp])>>8;
+            coord_stack_pop(&done_cells, &x, &y);
         } else {
-            remove_walls(px, py, pnx, pny);
+            maze_remove_wall(maze, x, y, nx, ny);
 
             /* save position on the stack */
-            stack[stp] = ((*px<<8)|*py);
-            stp++;
+            coord_stack_push(&done_cells, x, y);
+
             /* current cell = neighbour cell */
             x=nx;
             y=ny;
@@ -328,16 +362,17 @@ void generate_maze(void){
 }
 
 
-void solve_maze(void){
+void maze_solve(struct maze* maze){
     int x, y;
     unsigned short cell;
     unsigned short  w;
     int dead_ends = 1;
+    unsigned short solved_maze[MAZE_WIDTH][MAZE_HEIGHT];
 
-    /* dead end filler*/
+    maze->solved = ~(maze->solved);
 
     /* copy maze for solving */
-    rb->memcpy(solved_maze, maze, (MAZE_HEIGHT*MAZE_WIDTH*sizeof(maze[0][0])));
+    rb->memcpy(solved_maze, maze->maze, (MAZE_HEIGHT*MAZE_WIDTH*sizeof(maze->maze[0][0])));
 
 
     /* remove some  borders and walls on start and end point */
@@ -357,7 +392,7 @@ void solve_maze(void){
                    w == WALL_S ||
                    w == WALL_W){
                     /* found dead end, clear path bit and fill it up */
-                    maze[x][y] &= ~PATH;
+                    maze->maze[x][y] &= ~PATH;
                     solved_maze[x][y] |= WALL_ALL;
                     /* don't forget the neighbours */
                     if(!(cell & BORDER_N))
@@ -375,31 +410,66 @@ void solve_maze(void){
     }
 }
 
+void maze_move_player_down(struct maze* maze){
+    unsigned short cell=maze->maze[maze->player_x][maze->player_y];
+    if( !(cell & WALL_S) &&
+        !(cell & BORDER_S)){
+        maze->player_y++;
+    }
+}
+
+void maze_move_player_up(struct maze* maze){
+    unsigned short cell=maze->maze[maze->player_x][maze->player_y];
+    if( !(cell & WALL_N) &&
+        !(cell & BORDER_N)){
+        maze->player_y--;
+    }
+}
+
+void maze_move_player_left(struct maze* maze){
+    unsigned short cell=maze->maze[maze->player_x][maze->player_y];
+    if( !(cell & WALL_W) &&
+        !(cell & BORDER_W)){
+        maze->player_x--;
+    }
+}
+
+void maze_move_player_right(struct maze* maze){
+    unsigned short cell=maze->maze[maze->player_x][maze->player_y];
+    if( !(cell & WALL_E) &&
+        !(cell & BORDER_E)){
+        maze->player_x++;
+    }
+}
 /**********************************/
 /* this is the plugin entry point */
 /**********************************/
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
-{
+enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
     int button, lastbutton = BUTTON_NONE;
     int quit = 0;
-
+    int i;
+    struct maze maze;
     (void)parameter;
     rb = api;
 
     rb->backlight_set_timeout(1);
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
-    rb->lcd_set_background(LCD_DEFAULT_BG);
-#if LCD_DEPTH >= 16
-    rb->lcd_set_foreground( LCD_RGBPACK( 0, 0, 0));
-#elif LCD_DEPTH == 2
-    rb->lcd_set_foreground(0);
-#endif
+    FOR_NB_SCREENS(i){
+        if(rb->screens[i]->depth>1){
+            rb->screens[i]->set_background(LCD_DEFAULT_BG);
+            if(rb->screens[i]->depth>=16)
+                rb->screens[i]->set_foreground( LCD_RGBPACK( 0, 0, 0));
+            else if(rb->screens[i]->depth==2)
+                rb->screens[i]->set_foreground(0);
+        }
+    }
 #endif
 
-    init_maze();
-    generate_maze();
-    show_maze();
+    maze_init(&maze);
+    maze_generate(&maze);
+    FOR_NB_SCREENS(i)
+        maze_draw(&maze, rb->screens[i]);
 
     while(!quit) {
 #ifdef __PLUGINLIB_ACTIONS_H__
@@ -413,45 +483,40 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             if(lastbutton != MAZE_NEW_PRE)
                 break;
 #endif
-            solved = false;
-            init_maze();
-            generate_maze();
-            show_maze();
+            maze_init(&maze);
+            maze_generate(&maze);
+            FOR_NB_SCREENS(i)
+                maze_draw(&maze, rb->screens[i]);
             break;
         case MAZE_SOLVE:
-            solved = ~solved;
-            solve_maze();
-            show_maze();
+            maze_solve(&maze);
+            FOR_NB_SCREENS(i)
+                maze_draw(&maze, rb->screens[i]);
             break;
         case MAZE_RIGHT:
         case MAZE_RRIGHT:
-            if( !(maze[sx][sy] & WALL_E) && !(maze[sx][sy] & BORDER_E)){
-                sx++;
-                show_maze();
-            }
+            maze_move_player_right(&maze);
+            FOR_NB_SCREENS(i)
+                maze_draw(&maze, rb->screens[i]);
             break;
         case MAZE_LEFT:
         case MAZE_RLEFT:
-            if( !(maze[sx][sy] & WALL_W) && !(maze[sx][sy] & BORDER_W)){
-                sx--;
-                show_maze();
-            }
+            maze_move_player_left(&maze);
+            FOR_NB_SCREENS(i)
+                maze_draw(&maze, rb->screens[i]);
             break;
         case MAZE_UP:
         case MAZE_RUP:
-            if( !(maze[sx][sy] & WALL_N) && !(maze[sx][sy] & BORDER_N)){
-                sy--;
-                show_maze();
-            }
+            maze_move_player_up(&maze);
+            FOR_NB_SCREENS(i)
+                maze_draw(&maze, rb->screens[i]);
             break;
         case MAZE_DOWN:
         case MAZE_RDOWN:
-            if( !(maze[sx][sy] & WALL_S) && !(maze[sx][sy] & BORDER_S)){
-                sy++;
-                show_maze();
-            }
+            maze_move_player_down(&maze);
+            FOR_NB_SCREENS(i)
+                maze_draw(&maze, rb->screens[i]);
             break;
-
         case MAZE_QUIT:
             /* quit plugin */
             quit=true;
