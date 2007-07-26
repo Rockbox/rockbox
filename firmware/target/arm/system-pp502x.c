@@ -18,6 +18,7 @@
  ****************************************************************************/
 #include "system.h"
 #include "thread.h"
+#include "i2s.h"
 
 #if NUM_CORES > 1
 struct mutex boostctrl_mtx NOCACHEBSS_ATTR;
@@ -165,6 +166,10 @@ void set_cpu_frequency(long frequency)
         postmult = CPUFREQ_DEFAULT_MULT;
     cpu_frequency = frequency;
 
+#ifdef SANSA_E200
+    i2s_scale_attn_level(CPUFREQ_DEFAULT);
+#endif
+
     unknown2 = inl(0x600060a0);
 
     outl(inl(0x70000020) | (1<<30), 0x70000020);   /* Enable PLL power */
@@ -196,6 +201,10 @@ void set_cpu_frequency(long frequency)
 
     inl(0x600060a0); /* sync pipeline (?) */
     outl(unknown2, 0x600060a0);
+
+#ifdef SANSA_E200
+    i2s_scale_attn_level(frequency);
+#endif
 
 # if NUM_CORES > 1
     boostctrl_mtx.locked = 0;

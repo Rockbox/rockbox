@@ -378,7 +378,7 @@ void fiq_record(void)
     if (audio_channels == 2) {
         /* RX is stereo */
         while (p_size > 0) {
-            if (FIFO_FREE_COUNT < 8) {
+            if (FIFO_FREE_COUNT < 2) {
                 /* enable interrupt */
                 IISCONFIG |= (1 << 0);
                 goto fiq_record_exit;
@@ -402,7 +402,7 @@ void fiq_record(void)
     else {
         /* RX is left channel mono */
         while (p_size > 0) {
-            if (FIFO_FREE_COUNT < 8) {
+            if (FIFO_FREE_COUNT < 2) {
                 /* enable interrupt */
                 IISCONFIG |= (1 << 0);
                 goto fiq_record_exit;
