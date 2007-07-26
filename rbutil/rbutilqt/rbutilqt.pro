@@ -4,7 +4,8 @@ SOURCES += rbutilqt.cpp \
  httpget.cpp \
  configure.cpp \
  zip/zip.cpp \
- zip/unzip.cpp 
+ zip/unzip.cpp \
+ installrb.cpp
  
 HEADERS += rbutilqt.h \
  settings.h \
@@ -16,7 +17,8 @@ HEADERS += rbutilqt.h \
  zip/zipentry_p.h \
  zip/unzip_p.h \
  zip/zip_p.h \
- version.h 
+ version.h \
+ installrb.h
 
 TEMPLATE = app
 CONFIG += release \

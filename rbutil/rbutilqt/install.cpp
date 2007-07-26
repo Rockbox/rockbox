@@ -20,12 +20,7 @@
 #include "install.h"
 #include "ui_installfrm.h"
 #include "ui_installprogressfrm.h"
-#include "httpget.h"
-#include "zip/zip.h"
-#include "zip/unzip.h"
 
-#include <QtGui>
-#include <QtNetwork>
 
 Install::Install(QWidget *parent) : QDialog(parent)
 {
@@ -150,108 +145,27 @@ void Install::accept()
     }
     userSettings->sync();
 
-    dp.listProgress->addItem(tr("Downloading file %1.%2")
-            .arg(QFileInfo(file).baseName(), QFileInfo(file).completeSuffix()));
-
-    // temporary file needs to be opened to get the filename
-    downloadFile.open();
-    fileName = downloadFile.fileName();
-    downloadFile.close();
-    // get the real file.
-    getter = new HttpGet(this);
-    getter->setProxy(proxy);
-    getter->setFile(&downloadFile);
-
-    getter->getFile(QUrl(file));
-    connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
-    connect(dp.buttonAbort, SIGNAL(clicked()), getter, SLOT(abort()));
-    connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
-    connect(getter, SIGNAL(downloadDone(int, bool)), this, SLOT(downloadRequestFinished(int, bool)));
-
+    installer = new RBInstaller(this);
+    installer->install(file,fileName,mountPoint,proxy, &dp);
+    
+    connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));    
+    
     downloadProgress->show();
 }
 
-void Install::downloadRequestFinished(int id, bool error)
+
+void Install::done(bool error)
 {
-    qDebug() << "Install::downloadRequestFinished" << id << error;
-    qDebug() << "error:" << getter->errorString();
+    qDebug() << "Install::done, error:" << error;
 
-    downloadDone(error);
-
-}
-
-void Install::downloadDone(bool error)
-{
-    qDebug() << "Install::downloadDone, error:" << error;
-
-    // update progress bar
-    int max = dp.progressBar->maximum();
-    if(max == 0) {
-        max = 100;
-        dp.progressBar->setMaximum(max);
-    }
-    dp.progressBar->setValue(max);
-    if(getter->httpResponse() != 200) {
-        dp.listProgress->addItem(tr("Download error: received HTTP error %1.").arg(getter->httpResponse()));
-        dp.buttonAbort->setText(tr("&Ok"));
-        connect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(close()));
-        return;
-    }
-    if(error) {
-        dp.listProgress->addItem(tr("Download error: %1").arg(getter->errorString()));
-        dp.buttonAbort->setText(tr("&Ok"));
-        connect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(close()));
-        return;
-    }
-    else dp.listProgress->addItem(tr("Download finished."));
-
-    // unzip downloaded file
-    qDebug() << "about to unzip the downloaded file" << fileName << "to" << mountPoint;
-
-    dp.listProgress->addItem(tr("Extracting file."));
-
-    qDebug() << "file to unzip: " << fileName;
-    UnZip::ErrorCode ec;
-    UnZip uz;
-    ec = uz.openArchive(fileName);
-    if(ec != UnZip::Ok) {
-        dp.listProgress->addItem(tr("Opening archive failed: %1.")
-            .arg(uz.formatError(ec)));
-        dp.buttonAbort->setText(tr("&Ok"));
-        connect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(close()));
-        return;
-    }
-    ec = uz.extractAll(mountPoint);
-    if(ec != UnZip::Ok) {
-        dp.listProgress->addItem(tr("Extracting failed: %1.")
-            .arg(uz.formatError(ec)));
-        dp.buttonAbort->setText(tr("&Ok"));
-        connect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(close()));
-        return;
-    }
-
-    dp.listProgress->addItem(tr("creating installation log"));
-    
-       
-    QStringList zipContents = uz.fileList();
-       
-    QSettings installlog(mountPoint + "/.rockbox/rbutil.log", QSettings::IniFormat, 0); 
-
-    installlog.beginGroup("rockboxbase");
-    for(int i = 0; i < zipContents.size(); i++)
+    if(error)
     {
-        installlog.setValue(zipContents.at(i),installlog.value(zipContents.at(i),0).toInt()+1);
+        connect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(close()));
+        return;
     }
-    installlog.endGroup();
-   
-
-    // remove temporary file
-    downloadFile.remove();
-
-    dp.listProgress->addItem(tr("Extraction finished successfully."));
-    dp.buttonAbort->setText(tr("&Ok"));
+      
     connect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(close()));
-
+    delete installer;
 }
 
 
@@ -314,14 +228,6 @@ void Install::setArchivedString(QString string)
         qDebug() << "no information about archived version available!";
     }
     qDebug() << "Install::setArchivedString" << archived;
-}
-
-
-void Install::updateDataReadProgress(int read, int total)
-{
-    dp.progressBar->setMaximum(total);
-    dp.progressBar->setValue(read);
-    qDebug() << "progress:" << read << "/" << total;
 }
 
 void Install::setUserSettings(QSettings *user)

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Riebeling
- *   $Id:$
+ *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -21,13 +21,12 @@
 #define INSTALL_H
 
 #include <QtGui>
-#include <QtNetwork>
 
 #include <QSettings>
 
 #include "ui_installfrm.h"
 #include "ui_installprogressfrm.h"
-#include "httpget.h"
+#include "installrb.h"
 
 class Install : public QDialog
 {
@@ -55,12 +54,11 @@ class Install : public QDialog
         QDialog *downloadProgress;
         QHttp *download;
         QFile *target;
-        HttpGet *getter;
         QString file;
         QString fileName;
         QString mountPoint;
         QString archived;
-        QTemporaryFile downloadFile;
+        RBInstaller* installer;
 
     private slots:
         void setCached(bool);
@@ -68,9 +66,8 @@ class Install : public QDialog
         void setDetailsCurrent(bool);
         void setDetailsStable(bool);
         void setDetailsArchived(bool);
-        void updateDataReadProgress(int, int);
-        void downloadDone(bool);
-        void downloadRequestFinished(int, bool);
+        void done(bool);
+        
 };
 
 
