@@ -188,7 +188,10 @@ A: invadrox
 A: iriver_flash
 A: iriverify
 A: jackpot
+
 A: jewels
+M: Antoine Cellerier
+
 A: jpeg
 A: logo
 A: mandelbrot
@@ -197,7 +200,10 @@ A: mazezam
 A: metronome
 A: midi2wav
 A: midiplay
+
 A: minesweeper
+M: Antoine Cellerier
+
 A: mosaique
 A: mp3_encoder
 A: mpegplayer
@@ -215,18 +221,30 @@ A: random_folder_advance_config
 M: Jonathan Gordon
 
 A: reversi
+M: Antoine Cellerier
+
 A: rockblox
 A: rockbox_flash
 A: rockboy
+
 A: rocklife
+M: Antoine Cellerier
+
 A: rockpaint
+M: Antoine Cellerier
+
 A: search
 A: sliding_puzzle
 A: snake
 A: snake2
 A: snow
+
 A: sokoban
+M: Antoine Cellerier
+
 A: solitaire
+M: Antoine Cellerier
+
 A: sort
 A: spacerocks
 A: splitedit
@@ -261,7 +279,10 @@ A: wavplay
 A: wavrecord
 A: wavview
 A: wormlet
+
 A: xobox
+M: Antoine Cellerier
+
 A: zxbox
 
 
