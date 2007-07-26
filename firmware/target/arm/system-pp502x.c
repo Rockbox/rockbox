@@ -156,7 +156,7 @@ void set_cpu_frequency(long frequency)
     /* Using mutex or spinlock isn't safe here. */
     while (test_and_set(&boostctrl_mtx.locked, 1)) ;
 # endif
-    
+
     if (frequency == CPUFREQ_NORMAL)
         postmult = CPUFREQ_NORMAL_MULT;
     else if (frequency == CPUFREQ_MAX)
@@ -171,8 +171,8 @@ void set_cpu_frequency(long frequency)
 
     /* Set clock source #1 to 24MHz and select it */
     outl((inl(0x60006020) & 0x0ffffff0) | 0x10000002, 0x60006020);
-    
-    outl(unknown2 & 0x3fffffff, 0x600060a0);
+
+    outl(inl(0x600060a0) & ~0xc0000000, 0x600060a0);
 
     unknown1 = (138 * postmult + 255) >> 8;
     if (unknown1 > 15)
@@ -193,9 +193,10 @@ void set_cpu_frequency(long frequency)
 
     /* Select PLL as clock source? */
     outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);
-    
+
+    inl(0x600060a0); /* sync pipeline (?) */
     outl(unknown2, 0x600060a0);
-    
+
 # if NUM_CORES > 1
     boostctrl_mtx.locked = 0;
 # endif
