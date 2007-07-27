@@ -562,11 +562,8 @@ static bool dbg_hw_info(void)
 
     lcd_update();
 
-    while(1)
-    {
-        if (action_userabort(TIMEOUT_BLOCK))
-            return false;
-    }
+    while (!(action_userabort(TIMEOUT_BLOCK)));
+
 #elif CONFIG_CPU == MCF5249 || CONFIG_CPU == MCF5250
     char buf[32];
     unsigned manu, id; /* flash IDs */
@@ -624,11 +621,8 @@ static bool dbg_hw_info(void)
 
     lcd_update();
 
-    while(1)
-    {
-        if (action_userabort(TIMEOUT_BLOCK))
-            return false;
-    }
+    while (!(action_userabort(TIMEOUT_BLOCK)));
+
 #elif defined(CPU_PP502x)
     int line = 0;
     char buf[32];
@@ -663,11 +657,30 @@ static bool dbg_hw_info(void)
 
     lcd_update();
 
-    while(1)
-    {
-        if (action_userabort(TIMEOUT_BLOCK))
-            return false;
-    }
+    while (!(action_userabort(TIMEOUT_BLOCK)));
+
+#elif CONFIG_CPU == PP5002
+    int line = 0;
+    char buf[32];
+
+    lcd_setmargins(0, 0);
+    lcd_setfont(FONT_SYSFIXED);
+    lcd_clear_display();
+
+    lcd_puts(0, line++, "[Hardware info]");
+
+#ifdef IPOD_ARCH
+    snprintf(buf, sizeof(buf), "HW rev: 0x%08lx", IPOD_HW_REVISION);
+    lcd_puts(0, line++, buf);
+#endif
+
+    snprintf(buf, sizeof(buf), "Est. clock (kHz): %d", perfcheck());
+    lcd_puts(0, line++, buf);
+
+    lcd_update();
+
+    while (!(action_userabort(TIMEOUT_BLOCK)));
+
 #endif /* CONFIG_CPU */
     return false;
 }
@@ -1274,8 +1287,6 @@ bool dbg_ports(void)
         snprintf(buf, sizeof(buf), "TIMING1_CTL:  %08lx", TIMING1_CTL);
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "TIMING2_CTL:  %08lx", TIMING2_CTL);
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "Est. clock (kHz): %d", perfcheck());
         lcd_puts(0, line++, buf);
 
         lcd_update();
