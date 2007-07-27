@@ -25,7 +25,9 @@
 #include "ui_aboutbox.h"
 #include "configure.h"
 #include "install.h"
+#include "installbl.h"
 #include "httpget.h"
+#include "installbootloader.h"
 
 RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
 {
@@ -71,6 +73,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     connect(ui.action_Configure, SIGNAL(triggered()), this, SLOT(configDialog()));
     connect(ui.comboBoxDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(updateDevice(int)));
     connect(ui.buttonRockbox, SIGNAL(clicked()), this, SLOT(install()));
+    connect(ui.buttonBootloader, SIGNAL(clicked()), this, SLOT(installBl()));
 
     // disable unimplemented stuff
     ui.buttonThemes->setEnabled(false);
@@ -80,7 +83,9 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     ui.buttonGames->setEnabled(false);
     ui.buttonFonts->setEnabled(false);
     ui.buttonComplete->setEnabled(false);
+    ui.buttonDetect->setEnabled(false);
 
+    initIpodpatcher();    
     downloadInfo();
 
 }
@@ -229,3 +234,16 @@ void RbUtilQt::install()
 
     installWindow->show();
 }
+
+void RbUtilQt::installBl()
+{
+    InstallBl *installWindow = new InstallBl(this);
+    installWindow->setUserSettings(userSettings);
+    installWindow->setDeviceSettings(devices);
+    if(userSettings->value("defaults/proxytype") == "manual")
+        installWindow->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
+    installWindow->setMountPoint(userSettings->value("defaults/mountpoint").toString());
+
+    installWindow->show();
+}
+

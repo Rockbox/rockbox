@@ -6,8 +6,8 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- *   Copyright (C) 2007 by Dominik Riebeling
- *   $Id$
+ *   Copyright (C) 2007 by Dominik Wenger
+ *   $Id: installbl.h 14027 2007-07-27 17:42:49Z domonoky $
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -17,42 +17,50 @@
  *
  ****************************************************************************/
 
+#ifndef INSTALLBL_H
+#define INSTALLBL_H
 
-#ifndef QRBUTIL_H
-#define QRBUTIL_H
+#include <QtGui>
 
-#include "ui_rbutilqtfrm.h"
-#include "httpget.h"
 #include <QSettings>
-#include <QTemporaryFile>
 
-class RbUtilQt : public QMainWindow
+#include "ui_installbootloaderfrm.h"
+#include "ui_installprogressfrm.h"
+
+#include "installbootloader.h"
+
+class InstallBl : public QDialog
 {
     Q_OBJECT
-
     public:
-        RbUtilQt(QWidget *parent = 0);
+        InstallBl(QWidget *parent = 0);
+        void setProxy(QUrl);
+        void setMountPoint(QString);
+        void setUserSettings(QSettings*);
+        void setDeviceSettings(QSettings*);
+
+    public slots:
+        void accept(void);
 
     private:
-        Ui::RbUtilQtFrm ui;
+        Ui::InstallBootloaderFrm ui;
+        Ui::InstallProgressFrm dp;
+        QUrl proxy;
         QSettings *devices;
         QSettings *userSettings;
-        void initDeviceNames(void);
-        QString deviceName(QString);
-        QString platform;
-        HttpGet *daily;
-        QString absolutePath;
-        QTemporaryFile buildInfo;
+        QDialog *downloadProgress;
+        QHttp *download;
+        QFile *target;
+        QString file;
+        QString fileName;
+        QString mountPoint;
+        BootloaderInstaller* binstaller;
 
     private slots:
-        void about(void);
-        void configDialog(void);
-        void updateDevice(int);
-        void install(void);
-        void installBl(void);
-        void downloadDone(bool);
-        void downloadDone(int, bool);
-        void downloadInfo(void);
+        void browseFolder(void);
+        void done(bool);
+        
 };
+
 
 #endif

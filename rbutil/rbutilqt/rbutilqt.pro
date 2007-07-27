@@ -5,7 +5,11 @@ SOURCES += rbutilqt.cpp \
  configure.cpp \
  zip/zip.cpp \
  zip/unzip.cpp \
- installzip.cpp
+ installzip.cpp \
+ installbootloader.cpp \
+ installbl.cpp \
+ ../ipodpatcher/ipodpatcher.c 
+
  
 HEADERS += rbutilqt.h \
  settings.h \
@@ -18,8 +22,14 @@ HEADERS += rbutilqt.h \
  zip/unzip_p.h \
  zip/zip_p.h \
  version.h \
- installzip.h
-
+ installzip.h \
+ installbootloader.h \
+ installbl.h \
+ ../ipodpatcher/ipodpatcher.h \
+ ../ipodpatcher/ipodio.h \
+ ../ipodpatcher/parttypes.h
+ 
+ 
 TEMPLATE = app
 CONFIG += release \
           warn_on \
@@ -30,8 +40,17 @@ FORMS += rbutilqtfrm.ui \
  aboutbox.ui \
  installfrm.ui \
  installprogressfrm.ui \
- configurefrm.ui
+ configurefrm.ui \
+ installbootloaderfrm.ui
 RESOURCES += rbutilqt.qrc
 
 TRANSLATIONS += rbutil_de.ts
 QT += network
+
+win32{
+    SOURCES +=  ../ipodpatcher/ipodio-win32.c
+}
+
+!win32{
+    SOURCES +=  ../ipodpatcher/ipodio-posix.c
+}
