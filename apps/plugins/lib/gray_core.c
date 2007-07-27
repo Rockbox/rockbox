@@ -545,8 +545,14 @@ void gray_show(bool enable)
 #elif CONFIG_LCD == LCD_S1D15E06
         _gray_rb->timer_register(1, NULL, TIMER_FREQ / 70, 1, _timer_isr);
 #elif CONFIG_LCD == LCD_IPOD2BPP
+#ifdef IPOD_1G2G
+        _gray_rb->timer_register(1, NULL, TIMER_FREQ / 95, 1, _timer_isr); /* verified */
+#elif defined IPOD_3G
+        _gray_rb->timer_register(1, NULL, TIMER_FREQ / 87, 1, _timer_isr); /* verified */
+#else
         /* FIXME: verify value */
         _gray_rb->timer_register(1, NULL, TIMER_FREQ / 80, 1, _timer_isr);
+#endif
 #elif CONFIG_LCD == LCD_IPODMINI
         _gray_rb->timer_register(1, NULL, TIMER_FREQ / 88, 1, _timer_isr);
 #elif CONFIG_LCD == LCD_IFP7XX
