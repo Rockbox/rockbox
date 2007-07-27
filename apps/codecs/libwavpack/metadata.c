@@ -16,6 +16,7 @@
 
 int read_metadata_buff (WavpackContext *wpc, WavpackMetadata *wpmd)
 {
+    uint32_t bytes_to_read;
     uchar tchar;
 
     if (!wpc->infile (&wpmd->id, 1) || !wpc->infile (&tchar, 1))
@@ -42,18 +43,29 @@ int read_metadata_buff (WavpackContext *wpc, WavpackMetadata *wpmd)
         wpmd->byte_length--;
     }
 
-    if (wpmd->byte_length && wpmd->byte_length <= (int32_t)sizeof (wpc->read_buffer)) {
-        uint32_t bytes_to_read = wpmd->byte_length + (wpmd->byte_length & 1);
+    if (!wpmd->byte_length || wpmd->id == ID_WV_BITSTREAM) {
+        wpmd->data = NULL;
+        return TRUE;
+    }
 
-        if (wpc->infile (wpc->read_buffer, bytes_to_read) != (int32_t) bytes_to_read) {
-            wpmd->data = NULL;
-            return FALSE;
-        }
+    bytes_to_read = wpmd->byte_length + (wpmd->byte_length & 1);
 
-        wpmd->data = wpc->read_buffer;
+    if (bytes_to_read > sizeof (wpc->read_buffer)) {
+        wpmd->data = NULL;
+
+        while (bytes_to_read > sizeof (wpc->read_buffer))
+            if (wpc->infile (wpc->read_buffer, sizeof (wpc->read_buffer)) == sizeof (wpc->read_buffer))
+                bytes_to_read -= sizeof (wpc->read_buffer);
+            else
+                return FALSE;
     }
     else
+        wpmd->data = wpc->read_buffer;
+
+    if (bytes_to_read && wpc->infile (wpc->read_buffer, bytes_to_read) != (int32_t) bytes_to_read) {
         wpmd->data = NULL;
+        return FALSE;
+    }
 
     return TRUE;
 }
