@@ -165,9 +165,8 @@ static int key_pressed(void)
     if ((state & 0x8) == 0) return BUTTON_PLAY;
     if ((state & 0x2) == 0) return BUTTON_RIGHT;
 #endif
-#elif CONFIG_KEYPAD == IPOD_3G_PAD
-    state = inb(0xcf000030);
-    if (((state & 0x20) == 0)) return BUTTON_HOLD; /* hold on */
+#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_1G2G_PAD)
+    state = GPIOA_INPUT_VAL;
     if ((state & 0x08) == 0) return BUTTON_LEFT;
     if ((state & 0x10) == 0) return BUTTON_MENU;
     if ((state & 0x04) == 0) return BUTTON_PLAY;
@@ -176,10 +175,13 @@ static int key_pressed(void)
     return 0;
 }
 
-/* This function is the same on all ipods */
 bool button_hold(void)
 {
-    return (GPIOA_INPUT_VAL & 0x20)?false:true;
+#if CONFIG_KEYPAD == IPOD_1G2G_PAD
+    return (GPIOA_INPUT_VAL & 0x20);
+#else
+    return !(GPIOA_INPUT_VAL & 0x20);
+#endif
 }
 
 void fatal_error(void)
@@ -188,7 +190,11 @@ void fatal_error(void)
     bool holdstatus=false;
 
     /* System font is 6 pixels wide */
-#if LCD_WIDTH >= (30*6)
+#if defined(IPOD_1G2G) || defined(IPOD_3G)
+    printf("Hold MENU+PLAY to");
+    printf("reboot then REW+FF");
+    printf("for disk mode");
+#elif LCD_WIDTH >= (30*6)
     printf("Hold MENU+SELECT to reboot");
     printf("then SELECT+PLAY for disk mode");
 #else
