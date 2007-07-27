@@ -145,8 +145,13 @@ void Install::accept()
     }
     userSettings->sync();
 
-    installer = new RBInstaller(this);
-    installer->install(file,fileName,mountPoint,proxy, &dp);
+    installer = new ZipInstaller(this);
+    installer->setFilename(fileName);
+    installer->setUrl(file);
+    installer->setProxy(proxy);
+    installer->setLogSection("rockboxbase");
+    installer->setMountPoint(mountPoint);
+    installer->install(&dp);
     
     connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));    
     

@@ -26,7 +26,7 @@
 
 #include "ui_installfrm.h"
 #include "ui_installprogressfrm.h"
-#include "installrb.h"
+#include "installzip.h"
 
 class Install : public QDialog
 {
@@ -58,7 +58,7 @@ class Install : public QDialog
         QString fileName;
         QString mountPoint;
         QString archived;
-        RBInstaller* installer;
+        ZipInstaller* installer;
 
     private slots:
         void setCached(bool);

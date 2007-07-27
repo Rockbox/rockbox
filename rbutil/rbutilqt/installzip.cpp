@@ -6,8 +6,8 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- *   Copyright (C) 2007 by Dominik Riebeling
- *   $Id: installrb.cpp 13990 2007-07-25 22:26:10Z Dominik Wenger $
+ *   Copyright (C) 2007 by Dominik Wenger
+ *   $Id: installzip.cpp 13990 2007-07-25 22:26:10Z Dominik Wenger $
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -17,22 +17,19 @@
  *
  ****************************************************************************/
  
-#include "installrb.h"
+#include "installzip.h"
 
 #include "zip/zip.h"
 #include "zip/unzip.h"
 
-RBInstaller::RBInstaller(QObject* parent): QObject(parent) 
+ZipInstaller::ZipInstaller(QObject* parent): QObject(parent) 
 {
 
 }
 
 
-void RBInstaller::install(QString url,QString file,QString mountpoint, QUrl proxy,Ui::InstallProgressFrm* dp)
+void ZipInstaller::install(Ui::InstallProgressFrm* dp)
 {
-    m_url=url;
-    m_mountpoint = mountpoint;
-    m_file = file;
     m_dp = dp;
 
     m_dp->listProgress->addItem(tr("Downloading file %1.%2")
@@ -44,9 +41,9 @@ void RBInstaller::install(QString url,QString file,QString mountpoint, QUrl prox
     downloadFile.close();
     // get the real file.
     getter = new HttpGet(this);
-    getter->setProxy(proxy);
+    getter->setProxy(m_proxy);
     getter->setFile(&downloadFile);
-    getter->getFile(QUrl(url));
+    getter->getFile(QUrl(m_url));
 
     connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
     connect(getter, SIGNAL(downloadDone(int, bool)), this, SLOT(downloadRequestFinished(int, bool)));
@@ -54,7 +51,7 @@ void RBInstaller::install(QString url,QString file,QString mountpoint, QUrl prox
     
 }
 
-void RBInstaller::downloadRequestFinished(int id, bool error)
+void ZipInstaller::downloadRequestFinished(int id, bool error)
 {
     qDebug() << "Install::downloadRequestFinished" << id << error;
     qDebug() << "error:" << getter->errorString();
@@ -62,12 +59,13 @@ void RBInstaller::downloadRequestFinished(int id, bool error)
     downloadDone(error);
 }
 
-void RBInstaller::downloadDone(bool error)
+void ZipInstaller::downloadDone(bool error)
 {
     qDebug() << "Install::downloadDone, error:" << error;
 
     
      // update progress bar
+     
     int max = m_dp->progressBar->maximum();
     if(max == 0) {
         max = 100;
@@ -120,7 +118,7 @@ void RBInstaller::downloadDone(bool error)
        
     QSettings installlog(m_mountpoint + "/.rockbox/rbutil.log", QSettings::IniFormat, 0); 
 
-    installlog.beginGroup("rockboxbase");
+    installlog.beginGroup(m_logsection);
     for(int i = 0; i < zipContents.size(); i++)
     {
         installlog.setValue(zipContents.at(i),installlog.value(zipContents.at(i),0).toInt()+1);
@@ -136,7 +134,7 @@ void RBInstaller::downloadDone(bool error)
     emit done(false);
 }
 
-void RBInstaller::updateDataReadProgress(int read, int total)
+void ZipInstaller::updateDataReadProgress(int read, int total)
 {
     m_dp->progressBar->setMaximum(total);
     m_dp->progressBar->setValue(read);
