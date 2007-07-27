@@ -849,6 +849,9 @@ static char *get_token_value(struct gui_wps *gwps,
             return buf;
 
         case WPS_TOKEN_TRACK_ELAPSED_PERCENT:
+            if (id3->length <= 0)
+                return NULL;
+
             if (intval)
             {
                 *intval = limit * (id3->elapsed + state->ff_rewind_count)
