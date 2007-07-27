@@ -72,6 +72,7 @@ static inline bool timer_check(int clock_start, int usecs)
 /* The backlight makes the LCD appear negative on the 1st/2nd gen */
 static bool lcd_inverted = false;
 static bool lcd_backlit = false;
+static void invert_display(void);
 #endif
 
 /* needed for flip */
@@ -134,7 +135,11 @@ static void lcd_cmd_and_data(unsigned cmd, unsigned data)
 /* LCD init */
 void lcd_init_device(void)
 {
+#ifdef HAVE_BACKLIGHT_INVERSION
+    invert_display();
+#else
     lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0009);
+#endif
     lcd_set_flip(false);
     lcd_cmd_and_data(R_ENTRY_MODE, 0x0000);
 
@@ -153,7 +158,7 @@ void lcd_init_device(void)
 int lcd_default_contrast(void)
 {
 #ifdef IPOD_1G2G
-    return 28;
+    return 30;
 #elif defined(IPOD_MINI) || defined(IPOD_MINI2G) || defined(IPOD_3G)
     return 42;
 #else
