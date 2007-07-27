@@ -47,7 +47,8 @@ enum {
    WRITE_FIRMWARE,
    READ_PARTITION,
    WRITE_PARTITION,
-   FORMAT_PARTITION
+   FORMAT_PARTITION,
+   CONVERT_TO_FAT32
 };
 
 void print_macpod_warning(void)
@@ -87,6 +88,7 @@ void print_usage(void)
     fprintf(stderr,"  -ab,  --add-bootloader-bin filename.bin\n");
     fprintf(stderr,"  -d,   --delete-bootloader\n");
     fprintf(stderr,"  -f,   --format\n");
+    fprintf(stderr,"  -c,   --convert\n");
     fprintf(stderr,"\n");
 
 #ifdef __WIN32__
@@ -118,11 +120,11 @@ void display_partinfo(struct ipod_t* ipod)
         if (ipod->pinfo[i].start != 0) {
             printf("[INFO]    %d      %10ld    %10ld  %10.1f   %s (0x%02x)\n",
                    i,
-                   ipod->pinfo[i].start,
-                   ipod->pinfo[i].start+ipod->pinfo[i].size-1,
+                   (long int)ipod->pinfo[i].start,
+                   (long int)ipod->pinfo[i].start+ipod->pinfo[i].size-1,
                    ipod->pinfo[i].size/sectors_per_MB,
                    get_parttype(ipod->pinfo[i].type),
-                   ipod->pinfo[i].type);
+                   (int)ipod->pinfo[i].type);
         }
     }
 }
@@ -297,6 +299,10 @@ int main(int argc, char* argv[])
                    (strcmp(argv[i],"--format")==0)) {
             action = FORMAT_PARTITION;
             i++;
+        } else if ((strcmp(argv[i],"-c")==0) || 
+                   (strcmp(argv[i],"--convert")==0)) {
+            action = CONVERT_TO_FAT32;
+            i++;
         } else {
             print_usage(); return 1;
         }
@@ -470,8 +476,9 @@ int main(int argc, char* argv[])
 
         close(infile);
     } else if (action==FORMAT_PARTITION) {
-        printf("WARNING!!! YOU ARE ABOUT TO USE AN EXPERIMENTAL FORMATTING FEATURE.\n");
-        printf("Are you sure you want to continue? (y/n):");
+        printf("WARNING!!! YOU ARE ABOUT TO USE AN EXPERIMENTAL FEATURE.\n");
+        printf("ALL DATA ON YOUR IPOD WILL BE ERASED.\n");
+        printf("Are you sure you want to format your ipod? (y/n):");
         
         if (fgets(yesno,4,stdin)) {
             if (yesno[0]=='y') {
@@ -484,6 +491,32 @@ int main(int argc, char* argv[])
                 }
             } else {
                 fprintf(stderr,"[INFO] Format cancelled.\n");
+            }
+        }
+    } else if (action==CONVERT_TO_FAT32) {
+        if (!ipod.macpod) {
+            printf("[ERR]  Ipod is already FAT32, aborting\n");
+        } else {
+            printf("WARNING!!! YOU ARE ABOUT TO USE AN EXPERIMENTAL FEATURE.\n");
+            printf("ALL DATA ON YOUR IPOD WILL BE ERASED.\n");
+            printf("Are you sure you want to convert your ipod to FAT32? (y/n):");
+        
+            if (fgets(yesno,4,stdin)) {
+                if (yesno[0]=='y') {
+                    if (ipod_reopen_rw(&ipod) < 0) {
+                        return 5;
+                    }
+
+                    if (write_dos_partition_table(&ipod) < 0) {
+                        fprintf(stderr,"[ERR]  Partition conversion failed.\n");
+                    }
+
+                    if (format_partition(&ipod,1) < 0) {
+                        fprintf(stderr,"[ERR]  Format failed.\n");
+                    }
+                } else {
+                    fprintf(stderr,"[INFO] Format cancelled.\n");
+                }
             }
         }
     }

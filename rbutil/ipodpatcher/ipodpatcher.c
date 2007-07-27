@@ -171,6 +171,8 @@ int read_partinfo(struct ipod_t* ipod, int silent)
         return -1;
     }
 
+    memset(ipod->pinfo, 0, sizeof(ipod->pinfo));
+
     if ((sectorbuf[510] == 0x55) && (sectorbuf[511] == 0xaa)) {
         /* DOS partition table */
         ipod->macpod = 0;
@@ -1288,4 +1290,61 @@ int ipod_scan(struct ipod_t* ipod)
         strcpy(ipod->diskname,last_ipod);
     }
     return n;
+}
+
+static void put_int32le(uint32_t x, unsigned char* p)
+{
+    p[0] = x & 0xff;
+    p[1] = (x >> 8) & 0xff;
+    p[2] = (x >> 16) & 0xff;
+    p[3] = (x >> 24) & 0xff;
+}
+
+int write_dos_partition_table(struct ipod_t* ipod)
+{
+    unsigned char* p;
+    int i, n;
+    uint32_t type;
+
+    /* Only support 512-byte sectors at the moment */
+    if ( ipod->sector_size != 512 )
+    {
+        fprintf(stderr,"[ERR]  Only ipods with 512 bytes per sector are supported.\n");
+        return -1;
+    }
+
+    /* Firstly zero the entire MBR */
+    memset(sectorbuf, 0, ipod->sector_size);
+
+    /* Now add the partition info */
+    for (i=0; i < 4 ; i++) 
+    {
+        p = sectorbuf + 0x1be + i*16;
+
+        /* Ensure first partition is type 0, and second is 0xb */
+        if (i==0) { type = 0; }
+        else if (i==1) { type = 0xb; }
+        else { type = ipod->pinfo[i].type; }
+
+        put_int32le(type, p + 4);
+        put_int32le(ipod->pinfo[i].start, p + 8);
+        put_int32le(ipod->pinfo[i].size, p + 12);
+    }
+
+    /* Finally add the magic */
+    sectorbuf[0x1fe] = 0x55;
+    sectorbuf[0x1ff] = 0xaa;
+
+    if (ipod_seek(ipod, 0) < 0) {
+        fprintf(stderr,"[ERR]  Seek failed writing MBR\n");
+        return -1;
+    }
+
+    /* Write MBR */
+    if ((n = ipod_write(ipod, sectorbuf, ipod->sector_size)) < 0) {
+        perror("[ERR]  Write failed\n");
+        return -1;
+    }
+
+    return 0;
 }

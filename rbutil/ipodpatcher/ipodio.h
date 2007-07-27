@@ -53,9 +53,9 @@ struct ipod_directory_t {
 };
 
 struct partinfo_t {
-  unsigned long start; /* first sector (LBA) */
-  unsigned long size;  /* number of sectors */
-  int type;
+  uint32_t start; /* first sector (LBA) */
+  uint32_t size;  /* number of sectors */
+  uint32_t type;
 };
 
 struct ipod_t {
