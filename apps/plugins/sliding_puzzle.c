@@ -55,7 +55,8 @@ PLUGIN_HEADER
 #define PUZZLE_RC_QUIT BUTTON_RC_STOP
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD)
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define PUZZLE_QUIT    (BUTTON_SELECT | BUTTON_MENU)
 #define PUZZLE_UP      BUTTON_MENU
 #define PUZZLE_DOWN    BUTTON_PLAY
@@ -400,7 +401,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_putsxy(0, 28, "[MODE..] shuffle");
     rb->lcd_putsxy(0, 38, "[MODE] change pic");
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD)
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
     rb->lcd_putsxy(0, 18, "[S-MENU] to stop");
     rb->lcd_putsxy(0, 28, "[S-LEFT] shuffle");
     rb->lcd_putsxy(0, 38, "[S-RIGHT] change pic");

@@ -36,6 +36,7 @@ static struct adc_struct adcdata[NUM_ADC_CHANNELS] IDATA_ATTR;
 
 static unsigned short _adc_read(struct adc_struct *adc)
 {
+#ifndef IPOD_1G2G
     if (adc->timeout < current_tick) {
         unsigned char data[2];
         unsigned short value;
@@ -54,7 +55,9 @@ static unsigned short _adc_read(struct adc_struct *adc)
         }
         adc->data = value;
         return value;
-    } else {
+    } else 
+#endif
+    {
         return adc->data;
     }
 }

@@ -74,7 +74,8 @@ enum minesweeper_status {
 #   define MINESWP_RC_QUIT  BUTTON_RC_STOP
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD)
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #   define MINESWP_SCROLLWHEEL
 #   define MINESWP_UP         BUTTON_MENU
 #   define MINESWP_DOWN       BUTTON_PLAY

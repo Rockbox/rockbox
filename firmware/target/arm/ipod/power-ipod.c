@@ -30,7 +30,9 @@
 
 void power_init(void)
 {
+#ifndef IPOD_1G2G
     pcf50605_init();
+#endif
 }
 
 bool charger_inserted(void)
@@ -74,7 +76,12 @@ void power_off(void)
 #endif
 
 #ifndef BOOTLOADER
+#ifdef IPOD_1G2G
+    /* we cannot turn off the 1st gen/ 2nd gen yet. Need to figure out sleep mode. */
+    system_reboot();
+#else
     /* We don't turn off the ipod, we put it in a deep sleep */
     pcf50605_standby_mode();
+#endif
 #endif
 }

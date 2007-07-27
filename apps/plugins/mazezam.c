@@ -77,7 +77,8 @@ MEM_FUNCTION_WRAPPERS(rb);
 #define MAZEZAM_QUIT_KEYNAME        "[POWER]"
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD)
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define MAZEZAM_UP                  BUTTON_MENU
 #define MAZEZAM_DOWN                BUTTON_PLAY
 #define MAZEZAM_LEFT                BUTTON_LEFT

@@ -42,8 +42,9 @@ struct file_format *list = NULL;
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) \
    || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) \
-   || (CONFIG_KEYPAD == IPOD_3G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
 

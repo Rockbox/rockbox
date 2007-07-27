@@ -148,7 +148,8 @@ extern const fb_data sokoban_tiles[];
 #define SOKOBAN_RC_MENU BUTTON_RC_STOP
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD)
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define SOKOBAN_UP BUTTON_MENU
 #define SOKOBAN_DOWN BUTTON_PLAY
 #define SOKOBAN_MENU (BUTTON_SELECT | BUTTON_MENU)
@@ -1147,7 +1148,8 @@ static int sokoban_menu(void)
                 rb->lcd_putsxy(3, 46, "[PLAY] Restart Level");
                 rb->lcd_putsxy(3, 56, "[PLAY+UP] Next Level");
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD)
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
                 rb->lcd_putsxy(3,  6, "[SELECT+MENU] Menu");
                 rb->lcd_putsxy(3, 16, "[SELECT] Undo");
                 rb->lcd_putsxy(3, 26, "[SELECT+PLAY] Redo");

@@ -73,7 +73,8 @@ PLUGIN_HEADER
 #define FLIPIT_RC_QUIT BUTTON_RC_STOP
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD)
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 
 #define FLIPIT_UP           BUTTON_MENU
 #define FLIPIT_DOWN         BUTTON_PLAY
@@ -496,8 +497,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_putsxy(2, 28, "[MODE] shuffle");
     rb->lcd_putsxy(2, 38, "[PLAY] solution");
     rb->lcd_putsxy(2, 48, "[REC] step by step");
-#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_4G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
     rb->lcd_putsxy(2, 8, "[S-MENU] to stop");
     rb->lcd_putsxy(2, 18, "[SELECT] toggle");
     rb->lcd_putsxy(2, 28, "[S-LEFT] shuffle");

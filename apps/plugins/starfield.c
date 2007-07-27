@@ -27,7 +27,8 @@ static struct plugin_api* rb; /* global api struct pointer */
 
 /* Key assignement */
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-    (CONFIG_KEYPAD == IPOD_3G_PAD)
+    (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define STARFIELD_QUIT BUTTON_MENU
 #define STARFIELD_INCREASE_ZMOVE BUTTON_SCROLL_FWD
 #define STARFIELD_DECREASE_ZMOVE BUTTON_SCROLL_BACK

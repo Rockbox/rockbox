@@ -131,7 +131,8 @@ static struct plugin_api* rb;
 #   define HK_CUR2STACK    "NAVI.."
 #   define HK_REM2STACK    "PLAY+RIGHT"
 
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) ||(CONFIG_KEYPAD == IPOD_3G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #   define SOL_QUIT         (BUTTON_SELECT | BUTTON_MENU)
 #   define SOL_UP           BUTTON_SCROLL_BACK
 #   define SOL_DOWN         BUTTON_SCROLL_FWD

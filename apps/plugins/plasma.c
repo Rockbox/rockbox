@@ -51,7 +51,8 @@ static unsigned char sp1, sp2, sp3, sp4; /* Speed of plasma */
 static int plasma_frequency;
 
 /* Key assignement, all bitmapped models */
-#if (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define PLASMA_QUIT BUTTON_MENU
 #define PLASMA_INCREASE_FREQUENCY BUTTON_SCROLL_FWD
 #define PLASMA_DECREASE_FREQUENCY BUTTON_SCROLL_BACK

@@ -41,7 +41,8 @@ extern const fb_data chessbox_pieces[];
 PLUGIN_HEADER
 
 /* button definitions */
-#if (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define CB_SELECT  BUTTON_SELECT
 #define CB_UP      BUTTON_MENU
 #define CB_DOWN    BUTTON_PLAY

@@ -103,11 +103,12 @@ static int ipod_3g_button_read(void)
     unsigned char source, state;
     static int was_hold = 0;
     int btn = BUTTON_NONE;
-    /*
-     * we need some delay for g3, cause hold generates several interrupts,
-     * some of them delayed
-     */
+    
+#ifdef IPOD_3G
+    /* we need some delay for g3, cause hold generates several interrupts,
+     * some of them delayed */
     udelay(250);
+#endif
 
     /* get source of interupts */
     source = GPIOA_INT_STAT;
@@ -117,13 +118,13 @@ static int ipod_3g_button_read(void)
     state = GPIOA_INPUT_VAL;
     GPIOA_INT_LEV = ~state;
 
+#ifdef IPOD_3G
     if (was_hold && source == 0x40 && state == 0xbf) {
         /* ack any active interrupts */
         GPIOA_INT_CLR = source;
         return BUTTON_NONE;
     }
     was_hold = 0;
-
 
     if ((state & 0x20) == 0) {
         /* 3g hold switch is active low */
@@ -133,6 +134,12 @@ static int ipod_3g_button_read(void)
         GPIOA_INT_CLR = source;
         return BUTTON_NONE;
     }
+#elif defined IPOD_1G2G
+    if (state & 0x20)
+        was_hold = 1;
+    else
+        was_hold = 0;
+#endif
     if ((state & 0x1) == 0) {
         btn |= BUTTON_RIGHT;
     }
@@ -163,6 +170,7 @@ void button_init_device(void)
 {
     GPIOA_INT_LEV = ~GPIOA_INPUT_VAL;
     GPIOA_INT_CLR = GPIOA_INT_STAT;
+    /* TODO: put additional G1 code here */
     GPIOA_INT_EN  = 0xff;
 }
 

@@ -60,7 +60,8 @@ PLUGIN_HEADER
 #define JEWELS_CANCEL BUTTON_OFF
 #define JEWELS_RC_CANCEL BUTTON_RC_STOP
 
-#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define JEWELS_SCROLLWHEEL
 #define JEWELS_UP     BUTTON_MENU
 #define JEWELS_DOWN   BUTTON_PLAY
@@ -1449,7 +1450,8 @@ static int jewels_main(struct game_context* bj) {
                 rb->lcd_puts(0, 9, "SELECT to select");
                 rb->lcd_puts(0, 10, "Long SELECT to show menu");
                 rb->lcd_puts(0, 11, "OFF to cancel");
-#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
                 rb->lcd_puts(0, 2, "Swap pairs of jewels to");
                 rb->lcd_puts(0, 3, "form connected segments");
                 rb->lcd_puts(0, 4, "of three or more of the");

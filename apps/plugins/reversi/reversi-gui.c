@@ -566,7 +566,8 @@ enum plugin_status plugin_start(struct plugin_api *api, void *parameter) {
 
     reversi_gui_init();
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-    (CONFIG_KEYPAD == IPOD_3G_PAD)
+    (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
     cursor_wrap_mode = WRAP_TORUS;
 #else
     cursor_wrap_mode = WRAP_FLAT;
