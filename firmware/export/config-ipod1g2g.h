@@ -38,7 +38,7 @@
 /* LCD contrast */
 #define MIN_CONTRAST_SETTING        5
 #define MAX_CONTRAST_SETTING        63
-#define DEFAULT_CONTRAST_SETTING    40 /* Match boot contrast */
+#define DEFAULT_CONTRAST_SETTING    28 /* Match boot contrast */
 
 #define CONFIG_KEYPAD IPOD_1G2G_PAD
 
@@ -62,6 +62,9 @@
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
+
+/* Define this if the backlight unverts LCD appearance */
+#define HAVE_BACKLIGHT_INVERSION
 
 #define BATTERY_CAPACITY_DEFAULT 630 /* default battery capacity */
 

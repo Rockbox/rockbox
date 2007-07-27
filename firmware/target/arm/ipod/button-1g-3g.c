@@ -194,7 +194,11 @@ int button_read_device(void)
 
 bool button_hold(void)
 {
-    return (GPIOA_INPUT_VAL & 0x20)?false:true;
+#ifdef IPOD_1G2G
+    return (GPIOA_INPUT_VAL & 0x20);
+#else
+    return !(GPIOA_INPUT_VAL & 0x20);
+#endif
 }
 
 bool headphones_inserted(void)

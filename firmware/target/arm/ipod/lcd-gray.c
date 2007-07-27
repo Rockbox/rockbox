@@ -68,6 +68,12 @@ static inline bool timer_check(int clock_start, int usecs)
 #define R_RAM_ADDR_SET          0x11
 #define R_RAM_DATA              0x12
 
+#ifdef HAVE_BACKLIGHT_INVERSION
+/* The backlight makes the LCD appear negative on the 1st/2nd gen */
+static bool lcd_inverted = false;
+static bool lcd_backlit = false;
+#endif
+
 /* needed for flip */
 static int addr_offset;
 #if defined(IPOD_MINI) || defined(IPOD_MINI2G)
@@ -146,7 +152,9 @@ void lcd_init_device(void)
 
 int lcd_default_contrast(void)
 {
-#if defined(IPOD_MINI) || defined(IPOD_MINI2G) || defined(IPOD_3G)
+#ifdef IPOD_1G2G
+    return 28;
+#elif defined(IPOD_MINI) || defined(IPOD_MINI2G) || defined(IPOD_3G)
     return 42;
 #else
     return 35;
@@ -162,6 +170,27 @@ void lcd_set_contrast(int val)
     lcd_cmd_and_data(R_CONTRAST_CONTROL, 0x400 | (val + 64));
 }
 
+#ifdef HAVE_BACKLIGHT_INVERSION
+static void invert_display(void)
+{
+    if (lcd_inverted ^ lcd_backlit)
+        lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0023);
+    else
+        lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0009);
+}
+
+void lcd_set_invert_display(bool yesno)
+{
+    lcd_inverted = yesno;
+    invert_display();
+}
+
+void lcd_set_backlight_inversion(bool yesno)
+{
+    lcd_backlit = yesno;
+    invert_display();
+}
+#else
 void lcd_set_invert_display(bool yesno)
 {
     if (yesno)
@@ -169,6 +198,7 @@ void lcd_set_invert_display(bool yesno)
     else
         lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0009);
 }
+#endif
 
 /* turn the display upside down (call lcd_update() afterwards) */
 void lcd_set_flip(bool yesno)

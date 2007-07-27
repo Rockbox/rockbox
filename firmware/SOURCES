@@ -625,7 +625,7 @@ target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
 target/arm/ipod/adc-ipod.c
 target/arm/ipod/3g/backlight-3g.c
-target/arm/ipod/3g/button-3g.c
+target/arm/ipod/button-1g-3g.c
 target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
 target/arm/usb-pp.c
@@ -638,8 +638,8 @@ target/arm/ata-pp5002.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
 target/arm/ipod/adc-ipod.c
-target/arm/ipod/3g/backlight-3g.c /* FIXME */
-target/arm/ipod/3g/button-3g.c /* FIXME */
+target/arm/ipod/1g2g/backlight-1g2g.c
+target/arm/ipod/button-1g-3g.c
 target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
 #endif /* SIMULATOR */

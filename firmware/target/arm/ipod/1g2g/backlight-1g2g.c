@@ -19,13 +19,16 @@
 #include "config.h"
 #include "system.h"
 #include "backlight.h"
+#include "lcd.h"
 
-inline void __backlight_on(void)
+void __backlight_on(void)
 {
     outl(inl(0xc0001000) | 0x02, 0xc0001000);
+    lcd_set_backlight_inversion(true);
 }
 
-inline void __backlight_off(void)
+void __backlight_off(void)
 {
     outl(inl(0xc0001000) & ~0x02, 0xc0001000);
+    lcd_set_backlight_inversion(false);
 }
