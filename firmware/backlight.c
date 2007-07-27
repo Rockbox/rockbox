@@ -210,22 +210,22 @@ static void backlight_isr(void)
 {
     int timer_period;
     bool idle = false;
-    
+
     timer_period = TIMER_FREQ / 1000 * BL_PWM_INTERVAL / 1000;
-    switch (bl_dim_state) 
+    switch (bl_dim_state)
     {
       /* New cycle */
       case DIM_STATE_START:
         bl_pwm_counter = 0;
         bl_cycle_counter++;
-        
+
         if (bl_dim_current > 0 && bl_dim_current < BL_PWM_COUNT)
         {
             __backlight_on();
             bl_pwm_counter = bl_dim_current;
             timer_period = timer_period * bl_pwm_counter / BL_PWM_COUNT;
             bl_dim_state = DIM_STATE_MAIN;
-        } 
+        }
         else
         {
             if (bl_dim_current)
@@ -235,9 +235,9 @@ static void backlight_isr(void)
             if (bl_dim_current == bl_dim_target)
                 idle = true;
         }
-        
+
         break ;
-        
+
       /* Dim main screen */
       case DIM_STATE_MAIN:
         __backlight_off();
@@ -258,7 +258,7 @@ static void backlight_isr(void)
         bl_cycle_counter = 0;
     }
 
-    if (idle) 
+    if (idle)
     {
 #ifdef CPU_COLDFIRE
         queue_post(&backlight_queue, BACKLIGHT_UNBOOST_CPU, 0);
@@ -624,7 +624,7 @@ void backlight_init(void)
 {
     queue_init(&backlight_queue, true);
     queue_set_irq_safe(&backlight_queue, true);
-    
+
 #ifndef SIMULATOR
     if (__backlight_init())
     {
@@ -644,9 +644,9 @@ void backlight_init(void)
 #endif
 
     create_thread(backlight_thread, backlight_stack,
-                  sizeof(backlight_stack), backlight_thread_name 
+                  sizeof(backlight_stack), backlight_thread_name
                   IF_PRIO(, PRIORITY_SYSTEM)
-		  IF_COP(, CPU, false));
+                  IF_COP(, CPU, false));
     tick_add_task(backlight_tick);
 }
 
