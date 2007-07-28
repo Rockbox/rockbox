@@ -15,9 +15,7 @@ Rockbox project.
 
 Syntax used:
 
-A: area name
-M: maintainer person (for the area mentioned above), please use one M: line
-   for each person, one area can have multiple M: lines
+  :area name: maintainer 1,maintainer 2
 
 
 Port maintainers
@@ -27,104 +25,78 @@ NOTE: Port maintainers are simply developers who use a particular
 target on a daily basis and are therefore able to report issues
 specific to that target.
 
-A: Archos Player/Studio
-A: Archos Recorder v1
-A: Archos Recorder 8MB
-A: Archos FM Recorder
-A: Archos Recorder v2
-A: Archos Ondio FM
-A: Archos Ondio SP
-A: Iriver H100/H115
-
-A: Iriver H120/H140
-M: Miika Pekkarinen
-
-A: Iriver H320/H340
-
-A: Ipod Color/Photo
-M: Dave Chapman
-
-A: Ipod Nano 1st Gen
-A: Ipod 4th Gen Grayscale
-A: Ipod Video
-A: Ipod 3rd Gen
-A: Ipod Mini 1st Gen
-A: Ipod Mini 2nd Gen
-A: Iriver H10 20GB
-A: Iriver H10 5GB/6GB
-A: Iaudio X5
-A: Iaudio M5
-A: Sansa E200
-A: Toshiba Gigabeat F
-A: Toshiba Gigabeat X
+:Archos Player/Studio:
+:Archos Recorder v1:
+:Archos Recorder 8MB:
+:Archos FM Recorder:
+:Archos Recorder v2:
+:Archos Ondio FM:
+:Archos Ondio SP:
+:Iriver H100/H115:
+:Iriver H120/H140: Miika Pekkarinen
+:Iriver H320/H340:
+:Ipod Color/Photo: Dave Chapman
+:Ipod Nano 1st Gen:
+:Ipod 4th Gen Grayscale:
+:Ipod Video:
+:Ipod 3rd Gen:
+:Ipod Mini 1st Gen:
+:Ipod Mini 2nd Gen:
+:Iriver H10 20GB:
+:Iriver H10 5GB/6GB:
+:Iaudio X5:
+:Iaudio M5:
+:Sansa E200:
+:Toshiba Gigabeat F:
+:Toshiba Gigabeat X:
 
 
 Core code (low-level)
 ---------------------
 
-A: Kernel
-M: Miika Pekkarinen
-
-A: LCD drivers
-A: Button drivers
-A: Rolo
-A: ATA driver
-A: FAT driver
-A: Battery/Power Management
-A: FM Tuner drivers
-A: Audio codec drivers
+:Kernel: Miika Pekkarinen
+:LCD drivers:
+:Button drivers:
+:Rolo:
+:ATA driver:
+:FAT driver:
+:Battery/Power Management:
+:FM Tuner drivers:
+:Audio codec drivers:
 
 
 Core code (Mid-level)
 ----------------------
 
-A: DSP
-A: LCD/Graphics API
-A: Playback engine (HWCODEC)
-A: Playback engine (SWCODEC)
-A: PCM playback API (SWCODEC)
-A: PCM recording API (SWCODEC)
-A: Recording API (HWCODEC)
-A: Fonts and Unicode
-A: Replaygain
-A: Profiling
-
-A: Screens API and GUI widgets
-M: Kévin Ferrare
-
-A: Settings API
-M: Jonathan Gordon
-
-A: Language API
-
-A: Menu API
-M: Jonathan Gordon
-
-A: Button actions
-M: Jonathan Gordon
+:DSP:
+:LCD/Graphics API:
+:Playback engine (HWCODEC):
+:Playback engine (SWCODEC):
+:PCM playback API (SWCODEC):
+:PCM recording API (SWCODEC):
+:Recording API (HWCODEC):
+:Fonts and Unicode:
+:Replaygain:
+:Profiling:
+:Screens API and GUI widgets: Kévin Ferrar
+:Settings API: Jonathan Gordon
+:Language API:
+:Menu API: Jonathan Gordon
+:Button actions: Jonathan Gordon
 
 
 Core code (high-level)
 ----------------------
 
-A: Bookmarks
-
-A: Cuesheet support
-M: Nicolas Pennequin
-
-A: Database
-M: Miika Pekkarinen
-
-A: Playlists
-A: Radio UI
-A: Recording UI
-A: Voice UI
-
-A: WPS
-M: Nicolas Pennequin
-
-A: User interface
-M: Jonathan Gordon
+:Bookmarks:
+:Cuesheet support: Nicolas Pennequin
+:Database: Miika Pekkarinen
+:Playlists:
+:Radio UI:
+:Recording UI:
+:Voice UI:
+:WPS: Nicolas Pennequin
+:User interface: Jonathan Gordon
 
 
 Metadata parsing
@@ -133,10 +105,10 @@ Metadata parsing
 NOTE: Format-specific container format parsing is maintained by the
 relevant codec maintainer.
 
-A: General
-A: ID3v1/v2
-A: Vorbis Comments
-A: APEv2
+:General:
+:ID3v1/v2:
+:Vorbis Comments:
+:APEv2:
 
 
 Translations
@@ -145,261 +117,189 @@ Translations
 NOTE: Any languages without a dedicated maintainer are maintained by
 the person(s) named next to "General".
 
-A: General
-A: [Language 1]
-A: [Language 2]
+:General:
+:[Language 1]:
+:[Language 2]:
 
 
 Plugins
 -------
 
-A: Plugin loader & API
-A: Plugin library (general)
-A: Greyscale library
-A: XLCD library
+:Plugin loader & API:
+:Plugin library (general):
+:Greyscale library:
+:XLCD library:
 
-A: alpine_cdc
-A: battery_bench
-A: blackjack
-A: bounce
-A: brickmania
-A: bubbles
-A: calculator
-A: calendar
-A: chessbox
-A: chessclock
-A: chip8
-A: chopper
-A: clock
-A: credits
-A: cube
-
-A: demystify
-M: Kévin Ferrare
-
-A: dice
-A: dict
-A: disktidy
-A: doom
-A: euroconverter
-
-A: fire
-M: Kévin Ferrare
-
-A: fireworks
-A: firmware_flash
-A: flipit
-A: grayscale
-A: helloworld
-A: invadrox
-A: iriver_flash
-A: iriverify
-A: jackpot
-
-A: jewels
-M: Antoine Cellerier
-
-A: jpeg
-A: logo
-A: mandelbrot
-A: maze
-A: mazezam
-A: metronome
-A: midi2wav
-A: midiplay
-
-A: minesweeper
-M: Antoine Cellerier
-
-A: mosaique
-A: mp3_encoder
-A: mpegplayer
-A: nim
-A: oscilloscope
-
-A: pacbox
-M: Dave Chapman
-
-A: plasma
-A: pong
-A: properties
-
-A: random_folder_advance_config
-M: Jonathan Gordon
-
-A: reversi
-M: Antoine Cellerier
-
-A: rockblox
-A: rockbox_flash
-A: rockboy
-
-A: rocklife
-M: Antoine Cellerier
-
-A: rockpaint
-M: Antoine Cellerier
-
-A: search
-A: sliding_puzzle
-A: snake
-A: snake2
-A: snow
-
-A: sokoban
-M: Antoine Cellerier
-
-A: solitaire
-M: Antoine Cellerier
-
-A: sort
-A: spacerocks
-A: splitedit
-A: star
-
-A: starfield
-M: Kévin Ferrare
-
-A: stats
-A: stopwatch
-
-A: sudoku
-M: Dave Chapman
-
-A: test_codec
-M: Dave Chapman
-
-A: test_disk
-A: test_fps
-A: test_sampr
-A: test_scanrate
-
-A: text_editor
-M: Jonathan Gordon
-
-A: vbrfix
-A: video
-A: viewer
-A: vu_meter
-A: wav2wv
-A: wavplay
-A: wavrecord
-A: wavview
-A: wormlet
-
-A: xobox
-M: Antoine Cellerier
-
-A: zxbox
+:alpine_cdc:
+:battery_bench:
+:blackjack:
+:bounce:
+:brickmania:
+:bubbles:
+:calculator:
+:calendar:
+:chessbox:
+:chessclock:
+:chip8:
+:chopper:
+:clock:
+:credits:
+:cube:
+:demystify: Kévin Ferrar
+:dice:
+:dict:
+:disktidy:
+:doom:
+:euroconverter:
+:fire: Kévin Ferrar
+:fireworks:
+:firmware_flash:
+:flipit:
+:grayscale:
+:helloworld:
+:invadrox:
+:iriver_flash:
+:iriverify:
+:jackpot:
+:jewels: Antoine Cellerier
+:jpeg:
+:logo:
+:mandelbrot:
+:maze:
+:mazezam:
+:metronome:
+:midi2wav:
+:midiplay:
+:minesweeper: Antoine Cellerier
+:mosaique:
+:mp3_encoder:
+:mpegplayer:
+:nim:
+:oscilloscope:
+:pacbox: Dave Chapman
+:plasma:
+:pong:
+:properties:
+:random_folder_advance_config: Jonathan Gordon
+:reversi: Antoine Cellerier
+:rockblox:
+:rockbox_flash:
+:rockboy:
+:rocklife: Antoine Cellerier
+:rockpaint: Antoine Cellerier
+:search:
+:sliding_puzzle:
+:snake:
+:snake2:
+:snow:
+:sokoban: Antoine Cellerier
+:solitaire: Antoine Cellerier
+:sort:
+:spacerocks:
+:splitedit:
+:star:
+:starfield:Kévin Ferrar
+:stats:
+:stopwatch:
+:sudoku: Dave Chapman
+:test_codec: Dave Chapman
+:test_disk:
+:test_fps:
+:test_sampr:
+:test_scanrate:
+:text_editor: Jonathan Gordon
+:vbrfix:
+:video:
+:viewer:
+:vu_meter:
+:wav2wv:
+:wavplay:
+:wavrecord:
+:wavview:
+:wormlet:
+:xobox: Antoine Cellerier
+:zxbox:
 
 
 Codecs (Playback)
 -----------------
 
-A: Codec loader & API
-
-A: A/52 (AC-3)
-M: Dave Chapman
-
-A: AAC
-A: ADX
-A: AIFF
-
-A: ALAC
-M: Dave Chapman
-
-A: APE (Monkey's Audio)
-M: Dave Chapman
-
-A: FLAC
-M: Dave Chapman
-
-A: MPEG Audio (MP1/MP2/MP3)
-A: Musepack
-A: NSF
-A: Ogg Vorbis
-A: Shorten
-A: SID
-A: SPC
-A: Speex
-A: WAVE
-A: WavPack
-
-A: WMA
-M: Dave Chapman (ASF parsing only)
+:Codec loader & API:
+:A/52 (AC-3): Dave Chapman
+:AAC:
+:ADX:
+:AIFF:
+:ALAC:Dave Chapman
+:APE (Monkey's Audio): Dave Chapman
+:FLAC: Dave Chapman
+:MPEG Audio (MP1/MP2/MP3):
+:Musepack:
+:NSF:
+:Ogg Vorbis:
+:Shorten:
+:SID:
+:SPC:
+:Speex:
+:WAVE:
+:WavPack:
+:WMA (ASF Parsing): Dave Chapman
+:WMA (Decoder):
 
 
 Codecs (Recording)
 ------------------
 
-A: AIFF
-A: MP3
-A: WAVE
-A: WavPack
+:AIFF:
+:MP3:
+:WAVE:
+:WavPack:
 
 
 Bootloaders
 -----------
 
-A: Iriver H1xx/H3xx
-M: Miika Pekkarinen
-
-A: Iaudio X5/M5
-A: PortalPlayer (not ipod)
-
-A: Ipod
-M: Dave Chapman
-
-A: Gigabeat F/X
+:Iriver H1xx/H3xx: Miika Pekkarinen
+:Iaudio X5/M5:
+:PortalPlayer (not ipod):
+:Ipod: Dave Chapman
+:Gigabeat F/X
 
 
 Build Tools
 -----------
 
-A: configure script and build system
-M: Daniel Stenberg
-
-A: bdf2bmp
-A: bmp2rb
-
-A: checkwps
-M: Nicolas Pennequin
-
-A: mkboot
-A: database
-A: rdf2binary
-A: convbdf
-A: codepages
-A: player_unifont
-A: uclpack
-A: wavtrim
-A: voicefont
-A: scramble
-A: descramble
+:configure script and build system: Daniel Stenberg
+:bdf2bmp:
+:bmp2rb:
+:checkwps: Nicolas Pennequin
+:mkboot:
+:database:
+:rdf2binary:
+:convbdf:
+:codepages:
+:player_unifont:
+:uclpack:
+:wavtrim:
+:voicefont:
+:scramble:
+:descramble:
 
 
 Install Tools
 -------------
 
-A: Rockbox Utility
-
-A: ipodpatcher
-M: Dave Chapman
-
-A: sansapatcher
-M: Dave Chapman
+:Rockbox Utility:
+:ipodpatcher: Dave Chapman
+:sansapatcher: Dave Chapman
 
 
 Manual
 ------
 
-A: Manual build system
+:Manual build system:
 [What to put here - maintainers for chapters?]
 
 Web site stuff
 --------------
 
-A: web site scripts and server-side admin
-M: Daniel Stenberg
-M: Björn Stenberg
-M: Linus Nielsen Feltzing
+:web site scripts and server-side admin:Daniel Stenberg,Björn Stenberg,Linus Nielsen Feltzing
