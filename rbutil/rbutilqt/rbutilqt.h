@@ -50,6 +50,8 @@ class RbUtilQt : public QMainWindow
         void updateDevice(int);
         void install(void);
         void installBl(void);
+        void installFonts(void);
+        void installDoom(void);
         void downloadDone(bool);
         void downloadDone(int, bool);
         void downloadInfo(void);

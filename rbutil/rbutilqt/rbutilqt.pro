@@ -8,6 +8,7 @@ SOURCES += rbutilqt.cpp \
  installzip.cpp \
  installbootloader.cpp \
  installbl.cpp \
+ installzipwindow.cpp \
  ../ipodpatcher/ipodpatcher.c \
  ../sansapatcher/sansapatcher.c \
  irivertools/irivertools.cpp \
@@ -28,6 +29,7 @@ HEADERS += rbutilqt.h \
  installzip.h \
  installbootloader.h \
  installbl.h \
+ installzipwindow.h \
  ../ipodpatcher/ipodpatcher.h \
  ../ipodpatcher/ipodio.h \
  ../ipodpatcher/parttypes.h \
@@ -45,12 +47,16 @@ CONFIG += release \
 	  thread \
           qt
 TARGET = rbutilqt
+
 FORMS += rbutilqtfrm.ui \
  aboutbox.ui \
  installfrm.ui \
  installprogressfrm.ui \
  configurefrm.ui \
- installbootloaderfrm.ui
+ installbootloaderfrm.ui \
+ installzipfrm.ui
+ 
+ 
 RESOURCES += rbutilqt.qrc
 
 TRANSLATIONS += rbutil_de.ts

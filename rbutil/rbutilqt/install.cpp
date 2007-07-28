@@ -100,10 +100,8 @@ void Install::browseFolder()
 
 void Install::accept()
 {
-    QDialog *downloadProgress = new QDialog(this);
+    downloadProgress = new QDialog(this);
     dp.setupUi(downloadProgress);
-    // connect close button now as it's needed if we break upon an error
-    connect(dp.buttonAbort, SIGNAL(clicked()), downloadProgress, SLOT(close()));
     // show dialog with error if mount point is wrong
     if(QFileInfo(ui.lineMountPoint->text()).isDir()) {
         mountPoint = ui.lineMountPoint->text();
@@ -165,12 +163,13 @@ void Install::done(bool error)
 
     if(error)
     {
-        connect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(close()));
+        connect(dp.buttonAbort, SIGNAL(clicked()), downloadProgress, SLOT(close()));
         return;
     }
       
     connect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(close()));
-    delete installer;
+    connect(dp.buttonAbort, SIGNAL(clicked()),downloadProgress, SLOT(close()));     
+
 }
 
 

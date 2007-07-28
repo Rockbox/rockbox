@@ -28,6 +28,7 @@
 #include "installbl.h"
 #include "httpget.h"
 #include "installbootloader.h"
+#include "installzipwindow.h"
 
 RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
 {
@@ -74,14 +75,14 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     connect(ui.comboBoxDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(updateDevice(int)));
     connect(ui.buttonRockbox, SIGNAL(clicked()), this, SLOT(install()));
     connect(ui.buttonBootloader, SIGNAL(clicked()), this, SLOT(installBl()));
+    connect(ui.buttonFonts, SIGNAL(clicked()), this, SLOT(installFonts()));
+    connect(ui.buttonGames, SIGNAL(clicked()), this, SLOT(installDoom()));
 
     // disable unimplemented stuff
     ui.buttonThemes->setEnabled(false);
     ui.buttonSmall->setEnabled(false);
     ui.buttonRemoveRockbox->setEnabled(false);
     ui.buttonRemoveBootloader->setEnabled(false);
-    ui.buttonGames->setEnabled(false);
-    ui.buttonFonts->setEnabled(false);
     ui.buttonComplete->setEnabled(false);
     ui.buttonDetect->setEnabled(false);
 
@@ -247,3 +248,32 @@ void RbUtilQt::installBl()
     installWindow->show();
 }
 
+void RbUtilQt::installFonts()
+{
+	InstallZipWindow* installWindow = new InstallZipWindow(this);
+	installWindow->setUserSettings(userSettings);
+    installWindow->setDeviceSettings(devices);
+    if(userSettings->value("defaults/proxytype") == "manual")
+        installWindow->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
+    installWindow->setMountPoint(userSettings->value("defaults/mountpoint").toString());
+	installWindow->setLogSection("Fonts");
+	installWindow->setUrl(devices->value("font_url").toString());
+	installWindow->setWindowTitle("Font Installation");
+	installWindow->show();
+		
+}
+
+void RbUtilQt::installDoom()
+{
+	InstallZipWindow* installWindow = new InstallZipWindow(this);
+	installWindow->setUserSettings(userSettings);
+    installWindow->setDeviceSettings(devices);
+    if(userSettings->value("defaults/proxytype") == "manual")
+        installWindow->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
+    installWindow->setMountPoint(userSettings->value("defaults/mountpoint").toString());
+	installWindow->setLogSection("Doom");
+	installWindow->setUrl(devices->value("doom_url").toString());
+	installWindow->setWindowTitle("Doom Installation");
+	installWindow->show();
+		
+}

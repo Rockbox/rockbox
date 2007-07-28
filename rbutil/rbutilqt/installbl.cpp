@@ -18,7 +18,6 @@
  ****************************************************************************/
 
 #include "installbl.h"
-#include "ui_installfrm.h"
 #include "ui_installprogressfrm.h"
 
 
@@ -89,10 +88,8 @@ void InstallBl::browseOF()
 
 void InstallBl::accept()
 {
-    QDialog *downloadProgress = new QDialog(this);
+    downloadProgress = new QDialog(this);
     dp.setupUi(downloadProgress);
-    // connect close button now as it's needed if we break upon an error
-    connect(dp.buttonAbort, SIGNAL(clicked()), downloadProgress, SLOT(close()));
     // show dialog with error if mount point is wrong
     if(QFileInfo(ui.lineMountPoint->text()).isDir()) {
         mountPoint = ui.lineMountPoint->text();
@@ -144,12 +141,12 @@ void InstallBl::done(bool error)
 
     if(error)
     {
-        connect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(close()));
+        connect(dp.buttonAbort, SIGNAL(clicked()), downloadProgress, SLOT(close()));
         return;
     }
       
     connect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(close()));
-    delete binstaller;
+    connect(dp.buttonAbort, SIGNAL(clicked()),downloadProgress, SLOT(close()));   
 }
 
 void InstallBl::setDeviceSettings(QSettings *dev)

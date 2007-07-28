@@ -48,7 +48,7 @@ void ZipInstaller::install(Ui::InstallProgressFrm* dp)
     connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
     connect(getter, SIGNAL(downloadDone(int, bool)), this, SLOT(downloadRequestFinished(int, bool)));
     connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
-    
+    connect(m_dp->buttonAbort, SIGNAL(clicked()), getter, SLOT(abort()));
 }
 
 void ZipInstaller::downloadRequestFinished(int id, bool error)
@@ -63,7 +63,6 @@ void ZipInstaller::downloadDone(bool error)
 {
     qDebug() << "Install::downloadDone, error:" << error;
 
-    
      // update progress bar
      
     int max = m_dp->progressBar->maximum();
