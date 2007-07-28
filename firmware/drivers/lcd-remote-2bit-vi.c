@@ -126,11 +126,6 @@ void lcd_remote_setfont(int newfont)
     curfont = newfont;
 }
 
-int lcd_remote_getfont(void)
-{
-    return curfont;
-}
-
 int lcd_remote_getstringsize(const unsigned char *str, int *w, int *h)
 {
     return font_getstringsize(str, w, h, curfont);

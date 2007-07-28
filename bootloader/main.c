@@ -26,6 +26,7 @@
 #include "system.h"
 #include "lcd.h"
 #include "lcd-remote.h"
+#include "scroll_engine.h"
 #include "kernel.h"
 #include "thread.h"
 #include "ata.h"

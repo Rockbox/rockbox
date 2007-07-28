@@ -43,10 +43,10 @@
 #define SYS_EVENT_CLS_PLUG    4
 /* make sure SYS_EVENT_CLS_BITS has enough range */
 
-/* MSb->|S|c...c|i...i| */
-#define SYS_EVENT                 ((long)(~0ul ^ (~0ul >> 1)))
+/* Bit 31->|S|c...c|i...i| */
+#define SYS_EVENT                 ((long)(int)(1 << 31))
 #define SYS_EVENT_CLS_BITS        (3)
-#define SYS_EVENT_CLS_SHIFT       (sizeof (long)*8-SYS_EVENT_CLS_BITS-1)
+#define SYS_EVENT_CLS_SHIFT       (31-SYS_EVENT_CLS_BITS)
 #define SYS_EVENT_CLS_MASK        (((1l << SYS_EVENT_CLS_BITS)-1) << SYS_EVENT_SHIFT)
 #define MAKE_SYS_EVENT(cls, id)   (SYS_EVENT | ((long)(cls) << SYS_EVENT_CLS_SHIFT) | (long)(id))
 /* Macros for extracting codes */
