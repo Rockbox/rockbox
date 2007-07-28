@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>673</width>
-    <height>453</height>
+    <width>665</width>
+    <height>499</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -43,7 +43,7 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="2" colspan="2" >
+   <item row="9" column="2" colspan="2" >
     <widget class="QDialogButtonBox" name="buttonBox" >
      <property name="orientation" >
       <enum>Qt::Horizontal</enum>
@@ -53,7 +53,7 @@
      </property>
     </widget>
    </item>
-   <item rowspan="4" row="2" column="1" colspan="3" >
+   <item rowspan="4" row="4" column="1" colspan="3" >
     <spacer>
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
@@ -65,6 +65,36 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item row="3" column="1" >
+    <widget class="QLineEdit" name="lineOriginalFirmware" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip" >
+      <string>select the original Firmware</string>
+     </property>
+     <property name="accessibleDescription" >
+      <string>select the original Firmware</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" >
+    <widget class="QLabel" name="label_3" >
+     <property name="text" >
+      <string>Download and select an original Firmware</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2" >
+    <widget class="QToolButton" name="buttonBrowseOF" >
+     <property name="text" >
+      <string>Browse</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

@@ -24,6 +24,7 @@
 
 #include "ui_installprogressfrm.h"
 #include "httpget.h"
+#include "irivertools/irivertools.h"
 
 extern "C" {
     // Ipodpatcher
@@ -47,10 +48,11 @@ public:
     
     void setMountPoint(QString mountpoint) {m_mountpoint = mountpoint;}
     void setProxy(QUrl proxy) {m_proxy= proxy;}
-    void setDevice(QString device) {m_device= device;}
+    void setDevice(QString device) {m_device= device;}  // the current plattform
     void setBootloaderMethod(QString method) {m_bootloadermethod= method;}
     void setBootloaderName(QString name){m_bootloadername= name;}
     void setBootloaderBaseUrl(QString baseUrl){m_bootloaderUrlBase = baseUrl;}
+    void setOrigFirmwarePath(QString path) {m_origfirmware = path;}  //for iriver original firmware
    
 signals:
     void done(bool error);  //installation finished.
@@ -83,13 +85,18 @@ private slots:
     //sansa specific routines
     void sansaPrepare();
     void sansaFinish();
+
+    //iriver specific routines
+    void iriverPrepare();
+    void iriverFinish();
     
 private:
     QString m_mountpoint, m_device,m_bootloadermethod,m_bootloadername;
-    QString m_bootloaderUrlBase,m_tempfilename;
+    QString m_bootloaderUrlBase,m_tempfilename,m_origfirmware;
     QUrl m_proxy;
     bool m_install;
     
+    int series,table_entry;  // for fwpatcher
     
     HttpGet *getter;
     QTemporaryFile downloadFile;

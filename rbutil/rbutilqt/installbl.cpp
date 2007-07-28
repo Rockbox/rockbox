@@ -26,6 +26,8 @@ InstallBl::InstallBl(QWidget *parent) : QDialog(parent)
 {
     ui.setupUi(this);
     connect(ui.buttonBrowse, SIGNAL(clicked()), this, SLOT(browseFolder()));
+    connect(ui.buttonBrowseOF, SIGNAL(clicked()), this, SLOT(browseOF()));
+    
 }
 
 void InstallBl::setProxy(QUrl proxy_url)
@@ -40,6 +42,15 @@ void InstallBl::setMountPoint(QString mount)
     if(m.isDir()) {
         ui.lineMountPoint->clear();
         ui.lineMountPoint->insert(mount);
+    }
+}
+
+void InstallBl::setOFPath(QString path)
+{
+    QFileInfo m(path);
+    if(m.exists()) {
+        ui.lineOriginalFirmware->clear();
+        ui.lineOriginalFirmware->insert(path);
     }
 }
 
@@ -60,6 +71,22 @@ void InstallBl::browseFolder()
     }
 }
 
+void InstallBl::browseOF()
+{
+    QFileDialog browser(this);
+    if(QFileInfo(ui.lineOriginalFirmware->text()).exists())
+        browser.setDirectory(ui.lineOriginalFirmware->text());
+    else
+        browser.setDirectory("/media");
+    browser.setReadOnly(true);
+    browser.setAcceptMode(QFileDialog::AcceptOpen);
+    if(browser.exec()) {
+        qDebug() << browser.directory();
+        QStringList files = browser.selectedFiles();
+        setOFPath(files.at(0));
+    }
+}
+
 void InstallBl::accept()
 {
     QDialog *downloadProgress = new QDialog(this);
@@ -77,6 +104,18 @@ void InstallBl::accept()
         downloadProgress->show();
         return;
     }
+    
+    if(QFileInfo(ui.lineOriginalFirmware->text()).exists())
+    {
+        m_OrigFirmware = ui.lineOriginalFirmware->text();
+    }
+    else
+    {
+        dp.listProgress->addItem(tr("Original Firmware Path is wrong!"));
+        dp.buttonAbort->setText(tr("&Ok"));
+        downloadProgress->show();
+        return;
+    }
     userSettings->sync();
 
     binstaller = new BootloaderInstaller(this);
@@ -89,6 +128,7 @@ void InstallBl::accept()
     binstaller->setBootloaderMethod(devices->value(plattform + "/bootloadermethod").toString());
     binstaller->setBootloaderName(devices->value(plattform + "/bootloadername").toString());
     binstaller->setBootloaderBaseUrl(devices->value("bootloader_url").toString());
+    binstaller->setOrigFirmwarePath(m_OrigFirmware);
     
     binstaller->install(&dp);
     
@@ -115,6 +155,21 @@ void InstallBl::done(bool error)
 void InstallBl::setDeviceSettings(QSettings *dev)
 {
     devices = dev;
+    
+    if(userSettings->value("defaults/platform").toString() == "h100" ||
+        userSettings->value("defaults/platform").toString() == "h120" ||
+        userSettings->value("defaults/platform").toString() == "h300")
+    {
+        ui.buttonBrowseOF->show();
+        ui.lineOriginalFirmware->show();
+        ui.label_3->show();
+    }
+    else
+    {
+        ui.buttonBrowseOF->hide();
+        ui.lineOriginalFirmware->hide();
+        ui.label_3->hide();
+    }
     qDebug() << "Install::setDeviceSettings:" << devices;
 }
 

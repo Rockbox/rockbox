@@ -60,6 +60,12 @@ void BootloaderInstaller::install(Ui::InstallProgressFrm* dp)
         connect(this,SIGNAL(prepare()),this,SLOT(sansaPrepare()));  
         connect(this,SIGNAL(finish()),this,SLOT(sansaFinish()));       
     }       
+    else if(m_bootloadermethod == "fwpatcher")
+    {
+        // connect internal signal
+        connect(this,SIGNAL(prepare()),this,SLOT(iriverPrepare()));  
+        connect(this,SIGNAL(finish()),this,SLOT(iriverFinish()));       
+    }       
     else
     {
         m_dp->listProgress->addItem(tr("unsupported install Method"));
@@ -101,6 +107,12 @@ void BootloaderInstaller::uninstall(Ui::InstallProgressFrm* dp)
     {
         // connect internal signal
         connect(this,SIGNAL(prepare()),this,SLOT(sansaPrepare())); 
+    }
+    else if(m_bootloadermethod == "fwpatcher")
+    {
+        m_dp->listProgress->addItem(tr("No uninstallation possible"));
+        emit done(true);
+        return;      
     }
     else
     {
@@ -885,4 +897,176 @@ void BootloaderInstaller::sansaFinish()
 
 }
 
+/**************************************************
+*** iriver /fwpatcher  secific code 
+***************************************************/
 
+void BootloaderInstaller::iriverPrepare()
+{
+    char md5sum_str[32];
+    if (!FileMD5(m_origfirmware, md5sum_str)) {
+        m_dp->listProgress->addItem(tr("Could not MD5Sum original firmware"));
+        emit done(true);
+        return;
+    }
+    
+    /* Check firmware against md5sums in h120sums and h100sums */
+    series = 0;
+    table_entry = intable(md5sum_str, &h120pairs[0],
+                          sizeof(h120pairs)/sizeof(struct sumpairs));
+    if (table_entry >= 0) {
+        series = 120;
+    }
+    else 
+    {
+        table_entry = intable(md5sum_str, &h100pairs[0],
+                              sizeof(h100pairs)/sizeof(struct sumpairs));
+        if (table_entry >= 0) 
+        {
+            series = 100;
+        }
+        else 
+        {
+            table_entry = intable(md5sum_str, &h300pairs[0],
+                                  sizeof(h300pairs)/sizeof(struct sumpairs));
+            if (table_entry >= 0)
+                series = 300;
+        }
+    }
+    if (series == 0)
+    {
+        m_dp->listProgress->addItem(tr("Could not detect firmware type"));
+        emit done(true);
+        return;
+    }
+    
+    QString url = m_bootloaderUrlBase + "/iriver/" + m_bootloadername;
+      
+    m_dp->listProgress->addItem(tr("Downloading file %1.%2")
+        .arg(QFileInfo(url).baseName(), QFileInfo(url).completeSuffix()));
+
+    // temporary file needs to be opened to get the filename
+    downloadFile.open();
+    m_tempfilename = downloadFile.fileName();
+    downloadFile.close();
+    // get the real file.
+    getter = new HttpGet(this);
+    getter->setProxy(m_proxy);
+    getter->setFile(&downloadFile);
+    getter->getFile(QUrl(url));
+    // connect signals from HttpGet
+    connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
+    //connect(getter, SIGNAL(requestFinished(int, bool)), this, SLOT(downloadRequestFinished(int, bool)));
+    connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));   
+    
+}
+
+void BootloaderInstaller::iriverFinish()
+{
+    // Patch firmware
+    char md5sum_str[32];
+    struct sumpairs *sums;
+    int origin;
+
+    /* get pointer to the correct bootloader.bin */
+    switch(series) {
+        case 100:
+            sums = &h100pairs[0];
+            origin = 0x1f0000;
+            break;
+        case 120:
+            sums = &h120pairs[0];
+            origin = 0x1f0000;
+            break;
+        case 300:
+            sums = &h300pairs[0];
+            origin = 0x3f0000;
+            break;
+    }
+    
+    // temporary files needs to be opened to get the filename
+    QTemporaryFile firmwareBin, newBin, newHex;
+    firmwareBin.open();
+    newBin.open();
+    newHex.open();
+    QString firmwareBinName = firmwareBin.fileName();
+    QString newBinName = newBin.fileName();
+    QString newHexName = newHex.fileName();
+    firmwareBin.close();
+    newBin.close();
+    newHex.close();
+    
+    // iriver decode
+    if (iriver_decode(m_origfirmware, firmwareBinName, FALSE, STRIP_NONE,m_dp) == -1) 
+    {
+        m_dp->listProgress->addItem(tr("Error in descramble"));
+        firmwareBin.remove();
+        newBin.remove();
+        newHex.remove();
+        emit done(true);
+        return;
+    }
+    //  mkboot
+    if (!mkboot(firmwareBinName, newBinName, m_tempfilename, origin,m_dp)) 
+    {
+        m_dp->listProgress->addItem(tr("Error in patching"));
+        firmwareBin.remove();
+        newBin.remove();
+        newHex.remove();
+        emit done(true);
+        return;
+    }
+    // iriver_encode
+    if (iriver_encode(newBinName, newHexName, FALSE,m_dp) == -1) 
+    {
+        m_dp->listProgress->addItem(tr("Error in scramble"));
+        firmwareBin.remove();
+        newBin.remove();
+        newHex.remove();
+        emit done(true);
+        return;
+    }
+    
+    /* now md5sum it */
+    if (!FileMD5(newHexName, md5sum_str)) 
+    {
+        m_dp->listProgress->addItem(tr("Error in checksumming"));
+        firmwareBin.remove();
+        newBin.remove();
+        newHex.remove();
+        emit done(true);
+        return;
+    }
+    if (strncmp(sums[table_entry].patched, md5sum_str, 32) == 0) {
+        /* delete temp files */
+        firmwareBin.remove();
+        newBin.remove();
+    }
+    
+    // Load patched Firmware to player
+    QString dest;
+    if(series == 100)
+            dest = m_mountpoint + "/ihp_100.hex";
+    else if(series == 120)
+            dest = m_mountpoint + "/ihp_120.hex";
+    else if(series == 300)
+            dest = m_mountpoint + "/H300.hex";
+    // copy file
+    if(!newHex.copy(dest))
+    {
+        m_dp->listProgress->addItem(tr("Could not copy: %1 to %2")
+                                .arg(newHexName,dest));
+        emit done(true);
+        return;
+    }
+    
+    downloadFile.remove();
+    newHex.remove();
+
+    m_dp->listProgress->addItem(tr("Bootloader install finished successfully."));
+    m_dp->buttonAbort->setText(tr("&Ok"));
+    
+    emit done(false);  // success
+
+
+}

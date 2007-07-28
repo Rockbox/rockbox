@@ -9,7 +9,9 @@ SOURCES += rbutilqt.cpp \
  installbootloader.cpp \
  installbl.cpp \
  ../ipodpatcher/ipodpatcher.c \
- ../sansapatcher/sansapatcher.c
+ ../sansapatcher/sansapatcher.c \
+ irivertools/irivertools.cpp \
+ irivertools/md5sum.cpp
 
  
 HEADERS += rbutilqt.h \
@@ -30,8 +32,12 @@ HEADERS += rbutilqt.h \
  ../ipodpatcher/ipodio.h \
  ../ipodpatcher/parttypes.h \
  ../sansapatcher/sansapatcher.h \
- ../sansapatcher/sansaio.h
- 
+ ../sansapatcher/sansaio.h \
+ irivertools/irivertools.h \
+ irivertools/md5sum.h \
+ irivertools/h100sums.h \ 
+ irivertools/h120sums.h \
+ irivertools/h300sums.h
  
 TEMPLATE = app
 CONFIG += release \

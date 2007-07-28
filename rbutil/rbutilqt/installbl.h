@@ -28,6 +28,7 @@
 #include "ui_installprogressfrm.h"
 
 #include "installbootloader.h"
+#include "irivertools/irivertools.h"
 
 class InstallBl : public QDialog
 {
@@ -36,6 +37,7 @@ class InstallBl : public QDialog
         InstallBl(QWidget *parent = 0);
         void setProxy(QUrl);
         void setMountPoint(QString);
+        void setOFPath(QString);
         void setUserSettings(QSettings*);
         void setDeviceSettings(QSettings*);
 
@@ -54,10 +56,12 @@ class InstallBl : public QDialog
         QString file;
         QString fileName;
         QString mountPoint;
+        QString m_OrigFirmware;
         BootloaderInstaller* binstaller;
 
     private slots:
         void browseFolder(void);
+        void browseOF(void);
         void done(bool);
         
 };
