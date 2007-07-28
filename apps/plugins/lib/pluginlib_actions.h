@@ -222,13 +222,15 @@ static const struct button_mapping generic_left_right_fire[] =
 static const struct button_mapping generic_actions[] = 
 {
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-    {PLA_QUIT,          BUTTON_OFF,     BUTTON_NONE},
-    {PLA_QUIT,          BUTTON_RC_STOP, BUTTON_NONE},
-    {PLA_START,         BUTTON_ON,      BUTTON_NONE},
-    {PLA_START,         BUTTON_RC_ON,   BUTTON_NONE},
-    {PLA_MENU,          BUTTON_MODE,    BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_SELECT,  BUTTON_NONE},
+    {PLA_QUIT,          BUTTON_OFF,                   BUTTON_NONE},
+    {PLA_QUIT,          BUTTON_RC_STOP,               BUTTON_NONE},
+    {PLA_START,         BUTTON_ON,                    BUTTON_NONE},
+    {PLA_START,         BUTTON_RC_ON,                 BUTTON_NONE},
+    {PLA_MENU,          BUTTON_MODE,                  BUTTON_NONE},
+    {PLA_FIRE,          BUTTON_SELECT,                BUTTON_NONE},
+    {PLA_FIRE,          BUTTON_RC_MENU,               BUTTON_NONE},
     {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,  BUTTON_NONE},
+    {PLA_FIRE_REPEAT,   BUTTON_RC_MENU|BUTTON_REPEAT, BUTTON_NONE},
 #elif (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
    || (CONFIG_KEYPAD == IPOD_4G_PAD)
@@ -238,12 +240,15 @@ static const struct button_mapping generic_actions[] =
     {PLA_FIRE,          BUTTON_SELECT|BUTTON_REL,       BUTTON_SELECT},
     {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
-    {PLA_QUIT,          BUTTON_POWER,       BUTTON_NONE},
-    {PLA_START,         BUTTON_PLAY,        BUTTON_NONE},
-    {PLA_START,         BUTTON_RC_PLAY,     BUTTON_NONE},
-    {PLA_MENU,          BUTTON_REC,         BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_SELECT,      BUTTON_NONE},
+    {PLA_QUIT,          BUTTON_POWER,                   BUTTON_NONE},
+    {PLA_START,         BUTTON_PLAY,                    BUTTON_NONE},
+    {PLA_START,         BUTTON_RC_PLAY,                 BUTTON_NONE},
+    {PLA_MENU,          BUTTON_REC,                     BUTTON_NONE},
+    {PLA_MENU,          BUTTON_RC_MENU,                 BUTTON_NONE},
+    {PLA_FIRE,          BUTTON_SELECT,                  BUTTON_NONE},
+    {PLA_FIRE,          BUTTON_RC_MODE,                 BUTTON_NONE},
     {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
+    {PLA_FIRE_REPEAT,   BUTTON_RC_MODE|BUTTON_REPEAT,   BUTTON_NONE},
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
     {PLA_QUIT,          BUTTON_A,           BUTTON_NONE},
     {PLA_START,         BUTTON_POWER,       BUTTON_NONE},

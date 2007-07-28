@@ -41,6 +41,7 @@ static unsigned char jackpot_slots_patterns[]={
     0x00, 0x0A, 0x1F, 0x1F, 0x1F, 0x0e, 0x04  /* (+63)Heart */
 };
 static unsigned long char_patterns[NB_SLOTS];
+#define SLEEP_TIME (HZ/24)
 #else /* bitmaps LCDs */
 
 #define PICTURE_HEIGHT (BMPHEIGHT_jackpot_slots/(NB_PICTURES+1))
@@ -48,7 +49,7 @@ static unsigned long char_patterns[NB_SLOTS];
 #define PICTURE_ROTATION_STEPS PICTURE_HEIGHT
 #else
 #define REMOTE_PICTURE_HEIGHT (BMPHEIGHT_jackpot_slots_remote/(NB_PICTURES+1))
-#define PICTURE_ROTATION_STEPS (REMOTE_PICTURE_HEIGHT*PICTURE_HEIGHT)
+#define PICTURE_ROTATION_STEPS REMOTE_PICTURE_HEIGHT
 #endif
 
 struct jackpot_picture{
@@ -77,7 +78,7 @@ const struct jackpot_picture jackpot_pictures[]={
     }
 #endif
 };
-
+#define SLEEP_TIME (HZ/100)
 #endif /* HAVE_LCD_CHARCELLS */
 
 static struct plugin_api* rb;
@@ -300,7 +301,7 @@ void jackpot_play_turn(struct jackpot* game)
         }
         FOR_NB_SCREENS(d)
             jackpot_display_slot_machine(game, rb->screens[d]);
-        rb->sleep(7*HZ/(24*PICTURE_ROTATION_STEPS));
+        rb->sleep(SLEEP_TIME);
     }
     gain=jackpot_get_gain(game);
     if(gain!=0)
