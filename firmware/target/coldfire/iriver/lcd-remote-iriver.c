@@ -19,8 +19,9 @@
 
 #include "config.h"
 #include "system.h"
-#include "kernel.h"
+#include "file.h"
 #include "lcd-remote.h"
+#include "scroll_engine.h"
 
 /*** definitions ***/
 
@@ -521,7 +522,7 @@ static void remote_tick(void)
 
                     if (--init_delay <= 0)
                     {
-                        queue_post(&remote_scroll_queue, REMOTE_INIT_LCD, 0);
+                        queue_broadcast(SYS_REMOTE_PLUGGED, 0);
                         init_delay = 6;
                     }
                 }
@@ -537,7 +538,7 @@ static void remote_tick(void)
             {
                 _remote_type = REMOTETYPE_UNPLUGGED;
 
-                queue_post(&remote_scroll_queue, REMOTE_DEINIT_LCD, 0);
+                queue_broadcast(SYS_REMOTE_UNPLUGGED, 0);
             }
         }
     }

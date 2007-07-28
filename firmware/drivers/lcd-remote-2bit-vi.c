@@ -34,8 +34,7 @@
 #include "rbunicode.h"
 #include "bidi.h"
 #include "lcd-remote-target.h"
-
-#define SCROLLABLE_LINES (((LCD_REMOTE_HEIGHT+4)/5 < 32) ? (LCD_REMOTE_HEIGHT+4)/5 : 32)
+#include "scroll_engine.h"
 
 /*** globals ***/
 
@@ -53,28 +52,6 @@ static int drawmode = DRMODE_SOLID;
 static int xmargin = 0;
 static int ymargin = 0;
 static int curfont = FONT_SYSFIXED;
-
-/* scrolling */
-static volatile int scrolling_lines=0; /* Bitpattern of which lines are scrolling */
-static void scroll_thread(void);
-static long scroll_stack[DEFAULT_STACK_SIZE/sizeof(long)];
-static const char scroll_name[] = "remote_scroll";
-static int scroll_ticks = 12; /* # of ticks between updates*/
-static int scroll_delay = HZ/2; /* ticks delay before start */
-static int scroll_step = 6;  /* pixels per scroll step */
-static int bidir_limit = 50;  /* percent */
-static struct scrollinfo scroll[SCROLLABLE_LINES];
-
-static const char scroll_tick_table[16] = {
- /* Hz values:
-    1, 1.25, 1.55, 2, 2.5, 3.12, 4, 5, 6.25, 8.33, 10, 12.5, 16.7, 20, 25, 33 */
-    100, 80, 64, 50, 40, 32, 25, 20, 16, 12, 10, 8, 6, 5, 4, 3
-};
-
-/* remote hotplug */
-#ifndef SIMULATOR
-struct event_queue remote_scroll_queue;
-#endif
 
 /*** parameter handling ***/
 unsigned lcd_remote_color_to_native(unsigned color)
@@ -147,6 +124,11 @@ int lcd_remote_getymargin(void)
 void lcd_remote_setfont(int newfont)
 {
     curfont = newfont;
+}
+
+int lcd_remote_getfont(void)
+{
+    return curfont;
 }
 
 int lcd_remote_getstringsize(const unsigned char *str, int *w, int *h)
@@ -388,7 +370,8 @@ void lcd_remote_clear_display(void)
             memset(lcd_remote_framebuffer, bg_pattern,
                    sizeof lcd_remote_framebuffer);
     }
-    scrolling_lines = 0;
+
+    lcd_remote_scroll_info.lines = 0;
 }
 
 /* Set a single pixel */
@@ -935,7 +918,7 @@ void lcd_remote_bitmap(const fb_remote_data *src, int x, int y, int width,
 }
 
 /* put a string at a given pixel position, skipping first ofs pixel columns */
-static void lcd_remote_putsxyofs(int x, int y, int ofs, const unsigned char *str)
+void lcd_remote_putsxyofs(int x, int y, int ofs, const unsigned char *str)
 {
     unsigned short ch;
     unsigned short *ucs;
@@ -1000,7 +983,7 @@ void lcd_remote_puts_style_offset(int x, int y, const unsigned char *str,
     int lastmode = drawmode;
 
     /* make sure scrolling is turned off on the line we are updating */
-    scrolling_lines &= ~(1 << y);
+    lcd_remote_scroll_info.lines &= ~(1 << y);
 
     if(!str || !str[0])
         return;
@@ -1018,46 +1001,6 @@ void lcd_remote_puts_style_offset(int x, int y, const unsigned char *str,
 }
 
 /*** scrolling ***/
-
-/* Reverse the invert setting of the scrolling line (if any) at given char
-   position.  Setting will go into affect next time line scrolls. */
-void lcd_remote_invertscroll(int x, int y)
-{
-    struct scrollinfo* s;
-
-    (void)x;
-
-    if(y>=SCROLLABLE_LINES) return;
-
-    s = &scroll[y];
-    s->invert = !s->invert;
-}
-
-void lcd_remote_stop_scroll(void)
-{
-    scrolling_lines=0;
-}
-
-void lcd_remote_scroll_speed(int speed)
-{
-    scroll_ticks = scroll_tick_table[speed];
-}
-
-void lcd_remote_scroll_step(int step)
-{
-    scroll_step = step;
-}
-
-void lcd_remote_scroll_delay(int ms)
-{
-    scroll_delay = ms / (HZ / 10);
-}
-
-void lcd_remote_bidir_scroll(int percent)
-{
-    bidir_limit = percent;
-}
-
 void lcd_remote_puts_scroll(int x, int y, const unsigned char *string)
 {
     lcd_remote_puts_scroll_style(x, y, string, STYLE_DEFAULT);
@@ -1079,11 +1022,11 @@ void lcd_remote_puts_scroll_style_offset(int x, int y, const unsigned char *stri
     struct scrollinfo* s;
     int w, h;
 
-    if(y>=SCROLLABLE_LINES) return;
+    if(y>=LCD_REMOTE_SCROLLABLE_LINES) return;
 
-    s = &scroll[y];
+    s = &lcd_remote_scroll_info.scroll[y];
 
-    s->start_tick = current_tick + scroll_delay;
+    s->start_tick = current_tick + lcd_remote_scroll_info.delay;
     s->invert = false;
     if (style & STYLE_INVERT) {
         s->invert = true;
@@ -1106,9 +1049,9 @@ void lcd_remote_puts_scroll_style_offset(int x, int y, const unsigned char *stri
 
         /* scroll bidirectional or forward only depending on the string
            width */
-        if ( bidir_limit ) {
+        if ( lcd_remote_scroll_info.bidir_limit ) {
             s->bidir = s->width < (LCD_REMOTE_WIDTH - xmargin) *
-                (100 + bidir_limit) / 100;
+                (100 + lcd_remote_scroll_info.bidir_limit) / 100;
         }
         else
             s->bidir = false;
@@ -1126,112 +1069,67 @@ void lcd_remote_puts_scroll_style_offset(int x, int y, const unsigned char *stri
         s->offset = offset;
         s->startx = xmargin + x * s->width / s->len;;
         s->backward = false;
-        scrolling_lines |= (1<<y);
+        lcd_remote_scroll_info.lines |= (1<<y);
     }
     else
         /* force a bit switch-off since it doesn't scroll */
-        scrolling_lines &= ~(1<<y);
+        lcd_remote_scroll_info.lines &= ~(1<<y);
 }
 
-static void scroll_thread(void)
+void lcd_remote_scroll_fn(void)
 {
     struct font* pf;
     struct scrollinfo* s;
     int index;
     int xpos, ypos;
     int lastmode;
-    long delay = 0;
-    long next_tick = current_tick;
-#ifndef SIMULATOR
-    struct event ev;
-#endif
 
-    /* initialize scroll struct array */
-    scrolling_lines = 0;
-
-    while ( 1 ) {
-
-#ifdef SIMULATOR
-        sleep(delay);
-#else
-        if (remote_initialized)
-            queue_wait_w_tmo(&remote_scroll_queue, &ev, delay);
-        else
-            queue_wait(&remote_scroll_queue, &ev);
-
-        switch (ev.id)
-        {
-            case REMOTE_INIT_LCD:
-                lcd_remote_on();
-                lcd_remote_update();
-                break;
-
-            case REMOTE_DEINIT_LCD:
-                lcd_remote_off();
-                break;
-        }
-
-        delay = next_tick - current_tick - 1;
-        if (delay >= 0)
+    for ( index = 0; index < LCD_REMOTE_SCROLLABLE_LINES; index++ ) {
+        /* really scroll? */
+        if ((lcd_remote_scroll_info.lines & (1 << index)) == 0)
             continue;
-#endif
 
-        for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
-            /* really scroll? */
-            if ( !(scrolling_lines&(1<<index)) )
-                continue;
+        s = &lcd_remote_scroll_info.scroll[index];
 
-            s = &scroll[index];
+        /* check pause */
+        if (TIME_BEFORE(current_tick, s->start_tick))
+            continue;
 
-            /* check pause */
-            if (TIME_BEFORE(current_tick, s->start_tick))
-                continue;
+        if (s->backward)
+            s->offset -= lcd_remote_scroll_info.step;
+        else
+            s->offset += lcd_remote_scroll_info.step;
 
-            if (s->backward)
-                s->offset -= scroll_step;
-            else
-                s->offset += scroll_step;
+        pf = font_get(curfont);
+        xpos = s->startx;
+        ypos = ymargin + index * pf->height;
 
-            pf = font_get(curfont);
-            xpos = s->startx;
-            ypos = ymargin + index * pf->height;
-
-            if (s->bidir) { /* scroll bidirectional */
-                if (s->offset <= 0) {
-                    /* at beginning of line */
-                    s->offset = 0;
-                    s->backward = false;
-                    s->start_tick = current_tick + scroll_delay * 2;
-                }
-                if (s->offset >= s->width - (LCD_REMOTE_WIDTH - xpos)) {
-                    /* at end of line */
-                    s->offset = s->width - (LCD_REMOTE_WIDTH - xpos);
-                    s->backward = true;
-                    s->start_tick = current_tick + scroll_delay * 2;
-                }
+        if (s->bidir) { /* scroll bidirectional */
+            if (s->offset <= 0) {
+                /* at beginning of line */
+                s->offset = 0;
+                s->backward = false;
+                s->start_tick = current_tick + lcd_remote_scroll_info.delay*2;
             }
-            else {
-                /* scroll forward the whole time */
-                if (s->offset >= s->width)
-                    s->offset %= s->width;
+            if (s->offset >= s->width - (LCD_REMOTE_WIDTH - xpos)) {
+                /* at end of line */
+                s->offset = s->width - (LCD_REMOTE_WIDTH - xpos);
+                s->backward = true;
+                s->start_tick = current_tick + lcd_remote_scroll_info.delay*2;
             }
-
-            lastmode = drawmode;
-            drawmode = s->invert ?
-                       (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
-            lcd_remote_putsxyofs(xpos, ypos, s->offset, s->line);
-            drawmode = lastmode;
-            lcd_remote_update_rect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, pf->height);
+        }
+        else {
+            /* scroll forward the whole time */
+            if (s->offset >= s->width)
+                s->offset %= s->width;
         }
 
-
-        next_tick += scroll_ticks;
-        delay = next_tick - current_tick - 1;
-        if (delay < 0)
-        {
-            next_tick = current_tick + 1;
-            delay = 0;
-        }
+        lastmode = drawmode;
+        drawmode = s->invert ?
+            (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
+        lcd_remote_putsxyofs(xpos, ypos, s->offset, s->line);
+        drawmode = lastmode;
+        lcd_remote_update_rect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, pf->height);
     }
 }
 
@@ -1241,10 +1139,5 @@ void lcd_remote_init(void)
 #ifndef SIMULATOR
     /* Call device specific init */
     lcd_remote_init_device();
-    /* private queue */
-    queue_init(&remote_scroll_queue, false);
 #endif
-    create_thread(scroll_thread, scroll_stack,
-                  sizeof(scroll_stack), scroll_name IF_PRIO(, PRIORITY_USER_INTERFACE)
-		  IF_COP(, CPU, false));
 }

@@ -312,6 +312,7 @@ extern void lcd_set_flip(bool yesno);
 extern void lcd_set_drawmode(int mode);
 extern int  lcd_get_drawmode(void);
 extern void lcd_setfont(int font);
+extern int lcd_getfont(void);
 
 extern void lcd_puts_style_offset(int x, int y, const unsigned char *str,
                                   int style, int offset);
@@ -375,30 +376,5 @@ extern void lcd_bitmap_transparent(const fb_data *src, int x, int y,
 #endif
 
 #endif /* HAVE_LCD_BITMAP */
-
-/* internal usage, but in multiple drivers */
-#define SCROLL_SPACING   3
-#ifdef HAVE_LCD_BITMAP
-#define SCROLL_LINE_SIZE (MAX_PATH + SCROLL_SPACING + 3*LCD_WIDTH/2 + 2)
-#else
-#define SCROLL_LINE_SIZE (MAX_PATH + SCROLL_SPACING + 3*LCD_WIDTH + 2)
-#endif
-
-struct scrollinfo {
-    char line[SCROLL_LINE_SIZE];
-    int len;    /* length of line in chars */
-    int offset;
-    int startx;
-#ifdef HAVE_LCD_BITMAP
-    int width;  /* length of line in pixels */
-    bool invert; /* invert the scrolled text */
-#endif
-    bool backward; /* scroll presently forward or backward? */
-    bool bidir;
-    long start_tick;
-#ifdef HAVE_LCD_COLOR
-    int line_colour;
-#endif
-};
 
 #endif /* __LCD_H__ */

@@ -18,8 +18,9 @@
  ****************************************************************************/
 #include "config.h"
 #include "system.h"
-#include "kernel.h"
+#include "file.h"
 #include "lcd-remote.h"
+#include "scroll_engine.h"
 
 /* The LCD in the iAudio M3/M5/X5 remote control is a Tomato LSI 0350 */
 
@@ -397,7 +398,6 @@ static void remote_tick(void)
 {
     static bool last_status = false;
     static int countdown = 0;
-    static int init_delay = 0;
     bool current_status;
 
     current_status = remote_detect();
@@ -416,20 +416,16 @@ static void remote_tick(void)
 
         if (current_status)
         {
-            if (!(countdown % 8))
+            if (!(countdown % 48))
             {
-                if (--init_delay <= 0)
-                {
-                    queue_post(&remote_scroll_queue, REMOTE_INIT_LCD, 0);
-                    init_delay = 6;
-                }
+                queue_broadcast(SYS_REMOTE_PLUGGED, 0);
             }
         }
         else
         {
             if (countdown == 0)
             {
-                queue_post(&remote_scroll_queue, REMOTE_DEINIT_LCD, 0);
+                queue_broadcast(SYS_REMOTE_UNPLUGGED, 0);
             }
         }
     }

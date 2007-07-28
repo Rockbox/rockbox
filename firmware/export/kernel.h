@@ -34,21 +34,40 @@
 #define QUEUE_LENGTH 16 /* MUST be a power of 2 */
 #define QUEUE_LENGTH_MASK (QUEUE_LENGTH - 1)
 
-/* System defined message ID's, occupying the top 5 bits of the event ID */
-#define SYS_EVENT                 (long)0x80000000 /* SYS events are negative */
-#define SYS_USB_CONNECTED         ((SYS_EVENT | ((long)1 << 27)))
-#define SYS_USB_CONNECTED_ACK     ((SYS_EVENT | ((long)2 << 27)))
-#define SYS_USB_DISCONNECTED      ((SYS_EVENT | ((long)3 << 27)))
-#define SYS_USB_DISCONNECTED_ACK  ((SYS_EVENT | ((long)4 << 27)))
-#define SYS_TIMEOUT               ((SYS_EVENT | ((long)5 << 27)))
-#define SYS_HOTSWAP_INSERTED      ((SYS_EVENT | ((long)6 << 27)))
-#define SYS_HOTSWAP_EXTRACTED     ((SYS_EVENT | ((long)7 << 27)))
-#define SYS_POWEROFF              ((SYS_EVENT | ((long)8 << 27)))
-#define SYS_FS_CHANGED            ((SYS_EVENT | ((long)9 << 27)))
-#define SYS_CHARGER_CONNECTED     ((SYS_EVENT | ((long)10 << 27)))
-#define SYS_CHARGER_DISCONNECTED  ((SYS_EVENT | ((long)11 << 27)))
-#define SYS_PHONE_PLUGGED         ((SYS_EVENT | ((long)12 << 27)))
-#define SYS_PHONE_UNPLUGGED       ((SYS_EVENT | ((long)13 << 27)))
+/* System defined message ID's - |sign bit = 1|class|id| */
+/* Event class list */
+#define SYS_EVENT_CLS_QUEUE   0
+#define SYS_EVENT_CLS_USB     1
+#define SYS_EVENT_CLS_POWER   2
+#define SYS_EVENT_CLS_FILESYS 3
+#define SYS_EVENT_CLS_PLUG    4
+/* make sure SYS_EVENT_CLS_BITS has enough range */
+
+/* MSb->|S|c...c|i...i| */
+#define SYS_EVENT                 ((long)(~0ul ^ (~0ul >> 1)))
+#define SYS_EVENT_CLS_BITS        (3)
+#define SYS_EVENT_CLS_SHIFT       (sizeof (long)*8-SYS_EVENT_CLS_BITS-1)
+#define SYS_EVENT_CLS_MASK        (((1l << SYS_EVENT_CLS_BITS)-1) << SYS_EVENT_SHIFT)
+#define MAKE_SYS_EVENT(cls, id)   (SYS_EVENT | ((long)(cls) << SYS_EVENT_CLS_SHIFT) | (long)(id))
+/* Macros for extracting codes */
+#define SYS_EVENT_CLS(e)          (((e) & SYS_EVENT_CLS_MASK) >> SYS_EVENT_SHIFT)
+#define SYS_EVENT_ID(e)           ((e) & ~(SYS_EVENT|SYS_EVENT_CLS_MASK))
+
+#define SYS_TIMEOUT               MAKE_SYS_EVENT(SYS_EVENT_CLS_QUEUE, 0)
+#define SYS_USB_CONNECTED         MAKE_SYS_EVENT(SYS_EVENT_CLS_USB, 0)
+#define SYS_USB_CONNECTED_ACK     MAKE_SYS_EVENT(SYS_EVENT_CLS_USB, 1)
+#define SYS_USB_DISCONNECTED      MAKE_SYS_EVENT(SYS_EVENT_CLS_USB, 2)
+#define SYS_USB_DISCONNECTED_ACK  MAKE_SYS_EVENT(SYS_EVENT_CLS_USB, 3)
+#define SYS_POWEROFF              MAKE_SYS_EVENT(SYS_EVENT_CLS_POWER, 0)
+#define SYS_CHARGER_CONNECTED     MAKE_SYS_EVENT(SYS_EVENT_CLS_POWER, 1)
+#define SYS_CHARGER_DISCONNECTED  MAKE_SYS_EVENT(SYS_EVENT_CLS_POWER, 2)
+#define SYS_FS_CHANGED            MAKE_SYS_EVENT(SYS_EVENT_CLS_FILESYS, 0)
+#define SYS_HOTSWAP_INSERTED      MAKE_SYS_EVENT(SYS_EVENT_CLS_PLUG, 0)
+#define SYS_HOTSWAP_EXTRACTED     MAKE_SYS_EVENT(SYS_EVENT_CLS_PLUG, 1)
+#define SYS_PHONE_PLUGGED         MAKE_SYS_EVENT(SYS_EVENT_CLS_PLUG, 2)
+#define SYS_PHONE_UNPLUGGED       MAKE_SYS_EVENT(SYS_EVENT_CLS_PLUG, 3)
+#define SYS_REMOTE_PLUGGED        MAKE_SYS_EVENT(SYS_EVENT_CLS_PLUG, 4)
+#define SYS_REMOTE_UNPLUGGED      MAKE_SYS_EVENT(SYS_EVENT_CLS_PLUG, 5)
 
 struct event
 {

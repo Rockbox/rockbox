@@ -26,6 +26,7 @@
 #include "lcd.h"
 #include "rbunicode.h"
 #include "arabjoin.h"
+#include "scroll_engine.h"
 
 //#define _HEB_BUFFER_LENGTH (MAX_PATH + LCD_WIDTH/2 + 3 + 2 + 2) * 2
 #define _HEB_BLOCK_TYPE_ENG 1

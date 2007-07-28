@@ -58,6 +58,8 @@ common/timefuncs.c
 common/unicode.c
 
 /* Display */
+scroll_engine.c
+
 #ifdef HAVE_LCD_CHARCELLS
 drivers/lcd-charcell.c
 drivers/lcd-charset-player.c

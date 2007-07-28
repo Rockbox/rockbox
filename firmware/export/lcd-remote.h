@@ -39,10 +39,6 @@
 int remote_type(void);
 #endif
 
-#ifndef SIMULATOR
-extern struct event_queue remote_scroll_queue;
-#endif
-
 #define STYLE_DEFAULT    0x00000000
 #define STYLE_INVERT     0x20000000
 
@@ -146,6 +142,7 @@ extern void lcd_remote_setmargins(int xmargin, int ymargin);
 extern int  lcd_remote_getxmargin(void);
 extern int  lcd_remote_getymargin(void);
 extern void lcd_remote_setfont(int font);
+extern int  lcd_remote_getfont(void);
 extern int  lcd_remote_getstringsize(const unsigned char *str, int *w, int *h);
 
 /* low level drawing function pointer arrays */

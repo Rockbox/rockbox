@@ -545,6 +545,18 @@ void backlight_thread(void)
                 break;
 #endif
 
+#if defined(HAVE_REMOTE_LCD) && !defined(SIMULATOR)
+            /* Here for now or else the aggressive init messes up scrolling */
+            case SYS_REMOTE_PLUGGED:
+                lcd_remote_on();
+                lcd_remote_update();
+                break;
+
+            case SYS_REMOTE_UNPLUGGED:
+                lcd_remote_off();
+                break;
+#endif /* defined(HAVE_REMOTE_LCD) && !defined(SIMULATOR) */
+
             case SYS_USB_CONNECTED:
                 /* Tell the USB thread that we are safe */
                 DEBUGF("backlight_thread got SYS_USB_CONNECTED\n");
