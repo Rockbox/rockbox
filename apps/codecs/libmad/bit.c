@@ -128,13 +128,7 @@ void mad_bit_skip(struct mad_bitptr *bitptr, unsigned int len)
  * NAME:	bit->read()
  * DESCRIPTION:	read an arbitrary number of bits and return their UIMSBF value
  */
-unsigned long bmask[] ICONST_ATTR =
-{ 0x00000000, 0x00000001, 0x00000003, 0x00000007, 0x0000000f, 0x0000001f,
-  0x0000003f, 0x0000007f, 0x000000ff, 0x000001ff, 0x000003ff, 0x000007ff,
-  0x00000fff, 0x00001fff, 0x00003fff, 0x00007fff, 0x0000ffff, 0x0001ffff,
-  0x0003ffff, 0x0007ffff, 0x000fffff, 0x001fffff, 0x003fffff, 0x007fffff,
-  0x00ffffff, 0x01ffffff, 0x03ffffff, 0x07ffffff, 0x0fffffff, 0x1fffffff,
-  0x3fffffff, 0x7fffffff, 0xffffffff };
+
 unsigned long mad_bit_read(struct mad_bitptr *bitptr, unsigned int len) ICODE_ATTR;
 unsigned long mad_bit_read(struct mad_bitptr *bitptr, unsigned int len)
 {
@@ -142,19 +136,13 @@ unsigned long mad_bit_read(struct mad_bitptr *bitptr, unsigned int len)
 
   if(len)
   {
-    if((bitptr->readbit ^ (bitptr->readbit + len - 1)) < 32)
-    {
-      bitptr->readbit += len;
+    unsigned long r = betoh32(curr[0]) << (bitptr->readbit & 31);
 
-      return (betoh32(curr[0]) >> (-bitptr->readbit & 31)) & bmask[len];
-    }
-    else
-    {
-      bitptr->readbit += len;
+    if((bitptr->readbit & 31) + len > 32)
+      r += betoh32(curr[1]) >> (-bitptr->readbit & 31);
 
-      return ((betoh32(curr[0]) << ( bitptr->readbit & 31))
-            + (betoh32(curr[1]) >> (-bitptr->readbit & 31))) & bmask[len];
-    }
+    bitptr->readbit += len;
+    return r >> (32 - len);
   }
 
   return 0;

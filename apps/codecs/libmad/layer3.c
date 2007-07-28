@@ -922,8 +922,19 @@ mad_fixed_t III_requantize(unsigned int value, signed int exp)
 }
 
 /* we must take care that sz >= bits and sz < sizeof(long) lest bits == 0 */
+# if defined(CPU_ARM)
+# define MASK(cache, sz, bits) \
+    ({ unsigned long res; \
+       asm ("mov  %0, #1\n\t" \
+            "rsb  %0, %0, %0, lsl %3\n\t" \
+            "and  %0, %0, %1, lsr %2" \
+           : "=&r" (res) : "r" (cache), "r" ((sz) - (bits)), "r" (bits)); \
+       res; \
+    })
+#else
 # define MASK(cache, sz, bits)	\
     (((cache) >> ((sz) - (bits))) & ((1 << (bits)) - 1))
+#endif
 # define MASK1BIT(cache, sz)  \
     ((cache) & (1 << ((sz) - 1)))
 
@@ -1546,6 +1557,9 @@ enum mad_error III_stereo(mad_fixed_t xr[2][576],
   return MAD_ERROR_NONE;
 }
 
+#if defined(CPU_ARM)
+void III_aliasreduce(mad_fixed_t xr[576], int lines);
+#else
 /*
  * NAME:	III_aliasreduce()
  * DESCRIPTION:	perform frequency line alias reduction
@@ -1600,6 +1614,7 @@ void III_aliasreduce(mad_fixed_t xr[576], int lines)
     }
   }
 }
+#endif
 
 # if defined(ASO_IMDCT)
 void III_imdct_l(mad_fixed_t const [18], mad_fixed_t [36], unsigned int);
@@ -2894,6 +2909,11 @@ void III_imdct_s(mad_fixed_t const X[18], mad_fixed_t z[36])
 
 #endif
 
+#ifdef CPU_ARM
+void III_overlap(mad_fixed_t const output[36], mad_fixed_t overlap[18],
+		 mad_fixed_t sample[18][32], unsigned int sb);
+#else
+
 /*
  * NAME:	III_overlap()
  * DESCRIPTION:	perform overlap-add of windowed IMDCT outputs
@@ -2941,6 +2961,7 @@ void III_overlap(mad_fixed_t const output[36], mad_fixed_t overlap[18],
   }
 # endif
 }
+#endif
 
 /*
  * NAME:	III_overlap_z()
@@ -3142,10 +3163,21 @@ enum mad_error III_decode(struct mad_bitptr *ptr, struct mad_frame *frame,
 
       /* (nonzero) subbands 2-31 */
 
+/*
       i = 576;
       while (i > 36 && xr[ch][i - 1] == 0)
 	--i;
+*/
 
+      {
+          /* saves ~600k cycles */
+          mad_fixed_t *p = &xr[ch][576];
+          mad_fixed_t tmp = xr[ch][35];
+          xr[ch][35] = 1;
+          while (!*--p);
+          xr[ch][35] = tmp;
+          i = p - &xr[ch][0] + 1;
+      }
       sblimit = 32 - (576 - i) / 18;
 
       if (channel->block_type != 2) {

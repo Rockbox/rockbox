@@ -14,4 +14,6 @@ imdct_mcf5249.S
 #endif
 #if defined(CPU_ARM) && !defined(SIMULATOR)
 imdct_l_arm.S
+dct32_arm.S
+synth_full_arm.S
 #endif
