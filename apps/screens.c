@@ -1158,7 +1158,7 @@ static const int id3_headers[]=
     LANG_ID3_LENGTH,
     LANG_ID3_PLAYLIST,
     LANG_ID3_BITRATE,
-    LANG_ID3_FRECUENCY,
+    LANG_ID3_FREQUENCY,
 #if CONFIG_CODEC == SWCODEC
     LANG_ID3_TRACK_GAIN,
     LANG_ID3_ALBUM_GAIN,
@@ -1230,7 +1230,7 @@ static char * id3_get_info(int selected_item, void* data, char *buffer)
             id3->vbr ? str(LANG_ID3_VBR) : (const unsigned char*) "");
                 info=buffer;
                 break;
-            case 11:/*LANG_ID3_FRECUENCY*/
+            case 11:/*LANG_ID3_FREQUENCY*/
                 snprintf(buffer, MAX_PATH, "%ld Hz", id3->frequency);
                 info=buffer;
                 break;
