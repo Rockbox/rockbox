@@ -28,9 +28,11 @@
 extern "C" {
     // Ipodpatcher
     #include "../ipodpatcher/ipodpatcher.h"
+    #include "../sansapatcher/sansapatcher.h"
 };
 
 bool initIpodpatcher();
+bool initSansapatcher();
 
 class BootloaderInstaller : public QObject
 {
@@ -77,6 +79,10 @@ private slots:
     //ipod specific routines
     void ipodPrepare();
     void ipodFinish();
+    
+    //sansa specific routines
+    void sansaPrepare();
+    void sansaFinish();
     
 private:
     QString m_mountpoint, m_device,m_bootloadermethod,m_bootloadername;

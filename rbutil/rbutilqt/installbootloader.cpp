@@ -54,6 +54,12 @@ void BootloaderInstaller::install(Ui::InstallProgressFrm* dp)
         connect(this,SIGNAL(prepare()),this,SLOT(ipodPrepare()));  
         connect(this,SIGNAL(finish()),this,SLOT(ipodFinish()));       
     }       
+    else if(m_bootloadermethod == "sansapatcher")
+    {
+        // connect internal signal
+        connect(this,SIGNAL(prepare()),this,SLOT(sansaPrepare()));  
+        connect(this,SIGNAL(finish()),this,SLOT(sansaFinish()));       
+    }       
     else
     {
         m_dp->listProgress->addItem(tr("unsupported install Method"));
@@ -90,6 +96,11 @@ void BootloaderInstaller::uninstall(Ui::InstallProgressFrm* dp)
     {
         // connect internal signal
         connect(this,SIGNAL(prepare()),this,SLOT(ipodPrepare())); 
+    }
+    else if(m_bootloadermethod == "sansapatcher")
+    {
+        // connect internal signal
+        connect(this,SIGNAL(prepare()),this,SLOT(sansaPrepare())); 
     }
     else
     {
@@ -596,7 +607,7 @@ void BootloaderInstaller::ipodPrepare()
         if (delete_bootloader(&ipod)==0) 
         {
             m_dp->listProgress->addItem(tr("Successfully removed Bootloader"));
-            emit done(true);
+            emit done(false);
             ipod_close(&ipod);
             return;      
         }
@@ -604,6 +615,7 @@ void BootloaderInstaller::ipodPrepare()
         {
             m_dp->listProgress->addItem(tr("--delete-bootloader failed."));
             emit done(true);
+            ipod_close(&ipod);
             return;          
         }    
     }   
@@ -685,7 +697,7 @@ void BootloaderInstaller::ipodFinish()
     if (add_bootloader(&ipod, m_tempfilename.toLatin1().data(), FILETYPE_DOT_IPOD)==0) 
     {
         m_dp->listProgress->addItem(tr("Successfully added Bootloader"));
-        emit done(true);
+        emit done(false);
         ipod_close(&ipod);
         return;      
     }
@@ -695,8 +707,182 @@ void BootloaderInstaller::ipodFinish()
         ipod_close(&ipod);
         emit done(true);
         return;      
+    }       
+}
+
+/**************************************************
+*** sansa secific code 
+***************************************************/
+// reserves memory for sansapatcher
+bool initSansaPatcher()
+{
+      if (sansa_alloc_buffer(&sectorbuf,BUFFER_SIZE) < 0) return true;
+      else return false;
+}
+
+
+void BootloaderInstaller::sansaPrepare()
+{
+    m_dp->listProgress->addItem(tr("Searching for sansas"));
+    struct sansa_t sansa;
+
+    int n = sansa_scan(&sansa);
+    if (n == 0)
+    {
+        m_dp->listProgress->addItem(tr("No Sansa found"));
+        emit done(true);
+        return;
     }
+    if (n > 1)
+    {
+        m_dp->listProgress->addItem(tr("Too many Sansas found"));
+        emit done(true);
+    }
+    
+    if(m_install)         // Installation
+    {
+        QString url = m_bootloaderUrlBase + "/sandisk-sansa/e200/" + m_bootloadername;
+      
+        m_dp->listProgress->addItem(tr("Downloading file %1.%2")
+          .arg(QFileInfo(url).baseName(), QFileInfo(url).completeSuffix()));
+
+        // temporary file needs to be opened to get the filename
+        downloadFile.open();
+        m_tempfilename = downloadFile.fileName();
+        downloadFile.close();
+        // get the real file.
+        getter = new HttpGet(this);
+        getter->setProxy(m_proxy);
+        getter->setFile(&downloadFile);
+        getter->getFile(QUrl(url));
+        // connect signals from HttpGet
+        connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
+        //connect(getter, SIGNAL(requestFinished(int, bool)), this, SLOT(downloadRequestFinished(int, bool)));
+        connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));   
+    }
+    else                 // Uninstallation
+    {
+      
+        if (sansa_open(&sansa, 0) < 0)
+        {
+            m_dp->listProgress->addItem(tr("could not open Sansa"));
+            emit done(true);
+            return;
+        }
+    
+        if (sansa_read_partinfo(&sansa,0) < 0)
+        {
+            m_dp->listProgress->addItem(tr("could not read partitiontable"));
+            emit done(true);
+            return;
+        }
+
+        int i = is_e200(&sansa);
+        if (i < 0) {
+            m_dp->listProgress->addItem(tr("Disk is not an E200 (%1), aborting.").arg(i));
+            emit done(true);
+            return;
+        }
+
+        if (sansa.hasoldbootloader)
+        {
+            m_dp->listProgress->addItem(tr("********************************************\n"
+                                       "OLD ROCKBOX INSTALLATION DETECTED, ABORTING.\n"
+                                       "You must reinstall the original Sansa firmware before running\n"
+                                       "sansapatcher for the first time.\n"
+                                       "See http://www.rockbox.org/twiki/bin/view/Main/SansaE200Install\n"
+                                       "*********************************************\n"));
+            emit done(true);
+            return;
+        }
         
+
+        if (sansa_reopen_rw(&sansa) < 0) 
+        {
+            m_dp->listProgress->addItem(tr("Could not open Sansa in RW mode"));
+            emit done(true);
+            return;
+        }
+        
+        if (sansa_delete_bootloader(&sansa)==0) 
+        {
+            m_dp->listProgress->addItem(tr("Successfully removed Bootloader"));
+            emit done(false);
+            sansa_close(&sansa);
+            return;      
+        }
+        else 
+        {
+            m_dp->listProgress->addItem(tr("--delete-bootloader failed."));
+            emit done(true);
+            sansa_close(&sansa);
+            return;          
+        }        
+    }    
+}
+
+void BootloaderInstaller::sansaFinish()
+{
+    struct sansa_t sansa;
+    sansa_scan(&sansa);
+    
+    if (sansa_open(&sansa, 0) < 0)
+    {
+        m_dp->listProgress->addItem(tr("could not open Sansa"));
+        emit done(true);
+        return;
+    }
+    
+    if (sansa_read_partinfo(&sansa,0) < 0)
+    {
+        m_dp->listProgress->addItem(tr("could not read partitiontable"));
+        emit done(true);
+        return;
+    }
+
+
+    int i = is_e200(&sansa);
+    if (i < 0) {
+    
+        m_dp->listProgress->addItem(tr("Disk is not an E200 (%1), aborting.").arg(i));
+        emit done(true);
+        return;
+    }
+
+    if (sansa.hasoldbootloader)
+    {
+        m_dp->listProgress->addItem(tr("********************************************\n"
+                                       "OLD ROCKBOX INSTALLATION DETECTED, ABORTING.\n"
+                                       "You must reinstall the original Sansa firmware before running\n"
+                                       "sansapatcher for the first time.\n"
+                                       "See http://www.rockbox.org/twiki/bin/view/Main/SansaE200Install\n"
+                                       "*********************************************\n"));
+        emit done(true);
+        return;
+    }
+
+    if (sansa_reopen_rw(&sansa) < 0) 
+    {
+        m_dp->listProgress->addItem(tr("Could not open Sansa in RW mode"));
+        emit done(true);
+        return;
+    }
+
+    if (sansa_add_bootloader(&sansa, m_tempfilename.toLatin1().data(), FILETYPE_MI4)==0) 
+    {
+        m_dp->listProgress->addItem(tr("Successfully added Bootloader"));
+        emit done(false);
+        sansa_close(&sansa);
+        return;      
+    }
+    else 
+    {
+        m_dp->listProgress->addItem(tr("failed to add Bootloader"));
+        sansa_close(&sansa);
+        emit done(true);
+        return;      
+    }       
+
 }
 
 

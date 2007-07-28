@@ -8,7 +8,8 @@ SOURCES += rbutilqt.cpp \
  installzip.cpp \
  installbootloader.cpp \
  installbl.cpp \
- ../ipodpatcher/ipodpatcher.c 
+ ../ipodpatcher/ipodpatcher.c \
+ ../sansapatcher/sansapatcher.c
 
  
 HEADERS += rbutilqt.h \
@@ -27,7 +28,9 @@ HEADERS += rbutilqt.h \
  installbl.h \
  ../ipodpatcher/ipodpatcher.h \
  ../ipodpatcher/ipodio.h \
- ../ipodpatcher/parttypes.h
+ ../ipodpatcher/parttypes.h \
+ ../sansapatcher/sansapatcher.h \
+ ../sansapatcher/sansaio.h
  
  
 TEMPLATE = app
@@ -46,11 +49,14 @@ RESOURCES += rbutilqt.qrc
 
 TRANSLATIONS += rbutil_de.ts
 QT += network
+DEFINES += RBUTIL
 
 win32{
     SOURCES +=  ../ipodpatcher/ipodio-win32.c
+    SOURCES +=  ../sansapatcher/sansaio-win32.c
 }
 
-!win32{
+unix{
     SOURCES +=  ../ipodpatcher/ipodio-posix.c
+    SOURCES +=  ../sansapatcher/sansaio-posix.c
 }
