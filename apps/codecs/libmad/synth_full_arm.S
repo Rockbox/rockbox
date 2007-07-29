@@ -21,7 +21,7 @@
 
 /* This performs slower in IRAM on PP502x and there is no space in
    mpegplayer on the PP5002 */
-#if defined(CPU_PP502x) || (CONFIG_CPU == PP5002 && defined(MPEGPLAYER))
+#if defined(CPU_PP502x) || (CONFIG_CPU == PP5002 && defined(MPEGPLAYER)) || defined(TOSHIBA_GIGABEAT_F)
     .section    .text,"ax",%progbits
 #else
     .section    .icode,"ax",%progbits

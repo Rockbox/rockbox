@@ -584,7 +584,7 @@ void synth_full(struct mad_synth *, struct mad_frame const *,
  */
 
 /* optimised version of synth_full */
-# ifdef FPM_COLDFIRE_EMAC 
+# ifdef FPM_COLDFIRE_EMAC
 static
 void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 		unsigned int nch, unsigned int ns)
@@ -630,7 +630,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
         "msac.l %%d5, %%a5, 20(%2), %%a5, %%acc0\n\t"
         "msac.l %%d6, %%a5, 12(%2), %%a5, %%acc0\n\t"
         "msac.l %%d7, %%a5,   (%2), %%a5, %%acc0\n\t"
-        
+
         "movem.l (%3), %%d0-%%d7\n\t"
         "mac.l  %%d0, %%a5, 56(%2), %%a5, %%acc0\n\t"
         "mac.l  %%d1, %%a5, 48(%2), %%a5, %%acc0\n\t"
@@ -713,7 +713,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
         "mac.l %%d6, %%a5, 12(%2), %%a5, %%acc0\n\t"
         "mac.l %%d7, %%a5,               %%acc0\n\t"
         "movclr.l %%acc0, %0\n\t"
-        : "=r" (hi0) : "a" (*fo), "a" (*D0ptr) 
+        : "=r" (hi0) : "a" (*fo), "a" (*D0ptr)
         : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
 
         pcm[0] = -(hi0 << 3);
@@ -731,7 +731,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
         "msac.l %%d5, %%a5, 16(%2), %%a5, %%acc0\n\t"
         "msac.l %%d6, %%a5,  8(%2), %%a5, %%acc0\n\t"
         "msac.l %%d7, %%a5,  4(%2), %%a5, %%acc0\n\t"
-        
+
         "movem.l (%3), %%d0-%%d7\n\t"
         "mac.l  %%d0, %%a5, 60(%2), %%a5, %%acc0\n\t"
         "mac.l  %%d1, %%a5, 52(%2), %%a5, %%acc0\n\t"
@@ -814,7 +814,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
         "mac.l %%d6, %%a5,  8(%2), %%a5, %%acc0\n\t"
         "mac.l %%d7, %%a5,               %%acc0\n\t"
         "movclr.l %%acc0, %0\n\t"
-        : "=r" (hi0) : "a" (*fo), "a" (*D0ptr) 
+        : "=r" (hi0) : "a" (*fo), "a" (*D0ptr)
         : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
 
         pcm[0] = -(hi0 << 3);
@@ -1044,7 +1044,7 @@ void synth_full2(mad_fixed_t *pcm, mad_fixed_t (*fo)[8], mad_fixed_t (*fe)[8],
 
 /* This performs slower in IRAM on PP502x and there is no space in
    mpegplayer on the PP5002 */
-#if !defined(CPU_PP502x) && !(CONFIG_CPU == PP5002 && defined(MPEGPLAYER))
+#if !defined(CPU_PP502x) && !(CONFIG_CPU == PP5002 && defined(MPEGPLAYER)) && !defined(TOSHIBA_GIGABEAT_F)
 static
 void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 		unsigned int nch, unsigned int ns) ICODE_ATTR;
@@ -1117,7 +1117,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
         D1ptr += 15;
         fo += 15;
         fe += 15;
-        
+
         ptr = *(D0ptr + 1);
         PROD_ODD_0(hi, lo, *fo, ptr);
 /*
@@ -1166,7 +1166,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
         D1ptr += 15;
         fo += 15;
         fe += 15;
-        
+
         ptr = *(D0ptr + 1);
 /*
         ML0(hi, lo, (*fo)[0], ptr[ 0]);
