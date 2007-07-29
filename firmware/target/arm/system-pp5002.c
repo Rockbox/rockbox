@@ -21,6 +21,7 @@
 #ifndef BOOTLOADER
 extern void TIMER1(void);
 extern void TIMER2(void);
+extern void ipod_3g_button_int(void);
 
 void irq(void)
 {
@@ -30,6 +31,8 @@ void irq(void)
             TIMER1();
         else if (CPU_INT_STAT & TIMER2_MASK)
             TIMER2();
+        else if (CPU_INT_STAT & GPIO_MASK)
+            ipod_3g_button_int();
     } else {
         if (COP_INT_STAT & TIMER1_MASK)
             TIMER1();

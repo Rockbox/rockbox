@@ -40,6 +40,8 @@
 #include "system.h"
 #include "powermgmt.h"
 
+int int_btn = BUTTON_NONE;
+
 /* iPod 3G and mini 1G, mini 2G uses iPod 4G code */
 void handle_scroll_wheel(int new_scroll, int was_hold, int reverse)
 {
@@ -101,21 +103,23 @@ void handle_scroll_wheel(int new_scroll, int was_hold, int reverse)
 static int ipod_3g_button_read(void)
 {
     unsigned char source, state;
-    static int was_hold = 0;
+    static bool was_hold = false;
     int btn = BUTTON_NONE;
     
 #ifdef IPOD_3G
-    /* we need some delay for g3, cause hold generates several interrupts,
-     * some of them delayed */
-    udelay(250);
+    /* The following delay was 250 in the ipodlinux source,
+     * but 50 seems to work fine. 250 causes the wheel to stop
+     * working when spinning it real fast. */
+    udelay(50);
 #endif
 
     /* get source of interupts */
     source = GPIOA_INT_STAT;
-
-
+    
     /* get current keypad status */
     state = GPIOA_INPUT_VAL;
+    
+    /* toggle interrupt level */
     GPIOA_INT_LEV = ~state;
 
 #ifdef IPOD_3G
@@ -124,21 +128,22 @@ static int ipod_3g_button_read(void)
         GPIOA_INT_CLR = source;
         return BUTTON_NONE;
     }
-    was_hold = 0;
+    was_hold = false;
 
     if ((state & 0x20) == 0) {
         /* 3g hold switch is active low */
-        was_hold = 1;
+        was_hold = true;
         /* hold switch on 3g causes all outputs to go low */
         /* we shouldn't interpret these as key presses */
         GPIOA_INT_CLR = source;
         return BUTTON_NONE;
     }
 #elif defined IPOD_1G2G
-    if (state & 0x20)
-        was_hold = 1;
-    else
-        was_hold = 0;
+    if (state & 0x20) {
+        /* 1g/2g hold switch is active high */
+        GPIOA_INT_CLR = source;
+        return BUTTON_NONE;
+    }
 #endif
     if ((state & 0x1) == 0) {
         btn |= BUTTON_RIGHT;
@@ -166,12 +171,26 @@ static int ipod_3g_button_read(void)
     return btn;
 }
 
+void ipod_3g_button_int(void)
+{
+    CPU_INT_CLR = GPIO_MASK;
+    int_btn = ipod_3g_button_read();
+    CPU_INT_EN = GPIO_MASK;
+}
+
 void button_init_device(void)
 {
+    GPIOA_ENABLE = 0xff;
+    GPIOA_OUTPUT_EN = 0;
+
     GPIOA_INT_LEV = ~GPIOA_INPUT_VAL;
     GPIOA_INT_CLR = GPIOA_INT_STAT;
-    /* TODO: put additional G1 code here */
+
+    /* TODO: put additional G1 code here (wheel enable) */
+
     GPIOA_INT_EN  = 0xff;
+
+    CPU_INT_EN = GPIO_MASK;
 }
 
 /*
@@ -189,7 +208,7 @@ int button_read_device(void)
     if (hold_button != hold_button_old)
         backlight_hold_changed(hold_button);
         
-    return ipod_3g_button_read();
+    return int_btn;
 }
 
 bool button_hold(void)
