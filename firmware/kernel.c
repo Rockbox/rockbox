@@ -750,6 +750,108 @@ int tick_remove_task(void (*f)(void))
     return -1;
 }
 
+/****************************************************************************
+ * Tick-based interval timers/one-shots - be mindful this is not really
+ * intended for continuous timers but for events that need to run for a short
+ * time and be cancelled without further software intervention.
+ ****************************************************************************/
+#ifdef INCLUDE_TIMEOUT_API
+static struct timeout *tmo_list = NULL; /* list of active timeout events */
+
+/* timeout tick task - calls event handlers when they expire
+ * Event handlers may alter ticks, callback and data during operation.
+ */
+static void timeout_tick(void)
+{
+    unsigned long tick = current_tick;
+    struct timeout *curr, *next;
+
+    for (curr = tmo_list; curr != NULL; curr = next)
+    {
+        next = (struct timeout *)curr->next;
+
+        if (TIME_BEFORE(tick, curr->expires))
+            continue;
+
+        /* this event has expired - call callback */
+        if (curr->callback(curr))
+            *(long *)&curr->expires = tick + curr->ticks; /* reload */
+        else
+            timeout_cancel(curr); /* cancel */
+    }
+}
+
+/* Cancels a timeout callback - can be called from the ISR */
+void timeout_cancel(struct timeout *tmo)
+{
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+
+    if (tmo_list != NULL)
+    {
+        struct timeout *curr = tmo_list;
+        struct timeout *prev = NULL;
+
+        while (curr != tmo && curr != NULL)
+        {
+            prev = curr;
+            curr = (struct timeout *)curr->next;
+        }
+
+        if (curr != NULL)
+        {
+            /* in list */
+            if (prev == NULL)
+                tmo_list = (struct timeout *)curr->next;
+            else
+                *(const struct timeout **)&prev->next = curr->next;
+
+            if (tmo_list == NULL)
+                tick_remove_task(timeout_tick); /* last one - remove task */
+        }
+        /* not in list or tmo == NULL */
+    }
+
+    set_irq_level(oldlevel);
+}
+
+/* Adds a timeout callback - calling with an active timeout resets the
+   interval - can be called from the ISR */
+void timeout_register(struct timeout *tmo, timeout_cb_type callback,
+                      int ticks, intptr_t data)
+{
+    int oldlevel;
+    struct timeout *curr;
+
+    if (tmo == NULL)
+        return;
+
+    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+
+    /* see if this one is already registered */
+    curr = tmo_list;
+    while (curr != tmo && curr != NULL)
+        curr = (struct timeout *)curr->next;
+
+    if (curr == NULL)
+    {
+        /* not found - add it */
+        if (tmo_list == NULL)
+            tick_add_task(timeout_tick); /* first one - add task */
+
+        *(struct timeout **)&tmo->next = tmo_list;
+        tmo_list = tmo;
+    }
+
+    tmo->callback = callback;
+    tmo->ticks = ticks;
+    tmo->data = data;
+    *(long *)&tmo->expires = current_tick + ticks;
+
+    set_irq_level(oldlevel);
+}
+
+#endif /* INCLUDE_TIMEOUT_API */
+
 #ifndef SIMULATOR
 /*
  * Simulator versions in uisimulator/SIMVER/

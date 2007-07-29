@@ -1122,15 +1122,24 @@ bool card_detect_target(void)
     return (GPIOA_INPUT_VAL & 0x80) == 0;
 }
 
+static bool sd1_oneshot_callback(struct timeout *tmo)
+{
+    /* Take final state only - insert/remove is bouncy */
+    queue_remove_from_head(&sd_queue, SD_HOTSWAP);
+    queue_post(&sd_queue, SD_HOTSWAP, tmo->data);
+    return false;
+}
+
 /* called on insertion/removal interrupt */
 void microsd_int(void)
 {
+    static struct timeout sd1_oneshot;
+
     int detect = GPIOA_INPUT_VAL & 0x80;
 
     GPIOA_INT_LEV = (GPIOA_INT_LEV & ~0x80) | (detect ^ 0x80);
     GPIOA_INT_CLR = 0x80;
 
-    /* Take final state only - insert/remove is bouncy */
-    queue_remove_from_head(&sd_queue, SD_HOTSWAP);
-    queue_post(&sd_queue, SD_HOTSWAP, detect == 0);
+    timeout_register(&sd1_oneshot, sd1_oneshot_callback,
+                     detect ? 1 : HZ/2, detect == 0);
 }

@@ -176,4 +176,6 @@
 /* Range for this target: 0xffffff*(0.0-16.000000894069724921567733381255) */
 #define WHEEL_ACCELERATION_FACTOR   (0xffffff*7)
 
+#define INCLUDE_TIMEOUT_API
+
 #endif /* SIMULATOR */

@@ -126,6 +126,28 @@ extern void sleep(int ticks);
 int tick_add_task(void (*f)(void));
 int tick_remove_task(void (*f)(void));
 
+struct timeout;
+
+/* timeout callback type
+ * tmo - pointer to struct timeout associated with event
+ */
+typedef bool (* timeout_cb_type)(struct timeout *tmo);
+
+struct timeout
+{
+    /* for use by callback/internal - read/write */
+    timeout_cb_type callback;/* callback - returning false cancels */
+    int             ticks;   /* timeout period in ticks */
+    intptr_t        data;    /* data passed to callback */
+    /* internal use - read-only */
+    const struct timeout * const next; /* next timeout in list */
+    const long expires; /* expiration tick */
+};
+
+void timeout_register(struct timeout *tmo, timeout_cb_type callback,
+                      int ticks, intptr_t data);
+void timeout_cancel(struct timeout *tmo);
+
 extern void queue_init(struct event_queue *q, bool register_queue);
 #if NUM_CORES > 1
 extern void queue_set_irq_safe(struct event_queue *q, bool state);
