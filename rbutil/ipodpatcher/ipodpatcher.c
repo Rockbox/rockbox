@@ -966,10 +966,16 @@ int read_firmware(struct ipod_t* ipod, char* filename, int type)
         int2be(chksum,header);
         memcpy(header+4, ipod->modelname,4);
 
-        write(outfile,header,8);
+        n = write(outfile,header,8);
+        if (n != 8) {
+            fprintf(stderr,"[ERR]  Write error - %d\n",n);
+        }
     }
 
-    write(outfile,sectorbuf,length);
+    n = write(outfile,sectorbuf,length);
+    if (n != length) {
+        fprintf(stderr,"[ERR]  Write error - %d\n",n);
+    }
     close(outfile);
 
     return 0;
