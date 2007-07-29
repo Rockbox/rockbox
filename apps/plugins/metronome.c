@@ -34,10 +34,10 @@ enum {
     METRONOME_PLAY_TAP = LAST_PLUGINLIB_ACTION+1,
 #if CONFIG_KEYPAD == ONDIO_PAD
     METRONOME_PAUSE,
-#endif
+#endif /* ONDIO_PAD  */
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
     METRONOME_SYNC 
-#endif
+#endif /* IRIVER_H100_PAD||IRIVER_H300_PAD */
 };
 
 
@@ -51,7 +51,7 @@ static const struct button_mapping ondio_action[] =
     {METRONOME_PAUSE, BUTTON_MENU|BUTTON_REPEAT, BUTTON_NONE },
     {CONTEXT_CUSTOM,BUTTON_NONE,BUTTON_NONE}
 };
-#else
+#else /* !ONDIO_PAD  */
 #define METRONOME_TAP       PLA_FIRE
 #define METRONOME_PLAYPAUSE PLA_START
 #define METRONOME_MSG_START "press play"
@@ -64,9 +64,18 @@ static const struct button_mapping iriver_syncaction[] =
     {METRONOME_SYNC, BUTTON_REC, BUTTON_NONE },
     {CONTEXT_CUSTOM,BUTTON_NONE,BUTTON_NONE}
 };
-#endif
+#endif /* IRIVER_H100_PAD||IRIVER_H300_PAD */
 #endif /* #if CONFIG_KEYPAD == ONDIO_PAD */
 
+const struct button_mapping *plugin_contexts[]={
+    generic_directions,
+#if CONFIG_KEYPAD == ONDIO_PAD
+    ondio_action,
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+    iriver_syncaction,
+#endif
+    generic_actions
+};
 
 static struct plugin_api* rb;
 
@@ -81,7 +90,7 @@ static bool sound_paused = true;
 
 static char buffer[30];
 
-static bool reset_tap = false;    
+static bool reset_tap = false;
 static int tap_count    = 0;
 static int tap_time     = 0;
 static int tap_timeout  = 0;
@@ -93,8 +102,6 @@ int bpm_step_counter = 0;
 #define MET_IS_PLAYING rb->mp3_is_playing()
 #define MET_PLAY_STOP rb->mp3_play_stop()
 
-
-    
 void callback(unsigned char** start, size_t* size){
     (void)start; /* unused parameter, avoid warning */
     *size = NULL; /* end of data */
@@ -109,16 +116,14 @@ void play_tock(void){
     rb->mp3_play_pause(true); /* kickoff audio */ 
 }
 
-#else
+#else /*  CONFIG_CODEC == SWCODEC */
 
 #define MET_IS_PLAYING rb->pcm_is_playing()
 #define MET_PLAY_STOP rb->audio_stop()
 
 
 int tock;
-#if CONFIG_CODEC == SWCODEC
 bool need_to_play = false;
-#endif
 
 short sndbuf[sizeof(sound)*2];
 
@@ -137,7 +142,7 @@ void play_tock(void) {
     tock++;
 }
 
-#endif
+#endif /* CONFIG_CODEC != SWCODEC */
 
 void calc_period(void)
 {
@@ -164,14 +169,14 @@ void metronome_draw(struct screen* display)
         display->puts(0, 6, "Mode to SYNC");
     }
 #endif
-#endif
+#endif /* HAVE_LCD_BITMAP */
 
     rb->snprintf(buffer, sizeof(buffer), "BPM: %d ",bpm);
 #ifdef HAVE_LCD_BITMAP
     display->puts(0,3, buffer);
 #else
     display->puts(0,0, buffer);
-#endif
+#endif /* HAVE_LCD_BITMAP */
 
     rb->snprintf(buffer, sizeof(buffer), "Vol: %d",
                  rb->global_settings->volume);
@@ -179,7 +184,7 @@ void metronome_draw(struct screen* display)
     display->puts(10, 3, buffer);
 #else
     display->puts(0,1, buffer);
-#endif
+#endif /* HAVE_LCD_BITMAP */
 
 #ifdef HAVE_LCD_BITMAP
     display->drawline(0, 12, 111, 12);
@@ -187,7 +192,7 @@ void metronome_draw(struct screen* display)
         display->puts(0,2,METRONOME_MSG_START);
     else
         display->puts(0,2,METRONOME_MSG_STOP);
-#endif
+#endif /* HAVE_LCD_BITMAP */
     display->update();
 }
 
@@ -197,6 +202,7 @@ void draw_display(void)
     FOR_NB_SCREENS(i)
         metronome_draw(rb->screens[i]);
 }
+
 /* helper function to change the volume by a certain amount, +/-
    ripped from video.c */
 void change_volume(int delta){
@@ -223,13 +229,13 @@ void change_bpm(int direction){
         bpm = bpm + direction * 2;
     else
         bpm = bpm + direction * 9; 
-        
+
     if (bpm > 400) bpm = 400;
     if (bpm < 1) bpm = 1;
     calc_period();
     draw_display();
     bpm_step_counter++;
-}    
+}
 
 void timer_callback(void)
 {
@@ -248,7 +254,7 @@ void timer_callback(void)
     else {
         minitick++;
     }
-    
+
     if (tap_count) {
         tap_time++;
         if (tap_count > 1 && tap_time > tap_timeout)
@@ -273,17 +279,17 @@ void tap(void)
     else {
         if (tap_time > 0) {
             bpm = 61440/(tap_time/tap_count);
-            
+
             if (bpm > 400)
                 bpm = 400;
         }
-        
+
         calc_period();
         draw_display();
-        
+
         tap_timeout = (tap_count+2)*tap_time/tap_count;
     }
-    
+
     tap_count++;
     minitick = 0;  /* sync tock to tapping */
     play_tock();
@@ -293,14 +299,6 @@ void tap(void)
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
     int button;
-    const struct button_mapping *plugin_contexts[]
-                     = {generic_directions,
-#if CONFIG_KEYPAD == ONDIO_PAD
-                        ondio_action,
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-                        iriver_syncaction,
-#endif
-                        generic_actions};
 #if (CONFIG_KEYPAD == ONDIO_PAD) \
     || (CONFIG_KEYPAD == IRIVER_H100_PAD) \
     || (CONFIG_KEYPAD == IRIVER_H300_PAD)
@@ -315,7 +313,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
 
     if (MET_IS_PLAYING)
         MET_PLAY_STOP; /* stop audio IS */
-        
+
 #if CONFIG_CODEC != SWCODEC
     rb->bitswap(sound, sizeof(sound));
 #else
@@ -326,17 +324,16 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
     rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
     rb->pcm_set_frequency(SAMPR_44);
-#endif
+#endif /* CONFIG_CODEC != SWCODEC */
 
     calc_period();
     rb->timer_register(1, NULL, TIMER_FREQ/1024, 1, timer_callback);
+
     draw_display();
 
     /* main loop */
     while (true){
         reset_tap = true;
-                    
-    
 #if CONFIG_CODEC == SWCODEC
         button = pluginlib_getaction(rb,1,plugin_contexts,PLA_ARRAY_COUNT);
         if (need_to_play)
@@ -347,8 +344,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
 #else
         button = pluginlib_getaction(rb,TIMEOUT_BLOCK,
                                      plugin_contexts,PLA_ARRAY_COUNT);
-#endif
-        
+#endif /* SWCODEC */
         switch (button) {
 
             case METRONOME_QUIT:
@@ -367,13 +363,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
                 else
                     tap();
                 break;
-                
+
             case METRONOME_PAUSE:
                 if(!sound_paused) {
                     sound_paused = true;
                     draw_display();
-                }    
+                }
                 break;
+
 #else
             case METRONOME_PLAYPAUSE:
                 if(sound_paused)
@@ -383,14 +380,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
                 calc_period();
                 draw_display();
                 break;
-#endif
-                
+#endif /* ONDIO_PAD */
+
             case METRONOME_VOL_UP:
             case METRONOME_VOL_UP_REP:
                 change_volume(1);
                 calc_period();
                 break;
-          
+
             case METRONOME_VOL_DOWN:
             case METRONOME_VOL_DOWN_REP:
                 change_volume(-1);
@@ -443,4 +440,3 @@ metronome_exit:
 #endif
     return status;
 }
-
