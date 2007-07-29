@@ -19,8 +19,6 @@
 
 #include "install.h"
 #include "ui_installfrm.h"
-#include "ui_installprogressfrm.h"
-
 
 Install::Install(QWidget *parent) : QDialog(parent)
 {
@@ -98,17 +96,17 @@ void Install::browseFolder()
 
 void Install::accept()
 {
-    downloadProgress = new QDialog(this);
-    dp.setupUi(downloadProgress);
+    logger = new ProgressLoggerGui(this);
+    logger->show();
+   
     // show dialog with error if mount point is wrong
     if(QFileInfo(ui.lineMountPoint->text()).isDir()) {
         mountPoint = ui.lineMountPoint->text();
         userSettings->setValue("defaults/mountpoint", mountPoint);
     }
     else {
-        dp.listProgress->addItem(tr("Mount point is wrong!"));
-        dp.buttonAbort->setText(tr("&Ok"));
-        downloadProgress->show();
+        logger->addItem(tr("Mount point is wrong!"));
+        logger->abort();
         return;
     }
 
@@ -147,26 +145,25 @@ void Install::accept()
     installer->setProxy(proxy);
     installer->setLogSection("rockboxbase");
     installer->setMountPoint(mountPoint);
-    installer->install(&dp);
-
-    connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));
-
-    downloadProgress->show();
+    installer->install(logger);
+    
+    connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));    
+  
 }
 
-
+// Zip installer has finished
 void Install::done(bool error)
 {
     qDebug() << "Install::done, error:" << error;
 
     if(error)
     {
-        connect(dp.buttonAbort, SIGNAL(clicked()), downloadProgress, SLOT(close()));
+       logger->abort();
         return;
     }
 
-    connect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(close()));
-    connect(dp.buttonAbort, SIGNAL(clicked()),downloadProgress, SLOT(close()));
+    // no error, close the window, when the logger is closed
+    connect(logger,SIGNAL(closed()),this,SLOT(close()));     
 
 }
 

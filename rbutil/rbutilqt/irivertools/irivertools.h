@@ -25,7 +25,7 @@
 #include <QtGui>
 
 #include "md5sum.h"
-#include "ui_installprogressfrm.h"
+#include "progressloggerinterface.h"
 
 #define ESTF_SIZE 32
 
@@ -61,9 +61,9 @@ enum striptype
 
 int intable(char *md5, struct sumpairs *table, int len);
 
-bool mkboot(QString infile, QString outfile,QString bootloader,int origin,Ui::InstallProgressFrm* dp);
+bool mkboot(QString infile, QString outfile,QString bootloader,int origin,ProgressloggerInterface* dp);
 int iriver_decode(QString infile_name, QString outfile_name, unsigned int modify,
-                  enum striptype stripmode,Ui::InstallProgressFrm* dp );
-int iriver_encode(QString infile_name, QString outfile_name, unsigned int modify,Ui::InstallProgressFrm* dp);
+                  enum striptype stripmode,ProgressloggerInterface* dp );
+int iriver_encode(QString infile_name, QString outfile_name, unsigned int modify,ProgressloggerInterface* dp);
 
 #endif // IRIVERTOOLS_H_INCLUDED

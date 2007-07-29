@@ -25,8 +25,8 @@
 #include <QSettings>
 
 #include "ui_installfrm.h"
-#include "ui_installprogressfrm.h"
 #include "installzip.h"
+#include "progressloggergui.h"
 
 class Install : public QDialog
 {
@@ -42,16 +42,14 @@ class Install : public QDialog
 
     public slots:
         void accept(void);
-//         void extractBuild(bool);
 
     private:
         Ui::InstallFrm ui;
-        Ui::InstallProgressFrm dp;
+        ProgressLoggerGui* logger;
         QUrl proxy;
         QString releasever;
         QSettings *devices;
         QSettings *userSettings;
-        QDialog *downloadProgress;
         QHttp *download;
         QFile *target;
         QString file;

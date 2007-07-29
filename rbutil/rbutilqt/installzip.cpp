@@ -28,11 +28,11 @@ ZipInstaller::ZipInstaller(QObject* parent): QObject(parent)
 }
 
 
-void ZipInstaller::install(Ui::InstallProgressFrm* dp)
+void ZipInstaller::install(ProgressloggerInterface* dp)
 {
     m_dp = dp;
 
-    m_dp->listProgress->addItem(tr("Downloading file %1.%2")
+    m_dp->addItem(tr("Downloading file %1.%2")
             .arg(QFileInfo(m_url).baseName(), QFileInfo(m_url).completeSuffix()));
 
     // temporary file needs to be opened to get the filename
@@ -48,7 +48,7 @@ void ZipInstaller::install(Ui::InstallProgressFrm* dp)
     connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
     connect(getter, SIGNAL(downloadDone(int, bool)), this, SLOT(downloadRequestFinished(int, bool)));
     connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
-    connect(m_dp->buttonAbort, SIGNAL(clicked()), getter, SLOT(abort()));
+    connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort()));
 }
 
 void ZipInstaller::downloadRequestFinished(int id, bool error)
@@ -65,53 +65,53 @@ void ZipInstaller::downloadDone(bool error)
 
      // update progress bar
      
-    int max = m_dp->progressBar->maximum();
+    int max = m_dp->getProgressMax();
     if(max == 0) {
         max = 100;
-        m_dp->progressBar->setMaximum(max);
+        m_dp->setProgressMax(max);
     }
-    m_dp->progressBar->setValue(max);
+    m_dp->setProgressValue(max);
     if(getter->httpResponse() != 200) {
-        m_dp->listProgress->addItem(tr("Download error: received HTTP error %1.").arg(getter->httpResponse()));
-        m_dp->buttonAbort->setText(tr("&Ok"));
+        m_dp->addItem(tr("Download error: received HTTP error %1.").arg(getter->httpResponse()));
+        m_dp->abort();
         emit done(true);
         return;
     }
     if(error) {
-        m_dp->listProgress->addItem(tr("Download error: %1").arg(getter->errorString()));
-        m_dp->buttonAbort->setText(tr("&Ok"));
+        m_dp->addItem(tr("Download error: %1").arg(getter->errorString()));
+        m_dp->abort();
         emit done(true);
         return;
     }
-    else m_dp->listProgress->addItem(tr("Download finished."));
+    else m_dp->addItem(tr("Download finished."));
 
     // unzip downloaded file
     qDebug() << "about to unzip the downloaded file" << m_file << "to" << m_mountpoint;
 
-    m_dp->listProgress->addItem(tr("Extracting file."));
+    m_dp->addItem(tr("Extracting file."));
     
     qDebug() << "file to unzip: " << m_file;
     UnZip::ErrorCode ec;
     UnZip uz;
     ec = uz.openArchive(m_file);
     if(ec != UnZip::Ok) {
-        m_dp->listProgress->addItem(tr("Opening archive failed: %1.")
+        m_dp->addItem(tr("Opening archive failed: %1.")
             .arg(uz.formatError(ec)));
-        m_dp->buttonAbort->setText(tr("&Ok"));
+        m_dp->abort();
         emit done(false);
         return;
     }
     
     ec = uz.extractAll(m_mountpoint);
     if(ec != UnZip::Ok) {
-        m_dp->listProgress->addItem(tr("Extracting failed: %1.")
+        m_dp->addItem(tr("Extracting failed: %1.")
             .arg(uz.formatError(ec)));
-        m_dp->buttonAbort->setText(tr("&Ok"));
+        m_dp->abort();
         emit done(false);
         return;
     }
 
-    m_dp->listProgress->addItem(tr("creating installation log"));
+    m_dp->addItem(tr("creating installation log"));
     
     QStringList zipContents = uz.fileList();
        
@@ -127,16 +127,15 @@ void ZipInstaller::downloadDone(bool error)
     // remove temporary file
     downloadFile.remove();
 
-    m_dp->listProgress->addItem(tr("Extraction finished successfully."));
-    m_dp->buttonAbort->setText(tr("&Ok"));
-    
+    m_dp->addItem(tr("Extraction finished successfully."));
+    m_dp->abort();
     emit done(false);
 }
 
 void ZipInstaller::updateDataReadProgress(int read, int total)
 {
-    m_dp->progressBar->setMaximum(total);
-    m_dp->progressBar->setValue(read);
+    m_dp->setProgressMax(total);
+    m_dp->setProgressValue(read);
     qDebug() << "progress:" << read << "/" << total;
 
 }

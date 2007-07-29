@@ -25,7 +25,7 @@
 #include <QSettings>
 
 #include "ui_installbootloaderfrm.h"
-#include "ui_installprogressfrm.h"
+#include "progressloggergui.h"
 
 #include "installbootloader.h"
 #include "irivertools/irivertools.h"
@@ -46,11 +46,10 @@ class InstallBl : public QDialog
 
     private:
         Ui::InstallBootloaderFrm ui;
-        Ui::InstallProgressFrm dp;
+         ProgressLoggerGui* logger;
         QUrl proxy;
         QSettings *devices;
         QSettings *userSettings;
-        QDialog *downloadProgress;
         QHttp *download;
         QFile *target;
         QString file;

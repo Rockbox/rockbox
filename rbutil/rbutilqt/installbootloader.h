@@ -22,7 +22,7 @@
 
 #include <QtGui>
 
-#include "ui_installprogressfrm.h"
+#include "progressloggerinterface.h"
 #include "httpget.h"
 #include "irivertools/irivertools.h"
 
@@ -43,8 +43,8 @@ public:
     BootloaderInstaller(QObject* parent);
     ~BootloaderInstaller() {}
 
-    void install(Ui::InstallProgressFrm* dp);
-    void uninstall(Ui::InstallProgressFrm* dp);
+    void install(ProgressloggerInterface* dp);
+    void uninstall(ProgressloggerInterface* dp);
     
     void setMountPoint(QString mountpoint) {m_mountpoint = mountpoint;}
     void setProxy(QUrl proxy) {m_proxy= proxy;}
@@ -101,7 +101,7 @@ private:
     HttpGet *getter;
     QTemporaryFile downloadFile;
     
-    Ui::InstallProgressFrm* m_dp;
+    ProgressloggerInterface* m_dp;
 
 };
 #endif

@@ -18,7 +18,7 @@
  ****************************************************************************/
 
 #include "installzipwindow.h"
-#include "ui_installprogressfrm.h"
+//#include "ui_installprogressfrm.h"
 
 
 InstallZipWindow::InstallZipWindow(QWidget *parent) : QDialog(parent)
@@ -66,54 +66,52 @@ void InstallZipWindow::browseFolder()
 
 void InstallZipWindow::accept()
 {
-    downloadProgress = new QDialog(this);
-    dp.setupUi(downloadProgress);
-   
+    // create logger
+    logger = new ProgressLoggerGui(this);
+    logger->show();
+    
     // show dialog with error if mount point is wrong
     if(QFileInfo(ui.lineMountPoint->text()).isDir()) {
         mountPoint = ui.lineMountPoint->text();
         userSettings->setValue("defaults/mountpoint", mountPoint);
     }
     else {
-        dp.listProgress->addItem(tr("Mount point is wrong!"));
-        dp.buttonAbort->setText(tr("&Ok"));
-        downloadProgress->show();
+        logger->addItem(tr("Mount point is wrong!"));
+        logger->abort();
         return;
     }
 
     userSettings->sync();
 
+    // create Zip installer
 	installer = new ZipInstaller(this);
 	  
 	QString fileName = url.section('/', -1);
-	  
     installer->setFilename(fileName);
     installer->setUrl(url);
     installer->setProxy(proxy);
     installer->setLogSection(logsection);
     installer->setMountPoint(mountPoint);
-    installer->install(&dp);
+    installer->install(logger);
     
     connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));    
     
-    downloadProgress->show();
-
+   
 }
 
-
+// we are done with Zip installing 
 void InstallZipWindow::done(bool error)
 {
     qDebug() << "Install::done, error:" << error;
 
-    if(error)
+    if(error)   // if there was an error
     {
-        // connect close button now as it's needed if we break upon an error
-        connect(dp.buttonAbort, SIGNAL(clicked()), downloadProgress, SLOT(close()));
+        logger->abort();
         return;
     }
-      
-    connect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(close()));
-    connect(dp.buttonAbort, SIGNAL(clicked()),downloadProgress, SLOT(close()));   
+    
+    // no error, close the window, when the logger is closed
+    connect(logger,SIGNAL(closed()),this,SLOT(close()));
 }
 
 void InstallZipWindow::setDeviceSettings(QSettings *dev)

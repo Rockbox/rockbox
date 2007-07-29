@@ -24,11 +24,11 @@ BootloaderInstaller::BootloaderInstaller(QObject* parent): QObject(parent)
 
 }
 
-void BootloaderInstaller::install(Ui::InstallProgressFrm* dp)
+void BootloaderInstaller::install(ProgressloggerInterface* dp)
 {
     m_dp = dp;
     m_install = true;
-    m_dp->listProgress->addItem(tr("Starting bootloader installation"));
+    m_dp->addItem(tr("Starting bootloader installation"));
     
     if(m_bootloadermethod == "gigabeatf")
     {
@@ -68,7 +68,7 @@ void BootloaderInstaller::install(Ui::InstallProgressFrm* dp)
     }       
     else
     {
-        m_dp->listProgress->addItem(tr("unsupported install Method"));
+        m_dp->addItem(tr("unsupported install Method"));
         emit done(true);
         return;
     }
@@ -76,11 +76,11 @@ void BootloaderInstaller::install(Ui::InstallProgressFrm* dp)
     emit prepare();
 }
 
-void BootloaderInstaller::uninstall(Ui::InstallProgressFrm* dp)
+void BootloaderInstaller::uninstall(ProgressloggerInterface* dp)
 {
     m_dp = dp;
     m_install = false;
-    m_dp->listProgress->addItem(tr("Starting bootloader uninstallation"));
+    m_dp->addItem(tr("Starting bootloader uninstallation"));
     
     if(m_bootloadermethod == "gigabeatf")
     {
@@ -89,7 +89,7 @@ void BootloaderInstaller::uninstall(Ui::InstallProgressFrm* dp)
     }
     else if(m_bootloadermethod == "iaudio")
     {
-        m_dp->listProgress->addItem(tr("No uninstallation possible"));
+        m_dp->addItem(tr("No uninstallation possible"));
         emit done(true);
         return;      
     }
@@ -110,13 +110,13 @@ void BootloaderInstaller::uninstall(Ui::InstallProgressFrm* dp)
     }
     else if(m_bootloadermethod == "fwpatcher")
     {
-        m_dp->listProgress->addItem(tr("No uninstallation possible"));
+        m_dp->addItem(tr("No uninstallation possible"));
         emit done(true);
         return;      
     }
     else
     {
-        m_dp->listProgress->addItem(tr("unsupported install Method"));
+        m_dp->addItem(tr("unsupported install Method"));
         emit done(true);
         return;
     }
@@ -138,25 +138,25 @@ void BootloaderInstaller::downloadDone(bool error)
     
      // update progress bar
      
-    int max = m_dp->progressBar->maximum();
+    int max = m_dp->getProgressMax();
     if(max == 0) {
         max = 100;
-        m_dp->progressBar->setMaximum(max);
+        m_dp->setProgressMax(max);
     }
-    m_dp->progressBar->setValue(max);
+    m_dp->setProgressValue(max);
     if(getter->httpResponse() != 200) {
-        m_dp->listProgress->addItem(tr("Download error: received HTTP error %1.").arg(getter->httpResponse()));
-        m_dp->buttonAbort->setText(tr("&Ok"));
+        m_dp->addItem(tr("Download error: received HTTP error %1.").arg(getter->httpResponse()));
+        m_dp->abort();
         emit done(true);
         return;
     }
     if(error) {
-        m_dp->listProgress->addItem(tr("Download error: %1").arg(getter->errorString()));
-        m_dp->buttonAbort->setText(tr("&Ok"));
+        m_dp->addItem(tr("Download error: %1").arg(getter->errorString()));
+        m_dp->abort();
         emit done(true);
         return;
     }
-    else m_dp->listProgress->addItem(tr("Download finished."));
+    else m_dp->addItem(tr("Download finished."));
     
     emit finish();
    
@@ -164,8 +164,8 @@ void BootloaderInstaller::downloadDone(bool error)
 
 void BootloaderInstaller::updateDataReadProgress(int read, int total)
 {
-    m_dp->progressBar->setMaximum(total);
-    m_dp->progressBar->setValue(read);
+    m_dp->setProgressMax(total);
+    m_dp->setProgressValue(read);
     qDebug() << "progress:" << read << "/" << total;
 }
 
@@ -180,7 +180,7 @@ void BootloaderInstaller::gigabeatPrepare()
     {
         QString url = m_bootloaderUrlBase + "/gigabeat/" + m_bootloadername;
       
-        m_dp->listProgress->addItem(tr("Downloading file %1.%2")
+        m_dp->addItem(tr("Downloading file %1.%2")
             .arg(QFileInfo(url).baseName(), QFileInfo(url).completeSuffix()));
 
         // temporary file needs to be opened to get the filename
@@ -194,9 +194,8 @@ void BootloaderInstaller::gigabeatPrepare()
         getter->getFile(QUrl(url));
         // connect signals from HttpGet
         connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
-        //connect(getter, SIGNAL(requestFinished(int, bool)), this, SLOT(downloadRequestFinished(int, bool)));
         connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
-         
+        connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort())); 
    }
    else                 //UnInstallation
    {
@@ -208,7 +207,7 @@ void BootloaderInstaller::gigabeatPrepare()
         // check if original firmware exists
         if(!firmwareOrigFI.exists())
         {
-             m_dp->listProgress->addItem(tr("Could not find the Original Firmware at: %1")
+             m_dp->addItem(tr("Could not find the Original Firmware at: %1")
                     .arg(firmwareOrig));
             emit done(true);
             return;        
@@ -220,7 +219,7 @@ void BootloaderInstaller::gigabeatPrepare()
         //remove modified firmware
         if(!firmwareFile.remove())
         {
-             m_dp->listProgress->addItem(tr("Could not remove the Firmware at: %1")
+             m_dp->addItem(tr("Could not remove the Firmware at: %1")
                     .arg(firmware));
             emit done(true);
             return;        
@@ -229,7 +228,7 @@ void BootloaderInstaller::gigabeatPrepare()
         //copy  original firmware
         if(!firmwareOrigFile.copy(firmware))   
         {
-             m_dp->listProgress->addItem(tr("Could not copy the Firmware from: %1 to %2")
+             m_dp->addItem(tr("Could not copy the Firmware from: %1 to %2")
                     .arg(firmwareOrig,firmware));
             emit done(true);
             return;        
@@ -244,7 +243,7 @@ void BootloaderInstaller::gigabeatFinish()
 {
     // this step is only need for installation, so no code for uninstall here
 
-    m_dp->listProgress->addItem(tr("Finishing bootloader install"));
+    m_dp->addItem(tr("Finishing bootloader install"));
 
     QString firmware = m_mountpoint + "/GBSYSTEM/FWIMG/" + m_bootloadername;
     
@@ -253,7 +252,7 @@ void BootloaderInstaller::gigabeatFinish()
     // check if firmware exists
     if(!firmwareFI.exists())
     {
-        m_dp->listProgress->addItem(tr("Could not find the Firmware at: %1")
+        m_dp->addItem(tr("Could not find the Firmware at: %1")
             .arg(firmware));
         emit done(true);
         return;        
@@ -269,7 +268,7 @@ void BootloaderInstaller::gigabeatFinish()
         QFile firmwareFile(firmware);
         if(!firmwareFile.rename(firmwareOrig))
         {
-            m_dp->listProgress->addItem(tr("Could not rename: %1 to %2")
+            m_dp->addItem(tr("Could not rename: %1 to %2")
                                 .arg(firmware,firmwareOrig));
             emit done(true);
             return;
@@ -284,7 +283,7 @@ void BootloaderInstaller::gigabeatFinish()
     //copy the firmware
     if(!downloadFile.copy(firmware))
     {
-        m_dp->listProgress->addItem(tr("Could not copy: %1 to %2")
+        m_dp->addItem(tr("Could not copy: %1 to %2")
                                 .arg(m_tempfilename,firmware));
         emit done(true);
         return;
@@ -292,8 +291,8 @@ void BootloaderInstaller::gigabeatFinish()
     
     downloadFile.remove();
 
-    m_dp->listProgress->addItem(tr("Bootloader install finished successfully."));
-    m_dp->buttonAbort->setText(tr("&Ok"));
+    m_dp->addItem(tr("Bootloader install finished successfully."));
+    m_dp->abort();
     
     emit done(false);  // success
 
@@ -307,7 +306,7 @@ void BootloaderInstaller::iaudioPrepare()
 
     QString url = m_bootloaderUrlBase + "/iaudio/" + m_bootloadername;
       
-    m_dp->listProgress->addItem(tr("Downloading file %1.%2")
+    m_dp->addItem(tr("Downloading file %1.%2")
           .arg(QFileInfo(url).baseName(), QFileInfo(url).completeSuffix()));
 
     // temporary file needs to be opened to get the filename
@@ -321,9 +320,8 @@ void BootloaderInstaller::iaudioPrepare()
     getter->getFile(QUrl(url));
     // connect signals from HttpGet
     connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
-    //connect(getter, SIGNAL(requestFinished(int, bool)), this, SLOT(downloadRequestFinished(int, bool)));
     connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));   
-
+    connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort())); 
 }  
 
 void BootloaderInstaller::iaudioFinish()
@@ -333,7 +331,7 @@ void BootloaderInstaller::iaudioFinish()
     //copy the firmware
     if(!downloadFile.copy(firmware))
     {
-        m_dp->listProgress->addItem(tr("Could not copy: %1 to %2")
+        m_dp->addItem(tr("Could not copy: %1 to %2")
                                 .arg(m_tempfilename,firmware));
         emit done(true);
         return;
@@ -341,8 +339,8 @@ void BootloaderInstaller::iaudioFinish()
     
     downloadFile.remove();
 
-    m_dp->listProgress->addItem(tr("Bootloader install finished successfully."));
-    m_dp->buttonAbort->setText(tr("&Ok"));
+    m_dp->addItem(tr("Bootloader install finished successfully."));
+    m_dp->abort();
     
     emit done(false);  // success
    
@@ -358,7 +356,7 @@ void BootloaderInstaller::h10Prepare()
     {
         QString url = m_bootloaderUrlBase + "/iriver/" + m_bootloadername;
       
-        m_dp->listProgress->addItem(tr("Downloading file %1.%2")
+        m_dp->addItem(tr("Downloading file %1.%2")
           .arg(QFileInfo(url).baseName(), QFileInfo(url).completeSuffix()));
 
         // temporary file needs to be opened to get the filename
@@ -372,8 +370,8 @@ void BootloaderInstaller::h10Prepare()
         getter->getFile(QUrl(url));
         // connect signals from HttpGet
         connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
-        //connect(getter, SIGNAL(requestFinished(int, bool)), this, SLOT(downloadRequestFinished(int, bool)));
         connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));   
+        connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort())); 
     }
     else             // Uninstallation
     {
@@ -390,7 +388,7 @@ void BootloaderInstaller::h10Prepare()
             firmwareFI.setFile(firmware);
             if(!firmwareFI.exists())  //Firmware dosent exists on player
             {
-                m_dp->listProgress->addItem(tr("Firmware doesn not exist: %1")
+                m_dp->addItem(tr("Firmware doesn not exist: %1")
                                 .arg(firmware));
                 emit done(true);
                 return;
@@ -400,7 +398,7 @@ void BootloaderInstaller::h10Prepare()
         QFileInfo firmwareOrigFI(firmwareOrig);
         if(!firmwareOrigFI.exists())  //Original Firmware dosent exists on player
         {
-            m_dp->listProgress->addItem(tr("Original Firmware doesn not exist: %1")
+            m_dp->addItem(tr("Original Firmware doesn not exist: %1")
                                 .arg(firmwareOrig));
             emit done(true);
             return;
@@ -412,7 +410,7 @@ void BootloaderInstaller::h10Prepare()
         //remove modified firmware
         if(!firmwareFile.remove())
         {
-             m_dp->listProgress->addItem(tr("Could not remove the Firmware at: %1")
+             m_dp->addItem(tr("Could not remove the Firmware at: %1")
                     .arg(firmware));
             emit done(true);
             return;        
@@ -421,7 +419,7 @@ void BootloaderInstaller::h10Prepare()
         //copy  original firmware
         if(!firmwareOrigFile.copy(firmware))   
         {
-             m_dp->listProgress->addItem(tr("Could not copy the Firmware from: %1 to %2")
+             m_dp->addItem(tr("Could not copy the Firmware from: %1 to %2")
                     .arg(firmwareOrig,firmware));
             emit done(true);
             return;        
@@ -447,7 +445,7 @@ void BootloaderInstaller::h10Finish()
         firmwareFI.setFile(firmware);
         if(!firmwareFI.exists())  //Firmware dosent exists on player
         {
-            m_dp->listProgress->addItem(tr("Firmware does not exist: %1")
+            m_dp->addItem(tr("Firmware does not exist: %1")
                                 .arg(firmware));
             emit done(true);
             return;
@@ -461,7 +459,7 @@ void BootloaderInstaller::h10Finish()
         QFile firmwareFile(firmware);
         if(!firmwareFile.rename(firmwareOrig)) //rename Firmware to Original
         {
-            m_dp->listProgress->addItem(tr("Could not rename: %1 to %2")
+            m_dp->addItem(tr("Could not rename: %1 to %2")
                                 .arg(firmware,firmwareOrig));
             emit done(true);
             return;
@@ -475,7 +473,7 @@ void BootloaderInstaller::h10Finish()
         //copy the firmware
     if(!downloadFile.copy(firmware))
     {
-        m_dp->listProgress->addItem(tr("Could not copy: %1 to %2")
+        m_dp->addItem(tr("Could not copy: %1 to %2")
                                 .arg(m_tempfilename,firmware));
         emit done(true);
         return;
@@ -483,8 +481,8 @@ void BootloaderInstaller::h10Finish()
     
     downloadFile.remove();
 
-    m_dp->listProgress->addItem(tr("Bootloader install finished successfully."));
-    m_dp->buttonAbort->setText(tr("&Ok"));
+    m_dp->addItem(tr("Bootloader install finished successfully."));
+    m_dp->abort();
     
     emit done(false);  // success
 
@@ -503,19 +501,19 @@ bool initIpodpatcher()
 
 void BootloaderInstaller::ipodPrepare()
 {
-    m_dp->listProgress->addItem(tr("Searching for ipods"));
+    m_dp->addItem(tr("Searching for ipods"));
     struct ipod_t ipod;
 
     int n = ipod_scan(&ipod);
     if (n == 0)
     {
-        m_dp->listProgress->addItem(tr("No Ipods found"));
+        m_dp->addItem(tr("No Ipods found"));
         emit done(true);
         return;
     }
     if (n > 1)
     {
-        m_dp->listProgress->addItem(tr("Too many Ipods found"));
+        m_dp->addItem(tr("Too many Ipods found"));
         emit done(true);
     }
     
@@ -524,7 +522,7 @@ void BootloaderInstaller::ipodPrepare()
     
         QString url = m_bootloaderUrlBase + "/ipod/bootloader-" + m_bootloadername + ".ipod";
       
-        m_dp->listProgress->addItem(tr("Downloading file %1.%2")
+        m_dp->addItem(tr("Downloading file %1.%2")
           .arg(QFileInfo(url).baseName(), QFileInfo(url).completeSuffix()));
 
         // temporary file needs to be opened to get the filename
@@ -538,38 +536,37 @@ void BootloaderInstaller::ipodPrepare()
         getter->getFile(QUrl(url));
         // connect signals from HttpGet
         connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
-        //connect(getter, SIGNAL(requestFinished(int, bool)), this, SLOT(downloadRequestFinished(int, bool)));
         connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));   
-    
+        connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort())); 
     }
     else                 // Uninstallation
     {
         if (ipod_open(&ipod, 0) < 0)
         {
-            m_dp->listProgress->addItem(tr("could not open ipod"));
+            m_dp->addItem(tr("could not open ipod"));
             emit done(true);
             return;
         }
 
         if (read_partinfo(&ipod,0) < 0)
         {
-            m_dp->listProgress->addItem(tr("could not read partitiontable"));
+            m_dp->addItem(tr("could not read partitiontable"));
             emit done(true);
             return;
         }
 
         if (ipod.pinfo[0].start==0)
         {
-            m_dp->listProgress->addItem(tr("No partition 0 on disk"));
+            m_dp->addItem(tr("No partition 0 on disk"));
         
             int i;
             double sectors_per_MB = (1024.0*1024.0)/ipod.sector_size;
-            m_dp->listProgress->addItem(tr("[INFO] Part    Start Sector    End Sector   Size (MB)   Type\n"));
+            m_dp->addItem(tr("[INFO] Part    Start Sector    End Sector   Size (MB)   Type\n"));
             for ( i = 0; i < 4; i++ ) 
             {
                 if (ipod.pinfo[i].start != 0) 
                 {
-                    m_dp->listProgress->addItem(tr("[INFO]    %1      %2    %3  %4   %5 (%6)").arg(
+                    m_dp->addItem(tr("[INFO]    %1      %2    %3  %4   %5 (%6)").arg(
                         i).arg(
                         ipod.pinfo[i].start).arg(
                         ipod.pinfo[i].start+ipod.pinfo[i].size-1).arg(
@@ -586,13 +583,13 @@ void BootloaderInstaller::ipodPrepare()
 
         if (ipod.nimages <= 0)
         {
-            m_dp->listProgress->addItem(tr("Failed to read firmware directory"));
+            m_dp->addItem(tr("Failed to read firmware directory"));
             emit done(true);
             return;
         }
         if (getmodel(&ipod,(ipod.ipod_directory[0].vers>>8)) < 0)
         {
-            m_dp->listProgress->addItem(tr("Unknown version number in firmware (%1)").arg(
+            m_dp->addItem(tr("Unknown version number in firmware (%1)").arg(
                 ipod.ipod_directory[0].vers));
             emit done(true);
             return;
@@ -600,32 +597,32 @@ void BootloaderInstaller::ipodPrepare()
 
         if (ipod.macpod)
         {
-            m_dp->listProgress->addItem(tr("Warning this is a MacPod, Rockbox doesnt work on this. Convert it to WinPod"));
+            m_dp->addItem(tr("Warning this is a MacPod, Rockbox doesnt work on this. Convert it to WinPod"));
         }
         
         if (ipod_reopen_rw(&ipod) < 0) 
         {
-            m_dp->listProgress->addItem(tr("Could not open Ipod in RW mode"));
+            m_dp->addItem(tr("Could not open Ipod in RW mode"));
             emit done(true);
             return;
         }
         
         if (ipod.ipod_directory[0].entryOffset==0) {
-            m_dp->listProgress->addItem(tr("No bootloader detected."));
+            m_dp->addItem(tr("No bootloader detected."));
             emit done(true);
             return;
         }
        
         if (delete_bootloader(&ipod)==0) 
         {
-            m_dp->listProgress->addItem(tr("Successfully removed Bootloader"));
+            m_dp->addItem(tr("Successfully removed Bootloader"));
             emit done(false);
             ipod_close(&ipod);
             return;      
         }
         else 
         {
-            m_dp->listProgress->addItem(tr("--delete-bootloader failed."));
+            m_dp->addItem(tr("--delete-bootloader failed."));
             emit done(true);
             ipod_close(&ipod);
             return;          
@@ -640,32 +637,32 @@ void BootloaderInstaller::ipodFinish()
     
     if (ipod_open(&ipod, 0) < 0)
     {
-        m_dp->listProgress->addItem(tr("could not open ipod"));
+        m_dp->addItem(tr("could not open ipod"));
         emit done(true);
         return;
     }
 
     if (read_partinfo(&ipod,0) < 0)
     {
-        m_dp->listProgress->addItem(tr("could not read partitiontable"));
+        m_dp->addItem(tr("could not read partitiontable"));
         emit done(true);
         return;
     }
 
     if (ipod.pinfo[0].start==0)
     {
-        m_dp->listProgress->addItem(tr("No partition 0 on disk"));
+        m_dp->addItem(tr("No partition 0 on disk"));
         
         int i;
         double sectors_per_MB = (1024.0*1024.0)/ipod.sector_size;
 
-        m_dp->listProgress->addItem(tr("[INFO] Part    Start Sector    End Sector   Size (MB)   Type\n"));
+        m_dp->addItem(tr("[INFO] Part    Start Sector    End Sector   Size (MB)   Type\n"));
         
         for ( i = 0; i < 4; i++ ) 
         {
          if (ipod.pinfo[i].start != 0) 
          {
-            m_dp->listProgress->addItem(tr("[INFO]    %1      %2    %3  %4   %5 (%6)").arg(
+            m_dp->addItem(tr("[INFO]    %1      %2    %3  %4   %5 (%6)").arg(
                     i).arg(
                    ipod.pinfo[i].start).arg(
                    ipod.pinfo[i].start+ipod.pinfo[i].size-1).arg(
@@ -682,13 +679,13 @@ void BootloaderInstaller::ipodFinish()
 
     if (ipod.nimages <= 0)
     {
-        m_dp->listProgress->addItem(tr("Failed to read firmware directory"));
+        m_dp->addItem(tr("Failed to read firmware directory"));
         emit done(true);
         return;
     }
     if (getmodel(&ipod,(ipod.ipod_directory[0].vers>>8)) < 0)
     {
-        m_dp->listProgress->addItem(tr("Unknown version number in firmware (%1)").arg(
+        m_dp->addItem(tr("Unknown version number in firmware (%1)").arg(
                 ipod.ipod_directory[0].vers));
         emit done(true);
         return;
@@ -696,26 +693,26 @@ void BootloaderInstaller::ipodFinish()
 
     if (ipod.macpod)
     {
-        m_dp->listProgress->addItem(tr("Warning this is a MacPod, Rockbox doesnt work on this. Convert it to WinPod"));
+        m_dp->addItem(tr("Warning this is a MacPod, Rockbox doesnt work on this. Convert it to WinPod"));
     }
 
     if (ipod_reopen_rw(&ipod) < 0) 
     {
-        m_dp->listProgress->addItem(tr("Could not open Ipod in RW mode"));
+        m_dp->addItem(tr("Could not open Ipod in RW mode"));
         emit done(true);
         return;
     }
 
     if (add_bootloader(&ipod, m_tempfilename.toLatin1().data(), FILETYPE_DOT_IPOD)==0) 
     {
-        m_dp->listProgress->addItem(tr("Successfully added Bootloader"));
+        m_dp->addItem(tr("Successfully added Bootloader"));
         emit done(false);
         ipod_close(&ipod);
         return;      
     }
     else 
     {
-        m_dp->listProgress->addItem(tr("failed to add Bootloader"));
+        m_dp->addItem(tr("failed to add Bootloader"));
         ipod_close(&ipod);
         emit done(true);
         return;      
@@ -735,19 +732,19 @@ bool initSansaPatcher()
 
 void BootloaderInstaller::sansaPrepare()
 {
-    m_dp->listProgress->addItem(tr("Searching for sansas"));
+    m_dp->addItem(tr("Searching for sansas"));
     struct sansa_t sansa;
 
     int n = sansa_scan(&sansa);
     if (n == 0)
     {
-        m_dp->listProgress->addItem(tr("No Sansa found"));
+        m_dp->addItem(tr("No Sansa found"));
         emit done(true);
         return;
     }
     if (n > 1)
     {
-        m_dp->listProgress->addItem(tr("Too many Sansas found"));
+        m_dp->addItem(tr("Too many Sansas found"));
         emit done(true);
     }
     
@@ -755,7 +752,7 @@ void BootloaderInstaller::sansaPrepare()
     {
         QString url = m_bootloaderUrlBase + "/sandisk-sansa/e200/" + m_bootloadername;
       
-        m_dp->listProgress->addItem(tr("Downloading file %1.%2")
+        m_dp->addItem(tr("Downloading file %1.%2")
           .arg(QFileInfo(url).baseName(), QFileInfo(url).completeSuffix()));
 
         // temporary file needs to be opened to get the filename
@@ -769,36 +766,36 @@ void BootloaderInstaller::sansaPrepare()
         getter->getFile(QUrl(url));
         // connect signals from HttpGet
         connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
-        //connect(getter, SIGNAL(requestFinished(int, bool)), this, SLOT(downloadRequestFinished(int, bool)));
         connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));   
+        connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort())); 
     }
     else                 // Uninstallation
     {
       
         if (sansa_open(&sansa, 0) < 0)
         {
-            m_dp->listProgress->addItem(tr("could not open Sansa"));
+            m_dp->addItem(tr("could not open Sansa"));
             emit done(true);
             return;
         }
     
         if (sansa_read_partinfo(&sansa,0) < 0)
         {
-            m_dp->listProgress->addItem(tr("could not read partitiontable"));
+            m_dp->addItem(tr("could not read partitiontable"));
             emit done(true);
             return;
         }
 
         int i = is_e200(&sansa);
         if (i < 0) {
-            m_dp->listProgress->addItem(tr("Disk is not an E200 (%1), aborting.").arg(i));
+            m_dp->addItem(tr("Disk is not an E200 (%1), aborting.").arg(i));
             emit done(true);
             return;
         }
 
         if (sansa.hasoldbootloader)
         {
-            m_dp->listProgress->addItem(tr("********************************************\n"
+            m_dp->addItem(tr("********************************************\n"
                                        "OLD ROCKBOX INSTALLATION DETECTED, ABORTING.\n"
                                        "You must reinstall the original Sansa firmware before running\n"
                                        "sansapatcher for the first time.\n"
@@ -811,21 +808,21 @@ void BootloaderInstaller::sansaPrepare()
 
         if (sansa_reopen_rw(&sansa) < 0) 
         {
-            m_dp->listProgress->addItem(tr("Could not open Sansa in RW mode"));
+            m_dp->addItem(tr("Could not open Sansa in RW mode"));
             emit done(true);
             return;
         }
         
         if (sansa_delete_bootloader(&sansa)==0) 
         {
-            m_dp->listProgress->addItem(tr("Successfully removed Bootloader"));
+            m_dp->addItem(tr("Successfully removed Bootloader"));
             emit done(false);
             sansa_close(&sansa);
             return;      
         }
         else 
         {
-            m_dp->listProgress->addItem(tr("--delete-bootloader failed."));
+            m_dp->addItem(tr("--delete-bootloader failed."));
             emit done(true);
             sansa_close(&sansa);
             return;          
@@ -840,14 +837,14 @@ void BootloaderInstaller::sansaFinish()
     
     if (sansa_open(&sansa, 0) < 0)
     {
-        m_dp->listProgress->addItem(tr("could not open Sansa"));
+        m_dp->addItem(tr("could not open Sansa"));
         emit done(true);
         return;
     }
     
     if (sansa_read_partinfo(&sansa,0) < 0)
     {
-        m_dp->listProgress->addItem(tr("could not read partitiontable"));
+        m_dp->addItem(tr("could not read partitiontable"));
         emit done(true);
         return;
     }
@@ -856,14 +853,14 @@ void BootloaderInstaller::sansaFinish()
     int i = is_e200(&sansa);
     if (i < 0) {
     
-        m_dp->listProgress->addItem(tr("Disk is not an E200 (%1), aborting.").arg(i));
+        m_dp->addItem(tr("Disk is not an E200 (%1), aborting.").arg(i));
         emit done(true);
         return;
     }
 
     if (sansa.hasoldbootloader)
     {
-        m_dp->listProgress->addItem(tr("********************************************\n"
+        m_dp->addItem(tr("********************************************\n"
                                        "OLD ROCKBOX INSTALLATION DETECTED, ABORTING.\n"
                                        "You must reinstall the original Sansa firmware before running\n"
                                        "sansapatcher for the first time.\n"
@@ -875,21 +872,21 @@ void BootloaderInstaller::sansaFinish()
 
     if (sansa_reopen_rw(&sansa) < 0) 
     {
-        m_dp->listProgress->addItem(tr("Could not open Sansa in RW mode"));
+        m_dp->addItem(tr("Could not open Sansa in RW mode"));
         emit done(true);
         return;
     }
 
     if (sansa_add_bootloader(&sansa, m_tempfilename.toLatin1().data(), FILETYPE_MI4)==0) 
     {
-        m_dp->listProgress->addItem(tr("Successfully added Bootloader"));
+        m_dp->addItem(tr("Successfully added Bootloader"));
         emit done(false);
         sansa_close(&sansa);
         return;      
     }
     else 
     {
-        m_dp->listProgress->addItem(tr("failed to add Bootloader"));
+        m_dp->addItem(tr("failed to add Bootloader"));
         sansa_close(&sansa);
         emit done(true);
         return;      
@@ -905,7 +902,7 @@ void BootloaderInstaller::iriverPrepare()
 {
     char md5sum_str[32];
     if (!FileMD5(m_origfirmware, md5sum_str)) {
-        m_dp->listProgress->addItem(tr("Could not MD5Sum original firmware"));
+        m_dp->addItem(tr("Could not MD5Sum original firmware"));
         emit done(true);
         return;
     }
@@ -935,14 +932,14 @@ void BootloaderInstaller::iriverPrepare()
     }
     if (series == 0)
     {
-        m_dp->listProgress->addItem(tr("Could not detect firmware type"));
+        m_dp->addItem(tr("Could not detect firmware type"));
         emit done(true);
         return;
     }
     
     QString url = m_bootloaderUrlBase + "/iriver/" + m_bootloadername;
       
-    m_dp->listProgress->addItem(tr("Downloading file %1.%2")
+    m_dp->addItem(tr("Downloading file %1.%2")
         .arg(QFileInfo(url).baseName(), QFileInfo(url).completeSuffix()));
 
     // temporary file needs to be opened to get the filename
@@ -956,9 +953,8 @@ void BootloaderInstaller::iriverPrepare()
     getter->getFile(QUrl(url));
     // connect signals from HttpGet
     connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
-    //connect(getter, SIGNAL(requestFinished(int, bool)), this, SLOT(downloadRequestFinished(int, bool)));
     connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));   
-    
+    connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort())); 
 }
 
 void BootloaderInstaller::iriverFinish()
@@ -999,7 +995,7 @@ void BootloaderInstaller::iriverFinish()
     // iriver decode
     if (iriver_decode(m_origfirmware, firmwareBinName, FALSE, STRIP_NONE,m_dp) == -1) 
     {
-        m_dp->listProgress->addItem(tr("Error in descramble"));
+        m_dp->addItem(tr("Error in descramble"));
         firmwareBin.remove();
         newBin.remove();
         newHex.remove();
@@ -1009,7 +1005,7 @@ void BootloaderInstaller::iriverFinish()
     //  mkboot
     if (!mkboot(firmwareBinName, newBinName, m_tempfilename, origin,m_dp)) 
     {
-        m_dp->listProgress->addItem(tr("Error in patching"));
+        m_dp->addItem(tr("Error in patching"));
         firmwareBin.remove();
         newBin.remove();
         newHex.remove();
@@ -1019,7 +1015,7 @@ void BootloaderInstaller::iriverFinish()
     // iriver_encode
     if (iriver_encode(newBinName, newHexName, FALSE,m_dp) == -1) 
     {
-        m_dp->listProgress->addItem(tr("Error in scramble"));
+        m_dp->addItem(tr("Error in scramble"));
         firmwareBin.remove();
         newBin.remove();
         newHex.remove();
@@ -1030,7 +1026,7 @@ void BootloaderInstaller::iriverFinish()
     /* now md5sum it */
     if (!FileMD5(newHexName, md5sum_str)) 
     {
-        m_dp->listProgress->addItem(tr("Error in checksumming"));
+        m_dp->addItem(tr("Error in checksumming"));
         firmwareBin.remove();
         newBin.remove();
         newHex.remove();
@@ -1054,7 +1050,7 @@ void BootloaderInstaller::iriverFinish()
     // copy file
     if(!newHex.copy(dest))
     {
-        m_dp->listProgress->addItem(tr("Could not copy: %1 to %2")
+        m_dp->addItem(tr("Could not copy: %1 to %2")
                                 .arg(newHexName,dest));
         emit done(true);
         return;
@@ -1063,8 +1059,8 @@ void BootloaderInstaller::iriverFinish()
     downloadFile.remove();
     newHex.remove();
 
-    m_dp->listProgress->addItem(tr("Bootloader install finished successfully."));
-    m_dp->buttonAbort->setText(tr("&Ok"));
+    m_dp->addItem(tr("Bootloader install finished successfully."));
+    m_dp->abort();
     
     emit done(false);  // success
 

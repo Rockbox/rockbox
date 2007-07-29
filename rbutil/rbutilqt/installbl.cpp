@@ -88,17 +88,18 @@ void InstallBl::browseOF()
 
 void InstallBl::accept()
 {
-    downloadProgress = new QDialog(this);
-    dp.setupUi(downloadProgress);
+    // create logger
+    logger = new ProgressLoggerGui(this);
+    logger->show();
+  
     // show dialog with error if mount point is wrong
     if(QFileInfo(ui.lineMountPoint->text()).isDir()) {
         mountPoint = ui.lineMountPoint->text();
         userSettings->setValue("defaults/mountpoint", mountPoint);
     }
     else {
-        dp.listProgress->addItem(tr("Mount point is wrong!"));
-        dp.buttonAbort->setText(tr("&Ok"));
-        downloadProgress->show();
+        logger->addItem(tr("Mount point is wrong!"));
+        logger->abort();
         return;
     }
     
@@ -108,9 +109,8 @@ void InstallBl::accept()
     }
     else
     {
-        dp.listProgress->addItem(tr("Original Firmware Path is wrong!"));
-        dp.buttonAbort->setText(tr("&Ok"));
-        downloadProgress->show();
+        logger->addItem(tr("Original Firmware Path is wrong!"));
+        logger->abort();
         return;
     }
     userSettings->sync();
@@ -127,11 +127,10 @@ void InstallBl::accept()
     binstaller->setBootloaderBaseUrl(devices->value("bootloader_url").toString());
     binstaller->setOrigFirmwarePath(m_OrigFirmware);
     
-    binstaller->install(&dp);
+    binstaller->install(logger);
     
     connect(binstaller, SIGNAL(done(bool)), this, SLOT(done(bool)));    
     
-    downloadProgress->show();
 }
 
 
@@ -141,12 +140,13 @@ void InstallBl::done(bool error)
 
     if(error)
     {
-        connect(dp.buttonAbort, SIGNAL(clicked()), downloadProgress, SLOT(close()));
+        logger->abort();
         return;
     }
-      
-    connect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(close()));
-    connect(dp.buttonAbort, SIGNAL(clicked()),downloadProgress, SLOT(close()));   
+    
+    // no error, close the window, when the logger is closed
+    connect(logger,SIGNAL(closed()),this,SLOT(close()));
+   
 }
 
 void InstallBl::setDeviceSettings(QSettings *dev)

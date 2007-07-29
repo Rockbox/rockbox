@@ -9,6 +9,7 @@ SOURCES += rbutilqt.cpp \
  installbootloader.cpp \
  installbl.cpp \
  installzipwindow.cpp \
+ progressloggergui.cpp \
  ../ipodpatcher/ipodpatcher.c \
  ../sansapatcher/sansapatcher.c \
  irivertools/irivertools.cpp \
@@ -30,6 +31,8 @@ HEADERS += rbutilqt.h \
  installbootloader.h \
  installbl.h \
  installzipwindow.h \
+ progressloggerinterface.h \
+ progressloggergui.h \
  ../ipodpatcher/ipodpatcher.h \
  ../ipodpatcher/ipodio.h \
  ../ipodpatcher/parttypes.h \
@@ -44,7 +47,7 @@ HEADERS += rbutilqt.h \
 TEMPLATE = app
 CONFIG += release \
           warn_on \
-	  thread \
+          thread \
           qt
 TARGET = rbutilqt
 

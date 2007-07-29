@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Wenger
- *   $Id: installzip.h 13990 2007-07-25 22:26:10Z Dominik Wenger $
+ *   $Id: progressloggergui.h 14027 2007-07-27 17:42:49Z domonoky $
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,51 +16,40 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef PROGRESSLOGGERGUI_H
+#define PROGRESSLOGGERGUI_H
  
- 
-#ifndef INSTALLRB_H
-#define INSTALLRB_H
- 
-
-
 #include <QtGui>
-#include <QtNetwork>
 
 #include "progressloggerinterface.h"
-#include "httpget.h"
- 
-class ZipInstaller : public QObject
-{ 
+#include "ui_installprogressfrm.h"
+
+class ProgressLoggerGui :public ProgressloggerInterface
+{
     Q_OBJECT
 public:
-    ZipInstaller(QObject* parent) ;
-    ~ZipInstaller(){}
-    void install(ProgressloggerInterface* dp);
-    void setMountPoint(QString mountpoint) {m_mountpoint = mountpoint;}
-    void setFilename(QString filename){m_file = filename;}
-    void setUrl(QString url){m_url = url;}
-    void setProxy(QUrl proxy) {m_proxy= proxy;}
-    void setLogSection(QString name) {m_logsection = name;}
+    ProgressLoggerGui(QObject * parent);
     
-signals:
-    void done(bool error);
+    virtual void addItem(QString text) ;  //adds a string to the list
     
-private slots:
-    void updateDataReadProgress(int, int);
-    void downloadDone(bool);
-    void downloadRequestFinished(int, bool);
+    virtual void setProgressValue(int value);
+    virtual void setProgressMax(int max);
+    virtual int getProgressMax();
 
+signals:
+    virtual void aborted();
+    virtual void closed();
+
+public slots:
+    virtual void abort();
+    virtual void close();
+    virtual void show();
+    
 private:    
-    QString m_url,m_file,m_mountpoint,m_logsection;
-    QUrl m_proxy;
-    
-    HttpGet *getter;
-    QTemporaryFile downloadFile;
-    
-    ProgressloggerInterface* m_dp;
+    Ui::InstallProgressFrm dp;
+    QDialog *downloadProgress;
+
 };
- 
- 
 
 #endif
 

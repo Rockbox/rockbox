@@ -25,9 +25,8 @@
 #include <QSettings>
 
 #include "ui_installzipfrm.h"
-#include "ui_installprogressfrm.h"
 #include "installzip.h"
-
+#include "progressloggergui.h"
 
 class InstallZipWindow : public QDialog
 {
@@ -46,11 +45,10 @@ class InstallZipWindow : public QDialog
 
     private:
         Ui::InstallZipFrm ui;
-        Ui::InstallProgressFrm dp;
         QUrl proxy;
         QSettings *devices;
         QSettings *userSettings;
-        QDialog *downloadProgress;
+        ProgressLoggerGui* logger;
         QString file;
         QString fileName;
         QString mountPoint;
