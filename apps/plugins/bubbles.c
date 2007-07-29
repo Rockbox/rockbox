@@ -55,10 +55,23 @@ PLUGIN_HEADER
 #define MAX_SHOTTIME 1000
 
 /* keyboard layouts */
+#if CONFIG_KEYPAD != SANSA_E200_PAD
+/* sansa uses the wheel instead of left/right */
 #define BUBBLES_LEFT        PLA_LEFT
 #define BUBBLES_LEFT_REP    PLA_LEFT_REPEAT
 #define BUBBLES_RIGHT       PLA_RIGHT
 #define BUBBLES_RIGHT_REP   PLA_RIGHT_REPEAT
+#define ANGLE_STEP  4
+#define ANGLE_STEP_REP 4
+#else
+#define BUBBLES_LEFT        PLA_UP
+#define BUBBLES_LEFT_REP    PLA_UP_REPEAT
+#define BUBBLES_RIGHT       PLA_DOWN
+#define BUBBLES_RIGHT_REP   PLA_DOWN_REPEAT
+#define ANGLE_STEP  2
+#define ANGLE_STEP_REP 4
+#endif
+
 #define BUBBLES_QUIT        PLA_QUIT
 #define BUBBLES_START       PLA_START
 #define BUBBLES_SELECT      PLA_FIRE
@@ -2348,7 +2361,11 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
     int buttonres;
     long start;
     const struct button_mapping *plugin_contexts[]
+#if CONFIG_KEYPAD != SANSA_E200_PAD
                      = {generic_left_right_fire,generic_actions};
+#else
+                     = {generic_directions,generic_actions};
+#endif
 
     if (timeout < 0)
         timeout = 0;
@@ -2360,15 +2377,15 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
 
     switch(button){
         case BUBBLES_LEFT_REP:
-            if(bb->angle > MIN_ANGLE) bb->angle -= 4;
+            if(bb->angle > MIN_ANGLE) bb->angle -= ANGLE_STEP_REP;
         case BUBBLES_LEFT:   /* change angle to the left */
-            if(bb->angle > MIN_ANGLE) bb->angle -= 2;
+            if(bb->angle > MIN_ANGLE) bb->angle -= ANGLE_STEP;
             break;
 
         case BUBBLES_RIGHT_REP:
-            if(bb->angle < MAX_ANGLE) bb->angle += 4;
+            if(bb->angle < MAX_ANGLE) bb->angle += ANGLE_STEP_REP;
         case BUBBLES_RIGHT:  /* change angle to the right */
-            if(bb->angle < MAX_ANGLE) bb->angle += 2;
+            if(bb->angle < MAX_ANGLE) bb->angle += ANGLE_STEP;
             break;
 
         case BUBBLES_SELECT: /* fire the shot */
@@ -2509,8 +2526,8 @@ static int bubbles(struct game_context* bb) {
             rb->lcd_puts(0, 4, "POWER to exit");
             rb->lcd_puts(0, 5, "SELECT to fire");
             rb->lcd_puts(0, 6, " and show high scores");
-            rb->lcd_puts(0, 7, "LEFT/RIGHT to aim");
-            rb->lcd_puts(0, 8, "SCROLL to change level");
+            rb->lcd_puts(0, 7, "SCROLL to aim");
+            rb->lcd_puts(0, 8, " and change level");
 #endif
 #if LCD_WIDTH >= 138
             rb->snprintf(str, 28, "Start on level %d of %d", startlevel+1,
