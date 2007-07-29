@@ -1,173 +1,121 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="de">
+<!DOCTYPE TS><TS>
 <defaultcodec></defaultcodec>
+<context>
+    <name>Config</name>
+    <message>
+        <source>Language changed</source>
+        <translation>Sprache geändert</translation>
+    </message>
+    <message>
+        <source>You need to restart the application for the changed language to take effect.</source>
+        <translation type="unfinished">Die Anwendung muss neu gestartet werden um die geänderten Spracheinstallungen anzuwenden.</translation>
+    </message>
+</context>
 <context>
     <name>ConfigForm</name>
     <message>
-        <location filename="" line="478"/>
         <source>Configuration</source>
-        <translation type="unfinished">Konfiguration</translation>
+        <translation>Konfiguration</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Configure Rockbox Utility</source>
         <translation type="unfinished">Rockbox Utility konfigurieren</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Ok</source>
-        <translation type="unfinished">&amp;Ok</translation>
+        <translation>&amp;Ok</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Abbrechen</translation>
+        <translation>&amp;Abbrechen</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Proxy</source>
-        <translation type="unfinished">&amp;Proxy</translation>
+        <translation>&amp;Proxy</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;No Proxy</source>
-        <translation type="unfinished">&amp;kein Proxy</translation>
+        <translation>&amp;kein Proxy</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Use &amp;System values</source>
-        <translation type="unfinished">&amp;Systemeinstellungen benutzen</translation>
+        <translation>&amp;Systemeinstellungen benutzen</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Manual Proxy settings</source>
-        <translation type="unfinished">&amp;Manuelle Proxyeinstellungen</translation>
+        <translation>&amp;Manuelle Proxyeinstellungen</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Proxy Values</source>
-        <translation type="unfinished">Proxyeinstellungen</translation>
+        <translation>Proxyeinstellungen</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Host:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Host:</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Port:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Port:</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Username</source>
-        <translation type="unfinished">&amp;Benutzername</translation>
+        <translation>&amp;Benutzername</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>P&amp;assword</source>
-        <translation type="unfinished">P&amp;asswort</translation>
+        <translation>P&amp;asswort</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Language</source>
-        <translation type="unfinished">&amp;Sprache</translation>
+        <translation>&amp;Sprache</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Scrobbler</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
+    <name>Configure</name>
+    <message>
+        <source>English</source>
+        <translation>Deutsch</translation>
+    </message>
+</context>
+<context>
     <name>Install</name>
     <message>
-        <location filename="" line="478"/>
         <source>Mount point is wrong!</source>
         <translation type="unfinished">Falscher Einhängepunkt!</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Ok</source>
-        <translation type="unfinished">&amp;Ok</translation>
+        <translation>&amp;Ok</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
-        <source>Downloading file %1.%2</source>
-        <translation type="unfinished">Herunterladen von Datei %1.%2</translation>
-    </message>
-    <message>
-        <location filename="" line="478"/>
-        <source>Download error!</source>
-        <translation type="unfinished">Download-Fehler!</translation>
-    </message>
-    <message>
-        <location filename="" line="478"/>
-        <source>Download finished.</source>
-        <translation type="unfinished">Download abgeschlossen.</translation>
-    </message>
-    <message>
-        <location filename="" line="478"/>
-        <source>Extracting file %1.%2</source>
-        <translation type="unfinished">Extrahiere Datei %1.%2</translation>
-    </message>
-    <message>
-        <location filename="" line="478"/>
-        <source>Opening archive failed: %1.</source>
-        <translation type="unfinished">Öffnen des Archives fehlgeschlagen: %1</translation>
-    </message>
-    <message>
-        <location filename="" line="478"/>
-        <source>Extracting failed: %1.</source>
-        <translation type="unfinished">Extrahieren fehlgeschlagen: %1</translation>
-    </message>
-    <message>
-        <location filename="" line="478"/>
-        <source>creating installation log</source>
-        <translation type="unfinished">erzeuge Installationshistorie</translation>
-    </message>
-    <message>
-        <location filename="" line="478"/>
-        <source>creating log failed!</source>
-        <translation type="unfinished">Erzeugen der Installationshistorie fehlgeschlagen!</translation>
-    </message>
-    <message>
-        <location filename="" line="478"/>
-        <source>Extraction finished successfully.</source>
-        <translation type="unfinished">Extraktion erfolgreich abgeschlossen.</translation>
-    </message>
-    <message>
-        <location filename="" line="478"/>
         <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; This option will always download a fresh copy. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; This option will always download a fresh copy.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>This is the last released version of Rockbox.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&lt;b&gt;Note:&lt;/b&gt;The lastest released version is %1. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>These are automatically built each day from the current development source code. This generally has more features than the last release but may be much less stable. Features may change regularly.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; archived version is %1.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -175,144 +123,134 @@
 <context>
     <name>InstallFrm</name>
     <message>
-        <location filename="" line="478"/>
         <source>Install Rockbox</source>
         <translation type="unfinished">Rockbox installieren</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Select your device in the filesystem</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Browse</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Please select the Rockbox version you want to install on your player:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Version</source>
-        <translation type="unfinished">Version</translation>
+        <translation>Version</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Rockbox &amp;stable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Archived Build</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Current Build</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Details</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Details about the selected version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Note</source>
-        <translation type="unfinished"></translation>
+        <translation>Hinweis</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Rockbox Utility stores copies of Rockbox it has downloaded on the local hard disk to save network traffic. If your local copy is no longer working, tick this box to download a fresh copy.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Don&apos;t use locally cached copy</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;keine lokale Zwischenkopie verwenden</translation>
     </message>
 </context>
 <context>
     <name>InstallProgressFrm</name>
     <message>
-        <location filename="" line="478"/>
         <source>Progress</source>
-        <translation type="unfinished">Fortschritt</translation>
+        <translation>Fortschritt</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Abort</source>
-        <translation type="unfinished">&amp;Abbrechen</translation>
+        <translation>&amp;Abbrechen</translation>
     </message>
 </context>
 <context>
-    <name>QrbUtilMain</name>
+    <name>RBInstaller</name>
     <message>
-        <location filename="" line="478"/>
-        <source>&amp;File</source>
-        <translation type="obsolete">&amp;Datei</translation>
+        <source>Downloading file %1.%2</source>
+        <translation>Herunterladen von Datei %1.%2</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
-        <source>&amp;About</source>
-        <translation type="obsolete">Ü&amp;ber</translation>
+        <source>Download error: received HTTP error %1.</source>
+        <translation type="unfinished">Fehler beim Herunterladen: HTTP Fehler %1.</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
-        <source>Set &amp;Proxy</source>
-        <translation type="obsolete">&amp;Proxy einstellen</translation>
+        <source>&amp;Ok</source>
+        <translation>&amp;Ok</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
-        <source>E&amp;xit</source>
-        <translation type="obsolete">&amp;Beenden</translation>
+        <source>Download error: %1</source>
+        <translation>Downloadfehler: %1</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
-        <source>Ctrl+Q</source>
-        <translation type="obsolete">Strg+Q</translation>
+        <source>Download finished.</source>
+        <translation>Download abgeschlossen.</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
-        <source>About &amp;Qt</source>
-        <translation type="obsolete">Über &amp;Qt</translation>
+        <source>Extracting file.</source>
+        <translation>Extrahiere Datei.</translation>
+    </message>
+    <message>
+        <source>Opening archive failed: %1.</source>
+        <translation type="unfinished">Öffnen des Archives fehlgeschlagen: %1</translation>
+    </message>
+    <message>
+        <source>Extracting failed: %1.</source>
+        <translation type="unfinished">Extrahieren fehlgeschlagen: %1</translation>
+    </message>
+    <message>
+        <source>creating installation log</source>
+        <translation>erzeuge Installationshistorie</translation>
+    </message>
+    <message>
+        <source>Extraction finished successfully.</source>
+        <translation type="unfinished">Extraktion erfolgreich abgeschlossen.</translation>
     </message>
 </context>
 <context>
     <name>RbUtilQt</name>
     <message>
-        <location filename="" line="478"/>
         <source>Network error: %1. Please check your network and proxy settings.</source>
-        <translation type="unfinished">Netzwerkfehler: %1. Bitte Netzwerk und Proxyeinstellungen überprüfen.</translation>
+        <translation>Netzwerkfehler: %1. Bitte Netzwerk und Proxyeinstellungen überprüfen.</translation>
     </message>
 </context>
 <context>
     <name>RbUtilQtFrm</name>
     <message>
-        <location filename="" line="478"/>
         <source>Rockbox Utility</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Quick Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -321,7 +259,6 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -330,12 +267,10 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Installation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -344,7 +279,6 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;
@@ -352,12 +286,10 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Extras</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -366,7 +298,6 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -375,7 +306,6 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -384,12 +314,10 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Uninstallation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -398,7 +326,6 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -407,211 +334,231 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Manual</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Autodetect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;File</source>
-        <translation type="unfinished">&amp;Datei</translation>
+        <translation>&amp;Datei</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;About</source>
-        <translation type="unfinished">Ü&amp;ber</translation>
+        <translation>Ü&amp;ber</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Empty local download cache</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Download-Cache löschen</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Install Rockbox Utility on player</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rockbox Utility auf dem Gerät installieren</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Configure</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Konfigurieren</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>E&amp;xit</source>
         <translation type="unfinished">&amp;Beenden</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Ctrl+Q</source>
-        <translation type="unfinished">Strg+Q</translation>
+        <translation type="unfinished">Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>About &amp;Qt</source>
         <translation type="unfinished">Über &amp;Qt</translation>
+    </message>
+    <message>
+        <source>Select the task group you want to perform</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>InstallationTab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the tab view of the tasks you can perform</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CompleteInstallationButton</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This performs a complete installation of Rockbox. It installs the bootloader, a current build and the extras package.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Install Rockbox</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ButtonInstall</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This installs a build of Rockbox on your player. It can also upgrade an existing build.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Install Bootloader</source>
+        <translation type="unfinished">Bootloader installieren</translation>
+    </message>
+    <message>
+        <source>Install Fonts package</source>
+        <translation type="unfinished">Schriftarten-Paket installieren</translation>
+    </message>
+    <message>
+        <source>Install themes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Install game files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Uninstall Bootloader</source>
+        <translation type="unfinished">Bootloader entfernen</translation>
+    </message>
+    <message>
+        <source>Uninstall Rockbox</source>
+        <translation type="unfinished">Rockbox entfernen</translation>
+    </message>
+    <message>
+        <source>Device selection combo box</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>UnZip</name>
     <message>
-        <location filename="" line="478"/>
         <source>ZIP operation completed successfully.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Failed to initialize or load zlib library.</source>
-        <translation type="unfinished"></translation>
+        <translation>Initialisieren oder Laden der zlib-Bibliothek fehlgeschlagen.</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>zlib library error.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler in zlib-Bibliothek.</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Unable to create or open file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erzeugen oder Öffnen der Datei fehlgeschlagen.</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Partially corrupted archive. Some files might be extracted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Teilweise korruptes Archiv. Einige Dateien wurden möglicherweise extrahiert.</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Corrupted archive.</source>
-        <translation type="unfinished"></translation>
+        <translation>Korruptes Archiv.</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Wrong password.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falsches Passwort.</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>No archive has been created yet.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>File or directory does not exist.</source>
-        <translation type="unfinished"></translation>
+        <translation>Datei oder Ordner existiert nicht.</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>File read error.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler beim Lesen der Datei.</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>File write error.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler beim Schreiben der Datei.</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>File seek error.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler beim Durchsuchen der Datei.</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Unable to create a directory.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Invalid device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ungültiges Gerät.</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Invalid or incompatible zip archive.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ungültiges oder inkompatibles Zip-Archiv.</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Inconsistent headers. Archive might be corrupted.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Unknown error.</source>
-        <translation type="unfinished"></translation>
+        <translation>Unbekannter Fehler.</translation>
     </message>
 </context>
 <context>
     <name>Zip</name>
     <message>
-        <location filename="" line="478"/>
         <source>ZIP operation completed successfully.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Failed to initialize or load zlib library.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Initialisieren oder Laden der zlib-Bibliothek fehlgeschlagen.</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>zlib library error.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fehler in zlib-Bibliothek.</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Unable to create or open file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erzeugen oder Öffnen der Datei fehlgeschlagen.</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>No archive has been created yet.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>File or directory does not exist.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Datei oder Ordner existiert nicht.</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>File read error.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fehler beim Lesen der Datei.</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>File write error.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fehler beim Schreiben der Datei.</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>File seek error.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fehler beim Durchsuchen der Datei.</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>Unknown error.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Unbekannter Fehler.</translation>
     </message>
 </context>
 <context>
     <name>aboutBox</name>
     <message>
-        <location filename="" line="478"/>
         <source>About Rockbox Utility</source>
-        <translation type="unfinished">Über Rockbox Utility</translation>
+        <translation>Über Rockbox Utility</translation>
     </message>
     <message encoding="UTF-8">
-        <location filename="" line="478"/>
         <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.
 
 © 2005 - 2007 The Rockbox Team.
@@ -620,24 +567,20 @@ Released under the GNU General Public License v2.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Credits</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;License</source>
-        <translation type="unfinished">&amp;Lizenz</translation>
+        <translation>&amp;Lizenz</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>&amp;Ok</source>
-        <translation type="unfinished">&amp;Ok</translation>
+        <translation>&amp;Ok</translation>
     </message>
     <message>
-        <location filename="" line="478"/>
         <source>The Rockbox Utility</source>
-        <translation type="unfinished"></translation>
+        <translation>Rockbox Utility</translation>
     </message>
 </context>
 </TS>

@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/docs" >
-        <file>COPYING</file>
         <file>CREDITS</file>
         <file>gpl-2.0.html</file>
     </qresource>
@@ -18,5 +17,7 @@
     </qresource>
     <qresource prefix="/ini" >
         <file>rbutil.ini</file>
+    </qresource>
+    <qresource prefix="/lang" >
     </qresource>
 </RCC>

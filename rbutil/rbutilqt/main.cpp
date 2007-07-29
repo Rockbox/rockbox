@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Riebeling
- *   $Id:$
+ *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -25,8 +25,22 @@
 int main( int argc, char ** argv ) {
     QApplication app( argc, argv );
 
+    QString absolutePath = QFileInfo(qApp->arguments().at(0)).absolutePath() + "/";
+    // portable installation:
+    // check for a configuration file in the program folder.
+    QSettings *user;
+    if(QFileInfo(absolutePath + "RockboxUtility.ini").isFile())
+        user = new QSettings(absolutePath + "RockboxUtility.ini", QSettings::IniFormat, 0);
+    else user = new QSettings(QSettings::IniFormat, QSettings::UserScope, "rockbox.org", "RockboxUtility");
+
     QTranslator translator;
-//    translator.load("rbutil_de.qm");
+    if(user->value("defaults/lang").toString() != "")
+    // install translator
+    if(user->value("defaults/lang", "").toString() != "") {
+        if(!translator.load(user->value("defaults/lang").toString(), absolutePath))
+            translator.load(user->value("defaults/lang").toString(), ":/lang");
+    }
+    delete user;
     app.installTranslator(&translator);
 
     RbUtilQt window(0);

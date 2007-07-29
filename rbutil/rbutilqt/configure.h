@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Riebeling
- *   $Id:$
+ *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -40,9 +40,15 @@ class Config : public QDialog
     private:
         Ui::ConfigForm ui;
         QSettings *userSettings;
+        QStringList findLanguageFiles(void);
+        QString languageName(const QString&);
+        QMap<QString, QString> lang;
+        QString language;
+        QString programPath;
 
     private slots:
         void setNoProxy(bool);
+        void updateLanguage(void);
 };
 
 #endif

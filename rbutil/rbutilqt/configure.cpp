@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Riebeling
- *   $Id:$
+ *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -22,8 +22,11 @@
 #include "configure.h"
 #include "ui_configurefrm.h"
 
+#define DEFAULT_LANG "English (builtin)"
+
 Config::Config(QWidget *parent) : QDialog(parent)
 {
+    programPath = QFileInfo(qApp->arguments().at(0)).absolutePath() + "/";
     ui.setupUi(this);
     ui.radioManualProxy->setChecked(true);
     QRegExpValidator *proxyValidator = new QRegExpValidator(this);
@@ -32,6 +35,19 @@ Config::Config(QWidget *parent) : QDialog(parent)
     ui.proxyPort->setValidator(proxyValidator);
 
     ui.radioSystemProxy->setEnabled(false); // not implemented yet
+
+    // build language list and sort alphabetically
+    QStringList langs = findLanguageFiles();
+    for(int i = 0; i < langs.size(); ++i)
+        lang.insert(languageName(langs[i]), langs[i]);
+    lang.insert(DEFAULT_LANG, "");
+    QMap<QString, QString>::const_iterator i = lang.constBegin();
+    while (i != lang.constEnd()) {
+        ui.listLanguages->addItem(i.key());
+        i++;
+    }
+    ui.listLanguages->setSelectionMode(QAbstractItemView::SingleSelection);
+    connect(ui.listLanguages, SIGNAL(itemSelectionChanged()), this, SLOT(updateLanguage()));
 
     connect(ui.buttonOk, SIGNAL(clicked()), this, SLOT(accept()));
     connect(ui.buttonCancel, SIGNAL(clicked()), this, SLOT(abort()));
@@ -42,6 +58,7 @@ Config::Config(QWidget *parent) : QDialog(parent)
 void Config::accept()
 {
     qDebug() << "Config::accept()";
+    // proxy: save entered proxy values, not displayed.
     QUrl proxy;
     proxy.setScheme("http");
     proxy.setUserName(ui.proxyUser->text());
@@ -51,13 +68,20 @@ void Config::accept()
 
     userSettings->setValue("defaults/proxy", proxy.toString());
     qDebug() << "new proxy:" << proxy;
-
+    // proxy type
     QString proxyType;
     if(ui.radioNoProxy->isChecked()) proxyType = "none";
     else if(ui.radioSystemProxy->isChecked()) proxyType = "system";
     else proxyType = "manual";
     userSettings->setValue("defaults/proxytype", proxyType);
 
+    // language
+    if(userSettings->value("defaults/lang").toString() != language)
+        QMessageBox::information(this, tr("Language changed"),
+            tr("You need to restart the application for the changed language to take effect."));
+    userSettings->setValue("defaults/lang", language);
+
+    // sync settings
     userSettings->sync();
     this->close();
     emit settingsUpdated();
@@ -76,15 +100,33 @@ void Config::setUserSettings(QSettings *user)
     userSettings = user;
     QUrl proxy = userSettings->value("defaults/proxy").toString();
 
-    ui.proxyPort->insert(QString("%1").arg(proxy.port()));
-    ui.proxyHost->insert(proxy.host());
-    ui.proxyUser->insert(proxy.userName());
-    ui.proxyPass->insert(proxy.password());
+    ui.proxyPort->setText(QString("%1").arg(proxy.port()));
+    ui.proxyHost->setText(proxy.host());
+    ui.proxyUser->setText(proxy.userName());
+    ui.proxyPass->setText(proxy.password());
 
     QString proxyType = userSettings->value("defaults/proxytype").toString();
     if(proxyType == "manual") ui.radioManualProxy->setChecked(true);
     else if(proxyType == "system") ui.radioSystemProxy->setChecked(true);
     else if(proxyType == "none") ui.radioNoProxy->setChecked(true);
+
+    // set language selection
+    QList<QListWidgetItem*> a;
+    QString b;
+    // find key for lang value
+    QMap<QString, QString>::const_iterator i = lang.constBegin();
+    while (i != lang.constEnd()) {
+        if(i.value() == userSettings->value("defaults/lang").toString() + ".qm") {
+            b = i.key();
+            break;
+        }
+        i++;
+    }
+    a = ui.listLanguages->findItems(b, Qt::MatchExactly);
+    if(a.size() <= 0)
+        a = ui.listLanguages->findItems(DEFAULT_LANG, Qt::MatchExactly);
+    if(a.size() > 0)
+        ui.listLanguages->setCurrentItem(a.at(0));
 
 }
 
@@ -97,4 +139,41 @@ void Config::setNoProxy(bool checked)
     ui.proxyUser->setEnabled(i);
     ui.proxyPass->setEnabled(i);
 }
+
+
+QStringList Config::findLanguageFiles()
+{
+    QDir dir(programPath + "/");
+    QStringList fileNames;
+    fileNames = dir.entryList(QStringList("*.qm"), QDir::Files, QDir::Name);
+
+    QDir resDir(":/lang");
+    fileNames += resDir.entryList(QStringList("*.qm"), QDir::Files, QDir::Name);
+
+    fileNames.sort();
+    qDebug() << "Config::findLanguageFiles()" << fileNames;
+
+    return fileNames;
+}
+
+
+QString Config::languageName(const QString &qmFile)
+{
+    QTranslator translator;
+
+    if(!translator.load(qmFile, programPath))
+        translator.load(qmFile, ":/lang");
+
+    return translator.translate("Configure", "English");
+}
+
+
+void Config::updateLanguage()
+{
+    qDebug() << "updateLanguage()";
+    QList<QListWidgetItem*> a = ui.listLanguages->selectedItems();
+    if(a.size() > 0)
+        language = QFileInfo(lang.value(a.at(0)->text())).baseName();
+}
+
 
