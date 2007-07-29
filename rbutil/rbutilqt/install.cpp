@@ -73,10 +73,8 @@ void Install::setProxy(QUrl proxy_url)
 void Install::setMountPoint(QString mount)
 {
     QFileInfo m(mount);
-    if(m.isDir()) {
-        ui.lineMountPoint->clear();
-        ui.lineMountPoint->insert(mount);
-    }
+    if(m.isDir())
+        ui.lineMountPoint->setText(mount);
 }
 
 
@@ -150,9 +148,9 @@ void Install::accept()
     installer->setLogSection("rockboxbase");
     installer->setMountPoint(mountPoint);
     installer->install(&dp);
-    
-    connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));    
-    
+
+    connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));
+
     downloadProgress->show();
 }
 
@@ -166,9 +164,9 @@ void Install::done(bool error)
         connect(dp.buttonAbort, SIGNAL(clicked()), downloadProgress, SLOT(close()));
         return;
     }
-      
+
     connect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(close()));
-    connect(dp.buttonAbort, SIGNAL(clicked()),downloadProgress, SLOT(close()));     
+    connect(dp.buttonAbort, SIGNAL(clicked()),downloadProgress, SLOT(close()));
 
 }
 
