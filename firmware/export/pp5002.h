@@ -19,13 +19,24 @@
 #ifndef __PP5002_H__
 #define __PP5002_H__
 
-/* All info gleaned and/or copied from the iPodLinux project. */
+/* Much info gleaned and/or copied from the iPodLinux project. */
 #define DRAM_START       0x28000000
 
 #define IPOD_LCD_BASE    0xc0001000
 
-#define CPU_CTL          (*(volatile unsigned char *)(0xcf004054))
-#define COP_CTL          (*(volatile unsigned char *)(0xcf004058))
+#define IISCONFIG        (*(volatile unsigned long *)(0xc0002500))
+
+#define IISFIFO_CFG      (*(volatile unsigned long *)(0xc000251c))
+#define IISFIFO_WR       (*(volatile unsigned long *)(0xc0002540))
+#define IISFIFO_RD       (*(volatile unsigned long *)(0xc0002580))
+
+#define I2C_BASE         0xc0008000
+
+/* The PortalPlayer USB controller uses base address 0xc5000000 */
+#define USB_BASE         0xc5000000
+
+#define USB2D_IDENT      (*(volatile unsigned long *)(0xc5000000))
+#define USB_STATUS       (*(volatile unsigned long *)(0xc50001a4))
 
 #define GPIOA_ENABLE     (*(volatile unsigned char *)(0xcf000000))
 #define GPIOB_ENABLE     (*(volatile unsigned char *)(0xcf000004))
@@ -60,84 +71,78 @@
 #define GPIOC_INT_CLR    (*(volatile unsigned char *)(0xcf000078))
 #define GPIOD_INT_CLR    (*(volatile unsigned char *)(0xcf00007c))
 
-#define DEV_RS (*(volatile unsigned long *)( 0xcf005030))
-#define DEV_EN (*(volatile unsigned long *)( 0xcf005000))
-
-#define DEV_I2C     (1<<8)
-#define DEV_USB     0x400000
-
-#define DEV_INIT    (*(volatile unsigned long *)(0x70000020))
-
-#define INIT_USB    0x80000000
-
-#define CPU_INT_STAT     (*(volatile unsigned long*)(0xcf001000))
-#define CPU_INT_EN       (*(volatile unsigned long*)(0xcf001024))
-#define CPU_INT_CLR      (*(volatile unsigned long*)(0xcf001028))
-#define COP_INT_STAT     (*(volatile unsigned long*)(0xcf001010)) /* A guess */
-#define COP_INT_EN       (*(volatile unsigned long*)(0xcf001034))
-#define COP_INT_CLR      (*(volatile unsigned long*)(0xcf001038))
-
-#define USB2D_IDENT         (*(volatile unsigned long*)(0xc5000000))
-#define USB_STATUS          (*(volatile unsigned long*)(0xc50001a4))
-
-#define IISCONFIG           (*(volatile unsigned long*)(0xc0002500))
-
-#define IISFIFO_CFG         (*(volatile unsigned long*)(0xc000251c))
-#define IISFIFO_WR          (*(volatile unsigned long*)(0xc0002540))
-#define IISFIFO_RD          (*(volatile unsigned long*)(0xc0002580))
-
-#define I2C_BASE     0xc0008000
-
-#define TIMER1_CFG   (*(volatile unsigned long *)(0xcf001100))
-#define TIMER1_VAL   (*(volatile unsigned long *)(0xcf001104))
-#define TIMER2_CFG   (*(volatile unsigned long *)(0xcf001108))
-#define TIMER2_VAL   (*(volatile unsigned long *)(0xcf00110c))
-
-#define USEC_TIMER   (*(volatile unsigned long *)(0xcf001110))
-
-#define PP5002_TIMER_STATUS 0xcf001110
+#define INT_FORCED_CLR   (*(volatile unsigned long *)(0xcf00101c))
+#define CPU_INT_STAT     (*(volatile unsigned long *)(0xcf001000))
+#define CPU_INT_EN       (*(volatile unsigned long *)(0xcf001024))
+#define CPU_INT_CLR      (*(volatile unsigned long *)(0xcf001028))
+#define CPU_INT_PRIORITY (*(volatile unsigned long *)(0xcf00102c))
+#define COP_INT_STAT     (*(volatile unsigned long *)(0xcf001010))
+#define COP_INT_EN       (*(volatile unsigned long *)(0xcf001034))
+#define COP_INT_CLR      (*(volatile unsigned long *)(0xcf001038))
+#define COP_INT_PRIORITY (*(volatile unsigned long *)(0xcf00103c))
 
 #define IDE_IRQ          1
 #define SER0_IRQ         4
 #define I2S_IRQ          5
 #define SER1_IRQ         7
 #define TIMER1_IRQ      11
-#define TIMER2_IRQ      12 /* NOTE: THIS IS A GUESS, NEEDS TESTING */
+#define TIMER2_IRQ      12
 #define GPIO_IRQ        14
 #define DMA_OUT_IRQ     30
 #define DMA_IN_IRQ      31
 
-#define TIMER1_MASK  (1 << TIMER1_IRQ)
-#define TIMER2_MASK  (1 << TIMER2_IRQ)
-#define I2S_MASK     (1 << I2S_IRQ)
-#define IDE_MASK     (1 << IDE_IRQ)
-#define GPIO_MASK    (1 << GPIO_IRQ)
-#define SER0_MASK    (1 << SER0_IRQ)
-#define SER1_MASK    (1 << SER1_IRQ)
-#define DMA_OUT_MASK (1 << DMA_OUT_IRQ)
+#define IDE_MASK         (1 << IDE_IRQ)
+#define SER0_MASK        (1 << SER0_IRQ)
+#define I2S_MASK         (1 << I2S_IRQ)
+#define SER1_MASK        (1 << SER1_IRQ)
+#define TIMER1_MASK      (1 << TIMER1_IRQ)
+#define TIMER2_MASK      (1 << TIMER2_IRQ)
+#define GPIO_MASK        (1 << GPIO_IRQ)
+#define DMA_OUT_MASK     (1 << DMA_OUT_IRQ)
+#define DMA_IN_MASK      (1 << DMA_IN_IRQ)
 
-#define TIMING1_CTL         (*(volatile unsigned long*)(0xcf004000))
-#define TIMING2_CTL         (*(volatile unsigned long*)(0xcf004008))
 
-#define CLOCK_ENABLE        (*(volatile unsigned long*)(0xcf005008))
-#define CLOCK_SOURCE        (*(volatile unsigned long*)(0xcf00500c))
-#define CLOCK_DIV           (*(volatile unsigned long*)(0xcf005010))
-#define PLL_DIV             (*(volatile unsigned long*)(0xcf005018))
-#define PLL_MULT            (*(volatile unsigned long*)(0xcf00501c))
+#define TIMER1_CFG       (*(volatile unsigned long *)(0xcf001100))
+#define TIMER1_VAL       (*(volatile unsigned long *)(0xcf001104))
+#define TIMER2_CFG       (*(volatile unsigned long *)(0xcf001108))
+#define TIMER2_VAL       (*(volatile unsigned long *)(0xcf00110c))
 
-#define MMAP0_LOGICAL       (*(volatile unsigned long*)(0xf000f000))
-#define MMAP0_PHYSICAL      (*(volatile unsigned long*)(0xf000f004))
-#define MMAP1_LOGICAL       (*(volatile unsigned long*)(0xf000f008))
-#define MMAP1_PHYSICAL      (*(volatile unsigned long*)(0xf000f00c))
-#define MMAP2_LOGICAL       (*(volatile unsigned long*)(0xf000f010))
-#define MMAP2_PHYSICAL      (*(volatile unsigned long*)(0xf000f014))
-#define MMAP3_LOGICAL       (*(volatile unsigned long*)(0xf000f018))
-#define MMAP3_PHYSICAL      (*(volatile unsigned long*)(0xf000f01c))
+#define USEC_TIMER       (*(volatile unsigned long *)(0xcf001110))
 
-/* The PortalPlayer USB controller uses base address 0xc5000000 */
-#define USB_BASE                0xc5000000
+#define TIMING1_CTL      (*(volatile unsigned long *)(0xcf004000))
+#define TIMING2_CTL      (*(volatile unsigned long *)(0xcf004008))
 
-#define PROC_SLEEP   0xca
-#define PROC_WAKE    0xce
+#define CPU_CTL          (*(volatile unsigned char *)(0xcf004054))
+#define COP_CTL          (*(volatile unsigned char *)(0xcf004058))
+
+#define PROC_SLEEP       0xca
+#define PROC_WAKE        0xce
+
+
+#define DEV_EN           (*(volatile unsigned long *)(0xcf005000))
+#define DEV_RS           (*(volatile unsigned long *)(0xcf005030))
+
+#define DEV_I2C          (1<<8)
+#define DEV_USB          0x400000
+
+#define CLOCK_ENABLE     (*(volatile unsigned long *)(0xcf005008))
+#define CLOCK_SOURCE     (*(volatile unsigned long *)(0xcf00500c))
+#define PLL_CONTROL      (*(volatile unsigned long *)(0xcf005010))
+#define PLL_DIV          (*(volatile unsigned long *)(0xcf005018))
+#define PLL_MULT         (*(volatile unsigned long *)(0xcf00501c))
+
+#define MMAP0_LOGICAL    (*(volatile unsigned long *)(0xf000f000))
+#define MMAP0_PHYSICAL   (*(volatile unsigned long *)(0xf000f004))
+#define MMAP1_LOGICAL    (*(volatile unsigned long *)(0xf000f008))
+#define MMAP1_PHYSICAL   (*(volatile unsigned long *)(0xf000f00c))
+#define MMAP2_LOGICAL    (*(volatile unsigned long *)(0xf000f010))
+#define MMAP2_PHYSICAL   (*(volatile unsigned long *)(0xf000f014))
+#define MMAP3_LOGICAL    (*(volatile unsigned long *)(0xf000f018))
+#define MMAP3_PHYSICAL   (*(volatile unsigned long *)(0xf000f01c))
+
+/* FIXME: These are PP502x definitions, but without them, iPod 3rd gen
+ * doesn't compile. The correct values for 3rd gen are not yet known. */
+#define DEV_INIT    (*(volatile unsigned long *)(0x70000020))
+#define INIT_USB    0x80000000
 
 #endif

@@ -1278,7 +1278,7 @@ bool dbg_ports(void)
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "CLOCK_SOURCE: %08lx", CLOCK_SOURCE);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "CLOCK_DIV:    %08lx", CLOCK_DIV);
+        snprintf(buf, sizeof(buf), "PLL_CONTROL:  %08lx", PLL_CONTROL);
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "PLL_DIV:      %08lx", PLL_DIV);
         lcd_puts(0, line++, buf);

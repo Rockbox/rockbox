@@ -96,40 +96,34 @@ void set_cpu_frequency(long frequency)
         cpu_frequency = frequency;
 
         outl(0xd19b, 0xcf005038);
-        outl(0x02, 0xcf005008);
-        outl(0x55, 0xcf00500c);
-        outl(0x6000, 0xcf005010);
+
+        outl(inl(0xcf005010) | 0x6000, 0xcf005010);
+        outl(0x01, 0xcf005008);
+        outl(0xa9, 0xcf00500c);
+        outl(0xe000, 0xcf005010);
 
         /* Clock frequency = (24/4)*postmult */
         outl(4, 0xcf005018);
         outl(postmult, 0xcf00501c);
 
-        outl(0xe000, 0xcf005010);
-
         /* Wait for PLL relock? */
-        udelay(2000);
+        udelay(200);
 
-        /* Select PLL as clock source? */
-        outl(0xa8, 0xcf00500c);
+        outl(0x02, 0xcf005008);
     }
 }
 #elif !defined(BOOTLOADER)
 static void ipod_set_cpu_speed(void)
 {
+    outl(0xd19b, 0xcf005038);
+
     outl(0x02, 0xcf005008);
     outl(0x55, 0xcf00500c);
     outl(0x6000, 0xcf005010);
-#if 1
-    // 75  MHz (24/24 * 75) (default)
-    outl(24, 0xcf005018);
-    outl(75, 0xcf00501c);
-#endif
 
-#if 0
-    // 66 MHz (24/3 * 8)
-    outl(3, 0xcf005018);
-    outl(8, 0xcf00501c);
-#endif
+    /* 78  MHz (24*13/4) */
+    outl(4, 0xcf005018);
+    outl(13, 0xcf00501c);
 
     outl(0xe000, 0xcf005010);
 
@@ -148,9 +142,15 @@ void system_init(void)
         MMAP3_LOGICAL  = 0x20000000 | 0x3a00;
         MMAP3_PHYSICAL = 0x00000000 | 0x3f84;
 
-        outl(-1, 0xcf00101c);
-        outl(-1, 0xcf001028);
-        outl(-1, 0xcf001038);
+        INT_FORCED_CLR = -1;
+        CPU_INT_CLR    = -1;
+        COP_INT_CLR    = -1;
+
+        GPIOA_INT_EN   = 0;
+        GPIOB_INT_EN   = 0;
+        GPIOC_INT_EN   = 0;
+        GPIOD_INT_EN   = 0;
+
 #ifndef HAVE_ADJUSTABLE_CPU_FREQ
         ipod_set_cpu_speed();
 #endif
