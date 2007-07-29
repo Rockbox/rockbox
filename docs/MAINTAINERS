@@ -78,7 +78,7 @@ Core code (Mid-level)
 :Fonts and Unicode:
 :Replaygain:
 :Profiling:
-:Screens API and GUI widgets: Kévin Ferrar
+:Screens API and GUI widgets: Kévin Ferrare
 :Settings API: Jonathan Gordon
 :Language API:
 :Menu API: Jonathan Gordon
@@ -145,13 +145,13 @@ Plugins
 :clock:
 :credits:
 :cube:
-:demystify: Kévin Ferrar
+:demystify: Kévin Ferrare
 :dice:
 :dict:
 :disktidy:
 :doom:
 :euroconverter:
-:fire: Kévin Ferrar
+:fire: Kévin Ferrare
 :fireworks:
 :firmware_flash:
 :flipit:
@@ -160,7 +160,7 @@ Plugins
 :invadrox:
 :iriver_flash:
 :iriverify:
-:jackpot:
+:jackpot:Kévin Ferrare
 :jewels: Antoine Cellerier
 :jpeg:
 :logo:
@@ -198,7 +198,7 @@ Plugins
 :spacerocks:
 :splitedit:
 :star:
-:starfield:Kévin Ferrar
+:starfield:Kévin Ferrare
 :stats:
 :stopwatch:
 :sudoku: Dave Chapman
