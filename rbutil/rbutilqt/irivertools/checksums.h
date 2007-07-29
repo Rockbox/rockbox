@@ -18,37 +18,22 @@
  *
  ****************************************************************************/
 
+#ifndef CHECKSUMS_H
+#define CHECKSUMS_H
 
-#ifndef IRIVERTOOLS_H_INCLUDED
-#define IRIVERTOOLS_H_INCLUDED
-
-#include <QtGui>
-
-#include "md5sum.h"
-#include "progressloggerinterface.h"
-
-#define ESTF_SIZE 32
-
-struct sumpairs {
-    char *unpatched;
-    char *patched;
+/* precalculated checksums for H110/H115 */
+static struct sumpairs h100pairs[] = {
+#include "h100sums.h"
 };
 
-
-enum striptype
-{
-  STRIP_NONE,
-  STRIP_HEADER_CHECKSUM,
-  STRIP_HEADER_CHECKSUM_ESTF
+/* precalculated checksums for H120/H140 */
+static struct sumpairs h120pairs[] = {
+#include "h120sums.h"
 };
 
-/* protos for iriver.c */
+/* precalculated checksums for H320/H340 */
+static struct sumpairs h300pairs[] = {
+#include "h300sums.h"
+};
 
-int intable(char *md5, struct sumpairs *table, int len);
-
-bool mkboot(QString infile, QString outfile,QString bootloader,int origin,ProgressloggerInterface* dp);
-int iriver_decode(QString infile_name, QString outfile_name, unsigned int modify,
-                  enum striptype stripmode,ProgressloggerInterface* dp );
-int iriver_encode(QString infile_name, QString outfile_name, unsigned int modify,ProgressloggerInterface* dp);
-
-#endif // IRIVERTOOLS_H_INCLUDED
+#endif

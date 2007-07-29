@@ -46,7 +46,7 @@ class InstallBl : public QDialog
 
     private:
         Ui::InstallBootloaderFrm ui;
-         ProgressLoggerGui* logger;
+        ProgressLoggerGui* logger;
         QUrl proxy;
         QSettings *devices;
         QSettings *userSettings;
@@ -62,7 +62,7 @@ class InstallBl : public QDialog
         void browseFolder(void);
         void browseOF(void);
         void done(bool);
-        
+
 };
 
 

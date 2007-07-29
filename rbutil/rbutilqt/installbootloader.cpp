@@ -18,6 +18,7 @@
  ****************************************************************************/
  
 #include "installbootloader.h"
+#include "irivertools/checksums.h"
 
 BootloaderInstaller::BootloaderInstaller(QObject* parent): QObject(parent) 
 {
@@ -961,8 +962,8 @@ void BootloaderInstaller::iriverFinish()
 {
     // Patch firmware
     char md5sum_str[32];
-    struct sumpairs *sums;
-    int origin;
+    struct sumpairs *sums = 0;
+    int origin = 0;
 
     /* get pointer to the correct bootloader.bin */
     switch(series) {
