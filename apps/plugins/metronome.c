@@ -191,7 +191,7 @@ void metronome_draw(struct screen* display)
     display->update();
 }
 
-void draw_display()
+void draw_display(void)
 {
     int i;
     FOR_NB_SCREENS(i)
