@@ -390,7 +390,6 @@ int diskmove(struct ipod_t* ipod, int delta)
     int src_end;
     int bytesleft;
     int chunksize;
-    int i;
     int n;
 
     src_start = ipod->ipod_directory[1].devOffset + ipod->sector_size;
@@ -437,7 +436,7 @@ int diskmove(struct ipod_t* ipod, int delta)
 
         if (n < chunksize) {
             fprintf(stderr,"[ERR]  Short read - requested %d bytes, received %d\n",
-                           i,n);
+                           chunksize,n);
             return -1;
         }
 
@@ -453,7 +452,7 @@ int diskmove(struct ipod_t* ipod, int delta)
 
         if (n < chunksize) {
             fprintf(stderr,"[ERR]  Short write - requested %d bytes, received %d\n"
-                          ,i,n);
+                          ,chunksize,n);
             return -1;
         }
 
@@ -602,7 +601,7 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
 
     if (n < entryOffset) {
         fprintf(stderr,"[ERR]  Short read - requested %d bytes, received %d\n"
-                      ,i,n);
+                      ,entryOffset,n);
         return -1;
     }
 
@@ -637,7 +636,7 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
 
     if (n < (entryOffset+paddedlength)) {
         fprintf(stderr,"[ERR]  Short read - requested %d bytes, received %d\n"
-                      ,i,n);
+                      ,entryOffset+paddedlength,n);
         return -1;
     }
 
@@ -882,7 +881,7 @@ int write_firmware(struct ipod_t* ipod, char* filename, int type)
 
     if (n < newsize) {
         fprintf(stderr,"[ERR]  Short write - requested %d bytes, received %d\n"
-                      ,i,n);
+                      ,newsize,n);
         return -1;
     }
     fprintf(stderr,"[INFO]  Wrote %d bytes to firmware partition\n",n);
