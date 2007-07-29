@@ -30,6 +30,10 @@
 #include "installbootloader.h"
 #include "installzipwindow.h"
 
+#ifdef __linux
+#include <stdio.h>
+#endif
+
 RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
 {
     QString programPath = qApp->arguments().at(0);
@@ -86,7 +90,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     ui.buttonComplete->setEnabled(false);
     ui.buttonDetect->setEnabled(false);
 
-    initIpodpatcher();    
+    initIpodpatcher();
     downloadInfo();
 
 }
@@ -100,6 +104,10 @@ void RbUtilQt::downloadInfo()
     connect(daily, SIGNAL(requestFinished(int, bool)), this, SLOT(downloadDone(int, bool)));
     if(userSettings->value("defaults/proxytype") == "manual")
         daily->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
+#ifdef __linux
+    else if(userSettings->value("defaults/proxytype") == "system")
+        daily->setProxy(QUrl(getenv("http_proxy")));
+#endif
 
     qDebug() << "downloading build info";
     daily->setFile(&buildInfo);
@@ -218,6 +226,10 @@ void RbUtilQt::install()
     installWindow->setDeviceSettings(devices);
     if(userSettings->value("defaults/proxytype") == "manual")
         installWindow->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
+#ifdef __linux
+    else if(userSettings->value("defaults/proxytype") == "system")
+        installWindow->setProxy(QUrl(getenv("http_proxy")));
+#endif
     installWindow->setMountPoint(userSettings->value("defaults/mountpoint").toString());
 
     buildInfo.open();
@@ -243,6 +255,10 @@ void RbUtilQt::installBl()
     installWindow->setDeviceSettings(devices);
     if(userSettings->value("defaults/proxytype") == "manual")
         installWindow->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
+#ifdef __linux
+    else if(userSettings->value("defaults/proxytype") == "system")
+        installWindow->setProxy(QUrl(getenv("http_proxy")));
+#endif
     installWindow->setMountPoint(userSettings->value("defaults/mountpoint").toString());
 
     installWindow->show();
@@ -250,30 +266,38 @@ void RbUtilQt::installBl()
 
 void RbUtilQt::installFonts()
 {
-	InstallZipWindow* installWindow = new InstallZipWindow(this);
-	installWindow->setUserSettings(userSettings);
+    InstallZipWindow* installWindow = new InstallZipWindow(this);
+    installWindow->setUserSettings(userSettings);
     installWindow->setDeviceSettings(devices);
     if(userSettings->value("defaults/proxytype") == "manual")
         installWindow->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
+#ifdef __linux
+    else if(userSettings->value("defaults/proxytype") == "system")
+        installWindow->setProxy(QUrl(getenv("http_proxy")));
+#endif
     installWindow->setMountPoint(userSettings->value("defaults/mountpoint").toString());
-	installWindow->setLogSection("Fonts");
-	installWindow->setUrl(devices->value("font_url").toString());
-	installWindow->setWindowTitle("Font Installation");
-	installWindow->show();
-		
+    installWindow->setLogSection("Fonts");
+    installWindow->setUrl(devices->value("font_url").toString());
+    installWindow->setWindowTitle("Font Installation");
+    installWindow->show();
+
 }
 
 void RbUtilQt::installDoom()
 {
-	InstallZipWindow* installWindow = new InstallZipWindow(this);
-	installWindow->setUserSettings(userSettings);
+    InstallZipWindow* installWindow = new InstallZipWindow(this);
+    installWindow->setUserSettings(userSettings);
     installWindow->setDeviceSettings(devices);
     if(userSettings->value("defaults/proxytype") == "manual")
         installWindow->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
+#ifdef __linux
+    else if(userSettings->value("defaults/proxytype") == "system")
+        installWindow->setProxy(QUrl(getenv("http_proxy")));
+#endif
     installWindow->setMountPoint(userSettings->value("defaults/mountpoint").toString());
-	installWindow->setLogSection("Doom");
-	installWindow->setUrl(devices->value("doom_url").toString());
-	installWindow->setWindowTitle("Doom Installation");
-	installWindow->show();
-		
+    installWindow->setLogSection("Doom");
+    installWindow->setUrl(devices->value("doom_url").toString());
+    installWindow->setWindowTitle("Doom Installation");
+    installWindow->show();
+
 }

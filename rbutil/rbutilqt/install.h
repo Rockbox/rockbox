@@ -65,7 +65,7 @@ class Install : public QDialog
         void setDetailsStable(bool);
         void setDetailsArchived(bool);
         void done(bool);
-        
+
 };
 
 

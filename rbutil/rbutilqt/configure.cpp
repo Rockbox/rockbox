@@ -22,6 +22,10 @@
 #include "configure.h"
 #include "ui_configurefrm.h"
 
+#ifdef __linux
+#include <stdio.h>
+#endif
+
 #define DEFAULT_LANG "English (builtin)"
 
 Config::Config(QWidget *parent) : QDialog(parent)
@@ -33,9 +37,9 @@ Config::Config(QWidget *parent) : QDialog(parent)
     QRegExp validate("[0-9]*");
     proxyValidator->setRegExp(validate);
     ui.proxyPort->setValidator(proxyValidator);
-
-    ui.radioSystemProxy->setEnabled(false); // not implemented yet
-
+#ifndef __linux
+    ui.radioSystemProxy->setEnabled(false); // only on linux for now
+#endif
     // build language list and sort alphabetically
     QStringList langs = findLanguageFiles();
     for(int i = 0; i < langs.size(); ++i)
@@ -52,6 +56,7 @@ Config::Config(QWidget *parent) : QDialog(parent)
     connect(ui.buttonOk, SIGNAL(clicked()), this, SLOT(accept()));
     connect(ui.buttonCancel, SIGNAL(clicked()), this, SLOT(abort()));
     connect(ui.radioNoProxy, SIGNAL(toggled(bool)), this, SLOT(setNoProxy(bool)));
+    connect(ui.radioSystemProxy, SIGNAL(toggled(bool)), this, SLOT(setSystemProxy(bool)));
 }
 
 
@@ -59,13 +64,13 @@ void Config::accept()
 {
     qDebug() << "Config::accept()";
     // proxy: save entered proxy values, not displayed.
-    QUrl proxy;
-    proxy.setScheme("http");
-    proxy.setUserName(ui.proxyUser->text());
-    proxy.setPassword(ui.proxyPass->text());
-    proxy.setHost(ui.proxyHost->text());
-    proxy.setPort(ui.proxyPort->text().toInt());
-
+    if(ui.radioManualProxy->isChecked()) {
+        proxy.setScheme("http");
+        proxy.setUserName(ui.proxyUser->text());
+        proxy.setPassword(ui.proxyPass->text());
+        proxy.setHost(ui.proxyHost->text());
+        proxy.setPort(ui.proxyPort->text().toInt());
+    }
     userSettings->setValue("defaults/proxy", proxy.toString());
     qDebug() << "new proxy:" << proxy;
     // proxy type
@@ -138,6 +143,39 @@ void Config::setNoProxy(bool checked)
     ui.proxyHost->setEnabled(i);
     ui.proxyUser->setEnabled(i);
     ui.proxyPass->setEnabled(i);
+}
+
+
+void Config::setSystemProxy(bool checked)
+{
+    bool i = !checked;
+    ui.proxyPort->setEnabled(i);
+    ui.proxyHost->setEnabled(i);
+    ui.proxyUser->setEnabled(i);
+    ui.proxyPass->setEnabled(i);
+    if(checked) {
+        // save values in input box
+        proxy.setScheme("http");
+        proxy.setUserName(ui.proxyUser->text());
+        proxy.setPassword(ui.proxyPass->text());
+        proxy.setHost(ui.proxyHost->text());
+        proxy.setPort(ui.proxyPort->text().toInt());
+        // show system values in input box
+#ifdef __linux
+        QUrl envproxy = QUrl(getenv("http_proxy"));
+        ui.proxyHost->setText(envproxy.host());
+        ui.proxyPort->setText(QString("%1").arg(envproxy.port()));
+        ui.proxyUser->setText(envproxy.userName());
+        ui.proxyPass->setText(envproxy.password());
+#endif
+    }
+    else {
+        ui.proxyHost->setText(proxy.host());
+        ui.proxyPort->setText(QString("%1").arg(proxy.port()));
+        ui.proxyUser->setText(proxy.userName());
+        ui.proxyPass->setText(proxy.password());
+    }
+
 }
 
 

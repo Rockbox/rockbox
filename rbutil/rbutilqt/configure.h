@@ -45,9 +45,11 @@ class Config : public QDialog
         QMap<QString, QString> lang;
         QString language;
         QString programPath;
+        QUrl proxy;
 
     private slots:
         void setNoProxy(bool);
+        void setSystemProxy(bool);
         void updateLanguage(void);
 };
 
