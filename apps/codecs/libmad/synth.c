@@ -1042,13 +1042,9 @@ void synth_full2(mad_fixed_t *pcm, mad_fixed_t (*fo)[8], mad_fixed_t (*fe)[8],
                  mad_fixed_t const (*D0ptr)[32],
                  mad_fixed_t const (*D1ptr)[32]);
 
-/* This performs slower in IRAM on PP502x and there is no space in
-   mpegplayer on the PP5002 */
-#if !defined(CPU_PP502x) && !(CONFIG_CPU == PP5002 && defined(MPEGPLAYER)) && !defined(TOSHIBA_GIGABEAT_F)
 static
 void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
-		unsigned int nch, unsigned int ns) ICODE_ATTR;
-#endif
+		unsigned int nch, unsigned int ns) ICODE_ATTR_MPA_SYNTH;
 static
 void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 		unsigned int nch, unsigned int ns)

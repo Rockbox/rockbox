@@ -17,17 +17,11 @@
  *
  ****************************************************************************/
 
-#include "config.h"
+#include "mad_iram.h"
 
     .global dct32
 
-/* This performs slower in IRAM on PP502x and there is no space in
-   mpegplayer on the PP5002 */
-#if defined(CPU_PP502x) || (CONFIG_CPU == PP5002 && defined(MPEGPLAYER)) || defined(TOSHIBA_GIGABEAT_F)
-    .section    .text,"ax",%progbits
-#else
-    .section    .icode,"ax",%progbits
-#endif
+    .section    ICODE_SECTION_MPA_ARM,"ax",%progbits
 
 dct32:
     stmdb    r13!, {r4, r5, r6, r7, r8, r9, r10, r11, r12, lr}
