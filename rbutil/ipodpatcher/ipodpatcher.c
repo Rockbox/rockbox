@@ -302,7 +302,7 @@ int read_partition(struct ipod_t* ipod, int outfile)
         if (n < chunksize) {
             fprintf(stderr,
               "[ERR]  Short read in disk_read() - requested %d, got %d\n",
-              chunksize,n);
+              chunksize,(int)n);
             return -1;
         }
 
@@ -317,7 +317,7 @@ int read_partition(struct ipod_t* ipod, int outfile)
 
         if (res != n) {
             fprintf(stderr,
-              "Short write - requested %d, received %d - aborting.\n",n,res);
+              "Short write - requested %d, received %d - aborting.\n",(int)n,res);
             return -1;
         }
     }
@@ -370,7 +370,7 @@ int write_partition(struct ipod_t* ipod, int infile)
         }
 
         if (res != n) {
-            fprintf(stderr,"[ERR]  Short write - requested %d, received %d - aborting.\n",n,res);
+            fprintf(stderr,"[ERR]  Short write - requested %d, received %d - aborting.\n",n,(int)res);
             return -1;
         }
 
