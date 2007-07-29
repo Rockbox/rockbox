@@ -46,34 +46,34 @@ specific to that target.
 :Iriver H10 5GB/6GB:
 :Iaudio X5:
 :Iaudio M5:
-:Sansa E200:
-:Toshiba Gigabeat F:
+:Sansa E200: Michael Sevakis
+:Toshiba Gigabeat F: Michael Sevakis
 :Toshiba Gigabeat X:
 
 
 Core code (low-level)
 ---------------------
 
-:Kernel: Miika Pekkarinen
-:LCD drivers:
-:Button drivers:
+:Kernel: Miika Pekkarinen,Michael Sevakis
+:LCD drivers: Michael Sevakis
+:Button drivers: Michael Sevakis
 :Rolo:
-:ATA driver:
+:ATA driver: Michael Sevakis
 :FAT driver:
 :Battery/Power Management:
-:FM Tuner drivers:
-:Audio codec drivers:
+:FM Tuner drivers: Michael Sevakis
+:Audio codec drivers: Michael Sevakis
 
 
 Core code (Mid-level)
 ----------------------
 
-:DSP:
+:DSP: Michael Sevakis
 :LCD/Graphics API:
 :Playback engine (HWCODEC):
-:Playback engine (SWCODEC):
-:PCM playback API (SWCODEC):
-:PCM recording API (SWCODEC):
+:Playback engine (SWCODEC): Michael Sevakis
+:PCM playback API (SWCODEC): Michael Sevakis
+:PCM recording API (SWCODEC): Michael Sevakis
 :Recording API (HWCODEC):
 :Fonts and Unicode:
 :Replaygain:
@@ -173,7 +173,7 @@ Plugins
 :minesweeper: Antoine Cellerier
 :mosaique:
 :mp3_encoder:
-:mpegplayer:
+:mpegplayer: Michael Sevakis
 :nim:
 :oscilloscope:
 :pacbox: Dave Chapman
@@ -205,7 +205,7 @@ Plugins
 :test_codec: Dave Chapman
 :test_disk:
 :test_fps:
-:test_sampr:
+:test_sampr: Michael Sevakis
 :test_scanrate:
 :text_editor: Jonathan Gordon
 :vbrfix:
@@ -238,7 +238,7 @@ Codecs (Playback)
 :Ogg Vorbis:
 :Shorten:
 :SID:
-:SPC:
+:SPC: Michael Sevakis
 :Speex:
 :WAVE:
 :WavPack:
@@ -249,10 +249,10 @@ Codecs (Playback)
 Codecs (Recording)
 ------------------
 
-:AIFF:
-:MP3:
-:WAVE:
-:WavPack:
+:AIFF: Michael Sevakis
+:MP3: Michael Sevakis
+:WAVE: Michael Sevakis
+:WavPack: Michael Sevakis
 
 
 Bootloaders
