@@ -1,4 +1,4 @@
-CFLAGS=-Wall
+CFLAGS=-Wall -W
 
 BOOT_H = ipod1g2g.h ipod3g.h ipod4g.h ipodcolor.h ipodmini.h ipodmini2g.h ipodnano.h ipodvideo.h
 

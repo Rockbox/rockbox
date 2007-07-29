@@ -52,6 +52,9 @@ struct ipod_directory_t {
   uint32_t loadAddr;
 };
 
+/* A fake partition type - DOS partition tables can't include HFS partitions */
+#define PARTTYPE_HFS 0xffff
+
 struct partinfo_t {
   uint32_t start; /* first sector (LBA) */
   uint32_t size;  /* number of sectors */
@@ -86,8 +89,8 @@ int ipod_open(struct ipod_t* ipod, int silent);
 int ipod_reopen_rw(struct ipod_t* ipod);
 int ipod_close(struct ipod_t* ipod);
 int ipod_seek(struct ipod_t* ipod, unsigned long pos);
-int ipod_read(struct ipod_t* ipod, unsigned char* buf, int nbytes);
-int ipod_write(struct ipod_t* ipod, unsigned char* buf, int nbytes);
+ssize_t ipod_read(struct ipod_t* ipod, unsigned char* buf, int nbytes);
+ssize_t ipod_write(struct ipod_t* ipod, unsigned char* buf, int nbytes);
 int ipod_alloc_buffer(unsigned char** sectorbuf, int bufsize);
 
 /* In fat32format.c */

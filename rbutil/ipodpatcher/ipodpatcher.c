@@ -73,7 +73,7 @@ char* get_parttype(int pt)
     int i;
     static char unknown[]="Unknown";
 
-    if (pt == -1) {
+    if (pt == PARTTYPE_HFS) {
         return "HFS/HFS+";
     }
 
@@ -104,41 +104,41 @@ off_t filesize(int fd) {
 #define MAX_SECTOR_SIZE 2048
 #define SECTOR_SIZE 512
 
-unsigned short static inline le2ushort(unsigned char* buf)
+static inline unsigned short le2ushort(unsigned char* buf)
 {
    unsigned short res = (buf[1] << 8) | buf[0];
 
    return res;
 }
 
-int static inline le2int(unsigned char* buf)
+static inline int le2int(unsigned char* buf)
 {
    int32_t res = (buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8) | buf[0];
 
    return res;
 }
 
-int static inline be2int(unsigned char* buf)
+static inline int be2int(unsigned char* buf)
 {
    int32_t res = (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
 
    return res;
 }
 
-int static inline getint16le(char* buf)
+static inline int getint16le(char* buf)
 {
    int16_t res = (buf[1] << 8) | buf[0];
 
    return res;
 }
 
-void static inline short2le(unsigned short val, unsigned char* addr)
+static inline void short2le(unsigned short val, unsigned char* addr)
 {
     addr[0] = val & 0xFF;
     addr[1] = (val >> 8) & 0xff;
 }
 
-void static inline int2le(unsigned int val, unsigned char* addr)
+static inline void int2le(unsigned int val, unsigned char* addr)
 {
     addr[0] = val & 0xFF;
     addr[1] = (val >> 8) & 0xff;
@@ -146,7 +146,7 @@ void static inline int2le(unsigned int val, unsigned char* addr)
     addr[3] = (val >> 24) & 0xff;
 }
 
-void int2be(unsigned int val, unsigned char* addr)
+static inline void int2be(unsigned int val, unsigned char* addr)
 {
     addr[0] = (val >> 24) & 0xff;
     addr[1] = (val >> 16) & 0xff;
@@ -245,7 +245,7 @@ int read_partinfo(struct ipod_t* ipod, int silent)
                  /* A HFS partition */
                  ipod->pinfo[i].start = pmPyPartStart;
                  ipod->pinfo[i].size = pmPartBlkCnt;
-                 ipod->pinfo[i].type = -1;
+                 ipod->pinfo[i].type = PARTTYPE_HFS;
                  i++;
             }
 
@@ -262,7 +262,7 @@ int read_partinfo(struct ipod_t* ipod, int silent)
     */
     if ((ipod->pinfo[0].type != 0) || (ipod->pinfo[0].size == 0) || 
         ((ipod->pinfo[1].type != 0xb) && (ipod->pinfo[1].type != 0xc) && 
-         (ipod->pinfo[1].type != -1))) {
+         (ipod->pinfo[1].type != PARTTYPE_HFS))) {
         if (!silent) fprintf(stderr,"[ERR]  Partition layout is not an ipod\n");
         return -1;
     }
@@ -274,7 +274,7 @@ int read_partinfo(struct ipod_t* ipod, int silent)
 int read_partition(struct ipod_t* ipod, int outfile)
 {
     int res;
-    unsigned long n;
+    ssize_t n;
     int bytesleft;
     int chunksize;
     int count = ipod->pinfo[0].size;
@@ -301,7 +301,7 @@ int read_partition(struct ipod_t* ipod, int outfile)
 
         if (n < chunksize) {
             fprintf(stderr,
-              "[ERR]  Short read in disk_read() - requested %d, got %lu\n",
+              "[ERR]  Short read in disk_read() - requested %d, got %d\n",
               chunksize,n);
             return -1;
         }
@@ -317,7 +317,7 @@ int read_partition(struct ipod_t* ipod, int outfile)
 
         if (res != n) {
             fprintf(stderr,
-              "Short write - requested %lu, received %d - aborting.\n",n,res);
+              "Short write - requested %d, received %d - aborting.\n",n,res);
             return -1;
         }
     }
@@ -328,7 +328,7 @@ int read_partition(struct ipod_t* ipod, int outfile)
 
 int write_partition(struct ipod_t* ipod, int infile)
 {
-    unsigned long res;
+    ssize_t res;
     int n;
     int bytesread;
     int byteswritten = 0;
@@ -370,7 +370,7 @@ int write_partition(struct ipod_t* ipod, int infile)
         }
 
         if (res != n) {
-            fprintf(stderr,"[ERR]  Short write - requested %d, received %lu - aborting.\n",n,res);
+            fprintf(stderr,"[ERR]  Short write - requested %d, received %d - aborting.\n",n,res);
             return -1;
         }
 
