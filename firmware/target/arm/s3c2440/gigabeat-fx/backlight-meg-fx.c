@@ -28,11 +28,18 @@
 #define BUTTONLIGHT_MENU (SC606_LED_B1)
 #define BUTTONLIGHT_ALL  (SC606_LED_B1 | SC606_LED_B2 | SC606_LED_C1 | SC606_LED_C2)
 
+#ifndef BOOTLOADER
 static void led_control_service(void);
-static unsigned char backlight_brightness;
-static unsigned char buttonlight_brightness;
-static unsigned char backlight_target;
-static unsigned char buttonlight_target;
+
+static enum sc606_states
+{
+    SC606_CONTROL_IDLE,
+    SC606_CONTROL_A12,
+    SC606_CONTROL_B12,
+    SC606_CONTROL_C12,
+    SC606_CONTROL_CONF
+} sc606_control;
+#endif /* BOOTLOADER */
 
 static enum backlight_states
 {
@@ -43,15 +50,6 @@ static enum backlight_states
     BACKLIGHT_CONTROL_FADE
 } backlight_control;
 
-static enum sc606_states
-{
-    SC606_CONTROL_IDLE,
-    SC606_CONTROL_A12,
-    SC606_CONTROL_B12,
-    SC606_CONTROL_C12,
-    SC606_CONTROL_CONF
-} sc606_control;
-
 enum buttonlight_states
 {
     BUTTONLIGHT_CONTROL_IDLE,
@@ -61,28 +59,13 @@ enum buttonlight_states
     BUTTONLIGHT_CONTROL_FADE,
 } buttonlight_control;
 
+
+static unsigned char backlight_brightness;
+static unsigned char buttonlight_brightness;
+static unsigned char backlight_target;
+static unsigned char buttonlight_target;
+
 static unsigned short buttonlight_trigger_now;
-
-bool __backlight_init(void)
-{
-    buttonlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
-    backlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
-
-    buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
-    backlight_control = BACKLIGHT_CONTROL_ON;
-
-    /* Set the backlight up in a known state */
-    sc606_init();
-    sc606_write(SC606_REG_A , DEFAULT_BRIGHTNESS_SETTING);
-    sc606_write(SC606_REG_B , 0);
-    sc606_write(SC606_REG_C , 0);
-    sc606_write(SC606_REG_CONF , 0x03);
-
-    /* put the led control on the tick list */
-    tick_add_task(led_control_service);
-
-    return true;
-}
 
 void __backlight_on(void)
 {
@@ -145,6 +128,7 @@ void __buttonlight_mode(enum buttonlight_mode mode)
  * i2c operations - they are all serialized here in the ISR tick. It also
  * insures that we get called at equal timing for good visual effect.
  */
+#ifndef BOOTLOADER
 static void led_control_service(void)
 {
     static unsigned char
@@ -342,6 +326,7 @@ static void led_control_service(void)
     else
         lcd_enable(false);
 }
+#endif /* BOOTLOADER */
 
 void __button_backlight_on(void)
 {
@@ -389,4 +374,25 @@ void __buttonlight_set_brightness(int brightness)
     buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
     buttonlight_brightness = brightness;
     buttonlight_control = BUTTONLIGHT_CONTROL_SET;
+}
+
+bool __backlight_init(void)
+{
+    buttonlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
+    backlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
+
+    buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
+    backlight_control = BACKLIGHT_CONTROL_ON;
+
+    /* Set the backlight up in a known state */
+    sc606_init();
+    sc606_write(SC606_REG_A , DEFAULT_BRIGHTNESS_SETTING);
+    sc606_write(SC606_REG_B , 0);
+    sc606_write(SC606_REG_C , 0);
+    sc606_write(SC606_REG_CONF , 0x03);
+#ifndef BOOTLOADER
+    /* put the led control on the tick list */
+    tick_add_task(led_control_service);
+#endif
+    return true;
 }
