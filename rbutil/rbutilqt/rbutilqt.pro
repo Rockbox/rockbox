@@ -64,7 +64,7 @@ RESOURCES += rbutilqt.qrc
 
 TRANSLATIONS += rbutil_de.ts
 QT += network
-DEFINES += RBUTIL
+DEFINES += RBUTIL _LARGEFILE64_SOURCE
 
 win32{
     SOURCES +=  ../ipodpatcher/ipodio-win32.c
@@ -75,3 +75,5 @@ unix{
     SOURCES +=  ../ipodpatcher/ipodio-posix.c
     SOURCES +=  ../sansapatcher/sansaio-posix.c
 }
+
+
