@@ -60,14 +60,21 @@ static off_t filesize(int fd) {
 #define MAX_SECTOR_SIZE 2048
 #define SECTOR_SIZE 512
 
-int static inline le2int(unsigned char* buf)
+static inline int32_t le2int(unsigned char* buf)
 {
    int32_t res = (buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8) | buf[0];
 
    return res;
 }
 
-void static inline int2le(unsigned int val, unsigned char* addr)
+static inline uint32_t le2uint(unsigned char* buf)
+{
+   uint32_t res = (buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8) | buf[0];
+
+   return res;
+}
+
+static inline void int2le(unsigned int val, unsigned char* addr)
 {
     addr[0] = val & 0xFF;
     addr[1] = (val >> 8) & 0xff;
@@ -223,7 +230,7 @@ void tea_decrypt(uint32_t* v0, uint32_t* v1, uint32_t* k) {
 void tea_decrypt_buf(unsigned char* src, unsigned char* dest, size_t n, uint32_t * key)
 {
     uint32_t v0, v1;
-    int i;
+    unsigned int i;
 
     for (i = 0; i < (n / 8); i++) {
         v0 = le2int(src);
@@ -503,7 +510,7 @@ static int load_original_firmware(struct sansa_t* sansa, unsigned char* buf, str
                             tmpbuf,
                             mi4header->mi4size-(mi4header->plaintext+0x200),
                             keys[i]);
-            key_found = (le2int(tmpbuf+mi4header->length-mi4header->plaintext-4) == 0xaa55aa55);
+            key_found = (le2uint(tmpbuf+mi4header->length-mi4header->plaintext-4) == 0xaa55aa55);
         }
 
         if (key_found) {
@@ -547,7 +554,11 @@ int sansa_read_firmware(struct sansa_t* sansa, char* filename)
         return -1;
     }
 
-    write(outfile,sectorbuf,mi4header.mi4size);
+    res = write(outfile,sectorbuf,mi4header.mi4size);
+    if (res != (int)mi4header.mi4size) {
+        fprintf(stderr,"[ERR]  Write error - %d\n", res);
+        return -1;
+    }
     close(outfile);
 
     return 0;
@@ -557,8 +568,8 @@ int sansa_read_firmware(struct sansa_t* sansa, char* filename)
 int sansa_add_bootloader(struct sansa_t* sansa, char* filename, int type)
 {
     int res;
-    int infile;
-    int bl_length;
+    int infile = -1;   /* Prevent an erroneous "may be used uninitialised" gcc warning */
+    int bl_length = 0; /* Keep gcc happy when building for rbutil */
     struct mi4header_t mi4header;
     int n;
     int length;
@@ -587,6 +598,7 @@ int sansa_add_bootloader(struct sansa_t* sansa, char* filename, int type)
     if (type==FILETYPE_MI4) {
         /* Read bootloader into sectorbuf+0x200 */
         n = read(infile,sectorbuf+0x200,bl_length);
+        close(infile);
         if (n < bl_length) {
             fprintf(stderr,"[ERR]  Short read - requested %d bytes, received %d\n"
                           ,bl_length,n);
