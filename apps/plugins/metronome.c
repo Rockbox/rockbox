@@ -178,7 +178,7 @@ void metronome_draw(struct screen* display)
 #ifdef HAVE_LCD_BITMAP
     display->puts(10, 3, buffer);
 #else
-    rb->lcd_puts(0,1, buffer);
+    display->puts(0,1, buffer);
 #endif
 
 #ifdef HAVE_LCD_BITMAP
