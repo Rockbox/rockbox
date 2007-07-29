@@ -20,8 +20,7 @@ stopwatch.c
 vbrfix.c
 viewer.c
 
-/* plugins built for all targets, but not for the simulator */
-#if !defined(SIMULATOR)
+#if CONFIG_CODEC == SWCODEC
 metronome.c
 #endif
 

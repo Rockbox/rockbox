@@ -112,7 +112,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 66
+#define PLUGIN_API_VERSION 67
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -345,12 +345,13 @@ struct plugin_api {
     void (*cpu_boost)(bool on_off);
 #endif
 #endif
+#endif
     bool (*timer_register)(int reg_prio, void (*unregister_callback)(void),
                            long cycles, int int_prio,
                            void (*timer_callback)(void));
     void (*timer_unregister)(void);
     bool (*timer_set_period)(long count);
-#endif
+
     void (*queue_init)(struct event_queue *q, bool register_queue);
     void (*queue_delete)(struct event_queue *q);
     void (*queue_post)(struct event_queue *q, long id, intptr_t data);
@@ -615,6 +616,7 @@ struct plugin_api {
     void (*screen_clear_area)(struct screen * display, int xstart, int ystart,
                               int width, int height);
 #endif
+    void (*led)(bool on);
 };
 
 /* plugin header */

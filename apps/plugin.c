@@ -24,6 +24,7 @@
 #include "debug.h"
 #include "i2c.h"
 #include "lang.h"
+#include "led.h"
 #include "keyboard.h"
 #include "buffer.h"
 #include "backlight.h"
@@ -252,10 +253,11 @@ static const struct plugin_api rockbox_api = {
     cpu_boost,
 #endif
 #endif
+#endif
     timer_register,
     timer_unregister,
     timer_set_period,
-#endif
+
     queue_init,
     queue_delete,
     queue_post,
@@ -493,6 +495,7 @@ static const struct plugin_api rockbox_api = {
 #ifdef HAVE_LCD_BITMAP
     screen_clear_area,
 #endif
+    led,
 };
 
 int plugin_load(const char* plugin, void* parameter)

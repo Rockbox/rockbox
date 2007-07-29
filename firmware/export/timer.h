@@ -23,8 +23,6 @@
 #include <stdbool.h>
 #include "config.h"
 
-#ifndef SIMULATOR
-
 #if defined(CPU_PP)
  /* Portalplayer chips use a microsecond timer. */
  #define TIMER_FREQ 1000000
@@ -35,10 +33,11 @@
  #define TIMER_FREQ 3000000
 #elif CONFIG_CPU == S3C2440
  #include "timer-target.h"
+#elif SIMULATOR
+ #define TIMER_FREQ 1000000
 #else
  #define TIMER_FREQ CPU_FREQ
 #endif
-
 bool timer_register(int reg_prio, void (*unregister_callback)(void),
                     long cycles, int int_prio, void (*timer_callback)(void));
 bool timer_set_period(long cycles);
@@ -51,5 +50,4 @@ void timer_unregister(void);
 extern void (*pfn_timer)(void);
 extern void (*pfn_unregister)(void);
 
-#endif /* !SIMULATOR */
 #endif /* __TIMER_H__ */
