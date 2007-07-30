@@ -1,0 +1,93 @@
+% $Id: ipod3g.tex 13422 2007-05-19 19:21:52Z christi $ %
+\def\UseOption{ipod1g2g}
+\edef\UseOption{\UseOption,HAVE_RB_BL_ON_DISK}
+\edef\UseOption{\UseOption,HAVE_LCD_BITMAP}
+\edef\UseOption{\UseOption,CONFIG_RTC}
+\edef\UseOption{\UseOption,HAVE_RTC_ALARM}
+\edef\UseOption{\UseOption,SWCODEC}
+\edef\UseOption{\UseOption,IPOD_3G_PAD}
+\edef\UseOption{\UseOption,ipod}
+
+\newcommand{\playerman}{Ipod}
+\newcommand{\playertype}{1G / 2G}
+\newcommand{\playerlongtype}{\playertype}
+\newcommand{\genericimg}{160x128x2}
+\newcommand{\specimg}{ipod1g2g}
+%Used to name the player, e.g. ...to the \dap
+\newcommand{\dap}{player}
+%For use when referring to the player. E.g. the \daps\ capacity ...
+\newcommand{\daps}{player's}
+\newcommand{\firmwarefilename}{\fname{rockbox.ipod}}
+\newcommand{\screenshotsize}{4cm}
+\newcommand{\disk}{hard disk}
+
+\newcommand{\ButtonLeft}{\btnfnt{Prev}}
+\newcommand{\ButtonRight}{\btnfnt{Next}}
+\newcommand{\ButtonMenu}{\btnfnt{Menu}}
+\newcommand{\ButtonPlay}{\btnfnt{Play}}
+\newcommand{\ButtonSelect}{\btnfnt{Select}}
+\newcommand{\ButtonScrollFwd}{\btnfnt{Scroll Fwd}}
+\newcommand{\ButtonScrollBack}{\btnfnt{Scroll Back}}
+\newcommand{\ButtonHold}{\btnfnt{Hold}}
+
+%Button actions, standard context
+\newcommand{\ActionStdPrev}{\ButtonScrollBack}
+\newcommand{\ActionStdPrevRepeat}{Long \ButtonScrollBack}
+\newcommand{\ActionStdNext}{\ButtonScrollFwd}
+\newcommand{\ActionStdNextRepeat}{Long \ButtonScrollFwd}
+\newcommand{\ActionStdCancel}{\ButtonLeft or Long \ButtonPlay}
+\newcommand{\ActionStdContext}{Long \ButtonSelect}
+\newcommand{\ActionStdQuickScreen}{Long \ButtonMenu}
+\newcommand{\ActionStdMenu}{\ButtonMenu}
+\newcommand{\ActionStdOk}{\ButtonSelect{} or \ButtonRight}
+
+%Button actions, wps context
+\newcommand{\ActionWpsPlay}{\ButtonPlay}
+\newcommand{\ActionWpsSkipNext}{\ButtonRight}
+\newcommand{\ActionWpsSkipPrev}{\ButtonLeft}
+\newcommand{\ActionWpsSeekBack}{Long \ButtonLeft}
+\newcommand{\ActionWpsSeekFwd}{Long \ButtonRight}
+
+\newcommand{\ActionWpsStop}{Long \ButtonPlay}
+\newcommand{\ActionWpsVolDown}{\ButtonScrollBack}
+\newcommand{\ActionWpsVolUp}{\ButtonScrollFwd}
+
+\newcommand{\ActionWpsQuickScreen}{Long \ButtonMenu}
+\newcommand{\ActionWpsMenu}{\ButtonMenu}
+\newcommand{\ActionWpsContext}{Long \ButtonSelect}
+\newcommand{\ActionWpsBrowse}{\ButtonSelect}
+
+%Button actions, tree context
+\newcommand{\ActionTreeWps}{\ButtonPlay}
+\newcommand{\ActionTreeStop}{Long \ButtonPlay}
+\newcommand{\ActionTreeEnter}{\ButtonSelect{} or \ButtonRight}
+\newcommand{\ActionTreeParentDirectory}{\ButtonLeft}
+
+%Button actions, YesNo context
+\newcommand{\ActionYesNoAccept}{\ButtonPlay}
+
+%Button actions, Setting context
+\newcommand{\ActionSettingInc}{\ButtonScrollFwd}
+\newcommand{\ActionSettingDec}{\ButtonScrollBack}
+
+%Button actions, Virtual Keyboard Context
+\newcommand{\ActionKbdLeft}{\ButtonLeft}
+\newcommand{\ActionKbdRight}{\ButtonRight}
+\newcommand{\ActionKbdSelect}{\ButtonSelect}
+\newcommand{\ActionKbdDone}{\ButtonPlay}
+\newcommand{\ActionKbdAbort}{\ButtonMenu}
+\newcommand{\ActionKbdUp}{\ButtonScrollBack}
+\newcommand{\ActionKbdDown}{\ButtonScrollFwd}
+\newcommand{\ActionKbdMorseInput}{Long \ButtonMenu}
+\newcommand{\ActionKbdMorseSelect}{\ButtonSelect}
+
+%Button actions, Pitch Screen context
+\newcommand{\ActionPsToggleMode}{\ButtonPlay}
+\newcommand{\ActionPsIncSmall}{\ButtonScrollFwd}
+\newcommand{\ActionPsIncBig}{Long \ButtonScrollFwd}
+\newcommand{\ActionPsDecSmall}{\ButtonScrollBack}
+\newcommand{\ActionPsDecBig}{Long \ButtonScrollBack}
+\newcommand{\ActionPsNudgeLeft}{\ButtonLeft}
+\newcommand{\ActionPsNudgeRight}{\ButtonRight}
+\newcommand{\ActionPsReset}{\ButtonMenu}
+\newcommand{\ActionPsExit}{\ButtonSelect}
