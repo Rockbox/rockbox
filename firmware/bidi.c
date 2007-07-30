@@ -28,13 +28,14 @@
 #include "arabjoin.h"
 #include "scroll_engine.h"
 
-//#define _HEB_BUFFER_LENGTH (MAX_PATH + LCD_WIDTH/2 + 3 + 2 + 2) * 2
+/* #define _HEB_BUFFER_LENGTH (MAX_PATH + LCD_WIDTH/2 + 3 + 2 + 2) * 2 */
 #define _HEB_BLOCK_TYPE_ENG 1
 #define _HEB_BLOCK_TYPE_HEB 0
 #define _HEB_ORIENTATION_LTR 1
 #define _HEB_ORIENTATION_RTL 0
 
-#define ischar(c) ((c > 0x0589 && c < 0x0700) || (c >= 0xfb50 && c <= 0xfefc) ? 1 : 0)
+#define ischar(c) ((c > 0x0589 && c < 0x0700) || \
+                   (c >= 0xfb50 && c <= 0xfefc) ? 1 : 0)
 #define _isblank(c) ((c==' ' || c=='\t') ? 1 : 0)
 #define _isnewline(c) ((c=='\n' || c=='\r') ? 1 : 0)
 #define XOR(a,b) ((a||b) && !(a&&b))
@@ -134,12 +135,14 @@ unsigned short *bidi_l2v(const unsigned char *str, int orientation)
     int length = utf8length(str);
     static unsigned short  utf16_buf[SCROLL_LINE_SIZE];
     static unsigned short  bidi_buf[SCROLL_LINE_SIZE];
-    unsigned short *heb_str, *target, *tmp; // *broken_str
+    unsigned short *heb_str, *target, *tmp; /* *broken_str */
     int block_start, block_end, block_type, block_length, i;
-    //long max_chars=0;
-    //int begin, end, char_count, orig_begin;
+    /*
+    long max_chars=0;
+    int begin, end, char_count, orig_begin;
 
-    //tmp = str;
+    tmp = str;
+    */
     target = tmp = utf16_buf;
     while (*str)
         str = utf8decode(str, target++);
@@ -186,7 +189,8 @@ unsigned short *bidi_l2v(const unsigned char *str, int orientation)
         }
 
         for (i=block_start; i<=block_end; i++) {
-            *target = (block_type == orientation) ? *(utf16_buf+i) : *(utf16_buf+block_end-i+block_start);
+            *target = (block_type == orientation) ?
+                      *(utf16_buf+i) : *(utf16_buf+block_end-i+block_start);
             if (block_type!=orientation) {
                 switch (*target) {
                 case '(':
