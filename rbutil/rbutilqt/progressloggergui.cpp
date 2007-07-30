@@ -22,6 +22,7 @@
 ProgressLoggerGui::ProgressLoggerGui(QObject* parent): ProgressloggerInterface(parent)
 {
     downloadProgress = new QDialog();
+    downloadProgress->setModal(true);
     dp.setupUi(downloadProgress);
     connect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(abort()));
 }

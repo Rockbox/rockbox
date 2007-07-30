@@ -138,10 +138,11 @@ void RbUtilQt::downloadDone(int id, bool error)
 
 void RbUtilQt::about()
 {
-    QDialog *window = new QDialog;
+    QDialog *window = new QDialog(this);
     Ui::aboutBox about;
     about.setupUi(window);
-
+    window->setModal(true);
+    
     QFile licence(":/docs/gpl-2.0.html");
     licence.open(QIODevice::ReadOnly);
     QTextStream c(&licence);

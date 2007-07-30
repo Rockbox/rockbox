@@ -24,7 +24,7 @@
 #include "progressloggerinterface.h"
 #include "ui_installprogressfrm.h"
 
-class ProgressLoggerGui :public ProgressloggerInterface
+class ProgressLoggerGui :public ProgressloggerInterface 
 {
     Q_OBJECT
 public:

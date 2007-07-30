@@ -53,6 +53,8 @@ Config::Config(QWidget *parent) : QDialog(parent)
     ui.listLanguages->setSelectionMode(QAbstractItemView::SingleSelection);
     connect(ui.listLanguages, SIGNAL(itemSelectionChanged()), this, SLOT(updateLanguage()));
 
+    this->setModal(true);
+    
     connect(ui.buttonOk, SIGNAL(clicked()), this, SLOT(accept()));
     connect(ui.buttonCancel, SIGNAL(clicked()), this, SLOT(abort()));
     connect(ui.radioNoProxy, SIGNAL(toggled(bool)), this, SLOT(setNoProxy(bool)));
