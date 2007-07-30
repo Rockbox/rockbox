@@ -22,7 +22,6 @@
 #include "kernel.h"
 #include "thread.h"
 #include "adc.h"
-static unsigned char adcdata[NUM_ADC_CHANNELS];
 
 
 #define CS_LO  and_l(~0x80, &GPIO_OUT)
@@ -48,6 +47,7 @@ static unsigned char adcdata[NUM_ADC_CHANNELS];
 
 unsigned short adc_scan(int channel)
 {
+    int level = set_irq_level(HIGHEST_IRQ_LEVEL);
     unsigned char data = 0;
     int i;
     
@@ -97,26 +97,8 @@ unsigned short adc_scan(int channel)
     
     CS_HI;
 
-    adcdata[channel] = data;
-
+    set_irq_level(level);
     return data;
-}
-unsigned short adc_read(int channel)
-{
-    return adcdata[channel];
-}
-
-static int adc_counter;
-
-static void adc_tick(void)
-{
-    if(++adc_counter == HZ)
-    {
-        adc_counter = 0;
-        adc_scan(ADC_BATTERY);
-        adc_scan(ADC_REMOTEDETECT); /* Temporary. Remove when the remote
-                                       detection feels stable. */
-    }
 }
 
 void adc_init(void)
@@ -128,8 +110,4 @@ void adc_init(void)
     or_l(0x00600080, &GPIO_ENABLE);
     or_l(0x80, &GPIO_OUT);          /* CS high */
     and_l(~0x00400000, &GPIO_OUT);  /* CLK low */
-
-    adc_scan(ADC_BATTERY);
-    
-    tick_add_task(adc_tick);
 }

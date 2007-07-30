@@ -24,8 +24,6 @@
 #include "adc.h"
 #include "pcf50606.h"
 
-static unsigned char adcdata[NUM_ADC_CHANNELS];
-
 static int adcc2_parms[] =
 {
     [ADC_BUTTONS] = 0x80 | (5 << 1) | 1, /* ADCIN2 */
@@ -42,34 +40,6 @@ unsigned short adc_scan(int channel)
     pcf50606_write(0x2f, adcc2_parms[channel]);
     data = pcf50606_read(0x30);
 
-    adcdata[channel] = data;
-
     set_irq_level(level);
     return data;
-}
-
-
-unsigned short adc_read(int channel)
-{
-    return adcdata[channel];
-}
-
-static int adc_counter;
-
-static void adc_tick(void)
-{
-    if(++adc_counter == HZ)
-    {
-        adc_counter = 0;
-        adc_scan(ADC_BATTERY);
-        adc_scan(ADC_REMOTEDETECT); /* Temporary. Remove when the remote
-                                       detection feels stable. */
-    }
-}
-
-void adc_init(void)
-{
-    adc_scan(ADC_BATTERY);
-    
-    tick_add_task(adc_tick);
 }
