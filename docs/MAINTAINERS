@@ -93,7 +93,7 @@ Core code (high-level)
 :Database: Miika Pekkarinen
 :Playlists:
 :Radio UI:
-:Recording UI:
+:Recording UI: Peter D'Hoye
 :Voice UI:
 :WPS: Nicolas Pennequin
 :User interface: Jonathan Gordon
@@ -118,6 +118,7 @@ the person(s) named next to "General".
 
 :General:
 :Italian: Alessio Lenzi
+:Dutch: Peter D'Hoye
 :[Language 2]:
 
 
@@ -159,7 +160,7 @@ Plugins
 :invadrox:
 :iriver_flash:
 :iriverify:
-:jackpot:Kévin Ferrare
+:jackpot: Kévin Ferrare
 :jewels: Antoine Cellerier
 :jpeg:
 :logo:
@@ -178,7 +179,7 @@ Plugins
 :pacbox: Dave Chapman
 :plasma:
 :pong:
-:properties:
+:properties: Peter D'Hoye
 :random_folder_advance_config: Jonathan Gordon
 :reversi: Antoine Cellerier
 :rockblox:
@@ -197,13 +198,13 @@ Plugins
 :spacerocks:
 :splitedit:
 :star:
-:starfield:Kévin Ferrare
+:starfield: Kévin Ferrare
 :stats:
 :stopwatch:
 :sudoku: Dave Chapman
 :test_codec: Dave Chapman
 :test_disk:
-:test_fps:
+:test_fps: Peter D'Hoye
 :test_sampr: Michael Sevakis
 :test_scanrate:
 :text_editor: Jonathan Gordon
@@ -214,7 +215,7 @@ Plugins
 :wav2wv:
 :wavplay:
 :wavrecord:
-:wavview:
+:wavview: Peter D'Hoye
 :wormlet:
 :xobox: Antoine Cellerier
 :zxbox:
