@@ -388,12 +388,11 @@ static void remove_from_list(struct thread_entry **list,
 static void check_sleepers(void) __attribute__ ((noinline));
 static void check_sleepers(void)
 {
+    const unsigned int core = CURRENT_CORE;
     struct thread_entry *current, *next;
     
     /* Check sleeping threads. */
-    current = cores[CURRENT_CORE].sleeping;
-    if (current == NULL)
-        return ;
+    current = cores[core].sleeping;
     
     for (;;)
     {
@@ -403,12 +402,12 @@ static void check_sleepers(void)
         {
             /* Sleep timeout has been reached so bring the thread
              * back to life again. */
-            remove_from_list(&cores[CURRENT_CORE].sleeping, current);
-            add_to_list(&cores[CURRENT_CORE].running, current);
+            remove_from_list(&cores[core].sleeping, current);
+            add_to_list(&cores[core].running, current);
             current->statearg = 0;
             
             /* If there is no more processes in the list, break the loop. */
-            if (cores[CURRENT_CORE].sleeping == NULL)
+            if (cores[core].sleeping == NULL)
                 break;
             
             current = next;
@@ -419,7 +418,7 @@ static void check_sleepers(void)
         
         /* Break the loop once we have walked through the list of all
          * sleeping processes. */
-        if (current == cores[CURRENT_CORE].sleeping)
+        if (current == cores[core].sleeping)
             break;
     }
 }
@@ -429,14 +428,15 @@ static void check_sleepers(void)
 static void wake_list_awaken(void) __attribute__ ((noinline));
 static void wake_list_awaken(void)
 {
+    const unsigned int core = CURRENT_CORE;
     int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
 
     /* No need for another check in the IRQ lock since IRQs are allowed
        only to add threads to the waking list. They won't be adding more
        until we're done here though. */
 
-    struct thread_entry *waking = cores[CURRENT_CORE].waking;
-    struct thread_entry *running = cores[CURRENT_CORE].running;
+    struct thread_entry *waking = cores[core].waking;
+    struct thread_entry *running = cores[core].running;
 
     if (running != NULL)
     {
@@ -452,33 +452,36 @@ static void wake_list_awaken(void)
     {
         /* Just transfer the list as-is - just came out of a core
          * sleep. */
-        cores[CURRENT_CORE].running = waking;
+        cores[core].running = waking;
     }
 
     /* Done with waking list */
-    cores[CURRENT_CORE].waking = NULL;
+    cores[core].waking = NULL;
     set_irq_level(oldlevel);
 }
 
 static inline void sleep_core(void)
 {
+    const unsigned int core = CURRENT_CORE;
+
     for (;;)
     {
         /* We want to do these ASAP as it may change the decision to sleep
            the core or the core has woken because an interrupt occurred
            and posted a message to a queue. */
-        if (cores[CURRENT_CORE].waking != NULL)
+        if (cores[core].waking != NULL)
             wake_list_awaken();
 
-        if (cores[CURRENT_CORE].last_tick != current_tick)
+        if (cores[core].last_tick != current_tick)
         {
-            check_sleepers();
-            cores[CURRENT_CORE].last_tick = current_tick;
+            if (cores[core].sleeping != NULL)
+                check_sleepers();
+            cores[core].last_tick = current_tick;
         }
         
         /* We must sleep until there is at least one process in the list
          * of running processes. */
-        if (cores[CURRENT_CORE].running != NULL)
+        if (cores[core].running != NULL)
             break;
 
         /* Enter sleep mode to reduce power usage, woken up on interrupt */
@@ -508,34 +511,35 @@ void profile_thread(void) {
 static void change_thread_state(struct thread_entry **blocked_list) __attribute__ ((noinline));
 static void change_thread_state(struct thread_entry **blocked_list)
 {
+    const unsigned int core = CURRENT_CORE;
     struct thread_entry *old;
     unsigned long new_state;
     
     /* Remove the thread from the list of running threads. */
-    old = cores[CURRENT_CORE].running;
+    old = cores[core].running;
     new_state = GET_STATE(old->statearg);
 
     /* Check if a thread state change has been requested. */
     if (new_state)
     {
         /* Change running thread state and switch to next thread. */
-        remove_from_list(&cores[CURRENT_CORE].running, old);
+        remove_from_list(&cores[core].running, old);
         
         /* And put the thread into a new list of inactive threads. */
         if (new_state == STATE_BLOCKED)
             add_to_list(blocked_list, old);
         else
-            add_to_list(&cores[CURRENT_CORE].sleeping, old);
+            add_to_list(&cores[core].sleeping, old);
         
 #ifdef HAVE_PRIORITY_SCHEDULING
         /* Reset priorities */
-        if (old->priority == cores[CURRENT_CORE].highest_priority)
-            cores[CURRENT_CORE].highest_priority = 100;
+        if (old->priority == cores[core].highest_priority)
+            cores[core].highest_priority = 100;
 #endif
     }
     else
         /* Switch to the next running thread. */
-        cores[CURRENT_CORE].running = old->next;
+        cores[core].running = old->next;
 }
 
 /*---------------------------------------------------------------------------
@@ -544,8 +548,10 @@ static void change_thread_state(struct thread_entry **blocked_list)
  */
 void switch_thread(bool save_context, struct thread_entry **blocked_list)
 {
+    const unsigned int core = CURRENT_CORE;
+
 #ifdef RB_PROFILE
-    profile_thread_stopped(get_threadnum(cores[CURRENT_CORE].running));
+    profile_thread_stopped(get_threadnum(cores[core].running));
 #endif
     unsigned int *stackptr;
     
@@ -560,13 +566,13 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
      * to this call. */
     if (save_context)
     {
-        store_context(&cores[CURRENT_CORE].running->context);
+        store_context(&cores[core].running->context);
 
         /* Check if the current thread stack is overflown */
-        stackptr = cores[CURRENT_CORE].running->stack;
+        stackptr = cores[core].running->stack;
         if(stackptr[0] != DEADBEEF)
 #ifdef THREAD_EXTRA_CHECKS
-            thread_panicf("Stkov", cores[CURRENT_CORE].running, NULL);
+            thread_panicf("Stkov", cores[core].running, NULL);
 #else
             thread_stkov();
 #endif
@@ -577,10 +583,10 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
         /* This has to be done after the scheduler is finished with the
            blocked_list pointer so that an IRQ can't kill us by attempting
            a wake but before attempting any core sleep. */
-        if (cores[CURRENT_CORE].switch_to_irq_level != STAY_IRQ_LEVEL)
+        if (cores[core].switch_to_irq_level != STAY_IRQ_LEVEL)
         {
-            int level = cores[CURRENT_CORE].switch_to_irq_level;
-            cores[CURRENT_CORE].switch_to_irq_level = STAY_IRQ_LEVEL;
+            int level = cores[core].switch_to_irq_level;
+            cores[core].switch_to_irq_level = STAY_IRQ_LEVEL;
             set_irq_level(level);
         }
     }
@@ -595,34 +601,34 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
      * got CPU time. */
     for (;;)
     {
-        int priority = cores[CURRENT_CORE].running->priority;
+        int priority = cores[core].running->priority;
 
-        if (priority < cores[CURRENT_CORE].highest_priority)
-            cores[CURRENT_CORE].highest_priority = priority;
+        if (priority < cores[core].highest_priority)
+            cores[core].highest_priority = priority;
 
-        if (priority == cores[CURRENT_CORE].highest_priority ||
-                (current_tick - cores[CURRENT_CORE].running->last_run >
+        if (priority == cores[core].highest_priority ||
+                (current_tick - cores[core].running->last_run >
                  priority * 8) ||
-            cores[CURRENT_CORE].running->priority_x != 0)
+            cores[core].running->priority_x != 0)
         {
             break;
         }
 
-        cores[CURRENT_CORE].running = cores[CURRENT_CORE].running->next;
+        cores[core].running = cores[core].running->next;
     }
     
     /* Reset the value of thread's last running time to the current time. */
-    cores[CURRENT_CORE].running->last_run = current_tick;
+    cores[core].running->last_run = current_tick;
 #endif
     
 #endif
     unlock_cores();
     
     /* And finally give control to the next thread. */
-    load_context(&cores[CURRENT_CORE].running->context);
+    load_context(&cores[core].running->context);
     
 #ifdef RB_PROFILE
-    profile_thread_started(get_threadnum(cores[CURRENT_CORE].running));
+    profile_thread_started(get_threadnum(cores[core].running));
 #endif
 }
 
@@ -819,7 +825,7 @@ void wakeup_thread_irq_safe(struct thread_entry **list)
 struct thread_entry* 
     create_thread(void (*function)(void), void* stack, int stack_size,
                   const char *name IF_PRIO(, int priority)
-		  IF_COP(, unsigned int core, bool fallback))
+          IF_COP(, unsigned int core, bool fallback))
 {
     unsigned int i;
     unsigned int stacklen;
@@ -845,8 +851,8 @@ struct thread_entry*
     {
         if (fallback)
             return create_thread(function, stack, stack_size, name
-	                         IF_PRIO(, priority) IF_COP(, CPU, false));
-	else
+                                 IF_PRIO(, priority) IF_COP(, CPU, false));
+        else
             return NULL;
     }
 #endif
@@ -929,7 +935,7 @@ void trigger_cpu_boost(void)
 void remove_thread(struct thread_entry *thread)
 {
     lock_cores();
-    
+
     if (thread == NULL)
         thread = cores[CURRENT_CORE].running;
     
@@ -995,7 +1001,7 @@ struct thread_entry * thread_get_current(void)
 
 void init_threads(void)
 {
-    unsigned int core = CURRENT_CORE;
+    const unsigned int core = CURRENT_CORE;
     int slot;
 
     /* Let main CPU initialize first. */
