@@ -32,7 +32,6 @@ void emu_step(void)
  * make things work in the mean time. */
 void emu_run(void)
 {
-    /*void *timer = sys_timer();*/
     int framesin=0,frames=0,timeten=*rb->current_tick, timehun=*rb->current_tick;
 
     setvidmode();
@@ -48,20 +47,13 @@ void emu_run(void)
         while (R_LY > 0 && R_LY < 144)
             emu_step();
 
-        rtc_tick();   /* RTC support not implemented */
+        rtc_tick();
 
         if (options.sound || !plugbuf)
 		{
             sound_mix();
             pcm_submit();
 		}
-		else
-		{
-/*			delay = framelen - sys_elapsed(timer);
-			sys_sleep(delay);
-			sys_elapsed(timer);
-*/
-        }      
 
         doevents();
         vid_begin();

@@ -112,12 +112,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 67
+#define PLUGIN_API_VERSION 68
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 65
+#define PLUGIN_MIN_API_VERSION 68
 
 /* plugin return codes */
 enum plugin_status {
@@ -549,6 +549,9 @@ struct plugin_api {
     int (*kbd_input)(char* buffer, int buflen);
     struct tm* (*get_time)(void);
     int  (*set_time)(const struct tm *tm);
+#if CONFIG_RTC
+    time_t (*mktime)(struct tm *t);
+#endif
     void* (*plugin_get_buffer)(size_t *buffer_size);
     void* (*plugin_get_audio_buffer)(size_t *buffer_size);
     void (*plugin_tsr)(bool (*exit_callback)(bool reenter));
