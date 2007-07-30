@@ -43,6 +43,7 @@ class RbUtilQt : public QMainWindow
         HttpGet *daily;
         QString absolutePath;
         QTemporaryFile buildInfo;
+        void updateManual(void);
 
     private slots:
         void about(void);

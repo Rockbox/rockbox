@@ -72,6 +72,10 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     userSettings->endGroup();
     ui.comboBoxDevice->setCurrentIndex(ui.comboBoxDevice->findData(platform));
     updateDevice(ui.comboBoxDevice->currentIndex());
+    
+    // manual tab
+    ui.buttonDownloadManual->setEnabled(false);
+    updateManual();
 
     connect(ui.actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
     connect(ui.action_About, SIGNAL(triggered()), this, SLOT(about()));
@@ -217,6 +221,37 @@ void RbUtilQt::updateDevice(int index)
     devices->endGroup();
 
     qDebug() << "new device selected:" << platform;
+    // update manual from here to make sure new device is already selected
+    updateManual();
+}
+
+
+void RbUtilQt::updateManual()
+{
+    if(userSettings->value("defaults/platform").toString() != "")
+    {
+        devices->beginGroup(userSettings->value("defaults/platform").toString());
+        QString manual;
+        manual = devices->value("manualname", "").toString();
+        
+        if(manual == "")
+            manual = "rockbox-" + devices->value("platform").toString();
+        devices->endGroup();
+        QString pdfmanual;
+        pdfmanual = devices->value("manual_url").toString() + "/" + manual + ".pdf";
+        QString htmlmanual;
+        htmlmanual = devices->value("manual_url").toString() + "/" + manual + "/rockbox-build.html";
+        ui.labelPdfManual->setText(tr("<a href='%1'>PDF Manual</a>")
+            .arg(pdfmanual));
+        ui.labelHtmlManual->setText(tr("<a href='%1'>HTML Manual (opens in browser)</a>")
+            .arg(htmlmanual));
+    }
+    else {
+        ui.labelPdfManual->setText(tr("Select a device for a link to the correct manual"));
+        ui.labelHtmlManual->setText(tr("<a href='%1'>Manual Overview</a>")
+            .arg("http://www.rockbox.org/manual.shtml"));
+
+    }
 }
 
 
