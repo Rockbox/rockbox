@@ -22,6 +22,7 @@
 extern void TIMER1(void);
 extern void TIMER2(void);
 extern void ipod_3g_button_int(void);
+extern void ipod_2g_adc_int(void);
 
 void irq(void)
 {
@@ -32,8 +33,17 @@ void irq(void)
         else if (CPU_INT_STAT & TIMER2_MASK)
             TIMER2();
         else if (CPU_INT_STAT & GPIO_MASK)
-            ipod_3g_button_int();
-    } else {
+        {
+            if (GPIOA_INT_STAT)
+                ipod_3g_button_int();
+#ifdef IPOD_1G2G
+            if (GPIOB_INT_STAT & 0x04)
+                ipod_2g_adc_int();
+#endif
+        }
+    } 
+    else
+    {
         if (COP_INT_STAT & TIMER1_MASK)
             TIMER1();
         else if (COP_INT_STAT & TIMER2_MASK)

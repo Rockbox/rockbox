@@ -24,18 +24,22 @@
 
 static struct mutex adc_mutex NOCACHEBSS_ATTR;
 
+/* used in the 2nd gen ADC interrupt */
+static unsigned int_data;
+static int int_status = -1;
+
 unsigned short adc_scan(int channel)
 {
-    int i, j;
     unsigned short data = 0;
-    unsigned pval;
 
     (void)channel; /* there is only one */
     spinlock_lock(&adc_mutex);
 
     if ((IPOD_HW_REVISION >> 16) == 1)
     {
-        pval = GPIOB_OUTPUT_VAL;
+        int i, j;
+        unsigned pval = GPIOB_OUTPUT_VAL;
+
         GPIOB_OUTPUT_VAL = pval | 0x04;  /* B2 -> high */
         for (i = 32; i > 0; --i);
 
@@ -55,26 +59,43 @@ unsigned short adc_scan(int channel)
     }
     else if ((IPOD_HW_REVISION >> 16) == 2)
     {
-        pval = GPIOB_OUTPUT_VAL;
-        GPIOB_OUTPUT_VAL = pval | 0x0a;  /* B1, B3 -> high */
-        while (!(GPIOB_INPUT_VAL & 0x04)); /* wait for B2 == 1 */
+        int_status = 0;
+        GPIOB_INT_LEV    |= 0x04; /* high active */
+        GPIOB_INT_EN     |= 0x04; /* enable interrupt */
+        GPIOB_OUTPUT_VAL |= 0x0a; /* B1, B3 -> high: start conversion */
 
-        GPIOB_OUTPUT_VAL = pval;         /* B1, B3 -> low */
-        while (GPIOB_INPUT_VAL & 0x04);  /* wait for B2 == 0 */
+        while (int_status >= 0)
+            yield();
 
-        for (j = 0; j < 8; j++)
-        {
-            GPIOB_OUTPUT_VAL = pval | 0x02; /* B1 -> high */
-            while (!(GPIOB_INPUT_VAL & 0x04)); /* wait for B2 == 1 */
-
-            data = (data << 1) | ((GPIOB_INPUT_VAL & 0x10) >> 4);
-
-            GPIOB_OUTPUT_VAL = pval;     /* B1 -> low */
-            while (GPIOB_INPUT_VAL & 0x04); /* wait for B2 == 0 */
-        }
+        data = int_data & 0xff;
     }
     spinlock_unlock(&adc_mutex);
     return data;
+}
+
+/* Used for 2nd gen only. Conversion can take several milliseconds there. */
+void ipod_2g_adc_int(void)
+{
+    if (GPIOB_INPUT_VAL & 0x04)
+    {
+        int_data = (int_data << 1) | ((GPIOB_INPUT_VAL & 0x10) >> 4);
+
+        GPIOB_OUTPUT_VAL &= ~0x0a; /* B1, B3 -> low */
+        /* B3 needs to be set low in the first call only, but then stays low
+         * anyway so no need for special handling */
+    }
+    else
+    {
+        if (++int_status > 8)
+        {
+            GPIOB_INT_EN &= ~0x04;
+            int_status = -1;
+        }
+        else
+            GPIOB_OUTPUT_VAL |= 0x02;  /* B1 -> high */
+    }
+    GPIOB_INT_LEV ^= 0x04; /* toggle interrupt level */
+    GPIOB_INT_CLR  = 0x04; /* acknowledge interrupt */
 }
 
 void adc_init(void)
