@@ -562,7 +562,7 @@ target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
-target/arm/ipod/adc-ipod.c
+target/arm/ipod/adc-ipod-pcf.c
 target/arm/ipod/backlight-4g_color.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/lcd-gray.c
@@ -578,7 +578,7 @@ target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/ipod/adc-ipod.c
+target/arm/ipod/adc-ipod-pcf.c
 target/arm/ipod/backlight-4g_color.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/lcd-color_nano.c
@@ -594,7 +594,7 @@ target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/ipod/adc-ipod.c
+target/arm/ipod/adc-ipod-pcf.c
 target/arm/ipod/backlight-nano_video.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/lcd-color_nano.c
@@ -610,7 +610,7 @@ target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/ipod/adc-ipod.c
+target/arm/ipod/adc-ipod-pcf.c
 target/arm/ipod/backlight-nano_video.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/power-ipod.c
@@ -625,7 +625,7 @@ drivers/pcf50605.c
 target/arm/ata-pp5002.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/ipod/adc-ipod.c
+target/arm/ipod/adc-ipod-pcf.c
 target/arm/ipod/3g/backlight-3g.c
 target/arm/ipod/button-1g-3g.c
 target/arm/ipod/lcd-gray.c
@@ -639,7 +639,7 @@ target/arm/usb-pp.c
 target/arm/ata-pp5002.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/ipod/adc-ipod.c
+target/arm/ipod/1g2g/adc-ipod-1g2g.c
 target/arm/ipod/1g2g/backlight-1g2g.c
 target/arm/ipod/button-1g-3g.c
 target/arm/ipod/lcd-gray.c
@@ -654,7 +654,7 @@ target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/ipod/adc-ipod.c
+target/arm/ipod/adc-ipod-pcf.c
 target/arm/ipod/backlight-mini1g_mini2g.c
 target/arm/ipod/button-mini1g.c
 target/arm/ipod/lcd-gray.c
@@ -670,7 +670,7 @@ target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/ipod/adc-ipod.c
+target/arm/ipod/adc-ipod-pcf.c
 target/arm/ipod/backlight-mini1g_mini2g.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/lcd-gray.c

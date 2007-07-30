@@ -81,11 +81,11 @@
 
 /* Type of mobile power */
 #define CONFIG_BATTERY BATT_LIPOL1300
-#define BATTERY_CAPACITY_MIN 630  /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 1000 /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC 10   /* capacity increment */
+#define BATTERY_CAPACITY_MIN 1200  /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 1900 /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC 50   /* capacity increment */
 #define BATTERY_TYPES_COUNT  1    /* only one type */
-#define BATTERY_SCALE_FACTOR 5865
+#define BATTERY_SCALE_FACTOR 25882
 
 /* Hardware controlled charging? FIXME */
 //#define CONFIG_CHARGING CHARGING_SIMPLE

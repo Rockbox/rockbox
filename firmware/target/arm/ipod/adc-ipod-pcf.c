@@ -36,7 +36,6 @@ static struct adc_struct adcdata[NUM_ADC_CHANNELS] IDATA_ATTR;
 
 static unsigned short _adc_read(struct adc_struct *adc)
 {
-#ifndef IPOD_1G2G
     if (adc->timeout < current_tick) {
         unsigned char data[2];
         unsigned short value;
@@ -56,7 +55,6 @@ static unsigned short _adc_read(struct adc_struct *adc)
         adc->data = value;
         return value;
     } else
-#endif
     {
         return adc->data;
     }
@@ -66,19 +64,11 @@ static unsigned short _adc_read(struct adc_struct *adc)
 unsigned short adc_scan(int channel) {
     struct adc_struct *adc = &adcdata[channel];
     adc->timeout = 0;
-#ifdef IPOD_1G2G
-    if (channel == ADC_UNREG_POWER)
-        return 681; /* FIXME fake 4.00V */
-#endif
     return _adc_read(adc);
 }
 
 /* Retrieve the ADC value, only does a scan periodically */
 unsigned short adc_read(int channel) {
-#ifdef IPOD_1G2G
-    if (channel == ADC_UNREG_POWER)
-        return 681; /* FIXME fake 4.00V */
-#endif
     return _adc_read(&adcdata[channel]);
 }
 
