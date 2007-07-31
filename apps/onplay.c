@@ -1135,7 +1135,7 @@ MAKE_ONPLAYMENU( wps_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
 #ifdef HAVE_TAGCACHE
            &rating_item, 
 #endif
-           &bookmark_menu, &browse_id3_item, &view_cue_item,
+           &bookmark_menu, &browse_id3_item, &delete_file_item, &view_cue_item,
 #ifdef HAVE_PITCHSCREEN
            &pitch_screen_item,
 #endif
