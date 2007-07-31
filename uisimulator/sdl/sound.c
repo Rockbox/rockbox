@@ -286,6 +286,7 @@ void pcm_calculate_peaks(int *left, int *right)
     }
 }
 
+extern int sim_volume; /* in firmware/sound.c
 void write_to_soundcard(struct pcm_udata *udata) {
     if (cvt.needed) {
         Uint32 rd = udata->num_in;
@@ -315,8 +316,7 @@ void write_to_soundcard(struct pcm_udata *udata) {
             memcpy(cvt.buf, pcm_data, cvt.len);
 
             SDL_ConvertAudio(&cvt);
-
-            memcpy(udata->stream, cvt.buf, cvt.len_cvt);
+            SDL_MixAudio(udata->stream, cvt.buf, cvt.len_cvt, sim_volume);
 
             udata->num_in = cvt.len / pcm_sample_bytes;
             udata->num_out = cvt.len_cvt / pcm_sample_bytes;
@@ -357,7 +357,8 @@ void write_to_soundcard(struct pcm_udata *udata) {
         }
     } else {
         udata->num_in = udata->num_out = MIN(udata->num_in, udata->num_out);
-        memcpy(udata->stream, pcm_data, udata->num_out * pcm_sample_bytes);
+        SDL_MixAudio(udata->stream, pcm_data, 
+                     udata->num_out * pcm_sample_bytes, sim_volume);
         
         if (udata->debug != NULL) {
            fwrite(pcm_data, sizeof(Uint8), udata->num_out * pcm_sample_bytes,
