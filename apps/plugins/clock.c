@@ -94,6 +94,7 @@ Original release, featuring analog/digital modes and a few options.
 #include "xlcd.h"
 #include "oldmenuapi.h"
 #include "fixedpoint.h"
+#include "pluginlib_actions.h"
 
 PLUGIN_HEADER
 
@@ -168,66 +169,17 @@ PLUGIN_HEADER
 #define SMALLSEG_YOFS(x) (LCD_HEIGHT-x*SMALLSEG_HEIGHT)/2
 
 /* Keymaps */
-#if (CONFIG_KEYPAD == RECORDER_PAD)
-#define COUNTER_TOGGLE_BUTTON (BUTTON_ON|BUTTON_REL)
-#define COUNTER_RESET_BUTTON (BUTTON_ON|BUTTON_REPEAT)
-#define MENU_BUTTON BUTTON_PLAY
-#define ALT_MENU_BUTTON BUTTON_F1
-#define EXIT_BUTTON BUTTON_OFF
-#define MODE_NEXT_BUTTON BUTTON_RIGHT
-#define MODE_PREV_BUTTON BUTTON_LEFT
-#elif (CONFIG_KEYPAD == ARCHOS_AV300_PAD)
-#define COUNTER_TOGGLE_BUTTON (BUTTON_ON|BUTTON_REL)
-#define COUNTER_RESET_BUTTON (BUTTON_ON|BUTTON_REPEAT)
-#define MENU_BUTTON BUTTON_SELECT
-#define ALT_MENU_BUTTON BUTTON_F1
-#define EXIT_BUTTON BUTTON_OFF
-#define MODE_NEXT_BUTTON BUTTON_RIGHT
-#define MODE_PREV_BUTTON BUTTON_LEFT
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
-#define COUNTER_TOGGLE_BUTTON (BUTTON_PLAY|BUTTON_REL)
-#define COUNTER_RESET_BUTTON (BUTTON_PLAY|BUTTON_REPEAT)
-#define MENU_BUTTON BUTTON_SELECT
-#define EXIT_BUTTON BUTTON_MENU
-#define MODE_NEXT_BUTTON BUTTON_RIGHT
-#define MODE_PREV_BUTTON BUTTON_LEFT
-#elif (CONFIG_KEYPAD == IRIVER_H300_PAD) || (CONFIG_KEYPAD == IRIVER_H100_PAD)
-#define COUNTER_TOGGLE_BUTTON (BUTTON_ON|BUTTON_REL)
-#define COUNTER_RESET_BUTTON (BUTTON_ON|BUTTON_REPEAT)
-#define MENU_BUTTON BUTTON_SELECT
-#define EXIT_BUTTON BUTTON_OFF
-#define MODE_NEXT_BUTTON BUTTON_RIGHT
-#define MODE_PREV_BUTTON BUTTON_LEFT
-#define EXIT_RC_BUTTON BUTTON_RC_STOP
-#elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
-#define COUNTER_TOGGLE_BUTTON (BUTTON_PLAY|BUTTON_REL)
-#define COUNTER_RESET_BUTTON (BUTTON_PLAY|BUTTON_REPEAT)
-#define MENU_BUTTON BUTTON_SELECT
-#define EXIT_BUTTON BUTTON_POWER
-#define MODE_NEXT_BUTTON BUTTON_RIGHT
-#define MODE_PREV_BUTTON BUTTON_LEFT
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD)
-#define COUNTER_TOGGLE_BUTTON BUTTON_UP
-#define COUNTER_RESET_BUTTON BUTTON_DOWN
-#define MENU_BUTTON BUTTON_SELECT
-#define EXIT_BUTTON BUTTON_POWER
-#define MODE_NEXT_BUTTON BUTTON_RIGHT
-#define MODE_PREV_BUTTON BUTTON_LEFT
-#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
-#define COUNTER_TOGGLE_BUTTON (BUTTON_PLAY|BUTTON_REL)
-#define COUNTER_RESET_BUTTON (BUTTON_PLAY|BUTTON_REPEAT)
-#define MENU_BUTTON BUTTON_REW
-#define EXIT_BUTTON BUTTON_POWER
-#define MODE_NEXT_BUTTON BUTTON_RIGHT
-#define MODE_PREV_BUTTON BUTTON_LEFT
-#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
-#define COUNTER_TOGGLE_BUTTON (BUTTON_SELECT|BUTTON_REL)
-#define COUNTER_RESET_BUTTON (BUTTON_SELECT|BUTTON_REPEAT)
-#define MENU_BUTTON BUTTON_MENU
-#define EXIT_BUTTON BUTTON_A
-#define MODE_NEXT_BUTTON BUTTON_RIGHT
-#define MODE_PREV_BUTTON BUTTON_LEFT
-#endif
+const struct button_mapping* plugin_contexts[]={
+    generic_actions,
+    generic_directions
+};
+
+#define ACTION_COUNTER_TOGGLE PLA_FIRE
+#define ACTION_COUNTER_RESET PLA_FIRE_REPEAT
+#define ACTION_MENU PLA_MENU
+#define ACTION_EXIT PLA_QUIT
+#define ACTION_MODE_NEXT PLA_RIGHT
+#define ACTION_MODE_PREV PLA_LEFT
 
 /************
  * Prototypes
@@ -349,14 +301,7 @@ static const struct opt_items noyes_text[2] = {
     { "No", -1 },
     { "Yes", -1 }
 };
-static const struct opt_items saving_options_text[2] = {
-    { "No", -1 },
-    { "Yes", -1 }
-};
-static const struct opt_items show_counter_text[2] = {
-    { "No", -1 },
-    { "Yes", -1 }
-};
+
 static const struct opt_items backlight_settings_text[3] = {
     { "Always Off", -1 },
     { "Rockbox setting", -1 },
@@ -370,65 +315,26 @@ static const struct opt_items counting_direction_text[2] = {
     {"Down",   -1},
     {"Up", -1}
 };
-static const struct opt_items analog_date_text[3] = {
+static const struct opt_items date_format_text[] = {
     { "No", -1 },
     { "American format", -1 },
     { "European format", -1 }
 };
-static const struct opt_items analog_secondhand_text[2] = {
-    { "No", -1 },
-    { "Yes", -1 }
-};
+
 static const struct opt_items analog_time_text[3] = {
     { "No", -1 },
     { "24-hour Format", -1 },
     { "12-hour Format", -1 }
 };
-static const struct opt_items digital_seconds_text[2] = {
-    { "No", -1 },
-    { "Yes", -1 }
-};
-static const struct opt_items digital_date_text[3] = {
-    { "No", -1 },
-    { "American format", -1 },
-    { "European format", -1 }
-};
-static const struct opt_items digital_blinkcolon_text[2] = {
-    { "No", -1 },
-    { "Yes", -1 }
-};
-static const struct opt_items digital_format_text[2] = {
+
+static const struct opt_items time_format_text[2] = {
     { "24-hour Format", -1 },
     { "12-hour Format", -1 }
 };
-static const struct opt_items fullscreen_border_text[2] = {
-    { "No", -1 },
-    { "Yes", -1 }
-};
-static const struct opt_items fullscreen_secondhand_text[2] = {
-    { "No", -1 },
-    { "Yes", -1 }
-};
+
 static const struct opt_items binary_mode_text[2] = {
     { "Numbers", -1 },
     { "Dots", -1 }
-};
-static const struct opt_items plain_date_text[3] = {
-    { "No", -1 },
-    { "American format", -1 },
-    { "European format", -1 }
-};
-static const struct opt_items plain_seconds_text[3] = {
-    { "No", -1 },
-    { "Yes", -1 }
-};
-static const struct opt_items plain_blinkcolon_text[2] = {
-    { "No", -1 },
-    { "Yes", -1 }
-};
-static const struct opt_items plain_format_text[3] = {
-    { "24-hour Format", -1 },
-    { "12-hour Format", -1 }
 };
 
 /*****************************************
@@ -1057,11 +963,11 @@ void analog_settings_menu(void)
         {
             case 0:
                 rb->set_option("Show Date", &settings.analog[analog_date],
-                               INT, analog_date_text, 3, NULL);
+                               INT, date_format_text, 3, NULL);
                 break;
             case 1:
                 rb->set_option("Show Second Hand", &settings.analog[analog_secondhand],
-                               INT, analog_secondhand_text, 2, NULL);
+                               INT, noyes_text, 2, NULL);
                 break;
             case 2:
                 rb->set_option("Show Time", &settings.analog[analog_time],
@@ -1102,19 +1008,19 @@ void digital_settings_menu(void)
         {
             case 0:
                 rb->set_option("Show Seconds", &settings.digital[digital_seconds],
-                               INT, digital_seconds_text, 2, NULL);
+                               INT, noyes_text, 2, NULL);
                 break;
             case 1:
                 rb->set_option("Show Date", &settings.digital[digital_date],
-                               INT, digital_date_text, 3, NULL);
+                               INT, date_format_text, 3, NULL);
                 break;
             case 2:
                 rb->set_option("Blinking Colon", &settings.digital[digital_blinkcolon],
-                               INT, digital_blinkcolon_text, 2, NULL);
+                               INT, noyes_text, 2, NULL);
                 break;
             case 3:
                 rb->set_option("Time Format", &settings.digital[digital_format],
-                               INT, digital_format_text, 2, NULL);
+                               INT, time_format_text, 2, NULL);
                 break;
 
             default:
@@ -1151,11 +1057,11 @@ void fullscreen_settings_menu(void)
         {
             case 0:
                 rb->set_option("Show Border", &settings.fullscreen[fullscreen_border],
-                               INT, fullscreen_border_text, 2, NULL);
+                               INT, noyes_text, 2, NULL);
                 break;
             case 1:
                 rb->set_option("Show Second Hand", &settings.fullscreen[fullscreen_secondhand],
-                               INT, fullscreen_secondhand_text, 2, NULL);
+                               INT, noyes_text, 2, NULL);
                 break;
 
             default:
@@ -1229,19 +1135,19 @@ void plain_settings_menu(void)
         {
             case 0:
                 rb->set_option("Show Date", &settings.plain[plain_date],
-                               INT, plain_date_text, 3, NULL);
+                               INT, date_format_text, 3, NULL);
                 break;
             case 1:
                 rb->set_option("Show Seconds", &settings.plain[plain_seconds],
-                               INT, plain_seconds_text, 2, NULL);
+                               INT, noyes_text, 2, NULL);
                 break;
             case 2:
                 rb->set_option("Blinking Colon", &settings.plain[plain_blinkcolon],
-                               INT, plain_blinkcolon_text, 2, NULL);
+                               INT, noyes_text, 2, NULL);
                 break;
             case 3:
                 rb->set_option("Time Format", &settings.plain[plain_format],
-                               INT, plain_format_text, 2, NULL);
+                               INT, time_format_text, 2, NULL);
                 break;
 
             default:
@@ -1323,7 +1229,7 @@ void general_settings(void)
 
             case 2:
                 rb->set_option("Save On Exit", &settings.general[general_savesetting],
-                               INT, saving_options_text, 2, NULL);
+                               INT, noyes_text, 2, NULL);
 
                 /* if we no longer save on exit, we better save now to remember that */
                 if(settings.general[general_savesetting] == 0)
@@ -1332,7 +1238,7 @@ void general_settings(void)
 
             case 3:
                 rb->set_option("Show Counter", &settings.general[general_counter],
-                               INT, show_counter_text, 2, NULL);
+                               INT, noyes_text, 2, NULL);
                 break;
 
             case 4:
@@ -1843,10 +1749,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         /*************************
          * Scan for button presses
          ************************/
-        button = rb->button_get_w_tmo(HZ/10);
+        button =  pluginlib_getaction(rb, HZ/10, plugin_contexts, 2);
         switch (button)
         {
-            case COUNTER_TOGGLE_BUTTON: /* start/stop counter */
+            case ACTION_COUNTER_TOGGLE: /* start/stop counter */
                 if(settings.general[general_counter])
                 {
                     if(!counter_btn_held) /* Ignore if the counter was reset */
@@ -1866,7 +1772,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 }
                 break;
 
-            case COUNTER_RESET_BUTTON: /* reset counter */
+            case ACTION_COUNTER_RESET: /* reset counter */
                 if(settings.general[general_counter])
                 {
                     counter_btn_held = true;  /* Ignore the release event */
@@ -1875,7 +1781,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 }
                 break;
 
-            case MODE_NEXT_BUTTON:
+            case ACTION_MODE_NEXT:
                 if(settings.clock < CLOCK_MODES)
                     settings.clock++;
                 else
@@ -1884,7 +1790,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 set_digital_colors();
                 break;
 
-            case MODE_PREV_BUTTON:
+            case ACTION_MODE_PREV:
                 if(settings.clock > 1)
                     settings.clock--;
                 else
@@ -1893,11 +1799,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 set_digital_colors();
                 break;
 
-            case MENU_BUTTON: /* main menu */
-#ifdef ALT_MENU_BUTTON
-            case ALT_MENU_BUTTON:
-#endif
+            case ACTION_MENU: /* main menu */
                 main_menu();
+                break;
+
+            case ACTION_EXIT: /* main menu */
+                exit_clock=true;
                 break;
 
             default:
