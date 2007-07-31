@@ -27,9 +27,13 @@ struct mutex boostctrl_mtx NOCACHEBSS_ATTR;
 #ifndef BOOTLOADER
 extern void TIMER1(void);
 extern void TIMER2(void);
-
-#if defined(IPOD_MINI) /* mini 1 only, mini 2G uses iPod 4G code */
-extern void ipod_mini_button_int(void);
+extern void ipod_mini_button_int(void); /* iPod Mini 1st gen only */
+extern void ipod_4g_button_int(void);   /* iPod 4th gen and higher only */
+#ifdef SANSA_E200
+extern void button_int(void);
+extern void clickwheel_int(void);
+extern void microsd_int(void);
+#endif
 
 void irq(void)
 {
@@ -39,38 +43,13 @@ void irq(void)
             TIMER1();
         else if (CPU_INT_STAT & TIMER2_MASK)
             TIMER2();
+#if defined(IPOD_MINI) /* Mini 1st gen only, mini 2nd gen uses iPod 4G code */
         else if (CPU_HI_INT_STAT & GPIO_MASK)
             ipod_mini_button_int();
-    } else {
-        if (COP_INT_STAT & TIMER1_MASK)
-            TIMER1();
-        else if (COP_INT_STAT & TIMER2_MASK)
-            TIMER2();
-        else if (COP_HI_INT_STAT & GPIO_MASK)
-            ipod_mini_button_int();
-    }
-}
-#elif (defined IRIVER_H10) || (defined IRIVER_H10_5GB) || defined(ELIO_TPJ1022) \
-    || (defined SANSA_E200)
-/* TODO: this should really be in the target tree, but moving it there caused
-   crt0.S not to find it while linking */
-/* TODO: Even if it isn't in the target tree, this should be the default case */
-#ifdef SANSA_E200
-extern void button_int(void);
-extern void clickwheel_int(void);
-extern void microsd_int(void);
-#endif
-
-void irq(void)
-{
-    if(CURRENT_CORE == CPU) {
-        if (CPU_INT_STAT & TIMER1_MASK) {
-            TIMER1();
-        }
-        else if (CPU_INT_STAT & TIMER2_MASK) {
-            TIMER2();
-        }
-#ifdef SANSA_E200
+#elif CONFIG_KEYPAD == IPOD_4G_PAD /* except Mini 1st gen, handled above */
+        else if (CPU_HI_INT_STAT & I2C_MASK)
+            ipod_4g_button_int();
+#elif defined(SANSA_E200)
         else if (CPU_HI_INT_STAT & GPIO0_MASK) {
             if (GPIOA_INT_STAT & 0x80)
                 microsd_int();
@@ -89,29 +68,6 @@ void irq(void)
             TIMER2();
     }
 }
-#else
-extern void ipod_4g_button_int(void);
-
-void irq(void)
-{
-    if(CURRENT_CORE == CPU)
-    {
-        if (CPU_INT_STAT & TIMER1_MASK)
-            TIMER1();
-        else if (CPU_INT_STAT & TIMER2_MASK)
-            TIMER2();
-        else if (CPU_HI_INT_STAT & I2C_MASK)
-            ipod_4g_button_int();
-    } else {
-        if (COP_INT_STAT & TIMER1_MASK)
-            TIMER1();
-        else if (COP_INT_STAT & TIMER2_MASK)
-            TIMER2();
-        else if (COP_HI_INT_STAT & I2C_MASK)
-            ipod_4g_button_int();
-    }
-}
-#endif
 #endif /* BOOTLOADER */
 
 /* TODO: The following function has been lifted straight from IPL, and
