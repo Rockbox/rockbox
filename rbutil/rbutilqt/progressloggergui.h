@@ -32,6 +32,8 @@ public:
     
     virtual void addItem(QString text) ;  //adds a string to the list
     
+    virtual void addItem(QString text, int flag) ;  //adds a string to the list
+    
     virtual void setProgressValue(int value);
     virtual void setProgressMax(int max);
     virtual int getProgressMax();

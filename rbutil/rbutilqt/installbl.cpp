@@ -98,7 +98,7 @@ void InstallBl::accept()
         userSettings->setValue("defaults/mountpoint", mountPoint);
     }
     else {
-        logger->addItem(tr("Mount point is wrong!"));
+        logger->addItem(tr("Mount point is wrong!"),LOGERROR);
         logger->abort();
         return;
     }
@@ -107,9 +107,9 @@ void InstallBl::accept()
     {
         m_OrigFirmware = ui.lineOriginalFirmware->text();
     }
-    else
+    else if(needextrafile)
     {
-        logger->addItem(tr("Original Firmware Path is wrong!"));
+        logger->addItem(tr("Original Firmware Path is wrong!"),LOGERROR);
         logger->abort();
         return;
     }
@@ -160,12 +160,14 @@ void InstallBl::setDeviceSettings(QSettings *dev)
         ui.buttonBrowseOF->show();
         ui.lineOriginalFirmware->show();
         ui.label_3->show();
+        needextrafile = true;
     }
     else
     {
         ui.buttonBrowseOF->hide();
         ui.lineOriginalFirmware->hide();
         ui.label_3->hide();
+        needextrafile = false;
     }
     qDebug() << "Install::setDeviceSettings:" << devices;
 }

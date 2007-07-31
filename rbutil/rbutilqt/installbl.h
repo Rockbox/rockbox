@@ -57,6 +57,7 @@ class InstallBl : public QDialog
         QString mountPoint;
         QString m_OrigFirmware;
         BootloaderInstaller* binstaller;
+        bool needextrafile;
 
     private slots:
         void browseFolder(void);

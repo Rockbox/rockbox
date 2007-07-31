@@ -31,7 +31,30 @@ ProgressLoggerGui::ProgressLoggerGui(QObject* parent): ProgressloggerInterface(p
 void ProgressLoggerGui::addItem(QString text)
 {
     dp.listProgress->addItem(text);
-}  
+} 
+
+void ProgressLoggerGui::addItem(QString text,int flag)
+{
+    QListWidgetItem* item = new QListWidgetItem(text);
+    
+    switch(flag)
+    {
+        case LOGOK:
+            item->setIcon(QIcon(":/icons/icons/log-ok.png"));
+            break;
+        case LOGINFO:
+            item->setIcon(QIcon(":/icons/icons/log-info.png"));
+            break;
+        case LOGWARNING:
+            item->setIcon(QIcon(":/icons/icons/log-warning.png"));
+            break;
+        case LOGERROR:
+            item->setIcon(QIcon(":/icons/icons/log-error.png"));
+            break;
+    }
+    
+    dp.listProgress->addItem(item);
+} 
 
 void ProgressLoggerGui::setProgressValue(int  value)
 {

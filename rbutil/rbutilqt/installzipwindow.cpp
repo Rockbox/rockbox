@@ -76,7 +76,7 @@ void InstallZipWindow::accept()
         userSettings->setValue("defaults/mountpoint", mountPoint);
     }
     else {
-        logger->addItem(tr("Mount point is wrong!"));
+        logger->addItem(tr("Mount point is wrong!"),LOGERROR);
         logger->abort();
         return;
     }
@@ -84,9 +84,9 @@ void InstallZipWindow::accept()
     userSettings->sync();
 
     // create Zip installer
-	installer = new ZipInstaller(this);
-	  
-	QString fileName = url.section('/', -1);
+    installer = new ZipInstaller(this);
+   
+    QString fileName = url.section('/', -1);
     installer->setFilename(fileName);
     installer->setUrl(url);
     installer->setProxy(proxy);

@@ -33,7 +33,7 @@ void ZipInstaller::install(ProgressloggerInterface* dp)
     m_dp = dp;
 
     m_dp->addItem(tr("Downloading file %1.%2")
-            .arg(QFileInfo(m_url).baseName(), QFileInfo(m_url).completeSuffix()));
+            .arg(QFileInfo(m_url).baseName(), QFileInfo(m_url).completeSuffix()),LOGINFO);
 
     // temporary file needs to be opened to get the filename
     downloadFile.open();
@@ -72,23 +72,23 @@ void ZipInstaller::downloadDone(bool error)
     }
     m_dp->setProgressValue(max);
     if(getter->httpResponse() != 200) {
-        m_dp->addItem(tr("Download error: received HTTP error %1.").arg(getter->httpResponse()));
+        m_dp->addItem(tr("Download error: received HTTP error %1.").arg(getter->httpResponse()),LOGERROR);
         m_dp->abort();
         emit done(true);
         return;
     }
     if(error) {
-        m_dp->addItem(tr("Download error: %1").arg(getter->errorString()));
+        m_dp->addItem(tr("Download error: %1").arg(getter->errorString()),LOGERROR);
         m_dp->abort();
         emit done(true);
         return;
     }
-    else m_dp->addItem(tr("Download finished."));
+    else m_dp->addItem(tr("Download finished."),LOGOK);
 
     // unzip downloaded file
     qDebug() << "about to unzip the downloaded file" << m_file << "to" << m_mountpoint;
 
-    m_dp->addItem(tr("Extracting file."));
+    m_dp->addItem(tr("Extracting file."),LOGINFO);
     
     qDebug() << "file to unzip: " << m_file;
     UnZip::ErrorCode ec;
@@ -96,7 +96,7 @@ void ZipInstaller::downloadDone(bool error)
     ec = uz.openArchive(m_file);
     if(ec != UnZip::Ok) {
         m_dp->addItem(tr("Opening archive failed: %1.")
-            .arg(uz.formatError(ec)));
+            .arg(uz.formatError(ec)),LOGERROR);
         m_dp->abort();
         emit done(false);
         return;
@@ -105,13 +105,13 @@ void ZipInstaller::downloadDone(bool error)
     ec = uz.extractAll(m_mountpoint);
     if(ec != UnZip::Ok) {
         m_dp->addItem(tr("Extracting failed: %1.")
-            .arg(uz.formatError(ec)));
+            .arg(uz.formatError(ec)),LOGERROR);
         m_dp->abort();
         emit done(false);
         return;
     }
 
-    m_dp->addItem(tr("creating installation log"));
+    m_dp->addItem(tr("creating installation log"),LOGINFO);
     
     QStringList zipContents = uz.fileList();
        
@@ -127,7 +127,7 @@ void ZipInstaller::downloadDone(bool error)
     // remove temporary file
     downloadFile.remove();
 
-    m_dp->addItem(tr("Extraction finished successfully."));
+    m_dp->addItem(tr("Extraction finished successfully."),LOGOK);
     m_dp->abort();
     emit done(false);
 }

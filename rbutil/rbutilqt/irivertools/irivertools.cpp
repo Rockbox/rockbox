@@ -59,12 +59,12 @@ bool mkboot(QString infile, QString outfile,QString bootloader,int origin,Progre
     QFile f(infile);
     if(!f.open(QIODevice::ReadOnly))
     {
-        dp->addItem("Could not open: %1" + infile);
+        dp->addItem("Could not open: %1" + infile,LOGERROR);
         return false;
     }
     i = f.read((char*)image,16);
     if(i < 16) {
-        dp->addItem("reading header failed");
+        dp->addItem("reading header failed",LOGERROR);
         return false;
     }
 
@@ -77,7 +77,7 @@ bool mkboot(QString infile, QString outfile,QString bootloader,int origin,Progre
     len = binary_length+0x200-16;
     i = f.read((char*)image+16, len);
     if(i < len) {
-        dp->addItem("reading firmware failed");
+        dp->addItem("reading firmware failed",LOGERROR);
         return false;
     }
 
@@ -86,7 +86,7 @@ bool mkboot(QString infile, QString outfile,QString bootloader,int origin,Progre
     f.setFileName(bootloader);
     if(!f.open(QIODevice::ReadOnly))
     {
-        dp->addItem("Could not open: %1" + bootloader);
+        dp->addItem("Could not open: %1" + bootloader,LOGERROR);
         return false;
     }
 
@@ -94,7 +94,7 @@ bool mkboot(QString infile, QString outfile,QString bootloader,int origin,Progre
 
     i = f.read((char*)image+0x220 + origin, bllen);
     if(i < bllen) {
-       dp->addItem("reading bootloader failed"); 
+       dp->addItem("reading bootloader failed",LOGERROR); 
        return false;
     }
 
@@ -102,7 +102,7 @@ bool mkboot(QString infile, QString outfile,QString bootloader,int origin,Progre
     f.setFileName(outfile);
     if(!f.open(QIODevice::WriteOnly))
     {
-        dp->addItem("Could not open: %1" + outfile);
+        dp->addItem("Could not open: %1" + outfile,LOGERROR);
         return false;
     }
 
@@ -154,7 +154,7 @@ bool mkboot(QString infile, QString outfile,QString bootloader,int origin,Progre
 
     i = f.write((char*)image,total_length);
     if(i < total_length) {
-        dp->addItem("writing bootloader failed");
+        dp->addItem("writing bootloader failed",LOGERROR);
         return false;
     }
 
@@ -226,19 +226,19 @@ int iriver_decode(QString infile_name, QString outfile_name, unsigned int modify
      
     if(!infile.open(QIODevice::ReadOnly))
     {
-        dp->addItem("Could not open: %1" + infile_name);
+        dp->addItem("Could not open: %1" + infile_name,LOGERROR);
         return -1;
     }
     if(!outfile.open(QIODevice::WriteOnly))
     {
-        dp->addItem("Could not open: %1" + outfile_name);
+        dp->addItem("Could not open: %1" + outfile_name,LOGERROR);
         return -1;
     }
     lenread = infile.read( (char*)headerdata, 512);
     if( lenread != 512 )
     {
         dp->addItem("This doesn't look like a valid encrypted iHP" 
-                                    "firmware - reason: header length.");
+                                    "firmware - reason: header length.",LOGERROR);
         infile.close();
         outfile.close();
         return -1;
@@ -248,7 +248,7 @@ int iriver_decode(QString infile_name, QString outfile_name, unsigned int modify
     if( i == -1 )
     {
         dp->addItem("This firmware is for an unknown model, or is not"
-                                    " a valid encrypted iHP firmware.");
+                                    " a valid encrypted iHP firmware.",LOGERROR);
         infile.close();
         outfile.close();
         return -1;
@@ -271,7 +271,7 @@ int iriver_decode(QString infile_name, QString outfile_name, unsigned int modify
         dwLength2+dwLength3+512 != dwLength1 )
     {
         dp->addItem("This doesn't look like a valid encrypted "
-                                    "iHP firmware - reason: file 'length' data.");
+                                    "iHP firmware - reason: file 'length' data.",LOGERROR);
         infile.close();
         outfile.close();
         return -1;
@@ -333,7 +333,7 @@ int iriver_decode(QString infile_name, QString outfile_name, unsigned int modify
     if( fp != dwLength2 )
     {
         dp->addItem("This doesn't look like a valid encrypted "
-                                    "iHP firmware - reason: 'length2' mismatch.");
+                                    "iHP firmware - reason: 'length2' mismatch.",LOGERROR);
         infile.close();
         outfile.close();
         return -1;
@@ -350,7 +350,7 @@ int iriver_decode(QString infile_name, QString outfile_name, unsigned int modify
         if( memcmp( ppChecksums, blockdata, lenread ) != 0 )
         {
             dp->addItem("This doesn't look like a valid encrypted "
-                                    "iHP firmware - reason: Checksum mismatch!");
+                                    "iHP firmware - reason: Checksum mismatch!",LOGERROR);
             infile.close();
             outfile.close();
             return -1;
@@ -361,7 +361,7 @@ int iriver_decode(QString infile_name, QString outfile_name, unsigned int modify
     if( fp != dwLength3 )
     {
         dp->addItem("This doesn't look like a valid encrypted "
-                                    "iHP firmware - reason: 'length3' mismatch.");
+                                    "iHP firmware - reason: 'length3' mismatch.",LOGERROR);
         infile.close();
         outfile.close();
         return -1;
@@ -409,12 +409,12 @@ int iriver_encode(QString infile_name, QString outfile_name, unsigned int modify
 
     if(!infile.open(QIODevice::ReadOnly))
     {
-        dp->addItem("Could not open: %1" + infile_name);
+        dp->addItem("Could not open: %1" + infile_name,LOGERROR);
         return -1;
     }
     if(!outfile.open(QIODevice::WriteOnly))
     {
-        dp->addItem("Could not open: %1" + outfile_name);
+        dp->addItem("Could not open: %1" + outfile_name,LOGERROR);
         return -1;
     }
 
@@ -422,7 +422,7 @@ int iriver_encode(QString infile_name, QString outfile_name, unsigned int modify
     if( lenread != 512 )
     {
         dp->addItem("This doesn't look like a valid decoded "
-                                    "iHP firmware - reason: header length.");
+                                    "iHP firmware - reason: header length.",LOGERROR);
         infile.close();
         outfile.close();
     };
@@ -436,7 +436,7 @@ int iriver_encode(QString infile_name, QString outfile_name, unsigned int modify
     if( i == -1 )
     {
         dp->addItem("This firmware is for an unknown model, or is not"
-                                    " a valid decoded iHP firmware.");
+                                    " a valid decoded iHP firmware.",LOGERROR);
         infile.close();
         outfile.close();
     };
@@ -457,7 +457,7 @@ int iriver_encode(QString infile_name, QString outfile_name, unsigned int modify
         dwLength2+dwLength3+512 != dwLength1 )
     {
         dp->addItem("This doesn't look like a valid decoded "
-                                    "iHP firmware - reason:file 'length' data.");
+                                    "iHP firmware - reason:file 'length' data.",LOGERROR);
         infile.close();
         outfile.close();
     };
@@ -495,7 +495,7 @@ int iriver_encode(QString infile_name, QString outfile_name, unsigned int modify
     if( fp != dwLength2 )
     {
         dp->addItem("This doesn't look like a valid decoded "
-                                    "iHP firmware - reason: 'length1' mismatch.");
+                                    "iHP firmware - reason: 'length1' mismatch.",LOGERROR);
         infile.close();
         outfile.close();
     };
@@ -515,7 +515,7 @@ int iriver_encode(QString infile_name, QString outfile_name, unsigned int modify
     if( fp != dwLength3 )
     {
         dp->addItem("This doesn't look like a valid decoded "
-                                    "iHP firmware - 'length2' mismatch.");
+                                    "iHP firmware - 'length2' mismatch.",LOGERROR);
         infile.close();
         outfile.close();
     };

@@ -7,17 +7,20 @@
         <file>icons/bootloader_btn.png</file>
         <file>icons/doom_btn.png</file>
         <file>icons/font_btn.png</file>
+        <file>icons/log-error.png</file>
+        <file>icons/log-info.png</file>
+        <file>icons/log-ok.png</file>
+        <file>icons/log-warning.png</file>
         <file>icons/rbinstall_btn.png</file>
+        <file>icons/rblogo.xpm</file>
+        <file>icons/rbutil.xpm</file>
         <file>icons/rembootloader_btn.png</file>
         <file>icons/remrb_btn.png</file>
         <file>icons/themes_btn.png</file>
         <file>icons/wizard.xpm</file>
-        <file>icons/rblogo.xpm</file>
-        <file>icons/rbutil.xpm</file>
     </qresource>
     <qresource prefix="/ini" >
         <file>rbutil.ini</file>
     </qresource>
-    <qresource prefix="/lang" >
-    </qresource>
+    <qresource prefix="/lang" />
 </RCC>

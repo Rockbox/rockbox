@@ -105,7 +105,7 @@ void Install::accept()
         userSettings->setValue("defaults/mountpoint", mountPoint);
     }
     else {
-        logger->addItem(tr("Mount point is wrong!"));
+        logger->addItem(tr("Mount point is wrong!"),LOGERROR);
         logger->abort();
         return;
     }
