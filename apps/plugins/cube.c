@@ -22,6 +22,7 @@
 #include "gray.h"
 #include "playergfx.h"
 #include "xlcd.h"
+#include "fixedpoint.h"
 
 PLUGIN_HEADER
 
@@ -312,87 +313,7 @@ static long matrice[3][3];
 static const int nb_points = 8;
 static long z_off = 600;
 
-/* Precalculated sine and cosine * 16384 (fixed point 18.14) */
-static const short sin_table[91] =
-{
-        0,   285,   571,   857,  1142,  1427,  1712,  1996,  2280,  2563,
-     2845,  3126,  3406,  3685,  3963,  4240,  4516,  4790,  5062,  5334,
-     5603,  5871,  6137,  6401,  6663,  6924,  7182,  7438,  7691,  7943,
-     8191,  8438,  8682,  8923,  9161,  9397,  9630,  9860, 10086, 10310,
-    10531, 10748, 10963, 11173, 11381, 11585, 11785, 11982, 12175, 12365,
-    12550, 12732, 12910, 13084, 13254, 13420, 13582, 13740, 13894, 14043,
-    14188, 14329, 14466, 14598, 14725, 14848, 14967, 15081, 15190, 15295,
-    15395, 15491, 15582, 15668, 15749, 15825, 15897, 15964, 16025, 16082,
-    16135, 16182, 16224, 16261, 16294, 16321, 16344, 16361, 16374, 16381,
-    16384
-};
-
 static struct plugin_api* rb;
-
-static long sin(int val)
-{
-    /* Speed improvement through sukzessive lookup */
-    if (val < 181)
-    {
-        if (val < 91)
-        {
-            /* phase 0-90 degree */
-            return (long)sin_table[val];
-        }
-        else
-        {
-            /* phase 91-180 degree */
-            return (long)sin_table[180-val];
-        }
-    }
-    else
-    {
-        if (val < 271)
-        {
-            /* phase 181-270 degree */
-            return -(long)sin_table[val-180];
-        }
-        else
-        {
-            /* phase 270-359 degree */
-            return -(long)sin_table[360-val];
-        }
-    }
-    return 0;
-}
-
-static long cos(int val)
-{
-    /* Speed improvement through sukzessive lookup */
-    if (val < 181)
-    {
-        if (val < 91)
-        {
-            /* phase 0-90 degree */
-            return (long)sin_table[90-val];
-        }
-        else
-        {
-            /* phase 91-180 degree */
-            return -(long)sin_table[val-90];
-        }
-    }
-    else
-    {
-        if (val < 271)
-        {
-            /* phase 181-270 degree */
-            return -(long)sin_table[270-val];
-        }
-        else
-        {
-            /* phase 270-359 degree */
-            return (long)sin_table[val-270];
-        }
-    }
-    return 0;
-}
-
 
 static void cube_rotate(int xa, int ya, int za)
 {
@@ -400,12 +321,12 @@ static void cube_rotate(int xa, int ya, int za)
     /* Just to prevent unnecessary lookups */
     long sxa, cxa, sya, cya, sza, cza;
 
-    sxa = sin(xa);
-    cxa = cos(xa);
-    sya = sin(ya);
-    cya = cos(ya);
-    sza = sin(za);
-    cza = cos(za);
+    sxa = sin_int(xa);
+    cxa = cos_int(xa);
+    sya = sin_int(ya);
+    cya = cos_int(ya);
+    sza = sin_int(za);
+    cza = cos_int(za);
 
     /* calculate overall translation matrix */
     matrice[0][0] = (cza * cya) >> 14;

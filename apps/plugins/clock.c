@@ -93,124 +93,37 @@ Original release, featuring analog/digital modes and a few options.
 #include "checkbox.h"
 #include "xlcd.h"
 #include "oldmenuapi.h"
+#include "fixedpoint.h"
 
 PLUGIN_HEADER
 
 /* External bitmap references */
-extern const fb_data clock_digits[];
-extern const fb_data clock_smalldigits[];
-extern const fb_data clock_segments[];
-extern const fb_data clock_smallsegments[];
-extern const fb_data clock_logo[];
-extern const fb_data clock_messages[];
-extern const fb_data clock_timesup[];
+#include "clock_digits.h"
+#include "clock_smalldigits.h"
+#include "clock_smallsegments.h"
+#include "clock_messages.h"
+#include "clock_logo.h"
+#include "clock_segments.h"
 
-/* Bitmap sizes/positions/deltas, per LCD size */
-#if (LCD_WIDTH >= 320) && (LCD_HEIGHT >=240) && (LCD_DEPTH >= 16) /* iPod 5G */
-#define DIGIT_WIDTH  50
-#define DIGIT_HEIGHT 70
-#define SMALLDIGIT_WIDTH  15
-#define SMALLDIGIT_HEIGHT 21
-#define SMALLSEG_WIDTH  15
-#define SMALLSEG_HEIGHT 21
-#define MESSAGE_HEIGHT  40
-#define MESSAGE_WIDTH   320
-#define LOGO_WIDTH  320
-#define LOGO_HEIGHT 160
-#define LCD_OFFSET 1.5
-#define HAND_W 3
-#elif (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176) && (LCD_DEPTH >= 16) /* H300 */
-#define DIGIT_WIDTH  35
-#define DIGIT_HEIGHT 49
-#define SMALLDIGIT_WIDTH  10
-#define SMALLDIGIT_HEIGHT 14
-#define SMALLSEG_WIDTH  10
-#define SMALLSEG_HEIGHT 14
-#define MESSAGE_HEIGHT  27
-#define MESSAGE_WIDTH   220
-#define LOGO_WIDTH  220
-#define LOGO_HEIGHT 110
-#define LCD_OFFSET 1.5
-#define HAND_W 3
-#elif (LCD_WIDTH >= 176) && (LCD_HEIGHT >= 132) && (LCD_DEPTH >=16) /* Nano */
-#define DIGIT_WIDTH  25
-#define DIGIT_HEIGHT 35
-#define SMALLDIGIT_WIDTH  10
-#define SMALLDIGIT_HEIGHT 14
-#define SMALLSEG_WIDTH  10
-#define SMALLSEG_HEIGHT 14
-#define MESSAGE_HEIGHT  22
-#define MESSAGE_WIDTH   176
-#define LOGO_WIDTH  176
-#define LOGO_HEIGHT 88
-#define LCD_OFFSET 1.5
-#define HAND_W 3
-#elif (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128) && (LCD_DEPTH >=16) /* iAudio, H10 */
-#define DIGIT_WIDTH  25
-#define DIGIT_HEIGHT 35
-#define SMALLDIGIT_WIDTH  10
-#define SMALLDIGIT_HEIGHT 14
-#define SMALLSEG_WIDTH  10
-#define SMALLSEG_HEIGHT 14
-#define MESSAGE_HEIGHT  20
-#define MESSAGE_WIDTH   160
-#define LOGO_WIDTH  160
-#define LOGO_HEIGHT 80
-#define LCD_OFFSET 1.5
-#define HAND_W 3
-#elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 128) && (LCD_DEPTH >=16) /* H10 5/6GB */
-#define DIGIT_WIDTH  20
-#define DIGIT_HEIGHT 28
-#define SMALLDIGIT_WIDTH  10
-#define SMALLDIGIT_HEIGHT 14
-#define SMALLSEG_WIDTH  10
-#define SMALLSEG_HEIGHT 14
-#define MESSAGE_HEIGHT  16
-#define MESSAGE_WIDTH   128
-#define LOGO_WIDTH  128
-#define LOGO_HEIGHT 64
-#define LCD_OFFSET 1.5
-#define HAND_W 3
-#elif (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128) && (LCD_DEPTH >=2) /* iPod 3G, 4G */
-#define DIGIT_WIDTH  25
-#define DIGIT_HEIGHT 35
-#define SMALLDIGIT_WIDTH  10
-#define SMALLDIGIT_HEIGHT 14
-#define SMALLSEG_WIDTH  10
-#define SMALLSEG_HEIGHT 14
-#define MESSAGE_HEIGHT  20
-#define MESSAGE_WIDTH   160
-#define LOGO_WIDTH  160
-#define LOGO_HEIGHT 80
-#define LCD_OFFSET 1.5
-#define HAND_W 3
-#elif (LCD_WIDTH >= 138) && (LCD_HEIGHT >= 110) && (LCD_DEPTH >=2) /* iPod mini */
-#define DIGIT_WIDTH  23
-#define DIGIT_HEIGHT 32
-#define SMALLDIGIT_WIDTH  10
-#define SMALLDIGIT_HEIGHT 14
-#define SMALLSEG_WIDTH  10
-#define SMALLSEG_HEIGHT 14
-#define MESSAGE_HEIGHT  17
-#define MESSAGE_WIDTH   138
-#define LOGO_WIDTH  138
-#define LOGO_HEIGHT 69
-#define LCD_OFFSET 1.5
-#define HAND_W 3
-#elif (LCD_WIDTH >= 112) && (LCD_HEIGHT >= 64) && (LCD_DEPTH >= 1) /* Archos */
-#define DIGIT_WIDTH  16
-#define DIGIT_HEIGHT 20
-#define SMALLDIGIT_WIDTH  8
-#define SMALLDIGIT_HEIGHT 10
-#define SMALLSEG_WIDTH  10
-#define SMALLSEG_HEIGHT 12
-#define MESSAGE_HEIGHT  14
-#define MESSAGE_WIDTH   112
-#define LOGO_WIDTH  112
-#define LOGO_HEIGHT 50
+/* Bitmap positions/deltas, per LCD size */
+#if (LCD_WIDTH >= 112) && (LCD_HEIGHT >= 64) && (LCD_DEPTH >= 1) /* Archos */
 #define LCD_OFFSET 1
 #define HAND_W 2
+#else
+#define LCD_OFFSET 1.5
+#define HAND_W 3
 #endif
+
+#define DIGIT_WIDTH BMPWIDTH_clock_digits
+#define DIGIT_HEIGHT (BMPHEIGHT_clock_digits/15)
+#define SMALLDIGIT_WIDTH BMPWIDTH_clock_smalldigits
+#define SMALLDIGIT_HEIGHT (BMPHEIGHT_clock_smalldigits/13)
+#define SMALLSEG_WIDTH BMPWIDTH_clock_smallsegments
+#define SMALLSEG_HEIGHT (BMPHEIGHT_clock_smallsegments/13)
+#define MESSAGE_WIDTH BMPWIDTH_clock_messages
+#define MESSAGE_HEIGHT (BMPHEIGHT_clock_messages/6)
+#define LOGO_WIDTH BMPWIDTH_clock_logo
+#define LOGO_HEIGHT BMPHEIGHT_clock_logo
 
 /* Parts of larger bitmaps */
 #define COLON      10
@@ -556,51 +469,6 @@ void reset_settings(void)
     settings.plain[plain_blinkcolon] = false;
 }
 
-/************************************************
- * Precalculated sine * 16384 (fixed point 18.14)
- ***********************************************/
-static const short sin_table[91] =
-{
-    0,     285,   571,   857,   1142,  1427,  1712,  1996,  2280,  2563,
-    2845,  3126,  3406,  3685,  3963,  4240,  4516,  4790,  5062,  5334,
-    5603,  5871,  6137,  6401,  6663,  6924,  7182,  7438,  7691,  7943,
-    8191,  8438,  8682,  8923,  9161,  9397,  9630,  9860,  10086, 10310,
-    10531, 10748, 10963, 11173, 11381, 11585, 11785, 11982, 12175, 12365,
-    12550, 12732, 12910, 13084, 13254, 13420, 13582, 13740, 13894, 14043,
-    14188, 14329, 14466, 14598, 14725, 14848, 14967, 15081, 15190, 15295,
-    15395, 15491, 15582, 15668, 15749, 15825, 15897, 15964, 16025, 16082,
-    16135, 16182, 16224, 16261, 16294, 16321, 16344, 16361, 16374, 16381,
-    16384
-};
-
-/*******************************
- * Sine function (from plasma.c)
- ******************************/
-static short sin(int val)
-{
-    /* value should be between 0 and 360 degree for correct lookup*/
-    val%=360;
-    if(val<0)
-        val+=360;
-
-    /* Speed improvement through successive lookup */
-    if (val < 181)
-    {
-        if (val < 91)
-            return (short)sin_table[val]; /* phase 0-90 degree */
-        else
-            return (short)sin_table[180-val]; /* phase 91-180 degree */
-    }
-    else
-    {
-        if (val < 271)
-            return -(short)sin_table[val-180]; /* phase 181-270 degree */
-        else
-            return -(short)sin_table[360-val]; /* phase 270-359 degree */
-    }
-    return 0;
-}
-
 /**************************************************************
  * Simple function to check if we're switching to digital mode,
  * and if so, set bg/fg colors appropriately.
@@ -812,13 +680,13 @@ void init_clock(void)
 
     for(i=0; i<ANALOG_VALUES; i++)
     {
-        xminute[i] = ((sin(360 * i / ANALOG_VALUES)
+        xminute[i] = ((sin_int(360 * i / ANALOG_VALUES)
                         * ANALOG_MIN_RADIUS) >> 14) + ANALOG_XCENTER;
-        yminute[i] = ((sin(360*i/ ANALOG_VALUES-90)
+        yminute[i] = ((sin_int(360*i/ ANALOG_VALUES-90)
                         * ANALOG_MIN_RADIUS) >> 14) + ANALOG_YCENTER;
-        xhour[i] = ((sin(360 * i / ANALOG_VALUES)
+        xhour[i] = ((sin_int(360 * i / ANALOG_VALUES)
                         * ANALOG_HR_RADIUS) >> 14) + ANALOG_XCENTER;
-        yhour[i] = ((sin(360 * i / ANALOG_VALUES-90)
+        yhour[i] = ((sin_int(360 * i / ANALOG_VALUES-90)
                         * ANALOG_HR_RADIUS) >> 14) + ANALOG_YCENTER;
 
         /* Fullscreen initialization */
