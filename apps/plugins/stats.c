@@ -21,7 +21,7 @@
 PLUGIN_HEADER
 
 static struct plugin_api* rb;
-static int files, dirs, musicfiles;
+static int files, dirs, musicfiles, largestdir;
 static int lasttick;
 static bool abort;
 
@@ -76,7 +76,7 @@ void prn(const char *str, int y)
 
 void update_screen(void)
 {
-    char buf[15];
+    char buf[32];
 
     rb->lcd_clear_display();
 #ifdef HAVE_REMOTE_LCD
@@ -90,6 +90,8 @@ void update_screen(void)
     prn(buf,1);
     rb->snprintf(buf, sizeof(buf), "Dirs: %d", dirs);
     prn(buf,2);
+    rb->snprintf(buf, sizeof(buf), "Max files in Dir: %d", largestdir);
+    prn(buf,3);
 #else
     rb->snprintf(buf, sizeof(buf), "Files:%5d", files);
     prn(buf,0);
@@ -109,6 +111,7 @@ void traversedir(char* location, char* name)
     struct dirent *entry;
     DIR* dir;
     char fullpath[MAX_PATH];
+    int files_in_dir = 0;
 
     rb->snprintf(fullpath, sizeof(fullpath), "%s/%s", location, name);
     dir = rb->opendir(fullpath);
@@ -126,7 +129,7 @@ void traversedir(char* location, char* name)
                 }
                 else {
                     char *ptr = rb->strrchr(entry->d_name,'.'); 
-                    files++;
+                    files++; files_in_dir++;
                     /* Might want to only count .mp3, .ogg etc. */
                     if(ptr){
                         unsigned i;
@@ -157,6 +160,8 @@ void traversedir(char* location, char* name)
         }
         rb->closedir(dir);
     }
+    if (largestdir < files_in_dir)
+        largestdir = files_in_dir;
 }
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
@@ -169,6 +174,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     files = 0;
     dirs = 0;
     musicfiles = 0;
+    largestdir = 0;
     abort = false;
 
     rb->splash(HZ, "Counting...");
