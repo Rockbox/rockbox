@@ -12,10 +12,6 @@
 /* define this if you have recording possibility */
 #define HAVE_RECORDING
 
-#define DEFAULT_REC_MIC_GAIN    23
-#define DEFAULT_REC_LEFT_GAIN   23
-#define DEFAULT_REC_RIGHT_GAIN  23
-
 #define REC_SAMPR_CAPS      (SAMPR_CAP_22)
 #define REC_FREQ_DEFAULT    REC_FREQ_22 /* Default is not 44.1kHz */
 #define REC_SAMPR_DEFAULT   SAMPR_22
@@ -29,30 +25,6 @@
 
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR
-
-/* define this if you have LCD enable function */
-#define HAVE_LCD_ENABLE
-
-/* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
-   should be defined as well. */
-#define HAVE_LCD_SLEEP
-
-#ifndef SIMULATOR
-#define HAVE_HOTSWAP
-#define HAVE_MULTIVOLUME
-#endif
-
-/* define this if you can invert the colours on your LCD */
-#define HAVE_LCD_INVERT
-
-/* define this if you can flip your LCD */
-#define HAVE_LCD_FLIP
-
-#define HAVE_BACKLIGHT_BRIGHTNESS
-/* Main LCD backlight brightness range and defaults */
-#define MIN_BRIGHTNESS_SETTING           1
-#define MAX_BRIGHTNESS_SETTING           12
-#define DEFAULT_BRIGHTNESS_SETTING       6
 
 /* define this if you have a light associated with the buttons */
 #define HAVE_BUTTON_LIGHT
@@ -108,9 +80,11 @@
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
+#define HAVE_BACKLIGHT_BRIGHTNESS
 
 #define BATTERY_CAPACITY_DEFAULT 750    /* default battery capacity */
 
+/** Non-simulator section **/
 #ifndef SIMULATOR
 
 /* Define this if you have a PortalPlayer PP5024 */
@@ -142,6 +116,22 @@
 
 /* Type of LCD TODO: hopefully the same as the x5 but check this*/
 #define CONFIG_LCD LCD_X5
+
+#define HAVE_HOTSWAP
+#define HAVE_MULTIVOLUME
+
+/* define this if you have LCD enable function */
+#define HAVE_LCD_ENABLE
+
+/* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
+   should be defined as well. */
+#define HAVE_LCD_SLEEP
+
+/* define this if you can invert the colours on your LCD */
+#define HAVE_LCD_INVERT
+
+/* define this if you can flip your LCD */
+#define HAVE_LCD_FLIP
 
 /* Offset ( in the firmware file's header ) to the file CRC and data. These are
    only used when loading the old format rockbox.e200 file */
@@ -179,3 +169,17 @@
 #define INCLUDE_TIMEOUT_API
 
 #endif /* SIMULATOR */
+
+/** Port-specific settings **/
+
+/* Main LCD backlight brightness range and defaults */
+#define MIN_BRIGHTNESS_SETTING      1
+#define MAX_BRIGHTNESS_SETTING     12
+#define DEFAULT_BRIGHTNESS_SETTING  6
+
+/* Default recording levels */
+#define DEFAULT_REC_MIC_GAIN    23
+#define DEFAULT_REC_LEFT_GAIN   23
+#define DEFAULT_REC_RIGHT_GAIN  23
+
+
