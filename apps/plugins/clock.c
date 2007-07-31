@@ -300,30 +300,30 @@ struct saved_settings
     int fullscreen[2];
     int binary[1];
     int plain[4];
-} settings;
+} clock_settings;
 
 /************************
  * Setting default values
  ***********************/
 void reset_settings(void)
 {
-    settings.clock = 1;
-    settings.general[general_counter] = 1;
-    settings.general[general_savesetting] = 1;
-    settings.general[general_backlight] = 2;
-    settings.analog[analog_date] = 0;
-    settings.analog[analog_secondhand] = true;
-    settings.analog[analog_time] = false;
-    settings.digital[digital_seconds] = 1;
-    settings.digital[digital_date] = 1;
-    settings.digital[digital_blinkcolon] = false;
-    settings.digital[digital_format] = true;
-    settings.fullscreen[fullscreen_border] = true;
-    settings.fullscreen[fullscreen_secondhand] = true;
-    settings.plain[plain_format] = true;
-    settings.plain[plain_seconds] = true;
-    settings.plain[plain_date] = 1;
-    settings.plain[plain_blinkcolon] = false;
+    clock_settings.clock = 1;
+    clock_settings.general[general_counter] = 1;
+    clock_settings.general[general_savesetting] = 1;
+    clock_settings.general[general_backlight] = 2;
+    clock_settings.analog[analog_date] = 0;
+    clock_settings.analog[analog_secondhand] = true;
+    clock_settings.analog[analog_time] = false;
+    clock_settings.digital[digital_seconds] = 1;
+    clock_settings.digital[digital_date] = 1;
+    clock_settings.digital[digital_blinkcolon] = false;
+    clock_settings.digital[digital_format] = true;
+    clock_settings.fullscreen[fullscreen_border] = true;
+    clock_settings.fullscreen[fullscreen_secondhand] = true;
+    clock_settings.plain[plain_format] = true;
+    clock_settings.plain[plain_seconds] = true;
+    clock_settings.plain[plain_date] = 1;
+    clock_settings.plain[plain_blinkcolon] = false;
 }
 
 /**************************************************************
@@ -333,7 +333,7 @@ void reset_settings(void)
 void set_digital_colors(void)
 {
 #ifdef HAVE_LCD_COLOR /* color LCDs.. */
-    if(settings.clock == DIGITAL)
+    if(clock_settings.clock == DIGITAL)
     {
         rb->lcd_set_foreground(LCD_WHITE);
         rb->lcd_set_background(LCD_BLACK);
@@ -344,7 +344,7 @@ void set_digital_colors(void)
         rb->lcd_set_background(LCD_RGBPACK(180,200,230));
     }
 #elif LCD_DEPTH >= 2
-    if(settings.clock == DIGITAL)
+    if(clock_settings.clock == DIGITAL)
     {
         rb->lcd_set_foreground(LCD_WHITE);
         rb->lcd_set_background(LCD_BLACK);
@@ -378,7 +378,7 @@ void cleanup(void *parameter)
 {
     (void)parameter;
 
-    if(settings.general[general_savesetting] == 1)
+    if(clock_settings.general[general_savesetting] == 1)
         save_settings(true);
 
     /* restore set backlight timeout */
@@ -423,7 +423,7 @@ void save_settings(bool interface)
 
     if(fd >= 0) /* file exists, save successful */
     {
-        rb->write (fd, &settings, sizeof(struct saved_settings));
+        rb->write (fd, &clock_settings, sizeof(struct saved_settings));
         rb->close(fd);
 
         if(interface)
@@ -472,7 +472,7 @@ void load_settings(void)
     {
         if(rb->filesize(fd) == sizeof(struct saved_settings)) /* if so, is it the right size? */
         {
-            rb->read(fd, &settings, sizeof(struct saved_settings));
+            rb->read(fd, &clock_settings, sizeof(struct saved_settings));
             rb->close(fd);
 
             rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
@@ -572,11 +572,11 @@ void init_clock(void)
     load_settings();
 
     /* set backlight timeout */
-    if(settings.general[general_backlight] == 0)
+    if(clock_settings.general[general_backlight] == 0)
         rb->backlight_set_timeout(0);
-    else if(settings.general[general_backlight] == 1)
+    else if(clock_settings.general[general_backlight] == 1)
         rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
-    else if(settings.general[general_backlight] == 2)
+    else if(clock_settings.general[general_backlight] == 2)
         rb->backlight_set_timeout(1);
 
     for(i=0; i<ANALOG_VALUES; i++)
@@ -616,7 +616,7 @@ void analog_clock(int hour, int minute, int second)
     rb->lcd_set_foreground(LCD_RGBPACK(100,110,125));
 
     /* second hand */
-    if(settings.analog[analog_secondhand])
+    if(clock_settings.analog[analog_secondhand])
     {
         xlcd_filltriangle(LCD_WIDTH/2, LCD_HEIGHT/2-2, LCD_WIDTH/2, LCD_HEIGHT/2+2,
                           xminute[second], yminute[second]);
@@ -640,7 +640,7 @@ void analog_clock(int hour, int minute, int second)
 #endif
 
     /* second hand, if needed */
-    if(settings.analog[analog_secondhand])
+    if(clock_settings.analog[analog_secondhand])
     {
         xlcd_filltriangle(LCD_WIDTH/2, LCD_HEIGHT/2-1, LCD_WIDTH/2, LCD_HEIGHT/2+1,
                           xminute[second], yminute[second]);
@@ -690,14 +690,14 @@ void digital_clock(int hour, int minute, int second, bool colon)
 
     /* this basically detects if we draw an AM or PM bitmap.
      * if we don't, we center the hh:mm display. */
-    if(!settings.digital[digital_format])
+    if(!clock_settings.digital[digital_format])
         x_ofs=DIGIT_WIDTH/2;
 
 #if LCD_DEPTH == 1
     rb->lcd_fillrect(0,0,112,64);
 #endif
 
-    if(settings.digital[digital_format])
+    if(clock_settings.digital[digital_format])
     {
         /* draw the AM or PM bitmap */
         if(hour<12)
@@ -723,7 +723,7 @@ void digital_clock(int hour, int minute, int second, bool colon)
     draw_segment(minute/10, DIGIT_XOFS(6)+3*DIGIT_WIDTH+x_ofs, 0);
     draw_segment(minute%10, DIGIT_XOFS(6)+4*DIGIT_WIDTH+x_ofs, 0);
 
-    if(settings.digital[digital_seconds])
+    if(clock_settings.digital[digital_seconds])
     {
         draw_segment(second/10, DIGIT_XOFS(2),             DIGIT_HEIGHT);
         draw_segment(second%10, DIGIT_XOFS(2)+DIGIT_WIDTH, DIGIT_HEIGHT);
@@ -749,7 +749,7 @@ void fullscreen_clock(int hour, int minute, int second)
     rb->lcd_set_foreground(LCD_RGBPACK(100,110,125));
 
     /* second hand */
-    if(settings.analog[analog_secondhand])
+    if(clock_settings.analog[analog_secondhand])
     {
         xlcd_filltriangle(LCD_WIDTH/2, LCD_HEIGHT/2-2, LCD_WIDTH/2, LCD_HEIGHT/2+2,
                           xminute_full[second], yminute_full[second]);
@@ -773,7 +773,7 @@ void fullscreen_clock(int hour, int minute, int second)
 #endif
 
     /* second hand, if needed */
-    if(settings.analog[analog_secondhand])
+    if(clock_settings.analog[analog_secondhand])
     {
         xlcd_filltriangle(LCD_WIDTH/2, LCD_HEIGHT/2-1, LCD_WIDTH/2, LCD_HEIGHT/2+1,
                           xminute_full[second], yminute_full[second]);
@@ -833,7 +833,7 @@ void binary_clock(int hour, int minute, int second)
         {
             if(mode_var[mode] >= i)
             {
-                if(settings.binary[binary_mode])
+                if(clock_settings.binary[binary_mode])
                     draw_digit(DOT_FILLED, xpos*DIGIT_WIDTH+DIGIT_XOFS(6), DIGIT_HEIGHT*mode+DIGIT_YOFS(3));
                 else
                     draw_digit(1, xpos*DIGIT_WIDTH+DIGIT_XOFS(6), DIGIT_HEIGHT*mode+DIGIT_YOFS(3));
@@ -841,7 +841,7 @@ void binary_clock(int hour, int minute, int second)
             }
             else
             {
-                if(settings.binary[binary_mode])
+                if(clock_settings.binary[binary_mode])
                     draw_digit(DOT_EMPTY, xpos*DIGIT_WIDTH+DIGIT_XOFS(6), DIGIT_HEIGHT*mode+DIGIT_YOFS(3));
                 else
                     draw_digit(0, xpos*DIGIT_WIDTH+DIGIT_XOFS(6), DIGIT_HEIGHT*mode+DIGIT_YOFS(3));
@@ -864,10 +864,10 @@ void plain_clock(int hour, int minute, int second, bool colon)
 
     /* this basically detects if we draw an AM or PM bitmap.
      * if we don't, we center the hh:mm display. */
-    if(!settings.plain[plain_format])
+    if(!clock_settings.plain[plain_format])
         x_ofs=DIGIT_WIDTH/2;
 
-    if(settings.plain[plain_format])
+    if(clock_settings.plain[plain_format])
     {
         /* draw the AM or PM bitmap */
         if(hour<12)
@@ -891,7 +891,7 @@ void plain_clock(int hour, int minute, int second, bool colon)
     draw_digit(minute/10, DIGIT_XOFS(6)+(DIGIT_WIDTH*3)+x_ofs, 0);
     draw_digit(minute%10, DIGIT_XOFS(6)+(DIGIT_WIDTH*4)+x_ofs, 0);
 
-    if(settings.plain[plain_seconds])
+    if(clock_settings.plain[plain_seconds])
     {
         draw_digit(second/10, DIGIT_XOFS(2),               DIGIT_HEIGHT);
         draw_digit(second%10, DIGIT_XOFS(2)+(DIGIT_WIDTH), DIGIT_HEIGHT);
@@ -915,7 +915,7 @@ void draw_extras(int year, int day, int month, int hour, int minute, int second)
     char tmsec[3];
 
     /* american date readout */
-    if(settings.analog[analog_date] == 1)
+    if(clock_settings.analog[analog_date] == 1)
         rb->snprintf(moday, sizeof(moday), "%02d/%02d", month, day);
     else
         rb->snprintf(moday, sizeof(moday), "%02d.%02d", day, month);
@@ -924,9 +924,9 @@ void draw_extras(int year, int day, int month, int hour, int minute, int second)
     rb->snprintf(tmsec, sizeof(tmsec), "%02d", second);
 
     /* Analog Extras */
-    if(settings.clock == ANALOG)
+    if(clock_settings.clock == ANALOG)
     {
-        if(settings.analog[analog_time] != 0) /* Digital readout */
+        if(clock_settings.analog[analog_time] != 0) /* Digital readout */
         {
             draw_smalldigit(hour/10,   SMALLDIGIT_WIDTH*0, 0);
             draw_smalldigit(hour%10,   SMALLDIGIT_WIDTH*1, 0);
@@ -938,7 +938,7 @@ void draw_extras(int year, int day, int month, int hour, int minute, int second)
             draw_smalldigit(second%10, SMALLDIGIT_WIDTH*2.5, SMALLDIGIT_HEIGHT);
 
             /* AM/PM indicator */
-            if(settings.analog[analog_time] == 2)
+            if(clock_settings.analog[analog_time] == 2)
             {
                 if(current_time->tm_hour > 12) /* PM */
                     draw_digit(ICON_PM, LCD_WIDTH-DIGIT_WIDTH, DIGIT_HEIGHT/2-DIGIT_HEIGHT);
@@ -946,9 +946,9 @@ void draw_extras(int year, int day, int month, int hour, int minute, int second)
                     draw_digit(ICON_AM, LCD_WIDTH-DIGIT_WIDTH, DIGIT_HEIGHT/2-DIGIT_HEIGHT);
             }
         }
-        if(settings.analog[analog_date] != 0) /* Date readout */
+        if(clock_settings.analog[analog_date] != 0) /* Date readout */
         {
-            if(settings.analog[analog_date] == 1)
+            if(clock_settings.analog[analog_date] == 1)
             {
                 draw_smalldigit(month/10,      SMALLDIGIT_WIDTH*0,
                                 LCD_HEIGHT-SMALLDIGIT_HEIGHT*2);
@@ -969,7 +969,7 @@ void draw_extras(int year, int day, int month, int hour, int minute, int second)
                 draw_smalldigit(year%10,       SMALLDIGIT_WIDTH*3.5,
                                 LCD_HEIGHT-SMALLDIGIT_HEIGHT);
             }
-            else if(settings.analog[analog_date] == 2)
+            else if(clock_settings.analog[analog_date] == 2)
             {
 
                 draw_smalldigit(day/10,        SMALLDIGIT_WIDTH*0,
@@ -993,10 +993,10 @@ void draw_extras(int year, int day, int month, int hour, int minute, int second)
             }
         }
     }
-    else if(settings.clock == DIGITAL)
+    else if(clock_settings.clock == DIGITAL)
     {
         /* Date readout */
-        if(settings.digital[digital_date] == 1) /* american mode */
+        if(clock_settings.digital[digital_date] == 1) /* american mode */
         {
             draw_smallsegment(month/10, SMALLSEG_WIDTH*0+SMALLSEG_XOFS(10),
                               LCD_HEIGHT-SMALLSEG_HEIGHT*LCD_OFFSET*2);
@@ -1019,7 +1019,7 @@ void draw_extras(int year, int day, int month, int hour, int minute, int second)
             draw_smallsegment(year%10, SMALLSEG_WIDTH*9+SMALLSEG_XOFS(10),
                               LCD_HEIGHT-SMALLSEG_HEIGHT*LCD_OFFSET*2);
         }
-        else if(settings.digital[digital_date] == 2) /* european mode */
+        else if(clock_settings.digital[digital_date] == 2) /* european mode */
         {
             draw_smallsegment(day/10, SMALLSEG_WIDTH*0+SMALLSEG_XOFS(10),
                               LCD_HEIGHT-SMALLSEG_HEIGHT*LCD_OFFSET*2);
@@ -1043,18 +1043,18 @@ void draw_extras(int year, int day, int month, int hour, int minute, int second)
                               LCD_HEIGHT-SMALLSEG_HEIGHT*LCD_OFFSET*2);
         }
     }
-    else if(settings.clock == FULLSCREEN) /* Fullscreen mode */
+    else if(clock_settings.clock == FULLSCREEN) /* Fullscreen mode */
     {
-        if(settings.fullscreen[fullscreen_border])
+        if(clock_settings.fullscreen[fullscreen_border])
         {
             for(i=0; i < 60; i+=5) /* Draw the circle */
                 rb->lcd_fillrect(xminute_full[i]-1, yminute_full[i]-1, 3, 3);
         }
     }
-    else if(settings.clock == PLAIN) /* Plain mode */
+    else if(clock_settings.clock == PLAIN) /* Plain mode */
     {
         /* Date readout */
-        if(settings.plain[plain_date] == 1) /* american mode */
+        if(clock_settings.plain[plain_date] == 1) /* american mode */
         {
             draw_smalldigit(month/10, SMALLDIGIT_WIDTH*0+SMALLDIGIT_XOFS(10),
                             LCD_HEIGHT-SMALLDIGIT_HEIGHT*LCD_OFFSET*2);
@@ -1077,7 +1077,7 @@ void draw_extras(int year, int day, int month, int hour, int minute, int second)
             draw_smalldigit(year%10, SMALLDIGIT_WIDTH*9+SMALLDIGIT_XOFS(10),
                             LCD_HEIGHT-SMALLDIGIT_HEIGHT*LCD_OFFSET*2);
         }
-        else if(settings.plain[plain_date] == 2) /* european mode */
+        else if(clock_settings.plain[plain_date] == 2) /* european mode */
         {
             draw_smalldigit(day/10, SMALLDIGIT_WIDTH*0+SMALLDIGIT_XOFS(10),
                             LCD_HEIGHT-SMALLDIGIT_HEIGHT*LCD_OFFSET*2);
@@ -1123,9 +1123,9 @@ void show_counter(void)
     count_m = displayed_value % 3600 / 60;
     count_h = displayed_value / 3600;
 
-    if(settings.general[general_counter])
+    if(clock_settings.general[general_counter])
     {
-        if(settings.clock == ANALOG)
+        if(clock_settings.clock == ANALOG)
         {
             draw_smalldigit(count_h/10, LCD_WIDTH-SMALLDIGIT_WIDTH*5,
                             LCD_HEIGHT-SMALLDIGIT_HEIGHT*2);
@@ -1142,7 +1142,7 @@ void show_counter(void)
             draw_smalldigit(count_s%10, LCD_WIDTH-SMALLDIGIT_WIDTH*2.5,
                             LCD_HEIGHT-SMALLDIGIT_HEIGHT);
         }
-        else if(settings.clock == DIGITAL)
+        else if(clock_settings.clock == DIGITAL)
         {
             draw_smallsegment(count_h/10, SMALLSEG_WIDTH*0+SMALLSEG_XOFS(8),
                               LCD_HEIGHT-SMALLSEG_HEIGHT*LCD_OFFSET);
@@ -1161,7 +1161,7 @@ void show_counter(void)
             draw_smallsegment(count_s%10, SMALLSEG_WIDTH*7+SMALLSEG_XOFS(8),
                               LCD_HEIGHT-SMALLSEG_HEIGHT*LCD_OFFSET);
         }
-        else if(settings.clock == FULLSCREEN)
+        else if(clock_settings.clock == FULLSCREEN)
         {
 
             draw_smalldigit(count_h/10, SMALLDIGIT_WIDTH*0+SMALLDIGIT_XOFS(8),
@@ -1181,7 +1181,7 @@ void show_counter(void)
             draw_smalldigit(count_s%10, SMALLDIGIT_WIDTH*7+SMALLDIGIT_XOFS(8),
                             LCD_HEIGHT-SMALLDIGIT_HEIGHT*1.5);
         }
-        else if(settings.clock == PLAIN)
+        else if(clock_settings.clock == PLAIN)
         {
             draw_smalldigit(count_h/10, SMALLDIGIT_WIDTH*0+SMALLDIGIT_XOFS(8),
                             LCD_HEIGHT-SMALLDIGIT_HEIGHT*LCD_OFFSET);
@@ -1210,7 +1210,7 @@ void show_counter(void)
  **************/
 bool menu_mode_selector(void)
 {
-    int selection=settings.clock-1;
+    int selection=clock_settings.clock-1;
 
     set_standard_colors();
 
@@ -1220,7 +1220,7 @@ bool menu_mode_selector(void)
     /* check for this, so if the user exits the menu without
      * making a selection, it won't change to some weird value. */
     if(rb->do_menu(&menu, &selection) >=0){
-        settings.clock = selection+1;
+        clock_settings.clock = selection+1;
         return(true);
     }
     return(false);
@@ -1242,15 +1242,15 @@ void menu_analog_settings(void)
         switch(result)
         {
             case 0:
-                rb->set_option("Show Date", &settings.analog[analog_date],
+                rb->set_option("Show Date", &clock_settings.analog[analog_date],
                                INT, date_format_text, 3, NULL);
                 break;
             case 1:
-                rb->set_option("Show Second Hand", &settings.analog[analog_secondhand],
+                rb->set_option("Show Second Hand", &clock_settings.analog[analog_secondhand],
                                INT, noyes_text, 2, NULL);
                 break;
             case 2:
-                rb->set_option("Show Time", &settings.analog[analog_time],
+                rb->set_option("Show Time", &clock_settings.analog[analog_time],
                                INT, analog_time_text, 3, NULL);
                 break;
         }
@@ -1273,19 +1273,19 @@ void menu_digital_settings(void)
         switch(result)
         {
             case 0:
-                rb->set_option("Show Date", &settings.digital[digital_date],
+                rb->set_option("Show Date", &clock_settings.digital[digital_date],
                                INT, date_format_text, 3, NULL);
                 break;
             case 1:
-                rb->set_option("Show Seconds", &settings.digital[digital_seconds],
+                rb->set_option("Show Seconds", &clock_settings.digital[digital_seconds],
                                INT, noyes_text, 2, NULL);
                 break;
             case 2:
-                rb->set_option("Blinking Colon", &settings.digital[digital_blinkcolon],
+                rb->set_option("Blinking Colon", &clock_settings.digital[digital_blinkcolon],
                                INT, noyes_text, 2, NULL);
                 break;
             case 3:
-                rb->set_option("Time Format", &settings.digital[digital_format],
+                rb->set_option("Time Format", &clock_settings.digital[digital_format],
                                INT, time_format_text, 2, NULL);
                 break;
         }
@@ -1308,11 +1308,11 @@ void menu_fullscreen_settings(void)
         switch(result)
         {
             case 0:
-                rb->set_option("Show Border", &settings.fullscreen[fullscreen_border],
+                rb->set_option("Show Border", &clock_settings.fullscreen[fullscreen_border],
                                INT, noyes_text, 2, NULL);
                 break;
             case 1:
-                rb->set_option("Show Second Hand", &settings.fullscreen[fullscreen_secondhand],
+                rb->set_option("Show Second Hand", &clock_settings.fullscreen[fullscreen_secondhand],
                                INT, noyes_text, 2, NULL);
                 break;
         }
@@ -1334,7 +1334,7 @@ void menu_binary_settings(void)
         switch(result)
         {
             case 0:
-                rb->set_option("Display Mode", &settings.binary[binary_mode],
+                rb->set_option("Display Mode", &clock_settings.binary[binary_mode],
                                INT, binary_mode_text, 2, NULL);
         }
 
@@ -1357,19 +1357,19 @@ void menu_plain_settings(void)
         switch(result)
         {
             case 0:
-                rb->set_option("Show Date", &settings.plain[plain_date],
+                rb->set_option("Show Date", &clock_settings.plain[plain_date],
                                INT, date_format_text, 3, NULL);
                 break;
             case 1:
-                rb->set_option("Show Seconds", &settings.plain[plain_seconds],
+                rb->set_option("Show Seconds", &clock_settings.plain[plain_seconds],
                                INT, noyes_text, 2, NULL);
                 break;
             case 2:
-                rb->set_option("Blinking Colon", &settings.plain[plain_blinkcolon],
+                rb->set_option("Blinking Colon", &clock_settings.plain[plain_blinkcolon],
                                INT, noyes_text, 2, NULL);
                 break;
             case 3:
-                rb->set_option("Time Format", &settings.plain[plain_format],
+                rb->set_option("Time Format", &clock_settings.plain[plain_format],
                                INT, time_format_text, 2, NULL);
                 break;
         }
@@ -1420,21 +1420,21 @@ void menu_general_settings(void)
                 break;
 
             case 2:
-                rb->set_option("Save On Exit", &settings.general[general_savesetting],
+                rb->set_option("Save On Exit", &clock_settings.general[general_savesetting],
                                INT, noyes_text, 2, NULL);
 
                 /* if we no longer save on exit, we better save now to remember that */
-                if(settings.general[general_savesetting] == 0)
+                if(clock_settings.general[general_savesetting] == 0)
                     save_settings(false);
                 break;
 
             case 3:
-                rb->set_option("Show Counter", &settings.general[general_counter],
+                rb->set_option("Show Counter", &clock_settings.general[general_counter],
                                INT, noyes_text, 2, NULL);
                 break;
 
             case 4:
-                rb->set_option("Backlight Settings", &settings.general[general_backlight],
+                rb->set_option("Backlight Settings", &clock_settings.general[general_backlight],
                                INT, backlight_settings_text, 3, NULL);
                 break;
 
@@ -1474,7 +1474,7 @@ void main_menu(void)
                 break;
 
             case 2:
-                switch(settings.clock)
+                switch(clock_settings.clock)
                 {
                     case ANALOG: menu_analog_settings();break;
                     case DIGITAL: menu_digital_settings();break;
@@ -1557,26 +1557,26 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             rb->lcd_clear_display();
 
             /* Analog mode */
-            if(settings.clock == ANALOG)
+            if(clock_settings.clock == ANALOG)
                 analog_clock(hour, minute, second);
             /* Digital mode */
-            else if(settings.clock == DIGITAL)
+            else if(clock_settings.clock == DIGITAL)
             {
-                if(settings.digital[digital_blinkcolon])
+                if(clock_settings.digital[digital_blinkcolon])
                     digital_clock(hour, minute, second, second & 1);
                 else
                     digital_clock(hour, minute, second, true);
             }
             /* Fullscreen mode */
-            else if(settings.clock == FULLSCREEN)
+            else if(clock_settings.clock == FULLSCREEN)
                 fullscreen_clock(hour, minute, second);
             /* Binary mode */
-            else if(settings.clock == BINARY)
+            else if(clock_settings.clock == BINARY)
                 binary_clock(hour, minute, second);
             /* Plain mode */
-            else if(settings.clock == PLAIN)
+            else if(clock_settings.clock == PLAIN)
             {
-                if(settings.plain[plain_blinkcolon])
+                if(clock_settings.plain[plain_blinkcolon])
                     plain_clock(hour, minute, second, second & 1);
                 else
                     plain_clock(hour, minute, second, true);
@@ -1586,9 +1586,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             show_counter();
         }
 
-        if(settings.analog[analog_time] == 2 && temphour == 0)
+        if(clock_settings.analog[analog_time] == 2 && temphour == 0)
             temphour = 12;
-        if(settings.analog[analog_time] == 2 && temphour > 12)
+        if(clock_settings.analog[analog_time] == 2 && temphour > 12)
             temphour -= 12;
 
         /* all the "extras" - readouts/displays */
@@ -1606,7 +1606,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         switch (button)
         {
             case ACTION_COUNTER_TOGGLE: /* start/stop counter */
-                if(settings.general[general_counter])
+                if(clock_settings.general[general_counter])
                 {
                     if(!counter_btn_held) /* Ignore if the counter was reset */
                     {
@@ -1626,7 +1626,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 break;
 
             case ACTION_COUNTER_RESET: /* reset counter */
-                if(settings.general[general_counter])
+                if(clock_settings.general[general_counter])
                 {
                     counter_btn_held = true;  /* Ignore the release event */
                     counter = 0;
@@ -1635,19 +1635,19 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 break;
 
             case ACTION_MODE_NEXT:
-                if(settings.clock < CLOCK_MODES)
-                    settings.clock++;
+                if(clock_settings.clock < CLOCK_MODES)
+                    clock_settings.clock++;
                 else
-                    settings.clock = 1;
+                    clock_settings.clock = 1;
 
                 set_digital_colors();
                 break;
 
             case ACTION_MODE_PREV:
-                if(settings.clock > 1)
-                    settings.clock--;
+                if(clock_settings.clock > 1)
+                    clock_settings.clock--;
                 else
-                    settings.clock = CLOCK_MODES;
+                    clock_settings.clock = CLOCK_MODES;
 
                 set_digital_colors();
                 break;

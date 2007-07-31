@@ -188,16 +188,16 @@ struct saved_settings {
     bool digital_minimeters;
     int analog_decay;
     int digital_decay; 
-} settings;
+} vumeter_settings;
 
 void reset_settings(void) {
-    settings.meter_type=ANALOG;
-    settings.analog_use_db_scale=true;
-    settings.digital_use_db_scale=true;
-    settings.analog_minimeters=true;
-    settings.digital_minimeters=false;
-    settings.analog_decay=3;
-    settings.digital_decay=0; 
+    vumeter_settings.meter_type=ANALOG;
+    vumeter_settings.analog_use_db_scale=true;
+    vumeter_settings.digital_use_db_scale=true;
+    vumeter_settings.analog_minimeters=true;
+    vumeter_settings.digital_minimeters=false;
+    vumeter_settings.analog_decay=3;
+    vumeter_settings.digital_decay=0; 
 }
 
 /* taken from http://www.quinapalus.com/efunc.html */
@@ -305,7 +305,7 @@ void calc_scales(void)
 void load_settings(void) {
     int fp = rb->open("/.rockbox/rocks/.vu_meter", O_RDONLY);
     if(fp>=0) {
-            rb->read(fp, &settings, sizeof(struct saved_settings));
+            rb->read(fp, &vumeter_settings, sizeof(struct saved_settings));
             rb->close(fp);
     }
     else {
@@ -321,7 +321,7 @@ void load_settings(void) {
 void save_settings(void) {
     int fp = rb->creat("/.rockbox/rocks/.vu_meter");
     if(fp >= 0) {
-        rb->write (fp, &settings, sizeof(struct saved_settings));
+        rb->write (fp, &vumeter_settings, sizeof(struct saved_settings));
         rb->close(fp);
     }
 }
@@ -372,45 +372,45 @@ static bool vu_meter_menu(void)
         switch(rb->do_menu(&menu, &selection))
         {
             case 0:
-                rb->set_option("Meter Type", &settings.meter_type, INT,
+                rb->set_option("Meter Type", &vumeter_settings.meter_type, INT,
                                meter_type_option, 2, NULL);
                 break;
                 
             case 1:
-                if(settings.meter_type==ANALOG)
+                if(vumeter_settings.meter_type==ANALOG)
                 {
-                    rb->set_bool_options("Scale", &settings.analog_use_db_scale,
+                    rb->set_bool_options("Scale", &vumeter_settings.analog_use_db_scale,
                                          "dBfs", -1, "Linear", -1, NULL);
                 }
                 else
                 {
-                    rb->set_bool_options("Scale", &settings.digital_use_db_scale,
+                    rb->set_bool_options("Scale", &vumeter_settings.digital_use_db_scale,
                                          "dBfs", -1, "Linear", -1, NULL);
                 }
                 break;
                 
             case 2:
-                if(settings.meter_type==ANALOG)
+                if(vumeter_settings.meter_type==ANALOG)
                 {
                     rb->set_bool("Enable Minimeters",
-                                 &settings.analog_minimeters);
+                                 &vumeter_settings.analog_minimeters);
                 }
                 else
                 {
                     rb->set_bool("Enable Minimeters",
-                                 &settings.digital_minimeters);
+                                 &vumeter_settings.digital_minimeters);
                 }
                 break;
                 
             case 3:
-                if(settings.meter_type==ANALOG)
+                if(vumeter_settings.meter_type==ANALOG)
                 {
-                    rb->set_option("Decay Speed", &settings.analog_decay, INT, 
+                    rb->set_option("Decay Speed", &vumeter_settings.analog_decay, INT, 
                                decay_speed_option, 7, NULL);
                 }
                 else
                 {
-                    rb->set_option("Decay Speed", &settings.digital_decay, INT, 
+                    rb->set_option("Decay Speed", &vumeter_settings.digital_decay, INT, 
                                decay_speed_option, 7, NULL);
                 }
                 break;
@@ -490,7 +490,7 @@ void analog_meter(void) {
     rb->pcm_calculate_peaks(&left_peak, &right_peak);
 #endif
 
-    if(settings.analog_use_db_scale) {
+    if(vumeter_settings.analog_use_db_scale) {
         left_needle_top_x = analog_db_scale[left_peak * half_width / MAX_PEAK];
         right_needle_top_x = analog_db_scale[right_peak * half_width / MAX_PEAK] + half_width;
     }
@@ -500,8 +500,10 @@ void analog_meter(void) {
     }
 
     /* Makes a decay on the needle */
-    left_needle_top_x = (left_needle_top_x+last_left_needle_top_x*settings.analog_decay)/(settings.analog_decay+1);
-    right_needle_top_x = (right_needle_top_x+last_right_needle_top_x*settings.analog_decay)/(settings.analog_decay+1);
+    left_needle_top_x = (left_needle_top_x+last_left_needle_top_x*vumeter_settings.analog_decay)
+                        /(vumeter_settings.analog_decay+1);
+    right_needle_top_x = (right_needle_top_x+last_right_needle_top_x*vumeter_settings.analog_decay)
+                         /(vumeter_settings.analog_decay+1);
 
     last_left_needle_top_x = left_needle_top_x;
     last_right_needle_top_x = right_needle_top_x;
@@ -513,7 +515,7 @@ void analog_meter(void) {
     rb->lcd_drawline(quarter_width, LCD_HEIGHT-1, left_needle_top_x, left_needle_top_y);
     rb->lcd_drawline((quarter_width+half_width), LCD_HEIGHT-1, right_needle_top_x, right_needle_top_y);
 
-    if(settings.analog_minimeters)
+    if(vumeter_settings.analog_minimeters)
         draw_analog_minimeters();
 
     /* Needle covers */
@@ -545,7 +547,7 @@ void digital_meter(void) {
     rb->pcm_calculate_peaks(&left_peak, &right_peak);
 #endif
 
-    if(settings.digital_use_db_scale) {
+    if(vumeter_settings.digital_use_db_scale) {
         num_left_leds = digital_db_scale[left_peak * 44 / MAX_PEAK];
         num_right_leds = digital_db_scale[right_peak * 44 / MAX_PEAK];
     }
@@ -554,8 +556,10 @@ void digital_meter(void) {
         num_right_leds = right_peak * 11 / MAX_PEAK;
     }
 
-    num_left_leds = (num_left_leds+last_num_left_leds*settings.digital_decay)/(settings.digital_decay+1);
-    num_right_leds = (num_right_leds+last_num_right_leds*settings.digital_decay)/(settings.digital_decay+1);
+    num_left_leds = (num_left_leds+last_num_left_leds*vumeter_settings.digital_decay)
+                    /(vumeter_settings.digital_decay+1);
+    num_right_leds = (num_right_leds+last_num_right_leds*vumeter_settings.digital_decay)
+                     /(vumeter_settings.digital_decay+1);
 
     last_num_left_leds = num_left_leds;
     last_num_right_leds = num_right_leds;
@@ -573,7 +577,7 @@ void digital_meter(void) {
 
     rb->lcd_set_drawmode(DRMODE_SOLID);
 
-    if(settings.digital_minimeters)
+    if(vumeter_settings.digital_minimeters)
         draw_digital_minimeters();
 
     /* Lines above/below where the LEDS are */
@@ -609,7 +613,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
 
         rb->lcd_putsxy(half_width-23, 0, "VU Meter");
 
-        if(settings.meter_type==ANALOG)
+        if(vumeter_settings.meter_type==ANALOG)
             analog_meter();
         else
             digital_meter();
