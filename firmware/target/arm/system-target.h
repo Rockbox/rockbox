@@ -26,17 +26,15 @@
  * moved into an appropriate subdir (or even split in 2). */
 
 #if CONFIG_CPU == PP5002
-#define CPUFREQ_DEFAULT_MULT 4
+#define CPUFREQ_SLEEP      32768
 #define CPUFREQ_DEFAULT 24000000
-#define CPUFREQ_NORMAL_MULT 5
-#define CPUFREQ_NORMAL 30000000
-#define CPUFREQ_MAX_MULT 13
-#define CPUFREQ_MAX 78000000
+#define CPUFREQ_NORMAL  30000000
+#define CPUFREQ_MAX     80000000
 
 #else /* PP5022, PP5024 */
 #define CPUFREQ_DEFAULT 24000000
-#define CPUFREQ_NORMAL 30000000
-#define CPUFREQ_MAX 80000000
+#define CPUFREQ_NORMAL  30000000
+#define CPUFREQ_MAX     80000000
 #endif
 
 #define inl(a) (*(volatile unsigned long *) (a))

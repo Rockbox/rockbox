@@ -130,6 +130,7 @@
 #define PLL_CONTROL      (*(volatile unsigned long *)(0xcf005010))
 #define PLL_DIV          (*(volatile unsigned long *)(0xcf005018))
 #define PLL_MULT         (*(volatile unsigned long *)(0xcf00501c))
+#define PLL_UNLOCK       (*(volatile unsigned long *)(0xcf005038))
 
 #define MMAP0_LOGICAL    (*(volatile unsigned long *)(0xf000f000))
 #define MMAP0_PHYSICAL   (*(volatile unsigned long *)(0xf000f004))
