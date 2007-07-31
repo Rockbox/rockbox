@@ -45,8 +45,6 @@
 
 #define HAVE_BUTTON_LIGHT
 
-#define HAVE_LCD_ENABLE
-
 #define HAVE_BACKLIGHT_BRIGHTNESS
 
 #define HAVE_BUTTONLIGHT_BRIGHTNESS
@@ -79,6 +77,9 @@
                        SAMPR_CAP_11)
 
 #ifndef SIMULATOR
+
+/* Define this if your LCD can be enabled/disabled */
+#define HAVE_LCD_ENABLE
 
 /* The LCD on a Gigabeat is 240x320 - it is portrait */
 #define HAVE_PORTRAIT_LCD

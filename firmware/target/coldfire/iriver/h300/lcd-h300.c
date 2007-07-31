@@ -284,6 +284,11 @@ void lcd_enable(bool on)
     }
 }
 
+bool lcd_enabled(void)
+{
+    return display_on;
+}
+
 /*** update functions ***/
 
 /* Performance function that works with an external buffer

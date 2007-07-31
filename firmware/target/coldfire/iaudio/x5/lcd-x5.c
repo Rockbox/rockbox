@@ -399,6 +399,11 @@ void lcd_enable(bool on)
     }
 }
 
+bool lcd_enabled(void)
+{
+    return display_on;
+}
+
 void lcd_sleep(void)
 {
     if (power_on)

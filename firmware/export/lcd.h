@@ -35,15 +35,15 @@
 #endif
 #else
 #include "file.h"  /* for MAX_PATH; FIXME: Why does this not work for sims? */
-#endif
+#endif /* SIMULATOR */
 
 #if LCD_DEPTH <=8
 typedef unsigned char fb_data;
 #elif LCD_DEPTH <= 16
 typedef unsigned short fb_data;
-#else
+#else /* LCD_DEPTH > 16 */
 typedef unsigned long fb_data;
-#endif
+#endif /* LCD_DEPTH */
 
 /* common functions */
 extern void lcd_write_command(int byte);
@@ -51,12 +51,14 @@ extern void lcd_write_command_e(int cmd, int data);
 extern void lcd_write_command_ex(int cmd, int data1, int data2);
 extern void lcd_write_data(const fb_data* p_bytes, int count);
 extern void lcd_init(void);
+
 #ifdef SIMULATOR
 /* Define a dummy device specific init for the sims */
 #define lcd_init_device()
 #else
 extern void lcd_init_device(void);
-#endif
+#endif /* SIMULATOR */
+
 extern void lcd_backlight(bool on);
 extern int  lcd_default_contrast(void);
 extern void lcd_set_contrast(int val);
@@ -100,8 +102,8 @@ extern void lcd_update_rect(int x, int y, int width, int height);
 extern void lcd_remote_update(void);
 /* update a fraction of the screen */
 extern void lcd_remote_update_rect(int x, int y, int width, int height);
-#endif
-#endif
+#endif /* HAVE_REMOTE_LCD */
+#endif /* HAVE_LCD_BITMAP */
 
 #ifdef HAVE_LCD_CHARCELLS
 
@@ -138,7 +140,7 @@ void lcd_remove_cursor(void);
 #define JUMP_SCROLL_ALWAYS 5
 extern void lcd_jump_scroll(int mode); /* 0=off, 1=once, ..., ALWAYS */
 extern void lcd_jump_scroll_delay(int ms);
-#endif
+#endif /* HAVE_LCD_CHARCELLS */
 
 /* Draw modes */
 #define DRMODE_COMPLEMENT 0
@@ -207,7 +209,7 @@ static inline unsigned lcd_color_to_native(unsigned color)
 #define RGB_UNPACK_RED_LCD(x)    _SWAPUNPACK((x), _RGB_UNPACK_RED_LCD)
 #define RGB_UNPACK_GREEN_LCD(x)  _SWAPUNPACK((x), _RGB_UNPACK_GREEN_LCD)
 #define RGB_UNPACK_BLUE_LCD(x)   _SWAPUNPACK((x), _RGB_UNPACK_BLUE_LCD)
-#else
+#else /* LCD_PIXELFORMAT == RGB565 */
 /* RGB565 */
 #define _LCD_UNSWAP_COLOR(x)     (x)
 #define LCD_RGBPACK(r, g, b)     _RGBPACK((r), (g), (b))
@@ -218,7 +220,7 @@ static inline unsigned lcd_color_to_native(unsigned color)
 #define RGB_UNPACK_RED_LCD(x)    _RGB_UNPACK_RED_LCD(x)
 #define RGB_UNPACK_GREEN_LCD(x)  _RGB_UNPACK_GREEN_LCD(x)
 #define RGB_UNPACK_BLUE_LCD(x)   _RGB_UNPACK_BLUE_LCD(x)
-#endif
+#endif /* RGB565* */
 #else
 /* other colour depths */
 #endif
@@ -231,6 +233,7 @@ static inline unsigned lcd_color_to_native(unsigned color)
 #define LCD_DEFAULT_BG LCD_RGBPACK(182, 198, 229) /* rockbox blue */
 
 #elif LCD_DEPTH > 1 /* greyscale */
+
 #define LCD_MAX_LEVEL ((1 << LCD_DEPTH) - 1)
 #define LCD_BRIGHTNESS(y) (((y) * LCD_MAX_LEVEL + 127) / 255)
 
@@ -240,7 +243,8 @@ static inline unsigned lcd_color_to_native(unsigned color)
 #define LCD_WHITE      LCD_BRIGHTNESS(255)
 #define LCD_DEFAULT_FG LCD_BLACK
 #define LCD_DEFAULT_BG LCD_WHITE
-#endif
+
+#endif /* HAVE_LCD_COLOR */
 
 /* Frame buffer dimensions */
 #if LCD_DEPTH == 1
@@ -248,13 +252,13 @@ static inline unsigned lcd_color_to_native(unsigned color)
 #define LCD_FBWIDTH ((LCD_WIDTH+7)/8)
 #else /* LCD_PIXELFORMAT == VERTICAL_PACKING */
 #define LCD_FBHEIGHT ((LCD_HEIGHT+7)/8)
-#endif
+#endif /* LCD_PIXELFORMAT */
 #elif LCD_DEPTH == 2
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
 #define LCD_FBWIDTH ((LCD_WIDTH+3)/4)
 #else /* LCD_PIXELFORMAT == VERTICAL_PACKING */
 #define LCD_FBHEIGHT ((LCD_HEIGHT+3)/4)
-#endif
+#endif /* LCD_PIXELFORMAT */
 #endif /* LCD_DEPTH */
 /* Set defaults if not defined different yet. The defaults apply to both
  * dimensions for LCD_DEPTH >= 8 */
@@ -271,12 +275,13 @@ extern fb_data lcd_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH];
 #ifdef HAVE_LCD_ENABLE
 /* Enable/disable the main display. */
 extern void lcd_enable(bool on);
-#endif
+extern bool lcd_enabled(void);
+#endif /* HAVE_LCD_ENABLE */
 
 #ifdef HAVE_LCD_SLEEP
 /* Put the LCD into a power saving state deeper than lcd_enable(false). */
 extern void lcd_sleep(void);
-#endif
+#endif /* HAVE_LCD_SLEEP */
 
 /* Bitmap formats */
 enum
@@ -306,7 +311,7 @@ struct bitmap {
 extern void lcd_set_invert_display(bool yesno);
 #ifdef HAVE_BACKLIGHT_INVERSION
 extern void lcd_set_backlight_inversion(bool yesno);
-#endif
+#endif /* HAVE_BACKLIGHT_INVERSION */
 extern void lcd_set_flip(bool yesno);
 
 extern void lcd_set_drawmode(int mode);
@@ -324,10 +329,10 @@ extern lcd_fastpixelfunc_type* const *lcd_fastpixelfuncs;
 #elif LCD_DEPTH > 1
 extern lcd_pixelfunc_type* const *lcd_pixelfuncs;
 extern lcd_blockfunc_type* const *lcd_blockfuncs;
-#else
+#else /* LCD_DEPTH == 1*/
 extern lcd_pixelfunc_type* const lcd_pixelfuncs[8];
 extern lcd_blockfunc_type* const lcd_blockfuncs[8];
-#endif
+#endif /* LCD_DEPTH */
 
 extern void lcd_drawpixel(int x, int y);
 extern void lcd_drawline(int x1, int y1, int x2, int y2);
@@ -351,11 +356,6 @@ extern unsigned lcd_get_background(void);
 extern void     lcd_set_drawinfo(int mode, unsigned foreground,
                                  unsigned background);
 void lcd_set_backdrop(fb_data* backdrop);
-#if defined(TOSHIBA_GIGABEAT_F) && !defined(SIMULATOR)
-bool lcd_enabled(void);
-#else
-#define lcd_enabled() true
-#endif
 
 fb_data* lcd_get_backdrop(void);
 
@@ -372,7 +372,7 @@ extern void lcd_bitmap_transparent(const fb_data *src, int x, int y,
 #else /* LCD_DEPTH == 1 */
 #define lcd_mono_bitmap lcd_bitmap
 #define lcd_mono_bitmap_part lcd_bitmap_part
-#endif
+#endif /* LCD_DEPTH */
 
 #endif /* HAVE_LCD_BITMAP */
 
