@@ -200,7 +200,6 @@ bool counting = false;
  * Everything else...
  *******************/
 bool idle_poweroff = true; /* poweroff activated or not? */
-bool done = false; /* used for most of the while loops */
 bool exit_clock = false; /* when true, the main plugin loop will exit */
 
 static struct plugin_api* rb;
@@ -224,10 +223,10 @@ static const char default_filename[] = "/.rockbox/rocks/.clock_settings";
  * Some arrays/definitions for drawing settings/menu text.
  ********************************************************/
 #define ANALOG      1
-#define DIGITAL     2
-#define FULLSCREEN  3
-#define BINARY      4
-#define PLAIN       5
+#define FULLSCREEN  2
+#define DIGITAL     3
+#define PLAIN       4
+#define BINARY      5
 #define CLOCK_MODES 5
 
 #define analog_date 0
@@ -248,70 +247,22 @@ static const char default_filename[] = "/.rockbox/rocks/.clock_settings";
 #define general_savesetting 1
 #define general_backlight 2
 
-/* Menu structs (lists of menu items) */
-static const struct menu_item main_menu_items[] = {
-    { "View Clock", NULL },
-    { "Mode Selector",  NULL },
-    { "Mode Settings", NULL },
-    { "General Settings", NULL },
-    { "Exit Plugin", NULL }
-};
-static const struct menu_item mode_selector_items[] = {
-    { "Analog", NULL },
-    { "Digital/LCD",  NULL },
-    { "Full-screen", NULL },
-    { "Binary", NULL },
-    { "Plain", NULL }
-};
-static const struct menu_item general_settings_items[] = {
-    { "Reset Settings", NULL },
-    { "Save Settings Now",  NULL },
-    { "Save On Exit", NULL },
-    { "Show Counter", NULL },
-    { "Backlight Settings", NULL },
-    { "Idle Poweroff (temporary)", NULL }
-};
-static const struct menu_item analog_items[] = {
-    { "Show Date",  NULL },
-    { "Show Second Hand", NULL },
-    { "Show Time Readout", NULL }
-};
-static const struct menu_item digital_items[] = {
-    { "Show Seconds", NULL },
-    { "Show Date",  NULL },
-    { "Blinking Colon", NULL },
-    { "Time Format", NULL }
-};
-static const struct menu_item fullscreen_items[] = {
-    { "Show Border", NULL },
-    { "Show Second Hand",  NULL }
-};
-static const struct menu_item binary_items[] = {
-    { "Display Mode", NULL }
-};
-static const struct menu_item plain_items[] = {
-    { "Show Date",  NULL },
-    { "Show Seconds", NULL },
-    { "Blinking Colon", NULL },
-    { "Time Format", NULL }
-};
-
 /* Option structs (possible selections per each option) */
-static const struct opt_items noyes_text[2] = {
+static const struct opt_items noyes_text[] = {
     { "No", -1 },
     { "Yes", -1 }
 };
 
-static const struct opt_items backlight_settings_text[3] = {
+static const struct opt_items backlight_settings_text[] = {
     { "Always Off", -1 },
     { "Rockbox setting", -1 },
     { "Always On", -1 }
 };
-static const struct opt_items idle_poweroff_text[2] = {
+static const struct opt_items idle_poweroff_text[] = {
     { "Disabled", -1 },
     { "Enabled", -1 }
 };
-static const struct opt_items counting_direction_text[2] = {
+static const struct opt_items counting_direction_text[] = {
     {"Down",   -1},
     {"Up", -1}
 };
@@ -321,18 +272,18 @@ static const struct opt_items date_format_text[] = {
     { "European format", -1 }
 };
 
-static const struct opt_items analog_time_text[3] = {
+static const struct opt_items analog_time_text[] = {
     { "No", -1 },
     { "24-hour Format", -1 },
     { "12-hour Format", -1 }
 };
 
-static const struct opt_items time_format_text[2] = {
+static const struct opt_items time_format_text[] = {
     { "24-hour Format", -1 },
     { "12-hour Format", -1 }
 };
 
-static const struct opt_items binary_mode_text[2] = {
+static const struct opt_items binary_mode_text[] = {
     { "Numbers", -1 },
     { "Dots", -1 }
 };
@@ -558,6 +509,50 @@ void load_settings(void)
     rb->sleep(HZ);
 }
 
+void polar_to_cartesian(int a, int r, int* x, int* y)
+{
+    *x = (sin_int(a) * r) >> 14;
+    *y = (sin_int(a-90) * r) >> 14;
+}
+
+void polar_to_cartesian_screen_centered(struct screen * display, 
+                                        int a, int r, int* x, int* y)
+{
+    polar_to_cartesian(a, r, x, y);
+    *x+=display->width/2;
+    *y+=display->height/2;
+}
+
+void angle_to_square(struct screen * display,
+                     int square_width, int square_height,
+                     int a, int* x, int* y)
+{
+    a = (a+360-90)%360;
+    if(a>45 && a<=135){/* top line */
+        a-=45;
+        *x=square_width-(square_width*2*a)/90;
+        *y=square_height;
+    }else if(a>135 && a<=225){/* left line */
+        a-=135;
+        *x=-square_width;
+        *y=square_height-(square_height*2*a)/90;
+    }else if(a>225 && a<=315){/* bottom line */
+        a-=225;
+        *x=(square_width*2*a)/90-square_width;
+        *y=-square_height;
+    }else if(a>315 || a<=45){/* right line */
+        if(a>315)
+            a-=315;
+        else
+            a+=45;
+        *x=square_width;
+        *y=(square_height*2*a)/90-square_height;
+    }
+    /* recenter */
+    *x+=display->width/2;
+    *y+=display->height/2;
+}
+
 /*******************************
  * Init clock, set up x/y tables
  ******************************/
@@ -586,54 +581,19 @@ void init_clock(void)
 
     for(i=0; i<ANALOG_VALUES; i++)
     {
-        xminute[i] = ((sin_int(360 * i / ANALOG_VALUES)
-                        * ANALOG_MIN_RADIUS) >> 14) + ANALOG_XCENTER;
-        yminute[i] = ((sin_int(360*i/ ANALOG_VALUES-90)
-                        * ANALOG_MIN_RADIUS) >> 14) + ANALOG_YCENTER;
-        xhour[i] = ((sin_int(360 * i / ANALOG_VALUES)
-                        * ANALOG_HR_RADIUS) >> 14) + ANALOG_XCENTER;
-        yhour[i] = ((sin_int(360 * i / ANALOG_VALUES-90)
-                        * ANALOG_HR_RADIUS) >> 14) + ANALOG_YCENTER;
+        int angle=360 * i / ANALOG_VALUES;
+        polar_to_cartesian_screen_centered(
+                           rb->screens[0], angle, ANALOG_MIN_RADIUS,
+                           &(xminute[i]), &(yminute[i]));
+        polar_to_cartesian_screen_centered(
+                           rb->screens[0], angle, ANALOG_HR_RADIUS,
+                           &(xhour[i]), &(yhour[i]));
 
         /* Fullscreen initialization */
-        if(i==0)
-        {
-            xminute_full[i] = LCD_WIDTH/2;
-            xhour_full[i] = LCD_WIDTH/2;
-            yminute_full[i] = 1;
-            yhour_full[i] = LCD_HEIGHT/6;
-        }
-        else if(i<10 || (i>50 && i <60) )
-        {
-            xminute_full[i] = xminute_full[i-1]+LCD_WIDTH/20;
-            xhour_full[i] = xhour_full[i-1]+(LCD_WIDTH/30);
-            yminute_full[i] = 1;
-            yhour_full[i] = LCD_HEIGHT/6;
-        }
-
-        else if (i>=10 && i < 20)
-        {
-            xminute_full[i] = LCD_WIDTH-2;
-            xhour_full[i] = (5*LCD_WIDTH)/6;
-            yminute_full[i] = ((i-10)*LCD_HEIGHT)/10;
-            yhour_full[i] = (LCD_HEIGHT/6)+((i-10)*(LCD_HEIGHT))/15;
-        }
-
-        else if(i>=20&&i<40)
-        {
-            xminute_full[i] = ((40-i)*LCD_WIDTH)/20;
-            xhour_full[i] = (LCD_WIDTH/6)+((40-i)*(LCD_WIDTH))/30;
-            yminute_full[i] = LCD_HEIGHT-2;
-            yhour_full[i] = (5*LCD_HEIGHT)/6;
-
-        }
-        else
-        {
-            xminute_full[i] = 1;
-            xhour_full[i] = LCD_WIDTH/6;
-            yminute_full[i] = ((50-i)*LCD_HEIGHT)/10;
-            yhour_full[i] = LCD_HEIGHT/6 + ((50-i)*LCD_HEIGHT)/15;
-        }
+        angle_to_square(rb->screens[0], LCD_WIDTH/2, LCD_HEIGHT/2, angle,
+                        &(xminute_full[i]), &(yminute_full[i]));
+        angle_to_square(rb->screens[0], LCD_WIDTH/3, LCD_HEIGHT/3, angle,
+                        &(xhour_full[i]), &(yhour_full[i]));
     }
 }
 
@@ -938,329 +898,7 @@ void plain_clock(int hour, int minute, int second, bool colon)
     }
 }
 
-/**********************
- * Analog settings menu
- *********************/
-void analog_settings_menu(void)
-{
-    int m=0, result;
 
-    done = false;
-
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_RGBPACK(180,200,230));
-    rb->lcd_set_foreground(LCD_BLACK);
-#endif
-
-    m = menu_init(rb, analog_items, sizeof(analog_items) / sizeof(*analog_items),
-                      NULL, NULL, NULL, NULL);
-
-    while(!done)
-    {
-        result = menu_show(m);
-
-        switch(result)
-        {
-            case 0:
-                rb->set_option("Show Date", &settings.analog[analog_date],
-                               INT, date_format_text, 3, NULL);
-                break;
-            case 1:
-                rb->set_option("Show Second Hand", &settings.analog[analog_secondhand],
-                               INT, noyes_text, 2, NULL);
-                break;
-            case 2:
-                rb->set_option("Show Time", &settings.analog[analog_time],
-                               INT, analog_time_text, 3, NULL);
-                break;
-
-            default:
-                done = true;
-                break;
-        }
-
-        menu_exit(m);
-    }
-}
-
-/***********************
- * Digital settings menu
- **********************/
-void digital_settings_menu(void)
-{
-    int m=0, result;
-
-    done = false;
-
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_RGBPACK(180,200,230));
-    rb->lcd_set_foreground(LCD_BLACK);
-#endif
-
-    m = menu_init(rb, digital_items, sizeof(digital_items) / sizeof(*digital_items),
-                      NULL, NULL, NULL, NULL);
-
-    while(!done)
-    {
-        result = menu_show(m);
-
-        switch(result)
-        {
-            case 0:
-                rb->set_option("Show Seconds", &settings.digital[digital_seconds],
-                               INT, noyes_text, 2, NULL);
-                break;
-            case 1:
-                rb->set_option("Show Date", &settings.digital[digital_date],
-                               INT, date_format_text, 3, NULL);
-                break;
-            case 2:
-                rb->set_option("Blinking Colon", &settings.digital[digital_blinkcolon],
-                               INT, noyes_text, 2, NULL);
-                break;
-            case 3:
-                rb->set_option("Time Format", &settings.digital[digital_format],
-                               INT, time_format_text, 2, NULL);
-                break;
-
-            default:
-                done = true;
-                break;
-        }
-
-        menu_exit(m);
-    }
-}
-
-/**************************
- * Fullscreen settings menu
- *************************/
-void fullscreen_settings_menu(void)
-{
-    int m=0, result;
-
-    done = false;
-
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_RGBPACK(180,200,230));
-    rb->lcd_set_foreground(LCD_BLACK);
-#endif
-
-    m = menu_init(rb, fullscreen_items, sizeof(fullscreen_items) / sizeof(*fullscreen_items),
-                      NULL, NULL, NULL, NULL);
-
-    while(!done)
-    {
-        result = menu_show(m);
-
-        switch(result)
-        {
-            case 0:
-                rb->set_option("Show Border", &settings.fullscreen[fullscreen_border],
-                               INT, noyes_text, 2, NULL);
-                break;
-            case 1:
-                rb->set_option("Show Second Hand", &settings.fullscreen[fullscreen_secondhand],
-                               INT, noyes_text, 2, NULL);
-                break;
-
-            default:
-                done = true;
-                break;
-        }
-
-        menu_exit(m);
-    }
-}
-
-/**********************
- * Binary settings menu
- *********************/
-void binary_settings_menu(void)
-{
-    int m=0, result;
-
-    done = false;
-
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_RGBPACK(180,200,230));
-    rb->lcd_set_foreground(LCD_BLACK);
-#endif
-
-    m = menu_init(rb,binary_items, sizeof(binary_items) / sizeof(*binary_items),
-                      NULL, NULL, NULL, NULL);
-
-    while(!done)
-    {
-        result = menu_show(m);
-
-        switch(result)
-        {
-            case 0:
-                rb->set_option("Display Mode", &settings.binary[binary_mode],
-                               INT, binary_mode_text, 2, NULL);
-                break;
-
-            default:
-                done = true;
-                break;
-        }
-
-        menu_exit(m);
-    }
-}
-
-/*********************
- * Plain settings menu
- ********************/
-void plain_settings_menu(void)
-{
-    int m=0, result;
-
-    done = false;
-
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_RGBPACK(180,200,230));
-    rb->lcd_set_foreground(LCD_BLACK);
-#endif
-
-    m = menu_init(rb,plain_items, sizeof(plain_items) / sizeof(*plain_items),
-                      NULL, NULL, NULL, NULL);
-
-    while(!done)
-    {
-        result = menu_show(m);
-
-        switch(result)
-        {
-            case 0:
-                rb->set_option("Show Date", &settings.plain[plain_date],
-                               INT, date_format_text, 3, NULL);
-                break;
-            case 1:
-                rb->set_option("Show Seconds", &settings.plain[plain_seconds],
-                               INT, noyes_text, 2, NULL);
-                break;
-            case 2:
-                rb->set_option("Blinking Colon", &settings.plain[plain_blinkcolon],
-                               INT, noyes_text, 2, NULL);
-                break;
-            case 3:
-                rb->set_option("Time Format", &settings.plain[plain_format],
-                               INT, time_format_text, 2, NULL);
-                break;
-
-            default:
-                done = true;
-                break;
-        }
-
-        menu_exit(m);
-    }
-}
-
-/**************************************
- * Settings screen for the current mode
- *************************************/
-void settings_screen(void)
-{
-    set_standard_colors();
-
-    if(settings.clock == ANALOG)
-        analog_settings_menu();
-    else if(settings.clock == DIGITAL)
-        digital_settings_menu();
-    else if(settings.clock == FULLSCREEN)
-        fullscreen_settings_menu();
-    else if(settings.clock == BINARY)
-        binary_settings_menu();
-    else if(settings.clock == PLAIN)
-        plain_settings_menu();
-
-    set_digital_colors();
-
-}
-
-/***********************************************************
- * Confirm resetting of settings, used in general_settings()
- **********************************************************/
-void confirm_reset(void)
-{
-    int result=0;
-
-    rb->set_option("Reset all settings?", &result, INT, noyes_text, 2, NULL);
-
-    if(result == 1) /* reset! */
-    {
-        reset_settings();
-        rb->splash(HZ, "Settings reset!");
-    }
-    else
-        rb->splash(HZ, "Settings NOT reset.");
-}
-
-/************************************
- * General settings. Reset, save, etc
- ***********************************/
-void general_settings(void)
-{
-    int m, result;
-    done = false;
-
-    set_standard_colors();
-
-    m = menu_init(rb,general_settings_items, sizeof(general_settings_items) / sizeof(*general_settings_items),
-                      NULL, NULL, NULL, NULL);
-
-    while(!done)
-    {
-        result = menu_show(m);
-
-        switch(result)
-        {
-            case 0:
-                confirm_reset();
-                break;
-
-            case 1:
-                save_settings(false);
-                rb->splash(HZ, "Settings saved");
-                break;
-
-            case 2:
-                rb->set_option("Save On Exit", &settings.general[general_savesetting],
-                               INT, noyes_text, 2, NULL);
-
-                /* if we no longer save on exit, we better save now to remember that */
-                if(settings.general[general_savesetting] == 0)
-                    save_settings(false);
-                break;
-
-            case 3:
-                rb->set_option("Show Counter", &settings.general[general_counter],
-                               INT, noyes_text, 2, NULL);
-                break;
-
-            case 4:
-                rb->set_option("Backlight Settings", &settings.general[general_backlight],
-                               INT, backlight_settings_text, 3, NULL);
-                break;
-
-            case 5:
-                rb->set_option("Idle Poweroff (temporary)", &idle_poweroff,
-                               BOOL, idle_poweroff_text, 2, NULL);
-                break;
-
-            default:
-                done=true;
-                break;
-        }
-
-        menu_exit(m);
-    }
-
-    set_digital_colors();
-}
 
 /****************************************
  * Draws the extras, IE border, digits...
@@ -1465,36 +1103,6 @@ void draw_extras(int year, int day, int month, int hour, int minute, int second)
     }
 }
 
-/***************
- * Select a mode
- **************/
-void mode_selector(void)
-{
-    int m, result;
-    done = false;
-
-    set_standard_colors();
-
-    m = menu_init(rb,mode_selector_items, sizeof(mode_selector_items) / sizeof(*mode_selector_items),
-                  NULL, NULL, NULL, NULL);
-
-    while(!done)
-    {
-        result = menu_show(m);
-
-        /* check for this, so if the user exits the menu without
-         * making a selection, it won't change to some weird value. */
-        if(result >= 0)
-            settings.clock = result+1;
-
-        done = true;
-
-        menu_exit(m);
-    }
-
-    set_digital_colors();
-}
-
 /*********************
  * Display the counter
  ********************/
@@ -1595,24 +1203,266 @@ void show_counter(void)
     }
 }
 
+/* Menus */
+
+/***************
+ * Select a mode
+ **************/
+bool menu_mode_selector(void)
+{
+    int selection=settings.clock-1;
+
+    set_standard_colors();
+
+    MENUITEM_STRINGLIST(menu,"Mode Selector",NULL, "Analog", "Full-screen",
+                        "Digital/LCD","Plain","Binary");
+
+    /* check for this, so if the user exits the menu without
+     * making a selection, it won't change to some weird value. */
+    if(rb->do_menu(&menu, &selection) >=0){
+        settings.clock = selection+1;
+        return(true);
+    }
+    return(false);
+}
+
+/**********************
+ * Analog settings menu
+ *********************/
+void menu_analog_settings(void)
+{
+    int selection=0, result=0;
+
+    MENUITEM_STRINGLIST(menu,"Analog Mode Settings",NULL,"Show Date",
+                        "Show Second Hand","Show Time Readout");
+
+    while(result>=0)
+    {
+        result=rb->do_menu(&menu, &selection);
+        switch(result)
+        {
+            case 0:
+                rb->set_option("Show Date", &settings.analog[analog_date],
+                               INT, date_format_text, 3, NULL);
+                break;
+            case 1:
+                rb->set_option("Show Second Hand", &settings.analog[analog_secondhand],
+                               INT, noyes_text, 2, NULL);
+                break;
+            case 2:
+                rb->set_option("Show Time", &settings.analog[analog_time],
+                               INT, analog_time_text, 3, NULL);
+                break;
+        }
+    }
+}
+
+/***********************
+ * Digital settings menu
+ **********************/
+void menu_digital_settings(void)
+{
+    int selection=0, result=0;
+
+    MENUITEM_STRINGLIST(menu,"Digital/LCD Mode Settings",NULL,"Show Date",
+                        "Show Seconds","Blinking Colon","Time Format");
+
+    while(result>=0)
+    {
+        result=rb->do_menu(&menu, &selection);
+        switch(result)
+        {
+            case 0:
+                rb->set_option("Show Date", &settings.digital[digital_date],
+                               INT, date_format_text, 3, NULL);
+                break;
+            case 1:
+                rb->set_option("Show Seconds", &settings.digital[digital_seconds],
+                               INT, noyes_text, 2, NULL);
+                break;
+            case 2:
+                rb->set_option("Blinking Colon", &settings.digital[digital_blinkcolon],
+                               INT, noyes_text, 2, NULL);
+                break;
+            case 3:
+                rb->set_option("Time Format", &settings.digital[digital_format],
+                               INT, time_format_text, 2, NULL);
+                break;
+        }
+    }
+}
+
+/**************************
+ * Fullscreen settings menu
+ *************************/
+void menu_fullscreen_settings(void)
+{
+    int selection=0, result=0;
+
+    MENUITEM_STRINGLIST(menu,"Fullscreen Mode Settings",NULL,
+                        "Show Border","Show Second Hand");
+
+    while(result>=0)
+    {
+        result=rb->do_menu(&menu, &selection);
+        switch(result)
+        {
+            case 0:
+                rb->set_option("Show Border", &settings.fullscreen[fullscreen_border],
+                               INT, noyes_text, 2, NULL);
+                break;
+            case 1:
+                rb->set_option("Show Second Hand", &settings.fullscreen[fullscreen_secondhand],
+                               INT, noyes_text, 2, NULL);
+                break;
+        }
+    }
+}
+
+/**********************
+ * Binary settings menu
+ *********************/
+void menu_binary_settings(void)
+{
+    int selection=0, result=0;
+
+    MENUITEM_STRINGLIST(menu,"Binary Mode Settings",NULL,"Display Mode");
+
+    while(result>=0)
+    {
+        result=rb->do_menu(&menu, &selection);
+        switch(result)
+        {
+            case 0:
+                rb->set_option("Display Mode", &settings.binary[binary_mode],
+                               INT, binary_mode_text, 2, NULL);
+        }
+
+    }
+}
+
+/*********************
+ * Plain settings menu
+ ********************/
+void menu_plain_settings(void)
+{
+    int selection=0, result=0;
+
+    MENUITEM_STRINGLIST(menu,"Plain Mode Settings",NULL,"Show Date",
+                        "Show Seconds","Blinking Colon","Time Format");
+
+    while(result>=0)
+    {
+        result=rb->do_menu(&menu, &selection);
+        switch(result)
+        {
+            case 0:
+                rb->set_option("Show Date", &settings.plain[plain_date],
+                               INT, date_format_text, 3, NULL);
+                break;
+            case 1:
+                rb->set_option("Show Seconds", &settings.plain[plain_seconds],
+                               INT, noyes_text, 2, NULL);
+                break;
+            case 2:
+                rb->set_option("Blinking Colon", &settings.plain[plain_blinkcolon],
+                               INT, noyes_text, 2, NULL);
+                break;
+            case 3:
+                rb->set_option("Time Format", &settings.plain[plain_format],
+                               INT, time_format_text, 2, NULL);
+                break;
+        }
+    }
+}
+
+/***********************************************************
+ * Confirm resetting of settings, used in general_settings()
+ **********************************************************/
+void confirm_reset(void)
+{
+    int result=0;
+
+    rb->set_option("Reset all settings?", &result, INT, noyes_text, 2, NULL);
+
+    if(result == 1) /* reset! */
+    {
+        reset_settings();
+        rb->splash(HZ, "Settings reset!");
+    }
+    else
+        rb->splash(HZ, "Settings NOT reset.");
+}
+
+/************************************
+ * General settings. Reset, save, etc
+ ***********************************/
+void menu_general_settings(void)
+{
+    int selection=0, result=0;
+
+    MENUITEM_STRINGLIST(menu,"General Settings",NULL,"Reset Settings",
+                        "Save Settings Now","Save On Exit","Show Counter",
+                        "Backlight Settings","Idle Poweroff (temporary)");
+
+    while(result>=0)
+    {
+        result=rb->do_menu(&menu, &selection);
+        switch(result)
+        {
+            case 0:
+                confirm_reset();
+                break;
+
+            case 1:
+                save_settings(false);
+                rb->splash(HZ, "Settings saved");
+                break;
+
+            case 2:
+                rb->set_option("Save On Exit", &settings.general[general_savesetting],
+                               INT, noyes_text, 2, NULL);
+
+                /* if we no longer save on exit, we better save now to remember that */
+                if(settings.general[general_savesetting] == 0)
+                    save_settings(false);
+                break;
+
+            case 3:
+                rb->set_option("Show Counter", &settings.general[general_counter],
+                               INT, noyes_text, 2, NULL);
+                break;
+
+            case 4:
+                rb->set_option("Backlight Settings", &settings.general[general_backlight],
+                               INT, backlight_settings_text, 3, NULL);
+                break;
+
+            case 5:
+                rb->set_option("Idle Poweroff (temporary)", &idle_poweroff,
+                               BOOL, idle_poweroff_text, 2, NULL);
+                break;
+        }
+
+    }
+}
+
 /***********
  * Main menu
  **********/
 void main_menu(void)
 {
-    int m, result;
-    done = false;
+    int selection=0;
+    bool done = false;
 
     set_standard_colors();
 
-    m = menu_init(rb,main_menu_items, sizeof(main_menu_items) / sizeof(*main_menu_items),
-                  NULL, NULL, NULL, NULL);
+    MENUITEM_STRINGLIST(menu,"Clock Menu",NULL,"View Clock","Mode Selector",
+                        "Mode Settings","General Settings","Quit");
 
     while(!done)
     {
-        result = menu_show(m);
-
-        switch(result)
+        switch(rb->do_menu(&menu, &selection))
         {
             case 0:
                 rb->lcd_setfont(FONT_SYSFIXED);
@@ -1620,15 +1470,22 @@ void main_menu(void)
                 break;
 
             case 1:
-                mode_selector();
+                done=menu_mode_selector();
                 break;
 
             case 2:
-                settings_screen();
+                switch(settings.clock)
+                {
+                    case ANALOG: menu_analog_settings();break;
+                    case DIGITAL: menu_digital_settings();break;
+                    case FULLSCREEN: menu_fullscreen_settings();break;
+                    case BINARY: menu_binary_settings();break;
+                    case PLAIN: menu_plain_settings();break;
+                }
                 break;
 
             case 3:
-                general_settings();
+                menu_general_settings();
                 break;
 
             case 4:
@@ -1640,8 +1497,6 @@ void main_menu(void)
                 done=true;
                 break;
         }
-
-        menu_exit(m);
     }
 
     rb->lcd_setfont(FONT_SYSFIXED);
@@ -1696,8 +1551,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         year = current_time->tm_year + 1900;
         day = current_time->tm_mday;
         month = current_time->tm_mon + 1;
-
-        done = false;
 
         if(second != last_second)
         {
@@ -1799,11 +1652,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 set_digital_colors();
                 break;
 
-            case ACTION_MENU: /* main menu */
+            case ACTION_MENU:
                 main_menu();
                 break;
 
-            case ACTION_EXIT: /* main menu */
+            case ACTION_EXIT:
                 exit_clock=true;
                 break;
 
