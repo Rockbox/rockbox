@@ -247,8 +247,8 @@ static bool automatic_skip = false; /* Who initiated in-progress skip? (C/A-) */
 static bool playlist_end = false;   /* Has the current playlist ended? (A) */
 static bool dir_skip = false;       /* Is a directory skip pending? (A) */
 static bool new_playlist = false;   /* Are we starting a new playlist? (A) */
-/* Pending track change offset, to keep WPS responsive (A) */
-static int wps_offset = 0;
+static int wps_offset = 0;          /* Pending track change offset, to keep WPS responsive (A) */
+static bool skipped_during_pause = false; /* Do we need to clear the PCM buffer when playback resumes (A) */
 
 /* Callbacks which applications or plugins may set */
 /* When the playing track has changed from the user's perspective */
@@ -3406,6 +3406,8 @@ static void audio_initiate_track_change(long direction)
     playlist_end = false;
     ci.new_track += direction;
     wps_offset -= direction;
+    if (paused)
+        skipped_during_pause = true;
 }
 
 static void audio_initiate_dir_change(long direction)
@@ -3413,6 +3415,8 @@ static void audio_initiate_dir_change(long direction)
     playlist_end = false;
     dir_skip = true;
     ci.new_track = direction;
+    if (paused)
+        skipped_during_pause = true;
 }
 
 /*
@@ -3632,6 +3636,9 @@ static void audio_thread(void)
 
             case Q_AUDIO_PAUSE:
                 LOGFQUEUE("audio < Q_AUDIO_PAUSE");
+                if (!(bool) ev.data && skipped_during_pause && !pcmbuf_is_crossfade_active())
+                    pcmbuf_play_stop(); /* Flush old track on resume after skip */
+                skipped_during_pause = false;
                 if (!playing)
                     break;
                 pcmbuf_pause((bool)ev.data);
