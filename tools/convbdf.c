@@ -725,8 +725,9 @@ bitmap_t bdf_hexval(unsigned char *buf, int ndx1, int ndx2)
  * Doing it this way keeps fonts in standard formats,
  * as well as keeping Rockbox hw bitmap format.
  */
-int rotleft(unsigned char *dst, bitmap_t *src, unsigned int width,
-                    unsigned int height)
+int rotleft(unsigned char *dst, /* output buffer */
+            size_t dstlen,      /* buffer size */
+            bitmap_t *src, unsigned int width, unsigned int height)
 {
     unsigned int i,j;
     unsigned int src_words;        /* # words of input image*/
@@ -736,6 +737,13 @@ int rotleft(unsigned char *dst, bitmap_t *src, unsigned int width,
     /* calc words of input image*/
     src_words = BITMAP_WORDS(width) * height;
 
+    if(((height + 7) / 8) * width > dstlen) {
+        fprintf(stderr, "%s:%d %d x %d overflows %d bytes buffer, needs %d\n",
+                __FILE__, __LINE__, width, height, dstlen,
+                ((height + 7) / 8) * width );
+        return 0;
+    }
+    
     /* clear background*/
     memset(dst, 0, ((height + 7) / 8) * width);
 
@@ -881,10 +889,11 @@ int gen_c_source(struct font* pf, char *path)
         bits = pf->bits + (pf->offset? pf->offset[i]: (pf->height * i));
 #ifdef ROTATE /* pre-rotated into Rockbox bitmap format */
         {
-          unsigned char bytemap[256];
+          unsigned char bytemap[512];
           int y8, ix=0;
           
-          int size = rotleft(bytemap, bits, width, pf->height);
+          int size = rotleft(bytemap, sizeof(bytemap), bits, width,
+                             pf->height);
           for (y8=0; y8<pf->height; y8+=8) /* column rows */
           {
             for (x=0; x<width; x++) {
@@ -1117,7 +1126,7 @@ int gen_fnt_file(struct font* pf, char *path)
         bitmap_t* bits;
         int width = pf->width ? pf->width[i] : pf->maxwidth;
         int size;  
-        unsigned char bytemap[256];
+        unsigned char bytemap[512];
 
         /* Skip missing glyphs */
         if (pf->offset && (pf->offset[i] == (unsigned int)-1))
@@ -1125,7 +1134,7 @@ int gen_fnt_file(struct font* pf, char *path)
 
         bits = pf->bits + (pf->offset? pf->offset[i]: (pf->height * i));
 
-        size = rotleft(bytemap, bits, width, pf->height);
+        size = rotleft(bytemap, sizeof(bytemap), bits, width, pf->height);
         writestr(ofp, (char *)bytemap, size);
 
         /* update offrot since bits are now in sorted order */
