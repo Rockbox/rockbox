@@ -286,7 +286,7 @@ void pcm_calculate_peaks(int *left, int *right)
     }
 }
 
-extern int sim_volume; /* in firmware/sound.c
+extern int sim_volume; /* in firmware/sound.c */
 void write_to_soundcard(struct pcm_udata *udata) {
     if (cvt.needed) {
         Uint32 rd = udata->num_in;
