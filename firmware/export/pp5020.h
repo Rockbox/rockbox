@@ -141,8 +141,33 @@
 #define CPU_CTL          (*(volatile unsigned long *)(0x60007000))
 #define COP_CTL          (*(volatile unsigned long *)(0x60007004))
 
-#define PROC_SLEEP   0x80000000
-#define PROC_WAKE    0x0
+#define PROC_SLEEP     0x80000000
+#define PROC_WAIT      0x40000000
+#define PROC_WAIT_CLR  0x20000000
+#define PROC_CNT_START 0x08000000
+#define PROC_WAKE      0x00000000
+/**
+ * This is based on some quick but sound experiments on PP5022C.
+ * CPU/COP_CTL bitmap:
+ *   [31] - sleep until an interrupt occurs
+ *   [30] - wait for cycle countdown to 0
+ *   [29] - wait for cycle countdown to 0
+ *          behaves identically to bit 30 unless bit 30 is set as well
+ *          in which case this bit is cleared at the end of the count
+ *   [28] - unknown - no execution effect observed yet
+ *   [27] - begin cycle countdown
+ * [26:8] - semaphore flags for core communication ?
+ *          no execution effect observed yet
+ *          [11:8] seem to often be set to the core's own ID
+ *                 nybble when sleeping - 0x5 or 0xa.
+ *  [7:0] - W: number of cycles to skip on next instruction
+ *          R: cycles remaining
+ * Executing on CPU
+ *   CPU_CTL = 0x68000080
+ *   nop
+ * stalls the nop for 128 cycles
+ * Reading CPU_CTL after the nop will return 0x48000000
+ */
 
 /* Cache Control */
 #define CACHE_CTL        (*(volatile unsigned long *)(0x6000c000))
