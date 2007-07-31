@@ -107,7 +107,6 @@ static void pp_set_cpu_frequency(long frequency)
 #endif
 {
     unsigned long clcd_clock_src;
-    bool use_pll = true;
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES > 1)
     /* Using mutex or spinlock isn't safe here. */
@@ -121,31 +120,39 @@ static void pp_set_cpu_frequency(long frequency)
     cpu_frequency = frequency;
     clcd_clock_src = CLCD_CLOCK_SRC; /* save selected color LCD clock source */
 
-    CLOCK_SOURCE = (CLOCK_SOURCE & ~0xf000000f) | 0x10000002;
-                                /* set clock source 1 to 24MHz and select it */
-    CLCD_CLOCK_SRC &= ~0xc0000000; /* select 24MHz as color LCD clock source */
-
     switch (frequency)
     {
 #if CONFIG_CPU == PP5020
       case CPUFREQ_MAX:
-        DEV_TIMING1 = 0x00000808;
-        PLL_CONTROL = 0x8a020a03; /* 10/3 * 24MHz */
-        PLL_STATUS  = 0xd19b;     /* unlock frequencies > 66MHz */
-        PLL_CONTROL = 0x8a020a03; /* repeat setup */
-        udelay(500);              /* wait for relock */
+        CLOCK_SOURCE = 0x10007772;  /* source #1: 24MHz, #2, #3, #4: PLL */
+        CLCD_CLOCK_SRC &= ~0xc0000000; /* select 24MHz as color LCD clock source */
+        DEV_TIMING1  = 0x00000808;
+        PLL_CONTROL  = 0x8a020a03;  /* 10/3 * 24MHz */
+        PLL_STATUS   = 0xd19b;      /* unlock frequencies > 66MHz */
+        PLL_CONTROL  = 0x8a020a03;  /* repeat setup */
+        udelay(500);                /* wait for relock */
         break;
 
       case CPUFREQ_NORMAL:
-        DEV_TIMING1 = 0x00000303;
-        PLL_CONTROL = 0x8a020504; /* 5/4 * 24MHz */
-        udelay(500);              /* wait for relock */
+        CLOCK_SOURCE = 0x10007772;   /* source #1: 24MHz, #2, #3, #4: PLL */
+        CLCD_CLOCK_SRC &= ~0xc0000000; /* select 24MHz as color LCD clock source */
+        DEV_TIMING1  = 0x00000303;
+        PLL_CONTROL  = 0x8a020504;  /* 5/4 * 24MHz */
+        udelay(500);                /* wait for relock */
+        break;
+
+      case CPUFREQ_SLEEP:
+        CLOCK_SOURCE = 0x10002202;  /* source #2: 32kHz, #1, #3, #4: 24MHz */
+        CLCD_CLOCK_SRC &= ~0xc0000000; /* select 24MHz as color LCD clock source */
+        PLL_CONTROL &= ~0x80000000; /* disable PLL */
+        udelay(10000);              /* let 32kHz source stabilize? */
         break;
 
       default:
-        DEV_TIMING1 = 0x00000303;
+        CLOCK_SOURCE = 0x10002222;  /* source #1, #2, #3, #4: 24MHz */
+        CLCD_CLOCK_SRC &= ~0xc0000000; /* select 24MHz as color LCD clock source */
+        DEV_TIMING1  = 0x00000303;
         PLL_CONTROL &= ~0x80000000; /* disable PLL */
-        use_pll = false;
         cpu_frequency = CPUFREQ_DEFAULT;
         break;
 
@@ -155,29 +162,40 @@ static void pp_set_cpu_frequency(long frequency)
        * PP5026 is similar to PP5022 except it doesn't
        * have this limitation (and the post divider?) */
       case CPUFREQ_MAX:
-        DEV_TIMING1 = 0x00000808;
-        PLL_CONTROL = 0x8a121403; /* (20/3 * 24MHz) / 2 */
+        CLOCK_SOURCE = 0x10007772;  /* source #1: 24MHz, #2, #3, #4: PLL */
+        CLCD_CLOCK_SRC &= ~0xc0000000; /* select 24MHz as color LCD clock source */
+        DEV_TIMING1  = 0x00000808;
+        PLL_CONTROL  = 0x8a121403;  /* (20/3 * 24MHz) / 2 */
         udelay(250);
         while (!(PLL_STATUS & 0x80000000)); /* wait for relock */
         break;
 
       case CPUFREQ_NORMAL:
-        DEV_TIMING1 = 0x00000303;
-        PLL_CONTROL = 0x8a220501; /* (5/1 * 24MHz) / 4 */
+        CLOCK_SOURCE = 0x10007772;  /* source #1: 24MHz, #2, #3, #4: PLL */
+        CLCD_CLOCK_SRC &= ~0xc0000000; /* select 24MHz as color LCD clock source */
+        DEV_TIMING1  = 0x00000303;
+        PLL_CONTROL  = 0x8a220501;  /* (5/1 * 24MHz) / 4 */
         udelay(250);
         while (!(PLL_STATUS & 0x80000000)); /* wait for relock */
         break;
 
-      default:
-        DEV_TIMING1 = 0x00000303;
+      case CPUFREQ_SLEEP:
+        CLOCK_SOURCE = 0x10002202;  /* source #2: 32kHz, #1, #3, #4: 24MHz */
+        CLCD_CLOCK_SRC &= ~0xc0000000; /* select 24MHz as color LCD clock source */
         PLL_CONTROL &= ~0x80000000; /* disable PLL */
-        use_pll = false;
+        udelay(10000);              /* let 32kHz source stabilize? */
+        break;
+
+      default:
+        CLOCK_SOURCE = 0x10002222;  /* source #1, #2, #3, #4: 24MHz */
+        CLCD_CLOCK_SRC &= ~0xc0000000; /* select 24MHz as color LCD clock source */
+        DEV_TIMING1  = 0x00000303;
+        PLL_CONTROL &= ~0x80000000; /* disable PLL */
         cpu_frequency = CPUFREQ_DEFAULT;
         break;
 #endif
     }
-    if (use_pll)                  /* set clock source 2 to PLL and select it */
-        CLOCK_SOURCE = (CLOCK_SOURCE & ~0xf00000f0) | 0x20000070;
+    CLOCK_SOURCE = (CLOCK_SOURCE&~0xf000000)|0x20000000;  /* select source #2 */
 
     CLCD_CLOCK_SRC;             /* dummy read (to sync the write pipeline??) */
     CLCD_CLOCK_SRC = clcd_clock_src; /* restore saved value */
