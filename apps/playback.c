@@ -914,10 +914,6 @@ static void swap_codec(void)
     } while (my_codec == current_codec);
 
     /* Wait for other codec to unlock */
-    /* FIXME: We need some sort of timed boost cancellation here or the CPU
-       doesn't unboost during playback when the voice codec goes back to
-       waiting - recall that mutex_lock calls block_thread which is an
-       indefinite wait that doesn't cancel the thread's CPU boost */
     mutex_lock(&mutex_codecthread);
 
     /* Take control */
@@ -1112,6 +1108,10 @@ static bool voice_on_voice_stop(bool aborting, size_t *realsize)
         voice_remaining = 0;
         voicebuf = NULL;
 
+        /* Cancel any automatic boost if no more clips requested. */
+        if (!playing || !voice_thread_start)
+            sleep(0);
+
         /* Force the codec to think it's changing tracks */
         ci_voice.new_track = 1; 
 
@@ -1142,14 +1142,7 @@ static void* voice_request_buffer_callback(size_t *realsize, size_t reqsize)
         }
         else
         {
-            /* We must use queue_wait_w_tmo() because queue_wait() doesn't
-               unboost the CPU */
-            /* FIXME: when long timeouts work correctly max out the the timeout
-               (we'll still need the timeout guard here) or an infinite timeout
-               can unboost, use that */
-            do
-                queue_wait_w_tmo(&voice_queue, &ev, HZ*5);
-            while (ev.id == SYS_TIMEOUT); /* Fake infinite wait */
+            queue_wait(&voice_queue, &ev);
         }
 
         switch (ev.id) {
