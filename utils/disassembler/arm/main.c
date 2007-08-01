@@ -11,10 +11,18 @@ ULONG isdata[1000000]; /* each bit defines one byte as: code=0, data=1 */
 
 extern void dis_asm(ULONG off, ULONG val, char *stg);
 
+int static inline le2int(unsigned char* buf)
+{
+   int32_t res = (buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8) | buf[0];
+
+   return res;
+}
+
 int main(int argc, char **argv)
 {
   FILE   *in, *out;
   char   *ptr, stg[256];
+  unsigned char buf[4];
   ULONG  pos, sz, val, loop;
   int    offset, offset1;
   USHORT regid;
@@ -46,7 +54,9 @@ int main(int argc, char **argv)
       memset(stg, 0, 40);
       /* read next code dword */
       fseek(in, pos, SEEK_SET);
-      fread(&val, 4, 1, in);
+      fread(buf, 1, 4, in);
+      
+      val = le2int(buf);
 
       /* check for data tag set: if 1 byte out of 4 is marked => assume data */
       if((isdata[pos>>5] & (0xf << (pos & 31))) || (val & 0xffff0000) == 0)
@@ -101,7 +111,9 @@ int main(int argc, char **argv)
 
           /* add const data to disassembler string */
           fseek(in, pos+offset+8, SEEK_SET);
-          fread(&offset, 4, 1, in);
+          fread(&buf, 1, 4, in);
+          offset = le2int(buf);
+          
           sprintf(stg+strlen(stg), " <- 0x%x", offset);
         }
       }
