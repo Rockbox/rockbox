@@ -52,6 +52,7 @@ Config::Config(QWidget *parent) : QDialog(parent)
     }
     ui.listLanguages->setSelectionMode(QAbstractItemView::SingleSelection);
     connect(ui.listLanguages, SIGNAL(itemSelectionChanged()), this, SLOT(updateLanguage()));
+    ui.proxyPass->setEchoMode(QLineEdit::Password);
 
     this->setModal(true);
     
