@@ -60,6 +60,15 @@ Config::Config(QWidget *parent) : QDialog(parent)
     connect(ui.buttonCancel, SIGNAL(clicked()), this, SLOT(abort()));
     connect(ui.radioNoProxy, SIGNAL(toggled(bool)), this, SLOT(setNoProxy(bool)));
     connect(ui.radioSystemProxy, SIGNAL(toggled(bool)), this, SLOT(setSystemProxy(bool)));
+
+    // disable unimplemented stuff
+    ui.buttonCacheBrowse->setEnabled(false);
+    ui.cacheDisable->setEnabled(false);
+    ui.cacheOfflineMode->setEnabled(false);
+    ui.buttonCacheClear->setEnabled(false);
+    ui.scrobblerUser->setEnabled(false);
+    ui.scrobblerPass->setEnabled(false);
+    ui.scrobblerTimezone->setEnabled(false);
 }
 
 

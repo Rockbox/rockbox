@@ -40,16 +40,16 @@ void ProgressLoggerGui::addItem(QString text,int flag)
     switch(flag)
     {
         case LOGOK:
-            item->setIcon(QIcon(":/icons/icons/log-ok.png"));
+            item->setIcon(QIcon(":/icons/icons/go-next.png"));
             break;
         case LOGINFO:
-            item->setIcon(QIcon(":/icons/icons/log-info.png"));
+            item->setIcon(QIcon(":/icons/icons/dialog-information.png"));
             break;
         case LOGWARNING:
-            item->setIcon(QIcon(":/icons/icons/log-warning.png"));
+            item->setIcon(QIcon(":/icons/icons/dialog-warning.png"));
             break;
         case LOGERROR:
-            item->setIcon(QIcon(":/icons/icons/log-error.png"));
+            item->setIcon(QIcon(":/icons/icons/dialog-error.png"));
             break;
     }
     
