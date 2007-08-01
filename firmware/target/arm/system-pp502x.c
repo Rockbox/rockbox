@@ -171,7 +171,7 @@ static void pp_set_cpu_frequency(long frequency)
         cpu_frequency = CPUFREQ_DEFAULT;
         break;
     }
-    CLOCK_SOURCE = (CLOCK_SOURCE&~0xf000000)|0x20000000;  /* select source #2 */
+    CLOCK_SOURCE = (CLOCK_SOURCE & ~0xf0000000) | 0x20000000;  /* select source #2 */
 
     CLCD_CLOCK_SRC;             /* dummy read (to sync the write pipeline??) */
     CLCD_CLOCK_SRC = clcd_clock_src; /* restore saved value */
