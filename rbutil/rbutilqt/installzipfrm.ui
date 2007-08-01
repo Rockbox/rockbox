@@ -8,15 +8,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>665</width>
-    <height>499</height>
+    <width>600</width>
+    <height>450</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Install Zip</string>
   </property>
   <layout class="QGridLayout" >
-   <item rowspan="8" row="0" column="0" >
+   <item rowspan="4" row="0" column="0" >
     <widget class="QLabel" name="label" >
      <property name="text" >
       <string/>
@@ -24,36 +24,32 @@
      <property name="pixmap" >
       <pixmap resource="rbutilqt.qrc" >:/icons/icons/wizard.xpm</pixmap>
      </property>
+     <property name="alignment" >
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
     </widget>
    </item>
-   <item row="0" column="1" colspan="3" >
+   <item row="0" column="1" colspan="4" >
     <widget class="QLabel" name="label_2" >
      <property name="text" >
       <string>Select your device in the filesystem</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="1" colspan="2" >
+   <item row="1" column="1" colspan="3" >
     <widget class="QLineEdit" name="lineMountPoint" />
    </item>
-   <item row="1" column="3" >
-    <widget class="QToolButton" name="buttonBrowse" >
+   <item row="1" column="4" >
+    <widget class="QPushButton" name="buttonBrowse" >
      <property name="text" >
       <string>&amp;Browse</string>
      </property>
-    </widget>
-   </item>
-   <item row="9" column="2" colspan="2" >
-    <widget class="QDialogButtonBox" name="buttonBox" >
-     <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons" >
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
+     <property name="icon" >
+      <iconset resource="rbutilqt.qrc" >:/icons/icons/system-search.png</iconset>
      </property>
     </widget>
    </item>
-   <item rowspan="4" row="4" column="1" colspan="3" >
+   <item row="2" column="2" >
     <spacer>
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
@@ -66,6 +62,43 @@
      </property>
     </spacer>
    </item>
+   <item row="3" column="1" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="3" column="3" colspan="2" >
+    <layout class="QHBoxLayout" >
+     <item>
+      <widget class="QPushButton" name="buttonOk" >
+       <property name="text" >
+        <string>&amp;Ok</string>
+       </property>
+       <property name="icon" >
+        <iconset resource="rbutilqt.qrc" >:/icons/icons/go-next.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="buttonCancel" >
+       <property name="text" >
+        <string>&amp;Cancel</string>
+       </property>
+       <property name="icon" >
+        <iconset resource="rbutilqt.qrc" >:/icons/icons/process-stop.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
   </layout>
  </widget>
  <resources>
@@ -73,34 +106,34 @@
  </resources>
  <connections>
   <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
+   <sender>buttonOk</sender>
+   <signal>clicked()</signal>
    <receiver>InstallZipFrm</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>248</x>
-     <y>254</y>
+     <x>472</x>
+     <y>418</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>157</x>
-     <y>274</y>
+     <x>382</x>
+     <y>328</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
+   <sender>buttonCancel</sender>
+   <signal>clicked()</signal>
    <receiver>InstallZipFrm</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>316</x>
-     <y>260</y>
+     <x>561</x>
+     <y>428</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>286</x>
-     <y>274</y>
+     <x>522</x>
+     <y>332</y>
     </hint>
    </hints>
   </connection>
