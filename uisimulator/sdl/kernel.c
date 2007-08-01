@@ -191,7 +191,7 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
     if(q->send)
     {
         struct thread_entry **spp = &q->send->senders[wr];
-        struct thread_entry sender;
+        static struct thread_entry sender;
 
         if(*spp)
         {
