@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 
 #define ULONG unsigned long
 #define UCHAR unsigned char
@@ -194,7 +195,7 @@ void opcode_stg(char *stg, ULONG val, ULONG off)
 
   if(val & 0x2000000) // immidiate
 	{
-    off = (ULONG)((unsigned __int64)(val&0xff) << (32 - 2 * ((val >> 8) & 15))) | ((val&0xff) >> 2 * ((val >> 8) & 15));
+    off = (ULONG)((uint64_t)(val&0xff) << (32 - 2 * ((val >> 8) & 15))) | ((val&0xff) >> 2 * ((val >> 8) & 15));
     sprintf(op2, FRMT" ", off);
 	}
   else

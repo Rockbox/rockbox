@@ -10,7 +10,7 @@ ULONG isdata[1000000]; /* each bit defines one byte as: code=0, data=1 */
 
 extern void dis_asm(ULONG off, ULONG val, char *stg);
 
-void main(int argc, char **argv)
+int main(int argc, char **argv)
 {
   FILE   *in, *out;
   char   *ptr, stg[256];
@@ -20,7 +20,7 @@ void main(int argc, char **argv)
 
   if(argc == 1 || strcmp(argv[1], "--help") == 0)
   { printf("Usage: arm_disass [input file]\n");
-    printf(" disassembles input file to 'disasm.txt'");
+    printf(" disassembles input file to 'disasm.txt'\n");
     exit(-1);
   }
 
