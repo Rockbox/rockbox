@@ -202,6 +202,7 @@ cpu_init:
     ldr    sp, =irq_stack
     msr    cpsr_c, #0xdb /* IRQ/FIQ disabled */
     ldr    sp, =irq_stack
+
     /* Switch to supervisor mode */
     msr    cpsr_c, #0xd3
     ldr    sp, =stackend
@@ -246,6 +247,8 @@ cop_init:
     msr    cpsr_c, #0xdb /* IRQ/FIQ disabled */
     ldr    sp, =cop_irq_stack
 
+    /* Switch to supervisor mode */
+    msr    cpsr_c, #0xd3
     ldr    sp, =cop_stackend
     
     /* Run cop_main() in apps/main.c */
