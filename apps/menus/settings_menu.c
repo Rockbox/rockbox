@@ -343,7 +343,7 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #ifndef SIMULATOR
             &battery_menu,
 #endif
-#ifndef HAVE_MMC
+#if defined(HAVE_DIRCACHE) || !defined(HAVE_FLASH_STORAGE)
             &disk_menu,
 #endif
 #if CONFIG_RTC
