@@ -141,9 +141,4 @@
 #define MMAP3_LOGICAL    (*(volatile unsigned long *)(0xf000f018))
 #define MMAP3_PHYSICAL   (*(volatile unsigned long *)(0xf000f01c))
 
-/* FIXME: These are PP502x definitions, but without them, iPod 3rd gen
- * doesn't compile. The correct values for 3rd gen are not yet known. */
-#define DEV_INIT    (*(volatile unsigned long *)(0x70000020))
-#define INIT_USB    0x80000000
-
 #endif

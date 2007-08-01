@@ -86,27 +86,25 @@ void usb_init_device(void)
 
     udelay(0x186A0);
 
-
     dr_controller_setup();
+
+#if defined(IPOD_COLOR) || defined(IPOD_4G) \
+ || defined(IPOD_MINI)  || defined(IPOD_MINI2G)
+    /* GPIO C bit 1 is firewire detect */
+    GPIOC_ENABLE    |=  0x02;
+    GPIOC_OUTPUT_EN &= ~0x02;
+#endif
 }
 
 void usb_enable(bool on)
 {
     /* This device specific code will eventually give way to proper USB
-       handling, which should be the same for all PortalPlayer targets. */
+       handling, which should be the same for all PP502x targets. */
     if (on)
     {
 #if defined(IPOD_ARCH) || defined(IRIVER_H10) || defined (IRIVER_H10_5GB)
         /* For the H10 and iPod, we can only do one thing with USB mode - reboot
            into the flash-based disk-mode.  This does not return. */
-       
-        /* The following code is copied from ipodlinux */
-#if defined(IPOD_COLOR) || defined(IPOD_3G) || \
-    defined(IPOD_4G) || defined(IPOD_MINI)
-        unsigned char* storage_ptr = (unsigned char *)0x40017F00;
-#elif defined(IPOD_NANO) || defined(IPOD_VIDEO) || defined(IPOD_MINI2G)
-        unsigned char* storage_ptr = (unsigned char *)0x4001FF00;
-#endif
 
 #if defined(IRIVER_H10) || defined (IRIVER_H10_5GB)
         if(button_status()==BUTTON_RIGHT)
@@ -114,9 +112,15 @@ void usb_enable(bool on)
         {
             ata_sleepnow(); /* Immediately spindown the disk. */
             sleep(HZ*2);
-#ifdef IPOD_ARCH
-            memcpy(storage_ptr, "diskmode\0\0hotstuff\0\0\1", 21);
+
+#ifdef IPOD_ARCH  /* The following code is based on ipodlinux */
+#if CONFIG_CPU == PP5020
+            memcpy((void *)0x40017f00, "diskmode\0\0hotstuff\0\0\1", 21);
+#elif CONFIG_CPU == PP5022
+            memcpy((void *)0x4001ff00, "diskmode\0\0hotstuff\0\0\1", 21);
 #endif
+#endif
+
             system_reboot(); /* Reboot */
         }
 #endif
@@ -127,6 +131,13 @@ bool usb_detect(void)
 {
     static bool prev_usbstatus1 = false;
     bool usbstatus1,usbstatus2;
+
+#if defined(IPOD_COLOR) || defined(IPOD_4G) \
+ || defined(IPOD_MINI)  || defined(IPOD_MINI2G)
+    /* GPIO C bit 1 is firewire detect */
+    if (!(GPIOC_INPUT_VAL & 0x02))
+        return true;
+#endif
 
     /* UDC_ID should have the bit format:
         [31:24] = 0x0

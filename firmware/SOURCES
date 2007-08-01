@@ -382,7 +382,7 @@ target/arm/sandisk/sansa-e200/lcd-e200.c
 target/arm/sandisk/sansa-e200/lcd-as-e200.S
 target/arm/sandisk/sansa-e200/adc-e200.c
 target/arm/sandisk/sansa-e200/backlight-e200.c
-target/arm/usb-pp.c
+target/arm/usb-fw-pp502x.c
 target/arm/sandisk/sansa-e200/button-e200.c
 target/arm/sandisk/sansa-e200/power-e200.c
 target/arm/i2s-pp.c
@@ -497,7 +497,7 @@ target/arm/iriver/h10/backlight-h10.c
 target/arm/iriver/h10/button-h10.c
 target/arm/iriver/h10/lcd-h10_20gb.c
 target/arm/iriver/h10/power-h10.c
-target/arm/usb-pp.c
+target/arm/usb-fw-pp502x.c
 #endif /* SIMULATOR */
 #endif /* IRIVER_H10 */
 
@@ -512,7 +512,7 @@ target/arm/iriver/h10/backlight-h10.c
 target/arm/iriver/h10/button-h10.c
 target/arm/iriver/h10/lcd-h10_5gb.c
 target/arm/iriver/h10/power-h10.c
-target/arm/usb-pp.c
+target/arm/usb-fw-pp502x.c
 #endif /* SIMULATOR */
 #endif /* IRIVER_H10_5GB */
 
@@ -551,7 +551,7 @@ target/arm/tatung/tpj1022/backlight-tpj1022.c
 target/arm/tatung/tpj1022/button-tpj1022.c
 target/arm/tatung/tpj1022/lcd-tpj1022.c
 target/arm/tatung/tpj1022/power-tpj1022.c
-target/arm/usb-pp.c
+target/arm/usb-fw-pp502x.c
 #endif /* SIMULATOR */
 #endif /* ELIO_TPJ1022 */
 
@@ -567,7 +567,7 @@ target/arm/ipod/backlight-4g_color.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
-target/arm/usb-pp.c
+target/arm/usb-fw-pp502x.c
 #endif /* SIMULATOR */
 #endif /* IPOD_4G */
 
@@ -583,7 +583,7 @@ target/arm/ipod/backlight-4g_color.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/lcd-color_nano.c
 target/arm/ipod/power-ipod.c
-target/arm/usb-pp.c
+target/arm/usb-fw-pp502x.c
 #endif /* SIMULATOR */
 #endif /* IPOD_COLOR */
 
@@ -599,7 +599,7 @@ target/arm/ipod/backlight-nano_video.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/lcd-color_nano.c
 target/arm/ipod/power-ipod.c
-target/arm/usb-pp.c
+target/arm/usb-fw-pp502x.c
 #endif /* SIMULATOR */
 #endif /* IPOD_NANO */
 
@@ -615,7 +615,7 @@ target/arm/ipod/backlight-nano_video.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/video/lcd-video.c
-target/arm/usb-pp.c
+target/arm/usb-fw-pp502x.c
 #endif /* SIMULATOR */
 #endif /* IPOD_VIDEO */
 
@@ -630,7 +630,7 @@ target/arm/ipod/3g/backlight-3g.c
 target/arm/ipod/button-1g-3g.c
 target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
-target/arm/usb-pp.c
+target/arm/usb-fw-pp5002.c
 #endif /* SIMULATOR */
 #endif /* IPOD_3G */
 
@@ -644,6 +644,7 @@ target/arm/ipod/1g2g/backlight-1g2g.c
 target/arm/ipod/button-1g-3g.c
 target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
+target/arm/usb-fw-pp5002.c
 #endif /* SIMULATOR */
 #endif /* IPOD_1G2G */
 
@@ -659,7 +660,7 @@ target/arm/ipod/backlight-mini1g_mini2g.c
 target/arm/ipod/button-mini1g.c
 target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
-target/arm/usb-pp.c
+target/arm/usb-fw-pp502x.c
 #endif /* SIMULATOR */
 #endif /* IPOD_MINI */
 
@@ -675,7 +676,7 @@ target/arm/ipod/backlight-mini1g_mini2g.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
-target/arm/usb-pp.c
+target/arm/usb-fw-pp502x.c
 #endif /* SIMULATOR */
 #endif /* IPOD_MINI2G */
 
