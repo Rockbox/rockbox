@@ -64,7 +64,7 @@
 #include "misc.h"
 
 #ifdef BOOTFILE
-#ifndef USB_IPODSTYLE
+#if !defined(USB_NONE) && !defined(USB_IPODSTYLE)
 #include "textarea.h"
 #include "rolo.h"
 #include "yesno.h"
@@ -842,13 +842,13 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
                 scrobbler_flush_cache();
                 system_flush();
 #ifdef BOOTFILE
-#ifndef USB_IPODSTYLE
+#if !defined(USB_NONE) && !defined(USB_IPODSTYLE)
                 check_bootfile(false); /* gets initial size */
 #endif
 #endif
                 usb_screen();
 #ifdef BOOTFILE
-#ifndef USB_IPODSTYLE
+#if !defined(USB_NONE) && !defined(USB_IPODSTYLE)
                 check_bootfile(true);
 #endif
 #endif
@@ -944,7 +944,7 @@ int get_replaygain_mode(bool have_track_gain, bool have_album_gain)
 #endif
 
 #ifdef BOOTFILE
-#ifndef USB_IPODSTYLE
+#if !defined(USB_NONE) && !defined(USB_IPODSTYLE)
 /*
     memorize/compare details about the BOOTFILE
     we don't use dircache because it may not be up to date after
