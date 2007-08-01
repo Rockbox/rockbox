@@ -30,13 +30,13 @@
 #define IISFIFO_WR       (*(volatile unsigned long *)(0xc0002540))
 #define IISFIFO_RD       (*(volatile unsigned long *)(0xc0002580))
 
+#define IDE_BASE         0xc0003000
+
+#define IDE_CFG_STATUS   (*(volatile unsigned long *)(0xc0003024))
+
+#define USB_BASE         0xc0005000
+
 #define I2C_BASE         0xc0008000
-
-/* The PortalPlayer USB controller uses base address 0xc5000000 */
-#define USB_BASE         0xc5000000
-
-#define USB2D_IDENT      (*(volatile unsigned long *)(0xc5000000))
-#define USB_STATUS       (*(volatile unsigned long *)(0xc50001a4))
 
 #define GPIOA_ENABLE     (*(volatile unsigned char *)(0xcf000000))
 #define GPIOB_ENABLE     (*(volatile unsigned char *)(0xcf000004))

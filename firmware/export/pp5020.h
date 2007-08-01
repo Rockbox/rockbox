@@ -299,6 +299,8 @@
 #define I2C_BASE            0x7000c000
 
 /* EIDE Controller */
+#define IDE_BASE            0xc3000000
+
 #define IDE0_PRI_TIMING0    (*(volatile unsigned long*)(0xc3000000))
 #define IDE0_PRI_TIMING1    (*(volatile unsigned long*)(0xc3000004))
 #define IDE0_SEC_TIMING0    (*(volatile unsigned long*)(0xc3000008))
