@@ -30,6 +30,7 @@ void BootloaderInstaller::install(ProgressloggerInterface* dp)
     m_dp = dp;
     m_install = true;
     m_dp->addItem(tr("Starting bootloader installation"),LOGINFO);
+    connect(this, SIGNAL(done(bool)), this, SLOT(installEnded(bool)));
     
     if(m_bootloadermethod == "gigabeatf")
     {
@@ -82,6 +83,7 @@ void BootloaderInstaller::uninstall(ProgressloggerInterface* dp)
     m_dp = dp;
     m_install = false;
     m_dp->addItem(tr("Starting bootloader uninstallation"),LOGINFO);
+    connect(this, SIGNAL(done(bool)), this, SLOT(installEnded(bool)));
     
     if(m_bootloadermethod == "gigabeatf")
     {
@@ -168,6 +170,13 @@ void BootloaderInstaller::updateDataReadProgress(int read, int total)
     m_dp->setProgressMax(total);
     m_dp->setProgressValue(read);
     qDebug() << "progress:" << read << "/" << total;
+}
+
+
+void BootloaderInstaller::installEnded(bool error)
+{
+    (void) error;
+    m_dp->abort();
 }
 
 

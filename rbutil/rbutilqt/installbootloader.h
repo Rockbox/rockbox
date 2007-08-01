@@ -65,6 +65,7 @@ private slots:
     void updateDataReadProgress(int, int);
     void downloadDone(bool);
     void downloadRequestFinished(int, bool);
+    void installEnded(bool);
     
     // gigabeat specific routines
     void gigabeatPrepare();
