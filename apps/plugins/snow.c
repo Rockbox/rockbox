@@ -186,6 +186,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         return PLUGIN_OK;
     }
 #endif
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_clear_display();
+    rb->lcd_set_foreground(LCD_WHITE);
+    rb->lcd_set_background(LCD_DEFAULT_BG);
+#endif
     snow_init();
     while (1) {
         snow_move();
