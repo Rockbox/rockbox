@@ -30,8 +30,7 @@ void system_init(void)
 {
 }
 
-
- inline void dumpregs(void) 
+inline void dumpregs(void) 
 {
 	asm volatile ("mov %0,r0\n\t"
 				  "mov %1,r1\n\t"
@@ -77,7 +76,6 @@ void system_init(void)
 	//DEBUGF("CPSR=0x%x\t\n",regs.cpsr);
     
  }
-
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 

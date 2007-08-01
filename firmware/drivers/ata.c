@@ -30,6 +30,7 @@
 #include "string.h"
 #include "ata_idle_notify.h"
 #include "ata-target.h"
+#include "debug.h"
 
 #define SECTOR_SIZE     (512)
 
@@ -1175,7 +1176,6 @@ int ata_init(void)
             multisectors = 16;
 
         DEBUGF("ata: %d sectors per ata request\n",multisectors);
-
 #ifdef MAX_PHYS_SECTOR_SIZE
         /* Find out the physical sector size */
         if((identify_info[106] & 0xe000) == 0x6000)

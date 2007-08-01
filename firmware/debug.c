@@ -244,7 +244,9 @@ void debugf(const char *fmt, ...)
     vsnprintf(debugmembuf, sizeof(debugmembuf), fmt, ap);
     va_end(ap);
     //debug(debugmembuf);
-    lcd_puts(0,line++,debugmembuf);
+    line = (line + 1)%(LCD_HEIGHT/8);
+    lcd_puts(0,line,debugmembuf);
+    lcd_update();
 #else
     (void)fmt;
 #endif

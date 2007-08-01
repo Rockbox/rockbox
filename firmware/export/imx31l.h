@@ -99,6 +99,17 @@
 #define WDOG1_BASE_ADDR       WDOG_BASE_ADDR
 #define CRM_MCU_BASE_ADDR     CCM_BASE_ADDR
 
+/* ATA */
+#define TIME_OFF                (*(volatile unsigned char*)0x43F8C000)
+#define TIME_ON                 (*(volatile unsigned char*)0x43F8C001)
+#define TIME_1                  (*(volatile unsigned char*)0x43F8C002)
+#define TIME_2W                 (*(volatile unsigned char*)0x43F8C003)
+#define TIME_2R                 (*(volatile unsigned char*)0x43F8C004)
+#define TIME_AX                 (*(volatile unsigned char*)0x43F8C005)
+#define TIME_PIO_RDX            (*(volatile unsigned char*)0x43F8C00F)
+#define TIME_4                  (*(volatile unsigned char*)0x43F8C007)
+#define TIME_9                  (*(volatile unsigned char*)0x43F8C008)
+
 /* Timers */
 #define EPITCR1                 (*(volatile long*)EPIT1_BASE_ADDR)
 #define EPITSR1                 (*(volatile long*)(EPIT1_BASE_ADDR+0x04))
@@ -237,15 +248,16 @@
 #define L2_CACHE_CLEAN_INV_LINE_REG     0x7F0
 
 /* CCM */
-#define CLKCTL_CCMR                     0x00
-#define CLKCTL_PDR0                     0x04
-#define CLKCTL_PDR1                     0x08
-#define CLKCTL_PDR2                     0x64
-#define CLKCTL_RCSR                     0x0C
-#define CLKCTL_MPCTL                    0x10
-#define CLKCTL_UPCTL                    0x14
-#define CLKCTL_SPCTL                    0x18
-#define CLKCTL_COSR                     0x1C
+#define CLKCTL_CCMR                     (*(volatile long*)(CCM_BASE_ADDR+0x00))
+#define CLKCTL_PDR0                     (*(volatile long*)(CCM_BASE_ADDR+0x04))
+#define CLKCTL_PDR1                     (*(volatile long*)(CCM_BASE_ADDR+0x08))
+#define CLKCTL_PDR2                     (*(volatile long*)(CCM_BASE_ADDR+0x64))
+#define CLKCTL_RCSR                     (*(volatile long*)(CCM_BASE_ADDR+0x0C))
+#define CLKCTL_MPCTL                    (*(volatile long*)(CCM_BASE_ADDR+0x10))
+#define CLKCTL_UPCTL                    (*(volatile long*)(CCM_BASE_ADDR+0x14))
+#define CLKCTL_SPCTL                    (*(volatile long*)(CCM_BASE_ADDR+0x18))
+#define CLKCTL_COSR                     (*(volatile long*)(CCM_BASE_ADDR+0x1C))
+#define CLKCTL_PMCR0                    (*(volatile long*)(CCM_BASE_ADDR+0x5C))
 #define PLL_REF_CLK                     26000000
 
 /* WEIM - CS0 */

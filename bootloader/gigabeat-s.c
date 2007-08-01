@@ -50,11 +50,45 @@ char version[] = APPSVERSION;
 
 void main(void)
 {
-        printscreen(0xFA);
-        printf("Hello world!");
-        printf("Gigabeat S Rockbox Bootloader v.00000001");          
-        avic_init();
-		imx31_int[UART1].pInt_Handler();
-		for(;;) {}
+    lcd_clear_display();
+    printf("Hello world!");
+    printf("Gigabeat S Rockbox Bootloader v.00000001");          
+    kernel_init();
+    int rc;
+
+    rc = ata_init();
+    if(rc)
+    {
+        reset_screen();
+        error(EATA, rc);
+    }
+
+    disk_init();
+
+    rc = disk_mount_all();
+    if (rc<=0)
+    {
+        error(EDISK,rc);
+    }
+
+    printf("Congratulations!");
+    while(1);
+
+#if 0
+    printf("Loading firmware");
+
+    loadbuffer = (unsigned char*) 0x100;
+    buffer_size = (unsigned char*)0x400000 - loadbuffer;
+
+    rc = load_firmware(loadbuffer, BOOTFILE, buffer_size);
+    if(rc < 0)
+        error(EBOOTFILE, rc);
+
+    if (rc == EOK)
+    {
+        kernel_entry = (void*) loadbuffer;
+        rc = kernel_entry();
+    }
+#endif
 }
 

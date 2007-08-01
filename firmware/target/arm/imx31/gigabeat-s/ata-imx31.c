@@ -28,9 +28,6 @@
 #include "mmu-imx31.h"
 #include "backlight-target.h"
 
-#define INTERRUPT_PENDING (*(volatile long*)0x43F8C024)
-#define DMA_PENDING (1 << 3)
-#define CONTROLLER_IDLE (1 << 4)
 #define ATA_RST (1 << 6)
 
 void ata_reset(void)
@@ -52,23 +49,83 @@ bool ata_is_coldstart(void)
     return 0;
 }
 
+unsigned long get_pll(bool serial) {
+    unsigned long mfi, mfn, mfd, pdf, ref_clk;
+    unsigned long reg = 0, ccmr;
+    unsigned long long temp;
+    unsigned int prcs;
+
+    ccmr = CLKCTL_CCMR;
+    prcs = (ccmr & 0x6) >> 1;
+    if(prcs == 0x1) {
+        ref_clk = 32768 * 1024;
+    } else {
+        ref_clk = 27000000;
+    }
+
+    if(serial) {
+        reg = CLKCTL_SPCTL;
+    } else {
+        if((ccmr & 0x8) == 0)
+            return ref_clk;
+        if((ccmr & 0x80) != 0)
+            return ref_clk;
+        reg = CLKCTL_MPCTL;
+    }
+    pdf = (reg & (0x7 << 26)) >> 26;
+    mfd = (reg & (0x3FF << 16)) >> 16;
+    mfi = (reg & (0xF << 10)) >> 10;
+    mfi = (mfi <= 5) ? 5 : mfi;
+    mfn = (reg & 0x3FF);
+
+    if(mfn < 0x200) {
+        temp = (unsigned long long)2 *ref_clk * mfn;
+        temp /= (mfd + 1);
+        temp = (unsigned long long)2 *ref_clk * mfi + temp;
+        temp /= (pdf + 1);
+    } else {
+        temp = (unsigned long long)2 *ref_clk * (0x400 - mfn);
+        temp /= (mfd + 1);
+        temp = (unsigned long long)2 *ref_clk * mfi - temp;
+        temp /= (pdf + 1);
+
+    }
+    return (unsigned long)temp;
+}
+
+unsigned long get_ata_clock(void) {
+    unsigned long pll, ret_val, hclk, max_pdf, ipg_pdf, mcu_pdf;
+
+    max_pdf = (CLKCTL_PDR0 & (0x7 << 3)) >> 3;
+    ipg_pdf = (CLKCTL_PDR0 & (0x3 << 6)) >> 6;
+    mcu_pdf = (CLKCTL_PDR0 & 0x7);
+    if((CLKCTL_PMCR0 & 0xC0000000 ) == 0) {
+        pll = get_pll(true);
+    } else {
+        pll = get_pll(false);
+    }
+    hclk = pll/(max_pdf + 1);
+    ret_val = hclk / (ipg_pdf + 1);
+
+    return ret_val;
+}
+
 void ata_device_init(void)
 {
-    bool reassert_dma_pending = false;
+    ATA_CONTROL |= ATA_RST; /* Make sure we're not in reset mode */
 
-    if(ATA_CONTROL & DMA_PENDING)
-        reassert_dma_pending = true;
-    ATA_CONTROL &= ~DMA_PENDING;
-    while(!(INTERRUPT_PENDING & CONTROLLER_IDLE))
-        sleep(1);
     /* Setup the timing for PIO mode */
-    /* TODO */
+    int T = 1000 * 1000 * 1000 / get_ata_clock();
+    TIME_OFF = 3;
+    TIME_ON = 3;
 
-    /* If DMA_PENDING was set before we changed the timings
-     * we need to reset it, otherwise a DMA read will fail */
-    if(reassert_dma_pending)
-        ATA_CONTROL |= DMA_PENDING;
-    
+    TIME_1 = (T + 70)/T;
+    TIME_2W = (T + 290)/T;
+    TIME_2R = (T + 290)/T;
+    TIME_AX = (T + 50)/T;
+    TIME_PIO_RDX = 1;
+    TIME_4 = (T + 30)/T;
+    TIME_9 = (T + 20)/T;
 }
 
 #if !defined(BOOTLOADER)
