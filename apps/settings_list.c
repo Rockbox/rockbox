@@ -622,7 +622,7 @@ const struct settings_list settings[] = {
         ff_rewind_min_step_getlang, NULL),        
     INT_SETTING(0, ff_rewind_accel, LANG_FFRW_ACCEL, 3, "scan accel",
         UNIT_SEC, 16, 0, -1, scanaccel_formatter, scanaccel_getlang, NULL), 
-#if CONFIG_CODEC == SWCODEC
+#if (CONFIG_CODEC == SWCODEC) && !defined(HAVE_FLASH_STORAGE)
     STRINGCHOICE_SETTING(0, buffer_margin, LANG_MP3BUFFER_MARGIN, 0,"antiskip",
         "5s,15s,30s,1min,2min,3min,5min,10min",NULL, 8,
         TALK_ID(5, UNIT_SEC), TALK_ID(15, UNIT_SEC),
