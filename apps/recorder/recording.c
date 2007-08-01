@@ -604,20 +604,49 @@ static bool check_dir(char *folder)
 char *rec_create_filename(char *buffer)
 {
     char ext[16];
+    char pref[9];
     strcpy(buffer,global_settings.rec_directory);
     if (!check_dir(buffer))
         return NULL;
+
+    switch(global_settings.rec_source)
+    {
+#ifdef HAVE_MIC_IN        
+    case AUDIO_SRC_MIC:
+        snprintf(pref, 9, "R_MIC_");
+        break;
+#endif    
+#ifdef HAVE_LINE_REC
+    case AUDIO_SRC_LINEIN:
+        snprintf(pref, 9, "R_LINE_");
+        break;
+#endif        
+#ifdef HAVE_FMRADIO_REC
+    case AUDIO_SRC_FMRADIO:
+        snprintf(pref, 9, "R_FM_");
+        break;
+#endif        
+#ifdef HAVE_SPDIF_IN
+    case AUDIO_SRC_SPDIF:
+        snprintf(pref, 9, "R_SPDIF_");
+        break;
+#endif        
+    default:
+        /* this should never happen */
+        snprintf(pref, 9, "R_");
+        break;
+    }
     
     snprintf(ext, sizeof(ext), ".%s",
              REC_FILE_ENDING(global_settings.rec_format));
 
 #if CONFIG_RTC == 0
-    return create_numbered_filename(buffer, buffer, "rec_", ext, 4,
+    return create_numbered_filename(buffer, buffer, pref, ext, 4,
                                     &file_number);
 #else
     /* We'll wait at least up to the start of the next second so no duplicate
        names are created */
-    return create_datetime_filename(buffer, buffer, "R", ext, true);
+    return create_datetime_filename(buffer, buffer, pref, ext, true);
 #endif
 }
 
