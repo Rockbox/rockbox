@@ -32,26 +32,29 @@ start:
  *
  */
 #if CONFIG_CPU == PP5002
-    .equ    PROC_ID,  0xc4000000
-    .equ    COP_CTRL, 0xcf004058
+    .equ    PROC_ID,    0xc4000000
+    .equ    CPU_ICLR,   0xcf001028
+    .equ    COP_ICLR,   0xcf001038
+    .equ    COP_CTRL,   0xcf004058
     .equ    COP_STATUS, 0xcf004050
     .equ    IIS_CONFIG, 0xc0002500
-    .equ    SLEEP,    0xca
-    .equ    WAKE,     0xce
-    .equ    SLEEPING, 0x4000
+    .equ    SLEEP,      0x000000ca
+    .equ    WAKE,       0x000000ce
+    .equ    SLEEPING,   0x00004000
 #else
-    .equ    PROC_ID,  0x60000000
-    .equ    COP_CTRL, 0x60007004
+    .equ    PROC_ID,    0x60000000
+    .equ    CPU_ICLR,   0x60004028
+    .equ    COP_ICLR,   0x60004038
+    .equ    COP_CTRL,   0x60007004
     .equ    COP_STATUS, 0x60007004
     .equ    IIS_CONFIG, 0x70002800
-    .equ    SLEEP,    0x80000000
-    .equ    WAKE,     0x0
-    .equ    SLEEPING, 0x80000000
+    .equ    SLEEP,      0x80000000
+    .equ    WAKE,       0x00000000
+    .equ    SLEEPING,   0x80000000
     .equ    CACHE_CTRL, 0x6000c000
 #endif
 
-    msr    cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ */
-
+    msr    cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
     b      pad_skip
 
 .space 60*4 /* (more than enough) space for exception vectors and mi4 magic */
@@ -110,25 +113,28 @@ remap_end:
 
     /* Find out which processor we are */
     ldr    r0, =PROC_ID
-    ldr    r0, [r0]
-    and    r0, r0, #0xff
+    ldrb   r0, [r0]
     cmp    r0, #0x55
-    beq    cpu_init
+
+    /* Mask all interrupt sources before setting up modes */
+    ldreq  r0, =CPU_ICLR
+    ldrne  r0, =COP_ICLR    
+    mvn    r1, #1
+    str    r1, [r0]    
     
     /* put us (co-processor) to sleep */
-    ldr    r4, =COP_CTRL
-    mov    r3, #SLEEP
-    str    r3, [r4]
+    ldrne  r4, =COP_CTRL
+    movne  r3, #SLEEP
+    strne  r3, [r4]
 
-    ldr    pc, =cop_init
-
+    ldrne  pc, =cop_init
 
 cpu_init:
     /* Wait for COP to be sleeping */
     ldr    r4, =COP_STATUS
 1:
     ldr    r3, [r4]
-    ands   r3, r3, #SLEEPING
+    tst    r3, #SLEEPING
     beq    1b
     
     /* Copy exception handler code to address 0 */
@@ -180,10 +186,10 @@ cpu_init:
     bhi    1b
     
     /* Set up stack for IRQ mode */ 
-    msr    cpsr_c, #0xd2
+    msr    cpsr_c, #0x92 /* IRQ disabled, FIQ enabled */
     ldr    sp, =irq_stack
     /* Set up stack for FIQ mode */ 
-    msr    cpsr_c, #0xd1
+    msr    cpsr_c, #0xd1 /* IRQ/FIQ disabled */
     ldr    sp, =fiq_stack
     /* We'll load the banked FIQ mode registers with useful values here.
        These values will be used in the FIQ handler in pcm_playback.c */
@@ -192,9 +198,9 @@ cpu_init:
     ldr    r11, =p
 
     /* Let abort and undefined modes use IRQ stack */
-    msr    cpsr_c, #0xd7
+    msr    cpsr_c, #0xd7 /* IRQ/FIQ disabled */
     ldr    sp, =irq_stack
-    msr    cpsr_c, #0xdb
+    msr    cpsr_c, #0xdb /* IRQ/FIQ disabled */
     ldr    sp, =irq_stack
     /* Switch to supervisor mode */
     msr    cpsr_c, #0xd3
@@ -228,16 +234,16 @@ cop_init:
     bhi    2b
 
     /* Set up stack for IRQ mode */
-    msr    cpsr_c, #0xd2
+    msr    cpsr_c, #0x92 /* IRQ disabled, FIQ enabled */
     ldr    sp, =cop_irq_stack
     /* Set up stack for FIQ mode */
-    msr    cpsr_c, #0xd1
-    ldr    sp, =fiq_stack
+    msr    cpsr_c, #0xd1 /* IRQ/FIQ disabled */
+    ldr    sp, =cop_fiq_stack
 
     /* Let abort and undefined modes use IRQ stack */
-    msr    cpsr_c, #0xd7
+    msr    cpsr_c, #0xd7 /* IRQ/FIQ disabled */
     ldr    sp, =cop_irq_stack
-    msr    cpsr_c, #0xdb
+    msr    cpsr_c, #0xdb /* IRQ/FIQ disabled */
     ldr    sp, =cop_irq_stack
 
     ldr    sp, =cop_stackend
@@ -266,13 +272,12 @@ vectors:
     .word  data_abort_handler
     .word  reserved_handler
     .word  irq_handler
-    .word  fiq_handler
+    .word  0 /* fiq handler set in pcm driver */
 
     .text
 
 #ifndef STUB
     .global irq
-    .global fiq
     .global UIE
 #endif
 
@@ -297,11 +302,6 @@ prefetch_abort_handler:
     sub    r0, lr, #4
     mov    r1, #1
     b      UIE
-
-fiq_handler:
-    @ Branch straight to FIQ handler in pcm_playback.c. This also handles the
-    @ the correct return sequence.
-    ldr    pc, =fiq
 
 data_abort_handler:
     sub    r0, lr, #8 
@@ -332,3 +332,10 @@ cop_irq_stack:
 /* 256 words of FIQ stack */
     .space 256*4
 fiq_stack:
+
+/* We'll need this soon - just reserve the symbol */
+#if 0
+/* 256 words of COP FIQ stack */
+    .space 256*4
+#endif
+cop_fiq_stack:
