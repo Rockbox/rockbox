@@ -246,7 +246,10 @@ void bounce(struct pong *p, int pad, int info)
 
 void score(struct pong *p, int pad)
 {
-    rb->splash(HZ/4, "%s scores!", pad?"right":"left");
+    if(pad)
+        rb->splash(HZ/4, "right scores!");
+    else
+        rb->splash(HZ/4, "left scores!");
     rb->lcd_clear_display();
     p->score[pad]++;
 
