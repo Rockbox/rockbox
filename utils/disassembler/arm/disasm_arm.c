@@ -2,8 +2,8 @@
 #include <string.h>
 #include <stdint.h>
 
-#define ULONG unsigned long
-#define UCHAR unsigned char
+#define ULONG uint32_t
+#define UCHAR uint8_t
 
 #define FRMT     "0x%x"       // "0x%x"
 #define SHFTFRMC "%s %s #%d"  // "%s %s %d"
@@ -162,7 +162,7 @@ void halfword_stg(char *stg, ULONG val)
 
 void branch_stg(char *stg, ULONG val, ULONG pos)
 {
-  ULONG off = pos + ((int)val*256) / 64 + 8;
+  ULONG off = pos + (((int32_t)val << 8) >> 6) + 8;
 
   if((val & 0x0ffffff0) == 0x012fff10) // bx instruction
   { sprintf(stg+strlen(stg), "bx%s	%s", cond[val>>28], regs[val&15]); }
@@ -226,7 +226,7 @@ void opcode_stg(char *stg, ULONG val, ULONG off)
              { sprintf(st, "msr%s	%s, %s", cnd1[val>>28], val&0x400000?"SPSR_xx":"CPSR", regs[val&15]); }
              else
              if((((val>>23) & 31) == 6) && ((val & 0x30f000) == 0x20f000))
-             { sprintf(st, "msr%s	%s, 0x%x", cnd1[val>>28], val&0x400000?"SPSR_xx":"CPSR_cf", op2); }
+             { sprintf(st, "msr%s	%s, %s", cnd1[val>>28], val&0x400000?"SPSR_xx":"CPSR_cf", op2); }
              else
              if((((val>>23) & 31) == 2) && ((val & 0x300ff0) == 0x000090))
              { sprintf(st, "swp%s%s	%s, %s, [%s]", val&0x400000?"b":"", cnd1[val>>28], regs[(val>>12)&15], regs[val&15], regs[(val>>16)&15]); }
@@ -254,14 +254,15 @@ void single_data(char *stg, ULONG val)
     if(val & 0x100000) sprintf(stg+strlen(stg), "ldr%s	", cnd1[val>>28]);
     else               sprintf(stg+strlen(stg), "str%s	", cnd1[val>>28]);
 
-  if(val & 0x2000000) // reg offset
+  if(val & 0x2000000) {// reg offset
     if(val & 16) // shift type
       sprintf(op2, "error: reg defined shift");
-    else
+    else 
       if((val>>7) & 31)
         sprintf(op2, SHFTFRMC, regs[val&15], shfts[(val>>5)&3], (val>>7) & 31);
       else
         sprintf(op2, "%s", regs[val&15]);
+  }
 
   if(val & 0x2000000) // reg offset
     if(val & 0x1000000) // pre index

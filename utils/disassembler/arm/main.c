@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
 
-#define ULONG  unsigned long
-#define USHORT unsigned short
-#define UCHAR  unsigned char
+#define ULONG  uint32_t
+#define USHORT uint16_t
+#define UCHAR  uint8_t
 
 ULONG isdata[1000000]; /* each bit defines one byte as: code=0, data=1 */
 
@@ -115,4 +116,5 @@ int main(int argc, char **argv)
   }
 
   fclose(in);
+  return 0;
 }
