@@ -658,7 +658,9 @@ void settings_apply(void)
     DEBUGF( "settings_apply()\n" );
     sound_settings_apply();
 
+#ifndef HAVE_FLASH_STORAGE
     audio_set_buffer_margin(global_settings.buffer_margin);
+#endif
 
 #ifdef HAVE_LCD_CONTRAST
     lcd_set_contrast(global_settings.contrast);
@@ -702,7 +704,9 @@ void settings_apply(void)
 #ifdef HAVE_BUTTON_LIGHT
     button_backlight_set_timeout(global_settings.button_light_timeout);
 #endif
+#ifndef HAVE_FLASH_STORAGE
     ata_spindown(global_settings.disk_spindown);
+#endif
 #if (CONFIG_CODEC == MAS3507D) && !defined(SIMULATOR)
     dac_line_in(global_settings.line_in);
 #endif

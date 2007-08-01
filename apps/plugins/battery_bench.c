@@ -188,15 +188,17 @@ void thread(void)
 #if  CONFIG_CHARGING || defined(HAVE_USB_POWER) 
     unsigned int last_state = 0;
 #endif    
-    long sleep_time;
+    long sleep_time = 5 * HZ;
     
     struct event ev;
 
     buffelements = sizeof(bat)/sizeof(struct batt_info);
 
-    sleep_time = (rb->global_settings->disk_spindown > 1) ?
-        (rb->global_settings->disk_spindown - 1) * HZ : 5 * HZ;
-    
+#ifndef HAVE_FLASH_STORAGE
+    if(rb->global_settings->disk_spindown > 1)
+        sleep_time = (rb->global_settings->disk_spindown - 1) * HZ;
+#endif
+
     do
     {
         if(!in_usb_mode && got_info && 

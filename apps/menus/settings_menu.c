@@ -160,8 +160,9 @@ MAKE_MENU(battery_menu, ID2P(LANG_BATTERY_MENU), 0, Icon_NOICON,
          );
 #endif /* SIMULATOR */
 /* Disk */
-#ifndef HAVE_MMC
+#ifndef HAVE_FLASH_STORAGE
 MENUITEM_SETTING(disk_spindown, &global_settings.disk_spindown, NULL);
+#endif
 #ifdef HAVE_DIRCACHE
 static int dircache_callback(int action,const struct menu_item_ex *this_item)
 {
@@ -186,8 +187,11 @@ static int dircache_callback(int action,const struct menu_item_ex *this_item)
 }
 MENUITEM_SETTING(dircache, &global_settings.dircache, dircache_callback);
 #endif
+#if defined(HAVE_DIRCACHE) || !defined(HAVE_FLASH_STORAGE)
 MAKE_MENU(disk_menu, ID2P(LANG_DISK_MENU), 0, Icon_NOICON,
+#ifndef HAVE_FLASH_STORAGE
           &disk_spindown,
+#endif
 #ifdef HAVE_DIRCACHE
             &dircache,
 #endif

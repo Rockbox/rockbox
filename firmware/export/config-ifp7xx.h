@@ -57,6 +57,9 @@
 #define MAX_CONTRAST_SETTING        63
 #define DEFAULT_CONTRAST_SETTING    40
 
+/* define this if you have a flash memory storage */
+#define HAVE_FLASH_STORAGE
+
 #ifndef SIMULATOR
 
 /* Define this if you have a Philips PNX0101 */

@@ -84,6 +84,9 @@
 
 #define BATTERY_CAPACITY_DEFAULT 750    /* default battery capacity */
 
+/* define this if you have a flash memory storage */
+#define HAVE_FLASH_STORAGE
+
 /** Non-simulator section **/
 #ifndef SIMULATOR
 

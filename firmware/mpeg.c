@@ -158,7 +158,7 @@ static int last_dma_tick = 0;
 static int last_dma_chunk_size;
 
 static long low_watermark;          /* Dynamic low watermark level */
-static long low_watermark_margin;   /* Extra time in seconds for watermark */
+static long low_watermark_margin = 0;   /* Extra time in seconds for watermark */
 static long lowest_watermark_level; /* Debug value to observe the buffer
                                        usage */
 #if CONFIG_CODEC == MAS3587F
@@ -592,10 +592,12 @@ static void recalculate_watermark(int bitrate)
     }
 }
 
+#ifndef HAVE_FLASH_STORAGE
 void audio_set_buffer_margin(int seconds)
 {
     low_watermark_margin = seconds;
 }
+#endif
 
 void audio_get_debugdata(struct audio_debug *dbgdata)
 {

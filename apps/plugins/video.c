@@ -650,8 +650,11 @@ int PlayTick(int fd)
                              * gFileHdr.bps_peak / 8 / HZ;
         }
 
-        if (!gPlay.bRefilling 
-            && rb->global_settings->disk_spindown < 20) /* condition for test only */
+        if (!gPlay.bRefilling
+#ifndef HAVE_FLASH_STORAGE
+            && rb->global_settings->disk_spindown < 20  /* condition for test only */
+#endif
+            )
         {
             rb->ata_sleep(); /* no point in leaving the disk run til timeout */
             gPlay.bDiskSleep = true;

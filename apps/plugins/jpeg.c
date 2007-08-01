@@ -2541,7 +2541,7 @@ int show_menu(void) /* return 1 to quit */
             break;
     }
 
-#ifndef SIMULATOR
+#if !defined(SIMULATOR) && !defined(HAVE_FLASH_STORAGE)
     /* change ata spindown time based on slideshow time setting */
     immediate_ata_off = false;
     rb->ata_spindown(rb->global_settings->disk_spindown);
@@ -3325,7 +3325,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
 #endif
 
-#ifndef SIMULATOR
+#if !defined(SIMULATOR) && !defined(HAVE_FLASH_STORAGE)
     /* set back ata spindown time in case we changed it */
     rb->ata_spindown(rb->global_settings->disk_spindown);
 #endif

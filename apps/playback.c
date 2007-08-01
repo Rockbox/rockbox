@@ -792,6 +792,7 @@ int audio_get_file_pos(void)
     return 0;
 }
 
+#ifndef HAVE_FLASH_STORAGE
 void audio_set_buffer_margin(int setting)
 {
     static const int lookup[] = {5, 15, 30, 60, 120, 180, 300, 600};
@@ -799,6 +800,7 @@ void audio_set_buffer_margin(int setting)
     logf("buffer margin: %ld", buffer_margin);
     set_filebuf_watermark(buffer_margin);
 }
+#endif
 
 /* Take nescessary steps to enable or disable the crossfade setting */
 void audio_set_crossfade(int enable)
@@ -3839,5 +3841,8 @@ void audio_init(void)
 #ifdef HAVE_WM8758
     eq_hw_enable(global_settings.eq_hw_enabled);
 #endif
+#ifndef HAVE_FLASH_STORAGE 
     audio_set_buffer_margin(global_settings.buffer_margin);
+#endif
 } /* audio_init */
+

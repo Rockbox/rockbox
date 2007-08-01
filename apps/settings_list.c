@@ -628,15 +628,15 @@ const struct settings_list settings[] = {
         TALK_ID(5, UNIT_SEC), TALK_ID(15, UNIT_SEC),
         TALK_ID(30, UNIT_SEC), TALK_ID(1, UNIT_MIN), TALK_ID(2, UNIT_MIN),
         TALK_ID(3, UNIT_MIN), TALK_ID(5, UNIT_MIN), TALK_ID(10, UNIT_MIN)),
-#else
+#elif !defined(HAVE_FLASH_STORAGE)
     INT_SETTING(0, buffer_margin, LANG_MP3BUFFER_MARGIN, 0, "antiskip",
                     UNIT_SEC, 0, 7, 1, NULL, NULL, audio_set_buffer_margin),
 #endif
     /* disk */
-#ifndef HAVE_MMC
+#ifndef HAVE_FLASH_STORAGE
     INT_SETTING(0, disk_spindown, LANG_SPINDOWN, 5, "disk spindown",
                     UNIT_SEC, 3, 254, 1, NULL, NULL, ata_spindown),
-#endif /* HAVE_MMC */
+#endif /* HAVE_FLASH_STORAGE */
     /* browser */
     CHOICE_SETTING(0, dirfilter, LANG_FILTER, SHOW_SUPPORTED, "show files",
         "all,supported,music,playlists", NULL, 4, ID2P(LANG_FILTER_ALL),

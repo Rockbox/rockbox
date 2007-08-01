@@ -70,6 +70,9 @@
 /* We can fade the backlight by using PWM */
 #define HAVE_BACKLIGHT_PWM_FADING
 
+/* define this if you have a flash memory storage */
+#define HAVE_FLASH_STORAGE
+
 #ifndef SIMULATOR
 
 /* Define this if you have a PortalPlayer PP5022 */
