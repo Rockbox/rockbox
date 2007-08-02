@@ -70,9 +70,8 @@ static int write_cfile(unsigned char* buf, off_t len, char* cname)
     return 0;
 }
 
-static int write_hfile(unsigned char* buf, off_t len, char* cname)
+static int write_hfile(off_t len, char* cname)
 {
-    (void)buf;
     char filename[256];
     FILE* fp;
 
@@ -126,7 +125,7 @@ int main (int argc, char* argv[])
     if (write_cfile(buf,len,cname) < 0) {
         return -1;
     }
-    if (write_hfile(buf,len,cname) < 0) {
+    if (write_hfile(len,cname) < 0) {
         return -1;
     }
 
