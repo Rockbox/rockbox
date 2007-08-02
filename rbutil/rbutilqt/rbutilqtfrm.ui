@@ -119,6 +119,9 @@ p, li { white-space: pre-wrap; }
          <property name="text" >
           <string>&amp;Change</string>
          </property>
+         <property name="icon" >
+          <iconset resource="rbutilqt.qrc" >:/icons/icons/edit-find.png</iconset>
+         </property>
         </widget>
        </item>
       </layout>

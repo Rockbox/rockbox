@@ -253,7 +253,6 @@ void RbUtilQt::install()
     else if(userSettings->value("defaults/proxytype") == "system")
         installWindow->setProxy(QUrl(getenv("http_proxy")));
 #endif
-    installWindow->setMountPoint(userSettings->value("defaults/mountpoint").toString());
 
     buildInfo.open();
     QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);

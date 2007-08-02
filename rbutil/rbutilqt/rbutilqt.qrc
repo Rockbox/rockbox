@@ -9,8 +9,11 @@
         <file>icons/dialog-information.png</file>
         <file>icons/dialog-warning.png</file>
         <file>icons/doom_btn.png</file>
+        <file>icons/edit-find.png</file>
         <file>icons/font_btn.png</file>
         <file>icons/go-next.png</file>
+        <file>icons/network-idle.png</file>
+        <file>icons/preferences-desktop-locale.png</file>
         <file>icons/process-stop.png</file>
         <file>icons/rbinstall_btn.png</file>
         <file>icons/rblogo.xpm</file>
@@ -24,5 +27,4 @@
     <qresource prefix="/ini" >
         <file>rbutil.ini</file>
     </qresource>
-    <qresource prefix="/lang" />
 </RCC>

@@ -62,6 +62,9 @@
       <attribute name="title" >
        <string>&amp;Device</string>
       </attribute>
+      <attribute name="icon" >
+       <iconset resource="rbutilqt.qrc" >:/icons/icons/rbutil.xpm</iconset>
+      </attribute>
       <layout class="QGridLayout" >
        <item row="0" column="0" >
         <widget class="QLabel" name="labelMountPoint" >
@@ -127,6 +130,9 @@
          <property name="text" >
           <string>&amp;Autodetect</string>
          </property>
+         <property name="icon" >
+          <iconset resource="rbutilqt.qrc" >:/icons/icons/edit-find.png</iconset>
+         </property>
         </widget>
        </item>
       </layout>
@@ -134,6 +140,9 @@
      <widget class="QWidget" name="tabProxy" >
       <attribute name="title" >
        <string>&amp;Proxy</string>
+      </attribute>
+      <attribute name="icon" >
+       <iconset resource="rbutilqt.qrc" >:/icons/icons/network-idle.png</iconset>
       </attribute>
       <layout class="QGridLayout" >
        <item row="0" column="0" >
@@ -247,6 +256,9 @@
      <widget class="QWidget" name="tabLanguage" >
       <attribute name="title" >
        <string>&amp;Language</string>
+      </attribute>
+      <attribute name="icon" >
+       <iconset resource="rbutilqt.qrc" >:/icons/icons/preferences-desktop-locale.png</iconset>
       </attribute>
       <layout class="QGridLayout" >
        <item row="0" column="0" >

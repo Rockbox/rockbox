@@ -28,7 +28,6 @@ Install::Install(QWidget *parent) : QDialog(parent)
     connect(ui.radioStable, SIGNAL(toggled(bool)), this, SLOT(setDetailsStable(bool)));
     connect(ui.radioCurrent, SIGNAL(toggled(bool)), this, SLOT(setDetailsCurrent(bool)));
     connect(ui.radioArchived, SIGNAL(toggled(bool)), this, SLOT(setDetailsArchived(bool)));
-    connect(ui.buttonBrowse, SIGNAL(clicked()), this, SLOT(browseFolder()));
 }
 
 
@@ -68,43 +67,14 @@ void Install::setProxy(QUrl proxy_url)
 }
 
 
-void Install::setMountPoint(QString mount)
-{
-    QFileInfo m(mount);
-    if(m.isDir())
-        ui.lineMountPoint->setText(mount);
-}
-
-
-void Install::browseFolder()
-{
-    QFileDialog browser(this);
-    if(QFileInfo(ui.lineMountPoint->text()).isDir())
-        browser.setDirectory(ui.lineMountPoint->text());
-    else
-        browser.setDirectory("/media");
-    browser.setReadOnly(true);
-    browser.setFileMode(QFileDialog::DirectoryOnly);
-    browser.setAcceptMode(QFileDialog::AcceptOpen);
-    if(browser.exec()) {
-        qDebug() << browser.directory();
-        QStringList files = browser.selectedFiles();
-        setMountPoint(files.at(0));
-    }
-}
-
-
 void Install::accept()
 {
     logger = new ProgressLoggerGui(this);
     logger->show();
-   
+    QString mountPoint = userSettings->value("defaults/mountpoint").toString();
+    qDebug() << "mountpoint:" << userSettings->value("defaults/mountpoint").toString();
     // show dialog with error if mount point is wrong
-    if(QFileInfo(ui.lineMountPoint->text()).isDir()) {
-        mountPoint = ui.lineMountPoint->text();
-        userSettings->setValue("defaults/mountpoint", mountPoint);
-    }
-    else {
+    if(!QFileInfo(mountPoint).isDir()) {
         logger->addItem(tr("Mount point is wrong!"),LOGERROR);
         logger->abort();
         return;
@@ -147,7 +117,7 @@ void Install::accept()
     installer->setMountPoint(mountPoint);
     installer->install(logger);
     
-    connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));    
+    connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));
   
 }
 

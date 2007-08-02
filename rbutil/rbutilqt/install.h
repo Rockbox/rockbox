@@ -35,7 +35,6 @@ class Install : public QDialog
         Install(QWidget *parent = 0);
         void setProxy(QUrl);
         void setReleased(QString);
-        void setMountPoint(QString);
         void setUserSettings(QSettings*);
         void setDeviceSettings(QSettings*);
         void setArchivedString(QString);
@@ -54,13 +53,11 @@ class Install : public QDialog
         QFile *target;
         QString file;
         QString fileName;
-        QString mountPoint;
         QString archived;
         ZipInstaller* installer;
 
     private slots:
         void setCached(bool);
-        void browseFolder(void);
         void setDetailsCurrent(bool);
         void setDetailsStable(bool);
         void setDetailsArchived(bool);
