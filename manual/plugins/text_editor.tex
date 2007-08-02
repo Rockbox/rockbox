@@ -8,7 +8,7 @@ If you start the Text Editor from the plugin browser you will be greeted with
 a blank screen. When started from the \setting{Open with} menu item your file 
 should be shown on the screen. You can now edit the file.
 The Text Editor is line based. This means you can edit one line at a time using
-the virtual keyboard.
+the \setting{Virtual Keyboard} (see \reference{sec:virtual_keyboard}).
 
 \begin{itemize}
   \item Move the selection bar to the line you want to edit.
@@ -20,18 +20,10 @@ the virtual keyboard.
 
 \begin{table}
     \begin{btnmap}{}{}
-    \opt{RECORDER_PAD}{\ButtonPlay}\opt{ONDIO_PAD}{\ButtonMenu}
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD}{\ButtonSelect} 
-    & Edit Line / Select Character\\
-    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonMenu}\opt{IAUDIO_X5_PAD}{\ButtonPower} 
-    & Exit / Abort Editing\\
-    \opt{RECORDER_PAD}{\ButtonFOne}\opt{ONDIO_PAD}{Hold \ButtonMenu}
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}\opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
-    \opt{IAUDIO_X5_PAD}{\ButtonPlay} 
-    & Show Item Menu / Accept Line\\
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec & Delete Line / Delete Character\\}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonLeft & Delete Line / Delete Character\\}
+    \ActionStdOk & Edit Line / Select Character\\
+    \ActionStdCancel & Exit / Abort Editing\\
+    \ActionStdMenu & Show Item Menu\\
+    \ActionStdContext & Delete Line\\
     \end{btnmap}
 \end{table}
 
