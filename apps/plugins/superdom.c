@@ -73,11 +73,13 @@ char buf[255];
 #define NUM_MARGIN_X (LCD_WIDTH-3*NUM_BOX_WIDTH)/2
 #define NUM_MARGIN_Y (LCD_HEIGHT-4*NUM_BOX_HEIGHT)/2
 
-#if CONFIG_KEYPAD == IPOD_4G_PAD
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define SUPERDOM_OK BUTTON_SELECT
 #define SUPERDOM_CANCEL BUTTON_MENU
 #define SUPERDOM_LEFT BUTTON_LEFT
 #define SUPERDOM_RIGHT BUTTON_RIGHT
+#define IPOD_STYLE
 
 #elif CONFIG_KEYPAD == IRIVER_H300_PAD || CONFIG_KEYPAD == IRIVER_H100_PAD
 #define SUPERDOM_OK BUTTON_SELECT
@@ -816,7 +818,7 @@ int get_number(char* param, int* value) {
                                 NUM_BOX_WIDTH+1, NUM_BOX_HEIGHT+1);
                 rb->lcd_set_drawmode(DRMODE_SOLID);
                 if(x==0) {
-#if CONFIG_KEYPAD == IPOD_4G_PAD
+#ifdef IPOD_STYLE
                     if(y>0)
                         y--;
                     else
@@ -839,7 +841,7 @@ int get_number(char* param, int* value) {
                                 NUM_BOX_WIDTH+1, NUM_BOX_HEIGHT+1);
                 rb->lcd_set_drawmode(DRMODE_SOLID);
                 if(x==2) {
-#if CONFIG_KEYPAD == IPOD_4G_PAD
+#ifdef IPOD_STYLE
                     if(y==3)
                         y=0;
                     else
@@ -856,7 +858,7 @@ int get_number(char* param, int* value) {
                 rb->lcd_set_drawmode(DRMODE_SOLID);
                 break;
 #endif
-#if CONFIG_KEYPAD != IPOD_4G_PAD
+#ifndef IPOD_STYLE
             case SUPERDOM_UP:
                 rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
                 rb->lcd_fillrect(NUM_MARGIN_X+(NUM_BOX_WIDTH*x), 
@@ -1475,7 +1477,7 @@ int select_square(void) {
                 if(cursor.x>1) {
                     cursor.x--;
                 } else {
-#if CONFIG_KEYPAD == IPOD_4G_PAD
+#ifdef IPOD_STYLE
                     if(cursor.y>1)
                         cursor.y--;
                     else
@@ -1492,7 +1494,7 @@ int select_square(void) {
                 if(cursor.x<10) {
                     cursor.x++;
                 } else {
-#if CONFIG_KEYPAD == IPOD_4G_PAD
+#ifdef IPOD_STYLE
                     if(cursor.y<10)
                         cursor.y++;
                     else
@@ -1504,7 +1506,7 @@ int select_square(void) {
                 draw_cursor();
                 break;
 #endif
-#if CONFIG_KEYPAD != IPOD_4G_PAD
+#ifndef IPOD_STYLE
             case SUPERDOM_UP:
             case (SUPERDOM_UP|BUTTON_REPEAT):
                 draw_cursor(); /* Deselect the current tile */
