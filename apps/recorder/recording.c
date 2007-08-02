@@ -604,7 +604,8 @@ static bool check_dir(char *folder)
 char *rec_create_filename(char *buffer)
 {
     char ext[16];
-    char pref[9];
+    char *pref = "R_";
+
     strcpy(buffer,global_settings.rec_directory);
     if (!check_dir(buffer))
         return NULL;
@@ -613,28 +614,24 @@ char *rec_create_filename(char *buffer)
     {
 #ifdef HAVE_MIC_IN        
     case AUDIO_SRC_MIC:
-        snprintf(pref, 9, "R_MIC_");
+        pref = "R_MIC_";
         break;
 #endif    
 #ifdef HAVE_LINE_REC
     case AUDIO_SRC_LINEIN:
-        snprintf(pref, 9, "R_LINE_");
+        pref = "R_LINE_";
         break;
 #endif        
 #ifdef HAVE_FMRADIO_REC
     case AUDIO_SRC_FMRADIO:
-        snprintf(pref, 9, "R_FM_");
+        pref = "R_FM_";
         break;
 #endif        
 #ifdef HAVE_SPDIF_IN
     case AUDIO_SRC_SPDIF:
-        snprintf(pref, 9, "R_SPDIF_");
+        pref = "R_SPDIF_";
         break;
 #endif        
-    default:
-        /* this should never happen */
-        snprintf(pref, 9, "R_");
-        break;
     }
     
     snprintf(ext, sizeof(ext), ".%s",
