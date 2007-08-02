@@ -732,7 +732,7 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
             s->coefs_end[k] = (s->frame_len - ((s->frame_len * 9) / 100)) >> k;
             /* high freq computation */
 
-            fixed32 tmp1 = high_freq*2;			/* high_freq is a fixed32!*/
+            fixed32 tmp1 = high_freq*2;            /* high_freq is a fixed32!*/
             fixed32 tmp2=itofix32(s->sample_rate>>1);
             s->high_band_start[k] = fixtoi32( fixdiv32(tmp1, tmp2) * (block_len>>1) +0x8000);
 
@@ -775,44 +775,44 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
         ff_mdct_init(&s->mdct_ctx[i], s->frame_len_bits - i + 1, 1);
     }
 
-	{
-		int i, n;
-		fixed32 c1, s1, s2;
+    {
+        int i, n;
+        fixed32 c1, s1, s2;
 
-		n=1<<10;
-		s2 = 1 ? 1 : -1;
-		  for(i=0;i<(n/2);++i)
-		  {
-		    fixed32 ifix = itofix32(i);
-		    fixed32 nfix = itofix32(n);
-		    fixed32 res = fixdiv32(ifix,nfix);
+        n=1<<10;
+        s2 = 1 ? 1 : -1;
+        for(i=0;i<(n/2);++i)
+        {
+            fixed32 ifix = itofix32(i);
+            fixed32 nfix = itofix32(n);
+            fixed32 res = fixdiv32(ifix,nfix);
 
-		    s1 = fsincos(res<<16, &c1);
+            s1 = fsincos(res<<16, &c1);
 
-		    exptab0[i].re = c1;
-		    exptab0[i].im = s1*s2;
-		}
-	}
+            exptab0[i].re = c1;
+            exptab0[i].im = s1*s2;
+        }
+    }
 
     /* init the MDCT bit reverse table here rather then in fft_init */
 
-      for(i=0;i<1024;i++)           /*hard coded to a 2048 bit rotation*/
-      {                             /*smaller sizes can reuse the largest*/
-             m=0;
-             for(j=0;j<10;j++)
-             {
-                 m |= ((i >> j) & 1) << (10-j-1);
-             }
+    for(i=0;i<1024;i++)           /*hard coded to a 2048 bit rotation*/
+    {                             /*smaller sizes can reuse the largest*/
+        m=0;
+        for(j=0;j<10;j++)
+        {
+            m |= ((i >> j) & 1) << (10-j-1);
+        }
 
        revtab0[i]=m;
-       }
+    }
 
     /*ffmpeg uses malloc to only allocate as many window sizes as needed.  However, we're really only interested in the worst case memory usage.
     * In the worst case you can have 5 window sizes, 128 doubling up 2048
     * Smaller windows are handled differently.
     * Since we don't have malloc, just statically allocate this
     */
-        fixed32 *temp[5];
+    fixed32 *temp[5];
     temp[0] = stat0;
     temp[1] = stat1;
     temp[2] = stat2;
@@ -836,7 +836,7 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
         for(j=0;j<n;++j)
         {
             fixed32 j2 = itofix32(j) + 0x8000;
-             window[j] = fsincos(fixmul32(j2,alpha)<<16, 0);        //alpha between 0 and pi/2
+            window[j] = fsincos(fixmul32(j2,alpha)<<16, 0);        //alpha between 0 and pi/2
 
         }
         //printf("created window\n");
@@ -857,9 +857,9 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
         else
         {
             s->noise_mult = 0xa3d;
-			/*LSP values are simply 2x the EXP values*/
+            /* LSP values are simply 2x the EXP values */
             for (i=0;i<NOISE_TAB_SIZE;++i)
-            	noisetable_exp[i] = noisetable_exp[i]<< 1;
+                noisetable_exp[i] = noisetable_exp[i]<< 1;
             s->noise_table = noisetable_exp;
         }
 #if 0
@@ -876,11 +876,11 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
         }
 #endif
 
-		 s->hgain_vlc.table = vlcbuf4;
-		 s->hgain_vlc.table_allocated = 540;
-		 init_vlc(&s->hgain_vlc, 9, sizeof(hgain_huffbits),
-					 hgain_huffbits, 1, 1,
-					 hgain_huffcodes, 2, 2, 0);
+         s->hgain_vlc.table = vlcbuf4;
+         s->hgain_vlc.table_allocated = 540;
+         init_vlc(&s->hgain_vlc, 9, sizeof(hgain_huffbits),
+                  hgain_huffbits, 1, 1,
+                  hgain_huffcodes, 2, 2, 0);
     }
 
     if (s->use_exp_vlc)
@@ -890,8 +890,8 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
         s->exp_vlc.table_allocated = 1536;
 
          init_vlc(&s->exp_vlc, 9, sizeof(scale_huffbits),
-        		scale_huffbits, 1, 1,
-                 scale_huffcodes, 4, 4, 0);
+                  scale_huffbits, 1, 1,
+                  scale_huffcodes, 4, 4, 0);
     }
     else
     {
@@ -950,9 +950,9 @@ static inline fixed32 pow_m1_4(WMADecodeContext *s, fixed32 x)
     a = s->lsp_pow_m_table1[m];
     b = s->lsp_pow_m_table2[m];
 
-	/*lsp_pow_e_table contains 32.32 format */
-	/*TODO:  Since we're unlikely have value that cover the whole
-	 * IEEE754 range, we probably don't need to have all possible exponents*/
+    /* lsp_pow_e_table contains 32.32 format */
+    /* TODO:  Since we're unlikely have value that cover the whole
+     * IEEE754 range, we probably don't need to have all possible exponents */
 
     return (lsp_pow_e_table[e] * (a + fixmul32(b, ftofix32(t.f))) >>32);
 }
@@ -966,9 +966,9 @@ static void wma_lsp_to_curve_init(WMADecodeContext *s, int frame_len)
     temp = fixdiv32(itofix32(1),     itofix32(frame_len));
     for (i=0; i<frame_len; ++i)
     {
-		/*TODO: can probably reuse the trig_init values here */
+        /* TODO: can probably reuse the trig_init values here */
         fsincos((temp*i)<<15, &temp2);
-        /*get 3 bits headroom + 1 bit from not doubleing the values*/
+        /* get 3 bits headroom + 1 bit from not doubleing the values */
         s->lsp_cos_table[i] = temp2>>3;
 
     }
@@ -1003,9 +1003,9 @@ static void wma_lsp_to_curve(WMADecodeContext *s,
     val_max = 0;
     for(i=0;i<n;++i)
     {
-		/* shift by 2 now to reduce rounding error,
-		 * we can renormalize right before pow_m1_4
-		 */
+        /* shift by 2 now to reduce rounding error,
+         * we can renormalize right before pow_m1_4
+         */
 
         p = 0x8000<<5;
         q = 0x8000<<5;
@@ -1013,16 +1013,16 @@ static void wma_lsp_to_curve(WMADecodeContext *s,
 
         for (j=1;j<NB_LSP_COEFS;j+=2)
         {
-
-			 /*w is 5.27 format, lsp is in 16.16, temp2 becomes 5.27 format*/
-			temp2 = ((w - (lsp[j - 1]<<11)));
+            /* w is 5.27 format, lsp is in 16.16, temp2 becomes 5.27 format */
+            temp2 = ((w - (lsp[j - 1]<<11)));
             temp = q;
-            /*q is 16.16 format, temp2 is 5.27, q becomes 16.16 */
+
+            /* q is 16.16 format, temp2 is 5.27, q becomes 16.16 */
             q = fixmul32b(q, temp2 )<<4;
- 			p = fixmul32b(p, (w - (lsp[j]<<11)))<<4;
+            p = fixmul32b(p, (w - (lsp[j]<<11)))<<4;
         }
 
-		/* 2 in 5.27 format is 0x10000000 */
+        /* 2 in 5.27 format is 0x10000000 */
         p = fixmul32(p, fixmul32b(p, (0x10000000 - w)))<<3;
         q = fixmul32(q, fixmul32b(q, (0x10000000 + w)))<<3;
 
@@ -1031,7 +1031,6 @@ static void wma_lsp_to_curve(WMADecodeContext *s,
         if (v > val_max)
             val_max = v;
         out[i] = v;
-
     }
 
     *val_max_ptr = val_max;
@@ -1157,9 +1156,6 @@ static int wma_decode_block(WMADecodeContext *s)
         }
         v = get_bits(&s->gb, n);
 
-
-
-
         if (v >= s->nb_block_sizes)
         {
          // rb->splash(HZ*4, "v was %d", v);        //5, 7
@@ -1228,6 +1224,7 @@ static int wma_decode_block(WMADecodeContext *s)
         coef_nb_bits = 10;
     else
         coef_nb_bits = 9;
+
     /* compute number of coefficients */
     n = s->coefs_end[bsize] - s->coefs_start;
 
@@ -1288,9 +1285,9 @@ static int wma_decode_block(WMADecodeContext *s)
         }
     }
 
- /* exponents can be reused in short blocks. */
-    if ((s->block_len_bits == s->frame_len_bits) || get_bits(&s->gb, 1)) {
-
+    /* exponents can be reused in short blocks. */
+    if ((s->block_len_bits == s->frame_len_bits) || get_bits(&s->gb, 1))
+    {
         for(ch = 0; ch < s->nb_channels; ++ch)
         {
             if (s->channel_coded[ch])
@@ -1331,8 +1328,6 @@ static int wma_decode_block(WMADecodeContext *s)
             ptr = &s->coefs1[ch][0];
             eptr = ptr + nb_coefs[ch];
             memset(ptr, 0, s->block_len * sizeof(int16_t));
-
-
 
             for(;;)
             {
@@ -1421,7 +1416,7 @@ static int wma_decode_block(WMADecodeContext *s)
             mult = fixmul64byfixed(mult, mdct_norm);        //what the hell?  This is actually fixed64*2^16!
             coefs = (*(s->coefs))[ch];
 
-       		n=0;
+               n=0;
 
             if (s->use_noise_coding)
             {
@@ -1451,7 +1446,7 @@ static int wma_decode_block(WMADecodeContext *s)
                         e2 = 0;
                         for(i = 0;i < n; ++i)
                         {
-							/*v is noramlized later on so its fixed format is irrelevant*/
+                            /*v is noramlized later on so its fixed format is irrelevant*/
                             v = exp_ptr[i]>>4;
                             e2 += fixmul32(v, v)>>3;
                         }
@@ -1484,7 +1479,7 @@ static int wma_decode_block(WMADecodeContext *s)
                         mult1 = mult1 * pow_table[s->high_band_values[ch][j]+20] >> PRECISION;
 
                         /*this step has a fairly high degree of error for some reason*/
-                   		mult1 = fixdiv64(mult1,fixmul32(s->max_exponent[ch],s->noise_mult));
+                           mult1 = fixdiv64(mult1,fixmul32(s->max_exponent[ch],s->noise_mult));
 
                          mult1 = mult1*mdct_norm>>PRECISION;
                         for(i = 0;i < n; ++i)
@@ -1505,8 +1500,8 @@ static int wma_decode_block(WMADecodeContext *s)
                             s->noise_index = (s->noise_index + 1) & (NOISE_TAB_SIZE - 1);
 
                            /*don't forget to renormalize the noise*/
-						   temp1 = (((int32_t)*coefs1++)<<16) + (noise>>4);
-						   temp2 = fixmul32(*exponents, mult>>17);
+                           temp1 = (((int32_t)*coefs1++)<<16) + (noise>>4);
+                           temp2 = fixmul32(*exponents, mult>>17);
                            *coefs++ = fixmul32(temp1, temp2);
                            ++exponents;
                         }
@@ -1662,9 +1657,7 @@ static int wma_decode_frame(WMADecodeContext *s, int16_t *samples)
 
         for (i=0;i<n;++i)
         {
-
-			a = fixtoi32(*iptr++)<<1;        //ugly but good enough for now
-
+            a = fixtoi32(*iptr++)<<1;        //ugly but good enough for now
 
             if (a > 32767)
             {
