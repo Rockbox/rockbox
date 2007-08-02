@@ -498,11 +498,6 @@ bool get_asf_metadata(int fd, struct mp3entry* id3)
         return false;
     }
 
-    if (wfx.bitrate < 20000) {
-        DEBUGF("ASF: < 20kbps files not supported\n");
-        return false;
-    }
-
     asf_read_object_header(&obj, fd);
 
     if (!asf_guid_match(&obj.guid, &asf_guid_data)) {

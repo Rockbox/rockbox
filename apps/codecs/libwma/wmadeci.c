@@ -286,10 +286,9 @@ int ff_mdct_init(MDCTContext *s, int nbits, int inverse)
     s->tsin[i] = - fsincos(ip<<16, &(s->tcos[i]));            //I can't remember why this works, but it seems to agree for ~24 bits, maybe more!
     s->tcos[i] *=-1;
   }
-      s->fft.nbits = s->nbits - 2;
+    (&s->fft)->nbits = nbits-2;
 
-
-    s->fft.inverse = inverse;
+    (&s->fft)->inverse = inverse;
 
     return 0;
 
@@ -733,8 +732,10 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
             s->coefs_end[k] = (s->frame_len - ((s->frame_len * 9) / 100)) >> k;
             /* high freq computation */
 
-            fixed32 tmp = high_freq*2;
-            s->high_band_start[k] = fixtoi32(fixdiv32(tmp, itofix32(s->sample_rate)) *block_len +0x8000);
+            fixed32 tmp1 = high_freq*2;			/* high_freq is a fixed32!*/
+            fixed32 tmp2=itofix32(s->sample_rate>>1);
+            s->high_band_start[k] = fixtoi32( fixdiv32(tmp1, tmp2) * (block_len>>1) +0x8000);
+
             /*
             s->high_band_start[k] = (int)((block_len * 2 * high_freq) /
                                           s->sample_rate + 0.5);*/
@@ -935,48 +936,57 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
 static inline fixed32 pow_m1_4(WMADecodeContext *s, fixed32 x)
 {
     union {
-        fixed64 f;
+        float f;
         unsigned int v;
     } u, t;
     unsigned int e, m;
-    fixed64 a, b;
+    fixed32 a, b;
 
-    u.f = x;
+    u.f = fixtof64(x);
     e = u.v >> 23;
     m = (u.v >> (23 - LSP_POW_BITS)) & ((1 << LSP_POW_BITS) - 1);
     /* build interpolation scale: 1 <= t < 2. */
     t.v = ((u.v << LSP_POW_BITS) & ((1 << 23) - 1)) | (127 << 23);
     a = s->lsp_pow_m_table1[m];
     b = s->lsp_pow_m_table2[m];
-    return lsp_pow_e_table[e] * (a + b * t.f);
+
+	/*lsp_pow_e_table contains 32.32 format */
+	/*TODO:  Since we're unlikely have value that cover the whole
+	 * IEEE754 range, we probably don't need to have all possible exponents*/
+
+    return (lsp_pow_e_table[e] * (a + fixmul32(b, ftofix32(t.f))) >>32);
 }
 
 static void wma_lsp_to_curve_init(WMADecodeContext *s, int frame_len)
 {
-    fixed32 wdel, a, b;
+    fixed32 wdel, a, b, temp, temp2;
     int i, m;
 
     wdel = fixdiv32(M_PI_F, itofix32(frame_len));
+    temp = fixdiv32(itofix32(1),     itofix32(frame_len));
     for (i=0; i<frame_len; ++i)
     {
-        s->lsp_cos_table[i] = 0x20000 * fixcos32(wdel * i);    //wdel*i between 0 and pi
+		/*TODO: can probably reuse the trig_init values here */
+        fsincos((temp*i)<<15, &temp2);
+        /*get 3 bits headroom + 1 bit from not doubleing the values*/
+        s->lsp_cos_table[i] = temp2>>3;
 
     }
-
-
     /* NOTE: these two tables are needed to avoid two operations in
        pow_m1_4 */
     b = itofix32(1);
     int ix = 0;
+
+    /*double check this later*/
     for(i=(1 << LSP_POW_BITS) - 1;i>=0;i--)
     {
         m = (1 << LSP_POW_BITS) + i;
-        a = m * (0x8000 / (1 << LSP_POW_BITS)); //PJJ
-        a = pow_a_table[ix++];  // PJJ : further refinement
+        a = pow_a_table[ix++]<<4;
         s->lsp_pow_m_table1[i] = 2 * a - b;
         s->lsp_pow_m_table2[i] = b - a;
         b = a;
     }
+
 }
 
 /* NOTE: We use the same code as Vorbis here */
@@ -988,27 +998,42 @@ static void wma_lsp_to_curve(WMADecodeContext *s,
                              fixed32 *lsp)
 {
     int i, j;
-    fixed32 p, q, w, v, val_max;
+    fixed32 p, q, w, v, val_max, temp, temp2;
 
     val_max = 0;
     for(i=0;i<n;++i)
     {
-        p = 0x8000;
-        q = 0x8000;
+		/* shift by 2 now to reduce rounding error,
+		 * we can renormalize right before pow_m1_4
+		 */
+
+        p = 0x8000<<5;
+        q = 0x8000<<5;
         w = s->lsp_cos_table[i];
+
         for (j=1;j<NB_LSP_COEFS;j+=2)
         {
-            q *= w - lsp[j - 1];
-            p *= w - lsp[j];
+
+			 /*w is 5.27 format, lsp is in 16.16, temp2 becomes 5.27 format*/
+			temp2 = ((w - (lsp[j - 1]<<11)));
+            temp = q;
+            /*q is 16.16 format, temp2 is 5.27, q becomes 16.16 */
+            q = fixmul32b(q, temp2 )<<4;
+ 			p = fixmul32b(p, (w - (lsp[j]<<11)))<<4;
         }
-        p *= p * (0x20000 - w);
-        q *= q * (0x20000 + w);
-        v = p + q;
-        v = pow_m1_4(s, v); // PJJ
+
+		/* 2 in 5.27 format is 0x10000000 */
+        p = fixmul32(p, fixmul32b(p, (0x10000000 - w)))<<3;
+        q = fixmul32(q, fixmul32b(q, (0x10000000 + w)))<<3;
+
+        v = (p + q) >>9;  /* p/q end up as 16.16 */
+        v = pow_m1_4(s, v);
         if (v > val_max)
             val_max = v;
         out[i] = v;
+
     }
+
     *val_max_ptr = val_max;
 }
 
@@ -1392,13 +1417,11 @@ static int wma_decode_block(WMADecodeContext *s)
             coefs1 = s->coefs1[ch];
             exponents = s->exponents[ch];
             esize = s->exponents_bsize[ch];
-            mult = fixdiv64(pow_table[total_gain],Fixed32To64(s->max_exponent[ch]));
-         //   mul = fixtof64(pow_table[total_gain])/(s->block_len/2)/fixtof64(s->max_exponent[ch]);
-
+            mult = fixdiv64(pow_table[total_gain+20],Fixed32To64(s->max_exponent[ch]));
             mult = fixmul64byfixed(mult, mdct_norm);        //what the hell?  This is actually fixed64*2^16!
-            coefs = (*(s->coefs))[ch];                                            //VLC exponenents are used to get MDCT coef here!
+            coefs = (*(s->coefs))[ch];
 
-        n=0;
+       		n=0;
 
             if (s->use_noise_coding)
             {
@@ -1428,8 +1451,9 @@ static int wma_decode_block(WMADecodeContext *s)
                         e2 = 0;
                         for(i = 0;i < n; ++i)
                         {
-                            v = exp_ptr[i]>>5;	/*v is noramlized later on so its fixed format is irrelevant*/
-                            e2 += fixmul32(v, v);
+							/*v is noramlized later on so its fixed format is irrelevant*/
+                            v = exp_ptr[i]>>4;
+                            e2 += fixmul32(v, v)>>3;
                         }
                          exp_power[j] = e2/n; /*n is an int...*/
                         last_high_band = j;
@@ -1456,7 +1480,8 @@ static int wma_decode_block(WMADecodeContext *s)
                         fixed32 tmp = fixdiv32(exp_power[j],exp_power[last_high_band]);
                         mult1 = (fixed64)fixsqrt32(tmp);
                         /* XXX: use a table */
-                        mult1 = mult1 * pow_table[s->high_band_values[ch][j]] >> PRECISION;
+                        /*mult1 is 48.16, pow_table is 48.16*/
+                        mult1 = mult1 * pow_table[s->high_band_values[ch][j]+20] >> PRECISION;
 
                         /*this step has a fairly high degree of error for some reason*/
                    		mult1 = fixdiv64(mult1,fixmul32(s->max_exponent[ch],s->noise_mult));
@@ -1481,9 +1506,9 @@ static int wma_decode_block(WMADecodeContext *s)
 
                            /*don't forget to renormalize the noise*/
 						   temp1 = (((int32_t)*coefs1++)<<16) + (noise>>4);
-						   temp2 = fixmul32(*exponents, mult>>16);
-                            *coefs++ = fixmul32(temp1, temp2)>>1;
-                            ++exponents;
+						   temp2 = fixmul32(*exponents, mult>>17);
+                           *coefs++ = fixmul32(temp1, temp2);
+                           ++exponents;
                         }
                     }
                 }
@@ -1637,10 +1662,8 @@ static int wma_decode_frame(WMADecodeContext *s, int16_t *samples)
 
         for (i=0;i<n;++i)
         {
-            a = fixtoi32(*iptr++)<<1;        //ugly but good enough for now
 
-
-
+			a = fixtoi32(*iptr++)<<1;        //ugly but good enough for now
 
 
             if (a > 32767)
