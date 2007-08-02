@@ -347,8 +347,8 @@ int is_e200(struct sansa_t* sansa)
 
     /* Check Main firmware header */
     if (sansa_seek_and_read(sansa, sansa->start+PPMI_OFFSET, sectorbuf, 0x200) < 0) {
-        fprintf(stderr,"[ERR]  Seek to 0x%08x in is_e200 failed.\n",
-                       (unsigned int)(sansa->start+PPMI_OFFSET));
+        fprintf(stderr,"[ERR]  Seek to 0x%08llx in is_e200 failed.\n",
+                       sansa->start+PPMI_OFFSET);
         return -5;
     }
     if (memcmp(sectorbuf,"PPMI",4)!=0) {
@@ -359,8 +359,8 @@ int is_e200(struct sansa_t* sansa)
 
     /* Check main mi4 file header */
     if (sansa_seek_and_read(sansa, sansa->start+PPMI_OFFSET+0x200, sectorbuf, 0x200) < 0) {
-        fprintf(stderr,"[ERR]  Seek to 0x%08x in is_e200 failed.\n",
-                       (unsigned int)(sansa->start+PPMI_OFFSET+0x200));
+        fprintf(stderr,"[ERR]  Seek to 0x%08llx in is_e200 failed.\n",
+                       sansa->start+PPMI_OFFSET+0x200);
         return -5;
     }
 
@@ -631,8 +631,8 @@ int sansa_add_bootloader(struct sansa_t* sansa, char* filename, int type)
     /* Now write the whole thing back to the Sansa */
 
     if (sansa_seek(sansa, sansa->start+PPMI_OFFSET) < 0) {
-        fprintf(stderr,"[ERR]  Seek to 0x%08x in add_bootloader failed.\n",
-                       (unsigned int)(sansa->start+PPMI_OFFSET));
+        fprintf(stderr,"[ERR]  Seek to 0x%08llx in add_bootloader failed.\n",
+                       sansa->start+PPMI_OFFSET);
         return -5;
     }
 
@@ -668,8 +668,8 @@ int sansa_delete_bootloader(struct sansa_t* sansa)
     /* Now write the whole thing back to the Sansa */
 
     if (sansa_seek(sansa, sansa->start+PPMI_OFFSET) < 0) {
-        fprintf(stderr,"[ERR]  Seek to 0x%08x in add_bootloader failed.\n",
-                       (unsigned int)(sansa->start+PPMI_OFFSET));
+        fprintf(stderr,"[ERR]  Seek to 0x%08llx in add_bootloader failed.\n",
+                       sansa->start+PPMI_OFFSET);
         return -5;
     }
 
@@ -715,7 +715,7 @@ int sansa_update_of(struct sansa_t* sansa, char* filename)
     int of_length = 0; /* Keep gcc happy when building for rbutil */
     int ppmi_length;
     struct mi4header_t mi4header;
-    char buf[512];
+    unsigned char buf[512];
 
     /* Step 1 - check we have an OF on the Sansa to upgrade. We expect the 
        Rockbox bootloader to be installed and the OF to be after it on disk. */
@@ -739,7 +739,7 @@ int sansa_update_of(struct sansa_t* sansa, char* filename)
     if (get_mi4header(buf,&mi4header)!=0) {
         /* We don't have a valid MI4 file after a bootloader, so do nothing. */
         fprintf(stderr,"[ERR]  No original firmware found at 0x%08llx\n",
-                    (loff_t)(sansa->start+PPMI_OFFSET+0x200+ppmi_length));
+                    sansa->start+PPMI_OFFSET+0x200+ppmi_length);
         return -1;
     }
 
@@ -777,8 +777,8 @@ int sansa_update_of(struct sansa_t* sansa, char* filename)
 
     /* Step 3 - write the OF to the Sansa */
     if (sansa_seek(sansa, sansa->start+PPMI_OFFSET+0x200+ppmi_length) < 0) {
-        fprintf(stderr,"[ERR]  Seek to 0x%08x in sansa_update_of failed.\n",
-                   (unsigned int)(sansa->start+PPMI_OFFSET+0x200+ppmi_length));
+        fprintf(stderr,"[ERR]  Seek to 0x%08llx in sansa_update_of failed.\n",
+                   sansa->start+PPMI_OFFSET+0x200+ppmi_length);
         return -1;
     }
 

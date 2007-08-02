@@ -72,6 +72,7 @@ static int write_cfile(unsigned char* buf, off_t len, char* cname)
 
 static int write_hfile(unsigned char* buf, off_t len, char* cname)
 {
+    (void)buf;
     char filename[256];
     FILE* fp;
 
