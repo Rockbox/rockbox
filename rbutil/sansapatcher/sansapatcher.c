@@ -446,43 +446,13 @@ int sansa_scan(struct sansa_t* sansa)
     return n;
 }
 
-static int load_original_firmware(struct sansa_t* sansa, unsigned char* buf, struct mi4header_t* mi4header)
+/* Prepare original firmware for writing to the firmware partition by decrypting
+   and updating the header */
+static int prepare_original_firmware(unsigned char* buf, struct mi4header_t* mi4header)
 {
-    int ppmi_length;
-    int n;
     unsigned char* tmpbuf;
     int i;
     int key_found;
-
-    /* Read 512 bytes from PPMI_OFFSET - the PPMI header plus the mi4 header */
-    if (sansa_seek_and_read(sansa, sansa->start + PPMI_OFFSET, buf, 512) < 0) {
-        return -1;
-    }
-
-    /* No need to check PPMI magic - it's done during init to confirm
-       this is an E200 */
-    ppmi_length = le2int(buf+4);
-
-    /* Firstly look for an original firmware after the first image */
-    if (sansa_seek_and_read(sansa, sansa->start + PPMI_OFFSET + 0x200 + ppmi_length, buf, 512) < 0) {
-        return -1;
-    }
-
-    if (get_mi4header(buf,mi4header)==0) {
-        /* We have a valid MI4 file after a bootloader, so we use this. */
-        if ((n = sansa_seek_and_read(sansa,
-                                     sansa->start + PPMI_OFFSET + 0x200 + ppmi_length,
-                                     buf, mi4header->mi4size)) < 0) {
-            return -1;
-        }
-    } else {
-        /* No valid MI4 file, so read the first image. */
-        if ((n = sansa_seek_and_read(sansa,
-                                     sansa->start + PPMI_OFFSET + 0x200,
-                                     buf, ppmi_length)) < 0) {
-            return -1;
-        }
-    }
 
     get_mi4header(buf,mi4header);
 
@@ -536,6 +506,43 @@ static int load_original_firmware(struct sansa_t* sansa, unsigned char* buf, str
     memcpy(buf+0x1f8,"RBOFe200",8);
 
     return 0;
+}
+
+static int load_original_firmware(struct sansa_t* sansa, unsigned char* buf, struct mi4header_t* mi4header)
+{
+    int ppmi_length;
+    int n;
+    
+    /* Read 512 bytes from PPMI_OFFSET - the PPMI header plus the mi4 header */
+    if (sansa_seek_and_read(sansa, sansa->start + PPMI_OFFSET, buf, 512) < 0) {
+        return -1;
+    }
+
+    /* No need to check PPMI magic - it's done during init to confirm
+       this is an E200 */
+    ppmi_length = le2int(buf+4);
+
+    /* Firstly look for an original firmware after the first image */
+    if (sansa_seek_and_read(sansa, sansa->start + PPMI_OFFSET + 0x200 + ppmi_length, buf, 512) < 0) {
+        return -1;
+    }
+
+    if (get_mi4header(buf,mi4header)==0) {
+        /* We have a valid MI4 file after a bootloader, so we use this. */
+        if ((n = sansa_seek_and_read(sansa,
+                                     sansa->start + PPMI_OFFSET + 0x200 + ppmi_length,
+                                     buf, mi4header->mi4size)) < 0) {
+            return -1;
+        }
+    } else {
+        /* No valid MI4 file, so read the first image. */
+        if ((n = sansa_seek_and_read(sansa,
+                                     sansa->start + PPMI_OFFSET + 0x200,
+                                     buf, ppmi_length)) < 0) {
+            return -1;
+        }
+    }
+    return prepare_original_firmware(buf, mi4header);
 }
 
 int sansa_read_firmware(struct sansa_t* sansa, char* filename)
@@ -700,3 +707,87 @@ void sansa_list_images(struct sansa_t* sansa)
         printf("[INFO] Image 2 - %d bytes\n",mi4header.mi4size);
     }
 }
+
+int sansa_update_of(struct sansa_t* sansa, char* filename)
+{
+    int n;
+    int infile = -1;   /* Prevent an erroneous "may be used uninitialised" gcc warning */
+    int of_length = 0; /* Keep gcc happy when building for rbutil */
+    int ppmi_length;
+    struct mi4header_t mi4header;
+    char buf[512];
+
+    /* Step 1 - check we have an OF on the Sansa to upgrade. We expect the 
+       Rockbox bootloader to be installed and the OF to be after it on disk. */
+
+    /* Read 512 bytes from PPMI_OFFSET - the PPMI header */
+    if (sansa_seek_and_read(sansa, sansa->start + PPMI_OFFSET,
+                            buf, 512) < 0) {
+        return -1;
+    }
+
+    /* No need to check PPMI magic - it's done during init to confirm
+       this is an E200 */
+    ppmi_length = le2int(buf+4);
+
+    /* Look for an original firmware after the first image */
+    if (sansa_seek_and_read(sansa, sansa->start+PPMI_OFFSET+0x200+ppmi_length,
+                            buf, 512) < 0) {
+        return -1;
+    }
+
+    if (get_mi4header(buf,&mi4header)!=0) {
+        /* We don't have a valid MI4 file after a bootloader, so do nothing. */
+        fprintf(stderr,"[ERR]  No original firmware found at 0x%08llx\n",
+                    (loff_t)(sansa->start+PPMI_OFFSET+0x200+ppmi_length));
+        return -1;
+    }
+
+    /* Step 2 - read OF into RAM. */
+    infile=open(filename,O_RDONLY|O_BINARY);
+    if (infile < 0) {
+        fprintf(stderr,"[ERR]  Couldn't open input file %s\n",filename);
+        return -1;
+    }
+
+    of_length = filesize(infile);
+
+    /* Load original firmware from file */
+    memset(sectorbuf,0,0x200);
+    n = read(infile,sectorbuf,of_length);
+    close(infile);
+    if (n < of_length) {
+           fprintf(stderr,"[ERR]  Short read - requested %d bytes, received %d\n"
+                         , of_length, n);
+           return -1;
+    }
+
+    /* Check we have a valid MI4 file. */
+    if (get_mi4header(sectorbuf,&mi4header)!=0) {
+        fprintf(stderr,"[ERR]  %s is not a valid mi4 file\n",filename);
+        return -1;
+    }
+
+    /* Decrypt and build the header */
+    if(prepare_original_firmware(sectorbuf, &mi4header)!=0){
+        fprintf(stderr,"[ERR]  Unable to build decrypted mi4 from %s\n"
+                      ,filename);
+        return -1;
+    }
+
+    /* Step 3 - write the OF to the Sansa */
+    if (sansa_seek(sansa, sansa->start+PPMI_OFFSET+0x200+ppmi_length) < 0) {
+        fprintf(stderr,"[ERR]  Seek to 0x%08x in sansa_update_of failed.\n",
+                   (unsigned int)(sansa->start+PPMI_OFFSET+0x200+ppmi_length));
+        return -1;
+    }
+
+    n=sansa_write(sansa, sectorbuf, of_length);
+    if (n < of_length) {
+        fprintf(stderr,"[ERR]  Short write in sansa_update_of\n");
+        return -1;
+    }
+
+    return 0;
+}
+

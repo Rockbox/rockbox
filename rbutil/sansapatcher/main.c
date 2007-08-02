@@ -47,7 +47,8 @@ enum {
    READ_FIRMWARE,
    WRITE_FIRMWARE,
    READ_PARTITION,
-   WRITE_PARTITION
+   WRITE_PARTITION,
+   UPDATE_OF
 };
 
 void print_usage(void)
@@ -62,9 +63,10 @@ void print_usage(void)
     fprintf(stderr,"Where [action] is one of the following options:\n");
     fprintf(stderr,"        --install\n");
     fprintf(stderr,"  -l,   --list\n");
-    fprintf(stderr,"  -rf,  --read-firmware      filename.mi4\n");
-    fprintf(stderr,"  -a,   --add-bootloader     filename.mi4\n");
+    fprintf(stderr,"  -rf,  --read-firmware             filename.mi4\n");
+    fprintf(stderr,"  -a,   --add-bootloader            filename.mi4\n");
     fprintf(stderr,"  -d,   --delete-bootloader\n");
+    fprintf(stderr,"  -of   --update-original-firmware  filename.mi4\n");
     fprintf(stderr,"\n");
 
 #ifdef __WIN32__
@@ -216,6 +218,13 @@ int main(int argc, char* argv[])
             if (i == argc) { print_usage(); return 1; }
             filename=argv[i];
             i++;
+        } else if ((strcmp(argv[i],"-of")==0) || 
+                   (strcmp(argv[i],"--update-original-firmware")==0)) {
+            action = UPDATE_OF;
+            i++;
+            if (i == argc) { print_usage(); return 1; }
+            filename=argv[i];
+            i++;
         } else if ((strcmp(argv[i],"-rf")==0) || 
                    (strcmp(argv[i],"--read-firmware")==0)) {
             action = READ_FIRMWARE;
@@ -325,6 +334,16 @@ int main(int argc, char* argv[])
                 fprintf(stderr,"[INFO] Bootloader removed successfully.\n");
             } else {
                 fprintf(stderr,"[ERR]  --delete-bootloader failed.\n");
+            }
+        } else if (action==UPDATE_OF) {
+            if (sansa_reopen_rw(&sansa) < 0) {
+                return 5;
+            }
+
+            if (sansa_update_of(&sansa, filename)==0) {
+                fprintf(stderr,"[INFO] OF updated successfully.\n");
+            } else {
+                fprintf(stderr,"[ERR]  --update-original-firmware failed.\n");
             }
         }
     }
