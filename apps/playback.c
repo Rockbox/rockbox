@@ -1961,7 +1961,7 @@ static void codec_thread(void)
 #ifdef PLAYBACK_VOICE
                 mutex_unlock(&mutex_codecthread);
 #endif
-                break ;
+                break;
 
             case Q_CODEC_LOAD:
                 LOGFQUEUE("codec < Q_CODEC_LOAD");
@@ -1974,7 +1974,7 @@ static void codec_thread(void)
                     ci.stop_codec = true;
                     LOGFQUEUE("codec > codec Q_AUDIO_PLAY");
                     queue_post(&codec_queue, Q_AUDIO_PLAY, 0);
-                    break ;
+                    break;
                 }
 
                 audio_codec_loaded = true;
@@ -1994,7 +1994,7 @@ static void codec_thread(void)
 #ifdef PLAYBACK_VOICE
                 mutex_unlock(&mutex_codecthread);
 #endif
-                break ;
+                break;
 
 #ifdef AUDIO_HAVE_RECORDING
             case Q_ENCODER_LOAD_DISK:
@@ -3344,11 +3344,12 @@ static void audio_play_start(size_t offset)
 /* Invalidates all but currently playing track. */
 static void audio_invalidate_tracks(void)
 {
-    if (audio_have_tracks()) {
+    if (audio_have_tracks()) 
+    {
         last_peek_offset = 0;
-
         playlist_end = false;
         track_widx = track_ridx;
+
         /* Mark all other entries null (also buffered wrong metadata). */
         audio_clear_track_entries(true);
 
@@ -3366,7 +3367,10 @@ static void audio_new_playlist(void)
 {
     /* Prepare to start a new fill from the beginning of the playlist */
     last_peek_offset = -1;
-    if (audio_have_tracks()) {
+    if (audio_have_tracks()) 
+    {
+        if (paused)
+            skipped_during_pause = true;
         playlist_end = false;
         track_widx = track_ridx;
         audio_clear_track_entries(true);
@@ -3619,7 +3623,7 @@ static void audio_thread(void)
                     audio_stop_playback();
                     audio_play_start((size_t)ev.data);
                 }
-                break ;
+                break;
 
             case Q_AUDIO_STOP:
                 LOGFQUEUE("audio < Q_AUDIO_STOP");
@@ -3627,7 +3631,7 @@ static void audio_thread(void)
                     audio_stop_playback();
                 if (ev.data != 0)
                     queue_clear(&audio_queue);
-                break ;
+                break;
 
             case Q_AUDIO_PAUSE:
                 LOGFQUEUE("audio < Q_AUDIO_PAUSE");
@@ -3638,7 +3642,7 @@ static void audio_thread(void)
                     break;
                 pcmbuf_pause((bool)ev.data);
                 paused = (bool)ev.data;
-                break ;
+                break;
 
             case Q_AUDIO_SKIP:
                 LOGFQUEUE("audio < Q_AUDIO_SKIP");
@@ -3655,9 +3659,9 @@ static void audio_thread(void)
             case Q_AUDIO_FF_REWIND:
                 LOGFQUEUE("audio < Q_AUDIO_FF_REWIND");
                 if (!playing)
-                    break ;
+                    break;
                 ci.seek_time = (long)ev.data+1;
-                break ;
+                break;
 
             case Q_AUDIO_REBUFFER_SEEK:
                 LOGFQUEUE("audio < Q_AUDIO_REBUFFER_SEEK");
@@ -3678,7 +3682,7 @@ static void audio_thread(void)
             case Q_AUDIO_FLUSH:
                 LOGFQUEUE("audio < Q_AUDIO_FLUSH");
                 audio_invalidate_tracks();
-                break ;
+                break;
 
             case Q_AUDIO_TRACK_CHANGED:
                 LOGFQUEUE("audio < Q_AUDIO_TRACK_CHANGED");
@@ -3686,7 +3690,7 @@ static void audio_thread(void)
                     track_changed_callback(&CUR_TI->id3);
                 track_changed = true;
                 playlist_update_resume_info(audio_current_track());
-                break ;
+                break;
 
 #ifndef SIMULATOR
             case SYS_USB_CONNECTED:
@@ -3695,7 +3699,7 @@ static void audio_thread(void)
                     audio_stop_playback();
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 usb_wait_for_disconnect(&audio_queue);
-                break ;
+                break;
 #endif
 
             case SYS_TIMEOUT:
