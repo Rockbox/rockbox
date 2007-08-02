@@ -434,18 +434,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 }
             }
             break;
-#ifdef TEXT_EDITOR_DELETE
-            case TEXT_EDITOR_DELETE:
-#ifdef TEXT_EDITOR_DELETE_PRE
-                if (last_button != TEXT_EDITOR_DELETE_PRE)
-                    break;
-#endif
+            case ACTION_STD_CONTEXT:
                 if (!line_count) break;
                 rb->strcpy(copy_buffer,&buffer[do_action(ACTION_GET,0,cur_sel)]);
                 do_action(ACTION_REMOVE,0,cur_sel);
                 changed = true;
             break;
-#endif
             case ACTION_STD_MENU:
             { /* do the item menu */
                 switch (do_item_menu(cur_sel, copy_buffer))
