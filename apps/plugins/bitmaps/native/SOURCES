@@ -457,4 +457,19 @@ sudoku_inverse.320x240x16.bmp
 #endif
 #endif
 
+/* Superdom */
+#if LCD_DEPTH == 16
+#if ((LCD_WIDTH == 220) && (LCD_HEIGHT == 176))
+superdom_boarditems.220x176x16.bmp
+#elif ((LCD_WIDTH == 176) && (LCD_HEIGHT == 132)) || \
+      ((LCD_WIDTH == 160) && (LCD_HEIGHT == 128)) || \
+      ((LCD_WIDTH == 176) && (LCD_HEIGHT == 220))
+superdom_boarditems.176x132x16.bmp
+#elif (LCD_WIDTH == 320 && LCD_HEIGHT == 240)
+superdom_boarditems.320x240x16.bmp
+#elif (LCD_WIDTH == 240 && LCD_HEIGHT == 320)
+superdom_boarditems.240x320x16.bmp
+#endif
+#endif
+
 #endif /* HAVE_LCD_BITMAP */

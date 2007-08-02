@@ -133,3 +133,6 @@ iriver_flash.c
 #endif
 
 #endif /* iFP7xx */
+#if (LCD_WIDTH == 220) || (LCD_WIDTH == 176) || (LCD_WIDTH == 160) || (LCD_WIDTH == 320) || (LCD_WIDTH == 240)
+superdom.c
+#endif
