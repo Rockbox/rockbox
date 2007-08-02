@@ -133,7 +133,7 @@ iriver_flash.c
 #endif
 
 #endif /* iFP7xx */
-#if (LCD_WIDTH > 128)
-/* Built for all bitmap targets except H10 5/6gb, Archoses, and ifp */
+#if (LCD_WIDTH > 138)
+/* Built for bitmap targets except H10 5/6gb, Archoses, iPod mini and ifp */
 superdom.c
 #endif
