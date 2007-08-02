@@ -48,7 +48,8 @@ class RbUtilQt : public QMainWindow
     private slots:
         void about(void);
         void configDialog(void);
-        void updateDevice(int);
+        void updateDevice(void);
+        void updateSettings(void);
         void install(void);
         void installBl(void);
         void installFonts(void);

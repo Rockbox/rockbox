@@ -50,7 +50,6 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     }
 
     ui.setupUi(this);
-    initDeviceNames();
 
     // portable installation:
     // check for a configuration file in the program folder.
@@ -66,21 +65,16 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
             QSettings::UserScope, "rockbox.org", "RockboxUtility");
         qDebug() << "config: system";
     }
-
-    userSettings->beginGroup("defaults");
-    platform = userSettings->value("platform").toString();
-    userSettings->endGroup();
-    ui.comboBoxDevice->setCurrentIndex(ui.comboBoxDevice->findData(platform));
-    updateDevice(ui.comboBoxDevice->currentIndex());
     
     // manual tab
     ui.buttonDownloadManual->setEnabled(false);
     updateManual();
+    updateDevice();
 
     connect(ui.actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
     connect(ui.action_About, SIGNAL(triggered()), this, SLOT(about()));
     connect(ui.action_Configure, SIGNAL(triggered()), this, SLOT(configDialog()));
-    connect(ui.comboBoxDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(updateDevice(int)));
+    connect(ui.buttonChangeDevice, SIGNAL(clicked()), this, SLOT(configDialog()));
     connect(ui.buttonRockbox, SIGNAL(clicked()), this, SLOT(install()));
     connect(ui.buttonBootloader, SIGNAL(clicked()), this, SLOT(installBl()));
     connect(ui.buttonFonts, SIGNAL(clicked()), this, SLOT(installFonts()));
@@ -92,7 +86,6 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     ui.buttonRemoveRockbox->setEnabled(false);
     ui.buttonRemoveBootloader->setEnabled(false);
     ui.buttonComplete->setEnabled(false);
-    ui.buttonDetect->setEnabled(false);
 
     initIpodpatcher();
     downloadInfo();
@@ -130,7 +123,8 @@ void RbUtilQt::downloadDone(bool error)
 void RbUtilQt::downloadDone(int id, bool error)
 {
     QString errorString;
-    errorString = tr("Network error: %1. Please check your network and proxy settings.").arg(daily->errorString());
+    errorString = tr("Network error: %1. Please check your network and proxy settings.")
+        .arg(daily->errorString());
     if(error) QMessageBox::about(this, "Network Error", errorString);
     qDebug() << "downloadDone:" << id << error;
 }
@@ -168,38 +162,25 @@ void RbUtilQt::configDialog()
 {
     Config *cw = new Config(this);
     cw->setUserSettings(userSettings);
+    cw->setDevices(devices);
     cw->show();
     connect(cw, SIGNAL(settingsUpdated()), this, SLOT(downloadInfo()));
+    connect(cw, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
 }
 
 
-void RbUtilQt::initDeviceNames()
+void RbUtilQt::updateSettings()
 {
-    qDebug() << "RbUtilQt::initDeviceNames()";
-    devices->beginGroup("platforms");
-    QStringList a = devices->childKeys();
-    devices->endGroup();
-
-    for(int it = 0; it < a.size(); it++) {
-        QString curdev;
-        devices->beginGroup("platforms");
-        curdev = devices->value(a.at(it), "null").toString();
-        devices->endGroup();
-        QString curname;
-        devices->beginGroup(curdev);
-        curname = devices->value("name", "null").toString();
-        devices->endGroup();
-        ui.comboBoxDevice->addItem(curname, curdev);
-    }
+    qDebug() << "updateSettings()";
+    updateDevice();
+    updateManual();
 }
 
 
-void RbUtilQt::updateDevice(int index)
+void RbUtilQt::updateDevice()
 {
-    platform = ui.comboBoxDevice->itemData(index).toString();
-    userSettings->setValue("defaults/platform", platform);
-    userSettings->sync();
-
+    platform = userSettings->value("defaults/platform").toString();
+    // buttons
     devices->beginGroup(platform);
     if(devices->value("needsbootloader", "") == "no") {
         ui.buttonBootloader->setEnabled(false);
@@ -220,10 +201,15 @@ void RbUtilQt::updateDevice(int index)
         }
     }
     devices->endGroup();
-
-    qDebug() << "new device selected:" << platform;
-    // update manual from here to make sure new device is already selected
-    updateManual();
+    // displayed device info
+    platform = userSettings->value("defaults/platform").toString();
+    QString mountpoint = userSettings->value("defaults/mountpoint").toString();
+    devices->beginGroup(platform);
+    QString brand = devices->value("brand").toString();
+    QString name = devices->value("name").toString();
+    devices->endGroup();
+    ui.labelDevice->setText(tr("<b>%1 %2</b> at <b>%3</b>")
+            .arg(brand, name, mountpoint));
 }
 
 
@@ -285,6 +271,7 @@ void RbUtilQt::install()
     installWindow->show();
 }
 
+
 void RbUtilQt::installBl()
 {
     InstallBl *installWindow = new InstallBl(this);
@@ -300,6 +287,7 @@ void RbUtilQt::installBl()
 
     installWindow->show();
 }
+
 
 void RbUtilQt::installFonts()
 {
@@ -320,6 +308,7 @@ void RbUtilQt::installFonts()
 
 }
 
+
 void RbUtilQt::installDoom()
 {
     InstallZipWindow* installWindow = new InstallZipWindow(this);
@@ -338,3 +327,4 @@ void RbUtilQt::installDoom()
     installWindow->show();
 
 }
+

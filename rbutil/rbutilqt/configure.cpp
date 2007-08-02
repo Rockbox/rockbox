@@ -60,15 +60,15 @@ Config::Config(QWidget *parent) : QDialog(parent)
     connect(ui.buttonCancel, SIGNAL(clicked()), this, SLOT(abort()));
     connect(ui.radioNoProxy, SIGNAL(toggled(bool)), this, SLOT(setNoProxy(bool)));
     connect(ui.radioSystemProxy, SIGNAL(toggled(bool)), this, SLOT(setSystemProxy(bool)));
+    connect(ui.browseMountPoint, SIGNAL(clicked()), this, SLOT(browseFolder()));
 
     // disable unimplemented stuff
     ui.buttonCacheBrowse->setEnabled(false);
     ui.cacheDisable->setEnabled(false);
     ui.cacheOfflineMode->setEnabled(false);
     ui.buttonCacheClear->setEnabled(false);
-    ui.scrobblerUser->setEnabled(false);
-    ui.scrobblerPass->setEnabled(false);
-    ui.scrobblerTimezone->setEnabled(false);
+
+    ui.buttonAutodetect->setEnabled(false);
 }
 
 
@@ -115,6 +115,7 @@ void Config::abort()
 void Config::setUserSettings(QSettings *user)
 {
     userSettings = user;
+    // set proxy
     QUrl proxy = userSettings->value("defaults/proxy").toString();
 
     ui.proxyPort->setText(QString("%1").arg(proxy.port()));
@@ -145,6 +146,94 @@ void Config::setUserSettings(QSettings *user)
     if(a.size() > 0)
         ui.listLanguages->setCurrentItem(a.at(0));
 
+    // devices tab
+    ui.mountPoint->setText(userSettings->value("defaults/mountpoint").toString());
+
+}
+
+
+void Config::setDevices(QSettings *dev)
+{
+    devices = dev;
+    // setup devices table
+    qDebug() << "Config::setDevices()";
+    devices->beginGroup("platforms");
+    QStringList a = devices->childKeys();
+    devices->endGroup();
+    
+    QMap <QString, QString> manuf;
+    QMap <QString, QString> devcs;
+    for(int it = 0; it < a.size(); it++) {
+        QString curdev;
+        devices->beginGroup("platforms");
+        curdev = devices->value(a.at(it), "null").toString();
+        devices->endGroup();
+        QString curname;
+        devices->beginGroup(curdev);
+        curname = devices->value("name", "null").toString();
+        QString curbrand = devices->value("brand", "").toString();
+        devices->endGroup();
+        manuf.insertMulti(curbrand, curdev);
+        devcs.insert(curdev, curname);
+    }
+
+    QString platform;
+    platform = devcs.value(userSettings->value("defaults/platform").toString());
+
+    // set up devices table
+    ui.treeDevices->header()->hide();
+    ui.treeDevices->expandAll();
+    ui.treeDevices->setColumnCount(1);
+    QList<QTreeWidgetItem *> items;
+
+    // get manufacturers
+    QStringList brands = manuf.uniqueKeys();
+    QTreeWidgetItem *w;
+    QTreeWidgetItem *w2;
+    QTreeWidgetItem *w3;
+    for(int c = 0; c < brands.size(); c++) {
+        qDebug() << brands.at(c);
+        w = new QTreeWidgetItem();
+        w->setFlags(Qt::ItemIsEnabled);
+        w->setText(0, brands.at(c));
+//        w->setData(0, Qt::DecorationRole, <icon>);
+        items.append(w);
+        
+        // go through platforms again for sake of order
+        for(int it = 0; it < a.size(); it++) {
+            QString curdev;
+            devices->beginGroup("platforms");
+            curdev = devices->value(a.at(it), "null").toString();
+            devices->endGroup();
+            QString curname;
+            devices->beginGroup(curdev);
+            curname = devices->value("name", "null").toString();
+            QString curbrand = devices->value("brand", "").toString();
+            devices->endGroup();
+            if(curbrand != brands.at(c)) continue;
+            qDebug() << "adding:" << brands.at(c) << curname << curdev;
+            w2 = new QTreeWidgetItem(w, QStringList(curname));
+            w2->setData(0, Qt::UserRole, curdev);
+            if(platform.contains(curname)) {
+                w2->setSelected(true);
+                w->setExpanded(true);
+                w3 = w2; // save pointer to hilight old selection
+            }
+            items.append(w2);
+        }
+    }
+    ui.treeDevices->insertTopLevelItems(0, items);
+    ui.treeDevices->setCurrentItem(w3); // hilight old selection
+    connect(ui.treeDevices, SIGNAL(itemSelectionChanged()), this, SLOT(updatePlatform()));
+}
+
+
+void Config::updatePlatform()
+{
+    qDebug() << "updatePlatform()";
+    QString nplat;
+    nplat = ui.treeDevices->selectedItems().at(0)->data(0, Qt::UserRole).toString();
+    userSettings->setValue("defaults/platform", nplat);
 }
 
 
@@ -227,3 +316,20 @@ void Config::updateLanguage()
 }
 
 
+void Config::browseFolder()
+{
+    QFileDialog browser(this);
+    if(QFileInfo(ui.mountPoint->text()).isDir())
+        browser.setDirectory(ui.mountPoint->text());
+    else
+        browser.setDirectory("/media");
+    browser.setReadOnly(true);
+    browser.setFileMode(QFileDialog::DirectoryOnly);
+    browser.setAcceptMode(QFileDialog::AcceptOpen);
+    if(browser.exec()) {
+        qDebug() << browser.directory();
+        QStringList files = browser.selectedFiles();
+        ui.mountPoint->setText(files.at(0));
+        userSettings->setValue("defaults/mountpoint", files.at(0));
+    }
+}
