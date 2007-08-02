@@ -206,7 +206,7 @@ if($english) {
                     # Assign an ID number to this entry
                     $idmap{$id}=$idnum;
                     $idnum++;
-                    print STDERR "DEST: bumped idnum to $idnum\n";
+   #                 print STDERR "DEST: bumped idnum to $idnum\n";
                 }
 
                 # this is the end of a phrase, add it to the english hash
@@ -230,13 +230,13 @@ if($english) {
                 # model name isn't "our"
                 dest($_, $name, $val);
 
-                print STDERR "DEST: \"$dest\" for $name / $id\n";
+   #             print STDERR "DEST: \"$dest\" for $name / $id\n";
 
                 if($update || ($dest && ($dest !~ /^none\z/i))) {
                     # we unconditionally always use all IDs when the "update"
                     # feature is used
                     $id = $maybeid;
-                    print STDERR "DEST: use this id $id\n";
+   #                 print STDERR "DEST: use this id $id\n";
                 }
             }
         }
@@ -362,7 +362,10 @@ while(<LANG>) {
                 my $idstr = $phrase{'id'};
                 my $idnum;
 
-                if($dest =~ /^none\z/i) {
+                if($binary && !$english{$idstr}) {
+                    # $idstr doesn't exist for english, skip it\n";
+                }
+                elsif($dest =~ /^none\z/i) {
                     # "none" as dest (without quotes) means that this entire
                     # phrase is to be ignored
                 }
