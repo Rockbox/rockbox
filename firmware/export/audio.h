@@ -129,6 +129,7 @@ enum rec_channel_modes
 #define CHN_CAP_ALL     (CHN_CAP_STEREO | CHN_CAP_MONO)
 #endif /* CONFIG_CODEC == SWCODEC */
 
+/* the enums below must match prestr[] in recording.c */
 enum audio_sources
 {
     AUDIO_SRC_PLAYBACK = -1, /* Virtual source */

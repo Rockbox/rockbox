@@ -601,37 +601,36 @@ static bool check_dir(char *folder)
     return true;
 }
 
+/* the list below must match enum audio_sources in audio.h */
+static const char* const prestr[] =
+{
+#ifdef HAVE_MIC_IN
+    "R_MIC_",
+#endif
+#ifdef HAVE_LINE_REC
+    "R_LINE_",
+#endif
+#ifdef HAVE_SPDIF_IN
+    "R_SPDIF_",
+#endif
+#ifdef HAVE_FMRADIO_REC
+    "R_FM_",
+#endif
+};
+
 char *rec_create_filename(char *buffer)
 {
     char ext[16];
-    char *pref = "R_";
+    const char *pref = "R_";
 
     strcpy(buffer,global_settings.rec_directory);
     if (!check_dir(buffer))
         return NULL;
 
-    switch(global_settings.rec_source)
+    if((global_settings.rec_source > AUDIO_SRC_PLAYBACK) &&
+       (global_settings.rec_source < AUDIO_NUM_SOURCES))
     {
-#ifdef HAVE_MIC_IN        
-    case AUDIO_SRC_MIC:
-        pref = "R_MIC_";
-        break;
-#endif    
-#ifdef HAVE_LINE_REC
-    case AUDIO_SRC_LINEIN:
-        pref = "R_LINE_";
-        break;
-#endif        
-#ifdef HAVE_FMRADIO_REC
-    case AUDIO_SRC_FMRADIO:
-        pref = "R_FM_";
-        break;
-#endif        
-#ifdef HAVE_SPDIF_IN
-    case AUDIO_SRC_SPDIF:
-        pref = "R_SPDIF_";
-        break;
-#endif        
+        pref = prestr[global_settings.rec_source];
     }
     
     snprintf(ext, sizeof(ext), ".%s",
