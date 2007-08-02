@@ -618,7 +618,11 @@ long gui_wps_show(void)
                 update_track = true;
                 ffwd_rew(button); /* hopefully fix the ffw/rwd bug */
                 break;
-
+#ifdef HAVE_RECORDING
+            case ACTION_WPS_REC:
+                exit = true;
+                break;
+#endif
             case SYS_POWEROFF:
                 bookmark_autobookmark();
 #if LCD_DEPTH > 1
@@ -676,6 +680,10 @@ long gui_wps_show(void)
             audio_stop();
 #ifdef AB_REPEAT_ENABLE
             ab_reset_markers();
+#endif
+#ifdef HAVE_RECORDING
+            if (button == ACTION_WPS_REC)
+                return GO_TO_RECSCREEN;
 #endif
             if (global_settings.browse_current)
                 return GO_TO_PREVIOUS_BROWSER;

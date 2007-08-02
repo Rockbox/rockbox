@@ -91,6 +91,7 @@ enum {
     ACTION_STD_MENU,
     ACTION_STD_QUICKSCREEN,
     ACTION_STD_KEYLOCK,
+    ACTION_STD_REC,
     
     ACTION_F3, /* just so everything works again, possibly change me */
     /* code context actions */
@@ -111,6 +112,7 @@ enum {
     ACTION_WPS_CONTEXT,
     ACTION_WPS_QUICKSCREEN,/* optional */
     ACTION_WPS_MENU, /*this should be the same as ACTION_STD_MENU */
+    ACTION_WPS_REC,
 #if 0
     ACTION_WPSAB_SINGLE, /* This needs to be #defined in 
                             the config-<target>.h to one of the ACTION_WPS_ actions

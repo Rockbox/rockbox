@@ -61,6 +61,7 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_OK,            BUTTON_SELECT|BUTTON_REL,   BUTTON_SELECT },
     { ACTION_STD_OK,            BUTTON_RIGHT,               BUTTON_NONE },
     { ACTION_STD_OK,            BUTTON_ON|BUTTON_REL,       BUTTON_NONE },
+    { ACTION_STD_REC,           BUTTON_REC|BUTTON_REPEAT,        BUTTON_NONE },
     
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
@@ -88,6 +89,7 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_BROWSE,        BUTTON_SELECT|BUTTON_REL,       BUTTON_SELECT },
     { ACTION_WPS_ABRESET,       BUTTON_ON|BUTTON_SELECT,        BUTTON_ON },
     { ACTION_WPS_ID3SCREEN,     BUTTON_ON|BUTTON_MODE,          BUTTON_NONE },
+    { ACTION_WPS_REC,           BUTTON_REC|BUTTON_REPEAT,        BUTTON_NONE },
     
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */

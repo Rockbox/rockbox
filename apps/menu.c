@@ -340,6 +340,14 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
             continue;
         }
         
+#ifdef HAVE_RECORDING
+        if (action == ACTION_STD_REC)
+        {
+            ret = GO_TO_RECSCREEN;
+            done = true;
+        }
+        else
+#endif
         if (action == ACTION_TREE_WPS)
         {
             ret = GO_TO_PREVIOUS_MUSIC;

@@ -630,6 +630,11 @@ static int dirbrowse()
                 return GO_TO_ROOT;
                 break;
 
+#ifdef HAVE_RECORDING
+            case ACTION_STD_REC:
+                return GO_TO_RECSCREEN;
+#endif
+
             case ACTION_TREE_WPS:
                 return GO_TO_PREVIOUS_MUSIC;
                 break;
