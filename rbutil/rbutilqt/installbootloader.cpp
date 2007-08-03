@@ -349,7 +349,7 @@ void BootloaderInstaller::iaudioFinish()
     
     downloadFile.remove();
 
-    m_dp->addItem(tr("Bootloader install finished successfully."),LOGERROR);
+    m_dp->addItem(tr("Bootloader install finished successfully."),LOGOK);
     m_dp->abort();
     
     emit done(false);  // success
