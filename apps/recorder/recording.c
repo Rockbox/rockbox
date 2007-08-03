@@ -604,18 +604,10 @@ static bool check_dir(char *folder)
 /* the list below must match enum audio_sources in audio.h */
 static const char* const prestr[] =
 {
-#ifdef HAVE_MIC_IN
-    "R_MIC_",
-#endif
-#ifdef HAVE_LINE_REC
-    "R_LINE_",
-#endif
-#ifdef HAVE_SPDIF_IN
-    "R_SPDIF_",
-#endif
-#ifdef HAVE_FMRADIO_REC
-    "R_FM_",
-#endif
+    HAVE_MIC_IN_([AUDIO_SRC_MIC]          = "R_MIC_",)
+    HAVE_LINE_REC_([AUDIO_SRC_LINEIN]     = "R_LINE_",)
+    HAVE_SPDIF_IN_([AUDIO_SRC_SPDIF]      = "R_SPDIF_",)
+    HAVE_FMRADIO_REC_([AUDIO_SRC_FMRADIO] = "R_FM_",)
 };
 
 char *rec_create_filename(char *buffer)
