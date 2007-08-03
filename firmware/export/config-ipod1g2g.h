@@ -73,6 +73,9 @@
 /* Define this if you have a PortalPlayer PP5002 */
 #define CONFIG_CPU PP5002
 
+/* We're able to shut off power to the HDD */
+#define HAVE_ATA_POWER_OFF
+
 /* Define this if you want to use the PP5002 i2c interface */
 #define CONFIG_I2C I2C_PP5002
 
