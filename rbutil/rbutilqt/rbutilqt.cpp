@@ -28,7 +28,6 @@
 #include "installbl.h"
 #include "httpget.h"
 #include "installbootloader.h"
-#include "installzipwindow.h"
 
 #ifdef __linux
 #include <stdio.h>
@@ -290,40 +289,57 @@ void RbUtilQt::installBl()
 
 void RbUtilQt::installFonts()
 {
-    InstallZipWindow* installWindow = new InstallZipWindow(this);
-    installWindow->setUserSettings(userSettings);
-    installWindow->setDeviceSettings(devices);
+    if(QMessageBox::question(this, tr("Confirm Installation"),
+        tr("Do you really want to install the fonts package?"),
+           QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
+    // create logger
+    logger = new ProgressLoggerGui(this);
+    logger->show();
+    
+    // create zip installer
+    installer = new ZipInstaller(this);
+   
+    installer->setUrl(devices->value("font_url").toString());
     if(userSettings->value("defaults/proxytype") == "manual")
-        installWindow->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
+        installer->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
 #ifdef __linux
     else if(userSettings->value("defaults/proxytype") == "system")
-        installWindow->setProxy(QUrl(getenv("http_proxy")));
+        installer->setProxy(QUrl(getenv("http_proxy")));
 #endif
-    installWindow->setMountPoint(userSettings->value("defaults/mountpoint").toString());
-    installWindow->setLogSection("Fonts");
-    installWindow->setUrl(devices->value("font_url").toString());
-    installWindow->setWindowTitle("Font Installation");
-    installWindow->show();
 
+    installer->setLogSection("Fonts");
+    installer->setMountPoint(userSettings->value("defaults/mountpoint").toString());
+    installer->install(logger);
+    
+    connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));
 }
 
 
 void RbUtilQt::installDoom()
 {
-    InstallZipWindow* installWindow = new InstallZipWindow(this);
-    installWindow->setUserSettings(userSettings);
-    installWindow->setDeviceSettings(devices);
+    if(QMessageBox::question(this, tr("Confirm Installation"),
+       tr("Do you really want to install the game addon files?"),
+       QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
+    // create logger
+    logger = new ProgressLoggerGui(this);
+    logger->show();
+    
+    // create zip installer
+    installer = new ZipInstaller(this);
+   
+    installer->setUrl(devices->value("doom_url").toString());
     if(userSettings->value("defaults/proxytype") == "manual")
-        installWindow->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
+        installer->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
 #ifdef __linux
     else if(userSettings->value("defaults/proxytype") == "system")
-        installWindow->setProxy(QUrl(getenv("http_proxy")));
+        installer->setProxy(QUrl(getenv("http_proxy")));
 #endif
-    installWindow->setMountPoint(userSettings->value("defaults/mountpoint").toString());
-    installWindow->setLogSection("Doom");
-    installWindow->setUrl(devices->value("doom_url").toString());
-    installWindow->setWindowTitle("Doom Installation");
-    installWindow->show();
+
+    installer->setLogSection("Game Addons");
+    installer->setMountPoint(userSettings->value("defaults/mountpoint").toString());
+    installer->install(logger);
+    
+    connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));
 
 }
 

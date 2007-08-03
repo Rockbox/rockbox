@@ -8,14 +8,13 @@ SOURCES += rbutilqt.cpp \
  installzip.cpp \
  installbootloader.cpp \
  installbl.cpp \
- installzipwindow.cpp \
  progressloggergui.cpp \
  ../ipodpatcher/ipodpatcher.c \
  ../sansapatcher/sansapatcher.c \
  irivertools/irivertools.cpp \
- irivertools/md5sum.cpp
+ irivertools/md5sum.cpp 
 
- 
+
 HEADERS += rbutilqt.h \
  settings.h \
  install.h \
@@ -42,8 +41,9 @@ HEADERS += rbutilqt.h \
  irivertools/md5sum.h \
  irivertools/h100sums.h \ 
  irivertools/h120sums.h \
- irivertools/h300sums.h
- 
+ irivertools/h300sums.h \
+ irivertools/checksums.h
+
 TEMPLATE = app
 CONFIG += release \
           warn_on \
@@ -56,10 +56,9 @@ FORMS += rbutilqtfrm.ui \
  installfrm.ui \
  installprogressfrm.ui \
  configurefrm.ui \
- installbootloaderfrm.ui \
- installzipfrm.ui
- 
- 
+ installbootloaderfrm.ui 
+
+
 RESOURCES += rbutilqt.qrc
 
 TRANSLATIONS += rbutil_de.ts

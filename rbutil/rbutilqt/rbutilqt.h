@@ -21,10 +21,13 @@
 #ifndef QRBUTIL_H
 #define QRBUTIL_H
 
-#include "ui_rbutilqtfrm.h"
-#include "httpget.h"
 #include <QSettings>
 #include <QTemporaryFile>
+
+#include "ui_rbutilqtfrm.h"
+#include "httpget.h"
+#include "installzip.h"
+#include "progressloggergui.h"
 
 class RbUtilQt : public QMainWindow
 {
@@ -44,6 +47,8 @@ class RbUtilQt : public QMainWindow
         QString absolutePath;
         QTemporaryFile buildInfo;
         void updateManual(void);
+        ProgressLoggerGui *logger;
+        ZipInstaller *installer;
 
     private slots:
         void about(void);
