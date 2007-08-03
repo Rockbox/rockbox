@@ -1038,9 +1038,20 @@ int read_directory(struct ipod_t* ipod)
     }
 
     p = sectorbuf + x;
-    
+
+    /* A hack to detect 2nd gen Nanos - maybe there is a better way? */
+    if (p[0] == 0)
+    {
+        n=ipod_read(ipod, sectorbuf, ipod->sector_size);
+        if (n < 0) { 
+            fprintf(stderr,"[ERR]  Read of directory failed.\n");
+            return -1;
+        }
+        p = sectorbuf;
+    }
+
     while ((ipod->nimages < MAX_IMAGES) && (p < (sectorbuf + x + 400)) && 
-           (memcmp(p,"!ATA",4)==0)) {
+           ((memcmp(p,"!ATA",4)==0) || (memcmp(p,"DNAN",4)==0))) {
         p+=4;
         if (memcmp(p,"soso",4)==0) {
             ipod->ipod_directory[ipod->nimages].ftype=FTYPE_OSOS;
@@ -1220,6 +1231,15 @@ int getmodel(struct ipod_t* ipod, int ipod_version)
 #ifdef WITH_BOOTOBJS
             ipod->bootloader = ipodvideo;
             ipod->bootloader_len = LEN_ipodvideo;
+#endif
+            break;
+        case 0x100:
+            ipod->modelstr="2nd Generation Nano";
+            ipod->modelnum = 0;
+            ipod->targetname = NULL;
+#ifdef WITH_BOOTOBJS
+            ipod->bootloader = NULL;
+            ipod->bootloader_len = 0;
 #endif
             break;
         default:
