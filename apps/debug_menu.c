@@ -1194,6 +1194,8 @@ bool dbg_ports(void)
         lcd_puts(0, line++, buf);
         line++;
         
+        snprintf(buf, sizeof(buf), "DEV_EN:       %08lx", DEV_EN);
+        lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "CLOCK_SRC:    %08lx", CLOCK_SOURCE);
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "CLCD_CLK_SRC: %08lx", CLCD_CLOCK_SRC);
@@ -1201,8 +1203,6 @@ bool dbg_ports(void)
         snprintf(buf, sizeof(buf), "PLL_CONTROL:  %08lx", PLL_CONTROL);
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "PLL_STATUS:   %08lx", PLL_STATUS);
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "DEV_INIT:     %08lx", DEV_INIT);
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "DEV_TIMING1:  %08lx", DEV_TIMING1);
         lcd_puts(0, line++, buf);
