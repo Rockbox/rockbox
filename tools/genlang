@@ -259,6 +259,10 @@ sub compare {
     my $mode=0;
     
     for my $l (@$engref) {
+        if($l =~ /^ *#/) {
+            # comment
+            next;
+        }
         if($l =~ /^ *desc: (.*)/) {
             $edesc=$1;
         }
