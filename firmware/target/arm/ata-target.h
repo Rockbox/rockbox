@@ -19,20 +19,6 @@
 
 #ifdef CPU_PP
 
-#if (CONFIG_CPU == PP5002)
-
-/* Plain C reading and writing. See comment in ata-as-arm.S */
-
-#elif defined CPU_PP502x
-
-/* asm optimized reading and writing */
-#define ATA_OPTIMIZED_READING
-#define ATA_OPTIMIZED_WRITING
-void copy_read_sectors(unsigned char* buf, int wordcount);
-void copy_write_sectors(const unsigned char* buf, int wordcount);
-
-#endif /* CONFIG_CPU */
-
 /* primary channel */
 #define ATA_DATA        (*((volatile unsigned short*)(IDE_BASE + 0x1e0)))
 #define ATA_ERROR       (*((volatile unsigned char*)(IDE_BASE + 0x1e4)))
@@ -66,8 +52,27 @@ void copy_write_sectors(const unsigned char* buf, int wordcount);
 #define READ_PATTERN3_MASK 0xff
 #define READ_PATTERN4_MASK 0xff
 
+#if (CONFIG_CPU == PP5002)
+
+#define SET_REG(reg,val) do { reg = (val); \
+                              while (!(IDE_CFG_STATUS & 0x40)); \
+                         } while (0)
+#define SET_16BITREG(reg,val) reg = (val)
+
+/* Plain C reading and writing. See comment in ata-as-arm.S */
+
+#elif defined CPU_PP502x
+
 #define SET_REG(reg,val) reg = (val)
 #define SET_16BITREG(reg,val) reg = (val)
+
+/* asm optimized reading and writing */
+#define ATA_OPTIMIZED_READING
+#define ATA_OPTIMIZED_WRITING
+void copy_read_sectors(unsigned char* buf, int wordcount);
+void copy_write_sectors(const unsigned char* buf, int wordcount);
+
+#endif /* CONFIG_CPU */
 
 #endif
 
