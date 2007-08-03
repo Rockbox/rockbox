@@ -2235,8 +2235,16 @@ int average_strength(bool colour) {
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int tempmenu;
-    rb = api;
     bool statusbar_setting;
+
+    rb = api;
+
+#if LCD_DEPTH > 1
+    rb->lcd_set_backdrop(NULL);
+    rb->lcd_set_foreground(LCD_BLACK);
+    rb->lcd_set_background(LCD_WHITE);
+#endif
+
     statusbar_setting = rb->global_settings->statusbar; 
     rb->global_settings->statusbar = false;
     cursor.x = 1;
