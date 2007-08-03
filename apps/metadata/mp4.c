@@ -428,7 +428,7 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                 unsigned short n[2];
                 
                 read_mp4_tag(fd, size, (char*) &n, sizeof(n));
-                id3->disknum = betoh16(n[1]);
+                id3->discnum = betoh16(n[1]);
             }
             break;
 
