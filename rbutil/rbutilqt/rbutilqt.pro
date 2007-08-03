@@ -29,7 +29,6 @@ HEADERS += rbutilqt.h \
  installzip.h \
  installbootloader.h \
  installbl.h \
- installzipwindow.h \
  progressloggerinterface.h \
  progressloggergui.h \
  ../ipodpatcher/ipodpatcher.h \
