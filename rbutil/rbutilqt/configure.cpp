@@ -98,6 +98,16 @@ void Config::accept()
             tr("You need to restart the application for the changed language to take effect."));
     userSettings->setValue("defaults/lang", language);
 
+    // mountpoint
+    QString mp = ui.mountPoint->text();
+    if(QFileInfo(mp).isDir())
+        userSettings->setValue("defaults/mountpoint", mp);
+
+    // platform
+    QString nplat;
+    nplat = ui.treeDevices->selectedItems().at(0)->data(0, Qt::UserRole).toString();
+    userSettings->setValue("defaults/platform", nplat);
+
     // sync settings
     userSettings->sync();
     this->close();
@@ -118,7 +128,9 @@ void Config::setUserSettings(QSettings *user)
     // set proxy
     QUrl proxy = userSettings->value("defaults/proxy").toString();
 
-    ui.proxyPort->setText(QString("%1").arg(proxy.port()));
+    if(proxy.port() > 0)
+        ui.proxyPort->setText(QString("%1").arg(proxy.port()));
+    else ui.proxyPort->setText("");
     ui.proxyHost->setText(proxy.host());
     ui.proxyUser->setText(proxy.userName());
     ui.proxyPass->setText(proxy.password());
@@ -225,16 +237,6 @@ void Config::setDevices(QSettings *dev)
     ui.treeDevices->insertTopLevelItems(0, items);
     if(w3 != 0)
         ui.treeDevices->setCurrentItem(w3); // hilight old selection
-    connect(ui.treeDevices, SIGNAL(itemSelectionChanged()), this, SLOT(updatePlatform()));
-}
-
-
-void Config::updatePlatform()
-{
-    qDebug() << "updatePlatform()";
-    QString nplat;
-    nplat = ui.treeDevices->selectedItems().at(0)->data(0, Qt::UserRole).toString();
-    userSettings->setValue("defaults/platform", nplat);
 }
 
 
@@ -273,7 +275,9 @@ void Config::setSystemProxy(bool checked)
     }
     else {
         ui.proxyHost->setText(proxy.host());
-        ui.proxyPort->setText(QString("%1").arg(proxy.port()));
+        if(proxy.port() > 0)
+            ui.proxyPort->setText(QString("%1").arg(proxy.port()));
+        else ui.proxyPort->setText("");
         ui.proxyUser->setText(proxy.userName());
         ui.proxyPass->setText(proxy.password());
     }

@@ -207,6 +207,8 @@ void RbUtilQt::updateDevice()
     QString brand = devices->value("brand").toString();
     QString name = devices->value("name").toString();
     devices->endGroup();
+    if(name.isEmpty()) name = "&lt;none&gt;";
+    if(mountpoint.isEmpty()) mountpoint = "&lt;invalid&gt;";
     ui.labelDevice->setText(tr("<b>%1 %2</b> at <b>%3</b>")
             .arg(brand, name, mountpoint));
 }
