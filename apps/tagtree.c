@@ -209,6 +209,7 @@ static int get_tag(int *tag)
     MATCH(tag, buf, "title", tag_title);
     MATCH(tag, buf, "filename", tag_filename);
     MATCH(tag, buf, "tracknum", tag_tracknumber);
+    MATCH(tag, buf, "discnum", tag_discnumber);
     MATCH(tag, buf, "year", tag_year);
     MATCH(tag, buf, "playcount", tag_playcount);
     MATCH(tag, buf, "rating", tag_rating);

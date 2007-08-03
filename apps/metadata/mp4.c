@@ -43,6 +43,7 @@
 #define MP4_cwrt MP4_ID(0xa9, 'w', 'r', 't')
 #define MP4_ccmt MP4_ID(0xa9, 'c', 'm', 't')
 #define MP4_cday MP4_ID(0xa9, 'd', 'a', 'y')
+#define MP4_disk MP4_ID('d', 'i', 's', 'k')
 #define MP4_esds MP4_ID('e', 's', 'd', 's')
 #define MP4_ftyp MP4_ID('f', 't', 'y', 'p')
 #define MP4_gnre MP4_ID('g', 'n', 'r', 'e')
@@ -420,6 +421,15 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
         case MP4_cgen:
             read_mp4_tag_string(fd, size, &buffer, &buffer_left,
                 &id3->genre_string);
+            break;
+
+        case MP4_disk:
+            {
+                unsigned short n[2];
+                
+                read_mp4_tag(fd, size, (char*) &n, sizeof(n));
+                id3->disknum = betoh16(n[1]);
+            }
             break;
 
         case MP4_trkn:

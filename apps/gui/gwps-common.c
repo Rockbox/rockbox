@@ -876,6 +876,15 @@ static char *get_token_value(struct gui_wps *gwps,
         case WPS_TOKEN_METADATA_GENRE:
             return id3->genre_string;
 
+        case WPS_TOKEN_METADATA_DISC_NUMBER:
+            if (id3->disc_string)
+                return id3->disc_string;
+            if (id3->discnum) {
+                snprintf(buf, buf_size, "%d", id3->discnum);
+                return buf;
+            }
+            return NULL;
+
         case WPS_TOKEN_METADATA_TRACK_NUMBER:
             if (id3->track_string)
                 return id3->track_string;

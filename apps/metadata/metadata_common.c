@@ -224,6 +224,11 @@ long parse_tag(const char* name, char* value, struct mp3entry* id3,
         id3->tracknum = atoi(value);
         p = &(id3->track_string);
     }
+    else if (strcasecmp(name, "discnumber") == 0 || strcasecmp(name, "disc") == 0)
+    {
+        id3->discnum = atoi(value);
+        p = &(id3->disc_string);
+    }
     else if (((strcasecmp(name, "year") == 0) && (type == TAGTYPE_APE))
         || ((strcasecmp(name, "date") == 0) && (type == TAGTYPE_VORBIS)))
     {

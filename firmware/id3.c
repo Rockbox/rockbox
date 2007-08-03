@@ -352,6 +352,13 @@ static int parsetracknum( struct mp3entry* entry, char* tag, int bufferpos )
 }
 
 /* parse numeric value from string */
+static int parsediscnum( struct mp3entry* entry, char* tag, int bufferpos )
+{
+    entry->discnum = atoi( tag );
+    return bufferpos;
+}
+
+/* parse numeric value from string */
 static int parseyearnum( struct mp3entry* entry, char* tag, int bufferpos )
 {
     entry->year = atoi( tag );
@@ -446,6 +453,7 @@ static const struct tag_resolver taglist[] = {
     { "TALB", 4, offsetof(struct mp3entry, album), NULL, false },
     { "TAL",  3, offsetof(struct mp3entry, album), NULL, false },
     { "TRK",  3, offsetof(struct mp3entry, track_string), &parsetracknum, false },
+    { "TPOS", 4, offsetof(struct mp3entry, disc_string), &parsediscnum, false },
     { "TRCK", 4, offsetof(struct mp3entry, track_string), &parsetracknum, false },
     { "TDRC", 4, offsetof(struct mp3entry, year_string), &parseyearnum, false },
     { "TYER", 4, offsetof(struct mp3entry, year_string), &parseyearnum, false },
@@ -693,7 +701,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             return;
     }
     entry->id3version = version;
-    entry->tracknum = entry->year = 0;
+    entry->tracknum = entry->year = entry->discnum = 0;
     entry->title = entry->artist = entry->album = NULL; /* FIXME incomplete */
 
     global_flags = header[5];
@@ -1112,6 +1120,7 @@ bool get_mp3_metadata(int fd, struct mp3entry *entry, const char *filename, bool
     entry->filesize = filesize(fd);
     entry->id3v2len = getid3v2len(fd);
     entry->tracknum = 0;
+    entry->discnum = 0;
 
     if(v1first)
         v1found = setid3v1title(fd, entry);
@@ -1173,6 +1182,8 @@ void adjust_mp3entry(struct mp3entry *entry, void *dest, void *orig)
         entry->genre_string += offset;
     if (entry->track_string)
         entry->track_string += offset;
+    if (entry->disc_string)
+        entry->disc_string += offset;
     if (entry->year_string)
         entry->year_string += offset;
     if (entry->composer)

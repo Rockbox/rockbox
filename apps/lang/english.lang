@@ -11054,3 +11054,17 @@
     *: "Can't write to recording directory"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ID3_DISCNUM
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Discnum]"
+  </source>
+  <dest>
+    *: "[Discnum]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>

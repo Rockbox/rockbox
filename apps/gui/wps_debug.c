@@ -294,6 +294,10 @@ static void dump_wps_tokens(struct wps_data *data)
                          next_str(next));
                 break;
 
+            case WPS_TOKEN_METADATA_DISC_NUMBER:
+                snprintf(buf, sizeof(buf), "%strack disc", next_str(next));
+                break;
+
             case WPS_TOKEN_METADATA_TRACK_NUMBER:
                 snprintf(buf, sizeof(buf), "%strack number",
                          next_str(next));

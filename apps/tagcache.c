@@ -115,7 +115,7 @@ static const int unique_tags[] = { tag_artist, tag_album, tag_genre,
     tag_composer, tag_comment, tag_albumartist };
 
 /* Numeric tags (we can use these tags with conditional clauses). */
-static const int numeric_tags[] = { tag_year, tag_tracknumber, tag_length, 
+static const int numeric_tags[] = { tag_year, tag_discnumber, tag_tracknumber, tag_length,
     tag_bitrate, tag_playcount, tag_rating, tag_playtime, tag_lastplayed, tag_commitid,
     tag_virt_length_min, tag_virt_length_sec,
     tag_virt_playtime_min, tag_virt_playtime_sec,
@@ -123,7 +123,7 @@ static const int numeric_tags[] = { tag_year, tag_tracknumber, tag_length,
 
 /* String presentation of the tags defined in tagcache.h. Must be in correct order! */
 static const char *tags_str[] = { "artist", "album", "genre", "title", 
-    "filename", "composer", "comment", "albumartist", "year", "tracknumber", 
+    "filename", "composer", "comment", "albumartist", "year", "discnumber", "tracknumber",
     "bitrate", "length", "playcount", "rating", "playtime", "lastplayed", "commitid" };
 
 /* Status information of the tagcache. */
@@ -188,7 +188,7 @@ struct master_header {
 
 /* For the endianess correction */
 static const char *tagfile_entry_ec   = "ss";
-static const char *index_entry_ec     = "llllllllllllllllll"; /* (1 + TAG_COUNT) * l */
+static const char *index_entry_ec     = "lllllllllllllllllll"; /* (1 + TAG_COUNT) * l */
 static const char *tagcache_header_ec = "lll";
 static const char *master_header_ec   = "llllll";
 
@@ -1556,6 +1556,7 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
     id3->score      = get_tag_numeric(entry, tag_virt_autoscore) / 10;
     id3->year       = get_tag_numeric(entry, tag_year);
 
+    id3->discnum = get_tag_numeric(entry, tag_discnumber);
     id3->tracknum = get_tag_numeric(entry, tag_tracknumber);
     id3->bitrate = get_tag_numeric(entry, tag_bitrate);
     if (id3->bitrate == 0)
@@ -1699,6 +1700,7 @@ static void add_tagcache(char *path)
     
     /* Numeric tags */
     entry.tag_offset[tag_year] = track.id3.year;
+    entry.tag_offset[tag_discnumber] = track.id3.discnum;
     entry.tag_offset[tag_tracknumber] = track.id3.tracknum;
     entry.tag_offset[tag_length] = track.id3.length;
     entry.tag_offset[tag_bitrate] = track.id3.bitrate;
