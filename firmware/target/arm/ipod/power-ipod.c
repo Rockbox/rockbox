@@ -30,11 +30,12 @@
 
 void power_init(void)
 {
-#ifdef IPOD_1G2G  /* probably also 3rd gen */
+#if defined(IPOD_1G2G) || defined(IPOD_3G)
     GPIOC_ENABLE |= 0x40;      /* GPIO C6 is HDD power (low active) */
     GPIOC_OUTPUT_VAL &= ~0x40; /* on by default */
     GPIOC_OUTPUT_EN |= 0x40;   /* enable output */
-#else
+#endif
+#ifndef IPOD_1G2G
     pcf50605_init();
 #endif
 }
@@ -57,7 +58,7 @@ bool charging_state(void) {
 
 void ide_power_enable(bool on)
 {
-#ifdef IPOD_1G2G /* probably also 3rd gen */
+#if defined(IPOD_1G2G) || defined(IPOD_3G)
     if (on)
         GPIOC_OUTPUT_VAL &= ~0x40;
     else
@@ -70,7 +71,7 @@ void ide_power_enable(bool on)
 
 bool ide_powered(void)
 {
-#ifdef IPOD_1G2G  /* probably also 3rd gen */
+#if defined(IPOD_1G2G) || defined(IPOD_3G)
     return !(GPIOC_OUTPUT_VAL & 0x40);
 #else
     /* pretend we are always powered - we don't turn it off on the ipod */
