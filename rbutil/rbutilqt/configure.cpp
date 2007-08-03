@@ -190,7 +190,7 @@ void Config::setDevices(QSettings *dev)
     QStringList brands = manuf.uniqueKeys();
     QTreeWidgetItem *w;
     QTreeWidgetItem *w2;
-    QTreeWidgetItem *w3;
+    QTreeWidgetItem *w3 = 0;
     for(int c = 0; c < brands.size(); c++) {
         qDebug() << brands.at(c);
         w = new QTreeWidgetItem();
@@ -223,7 +223,8 @@ void Config::setDevices(QSettings *dev)
         }
     }
     ui.treeDevices->insertTopLevelItems(0, items);
-    ui.treeDevices->setCurrentItem(w3); // hilight old selection
+    if(w3 != 0)
+        ui.treeDevices->setCurrentItem(w3); // hilight old selection
     connect(ui.treeDevices, SIGNAL(itemSelectionChanged()), this, SLOT(updatePlatform()));
 }
 
