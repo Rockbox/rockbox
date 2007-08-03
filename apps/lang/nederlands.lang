@@ -10741,6 +10741,7 @@
   user:
   <source>
     *: "List Acceleration Speed"
+    e200: ""
   </source>
   <dest>
     *: "Lijst Acceleratie Snelheid"
@@ -10926,6 +10927,7 @@
   user:
   <source>
     *: "List Acceleration Start Delay"
+    e200: ""
   </source>
   <dest>
     *: "Lijst Acceleratie Start Vertraging"
@@ -11038,4 +11040,17 @@
     *: "Stel in als Opname Locatie"
   </voice>
 </phrase>
-
+<phrase>
+  id: LANG_ID3_DISCNUM
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Discnum]"
+  </source>
+  <dest>
+    *: "[DiscNr]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
