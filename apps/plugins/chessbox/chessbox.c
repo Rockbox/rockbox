@@ -1032,6 +1032,7 @@ void cb_play_game(void) {
                     computer = black;
                 }
                 rb->splash ( 0 , "Thinking..." );
+                ElapsedTime(1);
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
                 rb->cpu_boost ( true );
 #endif

@@ -52,5 +52,6 @@ void GNUChess_Initialize(void);
 int  VerifyMove(char s[],short iop,unsigned short *mv);
 int  SelectMove ( short side, short iop , void (*callback)(void), char *move_buffer );
 void InitializeStats ( void );
+void ElapsedTime ( short iop );
 
 #endif
