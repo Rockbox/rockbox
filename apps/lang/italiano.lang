@@ -11022,3 +11022,17 @@ LANG_RECORDING_AGC_PRESET: The phrase is not used. Skipped
     *: "Imposta come cartella di registrazione"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ID3_DISCNUM
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Discnum]"
+  </source>
+  <dest>
+    *: "[Discnum]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
