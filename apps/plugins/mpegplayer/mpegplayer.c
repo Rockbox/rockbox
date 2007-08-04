@@ -227,15 +227,10 @@ static inline bool str_have_msg(Stream *str)
 /* Waits until a message is sent */
 static void str_wait_msg(Stream *str)
 {
-    /* NOTE: sleep(0) caused a prefectch abort at C0EDBABE on e200 -
-       will look into this oddness */
-#if 0
     int spin_count = 0;
-#endif
 
     while (str->have_msg == 0)
     {
-#if 0
         if (spin_count < 100)
         {
             rb->yield();
@@ -244,8 +239,6 @@ static void str_wait_msg(Stream *str)
         }
 
         rb->sleep(0);
-#endif
-        rb->yield();
     }
 }
 
@@ -285,12 +278,7 @@ static void str_reply_msg(Stream *str, int reply)
 /* Sends a message to a stream and waits for a reply */
 static intptr_t str_send_msg(Stream *str, int id, intptr_t data)
 {
-    /* NOTE: sleep(0) caused a prefectch abort at C0EDBABE on e200 -
-       will look into this oddness */
-#if 0
     int spin_count = 0;
-#endif
-
     intptr_t reply;
 
 #if 0
@@ -309,7 +297,6 @@ static intptr_t str_send_msg(Stream *str, int id, intptr_t data)
 
     while (str->replied == 0 && str->status != STREAM_TERMINATED)
     {
-#if 0
         if (spin_count < 100)
         {
             rb->yield();
@@ -318,8 +305,6 @@ static intptr_t str_send_msg(Stream *str, int id, intptr_t data)
         }
 
         rb->sleep(0);
-#endif
-        rb->yield();
     }
 
     reply = str->reply;
@@ -1925,6 +1910,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
 
     init_stream_lock();
+
+    flush_icache();
 
     /* We put the video thread on the second processor for multi-core targets. */
     if ((video_str.thread = rb->create_thread(video_thread,
