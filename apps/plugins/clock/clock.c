@@ -174,16 +174,17 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
                 break;
 
             default:
-                redraw=false;
                 if(rb->default_event_handler_ex(button, cleanup, NULL)
                    == SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
+                if(time.second != last_second){
+                    last_second=time.second;
+                    redraw=true;
+                }else
+                    redraw=false;
                 break;
         }
-        if(time.second != last_second){
-            last_second=time.second;
-            redraw=true;
-        }
+
         if(redraw){
             clock_draw_set_colors();
             FOR_NB_SCREENS(i)

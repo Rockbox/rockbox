@@ -19,6 +19,7 @@
 
 #include "plugin.h"
 #include "pluginlib_actions.h"
+#include "picture.h"
 
 PLUGIN_HEADER
 
@@ -52,32 +53,19 @@ static unsigned long char_patterns[NB_SLOTS];
 #define PICTURE_ROTATION_STEPS REMOTE_PICTURE_HEIGHT
 #endif
 
-struct jackpot_picture{
-    const void* data;
-    int width;
-    int height;
-};
-
 /* FIXME: would be nice to have better graphics ... */
 #include "jackpot_slots.h"
 #if NB_SCREENS==2
 #include "jackpot_slots_remote.h"
 #endif
 
-const struct jackpot_picture jackpot_pictures[]={
-    {
-        jackpot_slots,
-        BMPWIDTH_jackpot_slots,
-        PICTURE_HEIGHT
-    },
+const struct picture jackpot_pictures[]={
+    {jackpot_slots, BMPWIDTH_jackpot_slots,PICTURE_HEIGHT},
 #if NB_SCREENS==2
-    {
-        jackpot_slots_remote,
-        BMPWIDTH_jackpot_slots_remote,
-        REMOTE_PICTURE_HEIGHT
-    }
+    {jackpot_slots_remote,BMPWIDTH_jackpot_slots_remote,REMOTE_PICTURE_HEIGHT}
 #endif
 };
+
 #define SLEEP_TIME (HZ/100)
 #endif /* HAVE_LCD_CHARCELLS */
 
@@ -182,8 +170,7 @@ void jackpot_display_slot_machine(struct jackpot* game, struct screen* display)
 #ifdef HAVE_LCD_CHARCELLS
     display->putc(0, 0, '[');
 #else
-    const struct jackpot_picture* picture=
-            &(jackpot_pictures[display->screen_type]);
+    const struct picture* picture= &(jackpot_pictures[display->screen_type]);
     int pos_x=(display->width-NB_SLOTS*(picture->width+1))/2;
     int pos_y=(display->height-(picture->height))/2;
 #endif /* HAVE_LCD_CHARCELLS */
@@ -216,6 +203,7 @@ void jackpot_display_slot_machine(struct jackpot* game, struct screen* display)
             /* Position on the screen */
             pos_x, pos_y, picture->width, picture->height
         );
+        vertical_picture_draw_part(display, picture, state_y, pos_x, pos_y);
         pos_x+=(picture->width+1);
 #endif
     }
