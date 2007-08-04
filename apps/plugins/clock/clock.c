@@ -170,8 +170,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
                 break;
 
             case ACTION_EXIT:
-                /*clock_draw_restore_colors();
-                exit_clock=main_menu();*/
                 exit_clock=true;
                 break;
 

@@ -45,6 +45,14 @@ enum settings_file_status{
 
 struct clock_settings clock_settings;
 
+/* The settings as they exist on the hard disk, so that 
+ * we can know at saving time if changes have been made */
+struct clock_settings hdd_clock_settings;
+
+bool settings_needs_saving(struct clock_settings* settings){
+    return(rb->memcmp(settings, &hdd_clock_settings, sizeof(*settings)));
+}
+
 void clock_settings_reset(struct clock_settings* settings){
     settings->mode = ANALOG;
     int i;
@@ -98,6 +106,7 @@ enum settings_file_status clock_settings_load(struct clock_settings* settings,
             rb->read(fd, settings, sizeof(*settings));
             rb->close(fd);
             apply_backlight_setting(settings->general.backlight);
+            rb->memcpy(&hdd_clock_settings, settings, sizeof(*settings));
             return(LOADED);
         }
     }
@@ -171,6 +180,9 @@ void load_settings(void){
 void save_settings(void){
     int i;
     struct screen* display;
+    if(!settings_needs_saving(&clock_settings))
+        return;
+
     FOR_NB_SCREENS(i){
         display=rb->screens[i];
         display->clear_display();
