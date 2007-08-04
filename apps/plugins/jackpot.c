@@ -195,14 +195,6 @@ void jackpot_display_slot_machine(struct jackpot* game, struct screen* display)
                                 current_pattern);
         display->putc(i+1, 0, char_patterns[i]);
 #else
-        display->bitmap_part(
-            picture->data, 
-            /*slice into picture->data */
-            0, state_y,
-            picture->width,
-            /* Position on the screen */
-            pos_x, pos_y, picture->width, picture->height
-        );
         vertical_picture_draw_part(display, picture, state_y, pos_x, pos_y);
         pos_x+=(picture->width+1);
 #endif
