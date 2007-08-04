@@ -756,7 +756,11 @@ bool search_playlist(void)
 #endif
         );
         if (action_userabort(TIMEOUT_NOBLOCK))
-            return ret;
+        {
+            if (!found_indicies_count)
+                return ret;
+            break;
+        }
         playlist_get_track_info(viewer.playlist,i,&track);
         if (strcasestr(track.filename,search_str))
         {
