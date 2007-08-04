@@ -74,6 +74,7 @@ int ProgressLoggerGui::getProgressMax()
 void ProgressLoggerGui::abort()
 {
     dp.buttonAbort->setText(tr("&Ok"));
+    dp.buttonAbort->setIcon(QIcon(QString::fromUtf8(":/icons/icons/go-next.png")));
     disconnect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(abort()));
     connect(dp.buttonAbort, SIGNAL(clicked()), downloadProgress, SLOT(close()));
     connect(dp.buttonAbort, SIGNAL(clicked()), this, SIGNAL(closed()));

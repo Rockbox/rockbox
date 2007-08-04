@@ -55,10 +55,15 @@
      <property name="text" >
       <string>&amp;Abort</string>
      </property>
+     <property name="icon" >
+      <iconset resource="rbutilqt.qrc" >:/icons/icons/process-stop.png</iconset>
+     </property>
     </widget>
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="rbutilqt.qrc" />
+ </resources>
  <connections/>
 </ui>
