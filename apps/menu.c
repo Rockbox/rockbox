@@ -385,7 +385,8 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                 menu = menu_stack[stack_top];
                 if (menu->flags&MENU_EXITAFTERTHISMENU)
                     done = true;
-                init_menu_lists(menu, &lists, 
+                else
+                    init_menu_lists(menu, &lists, 
                                  menu_stack_selected_item[stack_top], false);
                 /* new menu, so reload the callback */
                 get_menu_callback(menu, &menu_callback);
