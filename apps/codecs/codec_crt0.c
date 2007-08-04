@@ -42,5 +42,9 @@ enum codec_status codec_start(struct codec_api *api)
     api->memset(plugin_bss_start, 0, plugin_end_addr - plugin_bss_start);
 #endif
     ci = api;
+#if NUM_CORES > 1
+    /* writeback cleared iedata and bss areas */
+    flush_icache();
+#endif
     return codec_main();
 }

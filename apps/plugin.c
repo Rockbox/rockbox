@@ -718,6 +718,10 @@ void plugin_iram_init(char *iramstart, char *iramcopy, size_t iram_size,
     memcpy(iramstart, iramcopy, iram_size);
     memset(iedata, 0, iedata_size);
     memset(iramcopy, 0, iram_size);
+#if NUM_CORES > 1
+    /* writeback cleared iedata and iramcopy areas */
+    flush_icache();
+#endif
 }
 #endif /* IRAM_STEAL */
 
