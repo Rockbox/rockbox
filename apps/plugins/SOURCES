@@ -82,7 +82,6 @@ vu_meter.c
 wormlet.c
 
 #if CONFIG_RTC 
-clock.c
 #if CONFIG_KEYPAD == RECORDER_PAD  /* Recorder models only for now */
 calendar.c
 #endif

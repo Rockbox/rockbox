@@ -1,0 +1,10 @@
+clock.c
+clock_bitmaps.c
+clock_bitmap_strings.c
+clock_counter.c
+clock_draw.c
+clock_draw_analog.c
+clock_draw_binary.c
+clock_draw_digital.c
+clock_menu.c
+clock_settings.c

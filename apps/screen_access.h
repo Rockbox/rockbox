@@ -58,6 +58,9 @@ struct screen
     enum screen_type screen_type;
     int depth;
     bool is_color;
+#ifdef HAVE_LCD_BITMAP
+    int pixel_format;
+#endif
     int char_width;
     int char_height;
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)

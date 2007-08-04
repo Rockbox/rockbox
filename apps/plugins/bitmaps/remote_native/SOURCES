@@ -4,3 +4,14 @@ osx.dummy.bmp
 
 /* Jackpot */
 jackpot_slots_remote.15x210x1.bmp
+
+clock_logo_remote.112x64x1.bmp
+clock_messages_remote.112x64x1.bmp
+
+clock_binary_remote.112x64x1.bmp
+
+clock_digits_remote.112x64x1.bmp
+clock_smalldigits_remote.112x64x1.bmp
+
+clock_segments_remote.112x64x1.bmp
+clock_smallsegments_remote.112x64x1.bmp
