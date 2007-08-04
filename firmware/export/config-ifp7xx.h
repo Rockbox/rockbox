@@ -25,6 +25,9 @@
 #define LCD_HEIGHT 64
 #define LCD_DEPTH  1
 
+/* To make the sim compile until the real value is discovered */
+#define LCD_PIXELFORMAT 0 /* FIXME */
+
 #define CONFIG_KEYPAD IRIVER_IFP7XX_PAD
 
 #define CONFIG_FLASH FLASH_IFP7XX
