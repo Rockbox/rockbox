@@ -193,7 +193,7 @@ void draw_hour(struct screen* display, struct time* time,
     if(display->is_color){
         display->set_foreground(LCD_RGBPACK(100,110,125));
         draw_hands(display, hour, time->minute, time->second,
-                   2, skin, show_seconds);
+                   1, skin, show_seconds);
         display->set_foreground(LCD_BLACK);
     }
 #endif
