@@ -7425,13 +7425,13 @@
   desc: Set the rating of a file in the wps context menu
   user:
   <source>
-    *: "Menu set rating"
+    *: "Set Song Rating"
   </source>
   <dest>
-    *: "Menu set rating"
+    *: "Set Song Rating"
   </dest>
   <voice>
-    *: "Menu set rating"
+    *: "Set Song Rating"
   </voice>
 </phrase>
 <phrase>
