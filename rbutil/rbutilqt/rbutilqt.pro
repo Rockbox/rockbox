@@ -11,6 +11,7 @@ SOURCES += rbutilqt.cpp \
  progressloggergui.cpp \
  installtalkwindow.cpp \
  talkfile.cpp \
+ autodetection.cpp \
  ../ipodpatcher/ipodpatcher.c \
  ../sansapatcher/sansapatcher.c \
  irivertools/irivertools.cpp \
@@ -33,6 +34,7 @@ HEADERS += rbutilqt.h \
  installbl.h \
  installtalkwindow.h \
  talkfile.h \
+ autodetection.h \
  progressloggerinterface.h \
  progressloggergui.h \
  ../ipodpatcher/ipodpatcher.h \

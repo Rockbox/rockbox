@@ -54,6 +54,7 @@ class Config : public QDialog
         void setSystemProxy(bool);
         void updateLanguage(void);
         void browseFolder(void);
+        void autodetect(void);
 };
 
 #endif

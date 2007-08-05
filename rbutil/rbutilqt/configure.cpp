@@ -20,6 +20,7 @@
 #include <QtGui>
 
 #include "configure.h"
+#include "autodetection.h"
 #include "ui_configurefrm.h"
 
 #ifdef __linux
@@ -61,15 +62,17 @@ Config::Config(QWidget *parent) : QDialog(parent)
     connect(ui.radioNoProxy, SIGNAL(toggled(bool)), this, SLOT(setNoProxy(bool)));
     connect(ui.radioSystemProxy, SIGNAL(toggled(bool)), this, SLOT(setSystemProxy(bool)));
     connect(ui.browseMountPoint, SIGNAL(clicked()), this, SLOT(browseFolder()));
-
+    connect(ui.buttonAutodetect,SIGNAL(clicked()),this,SLOT(autodetect()));
+    
     // disable unimplemented stuff
     ui.buttonCacheBrowse->setEnabled(false);
     ui.cacheDisable->setEnabled(false);
     ui.cacheOfflineMode->setEnabled(false);
     ui.buttonCacheClear->setEnabled(false);
 
-    ui.buttonAutodetect->setEnabled(false);
+    //ui.buttonAutodetect->setEnabled(false);
 }
+
 
 
 void Config::accept()
@@ -336,5 +339,58 @@ void Config::browseFolder()
         QStringList files = browser.selectedFiles();
         ui.mountPoint->setText(files.at(0));
         userSettings->setValue("defaults/mountpoint", files.at(0));
+    }
+}
+
+void Config::autodetect()
+{
+    Autodetection detector(this);
+
+    if(detector.detect())  //let it detect
+    {
+        QString devicename = detector.getDevice();
+        //deexpand the platform
+        ui.treeDevices->selectedItems().at(0)->parent()->setExpanded(false);
+        //deselect the selected item
+        ui.treeDevices->selectedItems().at(0)->setSelected(false);
+
+        // find the new item
+        //enumerate al plattform items
+        QList<QTreeWidgetItem*> itmList= ui.treeDevices->findItems("*",Qt::MatchWildcard);
+        for(int i=0; i< itmList.size();i++)
+        {
+            //enumerate device items
+            for(int j=0;j < itmList.at(i)->childCount();j++)
+            {
+                QString data = itmList.at(i)->child(j)->data(0, Qt::UserRole).toString();
+                
+                if( devicename.contains(data)) //item found
+                {
+                    itmList.at(i)->child(j)->setSelected(true); //select the item
+                    itmList.at(i)->setExpanded(true); //expand the platform item
+                    break;
+                }
+            }
+        }
+
+        if(detector.getMountPoint() != "" )
+        {
+            ui.mountPoint->setText(detector.getMountPoint());
+        }
+        else
+        {
+            QMessageBox::warning(this, tr("Autodetection"),
+                    tr("Could not detect a Mountpoint.\n"
+                    "Select your Mountpoint manually."),
+                    QMessageBox::Ok ,QMessageBox::Ok);
+        }
+    }
+    else
+    {
+        QMessageBox::warning(this, tr("Autodetection"),
+                tr("Could not detect a device.\n"
+                   "Select your device and Mountpoint manually."),
+                   QMessageBox::Ok ,QMessageBox::Ok);
+        
     }
 }
