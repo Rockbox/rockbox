@@ -92,4 +92,7 @@ plugins/zxbox/SOURCES
 plugins/reversi/*.[ch]
 plugins/reversi/Makefile
 plugins/reversi/SOURCES
+plugins/clock/*.[ch]
+plugins/clock/Makefile
+plugins/clock/SOURCES
 recorder/*.[ch]
