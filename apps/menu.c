@@ -355,7 +355,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
         }
         else if (action == ACTION_TREE_STOP)
         {
-            list_stop_handler();
+            redraw_lists = list_stop_handler();
         }
         else if (action == ACTION_STD_CONTEXT &&
                  menu == &root_menu_)

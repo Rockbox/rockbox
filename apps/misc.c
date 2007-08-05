@@ -709,6 +709,7 @@ bool list_stop_handler(void)
                 fade(0);
             bookmark_autobookmark();
             audio_stop();
+            ret = true;  /* bookmarking can make a refresh necessary */
         }
     }
 #if CONFIG_CHARGING
