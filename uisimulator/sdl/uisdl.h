@@ -107,6 +107,18 @@
 #define UI_REMOTE_WIDTH             128
 #define UI_REMOTE_HEIGHT            64
 
+#elif defined(IPOD_1G2G)
+#define UI_TITLE                    "iPod 1G/2G"
+#define UI_WIDTH                    224 /* width of GUI window */
+#define UI_HEIGHT                   382 /* height of GUI window */
+#define UI_LCD_BGCOLOR              100, 135, 100 /* bkgnd color of LCD (no backlight) */
+#define UI_LCD_BGCOLORLIGHT         223, 216, 255 /* bkgnd color of LCD (backlight) */
+#define UI_LCD_BLACK                0, 0, 0 /* black */
+#define UI_LCD_POSX                 32 /* x position of lcd */
+#define UI_LCD_POSY                 12 /* y position of lcd */
+#define UI_LCD_WIDTH                160
+#define UI_LCD_HEIGHT               128
+
 #elif defined(IPOD_3G)
 #define UI_TITLE                    "iPod 3G"
 #define UI_WIDTH                    218 /* width of GUI window */
