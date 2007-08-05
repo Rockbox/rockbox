@@ -66,7 +66,7 @@ const struct picture jackpot_pictures[]={
 #endif
 };
 
-#define SLEEP_TIME (HZ/100)
+#define SLEEP_TIME (HZ/200)
 #endif /* HAVE_LCD_CHARCELLS */
 
 static struct plugin_api* rb;
