@@ -536,11 +536,11 @@ int settings_save( void )
         {
             screens[i].clear_display();
 #ifdef HAVE_LCD_CHARCELLS
-            screens[i].puts(0, 0, str(LANG_SETTINGS_SAVE_PLAYER));
-            screens[i].puts(0, 1, str(LANG_SETTINGS_BATTERY_PLAYER));
+            screens[i].puts(0, 0, str(LANG_SETTINGS_SAVE_FAILED));
+            screens[i].puts(0, 1, str(LANG_SETTINGS_PARTITION));
 #else
-            screens[i].puts(4, 2, str(LANG_SETTINGS_SAVE_RECORDER));
-            screens[i].puts(2, 4, str(LANG_SETTINGS_BATTERY_RECORDER));
+            screens[i].puts(4, 2, str(LANG_SETTINGS_SAVE_FAILED));
+            screens[i].puts(2, 4, str(LANG_SETTINGS_PARTITION));
             screens[i].update();
 #endif
         }
@@ -575,7 +575,7 @@ bool settings_save_config(int options)
             break;
         }
         else {
-            gui_syncsplash(HZ, str(LANG_MENU_SETTING_CANCEL));
+            gui_syncsplash(HZ, str(LANG_CANCEL));
             return false;
         }
     }

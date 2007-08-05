@@ -1717,10 +1717,13 @@ clean:
 	\$(SILENT)rm -rf rockbox.zip TAGS @APPS@ firmware comsim sim lang.[ch]\
                   manual *.pdf *.a credits.raw @OUTPUT@ bitmaps pluginbitmaps \
                   @ARCHOSROM@ @FLASHFILE@ UI256.bmp rockbox-full.zip \
-	          html txt rockbox-manual*.zip sysfont.h rockbox-info.txt
+	          html txt rockbox-manual*.zip sysfont.h rockbox-info.txt \
+	          voicefontids
 
 voice: tools
-	\$(TOOLSDIR)/genvoice.sh \$(ROOTDIR) \$(LANGUAGE) \$(ARCHOS) voicesettings.sh
+	\$(SILENT)\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@ features
+	\$(SILENT)for f in \`cat \$(BUILDDIR)/@APPS@/features\`; do feat="\$\$feat:\$\$f" ; done ; \\
+	\$(TOOLSDIR)/genvoice.sh \$(ROOTDIR) \$(LANGUAGE) \$(ARCHOS)\$\$feat \$(TARGET_ID) voicesettings.sh
 
 tools:
 	\$(SILENT)\$(MAKE) -C \$(TOOLSDIR) CC=\$(HOSTCC) @TOOLSET@
@@ -1736,20 +1739,24 @@ fontzip:
 	\$(SILENT)\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(ARCHOS)\" -r "\$(ROOTDIR)" -f 1 -o rockbox-fonts.zip \$(TARGET) \$(BINARY)
 
 zip:
-	\$(SILENT)\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(ARCHOS)\" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
+	\$(SILENT)for f in \`cat \$(BUILDDIR)/@APPS@/features\`; do feat="\$\$feat:\$\$f" ; done ; \\
+	\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(ARCHOS)\$\$feat\" -i \"\$(TARGET_ID)\"  -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
 
 mapzip:
 	\$(SILENT)find . -name "*.map" | xargs zip rockbox-maps.zip
 
 fullzip:
-	\$(SILENT)\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(ARCHOS)\" -r "\$(ROOTDIR)" -f 2 -o rockbox-full.zip \$(TARGET) \$(BINARY)
+	\$(SILENT)for f in \`cat \$(BUILDDIR)/@APPS@/features\`; do feat="\$\$feat:\$\$f" ; done; \\
+	\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(ARCHOS)\$\$feat\" -i \"\$(TARGET_ID)\"  -r "\$(ROOTDIR)" -f 2 -o rockbox-full.zip \$(TARGET) \$(BINARY)
 
 7zip:
-	\$(SILENT)\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(ARCHOS)\" -o "rockbox.7z" -z "7za a" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
+	\$(SILENT)for f in \`cat \$(BUILDDIR)/@APPS@/features\`; do feat="\$\$feat:\$\$f" ; done; \\
+	\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(ARCHOS)\$\$feat\" -i \"\$(TARGET_ID)\"  -o "rockbox.7z" -z "7za a" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
 
 tar:
 	\$(SILENT)rm -f rockbox.tar
-	\$(SILENT)\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(ARCHOS)\" -o "rockbox.tar" -z "tar --no-recursion -uf" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
+	\$(SILENT)for f in \`cat \$(BUILDDIR)/@APPS@/features\`; do feat="\$\$feat:\$\$f" ; done; \\
+	\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(ARCHOS)\$\$feat\" -i \"\$(TARGET_ID)\"  -o "rockbox.tar" -z "tar --no-recursion -uf" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
 
 bzip2: tar
 	\$(SILENT)bzip2 -f9 rockbox.tar

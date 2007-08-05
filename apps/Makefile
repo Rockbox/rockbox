@@ -90,6 +90,8 @@ $(DEPFILE): $(BITMAPLIBS)
 
 dep: $(DEPFILE)
 
+features: $(OBJDIR)/features
+
 build-codecs:
 	$(SILENT)$(MAKE) -C codecs/lib OBJDIR=$(OBJDIR)/codecs/lib
 	$(SILENT)$(MAKE) -C codecs OBJDIR=$(OBJDIR)/codecs
@@ -195,9 +197,22 @@ $(BUILDDIR)/rombox.iriver: $(OBJDIR)/rombox.bin
     
 include $(TOOLSDIR)/make.inc
 
-$(OBJDIR)/lang.o: lang/$(LANGUAGE).lang
-	@mkdir -p $(dir $@)
-	$(call PRINTS,GENLANG)perl -s $(TOOLSDIR)/genlang -p=$(BUILDDIR)/lang -t=$(ARCHOS) $<
+# apps/features.txt is a file that (is preprocessed and) lists named features
+# based on defines in the config-*.h files. The named features will be passed
+# to genlang and thus (translated) phrases can be used based on those names.
+# button.h is included for the HAS_BUTTON_HOLD define.
+#
+
+$(OBJDIR)/features: features.txt
+	$(SILENT)cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
+	$(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -imacros "config.h" -imacros "button.h" - | \
+	grep -v "^\#" | grep -v "^$$" > $@; \
+	echo "" >/dev/null 
+
+$(OBJDIR)/lang.o: lang/$(LANGUAGE).lang $(OBJDIR)/features
+	$(SILENT)mkdir -p `dirname $@`
+	$(SILENT)for f in `cat $(OBJDIR)/features`; do feat="$$feat:$$f" ; done; \
+	perl -s $(TOOLSDIR)/genlang -p=$(BUILDDIR)/lang -t=$(ARCHOS):$$feat $<
 	$(call PRINTS,CC lang.c)$(CC) $(CFLAGS) -c $(BUILDDIR)/lang.c -o $@
 
 clean:

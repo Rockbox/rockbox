@@ -320,12 +320,7 @@ static int display_playlists(char* playlist, bool view)
 static void display_insert_count(int count)
 {
     gui_syncsplash(0, str(LANG_PLAYLIST_INSERT_COUNT), count,
-#if CONFIG_KEYPAD == PLAYER_PAD
-        str(LANG_STOP_ABORT)
-#else
-        str(LANG_OFF_ABORT)
-#endif
-        );
+        str(LANG_OFF_ABORT));
 }
 
 /* Add specified track into playlist.  Callback from directory insert */

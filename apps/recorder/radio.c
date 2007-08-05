@@ -496,7 +496,7 @@ int radio_screen(void)
 
 #ifdef HAS_BUTTONBAR
     gui_buttonbar_set(&buttonbar, str(LANG_BUTTONBAR_MENU),
-        str(LANG_FM_BUTTONBAR_PRESETS), str(LANG_FM_BUTTONBAR_RECORD));
+        str(LANG_PRESET), str(LANG_FM_BUTTONBAR_RECORD));
 #endif
 
 #ifndef HAVE_NOISY_IDLE_MODE
@@ -680,7 +680,7 @@ int radio_screen(void)
                 }
 #ifdef HAS_BUTTONBAR
                 gui_buttonbar_set(&buttonbar, str(LANG_BUTTONBAR_MENU),
-                                  str(LANG_FM_BUTTONBAR_PRESETS),
+                                  str(LANG_PRESET),
                                   str(LANG_FM_BUTTONBAR_RECORD));
 #endif
                 update_screen = true;
@@ -713,7 +713,7 @@ int radio_screen(void)
 #ifdef HAS_BUTTONBAR
                 gui_buttonbar_set(&buttonbar,
                                   str(LANG_BUTTONBAR_MENU),
-                                  str(LANG_FM_BUTTONBAR_PRESETS),
+                                  str(LANG_PRESET),
                                   str(LANG_FM_BUTTONBAR_RECORD));
 #endif
                 update_screen = true;
@@ -858,8 +858,8 @@ int radio_screen(void)
                 FOR_NB_SCREENS(i)
                     screens[i].puts_scroll(0, top_of_screen + 2, buf);
 
-                snprintf(buf, 128, "%s %s", str(LANG_FM_TUNE_MODE),
-                         radio_mode ? str(LANG_RADIO_PRESET_MODE) :
+                snprintf(buf, 128, "%s %s", str(LANG_MODE),
+                         radio_mode ? str(LANG_PRESET) :
                                       str(LANG_RADIO_SCAN_MODE));
                 FOR_NB_SCREENS(i)
                     screens[i].puts_scroll(0, top_of_screen + 3, buf);
@@ -1223,7 +1223,7 @@ int radio_preset_callback(int action, const struct menu_item_ex *this_item)
     return action;
     (void)this_item;
 }
-MAKE_MENU(handle_radio_preset_menu, ID2P(LANG_FM_BUTTONBAR_PRESETS),
+MAKE_MENU(handle_radio_preset_menu, ID2P(LANG_PRESET),
             radio_preset_callback, Icon_NOICON, &radio_edit_preset_item, 
             &radio_delete_preset_item);
 /* present a list of preset stations */
@@ -1255,7 +1255,7 @@ static int handle_radio_presets(void)
     gui_buttonbar_draw(&buttonbar);
 #endif
     gui_synclist_init(&lists, presets_get_name, NULL, false, 1);
-    gui_synclist_set_title(&lists, str(LANG_FM_BUTTONBAR_PRESETS), NOICON);
+    gui_synclist_set_title(&lists, str(LANG_PRESET), NOICON);
     gui_synclist_set_icon_callback(&lists, NULL);
     gui_synclist_set_nb_items(&lists, num_presets);
     gui_synclist_select_item(&lists, curr_preset<0 ? 0 : curr_preset);
@@ -1318,8 +1318,8 @@ char* get_mode_text(int selected_item, void * data, char *buffer)
 {
     (void)selected_item;
     (void)data;
-    snprintf(buffer, MAX_PATH, "%s %s", str(LANG_FM_TUNE_MODE),
-             radio_mode ? str(LANG_RADIO_PRESET_MODE) :
+    snprintf(buffer, MAX_PATH, "%s %s", str(LANG_MODE),
+             radio_mode ? str(LANG_PRESET) :
                           str(LANG_RADIO_SCAN_MODE));
     return buffer;
 }
@@ -1455,7 +1455,7 @@ static int fm_recording_settings(void)
 #endif /* HAVE_RECORDING */
 
 #ifdef FM_RECORDING_SCREEN
-MENUITEM_FUNCTION(recscreen_item, 0, ID2P(LANG_RECORDING_MENU), 
+MENUITEM_FUNCTION(recscreen_item, 0, ID2P(LANG_RECORDING), 
                     fm_recording_screen, NULL, NULL, Icon_Recording);
 #endif
 #ifdef FM_RECORDING_SETTINGS
@@ -1463,7 +1463,7 @@ MENUITEM_FUNCTION(recsettings_item, 0, ID2P(LANG_RECORDING_SETTINGS),
                     fm_recording_settings, NULL, NULL, Icon_Recording);
 #endif
 #ifndef FM_PRESET
-MENUITEM_FUNCTION(radio_presets_item, 0, ID2P(LANG_FM_BUTTONBAR_PRESETS), 
+MENUITEM_FUNCTION(radio_presets_item, 0, ID2P(LANG_PRESET), 
                     handle_radio_presets, NULL, NULL, Icon_NOICON);
 #endif
 #ifndef FM_PRESET_ADD

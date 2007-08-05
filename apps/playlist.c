@@ -484,7 +484,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
         lcd_setmargins(0, 0);
 #endif
 
-    gui_syncsplash(0, str(LANG_PLAYLIST_LOAD));
+    gui_syncsplash(0, str(LANG_WAIT));
 
     if (!buffer)
     {
@@ -1668,13 +1668,7 @@ static void display_playlist_count(int count, const unsigned char *fmt)
         lcd_setmargins(0, 0);
 #endif
 
-    gui_syncsplash(0, fmt, count,
-#if CONFIG_KEYPAD == PLAYER_PAD
-                   str(LANG_STOP_ABORT)
-#else
-                   str(LANG_OFF_ABORT)
-#endif
-        );
+    gui_syncsplash(0, fmt, count, str(LANG_OFF_ABORT));
 }
 
 /*
@@ -1997,12 +1991,7 @@ int playlist_resume(void)
             {
                 gui_syncsplash(0, str(LANG_LOADING_PERCENT), 
                                (total_read+count)*100/control_file_size,
-#if CONFIG_KEYPAD == PLAYER_PAD
-                               str(LANG_STOP_ABORT)
-#else
-                               str(LANG_OFF_ABORT)
-#endif
-                               );
+                               str(LANG_OFF_ABORT));
                 if (action_userabort(TIMEOUT_NOBLOCK))
                 {
                     /* FIXME: 

@@ -190,7 +190,7 @@ bool bookmark_autobookmark(void)
     struct text_message message={(char **)lines, 1};
 #else
     unsigned char *lines[]={str(LANG_AUTO_BOOKMARK_QUERY),
-                            str(LANG_RESUME_CONFIRM_PLAYER)};
+                            str(LANG_CONFIRM_WITH_BUTTON)};
     struct text_message message={(char **)lines, 2};
 #endif
 #if LCD_DEPTH > 1
@@ -819,7 +819,7 @@ static void say_bookmark(const char* bookmark,
     talk_number(bookmark_id + 1, true);
     talk_id(VOICE_BOOKMARK_SELECT_INDEX_TEXT, true);
     talk_number(resume_index + 1, true);
-    talk_id(VOICE_BOOKMARK_SELECT_TIME_TEXT, true);
+    talk_id(LANG_TIME, true);
     if (ms / 60000)
         talk_value(ms / 60000, UNIT_MIN, true);
     talk_value((ms % 60000) / 1000, UNIT_SEC, true);

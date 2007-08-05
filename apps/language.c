@@ -45,14 +45,15 @@ int lang_load(const char *filename)
     int fsize;
     int fd = open(filename, O_RDONLY);
     int retcode=0;
-    unsigned char lang_header[2];
+    unsigned char lang_header[3];
     if(fd == -1)
         return 1;
     fsize = filesize(fd) - 2;
     if(fsize <= MAX_LANGUAGE_SIZE) {
-        read(fd, lang_header, 2);
+        read(fd, lang_header, 3);
         if((lang_header[0] == LANGUAGE_COOKIE) &&
-           (lang_header[1] == LANGUAGE_VERSION)) {
+           (lang_header[1] == LANGUAGE_VERSION) &&
+           (lang_header[2] == TARGET_ID)) {
             read(fd, language_buffer, MAX_LANGUAGE_SIZE);
             unsigned char *ptr = language_buffer;
             int id;

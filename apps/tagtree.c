@@ -916,12 +916,7 @@ static bool show_search_progress(bool init, int count)
     if (current_tick - last_tick > HZ/4)
     {
         gui_syncsplash(0, str(LANG_PLAYLIST_SEARCH_MSG), count,
-#if CONFIG_KEYPAD == PLAYER_PAD
-                       str(LANG_STOP_ABORT)
-#else
-                       str(LANG_OFF_ABORT)
-#endif
-                       );
+                          str(LANG_OFF_ABORT));
         if (action_userabort(TIMEOUT_NOBLOCK))
             return false;
         last_tick = current_tick;
@@ -1604,7 +1599,7 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
     }
 
     if (tc->filesindir <= 0)
-        gui_syncsplash(HZ, str(LANG_END_PLAYLIST_PLAYER));
+        gui_syncsplash(HZ, str(LANG_END_PLAYLIST));
     else
     {
         logf("insert_all_playlist");

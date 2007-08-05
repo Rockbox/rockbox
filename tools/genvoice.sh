@@ -34,13 +34,17 @@ TTS_ENGINE=festival
 ENCODER=lame
 # Where to save temporary files
 TEMPDIR=/tmp
+# List of IDs to send to voicefont
+VOICEFONTIDS=voicefontids
 
 ###################
 # End of settings #
 ###################
 
+TARGET_ID="$4"
 createvoicefile() {
-    $VOICEFONT "$LANG_FILE" "$TEMPDIR/" "./$RLANG.voice"
+    $GENLANG -e=$ENGLISH -o -t=$TARGET $LANG_FILE > $VOICEFONTIDS
+    $VOICEFONT "$VOICEFONTIDS" "$TARGET_ID" "$TEMPDIR/" "./$RLANG.voice"
 }
 
 deletefiles() {
@@ -106,7 +110,7 @@ generateclips() {
 }
 
 if [ -z "$3" ]; then
-    echo "Usage: $0 rockboxdirectory language target [settingsfile]";
+    echo "Usage: $0 rockboxdirectory language target targetid [settingsfile]";
     exit 32
 else
     if [ ! -d "$1" ] || [ ! -f "$1/tools/genlang" ]; then
@@ -117,12 +121,12 @@ else
         echo "Error: $2 is not a valid language"
         exit 34
     fi
-    if [ ! -z "$4" ]; then
-        if [ -f "$4" ]; then
+    if [ ! -z "$5" ]; then
+        if [ -f "$5" ]; then
             # Read settings from file
-            source "$4"
+            source "$5"
         else
-            echo "Error: $4 does not exist"
+            echo "Error: $5 does not exist"
             exit 36
         fi
     fi

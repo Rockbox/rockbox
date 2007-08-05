@@ -74,8 +74,10 @@ static void gui_yesno_draw(struct gui_yesno * yn)
     {
         if(nb_lines+line_shift+3<=display->nb_lines)
             nb_lines++;
-        display->puts(0, nb_lines+line_shift, str(LANG_CONFIRM_WITH_PLAY_RECORDER));
-        display->puts(0, nb_lines+line_shift+1, str(LANG_CANCEL_WITH_ANY_RECORDER));
+        display->puts(0, nb_lines+line_shift, str(LANG_CONFIRM_WITH_BUTTON));
+#ifdef HAVE_LCD_BITMAP
+        display->puts(0, nb_lines+line_shift+1, str(LANG_CANCEL_WITH_ANY));
+#endif
     }
     gui_textarea_update(display);
 }

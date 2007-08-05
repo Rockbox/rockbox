@@ -1330,10 +1330,10 @@ void tree_restore(void)
         FOR_NB_SCREENS(i)
         {
             screens[i].putsxy((LCD_WIDTH/2) -
-                              ((strlen(str(LANG_DIRCACHE_BUILDING)) *
+                              ((strlen(str(LANG_SCANNING_DISK)) *
                                 screens[i].char_width)/2),
                               LCD_HEIGHT-screens[i].char_height*3,
-                              str(LANG_DIRCACHE_BUILDING));
+                              str(LANG_SCANNING_DISK));
             gui_textarea_update(&screens[i]);
         }
 

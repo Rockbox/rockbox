@@ -101,7 +101,7 @@ const struct filetype inbuilt_filetypes[] = {
     { "kbd", FILE_ATTR_KBD, Icon_Keyboard, VOICE_EXT_KBD },
 #endif
     { "bmark",FILE_ATTR_BMARK, Icon_Bookmark,  VOICE_EXT_BMARK },
-    { "cue",  FILE_ATTR_CUE,   Icon_Bookmark,  LANG_CUESHEET },
+    { "cue",  FILE_ATTR_CUE,   Icon_Bookmark,  VOICE_EXT_CUESHEET },
 #ifdef BOOTFILE_EXT
     { BOOTFILE_EXT, FILE_ATTR_MOD, Icon_Firmware, VOICE_EXT_AJZ },
 #endif /* #ifndef SIMULATOR */

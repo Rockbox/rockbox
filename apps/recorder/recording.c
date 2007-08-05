@@ -1529,7 +1529,7 @@ bool recording_screen(bool no_source)
             if(global_settings.rec_source == AUDIO_SRC_MIC)
             {
                 /* Draw MIC recording gain */
-                snprintf(buf, sizeof(buf), "%s:%s", str(LANG_SYSFONT_RECORDING_GAIN),
+                snprintf(buf, sizeof(buf), "%s:%s", str(LANG_SYSFONT_GAIN),
                          fmt_gain(SOUND_MIC_GAIN,
                                   global_settings.rec_mic_gain,
                                   buf2, sizeof(buf2)));
@@ -1921,12 +1921,12 @@ static bool f2_rec_screen(void)
 
         FOR_NB_SCREENS(i)
         {
-            screens[i].getstringsize(str(LANG_SYSFONT_RECORDING_CHANNELS), &w, &h);
+            screens[i].getstringsize(str(LANG_SYSFONT_CHANNELS), &w, &h);
             screens[i].putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2,
-                       str(LANG_SYSFONT_RECORDING_CHANNELS));
-            screens[i].getstringsize(str(LANG_SYSFONT_F2_MODE), &w, &h);
+                       str(LANG_SYSFONT_CHANNELS));
+            screens[i].getstringsize(str(LANG_SYSFONT_MODE), &w, &h);
             screens[i].putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h,
-                       str(LANG_SYSFONT_F2_MODE));
+                       str(LANG_SYSFONT_MODE));
             screens[i].getstringsize(ptr, &w, &h);
             screens[i].putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, ptr);
             screens[i].mono_bitmap(bitmap_icons_7x8[Icon_FastForward], 
@@ -1999,7 +1999,7 @@ static bool f3_rec_screen(void)
     char *src_str[] =
     {
         str(LANG_SYSFONT_RECORDING_SRC_MIC),
-        str(LANG_SYSFONT_RECORDING_SRC_LINE),
+        str(LANG_SYSFONT_LINE_IN),
         str(LANG_SYSFONT_RECORDING_SRC_DIGITAL)
     };
     struct audio_recording_options rec_options;

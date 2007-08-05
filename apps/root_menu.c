@@ -315,14 +315,14 @@ char *get_wps_item_name(int selected_item, void * data, char *buffer)
 MENUITEM_RETURNVALUE_DYNTEXT(wps_item, GO_TO_WPS, NULL, get_wps_item_name, 
                                 NULL, Icon_Playback_menu);
 #ifdef HAVE_RECORDING
-MENUITEM_RETURNVALUE(rec, ID2P(LANG_RECORDING_MENU), GO_TO_RECSCREEN,  
+MENUITEM_RETURNVALUE(rec, ID2P(LANG_RECORDING), GO_TO_RECSCREEN,  
                         NULL, Icon_Recording);
 #endif
 #if CONFIG_TUNER
 MENUITEM_RETURNVALUE(fm, ID2P(LANG_FM_RADIO), GO_TO_FM,  
                         item_callback, Icon_Radio_screen);
 #endif
-MENUITEM_RETURNVALUE(menu_, ID2P(LANG_SETTINGS_MENU), GO_TO_MAINMENU,  
+MENUITEM_RETURNVALUE(menu_, ID2P(LANG_SETTINGS), GO_TO_MAINMENU,  
                         NULL, Icon_Submenu_Entered);
 MENUITEM_RETURNVALUE(bookmarks, ID2P(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS),
                         GO_TO_RECENTBMARKS,  item_callback, 

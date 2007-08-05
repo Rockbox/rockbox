@@ -151,7 +151,7 @@ static int init_dircache(bool preinit)
             {
                 /* This will be in default language, settings are not
                    applied yet. Not really any easy way to fix that. */
-                gui_syncsplash(0, str(LANG_DIRCACHE_BUILDING));
+                gui_syncsplash(0, str(LANG_SCANNING_DISK));
                 clear = true;
             }
             
@@ -169,7 +169,7 @@ static int init_dircache(bool preinit)
         {
             if (global_status.dircache_size <= 0)
             {
-                gui_syncsplash(0, str(LANG_DIRCACHE_BUILDING));
+                gui_syncsplash(0, str(LANG_SCANNING_DISK));
                 clear = true;
             }
             result = dircache_build(global_status.dircache_size);

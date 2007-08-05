@@ -387,8 +387,8 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0, superbass, LANG_SUPERBASS, false, "superbass", set_superbass),
 #endif
          
-    CHOICE_SETTING(0,channel_config,LANG_CHANNEL,0,"channels",
-         "stereo,mono,custom,mono left,mono right,karaoke", 
+    CHOICE_SETTING(0,channel_config,LANG_CHANNEL_CONFIGURATION,0,"channels",
+         "stereo,mono,custom,mono left,mono right,karaoke",
          sound_set_channels,
          6, ID2P(LANG_CHANNEL_STEREO), ID2P(LANG_CHANNEL_MONO),
             ID2P(LANG_CHANNEL_CUSTOM), ID2P(LANG_CHANNEL_LEFT),
@@ -412,7 +412,7 @@ const struct settings_list settings[] = {
 #else
         4,
 #endif
-        ID2P(LANG_OFF), ID2P(LANG_REPEAT_ALL), ID2P(LANG_REPEAT_ONE), ID2P(LANG_SHUFFLE)
+        ID2P(LANG_OFF), ID2P(LANG_ALL), ID2P(LANG_REPEAT_ONE), ID2P(LANG_SHUFFLE)
 #ifdef AB_REPEAT_ENABLE
         ,ID2P(LANG_REPEAT_AB)
 #endif
@@ -440,9 +440,13 @@ const struct settings_list settings[] = {
 #endif
 #endif /* HAVE_BACKLIGHT */
 #ifdef HAVE_LCD_BITMAP
+#ifdef HAVE_LCD_INVERT
     BOOL_SETTING(0, invert, LANG_INVERT, false ,"invert", off_on,
-        LANG_INVERT_LCD_INVERSE, LANG_INVERT_LCD_NORMAL, lcd_set_invert_display),
+        LANG_INVERT_LCD_INVERSE, LANG_NORMAL, lcd_set_invert_display),
+#endif
+#ifdef HAVE_LCD_FLIP
     OFFON_SETTING(0,flip_display, LANG_FLIP_DISPLAY, false,"flip display", NULL),
+#endif
     /* display */
     BOOL_SETTING(F_TEMPVAR, invert_cursor, LANG_INVERT_CURSOR, true ,"invert cursor", off_on,
         LANG_INVERT_CURSOR_BAR, LANG_INVERT_CURSOR_POINTER, NULL),
@@ -458,9 +462,11 @@ const struct settings_list settings[] = {
     CHOICE_SETTING(0, battery_display, LANG_BATTERY_DISPLAY, 0,
         "battery display", graphic_numeric, NULL, 2,
         ID2P(LANG_DISPLAY_GRAPHIC), ID2P(LANG_DISPLAY_NUMERIC)),
+#if CONFIG_RTC
     CHOICE_SETTING(0, timeformat, LANG_TIMEFORMAT, 0,
         "time format", "24hour,12hour", NULL, 2,
         ID2P(LANG_24_HOUR_CLOCK), ID2P(LANG_12_HOUR_CLOCK)),
+#endif
 #endif /* HAVE_LCD_BITMAP */
     OFFON_SETTING(0,show_icons, LANG_SHOW_ICONS ,true,"show icons", NULL),
     /* system */
@@ -515,7 +521,7 @@ const struct settings_list settings[] = {
         "remote contrast", UNIT_INT, MIN_REMOTE_CONTRAST_SETTING, 
         MAX_REMOTE_CONTRAST_SETTING, 1, NULL, NULL, lcd_remote_set_contrast),
     BOOL_SETTING(0, remote_invert, LANG_INVERT, false ,"remote invert", off_on,
-        LANG_INVERT_LCD_INVERSE, LANG_INVERT_LCD_NORMAL, lcd_remote_set_invert_display),
+        LANG_INVERT_LCD_INVERSE, LANG_NORMAL, lcd_remote_set_invert_display),
     OFFON_SETTING(0,remote_flip_display, LANG_FLIP_DISPLAY,
         false,"remote flip display", NULL),
     INT_SETTING_W_CFGVALS(F_FLIPLIST, remote_backlight_timeout, LANG_BACKLIGHT, 6,
@@ -640,8 +646,8 @@ const struct settings_list settings[] = {
 #endif /* HAVE_FLASH_STORAGE */
     /* browser */
     CHOICE_SETTING(0, dirfilter, LANG_FILTER, SHOW_SUPPORTED, "show files",
-        "all,supported,music,playlists", NULL, 4, ID2P(LANG_FILTER_ALL),
-        ID2P(LANG_FILTER_SUPPORTED), ID2P(LANG_FILTER_MUSIC), ID2P(LANG_FILTER_PLAYLIST)),
+        "all,supported,music,playlists", NULL, 4, ID2P(LANG_ALL),
+        ID2P(LANG_FILTER_SUPPORTED), ID2P(LANG_FILTER_MUSIC), ID2P(LANG_PLAYLISTS)),
     OFFON_SETTING(0,sort_case,LANG_SORT_CASE,false,"sort case",NULL),
     OFFON_SETTING(0,browse_current,LANG_FOLLOW,false,"follow playlist",NULL),
     OFFON_SETTING(0,playlist_viewer_icons,LANG_SHOW_ICONS,true,
@@ -653,17 +659,17 @@ const struct settings_list settings[] = {
                     ID2P(LANG_DISPLAY_TRACK_NAME_ONLY), ID2P(LANG_DISPLAY_FULL_PATH)),
     CHOICE_SETTING(0, recursive_dir_insert, LANG_RECURSE_DIRECTORY , RECURSE_OFF,
         "recursive directory insert", off_on_ask, NULL , 3 ,
-        ID2P(LANG_OFF), ID2P(LANG_ON), ID2P(LANG_RESUME_SETTING_ASK)),
+        ID2P(LANG_OFF), ID2P(LANG_ON), ID2P(LANG_ASK)),
     /* bookmarks */
     CHOICE_SETTING(0, autocreatebookmark, LANG_BOOKMARK_SETTINGS_AUTOCREATE,
         BOOKMARK_NO, "autocreate bookmarks",
         "off,on,ask,recent only - on,recent only - ask", NULL, 5,
         ID2P(LANG_SET_BOOL_NO), ID2P(LANG_SET_BOOL_YES),
-        ID2P(LANG_RESUME_SETTING_ASK), ID2P(LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES),
+        ID2P(LANG_ASK), ID2P(LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES),
         ID2P(LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK)),
     CHOICE_SETTING(0, autoloadbookmark, LANG_BOOKMARK_SETTINGS_AUTOLOAD, 
         BOOKMARK_NO, "autoload bookmarks", off_on_ask, NULL, 3,
-        ID2P(LANG_SET_BOOL_NO), ID2P(LANG_SET_BOOL_YES), ID2P(LANG_RESUME_SETTING_ASK)),
+        ID2P(LANG_SET_BOOL_NO), ID2P(LANG_SET_BOOL_YES), ID2P(LANG_ASK)),
     CHOICE_SETTING(0, usemrb, LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS,
         BOOKMARK_NO, "use most-recent-bookmarks", "off,on,unique only", NULL, 3,
         ID2P(LANG_SET_BOOL_NO), ID2P(LANG_SET_BOOL_YES),
@@ -764,14 +770,14 @@ const struct settings_list settings[] = {
         TALK_ID(512, UNIT_MB), TALK_ID(650, UNIT_MB), TALK_ID(700, UNIT_MB), 
         TALK_ID(1024, UNIT_MB), TALK_ID(1536, UNIT_MB), TALK_ID(1792, UNIT_MB)),
     {F_T_INT|F_RECSETTING, &global_settings.rec_channels,
-        LANG_RECORDING_CHANNELS, INT(0),
+        LANG_CHANNELS, INT(0),
         "rec channels","stereo,mono",UNUSED},
     CHOICE_SETTING(F_RECSETTING, rec_split_type, LANG_SPLIT_TYPE, 0 ,
         "rec split type", "Split, Stop", NULL, 2,
         ID2P(LANG_START_NEW_FILE), ID2P(LANG_STOP_RECORDING)),
     CHOICE_SETTING(F_RECSETTING, rec_split_method, LANG_SPLIT_MEASURE, 0 ,
         "rec split method", "Time,Filesize", NULL, 2,
-        ID2P(LANG_REC_TIME), ID2P(LANG_REC_SIZE)),
+        ID2P(LANG_TIME), ID2P(LANG_REC_SIZE)),
     {F_T_INT|F_RECSETTING, &global_settings.rec_source,
         LANG_RECORDING_SOURCE, INT(0),
         "rec source",
@@ -790,13 +796,10 @@ const struct settings_list settings[] = {
     CHOICE_SETTING(F_RECSETTING, cliplight, LANG_CLIP_LIGHT, 0 ,
         "cliplight", "off,main,both,remote", NULL, 
 #ifdef HAVE_REMOTE_LCD
-        4,
+        4, ID2P(LANG_OFF), ID2P(LANG_MAIN_UNIT), ID2P(LANG_REMOTE_MAIN),
+        ID2P(LANG_REMOTE_UNIT)
 #else
-        2,
-#endif
-        ID2P(LANG_OFF), ID2P(LANG_MAIN_UNIT)
-#ifdef HAVE_REMOTE_LCD
-        , ID2P(LANG_REMOTE_MAIN), ID2P(LANG_REMOTE_UNIT)
+        2, ID2P(LANG_OFF), ID2P(LANG_ON)
 #endif
         ),
     {F_T_INT|F_RECSETTING,&global_settings.cliplight,LANG_CLIP_LIGHT,INT(0),
@@ -804,7 +807,7 @@ const struct settings_list settings[] = {
 #endif
 #ifdef DEFAULT_REC_MIC_GAIN
     {F_T_INT|F_RECSETTING,&global_settings.rec_mic_gain,
-        LANG_RECORDING_GAIN,INT(DEFAULT_REC_MIC_GAIN),
+        LANG_GAIN,INT(DEFAULT_REC_MIC_GAIN),
         "rec mic gain",NULL,UNUSED},
 #endif /* DEFAULT_REC_MIC_GAIN */
 #ifdef DEFAULT_REC_LEFT_GAIN
@@ -855,16 +858,16 @@ const struct settings_list settings[] = {
         LANG_RECORD_STOP_THRESHOLD,INT(-45),
         "trigger stop threshold",NULL,UNUSED},
     {F_T_INT|F_RECSETTING,&global_settings.rec_start_duration,
-        LANG_RECORD_MIN_DURATION,INT(0),
+        LANG_MIN_DURATION,INT(0),
         "trigger start duration",trig_durations_conf,UNUSED},
     {F_T_INT|F_RECSETTING,&global_settings.rec_stop_postrec,
-        LANG_RECORD_STOP_POSTREC,INT(2),
+        LANG_MIN_DURATION,INT(2),
         "trigger stop postrec",trig_durations_conf,UNUSED},
     {F_T_INT|F_RECSETTING,&global_settings.rec_stop_gap,
         LANG_RECORD_STOP_GAP,INT(1),
         "trigger min gap",trig_durations_conf,UNUSED},
     {F_T_INT|F_RECSETTING,&global_settings.rec_trigger_mode,
-        LANG_RECORD_TRIGGER_MODE,INT(0),
+        LANG_RECORD_TRIGGER,INT(0),
         "trigger mode","off,once,repeat",UNUSED},
 #endif /* HAVE_RECORDING */
 
@@ -961,19 +964,19 @@ const struct settings_list settings[] = {
                     UNIT_INT, EQ_Q_MIN, EQ_Q_MAX, EQ_Q_STEP,
                     eq_q_format, NULL, NULL),
     /* -240..240 (or -24db to +24db) */
-    INT_SETTING(0, eq_band0_gain, LANG_EQUALIZER_BAND_GAIN, 0, "eq band 0 gain",
+    INT_SETTING(0, eq_band0_gain, LANG_GAIN, 0, "eq band 0 gain",
                     UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX, EQ_GAIN_STEP,
                     eq_gain_format, NULL, NULL),
-    INT_SETTING(0, eq_band1_gain, LANG_EQUALIZER_BAND_GAIN, 0, "eq band 1 gain",
+    INT_SETTING(0, eq_band1_gain, LANG_GAIN, 0, "eq band 1 gain",
                     UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX, EQ_GAIN_STEP,
                     eq_gain_format, NULL, NULL),
-    INT_SETTING(0, eq_band2_gain, LANG_EQUALIZER_BAND_GAIN, 0, "eq band 2 gain",
+    INT_SETTING(0, eq_band2_gain, LANG_GAIN, 0, "eq band 2 gain",
                     UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX, EQ_GAIN_STEP,
                     eq_gain_format, NULL, NULL),
-    INT_SETTING(0, eq_band3_gain, LANG_EQUALIZER_BAND_GAIN, 0, "eq band 3 gain",
+    INT_SETTING(0, eq_band3_gain, LANG_GAIN, 0, "eq band 3 gain",
                     UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX, EQ_GAIN_STEP,
                     eq_gain_format, NULL, NULL),
-    INT_SETTING(0, eq_band4_gain, LANG_EQUALIZER_BAND_GAIN, 0, "eq band 4 gain",
+    INT_SETTING(0, eq_band4_gain, LANG_GAIN, 0, "eq band 4 gain",
                     UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX, EQ_GAIN_STEP,
                     eq_gain_format, NULL, NULL),
 
@@ -993,9 +996,10 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0,tagcache_autoupdate,
         LANG_TAGCACHE_AUTOUPDATE,false,"tagcache_autoupdate",NULL),
 #endif
-#ifdef HAVE_LCD_BITMAP
     CHOICE_SETTING(0, default_codepage, LANG_DEFAULT_CODEPAGE, 0,
-        "default codepage", /* The order must match with that in unicode.c */
+        "default codepage",
+#ifdef HAVE_LCD_BITMAP
+        /* The order must match with that in unicode.c */
         "iso8859-1,iso8859-7,iso8859-8,cp1251,iso8859-11,cp1256,"
         "iso8859-9,iso8859-2,sjis,gb2312,ksx1001,big5,utf-8",
         set_codepage, 13,
@@ -1007,15 +1011,13 @@ const struct settings_list settings[] = {
         ID2P(LANG_CODEPAGE_KOREAN), ID2P(LANG_CODEPAGE_TRADITIONAL),
         ID2P(LANG_CODEPAGE_UTF8)),
 #else /* !HAVE_LCD_BITMAP */
-    CHOICE_SETTING(0, default_codepage, LANG_DEFAULT_CODEPAGE, 0,
-        "default codepage", /* The order must match with that in unicode.c */
+        /* The order must match with that in unicode.c */
         "iso8859-1,iso8859-7,cp1251,iso8859-9,iso8859-2,utf-8",
         set_codepage, 6,
         ID2P(LANG_CODEPAGE_LATIN1), ID2P(LANG_CODEPAGE_GREEK),
         ID2P(LANG_CODEPAGE_CYRILLIC), ID2P(LANG_CODEPAGE_TURKISH),
         ID2P(LANG_CODEPAGE_LATIN_EXTENDED), ID2P(LANG_CODEPAGE_UTF8)),
 #endif
-
     OFFON_SETTING(0,warnon_erase_dynplaylist,
         LANG_WARN_ERASEDYNPLAYLIST_MENU,false,
         "warn when erasing dynamic playlist",NULL),
@@ -1025,7 +1027,7 @@ const struct settings_list settings[] = {
     CHOICE_SETTING(0, backlight_on_button_hold,
         LANG_BACKLIGHT_ON_BUTTON_HOLD, 0, "backlight on button hold",
         "normal,off,on", backlight_set_on_button_hold, 3,
-        ID2P(LANG_BACKLIGHT_ON_BUTTON_HOLD_NORMAL), ID2P(LANG_OFF), ID2P(LANG_ON)),
+        ID2P(LANG_NORMAL), ID2P(LANG_OFF), ID2P(LANG_ON)),
 #endif
 
 #ifdef HAVE_LCD_SLEEP
@@ -1047,7 +1049,7 @@ const struct settings_list settings[] = {
         "eq hardware band 0 cutoff", "80Hz,105Hz,135Hz,175Hz", NULL, 4,
         TALK_ID(80, UNIT_HERTZ), TALK_ID(105, UNIT_HERTZ), 
         TALK_ID(135, UNIT_HERTZ), TALK_ID(175, UNIT_HERTZ)),
-    INT_SETTING(0, eq_hw_band0_gain, LANG_EQUALIZER_BAND_GAIN, 0, 
+    INT_SETTING(0, eq_hw_band0_gain, LANG_GAIN, 0, 
         "eq hardware band 0 gain", UNIT_DB, EQ_HW_GAIN_MIN, 
         EQ_HW_GAIN_MAX, EQ_HW_GAIN_STEP, eq_hw_gain_format, NULL, NULL),
 
@@ -1059,7 +1061,7 @@ const struct settings_list settings[] = {
         "eq hardware band 1 bandwidth", "narrow,wide", NULL, 2,
         ID2P(LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW), 
         ID2P(LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE)),
-    INT_SETTING(0, eq_hw_band1_gain, LANG_EQUALIZER_BAND_GAIN, 0, 
+    INT_SETTING(0, eq_hw_band1_gain, LANG_GAIN, 0, 
         "eq hardware band 1 gain", UNIT_DB, EQ_HW_GAIN_MIN, 
         EQ_HW_GAIN_MAX, EQ_HW_GAIN_STEP, eq_hw_gain_format, NULL, NULL),
 
@@ -1071,7 +1073,7 @@ const struct settings_list settings[] = {
         "eq hardware band 2 bandwidth", "narrow,wide", NULL, 2,
         ID2P(LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW), 
         ID2P(LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE)),
-    INT_SETTING(0, eq_hw_band2_gain, LANG_EQUALIZER_BAND_GAIN, 0, 
+    INT_SETTING(0, eq_hw_band2_gain, LANG_GAIN, 0, 
         "eq hardware band 2 gain", UNIT_DB, EQ_HW_GAIN_MIN, 
         EQ_HW_GAIN_MAX, EQ_HW_GAIN_STEP, eq_hw_gain_format, NULL, NULL),
 
@@ -1083,7 +1085,7 @@ const struct settings_list settings[] = {
         "eq hardware band 3 bandwidth", "narrow,wide", NULL, 2,
         ID2P(LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW), 
         ID2P(LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE)),
-    INT_SETTING(0, eq_hw_band3_gain, LANG_EQUALIZER_BAND_GAIN, 0, 
+    INT_SETTING(0, eq_hw_band3_gain, LANG_GAIN, 0, 
         "eq hardware band 3 gain", UNIT_DB, EQ_HW_GAIN_MIN, 
         EQ_HW_GAIN_MAX, EQ_HW_GAIN_STEP, eq_hw_gain_format, NULL, NULL),
 
@@ -1091,7 +1093,7 @@ const struct settings_list settings[] = {
         "eq hardware band 4 cutoff", "5.3kHz,6.9kHz,9kHz,11.7kHz", NULL, 4,
         TALK_ID(5300, UNIT_HERTZ), TALK_ID(6900, UNIT_HERTZ), 
         TALK_ID(9000, UNIT_HERTZ), TALK_ID(11700, UNIT_HERTZ)),
-    INT_SETTING(0, eq_hw_band4_gain, LANG_EQUALIZER_BAND_GAIN, 0, 
+    INT_SETTING(0, eq_hw_band4_gain, LANG_GAIN, 0, 
         "eq hardware band 4 gain", UNIT_DB, EQ_HW_GAIN_MIN, 
         EQ_HW_GAIN_MAX, EQ_HW_GAIN_STEP, eq_hw_gain_format, NULL, NULL),
 #endif
@@ -1100,7 +1102,7 @@ const struct settings_list settings[] = {
         "hold_lr_for_scroll_in_list",NULL),
     CHOICE_SETTING(0, show_path_in_browser, LANG_SHOW_PATH, SHOW_PATH_OFF,
         "show path in browser", "off,current directory,full path", NULL, 3,
-        ID2P(LANG_OFF), ID2P(LANG_SHOW_PATH_CURRENT), ID2P(LANG_SHOW_PATH_FULL)),
+        ID2P(LANG_OFF), ID2P(LANG_SHOW_PATH_CURRENT), ID2P(LANG_DISPLAY_FULL_PATH)),
 
 #ifdef HAVE_AGC
     {F_T_INT,&global_settings.rec_agc_preset_mic,LANG_RECORD_AGC_PRESET,INT(1),
@@ -1120,16 +1122,16 @@ const struct settings_list settings[] = {
     CHOICE_SETTING(0, remote_backlight_on_button_hold,
         LANG_BACKLIGHT_ON_BUTTON_HOLD, 0, "remote backlight on button hold",
         "normal,off,on", remote_backlight_set_on_button_hold, 3,
-        ID2P(LANG_BACKLIGHT_ON_BUTTON_HOLD_NORMAL), ID2P(LANG_OFF), ID2P(LANG_ON)),
+        ID2P(LANG_NORMAL), ID2P(LANG_OFF), ID2P(LANG_ON)),
 #endif
 #endif
 #ifdef HAVE_HEADPHONE_DETECTION
-    CHOICE_SETTING(0, unplug_mode, LANG_UNPLUG, 0,
+    CHOICE_SETTING(0, unplug_mode, LANG_HEADPHONE_UNPLUG, 0,
         "pause on headphone unplug", "off,pause,pause and resume", NULL, 3,
-        ID2P(LANG_OFF), ID2P(LANG_PAUSE), ID2P(LANG_UNPLUG_RESUME)),
-    INT_SETTING(0, unplug_rw, LANG_UNPLUG_RW, 0, "rewind duration on pause",                      
+        ID2P(LANG_OFF), ID2P(LANG_PAUSE), ID2P(LANG_HEADPHONE_UNPLUG_RESUME)),
+    INT_SETTING(0, unplug_rw, LANG_HEADPHONE_UNPLUG_RW, 0, "rewind duration on pause",                      
                     UNIT_SEC, 0, 15, 1, NULL, NULL,NULL) ,
-    OFFON_SETTING(0,unplug_autoresume,LANG_UNPLUG_DISABLE_AUTORESUME,false,
+    OFFON_SETTING(0,unplug_autoresume,LANG_HEADPHONE_UNPLUG_RESUME,false,
         "disable autoresume if phones not present",NULL),
 #endif
 #if CONFIG_TUNER
@@ -1192,7 +1194,7 @@ const struct settings_list settings[] = {
 #endif
             ID2P(LANG_PREVIOUS_SCREEN), ID2P(LANG_MAIN_MENU),
             ID2P(LANG_DIR_BROWSER), ID2P(LANG_TAGCACHE),
-            ID2P(LANG_RESUME_PLAYBACK), ID2P(LANG_SETTINGS_MENU),
+            ID2P(LANG_RESUME_PLAYBACK), ID2P(LANG_SETTINGS),
 #ifdef HAVE_RECORDING
             ID2P(LANG_RECORDING),
 #endif

@@ -1,0 +1,159 @@
+/* This file controls which strings are included when rockbox is built and
+   when the .lng and .voice files are built. That means that a change in this
+   file will break compatiblity with older .lng and .voice files and that those
+   version numbers should be updated. It also means that changing defines in
+   the various config*.h files could also break back compatiblity */  
+
+#if defined(HAVE_AGC)
+agc
+#endif
+
+#if defined(HAVE_RTC_ALARM)
+alarm
+#endif
+
+#if defined(HAVE_BACKLIGHT_BRIGHTNESS)
+backlight_brightness
+#endif
+
+#if defined(HAVE_BACKLIGHT_PWM_FADING)
+backlight_fade
+#endif
+
+#if BATTERY_TYPES_COUNT > 1
+battery_types
+#endif
+
+#if defined(HAVE_DIRCACHE)
+dircache
+#endif
+
+#if defined(HAVE_FLASH_STORAGE)
+flash_storage
+#endif
+
+#if defined(HAVE_HEADPHONE_DETECTION)
+headphone_detection
+#endif
+
+#if defined(HAS_BUTTON_HOLD)
+hold_button
+#endif
+
+#if defined(HAVE_LCD_BITMAP)
+lcd_bitmap
+#endif
+
+#if defined(HAVE_LCD_CHARCELLS)
+lcd_charcell
+#endif
+
+#if LCD_DEPTH > 1
+lcd_non-mono
+#endif
+
+#if defined(HAVE_LCD_COLOR)
+lcd_color
+#endif
+
+#if defined(HAVE_LCD_FLIP)
+lcd_flip
+#endif
+
+#if defined(HAVE_LCD_INVERT) || defined(HAVE_REMOTE_LCD)
+lcd_invert
+#endif
+
+#if defined(HAVE_LCD_SLEEP)
+lcd_sleep
+#endif
+
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+masf
+#endif
+
+#if (CONFIG_CODEC == MAS3507D)
+masd
+#endif
+
+#if defined(HAVE_PITCHSCREEN)
+pitchscreen
+#endif
+
+#if defined(HAVE_MULTIVOLUME)
+multivolume
+#endif
+
+#if defined(HAVE_QUICKSCREEN)
+quickscreen
+#endif
+
+#if defined(CONFIG_TUNER)
+radio
+#endif
+
+#if (CONFIG_KEYPAD == RECORDER_PAD)
+recorder_pad
+#if defined(CONFIG_TUNER)
+radio_screen_button_bar
+#endif
+#endif
+
+#if defined(HAVE_RECORDING)
+recording
+#if CONFIG_CODEC == SWCODEC
+recording_swcodec
+#else
+recording_hwcodec
+#endif
+#endif
+
+#if defined(HAVE_REMOTE_LCD)
+remote
+#endif
+
+#if defined(HAVE_REMOTE_LCD_TICKING)
+remote_ticking
+#endif
+
+#if CONFIG_RTC
+rtc
+#endif
+
+#if defined(HAVE_SCROLLWHEEL)
+scrollwheel
+#endif
+
+#if defined(SIMULATOR)
+sim
+#endif
+
+#if defined(ARCHOS_RECORDER) || defined(ARCHOS_PLAYER)
+soft_shutdown
+#endif
+
+#if defined(HAVE_SPDIF_POWER)
+spdif_power
+#endif
+
+#if CONFIG_CODEC == SWCODEC
+swcodec
+#else
+hwcodec
+#endif
+
+#if defined(HAVE_TAGCACHE)
+tagcache
+#endif
+
+#if defined(HAVE_TC_RAMCACHE)
+tc_ramcache
+#endif
+
+#if CONFIG_CHARGING || defined(SIMULATOR)
+charging
+#if defined(HAVE_USB_POWER) || defined(SIMULATOR)
+usb_charging
+#endif
+#endif
+

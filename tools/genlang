@@ -11,7 +11,7 @@
 #
 
 # binary version for the binary lang file
-my $langversion = 3; # 3 was the latest one used in the v1 format
+my $langversion = 4; # 3 was the latest one used in the v1 format
 
 # A note for future users and readers: The original v1 language system allowed
 # the build to create and use a different language than english built-in. We
@@ -28,8 +28,8 @@ Usage: genlang [options] <langv2 file>
     Make the tool create a [prefix].c and [prefix].h file.
 
  -b=<outfile>
-    Make the tool create a binary language (.lng) file namaed [outfile].
-    The use of this option requires that you also use -e.
+    Make the tool create a binary language (.lng) file named [outfile].
+    The use of this option requires that you also use -e, -t and -i.
 
  -u
     Update language file. Given the translated file and the most recent english
@@ -47,6 +47,9 @@ Usage: genlang [options] <langv2 file>
     The target can in fact be specified as numerous different strings,
     separated with colons. This will make genlang to use all the specified
     strings when searching for a matching phrase.
+
+ -i=<target id>
+    The target id number, needed for -b.
 
  -o
     Voice mode output. Outputs all id: and voice: lines for the given target!
@@ -88,8 +91,15 @@ if(!$check) {
     print "Please use at least one of -p, -u, -o and -b\n";
     exit;
 }
+
 if(($binary || $update || $voiceout) && !$english) {
     print "Please use -e too when you use -b, -o or -u\n";
+    exit;
+}
+
+my $target_id = $i;
+if($binary && !$target_id) {
+    print "Please specify a target id number (with -i)!\n";
     exit;
 }
 
@@ -586,7 +596,7 @@ elsif($binary) {
 
     open(OUTF, ">$binary") or die "Can't create $binary";
     binmode OUTF;
-    printf OUTF ("\x1a%c", $langversion); # magic lang file header
+    printf OUTF ("\x1a%c%c", $langversion, $target_id); # magic lang file header
 
     # loop over the target phrases
     for $i (1 .. $idcount) {

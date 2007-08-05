@@ -398,7 +398,7 @@ static void pitch_screen_draw(struct screen *display, int pitch, int pitch_mode)
 
     if (display->nb_lines < 4) /* very small screen, just show the pitch value */
     {
-        w = snprintf((char *)buf, sizeof(buf), "%s: %d.%d%%",str(LANG_SYSFONT_PITCH),
+        w = snprintf((char *)buf, sizeof(buf), "%s: %d.%d%%",str(LANG_PITCH),
                   pitch / 10, pitch % 10 );
         display->putsxy((display->width-(w*display->char_width))/2,
                          display->nb_lines/2,buf);
@@ -408,9 +408,9 @@ static void pitch_screen_draw(struct screen *display, int pitch, int pitch_mode)
 
         /* UP: Pitch Up */
         if (pitch_mode == PITCH_MODE_ABSOLUTE) {
-            ptr = str(LANG_SYSFONT_PITCH_UP);
+            ptr = str(LANG_PITCH_UP);
         } else {
-            ptr = str(LANG_SYSFONT_PITCH_UP_SEMITONE);
+            ptr = str(LANG_PITCH_UP_SEMITONE);
         }
         display->getstringsize(ptr,&w,&h);
         display->putsxy((display->width-w)/2, 0, ptr);
@@ -419,9 +419,9 @@ static void pitch_screen_draw(struct screen *display, int pitch, int pitch_mode)
 
         /* DOWN: Pitch Down */
         if (pitch_mode == PITCH_MODE_ABSOLUTE) {
-            ptr = str(LANG_SYSFONT_PITCH_DOWN);
+            ptr = str(LANG_PITCH_DOWN);
         } else {
-            ptr = str(LANG_SYSFONT_PITCH_DOWN_SEMITONE);
+            ptr = str(LANG_PITCH_DOWN_SEMITONE);
         }
         display->getstringsize(ptr,&w,&h);
         display->putsxy((display->width-w)/2, display->height - h, ptr);
@@ -443,7 +443,7 @@ static void pitch_screen_draw(struct screen *display, int pitch, int pitch_mode)
                              w+1, (display->height-h)/2, 7, 8);
 
         /* "Pitch" */
-        snprintf((char *)buf, sizeof(buf), str(LANG_SYSFONT_PITCH));
+        snprintf((char *)buf, sizeof(buf), str(LANG_PITCH));
         display->getstringsize(buf,&w,&h);
         display->putsxy((display->width-w)/2, (display->height/2)-h, buf);
         /* "XX.X%" */
@@ -654,14 +654,14 @@ bool quick_screen_quick(int button_enter)
         [1]={ STR(LANG_SYSFONT_ON) }
     };
     static const struct opt_items bottom_items[] = {
-        [SHOW_ALL]={ STR(LANG_SYSFONT_FILTER_ALL) },
+        [SHOW_ALL]={ STR(LANG_SYSFONT_ALL) },
         [SHOW_SUPPORTED]={ STR(LANG_SYSFONT_FILTER_SUPPORTED) },
         [SHOW_MUSIC]={ STR(LANG_SYSFONT_FILTER_MUSIC) },
         [SHOW_PLAYLIST]={ STR(LANG_SYSFONT_FILTER_PLAYLIST) },
     };
     static const struct opt_items right_items[] = {
         [REPEAT_OFF]={ STR(LANG_SYSFONT_OFF) },
-        [REPEAT_ALL]={ STR(LANG_SYSFONT_REPEAT_ALL) },
+        [REPEAT_ALL]={ STR(LANG_SYSFONT_ALL) },
         [REPEAT_ONE]={ STR(LANG_SYSFONT_REPEAT_ONE) },
         [REPEAT_SHUFFLE]={ STR(LANG_SYSFONT_SHUFFLE) },
 #ifdef AB_REPEAT_ENABLE
@@ -1014,7 +1014,7 @@ bool set_time_screen(const char* title, struct tm *tm)
 
             /* print help text */
             if (screens[s].nb_lines > 4)
-                screens[s].puts(0, 4, str(LANG_TIME_SET));
+                screens[s].puts(0, 4, str(LANG_TIME_SET_BUTTON));
             if (screens[s].nb_lines > 5)
                 screens[s].puts(0, 5, str(LANG_TIME_REVERT));
             screens[s].update();

@@ -281,8 +281,8 @@ static int draw_eq_slider(struct screen * screen, int x, int y,
 #if NB_SCREENS > 1
     if (screen->screen_type == SCREEN_REMOTE) {
         if (mode == GAIN) {
-            screen->putsxy(current_x, y + 2, str(LANG_EQUALIZER_BAND_GAIN));
-            screen->getstringsize(str(LANG_EQUALIZER_BAND_GAIN), &w, &h);
+            screen->putsxy(current_x, y + 2, str(LANG_GAIN));
+            screen->getstringsize(str(LANG_GAIN), &w, &h);
         } else if (mode == CUTOFF) {
             screen->putsxy(current_x, y + 2, str(LANG_EQUALIZER_BAND_CUTOFF));
             screen->getstringsize(str(LANG_EQUALIZER_BAND_CUTOFF), &w, &h);
@@ -454,7 +454,7 @@ bool eq_menu_graphical(void)
             voice_unit = UNIT_DB;
             
             snprintf(buf, sizeof(buf), str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
-                str(LANG_SYSFONT_EQUALIZER_BAND_GAIN));
+                str(LANG_SYSFONT_GAIN));
             
             screens[SCREEN_MAIN].putsxy(2, y, buf);
         } else if (mode == CUTOFF) {
@@ -596,7 +596,7 @@ static bool eq_save_preset(void)
                 break;
         }
         else {
-            gui_syncsplash(HZ, str(LANG_MENU_SETTING_CANCEL));
+            gui_syncsplash(HZ, str(LANG_CANCEL));
             return false;
         }
     }

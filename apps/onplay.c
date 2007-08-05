@@ -295,7 +295,7 @@ MENUITEM_FUNCTION(playlist_save_item, 0, ID2P(LANG_SAVE_DYNAMIC_PLAYLIST),
                   save_playlist, NULL, NULL, Icon_Playlist);
 MENUITEM_FUNCTION(reshuffle_item, 0, ID2P(LANG_SHUFFLE_PLAYLIST),
                   shuffle_playlist, NULL, NULL, Icon_Playlist);
-MAKE_ONPLAYMENU( wps_playlist_menu, ID2P(LANG_PLAYLIST_MENU), 
+MAKE_ONPLAYMENU( wps_playlist_menu, ID2P(LANG_PLAYLIST), 
                  NULL, Icon_Playlist, 
                  &playlist_viewer_item, &search_playlist_item,
                  &playlist_save_item, &reshuffle_item
@@ -373,7 +373,7 @@ MENUITEM_FUNCTION(view_playlist_item, 0, ID2P(LANG_VIEW),
                   view_playlist, NULL,
                   treeplaylist_callback, Icon_Playlist);
 
-MAKE_ONPLAYMENU( tree_playlist_menu, ID2P(LANG_PLAYLIST_MENU), 
+MAKE_ONPLAYMENU( tree_playlist_menu, ID2P(LANG_PLAYLIST), 
                  treeplaylist_callback, Icon_Playlist,
                  
                  /* view */
@@ -502,7 +502,7 @@ static int remove_dir(char* dirname, int len)
 #endif
         if(ACTION_STD_CANCEL == get_action(CONTEXT_STD,TIMEOUT_NOBLOCK))
         {
-            gui_syncsplash(HZ, str(LANG_MENU_SETTING_CANCEL));
+            gui_syncsplash(HZ, str(LANG_CANCEL));
             result = -1;
             break;
         }
@@ -1032,6 +1032,7 @@ MENUITEM_FUNCTION(view_cue_item, 0, ID2P(LANG_BROWSE_CUESHEET),
 /* CONTEXT_WPS items */
 MENUITEM_FUNCTION(browse_id3_item, 0, ID2P(LANG_MENU_SHOW_ID3_INFO),
                   browse_id3, NULL, NULL, Icon_NOICON);
+/* NOTE: the LANG_MENU_SET_RATING string has been removed from english.lang */
 #ifdef HAVE_PITCHSCREEN
 MENUITEM_FUNCTION(pitch_screen_item, 0, ID2P(LANG_PITCH),
                   pitch_screen, NULL, NULL, Icon_Audio);

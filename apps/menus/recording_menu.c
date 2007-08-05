@@ -76,7 +76,7 @@ static int recsource_func(void)
         HAVE_MIC_REC_([AUDIO_SRC_MIC]
             = { STR(LANG_RECORDING_SRC_MIC) },)
         HAVE_LINE_REC_([AUDIO_SRC_LINEIN]
-            = { STR(LANG_RECORDING_SRC_LINE) },)
+            = { STR(LANG_LINE_IN) },)
         HAVE_SPDIF_REC_([AUDIO_SRC_SPDIF]
             = { STR(LANG_RECORDING_SRC_DIGITAL) },)
         HAVE_FMRADIO_REC_([AUDIO_SRC_FMRADIO]
@@ -217,7 +217,7 @@ static int recchannels_func(void)
         [CHN_MODE_MONO]   = { STR(LANG_CHANNEL_MONO)   }
     };
 #if CONFIG_CODEC == MAS3587F
-    return set_option(str(LANG_RECORDING_CHANNELS),
+    return set_option(str(LANG_CHANNELS),
                       &global_settings.rec_channels, INT,
                       names, CHN_NUM_MODES, NULL );
 #endif /* CONFIG_CODEC == MAS3587F */
@@ -245,7 +245,7 @@ static int recchannels_func(void)
 
     make_options_from_indexes(names, table, n_opts, opts);
 
-    ret = set_option(str(LANG_RECORDING_CHANNELS), &rec_channels,
+    ret = set_option(str(LANG_CHANNELS), &rec_channels,
                      INT, opts, n_opts, NULL );
 
     if (!ret)
@@ -254,7 +254,7 @@ static int recchannels_func(void)
     return ret;
 #endif /* CONFIG_CODEC == SWCODEC */
 }
-MENUITEM_FUNCTION(recchannels, 0, ID2P(LANG_RECORDING_CHANNELS), 
+MENUITEM_FUNCTION(recchannels, 0, ID2P(LANG_CHANNELS),
                     recchannels_func, NULL, NULL, Icon_Menu_setting);
 
 #if CONFIG_CODEC == SWCODEC
@@ -438,7 +438,7 @@ bool rectrigger(void)
     static const unsigned char *trigger_modes[] = {
         ID2P(LANG_OFF),
         ID2P(LANG_RECORD_TRIG_NOREARM),
-        ID2P(LANG_RECORD_TRIG_REARM)
+        ID2P(LANG_REPEAT)
     };
 
 #define PRERECORD_TIMES_COUNT 31
@@ -452,18 +452,18 @@ bool rectrigger(void)
 #define TRIGGER_TYPE_COUNT 3
     static const unsigned char *trigger_types[] = {
         ID2P(LANG_RECORD_TRIGGER_STOP),
-        ID2P(LANG_RECORD_TRIGGER_PAUSE),
+        ID2P(LANG_PAUSE),
         ID2P(LANG_RECORD_TRIGGER_NEWFILESTP),
     };
 
     static const unsigned char *option_name[] = {
-        [TRIGGER_MODE] =    ID2P(LANG_RECORD_TRIGGER_MODE),
+        [TRIGGER_MODE] =    ID2P(LANG_RECORD_TRIGGER),
         [TRIGGER_TYPE] =    ID2P(LANG_RECORD_TRIGGER_TYPE),
         [PRERECORD_TIME] =  ID2P(LANG_RECORD_PRERECORD_TIME),
         [START_THRESHOLD] = ID2P(LANG_RECORD_START_THRESHOLD),
-        [START_DURATION] =  ID2P(LANG_RECORD_MIN_DURATION),
+        [START_DURATION] =  ID2P(LANG_MIN_DURATION),
         [STOP_THRESHOLD] =  ID2P(LANG_RECORD_STOP_THRESHOLD),
-        [STOP_POSTREC] =    ID2P(LANG_RECORD_STOP_POSTREC),
+        [STOP_POSTREC] =    ID2P(LANG_MIN_DURATION),
         [STOP_GAP] =        ID2P(LANG_RECORD_STOP_GAP)
     };
 
@@ -637,7 +637,7 @@ bool rectrigger(void)
 
         switch (button) {
             case ACTION_STD_CANCEL:
-                gui_syncsplash(50, str(LANG_MENU_SETTING_CANCEL));
+                gui_syncsplash(50, str(LANG_CANCEL));
                 global_settings.rec_start_thres = old_start_thres;
                 global_settings.rec_start_duration = old_start_duration;
                 global_settings.rec_prerecord_time = old_prerecord_time;

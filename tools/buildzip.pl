@@ -37,6 +37,12 @@ while(1) {
         shift @ARGV;
         shift @ARGV;    
     }
+    elsif($ARGV[0] eq "-i") {
+        # The target id name as used in TARGET_ID in the root makefile
+        $target_id=$ARGV[1];
+        shift @ARGV;
+        shift @ARGV;    
+    }
     elsif($ARGV[0] eq "-o") {
         $output=$ARGV[1];
         shift @ARGV;
@@ -158,8 +164,8 @@ sub buildlangs {
     for(@files) {
         my $output = $_;
         $output =~ s/(.*)\.lang/$1.lng/;
-        print "$ROOT/tools/genlang -e=$dir/english.lang -t=$archos -b=$outputlang/$output $dir/$_\n" if($verbose);
-        system ("$ROOT/tools/genlang -e=$dir/english.lang -t=$archos -b=$outputlang/$output $dir/$_ >/dev/null 2>&1");
+        print "$ROOT/tools/genlang -e=$dir/english.lang -t=$archos -i=$target_id -b=$outputlang/$output $dir/$_\n" if($verbose);
+        system ("$ROOT/tools/genlang -e=$dir/english.lang -t=$archos -i=$target_id -b=$outputlang/$output $dir/$_ >/dev/null 2>&1");
     }
 }
 

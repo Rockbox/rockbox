@@ -95,6 +95,7 @@ struct clip_entry /* one entry of the index table */
 struct voicefile /* file format of our voice file */
 {
     int version; /* version of the voicefile */
+    int target_id; /* the rockbox target the file was made for */
     int table;   /* offset to index table, (=header size) */
     int id1_max; /* number of "normal" clips contained in above index */
     int id2_max; /* number of "voice only" clips contained in above index */
@@ -197,6 +198,11 @@ static void load_voicefile(void)
     {
         p_voicefile = (struct voicefile*)audiobuf;
 
+        if (p_voicefile->target_id != TARGET_ID)
+        {
+            logf("Incompatible voice file (wrong target)");
+            goto load_err;
+        }
 #if CONFIG_CODEC != SWCODEC
         /* MASCODEC: now use audiobuf for voice then thumbnail */
         p_thumbnail = audiobuf + file_size;

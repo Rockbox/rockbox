@@ -294,7 +294,7 @@ bool gui_wps_display(void)
 #ifdef HAVE_LCD_BITMAP
         gui_syncstatusbar_draw(&statusbars, true);
 #endif
-        gui_syncsplash(HZ, str(LANG_END_PLAYLIST_RECORDER));
+        gui_syncsplash(HZ, str(LANG_END_PLAYLIST));
         return true;
     }
     else
@@ -440,17 +440,10 @@ void display_keylock_text(bool locked)
     FOR_NB_SCREENS(i)
         gui_wps[i].display->stop_scroll();
 
-#ifdef HAVE_LCD_CHARCELLS
     if(locked)
-        s = str(LANG_KEYLOCK_ON_PLAYER);
+        s = str(LANG_KEYLOCK_ON);
     else
-        s = str(LANG_KEYLOCK_OFF_PLAYER);
-#else
-    if(locked)
-        s = str(LANG_KEYLOCK_ON_RECORDER);
-    else
-        s = str(LANG_KEYLOCK_OFF_RECORDER);
-#endif
+        s = str(LANG_KEYLOCK_OFF);
     gui_syncsplash(HZ, s);
 }
 

@@ -430,7 +430,7 @@ static int onplay_menu(int index)
     int result, ret = 0;
     struct playlist_entry * current_track=
         playlist_buffer_get_track(&viewer.buffer, index);
-    MENUITEM_STRINGLIST(menu_items, ID2P(LANG_PLAYLIST_MENU), NULL, 
+    MENUITEM_STRINGLIST(menu_items, ID2P(LANG_PLAYLIST), NULL, 
                         ID2P(LANG_REMOVE), ID2P(LANG_MOVE),
                         ID2P(LANG_CATALOG_ADD_TO), ID2P(LANG_CATALOG_ADD_TO_NEW));
     bool current = (current_track->index == viewer.current_playing_track);
@@ -569,7 +569,7 @@ bool playlist_viewer_ex(char* filename)
                   &playlist_callback_icons:NULL);
     gui_synclist_set_nb_items(&playlist_lists, viewer.num_tracks);
     gui_synclist_select_item(&playlist_lists, viewer.selected_track);
-    gui_synclist_set_title(&playlist_lists, str(LANG_PLAYLIST_MENU), Icon_Playlist);
+    gui_synclist_set_title(&playlist_lists, str(LANG_PLAYLIST), Icon_Playlist);
     gui_synclist_draw(&playlist_lists);
     while (!exit)
     {
@@ -577,7 +577,7 @@ bool playlist_viewer_ex(char* filename)
         if (global_status.resume_index == -1)
         {
             /* Play has stopped */
-            gui_syncsplash(HZ, str(LANG_END_PLAYLIST_RECORDER));
+            gui_syncsplash(HZ, str(LANG_END_PLAYLIST));
             goto exit;
         }
 
@@ -635,8 +635,8 @@ bool playlist_viewer_ex(char* filename)
                     ret_val = playlist_move(viewer.playlist, viewer.move_track,
                         current_track->index);
                     if (ret_val < 0)
-                        gui_syncsplash(HZ, str(LANG_MOVE_FAILED));
-
+                         gui_syncsplash(HZ, (unsigned char *)"%s %s",
+                             str(LANG_MOVE), str(LANG_FAILED));
                     update_playlist(true);
                     viewer.move_track = -1;
                 }
@@ -749,12 +749,7 @@ bool search_playlist(void)
     for (i=0;(i<playlist_count)&&(found_indicies_count<MAX_PLAYLIST_ENTRIES);i++)
     {
         gui_syncsplash(0, str(LANG_PLAYLIST_SEARCH_MSG),found_indicies_count,
-#if CONFIG_KEYPAD == PLAYER_PAD
-                   str(LANG_STOP_ABORT)
-#else
-                   str(LANG_OFF_ABORT)
-#endif
-        );
+                   str(LANG_OFF_ABORT));
         if (action_userabort(TIMEOUT_NOBLOCK))
         {
             if (!found_indicies_count)

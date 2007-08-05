@@ -228,7 +228,7 @@ static int timedate_set(void)
         tm.tm_year = YEAR-1900;
     }
 
-    result = (int)set_time_screen(str(LANG_TIME), &tm);
+    result = (int)set_time_screen(str(LANG_SET_TIME), &tm);
 
     if(tm.tm_year != -1) {
         set_time(&tm);
@@ -236,7 +236,7 @@ static int timedate_set(void)
     return result;
 }
 
-MENUITEM_FUNCTION(time_set, 0, ID2P(LANG_TIME), 
+MENUITEM_FUNCTION(time_set, 0, ID2P(LANG_SET_TIME), 
                     timedate_set, NULL, NULL, Icon_NOICON);
 MENUITEM_SETTING(timeformat, &global_settings.timeformat, NULL);
 MAKE_MENU(time_menu, ID2P(LANG_TIME_MENU), 0, Icon_NOICON, &time_set, &timeformat);
