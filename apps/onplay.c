@@ -1032,7 +1032,6 @@ MENUITEM_FUNCTION(view_cue_item, 0, ID2P(LANG_BROWSE_CUESHEET),
 /* CONTEXT_WPS items */
 MENUITEM_FUNCTION(browse_id3_item, 0, ID2P(LANG_MENU_SHOW_ID3_INFO),
                   browse_id3, NULL, NULL, Icon_NOICON);
-/* NOTE: the LANG_MENU_SET_RATING string has been removed from english.lang */
 #ifdef HAVE_PITCHSCREEN
 MENUITEM_FUNCTION(pitch_screen_item, 0, ID2P(LANG_PITCH),
                   pitch_screen, NULL, NULL, Icon_Audio);
