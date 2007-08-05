@@ -241,4 +241,24 @@ void gui_bitmap_scrollbar_draw(struct screen * screen, struct bitmap bm, int x, 
 #endif
     }
 }
+
+void show_busy_slider(struct screen *s, int x, int y, int width, int height)
+{
+    static int start = 0, dir = 1;
+    gui_scrollbar_draw(s, x, y, width, height, 100,
+                           start, start+20, HORIZONTAL);
+#if NB_SCREENS > 1
+    if (s->screen_type == SCREEN_MAIN)
+    {
+#endif
+        start += (dir*2);
+        if (start > 79)
+            dir = -1;
+        else if (start < 1)
+            dir = 1;
+#if NB_SCREENS > 1
+    }
+#endif
+}
+
 #endif /* HAVE_LCD_BITMAP */

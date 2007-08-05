@@ -487,8 +487,13 @@ static int remove_dir(char* dirname, int len)
         }
         else
         {   /* remove a file */
+#ifdef HAVE_LCD_BITMAP
             FOR_NB_SCREENS(i)
-                screens[i].puts_scroll(0,2,entry->d_name);
+            {
+                show_busy_slider(&screens[i], 2, 3*screens[i].char_height,
+                                 LCD_WIDTH-4, screens[i].char_height);
+            }
+#endif
             result = remove(dirname);
         }
 #ifdef HAVE_LCD_BITMAP
@@ -661,6 +666,21 @@ static bool clipboard_copy(void)
     return clipboard_clip(true);
 }
 
+#ifdef HAVE_LCD_BITMAP
+static inline void draw_slider(void)
+{
+    int i;
+    FOR_NB_SCREENS(i)
+    {
+        show_busy_slider(&screens[i], 2, LCD_HEIGHT/4,
+                         LCD_WIDTH-4, screens[i].char_height);
+        screens[i].update();
+    }
+}
+#else
+#define draw_slider()
+#endif
+
 /* Paste a file to a new directory. Will overwrite always. */
 static bool clipboard_pastefile(const char *src, const char *target, bool copy)
 {
@@ -721,6 +741,7 @@ static bool clipboard_pastefile(const char *src, const char *target, bool copy)
                         }
 
                         bytesread -= byteswritten;
+                        draw_slider();
                     }
                 }
 
