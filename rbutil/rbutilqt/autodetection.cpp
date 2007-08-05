@@ -64,7 +64,7 @@ bool Autodetection::detect()
 
 QStringList Autodetection::getMountpoints()
 {
-#ifdef Q_OS_WIN32
+#if defined(Q_OS_WIN32)
     QStringList tempList;
     QFileInfoList list = QDir::drives();
     for(int i=0; i<list.size();i++)
@@ -73,10 +73,10 @@ QStringList Autodetection::getMountpoints()
     }
     return tempList;
     
-#elif Q_OS_MACX
+#elif defined(Q_OS_MACX)
     QDir dir("/Volumes");
     return dir.entryList(); 
-#elif Q_OS_LINUX
+#elif defined(Q_OS_LINUX)
     QStringList tempList;
 
     FILE *fp = fopen( "/proc/mounts", "r" );
