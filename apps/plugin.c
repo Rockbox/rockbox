@@ -499,6 +499,8 @@ static const struct plugin_api rockbox_api = {
     screen_clear_area,
 #endif
     led,
+    set_current_file,
+    set_dirfilter,
 };
 
 int plugin_load(const char* plugin, void* parameter)

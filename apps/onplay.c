@@ -1077,7 +1077,15 @@ static bool set_recdir(void)
 MENUITEM_FUNCTION(set_recdir_item, 0, ID2P(LANG_SET_AS_REC_DIR),
                   set_recdir, NULL, clipboard_callback, Icon_Recording);
 #endif
-
+static bool add_to_faves(void)
+{
+    if(PLUGIN_USB_CONNECTED == filetype_load_plugin("shortcuts",
+                                                    selected_file))
+        onplay_result = ONPLAY_RELOAD_DIR;
+    return false;
+}
+MENUITEM_FUNCTION(add_to_faves_item, 0, ID2P(LANG_ADD_TO_FAVES),
+                  add_to_faves, NULL, clipboard_callback, Icon_NOICON);
 
 
 static int clipboard_callback(int action,const struct menu_item_ex *this_item)
@@ -1096,7 +1104,8 @@ static int clipboard_callback(int action,const struct menu_item_ex *this_item)
                      (this_item == &properties_item) || 
                      (this_item == &rename_file_item) ||
                      (this_item == &clipboard_cut_item) ||
-                     (this_item == &clipboard_copy_item)
+                     (this_item == &clipboard_copy_item) ||
+                     (this_item == &add_to_faves_item)
                     )
             {
                 /* always visible */
@@ -1177,6 +1186,7 @@ MAKE_ONPLAYMENU( tree_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
 #ifdef HAVE_RECORDING
            &set_recdir_item,
 #endif
+           &add_to_faves_item,
          );
 int onplay(char* file, int attr, int from)
 {

@@ -454,8 +454,15 @@ void get_current_file(char* buffer, int buffer_len)
                                           tc.dirlength ? e->name : "");
 }
 
+/* Allow apps to change our dirfilter directly (required for sub browsers) 
+   if they're suddenly going to become a file browser for example */
+void set_dirfilter(int l_dirfilter)
+{
+    *tc.dirfilter = l_dirfilter;
+}
+
 /* Selects a file and update tree context properly */
-static void set_current_file(char *path)
+void set_current_file(char *path)
 {
     char *name;
     int i;
