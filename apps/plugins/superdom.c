@@ -350,112 +350,33 @@ void draw_board(void) {
 }
 
 int calc_strength(bool colour, int x, int y) {
-    /* Yes, I know. Please, if you know how, fix it. */
-    int score=0;
-    if(board[x][y].colour == colour) {
-        score+=10;
-    }
-    if(board[x+1][y].colour == colour) {
-        score+=10;
-    }
-    if(board[x][y+1].colour == colour) {
-        score+=10;
-    }
-    if(board[x-1][y].colour == colour) {
-        score+=10;
-    }
-    if(board[x][y-1].colour == colour) {
-        score+=10;
-    }
-    if((board[x][y].colour == colour) && board[x][y].tank) {
-        score+=30;
-    }
-    if((board[x+1][y].colour == colour) && board[x+1][y].tank) {
-        score+=30;
-    }
-    if((board[x][y+1].colour == colour) && board[x][y+1].tank) {
-        score+=30;
-    }
-    if((board[x-1][y].colour == colour) && board[x-1][y].tank) {
-        score+=30;
-    }
-    if((board[x][y-1].colour == colour) && board[x][y-1].tank) {
-        score+=30;
-    }
-    if((board[x][y].colour == colour) && board[x][y].plane) {
-        score+=40;
-    }
-    if((board[x+1][y].colour == colour) && board[x+1][y].plane) {
-        score+=40;
-    }
-    if((board[x][y+1].colour == colour) && board[x][y+1].plane) {
-        score+=40;
-    }
-    if((board[x-1][y].colour == colour) && board[x-1][y].plane) {
-        score+=40;
-    }
-    if((board[x][y-1].colour == colour) && board[x][y-1].plane) {
-        score+=40;
-    }
-    if((board[x][y].colour == colour) && board[x][y].ind) {
-        score+=40;
-    }
-    if((board[x+1][y].colour == colour) && board[x+1][y].ind) {
-        score+=40;
-    }
-    if((board[x][y+1].colour == colour) && board[x][y+1].ind) {
-        score+=40;
-    }
-    if((board[x-1][y].colour == colour) && board[x-1][y].ind) {
-        score+=40;
-    }
-    if((board[x][y-1].colour == colour) && board[x][y-1].ind) {
-        score+=40;
-    }
-    if((board[x][y].colour == colour) && board[x][y].farm) {
-        score+=30;
-    }
-    if((board[x+1][y].colour == colour) && board[x+1][y].farm) {
-        score+=30;
-    }
-    if((board[x][y+1].colour == colour) && board[x][y+1].farm) {
-        score+=30;
-    }
-    if((board[x-1][y].colour == colour) && board[x-1][y].farm) {
-        score+=30;
-    }
-    if((board[x][y-1].colour == colour) && board[x][y-1].farm) {
-        score+=30;
-    }
-     if((board[x][y].colour == colour) && board[x][y].nuke) {
-        score+=20;
-    }
-    if((board[x+1][y].colour == colour) && board[x+1][y].nuke) {
-        score+=20;
-    }
-    if((board[x][y+1].colour == colour) && board[x][y+1].nuke) {
-        score+=20;
-    }
-    if((board[x-1][y].colour == colour) && board[x-1][y].nuke) {
-        score+=20;
-    }
-    if((board[x][y-1].colour == colour) && board[x][y-1].nuke) {
-        score+=20;
-    }
-    if((board[x][y].colour == colour) && board[x][y].men) {
-        score+=(board[x][y].men*133/1000);
-    }
-    if((board[x+1][y].colour == colour) && board[x+1][y].men) {
-        score+=(board[x+1][y].men*133/1000);
-    }
-    if((board[x][y+1].colour == colour) && board[x][y+1].men) {
-        score+=(board[x][y+1].men*133/1000);
-    }
-    if((board[x-1][y].colour == colour) && board[x-1][y].men) {
-        score+=(board[x-1][y].men*133/1000);
-    }
-    if((board[x][y-1].colour == colour) && board[x][y-1].men) {
-        score+=(board[x][y-1].men*133/1000);
+    int a, b, score=0;
+    for (a = -1; a < 2; a++){
+   for (b = -1; b < 2; b++){
+       if (b == 0){
+           if(board[x + a][y].colour == colour)
+           score+=10;
+       if(((board[x + a][y].colour == colour) && board[x + a][y].tank) || ((board[x + a][y].colour == colour) && board[x + a][y].farm))
+               score+=30;
+       if(((board[x + a][y].colour == colour) && board[x + a][y].plane) || ((board[x + a][y].colour == colour) && board[x + a][y].ind))
+               score+=40;
+       if((board[x + a][y].colour == colour) && board[x + a][y].nuke)
+               score+=20;
+       if((board[x + a][y].colour == colour) && board[x + a][y].men)
+               score+=(board[x + a][y].men*133/1000);
+       } else if (a == 0){
+                if(board[x][y + b].colour == colour)
+           score+=10;
+       if(((board[x][y + b].colour == colour) && board[x][y + b].tank) || ((board[x][y + b].colour == colour) && board[x][y + b].farm))
+               score+=30;
+       if(((board[x][y + b].colour == colour) && board[x][y + b].plane) || ((board[x][y + b].colour == colour) && board[x][y + b].ind))
+               score+=40;
+       if((board[x][y + b].colour == colour) && board[x][y + b].nuke)
+               score+=20;
+       if((board[x][y + b].colour == colour) && board[x][y + b].men)
+               score+=(board[x][y + b].men*133/1000);
+       }
+   }
     }
     return score;
 }
