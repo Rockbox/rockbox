@@ -888,6 +888,10 @@ struct thread_entry*
 
 #if NUM_CORES > 1
     thread->core = core;
+
+    /* Writeback stack munging or anything else before starting */
+    if (core != CURRENT_CORE)
+        flush_icache();
 #endif
     
     regs = &thread->context;
