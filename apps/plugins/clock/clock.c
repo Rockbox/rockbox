@@ -38,15 +38,20 @@ const struct button_mapping* plugin_contexts[]={
     remote_directions
 #endif
 };
+
 #define NB_ACTION_CONTEXTS sizeof(plugin_contexts)/sizeof(plugin_contexts[0])
 #define ACTION_COUNTER_TOGGLE PLA_FIRE
 #define ACTION_COUNTER_RESET PLA_FIRE_REPEAT
 #define ACTION_MENU PLA_MENU
 #define ACTION_EXIT PLA_QUIT
 #define ACTION_MODE_NEXT PLA_RIGHT
+#define ACTION_MODE_NEXT_REPEAT PLA_RIGHT_REPEAT
 #define ACTION_MODE_PREV PLA_LEFT
+#define ACTION_MODE_PREV_REPEAT PLA_LEFT_REPEAT
 #define ACTION_SKIN_NEXT PLA_UP
+#define ACTION_SKIN_NEXT_REPEAT PLA_UP_REPEAT
 #define ACTION_SKIN_PREV PLA_DOWN
+#define ACTION_SKIN_PREV_REPEAT PLA_DOWN_REPEAT
 
 extern struct plugin_api* rb;
 
@@ -147,20 +152,24 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
                     counter_reset(&counter);
                 break;
 
+            case ACTION_MODE_NEXT_REPEAT:
             case ACTION_MODE_NEXT:
                 clock_settings.mode++;
                 if(clock_settings.mode >= NB_CLOCK_MODES)
                     clock_settings.mode = 0;
                 break;
 
+            case ACTION_MODE_PREV_REPEAT:
             case ACTION_MODE_PREV:
                 clock_settings.mode--;
                 if(clock_settings.mode < 0)
                     clock_settings.mode = NB_CLOCK_MODES-1;
                 break;
+            case ACTION_SKIN_PREV_REPEAT:
             case ACTION_SKIN_PREV:
                 clock_settings_skin_next(&clock_settings);
                 break;
+            case ACTION_SKIN_NEXT_REPEAT:
             case ACTION_SKIN_NEXT:
                 clock_settings_skin_previous(&clock_settings);
                 break;
