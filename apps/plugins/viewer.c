@@ -376,8 +376,11 @@ static unsigned char* find_last_space(const unsigned char* p, int size)
 
     for (i=size-1; i>=0; i--)
         for (j=k; j < (int) sizeof(line_break); j++)
-            if (p[i] == line_break[j])
-                return (unsigned char*) p+i;
+        {
+            if (((p[i] != '-') && (prefs.word_mode != WRAP)))
+                if (p[i] == line_break[j])
+                    return (unsigned char*) p+i;
+        }
 
     return NULL;
 }
