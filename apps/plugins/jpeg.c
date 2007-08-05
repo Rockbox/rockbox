@@ -134,7 +134,8 @@ PLUGIN_HEADER
 #define JPEG_DOWN               BUTTON_DOWN
 #define JPEG_LEFT               BUTTON_LEFT
 #define JPEG_RIGHT              BUTTON_RIGHT
-#define JPEG_MENU               BUTTON_REC
+#define JPEG_MENU               BUTTON_POWER
+#define JPEG_SLIDE_SHOW         BUTTON_REC
 #define JPEG_NEXT               BUTTON_SCROLL_DOWN
 #define JPEG_NEXT_REPEAT        (BUTTON_SCROLL_DOWN|BUTTON_REPEAT)
 #define JPEG_PREVIOUS           BUTTON_SCROLL_UP
@@ -2719,6 +2720,14 @@ int scroll_bmp(struct t_disp* pdisp)
             if (entries > 0)
                 return change_filename(DIR_NEXT);
             break;
+
+#ifdef JPEG_SLIDE_SHOW
+        case JPEG_SLIDE_SHOW:
+            slideshow_enabled = !slideshow_enabled;
+            running_slideshow = slideshow_enabled;
+            break;
+#endif
+
 #ifdef JPEG_NEXT_REPEAT
         case JPEG_NEXT_REPEAT:
 #endif
