@@ -1,0 +1,268 @@
+<ui version="4.0" >
+ <class>InstallTalkFrm</class>
+ <widget class="QDialog" name="InstallTalkFrm" >
+  <property name="windowModality" >
+   <enum>Qt::WindowModal</enum>
+  </property>
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>681</width>
+    <height>516</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Install Talk Files</string>
+  </property>
+  <layout class="QGridLayout" >
+   <item rowspan="5" row="0" column="0" >
+    <widget class="QLabel" name="label" >
+     <property name="text" >
+      <string/>
+     </property>
+     <property name="pixmap" >
+      <pixmap resource="rbutilqt.qrc" >:/icons/icons/wizard.xpm</pixmap>
+     </property>
+     <property name="alignment" >
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" colspan="5" >
+    <widget class="QLabel" name="label_2" >
+     <property name="text" >
+      <string>Select the Folder to generate Talkfiles for.</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" colspan="4" >
+    <widget class="QLineEdit" name="lineTalkFolder" />
+   </item>
+   <item row="1" column="5" >
+    <widget class="QPushButton" name="buttonBrowse" >
+     <property name="text" >
+      <string>&amp;Browse</string>
+     </property>
+     <property name="icon" >
+      <iconset resource="rbutilqt.qrc" >:/icons/icons/system-search.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" colspan="5" >
+    <widget class="QGroupBox" name="groupBox" >
+     <property name="title" >
+      <string>TTS Engine</string>
+     </property>
+     <layout class="QGridLayout" >
+      <item row="0" column="0" colspan="2" >
+       <widget class="QLabel" name="label_3" >
+        <property name="text" >
+         <string>Select a TTS Engine</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2" >
+       <widget class="QComboBox" name="TTScbx" />
+      </item>
+      <item row="2" column="0" colspan="2" >
+       <widget class="QLabel" name="label_4" >
+        <property name="text" >
+         <string>Select the TTS executable in your Filesystem</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" >
+       <widget class="QLineEdit" name="TTSpath" />
+      </item>
+      <item row="3" column="1" >
+       <widget class="QPushButton" name="buttonBrowseTTS" >
+        <property name="text" >
+         <string>Browse</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" >
+       <widget class="QLabel" name="label_7" >
+        <property name="text" >
+         <string>TTS Options</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0" colspan="2" >
+       <widget class="QLineEdit" name="TTSOptions" />
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="1" colspan="5" >
+    <widget class="QGroupBox" name="groupBox_2" >
+     <property name="title" >
+      <string>Encoder Engine</string>
+     </property>
+     <layout class="QGridLayout" >
+      <item row="0" column="0" colspan="2" >
+       <widget class="QLabel" name="label_5" >
+        <property name="text" >
+         <string>Select an Encoder</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2" >
+       <widget class="QComboBox" name="Encodercbx" />
+      </item>
+      <item row="2" column="0" colspan="2" >
+       <widget class="QLabel" name="label_6" >
+        <property name="text" >
+         <string>Select the Encoder executable in your Filesystem</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" >
+       <widget class="QLineEdit" name="Encoderpath" />
+      </item>
+      <item row="3" column="1" >
+       <widget class="QPushButton" name="buttonBrowseEncoder" >
+        <property name="text" >
+         <string>Browse</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" >
+       <widget class="QLabel" name="label_8" >
+        <property name="text" >
+         <string>Encoder Options</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0" colspan="2" >
+       <widget class="QLineEdit" name="EncoderOptions" />
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="4" column="1" >
+    <widget class="QCheckBox" name="OverwriteWav" >
+     <property name="text" >
+      <string>Overwrite Wavefiles</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2" >
+    <widget class="QCheckBox" name="RemoveWav" >
+     <property name="text" >
+      <string>Remove Wavefiles</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="3" colspan="2" >
+    <widget class="QCheckBox" name="recursive" >
+     <property name="text" >
+      <string>Run recursive</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1" >
+    <widget class="QCheckBox" name="OverwriteTalk" >
+     <property name="text" >
+      <string>Overwrite Talkfiles</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2" >
+    <widget class="QCheckBox" name="StripExtensions" >
+     <property name="text" >
+      <string>Strip Extensions</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="4" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>111</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="6" column="1" colspan="3" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="6" column="4" colspan="2" >
+    <layout class="QHBoxLayout" >
+     <item>
+      <widget class="QPushButton" name="buttonOk" >
+       <property name="text" >
+        <string>&amp;Ok</string>
+       </property>
+       <property name="icon" >
+        <iconset resource="rbutilqt.qrc" >:/icons/icons/go-next.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="buttonCancel" >
+       <property name="text" >
+        <string>&amp;Cancel</string>
+       </property>
+       <property name="icon" >
+        <iconset resource="rbutilqt.qrc" >:/icons/icons/process-stop.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="rbutilqt.qrc" />
+ </resources>
+ <connections>
+  <connection>
+   <sender>buttonOk</sender>
+   <signal>clicked()</signal>
+   <receiver>InstallTalkFrm</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>472</x>
+     <y>418</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>382</x>
+     <y>328</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonCancel</sender>
+   <signal>clicked()</signal>
+   <receiver>InstallTalkFrm</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>561</x>
+     <y>428</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>522</x>
+     <y>332</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

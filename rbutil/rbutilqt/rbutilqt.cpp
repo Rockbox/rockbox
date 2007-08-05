@@ -26,6 +26,7 @@
 #include "configure.h"
 #include "install.h"
 #include "installbl.h"
+#include "installtalkwindow.h"
 #include "httpget.h"
 #include "installbootloader.h"
 
@@ -78,7 +79,9 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     connect(ui.buttonBootloader, SIGNAL(clicked()), this, SLOT(installBl()));
     connect(ui.buttonFonts, SIGNAL(clicked()), this, SLOT(installFonts()));
     connect(ui.buttonGames, SIGNAL(clicked()), this, SLOT(installDoom()));
-
+    connect(ui.buttonTalk, SIGNAL(clicked()), this, SLOT(createTalkFiles()));
+  
+    
     // disable unimplemented stuff
     ui.buttonThemes->setEnabled(false);
     ui.buttonSmall->setEnabled(false);
@@ -345,3 +348,12 @@ void RbUtilQt::installDoom()
 
 }
 
+
+void RbUtilQt::createTalkFiles(void)
+{
+	InstallTalkWindow *installWindow = new InstallTalkWindow(this);
+	installWindow->setUserSettings(userSettings);
+	installWindow->setDeviceSettings(devices);
+	installWindow->show();
+
+}

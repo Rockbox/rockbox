@@ -9,6 +9,8 @@ SOURCES += rbutilqt.cpp \
  installbootloader.cpp \
  installbl.cpp \
  progressloggergui.cpp \
+ installtalkwindow.cpp \
+ talkfile.cpp \
  ../ipodpatcher/ipodpatcher.c \
  ../sansapatcher/sansapatcher.c \
  irivertools/irivertools.cpp \
@@ -29,6 +31,8 @@ HEADERS += rbutilqt.h \
  installzip.h \
  installbootloader.h \
  installbl.h \
+ installtalkwindow.h \
+ talkfile.h \
  progressloggerinterface.h \
  progressloggergui.h \
  ../ipodpatcher/ipodpatcher.h \
@@ -55,7 +59,8 @@ FORMS += rbutilqtfrm.ui \
  installfrm.ui \
  installprogressfrm.ui \
  configurefrm.ui \
- installbootloaderfrm.ui 
+ installbootloaderfrm.ui \
+ installtalkfrm.ui
 
 
 RESOURCES += rbutilqt.qrc

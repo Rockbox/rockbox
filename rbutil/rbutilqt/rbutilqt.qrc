@@ -21,6 +21,7 @@
         <file>icons/rembootloader_btn.png</file>
         <file>icons/remrb_btn.png</file>
         <file>icons/system-search.png</file>
+        <file>icons/talkfile_btn.png</file>
         <file>icons/themes_btn.png</file>
         <file>icons/wizard.xpm</file>
     </qresource>

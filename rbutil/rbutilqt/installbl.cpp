@@ -152,27 +152,26 @@ void InstallBl::done(bool error)
 void InstallBl::setDeviceSettings(QSettings *dev)
 {
     devices = dev;
-    
-    if(userSettings->value("defaults/platform").toString() == "h100" ||
-        userSettings->value("defaults/platform").toString() == "h120" ||
-        userSettings->value("defaults/platform").toString() == "h300")
-    {
-        ui.buttonBrowseOF->show();
-        ui.lineOriginalFirmware->show();
-        ui.label_3->show();
-        needextrafile = true;
-    }
-    else
-    {
-        ui.buttonBrowseOF->hide();
-        ui.lineOriginalFirmware->hide();
-        ui.label_3->hide();
-        needextrafile = false;
-    }
     qDebug() << "Install::setDeviceSettings:" << devices;
 }
 
 void InstallBl::setUserSettings(QSettings *user)
 {
     userSettings = user;
+    if(userSettings->value("defaults/platform").toString() == "h100" ||
+           userSettings->value("defaults/platform").toString() == "h120" ||
+           userSettings->value("defaults/platform").toString() == "h300")
+   {
+      ui.buttonBrowseOF->show();
+      ui.lineOriginalFirmware->show();
+      ui.label_3->show();
+      needextrafile = true;
+   }
+   else
+   {
+      ui.buttonBrowseOF->hide();
+      ui.lineOriginalFirmware->hide();
+      ui.label_3->hide();
+      needextrafile = false;
+   }
 }

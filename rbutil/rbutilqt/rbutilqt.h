@@ -59,6 +59,7 @@ class RbUtilQt : public QMainWindow
         void installBl(void);
         void installFonts(void);
         void installDoom(void);
+        void createTalkFiles(void);
         void downloadDone(bool);
         void downloadDone(int, bool);
         void downloadInfo(void);
