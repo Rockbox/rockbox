@@ -511,7 +511,7 @@
 </phrase>
 <phrase>
   id: LANG_SYSTEM
-  desc: in the main menu ang settings menu
+  desc: in the main menu and settings menu
   user:
   <source>
     *: "System"
@@ -1627,15 +1627,15 @@
   user:
   <source>
     *: "Anti-Skip Buffer"
-    flash_storage*: none
+    flash_storage: none
   </source>
   <dest>
     *: "Anti-Skip Buffer"
-    flash_storage*: none
+    flash_storage: none
     </dest>
   <voice>
     *: "Anti-Skip Buffer"
-    flash_storage*: none   
+    flash_storage: none   
   </voice>
 </phrase>
 <phrase>
