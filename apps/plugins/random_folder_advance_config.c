@@ -27,8 +27,13 @@ static int fd;
 static int dirs_count;
 static int lasttick;
 #define RFA_FILE ROCKBOX_DIR "/folder_advance_list.dat"
+#define RFADIR_FILE ROCKBOX_DIR "/folder_advance_dir.txt"
+#define MAX_REMOVED_DIRS 10
+
 char *buffer = NULL;
 ssize_t buffer_size;
+int num_replaced_dirs = 0;
+char removed_dirs[MAX_REMOVED_DIRS][MAX_PATH];
 struct file_format {
     int count;
     char folder[][MAX_PATH];
@@ -77,8 +82,9 @@ void traversedir(char* location, char* name)
 {
     struct dirent *entry;
     DIR* dir;
-    char fullpath[MAX_PATH];
+    char fullpath[MAX_PATH], path[MAX_PATH];
     bool check = false;
+    int i;
 
     rb->snprintf(fullpath, sizeof(fullpath), "%s/%s", location, name);
     dir = rb->opendir(fullpath);
@@ -97,11 +103,24 @@ void traversedir(char* location, char* name)
                 else check = true;
             }
             else check = true;
-            
+
+        /* check if path is removed directory, if so dont enter it */
+        rb->snprintf(path, MAX_PATH, "%s/%s", fullpath, entry->d_name);
+        while(path[0] == '/')
+            rb->strncpy(path, path + 1, rb->strlen(path));
+        for(i = 0; i < num_replaced_dirs; i++)
+        {
+            if(!rb->strcmp(path, removed_dirs[i]))
+            {
+                check = false;
+                break;
+            }
+        }
+
             if (check)
             {
                 if (entry->attribute & ATTR_DIRECTORY) {
-                    char *start, path[MAX_PATH];
+                    char *start;
                     dirs_count++;
                     rb->snprintf(path,MAX_PATH,"%s/%s",fullpath,entry->d_name);
                     start = &path[rb->strlen(path)];
@@ -125,6 +144,93 @@ void traversedir(char* location, char* name)
         rb->closedir(dir);
     }
 }
+
+bool custom_dir(void)
+{
+    DIR* dir_check;
+    char *starts, line[MAX_PATH], formatted_line[MAX_PATH];
+    static int fd2;
+    char buf[11];
+    int i, errors = 0;
+
+    /* populate removed dirs array */
+    if((fd2 = rb->open(RFADIR_FILE,O_RDONLY)) > 0)
+    {
+        while ((rb->read_line(fd2, line, MAX_PATH - 1)) > 0)
+        {
+            if ((line[0] == '-') && (line[1] == '/') &&
+                     (num_replaced_dirs < MAX_REMOVED_DIRS))
+            {
+                num_replaced_dirs ++;
+                rb->strncpy(removed_dirs[num_replaced_dirs - 1], line + 2,
+                                rb->strlen(line));
+            }
+        }
+        rb->close(fd2);
+    }
+
+    if((fd2 = rb->open(RFADIR_FILE,O_RDONLY)) > 0)
+    {
+        while ((rb->read_line(fd2, line, MAX_PATH - 1)) > 0)
+        {
+            /* blank lines and removed dirs ignored */
+            if (rb->strlen(line) && ((line[0] != '-') || (line[1] != '/')))
+            {
+                /* remove preceeding '/'s from the line */
+                while(line[0] == '/')
+                    rb->strncpy(line, line + 1, rb->strlen(line));
+
+                rb->snprintf(formatted_line, MAX_PATH, "/%s", line);
+
+                dir_check = rb->opendir(formatted_line);
+
+                if (dir_check)
+                {
+                    rb->closedir(dir_check);
+                    starts = &formatted_line[rb->strlen(formatted_line)];
+                    rb->memset(starts, 0, &formatted_line[MAX_PATH-1]-starts);
+                    bool write_line = true;
+
+                    for(i = 0; i < num_replaced_dirs; i++)
+                    {
+                        if(!rb->strcmp(line, removed_dirs[i]))
+                        {
+                             write_line = false;
+                             break;
+                        }
+                    }
+
+                    if(write_line)
+                    {
+                        dirs_count++;
+                        rb->write(fd, formatted_line, MAX_PATH);
+                    }
+
+                    traversedir("", line);
+                }
+                else
+                {
+                     errors ++;
+                     rb->snprintf(buf,sizeof(buf),"Not found:");
+                     FOR_NB_SCREENS(i)
+                     {
+                         rb->screens[i]->puts(0,0,buf);
+                         rb->screens[i]->puts(0, errors, line);
+                     }
+                     update_screen(false);
+                }
+            }
+        }
+        rb->close(fd2);
+        if(errors)
+            /* Press button to continue */
+            rb->get_action(CONTEXT_STD, TIMEOUT_BLOCK); 
+    }
+    else
+        return false;
+    return true;
+}
+
 void generate(void)
 {
     dirs_count = 0;
@@ -141,7 +247,9 @@ void generate(void)
 #endif
     lasttick = *rb->current_tick;
 
-    traversedir("", "");
+    if(!custom_dir())
+        traversedir("", "");
+
     rb->lseek(fd,0,SEEK_SET);
     rb->write(fd,&dirs_count,sizeof(int));
     rb->close(fd);
