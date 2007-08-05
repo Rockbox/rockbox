@@ -114,9 +114,11 @@ static bool test_fs(void)
 
     log_init();
     log_text("test_disk WRITE&VERIFY", true);
+#ifndef SIMULATOR
     rb->snprintf(text_buf, sizeof(text_buf), "CPU clock: %ld Hz",
                  *rb->cpu_frequency);
     log_text(text_buf, true);
+#endif
     log_text("----------------------", true);
     rb->snprintf(text_buf, sizeof text_buf, "Data size: %dKB", (TEST_SIZE>>10));
     log_text(text_buf, true);
@@ -297,9 +299,11 @@ static bool test_speed(void)
     rb->memset(audiobuf, 'T', audiobuflen);
     log_init();
     log_text("test_disk SPEED TEST", true);
+#ifndef SIMULATOR
     rb->snprintf(text_buf, sizeof(text_buf), "CPU clock: %ld Hz",
                  *rb->cpu_frequency);
     log_text(text_buf, true);
+#endif
     log_text("--------------------", true);
 
     /* File creation speed */
