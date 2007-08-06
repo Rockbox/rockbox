@@ -200,12 +200,14 @@ void gui_syncsplash(int ticks, const unsigned char *fmt, ...)
 {
     va_list ap;
     int i;
+#if !defined(SIMULATOR) || CONFIG_CODEC == SWCODEC
     long id;
     /* fmt may be a so called virtual pointer. See settings.h. */
     if((id = P2ID(fmt)) >= 0)
         /* If fmt specifies a voicefont ID, and voice menus are
            enabled, then speak it. */
         cond_talk_ids_fq(id);
+#endif
     /* If fmt is a lang ID then get the corresponding string (which
        still might contain % place holders). */
     fmt = P2STR(fmt);

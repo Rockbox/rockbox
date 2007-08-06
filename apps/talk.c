@@ -139,7 +139,8 @@ static void mp3_callback(unsigned char** start, size_t* size);
 static int queue_clip(unsigned char* buf, long size, bool enqueue);
 static int open_voicefile(void);
 static unsigned char* get_clip(long id, long* p_size);
-
+static int shutup(void); /* Interrupt voice, as when enqueue is false */
+static int do_shutup(void); /* kill voice unconditionally */
 
 /***************** Private implementation *****************/
 

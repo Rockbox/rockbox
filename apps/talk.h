@@ -66,8 +66,6 @@ bool talk_voice_required(void); /* returns true if voice codec required */
 int talk_get_bufsize(void); /* get the loaded voice file size */
 /* talk_buffer_steal - on SWCODEC, for use by buffer functions only */
 int talk_buffer_steal(void); /* claim the mp3 buffer e.g. for play/record */
-//int shutup(void); /* Interrupt voice, as when enqueue is false */
-//int do_shutup(void); /* kill voice unconditionally */
 bool is_voice_queued(void); /* Are there more voice clips to be spoken? */
 int talk_id(long id, bool enqueue); /* play a voice ID from voicefont */
 int talk_file(const char* filename, bool enqueue); /* play a thumbnail from file */
@@ -78,14 +76,27 @@ bool talk_menus_enabled(void); /* returns true if menus should be voiced */
 void talk_disable_menus(void); /* disable voice menus (temporarily, not persisted) */
 void talk_enable_menus(void); /* re-enable voice menus */
 
+
+
+
+/* This (otherwise invalid) ID signals the end of the array. */
+#define TALK_FINAL_ID LANG_LAST_INDEX_IN_ARRAY
+
+/* We don't build talk.c for hwcodec sims so we need to define these as empty */
+#if defined(SIMULATOR) && !(CONFIG_CODEC == SWCODEC)
+#define talk_force_enqueue_next(...)
+#define talk_idarray(...)
+#define talk_ids(...)
+#define cond_talk_ids(...)
+#define cond_talk_ids_fq(...)
+#else
+
 /* Enqueue next utterance even if enqueue parameter is false: don't
    interrupt the current utterance. */
 void talk_force_enqueue_next(void);
 
 /* speaks one or more IDs (from an array)). */
 int talk_idarray(long *idarray, bool enqueue);
-/* This (otherwise invalid) ID signals the end of the array. */
-#define TALK_FINAL_ID LANG_LAST_INDEX_IN_ARRAY
 /* This makes an initializer for the array of IDs and takes care to
    put the final sentinel element at the end. */
 #define TALK_IDARRAY(ids...) ((long[]){ids,TALK_FINAL_ID})
@@ -110,4 +121,5 @@ int talk_idarray(long *idarray, bool enqueue);
             talk_force_enqueue_next(); \
         } \
     }while(0)
+#endif /*defined(SIMULATOR) && !(CONFIG_CODEC == SWCODEC)*/
 #endif /* __TALK_H__ */
