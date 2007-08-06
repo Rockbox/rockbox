@@ -24,8 +24,8 @@
 PLUGIN_HEADER
 
 /* save files */
-#define SCORE_FILE PLUGIN_DIR "/blackjack.score"
-#define SAVE_FILE  PLUGIN_DIR "/blackjack.save"
+#define SCORE_FILE PLUGIN_GAMES_DIR "/blackjack.score"
+#define SAVE_FILE  PLUGIN_GAMES_DIR "/blackjack.save"
 
 #define NUM_SCORES LCD_HEIGHT/8-2
 

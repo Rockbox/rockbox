@@ -24,8 +24,8 @@
 
 PLUGIN_HEADER
 
-#define SETTINGS_FILE   "/.rockbox/viewers/viewer.dat" /* binary file, so dont use .cfg */
-#define BOOKMARKS_FILE   "/.rockbox/viewers/viewer_bookmarks.dat"
+#define SETTINGS_FILE   PLUGIN_APPS_DIR "/viewer.dat" /* binary file, so dont use .cfg */
+#define BOOKMARKS_FILE  PLUGIN_APPS_DIR "/viewer_bookmarks.dat"
 
 #define WRAP_TRIM          44  /* Max number of spaces to trim (arbitrary) */
 #define MAX_COLUMNS        64  /* Max displayable string len (over-estimate) */

@@ -64,6 +64,8 @@ static int  plugin_size = 0;
 static bool (*pfn_tsr_exit)(bool reenter) = NULL; /* TSR exit callback */
 static char current_plugin[MAX_PATH];
 
+char *plugin_get_current_filename(void);
+
 extern struct thread_entry threads[MAXTHREADS];
 
 static const struct plugin_api rockbox_api = {
@@ -125,6 +127,7 @@ static const struct plugin_api rockbox_api = {
     font_get,
     font_getstringsize,
     font_get_width,
+    screen_clear_area,
 #endif
     backlight_on,
     backlight_off,
@@ -445,6 +448,7 @@ static const struct plugin_api rockbox_api = {
     plugin_get_buffer,
     plugin_get_audio_buffer,
     plugin_tsr,
+    plugin_get_current_filename,
 #ifdef IRAM_STEAL
     plugin_iram_init,
 #endif
@@ -471,6 +475,8 @@ static const struct plugin_api rockbox_api = {
 #endif
     show_logo,
     tree_get_context,
+    set_current_file,
+    set_dirfilter,
 
 #ifdef HAVE_WHEEL_POSITION
     wheel_status,
@@ -495,12 +501,7 @@ static const struct plugin_api rockbox_api = {
     get_codec_filename,
     get_metadata,
 #endif
-#ifdef HAVE_LCD_BITMAP
-    screen_clear_area,
-#endif
     led,
-    set_current_file,
-    set_dirfilter,
 };
 
 int plugin_load(const char* plugin, void* parameter)
@@ -733,4 +734,9 @@ void plugin_iram_init(char *iramstart, char *iramcopy, size_t iram_size,
 void plugin_tsr(bool (*exit_callback)(bool))
 {
     pfn_tsr_exit = exit_callback; /* remember the callback for later */
+}
+
+char *plugin_get_current_filename(void)
+{
+    return current_plugin;
 }

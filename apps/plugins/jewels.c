@@ -178,8 +178,8 @@ PLUGIN_HEADER
 #endif
 
 /* save files */
-#define SCORE_FILE PLUGIN_DIR "/jewels.score"
-#define SAVE_FILE  PLUGIN_DIR "/jewels.save"
+#define SCORE_FILE PLUGIN_GAMES_DIR "/jewels.score"
+#define SAVE_FILE  PLUGIN_GAMES_DIR "/jewels.save"
 
 /* final game return status */
 #define BJ_QUIT_FROM_GAME 4

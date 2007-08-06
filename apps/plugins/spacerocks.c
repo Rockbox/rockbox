@@ -162,7 +162,7 @@ static struct plugin_api* rb; /* global api struct pointer */
 #define WRAP_GAP                12
 #define EXPLOSION_LENGTH        20
 #define SHOW_COL 0
-#define HISCORE_FILE PLUGIN_DIR "/astrorocks.hs"
+#define HISCORE_FILE PLUGIN_GAMES_DIR "/astrorocks.hs"
 #define POINT_SIZE 2
 #define MAX_NUM_ASTEROIDS 25
 #define MAX_NUM_MISSILES 6

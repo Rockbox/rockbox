@@ -130,7 +130,7 @@ PLUGIN_HEADER
 #define COLOR_BROWN        LCD_RGBPACK(128,64,0)
 #define COLOR_LIGHTBROWN   LCD_RGBPACK(255,128,64)
 
-#define SPLASH_SCREEN PLUGIN_DIR "/rockpaint/splash.bmp"
+#define SPLASH_SCREEN PLUGIN_APPS_DIR "/rockpaint/splash.bmp"
 #define ROCKPAINT_TITLE_FONT  2
 
 /***********************************************************************

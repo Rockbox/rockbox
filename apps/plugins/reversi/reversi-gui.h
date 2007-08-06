@@ -22,7 +22,7 @@
 
 #include "plugin.h"
 
-#define GAME_FILE         PLUGIN_DIR "/reversi.rev"
+#define GAME_FILE         PLUGIN_GAMES_DIR "/reversi.rev"
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD

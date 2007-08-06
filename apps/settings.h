@@ -56,8 +56,13 @@
 #define WPS_DIR     ROCKBOX_DIR "/wps"
 #define THEME_DIR   ROCKBOX_DIR "/themes"
 #define ICON_DIR    ROCKBOX_DIR "/icons"
-#define PLUGIN_DIR  ROCKBOX_DIR "/rocks"
-#define VIEWERS_DIR  ROCKBOX_DIR "/viewers"
+
+#define PLUGIN_DIR          ROCKBOX_DIR "/rocks"
+#define PLUGIN_GAMES_DIR    PLUGIN_DIR "/games"
+#define PLUGIN_APPS_DIR     PLUGIN_DIR "/apps"
+#define PLUGIN_DEMOS_DIR    PLUGIN_DIR "/demos"
+#define VIEWERS_DIR         PLUGIN_DIR "/viewers"
+
 #define BACKDROP_DIR ROCKBOX_DIR "/backdrops"
 #define REC_BASE_DIR "/"
 #define EQS_DIR     ROCKBOX_DIR "/eqs"

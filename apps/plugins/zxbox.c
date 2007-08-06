@@ -26,6 +26,6 @@ PLUGIN_HEADER
 /* this is the plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    return run_overlay(api, parameter, "/.rockbox/viewers/zxbox.ovl", "ZXBox");
+    return run_overlay(api, parameter, PLUGIN_APPS_DIR "/zxbox.ovl", "ZXBox");
 }
 #endif

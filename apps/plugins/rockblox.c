@@ -477,7 +477,7 @@ figures[BLOCKS_NUM] = {
 };
 
 /* Rockbox File System only supports full filenames inc dir */
-#define HIGH_SCORE "/.rockbox/rocks/rockblox.score"
+#define HIGH_SCORE PLUGIN_GAMES_DIR "/rockblox.score"
 #define MAX_HIGH_SCORES 5
 /* Default High Scores... */
 struct highscore Highest[MAX_HIGH_SCORES];

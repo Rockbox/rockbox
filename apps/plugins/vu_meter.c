@@ -236,7 +236,7 @@ void calc_scales(void)
 }
 
 void load_settings(void) {
-    int fp = rb->open("/.rockbox/rocks/.vu_meter", O_RDONLY);
+    int fp = rb->open(PLUGIN_DEMOS_DIR "/.vu_meter", O_RDONLY);
     if(fp>=0) {
             rb->read(fp, &vumeter_settings, sizeof(struct saved_settings));
             rb->close(fp);
@@ -252,7 +252,7 @@ void load_settings(void) {
 }
 
 void save_settings(void) {
-    int fp = rb->creat("/.rockbox/rocks/.vu_meter");
+    int fp = rb->creat(PLUGIN_DEMOS_DIR "/.vu_meter");
     if(fp >= 0) {
         rb->write (fp, &vumeter_settings, sizeof(struct saved_settings));
         rb->close(fp);

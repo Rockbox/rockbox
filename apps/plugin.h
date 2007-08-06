@@ -112,12 +112,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 70
+#define PLUGIN_API_VERSION 71
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 69
+#define PLUGIN_MIN_API_VERSION 71
 
 /* plugin return codes */
 enum plugin_status {
@@ -204,6 +204,8 @@ struct plugin_api {
     int  (*font_getstringsize)(const unsigned char *str, int *w, int *h,
                                int fontnumber);
     int (*font_get_width)(struct font* pf, unsigned short char_code);
+    void (*screen_clear_area)(struct screen * display, int xstart, int ystart,
+                              int width, int height);
 #endif
     void (*backlight_on)(void);
     void (*backlight_off)(void);
@@ -555,6 +557,7 @@ struct plugin_api {
     void* (*plugin_get_buffer)(size_t *buffer_size);
     void* (*plugin_get_audio_buffer)(size_t *buffer_size);
     void (*plugin_tsr)(bool (*exit_callback)(bool reenter));
+    char* (*plugin_get_current_filename)(void);
 #ifdef IRAM_STEAL
     void (*plugin_iram_init)(char *iramstart, char *iramcopy, size_t iram_size,
                              char *iedata, size_t iedata_size);
@@ -590,6 +593,8 @@ struct plugin_api {
 #endif
     int (*show_logo)(void);
     struct tree_context* (*tree_get_context)(void);
+    void (*set_current_file)(char* path);
+    void (*set_dirfilter)(int l_dirfilter);
 
 #ifdef HAVE_WHEEL_POSITION
     int (*wheel_status)(void);
@@ -615,13 +620,7 @@ struct plugin_api {
     bool (*get_metadata)(struct track_info* track, int fd, const char* trackname,
                          bool v1first);
 #endif
-#ifdef HAVE_LCD_BITMAP
-    void (*screen_clear_area)(struct screen * display, int xstart, int ystart,
-                              int width, int height);
-#endif
     void (*led)(bool on);
-    void (*set_current_file)(char* path);
-    void (*set_dirfilter)(int l_dirfilter);
 };
 
 /* plugin header */

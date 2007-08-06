@@ -22,7 +22,7 @@
 
 #include "plugin.h"
 
-#define GAME_FILE         PLUGIN_DIR "/sudoku.ss"
+#define GAME_FILE         PLUGIN_GAMES_DIR "/sudoku.ss"
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD

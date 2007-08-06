@@ -26,6 +26,23 @@ void configfile_init(struct plugin_api* newrb)
     cfg_rb = newrb;
 }
 
+void get_cfg_filename(char* buf, int buf_len, const char* filename)
+{
+    char *s;
+    cfg_rb->strcpy(buf, cfg_rb->plugin_get_current_filename());
+    s = cfg_rb->strrchr(buf, '/');
+    if (!s) /* should never happen */
+    {
+        cfg_rb->snprintf(buf, buf_len, "/.rockbox/rocks/%s", filename);
+    }
+    else
+    {
+        s++;
+        *s = '\0';
+        cfg_rb->strcat(s, filename);
+    }
+}
+
 int configfile_save(const char *filename, struct configdata *cfg,
                     int num_items, int version)
 {
@@ -33,7 +50,7 @@ int configfile_save(const char *filename, struct configdata *cfg,
     int i;
     char buf[MAX_PATH];
 
-    cfg_rb->snprintf(buf, MAX_PATH, "/.rockbox/rocks/%s", filename);
+    get_cfg_filename(buf, MAX_PATH, filename);
     fd = cfg_rb->creat(buf);
     if(fd < 0)
         return fd*10 - 1;
@@ -78,7 +95,7 @@ int configfile_load(const char *filename, struct configdata *cfg,
     int file_version = -1;
     int tmp;
 
-    cfg_rb->snprintf(buf, MAX_PATH, "/.rockbox/rocks/%s", filename);
+    get_cfg_filename(buf, MAX_PATH, filename);
     fd = cfg_rb->open(buf, O_RDONLY);
     if(fd < 0)
         return fd*10 - 1;

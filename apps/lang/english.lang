@@ -10962,4 +10962,45 @@
     *: "of"
   </voice>
 </phrase>
-
+<phrase>
+  id: LANG_PLUGIN_GAMES
+  desc: in the main menu
+  user:
+  <source>
+    *: "Games"
+  </source>
+  <dest>
+    *: "Games"
+  </dest>
+  <voice>
+    *: "Games"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_APPS
+  desc: in the main menu
+  user:
+  <source>
+    *: "Applications"
+  </source>
+  <dest>
+    *: "Applications"
+  </dest>
+  <voice>
+    *: "Applications"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_DEMOS
+  desc: in the main menu
+  user:
+  <source>
+    *: "Demos"
+  </source>
+  <dest>
+    *: "Demos"
+  </dest>
+  <voice>
+    *: "Demos"
+  </voice>
+</phrase>

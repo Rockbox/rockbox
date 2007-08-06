@@ -321,8 +321,8 @@ extern const unsigned char snake2_bottom[];
 #define SOUTH_EAST  2048
 #define SOUTH_WEST  4096
 
-#define LEVELS_FILE  PLUGIN_DIR "/snake2.levels"
-#define HISCORE_FILE PLUGIN_DIR "/snake2.hs"
+#define LEVELS_FILE  PLUGIN_GAMES_DIR "/snake2.levels"
+#define HISCORE_FILE PLUGIN_GAMES_DIR "/snake2.hs"
 
 int load_all_levels(void)
 {

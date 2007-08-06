@@ -116,7 +116,7 @@ MAKE_MENU(manage_settings, ID2P(LANG_MANAGE_MENU), NULL, Icon_Config,
 
 static bool show_credits(void)
 {
-    if (plugin_load(PLUGIN_DIR "/credits.rock",NULL) != PLUGIN_OK)
+    if (plugin_load(VIEWERS_DIR "/credits.rock",NULL) != PLUGIN_OK)
     {
         /* show the rockbox logo and version untill a button is pressed */
         show_logo();

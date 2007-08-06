@@ -279,6 +279,37 @@ static int load_bmarks(void* param)
     bookmark_mrb_load();
     return GO_TO_PREVIOUS;
 }
+static int plugins_menu(void* param)
+{
+    (void)param;
+    MENUITEM_STRINGLIST(plugins_menu_items, ID2P(LANG_PLUGINS), NULL,
+                        ID2P(LANG_PLUGIN_GAMES),
+                        ID2P(LANG_PLUGIN_APPS), ID2P(LANG_PLUGIN_DEMOS));
+    char *folder;
+    int retval = GO_TO_PREVIOUS;
+    int selection = 0, current = 0;
+    while (retval == GO_TO_PREVIOUS)
+    {
+        selection = do_menu(&plugins_menu_items, &current);
+        switch (selection)
+        {
+            case 0:
+                folder = PLUGIN_GAMES_DIR;
+                break;
+            case 1:
+                folder = PLUGIN_APPS_DIR;
+                break;
+            case 2:
+                folder = PLUGIN_DEMOS_DIR;
+                break;
+            default:
+                return selection;
+        }
+        retval = rockbox_browse(folder, SHOW_PLUGINS);
+    }
+    return retval;
+}
+
 /* These are all static const'd from apps/menus/ *.c
    so little hack so we can use them */
 extern struct menu_item_ex 
@@ -308,7 +339,7 @@ static const struct root_items items[] = {
 #endif
     
     [GO_TO_RECENTBMARKS] =  { load_bmarks, NULL, &bookmark_settings_menu }, 
-    [GO_TO_BROWSEPLUGINS] = { browser, (void*)GO_TO_BROWSEPLUGINS, NULL }, 
+    [GO_TO_BROWSEPLUGINS] = { plugins_menu, NULL, NULL }, 
     
 };
 static const int nb_items = sizeof(items)/sizeof(*items);

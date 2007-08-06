@@ -30,8 +30,8 @@
 PLUGIN_HEADER
 
 /* files */
-#define SCORE_FILE PLUGIN_DIR "/bubbles.score"
-#define SAVE_FILE  PLUGIN_DIR "/bubbles.save"
+#define SCORE_FILE PLUGIN_GAMES_DIR "/bubbles.score"
+#define SAVE_FILE  PLUGIN_GAMES_DIR "/bubbles.save"
 
 /* final game return status */
 #define BB_NONE 5

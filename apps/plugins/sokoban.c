@@ -33,8 +33,8 @@ extern const fb_data sokoban_tiles[];
 
 #define SOKOBAN_TITLE        "Sokoban"
 
-#define SOKOBAN_LEVELS_FILE  PLUGIN_DIR "/sokoban.levels"
-#define SOKOBAN_SAVE_FILE    PLUGIN_DIR "/sokoban.save"
+#define SOKOBAN_LEVELS_FILE  PLUGIN_GAMES_DIR "/sokoban.levels"
+#define SOKOBAN_SAVE_FILE    PLUGIN_GAMES_DIR "/sokoban.save"
 #define SOKOBAN_SAVE_FOLDER  "/games"
 
 /* Magnify is the number of pixels for each block.

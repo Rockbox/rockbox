@@ -119,7 +119,6 @@ void tree_get_filetypes(const struct filetype** types, int* count)
 
 struct file_type {
     int  icon; /* the icon which shall be used for it, NOICON if unknown */
-    bool  viewer; /* true if the rock is in viewers, false if in rocks */
     unsigned char  attr; /* FILETYPES_MASK >> 8 */ 
     char* plugin; /* Which plugin to use, NULL if unknown, or builtin */
     char* extension; /* NULL for none */
@@ -289,7 +288,6 @@ static void read_config(char* config_file)
 {
     char line[64], *s, *e;
     char extension[8], plugin[32];
-    bool viewer;
     int fd = open(config_file, O_RDONLY);
     if (fd < 0)
         return;
@@ -314,24 +312,15 @@ static void read_config(char* config_file)
     
         /* get the plugin */
         s = e+1;
-        e = strchr(s, '/');
-        if (!e)
-            continue;
-        *e = '\0';
-        if (!strcasecmp("viewers", s))
-            viewer = true;
-        else
-            viewer = false;
-        s = e+1;
         e = strchr(s, ',');
         if (!e)
             continue;
         *e = '\0';
+        
         strcpy(plugin, s);
         /* ok, store this plugin/extension, check icon after */
         filetypes[filetype_count].extension = filetypes_strdup(extension);
         filetypes[filetype_count].plugin = filetypes_strdup(plugin);
-        filetypes[filetype_count].viewer = viewer;
         filetypes[filetype_count].attr = heighest_attr +1;
         filetypes[filetype_count].icon = Icon_Questionmark;
         heighest_attr++;
@@ -422,8 +411,7 @@ char* filetype_get_plugin(const struct entry* file)
     if (filetypes[index].plugin == NULL)
         return NULL;
     snprintf(plugin_name, MAX_PATH, "%s/%s.%s", 
-             filetypes[index].viewer? VIEWERS_DIR: PLUGIN_DIR,
-                        filetypes[index].plugin, ROCK_EXTENSION);
+             PLUGIN_DIR, filetypes[index].plugin, ROCK_EXTENSION);
     return plugin_name;
 }
 

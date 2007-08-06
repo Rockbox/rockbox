@@ -559,7 +559,7 @@ unsigned char fire_sprite[FIRE_HEIGHT] = {
 #define TARGET_BOTTOM 3
 #define TARGET_UFO 4
 
-#define HISCOREFILE "/.rockbox/rocks/invadrox.high"
+#define HISCOREFILE PLUGIN_GAMES_DIR "/invadrox.high"
 
 
 /* The time (in ms) for one iteration through the game loop - decrease this
