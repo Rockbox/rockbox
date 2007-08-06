@@ -146,6 +146,11 @@ void system_init(void)
         MMAP3_LOGICAL  = 0x20000000 | 0x3a00;
         MMAP3_PHYSICAL = 0x00000000 | 0x3f84;
 
+#if defined(IPOD_1G2G) || defined(IPOD_3G)
+        DEV_EN = 0x0b9f; /* don't clock unused PP5002 hardware components */
+        outl(0x0035, 0xcf005004);  /* DEV_EN2 ? */
+#endif
+
         INT_FORCED_CLR = -1;
         CPU_INT_CLR    = -1;
         COP_INT_CLR    = -1;
