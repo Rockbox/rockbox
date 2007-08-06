@@ -424,10 +424,14 @@ int filetype_list_viewers(const char* current_file)
 {
     int i, count = 0;
     char *strings[MAX_FILETYPES/2];
+    char *ext;
     struct menu_callback_with_desc cb_and_desc = 
         { NULL, ID2P(LANG_ONPLAY_OPEN_WITH), Icon_Plugin };
     struct menu_item_ex menu;
     
+    ext = strrchr(current_file, '.');
+    if (ext)
+        ext++;
     for (i=0; i<filetype_count && count < (MAX_FILETYPES/2); i++)
     {
         if (filetypes[i].plugin)
@@ -440,8 +444,15 @@ int filetype_list_viewers(const char* current_file)
             }
             if (j<count) 
                 continue; /* it is so grab the next plugin */
-            strings[count] = filetypes[i].plugin;
-            count++;
+            if (ext && filetypes[i].extension &&
+                (filetypes[i].extension[0] != '*'))
+            {
+                if (strcasecmp(filetypes[i].extension, ext))
+                    continue; /* skip this one */
+            }
+            strings[count] = strrchr(filetypes[i].plugin,'/');
+            if (strings[count])
+                strings[count++]++;
         }
     }
 #ifndef HAVE_LCD_BITMAP
