@@ -193,7 +193,7 @@ void clickwheel_int(void)
             {
                 /* poke backlight to turn it on or maintain it no more often
                    than every 1/4 second*/
-                next_backlight_on = current_tick + 1000000/4;
+                next_backlight_on = current_tick + HZ/4;
                 backlight_on();
                 button_backlight_on();
             }
