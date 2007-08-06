@@ -188,11 +188,12 @@ void clickwheel_int(void)
                 wheel_delta = 1;
             }
 
-            if (TIME_AFTER(usec, next_backlight_on))
+            if (TIME_AFTER(current_tick, next_backlight_on) ||
+                v <= 0xffffff/(1000000/4))
             {
                 /* poke backlight to turn it on or maintain it no more often
                    than every 1/4 second*/
-                next_backlight_on = usec + 1000000/4;
+                next_backlight_on = current_tick + 1000000/4;
                 backlight_on();
                 button_backlight_on();
             }
