@@ -172,6 +172,6 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx);
 int wma_decode_superframe_init(WMADecodeContext* s,
                                uint8_t *buf, int buf_size);
 int wma_decode_superframe_frame(WMADecodeContext* s,
-                                int16_t *samples,
+                                int32_t *samples,
                                 uint8_t *buf, int buf_size);
 #endif

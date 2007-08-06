@@ -1619,10 +1619,10 @@ next:
 }
 
 /* decode a frame of frame_len samples */
-static int wma_decode_frame(WMADecodeContext *s, int16_t *samples)
+static int wma_decode_frame(WMADecodeContext *s, int32_t *samples)
 {
-    int ret, i, n, a, ch, incr;
-    int16_t *ptr;
+    int ret, i, n, ch, incr;
+    int32_t *ptr;
     fixed32 *iptr;
    // rb->splash(HZ, "in wma_decode_frame");
 
@@ -1646,7 +1646,7 @@ static int wma_decode_frame(WMADecodeContext *s, int16_t *samples)
         }
     }
 
-    /* convert frame to integer */
+    /* return frame with full 30-bit precision */
     n = s->frame_len;
     incr = s->nb_channels;
     for(ch = 0; ch < s->nb_channels; ++ch)
@@ -1656,17 +1656,7 @@ static int wma_decode_frame(WMADecodeContext *s, int16_t *samples)
 
         for (i=0;i<n;++i)
         {
-            a = fixtoi32(*iptr++)<<1;        //ugly but good enough for now
-
-            if (a > 32767)
-            {
-                a = 32767;
-            }
-            else if (a < -32768)
-            {
-                a = -32768;
-            }
-            *ptr = a;
+            *ptr = (*iptr++);
             ptr += incr;
         }
         /* prepare for next block */
@@ -1719,7 +1709,7 @@ int wma_decode_superframe_init(WMADecodeContext* s,
 */
 
 int wma_decode_superframe_frame(WMADecodeContext* s,
-                                int16_t* samples, /*output*/
+                                int32_t* samples, /*output*/
                                 uint8_t *buf,  /*input*/
                                 int buf_size)
 {
