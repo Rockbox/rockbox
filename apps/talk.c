@@ -220,25 +220,6 @@ static void load_voicefile(void)
         structec_convert(&p_voicefile->index[i], "ll", 1, true);
 #endif
 
-    /* Do a bitswap as necessary. */
-#if CONFIG_CODEC == SWCODEC
-    logf("Bitswapping voice file.");
-    cpu_boost(true);
-    buf = (unsigned char *)(&p_voicefile->index) +
-        (p_voicefile->id1_max + p_voicefile->id2_max) * sizeof(struct clip_entry);
-    length = file_size - (buf - (unsigned char *) p_voicefile);
-               
-    for (i = 0; i < length; i++)
-    {
-        temp   = buf[i];
-        temp   = ((temp >> 4) & 0x0f) | ((temp & 0x0f) << 4);
-        temp   = ((temp >> 2) & 0x33) | ((temp & 0x33) << 2);
-        buf[i] = ((temp >> 1) & 0x55) | ((temp & 0x55) << 1);
-    }
-    cpu_boost(false);
-    
-#endif
-
 #ifdef HAVE_MMC
     /* load the index table, now that we know its size from the header */
     load_size = (p_voicefile->id1_max + p_voicefile->id2_max)

@@ -85,6 +85,8 @@ int main (int argc, char** argv)
     char mp3filename2[1024];
     char* mp3filename;
     FILE* pMp3File;
+    int target_id;
+    int do_bitswap_audio = 0;
 
 
     if (argc < 2)
@@ -103,7 +105,14 @@ int main (int argc, char** argv)
         printf("Error opening language file %s\n", argv[1]);
         return -2;
     }
-    
+
+    /* We bitswap the voice file only SH based archos players, target IDs
+       equal to or lower than 8. See the target_id line for each target in
+       configure */
+    target_id = atoi(argv[2]);
+    if (target_id <= 8)
+        do_bitswap_audio = 1;
+
     memset(voiceonly, 0, sizeof(voiceonly));
     while (!feof(pFile))
     {
@@ -156,7 +165,8 @@ int main (int argc, char** argv)
 
         size[i] = fread(buffer, 1, sizeof(buffer), pMp3File);
         fclose(pMp3File);
-        BitswapAudio(buffer, buffer, size[i]);
+        if (do_bitswap_audio)
+            BitswapAudio(buffer, buffer, size[i]);
         fwrite(buffer, 1, size[i], pFile);
 
         printf("%d %s %d\n", i, names[i], size[i]); /* debug */
