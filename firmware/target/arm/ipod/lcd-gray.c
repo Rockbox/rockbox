@@ -138,7 +138,7 @@ void lcd_init_device(void)
 #ifdef HAVE_BACKLIGHT_INVERSION
     invert_display();
 #else
-    lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0009);
+    lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0015);
 #endif
     lcd_set_flip(false);
     lcd_cmd_and_data(R_ENTRY_MODE, 0x0000);
@@ -179,9 +179,9 @@ void lcd_set_contrast(int val)
 static void invert_display(void)
 {
     if (lcd_inverted ^ lcd_backlit)
-        lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0023);
+        lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0017);
     else
-        lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0009);
+        lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0015);
 }
 
 void lcd_set_invert_display(bool yesno)
