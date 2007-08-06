@@ -30,10 +30,10 @@
 #include "bitstream.h"
 
 
-#define VLCBITS 9
+#define VLCBITS 7		/*7 is the lowest without glitching*/
 #define VLCMAX ((22+VLCBITS-1)/VLCBITS)
 
-#define EXPVLCBITS 9
+#define EXPVLCBITS 7
 #define EXPMAX ((19+EXPVLCBITS-1)/EXPVLCBITS)
 
 #define HGAINVLCBITS 9
@@ -140,11 +140,12 @@ uint16_t runtab0[1336], runtab1[1336], levtab0[1336], levtab1[1336];            
 
 FFTComplex mdct_tmp[1] ;              /* dummy var */
 
-//may also be too large by ~ 1KB each?
-static VLC_TYPE vlcbuf1[6144][2];
-static VLC_TYPE vlcbuf2[3584][2];
-static VLC_TYPE vlcbuf3[1536][2] IBSS_ATTR;    //small so lets try iram
-static VLC_TYPE vlcbuf4[540][2];
+
+/*putting these in IRAM actually makes PP slower*/
+VLC_TYPE vlcbuf1[2550][2];
+VLC_TYPE vlcbuf2[2550][2];
+VLC_TYPE vlcbuf3[360][2];
+VLC_TYPE vlcbuf4[540][2];
 
 
 
@@ -877,8 +878,7 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
 #endif
 
          s->hgain_vlc.table = vlcbuf4;
-         s->hgain_vlc.table_allocated = 540;
-         init_vlc(&s->hgain_vlc, 9, sizeof(hgain_huffbits),
+         init_vlc(&s->hgain_vlc, HGAINVLCBITS, sizeof(hgain_huffbits),
                   hgain_huffbits, 1, 1,
                   hgain_huffcodes, 2, 2, 0);
     }
@@ -887,9 +887,8 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
     {
 
         s->exp_vlc.table = vlcbuf3;
-        s->exp_vlc.table_allocated = 1536;
 
-         init_vlc(&s->exp_vlc, 9, sizeof(scale_huffbits),
+         init_vlc(&s->exp_vlc, EXPVLCBITS, sizeof(scale_huffbits),
                   scale_huffbits, 1, 1,
                   scale_huffcodes, 4, 4, 0);
     }

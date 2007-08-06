@@ -119,8 +119,7 @@ static int build_table(VLC *vlc, int table_nb_bits,
                        const void *codes, int codes_wrap, int codes_size,
                        uint32_t code_prefix, int n_prefix)
 {
-    int i, j, k, n, table_size, table_index, nb, n1, index;
-    uint32_t code_prefix2;
+    int i, j, k, n, table_size, table_index, nb, n1, index, code_prefix2;
     uint32_t code;
     int flags = 0;
     VLC_TYPE (*table)[2];
@@ -153,10 +152,10 @@ static int build_table(VLC *vlc, int table_nb_bits,
         /* if code matches the prefix, it is in the table */
         n -= n_prefix;
         if(flags & INIT_VLC_LE)
-            code_prefix2= code & (n_prefix>=32 ? 0xffffffff : (uint32_t)( (1 << n_prefix)-1));
+            code_prefix2= code & (n_prefix>=32 ? 0xffffffff : (uint32_t)(1 << n_prefix)-1);
         else
             code_prefix2= code >> n;
-        if (n > 0 && code_prefix2 == code_prefix) {
+        if (n > 0 && (int)code_prefix2 == code_prefix) {
             if (n <= table_nb_bits) {
                 /* no need to add another table */
                 j = (code << (table_nb_bits - n)) & (table_size - 1);
@@ -165,11 +164,10 @@ static int build_table(VLC *vlc, int table_nb_bits,
                     if(flags & INIT_VLC_LE)
                         j = (code >> n_prefix) + (k<<n);
 #ifdef DEBUG_VLC
-                    av_log(NULL, AV_LOG_DEBUG, "%4x: code=%d n=%d\n",
+                    av_log(NULL, 0, "%4x: code=%d n=%d\n",
                            j, i, n);
 #endif
                     if (table[j][1] /*bits*/ != 0) {
-                       // av_log(NULL, AV_LOG_ERROR, "incorrect codes\n");
                         return -1;
                     }
                     table[j][1] = n; //bits
@@ -180,7 +178,7 @@ static int build_table(VLC *vlc, int table_nb_bits,
                 n -= table_nb_bits;
                 j = (code >> ((flags & INIT_VLC_LE) ? n_prefix : n)) & ((1 << table_nb_bits) - 1);
 #ifdef DEBUG_VLC
-                printf("%4x: n=%d (subtable)\n",
+                av_log(NULL, 0,"%4x: n=%d (subtable)\n",
                        j, n);
 #endif
                 /* compute table size */
@@ -267,9 +265,4 @@ int init_vlc(VLC *vlc, int nb_bits, int nb_codes,
     return flags;
 }
 
-/*
-void free_vlc(VLC *vlc)
-{
-    av_free(vlc->table);
-}
-*/
+
