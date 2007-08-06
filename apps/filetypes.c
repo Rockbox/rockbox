@@ -300,7 +300,7 @@ static void read_config(char* config_file)
     {
         if (filetype_count >= MAX_FILETYPES)
         {
-            gui_syncsplash(HZ, str(LANG_FILETYPES_FULL));
+            gui_syncsplash(HZ, ID2P(LANG_FILETYPES_FULL));
             break;
         }
         rm_whitespaces(line);

@@ -197,7 +197,7 @@
     *: "Loading..."
   </dest>
   <voice>
-    *: ""
+    *: "Loading"
   </voice>
 </phrase>
 <phrase>
@@ -225,7 +225,7 @@
     *: "Scanning disk..."
   </dest>
   <voice>
-    *: ""
+    *: "Scanning disk"
   </voice>
 </phrase>
 <phrase>
@@ -239,7 +239,7 @@
     *: "Shutting down..."
   </dest>
   <voice>
-    *: ""
+    *: "Shutting down"
   </voice>
 </phrase>
 <phrase>
@@ -267,7 +267,7 @@
     *: "Cancelled"
   </dest>
   <voice>
-    *: ""
+    *: "Cancelled"
   </voice>
 </phrase>
 <phrase>
@@ -281,7 +281,7 @@
     *: "Failed"
   </dest>
   <voice>
-    *: ""
+    *: "Failed"
   </voice>
 </phrase>
 <phrase>
@@ -309,7 +309,7 @@
     *: "Are You Sure?"
   </dest>
   <voice>
-    *: ""
+    *: "Are You Sure?"
   </voice>
 </phrase>
 <phrase>
@@ -632,7 +632,7 @@
     *: "Create a Bookmark?"
   </dest>
   <voice>
-    *: ""
+    *: "Create a Bookmark?"
   </voice>
 </phrase>
 <phrase>
@@ -646,7 +646,7 @@
     *: "Bookmark Created"
   </dest>
   <voice>
-    *: ""
+    *: "Bookmark Created"
   </voice>
 </phrase>
 <phrase>
@@ -660,7 +660,7 @@
     *: "Bookmark Failed!"
   </dest>
   <voice>
-    *: ""
+    *: "Bookmark Failed!"
   </voice>
 </phrase>
 <phrase>
@@ -674,7 +674,7 @@
     *: "Bookmark Empty"
   </dest>
   <voice>
-    *: ""
+    *: "Bookmark Empty"
   </voice>
 </phrase>
 <phrase>
@@ -2430,7 +2430,11 @@
     h10,h10_5gb,e200: "Building database... %d found (PREV to return)"
   </dest>
   <voice>
-    *: ""
+    *: "entries found for database"
+    h100,h120,h300: "entries found for database"
+    ipod*: "entries found for database"
+    x5,m5: "entries found for database"
+    h10,h10_5gb,e200: "entries found for database"
   </voice>
 </phrase>
 <phrase>
@@ -2545,7 +2549,7 @@
     *: "Updating in background"
   </dest>
   <voice>
-    *: ""
+    *: "Updating in background"
   </voice>
 </phrase>
 <phrase>
@@ -2559,7 +2563,7 @@
     *: "Committing database"
   </dest>
   <voice>
-    *: ""
+    *: "Committing database"
   </voice>
 </phrase>
 <phrase>
@@ -4893,7 +4897,7 @@
     *: "New Language"
   </dest>
   <voice>
-    *: ""
+    *: "New Language"
   </voice>
 </phrase>
 <phrase>
@@ -5061,7 +5065,7 @@
     *: "Settings Loaded"
   </dest>
   <voice>
-    *: ""
+    *: "Settings Loaded"
   </voice>
 </phrase>
 <phrase>
@@ -5089,7 +5093,7 @@
     *: "Cleared"
   </dest>
   <voice>
-    *: ""
+    *: "Settings Cleared"
   </voice>
 </phrase>
 <phrase>
@@ -5117,7 +5121,7 @@
     *: "Settings Saved"
   </dest>
   <voice>
-    *: ""
+    *: "Settings Saved"
   </voice>
 </phrase>
 <phrase>
@@ -5213,7 +5217,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "No presets"
   </voice>
 </phrase>
 <phrase>
@@ -5281,7 +5285,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Preset Save Failed"
   </voice>
 </phrase>
 <phrase>
@@ -5298,7 +5302,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "The Preset List is Full"
   </voice>
 </phrase>
 <phrase>
@@ -5468,7 +5472,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Clear Current Presets?"
   </voice>
 </phrase>
 <phrase>
@@ -5604,7 +5608,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "No settings found. Autoscan?"
   </voice>
 </phrase>
 <phrase>
@@ -5621,7 +5625,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Save Changes?"
   </voice>
 </phrase>
 <phrase>
@@ -6766,7 +6770,7 @@
     *: "Saved %d tracks (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "tracks saved"
   </voice>
 </phrase>
 <phrase>
@@ -6808,7 +6812,7 @@
     *: "Recursively?"
   </dest>
   <voice>
-    *: ""
+    *: "Recursively?"
   </voice>
 </phrase>
 <phrase>
@@ -6836,7 +6840,7 @@
     *: "Erase dynamic playlist?"
   </dest>
   <voice>
-    *: ""
+    *: "Erase dynamic playlist?"
   </voice>
 </phrase>
 <phrase>
@@ -7221,7 +7225,7 @@
     *: "Inserted %d tracks (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "tracks inserted"
   </voice>
 </phrase>
 <phrase>
@@ -7235,7 +7239,7 @@
     *: "Queued %d tracks (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "tracks queued"
   </voice>
 </phrase>
 <phrase>
@@ -7781,7 +7785,7 @@
     *: "File/directory exists. Overwrite?"
   </dest>
   <voice>
-    *: ""
+    *: "File or directory exists. Overwrite?"
   </voice>
 </phrase>
 <phrase>
@@ -7823,7 +7827,7 @@
     *: "Delete?"
   </dest>
   <voice>
-    *: ""
+    *: "Really delete?"
   </voice>
 </phrase>
 <phrase>
@@ -7879,7 +7883,7 @@
     *: "Deleted"
   </dest>
   <voice>
-    *: ""
+    *: "Deleted"
   </voice>
 </phrase>
 <phrase>
@@ -8085,7 +8089,7 @@
     *: "Playlist Buffer Full"
   </dest>
   <voice>
-    *: ""
+    *: "Playlist Buffer Full"
   </voice>
 </phrase>
 <phrase>
@@ -8101,7 +8105,8 @@
     player: "End of List"
   </dest>
   <voice>
-    *: ""
+    *: "End of Song List"
+    player: "End of List"
   </voice>
 </phrase>
 <phrase>
@@ -8129,7 +8134,7 @@
     *: "Nothing to resume"
   </dest>
   <voice>
-    *: ""
+    *: "Nothing to resume"
   </voice>
 </phrase>
 <phrase>
@@ -8143,7 +8148,7 @@
     *: "Error updating playlist control file"
   </dest>
   <voice>
-    *: ""
+    *: "Error updating playlist control file"
   </voice>
 </phrase>
 <phrase>
@@ -8157,7 +8162,7 @@
     *: "Error accessing playlist file"
   </dest>
   <voice>
-    *: ""
+    *: "Error accessing playlist file"
   </voice>
 </phrase>
 <phrase>
@@ -8171,7 +8176,7 @@
     *: "Error accessing playlist control file"
   </dest>
   <voice>
-    *: ""
+    *: "Error accessing playlist control file"
   </voice>
 </phrase>
 <phrase>
@@ -8185,7 +8190,7 @@
     *: "Error accessing directory"
   </dest>
   <voice>
-    *: ""
+    *: "Error accessing directory"
   </voice>
 </phrase>
 <phrase>
@@ -8199,7 +8204,7 @@
     *: "Playlist control file is invalid"
   </dest>
   <voice>
-    *: ""
+    *: "Playlist control file is invalid"
   </voice>
 </phrase>
 <phrase>
@@ -8213,7 +8218,7 @@
     *: "Save Failed"
   </dest>
   <voice>
-    *: ""
+    *: "Save Failed"
   </voice>
 </phrase>
 <phrase>
@@ -8419,7 +8424,7 @@
     *: "Boot changed"
   </dest>
   <voice>
-    *: ""
+    *: "Boot changed"
   </voice>
 </phrase>
 <phrase>
@@ -8433,7 +8438,7 @@
     *: "Reboot now?"
   </dest>
   <voice>
-    *: ""
+    *: "Reboot now?"
   </voice>
 </phrase>
 <phrase>
@@ -8469,7 +8474,7 @@
     *: "No files"
   </dest>
   <voice>
-    *: ""
+    *: "No files"
   </voice>
 </phrase>
 <phrase>
@@ -8483,7 +8488,7 @@
     *: "New Keyboard"
   </dest>
   <voice>
-    *: ""
+    *: "New Keyboard"
   </voice>
 </phrase>
 <phrase>
@@ -8567,7 +8572,7 @@
     *: "Extension array full"
   </dest>
   <voice>
-    *: ""
+    *: "Extension array full"
   </voice>
 </phrase>
 <phrase>
@@ -8581,7 +8586,7 @@
     *: "Filetype array full"
   </dest>
   <voice>
-    *: ""
+    *: "Filetype array full"
   </voice>
 </phrase>
 <phrase>
@@ -8595,7 +8600,7 @@
     *: "Dir Buffer is Full!"
   </dest>
   <voice>
-    *: ""
+    *: "Directory Buffer is Full!"
   </voice>
 </phrase>
 <phrase>
@@ -8623,7 +8628,7 @@
     *: "Plugin name too long"
   </dest>
   <voice>
-    *: ""
+    *: "Plugin name too long"
   </voice>
 </phrase>
 <phrase>
@@ -8654,7 +8659,7 @@
     *: "Please reboot to enable"
   </dest>
   <voice>
-    *: ""
+    *: "Please reboot to enable"
   </voice>
 </phrase>
 <phrase>
@@ -8720,7 +8725,7 @@
     *: "WARNING! Low Battery!"
   </dest>
   <voice>
-    *: ""
+    *: "WARNING! Low Battery!"
   </voice>
 </phrase>
 <phrase>
@@ -8734,7 +8739,7 @@
     *: "Battery empty! RECHARGE!"
   </dest>
   <voice>
-    *: ""
+    *: "Battery empty! RECHARGE!"
   </voice>
 </phrase>
 <phrase>
@@ -10941,6 +10946,20 @@
   <voice>
     *: none
     agc: "AGC maximum gain"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OF
+  desc: spoken only, as in 3/8 => 3 of 8
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "of"
   </voice>
 </phrase>
 

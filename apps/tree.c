@@ -325,7 +325,7 @@ static int update_dir(void)
         (tc.dirfull ||
                       tc.filesindir == global_settings.max_files_in_dir) )
         {
-            gui_syncsplash(HZ, str(LANG_SHOWDIR_BUFFER_FULL));
+            gui_syncsplash(HZ, ID2P(LANG_SHOWDIR_BUFFER_FULL));
         }
     }
 #ifdef HAVE_TAGCACHE
@@ -556,7 +556,7 @@ static int dirbrowse()
 
     if (*tc.dirfilter > NUM_FILTER_MODES && numentries==0)
     {
-        gui_syncsplash(HZ*2, str(LANG_NO_FILES));
+        gui_syncsplash(HZ*2, ID2P(LANG_NO_FILES));
         return false;  /* No files found for rockbox_browser() */
     }
     
@@ -567,7 +567,7 @@ static int dirbrowse()
           tc.dirlevel = 0; /* shouldnt be needed.. this code needs work! */
 #ifdef BOOTFILE
         if (boot_changed) {
-            char *lines[]={str(LANG_BOOT_CHANGED), str(LANG_REBOOT_NOW)};
+            char *lines[]={ID2P(LANG_BOOT_CHANGED), ID2P(LANG_REBOOT_NOW)};
             struct text_message message={lines, 2};
             if(gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
                 rolo_load("/" BOOTFILE);
@@ -1336,6 +1336,7 @@ void tree_restore(void)
                               str(LANG_SCANNING_DISK));
             gui_textarea_update(&screens[i]);
         }
+        cond_talk_ids_fq(LANG_SCANNING_DISK);
 
         dircache_build(global_status.dircache_size);
 

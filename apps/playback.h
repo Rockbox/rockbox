@@ -63,6 +63,7 @@ void audio_set_track_buffer_event(void (*handler)(struct mp3entry *id3,
                                                   bool last_track));
 void audio_set_track_unbuffer_event(void (*handler)(struct mp3entry *id3,
                                                    bool last_track));
+void voice_wait(void);
 
 #if CONFIG_CODEC == SWCODEC /* This #ifdef is better here than gui/gwps.c */
 extern void audio_next_dir(void);

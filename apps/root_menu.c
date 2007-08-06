@@ -129,7 +129,7 @@ static int browser(void* param)
                     /* Maybe just needs to reboot due to delayed commit */
                     if (stat->commit_delayed)
                     {
-                        gui_syncsplash(HZ*2, str(LANG_PLEASE_REBOOT));
+                        gui_syncsplash(HZ*2, ID2P(LANG_PLEASE_REBOOT));
                         break;
                     }
 
@@ -146,7 +146,7 @@ static int browser(void* param)
                     {
                         /* Prompt the user */
                         reinit_attempted = true;
-                        char *lines[]={str(LANG_TAGCACHE_BUSY), str(LANG_TAGCACHE_FORCE_UPDATE)};
+                        char *lines[]={ID2P(LANG_TAGCACHE_BUSY), ID2P(LANG_TAGCACHE_FORCE_UPDATE)};
                         struct text_message message={lines, 2};
                         if(gui_syncyesno_run(&message, NULL, NULL) == YESNO_NO)
                             break;
@@ -159,6 +159,24 @@ static int browser(void* param)
                     }
 
                     /* Display building progress */
+                    static long talked_tick = 0;
+                    if(talk_menus_enabled() &&
+                       (talked_tick == 0
+                        || TIME_AFTER(current_tick, talked_tick+7*HZ)))
+                    {
+                        talked_tick = current_tick;
+                        if (stat->commit_step > 0)
+                        {
+                            talk_id(LANG_TAGCACHE_INIT, false);
+                            talk_number(stat->commit_step, true);
+                            talk_id(VOICE_OF, true);
+                            talk_number(tagcache_get_max_commit_step(), true);
+                        } else if(stat->processed_entries)
+                        {
+                            talk_number(stat->processed_entries, false);
+                            talk_id(LANG_BUILDING_DATABASE, true);
+                        }
+                    }
                     if (stat->commit_step > 0)
                     {
                         gui_syncsplash(0, "%s [%d/%d]",
@@ -236,7 +254,7 @@ static int wpsscrn(void* param)
     }
     else
     {
-        gui_syncsplash(HZ*2, str(LANG_NOTHING_TO_RESUME));
+        gui_syncsplash(HZ*2, ID2P(LANG_NOTHING_TO_RESUME));
     }
 #if LCD_DEPTH > 1
     show_main_backdrop();

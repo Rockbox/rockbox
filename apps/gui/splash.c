@@ -22,6 +22,9 @@
 #include "stdio.h"
 #include "kernel.h"
 #include "screen_access.h"
+#include "lang.h"
+#include "settings.h"
+#include "talk.h"
 
 #ifndef MAX
 #define MAX(a, b) (((a)>(b))?(a):(b))
@@ -197,6 +200,15 @@ void gui_syncsplash(int ticks, const unsigned char *fmt, ...)
 {
     va_list ap;
     int i;
+    long id;
+    /* fmt may be a so called virtual pointer. See settings.h. */
+    if((id = P2ID(fmt)) >= 0)
+        /* If fmt specifies a voicefont ID, and voice menus are
+           enabled, then speak it. */
+        cond_talk_ids_fq(id);
+    /* If fmt is a lang ID then get the corresponding string (which
+       still might contain % place holders). */
+    fmt = P2STR(fmt);
     va_start( ap, fmt );
     FOR_NB_SCREENS(i)
         splash(&(screens[i]), fmt, ap);

@@ -690,7 +690,7 @@ bool tagtree_export(void)
     gui_syncsplash(0, str(LANG_CREATING));
     if (!tagcache_create_changelog(&tcs))
     {
-        gui_syncsplash(HZ*2, str(LANG_FAILED));
+        gui_syncsplash(HZ*2, ID2P(LANG_FAILED));
     }
     
     return false;
@@ -698,10 +698,10 @@ bool tagtree_export(void)
 
 bool tagtree_import(void)
 {
-    gui_syncsplash(0, str(LANG_WAIT));
+    gui_syncsplash(0, ID2P(LANG_WAIT));
     if (!tagcache_import_changelog())
     {
-        gui_syncsplash(HZ*2, str(LANG_FAILED));
+        gui_syncsplash(HZ*2, ID2P(LANG_FAILED));
     }
     
     return false;
@@ -1228,7 +1228,7 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     
     if (!sort && (sort_inverse || sort_limit))
     {
-        gui_syncsplash(HZ*4, str(LANG_SHOWDIR_BUFFER_FULL), total_count);
+        gui_syncsplash(HZ*4, ID2P(LANG_SHOWDIR_BUFFER_FULL), total_count);
         logf("Too small dir buffer");
         return 0;
     }
@@ -1419,7 +1419,7 @@ int tagtree_enter(struct tree_context* c)
                     !global_settings.party_mode &&
                     playlist_modified(NULL))
                 {
-                    char *lines[]={str(LANG_WARN_ERASEDYNPLAYLIST_PROMPT)};
+                    char *lines[]={ID2P(LANG_WARN_ERASEDYNPLAYLIST_PROMPT)};
                     struct text_message message={lines, 1};
                     
                     if (gui_syncyesno_run(&message, NULL, NULL) != YESNO_YES)
@@ -1496,7 +1496,7 @@ static bool insert_all_playlist(struct tree_context *c, int position, bool queue
     cpu_boost(true);
     if (!tagcache_search(&tcs, tag_filename))
     {
-        gui_syncsplash(HZ, str(LANG_TAGCACHE_BUSY));
+        gui_syncsplash(HZ, ID2P(LANG_TAGCACHE_BUSY));
         cpu_boost(false);
         return false;
     }
@@ -1599,12 +1599,12 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
     }
 
     if (tc->filesindir <= 0)
-        gui_syncsplash(HZ, str(LANG_END_PLAYLIST));
+        gui_syncsplash(HZ, ID2P(LANG_END_PLAYLIST));
     else
     {
         logf("insert_all_playlist");
         if (!insert_all_playlist(tc, position, queue))
-            gui_syncsplash(HZ*2, str(LANG_FAILED));
+            gui_syncsplash(HZ*2, ID2P(LANG_FAILED));
     }
     
     /* Finally return the dirlevel to its original value. */

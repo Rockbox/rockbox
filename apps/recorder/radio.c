@@ -487,7 +487,7 @@ int radio_screen(void)
         radio_start();
 #endif
 
-   if(num_presets < 1 && yesno_pop(str(LANG_FM_FIRST_AUTOSCAN)))
+   if(num_presets < 1 && yesno_pop(ID2P(LANG_FM_FIRST_AUTOSCAN)))
         scan_presets();
     
     curr_preset = find_preset(curr_freq);
@@ -551,7 +551,7 @@ int radio_screen(void)
                     done = true;
                     if(presets_changed)
                     {
-                        if(yesno_pop(str(LANG_FM_SAVE_CHANGES)))
+                        if(yesno_pop(ID2P(LANG_FM_SAVE_CHANGES)))
                         {
                             if(filepreset[0] == '\0')
                                 save_preset_list();
@@ -606,7 +606,7 @@ int radio_screen(void)
                 ret_val = GO_TO_ROOT;
                 if(presets_changed)
                 {
-                    if(yesno_pop(str(LANG_FM_SAVE_CHANGES)))
+                    if(yesno_pop(ID2P(LANG_FM_SAVE_CHANGES)))
                     {
                         if(filepreset[0] == '\0')
                             save_preset_list();
@@ -690,7 +690,7 @@ int radio_screen(void)
             case ACTION_FM_PRESET:
                 if(num_presets < 1)
                 {
-                    gui_syncsplash(HZ, str(LANG_FM_NO_PRESETS));
+                    gui_syncsplash(HZ, ID2P(LANG_FM_NO_PRESETS));
                     update_screen = true;
                     FOR_NB_SCREENS(i)
                     {
@@ -996,7 +996,7 @@ static void radio_save_presets(void)
     }
     else
     {
-        gui_syncsplash(HZ, str(LANG_FM_PRESET_SAVE_FAILED));
+        gui_syncsplash(HZ, ID2P(LANG_FM_PRESET_SAVE_FAILED));
     }    
 }
 
@@ -1082,7 +1082,7 @@ static int radio_add_preset(void)
     }
     else
     {
-        gui_syncsplash(HZ, str(LANG_FM_NO_FREE_PRESETS));
+        gui_syncsplash(HZ, ID2P(LANG_FM_NO_FREE_PRESETS));
     }
     return true;
 }
@@ -1170,7 +1170,7 @@ static int save_preset_list(void)
                 if((!p1) || (len > MAX_FILENAME) || (len == 0))
                 {
                     /* no slash, too long or too short */
-                    gui_syncsplash(HZ, str(LANG_INVALID_FILENAME));                    
+                    gui_syncsplash(HZ, ID2P(LANG_INVALID_FILENAME));                    
                 }
                 else
                 {
@@ -1190,7 +1190,7 @@ static int save_preset_list(void)
         }
     }
     else
-        gui_syncsplash(HZ, str(LANG_FM_NO_PRESETS));
+        gui_syncsplash(HZ, ID2P(LANG_FM_NO_PRESETS));
         
     return true;
 }
@@ -1339,7 +1339,7 @@ static int scan_presets(void)
     bool do_scan = true;
     
     if(num_presets > 0) /* Do that to avoid 2 questions. */
-        do_scan = yesno_pop(str(LANG_FM_CLEAR_PRESETS));
+        do_scan = yesno_pop(ID2P(LANG_FM_CLEAR_PRESETS));
         
     if(do_scan)
     {

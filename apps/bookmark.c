@@ -186,10 +186,10 @@ bool bookmark_autobookmark(void)
             return write_bookmark(false);
     }
 #ifdef HAVE_LCD_BITMAP
-    unsigned char *lines[]={str(LANG_AUTO_BOOKMARK_QUERY)};
+    unsigned char *lines[]={ID2P(LANG_AUTO_BOOKMARK_QUERY)};
     struct text_message message={(char **)lines, 1};
 #else
-    unsigned char *lines[]={str(LANG_AUTO_BOOKMARK_QUERY),
+    unsigned char *lines[]={ID2P(LANG_AUTO_BOOKMARK_QUERY),
                             str(LANG_CONFIRM_WITH_BUTTON)};
     struct text_message message={(char **)lines, 2};
 #endif
@@ -244,8 +244,8 @@ static bool write_bookmark(bool create_bookmark_file)
         }
     }
 
-    gui_syncsplash(HZ, str(success ? LANG_BOOKMARK_CREATE_SUCCESS
-        : LANG_BOOKMARK_CREATE_FAILURE));
+    gui_syncsplash(HZ, success ? ID2P(LANG_BOOKMARK_CREATE_SUCCESS)
+        : ID2P(LANG_BOOKMARK_CREATE_FAILURE));
 
     return true;
 }
@@ -634,7 +634,7 @@ static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resu
             if (bookmarks->total_count < 1)
             {
                 /* No more bookmarks, delete file and exit */
-                gui_syncsplash(HZ, str(LANG_BOOKMARK_LOAD_EMPTY));
+                gui_syncsplash(HZ, ID2P(LANG_BOOKMARK_LOAD_EMPTY));
                 remove(bookmark_file_name);
                 return NULL;
             }

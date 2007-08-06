@@ -117,6 +117,8 @@ static long size_for_thumbnail; /* leftover buffer size for it */
 static struct voicefile* p_voicefile; /* loaded voicefile */
 static bool has_voicefile; /* a voicefile file is present */
 static struct queue_entry queue[QUEUE_SIZE]; /* queue of scheduled clips */
+/* enqueue next utterance even if enqueue is false. */
+static bool force_enqueue_next;
 static int queue_write; /* write index of queue, by application */
 static int queue_read; /* read index of queue, by ISR context */
 static int sent; /* how many bytes handed over to playback, owned by ISR */
@@ -134,7 +136,6 @@ static int talk_menu_disable; /* if non-zero, temporarily disable voice UI (not 
 
 static void load_voicefile(void);
 static void mp3_callback(unsigned char** start, size_t* size);
-static int shutup(void);
 static int queue_clip(unsigned char* buf, long size, bool enqueue);
 static int open_voicefile(void);
 static unsigned char* get_clip(long id, long* p_size);
@@ -267,6 +268,13 @@ load_err:
 }
 
 
+/* Are more voice clips queued and waiting? */
+bool is_voice_queued()
+{
+    return !!QUEUE_LEVEL;
+}
+
+
 /* called in ISR context if mp3 data got consumed */
 static void mp3_callback(unsigned char** start, size_t* size)
 {
@@ -321,7 +329,7 @@ re_check:
 }
 
 /* stop the playback and the pending clips */
-static int shutup(void)
+static int do_shutup(void)
 {
 #if CONFIG_CODEC != SWCODEC
     unsigned char* pos;
@@ -387,6 +395,13 @@ static int shutup(void)
     return 0;
 }
 
+/* Shutup the voice, except if force_enqueue_next is set. */
+static int shutup(void)
+{
+    if (!force_enqueue_next)
+        return do_shutup();
+    return 0;
+}
 
 /* schedule a clip, at the end or discard the existing queue */
 static int queue_clip(unsigned char* buf, long size, bool enqueue)
@@ -395,6 +410,9 @@ static int queue_clip(unsigned char* buf, long size, bool enqueue)
 
     if (!enqueue)
         shutup(); /* cut off all the pending stuff */
+    /* Something is being enqueued, force_enqueue_next override is no
+       longer in effect. */
+    force_enqueue_next = false;
     
     if (!size)
         return 0; /* safety check */
@@ -617,6 +635,26 @@ int talk_id(long id, bool enqueue)
     return 0;
 }
 
+/* Speaks zero or more IDs (from an array). */
+int talk_idarray(long *ids, bool enqueue)
+{
+    int r;
+    if(!ids)
+        return 0;
+    while(*ids != TALK_FINAL_ID)
+    {
+        if((r = talk_id(*ids++, enqueue)) <0)
+            return r;
+        enqueue = true;
+    }
+    return 0;
+}
+
+/* Make sure the current utterance is not interrupted by the next one. */
+void talk_force_enqueue_next(void)
+{
+    force_enqueue_next = true;
+}
 
 /* play a thumbnail from file */
 int talk_file(const char* filename, bool enqueue)

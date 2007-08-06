@@ -23,6 +23,7 @@
 #include "misc.h"
 #include "lang.h"
 #include "action.h"
+#include "talk.h"
 
 /*
  * Initializes the yesno asker
@@ -97,7 +98,28 @@ static bool gui_yesno_draw_result(struct gui_yesno * yn, enum yesno_res result)
     gui_textarea_put_message(yn->display, message, 0);
     return(true);
 }
+
 #include "debug.h"
+
+/* Processes a text_message whose lines may be virtual pointers
+   representing language / voicefont IDs (see settings.h). Copies out
+   the IDs to the ids array, which is of length maxlen, and replaces
+   the pointers in the text_message with the actual language strings.
+   The ids array is terminated with the TALK_FINAL_ID sentinel
+   element. */
+static void extract_talk_ids(struct text_message *m, long *ids, int maxlen)
+{
+    int line, i=0;
+    if(m)
+        for(line=0; line<m->nb_lines; line++) {
+            long id = P2ID((unsigned char *)m->message_lines[line]);
+            if(id>=0 && i<maxlen-1)
+                ids[i++] = id;
+            m->message_lines[line] = (char *)P2STR((unsigned char *)m->message_lines[line]);
+        }
+    ids[i] = TALK_FINAL_ID;
+}
+
 enum yesno_res gui_syncyesno_run(struct text_message * main_message,
                                  struct text_message * yes_message,
                                  struct text_message * no_message)
@@ -107,6 +129,13 @@ enum yesno_res gui_syncyesno_run(struct text_message * main_message,
     int result=-1;
     bool result_displayed;
     struct gui_yesno yn[NB_SCREENS];
+    long voice_ids[5];
+    long talked_tick = 0;
+    /* The text messages may contain virtual pointers to IDs (see
+       settings.h) instead of plain strings. Copy the IDs out so we
+       can speak them, and unwrap the actual language strings. */
+    extract_talk_ids(main_message, voice_ids,
+                     sizeof(voice_ids)/sizeof(voice_ids[0]));
     FOR_NB_SCREENS(i)
     {
         gui_yesno_init(&(yn[i]), main_message, yes_message, no_message);
@@ -115,7 +144,14 @@ enum yesno_res gui_syncyesno_run(struct text_message * main_message,
     }
     while (result==-1)
     {
-        button = get_action(CONTEXT_YESNOSCREEN,TIMEOUT_BLOCK);
+        /* Repeat the question every 5secs (more or less) */
+        if (talk_menus_enabled()
+            && (talked_tick==0 || TIME_AFTER(current_tick, talked_tick+HZ*5)))
+        {
+            talked_tick = current_tick;
+            talk_idarray(voice_ids, false);
+        }
+        button = get_action(CONTEXT_YESNOSCREEN, HZ*5);
         switch (button)
         {
             case ACTION_YESNO_ACCEPT:
@@ -133,6 +169,13 @@ enum yesno_res gui_syncyesno_run(struct text_message * main_message,
     }
     FOR_NB_SCREENS(i)
         result_displayed=gui_yesno_draw_result(&(yn[i]), result);
+    extract_talk_ids((result == YESNO_YES) ? yes_message : no_message,
+                     voice_ids, sizeof(voice_ids)/sizeof(voice_ids[0]));
+    if (talk_menus_enabled())
+    {
+        talk_idarray(voice_ids, false);
+        talk_force_enqueue_next();
+    }
     if(result_displayed)
         sleep(HZ);
     return(result);

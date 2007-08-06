@@ -67,12 +67,12 @@ int browse_folder(void *param)
 
 static int reset_settings(void)
 {
-    unsigned char *lines[]={str(LANG_RESET_ASK)};
+    unsigned char *lines[]={ID2P(LANG_RESET_ASK)};
     unsigned char *yes_lines[]={
         str(LANG_SETTINGS),
-        str(LANG_RESET_DONE_CLEAR)
+        ID2P(LANG_RESET_DONE_CLEAR)
     };
-    unsigned char *no_lines[]={yes_lines[0], str(LANG_CANCEL)};
+    unsigned char *no_lines[]={yes_lines[0], ID2P(LANG_CANCEL)};
     struct text_message message={(char **)lines, 1};
     struct text_message yes_message={(char **)yes_lines, 2};
     struct text_message no_message={(char **)no_lines, 2};

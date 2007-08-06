@@ -957,6 +957,24 @@ static void voice_stop(void)
         pcmbuf_play_stop();
 #endif
 } /* voice_stop */
+
+/* Is voice still speaking */
+/* Unfortunately only reliable when music is not also playing. */
+static bool is_voice_speaking(void)
+{
+    return is_voice_queued()
+        || voice_is_playing
+        || (!playing && pcm_is_playing());
+}
+
+/* Wait for voice to finish speaking. */
+/* Also only reliable when music is not also playing. */
+void voice_wait(void)
+{
+    while (is_voice_speaking())
+        sleep(HZ/10);
+}
+
 #endif /* PLAYBACK_VOICE */
 
 static void set_filebuf_watermark(int seconds)

@@ -537,7 +537,7 @@ int plugin_load(const char* plugin, void* parameter)
         plugin_loaded = false;
     }
 
-    gui_syncsplash(0, str(LANG_WAIT));
+    gui_syncsplash(0, ID2P(LANG_WAIT));
     strcpy(current_plugin,p);
 
 #ifdef SIMULATOR

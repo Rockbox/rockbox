@@ -544,6 +544,7 @@ int settings_save( void )
             screens[i].update();
 #endif
         }
+        cond_talk_ids_fq(LANG_SETTINGS_SAVE_FAILED);
         sleep(HZ*2);
         return -1;
     }
@@ -575,15 +576,15 @@ bool settings_save_config(int options)
             break;
         }
         else {
-            gui_syncsplash(HZ, str(LANG_CANCEL));
+            gui_syncsplash(HZ, ID2P(LANG_CANCEL));
             return false;
         }
     }
 
     if (settings_write_config(filename, options))
-        gui_syncsplash(HZ, str(LANG_SETTINGS_SAVED));
+        gui_syncsplash(HZ, ID2P(LANG_SETTINGS_SAVED));
     else
-        gui_syncsplash(HZ, str(LANG_FAILED));
+        gui_syncsplash(HZ, ID2P(LANG_FAILED));
     return true;
 }
 

@@ -160,12 +160,12 @@ static bool add_to_playlist(int position, bool queue)
 {
     bool new_playlist = !(audio_status() & AUDIO_STATUS_PLAY);
     char *lines[] = {
-        (char *)str(LANG_RECURSE_DIRECTORY_QUESTION),
+        ID2P(LANG_RECURSE_DIRECTORY_QUESTION),
         selected_file
     };
     struct text_message message={lines, 2};
 
-    gui_syncsplash(0, str(LANG_WAIT));
+    gui_syncsplash(0, ID2P(LANG_WAIT));
     
     if (new_playlist)
         playlist_create(NULL, NULL);
@@ -502,7 +502,7 @@ static int remove_dir(char* dirname, int len)
 #endif
         if(ACTION_STD_CANCEL == get_action(CONTEXT_STD,TIMEOUT_NOBLOCK))
         {
-            gui_syncsplash(HZ, str(LANG_CANCEL));
+            gui_syncsplash(HZ, ID2P(LANG_CANCEL));
             result = -1;
             break;
         }
@@ -524,11 +524,11 @@ static int remove_dir(char* dirname, int len)
 static bool delete_handler(bool is_dir)
 {
     char *lines[]={
-        (char *)str(LANG_REALLY_DELETE),
+        ID2P(LANG_REALLY_DELETE),
         selected_file
     };
     char *yes_lines[]={
-        (char *)str(LANG_DELETED),
+        ID2P(LANG_DELETED),
         selected_file
     };
 
@@ -599,6 +599,7 @@ static bool rename_file(void)
             lcd_puts(0,0,str(LANG_RENAME));
             lcd_puts(0,1,str(LANG_FAILED));
             lcd_update();
+            cond_talk_ids_fq(LANG_RENAME, LANG_FAILED);
             sleep(HZ*2);
         }
         else
@@ -628,6 +629,7 @@ static bool create_dir(void)
 
     rc = mkdir(dirname);
     if (rc < 0) {
+        cond_talk_ids_fq(LANG_CREATE_DIR, LANG_FAILED);
         gui_syncsplash(HZ, (unsigned char *)"%s %s",
                        str(LANG_CREATE_DIR), str(LANG_FAILED));
     } else {
@@ -873,7 +875,7 @@ static bool clipboard_paste(void)
     bool success;
     int target_fd;
 
-    unsigned char *lines[]={str(LANG_REALLY_OVERWRITE)};
+    unsigned char *lines[]={ID2P(LANG_REALLY_OVERWRITE)};
     struct text_message message={(char **)lines, 1};
 
     /* Get the name of the current directory */
@@ -896,11 +898,11 @@ static bool clipboard_paste(void)
     }
 
     if (clipboard_is_copy) {
-        gui_syncsplash(0, str(LANG_COPYING));
+        gui_syncsplash(0, ID2P(LANG_COPYING));
     }
     else
     {
-        gui_syncsplash(0, str(LANG_MOVING));
+        gui_syncsplash(0, ID2P(LANG_MOVING));
     }
 
     /* Now figure out what we're doing */
@@ -939,6 +941,7 @@ static bool clipboard_paste(void)
         /* Force reload of the current directory */
         onplay_result = ONPLAY_RELOAD_DIR;
     } else {
+        cond_talk_ids_fq(LANG_PASTE, LANG_FAILED);
         gui_syncsplash(HZ, (unsigned char *)"%s %s",
                str(LANG_PASTE), str(LANG_FAILED));
     }

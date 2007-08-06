@@ -217,6 +217,17 @@ static void init_tagcache(void)
 
         if (ret > 0)
         {
+            static long talked_tick = 0;
+            if(talk_menus_enabled()
+               && (talked_tick == 0
+                   || TIME_AFTER(current_tick, talked_tick+7*HZ)))
+            {
+                talked_tick = current_tick;
+                talk_id(LANG_TAGCACHE_INIT, false);
+                talk_number(ret, true);
+                talk_id(VOICE_OF, true);
+                talk_number(tagcache_get_max_commit_step(), true);
+            }
 #ifdef HAVE_LCD_BITMAP
             gui_syncsplash(0, "%s [%d/%d]",
                 str(LANG_TAGCACHE_INIT), ret, 
@@ -474,7 +485,7 @@ static void init(void)
     if (button_hold())
 #endif
     {
-        gui_syncsplash(HZ*2, str(LANG_RESET_DONE_CLEAR));
+        gui_syncsplash(HZ*2, ID2P(LANG_RESET_DONE_CLEAR));
         settings_reset();
     }
     else

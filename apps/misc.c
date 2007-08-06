@@ -62,6 +62,7 @@
 #include "bookmark.h"
 
 #include "misc.h"
+#include "playback.h"
 
 #ifdef BOOTFILE
 #if !defined(USB_NONE) && !defined(USB_IPODSTYLE)
@@ -603,6 +604,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
     call_ata_idle_notifys(true);
     exit(0);
 #else
+    long msg_id = -1;
     int i;
 
     scrobbler_poweroff();
@@ -625,19 +627,23 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
             if (!tagcache_prepare_shutdown())
             {
                 cancel_shutdown();
-                gui_syncsplash(HZ, str(LANG_TAGCACHE_BUSY));
+                gui_syncsplash(HZ, ID2P(LANG_TAGCACHE_BUSY));
                 return false;
             }
 #endif
             if (battery_level() > 10)
                 gui_syncsplash(0, str(LANG_SHUTTINGDOWN));
             else
+            {
+                msg_id = LANG_WARNING_BATTERY_LOW;
                 gui_syncsplash(0, "%s %s",
                                str(LANG_WARNING_BATTERY_LOW),
                                str(LANG_SHUTTINGDOWN));
+            }
         }
         else
         {
+            msg_id = LANG_WARNING_BATTERY_EMPTY;
             gui_syncsplash(0, "%s %s",
                            str(LANG_WARNING_BATTERY_EMPTY),
                            str(LANG_SHUTTINGDOWN));
@@ -675,6 +681,21 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 #if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
             audio_close_recording();       
 #endif
+
+            if(talk_menus_enabled())
+            {
+                bool enqueue = false;
+                if(msg_id != -1)
+                {
+                    talk_id(msg_id, enqueue);
+                    enqueue = true;
+                }
+                talk_id(LANG_SHUTTINGDOWN, enqueue);
+#if CONFIG_CODEC == SWCODEC
+                voice_wait();
+#endif
+            }
+
             system_flush();
 #ifdef HAVE_EEPROM_SETTINGS
             if (firmware_settings.initialized)
@@ -974,8 +995,8 @@ void check_bootfile(bool do_rolo)
                 if((entry->wrtdate != wrtdate) ||
                    (entry->wrttime != wrttime))
                 {
-                    char *lines[] = { str(LANG_BOOT_CHANGED),
-                                      str(LANG_REBOOT_NOW) };
+                    char *lines[] = { ID2P(LANG_BOOT_CHANGED),
+                                      ID2P(LANG_REBOOT_NOW) };
                     struct text_message message={ lines, 2 };
                     button_clear_queue(); /* Empty the keyboard buffer */
                     if(gui_syncyesno_run(&message, NULL, NULL) == YESNO_YES)

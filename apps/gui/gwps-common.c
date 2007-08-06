@@ -294,7 +294,7 @@ bool gui_wps_display(void)
 #ifdef HAVE_LCD_BITMAP
         gui_syncstatusbar_draw(&statusbars, true);
 #endif
-        gui_syncsplash(HZ, str(LANG_END_PLAYLIST));
+        gui_syncsplash(HZ, ID2P(LANG_END_PLAYLIST));
         return true;
     }
     else
