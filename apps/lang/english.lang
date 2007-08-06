@@ -8627,20 +8627,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FILETYPES_STRING_BUFFER_FULL
-  desc: Filetype string buffer full
-  user:
-  <source>
-    *: "Filetype string buffer full"
-  </source>
-  <dest>
-    *: "Filetype string buffer full"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RESTARTING_PLAYBACK
   desc: splash screen displayed when pcm buffer size is changed
   user:
