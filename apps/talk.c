@@ -167,9 +167,8 @@ static void load_voicefile(void)
     int load_size;
     int got_size;
     int file_size;
-#if CONFIG_CODEC == SWCODEC    
-    int length, i;
-    unsigned char *buf, temp;
+#ifdef ROCKBOX_LITTLE_ENDIAN
+    int i;
 #endif
 
     filehandle = open_voicefile();
