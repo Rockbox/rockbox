@@ -155,7 +155,7 @@ static int build_table(VLC *vlc, int table_nb_bits,
             code_prefix2= code & (n_prefix>=32 ? 0xffffffff : (uint32_t)(1 << n_prefix)-1);
         else
             code_prefix2= code >> n;
-        if (n > 0 && (int)code_prefix2 == code_prefix) {
+        if (n > 0 && (int)code_prefix2 == (int)code_prefix) {
             if (n <= table_nb_bits) {
                 /* no need to add another table */
                 j = (code << (table_nb_bits - n)) & (table_size - 1);
