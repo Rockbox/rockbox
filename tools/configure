@@ -619,7 +619,7 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
     output="ajbrec.ajz"
     appextra="recorder:gui"
-    archosrom=""#"$pwd/rombox.ucl"
+    archosrom="" #"$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
     swcodec=""
@@ -641,7 +641,7 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
     output="ajbrec.ajz"
     appextra="recorder:gui"
-    archosrom=""#"$pwd/rombox.ucl"
+    archosrom="" #"$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
     swcodec=""
@@ -663,7 +663,7 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
     output="ajbrec.ajz"
     appextra="recorder:gui"
-    archosrom=""#"$pwd/rombox.ucl"
+    archosrom="" #"$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
     swcodec=""
@@ -707,7 +707,7 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
     output="ajbrec.ajz"
     appextra="recorder:gui"
-    archosrom=""#"$pwd/rombox.ucl"
+    archosrom="" #"$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
     swcodec=""
@@ -1718,7 +1718,7 @@ clean:
                   manual *.pdf *.a credits.raw @OUTPUT@ bitmaps pluginbitmaps \
                   @ARCHOSROM@ @FLASHFILE@ UI256.bmp rockbox-full.zip \
 	          html txt rockbox-manual*.zip sysfont.h rockbox-info.txt \
-	          voicefontids
+	          voicefontids *.wav *.mp3 *.voice
 
 voice: tools
 	\$(SILENT)\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@ features
