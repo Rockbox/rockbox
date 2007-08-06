@@ -1318,7 +1318,7 @@ fi
 
   case $option in
     [Bb])
-      if test -n "$archosrom"; then
+      if test $t_manufacturer = "archos"; then
           # Archos SH-based players do this somewhat differently for
           # some reason
           appsdir='\$(ROOTDIR)/flash/bootbox'
