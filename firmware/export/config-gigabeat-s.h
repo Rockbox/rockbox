@@ -38,18 +38,14 @@
 #define CONFIG_CODEC SWCODEC
 
 /* define this if you have a real-time clock */
-#define CONFIG_RTC RTC_IMX31L
+//#define CONFIG_RTC RTC_IMX31L
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 
-#define HAVE_BUTTON_LIGHT
-
 #define HAVE_LCD_ENABLE
 
-#define HAVE_BACKLIGHT_BRIGHTNESS
-
-#define HAVE_BUTTONLIGHT_BRIGHTNESS
+//#define HAVE_BACKLIGHT_BRIGHTNESS
 
 /* Main LCD backlight brightness range and defaults */
 #define MIN_BRIGHTNESS_SETTING          0   /* 0.5 mA */
@@ -120,7 +116,7 @@
 #define CONFIG_LCD LCD_GIGABEAT
 
 /* define this if the backlight can be set to a brightness */
-#define HAVE_BACKLIGHT_SET_FADING
+//#define HAVE_BACKLIGHT_SET_FADING
 #define __BACKLIGHT_INIT
 
 /* Offset ( in the firmware file's header ) to the file CRC */
@@ -128,8 +124,6 @@
 
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 8
-
-#define HAVE_HEADPHONE_DETECTION
 
 #define HAVE_SERIAL
 
