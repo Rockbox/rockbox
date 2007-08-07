@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Linus Nielsen Feltzing
+ * Copyright (c) 2007 Will Robertson
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,14 +16,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef BACKLIGHT_TARGET_H
-#define BACKLIGHT_TARGET_H
+#define DATAMASK 0xFF000000
 
-bool __backlight_init(void);
-void __backlight_on(void);
-void __backlight_off(void);
-void __backlight_set_brightness(int brightness);
-
-/* true: backlight fades off - false: backlight fades on */
-void __backlight_dim(bool dim);
-#endif
+void spi_init(void);
+void spi_send(int address, unsigned long data);
+void spi_read(int address, unsigned long* buffer);

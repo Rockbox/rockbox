@@ -553,6 +553,7 @@ target/arm/imx31/gigabeat-s/dma_start.c
 target/arm/imx31/gigabeat-s/system-imx31.c
 target/arm/imx31/gigabeat-s/mmu-imx31.c
 target/arm/imx31/gigabeat-s/avic-imx31.c
+target/arm/imx31/gigabeat-s/spi-imx31.c
 #ifndef BOOTLOADER
 target/arm/imx31/gigabeat-s/pcm-imx31.c
 #endif

@@ -147,6 +147,25 @@
 #define GPIO3_IMR               (*(volatile long*)(GPIO3_BASE_ADDR+0x14))
 #define GPIO3_ISR               (*(volatile long*)(GPIO3_BASE_ADDR+0x18))
 
+/* SPI */
+#define CSPI_RXDATA1            (*(volatile long*)CSPI1_BASE_ADDR)
+#define CSPI_TXDATA1            (*(volatile long*)(CSPI1_BASE_ADDR+0x04))
+#define CSPI_CONREG1            (*(volatile long*)(CSPI1_BASE_ADDR+0x08))
+#define CSPI_INTREG1            (*(volatile long*)(CSPI1_BASE_ADDR+0x0C))
+#define CSPI_DMAREG1            (*(volatile long*)(CSPI1_BASE_ADDR+0x10))
+#define CSPI_STATREG1           (*(volatile long*)(CSPI1_BASE_ADDR+0x14))
+#define CSPI_PERIODREG1         (*(volatile long*)(CSPI1_BASE_ADDR+0x18))
+#define CSPI_TESTREG1           (*(volatile long*)(CSPI1_BASE_ADDR+0x1C0))
+
+#define CSPI_RXDATA2            (*(volatile long*)CSPI2_BASE_ADDR)
+#define CSPI_TXDATA2            (*(volatile long*)(CSPI2_BASE_ADDR+0x04))
+#define CSPI_CONREG2            (*(volatile long*)(CSPI2_BASE_ADDR+0x08))
+#define CSPI_INTREG2            (*(volatile long*)(CSPI2_BASE_ADDR+0x0C))
+#define CSPI_DMAREG2            (*(volatile long*)(CSPI2_BASE_ADDR+0x10))
+#define CSPI_STATREG2           (*(volatile long*)(CSPI2_BASE_ADDR+0x14))
+#define CSPI_PERIODREG2         (*(volatile long*)(CSPI2_BASE_ADDR+0x18))
+#define CSPI_TESTREG2           (*(volatile long*)(CSPI2_BASE_ADDR+0x1C0))
+
 /* ROMPATCH and AVIC */
 #define ROMPATCH_BASE_ADDR      0x60000000
 #define AVIC_BASE_ADDR          0x68000000
