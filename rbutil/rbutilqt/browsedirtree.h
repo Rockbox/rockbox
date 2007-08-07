@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Riebeling
- *   $Id$
+ *   $Id: installrb.cpp 13990 2007-07-25 22:26:10Z Dominik Wenger $
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -17,48 +17,30 @@
  *
  ****************************************************************************/
 
-#ifndef CONFIGURE_H
-#define CONFIGURE_H
+#ifndef BROWSEDIRTREE_H
+#define BROWSEDIRTREE_H
 
-#include "ui_configurefrm.h"
-#include "browsedirtree.h"
 #include <QtGui>
+#include "ui_browsedirtreefrm.h"
 
-class Config : public QDialog
+class BrowseDirtree : public QDialog
 {
     Q_OBJECT
+
     public:
-        Config(QWidget *parent = 0);
-        void setUserSettings(QSettings*);
-        void setDevices(QSettings*);
+        BrowseDirtree(QWidget *parent = 0);
+        void setFilter(QDir::Filters);
+        void setDir(QDir&);
 
     signals:
-        void settingsUpdated(void);
-
-    public slots:
-        void accept(void);
-        void abort(void);
+        void itemChanged(QString);
 
     private:
-        Ui::ConfigForm ui;
-        QSettings *userSettings;
-        QSettings *devices;
-        QStringList findLanguageFiles(void);
-        QString languageName(const QString&);
-        QMap<QString, QString> lang;
-        QString language;
-        QString programPath;
-        QUrl proxy;
-        
-        BrowseDirtree *browser;
+        Ui::BrowseDirtreeFrm ui;
+        QDirModel model;
         
     private slots:
-        void setNoProxy(bool);
-        void setSystemProxy(bool);
-        void updateLanguage(void);
-        void browseFolder(void);
-        void autodetect(void);
-        void setMountpoint(QString);
+        void accept(void);
 };
 
 #endif

@@ -15,8 +15,8 @@ SOURCES += rbutilqt.cpp \
  ../ipodpatcher/ipodpatcher.c \
  ../sansapatcher/sansapatcher.c \
  irivertools/irivertools.cpp \
- irivertools/md5sum.cpp 
-
+ irivertools/md5sum.cpp  \
+ browsedirtree.cpp
 
 HEADERS += rbutilqt.h \
  settings.h \
@@ -47,7 +47,8 @@ HEADERS += rbutilqt.h \
  irivertools/h100sums.h \ 
  irivertools/h120sums.h \
  irivertools/h300sums.h \
- irivertools/checksums.h
+ irivertools/checksums.h \
+ browsedirtree.h 
 
 TEMPLATE = app
 CONFIG += release \
@@ -62,8 +63,8 @@ FORMS += rbutilqtfrm.ui \
  installprogressfrm.ui \
  configurefrm.ui \
  installbootloaderfrm.ui \
- installtalkfrm.ui
-
+ browsedirtreefrm.ui \
+ installtalkfrm.ui 
 
 RESOURCES += rbutilqt.qrc
 
@@ -71,12 +72,12 @@ TRANSLATIONS += rbutil_de.ts
 QT += network
 DEFINES += RBUTIL _LARGEFILE64_SOURCE
 
-win32{
+win32 {
     SOURCES +=  ../ipodpatcher/ipodio-win32.c
     SOURCES +=  ../sansapatcher/sansaio-win32.c
 }
 
-unix{
+unix {
     SOURCES +=  ../ipodpatcher/ipodio-posix.c
     SOURCES +=  ../sansapatcher/sansaio-posix.c
 }

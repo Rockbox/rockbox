@@ -22,6 +22,7 @@
 #include "configure.h"
 #include "autodetection.h"
 #include "ui_configurefrm.h"
+#include "browsedirtree.h"
 
 #ifdef __linux
 #include <stdio.h>
@@ -326,21 +327,24 @@ void Config::updateLanguage()
 
 void Config::browseFolder()
 {
-    QFileDialog browser(this);
-    if(QFileInfo(ui.mountPoint->text()).isDir())
-        browser.setDirectory(ui.mountPoint->text());
-    else
-        browser.setDirectory("/media");
-    browser.setReadOnly(true);
-    browser.setFileMode(QFileDialog::DirectoryOnly);
-    browser.setAcceptMode(QFileDialog::AcceptOpen);
-    if(browser.exec()) {
-        qDebug() << browser.directory();
-        QStringList files = browser.selectedFiles();
-        ui.mountPoint->setText(files.at(0));
-        userSettings->setValue("defaults/mountpoint", files.at(0));
-    }
+    browser = new BrowseDirtree(this);
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
+    browser->setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+#elif defined(Q_OS_WIN32)
+    browser->setFilter(QDir::Drives);
+#endif
+    QDir d(ui.mountPoint->text());
+    browser->setDir(d);
+    browser->show();
+    connect(browser, SIGNAL(itemChanged(QString)), this, SLOT(setMountpoint(QString)));
 }
+
+
+void Config::setMountpoint(QString m)
+{
+    ui.mountPoint->setText(m);
+}
+
 
 void Config::autodetect()
 {
@@ -394,3 +398,4 @@ void Config::autodetect()
         
     }
 }
+
