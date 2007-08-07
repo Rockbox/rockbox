@@ -20,6 +20,8 @@
 #include "installtalkwindow.h"
 #include "ui_installtalkfrm.h"
 
+#include "browsedirtree.h"
+
 InstallTalkWindow::InstallTalkWindow(QWidget *parent) : QDialog(parent)
 {
     ui.setupUi(this);
@@ -43,18 +45,23 @@ InstallTalkWindow::InstallTalkWindow(QWidget *parent) : QDialog(parent)
 
 void InstallTalkWindow::browseFolder()
 {
-    QFileDialog browser(this);
+    BrowseDirtree browser(this);
+    browser.setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+    
     if(QFileInfo(ui.lineTalkFolder->text()).isDir())
-        browser.setDirectory(ui.lineTalkFolder->text());
+    {
+        QDir d(ui.lineTalkFolder->text());
+        browser.setDir(d);
+    }
     else
-        browser.setDirectory("/media");
-    browser.setReadOnly(true);
-    browser.setFileMode(QFileDialog::DirectoryOnly);
-    browser.setAcceptMode(QFileDialog::AcceptOpen);
-    if(browser.exec()) {
-        qDebug() << browser.directory();
-        QStringList files = browser.selectedFiles();
-        setTalkFolder(files.at(0));
+    {
+        QDir d("/media");
+        browser.setDir(d);
+    }
+    if(browser.exec() == QDialog::Accepted)
+    {
+        qDebug() << browser.getSelected();
+        setTalkFolder(browser.getSelected());
     }
 }
 
@@ -66,19 +73,25 @@ void InstallTalkWindow::setTalkFolder(QString folder)
 
 void InstallTalkWindow::browseTTS()
 {
-    QFileDialog browser(this);
+    BrowseDirtree browser(this);
+    browser.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
+    
     if(QFileInfo(ui.TTSpath->text()).isDir())
-        browser.setDirectory(ui.TTSpath->text());
-    else
-        browser.setDirectory("/media");
-    browser.setReadOnly(true);
-    browser.setFileMode(QFileDialog::ExistingFile);
-    browser.setAcceptMode(QFileDialog::AcceptOpen);
-    if(browser.exec()) {
-        qDebug() << browser.directory();
-        QStringList files = browser.selectedFiles();
-        setTTSExec(files.at(0));
+    {
+        QDir d(ui.TTSpath->text());
+        browser.setDir(d);
     }
+    else
+    {
+        QDir d("/media");
+        browser.setDir(d);
+    }
+    if(browser.exec() == QDialog::Accepted)
+    {
+        qDebug() << browser.getSelected();
+        setTTSExec(browser.getSelected());
+    }
+    
 }
 
 void InstallTalkWindow::setTTSExec(QString path)
@@ -89,18 +102,23 @@ void InstallTalkWindow::setTTSExec(QString path)
 
 void InstallTalkWindow::browseEncoder()
 {
-    QFileDialog browser(this);
+    BrowseDirtree browser(this);
+    browser.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
+        
     if(QFileInfo(ui.Encoderpath->text()).isDir())
-        browser.setDirectory(ui.Encoderpath->text());
+    {
+       QDir d(ui.Encoderpath->text());
+       browser.setDir(d);
+    }
     else
-        browser.setDirectory("/media");
-    browser.setReadOnly(true);
-    browser.setFileMode(QFileDialog::ExistingFile);
-    browser.setAcceptMode(QFileDialog::AcceptOpen);
-    if(browser.exec()) {
-        qDebug() << browser.directory();
-        QStringList files = browser.selectedFiles();
-        setEncoderExec(files.at(0));
+    {
+       QDir d("/media");
+       browser.setDir(d);
+    }
+    if(browser.exec() == QDialog::Accepted)
+    {
+        qDebug() << browser.getSelected();
+        setEncoderExec(browser.getSelected());
     }
 }
 

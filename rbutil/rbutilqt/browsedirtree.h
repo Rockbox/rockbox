@@ -31,7 +31,8 @@ class BrowseDirtree : public QDialog
         BrowseDirtree(QWidget *parent = 0);
         void setFilter(QDir::Filters);
         void setDir(QDir&);
-
+        QString getSelected();
+        
     signals:
         void itemChanged(QString);
 

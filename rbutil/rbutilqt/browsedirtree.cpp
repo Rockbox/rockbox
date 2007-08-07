@@ -65,6 +65,14 @@ void BrowseDirtree::accept()
 
     this->close();
     emit itemChanged(path);
+    setResult(QDialog::Accepted); 
+}
+
+QString BrowseDirtree::getSelected()
+{
+    QString path;
+    path = model.filePath(ui.tree->currentIndex());
+    return path;
 }
 
 
