@@ -107,7 +107,7 @@ static void search_buffer(void){
         fill_buffer(buffer_pos);
 }
 
-static void clear_display(){
+static void clear_display(void){
     int i;
     FOR_NB_SCREENS(i){
         rb->screens[i]->clear_display();
