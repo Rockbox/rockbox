@@ -191,7 +191,7 @@ static void load_voicefile(void)
             
 #ifdef ROCKBOX_LITTLE_ENDIAN
     logf("Byte swapping voice file");
-    structec_convert(audiobuf, "llll", 1, true);
+    structec_convert(audiobuf, "llllll", 1, true);
 #endif
 
     if (((struct voicefile*)audiobuf)->table /* format check */
