@@ -314,7 +314,7 @@ STOP
                 }
                 print VIEWERS $line;
             }
-            elsif(-e ".rockbox/$r") {
+            elsif(-e ".rockbox/rocks/$r") {
                 # in case the same plugin works for multiple extensions, it
                 # was already moved to the viewers dir
                 print VIEWERS $line;
