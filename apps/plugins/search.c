@@ -42,22 +42,20 @@ static int line_end;   /* Index of the end of line */
 char resultfile[MAX_PATH];
 char path[MAX_PATH];
 
-static int strpcasecmp(const char *s1, const char *s2) 	 
-{ 	 
-    while (*s1 != '\0' && tolower(*s1) == tolower(*s2)) { 	 
-        s1++; 	 
-        s2++; 	 
-    } 	 
-    
-    return (*s1 == '\0') ; 	 
+static int strpcasecmp(const char *s1, const char *s2){
+    while (*s1 != '\0' && tolower(*s1) == tolower(*s2)) {
+        s1++;
+        s2++;
+    }
+
+    return (*s1 == '\0');
 }
 
-static void fill_buffer(int pos)
-{
+static void fill_buffer(int pos){
     int numread;
     int i;
     int found = false ;
-    const char crlf = '\n'; 
+    const char crlf = '\n';
 
     if (pos>=file_size-BUFFER_SIZE)
         pos = file_size-BUFFER_SIZE;
@@ -71,57 +69,57 @@ static void fill_buffer(int pos)
     line_end = 0;
 
     for(i=0;i<numread;i++) {
-	switch(buffer[i]) {
-	    case '\r':
-		buffer[i] = ' ';
-		break;
+        switch(buffer[i]) {
+            case '\r':
+                buffer[i] = ' ';
+                break;
             case '\n':
-		buffer[i] = 0;
-		buffer_pos = pos + i +1 ;
+                buffer[i] = 0;
+                buffer_pos = pos + i +1 ;
 
-		if (found)
-		{
-		    /* write to playlist */
-		    rb->write(fdw, &buffer[line_end],
+                if (found){
+                    /* write to playlist */
+                    rb->write(fdw, &buffer[line_end],
                               rb->strlen( &buffer[line_end] ));
-		    rb->write(fdw, &crlf, 1);
-		    
-		    found = false ;
-		    results++ ;
-		}
-		line_end = i +1 ;
-                
-		break;
-                
+                    rb->write(fdw, &crlf, 1);
+
+                    found = false ;
+                    results++ ;
+                }
+                line_end = i +1 ;
+
+                break;
+
             default:
-	    	if (!found && tolower(buffer[i]) == tolower(search_string[0]))
-		{
+                if (!found && tolower(buffer[i]) == tolower(search_string[0]))
                     found = strpcasecmp(&search_string[0],&buffer[i]) ;
-		}
-		break;
-	}
+                break;
+        }
     }
     DEBUGF("\n-------------------\n");
 }
 
-static void search_buffer(void)
-{
+static void search_buffer(void){
     buffer_pos = 0;
- 
+
     fill_buffer(0);
-    while ((buffer_pos+1) < file_size) {
-	fill_buffer(buffer_pos);	
+    while ((buffer_pos+1) < file_size)
+        fill_buffer(buffer_pos);
+}
+
+static void clear_display(){
+    int i;
+    FOR_NB_SCREENS(i){
+        rb->screens[i]->clear_display();
     }
 }
 
-static bool search_init(char* file)
-{
+static bool search_init(char* file){
     rb->memset(search_string, 0, sizeof(search_string));
-    
-    if (!rb->kbd_input(search_string,sizeof search_string))
-    {
-        rb->lcd_clear_display();
-        rb->splash(0, "Searching...");	
+
+    if (!rb->kbd_input(search_string,sizeof search_string)){
+        clear_display();
+        rb->splash(0, "Searching...");
         fd = rb->open(file, O_RDONLY);
         if (fd==-1)
             return false;
@@ -136,12 +134,12 @@ static bool search_init(char* file)
 #endif
             return false;
         }
-   
+
         file_size = rb->lseek(fd, 0, SEEK_END);
 
         return true;
     }
-    
+
     return false ;
 }
 
@@ -163,19 +161,18 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
 
     rb->strcpy(path, filename);
-    
+
     p = rb->strrchr(path, '/');
     if(p)
         *p = 0;
 
     rb->snprintf(resultfile, MAX_PATH, "%s/search_result.m3u", path);
     ok = search_init(parameter);
-    if (!ok) {
-    	return PLUGIN_ERROR;
-    }
+    if (!ok)
+        return PLUGIN_ERROR;
     search_buffer();
 
-    rb->lcd_clear_display();
+    clear_display();
     rb->splash(HZ, "Done");
     rb->close(fdw);
     rb->close(fd);
