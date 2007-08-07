@@ -1,3 +1,17 @@
+unix:!mac {
+    CCACHE = $$system(which ccache)
+    !isEmpty(CCACHE) {
+        message("using ccache")
+        QMAKE_CXX = ccache g++
+        QMAKE_CC = ccache gcc
+    }
+}
+
+OBJECTS_DIR = build/o
+UI_DIR = build/ui
+MOC_DIR = build/moc
+RCC_DIR = build/rcc
+
 SOURCES += rbutilqt.cpp \
            main.cpp \
  install.cpp \
@@ -50,6 +64,9 @@ HEADERS += rbutilqt.h \
  irivertools/checksums.h \
  browsedirtree.h 
 
+# Needed by QT on Win
+INCLUDEPATH = . irivertools zip zlib ../ipodpatcher ../sansapatcher
+ 
 TEMPLATE = app
 CONFIG += release \
           warn_on \
