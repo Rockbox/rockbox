@@ -130,11 +130,14 @@ p, li { white-space: pre-wrap; }
     <item row="2" column="0" >
      <widget class="QTabWidget" name="tabWidget" >
       <property name="currentIndex" >
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="quickStart" >
        <attribute name="title" >
         <string>&amp;Quick Start</string>
+       </attribute>
+       <attribute name="toolTip" >
+        <string>Welcome</string>
        </attribute>
        <layout class="QGridLayout" >
         <item row="0" column="0" >
@@ -237,6 +240,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QWidget" name="installation" >
        <attribute name="title" >
         <string>&amp;Installation</string>
+       </attribute>
+       <attribute name="toolTip" >
+        <string>Basic Rockbox installation</string>
        </attribute>
        <layout class="QGridLayout" >
         <item row="0" column="0" >
@@ -344,6 +350,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QWidget" name="extras" >
        <attribute name="title" >
         <string>&amp;Extras</string>
+       </attribute>
+       <attribute name="toolTip" >
+        <string>Install extras for Rockbox</string>
        </attribute>
        <layout class="QGridLayout" >
         <item row="0" column="0" >
@@ -462,7 +471,47 @@ p, li { white-space: pre-wrap; }
           </property>
          </spacer>
         </item>
-        <item row="3" column="0" >
+       </layout>
+      </widget>
+      <widget class="QWidget" name="accessibility" >
+       <attribute name="title" >
+        <string>&amp;Accessibility</string>
+       </attribute>
+       <attribute name="toolTip" >
+        <string>Install accessibility add-ons</string>
+       </attribute>
+       <layout class="QGridLayout" >
+        <item row="0" column="0" >
+         <widget class="QToolButton" name="buttonVoice" >
+          <property name="text" >
+           <string>Install Voice files</string>
+          </property>
+          <property name="icon" >
+           <iconset resource="rbutilqt.qrc" >:/icons/icons/talkfile_btn.png</iconset>
+          </property>
+          <property name="iconSize" >
+           <size>
+            <width>56</width>
+            <height>46</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" >
+         <widget class="QLabel" name="labelVoice" >
+          <property name="text" >
+           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600;">Install Voice file&lt;/span>&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Voice files are needed to make Rockbox speak the user interface. Speaking is enabled by default, so if you installed the voice file Rockbox will speak.&lt;/p>&lt;/body>&lt;/html></string>
+          </property>
+          <property name="wordWrap" >
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" >
          <widget class="QToolButton" name="buttonTalk" >
           <property name="text" >
            <string>Install Talk files</string>
@@ -478,8 +527,8 @@ p, li { white-space: pre-wrap; }
           </property>
          </widget>
         </item>
-        <item row="3" column="1" >
-         <widget class="QLabel" name="label" >
+        <item row="1" column="1" >
+         <widget class="QLabel" name="labelTalk" >
           <property name="text" >
            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
 p, li { white-space: pre-wrap; }
@@ -489,11 +538,40 @@ p, li { white-space: pre-wrap; }
           </property>
          </widget>
         </item>
+        <item row="2" column="0" >
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" >
+           <size>
+            <width>20</width>
+            <height>51</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="2" column="1" >
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" >
+           <size>
+            <width>20</width>
+            <height>51</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="uninstall" >
        <attribute name="title" >
         <string>&amp;Uninstallation</string>
+       </attribute>
+       <attribute name="toolTip" >
+        <string>Uninstall Rockbox</string>
        </attribute>
        <layout class="QGridLayout" >
         <item row="0" column="0" >
@@ -593,6 +671,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QWidget" name="manual" >
        <attribute name="title" >
         <string>&amp;Manual</string>
+       </attribute>
+       <attribute name="toolTip" >
+        <string>View and download the manual</string>
        </attribute>
        <layout class="QGridLayout" >
         <item row="0" column="0" >
@@ -702,7 +783,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>600</width>
-     <height>21</height>
+     <height>29</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File" >
