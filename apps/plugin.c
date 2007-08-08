@@ -508,7 +508,6 @@ int plugin_load(const char* plugin, void* parameter)
 {
     int rc;
     struct plugin_header *hdr;
-    const char *p = strrchr(plugin,'/');
 #ifdef SIMULATOR
     void *pd;
 #else
@@ -524,12 +523,9 @@ int plugin_load(const char* plugin, void* parameter)
     fb_data* old_backdrop;
 #endif
 
-    if (!p)
-        p = plugin;
-
     if (pfn_tsr_exit != NULL) /* if we have a resident old plugin: */
     {
-        if (pfn_tsr_exit(!strcmp(current_plugin,p)) == false )
+        if (pfn_tsr_exit(!strcmp(current_plugin, plugin)) == false )
         {
             /* not allowing another plugin to load */
             return PLUGIN_OK;
@@ -539,7 +535,7 @@ int plugin_load(const char* plugin, void* parameter)
     }
 
     gui_syncsplash(0, ID2P(LANG_WAIT));
-    strcpy(current_plugin,p);
+    strcpy(current_plugin, plugin);
 
 #ifdef SIMULATOR
     hdr = sim_plugin_load((char *)plugin, &pd);
