@@ -100,7 +100,8 @@ struct voicefile /* file format of our voice file */
     int id1_max; /* number of "normal" clips contained in above index */
     int id2_max; /* number of "voice only" clips contained in above index */
     struct clip_entry index[]; /* followed by the index tables */
-    /* and finally the bitswapped mp3 clips, not visible here */
+    /* and finally the mp3 clips, not visible here, bitswapped 
+       for SH based players */
 };
 
 struct queue_entry /* one entry of the internal queue */
@@ -188,10 +189,10 @@ static void load_voicefile(void)
     got_size = read(filehandle, audiobuf, load_size);
     if (got_size != load_size /* failure */)
         goto load_err;
-            
+
 #ifdef ROCKBOX_LITTLE_ENDIAN
     logf("Byte swapping voice file");
-    structec_convert(audiobuf, "llllll", 1, true);
+    structec_convert(audiobuf, "lllll", 1, true);
 #endif
 
     if (((struct voicefile*)audiobuf)->table /* format check */
