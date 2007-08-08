@@ -40,10 +40,10 @@ void BrowseDirtree::setDir(QDir &dir)
 {
     qDebug() << "BrowseDirtree::setDir()" << model.index(dir.absolutePath());
 
+    // do not try to hilight directory if it's not valid.
+    if(!dir.exists()) return;
     // hilight the set directory if it's valid
     if(model.index(dir.absolutePath()).isValid()) {
-        model.index(dir.absolutePath()).parent();
-
         QModelIndex p = model.index(dir.absolutePath());
         ui.tree->setCurrentIndex(p);
         ui.tree->scrollTo(p);
