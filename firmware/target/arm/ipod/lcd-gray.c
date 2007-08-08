@@ -30,26 +30,19 @@
 #include "system.h"
 
 
-/* check if number of useconds has past */
-static inline bool timer_check(int clock_start, int usecs)
-{
-    return ((int)(USEC_TIMER - clock_start)) >= usecs;
-}
-
 /*** hardware configuration ***/
 
 #if CONFIG_CPU == PP5002
-#define IPOD_LCD_BASE            0xc0001000
-#define IPOD_LCD_BUSY_MASK       0x80000000
+#define IPOD_LCD_BASE       0xc0001000
 #else /* PP502x */
-#define IPOD_LCD_BASE            0x70003000
-#define IPOD_LCD_BUSY_MASK       0x00008000
+#define IPOD_LCD_BASE       0x70003000
 #endif
 
-/* LCD command codes for HD66753 */
-
+#define LCD_BUSY_MASK       0x00008000
 #define LCD_CMD  0x08
 #define LCD_DATA 0x10
+
+/* LCD command codes for HD66753 */
 
 #define R_START_OSC             0x00
 #define R_DRV_OUTPUT_CONTROL    0x01
@@ -89,11 +82,10 @@ static const unsigned char dibits[16] ICONST_ATTR = {
 /* wait for LCD with timeout */
 static inline void lcd_wait_write(void)
 {
-    int start = USEC_TIMER;
+    long timeout = USEC_TIMER + 1000; /* 1 ms */
 
-    do {
-        if ((inl(IPOD_LCD_BASE) & 0x8000) == 0) break;
-    } while (timer_check(start, 1000) == 0);
+    while ((inl(IPOD_LCD_BASE) & LCD_BUSY_MASK)
+           && TIME_BEFORE(USEC_TIMER, timeout));
 }
 
 
@@ -199,9 +191,9 @@ void lcd_set_backlight_inversion(bool yesno)
 void lcd_set_invert_display(bool yesno)
 {
     if (yesno)
-        lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0023);
+        lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0017);
     else
-        lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0009);
+        lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0015);
 }
 #endif
 
