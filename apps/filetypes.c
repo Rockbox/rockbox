@@ -448,7 +448,8 @@ int filetype_list_viewers(const char* current_file)
             int j;
             for (j=0;j<count;j++) /* check if the plugin is in the list yet */
             {
-                if (items[j] == i)
+                if (filetypes[i].plugin && 
+                    !strcmp(filetypes[i].plugin,filetypes[items[j]].plugin))
                     break;
             }
             if (j<count) 
@@ -479,9 +480,11 @@ int filetype_list_viewers(const char* current_file)
             continue;
         else if (action == ACTION_STD_OK)
         {
-            i = gui_synclist_get_sel_pos(&lists);
-            return filetype_load_plugin(filetypes[i].plugin,
-                                        (void*)current_file);
+            char plugin[MAX_PATH];
+            i = items[gui_synclist_get_sel_pos(&lists)];
+            snprintf(plugin, MAX_PATH, "%s/%s.%s",
+                     PLUGIN_DIR, filetypes[i].plugin, ROCK_EXTENSION);
+            return plugin_load(plugin, (char*)current_file);
         }
         else if (action == ACTION_STD_CANCEL)
             return action;
