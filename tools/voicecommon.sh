@@ -35,7 +35,7 @@ FESTIVAL_CLIENT=festival_client
 FLITE_BIN=flite
 
 # The eSpeak executable
-ESPEAK_BIN=speak
+ESPEAK_BIN=espeak
 
 # The lame executable
 LAME_BIN=lame

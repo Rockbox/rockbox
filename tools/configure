@@ -215,7 +215,7 @@ whichadvanced () {
   #
   echo ""
   echo "Enter your developer options (press enter when done)"
-  echo -n "(D)EBUG, (L)ogf, (S)imulator, (P)rofiling"
+  echo -n "(D)EBUG, (L)ogf, (S)imulator, (P)rofiling, (V)oice"
   if [ "$memory" = "2" ]; then
     echo -n ", (8)MB MOD"
   fi
@@ -255,6 +255,10 @@ whichadvanced () {
           profile="yes"
         fi
         ;;
+      [Vv])
+        echo "Voice build selected"
+        voice="yes"
+        ;;
       8)
         if [ "$memory" = "2" ]; then
           memory="8"
@@ -279,6 +283,10 @@ whichadvanced () {
   done
   echo "done"
 
+  if [ "yes" = "$voice" ]; then
+     voiceconfig
+     toolset="${toolset} voicefont wavtrim"
+  fi
   if [ "yes" = "$use_debug" ]; then
     debug="-DDEBUG"
     GCCOPTS="$GCCOPTS -g -DDEBUG"
@@ -308,7 +316,7 @@ voiceconfig () {
         DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="L"
     fi
-    if [ `which speak` ]; then
+    if [ `which espeak` ]; then
         ESPEAK="(e)Speak "
         ESPEAK_OPTS="ESPEAK_OPTS=\"\""
         DEFAULT_TTS="espeak"
@@ -383,27 +391,27 @@ voiceconfig () {
         echo "You need to have Lame installed to build voice files"
     fi
 
-    echo "Encoder to use: ${LAME}${OGGENC}${SPEEXENC}(${DEFAULT_CHOICE})?"
-    echo ""
-    echo "Note: Use Lame - the other options won't work"
-    option=`input`
-    case "$option" in
-        [Oo])
-        ENCODER="oggenc"
-        ENC_OPTS=$VORBIS_OPTS
-        ;;
-        [Ss])
-        ENCODER="speexenc"
-        ENC_OPTS=$SPEEX_OPTS
-        ;;
-        [Ll])
+#    echo "Encoder to use: ${LAME}${OGGENC}${SPEEXENC}(${DEFAULT_CHOICE})?"
+#    echo ""
+#    echo "Note: Use Lame - the other options won't work"
+#    option=`input`
+#    case "$option" in
+#        [Oo])
+#        ENCODER="oggenc"
+#        ENC_OPTS=$VORBIS_OPTS
+#        ;;
+#        [Ss])
+#        ENCODER="speexenc"
+#        ENC_OPTS=$SPEEX_OPTS
+#        ;;
+#        [Ll])
         ENCODER="lame"
         ENC_OPTS=$LAME_OPTS
-        ;;
-        *)
-        ENCODER=$DEFAULT_ENC
-        ENC_OPTS=$DEFAULT_ENC_OPTS
-    esac
+#        ;;
+#        *)
+#        ENCODER=$DEFAULT_ENC
+#        ENC_OPTS=$DEFAULT_ENC_OPTS
+#    esac
     echo "Using $ENCODER for encoding voice clips"
 
     cat > voicesettings.sh <<EOF
@@ -1312,7 +1320,7 @@ fi
   esac
 
   echo ""
-  echo "Build (N)ormal, (A)dvanced, (S)imulator, (B)ootloader, $gdbstub(M)anual, (V)oice? (N)"
+  echo "Build (N)ormal, (A)dvanced, (S)imulator, (B)ootloader, $gdbstub(M)anual (N)"
 
   option=`input`;
 
@@ -1369,12 +1377,6 @@ fi
       apps="manual"
       echo "Manual build selected"
       ;;
-    [Vv])
-      echo "Voice build selected"
-      voiceconfig
-      toolset="${toolset} voicefont wavtrim"
-      voice="yes"
-      ;;
     *)
       debug=""
       echo "Normal build selected"
@@ -1414,13 +1416,13 @@ if [ "yes" = "$voice" ]; then
     echo "Select a number for the language to use (default is english)"
 
     picklang
-    language=`whichlang`
+    voicelanguage=`whichlang`
 
-    if [ -z "$language" ]; then
+    if [ -z "$voicelanguage" ]; then
         # pick a default
-        language="english"
+        voicelanguage="english"
     fi
-    echo "Language set to $language"
+    echo "Voice language set to $voicelanguage"
 fi
 
 uname=`uname`
@@ -1573,6 +1575,7 @@ sed > Makefile \
  -e "s,@MANUFACTURER@,${t_manufacturer},g" \
  -e "s,@ARCHOS@,${archos},g" \
  -e "s,@LANGUAGE@,${language},g" \
+ -e "s,@VOICELANGUAGE@,${voicelanguage},g" \
  -e "s,@PWD@,${pwd},g" \
  -e "s,@CC@,${CC},g" \
  -e "s,@LD@,${LD},g" \
@@ -1646,6 +1649,7 @@ export MANUFACTURER=@MANUFACTURER@
 export OBJDIR=@PWD@
 export BUILDDIR=@PWD@
 export LANGUAGE=@LANGUAGE@
+export VOICELANGUAGE=@VOICELANGUAGE@
 export MEMORYSIZE=@MEMORY@
 export VERSION=\$(shell \$(ROOTDIR)/tools/svnversion.sh \$(ROOTDIR))
 export BUILDDATE=\$(shell date -u +'-DYEAR=%Y -DMONTH=%m -DDAY=%d')
@@ -1723,7 +1727,7 @@ clean:
 voice: tools
 	\$(SILENT)\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@ features
 	\$(SILENT)for f in \`cat \$(BUILDDIR)/@APPS@/features\`; do feat="\$\$feat:\$\$f" ; done ; \\
-	\$(TOOLSDIR)/genvoice.sh \$(ROOTDIR) \$(LANGUAGE) \$(ARCHOS)\$\$feat \$(TARGET_ID) voicesettings.sh
+	\$(TOOLSDIR)/genvoice.sh \$(ROOTDIR) \$(VOICELANGUAGE) \$(ARCHOS)\$\$feat \$(TARGET_ID) voicesettings.sh
 
 tools:
 	\$(SILENT)\$(MAKE) -C \$(TOOLSDIR) CC=\$(HOSTCC) @TOOLSET@
