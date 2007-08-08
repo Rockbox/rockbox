@@ -123,8 +123,8 @@ long reverse (long N) {
 #endif
 
 /* data files */
-#define DICT_INDEX ROCKBOX_DIR "/dict.index"
-#define DICT_DESC ROCKBOX_DIR "/dict.desc"
+#define DICT_INDEX ROCKBOX_DIR "/rocks/apps/dict.index"
+#define DICT_DESC ROCKBOX_DIR "/rocks/apps/dict.desc"
 
 /* the main plugin function */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
