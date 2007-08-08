@@ -289,6 +289,11 @@ static void dump_wps_tokens(struct wps_data *data)
                          next_str(next));
                 break;
 
+            case WPS_TOKEN_METADATA_GROUPING:
+                snprintf(buf, sizeof(buf), "%strack grouping",
+                         next_str(next));
+                break;
+
             case WPS_TOKEN_METADATA_GENRE:
                 snprintf(buf, sizeof(buf), "%strack genre",
                          next_str(next));

@@ -280,6 +280,18 @@ long parse_tag(const char* name, char* value, struct mp3entry* id3,
     {
         p = &(id3->albumartist);
     }
+    else if (strcasecmp(name, "grouping") == 0)
+    {
+        p = &(id3->grouping);
+    }
+    else if (strcasecmp(name, "content group") == 0)
+    {
+        p = &(id3->grouping);
+    }
+    else if (strcasecmp(name, "contentgroup") == 0) 
+    {
+        p = &(id3->grouping);
+    }
     else
     {
         len = parse_replaygain(name, value, id3, buf, buf_remaining);

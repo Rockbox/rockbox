@@ -200,6 +200,7 @@ static int get_tag(int *tag)
     MATCH(tag, buf, "comment", tag_comment);
     MATCH(tag, buf, "albumartist", tag_albumartist);
     MATCH(tag, buf, "ensemble", tag_albumartist);
+    MATCH(tag, buf, "grouping", tag_grouping);
     MATCH(tag, buf, "genre", tag_genre);
     MATCH(tag, buf, "length", tag_length);
     MATCH(tag, buf, "Lm", tag_virt_length_min);

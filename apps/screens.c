@@ -1151,6 +1151,7 @@ static const int id3_headers[]=
     LANG_ID3_ARTIST,
     LANG_ID3_ALBUM,
     LANG_ID3_ALBUMARTIST,
+    LANG_ID3_GROUPING,
     LANG_ID3_DISCNUM,
     LANG_ID3_TRACKNUM,
     LANG_ID3_COMMENT,
@@ -1193,7 +1194,10 @@ static char * id3_get_info(int selected_item, void* data, char *buffer)
             case 3:/*LANG_ID3_ALBUMARTIST*/
                 info=id3->albumartist;
                 break;
-            case 4:/*LANG_ID3_DISCNUM*/
+            case 4:/*LANG_ID3_ALBUMARTIST*/
+                info=id3->grouping;
+                break;
+            case 5:/*LANG_ID3_DISCNUM*/
                 if (id3->disc_string)
                     info = id3->disc_string;
                 else if (id3->discnum)
@@ -1202,7 +1206,7 @@ static char * id3_get_info(int selected_item, void* data, char *buffer)
                     info = buffer;
                 }
                 break;
-            case 5:/*LANG_ID3_TRACKNUM*/
+            case 6:/*LANG_ID3_TRACKNUM*/
                 if (id3->track_string)
                     info = id3->track_string;
                 else if (id3->tracknum)
@@ -1211,13 +1215,13 @@ static char * id3_get_info(int selected_item, void* data, char *buffer)
                     info = buffer;
                 }
                 break;
-            case 6:/*LANG_ID3_COMMENT*/
+            case 7:/*LANG_ID3_COMMENT*/
                 info=id3->comment;
                 break;
-            case 7:/*LANG_ID3_GENRE*/
+            case 8:/*LANG_ID3_GENRE*/
                 info = id3->genre_string;
                 break;
-            case 8:/*LANG_ID3_YEAR*/
+            case 9:/*LANG_ID3_YEAR*/
                 if (id3->year_string)
                     info = id3->year_string;
                 else if (id3->year)
@@ -1226,34 +1230,34 @@ static char * id3_get_info(int selected_item, void* data, char *buffer)
                     info = buffer;
                 }
                 break;
-            case 9:/*LANG_ID3_LENGTH*/
+            case 10:/*LANG_ID3_LENGTH*/
                 format_time(buffer, MAX_PATH, id3->length);
                 info=buffer;
                 break;
-            case 10:/*LANG_ID3_PLAYLIST*/
+            case 11:/*LANG_ID3_PLAYLIST*/
                 snprintf(buffer, MAX_PATH, "%d/%d", playlist_get_display_index(),
             playlist_amount());
                 info=buffer;
                 break;
-            case 11:/*LANG_ID3_BITRATE*/
+            case 12:/*LANG_ID3_BITRATE*/
                 snprintf(buffer, MAX_PATH, "%d kbps%s", id3->bitrate,
             id3->vbr ? str(LANG_ID3_VBR) : (const unsigned char*) "");
                 info=buffer;
                 break;
-            case 12:/*LANG_ID3_FREQUENCY*/
+            case 13:/*LANG_ID3_FREQUENCY*/
                 snprintf(buffer, MAX_PATH, "%ld Hz", id3->frequency);
                 info=buffer;
                 break;
 #if CONFIG_CODEC == SWCODEC
-            case 13:/*LANG_ID3_TRACK_GAIN*/
+            case 14:/*LANG_ID3_TRACK_GAIN*/
                 info=id3->track_gain_string;
                 break;
-            case 14:/*LANG_ID3_ALBUM_GAIN*/
+            case 15:/*LANG_ID3_ALBUM_GAIN*/
                 info=id3->album_gain_string;
                 break;
-            case 15:/*LANG_ID3_PATH*/
+            case 16:/*LANG_ID3_PATH*/
 #else
-            case 13:/*LANG_ID3_PATH*/
+            case 17:/*LANG_ID3_PATH*/
 #endif
                 info=id3->path;
                 break;

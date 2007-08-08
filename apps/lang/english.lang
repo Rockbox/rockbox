@@ -11004,3 +11004,17 @@
     *: "Demos"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ID3_GROUPING
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Work]"
+  </source>
+  <dest>
+    *: "[Work]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>

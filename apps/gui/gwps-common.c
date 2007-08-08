@@ -866,6 +866,9 @@ static char *get_token_value(struct gui_wps *gwps,
         case WPS_TOKEN_METADATA_ALBUM_ARTIST:
             return id3->albumartist;
 
+        case WPS_TOKEN_METADATA_GROUPING:
+            return id3->grouping;
+            
         case WPS_TOKEN_METADATA_GENRE:
             return id3->genre_string;
 

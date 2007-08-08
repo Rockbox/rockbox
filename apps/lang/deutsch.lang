@@ -11017,3 +11017,17 @@
     *: "Als Aufnahmeverzeichnis festlegen"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ID3_GROUPING
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Work]"
+  </source>
+  <dest>
+    *: "[Werk]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>

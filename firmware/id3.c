@@ -460,7 +460,9 @@ static const struct tag_resolver taglist[] = {
     { "TYE",  3, offsetof(struct mp3entry, year_string), &parseyearnum, false },
     { "TCOM", 4, offsetof(struct mp3entry, composer), NULL, false },
     { "TPE2", 4, offsetof(struct mp3entry, albumartist), NULL, false },
-    { "TP2", 3, offsetof(struct mp3entry, albumartist), NULL, false },
+    { "TP2",  3, offsetof(struct mp3entry, albumartist), NULL, false },
+    { "TIT1", 4, offsetof(struct mp3entry, grouping), NULL, false },
+    { "TT1",  3, offsetof(struct mp3entry, grouping), NULL, false },
     { "COMM", 4, offsetof(struct mp3entry, comment), NULL, false }, 
     { "TCON", 4, offsetof(struct mp3entry, genre_string), &parsegenre, false },
     { "TCO",  3, offsetof(struct mp3entry, genre_string), &parsegenre, false },
@@ -1192,6 +1194,8 @@ void adjust_mp3entry(struct mp3entry *entry, void *dest, void *orig)
         entry->comment += offset;
     if (entry->albumartist)
         entry->albumartist += offset;
+    if (entry->grouping)
+        entry->grouping += offset;
 #if CONFIG_CODEC == SWCODEC
     if (entry->track_gain_string)
         entry->track_gain_string += offset;

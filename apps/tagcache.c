@@ -108,11 +108,11 @@ static long tempbuf_pos;
 
 /* Tags we want to get sorted (loaded to the tempbuf). */
 static const int sorted_tags[] = { tag_artist, tag_album, tag_genre, 
-    tag_composer, tag_comment, tag_albumartist, tag_title };
+    tag_composer, tag_comment, tag_albumartist, tag_grouping, tag_title };
 
 /* Uniqued tags (we can use these tags with filters and conditional clauses). */
 static const int unique_tags[] = { tag_artist, tag_album, tag_genre, 
-    tag_composer, tag_comment, tag_albumartist };
+    tag_composer, tag_comment, tag_albumartist, tag_grouping };
 
 /* Numeric tags (we can use these tags with conditional clauses). */
 static const int numeric_tags[] = { tag_year, tag_discnumber, tag_tracknumber, tag_length,
@@ -123,7 +123,7 @@ static const int numeric_tags[] = { tag_year, tag_discnumber, tag_tracknumber, t
 
 /* String presentation of the tags defined in tagcache.h. Must be in correct order! */
 static const char *tags_str[] = { "artist", "album", "genre", "title", 
-    "filename", "composer", "comment", "albumartist", "year", "discnumber", "tracknumber",
+    "filename", "composer", "comment", "albumartist", "grouping", "year", "discnumber", "tracknumber",
     "bitrate", "length", "playcount", "rating", "playtime", "lastplayed", "commitid" };
 
 /* Status information of the tagcache. */
@@ -188,7 +188,7 @@ struct master_header {
 
 /* For the endianess correction */
 static const char *tagfile_entry_ec   = "ss";
-static const char *index_entry_ec     = "lllllllllllllllllll"; /* (1 + TAG_COUNT) * l */
+static const char *index_entry_ec     = "llllllllllllllllllll"; /* (1 + TAG_COUNT) * l */
 static const char *tagcache_header_ec = "lll";
 static const char *master_header_ec   = "llllll";
 
@@ -1549,6 +1549,7 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
     id3->composer     = get_tag_string(entry, tag_composer);
     id3->comment      = get_tag_string(entry, tag_comment);
     id3->albumartist  = get_tag_string(entry, tag_albumartist);
+    id3->grouping     = get_tag_string(entry, tag_grouping);
 
     id3->playcount  = get_tag_numeric(entry, tag_playcount);
     id3->rating     = get_tag_numeric(entry, tag_rating);
@@ -1615,6 +1616,7 @@ static void add_tagcache(char *path)
     int offset = 0;
     int path_length = strlen(path);
     bool has_albumartist;
+    bool has_grouping;
 
     if (cachefd < 0)
         return ;
@@ -1708,6 +1710,8 @@ static void add_tagcache(char *path)
     /* String tags. */
     has_albumartist = track.id3.albumartist != NULL
         && strlen(track.id3.albumartist) > 0;
+    has_grouping = track.id3.grouping != NULL
+        && strlen(track.id3.grouping) > 0;
 
     ADD_TAG(entry, tag_filename, &path);
     ADD_TAG(entry, tag_title, &track.id3.title);
@@ -1723,6 +1727,14 @@ static void add_tagcache(char *path)
     else
     {
         ADD_TAG(entry, tag_albumartist, &track.id3.artist);
+    }
+    if (has_grouping)
+    {
+        ADD_TAG(entry, tag_grouping, &track.id3.grouping);
+    }
+    else
+    {
+        ADD_TAG(entry, tag_grouping, &track.id3.title);
     }
     entry.data_length = offset;
     
@@ -1744,6 +1756,14 @@ static void add_tagcache(char *path)
     else
     {
         write_item(track.id3.artist);
+    }
+    if (has_grouping)
+    {
+        write_item(track.id3.grouping);
+    }
+    else
+    {
+        write_item(track.id3.title);
     }
     total_entry_count++;    
 }
