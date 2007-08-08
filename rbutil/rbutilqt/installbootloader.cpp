@@ -733,7 +733,7 @@ void BootloaderInstaller::ipodFinish()
 *** sansa secific code 
 ***************************************************/
 // reserves memory for sansapatcher
-bool initSansaPatcher()
+bool initSansapatcher()
 {
       if (sansa_alloc_buffer(&sectorbuf,BUFFER_SIZE) < 0) return true;
       else return false;

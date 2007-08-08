@@ -90,6 +90,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     ui.buttonComplete->setEnabled(false);
 
     initIpodpatcher();
+    initSansapatcher();
     downloadInfo();
 
 }
@@ -351,9 +352,9 @@ void RbUtilQt::installDoom()
 
 void RbUtilQt::createTalkFiles(void)
 {
-	InstallTalkWindow *installWindow = new InstallTalkWindow(this);
-	installWindow->setUserSettings(userSettings);
-	installWindow->setDeviceSettings(devices);
-	installWindow->show();
+    InstallTalkWindow *installWindow = new InstallTalkWindow(this);
+    installWindow->setUserSettings(userSettings);
+    installWindow->setDeviceSettings(devices);
+    installWindow->show();
 
 }
