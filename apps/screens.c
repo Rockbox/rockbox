@@ -1194,7 +1194,7 @@ static char * id3_get_info(int selected_item, void* data, char *buffer)
             case 3:/*LANG_ID3_ALBUMARTIST*/
                 info=id3->albumartist;
                 break;
-            case 4:/*LANG_ID3_ALBUMARTIST*/
+            case 4:/*LANG_ID3_GROUPING*/
                 info=id3->grouping;
                 break;
             case 5:/*LANG_ID3_DISCNUM*/
@@ -1257,7 +1257,7 @@ static char * id3_get_info(int selected_item, void* data, char *buffer)
                 break;
             case 16:/*LANG_ID3_PATH*/
 #else
-            case 17:/*LANG_ID3_PATH*/
+            case 14:/*LANG_ID3_PATH*/
 #endif
                 info=id3->path;
                 break;
