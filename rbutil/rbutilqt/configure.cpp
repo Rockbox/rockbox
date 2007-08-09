@@ -142,7 +142,7 @@ void Config::setUserSettings(QSettings *user)
     QString proxyType = userSettings->value("defaults/proxytype").toString();
     if(proxyType == "manual") ui.radioManualProxy->setChecked(true);
     else if(proxyType == "system") ui.radioSystemProxy->setChecked(true);
-    else if(proxyType == "none") ui.radioNoProxy->setChecked(true);
+    else ui.radioNoProxy->setChecked(true);
 
     // set language selection
     QList<QListWidgetItem*> a;
