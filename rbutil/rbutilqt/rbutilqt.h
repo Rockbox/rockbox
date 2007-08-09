@@ -63,6 +63,7 @@ class RbUtilQt : public QMainWindow
         void downloadDone(bool);
         void downloadDone(int, bool);
         void downloadInfo(void);
+        void installVoice(void);
 };
 
 #endif

@@ -80,6 +80,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     connect(ui.buttonFonts, SIGNAL(clicked()), this, SLOT(installFonts()));
     connect(ui.buttonGames, SIGNAL(clicked()), this, SLOT(installDoom()));
     connect(ui.buttonTalk, SIGNAL(clicked()), this, SLOT(createTalkFiles()));
+    connect(ui.buttonVoice, SIGNAL(clicked()), this, SLOT(installVoice()));
   
     
     // disable unimplemented stuff
@@ -315,6 +316,44 @@ void RbUtilQt::installFonts()
 
     installer->setLogSection("Fonts");
     installer->setMountPoint(userSettings->value("defaults/mountpoint").toString());
+    installer->install(logger);
+    
+    connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));
+}
+
+
+void RbUtilQt::installVoice()
+{
+    if(QMessageBox::question(this, tr("Confirm Installation"),
+       tr("Do you really want to install the voice file?"),
+       QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
+    // create logger
+    logger = new ProgressLoggerGui(this);
+    logger->show();
+
+    // create zip installer
+    installer = new ZipInstaller(this);
+    installer->setUnzip(false);
+    buildInfo.open();
+    QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
+    buildInfo.close();
+    QString datestring = info.value("dailies/date").toString();
+    
+    QString voiceurl = devices->value("voice_url").toString() + "/" +
+        userSettings->value("defaults/platform").toString() + "-" +
+        datestring + "-english.voice";
+    qDebug() << voiceurl;
+     if(userSettings->value("defaults/proxytype") == "manual")
+         installer->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
+ #ifdef __linux
+     else if(userSettings->value("defaults/proxytype") == "system")
+         installer->setProxy(QUrl(getenv("http_proxy")));
+ #endif
+
+    installer->setUrl(voiceurl);
+    installer->setLogSection("Voice");
+    installer->setMountPoint(userSettings->value("defaults/mountpoint").toString());
+    installer->setTarget("/.rockbox/langs/english.lang");
     installer->install(logger);
     
     connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));

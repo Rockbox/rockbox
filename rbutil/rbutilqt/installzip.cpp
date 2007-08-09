@@ -24,7 +24,7 @@
 
 ZipInstaller::ZipInstaller(QObject* parent): QObject(parent) 
 {
-
+    m_unzip = true;
 }
 
 
@@ -62,7 +62,7 @@ void ZipInstaller::downloadRequestFinished(int id, bool error)
 void ZipInstaller::downloadDone(bool error)
 {
     qDebug() << "Install::downloadDone, error:" << error;
-
+    QStringList zipContents; // needed later
      // update progress bar
      
     int max = m_dp->getProgressMax();
@@ -85,37 +85,63 @@ void ZipInstaller::downloadDone(bool error)
     }
     else m_dp->addItem(tr("Download finished."),LOGOK);
 
-    // unzip downloaded file
-    qDebug() << "about to unzip the downloaded file" << m_file << "to" << m_mountpoint;
+    if(m_unzip) {
+        // unzip downloaded file
+        qDebug() << "about to unzip the downloaded file" << m_file << "to" << m_mountpoint;
 
-    m_dp->addItem(tr("Extracting file."),LOGINFO);
-    
-    qDebug() << "file to unzip: " << m_file;
-    UnZip::ErrorCode ec;
-    UnZip uz;
-    ec = uz.openArchive(m_file);
-    if(ec != UnZip::Ok) {
-        m_dp->addItem(tr("Opening archive failed: %1.")
-            .arg(uz.formatError(ec)),LOGERROR);
-        m_dp->abort();
-        emit done(false);
-        return;
+        m_dp->addItem(tr("Extracting file."),LOGINFO);
+        
+        qDebug() << "file to unzip: " << m_file;
+        UnZip::ErrorCode ec;
+        UnZip uz;
+        ec = uz.openArchive(m_file);
+        if(ec != UnZip::Ok) {
+            m_dp->addItem(tr("Opening archive failed: %1.")
+                .arg(uz.formatError(ec)),LOGERROR);
+            m_dp->abort();
+            downloadFile.remove();
+            emit done(false);
+            return;
+        }
+        
+        ec = uz.extractAll(m_mountpoint);
+        if(ec != UnZip::Ok) {
+            m_dp->addItem(tr("Extracting failed: %1.")
+                .arg(uz.formatError(ec)),LOGERROR);
+            m_dp->abort();
+            downloadFile.remove();
+            emit done(false);
+            return;
+        }
+        // prepare file list for log
+        zipContents = uz.fileList();
     }
-    
-    ec = uz.extractAll(m_mountpoint);
-    if(ec != UnZip::Ok) {
-        m_dp->addItem(tr("Extracting failed: %1.")
-            .arg(uz.formatError(ec)),LOGERROR);
-        m_dp->abort();
-        emit done(false);
-        return;
+    else {
+        // only copy the downloaded file to the output location / name
+        m_dp->addItem(tr("Installing file."), LOGINFO);
+        qDebug() << "saving downloaded file (no extraction)";
+
+        downloadFile.open(); // copy fails if file is not opened (filename issue?)
+        // make sure the required path is existing
+        QString path = QFileInfo(m_mountpoint + m_target).absolutePath();
+        QDir p;
+        p.mkpath(path);
+        // QFile::copy() doesn't overwrite files, so remove old one first
+        QFile(m_mountpoint + m_target).remove();
+        if(!downloadFile.copy(m_mountpoint + m_target)) {
+            m_dp->addItem(tr("Installing file failed."), LOGERROR);
+            m_dp->abort();
+            downloadFile.remove();
+            emit done(false);
+            return;
+        }
+        
+        // add file to log
+        zipContents.append(m_mountpoint + m_target);
     }
 
-    m_dp->addItem(tr("creating installation log"),LOGINFO);
-    
-    QStringList zipContents = uz.fileList();
-       
-    QSettings installlog(m_mountpoint + "/.rockbox/rbutil.log", QSettings::IniFormat, 0); 
+    m_dp->addItem(tr("Creating installation log"),LOGINFO);
+    QSettings installlog(m_mountpoint + "/.rockbox/rbutil.log", QSettings::IniFormat, 0);
 
     installlog.beginGroup(m_logsection);
     for(int i = 0; i < zipContents.size(); i++)
@@ -127,7 +153,7 @@ void ZipInstaller::downloadDone(bool error)
     // remove temporary file
     downloadFile.remove();
 
-    m_dp->addItem(tr("Extraction finished successfully."),LOGOK);
+    m_dp->addItem(tr("Installation finished successfully."),LOGOK);
     m_dp->abort();
     emit done(false);
 }

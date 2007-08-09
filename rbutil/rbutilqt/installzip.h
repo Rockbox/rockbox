@@ -41,6 +41,8 @@ public:
     void setUrl(QString url){m_url = url;}
     void setProxy(QUrl proxy) {m_proxy= proxy;}
     void setLogSection(QString name) {m_logsection = name;}
+    void setUnzip(bool i) { m_unzip = i; }
+    void setTarget(QString t) { m_target = t; }
     
 signals:
     void done(bool error);
@@ -50,9 +52,11 @@ private slots:
     void downloadDone(bool);
     void downloadRequestFinished(int, bool);
 
-private:    
+private:
     QString m_url,m_file,m_mountpoint,m_logsection;
     QUrl m_proxy;
+    bool m_unzip;
+    QString m_target;
     
     HttpGet *getter;
     QTemporaryFile downloadFile;
