@@ -4398,6 +4398,7 @@
     alarm: "Alarm Time: %02d:%02d"
   </source>
   <dest>
+    *: none
     alarm: "Orario sveglia: %02d:%02d"
   </dest>
   <voice>
