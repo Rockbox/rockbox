@@ -65,7 +65,7 @@
 #include "recording.h"
 
 
-static bool no_source_in_menu = true;
+static bool no_source_in_menu = false;
 int recmenu_callback(int action,const struct menu_item_ex *this_item);
 
 static int recsource_func(void)
@@ -846,8 +846,11 @@ MAKE_MENU(recording_settings_menu, ID2P(LANG_RECORDING_SETTINGS),
 
 bool recording_menu(bool no_source)
 {
+    bool retval;
     no_source_in_menu = no_source;
-    return do_menu(&recording_settings_menu, NULL) == MENU_ATTACHED_USB;
+    retval = do_menu(&recording_settings_menu, NULL) == MENU_ATTACHED_USB;
+    no_source_in_menu = false; /* always fall back to the default */
+    return retval;
 };
 
 MENUITEM_FUNCTION(recording_settings, MENU_FUNC_USEPARAM, ID2P(LANG_RECORDING_SETTINGS),
