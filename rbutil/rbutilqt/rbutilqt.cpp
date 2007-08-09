@@ -36,10 +36,9 @@
 
 RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
 {
-    QString programPath = qApp->arguments().at(0);
-    absolutePath = QFileInfo(programPath).absolutePath() + "/";
+    absolutePath = qApp->applicationDirPath();
     // use built-in rbutil.ini if no external file in binary folder
-    QString iniFile = absolutePath + "rbutil.ini";
+    QString iniFile = absolutePath + "/rbutil.ini";
     if(QFileInfo(iniFile).isFile()) {
         qDebug() << "using external rbutil.ini";
         devices = new QSettings(iniFile, QSettings::IniFormat, 0);
@@ -54,9 +53,9 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     // portable installation:
     // check for a configuration file in the program folder.
     QFileInfo config;
-    config.setFile(absolutePath + "RockboxUtility.ini");
+    config.setFile(absolutePath + "/RockboxUtility.ini");
     if(config.isFile()) {
-        userSettings = new QSettings(absolutePath + "RockboxUtility.ini",
+        userSettings = new QSettings(absolutePath + "/RockboxUtility.ini",
             QSettings::IniFormat, 0);
         qDebug() << "config: portable";
     }

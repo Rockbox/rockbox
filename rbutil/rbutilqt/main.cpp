@@ -25,12 +25,12 @@
 int main( int argc, char ** argv ) {
     QApplication app( argc, argv );
 
-    QString absolutePath = QFileInfo(qApp->arguments().at(0)).absolutePath() + "/";
+    QString absolutePath = qApp->applicationDirPath();
     // portable installation:
     // check for a configuration file in the program folder.
     QSettings *user;
-    if(QFileInfo(absolutePath + "RockboxUtility.ini").isFile())
-        user = new QSettings(absolutePath + "RockboxUtility.ini", QSettings::IniFormat, 0);
+    if(QFileInfo(absolutePath + "/RockboxUtility.ini").isFile())
+        user = new QSettings(absolutePath + "/RockboxUtility.ini", QSettings::IniFormat, 0);
     else user = new QSettings(QSettings::IniFormat, QSettings::UserScope, "rockbox.org", "RockboxUtility");
 
     QTranslator translator;
