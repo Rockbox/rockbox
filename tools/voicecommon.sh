@@ -46,8 +46,14 @@ SPEEX_BIN=speexenc
 # The oggenc executable
 VORBIS_BIN=oggenc
 
+# Tools directory
+TOOLSDIR=`dirname $0`
+
 # The wavtrim executable
-WAVTRIM=`dirname $0`/wavtrim
+WAVTRIM=$TOOLSDIR/wavtrim
+
+# The SAPI5 script directory
+SAPI5DIR=`cygpath $TOOLSDIR -a -w`
 
 #####################
 # Festival settings #
@@ -158,9 +164,17 @@ init_tts() {
             fi
             ;;
         espeak)
-            # Check for flite
+            # Check for espeak
             if [ ! `which $ESPEAK_BIN` ]; then
                 echo "Error: $ESPEAK_BIN not found"
+                exit 5
+            fi
+            ;;
+        sapi5)
+            # Check for SAPI5
+            cscript /B $SAPI5DIR/sapi5_init_tts.vbs
+            if [ $? -ne 0 ]; then
+                echo "Error: SAPI 5 not available"
                 exit 5
             fi
             ;;
@@ -267,6 +281,9 @@ voice() {
                 flite)
                     echo "Action: Generate $WAV_FILE with flite"
                     echo -E "$TO_SPEAK" | $FLITE_BIN $FLITE_OPTS -o "$WAV_FILE"
+                    ;;
+                sapi5)
+                    cscript /B "$SAPI5DIR\sapi5_voice.vbs" ""$TO_SPEAK"" "$WAV_FILE"
                     ;;
             esac
         fi

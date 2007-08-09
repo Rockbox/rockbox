@@ -326,19 +326,28 @@ voiceconfig () {
     fi
     if [ `which festival` ]; then
         FESTIVAL="(F)estival "
-        FESTIVAL_OPTS="FLITE_OPTS=\"\""
+        FESTIVAL_OPTS="FESTIVAL_OPTS=\"\""
         DEFAULT_TTS="festival"
         DEFAULT_TTS_OPTS=$FESTIVAL_OPTS
         DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="F"
     fi
+    # Allow SAPI if Windows is in use
+    if [ `which winver` ]; then
+        SAPI5="(S)API5 "
+        SAPI5_OPTS="SAPI5_OPTS=\"\""
+        DEFAULT_TTS="sapi5"
+        DEFAULT_TTS_OPTS=$SAPI5_OPTS
+        DEFAULT_NOISEFLOOR="500"
+        DEFAULT_CHOICE="S"
+    fi
 
-    if [ "$FESTIVAL" = "$FLITE" ] && [ "$FLITE" = "$ESPEAK" ]; then
-        echo "You need Festival, eSpeak or Flite in your path to build voice files"
+    if [ "$FESTIVAL" = "$FLITE" ] && [ "$FLITE" = "$ESPEAK" ] && [ "$ESPEAK" = "$SAPI5" ]; then
+        echo "You need Festival, eSpeak or Flite in your path, or SAPI5 available to build voice files"
         exit
     fi
 
-    echo "TTS engine to use: ${FLITE}${FESTIVAL}${ESPEAK}(${DEFAULT_CHOICE})?"
+    echo "TTS engine to use: ${FLITE}${FESTIVAL}${ESPEAK}${SAPI5}(${DEFAULT_CHOICE})?"
     option=`input`
     case "$option" in
         [Ll])
@@ -355,6 +364,11 @@ voiceconfig () {
         TTS_ENGINE="festival"
         NOISEFLOOR="500"
         TTS_OPTS=$FESTIVAL_OPTS
+        ;;
+        [Ss])
+        TTS_ENGINE="sapi5"
+        NOISEFLOOR="500"
+        TTS_OPTS=$SAPI5_OPTS
         ;;
         *)
         TTS_ENGINE=$DEFAULT_TTS
@@ -413,11 +427,15 @@ voiceconfig () {
 #        ENC_OPTS=$DEFAULT_ENC_OPTS
 #    esac
     echo "Using $ENCODER for encoding voice clips"
+    TEMPDIR="${pwd}"
+    if [ `which cygpath` ]; then
+        TEMPDIR=`cygpath . -a -w`
+    fi
 
     cat > voicesettings.sh <<EOF
 TTS_ENGINE="${TTS_ENGINE}"
 ENCODER="${ENCODER}"
-TEMPDIR="${pwd}"
+TEMPDIR="$TEMPDIR"
 NOISEFLOOR="${NOISEFLOOR}"
 ${TTS_OPTS}
 ${ENC_OPTS}
