@@ -53,7 +53,9 @@ TOOLSDIR=`dirname $0`
 WAVTRIM=$TOOLSDIR/wavtrim
 
 # The SAPI5 script directory
-SAPI5DIR=`cygpath $TOOLSDIR -a -w`
+if [ "`which cygpath`" != "" ]; then
+    SAPI5DIR=`cygpath $TOOLSDIR -a -w`
+fi
 
 #####################
 # Festival settings #
@@ -126,14 +128,14 @@ init_tts() {
     case $TTS_ENGINE in
         festival)
             # Check for festival_client
-            if [ ! `which $FESTIVAL_CLIENT` ]; then
+            if [ "`which $FESTIVAL_CLIENT`" = "" ]; then
                 echo "Error: $FESTIVAL_CLIENT not found"
                 exit 4
             fi
 
             # Check for, and start festival server if specified
             if [ X$FESTIVAL_START = XY ]; then
-                if [ ! `which $FESTIVAL_BIN` ]; then
+                if [ "`which $FESTIVAL_BIN`" = "" ]; then
                     echo "Error: $FESTIVAL_BIN not found"
                     exit 3
                 fi
@@ -158,14 +160,14 @@ init_tts() {
             ;;
         flite)
             # Check for flite
-            if [ ! `which $FLITE_BIN` ]; then
+            if [ "`which $FLITE_BIN`" = "" ]; then
                 echo "Error: $FLITE_BIN not found"
                 exit 5
             fi
             ;;
         espeak)
             # Check for espeak
-            if [ ! `which $ESPEAK_BIN` ]; then
+            if [ "`which $ESPEAK_BIN`" = "" ]; then
                 echo "Error: $ESPEAK_BIN not found"
                 exit 5
             fi
@@ -206,21 +208,21 @@ init_encoder() {
     case $ENCODER in
         lame)
             # Check for lame binary
-            if [ ! `which $LAME_BIN` ]; then
+            if [ "" = "`which $LAME_BIN`" ]; then
                 echo "Error: $LAME_BIN not found"
                 exit 6
             fi
             ;;
         speex)
             # Check for speexenc binary
-            if [ ! `which $SPEEX_BIN` ]; then
+            if [ "" = "`which $SPEEX_BIN`" ]; then
                 echo "Error: $SPEEX_BIN not found"
                 exit 7
             fi
             ;;
         vorbis)
             # Check for vorbis encoder binary
-            if [ ! `which $VORBIS_BIN` ]; then
+            if [ "" = "`which $VORBIS_BIN`" ]; then
                 echo "Error: $VORBIS_BIN not found"
                 exit 10
             fi

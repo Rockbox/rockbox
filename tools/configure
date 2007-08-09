@@ -308,7 +308,7 @@ voiceconfig () {
     echo "Building voice for $archos"
     echo ""
 
-    if [ `which flite` ]; then
+    if [ "`which flite`" != "" ]; then
         FLITE="F(l)ite "
         FLITE_OPTS="FLITE_OPTS=\"\""
         DEFAULT_TTS="flite"
@@ -316,7 +316,7 @@ voiceconfig () {
         DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="L"
     fi
-    if [ `which espeak` ]; then
+    if [ "`which espeak`" != "" ]; then
         ESPEAK="(e)Speak "
         ESPEAK_OPTS="ESPEAK_OPTS=\"\""
         DEFAULT_TTS="espeak"
@@ -324,7 +324,7 @@ voiceconfig () {
         DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="e"
     fi
-    if [ `which festival` ]; then
+    if [ "`which festival`" != "" ]; then
         FESTIVAL="(F)estival "
         FESTIVAL_OPTS="FESTIVAL_OPTS=\"\""
         DEFAULT_TTS="festival"
@@ -333,7 +333,7 @@ voiceconfig () {
         DEFAULT_CHOICE="F"
     fi
     # Allow SAPI if Windows is in use
-    if [ `which winver` ]; then
+    if [ "`which winver`" != "" ]; then
         SAPI5="(S)API5 "
         SAPI5_OPTS="SAPI5_OPTS=\"\""
         DEFAULT_TTS="sapi5"
@@ -379,21 +379,21 @@ voiceconfig () {
 
     echo ""
 
-    if [ `which oggenc` ]; then
+    if [ "`which oggenc`" != "" ]; then
         OGGENC="(O)ggenc "
         DEFAULT_ENC="oggenc"
         VORBIS_OPTS="VORBIS_OPTS=\"-q0 --downmix\""
         DEFAULT_ENC_OPTS=$VORBIS_OPTS
         DEFAULT_CHOICE="O"
     fi
-    if [ `which speexenc` ]; then
+    if [ "`which speexenc`" != "" ]; then
         SPEEXENC="(S)peexenc "
         DEFAULT_ENC="speexenc"
         SPEEX_OPTS="" # TODO: find appropriate options for speex
         DEFAULT_ENC_OPTS=$SPEEX_OPTS
         DEFAULT_CHOICE="S"
     fi
-    if [ `which lame` ]; then
+    if [ "`which lame`" != "" ]; then
         LAME="(L)ame "
         DEFAULT_ENC="lame"
         LAME_OPTS="LAME_OPTS=\"--resample 12 -t -m m -h -V 9 -S\""
@@ -428,7 +428,7 @@ voiceconfig () {
 #    esac
     echo "Using $ENCODER for encoding voice clips"
     TEMPDIR="${pwd}"
-    if [ `which cygpath` ]; then
+    if [ "`which cygpath`" != "" ]; then
         TEMPDIR=`cygpath . -a -w`
     fi
 
