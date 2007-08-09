@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Wenger
- *   $Id: installbl.cpp 14027 2007-07-27 17:42:49Z domonoky $
+ *   $Id: installbootloaderwindow.cpp 14027 2007-07-27 17:42:49Z domonoky $
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -17,11 +17,11 @@
  *
  ****************************************************************************/
 
-#include "installbl.h"
+#include "installbootloaderwindow.h"
 #include "ui_installprogressfrm.h"
 
 
-InstallBl::InstallBl(QWidget *parent) : QDialog(parent)
+InstallBootloaderWindow::InstallBootloaderWindow(QWidget *parent) : QDialog(parent)
 {
     ui.setupUi(this);
     connect(ui.buttonBrowse, SIGNAL(clicked()), this, SLOT(browseFolder()));
@@ -29,13 +29,13 @@ InstallBl::InstallBl(QWidget *parent) : QDialog(parent)
     
 }
 
-void InstallBl::setProxy(QUrl proxy_url)
+void InstallBootloaderWindow::setProxy(QUrl proxy_url)
 {
     proxy = proxy_url;
     qDebug() << "Install::setProxy" << proxy;
 }
 
-void InstallBl::setMountPoint(QString mount)
+void InstallBootloaderWindow::setMountPoint(QString mount)
 {
     QFileInfo m(mount);
     if(m.isDir()) {
@@ -44,7 +44,7 @@ void InstallBl::setMountPoint(QString mount)
     }
 }
 
-void InstallBl::setOFPath(QString path)
+void InstallBootloaderWindow::setOFPath(QString path)
 {
     QFileInfo m(path);
     if(m.exists()) {
@@ -53,7 +53,7 @@ void InstallBl::setOFPath(QString path)
     }
 }
 
-void InstallBl::browseFolder()
+void InstallBootloaderWindow::browseFolder()
 {
     QFileDialog browser(this);
     if(QFileInfo(ui.lineMountPoint->text()).isDir())
@@ -70,7 +70,7 @@ void InstallBl::browseFolder()
     }
 }
 
-void InstallBl::browseOF()
+void InstallBootloaderWindow::browseOF()
 {
     QFileDialog browser(this);
     if(QFileInfo(ui.lineOriginalFirmware->text()).exists())
@@ -86,7 +86,7 @@ void InstallBl::browseOF()
     }
 }
 
-void InstallBl::accept()
+void InstallBootloaderWindow::accept()
 {
     // create logger
     logger = new ProgressLoggerGui(this);
@@ -134,7 +134,7 @@ void InstallBl::accept()
 }
 
 
-void InstallBl::done(bool error)
+void InstallBootloaderWindow::done(bool error)
 {
     qDebug() << "Install::done, error:" << error;
 
@@ -149,13 +149,13 @@ void InstallBl::done(bool error)
    
 }
 
-void InstallBl::setDeviceSettings(QSettings *dev)
+void InstallBootloaderWindow::setDeviceSettings(QSettings *dev)
 {
     devices = dev;
     qDebug() << "Install::setDeviceSettings:" << devices;
 }
 
-void InstallBl::setUserSettings(QSettings *user)
+void InstallBootloaderWindow::setUserSettings(QSettings *user)
 {
     userSettings = user;
     if(userSettings->value("defaults/platform").toString() == "h100" ||

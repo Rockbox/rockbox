@@ -25,7 +25,7 @@
 #include "ui_aboutbox.h"
 #include "configure.h"
 #include "install.h"
-#include "installbl.h"
+#include "installbootloaderwindow.h"
 #include "installtalkwindow.h"
 #include "httpget.h"
 #include "installbootloader.h"
@@ -279,7 +279,7 @@ void RbUtilQt::install()
 
 void RbUtilQt::installBl()
 {
-    InstallBl *installWindow = new InstallBl(this);
+    InstallBootloaderWindow *installWindow = new InstallBootloaderWindow(this);
     installWindow->setUserSettings(userSettings);
     installWindow->setDeviceSettings(devices);
     if(userSettings->value("defaults/proxytype") == "manual")

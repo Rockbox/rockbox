@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Wenger
- *   $Id: installbl.h 14027 2007-07-27 17:42:49Z domonoky $
+ *   $Id: installbootloaderwindow.h 14027 2007-07-27 17:42:49Z domonoky $
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -30,11 +30,11 @@
 #include "installbootloader.h"
 #include "irivertools/irivertools.h"
 
-class InstallBl : public QDialog
+class InstallBootloaderWindow : public QDialog
 {
     Q_OBJECT
     public:
-        InstallBl(QWidget *parent = 0);
+        InstallBootloaderWindow(QWidget *parent = 0);
         void setProxy(QUrl);
         void setMountPoint(QString);
         void setOFPath(QString);

@@ -21,7 +21,7 @@ SOURCES += rbutilqt.cpp \
  zip/unzip.cpp \
  installzip.cpp \
  installbootloader.cpp \
- installbl.cpp \
+ installbootloaderwindow.cpp \
  progressloggergui.cpp \
  installtalkwindow.cpp \
  talkfile.cpp \
@@ -45,7 +45,7 @@ HEADERS += rbutilqt.h \
  version.h \
  installzip.h \
  installbootloader.h \
- installbl.h \
+ installbootloaderwindow.h \
  installtalkwindow.h \
  talkfile.h \
  autodetection.h \
