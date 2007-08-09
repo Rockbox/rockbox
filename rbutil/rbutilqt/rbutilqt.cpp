@@ -353,7 +353,7 @@ void RbUtilQt::installVoice()
     installer->setUrl(voiceurl);
     installer->setLogSection("Voice");
     installer->setMountPoint(userSettings->value("defaults/mountpoint").toString());
-    installer->setTarget("/.rockbox/langs/english.lang");
+    installer->setTarget("/.rockbox/langs/english.voice");
     installer->install(logger);
     
     connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));
