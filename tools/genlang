@@ -230,9 +230,20 @@ if($english) {
             push @phrase, $_;
             if($_ =~ /^ *\<dest\>/i) {
                 $withindest=1;
+                $deststr="";
             }
             elsif($withindest && ($_ =~ /^ *\<\/dest\>/i)) {
                 $withindest=0;
+
+                if($update || ($deststr && ($deststr !~ /^none\z/i))) {
+                    # we unconditionally always use all IDs when the "update"
+                    # feature is used
+                    $id = $maybeid;
+   #                 print STDERR "DEST: use this id $id\n";
+                }
+                else {
+   #                 print "skip $maybeid for $name\n";
+                }
             }
             elsif($withindest && ($_ =~ / *([^:]+): *(.*)/)) {
                 my ($name, $val)=($1, $2);
@@ -240,13 +251,10 @@ if($english) {
                 # model name isn't "our"
                 dest($_, $name, $val);
 
-   #             print STDERR "DEST: \"$dest\" for $name / $id\n";
-
-                if($update || ($dest && ($dest !~ /^none\z/i))) {
-                    # we unconditionally always use all IDs when the "update"
-                    # feature is used
-                    $id = $maybeid;
-   #                 print STDERR "DEST: use this id $id\n";
+                if($dest) {
+                    # Store the current dest string. If this target matches
+                    # multiple strings, it will get updated several times.
+                    $deststr = $dest;
                 }
             }
         }
@@ -537,7 +545,7 @@ MOO
         
         $name =~ s/\"//g; # cut off the quotes
         
-        printf HFILE ("    %s,\n", $name);
+        printf HFILE ("    %s, /* %d */\n", $name, $i-1);
     }
 
 # Output separation marker for last string ID and the upcoming voice IDs
