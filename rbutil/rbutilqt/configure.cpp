@@ -109,8 +109,10 @@ void Config::accept()
 
     // platform
     QString nplat;
-    nplat = ui.treeDevices->selectedItems().at(0)->data(0, Qt::UserRole).toString();
-    userSettings->setValue("defaults/platform", nplat);
+    if(ui.treeDevices->selectedItems().size() != 0) {
+        nplat = ui.treeDevices->selectedItems().at(0)->data(0, Qt::UserRole).toString();
+        userSettings->setValue("defaults/platform", nplat);
+    }
 
     // sync settings
     userSettings->sync();
