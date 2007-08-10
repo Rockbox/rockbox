@@ -212,7 +212,7 @@ $(OBJDIR)/features: features.txt
 $(OBJDIR)/lang.o: lang/$(LANGUAGE).lang $(OBJDIR)/features
 	$(SILENT)mkdir -p `dirname $@`
 	$(SILENT)for f in `cat $(OBJDIR)/features`; do feat="$$feat:$$f" ; done; \
-	perl -s $(TOOLSDIR)/genlang -p=$(BUILDDIR)/lang -t=$(ARCHOS):$$feat $<
+	perl -s $(TOOLSDIR)/genlang -p=$(BUILDDIR)/lang -t=$(ARCHOS)$$feat $<
 	$(call PRINTS,CC lang.c)$(CC) $(CFLAGS) -c $(BUILDDIR)/lang.c -o $@
 
 clean:
