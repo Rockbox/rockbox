@@ -112,9 +112,9 @@ int menu_show(int m)
             case ACTION_STD_OK:
                 return rb->gui_synclist_get_sel_pos(&(menus[m].synclist));
 
-
             case ACTION_STD_CANCEL:
             case ACTION_STD_MENU:
+            case SYS_POWEROFF:
                 exit = true;
                 break;
 

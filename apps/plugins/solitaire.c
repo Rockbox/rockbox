@@ -1579,6 +1579,9 @@ int solitaire( void )
                 }
                 break;
 
+            case SYS_POWEROFF:
+                return SOLITAIRE_QUIT;
+            
             default:
                 if( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
                     return SOLITAIRE_USB;
