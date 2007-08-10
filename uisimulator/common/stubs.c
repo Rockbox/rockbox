@@ -105,12 +105,6 @@ void ata_spindown(int s)
     (void)s;
 }
 
-bool simulate_usb(void)
-{
-    usb_screen();
-    return false;
-}
-
 int rtc_read(int address)
 {
     return address ^ 0x55;

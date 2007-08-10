@@ -7058,23 +7058,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_USB
-  desc: in the info menu
-  user:
-  <source>
-    *: none
-    sim: "USB (Sim)"
-  </source>
-  <dest>
-    *: none
-    sim: "USB (Sim)"
-  </dest>
-  <voice>
-    *: none
-    sim: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYLIST
   desc: Used when you need to say playlist, also voiced
   user:

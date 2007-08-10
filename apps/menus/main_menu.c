@@ -125,10 +125,6 @@ static bool show_credits(void)
     return false;
 }
 
-#ifdef SIMULATOR
-extern bool simulate_usb(void);
-#endif
-
 #ifdef HAVE_LCD_CHARCELLS
 #define SIZE_FMT "%s%s"
 #else
@@ -399,18 +395,10 @@ MENUITEM_FUNCTION(show_runtime_item, 0, ID2P(LANG_RUNNING_TIME),
                    (menu_function)view_runtime, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(debug_menu_item, 0, ID2P(LANG_DEBUG),
                    (menu_function)debug_menu, NULL, NULL, Icon_NOICON);
-#ifdef SIMULATOR
-MENUITEM_FUNCTION(simulate_usb_item, 0, ID2P(LANG_USB),
-                   (menu_function)simulate_usb, NULL, NULL, Icon_NOICON);
-#endif
 
 MAKE_MENU(info_menu, ID2P(LANG_SYSTEM), 0, Icon_Questionmark,
           &show_info_item, &show_credits_item, &show_runtime_item, 
-          &sleep_timer_call, &debug_menu_item
-#ifdef SIMULATOR
-        ,&simulate_usb_item
-#endif
-        );
+          &sleep_timer_call, &debug_menu_item);
 /*      INFO MENU                  */
 /***********************************/
 

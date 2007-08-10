@@ -124,10 +124,6 @@ rtc
 scrollwheel
 #endif
 
-#if defined(SIMULATOR)
-sim
-#endif
-
 #if defined(ARCHOS_RECORDER) || defined(ARCHOS_PLAYER)
 soft_shutdown
 #endif
