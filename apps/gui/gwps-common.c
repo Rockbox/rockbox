@@ -144,7 +144,7 @@ bool update_onvol_change(struct gui_wps * gwps)
 
 bool ffwd_rew(int button)
 {
-    static const int ff_rew_steps[] = {
+    static const uint16_t ff_rew_steps[] = {
       1000, 2000, 3000, 4000,
       5000, 6000, 8000, 10000,
       15000, 20000, 25000, 30000,
