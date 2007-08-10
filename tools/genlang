@@ -239,10 +239,10 @@ if($english) {
                     # we unconditionally always use all IDs when the "update"
                     # feature is used
                     $id = $maybeid;
-   #                 print STDERR "DEST: use this id $id\n";
+    #                print "DEST: use this id $id\n";
                 }
                 else {
-   #                 print "skip $maybeid for $name\n";
+    #                print "skip $maybeid for $name\n";
                 }
             }
             elsif($withindest && ($_ =~ / *([^:]+): *(.*)/)) {
@@ -434,7 +434,7 @@ while(<LANG>) {
                     $source{$idstr}=$src;
                     $dest{$idstr}=$dest;
                     $voice{$idstr}=$voice;
-                    
+
                     if($verbose) {
                         print "id: $phrase{id} ($idnum)\n";
                         print "source: $src\n";
@@ -645,9 +645,15 @@ elsif($voiceout) {
             # Now, make sure we get the number from the english sort order:
             $idnum = $idmap{$name};
 
-            $engl[$idnum] = $i;
+            if(length($idnum)) {
+                $engl[$idnum] = $i;
 
-           # print "Input index $i output index $idnum\n";
+                #print "Input index $i output index $idnum\n";
+            }
+            else {
+                # not used, mark it so
+                $engl[$i] = -1
+            }
 
         }
     }
@@ -655,10 +661,15 @@ elsif($voiceout) {
 
         my $o = $engl[$i];
 
+        if(($o < 0) || !length($o)) {
+            print "#$i\nid: NOT_USED_$i\nvoice: \"\"\n";
+            next;
+        }
+
         my $name=$idnum[$o]; # get the ID
         my $dest = $voice{$name}; # get the destination voice string
         
-        print "#$i\nid: $name\nvoice: $dest\n";
+        print "#$i ($o)\nid: $name\nvoice: $dest\n";
     }
     
 }
