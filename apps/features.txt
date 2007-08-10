@@ -88,7 +88,7 @@ multivolume
 quickscreen
 #endif
 
-#if defined(CONFIG_TUNER)
+#if CONFIG_TUNER != 0
 radio
 #endif
 
