@@ -97,7 +97,8 @@ static const char backlight_thread_name[] = "backlight";
 static struct event_queue backlight_queue;
 
 static int backlight_timer;
-static int backlight_timeout = 5*HZ;
+static int backlight_timeout;
+static int backlight_timeout_normal = 5*HZ;
 #if CONFIG_CHARGING
 static int backlight_timeout_plugged = 5*HZ;
 #endif
@@ -173,7 +174,8 @@ void button_backlight_set_timeout(int index)
 
 #ifdef HAVE_REMOTE_LCD
 static int remote_backlight_timer;
-static int remote_backlight_timeout = 5*HZ;
+static int remote_backlight_timeout;
+static int remote_backlight_timeout_normal = 5*HZ;
 #if CONFIG_CHARGING
 static int remote_backlight_timeout_plugged = 5*HZ;
 #endif
@@ -395,37 +397,32 @@ static void __remote_backlight_off(void)
 /* Update state of backlight according to timeout setting */
 static void backlight_update_state(void)
 {
-#if CONFIG_CHARGING
-    if (charger_inserted()
-#ifdef HAVE_USB_POWER
-            || usb_powered()
-#endif
-            )
-        backlight_timer = backlight_timeout_plugged;
+#ifdef HAS_BUTTON_HOLD
+    if (button_hold() && (backlight_on_button_hold != 0))
+        backlight_timeout = (backlight_on_button_hold == 2) ? 0 : -1;
+        /* always on or always off */
     else
 #endif
-        backlight_timer = backlight_timeout;
+#if CONFIG_CHARGING
+        if (charger_inserted()
+#ifdef HAVE_USB_POWER
+                || usb_powered()
+#endif
+                )
+            backlight_timeout = backlight_timeout_plugged;
+        else
+#endif
+            backlight_timeout = backlight_timeout_normal;
 
     /* Backlight == OFF in the setting? */
-    if (backlight_timer < 0)
+    if (backlight_timeout < 0)
     {
         backlight_timer = 0; /* Disable the timeout */
-#ifdef HAS_BUTTON_HOLD
-        if (backlight_on_button_hold == 2 && button_hold())
-            return; /* Keep on if "On" */
-#endif
         _backlight_off();
     }
     else
     {
-#ifdef HAS_BUTTON_HOLD
-        if (backlight_on_button_hold == 1 && button_hold())
-        {
-            /* Keep off if "Off". */
-            backlight_timer = 0; /* Disable the timeout */
-            return;
-        }
-#endif
+        backlight_timer = backlight_timeout;
         _backlight_on();
     }
 }
@@ -434,47 +431,33 @@ static void backlight_update_state(void)
 /* Update state of remote backlight according to timeout setting */
 static void remote_backlight_update_state(void)
 {
+#ifdef HAS_REMOTE_BUTTON_HOLD
+    if (remote_button_hold() && (remote_backlight_on_button_hold != 0))
+        remote_backlight_timeout = (remote_backlight_on_button_hold == 2)
+                                 ? 0 : -1;  /* always on or always off */
+    else
+#endif
 #if CONFIG_CHARGING
-    if (charger_inserted()
+        if (charger_inserted()
 #ifdef HAVE_USB_POWER
             || usb_powered()
 #endif
             )
-        remote_backlight_timer = remote_backlight_timeout_plugged;
-    else
+            remote_backlight_timeout = remote_backlight_timeout_plugged;
+        else
 #endif
-        remote_backlight_timer = remote_backlight_timeout;
+            remote_backlight_timeout = remote_backlight_timeout_normal;
 
     /* Backlight == OFF in the setting? */
-    if (remote_backlight_timer < 0)
+    if (remote_backlight_timeout < 0)
     {
         remote_backlight_timer = 0; /* Disable the timeout */
-#ifdef HAS_REMOTE_BUTTON_HOLD
-        if (remote_backlight_on_button_hold == 2 && remote_button_hold())
-            return; /* Keep on if "On" */
-#endif
         __remote_backlight_off();
     }
     else
     {
-#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-        if (remote_type() == REMOTETYPE_H300_NONLCD)
-        {
-            backlight_update_state();
-        }
-        else
-#endif
-        {
-#ifdef HAS_REMOTE_BUTTON_HOLD
-            if (remote_backlight_on_button_hold == 1 && remote_button_hold())
-            {
-                /* Keep off if "Off". */
-                remote_backlight_timer = 0; /* Disable the timeout */
-                return;
-            }
-#endif
-            __remote_backlight_on();
-        }
+        remote_backlight_timer = remote_backlight_timeout;
+        __remote_backlight_on();
     }
 }
 #endif /* HAVE_REMOTE_LCD */
@@ -495,11 +478,6 @@ void backlight_thread(void)
 
             case REMOTE_BACKLIGHT_OFF:
                 remote_backlight_timer = 0; /* Disable the timeout */
-#ifdef HAS_REMOTE_BUTTON_HOLD
-                if (remote_backlight_on_button_hold == 2 &&
-                    remote_button_hold())
-                    break; /* Keep on if "On" */
-#endif
                 __remote_backlight_off();
                 break;
 #endif /* HAVE_REMOTE_LCD */
@@ -510,10 +488,6 @@ void backlight_thread(void)
 
             case BACKLIGHT_OFF:
                 backlight_timer = 0; /* Disable the timeout */
-#ifdef HAS_BUTTON_HOLD
-                if (backlight_on_button_hold == 2 && button_hold())
-                    break; /* Keep on if "On" */
-#endif
                 _backlight_off();
                 break;
 
@@ -557,6 +531,16 @@ void backlight_thread(void)
                 break;
 #endif /* defined(HAVE_REMOTE_LCD) && !defined(SIMULATOR) */
 
+#if CONFIG_CHARGING
+            case SYS_CHARGER_CONNECTED:
+            case SYS_CHARGER_DISCONNECTED:
+                backlight_update_state();
+#ifdef HAVE_REMOTE_LCD
+                remote_backlight_update_state();
+#endif
+                break;
+#endif /* CONFIG_CHARGING */
+
             case SYS_USB_CONNECTED:
                 /* Tell the USB thread that we are safe */
                 DEBUGF("backlight_thread got SYS_USB_CONNECTED\n");
@@ -572,24 +556,6 @@ void backlight_thread(void)
 
 static void backlight_tick(void)
 {
-#if CONFIG_CHARGING
-    static bool charger_was_inserted = false;
-    bool charger_is_inserted = charger_inserted()
-#ifdef HAVE_USB_POWER
-        || usb_powered()
-#endif
-        ;
-
-    if( charger_was_inserted != charger_is_inserted )
-    {
-        backlight_on();
-#ifdef HAVE_REMOTE_LCD
-        remote_backlight_on();
-#endif
-    }
-    charger_was_inserted = charger_is_inserted;
-#endif /* CONFIG_CHARGING */
-
     if(backlight_timer)
     {
         backlight_timer--;
@@ -689,7 +655,7 @@ void backlight_off(void)
 /* returns true when the backlight is on OR when it's set to always off */
 bool is_backlight_on(void)
 {
-    if (backlight_timer || backlight_get_current_timeout() <= 0)
+    if (backlight_timer || backlight_timeout <= 0)
         return true;
     else
         return false;
@@ -698,18 +664,7 @@ bool is_backlight_on(void)
 /* return value in ticks; 0 means always on, <0 means always off */
 int backlight_get_current_timeout(void)
 {
-#if CONFIG_CHARGING
-    if (charger_inserted()
-#ifdef HAVE_USB_POWER
-            || usb_powered()
-#endif
-        )
-        return backlight_timeout_plugged;
-    else
-        return backlight_timeout;
-#else
     return backlight_timeout;
-#endif
 }
 
 void backlight_set_timeout(int index)
@@ -717,7 +672,7 @@ void backlight_set_timeout(int index)
     if((unsigned)index >= sizeof(backlight_timeout_value))
         /* if given a weird value, use default */
         index = 6;
-    backlight_timeout = HZ * backlight_timeout_value[index];
+    backlight_timeout_normal = HZ * backlight_timeout_value[index];
     backlight_update_state();
 }
 
@@ -736,12 +691,8 @@ void backlight_set_timeout_plugged(int index)
 /* Hold button change event handler. */
 void backlight_hold_changed(bool hold_button)
 {
-    /* Hold switch overrides all backlight behavior except when
-       set to "Normal" */
-    /* Queue or freeze */
-    if (hold_button && backlight_on_button_hold == 1)
-        backlight_off(); /* setting == Off */
-    else  /* setting == On, Normal, no hold button, or anything else */
+    if (!hold_button || (backlight_on_button_hold > 0))
+        /* if unlocked or override in effect */
         backlight_on();
 }
 
@@ -751,11 +702,8 @@ void backlight_set_on_button_hold(int index)
         /* if given a weird value, use default */
         index = 0;
 
-    if (index == backlight_on_button_hold)
-        return;
-
     backlight_on_button_hold = index;
-    backlight_hold_changed(button_hold());
+    backlight_update_state();
 }
 #endif /* HAS_BUTTON_HOLD */
 
@@ -796,7 +744,7 @@ void remote_backlight_set_timeout(int index)
     if((unsigned)index >= sizeof(backlight_timeout_value))
         /* if given a weird value, use default */
         index=6;
-    remote_backlight_timeout = HZ * backlight_timeout_value[index];
+    remote_backlight_timeout_normal = HZ * backlight_timeout_value[index];
     remote_backlight_update_state();
 }
 
@@ -815,12 +763,8 @@ void remote_backlight_set_timeout_plugged(int index)
 /* Remote hold button change event handler. */
 void remote_backlight_hold_changed(bool rc_hold_button)
 {
-    /* Hold switch overrides all backlight behavior except when
-       set to "Normal" */
-    /* Queue or freeze */
-    if (rc_hold_button && remote_backlight_on_button_hold == 1)
-        remote_backlight_off(); /* setting == Off */
-    else  /* setting == On, Normal, no hold button, or anything else */
+    if (!rc_hold_button || (remote_backlight_on_button_hold > 0))
+        /* if unlocked or override */
         remote_backlight_on();
 }
 
@@ -830,36 +774,21 @@ void remote_backlight_set_on_button_hold(int index)
         /* if given a weird value, use default */
         index = 0;
 
-    if (index == remote_backlight_on_button_hold)
-        return;
-
     remote_backlight_on_button_hold = index;
-    remote_backlight_hold_changed(remote_button_hold());
+    remote_backlight_update_state();
 }
 #endif /* HAS_REMOTE_BUTTON_HOLD */
 
 /* return value in ticks; 0 means always on, <0 means always off */
 int remote_backlight_get_current_timeout(void)
 {
-#if CONFIG_CHARGING
-    if (charger_inserted()
-#ifdef HAVE_USB_POWER
-            || usb_powered()
-#endif
-        )
-        return remote_backlight_timeout_plugged;
-    else
-        return remote_backlight_timeout;
-#else
     return remote_backlight_timeout;
-#endif
 }
 
 /* returns true when the backlight is on OR when it's set to always off */
 bool is_remote_backlight_on(void)
 {
-    if (remote_backlight_timer != 0 ||
-                    remote_backlight_get_current_timeout() <= 0)
+    if (remote_backlight_timer != 0 || remote_backlight_timeout <= 0)
         return true;
     else
         return false;
