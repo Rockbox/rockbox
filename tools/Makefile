@@ -10,7 +10,8 @@ CFLAGS := -O -ansi -g
 LDFLAGS := -g
 
 CLEANALL := scramble descramble iriver sh2d bmp2rb rdf2binary convbdf	\
- generate_rocklatin mkboot ipod_fw codepages uclpack mi4 gigabeat database
+ generate_rocklatin mkboot ipod_fw codepages uclpack mi4 gigabeat database \
+ lngdump
 
 all:
 	@echo "Run make in your build directory!"
@@ -33,6 +34,9 @@ rdf2binary:	rdf2binary.c
 	$(SILENT)$(CC) -g $+ -o $@
 
 mkboot:	mkboot.c
+	$(SILENT)$(CC) -g $+ -o $@
+
+lngdump: lngdump.c
 	$(SILENT)$(CC) -g $+ -o $@
 
 ipod_fw:	ipod_fw.c
