@@ -28,6 +28,7 @@
 #include "lcd.h"
 #include "kernel.h"
 #include "system.h"
+#include "hwcompat.h"
 
 
 /*** hardware configuration ***/
@@ -68,6 +69,20 @@ static bool lcd_backlit = false;
 static void invert_display(void);
 #endif
 
+#if defined(IPOD_1G2G) || defined(IPOD_3G)
+static unsigned short power_reg_h;
+#define POWER_REG_H power_reg_h
+#else
+#define POWER_REG_H 0x1200
+#endif
+
+#ifdef IPOD_1G2G
+static unsigned short contrast_reg_h;
+#define CONTRAST_REG_H contrast_reg_h
+#else
+#define CONTRAST_REG_H 0x400
+#endif
+
 /* needed for flip */
 static int addr_offset;
 #if defined(IPOD_MINI) || defined(IPOD_MINI2G)
@@ -82,19 +97,18 @@ static const unsigned char dibits[16] ICONST_ATTR = {
 /* wait for LCD with timeout */
 static inline void lcd_wait_write(void)
 {
-    long timeout = USEC_TIMER + 1000; /* 1 ms */
-
-    while ((inl(IPOD_LCD_BASE) & LCD_BUSY_MASK)
-           && TIME_BEFORE(USEC_TIMER, timeout));
+    while (inl(IPOD_LCD_BASE) & LCD_BUSY_MASK);
 }
 
-
 /* send LCD data */
+#if CONFIG_CPU == PP5002
+STATICIRAM void ICODE_ATTR lcd_send_data(unsigned data)
+#else
 static void lcd_send_data(unsigned data)
+#endif
 {
     lcd_wait_write();
 #ifdef IPOD_MINI2G
-    outl((inl(IPOD_LCD_BASE) & ~0x1f00000) | 0x1700000, IPOD_LCD_BASE);
     outl(data | 0x760000, IPOD_LCD_BASE+8);
 #else
     outl(data >> 8, IPOD_LCD_BASE + LCD_DATA);
@@ -108,7 +122,6 @@ static void lcd_prepare_cmd(unsigned cmd)
 {
     lcd_wait_write();
 #ifdef IPOD_MINI2G
-    outl((inl(IPOD_LCD_BASE) & ~0x1f00000) | 0x1700000, IPOD_LCD_BASE);
     outl(cmd | 0x740000, IPOD_LCD_BASE+8);
 #else
     outl(0x0, IPOD_LCD_BASE + LCD_CMD);
@@ -127,6 +140,38 @@ static void lcd_cmd_and_data(unsigned cmd, unsigned data)
 /* LCD init */
 void lcd_init_device(void)
 {
+#ifdef IPOD_1G2G
+    if ((IPOD_HW_REVISION >> 16) == 1)
+    {
+        power_reg_h = 0x1500;
+        contrast_reg_h = 0x700;
+    }
+    else /* 2nd gen */
+    {
+        if (inl(0xcf00404c) & 0x01) /* check bit 0 */
+        {
+            power_reg_h = 0x1520;   /* Set step-up frequency to f/8 instead of
+                                     * f/32, for better blacklevel stability */
+            contrast_reg_h = 0x400;
+        }
+        else
+        {
+            power_reg_h = 0x1100;
+            contrast_reg_h = 0x300;
+        }
+    }
+#elif defined IPOD_3G
+    if (inl(0xcf00404c) & 0x01) /* check bit 0 */
+        power_reg_h = 0x1520;   /* Set step-up frequency to f/8 instead of
+                                 * f/32, for better blacklevel stability */
+    else
+        power_reg_h = 0x1100;
+#elif defined IPOD_MINI2G
+    lcd_wait_write();
+    outl((inl(IPOD_LCD_BASE) & ~0x1f00000) | 0x1700000, IPOD_LCD_BASE);
+#endif
+
+    lcd_cmd_and_data(R_POWER_CONTROL, POWER_REG_H | 0xc);
 #ifdef HAVE_BACKLIGHT_INVERSION
     invert_display();
 #else
@@ -150,10 +195,10 @@ void lcd_init_device(void)
 int lcd_default_contrast(void)
 {
 #ifdef IPOD_1G2G
-    return 30;
+    return 28;
 #elif defined(IPOD_MINI) || defined(IPOD_MINI2G) || defined(IPOD_3G)
     return 42;
-#else
+#elif defined(IPOD_4G)
     return 35;
 #endif
 }
@@ -164,7 +209,7 @@ void lcd_set_contrast(int val)
     if (val < 0) val = 0;
     else if (val > 63) val = 63;
 
-    lcd_cmd_and_data(R_CONTRAST_CONTROL, 0x400 | (val + 64));
+    lcd_cmd_and_data(R_CONTRAST_CONTROL, CONTRAST_REG_H | (val + 64));
 }
 
 #ifdef HAVE_BACKLIGHT_INVERSION
@@ -227,6 +272,25 @@ void lcd_set_flip(bool yesno)
         addr_offset = 20;
     }
 #endif
+}
+
+void lcd_enable(bool on)
+{
+    if (on)
+    {
+        lcd_cmd_and_data(R_START_OSC, 1);               /* start oscillation */
+        sleep(HZ/10);                                           /* wait 10ms */
+        lcd_cmd_and_data(R_POWER_CONTROL, POWER_REG_H); /*clear standby mode */
+        lcd_cmd_and_data(R_POWER_CONTROL, POWER_REG_H | 0xc);
+                                                   /* enable opamp & booster */
+    }
+    else
+    {
+        lcd_cmd_and_data(R_POWER_CONTROL, POWER_REG_H);
+                                               /* switch off opamp & booster */
+        lcd_cmd_and_data(R_POWER_CONTROL, POWER_REG_H | 0x1);
+                                                       /* enter standby mode */
+    }
 }
 
 /*** update functions ***/
