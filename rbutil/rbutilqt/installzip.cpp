@@ -137,7 +137,7 @@ void ZipInstaller::downloadDone(bool error)
         }
         
         // add file to log
-        zipContents.append(m_mountpoint + m_target);
+        zipContents.append( m_target);
     }
 
     m_dp->addItem(tr("Creating installation log"),LOGINFO);

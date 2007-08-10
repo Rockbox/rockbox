@@ -29,6 +29,7 @@
 #include "installtalkwindow.h"
 #include "httpget.h"
 #include "installbootloader.h"
+#include "uninstallwindow.h"
 
 #ifdef __linux
 #include <stdio.h>
@@ -80,13 +81,12 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     connect(ui.buttonGames, SIGNAL(clicked()), this, SLOT(installDoom()));
     connect(ui.buttonTalk, SIGNAL(clicked()), this, SLOT(createTalkFiles()));
     connect(ui.buttonVoice, SIGNAL(clicked()), this, SLOT(installVoice()));
-  
+    connect(ui.buttonRemoveRockbox, SIGNAL(clicked()), this, SLOT(uninstall()));
+    connect(ui.buttonRemoveBootloader, SIGNAL(clicked()), this, SLOT(uninstallBootloader()));
     
     // disable unimplemented stuff
     ui.buttonThemes->setEnabled(false);
     ui.buttonSmall->setEnabled(false);
-    ui.buttonRemoveRockbox->setEnabled(false);
-    ui.buttonRemoveBootloader->setEnabled(false);
     ui.buttonComplete->setEnabled(false);
 
     initIpodpatcher();
@@ -94,6 +94,8 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     downloadInfo();
 
 }
+
+
 
 
 void RbUtilQt::downloadInfo()
@@ -395,4 +397,32 @@ void RbUtilQt::createTalkFiles(void)
     installWindow->setDeviceSettings(devices);
     installWindow->show();
 
+}
+
+void RbUtilQt::uninstall(void)
+{
+    UninstallWindow *uninstallWindow = new UninstallWindow(this);
+    uninstallWindow->setUserSettings(userSettings);
+    uninstallWindow->setDeviceSettings(devices);
+    uninstallWindow->show();
+}
+
+void RbUtilQt::uninstallBootloader(void)
+{
+    if(QMessageBox::question(this, tr("Confirm Uninstallation"),
+           tr("Do you really want to uninstall the Bootloader?"),
+           QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
+    // create logger
+    ProgressLoggerGui* logger = new ProgressLoggerGui(this);
+    logger->show();
+    
+    QString plattform = userSettings->value("defaults/platform").toString();
+    BootloaderInstaller blinstaller(this);
+    blinstaller.setMountPoint(userSettings->value("defaults/mountpoint").toString());
+    blinstaller.setDevice(userSettings->value("defaults/platform").toString());
+    blinstaller.setBootloaderMethod(devices->value(plattform + "/bootloadermethod").toString());
+    blinstaller.setBootloaderName(devices->value(plattform + "/bootloadername").toString());
+    blinstaller.setBootloaderBaseUrl(devices->value("bootloader_url").toString());
+    blinstaller.uninstall(logger);
+    
 }

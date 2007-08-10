@@ -18,8 +18,8 @@
  ****************************************************************************/
  
  
-#ifndef INSTALLRB_H
-#define INSTALLRB_H
+#ifndef INSTALLZIP_H
+#define INSTALLZIP_H
  
 
 

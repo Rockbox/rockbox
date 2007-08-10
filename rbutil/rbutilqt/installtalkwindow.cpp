@@ -200,6 +200,7 @@ void InstallTalkWindow::accept()
     talkcreator->setStripExtensions(ui.StripExtensions->isChecked());
 
     talkcreator->createTalkFiles(logger);
+    connect(logger,SIGNAL(closed()),this,SLOT(close()));    
 }
 
 
@@ -274,7 +275,7 @@ void InstallTalkWindow::setUserSettings(QSettings *user)
 {
     userSettings = user;
     
-
+    talkcreator->setMountPoint(userSettings->value("defaults/mountpoint").toString());
    
     setTalkFolder(userSettings->value("defaults/folderToTalk").toString());
     setEncoderExec(userSettings->value("defaults/pathEncoder").toString());

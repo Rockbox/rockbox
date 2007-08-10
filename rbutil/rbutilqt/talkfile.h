@@ -54,6 +54,7 @@ public:
     void setEncOpts(QString opts) {m_EncOpts=opts;}
 
     void setDir(QString dir){m_dir = dir; }
+    void setMountPoint(QString mountpoint) {m_mountpoint =mountpoint; }
 
     void setOverwriteTalk(bool ov) {m_overwriteTalk = ov;}
     void setOverwriteWav(bool ov) {m_overwriteWav = ov;}
@@ -74,7 +75,7 @@ private:
     bool voice(QString text,QString wavfile);
 
     QString m_dir;
-
+    QString m_mountpoint;
     QString m_curTTS;
     QString m_TTSexec;
     QStringList m_supportedTTS;

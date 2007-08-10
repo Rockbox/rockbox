@@ -85,6 +85,8 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
     connect(logger,SIGNAL(aborted()),this,SLOT(abort()));
     m_logger->setProgressMax(0);
     QDirIterator it(m_dir,QDirIterator::Subdirectories);
+    QSettings installlog(m_mountpoint + "/.rockbox/rbutil.log", QSettings::IniFormat, 0);
+    installlog.beginGroup("talkfiles");
     // iterate over all entrys
     while (it.hasNext()) 
     {
@@ -148,11 +150,16 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
         {
             QFile wavfile(wavfilename);
             wavfile.remove();
-        }    
-
+            installlog.remove(wavfilename);
+        }
+        else
+            installlog.setValue(wavfilename.remove(m_mountpoint),installlog.value(wavfilename,0).toInt()+1);
+        
+        installlog.setValue(filename.remove(m_mountpoint),installlog.value(filename,0).toInt()+1);
         it.next();
     }
     
+    installlog.endGroup();
     m_logger->addItem("Finished creating Talkfiles",LOGOK);
     m_logger->setProgressMax(1);
     m_logger->setProgressValue(1);

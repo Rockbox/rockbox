@@ -64,6 +64,8 @@ class RbUtilQt : public QMainWindow
         void downloadDone(int, bool);
         void downloadInfo(void);
         void installVoice(void);
+        void uninstall(void);
+        void uninstallBootloader(void);
 };
 
 #endif

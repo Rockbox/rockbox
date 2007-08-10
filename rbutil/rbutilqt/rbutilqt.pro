@@ -30,7 +30,9 @@ SOURCES += rbutilqt.cpp \
  ../sansapatcher/sansapatcher.c \
  irivertools/irivertools.cpp \
  irivertools/md5sum.cpp  \
- browsedirtree.cpp
+ browsedirtree.cpp \
+ uninstall.cpp \
+ uninstallwindow.cpp
 
 HEADERS += rbutilqt.h \
  settings.h \
@@ -62,7 +64,9 @@ HEADERS += rbutilqt.h \
  irivertools/h120sums.h \
  irivertools/h300sums.h \
  irivertools/checksums.h \
- browsedirtree.h 
+ browsedirtree.h \
+ uninstall.h \
+ uninstallwindow.h
 
 # Needed by QT on Win
 INCLUDEPATH = . irivertools zip zlib ../ipodpatcher ../sansapatcher
@@ -81,7 +85,8 @@ FORMS += rbutilqtfrm.ui \
  configurefrm.ui \
  installbootloaderfrm.ui \
  browsedirtreefrm.ui \
- installtalkfrm.ui 
+ installtalkfrm.ui \
+ uninstallfrm.ui
 
 RESOURCES += rbutilqt.qrc
 
