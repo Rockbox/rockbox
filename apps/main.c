@@ -485,7 +485,7 @@ static void init(void)
     if (button_hold())
 #endif
     {
-        gui_syncsplash(HZ*2, ID2P(LANG_RESET_DONE_CLEAR));
+        gui_syncsplash(HZ*2, str(LANG_RESET_DONE_CLEAR));
         settings_reset();
     }
     else
