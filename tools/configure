@@ -1742,11 +1742,6 @@ clean:
 	          html txt rockbox-manual*.zip sysfont.h rockbox-info.txt \
 	          voicefontids *.wav *.mp3 *.voice
 
-voice: tools
-	\$(SILENT)\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@ features
-	\$(SILENT)for f in \`cat \$(BUILDDIR)/@APPS@/features\`; do feat="\$\$feat:\$\$f" ; done ; \\
-	\$(TOOLSDIR)/genvoice.sh \$(ROOTDIR) \$(VOICELANGUAGE) \$(ARCHOS)\$\$feat \$(TARGET_ID) voicesettings.sh
-
 tools:
 	\$(SILENT)\$(MAKE) -C \$(TOOLSDIR) CC=\$(HOSTCC) @TOOLSET@
 
@@ -1829,6 +1824,18 @@ if [ "yes" = "$simulator" ]; then
 install:
 	@echo "installing a full setup in your archos dir"
 	@(\$(MAKE) fullzip && cd archos && unzip -oq ../rockbox-full.zip)
+EOF
+
+fi
+
+if [ "yes" = "$voice" ]; then
+
+ cat >> Makefile <<EOF
+
+voice: tools
+	\$(SILENT)\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@ features
+	\$(SILENT)for f in \`cat \$(BUILDDIR)/@APPS@/features\`; do feat="\$\$feat:\$\$f" ; done ; \\
+	\$(TOOLSDIR)/genvoice.sh \$(ROOTDIR) \$(VOICELANGUAGE) \$(ARCHOS)\$\$feat \$(TARGET_ID) voicesettings.sh
 EOF
 
 fi
