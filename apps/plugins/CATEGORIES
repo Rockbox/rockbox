@@ -73,10 +73,10 @@ starfield,demos
 stats,apps
 stopwatch,apps
 test_codec,viewers
-test_disk,test
-test_fps,test
-test_sampr,test
-test_scanrate,test
+test_disk,apps
+test_fps,apps
+test_sampr,apps
+test_scanrate,apps
 text_editor,apps
 vbrfix,viewers
 video,viewers
