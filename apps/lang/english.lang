@@ -5673,7 +5673,7 @@
   </dest>
   <voice>
     *: none
-    radio: "US / Canada"
+    radio: "US and Canada"
   </voice>
 </phrase>
 <phrase>
@@ -10431,7 +10431,7 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_DIRBROWSE_F1
-  desc: in dir browser, F1 button bar text /* there appears to be a bug that makes these strings not be included in the right build if they are excluded from any... */
+  desc: in dir browser, F1 button bar text
   user:
   <source>
     *: none
