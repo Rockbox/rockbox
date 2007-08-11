@@ -401,9 +401,9 @@ bool bookmark_autoload(const char* file)
     {
         char* bookmark = select_bookmark(global_bookmark_file_name, true);
         
-        if (bookmark)
+        if (bookmark != NULL)
         {
-            return bookmark_load(global_bookmark_file_name, true);
+            return play_bookmark(bookmark);
         }
 
         return false;
@@ -452,7 +452,6 @@ static int get_bookmark_count(const char* bookmark_file_name)
     if(file < 0)
         return -1;
 
-    /* Get the requested bookmark */
     while(read_line(file, global_read_buffer, sizeof(global_read_buffer)) > 0)
     {
         read_count++;
