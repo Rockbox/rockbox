@@ -34,7 +34,7 @@
     *: "On"
   </source>
   <dest>
-    *: "Vkl"
+    *: "Вкл"
   </dest>
   <voice>
     *: "On"
@@ -48,7 +48,7 @@
     *: "Off"
   </source>
   <dest>
-    *: "Vykl"
+    *: "Выкл"
   </dest>
   <voice>
     *: "Off"
@@ -132,7 +132,7 @@
     *: "Restarting playback..."
   </source>
   <dest>
-    *: "Перезапуск воспроизведения..."
+    *: "Перезапускаю воспроизведение..."
   </dest>
   <voice>
     *: ""
@@ -146,7 +146,7 @@
     *: "Please remove inserted MMC"
   </source>
   <dest>
-    *: "Пожалуйста удалите MMC карту из слота"
+    *: "Пожалуйста, выньте карту MMC"
   </dest>
   <voice>
     *: "Please remove multimedia card"
@@ -174,7 +174,7 @@
     *: "Failed"
   </source>
   <dest>
-    *: "Не удалось"
+    *: "Не получилось"
   </dest>
   <voice>
     *: ""
@@ -188,7 +188,7 @@
     *: "Recent Bookmarks"
   </source>
   <dest>
-    *: "Новые закладки"
+    *: "Недавние закладки"
   </dest>
   <voice>
     *: "Recent Bookmarks"
@@ -258,7 +258,7 @@
     *: "FM Radio"
   </source>
   <dest>
-    *: "FM радио"
+    *: "FM-радио"
   </dest>
   <voice>
     *: "FM Radio"
@@ -314,7 +314,7 @@
     *: "Info"
   </source>
   <dest>
-    *: "Инфо"
+    *: "Информация"
   </dest>
   <voice>
     *: "Info"
@@ -356,7 +356,7 @@
     *: "Bass"
   </source>
   <dest>
-    *: "Басы"
+    *: "Низкие"
   </dest>
   <voice>
     *: "Bass"
@@ -468,7 +468,7 @@
     *: "Mono Left"
   </source>
   <dest>
-    *: "Моно левый"
+    *: "Левый моно"
   </dest>
   <voice>
     *: "Mono Left"
@@ -482,7 +482,7 @@
     *: "Mono Right"
   </source>
   <dest>
-    *: "Моно правый"
+    *: "Правый моно"
   </dest>
   <voice>
     *: "Mono Right"
@@ -538,7 +538,7 @@
     *: "Auto Volume"
   </source>
   <dest>
-    *: "Авто громкость"
+    *: "Автогромкость"
   </dest>
   <voice>
     *: "Auto Volume"
@@ -566,7 +566,7 @@
     *: "Super bass"
   </source>
   <dest>
-    *: "Супер басы"
+    *: "Супербасы"
   </dest>
   <voice>
     *: "Super bass"
@@ -776,7 +776,7 @@
     *: "Browse .cfg files"
   </source>
   <dest>
-    *: "Выбор .cfg файлов"
+    *: "Выбор файлов .cfg "
   </dest>
   <voice>
     *: "Browse configuration files"
@@ -847,7 +847,7 @@
     *: "Any Other = No"
   </source>
   <dest>
-    *: "Все остальное = Нет"
+    *: "Другие кнопки = Нет"
   </dest>
   <voice>
     *: ""
@@ -903,7 +903,7 @@
     *: "Write .cfg file"
   </source>
   <dest>
-    *: "Запись .cfg файла"
+    *: "Запись файла .cfg"
   </dest>
   <voice>
     *: "Write configuration file"
@@ -917,7 +917,7 @@
     *: "Save Failed"
   </source>
   <dest>
-    *: "Настройки утеряны"
+    *: "Ошибка сохранения"
   </dest>
   <voice>
     *: ""
@@ -945,7 +945,7 @@
     *: "Save Failed"
   </source>
   <dest>
-    *: "Настройки утеряны"
+    *: "Ошибка сохранения"
   </dest>
   <voice>
     *: ""
@@ -1337,7 +1337,7 @@
     *: "Shuffle"
   </source>
   <dest>
-    *: "Sluchaino"
+    *: "Случайно"
   </dest>
   <voice>
     *: "Shuffle"
@@ -1351,7 +1351,7 @@
     *: "Repeat"
   </source>
   <dest>
-    *: "Povtor"
+    *: "Повтор"
   </dest>
   <voice>
     *: "Repeat"
@@ -1365,7 +1365,7 @@
     *: "All"
   </source>
   <dest>
-    *: "Vse"
+    *: "Все"
   </dest>
   <voice>
     *: "All"
@@ -1379,7 +1379,7 @@
     *: "One"
   </source>
   <dest>
-    *: "Odin"
+    *: "Одна"
   </dest>
   <voice>
     *: "One"
@@ -1393,7 +1393,7 @@
     *: "A-B"
   </source>
   <dest>
-    *: "A-B"
+    *: "А-Б"
   </dest>
   <voice>
     *: "A-B"
@@ -1449,7 +1449,7 @@
     *: "Anti-Skip Buffer"
   </source>
   <dest>
-    *: "Буфер анти-шок"
+    *: "Антишок-буфер "
   </dest>
   <voice>
     *: "Anti-Skip Buffer"
@@ -1575,7 +1575,7 @@
     *: "ID3 tag priority"
   </source>
   <dest>
-    *: "Приоритет ID3 тегов"
+    *: "Приоритет тегов ID3"
   </dest>
   <voice>
     *: "ID3 tag priority"
@@ -1589,7 +1589,7 @@
     *: "V1 then V2"
   </source>
   <dest>
-    *: "V1 и потом V2"
+    *: "V1 и затем V2"
   </dest>
   <voice>
     *: "Version 1 then version 2"
@@ -1603,7 +1603,7 @@
     *: "V2 then V1"
   </source>
   <dest>
-    *: "V2 и потом V1"
+    *: "V2 и затем V1"
   </dest>
   <voice>
     *: "Version 2 then version 1"
@@ -1617,7 +1617,7 @@
     *: "Auto change directory"
   </source>
   <dest>
-    *: "Авто смена директории"
+    *: "Авт. смена папки"
   </dest>
   <voice>
     *: "Auto change directory"
@@ -1659,7 +1659,7 @@
     *: "Sort Directories"
   </source>
   <dest>
-    *: "Сортировать директории"
+    *: "Сортировать папки"
   </dest>
   <voice>
     *: "sort directories"
@@ -1715,7 +1715,7 @@
     *: "by newest date"
   </source>
   <dest>
-    *: "по самой новой дате"
+    *: "по последней дате"
   </dest>
   <voice>
     *: "by newest date"
@@ -1743,7 +1743,7 @@
     *: "Show Files"
   </source>
   <dest>
-    *: "Pokazyvat faily"
+    *: "Показывать файлы"
   </dest>
   <voice>
     *: "Show Files"
@@ -1757,7 +1757,7 @@
     *: "All"
   </source>
   <dest>
-    *: "Vse"
+    *: "Все"
   </dest>
   <voice>
     *: "All"
@@ -1771,7 +1771,7 @@
     *: "Supported"
   </source>
   <dest>
-    *: "Podderjivaemie"
+    *: "Поддерживаемые"
   </dest>
   <voice>
     *: "Supported"
@@ -1785,7 +1785,7 @@
     *: "Music"
   </source>
   <dest>
-    *: "Muzyka"
+    *: "Музыка"
   </dest>
   <voice>
     *: "Music"
@@ -1799,7 +1799,7 @@
     *: "Playlists"
   </source>
   <dest>
-    *: "Playlists"
+    *: "Списки воспроизведения"
   </dest>
   <voice>
     *: "Playlists"
@@ -1813,7 +1813,7 @@
     *: "ID3 database"
   </source>
   <dest>
-    *: "Bazy dannih ID3"
+    *: "Базы данных ID3"
   </dest>
   <voice>
     *: "ID3 database"
@@ -1869,7 +1869,7 @@
     *: "Browse .wps files"
   </source>
   <dest>
-    *: "Выбор .wps файлов"
+    *: "Выбор файлов .wps"
   </dest>
   <voice>
     *: "Browse while-playing-screen files"
@@ -1883,7 +1883,7 @@
     *: "Browse .rwps files"
   </source>
   <dest>
-    *: "Выбор .rwps файлов"
+    *: "Выбор файлов .rwps"
   </dest>
   <voice>
     *: "Browse remote while-playing-screen files"
@@ -1911,7 +1911,7 @@
     *: "Remote-LCD Settings"
   </source>
   <dest>
-    *: "Настройка ЖКД на пульте"
+    *: "Настройка ЖКД пульта"
   </dest>
   <voice>
     *: "Remote LCD settings"
@@ -1939,7 +1939,7 @@
     *: "Status-/Scrollbar"
   </source>
   <dest>
-    *: "Статус-/Прокрутка"
+    *: "Статус/Прокрутка"
   </dest>
   <voice>
     *: "Status- and Scrollbar"
@@ -2163,7 +2163,7 @@
     *: "Battery"
   </source>
   <dest>
-    *: "Батарея"
+    *: "Аккумулятор"
   </dest>
   <voice>
     *: "Battery"
@@ -2205,7 +2205,7 @@
     *: "Idle Poweroff"
   </source>
   <dest>
-    *: "Отключение при простое"
+    *: "Выключение при простое"
   </dest>
   <voice>
     *: "Idle Poweroff"
@@ -2289,7 +2289,7 @@
     *: "Bookmark on Stop"
   </source>
   <dest>
-    *: "Создать закладку на остановке"
+    *: "Создать закладку на Паузе"
   </dest>
   <voice>
     *: "Bookmark on Stop"
@@ -2331,7 +2331,7 @@
     *: "Load Last Bookmark"
   </source>
   <dest>
-    *: "Загрузить послед. закладку"
+    *: "Загрузить посл. закладку"
   </dest>
   <voice>
     *: "Load Last Bookmark"
@@ -2345,7 +2345,7 @@
     *: "Maintain a List of Recent Bookmarks?"
   </source>
   <dest>
-    *: "Исправить лист новых закладок?"
+    *: "Вести список недавних закладок?"
   </dest>
   <voice>
     *: "Maintain a List of Recent Bookmarks?"
@@ -2387,7 +2387,7 @@
     *: "Voice Directories"
   </source>
   <dest>
-    *: "Озвучивать директории"
+    *: "Озвучивать папки"
   </dest>
   <voice>
     *: "Voice Directories"
@@ -2415,7 +2415,7 @@
     *: "Numbers"
   </source>
   <dest>
-    *: "Цыфры"
+    *: "Числа"
   </dest>
   <voice>
     *: "Numbers"
@@ -2443,7 +2443,7 @@
     *: ".talk mp3 clip"
   </source>
   <dest>
-    *: ".говорить mp3 клипы"
+    *: ".проговаривать mp3"
   </dest>
   <voice>
     *: "talk mp3 clip"
@@ -2555,7 +2555,7 @@
     *: "Independent frames"
   </source>
   <dest>
-    *: "Назависимые рамки"
+    *: "Независимые рамки"
   </dest>
   <voice>
     *: "Independent frames"
@@ -2569,7 +2569,7 @@
     *: "Time Split"
   </source>
   <dest>
-    *: "Деление времени"
+    *: "Разделение по времени"
   </dest>
   <voice>
     *: "Time Split"
@@ -2597,7 +2597,7 @@
     *: "Directory"
   </source>
   <dest>
-    *: "Директория"
+    *: "Папка"
   </dest>
   <voice>
     *: "Directory"
@@ -2611,7 +2611,7 @@
     *: "Current dir"
   </source>
   <dest>
-    *: "Текущая директория"
+    *: "Текущая папка"
   </dest>
   <voice>
     *: "Current directory"
@@ -2639,7 +2639,7 @@
     *: "Trigger"
   </source>
   <dest>
-    *: "Спусковой механизм"
+    *: "Триггер"
   </dest>
   <voice>
     *: "Trigger"
@@ -2695,7 +2695,7 @@
     *: "Main and remote unit"
   </source>
   <dest>
-    *: "На плеере и на пульте"
+    *: "На плеере и пульте"
   </dest>
   <voice>
     *: "Main and remote unit"
@@ -2737,7 +2737,7 @@
     *: "Enable crossfade"
   </source>
   <dest>
-    *: "Включить crossfade"
+    *: "Включить пересечение"
   </dest>
   <voice>
     *: "Enable crossfade"
@@ -2835,7 +2835,7 @@
     *: "Enable replaygain"
   </source>
   <dest>
-    *: "Включить усиление воспроизвед."
+    *: "Включить усиление воспр."
   </dest>
   <voice>
     *: "Enable replaygain"
@@ -2849,7 +2849,7 @@
     *: "Prevent clipping"
   </source>
   <dest>
-    *: "Предотвратить перегрузку"
+    *: "Предотвратить перегрузки"
   </dest>
   <voice>
     *: "Prevent clipping"
@@ -2947,7 +2947,7 @@
     *: "Backlight When Plugged"
   </source>
   <dest>
-    *: "Подсветка при внеш. питании"
+    *: "Подсветка при внешн. питании"
   </dest>
   <voice>
     *: "Backlight When Plugged"
@@ -2961,7 +2961,7 @@
     *: "Caption backlight"
   </source>
   <dest>
-    *: "Подсветка заголовка"
+    *: "Подсв. при смене названия"
   </dest>
   <voice>
     *: "Caption backlight"
@@ -3017,7 +3017,7 @@
     *: "Contrast"
   </source>
   <dest>
-    *: "Контраст"
+    *: "Контрастность"
   </dest>
   <voice>
     *: "Contrast"
@@ -3073,7 +3073,7 @@
     *: "Upside Down"
   </source>
   <dest>
-    *: "Перевернутый"
+    *: "Перевёрнутый"
   </dest>
   <voice>
     *: "Upside Down"
@@ -3087,7 +3087,7 @@
     *: "Line Selector"
   </source>
   <dest>
-    *: "Выбор линии"
+    *: "Выбор черты"
   </dest>
   <voice>
     *: "Line Selector"
@@ -3101,7 +3101,7 @@
     *: "Pointer"
   </source>
   <dest>
-    *: "Указатель"
+    *: "Стрелочка"
   </dest>
   <voice>
     *: "Pointer"
@@ -3115,7 +3115,7 @@
     *: "Bar(Inverse)"
   </source>
   <dest>
-    *: "Курсор(Инверсивный)"
+    *: "Инверсный курсор"
   </dest>
   <voice>
     *: "Inverse Bar"
@@ -3143,7 +3143,7 @@
     *: "Reduce ticking"
   </source>
   <dest>
-    *: "Уменьшить мерцание"
+    *: "Бороться с щелчками"
   </dest>
   <voice>
     *: "Reduce ticking"
@@ -3213,7 +3213,7 @@
     *: "Scroll Step Size Setting Example Text"
   </source>
   <dest>
-    *: "Образец текста для велечины шага прокрутки"
+    *: "Образец прокрутки"
   </dest>
   <voice>
     *: ""
@@ -3227,7 +3227,7 @@
     *: "Bidirectional Scroll Limit"
   </source>
   <dest>
-    *: "Огранич. дву-направленной прокрутки"
+    *: "Огр. двунаправленной прокрутки"
   </dest>
   <voice>
     *: "Bidirectional Scroll Limit"
@@ -3507,7 +3507,7 @@
     *: "Logarithmic(dB)"
   </source>
   <dest>
-    *: "Логарифмическая(dB)"
+    *: "Логарифмическая (dB)"
   </dest>
   <voice>
     *: "Logarithmic decibel"
@@ -3521,7 +3521,7 @@
     *: "Linear(%)"
   </source>
   <dest>
-    *: "Линейная(%)"
+    *: "Линейная (%)"
   </dest>
   <voice>
     *: "Linear percent"
@@ -3563,7 +3563,7 @@
     *: "Battery Capacity"
   </source>
   <dest>
-    *: "Емкость аккумулятора"
+    *: "Ёмкость аккумулятора"
   </dest>
   <voice>
     *: "Battery Capacity"
@@ -3577,7 +3577,7 @@
     *: "Battery Type"
   </source>
   <dest>
-    *: "Тип батареи"
+    *: "Тип аккумулятора"
   </dest>
   <voice>
     *: "Battery type"
@@ -3605,7 +3605,7 @@
     *: "NiMH"
   </source>
   <dest>
-    *: "Никель металлогидридная"
+    *: "Никель-металгидридная"
   </dest>
   <voice>
     *: "Nickel metal hydride"
@@ -3647,7 +3647,7 @@
     *: "Directory cache"
   </source>
   <dest>
-    *: "Кэш директорий"
+    *: "Кэш папок"
   </dest>
   <voice>
     *: "Directory cache"
@@ -3661,7 +3661,7 @@
     *: "Please reboot to enable the cache"
   </source>
   <dest>
-    *: "Пожалуйста перезагрузитесь для включения кэша"
+    *: "Перезагрузитесь для включения кэша"
   </dest>
   <voice>
     *: ""
@@ -3717,7 +3717,7 @@
     *: "12 Hour Clock"
   </source>
   <dest>
-    *: "12-ти часовой"
+    *: "12ти-часовой"
   </dest>
   <voice>
     *: "12 Hour Clock"
@@ -3731,7 +3731,7 @@
     *: "24 Hour Clock"
   </source>
   <dest>
-    *: "24-х часовой"
+    *: "24х-часовой"
   </dest>
   <voice>
     *: "24 Hour Clock"
@@ -3745,7 +3745,7 @@
     *: "Max files in dir browser"
   </source>
   <dest>
-    *: "Макс. файлов в директории"
+    *: "Макс. файлов в папке"
   </dest>
   <voice>
     *: "Max files in directory browser"
@@ -3801,7 +3801,7 @@
     *: "Show ID3 Info"
   </source>
   <dest>
-    *: "Показывать ID3 инф."
+    *: "Показывать инф. ID3"
   </dest>
   <voice>
     *: "Show ID3 Info"
@@ -3885,7 +3885,7 @@
     *: "Delete directory"
   </source>
   <dest>
-    *: "Удалить директорию"
+    *: "Удалить папку"
   </dest>
   <voice>
     *: "delete directory"
@@ -3927,7 +3927,7 @@
     *: "Open with"
   </source>
   <dest>
-    *: "Открыть с"
+    *: "Открыть с ..."
   </dest>
   <voice>
     *: "open with"
@@ -3941,7 +3941,7 @@
     *: "Create directory"
   </source>
   <dest>
-    *: "Создать директорию"
+    *: "Создать папку"
   </dest>
   <voice>
     *: "Create directory"
@@ -3969,7 +3969,7 @@
     *: "Reshuffle"
   </source>
   <dest>
-    *: "Перестановка"
+    *: "Перемешать"
   </dest>
   <voice>
     *: "Reshuffle"
@@ -4123,7 +4123,7 @@
     *: "Rockbox Info:"
   </source>
   <dest>
-    *: "Инфо о Rockbox:"
+    *: "Инф. о Rockbox:"
   </dest>
   <voice>
     *: ""
@@ -4165,7 +4165,7 @@
     *: "Battery: Charging"
   </source>
   <dest>
-    *: "Батарея: Зарядка"
+    *: "Аккумулятор: Заряжается"
   </dest>
   <voice>
     *: ""
@@ -4249,7 +4249,7 @@
     *: "Int:"
   </source>
   <dest>
-    *: "Внут:"
+    *: "Внутр:"
   </dest>
   <voice>
     *: "Internal"
@@ -4389,7 +4389,7 @@
     *: "Down = List"
   </source>
   <dest>
-    *: "Down = Лист"
+    *: "Down = Список"
   </dest>
   <voice>
     *: ""
@@ -4531,7 +4531,7 @@
     *: "Bookmark Failed!"
   </source>
   <dest>
-    *: "Закладка не сработала!"
+    *: "Закладка не создана!"
   </dest>
   <voice>
     *: ""
@@ -4783,7 +4783,7 @@
     *: "Trigger"
   </source>
   <dest>
-    *: "Спусковой механизм"
+    *: "Триггер"
   </dest>
   <voice>
     *: ""
@@ -4811,7 +4811,7 @@
     *: "Repeat"
   </source>
   <dest>
-    *: "Повтор"
+    *: "Повторять"
   </dest>
   <voice>
     *: ""
@@ -4923,7 +4923,7 @@
     *: "Trigger active"
   </source>
   <dest>
-    *: "Спусковой механизм включен"
+    *: "Триггер включен"
   </dest>
   <voice>
     *: ""
@@ -4937,7 +4937,7 @@
     *: "Alarm Time: %02d:%02d"
   </source>
   <dest>
-    *: "Время будильника: %02d:%02d"
+    *: "Будильник на: %02d:%02d"
   </dest>
   <voice>
     *: ""
@@ -4951,7 +4951,7 @@
     *: "Waking Up In %d:%02d"
   </source>
   <dest>
-    *: "Пробудиться в %d:%02d"
+    *: "Проснуться в %d:%02d"
   </dest>
   <voice>
     *: ""
@@ -4979,7 +4979,7 @@
     *: "Alarm Time Is Too Soon!"
   </source>
   <dest>
-    *: "Установлено слишком раннее время"
+    *: "Будильник слишком скоро!"
   </dest>
   <voice>
     *: ""
@@ -4993,7 +4993,7 @@
     *: "PLAY=Set OFF=Cancel"
   </source>
   <dest>
-    *: "PLAY=Устан. OFF=Отмен."
+    *: "PLAY=Уст., OFF=Отм."
   </dest>
   <voice>
     *: ""
@@ -5007,7 +5007,7 @@
     *: "Alarm Disabled"
   </source>
   <dest>
-    *: "Будильник отключен"
+    *: "Будильник выключен"
   </dest>
   <voice>
     *: "Alarm Disabled"
@@ -6827,7 +6827,7 @@
     *: "Playlist Buffer Full"
   </source>
   <dest>
-    *: "Список Буфер заполнен"
+    *: "Буфер списка заполнен"
   </dest>
   <voice>
     *: ""
@@ -6869,7 +6869,7 @@
     *: "Creating"
   </source>
   <dest>
-    *: "Создается"
+    *: "Создаётся"
   </dest>
   <voice>
     *: ""
@@ -6953,7 +6953,7 @@
     *: "Nothing to resume"
   </source>
   <dest>
-    *: "Нечего возобновлять"
+    *: "Нечего продолжать"
   </dest>
   <voice>
     *: ""
@@ -7023,7 +7023,7 @@
     *: "Playlist control file is invalid"
   </source>
   <dest>
-    *: "Файл скпика песен поврежден"
+    *: "Файл списка песен поврежден"
   </dest>
   <voice>
     *: ""
@@ -7051,7 +7051,7 @@
     *: "No presets"
   </source>
   <dest>
-    *: "No presets"
+    *: "Нет предустановок"
   </dest>
   <voice>
     *: ""
@@ -7079,7 +7079,7 @@
     *: "Edit preset"
   </source>
   <dest>
-    *: "Редактир. предустановку"
+    *: "Редакт. предустановку"
   </dest>
   <voice>
     *: ""
@@ -7233,7 +7233,7 @@
     *: "Screen frozen!"
   </source>
   <dest>
-    *: "Экран остановлен!"
+    *: "Экран заморожен!"
   </dest>
   <voice>
     *: ""
@@ -7247,7 +7247,7 @@
     *: "Auto scan presets"
   </source>
   <dest>
-    *: "Автоскан. предустановок"
+    *: "Автоскан. радиостанций"
   </dest>
   <voice>
     *: "Auto scan presets"
@@ -7359,7 +7359,7 @@
     *: "Option"
   </source>
   <dest>
-    *: "Опция"
+    *: "Параметр"
   </dest>
   <voice>
     *: ""
@@ -7387,7 +7387,7 @@
     *: "Dir Buffer Is Full!"
   </source>
   <dest>
-    *: "Буфер директорий заполнен!"
+    *: "Буфер папок заполнен!"
   </dest>
   <voice>
     *: ""
@@ -7401,7 +7401,7 @@
     *: "New Language"
   </source>
   <dest>
-    *: "Новый язык"
+    *: "Язык загружен"
   </dest>
   <voice>
     *: ""
@@ -7415,7 +7415,7 @@
     *: "Settings Loaded"
   </source>
   <dest>
-    *: "Настройки Загружен"
+    *: "Настройки загружены"
   </dest>
   <voice>
     *: ""
@@ -7429,7 +7429,7 @@
     *: "Settings Saved"
   </source>
   <dest>
-    *: "Настройки Сохранены"
+    *: "Настройки сохранены"
   </dest>
   <voice>
     *: ""
@@ -7457,7 +7457,7 @@
     *: "Reboot now?"
   </source>
   <dest>
-    *: "Перезагрузить сейчас?"
+    *: "Перезагрузиться сейчас?"
   </dest>
   <voice>
     *: ""
@@ -7765,7 +7765,7 @@
     *: "File Options"
   </source>
   <dest>
-    *: "Опции файла"
+    *: "Параметры файла"
   </dest>
   <voice>
     *: "File Options"
@@ -7835,7 +7835,7 @@
     *: "Plugin returned error"
   </source>
   <dest>
-    *: "Плагин выдал ошибку"
+    *: "Плагин вернул ошибку"
   </dest>
   <voice>
     *: ""
@@ -7849,7 +7849,7 @@
     *: "Extension array full"
   </source>
   <dest>
-    *: "Массив дополнений полон"
+    *: "Массив расширений полон"
   </dest>
   <voice>
     *: ""
@@ -7905,7 +7905,7 @@
     *: "(PLAY/STOP)"
   </source>
   <dest>
-    *: "(воспр/стоп)"
+    *: "(Воспр./Ост.)"
   </dest>
   <voice>
     *: ""
@@ -7947,7 +7947,7 @@
     *: "On"
   </source>
   <dest>
-    *: "Vkl"
+    *: "Вкл"
   </dest>
   <voice>
     *: "On"
@@ -7961,7 +7961,7 @@
     *: "Off"
   </source>
   <dest>
-    *: "Vykl"
+    *: "Выкл"
   </dest>
   <voice>
     *: "Off"
@@ -8059,7 +8059,7 @@
     *: "Shuffle"
   </source>
   <dest>
-    *: "Sluchaino"
+    *: "Случайно"
   </dest>
   <voice>
     *: "Shuffle"
@@ -8073,7 +8073,7 @@
     *: "Repeat"
   </source>
   <dest>
-    *: "Povtor"
+    *: "Повтор"
   </dest>
   <voice>
     *: "Repeat"
@@ -8087,7 +8087,7 @@
     *: "All"
   </source>
   <dest>
-    *: "Vse"
+    *: "Все"
   </dest>
   <voice>
     *: "All"
@@ -8101,7 +8101,7 @@
     *: "One"
   </source>
   <dest>
-    *: "Odin"
+    *: "Одна"
   </dest>
   <voice>
     *: "One"
@@ -8115,7 +8115,7 @@
     *: "A-B"
   </source>
   <dest>
-    *: "A-B"
+    *: "А-Б"
   </dest>
   <voice>
     *: "A-B"
@@ -8129,7 +8129,7 @@
     *: "Show Files"
   </source>
   <dest>
-    *: "Pokazyvat faily"
+    *: "Показывать файлы"
   </dest>
   <voice>
     *: "Show Files"
@@ -8143,7 +8143,7 @@
     *: "All"
   </source>
   <dest>
-    *: "Vse"
+    *: "Все"
   </dest>
   <voice>
     *: "All"
@@ -8157,7 +8157,7 @@
     *: "Supported"
   </source>
   <dest>
-    *: "Podderjivaemie"
+    *: "Поддерживаемые"
   </dest>
   <voice>
     *: "Supported"
@@ -8171,7 +8171,7 @@
     *: "Music"
   </source>
   <dest>
-    *: "Muzyka"
+    *: "Музыка"
   </dest>
   <voice>
     *: "Music"
@@ -8185,7 +8185,7 @@
     *: "Playlists"
   </source>
   <dest>
-    *: "Playlists"
+    *: "Списки воспроизведения"
   </dest>
   <voice>
     *: "Playlists"
@@ -8193,19 +8193,13 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_ID3DB
-### The 'desc' field differs from the english!
-### the previously used desc is commented below:
-### desc: show ID3 database
   desc: show ID3 Database
   user:
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "ID3 database"
     *: "ID3 Database"
   </source>
   <dest>
-    *: "Bazy dannih ID3"
+    *: "База данных ID3"
   </dest>
   <voice>
     *: "ID3 database"
@@ -8317,7 +8311,7 @@
     *: "Trigger"
   </source>
   <dest>
-    *: "Спусковой механизм"
+    *: "Триггер"
   </dest>
   <voice>
     *: "Trigger"
@@ -8331,7 +8325,7 @@
     *: "Upside Down"
   </source>
   <dest>
-    *: "Перевернутый"
+    *: "Перевёрнутый"
   </dest>
   <voice>
     *: "Upside Down"
@@ -8426,9 +8420,6 @@
   desc: Display of record timer interval setting, on the record screen
   user:
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Split time:"
     *: "Split Time:"
   </source>
   <dest>
@@ -8457,9 +8448,6 @@
   desc: in recording and radio screen
   user:
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Prerecording"
     *: "Pre-Recording"
   </source>
   <dest>
@@ -8547,7 +8535,7 @@
     *: "Option"
   </source>
   <dest>
-    *: "Опция"
+    *: "Параметр"
   </dest>
   <voice>
     *: ""
@@ -8567,8 +8555,6 @@
     *: ""
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SYSFONT_PITCH
   desc: "pitch" in the pitch screen
@@ -8577,14 +8563,12 @@
     *: "Pitch"
   </source>
   <dest>
-    *: "Pitch"
+    *: "Высота"
   </dest>
   <voice>
     *: "Pitch"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SYSFONT_AGC_SAFETY
   desc: AGC preset
@@ -8592,14 +8576,12 @@
     *: "Safety (clip)"
   </source>
   <dest>
-    *: "Safety (clip)"
+    *: "Безопасность (обр.)"
   </dest>
   <voice>
     *: "Safety (clip)"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SYSFONT_AGC_VOICE
   desc: AGC preset
@@ -8607,14 +8589,12 @@
     *: "Voice (fast)"
   </source>
   <dest>
-    *: "Voice (fast)"
+    *: "Голос (быстро)"
   </dest>
   <voice>
     *: "Voice (fast)"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SYSFONT_AGC_MEDIUM
   desc: AGC preset
@@ -8622,14 +8602,12 @@
     *: "Medium"
   </source>
   <dest>
-    *: "Medium"
+    *: "Средне"
   </dest>
   <voice>
     *: "Medium"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SYSFONT_AGC_LIVE
   desc: AGC preset
@@ -8637,14 +8615,12 @@
     *: "Live (slow)"
   </source>
   <dest>
-    *: "Live (slow)"
+    *: "Концерт (медленно)"
   </dest>
   <voice>
     *: "Live (slow)"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SYSFONT_AGC_DJSET
   desc: AGC preset
@@ -8652,14 +8628,12 @@
     *: "DJ-Set (slow)"
   </source>
   <dest>
-    *: "DJ-Set (slow)"
+    *: "DJ-Set (медленно)"
   </dest>
   <voice>
     *: "DJ set (slow)"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
   desc: AGC maximum gain in recording screen
