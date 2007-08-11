@@ -76,16 +76,17 @@ generateclips() {
             2)
                 # String
                 STRING=`echo $line |cut -b 8-`
+                STRING_MD5=`echo $STRING |md5sum|cut -b-32`
 
                 if [ -n "$POOL" ]; then
                     # we have a common pool of snippets, check that first
                     # for available mp3 sounds, and if it is available copy
                     # (symlink!) it over
-                    if [ -f "$POOL/$STRING.mp3" ]; then
+                    if [ -f "$POOL/$STRING_MD5.mp3" ]; then
                         echo "Re-using $ID from pool"
                         if [ ! -e "$TEMPDIR/$ID".mp3 ]; then
                             # only do this if not present
-                            ln -s "$POOL/$STRING.mp3" "$TEMPDIR/$ID".mp3
+                            ln -s "$POOL/$STRING_MD5.mp3" "$TEMPDIR/$ID".mp3
                         fi
                     fi
                 fi
@@ -96,8 +97,8 @@ generateclips() {
                     voice "$STRING" "$TEMPDIR/$ID".wav
                     if [ -n "$POOL" ]; then
                         # create it in the pool, symlink it back
-                        encode "$TEMPDIR/$ID".wav "$POOL/$STRING".mp3
-                        ln -s "$POOL/$STRING.mp3" "$TEMPDIR/$ID".mp3
+                        encode "$TEMPDIR/$ID".wav "$POOL/$STRING_MD5".mp3
+                        ln -s "$POOL/$STRING_MD5.mp3" "$TEMPDIR/$ID".mp3
                     else
                         encode "$TEMPDIR/$ID".wav "$TEMPDIR/$ID".mp3
                     fi
@@ -109,7 +110,7 @@ generateclips() {
     )
 }
 
-if [ -z "$3" ]; then
+if [ -z "$4" ]; then
     echo "Usage: $0 rockboxdirectory language target targetid [settingsfile]";
     exit 32
 else
