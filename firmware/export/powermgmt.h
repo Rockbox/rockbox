@@ -26,6 +26,34 @@
 #define CHARGE_END_LONGD  50     /* stop when N minutes have passed with
                                   * avg delta being < -0.02 V */
 
+#if CONFIG_CHARGING >= CHARGING_MONITOR
+typedef enum {       /* sorted by increasing charging current */
+    DISCHARGING = 0,
+    TRICKLE,         /* Can occur for CONFIG_CHARGING >= CHARGING_MONITOR */
+    TOPOFF,          /* Can occur for CONFIG_CHARGING == CHARGING_CONTROL */
+    CHARGING         /* Can occur for all CONFIG_CHARGING options */
+} charge_state_type;
+
+/* tells what the charger is doing */
+extern charge_state_type charge_state;
+#endif /* CONFIG_CHARGING >= CHARGING_MONITOR */
+
+#ifdef CONFIG_CHARGING
+/*
+ * Flag that the charger has been plugged in/removed: this is set for exactly
+ * one time through the power loop when the charger has been plugged in.
+ */
+typedef enum {
+    NO_CHARGER,
+    CHARGER_UNPLUGGED,              /* transient state */
+    CHARGER_PLUGGED,                /* transient state */
+    CHARGER
+} charger_input_state_type;
+
+/* tells the state of the charge input */
+extern charger_input_state_type charger_input_state;
+#endif
+
 #ifndef SIMULATOR
 
 #if CONFIG_CHARGING == CHARGING_CONTROL
@@ -60,34 +88,6 @@ extern int pid_i;                /* PID integral term */
 extern int trickle_sec;          /* trickle charge: How many seconds per minute are we charging actually? */
 
 #endif /* CONFIG_CHARGING == CHARGING_CONTROL */
-
-#if CONFIG_CHARGING >= CHARGING_MONITOR
-typedef enum {       /* sorted by increasing charging current */
-    DISCHARGING = 0,
-    TRICKLE,         /* Can occur for CONFIG_CHARGING >= CHARGING_MONITOR */
-    TOPOFF,          /* Can occur for CONFIG_CHARGING == CHARGING_CONTROL */
-    CHARGING         /* Can occur for all CONFIG_CHARGING options */
-} charge_state_type;
-
-/* tells what the charger is doing */
-extern charge_state_type charge_state;
-#endif /* CONFIG_CHARGING >= CHARGING_MONITOR */
-
-#ifdef CONFIG_CHARGING
-/*
- * Flag that the charger has been plugged in/removed: this is set for exactly
- * one time through the power loop when the charger has been plugged in.
- */
-typedef enum {
-    NO_CHARGER,
-    CHARGER_UNPLUGGED,              /* transient state */
-    CHARGER_PLUGGED,                /* transient state */
-    CHARGER
-} charger_input_state_type;
-
-/* tells the state of the charge input */
-extern charger_input_state_type charger_input_state;
-#endif
 
 #ifdef HAVE_MMC  /* Values for Ondio */
 # define CURRENT_NORMAL     95  /* average, nearly proportional to 1/U */

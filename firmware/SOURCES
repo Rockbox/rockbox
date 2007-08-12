@@ -95,11 +95,11 @@ drivers/lcd-remote-2bit-vi.c
 
 /* Misc. */
 drivers/led.c
+drivers/button.c
 #ifndef TARGET_TREE
 drivers/power.c
 #endif /* TARGET_TREE */
 #ifndef SIMULATOR
-drivers/button.c
 drivers/dac.c
 drivers/serial.c
 #endif /* SIMULATOR */

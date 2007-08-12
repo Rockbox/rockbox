@@ -79,12 +79,23 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x80000
 
-#define BATTERY_CAPACITY_DEFAULT 950 /* default battery capacity */
-
 #define HAVE_TLV320
 
 /* TLV320 has no tone controls, so we use the software ones */
 #define HAVE_SW_TONE_CONTROLS
+
+/* Type of mobile power */
+#define X5_BATT_CONFIG          2
+#define CONFIG_BATTERY          BATT_IAUDIO_X5M5
+#define BATTERY_CAPACITY_DEFAULT 950 /* default battery capacity */
+#define BATTERY_CAPACITY_MIN    950   /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX    2250  /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC    50    /* capacity increment */
+#define BATTERY_TYPES_COUNT     1     /* only one type */
+#define BATTERY_SCALE_FACTOR    5859  /* (420703125 + 35900) / 71800 */
+
+/* Hardware controlled charging? FIXME */
+#define CONFIG_CHARGING CHARGING_SIMPLE
 
 #ifndef SIMULATOR
 
@@ -97,9 +108,6 @@
 /* Define this if you want to use coldfire's i2c interface */
 #define CONFIG_I2C I2C_COLDFIRE
 
-/* Hardware controlled charging? FIXME */
-#define CONFIG_CHARGING CHARGING_SIMPLE
-
 /* define this if the hardware can be powered off while charging */
 #define HAVE_POWEROFF_WHILE_CHARGING
 
@@ -108,15 +116,6 @@
 
 /* Define this to the CPU frequency */
 #define CPU_FREQ      11289600
-
-/* Type of mobile power */
-#define X5_BATT_CONFIG          2
-#define CONFIG_BATTERY          BATT_IAUDIO_X5M5
-#define BATTERY_CAPACITY_MIN    950   /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX    2250  /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC    50    /* capacity increment */
-#define BATTERY_TYPES_COUNT     1     /* only one type */
-#define BATTERY_SCALE_FACTOR    5859  /* (420703125 + 35900) / 71800 */
 
 /* Define this if you have ATA power-off control */
 #define HAVE_ATA_POWER_OFF

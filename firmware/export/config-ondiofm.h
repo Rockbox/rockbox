@@ -46,10 +46,23 @@
 /* Enable this if you have done the backlight mod */
 //#define HAVE_BACKLIGHT
 
-#define BATTERY_CAPACITY_DEFAULT 1000 /* default battery capacity */
-
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
+
+/* define this if more than one device/partition can be used */
+#define HAVE_MULTIVOLUME
+
+/* Type of mobile power */
+#define CONFIG_BATTERY BATT_3AAA
+#define BATTERY_CAPACITY_DEFAULT 1000 /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 500  /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 1500 /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC 50   /* capacity increment */
+#define BATTERY_TYPES_COUNT  2    /* Alkalines or NiMH */
+#define BATTERY_SCALE_FACTOR 4735 /* average from 3 Ondios */
+
+/* define this if the unit can be powered or charged via USB */
+#define HAVE_USB_POWER
 
 #ifndef SIMULATOR
 
@@ -61,14 +74,6 @@
 
 /* Define this for different I2C pinout */
 #define CONFIG_I2C I2C_ONDIO
-
-/* Type of mobile power */
-#define CONFIG_BATTERY BATT_3AAA
-#define BATTERY_CAPACITY_MIN 500  /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 1500 /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC 50   /* capacity increment */
-#define BATTERY_TYPES_COUNT  2    /* Alkalines or NiMH */
-#define BATTERY_SCALE_FACTOR 4735 /* average from 3 Ondios */
 
 /* Define this if you control power on PB5 (instead of the OFF button) */
 #define HAVE_POWEROFF_ON_PB5
@@ -107,9 +112,6 @@
 /* Define this if the MAS SIBI line can be controlled via PB8 */
 #define HAVE_MAS_SIBI_CONTROL
 
-/* define this if more than one device/partition can be used */
-#define HAVE_MULTIVOLUME
-
 /* define this if media can be exchanged on the fly */
 #define HAVE_HOTSWAP
 
@@ -117,9 +119,6 @@
 #define CONFIG_LED LED_VIRTUAL
 
 #define CONFIG_LCD LCD_SSD1815
-
-/* define this if the unit can be powered or charged via USB */
-#define HAVE_USB_POWER
 
 #define BOOTFILE_EXT "ajz"
 #define BOOTFILE "ajbrec." BOOTFILE_EXT

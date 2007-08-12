@@ -37,6 +37,7 @@
 #include "lcd-remote.h"
 #endif
 
+#ifndef SIMULATOR
 #if 0
 /* Older than MAX_EVENT_AGE button events are going to be ignored.
  * Used to prevent for example volume going up uncontrollable when events
@@ -481,6 +482,8 @@ void button_clear_queue(void)
 {
     queue_clear(&button_queue);
 }
+
+#endif /* SIMULATOR */
 
 #ifdef HAVE_SCROLLWHEEL
 /**

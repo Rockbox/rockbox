@@ -35,6 +35,9 @@
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_M41ST84W
 
+/* FM recorders can wake up from RTC alarm */
+#define HAVE_RTC_ALARM
+
 /* define this if you have RTC RAM available for settings */
 #define HAVE_RTC_RAM
 
@@ -57,7 +60,21 @@
 
 #define CONFIG_I2C I2C_PLAYREC
 
+/* Type of mobile power */
+#define CONFIG_BATTERY BATT_LIION2200
 #define BATTERY_CAPACITY_DEFAULT 2200 /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 2200 /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC 50   /* capacity increment */
+#define BATTERY_TYPES_COUNT  1    /* only one type */
+/* Battery scale factor (guessed, seems to be 1,25 * value from recorder) */
+#define BATTERY_SCALE_FACTOR 8081
+
+/* Hardware controlled charging with monitoring */
+#define CONFIG_CHARGING CHARGING_MONITOR
+
+/* define this if the unit can be powered or charged via USB */
+#define HAVE_USB_POWER
 
 #ifndef SIMULATOR
 
@@ -76,15 +93,6 @@
 /* Define this to the CPU frequency */
 #define CPU_FREQ      11059200
 
-/* Type of mobile power */
-#define CONFIG_BATTERY BATT_LIION2200
-#define BATTERY_CAPACITY_MIN 2200 /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC 50   /* capacity increment */
-#define BATTERY_TYPES_COUNT  1    /* only one type */
-/* Battery scale factor (guessed, seems to be 1,25 * value from recorder) */
-#define BATTERY_SCALE_FACTOR 8081
-
 /* Define this if you control power on PB5 (instead of the OFF button) */
 #define HAVE_POWEROFF_ON_PB5
 
@@ -97,21 +105,12 @@
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 24
 
-/* FM recorders can wake up from RTC alarm */
-#define HAVE_RTC_ALARM
-
-/* Hardware controlled charging with monitoring */
-#define CONFIG_CHARGING CHARGING_MONITOR
-
 /* The start address index for ROM builds */
 /* #define ROM_START 0x14010 for behind original Archos */
 #define ROM_START 0x7010 /* for behind BootBox */
 
 /* Software controlled LED */
 #define CONFIG_LED LED_REAL
-
-/* define this if the unit can be powered or charged via USB */
-#define HAVE_USB_POWER
 
 #define CONFIG_LCD LCD_SSD1815
 

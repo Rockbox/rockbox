@@ -48,6 +48,9 @@
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_PCF50605
 
+/* Define if the device can wake from an RTC alarm */
+#define HAVE_RTC_ALARM
+
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 
@@ -66,7 +69,20 @@
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 
+/* Define this if you can detect headphones */
+#define HAVE_HEADPHONE_DETECTION
+
+/* Type of mobile power */
+#define CONFIG_BATTERY BATT_LIPOL1300
 #define BATTERY_CAPACITY_DEFAULT 630 /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 630  /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 1000 /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC 10   /* capacity increment */
+#define BATTERY_TYPES_COUNT  1    /* only one type */
+#define BATTERY_SCALE_FACTOR 5865
+
+/* Hardware controlled charging? FIXME */
+//#define CONFIG_CHARGING CHARGING_SIMPLE
 
 #ifndef SIMULATOR
 
@@ -78,17 +94,6 @@
 
 /* Define this if you want to use the PP5002 i2c interface */
 #define CONFIG_I2C I2C_PP5002
-
-/* Type of mobile power */
-#define CONFIG_BATTERY BATT_LIPOL1300
-#define BATTERY_CAPACITY_MIN 630  /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 1000 /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC 10   /* capacity increment */
-#define BATTERY_TYPES_COUNT  1    /* only one type */
-#define BATTERY_SCALE_FACTOR 5865
-
-/* Hardware controlled charging? FIXME */
-//#define CONFIG_CHARGING CHARGING_SIMPLE
 
 /* define this if the hardware can be powered off while charging */
 //#define HAVE_POWEROFF_WHILE_CHARGING
@@ -119,14 +124,8 @@
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
 
-/* Define if the device can wake from an RTC alarm */
-#define HAVE_RTC_ALARM 
-
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
-
-/* Define this if you can detect headphones */
-#define HAVE_HEADPHONE_DETECTION
 
 #define BOOTFILE_EXT "ipod"
 #define BOOTFILE "rockbox." BOOTFILE_EXT

@@ -44,6 +44,19 @@
 #define LCD_DEPTH  16   /* 65536 colours */
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
 
+/* define this if you have LCD enable function */
+#define HAVE_LCD_ENABLE
+
+/* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
+   should be defined as well. */
+#define HAVE_LCD_SLEEP
+
+/* define this if you can flip your LCD */
+#define HAVE_LCD_FLIP
+
+/* define this if you can invert the colours on your LCD */
+#define HAVE_LCD_INVERT
+
 /* #define IRAM_LCDFRAMEBUFFER IDATA_ATTR *//* put the lcd frame buffer in IRAM */
 
 #define CONFIG_KEYPAD SANSA_E200_PAD
@@ -82,10 +95,31 @@
 #define HAVE_BACKLIGHT
 #define HAVE_BACKLIGHT_BRIGHTNESS
 
-#define BATTERY_CAPACITY_DEFAULT 750    /* default battery capacity */
+/* define this if the unit uses a scrollwheel for navigation */
+#define HAVE_SCROLLWHEEL
+/* define wheel acceleration scaling factor */
+/* Range for this target: 0xffffff*(0.0-16.000000894069724921567733381255) */
+#define WHEEL_ACCELERATION_FACTOR   (0xffffff*7)
 
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
+
+#define HAVE_MULTIVOLUME
+
+/* Type of mobile power */
+#define CONFIG_BATTERY BATT_LIION750
+#define BATTERY_CAPACITY_DEFAULT 750    /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 750        /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 750        /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC 0          /* capacity increment */
+#define BATTERY_TYPES_COUNT  1          /* only one type */
+#define BATTERY_SCALE_FACTOR 5005       /* ADC should read 0x3ff=5.12V */
+
+/* Hardware controlled charging? FIXME */
+#define CONFIG_CHARGING CHARGING_SIMPLE
+
+/* define this if the unit can be powered or charged via USB */
+#define HAVE_USB_POWER
 
 /** Non-simulator section **/
 #ifndef SIMULATOR
@@ -95,17 +129,6 @@
 
 /* Define this if you want to use the PP5024 i2c interface */
 #define CONFIG_I2C I2C_PP5024
-
-/* Type of mobile power */
-#define CONFIG_BATTERY BATT_LIION750
-#define BATTERY_CAPACITY_MIN 750        /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 750        /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC 0          /* capacity increment */
-#define BATTERY_TYPES_COUNT  1          /* only one type */
-#define BATTERY_SCALE_FACTOR 5005       /* ADC should read 0x3ff=5.12V */
-
-/* Hardware controlled charging? FIXME */
-#define CONFIG_CHARGING CHARGING_SIMPLE
 
 /* define this if the hardware can be powered off while charging */
 /* Sansa can't be powered off while charging */
@@ -121,20 +144,6 @@
 #define CONFIG_LCD LCD_X5
 
 #define HAVE_HOTSWAP
-#define HAVE_MULTIVOLUME
-
-/* define this if you have LCD enable function */
-#define HAVE_LCD_ENABLE
-
-/* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
-   should be defined as well. */
-#define HAVE_LCD_SLEEP
-
-/* define this if you can invert the colours on your LCD */
-#define HAVE_LCD_INVERT
-
-/* define this if you can flip your LCD */
-#define HAVE_LCD_FLIP
 
 /* Offset ( in the firmware file's header ) to the file CRC and data. These are
    only used when loading the old format rockbox.e200 file */
@@ -145,9 +154,6 @@
 
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_ARC
-
-/* define this if the unit can be powered or charged via USB */
-#define HAVE_USB_POWER
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
@@ -162,12 +168,6 @@
 #define BOOTDIR "/.rockbox"
 
 #define ICODE_ATTR_TREMOR_NOT_MDCT
-
-/* define this if the unit uses a scrollwheel for navigation */
-#define HAVE_SCROLLWHEEL
-/* define wheel acceleration scaling factor */
-/* Range for this target: 0xffffff*(0.0-16.000000894069724921567733381255) */
-#define WHEEL_ACCELERATION_FACTOR   (0xffffff*7)
 
 #define INCLUDE_TIMEOUT_API
 

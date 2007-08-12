@@ -65,27 +65,6 @@ void power_off(void)
     asm("halt");
 }
 
-#else
-
-bool charger_inserted(void)
-{
-    return false;
-}
-
-void charger_enable(bool on)
-{
-    (void)on;
-}
-
-void power_off(void)
-{
-}
-
-void ide_power_enable(bool on)
-{
-   (void)on;
-}
-
 #endif /* SIMULATOR */
 
 static bool powered = false;

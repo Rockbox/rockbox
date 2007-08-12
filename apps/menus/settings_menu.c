@@ -122,7 +122,6 @@ MAKE_MENU(file_menu, ID2P(LANG_FILE), 0, Icon_file_view_menu,
 /*    SYSTEM MENU                  */
 
 /* Battery */
-#ifndef SIMULATOR
 #if BATTERY_CAPACITY_INC > 0
 MENUITEM_SETTING(battery_capacity, &global_settings.battery_capacity, NULL);
 #endif
@@ -158,7 +157,6 @@ MAKE_MENU(battery_menu, ID2P(LANG_BATTERY_MENU), 0, Icon_NOICON,
 #endif
 #endif
          );
-#endif /* SIMULATOR */
 /* Disk */
 #ifndef HAVE_FLASH_STORAGE
 MENUITEM_SETTING(disk_spindown, &global_settings.disk_spindown, NULL);
@@ -340,7 +338,7 @@ MENUITEM_SETTING(buttonlight_brightness, &global_settings.buttonlight_brightness
 MAKE_MENU(system_menu, ID2P(LANG_SYSTEM), 
           0, Icon_System_menu,
             &start_screen,
-#ifndef SIMULATOR
+#if (BATTERY_CAPACITY_INC > 0) || (BATTERY_TYPES_COUNT > 1)
             &battery_menu,
 #endif
 #if defined(HAVE_DIRCACHE) || !defined(HAVE_FLASH_STORAGE)

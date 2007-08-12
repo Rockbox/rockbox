@@ -57,20 +57,11 @@
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 
+/* Type of mobile power */
+#define CONFIG_BATTERY BATT_LPCS355385
 #define BATTERY_CAPACITY_DEFAULT 1550 /* default battery capacity
                                         TODO: check this, probably different
                                         for different models too */
-
-#ifndef SIMULATOR
-
-/* Define this if you have a PortalPlayer PP5020 */
-#define CONFIG_CPU PP5020
-
-/* Define this if you want to use the PP5020 i2c interface */
-#define CONFIG_I2C I2C_PP5020
-
-/* Type of mobile power */
-#define CONFIG_BATTERY BATT_LPCS355385
 #define BATTERY_CAPACITY_MIN 1500  /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX 1600 /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 10   /* capacity increment */
@@ -79,6 +70,17 @@
 
 /* Hardware controlled charging? FIXME */
 //#define CONFIG_CHARGING CHARGING_SIMPLE
+
+/* define this if the unit can be powered or charged via USB */
+/*#define HAVE_USB_POWER*/
+
+#ifndef SIMULATOR
+
+/* Define this if you have a PortalPlayer PP5020 */
+#define CONFIG_CPU PP5020
+
+/* Define this if you want to use the PP5020 i2c interface */
+#define CONFIG_I2C I2C_PP5020
 
 /* define this if the hardware can be powered off while charging */
 /* TODO: should this be set for the H10? */
@@ -109,9 +111,6 @@
 
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_ARC
-
-/* define this if the unit can be powered or charged via USB */
-/*#define HAVE_USB_POWER*/
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL

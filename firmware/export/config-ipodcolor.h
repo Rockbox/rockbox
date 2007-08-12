@@ -49,6 +49,9 @@
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_PCF50605
 
+/* Define if the device can wake from an RTC alarm */
+#define HAVE_RTC_ALARM
+
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 
@@ -67,18 +70,12 @@
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 
-#define BATTERY_CAPACITY_DEFAULT 700 /* default battery capacity */
-
-#ifndef SIMULATOR
-
-/* Define this if you have a PortalPlayer PP5020 */
-#define CONFIG_CPU PP5020
-
-/* Define this if you want to use the PP5020 i2c interface */
-#define CONFIG_I2C I2C_PP5020
+/* Define this if you can detect headphones */
+#define HAVE_HEADPHONE_DETECTION
 
 /* Type of mobile power */
 #define CONFIG_BATTERY BATT_LIPOL1300
+#define BATTERY_CAPACITY_DEFAULT 700 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 700  /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX 1000 /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 10   /* capacity increment */
@@ -87,6 +84,17 @@
 
 /* Hardware controlled charging? FIXME */
 //#define CONFIG_CHARGING CHARGING_SIMPLE
+
+/* define this if the unit can be powered or charged via USB */
+#define HAVE_USB_POWER
+
+#ifndef SIMULATOR
+
+/* Define this if you have a PortalPlayer PP5020 */
+#define CONFIG_CPU PP5020
+
+/* Define this if you want to use the PP5020 i2c interface */
+#define CONFIG_I2C I2C_PP5020
 
 /* define this if the hardware can be powered off while charging */
 //#define HAVE_POWEROFF_WHILE_CHARGING
@@ -116,20 +124,11 @@
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_ARC
 
-/* define this if the unit can be powered or charged via USB */
-#define HAVE_USB_POWER
-
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
 
-/* Define if the device can wake from an RTC alarm */
-#define HAVE_RTC_ALARM 
-
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
-
-/* Define this if you can detect headphones */
-#define HAVE_HEADPHONE_DETECTION
 
 /* Define this if you can read an absolute wheel position */
 #define HAVE_WHEEL_POSITION

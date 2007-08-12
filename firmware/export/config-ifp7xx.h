@@ -50,8 +50,6 @@
 
 #define HAVE_FLASH_DISK
 
-#define BATTERY_CAPACITY_DEFAULT 1000 /* default battery capacity */
-
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
 
@@ -62,6 +60,15 @@
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 
+/* Type of mobile power */
+#define CONFIG_BATTERY BATT_1AA
+#define BATTERY_CAPACITY_DEFAULT 1000 /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 500  /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 2800 /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC 50   /* capacity increment */
+#define BATTERY_TYPES_COUNT  2    /* Alkalines or NiMH */
+#define BATTERY_SCALE_FACTOR 3000 /* TODO: only roughly correct */
+
 #ifndef SIMULATOR
 
 /* Define this if you have a Philips PNX0101 */
@@ -69,14 +76,6 @@
 
 /* Define this if you want to use the PNX0101 i2c interface */
 #define CONFIG_I2C I2C_PNX0101
-
-/* Type of mobile power */
-#define CONFIG_BATTERY BATT_1AA
-#define BATTERY_CAPACITY_MIN 500  /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 2800 /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC 50   /* capacity increment */
-#define BATTERY_TYPES_COUNT  2    /* Alkalines or NiMH */
-#define BATTERY_SCALE_FACTOR 3000 /* TODO: only roughly correct */
 
 /* The start address index for ROM builds */
 #define ROM_START 0x00000000

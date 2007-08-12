@@ -76,6 +76,13 @@ static int wrcount;
 #endif
 
 static int shutdown_timeout = 0;
+#if CONFIG_CHARGING >= CHARGING_MONITOR
+charge_state_type charge_state;     /* charging mode */
+#endif
+
+#if CONFIG_CHARGING
+charger_input_state_type charger_input_state IDATA_ATTR;
+#endif
 
 #ifdef SIMULATOR /***********************************************************/
 
@@ -153,10 +160,16 @@ void set_battery_capacity(int capacity)
   (void)capacity;
 }
 
+#if BATTERY_TYPES_COUNT > 1
+void set_battery_type(int type)
+{
+    (void)type;
+}
+#endif
+
 void reset_poweroff_timer(void)
 {
 }
-
 
 #else /* not SIMULATOR ******************************************************/
 
@@ -269,9 +282,6 @@ static const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 };
 
 #if CONFIG_CHARGING
-charger_input_state_type charger_input_state IDATA_ATTR;
-
-
 /* voltages (centivolt) of 0%, 10%, ... 100% when charging enabled */
 static const unsigned short percent_to_volt_charge[11] =
 {
@@ -304,10 +314,6 @@ static const unsigned short percent_to_volt_charge[11] =
 #endif
 };
 #endif /* CONFIG_CHARGING */
-
-#if CONFIG_CHARGING >= CHARGING_MONITOR
-charge_state_type charge_state;     /* charging mode */
-#endif
 
 #if CONFIG_CHARGING == CHARGING_CONTROL
 int long_delta;                     /* long term delta battery voltage */

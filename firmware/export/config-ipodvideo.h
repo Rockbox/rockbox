@@ -52,6 +52,9 @@
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_PCF50605
 
+/* Define if the device can wake from an RTC alarm */
+#define HAVE_RTC_ALARM
+
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 
@@ -73,13 +76,8 @@
 /* We can fade the backlight by using PWM */
 #define HAVE_BACKLIGHT_PWM_FADING
 
-#ifndef SIMULATOR
-
-/* Define this if you have a PortalPlayer PP5022 */
-#define CONFIG_CPU PP5022
-
-/* Define this if you want to use the PP5020 i2c interface */
-#define CONFIG_I2C I2C_PP5020
+/* Define this if you can detect headphones */
+#define HAVE_HEADPHONE_DETECTION
 
 /* Type of mobile power */
 #if (MEM==32)  /* this is the 30GB-model */
@@ -102,6 +100,17 @@
 
 /* Hardware controlled charging with monitoring */
 #define CONFIG_CHARGING CHARGING_MONITOR
+
+/* define this if the unit can be powered or charged via USB */
+#define HAVE_USB_POWER
+
+#ifndef SIMULATOR
+
+/* Define this if you have a PortalPlayer PP5022 */
+#define CONFIG_CPU PP5022
+
+/* Define this if you want to use the PP5020 i2c interface */
+#define CONFIG_I2C I2C_PP5020
 
 /* define this if the hardware can be powered off while charging */
 //#define HAVE_POWEROFF_WHILE_CHARGING
@@ -131,20 +140,11 @@
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_ARC
 
-/* define this if the unit can be powered or charged via USB */
-#define HAVE_USB_POWER
-
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
 
-/* Define if the device can wake from an RTC alarm */
-#define HAVE_RTC_ALARM 
-
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
-
-/* Define this if you can detect headphones */
-#define HAVE_HEADPHONE_DETECTION
 
 /* Define this if you can read an absolute wheel position */
 #define HAVE_WHEEL_POSITION

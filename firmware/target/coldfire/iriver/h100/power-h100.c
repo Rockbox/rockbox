@@ -127,37 +127,4 @@ void power_off(void)
         yield();
 }
 
-#else
-
-bool charger_inserted(void)
-{
-    return false;
-}
-
-void charger_enable(bool on)
-{
-    (void)on;
-}
-
-void power_off(void)
-{
-}
-
-void ide_power_enable(bool on)
-{
-   (void)on;
-}
-
-#ifdef HAVE_SPDIF_POWER
-void spdif_power_enable(bool on)
-{
-   (void)on;
-}
-
-bool spdif_powered(void)
-{
-    return false;
-}
-#endif
-
 #endif /* SIMULATOR */

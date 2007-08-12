@@ -146,9 +146,9 @@ tagcache
 tc_ramcache
 #endif
 
-#if CONFIG_CHARGING || defined(SIMULATOR)
+#if CONFIG_CHARGING
 charging
-#if defined(HAVE_USB_POWER) || defined(SIMULATOR)
+#if defined(HAVE_USB_POWER)
 usb_charging
 #endif
 #endif

@@ -779,7 +779,7 @@ bool quick_screen_f3(int button_enter)
 #endif /* BUTTON_F3 */
 #endif /* CONFIG_KEYPAD in (RECORDER_PAD |IRIVER_H100_PAD | IRIVER_H300_PAD) */
 
-#if CONFIG_CHARGING || defined(SIMULATOR)
+#if CONFIG_CHARGING
 void charging_splash(void)
 {
     gui_syncsplash(2*HZ, (unsigned char *)str(LANG_BATTERY_CHARGE));

@@ -53,6 +53,9 @@
 /* Define this if you have an remote lcd */
 #define HAVE_REMOTE_LCD
 
+/* Define if we have a hardware defect that causes ticking on the audio line */
+#define HAVE_REMOTE_LCD_TICKING
+
 #define CONFIG_LCD LCD_S1D15E06
 
 /* Define this for LCD backlight available */
@@ -69,8 +72,6 @@
 
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x80000
-
-#define BATTERY_CAPACITY_DEFAULT 1300 /* default battery capacity */
 
 #define AB_REPEAT_ENABLE 1
 
@@ -90,6 +91,19 @@
 
 #define HAVE_AGC
 
+/* Type of mobile power */
+#define CONFIG_BATTERY BATT_LIPOL1300
+#define BATTERY_CAPACITY_DEFAULT 1300 /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 1300 /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC 50   /* capacity increment */
+#define BATTERY_TYPES_COUNT  1    /* only one type */
+#define BATTERY_SCALE_FACTOR 16665 /* FIX: this value is picked at random */
+
+/* Hardware controlled charging */
+//#define CONFIG_CHARGING CHARGING_SIMPLE
+#define CONFIG_CHARGING CHARGING_MONITOR /* FIXME: remove that once monitoring is fixed properly */
+
 #ifndef SIMULATOR
 
 /* Define this if you have a Motorola SCF5249 */
@@ -101,21 +115,6 @@
 /* Define this if you can run rockbox from flash memory */
 /* In theory we can, but somebody needs to verify there are no issues. */
 // #define HAVE_FLASHED_ROCKBOX
-
-/* Define if we have a hardware defect that causes ticking on the audio line */
-#define HAVE_REMOTE_LCD_TICKING
-
-/* Type of mobile power */
-#define CONFIG_BATTERY BATT_LIPOL1300
-#define BATTERY_CAPACITY_MIN 1300 /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC 50   /* capacity increment */
-#define BATTERY_TYPES_COUNT  1    /* only one type */
-#define BATTERY_SCALE_FACTOR 16665 /* FIX: this value is picked at random */
-
-/* Hardware controlled charging */
-//#define CONFIG_CHARGING CHARGING_SIMPLE
-#define CONFIG_CHARGING CHARGING_MONITOR /* FIXME: remove that once monitoring is fixed properly */
 
 /* define this if the hardware can be powered off while charging */
 #define HAVE_POWEROFF_WHILE_CHARGING

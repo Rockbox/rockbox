@@ -27,7 +27,7 @@
 
 #ifdef HAVE_REMOTE_LCD
 
-#if defined(TARGET_TREE) && !defined(SIMULATOR)
+#if defined(TARGET_TREE)
 #include "lcd-remote-target.h"
 #endif
 

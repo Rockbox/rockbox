@@ -499,13 +499,11 @@ const struct settings_list settings[] = {
         200,
 #endif
             "max files in dir", UNIT_INT,50,10000,50,NULL,NULL,NULL),
-#ifndef SIMULATOR
 #if BATTERY_CAPACITY_INC > 0
     INT_SETTING(0, battery_capacity, LANG_BATTERY_CAPACITY, BATTERY_CAPACITY_DEFAULT, 
                 "battery capacity", UNIT_MAH,
                 BATTERY_CAPACITY_MIN, BATTERY_CAPACITY_MAX, BATTERY_CAPACITY_INC,
                 NULL, NULL, NULL),
-#endif
 #endif
 #if CONFIG_CHARGING
     OFFON_SETTING(NVRAM(1), car_adapter_mode,

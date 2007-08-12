@@ -51,7 +51,17 @@
 
 #define CONFIG_I2C I2C_PLAYREC
 
+/* Type of mobile power */
+#define CONFIG_BATTERY BATT_4AA_NIMH
 #define BATTERY_CAPACITY_DEFAULT 1500 /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 1500 /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC 50   /* capacity increment */
+#define BATTERY_TYPES_COUNT  1    /* only one type */
+#define BATTERY_SCALE_FACTOR 6465
+
+/* Software controlled charging */
+#define CONFIG_CHARGING CHARGING_CONTROL
 
 #ifndef SIMULATOR
 
@@ -67,14 +77,6 @@
 /* Define this to the CPU frequency */
 #define CPU_FREQ      11059200
 
-/* Type of mobile power */
-#define CONFIG_BATTERY BATT_4AA_NIMH
-#define BATTERY_CAPACITY_MIN 1500 /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC 50   /* capacity increment */
-#define BATTERY_TYPES_COUNT  1    /* only one type */
-#define BATTERY_SCALE_FACTOR 6465
-
 /* Define this if you control power on PBDR (instead of PADR) */
 #define HAVE_POWEROFF_ON_PBDR
 
@@ -86,9 +88,6 @@
 
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 6
-
-/* Software controlled charging */
-#define CONFIG_CHARGING CHARGING_CONTROL
 
 /* The start address index for ROM builds */
 /* #define ROM_START 0x11010 for behind original Archos */

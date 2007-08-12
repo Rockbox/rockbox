@@ -44,11 +44,18 @@ int fat_startsector(void)
     return 63;
 }
 
+bool fat_ismounted(int volume)
+{
+    (void)volume;
+    return true;
+}
+
 int ata_write_sectors(IF_MV2(int drive,)
                       unsigned long start,
                       int count,
                       const void* buf)
 {
+    IF_MV((void)drive;)
     int i;
 
     for (i=0; i<count; i++ ) {
@@ -70,6 +77,7 @@ int ata_read_sectors(IF_MV2(int drive,)
                      int count,
                      void* buf)
 {
+    IF_MV((void)drive;)
     int i;
 
     for (i=0; i<count; i++ ) {
@@ -103,6 +111,10 @@ void ata_spin(void)
 void ata_spindown(int s)
 {
     (void)s;
+}
+
+void rtc_init(void)
+{
 }
 
 int rtc_read(int address)
@@ -139,10 +151,102 @@ int rtc_write_datetime(unsigned char* buf)
     return 0;
 }
 
+#ifdef HAVE_RTC_ALARM
+void rtc_get_alarm(int *h, int *m)
+{
+    *h = 11;
+    *m = 55;
+}
+
+void rtc_set_alarm(int h, int m)
+{
+    (void)h;
+    (void)m;
+}
+
+bool rtc_enable_alarm(bool enable)
+{
+    return enable;
+}
+
+bool rtc_check_alarm_started(bool release_alarm)
+{
+    return release_alarm;
+}
+
+bool rtc_check_alarm_flag(void)
+{
+    return true;
+}
+#endif
+
+#ifdef HAVE_HEADPHONE_DETECTION
+bool headphones_inserted(void)
+{
+    return true;
+}
+#endif
+
+#ifdef HAVE_LCD_ENABLE
+bool lcd_enabled(void)
+{
+    return true;
+}
+#endif
+
+bool charging_state(void)
+{
+    return false;
+}
+
+bool charger_inserted(void)
+{
+    return false;
+}
+
+#ifdef HAVE_SPDIF_POWER
+void spdif_power_enable(bool on)
+{
+   (void)on;
+}
+
+bool spdif_powered(void)
+{
+    return false;
+}
+#endif
+
 bool is_new_player(void)
 {
     return having_new_lcd;
 }
+
+#ifdef HAVE_USB_POWER
+bool usb_powered(void)
+{
+    return false;
+}
+
+#if CONFIG_CHARGING
+bool usb_charging_enable(bool on)
+{
+    (void)on;
+    return false;
+}
+#endif
+#endif
+
+bool usb_inserted(void)
+{
+    return false;
+}
+
+#ifdef HAVE_REMOTE_LCD_TICKING
+void lcd_remote_emireduce(bool state)
+{
+    (void)state;
+}
+#endif
 
 void lcd_set_contrast( int x )
 {

@@ -32,6 +32,9 @@
 #define LCD_DEPTH  16   /* 65k colours */
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
 
+/* Define this if your LCD can be enabled/disabled */
+#define HAVE_LCD_ENABLE
+
 #define CONFIG_KEYPAD GIGABEAT_PAD
 
 /* Define this if you do software codec */
@@ -71,15 +74,28 @@
 /* Define this if you want to use the adaptive bass capibility of the 8751 */
 /* #define USE_ADAPTIVE_BASS */
 
-#define BATTERY_CAPACITY_DEFAULT 2000 /* default battery capacity */
-
 #define HW_SAMPR_CAPS (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | \
                        SAMPR_CAP_11)
 
-#ifndef SIMULATOR
+#define HAVE_HEADPHONE_DETECTION
 
-/* Define this if your LCD can be enabled/disabled */
-#define HAVE_LCD_ENABLE
+/* Type of mobile power - check this out */
+#define CONFIG_BATTERY BATT_LIION830    /* could change this later */
+#define BATTERY_CAPACITY_DEFAULT 2000 /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 1500        /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 2500        /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC 25         /* capacity increment */
+#define BATTERY_TYPES_COUNT  1          /* only one type */
+/* ADC[0] is (530) at discharge and 625 at full charge */
+#define BATTERY_SCALE_FACTOR 6450
+
+/* Hardware controlled charging with monitoring */
+#define CONFIG_CHARGING CHARGING_MONITOR
+
+/* define this if the unit can be powered or charged via USB */
+#define HAVE_USB_POWER
+
+#ifndef SIMULATOR
 
 /* The LCD on a Gigabeat is 240x320 - it is portrait */
 #define HAVE_PORTRAIT_LCD
@@ -90,19 +106,6 @@
 /* Define this if you want to use coldfire's i2c interface */
 #define CONFIG_I2C I2C_S3C2440
 
-/* Type of mobile power - check this out */
-#define CONFIG_BATTERY BATT_LIION830    /* could change this later */
-#define BATTERY_CAPACITY_MIN 1500        /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 2500        /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC 25         /* capacity increment */
-#define BATTERY_TYPES_COUNT  1          /* only one type */
-
-/* ADC[0] is (530) at discharge and 625 at full charge */
-#define BATTERY_SCALE_FACTOR 6450
-
-/* Hardware controlled charging with monitoring */
-#define CONFIG_CHARGING CHARGING_MONITOR
-
 /* define this if the hardware can be powered off while charging */
 #define HAVE_POWEROFF_WHILE_CHARGING
 
@@ -111,9 +114,6 @@
 
 /* Define this to the CPU frequency */
 #define CPU_FREQ 16934400
-
-/* define this if the unit can be powered or charged via USB */
-#define HAVE_USB_POWER
 
 /* Define this if you have ATA power-off control */
 #define HAVE_ATA_POWER_OFF
@@ -132,8 +132,6 @@
 
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 8
-
-#define HAVE_HEADPHONE_DETECTION
 
 /* Define this if you have adjustable CPU frequency */
 /* #define HAVE_ADJUSTABLE_CPU_FREQ */

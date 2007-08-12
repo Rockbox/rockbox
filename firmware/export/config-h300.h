@@ -50,8 +50,12 @@
 /* Define this if you have an remote lcd */
 #define HAVE_REMOTE_LCD
 
+/* Define if we have a hardware defect that causes ticking on the audio line */
+#define HAVE_REMOTE_LCD_TICKING
+
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
+#define HAVE_BACKLIGHT_BRIGHTNESS
 
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
@@ -84,7 +88,20 @@
 
 #define HAVE_AGC
 
+/* Type of mobile power */
+#define CONFIG_BATTERY BATT_LIPOL1300
 #define BATTERY_CAPACITY_DEFAULT 1300 /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 1300 /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC 50   /* capacity increment */
+#define BATTERY_TYPES_COUNT  1    /* only one type */
+#define BATTERY_SCALE_FACTOR 23437 /* FIX: this value is picked at random */
+
+/* Hardware controlled charging with monitoring */
+#define CONFIG_CHARGING CHARGING_MONITOR
+
+/* define this if the unit can be powered or charged via USB */
+#define HAVE_USB_POWER
 
 #ifndef SIMULATOR
 
@@ -96,20 +113,6 @@
 
 /* Define this if you want to use coldfire's i2c interface */
 #define CONFIG_I2C I2C_COLDFIRE
-
-/* Type of mobile power */
-#define CONFIG_BATTERY BATT_LIPOL1300
-#define BATTERY_CAPACITY_MIN 1300 /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC 50   /* capacity increment */
-#define BATTERY_TYPES_COUNT  1    /* only one type */
-#define BATTERY_SCALE_FACTOR 23437 /* FIX: this value is picked at random */
-
-/* Define if we have a hardware defect that causes ticking on the audio line */
-#define HAVE_REMOTE_LCD_TICKING
-
-/* Hardware controlled charging with monitoring */
-#define CONFIG_CHARGING CHARGING_MONITOR
 
 /* The size of the flash ROM */
 #define FLASH_SIZE 0x400000
@@ -144,11 +147,6 @@
 #define BOOTLOADER_ENTRYPOINT  0x001F0000
 #define FLASH_ENTRYPOINT       0x00001000
 #define FLASH_MAGIC            0xfbfbfbf1
-
-#define HAVE_BACKLIGHT_BRIGHTNESS
-
-/* define this if the unit can be powered or charged via USB */
-#define HAVE_USB_POWER
 
 /* Define this if there is an EEPROM chip */
 #define HAVE_EEPROM
