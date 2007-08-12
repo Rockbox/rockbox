@@ -8764,7 +8764,7 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_DIRBROWSE_F1
-  desc: in dir browser, F1 button bar text /* there appears to be a bug that makes these strings not be included in the right build if they are excluded from any... */
+  desc: in dir browser, F1 button bar text
   user:
   <source>
     *: none
@@ -9892,14 +9892,14 @@
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PLAY/PAUSE to return)"
-    x5,m5: "Building database... %d found (Long PLAY to return)"
+    x5,m5: "Building database... %d found (Left to return)"
     h10,h10_5gb,e200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Aanmaken van database... %d gevonden (OFF = terug)"
     h100,h120,h300: "Aanmaken van database... %d gevonden (STOP = terug)"
     ipod*: "Aanmaken van database... %d gevonden (PLAY/PAUSE = terug)"
-    x5,m5: "Aanmaken van database... %d gevonden (Long PLAY = terug)"
+    x5,m5: "Aanmaken van database... %d gevonden (Links = terug)"
     h10,h10_5gb,e200: "Aanmaken van database... %d gevonden (PREV = terug)"
   </dest>
   <voice>
@@ -10913,7 +10913,7 @@
   desc: in tag viewer
   user:
   <source>
-    *: "[Werk]"
+    *: "[Work]"
   </source>
   <dest>
     *: "[Werk]"
