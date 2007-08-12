@@ -24,8 +24,6 @@
 #include "system.h"
 #include "power.h"
 #include "logf.h"
-#include "pcf50605.h"
-#include "pcf50606.h"
 #include "usb.h"
 
 #if CONFIG_CHARGING == CHARGING_CONTROL
@@ -80,7 +78,6 @@ void power_init(void)
     or_b(0x04, &PAIORL); /* output for PA2 */
 #endif
 }
-
 
 #if CONFIG_CHARGING
 bool charger_inserted(void)
@@ -196,7 +193,6 @@ bool ide_powered(void)
 }
 #endif /* !HAVE_MMC */
 
-
 void power_off(void)
 {
     set_irq_level(HIGHEST_IRQ_LEVEL);
@@ -216,28 +212,5 @@ void power_off(void)
     while(1)
         yield();
 }
-
-#else
-
-void charger_enable(bool on)
-{
-    (void)on;
-}
-
-void power_off(void)
-{
-}
-
-void ide_power_enable(bool on)
-{
-   (void)on;
-}
-
-#ifdef HAVE_SPDIF_POWER
-void spdif_power_enable(bool on)
-{
-   (void)on;
-}
-#endif
 
 #endif /* SIMULATOR */
