@@ -370,11 +370,19 @@ static long jumpscroll_getlang(int value)
 }
 #endif /* HAVE_LCD_CHARCELLS */
 
+#if defined (HAVE_SCROLLWHEEL)      || \
+    (CONFIG_KEYPAD == IPOD_3G_PAD)  || \
+    (CONFIG_KEYPAD == IPOD_4G_PAD)  || \
+    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
+#define BALANCE_FLIP F_FLIPLIST
+#else
+#define BALANCE_FLIP 0
+#endif
                     
 const struct settings_list settings[] = {
     /* sound settings */
     SOUND_SETTING(0,volume, LANG_VOLUME, "volume", SOUND_VOLUME),
-    SOUND_SETTING(0,balance, LANG_BALANCE, "balance", SOUND_BALANCE),
+    SOUND_SETTING(BALANCE_FLIP, balance, LANG_BALANCE, "balance", SOUND_BALANCE),
     SOUND_SETTING(0,bass, LANG_BASS, "bass", SOUND_BASS),
     SOUND_SETTING(0,treble, LANG_TREBLE, "treble", SOUND_TREBLE),
     
