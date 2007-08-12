@@ -28,27 +28,35 @@
 #define ANALOG_MINUTE_RADIUS(screen, round) \
     (round?MIN(screen->height/2 -10, screen->width/2 -10):screen->height/2)
 #define ANALOG_HOUR_RADIUS(screen, round) \
-    (ANALOG_MINUTE_RADIUS(screen, round)/2)
+    (2*ANALOG_MINUTE_RADIUS(screen, round)/3)
 
 #define HOUR_ANGLE(hour, minute, second) (30*(hour) +(minute)/2)
 #define MINUTE_ANGLE(minute, second) (6*(minute)+(second)/10)
 #define SECOND_ANGLE(second) (6 * (second))
 
 /* Note that the given angle's origin is midday and not 3 o'clock */
-void polar_to_cartesian(int a, int r, int* x, int* y){
+void polar_to_cartesian(int a, int r, int* x, int* y)
+{
+#if CONFIG_LCD == LCD_SSD1815
+    /* Correct non-square pixel aspect of archos recorder LCD */
+    *x = (sin_int(a) * 5 / 4 * r) >> 14;
+#else
     *x = (sin_int(a) * r) >> 14;
+#endif
     *y = (sin_int(a-90) * r) >> 14;
 }
 
 void polar_to_cartesian_screen_centered(struct screen * display, 
-                                        int a, int r, int* x, int* y){
+                                        int a, int r, int* x, int* y)
+{
     polar_to_cartesian(a, r, x, y);
     *x+=display->width/2;
     *y+=display->height/2;
 }
 
 void angle_to_square(int square_width, int square_height,
-                     int a, int* x, int* y){
+                     int a, int* x, int* y)
+{
     a = (a+360-90)%360;
     if(a>45 && a<=135){/* top line */
         a-=45;
@@ -74,14 +82,16 @@ void angle_to_square(int square_width, int square_height,
 
 void angle_to_square_screen_centered(struct screen * display,
                      int square_width, int square_height,
-                     int a, int* x, int* y){
+                     int a, int* x, int* y)
+{
     angle_to_square(square_width, square_height, a, x, y);
     *x+=display->width/2;
     *y+=display->height/2;
 }
 
 void draw_hand(struct screen* display, int angle,
-               int radius, int thickness, bool round){
+               int radius, int thickness, bool round)
+{
     int x1, y1; /* the longest */
     int x2, y2, x3, y3; /* the base */
     if(round){/* round clock */
@@ -99,10 +109,13 @@ void draw_hand(struct screen* display, int angle,
     polar_to_cartesian_screen_centered(display, (angle+240)%360,
         radius/40+thickness, &x3, &y3);
     xlcd_filltriangle_screen(display, x1, y1, x2, y2, x3, y3);
+    rb->lcd_drawline(x1, y1, x2, y2);
+    rb->lcd_drawline(x1, y1, x3, y3);
 }
 
 void draw_hands(struct screen* display, int hour, int minute, int second,
-                int thickness, bool round, bool draw_seconds){
+                int thickness, bool round, bool draw_seconds)
+{
     if(draw_seconds){
         draw_hand(display, SECOND_ANGLE(second),
                   ANALOG_SECOND_RADIUS(display, round), thickness, round);
@@ -113,7 +126,8 @@ void draw_hands(struct screen* display, int hour, int minute, int second,
               ANALOG_HOUR_RADIUS(display, round), thickness+2, round);
 }
 
-void draw_counter(struct screen* display, struct counter* counter){
+void draw_counter(struct screen* display, struct counter* counter)
+{
     char buffer[10];
     int second_str_w, hour_str_w, str_h;
     const struct picture* smalldigits_bitmaps =
@@ -134,7 +148,8 @@ void draw_counter(struct screen* display, struct counter* counter){
                 display->height-str_h);
 }
 
-void draw_date(struct screen* display, struct time* time, int date_format){
+void draw_date(struct screen* display, struct time* time, int date_format)
+{
     char buffer[10];
     int year_str_w, monthday_str_w, str_h;
     int year_line=date_format==JAPANESE?1:2;
@@ -159,7 +174,8 @@ void draw_date(struct screen* display, struct time* time, int date_format){
                 display->height-monthday_line*str_h);
 }
 
-void draw_border(struct screen* display, int skin){
+void draw_border(struct screen* display, int skin)
+{
     /* Draws square dots every 5 minutes */
     int i;
     int x, y;
@@ -180,7 +196,8 @@ void draw_border(struct screen* display, int skin){
 }
 
 void draw_hour(struct screen* display, struct time* time,
-               bool show_seconds, int skin){
+               bool show_seconds, int skin)
+{
     int hour=time->hour;
     if(hour >= 12)
         hour -= 12;
@@ -201,7 +218,8 @@ void draw_hour(struct screen* display, struct time* time,
                0, skin, show_seconds);
 }
 
-void draw_center_cover(struct screen* display){
+void draw_center_cover(struct screen* display)
+{
     display->drawline((display->width/2)-1, (display->height/2)+3,
                       (display->width/2)+1, (display->height/2)+3);
     display->drawline((display->width/2)-3, (display->height/2)+2,
@@ -221,7 +239,8 @@ void draw_center_cover(struct screen* display){
 void analog_clock_draw(struct screen* display, struct time* time,
                        struct clock_settings* settings,
                        struct counter* counter,
-                       int skin){
+                       int skin)
+{
 
     draw_hour(display, time, settings->analog.show_seconds, skin);
     if(settings->analog.show_border)
