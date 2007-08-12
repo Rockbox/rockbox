@@ -32,7 +32,7 @@
 
 Config::Config(QWidget *parent) : QDialog(parent)
 {
-    programPath = QFileInfo(qApp->arguments().at(0)).absolutePath() + "/";
+    programPath = qApp->applicationDirPath() + "/";
     ui.setupUi(this);
     ui.radioManualProxy->setChecked(true);
     QRegExpValidator *proxyValidator = new QRegExpValidator(this);
@@ -295,7 +295,7 @@ void Config::setSystemProxy(bool checked)
 
 QStringList Config::findLanguageFiles()
 {
-    QDir dir(programPath + "/");
+    QDir dir(programPath);
     QStringList fileNames;
     fileNames = dir.entryList(QStringList("*.qm"), QDir::Files, QDir::Name);
 
