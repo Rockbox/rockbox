@@ -114,6 +114,7 @@ typedef struct {
 #define ID_CUESHEET             (ID_OPTIONAL_DATA | 0x4)
 #define ID_CONFIG_BLOCK         (ID_OPTIONAL_DATA | 0x5)
 #define ID_MD5_CHECKSUM         (ID_OPTIONAL_DATA | 0x6)
+#define ID_SAMPLE_RATE          (ID_OPTIONAL_DATA | 0x7)
 
 ///////////////////////// WavPack Configuration ///////////////////////////////
 
@@ -364,6 +365,7 @@ int read_float_info (WavpackStream *wps, WavpackMetadata *wpmd);
 int read_int32_info (WavpackStream *wps, WavpackMetadata *wpmd);
 int read_channel_info (WavpackContext *wpc, WavpackMetadata *wpmd);
 int read_config_info (WavpackContext *wpc, WavpackMetadata *wpmd);
+int read_sample_rate (WavpackContext *wpc, WavpackMetadata *wpmd);
 int32_t unpack_samples (WavpackContext *wpc, int32_t *buffer, uint32_t sample_count);
 int check_crc_error (WavpackContext *wpc);
 

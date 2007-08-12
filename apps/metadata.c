@@ -51,12 +51,6 @@ static const unsigned short a52_441framesizes[] =
     1254 * 2, 1393 * 2, 1394 * 2
 };
 
-static const long wavpack_sample_rates [] = 
-{
-     6000,  8000,  9600, 11025, 12000, 16000,  22050, 24000, 
-    32000, 44100, 48000, 64000, 88200, 96000, 192000 
-};
-
 #endif /* CONFIG_CODEC == SWCODEC */
 
 
@@ -179,59 +173,8 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         break;
 
     case AFMT_WAVPACK:
-        /* A simple parser to read basic information from a WavPack file. This
-         * now works with self-extrating WavPack files. This no longer fails on
-         * WavPack files containing floating-point audio data because these are
-         * now converted to standard Rockbox format in the decoder.
-         */
-
-        /* Use the trackname part of the id3 structure as a temporary buffer */
-        buf = (unsigned char *)track->id3.path;
-      
-        for (i = 0; i < 256; ++i) {
-
-            /* at every 256 bytes into file, try to read a WavPack header */
-
-            if ((lseek(fd, i * 256, SEEK_SET) < 0) || (read(fd, buf, 32) < 32))
-            {
-                return false;
-            }
-
-            /* if valid WavPack 4 header version & not floating data, break */
-
-            if (memcmp (buf, "wvpk", 4) == 0 && buf [9] == 4 &&
-                (buf [8] >= 2 && buf [8] <= 0x10))
-            {          
-                break;
-            }
-        }
-
-        if (i == 256) {
-            logf ("%s is not a WavPack file\n", trackname);
+        if (!get_wavpack_metadata(fd, &(track->id3)))
             return false;
-        }
-
-        track->id3.vbr = true;   /* All WavPack files are VBR */
-        track->id3.filesize = filesize (fd);
-
-        if ((buf [20] | buf [21] | buf [22] | buf [23]) &&
-            (buf [12] & buf [13] & buf [14] & buf [15]) != 0xff) 
-        {
-            int srindx = ((buf [26] >> 7) & 1) + ((buf [27] << 1) & 14);
-
-            if (srindx == 15)
-            {
-                track->id3.frequency = 44100;
-            }
-            else
-            {
-                track->id3.frequency = wavpack_sample_rates[srindx];
-            }
-
-            totalsamples = get_long_le(&buf[12]);
-            track->id3.length = totalsamples / (track->id3.frequency / 100) * 10;
-            track->id3.bitrate = filesize (fd) / (track->id3.length / 8);
-        }
 
         read_ape_tags(fd, &track->id3);     /* use any apetag info we find */
         break;

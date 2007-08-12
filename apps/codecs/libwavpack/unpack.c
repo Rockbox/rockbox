@@ -270,6 +270,22 @@ int read_config_info (WavpackContext *wpc, WavpackMetadata *wpmd)
     return TRUE;
 }
 
+// Read non-standard sampling rate from metadata.
+
+int read_sample_rate (WavpackContext *wpc, WavpackMetadata *wpmd)
+{
+    int bytecnt = wpmd->byte_length;
+    uchar *byteptr = wpmd->data;
+
+    if (bytecnt == 3) {
+        wpc->config.sample_rate = (int32_t) *byteptr++;
+        wpc->config.sample_rate |= (int32_t) *byteptr++ << 8;
+        wpc->config.sample_rate |= (int32_t) *byteptr++ << 16;
+    }
+
+    return TRUE;
+}
+
 // This monster actually unpacks the WavPack bitstream(s) into the specified
 // buffer as 32-bit integers or floats (depending on orignal data). Lossy
 // samples will be clipped to their original limits (i.e. 8-bit samples are

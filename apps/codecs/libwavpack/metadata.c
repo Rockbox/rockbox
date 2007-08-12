@@ -102,6 +102,9 @@ int process_metadata (WavpackContext *wpc, WavpackMetadata *wpmd)
         case ID_CHANNEL_INFO:
             return read_channel_info (wpc, wpmd);
 
+        case ID_SAMPLE_RATE:
+            return read_sample_rate (wpc, wpmd);
+
         case ID_CONFIG_BLOCK:
             return read_config_info (wpc, wpmd);
 
