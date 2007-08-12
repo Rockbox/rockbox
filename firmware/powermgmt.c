@@ -173,12 +173,12 @@ void reset_poweroff_timer(void)
 
 #else /* not SIMULATOR ******************************************************/
 
-static const int poweroff_idle_timeout_value[15] =
+static const unsigned char poweroff_idle_timeout_value[15] =
 {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 30, 45, 60
 };
 
-static const unsigned int battery_level_dangerous[BATTERY_TYPES_COUNT] =
+static const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
 #if CONFIG_BATTERY == BATT_LIION2200    /* FM Recorder, LiIon */
     280
