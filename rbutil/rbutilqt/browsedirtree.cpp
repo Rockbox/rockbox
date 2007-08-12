@@ -33,6 +33,7 @@ BrowseDirtree::BrowseDirtree(QWidget *parent) : QDialog(parent)
     ui.tree->setColumnHidden(1, true);
     ui.tree->setColumnHidden(2, true);
     ui.tree->setColumnHidden(3, true);
+    ui.tree->setAlternatingRowColors(true);
 }
 
 

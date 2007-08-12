@@ -24,7 +24,7 @@
 UninstallWindow::UninstallWindow(QWidget *parent) : QDialog(parent)
 {
     ui.setupUi(this);
-    
+    ui.UninstalllistWidget->setAlternatingRowColors(true);    
     connect(ui.UninstalllistWidget,SIGNAL(itemSelectionChanged()),this,SLOT(selectionChanged()));
     connect(ui.CompleteRadioBtn,SIGNAL(toggled(bool)),this,SLOT(UninstallMethodChanged(bool)));
 }

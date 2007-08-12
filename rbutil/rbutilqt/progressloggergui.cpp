@@ -24,6 +24,7 @@ ProgressLoggerGui::ProgressLoggerGui(QObject* parent): ProgressloggerInterface(p
     downloadProgress = new QDialog();
     downloadProgress->setModal(true);
     dp.setupUi(downloadProgress);
+    dp.listProgress->setAlternatingRowColors(true);
     connect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(abort()));
 }
 

@@ -55,6 +55,8 @@ Config::Config(QWidget *parent) : QDialog(parent)
     ui.listLanguages->setSelectionMode(QAbstractItemView::SingleSelection);
     connect(ui.listLanguages, SIGNAL(itemSelectionChanged()), this, SLOT(updateLanguage()));
     ui.proxyPass->setEchoMode(QLineEdit::Password);
+    ui.treeDevices->setAlternatingRowColors(true);
+    ui.listLanguages->setAlternatingRowColors(true);
 
     this->setModal(true);
     
