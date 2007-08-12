@@ -167,10 +167,14 @@ enum yesno_res gui_syncyesno_run(struct text_message * main_message,
                 result = YESNO_NO;
         }
     }
-    FOR_NB_SCREENS(i)
-        result_displayed=gui_yesno_draw_result(&(yn[i]), result);
+
+    /* extract_talk_ids also converts ID to STR */
     extract_talk_ids((result == YESNO_YES) ? yes_message : no_message,
                      voice_ids, sizeof(voice_ids)/sizeof(voice_ids[0]));
+
+    FOR_NB_SCREENS(i)
+        result_displayed=gui_yesno_draw_result(&(yn[i]), result);
+
     if (talk_menus_enabled())
     {
         talk_idarray(voice_ids, false);
