@@ -41,20 +41,12 @@
 #include "icons.h"
 #include "logf.h"
 
-/* max filetypes (plugins & icons stored here) */
-#if CONFIG_CODEC == SWCODEC
-#define MAX_FILETYPES 80
-#else
-#define MAX_FILETYPES 48
-#endif
-
 /* a table for the know file types */
 const struct filetype inbuilt_filetypes[] = {
     { "mp3", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "mp2", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "mpa", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
 #if CONFIG_CODEC == SWCODEC
-    /* Temporary hack to allow playlist creation */
     { "mp1", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "ogg", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "wma", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
@@ -104,7 +96,7 @@ const struct filetype inbuilt_filetypes[] = {
     { "cue",  FILE_ATTR_CUE,   Icon_Bookmark,  VOICE_EXT_CUESHEET },
 #ifdef BOOTFILE_EXT
     { BOOTFILE_EXT, FILE_ATTR_MOD, Icon_Firmware, VOICE_EXT_AJZ },
-#endif /* #ifndef SIMULATOR */
+#endif /* #ifndef BOOTFILE_EXT */
 };
 
 void tree_get_filetypes(const struct filetype** types, int* count)
@@ -123,14 +115,14 @@ struct file_type {
     char* plugin; /* Which plugin to use, NULL if unknown, or builtin */
     char* extension; /* NULL for none */
 };
-static struct file_type filetypes[MAX_FILETYPES];
-static int custom_filetype_icons[MAX_FILETYPES];
+static struct file_type *filetypes;
+static int *custom_filetype_icons;
 static bool custom_icons_loaded = false;
 #ifdef HAVE_LCD_COLOR
-static int custom_colors[MAX_FILETYPES+1];
+static int *custom_colors;
 #endif
-static int filetype_count = 0;
 static unsigned char heighest_attr = 0;
+static int max_types = 0, filetype_count;
 
 static char *filetypes_strdup(char* string)
 {
@@ -150,7 +142,10 @@ void read_color_theme_file(void) {
     int fd;
     char *ext, *color;
     int i;
-    for (i = 0; i < MAX_FILETYPES+1; i++) {
+
+    if (max_types == 0)
+        return;
+    for (i = 0; i < filetype_count+1; i++) {
         custom_colors[i] = -1;
     }
     snprintf(buffer, MAX_PATH, "%s/%s.colours", THEME_DIR, 
@@ -169,7 +164,7 @@ void read_color_theme_file(void) {
         }
         if (!strcasecmp(ext, "???"))
         {
-            custom_colors[MAX_FILETYPES] = hex_to_rgb(color);
+            custom_colors[filetype_count] = hex_to_rgb(color);
             continue;
         }
         for (i=1; i<filetype_count; i++)
@@ -195,6 +190,8 @@ void read_viewer_theme_file(void)
     global_status.viewer_icon_count = 0;
     custom_icons_loaded = false;
     custom_filetype_icons[0] = Icon_Folder;
+    if (max_types == 0)
+        return;
     for (i=1; i<filetype_count; i++)
     {
         custom_filetype_icons[i] = filetypes[i].icon;
@@ -236,6 +233,16 @@ void read_viewer_theme_file(void)
 
 void  filetype_init(void)
 {
+    max_types = global_status.filetype_count + 8; /* always make a bit more room
+                                                     for more types */
+    filetypes = (struct file_type *)buffer_alloc(sizeof(struct file_type)*
+                                                 max_types);
+    custom_filetype_icons = (int*)buffer_alloc(sizeof(int)*max_types);
+#ifdef HAVE_LCD_COLOR
+    /* the extra item here is for the unknown types
+       which use the last array element */
+    custom_colors = (int*)buffer_alloc(sizeof(int)*max_types+1);
+#endif
     /* set the directory item first */
     filetypes[0].extension = NULL;
     filetypes[0].plugin = NULL;
@@ -251,6 +258,10 @@ void  filetype_init(void)
 #ifdef HAVE_LCD_COLOR
     read_color_theme_file();
 #endif
+    if (global_status.filetype_count == 0)
+        global_status.filetype_count = MAX_FILETYPES;
+    else global_status.filetype_count = filetype_count;
+    status_save();
 }
 
 /* remove all white spaces from string */
@@ -272,14 +283,14 @@ static void rm_whitespaces(char* str)
 static void read_builtin_types(void)
 {
     int count = sizeof(inbuilt_filetypes)/sizeof(*inbuilt_filetypes), i;
-    for(i=0; i<count && (filetype_count < MAX_FILETYPES); i++)
+    for(i=0; i<count && (filetype_count<max_types); i++)
     {
         filetypes[filetype_count].extension = inbuilt_filetypes[i].extension;
         filetypes[filetype_count].plugin = NULL;
-        filetypes[filetype_count].attr   = inbuilt_filetypes[i].tree_attr>>8;
+        filetypes[filetype_count].attr = inbuilt_filetypes[i].tree_attr>>8;
         if (filetypes[filetype_count].attr > heighest_attr)
             heighest_attr = filetypes[filetype_count].attr;
-        filetypes[filetype_count].icon   = inbuilt_filetypes[i].icon;
+        filetypes[filetype_count].icon = inbuilt_filetypes[i].icon;
         filetype_count++;
     }
 }
@@ -291,14 +302,15 @@ static void read_config(char* config_file)
     int fd = open(config_file, O_RDONLY);
     if (fd < 0)
         return;
-    /* config file is in the for 
+    /* config file is in the form 
        <extension>,<plugin>,<icon code>
        ignore line if either of the first two are missing */
     while (read_line(fd, line, 64) > 0)
     {
-        if (filetype_count >= MAX_FILETYPES)
+        if (filetype_count >= max_types)
         {
             gui_syncsplash(HZ, ID2P(LANG_FILETYPES_FULL));
+            global_status.filetype_count = 0; /* make plenty of room for next reboot */
             break;
         }
         rm_whitespaces(line);
@@ -347,7 +359,7 @@ int filetype_get_attr(const char* file)
     if (!extension)
         return 0;
     extension++;
-    for (i=0; i<filetype_count; i++)
+    for (i=0; i<max_types; i++)
     {
         if (filetypes[i].extension && 
             !strcasecmp(extension, filetypes[i].extension))
@@ -379,7 +391,7 @@ int filetype_get_color(const char * name, int attr)
         return custom_colors[0];
     extension = strrchr(name, '.');
     if (!extension)
-        return custom_colors[MAX_FILETYPES];
+        return custom_colors[filetype_count];
     extension++;
     
     for (i=1; i<filetype_count; i++)
@@ -388,7 +400,7 @@ int filetype_get_color(const char * name, int attr)
             !strcasecmp(extension, filetypes[i].extension))
             return custom_colors[i];
     }
-    return custom_colors[MAX_FILETYPES];
+    return custom_colors[filetype_count];
 }
 #endif
 
@@ -439,9 +451,9 @@ char * openwith_get_name(int selected_item, void * data, char * buffer)
 int filetype_list_viewers(const char* current_file)
 {
     int i, count = 0, action;
-    int items[MAX_FILETYPES];
+    int items[64];
     struct gui_synclist lists;
-    for (i=0; i<filetype_count && count < MAX_FILETYPES; i++)
+    for (i=0; i<filetype_count && count < 64; i++)
     {
         if (filetypes[i].plugin)
         {
