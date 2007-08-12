@@ -143,15 +143,22 @@ static bool read_nvram_data(char* buf, int max_len)
     /* all good, so read in the settings */
     var_count = buf[3];
     buf_pos = NVRAM_DATA_START;
-    for(i=0; (i<nb_settings) && (var_count>0) && (buf_pos<max_len); i++)
+    for(i=0; i<nb_settings; i++)
     {
         int nvram_bytes = (settings[i].flags&F_NVRAM_BYTES_MASK)
                                 >>F_NVRAM_MASK_SHIFT;
         if (nvram_bytes)
         {
-            memcpy(settings[i].setting,&buf[buf_pos],nvram_bytes);
-            buf_pos += nvram_bytes;
-            var_count--;
+            if ((var_count>0) && (buf_pos<max_len))
+            {
+                memcpy(settings[i].setting,&buf[buf_pos],nvram_bytes);
+                buf_pos += nvram_bytes;
+                var_count--;
+            }
+            else /* should only happen when new items are added to the end */
+            {
+                memcpy(settings[i].setting, &settings[i].default_val, nvram_bytes);
+            }
         }
     }
     return true;

@@ -241,7 +241,7 @@ void  filetype_init(void)
 #ifdef HAVE_LCD_COLOR
     /* the extra item here is for the unknown types
        which use the last array element */
-    custom_colors = (int*)buffer_alloc(sizeof(int)*max_types+1);
+    custom_colors = (int*)buffer_alloc(sizeof(int)*(max_types+1));
 #endif
     /* set the directory item first */
     filetypes[0].extension = NULL;
