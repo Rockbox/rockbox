@@ -145,13 +145,6 @@ extern const char * const trig_durations[TRIG_DURATION_COUNT];
 #define HAVE_LCD_CONTRAST
 #endif
 
-#if CONFIG_CODEC == SWCODEC
-#define MAX_FILETYPES 128
-#else
-#define MAX_FILETYPES 48
-#endif
-
-
 /* repeat mode options */
 enum
 {
@@ -315,7 +308,6 @@ struct system_status
                             relative to MIN_FREQ */
 #endif
     char last_screen;
-    int  filetype_count;
     int  viewer_icon_count;
 };
 

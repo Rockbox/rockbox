@@ -96,7 +96,7 @@ struct choice_setting {
 
 #define F_NVRAM_BYTES_MASK     0xE000 /*0-4 bytes can be stored */
 #define F_NVRAM_MASK_SHIFT     13
-#define NVRAM_CONFIG_VERSION 3
+#define NVRAM_CONFIG_VERSION 4
 /* Above define should be bumped if
 - a new NVRAM setting is added between 2 other NVRAM settings
 - number of bytes for a NVRAM setting is changed

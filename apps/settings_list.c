@@ -1256,7 +1256,6 @@ const struct settings_list settings[] = {
                 3, "list_accel_wait", UNIT_SEC, 1, 10, 1, 
                 scanaccel_formatter, scanaccel_getlang, NULL),
 #endif /* HAVE_SCROLLWHEEL */
-    SYSTEM_SETTING(NVRAM(4),filetype_count, MAX_FILETYPES),
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);
