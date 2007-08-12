@@ -2419,22 +2419,18 @@
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PLAY/PAUSE to return)"
-    x5,m5: "Building database... %d found (Long PLAY to return)"
+    x5,m5: "Building database... %d found (Left to return)"
     h10,h10_5gb,e200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PLAY/PAUSE to return)"
-    x5,m5: "Building database... %d found (Long PLAY to return)"
+    x5,m5: "Building database... %d found (Left to return)"
     h10,h10_5gb,e200: "Building database... %d found (PREV to return)"
   </dest>
   <voice>
     *: "entries found for database"
-    h100,h120,h300: "entries found for database"
-    ipod*: "entries found for database"
-    x5,m5: "entries found for database"
-    h10,h10_5gb,e200: "entries found for database"
   </voice>
 </phrase>
 <phrase>
