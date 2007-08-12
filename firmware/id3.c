@@ -145,8 +145,8 @@ const int afmt_rec_format[AFMT_NUM_CODECS] =
 
 unsigned long unsync(unsigned long b0,
                      unsigned long b1,
-		     unsigned long b2,
-		     unsigned long b3)
+                     unsigned long b2,
+                     unsigned long b3)
 {
    return (((long)(b0 & 0x7F) << (3*7)) |
            ((long)(b1 & 0x7F) << (2*7)) |
@@ -900,6 +900,9 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                  */
                  
                 if(!memcmp( header, "COMM", 4 )) {
+                    /* ignore comments with iTunes 7 gapless data */
+                    if(!strcmp(tag+4, "iTunNORM"))
+                        break;
                     comm_offset = 3 + strlen(tag+4) + 1;
                     if(bytesread>comm_offset) {
                         bytesread-=comm_offset;
