@@ -90,9 +90,6 @@ const signed char backlight_timeout_value[19] =
 
 static void backlight_thread(void);
 static long backlight_stack[DEFAULT_STACK_SIZE/sizeof(long)];
-#ifdef X5_BACKLIGHT_SHUTDOWN
-#define BACKLIGHT_QUIT 256
-#endif
 static const char backlight_thread_name[] = "backlight";
 static struct event_queue backlight_queue;
 
@@ -465,12 +462,47 @@ static void remote_backlight_update_state(void)
 void backlight_thread(void)
 {
     struct event ev;
+    bool locked = false;
 
     while(1)
     {
         queue_wait(&backlight_queue, &ev);
         switch(ev.id)
-        {
+        {   /* These events must always be processed */
+#if defined(HAVE_BACKLIGHT_PWM_FADING) && defined(CPU_COLDFIRE) \
+    && !defined(SIMULATOR)
+            case BACKLIGHT_UNBOOST_CPU:
+                cpu_boost(false);
+                break;
+#endif
+
+#if defined(HAVE_REMOTE_LCD) && !defined(SIMULATOR)
+            /* Here for now or else the aggressive init messes up scrolling */
+            case SYS_REMOTE_PLUGGED:
+                lcd_remote_on();
+                lcd_remote_update();
+                break;
+
+            case SYS_REMOTE_UNPLUGGED:
+                lcd_remote_off();
+                break;
+#endif /* defined(HAVE_REMOTE_LCD) && !defined(SIMULATOR) */
+
+            case SYS_USB_CONNECTED:
+                /* Tell the USB thread that we are safe */
+                DEBUGF("backlight_thread got SYS_USB_CONNECTED\n");
+                usb_acknowledge(SYS_USB_CONNECTED_ACK);
+                break;
+
+            case SYS_USB_DISCONNECTED:
+                usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
+                break;
+        }
+        if (locked)
+            continue;
+
+        switch(ev.id)
+        {   /* These events are only processed if backlight isn't locked */
 #ifdef HAVE_REMOTE_LCD
             case REMOTE_BACKLIGHT_ON:
                 remote_backlight_update_state();
@@ -500,57 +532,26 @@ void backlight_thread(void)
             case BUTTON_LIGHT_ON:
                 buttonlight_update_state();
                 break;
+
             case BUTTON_LIGHT_OFF:
                 button_backlight_timer = 0;
                 _button_backlight_off();
                 break;
 #endif
 
-#ifdef X5_BACKLIGHT_SHUTDOWN
-            case BACKLIGHT_QUIT:
-                remove_thread(NULL);
-                break;
-#endif
-
-#if defined(HAVE_BACKLIGHT_PWM_FADING) && defined(CPU_COLDFIRE) \
-    && !defined(SIMULATOR)
-            case BACKLIGHT_UNBOOST_CPU:
-                cpu_boost(false);
-                break;
-#endif
-
-#if defined(HAVE_REMOTE_LCD) && !defined(SIMULATOR)
-            /* Here for now or else the aggressive init messes up scrolling */
-            case SYS_REMOTE_PLUGGED:
-                lcd_remote_on();
-                lcd_remote_update();
-                break;
-
-            case SYS_REMOTE_UNPLUGGED:
-                lcd_remote_off();
-                break;
-#endif /* defined(HAVE_REMOTE_LCD) && !defined(SIMULATOR) */
-
+            case SYS_POWEROFF:  /* Lock backlight on poweroff so it doesn't */
+                locked = true;      /* go off before power is actually cut. */
+                /* fall through */
 #if CONFIG_CHARGING
             case SYS_CHARGER_CONNECTED:
             case SYS_CHARGER_DISCONNECTED:
+#endif
                 backlight_update_state();
 #ifdef HAVE_REMOTE_LCD
                 remote_backlight_update_state();
 #endif
                 break;
-#endif /* CONFIG_CHARGING */
-
-            case SYS_USB_CONNECTED:
-                /* Tell the USB thread that we are safe */
-                DEBUGF("backlight_thread got SYS_USB_CONNECTED\n");
-                usb_acknowledge(SYS_USB_CONNECTED_ACK);
-                break;
-
-            case SYS_USB_DISCONNECTED:
-                usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
-                break;
-        } /* end switch */
+        }
     } /* end while */
 }
 
@@ -627,19 +628,6 @@ void backlight_init(void)
                   IF_COP(, CPU, false));
     tick_add_task(backlight_tick);
 }
-
-#ifdef X5_BACKLIGHT_SHUTDOWN
-void x5_backlight_shutdown(void)
-{
-    /* Turn on the screen and don't let anyone else mess with it. Called
-       from clean_shutdown in misc.c. */
-    queue_empty(&backlight_queue);
-    tick_remove_task(backlight_tick);
-    /* Next time the thread runs, if at all, it will just remove itself. */
-    queue_post(&backlight_queue, BACKLIGHT_QUIT, 0);
-    __backlight_on();
-}
-#endif /* X5_BACKLIGHT_SHUTDOWN */
 
 void backlight_on(void)
 {

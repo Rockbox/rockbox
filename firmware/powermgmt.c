@@ -1273,7 +1273,7 @@ void sys_poweroff(void)
         shutdown_timeout += HZ*20;
     }
 
-    queue_post(&button_queue, SYS_POWEROFF, 0);
+    queue_broadcast(SYS_POWEROFF, 0);
 }
 
 void cancel_shutdown(void)

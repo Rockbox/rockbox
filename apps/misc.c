@@ -618,9 +618,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 
         FOR_NB_SCREENS(i)
             screens[i].clear_display();
-#ifdef X5_BACKLIGHT_SHUTDOWN
-        x5_backlight_shutdown();
-#endif
+
         if (batt_safe)
         {
 #ifdef HAVE_TAGCACHE
