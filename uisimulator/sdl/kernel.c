@@ -27,6 +27,10 @@
 
 static void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
 
+/* This array holds all queues that are initiated. It is used for broadcast. */
+static struct event_queue *all_queues[32];
+static int num_queues = 0;
+
 int set_irq_level (int level)
 {
     static int _lv = 0;
@@ -91,19 +95,52 @@ void queue_enable_queue_send(struct event_queue *q,
 
 void queue_init(struct event_queue *q, bool register_queue)
 {
-    (void)register_queue;
-    
     q->read   = 0;
     q->write  = 0;
     q->thread = NULL;
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     q->send   = NULL; /* No message sending by default */
 #endif
+
+    if(register_queue)
+    {
+        /* Add it to the all_queues array */
+        all_queues[num_queues++] = q;
+    }
 }
 
 void queue_delete(struct event_queue *q)
 {
-    (void)q;
+    int i;
+    bool found = false;
+
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+    /* Release waiting threads and reply to any dequeued message
+       waiting for one. */
+    queue_release_all_senders(q);
+    queue_reply(q, 0);
+#endif
+    
+    /* Find the queue to be deleted */
+    for(i = 0;i < num_queues;i++)
+    {
+        if(all_queues[i] == q)
+        {
+            found = true;
+            break;
+        }
+    }
+
+    if(found)
+    {
+        /* Move the following queues up in the list */
+        for(;i < num_queues-1;i++)
+        {
+            all_queues[i] = all_queues[i+1];
+        }
+        
+        num_queues--;
+    }
 }
 
 void queue_wait(struct event_queue *q, struct event *ev)
@@ -284,6 +321,18 @@ void queue_remove_from_head(struct event_queue *q, long id)
 int queue_count(const struct event_queue *q)
 {
     return q->write - q->read;
+}
+
+int queue_broadcast(long id, intptr_t data)
+{
+    int i;
+    
+    for(i = 0;i < num_queues;i++)
+    {
+        queue_post(all_queues[i], id, data);
+    }
+   
+    return num_queues;
 }
 
 void switch_thread(bool save_context, struct thread_entry **blocked_list)
