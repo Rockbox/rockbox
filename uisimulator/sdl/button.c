@@ -722,7 +722,8 @@ long button_get_w_tmo(int ticks)
 
 intptr_t button_get_data(void)
 {
-    return button_data;
+    /* Needed by the accelerating wheel driver for Sansa e200 */
+    return 1 << 24;
 }
 
 void button_init(void)
@@ -738,3 +739,4 @@ void button_clear_queue(void)
 {
     queue_clear(&button_queue);
 }
+
