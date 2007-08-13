@@ -10922,3 +10922,31 @@
     *: ""
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SHOW_FILENAME_EXT
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Show filename extensions"
+  </source>
+  <dest>
+    *: "Bestandsextenties tonen"
+  </dest>
+  <voice>
+    *: "Bestandsextenties tonen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNKNOWN_TYPES
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Only unknown types"
+  </source>
+  <dest>
+    *: "Enkel onbekende types"
+  </dest>
+  <voice>
+    *: "Enkel onbekende types"
+  </voice>
+</phrase>
