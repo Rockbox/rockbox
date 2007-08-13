@@ -1865,7 +1865,7 @@ if [ "yes" = "$voice" ]; then
  cat >> Makefile <<EOF
 
 voice: tools features
-	\$(SILENT)for f in \`cat \$(BUILDDIR)/@APPS@/features\`; do feat="\$\$feat:\$\$f" ; done ; \\
+	\$(SILENT)for f in \`cat \$(BUILDDIR)/${apps}/features\`; do feat="\$\$feat:\$\$f" ; done ; \\
 	for lang in \`echo \$(VOICELANGUAGE) |sed "s/,/ /g"\`; do \$(TOOLSDIR)/genvoice.sh \$(ROOTDIR) \$\$lang \$(ARCHOS)\$\$feat \$(TARGET_ID) voicesettings-\$\$lang.sh ; done \\
 EOF
 
