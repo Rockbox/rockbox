@@ -154,11 +154,11 @@ static char * tree_get_filename(int selected_item, void * data, char *buffer)
         name = e->name;
         attr = e->attr;
     }
-    /* if any file filter is on, and if it's not a directory,
-     * strip the extension */
-
-    if ( (*(local_tc->dirfilter) != SHOW_ID3DB) && !(attr & ATTR_DIRECTORY)
-        && (*(local_tc->dirfilter) != SHOW_ALL) )
+    /* if it's not a directory, strip the extension if necessary */
+    if((global_settings.show_filename_ext == 0) ||
+       ((global_settings.show_filename_ext == 2) &&
+        (filetype_supported(attr)) &&
+        !(attr & ATTR_DIRECTORY)))
     {
         return(strip_extension(name, buffer));
     }
