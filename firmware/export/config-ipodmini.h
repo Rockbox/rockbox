@@ -72,6 +72,9 @@
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 
+/* We can fade the backlight by using PWM */
+#define HAVE_BACKLIGHT_PWM_FADING
+
 /* Define this if you can detect headphones */
 #define HAVE_HEADPHONE_DETECTION
 
