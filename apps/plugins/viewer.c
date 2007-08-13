@@ -377,7 +377,7 @@ static unsigned char* find_last_space(const unsigned char* p, int size)
     for (i=size-1; i>=0; i--)
         for (j=k; j < (int) sizeof(line_break); j++)
         {
-            if (((p[i] != '-') && (prefs.word_mode != WRAP)))
+            if (!((p[i] == '-') && (prefs.word_mode == WRAP)))
                 if (p[i] == line_break[j])
                     return (unsigned char*) p+i;
         }
@@ -1128,6 +1128,9 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
 static void viewer_save_settings(void)/* same name as global, but not the same file.. */
 {
     int settings_fd;
+
+    rb->splash(1, "Saving Settings");
+
     settings_fd = rb->creat(SETTINGS_FILE); /* create the settings file */
     
     rb->write (settings_fd, &prefs, sizeof(struct preferences));
@@ -1320,7 +1323,6 @@ static void viewer_menu(void)
     switch (result)
     {
         case 0: /* quit */
-            rb->splash(1, "Saving Settings");
             menu_exit(m);
             viewer_exit(NULL);
             done = true;
@@ -1357,9 +1359,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
     file_name = file;
     ok = viewer_init();
     if (!ok) {
-        rb->splash(HZ, "Error");
-        viewer_exit(NULL);
-        return PLUGIN_OK;
+        rb->splash(HZ, "Error opening file.");
+        return PLUGIN_ERROR;
     }
 
     viewer_reset_settings(); /* load defaults first */
