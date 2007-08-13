@@ -17,14 +17,9 @@ builddir="$HOME/build-rbdev"
 # This script needs to use GNU Make. On Linux systems, GNU Make is invoked
 # by running the "make" command, on most BSD systems, GNU Make is invoked
 # by running the "gmake" command. Set the "make" variable accordingly.
-if [ -n "`which gmake`" ]; then
+if [ -f "`which gmake`" ]; then
     make="gmake"
 else
-    make="make"
-fi
-
-# Alternate detection for Mac OS X/Darwin
-if [ "`uname`" == "Darwin" ] && which gmake | grep -q '^no'; then
     make="make"
 fi
 
