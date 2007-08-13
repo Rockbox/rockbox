@@ -207,8 +207,6 @@ static void rectime_formatter(char *buffer, int buffer_size,
 #ifdef HAVE_BACKLIGHT
 static const char backlight_times_conf [] =
                   "off,on,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90";
-static const int backlight_times[] = 
-            {-1, -1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 45, 60, 90};
 static void backlight_formatter(char *buffer, int buffer_size, 
         int val, const char *unit)
 {
@@ -217,8 +215,8 @@ static void backlight_formatter(char *buffer, int buffer_size,
         strcpy(buffer, str(LANG_OFF));
     else if (val == 1)
         strcpy(buffer, str(LANG_ON));
-    else 
-        snprintf(buffer, buffer_size, "%d s", backlight_times[val]);
+    else
+        snprintf(buffer, buffer_size, "%d s", backlight_timeout_value[val]);
 }
 static long backlight_getlang(int value)
 {
@@ -226,11 +224,11 @@ static long backlight_getlang(int value)
         return LANG_OFF;
     else if (value == 1)
         return LANG_ON;
-    return TALK_ID(backlight_times[value], UNIT_SEC);
+    return TALK_ID(backlight_timeout_value[value], UNIT_SEC);
 }
 #endif
 /* ffwd/rewind and scan acceleration stuff */
-static int ff_rewind_min_stepvals[] = {1,2,3,4,5,6,8,10,15,20,25,30,45,60};
+static const unsigned char ff_rewind_min_stepvals[] = {1,2,3,4,5,6,8,10,15,20,25,30,45,60};
 static long ff_rewind_min_step_getlang(int value)
 {
     return TALK_ID(ff_rewind_min_stepvals[value], UNIT_SEC);
@@ -257,7 +255,7 @@ static void scanaccel_formatter(char *buffer, int buffer_size,
         snprintf(buffer, buffer_size, "2x/%ds", val);
 }
 
-static int poweroff_idle_timer_times[] = {0,1,2,3,4,5,6,7,8,9,10,15,30,45,60};
+static const unsigned char poweroff_idle_timer_times[] = {0,1,2,3,4,5,6,7,8,9,10,15,30,45,60};
 static long poweroff_idle_timer_getlang(int value)
 {
     if (value == 0)
