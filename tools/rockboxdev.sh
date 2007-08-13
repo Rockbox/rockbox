@@ -23,6 +23,11 @@ else
     make="make"
 fi
 
+# Alternate detection for Mac OS X/Darwin
+if [ "`uname`" == "Darwin" ] && which gmake | grep -q '^no'; then
+    make="make"
+fi
+
 # If detection fails, override the value of make manually:
 # make="make"
 
