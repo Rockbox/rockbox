@@ -72,7 +72,7 @@ FESTIVAL_HOST=localhost
 FESTIVAL_PORT=1314
 # where to log the Festival client output
 FESTIVAL_LOG=/dev/null
-# other options to the festival client
+# other options to the festival server
 FESTIVAL_OPTS=""
 
 ##################
@@ -140,7 +140,7 @@ init_tts() {
                     exit 3
                 fi
                 FESTIVAL_HOST='localhost'
-                $FESTIVAL_BIN --server 2>&1 > /dev/null &
+                $FESTIVAL_BIN $FESTIVAL_OPTS --server 2>&1 > /dev/null &
                 FESTIVAL_SERVER_PID=$!
                 sleep 3
                 if [ `ps | grep -c "^\ *$FESTIVAL_SERVER_PID"` -ne 1 ]; then
@@ -271,7 +271,7 @@ voice() {
             case $TTS_ENGINE in
                 festival)
                     echo "Action: Generate $WAV_FILE with festival"
-                    echo -E "$TO_SPEAK" | $FESTIVAL_CLIENT $FESTIVAL_OPTS \
+                    echo -E "$TO_SPEAK" | $FESTIVAL_CLIENT \
                          --server $FESTIVAL_HOST \
                          --otype riff --ttw --output "$WAV_FILE" 2>"$WAV_FILE"
                     ;;

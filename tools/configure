@@ -284,8 +284,25 @@ whichadvanced () {
   echo "done"
 
   if [ "yes" = "$voice" ]; then
-     voiceconfig
-     toolset="${toolset} voicefont wavtrim"
+    toolset="${toolset} voicefont wavtrim"
+
+    # Ask about languages to build
+    echo "Select a number for the language to use (default is english)"
+    echo "You may enter a comma-separated list of languages to build"
+
+    picklang
+    voicelanguage=`whichlang`
+
+    if [ -z "$voicelanguage" ]; then
+      # pick a default
+      voicelanguage="english"
+    fi
+    echo "Voice language set to $voicelanguage"
+
+    # Configure encoder and TTS engine for each language
+    for thislang in `echo $voicelanguage | sed 's/,/ /g'`; do
+      voiceconfig "$thislang"
+    done
   fi
   if [ "yes" = "$use_debug" ]; then
     debug="-DDEBUG"
@@ -304,8 +321,10 @@ whichadvanced () {
   fi
 }
 
+# Configure voice settings
 voiceconfig () {
-    echo "Building voice for $archos"
+    thislang=$1
+    echo "Building $thislang voice for $archos. Select options"
     echo ""
 
     if [ "`which flite`" != "" ]; then
@@ -377,6 +396,13 @@ voiceconfig () {
     esac
     echo "Using $TTS_ENGINE for TTS"
 
+    # Allow the user to input manual commandline options
+    printf "Enter $TTS_ENGINE options (enter for defaults `echo $TTS_OPTS |sed 's/.*=//'`): "
+    USER_TTS_OPTS=`input`
+    if [ -n "$USER_TTS_OPTS" ]; then
+        TTS_OPTS="`echo $TTS_OPTS | sed 's/=.*//'`=\"$USER_TTS_OPTS\""
+    fi
+
     echo ""
 
     if [ "`which oggenc`" != "" ]; then
@@ -402,37 +428,46 @@ voiceconfig () {
     fi
 
     if [ "$LAME" = "" ]; then
-        echo "You need to have Lame installed to build voice files"
+        echo "You currently need to have Lame installed to build voice files"
     fi
 
 #    echo "Encoder to use: ${LAME}${OGGENC}${SPEEXENC}(${DEFAULT_CHOICE})?"
 #    echo ""
 #    echo "Note: Use Lame - the other options won't work"
 #    option=`input`
-#    case "$option" in
-#        [Oo])
-#        ENCODER="oggenc"
-#        ENC_OPTS=$VORBIS_OPTS
-#        ;;
-#        [Ss])
-#        ENCODER="speexenc"
-#        ENC_OPTS=$SPEEX_OPTS
-#        ;;
-#        [Ll])
+    option="l"
+    case "$option" in
+        [Oo])
+        ENCODER="oggenc"
+        ENC_OPTS=$VORBIS_OPTS
+        ;;
+        [Ss])
+        ENCODER="speexenc"
+        ENC_OPTS=$SPEEX_OPTS
+        ;;
+        [Ll])
         ENCODER="lame"
         ENC_OPTS=$LAME_OPTS
-#        ;;
-#        *)
-#        ENCODER=$DEFAULT_ENC
-#        ENC_OPTS=$DEFAULT_ENC_OPTS
-#    esac
+        ;;
+        *)
+        ENCODER=$DEFAULT_ENC
+        ENC_OPTS=$DEFAULT_ENC_OPTS
+    esac
     echo "Using $ENCODER for encoding voice clips"
+
+    # Allow the user to input manual commandline options
+    printf "Enter $ENCODER options (enter for defaults `echo $ENC_OPTS |sed 's/.*=//'`): "
+    USER_ENC_OPTS=`input`
+    if [ -n "$USER_ENC_OPTS" ]; then
+        ENC_OPTS="`echo $ENC_OPTS | sed 's/=.*//'`=\"$USER_ENC_OPTS\""
+    fi
+
     TEMPDIR="${pwd}"
     if [ "`which cygpath`" != "" ]; then
         TEMPDIR=`cygpath . -a -w`
     fi
 
-    cat > voicesettings.sh <<EOF
+    cat > voicesettings-$thislang.sh <<EOF
 TTS_ENGINE="${TTS_ENGINE}"
 ENCODER="${ENCODER}"
 TEMPDIR="$TEMPDIR"
@@ -456,18 +491,26 @@ picklang() {
     done
 
     read pick
-    return $pick;
 }
 
 whichlang() {
-    num=1
-    for one in $langs; do
-        if [ "$num" = "$pick" ]; then
-            echo $one
-            return
-        fi
-        num=`expr $num + 1`
+    output=""
+    # Allow the user to pass a comma-separated list of langauges
+    for thispick in `echo $pick | sed 's/,/ /g'`; do
+        num=1
+        for one in $langs; do
+            # Accept both the language number and name
+            if [ "$num" = "$thispick" ] || [ "$thispick" = "$one" ]; then
+                if [ "$output" = "" ]; then
+                    output=$one
+                else
+                    output=$output,$one
+                fi
+            fi
+            num=`expr $num + 1`
+        done
     done
+    echo $output
 }
 
 opt=$1
@@ -1429,20 +1472,6 @@ echo "Using source code root directory: $rootdir"
 # this was once possible to change at build-time, but no more:
 language="english"
 
-# Ask about language if building voice
-if [ "yes" = "$voice" ]; then
-    echo "Select a number for the language to use (default is english)"
-
-    picklang
-    voicelanguage=`whichlang`
-
-    if [ -z "$voicelanguage" ]; then
-        # pick a default
-        voicelanguage="english"
-    fi
-    echo "Voice language set to $voicelanguage"
-fi
-
 uname=`uname`
 
 if [ "yes" = "$simulator" ]; then
@@ -1593,7 +1622,7 @@ sed > Makefile \
  -e "s,@MANUFACTURER@,${t_manufacturer},g" \
  -e "s,@ARCHOS@,${archos},g" \
  -e "s,@LANGUAGE@,${language},g" \
- -e "s,@VOICELANGUAGE@,${voicelanguage},g" \
+ -e "s:@VOICELANGUAGE@:${voicelanguage}:g" \
  -e "s,@PWD@,${pwd},g" \
  -e "s,@CC@,${CC},g" \
  -e "s,@LD@,${LD},g" \
@@ -1794,6 +1823,9 @@ manual-ztxt:
 manual-zip:
 	\$(SILENT)\$(MAKE) -C \$(MANUALDIR) OBJDIR=\$(BUILDDIR)/manual manual-zip
 
+features:
+	\$(SILENT)\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@ features
+
 help:
 	@echo "A few helpful make targets"
 	@echo ""
@@ -1832,10 +1864,9 @@ if [ "yes" = "$voice" ]; then
 
  cat >> Makefile <<EOF
 
-voice: tools
-	\$(SILENT)\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@ features
+voice: tools features
 	\$(SILENT)for f in \`cat \$(BUILDDIR)/@APPS@/features\`; do feat="\$\$feat:\$\$f" ; done ; \\
-	\$(TOOLSDIR)/genvoice.sh \$(ROOTDIR) \$(VOICELANGUAGE) \$(ARCHOS)\$\$feat \$(TARGET_ID) voicesettings.sh
+	for lang in \`echo \$(VOICELANGUAGE) |sed "s/,/ /g"\`; do \$(TOOLSDIR)/genvoice.sh \$(ROOTDIR) \$\$lang \$(ARCHOS)\$\$feat \$(TARGET_ID) voicesettings-\$\$lang.sh ; done \\
 EOF
 
 fi
