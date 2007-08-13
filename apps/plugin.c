@@ -132,6 +132,9 @@ static const struct plugin_api rockbox_api = {
     backlight_on,
     backlight_off,
     backlight_set_timeout,
+#if CONFIG_CHARGING
+    backlight_set_timeout_plugged,
+#endif
     gui_syncsplash,
 #ifdef HAVE_REMOTE_LCD
     /* remote lcd */

@@ -112,12 +112,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 71
+#define PLUGIN_API_VERSION 72
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 71
+#define PLUGIN_MIN_API_VERSION 72
 
 /* plugin return codes */
 enum plugin_status {
@@ -210,6 +210,9 @@ struct plugin_api {
     void (*backlight_on)(void);
     void (*backlight_off)(void);
     void (*backlight_set_timeout)(int index);
+#if CONFIG_CHARGING
+    void (*backlight_set_timeout_plugged)(int index);
+#endif
     void (*splash)(int ticks, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
 
 #ifdef HAVE_REMOTE_LCD

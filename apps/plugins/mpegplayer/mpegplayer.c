@@ -104,6 +104,7 @@ FPS     | 27Mhz   | 100Hz          | 44.1KHz   | 48KHz
 
 #include "plugin.h"
 #include "gray.h"
+#include "helper.h"
 
 #include "mpeg2.h"
 #include "mpeg_settings.h"
@@ -1856,14 +1857,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_clear_display();
     rb->lcd_update();
 
-    /* make sure the backlight is always on when viewing video
-       (actually it should also set the timeout when plugged in,
-       but the function backlight_set_timeout_plugged is not
-       available in plugins) */
-#ifdef HAVE_BACKLIGHT
-    if (rb->global_settings->backlight_timeout > 0)
-        rb->backlight_set_timeout(1);
-#endif
+    backlight_force_on();
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
@@ -2000,10 +1994,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
 
-#ifdef HAVE_BACKLIGHT
-    /* reset backlight settings */
-    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
-#endif
+    backlight_use_settings();
 
     return status;
 }

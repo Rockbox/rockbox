@@ -30,3 +30,4 @@ bmp.c
 #endif
 #endif
 pluginlib_actions.c
+helper.c
