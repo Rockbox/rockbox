@@ -10950,3 +10950,17 @@
     *: "Enkel onbekende types"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_EXT_ONLY_VIEW_ALL
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Only when viewing all types"
+  </source>
+  <dest>
+    *: "Enkel bij tonen alle bestanden"
+  </dest>
+  <voice>
+    *: "Enkel bij tonen alle bestanden"
+  </voice>
+</phrase>

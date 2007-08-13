@@ -139,6 +139,7 @@ static char * tree_get_filename(int selected_item, void * data, char *buffer)
     struct tree_context * local_tc=(struct tree_context *)data;
     char *name;
     int attr=0;
+    bool stripit = false;
 #ifdef HAVE_TAGCACHE
     bool id3db = *(local_tc->dirfilter) == SHOW_ID3DB;
 
@@ -154,11 +155,34 @@ static char * tree_get_filename(int selected_item, void * data, char *buffer)
         name = e->name;
         attr = e->attr;
     }
-    /* if it's not a directory, strip the extension if necessary */
-    if((global_settings.show_filename_ext == 0) ||
-       ((global_settings.show_filename_ext == 2) &&
-        (filetype_supported(attr)) &&
-        !(attr & ATTR_DIRECTORY)))
+    
+    switch(global_settings.show_filename_ext)
+    {
+        case 0:
+            /* show file extension: off */
+            stripit = true;
+            break;
+        case 1:
+            /* show file extension: on */
+            stripit = false;
+            break;
+        case 2:
+            /* show file extension: only unknown types */
+            stripit = filetype_supported(attr);
+            break;
+        case 3:
+        default:
+            /* show file extension: only when viewing all */
+            stripit = (*(local_tc->dirfilter) != SHOW_ID3DB) &&
+                      (*(local_tc->dirfilter) != SHOW_ALL);
+            break;
+    }
+
+    /* global overrule: don't strip if it's a dir */
+    if(attr & ATTR_DIRECTORY)
+        stripit = false;
+
+    if(stripit)
     {
         return(strip_extension(name, buffer));
     }

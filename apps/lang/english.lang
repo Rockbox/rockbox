@@ -11025,3 +11025,17 @@
     *: "Only unknown types"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_EXT_ONLY_VIEW_ALL
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Only when viewing all types"
+  </source>
+  <dest>
+    *: "Only when viewing all types"
+  </dest>
+  <voice>
+    *: "Only when viewing all types"
+  </voice>
+</phrase>
