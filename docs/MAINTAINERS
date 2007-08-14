@@ -68,7 +68,7 @@ Core code (low-level)
 Core code (Mid-level)
 ----------------------
 
-:DSP: Michael Sevakis
+:DSP: Michael Sevakis,Thom Johansen
 :LCD/Graphics API:
 :Playback engine (HWCODEC):
 :Playback engine (SWCODEC): Michael Sevakis
@@ -233,8 +233,8 @@ Codecs (Playback)
 :ALAC:Dave Chapman
 :APE (Monkey's Audio): Dave Chapman
 :FLAC: Dave Chapman
-:MPEG Audio (MP1/MP2/MP3):
-:Musepack:
+:MPEG Audio (MP1/MP2/MP3): Thom Johansen
+:Musepack: Thom Johansen
 :NSF:
 :Ogg Vorbis:
 :Shorten:
