@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Riebeling
- *   $Id:$
+ *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -39,6 +39,7 @@ class HttpGet : public QObject
         QString errorString(void);
         void setFile(QFile*);
         int httpResponse(void);
+        QByteArray readAll(void);
 
     public slots:
         void abort(void);
@@ -53,11 +54,15 @@ class HttpGet : public QObject
         void httpProgress(int, int);
         void httpFinished(int, bool);
         void httpResponseHeader(const QHttpResponseHeader&);
+        void httpState(int);
+        void httpStarted(int);
 
     private:
         QHttp http;
         QFile *outputFile;
         int response;
+        int getRequest;
+        QByteArray dataBuffer;
 };
 
 #endif
