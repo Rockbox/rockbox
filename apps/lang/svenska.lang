@@ -2270,7 +2270,7 @@
     *: "Supported"
   </source>
   <dest>
-    *: "Alla filer som stödjs"
+    *: "Alla som stödjs"
   </dest>
   <voice>
     *: "Supported"
@@ -10248,7 +10248,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Alla filer som stödjs"
+    lcd_bitmap: "Alla som stödjs"
   </dest>
   <voice>
     *: none
@@ -10857,5 +10857,117 @@
   <voice>
     *: none
     agc: "AGC maximum gain"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OF
+  desc: spoken only, as in 3/8 => 3 of 8
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "av"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_GAMES
+  desc: in the main menu
+  user:
+  <source>
+    *: "Games"
+  </source>
+  <dest>
+    *: "Spel"
+  </dest>
+  <voice>
+    *: "Games"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_APPS
+  desc: in the main menu
+  user:
+  <source>
+    *: "Applications"
+  </source>
+  <dest>
+    *: "Applikationer"
+  </dest>
+  <voice>
+    *: "Applications"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_DEMOS
+  desc: in the main menu
+  user:
+  <source>
+    *: "Demos"
+  </source>
+  <dest>
+    *: "Demosar"
+  </dest>
+  <voice>
+    *: "Demos"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_GROUPING
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Work]"
+  </source>
+  <dest>
+    *: "[Verk]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_FILENAME_EXT
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Show filename extensions"
+  </source>
+  <dest>
+    *: "Visa filändelser"
+  </dest>
+  <voice>
+    *: "Show filename extensions"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNKNOWN_TYPES
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Only unknown types"
+  </source>
+  <dest>
+    *: "Bara för filer som ej stödjs"
+  </dest>
+  <voice>
+    *: "Only unknown types"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EXT_ONLY_VIEW_ALL
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Only when viewing all types"
+  </source>
+  <dest>
+    *: "Bara när alla filer visas"
+  </dest>
+  <voice>
+    *: "Only when viewing all types"
   </voice>
 </phrase>
