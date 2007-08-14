@@ -76,7 +76,7 @@ Core code (Mid-level)
 :PCM recording API (SWCODEC): Michael Sevakis
 :Recording API (HWCODEC):
 :Fonts and Unicode:
-:Replaygain:
+:Replaygain: Magnus Holmgren
 :Profiling:
 :Screens API and GUI widgets: Kévin Ferrare
 :Settings API: Jonathan Gordon
@@ -88,7 +88,7 @@ Core code (Mid-level)
 Core code (high-level)
 ----------------------
 
-:Bookmarks:
+:Bookmarks: Magnus Holmgren
 :Cuesheet support: Nicolas Pennequin
 :Database: Miika Pekkarinen
 :Playlists:
@@ -119,6 +119,7 @@ the person(s) named next to "General".
 :General:
 :Italian: Alessio Lenzi
 :Dutch: Peter D'Hoye
+:Swedish: Magnus Holmgren
 :[Language 2]:
 
 
@@ -226,7 +227,7 @@ Codecs (Playback)
 
 :Codec loader & API:
 :A/52 (AC-3): Dave Chapman
-:AAC:
+:AAC: Magnus Holmgren
 :ADX:
 :AIFF:
 :ALAC:Dave Chapman
