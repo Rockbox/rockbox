@@ -33,9 +33,12 @@ char str_dircount[64];
 char str_filecount[64];
 char str_date[64];
 char str_time[64];
+
+#if (CONFIG_CODEC == SWCODEC)
 char str_title[MAX_PATH];
 char str_artist[MAX_PATH];
 char str_album[MAX_PATH];
+#endif
 
 int num_properties;
 
@@ -97,6 +100,7 @@ static bool file_properties(char* selected_file)
 
                 num_properties = 5;
 
+#if (CONFIG_CODEC == SWCODEC)
                 fd = rb->open(selected_file, O_RDONLY);
                 if (fd >= 0)
                 {
@@ -108,10 +112,11 @@ static bool file_properties(char* selected_file)
                                      "Title: %s", id3.title ? id3.title : "");
                         rb->snprintf(str_album, sizeof str_album,
                                      "Album: %s", id3.album ? id3.album : "");
-                        num_properties = 8;
+                        num_properties += 3;
                     }
                     rb->close(fd);
                 }
+#endif
 
                 found = true;
                 break;
@@ -232,6 +237,7 @@ char * get_props(int selected_item, void* data, char *buffer)
         case 4:
             rb->strcpy(buffer, its_a_dir ? "" : str_time);
             break;
+#if (CONFIG_CODEC == SWCODEC)
         case 5:
             rb->strcpy(buffer, its_a_dir ? "" : str_artist);
             break;
@@ -241,6 +247,7 @@ char * get_props(int selected_item, void* data, char *buffer)
         case 7:
             rb->strcpy(buffer, its_a_dir ? "" : str_album);
             break;
+#endif
         default:
             rb->strcpy(buffer, "ERROR");
             break;
