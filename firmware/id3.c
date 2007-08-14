@@ -1132,7 +1132,10 @@ bool get_mp3_metadata(int fd, struct mp3entry *entry, const char *filename, bool
 
     if (!v1found && entry->id3v2len)
         setid3v2title(fd, entry);
-    entry->length = getsonglength(fd, entry);
+    int len = getsonglength(fd, entry);
+    if (len < 0)
+        return false;
+    entry->length = len;
 
     /* Subtract the meta information from the file size to get
        the true size of the MP3 stream */
