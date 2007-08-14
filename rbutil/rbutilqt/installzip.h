@@ -37,29 +37,36 @@ public:
     ~ZipInstaller(){}
     void install(ProgressloggerInterface* dp);
     void setMountPoint(QString mountpoint) {m_mountpoint = mountpoint;}
-    void setFilename(QString filename){m_file = filename;}
-    void setUrl(QString url){m_url = url;}
+    void setUrl(QString url){m_urllist = QStringList(url);}
+    void setUrl(QStringList url) { m_urllist = url; }
     void setProxy(QUrl proxy) {m_proxy= proxy;}
-    void setLogSection(QString name) {m_logsection = name;}
+    void setLogSection(QString name) {m_loglist = QStringList(name);}
+    void setLogSection(QStringList name) { m_loglist = name; }
     void setUnzip(bool i) { m_unzip = i; }
     void setTarget(QString t) { m_target = t; }
     
 signals:
     void done(bool error);
+    void cont();
     
 private slots:
     void updateDataReadProgress(int, int);
     void downloadDone(bool);
     void downloadRequestFinished(int, bool);
+    void installStart(void);
+    void installContinue(void);
 
 private:
-    QString m_url,m_file,m_mountpoint,m_logsection;
+    void installSingle(ProgressloggerInterface *dp);
+    QString m_url, m_file, m_mountpoint, m_logsection;
+    QStringList m_urllist, m_loglist;
     QUrl m_proxy;
     bool m_unzip;
     QString m_target;
+    int runner;
     
     HttpGet *getter;
-    QTemporaryFile downloadFile;
+    QTemporaryFile *downloadFile;
     
     ProgressloggerInterface* m_dp;
 };

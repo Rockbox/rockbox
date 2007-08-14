@@ -28,21 +28,61 @@ ZipInstaller::ZipInstaller(QObject* parent): QObject(parent)
 }
 
 
-void ZipInstaller::install(ProgressloggerInterface* dp)
+void ZipInstaller::install(ProgressloggerInterface *dp)
 {
+    qDebug() << "install(ProgressloggerInterface*)";
     m_dp = dp;
+    runner = 0;
+    connect(this, SIGNAL(cont()), this, SLOT(installContinue()));
+    m_url = m_urllist.at(runner);
+    m_logsection = m_loglist.at(runner);
+    installStart();
+
+}
+
+
+void ZipInstaller::installContinue()
+{
+    qDebug() << "installContinue()";
+    
+    runner++; // this gets called when a install finished, so increase first.
+    if(runner < m_urllist.size()) {
+        qDebug() << "==> runner at" << runner;
+        m_dp->addItem(tr("done."), LOGOK);
+        m_url = m_urllist.at(runner);
+        m_logsection = m_loglist.at(runner);
+        installStart();
+    }
+    else {
+        m_dp->addItem(tr("Installation finished successfully."),LOGOK);
+        m_dp->abort();
+
+        emit done(false);
+        return;
+    }
+
+}
+
+
+void ZipInstaller::installStart()
+{
+    qDebug() << "installStart()";
 
     m_dp->addItem(tr("Downloading file %1.%2")
             .arg(QFileInfo(m_url).baseName(), QFileInfo(m_url).completeSuffix()),LOGINFO);
 
     // temporary file needs to be opened to get the filename
-    downloadFile.open();
-    m_file = downloadFile.fileName();
-    downloadFile.close();
+    // make sure to get a fresh one on each run.
+    // making this a parent of the temporary file ensures the file gets deleted
+    // after the class object gets destroyed.
+    downloadFile = new QTemporaryFile(this);
+    downloadFile->open();
+    m_file = downloadFile->fileName();
+    downloadFile->close();
     // get the real file.
     getter = new HttpGet(this);
     getter->setProxy(m_proxy);
-    getter->setFile(&downloadFile);
+    getter->setFile(downloadFile);
     getter->getFile(QUrl(m_url));
 
     connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
@@ -51,6 +91,7 @@ void ZipInstaller::install(ProgressloggerInterface* dp)
     connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort()));
 }
 
+
 void ZipInstaller::downloadRequestFinished(int id, bool error)
 {
     qDebug() << "Install::downloadRequestFinished" << id << error;
@@ -58,6 +99,7 @@ void ZipInstaller::downloadRequestFinished(int id, bool error)
 
     downloadDone(error);
 }
+
 
 void ZipInstaller::downloadDone(bool error)
 {
@@ -99,7 +141,6 @@ void ZipInstaller::downloadDone(bool error)
             m_dp->addItem(tr("Opening archive failed: %1.")
                 .arg(uz.formatError(ec)),LOGERROR);
             m_dp->abort();
-            downloadFile.remove();
             emit done(false);
             return;
         }
@@ -109,7 +150,6 @@ void ZipInstaller::downloadDone(bool error)
             m_dp->addItem(tr("Extracting failed: %1.")
                 .arg(uz.formatError(ec)),LOGERROR);
             m_dp->abort();
-            downloadFile.remove();
             emit done(false);
             return;
         }
@@ -121,17 +161,16 @@ void ZipInstaller::downloadDone(bool error)
         m_dp->addItem(tr("Installing file."), LOGINFO);
         qDebug() << "saving downloaded file (no extraction)";
 
-        downloadFile.open(); // copy fails if file is not opened (filename issue?)
+        downloadFile->open(); // copy fails if file is not opened (filename issue?)
         // make sure the required path is existing
         QString path = QFileInfo(m_mountpoint + m_target).absolutePath();
         QDir p;
         p.mkpath(path);
         // QFile::copy() doesn't overwrite files, so remove old one first
         QFile(m_mountpoint + m_target).remove();
-        if(!downloadFile.copy(m_mountpoint + m_target)) {
+        if(!downloadFile->copy(m_mountpoint + m_target)) {
             m_dp->addItem(tr("Installing file failed."), LOGERROR);
             m_dp->abort();
-            downloadFile.remove();
             emit done(false);
             return;
         }
@@ -149,13 +188,8 @@ void ZipInstaller::downloadDone(bool error)
         installlog.setValue(zipContents.at(i),installlog.value(zipContents.at(i),0).toInt()+1);
     }
     installlog.endGroup();
-  
-    // remove temporary file
-    downloadFile.remove();
 
-    m_dp->addItem(tr("Installation finished successfully."),LOGOK);
-    m_dp->abort();
-    emit done(false);
+    emit cont();
 }
 
 void ZipInstaller::updateDataReadProgress(int read, int total)

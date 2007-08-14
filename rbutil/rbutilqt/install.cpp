@@ -110,7 +110,6 @@ void Install::accept()
     userSettings->sync();
 
     installer = new ZipInstaller(this);
-    installer->setFilename(fileName);
     installer->setUrl(file);
     installer->setProxy(proxy);
     installer->setLogSection("rockboxbase");
