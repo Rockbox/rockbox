@@ -202,10 +202,7 @@ void power_off(void)
 #elif defined(HAVE_POWEROFF_ON_PB5)
     and_b(~0x20, &PBDRL);
     or_b(0x20, &PBIORL);
-#else
-    /* Disable the backlight */
-    and_b(~0x40, &PAIORH);
-
+#else /* player */
     and_b(~0x08, &PADRH);
     or_b(0x08, &PAIORH);
 #endif
