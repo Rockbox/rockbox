@@ -33,6 +33,11 @@ char str_dircount[64];
 char str_filecount[64];
 char str_date[64];
 char str_time[64];
+char str_title[MAX_PATH];
+char str_artist[MAX_PATH];
+char str_album[MAX_PATH];
+
+int num_properties;
 
 static char* filesize2string(long long size, char* pstr, int len)
 {
@@ -61,6 +66,8 @@ static bool file_properties(char* selected_file)
     char tstr[MAX_PATH];
     DIR* dir;
     struct dirent* entry;
+    struct mp3entry id3;
+    int fd;
 
     char* ptr = rb->strrchr(selected_file, '/') + 1;
     int dirlen = (ptr - selected_file);
@@ -87,6 +94,25 @@ static bool file_properties(char* selected_file)
                 rb->snprintf(str_time, sizeof str_time, "Time: %02d:%02d",
                     ((entry->wrttime >> 11) & 0x1F),        /* hour    */
                     ((entry->wrttime >> 5 ) & 0x3F));       /* minutes */
+
+                num_properties = 5;
+
+                fd = rb->open(selected_file, O_RDONLY);
+                if (fd >= 0)
+                {
+                    if (rb->get_metadata(&id3, fd, selected_file, false))
+                    {
+                        rb->snprintf(str_artist, sizeof str_artist,
+                                     "Artist: %s", id3.artist ? id3.artist : "");
+                        rb->snprintf(str_title, sizeof str_title,
+                                     "Title: %s", id3.title ? id3.title : "");
+                        rb->snprintf(str_album, sizeof str_album,
+                                     "Album: %s", id3.album ? id3.album : "");
+                        num_properties = 8;
+                    }
+                    rb->close(fd);
+                }
+
                 found = true;
                 break;
             }
@@ -181,6 +207,7 @@ static bool dir_properties(char* selected_file)
     rb->snprintf(str_filecount, sizeof str_filecount, "Files: %d", dps.fc);
     rb->snprintf(str_size, sizeof str_size, "Size: %s",
                  filesize2string(dps.bc, tstr, sizeof tstr));
+    num_properties = 4;
     return true;
 }
 
@@ -204,6 +231,15 @@ char * get_props(int selected_item, void* data, char *buffer)
             break;
         case 4:
             rb->strcpy(buffer, its_a_dir ? "" : str_time);
+            break;
+        case 5:
+            rb->strcpy(buffer, its_a_dir ? "" : str_artist);
+            break;
+        case 6:
+            rb->strcpy(buffer, its_a_dir ? "" : str_title);
+            break;
+        case 7:
+            rb->strcpy(buffer, its_a_dir ? "" : str_album);
             break;
         default:
             rb->strcpy(buffer, "ERROR");
@@ -271,7 +307,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                                                   "Directory properties" :
                                                   "File properties", NOICON);
     rb->gui_synclist_set_icon_callback(&properties_lists, NULL);
-    rb->gui_synclist_set_nb_items(&properties_lists, its_a_dir ? 4 : 5);
+    rb->gui_synclist_set_nb_items(&properties_lists, num_properties);
     rb->gui_synclist_limit_scroll(&properties_lists, true);
     rb->gui_synclist_select_item(&properties_lists, 0);
     rb->gui_synclist_draw(&properties_lists);
