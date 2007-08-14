@@ -34,11 +34,9 @@ char str_filecount[64];
 char str_date[64];
 char str_time[64];
 
-#if (CONFIG_CODEC == SWCODEC)
 char str_title[MAX_PATH];
 char str_artist[MAX_PATH];
 char str_album[MAX_PATH];
-#endif
 
 int num_properties;
 
@@ -69,6 +67,7 @@ static bool file_properties(char* selected_file)
     char tstr[MAX_PATH];
     DIR* dir;
     struct dirent* entry;
+    struct mp3entry id3;
 
     char* ptr = rb->strrchr(selected_file, '/') + 1;
     int dirlen = (ptr - selected_file);
@@ -99,24 +98,24 @@ static bool file_properties(char* selected_file)
                 num_properties = 5;
 
 #if (CONFIG_CODEC == SWCODEC)
-                struct mp3entry id3;
                 int fd = rb->open(selected_file, O_RDONLY);
-                if (fd >= 0)
-                {
-                    if (rb->get_metadata(&id3, fd, selected_file, false))
-                    {
-                        rb->snprintf(str_artist, sizeof str_artist,
-                                     "Artist: %s", id3.artist ? id3.artist : "");
-                        rb->snprintf(str_title, sizeof str_title,
-                                     "Title: %s", id3.title ? id3.title : "");
-                        rb->snprintf(str_album, sizeof str_album,
-                                     "Album: %s", id3.album ? id3.album : "");
-                        num_properties += 3;
-                    }
-                    rb->close(fd);
-                }
+                if (fd >= 0 &&
+                    rb->get_metadata(&id3, fd, selected_file, false))
+#else
+                if (!rb->mp3info(&id3, selected_file, false))
 #endif
-
+                {
+                    rb->snprintf(str_artist, sizeof str_artist,
+                                 "Artist: %s", id3.artist ? id3.artist : "");
+                    rb->snprintf(str_title, sizeof str_title,
+                                 "Title: %s", id3.title ? id3.title : "");
+                    rb->snprintf(str_album, sizeof str_album,
+                                 "Album: %s", id3.album ? id3.album : "");
+                    num_properties += 3;
+                }
+#if (CONFIG_CODEC == SWCODEC)
+                rb->close(fd);
+#endif
                 found = true;
                 break;
             }
@@ -236,7 +235,6 @@ char * get_props(int selected_item, void* data, char *buffer)
         case 4:
             rb->strcpy(buffer, its_a_dir ? "" : str_time);
             break;
-#if (CONFIG_CODEC == SWCODEC)
         case 5:
             rb->strcpy(buffer, its_a_dir ? "" : str_artist);
             break;
@@ -246,7 +244,6 @@ char * get_props(int selected_item, void* data, char *buffer)
         case 7:
             rb->strcpy(buffer, its_a_dir ? "" : str_album);
             break;
-#endif
         default:
             rb->strcpy(buffer, "ERROR");
             break;
