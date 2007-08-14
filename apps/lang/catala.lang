@@ -10144,7 +10144,7 @@
     *: none
     ipodvideo: "Bandwidth"
   </voice>
-</phraSE>
+</phrase>
 <phrase>
   id: LANG_VOICE_DIR_TALK
   desc: Item of voice menu, whether to use directory .talk clips
