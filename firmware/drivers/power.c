@@ -25,6 +25,7 @@
 #include "power.h"
 #include "logf.h"
 #include "usb.h"
+#include "backlight-target.h"
 
 #if CONFIG_CHARGING == CHARGING_CONTROL
 bool charger_enabled;
@@ -66,6 +67,13 @@ void power_init(void)
     PBCR2 &= ~0x0c00;    /* GPIO for PB5 */
     or_b(0x20, &PBIORL); 
     or_b(0x20, &PBDRL);  /* hold power */
+#if defined(HAVE_MMC) && !defined(HAVE_BACKLIGHT)
+    /* Disable backlight on backlight-modded Ondios when running
+     * a standard build (always on otherwise). */
+    PACR1 &= ~0x3000;    /* Set PA14 (backlight control) to GPIO */
+    and_b(~0x40, &PADRH); /* drive it low */
+    or_b(0x40, &PAIORH); /* ..and output */
+#endif
 #endif
 #if CONFIG_CHARGING == CHARGING_CONTROL
     PBCR2 &= ~0x0c00;    /* GPIO for PB5 */
@@ -200,6 +208,10 @@ void power_off(void)
     and_b(~0x10, &PBDRL);
     or_b(0x10, &PBIORL);
 #elif defined(HAVE_POWEROFF_ON_PB5)
+#if defined(HAVE_MMC) && defined(HAVE_BACKLIGHT)
+    /* Switch off the light on backlight-modded Ondios */
+    __backlight_off();
+#endif
     and_b(~0x20, &PBDRL);
     or_b(0x20, &PBIORL);
 #else /* player */
