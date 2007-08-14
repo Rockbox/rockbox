@@ -156,31 +156,29 @@ static char * tree_get_filename(int selected_item, void * data, char *buffer)
         attr = e->attr;
     }
     
-    switch(global_settings.show_filename_ext)
+    if(!(attr & ATTR_DIRECTORY))
     {
-        case 0:
-            /* show file extension: off */
-            stripit = true;
-            break;
-        case 1:
-            /* show file extension: on */
-            stripit = false;
-            break;
-        case 2:
-            /* show file extension: only unknown types */
-            stripit = filetype_supported(attr);
-            break;
-        case 3:
-        default:
-            /* show file extension: only when viewing all */
-            stripit = (*(local_tc->dirfilter) != SHOW_ID3DB) &&
-                      (*(local_tc->dirfilter) != SHOW_ALL);
-            break;
+        switch(global_settings.show_filename_ext)
+        {
+            case 0:
+                /* show file extension: off */
+                stripit = true;
+                break;
+            case 1:
+                /* show file extension: on */
+                break;
+            case 2:
+                /* show file extension: only unknown types */
+                stripit = filetype_supported(attr);
+                break;
+            case 3:
+            default:
+                /* show file extension: only when viewing all */
+                stripit = (*(local_tc->dirfilter) != SHOW_ID3DB) &&
+                          (*(local_tc->dirfilter) != SHOW_ALL);
+                break;
+        }
     }
-
-    /* global overrule: don't strip if it's a dir */
-    if(attr & ATTR_DIRECTORY)
-        stripit = false;
 
     if(stripit)
     {
