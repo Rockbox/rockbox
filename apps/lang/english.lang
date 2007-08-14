@@ -1379,6 +1379,7 @@
     masf: "Super Bass"
   </dest>
   <voice>
+    *: none
     masf: "Super Bass"
   </voice>
 </phrase>
@@ -1632,10 +1633,10 @@
   <dest>
     *: "Anti-Skip Buffer"
     flash_storage: none
-    </dest>
+  </dest>
   <voice>
     *: "Anti-Skip Buffer"
-    flash_storage: none   
+    flash_storage: none
   </voice>
 </phrase>
 <phrase>
@@ -3019,11 +3020,11 @@
     lcd_color: "RGB"
   </source>
   <dest>
-   *: none
+    *: none
     lcd_color: "RGB"
   </dest>
   <voice>
-   *: none
+    *: none
     lcd_color: ""
   </voice>
 </phrase>
@@ -3032,15 +3033,15 @@
   desc: in color screen
   user:
   <source>
-   *: none
+    *: none
     lcd_color: "RGB: %02X%02X%02X"
   </source>
   <dest>
-   *: none
+    *: none
     lcd_color: "RGB: %02X%02X%02X"
   </dest>
   <voice>
-   *: none
+    *: none
     lcd_color: ""
   </voice>
 </phrase>
@@ -3049,15 +3050,15 @@
   desc: splash when user selects an invalid colour
   user:
   <source>
-   *: none
+    *: none
     lcd_non-mono: "Invalid colour"
   </source>
   <dest>
-   *: none
+    *: none
     lcd_non-mono: "Invalid colour"
   </dest>
   <voice>
-   *: none
+    *: none
     lcd_non-mono: ""
   </voice>
 </phrase>
@@ -3342,7 +3343,6 @@
     scrollwheel: none
   </voice>
 </phrase>
-
 <phrase>
   id: LANG_BARS_MENU
   desc: in the display sub menu
@@ -3900,7 +3900,7 @@
   <voice>
     *: none
     e200: "Wheel Light Timeout"
-    gigabeatf: "Button Light Timeout"    
+    gigabeatf: "Button Light Timeout"
   </voice>
 </phrase>
 <phrase>
@@ -5351,7 +5351,7 @@
     *: none
     radio_screen_button_bar: ""
   </voice>
-</phrase>-->
+</phrase>
 <phrase>
   id: LANG_PRESET
   desc: in button bar and radio screen / menu
@@ -6213,7 +6213,6 @@
     recording: "Can't write to recording directory"
   </voice>
 </phrase>
-
 <phrase>
   id: LANG_CLIP_LIGHT
   desc: in record settings menu.
@@ -7958,7 +7957,7 @@
     *: "Properties"
   </voice>
 </phrase>
-<phrase>  
+<phrase>
   id: LANG_ADD_TO_FAVES
   desc:
   user:
@@ -8692,7 +8691,6 @@
     charging: "Trickle charge"
   </voice>
 </phrase>
-<phrase>
 <phrase>
   id: LANG_WARNING_BATTERY_LOW
   desc: general warning
