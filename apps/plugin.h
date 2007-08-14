@@ -620,7 +620,7 @@ struct plugin_api {
 
     int (*codec_load_file)(const char* codec, struct codec_api *api);
     const char *(*get_codec_filename)(int cod_spec);
-    bool (*get_metadata)(struct track_info* track, int fd, const char* trackname,
+    bool (*get_metadata)(struct mp3entry* id3, int fd, const char* trackname,
                          bool v1first);
 #endif
     void (*led)(bool on);

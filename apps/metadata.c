@@ -93,7 +93,7 @@ unsigned int probe_file_format(const char *filename)
 /* Get metadata for track - return false if parsing showed problems with the
  * file that would prevent playback.
  */
-bool get_metadata(struct track_info* track, int fd, const char* trackname,
+bool get_metadata(struct mp3entry* id3, int fd, const char* trackname,
                   bool v1first) 
 {
 #if CONFIG_CODEC == SWCODEC
@@ -103,15 +103,15 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
 #endif
 
     /* Take our best guess at the codec type based on file extension */
-    track->id3.codectype = probe_file_format(trackname);
+    id3->codectype = probe_file_format(trackname);
 
     /* Load codec specific track tag information and confirm the codec type. */
-    switch (track->id3.codectype) 
+    switch (id3->codectype)
     {
     case AFMT_MPA_L1:
     case AFMT_MPA_L2:
     case AFMT_MPA_L3:
-        if (!get_mp3_metadata(fd, &track->id3, trackname, v1first))
+        if (!get_mp3_metadata(fd, id3, trackname, v1first))
         {
             return false;
         }
@@ -120,7 +120,7 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
 
 #if CONFIG_CODEC == SWCODEC
     case AFMT_FLAC:
-        if (!get_flac_metadata(fd, &(track->id3)))
+        if (!get_flac_metadata(fd, id3))
         {
             return false;
         }
@@ -128,28 +128,28 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         break;
 
     case AFMT_WMA:
-        if (!get_asf_metadata(fd, &(track->id3)))
+        if (!get_asf_metadata(fd, id3))
         {
             return false;
         }
         break;
 
     case AFMT_APE:
-        if (!get_monkeys_metadata(fd, &(track->id3)))
+        if (!get_monkeys_metadata(fd, id3))
         {
             return false;
         }
-        read_ape_tags(fd, &(track->id3));
+        read_ape_tags(fd, id3);
         break;
 
     case AFMT_MPC:
-        if (!get_musepack_metadata(fd, &(track->id3)))
+        if (!get_musepack_metadata(fd, id3))
             return false;
-        read_ape_tags(fd, &(track->id3));
+        read_ape_tags(fd, id3);
         break;
     
     case AFMT_OGG_VORBIS:
-        if (!get_vorbis_metadata(fd, &(track->id3)))/*detects and handles Ogg/Speex files*/
+        if (!get_vorbis_metadata(fd, id3))/*detects and handles Ogg/Speex files*/
         {
             return false;
         }
@@ -157,7 +157,7 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         break;
 
     case AFMT_SPEEX:
-        if (!get_speex_metadata(fd, &(track->id3)))
+        if (!get_speex_metadata(fd, id3))
         {
             return false;
         }
@@ -165,7 +165,7 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         break;
 
     case AFMT_PCM_WAV:
-        if (!get_wave_metadata(fd, &(track->id3)))
+        if (!get_wave_metadata(fd, id3))
         {
             return false;
         }
@@ -173,15 +173,15 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         break;
 
     case AFMT_WAVPACK:
-        if (!get_wavpack_metadata(fd, &(track->id3)))
+        if (!get_wavpack_metadata(fd, id3))
             return false;
 
-        read_ape_tags(fd, &track->id3);     /* use any apetag info we find */
+        read_ape_tags(fd, id3);     /* use any apetag info we find */
         break;
 
     case AFMT_A52:
         /* Use the trackname part of the id3 structure as a temporary buffer */
-        buf = (unsigned char *)track->id3.path;
+        buf = (unsigned char *)id3->path;
         
         if ((lseek(fd, 0, SEEK_SET) < 0) || (read(fd, buf, 5) < 5))
         {
@@ -202,25 +202,25 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
             return false;
         }
       
-        track->id3.bitrate = a52_bitrates[i >> 1];
-        track->id3.vbr = false;
-        track->id3.filesize = filesize(fd);
+        id3->bitrate = a52_bitrates[i >> 1];
+        id3->vbr = false;
+        id3->filesize = filesize(fd);
 
         switch (buf[4] & 0xc0) 
         {
         case 0x00: 
-            track->id3.frequency = 48000; 
-            track->id3.bytesperframe=track->id3.bitrate * 2 * 2;
+            id3->frequency = 48000;
+            id3->bytesperframe=id3->bitrate * 2 * 2;
             break;
             
         case 0x40: 
-            track->id3.frequency = 44100;
-            track->id3.bytesperframe = a52_441framesizes[i];
+            id3->frequency = 44100;
+            id3->bytesperframe = a52_441framesizes[i];
             break;
         
         case 0x80: 
-            track->id3.frequency = 32000; 
-            track->id3.bytesperframe = track->id3.bitrate * 3 * 2;
+            id3->frequency = 32000;
+            id3->bytesperframe = id3->bitrate * 3 * 2;
             break;
         
         default: 
@@ -230,13 +230,13 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         }
 
         /* One A52 frame contains 6 blocks, each containing 256 samples */
-        totalsamples = track->id3.filesize / track->id3.bytesperframe * 6 * 256;
-        track->id3.length = totalsamples / track->id3.frequency * 1000;
+        totalsamples = id3->filesize / id3->bytesperframe * 6 * 256;
+        id3->length = totalsamples / id3->frequency * 1000;
         break;
 
     case AFMT_ALAC:
     case AFMT_AAC:
-        if (!get_mp4_metadata(fd, &(track->id3)))
+        if (!get_mp4_metadata(fd, id3))
         {
             return false;
         }
@@ -244,9 +244,9 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         break;
 
     case AFMT_SHN:
-        track->id3.vbr = true;
-        track->id3.filesize = filesize(fd);
-        if (!skip_id3v2(fd, &(track->id3)))
+        id3->vbr = true;
+        id3->filesize = filesize(fd);
+        if (!skip_id3v2(fd, id3))
         {
             return false;
         }
@@ -254,22 +254,22 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         break;
 
     case AFMT_SID:
-        if (!get_sid_metadata(fd, &(track->id3)))
+        if (!get_sid_metadata(fd, id3))
         {
             return false;
         }
         break;
     case AFMT_SPC:
-        if(!get_spc_metadata(fd, &(track->id3)))
+        if(!get_spc_metadata(fd, id3))
         {
             DEBUGF("get_spc_metadata error\n");
         }
 
-        track->id3.filesize = filesize(fd);
-        track->id3.genre_string = id3_get_num_genre(36);
+        id3->filesize = filesize(fd);
+        id3->genre_string = id3_get_num_genre(36);
         break;
     case AFMT_ADX:
-        if (!get_adx_metadata(fd, &(track->id3)))
+        if (!get_adx_metadata(fd, id3))
         {
             DEBUGF("get_adx_metadata error\n");
             return false;
@@ -277,19 +277,19 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         
         break;
     case AFMT_NSF:
-        buf = (unsigned char *)track->id3.path;
+        buf = (unsigned char *)id3->path;
         if ((lseek(fd, 0, SEEK_SET) < 0) || ((read(fd, buf, 8)) < 8))
         {
             DEBUGF("lseek or read failed\n");
             return false;
         }
-        track->id3.vbr = false;
-        track->id3.filesize = filesize(fd);
+        id3->vbr = false;
+        id3->filesize = filesize(fd);
         if (memcmp(buf,"NESM",4) && memcmp(buf,"NSFE",4)) return false;
         break;
 
     case AFMT_AIFF:
-        if (!get_aiff_metadata(fd, &(track->id3)))
+        if (!get_aiff_metadata(fd, id3))
         {
             return false;
         }
@@ -310,13 +310,12 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
 #ifndef __PCTOOL__
     if (cuesheet_is_enabled() && look_for_cuesheet_file(trackname, NULL))
     {
-        track->id3.cuesheet_type = 1;
+        id3->cuesheet_type = 1;
     }
 #endif
     
     lseek(fd, 0, SEEK_SET);
-    strncpy(track->id3.path, trackname, sizeof(track->id3.path));
-    track->taginfo_ready = true;
+    strncpy(id3->path, trackname, sizeof(id3->path));
 
     return true;
 }

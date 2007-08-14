@@ -2746,8 +2746,9 @@ static bool audio_load_track(int offset, bool start_play, bool rebuffer)
     /* Get track metadata if we don't already have it. */
     if (!tracks[track_widx].taginfo_ready) 
     {
-        if (get_metadata(&tracks[track_widx],current_fd,trackname,v1first)) 
+        if (get_metadata(&(tracks[track_widx].id3),current_fd,trackname,v1first))
         {
+            tracks[track_widx].taginfo_ready = true;
             if (start_play) 
             {
                 track_changed = true;
@@ -2887,10 +2888,11 @@ static bool audio_read_next_metadata(void)
     if (fd < 0)
         return false;
 
-    status = get_metadata(&tracks[next_idx],fd,trackname,v1first);
+    status = get_metadata(&(tracks[next_idx].id3),fd,trackname,v1first);
     /* Preload the glyphs in the tags */
     if (status) 
     {
+        tracks[next_idx].taginfo_ready = true;
         if (tracks[next_idx].id3.title)
             lcd_getstringsize(tracks[next_idx].id3.title, NULL, NULL);
         if (tracks[next_idx].id3.artist)

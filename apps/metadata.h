@@ -23,7 +23,7 @@
 #include "playback.h"
 
 unsigned int probe_file_format(const char *filename);
-bool get_metadata(struct track_info* track, int fd, const char* trackname,
+bool get_metadata(struct mp3entry* id3, int fd, const char* trackname,
                   bool v1first);
 
 #endif
