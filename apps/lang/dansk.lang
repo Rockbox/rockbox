@@ -11026,3 +11026,17 @@
     *: "Er du sikker?"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_EXT_ONLY_VIEW_ALL
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Only when viewing all types"
+  </source>
+  <dest>
+    *: "Kun når alle typer vises"
+  </dest>
+  <voice>
+    *: "Kun når alle typer vises"
+  </voice>
+</phrase>
