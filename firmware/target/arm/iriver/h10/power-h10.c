@@ -38,27 +38,11 @@ bool charger_enabled;
 #if 0
 #if CONFIG_TUNER
 
-static bool powered = false;
-
-bool tuner_powered()
-{
-    return powered;
-}
-
 bool tuner_power(bool status)
 {
-    bool old_status = powered;
-    powered = status;
-#ifdef HAVE_TUNER_PWR_CTRL
-    if (status)
-    {
-        and_b(~0x04, &PADRL); /* drive PA2 low for tuner enable */
-        sleep(1); /* let the voltage settle */
-    }
-    else
-        or_b(0x04, &PADRL); /* drive PA2 high for tuner disable */
-#endif
-    return old_status;
+    (void)status;
+    /* TODO: tuner power control */
+    return true;
 }
 
 #endif /* #if CONFIG_TUNER */
@@ -69,7 +53,7 @@ void power_init(void)
 }
 
 bool charger_inserted(void)
-{     
+{
     return (GPIOF_INPUT_VAL & 0x08)?true:false;
 }
 

@@ -23,54 +23,65 @@
 #include "kernel.h"
 #include "system.h"
 #include "power.h"
-#include "logf.h"
 #include "usb.h"
-
-#if CONFIG_TUNER
-
-bool tuner_power(bool status)
-{
-    (void)status;
-    return true;
-}
-
-#endif /* #if CONFIG_TUNER */
-
-#ifndef SIMULATOR
 
 void power_init(void)
 {
 }
 
+bool charger_inserted(void)
+{
+    /* Player */
+    return (PADR & 1) == 0;
+}
+
 void ide_power_enable(bool on)
 {
-    (void)on;
-    /* no ide controller */
+    bool touched = false;
+
+    if(on)
+    {
+        or_b(0x10, &PBDRL);
+        touched = true;
+    }
+#ifdef HAVE_ATA_POWER_OFF
+    if(!on)
+    {
+        and_b(~0x10, &PBDRL);
+        touched = true;
+    }
+#endif /* HAVE_ATA_POWER_OFF */
+
+/* late port preparation, else problems with read/modify/write 
+   of other bits on same port, while input and floating high */
+    if (touched)
+    {
+        or_b(0x10, &PBIORL); /* PB4 is an output */
+        PBCR2 &= ~0x0300; /* GPIO for PB4 */
+    }
 }
+
 
 bool ide_powered(void)
 {
+#ifdef HAVE_ATA_POWER_OFF
+    /* This is not correct for very old players, since these are unable to
+     * control hd power. However, driving the pin doesn't hurt, because it
+     * is not connected anywhere */
+    if ((PBCR2 & 0x0300) || !(PBIORL & 0x10)) /* not configured for output */
+        return false; /* would be floating low, disk off */
+    else
+        return (PBDRL & 0x10) != 0;
+#else /* !defined(NEEDS_ATA_POWER_ON) && !defined(HAVE_ATA_POWER_OFF) */
     return true; /* pretend always powered if not controlable */
+#endif
 }
 
 void power_off(void)
 {
     set_irq_level(HIGHEST_IRQ_LEVEL);
-    GPIO1_CLR = 1 << 16;
-    GPIO2_SET = 1;
+    and_b(~0x08, &PADRH);
+    or_b(0x08, &PAIORH);
     while(1)
         yield();
 }
-
-#else
-
-void power_off(void)
-{
-}
-
-void ide_power_enable(bool on)
-{
-   (void)on;
-}
-
-#endif /* SIMULATOR */

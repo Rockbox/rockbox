@@ -81,17 +81,11 @@
 /* Define this if you have a FM Recorder key system */
 #define HAVE_FMADC
 
-/* Define this if you need to power on ATA */
-#define NEEDS_ATA_POWER_ON
-
 /* Define this if battery voltage can only be measured with ATA powered */
 #define NEED_ATA_POWER_BATT_MEASURE
 
 /* Define this to the CPU frequency */
 #define CPU_FREQ      11059200
-
-/* Define this if you control power on PB5 (instead of the OFF button) */
-#define HAVE_POWEROFF_ON_PB5
 
 /* Offset ( in the firmware file's header ) to the file length */
 #define FIRMWARE_OFFSET_FILE_LENGTH 20

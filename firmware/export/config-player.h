@@ -48,9 +48,6 @@
  * Attention, some players crash when ATA power-off is enabled! */
 //#define HAVE_ATA_POWER_OFF
 
-/* Define this if you need to power on ATA */
-#define NEEDS_ATA_POWER_ON
-
 /* Define this if you control ata power player style
    (with PB4, new player only) */
 #define ATA_POWER_PLAYERSTYLE
@@ -63,9 +60,6 @@
 #define HAVE_I2C_LOW_FIRST
 
 #define CONFIG_I2C I2C_PLAYREC
-
-/* Define this if you control power on PADR (instead of PBDR) */
-#define HAVE_POWEROFF_ON_PADR
 
 /* Offset ( in the firmware file's header ) to the file length */
 #define FIRMWARE_OFFSET_FILE_LENGTH 0

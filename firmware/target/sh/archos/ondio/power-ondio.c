@@ -19,75 +19,60 @@
 #include "config.h"
 #include "cpu.h"
 #include <stdbool.h>
+#include "adc.h"
 #include "kernel.h"
 #include "system.h"
 #include "power.h"
-#include "pcf50606.h"
-
+#include "usb.h"
+#include "backlight-target.h"
 
 #if CONFIG_TUNER
 
+static bool powered = false;
+
 bool tuner_power(bool status)
 {
-    (void)status;
-    return true;
+    bool old_status = powered;
+
+    powered = status;
+    if (status)
+    {
+        and_b(~0x04, &PADRL); /* drive PA2 low for tuner enable */
+        sleep(1); /* let the voltage settle */
+    }
+    else
+        or_b(0x04, &PADRL); /* drive PA2 high for tuner disable */
+    return old_status;
 }
 
 #endif /* #if CONFIG_TUNER */
 
-#ifndef SIMULATOR
-
 void power_init(void)
 {
-    or_l(0x00080000, &GPIO1_OUT);
-    or_l(0x00080000, &GPIO1_ENABLE);
-    or_l(0x00080000, &GPIO1_FUNCTION);
-
-#ifndef BOOTLOADER
-    /* The boot loader controls the power */
-    ide_power_enable(true);
+    PBCR2 &= ~0x0c00;    /* GPIO for PB5 */
+    or_b(0x20, &PBIORL);
+    or_b(0x20, &PBDRL);  /* hold power */
+#ifndef HAVE_BACKLIGHT
+    /* Disable backlight on backlight-modded Ondios when running
+     * a standard build (always on otherwise). */
+    PACR1 &= ~0x3000;    /* Set PA14 (backlight control) to GPIO */
+    and_b(~0x40, &PADRH); /* drive it low */
+    or_b(0x40, &PAIORH); /* ..and output */
 #endif
-    or_l(0x80000000, &GPIO_ENABLE);
-    or_l(0x80000000, &GPIO_FUNCTION);
-    pcf50606_init();
+    PACR2 &= ~0x0030;  /* GPIO for PA2 */
+    or_b(0x04, &PADRL); /* drive PA2 high for tuner disable */
+    or_b(0x04, &PAIORL); /* output for PA2 */
 }
-
-
-#if CONFIG_CHARGING
-bool charger_inserted(void)
-{     
-    return (GPIO1_READ & 0x00400000)?true:false;
-}
-#endif /* CONFIG_CHARGING */
-
-/* Returns true if the unit is charging the batteries. */
-bool charging_state(void) {
-    return (GPIO_READ & 0x00800000)?true:false;
-}
-
-
-void ide_power_enable(bool on)
-{
-    if(on)
-        and_l(~0x80000000, &GPIO_OUT);
-    else
-        or_l(0x80000000, &GPIO_OUT);
-}
-
-
-bool ide_powered(void)
-{
-    return (GPIO_OUT & 0x80000000)?false:true;
-}
-
 
 void power_off(void)
 {
-    set_irq_level(DISABLE_INTERRUPTS);
-    and_l(~0x00080000, &GPIO1_OUT);
-    asm("halt");
+    set_irq_level(HIGHEST_IRQ_LEVEL);
+#ifdef HAVE_BACKLIGHT
+    /* Switch off the light on backlight-modded Ondios */
+    __backlight_off();
+#endif
+    and_b(~0x20, &PBDRL);
+    or_b(0x20, &PBIORL);
     while(1)
         yield();
 }
-
-#endif /* SIMULATOR */

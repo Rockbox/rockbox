@@ -96,9 +96,6 @@ drivers/lcd-remote-2bit-vi.c
 /* Misc. */
 drivers/led.c
 drivers/button.c
-#ifndef TARGET_TREE
-drivers/power.c
-#endif /* TARGET_TREE */
 #ifndef SIMULATOR
 drivers/dac.c
 drivers/serial.c
@@ -340,6 +337,7 @@ target/sh/archos/player/button-player.c
 target/sh/archos/player/hwcompat-player.c
 target/sh/archos/player/lcd-as-player.S
 target/sh/archos/player/lcd-player.c
+target/sh/archos/player/power-player.c
 target/sh/archos/player/usb-player.c
 #endif /* SIMULATOR */
 #endif /* ARCHOS_PLAYER */
@@ -351,6 +349,7 @@ target/sh/archos/ata-as-archos.S
 target/sh/archos/lcd-archos-bitmap.c
 target/sh/archos/lcd-as-archos-bitmap.S   
 target/sh/archos/recorder/button-recorder.c
+target/sh/archos/recorder/power-recorder.c
 target/sh/archos/recorder/usb-recorder.c
 #endif /* SIMULATOR */
 #endif /* ARCHOS_RECORDER */
@@ -362,6 +361,7 @@ target/sh/archos/ata-as-archos.S
 target/sh/archos/lcd-archos-bitmap.c
 target/sh/archos/lcd-as-archos-bitmap.S
 target/sh/archos/fm_v2/button-fm_v2.c
+target/sh/archos/fm_v2/power-fm_v2.c
 target/sh/archos/fm_v2/usb-fm_v2.c
 #endif /* SIMULATOR */
 #endif /* ARCHOS_FMRECORDER || ARCHOS_RECORDERV2 */
@@ -371,6 +371,7 @@ target/sh/archos/fm_v2/usb-fm_v2.c
 target/sh/archos/lcd-archos-bitmap.c
 target/sh/archos/lcd-as-archos-bitmap.S
 target/sh/archos/ondio/button-ondio.c
+target/sh/archos/ondio/power-ondio.c
 target/sh/archos/ondio/usb-ondio.c
 #endif /* SIMULATOR */
 #endif /* ARCHOS_ONDIOFM || ARCHOS_ONDIOFM */

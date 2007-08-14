@@ -26,9 +26,7 @@
 static int frequency = 0;
 static bool mono = false;
 
-#ifdef HAVE_TUNER_PWR_CTRL
 static bool powered = false;
-#endif
 
 void tuner_init(void)
 {
@@ -89,13 +87,11 @@ int tuner_get(int setting)
     return val;
 }
 
-#ifdef HAVE_TUNER_PWR_CTRL
 bool tuner_power(bool status)
 {
     bool oldstatus = powered;
     powered = status;
     return oldstatus;
 }
-#endif
 
 #endif

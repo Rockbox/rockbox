@@ -125,8 +125,3 @@ bool tuner_power(bool status)
     lv24020lp_unlock();
     return old_status;
 }
-
-bool tuner_powered(void)
-{
-    return powered;
-}

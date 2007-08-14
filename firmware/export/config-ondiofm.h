@@ -75,9 +75,6 @@
 /* Define this for different I2C pinout */
 #define CONFIG_I2C I2C_ONDIO
 
-/* Define this if you control power on PB5 (instead of the OFF button) */
-#define HAVE_POWEROFF_ON_PB5
-
 /* Offset ( in the firmware file's header ) to the file length */
 #define FIRMWARE_OFFSET_FILE_LENGTH 20
 

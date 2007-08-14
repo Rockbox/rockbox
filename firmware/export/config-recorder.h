@@ -71,14 +71,8 @@
 /* Define this if you have ATA power-off control */
 #define HAVE_ATA_POWER_OFF
 
-/* Define this if you need to power on ATA */
-#define NEEDS_ATA_POWER_ON
-
 /* Define this to the CPU frequency */
 #define CPU_FREQ      11059200
-
-/* Define this if you control power on PBDR (instead of PADR) */
-#define HAVE_POWEROFF_ON_PBDR
 
 /* Offset ( in the firmware file's header ) to the file length */
 #define FIRMWARE_OFFSET_FILE_LENGTH 0
