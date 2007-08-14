@@ -69,8 +69,6 @@ static bool file_properties(char* selected_file)
     char tstr[MAX_PATH];
     DIR* dir;
     struct dirent* entry;
-    struct mp3entry id3;
-    int fd;
 
     char* ptr = rb->strrchr(selected_file, '/') + 1;
     int dirlen = (ptr - selected_file);
@@ -101,7 +99,8 @@ static bool file_properties(char* selected_file)
                 num_properties = 5;
 
 #if (CONFIG_CODEC == SWCODEC)
-                fd = rb->open(selected_file, O_RDONLY);
+                struct mp3entry id3;
+                int fd = rb->open(selected_file, O_RDONLY);
                 if (fd >= 0)
                 {
                     if (rb->get_metadata(&id3, fd, selected_file, false))
