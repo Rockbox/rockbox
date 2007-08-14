@@ -1840,7 +1840,7 @@
   </source>
   <dest>
   *: none
-    lcd_bitmap: "Barra(inversa)"
+    lcd_bitmap: "Barra (inversa)"
   </dest>
   <voice>
     *: "Barra inversa"
@@ -1882,7 +1882,7 @@
     *: "Scroll Start Delay"
   </source>
   <dest>
-    *: "Retard de l'inici del desplaz."
+    *: "Retard de l'inici del desplaç."
   </dest>
   <voice>
     *: "Retard de l'inici del desplaçament"
@@ -1910,7 +1910,7 @@
     *: "Scroll Step Size Setting Example Text"
   </source>
   <dest>
-    *: "Retard del salt de desplaçamentText d'exemple de la mida del pas de desplaçament"
+    *: "Text d'exemple de la mida del pas de desplaçament"
   </dest>
   <voice>
     *: ""
@@ -2189,7 +2189,7 @@
     masd: none
   </source>
   <dest>
-    *: "Logarítmica(dB)"
+    *: "Logarítmica (dB)"
     masd: none
   </dest>
   <voice>
@@ -2205,7 +2205,7 @@
     masd: none
   </source>
   <dest>
-    *: "Linial(%)"
+    *: "Linial (%)"
     masd: none
   </dest>
   <voice>
@@ -3085,7 +3085,7 @@
   <dest>
     *: none
     alarm: "PLAY=Accepta OFF=Cancela"
-    ipod*: "SELECT=Accepta MENU=Cancela"
+    alarm: "SELECT=Accepta MENU=Cancela"
   </dest>
   <voice>
     *: ""
@@ -5817,7 +5817,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Thai (ISO-8859-11)"
+    lcd_bitmap: "Tailandès (ISO-8859-11)"
   </dest>
   <voice>
     *: "Thai"
@@ -5909,7 +5909,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap:: "Japanese (SJIS)"
+    lcd_bitmap:: "Japonès (SJIS)"
   </dest>
   <voice>
     *: "Japanese"
@@ -5923,7 +5923,7 @@
     *: "[Album Gain]"
   </source>
   <dest>
-    *: "[Album Gain]"
+    *: "[Guany d'Album]"
   </dest>
   <voice>
     *: ""
@@ -5939,7 +5939,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Hebrew (ISO-8859-8)"
+    lcd_bitmap: "Hebreu (ISO-8859-8)"
   </dest>
   <voice>
     *: "Hebrew"
@@ -6014,7 +6014,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Korean (KSX1001)"
+    lcd_bitmap: "Koreà (KSX1001)"
   </dest>
   <voice>
     *: "Korean"
@@ -6028,7 +6028,7 @@
     *: "Turkish (ISO-8859-9)"
   </source>
   <dest>
-    *: "Turkish (ISO-8859-9)"
+    *: "Turc (ISO-8859-9)"
   </dest>
   <voice>
     *: "Turkish"
@@ -6060,7 +6060,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Simp. Chinese (GB2312)"
+    lcd_bitmap: "Xinès Simp. (GB2312)"
   </dest>
   <voice>
     *: "Simplified Chinese"
@@ -6262,7 +6262,7 @@
     *: "Greek (ISO-8859-7)"
   </source>
   <dest>
-    *: "Greek (ISO-8859-7)"
+    *: "Grec (ISO-8859-7)"
   </dest>
   <voice>
     *: "Greek"
@@ -6324,7 +6324,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Trad. Chinese (BIG5)"
+    lcd_bitmap: "Xinès Trad. (BIG5)"
   </dest>
   <voice>
     *: "Traditional Chinese"
@@ -6458,7 +6458,7 @@
     *: "Cyrillic (CP1251)"
   </source>
   <dest>
-    *: "Cyrillic (CP1251)"
+    *: "Cirilic (CP1251)"
   </dest>
   <voice>
     *: "Cyrillic"
@@ -6971,7 +6971,7 @@
     *: "Latin Extended (ISO-8859-2)"
   </source>
   <dest>
-    *: "Latin Extended (ISO-8859-2)"
+    *: "Llatí Extès (ISO-8859-2)"
   </dest>
   <voice>
     *: "Latin extended"
@@ -7134,7 +7134,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Arabic (CP1256)"
+    lcd_bitmap: "Àrab (CP1256)"
   </dest>
   <voice>
     *: "Arabic"
@@ -8813,7 +8813,7 @@
     *: "Use File .talk Clips"
   </source>
   <dest>
-    *: "Use File .talk Clips"
+    *: "Usar fitxers .talk"
   </dest>
   <voice>
     *: "Use File .talk Clips"
@@ -10138,7 +10138,7 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "Bandwidth"
+    ipodvideo: "Ample de banda"
   </dest>
   <voice>
     *: none
@@ -10153,7 +10153,7 @@
     *: "Use Directory .talk Clips"
   </source>
   <dest>
-    *: "Use Directory .talk Clips"
+    *: "Usar Directori .talk"
   </dest>
   <voice>
     *: "Use Directory .talk Clips"
@@ -10168,11 +10168,11 @@
   </source>
   <dest>
     *: none
-    agc: "Live (slow)"
+    agc: "Directe (lent)"
   </dest>
   <voice>
     *: none
-    agc: "Live (slow)"
+    agc: "Directe lent"
   </voice>
 </phrase>
 <phrase>
