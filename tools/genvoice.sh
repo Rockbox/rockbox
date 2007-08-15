@@ -90,7 +90,7 @@ generateclips() {
                         echo "Re-using $ID from pool (${POOL_FILE})"
                         if [ ! -e "$TEMPDIR/$ID".mp3 ]; then
                             # only do this if not present
-                            ln -sf "$POOL_FILE" "$TEMPDIR/$ID".mp3
+                            cp -f "$POOL_FILE" "$TEMPDIR/$ID".mp3
                         fi
                     fi
                 fi
@@ -102,7 +102,7 @@ generateclips() {
                     if [ -n "$POOL" ]; then
                         # create it in the pool, symlink it back
                         encode "$TEMPDIR/$ID".wav "$POOL_FILE"
-                        ln -sf "$POOL_FILE" "$TEMPDIR/$ID".mp3
+                        cp -f "$POOL_FILE" "$TEMPDIR/$ID".mp3
                     else
                         encode "$TEMPDIR/$ID".wav "$TEMPDIR/$ID".mp3
                     fi
