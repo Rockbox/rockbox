@@ -20,6 +20,7 @@
 ****************************************************************************/
 
 #include "plugin.h"
+#include "helper.h"
 
 #ifdef HAVE_LCD_BITMAP /* and also not for the Player */
 #ifndef HAVE_LCD_COLOR
@@ -330,7 +331,8 @@ void cleanup(void *parameter)
 #ifndef HAVE_LCD_COLOR
     gray_release();
 #endif
-    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+    /* Turn on backlight timeout (revert to settings) */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
 }
 
 /*
@@ -420,8 +422,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif
-    if (rb->global_settings->backlight_timeout > 0)
-        rb->backlight_set_timeout(1);/* keep the light on */
+    /* Turn off backlight timeout */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 
     ret = main();
 

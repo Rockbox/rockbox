@@ -25,6 +25,7 @@
 
 #include "plugin.h"
 #include "highscore.h"
+#include "helper.h"
 
 PLUGIN_HEADER
 
@@ -1764,9 +1765,8 @@ enum plugin_status plugin_start(struct plugin_api* api, UNUSED void* parameter)
     rb = api;
 
     rb->lcd_setfont(FONT_SYSFIXED);
-    /* Permanently enable the backlight (unless the user has turned it off) */
-    if (rb->global_settings->backlight_timeout > 0)
-        rb->backlight_set_timeout(1);
+    /* Turn off backlight timeout */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 
     /* now go ahead and have fun! */
     game_loop();
@@ -1783,7 +1783,8 @@ enum plugin_status plugin_start(struct plugin_api* api, UNUSED void* parameter)
 
     /* Restore user's original backlight setting */
     rb->lcd_setfont(FONT_UI);
-    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+    /* Turn on backlight timeout (revert to settings) */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
 
     return PLUGIN_OK;
 }

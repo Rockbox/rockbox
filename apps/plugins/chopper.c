@@ -21,6 +21,7 @@
 #include "plugin.h"
 #include "xlcd.h"
 #include "configfile.h"
+#include "helper.h"
 
 PLUGIN_HEADER
 
@@ -947,9 +948,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_set_foreground(LCD_WHITE);
 #endif
 
-    /* Permanently enable the backlight (unless the user has turned it off) */
-    if (rb->global_settings->backlight_timeout > 0)
-        rb->backlight_set_timeout(1);
+    /* Turn off backlight timeout */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 
     rb->srand( *rb->current_tick );
 
@@ -962,9 +962,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     configfile_save(CFG_FILE, config, 1, 0);
 
-    /* Restore user's original backlight setting */
     rb->lcd_setfont(FONT_UI);
-    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+    /* Turn on backlight timeout (revert to settings) */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
 
     return ret;
 }

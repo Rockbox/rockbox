@@ -21,6 +21,7 @@
 #include "plugin.h"
 #include "highscore.h"
 #include "playergfx.h"
+#include "helper.h"
 
 PLUGIN_HEADER
 
@@ -853,17 +854,14 @@ static int rockblox_loop (void)
     while (1) {
 #ifdef HAS_BUTTON_HOLD
         if (rb->button_hold ()) {
-            /* Restore user's original backlight setting */
-            rb->backlight_set_timeout (rb->global_settings->backlight_timeout);
-
+            /* Turn on backlight timeout (revert to settings) */
+            backlight_use_settings(); /* backlight control in lib/helper.c */
             rb->splash(0, "Paused");
             while (rb->button_hold ())
                 rb->sleep(HZ/10);
 
-            /* Permanently enable the backlight (unless the user has
-                                                             turned it off) */
-            if (rb->global_settings->backlight_timeout > 0)
-                rb->backlight_set_timeout (1);
+            /* Turn on backlight timeout (revert to settings) */
+            backlight_use_settings(); /* backlight control in lib/helper.c */
 
             /* get rid of the splash text */
             rb->lcd_bitmap (rockblox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
@@ -1031,9 +1029,8 @@ enum plugin_status plugin_start (struct plugin_api *api, void *parameter)
         return PLUGIN_OK;
     }
 #endif
-    /* Permanently enable the backlight (unless the user has turned it off) */
-    if (rb->global_settings->backlight_timeout > 0)
-        rb->backlight_set_timeout (1);
+    /* Turn on backlight timeout (revert to settings) */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
 
     init_rockblox ();
     ret = rockblox_loop ();

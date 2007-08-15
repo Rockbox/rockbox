@@ -27,6 +27,7 @@
 #include "plugin.h"
 #include "playback_control.h"
 #include "oldmenuapi.h"
+#include "helper.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "gray.h"
@@ -3309,14 +3310,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     buf_images = buf; buf_images_size = buf_size;
 
-    /* make sure the backlight is always on when viewing pictures
-       (actually it should also set the timeout when plugged in,
-       but the function backlight_set_timeout_plugged is not
-       available in plugins) */
-#ifdef HAVE_BACKLIGHT
-    if (rb->global_settings->backlight_timeout > 0)
-        rb->backlight_set_timeout(1);
-#endif
+    /* Turn off backlight timeout */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 
     do
     {
@@ -3339,10 +3334,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->ata_spindown(rb->global_settings->disk_spindown);
 #endif
 
-#ifdef HAVE_BACKLIGHT
-    /* reset backlight settings */
-    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
-#endif
+    /* Turn on backlight timeout (revert to settings) */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
 
 #ifdef USEGSLIB
     gray_release(); /* deinitialize */

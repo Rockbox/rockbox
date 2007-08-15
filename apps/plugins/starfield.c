@@ -16,6 +16,7 @@
 ****************************************************************************/
 
 #include "plugin.h"
+#include "helper.h"
 
 #ifdef HAVE_LCD_BITMAP /* and also not for the Player */
 
@@ -364,7 +365,8 @@ int plugin_main(void)
 #endif
             case(STARFIELD_QUIT):
             case(SYS_USB_CONNECTED):
-                rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+                /* Turn on backlight timeout (revert to settings) */
+                backlight_use_settings(); /* backlight control in lib/helper.c*/
                 return PLUGIN_OK;
                 break;
         }
@@ -379,8 +381,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     rb = api; /* copy to global api pointer */
     (void)parameter;
-    if (rb->global_settings->backlight_timeout > 0)
-        rb->backlight_set_timeout(1);/* keep the light on */
+    /* Turn off backlight timeout */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 
     ret = plugin_main();
 

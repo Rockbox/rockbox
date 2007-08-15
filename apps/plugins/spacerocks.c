@@ -20,6 +20,8 @@
 #include "plugin.h"
 #include "math.h"
 #include "stdio.h"
+#include "helper.h"
+
 PLUGIN_HEADER
 
 /******************************* Globals ***********************************/
@@ -1935,13 +1937,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_set_backdrop(NULL);
 #endif
     rb->lcd_setfont(FONT_SYSFIXED);
-    rb->backlight_set_timeout(1);
+    /* Turn off backlight timeout */
+    backlight_force_on(); /* backlight control in lib/helper.c */
     iohiscore();
     retval = start_game();  
     iohiscore();
     rb->lcd_setfont(FONT_UI);
-    /* restore normal backlight setting*/
-    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+    /* Turn on backlight timeout (revert to settings) */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
     
     return retval;
 }

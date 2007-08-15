@@ -20,6 +20,7 @@
 ****************************************************************************/
 
 #include "plugin.h"
+#include "helper.h" 
 
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
 #include "gray.h"
@@ -85,8 +86,8 @@ void cleanup(void *parameter)
     (void)parameter;
 
     gray_release(); /* switch off overlay and deinitialize */
-    /* restore normal backlight setting */
-    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+    /* Turn on backlight timeout (revert to settings) */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
 }
 
 /* this is only a demo of what the framework can do */
@@ -170,8 +171,8 @@ int main(void)
        110,110,110,110,110,110,110
     };
 
-    if (rb->global_settings->backlight_timeout > 0)
-        rb->backlight_set_timeout(1); /* keep the light on */
+    /* Turn off backlight timeout */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 
     rb->lcd_setfont(FONT_SYSFIXED);   /* select default font */
 
