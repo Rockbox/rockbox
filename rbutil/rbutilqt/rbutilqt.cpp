@@ -25,11 +25,11 @@
 #include "ui_aboutbox.h"
 #include "configure.h"
 #include "install.h"
-#include "installbootloaderwindow.h"
 #include "installtalkwindow.h"
 #include "httpget.h"
 #include "installbootloader.h"
 #include "uninstallwindow.h"
+#include "browseof.h"
 
 #ifdef __linux
 #include <stdio.h>
@@ -280,18 +280,67 @@ void RbUtilQt::install()
 
 void RbUtilQt::installBl()
 {
-    InstallBootloaderWindow *installWindow = new InstallBootloaderWindow(this);
-    installWindow->setUserSettings(userSettings);
-    installWindow->setDeviceSettings(devices);
+    if(QMessageBox::question(this, tr("Confirm Installation"),
+       tr("Do you really want to install the Bootloader?"),
+          QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
+   
+    // create logger
+    logger = new ProgressLoggerGui(this);
+    logger->show();
+    
+    QString platform = userSettings->value("defaults/platform").toString();
+    
+    // if fwpatcher , ask for extra file
+    QString offirmware;
+    if(devices->value(platform + "/bootloadermethod").toString() == "fwpatcher")
+    {
+        BrowseOF ofbrowser(this);
+        ofbrowser.setFile(userSettings->value("defaults/ofpath").toString());
+        if(ofbrowser.exec() == QDialog::Accepted)
+        {
+            offirmware = ofbrowser.getFile();
+            qDebug() << offirmware;
+            if(!QFileInfo(offirmware).exists())
+            {
+                logger->addItem(tr("Original Firmware Path is wrong!"),LOGERROR);
+                logger->abort();
+                return;
+            }
+            else
+            {
+                userSettings->setValue("defaults/ofpath",offirmware);
+                userSettings->sync();
+            }
+        }
+        else
+        {
+            logger->addItem(tr("Original Firmware selection Canceled!"),LOGERROR);
+            logger->abort();
+            return;
+        }
+    }
+    
+    // create installer
+    blinstaller  = new BootloaderInstaller(this);
+    
+    blinstaller->setMountPoint(userSettings->value("defaults/mountpoint").toString());
+    
     if(userSettings->value("defaults/proxytype") == "manual")
-        installWindow->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
+        blinstaller->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
 #ifdef __linux
     else if(userSettings->value("defaults/proxytype") == "system")
-        installWindow->setProxy(QUrl(getenv("http_proxy")));
+        blinstaller->setProxy(QUrl(getenv("http_proxy")));
 #endif
-    installWindow->setMountPoint(userSettings->value("defaults/mountpoint").toString());
 
-    installWindow->show();
+    blinstaller->setDevice(platform);
+    blinstaller->setBootloaderMethod(devices->value(platform + "/bootloadermethod").toString());
+    blinstaller->setBootloaderName(devices->value(platform + "/bootloadername").toString());
+    blinstaller->setBootloaderBaseUrl(devices->value("bootloader_url").toString());
+    blinstaller->setOrigFirmwarePath(offirmware);
+    
+    blinstaller->install(logger);
+    
+    // connect(blinstaller, SIGNAL(done(bool)), this, SLOT(done(bool)));  
 }
 
 
@@ -319,7 +368,7 @@ void RbUtilQt::installFonts()
     installer->setMountPoint(userSettings->value("defaults/mountpoint").toString());
     installer->install(logger);
     
-    connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));
+   // connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));
 }
 
 
@@ -357,7 +406,7 @@ void RbUtilQt::installVoice()
     installer->setTarget("/.rockbox/langs/english.voice");
     installer->install(logger);
     
-    connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));
+    //connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));
 }
 
 
@@ -381,11 +430,11 @@ void RbUtilQt::installDoom()
         installer->setProxy(QUrl(getenv("http_proxy")));
 #endif
 
-    installer->setLogSection("Game Addons");
+    installer->setLogSection("GameAddons");
     installer->setMountPoint(userSettings->value("defaults/mountpoint").toString());
     installer->install(logger);
     
-    connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));
+   // connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));
 
 }
 

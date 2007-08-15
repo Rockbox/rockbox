@@ -28,6 +28,7 @@
 #include "httpget.h"
 #include "installzip.h"
 #include "progressloggergui.h"
+#include "installbootloader.h"
 
 class RbUtilQt : public QMainWindow
 {
@@ -49,6 +50,7 @@ class RbUtilQt : public QMainWindow
         void updateManual(void);
         ProgressLoggerGui *logger;
         ZipInstaller *installer;
+        BootloaderInstaller* blinstaller;
 
     private slots:
         void about(void);

@@ -21,7 +21,6 @@ SOURCES += rbutilqt.cpp \
  zip/unzip.cpp \
  installzip.cpp \
  installbootloader.cpp \
- installbootloaderwindow.cpp \
  progressloggergui.cpp \
  installtalkwindow.cpp \
  talkfile.cpp \
@@ -32,7 +31,8 @@ SOURCES += rbutilqt.cpp \
  irivertools/md5sum.cpp  \
  browsedirtree.cpp \
  uninstall.cpp \
- uninstallwindow.cpp
+ uninstallwindow.cpp \
+ browseof.cpp
 
 HEADERS += rbutilqt.h \
  settings.h \
@@ -47,7 +47,6 @@ HEADERS += rbutilqt.h \
  version.h \
  installzip.h \
  installbootloader.h \
- installbootloaderwindow.h \
  installtalkwindow.h \
  talkfile.h \
  autodetection.h \
@@ -66,7 +65,8 @@ HEADERS += rbutilqt.h \
  irivertools/checksums.h \
  browsedirtree.h \
  uninstall.h \
- uninstallwindow.h
+ uninstallwindow.h \
+ browseof.h
 
 # Needed by QT on Win
 INCLUDEPATH = . irivertools zip zlib ../ipodpatcher ../sansapatcher
@@ -83,10 +83,10 @@ FORMS += rbutilqtfrm.ui \
  installfrm.ui \
  installprogressfrm.ui \
  configurefrm.ui \
- installbootloaderfrm.ui \
  browsedirtreefrm.ui \
  installtalkfrm.ui \
- uninstallfrm.ui
+ uninstallfrm.ui \
+ browseoffrm.ui
 
 RESOURCES += rbutilqt.qrc
 

@@ -302,6 +302,14 @@ void BootloaderInstaller::gigabeatFinish()
     downloadFile.remove();
 
     m_dp->addItem(tr("Bootloader install finished successfully."),LOGOK);
+    m_dp->addItem(tr("To finish the Bootloader installation, follow the steps below."),LOGINFO);
+    m_dp->addItem(tr("1. Eject/Unmount your Device."),LOGINFO);
+    m_dp->addItem(tr("2. Unplug USB and any Power adapters."),LOGINFO);
+    m_dp->addItem(tr("3. Hold POWER to turn the Device off."),LOGINFO);
+    m_dp->addItem(tr("4. Toggle the Battery switch on the Device."),LOGINFO);
+    m_dp->addItem(tr("5. Hold POWER to boot the Rockbox bootloader."),LOGINFO);
+                
+    
     m_dp->abort();
     
     emit done(false);  // success
@@ -350,6 +358,11 @@ void BootloaderInstaller::iaudioFinish()
     downloadFile.remove();
 
     m_dp->addItem(tr("Bootloader install finished successfully."),LOGOK);
+    m_dp->addItem(tr("To finish the Bootloader installation, follow the steps below."),LOGINFO);
+    m_dp->addItem(tr("1. Eject/Unmount your Device."),LOGINFO);
+    m_dp->addItem(tr("2. Turn you Device OFF."),LOGINFO);
+    m_dp->addItem(tr("3. Insert Charger."),LOGINFO);
+    
     m_dp->abort();
     
     emit done(false);  // success
@@ -1070,6 +1083,11 @@ void BootloaderInstaller::iriverFinish()
     newHex.remove();
 
     m_dp->addItem(tr("Bootloader install finished successfully."),LOGOK);
+    m_dp->addItem(tr("To finish the Bootloader installation, follow the steps below."),LOGINFO);
+    m_dp->addItem(tr("1. Eject/Unmount your Device."),LOGINFO);
+    m_dp->addItem(tr("2. Boot into the original Firmware."),LOGINFO);
+    m_dp->addItem(tr("3. Use the Firmware flash option in the Original Firmware."),LOGINFO);
+    m_dp->addItem(tr("4. Reboot."),LOGINFO);
     m_dp->abort();
     
     emit done(false);  // success
