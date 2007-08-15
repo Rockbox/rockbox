@@ -17,58 +17,56 @@
  *
  ****************************************************************************/
 
+#ifndef INSTALLTHEMES_H
+#define INSTALLTHEMES_H
 
-#ifndef QRBUTIL_H
-#define QRBUTIL_H
-
-#include <QSettings>
+#include <QtGui>
 #include <QTemporaryFile>
 
-#include "ui_rbutilqtfrm.h"
+#include "ui_installthemesfrm.h"
 #include "httpget.h"
 #include "installzip.h"
 #include "progressloggergui.h"
-#include "installbootloader.h"
 
-class RbUtilQt : public QMainWindow
+class ThemesInstallWindow : public QDialog
 {
     Q_OBJECT
 
     public:
-        RbUtilQt(QWidget *parent = 0);
+        ThemesInstallWindow(QWidget* parent = 0);
+        void setDeviceSettings(QSettings*);
+        void setUserSettings(QSettings *);
+        void setProxy(QUrl);
+        void downloadInfo(void);
+        void show(void);
+        void accept(void);
+        
+    public slots:
 
     private:
-        Ui::RbUtilQtFrm ui;
+        Ui::ThemeInstallFrm ui;
         QSettings *devices;
         QSettings *userSettings;
-        void initDeviceNames(void);
-        QString deviceName(QString);
-        QString platform;
-        HttpGet *daily;
-        QString absolutePath;
-        QTemporaryFile buildInfo;
-        void updateManual(void);
+        HttpGet *getter;
+        HttpGet igetter;
+        QTemporaryFile themesInfo;
+        QString resolution(void);
+        QUrl proxy;
+        int currentItem;
+        void resizeEvent(QResizeEvent*);
+        QByteArray imgData;
         ProgressLoggerGui *logger;
         ZipInstaller *installer;
-        BootloaderInstaller* blinstaller;
-
+        QString file;
+        QString fileName;
+        
     private slots:
-        void about(void);
-        void configDialog(void);
-        void updateDevice(void);
-        void updateSettings(void);
-        void install(void);
-        void installBl(void);
-        void installFonts(void);
-        void installDoom(void);
-        void createTalkFiles(void);
         void downloadDone(bool);
         void downloadDone(int, bool);
-        void downloadInfo(void);
-        void installVoice(void);
-        void installThemes(void);
-        void uninstall(void);
-        void uninstallBootloader(void);
+        void updateDetails(int);
+        void updateImage(bool);
+        void abort(void);
 };
+
 
 #endif

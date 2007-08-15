@@ -46,6 +46,7 @@ void ZipInstaller::installContinue()
     qDebug() << "installContinue()";
     
     runner++; // this gets called when a install finished, so increase first.
+    qDebug() << "runner is now at" << runner << "size is" << m_urllist.size();
     if(runner < m_urllist.size()) {
         qDebug() << "==> runner at" << runner;
         m_dp->addItem(tr("done."), LOGOK);
@@ -196,7 +197,7 @@ void ZipInstaller::updateDataReadProgress(int read, int total)
 {
     m_dp->setProgressMax(total);
     m_dp->setProgressValue(read);
-    qDebug() << "progress:" << read << "/" << total;
+    //qDebug() << "progress:" << read << "/" << total;
 
 }
 

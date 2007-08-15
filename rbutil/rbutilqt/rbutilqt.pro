@@ -30,12 +30,12 @@ SOURCES += rbutilqt.cpp \
  irivertools/irivertools.cpp \
  irivertools/md5sum.cpp  \
  browsedirtree.cpp \
+ installthemes.cpp \
  uninstall.cpp \
  uninstallwindow.cpp \
  browseof.cpp
 
 HEADERS += rbutilqt.h \
- settings.h \
  install.h \
  httpget.h \
  configure.h \
@@ -64,6 +64,7 @@ HEADERS += rbutilqt.h \
  irivertools/h300sums.h \
  irivertools/checksums.h \
  browsedirtree.h \
+ installthemes.h \
  uninstall.h \
  uninstallwindow.h \
  browseof.h
@@ -85,6 +86,7 @@ FORMS += rbutilqtfrm.ui \
  configurefrm.ui \
  browsedirtreefrm.ui \
  installtalkfrm.ui \
+ installthemesfrm.ui \
  uninstallfrm.ui \
  browseoffrm.ui
 

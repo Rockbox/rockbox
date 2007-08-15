@@ -28,6 +28,7 @@
 #include "installtalkwindow.h"
 #include "httpget.h"
 #include "installbootloader.h"
+#include "installthemes.h"
 #include "uninstallwindow.h"
 #include "browseof.h"
 
@@ -81,11 +82,10 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     connect(ui.buttonGames, SIGNAL(clicked()), this, SLOT(installDoom()));
     connect(ui.buttonTalk, SIGNAL(clicked()), this, SLOT(createTalkFiles()));
     connect(ui.buttonVoice, SIGNAL(clicked()), this, SLOT(installVoice()));
+    connect(ui.buttonThemes, SIGNAL(clicked()), this, SLOT(installThemes()));
     connect(ui.buttonRemoveRockbox, SIGNAL(clicked()), this, SLOT(uninstall()));
     connect(ui.buttonRemoveBootloader, SIGNAL(clicked()), this, SLOT(uninstallBootloader()));
-    
     // disable unimplemented stuff
-    ui.buttonThemes->setEnabled(false);
     ui.buttonSmall->setEnabled(false);
     ui.buttonComplete->setEnabled(false);
 
@@ -436,6 +436,22 @@ void RbUtilQt::installDoom()
     
    // connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));
 
+}
+
+
+void RbUtilQt::installThemes()
+{
+    ThemesInstallWindow* tw = new ThemesInstallWindow(this);
+    tw->setDeviceSettings(devices);
+    tw->setUserSettings(userSettings);
+    if(userSettings->value("defaults/proxytype") == "manual")
+        tw->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
+#ifdef __linux
+    else if(userSettings->value("defaults/proxytype") == "system")
+        tw->setProxy(QUrl(getenv("http_proxy")));
+#endif
+    tw->setModal(true);
+    tw->show();
 }
 
 
