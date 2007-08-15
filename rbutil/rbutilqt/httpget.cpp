@@ -109,13 +109,23 @@ bool HttpGet::getFile(const QUrl &url)
         }
     }
     http.setHost(url.host(), url.port(80));
+    // construct query (if any)
+    QList<QPair<QString, QString> > qitems = url.queryItems();
+    QString query;
+    if(url.hasQuery()) {
+        query = "?";
+        for(int i = 0; i < qitems.size(); i++)
+            query += qitems.at(i).first + "=" + qitems.at(i).second + "&";
+        qDebug() << query;
+    }
+
     if(outputToBuffer) {
-        qDebug() << "downloading to buffer:" << QString(url.toEncoded());
-        getRequest = http.get(QString(url.toEncoded()));
+        qDebug() << "downloading to buffer:" << url.toString();
+        getRequest = http.get(url.path() + query);
     }
     else {
-        qDebug() << "downloading to file:" << QString(url.toEncoded()) << qPrintable(outputFile->fileName());
-        getRequest = http.get(QString(url.toEncoded()), outputFile);
+        qDebug() << "downloading to file:" << url.toString() << qPrintable(outputFile->fileName());
+        getRequest = http.get(url.path() + query, outputFile);
     }
     qDebug() << "request scheduled: GET" << getRequest;
     
@@ -129,11 +139,8 @@ void HttpGet::httpDone(bool error)
     if (error) {
         qDebug() << "Error: " << qPrintable(http.errorString()) << endl;
     }
-    if(!outputToBuffer) {
+    if(!outputToBuffer)
         outputFile->close();
-        qDebug() << "File downloaded as" << qPrintable(outputFile->fileName());
-    }
-    else qDebug() << "file downloaded to buffer";
     
     emit done(error);
 }
