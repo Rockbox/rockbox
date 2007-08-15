@@ -39,6 +39,7 @@
 #include "power.h"
 #include "system.h"
 #include "powermgmt.h"
+#include "hwcompat.h"
 
 int int_btn = BUTTON_NONE;
 
@@ -186,8 +187,14 @@ void button_init_device(void)
     GPIOA_INT_LEV = ~GPIOA_INPUT_VAL;
     GPIOA_INT_CLR = GPIOA_INT_STAT;
 
-    /* TODO: put additional G1 code here (wheel enable) */
-
+#ifdef IPOD_1G2G
+    if ((IPOD_HW_REVISION >> 16) == 1)
+    {   /* enable scroll wheel */
+        GPIOB_ENABLE |= 0x01;
+        GPIOB_OUTPUT_EN |= 0x01;
+        GPIOB_OUTPUT_VAL |= 0x01;
+    }
+#endif
     GPIOA_INT_EN  = 0xff;
 
     CPU_INT_EN = GPIO_MASK;
