@@ -111,7 +111,6 @@ bool HttpGet::getFile(const QUrl &url)
     http.setHost(url.host(), url.port(80));
     // construct query (if any)
     QList<QPair<QString, QString> > qitems = url.queryItems();
-    QString query;
     if(url.hasQuery()) {
         query = "?";
         for(int i = 0; i < qitems.size(); i++)
@@ -177,13 +176,14 @@ void HttpGet::httpResponseHeader(const QHttpResponseHeader &resp)
         http.abort();
     }
     // 301 -- moved permanently
+    // 302 -- found
     // 303 -- see other
     // 307 -- moved temporarily
     // in all cases, header: location has the correct address so we can follow.
-    if(response == 301 || response == 303 || response == 307) {
+    if(response == 301 || response == 302 || response == 303 || response == 307) {
         // start new request with new url
         qDebug() << "http response" << response << "- following";
-        getFile(resp.value("location"));
+        getFile(resp.value("location") + query);
     }
 }
 
