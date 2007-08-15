@@ -204,7 +204,7 @@ include $(TOOLSDIR)/make.inc
 #
 
 $(OBJDIR)/features: features.txt
-	$(SILENT)cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
+	$(SILENT)cat $< | $(HOSTCC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
 	$(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -imacros "config.h" -imacros "button.h" - | \
 	grep -v "^\#" | grep -v "^$$" > $@; \
 	echo "" >/dev/null 
