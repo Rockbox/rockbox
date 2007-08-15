@@ -22,27 +22,35 @@
 /* the plugin must declare the plugin_api struct pointer itself */
 extern struct plugin_api* rb;
 
-/* force the backlight on */
+/*
+ *  force the backlight on
+ *  now enabled regardless of HAVE_BACKLIGHT because it is not needed to
+ *  build and makes modded targets easier to update
+ */
 void backlight_force_on(void)
 {
-#ifdef HAVE_BACKLIGHT
+/* #ifdef HAVE_BACKLIGHT */
     if (rb->global_settings->backlight_timeout > 1)
         rb->backlight_set_timeout(1);
 #if CONFIG_CHARGING
     if (rb->global_settings->backlight_timeout_plugged > 1)
         rb->backlight_set_timeout_plugged(1);
 #endif /* CONFIG_CHARGING */
-#endif /* HAVE_BACKLIGHT */
+/* #endif */ /* HAVE_BACKLIGHT */
 }    
 
-/* reset backlight operation to its settings */
+/*
+ *  reset backlight operation to its settings
+ *  now enabled regardless of HAVE_BACKLIGHT because it is not needed to
+ *  build and makes modded targets easier to update
+ */
 void backlight_use_settings(void)
 {
-#ifdef HAVE_BACKLIGHT
+/* #ifdef HAVE_BACKLIGHT */
     rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
 #if CONFIG_CHARGING
     rb->backlight_set_timeout_plugged(rb->global_settings-> \
                                                      backlight_timeout_plugged);
 #endif /* CONFIG_CHARGING */
-#endif /* HAVE_BACKLIGHT */
+/* #endif */ /* HAVE_BACKLIGHT */
 }
