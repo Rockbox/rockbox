@@ -1015,7 +1015,7 @@ static char *get_token_value(struct gui_wps *gwps,
         case WPS_TOKEN_BATTERY_VOLTS:
         {
             unsigned int v = battery_voltage();
-            snprintf(buf, buf_size, "%d.%02d", v/100, v%100);
+            snprintf(buf, buf_size, "%d.%02d", v / 1000, (v % 1000) / 10);
             return buf;
         }
 

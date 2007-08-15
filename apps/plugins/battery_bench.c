@@ -250,10 +250,9 @@ void thread(void)
                                 bat[j].eta / 60, bat[j].eta % 60, 
 #if CONFIG_CHARGING || defined(HAVE_USB_POWER)
                                 (bat[j].voltage & 
-                                 (~(BIT_CHARGER|BIT_CHARGING|BIT_USB_POWER)))
-                                *10,
+                                 (~(BIT_CHARGER|BIT_CHARGING|BIT_USB_POWER))),
 #else
-                                bat[j].voltage * 10,
+                                bat[j].voltage,
 #endif
                                 temp + 1 + (j-i)
 #if CONFIG_CHARGING

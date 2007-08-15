@@ -1048,10 +1048,9 @@ bool dbg_ports(void)
         snprintf(buf, 32, "AN3: %03x AN7: %03x", adc_read(3), adc_read(7));
         lcd_puts(0, 5, buf);
 
-        battery_read_info(NULL, &adc_battery_voltage,
-                          &adc_battery_level);
-        snprintf(buf, 32, "Batt: %d.%02dV %d%%  ", adc_battery_voltage / 100,
-                 adc_battery_voltage % 100, adc_battery_level);
+        battery_read_info(&adc_battery_voltage, &adc_battery_level);
+        snprintf(buf, 32, "Batt: %d.%03dV %d%%  ", adc_battery_voltage / 1000,
+                 adc_battery_voltage % 1000, adc_battery_level);
         lcd_puts(0, 6, buf);
 
         lcd_update();
@@ -1068,7 +1067,7 @@ bool dbg_ports(void)
     unsigned int gpio_enable;
     unsigned int gpio1_enable;
     int adc_buttons, adc_remote;
-    int adc_battery, adc_battery_voltage, adc_battery_level;
+    int adc_battery_voltage, adc_battery_level;
     char buf[128];
     int line;
 
@@ -1108,8 +1107,7 @@ bool dbg_ports(void)
 
         adc_buttons = adc_read(ADC_BUTTONS);
         adc_remote  = adc_read(ADC_REMOTE);
-        battery_read_info(&adc_battery, &adc_battery_voltage,
-                          &adc_battery_level);
+        battery_read_info(&adc_battery_voltage, &adc_battery_level);
 #if defined(IAUDIO_X5) ||  defined(IAUDIO_M5) || defined(IRIVER_H300_SERIES)
         snprintf(buf, sizeof(buf), "ADC_BUTTONS (%c): %02x",
             button_scan_enabled() ? '+' : '-', adc_buttons);
@@ -1123,9 +1121,6 @@ bool dbg_ports(void)
 #else
         snprintf(buf, sizeof(buf), "ADC_REMOTE:  %02x", adc_remote);
 #endif
-
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "ADC_BATTERY: %02x", adc_battery);
         lcd_puts(0, line++, buf);
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
         snprintf(buf, sizeof(buf), "ADC_REMOTEDETECT: %02x",
@@ -1133,8 +1128,8 @@ bool dbg_ports(void)
         lcd_puts(0, line++, buf);
 #endif
 
-        snprintf(buf, 32, "Batt: %d.%02dV %d%%  ", adc_battery_voltage / 100,
-                 adc_battery_voltage % 100, adc_battery_level);
+        snprintf(buf, 32, "Batt: %d.%03dV %d%%  ", adc_battery_voltage / 1000,
+                 adc_battery_voltage % 1000, adc_battery_level);
         lcd_puts(0, line++, buf);
 
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
@@ -1401,9 +1396,9 @@ bool dbg_ports(void)
         }
         lcd_puts(0, 0, buf);
 
-        battery_read_info(NULL, &adc_battery_voltage, NULL);
-        snprintf(buf, 32, "Batt: %d.%02dV", adc_battery_voltage / 100,
-                 adc_battery_voltage % 100);
+        battery_read_info(&adc_battery_voltage, NULL);
+        snprintf(buf, 32, "Batt: %d.%03dV", adc_battery_voltage / 1000,
+                 adc_battery_voltage % 1000);
         lcd_puts(0, 1, buf);
         lcd_update();
 
@@ -1510,29 +1505,20 @@ static bool view_battery(void)
         switch (view) {
             case 0: /* voltage history graph */
                 /* Find maximum and minimum voltage for scaling */
-                maxv = 0;
-                minv = 65535;
-                for (i = 0; i < BAT_LAST_VAL; i++) {
+                minv = power_history[0];
+                maxv = minv + 1;
+                for (i = 1; i < BAT_LAST_VAL && power_history[i]; i++) {
                     if (power_history[i] > maxv)
                         maxv = power_history[i];
-                    if (power_history[i] && (power_history[i] < minv))
-                    {
+                    if (power_history[i] < minv)
                         minv = power_history[i];
-                    }
                 }
 
-                if ((minv < 1) || (minv >= 65535))
-                    minv = 1;
-                if (maxv < 2)
-                    maxv = 2;
-                if (minv == maxv)
-                    maxv < 65535 ? maxv++ : minv--;
-
-                snprintf(buf, 30, "Battery %d.%02d", power_history[0] / 100,
-                         power_history[0] % 100);
+                snprintf(buf, 30, "Battery %d.%03d", power_history[0] / 1000,
+                         power_history[0] % 1000);
                 lcd_puts(0, 0, buf);
-                snprintf(buf, 30, "scale %d.%02d-%d.%02d V",
-                         minv / 100, minv % 100, maxv / 100, maxv % 100);
+                snprintf(buf, 30, "scale %d.%03d-%d.%03dV",
+                         minv / 1000, minv % 1000, maxv / 1000, maxv % 1000);
                 lcd_puts(0, 1, buf);
 
                 x = 0;
@@ -1551,12 +1537,12 @@ static bool view_battery(void)
             case 1: /* status: */
                 lcd_puts(0, 0, "Power status:");
 
-                battery_read_info(NULL, &y, NULL);
-                snprintf(buf, 30, "Battery: %d.%02d V", y / 100, y % 100);
+                battery_read_info(&y, NULL);
+                snprintf(buf, 30, "Battery: %d.%03d V", y / 1000, y % 1000);
                 lcd_puts(0, 1, buf);
 #ifdef ADC_EXT_POWER
-                y = (adc_read(ADC_EXT_POWER) * EXT_SCALE_FACTOR) / 10000;
-                snprintf(buf, 30, "External: %d.%02d V", y / 100, y % 100);
+                y = (adc_read(ADC_EXT_POWER) * EXT_SCALE_FACTOR) / 1000;
+                snprintf(buf, 30, "External: %d.%03d V", y / 1000, y % 1000);
                 lcd_puts(0, 2, buf);
 #endif
 #if CONFIG_CHARGING
@@ -1614,10 +1600,10 @@ static bool view_battery(void)
                 lcd_puts(0, 0, "Voltage deltas:");
 
                 for (i = 0; i <= 6; i++) {
-                    y = power_history[i] - power_history[i+i];
-                    snprintf(buf, 30, "-%d min: %s%d.%02d V", i,
-                             (y < 0) ? "-" : "", ((y < 0) ? y * -1 : y) / 100,
-                             ((y < 0) ? y * -1 : y ) % 100);
+                    y = power_history[i] - power_history[i+1];
+                    snprintf(buf, 30, "-%d min: %s%d.%03d V", i,
+                             (y < 0) ? "-" : "", ((y < 0) ? y * -1 : y) / 1000,
+                             ((y < 0) ? y * -1 : y ) % 1000);
                     lcd_puts(0, i+1, buf);
                 }
                 break;
@@ -1641,9 +1627,9 @@ static bool view_battery(void)
                 lcd_puts(0, 4, buf);
 #endif /* CONFIG_CHARGING == CHARGING_CONTROL */
 
-                snprintf(buf, 30, "Last PwrHist: %d.%02d V",
-                    power_history[0] / 100,
-                    power_history[0] % 100);
+                snprintf(buf, 30, "Last PwrHist: %d.%03dV",
+                    power_history[0] / 1000,
+                    power_history[0] % 1000);
                 lcd_puts(0, 5, buf);
 
                 snprintf(buf, 30, "battery level: %d%%", battery_level());

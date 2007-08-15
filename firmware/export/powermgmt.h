@@ -65,15 +65,14 @@ extern charger_input_state_type charger_input_state;
                                  /* actual max time depends also on BATTERY_CAPACITY! */
 #define CHARGE_MIN_TIME   10     /* minutes: minimum charging time */
 #define TOPOFF_MAX_TIME   90     /* After charging, go to top off charge. How long should top off charge be? */
-#define TOPOFF_VOLTAGE    565    /* which voltage is best? (centivolts) */
+#define TOPOFF_VOLTAGE    5650   /* which voltage is best? (millivolts) */
 #define TRICKLE_MAX_TIME  12*60  /* After top off charge, go to trickle charge. How long should trickle charge be? */
-#define TRICKLE_VOLTAGE   545    /* which voltage is best? (centivolts) */
+#define TRICKLE_VOLTAGE   5450   /* which voltage is best? (millivolts) */
 
 #define START_TOPOFF_SEC    25   /* initial trickle_sec for topoff */
 #define START_TRICKLE_SEC   15   /* initial trickle_sec for trickle */
 
-#define PID_PCONST          2   /* PID proportional constant */
-#define PID_DEADZONE        2   /* PID proportional deadzone */
+#define PID_DEADZONE        4    /* PID proportional deadzone */
 
 extern char power_message[POWER_MESSAGE_LEN];
 
@@ -147,11 +146,11 @@ void powermgmt_init(void);
 /* Returns battery statust */
 int battery_level(void); /* percent */
 int battery_time(void); /* minutes */
-int battery_adc_voltage(void); /* voltage from ADC in centivolts */
-unsigned int battery_voltage(void); /* filtered batt. voltage in centivolts */
+int battery_adc_voltage(void); /* voltage from ADC in millivolts */
+unsigned int battery_voltage(void); /* filtered batt. voltage in millivolts */
 
 /* read unfiltered battery info */
-void battery_read_info(int *adc, int *voltage, int *level);
+void battery_read_info(int *voltage, int *level);
 
 /* Tells if the battery level is safe for disk writes */
 bool battery_level_safe(void);

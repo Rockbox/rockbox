@@ -194,8 +194,8 @@ static void charging_display_info(bool animate)
 #endif
     {
         int battv = battery_voltage();
-        snprintf(buf, 32, "  Batt: %d.%02dV %d%%  ", battv / 100,
-                 battv % 100, battery_level());
+        snprintf(buf, 32, "  Batt: %d.%02dV %d%%  ", battv / 1000,
+                 (battv % 1000) / 10, battery_level());
         lcd_puts(0, 7, buf);
     }
 
@@ -291,7 +291,7 @@ static void charging_display_info(bool animate)
     char buf[32];
 
     battv = battery_voltage();
-    snprintf(buf, sizeof(buf), " %d.%02dV", battv / 100, battv % 100);
+    snprintf(buf, sizeof(buf), " %d.%02dV", battv / 1000, (battv % 1000) / 10);
     lcd_puts(4, 1, buf);
 
     memcpy(buf, logo_pattern, 32); /* copy logo patterns */

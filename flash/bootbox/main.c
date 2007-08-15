@@ -99,7 +99,7 @@ void charging_screen(void)
             char buf[32];
             int battv = battery_voltage();
             snprintf(buf, sizeof(buf), "%d.%02dV %d%%",
-                battv / 100, battv % 100, battery_level());
+                battv / 1000, (battv % 1000) / 10, battery_level());
             lcd_puts(0, 1, buf);
         }
         lcd_update();
