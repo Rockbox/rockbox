@@ -129,7 +129,6 @@ bool HttpGet::getFile(const QUrl &url)
     }
     qDebug() << "request scheduled: GET" << getRequest;
     
-    http.close();
     return true;
 }
 
@@ -137,7 +136,7 @@ bool HttpGet::getFile(const QUrl &url)
 void HttpGet::httpDone(bool error)
 {
     if (error) {
-        qDebug() << "Error: " << qPrintable(http.errorString()) << endl;
+        qDebug() << "Error: " << qPrintable(http.errorString()) << httpResponse();
     }
     if(!outputToBuffer)
         outputFile->close();
@@ -173,7 +172,19 @@ void HttpGet::httpResponseHeader(const QHttpResponseHeader &resp)
     // if there is a network error abort all scheduled requests for
     // this download
     response = resp.statusCode();
-    if(response != 200) http.abort();
+    if(response != 200) {
+        qDebug() << "http response error:" << response << resp.reasonPhrase();
+        http.abort();
+    }
+    // 301 -- moved permanently
+    // 303 -- see other
+    // 307 -- moved temporarily
+    // in all cases, header: location has the correct address so we can follow.
+    if(response == 301 || response == 303 || response == 307) {
+        // start new request with new url
+        qDebug() << "http response" << response << "- following";
+        getFile(resp.value("location"));
+    }
 }
 
 
