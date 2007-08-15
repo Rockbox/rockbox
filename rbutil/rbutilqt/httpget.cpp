@@ -28,15 +28,14 @@ HttpGet::HttpGet(QObject *parent)
     : QObject(parent)
 {
     qDebug() << "--> HttpGet::HttpGet()";
-    outputFile = new QFile(this);
-    outputFile->setFileName("");
+    outputToBuffer = true;
     getRequest = -1;
     connect(&http, SIGNAL(done(bool)), this, SLOT(httpDone(bool)));
     connect(&http, SIGNAL(dataReadProgress(int, int)), this, SLOT(httpProgress(int, int)));
     connect(&http, SIGNAL(requestFinished(int, bool)), this, SLOT(httpFinished(int, bool)));
     connect(&http, SIGNAL(responseHeaderReceived(const QHttpResponseHeader&)), this, SLOT(httpResponseHeader(const QHttpResponseHeader&)));
     connect(&http, SIGNAL(stateChanged(int)), this, SLOT(httpState(int)));
-    //connect(&http, SIGNAL(requestStarted(int)), this, SLOT(httpStarted(int)));
+    connect(&http, SIGNAL(requestStarted(int)), this, SLOT(httpStarted(int)));
 
     connect(&http, SIGNAL(readyRead(const QHttpResponseHeader&)), this, SLOT(httpResponseHeader(const QHttpResponseHeader&)));
 
@@ -71,6 +70,7 @@ void HttpGet::setProxy(const QUrl &proxy)
 void HttpGet::setFile(QFile *file)
 {
     outputFile = file;
+    outputToBuffer = false;
     qDebug() << "HttpGet::setFile" << outputFile->fileName();
 }
 
@@ -78,7 +78,7 @@ void HttpGet::setFile(QFile *file)
 void HttpGet::abort()
 {
     http.abort();
-    if(!outputFile->fileName().isEmpty());
+    if(!outputToBuffer)
         outputFile->close();
 }
 
@@ -100,7 +100,7 @@ bool HttpGet::getFile(const QUrl &url)
         return false;
     }
     // if no output file was set write to buffer
-    if(!outputFile->fileName().isEmpty()) {
+    if(!outputToBuffer) {
         if (!outputFile->open(QIODevice::ReadWrite)) {
             qDebug() << "Error: Cannot open " << qPrintable(outputFile->fileName())
                 << " for writing: " << qPrintable(outputFile->errorString())
@@ -108,14 +108,13 @@ bool HttpGet::getFile(const QUrl &url)
             return false;
         }
     }
-    qDebug() << "starting download to " << qPrintable(outputFile->fileName());
     http.setHost(url.host(), url.port(80));
-    if(outputFile->fileName().isEmpty()) {
-        qDebug() << "downloading to buffer";
+    if(outputToBuffer) {
+        qDebug() << "downloading to buffer:" << QString(url.toEncoded());
         getRequest = http.get(QString(url.toEncoded()));
     }
     else {
-        qDebug() << "downloading to file";
+        qDebug() << "downloading to file:" << QString(url.toEncoded()) << qPrintable(outputFile->fileName());
         getRequest = http.get(QString(url.toEncoded()), outputFile);
     }
     qDebug() << "request scheduled: GET" << getRequest;
@@ -127,15 +126,14 @@ bool HttpGet::getFile(const QUrl &url)
 
 void HttpGet::httpDone(bool error)
 {
-    qDebug() << "bytesAvailable =" << http.bytesAvailable();
     if (error) {
         qDebug() << "Error: " << qPrintable(http.errorString()) << endl;
-    } else {
-        qDebug() << "File downloaded as " << qPrintable(outputFile->fileName())
-             << endl;
     }
-    if(!outputFile->fileName().isEmpty())
+    if(!outputToBuffer) {
         outputFile->close();
+        qDebug() << "File downloaded as" << qPrintable(outputFile->fileName());
+    }
+    else qDebug() << "file downloaded to buffer";
     
     emit done(error);
 }
@@ -145,6 +143,8 @@ void HttpGet::httpFinished(int id, bool error)
 {
     qDebug() << "HttpGet::httpFinished(int, bool) =" << id << error;
     if(id == getRequest) dataBuffer = http.readAll();
+    qDebug() << "pending:" << http.hasPendingRequests();
+    //if(!http.hasPendingRequests()) httpDone(error);
     emit requestFinished(id, error);
 
 }

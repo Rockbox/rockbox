@@ -63,6 +63,7 @@ class HttpGet : public QObject
         int response;
         int getRequest;
         QByteArray dataBuffer;
+        bool outputToBuffer;
 };
 
 #endif
