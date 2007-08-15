@@ -29,6 +29,8 @@ BrowseDirtree::BrowseDirtree(QWidget *parent) : QDialog(parent)
     this->setModal(true);
     ui.tree->setModel(&model);
     model.setReadOnly(true);
+    model.setSorting(QDir::Name | QDir::DirsFirst | QDir::IgnoreCase);
+    
     // disable size / date / type columns
     ui.tree->setColumnHidden(1, true);
     ui.tree->setColumnHidden(2, true);
