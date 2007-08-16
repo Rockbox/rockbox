@@ -1139,7 +1139,7 @@ static void power_thread(void)
              * generate more heat [gvb].
              */
 
-            pid_p = (target_voltage - battery_millivolts) / 5;
+            pid_p = ((signed)target_voltage - (signed)battery_millivolts) / 5;
             if((pid_p <= PID_DEADZONE) && (pid_p >= -PID_DEADZONE))
                 pid_p = 0;
 
