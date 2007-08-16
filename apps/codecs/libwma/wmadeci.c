@@ -378,12 +378,47 @@ void ff_imdct_calc(MDCTContext *s,
  *
  */
 
+#ifdef CPU_ARM
+static inline
+void vector_fmul_add_add(fixed32 *dst, const fixed32 *data, const fixed32 *window, int n)
+{
+  while (n>=2) {
+    asm volatile ("ldmia %[d]!, {r0, r1};"
+                  "ldmia %[w]!, {r4, r5};"
+
+         /*consume the first data and window value so we can use those registers again */
+                  "smull r8, r9, r0, r4;"
+
+                  "ldmia %[dst], {r0, r4};"
+				  "add   r0, r0, r9, lsl #1;"  /* *dst=*dst+(r9<<1)*/
+                  "smull r8, r9, r1, r5;"
+                  "add   r1, r4, r9, lsl #1;"
+                  "stmia %[dst]!, {r0, r1};"
+                  : [d] "+r" (data), [w] "+r" (window), [dst] "+r" (dst)
+                  : : "r0", "r1",
+                  "r4", "r5", "r8", "r9",
+                  "memory", "cc");
+    n -= 2;
+  }
+  while(n>0) {
+    *dst = fixmul32b(*data, *window);
+    data++;
+    window++;
+    n--;
+  }
+}
+
+#else
+
 static inline void vector_fmul_add_add(fixed32 *dst, const fixed32 *src0, const fixed32 *src1, int len){
     int i;
     for(i=0; i<len; i++)
         dst[i] = fixmul32b(src0[i], src1[i]) + dst[i];
 }
 
+#endif
+
+/* TODO:  Adapt the above to work with this */
 static inline void vector_fmul_reverse(fixed32 *dst, const fixed32 *src0, const fixed32 *src1, int len){
     int i;
     src1 += len-1;
@@ -391,11 +426,15 @@ static inline void vector_fmul_reverse(fixed32 *dst, const fixed32 *src0, const 
         dst[i] = fixmul32b(src0[i], src1[-i]);
 }
 
+
 /**
   * Apply MDCT window and add into output.
   *
   * We ensure that when the windows overlap their squared sum
   * is always 1 (MDCT reconstruction rule).
+  *
+  *	The Vorbis I spec has a great diagram explaining this process.
+  * See section 1.3.2.3 of http://xiph.org/vorbis/doc/Vorbis_I_spec.html
   */
  static void wma_window(WMADecodeContext *s, fixed32 *in, fixed32 *out)
  {
@@ -403,6 +442,7 @@ static inline void vector_fmul_reverse(fixed32 *dst, const fixed32 *src0, const 
      int block_len, bsize, n;
 
      /* left part */
+     /*previous block was larger, so we'll use the size of the current block to set the window size*/
      if (s->block_len_bits <= s->prev_block_len_bits) {
          block_len = s->block_len;
          bsize = s->frame_len_bits - s->block_len_bits;
@@ -410,7 +450,9 @@ static inline void vector_fmul_reverse(fixed32 *dst, const fixed32 *src0, const 
          vector_fmul_add_add(out, in, s->windows[bsize], block_len);
 
      } else {
+		 /*previous block was smaller or the same size, so use it's size to set the window length*/
          block_len = 1 << s->prev_block_len_bits;
+         /*find the middle of the two overlapped blocks, this will be the first overlapped sample*/
          n = (s->block_len - block_len) / 2;
          bsize = s->frame_len_bits - s->prev_block_len_bits;
 
@@ -418,7 +460,10 @@ static inline void vector_fmul_reverse(fixed32 *dst, const fixed32 *src0, const 
 
          memcpy(out+n+block_len, in+n+block_len, n*sizeof(fixed32));
      }
-
+	/* Advance to the end of the current block and prepare to window it for the next block.
+	 * Since the window function needs to be reversed, we do it backwards starting with the
+	 * last sample and moving towards the first
+	 */
      out += s->block_len;
      in += s->block_len;
 
@@ -1124,7 +1169,7 @@ static int wma_decode_block(WMADecodeContext *s)
     int nb_coefs[MAX_CHANNELS];
     fixed32 mdct_norm;
 
-//    printf("***decode_block: %d:%d (%d)\n", s->frame_count - 1, s->block_num, s->block_len);
+	DEBUGF("***decode_block: %d of (%d samples) (%d)\n",  s->block_num, s->frame_len, s->block_len);
 
    /* compute current block length */
     if (s->use_variable_block_len)
