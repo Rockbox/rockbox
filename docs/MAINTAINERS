@@ -134,7 +134,7 @@ Plugins
 :alpine_cdc:
 :battery_bench:
 :blackjack:
-:bounce:
+:bounce: Daniel Stenberg
 :brickmania:
 :bubbles:
 :calculator:
@@ -179,7 +179,7 @@ Plugins
 :oscilloscope:
 :pacbox: Dave Chapman
 :plasma:
-:pong:
+:pong: Daniel Stenberg
 :properties: Peter D'Hoye
 :random_folder_advance_config: Jonathan Gordon
 :reversi: Antoine Cellerier
@@ -272,12 +272,12 @@ Build Tools
 :configure script and build system: Daniel Stenberg
 :genlang: Daniel Stenberg
 :bdf2bmp:
-:bmp2rb:
+:bmp2rb: Daniel Stenberg
 :checkwps: Nicolas Pennequin
 :mkboot:
 :database:
 :rdf2binary:
-:convbdf:
+:convbdf: Daniel Stenberg
 :codepages:
 :player_unifont:
 :uclpack:
@@ -285,7 +285,7 @@ Build Tools
 :voicefont:
 :scramble:
 :descramble:
-
+:mkinfo: Daniel Stenberg
 
 Install Tools
 -------------
