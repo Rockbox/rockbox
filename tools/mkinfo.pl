@@ -42,6 +42,8 @@ sub mapscan {
             $start = $1;
         }
     }
+    close(M);
+
     # return number of bytes
     return hex($end) - hex($start);
 }
