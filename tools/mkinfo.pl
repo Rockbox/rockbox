@@ -29,6 +29,23 @@ sub cmd1line {
     return $out[0];
 }
 
+sub mapscan {
+    my ($f)=@_;
+    my $start, $end;
+    open(M, "<$f");
+    while(<M>) {
+        if($_ =~ / +0x([0-9a-f]+) *_end = \./) {
+            $end = $1;
+            last;
+        }
+        elsif($_ =~ / +0x([0-9a-f]+) *_loadaddress = \./) {
+            $start = $1;
+        }
+    }
+    # return number of bytes
+    return hex($end) - hex($start);
+}
+
 if(!$output) {
     print "Usage: mkinfo.pl <filename>\n";
     exit;
@@ -50,6 +67,7 @@ printf O ("Version: %s\n", $ENV{'VERSION'});
 printf O ("Binary: %s\n", $ENV{'BINARY'});
 printf O ("Binary size: %s\n", filesize($ENV{'BINARY'}));
 printf O ("Actual size: %s\n", filesize("apps/rockbox.bin"));
+printf O ("RAM usage: %s\n", mapscan("apps/rockbox.map"));
 
 # Variables identifying tool and build environment details
 printf O ("gcc: %s\n", cmd1line("$ENV{'CC'} --version"));
@@ -58,4 +76,3 @@ printf O ("Host gcc: %s\n", cmd1line("$ENV{'HOSTCC'} --version"));
 printf O ("Host system: %s\n", $ENV{'UNAME'});
 
 close(O);
-
