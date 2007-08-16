@@ -368,7 +368,20 @@ static int update_dir(void)
     else
 #endif
     {
-        if (global_settings.show_path_in_browser == SHOW_PATH_FULL)
+        if (global_settings.show_path_in_browser && 
+            *(tc.dirfilter) == SHOW_PLUGINS)
+        {
+            char *title;
+            if (!strcmp(tc.currdir, PLUGIN_GAMES_DIR))
+                title = str(LANG_PLUGIN_GAMES);
+            else if (!strcmp(tc.currdir, PLUGIN_APPS_DIR))
+                title = str(LANG_PLUGIN_APPS);
+            else if (!strcmp(tc.currdir, PLUGIN_DEMOS_DIR))
+                title = str(LANG_PLUGIN_DEMOS);
+            else title = str(LANG_PLUGINS);
+            gui_synclist_set_title(&tree_lists, title, Icon_Plugin);
+        }
+        else if (global_settings.show_path_in_browser == SHOW_PATH_FULL)
         {
             gui_synclist_set_title(&tree_lists, tc.currdir,
                 filetype_get_icon(ATTR_DIRECTORY));
@@ -380,12 +393,6 @@ static int update_dir(void)
             {
                 /* Display "Files" for the root dir */
                 gui_synclist_set_title(&tree_lists, str(LANG_DIR_BROWSER),
-                    filetype_get_icon(ATTR_DIRECTORY));
-            }
-            else if(0 == strcasecmp(tc.currdir, PLUGIN_DIR))
-            {
-                /* Display "Plugins" for the rocks dir */
-                gui_synclist_set_title(&tree_lists, str(LANG_PLUGINS),
                     filetype_get_icon(ATTR_DIRECTORY));
             }
             else
