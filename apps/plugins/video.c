@@ -561,7 +561,7 @@ void Cleanup(void *fd)
         rb->mp3_play_stop(); /* stop audio ISR */
 
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(); /* backlight control in lib/helper.c */
+    backlight_use_settings(rb); /* backlight control in lib/helper.c */
 
     /* restore normal contrast */
     rb->lcd_set_contrast(rb->global_settings->contrast);
@@ -926,7 +926,7 @@ int main(char* filename)
     {
         gPlay.bHasVideo = true;
         /* Turn off backlight timeout */
-        backlight_force_on(); /* backlight control in lib/helper.c */
+        backlight_force_on(rb); /* backlight control in lib/helper.c */
     }
 
     /* prepare audio playback, if contained */

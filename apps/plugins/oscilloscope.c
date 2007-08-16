@@ -564,7 +564,7 @@ void cleanup(void *parameter)
     rb->lcd_set_background(LCD_DEFAULT_BG);
 #endif
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(); /* backlight control in lib/helper.c */
+    backlight_use_settings(rb); /* backlight control in lib/helper.c */
 }
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
@@ -595,7 +595,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
 
     /* Turn off backlight timeout */
-    backlight_force_on(); /* backlight control in lib/helper.c */
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
 
     rb->lcd_getstringsize("A", NULL, &font_height);
 

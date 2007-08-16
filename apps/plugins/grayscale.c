@@ -87,7 +87,7 @@ void cleanup(void *parameter)
 
     gray_release(); /* switch off overlay and deinitialize */
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(); /* backlight control in lib/helper.c */
+    backlight_use_settings(rb); /* backlight control in lib/helper.c */
 }
 
 /* this is only a demo of what the framework can do */
@@ -172,7 +172,7 @@ int main(void)
     };
 
     /* Turn off backlight timeout */
-    backlight_force_on(); /* backlight control in lib/helper.c */
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
 
     rb->lcd_setfont(FONT_SYSFIXED);   /* select default font */
 

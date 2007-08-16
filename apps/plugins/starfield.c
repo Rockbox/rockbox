@@ -366,7 +366,7 @@ int plugin_main(void)
             case(STARFIELD_QUIT):
             case(SYS_USB_CONNECTED):
                 /* Turn on backlight timeout (revert to settings) */
-                backlight_use_settings(); /* backlight control in lib/helper.c*/
+                backlight_use_settings(rb); /* backlight control in lib/helper.c*/
                 return PLUGIN_OK;
                 break;
         }
@@ -382,7 +382,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb = api; /* copy to global api pointer */
     (void)parameter;
     /* Turn off backlight timeout */
-    backlight_force_on(); /* backlight control in lib/helper.c */
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
 
     ret = plugin_main();
 

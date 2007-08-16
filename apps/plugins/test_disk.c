@@ -439,7 +439,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->srand(*rb->current_tick);
 
     /* Turn off backlight timeout */
-    backlight_force_on(); /* backlight control in lib/helper.c */
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
 
     m = menu_init(rb, items, sizeof(items) / sizeof(*items), NULL,
                       NULL, NULL, NULL);
@@ -447,7 +447,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     menu_exit(m);
 
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(); /* backlight control in lib/helper.c */
+    backlight_use_settings(rb); /* backlight control in lib/helper.c */
     
     rb->rmdir(testbasedir);
 

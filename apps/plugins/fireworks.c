@@ -380,7 +380,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     /* set everything up.. no BL timeout, no backdrop,
        white-text-on-black-background. */
-    backlight_force_on(); /* backlight control in lib/helper.c */
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
     rb->lcd_set_background(LCD_BLACK);
@@ -537,7 +537,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         }
     }
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(); /* backlight control in lib/helper.c */
+    backlight_use_settings(rb); /* backlight control in lib/helper.c */
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);

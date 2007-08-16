@@ -2031,7 +2031,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_set_backdrop(NULL);
 #endif
     /* Turn off backlight timeout */
-    backlight_force_on(); /* backlight control in lib/helper.c */
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
 
     /* now go ahead and have fun! */
     while (game_loop()!=1);
@@ -2041,7 +2041,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* Restore user's original backlight setting */
     rb->lcd_setfont(FONT_UI);
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(); /* backlight control in lib/helper.c */
+    backlight_use_settings(rb); /* backlight control in lib/helper.c */
 
     return PLUGIN_OK;
 }

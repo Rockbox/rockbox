@@ -24,7 +24,7 @@
 /**
  * Backlight on/off operations
  */
-void backlight_force_on(void);
-void backlight_use_settings(void);
+void backlight_force_on(struct plugin_api* rb);
+void backlight_use_settings(struct plugin_api* rb);
 
 #endif

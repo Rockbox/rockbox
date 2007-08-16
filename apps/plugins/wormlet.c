@@ -2334,7 +2334,7 @@ bool launch_wormlet(void)
     rb->lcd_clear_display();
 
     /* Turn off backlight timeout */
-    backlight_force_on(); /* backlight control in lib/helper.c */
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
 
     /* start the game */
     while (game_result == 1)
@@ -2344,7 +2344,7 @@ bool launch_wormlet(void)
     {
         case 2:
             /* Turn on backlight timeout (revert to settings) */
-            backlight_use_settings(); /* backlight control in lib/helper.c */
+            backlight_use_settings(rb); /* backlight control in lib/helper.c */
             return false;
             break;
     }
