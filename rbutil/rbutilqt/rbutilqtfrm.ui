@@ -142,12 +142,6 @@ p, li { white-space: pre-wrap; }
        <layout class="QGridLayout" >
         <item row="0" column="0" >
          <widget class="QToolButton" name="buttonComplete" >
-          <property name="accessibleName" >
-           <string>CompleteInstallationButton</string>
-          </property>
-          <property name="accessibleDescription" >
-           <string>This performs a complete installation of Rockbox. It installs the bootloader, a current build and the extras package.</string>
-          </property>
           <property name="text" >
            <string>...</string>
           </property>
@@ -279,12 +273,6 @@ p, li { white-space: pre-wrap; }
          <widget class="QToolButton" name="buttonRockbox" >
           <property name="toolTip" >
            <string>Install Rockbox</string>
-          </property>
-          <property name="accessibleName" >
-           <string>ButtonInstall</string>
-          </property>
-          <property name="accessibleDescription" >
-           <string>This installs a build of Rockbox on your player. It can also upgrade an existing build.</string>
           </property>
           <property name="text" >
            <string>Install Rockbox</string>
@@ -597,7 +585,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;">
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600;">Remove the bootloader&lt;/span>&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">After removing the bootloader you won't be able to start Rockbox.&lt;/p>&lt;/body>&lt;/html></string>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">After removing the bootloader you won't be able starting Rockbox.&lt;/p>&lt;/body>&lt;/html></string>
           </property>
           <property name="wordWrap" >
            <bool>true</bool>
@@ -790,7 +778,6 @@ p, li { white-space: pre-wrap; }
     <property name="title" >
      <string>&amp;File</string>
     </property>
-    <addaction name="actionEmpty_local_download_cache" />
     <addaction name="actionInstall_Rockbox_Utility_on_player" />
     <addaction name="action_Configure" />
     <addaction name="separator" />
