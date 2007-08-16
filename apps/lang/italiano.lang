@@ -1,4 +1,4 @@
-﻿<phrase>
+<phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
   user:
@@ -1145,23 +1145,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_USB
-  desc: in the info menu
-  user:
-  <source>
-    *: none
-    sim: "USB (Sim)"
-  </source>
-  <dest>
-    *: none
-    sim: "USB (Sim)"
-  </dest>
-  <voice>
-    *: none
-    sim: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SHUFFLE
   desc: in settings_menu
   user:
@@ -2109,7 +2092,7 @@
     *: "Segnalibro allo stop"
   </dest>
   <voice>
-    *: "Segnalibro Allo Stop""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4000,7 +3983,7 @@
   </source>
   <dest>
     *: "Batteria: %d%% %dh %dm"
-    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh
+    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh"
     h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"   
   </dest>
   <voice>
@@ -4449,6 +4432,7 @@
     alarm: "Alarm Time Is Too Soon!"
   </source>
   <dest>
+    *: ""
     alarm: "L'orario impostato Ã¨ troppo vicino!"
   </dest>
   <voice>
@@ -7753,6 +7737,7 @@
 <phrase>
   id: LANG_CROSSFEED_HF_CUTOFF
   desc: in crossfeed settings
+  user:
   <source>
     *: none
     swcodec: "High-Frequency Cutoff"
@@ -7769,6 +7754,7 @@
 <phrase>
   id: LANG_CROSSFEED_CROSS_GAIN
   desc: in crossfeed settings
+  user:
   <source>  
     *: none
     swcodec: "Cross Gain"
@@ -7785,6 +7771,7 @@
 <phrase>
   id: LANG_CROSSFEED_HF_ATTENUATION
   desc: in crossfeed settings
+  user:
   <source>
     *: none
     swcodec: "High-Frequency Attenuation"
@@ -7818,6 +7805,7 @@
 <phrase>
   id: LANG_TAGCACHE_BUSY
   desc: when trying to shutdown and tagcache is committing
+  user:
   <source>
     *: "Database is not ready"
   </source>
@@ -7966,6 +7954,7 @@
 <phrase>
   id: LANG_SPLIT_SIZE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Filesize"
@@ -7996,6 +7985,7 @@
 <phrase>
   id: LANG_SPLIT_MEASURE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Measure"
@@ -8026,6 +8016,7 @@
 <phrase>
   id: LANG_SPLIT_TIME
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Time"
@@ -8073,6 +8064,7 @@
 <phrase>
   id: LANG_SPLIT_TYPE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "What to do when Splitting"
@@ -8317,7 +8309,7 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_DIRBROWSE_F1
-  desc: in dir browser, F1 button bar text /* there appears to be a bug that makes these strings not be included in the right build if they are excluded from any... */
+  desc: in dir browser, F1 button bar text
   user:
   <source>
     *: none
@@ -8658,6 +8650,7 @@
 <phrase>
   id: LANG_SYSFONT_SPLIT_SIZE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Filesize"
@@ -8971,6 +8964,7 @@
 <phrase>
   id: LANG_RECORD_AGC_PRESET
   desc: automatic gain control in record settings
+  user:
   <source>
     *: none
     agc: "Automatic Gain Control"
@@ -8987,6 +8981,7 @@
 <phrase>
   id: LANG_AGC_SAFETY
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Safety (clip)"
@@ -9003,6 +8998,7 @@
 <phrase>
   id: LANG_AGC_LIVE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Live (slow)"
@@ -9019,6 +9015,7 @@
 <phrase>
   id: LANG_AGC_DJSET
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "DJ-Set (slow)"
@@ -9035,6 +9032,7 @@
 <phrase>
   id: LANG_AGC_MEDIUM
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Medium"
@@ -9051,6 +9049,7 @@
 <phrase>
   id: LANG_AGC_VOICE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Voice (fast)"
@@ -9067,6 +9066,7 @@
 <phrase>
   id: LANG_RECORD_AGC_CLIPTIME
   desc: in record settings
+  user:
   <source>
     *: none
     agc: "AGC clip time"
@@ -9114,6 +9114,7 @@
 <phrase>
   id: LANG_FM_EUROPE
   desc: fm tuner region europe
+  user:
   <source>
     *: none
     radio: "Europe"
@@ -9130,6 +9131,7 @@
 <phrase>
   id: LANG_FM_KOREA
   desc: fm region korea
+  user:
   <source>
     *: none
     radio: "Korea"
@@ -9146,6 +9148,7 @@
 <phrase>
   id: LANG_FM_US
   desc: fm region us / canada
+  user:
   <source>
     *: none
     radio: "US / Canada"
@@ -9162,6 +9165,7 @@
 <phrase>
   id: LANG_FM_REGION
   desc: fm tuner region setting
+  user:
   <source>
     *: none
     radio: "Region"
@@ -9178,6 +9182,7 @@
 <phrase>
   id: LANG_FM_JAPAN
   desc: fm region japan
+  user:
   <source>
     *: none
     radio: "Japan"
@@ -9194,6 +9199,7 @@
 <phrase>
   id: LANG_RANDOM
   desc: random folder
+  user:
   <source>
     *: "Random"
   </source>
@@ -9388,6 +9394,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_NEWFILESTP
   desc: trigger types
+  user:
   <source>
     *: none
     recording: "New file"
@@ -9404,6 +9411,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_STOP
   desc: trigger types
+  user:
   <source>
     *: none
     recording: "Stop"
@@ -9420,6 +9428,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_TYPE
   desc: in recording trigger menu
+  user:
   <source>
     *: none
     recording: "Trigtype"
@@ -9464,6 +9473,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
   desc: AGC maximum gain in recording screen
+  user:
   <source>
     *: none
     agc: "AGC max. gain"
@@ -9480,6 +9490,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_SAFETY
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Safety (clip)"
@@ -9496,6 +9507,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_MEDIUM
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Medium"
@@ -9529,6 +9541,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_DJSET
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "DJ-Set (slow)"
@@ -9545,6 +9558,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_PRESET
   desc: automatic gain control in recording screen
+  user:
   <source>
     *: none
     agc: "AGC"
@@ -9561,6 +9575,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_VOICE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Voice (fast)"
@@ -9577,6 +9592,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_LIVE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Live (slow)"
@@ -9904,18 +9920,22 @@
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PLAY/PAUSE to return)"
-    x5,m5: "Building database... %d found (Long PLAY to return)"
+    x5,m5: "Building database... %d found (Left to return)"
     h10,h10_5gb,e200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Costruzione database... %d trovato (OFF per uscire)"
     h100,h120,h300: "Costruzione database... %d trovato (STOP per uscire)"
     ipod*: "Costruzione database... %d trovato (PLAY/PAUSE per uscire)"
-    x5,m5: "Costruzione database... %d trovato (Long PLAY per uscire)"
+    x5,m5: "Costruzione database... %d trovato (LEFT per uscire)"
     h10,h10_5gb,e200: "Costruzione database... %d trovato (PREV per uscire)"
   </dest>
   <voice>
     *: ""
+    h100,h120,h300: ""
+    ipod*: ""
+    x5,m5: ""
+    h10,h10_5gb,e200: ""
   </voice>
 </phrase>
 <phrase>
@@ -9980,7 +10000,6 @@
   </dest>
   <voice>
     *: none
-    gigabeatf: "LuminositÃ Tasti""
   </voice>
 </phrase>
 <phrase>
@@ -10207,10 +10226,10 @@
     *: "Use Directory .talk Clips"
   </source>
   <dest>
-    *: "Usa Cartelle con Clip audio .talk""
+    *: ""
   </dest>
   <voice>
-    *: "Usa Cartelle con Clip audio .talk""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10227,7 +10246,6 @@
   </dest>
   <voice>
     *: none
-    recording: "Impossibile scrivere nella cartella di registrazione""
   </voice>
 </phrase>
 <phrase>
@@ -10652,19 +10670,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CHANNELS
-  desc: in settings_menu
-  user:
-  <source>
-    *: "Ask"
-  </source>
-  <dest>
-    *: "Chiedi"
-  </dest>
-  <voice>
-    *: "Chiedi"
-  </voice>
-<phrase>
   id: LANG_ASK
   desc: in settings_menu
   user:
@@ -10945,5 +10950,47 @@
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_FILENAME_EXT
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Show filename extensions"
+  </source>
+  <dest>
+    *: "Mostrare le estensioni di nome file"
+  </dest>
+  <voice>
+    *: "Mostrare le estensioni di nome file"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EXT_ONLY_VIEW_ALL
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Only when viewing all types"
+  </source>
+  <dest>
+    *: "Soltanto quando osservare tutto batte a macchina"
+  </dest>
+  <voice>
+    *: "Soltanto quando osservare tutto batte a macchina"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNKNOWN_TYPES
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Only unknown types"
+  </source>
+  <dest>
+    *: "I tipi soltanto sconosciuti"
+  </dest>
+  <voice>
+    *: "I tipi soltanto sconosciuti"
   </voice>
 </phrase>
