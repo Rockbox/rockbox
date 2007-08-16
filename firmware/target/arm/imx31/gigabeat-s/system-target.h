@@ -22,9 +22,12 @@
 #include "mmu-imx31.h"
 #include "system-arm.h"
 
-#define CPUFREQ_DEFAULT 98784000
-#define CPUFREQ_NORMAL  98784000
-#define CPUFREQ_MAX    296352000
+static inline void udelay(unsigned int usecs)
+{
+    volatile signed int stop = EPITCNT1 - usecs;
+    while (EPITCNT1 > stop);
+}
+
 
 #define HAVE_INVALIDATE_ICACHE
 static inline void invalidate_icache(void)

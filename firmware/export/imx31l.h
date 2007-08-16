@@ -166,6 +166,24 @@
 #define CSPI_PERIODREG2         (*(volatile long*)(CSPI2_BASE_ADDR+0x18))
 #define CSPI_TESTREG2           (*(volatile long*)(CSPI2_BASE_ADDR+0x1C0))
 
+/* RTC */
+#define RTC_HOURMIN             (*(volatile long*)RTC_BASE_ADDR)
+#define RTC_SECONDS             (*(volatile long*)(RTC_BASE_ADDR+0x04))
+#define RTC_ALRM_HM             (*(volatile long*)(RTC_BASE_ADDR+0x08))
+#define RTC_ALRM_SEC            (*(volatile long*)(RTC_BASE_ADDR+0x0C))
+#define RTC_CTL                 (*(volatile long*)(RTC_BASE_ADDR+0x10))
+#define RTC_ISR                 (*(volatile long*)(RTC_BASE_ADDR+0x14))
+#define RTC_IENR                (*(volatile long*)(RTC_BASE_ADDR+0x18))
+#define RTC_STPWCH              (*(volatile long*)(RTC_BASE_ADDR+0x1C))
+#define RTC_DAYR                (*(volatile long*)(RTC_BASE_ADDR+0x20))
+#define RTC_DAYALARM            (*(volatile long*)(RTC_BASE_ADDR+0x24))
+
+/* Keypad */
+#define KPP_KPCR                (*(volatile short*)KPP_BASE_ADDR)
+#define KPP_KPSR                (*(volatile short*)(KPP_BASE_ADDR+0x2))
+#define KPP_KDDR                (*(volatile short*)(KPP_BASE_ADDR+0x4))
+#define KPP_KPDR                (*(volatile short*)(KPP_BASE_ADDR+0x6))
+
 /* ROMPATCH and AVIC */
 #define ROMPATCH_BASE_ADDR      0x60000000
 #define AVIC_BASE_ADDR          0x68000000
@@ -451,7 +469,10 @@
 #define         SDRAM_COMPARE_CONST2    0xAAAAAAAA
 #define         UART_FIFO_CTRL          0x881
 #define         TIMEOUT                 1000
-#define         writel(v,a)  		(*(volatile int *) (a) = (v))
+#define         writel(v,a)         (*(volatile int *) (a) = (v))
+#define         readl(a)            (*(volatile int *)(a))
+#define         writew(v,a)         (*(volatile short *) (a) = (v))
+#define         readw(a)            (*(volatile short *)(a))
 
 // Dirty hack to enable DEBUG
 #define DEBUG

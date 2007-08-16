@@ -35,14 +35,12 @@ void __backlight_on(void)
 {
     // This relies on the SPI interface being initialised already
     spi_send(51, 1);
-    DEBUGF("Backlight on");
 }
 
 void __backlight_off(void)
 {
     // This relies on the SPI interface being initialised already
     spi_send(51, 0);
-    DEBUGF("Backlight off");
 }
 
 /* Assumes that the backlight has been initialized */

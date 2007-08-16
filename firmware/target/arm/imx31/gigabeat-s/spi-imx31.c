@@ -42,7 +42,6 @@ void spi_send(int address, unsigned long data) {
 
     while(CSPI_STATREG2 & (1<<2));  // Don't write while TXFIFO is full
     CSPI_TXDATA2 = packet;
-    DEBUGF("Sent a packet: 0x%X", (unsigned int)packet);
 }
 
 void spi_read(int address, unsigned long* buffer) {
@@ -56,7 +55,6 @@ void spi_read(int address, unsigned long* buffer) {
     // Wait till we have a word to read (or 1 second has elapsed)
     while(!(CSPI_TESTREG2 & 0xF0) && (newtick > current_tick));
     if(newtick >= current_tick) {
-        DEBUGF("SPI supposedly read successfully");
         *buffer = CSPI_RXDATA2;
     } else {
         DEBUGF("SPI read timed out");
