@@ -39,6 +39,7 @@
 #include "button.h"
 #include "panic.h"
 #include "power.h"
+#include "powermgmt.h"
 #include "file.h"
 #include "uda1380.h"
 #include "eeprom_settings.h"
