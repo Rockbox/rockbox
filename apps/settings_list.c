@@ -708,7 +708,7 @@ const struct settings_list settings[] = {
         TALK_ID(10, UNIT_SEC), TALK_ID(15, UNIT_SEC), TALK_ID(20, UNIT_SEC), 
         TALK_ID(30, UNIT_SEC), TALK_ID(60, UNIT_SEC)),
     INT_SETTING(0, peak_meter_release, LANG_PM_RELEASE, 8, "peak meter release",                      
-                    LANG_PM_UNITS_PER_READ, 1, 0x7e1, 1, NULL, NULL,NULL), 
+                    UNIT_INT, 1, 0x7e, 1, NULL, NULL,NULL), 
     OFFON_SETTING(0,peak_meter_dbfs,LANG_PM_DBFS,true,"peak meter dbfs",NULL),
     {F_T_INT,&global_settings.peak_meter_min,LANG_PM_MIN,INT(60),"peak meter min",NULL,UNUSED},
     {F_T_INT,&global_settings.peak_meter_max,LANG_PM_MAX,INT(0),"peak meter max",NULL,UNUSED},
