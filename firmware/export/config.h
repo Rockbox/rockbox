@@ -71,20 +71,6 @@
 #define H300_REMOTE 2
 #define X5_REMOTE   3
 
-/* CONFIG_BATTERY */
-#define BATT_LIION2200   2200 /* FM/V2 recorder type */
-#define BATT_4AA_NIMH    1500
-#define BATT_3AAA        1000 /* Ondio */
-#define BATT_IAUDIO_X5M5  950
-#define BATT_LIPOL1300   1300 /* the type used in iRiver h1x0 models */
-#define BATT_LPCS355385  1550 /* iriver h10 20Gb - SKC LPCS355385 */
-#define BATT_BP009        820 /* iriver H10 5/6Gb - iriver BP009 */
-#define BATT_LIION830     830 /* Toshiba Gigabeat Fxx and Xxx series MK11-2740 */
-#define BATT_LIION750     750 /* Sansa e200 LiIon 3,7V */
-#define BATT_LIION400     400 /* iPOD 5G/5.5G Video 30GB LiIon 400mAh */
-#define BATT_LIION300     300 /* iPOD nano LiIon 300mAh */
-#define BATT_1AA          333 /* iRiver iFP: Alkaline, NiHM */
-
 /* CONFIG_CHARGING */
 #define CHARGING_SIMPLE  1 /* Simple, hardware controlled charging */
 #define CHARGING_MONITOR 2 /* Hardware controlled charging with monitoring */

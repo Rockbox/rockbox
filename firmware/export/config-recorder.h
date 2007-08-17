@@ -51,14 +51,14 @@
 
 #define CONFIG_I2C I2C_PLAYREC
 
-/* Type of mobile power */
-#define CONFIG_BATTERY BATT_4AA_NIMH
 #define BATTERY_CAPACITY_DEFAULT 1500 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 1500 /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 50   /* capacity increment */
 #define BATTERY_TYPES_COUNT  1    /* only one type */
-#define BATTERY_SCALE_FACTOR 6465
+
+/* define this if the unit should not shut down on low battery. */
+#define NO_LOW_BATTERY_SHUTDOWN
 
 /* Software controlled charging */
 #define CONFIG_CHARGING CHARGING_CONTROL

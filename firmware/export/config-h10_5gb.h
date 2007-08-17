@@ -79,14 +79,11 @@
 
 #define AB_REPEAT_ENABLE 1
 
-/* Type of mobile power */
-#define CONFIG_BATTERY BATT_BP009
 #define BATTERY_CAPACITY_DEFAULT 820 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 700  /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX 900 /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 10   /* capacity increment */
 #define BATTERY_TYPES_COUNT  1    /* only one type */
-#define BATTERY_SCALE_FACTOR 4688
 
 /* Hardware controlled charging */
 #define CONFIG_CHARGING CHARGING_SIMPLE

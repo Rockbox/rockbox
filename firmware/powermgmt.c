@@ -175,143 +175,6 @@ static const unsigned char poweroff_idle_timeout_value[15] =
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 30, 45, 60
 };
 
-static const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
-{
-#if CONFIG_BATTERY == BATT_LIION2200    /* FM Recorder, LiIon */
-    2800
-#elif CONFIG_BATTERY == BATT_3AAA       /* Ondio: Alkaline, NiHM */
-    3100, 3450
-#elif CONFIG_BATTERY == BATT_1AA        /* iRiver iFP: Alkaline, NiHM */
-    1050, 1150
-#elif CONFIG_BATTERY == BATT_LIPOL1300  /* iRiver H1x0: LiPolymer */
-    3380
-#elif CONFIG_BATTERY == BATT_LIION300   /* ipod nano */
-    3330
-#elif CONFIG_BATTERY == BATT_LIION400   /* iPOD Video 30GB */
-    3450
-#elif CONFIG_BATTERY == BATT_LIION750   /* Sansa e200 */
-    3400
-#elif CONFIG_BATTERY == BATT_LIION830   /* Gigabeat F */
-    3450
-#elif CONFIG_BATTERY == BATT_IAUDIO_X5M5  /* iAudio X5 */
-    3540
-#elif CONFIG_BATTERY == BATT_LPCS355385 /* iriver H10 20GB: LiPolymer*/
-    3760
-#elif CONFIG_BATTERY == BATT_BP009      /* iriver H10 5/6GB: LiPolymer */
-    3720
-#else                                   /* Player/recorder: NiMH */
-    4750
-#endif
-};
-
-static const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-#if   CONFIG_BATTERY == BATT_LIION2200  /* FM Recorder */
-    2580
-#elif CONFIG_BATTERY == BATT_3AAA       /* Ondio */
-    2700, 2800
-#elif CONFIG_BATTERY == BATT_LIPOL1300  /* iRiver Hxxx */
-    3020
-#elif CONFIG_BATTERY == BATT_LIION300   /* ipod nano */
-    3230
-#elif CONFIG_BATTERY == BATT_LIION400   /* iPOD Video 30GB */
-    3450
-#elif CONFIG_BATTERY == BATT_LIION750   /* Sansa e200 */
-    3300
-#elif CONFIG_BATTERY == BATT_LIION830   /* Gigabeat F */
-    3400
-#elif CONFIG_BATTERY == BATT_IAUDIO_X5M5  /* iAudio X5 */
-    3500
-#elif CONFIG_BATTERY == BATT_LPCS355385 /* iriver H10 20GB */
-    3650
-#elif CONFIG_BATTERY == BATT_BP009      /* iriver H10 5/6GB */
-    3650
-#else                                   /* Player/recorder: NiMH */
-    4400
-#endif
-};
-
-/* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-static const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
-{
-#if CONFIG_BATTERY == BATT_LIION2200
-    /* measured values */
-    { 2600, 2850, 2950, 3030, 3110, 3200, 3300, 3450, 3600, 3800, 4000 }
-#elif CONFIG_BATTERY == BATT_3AAA
-    /* measured values */
-    { 2800, 3250, 3410, 3530, 3640, 3740, 3850, 3950, 4090, 4270, 4750 }, /* Alkaline */
-    { 3100, 3550, 3630, 3690, 3720, 3740, 3760, 3780, 3800, 3860, 4050 }  /* NiMH */
-#elif CONFIG_BATTERY == BATT_LIPOL1300
-    /* Below 3370 the backlight starts flickering during HD access */
-    { 3370, 3650, 3700, 3740, 3780, 3820, 3870, 3930, 4000, 4080, 4160 }
-#elif CONFIG_BATTERY == BATT_IAUDIO_X5M5
-    /* average measured values from X5 and M5L */
-    { 3500, 3650, 3720, 3740, 3760, 3790, 3840, 3900, 3950, 4040, 4120 }
-#elif CONFIG_BATTERY == BATT_LPCS355385
-    /* iriver H10 20GB */
-    { 3760, 3800, 3850, 3870, 3900, 3950, 4020, 4070, 4110, 4180, 4240 }
-#elif CONFIG_BATTERY == BATT_BP009
-    /* iriver H10 5/6GB */
-    { 3720, 3740, 3800, 3820, 3840, 3880, 3940, 4020, 4060, 4150, 4240 }
-#elif CONFIG_BATTERY == BATT_1AA
-    /* These values are the same as for 3AAA divided by 3. */
-    /* May need recalibration. */
-    {  930, 1080, 1140, 1180, 1210, 1250, 1280, 1320, 1360, 1420, 1580 }, /* alkaline */
-    { 1030, 1180, 1210, 1230, 1240, 1250, 1260, 1270, 1280, 1290, 1350 }  /* NiMH */
-#elif CONFIG_BATTERY == BATT_LIION830
-    /* Toshiba Gigabeat Li Ion 830mAH figured from discharge curve */
-    { 3480, 3550, 3590, 3610, 3630, 3650, 3700, 3760, 3800, 3910, 3990 },
-#elif CONFIG_BATTERY == BATT_LIION750
-    /* Sansa Li Ion 750mAH FIXME this is a first linear approach */
-    { 3300, 3390, 3480, 3570, 3660, 3750, 3840, 3930, 4020, 4110, 4200 },
-#elif CONFIG_BATTERY == BATT_LIION400  /* iPOD Video 30GB */
-    /* iPOD Video 30GB Li-Ion 400mAh, first approach based upon measurements */
-    { 3450, 3670, 3710, 3750, 3790, 3830, 3870, 3930, 4010, 4100, 4180 },
-#elif CONFIG_BATTERY == BATT_LIION300
-    /* measured values */
-    { 3230, 3620, 3700, 3730, 3750, 3780, 3830, 3890, 3950, 4030, 4160 },
-#else /* NiMH */
-    /* original values were taken directly after charging, but it should show
-       100% after turning off the device for some hours, too */
-    { 4500, 4810, 4910, 4970, 5030, 5070, 5120, 5140, 5170, 5250, 5400 }
-                                            /* orig. values: ...,5280,5600 */
-#endif
-};
-
-#if CONFIG_CHARGING
-/* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
-static const unsigned short percent_to_volt_charge[11] =
-{
-#if CONFIG_BATTERY == BATT_LIPOL1300
-    /* values measured over one full charging cycle */
-    3540, 3860, 3930, 3980, 4000, 4020, 4040, 4080, 4130, 4180, 4230 /* LiPo */
-#elif CONFIG_BATTERY == BATT_LIION300
-    /* measured values */
-    3230, 3620, 3700, 3730, 3750, 3780, 3830, 3890, 3950, 4030, 4160
-#elif CONFIG_BATTERY == BATT_LIION400
-    /* iPOD Video 30GB Li-Ion 400mAh, first approach based upon measurements */
-    3450, 3670, 3710, 3750, 3790, 3830, 3870, 3930, 4010, 4100, 4180
-#elif CONFIG_BATTERY == BATT_LIION750
-    /* Sansa Li Ion 750mAH FIXME*/
-    3300, 3390, 3480, 3570, 3660, 3750, 3840, 3930, 4020, 4110, 4200
-#elif CONFIG_BATTERY == BATT_LIION830
-    /* Toshiba Gigabeat Li Ion 830mAH */
-    3480, 3550, 3590, 3610, 3630, 3650, 3700, 3760, 3800, 3910, 3990
-#elif CONFIG_BATTERY == BATT_LPCS355385
-    /* iriver H10 20GB */
-    3990, 4030, 4060, 4080, 4100, 4120, 4150, 4180, 4220, 4260, 4310
-#elif CONFIG_BATTERY == BATT_BP009
-    /* iriver H10 5/6GB: Not yet calibrated */
-    3880, 3920, 3960, 4000, 4060, 4100, 4150, 4190, 4240, 4280, 4330
-#else
-    /* values guessed, see
-       http://www.seattlerobotics.org/encoder/200210/LiIon2.pdf until someone
-       measures voltages over a charging cycle */
-    4760, 5440, 5510, 5560, 5610, 5640, 5660, 5760, 5820, 5840, 5850 /* NiMH */
-#endif
-};
-#endif /* CONFIG_CHARGING */
-
 #if CONFIG_CHARGING == CHARGING_CONTROL
 int long_delta;                     /* long term delta battery voltage */
 int short_delta;                    /* short term delta battery voltage */
@@ -340,12 +203,11 @@ int pid_i = 0;                      /* PID integral term */
  */
 static unsigned int avgbat;     /* average battery voltage (filtering) */
 static unsigned int battery_millivolts;/* filtered battery voltage, millivolts */
+
 #ifdef HAVE_CHARGE_CTRL
 #define BATT_AVE_SAMPLES    32  /* filter constant / @ 2Hz sample rate */
-#elif CONFIG_BATTERY == BATT_LIPOL1300
-#define BATT_AVE_SAMPLES   128  /* slow filter for iriver */
 #else
-#define BATT_AVE_SAMPLES    64  /* medium filter constant for all others */
+#define BATT_AVE_SAMPLES   128  /* slw filter constant for all others */
 #endif
 
 /* battery level (0-100%) of this minute, updated once per minute */
@@ -373,7 +235,7 @@ static int runcurrent(void);
 
 void battery_read_info(int *voltage, int *level)
 {
-    int millivolts  = adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR / 1000;
+    int millivolts = battery_adc_voltage();
 
     if (voltage)
         *voltage = millivolts;
@@ -422,12 +284,6 @@ int battery_level(void)
 unsigned int battery_voltage(void)
 {
     return battery_millivolts;
-}
-
-/* Returns battery voltage from ADC [millivolts] */
-int battery_adc_voltage(void)
-{
-    return (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR + 500) / 1000;
 }
 
 /* Tells if the battery level is safe for disk writes */
@@ -487,7 +343,10 @@ static int voltage_to_battery_level(int battery_millivolts)
 {
     int level;
 
-#if defined(CONFIG_CHARGER) && CONFIG_BATTERY == BATT_LIPOL1300
+#if defined(CONFIG_CHARGER) \
+ && (defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES))
+    /* Checking for iriver is a temporary kludge.
+     * This code needs rework/unification */
     if (charger_input_state == NO_CHARGER) {
         /* discharging. calculate new battery level and average with last */
         level = voltage_to_percent(battery_millivolts,
@@ -549,7 +408,10 @@ static void battery_status_update(void)
                                       / 100 / (CURRENT_MAX_CHG - runcurrent());
     }
     else
-#elif CONFIG_CHARGING && CONFIG_BATTERY == BATT_LIPOL1300
+#elif CONFIG_CHARGING \
+  && (defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES))
+    /* Checking for iriver is a temporary kludge.
+     * This code needs rework/unification */
     if (charger_inserted()) {
 #ifdef IRIVER_H300_SERIES
         /* H300_SERIES use CURRENT_MAX_CHG for basic charge time (80%)
@@ -626,9 +488,8 @@ static void handle_auto_poweroff(void)
     }
 #endif
 
+#ifndef NO_LOW_BATTERY_SHUTDOWN
     /* switch off unit if battery level is too low for reliable operation */
-#if (CONFIG_BATTERY!=BATT_4AA_NIMH) && (CONFIG_BATTERY!=BATT_3AAA)&& \
-    (CONFIG_BATTERY!=BATT_1AA)
     if(battery_millivolts < battery_level_shutoff[battery_type]) {
         if(!shutdown_timeout) {
             backlight_on();
@@ -837,12 +698,11 @@ static void power_thread_sleep(int ticks)
          * likely always be spinning in USB mode).
          */
         if (!ata_disk_is_active() || usb_inserted()) {
-            avgbat += adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR
-                      - (avgbat / BATT_AVE_SAMPLES);
+            avgbat += battery_adc_voltage() - (avgbat / BATT_AVE_SAMPLES);
             /*
              * battery_millivolts is the millivolt-scaled filtered battery value.
              */
-            battery_millivolts = (avgbat / BATT_AVE_SAMPLES + 500) / 1000;
+            battery_millivolts = avgbat / BATT_AVE_SAMPLES;
 
             /* update battery status every time an update is available */
             battery_status_update();
@@ -858,15 +718,13 @@ static void power_thread_sleep(int ticks)
             /* update battery status every time an update is available */
             battery_status_update();
 
-#if (CONFIG_BATTERY!=BATT_4AA_NIMH) && (CONFIG_BATTERY!=BATT_3AAA)&& \
-    (CONFIG_BATTERY!=BATT_1AA)
+#ifndef NO_LOW_BATTERY_SHUTDOWN
             if (!shutdown_timeout &&
                 (battery_millivolts < battery_level_shutoff[battery_type]))
                 sys_poweroff();
             else
 #endif
-                avgbat += battery_millivolts * 1000
-                          - (avgbat / BATT_AVE_SAMPLES);
+                avgbat += battery_millivolts - (avgbat / BATT_AVE_SAMPLES);
         }
 
 #if CONFIG_CHARGING == CHARGING_CONTROL
@@ -912,7 +770,7 @@ static void power_thread(void)
 #endif
 
     /* initialize the voltages for the exponential filter */
-    avgbat = adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR + 15000;
+    avgbat = battery_adc_voltage() + 15;
 
 #ifndef HAVE_MMC  /* this adjustment is only needed for HD based */
         /* The battery voltage is usually a little lower directly after
@@ -921,17 +779,18 @@ static void power_thread(void)
     if(!charger_inserted()) /* only if charger not connected */
 #endif
         avgbat += (percent_to_volt_discharge[battery_type][6] -
-                   percent_to_volt_discharge[battery_type][5]) * 500;
+                   percent_to_volt_discharge[battery_type][5]) / 2;
 #endif /* not HAVE_MMC */
 
     avgbat = avgbat * BATT_AVE_SAMPLES;
-    battery_millivolts = avgbat / BATT_AVE_SAMPLES / 1000;
+    battery_millivolts = avgbat / BATT_AVE_SAMPLES;
 
 #if CONFIG_CHARGING
     if(charger_inserted()) {
         battery_percent  = voltage_to_percent(battery_millivolts,
                            percent_to_volt_charge);
-#if CONFIG_BATTERY == BATT_LIPOL1300
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
+        /* Checking for iriver is a temporary kludge. */
         charger_input_state = CHARGER;
 #endif
     } else

@@ -93,14 +93,11 @@
 
 #define AB_REPEAT_ENABLE 1
 
-/* Type of mobile power */
-#define CONFIG_BATTERY BATT_LPCS355385
 #define BATTERY_CAPACITY_DEFAULT 1550 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 1500  /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX 1600 /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 10   /* capacity increment */
 #define BATTERY_TYPES_COUNT  1    /* only one type */
-#define BATTERY_SCALE_FACTOR 4688
 
 /* Hardware controlled charging */
 #define CONFIG_CHARGING CHARGING_SIMPLE

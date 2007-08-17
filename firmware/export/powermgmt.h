@@ -19,6 +19,8 @@
 #ifndef _POWERMGMT_H_
 #define _POWERMGMT_H_
 
+#include <stdbool.h>
+
 #define POWER_HISTORY_LEN 2*60   /* 2 hours of samples, one per minute */
 
 #define CHARGE_END_SHORTD  6     /* stop when N minutes have passed with
@@ -137,6 +139,12 @@ extern int trickle_sec;          /* trickle charge: How many seconds per minute 
 #endif /* not HAVE_MMC */
 
 extern unsigned short power_history[POWER_HISTORY_LEN];
+extern const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT];
+extern const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT];
+extern const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11];
+#if CONFIG_CHARGING
+extern const unsigned short percent_to_volt_charge[11];
+#endif
 
 /* Start up power management thread */
 void powermgmt_init(void);
@@ -146,7 +154,7 @@ void powermgmt_init(void);
 /* Returns battery statust */
 int battery_level(void); /* percent */
 int battery_time(void); /* minutes */
-int battery_adc_voltage(void); /* voltage from ADC in millivolts */
+unsigned int battery_adc_voltage(void); /* voltage from ADC in millivolts */
 unsigned int battery_voltage(void); /* filtered batt. voltage in millivolts */
 
 /* read unfiltered battery info */

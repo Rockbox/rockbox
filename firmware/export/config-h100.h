@@ -91,14 +91,11 @@
 
 #define HAVE_AGC
 
-/* Type of mobile power */
-#define CONFIG_BATTERY BATT_LIPOL1300
 #define BATTERY_CAPACITY_DEFAULT 1300 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 1300 /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 50   /* capacity increment */
 #define BATTERY_TYPES_COUNT  1    /* only one type */
-#define BATTERY_SCALE_FACTOR 16665 /* FIX: this value is picked at random */
 
 /* Hardware controlled charging */
 //#define CONFIG_CHARGING CHARGING_SIMPLE

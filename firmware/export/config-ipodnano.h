@@ -79,8 +79,6 @@
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 
-/* Type of mobile power */
-#define CONFIG_BATTERY BATT_LIION300
 #define BATTERY_CAPACITY_DEFAULT 300   /* default battery capacity */
 #define BATTERY_CAPACITY_MIN     200   /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX     600   /* max. capacity selectable */
@@ -100,8 +98,6 @@
 
 /* Define this if you want to use the PP5020 i2c interface */
 #define CONFIG_I2C I2C_PP5020
-
-#define BATTERY_SCALE_FACTOR    5840
 
 /* define this if the hardware can be powered off while charging */
 //#define HAVE_POWEROFF_WHILE_CHARGING

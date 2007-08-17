@@ -52,14 +52,14 @@
 /* define this if more than one device/partition can be used */
 #define HAVE_MULTIVOLUME
 
-/* Type of mobile power */
-#define CONFIG_BATTERY BATT_3AAA
 #define BATTERY_CAPACITY_DEFAULT 1000 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 500  /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX 1500 /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 50   /* capacity increment */
 #define BATTERY_TYPES_COUNT  2    /* Alkalines or NiMH */
-#define BATTERY_SCALE_FACTOR 4735 /* average from 3 Ondios */
+
+/* define this if the unit should not shut down on low battery. */
+#define NO_LOW_BATTERY_SHUTDOWN
 
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER

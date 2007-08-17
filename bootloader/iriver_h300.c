@@ -109,13 +109,11 @@ void shutdown(void)
 /* Print the battery voltage (and a warning message). */
 void check_battery(void)
 {
-    int adc_battery, battery_voltage, batt_int, batt_frac;
+    int battery_voltage, batt_int, batt_frac;
     
-    adc_battery = adc_read(ADC_BATTERY);
-
-    battery_voltage = (adc_battery * BATTERY_SCALE_FACTOR) / 10000;
-    batt_int = battery_voltage / 100;
-    batt_frac = battery_voltage % 100;
+    battery_voltage = battery_adc_voltage();
+    batt_int = battery_voltage / 1000;
+    batt_frac = (battery_voltage % 1000) / 10;
 
     printf("Batt: %d.%02dV", batt_int, batt_frac);
 

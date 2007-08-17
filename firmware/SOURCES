@@ -338,6 +338,7 @@ target/sh/archos/player/hwcompat-player.c
 target/sh/archos/player/lcd-as-player.S
 target/sh/archos/player/lcd-player.c
 target/sh/archos/player/power-player.c
+target/sh/archos/player/powermgmt-player.c
 target/sh/archos/player/usb-player.c
 #endif /* SIMULATOR */
 #endif /* ARCHOS_PLAYER */
@@ -350,6 +351,7 @@ target/sh/archos/lcd-archos-bitmap.c
 target/sh/archos/lcd-as-archos-bitmap.S   
 target/sh/archos/recorder/button-recorder.c
 target/sh/archos/recorder/power-recorder.c
+target/sh/archos/recorder/powermgmt-recorder.c
 target/sh/archos/recorder/usb-recorder.c
 #endif /* SIMULATOR */
 #endif /* ARCHOS_RECORDER */
@@ -362,6 +364,7 @@ target/sh/archos/lcd-archos-bitmap.c
 target/sh/archos/lcd-as-archos-bitmap.S
 target/sh/archos/fm_v2/button-fm_v2.c
 target/sh/archos/fm_v2/power-fm_v2.c
+target/sh/archos/fm_v2/powermgmt-fm_v2.c
 target/sh/archos/fm_v2/usb-fm_v2.c
 #endif /* SIMULATOR */
 #endif /* ARCHOS_FMRECORDER || ARCHOS_RECORDERV2 */
@@ -372,6 +375,7 @@ target/sh/archos/lcd-archos-bitmap.c
 target/sh/archos/lcd-as-archos-bitmap.S
 target/sh/archos/ondio/button-ondio.c
 target/sh/archos/ondio/power-ondio.c
+target/sh/archos/ondio/powermgmt-ondio.c
 target/sh/archos/ondio/usb-ondio.c
 #endif /* SIMULATOR */
 #endif /* ARCHOS_ONDIOFM || ARCHOS_ONDIOFM */
@@ -386,6 +390,7 @@ target/arm/sandisk/sansa-e200/backlight-e200.c
 target/arm/usb-fw-pp502x.c
 target/arm/sandisk/sansa-e200/button-e200.c
 target/arm/sandisk/sansa-e200/power-e200.c
+target/arm/sandisk/sansa-e200/powermgmt-e200.c
 target/arm/i2s-pp.c
 #ifndef BOOTLOADER
 target/arm/sandisk/sansa-e200/audio-e200.c
@@ -401,6 +406,7 @@ target/coldfire/iaudio/adc-iaudio.c
 target/coldfire/iaudio/ata-iaudio.c
 target/coldfire/iaudio/lcd-remote-iaudio.c
 target/coldfire/iaudio/pcf50606-iaudio.c
+target/coldfire/iaudio/powermgmt-iaudio.c
 target/coldfire/iaudio/system-iaudio.c
 target/coldfire/iaudio/usb-iaudio.c
 target/coldfire/iaudio/x5/backlight-x5.c
@@ -429,6 +435,7 @@ target/coldfire/iaudio/m5/lcd-as-m5.S
 target/coldfire/iaudio/m5/lcd-m5.c
 target/coldfire/iaudio/m5/power-m5.c
 target/coldfire/iaudio/pcf50606-iaudio.c
+target/coldfire/iaudio/powermgmt-iaudio.c
 target/coldfire/iaudio/system-iaudio.c
 target/coldfire/iaudio/usb-iaudio.c
 #ifndef BOOTLOADER
@@ -459,6 +466,7 @@ target/coldfire/iriver/h300/pcf50606-h300.c
 target/coldfire/iriver/h300/lcd-as-h300.S
 target/coldfire/iriver/h300/lcd-h300.c
 target/coldfire/iriver/h300/power-h300.c
+target/coldfire/iriver/h300/powermgmt-h300.c
 target/coldfire/iriver/h300/usb-h300.c
 #ifndef BOOTLOADER
 target/coldfire/iriver/audio-iriver.c
@@ -479,6 +487,7 @@ target/coldfire/iriver/h100/button-h100.c
 target/coldfire/iriver/h100/lcd-as-h100.S
 target/coldfire/iriver/h100/lcd-h100.c
 target/coldfire/iriver/h100/power-h100.c
+target/coldfire/iriver/h100/powermgmt-h100.c
 #ifndef BOOTLOADER
 target/coldfire/iriver/audio-iriver.c
 target/coldfire/iriver/h100/spdif-h100.c
@@ -498,6 +507,7 @@ target/arm/iriver/h10/backlight-h10.c
 target/arm/iriver/h10/button-h10.c
 target/arm/iriver/h10/lcd-h10_20gb.c
 target/arm/iriver/h10/power-h10.c
+target/arm/iriver/h10/powermgmt-h10.c
 target/arm/usb-fw-pp502x.c
 #endif /* SIMULATOR */
 #endif /* IRIVER_H10 */
@@ -513,6 +523,7 @@ target/arm/iriver/h10/backlight-h10.c
 target/arm/iriver/h10/button-h10.c
 target/arm/iriver/h10/lcd-h10_5gb.c
 target/arm/iriver/h10/power-h10.c
+target/arm/iriver/h10/powermgmt-h10.c
 target/arm/usb-fw-pp502x.c
 #endif /* SIMULATOR */
 #endif /* IRIVER_H10_5GB */
@@ -528,6 +539,7 @@ target/arm/s3c2440/gigabeat-fx/kernel-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/lcd-as-meg-fx.S
 target/arm/s3c2440/gigabeat-fx/lcd-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/power-meg-fx.c
+target/arm/s3c2440/gigabeat-fx/powermgmt-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/sc606-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/timer-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/usb-meg-fx.c
@@ -552,6 +564,7 @@ target/arm/tatung/tpj1022/backlight-tpj1022.c
 target/arm/tatung/tpj1022/button-tpj1022.c
 target/arm/tatung/tpj1022/lcd-tpj1022.c
 target/arm/tatung/tpj1022/power-tpj1022.c
+target/arm/tatung/tpj1022/powermgmt-tpj1022.c
 target/arm/usb-fw-pp502x.c
 #endif /* SIMULATOR */
 #endif /* ELIO_TPJ1022 */
@@ -568,6 +581,7 @@ target/arm/ipod/backlight-4g_color.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
+target/arm/ipod/powermgmt-ipod-pcf.c
 target/arm/usb-fw-pp502x.c
 #endif /* SIMULATOR */
 #endif /* IPOD_4G */
@@ -584,6 +598,7 @@ target/arm/ipod/backlight-4g_color.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/lcd-color_nano.c
 target/arm/ipod/power-ipod.c
+target/arm/ipod/powermgmt-ipod-pcf.c
 target/arm/usb-fw-pp502x.c
 #endif /* SIMULATOR */
 #endif /* IPOD_COLOR */
@@ -600,6 +615,7 @@ target/arm/ipod/backlight-nano_video.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/lcd-color_nano.c
 target/arm/ipod/power-ipod.c
+target/arm/ipod/powermgmt-ipod-pcf.c
 target/arm/usb-fw-pp502x.c
 #endif /* SIMULATOR */
 #endif /* IPOD_NANO */
@@ -615,6 +631,7 @@ target/arm/ipod/adc-ipod-pcf.c
 target/arm/ipod/backlight-nano_video.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/power-ipod.c
+target/arm/ipod/powermgmt-ipod-pcf.c
 target/arm/ipod/video/lcd-video.c
 target/arm/usb-fw-pp502x.c
 #endif /* SIMULATOR */
@@ -631,6 +648,7 @@ target/arm/ipod/3g/backlight-3g.c
 target/arm/ipod/button-1g-3g.c
 target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
+target/arm/ipod/powermgmt-ipod-pcf.c
 target/arm/usb-fw-pp5002.c
 #endif /* SIMULATOR */
 #endif /* IPOD_3G */
@@ -642,6 +660,7 @@ target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
 target/arm/ipod/1g2g/adc-ipod-1g2g.c
 target/arm/ipod/1g2g/backlight-1g2g.c
+target/arm/ipod/1g2g/powermgmt-1g2g.c
 target/arm/ipod/button-1g-3g.c
 target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
@@ -661,6 +680,7 @@ target/arm/ipod/backlight-mini1g_mini2g.c
 target/arm/ipod/button-mini1g.c
 target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
+target/arm/ipod/powermgmt-ipod-pcf.c
 target/arm/usb-fw-pp502x.c
 #endif /* SIMULATOR */
 #endif /* IPOD_MINI */
@@ -677,6 +697,7 @@ target/arm/ipod/backlight-mini1g_mini2g.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
+target/arm/ipod/powermgmt-ipod-pcf.c
 target/arm/usb-fw-pp502x.c
 #endif /* SIMULATOR */
 #endif /* IPOD_MINI2G */
@@ -688,6 +709,7 @@ target/arm/pnx0101/iriver-ifp7xx/backlight-ifp7xx.c
 target/arm/pnx0101/iriver-ifp7xx/button-ifp7xx.c
 target/arm/pnx0101/iriver-ifp7xx/lcd-ifp7xx.c
 target/arm/pnx0101/iriver-ifp7xx/power-ifp7xx.c
+target/arm/pnx0101/iriver-ifp7xx/powermgmt-ifp7xx.c
 target/arm/pnx0101/iriver-ifp7xx/usb-ifp7xx.c
 #endif
 #endif

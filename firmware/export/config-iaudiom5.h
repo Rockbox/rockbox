@@ -84,15 +84,11 @@
 /* TLV320 has no tone controls, so we use the software ones */
 #define HAVE_SW_TONE_CONTROLS
 
-/* Type of mobile power */
-#define X5_BATT_CONFIG          2
-#define CONFIG_BATTERY          BATT_IAUDIO_X5M5
 #define BATTERY_CAPACITY_DEFAULT 950 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN    950   /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX    2250  /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC    50    /* capacity increment */
 #define BATTERY_TYPES_COUNT     1     /* only one type */
-#define BATTERY_SCALE_FACTOR    5859  /* (420703125 + 35900) / 71800 */
 
 /* Hardware controlled charging? FIXME */
 #define CONFIG_CHARGING CHARGING_SIMPLE

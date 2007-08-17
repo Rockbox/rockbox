@@ -60,14 +60,14 @@
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 
-/* Type of mobile power */
-#define CONFIG_BATTERY BATT_1AA
 #define BATTERY_CAPACITY_DEFAULT 1000 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 500  /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX 2800 /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 50   /* capacity increment */
 #define BATTERY_TYPES_COUNT  2    /* Alkalines or NiMH */
-#define BATTERY_SCALE_FACTOR 3000 /* TODO: only roughly correct */
+
+/* define this if the unit should not shut down on low battery. */
+#define NO_LOW_BATTERY_SHUTDOWN
 
 #ifndef SIMULATOR
 
