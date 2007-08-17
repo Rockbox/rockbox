@@ -33,7 +33,7 @@ specific to that target.
 :Archos Ondio FM:
 :Archos Ondio SP:
 :Iriver H100/H115:
-:Iriver H120/H140: Miika Pekkarinen
+:Iriver H120/H140: Miika Pekkarinen, Linus Nielsen Feltzing
 :Iriver H320/H340:
 :Ipod Color/Photo: Dave Chapman
 :Ipod Nano 1st Gen:
@@ -44,7 +44,7 @@ specific to that target.
 :Ipod Mini 2nd Gen:
 :Iriver H10 20GB:
 :Iriver H10 5GB/6GB:
-:Iaudio X5:
+:Iaudio X5: Linus Nielsen Feltzing
 :Iaudio M5:
 :Sansa E200: Michael Sevakis
 :Toshiba Gigabeat F: Michael Sevakis
@@ -59,7 +59,7 @@ Core code (low-level)
 :Button drivers: Michael Sevakis
 :Rolo:
 :ATA driver: Michael Sevakis
-:FAT driver:
+:FAT driver: Linus Nielsen Feltzing
 :Battery/Power Management:
 :FM Tuner drivers: Michael Sevakis
 :Audio codec drivers: Michael Sevakis
@@ -106,7 +106,7 @@ NOTE: Format-specific container format parsing is maintained by the
 relevant codec maintainer.
 
 :General:
-:ID3v1/v2:
+:ID3v1/v2: Linus Nielsen Feltzing
 :Vorbis Comments:
 :APEv2:
 
@@ -188,14 +188,14 @@ Plugins
 :rockboy:
 :rocklife: Antoine Cellerier
 :rockpaint: Antoine Cellerier
-:search:
+:search: Linus Nielsen Feltzing
 :sliding_puzzle:
 :snake:
 :snake2:
 :snow:
 :sokoban: Antoine Cellerier
 :solitaire: Antoine Cellerier
-:sort:
+:sort: Linus Nielsen Feltzing
 :spacerocks:
 :splitedit:
 :star:
@@ -209,7 +209,7 @@ Plugins
 :test_sampr: Michael Sevakis
 :test_scanrate:
 :text_editor: Jonathan Gordon
-:vbrfix:
+:vbrfix: Linus Nielsen Feltzing
 :video:
 :viewer:
 :vu_meter:
@@ -259,8 +259,8 @@ Codecs (Recording)
 Bootloaders
 -----------
 
-:Iriver H1xx/H3xx: Miika Pekkarinen
-:Iaudio X5/M5:
+:Iriver H1xx/H3xx: Miika Pekkarinen, Linus Nielsen Feltzing
+:Iaudio X5/M5: Linus Nielsen Feltzing
 :PortalPlayer (not ipod):
 :Ipod: Dave Chapman
 :Gigabeat F/X
@@ -274,17 +274,17 @@ Build Tools
 :bdf2bmp:
 :bmp2rb: Daniel Stenberg
 :checkwps: Nicolas Pennequin
-:mkboot:
+:mkboot: Linus Nielsen Feltzing
 :database:
 :rdf2binary:
 :convbdf: Daniel Stenberg
 :codepages:
 :player_unifont:
 :uclpack:
-:wavtrim:
+:wavtrim: Linus Nielsen Feltzing
 :voicefont:
-:scramble:
-:descramble:
+:scramble: Linus Nielsen Feltzing
+:descramble: Linus Nielsen Feltzing
 :mkinfo: Daniel Stenberg
 
 Install Tools
