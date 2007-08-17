@@ -38,6 +38,7 @@
 #include "button.h"
 #include "panic.h"
 #include "power.h"
+#include "powermgmt.h"
 #include "file.h"
 
 #include "pcf50606.h"
