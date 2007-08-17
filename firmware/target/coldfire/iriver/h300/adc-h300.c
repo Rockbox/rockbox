@@ -26,19 +26,22 @@
 
 static int adcc2_parms[] =
 {
-    [ADC_BUTTONS] = 0x80 | (5 << 1) | 1, /* ADCIN2 */
-    [ADC_REMOTE]  = 0x80 | (6 << 1) | 1, /* ADCIN3 */
-    [ADC_BATTERY] = 0x80 | (0 << 1) | 1, /* BATVOLT, resistive divider */
-    [ADC_REMOTEDETECT] = 0x80 | (2 << 1) | 1, /* ADCIN1, resistive divider */
+    [ADC_BUTTONS] = 0x80 | (5 << 1) | 1, /* 8b,  ADCIN2 */
+    [ADC_REMOTE]  = 0x80 | (6 << 1) | 1, /* 8b,  ADCIN3 */
+    [ADC_BATTERY] = 0x00 | (0 << 1) | 1, /* 10b, BATVOLT, resistive divider */
+    [ADC_REMOTEDETECT] = 0x80 | (2 << 1) | 1, /* 8b, ADCIN1, resistive divider */
 };
 
 unsigned short adc_scan(int channel)
 {
     int level = set_irq_level(HIGHEST_IRQ_LEVEL);
-    unsigned char data;
+    unsigned data;
 
     pcf50606_write(0x2f, adcc2_parms[channel]);
     data = pcf50606_read(0x30);
+
+    if (channel == ADC_BATTERY)
+        data = (data << 2) | (pcf50606_read(0x31) & 0x03);
 
     set_irq_level(level);
     return data;

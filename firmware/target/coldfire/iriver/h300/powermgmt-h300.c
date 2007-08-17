@@ -48,11 +48,11 @@ const unsigned short percent_to_volt_charge[11] =
 
 /* FIX: this value is picked at random */
 #define BATTERY_SCALE_FACTOR 6000
-/* full-scale ADC readout (2^8) in millivolt */
+/* full-scale ADC readout (2^10) in millivolt */
 
 /* Returns battery voltage from ADC [millivolts] */
 unsigned int battery_adc_voltage(void)
 {
-    return (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) >> 8;
+    return (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) >> 10;
 }
 
