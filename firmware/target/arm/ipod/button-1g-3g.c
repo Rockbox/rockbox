@@ -41,7 +41,14 @@
 #include "powermgmt.h"
 #include "hwcompat.h"
 
-int int_btn = BUTTON_NONE;
+static int int_btn = BUTTON_NONE;
+#ifdef IPOD_1G2G
+/* The 1st Gen wheel draws ~12mA when enabled permanently. Therefore
+ * we only enable it for a very short time to check for changes every
+ * tick, and only keep it enabled if there is activity. */
+#define WHEEL_TIMEOUT (HZ/4)
+static int wheel_timeout = 0;
+#endif
 
 /* iPod 3G and mini 1G, mini 2G uses iPod 4G code */
 void handle_scroll_wheel(int new_scroll, int was_hold, int reverse)
@@ -56,6 +63,10 @@ void handle_scroll_wheel(int new_scroll, int was_hold, int reverse)
         {1, 0, 0, -1},
         {0, -1, 1, 0}
     };
+    
+#ifdef IPOD_1G2G
+    wheel_timeout = WHEEL_TIMEOUT;
+#endif
 
     if ( prev_scroll == -1 ) {
         prev_scroll = new_scroll;
@@ -207,25 +218,37 @@ int button_read_device(void)
 {
     static bool hold_button = false;
     bool hold_button_old;
+#ifdef IPOD_1G2G
+    static unsigned char last_wheel_value = 0;
+    unsigned char wheel_value;
+
+    if ((IPOD_HW_REVISION >> 16) == 1)
+    {
+        if (!hold_button && (wheel_timeout == 0))
+        {
+            GPIOB_OUTPUT_VAL |= 0x01; /* enable wheel */
+            udelay(50);               /* let the voltage settle */
+            wheel_value = GPIOA_INPUT_VAL >> 6;
+            if (wheel_value != last_wheel_value)
+            {   
+                last_wheel_value = wheel_value; 
+                wheel_timeout = WHEEL_TIMEOUT; /* keep wheel enabled */
+            }
+        }                
+        if (wheel_timeout)
+            wheel_timeout--;
+        else
+            GPIOB_OUTPUT_VAL &= ~0x01; /* disable wheel */
+    }
+#endif
 
     /* normal buttons */
     hold_button_old = hold_button;
     hold_button = button_hold();
 
     if (hold_button != hold_button_old)
-    {
         backlight_hold_changed(hold_button);
-#ifdef IPOD_1G2G
-        /* Disable the 1st gen's wheel on hold in order to save power.
-         * The wheel draws ~12mA when enabled! Toggling the bit doesn't hurt
-         * on 2nd gen, because the pin is set to input (headphone detect). */
-        if (hold_button)
-            GPIOB_OUTPUT_VAL &= ~0x01; /* disable wheel */
-        else
-            GPIOB_OUTPUT_VAL |=  0x01; /* enable wheel */
-#endif
-    }
-        
+
     return int_btn;
 }
 
