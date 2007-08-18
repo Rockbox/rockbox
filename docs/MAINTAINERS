@@ -25,23 +25,24 @@ NOTE: Port maintainers are simply developers who use a particular
 target on a daily basis and are therefore able to report issues
 specific to that target.
 
-:Archos Player/Studio:
-:Archos Recorder v1:
+:Archos Player/Studio: Jens Arnold
+:Archos Recorder v1: Jens Arnold
 :Archos Recorder 8MB:
 :Archos FM Recorder:
 :Archos Recorder v2:
-:Archos Ondio FM:
+:Archos Ondio FM: Jens Arnold
 :Archos Ondio SP:
 :Iriver H100/H115:
 :Iriver H120/H140: Miika Pekkarinen, Linus Nielsen Feltzing
 :Iriver H320/H340: Peter D'Hoye
-:Ipod Color/Photo: Dave Chapman
-:Ipod Nano 1st Gen:
-:Ipod 4th Gen Grayscale:
-:Ipod Video:
+:Ipod 1st/2nd Gen: Jens Arnold
 :Ipod 3rd Gen:
+:Ipod 4th Gen Grayscale:
+:Ipod Color/Photo: Dave Chapman
+:Ipod Video:
 :Ipod Mini 1st Gen:
-:Ipod Mini 2nd Gen:
+:Ipod Mini 2nd Gen: Jens Arnold
+:Ipod Nano 1st Gen:
 :Iriver H10 20GB:
 :Iriver H10 5GB/6GB:
 :Iaudio X5: Linus Nielsen Feltzing
@@ -55,10 +56,11 @@ Core code (low-level)
 ---------------------
 
 :Kernel: Miika Pekkarinen,Michael Sevakis
-:LCD drivers: Michael Sevakis
+:LCD drivers: Michael Sevakis, Jens Arnold
 :Button drivers: Michael Sevakis
 :Rolo:
 :ATA driver: Michael Sevakis
+:MMC driver: Jens Arnold
 :FAT driver: Linus Nielsen Feltzing
 :Battery/Power Management:
 :FM Tuner drivers: Michael Sevakis
@@ -69,7 +71,7 @@ Core code (Mid-level)
 ----------------------
 
 :DSP: Michael Sevakis,Thom Johansen
-:LCD/Graphics API:
+:LCD/Graphics API: Jens Arnold
 :Playback engine (HWCODEC):
 :Playback engine (SWCODEC): Michael Sevakis
 :PCM playback API (SWCODEC): Michael Sevakis
@@ -128,7 +130,7 @@ Plugins
 
 :Plugin loader & API:
 :Plugin library (general):
-:Greyscale library:
+:Greyscale library: Jens Arnold
 :XLCD library:
 
 :alpine_cdc:
@@ -156,7 +158,7 @@ Plugins
 :fireworks:
 :firmware_flash:
 :flipit:
-:grayscale:
+:grayscale: Jens Arnold
 :helloworld:
 :invadrox:
 :iriver_flash:
@@ -165,7 +167,7 @@ Plugins
 :jewels: Antoine Cellerier
 :jpeg:
 :logo:
-:mandelbrot:
+:mandelbrot: Jens Arnold
 :maze:
 :mazezam:
 :metronome:
@@ -176,7 +178,7 @@ Plugins
 :mp3_encoder:
 :mpegplayer: Michael Sevakis
 :nim:
-:oscilloscope:
+:oscilloscope: Jens Arnold
 :pacbox: Dave Chapman
 :plasma:
 :pong: Daniel Stenberg
@@ -204,18 +206,18 @@ Plugins
 :stopwatch:
 :sudoku: Dave Chapman
 :test_codec: Dave Chapman
-:test_disk:
+:test_disk: Jens Arnold
 :test_fps: Peter D'Hoye
 :test_sampr: Michael Sevakis
-:test_scanrate:
+:test_scanrate: Jens Arnold
 :text_editor: Jonathan Gordon
 :vbrfix: Linus Nielsen Feltzing
 :video:
 :viewer:
 :vu_meter:
 :wav2wv:
-:wavplay:
-:wavrecord:
+:wavplay: Jens Arnold
+:wavrecord: Jens Arnold
 :wavview: Peter D'Hoye
 :wormlet:
 :xobox: Antoine Cellerier
