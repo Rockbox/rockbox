@@ -213,7 +213,18 @@ int button_read_device(void)
     hold_button = button_hold();
 
     if (hold_button != hold_button_old)
+    {
         backlight_hold_changed(hold_button);
+#ifdef IPOD_1G2G
+        /* Disable the 1st gen's wheel on hold in order to save power.
+         * The wheel draws ~12mA when enabled! Toggling the bit doesn't hurt
+         * on 2nd gen, because the pin is set to input (headphone detect). */
+        if (hold_button)
+            GPIOB_OUTPUT_VAL &= ~0x01; /* disable wheel */
+        else
+            GPIOB_OUTPUT_VAL |=  0x01; /* enable wheel */
+#endif
+    }
         
     return int_btn;
 }
