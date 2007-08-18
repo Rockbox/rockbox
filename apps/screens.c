@@ -115,6 +115,7 @@ void usb_screen(void)
                         (LCD_HEIGHT-BMPHEIGHT_usblogo)/2,
                          BMPWIDTH_usblogo, BMPHEIGHT_usblogo);
 #else
+            screens[i].double_height(false);
             screens[i].puts_scroll(0, 0, "[USB Mode]");
             status_set_param(false);
             status_set_audio(false);
