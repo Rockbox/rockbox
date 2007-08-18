@@ -3516,19 +3516,16 @@
 </phrase>
 <phrase>
   id: LANG_PM_UNITS_PER_READ
-  desc: in the peak meter menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Units Per Read"
-    masd: none
+    *: ""
   </source>
   <dest>
-    *: "Eenheden per keer"
-    masd: none
+    *: ""
   </dest>
   <voice>
-    *: "Eenheden per keer"
-    masd: none
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10969,5 +10966,19 @@
   </dest>
   <voice>
     *: "Enkel bij tonen alle bestanden"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PM_UNITS_PER_TICK
+  desc: spoken only, peak meter release unit
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "eenheden per tick"
   </voice>
 </phrase>
