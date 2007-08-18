@@ -43,6 +43,7 @@ enum {
     UNIT_HERTZ,   /* hertz */
     UNIT_MB,      /* Megabytes */
     UNIT_KBIT,    /* kilobits per sec */
+    UNIT_PM_TICK, /* peak meter units per tick */
     UNIT_LAST     /* END MARKER */
 };
 

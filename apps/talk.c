@@ -782,6 +782,8 @@ int talk_value(long n, int unit, bool enqueue)
             = LANG_MEGABYTE,
         [UNIT_KBIT]
             = VOICE_KBIT_PER_SEC,
+        [UNIT_PM_TICK]
+            = VOICE_PM_UNITS_PER_TICK,
     };
 
 #if CONFIG_CODEC != SWCODEC

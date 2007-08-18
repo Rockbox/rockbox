@@ -3566,19 +3566,16 @@
 </phrase>
 <phrase>
   id: LANG_PM_UNITS_PER_READ
-  desc: in the peak meter menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Units Per Read"
-    masd: none
+    *: ""
   </source>
   <dest>
-    *: "Units Per Read"
-    masd: none
+    *: ""
   </dest>
   <voice>
-    *: "Units Per Read"
-    masd: none
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11041,5 +11038,19 @@
   </dest>
   <voice>
     *: "Only when viewing all types"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PM_UNITS_PER_TICK
+  desc: spoken only, peak meter release unit
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "units per tick"
   </voice>
 </phrase>

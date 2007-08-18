@@ -880,6 +880,7 @@ void peak_meter_draw(struct screen *display, struct meter_scales *scales,
     int left = 0, right = 0;
     int meterwidth = width - 3;
     int i;
+    static long peak_release_tick = 0;
 
 #ifdef PM_DEBUG
     static long pm_tick = 0;
@@ -934,9 +935,17 @@ void peak_meter_draw(struct screen *display, struct meter_scales *scales,
         }
 
         /* apply release */
-        left  = MAX(left , scales->last_left  - pm_peak_release);
-        right = MAX(right, scales->last_right - pm_peak_release);
-
+        if(current_tick != peak_release_tick)
+        {
+            peak_release_tick = current_tick;
+            left  = MAX(left , scales->last_left  - pm_peak_release);
+            right = MAX(right, scales->last_right - pm_peak_release);
+        }
+        else
+        {
+            left  = MAX(left , scales->last_left);
+            right = MAX(right, scales->last_right);
+        }
         /* reset max values after timeout */
         if (TIME_AFTER(current_tick, scales->pm_peak_timeout_l)){
             scales->pm_peak_left = 0;

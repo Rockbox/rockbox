@@ -42,6 +42,7 @@ static const char *unit_strings[] =
     [UNIT_PER_SEC] = "per sec",
     [UNIT_HERTZ] = "Hz",
     [UNIT_MB]  = "MB",  [UNIT_KBIT]  = "kb/s",
+    [UNIT_PM_TICK] = "units/10ms",
 };
 
 char *option_get_valuestring(struct settings_list *setting, 
