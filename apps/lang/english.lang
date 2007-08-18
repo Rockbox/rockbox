@@ -10484,17 +10484,17 @@
     *: none
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5,ipod*,e200: "The disk is full. Press LEFT to continue."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "The disk is full. Press LEFT to continue."
   </source>
   <dest>
     *: none
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5,ipod*,e200: "The disk is full. Press LEFT to continue."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "The disk is full. Press LEFT to continue."
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod*,e200: ""
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: ""
   </voice>
 </phrase>
 <phrase>
