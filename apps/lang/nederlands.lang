@@ -7,6 +7,7 @@
 # $Id$
 #
 # Dutch language file.
+# Maintainer: Peter D'Hoye
 #
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -2533,19 +2534,19 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_CURRENT_DIR
-  desc: in recording directory options
+  desc: DEPRECATED
   user:
   <source>
     *: none
-    recording: "Current Directory"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Huidige map"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "Huidige map"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -3013,13 +3014,13 @@
   desc: Backlight behaviour setting
   user:
   <source>
-    *: "First Keypress Enables Backlight Only"
+    *: "First Buttonpress Enables Backlight Only"
   </source>
   <dest>
-    *: "Eerste aanraking activeert verlichting"
+    *: "Eerste knopdruk activeert enkel verlichting"
   </dest>
   <voice>
-    *: "Eerste aanraking activeert verlichting"
+    *: "Eerste knopdruk activeert enkel verlichting"
   </voice>
 </phrase>
 <phrase>
@@ -4666,11 +4667,17 @@
   user:
   <source>
     *: none
-    recording: "The disk is full. Press STOP to continue."
+    recording: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
+    m5,x5: "The disk is full. Press POWER to continue."
+    e200: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
-    recording: "De schijf is vol. Druk STOP om door te gaan."
+    recording: "De schijf is vol. Druk OFF om door te gaan."
+    h100,h120,h300: "De schijf is vol. Druk STOP om door te gaan."
+    m5,x5: "De schijf is vol. Druk POWER om door te gaan."
+    e200: "De schijf is vol. Druk UP om door te gaan."
   </dest>
   <voice>
     *: ""
@@ -4888,7 +4895,7 @@
   desc: in color screen
   user:
   <source>
-   *: none
+    *: none
     lcd_color: "RGB: %02X%02X%02X"
   </source>
   <dest>
@@ -4904,7 +4911,7 @@
   desc: splash when user selects an invalid colour
   user:
   <source>
-   *: none
+    *: none
     lcd_non-mono: "Invalid colour"
   </source>
   <dest>
@@ -6655,7 +6662,7 @@
 </phrase>
 <phrase>
   id: VOICE_EXT_TXT
-  desc: spoken only, for file extension
+  desc: DEPRECATED
   user:
   <source>
     *: ""
@@ -6664,7 +6671,7 @@
     *: ""
   </dest>
   <voice>
-    *: "text"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8157,11 +8164,11 @@
   user:
   <source>
     *: none
-    hold_button: "Backlight (On Hold Key)"
+    hold_button: "Backlight on Hold"
   </source>
   <dest>
     *: none
-    hold_button: "Verlichting (met Hold knop)"
+    hold_button: "Verlichting met Hold knop"
   </dest>
   <voice>
     *: none
@@ -8752,11 +8759,15 @@
   user:
   <source>
     *: none
-    recording: "The disk is full. Press STOP to continue."
+    recording: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "The disk is full. Press LEFT to continue."
   </source>
   <dest>
     *: none
-    recording: "De schijf is vol. Druk STOP om door te gaan."
+    recording: "De schijf is vol. Druk OFF om door te gaan."
+    h100,h120,h300: "De schijf is vol. Druk STOP om door te gaan."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "De schijf is vol. Druk LEFT om door te gaan."
   </dest>
   <voice>
     *: ""
@@ -9892,14 +9903,14 @@
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PLAY/PAUSE to return)"
-    x5,m5: "Building database... %d found (Left to return)"
+    x5,m5: "Building database... %d found (LEFT to return)"
     h10,h10_5gb,e200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Aanmaken van database... %d gevonden (OFF = terug)"
     h100,h120,h300: "Aanmaken van database... %d gevonden (STOP = terug)"
     ipod*: "Aanmaken van database... %d gevonden (PLAY/PAUSE = terug)"
-    x5,m5: "Aanmaken van database... %d gevonden (Links = terug)"
+    x5,m5: "Aanmaken van database... %d gevonden (LINKS = terug)"
     h10,h10_5gb,e200: "Aanmaken van database... %d gevonden (PREV = terug)"
   </dest>
   <voice>
@@ -10594,12 +10605,10 @@
   desc: displayed when key lock is turned off
   user:
   <source>
-    *: "Keylock is OFF"
-    player: "Key Lock OFF"
+    *: "Buttons Unlocked"
   </source>
   <dest>
-    *: "Toetsvergrendeling is UIT"
-    player: "Toetsvergrendeling UIT"
+    *: "Toetsvergrendeling UIT"
   </dest>
   <voice>
     *: ""
@@ -10799,12 +10808,10 @@
   desc: displayed when key lock is on
   user:
   <source>
-    *: "Keylock is ON"
-    player: "Key Lock ON"
+    *: "Buttons Locked"
   </source>
   <dest>
-    *: "Toetsvergrendeling is AAN"
-    player: "Toetsvergrendeling AAN"
+    *: "Toetsvergrendeling AAN"
   </dest>
   <voice>
     *: ""
