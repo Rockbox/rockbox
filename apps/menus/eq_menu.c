@@ -56,7 +56,7 @@
  * Utility functions
  */
 
-void eq_gain_format(char* buffer, int buffer_size, int value, const char* unit)
+void eq_gain_format(char* buffer, size_t buffer_size, int value, const char* unit)
 {
     int v = abs(value);
 
@@ -64,12 +64,12 @@ void eq_gain_format(char* buffer, int buffer_size, int value, const char* unit)
         v / EQ_USER_DIVISOR, v % EQ_USER_DIVISOR, unit);
 }
 
-void eq_q_format(char* buffer, int buffer_size, int value, const char* unit)
+void eq_q_format(char* buffer, size_t buffer_size, int value, const char* unit)
 {
     snprintf(buffer, buffer_size, "%d.%d %s", value / EQ_USER_DIVISOR, value % EQ_USER_DIVISOR, unit);
 }
 
-void eq_precut_format(char* buffer, int buffer_size, int value, const char* unit)
+void eq_precut_format(char* buffer, size_t buffer_size, int value, const char* unit)
 {
     snprintf(buffer, buffer_size, "%s%d.%d %s", value == 0 ? " " : "-",
         value / EQ_USER_DIVISOR, value % EQ_USER_DIVISOR, unit);
@@ -642,7 +642,7 @@ MAKE_MENU(equalizer_menu, ID2P(LANG_EQUALIZER), NULL, Icon_EQ,
 
 #ifdef HAVE_WM8758
 
-void eq_hw_gain_format(char* buffer, int buffer_size, int value,
+void eq_hw_gain_format(char* buffer, size_t buffer_size, int value,
                                     const char* unit)
 {
     snprintf(buffer, buffer_size, "%d %s", value, unit);

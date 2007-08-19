@@ -977,7 +977,7 @@ bool set_int(const unsigned char* string,
              int step,
              int min,
              int max,
-             void (*formatter)(char*, int, int, const char*) )
+             void (*formatter)(char*, size_t, int, const char*) )
 {
     return set_int_ex(string, unit, voice_unit, variable, function,
                       step, min, max, formatter, NULL);

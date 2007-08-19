@@ -45,7 +45,7 @@ static const char *unit_strings[] =
     [UNIT_PM_TICK] = "units/10ms",
 };
 
-char *option_get_valuestring(struct settings_list *setting, 
+static char *option_get_valuestring(struct settings_list *setting, 
                              char *buffer, int buf_len,
                              intptr_t temp_var)
 {
@@ -121,7 +121,7 @@ char *option_get_valuestring(struct settings_list *setting,
     return buffer;
 }
 
-void option_talk(struct settings_list *setting, int temp_var)
+static void option_talk(struct settings_list *setting, int temp_var)
 {
     if (!talk_menus_enabled())
         return;
@@ -492,7 +492,7 @@ bool set_int_ex(const unsigned char* string,
                 int step,
                 int min,
                 int max,
-                void (*formatter)(char*, int, int, const char*),
+                void (*formatter)(char*, size_t, int, const char*),
                 long (*get_talk_id)(int))
 {
     (void)unit;

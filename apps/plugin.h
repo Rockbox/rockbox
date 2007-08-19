@@ -516,7 +516,7 @@ struct plugin_api {
                              void (*function)(bool));
     bool (*set_int)(const unsigned char* string, const char* unit, int voice_unit,
                     int* variable, void (*function)(int), int step, int min,
-                    int max, void (*formatter)(char*, int, int, const char*) );
+                    int max, void (*formatter)(char*, size_t, int, const char*) );
     bool (*set_bool)(const char* string, bool* variable );
 
 #ifdef HAVE_LCD_COLOR

@@ -358,7 +358,7 @@ MENUITEM_FUNCTION(show_info_item, 0, ID2P(LANG_ROCKBOX_INFO),
 
 
 /* sleep Menu */
-static void sleep_timer_formatter(char* buffer, int buffer_size, int value,
+static void sleep_timer_formatter(char* buffer, size_t buffer_size, int value,
                                   const char* unit)
 {
     int minutes, hours;

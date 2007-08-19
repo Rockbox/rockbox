@@ -192,7 +192,7 @@ static long rectime_getlang(int value)
         return LANG_OFF;
     return TALK_ID(value, UNIT_SEC);
 }
-static void rectime_formatter(char *buffer, int buffer_size, 
+static void rectime_formatter(char *buffer, size_t buffer_size, 
         int val, const char *unit)
 {
     (void)unit;
@@ -207,7 +207,7 @@ static void rectime_formatter(char *buffer, int buffer_size,
 #ifdef HAVE_BACKLIGHT
 static const char backlight_times_conf [] =
                   "off,on,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90";
-static void backlight_formatter(char *buffer, int buffer_size, 
+static void backlight_formatter(char *buffer, size_t buffer_size, 
         int val, const char *unit)
 {
     (void)unit;
@@ -233,7 +233,7 @@ static long ff_rewind_min_step_getlang(int value)
 {
     return TALK_ID(ff_rewind_min_stepvals[value], UNIT_SEC);
 }
-static void ff_rewind_min_step_formatter(char *buffer, int buffer_size, 
+static void ff_rewind_min_step_formatter(char *buffer, size_t buffer_size, 
         int val, const char *unit)
 {
     (void)unit;
@@ -245,7 +245,7 @@ static long scanaccel_getlang(int value)
         return LANG_OFF;
     return TALK_ID(value, UNIT_SEC);
 }
-static void scanaccel_formatter(char *buffer, int buffer_size, 
+static void scanaccel_formatter(char *buffer, size_t buffer_size, 
         int val, const char *unit)
 {
     (void)unit;
@@ -262,7 +262,7 @@ static long poweroff_idle_timer_getlang(int value)
         return LANG_OFF;
     return TALK_ID(poweroff_idle_timer_times[value], UNIT_MIN);
 }
-static void poweroff_idle_timer_formatter(char *buffer, int buffer_size, 
+static void poweroff_idle_timer_formatter(char *buffer, size_t buffer_size, 
         int val, const char *unit)
 {
     (void)unit;
@@ -279,7 +279,7 @@ static long listaccel_getlang(int value)
         return LANG_OFF;
     return TALK_ID((HZ/2)*value, UNIT_MS);
 }
-static void listaccel_formatter(char *buffer, int buffer_size, 
+static void listaccel_formatter(char *buffer, size_t buffer_size, 
         int val, const char *unit)
 {
     (void)unit;
@@ -291,7 +291,7 @@ static void listaccel_formatter(char *buffer, int buffer_size,
 #endif /* HAVE_SCROLLWHEEL */
 
 #if CONFIG_CODEC == SWCODEC
-static void crossfeed_format(char* buffer, int buffer_size, int value,
+static void crossfeed_format(char* buffer, size_t buffer_size, int value,
     const char* unit)
 {
     snprintf(buffer, buffer_size, "%s%d.%d %s", value == 0 ? " " : "-",
@@ -305,7 +305,7 @@ static void crossfeed_cross_set(int val)
                                   global_settings.crossfeed_hf_cutoff);
 }
 
-static void replaygain_preamp_format(char* buffer, int buffer_size, int value,
+static void replaygain_preamp_format(char* buffer, size_t buffer_size, int value,
     const char* unit)
 {
     int v = abs(value);

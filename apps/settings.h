@@ -275,12 +275,12 @@ bool set_option(const char* string, void* variable, enum optiontype type,
 bool set_int(const unsigned char* string, const char* unit, int voice_unit,
              int* variable,
              void (*function)(int), int step, int min, int max, 
-             void (*formatter)(char*, int, int, const char*) );
+             void (*formatter)(char*, size_t, int, const char*) );
 /* use this one if you need to create a lang from the value (i.e with TALK_ID()) */
 bool set_int_ex(const unsigned char* string, const char* unit, int voice_unit,
              int* variable,
              void (*function)(int), int step, int min, int max, 
-             void (*formatter)(char*, int, int, const char*),
+             void (*formatter)(char*, size_t, int, const char*),
              long (*get_talk_id)(int));
 
 /* the following are either not in setting.c or shouldnt be */

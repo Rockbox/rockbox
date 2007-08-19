@@ -41,11 +41,11 @@ bool eq_browse_presets(void);
 bool eq_menu_graphical(void);
 
 /* utility functions for settings_list.c */
-void eq_gain_format(char* buffer, int buffer_size, int value, const char* unit);
-void eq_q_format(char* buffer, int buffer_size, int value, const char* unit);
-void eq_precut_format(char* buffer, int buffer_size, int value, const char* unit);
+void eq_gain_format(char* buffer, size_t buffer_size, int value, const char* unit);
+void eq_q_format(char* buffer, size_t buffer_size, int value, const char* unit);
+void eq_precut_format(char* buffer, size_t buffer_size, int value, const char* unit);
 #ifdef HAVE_WM8758
-void eq_hw_gain_format(char* buffer, int buffer_size, int value,
+void eq_hw_gain_format(char* buffer, size_t buffer_size, int value,
                                     const char* unit);
 /* WM8758 equalizer supports -12 to +12 dB gain in 1 dB increments. */
 #define EQ_HW_GAIN_STEP 1
