@@ -327,7 +327,7 @@ static void set_superbass(bool value)
 #endif
 
 #ifdef HAVE_LCD_CHARCELLS
-static void jumpscroll_format(char* buffer, int buffer_size, int value,
+static void jumpscroll_format(char* buffer, size_t buffer_size, int value,
     const char* unit)
 {
     (void)unit;
