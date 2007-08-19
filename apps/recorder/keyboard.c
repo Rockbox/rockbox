@@ -378,10 +378,13 @@ int kbd_input(char* text, int buflen)
         }
 
         sc->setfont(pm->curfont);
+        pm->font_w = 0; /* reset font width */
         /* find max width of keyboard glyphs */
         for (i = 0; i < pm->nchars; i++)
         {
-            pm->font_w = font_get_width(pm->font, pm->kbd_buf[i]);
+            w = font_get_width(pm->font, pm->kbd_buf[i]);
+            if ( w > pm->font_w )
+                pm->font_w = w;
         }
 
         /* Since we're going to be adding spaces, make sure that we check
