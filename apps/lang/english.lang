@@ -11003,13 +11003,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Show filename extensions"
+    *: "Show Filename Extensions"
   </source>
   <dest>
-    *: "Show filename extensions"
+    *: "Show Filename Extensions"
   </dest>
   <voice>
-    *: "Show filename extensions"
+    *: "Show Filename Extensions"
   </voice>
 </phrase>
 <phrase>
@@ -11017,13 +11017,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Only unknown types"
+    *: "Only Unknown Types"
   </source>
   <dest>
-    *: "Only unknown types"
+    *: "Only Unknown Types"
   </dest>
   <voice>
-    *: "Only unknown types"
+    *: "Only Unknown Types"
   </voice>
 </phrase>
 <phrase>
@@ -11031,13 +11031,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Only when viewing all types"
+    *: "Only When Viewing All Types"
   </source>
   <dest>
-    *: "Only when viewing all types"
+    *: "Only When Viewing All Types"
   </dest>
   <voice>
-    *: "Only when viewing all types"
+    *: "Only When Viewing All Types"
   </voice>
 </phrase>
 <phrase>
