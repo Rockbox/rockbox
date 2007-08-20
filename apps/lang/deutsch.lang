@@ -8175,10 +8175,10 @@
     *: "Time"
   </source>
   <dest>
-    *: "Zeit/Datum setzen"
+    *: "Zeit"
   </dest>
   <voice>
-    *: "Zeit und Datum setzen"
+    *: "Zeit"
   </voice>
 </phrase>
 <phrase>
