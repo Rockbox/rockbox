@@ -145,8 +145,8 @@ const int afmt_rec_format[AFMT_NUM_CODECS] =
 
 unsigned long unsync(unsigned long b0,
                      unsigned long b1,
-		     unsigned long b2,
-		     unsigned long b3)
+                     unsigned long b2,
+                     unsigned long b3)
 {
    return (((long)(b0 & 0x7F) << (3*7)) |
            ((long)(b1 & 0x7F) << (2*7)) |
@@ -352,6 +352,13 @@ static int parsetracknum( struct mp3entry* entry, char* tag, int bufferpos )
 }
 
 /* parse numeric value from string */
+static int parsediscnum( struct mp3entry* entry, char* tag, int bufferpos )
+{
+    entry->discnum = atoi( tag );
+    return bufferpos;
+}
+
+/* parse numeric value from string */
 static int parseyearnum( struct mp3entry* entry, char* tag, int bufferpos )
 {
     entry->year = atoi( tag );
@@ -446,13 +453,16 @@ static const struct tag_resolver taglist[] = {
     { "TALB", 4, offsetof(struct mp3entry, album), NULL, false },
     { "TAL",  3, offsetof(struct mp3entry, album), NULL, false },
     { "TRK",  3, offsetof(struct mp3entry, track_string), &parsetracknum, false },
+    { "TPOS", 4, offsetof(struct mp3entry, disc_string), &parsediscnum, false },
     { "TRCK", 4, offsetof(struct mp3entry, track_string), &parsetracknum, false },
     { "TDRC", 4, offsetof(struct mp3entry, year_string), &parseyearnum, false },
     { "TYER", 4, offsetof(struct mp3entry, year_string), &parseyearnum, false },
     { "TYE",  3, offsetof(struct mp3entry, year_string), &parseyearnum, false },
     { "TCOM", 4, offsetof(struct mp3entry, composer), NULL, false },
     { "TPE2", 4, offsetof(struct mp3entry, albumartist), NULL, false },
-    { "TP2", 3, offsetof(struct mp3entry, albumartist), NULL, false },
+    { "TP2",  3, offsetof(struct mp3entry, albumartist), NULL, false },
+    { "TIT1", 4, offsetof(struct mp3entry, grouping), NULL, false },
+    { "TT1",  3, offsetof(struct mp3entry, grouping), NULL, false },
     { "COMM", 4, offsetof(struct mp3entry, comment), NULL, false }, 
     { "TCON", 4, offsetof(struct mp3entry, genre_string), &parsegenre, false },
     { "TCO",  3, offsetof(struct mp3entry, genre_string), &parsegenre, false },
@@ -693,7 +703,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             return;
     }
     entry->id3version = version;
-    entry->tracknum = entry->year = 0;
+    entry->tracknum = entry->year = entry->discnum = 0;
     entry->title = entry->artist = entry->album = NULL; /* FIXME incomplete */
 
     global_flags = header[5];
@@ -890,6 +900,9 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                  */
                  
                 if(!memcmp( header, "COMM", 4 )) {
+                    /* ignore comments with iTunes 7 gapless data */
+                    if(!strcmp(tag+4, "iTunNORM"))
+                        break;
                     comm_offset = 3 + strlen(tag+4) + 1;
                     if(bytesread>comm_offset) {
                         bytesread-=comm_offset;
@@ -1112,13 +1125,17 @@ bool get_mp3_metadata(int fd, struct mp3entry *entry, const char *filename, bool
     entry->filesize = filesize(fd);
     entry->id3v2len = getid3v2len(fd);
     entry->tracknum = 0;
+    entry->discnum = 0;
 
     if(v1first)
         v1found = setid3v1title(fd, entry);
 
     if (!v1found && entry->id3v2len)
         setid3v2title(fd, entry);
-    entry->length = getsonglength(fd, entry);
+    int len = getsonglength(fd, entry);
+    if (len < 0)
+        return false;
+    entry->length = len;
 
     /* Subtract the meta information from the file size to get
        the true size of the MP3 stream */
@@ -1173,6 +1190,8 @@ void adjust_mp3entry(struct mp3entry *entry, void *dest, void *orig)
         entry->genre_string += offset;
     if (entry->track_string)
         entry->track_string += offset;
+    if (entry->disc_string)
+        entry->disc_string += offset;
     if (entry->year_string)
         entry->year_string += offset;
     if (entry->composer)
@@ -1181,6 +1200,8 @@ void adjust_mp3entry(struct mp3entry *entry, void *dest, void *orig)
         entry->comment += offset;
     if (entry->albumartist)
         entry->albumartist += offset;
+    if (entry->grouping)
+        entry->grouping += offset;
 #if CONFIG_CODEC == SWCODEC
     if (entry->track_gain_string)
         entry->track_gain_string += offset;

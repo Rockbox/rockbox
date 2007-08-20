@@ -129,7 +129,7 @@ static int browser(void* param)
                     /* Maybe just needs to reboot due to delayed commit */
                     if (stat->commit_delayed)
                     {
-                        gui_syncsplash(HZ*2, str(LANG_PLEASE_REBOOT));
+                        gui_syncsplash(HZ*2, ID2P(LANG_PLEASE_REBOOT));
                         break;
                     }
 
@@ -146,7 +146,7 @@ static int browser(void* param)
                     {
                         /* Prompt the user */
                         reinit_attempted = true;
-                        char *lines[]={str(LANG_TAGCACHE_BUSY), str(LANG_TAGCACHE_FORCE_UPDATE)};
+                        char *lines[]={ID2P(LANG_TAGCACHE_BUSY), ID2P(LANG_TAGCACHE_FORCE_UPDATE)};
                         struct text_message message={lines, 2};
                         if(gui_syncyesno_run(&message, NULL, NULL) == YESNO_NO)
                             break;
@@ -159,6 +159,24 @@ static int browser(void* param)
                     }
 
                     /* Display building progress */
+                    static long talked_tick = 0;
+                    if(talk_menus_enabled() &&
+                       (talked_tick == 0
+                        || TIME_AFTER(current_tick, talked_tick+7*HZ)))
+                    {
+                        talked_tick = current_tick;
+                        if (stat->commit_step > 0)
+                        {
+                            talk_id(LANG_TAGCACHE_INIT, false);
+                            talk_number(stat->commit_step, true);
+                            talk_id(VOICE_OF, true);
+                            talk_number(tagcache_get_max_commit_step(), true);
+                        } else if(stat->processed_entries)
+                        {
+                            talk_number(stat->processed_entries, false);
+                            talk_id(LANG_BUILDING_DATABASE, true);
+                        }
+                    }
                     if (stat->commit_step > 0)
                     {
                         gui_syncsplash(0, "%s [%d/%d]",
@@ -236,7 +254,7 @@ static int wpsscrn(void* param)
     }
     else
     {
-        gui_syncsplash(HZ*2, str(LANG_NOTHING_TO_RESUME));
+        gui_syncsplash(HZ*2, ID2P(LANG_NOTHING_TO_RESUME));
     }
 #if LCD_DEPTH > 1
     show_main_backdrop();
@@ -261,6 +279,37 @@ static int load_bmarks(void* param)
     bookmark_mrb_load();
     return GO_TO_PREVIOUS;
 }
+static int plugins_menu(void* param)
+{
+    (void)param;
+    MENUITEM_STRINGLIST(plugins_menu_items, ID2P(LANG_PLUGINS), NULL,
+                        ID2P(LANG_PLUGIN_GAMES),
+                        ID2P(LANG_PLUGIN_APPS), ID2P(LANG_PLUGIN_DEMOS));
+    char *folder;
+    int retval = GO_TO_PREVIOUS;
+    int selection = 0, current = 0;
+    while (retval == GO_TO_PREVIOUS)
+    {
+        selection = do_menu(&plugins_menu_items, &current);
+        switch (selection)
+        {
+            case 0:
+                folder = PLUGIN_GAMES_DIR;
+                break;
+            case 1:
+                folder = PLUGIN_APPS_DIR;
+                break;
+            case 2:
+                folder = PLUGIN_DEMOS_DIR;
+                break;
+            default:
+                return selection;
+        }
+        retval = rockbox_browse(folder, SHOW_PLUGINS);
+    }
+    return retval;
+}
+
 /* These are all static const'd from apps/menus/ *.c
    so little hack so we can use them */
 extern struct menu_item_ex 
@@ -290,7 +339,7 @@ static const struct root_items items[] = {
 #endif
     
     [GO_TO_RECENTBMARKS] =  { load_bmarks, NULL, &bookmark_settings_menu }, 
-    [GO_TO_BROWSEPLUGINS] = { browser, (void*)GO_TO_BROWSEPLUGINS, NULL }, 
+    [GO_TO_BROWSEPLUGINS] = { plugins_menu, NULL, NULL }, 
     
 };
 static const int nb_items = sizeof(items)/sizeof(*items);
@@ -315,14 +364,14 @@ char *get_wps_item_name(int selected_item, void * data, char *buffer)
 MENUITEM_RETURNVALUE_DYNTEXT(wps_item, GO_TO_WPS, NULL, get_wps_item_name, 
                                 NULL, Icon_Playback_menu);
 #ifdef HAVE_RECORDING
-MENUITEM_RETURNVALUE(rec, ID2P(LANG_RECORDING_MENU), GO_TO_RECSCREEN,  
+MENUITEM_RETURNVALUE(rec, ID2P(LANG_RECORDING), GO_TO_RECSCREEN,  
                         NULL, Icon_Recording);
 #endif
 #if CONFIG_TUNER
 MENUITEM_RETURNVALUE(fm, ID2P(LANG_FM_RADIO), GO_TO_FM,  
                         item_callback, Icon_Radio_screen);
 #endif
-MENUITEM_RETURNVALUE(menu_, ID2P(LANG_SETTINGS_MENU), GO_TO_MAINMENU,  
+MENUITEM_RETURNVALUE(menu_, ID2P(LANG_SETTINGS), GO_TO_MAINMENU,  
                         NULL, Icon_Submenu_Entered);
 MENUITEM_RETURNVALUE(bookmarks, ID2P(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS),
                         GO_TO_RECENTBMARKS,  item_callback, 
@@ -411,7 +460,6 @@ static inline int load_screen(int screen)
         old_previous = GO_TO_ROOT;
     global_status.last_screen = (char)screen;
     status_save();
-    action_signalscreenchange();
     ret_val = items[screen].function(items[screen].param);
     last_screen = screen;
     if (ret_val == GO_TO_PREVIOUS)

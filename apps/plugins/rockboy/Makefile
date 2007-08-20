@@ -19,7 +19,8 @@ endif
 LINKFILE := $(OBJDIR)/link.lds
 DEPFILE = $(OBJDIR)/dep-rockboy
 SRC = cpu.c emu.c events.c fastmem.c hw.c lcd.c lcdc.c loader.c main.c \
-	mem.c menu.c rbsound.c rockboy.c rtc.c save.c sound.c sys_rockbox.c
+	mem.c menu.c rbsound.c rockboy.c rtc.c save.c sound.c sys_rockbox.c \
+	../../../firmware/common/sscanf.c
 
 #CFLAGS += -DDYNAREC
 #SRC += dynarec.c

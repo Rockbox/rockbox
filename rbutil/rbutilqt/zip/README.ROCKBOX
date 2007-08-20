@@ -1,0 +1,7 @@
+This folder contains the zip extraction classes of the OSDaB project.
+These classes are distributed under the GPL license (see the file
+LICENSE.GPL in this folder). The source files are included unmodified as
+of 2007-07-24 with the examples folder left out.
+
+Details at http://osdab.sourceforge.net/snippets/zip.php
+

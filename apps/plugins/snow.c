@@ -37,7 +37,8 @@ PLUGIN_HEADER
 #if CONFIG_KEYPAD == PLAYER_PAD
 #define SNOW_QUIT BUTTON_STOP
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD)
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define SNOW_QUIT BUTTON_MENU
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
 #define SNOW_QUIT BUTTON_PLAY
@@ -184,6 +185,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->splash(HZ*2, "Old LCD :(");
         return PLUGIN_OK;
     }
+#endif
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_clear_display();
+    rb->lcd_set_foreground(LCD_WHITE);
+    rb->lcd_set_background(LCD_DEFAULT_BG);
 #endif
     snow_init();
     while (1) {

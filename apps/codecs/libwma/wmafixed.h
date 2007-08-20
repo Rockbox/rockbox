@@ -67,11 +67,9 @@ long fsincos(unsigned long phase, fixed32 *cos);
        uint32_t __lo;  \
        int32_t __result;  \
        asm ("smull   %0, %1, %3, %4\n\t"  \
-            "movs    %0, %0, lsr %5\n\t"  \
-            "adc    %2, %0, %1, lsl %6"  \
+            "movs    %2, %1, lsl #1"  \
             : "=&r" (__lo), "=&r" (__hi), "=r" (__result)  \
-            : "%r" (x), "r" (y),  \
-              "M" (31), "M" (32 - 31)  \
+            : "%r" (x), "r" (y)  \
             : "cc");  \
        __result;  \
     })

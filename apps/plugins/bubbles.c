@@ -20,16 +20,18 @@
 ****************************************************************************/
 
 #include "plugin.h"
-#include "xlcd.h"
-#include "pluginlib_actions.h"
 
 #ifdef HAVE_LCD_BITMAP
+
+#include "xlcd.h"
+#include "pluginlib_actions.h"
+#include "fixedpoint.h"
 
 PLUGIN_HEADER
 
 /* files */
-#define SCORE_FILE PLUGIN_DIR "/bubbles.score"
-#define SAVE_FILE  PLUGIN_DIR "/bubbles.save"
+#define SCORE_FILE PLUGIN_GAMES_DIR "/bubbles.score"
+#define SAVE_FILE  PLUGIN_GAMES_DIR "/bubbles.save"
 
 /* final game return status */
 #define BB_NONE 5
@@ -55,10 +57,23 @@ PLUGIN_HEADER
 #define MAX_SHOTTIME 1000
 
 /* keyboard layouts */
+#if CONFIG_KEYPAD != SANSA_E200_PAD
+/* sansa uses the wheel instead of left/right */
 #define BUBBLES_LEFT        PLA_LEFT
 #define BUBBLES_LEFT_REP    PLA_LEFT_REPEAT
 #define BUBBLES_RIGHT       PLA_RIGHT
 #define BUBBLES_RIGHT_REP   PLA_RIGHT_REPEAT
+#define ANGLE_STEP  4
+#define ANGLE_STEP_REP 4
+#else
+#define BUBBLES_LEFT        PLA_UP
+#define BUBBLES_LEFT_REP    PLA_UP_REPEAT
+#define BUBBLES_RIGHT       PLA_DOWN
+#define BUBBLES_RIGHT_REP   PLA_DOWN_REPEAT
+#define ANGLE_STEP  2
+#define ANGLE_STEP_REP 4
+#endif
+
 #define BUBBLES_QUIT        PLA_QUIT
 #define BUBBLES_START       PLA_START
 #define BUBBLES_SELECT      PLA_FIRE
@@ -1265,71 +1280,6 @@ struct game_context {
     struct tile playboard[BB_HEIGHT][BB_WIDTH];
 };
 
-/*
- * Precalculated sine and cosine * 16384 (fixed point 18.14)
- * Borrowed from cube.c plugin
- */
-static const short sin_table[91] = {
-        0,   285,   571,   857,  1142,  1427,  1712,  1996,  2280,  2563,
-     2845,  3126,  3406,  3685,  3963,  4240,  4516,  4790,  5062,  5334,
-     5603,  5871,  6137,  6401,  6663,  6924,  7182,  7438,  7691,  7943,
-     8191,  8438,  8682,  8923,  9161,  9397,  9630,  9860, 10086, 10310,
-    10531, 10748, 10963, 11173, 11381, 11585, 11785, 11982, 12175, 12365,
-    12550, 12732, 12910, 13084, 13254, 13420, 13582, 13740, 13894, 14043,
-    14188, 14329, 14466, 14598, 14725, 14848, 14967, 15081, 15190, 15295,
-    15395, 15491, 15582, 15668, 15749, 15825, 15897, 15964, 16025, 16082,
-    16135, 16182, 16224, 16261, 16294, 16321, 16344, 16361, 16374, 16381,
-    16384
-};
-
-static long sin(int val) {
-    val = (val+360)%360;
-
-    if(val < 181) {
-        if(val < 91) {
-            /* phase 0-90 degree */
-            return (long)sin_table[val];
-        } else {
-            /* phase 91-180 degree */
-            return (long)sin_table[180-val];
-        }
-    } else {
-        if(val < 271) {
-            /* phase 181-270 degree */
-            return -(long)sin_table[val-180];
-        } else {
-            /* phase 270-359 degree */
-            return -(long)sin_table[360-val];
-        }
-    }
-    return 0;
-}
-
-static long cos(int val) {
-    val = (val+360)%360;
-
-    if(val < 181) {
-        if(val < 91) {
-            /* phase 0-90 degree */
-            return (long)sin_table[90-val];
-        } else {
-            /* phase 91-180 degree */
-            return -(long)sin_table[val-90];
-        }
-    } else {
-        if(val < 271) {
-            /* phase 181-270 degree */
-            return -(long)sin_table[270-val];
-        } else {
-            /* phase 270-359 degree */
-            return (long)sin_table[val-270];
-        }
-    }
-    return 0;
-}
-
-
-
 static void bubbles_init(struct game_context* bb);
 static bool bubbles_nextlevel(struct game_context* bb);
 static void bubbles_getonboard(struct game_context* bb);
@@ -1540,17 +1490,17 @@ static void bubbles_drawboard(struct game_context* bb) {
                   ROW_HEIGHT*(BB_HEIGHT-2)+BUBBLE_HEIGHT);
 
     /* draw arrow */
-    tipx = SHOTX+BUBBLE_WIDTH/2+(((sin(bb->angle)>>4)*BUBBLE_WIDTH*3/2)>>10);
-    tipy = SHOTY+BUBBLE_HEIGHT/2-(((cos(bb->angle)>>4)*BUBBLE_HEIGHT*3/2)>>10);
+    tipx = SHOTX+BUBBLE_WIDTH/2+(((sin_int(bb->angle)>>4)*BUBBLE_WIDTH*3/2)>>10);
+    tipy = SHOTY+BUBBLE_HEIGHT/2-(((cos_int(bb->angle)>>4)*BUBBLE_HEIGHT*3/2)>>10);
 
-    rb->lcd_drawline(SHOTX+BUBBLE_WIDTH/2+(((sin(bb->angle)>>4)*BUBBLE_WIDTH/2)>>10),
-                     SHOTY+BUBBLE_HEIGHT/2-(((cos(bb->angle)>>4)*BUBBLE_HEIGHT/2)>>10),
+    rb->lcd_drawline(SHOTX+BUBBLE_WIDTH/2+(((sin_int(bb->angle)>>4)*BUBBLE_WIDTH/2)>>10),
+                     SHOTY+BUBBLE_HEIGHT/2-(((cos_int(bb->angle)>>4)*BUBBLE_HEIGHT/2)>>10),
                      tipx, tipy);
     xlcd_filltriangle(tipx, tipy,
-                      tipx+(((sin(bb->angle-135)>>4)*BUBBLE_WIDTH/3)>>10),
-                      tipy-(((cos(bb->angle-135)>>4)*BUBBLE_HEIGHT/3)>>10),
-                      tipx+(((sin(bb->angle+135)>>4)*BUBBLE_WIDTH/3)>>10),
-                      tipy-(((cos(bb->angle+135)>>4)*BUBBLE_HEIGHT/3)>>10));
+                      tipx+(((sin_int(bb->angle-135)>>4)*BUBBLE_WIDTH/3)>>10),
+                      tipy-(((cos_int(bb->angle-135)>>4)*BUBBLE_HEIGHT/3)>>10),
+                      tipx+(((sin_int(bb->angle+135)>>4)*BUBBLE_WIDTH/3)>>10),
+                      tipy-(((cos_int(bb->angle+135)>>4)*BUBBLE_HEIGHT/3)>>10));
 
     /* draw text */
     rb->lcd_getstringsize(level, &w, &h);
@@ -1595,8 +1545,8 @@ static int bubbles_fire(struct game_context* bb) {
 
     /* get current bubble */
     bubblecur = bb->queue[bb->nextinq];
-    shotxinc = ((sin(bb->angle)>>4)*BUBBLE_WIDTH)/3;
-    shotyinc = ((-1*(cos(bb->angle)>>4))*BUBBLE_HEIGHT)/3;
+    shotxinc = ((sin_int(bb->angle)>>4)*BUBBLE_WIDTH)/3;
+    shotyinc = ((-1*(cos_int(bb->angle)>>4))*BUBBLE_HEIGHT)/3;
     shotxofs = shotyofs = 0;
 
     /* advance the queue */
@@ -2348,7 +2298,11 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
     int buttonres;
     long start;
     const struct button_mapping *plugin_contexts[]
+#if CONFIG_KEYPAD != SANSA_E200_PAD
                      = {generic_left_right_fire,generic_actions};
+#else
+                     = {generic_directions,generic_actions};
+#endif
 
     if (timeout < 0)
         timeout = 0;
@@ -2360,15 +2314,15 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
 
     switch(button){
         case BUBBLES_LEFT_REP:
-            if(bb->angle > MIN_ANGLE) bb->angle -= 4;
+            if(bb->angle > MIN_ANGLE) bb->angle -= ANGLE_STEP_REP;
         case BUBBLES_LEFT:   /* change angle to the left */
-            if(bb->angle > MIN_ANGLE) bb->angle -= 2;
+            if(bb->angle > MIN_ANGLE) bb->angle -= ANGLE_STEP;
             break;
 
         case BUBBLES_RIGHT_REP:
-            if(bb->angle < MAX_ANGLE) bb->angle += 4;
+            if(bb->angle < MAX_ANGLE) bb->angle += ANGLE_STEP_REP;
         case BUBBLES_RIGHT:  /* change angle to the right */
-            if(bb->angle < MAX_ANGLE) bb->angle += 2;
+            if(bb->angle < MAX_ANGLE) bb->angle += ANGLE_STEP;
             break;
 
         case BUBBLES_SELECT: /* fire the shot */
@@ -2457,7 +2411,8 @@ static int bubbles(struct game_context* bb) {
             rb->lcd_puts(0, 6, " and show high scores");
             rb->lcd_puts(0, 7, "LEFT/RIGHT to aim");
             rb->lcd_puts(0, 8, "UP/DOWN to change level");
-#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
             rb->lcd_puts(0, 2, "PLAY to start/pause");
             rb->lcd_puts(0, 3, "MENU to save/resume");
             rb->lcd_puts(0, 4, "MENU+SELECT to exit");
@@ -2508,8 +2463,8 @@ static int bubbles(struct game_context* bb) {
             rb->lcd_puts(0, 4, "POWER to exit");
             rb->lcd_puts(0, 5, "SELECT to fire");
             rb->lcd_puts(0, 6, " and show high scores");
-            rb->lcd_puts(0, 7, "LEFT/RIGHT to aim");
-            rb->lcd_puts(0, 8, "SCROLL to change level");
+            rb->lcd_puts(0, 7, "SCROLL to aim");
+            rb->lcd_puts(0, 8, " and change level");
 #endif
 #if LCD_WIDTH >= 138
             rb->snprintf(str, 28, "Start on level %d of %d", startlevel+1,

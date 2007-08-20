@@ -24,6 +24,7 @@
 #include "debug.h"
 #include "i2c.h"
 #include "lang.h"
+#include "led.h"
 #include "keyboard.h"
 #include "buffer.h"
 #include "backlight.h"
@@ -62,6 +63,8 @@ static bool plugin_loaded = false;
 static int  plugin_size = 0;
 static bool (*pfn_tsr_exit)(bool reenter) = NULL; /* TSR exit callback */
 static char current_plugin[MAX_PATH];
+
+char *plugin_get_current_filename(void);
 
 extern struct thread_entry threads[MAXTHREADS];
 
@@ -124,10 +127,14 @@ static const struct plugin_api rockbox_api = {
     font_get,
     font_getstringsize,
     font_get_width,
+    screen_clear_area,
 #endif
     backlight_on,
     backlight_off,
     backlight_set_timeout,
+#if CONFIG_CHARGING
+    backlight_set_timeout_plugged,
+#endif
     gui_syncsplash,
 #ifdef HAVE_REMOTE_LCD
     /* remote lcd */
@@ -222,18 +229,11 @@ static const struct plugin_api rockbox_api = {
     create_numbered_filename,
 
     /* dir */
-    PREFIX(opendir),
-    PREFIX(closedir),
-    PREFIX(readdir),
-    PREFIX(mkdir),
-    PREFIX(rmdir),
-
-    /* dir, cached */
-#ifdef HAVE_DIRCACHE
-    opendir_cached,
-    readdir_cached,
-    closedir_cached,
-#endif
+    opendir,
+    closedir,
+    readdir,
+    mkdir,
+    rmdir,
 
     /* kernel/ system */
     PREFIX(sleep),
@@ -259,10 +259,11 @@ static const struct plugin_api rockbox_api = {
     cpu_boost,
 #endif
 #endif
+#endif
     timer_register,
     timer_unregister,
     timer_set_period,
-#endif
+
     queue_init,
     queue_delete,
     queue_post,
@@ -418,7 +419,6 @@ static const struct plugin_api rockbox_api = {
     /* action handling */
     get_custom_action,
     get_action,
-    action_signalscreenchange,
     action_userabort,
 
     /* power */
@@ -445,9 +445,13 @@ static const struct plugin_api rockbox_api = {
     kbd_input,
     get_time,
     set_time,
+#if CONFIG_RTC
+    mktime,
+#endif
     plugin_get_buffer,
     plugin_get_audio_buffer,
     plugin_tsr,
+    plugin_get_current_filename,
 #ifdef IRAM_STEAL
     plugin_iram_init,
 #endif
@@ -474,6 +478,8 @@ static const struct plugin_api rockbox_api = {
 #endif
     show_logo,
     tree_get_context,
+    set_current_file,
+    set_dirfilter,
 
 #ifdef HAVE_WHEEL_POSITION
     wheel_status,
@@ -488,24 +494,23 @@ static const struct plugin_api rockbox_api = {
 #endif
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-#if NUM_CORES > 1
+
+#if (CONFIG_CODEC == SWCODEC)
     spinlock_init,
     spinlock_lock,
     spinlock_unlock,
-#endif
 
-#if (CONFIG_CODEC == SWCODEC)
     codec_load_file,
     get_codec_filename,
     get_metadata,
 #endif
+    led,
 };
 
 int plugin_load(const char* plugin, void* parameter)
 {
     int rc;
     struct plugin_header *hdr;
-    const char *p = strrchr(plugin,'/');
 #ifdef SIMULATOR
     void *pd;
 #else
@@ -521,13 +526,9 @@ int plugin_load(const char* plugin, void* parameter)
     fb_data* old_backdrop;
 #endif
 
-    if (!p)
-        p = plugin;
-    action_signalscreenchange();
-
     if (pfn_tsr_exit != NULL) /* if we have a resident old plugin: */
     {
-        if (pfn_tsr_exit(!strcmp(current_plugin,p)) == false )
+        if (pfn_tsr_exit(!strcmp(current_plugin, plugin)) == false )
         {
             /* not allowing another plugin to load */
             return PLUGIN_OK;
@@ -536,8 +537,8 @@ int plugin_load(const char* plugin, void* parameter)
         plugin_loaded = false;
     }
 
-    gui_syncsplash(0, str(LANG_WAIT));
-    strcpy(current_plugin,p);
+    gui_syncsplash(0, ID2P(LANG_WAIT));
+    strcpy(current_plugin, plugin);
 
 #ifdef SIMULATOR
     hdr = sim_plugin_load((char *)plugin, &pd);
@@ -619,7 +620,6 @@ int plugin_load(const char* plugin, void* parameter)
     rc = hdr->entry_point((struct plugin_api*) &rockbox_api, parameter);
     /* explicitly casting the pointer here to avoid touching every plugin. */
 
-    action_signalscreenchange();
     button_clear_queue();
 
 #ifdef HAVE_LCD_BITMAP
@@ -720,6 +720,10 @@ void plugin_iram_init(char *iramstart, char *iramcopy, size_t iram_size,
     memcpy(iramstart, iramcopy, iram_size);
     memset(iedata, 0, iedata_size);
     memset(iramcopy, 0, iram_size);
+#if NUM_CORES > 1
+    /* writeback cleared iedata and iramcopy areas */
+    flush_icache();
+#endif
 }
 #endif /* IRAM_STEAL */
 
@@ -729,4 +733,9 @@ void plugin_iram_init(char *iramstart, char *iramcopy, size_t iram_size,
 void plugin_tsr(bool (*exit_callback)(bool))
 {
     pfn_tsr_exit = exit_callback; /* remember the callback for later */
+}
+
+char *plugin_get_current_filename(void)
+{
+    return current_plugin;
 }

@@ -306,39 +306,6 @@ void vect_mult_bw(ogg_int32_t *data, LOOKUP_T *window, int n)
                     "cc", "memory");
 }
 
-#if 0  
-/* this routine is subsumed by Jens' asm optimised memset which appears
-   to be more efficient anyway; will eventually be deleted */
-static inline 
-void mcf5249_vect_zero(ogg_int32_t *ptr, int n)
-{
-  /* ensure ptr is aligned to 16-bytes */
-  while(n>0 && (int)ptr%16) {
-    *ptr++ = 0;
-    n--;
-  }
-  asm volatile ("clr.l %%d0;"
-                "clr.l %%d1;"
-                "clr.l %%d2;"
-                "clr.l %%d3;"
-                /* loop start */
-                "tst.l %[n];"
-                "bra 1f;"
-                "0: movem.l %%d0-%%d3, (%[ptr]);"
-                "lea (4*4, %[ptr]), %[ptr];"
-                "subq.l #4, %[n];"  /* done 4 elements */
-                "1: bgt 0b;"
-                : [n] "+d" (n), [ptr] "+a" (ptr)
-                :
-                : "%d0","%d1","%d2","%d3","cc","memory");
-  /* clear remaining elements */
-  while(n>0) {
-    *ptr++ = 0;
-    n--;
-  }
-}
-#endif
-
 #endif
 
 #endif

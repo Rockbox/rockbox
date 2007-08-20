@@ -102,18 +102,6 @@
 #define RADIO_SCAN_MODE 0
 #define RADIO_PRESET_MODE 1
 
-static const struct fm_region_setting fm_region[] = {
-    /* Note: Desriptive strings are just for display atm and are not compiled. */
-    [REGION_EUROPE] =
-        FM_REGION_ENTRY("Europe",    87500000, 108000000,  50000, 0, 0),
-    [REGION_US_CANADA] =
-        FM_REGION_ENTRY("US/Canada", 87900000, 107900000, 200000, 1, 0),
-    [REGION_JAPAN] =
-        FM_REGION_ENTRY("Japan",     76000000,  90000000, 100000, 0, 1),
-    [REGION_KOREA] =
-        FM_REGION_ENTRY("Korea",     87500000, 108000000, 100000, 0, 0),
-    };
-
 static int curr_preset = -1;
 static int curr_freq;
 static int radio_mode = RADIO_SCAN_MODE;
@@ -176,66 +164,57 @@ bool in_radio_screen(void)
 #define FMRADIO_START_PAUSED 0x8000
 void radio_start(void)
 {
-    const struct fm_region_setting *fmr;
+    const struct fm_region_data *fmr;
     bool start_paused;
-#if CONFIG_TUNER != LV24020LP
-    int mute_timeout;
-#endif
 
     if(radio_status == FMRADIO_PLAYING)
         return;
 
-    fmr = &fm_region[global_settings.fm_region];
+    fmr = &fm_region_data[global_settings.fm_region];
 
     start_paused = radio_status & FMRADIO_START_PAUSED;
     /* clear flag before any yielding */
     radio_status &= ~FMRADIO_START_PAUSED;
 
     if(radio_status == FMRADIO_OFF)
-        radio_power(true);
+        tuner_power(true);
 
     curr_freq = global_status.last_frequency 
         * fmr->freq_step + fmr->freq_min;
 
-    radio_set(RADIO_SLEEP, 0); /* wake up the tuner */
-#if (CONFIG_TUNER & LV24020LP)
-    radio_set(RADIO_REGION, global_settings.fm_region);
-    radio_set(RADIO_FORCE_MONO, global_settings.fm_force_mono);
-#endif
-    radio_set(RADIO_FREQUENCY, curr_freq);
-
-#if CONFIG_TUNER != LV24020LP
+    tuner_set(RADIO_SLEEP, 0); /* wake up the tuner */
 
     if(radio_status == FMRADIO_OFF)
     {
-#if (CONFIG_TUNER & S1A0903X01)
-        radio_set(RADIO_IF_MEASUREMENT, 0);
-        radio_set(RADIO_SENSITIVITY, 0);
+#ifdef HAVE_RADIO_REGION
+        tuner_set(RADIO_REGION, global_settings.fm_region);
 #endif
-        radio_set(RADIO_FORCE_MONO, global_settings.fm_force_mono);
-#if (CONFIG_TUNER & TEA5767)
-        radio_set(RADIO_SET_DEEMPHASIS, fmr->deemphasis);
-        radio_set(RADIO_SET_BAND, fmr->band);
-#endif
-        mute_timeout = current_tick + 1*HZ;
-    }
-    else
-    {
-        /* paused */
-        mute_timeout = current_tick + 2*HZ;
+        tuner_set(RADIO_FORCE_MONO, global_settings.fm_force_mono);
     }
 
-    while(!radio_get(RADIO_STEREO) && !radio_get(RADIO_TUNED))
+    tuner_set(RADIO_FREQUENCY, curr_freq);
+
+#ifdef HAVE_RADIO_MUTE_TIMEOUT
     {
-        if(TIME_AFTER(current_tick, mute_timeout))
-             break;
-        yield();
+        unsigned long mute_timeout = current_tick + HZ;
+        if (radio_status != FMRADIO_OFF)
+        {
+            /* paused */
+            mute_timeout += HZ;
+        }
+
+        while(!tuner_get(RADIO_STEREO) && !tuner_get(RADIO_TUNED))
+        {
+            if(TIME_AFTER(current_tick, mute_timeout))
+                 break;
+            yield();
+        }
     }
-#endif /* CONFIG_TUNER != LV24020LP */
+#endif
 
     /* keep radio from sounding initially */
     if(!start_paused)
-        radio_set(RADIO_MUTE, 0);
+        tuner_set(RADIO_MUTE, 0);
 
     radio_status = FMRADIO_PLAYING;
 } /* radio_start */
@@ -251,8 +230,8 @@ void radio_pause(void)
         radio_start();
     }
 
-    radio_set(RADIO_MUTE, 1);
-    radio_set(RADIO_SLEEP, 1);
+    tuner_set(RADIO_MUTE, 1);
+    tuner_set(RADIO_SLEEP, 1);
 
     radio_status = FMRADIO_PAUSED;
 } /* radio_pause */
@@ -262,30 +241,22 @@ void radio_stop(void)
     if(radio_status == FMRADIO_OFF)
         return;
 
-    radio_set(RADIO_MUTE, 1);
-    radio_set(RADIO_SLEEP, 1); /* low power mode, if available */
+    tuner_set(RADIO_MUTE, 1);
+    tuner_set(RADIO_SLEEP, 1); /* low power mode, if available */
     radio_status = FMRADIO_OFF;
-    radio_power(false); /* status update, power off if avail. */
+    tuner_power(false); /* status update, power off if avail. */
 } /* radio_stop */
 
 bool radio_hardware_present(void)
 {
-#ifdef HAVE_TUNER_PWR_CTRL
-    bool ret;
-    bool fmstatus = radio_power(true); /* power it up */
-    ret = radio_get(RADIO_PRESENT);
-    radio_power(fmstatus); /* restore previous state */
-    return ret;
-#else
-    return radio_get(RADIO_PRESENT);
-#endif
+    return tuner_get(RADIO_PRESENT);
 }
 
 /* Keep freq on the grid for the current region */
 static int snap_freq_to_grid(int freq)
 {
-    const struct fm_region_setting * const fmr =
-        &fm_region[global_settings.fm_region];
+    const struct fm_region_data * const fmr =
+        &fm_region_data[global_settings.fm_region];
 
     /* Range clamp if out of range or just round to nearest */
     if (freq < fmr->freq_min)
@@ -346,9 +317,8 @@ static int find_closest_preset(int freq, int direction)
 
 static void remember_frequency(void)
 {
-    const struct fm_region_setting * const fmr =
-        &fm_region[global_settings.fm_region];
-
+    const struct fm_region_data * const fmr =
+        &fm_region_data[global_settings.fm_region];
     global_status.last_frequency = (curr_freq - fmr->freq_min) 
                                    / fmr->freq_step;
     status_save();
@@ -367,15 +337,15 @@ static void next_preset(int direction)
     /* Must stay on the current grid for the region */
     curr_freq = snap_freq_to_grid(presets[curr_preset].frequency);
 
-    radio_set(RADIO_FREQUENCY, curr_freq);
+    tuner_set(RADIO_FREQUENCY, curr_freq);
     remember_frequency();
 }
 
 /* Step to the next or previous frequency */
 static int step_freq(int freq, int direction)
 {
-    const struct fm_region_setting * const fmr =
-        &fm_region[global_settings.fm_region];
+    const struct fm_region_data * const fmr =
+        &fm_region_data[global_settings.fm_region];
 
     freq += direction*fmr->freq_step;
 
@@ -402,12 +372,12 @@ static void next_station(int direction)
     curr_freq = step_freq(curr_freq, direction);
 
     if (radio_status == FMRADIO_PLAYING)
-        radio_set(RADIO_MUTE, 1);
+        tuner_set(RADIO_MUTE, 1);
 
-    radio_set(RADIO_FREQUENCY, curr_freq);
+    tuner_set(RADIO_FREQUENCY, curr_freq);
 
     if (radio_status == FMRADIO_PLAYING)
-        radio_set(RADIO_MUTE, 0);
+        tuner_set(RADIO_MUTE, 0);
 
     curr_preset = find_preset(curr_freq);
     remember_frequency();
@@ -417,7 +387,7 @@ static void next_station(int direction)
 static void end_search(void)
 {
     if (search_dir != 0 && radio_status == FMRADIO_PLAYING)
-        radio_set(RADIO_MUTE, 0);
+        tuner_set(RADIO_MUTE, 0);
     search_dir = 0;
 }
 
@@ -517,7 +487,7 @@ int radio_screen(void)
         radio_start();
 #endif
 
-   if(num_presets < 1 && yesno_pop(str(LANG_FM_FIRST_AUTOSCAN)))
+   if(num_presets < 1 && yesno_pop(ID2P(LANG_FM_FIRST_AUTOSCAN)))
         scan_presets();
     
     curr_preset = find_preset(curr_freq);
@@ -526,7 +496,7 @@ int radio_screen(void)
 
 #ifdef HAS_BUTTONBAR
     gui_buttonbar_set(&buttonbar, str(LANG_BUTTONBAR_MENU),
-        str(LANG_FM_BUTTONBAR_PRESETS), str(LANG_FM_BUTTONBAR_RECORD));
+        str(LANG_PRESET), str(LANG_FM_BUTTONBAR_RECORD));
 #endif
 
 #ifndef HAVE_NOISY_IDLE_MODE
@@ -540,7 +510,7 @@ int radio_screen(void)
             curr_freq = step_freq(curr_freq, search_dir);
             update_screen = true;
 
-            if(radio_set(RADIO_SCAN_FREQUENCY, curr_freq))
+            if(tuner_set(RADIO_SCAN_FREQUENCY, curr_freq))
             {
                 curr_preset = find_preset(curr_freq);
                 remember_frequency();
@@ -581,7 +551,7 @@ int radio_screen(void)
                     done = true;
                     if(presets_changed)
                     {
-                        if(yesno_pop(str(LANG_FM_SAVE_CHANGES)))
+                        if(yesno_pop(ID2P(LANG_FM_SAVE_CHANGES)))
                         {
                             if(filepreset[0] == '\0')
                                 save_preset_list();
@@ -636,7 +606,7 @@ int radio_screen(void)
                 ret_val = GO_TO_ROOT;
                 if(presets_changed)
                 {
-                    if(yesno_pop(str(LANG_FM_SAVE_CHANGES)))
+                    if(yesno_pop(ID2P(LANG_FM_SAVE_CHANGES)))
                     {
                         if(filepreset[0] == '\0')
                             save_preset_list();
@@ -671,7 +641,7 @@ int radio_screen(void)
                 else if (dir == 0)
                 {
                     /* Starting auto scan */
-                    radio_set(RADIO_MUTE, 1);
+                    tuner_set(RADIO_MUTE, 1);
                     update_screen = true;
                 }
                 break;
@@ -710,7 +680,7 @@ int radio_screen(void)
                 }
 #ifdef HAS_BUTTONBAR
                 gui_buttonbar_set(&buttonbar, str(LANG_BUTTONBAR_MENU),
-                                  str(LANG_FM_BUTTONBAR_PRESETS),
+                                  str(LANG_PRESET),
                                   str(LANG_FM_BUTTONBAR_RECORD));
 #endif
                 update_screen = true;
@@ -720,7 +690,7 @@ int radio_screen(void)
             case ACTION_FM_PRESET:
                 if(num_presets < 1)
                 {
-                    gui_syncsplash(HZ, str(LANG_FM_NO_PRESETS));
+                    gui_syncsplash(HZ, ID2P(LANG_FM_NO_PRESETS));
                     update_screen = true;
                     FOR_NB_SCREENS(i)
                     {
@@ -743,7 +713,7 @@ int radio_screen(void)
 #ifdef HAS_BUTTONBAR
                 gui_buttonbar_set(&buttonbar,
                                   str(LANG_BUTTONBAR_MENU),
-                                  str(LANG_FM_BUTTONBAR_PRESETS),
+                                  str(LANG_PRESET),
                                   str(LANG_FM_BUTTONBAR_RECORD));
 #endif
                 update_screen = true;
@@ -847,7 +817,7 @@ int radio_screen(void)
                 /* keep "mono" from always being displayed when paused */
                 if (radio_status != FMRADIO_PAUSED)
                 {
-                    stereo = radio_get(RADIO_STEREO) &&
+                    stereo = tuner_get(RADIO_STEREO) &&
                         !global_settings.fm_force_mono;
 
                     if(stereo != last_stereo)
@@ -888,8 +858,8 @@ int radio_screen(void)
                 FOR_NB_SCREENS(i)
                     screens[i].puts_scroll(0, top_of_screen + 2, buf);
 
-                snprintf(buf, 128, "%s %s", str(LANG_FM_TUNE_MODE),
-                         radio_mode ? str(LANG_RADIO_PRESET_MODE) :
+                snprintf(buf, 128, "%s %s", str(LANG_MODE),
+                         radio_mode ? str(LANG_PRESET) :
                                       str(LANG_RADIO_SCAN_MODE));
                 FOR_NB_SCREENS(i)
                     screens[i].puts_scroll(0, top_of_screen + 3, buf);
@@ -1026,7 +996,7 @@ static void radio_save_presets(void)
     }
     else
     {
-        gui_syncsplash(HZ, str(LANG_FM_PRESET_SAVE_FAILED));
+        gui_syncsplash(HZ, ID2P(LANG_FM_PRESET_SAVE_FAILED));
     }    
 }
 
@@ -1112,7 +1082,7 @@ static int radio_add_preset(void)
     }
     else
     {
-        gui_syncsplash(HZ, str(LANG_FM_NO_FREE_PRESETS));
+        gui_syncsplash(HZ, ID2P(LANG_FM_NO_FREE_PRESETS));
     }
     return true;
 }
@@ -1200,7 +1170,7 @@ static int save_preset_list(void)
                 if((!p1) || (len > MAX_FILENAME) || (len == 0))
                 {
                     /* no slash, too long or too short */
-                    gui_syncsplash(HZ, str(LANG_INVALID_FILENAME));                    
+                    gui_syncsplash(HZ, ID2P(LANG_INVALID_FILENAME));                    
                 }
                 else
                 {
@@ -1220,7 +1190,7 @@ static int save_preset_list(void)
         }
     }
     else
-        gui_syncsplash(HZ, str(LANG_FM_NO_PRESETS));
+        gui_syncsplash(HZ, ID2P(LANG_FM_NO_PRESETS));
         
     return true;
 }
@@ -1253,7 +1223,7 @@ int radio_preset_callback(int action, const struct menu_item_ex *this_item)
     return action;
     (void)this_item;
 }
-MAKE_MENU(handle_radio_preset_menu, ID2P(LANG_FM_BUTTONBAR_PRESETS),
+MAKE_MENU(handle_radio_preset_menu, ID2P(LANG_PRESET),
             radio_preset_callback, Icon_NOICON, &radio_edit_preset_item, 
             &radio_delete_preset_item);
 /* present a list of preset stations */
@@ -1285,12 +1255,11 @@ static int handle_radio_presets(void)
     gui_buttonbar_draw(&buttonbar);
 #endif
     gui_synclist_init(&lists, presets_get_name, NULL, false, 1);
-    gui_synclist_set_title(&lists, str(LANG_FM_BUTTONBAR_PRESETS), NOICON);
+    gui_synclist_set_title(&lists, str(LANG_PRESET), NOICON);
     gui_synclist_set_icon_callback(&lists, NULL);
     gui_synclist_set_nb_items(&lists, num_presets);
     gui_synclist_select_item(&lists, curr_preset<0 ? 0 : curr_preset);
 
-    action_signalscreenchange();
     while (result == 0)
     {
         gui_synclist_draw(&lists);
@@ -1323,29 +1292,22 @@ static int handle_radio_presets(void)
                     result = 2;
         }
     }
-    action_signalscreenchange();
     return result - 1;
 }
 
 void toggle_mono_mode(bool mono)
 {
-    radio_set(RADIO_FORCE_MONO, mono);
+    tuner_set(RADIO_FORCE_MONO, mono);
 }
 
 void set_radio_region(int region)
 {
-#if (CONFIG_TUNER & LV24020LP)
-    radio_set(RADIO_REGION, global_settings.fm_region);
-#endif
-#if (CONFIG_TUNER & TEA5767)
-    radio_set(RADIO_SET_DEEMPHASIS, 
-        fm_region[region].deemphasis);
-    radio_set(RADIO_SET_BAND, fm_region[region].band);
-#else
-    (void)region;
+#ifdef HAVE_RADIO_REGION
+    tuner_set(RADIO_REGION, region);
 #endif
     next_station(0);
     remember_frequency();
+    (void)region;
 }
 
 MENUITEM_SETTING(set_region, &global_settings.fm_region, NULL);
@@ -1356,8 +1318,8 @@ char* get_mode_text(int selected_item, void * data, char *buffer)
 {
     (void)selected_item;
     (void)data;
-    snprintf(buffer, MAX_PATH, "%s %s", str(LANG_FM_TUNE_MODE),
-             radio_mode ? str(LANG_RADIO_PRESET_MODE) :
+    snprintf(buffer, MAX_PATH, "%s %s", str(LANG_MODE),
+             radio_mode ? str(LANG_PRESET) :
                           str(LANG_RADIO_SCAN_MODE));
     return buffer;
 }
@@ -1377,19 +1339,20 @@ static int scan_presets(void)
     bool do_scan = true;
     
     if(num_presets > 0) /* Do that to avoid 2 questions. */
-        do_scan = yesno_pop(str(LANG_FM_CLEAR_PRESETS));
+        do_scan = yesno_pop(ID2P(LANG_FM_CLEAR_PRESETS));
         
     if(do_scan)
     {
-        const struct fm_region_setting * const fmr =
-            &fm_region[global_settings.fm_region];
+        const struct fm_region_data * const fmr =
+            &fm_region_data[global_settings.fm_region];
+
         char buf[MAX_FMPRESET_LEN + 1];
         int i;
 
         curr_freq = fmr->freq_min;
         num_presets = 0;
         memset(presets, 0, sizeof(presets));
-        radio_set(RADIO_MUTE, 1);
+        tuner_set(RADIO_MUTE, 1);
 
         while(curr_freq <= fmr->freq_max)
         {
@@ -1404,7 +1367,7 @@ static int scan_presets(void)
             snprintf(buf, MAX_FMPRESET_LEN, str(LANG_FM_SCANNING), freq, frac);
             gui_syncsplash(0, buf);
 
-            if(radio_set(RADIO_SCAN_FREQUENCY, curr_freq))
+            if(tuner_set(RADIO_SCAN_FREQUENCY, curr_freq))
             {
                 /* add preset */
                 snprintf(buf, MAX_FMPRESET_LEN, 
@@ -1418,7 +1381,7 @@ static int scan_presets(void)
         }
 
         if (radio_status == FMRADIO_PLAYING)
-            radio_set(RADIO_MUTE, 0);
+            tuner_set(RADIO_MUTE, 0);
 
         presets_changed = true;
         
@@ -1459,9 +1422,6 @@ static int fm_recording_screen(void)
     int rec_source = global_settings.rec_source;
     global_settings.rec_source = AUDIO_SRC_FMRADIO;
 
-    /* clearing queue seems to cure a spontaneous abort during record */
-    action_signalscreenchange();
-
     ret = recording_screen(true);
 
     /* safe to reset as changing sources is prohibited here */
@@ -1495,7 +1455,7 @@ static int fm_recording_settings(void)
 #endif /* HAVE_RECORDING */
 
 #ifdef FM_RECORDING_SCREEN
-MENUITEM_FUNCTION(recscreen_item, 0, ID2P(LANG_RECORDING_MENU), 
+MENUITEM_FUNCTION(recscreen_item, 0, ID2P(LANG_RECORDING), 
                     fm_recording_screen, NULL, NULL, Icon_Recording);
 #endif
 #ifdef FM_RECORDING_SETTINGS
@@ -1503,7 +1463,7 @@ MENUITEM_FUNCTION(recsettings_item, 0, ID2P(LANG_RECORDING_SETTINGS),
                     fm_recording_settings, NULL, NULL, Icon_Recording);
 #endif
 #ifndef FM_PRESET
-MENUITEM_FUNCTION(radio_presets_item, 0, ID2P(LANG_FM_BUTTONBAR_PRESETS), 
+MENUITEM_FUNCTION(radio_presets_item, 0, ID2P(LANG_PRESET), 
                     handle_radio_presets, NULL, NULL, Icon_NOICON);
 #endif
 #ifndef FM_PRESET_ADD

@@ -5,18 +5,34 @@
 
 struct sndchan
 {
-    int on;
-    unsigned pos;
-    int cnt, encnt, swcnt;
-    int len, enlen, swlen;
-    int swfreq;
-    int freq;
-    int envol, endir;
+    /* S1, S2, S3, S4 */
+    int on, len, skip, cont;
+    unsigned int pos;
+
+    /* S1, S2, S4 */
+    int enlen, envol, endir, enlenreload;
+    
+    /* S1, S2 */
+    const byte *wave;
+    
+    /* S1 only */
+    int swlen, swlenreload, swsteps, swstep, swdir;
+
+    /* S3 only */
+    int outputlevel;
+
+    /* S4 only */
+    int shiftskip, shiftpos, shiftright, shiftleft;
+    int nsteps, clock;
+
 };
 
 struct snd
 {
+    int level1, level2, balance;
+    bool gbDigitalSound;
     int rate;
+    int quality;
     struct sndchan ch[4];
 };
 
@@ -29,12 +45,8 @@ extern struct snd snd;
 
 byte sound_read(byte r) ICODE_ATTR;
 void sound_write(byte r, byte b) ICODE_ATTR;
-void sound_dirty(void) ICODE_ATTR;
+void sound_dirty(void);
 void sound_reset(void);
 void sound_mix(void) ICODE_ATTR;
-void s1_init(void);
-void s2_init(void);
-void s3_init(void);
-void s4_init(void);
 
 #endif

@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $$
+ * $Id$
  *
  * Copyright (C) 2007 Nicolas Pennequin, Jonathan Gordon
  *
@@ -316,7 +316,6 @@ void browse_cuesheet(struct cuesheet *cue)
                 done = true;
         }
     }
-    action_signalscreenchange();
 }
 
 bool display_cuesheet_content(char* filename)

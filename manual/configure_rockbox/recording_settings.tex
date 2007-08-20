@@ -1,6 +1,11 @@
 % $Id:$ %
 \screenshot{main_menu/images/ss-recording-settings}{The recording settings screen}{}
 
+\note{To change the location where recordings are stored open the
+      \setting{File Menu} (see \reference{ref:Filemenu}) on the directory
+      where you want to store them in the \setting{File Browser} and select
+      \setting{Set As Recording Directory}.}
+
 \opt{MASCODEC}{
   \section{Quality}
     Choose the quality here (0 to 7). Default is 5, best quality is 7,
@@ -112,11 +117,9 @@
     This is useful for ensuring that a recording begins before a cue that is
     being waited for.
 
-\section{Directory}
-    Allows changing the location where the recorded files are saved. The
-    default location is \fname{/recordings}. If set to
-    \setting{Current Directory} the recorded files will be saved in the
-    directory where the \setting{File Browser} was left.
+\section{Clear Recording Directory}
+    Resets the location where the recorded files are saved to the root of your
+    \daps{} drive.
 
 \nopt{ondio}{
   \section{Clipping Light}

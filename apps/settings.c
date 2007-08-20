@@ -143,15 +143,22 @@ static bool read_nvram_data(char* buf, int max_len)
     /* all good, so read in the settings */
     var_count = buf[3];
     buf_pos = NVRAM_DATA_START;
-    for(i=0; (i<nb_settings) && (var_count>0) && (buf_pos<max_len); i++)
+    for(i=0; i<nb_settings; i++)
     {
         int nvram_bytes = (settings[i].flags&F_NVRAM_BYTES_MASK)
                                 >>F_NVRAM_MASK_SHIFT;
         if (nvram_bytes)
         {
-            memcpy(settings[i].setting,&buf[buf_pos],nvram_bytes);
-            buf_pos += nvram_bytes;
-            var_count--;
+            if ((var_count>0) && (buf_pos<max_len))
+            {
+                memcpy(settings[i].setting,&buf[buf_pos],nvram_bytes);
+                buf_pos += nvram_bytes;
+                var_count--;
+            }
+            else /* should only happen when new items are added to the end */
+            {
+                memcpy(settings[i].setting, &settings[i].default_val, nvram_bytes);
+            }
         }
     }
     return true;
@@ -536,14 +543,15 @@ int settings_save( void )
         {
             screens[i].clear_display();
 #ifdef HAVE_LCD_CHARCELLS
-            screens[i].puts(0, 0, str(LANG_SETTINGS_SAVE_PLAYER));
-            screens[i].puts(0, 1, str(LANG_SETTINGS_BATTERY_PLAYER));
+            screens[i].puts(0, 0, str(LANG_SETTINGS_SAVE_FAILED));
+            screens[i].puts(0, 1, str(LANG_SETTINGS_PARTITION));
 #else
-            screens[i].puts(4, 2, str(LANG_SETTINGS_SAVE_RECORDER));
-            screens[i].puts(2, 4, str(LANG_SETTINGS_BATTERY_RECORDER));
+            screens[i].puts(4, 2, str(LANG_SETTINGS_SAVE_FAILED));
+            screens[i].puts(2, 4, str(LANG_SETTINGS_PARTITION));
             screens[i].update();
 #endif
         }
+        cond_talk_ids_fq(LANG_SETTINGS_SAVE_FAILED);
         sleep(HZ*2);
         return -1;
     }
@@ -575,15 +583,15 @@ bool settings_save_config(int options)
             break;
         }
         else {
-            gui_syncsplash(HZ, str(LANG_MENU_SETTING_CANCEL));
+            gui_syncsplash(HZ, ID2P(LANG_CANCEL));
             return false;
         }
     }
 
     if (settings_write_config(filename, options))
-        gui_syncsplash(HZ, str(LANG_SETTINGS_SAVED));
+        gui_syncsplash(HZ, ID2P(LANG_SETTINGS_SAVED));
     else
-        gui_syncsplash(HZ, str(LANG_FAILED));
+        gui_syncsplash(HZ, ID2P(LANG_FAILED));
     return true;
 }
 
@@ -658,7 +666,9 @@ void settings_apply(void)
     DEBUGF( "settings_apply()\n" );
     sound_settings_apply();
 
+#ifndef HAVE_FLASH_STORAGE
     audio_set_buffer_margin(global_settings.buffer_margin);
+#endif
 
 #ifdef HAVE_LCD_CONTRAST
     lcd_set_contrast(global_settings.contrast);
@@ -702,7 +712,9 @@ void settings_apply(void)
 #ifdef HAVE_BUTTON_LIGHT
     button_backlight_set_timeout(global_settings.button_light_timeout);
 #endif
+#ifndef HAVE_FLASH_STORAGE
     ata_spindown(global_settings.disk_spindown);
+#endif
 #if (CONFIG_CODEC == MAS3507D) && !defined(SIMULATOR)
     dac_line_in(global_settings.line_in);
 #endif
@@ -965,7 +977,7 @@ bool set_int(const unsigned char* string,
              int step,
              int min,
              int max,
-             void (*formatter)(char*, int, int, const char*) )
+             void (*formatter)(char*, size_t, int, const char*) )
 {
     return set_int_ex(string, unit, voice_unit, variable, function,
                       step, min, max, formatter, NULL);

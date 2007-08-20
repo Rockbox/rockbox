@@ -149,7 +149,8 @@ void I_ShutdownGraphics(void)
 // I_StartTic
 //
 
-#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 //#define DOOMBUTTON_SCROLLWHEEL
 #define DOOMBUTTON_UP         BUTTON_MENU
 #define DOOMBUTTON_WEAPON     BUTTON_SELECT
@@ -258,7 +259,8 @@ inline void getkey()
          event.type = ev_keyup;
          hswitch=0;
       }
-#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
       /* Bring up the menu */
       event.data1=KEY_ESCAPE;
 #else

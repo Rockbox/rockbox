@@ -21,6 +21,7 @@
 #include "plugin.h"
 #include "xlcd.h"
 #include "configfile.h"
+#include "helper.h"
 
 PLUGIN_HEADER
 
@@ -39,8 +40,9 @@ PLUGIN_HEADER
 #define ACTION2 BUTTON_SELECT
 #define ACTIONTEXT "SELECT"
 
-#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_4G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 
 #define QUIT BUTTON_MENU
 #define ACTION BUTTON_SELECT
@@ -603,20 +605,26 @@ static void chopDrawScene(void)
 #elif LCD_DEPTH == 2
     rb->lcd_set_foreground(LCD_WHITE);
 #endif
-
+    
 #if LCD_WIDTH <= 128
     rb->snprintf(s, sizeof(s), "Dist: %d", score);
-    rb->lcd_putsxy(1, 1, s);
-    rb->snprintf(s, sizeof(s), "Hi: %d", highscore);
-    rb->lcd_getstringsize(s, &w, NULL);
-    rb->lcd_putsxy(LCD_WIDTH - 1 - w, 1, s);
 #else
     rb->snprintf(s, sizeof(s), "Distance: %d", score);
-    rb->lcd_putsxy(2, 2, s);
-    rb->snprintf(s, sizeof(s), "Best: %d", highscore);
-    rb->lcd_getstringsize(s, &w, NULL);
-    rb->lcd_putsxy(LCD_WIDTH - 2 - w, 2, s);
 #endif
+    rb->lcd_getstringsize(s, &w, NULL);
+    rb->lcd_putsxy(2, 2, s);
+    if (score < highscore)
+    {
+        int w2;
+#if LCD_WIDTH <= 128
+        rb->snprintf(s, sizeof(s), "Hi: %d", highscore);
+#else
+        rb->snprintf(s, sizeof(s), "Best: %d", highscore);
+#endif
+        rb->lcd_getstringsize(s, &w2, NULL);
+        if (LCD_WIDTH - 2 - w2 > w + 2)
+            rb->lcd_putsxy(LCD_WIDTH - 2 - w2, 2, s);
+    }
     rb->lcd_set_drawmode(DRMODE_SOLID);
 
     rb->lcd_update();
@@ -624,7 +632,7 @@ static void chopDrawScene(void)
 
 static int chopMenu(int menunum)
 {
-    int result;
+    int result = (menunum==0)?0:1;
     int res = 0;
     bool menu_quit = false;
 
@@ -940,9 +948,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_set_foreground(LCD_WHITE);
 #endif
 
-    /* Permanently enable the backlight (unless the user has turned it off) */
-    if (rb->global_settings->backlight_timeout > 0)
-        rb->backlight_set_timeout(1);
+    /* Turn off backlight timeout */
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
 
     rb->srand( *rb->current_tick );
 
@@ -955,9 +962,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     configfile_save(CFG_FILE, config, 1, 0);
 
-    /* Restore user's original backlight setting */
     rb->lcd_setfont(FONT_UI);
-    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+    /* Turn on backlight timeout (revert to settings) */
+    backlight_use_settings(rb); /* backlight control in lib/helper.c */
 
     return ret;
 }

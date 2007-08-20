@@ -25,6 +25,8 @@
 #define LCD_HEIGHT 64
 #define LCD_DEPTH  1
 
+#define LCD_PIXELFORMAT VERTICAL_PACKING
+
 #define CONFIG_KEYPAD IRIVER_IFP7XX_PAD
 
 #define CONFIG_FLASH FLASH_IFP7XX
@@ -48,14 +50,24 @@
 
 #define HAVE_FLASH_DISK
 
-#define BATTERY_CAPACITY_DEFAULT 1000 /* default battery capacity */
-
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
 
 #define MIN_CONTRAST_SETTING        5
 #define MAX_CONTRAST_SETTING        63
 #define DEFAULT_CONTRAST_SETTING    40
+
+/* define this if you have a flash memory storage */
+#define HAVE_FLASH_STORAGE
+
+#define BATTERY_CAPACITY_DEFAULT 1000 /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 500  /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 2800 /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC 50   /* capacity increment */
+#define BATTERY_TYPES_COUNT  2    /* Alkalines or NiMH */
+
+/* define this if the unit should not shut down on low battery. */
+#define NO_LOW_BATTERY_SHUTDOWN
 
 #ifndef SIMULATOR
 
@@ -64,14 +76,6 @@
 
 /* Define this if you want to use the PNX0101 i2c interface */
 #define CONFIG_I2C I2C_PNX0101
-
-/* Type of mobile power */
-#define CONFIG_BATTERY BATT_1AA
-#define BATTERY_CAPACITY_MIN 500  /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 2800 /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC 50   /* capacity increment */
-#define BATTERY_TYPES_COUNT  2    /* Alkalines or NiMH */
-#define BATTERY_SCALE_FACTOR 3000 /* TODO: only roughly correct */
 
 /* The start address index for ROM builds */
 #define ROM_START 0x00000000

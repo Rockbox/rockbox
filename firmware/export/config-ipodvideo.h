@@ -49,6 +49,9 @@
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_PCF50605
 
+/* Define if the device can wake from an RTC alarm */
+#define HAVE_RTC_ALARM
+
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 
@@ -70,7 +73,27 @@
 /* We can fade the backlight by using PWM */
 #define HAVE_BACKLIGHT_PWM_FADING
 
-#define BATTERY_CAPACITY_DEFAULT 400 /* default battery capacity for the 30GB model */
+/* Define this if you can detect headphones */
+#define HAVE_HEADPHONE_DETECTION
+
+/* Type of mobile power */
+#if (MEM==32)  /* this is the 30GB-model */
+# define BATTERY_CAPACITY_DEFAULT 400 /* default battery capacity for the 30GB model */
+# define BATTERY_CAPACITY_MIN     300 /* min. capacity selectable */
+# define BATTERY_CAPACITY_MAX     800 /* max. capacity selectable */
+#else          /* these are the 60/80GB-models */
+# define BATTERY_CAPACITY_DEFAULT 600 /* default battery capacity for the 60/80GB model */
+# define BATTERY_CAPACITY_MIN     500 /* min. capacity selectable */
+# define BATTERY_CAPACITY_MAX    1000 /* max. capacity selectable */
+#endif
+#define BATTERY_CAPACITY_INC       50 /* capacity increment */
+#define BATTERY_TYPES_COUNT         1 /* only one type */
+
+/* Hardware controlled charging with monitoring */
+#define CONFIG_CHARGING CHARGING_MONITOR
+
+/* define this if the unit can be powered or charged via USB */
+#define HAVE_USB_POWER
 
 #ifndef SIMULATOR
 
@@ -79,17 +102,6 @@
 
 /* Define this if you want to use the PP5020 i2c interface */
 #define CONFIG_I2C I2C_PP5020
-
-/* Type of mobile power */
-#define CONFIG_BATTERY BATT_LIPOL1300
-#define BATTERY_CAPACITY_MIN 400 /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 1000 /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC 50   /* capacity increment */
-#define BATTERY_TYPES_COUNT  1    /* only one type */
-#define BATTERY_SCALE_FACTOR 5865
-
-/* Hardware controlled charging with monitoring */
-#define CONFIG_CHARGING CHARGING_MONITOR
 
 /* define this if the hardware can be powered off while charging */
 //#define HAVE_POWEROFF_WHILE_CHARGING
@@ -119,20 +131,11 @@
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_ARC
 
-/* define this if the unit can be powered or charged via USB */
-#define HAVE_USB_POWER
-
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
 
-/* Define if the device can wake from an RTC alarm */
-#define HAVE_RTC_ALARM 
-
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
-
-/* Define this if you can detect headphones */
-#define HAVE_HEADPHONE_DETECTION
 
 /* Define this if you can read an absolute wheel position */
 #define HAVE_WHEEL_POSITION

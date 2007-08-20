@@ -37,9 +37,6 @@
 #include "config.h"
 #include "system.h"
 #include "dir.h"
-#ifndef SIMULATOR
-#include "dircache.h"
-#endif
 #include "kernel.h"
 #include "thread.h"
 #include "button.h"
@@ -115,12 +112,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 62
+#define PLUGIN_API_VERSION 73
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 62
+#define PLUGIN_MIN_API_VERSION 73
 
 /* plugin return codes */
 enum plugin_status {
@@ -207,10 +204,15 @@ struct plugin_api {
     int  (*font_getstringsize)(const unsigned char *str, int *w, int *h,
                                int fontnumber);
     int (*font_get_width)(struct font* pf, unsigned short char_code);
+    void (*screen_clear_area)(struct screen * display, int xstart, int ystart,
+                              int width, int height);
 #endif
     void (*backlight_on)(void);
     void (*backlight_off)(void);
     void (*backlight_set_timeout)(int index);
+#if CONFIG_CHARGING
+    void (*backlight_set_timeout_plugged)(int index);
+#endif
     void (*splash)(int ticks, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
 
 #ifdef HAVE_REMOTE_LCD
@@ -316,17 +318,11 @@ struct plugin_api {
                                       int numberlen IF_CNFN_NUM_(, int *num));
 
     /* dir */
-    DIR* (*PREFIX(opendir))(const char* name);
-    int (*PREFIX(closedir))(DIR* dir);
-    struct dirent* (*PREFIX(readdir))(DIR* dir);
-    int (*PREFIX(mkdir))(const char *name);
-    int (*PREFIX(rmdir))(const char *name);
-    /* dir, cached */
-#ifdef HAVE_DIRCACHE
-    DIRCACHED* (*opendir_cached)(const char* name);
-    struct dircache_entry* (*readdir_cached)(DIRCACHED* dir);
-    int (*closedir_cached)(DIRCACHED* dir);
-#endif
+    DIR* (*opendir)(const char* name);
+    int (*closedir)(DIR* dir);
+    struct dirent* (*readdir)(DIR* dir);
+    int (*mkdir)(const char *name);
+    int (*rmdir)(const char *name);
 
     /* kernel/ system */
     void (*PREFIX(sleep))(int ticks);
@@ -354,12 +350,13 @@ struct plugin_api {
     void (*cpu_boost)(bool on_off);
 #endif
 #endif
+#endif
     bool (*timer_register)(int reg_prio, void (*unregister_callback)(void),
                            long cycles, int int_prio,
                            void (*timer_callback)(void));
     void (*timer_unregister)(void);
     bool (*timer_set_period)(long count);
-#endif
+
     void (*queue_init)(struct event_queue *q, bool register_queue);
     void (*queue_delete)(struct event_queue *q);
     void (*queue_post)(struct event_queue *q, long id, intptr_t data);
@@ -508,7 +505,8 @@ struct plugin_api {
     
     /* options */
     const struct settings_list* (*find_setting)(void* variable, int *id);
-    bool (*option_screen)(struct settings_list *setting, bool use_temp_var);
+    bool (*option_screen)(struct settings_list *setting,
+                          bool use_temp_var, unsigned char* option_title);
     bool (*set_option)(const char* string, void* variable,
                        enum optiontype type, const struct opt_items* options,
                        int numoptions, void (*function)(int));
@@ -518,7 +516,7 @@ struct plugin_api {
                              void (*function)(bool));
     bool (*set_int)(const unsigned char* string, const char* unit, int voice_unit,
                     int* variable, void (*function)(int), int step, int min,
-                    int max, void (*formatter)(char*, int, int, const char*) );
+                    int max, void (*formatter)(char*, size_t, int, const char*) );
     bool (*set_bool)(const char* string, bool* variable );
 
 #ifdef HAVE_LCD_COLOR
@@ -529,7 +527,6 @@ struct plugin_api {
     int (*get_custom_action)(int context,int timeout,
                           const struct button_mapping* (*get_context_map)(int));
     int (*get_action)(int context, int timeout);
-    void (*action_signalscreenchange)(void);
     bool (*action_userabort)(int timeout);
 
     /* power */
@@ -557,9 +554,13 @@ struct plugin_api {
     int (*kbd_input)(char* buffer, int buflen);
     struct tm* (*get_time)(void);
     int  (*set_time)(const struct tm *tm);
+#if CONFIG_RTC
+    time_t (*mktime)(struct tm *t);
+#endif
     void* (*plugin_get_buffer)(size_t *buffer_size);
     void* (*plugin_get_audio_buffer)(size_t *buffer_size);
     void (*plugin_tsr)(bool (*exit_callback)(bool reenter));
+    char* (*plugin_get_current_filename)(void);
 #ifdef IRAM_STEAL
     void (*plugin_iram_init)(char *iramstart, char *iramcopy, size_t iram_size,
                              char *iedata, size_t iedata_size);
@@ -595,6 +596,8 @@ struct plugin_api {
 #endif
     int (*show_logo)(void);
     struct tree_context* (*tree_get_context)(void);
+    void (*set_current_file)(char* path);
+    void (*set_dirfilter)(int l_dirfilter);
 
 #ifdef HAVE_WHEEL_POSITION
     int (*wheel_status)(void);
@@ -610,18 +613,17 @@ struct plugin_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
-#if NUM_CORES > 1
+#if (CONFIG_CODEC == SWCODEC)
     void (*spinlock_init)(struct mutex *m);
     void (*spinlock_lock)(struct mutex *m);
     void (*spinlock_unlock)(struct mutex *m);
-#endif
 
-#if (CONFIG_CODEC == SWCODEC)
     int (*codec_load_file)(const char* codec, struct codec_api *api);
     const char *(*get_codec_filename)(int cod_spec);
-    bool (*get_metadata)(struct track_info* track, int fd, const char* trackname,
+    bool (*get_metadata)(struct mp3entry* id3, int fd, const char* trackname,
                          bool v1first);
 #endif
+    void (*led)(bool on);
 };
 
 /* plugin header */

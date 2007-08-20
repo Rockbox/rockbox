@@ -23,12 +23,14 @@
 ****************************************************************************/
 
 #include "plugin.h"
+#include "helper.h"
 
 #ifdef HAVE_LCD_BITMAP
 
 #ifndef HAVE_LCD_COLOR
 #include "gray.h"
 #endif
+#include "fixedpoint.h"
 
 PLUGIN_HEADER
 
@@ -51,7 +53,8 @@ static unsigned char sp1, sp2, sp3, sp4; /* Speed of plasma */
 static int plasma_frequency;
 
 /* Key assignement, all bitmapped models */
-#if (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define PLASMA_QUIT BUTTON_MENU
 #define PLASMA_INCREASE_FREQUENCY BUTTON_SCROLL_FWD
 #define PLASMA_DECREASE_FREQUENCY BUTTON_SCROLL_BACK
@@ -100,60 +103,6 @@ static int plasma_frequency;
 
 #define WAV_AMP 90
 
-
-/* Precalculated sine * 16384 (fixed point 18.14) */
-static const short sin_table[91] =
-{
-    0,   285,   571,   857,  1142,  1427,  1712,  1996,  2280,  2563,
-    2845,  3126,  3406,  3685,  3963,  4240,  4516,  4790,  5062,  5334,
-    5603,  5871,  6137,  6401,  6663,  6924,  7182,  7438,  7691,  7943,
-    8191,  8438,  8682,  8923,  9161,  9397,  9630,  9860, 10086, 10310,
-    10531, 10748, 10963, 11173, 11381, 11585, 11785, 11982, 12175, 12365,
-    12550, 12732, 12910, 13084, 13254, 13420, 13582, 13740, 13894, 14043,
-    14188, 14329, 14466, 14598, 14725, 14848, 14967, 15081, 15190, 15295,
-    15395, 15491, 15582, 15668, 15749, 15825, 15897, 15964, 16025, 16082,
-    16135, 16182, 16224, 16261, 16294, 16321, 16344, 16361, 16374, 16381,
-    16384
-};
-
-static short sin(int val)
-{
-    /* value should be between 0 and 360 degree for correct lookup*/
-    val%=360;
-    if(val<0)
-        val+=360;
-
-    /* Speed improvement through successive lookup */
-    if (val < 181)
-    {
-        if (val < 91)
-        {
-            /* phase 0-90 degree */
-            return (short)sin_table[val];
-        }
-        else
-        {
-            /* phase 91-180 degree */
-            return (short)sin_table[180-val];
-        }
-    }
-    else
-    {
-        if (val < 271)
-        {
-            /* phase 181-270 degree */
-            return -(short)sin_table[val-180];
-        }
-        else
-        {
-            /* phase 270-359 degree */
-            return -(short)sin_table[360-val];
-        }
-    }
-    return 0;
-}
-
-
 /*
  * Main wave function so we don't have to re-calc the sine 
  * curve every time. Mess around WAV_AMP and FREQ to make slighlty
@@ -166,7 +115,7 @@ static void wave_table_generate(void)
     for (i=0;i<256;++i)
     {
         wave_array[i] = (unsigned char)((WAV_AMP
-                      * (sin((i * 360 * plasma_frequency) / 256))) / 16384);
+                      * (sin_int((i * 360 * plasma_frequency) / 256))) / 16384);
     }
 }
 
@@ -222,7 +171,8 @@ void cleanup(void *parameter)
 #ifndef HAVE_LCD_COLOR
     gray_release();
 #endif
-    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+    /* Turn on backlight timeout (revert to settings) */
+    backlight_use_settings(rb); /* backlight control in lib/helper.c */
 }
 
 /*
@@ -351,8 +301,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif
-    if (rb->global_settings->backlight_timeout > 0)
-        rb->backlight_set_timeout(1);/* keep the light on */
+    /* Turn off backlight timeout */
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
 
     ret = main();
 

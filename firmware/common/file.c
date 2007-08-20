@@ -21,7 +21,7 @@
 #include <stdbool.h>
 #include "file.h"
 #include "fat.h"
-#include "dir.h"
+#include "dir_uncached.h"
 #include "debug.h"
 #include "dircache.h"
 #include "system.h"
@@ -59,8 +59,8 @@ int creat(const char *pathname)
 
 static int open_internal(const char* pathname, int flags, bool use_cache)
 {
-    DIR* dir;
-    struct dirent* entry;
+    DIR_UNCACHED* dir;
+    struct dirent_uncached* entry;
     int fd;
     char pathnamecopy[MAX_PATH];
     char* name;
@@ -134,12 +134,12 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
     name=strrchr(pathnamecopy+1,'/');
     if ( name ) {
         *name = 0; 
-        dir = opendir(pathnamecopy);
+        dir = opendir_uncached(pathnamecopy);
         *name = '/';
         name++;
     }
     else {
-        dir = opendir("/");
+        dir = opendir_uncached("/");
         name = pathnamecopy+1;
     }
     if (!dir) {
@@ -153,12 +153,12 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
         DEBUGF("Empty file name\n");
         errno = EINVAL;
         file->busy = false;
-        closedir(dir);
+        closedir_uncached(dir);
         return -5;
     }
     
     /* scan dir for name */
-    while ((entry = readdir(dir))) {
+    while ((entry = readdir_uncached(dir))) {
         if ( !strcasecmp(name, entry->d_name) ) {
             fat_open(IF_MV2(dir->fatdir.file.volume,)
                      entry->startcluster,
@@ -180,7 +180,7 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
                 DEBUGF("Couldn't create %s in %s\n",name,pathnamecopy);
                 errno = EIO;
                 file->busy = false;
-                closedir(dir);
+                closedir_uncached(dir);
                 return rc * 10 - 6;
             }
 #ifdef HAVE_DIRCACHE
@@ -193,18 +193,18 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
             DEBUGF("Couldn't find %s in %s\n",name,pathnamecopy);
             errno = ENOENT;
             file->busy = false;
-            closedir(dir);
+            closedir_uncached(dir);
             return -7;
         }
     } else {
         if(file->write && (file->attr & FAT_ATTR_DIRECTORY)) {
             errno = EISDIR;
             file->busy = false;
-            closedir(dir);
+            closedir_uncached(dir);
             return -8;
         }
     }
-    closedir(dir);
+    closedir_uncached(dir);
 
     file->cacheoffset = -1;
     file->fileoffset = 0;
@@ -327,7 +327,7 @@ int remove(const char* name)
 int rename(const char* path, const char* newpath)
 {
     int rc, fd;
-    DIR* dir;
+    DIR_UNCACHED* dir;
     char* nameptr;
     char* dirptr;
     struct filedesc* file;
@@ -371,7 +371,7 @@ int rename(const char* path, const char* newpath)
         dirptr = "/";
     }
     
-    dir = opendir(dirptr);
+    dir = opendir_uncached(dirptr);
     if(!dir)
         return - 5;
     
@@ -401,7 +401,7 @@ int rename(const char* path, const char* newpath)
         return rc * 10 - 8;
     }
 
-    rc = closedir(dir);
+    rc = closedir_uncached(dir);
     if (rc<0) {
         errno = EIO;
         return rc * 10 - 9;

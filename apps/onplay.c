@@ -160,12 +160,12 @@ static bool add_to_playlist(int position, bool queue)
 {
     bool new_playlist = !(audio_status() & AUDIO_STATUS_PLAY);
     char *lines[] = {
-        (char *)str(LANG_RECURSE_DIRECTORY_QUESTION),
+        ID2P(LANG_RECURSE_DIRECTORY_QUESTION),
         selected_file
     };
     struct text_message message={lines, 2};
 
-    gui_syncsplash(0, str(LANG_WAIT));
+    gui_syncsplash(0, ID2P(LANG_WAIT));
     
     if (new_playlist)
         playlist_create(NULL, NULL);
@@ -295,7 +295,7 @@ MENUITEM_FUNCTION(playlist_save_item, 0, ID2P(LANG_SAVE_DYNAMIC_PLAYLIST),
                   save_playlist, NULL, NULL, Icon_Playlist);
 MENUITEM_FUNCTION(reshuffle_item, 0, ID2P(LANG_SHUFFLE_PLAYLIST),
                   shuffle_playlist, NULL, NULL, Icon_Playlist);
-MAKE_ONPLAYMENU( wps_playlist_menu, ID2P(LANG_PLAYLIST_MENU), 
+MAKE_ONPLAYMENU( wps_playlist_menu, ID2P(LANG_PLAYLIST), 
                  NULL, Icon_Playlist, 
                  &playlist_viewer_item, &search_playlist_item,
                  &playlist_save_item, &reshuffle_item
@@ -373,7 +373,7 @@ MENUITEM_FUNCTION(view_playlist_item, 0, ID2P(LANG_VIEW),
                   view_playlist, NULL,
                   treeplaylist_callback, Icon_Playlist);
 
-MAKE_ONPLAYMENU( tree_playlist_menu, ID2P(LANG_PLAYLIST_MENU), 
+MAKE_ONPLAYMENU( tree_playlist_menu, ID2P(LANG_PLAYLIST), 
                  treeplaylist_callback, Icon_Playlist,
                  
                  /* view */
@@ -487,8 +487,13 @@ static int remove_dir(char* dirname, int len)
         }
         else
         {   /* remove a file */
+#ifdef HAVE_LCD_BITMAP
             FOR_NB_SCREENS(i)
-                screens[i].puts_scroll(0,2,entry->d_name);
+            {
+                show_busy_slider(&screens[i], 2, 3*screens[i].char_height,
+                                 LCD_WIDTH-4, screens[i].char_height);
+            }
+#endif
             result = remove(dirname);
         }
 #ifdef HAVE_LCD_BITMAP
@@ -497,7 +502,7 @@ static int remove_dir(char* dirname, int len)
 #endif
         if(ACTION_STD_CANCEL == get_action(CONTEXT_STD,TIMEOUT_NOBLOCK))
         {
-            gui_syncsplash(HZ, str(LANG_MENU_SETTING_CANCEL));
+            gui_syncsplash(HZ, ID2P(LANG_CANCEL));
             result = -1;
             break;
         }
@@ -519,11 +524,11 @@ static int remove_dir(char* dirname, int len)
 static bool delete_handler(bool is_dir)
 {
     char *lines[]={
-        (char *)str(LANG_REALLY_DELETE),
+        ID2P(LANG_REALLY_DELETE),
         selected_file
     };
     char *yes_lines[]={
-        (char *)str(LANG_DELETED),
+        ID2P(LANG_DELETED),
         selected_file
     };
 
@@ -594,6 +599,7 @@ static bool rename_file(void)
             lcd_puts(0,0,str(LANG_RENAME));
             lcd_puts(0,1,str(LANG_FAILED));
             lcd_update();
+            cond_talk_ids_fq(LANG_RENAME, LANG_FAILED);
             sleep(HZ*2);
         }
         else
@@ -623,6 +629,7 @@ static bool create_dir(void)
 
     rc = mkdir(dirname);
     if (rc < 0) {
+        cond_talk_ids_fq(LANG_CREATE_DIR, LANG_FAILED);
         gui_syncsplash(HZ, (unsigned char *)"%s %s",
                        str(LANG_CREATE_DIR), str(LANG_FAILED));
     } else {
@@ -660,6 +667,21 @@ static bool clipboard_copy(void)
 {
     return clipboard_clip(true);
 }
+
+#ifdef HAVE_LCD_BITMAP
+static inline void draw_slider(void)
+{
+    int i;
+    FOR_NB_SCREENS(i)
+    {
+        show_busy_slider(&screens[i], 2, LCD_HEIGHT/4,
+                         LCD_WIDTH-4, screens[i].char_height);
+        screens[i].update();
+    }
+}
+#else
+#define draw_slider()
+#endif
 
 /* Paste a file to a new directory. Will overwrite always. */
 static bool clipboard_pastefile(const char *src, const char *target, bool copy)
@@ -721,6 +743,7 @@ static bool clipboard_pastefile(const char *src, const char *target, bool copy)
                         }
 
                         bytesread -= byteswritten;
+                        draw_slider();
                     }
                 }
 
@@ -852,7 +875,7 @@ static bool clipboard_paste(void)
     bool success;
     int target_fd;
 
-    unsigned char *lines[]={str(LANG_REALLY_OVERWRITE)};
+    unsigned char *lines[]={ID2P(LANG_REALLY_OVERWRITE)};
     struct text_message message={(char **)lines, 1};
 
     /* Get the name of the current directory */
@@ -875,11 +898,11 @@ static bool clipboard_paste(void)
     }
 
     if (clipboard_is_copy) {
-        gui_syncsplash(0, str(LANG_COPYING));
+        gui_syncsplash(0, ID2P(LANG_COPYING));
     }
     else
     {
-        gui_syncsplash(0, str(LANG_MOVING));
+        gui_syncsplash(0, ID2P(LANG_MOVING));
     }
 
     /* Now figure out what we're doing */
@@ -918,6 +941,7 @@ static bool clipboard_paste(void)
         /* Force reload of the current directory */
         onplay_result = ONPLAY_RELOAD_DIR;
     } else {
+        cond_talk_ids_fq(LANG_PASTE, LANG_FAILED);
         gui_syncsplash(HZ, (unsigned char *)"%s %s",
                str(LANG_PASTE), str(LANG_FAILED));
     }
@@ -953,11 +977,14 @@ char *rating_name(int selected_item, void * data, char *buffer)
 static bool set_rating_inline(void)
 {
     struct mp3entry* id3 = audio_current_track();
-    if(id3) {
-        if(id3->rating<10) 
+    if (id3 && id3->tagcache_idx) 
+    {
+        if (id3->rating<10) 
             id3->rating++;
         else
             id3->rating=0;
+        
+        tagcache_update_numeric(id3->tagcache_idx, tag_rating, id3->rating);
     }
     return false;
 }
@@ -1053,7 +1080,15 @@ static bool set_recdir(void)
 MENUITEM_FUNCTION(set_recdir_item, 0, ID2P(LANG_SET_AS_REC_DIR),
                   set_recdir, NULL, clipboard_callback, Icon_Recording);
 #endif
-
+static bool add_to_faves(void)
+{
+    if(PLUGIN_USB_CONNECTED == filetype_load_plugin("shortcuts",
+                                                    selected_file))
+        onplay_result = ONPLAY_RELOAD_DIR;
+    return false;
+}
+MENUITEM_FUNCTION(add_to_faves_item, 0, ID2P(LANG_ADD_TO_FAVES),
+                  add_to_faves, NULL, clipboard_callback, Icon_NOICON);
 
 
 static int clipboard_callback(int action,const struct menu_item_ex *this_item)
@@ -1072,7 +1107,8 @@ static int clipboard_callback(int action,const struct menu_item_ex *this_item)
                      (this_item == &properties_item) || 
                      (this_item == &rename_file_item) ||
                      (this_item == &clipboard_cut_item) ||
-                     (this_item == &clipboard_copy_item)
+                     (this_item == &clipboard_copy_item) ||
+                     (this_item == &add_to_faves_item)
                     )
             {
                 /* always visible */
@@ -1132,7 +1168,7 @@ MAKE_ONPLAYMENU( wps_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
 #ifdef HAVE_TAGCACHE
            &rating_item, 
 #endif
-           &bookmark_menu, &browse_id3_item, &view_cue_item,
+           &bookmark_menu, &browse_id3_item, &delete_file_item, &view_cue_item,
 #ifdef HAVE_PITCHSCREEN
            &pitch_screen_item,
 #endif
@@ -1153,6 +1189,7 @@ MAKE_ONPLAYMENU( tree_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
 #ifdef HAVE_RECORDING
            &set_recdir_item,
 #endif
+           &add_to_faves_item,
          );
 int onplay(char* file, int attr, int from)
 {

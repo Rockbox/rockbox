@@ -5499,7 +5499,7 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_ID3_FRECUENCY
+  id: LANG_ID3_FREQUENCY
   desc: in tag viewer
   user:
   <source>

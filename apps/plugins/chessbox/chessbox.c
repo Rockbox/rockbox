@@ -41,7 +41,8 @@ extern const fb_data chessbox_pieces[];
 PLUGIN_HEADER
 
 /* button definitions */
-#if (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define CB_SELECT  BUTTON_SELECT
 #define CB_UP      BUTTON_MENU
 #define CB_DOWN    BUTTON_PLAY
@@ -240,7 +241,7 @@ PLUGIN_HEADER
 #define YOFS ((LCD_HEIGHT-8*TILE_HEIGHT)/2)
 
 /* save files */
-#define SAVE_FILE  PLUGIN_DIR "/chessbox.save"
+#define SAVE_FILE  PLUGIN_GAMES_DIR "/chessbox.save"
 
 /* commands enum */
 #define COMMAND_NOP        0
@@ -1031,6 +1032,7 @@ void cb_play_game(void) {
                     computer = black;
                 }
                 rb->splash ( 0 , "Thinking..." );
+                ElapsedTime(1);
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
                 rb->cpu_boost ( true );
 #endif

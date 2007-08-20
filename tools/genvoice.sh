@@ -34,19 +34,26 @@ TTS_ENGINE=festival
 ENCODER=lame
 # Where to save temporary files
 TEMPDIR=/tmp
+# List of IDs to send to voicefont
+VOICEFONTIDS=voicefontids
 
 ###################
 # End of settings #
 ###################
 
+TARGET_ID="$4"
 createvoicefile() {
-    $VOICEFONT "$LANG_FILE" "$TEMPDIR/" "./$RLANG.voice"
+    RLANG="$1"
+    $GENLANG -e=$ENGLISH -o -t=$TARGET $LANG_FILE > $VOICEFONTIDS
+    $VOICEFONT "$VOICEFONTIDS" "$TARGET_ID" "$TEMPDIR/" "./$RLANG.voice"
+    rm -f $VIOCEFONTIDS
 }
 
 deletefiles() {
     # XXX: might be unsafe depending on the value of TEMPDIR
     rm -f "${TEMPDIR}"/LANG_*
     rm -f "${TEMPDIR}"/VOICE_*
+    rm -f "${TEMPDIR}"/NOT_USED_*
 }
 
 generateclips() {
@@ -72,16 +79,18 @@ generateclips() {
             2)
                 # String
                 STRING=`echo $line |cut -b 8-`
+                # xxx: Should the hash include encoder/tts options?
+                POOL_FILE=${POOL}/`echo "$STRING" |md5sum|cut -b-32`-${RLANG}.mp3
 
                 if [ -n "$POOL" ]; then
                     # we have a common pool of snippets, check that first
                     # for available mp3 sounds, and if it is available copy
                     # (symlink!) it over
-                    if [ -f "$POOL/$STRING.mp3" ]; then
-                        echo "Re-using $ID from pool"
+                    if [ -f "$POOL_FILE" ]; then
+                        echo "Re-using $ID from pool (${POOL_FILE})"
                         if [ ! -e "$TEMPDIR/$ID".mp3 ]; then
                             # only do this if not present
-                            ln -s "$POOL/$STRING.mp3" "$TEMPDIR/$ID".mp3
+                            cp -f "$POOL_FILE" "$TEMPDIR/$ID".mp3
                         fi
                     fi
                 fi
@@ -92,8 +101,8 @@ generateclips() {
                     voice "$STRING" "$TEMPDIR/$ID".wav
                     if [ -n "$POOL" ]; then
                         # create it in the pool, symlink it back
-                        encode "$TEMPDIR/$ID".wav "$POOL/$STRING".mp3
-                        ln -s "$POOL/$STRING.mp3" "$TEMPDIR/$ID".mp3
+                        encode "$TEMPDIR/$ID".wav "$POOL_FILE"
+                        cp -f "$POOL_FILE" "$TEMPDIR/$ID".mp3
                     else
                         encode "$TEMPDIR/$ID".wav "$TEMPDIR/$ID".mp3
                     fi
@@ -105,24 +114,25 @@ generateclips() {
     )
 }
 
-if [ -z "$3" ]; then
-    echo "Usage: $0 rockboxdirectory language target [settingsfile]";
+if [ -z "$4" ]; then
+    echo "Usage: $0 rockboxdirectory language target targetid [settingsfile]";
     exit 32
 else
     if [ ! -d "$1" ] || [ ! -f "$1/tools/genlang" ]; then
         echo "Error: $1 is not a Rockbox directory"
         exit 33
     fi
+    # Check for valid language
     if [ ! -f "$1/apps/lang/$2.lang" ]; then
         echo "Error: $2 is not a valid language"
         exit 34
     fi
-    if [ ! -z "$4" ]; then
-        if [ -f "$4" ]; then
+    if [ ! -z "$5" ]; then
+        if [ -f "$5" ]; then
             # Read settings from file
-            source "$4"
+            . "$5"
         else
-            echo "Error: $4 does not exist"
+            echo "Error: $5 does not exist"
             exit 36
         fi
     fi
@@ -139,5 +149,5 @@ init_tts
 init_encoder
 generateclips "$1" "$2" "$3"
 stop_tts
-createvoicefile
-#deletefiles
+createvoicefile "$2"
+deletefiles

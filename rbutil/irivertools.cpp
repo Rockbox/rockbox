@@ -19,7 +19,6 @@
  ****************************************************************************/
 
 #include "irivertools.h"
-#include "md5sum.h"
 
 
 const unsigned char munge[] = {

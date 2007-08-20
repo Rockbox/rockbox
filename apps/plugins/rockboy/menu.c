@@ -8,6 +8,7 @@
 #include "rockmacros.h"
 #include "mem.h"
 #include "lib/oldmenuapi.h"
+#include "rtc-gb.h"
 
 #if (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define MENU_BUTTON_UP BUTTON_SCROLL_BACK
@@ -84,6 +85,11 @@ int do_user_menu(void) {
     bool done=false;
     int m, ret=0;
     int result;
+    int time = 0;
+    
+#if CONFIG_RTC    
+    time = rb->mktime(rb->get_time());
+#endif
 
     /* Clean out the button Queue */
     while (rb->button_get(false) != BUTTON_NONE) 
@@ -129,6 +135,12 @@ int do_user_menu(void) {
 
     rb->lcd_setfont(0); /* Reset the font */
     rb->lcd_clear_display(); /* Clear display for screen size changes */
+    
+    /* Keep the RTC in sync */
+#if CONFIG_RTC
+    time = (rb->mktime(rb->get_time()) - time) * 60;
+#endif
+    while (time-- > 0) rtc_tick();
 
     return ret;
 }

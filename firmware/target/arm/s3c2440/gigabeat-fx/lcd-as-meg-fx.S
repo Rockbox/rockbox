@@ -144,9 +144,9 @@ lcd_write_yuv420_lines:
     sub         r8, r8, #128            @ Cb -= 128
     sub         r11, r11, #128          @ Cr -= 128
                                         @
-    mvn         r2, #24                 @ compute guv
+    mvn         r2, #23                 @ compute guv
     mul         r10, r2, r8             @ r10 = Cb*-24
-    mvn         r2, #51                 @
+    mvn         r2, #50                 @
     mla         r10, r2, r11, r10       @ r10 = r10 + Cr*-51
                                         @
     mov         r2, #101                @ compute rv

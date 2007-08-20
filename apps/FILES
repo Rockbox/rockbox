@@ -40,6 +40,7 @@ metadata/*.[ch]
 player/*.[ch]
 plugins/*.[ch]
 plugins/*.pl
+plugins/CATEGORIES
 plugins/Makefile
 plugins/plugin.lds
 plugins/snake2.levels
@@ -92,4 +93,7 @@ plugins/zxbox/SOURCES
 plugins/reversi/*.[ch]
 plugins/reversi/Makefile
 plugins/reversi/SOURCES
+plugins/clock/*.[ch]
+plugins/clock/Makefile
+plugins/clock/SOURCES
 recorder/*.[ch]

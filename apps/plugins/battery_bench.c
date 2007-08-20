@@ -64,7 +64,8 @@ PLUGIN_HEADER
 #define BATTERY_RC_OFF BUTTON_RC_STOP
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD)
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 
 #define BATTERY_ON  BUTTON_PLAY
 #define BATTERY_OFF BUTTON_MENU
@@ -187,15 +188,17 @@ void thread(void)
 #if  CONFIG_CHARGING || defined(HAVE_USB_POWER) 
     unsigned int last_state = 0;
 #endif    
-    long sleep_time;
+    long sleep_time = 5 * HZ;
     
     struct event ev;
 
     buffelements = sizeof(bat)/sizeof(struct batt_info);
 
-    sleep_time = (rb->global_settings->disk_spindown > 1) ?
-        (rb->global_settings->disk_spindown - 1) * HZ : 5 * HZ;
-    
+#ifndef HAVE_FLASH_STORAGE
+    if(rb->global_settings->disk_spindown > 1)
+        sleep_time = (rb->global_settings->disk_spindown - 1) * HZ;
+#endif
+
     do
     {
         if(!in_usb_mode && got_info && 
@@ -247,10 +250,9 @@ void thread(void)
                                 bat[j].eta / 60, bat[j].eta % 60, 
 #if CONFIG_CHARGING || defined(HAVE_USB_POWER)
                                 (bat[j].voltage & 
-                                 (~(BIT_CHARGER|BIT_CHARGING|BIT_USB_POWER)))
-                                *10,
+                                 (~(BIT_CHARGER|BIT_CHARGING|BIT_USB_POWER))),
 #else
-                                bat[j].voltage * 10,
+                                bat[j].voltage,
 #endif
                                 temp + 1 + (j-i)
 #if CONFIG_CHARGING

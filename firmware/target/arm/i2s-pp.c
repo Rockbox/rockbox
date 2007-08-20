@@ -25,6 +25,7 @@
  ****************************************************************************/
 
 #include "system.h"
+#include "cpu.h"
 
 /* TODO: Add in PP5002 defs */
 #if CONFIG_CPU == PP5002
@@ -140,4 +141,34 @@ void i2s_reset(void)
     /* Rx.CLR = 1, TX.CLR = 1 */
     IISFIFO_CFG |= 0x1100;
 }
+
+#ifdef SANSA_E200
+void i2s_scale_attn_level(long frequency)
+{
+    unsigned int iisfifo_cfg = IISFIFO_CFG & ~0xff;
+
+    /* TODO: set this more appropriately for frequency */
+    if (frequency <= CPUFREQ_DEFAULT)
+    {
+        /* when 4 slots full */
+        /* when 4 slots empty */
+        iisfifo_cfg |= 0x11;
+    }
+    else if (frequency < CPUFREQ_MAX)
+    {
+        /* when 8 slots full */
+        /* when 8 slots empty */
+        iisfifo_cfg |= 0x22;
+    }
+    else
+    {
+        /* when 12 slots full */
+        /* when 12 slots empty */
+        iisfifo_cfg |= 0x33;
+    }
+
+    IISFIFO_CFG = iisfifo_cfg;
+}
+#endif /* SANSA_E200 */
+
 #endif

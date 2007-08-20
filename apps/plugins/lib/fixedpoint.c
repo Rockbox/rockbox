@@ -60,6 +60,21 @@ static const unsigned long atan_table[] = {
     0x00000000, /* +0.000000000 */
 };
 
+/* Precalculated sine and cosine * 16384 (2^14) (fixed point 18.14) */
+static const short sin_table[91] =
+{
+        0,   285,   571,   857,  1142,  1427,  1712,  1996,  2280,  2563,
+     2845,  3126,  3406,  3685,  3963,  4240,  4516,  4790,  5062,  5334,
+     5603,  5871,  6137,  6401,  6663,  6924,  7182,  7438,  7691,  7943,
+     8191,  8438,  8682,  8923,  9161,  9397,  9630,  9860, 10086, 10310,
+    10531, 10748, 10963, 11173, 11381, 11585, 11785, 11982, 12175, 12365,
+    12550, 12732, 12910, 13084, 13254, 13420, 13582, 13740, 13894, 14043,
+    14188, 14329, 14466, 14598, 14725, 14848, 14967, 15081, 15190, 15295,
+    15395, 15491, 15582, 15668, 15749, 15825, 15897, 15964, 16025, 16082,
+    16135, 16182, 16224, 16261, 16294, 16321, 16344, 16361, 16374, 16381,
+    16384
+};
+
 /**
  * Implements sin and cos using CORDIC rotation.
  *
@@ -136,3 +151,84 @@ long fsqrt(long a, unsigned int fracbits)
     return b;
 }
 
+/**
+ * Fixed point sinus using a lookup table
+ * don't forget to divide the result by 16384 to get the actual sinus value
+ * @param val sinus argument in degree
+ * @return sin(val)*16384
+ */
+long sin_int(int val)
+{
+    val = (val+360)%360;
+    if (val < 181)
+    {
+        if (val < 91)/* phase 0-90 degree */
+            return (long)sin_table[val];
+        else/* phase 91-180 degree */
+            return (long)sin_table[180-val];
+    }
+    else
+    {
+        if (val < 271)/* phase 181-270 degree */
+            return -(long)sin_table[val-180];
+        else/* phase 270-359 degree */
+            return -(long)sin_table[360-val];
+    }
+    return 0;
+}
+
+/**
+ * Fixed point cosinus using a lookup table
+ * don't forget to divide the result by 16384 to get the actual cosinus value
+ * @param val sinus argument in degree
+ * @return cos(val)*16384
+ */
+long cos_int(int val)
+{
+    val = (val+360)%360;
+    if (val < 181)
+    {
+        if (val < 91)/* phase 0-90 degree */
+            return (long)sin_table[90-val];
+        else/* phase 91-180 degree */
+            return -(long)sin_table[val-90];
+    }
+    else
+    {
+        if (val < 271)/* phase 181-270 degree */
+            return -(long)sin_table[270-val];
+        else/* phase 270-359 degree */
+            return (long)sin_table[val-270];
+    }
+    return 0;
+}
+
+/**
+ * Fixed-point natural log
+ * taken from http://www.quinapalus.com/efunc.html
+ *  "The code assumes integers are at least 32 bits long. The (positive)
+ *   argument and the result of the function are both expressed as fixed-point
+ *   values with 16 fractional bits, although intermediates are kept with 28
+ *   bits of precision to avoid loss of accuracy during shifts."
+ */
+
+long flog(int x) {
+    long t,y;
+
+    y=0xa65af;
+    if(x<0x00008000) x<<=16,              y-=0xb1721;
+    if(x<0x00800000) x<<= 8,              y-=0x58b91;
+    if(x<0x08000000) x<<= 4,              y-=0x2c5c8;
+    if(x<0x20000000) x<<= 2,              y-=0x162e4;
+    if(x<0x40000000) x<<= 1,              y-=0x0b172;
+    t=x+(x>>1); if((t&0x80000000)==0) x=t,y-=0x067cd;
+    t=x+(x>>2); if((t&0x80000000)==0) x=t,y-=0x03920;
+    t=x+(x>>3); if((t&0x80000000)==0) x=t,y-=0x01e27;
+    t=x+(x>>4); if((t&0x80000000)==0) x=t,y-=0x00f85;
+    t=x+(x>>5); if((t&0x80000000)==0) x=t,y-=0x007e1;
+    t=x+(x>>6); if((t&0x80000000)==0) x=t,y-=0x003f8;
+    t=x+(x>>7); if((t&0x80000000)==0) x=t,y-=0x001fe;
+    x=0x80000000-x;
+    y-=x>>15;
+    return y;
+}

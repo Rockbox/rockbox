@@ -56,8 +56,13 @@
 #define WPS_DIR     ROCKBOX_DIR "/wps"
 #define THEME_DIR   ROCKBOX_DIR "/themes"
 #define ICON_DIR    ROCKBOX_DIR "/icons"
-#define PLUGIN_DIR  ROCKBOX_DIR "/rocks"
-#define VIEWERS_DIR  ROCKBOX_DIR "/viewers"
+
+#define PLUGIN_DIR          ROCKBOX_DIR "/rocks"
+#define PLUGIN_GAMES_DIR    PLUGIN_DIR "/games"
+#define PLUGIN_APPS_DIR     PLUGIN_DIR "/apps"
+#define PLUGIN_DEMOS_DIR    PLUGIN_DIR "/demos"
+#define VIEWERS_DIR         PLUGIN_DIR "/viewers"
+
 #define BACKDROP_DIR ROCKBOX_DIR "/backdrops"
 #define REC_BASE_DIR "/"
 #define EQS_DIR     ROCKBOX_DIR "/eqs"
@@ -270,12 +275,12 @@ bool set_option(const char* string, void* variable, enum optiontype type,
 bool set_int(const unsigned char* string, const char* unit, int voice_unit,
              int* variable,
              void (*function)(int), int step, int min, int max, 
-             void (*formatter)(char*, int, int, const char*) );
+             void (*formatter)(char*, size_t, int, const char*) );
 /* use this one if you need to create a lang from the value (i.e with TALK_ID()) */
 bool set_int_ex(const unsigned char* string, const char* unit, int voice_unit,
              int* variable,
              void (*function)(int), int step, int min, int max, 
-             void (*formatter)(char*, int, int, const char*),
+             void (*formatter)(char*, size_t, int, const char*),
              long (*get_talk_id)(int));
 
 /* the following are either not in setting.c or shouldnt be */
@@ -439,6 +444,8 @@ struct user_settings
     int dirfilter;     /* 0=display all, 1=only supported, 2=only music,
                           3=dirs+playlists, 4=ID3 database */
     bool sort_case;    /* dir sort order: 0=case insensitive, 1=sensitive */
+    int show_filename_ext; /* show filename extensions in file browser?
+                              0 = no, 1 = yes, 2 = only unknown 0 */
     int volume_type;   /* how volume is displayed: 0=graphic, 1=percent */
     int battery_display; /* how battery is displayed: 0=graphic, 1=percent */
     int timeformat;    /* time format: 0=24 hour clock, 1=12 hour clock */
@@ -446,8 +453,11 @@ struct user_settings
     bool play_selected; /* Plays selected file even in shuffle mode */
     int ff_rewind_min_step; /* FF/Rewind minimum step size */
     int ff_rewind_accel; /* FF/Rewind acceleration (in seconds per doubling) */
+
+#ifndef HAVE_FLASH_STORAGE
     int disk_spindown; /* time until disk spindown, in seconds (0=off) */
     int buffer_margin; /* MP3 buffer watermark margin, in seconds */
+#endif
 
     int peak_meter_release;   /* units per read out */
     int peak_meter_hold;      /* hold time for peak meter in 1/100 s */
@@ -731,8 +741,10 @@ struct user_settings
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
     int buttonlight_brightness;
 #endif
+#ifndef HAVE_SCROLLWHEEL
     int list_accel_start_delay; /* ms before we start increaseing step size */
     int list_accel_wait; /* ms between increases */
+#endif
 };
 
 /** global variables **/

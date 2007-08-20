@@ -333,8 +333,7 @@ static void create_boot_sector(unsigned char* buf,
     buf[511] = 0xaa;
 }
 
-static void create_fsinfo(unsigned char* buf,
-                          struct ipod_t* ipod, int partition)
+static void create_fsinfo(unsigned char* buf)
 {
     struct FAT_FSINFO* pFAT32FsInfo = (struct FAT_FSINFO*)buf;
 
@@ -350,8 +349,7 @@ static void create_fsinfo(unsigned char* buf,
     pFAT32FsInfo->dNxt_Free = htole32(3); 
 }
 
-static void create_firstfatsector(unsigned char* buf, 
-                                  struct ipod_t* ipod, int partition)
+static void create_firstfatsector(unsigned char* buf)
 {
     uint32_t* p = (uint32_t*)buf;  /* We know the buffer is aligned */
 
@@ -481,7 +479,7 @@ int format_partition(struct ipod_t* ipod, int partition)
 
     /* Create the boot sector structure */
     create_boot_sector(sectorbuf, ipod, partition);
-    create_fsinfo(sectorbuf + 512, ipod, partition);
+    create_fsinfo(sectorbuf + 512);
 
     /* Write boot sector and fsinfo at start of partition */
     if (ipod_seek(ipod, ipod->pinfo[partition].start * ipod->sector_size) < 0) {
@@ -504,7 +502,7 @@ int format_partition(struct ipod_t* ipod, int partition)
     }
 
     /* Create the first FAT sector */
-    create_firstfatsector(sectorbuf, ipod, partition);
+    create_firstfatsector(sectorbuf);
     
     /* Write the first fat sector in the right places */
     for ( i=0; i<NumFATs; i++ ) {

@@ -42,9 +42,6 @@ void breakpoint(void);
 
 #define DEBUGF	debugf
 #define LDEBUGF debugf
-#elif CONFIG_CPU==IMX31L
-#define DEBUGF debugf
-#define LDEBUGF(...)
 #else
 #define DEBUGF(...)
 #define LDEBUGF(...)

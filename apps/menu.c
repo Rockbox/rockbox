@@ -253,15 +253,19 @@ static void talk_menu_item(const struct menu_item_ex *menu,
     }
 }
 #define MAX_OPTIONS 32
-/* returns true if the menu needs to be redrwan */
 bool do_setting_from_menu(const struct menu_item_ex *temp)
 {
     int setting_id;
     const struct settings_list *setting = find_setting(
                                                temp->variable,
                                                &setting_id);
+    char *title;
+    if ((temp->flags&MENU_TYPE_MASK) == MT_SETTING_W_TEXT)
+        title = temp->callback_and_desc->desc;
+    else
+        title = ID2P(setting->lang_id);
     option_screen((struct settings_list *)setting, 
-                   setting->flags&F_TEMPVAR);
+                  setting->flags&F_TEMPVAR, title);
     return false;
 }
 
@@ -296,8 +300,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
     in_stringlist = ((menu->flags&MENU_TYPE_MASK) == MT_RETURN_ID);
     
     talk_menu_item(menu, &lists);
-    
-    action_signalscreenchange();
     
     /* load the callback, and only reload it if menu changes */
     get_menu_callback(menu, &menu_callback);
@@ -338,6 +340,14 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
             continue;
         }
         
+#ifdef HAVE_RECORDING
+        if (action == ACTION_STD_REC)
+        {
+            ret = GO_TO_RECSCREEN;
+            done = true;
+        }
+        else
+#endif
         if (action == ACTION_TREE_WPS)
         {
             ret = GO_TO_PREVIOUS_MUSIC;
@@ -345,7 +355,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
         }
         else if (action == ACTION_TREE_STOP)
         {
-            list_stop_handler();
+            redraw_lists = list_stop_handler();
         }
         else if (action == ACTION_STD_CONTEXT &&
                  menu == &root_menu_)
@@ -375,7 +385,8 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                 menu = menu_stack[stack_top];
                 if (menu->flags&MENU_EXITAFTERTHISMENU)
                     done = true;
-                init_menu_lists(menu, &lists, 
+                else
+                    init_menu_lists(menu, &lists, 
                                  menu_stack_selected_item[stack_top], false);
                 /* new menu, so reload the callback */
                 get_menu_callback(menu, &menu_callback);
@@ -428,7 +439,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                 {
                     int return_value;
                     talk_item = true;
-                    action_signalscreenchange();
                     if (temp->flags&MENU_FUNC_USEPARAM)
                         return_value = temp->function->function_w_param(
                                     temp->function->param);
@@ -458,7 +468,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                 case MT_RETURN_ID:
                     if (in_stringlist)
                     {
-                        action_signalscreenchange();
                         done = true;
                         ret =  selected;
                     }
@@ -510,7 +519,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
         if (redraw_lists)
             gui_synclist_draw(&lists);
     }
-    action_signalscreenchange();
     if (start_selected)
     {
         /* make sure the start_selected variable is set to

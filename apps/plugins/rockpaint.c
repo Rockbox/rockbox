@@ -48,7 +48,8 @@ PLUGIN_HEADER
 #define ROCKPAINT_LEFT      BUTTON_LEFT
 #define ROCKPAINT_RIGHT     BUTTON_RIGHT
 
-#elif ( CONFIG_KEYPAD == IPOD_4G_PAD ) || ( CONFIG_KEYPAD == IPOD_3G_PAD )
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define ROCKPAINT_QUIT      ( ~BUTTON_MAIN )
 #define ROCKPAINT_DRAW      BUTTON_SELECT
 #define ROCKPAINT_MENU      ( BUTTON_SELECT | BUTTON_MENU )
@@ -129,7 +130,7 @@ PLUGIN_HEADER
 #define COLOR_BROWN        LCD_RGBPACK(128,64,0)
 #define COLOR_LIGHTBROWN   LCD_RGBPACK(255,128,64)
 
-#define SPLASH_SCREEN PLUGIN_DIR "/rockpaint/splash.bmp"
+#define SPLASH_SCREEN PLUGIN_APPS_DIR "/rockpaint/splash.bmp"
 #define ROCKPAINT_TITLE_FONT  2
 
 /***********************************************************************
@@ -688,7 +689,7 @@ static bool browse( char *dst, int dst_size, const char *start )
 
     while( 1 )
     {
-        d = rb->PREFIX(opendir)( bbuf );
+        d = rb->opendir( bbuf );
         if( !d )
         {
             /*
@@ -702,7 +703,7 @@ static bool browse( char *dst, int dst_size, const char *start )
             else if( errno == EACCES || errno == ENOENT )
             {
                 bbuf[0] = '/'; bbuf[1] = '\0';
-                d = rb->PREFIX(opendir)( "/" );
+                d = rb->opendir( "/" );
             }
             else
             {
@@ -714,12 +715,12 @@ static bool browse( char *dst, int dst_size, const char *start )
         li = -1;
         while( i < fvi )
         {
-            rb->PREFIX(readdir)( d );
+            rb->readdir( d );
             i++;
         }
         while( top_inside+(i-fvi)*(fh+LINE_SPACE) < HEIGHT )
         {
-            de = rb->PREFIX(readdir)( d );
+            de = rb->readdir( d );
             if( !de )
             {
                 li = i-1;
@@ -737,12 +738,12 @@ static bool browse( char *dst, int dst_size, const char *start )
         lvi = i-1;
         if( li == -1 )
         {
-            if( !rb->PREFIX(readdir)( d ) )
+            if( !rb->readdir( d ) )
             {
                 li = lvi;
             }
         }
-        rb->PREFIX(closedir)( d );
+        rb->closedir( d );
 
         rb->lcd_update();
 
@@ -863,7 +864,7 @@ static bool browse_fonts( char *dst, int dst_size )
         {
             b_need_redraw = 0;
 
-            d = rb->PREFIX(opendir)( FONT_DIR "/" );
+            d = rb->opendir( FONT_DIR "/" );
             if( !d )
             {
                 return false;
@@ -873,7 +874,7 @@ static bool browse_fonts( char *dst, int dst_size )
             li = -1;
             while( i < fvi )
             {
-                rb->PREFIX(readdir)( d );
+                rb->readdir( d );
                 i++;
             }
             cp = top_inside+LINE_SPACE;
@@ -883,7 +884,7 @@ static bool browse_fonts( char *dst, int dst_size )
 
             while( cp < top+HEIGHT )
             {
-                de = rb->PREFIX(readdir)( d );
+                de = rb->readdir( d );
                 if( !de )
                 {
                     li = i-1;
@@ -920,7 +921,7 @@ static bool browse_fonts( char *dst, int dst_size )
             lvi = i-1;
             if( li == -1 )
             {
-                if( !(de = rb->PREFIX(readdir)( d ) ) )
+                if( !(de = rb->readdir( d ) ) )
                 {
                     li = lvi;
                 }
@@ -936,7 +937,7 @@ static bool browse_fonts( char *dst, int dst_size )
                 }
             }
             rb->font_load( old_font );
-            rb->PREFIX(closedir)( d );
+            rb->closedir( d );
         }
 
         rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
@@ -2491,8 +2492,13 @@ static void goto_menu(void)
                 break;
 
             case MAIN_MENU_SAVE:
+                if (!filename[0])
+                    rb->strcpy(filename,"/");
                 if( !rb->kbd_input( filename, MAX_PATH ) )
                 {
+                    if(rb->strlen(filename) <= 4 ||
+                    rb->strcasecmp(&filename[rb->strlen(filename)-4], ".bmp"))
+                        rb->strcat(filename, ".bmp");
                     save_bitmap( filename );
                     rb->splash( 1*HZ, "File saved (%s)", filename );
                 }

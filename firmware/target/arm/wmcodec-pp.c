@@ -74,6 +74,11 @@ int audiohw_init(void) {
     /* GPIO D06 enable for output */
     outl(inl(0xcf00000c) | 0x40, 0xcf00000c);
     outl(inl(0xcf00001c) & ~0x40, 0xcf00001c);
+#ifdef IPOD_1G2G
+    /* bits 11,10 == 10 */
+    outl(inl(0xcf004040) & ~0x400, 0xcf004040);
+    outl(inl(0xcf004040) | 0x800, 0xcf004040);
+#else /* IPOD_3G */
     /* bits 11,10 == 01 */
     outl(inl(0xcf004040) | 0x400, 0xcf004040);
     outl(inl(0xcf004040) & ~0x800, 0xcf004040);
@@ -87,6 +92,7 @@ int audiohw_init(void) {
     outl(inl(0xcf000008) | 0x8, 0xcf000008);
     outl(inl(0xcf000018) | 0x8, 0xcf000018);
     outl(inl(0xcf000028) & ~0x8, 0xcf000028);
+#endif /* IPOD_1G2G/3G */
 #endif
     
     return 0;

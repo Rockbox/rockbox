@@ -18,8 +18,9 @@
  ****************************************************************************/
 #include "config.h"
 #include "system.h"
-#include "kernel.h"
+#include "file.h"
 #include "lcd-remote.h"
+#include "scroll_engine.h"
 
 /* The LCD in the iAudio M3/M5/X5 remote control is a Tomato LSI 0350 */
 
@@ -172,77 +173,72 @@ static inline void _write_fast(unsigned data)
         "swap    %[data]             \n"  /* Shift data to upper byte */
         "lsl.l   #8, %[data]         \n"
         
+        "move.l  %%d0, %%d1          \n"  /* precalculate opposite state of clock line */
+        "eor.l   %[cbit], %%d1       \n"
+        
         "lsl.l   #1,%[data]          \n"  /* Shift out MSB */
         "bcc.s   1f                  \n"
         "eor.l   %[dbit], %%d0       \n"  /* 1: Flip data bit */
+        "eor.l   %[dbit], %%d1       \n"  /*   for both clock states */
     "1:                              \n"
-        "eor.l   %[cbit], %%d0       \n"  /* Flip clock bit */
-        "move.l  %%d0, (%[gpo0])     \n"  /* Output new state */
-        "eor.l   %[cbit], %%d0       \n"  /* Flip clock bit */
-        "move.l  %%d0, (%[gpo0])     \n"  /* Output new state */
+        "move.l  %%d1, (%[gpo0])     \n"  /* Output new state and set CLK */
+        "move.l  %%d0, (%[gpo0])     \n"  /* reset CLK */
 
         "lsl.l   #1,%[data]          \n"  /* ..unrolled.. */
         "bcc.s   1f                  \n"
         "eor.l   %[dbit], %%d0       \n"
+        "eor.l   %[dbit], %%d1       \n"
     "1:                              \n"
-        "eor.l   %[cbit], %%d0       \n"
-        "move.l  %%d0, (%[gpo0])     \n"
-        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d1, (%[gpo0])     \n"
         "move.l  %%d0, (%[gpo0])     \n"
 
         "lsl.l   #1,%[data]          \n"
         "bcc.s   1f                  \n"
         "eor.l   %[dbit], %%d0       \n"
+        "eor.l   %[dbit], %%d1       \n"
     "1:                              \n"
-        "eor.l   %[cbit], %%d0       \n"
-        "move.l  %%d0, (%[gpo0])     \n"
-        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d1, (%[gpo0])     \n"
         "move.l  %%d0, (%[gpo0])     \n"
 
         "lsl.l   #1,%[data]          \n"
         "bcc.s   1f                  \n"
         "eor.l   %[dbit], %%d0       \n"
+        "eor.l   %[dbit], %%d1       \n"
     "1:                              \n"
-        "eor.l   %[cbit], %%d0       \n"
-        "move.l  %%d0, (%[gpo0])     \n"
-        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d1, (%[gpo0])     \n"
         "move.l  %%d0, (%[gpo0])     \n"
 
         "lsl.l   #1,%[data]          \n"
         "bcc.s   1f                  \n"
         "eor.l   %[dbit], %%d0       \n"
+        "eor.l   %[dbit], %%d1       \n"
     "1:                              \n"
-        "eor.l   %[cbit], %%d0       \n"
-        "move.l  %%d0, (%[gpo0])     \n"
-        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d1, (%[gpo0])     \n"
         "move.l  %%d0, (%[gpo0])     \n"
 
         "lsl.l   #1,%[data]          \n"
         "bcc.s   1f                  \n"
         "eor.l   %[dbit], %%d0       \n"
+        "eor.l   %[dbit], %%d1       \n"
     "1:                              \n"
-        "eor.l   %[cbit], %%d0       \n"
-        "move.l  %%d0, (%[gpo0])     \n"
-        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d1, (%[gpo0])     \n"
         "move.l  %%d0, (%[gpo0])     \n"
 
         "lsl.l   #1,%[data]          \n"
         "bcc.s   1f                  \n"
         "eor.l   %[dbit], %%d0       \n"
+        "eor.l   %[dbit], %%d1       \n"
     "1:                              \n"
-        "eor.l   %[cbit], %%d0       \n"
-        "move.l  %%d0, (%[gpo0])     \n"
-        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d1, (%[gpo0])     \n"
         "move.l  %%d0, (%[gpo0])     \n"
 
         "lsl.l   #1,%[data]          \n"
         "bcc.s   1f                  \n"
         "eor.l   %[dbit], %%d0       \n"
+        "eor.l   %[dbit], %%d1       \n"
     "1:                              \n"
-        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d1, (%[gpo0])     \n"
         "move.l  %%d0, (%[gpo0])     \n"
-        "eor.l   %[cbit], %%d0       \n"
-        "move.l  %%d0, (%[gpo0])     \n"  
 
         "move.w  %%d3, %%sr          \n" /* Restore interrupt level */
         : /* outputs */
@@ -402,7 +398,6 @@ static void remote_tick(void)
 {
     static bool last_status = false;
     static int countdown = 0;
-    static int init_delay = 0;
     bool current_status;
 
     current_status = remote_detect();
@@ -421,20 +416,16 @@ static void remote_tick(void)
 
         if (current_status)
         {
-            if (!(countdown % 8))
+            if (!(countdown % 48))
             {
-                if (--init_delay <= 0)
-                {
-                    queue_post(&remote_scroll_queue, REMOTE_INIT_LCD, 0);
-                    init_delay = 6;
-                }
+                queue_broadcast(SYS_REMOTE_PLUGGED, 0);
             }
         }
         else
         {
             if (countdown == 0)
             {
-                queue_post(&remote_scroll_queue, REMOTE_DEINIT_LCD, 0);
+                queue_broadcast(SYS_REMOTE_UNPLUGGED, 0);
             }
         }
     }

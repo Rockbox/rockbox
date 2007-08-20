@@ -62,6 +62,7 @@ MENUITEM_SETTING(ff_rewind_accel, &global_settings.ff_rewind_accel, NULL);
 MENUITEM_SETTING(ff_rewind_min_step, &global_settings.ff_rewind_min_step, NULL);
 MAKE_MENU(ff_rewind_settings_menu, ID2P(LANG_WIND_MENU), 0, Icon_NOICON,
           &ff_rewind_min_step, &ff_rewind_accel);
+#ifndef HAVE_FLASH_STORAGE
 #if CONFIG_CODEC == SWCODEC
 int buffermargin_callback(int action,const struct menu_item_ex *this_item)
 {
@@ -79,6 +80,7 @@ int buffermargin_callback(int action,const struct menu_item_ex *this_item)
 #endif
 MENUITEM_SETTING(buffer_margin, &global_settings.buffer_margin,
                  buffermargin_callback);
+#endif /*HAVE_FLASH_STORAGE */
 MENUITEM_SETTING(fade_on_stop, &global_settings.fade_on_stop, NULL);
 MENUITEM_SETTING(party_mode, &global_settings.party_mode, NULL);
 
@@ -136,7 +138,7 @@ int audioscrobbler_callback(int action,const struct menu_item_ex *this_item)
     {
         case ACTION_EXIT_MENUITEM: /* on exit */
             if (!scrobbler_is_enabled() && global_settings.audioscrobbler)
-                gui_syncsplash(HZ*2, str(LANG_PLEASE_REBOOT));
+                gui_syncsplash(HZ*2, ID2P(LANG_PLEASE_REBOOT));
         
             if(scrobbler_is_enabled() && !global_settings.audioscrobbler)
                 scrobbler_shutdown();
@@ -154,7 +156,7 @@ int cuesheet_callback(int action,const struct menu_item_ex *this_item)
     {
         case ACTION_EXIT_MENUITEM: /* on exit */
             if (!cuesheet_is_enabled() && global_settings.cuesheet)
-                gui_syncsplash(HZ*2, str(LANG_PLEASE_REBOOT));
+                gui_syncsplash(HZ*2, ID2P(LANG_PLEASE_REBOOT));
             break;
     }
     return action;
@@ -165,15 +167,18 @@ MENUITEM_SETTING(cuesheet, &global_settings.cuesheet, cuesheet_callback);
 MENUITEM_SETTING(unplug_mode, &global_settings.unplug_mode, NULL);
 MENUITEM_SETTING(unplug_rw, &global_settings.unplug_rw, NULL);
 MENUITEM_SETTING(unplug_autoresume, &global_settings.unplug_autoresume, NULL);
-MAKE_MENU(unplug_menu, ID2P(LANG_UNPLUG), 0, Icon_NOICON,
+MAKE_MENU(unplug_menu, ID2P(LANG_HEADPHONE_UNPLUG), 0, Icon_NOICON,
           &unplug_mode, &unplug_rw, &unplug_autoresume);
 #endif
 
 MAKE_MENU(playback_menu_item,ID2P(LANG_PLAYBACK),0,
           Icon_Playback_menu,
           &shuffle_item, &repeat_mode, &play_selected,
-          &ff_rewind_settings_menu, 
-          &buffer_margin, &fade_on_stop, &party_mode,
+          &ff_rewind_settings_menu,
+#ifndef HAVE_FLASH_STORAGE 
+          &buffer_margin,
+#endif
+          &fade_on_stop, &party_mode,
           
 #if CONFIG_CODEC == SWCODEC
           &crossfade_settings_menu, &replaygain_settings_menu, &beep,

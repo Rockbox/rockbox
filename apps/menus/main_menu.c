@@ -67,12 +67,12 @@ int browse_folder(void *param)
 
 static int reset_settings(void)
 {
-    unsigned char *lines[]={str(LANG_RESET_ASK_RECORDER)};
+    unsigned char *lines[]={ID2P(LANG_RESET_ASK)};
     unsigned char *yes_lines[]={
-        str(LANG_RESET_DONE_SETTING),
-        str(LANG_RESET_DONE_CLEAR)
+        str(LANG_SETTINGS),
+        ID2P(LANG_RESET_DONE_CLEAR)
     };
-    unsigned char *no_lines[]={yes_lines[0], str(LANG_RESET_DONE_CANCEL)};
+    unsigned char *no_lines[]={yes_lines[0], ID2P(LANG_CANCEL)};
     struct text_message message={(char **)lines, 1};
     struct text_message yes_message={(char **)yes_lines, 2};
     struct text_message no_message={(char **)no_lines, 2};
@@ -116,20 +116,14 @@ MAKE_MENU(manage_settings, ID2P(LANG_MANAGE_MENU), NULL, Icon_Config,
 
 static bool show_credits(void)
 {
-    if (plugin_load(PLUGIN_DIR "/credits.rock",NULL) != PLUGIN_OK)
+    if (plugin_load(VIEWERS_DIR "/credits.rock",NULL) != PLUGIN_OK)
     {
         /* show the rockbox logo and version untill a button is pressed */
-        action_signalscreenchange();
         show_logo();
         get_action(CONTEXT_STD, TIMEOUT_BLOCK);
-        action_signalscreenchange();
     }
     return false;
 }
-
-#ifdef SIMULATOR
-extern bool simulate_usb(void);
-#endif
 
 #ifdef HAVE_LCD_CHARCELLS
 #define SIZE_FMT "%s%s"
@@ -188,9 +182,11 @@ static bool show_info(void)
                     talk_value(battery_level(), UNIT_PERCENT, true);
 #if CONFIG_CHARGING >= CHARGING_MONITOR
                     if (charge_state == CHARGING)
-                        talk_id(LANG_BATTERY_CHARGE, true);               
+                        talk_id(LANG_BATTERY_CHARGE, true);
+#if CONFIG_CHARGING == CHARGING_CONTROL
                     else if (charge_state == TOPOFF)
                         talk_id(LANG_BATTERY_TOPOFF_CHARGE, true);
+#endif
                     else if (charge_state == TRICKLE)
                         talk_id(LANG_BATTERY_TRICKLE_CHARGE, true);
 #endif
@@ -254,13 +250,9 @@ static bool show_info(void)
             int integer = buflen / 1000;
             int decimal = buflen % 1000;
 
-#ifdef HAVE_LCD_CHARCELLS
-            snprintf(s, sizeof(s), (char *)str(LANG_BUFFER_STAT_PLAYER),
+            snprintf(s, sizeof(s), (char *)str(LANG_BUFFER_STAT),
                      integer, decimal);
-#else
-            snprintf(s, sizeof(s), (char *)str(LANG_BUFFER_STAT_RECORDER),
-                     integer, decimal);
-#endif
+
             FOR_NB_SCREENS(i)
                 screens[i].puts_scroll(0, y, (unsigned char *)s);
             y++;
@@ -343,7 +335,7 @@ static bool show_info(void)
 
 #ifndef SIMULATOR
             case ACTION_STD_OK:
-                gui_syncsplash(0, str(LANG_DIRCACHE_BUILDING));
+                gui_syncsplash(0, str(LANG_SCANNING_DISK));
                 fat_recalc_free(IF_MV(0));
 #ifdef HAVE_MULTIVOLUME
                 if (fat_ismounted(1))
@@ -359,15 +351,14 @@ static bool show_info(void)
                 break;
         }
     }
-    action_signalscreenchange();
     return false;
 }
-MENUITEM_FUNCTION(show_info_item, 0, ID2P(LANG_INFO_MENU),
+MENUITEM_FUNCTION(show_info_item, 0, ID2P(LANG_ROCKBOX_INFO),
                    (menu_function)show_info, NULL, NULL, Icon_NOICON);
 
 
 /* sleep Menu */
-static void sleep_timer_formatter(char* buffer, int buffer_size, int value,
+static void sleep_timer_formatter(char* buffer, size_t buffer_size, int value,
                                   const char* unit)
 {
     int minutes, hours;
@@ -404,18 +395,10 @@ MENUITEM_FUNCTION(show_runtime_item, 0, ID2P(LANG_RUNNING_TIME),
                    (menu_function)view_runtime, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(debug_menu_item, 0, ID2P(LANG_DEBUG),
                    (menu_function)debug_menu, NULL, NULL, Icon_NOICON);
-#ifdef SIMULATOR
-MENUITEM_FUNCTION(simulate_usb_item, 0, ID2P(LANG_USB),
-                   (menu_function)simulate_usb, NULL, NULL, Icon_NOICON);
-#endif
 
-MAKE_MENU(info_menu, ID2P(LANG_INFO), 0, Icon_Questionmark,
+MAKE_MENU(info_menu, ID2P(LANG_SYSTEM), 0, Icon_Questionmark,
           &show_info_item, &show_credits_item, &show_runtime_item, 
-          &sleep_timer_call, &debug_menu_item
-#ifdef SIMULATOR
-        ,&simulate_usb_item
-#endif
-        );
+          &sleep_timer_call, &debug_menu_item);
 /*      INFO MENU                  */
 /***********************************/
 
@@ -443,7 +426,7 @@ int mainmenu_callback(int action,const struct menu_item_ex *this_item)
 #else
 #define mainmenu_callback NULL
 #endif
-MAKE_MENU(main_menu_, ID2P(LANG_SETTINGS_MENU), mainmenu_callback,
+MAKE_MENU(main_menu_, ID2P(LANG_SETTINGS), mainmenu_callback,
         Icon_Submenu_Entered,
         &sound_settings,
         &settings_menu_item, &manage_settings, &browse_themes,

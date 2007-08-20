@@ -66,7 +66,6 @@
 /* Define this if you have the WM8975 audio codec */
 #define HAVE_WM8978
 
-#define BATTERY_CAPACITY_DEFAULT 2000 /* default battery capacity */
 
 #define HW_SAMPR_CAPS (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | \
                        SAMPR_CAP_11)
@@ -82,14 +81,11 @@
 #define CONFIG_I2C I2C_IMX31L
 
 /* Type of mobile power - check this out */
-#define CONFIG_BATTERY BATT_LIION830    /* could change this later */
+#define BATTERY_CAPACITY_DEFAULT 2000 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 1500        /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX 2500        /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 25         /* capacity increment */
 #define BATTERY_TYPES_COUNT  1          /* only one type */
-
-/* ADC[0] is (530) at discharge and 625 at full charge */
-#define BATTERY_SCALE_FACTOR 6450
 
 /* Hardware controlled charging with monitoring */
 #define CONFIG_CHARGING CHARGING_MONITOR

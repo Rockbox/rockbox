@@ -52,7 +52,7 @@ RBUTIL_OBJECTS =  \
         rbutil.o rbutilApp.o rbutilFrm.o install_dialogs.o bootloaders.o installlog.o \
         rbutilCtrls.o ipodpatcher/ipodpatcher.o ipodpatcher/ipodio-posix.o \
         sansapatcher/sansapatcher.o sansapatcher/sansaio-posix.o \
-        md5sum.o irivertools.o autodetection.o \
+        md5sum.o irivertools.o autodetection.o talkfile.o \
 	$(__rbutil___win32rc)
 
 ### Conditionally set variables: ###

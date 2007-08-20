@@ -35,7 +35,7 @@ FESTIVAL_CLIENT=festival_client
 FLITE_BIN=flite
 
 # The eSpeak executable
-ESPEAK_BIN=speak
+ESPEAK_BIN=espeak
 
 # The lame executable
 LAME_BIN=lame
@@ -46,8 +46,16 @@ SPEEX_BIN=speexenc
 # The oggenc executable
 VORBIS_BIN=oggenc
 
+# Tools directory
+TOOLSDIR=`dirname $0`
+
 # The wavtrim executable
-WAVTRIM=`dirname $0`/wavtrim
+WAVTRIM=$TOOLSDIR/wavtrim
+
+# The SAPI5 script directory
+if [ -f "`which cygpath`" ]; then
+    SAPI5DIR=`cygpath $TOOLSDIR -a -w`
+fi
 
 #####################
 # Festival settings #
@@ -64,7 +72,7 @@ FESTIVAL_HOST=localhost
 FESTIVAL_PORT=1314
 # where to log the Festival client output
 FESTIVAL_LOG=/dev/null
-# other options to the festival client
+# other options to the festival server
 FESTIVAL_OPTS=""
 
 ##################
@@ -120,19 +128,19 @@ init_tts() {
     case $TTS_ENGINE in
         festival)
             # Check for festival_client
-            if [ ! `which $FESTIVAL_CLIENT` ]; then
+            if [ ! -f "`which $FESTIVAL_CLIENT`" ]; then
                 echo "Error: $FESTIVAL_CLIENT not found"
                 exit 4
             fi
 
             # Check for, and start festival server if specified
             if [ X$FESTIVAL_START = XY ]; then
-                if [ ! `which $FESTIVAL_BIN` ]; then
+                if [ ! -f "`which $FESTIVAL_BIN`" ]; then
                     echo "Error: $FESTIVAL_BIN not found"
                     exit 3
                 fi
                 FESTIVAL_HOST='localhost'
-                $FESTIVAL_BIN --server 2>&1 > /dev/null &
+                $FESTIVAL_BIN $FESTIVAL_OPTS --server 2>&1 > /dev/null &
                 FESTIVAL_SERVER_PID=$!
                 sleep 3
                 if [ `ps | grep -c "^\ *$FESTIVAL_SERVER_PID"` -ne 1 ]; then
@@ -152,15 +160,23 @@ init_tts() {
             ;;
         flite)
             # Check for flite
-            if [ ! `which $FLITE_BIN` ]; then
+            if [ ! -f "`which $FLITE_BIN`" ]; then
                 echo "Error: $FLITE_BIN not found"
                 exit 5
             fi
             ;;
         espeak)
-            # Check for flite
-            if [ ! `which $ESPEAK_BIN` ]; then
+            # Check for espeak
+            if [ ! -f "`which $ESPEAK_BIN`" ]; then
                 echo "Error: $ESPEAK_BIN not found"
+                exit 5
+            fi
+            ;;
+        sapi5)
+            # Check for SAPI5
+            cscript /B $SAPI5DIR/sapi5_init_tts.vbs
+            if [ $? -ne 0 ]; then
+                echo "Error: SAPI 5 not available"
                 exit 5
             fi
             ;;
@@ -192,21 +208,21 @@ init_encoder() {
     case $ENCODER in
         lame)
             # Check for lame binary
-            if [ ! `which $LAME_BIN` ]; then
+            if [ ! -f "`which $LAME_BIN`" ]; then
                 echo "Error: $LAME_BIN not found"
                 exit 6
             fi
             ;;
         speex)
             # Check for speexenc binary
-            if [ ! `which $SPEEX_BIN` ]; then
+            if [ ! -f "`which $SPEEX_BIN`" ]; then
                 echo "Error: $SPEEX_BIN not found"
                 exit 7
             fi
             ;;
         vorbis)
             # Check for vorbis encoder binary
-            if [ ! `which $VORBIS_BIN` ]; then
+            if [ ! -f "`which $VORBIS_BIN`" ]; then
                 echo "Error: $VORBIS_BIN not found"
                 exit 10
             fi
@@ -255,7 +271,7 @@ voice() {
             case $TTS_ENGINE in
                 festival)
                     echo "Action: Generate $WAV_FILE with festival"
-                    echo -E "$TO_SPEAK" | $FESTIVAL_CLIENT $FESTIVAL_OPTS \
+                    echo -E "$TO_SPEAK" | $FESTIVAL_CLIENT \
                          --server $FESTIVAL_HOST \
                          --otype riff --ttw --output "$WAV_FILE" 2>"$WAV_FILE"
                     ;;
@@ -267,6 +283,9 @@ voice() {
                 flite)
                     echo "Action: Generate $WAV_FILE with flite"
                     echo -E "$TO_SPEAK" | $FLITE_BIN $FLITE_OPTS -o "$WAV_FILE"
+                    ;;
+                sapi5)
+                    cscript /B "$SAPI5DIR\sapi5_voice.vbs" ""$TO_SPEAK"" "$WAV_FILE"
                     ;;
             esac
         fi

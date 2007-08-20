@@ -40,26 +40,17 @@ char *my_strtok( char * s, const char * delim );
 #define read_line(a,b,c)   rb->read_line((a),(b),(c))
 
 #ifdef SIMULATOR
-#undef opendir
-#undef closedir
-#undef mkdir
 #undef open
 #undef lseek
 #undef filesize
-#define opendir(a)         rb->sim_opendir((a))
-#define closedir(a)        rb->sim_closedir((a))
-#define mkdir(a)           rb->sim_mkdir((a))
 #define open(a,b)          rb->sim_open((a),(b))
 #define lseek(a,b,c)       rb->sim_lseek((a),(b),(c))
 #define filesize(a)        rb->sim_filesize((a))
 #else /* !SIMULATOR */
-#define opendir(a)         rb->opendir((a))
-#define closedir(a)        rb->closedir((a))
-#define filesize(a)        rb->filesize((a))
-#define mkdir(a)           rb->mkdir((a))
 #define open(a,b)          my_open((a),(b))
 #define close(a)           my_close((a))
 #define lseek(a,b,c)       rb->lseek((a),(b),(c))
+#define filesize(a)        rb->filesize((a))
 #endif /* !SIMULATOR */
 
 #define strtok(a,b)        my_strtok((a),(b))

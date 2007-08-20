@@ -139,6 +139,7 @@ static char * tree_get_filename(int selected_item, void * data, char *buffer)
     struct tree_context * local_tc=(struct tree_context *)data;
     char *name;
     int attr=0;
+    bool stripit = false;
 #ifdef HAVE_TAGCACHE
     bool id3db = *(local_tc->dirfilter) == SHOW_ID3DB;
 
@@ -154,11 +155,32 @@ static char * tree_get_filename(int selected_item, void * data, char *buffer)
         name = e->name;
         attr = e->attr;
     }
-    /* if any file filter is on, and if it's not a directory,
-     * strip the extension */
+    
+    if(!(attr & ATTR_DIRECTORY))
+    {
+        switch(global_settings.show_filename_ext)
+        {
+            case 0:
+                /* show file extension: off */
+                stripit = true;
+                break;
+            case 1:
+                /* show file extension: on */
+                break;
+            case 2:
+                /* show file extension: only unknown types */
+                stripit = filetype_supported(attr);
+                break;
+            case 3:
+            default:
+                /* show file extension: only when viewing all */
+                stripit = (*(local_tc->dirfilter) != SHOW_ID3DB) &&
+                          (*(local_tc->dirfilter) != SHOW_ALL);
+                break;
+        }
+    }
 
-    if ( (*(local_tc->dirfilter) != SHOW_ID3DB) && !(attr & ATTR_DIRECTORY)
-        && (*(local_tc->dirfilter) != SHOW_ALL) )
+    if(stripit)
     {
         return(strip_extension(name, buffer));
     }
@@ -325,7 +347,7 @@ static int update_dir(void)
         (tc.dirfull ||
                       tc.filesindir == global_settings.max_files_in_dir) )
         {
-            gui_syncsplash(HZ, str(LANG_SHOWDIR_BUFFER_FULL));
+            gui_syncsplash(HZ, ID2P(LANG_SHOWDIR_BUFFER_FULL));
         }
     }
 #ifdef HAVE_TAGCACHE
@@ -346,7 +368,20 @@ static int update_dir(void)
     else
 #endif
     {
-        if (global_settings.show_path_in_browser == SHOW_PATH_FULL)
+        if (global_settings.show_path_in_browser && 
+            *(tc.dirfilter) == SHOW_PLUGINS)
+        {
+            char *title;
+            if (!strcmp(tc.currdir, PLUGIN_GAMES_DIR))
+                title = str(LANG_PLUGIN_GAMES);
+            else if (!strcmp(tc.currdir, PLUGIN_APPS_DIR))
+                title = str(LANG_PLUGIN_APPS);
+            else if (!strcmp(tc.currdir, PLUGIN_DEMOS_DIR))
+                title = str(LANG_PLUGIN_DEMOS);
+            else title = str(LANG_PLUGINS);
+            gui_synclist_set_title(&tree_lists, title, Icon_Plugin);
+        }
+        else if (global_settings.show_path_in_browser == SHOW_PATH_FULL)
         {
             gui_synclist_set_title(&tree_lists, tc.currdir,
                 filetype_get_icon(ATTR_DIRECTORY));
@@ -358,12 +393,6 @@ static int update_dir(void)
             {
                 /* Display "Files" for the root dir */
                 gui_synclist_set_title(&tree_lists, str(LANG_DIR_BROWSER),
-                    filetype_get_icon(ATTR_DIRECTORY));
-            }
-            else if(0 == strcasecmp(tc.currdir, PLUGIN_DIR))
-            {
-                /* Display "Plugins" for the rocks dir */
-                gui_synclist_set_title(&tree_lists, str(LANG_PLUGINS),
                     filetype_get_icon(ATTR_DIRECTORY));
             }
             else
@@ -454,8 +483,15 @@ void get_current_file(char* buffer, int buffer_len)
                                           tc.dirlength ? e->name : "");
 }
 
+/* Allow apps to change our dirfilter directly (required for sub browsers) 
+   if they're suddenly going to become a file browser for example */
+void set_dirfilter(int l_dirfilter)
+{
+    *tc.dirfilter = l_dirfilter;
+}
+
 /* Selects a file and update tree context properly */
-static void set_current_file(char *path)
+void set_current_file(char *path)
 {
     char *name;
     int i;
@@ -523,7 +559,6 @@ static int dirbrowse()
     bool need_update = true;
     bool exit_func = false;
     long thumbnail_time = -1; /* for delaying a thumbnail */
-    long last_cancel = 0;
 
     char* currdir = tc.currdir; /* just a shortcut */
 #ifdef HAVE_TAGCACHE
@@ -550,7 +585,7 @@ static int dirbrowse()
 
     if (*tc.dirfilter > NUM_FILTER_MODES && numentries==0)
     {
-        gui_syncsplash(HZ*2, str(LANG_NO_FILES));
+        gui_syncsplash(HZ*2, ID2P(LANG_NO_FILES));
         return false;  /* No files found for rockbox_browser() */
     }
     
@@ -561,7 +596,7 @@ static int dirbrowse()
           tc.dirlevel = 0; /* shouldnt be needed.. this code needs work! */
 #ifdef BOOTFILE
         if (boot_changed) {
-            char *lines[]={str(LANG_BOOT_CHANGED), str(LANG_REBOOT_NOW)};
+            char *lines[]={ID2P(LANG_BOOT_CHANGED), ID2P(LANG_REBOOT_NOW)};
             struct text_message message={lines, 2};
             if(gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
                 rolo_load("/" BOOTFILE);
@@ -605,16 +640,11 @@ static int dirbrowse()
                 if ((*tc.dirfilter == SHOW_ID3DB && tc.dirlevel == 0) ||
                     ((*tc.dirfilter != SHOW_ID3DB && !strcmp(currdir,"/"))))
                 {
-                    if (last_cancel && TIME_BEFORE(current_tick, last_cancel+HZ/2))
-                    {
-                        last_cancel = 0;
-                        action_signalscreenchange(); /* eat the cancel presses */
+                    if (returned_button == ACTION_STD_CANCEL)
                         break;
-                    }
                     else
                         return GO_TO_ROOT;
                 }
-                last_cancel = current_tick;
                 
 #ifdef HAVE_TAGCACHE
                 if (id3db)
@@ -635,6 +665,11 @@ static int dirbrowse()
             case ACTION_STD_MENU:
                 return GO_TO_ROOT;
                 break;
+
+#ifdef HAVE_RECORDING
+            case ACTION_STD_REC:
+                return GO_TO_RECSCREEN;
+#endif
 
             case ACTION_TREE_WPS:
                 return GO_TO_PREVIOUS_MUSIC;
@@ -922,7 +957,6 @@ static int dirbrowse()
             }
         }
     }
-    action_signalscreenchange();
     return true;
 }
 
@@ -931,20 +965,20 @@ static long pltick;
 static bool add_dir(char* dirname, int len, int fd)
 {
     bool abort = false;
-    DIRCACHED* dir;
+    DIR* dir;
 
     /* check for user abort */
     if (action_userabort(TIMEOUT_NOBLOCK))
         return true;
 
-    dir = opendir_cached(dirname);
+    dir = opendir(dirname);
     if(!dir)
         return true;
 
     while (true) {
-        struct dircache_entry *entry;
+        struct dirent *entry;
 
-        entry = readdir_cached(dir);
+        entry = readdir(dir);
         if (!entry)
             break;
         if (entry->attribute & ATTR_DIRECTORY) {
@@ -1021,7 +1055,7 @@ static bool add_dir(char* dirname, int len, int fd)
             }
         }
     }
-    closedir_cached(dir);
+    closedir(dir);
 
     return abort;
 }
@@ -1325,12 +1359,13 @@ void tree_restore(void)
         FOR_NB_SCREENS(i)
         {
             screens[i].putsxy((LCD_WIDTH/2) -
-                              ((strlen(str(LANG_DIRCACHE_BUILDING)) *
+                              ((strlen(str(LANG_SCANNING_DISK)) *
                                 screens[i].char_width)/2),
                               LCD_HEIGHT-screens[i].char_height*3,
-                              str(LANG_DIRCACHE_BUILDING));
+                              str(LANG_SCANNING_DISK));
             gui_textarea_update(&screens[i]);
         }
+        cond_talk_ids_fq(LANG_SCANNING_DISK);
 
         dircache_build(global_status.dircache_size);
 

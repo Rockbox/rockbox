@@ -42,9 +42,10 @@ static const char *unit_strings[] =
     [UNIT_PER_SEC] = "per sec",
     [UNIT_HERTZ] = "Hz",
     [UNIT_MB]  = "MB",  [UNIT_KBIT]  = "kb/s",
+    [UNIT_PM_TICK] = "units/10ms",
 };
 
-char *option_get_valuestring(struct settings_list *setting, 
+static char *option_get_valuestring(struct settings_list *setting, 
                              char *buffer, int buf_len,
                              intptr_t temp_var)
 {
@@ -99,8 +100,16 @@ char *option_get_valuestring(struct settings_list *setting,
         if (setting->flags & F_CHOICETALKS)
         {
             int setting_id;
-            find_setting(setting->setting, &setting_id);
-            cfg_int_to_string(setting_id, (int)temp_var, buffer, buf_len);
+            struct choice_setting *info = setting->choice_setting;
+            if (info->talks[(int)temp_var] < LANG_LAST_INDEX_IN_ARRAY)
+            {
+                snprintf(buffer, buf_len, "%s", str(info->talks[(int)temp_var]));
+            }
+            else
+            {
+                find_setting(setting->setting, &setting_id);
+                cfg_int_to_string(setting_id, (int)temp_var, buffer, buf_len);
+            }
         }
         else
         {
@@ -112,7 +121,7 @@ char *option_get_valuestring(struct settings_list *setting,
     return buffer;
 }
 
-void option_talk(struct settings_list *setting, int temp_var)
+static void option_talk(struct settings_list *setting, int temp_var)
 {
     if (!talk_menus_enabled())
         return;
@@ -276,7 +285,8 @@ static void bool_funcwrapper(int value)
         boolfunction(false);
 }
 
-bool option_screen(struct settings_list *setting, bool use_temp_var)
+bool option_screen(struct settings_list *setting,
+                   bool use_temp_var, unsigned char* option_title)
 {
     int action;
     bool done = false;
@@ -286,7 +296,7 @@ bool option_screen(struct settings_list *setting, bool use_temp_var)
     bool allow_wrap = ((int*)setting->setting != &global_settings.volume);
     int var_type = setting->flags&F_T_MASK;
     void (*function)(int) = NULL;
-    
+    char *title;
     if (var_type == F_T_INT || var_type == F_T_UINT)
     {
         variable = use_temp_var ? &temp_var: (int*)setting->setting;
@@ -303,11 +313,11 @@ bool option_screen(struct settings_list *setting, bool use_temp_var)
     gui_synclist_init(&lists, value_setting_get_name_cb, 
                       (void*)setting, false, 1);
     if (setting->lang_id == -1)
-        gui_synclist_set_title(&lists, 
-                                (char*)setting->cfg_vals, Icon_Questionmark);
+        title = (char*)setting->cfg_vals;
     else
-        gui_synclist_set_title(&lists, 
-                                str(setting->lang_id), Icon_Questionmark);
+        title = P2STR(option_title);
+    
+    gui_synclist_set_title(&lists, title, Icon_Questionmark);
     gui_synclist_set_icon_callback(&lists, NULL);
     
     /* set the number of items and current selection */
@@ -364,7 +374,6 @@ bool option_screen(struct settings_list *setting, bool use_temp_var)
     
     gui_synclist_limit_scroll(&lists, true);
     gui_synclist_draw(&lists);
-    action_signalscreenchange();
     /* talk the item */
     option_talk(setting, *variable);
     while (!done)
@@ -409,7 +418,7 @@ bool option_screen(struct settings_list *setting, bool use_temp_var)
                 }
             }
             if (show_cancel)
-                gui_syncsplash(HZ/2, str(LANG_MENU_SETTING_CANCEL));
+                gui_syncsplash(HZ/2, str(LANG_CANCEL));
             done = true;
         }
         else if (action == ACTION_STD_OK)
@@ -424,24 +433,18 @@ bool option_screen(struct settings_list *setting, bool use_temp_var)
             function(*variable);
     }
     
-    if (use_temp_var)
+    if (oldvalue != *variable)
     {
-        if (var_type == F_T_INT || var_type == F_T_UINT)
+        if (use_temp_var)
         {
-            if (oldvalue != *variable)
-            {
+            if (var_type == F_T_INT || var_type == F_T_UINT)
                 *(int*)setting->setting = *variable;
-                settings_save();
-            }
+            else 
+                *(bool*)setting->setting = *variable?true:false;
         }
-        else if (oldvalue != *variable)
-        {
-            *(bool*)setting->setting = *variable?true:false;
-            settings_save();
-        }
+        settings_save();
     }
-
-    action_signalscreenchange();
+    
     return false;
 }
 
@@ -473,7 +476,7 @@ bool set_option(const char* string, void* variable, enum optiontype type,
     data.desc = (void*)strings; /* shutup gcc... */
     data.option_callback = function;
     item.choice_setting = &data;
-    option_screen(&item, false);
+    option_screen(&item, false, NULL);
     if (type == BOOL)
     {
         *(bool*)variable = (temp == 1? true: false);
@@ -489,7 +492,7 @@ bool set_int_ex(const unsigned char* string,
                 int step,
                 int min,
                 int max,
-                void (*formatter)(char*, int, int, const char*),
+                void (*formatter)(char*, size_t, int, const char*),
                 long (*get_talk_id)(int))
 {
     (void)unit;
@@ -503,7 +506,7 @@ bool set_int_ex(const unsigned char* string,
     item.lang_id = -1;
     item.cfg_vals = (char*)string;
     item.setting = variable;
-    return option_screen(&item, false);
+    return option_screen(&item, false, NULL);
 }
 
 /* to be replaced */

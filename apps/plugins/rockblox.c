@@ -21,11 +21,13 @@
 #include "plugin.h"
 #include "highscore.h"
 #include "playergfx.h"
+#include "helper.h"
 
 PLUGIN_HEADER
 
-#if (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-    (CONFIG_KEYPAD == IPOD_4G_PAD)
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 
 #define ROCKBLOX_OFF           (BUTTON_MENU | BUTTON_SELECT)
 #define ROCKBLOX_ROTATE_RIGHT  BUTTON_SCROLL_BACK
@@ -52,6 +54,7 @@ PLUGIN_HEADER
 #define ROCKBLOX_RESTART       BUTTON_ON
 
 #define ROCKBLOX_RC_OFF       BUTTON_RC_STOP
+
 #elif CONFIG_KEYPAD == RECORDER_PAD
 
 #define ROCKBLOX_OFF           BUTTON_OFF
@@ -475,7 +478,7 @@ figures[BLOCKS_NUM] = {
 };
 
 /* Rockbox File System only supports full filenames inc dir */
-#define HIGH_SCORE "/.rockbox/rocks/rockblox.score"
+#define HIGH_SCORE PLUGIN_GAMES_DIR "/rockblox.score"
 #define MAX_HIGH_SCORES 5
 /* Default High Scores... */
 struct highscore Highest[MAX_HIGH_SCORES];
@@ -851,17 +854,14 @@ static int rockblox_loop (void)
     while (1) {
 #ifdef HAS_BUTTON_HOLD
         if (rb->button_hold ()) {
-            /* Restore user's original backlight setting */
-            rb->backlight_set_timeout (rb->global_settings->backlight_timeout);
-
+            /* Turn on backlight timeout (revert to settings) */
+            backlight_use_settings(rb); /* backlight control in lib/helper.c */
             rb->splash(0, "Paused");
             while (rb->button_hold ())
                 rb->sleep(HZ/10);
 
-            /* Permanently enable the backlight (unless the user has
-                                                             turned it off) */
-            if (rb->global_settings->backlight_timeout > 0)
-                rb->backlight_set_timeout (1);
+            /* Turn off backlight timeout */
+            backlight_force_on(rb); /* backlight control in lib/helper.c */
 
             /* get rid of the splash text */
             rb->lcd_bitmap (rockblox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
@@ -1029,9 +1029,8 @@ enum plugin_status plugin_start (struct plugin_api *api, void *parameter)
         return PLUGIN_OK;
     }
 #endif
-    /* Permanently enable the backlight (unless the user has turned it off) */
-    if (rb->global_settings->backlight_timeout > 0)
-        rb->backlight_set_timeout (1);
+    /* Turn off backlight timeout */
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
 
     init_rockblox ();
     ret = rockblox_loop ();

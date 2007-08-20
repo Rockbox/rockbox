@@ -57,9 +57,6 @@ enum codec_status codec_main(void)
     while (!*ci->taginfo_ready && !ci->stop_codec)
         ci->sleep(1);
         
-    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
-    codec_set_replaygain(ci->id3);
-   
     /* Create a decoder instance */
     wpc = WavpackOpenFileInput (read_callback, error);
 
@@ -68,6 +65,8 @@ enum codec_status codec_main(void)
         goto done;
     }
 
+    ci->configure(DSP_SWITCH_FREQUENCY, WavpackGetSampleRate (wpc));
+    codec_set_replaygain(ci->id3);
     bps = WavpackGetBytesPerSample (wpc);
     nchans = WavpackGetReducedChannels (wpc);
     ci->configure(DSP_SET_STEREO_MODE, nchans == 2 ? STEREO_INTERLEAVED : STEREO_MONO);

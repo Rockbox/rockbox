@@ -144,7 +144,7 @@ bool update_onvol_change(struct gui_wps * gwps)
 
 bool ffwd_rew(int button)
 {
-    static const int ff_rew_steps[] = {
+    static const uint16_t ff_rew_steps[] = {
       1000, 2000, 3000, 4000,
       5000, 6000, 8000, 10000,
       15000, 20000, 25000, 30000,
@@ -280,9 +280,8 @@ bool ffwd_rew(int button)
                 break;
         }
         if (!exit)
-            button = get_action(CONTEXT_WPS,TIMEOUT_BLOCK);
+            button = get_action(CONTEXT_WPS|ALLOW_SOFTLOCK,TIMEOUT_BLOCK);
     }
-    action_signalscreenchange();
     return usb;
 }
 
@@ -295,7 +294,7 @@ bool gui_wps_display(void)
 #ifdef HAVE_LCD_BITMAP
         gui_syncstatusbar_draw(&statusbars, true);
 #endif
-        gui_syncsplash(HZ, str(LANG_END_PLAYLIST_RECORDER));
+        gui_syncsplash(HZ, ID2P(LANG_END_PLAYLIST));
         return true;
     }
     else
@@ -441,17 +440,10 @@ void display_keylock_text(bool locked)
     FOR_NB_SCREENS(i)
         gui_wps[i].display->stop_scroll();
 
-#ifdef HAVE_LCD_CHARCELLS
     if(locked)
-        s = str(LANG_KEYLOCK_ON_PLAYER);
+        s = str(LANG_KEYLOCK_ON);
     else
-        s = str(LANG_KEYLOCK_OFF_PLAYER);
-#else
-    if(locked)
-        s = str(LANG_KEYLOCK_ON_RECORDER);
-    else
-        s = str(LANG_KEYLOCK_OFF_RECORDER);
-#endif
+        s = str(LANG_KEYLOCK_OFF);
     gui_syncsplash(HZ, s);
 }
 
@@ -843,11 +835,23 @@ static char *get_token_value(struct gui_wps *gwps,
                 else
                 {
                     *intval = (limit - 3) * (global_settings.volume
-                                             - sound_min(SOUND_VOLUME))
-                               / (sound_max(SOUND_VOLUME)
-                                  - sound_min(SOUND_VOLUME)) + 2;
+                                             - sound_min(SOUND_VOLUME) - 1)
+                              / (-1 - sound_min(SOUND_VOLUME)) + 2;
                 }
             }
+            return buf;
+
+        case WPS_TOKEN_TRACK_ELAPSED_PERCENT:
+            if (id3->length <= 0)
+                return NULL;
+
+            if (intval)
+            {
+                *intval = limit * (id3->elapsed + state->ff_rewind_count)
+                          / id3->length + 1;
+            }
+            snprintf(buf, buf_size, "%d",
+                     100*(id3->elapsed + state->ff_rewind_count) / id3->length);
             return buf;
 
         case WPS_TOKEN_METADATA_ARTIST:
@@ -862,8 +866,20 @@ static char *get_token_value(struct gui_wps *gwps,
         case WPS_TOKEN_METADATA_ALBUM_ARTIST:
             return id3->albumartist;
 
+        case WPS_TOKEN_METADATA_GROUPING:
+            return id3->grouping;
+            
         case WPS_TOKEN_METADATA_GENRE:
             return id3->genre_string;
+
+        case WPS_TOKEN_METADATA_DISC_NUMBER:
+            if (id3->disc_string)
+                return id3->disc_string;
+            if (id3->discnum) {
+                snprintf(buf, buf_size, "%d", id3->discnum);
+                return buf;
+            }
+            return NULL;
 
         case WPS_TOKEN_METADATA_TRACK_NUMBER:
             if (id3->track_string)
@@ -999,7 +1015,7 @@ static char *get_token_value(struct gui_wps *gwps,
         case WPS_TOKEN_BATTERY_VOLTS:
         {
             unsigned int v = battery_voltage();
-            snprintf(buf, buf_size, "%d.%02d", v/100, v%100);
+            snprintf(buf, buf_size, "%d.%02d", v / 1000, (v % 1000) / 10);
             return buf;
         }
 

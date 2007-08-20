@@ -38,4 +38,9 @@
 /* Force a scan now */
 unsigned short adc_scan(int channel);
 
+static inline unsigned short adc_read(int channel)
+{ 
+    return adc_scan(channel); 
+}
+
 #endif /* _ADC_TARGET_H_ */

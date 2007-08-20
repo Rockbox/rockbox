@@ -77,9 +77,19 @@
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 
-#define BATTERY_CAPACITY_DEFAULT 820 /* default battery capacity */
-
 #define AB_REPEAT_ENABLE 1
+
+#define BATTERY_CAPACITY_DEFAULT 820 /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 700  /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 900 /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC 10   /* capacity increment */
+#define BATTERY_TYPES_COUNT  1    /* only one type */
+
+/* Hardware controlled charging */
+#define CONFIG_CHARGING CHARGING_SIMPLE
+
+/* define this if the unit can be powered or charged via USB */
+#define HAVE_USB_POWER
 
 #ifndef SIMULATOR
 
@@ -88,17 +98,6 @@
 
 /* Define this if you want to use the PP5020 i2c interface */
 #define CONFIG_I2C I2C_PP5020
-
-/* Type of mobile power */
-#define CONFIG_BATTERY BATT_BP009
-#define BATTERY_CAPACITY_MIN 700  /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 900 /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC 10   /* capacity increment */
-#define BATTERY_TYPES_COUNT  1    /* only one type */
-#define BATTERY_SCALE_FACTOR 4688
-
-/* Hardware controlled charging */
-#define CONFIG_CHARGING CHARGING_SIMPLE
 
 /* define this if the hardware can be powered off while charging */
 #define HAVE_POWEROFF_WHILE_CHARGING
@@ -131,9 +130,6 @@
 
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_ARC
-
-/* define this if the unit can be powered or charged via USB */
-#define HAVE_USB_POWER
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL

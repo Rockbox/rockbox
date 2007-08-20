@@ -16,6 +16,7 @@
  *
  **************************************************************************/
 #include "plugin.h"
+#include "fixedpoint.h"
 
 #if defined(HAVE_LCD_BITMAP)
 
@@ -64,8 +65,9 @@ PLUGIN_HEADER
 
 #define VUMETER_RC_QUIT BUTTON_RC_STOP
 
-#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_4G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define VUMETER_QUIT BUTTON_MENU
 #define VUMETER_HELP BUTTON_PLAY
 #define VUMETER_MENU BUTTON_SELECT
@@ -187,80 +189,16 @@ struct saved_settings {
     bool digital_minimeters;
     int analog_decay;
     int digital_decay; 
-} settings;
+} vumeter_settings;
 
 void reset_settings(void) {
-    settings.meter_type=ANALOG;
-    settings.analog_use_db_scale=true;
-    settings.digital_use_db_scale=true;
-    settings.analog_minimeters=true;
-    settings.digital_minimeters=false;
-    settings.analog_decay=3;
-    settings.digital_decay=0; 
-}
-
-/* taken from http://www.quinapalus.com/efunc.html */
-int fxlog(int x) {
-    int t,y;
-
-    y=0xa65af;
-    if(x<0x00008000) x<<=16,              y-=0xb1721;
-    if(x<0x00800000) x<<= 8,              y-=0x58b91;
-    if(x<0x08000000) x<<= 4,              y-=0x2c5c8;
-    if(x<0x20000000) x<<= 2,              y-=0x162e4;
-    if(x<0x40000000) x<<= 1,              y-=0x0b172;
-    t=x+(x>>1); if((t&0x80000000)==0) x=t,y-=0x067cd;
-    t=x+(x>>2); if((t&0x80000000)==0) x=t,y-=0x03920;
-    t=x+(x>>3); if((t&0x80000000)==0) x=t,y-=0x01e27;
-    t=x+(x>>4); if((t&0x80000000)==0) x=t,y-=0x00f85;
-    t=x+(x>>5); if((t&0x80000000)==0) x=t,y-=0x007e1;
-    t=x+(x>>6); if((t&0x80000000)==0) x=t,y-=0x003f8;
-    t=x+(x>>7); if((t&0x80000000)==0) x=t,y-=0x001fe;
-    x=0x80000000-x;
-    y-=x>>15;
-    return y;
-}
-
-/*
- * Integer square root routine, good for up to 32-bit values.
- * Note that the largest square root (that of 0xffffffff) is
- * 0xffff, so the result fits in a regular unsigned and need
- * not be `long'.
- *
- * Original code from Tomas Rokicki (using a well known algorithm).
- * This version by Chris Torek, University of Maryland.
- *
- * This code is in the public domain.
- */
-unsigned int root(unsigned long v)
-{
-        register unsigned long t = 1L << 30, r = 0, s;  /* 30 = 15*2 */
-
-#define STEP(k) \
-        s = t + r; \
-        r >>= 1; \
-        if (s <= v) { \
-                v -= s; \
-                r |= t; \
-        }
-        STEP(15); t >>= 2;
-        STEP(14); t >>= 2;
-        STEP(13); t >>= 2;
-        STEP(12); t >>= 2;
-        STEP(11); t >>= 2;
-        STEP(10); t >>= 2;
-        STEP(9); t >>= 2;
-        STEP(8); t >>= 2;
-        STEP(7); t >>= 2;
-        STEP(6); t >>= 2;
-        STEP(5); t >>= 2;
-        STEP(4); t >>= 2;
-        STEP(3); t >>= 2;
-        STEP(2); t >>= 2;
-        STEP(1); t >>= 2;
-        STEP(0);
-        return r;
-
+    vumeter_settings.meter_type=ANALOG;
+    vumeter_settings.analog_use_db_scale=true;
+    vumeter_settings.digital_use_db_scale=true;
+    vumeter_settings.analog_minimeters=true;
+    vumeter_settings.digital_minimeters=false;
+    vumeter_settings.analog_decay=3;
+    vumeter_settings.digital_decay=0; 
 }
 
 void calc_scales(void)
@@ -268,9 +206,15 @@ void calc_scales(void)
     unsigned int fx_log_factor = E_POW_5/half_width;
     unsigned int y,z;
 
+    long j;
+    long k;
+    int nh = LCD_HEIGHT - NEEDLE_TOP;
+    long nh2 = nh*nh;
+
     for (i=1; i <= half_width; i++)
     {
-        y = (half_width/5)*fxlog(i*fx_log_factor);
+        /* analog scale */
+        y = (half_width/5)*flog(i*fx_log_factor);
 
         /* better way of checking for negative values? */
         z = y>>16;
@@ -280,31 +224,21 @@ void calc_scales(void)
         analog_db_scale[i-1] = z;
         /* play nice */
         rb->yield();
-    }
 
-    long j;
-    long k;
-    unsigned int l;
-    int nh = LCD_HEIGHT - NEEDLE_TOP;
-    long nh2 = nh*nh;
-    for (i=1; i<=half_width; i++)
-    {
+        /* y values (analog needle co-ords) */
         j = i - (int)(half_width/2);
         k = nh2 - ( j * j );
-        /* +1 seems to give a closer approximation */
-        l = root(k) + 1;
-        l = LCD_HEIGHT - l;
 
-        y_values[i-1] = l;
+        /* fsqrt+1 seems to give a closer approximation */
+        y_values[i-1] = LCD_HEIGHT - (fsqrt(k, 16)>>8) - 1;
         rb->yield();
     }
-
 }
 
 void load_settings(void) {
-    int fp = rb->open("/.rockbox/rocks/.vu_meter", O_RDONLY);
+    int fp = rb->open(PLUGIN_DEMOS_DIR "/.vu_meter", O_RDONLY);
     if(fp>=0) {
-            rb->read(fp, &settings, sizeof(struct saved_settings));
+            rb->read(fp, &vumeter_settings, sizeof(struct saved_settings));
             rb->close(fp);
     }
     else {
@@ -318,9 +252,9 @@ void load_settings(void) {
 }
 
 void save_settings(void) {
-    int fp = rb->creat("/.rockbox/rocks/.vu_meter");
+    int fp = rb->creat(PLUGIN_DEMOS_DIR "/.vu_meter");
     if(fp >= 0) {
-        rb->write (fp, &settings, sizeof(struct saved_settings));
+        rb->write (fp, &vumeter_settings, sizeof(struct saved_settings));
         rb->close(fp);
     }
 }
@@ -371,45 +305,45 @@ static bool vu_meter_menu(void)
         switch(rb->do_menu(&menu, &selection))
         {
             case 0:
-                rb->set_option("Meter Type", &settings.meter_type, INT,
+                rb->set_option("Meter Type", &vumeter_settings.meter_type, INT,
                                meter_type_option, 2, NULL);
                 break;
                 
             case 1:
-                if(settings.meter_type==ANALOG)
+                if(vumeter_settings.meter_type==ANALOG)
                 {
-                    rb->set_bool_options("Scale", &settings.analog_use_db_scale,
+                    rb->set_bool_options("Scale", &vumeter_settings.analog_use_db_scale,
                                          "dBfs", -1, "Linear", -1, NULL);
                 }
                 else
                 {
-                    rb->set_bool_options("Scale", &settings.digital_use_db_scale,
+                    rb->set_bool_options("Scale", &vumeter_settings.digital_use_db_scale,
                                          "dBfs", -1, "Linear", -1, NULL);
                 }
                 break;
                 
             case 2:
-                if(settings.meter_type==ANALOG)
+                if(vumeter_settings.meter_type==ANALOG)
                 {
                     rb->set_bool("Enable Minimeters",
-                                 &settings.analog_minimeters);
+                                 &vumeter_settings.analog_minimeters);
                 }
                 else
                 {
                     rb->set_bool("Enable Minimeters",
-                                 &settings.digital_minimeters);
+                                 &vumeter_settings.digital_minimeters);
                 }
                 break;
                 
             case 3:
-                if(settings.meter_type==ANALOG)
+                if(vumeter_settings.meter_type==ANALOG)
                 {
-                    rb->set_option("Decay Speed", &settings.analog_decay, INT, 
+                    rb->set_option("Decay Speed", &vumeter_settings.analog_decay, INT, 
                                decay_speed_option, 7, NULL);
                 }
                 else
                 {
-                    rb->set_option("Decay Speed", &settings.digital_decay, INT, 
+                    rb->set_option("Decay Speed", &vumeter_settings.digital_decay, INT, 
                                decay_speed_option, 7, NULL);
                 }
                 break;
@@ -489,7 +423,7 @@ void analog_meter(void) {
     rb->pcm_calculate_peaks(&left_peak, &right_peak);
 #endif
 
-    if(settings.analog_use_db_scale) {
+    if(vumeter_settings.analog_use_db_scale) {
         left_needle_top_x = analog_db_scale[left_peak * half_width / MAX_PEAK];
         right_needle_top_x = analog_db_scale[right_peak * half_width / MAX_PEAK] + half_width;
     }
@@ -499,8 +433,10 @@ void analog_meter(void) {
     }
 
     /* Makes a decay on the needle */
-    left_needle_top_x = (left_needle_top_x+last_left_needle_top_x*settings.analog_decay)/(settings.analog_decay+1);
-    right_needle_top_x = (right_needle_top_x+last_right_needle_top_x*settings.analog_decay)/(settings.analog_decay+1);
+    left_needle_top_x = (left_needle_top_x+last_left_needle_top_x*vumeter_settings.analog_decay)
+                        /(vumeter_settings.analog_decay+1);
+    right_needle_top_x = (right_needle_top_x+last_right_needle_top_x*vumeter_settings.analog_decay)
+                         /(vumeter_settings.analog_decay+1);
 
     last_left_needle_top_x = left_needle_top_x;
     last_right_needle_top_x = right_needle_top_x;
@@ -512,7 +448,7 @@ void analog_meter(void) {
     rb->lcd_drawline(quarter_width, LCD_HEIGHT-1, left_needle_top_x, left_needle_top_y);
     rb->lcd_drawline((quarter_width+half_width), LCD_HEIGHT-1, right_needle_top_x, right_needle_top_y);
 
-    if(settings.analog_minimeters)
+    if(vumeter_settings.analog_minimeters)
         draw_analog_minimeters();
 
     /* Needle covers */
@@ -544,7 +480,7 @@ void digital_meter(void) {
     rb->pcm_calculate_peaks(&left_peak, &right_peak);
 #endif
 
-    if(settings.digital_use_db_scale) {
+    if(vumeter_settings.digital_use_db_scale) {
         num_left_leds = digital_db_scale[left_peak * 44 / MAX_PEAK];
         num_right_leds = digital_db_scale[right_peak * 44 / MAX_PEAK];
     }
@@ -553,8 +489,10 @@ void digital_meter(void) {
         num_right_leds = right_peak * 11 / MAX_PEAK;
     }
 
-    num_left_leds = (num_left_leds+last_num_left_leds*settings.digital_decay)/(settings.digital_decay+1);
-    num_right_leds = (num_right_leds+last_num_right_leds*settings.digital_decay)/(settings.digital_decay+1);
+    num_left_leds = (num_left_leds+last_num_left_leds*vumeter_settings.digital_decay)
+                    /(vumeter_settings.digital_decay+1);
+    num_right_leds = (num_right_leds+last_num_right_leds*vumeter_settings.digital_decay)
+                     /(vumeter_settings.digital_decay+1);
 
     last_num_left_leds = num_left_leds;
     last_num_right_leds = num_right_leds;
@@ -572,7 +510,7 @@ void digital_meter(void) {
 
     rb->lcd_set_drawmode(DRMODE_SOLID);
 
-    if(settings.digital_minimeters)
+    if(vumeter_settings.digital_minimeters)
         draw_digital_minimeters();
 
     /* Lines above/below where the LEDS are */
@@ -608,7 +546,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
 
         rb->lcd_putsxy(half_width-23, 0, "VU Meter");
 
-        if(settings.meter_type==ANALOG)
+        if(vumeter_settings.meter_type==ANALOG)
             analog_meter();
         else
             digital_meter();

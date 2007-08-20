@@ -38,7 +38,6 @@
 #include "plugin.h"
 #include "rolo.h"
 #include "sprintf.h"
-#include "dircache.h"
 #include "splash.h"
 #include "yesno.h"
 #include "cuesheet.h"
@@ -84,11 +83,11 @@ int ft_build_playlist(struct tree_context* c, int start_index)
 static void check_file_thumbnails(struct tree_context* c)
 {
     int i;
-    struct dircache_entry *entry;
+    struct dirent *entry;
     struct entry* dircache = c->dircache;
-    DIRCACHED *dir;
+    DIR *dir;
 
-    dir = opendir_cached(c->currdir);
+    dir = opendir(c->currdir);
     if(!dir)
         return;
     /* mark all files as non talking, except the .talk ones */
@@ -109,7 +108,7 @@ static void check_file_thumbnails(struct tree_context* c)
         }
     }
 
-    while((entry = readdir_cached(dir)) != 0) /* walk directory */
+    while((entry = readdir(dir)) != 0) /* walk directory */
     {
         int ext_pos;
 
@@ -135,7 +134,7 @@ static void check_file_thumbnails(struct tree_context* c)
             }
         }
     }
-    closedir_cached(dir);
+    closedir(dir);
 }
 
 /* support function for qsort() */
@@ -209,12 +208,12 @@ int ft_load(struct tree_context* c, const char* tempdir)
 {
     int i;
     int name_buffer_used = 0;
-    DIRCACHED *dir;
+    DIR *dir;
 
     if (tempdir)
-        dir = opendir_cached(tempdir);
+        dir = opendir(tempdir);
     else
-        dir = opendir_cached(c->currdir);
+        dir = opendir(c->currdir);
     if(!dir)
         return -1; /* not a directory */
 
@@ -223,7 +222,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
 
     for ( i=0; i < global_settings.max_files_in_dir; i++ ) {
         int len;
-        struct dircache_entry *entry = readdir_cached(dir);
+        struct dirent *entry = readdir(dir);
         struct entry* dptr =
             (struct entry*)(c->dircache + i * sizeof(struct entry));
         if (!entry)
@@ -301,7 +300,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
     }
     c->filesindir = i;
     c->dirlength = i;
-    closedir_cached(dir);
+    closedir(dir);
 
     qsort(c->dircache,i,sizeof(struct entry),compare);
 
@@ -343,21 +342,21 @@ int ft_enter(struct tree_context* c)
         switch ( file->attr & FILE_ATTR_MASK ) {
             case FILE_ATTR_M3U:
                 if (global_settings.party_mode) {
-                    gui_syncsplash(HZ, str(LANG_PARTY_MODE));
+                    gui_syncsplash(HZ, ID2P(LANG_PARTY_MODE));
                     break;
                 }
 
                 if (bookmark_autoload(buf))
                     break;
 
-                gui_syncsplash(0, str(LANG_WAIT));
+                gui_syncsplash(0, ID2P(LANG_WAIT));
 
                 /* about to create a new current playlist...
                    allow user to cancel the operation */
                 if (global_settings.warnon_erase_dynplaylist &&
                     playlist_modified(NULL))
                 {
-                    char *lines[]={str(LANG_WARN_ERASEDYNPLAYLIST_PROMPT)};
+                    char *lines[]={ID2P(LANG_WARN_ERASEDYNPLAYLIST_PROMPT)};
                     struct text_message message={lines, 1};
 
                     if(gui_syncyesno_run(&message, NULL, NULL) != YESNO_YES)
@@ -378,7 +377,7 @@ int ft_enter(struct tree_context* c)
                 if (bookmark_autoload(c->currdir))
                     break;
 
-                gui_syncsplash(0, str(LANG_WAIT));
+                gui_syncsplash(0, ID2P(LANG_WAIT));
 
                 /* about to create a new current playlist...
                    allow user to cancel the operation */
@@ -386,7 +385,7 @@ int ft_enter(struct tree_context* c)
                     !global_settings.party_mode &&
                     playlist_modified(NULL))
                 {
-                    char *lines[]={str(LANG_WARN_ERASEDYNPLAYLIST_PROMPT)};
+                    char *lines[]={ID2P(LANG_WARN_ERASEDYNPLAYLIST_PROMPT)};
                     struct text_message message={lines, 1};
 
                     if(gui_syncyesno_run(&message, NULL, NULL) != YESNO_YES)
@@ -397,7 +396,7 @@ int ft_enter(struct tree_context* c)
                 {
                     playlist_insert_track(NULL, buf,
                                           PLAYLIST_INSERT_LAST, true, true);
-                    gui_syncsplash(HZ, str(LANG_QUEUE_LAST));
+                    gui_syncsplash(HZ, ID2P(LANG_QUEUE_LAST));
                 }
                 else if (playlist_create(c->currdir, NULL) != -1)
                 {
@@ -422,7 +421,7 @@ int ft_enter(struct tree_context* c)
                 /* fmr preset file */
             case FILE_ATTR_FMR:
 
-                gui_syncsplash(0, str(LANG_WAIT));
+                gui_syncsplash(0, ID2P(LANG_WAIT));
 
                 /* Preset inside the default folder. */
                 if(!strncasecmp(FMPRESET_PATH, buf, strlen(FMPRESET_PATH)))
@@ -449,7 +448,7 @@ int ft_enter(struct tree_context* c)
 
                 /* wps config file */
             case FILE_ATTR_WPS:
-                gui_syncsplash(0, str(LANG_WAIT));
+                gui_syncsplash(0, ID2P(LANG_WAIT));
 #if LCD_DEPTH > 1
                 unload_wps_backdrop();
 #endif
@@ -461,7 +460,7 @@ int ft_enter(struct tree_context* c)
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
                 /* remote-wps config file */
             case FILE_ATTR_RWPS:
-                gui_syncsplash(0, str(LANG_WAIT));
+                gui_syncsplash(0, ID2P(LANG_WAIT));
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
                 unload_remote_wps_backdrop();
 #endif
@@ -472,39 +471,39 @@ int ft_enter(struct tree_context* c)
 #endif
 
             case FILE_ATTR_CFG:
-                gui_syncsplash(0, str(LANG_WAIT));
+                gui_syncsplash(0, ID2P(LANG_WAIT));
                 if (!settings_load_config(buf,true))
                     break;
-                gui_syncsplash(HZ, str(LANG_SETTINGS_LOADED));
+                gui_syncsplash(HZ, ID2P(LANG_SETTINGS_LOADED));
                 break;
 
             case FILE_ATTR_BMARK:
-                gui_syncsplash(0, str(LANG_WAIT));
+                gui_syncsplash(0, ID2P(LANG_WAIT));
                 bookmark_load(buf, false);
                 reload_dir = true;
                 break;
 
             case FILE_ATTR_LNG:
-                gui_syncsplash(0, str(LANG_WAIT));
+                gui_syncsplash(0, ID2P(LANG_WAIT));
                 if(!lang_load(buf)) {
                     set_file(buf, (char *)global_settings.lang_file,
                              MAX_FILENAME);
                     talk_init(); /* use voice of same language */
-                    gui_syncsplash(HZ, str(LANG_LANGUAGE_LOADED));
+                    gui_syncsplash(HZ, ID2P(LANG_LANGUAGE_LOADED));
                 }
                 break;
 
 #ifdef HAVE_LCD_BITMAP
             case FILE_ATTR_FONT:
-                gui_syncsplash(0, str(LANG_WAIT));
+                gui_syncsplash(0, ID2P(LANG_WAIT));
                 font_load(buf);
                 set_file(buf, (char *)global_settings.font_file, MAX_FILENAME);
                 break;
 
             case FILE_ATTR_KBD:
-                gui_syncsplash(0, str(LANG_WAIT));
+                gui_syncsplash(0, ID2P(LANG_WAIT));
                 if (!load_kbd(buf))
-                    gui_syncsplash(HZ, str(LANG_KEYBOARD_LOADED));
+                    gui_syncsplash(HZ, ID2P(LANG_KEYBOARD_LOADED));
                 set_file(buf, (char *)global_settings.kbd_file, MAX_FILENAME);
                 break;
 #endif
@@ -512,7 +511,7 @@ int ft_enter(struct tree_context* c)
 #ifndef SIMULATOR
                 /* firmware file */
             case FILE_ATTR_MOD:
-                gui_syncsplash(0, str(LANG_WAIT));
+                gui_syncsplash(0, ID2P(LANG_WAIT));
                 rolo_load(buf);
                 break;
 #endif
@@ -520,11 +519,11 @@ int ft_enter(struct tree_context* c)
                 /* plugin file */
             case FILE_ATTR_ROCK:
                 if (global_settings.party_mode) {
-                    gui_syncsplash(HZ, str(LANG_PARTY_MODE));
+                    gui_syncsplash(HZ, ID2P(LANG_PARTY_MODE));
                     break;
                 }
 
-                gui_syncsplash(0, str(LANG_WAIT));
+                gui_syncsplash(0, ID2P(LANG_WAIT));
 
                 if (plugin_load(buf,NULL) == PLUGIN_USB_CONNECTED)
                 {
@@ -546,7 +545,7 @@ int ft_enter(struct tree_context* c)
                 char* plugin;
 
                 if (global_settings.party_mode) {
-                    gui_syncsplash(HZ, str(LANG_PARTY_MODE));
+                    gui_syncsplash(HZ, ID2P(LANG_PARTY_MODE));
                     break;
                 }
 

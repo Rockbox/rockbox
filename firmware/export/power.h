@@ -31,13 +31,13 @@ bool charger_inserted(void);
 void power_off(void);
 void ide_power_enable(bool on);
 
-#ifndef SIMULATOR
-
-void power_init(void);
-
 # if CONFIG_CHARGING == CHARGING_MONITOR
 bool charging_state(void);
 # endif
+
+#ifndef SIMULATOR
+
+void power_init(void);
 
 bool ide_powered(void);
 #endif
@@ -48,8 +48,8 @@ bool spdif_powered(void);
 #endif
 
 #if CONFIG_TUNER
-extern bool radio_power(bool status);
-extern bool radio_powered(void);
+bool tuner_power(bool status);
+bool tuner_power_nolock(bool status);
 #endif
 
 #endif

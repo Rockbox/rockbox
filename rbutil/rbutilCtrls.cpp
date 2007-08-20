@@ -263,10 +263,13 @@ void ThemeCtrl::ThemePreview()
     dest = gv->stdpaths->GetUserDataDir() + wxT("" PATH_SEP "download" PATH_SEP)
            + m_currentResolution + wxT("" PATH_SEP) + filename;
 
-    if(DownloadURL(src, dest))
+    if(!wxFileExists(dest))
     {
-        MESG_DIALOG(wxT("Unable to download image."));
-        return;
+        if(DownloadURL(src, dest))
+        {
+            MESG_DIALOG(wxT("Unable to download image."));
+            return;
+        }
     }
 
     m_currentimage = dest;

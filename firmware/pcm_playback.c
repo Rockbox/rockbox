@@ -53,7 +53,7 @@ void pcm_play_pause_unpause(void);
 
 /** Functions that require targeted implementation **/
 
-#if !defined(CPU_COLDFIRE) && (CONFIG_CPU != S3C2440)
+#if !defined(CPU_COLDFIRE) && (CONFIG_CPU != S3C2440) && (CONFIG_CPU != IMX31L)
 
 #if (CONFIG_CPU == PNX0101)
 

@@ -42,7 +42,8 @@ PLUGIN_IRAM_DECLARE
 
 #define BTN_RC_QUIT      BUTTON_RC_STOP
 
-#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define BTN_QUIT         (BUTTON_SELECT | BUTTON_MENU)
 #define BTN_RIGHT        BUTTON_RIGHT
 #define BTN_UP           BUTTON_SCROLL_FWD
@@ -80,12 +81,21 @@ PLUGIN_IRAM_DECLARE
 #define FRACTSIZE 10
 
 #ifndef SIMULATOR
-	#define SAMPLE_RATE SAMPR_22  // 44100 22050 11025
-	#define MAX_VOICES 20   // Note: 24 midi channels is the minimum general midi
-                         // spec implementation
+
+#if (HW_SAMPR_CAPS & SAMPR_CAP_22)
+#define SAMPLE_RATE SAMPR_22  // 44100 22050 11025
+#else
+#define SAMPLE_RATE SAMPR_44  // 44100 22050 11025
+#endif
+
+#define MAX_VOICES 20   // Note: 24 midi channels is the minimum general midi
+                        // spec implementation
+
 #else	// Simulator requires 44100, and we can afford to use more voices
-	#define SAMPLE_RATE SAMPR_44
-	#define MAX_VOICES 48
+
+#define SAMPLE_RATE SAMPR_44
+#define MAX_VOICES 48
+
 #endif
 
 

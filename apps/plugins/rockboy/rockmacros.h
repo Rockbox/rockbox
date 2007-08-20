@@ -35,7 +35,6 @@ void *sys_timer(void);
 int  sys_elapsed(long *oldtick);
 int  pcm_submit(void);
 void pcm_init(void);
-void sound_dirty(void);
 void doevents(void) ICODE_ATTR;
 void ev_poll(void);
 int do_user_menu(void);
@@ -71,22 +70,13 @@ void dynamic_recompile (struct dynarec_block *newblock);
 #define isalnum(c) (isdigit(c) || (isalpha(c)))
 
 #ifdef SIMULATOR
-#undef opendir
-#define opendir(a)      rb->sim_opendir((a))
-#undef closedir
-#define closedir(a)     rb->sim_closedir((a))
-#undef mkdir
-#define mkdir(a)        rb->sim_mkdir((a))
 #undef open
 #define open(a,b)       rb->sim_open((a),(b))
-#undef close
-#define close(a)        rb->close((a))
 #undef lseek
 #define lseek(a,b,c)    rb->sim_lseek((a),(b),(c))
+#undef close
+#define close(a)        rb->close((a))
 #else /* !SIMULATOR */
-#define opendir(a)      rb->opendir((a))
-#define closedir(a)     rb->closedir((a))
-#define mkdir(a)        rb->mkdir((a))
 #define open(a,b)       rb->open((a),(b))
 #define lseek(a,b,c)    rb->lseek((a),(b),(c))
 #define close(a)        rb->close((a))

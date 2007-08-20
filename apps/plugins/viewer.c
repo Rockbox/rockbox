@@ -24,8 +24,8 @@
 
 PLUGIN_HEADER
 
-#define SETTINGS_FILE   "/.rockbox/viewers/viewer.dat" /* binary file, so dont use .cfg */
-#define BOOKMARKS_FILE   "/.rockbox/viewers/viewer_bookmarks.dat"
+#define SETTINGS_FILE   PLUGIN_APPS_DIR "/viewer.dat" /* binary file, so dont use .cfg */
+#define BOOKMARKS_FILE  PLUGIN_APPS_DIR "/viewer_bookmarks.dat"
 
 #define WRAP_TRIM          44  /* Max number of spaces to trim (arbitrary) */
 #define MAX_COLUMNS        64  /* Max displayable string len (over-estimate) */
@@ -129,9 +129,10 @@ PLUGIN_HEADER
 
 #define VIEWER_RC_QUIT BUTTON_RC_STOP
 
-/* iPods with the 4G pad */
+/* iPods */
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD)
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define VIEWER_QUIT_PRE BUTTON_SELECT
 #define VIEWER_QUIT (BUTTON_SELECT | BUTTON_MENU)
 #define VIEWER_PAGE_UP BUTTON_SCROLL_BACK
@@ -375,8 +376,11 @@ static unsigned char* find_last_space(const unsigned char* p, int size)
 
     for (i=size-1; i>=0; i--)
         for (j=k; j < (int) sizeof(line_break); j++)
-            if (p[i] == line_break[j])
-                return (unsigned char*) p+i;
+        {
+            if (!((p[i] == '-') && (prefs.word_mode == WRAP)))
+                if (p[i] == line_break[j])
+                    return (unsigned char*) p+i;
+        }
 
     return NULL;
 }
@@ -1124,6 +1128,9 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
 static void viewer_save_settings(void)/* same name as global, but not the same file.. */
 {
     int settings_fd;
+
+    rb->splash(1, "Saving Settings");
+
     settings_fd = rb->creat(SETTINGS_FILE); /* create the settings file */
     
     rb->write (settings_fd, &prefs, sizeof(struct preferences));
@@ -1316,7 +1323,6 @@ static void viewer_menu(void)
     switch (result)
     {
         case 0: /* quit */
-            rb->splash(1, "Saving Settings");
             menu_exit(m);
             viewer_exit(NULL);
             done = true;
@@ -1353,9 +1359,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
     file_name = file;
     ok = viewer_init();
     if (!ok) {
-        rb->splash(HZ, "Error");
-        viewer_exit(NULL);
-        return PLUGIN_OK;
+        rb->splash(HZ, "Error opening file.");
+        return PLUGIN_ERROR;
     }
 
     viewer_reset_settings(); /* load defaults first */

@@ -41,7 +41,6 @@ struct ram
     int loaded;
 };
 
-
 extern struct mbc mbc;
 extern struct rom rom;
 extern struct ram ram;

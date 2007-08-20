@@ -5,6 +5,7 @@
 #define MIN(x,y) ((x) > (y) ? (y) : (x))
 
 bool debug_wps = true;
+int wps_verbose_level = 0;
 
 int read_bmp_file(char* filename,
                   struct bitmap *bm,
@@ -63,22 +64,36 @@ int main(int argc, char **argv)
 {
     int res;
     int fd;
+    int filearg = 1;
 
     struct wps_data wps;
 
-    if (argc != 2) {
-        printf("Usage: checkwps filename.wps\n");
+    if (argc < 2) {
+        printf("Usage: checkwps [OPTIONS] filename.wps\n");
+        printf("\nOPTIONS:\n");
+        printf("\t-v\tverbose\n");
+        printf("\t-vv\tmore verbose\n");
+        printf("\t-vvv\tvery verbose\n");
         return 1;
     }
 
-    fd = open(argv[1], O_RDONLY);
+    if (argv[1][0] == '-') {
+        filearg++;
+        int i = 1;
+        while (argv[1][i] && argv[1][i] == 'v') {
+            i++;
+            wps_verbose_level++;
+        }
+    }
+
+    fd = open(argv[filearg], O_RDONLY);
     if (fd < 0) {
       printf("Failed to open %s\n",argv[1]);
       return 2;
     }
     close(fd);
 
-    res = wps_data_load(&wps, argv[1], true);
+    res = wps_data_load(&wps, argv[filearg], true);
 
     if (!res) {
       printf("WPS parsing failure\n");

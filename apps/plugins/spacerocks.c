@@ -20,6 +20,8 @@
 #include "plugin.h"
 #include "math.h"
 #include "stdio.h"
+#include "helper.h"
+
 PLUGIN_HEADER
 
 /******************************* Globals ***********************************/
@@ -93,7 +95,8 @@ static struct plugin_api* rb; /* global api struct pointer */
 #define AST_FIRE BUTTON_SELECT
 #define AST_FIRE_REP BUTTON_SELECT | BUTTON_REPEAT
 
-#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define AST_PAUSE (BUTTON_SELECT | BUTTON_PLAY)
 #define AST_QUIT (BUTTON_SELECT | BUTTON_MENU)
 #define AST_THRUST BUTTON_MENU
@@ -161,7 +164,7 @@ static struct plugin_api* rb; /* global api struct pointer */
 #define WRAP_GAP                12
 #define EXPLOSION_LENGTH        20
 #define SHOW_COL 0
-#define HISCORE_FILE PLUGIN_DIR "/astrorocks.hs"
+#define HISCORE_FILE PLUGIN_GAMES_DIR "/astrorocks.hs"
 #define POINT_SIZE 2
 #define MAX_NUM_ASTEROIDS 25
 #define MAX_NUM_MISSILES 6
@@ -487,14 +490,20 @@ void iohiscore(void)
     rb->memset(phscore, 0, sizeof(phscore));
 
     fd = rb->open(HISCORE_FILE,O_RDWR | O_CREAT);
-
+    if(fd < 0)
+    {
+        rb->splash(HZ, "Highscore file read error");
+        return;
+    }
+    
     /* highscore used to %d, is now %d\n
        Deal with no file or bad file */
     rb->read(fd,phscore, sizeof(phscore));
 
     compare = rb->atoi(phscore);
 
-    if(high_score > compare){
+    if(high_score > compare)
+    {
         rb->lseek(fd,0,SEEK_SET);
         rb->fdprintf(fd, "%d\n", high_score);
     }
@@ -1923,24 +1932,23 @@ enum plugin_status start_game(void)
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     enum plugin_status retval;
-    
     (void)(parameter);
     rb = api;
     
     game_state = ATTRACT_MODE;
     
-    /* universal font */
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif
+    /* universal font */
     rb->lcd_setfont(FONT_SYSFIXED);
-    rb->backlight_set_timeout(1);
+    /* Turn off backlight timeout */
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
     iohiscore();
     retval = start_game();  
     iohiscore();
     rb->lcd_setfont(FONT_UI);
-    /* restore normal backlight setting*/
-    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
-    
+    /* Turn on backlight timeout (revert to settings) */
+    backlight_use_settings(rb); /* backlight control in lib/helper.c */
     return retval;
 }

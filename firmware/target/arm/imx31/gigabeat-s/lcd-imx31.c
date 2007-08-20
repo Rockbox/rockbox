@@ -91,6 +91,11 @@ void lcd_enable(bool state)
     (void)state;
 }
 
+bool lcd_enabled(void)
+{
+    return true;
+}
+
 /* Update the display.
    This must be called after all other LCD functions that change the display. */
 void lcd_update(void)

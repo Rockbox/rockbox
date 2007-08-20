@@ -98,10 +98,13 @@ extern unsigned short descramble(const unsigned char* source,
 extern void rolo_restart(const unsigned char* source, unsigned char* dest,
                          int length);
 #else
+
+/* explicitly put this code in iram, ICODE_ATTR is defined to be null for some
+   targets that are low on iram, like the gigabeat F/X */
 void rolo_restart(const unsigned char* source, unsigned char* dest,
-                  long length)  __attribute__ ((section (".icode")));
+                  long length) __attribute__ ((section(".icode")));
 void rolo_restart(const unsigned char* source, unsigned char* dest,
-                         long length)
+                  long length)
 {
     long i;
     unsigned char* localdest = dest;
@@ -109,6 +112,9 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
     unsigned long* memmapregs = (unsigned long*)0xf000f000;
 #endif
 
+    /* This is the equivalent of a call to memcpy() but this must be done from
+       iram to avoid overwriting itself and we don't want to depend on memcpy()
+       always being in iram */
     for(i = 0;i < length;i++)
         *localdest++ = *source++;
 

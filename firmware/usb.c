@@ -81,6 +81,9 @@ void screen_dump(void);   /* Nasty again. Defined in apps/ too */
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
 #define USBPOWER_BUTTON BUTTON_SELECT
 #define USBPOWER_BTN_IGNORE BUTTON_POWER
+#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
+#define USBPOWER_BUTTON BUTTON_SELECT
+#define USBPOWER_BTN_IGNORE BUTTON_BACK
 #endif
 #endif /* HAVE_USB_POWER */
 

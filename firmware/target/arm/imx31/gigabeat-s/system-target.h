@@ -22,6 +22,8 @@
 #include "mmu-imx31.h"
 #include "system-arm.h"
 
+#define CPUFREQ_NORMAL 532000000
+
 static inline void udelay(unsigned int usecs)
 {
     volatile signed int stop = EPITCNT1 - usecs;

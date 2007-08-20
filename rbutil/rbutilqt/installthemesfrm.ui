@@ -1,0 +1,133 @@
+<ui version="4.0" >
+ <class>ThemeInstallFrm</class>
+ <widget class="QDialog" name="ThemeInstallFrm" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>750</width>
+    <height>450</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Theme Installation</string>
+  </property>
+  <layout class="QGridLayout" >
+   <item rowspan="2" row="0" column="0" >
+    <widget class="QLabel" name="label" >
+     <property name="text" >
+      <string/>
+     </property>
+     <property name="pixmap" >
+      <pixmap resource="rbutilqt.qrc" >:/icons/icons/wizard.xpm</pixmap>
+     </property>
+     <property name="alignment" >
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" >
+    <widget class="QListWidget" name="listThemes" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2" colspan="2" >
+    <widget class="QGroupBox" name="groupBox" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title" >
+      <string>Selected Theme</string>
+     </property>
+     <layout class="QGridLayout" >
+      <item row="0" column="0" >
+       <widget class="QLabel" name="themePreview" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="MinimumExpanding" hsizetype="MinimumExpanding" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+        <property name="scaledContents" >
+         <bool>true</bool>
+        </property>
+        <property name="alignment" >
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_3" >
+        <property name="text" >
+         <string>Description</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" >
+       <widget class="QTextBrowser" name="themeDescription" />
+      </item>
+      <item row="3" column="0" >
+       <widget class="QLabel" name="labelSize" >
+        <property name="text" >
+         <string>Download size:</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="1" colspan="2" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>368</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="3" >
+    <layout class="QHBoxLayout" >
+     <item>
+      <widget class="QPushButton" name="buttonOk" >
+       <property name="text" >
+        <string>&amp;Ok</string>
+       </property>
+       <property name="icon" >
+        <iconset resource="rbutilqt.qrc" >:/icons/icons/go-next.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="buttonCancel" >
+       <property name="text" >
+        <string>&amp;Cancel</string>
+       </property>
+       <property name="icon" >
+        <iconset resource="rbutilqt.qrc" >:/icons/icons/process-stop.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="rbutilqt.qrc" />
+ </resources>
+ <connections/>
+</ui>

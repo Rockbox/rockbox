@@ -19,6 +19,7 @@
  ****************************************************************************/
 
 #include "plugin.h"
+#include "helper.h"
 
 PLUGIN_HEADER
 
@@ -42,8 +43,9 @@ PLUGIN_HEADER
 #define UP BUTTON_UP
 #define DOWN BUTTON_DOWN
 
-#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_4G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 
 #define QUIT (BUTTON_SELECT | BUTTON_MENU)
 #define LEFT BUTTON_LEFT
@@ -931,9 +933,8 @@ enum plugin_status plugin_start (struct plugin_api *api, void *parameter)
     rb->lcd_set_backdrop(NULL);
 #endif
 
-    /* Permanently enable the backlight (unless the user has turned it off) */
-    if (rb->global_settings->backlight_timeout > 0)
-        rb->backlight_set_timeout (1);
+    /* Turn off backlight timeout */
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
 
     quit = false;
 
@@ -943,7 +944,8 @@ enum plugin_status plugin_start (struct plugin_api *api, void *parameter)
         ret = xobox_loop ();
     }
 
-    rb->backlight_set_timeout (rb->global_settings->backlight_timeout);
+    /* Turn on backlight timeout (revert to settings) */
+    backlight_use_settings(rb); /* backlight control in lib/helper.c */
     rb->lcd_setfont (FONT_UI);
 
     return ret;

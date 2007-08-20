@@ -24,6 +24,8 @@
 #include "timer.h"
 #include "pcf50606.h"
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+
 /* Settings for all possible clock frequencies (with properly working timers)
  *
  *                    xxx_REFRESH_TIMER below
@@ -113,3 +115,5 @@ void set_cpu_frequency(long frequency)
         break;
     }
 }
+
+#endif /* HAVE_ADJUSTABLE_CPU_FREQ */

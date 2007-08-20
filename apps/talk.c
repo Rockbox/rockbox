@@ -95,11 +95,13 @@ struct clip_entry /* one entry of the index table */
 struct voicefile /* file format of our voice file */
 {
     int version; /* version of the voicefile */
+    int target_id; /* the rockbox target the file was made for */
     int table;   /* offset to index table, (=header size) */
     int id1_max; /* number of "normal" clips contained in above index */
     int id2_max; /* number of "voice only" clips contained in above index */
     struct clip_entry index[]; /* followed by the index tables */
-    /* and finally the bitswapped mp3 clips, not visible here */
+    /* and finally the mp3 clips, not visible here, bitswapped 
+       for SH based players */
 };
 
 struct queue_entry /* one entry of the internal queue */
@@ -116,6 +118,8 @@ static long size_for_thumbnail; /* leftover buffer size for it */
 static struct voicefile* p_voicefile; /* loaded voicefile */
 static bool has_voicefile; /* a voicefile file is present */
 static struct queue_entry queue[QUEUE_SIZE]; /* queue of scheduled clips */
+/* enqueue next utterance even if enqueue is false. */
+static bool force_enqueue_next;
 static int queue_write; /* write index of queue, by application */
 static int queue_read; /* read index of queue, by ISR context */
 static int sent; /* how many bytes handed over to playback, owned by ISR */
@@ -133,11 +137,11 @@ static int talk_menu_disable; /* if non-zero, temporarily disable voice UI (not 
 
 static void load_voicefile(void);
 static void mp3_callback(unsigned char** start, size_t* size);
-static int shutup(void);
 static int queue_clip(unsigned char* buf, long size, bool enqueue);
 static int open_voicefile(void);
 static unsigned char* get_clip(long id, long* p_size);
-
+static int shutup(void); /* Interrupt voice, as when enqueue is false */
+static int do_shutup(void); /* kill voice unconditionally */
 
 /***************** Private implementation *****************/
 
@@ -164,9 +168,8 @@ static void load_voicefile(void)
     int load_size;
     int got_size;
     int file_size;
-#if CONFIG_CODEC == SWCODEC    
-    int length, i;
-    unsigned char *buf, temp;
+#ifdef ROCKBOX_LITTLE_ENDIAN
+    int i;
 #endif
 
     filehandle = open_voicefile();
@@ -186,10 +189,10 @@ static void load_voicefile(void)
     got_size = read(filehandle, audiobuf, load_size);
     if (got_size != load_size /* failure */)
         goto load_err;
-            
+
 #ifdef ROCKBOX_LITTLE_ENDIAN
     logf("Byte swapping voice file");
-    structec_convert(audiobuf, "llll", 1, true);
+    structec_convert(audiobuf, "lllll", 1, true);
 #endif
 
     if (((struct voicefile*)audiobuf)->table /* format check */
@@ -197,6 +200,11 @@ static void load_voicefile(void)
     {
         p_voicefile = (struct voicefile*)audiobuf;
 
+        if (p_voicefile->target_id != TARGET_ID)
+        {
+            logf("Incompatible voice file (wrong target)");
+            goto load_err;
+        }
 #if CONFIG_CODEC != SWCODEC
         /* MASCODEC: now use audiobuf for voice then thumbnail */
         p_thumbnail = audiobuf + file_size;
@@ -210,25 +218,6 @@ static void load_voicefile(void)
 #ifdef ROCKBOX_LITTLE_ENDIAN
     for (i = 0; i < p_voicefile->id1_max + p_voicefile->id2_max; i++)
         structec_convert(&p_voicefile->index[i], "ll", 1, true);
-#endif
-
-    /* Do a bitswap as necessary. */
-#if CONFIG_CODEC == SWCODEC
-    logf("Bitswapping voice file.");
-    cpu_boost(true);
-    buf = (unsigned char *)(&p_voicefile->index) +
-        (p_voicefile->id1_max + p_voicefile->id2_max) * sizeof(struct clip_entry);
-    length = file_size - (buf - (unsigned char *) p_voicefile);
-               
-    for (i = 0; i < length; i++)
-    {
-        temp   = buf[i];
-        temp   = ((temp >> 4) & 0x0f) | ((temp & 0x0f) << 4);
-        temp   = ((temp >> 2) & 0x33) | ((temp & 0x33) << 2);
-        buf[i] = ((temp >> 1) & 0x55) | ((temp & 0x55) << 1);
-    }
-    cpu_boost(false);
-    
 #endif
 
 #ifdef HAVE_MMC
@@ -258,6 +247,13 @@ load_err:
         filehandle = -1;
     }
     return;
+}
+
+
+/* Are more voice clips queued and waiting? */
+bool is_voice_queued()
+{
+    return !!QUEUE_LEVEL;
 }
 
 
@@ -315,7 +311,7 @@ re_check:
 }
 
 /* stop the playback and the pending clips */
-static int shutup(void)
+static int do_shutup(void)
 {
 #if CONFIG_CODEC != SWCODEC
     unsigned char* pos;
@@ -381,6 +377,13 @@ static int shutup(void)
     return 0;
 }
 
+/* Shutup the voice, except if force_enqueue_next is set. */
+static int shutup(void)
+{
+    if (!force_enqueue_next)
+        return do_shutup();
+    return 0;
+}
 
 /* schedule a clip, at the end or discard the existing queue */
 static int queue_clip(unsigned char* buf, long size, bool enqueue)
@@ -389,6 +392,9 @@ static int queue_clip(unsigned char* buf, long size, bool enqueue)
 
     if (!enqueue)
         shutup(); /* cut off all the pending stuff */
+    /* Something is being enqueued, force_enqueue_next override is no
+       longer in effect. */
+    force_enqueue_next = false;
     
     if (!size)
         return 0; /* safety check */
@@ -611,6 +617,26 @@ int talk_id(long id, bool enqueue)
     return 0;
 }
 
+/* Speaks zero or more IDs (from an array). */
+int talk_idarray(long *ids, bool enqueue)
+{
+    int r;
+    if(!ids)
+        return 0;
+    while(*ids != TALK_FINAL_ID)
+    {
+        if((r = talk_id(*ids++, enqueue)) <0)
+            return r;
+        enqueue = true;
+    }
+    return 0;
+}
+
+/* Make sure the current utterance is not interrupted by the next one. */
+void talk_force_enqueue_next(void)
+{
+    force_enqueue_next = true;
+}
 
 /* play a thumbnail from file */
 int talk_file(const char* filename, bool enqueue)
@@ -756,6 +782,8 @@ int talk_value(long n, int unit, bool enqueue)
             = LANG_MEGABYTE,
         [UNIT_KBIT]
             = VOICE_KBIT_PER_SEC,
+        [UNIT_PM_TICK]
+            = VOICE_PM_UNITS_PER_TICK,
     };
 
 #if CONFIG_CODEC != SWCODEC

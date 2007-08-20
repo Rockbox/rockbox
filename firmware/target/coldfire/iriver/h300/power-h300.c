@@ -27,18 +27,10 @@
 
 #if CONFIG_TUNER
 
-static bool powered = false;
-
-bool radio_powered(void)
+bool tuner_power(bool status)
 {
-    return powered;
-}
-
-bool radio_power(bool status)
-{
-    bool old_status = powered;
-    powered = status;
-    return old_status;
+    (void)status;
+    return true;
 }
 
 #endif /* #if CONFIG_TUNER */

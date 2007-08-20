@@ -24,6 +24,7 @@
 
 #include "rbutil.h"
 #include "installlog.h"
+#include "md5sum.h"
 
 #define ESTF_SIZE 32
 

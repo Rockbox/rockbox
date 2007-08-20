@@ -125,8 +125,8 @@ void spkb_process_events( int evenframe )
 
     if(evenframe){
         int ki;
-#if (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD)
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
         if (rb->button_hold())
         {
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
@@ -143,8 +143,8 @@ void spkb_process_events( int evenframe )
         if ( buttons == previous_state )
             return;
         previous_state = buttons;
-#if (CONFIG_KEYPAD != IPOD_4G_PAD) && \
-      (CONFIG_KEYPAD != IPOD_3G_PAD)
+#if (CONFIG_KEYPAD != IPOD_4G_PAD) && (CONFIG_KEYPAD != IPOD_3G_PAD) && \
+    (CONFIG_KEYPAD != IPOD_1G2G_PAD)
         if (buttons & ZX_MENU)
         {
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)

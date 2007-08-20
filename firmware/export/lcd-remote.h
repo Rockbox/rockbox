@@ -27,7 +27,7 @@
 
 #ifdef HAVE_REMOTE_LCD
 
-#if defined(TARGET_TREE) && !defined(SIMULATOR)
+#if defined(TARGET_TREE)
 #include "lcd-remote-target.h"
 #endif
 
@@ -37,10 +37,6 @@
 #define REMOTETYPE_H300_LCD 2
 #define REMOTETYPE_H300_NONLCD 3
 int remote_type(void);
-#endif
-
-#ifndef SIMULATOR
-extern struct event_queue remote_scroll_queue;
 #endif
 
 #define STYLE_DEFAULT    0x00000000

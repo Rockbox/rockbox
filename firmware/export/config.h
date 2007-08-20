@@ -60,30 +60,19 @@
 #define IAUDIO_X5M5_PAD     6
 #define IPOD_4G_PAD         7
 #define IPOD_3G_PAD         8
-#define IRIVER_IFP7XX_PAD   9
-#define GIGABEAT_PAD       10
-#define IRIVER_H10_PAD     11
-#define SANSA_E200_PAD     12
-#define ELIO_TPJ1022_PAD   13
-#define ARCHOS_AV300_PAD   14
-#define GIGABEAT_S_PAD     15
+#define IPOD_1G2G_PAD       9
+#define IRIVER_IFP7XX_PAD  10
+#define GIGABEAT_PAD       11
+#define IRIVER_H10_PAD     12
+#define SANSA_E200_PAD     13
+#define ELIO_TPJ1022_PAD   14
+#define ARCHOS_AV300_PAD   15
+#define GIGABEAT_S_PAD     16
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
 #define H300_REMOTE 2
 #define X5_REMOTE   3
-
-/* CONFIG_BATTERY */
-#define BATT_LIION2200   2200 /* FM/V2 recorder type */
-#define BATT_4AA_NIMH    1500
-#define BATT_3AAA        1000 /* Ondio */
-#define BATT_IAUDIO_X5M5  950
-#define BATT_LIPOL1300   1300 /* the type used in iRiver h1x0 models */
-#define BATT_LPCS355385  1550 /* iriver h10 20Gb - SKC LPCS355385 */
-#define BATT_BP009        820 /* iriver H10 5/6Gb - iriver BP009 */
-#define BATT_LIION830     830 /* Toshiba Gigabeat Fxx and Xxx series MK11-2740 */
-#define BATT_LIION750     750 /* Sansa e200 LiIon 3,7V */
-#define BATT_1AA          333 /* iRiver iFP: Alkaline, NiHM */
 
 /* CONFIG_CHARGING */
 #define CHARGING_SIMPLE  1 /* Simple, hardware controlled charging */
@@ -187,6 +176,8 @@
 #include "config-ipodnano.h"
 #elif defined(IPOD_VIDEO)
 #include "config-ipodvideo.h"
+#elif defined(IPOD_1G2G)
+#include "config-ipod1g2g.h"
 #elif defined(IPOD_3G)
 #include "config-ipod3g.h"
 #elif defined(IPOD_4G)
@@ -250,6 +241,16 @@
 #endif
 #ifndef CONFIG_REMOTE_DEFAULT_ICON_WIDTH
 #define CONFIG_REMOTE_DEFAULT_ICON_WIDTH 6
+#endif
+
+#if (CONFIG_TUNER & (CONFIG_TUNER - 1)) != 0
+/* Multiple possible tuners */
+#define CONFIG_TUNER_MULTI
+#endif
+
+#if defined(BOOTLOADER) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
+/* Bootloaders don't use CPU frequency adjustment */
+#undef HAVE_ADJUSTABLE_CPU_FREQ
 #endif
 
 /* Enable the directory cache and tagcache in RAM if we have
@@ -352,7 +353,7 @@
 #define IRAM_LCDFRAMEBUFFER
 #endif
 
-/* Dual core support - not yet working on the 3G iPod */
+/* Dual core support - not yet working on the 1G/2G and 3G iPod */
 #if defined(CPU_PP) && CONFIG_CPU != PP5002
 #define NUM_CORES 2
 #define CURRENT_CORE current_core()

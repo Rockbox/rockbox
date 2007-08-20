@@ -49,13 +49,13 @@
 static void tagcache_rebuild_with_splash(void)
 {
     tagcache_rebuild();
-    gui_syncsplash(HZ*2, str(LANG_TAGCACHE_FORCE_UPDATE_SPLASH));   
+    gui_syncsplash(HZ*2, ID2P(LANG_TAGCACHE_FORCE_UPDATE_SPLASH));   
 }
 
 static void tagcache_update_with_splash(void)
 {
     tagcache_update();
-    gui_syncsplash(HZ*2, str(LANG_TAGCACHE_FORCE_UPDATE_SPLASH));
+    gui_syncsplash(HZ*2, ID2P(LANG_TAGCACHE_FORCE_UPDATE_SPLASH));
 }
 
 #ifdef HAVE_TC_RAMCACHE
@@ -92,6 +92,7 @@ MENUITEM_SETTING(sort_case, &global_settings.sort_case, NULL);
 MENUITEM_SETTING(sort_dir, &global_settings.sort_dir, fileview_callback);
 MENUITEM_SETTING(sort_file, &global_settings.sort_file, fileview_callback);
 MENUITEM_SETTING(dirfilter, &global_settings.dirfilter, NULL);
+MENUITEM_SETTING(show_filename_ext, &global_settings.show_filename_ext, NULL);
 MENUITEM_SETTING(browse_current, &global_settings.browse_current, NULL);
 MENUITEM_SETTING(show_path_in_browser, &global_settings.show_path_in_browser, NULL);
 static int fileview_callback(int action,const struct menu_item_ex *this_item)
@@ -113,7 +114,8 @@ static int fileview_callback(int action,const struct menu_item_ex *this_item)
 
 MAKE_MENU(file_menu, ID2P(LANG_FILE), 0, Icon_file_view_menu,
                 &sort_case, &sort_dir, &sort_file,
-                &dirfilter, &browse_current, &show_path_in_browser);
+                &dirfilter, &show_filename_ext, &browse_current,
+                &show_path_in_browser);
 /*    FILE VIEW MENU               */
 /***********************************/
 
@@ -122,9 +124,12 @@ MAKE_MENU(file_menu, ID2P(LANG_FILE), 0, Icon_file_view_menu,
 /*    SYSTEM MENU                  */
 
 /* Battery */
-#ifndef SIMULATOR
+#if BATTERY_CAPACITY_INC > 0
 MENUITEM_SETTING(battery_capacity, &global_settings.battery_capacity, NULL);
+#endif
+#if BATTERY_TYPES_COUNT > 1
 MENUITEM_SETTING(battery_type, &global_settings.battery_type, NULL);
+#endif
 #ifdef HAVE_USB_POWER
 #if CONFIG_CHARGING
 static int usbcharging_callback(int action,const struct menu_item_ex *this_item)
@@ -142,7 +147,9 @@ MENUITEM_SETTING(usb_charging, &global_settings.usb_charging, usbcharging_callba
 #endif
 #endif
 MAKE_MENU(battery_menu, ID2P(LANG_BATTERY_MENU), 0, Icon_NOICON,
-          &battery_capacity,
+#if BATTERY_CAPACITY_INC > 0
+            &battery_capacity,
+#endif
 #if BATTERY_TYPES_COUNT > 1
             &battery_type,
 #endif
@@ -152,10 +159,10 @@ MAKE_MENU(battery_menu, ID2P(LANG_BATTERY_MENU), 0, Icon_NOICON,
 #endif
 #endif
          );
-#endif /* SIMULATOR */
 /* Disk */
-#ifndef HAVE_MMC
+#ifndef HAVE_FLASH_STORAGE
 MENUITEM_SETTING(disk_spindown, &global_settings.disk_spindown, NULL);
+#endif
 #ifdef HAVE_DIRCACHE
 static int dircache_callback(int action,const struct menu_item_ex *this_item)
 {
@@ -167,7 +174,7 @@ static int dircache_callback(int action,const struct menu_item_ex *this_item)
             {
                 case true:
                     if (!dircache_is_enabled())
-                        gui_syncsplash(HZ*2, str(LANG_PLEASE_REBOOT));
+                        gui_syncsplash(HZ*2, ID2P(LANG_PLEASE_REBOOT));
                     break;
                 case false:
                     if (dircache_is_enabled())
@@ -180,8 +187,11 @@ static int dircache_callback(int action,const struct menu_item_ex *this_item)
 }
 MENUITEM_SETTING(dircache, &global_settings.dircache, dircache_callback);
 #endif
+#if defined(HAVE_DIRCACHE) || !defined(HAVE_FLASH_STORAGE)
 MAKE_MENU(disk_menu, ID2P(LANG_DISK_MENU), 0, Icon_NOICON,
+#ifndef HAVE_FLASH_STORAGE
           &disk_spindown,
+#endif
 #ifdef HAVE_DIRCACHE
             &dircache,
 #endif
@@ -218,7 +228,7 @@ static int timedate_set(void)
         tm.tm_year = YEAR-1900;
     }
 
-    result = (int)set_time_screen(str(LANG_TIME), &tm);
+    result = (int)set_time_screen(str(LANG_SET_TIME), &tm);
 
     if(tm.tm_year != -1) {
         set_time(&tm);
@@ -226,7 +236,7 @@ static int timedate_set(void)
     return result;
 }
 
-MENUITEM_FUNCTION(time_set, 0, ID2P(LANG_TIME), 
+MENUITEM_FUNCTION(time_set, 0, ID2P(LANG_SET_TIME), 
                     timedate_set, NULL, NULL, Icon_NOICON);
 MENUITEM_SETTING(timeformat, &global_settings.timeformat, NULL);
 MAKE_MENU(time_menu, ID2P(LANG_TIME_MENU), 0, Icon_NOICON, &time_set, &timeformat);
@@ -330,10 +340,10 @@ MENUITEM_SETTING(buttonlight_brightness, &global_settings.buttonlight_brightness
 MAKE_MENU(system_menu, ID2P(LANG_SYSTEM), 
           0, Icon_System_menu,
             &start_screen,
-#ifndef SIMULATOR
+#if (BATTERY_CAPACITY_INC > 0) || (BATTERY_TYPES_COUNT > 1)
             &battery_menu,
 #endif
-#ifndef HAVE_MMC
+#if defined(HAVE_DIRCACHE) || !defined(HAVE_FLASH_STORAGE)
             &disk_menu,
 #endif
 #if CONFIG_RTC

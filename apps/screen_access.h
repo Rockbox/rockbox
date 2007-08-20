@@ -57,6 +57,10 @@ struct screen
     int nb_lines;
     enum screen_type screen_type;
     int depth;
+    bool is_color;
+#ifdef HAVE_LCD_BITMAP
+    int pixel_format;
+#endif
     int char_width;
     int char_height;
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
@@ -118,6 +122,7 @@ struct screen
     void (*icon)(int icon, bool enable);
     unsigned long (*get_locked_pattern)(void);
     void (*define_pattern)(unsigned long ucs, const char *pattern);
+    void (*unlock_pattern)(unsigned long ucs);
 #endif
     void (*init)(void);
     void (*putsxy)(int x, int y, const unsigned char *str);

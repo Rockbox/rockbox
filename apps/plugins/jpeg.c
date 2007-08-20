@@ -27,6 +27,7 @@
 #include "plugin.h"
 #include "playback_control.h"
 #include "oldmenuapi.h"
+#include "helper.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "gray.h"
@@ -91,7 +92,8 @@ PLUGIN_HEADER
 #define JPEG_MENU BUTTON_OFF
 #define JPEG_RC_MENU BUTTON_RC_STOP
 
-#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define JPEG_ZOOM_IN BUTTON_SCROLL_FWD
 #define JPEG_ZOOM_OUT BUTTON_SCROLL_BACK
 #define JPEG_UP BUTTON_MENU
@@ -133,7 +135,8 @@ PLUGIN_HEADER
 #define JPEG_DOWN               BUTTON_DOWN
 #define JPEG_LEFT               BUTTON_LEFT
 #define JPEG_RIGHT              BUTTON_RIGHT
-#define JPEG_MENU               BUTTON_REC
+#define JPEG_MENU               BUTTON_POWER
+#define JPEG_SLIDE_SHOW         BUTTON_REC
 #define JPEG_NEXT               BUTTON_SCROLL_DOWN
 #define JPEG_NEXT_REPEAT        (BUTTON_SCROLL_DOWN|BUTTON_REPEAT)
 #define JPEG_PREVIOUS           BUTTON_SCROLL_UP
@@ -2540,7 +2543,7 @@ int show_menu(void) /* return 1 to quit */
             break;
     }
 
-#ifndef SIMULATOR
+#if !defined(SIMULATOR) && !defined(HAVE_FLASH_STORAGE)
     /* change ata spindown time based on slideshow time setting */
     immediate_ata_off = false;
     rb->ata_spindown(rb->global_settings->disk_spindown);
@@ -2718,6 +2721,14 @@ int scroll_bmp(struct t_disp* pdisp)
             if (entries > 0)
                 return change_filename(DIR_NEXT);
             break;
+
+#ifdef JPEG_SLIDE_SHOW
+        case JPEG_SLIDE_SHOW:
+            slideshow_enabled = !slideshow_enabled;
+            running_slideshow = slideshow_enabled;
+            break;
+#endif
+
 #ifdef JPEG_NEXT_REPEAT
         case JPEG_NEXT_REPEAT:
 #endif
@@ -3299,14 +3310,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     buf_images = buf; buf_images_size = buf_size;
 
-    /* make sure the backlight is always on when viewing pictures
-       (actually it should also set the timeout when plugged in,
-       but the function backlight_set_timeout_plugged is not
-       available in plugins) */
-#ifdef HAVE_BACKLIGHT
-    if (rb->global_settings->backlight_timeout > 0)
-        rb->backlight_set_timeout(1);
-#endif
+    /* Turn off backlight timeout */
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
 
     do
     {
@@ -3324,15 +3329,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
 #endif
 
-#ifndef SIMULATOR
+#if !defined(SIMULATOR) && !defined(HAVE_FLASH_STORAGE)
     /* set back ata spindown time in case we changed it */
     rb->ata_spindown(rb->global_settings->disk_spindown);
 #endif
 
-#ifdef HAVE_BACKLIGHT
-    /* reset backlight settings */
-    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
-#endif
+    /* Turn on backlight timeout (revert to settings) */
+    backlight_use_settings(rb); /* backlight control in lib/helper.c */
 
 #ifdef USEGSLIB
     gray_release(); /* deinitialize */

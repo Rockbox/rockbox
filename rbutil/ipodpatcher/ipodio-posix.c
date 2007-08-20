@@ -143,12 +143,12 @@ int ipod_seek(struct ipod_t* ipod, unsigned long pos)
     return 0;
 }
 
-int ipod_read(struct ipod_t* ipod, unsigned char* buf, int nbytes)
+ssize_t ipod_read(struct ipod_t* ipod, unsigned char* buf, int nbytes)
 {
     return read(ipod->dh, buf, nbytes);
 }
 
-int ipod_write(struct ipod_t* ipod, unsigned char* buf, int nbytes)
+ssize_t ipod_write(struct ipod_t* ipod, unsigned char* buf, int nbytes)
 {
     return write(ipod->dh, buf, nbytes);
 }

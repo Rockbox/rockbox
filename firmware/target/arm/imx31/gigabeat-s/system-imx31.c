@@ -18,7 +18,7 @@ extern void dma0(void); /* free */
 extern void dma1(void);
 extern void dma3(void);
 
-void irq(void)
+void irq_handler(void)
 {
 }
 

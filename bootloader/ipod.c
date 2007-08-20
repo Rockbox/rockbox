@@ -40,6 +40,7 @@
 #include "power.h"
 #include "file.h"
 #include "common.h"
+#include "hwcompat.h"
 
 #define XSC(X) #X
 #define SC(X) XSC(X)
@@ -54,12 +55,6 @@ unsigned char *loadbuffer = (unsigned char *)DRAM_START;
 
 /* Bootloader version */
 char version[] = APPSVERSION;
-
-#define IPOD_HW_REVISION (*((volatile unsigned long*)(0x00002084)))
-
-/* We copy the hardware revision to the last four bytes of SDRAM and then
-   re-read it after we have re-mapped SDRAM to 0x0 in Rockbox */
-#define TMP_IPOD_HW_REVISION (*((volatile unsigned long*)(0x11fffffc)))
 
 #define BUTTON_LEFT  1
 #define BUTTON_MENU  2
@@ -170,9 +165,8 @@ static int key_pressed(void)
     if ((state & 0x8) == 0) return BUTTON_PLAY;
     if ((state & 0x2) == 0) return BUTTON_RIGHT;
 #endif
-#elif CONFIG_KEYPAD == IPOD_3G_PAD
-    state = inb(0xcf000030);
-    if (((state & 0x20) == 0)) return BUTTON_HOLD; /* hold on */
+#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_1G2G_PAD)
+    state = GPIOA_INPUT_VAL;
     if ((state & 0x08) == 0) return BUTTON_LEFT;
     if ((state & 0x10) == 0) return BUTTON_MENU;
     if ((state & 0x04) == 0) return BUTTON_PLAY;
@@ -181,10 +175,13 @@ static int key_pressed(void)
     return 0;
 }
 
-/* This function is the same on all ipods */
 bool button_hold(void)
 {
-    return (GPIOA_INPUT_VAL & 0x20)?false:true;
+#if CONFIG_KEYPAD == IPOD_1G2G_PAD
+    return (GPIOA_INPUT_VAL & 0x20);
+#else
+    return !(GPIOA_INPUT_VAL & 0x20);
+#endif
 }
 
 void fatal_error(void)
@@ -193,7 +190,11 @@ void fatal_error(void)
     bool holdstatus=false;
 
     /* System font is 6 pixels wide */
-#if LCD_WIDTH >= (30*6)
+#if defined(IPOD_1G2G) || defined(IPOD_3G)
+    printf("Hold MENU+PLAY to");
+    printf("reboot then REW+FF");
+    printf("for disk mode");
+#elif LCD_WIDTH >= (30*6)
     printf("Hold MENU+SELECT to reboot");
     printf("then SELECT+PLAY for disk mode");
 #else
@@ -239,9 +240,6 @@ void* main(void)
     /* Turn on the backlight */
 
     __backlight_on();
-
-    TMP_IPOD_HW_REVISION = IPOD_HW_REVISION;
-    ipod_hw_rev = IPOD_HW_REVISION;
 
     system_init();
     kernel_init();
@@ -300,7 +298,6 @@ void* main(void)
     printf("Partition 1: 0x%02x %ld MB", 
            pinfo->type, pinfo->size / 2048);
 
-    
     if (button_was_held || (btn==BUTTON_MENU)) {
         /* If either the hold switch was on, or the Menu button was held, then 
            try the Apple firmware */

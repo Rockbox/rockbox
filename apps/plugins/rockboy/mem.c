@@ -562,10 +562,3 @@ void mbc_reset(void)
     mbc.enableram = 0;
     mem_updatemap();
 }
-
-
-
-
-
-
-

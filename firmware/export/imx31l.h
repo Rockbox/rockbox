@@ -475,4 +475,6 @@
 #define         readw(a)            (*(volatile short *)(a))
 
 // Dirty hack to enable DEBUG
+#ifdef BOOTLOADER
 #define DEBUG
+#endif

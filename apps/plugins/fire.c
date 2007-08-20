@@ -20,6 +20,7 @@
 ****************************************************************************/
 
 #include "plugin.h"
+#include "helper.h"
 
 #ifdef HAVE_LCD_BITMAP /* and also not for the Player */
 #ifndef HAVE_LCD_COLOR
@@ -73,7 +74,8 @@ static unsigned char draw_buffer[8*LCD_WIDTH];
 #define FIRE_INCREASE_MULT BUTTON_UP
 #define FIRE_DECREASE_MULT BUTTON_DOWN
 
-#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define FIRE_QUIT BUTTON_MENU
 #define FIRE_SWITCH_FLAMES_TYPE BUTTON_SELECT
 #define FIRE_SWITCH_FLAMES_MOVING BUTTON_RIGHT
@@ -329,7 +331,8 @@ void cleanup(void *parameter)
 #ifndef HAVE_LCD_COLOR
     gray_release();
 #endif
-    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+    /* Turn on backlight timeout (revert to settings) */
+    backlight_use_settings(rb); /* backlight control in lib/helper.c */
 }
 
 /*
@@ -419,8 +422,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif
-    if (rb->global_settings->backlight_timeout > 0)
-        rb->backlight_set_timeout(1);/* keep the light on */
+    /* Turn off backlight timeout */
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
 
     ret = main();
 

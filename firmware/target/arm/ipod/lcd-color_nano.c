@@ -28,7 +28,7 @@
 #include "lcd.h"
 #include "kernel.h"
 #include "system.h"
-
+#include "hwcompat.h"
 
 /* check if number of useconds has past */
 static inline bool timer_check(int clock_start, int usecs)
@@ -46,7 +46,7 @@ static inline bool timer_check(int clock_start, int usecs)
 #define LCD_CNTL_VERT_RAM_ADDR_POS      0x45
 
 /*** globals ***/
-static int lcd_type = 1; /* 0 = "old" Color/Photo, 1 = "new" Color & Nano */
+int lcd_type = 1; /* 0 = "old" Color/Photo, 1 = "new" Color & Nano */
 
 static void lcd_wait_write(void)
 {
@@ -109,7 +109,7 @@ void lcd_set_flip(bool yesno)
 void lcd_init_device(void)
 {  
 #if CONFIG_LCD == LCD_IPODCOLOR
-    if (ipod_hw_rev == 0x60000) {
+    if (IPOD_HW_REVISION == 0x60000) {
         lcd_type = 0;
     } else {
         int gpio_a01, gpio_a04;

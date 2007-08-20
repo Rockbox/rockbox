@@ -27,18 +27,10 @@
 
 #if CONFIG_TUNER
 
-static bool powered = false;
-
-bool radio_powered(void)
+bool tuner_power(bool status)
 {
-    return powered;
-}
-
-bool radio_power(bool status)
-{
-    bool old_status = powered;
-    powered = status;
-    return old_status;
+    (void)status;
+    return true;
 }
 
 #endif /* #if CONFIG_TUNER */
@@ -126,38 +118,5 @@ void power_off(void)
     while(1)
         yield();
 }
-
-#else
-
-bool charger_inserted(void)
-{
-    return false;
-}
-
-void charger_enable(bool on)
-{
-    (void)on;
-}
-
-void power_off(void)
-{
-}
-
-void ide_power_enable(bool on)
-{
-   (void)on;
-}
-
-#ifdef HAVE_SPDIF_POWER
-void spdif_power_enable(bool on)
-{
-   (void)on;
-}
-
-bool spdif_powered(void)
-{
-    return false;
-}
-#endif
 
 #endif /* SIMULATOR */

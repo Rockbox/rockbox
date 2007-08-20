@@ -200,6 +200,7 @@ static int get_tag(int *tag)
     MATCH(tag, buf, "comment", tag_comment);
     MATCH(tag, buf, "albumartist", tag_albumartist);
     MATCH(tag, buf, "ensemble", tag_albumartist);
+    MATCH(tag, buf, "grouping", tag_grouping);
     MATCH(tag, buf, "genre", tag_genre);
     MATCH(tag, buf, "length", tag_length);
     MATCH(tag, buf, "Lm", tag_virt_length_min);
@@ -209,6 +210,7 @@ static int get_tag(int *tag)
     MATCH(tag, buf, "title", tag_title);
     MATCH(tag, buf, "filename", tag_filename);
     MATCH(tag, buf, "tracknum", tag_tracknumber);
+    MATCH(tag, buf, "discnum", tag_discnumber);
     MATCH(tag, buf, "year", tag_year);
     MATCH(tag, buf, "playcount", tag_playcount);
     MATCH(tag, buf, "rating", tag_rating);
@@ -624,9 +626,14 @@ static void tagtree_buffer_event(struct mp3entry *id3, bool last_track)
     }
     
     id3->playcount  = tagcache_get_numeric(&tcs, tag_playcount);
-    if(!id3->rating) id3->rating = tagcache_get_numeric(&tcs, tag_rating);
+    if (!id3->rating)
+        id3->rating = tagcache_get_numeric(&tcs, tag_rating);
     id3->lastplayed = tagcache_get_numeric(&tcs, tag_lastplayed);
     id3->score      = tagcache_get_numeric(&tcs, tag_virt_autoscore) / 10;
+    id3->playtime   = tagcache_get_numeric(&tcs, tag_playtime);
+    
+    /* Store our tagcache index pointer. */
+    id3->tagcache_idx = tcs.idx_id;
     
     tagcache_search_finish(&tcs);
 }
@@ -635,7 +642,6 @@ static void tagtree_unbuffer_event(struct mp3entry *id3, bool last_track)
 {
     (void)last_track;
     long playcount;
-    long rating;
     long playtime;
     long lastplayed;
     
@@ -646,6 +652,12 @@ static void tagtree_unbuffer_event(struct mp3entry *id3, bool last_track)
         return;
     }
     
+    if (!id3->tagcache_idx)
+    {
+        logf("No tagcache index pointer found");
+        return;
+    }
+    
     /* Don't process unplayed tracks. */
     if (id3->elapsed == 0)
     {
@@ -653,48 +665,25 @@ static void tagtree_unbuffer_event(struct mp3entry *id3, bool last_track)
         return;
     }
     
-    if (!tagcache_find_index(&tcs, id3->path))
-    {
-        logf("tc stat: not found: %s", id3->path);
-        return;
-    }
-    
-    playcount  = tagcache_get_numeric(&tcs, tag_playcount);
-    playtime   = tagcache_get_numeric(&tcs, tag_playtime);
-    lastplayed = tagcache_get_numeric(&tcs, tag_lastplayed);
-    
-    playcount++;
-    
-    rating   = (long) id3->rating;
-    
+    playcount = id3->playcount + 1;
     lastplayed = tagcache_increase_serial();
     if (lastplayed < 0)
     {
         logf("incorrect tc serial:%ld", lastplayed);
-        tagcache_search_finish(&tcs);
         return;
     }
     
     /* Ignore the last 15s (crossfade etc.) */
-    playtime += MIN(id3->length, id3->elapsed + 15 * 1000);
+    playtime = id3->playtime + MIN(id3->length, id3->elapsed + 15 * 1000);
     
     logf("ube:%s", id3->path);
-    logf("-> %d/%ld/%ld/%ld", last_track, playcount, rating, playtime);
+    logf("-> %d/%ld/%ld", last_track, playcount, playtime);
     logf("-> %ld/%ld/%ld", id3->elapsed, id3->length, MIN(id3->length, id3->elapsed + 15 * 1000));
     
-    /* lastplayed not yet supported. */
-    
-    if (!tagcache_modify_numeric_entry(&tcs, tag_playcount, playcount)
-        || !tagcache_modify_numeric_entry(&tcs, tag_rating, rating)
-        || !tagcache_modify_numeric_entry(&tcs, tag_playtime, playtime)
-        || !tagcache_modify_numeric_entry(&tcs, tag_lastplayed, lastplayed))
-    {
-        logf("tc stat: modify failed!");
-        tagcache_search_finish(&tcs);
-        return;
-    }
-    
-    tagcache_search_finish(&tcs);
+    /* Queue the updates to the tagcache system. */
+    tagcache_update_numeric(id3->tagcache_idx, tag_playcount, playcount);
+    tagcache_update_numeric(id3->tagcache_idx, tag_playtime, playtime);
+    tagcache_update_numeric(id3->tagcache_idx, tag_lastplayed, lastplayed);
 }
 
 bool tagtree_export(void)
@@ -702,7 +691,7 @@ bool tagtree_export(void)
     gui_syncsplash(0, str(LANG_CREATING));
     if (!tagcache_create_changelog(&tcs))
     {
-        gui_syncsplash(HZ*2, str(LANG_FAILED));
+        gui_syncsplash(HZ*2, ID2P(LANG_FAILED));
     }
     
     return false;
@@ -710,10 +699,10 @@ bool tagtree_export(void)
 
 bool tagtree_import(void)
 {
-    gui_syncsplash(0, str(LANG_WAIT));
+    gui_syncsplash(0, ID2P(LANG_WAIT));
     if (!tagcache_import_changelog())
     {
-        gui_syncsplash(HZ*2, str(LANG_FAILED));
+        gui_syncsplash(HZ*2, ID2P(LANG_FAILED));
     }
     
     return false;
@@ -928,12 +917,7 @@ static bool show_search_progress(bool init, int count)
     if (current_tick - last_tick > HZ/4)
     {
         gui_syncsplash(0, str(LANG_PLAYLIST_SEARCH_MSG), count,
-#if CONFIG_KEYPAD == PLAYER_PAD
-                       str(LANG_STOP_ABORT)
-#else
-                       str(LANG_OFF_ABORT)
-#endif
-                       );
+                          str(LANG_OFF_ABORT));
         if (action_userabort(TIMEOUT_NOBLOCK))
             return false;
         last_tick = current_tick;
@@ -1245,7 +1229,7 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     
     if (!sort && (sort_inverse || sort_limit))
     {
-        gui_syncsplash(HZ*4, str(LANG_SHOWDIR_BUFFER_FULL), total_count);
+        gui_syncsplash(HZ*4, ID2P(LANG_SHOWDIR_BUFFER_FULL), total_count);
         logf("Too small dir buffer");
         return 0;
     }
@@ -1436,7 +1420,7 @@ int tagtree_enter(struct tree_context* c)
                     !global_settings.party_mode &&
                     playlist_modified(NULL))
                 {
-                    char *lines[]={str(LANG_WARN_ERASEDYNPLAYLIST_PROMPT)};
+                    char *lines[]={ID2P(LANG_WARN_ERASEDYNPLAYLIST_PROMPT)};
                     struct text_message message={lines, 1};
                     
                     if (gui_syncyesno_run(&message, NULL, NULL) != YESNO_YES)
@@ -1513,7 +1497,7 @@ static bool insert_all_playlist(struct tree_context *c, int position, bool queue
     cpu_boost(true);
     if (!tagcache_search(&tcs, tag_filename))
     {
-        gui_syncsplash(HZ, str(LANG_TAGCACHE_BUSY));
+        gui_syncsplash(HZ, ID2P(LANG_TAGCACHE_BUSY));
         cpu_boost(false);
         return false;
     }
@@ -1616,12 +1600,12 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
     }
 
     if (tc->filesindir <= 0)
-        gui_syncsplash(HZ, str(LANG_END_PLAYLIST_PLAYER));
+        gui_syncsplash(HZ, ID2P(LANG_END_PLAYLIST));
     else
     {
         logf("insert_all_playlist");
         if (!insert_all_playlist(tc, position, queue))
-            gui_syncsplash(HZ*2, str(LANG_FAILED));
+            gui_syncsplash(HZ*2, ID2P(LANG_FAILED));
     }
     
     /* Finally return the dirlevel to its original value. */

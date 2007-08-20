@@ -147,14 +147,14 @@ typedef struct WMADecodeContext
     uint8_t last_superframe[MAX_CODED_SUPERFRAME_SIZE + 4]; /* padding added */
     int last_bitoffset;
     int last_superframe_len;
-    fixed32 noise_table[NOISE_TAB_SIZE];
+    fixed32 *noise_table;
     int noise_index;
     fixed32 noise_mult; /* XXX: suppress that and integrate it in the noise array */
     /* lsp_to_curve tables */
     fixed32 lsp_cos_table[BLOCK_MAX_SIZE];
     fixed64 lsp_pow_e_table[256];
-    fixed64 lsp_pow_m_table1[(1 << LSP_POW_BITS)];
-    fixed64 lsp_pow_m_table2[(1 << LSP_POW_BITS)];
+    fixed32 lsp_pow_m_table1[(1 << LSP_POW_BITS)];
+    fixed32 lsp_pow_m_table2[(1 << LSP_POW_BITS)];
 
     /* State of current superframe decoding */
     int bit_offset;
@@ -172,6 +172,6 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx);
 int wma_decode_superframe_init(WMADecodeContext* s,
                                uint8_t *buf, int buf_size);
 int wma_decode_superframe_frame(WMADecodeContext* s,
-                                int16_t *samples,
+                                int32_t *samples,
                                 uint8_t *buf, int buf_size);
 #endif

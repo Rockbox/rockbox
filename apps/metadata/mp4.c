@@ -29,6 +29,7 @@
 #include "logf.h"
 #include "debug.h"
 #include "replaygain.h"
+#include "atoi.h"
 
 #define MP4_ID(a, b, c, d)  (((a) << 24) | ((b) << 16) | ((c) << 8) | (d))
 
@@ -37,8 +38,13 @@
 #define MP4_alac MP4_ID('a', 'l', 'a', 'c')
 #define MP4_calb MP4_ID(0xa9, 'a', 'l', 'b')
 #define MP4_cART MP4_ID(0xa9, 'A', 'R', 'T')
+#define MP4_cgrp MP4_ID(0xa9, 'g', 'r', 'p')
+#define MP4_cgen MP4_ID(0xa9, 'g', 'e', 'n')
 #define MP4_cnam MP4_ID(0xa9, 'n', 'a', 'm')
 #define MP4_cwrt MP4_ID(0xa9, 'w', 'r', 't')
+#define MP4_ccmt MP4_ID(0xa9, 'c', 'm', 't')
+#define MP4_cday MP4_ID(0xa9, 'd', 'a', 'y')
+#define MP4_disk MP4_ID('d', 'i', 's', 'k')
 #define MP4_esds MP4_ID('e', 's', 'd', 's')
 #define MP4_ftyp MP4_ID('f', 't', 'y', 'p')
 #define MP4_gnre MP4_ID('g', 'n', 'r', 'e')
@@ -373,6 +379,11 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                 &id3->albumartist);
             break;
 
+        case MP4_cgrp:
+            read_mp4_tag_string(fd, size, &buffer, &buffer_left,
+                &id3->grouping);
+            break;
+        
         case MP4_calb:
             read_mp4_tag_string(fd, size, &buffer, &buffer_left,
                 &id3->album);
@@ -384,12 +395,46 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
             cwrt = false;
             break;
 
+        case MP4_ccmt:
+            read_mp4_tag_string(fd, size, &buffer, &buffer_left,
+                &id3->comment);
+            break;
+
+        case MP4_cday:
+            read_mp4_tag_string(fd, size, &buffer, &buffer_left,
+                &id3->year_string);
+ 
+            /* Try to parse it as a year, for the benefit of the database.
+             */
+            id3->year = atoi(id3->year_string);
+
+            if (id3->year < 1900)
+            {
+                id3->year = 0;
+            }
+            
+            break;
+
         case MP4_gnre:
             {
                 unsigned short genre;
                 
                 read_mp4_tag(fd, size, (char*) &genre, sizeof(genre));
                 id3->genre_string = id3_get_num_genre(betoh16(genre) - 1);
+            }
+            break;
+        
+        case MP4_cgen:
+            read_mp4_tag_string(fd, size, &buffer, &buffer_left,
+                &id3->genre_string);
+            break;
+
+        case MP4_disk:
+            {
+                unsigned short n[2];
+                
+                read_mp4_tag(fd, size, (char*) &n, sizeof(n));
+                id3->discnum = betoh16(n[1]);
             }
             break;
 
@@ -420,7 +465,7 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                 if (sub_size > sizeof(tag_name) - 1)
                 {
                     read(fd, tag_name, sizeof(tag_name) - 1);
-                    lseek(fd, sub_size - sizeof(tag_name) - 1, SEEK_CUR);
+                    lseek(fd, sub_size - (sizeof(tag_name) - 1), SEEK_CUR);
                     tag_name[sizeof(tag_name) - 1] = 0;
                 }
                 else
@@ -666,8 +711,8 @@ bool get_mp4_metadata(int fd, struct mp3entry* id3)
     else
     {
         logf("MP4 metadata error");
-        DEBUGF("MP4 metadata error. errno %d, length %ld, frequency %ld, filesize %ld\n",
-            errno, id3->length, id3->frequency, id3->filesize);
+        DEBUGF("MP4 metadata error. errno %d, frequency %ld, filesize %ld\n",
+            errno, id3->frequency, id3->filesize);
         return false;
     }
 

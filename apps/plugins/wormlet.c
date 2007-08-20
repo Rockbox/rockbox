@@ -18,6 +18,7 @@
  ****************************************************************************/
 #include "plugin.h"
 #include "configfile.h"
+#include "helper.h"
 
 PLUGIN_HEADER
 
@@ -91,7 +92,8 @@ PLUGIN_HEADER
 #define PLAYERS_TEXT "UP/DN"
 #define WORMS_TEXT "L/R"
 
-#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 
 #define BTN_DIR_UP BUTTON_MENU
 #define BTN_DIR_DOWN BUTTON_PLAY
@@ -2331,9 +2333,8 @@ bool launch_wormlet(void)
 
     rb->lcd_clear_display();
 
-    /* Permanently enable the backlight (unless the user has turned it off) */
-    if (rb->global_settings->backlight_timeout > 0)
-        rb->backlight_set_timeout(1);
+    /* Turn off backlight timeout */
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
 
     /* start the game */
     while (game_result == 1)
@@ -2342,8 +2343,8 @@ bool launch_wormlet(void)
     switch (game_result)
     {
         case 2:
-            /* Restore user's original backlight setting */
-            rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+            /* Turn on backlight timeout (revert to settings) */
+            backlight_use_settings(rb); /* backlight control in lib/helper.c */
             return false;
             break;
     }

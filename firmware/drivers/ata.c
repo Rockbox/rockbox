@@ -716,11 +716,6 @@ int ata_write_sectors(IF_MV2(int drive,)
 
 static int check_registers(void)
 {
-#if (CONFIG_CPU == PP5002)
-    /* This fails on the PP5002, but the ATA driver still works.  This
-       needs more investigation. */
-    return 0;
-#else
     int i;
     if ( ATA_STATUS & STATUS_BSY )
             return -1;
@@ -738,7 +733,6 @@ static int check_registers(void)
             return 0;
     }
     return -2;
-#endif
 }
 
 static int freeze_lock(void)

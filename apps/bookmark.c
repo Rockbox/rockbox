@@ -186,11 +186,11 @@ bool bookmark_autobookmark(void)
             return write_bookmark(false);
     }
 #ifdef HAVE_LCD_BITMAP
-    unsigned char *lines[]={str(LANG_AUTO_BOOKMARK_QUERY)};
+    unsigned char *lines[]={ID2P(LANG_AUTO_BOOKMARK_QUERY)};
     struct text_message message={(char **)lines, 1};
 #else
-    unsigned char *lines[]={str(LANG_AUTO_BOOKMARK_QUERY),
-                            str(LANG_RESUME_CONFIRM_PLAYER)};
+    unsigned char *lines[]={ID2P(LANG_AUTO_BOOKMARK_QUERY),
+                            str(LANG_CONFIRM_WITH_BUTTON)};
     struct text_message message={(char **)lines, 2};
 #endif
 #if LCD_DEPTH > 1
@@ -244,8 +244,8 @@ static bool write_bookmark(bool create_bookmark_file)
         }
     }
 
-    gui_syncsplash(HZ, str(success ? LANG_BOOKMARK_CREATE_SUCCESS
-        : LANG_BOOKMARK_CREATE_FAILURE));
+    gui_syncsplash(HZ, success ? ID2P(LANG_BOOKMARK_CREATE_SUCCESS)
+        : ID2P(LANG_BOOKMARK_CREATE_FAILURE));
 
     return true;
 }
@@ -401,12 +401,11 @@ bool bookmark_autoload(const char* file)
     {
         char* bookmark = select_bookmark(global_bookmark_file_name, true);
         
-        if (bookmark)
+        if (bookmark != NULL)
         {
-            return bookmark_load(global_bookmark_file_name, true);
+            return play_bookmark(bookmark);
         }
 
-        action_signalscreenchange();
         return false;
     }
 }
@@ -453,7 +452,6 @@ static int get_bookmark_count(const char* bookmark_file_name)
     if(file < 0)
         return -1;
 
-    /* Get the requested bookmark */
     while(read_line(file, global_read_buffer, sizeof(global_read_buffer)) > 0)
     {
         read_count++;
@@ -622,7 +620,6 @@ static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resu
     gui_synclist_set_title(&list, str(LANG_BOOKMARK_SELECT_BOOKMARK), 
         Icon_Bookmark);
     gui_syncstatusbar_draw(&statusbars, true);
-    action_signalscreenchange();
 
     while (!exit)
     {
@@ -636,9 +633,8 @@ static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resu
             if (bookmarks->total_count < 1)
             {
                 /* No more bookmarks, delete file and exit */
-                gui_syncsplash(HZ, str(LANG_BOOKMARK_LOAD_EMPTY));
+                gui_syncsplash(HZ, ID2P(LANG_BOOKMARK_LOAD_EMPTY));
                 remove(bookmark_file_name);
-                action_signalscreenchange();
                 return NULL;
             }
 
@@ -710,7 +706,6 @@ static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resu
         case ACTION_STD_OK:
             if (item >= 0)
             {
-                action_signalscreenchange();
                 return bookmarks->items[item - bookmarks->start];
             }
             
@@ -741,7 +736,6 @@ static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resu
         }
     }
 
-    action_signalscreenchange();
     return NULL;
 }
 
@@ -824,7 +818,7 @@ static void say_bookmark(const char* bookmark,
     talk_number(bookmark_id + 1, true);
     talk_id(VOICE_BOOKMARK_SELECT_INDEX_TEXT, true);
     talk_number(resume_index + 1, true);
-    talk_id(VOICE_BOOKMARK_SELECT_TIME_TEXT, true);
+    talk_id(LANG_TIME, true);
     if (ms / 60000)
         talk_value(ms / 60000, UNIT_MIN, true);
     talk_value((ms % 60000) / 1000, UNIT_SEC, true);

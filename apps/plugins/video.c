@@ -27,6 +27,7 @@
 #include "plugin.h"
 #include "sh7034.h"
 #include "system.h"
+#include "helper.h"
 
 #ifndef SIMULATOR /* not for simulator by now */
 #ifdef HAVE_LCD_BITMAP /* and definitely not for the Player, haha */
@@ -559,8 +560,8 @@ void Cleanup(void *fd)
     if (gPlay.bHasAudio)
         rb->mp3_play_stop(); /* stop audio ISR */
 
-    /* restore normal backlight setting */
-    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+    /* Turn on backlight timeout (revert to settings) */
+    backlight_use_settings(rb); /* backlight control in lib/helper.c */
 
     /* restore normal contrast */
     rb->lcd_set_contrast(rb->global_settings->contrast);
@@ -650,8 +651,11 @@ int PlayTick(int fd)
                              * gFileHdr.bps_peak / 8 / HZ;
         }
 
-        if (!gPlay.bRefilling 
-            && rb->global_settings->disk_spindown < 20) /* condition for test only */
+        if (!gPlay.bRefilling
+#ifndef HAVE_FLASH_STORAGE
+            && rb->global_settings->disk_spindown < 20  /* condition for test only */
+#endif
+            )
         {
             rb->ata_sleep(); /* no point in leaving the disk run til timeout */
             gPlay.bDiskSleep = true;
@@ -921,8 +925,8 @@ int main(char* filename)
     if (gFileHdr.video_format == VIDEOFORMAT_RAW)
     {
         gPlay.bHasVideo = true;
-        if (rb->global_settings->backlight_timeout > 0)
-            rb->backlight_set_timeout(1); /* keep the light on */
+        /* Turn off backlight timeout */
+        backlight_force_on(rb); /* backlight control in lib/helper.c */
     }
 
     /* prepare audio playback, if contained */

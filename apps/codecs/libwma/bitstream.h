@@ -203,7 +203,7 @@ typedef struct RL_VLC_ELEM {
 #endif
 
 /* used to avoid missaligned exceptions on some archs (alpha, ...) */
-#if defined(ARCH_X86)
+#if defined(ARCH_X86) || defined(CPU_COLDFIRE)
 #    define unaligned16(a) (*(const uint16_t*)(a))
 #    define unaligned32(a) (*(const uint32_t*)(a))
 #    define unaligned64(a) (*(const uint64_t*)(a))

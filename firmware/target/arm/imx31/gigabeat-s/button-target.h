@@ -51,6 +51,8 @@ int button_read_device(void);
                 |BUTTON_VOL_UP|BUTTON_VOL_DOWN|BUTTON_NEXT|BUTTON_PREV \
                 |BUTTON_PLAY)
 
+#define BUTTON_REMOTE 0
+
 #define POWEROFF_BUTTON BUTTON_POWER
 #define POWEROFF_COUNT 10
 

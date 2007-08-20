@@ -19,7 +19,7 @@
 #ifndef _DIRCACHE_H
 #define _DIRCACHE_H
 
-#include "dir.h"
+#include "dir_uncached.h"
 
 #ifdef HAVE_DIRCACHE
 
@@ -34,8 +34,8 @@ struct travel_data {
     struct dircache_entry *ce;
     struct dircache_entry *down_entry;
 #ifdef SIMULATOR
-    DIR *dir, *newdir;
-    struct dirent *entry;
+    DIR_UNCACHED *dir, *newdir;
+    struct dirent_uncached *entry;
 #else
     struct fat_dir *dir;
     struct fat_dir newdir;
@@ -77,8 +77,8 @@ typedef struct {
     struct dircache_entry *entry;
     struct dircache_entry *internal_entry;
     struct dircache_entry secondary_entry;
-    DIR *regulardir;
-} DIRCACHED;
+    DIR_UNCACHED *regulardir;
+} DIR_CACHED;
 
 void dircache_init(void);
 int dircache_load(void);
@@ -103,17 +103,11 @@ void dircache_remove(const char *name);
 void dircache_rename(const char *oldpath, const char *newpath);
 void dircache_add_file(const char *path, long startcluster);
 
-DIRCACHED* opendir_cached(const char* name);
-struct dircache_entry* readdir_cached(DIRCACHED* dir);
-int closedir_cached(DIRCACHED *dir);
-
-#else /* HAVE_DIRCACHE */
-# define DIRCACHED DIR
-# define dircache_entry dirent
-# define opendir_cached opendir
-# define closedir_cached closedir
-# define readdir_cached readdir
-# define closedir_cached closedir
+DIR_CACHED* opendir_cached(const char* name);
+struct dircache_entry* readdir_cached(DIR_CACHED* dir);
+int closedir_cached(DIR_CACHED *dir);
+int mkdir_cached(const char *name);
+int rmdir_cached(const char* name);
 #endif /* !HAVE_DIRCACHE */
 
 #endif

@@ -18,3 +18,4 @@
  ****************************************************************************/
 
 void i2s_reset(void);
+void i2s_scale_attn_level(long frequency);

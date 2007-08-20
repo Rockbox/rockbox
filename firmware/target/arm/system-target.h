@@ -22,13 +22,28 @@
 
 #include "system-arm.h"
 
+/* TODO: This header is actually portalplayer specific, and should be
+ * moved into an appropriate subdir (or even split in 2). */
+
+#if CONFIG_CPU == PP5002
+#define CPUFREQ_SLEEP      32768
+#define CPUFREQ_DEFAULT 24000000
+#define CPUFREQ_NORMAL  30000000
+#define CPUFREQ_MAX     80000000
+
+#else /* PP5022, PP5024 */
+#define CPUFREQ_SLEEP      32768
+#define CPUFREQ_DEFAULT 24000000
+#define CPUFREQ_NORMAL  30000000
+#define CPUFREQ_MAX     80000000
+#endif
+
 #define inl(a) (*(volatile unsigned long *) (a))
 #define outl(a,b) (*(volatile unsigned long *) (b) = (a))
 #define inb(a) (*(volatile unsigned char *) (a))
 #define outb(a,b) (*(volatile unsigned char *) (b) = (a))
 #define inw(a) (*(volatile unsigned short *) (a))
 #define outw(a,b) (*(volatile unsigned short *) (b) = (a))
-extern unsigned int ipod_hw_rev;
 
 static inline void udelay(unsigned usecs)
 {

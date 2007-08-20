@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
+#include "helper.h"
 
 PLUGIN_HEADER
 
@@ -36,7 +37,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb = api;
 
     /* Turn off backlight timeout */
-    rb->backlight_set_timeout(1);
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
 
     rb->show_logo();
 #ifdef HAVE_LCD_CHARCELLS
@@ -55,8 +56,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     roll_credits();
 
 end_of_proc:
-    /* Restore the values we've changed */
-    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+    /* Turn on backlight timeout (revert to settings) */
+    backlight_use_settings(rb); /* backlight control in lib/helper.c */
 
     return PLUGIN_OK;
 }
@@ -128,7 +129,8 @@ void roll_credits(void)
 #if (CONFIG_KEYPAD == RECORDER_PAD)
     #define PAUSE_TIME 1.2
     #define ANIM_SPEED 35
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
     #define PAUSE_TIME 0
     #define ANIM_SPEED 100
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)

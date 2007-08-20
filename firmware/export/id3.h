@@ -147,11 +147,14 @@ struct mp3entry {
     char* artist;
     char* album;
     char* genre_string;
+    char* disc_string;
     char* track_string;
     char* year_string;
     char* composer;
     char* comment;
     char* albumartist;
+    char* grouping;
+    int discnum;    
     int tracknum;
     int version;
     int layer;
@@ -202,10 +205,12 @@ struct mp3entry {
     long rundbentryoffset;
 
     /* runtime database fields */
+    long tagcache_idx;
     short rating;
     short score;
     long playcount;
     long lastplayed;
+    long playtime;
     
     /* replaygain support */
     

@@ -27,6 +27,9 @@
 #include "misc.h"
 
 #include "debug.h"
+
+static intptr_t button_data; /* data value from last message dequeued */
+
 /* how long until repeat kicks in */
 #define REPEAT_START      6
 
@@ -210,7 +213,8 @@ void button_event(int key, bool pressed)
         new_btn = BUTTON_SELECT;
         break;
 
-#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_1G2G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+   || (CONFIG_KEYPAD == IPOD_4G_PAD)
     case SDLK_KP4:
     case SDLK_LEFT:
         new_btn = BUTTON_LEFT;
@@ -698,6 +702,7 @@ long button_get(bool block)
 
     if ( block || !queue_empty(&button_queue) ) {
         queue_wait(&button_queue, &ev);
+        button_data = ev.data;
         return ev.id;
     }
     return BUTTON_NONE;
@@ -707,8 +712,19 @@ long button_get_w_tmo(int ticks)
 {
     struct event ev;
     queue_wait_w_tmo(&button_queue, &ev, ticks);
-    return (ev.id != SYS_TIMEOUT)? ev.id: BUTTON_NONE;
-} 
+    if (ev.id == SYS_TIMEOUT)
+        ev.id = BUTTON_NONE;
+    else
+        button_data = ev.data;
+
+    return ev.id;
+}
+
+intptr_t button_get_data(void)
+{
+    /* Needed by the accelerating wheel driver for Sansa e200 */
+    return 1 << 24;
+}
 
 void button_init(void)
 {
@@ -723,3 +739,4 @@ void button_clear_queue(void)
 {
     queue_clear(&button_queue);
 }
+

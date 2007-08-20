@@ -29,10 +29,10 @@
 #include "system.h"
 #include "lcd-charcell.h"
 #include "rbunicode.h"
+#include "scroll_engine.h"
 
 /** definitions **/
 
-#define SCROLLABLE_LINES LCD_HEIGHT
 #define VARIABLE_XCHARS 16 /* number of software user-definable characters */
 /* There must be mappings for this many characters in the 0xe000 unicode range
  * in lcd-charset-<target>.c */
@@ -55,24 +55,6 @@ static int xspace; /* stores xhcar id of ' ' - often needed */
 static int xmargin = 0;
 static int ymargin = 0;
 
-/* scrolling */
-static volatile int scrolling_lines=0; /* Bitpattern of which lines are scrolling */
-static void scroll_thread(void);
-static char scroll_stack[DEFAULT_STACK_SIZE];
-static const char scroll_name[] = "scroll";
-static int scroll_ticks = 12; /* # of ticks between updates */
-static int scroll_delay = HZ/2; /* delay before starting scroll */
-static int bidir_limit = 50;  /* percent */
-static int jump_scroll_delay = HZ/4; /* delay between jump scroll jumps */
-static int jump_scroll = 0; /* 0=off, 1=once, ..., JUMP_SCROLL_ALWAYS */
-static struct scrollinfo scroll[SCROLLABLE_LINES];
-
-static const char scroll_tick_table[16] = {
- /* Hz values:
-    1, 1.25, 1.55, 2, 2.5, 3.12, 4, 5, 6.25, 8.33, 10, 12.5, 16.7, 20, 25, 33 */
-    100, 80, 64, 50, 40, 32, 25, 20, 16, 12, 10, 8, 6, 5, 4, 3
-};
-
 /* LCD init */
 void lcd_init (void)
 {
@@ -81,11 +63,7 @@ void lcd_init (void)
     memset(lcd_patterns, 0, sizeof(lcd_patterns));
     xspace = find_xchar(' ');
     memset(lcd_charbuffer, xchar_info[xspace].hw_char, sizeof(lcd_charbuffer));
-
-    create_thread(scroll_thread, scroll_stack,
-                  sizeof(scroll_stack), scroll_name
-                  IF_PRIO(, PRIORITY_USER_INTERFACE)
-		          IF_COP(, CPU, false));
+    scroll_init();
 }
 
 /** parameter handling **/
@@ -336,7 +314,7 @@ void lcd_put_cursor(int x, int y, unsigned long cursor_ucs)
     lcd_cursor.x = x;
     lcd_cursor.y = y;
     lcd_cursor.downcount = 0;
-    lcd_cursor.divider = MAX((HZ/2) / scroll_ticks, 1);
+    lcd_cursor.divider = MAX((HZ/2) / lcd_scroll_info.ticks, 1);
 }
 
 /* Remove the cursor */
@@ -398,7 +376,7 @@ void lcd_puts_offset(int x, int y, const unsigned char *str, int offset)
         return;
 
     /* make sure scrolling is turned off on the line we are updating */
-    scrolling_lines &= ~(1 << y);
+    lcd_scroll_info.lines &= ~(1 << y);
 
     x = lcd_putsxyofs(x, y, offset, str);
     while (x < LCD_WIDTH)
@@ -406,37 +384,6 @@ void lcd_puts_offset(int x, int y, const unsigned char *str, int offset)
 }
 
 /** scrolling **/
-
-void lcd_stop_scroll(void)
-{
-    scrolling_lines=0;
-}
-
-void lcd_scroll_speed(int speed)
-{
-    scroll_ticks = scroll_tick_table[speed];
-}
-
-void lcd_scroll_delay(int ms)
-{
-    scroll_delay = ms / (HZ / 10);
-}
-
-void lcd_bidir_scroll(int percent)
-{
-    bidir_limit = percent;
-}
-
-void lcd_jump_scroll(int mode) /* 0=off, 1=once, ..., JUMP_SCROLL_ALWAYS */
-{
-    jump_scroll = mode;
-}
-
-void lcd_jump_scroll_delay(int ms)
-{
-    jump_scroll_delay = ms / (HZ / 10);
-}
-
 void lcd_puts_scroll(int x, int y, const unsigned char *string)
 {
     lcd_puts_scroll_offset(x, y, string, 0);
@@ -448,11 +395,11 @@ void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
     struct scrollinfo* s;
     int len;
 
-    if(y>=SCROLLABLE_LINES) return;
+    if(y>=LCD_SCROLLABLE_LINES) return;
 
-    s = &scroll[y];
+    s = &lcd_scroll_info.scroll[y];
 
-    s->start_tick = current_tick + scroll_delay;
+    s->start_tick = current_tick + lcd_scroll_info.delay;
 
     lcd_puts_offset(x, y, string, offset);
     len = utf8length(string);
@@ -469,9 +416,10 @@ void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
         s->len = utf8length(s->line);
 
         /* scroll bidirectional or forward only depending on the string width */
-        if (bidir_limit)
+        if (lcd_scroll_info.bidir_limit)
         {
-            s->bidir = s->len < (LCD_WIDTH - xmargin) * (100 + bidir_limit) / 100;
+            s->bidir = s->len < (LCD_WIDTH - xmargin) *
+                (100 + lcd_scroll_info.bidir_limit) / 100;
         }
         else
             s->bidir = false;
@@ -489,83 +437,77 @@ void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
         s->offset = offset;
         s->startx = xmargin + x;
         s->backward = false;
-        scrolling_lines |= (1<<y);
+        lcd_scroll_info.lines |= (1<<y);
     }
     else
         /* force a bit switch-off since it doesn't scroll */
-        scrolling_lines &= ~(1<<y);
+        lcd_scroll_info.lines &= ~(1<<y);
 }
 
-static void scroll_thread(void)
+void lcd_scroll_fn(void)
 {
     struct scrollinfo* s;
     int index;
     int xpos, ypos;
     bool update;
 
-    /* initialize scroll struct array */
-    scrolling_lines = 0;
-
-    while (1)
+    update = false;
+    for (index = 0; index < LCD_SCROLLABLE_LINES; index++)
     {
-        update = false;
-        for (index = 0; index < SCROLLABLE_LINES; index++)
+        /* really scroll? */
+        if ((lcd_scroll_info.lines & (1 << index)) == 0)
+            continue;
+
+        s = &lcd_scroll_info.scroll[index];
+
+        /* check pause */
+        if (TIME_BEFORE(current_tick, s->start_tick))
+            continue;
+
+        if (s->backward)
+            s->offset--;
+        else
+            s->offset++;
+
+        xpos = s->startx;
+        ypos = ymargin + index;
+
+        if (s->bidir)  /* scroll bidirectional */
         {
-            /* really scroll? */
-            if (!(scrolling_lines&(1<<index)))
-                continue;
-
-            s = &scroll[index];
-
-            /* check pause */
-            if (TIME_BEFORE(current_tick, s->start_tick))
-                continue;
-
-            if (s->backward)
-                s->offset--;
-            else
-                s->offset++;
-
-            xpos = s->startx;
-            ypos = ymargin + index;
-
-            if (s->bidir)  /* scroll bidirectional */
-            {
-                if (s->offset <= 0) 
-                {
-                    /* at beginning of line */
-                    s->offset = 0;
-                    s->backward = false;
-                    s->start_tick = current_tick + scroll_delay * 2;
-                }
-                if (s->offset >= s->len - (LCD_WIDTH - xpos)) 
-                {
-                    /* at end of line */
-                    s->offset = s->len - (LCD_WIDTH - xpos);
-                    s->backward = true;
-                    s->start_tick = current_tick + scroll_delay * 2;
-                }
+            if (s->offset <= 0) {
+                /* at beginning of line */
+                s->offset = 0;
+                s->backward = false;
+                s->start_tick = current_tick + lcd_scroll_info.delay * 2;
             }
-            else    /* scroll forward the whole time */
-            {
-                if (s->offset >= s->len)
-                    s->offset -= s->len;
+            if (s->offset >= s->len - (LCD_WIDTH - xpos)) {
+                /* at end of line */
+                s->offset = s->len - (LCD_WIDTH - xpos);
+                s->backward = true;
+                s->start_tick = current_tick + lcd_scroll_info.delay * 2;
             }
-            lcd_putsxyofs(xpos, ypos, s->offset, s->line);
+        }
+        else    /* scroll forward the whole time */
+        {
+            if (s->offset >= s->len)
+                s->offset -= s->len;
+        }
+
+        lcd_putsxyofs(xpos, ypos, s->offset, s->line);
+        update = true;
+    }
+
+    if (lcd_cursor.enabled)
+    {
+        if (--lcd_cursor.downcount <= 0)
+        {
+            lcd_cursor.downcount = lcd_cursor.divider;
+            lcd_cursor.visible = !lcd_cursor.visible;
             update = true;
         }
-        if (lcd_cursor.enabled)
-        {
-            if (--lcd_cursor.downcount <= 0)
-            {
-                lcd_cursor.downcount = lcd_cursor.divider;
-                lcd_cursor.visible = !lcd_cursor.visible;
-                update = true;
-            }
-        }
-        if (update)
-            lcd_update();
-
-        sleep(scroll_ticks);
     }
+
+    if (update)
+        lcd_update();
 }
+

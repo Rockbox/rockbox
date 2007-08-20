@@ -328,23 +328,3 @@ void vid_update(int scanline)
 }
 #endif
 
-long timerresult;
-
-void *sys_timer(void) 
-{
-   /*timerresult=*rb->current_tick;
-   return &timerresult;*/
-   return 0;
-}
-
-/* returns microseconds passed since sys_timer */
-int sys_elapsed(long *oldtick) 
-{
-   /* int elap,mytime=microtick;
-
-   elap=mytime-*oldtick;
-   *oldtick=mytime;
-   return elap; */
-   /* return ((*rb->current_tick-(*oldtick))*1000000)/HZ; */
-   return *oldtick;
-}

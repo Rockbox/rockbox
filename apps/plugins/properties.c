@@ -34,6 +34,12 @@ char str_filecount[64];
 char str_date[64];
 char str_time[64];
 
+char str_title[MAX_PATH];
+char str_artist[MAX_PATH];
+char str_album[MAX_PATH];
+
+int num_properties;
+
 static char* filesize2string(long long size, char* pstr, int len)
 {
     /* margin set at 10K boundary: 10239 B +1 => 10 KB
@@ -59,30 +65,19 @@ static bool file_properties(char* selected_file)
 {
     bool found = false;
     char tstr[MAX_PATH];
-#ifdef HAVE_DIRCACHE
-    DIRCACHED* dir;
-    struct dircache_entry* entry;
-#else
     DIR* dir;
     struct dirent* entry;
-#endif
+    struct mp3entry id3;
+
     char* ptr = rb->strrchr(selected_file, '/') + 1;
     int dirlen = (ptr - selected_file);
     rb->strncpy(tstr, selected_file, dirlen);
     tstr[dirlen] = 0;
 
-#ifdef HAVE_DIRCACHE
-    dir = rb->opendir_cached(tstr);
-#else
     dir = rb->opendir(tstr);
-#endif
     if (dir)
     {
-#ifdef HAVE_DIRCACHE
-        while(0 != (entry = rb->readdir_cached(dir)))
-#else
         while(0 != (entry = rb->readdir(dir)))
-#endif
         {
             if(!rb->strcmp(entry->d_name, selected_file+dirlen))
             {
@@ -99,15 +94,33 @@ static bool file_properties(char* selected_file)
                 rb->snprintf(str_time, sizeof str_time, "Time: %02d:%02d",
                     ((entry->wrttime >> 11) & 0x1F),        /* hour    */
                     ((entry->wrttime >> 5 ) & 0x3F));       /* minutes */
+
+                num_properties = 5;
+
+#if (CONFIG_CODEC == SWCODEC)
+                int fd = rb->open(selected_file, O_RDONLY);
+                if (fd >= 0 &&
+                    rb->get_metadata(&id3, fd, selected_file, false))
+#else
+                if (!rb->mp3info(&id3, selected_file, false))
+#endif
+                {
+                    rb->snprintf(str_artist, sizeof str_artist,
+                                 "Artist: %s", id3.artist ? id3.artist : "");
+                    rb->snprintf(str_title, sizeof str_title,
+                                 "Title: %s", id3.title ? id3.title : "");
+                    rb->snprintf(str_album, sizeof str_album,
+                                 "Album: %s", id3.album ? id3.album : "");
+                    num_properties += 3;
+                }
+#if (CONFIG_CODEC == SWCODEC)
+                rb->close(fd);
+#endif
                 found = true;
                 break;
             }
         }
-#ifdef HAVE_DIRCACHE
-        rb->closedir_cached(dir);
-#else
         rb->closedir(dir);
-#endif
     }
     return found;
 }
@@ -128,30 +141,17 @@ static bool _dir_properties(DPS* dps)
        and informs the user of the progress */
     bool result;
     int dirlen;
-#ifdef HAVE_DIRCACHE
-    DIRCACHED* dir;
-    struct dircache_entry* entry;
-#else
     DIR* dir;
     struct dirent* entry;
-#endif
 
     result = true;
     dirlen = rb->strlen(dps->dirname);
-#ifdef HAVE_DIRCACHE
-    dir = rb->opendir_cached(dps->dirname);
-#else
     dir = rb->opendir(dps->dirname);
-#endif
     if (!dir)
         return false; /* open error */
 
     /* walk through the directory content */
-#ifdef HAVE_DIRCACHE
-    while(result && (0 != (entry = rb->readdir_cached(dir))))
-#else
     while(result && (0 != (entry = rb->readdir(dir))))
-#endif
     {
         /* append name to current directory */
         rb->snprintf(dps->dirname+dirlen, dps->len-dirlen, "/%s",
@@ -189,12 +189,7 @@ static bool _dir_properties(DPS* dps)
             result = false;
         rb->yield();
     }
-#ifdef HAVE_DIRCACHE
-    rb->closedir_cached(dir);
-#else
     rb->closedir(dir);
-#endif
-
     return result;
 }
 
@@ -215,6 +210,7 @@ static bool dir_properties(char* selected_file)
     rb->snprintf(str_filecount, sizeof str_filecount, "Files: %d", dps.fc);
     rb->snprintf(str_size, sizeof str_size, "Size: %s",
                  filesize2string(dps.bc, tstr, sizeof tstr));
+    num_properties = 4;
     return true;
 }
 
@@ -239,6 +235,15 @@ char * get_props(int selected_item, void* data, char *buffer)
         case 4:
             rb->strcpy(buffer, its_a_dir ? "" : str_time);
             break;
+        case 5:
+            rb->strcpy(buffer, its_a_dir ? "" : str_artist);
+            break;
+        case 6:
+            rb->strcpy(buffer, its_a_dir ? "" : str_title);
+            break;
+        case 7:
+            rb->strcpy(buffer, its_a_dir ? "" : str_album);
+            break;
         default:
             rb->strcpy(buffer, "ERROR");
             break;
@@ -256,30 +261,17 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 
     /* determine if it's a file or a directory */
     bool found = false;
-#ifdef HAVE_DIRCACHE
-    DIRCACHED* dir;
-    struct dircache_entry* entry;
-#else
     DIR* dir;
     struct dirent* entry;
-#endif
     char* ptr = rb->strrchr((char*)file, '/') + 1;
     int dirlen = (ptr - (char*)file);
     rb->strncpy(str_dirname, (char*)file, dirlen);
     str_dirname[dirlen] = 0;
 
-#ifdef HAVE_DIRCACHE
-    dir = rb->opendir_cached(str_dirname);
-#else
     dir = rb->opendir(str_dirname);
-#endif
     if (dir)
     {
-#ifdef HAVE_DIRCACHE
-        while(0 != (entry = rb->readdir_cached(dir)))
-#else
         while(0 != (entry = rb->readdir(dir)))
-#endif
         {
             if(!rb->strcmp(entry->d_name, file+dirlen))
             {
@@ -288,11 +280,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 break;
             }
         }
-#ifdef HAVE_DIRCACHE
-        rb->closedir_cached(dir);
-#else
         rb->closedir(dir);
-#endif
     }
     /* now we know if it's a file or a dir or maybe something failed */
     
@@ -322,7 +310,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                                                   "Directory properties" :
                                                   "File properties", NOICON);
     rb->gui_synclist_set_icon_callback(&properties_lists, NULL);
-    rb->gui_synclist_set_nb_items(&properties_lists, its_a_dir ? 4 : 5);
+    rb->gui_synclist_set_nb_items(&properties_lists, num_properties);
     rb->gui_synclist_limit_scroll(&properties_lists, true);
     rb->gui_synclist_select_item(&properties_lists, 0);
     rb->gui_synclist_draw(&properties_lists);
@@ -346,7 +334,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
         }
     }
     rb->global_settings->statusbar = prev_show_statusbar;
-    rb->action_signalscreenchange();
 
     return PLUGIN_OK;
 }

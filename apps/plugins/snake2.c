@@ -195,7 +195,8 @@ PLUGIN_HEADER
 
 #define SNAKE2_RC_QUIT  BUTTON_RC_STOP
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD)
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define SNAKE2_UP   BUTTON_MENU
 #define SNAKE2_DOWN BUTTON_PLAY
 #define SNAKE2_QUIT (BUTTON_SELECT | BUTTON_MENU)
@@ -320,8 +321,8 @@ extern const unsigned char snake2_bottom[];
 #define SOUTH_EAST  2048
 #define SOUTH_WEST  4096
 
-#define LEVELS_FILE  PLUGIN_DIR "/snake2.levels"
-#define HISCORE_FILE PLUGIN_DIR "/snake2.hs"
+#define LEVELS_FILE  PLUGIN_GAMES_DIR "/snake2.levels"
+#define HISCORE_FILE PLUGIN_GAMES_DIR "/snake2.hs"
 
 int load_all_levels(void)
 {

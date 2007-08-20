@@ -19,6 +19,7 @@
 
 #include "plugin.h"
 #include "oldmenuapi.h"
+#include "helper.h"
 
 PLUGIN_HEADER
 
@@ -114,9 +115,11 @@ static bool test_fs(void)
 
     log_init();
     log_text("test_disk WRITE&VERIFY", true);
+#ifndef SIMULATOR
     rb->snprintf(text_buf, sizeof(text_buf), "CPU clock: %ld Hz",
                  *rb->cpu_frequency);
     log_text(text_buf, true);
+#endif
     log_text("----------------------", true);
     rb->snprintf(text_buf, sizeof text_buf, "Data size: %dKB", (TEST_SIZE>>10));
     log_text(text_buf, true);
@@ -297,9 +300,11 @@ static bool test_speed(void)
     rb->memset(audiobuf, 'T', audiobuflen);
     log_init();
     log_text("test_disk SPEED TEST", true);
+#ifndef SIMULATOR
     rb->snprintf(text_buf, sizeof(text_buf), "CPU clock: %ld Hz",
                  *rb->cpu_frequency);
     log_text(text_buf, true);
+#endif
     log_text("--------------------", true);
 
     /* File creation speed */
@@ -433,16 +438,16 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     rb->srand(*rb->current_tick);
 
-    if (rb->global_settings->backlight_timeout > 0)
-        rb->backlight_set_timeout(1); /* keep the light on */
+    /* Turn off backlight timeout */
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
 
     m = menu_init(rb, items, sizeof(items) / sizeof(*items), NULL,
                       NULL, NULL, NULL);
     menu_run(m);
     menu_exit(m);
 
-    /* restore normal backlight setting */
-    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+    /* Turn on backlight timeout (revert to settings) */
+    backlight_use_settings(rb); /* backlight control in lib/helper.c */
     
     rb->rmdir(testbasedir);
 

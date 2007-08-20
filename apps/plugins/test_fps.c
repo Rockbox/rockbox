@@ -20,7 +20,8 @@
 
 #ifdef HAVE_LCD_BITMAP
 
-#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define FPS_QUIT BUTTON_MENU
 #elif defined(BUTTON_OFF)
 #define FPS_QUIT BUTTON_OFF
@@ -38,7 +39,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     char str[64];                   /* text buffer */
     int time_start;                 /* start tickcount */
     int frame_count;                /* frame counter */
+#ifndef SIMULATOR
     int cpu_freq;
+#endif
     int line = 0;
     int part14_x = LCD_WIDTH/4;     /* x-offset for 1/4 update test */
     int part14_w = LCD_WIDTH/2;     /* x-size for 1/4 update test */
@@ -66,7 +69,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
     rb->lcd_update();
 
+#ifndef SIMULATOR
     cpu_freq = *rb->cpu_frequency; /* remember CPU frequency */
+#endif
 
     /* TEST 1: FULL LCD UPDATE */
     frame_count = 0;
@@ -95,12 +100,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                  (frame_count%2)*5);
     rb->lcd_puts(0, line++, str);
     
+#ifndef SIMULATOR
     if (*rb->cpu_frequency != cpu_freq)
         rb->snprintf(str, sizeof(str), "CPU: frequency changed!");
     else
         rb->snprintf(str, sizeof(str), "CPU: %d Hz", cpu_freq);
 
     rb->lcd_puts(0, line++, str);
+#endif
     rb->lcd_update();
 
 #ifdef HAVE_REMOTE_LCD
@@ -109,7 +116,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_remote_puts(0, r_line++, "Remote LCD");
     rb->lcd_remote_update();
 
+#ifndef SIMULATOR
     cpu_freq = *rb->cpu_frequency; /* remember CPU frequency */
+#endif
 
     /* TEST 1: FULL LCD UPDATE */
     frame_count = 0;
@@ -139,12 +148,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                  (frame_count%2)*5);
     rb->lcd_puts(0, line++, str);
     
+#ifndef SIMULATOR
     if (*rb->cpu_frequency != cpu_freq)
         rb->snprintf(str, sizeof(str), "CPU: frequency changed!");
     else
         rb->snprintf(str, sizeof(str), "CPU: %d Hz", cpu_freq);
 
     rb->lcd_puts(0, line++, str);
+#endif
     rb->lcd_update();
 #endif
 

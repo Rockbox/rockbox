@@ -76,14 +76,21 @@ static int wrcount;
 #endif
 
 static int shutdown_timeout = 0;
+#if CONFIG_CHARGING >= CHARGING_MONITOR
+charge_state_type charge_state;     /* charging mode */
+#endif
+
+#if CONFIG_CHARGING
+charger_input_state_type charger_input_state IDATA_ATTR;
+#endif
 
 #ifdef SIMULATOR /***********************************************************/
 
-#define BATT_MINCVOLT   250             /* minimum centivolts of battery */
-#define BATT_MAXCVOLT   450             /* maximum centivolts of battery */
+#define BATT_MINMVOLT   2500            /* minimum millivolts of battery */
+#define BATT_MAXMVOLT   4500            /* maximum millivolts of battery */
 #define BATT_MAXRUNTIME (10 * 60)       /* maximum runtime with full battery in minutes */
 
-static unsigned int batt_centivolts = (unsigned int)BATT_MAXCVOLT;
+static unsigned int batt_millivolts = (unsigned int)BATT_MAXMVOLT;
 static int batt_level = 100;            /* battery capacity level in percent */
 static int batt_time = BATT_MAXRUNTIME; /* estimated remaining time in minutes */
 static time_t last_change = 0;
@@ -97,24 +104,21 @@ static void battery_status_update(void)
         last_change = now;
 
         /* change the values: */
-        batt_centivolts -= (unsigned int)(BATT_MAXCVOLT - BATT_MINCVOLT) / 101;
-        if (batt_centivolts < (unsigned int)BATT_MINCVOLT)
-            batt_centivolts = (unsigned int)BATT_MAXCVOLT;
+        batt_millivolts -= (unsigned int)(BATT_MAXMVOLT - BATT_MINMVOLT) / 101;
+        if (batt_millivolts < (unsigned int)BATT_MINMVOLT)
+            batt_millivolts = (unsigned int)BATT_MAXMVOLT;
 
-        batt_level = 100 * (batt_centivolts - BATT_MINCVOLT) / (BATT_MAXCVOLT - BATT_MINCVOLT);
+        batt_level = 100 * (batt_millivolts - BATT_MINMVOLT) / (BATT_MAXMVOLT - BATT_MINMVOLT);
         batt_time = batt_level * BATT_MAXRUNTIME / 100;
     }
 }
 
-void battery_read_info(int *adc, int *voltage, int *level)
+void battery_read_info(int *voltage, int *level)
 {
     battery_status_update();
 
-    if (adc)
-        *adc = batt_centivolts; /* just return something */
-
     if (voltage)
-        *voltage = batt_centivolts;
+        *voltage = batt_millivolts;
 
     if (level)
         *level = batt_level;
@@ -123,7 +127,7 @@ void battery_read_info(int *adc, int *voltage, int *level)
 unsigned int battery_voltage(void)
 {
     battery_status_update();
-    return batt_centivolts;
+    return batt_millivolts;
 }
 
 int battery_level(void)
@@ -153,141 +157,23 @@ void set_battery_capacity(int capacity)
   (void)capacity;
 }
 
+#if BATTERY_TYPES_COUNT > 1
+void set_battery_type(int type)
+{
+    (void)type;
+}
+#endif
+
 void reset_poweroff_timer(void)
 {
 }
 
-
 #else /* not SIMULATOR ******************************************************/
 
-static const int poweroff_idle_timeout_value[15] =
+static const unsigned char poweroff_idle_timeout_value[15] =
 {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 30, 45, 60
 };
-
-static const unsigned int battery_level_dangerous[BATTERY_TYPES_COUNT] =
-{
-#if CONFIG_BATTERY == BATT_LIION2200    /* FM Recorder, LiIon */
-    280
-#elif CONFIG_BATTERY == BATT_3AAA       /* Ondio: Alkaline, NiHM */
-    310, 345
-#elif CONFIG_BATTERY == BATT_1AA        /* iRiver iFP: Alkaline, NiHM */
-    105, 115
-#elif CONFIG_BATTERY == BATT_LIPOL1300  /* iRiver H1x0: LiPolymer */
-    338
-#elif CONFIG_BATTERY == BATT_LIION750   /* Sansa e200 */
-    340
-#elif CONFIG_BATTERY == BATT_LIION830   /* Gigabeat F */
-    345
-#elif CONFIG_BATTERY == BATT_IAUDIO_X5M5  /* iAudio X5 */
-    354
-#elif CONFIG_BATTERY == BATT_LPCS355385 /* iriver H10 20GB: LiPolymer*/
-    376
-#elif CONFIG_BATTERY == BATT_BP009      /* iriver H10 5/6GB: LiPolymer */
-    372
-#else                                   /* Player/recorder: NiMH */
-    475
-#endif
-};
-
-static const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-#if   CONFIG_BATTERY == BATT_LIION2200  /* FM Recorder */
-    258
-#elif CONFIG_BATTERY == BATT_3AAA       /* Ondio */
-    270, 280
-#elif CONFIG_BATTERY == BATT_LIPOL1300  /* iRiver Hxxx */
-    302
-#elif CONFIG_BATTERY == BATT_LIION750   /* Sansa e200 */
-    330
-#elif CONFIG_BATTERY == BATT_LIION830   /* Gigabeat F */
-    340
-#elif CONFIG_BATTERY == BATT_IAUDIO_X5M5  /* iAudio X5 */
-    350
-#elif CONFIG_BATTERY == BATT_LPCS355385 /* iriver H10 20GB */
-    365
-#elif CONFIG_BATTERY == BATT_BP009      /* iriver H10 5/6GB */
-    365
-#else                                   /* Player/recorder: NiMH */
-    440
-#endif
-};
-
-/* voltages (centivolt) of 0%, 10%, ... 100% when charging disabled */
-static const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
-{
-#if CONFIG_BATTERY == BATT_LIION2200
-    /* measured values */
-    { 260, 285, 295, 303, 311, 320, 330, 345, 360, 380, 400 }
-#elif CONFIG_BATTERY == BATT_3AAA
-    /* measured values */
-    { 280, 325, 341, 353, 364, 374, 385, 395, 409, 427, 475 }, /* Alkaline */
-    { 310, 355, 363, 369, 372, 374, 376, 378, 380, 386, 405 }  /* NiMH */
-#elif CONFIG_BATTERY == BATT_LIPOL1300
-    /* Below 337 the backlight starts flickering during HD access */
-    { 337, 365, 370, 374, 378, 382, 387, 393, 400, 408, 416 }
-#elif CONFIG_BATTERY == BATT_IAUDIO_X5M5
-    /* average measured values from X5 and M5L */
-    { 350, 365, 372, 374, 376, 379, 384, 390, 395, 404, 412 }
-#elif CONFIG_BATTERY == BATT_LPCS355385
-    /* iriver H10 20GB */
-    { 376, 380, 385, 387, 390, 395, 402, 407, 411, 418, 424 }
-#elif CONFIG_BATTERY == BATT_BP009
-    /* iriver H10 5/6GB */
-    { 372, 374, 380, 382, 384, 388, 394, 402, 406, 415, 424 }
-#elif CONFIG_BATTERY == BATT_1AA
-    /* These values are the same as for 3AAA divided by 3. */
-    /* May need recalibration. */
-    {  93, 108, 114, 118, 121, 125, 128, 132, 136, 142, 158 }, /* alkaline */
-    { 103, 118, 121, 123, 124, 125, 126, 127, 128, 129, 135 }  /* NiMH */
-#elif CONFIG_BATTERY == BATT_LIION830
-    /* Toshiba Gigabeat Li Ion 830mAH figured from discharge curve */
-    { 354, 357, 359, 361, 364, 366, 372, 381, 377, 381, 394 },
-#elif CONFIG_BATTERY == BATT_LIION750
-    /* Sansa Li Ion 750mAH FIXME this is a first linear approach */
-    { 330, 339, 348, 357, 366, 375, 384, 393, 402, 411, 420 },
-#else /* NiMH */
-    /* original values were taken directly after charging, but it should show
-       100% after turning off the device for some hours, too */
-    { 450, 481, 491, 497, 503, 507, 512, 514, 517, 525, 540 }
-                                            /* orig. values: ...,528,560 */
-#endif
-};
-
-#if CONFIG_CHARGING
-charger_input_state_type charger_input_state IDATA_ATTR;
-
-
-/* voltages (centivolt) of 0%, 10%, ... 100% when charging enabled */
-static const unsigned short percent_to_volt_charge[11] =
-{
-#if CONFIG_BATTERY == BATT_LIPOL1300
-    /* values measured over one full charging cycle */
-    354, 386, 393, 398, 400, 402, 404, 408, 413, 418, 423 /* LiPo */
-#elif CONFIG_BATTERY == BATT_LIION750
-    /* Sansa Li Ion 750mAH FIXME*/
-    330, 339, 348, 357, 366, 375, 384, 393, 402, 411, 420 
-#elif CONFIG_BATTERY == BATT_LIION830
-    /* Toshiba Gigabeat Li Ion 830mAH */
-    354, 357, 359, 361, 364, 366, 372, 381, 377, 381, 394
-#elif CONFIG_BATTERY == BATT_LPCS355385
-    /* iriver H10 20GB */
-    399, 403, 406, 408, 410, 412, 415, 418, 422, 426, 431
-#elif CONFIG_BATTERY == BATT_BP009
-    /* iriver H10 5/6GB: Not yet calibrated */
-    388, 392, 396, 400, 406, 410, 415, 419, 424, 428, 433
-#else
-    /* values guessed, see
-       http://www.seattlerobotics.org/encoder/200210/LiIon2.pdf until someone
-       measures voltages over a charging cycle */
-    476, 544, 551, 556, 561, 564, 566, 576, 582, 584, 585 /* NiMH */
-#endif
-};
-#endif /* CONFIG_CHARGING */
-
-#if CONFIG_CHARGING >= CHARGING_MONITOR
-charge_state_type charge_state;     /* charging mode */
-#endif
 
 #if CONFIG_CHARGING == CHARGING_CONTROL
 int long_delta;                     /* long term delta battery voltage */
@@ -316,13 +202,12 @@ int pid_i = 0;                      /* PID integral term */
  * exponential filter.
  */
 static unsigned int avgbat;     /* average battery voltage (filtering) */
-static unsigned int battery_centivolts;/* filtered battery voltage, centvolts */
+static unsigned int battery_millivolts;/* filtered battery voltage, millivolts */
+
 #ifdef HAVE_CHARGE_CTRL
 #define BATT_AVE_SAMPLES    32  /* filter constant / @ 2Hz sample rate */
-#elif CONFIG_BATTERY == BATT_LIPOL1300
-#define BATT_AVE_SAMPLES   128  /* slow filter for iriver */
 #else
-#define BATT_AVE_SAMPLES    64  /* medium filter constant for all others */
+#define BATT_AVE_SAMPLES   128  /* slw filter constant for all others */
 #endif
 
 /* battery level (0-100%) of this minute, updated once per minute */
@@ -344,23 +229,19 @@ static long sleeptimer_endtick;
 
 static long last_event_tick;
 
-static int voltage_to_battery_level(int battery_centivolts);
+static int voltage_to_battery_level(int battery_millivolts);
 static void battery_status_update(void);
 static int runcurrent(void);
 
-void battery_read_info(int *adc, int *voltage, int *level)
+void battery_read_info(int *voltage, int *level)
 {
-    int adc_battery = adc_read(ADC_UNREG_POWER);
-    int centivolts  = adc_battery*BATTERY_SCALE_FACTOR / 10000;
-
-    if (adc)
-        *adc = adc_battery;
+    int millivolts = battery_adc_voltage();
 
     if (voltage)
-        *voltage = centivolts;
+        *voltage = millivolts;
 
     if (level)
-        *level = voltage_to_battery_level(centivolts);
+        *level = voltage_to_battery_level(millivolts);
 }
 
 void reset_poweroff_timer(void)
@@ -399,22 +280,16 @@ int battery_level(void)
     return battery_percent;
 }
 
-/* Returns filtered battery voltage [centivolts] */
+/* Returns filtered battery voltage [millivolts] */
 unsigned int battery_voltage(void)
 {
-    return battery_centivolts;
-}
-
-/* Returns battery voltage from ADC [centivolts] */
-int battery_adc_voltage(void)
-{
-    return (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR + 5000) / 10000;
+    return battery_millivolts;
 }
 
 /* Tells if the battery level is safe for disk writes */
 bool battery_level_safe(void)
 {
-    return battery_centivolts > battery_level_dangerous[battery_type];
+    return battery_millivolts > battery_level_dangerous[battery_type];
 }
 
 void set_poweroff_timeout(int timeout)
@@ -464,44 +339,47 @@ static int voltage_to_percent(int voltage, const short* table)
 
 /* update battery level and estimated runtime, called once per minute or
  * when battery capacity / type settings are changed */
-static int voltage_to_battery_level(int battery_centivolts)
+static int voltage_to_battery_level(int battery_millivolts)
 {
     int level;
 
-#if defined(CONFIG_CHARGER) && CONFIG_BATTERY == BATT_LIPOL1300
+#if defined(CONFIG_CHARGER) \
+ && (defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES))
+    /* Checking for iriver is a temporary kludge.
+     * This code needs rework/unification */
     if (charger_input_state == NO_CHARGER) {
         /* discharging. calculate new battery level and average with last */
-        level = voltage_to_percent(battery_centivolts,
+        level = voltage_to_percent(battery_millivolts,
                 percent_to_volt_discharge[battery_type]);
         if (level != (battery_percent - 1))
             level = (level + battery_percent + 1) / 2;
     }
     else if (charger_input_state == CHARGER_UNPLUGGED) {
         /* just unplugged. adjust filtered values */
-        battery_centivolts -= percent_to_volt_charge[battery_percent/10] -
+        battery_millivolts -= percent_to_volt_charge[battery_percent/10] -
                               percent_to_volt_discharge[0][battery_percent/10];
-        avgbat = battery_centivolts * 10000 * BATT_AVE_SAMPLES;
+        avgbat = battery_millivolts * 1000 * BATT_AVE_SAMPLES;
         level  = battery_percent;
     }
     else if (charger_input_state == CHARGER_PLUGGED) {
         /* just plugged in. adjust battery values */
-        battery_centivolts += percent_to_volt_charge[battery_percent/10] -
+        battery_millivolts += percent_to_volt_charge[battery_percent/10] -
                               percent_to_volt_discharge[0][battery_percent/10];
-        avgbat = battery_centivolts * 10000 * BATT_AVE_SAMPLES;
+        avgbat = battery_millivolts * 1000 * BATT_AVE_SAMPLES;
         level  = MIN(12 * battery_percent / 10, 99);
     }
     else { /* charging. calculate new battery level */
-        level = voltage_to_percent(battery_centivolts,
+        level = voltage_to_percent(battery_millivolts,
                 percent_to_volt_charge);
     }
 #elif CONFIG_CHARGING >= CHARGING_MONITOR
     if (charge_state == DISCHARGING) {
-        level = voltage_to_percent(battery_centivolts,
+        level = voltage_to_percent(battery_millivolts,
                     percent_to_volt_discharge[battery_type]);
     }
     else if (charge_state == CHARGING) {
         /* battery level is defined to be < 100% until charging is finished */
-        level = MIN(voltage_to_percent(battery_centivolts,
+        level = MIN(voltage_to_percent(battery_millivolts,
                     percent_to_volt_charge), 99);
     }
     else { /* in topoff/trickle charge, battery is by definition 100% full */
@@ -509,7 +387,7 @@ static int voltage_to_battery_level(int battery_centivolts)
     }
 #else
     /* always use the discharge table */
-    level = voltage_to_percent(battery_centivolts,
+    level = voltage_to_percent(battery_millivolts,
                 percent_to_volt_discharge[battery_type]);
 #endif
 
@@ -518,7 +396,7 @@ static int voltage_to_battery_level(int battery_centivolts)
 
 static void battery_status_update(void)
 {
-    int level = voltage_to_battery_level(battery_centivolts);
+    int level = voltage_to_battery_level(battery_millivolts);
 
 
     /* calculate estimated remaining running time */
@@ -530,7 +408,10 @@ static void battery_status_update(void)
                                       / 100 / (CURRENT_MAX_CHG - runcurrent());
     }
     else
-#elif CONFIG_CHARGING && CONFIG_BATTERY == BATT_LIPOL1300
+#elif CONFIG_CHARGING \
+  && (defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES))
+    /* Checking for iriver is a temporary kludge.
+     * This code needs rework/unification */
     if (charger_inserted()) {
 #ifdef IRIVER_H300_SERIES
         /* H300_SERIES use CURRENT_MAX_CHG for basic charge time (80%)
@@ -569,11 +450,11 @@ static void battery_status_update(void)
     else
 #endif /* BATT_LIPOL1300 */
     {
-        if ((battery_centivolts + 2) > percent_to_volt_discharge[0][0])
+        if ((battery_millivolts + 20) > percent_to_volt_discharge[0][0])
             powermgmt_est_runningtime_min = (level + battery_percent) * 60 *
                                          battery_capacity / 200 / runcurrent();
         else
-            powermgmt_est_runningtime_min = (battery_centivolts -
+            powermgmt_est_runningtime_min = (battery_millivolts -
                                              battery_level_shutoff[0]) / 2;
     }
 
@@ -607,10 +488,9 @@ static void handle_auto_poweroff(void)
     }
 #endif
 
+#ifndef NO_LOW_BATTERY_SHUTDOWN
     /* switch off unit if battery level is too low for reliable operation */
-#if (CONFIG_BATTERY!=BATT_4AA_NIMH) && (CONFIG_BATTERY!=BATT_3AAA)&& \
-    (CONFIG_BATTERY!=BATT_1AA)
-    if(battery_centivolts < battery_level_shutoff[battery_type]) {
+    if(battery_millivolts < battery_level_shutoff[battery_type]) {
         if(!shutdown_timeout) {
             backlight_on();
             sys_poweroff();
@@ -818,12 +698,11 @@ static void power_thread_sleep(int ticks)
          * likely always be spinning in USB mode).
          */
         if (!ata_disk_is_active() || usb_inserted()) {
-            avgbat += adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR
-                      - (avgbat / BATT_AVE_SAMPLES);
+            avgbat += battery_adc_voltage() - (avgbat / BATT_AVE_SAMPLES);
             /*
-             * battery_centivolts is the centivolt-scaled filtered battery value.
+             * battery_millivolts is the millivolt-scaled filtered battery value.
              */
-            battery_centivolts = (avgbat / BATT_AVE_SAMPLES + 5000) / 10000;
+            battery_millivolts = avgbat / BATT_AVE_SAMPLES;
 
             /* update battery status every time an update is available */
             battery_status_update();
@@ -833,21 +712,19 @@ static void power_thread_sleep(int ticks)
              * Shut down if voltage drops below shutoff level and we are not
              * using NiMH or Alkaline batteries.
              */
-            battery_centivolts = (battery_adc_voltage() +
-                                  battery_centivolts + 1) / 2;
+            battery_millivolts = (battery_adc_voltage() +
+                                  battery_millivolts + 1) / 2;
 
             /* update battery status every time an update is available */
             battery_status_update();
 
-#if (CONFIG_BATTERY!=BATT_4AA_NIMH) && (CONFIG_BATTERY!=BATT_3AAA)&& \
-    (CONFIG_BATTERY!=BATT_1AA)
+#ifndef NO_LOW_BATTERY_SHUTDOWN
             if (!shutdown_timeout &&
-                (battery_centivolts < battery_level_shutoff[battery_type]))
+                (battery_millivolts < battery_level_shutoff[battery_type]))
                 sys_poweroff();
             else
 #endif
-                avgbat += battery_centivolts * 10000
-                          - (avgbat / BATT_AVE_SAMPLES);
+                avgbat += battery_millivolts - (avgbat / BATT_AVE_SAMPLES);
         }
 
 #if CONFIG_CHARGING == CHARGING_CONTROL
@@ -879,9 +756,8 @@ static void power_thread_sleep(int ticks)
 
 static void power_thread(void)
 {
-    int i;
-    short *phps, *phpd;         /* power history rotation pointers */
 #if CONFIG_CHARGING == CHARGING_CONTROL
+    int i;
     unsigned int target_voltage = TRICKLE_VOLTAGE;    /* desired topoff/trickle
                                        * voltage level */
     int charge_max_time_idle = 0;     /* max. charging duration, calculated at
@@ -894,7 +770,7 @@ static void power_thread(void)
 #endif
 
     /* initialize the voltages for the exponential filter */
-    avgbat = adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR + 15000;
+    avgbat = battery_adc_voltage() + 15;
 
 #ifndef HAVE_MMC  /* this adjustment is only needed for HD based */
         /* The battery voltage is usually a little lower directly after
@@ -903,22 +779,23 @@ static void power_thread(void)
     if(!charger_inserted()) /* only if charger not connected */
 #endif
         avgbat += (percent_to_volt_discharge[battery_type][6] -
-                   percent_to_volt_discharge[battery_type][5]) * 5000;
+                   percent_to_volt_discharge[battery_type][5]) / 2;
 #endif /* not HAVE_MMC */
 
     avgbat = avgbat * BATT_AVE_SAMPLES;
-    battery_centivolts = avgbat / BATT_AVE_SAMPLES / 10000;
+    battery_millivolts = avgbat / BATT_AVE_SAMPLES;
 
 #if CONFIG_CHARGING
     if(charger_inserted()) {
-        battery_percent  = voltage_to_percent(battery_centivolts,
+        battery_percent  = voltage_to_percent(battery_millivolts,
                            percent_to_volt_charge);
-#if CONFIG_BATTERY == BATT_LIPOL1300
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
+        /* Checking for iriver is a temporary kludge. */
         charger_input_state = CHARGER;
 #endif
     } else
 #endif
-    {   battery_percent  = voltage_to_percent(battery_centivolts,
+    {   battery_percent  = voltage_to_percent(battery_millivolts,
                            percent_to_volt_discharge[battery_type]);
         battery_percent += (battery_percent < 100);
     }
@@ -931,13 +808,11 @@ static void power_thread(void)
     while (1)
     {
         /* rotate the power history */
-        phpd = &power_history[POWER_HISTORY_LEN - 1];
-        phps = phpd - 1;
-        for (i = 0; i < POWER_HISTORY_LEN-1; i++)
-            *phpd-- = *phps--;
+        memmove(power_history + 1, power_history,
+                sizeof(power_history) - sizeof(power_history[0]));
 
-        /* insert new value at the start, in centivolts 8-) */
-        power_history[0] = battery_centivolts;
+        /* insert new value at the start, in millivolts 8-) */
+        power_history[0] = battery_millivolts;
 
 #if CONFIG_CHARGING == CHARGING_CONTROL
         if (charger_input_state == CHARGER_PLUGGED) {
@@ -1020,15 +895,15 @@ static void power_thread(void)
                              power_history[CHARGE_END_LONGD - 1];
 
                 for(i = CHARGE_END_SHORTD; i < CHARGE_END_SHORTD + 10; i++) {
-                    if(((power_history[i] - power_history[i+1]) >  5) ||
-                       ((power_history[i] - power_history[i+1]) < -5)) {
+                    if(((power_history[i] - power_history[i+1]) >  50) ||
+                       ((power_history[i] - power_history[i+1]) < -50)) {
                         long_delta = 777777;
                         break;
                     }
                 }
                  for(i = CHARGE_END_LONGD - 11; i < CHARGE_END_LONGD - 1 ; i++) {
-                    if(((power_history[i] - power_history[i+1]) >  5) ||
-                       ((power_history[i] - power_history[i+1]) < -5)) {
+                    if(((power_history[i] - power_history[i+1]) >  50) ||
+                       ((power_history[i] - power_history[i+1]) < -50)) {
                         long_delta = 888888;
                         break;
                     }
@@ -1043,10 +918,10 @@ static void power_thread(void)
              * 1) Charged a long time
              * 2) DeltaV went negative for a short time ( & long delta static)
              * 3) DeltaV was negative over a longer period (no disk use only)
-             * Note: short_delta and long_delta are centivolts
+             * Note: short_delta and long_delta are millivolts
              */
             if ((powermgmt_last_cycle_startstop_min >= charge_max_time_now) ||
-                (short_delta <= -5 && long_delta < 5 ) || (long_delta  < -2 &&
+                (short_delta <= -50 && long_delta < 50 ) || (long_delta  < -20 &&
                 last_disk_activity > CHARGE_END_LONGD)) {
                 if (powermgmt_last_cycle_startstop_min > charge_max_time_now) {
                     DEBUGF("power: powermgmt_last_cycle_startstop_min > charge_max_time_now, "
@@ -1074,7 +949,7 @@ static void power_thread(void)
                      * trickle target is -0.15v from full voltage acheived
                      * topup target is -0.05v from full voltage
                      */
-                    target_voltage = power_history[0] - 15;
+                    target_voltage = power_history[0] - 150;
 
                 } else {
                     if(short_delta <= -5) {
@@ -1084,7 +959,7 @@ static void power_thread(void)
                                  "end negd %d %dmin", short_delta,
                                  powermgmt_last_cycle_startstop_min);
                         target_voltage = power_history[CHARGE_END_SHORTD - 1]
-                                         - 5;
+                                         - 50;
                     } else {
                         DEBUGF("power: long-term small "
                                "positive delta, enough!\n");
@@ -1092,7 +967,7 @@ static void power_thread(void)
                                  "end lowd %d %dmin", long_delta,
                                  powermgmt_last_cycle_startstop_min);
                         target_voltage = power_history[CHARGE_END_LONGD - 1]
-                                         - 5;
+                                         - 50;
                     }
                     /*
                      * Switch to top-off charging.
@@ -1114,7 +989,7 @@ static void power_thread(void)
                 powermgmt_last_cycle_level = battery_percent;
                 powermgmt_last_cycle_startstop_min = 0;
                 charge_state = TRICKLE;
-                target_voltage = target_voltage - 10;
+                target_voltage = target_voltage - 100;
             }
             /*
              * Adjust trickle charge time (proportional and integral terms).
@@ -1123,12 +998,11 @@ static void power_thread(void)
              * generate more heat [gvb].
              */
 
-            pid_p = target_voltage - battery_centivolts;
-            if((pid_p > PID_DEADZONE) || (pid_p < -PID_DEADZONE))
-                pid_p = pid_p * PID_PCONST;
-            else
+            pid_p = ((signed)target_voltage - (signed)battery_millivolts) / 5;
+            if((pid_p <= PID_DEADZONE) && (pid_p >= -PID_DEADZONE))
                 pid_p = 0;
-            if((unsigned) battery_centivolts < target_voltage) {
+
+            if((unsigned) battery_millivolts < target_voltage) {
                 if(pid_i < 60) {
                     pid_i++;        /* limit so it doesn't "wind up" */
                 }
@@ -1201,7 +1075,7 @@ static void power_thread(void)
                 fd = open(DEBUG_FILE_NAME, O_WRONLY | O_APPEND | O_CREAT);
                 if(fd >= 0) {
                     snprintf(debug_message, DEBUG_MESSAGE_LEN,
-                    "cycle_min, bat_centivolts, bat_percent, chgr_state, charge_state, pid_p, pid_i, trickle_sec\n");
+                    "cycle_min, bat_millivolts, bat_percent, chgr_state, charge_state, pid_p, pid_i, trickle_sec\n");
                     write(fd, debug_message, strlen(debug_message));
                     wrcount = 99;   /* force a flush */
                 }
@@ -1209,7 +1083,7 @@ static void power_thread(void)
             if(fd >= 0) {
                 snprintf(debug_message, DEBUG_MESSAGE_LEN,
                         "%d, %d, %d, %d, %d, %d, %d, %d\n",
-                    powermgmt_last_cycle_startstop_min, battery_centivolts,
+                    powermgmt_last_cycle_startstop_min, battery_millivolts,
                     battery_percent, charger_input_state, charge_state,
                     pid_p, pid_i, trickle_sec);
                 write(fd, debug_message, strlen(debug_message));
@@ -1253,7 +1127,7 @@ void sys_poweroff(void)
         shutdown_timeout += HZ*20;
     }
 
-    queue_post(&button_queue, SYS_POWEROFF, 0);
+    queue_broadcast(SYS_POWEROFF, 0);
 }
 
 void cancel_shutdown(void)
@@ -1289,16 +1163,6 @@ void shutdown_hw(void)
     }
     while(ata_disk_is_active())
         sleep(HZ/10);
-
-#if !defined (IAUDIO_X5) && !defined (SANSA_E200)
-#if defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)
-    backlight_set_fade_out(0);
-#endif
-    backlight_off();
-#endif /* IAUDIO_X5, SANSA_E200 */
-#ifdef HAVE_REMOTE_LCD
-    remote_backlight_off();
-#endif
 
 #if CONFIG_CODEC != SWCODEC
     mp3_shutdown();

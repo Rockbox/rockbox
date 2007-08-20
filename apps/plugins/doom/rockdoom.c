@@ -329,7 +329,7 @@ int Dbuild_filelistm(struct menu_item **names, char *firstentry, char *directory
    char           *startpt;
    struct menu_item *temp;
 
-   filedir=opendir(directory);
+   filedir=rb->opendir(directory);
 
    if(filedir==NULL)
    {
@@ -345,8 +345,8 @@ int Dbuild_filelistm(struct menu_item **names, char *firstentry, char *directory
       i++;
 
    // Reset the directory
-   closedir(filedir);
-   filedir=opendir(directory);
+   rb->closedir(filedir);
+   filedir=rb->opendir(directory);
 
    i++;
    temp=malloc(i*sizeof(struct opt_items));
@@ -365,7 +365,7 @@ int Dbuild_filelistm(struct menu_item **names, char *firstentry, char *directory
          i++;
       }
    }
-   closedir(filedir);
+   rb->closedir(filedir);
    *names=temp;
    return i;
 }

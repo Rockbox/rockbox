@@ -1,8 +1,8 @@
 #ifndef KEYMAPS_H
 #define KEYMAPS_H
 
-#if (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD)
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 
 #define ZX_UP        BUTTON_MENU
 #define ZX_DOWN        BUTTON_PLAY

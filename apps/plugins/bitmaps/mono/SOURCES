@@ -46,6 +46,10 @@ flipit_cursor.16x13x1.bmp
 #endif
 #endif
 
+#if LCD_WIDTH == 160 && LCD_HEIGHT == 128 && LCD_DEPTH < 16
+superdom_boarditems.160x128x1.bmp
+#endif
+
 #endif /* HAVE_LCD_BITMAP */
 #if defined(SIMULATOR) && defined(__APPLE__)
 osx.dummy.bmp

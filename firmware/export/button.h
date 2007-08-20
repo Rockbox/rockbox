@@ -20,6 +20,7 @@
 #define _BUTTON_H_
 
 #include <stdbool.h>
+#include <inttypes.h>
 #include "config.h"
 #include "button-target.h"
 
@@ -28,6 +29,7 @@ extern struct event_queue button_queue;
 void button_init (void);
 long button_get (bool block);
 long button_get_w_tmo(int ticks);
+intptr_t button_get_data(void);
 int button_status(void);
 void button_clear_queue(void);
 #ifdef HAVE_LCD_BITMAP
@@ -46,6 +48,10 @@ bool headphones_inserted(void);
 #ifdef HAVE_WHEEL_POSITION
 int wheel_status(void);
 void wheel_send_events(bool send);
+#endif
+
+#ifdef HAVE_SCROLLWHEEL
+int button_apply_acceleration(unsigned int data, unsigned int factor);
 #endif
 
 #define BUTTON_NONE    0x00000000

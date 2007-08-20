@@ -62,9 +62,10 @@
 #include "bookmark.h"
 
 #include "misc.h"
+#include "playback.h"
 
 #ifdef BOOTFILE
-#ifndef USB_IPODSTYLE
+#if !defined(USB_NONE) && !defined(USB_IPODSTYLE)
 #include "textarea.h"
 #include "rolo.h"
 #include "yesno.h"
@@ -603,6 +604,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
     call_ata_idle_notifys(true);
     exit(0);
 #else
+    long msg_id = -1;
     int i;
 
     scrobbler_poweroff();
@@ -616,28 +618,30 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 
         FOR_NB_SCREENS(i)
             screens[i].clear_display();
-#ifdef X5_BACKLIGHT_SHUTDOWN
-        x5_backlight_shutdown();
-#endif
+
         if (batt_safe)
         {
 #ifdef HAVE_TAGCACHE
             if (!tagcache_prepare_shutdown())
             {
                 cancel_shutdown();
-                gui_syncsplash(HZ, str(LANG_TAGCACHE_BUSY));
+                gui_syncsplash(HZ, ID2P(LANG_TAGCACHE_BUSY));
                 return false;
             }
 #endif
             if (battery_level() > 10)
                 gui_syncsplash(0, str(LANG_SHUTTINGDOWN));
             else
+            {
+                msg_id = LANG_WARNING_BATTERY_LOW;
                 gui_syncsplash(0, "%s %s",
                                str(LANG_WARNING_BATTERY_LOW),
                                str(LANG_SHUTTINGDOWN));
+            }
         }
         else
         {
+            msg_id = LANG_WARNING_BATTERY_EMPTY;
             gui_syncsplash(0, "%s %s",
                            str(LANG_WARNING_BATTERY_EMPTY),
                            str(LANG_SHUTTINGDOWN));
@@ -653,7 +657,12 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
         {
 #if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
             if (audio_stat & AUDIO_STATUS_RECORD)
+            {
                 audio_stop_recording();
+                /* wait for stop to complete */
+                while (audio_status() & AUDIO_STATUS_RECORD)
+                    sleep(1);
+            }
 #endif
             /* audio_stop_recording == audio_stop for HWCODEC */
             audio_stop();
@@ -661,13 +670,30 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
             if (callback != NULL)
                 callback(parameter);
 
+#if CONFIG_CODEC != SWCODEC
             /* wait for audio_stop or audio_stop_recording to complete */
             while (audio_status())
                 sleep(1);
+#endif
 
 #if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
             audio_close_recording();       
 #endif
+
+            if(talk_menus_enabled())
+            {
+                bool enqueue = false;
+                if(msg_id != -1)
+                {
+                    talk_id(msg_id, enqueue);
+                    enqueue = true;
+                }
+                talk_id(LANG_SHUTTINGDOWN, enqueue);
+#if CONFIG_CODEC == SWCODEC
+                voice_wait();
+#endif
+            }
+
             system_flush();
 #ifdef HAVE_EEPROM_SETTINGS
             if (firmware_settings.initialized)
@@ -702,6 +728,7 @@ bool list_stop_handler(void)
                 fade(0);
             bookmark_autobookmark();
             audio_stop();
+            ret = true;  /* bookmarking can make a refresh necessary */
         }
     }
 #if CONFIG_CHARGING
@@ -835,13 +862,13 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
                 scrobbler_flush_cache();
                 system_flush();
 #ifdef BOOTFILE
-#ifndef USB_IPODSTYLE
+#if !defined(USB_NONE) && !defined(USB_IPODSTYLE)
                 check_bootfile(false); /* gets initial size */
 #endif
 #endif
                 usb_screen();
 #ifdef BOOTFILE
-#ifndef USB_IPODSTYLE
+#if !defined(USB_NONE) && !defined(USB_IPODSTYLE)
                 check_bootfile(true);
 #endif
 #endif
@@ -937,7 +964,7 @@ int get_replaygain_mode(bool have_track_gain, bool have_album_gain)
 #endif
 
 #ifdef BOOTFILE
-#ifndef USB_IPODSTYLE
+#if !defined(USB_NONE) && !defined(USB_IPODSTYLE)
 /*
     memorize/compare details about the BOOTFILE
     we don't use dircache because it may not be up to date after
@@ -966,8 +993,8 @@ void check_bootfile(bool do_rolo)
                 if((entry->wrtdate != wrtdate) ||
                    (entry->wrttime != wrttime))
                 {
-                    char *lines[] = { str(LANG_BOOT_CHANGED),
-                                      str(LANG_REBOOT_NOW) };
+                    char *lines[] = { ID2P(LANG_BOOT_CHANGED),
+                                      ID2P(LANG_REBOOT_NOW) };
                     struct text_message message={ lines, 2 };
                     button_clear_queue(); /* Empty the keyboard buffer */
                     if(gui_syncyesno_run(&message, NULL, NULL) == YESNO_YES)

@@ -25,46 +25,58 @@
 #ifdef HAVE_LCD_BITMAP
 #include "xlcd.h"
 
-#if (LCD_DEPTH >= 8) || (LCD_PIXELFORMAT == HORIZONTAL_PACKING)
-/* draw a filled triangle, using horizontal lines for speed */
-void xlcd_filltriangle(int x1, int y1, int x2, int y2, int x3, int y3)
+/* sort the given coordinates by increasing x value */
+void sort_points_by_increasing_x(int* x1, int* y1,
+                                 int* x2, int* y2,
+                                 int* x3, int* y3)
 {
     int x, y;
-    long fp_x1, fp_x2, fp_dx1, fp_dx2;
-
-    /* sort vertices by increasing y value */
-    if (y1 > y3)
+    if (*x1 > *x3)
     {
-        if (y2 < y3)       /* y2 < y3 < y1 */
+        if (*x2 < *x3)       /* x2 < x3 < x1 */
         {
-            x = x1; x1 = x2; x2 = x3; x3 = x;
-            y = y1; y1 = y2; y2 = y3; y3 = y;
+            x = *x1; *x1 = *x2; *x2 = *x3; *x3 = x;
+            y = *y1; *y1 = *y2; *y2 = *y3; *y3 = y;
         }
-        else if (y2 > y1)  /* y3 < y1 < y2 */
+        else if (*x2 > *x1)  /* x3 < x1 < x2 */
         {
-            x = x1; x1 = x3; x3 = x2; x2 = x;
-            y = y1; y1 = y3; y3 = y2; y2 = y;
+            x = *x1; *x1 = *x3; *x3 = *x2; *x2 = x;
+            y = *y1; *y1 = *y3; *y3 = *y2; *y2 = y;
         }
-        else               /* y3 <= y2 <= y1 */
+        else               /* x3 <= x2 <= x1 */
         {
-            x = x1; x1 = x3; x3 = x;
-            y = y1; y1 = y3; y3 = y;
+            x = *x1; *x1 = *x3; *x3 = x;
+            y = *y1; *y1 = *y3; *y3 = y;
         }
     }
     else
     {
-        if (y2 < y1)       /* y2 < y1 <= y3 */
+        if (*x2 < *x1)       /* x2 < x1 <= x3 */
         {
-            x = x1; x1 = x2; x2 = x;
-            y = y1; y1 = y2; y2 = y;
+            x = *x1; *x1 = *x2; *x2 = x;
+            y = *y1; *y1 = *y2; *y2 = y;
         }
-        else if (y2 > y3)  /* y1 <= y3 < y2 */
+        else if (*x2 > *x3)  /* x1 <= x3 < x2 */
         {
-            x = x2; x2 = x3; x3 = x;
-            y = y2; y2 = y3; y3 = y;
+            x = *x2; *x2 = *x3; *x3 = x;
+            y = *y2; *y2 = *y3; *y3 = y;
         }
         /* else already sorted */
     }
+}
+
+#define sort_points_by_increasing_y(x1, y1, x2, y2, x3, y3) \
+    sort_points_by_increasing_x(y1, x1, y2, x2, y3, x3)
+
+/* draw a filled triangle, using horizontal lines for speed */
+void xlcd_filltriangle_horizontal(struct screen* display,
+                                  int x1, int y1,
+                                  int x2, int y2,
+                                  int x3, int y3)
+{
+    long fp_x1, fp_x2, fp_dx1, fp_dx2;
+    int y;
+    sort_points_by_increasing_y(&x1, &y1, &x2, &y2, &x3, &y3);
 
     if (y1 < y3)  /* draw */
     {
@@ -72,12 +84,12 @@ void xlcd_filltriangle(int x1, int y1, int x2, int y2, int x3, int y3)
         fp_x1  = (x1 << 16) + (1<<15) + (fp_dx1 >> 1);
 
         if (y1 < y2)  /* first part */
-        {   
+        {
             fp_dx2 = ((x2 - x1) << 16) / (y2 - y1);
             fp_x2  = (x1 << 16) + (1<<15) + (fp_dx2 >> 1);
             for (y = y1; y < y2; y++)
             {
-                _xlcd_rb->lcd_hline(fp_x1 >> 16, fp_x2 >> 16, y);
+                display->hline(fp_x1 >> 16, fp_x2 >> 16, y);
                 fp_x1 += fp_dx1;
                 fp_x2 += fp_dx2;
             }
@@ -88,53 +100,23 @@ void xlcd_filltriangle(int x1, int y1, int x2, int y2, int x3, int y3)
             fp_x2 = (x2 << 16) + (1<<15) + (fp_dx2 >> 1);
             for (y = y2; y < y3; y++)
             {
-                _xlcd_rb->lcd_hline(fp_x1 >> 16, fp_x2 >> 16, y);
+                display->hline(fp_x1 >> 16, fp_x2 >> 16, y);
                 fp_x1 += fp_dx1;
                 fp_x2 += fp_dx2;
             }
         }
     }
-}            
-#else /* (LCD_DEPTH < 8) && (LCD_PIXELFORMAT == VERTICAL_PACKING) */
-/* draw a filled triangle, using vertical lines for speed */
-void xlcd_filltriangle(int x1, int y1, int x2, int y2, int x3, int y3)
-{
-    int x, y;
-    long fp_y1, fp_y2, fp_dy1, fp_dy2;
+}
 
-    /* sort vertices by increasing x value */
-    if (x1 > x3)
-    {
-        if (x2 < x3)       /* x2 < x3 < x1 */
-        {
-            x = x1; x1 = x2; x2 = x3; x3 = x;
-            y = y1; y1 = y2; y2 = y3; y3 = y;
-        }
-        else if (x2 > x1)  /* x3 < x1 < x2 */
-        {
-            x = x1; x1 = x3; x3 = x2; x2 = x;
-            y = y1; y1 = y3; y3 = y2; y2 = y;
-        }
-        else               /* x3 <= x2 <= x1 */
-        {
-            x = x1; x1 = x3; x3 = x;
-            y = y1; y1 = y3; y3 = y;
-        }
-    }
-    else
-    {
-        if (x2 < x1)       /* x2 < x1 <= x3 */
-        {
-            x = x1; x1 = x2; x2 = x;
-            y = y1; y1 = y2; y2 = y;
-        }
-        else if (x2 > x3)  /* x1 <= x3 < x2 */
-        {
-            x = x2; x2 = x3; x3 = x;
-            y = y2; y2 = y3; y3 = y;
-        }
-        /* else already sorted */
-    }
+/* draw a filled triangle, using vertical lines for speed */
+void xlcd_filltriangle_vertical(struct screen* display,
+                                int x1, int y1,
+                                int x2, int y2,
+                                int x3, int y3)
+{
+    long fp_y1, fp_y2, fp_dy1, fp_dy2;
+    int x;
+    sort_points_by_increasing_x(&x1, &y1, &x2, &y2, &x3, &y3);
 
     if (x1 < x3)  /* draw */
     {
@@ -142,12 +124,12 @@ void xlcd_filltriangle(int x1, int y1, int x2, int y2, int x3, int y3)
         fp_y1  = (y1 << 16) + (1<<15) + (fp_dy1 >> 1);
 
         if (x1 < x2)  /* first part */
-        {   
+        {
             fp_dy2 = ((y2 - y1) << 16) / (x2 - x1);
             fp_y2  = (y1 << 16) + (1<<15) + (fp_dy2 >> 1);
             for (x = x1; x < x2; x++)
             {
-                _xlcd_rb->lcd_vline(x, fp_y1 >> 16, fp_y2 >> 16);
+                display->vline(x, fp_y1 >> 16, fp_y2 >> 16);
                 fp_y1 += fp_dy1;
                 fp_y2 += fp_dy2;
             }
@@ -158,14 +140,33 @@ void xlcd_filltriangle(int x1, int y1, int x2, int y2, int x3, int y3)
             fp_y2 = (y2 << 16) + (1<<15) + (fp_dy2 >> 1);
             for (x = x2; x < x3; x++)
             {
-                _xlcd_rb->lcd_vline(x, fp_y1 >> 16, fp_y2 >> 16);
+                display->vline(x, fp_y1 >> 16, fp_y2 >> 16);
                 fp_y1 += fp_dy1;
                 fp_y2 += fp_dy2;
             }
         }
     }
 }
-#endif /* LCD_DEPTH, LCD_PIXELFORMAT */
+
+void xlcd_filltriangle(int x1, int y1,
+                       int x2, int y2,
+                       int x3, int y3)
+{
+    /* default is main screen */
+    xlcd_filltriangle_screen(_xlcd_rb->screens[SCREEN_MAIN],
+                             x1, y1, x2, y2, x3, y3);
+}
+
+void xlcd_filltriangle_screen(struct screen* display,
+                              int x1, int y1,
+                              int x2, int y2,
+                              int x3, int y3)
+{
+    if(display->pixel_format==HORIZONTAL_PACKING || display->depth>=8)
+        xlcd_filltriangle_horizontal(display, x1, y1, x2, y2, x3, y3);
+    else
+        xlcd_filltriangle_vertical(display, x1, y1, x2, y2, x3, y3);
+}
 
 #if LCD_DEPTH >= 8
 

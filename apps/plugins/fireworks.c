@@ -18,6 +18,7 @@
  ****************************************************************************/
 #include "plugin.h"
 #include "oldmenuapi.h"
+#include "helper.h"
 
 PLUGIN_HEADER
 
@@ -34,7 +35,8 @@ static struct plugin_api* rb;
 #if (CONFIG_KEYPAD == IRIVER_H300_PAD) || (CONFIG_KEYPAD == IRIVER_H100_PAD)
 #define BTN_MENU BUTTON_OFF
 #define BTN_FIRE BUTTON_SELECT
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define BTN_MENU BUTTON_MENU
 #define BTN_FIRE BUTTON_SELECT
 #elif (CONFIG_KEYPAD == RECORDER_PAD)
@@ -378,7 +380,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     /* set everything up.. no BL timeout, no backdrop,
        white-text-on-black-background. */
-    rb->backlight_set_timeout(1);
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
     rb->lcd_set_background(LCD_BLACK);
@@ -534,7 +536,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 break;
         }
     }
-    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+    /* Turn on backlight timeout (revert to settings) */
+    backlight_use_settings(rb); /* backlight control in lib/helper.c */
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);

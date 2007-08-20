@@ -56,7 +56,7 @@ endif
 
 # The arm code compiles too large for the plugin buffer when set to optimize for speed
 #ifeq ($(CC), arm-elf-gcc)
-ifneq (,$(strip $(foreach tgt,SANSA_E200 IPOD_NANO IPOD_COLOR IPOD_VIDEO IPOD_MINI IPOD_3G IPOD_4G IRIVER_H10_5GB IRIVER_H10 GIGABEAT_F,$(findstring $(tgt),$(TARGET)))))
+ifneq (,$(strip $(foreach tgt,SANSA_E200 IPOD_NANO IPOD_COLOR IPOD_VIDEO IPOD_MINI IPOD_1G2G IPOD_3G IPOD_4G IRIVER_H10_5GB IRIVER_H10 GIGABEAT_F,$(findstring $(tgt),$(TARGET)))))
     CFLAGS += -Os
 ifndef SIMVER
 ifeq ($(TARGET), IRIVER_H100)

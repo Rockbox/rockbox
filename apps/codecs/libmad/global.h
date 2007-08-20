@@ -24,6 +24,8 @@
 # ifndef LIBMAD_GLOBAL_H
 # define LIBMAD_GLOBAL_H
 
+#include "mad_iram.h"
+
 #if defined(CPU_COLDFIRE)
 #define FPM_COLDFIRE_EMAC
 #elif defined(CPU_ARM)
@@ -65,9 +67,5 @@
 #   define assert(x)	do { if (!(x)) abort(); } while (0)
 #  endif
 # endif
-
-#ifndef ICONST_ATTR_MPA_HUFFMAN
-#define ICONST_ATTR_MPA_HUFFMAN ICONST_ATTR
-#endif
 
 # endif

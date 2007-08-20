@@ -172,7 +172,6 @@ bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
     bool can_quit=false;
     gui_syncquickscreen_draw(qs);
     gui_syncstatusbar_draw(&statusbars, true);
-    action_signalscreenchange();
     while (true) {
         button = get_action(CONTEXT_QUICKSCREEN,TIMEOUT_BLOCK);
         if(default_event_handler(button) == SYS_USB_CONNECTED)
@@ -195,7 +194,6 @@ bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
             
         gui_syncstatusbar_draw(&statusbars, false);
     }
-    action_signalscreenchange();
     return false;
 }
 

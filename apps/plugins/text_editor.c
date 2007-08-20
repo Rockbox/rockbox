@@ -18,7 +18,7 @@
  ****************************************************************************/
 #include "plugin.h"
 #include "action.h"
-#include "oldmenuapi.h"
+#include "playback_control.h"
 
 #if PLUGIN_BUFFER_SIZE > 0x45000
 #define MAX_CHARS    0x40000 /* 128 kiB */
@@ -217,22 +217,13 @@ enum {
 };
 int do_item_menu(int cur_sel, char* copy_buffer)
 {
-    int m, ret = 0;
-    static const struct menu_item items[] = {
-            { "Cut", NULL },
-            { "Copy", NULL },
-            { "", NULL },
-            { "Insert Above", NULL },
-            { "Insert Below", NULL },
-            { "", NULL },
-            { "Cat To Above",NULL },
-            { "", NULL },
-            { "Save", NULL },
-    };
-    m = menu_init(rb, items, sizeof(items) / sizeof(*items),
-    NULL, NULL, NULL, NULL);
+    int ret = 0;
+    MENUITEM_STRINGLIST(menu, "Line Options", NULL, 
+                        "Cut/Delete", "Copy",
+                        "Insert Above", "Insert Below",
+                        "Concat To Above", "Save");
 
-    switch (menu_show(m))
+    switch (rb->do_menu(&menu, NULL))
     {
         case 0: /* cut */
             rb->strcpy(copy_buffer,&buffer[do_action(ACTION_GET,0,cur_sel)]);
@@ -243,11 +234,7 @@ int do_item_menu(int cur_sel, char* copy_buffer)
             rb->strcpy(copy_buffer,&buffer[do_action(ACTION_GET,0,cur_sel)]);
             ret = MENU_RET_NO_UPDATE;
         break;
-        case 2: /* blank */
-            ret = MENU_RET_NO_UPDATE;
-        break;
-
-        case 3: /* insert above */
+        case 2: /* insert above */
             if (!rb->kbd_input(copy_buffer,MAX_LINE_LEN))
             {
                 do_action(ACTION_INSERT,copy_buffer,cur_sel);
@@ -255,7 +242,7 @@ int do_item_menu(int cur_sel, char* copy_buffer)
                 ret = MENU_RET_UPDATE;
             }
         break;
-        case 4: /* insert below */
+        case 3: /* insert below */
             if (!rb->kbd_input(copy_buffer,MAX_LINE_LEN))
             {
                 do_action(ACTION_INSERT,copy_buffer,cur_sel+1);
@@ -263,24 +250,20 @@ int do_item_menu(int cur_sel, char* copy_buffer)
                 ret = MENU_RET_UPDATE;
             }
         break;
-        case 5: /* blank */
-            ret = MENU_RET_NO_UPDATE;
-        break;
-        case 6: /* cat to above */
+        case 4: /* cat to above */
             if (cur_sel>0)
             {
                 do_action(ACTION_CONCAT,0,cur_sel);
                 ret = MENU_RET_UPDATE;
             }
         break;
-        case 7: /* save */
+        case 5: /* save */
             ret = MENU_RET_SAVE;
         break;
         default:
             ret = MENU_RET_NO_UPDATE;
         break;
     }
-    menu_exit(m);
     return ret;
 }
 
@@ -451,18 +434,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 }
             }
             break;
-#ifdef TEXT_EDITOR_DELETE
-            case TEXT_EDITOR_DELETE:
-#ifdef TEXT_EDITOR_DELETE_PRE
-                if (last_button != TEXT_EDITOR_DELETE_PRE)
-                    break;
-#endif
+            case ACTION_STD_CONTEXT:
                 if (!line_count) break;
                 rb->strcpy(copy_buffer,&buffer[do_action(ACTION_GET,0,cur_sel)]);
                 do_action(ACTION_REMOVE,0,cur_sel);
                 changed = true;
             break;
-#endif
             case ACTION_STD_MENU:
             { /* do the item menu */
                 switch (do_item_menu(cur_sel, copy_buffer))
@@ -482,27 +459,17 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             case ACTION_STD_CANCEL:
                 if (changed)
                 {
-                    int m;
-                    int result;
-
-                    static const struct menu_item items[] = {
-                            { "Return", NULL },
-                            { " ", NULL },
-                            { "Save Changes", NULL },
-                            { "Save As...", NULL },
-                            { " ", NULL },
-                            { "Save and Exit", NULL },
-                            { "Ignore Changes and Exit", NULL },
-                    };
-
-                    m = menu_init(rb, items, sizeof(items) / sizeof(*items),
-                    NULL, NULL, NULL, NULL);
-
-                    result=menu_show(m);
-
-                    switch (result)
+                    MENUITEM_STRINGLIST(menu, "Do What?", NULL, 
+                                        "Return",
+                                        "Show Playback Menu", "Save Changes",
+                                        "Save As...", "Save and Exit",
+                                        "Ignore Changes and Exit");
+                    switch (rb->do_menu(&menu, NULL))
                     {
                         case 0:
+                        break;
+                        case 1:
+                            playback_control(rb);
                         break;
                         case 2: //save to disk
                             save_changes(1);
@@ -513,15 +480,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                             changed = 0;
                         break;
 
-                        case 5:
+                        case 4:
                             save_changes(1);
                             exit=1;
                         break;
-                        case 6:
+                        case 5:
                             exit=1;
                         break;
                     }
-                    menu_exit(m);
                 }
                 else exit=1;
             break;

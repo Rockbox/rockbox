@@ -31,6 +31,7 @@
 #include "ipodpatcher.h"
 
 #ifdef WITH_BOOTOBJS
+#include "ipod1g2g.h"
 #include "ipod3g.h"
 #include "ipod4g.h"
 #include "ipodmini.h"
@@ -72,7 +73,7 @@ char* get_parttype(int pt)
     int i;
     static char unknown[]="Unknown";
 
-    if (pt == -1) {
+    if (pt == PARTTYPE_HFS) {
         return "HFS/HFS+";
     }
 
@@ -103,41 +104,41 @@ off_t filesize(int fd) {
 #define MAX_SECTOR_SIZE 2048
 #define SECTOR_SIZE 512
 
-unsigned short static inline le2ushort(unsigned char* buf)
+static inline unsigned short le2ushort(unsigned char* buf)
 {
    unsigned short res = (buf[1] << 8) | buf[0];
 
    return res;
 }
 
-int static inline le2int(unsigned char* buf)
+static inline int le2int(unsigned char* buf)
 {
    int32_t res = (buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8) | buf[0];
 
    return res;
 }
 
-int static inline be2int(unsigned char* buf)
+static inline int be2int(unsigned char* buf)
 {
    int32_t res = (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
 
    return res;
 }
 
-int static inline getint16le(char* buf)
+static inline int getint16le(char* buf)
 {
    int16_t res = (buf[1] << 8) | buf[0];
 
    return res;
 }
 
-void static inline short2le(unsigned short val, unsigned char* addr)
+static inline void short2le(unsigned short val, unsigned char* addr)
 {
     addr[0] = val & 0xFF;
     addr[1] = (val >> 8) & 0xff;
 }
 
-void static inline int2le(unsigned int val, unsigned char* addr)
+static inline void int2le(unsigned int val, unsigned char* addr)
 {
     addr[0] = val & 0xFF;
     addr[1] = (val >> 8) & 0xff;
@@ -145,7 +146,7 @@ void static inline int2le(unsigned int val, unsigned char* addr)
     addr[3] = (val >> 24) & 0xff;
 }
 
-void int2be(unsigned int val, unsigned char* addr)
+static inline void int2be(unsigned int val, unsigned char* addr)
 {
     addr[0] = (val >> 24) & 0xff;
     addr[1] = (val >> 16) & 0xff;
@@ -169,6 +170,8 @@ int read_partinfo(struct ipod_t* ipod, int silent)
         print_error(" Error reading from disk: ");
         return -1;
     }
+
+    memset(ipod->pinfo, 0, sizeof(ipod->pinfo));
 
     if ((sectorbuf[510] == 0x55) && (sectorbuf[511] == 0xaa)) {
         /* DOS partition table */
@@ -242,7 +245,7 @@ int read_partinfo(struct ipod_t* ipod, int silent)
                  /* A HFS partition */
                  ipod->pinfo[i].start = pmPyPartStart;
                  ipod->pinfo[i].size = pmPartBlkCnt;
-                 ipod->pinfo[i].type = -1;
+                 ipod->pinfo[i].type = PARTTYPE_HFS;
                  i++;
             }
 
@@ -259,7 +262,7 @@ int read_partinfo(struct ipod_t* ipod, int silent)
     */
     if ((ipod->pinfo[0].type != 0) || (ipod->pinfo[0].size == 0) || 
         ((ipod->pinfo[1].type != 0xb) && (ipod->pinfo[1].type != 0xc) && 
-         (ipod->pinfo[1].type != -1))) {
+         (ipod->pinfo[1].type != PARTTYPE_HFS))) {
         if (!silent) fprintf(stderr,"[ERR]  Partition layout is not an ipod\n");
         return -1;
     }
@@ -271,7 +274,7 @@ int read_partinfo(struct ipod_t* ipod, int silent)
 int read_partition(struct ipod_t* ipod, int outfile)
 {
     int res;
-    unsigned long n;
+    ssize_t n;
     int bytesleft;
     int chunksize;
     int count = ipod->pinfo[0].size;
@@ -298,8 +301,8 @@ int read_partition(struct ipod_t* ipod, int outfile)
 
         if (n < chunksize) {
             fprintf(stderr,
-              "[ERR]  Short read in disk_read() - requested %d, got %lu\n",
-              chunksize,n);
+              "[ERR]  Short read in disk_read() - requested %d, got %d\n",
+              chunksize,(int)n);
             return -1;
         }
 
@@ -314,7 +317,7 @@ int read_partition(struct ipod_t* ipod, int outfile)
 
         if (res != n) {
             fprintf(stderr,
-              "Short write - requested %lu, received %d - aborting.\n",n,res);
+              "Short write - requested %d, received %d - aborting.\n",(int)n,res);
             return -1;
         }
     }
@@ -325,7 +328,7 @@ int read_partition(struct ipod_t* ipod, int outfile)
 
 int write_partition(struct ipod_t* ipod, int infile)
 {
-    unsigned long res;
+    ssize_t res;
     int n;
     int bytesread;
     int byteswritten = 0;
@@ -367,7 +370,7 @@ int write_partition(struct ipod_t* ipod, int infile)
         }
 
         if (res != n) {
-            fprintf(stderr,"[ERR]  Short write - requested %d, received %lu - aborting.\n",n,res);
+            fprintf(stderr,"[ERR]  Short write - requested %d, received %d - aborting.\n",n,(int)res);
             return -1;
         }
 
@@ -387,7 +390,6 @@ int diskmove(struct ipod_t* ipod, int delta)
     int src_end;
     int bytesleft;
     int chunksize;
-    int i;
     int n;
 
     src_start = ipod->ipod_directory[1].devOffset + ipod->sector_size;
@@ -434,7 +436,7 @@ int diskmove(struct ipod_t* ipod, int delta)
 
         if (n < chunksize) {
             fprintf(stderr,"[ERR]  Short read - requested %d bytes, received %d\n",
-                           i,n);
+                           chunksize,n);
             return -1;
         }
 
@@ -450,7 +452,7 @@ int diskmove(struct ipod_t* ipod, int delta)
 
         if (n < chunksize) {
             fprintf(stderr,"[ERR]  Short write - requested %d bytes, received %d\n"
-                          ,i,n);
+                          ,chunksize,n);
             return -1;
         }
 
@@ -599,7 +601,7 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
 
     if (n < entryOffset) {
         fprintf(stderr,"[ERR]  Short read - requested %d bytes, received %d\n"
-                      ,i,n);
+                      ,entryOffset,n);
         return -1;
     }
 
@@ -634,7 +636,7 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
 
     if (n < (entryOffset+paddedlength)) {
         fprintf(stderr,"[ERR]  Short read - requested %d bytes, received %d\n"
-                      ,i,n);
+                      ,entryOffset+paddedlength,n);
         return -1;
     }
 
@@ -879,7 +881,7 @@ int write_firmware(struct ipod_t* ipod, char* filename, int type)
 
     if (n < newsize) {
         fprintf(stderr,"[ERR]  Short write - requested %d bytes, received %d\n"
-                      ,i,n);
+                      ,newsize,n);
         return -1;
     }
     fprintf(stderr,"[INFO]  Wrote %d bytes to firmware partition\n",n);
@@ -964,10 +966,16 @@ int read_firmware(struct ipod_t* ipod, char* filename, int type)
         int2be(chksum,header);
         memcpy(header+4, ipod->modelname,4);
 
-        write(outfile,header,8);
+        n = write(outfile,header,8);
+        if (n != 8) {
+            fprintf(stderr,"[ERR]  Write error - %d\n",n);
+        }
     }
 
-    write(outfile,sectorbuf,length);
+    n = write(outfile,sectorbuf,length);
+    if (n != length) {
+        fprintf(stderr,"[ERR]  Write error - %d\n",n);
+    }
     close(outfile);
 
     return 0;
@@ -1030,9 +1038,20 @@ int read_directory(struct ipod_t* ipod)
     }
 
     p = sectorbuf + x;
-    
+
+    /* A hack to detect 2nd gen Nanos - maybe there is a better way? */
+    if (p[0] == 0)
+    {
+        n=ipod_read(ipod, sectorbuf, ipod->sector_size);
+        if (n < 0) { 
+            fprintf(stderr,"[ERR]  Read of directory failed.\n");
+            return -1;
+        }
+        p = sectorbuf;
+    }
+
     while ((ipod->nimages < MAX_IMAGES) && (p < (sectorbuf + x + 400)) && 
-           (memcmp(p,"!ATA",4)==0)) {
+           ((memcmp(p,"!ATA",4)==0) || (memcmp(p,"DNAN",4)==0))) {
         p+=4;
         if (memcmp(p,"soso",4)==0) {
             ipod->ipod_directory[ipod->nimages].ftype=FTYPE_OSOS;
@@ -1134,6 +1153,16 @@ int list_images(struct ipod_t* ipod)
 int getmodel(struct ipod_t* ipod, int ipod_version)
 {
     switch (ipod_version) {
+        case 0x01:
+            ipod->modelstr="1st or 2nd Generation";
+            ipod->modelnum = 19;
+            ipod->modelname = "1g2g";
+            ipod->targetname = "ipod1g2g";
+#ifdef WITH_BOOTOBJS
+            ipod->bootloader = ipod1g2g;
+            ipod->bootloader_len = LEN_ipod1g2g;
+#endif
+            break;
         case 0x02:
             ipod->modelstr="3rd Generation";
             ipod->modelnum = 7;
@@ -1202,6 +1231,15 @@ int getmodel(struct ipod_t* ipod, int ipod_version)
 #ifdef WITH_BOOTOBJS
             ipod->bootloader = ipodvideo;
             ipod->bootloader_len = LEN_ipodvideo;
+#endif
+            break;
+        case 0x100:
+            ipod->modelstr="2nd Generation Nano";
+            ipod->modelnum = 0;
+            ipod->targetname = NULL;
+#ifdef WITH_BOOTOBJS
+            ipod->bootloader = NULL;
+            ipod->bootloader_len = 0;
 #endif
             break;
         default:
@@ -1277,4 +1315,61 @@ int ipod_scan(struct ipod_t* ipod)
         strcpy(ipod->diskname,last_ipod);
     }
     return n;
+}
+
+static void put_int32le(uint32_t x, unsigned char* p)
+{
+    p[0] = x & 0xff;
+    p[1] = (x >> 8) & 0xff;
+    p[2] = (x >> 16) & 0xff;
+    p[3] = (x >> 24) & 0xff;
+}
+
+int write_dos_partition_table(struct ipod_t* ipod)
+{
+    unsigned char* p;
+    int i, n;
+    uint32_t type;
+
+    /* Only support 512-byte sectors at the moment */
+    if ( ipod->sector_size != 512 )
+    {
+        fprintf(stderr,"[ERR]  Only ipods with 512 bytes per sector are supported.\n");
+        return -1;
+    }
+
+    /* Firstly zero the entire MBR */
+    memset(sectorbuf, 0, ipod->sector_size);
+
+    /* Now add the partition info */
+    for (i=0; i < 4 ; i++) 
+    {
+        p = sectorbuf + 0x1be + i*16;
+
+        /* Ensure first partition is type 0, and second is 0xb */
+        if (i==0) { type = 0; }
+        else if (i==1) { type = 0xb; }
+        else { type = ipod->pinfo[i].type; }
+
+        put_int32le(type, p + 4);
+        put_int32le(ipod->pinfo[i].start, p + 8);
+        put_int32le(ipod->pinfo[i].size, p + 12);
+    }
+
+    /* Finally add the magic */
+    sectorbuf[0x1fe] = 0x55;
+    sectorbuf[0x1ff] = 0xaa;
+
+    if (ipod_seek(ipod, 0) < 0) {
+        fprintf(stderr,"[ERR]  Seek failed writing MBR\n");
+        return -1;
+    }
+
+    /* Write MBR */
+    if ((n = ipod_write(ipod, sectorbuf, ipod->sector_size)) < 0) {
+        perror("[ERR]  Write failed\n");
+        return -1;
+    }
+
+    return 0;
 }

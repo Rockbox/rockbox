@@ -10,7 +10,28 @@
 #include <byteswap.h>
 #else
 
-#ifdef ARCH_X86
+#ifdef ROCKBOX
+#include "codecs.h"
+
+/* rockbox' optimised inline functions */
+#define bswap_16(x) swap16(x)
+#define bswap_32(x) swap32(x)
+
+static inline uint64_t ByteSwap64(uint64_t x)
+{
+    union { 
+        uint64_t ll;
+        struct {
+           uint32_t l,h;
+        } l;
+    } r;
+    r.l.l = bswap_32 (x);
+    r.l.h = bswap_32 (x>>32);
+    return r.ll;
+}
+#define bswap_64(x) ByteSwap64(x)
+
+#elif defined(ARCH_X86)
 static inline unsigned short ByteSwap16(unsigned short x)
 {
   __asm("xchgb %b0,%h0"	:
@@ -83,7 +104,7 @@ static inline uint64_t ByteSwap64(uint64_t x)
 #else
 
 #define bswap_16(x) (((x) & 0x00ff) << 8 | ((x) & 0xff00) >> 8)
-			
+
 
 // code from bits/byteswap.h (C) 1997, 1998 Free Software Foundation, Inc.
 #define bswap_32(x) \

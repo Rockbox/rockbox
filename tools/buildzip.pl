@@ -37,6 +37,12 @@ while(1) {
         shift @ARGV;
         shift @ARGV;    
     }
+    elsif($ARGV[0] eq "-i") {
+        # The target id name as used in TARGET_ID in the root makefile
+        $target_id=$ARGV[1];
+        shift @ARGV;
+        shift @ARGV;    
+    }
     elsif($ARGV[0] eq "-o") {
         $output=$ARGV[1];
         shift @ARGV;
@@ -158,8 +164,8 @@ sub buildlangs {
     for(@files) {
         my $output = $_;
         $output =~ s/(.*)\.lang/$1.lng/;
-        print "$ROOT/tools/genlang -e=$dir/english.lang -t=$archos -b=$outputlang/$output $dir/$_\n" if($verbose);
-        system ("$ROOT/tools/genlang -e=$dir/english.lang -t=$archos -b=$outputlang/$output $dir/$_ >/dev/null 2>&1");
+        print "$ROOT/tools/genlang -e=$dir/english.lang -t=$archos -i=$target_id -b=$outputlang/$output $dir/$_\n" if($verbose);
+        system ("$ROOT/tools/genlang -e=$dir/english.lang -t=$archos -i=$target_id -b=$outputlang/$output $dir/$_ >/dev/null 2>&1");
     }
 }
 
@@ -207,6 +213,11 @@ sub buildzip {
 
     mkdir ".rockbox/langs", 0777;
     mkdir ".rockbox/rocks", 0777;
+    mkdir ".rockbox/rocks/games", 0777;
+    mkdir ".rockbox/rocks/apps", 0777;
+    mkdir ".rockbox/rocks/demos", 0777;
+    mkdir ".rockbox/rocks/viewers", 0777;
+
     if ($recording) {
         mkdir ".rockbox/recpresets", 0777;
     }
@@ -274,7 +285,7 @@ STOP
 
     open VIEWERS, ">.rockbox/viewers.config" or
         die "can't create .rockbox/viewers.config";
-    mkdir ".rockbox/viewers", 0777;
+
     foreach my $line (@viewers) {
         if ($line =~ /([^,]*),([^,]*),/) {
             my ($ext, $plugin)=($1, $2);
@@ -299,11 +310,11 @@ STOP
                 if($dir ne "rocks") {
                     # target is not 'rocks' but the plugins are always in that
                     # dir at first!
-                    `mv .rockbox/rocks/$name .rockbox/$r`;
+                    `mv .rockbox/rocks/$name .rockbox/rocks/$r`;
                 }
                 print VIEWERS $line;
             }
-            elsif(-e ".rockbox/$r") {
+            elsif(-e ".rockbox/rocks/$r") {
                 # in case the same plugin works for multiple extensions, it
                 # was already moved to the viewers dir
                 print VIEWERS $line;
@@ -312,11 +323,22 @@ STOP
             if(-e ".rockbox/rocks/$oname") {
                 # if there's an "overlay" file for the .rock, move that as
                 # well
-                `mv .rockbox/rocks/$oname .rockbox/$dir`;
+                `mv .rockbox/rocks/$oname .rockbox/rocks/$dir`;
             }
         }
     }
     close VIEWERS;
+                
+    open CATEGORIES, "$ROOT/apps/plugins/CATEGORIES" or
+        die "can't open CATEGORIES";
+    @rock_targetdirs = <CATEGORIES>;
+    close CATEGORIES;
+    foreach my $line (@rock_targetdirs) {
+        if ($line =~ /([^,]*),(.*)/) {
+            my ($plugin, $dir)=($1, $2);
+            `mv .rockbox/rocks/${plugin}.rock .rockbox/rocks/$dir 2> /dev/null`;
+        }
+    }
     
     if ($bitmap) {
         mkdir ".rockbox/icons", 0777;
@@ -329,8 +351,8 @@ STOP
     `cp $ROOT/apps/tagnavi.config .rockbox/`;
       
     if($bitmap) {
-        `cp $ROOT/apps/plugins/sokoban.levels .rockbox/rocks/`; # sokoban levels
-        `cp $ROOT/apps/plugins/snake2.levels .rockbox/rocks/`; # snake2 levels
+        `cp $ROOT/apps/plugins/sokoban.levels .rockbox/rocks/games/`; # sokoban levels
+        `cp $ROOT/apps/plugins/snake2.levels .rockbox/rocks/games/`; # snake2 levels
     }
 
     if($image) {

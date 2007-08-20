@@ -135,13 +135,39 @@
 #define CLOCK_SOURCE    (*(volatile unsigned long *)(0x60006020))
 #define PLL_CONTROL     (*(volatile unsigned long *)(0x60006034))
 #define PLL_STATUS      (*(volatile unsigned long *)(0x6000603c))
+#define CLCD_CLOCK_SRC  (*(volatile unsigned long *)(0x600060a0))
 
 /* Processors Control */
 #define CPU_CTL          (*(volatile unsigned long *)(0x60007000))
 #define COP_CTL          (*(volatile unsigned long *)(0x60007004))
 
-#define PROC_SLEEP   0x80000000
-#define PROC_WAKE    0x0
+#define PROC_SLEEP     0x80000000
+#define PROC_WAIT      0x40000000
+#define PROC_WAIT_CLR  0x20000000
+#define PROC_CNT_START 0x08000000
+#define PROC_WAKE      0x00000000
+/**
+ * This is based on some quick but sound experiments on PP5022C.
+ * CPU/COP_CTL bitmap:
+ *   [31] - sleep until an interrupt occurs
+ *   [30] - wait for cycle countdown to 0
+ *   [29] - wait for cycle countdown to 0
+ *          behaves identically to bit 30 unless bit 30 is set as well
+ *          in which case this bit is cleared at the end of the count
+ *   [28] - unknown - no execution effect observed yet
+ *   [27] - begin cycle countdown
+ * [26:8] - semaphore flags for core communication ?
+ *          no execution effect observed yet
+ *          [11:8] seem to often be set to the core's own ID
+ *                 nybble when sleeping - 0x5 or 0xa.
+ *  [7:0] - W: number of cycles to skip on next instruction
+ *          R: cycles remaining
+ * Executing on CPU
+ *   CPU_CTL = 0x68000080
+ *   nop
+ * stalls the nop for 128 cycles
+ * Reading CPU_CTL after the nop will return 0x48000000
+ */
 
 /* Cache Control */
 #define CACHE_CTL        (*(volatile unsigned long *)(0x6000c000))
@@ -254,6 +280,8 @@
 #define PP_VER1          (*(volatile unsigned long *)(0x70000000))
 #define PP_VER2          (*(volatile unsigned long *)(0x70000004))
 #define DEV_INIT         (*(volatile unsigned long *)(0x70000020))
+/* some timing that needs to be handled during clock setup */
+#define DEV_TIMING1      (*(volatile unsigned long *)(0x70000034))
 
 #define INIT_USB         0x80000000
 
@@ -271,6 +299,8 @@
 #define I2C_BASE            0x7000c000
 
 /* EIDE Controller */
+#define IDE_BASE            0xc3000000
+
 #define IDE0_PRI_TIMING0    (*(volatile unsigned long*)(0xc3000000))
 #define IDE0_PRI_TIMING1    (*(volatile unsigned long*)(0xc3000004))
 #define IDE0_SEC_TIMING0    (*(volatile unsigned long*)(0xc3000008))

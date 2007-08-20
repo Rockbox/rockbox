@@ -21,7 +21,8 @@
 #define _GUI_OPTION_SELECT_H_
 #include "settings.h"
 
-bool option_screen(struct settings_list *setting, bool use_temp_var);
+bool option_screen(struct settings_list *setting,
+                   bool use_temp_var, unsigned char* option_title);
 
 struct option_select
 {

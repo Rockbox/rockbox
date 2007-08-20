@@ -61,6 +61,7 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_OK,            BUTTON_SELECT|BUTTON_REL,   BUTTON_SELECT },
     { ACTION_STD_OK,            BUTTON_RIGHT,               BUTTON_NONE },
     { ACTION_STD_OK,            BUTTON_ON|BUTTON_REL,       BUTTON_NONE },
+    { ACTION_STD_REC,           BUTTON_REC|BUTTON_REPEAT,        BUTTON_NONE },
     
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
@@ -88,6 +89,7 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_BROWSE,        BUTTON_SELECT|BUTTON_REL,       BUTTON_SELECT },
     { ACTION_WPS_ABRESET,       BUTTON_ON|BUTTON_SELECT,        BUTTON_ON },
     { ACTION_WPS_ID3SCREEN,     BUTTON_ON|BUTTON_MODE,          BUTTON_NONE },
+    { ACTION_WPS_REC,           BUTTON_REC|BUTTON_REPEAT,        BUTTON_NONE },
     
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
@@ -710,6 +712,14 @@ static const struct button_mapping button_context_radio_h300lcdremote[] = {
 };
 
 
+static const struct button_mapping button_context_time_remote[]  = {
+    { ACTION_STD_CANCEL,       BUTTON_OFF,  BUTTON_NONE },
+    { ACTION_STD_OK,           BUTTON_ON,   BUTTON_NONE },
+    { ACTION_SETTINGS_INC,     BUTTON_RC_BITRATE,  BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,     BUTTON_RC_SOURCE,  BUTTON_NONE },
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS),
+}; /* button_context_settings_bmark */
+
 /* the actual used tables */
 static const struct button_mapping 
         *remote_btn_ctxt_std = 0, 
@@ -878,7 +888,9 @@ static const struct button_mapping* get_context_mapping_remote(int context)
                 return remote_btn_ctxt_listtree_scroll_w_cmb; 
         case CONTEXT_CUSTOM|CONTEXT_TREE:
             return remote_btn_ctxt_tree;
-        
+        case CONTEXT_SETTINGS_TIME:
+            return remote_btn_ctxt_settingsgrph;
+            
         case CONTEXT_SETTINGS:
             return remote_btn_ctxt_settings;
             

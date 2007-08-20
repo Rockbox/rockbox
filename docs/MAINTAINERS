@@ -1,0 +1,309 @@
+$Id: MAINTAINERS 14382 2007-08-18 06:00:10Z amiconn $
+               __________               __   ___.
+     Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+     Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+     Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+     Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+                       \/            \/     \/    \/            \/
+
+
+Rockbox Maintainers
+===================
+
+This file lists the people maintaining the different parts of the
+Rockbox project.
+
+Syntax used:
+
+  :area name: maintainer 1,maintainer 2
+
+
+Port maintainers
+----------------
+
+NOTE: Port maintainers are simply developers who use a particular
+target on a daily basis and are therefore able to report issues
+specific to that target.
+
+:Archos Player/Studio: Jens Arnold
+:Archos Recorder v1: Jens Arnold
+:Archos Recorder 8MB:
+:Archos FM Recorder:
+:Archos Recorder v2:
+:Archos Ondio FM: Jens Arnold
+:Archos Ondio SP:
+:Iriver H100/H115:
+:Iriver H120/H140: Miika Pekkarinen, Linus Nielsen Feltzing
+:Iriver H320/H340: Peter D'Hoye
+:Ipod 1st/2nd Gen: Jens Arnold
+:Ipod 3rd Gen:
+:Ipod 4th Gen Grayscale:
+:Ipod Color/Photo: Dave Chapman
+:Ipod Video:
+:Ipod Mini 1st Gen:
+:Ipod Mini 2nd Gen: Jens Arnold
+:Ipod Nano 1st Gen:
+:Iriver H10 20GB:
+:Iriver H10 5GB/6GB:
+:Iaudio X5: Linus Nielsen Feltzing
+:Iaudio M5:
+:Sansa E200: Michael Sevakis
+:Toshiba Gigabeat F: Michael Sevakis
+:Toshiba Gigabeat X:
+
+
+Core code (low-level)
+---------------------
+
+:Kernel: Miika Pekkarinen,Michael Sevakis
+:LCD drivers: Michael Sevakis, Jens Arnold
+:Button drivers: Michael Sevakis
+:Rolo:
+:ATA driver: Michael Sevakis
+:MMC driver: Jens Arnold
+:FAT driver: Linus Nielsen Feltzing
+:Battery/Power Management:
+:FM Tuner drivers: Michael Sevakis
+:Audio codec drivers: Michael Sevakis
+
+
+Core code (Mid-level)
+----------------------
+
+:DSP: Michael Sevakis,Thom Johansen
+:LCD/Graphics API: Jens Arnold
+:Playback engine (HWCODEC):
+:Playback engine (SWCODEC): Michael Sevakis
+:PCM playback API (SWCODEC): Michael Sevakis
+:PCM recording API (SWCODEC): Michael Sevakis
+:Recording API (HWCODEC):
+:Fonts and Unicode:
+:Replaygain: Magnus Holmgren
+:Profiling:
+:Screens API and GUI widgets: Kévin Ferrare
+:Settings API: Jonathan Gordon
+:Language API:
+:Menu API: Jonathan Gordon
+:Button actions: Jonathan Gordon
+
+
+Core code (high-level)
+----------------------
+
+:Bookmarks: Magnus Holmgren
+:Cuesheet support: Nicolas Pennequin
+:Database: Miika Pekkarinen
+:Playlists:
+:Radio UI:
+:Recording UI: Peter D'Hoye
+:Voice UI:
+:WPS: Nicolas Pennequin
+:User interface: Jonathan Gordon
+
+
+Metadata parsing
+----------------
+
+NOTE: Format-specific container format parsing is maintained by the
+relevant codec maintainer.
+
+:General:
+:ID3v1/v2: Linus Nielsen Feltzing
+:Vorbis Comments:
+:APEv2:
+
+
+Translations
+------------
+NOTE: Any languages without a dedicated maintainer are maintained by
+the person(s) named next to "General".
+
+:General:
+:Italian: Alessio Lenzi
+:Dutch: Peter D'Hoye
+:Swedish: Magnus Holmgren
+:[Language 2]:
+
+
+Plugins
+-------
+
+:Plugin loader & API:
+:Plugin library (general):
+:Greyscale library: Jens Arnold
+:XLCD library:
+
+:alpine_cdc:
+:battery_bench:
+:blackjack:
+:bounce: Daniel Stenberg
+:brickmania:
+:bubbles:
+:calculator:
+:calendar:
+:chessbox:
+:chessclock:
+:chip8:
+:chopper:
+:clock:
+:credits:
+:cube:
+:demystify: Kévin Ferrare
+:dice:
+:dict:
+:disktidy:
+:doom:
+:euroconverter:
+:fire: Kévin Ferrare
+:fireworks:
+:firmware_flash:
+:flipit:
+:grayscale: Jens Arnold
+:helloworld:
+:invadrox:
+:iriver_flash:
+:iriverify:
+:jackpot: Kévin Ferrare
+:jewels: Antoine Cellerier
+:jpeg:
+:logo:
+:mandelbrot: Jens Arnold
+:maze:
+:mazezam:
+:metronome:
+:midi2wav:
+:midiplay:
+:minesweeper: Antoine Cellerier
+:mosaique:
+:mp3_encoder:
+:mpegplayer: Michael Sevakis
+:nim:
+:oscilloscope: Jens Arnold
+:pacbox: Dave Chapman
+:plasma:
+:pong: Daniel Stenberg
+:properties: Peter D'Hoye
+:random_folder_advance_config: Jonathan Gordon
+:reversi: Antoine Cellerier
+:rockblox:
+:rockbox_flash:
+:rockboy:
+:rocklife: Antoine Cellerier
+:rockpaint: Antoine Cellerier
+:search: Linus Nielsen Feltzing
+:sliding_puzzle:
+:snake:
+:snake2:
+:snow:
+:sokoban: Antoine Cellerier
+:solitaire: Antoine Cellerier
+:sort: Linus Nielsen Feltzing
+:spacerocks:
+:splitedit:
+:star:
+:starfield: Kévin Ferrare
+:stats:
+:stopwatch:
+:sudoku: Dave Chapman
+:test_codec: Dave Chapman
+:test_disk: Jens Arnold
+:test_fps: Peter D'Hoye
+:test_sampr: Michael Sevakis
+:test_scanrate: Jens Arnold
+:text_editor: Jonathan Gordon
+:vbrfix: Linus Nielsen Feltzing
+:video:
+:viewer:
+:vu_meter:
+:wav2wv:
+:wavplay: Jens Arnold
+:wavrecord: Jens Arnold
+:wavview: Peter D'Hoye
+:wormlet:
+:xobox: Antoine Cellerier
+:zxbox:
+
+
+Codecs (Playback)
+-----------------
+
+:Codec loader & API:
+:A/52 (AC-3): Dave Chapman
+:AAC: Magnus Holmgren
+:ADX:
+:AIFF:
+:ALAC:Dave Chapman
+:APE (Monkey's Audio): Dave Chapman
+:FLAC: Dave Chapman
+:MPEG Audio (MP1/MP2/MP3): Thom Johansen
+:Musepack: Thom Johansen
+:NSF:
+:Ogg Vorbis:
+:Shorten:
+:SID:
+:SPC: Michael Sevakis
+:Speex:
+:WAVE:
+:WavPack:
+:WMA (ASF Parsing): Dave Chapman
+:WMA (Decoder):
+
+
+Codecs (Recording)
+------------------
+
+:AIFF: Michael Sevakis
+:MP3: Michael Sevakis
+:WAVE: Michael Sevakis
+:WavPack: Michael Sevakis
+
+
+Bootloaders
+-----------
+
+:Iriver H1xx/H3xx: Miika Pekkarinen, Linus Nielsen Feltzing
+:Iaudio X5/M5: Linus Nielsen Feltzing
+:PortalPlayer (not ipod):
+:Ipod: Dave Chapman
+:Gigabeat F/X
+
+
+Build Tools
+-----------
+
+:configure script and build system: Daniel Stenberg
+:genlang: Daniel Stenberg
+:bdf2bmp:
+:bmp2rb: Daniel Stenberg
+:checkwps: Nicolas Pennequin
+:mkboot: Linus Nielsen Feltzing
+:database:
+:rdf2binary:
+:convbdf: Daniel Stenberg
+:codepages:
+:player_unifont:
+:uclpack:
+:wavtrim: Linus Nielsen Feltzing
+:voicefont:
+:scramble: Linus Nielsen Feltzing
+:descramble: Linus Nielsen Feltzing
+:mkinfo: Daniel Stenberg
+
+Install Tools
+-------------
+
+:Rockbox Utility:
+:ipodpatcher: Dave Chapman
+:sansapatcher: Dave Chapman
+
+
+Manual
+------
+
+:Manual build system:
+[What to put here - maintainers for chapters?]
+
+Web site stuff
+--------------
+
+:web site scripts and server-side admin:Daniel Stenberg,Björn Stenberg,Linus Nielsen Feltzing

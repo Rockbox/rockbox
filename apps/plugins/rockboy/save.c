@@ -89,24 +89,24 @@ struct svar svars[] =
 
     I4("S1on", &snd.ch[0].on),
     I4("S1p ", &snd.ch[0].pos),
-    I4("S1c ", &snd.ch[0].cnt),
-    I4("S1ec", &snd.ch[0].encnt),
-    I4("S1sc", &snd.ch[0].swcnt),
+    I4("S1c ", &snd.ch[0].len),
+    I4("S1ec", &snd.ch[0].enlen),
+    I4("S1sc", &snd.ch[0].swlen),
 
     I4("S2on", &snd.ch[1].on),
     I4("S2p ", &snd.ch[1].pos),
-    I4("S2c ", &snd.ch[1].cnt),
-    I4("S2ec", &snd.ch[1].encnt),
-    
+    I4("S2c ", &snd.ch[1].len),
+    I4("S2ec", &snd.ch[1].enlen),
+
     I4("S3on", &snd.ch[2].on),
     I4("S3p ", &snd.ch[2].pos),
-    I4("S3c ", &snd.ch[2].cnt),
-    
+    I4("S3c ", &snd.ch[2].len),
+
     I4("S4on", &snd.ch[3].on),
     I4("S4p ", &snd.ch[3].pos),
-    I4("S4c ", &snd.ch[3].cnt),
-    I4("S4ec", &snd.ch[3].encnt),
-    
+    I4("S4c ", &snd.ch[3].len),
+    I4("S4ec", &snd.ch[3].enlen),
+
     I4("hdma", &hw.hdma),
     
     I4("sram", &sramblock),

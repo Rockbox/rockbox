@@ -23,15 +23,15 @@
 #include "id3.h"
 
 enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
-    tag_filename, tag_composer, tag_comment, tag_albumartist, tag_year, 
-    tag_tracknumber, tag_bitrate, tag_length, tag_playcount, tag_rating, 
+    tag_filename, tag_composer, tag_comment, tag_albumartist, tag_grouping, tag_year, 
+    tag_discnumber, tag_tracknumber, tag_bitrate, tag_length, tag_playcount, tag_rating,
     tag_playtime, tag_lastplayed, tag_commitid,
     /* Virtual tags */
     tag_virt_length_min, tag_virt_length_sec,
     tag_virt_playtime_min, tag_virt_playtime_sec,
     tag_virt_entryage, tag_virt_autoscore };
 
-#define TAG_COUNT 17
+#define TAG_COUNT 19
 
 /* Maximum length of a single tag. */
 #define TAG_MAXLEN (MAX_PATH*2)
@@ -43,7 +43,7 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 #define IDX_BUF_DEPTH 64
 
 /* Tag Cache Header version 'TCHxx'. Increment when changing internal structures. */
-#define TAGCACHE_MAGIC  0x54434809
+#define TAGCACHE_MAGIC  0x5443480b
 
 /* How much to allocate extra space for ramcache. */
 #define TAGCACHE_RESERVE 32768
@@ -62,6 +62,11 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 
 /* Always strict align entries for best performance and binary compatability. */
 #define TAGCACHE_STRICT_ALIGN 1
+
+/* Max events in the internal tagcache command queue. */
+#define TAGCACHE_COMMAND_QUEUE_LENGTH 32
+/* Idle time before committing events in the command queue. */
+#define TAGCACHE_COMMAND_QUEUE_COMMIT_DELAY  HZ*2
 
 #define TAGCACHE_MAX_FILTERS 4
 #define TAGCACHE_MAX_CLAUSES 32
@@ -170,6 +175,7 @@ long tagcache_increase_serial(void);
 long tagcache_get_serial(void);
 bool tagcache_import_changelog(void);
 bool tagcache_create_changelog(struct tagcache_search *tcs);
+void tagcache_update_numeric(int idx_id, int tag, long data);
 bool tagcache_modify_numeric_entry(struct tagcache_search *tcs, 
                                    int tag, long data);
 

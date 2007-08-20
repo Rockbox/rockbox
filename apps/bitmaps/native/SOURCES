@@ -31,7 +31,11 @@ usblogo.176x48x16.bmp
 usblogo.128x37x16.bmp
 #endif
 #elif LCD_DEPTH > 1 /* greyscale */
+#ifdef IPOD_1G2G /* use firewire logo */
+usblogo.fw.128x39x2.bmp
+#else
 usblogo.128x33x2.bmp
+#endif
 #else /* monochrome */
 #if LCD_WIDTH == 112
 usblogo.100x20x1.bmp

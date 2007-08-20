@@ -96,7 +96,9 @@ struct mp3entry* audio_next_track(void);
 bool audio_has_changed_track(void);
 void audio_get_debugdata(struct audio_debug *dbgdata);
 void audio_set_crossfade(int type);
+#ifndef HAVE_FLASH_STORAGE
 void audio_set_buffer_margin(int seconds);
+#endif
 unsigned int audio_error(void);
 void audio_error_clear(void);
 int audio_get_file_pos(void);
@@ -127,6 +129,7 @@ enum rec_channel_modes
 #define CHN_CAP_ALL     (CHN_CAP_STEREO | CHN_CAP_MONO)
 #endif /* CONFIG_CODEC == SWCODEC */
 
+/* the enums below must match prestr[] in recording.c */
 enum audio_sources
 {
     AUDIO_SRC_PLAYBACK = -1, /* Virtual source */

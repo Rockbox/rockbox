@@ -77,7 +77,8 @@ PLUGIN_HEADER
 #define PONG_RC_QUIT BUTTON_RC_STOP
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD)
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define PONG_QUIT BUTTON_SELECT
 #define PONG_LEFT_UP BUTTON_MENU
 #define PONG_LEFT_DOWN BUTTON_LEFT
@@ -245,7 +246,10 @@ void bounce(struct pong *p, int pad, int info)
 
 void score(struct pong *p, int pad)
 {
-    rb->splash(HZ/4, "%s scores!", pad?"right":"left");
+    if(pad)
+        rb->splash(HZ/4, "right scores!");
+    else
+        rb->splash(HZ/4, "left scores!");
     rb->lcd_clear_display();
     p->score[pad]++;
 

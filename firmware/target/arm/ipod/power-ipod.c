@@ -30,7 +30,14 @@
 
 void power_init(void)
 {
+#if defined(IPOD_1G2G) || defined(IPOD_3G)
+    GPIOC_ENABLE |= 0x40;      /* GPIO C6 is HDD power (low active) */
+    GPIOC_OUTPUT_VAL &= ~0x40; /* on by default */
+    GPIOC_OUTPUT_EN |= 0x40;   /* enable output */
+#endif
+#ifndef IPOD_1G2G
     pcf50605_init();
+#endif
 }
 
 bool charger_inserted(void)
@@ -51,14 +58,25 @@ bool charging_state(void) {
 
 void ide_power_enable(bool on)
 {
-    /* We do nothing on the iPod */
+#if defined(IPOD_1G2G) || defined(IPOD_3G)
+    if (on)
+        GPIOC_OUTPUT_VAL &= ~0x40;
+    else
+        GPIOC_OUTPUT_VAL |= 0x40;
+#else
+    /* We do nothing on other iPods yet */
     (void)on;
+#endif
 }
 
 bool ide_powered(void)
 {
+#if defined(IPOD_1G2G) || defined(IPOD_3G)
+    return !(GPIOC_OUTPUT_VAL & 0x40);
+#else
     /* pretend we are always powered - we don't turn it off on the ipod */
     return true;
+#endif
 }
 
 void power_off(void)
@@ -74,7 +92,12 @@ void power_off(void)
 #endif
 
 #ifndef BOOTLOADER
+#ifdef IPOD_1G2G
+    /* we cannot turn off the 1st gen/ 2nd gen yet. Need to figure out sleep mode. */
+    system_reboot();
+#else
     /* We don't turn off the ipod, we put it in a deep sleep */
     pcf50605_standby_mode();
+#endif
 #endif
 }

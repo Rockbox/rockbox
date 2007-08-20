@@ -19,47 +19,14 @@
 #ifndef _POWERMGMT_H_
 #define _POWERMGMT_H_
 
+#include <stdbool.h>
+
 #define POWER_HISTORY_LEN 2*60   /* 2 hours of samples, one per minute */
 
 #define CHARGE_END_SHORTD  6     /* stop when N minutes have passed with
                                   * avg delta being < -0.05 V */
 #define CHARGE_END_LONGD  50     /* stop when N minutes have passed with
                                   * avg delta being < -0.02 V */
-
-#ifndef SIMULATOR
-
-#if CONFIG_CHARGING == CHARGING_CONTROL
-#define START_TOPOFF_CHG    85  /* Battery % to start at top-off */
-#define START_TRICKLE_CHG   95  /* Battery % to start at trickle */
-
-#define POWER_MESSAGE_LEN 32     /* power thread status message */
-#define CHARGE_MAX_TIME_1500 450 /* minutes: maximum charging time for 1500 mAh batteries */
-                                 /* actual max time depends also on BATTERY_CAPACITY! */
-#define CHARGE_MIN_TIME   10     /* minutes: minimum charging time */
-#define TOPOFF_MAX_TIME   90     /* After charging, go to top off charge. How long should top off charge be? */
-#define TOPOFF_VOLTAGE    565    /* which voltage is best? (centivolts) */
-#define TRICKLE_MAX_TIME  12*60  /* After top off charge, go to trickle charge. How long should trickle charge be? */
-#define TRICKLE_VOLTAGE   545    /* which voltage is best? (centivolts) */
-
-#define START_TOPOFF_SEC    25   /* initial trickle_sec for topoff */
-#define START_TRICKLE_SEC   15   /* initial trickle_sec for trickle */
-
-#define PID_PCONST          2   /* PID proportional constant */
-#define PID_DEADZONE        2   /* PID proportional deadzone */
-
-extern char power_message[POWER_MESSAGE_LEN];
-
-extern int long_delta;          /* long term delta battery voltage */
-extern int short_delta;         /* short term delta battery voltage */
-
-extern int powermgmt_last_cycle_startstop_min; /* how many minutes ago was the charging started or stopped? */
-extern int powermgmt_last_cycle_level;         /* which level had the batteries at this time? */
-
-extern int pid_p;                /* PID proportional term */
-extern int pid_i;                /* PID integral term */
-extern int trickle_sec;          /* trickle charge: How many seconds per minute are we charging actually? */
-
-#endif /* CONFIG_CHARGING == CHARGING_CONTROL */
 
 #if CONFIG_CHARGING >= CHARGING_MONITOR
 typedef enum {       /* sorted by increasing charging current */
@@ -89,6 +56,40 @@ typedef enum {
 extern charger_input_state_type charger_input_state;
 #endif
 
+#ifndef SIMULATOR
+
+#if CONFIG_CHARGING == CHARGING_CONTROL
+#define START_TOPOFF_CHG    85  /* Battery % to start at top-off */
+#define START_TRICKLE_CHG   95  /* Battery % to start at trickle */
+
+#define POWER_MESSAGE_LEN 32     /* power thread status message */
+#define CHARGE_MAX_TIME_1500 450 /* minutes: maximum charging time for 1500 mAh batteries */
+                                 /* actual max time depends also on BATTERY_CAPACITY! */
+#define CHARGE_MIN_TIME   10     /* minutes: minimum charging time */
+#define TOPOFF_MAX_TIME   90     /* After charging, go to top off charge. How long should top off charge be? */
+#define TOPOFF_VOLTAGE    5650   /* which voltage is best? (millivolts) */
+#define TRICKLE_MAX_TIME  12*60  /* After top off charge, go to trickle charge. How long should trickle charge be? */
+#define TRICKLE_VOLTAGE   5450   /* which voltage is best? (millivolts) */
+
+#define START_TOPOFF_SEC    25   /* initial trickle_sec for topoff */
+#define START_TRICKLE_SEC   15   /* initial trickle_sec for trickle */
+
+#define PID_DEADZONE        4    /* PID proportional deadzone */
+
+extern char power_message[POWER_MESSAGE_LEN];
+
+extern int long_delta;          /* long term delta battery voltage */
+extern int short_delta;         /* short term delta battery voltage */
+
+extern int powermgmt_last_cycle_startstop_min; /* how many minutes ago was the charging started or stopped? */
+extern int powermgmt_last_cycle_level;         /* which level had the batteries at this time? */
+
+extern int pid_p;                /* PID proportional term */
+extern int pid_i;                /* PID integral term */
+extern int trickle_sec;          /* trickle charge: How many seconds per minute are we charging actually? */
+
+#endif /* CONFIG_CHARGING == CHARGING_CONTROL */
+
 #ifdef HAVE_MMC  /* Values for Ondio */
 # define CURRENT_NORMAL     95  /* average, nearly proportional to 1/U */
 # define CURRENT_USB         1  /* host powered in USB mode; avoid zero-div */
@@ -103,7 +104,19 @@ extern charger_input_state_type charger_input_state;
 # define CURRENT_NORMAL     80  /* 16h playback on 1300mAh battery from IriverRuntime wiki page */
 # define CURRENT_BACKLIGHT  23  /* FIXME: This needs to be measured, copied from H100 */
 # define CURRENT_RECORD    110  /* additional current while recording */
-#else /* Not iriver H1x0, H3x0, nor Archos Ondio */
+#elif defined(IPOD_ARCH) && (MODEL_NUMBER==4)   /* iPOD Nano */
+# define CURRENT_NORMAL     35  /* 8.5-9.0h playback out of 300mAh battery from IpodRuntime */
+# define CURRENT_BACKLIGHT  20  /* FIXME: estimation took over from iPOD Video */
+#if defined(HAVE_RECORDING)
+# define CURRENT_RECORD     35  /* FIXME: this needs adjusting */
+#endif
+#elif defined(IPOD_ARCH) && (MODEL_NUMBER==5)   /* iPOD Video */
+# define CURRENT_NORMAL     50  /* 8h out of 400mAh battery (30GB) or 11h out of 600mAh (60GB) from IpodRuntime */
+# define CURRENT_BACKLIGHT  20  /* estimation calculated from IpodRuntime measurement */
+#if defined(HAVE_RECORDING)
+# define CURRENT_RECORD     35  /* FIXME: this needs adjusting */
+#endif
+#else /* Not iriver H1x0, H3x0, nor Archos Ondio, nor iPODVideo */
 # define CURRENT_NORMAL    145  /* usual current in mA when using the AJB including some disk/backlight/... activity */
 # define CURRENT_BACKLIGHT  30  /* additional current when backlight always on */
 #if defined(HAVE_RECORDING)
@@ -126,6 +139,12 @@ extern charger_input_state_type charger_input_state;
 #endif /* not HAVE_MMC */
 
 extern unsigned short power_history[POWER_HISTORY_LEN];
+extern const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT];
+extern const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT];
+extern const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11];
+#if CONFIG_CHARGING
+extern const unsigned short percent_to_volt_charge[11];
+#endif
 
 /* Start up power management thread */
 void powermgmt_init(void);
@@ -135,11 +154,11 @@ void powermgmt_init(void);
 /* Returns battery statust */
 int battery_level(void); /* percent */
 int battery_time(void); /* minutes */
-int battery_adc_voltage(void); /* voltage from ADC in centivolts */
-unsigned int battery_voltage(void); /* filtered batt. voltage in centivolts */
+unsigned int battery_adc_voltage(void); /* voltage from ADC in millivolts */
+unsigned int battery_voltage(void); /* filtered batt. voltage in millivolts */
 
 /* read unfiltered battery info */
-void battery_read_info(int *adc, int *voltage, int *level);
+void battery_read_info(int *voltage, int *level);
 
 /* Tells if the battery level is safe for disk writes */
 bool battery_level_safe(void);

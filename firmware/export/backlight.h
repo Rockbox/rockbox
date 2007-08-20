@@ -29,11 +29,6 @@ void backlight_set_timeout(int index);
 #ifdef HAVE_BACKLIGHT
 void backlight_init(void);
 
-#if defined(IAUDIO_X5) && !defined(SIMULATOR)
-#define X5_BACKLIGHT_SHUTDOWN
-void x5_backlight_shutdown(void);
-#endif
-
 int  backlight_get_current_timeout(void);
 
 #ifdef HAVE_BACKLIGHT_PWM_FADING

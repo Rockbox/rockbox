@@ -40,10 +40,25 @@
 #define HW_MASK (*(short *)0x020000fc)
 #endif
 
+#ifdef CONFIG_TUNER_MULTI
+static inline int tuner_detect_type(void)
+{
+    return (HW_MASK & TUNER_MODEL) ? TEA5767 : S1A0903X01;
+}
+#endif
+
 #endif /* (CONFIG_CPU == SH7034) && !SIMULATOR */
 
 #ifdef ARCHOS_PLAYER
 bool is_new_player(void);
+#endif
+
+#ifdef IPOD_ARCH
+#ifdef BOOTLOADER
+#define IPOD_HW_REVISION (*((unsigned long*)(0x00002084)))
+#else
+#define IPOD_HW_REVISION (*((unsigned long*)(0x20002084)))
+#endif
 #endif
 
 #endif /* HWCOMPAT_H */

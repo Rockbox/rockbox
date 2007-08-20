@@ -1,3 +1,4 @@
+#ifndef GIGABEAT_S
 /* plugins common to all models */
 battery_bench.c
 chessclock.c
@@ -5,6 +6,7 @@ credits.c
 cube.c
 dict.c
 firmware_flash.c
+jackpot.c
 logo.c
 mosaique.c
 properties.c
@@ -12,6 +14,7 @@ random_folder_advance_config.c
 rockblox.c
 rockbox_flash.c
 search.c
+shortcuts.c
 snow.c
 sort.c
 stats.c
@@ -19,8 +22,7 @@ stopwatch.c
 vbrfix.c
 viewer.c
 
-/* plugins built for all targets, but not for the simulator */
-#if !defined(SIMULATOR)
+#if CONFIG_CODEC == SWCODEC
 metronome.c
 #endif
 
@@ -82,7 +84,6 @@ vu_meter.c
 wormlet.c
 
 #if CONFIG_RTC 
-clock.c
 #if CONFIG_KEYPAD == RECORDER_PAD  /* Recorder models only for now */
 calendar.c
 #endif
@@ -110,7 +111,6 @@ rocklife.c
 
 #ifdef HAVE_LCD_CHARCELLS          /* Player model only */
 euroconverter.c
-jackpot.c
 nim.c
 #endif /* HAVE_LCD_CHARCELLS */
 
@@ -134,3 +134,8 @@ iriver_flash.c
 #endif
 
 #endif /* iFP7xx */
+#if (LCD_WIDTH > 138)
+/* Built for bitmap targets except H10 5/6gb, Archoses, iPod mini and ifp */
+superdom.c
+#endif
+#endif /* GIGABEAT_S */

@@ -16,6 +16,7 @@
 ****************************************************************************/
 
 #include "plugin.h"
+#include "helper.h"
 
 #ifdef HAVE_LCD_BITMAP /* and also not for the Player */
 
@@ -27,7 +28,8 @@ static struct plugin_api* rb; /* global api struct pointer */
 
 /* Key assignement */
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-    (CONFIG_KEYPAD == IPOD_3G_PAD)
+    (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define STARFIELD_QUIT BUTTON_MENU
 #define STARFIELD_INCREASE_ZMOVE BUTTON_SCROLL_FWD
 #define STARFIELD_DECREASE_ZMOVE BUTTON_SCROLL_BACK
@@ -363,7 +365,8 @@ int plugin_main(void)
 #endif
             case(STARFIELD_QUIT):
             case(SYS_USB_CONNECTED):
-                rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+                /* Turn on backlight timeout (revert to settings) */
+                backlight_use_settings(rb); /* backlight control in lib/helper.c*/
                 return PLUGIN_OK;
                 break;
         }
@@ -378,8 +381,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     rb = api; /* copy to global api pointer */
     (void)parameter;
-    if (rb->global_settings->backlight_timeout > 0)
-        rb->backlight_set_timeout(1);/* keep the light on */
+    /* Turn off backlight timeout */
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
 
     ret = plugin_main();
 

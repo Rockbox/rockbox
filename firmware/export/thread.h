@@ -169,6 +169,20 @@ struct core_entry {
     ); \
     old; \
     })
+#elif CONFIG_CPU == SH7034
+#define test_and_set(x_, v_) \
+({   \
+    uint32_t old; \
+    asm volatile ( \
+        "tas.b  @%[x]          \r\n" \
+        "mov    #-1, %[old]    \r\n" \
+        "negc   %[old], %[old] \r\n" \
+        : [old]"=r"(old) \
+        : [v]"M"((uint32_t)v_), /* Value of v_ must be 1 */ \
+          [x]"r"((uint8_t *)x_) \
+    ); \
+    old; \
+    })
 #else
 /* default for no asm version */
 #define test_and_set(x_, v_) \

@@ -143,9 +143,6 @@ typedef struct {
 extern void  oggpack_readinit(oggpack_buffer *b,ogg_reference *r);
 extern long  oggpack_look_full(oggpack_buffer *b,int bits);
 extern long  oggpack_read(oggpack_buffer *b,int bits);
-extern long  oggpack_bytes(oggpack_buffer *b);
-extern long  oggpack_bits(oggpack_buffer *b);
-extern int   oggpack_eop(oggpack_buffer *b);
 
 /* Inline a few, often called functions */
 
@@ -221,7 +218,6 @@ extern int      ogg_sync_reset(ogg_sync_state *oy);
 extern unsigned char *ogg_sync_bufferin(ogg_sync_state *oy, long size);
 extern int      ogg_sync_wrote(ogg_sync_state *oy, long bytes);
 extern long     ogg_sync_pageseek(ogg_sync_state *oy,ogg_page *og);
-extern int      ogg_sync_pageout(ogg_sync_state *oy, ogg_page *og);
 extern int      ogg_stream_pagein(ogg_stream_state *os, ogg_page *og);
 extern int      ogg_stream_packetout(ogg_stream_state *os,ogg_packet *op);
 extern int      ogg_stream_packetpeek(ogg_stream_state *os,ogg_packet *op);
@@ -243,7 +239,6 @@ extern int      ogg_page_eos(ogg_page *og);
 extern ogg_int64_t  ogg_page_granulepos(ogg_page *og);
 extern ogg_uint32_t ogg_page_serialno(ogg_page *og);
 extern ogg_uint32_t ogg_page_pageno(ogg_page *og);
-extern int      ogg_page_packets(ogg_page *og);
 extern int      ogg_page_getbuffer(ogg_page *og, unsigned char **buffer);
 
 extern int      ogg_packet_release(ogg_packet *op);

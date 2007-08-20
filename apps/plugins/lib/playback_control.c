@@ -61,14 +61,14 @@ static bool volume(void)
 {
     const struct settings_list* vol = 
         api->find_setting(&api->global_settings->volume, NULL);
-    return api->option_screen((struct settings_list*)vol, false);
+    return api->option_screen((struct settings_list*)vol, false, NULL);
 }
 
 static bool shuffle(void)
 {
     const struct settings_list* shuffle = 
         api->find_setting(&api->global_settings->playlist_shuffle, NULL);
-    return api->option_screen((struct settings_list*)shuffle, false);
+    return api->option_screen((struct settings_list*)shuffle, false, NULL);
 }
 
 static bool repeat_mode(void)
@@ -77,7 +77,7 @@ static bool repeat_mode(void)
         api->find_setting(&api->global_settings->repeat_mode, NULL);
     int old_repeat = api->global_settings->repeat_mode;
   
-    api->option_screen((struct settings_list*)repeat, false);
+    api->option_screen((struct settings_list*)repeat, false, NULL);
   
     if (old_repeat != api->global_settings->repeat_mode &&
         (api->audio_status() & AUDIO_STATUS_PLAY))

@@ -86,44 +86,46 @@ void usb_screen(void)
     /* nothing here! */
 #else
     int i;
+    bool statusbar = global_settings.statusbar; /* force the statusbar */
+    global_settings.statusbar = true;
 #if LCD_DEPTH > 1
     show_main_backdrop();
 #endif
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
     show_remote_main_backdrop();
 #endif
-
     FOR_NB_SCREENS(i)
+    {
         screens[i].backlight_on();
-
-#ifdef HAVE_REMOTE_LCD
-    lcd_remote_clear_display();
-    lcd_remote_bitmap(remote_usblogo,
+        screens[i].clear_display();
+#if NB_SCREENS > 1
+        if (i == SCREEN_REMOTE)
+        {
+            screens[i].bitmap(remote_usblogo,
                       (LCD_REMOTE_WIDTH-BMPWIDTH_remote_usblogo),
                       (LCD_REMOTE_HEIGHT-BMPHEIGHT_remote_usblogo)/2,
                       BMPWIDTH_remote_usblogo, BMPHEIGHT_remote_usblogo);
-    lcd_remote_update();
+        }
+        else 
+        {
 #endif
-
-    lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
-#ifdef HAVE_LCD_COLOR
-    lcd_bitmap_transparent(usblogo, (LCD_WIDTH-BMPWIDTH_usblogo),
-                                    (LCD_HEIGHT-BMPHEIGHT_usblogo)/2,
-                                    BMPWIDTH_usblogo, BMPHEIGHT_usblogo);
-#else
-    lcd_bitmap(usblogo, (LCD_WIDTH-BMPWIDTH_usblogo),
+            screens[i].transparent_bitmap(usblogo, 
+                        (LCD_WIDTH-BMPWIDTH_usblogo),
                         (LCD_HEIGHT-BMPHEIGHT_usblogo)/2,
-                        BMPWIDTH_usblogo, BMPHEIGHT_usblogo);
-#endif  /* HAVE_LCD_COLOR */
+                         BMPWIDTH_usblogo, BMPHEIGHT_usblogo);
 #else
-    lcd_double_height(false);
-    lcd_puts_scroll(0, 0, "[USB Mode]");
-    status_set_param(false);
-    status_set_audio(false);
-    status_set_usb(true);
+            screens[i].double_height(false);
+            screens[i].puts_scroll(0, 0, "[USB Mode]");
+            status_set_param(false);
+            status_set_audio(false);
+            status_set_usb(true);
 #endif /* HAVE_LCD_BITMAP */
-    lcd_update();
+#if NB_SCREENS > 1
+        }
+#endif
+        screens[i].update();
+    }
 
     gui_syncstatusbar_draw(&statusbars, true);
 #ifdef SIMULATOR
@@ -144,6 +146,7 @@ void usb_screen(void)
 #endif /* HAVE_LCD_CHARCELLS */
     FOR_NB_SCREENS(i)
         screens[i].backlight_on();
+    global_settings.statusbar = statusbar;
 #endif /* USB_NONE */
 }
 
@@ -192,8 +195,8 @@ static void charging_display_info(bool animate)
 #endif
     {
         int battv = battery_voltage();
-        snprintf(buf, 32, "  Batt: %d.%02dV %d%%  ", battv / 100,
-                 battv % 100, battery_level());
+        snprintf(buf, 32, "  Batt: %d.%02dV %d%%  ", battv / 1000,
+                 (battv % 1000) / 10, battery_level());
         lcd_puts(0, 7, buf);
     }
 
@@ -289,7 +292,7 @@ static void charging_display_info(bool animate)
     char buf[32];
 
     battv = battery_voltage();
-    snprintf(buf, sizeof(buf), " %d.%02dV", battv / 100, battv % 100);
+    snprintf(buf, sizeof(buf), " %d.%02dV", battv / 1000, (battv % 1000) / 10);
     lcd_puts(4, 1, buf);
 
     memcpy(buf, logo_pattern, 32); /* copy logo patterns */
@@ -365,7 +368,6 @@ int charging_screen(void)
 #ifdef HAVE_LCD_CHARCELLS
     logo_lock_patterns(false);
 #endif
-    action_signalscreenchange();
     return rc;
 }
 #endif /* CONFIG_CHARGING && !HAVE_POWEROFF_WHILE_CHARGING && defined(CPU_SH) */
@@ -397,7 +399,7 @@ static void pitch_screen_draw(struct screen *display, int pitch, int pitch_mode)
 
     if (display->nb_lines < 4) /* very small screen, just show the pitch value */
     {
-        w = snprintf((char *)buf, sizeof(buf), "%s: %d.%d%%",str(LANG_SYSFONT_PITCH),
+        w = snprintf((char *)buf, sizeof(buf), "%s: %d.%d%%",str(LANG_PITCH),
                   pitch / 10, pitch % 10 );
         display->putsxy((display->width-(w*display->char_width))/2,
                          display->nb_lines/2,buf);
@@ -407,9 +409,9 @@ static void pitch_screen_draw(struct screen *display, int pitch, int pitch_mode)
 
         /* UP: Pitch Up */
         if (pitch_mode == PITCH_MODE_ABSOLUTE) {
-            ptr = str(LANG_SYSFONT_PITCH_UP);
+            ptr = str(LANG_PITCH_UP);
         } else {
-            ptr = str(LANG_SYSFONT_PITCH_UP_SEMITONE);
+            ptr = str(LANG_PITCH_UP_SEMITONE);
         }
         display->getstringsize(ptr,&w,&h);
         display->putsxy((display->width-w)/2, 0, ptr);
@@ -418,9 +420,9 @@ static void pitch_screen_draw(struct screen *display, int pitch, int pitch_mode)
 
         /* DOWN: Pitch Down */
         if (pitch_mode == PITCH_MODE_ABSOLUTE) {
-            ptr = str(LANG_SYSFONT_PITCH_DOWN);
+            ptr = str(LANG_PITCH_DOWN);
         } else {
-            ptr = str(LANG_SYSFONT_PITCH_DOWN_SEMITONE);
+            ptr = str(LANG_PITCH_DOWN_SEMITONE);
         }
         display->getstringsize(ptr,&w,&h);
         display->putsxy((display->width-w)/2, display->height - h, ptr);
@@ -442,7 +444,7 @@ static void pitch_screen_draw(struct screen *display, int pitch, int pitch_mode)
                              w+1, (display->height-h)/2, 7, 8);
 
         /* "Pitch" */
-        snprintf((char *)buf, sizeof(buf), str(LANG_SYSFONT_PITCH));
+        snprintf((char *)buf, sizeof(buf), str(LANG_PITCH));
         display->getstringsize(buf,&w,&h);
         display->putsxy((display->width-w)/2, (display->height/2)-h, buf);
         /* "XX.X%" */
@@ -539,7 +541,6 @@ bool pitch_screen(void)
     pcmbuf_set_low_latency(true);
 #endif
 
-    action_signalscreenchange();
     while (!exit)
     {
         FOR_NB_SCREENS(i)
@@ -623,7 +624,6 @@ bool pitch_screen(void)
     pcmbuf_set_low_latency(false);
 #endif
     lcd_setfont(FONT_UI);
-    action_signalscreenchange();
     return 0;
 }
 #endif /* HAVE_PITCHSCREEN */
@@ -655,14 +655,14 @@ bool quick_screen_quick(int button_enter)
         [1]={ STR(LANG_SYSFONT_ON) }
     };
     static const struct opt_items bottom_items[] = {
-        [SHOW_ALL]={ STR(LANG_SYSFONT_FILTER_ALL) },
+        [SHOW_ALL]={ STR(LANG_SYSFONT_ALL) },
         [SHOW_SUPPORTED]={ STR(LANG_SYSFONT_FILTER_SUPPORTED) },
         [SHOW_MUSIC]={ STR(LANG_SYSFONT_FILTER_MUSIC) },
         [SHOW_PLAYLIST]={ STR(LANG_SYSFONT_FILTER_PLAYLIST) },
     };
     static const struct opt_items right_items[] = {
         [REPEAT_OFF]={ STR(LANG_SYSFONT_OFF) },
-        [REPEAT_ALL]={ STR(LANG_SYSFONT_REPEAT_ALL) },
+        [REPEAT_ALL]={ STR(LANG_SYSFONT_ALL) },
         [REPEAT_ONE]={ STR(LANG_SYSFONT_REPEAT_ONE) },
         [REPEAT_SHUFFLE]={ STR(LANG_SYSFONT_SHUFFLE) },
 #ifdef AB_REPEAT_ENABLE
@@ -780,7 +780,7 @@ bool quick_screen_f3(int button_enter)
 #endif /* BUTTON_F3 */
 #endif /* CONFIG_KEYPAD in (RECORDER_PAD |IRIVER_H100_PAD | IRIVER_H300_PAD) */
 
-#if CONFIG_CHARGING || defined(SIMULATOR)
+#if CONFIG_CHARGING
 void charging_splash(void)
 {
     gui_syncsplash(2*HZ, (unsigned char *)str(LANG_BATTERY_CHARGE));
@@ -856,45 +856,42 @@ static void say_time(int cursorpos, const struct tm *tm)
 #define INDEX_WIDTH 2
 
 #define SEPARATOR ":"
-#define MONTHNAME_LEN 3
-#define DAYNAME_LEN 3
 bool set_time_screen(const char* title, struct tm *tm)
 {
     bool done = false;
     int button;
-    int i;
-    int cursorpos = 0;
-    int lastcursorpos = !cursorpos;
+    unsigned int i, s;
+    unsigned int cursorpos = 0;
+    unsigned int lastcursorpos = 1;
     unsigned int julianday;
     unsigned int realyear;
+    unsigned int width;
     unsigned int min = 0, steps = 0;
     unsigned int statusbar_height = 0;
-    unsigned int width, height;
     unsigned int separator_width, weekday_width;
     unsigned int line_height, prev_line_height;
     unsigned char daysinmonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    unsigned char buffer[25];
+    unsigned char buffer[20];
 
     /* 6 possible cursor possitions, 3 values stored for each: x, y, width */
     unsigned char cursor[6][3];
     memset(cursor, 0, sizeof(cursor));
 
     int *valptr = NULL;
-
-    /* for easy acess in the drawing loop */
     unsigned char *ptr[6];
-    ptr[0] = buffer;                    /* hours */
-    ptr[1] = buffer + 3;                /* minutes */
-    ptr[2] = buffer + 6;                /* seconds */
-    ptr[3] = buffer + 10 + DAYNAME_LEN; /* year (dayname is before year in the
-                                           buffer but is not drawn in the loop) */
-    ptr[4] = buffer + 15 + DAYNAME_LEN; /* monthname */
-    ptr[5] = buffer + 16 + DAYNAME_LEN + MONTHNAME_LEN;   /* day of month */
 
     if(global_settings.statusbar)
         statusbar_height = STATUSBAR_HEIGHT;
 
     while ( !done ) {
+        /* for easy acess in the drawing loop */
+        ptr[0] = buffer;                     /* hours */
+        ptr[1] = buffer + 3;                 /* minutes */
+        ptr[2] = buffer + 6;                 /* seconds */
+        ptr[3] = buffer + 9;                 /* year */
+        ptr[4] = str(monthname[tm->tm_mon]); /* monthname */
+        ptr[5] = buffer + 14;                /* day of month */
+
         /* calculate the number of days in febuary */
         realyear = tm->tm_year + 1900;
         if((realyear % 4 == 0 && !(realyear % 100 == 0)) || realyear % 400 == 0)
@@ -908,109 +905,122 @@ bool set_time_screen(const char* title, struct tm *tm)
 
         /* calculate day of week */
         julianday = 0;
-        for(i = 0; i < tm->tm_mon; i++) {
+        for(i = 0; (int)i < tm->tm_mon; i++) {
            julianday += daysinmonth[i];
         }
         julianday += tm->tm_mday;
         tm->tm_wday = (realyear + julianday + (realyear - 1) / 4 -
                        (realyear - 1) / 100 + (realyear - 1) / 400 + 7 - 1) % 7;
 
-        /* copy all the stuff we want from the tm struct to buffer */
+        /* put all the numbers we want from the tm struct into
+           an easily printable buffer */
         snprintf(buffer, sizeof(buffer),
-                 "%02d " "%02d " "%02d " "%.3s " "%04d " "%.3s " "%02d",
+                 "%02d " "%02d " "%02d " "%04d " "%02d",
                  tm->tm_hour, tm->tm_min, tm->tm_sec,
-                 str(dayname[tm->tm_wday]), tm->tm_year+1900,
-                 str(monthname[tm->tm_mon]), tm->tm_mday);
+                 tm->tm_year+1900, tm->tm_mday);
 
-        /* recalculate the positions and offsets */
-        lcd_getstringsize(title, &width, &prev_line_height);
-        lcd_getstringsize(buffer, &width, &line_height);
-        lcd_getstringsize(SEPARATOR, &separator_width, &height);
-
-        /* convert spaces in the buffer to \0 to make it possible to work
+        /* convert spaces in the buffer to '\0' to make it possible to work
            directly on the buffer */
-        buffer[2] = '\0';
-        buffer[5] = '\0';
-        buffer[8] = '\0';
-        buffer[9 + DAYNAME_LEN] = '\0';
-        buffer[14 + DAYNAME_LEN] = '\0';
-        buffer[15 + DAYNAME_LEN + MONTHNAME_LEN] = '\0';
-
-        /* hour */
-        lcd_getstringsize(buffer, &width, &height);
-        /* cursor[0][INDEX_X] is already 0 because of the memset */
-        cursor[0][INDEX_Y] = prev_line_height + statusbar_height;
-        cursor[0][INDEX_WIDTH] = width;
-
-        /* minute */
-        lcd_getstringsize(buffer + 3, &width, &height);
-        cursor[1][INDEX_X] = cursor[0][INDEX_WIDTH] + separator_width;
-        cursor[1][INDEX_Y] = prev_line_height + statusbar_height;
-        cursor[1][INDEX_WIDTH] = width;
-
-        /* second */
-        lcd_getstringsize(buffer + 6, &width, &height);
-        cursor[2][INDEX_X] = cursor[0][INDEX_WIDTH] + separator_width +
-                             cursor[1][INDEX_WIDTH] + separator_width;
-        cursor[2][INDEX_Y] = prev_line_height + statusbar_height;
-
-        /* weekday */
-        lcd_getstringsize(buffer + 9, &weekday_width, &height);
-        lcd_getstringsize(" ", &separator_width, &height);
-
-        /* year */
-        lcd_getstringsize(buffer  + 10 + DAYNAME_LEN, &width, &height);
-        cursor[3][INDEX_X] = weekday_width + separator_width;
-        cursor[3][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
-        cursor[3][INDEX_WIDTH] = width;
-
-        /* month */
-        lcd_getstringsize(buffer + 15 + DAYNAME_LEN, &width, &height);
-        cursor[4][INDEX_X] = weekday_width + 2 * separator_width +
-                             cursor[3][INDEX_WIDTH];
-        cursor[4][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
-        cursor[4][INDEX_WIDTH] = width;
-
-        /* day */
-        lcd_getstringsize(buffer + 16 + DAYNAME_LEN + MONTHNAME_LEN, &width, &height);
-        cursor[5][INDEX_X] = weekday_width + 3 * separator_width +
-                             cursor[3][INDEX_WIDTH] +
-                             cursor[4][INDEX_WIDTH];
-        cursor[5][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
-
-        /* draw the screen */
-        lcd_set_drawmode(DRMODE_SOLID);
-        lcd_clear_display();
-        /* display the screen title */
-        lcd_puts_scroll(0, 0, title);
-
-        /* these are not selectable, so we draw them outside the loop */
-        lcd_putsxy(0, cursor[3][INDEX_Y], buffer + 9); /* name of the week day */
-        lcd_putsxy(cursor[1][INDEX_X] - separator_width, cursor[0][INDEX_Y],
-                   SEPARATOR);
-        lcd_putsxy(cursor[2][INDEX_X] - separator_width, cursor[0][INDEX_Y],
-                   SEPARATOR);
-
-        /* draw the selected item with drawmode set to
-           DRMODE_SOLID|DRMODE_INVERSEVID, all other selectable
-           items with drawmode DRMODE_SOLID */
-        for(i=0; i<6; i++)
+        for(i=0; i < sizeof(buffer); i++)
         {
-            if (cursorpos == i)
-                lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-            else
-                lcd_set_drawmode(DRMODE_SOLID);
-
-            lcd_putsxy(cursor[i][INDEX_X], cursor[i][INDEX_Y], ptr[i]);
+            if(buffer[i] == ' ')
+                buffer[i] = '\0';
         }
 
-        /* print help text */
-        lcd_puts(0, 4, str(LANG_TIME_SET));
-        lcd_puts(0, 5, str(LANG_TIME_REVERT));
+        FOR_NB_SCREENS(s)
+        {
+            /* minimum lines needed is 2 + title line */
+            gui_textarea_update_nblines(&screens[s]);
+            if (screens[s].nb_lines < 4)
+            {
+                screens[s].setfont(FONT_SYSFIXED);
+                gui_textarea_update_nblines(&screens[s]);
+            }
+            
+            /* recalculate the positions and offsets */
+            if (screens[s].nb_lines >= 3)
+                screens[s].getstringsize(title, NULL, &prev_line_height);
+            else
+                prev_line_height = 0;
+            screens[s].getstringsize(buffer, NULL, &line_height);
+            screens[s].getstringsize(SEPARATOR, &separator_width, NULL);
 
+
+            /* get width for each string except the last one and put them
+               in the cursor array */
+            for(i=0; i < 5; i++)
+            {
+                screens[s].getstringsize(ptr[i], &width, NULL);
+                cursor[i][INDEX_WIDTH] = width;
+            }
+
+            /* hour */
+            /* cursor[0][INDEX_X] is already 0 because of the memset */
+            cursor[0][INDEX_Y] = prev_line_height + statusbar_height;
+
+            /* minute */
+            cursor[1][INDEX_X] = cursor[0][INDEX_WIDTH] + separator_width;
+            cursor[1][INDEX_Y] = prev_line_height + statusbar_height;
+    
+            /* second */
+            cursor[2][INDEX_X] = cursor[0][INDEX_WIDTH] + separator_width +
+                                cursor[1][INDEX_WIDTH] + separator_width;
+            cursor[2][INDEX_Y] = prev_line_height + statusbar_height;
+
+            /* weekday */
+            screens[s].getstringsize(str(dayname[tm->tm_wday]), &weekday_width, NULL);
+            screens[s].getstringsize(" ", &separator_width, NULL);
+
+            /* year */
+            cursor[3][INDEX_X] = weekday_width + separator_width;
+            cursor[3][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
+
+            /* month */
+            cursor[4][INDEX_X] = weekday_width + 2 * separator_width +
+                                cursor[3][INDEX_WIDTH];
+            cursor[4][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
+
+            /* day */
+            cursor[5][INDEX_X] = weekday_width + 3 * separator_width +
+                                cursor[3][INDEX_WIDTH] +
+                                cursor[4][INDEX_WIDTH];
+            cursor[5][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
+
+            /* draw the screen */
+            screens[s].set_drawmode(DRMODE_SOLID);
+            gui_textarea_clear(&screens[s]);
+            /* display the screen title */
+            screens[s].puts_scroll(0, 0, title);
+
+            /* these are not selectable, so we draw them outside the loop */
+            screens[s].putsxy(0, cursor[3][INDEX_Y], str(dayname[tm->tm_wday])); /* name of the week day */
+            screens[s].putsxy(cursor[1][INDEX_X] - separator_width, 
+                              cursor[0][INDEX_Y], SEPARATOR);
+            screens[s].putsxy(cursor[2][INDEX_X] - separator_width,
+                              cursor[0][INDEX_Y], SEPARATOR);
+
+            /* draw the selected item with drawmode set to
+                DRMODE_SOLID|DRMODE_INVERSEVID, all other selectable
+                items with drawmode DRMODE_SOLID */
+            for(i=0; i<6; i++)
+            {
+                if (cursorpos == i)
+                    screens[s].set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                else
+                    screens[s].set_drawmode(DRMODE_SOLID);
+    
+                screens[s].putsxy(cursor[i][INDEX_X], 
+                                  cursor[i][INDEX_Y], ptr[i]);
+            }
+
+            /* print help text */
+            if (screens[s].nb_lines > 4)
+                screens[s].puts(0, 4, str(LANG_TIME_SET_BUTTON));
+            if (screens[s].nb_lines > 5)
+                screens[s].puts(0, 5, str(LANG_TIME_REVERT));
+            screens[s].update();
+        }
         gui_syncstatusbar_draw(&statusbars, true);
-
-        lcd_update();
 
         /* calculate the minimum and maximum for the number under cursor */
         if(cursorpos!=lastcursorpos) {
@@ -1050,7 +1060,7 @@ bool set_time_screen(const char* title, struct tm *tm)
             say_time(cursorpos, tm);
         }
 
-        button = get_action(CONTEXT_SETTINGS_TIME,HZ/2);
+        button = get_action(CONTEXT_SETTINGS_TIME, TIMEOUT_BLOCK);
         switch ( button ) {
             case ACTION_STD_PREV:
                 cursorpos = (cursorpos + 6 - 1) % 6;
@@ -1090,7 +1100,11 @@ bool set_time_screen(const char* title, struct tm *tm)
                 break;
         }
     }
-    action_signalscreenchange();
+    FOR_NB_SCREENS(i)
+    {
+        screens[i].setfont(FONT_UI);
+        gui_textarea_update_nblines(&screens[i]);
+    }
     return false;
 }
 #endif /* defined(HAVE_LCD_BITMAP) && (CONFIG_RTC != 0) */
@@ -1115,10 +1129,10 @@ bool shutdown_screen(void)
                 sys_poweroff();
                 break;
 
-            /* do nothing here, because ACTION_UNKNOWN might be caused
+            /* do nothing here, because ACTION_NONE might be caused
              * by timeout or button release. In case of timeout the loop
              * is terminated by TIME_BEFORE */
-            case ACTION_UNKNOWN:
+            case ACTION_NONE:
                 break;
 
             default:
@@ -1128,7 +1142,6 @@ bool shutdown_screen(void)
                 break;
         }
     }
-    action_signalscreenchange();
     return false;
 }
 #endif
@@ -1139,6 +1152,8 @@ static const int id3_headers[]=
     LANG_ID3_ARTIST,
     LANG_ID3_ALBUM,
     LANG_ID3_ALBUMARTIST,
+    LANG_ID3_GROUPING,
+    LANG_ID3_DISCNUM,
     LANG_ID3_TRACKNUM,
     LANG_ID3_COMMENT,
     LANG_ID3_GENRE,
@@ -1146,7 +1161,7 @@ static const int id3_headers[]=
     LANG_ID3_LENGTH,
     LANG_ID3_PLAYLIST,
     LANG_ID3_BITRATE,
-    LANG_ID3_FRECUENCY,
+    LANG_ID3_FREQUENCY,
 #if CONFIG_CODEC == SWCODEC
     LANG_ID3_TRACK_GAIN,
     LANG_ID3_ALBUM_GAIN,
@@ -1180,7 +1195,19 @@ static char * id3_get_info(int selected_item, void* data, char *buffer)
             case 3:/*LANG_ID3_ALBUMARTIST*/
                 info=id3->albumartist;
                 break;
-            case 4:/*LANG_ID3_TRACKNUM*/
+            case 4:/*LANG_ID3_GROUPING*/
+                info=id3->grouping;
+                break;
+            case 5:/*LANG_ID3_DISCNUM*/
+                if (id3->disc_string)
+                    info = id3->disc_string;
+                else if (id3->discnum)
+				{
+                    snprintf(buffer, MAX_PATH, "%d", id3->discnum);
+                    info = buffer;
+                }
+                break;
+            case 6:/*LANG_ID3_TRACKNUM*/
                 if (id3->track_string)
                     info = id3->track_string;
                 else if (id3->tracknum)
@@ -1189,13 +1216,13 @@ static char * id3_get_info(int selected_item, void* data, char *buffer)
                     info = buffer;
                 }
                 break;
-            case 5:/*LANG_ID3_COMMENT*/
+            case 7:/*LANG_ID3_COMMENT*/
                 info=id3->comment;
                 break;
-            case 6:/*LANG_ID3_GENRE*/
+            case 8:/*LANG_ID3_GENRE*/
                 info = id3->genre_string;
                 break;
-            case 7:/*LANG_ID3_YEAR*/
+            case 9:/*LANG_ID3_YEAR*/
                 if (id3->year_string)
                     info = id3->year_string;
                 else if (id3->year)
@@ -1204,34 +1231,34 @@ static char * id3_get_info(int selected_item, void* data, char *buffer)
                     info = buffer;
                 }
                 break;
-            case 8:/*LANG_ID3_LENGTH*/
+            case 10:/*LANG_ID3_LENGTH*/
                 format_time(buffer, MAX_PATH, id3->length);
                 info=buffer;
                 break;
-            case 9:/*LANG_ID3_PLAYLIST*/
+            case 11:/*LANG_ID3_PLAYLIST*/
                 snprintf(buffer, MAX_PATH, "%d/%d", playlist_get_display_index(),
             playlist_amount());
                 info=buffer;
                 break;
-            case 10:/*LANG_ID3_BITRATE*/
+            case 12:/*LANG_ID3_BITRATE*/
                 snprintf(buffer, MAX_PATH, "%d kbps%s", id3->bitrate,
             id3->vbr ? str(LANG_ID3_VBR) : (const unsigned char*) "");
                 info=buffer;
                 break;
-            case 11:/*LANG_ID3_FRECUENCY*/
+            case 13:/*LANG_ID3_FREQUENCY*/
                 snprintf(buffer, MAX_PATH, "%ld Hz", id3->frequency);
                 info=buffer;
                 break;
 #if CONFIG_CODEC == SWCODEC
-            case 12:/*LANG_ID3_TRACK_GAIN*/
+            case 14:/*LANG_ID3_TRACK_GAIN*/
                 info=id3->track_gain_string;
                 break;
-            case 13:/*LANG_ID3_ALBUM_GAIN*/
+            case 15:/*LANG_ID3_ALBUM_GAIN*/
                 info=id3->album_gain_string;
                 break;
-            case 14:/*LANG_ID3_PATH*/
+            case 16:/*LANG_ID3_PATH*/
 #else
-            case 12:/*LANG_ID3_PATH*/
+            case 14:/*LANG_ID3_PATH*/
 #endif
                 info=id3->path;
                 break;
@@ -1251,14 +1278,12 @@ bool browse_id3(void)
         sizeof(id3_headers)/sizeof(id3_headers[0])*2);
     gui_synclist_draw(&id3_lists);
     gui_syncstatusbar_draw(&statusbars, true);
-    action_signalscreenchange();
     while (true) {
         gui_syncstatusbar_draw(&statusbars, false);
         key = get_action(CONTEXT_LIST,HZ/2);
         if(key!=ACTION_NONE && key!=ACTION_UNKNOWN
         && !gui_synclist_do_button(&id3_lists, key,LIST_WRAP_UNLESS_HELD))
         {
-            action_signalscreenchange();
             return(default_event_handler(key) == SYS_USB_CONNECTED);
         }
     }
@@ -1297,7 +1322,6 @@ bool view_runtime(void)
 #endif
     gui_synclist_set_icon_callback(&lists, NULL);
     gui_synclist_set_nb_items(&lists, 4);
-    action_signalscreenchange();
     while(1)
     {
 #if CONFIG_CHARGING
@@ -1333,7 +1357,6 @@ bool view_runtime(void)
         if(default_event_handler(action) == SYS_USB_CONNECTED)
             return true;
     }
-    action_signalscreenchange();
     return false;
 }
 

@@ -91,6 +91,7 @@ enum {
     ACTION_STD_MENU,
     ACTION_STD_QUICKSCREEN,
     ACTION_STD_KEYLOCK,
+    ACTION_STD_REC,
     
     ACTION_F3, /* just so everything works again, possibly change me */
     /* code context actions */
@@ -111,6 +112,7 @@ enum {
     ACTION_WPS_CONTEXT,
     ACTION_WPS_QUICKSCREEN,/* optional */
     ACTION_WPS_MENU, /*this should be the same as ACTION_STD_MENU */
+    ACTION_WPS_REC,
 #if 0
     ACTION_WPSAB_SINGLE, /* This needs to be #defined in 
                             the config-<target>.h to one of the ACTION_WPS_ actions
@@ -237,8 +239,6 @@ int get_custom_action(int context,int timeout,
                       const struct button_mapping* (*get_context_map)(int));
 /* use if one of the standard CONTEXT_ mappings will work (ALL the core should be using this! */
 int get_action(int context, int timeout);
-/* call this whenever you leave your button loop */
-void action_signalscreenchange(void);
 
 /* call this if you need to check for ACTION_STD_CANCEL only (i.e user abort! */
 bool action_userabort(int timeout);
@@ -253,10 +253,10 @@ bool is_keys_locked(void);
    If button != NULL it will be set to the actual button code */
 #define ACTION_REMOTE   0x1 /* remote was pressed */
 #define ACTION_REPEAT   0x2 /* action was repeated (NOT button) */
-#define ACTION_IGNORING 0x4 /* action_signalscreenchange() was called \
-                               waiting for BUTTON_REL */
 int get_action_statuscode(int *button);
 
+/* returns the data value associated with the last action that is not
+   BUTTON_NONE or flagged with SYS_EVENT */
+intptr_t get_action_data(void);
 
-
-#endif
+#endif /* __ACTION_H__ */

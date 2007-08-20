@@ -131,6 +131,7 @@ void lcd_set_flip(bool yesno)
 /* LCD init */
 void lcd_init_device(void)
 {  
+    CLCD_CLOCK_SRC |= 0xc0000000; /* Set LCD interface clock to PLL */
     /* H10 LCD is initialised by the bootloader */
 }
 

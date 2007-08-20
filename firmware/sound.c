@@ -663,9 +663,10 @@ void sound_set_superbass(int value)
 #endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
 
 #else /* SIMULATOR */
+int sim_volume;
 void sound_set_volume(int value)
 {
-    (void)value;
+    sim_volume =128*(value +40)/46; /* 128 is SDL_MIX_MAXVOLUME */
 }
 
 void sound_set_balance(int value)

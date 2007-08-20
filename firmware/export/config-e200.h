@@ -12,10 +12,6 @@
 /* define this if you have recording possibility */
 #define HAVE_RECORDING
 
-#define DEFAULT_REC_MIC_GAIN    23
-#define DEFAULT_REC_LEFT_GAIN   23
-#define DEFAULT_REC_RIGHT_GAIN  23
-
 #define REC_SAMPR_CAPS      (SAMPR_CAP_22)
 #define REC_FREQ_DEFAULT    REC_FREQ_22 /* Default is not 44.1kHz */
 #define REC_SAMPR_DEFAULT   SAMPR_22
@@ -29,30 +25,6 @@
 
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR
-
-/* define this if you have LCD enable function */
-#define HAVE_LCD_ENABLE
-
-/* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
-   should be defined as well. */
-#define HAVE_LCD_SLEEP
-
-#ifndef SIMULATOR
-#define HAVE_HOTSWAP
-#define HAVE_MULTIVOLUME
-#endif
-
-/* define this if you can invert the colours on your LCD */
-#define HAVE_LCD_INVERT
-
-/* define this if you can flip your LCD */
-#define HAVE_LCD_FLIP
-
-#define HAVE_BACKLIGHT_BRIGHTNESS
-/* Main LCD backlight brightness range and defaults */
-#define MIN_BRIGHTNESS_SETTING           1
-#define MAX_BRIGHTNESS_SETTING           12
-#define DEFAULT_BRIGHTNESS_SETTING       6
 
 /* define this if you have a light associated with the buttons */
 #define HAVE_BUTTON_LIGHT
@@ -71,6 +43,19 @@
 #define LCD_HEIGHT 220
 #define LCD_DEPTH  16   /* 65536 colours */
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
+
+/* define this if you have LCD enable function */
+#define HAVE_LCD_ENABLE
+
+/* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
+   should be defined as well. */
+#define HAVE_LCD_SLEEP
+
+/* define this if you can flip your LCD */
+#define HAVE_LCD_FLIP
+
+/* define this if you can invert the colours on your LCD */
+#define HAVE_LCD_INVERT
 
 /* #define IRAM_LCDFRAMEBUFFER IDATA_ATTR *//* put the lcd frame buffer in IRAM */
 
@@ -108,9 +93,32 @@
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
+#define HAVE_BACKLIGHT_BRIGHTNESS
+
+/* define this if the unit uses a scrollwheel for navigation */
+#define HAVE_SCROLLWHEEL
+/* define wheel acceleration scaling factor */
+/* Range for this target: 0xffffff*(0.0-16.000000894069724921567733381255) */
+#define WHEEL_ACCELERATION_FACTOR   (0xffffff*7)
+
+/* define this if you have a flash memory storage */
+#define HAVE_FLASH_STORAGE
+
+#define HAVE_MULTIVOLUME
 
 #define BATTERY_CAPACITY_DEFAULT 750    /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 750        /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 750        /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC 0          /* capacity increment */
+#define BATTERY_TYPES_COUNT  1          /* only one type */
 
+/* Hardware controlled charging? FIXME */
+#define CONFIG_CHARGING CHARGING_SIMPLE
+
+/* define this if the unit can be powered or charged via USB */
+#define HAVE_USB_POWER
+
+/** Non-simulator section **/
 #ifndef SIMULATOR
 
 /* Define this if you have a PortalPlayer PP5024 */
@@ -118,17 +126,6 @@
 
 /* Define this if you want to use the PP5024 i2c interface */
 #define CONFIG_I2C I2C_PP5024
-
-/* Type of mobile power */
-#define CONFIG_BATTERY BATT_LIION750
-#define BATTERY_CAPACITY_MIN 750        /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 750        /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC 0          /* capacity increment */
-#define BATTERY_TYPES_COUNT  1          /* only one type */
-#define BATTERY_SCALE_FACTOR 5005       /* ADC should read 0x3ff=5.12V */
-
-/* Hardware controlled charging? FIXME */
-#define CONFIG_CHARGING CHARGING_SIMPLE
 
 /* define this if the hardware can be powered off while charging */
 /* Sansa can't be powered off while charging */
@@ -143,6 +140,8 @@
 /* Type of LCD TODO: hopefully the same as the x5 but check this*/
 #define CONFIG_LCD LCD_X5
 
+#define HAVE_HOTSWAP
+
 /* Offset ( in the firmware file's header ) to the file CRC and data. These are
    only used when loading the old format rockbox.e200 file */
 #define FIRMWARE_OFFSET_FILE_CRC    0x0
@@ -153,14 +152,11 @@
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_ARC
 
-/* define this if the unit can be powered or charged via USB */
-#define HAVE_USB_POWER
-
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
 
 /* Define this if you have adjustable CPU frequency */
-/*#define HAVE_ADJUSTABLE_CPU_FREQ*/
+#define HAVE_ADJUSTABLE_CPU_FREQ
 
 #define MI4_FORMAT
 #define BOOTFILE_EXT    "mi4"
@@ -170,4 +166,20 @@
 
 #define ICODE_ATTR_TREMOR_NOT_MDCT
 
-#endif
+#define INCLUDE_TIMEOUT_API
+
+#endif /* SIMULATOR */
+
+/** Port-specific settings **/
+
+/* Main LCD backlight brightness range and defaults */
+#define MIN_BRIGHTNESS_SETTING      1
+#define MAX_BRIGHTNESS_SETTING     12
+#define DEFAULT_BRIGHTNESS_SETTING  6
+
+/* Default recording levels */
+#define DEFAULT_REC_MIC_GAIN    23
+#define DEFAULT_REC_LEFT_GAIN   23
+#define DEFAULT_REC_RIGHT_GAIN  23
+
+

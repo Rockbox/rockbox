@@ -105,7 +105,8 @@ long reverse (long N) {
 #if CONFIG_KEYPAD == PLAYER_PAD
 #define LP_QUIT BUTTON_STOP
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD)
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define LP_QUIT BUTTON_MENU
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
 #define LP_QUIT BUTTON_PLAY
@@ -122,8 +123,8 @@ long reverse (long N) {
 #endif
 
 /* data files */
-#define DICT_INDEX ROCKBOX_DIR "/dict.index"
-#define DICT_DESC ROCKBOX_DIR "/dict.desc"
+#define DICT_INDEX ROCKBOX_DIR "/rocks/apps/dict.index"
+#define DICT_DESC ROCKBOX_DIR "/rocks/apps/dict.desc"
 
 /* the main plugin function */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)

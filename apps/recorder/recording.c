@@ -601,23 +601,40 @@ static bool check_dir(char *folder)
     return true;
 }
 
+/* the list below must match enum audio_sources in audio.h */
+static const char* const prestr[] =
+{
+    HAVE_MIC_IN_([AUDIO_SRC_MIC]          = "R_MIC_",)
+    HAVE_LINE_REC_([AUDIO_SRC_LINEIN]     = "R_LINE_",)
+    HAVE_SPDIF_IN_([AUDIO_SRC_SPDIF]      = "R_SPDIF_",)
+    HAVE_FMRADIO_REC_([AUDIO_SRC_FMRADIO] = "R_FM_",)
+};
+
 char *rec_create_filename(char *buffer)
 {
     char ext[16];
+    const char *pref = "R_";
+
     strcpy(buffer,global_settings.rec_directory);
     if (!check_dir(buffer))
         return NULL;
+
+    if((global_settings.rec_source > AUDIO_SRC_PLAYBACK) &&
+       (global_settings.rec_source < AUDIO_NUM_SOURCES))
+    {
+        pref = prestr[global_settings.rec_source];
+    }
     
     snprintf(ext, sizeof(ext), ".%s",
              REC_FILE_ENDING(global_settings.rec_format));
 
 #if CONFIG_RTC == 0
-    return create_numbered_filename(buffer, buffer, "rec_", ext, 4,
+    return create_numbered_filename(buffer, buffer, pref, ext, 4,
                                     &file_number);
 #else
     /* We'll wait at least up to the start of the next second so no duplicate
        names are created */
-    return create_datetime_filename(buffer, buffer, "R", ext, true);
+    return create_datetime_filename(buffer, buffer, pref, ext, true);
 #endif
 }
 
@@ -1512,7 +1529,7 @@ bool recording_screen(bool no_source)
             if(global_settings.rec_source == AUDIO_SRC_MIC)
             {
                 /* Draw MIC recording gain */
-                snprintf(buf, sizeof(buf), "%s:%s", str(LANG_SYSFONT_RECORDING_GAIN),
+                snprintf(buf, sizeof(buf), "%s:%s", str(LANG_SYSFONT_GAIN),
                          fmt_gain(SOUND_MIC_GAIN,
                                   global_settings.rec_mic_gain,
                                   buf2, sizeof(buf2)));
@@ -1904,12 +1921,12 @@ static bool f2_rec_screen(void)
 
         FOR_NB_SCREENS(i)
         {
-            screens[i].getstringsize(str(LANG_SYSFONT_RECORDING_CHANNELS), &w, &h);
+            screens[i].getstringsize(str(LANG_SYSFONT_CHANNELS), &w, &h);
             screens[i].putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2,
-                       str(LANG_SYSFONT_RECORDING_CHANNELS));
-            screens[i].getstringsize(str(LANG_SYSFONT_F2_MODE), &w, &h);
+                       str(LANG_SYSFONT_CHANNELS));
+            screens[i].getstringsize(str(LANG_SYSFONT_MODE), &w, &h);
             screens[i].putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h,
-                       str(LANG_SYSFONT_F2_MODE));
+                       str(LANG_SYSFONT_MODE));
             screens[i].getstringsize(ptr, &w, &h);
             screens[i].putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, ptr);
             screens[i].mono_bitmap(bitmap_icons_7x8[Icon_FastForward], 
@@ -1982,7 +1999,7 @@ static bool f3_rec_screen(void)
     char *src_str[] =
     {
         str(LANG_SYSFONT_RECORDING_SRC_MIC),
-        str(LANG_SYSFONT_RECORDING_SRC_LINE),
+        str(LANG_SYSFONT_LINE_IN),
         str(LANG_SYSFONT_RECORDING_SRC_DIGITAL)
     };
     struct audio_recording_options rec_options;

@@ -70,7 +70,7 @@
 #include "crc32.h"
 #include "misc.h"
 #include "settings.h"
-#include "dircache.h"
+#include "dir.h"
 #include "structec.h"
 #ifndef __PCTOOL__
 #include "atoi.h"
@@ -108,14 +108,14 @@ static long tempbuf_pos;
 
 /* Tags we want to get sorted (loaded to the tempbuf). */
 static const int sorted_tags[] = { tag_artist, tag_album, tag_genre, 
-    tag_composer, tag_comment, tag_albumartist, tag_title };
+    tag_composer, tag_comment, tag_albumartist, tag_grouping, tag_title };
 
 /* Uniqued tags (we can use these tags with filters and conditional clauses). */
 static const int unique_tags[] = { tag_artist, tag_album, tag_genre, 
-    tag_composer, tag_comment, tag_albumartist };
+    tag_composer, tag_comment, tag_albumartist, tag_grouping };
 
 /* Numeric tags (we can use these tags with conditional clauses). */
-static const int numeric_tags[] = { tag_year, tag_tracknumber, tag_length, 
+static const int numeric_tags[] = { tag_year, tag_discnumber, tag_tracknumber, tag_length,
     tag_bitrate, tag_playcount, tag_rating, tag_playtime, tag_lastplayed, tag_commitid,
     tag_virt_length_min, tag_virt_length_sec,
     tag_virt_playtime_min, tag_virt_playtime_sec,
@@ -123,7 +123,7 @@ static const int numeric_tags[] = { tag_year, tag_tracknumber, tag_length,
 
 /* String presentation of the tags defined in tagcache.h. Must be in correct order! */
 static const char *tags_str[] = { "artist", "album", "genre", "title", 
-    "filename", "composer", "comment", "albumartist", "year", "tracknumber", 
+    "filename", "composer", "comment", "albumartist", "grouping", "year", "discnumber", "tracknumber",
     "bitrate", "length", "playcount", "rating", "playtime", "lastplayed", "commitid" };
 
 /* Status information of the tagcache. */
@@ -136,8 +136,26 @@ enum tagcache_queue {
     Q_IMPORT_CHANGELOG,
     Q_UPDATE,
     Q_REBUILD,
+    
+    /* Internal tagcache command queue. */
+    CMD_UPDATE_MASTER_HEADER,
+    CMD_UPDATE_NUMERIC,
 };
 
+struct tagcache_command_entry {
+    long command;
+    long idx_id;
+    long tag;
+    long data;
+};
+
+static struct tagcache_command_entry command_queue[TAGCACHE_COMMAND_QUEUE_LENGTH];
+static volatile int command_queue_widx = 0;
+static volatile int command_queue_ridx = 0;
+static struct mutex command_queue_mutex;
+/* Timestamp of the last added event, so we can wait a bit before committing the
+ * whole queue at once. */
+static long command_queue_timestamp = 0;
 
 /* Tag database structures. */
 
@@ -170,7 +188,7 @@ struct master_header {
 
 /* For the endianess correction */
 static const char *tagfile_entry_ec   = "ss";
-static const char *index_entry_ec     = "llllllllllllllllll"; /* (1 + TAG_COUNT) * l */
+static const char *index_entry_ec     = "llllllllllllllllllll"; /* (1 + TAG_COUNT) * l */
 static const char *tagcache_header_ec = "lll";
 static const char *master_header_ec   = "llllll";
 
@@ -327,7 +345,7 @@ static bool do_timed_yield(void)
 
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
 static long find_entry_ram(const char *filename,
-                           const struct dircache_entry *dc)
+                           const struct dirent *dc)
 {
     static long last_pos = 0;
     int i;
@@ -626,7 +644,7 @@ static bool retrieve(struct tagcache_search *tcs, struct index_entry *idx,
 # ifdef HAVE_DIRCACHE
         if (tag == tag_filename && idx->flag & FLAG_DIRCACHE)
         {
-            dircache_copy_path((struct dircache_entry *)seek,
+            dircache_copy_path((struct dirent *)seek,
                                buf, size);
             return true;
         }
@@ -1329,7 +1347,7 @@ static bool get_next(struct tagcache_search *tcs)
 # ifdef HAVE_DIRCACHE
         if (tcs->type == tag_filename)
         {
-            dircache_copy_path((struct dircache_entry *)tcs->position,
+            dircache_copy_path((struct dirent *)tcs->position,
                                buf, sizeof buf);
             tcs->result = buf;
             tcs->result_len = strlen(buf) + 1;
@@ -1531,6 +1549,7 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
     id3->composer     = get_tag_string(entry, tag_composer);
     id3->comment      = get_tag_string(entry, tag_comment);
     id3->albumartist  = get_tag_string(entry, tag_albumartist);
+    id3->grouping     = get_tag_string(entry, tag_grouping);
 
     id3->playcount  = get_tag_numeric(entry, tag_playcount);
     id3->rating     = get_tag_numeric(entry, tag_rating);
@@ -1538,6 +1557,7 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
     id3->score      = get_tag_numeric(entry, tag_virt_autoscore) / 10;
     id3->year       = get_tag_numeric(entry, tag_year);
 
+    id3->discnum = get_tag_numeric(entry, tag_discnumber);
     id3->tracknum = get_tag_numeric(entry, tag_tracknumber);
     id3->bitrate = get_tag_numeric(entry, tag_bitrate);
     if (id3->bitrate == 0)
@@ -1583,7 +1603,7 @@ static int check_if_empty(char **tag)
     offset += entry.tag_length[tag]
     
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-static void add_tagcache(char *path, const struct dircache_entry *dc)
+static void add_tagcache(char *path, const struct dirent *dc)
 #else
 static void add_tagcache(char *path)
 #endif
@@ -1596,6 +1616,7 @@ static void add_tagcache(char *path)
     int offset = 0;
     int path_length = strlen(path);
     bool has_albumartist;
+    bool has_grouping;
 
     if (cachefd < 0)
         return ;
@@ -1639,7 +1660,7 @@ static void add_tagcache(char *path)
     memset(&track, 0, sizeof(struct track_info));
     memset(&entry, 0, sizeof(struct temp_file_entry));
     memset(&tracknumfix, 0, sizeof(tracknumfix));
-    ret = get_metadata(&track, fd, path, false);
+    ret = get_metadata(&(track.id3), fd, path, false);
     close(fd);
 
     if (!ret)
@@ -1681,6 +1702,7 @@ static void add_tagcache(char *path)
     
     /* Numeric tags */
     entry.tag_offset[tag_year] = track.id3.year;
+    entry.tag_offset[tag_discnumber] = track.id3.discnum;
     entry.tag_offset[tag_tracknumber] = track.id3.tracknum;
     entry.tag_offset[tag_length] = track.id3.length;
     entry.tag_offset[tag_bitrate] = track.id3.bitrate;
@@ -1688,6 +1710,8 @@ static void add_tagcache(char *path)
     /* String tags. */
     has_albumartist = track.id3.albumartist != NULL
         && strlen(track.id3.albumartist) > 0;
+    has_grouping = track.id3.grouping != NULL
+        && strlen(track.id3.grouping) > 0;
 
     ADD_TAG(entry, tag_filename, &path);
     ADD_TAG(entry, tag_title, &track.id3.title);
@@ -1703,6 +1727,14 @@ static void add_tagcache(char *path)
     else
     {
         ADD_TAG(entry, tag_albumartist, &track.id3.artist);
+    }
+    if (has_grouping)
+    {
+        ADD_TAG(entry, tag_grouping, &track.id3.grouping);
+    }
+    else
+    {
+        ADD_TAG(entry, tag_grouping, &track.id3.title);
     }
     entry.data_length = offset;
     
@@ -1724,6 +1756,14 @@ static void add_tagcache(char *path)
     else
     {
         write_item(track.id3.artist);
+    }
+    if (has_grouping)
+    {
+        write_item(track.id3.grouping);
+    }
+    else
+    {
+        write_item(track.id3.title);
     }
     total_entry_count++;    
 }
@@ -2737,33 +2777,6 @@ static void free_tempbuf(void)
     tempbuf_size = 0;
 }
 
-long tagcache_increase_serial(void)
-{
-    long old;
-    
-    if (!tc_stat.ready)
-        return -2;
-    
-    while (read_lock)
-        sleep(1);
-    
-    old = current_tcmh.serial++;
-    if (!update_master_header())
-        return -1;
-    
-    return old;
-}
-
-long tagcache_get_serial(void)
-{
-    return current_tcmh.serial;
-}
-
-long tagcache_get_commitid(void)
-{
-    return current_tcmh.commitid;
-}
-
 static bool modify_numeric_entry(int masterfd, int idx_id, int tag, long data)
 {
     struct index_entry idx;
@@ -2783,6 +2796,7 @@ static bool modify_numeric_entry(int masterfd, int idx_id, int tag, long data)
     return write_index(masterfd, idx_id, &idx);
 }
 
+#if 0
 bool tagcache_modify_numeric_entry(struct tagcache_search *tcs, 
                                    int tag, long data)
 {
@@ -2795,6 +2809,137 @@ bool tagcache_modify_numeric_entry(struct tagcache_search *tcs,
     }
     
     return modify_numeric_entry(tcs->masterfd, tcs->idx_id, tag, data);
+}
+#endif
+
+#define COMMAND_QUEUE_IS_EMPTY (command_queue_ridx == command_queue_widx)
+
+static bool command_queue_is_full(void)
+{
+    int next;
+    
+    next = command_queue_widx + 1;
+    if (next >= TAGCACHE_COMMAND_QUEUE_LENGTH)
+        next = 0;
+    
+    return (next == command_queue_ridx);
+}
+
+void run_command_queue(bool force)
+{
+    struct master_header myhdr;
+    int masterfd;
+    
+    if (COMMAND_QUEUE_IS_EMPTY)
+        return;
+    
+    if (!force && !command_queue_is_full() 
+        && current_tick - TAGCACHE_COMMAND_QUEUE_COMMIT_DELAY 
+           < command_queue_timestamp)
+    {
+        return;
+    }
+        
+    mutex_lock(&command_queue_mutex);
+	
+    if ( (masterfd = open_master_fd(&myhdr, true)) < 0)
+        return;
+    
+    while (command_queue_ridx != command_queue_widx)
+    {
+        struct tagcache_command_entry *ce = &command_queue[command_queue_ridx];
+        
+        switch (ce->command)
+        {
+            case CMD_UPDATE_MASTER_HEADER:
+            {
+                close(masterfd);
+                update_master_header();
+                
+                /* Re-open the masterfd. */
+                if ( (masterfd = open_master_fd(&myhdr, true)) < 0)
+                    return;
+                
+                break;
+            }
+            case CMD_UPDATE_NUMERIC:
+            {
+                modify_numeric_entry(masterfd, ce->idx_id, ce->tag, ce->data);
+                break;
+            }
+        }
+        
+        if (++command_queue_ridx >= TAGCACHE_COMMAND_QUEUE_LENGTH)
+            command_queue_ridx = 0;
+    }
+    
+    close(masterfd);
+    
+    mutex_unlock(&command_queue_mutex);
+}
+
+static void queue_command(int cmd, long idx_id, int tag, long data)
+{
+    while (1)
+    {
+        int next;
+        
+        mutex_lock(&command_queue_mutex);
+        next = command_queue_widx + 1;
+        if (next >= TAGCACHE_COMMAND_QUEUE_LENGTH)
+            next = 0;
+        
+        /* Make sure queue is not full. */
+        if (next != command_queue_ridx)
+        {
+            struct tagcache_command_entry *ce = &command_queue[command_queue_widx];
+            
+            ce->command = cmd;
+            ce->idx_id = idx_id;
+            ce->tag = tag;
+            ce->data = data;
+            
+            command_queue_widx = next;
+            command_queue_timestamp = current_tick;
+            mutex_unlock(&command_queue_mutex);
+            break;
+        }
+        
+        /* Queue is full, try again later... */
+        mutex_unlock(&command_queue_mutex);
+        sleep(1);
+    }
+}
+
+long tagcache_increase_serial(void)
+{
+    long old;
+    
+    if (!tc_stat.ready)
+        return -2;
+    
+    while (read_lock)
+        sleep(1);
+    
+    old = current_tcmh.serial++;
+    queue_command(CMD_UPDATE_MASTER_HEADER, 0, 0, 0);
+    
+    return old;
+}
+
+void tagcache_update_numeric(int idx_id, int tag, long data)
+{
+    queue_command(CMD_UPDATE_NUMERIC, idx_id, tag, data);
+}
+
+long tagcache_get_serial(void)
+{
+    return current_tcmh.serial;
+}
+
+long tagcache_get_commitid(void)
+{
+    return current_tcmh.commitid;
 }
 
 static bool write_tag(int fd, const char *tagstr, const char *datastr)
@@ -3464,7 +3609,7 @@ static bool load_tagcache(void)
             if (tag == tag_filename)
             {
 # ifdef HAVE_DIRCACHE
-                const struct dircache_entry *dc;
+                const struct dirent *dc;
 # endif
                 
                 // FIXME: This is wrong!
@@ -3647,14 +3792,14 @@ static bool check_deleted_files(void)
 
 static bool check_dir(const char *dirname)
 {
-    DIRCACHED *dir;
+    DIR *dir;
     int len;
     int success = false;
 
-    dir = opendir_cached(dirname);
+    dir = opendir(dirname);
     if (!dir)
     {
-        logf("tagcache: opendir_cached() failed");
+        logf("tagcache: opendir() failed");
         return false;
     }
     
@@ -3665,9 +3810,9 @@ static bool check_dir(const char *dirname)
     while (!check_event_queue())
 #endif
     {
-        struct dircache_entry *entry;
+        struct dirent *entry;
 
-        entry = readdir_cached(dir);
+        entry = readdir(dir);
     
         if (entry == NULL)
         {
@@ -3698,7 +3843,7 @@ static bool check_dir(const char *dirname)
         curpath[len] = '\0';
     }
     
-    closedir_cached(dir);
+    closedir(dir);
 
     return success;
 }
@@ -3860,6 +4005,8 @@ static void tagcache_thread(void)
     
     while (1)
     {
+        run_command_queue(false);
+        
         queue_wait_w_tmo(&tagcache_queue, &ev, HZ);
 
         switch (ev.id)
@@ -3942,6 +4089,9 @@ bool tagcache_prepare_shutdown(void)
 
 void tagcache_shutdown(void)
 {
+    /* Flush the command queue. */
+    run_command_queue(true);
+    
 #ifdef HAVE_EEPROM_SETTINGS
     if (tc_stat.ramcache)
         tagcache_dumpsave();
@@ -4023,6 +4173,7 @@ void tagcache_init(void)
     write_lock = read_lock = 0;
     
 #ifndef __PCTOOL__
+    mutex_init(&command_queue_mutex);
     queue_init(&tagcache_queue, true);
     create_thread(tagcache_thread, tagcache_stack,
                   sizeof(tagcache_stack), tagcache_thread_name 

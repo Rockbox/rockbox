@@ -148,7 +148,286 @@ bool bootloaderInstallDlg::TransferDataToWindow()
     m_firmwarepos->setDefault();
     return true;
 }
+////////////////////////////////////////////////
+//// Talk file creation
+/////////////////////////////////////////////////
 
+
+IMPLEMENT_CLASS( talkInstallDlg, wxDialog )
+
+BEGIN_EVENT_TABLE( talkInstallDlg, wxDialog )
+    EVT_BUTTON(ID_BROWSE_ENC_BTN, talkInstallDlg::OnBrowseEncBtn)
+    EVT_BUTTON(ID_BROWSE_TTS_BTN, talkInstallDlg::OnBrowseTtsBtn)
+END_EVENT_TABLE()
+
+talkInstallDlg::talkInstallDlg(TalkFileCreator* talkcreator )
+{
+    m_talkCreator = talkcreator;
+    Init();
+}
+
+talkInstallDlg::talkInstallDlg(TalkFileCreator* talkcreator, wxWindow* parent,
+    wxWindowID id, const wxString& caption,
+    const wxPoint& pos, const wxSize& size, long style )
+{
+    m_talkCreator = talkcreator;
+    Init();
+    Create(parent, id, caption, pos, size, style);
+}
+
+void talkInstallDlg::CreateControls()
+{
+    // A top-level sizer
+    wxBoxSizer* topSizer = new wxBoxSizer(wxVERTICAL);
+    this->SetSizer(topSizer);
+
+    wxBoxSizer* wxBoxSizer2 = new wxBoxSizer(wxHORIZONTAL);
+    topSizer->Add(wxBoxSizer2, 0, wxALIGN_LEFT|wxALL, 5);
+
+    // bitmap
+    wxBitmap sidebmp(wizard_xpm);
+
+    ImageCtrl* sideimage = new ImageCtrl(this,wxID_ANY);
+    sideimage->SetBitmap(sidebmp);
+    wxBoxSizer2->Add(sideimage,0,wxALIGN_LEFT | wxALL,5);
+
+    wxBoxSizer* wxBoxSizer3 = new wxBoxSizer(wxVERTICAL);
+    wxBoxSizer2->Add(wxBoxSizer3, 0, wxALIGN_LEFT|wxALL, 5);
+
+    // Device position
+    m_devicepos = new DevicePositionCtrl(this,ID_DEVICEPOS);
+    wxBoxSizer3->Add(m_devicepos, 0, wxALIGN_LEFT|wxALL, 5);
+
+    // Encoder
+    wxStaticBox* WxStaticBoxSizer2_StaticBoxObj = new wxStaticBox(this,
+        wxID_ANY, wxT("Encoder"));
+	wxStaticBoxSizer* WxStaticBoxSizer2 =
+        new wxStaticBoxSizer(WxStaticBoxSizer2_StaticBoxObj,wxVERTICAL);
+	wxBoxSizer3->Add(WxStaticBoxSizer2,0,wxALIGN_CENTER_HORIZONTAL|wxGROW | wxALL, 5);
+
+    m_Enc = new wxComboBox(this,ID_ENC_CBX,wxT("lame"),
+            wxDefaultPosition,wxDefaultSize,m_talkCreator->getSupportedEnc(),wxCB_READONLY);
+    m_Enc->SetToolTip(wxT("Select your Encoder."));
+    m_Enc->SetHelpText(wxT("Select your Encoder."));
+    WxStaticBoxSizer2->Add(m_Enc,0,wxALIGN_CENTER_HORIZONTAL|wxGROW | wxALL, 5);
+
+    wxStaticText* enc_desc = new wxStaticText( this, wxID_STATIC,
+        wxT("Select the Encoder executable"), wxDefaultPosition,
+        wxDefaultSize, 0 );
+    WxStaticBoxSizer2->Add(enc_desc, 0, wxALIGN_LEFT|wxALL, 5);
+
+    wxBoxSizer* horizontalSizer = new wxBoxSizer(wxHORIZONTAL);
+    WxStaticBoxSizer2->Add(horizontalSizer, 0, wxGROW|wxALL, 5);
+
+    m_EncExe = new wxTextCtrl(this,wxID_ANY,gv->pathToEnc);
+    m_EncExe->SetToolTip(wxT("Type the folder where your Encoder exe is"));
+    m_EncExe->SetHelpText(wxT("Type the folder where your Encoder exe is"));
+    horizontalSizer->Add(m_EncExe,0,wxGROW | wxALL,5);
+
+    m_browseEncBtn = new wxButton(this, ID_BROWSE_ENC_BTN, wxT("Browse"),
+         wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator,
+         wxT("BrowseEncBtn"));
+    m_browseEncBtn->SetToolTip(wxT("Browse for your Encoder Exe"));
+    m_browseEncBtn->SetHelpText(wxT("Browse for your Encoder exe"));
+    horizontalSizer->Add(m_browseEncBtn,0,wxGROW | wxALL,5);
+
+    wxStaticText* enc_desc_opt = new wxStaticText( this, wxID_STATIC,
+        wxT("Encoder Options"), wxDefaultPosition,
+        wxDefaultSize, 0 );
+    WxStaticBoxSizer2->Add(enc_desc_opt, 0, wxALIGN_LEFT|wxALL, 5);
+
+    m_EncOpts = new wxTextCtrl(this,wxID_ANY,m_talkCreator->getEncOpts(wxT("lame")));
+    m_EncOpts->SetToolTip(wxT("Encoder Options"));
+    m_EncOpts->SetHelpText(wxT("Encoder Options"));
+    WxStaticBoxSizer2->Add(m_EncOpts, 0, wxALIGN_LEFT|wxALL, 5);
+
+    // TTS
+    wxStaticBox* WxStaticBoxSizer3_StaticBoxObj = new wxStaticBox(this,
+        wxID_ANY, wxT("Text to Speach"));
+	wxStaticBoxSizer* WxStaticBoxSizer3 =
+        new wxStaticBoxSizer(WxStaticBoxSizer3_StaticBoxObj,wxVERTICAL);
+	wxBoxSizer3->Add(WxStaticBoxSizer3,0,wxALIGN_CENTER_HORIZONTAL|wxGROW | wxALL, 5);
+
+    m_Tts = new wxComboBox(this,ID_TTS_CBX,wxT("espeak"),
+            wxDefaultPosition,wxDefaultSize,m_talkCreator->getSupportedTTS(),wxCB_READONLY);
+    m_Tts->SetToolTip(wxT("Select your TTS."));
+    m_Tts->SetHelpText(wxT("Select your TTS."));
+    WxStaticBoxSizer3->Add(m_Tts,0,wxALIGN_CENTER_HORIZONTAL|wxGROW | wxALL, 5);
+
+    wxStaticText* tts_desc = new wxStaticText( this, wxID_STATIC,
+        wxT("Select the TTS executable"), wxDefaultPosition,
+        wxDefaultSize, 0 );
+    WxStaticBoxSizer3->Add(tts_desc, 0, wxALIGN_LEFT|wxALL, 5);
+
+    wxBoxSizer* horizontalSizer2 = new wxBoxSizer(wxHORIZONTAL);
+    WxStaticBoxSizer3->Add(horizontalSizer2, 0, wxGROW|wxALL, 5);
+
+    m_TtsExe = new wxTextCtrl(this,wxID_ANY,gv->pathToTts);
+    m_TtsExe->SetToolTip(wxT("Type the folder where your TTS exe is"));
+    m_TtsExe->SetHelpText(wxT("Type the folder where your TTS exe is"));
+    horizontalSizer2->Add(m_TtsExe,0,wxGROW | wxALL,5);
+
+    m_browseTtsBtn = new wxButton(this, ID_BROWSE_TTS_BTN, wxT("Browse"),
+         wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator,
+         wxT("BrowseEncBtn"));
+    m_browseTtsBtn->SetToolTip(wxT("Browse for your Encoder Exe"));
+    m_browseTtsBtn->SetHelpText(wxT("Browse for your Encoder exe"));
+    horizontalSizer2->Add(m_browseTtsBtn,0,wxGROW | wxALL,5);
+
+    wxStaticText* tts_desc_opt = new wxStaticText( this, wxID_STATIC,
+        wxT("TTS Options"), wxDefaultPosition,
+        wxDefaultSize, 0 );
+    WxStaticBoxSizer3->Add(tts_desc_opt, 0, wxALIGN_LEFT|wxALL, 5);
+
+    m_TtsOpts = new wxTextCtrl(this,wxID_ANY,m_talkCreator->getTTsOpts(wxT("espeak")));
+    m_TtsOpts->SetToolTip(wxT("TTS Options"));
+    m_TtsOpts->SetHelpText(wxT("TTS Options"));
+    WxStaticBoxSizer3->Add(m_TtsOpts, 0, wxALIGN_LEFT|wxALL, 5);
+
+    m_OverwriteWave = new wxCheckBox(this,wxID_ANY,wxT("Overwrite Wav"));
+    m_OverwriteWave->SetToolTip(wxT("Overwrite Wavefiles"));
+    m_OverwriteWave->SetHelpText(wxT("Overwrite Wavefiles"));
+    wxBoxSizer3->Add(m_OverwriteWave,0,wxALIGN_CENTER_HORIZONTAL|wxGROW | wxALL, 5);
+
+    m_OverwriteTalk = new wxCheckBox(this,wxID_ANY,wxT("Overwrite Talk"));
+    m_OverwriteTalk->SetToolTip(wxT("Overwrite Talkfiles"));
+    m_OverwriteTalk->SetHelpText(wxT("Overwrite Talkfiles"));
+    wxBoxSizer3->Add(m_OverwriteTalk,0,wxALIGN_CENTER_HORIZONTAL|wxGROW | wxALL, 5);
+
+    m_RemoveWave = new wxCheckBox(this,wxID_ANY,wxT("Remove Wav"));
+    m_RemoveWave->SetToolTip(wxT("Remove Wavfiles"));
+    m_RemoveWave->SetHelpText(wxT("Remove Wavfiles"));
+    wxBoxSizer3->Add(m_RemoveWave,0,wxALIGN_CENTER_HORIZONTAL|wxGROW | wxALL, 5);
+
+    m_Recursive = new wxCheckBox(this,wxID_ANY,wxT("Recursive"));
+    m_Recursive->SetToolTip(wxT("Recursive"));
+    m_Recursive->SetHelpText(wxT("Recursive"));
+    wxBoxSizer3->Add(m_Recursive,0,wxALIGN_CENTER_HORIZONTAL|wxGROW | wxALL, 5);
+
+    m_StripExtensions = new wxCheckBox(this,wxID_ANY,wxT("Strip Extensions"));
+    m_StripExtensions->SetToolTip(wxT("Strip Extensions"));
+    m_StripExtensions->SetHelpText(wxT("Strip Extensions"));
+    wxBoxSizer3->Add(m_StripExtensions,0,wxALIGN_CENTER_HORIZONTAL|wxGROW | wxALL, 5);
+
+    OkCancelCtrl* okCancel = new OkCancelCtrl(this,wxID_ANY);
+    topSizer->Add(okCancel, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+
+    // controls at the bottom
+    wxBoxSizer* wxBoxSizer7 = new wxBoxSizer(wxVERTICAL);
+    topSizer->Add(wxBoxSizer7, 0, wxGROW | wxALL, 5);
+
+}
+
+//init the local variables
+void talkInstallDlg::Init()
+{
+
+}
+
+// create the window
+bool talkInstallDlg::Create( wxWindow* parent,
+    wxWindowID id, const wxString& caption,
+    const wxPoint& pos, const wxSize& size, long style )
+{
+
+    if (!wxDialog::Create( parent, id, caption, pos, size, style ))
+        return false;
+    CreateControls();
+    GetSizer()->Fit(this);
+    GetSizer()->SetSizeHints(this);
+    Centre();
+    return true;
+}
+
+void talkInstallDlg::OnBrowseEncBtn(wxCommandEvent& event)
+{
+    const wxString& temp = wxFileSelector(
+        wxT("Please select the location of your encoder"), wxT(""),
+        wxT(""),wxT(""),wxT("*.*"),0, this);
+
+    if (!temp.empty())
+    {
+        m_EncExe->SetValue(temp);
+    }
+}
+
+void talkInstallDlg::OnBrowseTtsBtn(wxCommandEvent& event)
+{
+    const wxString& temp = wxFileSelector(
+        wxT("Please select the location of your TTS engine"), wxT(""),
+        wxT(""),wxT(""),wxT("*.*"),0, this);
+
+
+    if (!temp.empty())
+    {
+        m_TtsExe->SetValue(temp);
+    }
+}
+
+// tranver data from the controls
+bool talkInstallDlg::TransferDataFromWindow()
+{
+    gv->curdestdir = m_devicepos->getDevicePos();
+    if(!wxDirExists(gv->curdestdir))
+    {
+        WARN_DIALOG(wxT("The Devicepostion is not valid"),
+            wxT("Select a Deviceposition"));
+        gv->curdestdir = wxT("");
+        return false;
+    }
+    m_talkCreator->setDir(gv->curdestdir);
+
+    gv->pathToEnc = m_EncExe->GetValue();
+    if(!wxFileExists(gv->pathToEnc))
+    {
+        WARN_DIALOG(wxT("The Encoder exe is not valid"),
+            wxT("Select an Encoder"));
+        gv->pathToEnc = wxT("");
+        return false;
+    }
+    m_talkCreator->setEncexe(gv->pathToEnc);
+
+    gv->pathToTts = m_TtsExe->GetValue();
+    if(!wxFileExists(gv->pathToTts))
+    {
+        WARN_DIALOG(wxT("The TTs exe is not valid"),
+            wxT("Select an TTS engine"));
+        gv->pathToTts = wxT("");
+        return false;
+    }
+    m_talkCreator->setTTSexe(gv->pathToTts);
+
+    m_talkCreator->setTTsType(m_Tts->GetValue());
+    m_talkCreator->setEncType(m_Enc->GetValue());
+
+
+    m_talkCreator->setOverwriteTalk(m_OverwriteWave->IsChecked());
+    m_talkCreator->setOverwriteWav(m_OverwriteTalk->IsChecked());
+    m_talkCreator->setRemoveWav(m_RemoveWave->IsChecked());
+    m_talkCreator->setRecursive(m_Recursive->IsChecked());
+    m_talkCreator->setStripExtensions(m_StripExtensions->IsChecked());
+
+    m_talkCreator->setEncOpts(m_EncOpts->GetValue());
+    m_talkCreator->setTTsOpts(m_TtsOpts->GetValue());
+
+    return true;
+}
+
+// tranver data to the controls
+bool talkInstallDlg::TransferDataToWindow()
+{
+   m_devicepos->setDefault();
+
+   m_OverwriteWave->SetValue(true);
+   m_OverwriteTalk->SetValue(true);
+   m_RemoveWave->SetValue(true);
+   m_Recursive->SetValue(true);
+   m_StripExtensions->SetValue(false);
+
+
+
+   return true;
+}
 
 ////////////////////////////////////////////////
 //// Font Installation

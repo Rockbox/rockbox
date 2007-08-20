@@ -38,6 +38,8 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
     {
 #ifdef HAVE_REMOTE_LCD
         case SCREEN_REMOTE:
+            screen->is_color=false;/* No color remotes yet */
+            screen->pixel_format=LCD_REMOTE_PIXELFORMAT;
             screen->depth=LCD_REMOTE_DEPTH;
             screen->has_disk_led=false;
 
@@ -112,6 +114,14 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
 
         case SCREEN_MAIN:
         default:
+#if defined(HAVE_LCD_COLOR)
+            screen->is_color=true;
+#else
+            screen->is_color=false;
+#endif
+#ifdef HAVE_LCD_BITMAP
+            screen->pixel_format=LCD_PIXELFORMAT;
+#endif
             screen->depth=LCD_DEPTH;
 #if (CONFIG_LED == LED_VIRTUAL)
             screen->has_disk_led=false;
@@ -168,6 +178,7 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->putc=&lcd_putc;
             screen->get_locked_pattern=&lcd_get_locked_pattern;
             screen->define_pattern=&lcd_define_pattern;
+            screen->unlock_pattern=&lcd_unlock_pattern;
             screen->icon=&lcd_icon;
 #endif /* HAVE_LCD_CHARCELLS */
 

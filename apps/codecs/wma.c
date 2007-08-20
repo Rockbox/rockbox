@@ -27,9 +27,9 @@ CODEC_HEADER
    BLOCK_MAX_SIZE is 2048 (samples) and MAX_CHANNELS is 2.
  */
 
-static uint16_t decoded[BLOCK_MAX_SIZE * MAX_CHANNELS];
+static uint32_t decoded[BLOCK_MAX_SIZE * MAX_CHANNELS];
 
-/* NOTE: WMADecodeContext is 142688 bytes (on x86) */
+/* NOTE: WMADecodeContext is 120152 bytes (on x86) */
 static WMADecodeContext wmadec;
 
 enum asf_error_e {
@@ -211,7 +211,8 @@ static int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlen
            relatively small packets less than about 8KB), but I don't
            know what is expected.
         */
-        DEBUGF("Could not read packet (%d bytes), aborting\n",(int)length);
+        DEBUGF("Could not read packet (requested %d bytes, received %d), curpos=%d, aborting\n",
+               (int)length,(int)bufsize,(int)ci->curpos);
         return -1;
     }
 
@@ -318,7 +319,7 @@ enum codec_status codec_main(void)
     ci->configure(CODEC_SET_FILEBUF_WATERMARK, 1024*512);
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*128);
 
-    ci->configure(DSP_SET_SAMPLE_DEPTH, 15);
+    ci->configure(DSP_SET_SAMPLE_DEPTH, 30);
 
     next_track:
 

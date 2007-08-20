@@ -18,10 +18,11 @@
  ****************************************************************************/
 #include "system.h"
 
-unsigned int ipod_hw_rev;
 #ifndef BOOTLOADER
 extern void TIMER1(void);
 extern void TIMER2(void);
+extern void ipod_3g_button_int(void);
+extern void ipod_2g_adc_int(void);
 
 void irq(void)
 {
@@ -31,7 +32,18 @@ void irq(void)
             TIMER1();
         else if (CPU_INT_STAT & TIMER2_MASK)
             TIMER2();
-    } else {
+        else if (CPU_INT_STAT & GPIO_MASK)
+        {
+            if (GPIOA_INT_STAT)
+                ipod_3g_button_int();
+#ifdef IPOD_1G2G
+            if (GPIOB_INT_STAT & 0x04)
+                ipod_2g_adc_int();
+#endif
+        }
+    } 
+    else
+    {
         if (COP_INT_STAT & TIMER1_MASK)
             TIMER1();
         else if (COP_INT_STAT & TIMER2_MASK)
@@ -79,66 +91,51 @@ static void ipod_init_cache(void)
     outl(0x3, 0xcf004024);
 }
     
-#endif
-
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 void set_cpu_frequency(long frequency)
+#else
+static void pp_set_cpu_frequency(long frequency)
+#endif
 {
-    unsigned long postmult;
+    cpu_frequency = frequency;
 
-    if (CURRENT_CORE == CPU)
+    PLL_CONTROL |= 0x6000;     /* make sure some enable bits are set */
+    CLOCK_ENABLE = 0x01;       /* select source #1 */
+
+    switch (frequency)
     {
-        if (frequency == CPUFREQ_NORMAL)
-            postmult = CPUFREQ_NORMAL_MULT;
-        else if (frequency == CPUFREQ_MAX)
-            postmult = CPUFREQ_MAX_MULT;
-        else
-            postmult = CPUFREQ_DEFAULT_MULT;
-        cpu_frequency = frequency;
+      case CPUFREQ_MAX:
+        PLL_UNLOCK   = 0xd19b; /* unlock frequencies > 66MHz */
+        CLOCK_SOURCE = 0xa9;   /* source #1: 24 Mhz, source #2..#4: PLL */
+        PLL_CONTROL  = 0xe000; /* PLL enabled */
+        PLL_DIV      = 3;      /* 10/3 * 24MHz */
+        PLL_MULT     = 10;
+        udelay(200);           /* wait for relock */
+        break;
 
-        outl(0xd19b, 0xcf005038);
-        outl(0x02, 0xcf005008);
-        outl(0x55, 0xcf00500c);
-        outl(0x6000, 0xcf005010);
+      case CPUFREQ_NORMAL:
+        CLOCK_SOURCE = 0xa9;   /* source #1: 24 Mhz, source #2..#4: PLL */
+        PLL_CONTROL  = 0xe000; /* PLL enabled */
+        PLL_DIV      = 4;      /* 5/4 * 24MHz */
+        PLL_MULT     = 5;
+        udelay(200);           /* wait for relock */
+        break;
+        
+      case CPUFREQ_SLEEP:
+        CLOCK_SOURCE = 0x51;   /* source #2: 32kHz, #1, #2, #4: 24MHz */
+        PLL_CONTROL  = 0x6000; /* PLL disabled */
+        udelay(10000);         /* let 32kHz source stabilize? */
+        break;
 
-        /* Clock frequency = (24/4)*postmult */
-        outl(4, 0xcf005018);
-        outl(postmult, 0xcf00501c);
-
-        outl(0xe000, 0xcf005010);
-
-        /* Wait for PLL relock? */
-        udelay(2000);
-
-        /* Select PLL as clock source? */
-        outl(0xa8, 0xcf00500c);
+      default:
+        CLOCK_SOURCE = 0x55;   /* source #1..#4: 24 Mhz */
+        PLL_CONTROL  = 0x6000; /* PLL disabled */
+        cpu_frequency = CPUFREQ_DEFAULT;
+        break;
     }
+    CLOCK_ENABLE = 0x02;       /* select source #2 */
 }
-#elif !defined(BOOTLOADER)
-static void ipod_set_cpu_speed(void)
-{
-    outl(0x02, 0xcf005008);
-    outl(0x55, 0xcf00500c);
-    outl(0x6000, 0xcf005010);
-#if 1
-    // 75  MHz (24/24 * 75) (default)
-    outl(24, 0xcf005018);
-    outl(75, 0xcf00501c);
-#endif
-
-#if 0
-    // 66 MHz (24/3 * 8)
-    outl(3, 0xcf005018);
-    outl(8, 0xcf00501c);
-#endif
-
-    outl(0xe000, 0xcf005010);
-
-    udelay(2000);
-
-    outl(0xa8, 0xcf00500c);
-}
-#endif
+#endif /* !BOOTLOADER */
 
 void system_init(void)
 {
@@ -149,12 +146,22 @@ void system_init(void)
         MMAP3_LOGICAL  = 0x20000000 | 0x3a00;
         MMAP3_PHYSICAL = 0x00000000 | 0x3f84;
 
-        ipod_hw_rev = (*((volatile unsigned long*)(0x01fffffc)));
-        outl(-1, 0xcf00101c);
-        outl(-1, 0xcf001028);
-        outl(-1, 0xcf001038);
+#if defined(IPOD_1G2G) || defined(IPOD_3G)
+        DEV_EN = 0x0b9f; /* don't clock unused PP5002 hardware components */
+        outl(0x0035, 0xcf005004);  /* DEV_EN2 ? */
+#endif
+
+        INT_FORCED_CLR = -1;
+        CPU_INT_CLR    = -1;
+        COP_INT_CLR    = -1;
+
+        GPIOA_INT_EN   = 0;
+        GPIOB_INT_EN   = 0;
+        GPIOC_INT_EN   = 0;
+        GPIOD_INT_EN   = 0;
+
 #ifndef HAVE_ADJUSTABLE_CPU_FREQ
-        ipod_set_cpu_speed();
+        pp_set_cpu_frequency(CPUFREQ_MAX);
 #endif
     }
     ipod_init_cache();
@@ -163,7 +170,7 @@ void system_init(void)
 
 void system_reboot(void)
 {
-    outl(inl(0xcf005030) | 0x4, 0xcf005030);
+    DEV_RS |= 4;
 }
 
 int system_memory_guard(int newmode)
@@ -171,5 +178,3 @@ int system_memory_guard(int newmode)
     (void)newmode;
     return 0;
 }
-
-

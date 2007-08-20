@@ -22,7 +22,7 @@
 
 #include "plugin.h"
 
-#define GAME_FILE         PLUGIN_DIR "/sudoku.ss"
+#define GAME_FILE         PLUGIN_GAMES_DIR "/sudoku.ss"
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
@@ -71,7 +71,8 @@
 #define SUDOKU_BUTTON_POSSIBLE BUTTON_REC
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD)
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define SUDOKU_BUTTON_MENU       BUTTON_MENU
 #define SUDOKU_BUTTON_LEFT       BUTTON_SCROLL_BACK
 #define SUDOKU_BUTTON_RIGHT      BUTTON_SCROLL_FWD

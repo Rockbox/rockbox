@@ -105,7 +105,8 @@ PLUGIN_HEADER
 
 #define STAR_RC_QUIT BUTTON_RC_STOP
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD)
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 
 #define STAR_QUIT           (BUTTON_SELECT | BUTTON_MENU)
 #define STAR_UP             BUTTON_MENU
@@ -920,7 +921,8 @@ static int star_menu(void)
                                   "[ON + LEFT] Prev. level\n"
                                   "[ON + NAVI] Reset level\n"
                                   "[ON + RIGHT] Next level", true);
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
                 star_display_text("KEYS\n\n"
                                   "[SELECT] Toggle Ctl\n"
                                   "[S + MENU] Exit\n"

@@ -22,7 +22,7 @@
 
 #include "plugin.h"
 
-#define GAME_FILE         PLUGIN_DIR "/reversi.rev"
+#define GAME_FILE         PLUGIN_GAMES_DIR "/reversi.rev"
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
@@ -57,7 +57,8 @@
 #define REVERSI_BUTTON_MENU BUTTON_MODE
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD)
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define REVERSI_BUTTON_UP BUTTON_MENU
 #define REVERSI_BUTTON_DOWN BUTTON_PLAY
 #define REVERSI_BUTTON_LEFT BUTTON_LEFT

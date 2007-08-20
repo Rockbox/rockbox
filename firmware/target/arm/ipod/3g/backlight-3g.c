@@ -17,18 +17,7 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include <stdlib.h>
-#include "cpu.h"
-#include "kernel.h"
-#include "thread.h"
-#include "i2c.h"
-#include "debug.h"
-#include "rtc.h"
-#include "usb.h"
-#include "power.h"
 #include "system.h"
-#include "button.h"
-#include "timer.h"
 #include "backlight.h"
 
 inline void __backlight_on(void)

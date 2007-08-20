@@ -29,8 +29,9 @@
 #include "debug.h"
 #include "splash.h"
 
-static bool ignore_until_release = false;
-static int last_button = BUTTON_NONE;
+static int last_button = BUTTON_NONE|BUTTON_REL; /* allow the ipod wheel to 
+                                                    work on startup */
+static intptr_t last_data = 0;
 static int last_action = ACTION_NONE;
 static bool repeated = false;
 
@@ -104,6 +105,7 @@ static int get_action_worker(int context, int timeout,
     int button;
     int i=0;
     int ret = ACTION_UNKNOWN;
+    static int last_context = CONTEXT_STD;
     
     if (timeout == TIMEOUT_NOBLOCK)
         button = button_get(false);
@@ -112,19 +114,24 @@ static int get_action_worker(int context, int timeout,
     else
         button = button_get_w_tmo(timeout);
 
+    /* Data from sys events can be pulled with button_get_data */
     if (button == BUTTON_NONE || button&SYS_EVENT)
     {
         return button;
     }
     
-    if (ignore_until_release == true)
+    if ((context != last_context) && ((last_button&BUTTON_REL) == 0))
     {
         if (button&BUTTON_REL)
         {
-            ignore_until_release = false;
+            last_button = button;
+            last_action = ACTION_NONE;
         }
+        /* eat all buttons until the previous button was |BUTTON_REL
+           (also eat the |BUTTON_REL button) */
         return ACTION_NONE; /* "safest" return value */
     }
+    last_context = context;
     
 #ifndef HAS_BUTTON_HOLD
     screen_has_lock = ((context&ALLOW_SOFTLOCK)==ALLOW_SOFTLOCK);
@@ -134,7 +141,7 @@ static int get_action_worker(int context, int timeout,
         {
             last_button = BUTTON_NONE;
             keys_locked = false;
-            gui_syncsplash(HZ/2, str(LANG_KEYLOCK_OFF_PLAYER));
+            gui_syncsplash(HZ/2, str(LANG_KEYLOCK_OFF));
             return ACTION_REDRAW;
         } 
         else 
@@ -143,7 +150,7 @@ static int get_action_worker(int context, int timeout,
 #endif
         {
             if ((button&BUTTON_REL))
-                gui_syncsplash(HZ/2, str(LANG_KEYLOCK_ON_PLAYER));
+                gui_syncsplash(HZ/2, str(LANG_KEYLOCK_ON));
             return ACTION_REDRAW;
         }
     }
@@ -182,8 +189,7 @@ static int get_action_worker(int context, int timeout,
     {       
         unlock_combo = button;
         keys_locked = true;
-        action_signalscreenchange();
-        gui_syncsplash(HZ/2, str(LANG_KEYLOCK_ON_PLAYER));
+        gui_syncsplash(HZ/2, str(LANG_KEYLOCK_ON));
         
         button_clear_queue();
         return ACTION_REDRAW;
@@ -197,6 +203,7 @@ static int get_action_worker(int context, int timeout,
 
     last_button = button;
     last_action = ret;
+    last_data   = button_get_data();
     last_action_tick = current_tick;
     return ret;
 }
@@ -214,28 +221,22 @@ int get_custom_action(int context,int timeout,
 
 bool action_userabort(int timeout)
 {
-    action_signalscreenchange();
     int action = get_action_worker(CONTEXT_STD,timeout,NULL);
     bool ret = (action == ACTION_STD_CANCEL);
-    action_signalscreenchange();
     return ret;
 }
 
-void action_signalscreenchange(void)
-{
-    if ((last_button != BUTTON_NONE) && 
-         !(last_button&BUTTON_REL))
-    {
-        ignore_until_release = true;
-    }
-    last_button = BUTTON_NONE;
-}
 #ifndef HAS_BUTTON_HOLD
 bool is_keys_locked(void)
 {
     return (screen_has_lock && (keys_locked == true));
 }
 #endif
+
+intptr_t get_action_data(void)
+{
+    return last_data;
+}
 
 int get_action_statuscode(int *button)
 {
@@ -247,7 +248,5 @@ int get_action_statuscode(int *button)
         ret |= ACTION_REMOTE;
     if (repeated)
         ret |= ACTION_REPEAT;
-    if (ignore_until_release)
-        ret |= ACTION_IGNORING;
     return ret;
 }

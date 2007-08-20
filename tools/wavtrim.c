@@ -75,6 +75,8 @@ int main (int argc, char** argv)
     int bps; /* byte per sample */
     int sps; /* samples per second */
     int datapos; /* where the payload starts */
+    int datalen; /* Length of the data chunk */
+    unsigned char *databuf; /* Pointer to the data chunk payload */
     int skip_head, skip_tail, pad_head, pad_tail;
     int i;
     int max_silence = 0;
@@ -123,6 +125,7 @@ int main (int argc, char** argv)
 
     bps = Read16(pBuf + 32);
     datapos = 28 + Read16(pBuf + 16);
+    databuf = &pBuf[datapos];
 
     if (Read32(pBuf) != 0x46464952 /* "RIFF" */
      || Read32(pBuf+8) != 0x45564157 /* "WAVE" */
@@ -133,6 +136,8 @@ int main (int argc, char** argv)
         free(pBuf);
         return -1;
     }
+
+    datalen = Read32(pBuf+datapos-4);
     
     sps = Read32(pBuf + 24);
     pad_head = sps * 10 / 1000; /* 10 ms */
@@ -144,54 +149,54 @@ int main (int argc, char** argv)
         max_silence >>= 8;
 
         /* clip the start */
-        for (i=datapos; i<lFileSize; i++)
+        for (i=0; i<datalen; i++)
         {
-            sample8 = pBuf[i] - 0x80;
+            sample8 = databuf[i] - 0x80;
             if (abs(sample8) > max_silence)
                 break;
         }
-        skip_head = i - datapos;
+        skip_head = i;
         skip_head = (skip_head > pad_head) ? skip_head - pad_head : 0;
         
         /* clip the end */
-        for (i=lFileSize-1; i>datapos+skip_head; i--)
+        for (i=datalen-1; i>skip_head; i--)
         {
-            sample8 = pBuf[i] - 0x80;
+            sample8 = databuf[i] - 0x80;
             if (abs(sample8) > max_silence)
                 break;
         }
-        skip_tail = lFileSize - 1 - i;
+        skip_tail = datalen - 1 - i;
         skip_tail = (skip_tail > pad_tail) ? skip_tail - pad_tail : 0;
     }
     else if (bps == 2) /* 16 bit samples */
     {
 
         /* clip the start */
-        for (i=datapos; i<lFileSize; i+=2)
+        for (i=0; i<datalen; i+=2)
         {
-            sample16 = *(short *)(pBuf + i);
+            sample16 = *(short *)(databuf + i);
             if (abs(sample16) > max_silence)
                 break;
         }
-        skip_head = i - datapos;
+        skip_head = i;
         skip_head = (skip_head > 2 * pad_head) ?
                      skip_head - 2 * pad_head : 0;
 
         /* clip the end */
-        for (i=lFileSize-2; i>datapos+skip_head; i-=2)
+        for (i=datalen-2; i>skip_head; i-=2)
         {
-            sample16 = *(short *)(pBuf + i);
+            sample16 = *(short *)(databuf + i);
             if (abs(sample16) > max_silence)
                 break;
         }
-        skip_tail = lFileSize - 2 - i;
+        skip_tail = datalen - 2 - i;
         skip_tail = (skip_tail > 2 * pad_tail) ?
                      skip_tail - 2 * pad_tail : 0;
     }
 
     /* update the size in the headers */
     Write32(pBuf+4, Read32(pBuf+4) - skip_head - skip_tail);
-    Write32(pBuf+datapos-4, Read32(pBuf+datapos-4) - skip_head - skip_tail);
+    Write32(pBuf+datapos-4, datalen - skip_head - skip_tail);
 
     pFile = fopen(argv[1], "wb");
     if (pFile == NULL)
@@ -202,7 +207,7 @@ int main (int argc, char** argv)
 
     /* write the new file */
     fwrite(pBuf, 1, datapos, pFile); /* write header */
-    fwrite(pBuf + datapos + skip_head, 1, lFileSize - datapos - skip_head - skip_tail, pFile);
+    fwrite(pBuf + datapos + skip_head, 1, datalen - skip_head - skip_tail, pFile);
     fclose(pFile);
 
     free(pBuf);

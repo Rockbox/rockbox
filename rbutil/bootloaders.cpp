@@ -19,11 +19,7 @@
  ****************************************************************************/
 
 #include "bootloaders.h"
-#include "irivertools.h"
-#include "md5sum.h"
 
-#include "rbutil.h"
-#include "installlog.h"
 
 
 int verbose =0;

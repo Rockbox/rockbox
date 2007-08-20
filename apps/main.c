@@ -151,7 +151,7 @@ static int init_dircache(bool preinit)
             {
                 /* This will be in default language, settings are not
                    applied yet. Not really any easy way to fix that. */
-                gui_syncsplash(0, str(LANG_DIRCACHE_BUILDING));
+                gui_syncsplash(0, str(LANG_SCANNING_DISK));
                 clear = true;
             }
             
@@ -169,7 +169,7 @@ static int init_dircache(bool preinit)
         {
             if (global_status.dircache_size <= 0)
             {
-                gui_syncsplash(0, str(LANG_DIRCACHE_BUILDING));
+                gui_syncsplash(0, str(LANG_SCANNING_DISK));
                 clear = true;
             }
             result = dircache_build(global_status.dircache_size);
@@ -217,6 +217,17 @@ static void init_tagcache(void)
 
         if (ret > 0)
         {
+            static long talked_tick = 0;
+            if(talk_menus_enabled()
+               && (talked_tick == 0
+                   || TIME_AFTER(current_tick, talked_tick+7*HZ)))
+            {
+                talked_tick = current_tick;
+                talk_id(LANG_TAGCACHE_INIT, false);
+                talk_number(ret, true);
+                talk_id(VOICE_OF, true);
+                talk_number(tagcache_get_max_commit_step(), true);
+            }
 #ifdef HAVE_LCD_BITMAP
             gui_syncsplash(0, "%s [%d/%d]",
                 str(LANG_TAGCACHE_INIT), ret, 
@@ -544,7 +555,7 @@ static void init(void)
 #ifdef AUTOROCK
     {
         int fd;
-        static const char filename[] = PLUGIN_DIR "/autostart.rock"; 
+        static const char filename[] = PLUGIN_APPS_DIR "/autostart.rock"; 
 
         fd = open(filename, O_RDONLY);
         if(fd >= 0) /* no complaint if it doesn't exist */

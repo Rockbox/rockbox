@@ -27,7 +27,6 @@
 #include <errno.h>
 #include <string.h>
 #include <stdbool.h>
-#include "dir.h"
 #include "debug.h"
 #include "atoi.h"
 #include "system.h"
@@ -44,7 +43,7 @@
 #define DIRCACHE_STOP  2
 
 #define MAX_OPEN_DIRS 8
-DIRCACHED opendirs[MAX_OPEN_DIRS];
+DIR_CACHED opendirs[MAX_OPEN_DIRS];
 
 static struct dircache_entry *fd_bindings[MAX_OPEN_FILES];
 static struct dircache_entry *dircache_root;
@@ -165,7 +164,7 @@ static bool check_event_queue(void)
 static int dircache_scan(struct travel_data *td)
 {
 #ifdef SIMULATOR
-    while ( ( td->entry = readdir(td->dir) ) )
+    while ( ( td->entry = readdir_uncached(td->dir) ) )
 #else
     while ( (fat_getnext(td->dir, &td->entry) >= 0) && (td->entry.name[0]))
 #endif
@@ -221,10 +220,10 @@ static int dircache_scan(struct travel_data *td)
             strncpy(&dircache_cur_path[td->pathpos+1], td->entry->d_name, 
                     sizeof(dircache_cur_path) - td->pathpos - 2);
             
-            td->newdir = opendir(dircache_cur_path);
+            td->newdir = opendir_uncached(dircache_cur_path);
             if (td->newdir == NULL)
             {
-                logf("Failed to opendir(): %s", dircache_cur_path);
+                logf("Failed to opendir_uncached(): %s", dircache_cur_path);
                 return -3;
             }
 #else
@@ -269,7 +268,7 @@ static int dircache_scan(struct travel_data *td)
  * Recursively scan the hard disk and build the cache.
  */
 #ifdef SIMULATOR
-static int dircache_travel(DIR *dir, struct dircache_entry *ce)
+static int dircache_travel(DIR_UNCACHED *dir, struct dircache_entry *ce)
 #else
 static int dircache_travel(struct fat_dir *dir, struct dircache_entry *ce)
 #endif
@@ -292,7 +291,7 @@ static int dircache_travel(struct fat_dir *dir, struct dircache_entry *ce)
                 ce->d_name = ".";
                 ce->name_len = 2;
 #ifdef SIMULATOR
-                closedir(dir_recursion[depth].dir);
+                closedir_uncached(dir_recursion[depth].dir);
                 ce->attribute = ATTR_DIRECTORY;
 #else
                 ce->attribute = FAT_ATTR_DIRECTORY;
@@ -519,7 +518,7 @@ int dircache_save(void)
 static int dircache_do_rebuild(void)
 {
 #ifdef SIMULATOR
-    DIR *pdir;
+    DIR_UNCACHED *pdir;
 #else
     struct fat_dir dir, *pdir;
 #endif
@@ -532,7 +531,7 @@ static int dircache_do_rebuild(void)
     dircache_initializing = true;
     
 #ifdef SIMULATOR
-    pdir = opendir("/");
+    pdir = opendir_uncached("/");
     if (pdir == NULL)
     {
         logf("Failed to open rootdir");
@@ -1082,11 +1081,11 @@ void dircache_add_file(const char *path, long startcluster)
     entry->startcluster = startcluster;
 }
 
-DIRCACHED* opendir_cached(const char* name)
+DIR_CACHED* opendir_cached(const char* name)
 {
     struct dircache_entry *cache_entry;
     int dd;
-    DIRCACHED* pdir = opendirs;
+    DIR_CACHED* pdir = opendirs;
 
     if ( name[0] != '/' )
     {
@@ -1108,7 +1107,7 @@ DIRCACHED* opendir_cached(const char* name)
 
     if (!dircache_initialized)
     {
-        pdir->regulardir = opendir(name);
+        pdir->regulardir = opendir_uncached(name);
         if (!pdir->regulardir)
             return NULL;
         
@@ -1130,9 +1129,9 @@ DIRCACHED* opendir_cached(const char* name)
     return pdir;
 }
 
-struct dircache_entry* readdir_cached(DIRCACHED* dir)
+struct dircache_entry* readdir_cached(DIR_CACHED* dir)
 {
-    struct dirent *regentry;
+    struct dirent_uncached *regentry;
     struct dircache_entry *ce;
     
     if (!dir->busy)
@@ -1140,7 +1139,7 @@ struct dircache_entry* readdir_cached(DIRCACHED* dir)
 
     if (dir->regulardir != NULL)
     {
-        regentry = readdir(dir->regulardir);
+        regentry = readdir_uncached(dir->regulardir);
         if (regentry == NULL)
             return NULL;
 
@@ -1181,15 +1180,30 @@ struct dircache_entry* readdir_cached(DIRCACHED* dir)
     return &dir->secondary_entry;
 }
 
-int closedir_cached(DIRCACHED* dir)
+int closedir_cached(DIR_CACHED* dir)
 {
     if (!dir->busy)
         return -1;
         
     dir->busy=false;
     if (dir->regulardir != NULL)
-        return closedir(dir->regulardir);
+        return closedir_uncached(dir->regulardir);
     
     return 0;
 }
 
+int mkdir_cached(const char *name)
+{
+    int rc=mkdir_uncached(name);
+    if (rc >= 0)
+        dircache_mkdir(name);
+    return(rc);
+}
+
+int rmdir_cached(const char* name)
+{
+    int rc=rmdir_uncached(name);
+    if(rc>=0)
+        dircache_rmdir(name);
+    return(rc);
+}

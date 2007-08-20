@@ -10,5 +10,6 @@ lcd-remote-bitmap.c
 #endif
 lcd-sdl.c
 sound.c
+timer.c
 thread-sdl.c
 uisdl.c
