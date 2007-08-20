@@ -122,7 +122,7 @@ the person(s) named next to "General".
 :Italian: Alessio Lenzi
 :Dutch: Peter D'Hoye
 :Swedish: Magnus Holmgren
-:[Language 2]:
+:Danish: Jonas Häggqvist
 
 
 Plugins
@@ -288,6 +288,7 @@ Build Tools
 :scramble: Linus Nielsen Feltzing
 :descramble: Linus Nielsen Feltzing
 :mkinfo: Daniel Stenberg
+:voice shell scripts: Jonas Häggqvist
 
 Install Tools
 -------------

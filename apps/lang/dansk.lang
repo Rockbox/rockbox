@@ -2174,19 +2174,17 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_CURRENT_DIR
-  desc: in recording directory options
+  desc: DEPRECATED
   user:
   <source>
     *: none
-    recording: "Current Directory"
+    recording: ""
   </source>
   <dest>
-    *: none
-    recording: "Nuværende mappe"
+    *: ""
   </dest>
   <voice>
-    *: none
-    recording: "Nuværende mappe"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2947,19 +2945,16 @@
 </phrase>
 <phrase>
   id: LANG_PM_UNITS_PER_READ
-  desc: in the peak meter menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Units Per Read"
-    masd: none
+    *: ""
   </source>
   <dest>
-    *: "Enheder per læsning"
-    masd: none
+    *: ""
   </dest>
   <voice>
-    *: "Enheder per læsning"
-    masd: none
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3975,15 +3970,24 @@
   user:
   <source>
     *: none
-    recording: "The disk is full. Press STOP to continue."
+    recording: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
+    m5,x5: "The disk is full. Press POWER to continue."
+    e200: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
     recording: "Disken er fuld. Tryk SLUK for at fortsætte."
+    h100,h120,h300: "Disken er fuld. Tryk STOP for at fortsætte."
+    m5,x5: "Disken er fuld. Tryk TÆND/SLUK for at fortsætte."
+    e200: "Disken er fuld. Tryk SLUK for at fortsætte."
   </dest>
   <voice>
     *: none
     recording: ""
+    h100,h120,h300: ""
+    m5,x5: ""
+    e200: ""
   </voice>
 </phrase>
 <phrase>
@@ -5901,7 +5905,7 @@
 </phrase>
 <phrase>
   id: VOICE_EXT_TXT
-  desc: spoken only, for file extension
+  desc: DEPRECATED
   user:
   <source>
     *: ""
@@ -5910,7 +5914,7 @@
     *: ""
   </dest>
   <voice>
-    *: "tekst"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7022,7 +7026,7 @@
   desc: Backlight behaviour setting
   user:
   <source>
-    *: "First Keypress Enables Backlight Only"
+    *: "First Buttonpress Enables Backlight Only"
   </source>
   <dest>
     *: "Første tastetryk tænder kun skærm"
@@ -8704,15 +8708,21 @@
   user:
   <source>
     *: none
-    recording: "The disk is full. Press STOP to continue."
+    recording: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "The disk is full. Press LEFT to continue."
   </source>
   <dest>
     *: none
-    recording: "Disken er fuld. Tryk STOP for at fortsætte."
+    recording: "Disken er fuld. Tryk SLUK for at fortsætte."
+    h100,h120,h300: "Disken er fuld. Tryk STOP for at fortsætte."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "Disken er fuld. Tryk VENSTRE for at fortsætte."
   </dest>
   <voice>
     *: none
     recording: ""
+    h100,h120,h300: ""
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: ""
   </voice>
 </phrase>
 <phrase>
@@ -9120,7 +9130,7 @@
   user:
   <source>
     *: none
-    hold_button: "Backlight (On Hold Key)"
+    hold_button: "Backlight on Hold"
   </source>
   <dest>
     *: none
@@ -9289,7 +9299,7 @@
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PLAY/PAUSE to return)"
-    x5,m5: "Building database... %d found (Left to return)"
+    x5,m5: "Building database... %d found (LEFT to return)"
     h10,h10_5gb,e200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
@@ -10180,7 +10190,7 @@
     *: "[Discnum]"
   </source>
   <dest>
-    *: "[Discnum]"
+    *: "[Disc nummer]"
   </dest>
   <voice>
     *: ""
@@ -10696,16 +10706,13 @@
   desc: displayed when key lock is turned off
   user:
   <source>
-    *: "Keylock is OFF"
-    player: "Key Lock OFF"
+    *: "Buttons Unlocked"
   </source>
   <dest>
     *: "Knaplås fra"
-    player: "Knaplås fra"
   </dest>
   <voice>
     *: ""
-    player: ""
   </voice>
 </phrase>
 <phrase>
@@ -10958,16 +10965,13 @@
   desc: displayed when key lock is on
   user:
   <source>
-    *: "Keylock is ON"
-    player: "Key Lock ON"
+    *: "Buttons Locked"
   </source>
   <dest>
     *: "Knaplås til"
-    player: "Knaplås til"
   </dest>
   <voice>
     *: ""
-    player: ""
   </voice>
 </phrase>
 <phrase>
@@ -11038,5 +11042,19 @@
   </dest>
   <voice>
     *: "Kun når alle typer vises"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PM_UNITS_PER_TICK
+  desc: spoken only, peak meter release unit
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "enheder per tidsenhed"
   </voice>
 </phrase>
