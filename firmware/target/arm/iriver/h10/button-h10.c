@@ -98,7 +98,7 @@ int button_read_device(void)
         if ( GPIOD_INPUT_VAL & 0x20 )
         {
             GPIOD_OUTPUT_VAL &=~ 0x40;
-            udelay(50);
+            udelay(250);
             data = adc_scan(ADC_SCROLLPAD);
             GPIOD_OUTPUT_VAL |= 0x40;
             

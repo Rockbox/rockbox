@@ -42,7 +42,12 @@ unsigned short adc_scan(int channel)
     /* Start? */
     ADC_ADDR |= 0x20000000;
     ADC_ADDR |= 0x80000000;
-    
+
+#if 0
+    /* wait for ADC ready. THIS IS NOT WORKING (locks up) */
+    while(ADC_STATUS & (0x40 << (channel*8))); /* add loop protection here */
+#endif
+
     /* ADC_DATA_1 and ADC_DATA_2 are both four bytes, one byte per channel.
        For each channel, ADC_DATA_1 stores the 8-bit msb, ADC_DATA_2 stores the
        2-bit lsb (in bits 0 and 1). Each channel is 10 bits total. */
