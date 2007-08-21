@@ -1204,13 +1204,11 @@ bool dbg_ports(void)
 
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
         line++;
-        snprintf(buf, sizeof(buf), "ADC_BATTERY:   %02x", adc_read(ADC_BATTERY));
+        snprintf(buf, sizeof(buf), "BATT: %02x UNK1: %02x", adc_read(ADC_BATTERY),
+                                                            adc_read(ADC_UNKNOWN_1));
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "ADC_UNKNOWN_1: %02x", adc_read(ADC_UNKNOWN_1));
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "ADC_REMOTE:    %02x", adc_read(ADC_REMOTE));
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "ADC_SCROLLPAD: %02x", adc_read(ADC_SCROLLPAD));
+        snprintf(buf, sizeof(buf), "REM:  %02x PAD: %02x", adc_read(ADC_REMOTE),
+                                                           adc_read(ADC_SCROLLPAD));
         lcd_puts(0, line++, buf);
 #elif defined(SANSA_E200)
         line++;
