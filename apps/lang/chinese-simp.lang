@@ -10,7 +10,7 @@
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
-  user:
+  user: 
   <source>
     *: "Yes"
   </source>
@@ -24,7 +24,7 @@
 <phrase>
   id: LANG_SET_BOOL_NO
   desc: bool false representation
-  user:
+  user: 
   <source>
     *: "No"
   </source>
@@ -38,7 +38,7 @@
 <phrase>
   id: LANG_ON
   desc: Used in a lot of places
-  user:
+  user: 
   <source>
     *: "On"
   </source>
@@ -52,7 +52,7 @@
 <phrase>
   id: LANG_OFF
   desc: Used in a lot of places
-  user:
+  user: 
   <source>
     *: "Off"
   </source>
@@ -66,7 +66,7 @@
 <phrase>
   id: LANG_ALWAYS
   desc: used in various places
-  user:
+  user: 
   <source>
     *: "Always"
   </source>
@@ -80,7 +80,7 @@
 <phrase>
   id: LANG_WAIT
   desc: general please wait splash
-  user:
+  user: 
   <source>
     *: "Loading..."
   </source>
@@ -94,7 +94,7 @@
 <phrase>
   id: LANG_CONFIRM_SHUTDOWN
   desc: in shutdown screen
-  user:
+  user: 
   <source>
     *: none
     soft_shutdown: "Press OFF to shut down"
@@ -111,7 +111,7 @@
 <phrase>
   id: LANG_SHUTTINGDOWN
   desc: in main menu
-  user:
+  user: 
   <source>
     *: "Shutting down..."
   </source>
@@ -125,7 +125,7 @@
 <phrase>
   id: LANG_RESTARTING_PLAYBACK
   desc: splash screen displayed when pcm buffer size is changed
-  user:
+  user: 
   <source>
     *: none
     swcodec: "Restarting playback..."
@@ -142,7 +142,7 @@
 <phrase>
   id: LANG_REMOVE_MMC
   desc: before acknowledging usb in case an MMC is inserted (Ondio)
-  user:
+  user: 
   <source>
     *: none
     ondio*: "Please remove inserted MMC"
@@ -159,7 +159,7 @@
 <phrase>
   id: LANG_FAILED
   desc: Something failed. To be appended after actions
-  user:
+  user: 
   <source>
     *: "Failed"
   </source>
@@ -173,7 +173,7 @@
 <phrase>
   id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
   desc: in the main menu
-  user:
+  user: 
   <source>
     *: "Recent Bookmarks"
   </source>
@@ -187,7 +187,7 @@
 <phrase>
   id: LANG_SOUND_SETTINGS
   desc: in the main menu
-  user:
+  user: 
   <source>
     *: "Sound Settings"
   </source>
@@ -201,7 +201,7 @@
 <phrase>
   id: LANG_GENERAL_SETTINGS
   desc: in the main menu
-  user:
+  user: 
   <source>
     *: "General Settings"
   </source>
@@ -215,7 +215,7 @@
 <phrase>
   id: LANG_MANAGE_MENU
   desc: in the main menu
-  user:
+  user: 
   <source>
     *: "Manage Settings"
   </source>
@@ -229,7 +229,7 @@
 <phrase>
   id: LANG_CUSTOM_THEME
   desc: in the main menu
-  user:
+  user: 
   <source>
     *: "Browse Themes"
   </source>
@@ -243,7 +243,7 @@
 <phrase>
   id: LANG_FM_RADIO
   desc: in the main menu
-  user:
+  user: 
   <source>
     *: none
     radio: "FM Radio"
@@ -260,7 +260,7 @@
 <phrase>
   id: LANG_RECORDING
   desc: in the main menu
-  user:
+  user: 
   <source>
     *: none
     recording: "Recording"
@@ -277,7 +277,7 @@
 <phrase>
   id: LANG_PLUGINS
   desc: in the main menu
-  user:
+  user: 
   <source>
     *: "Plugins"
   </source>
@@ -291,7 +291,7 @@
 <phrase>
   id: LANG_SHUTDOWN
   desc: in main menu
-  user:
+  user: 
   <source>
     *: none
     soft_shutdown: "Shut down"
@@ -308,7 +308,7 @@
 <phrase>
   id: LANG_VOLUME
   desc: in sound_settings
-  user:
+  user: 
   <source>
     *: "Volume"
   </source>
@@ -322,7 +322,7 @@
 <phrase>
   id: LANG_BASS
   desc: in sound_settings
-  user:
+  user: 
   <source>
     *: "Bass"
   </source>
@@ -336,7 +336,7 @@
 <phrase>
   id: LANG_TREBLE
   desc: in sound_settings
-  user:
+  user: 
   <source>
     *: "Treble"
   </source>
@@ -350,7 +350,7 @@
 <phrase>
   id: LANG_BALANCE
   desc: in sound_settings
-  user:
+  user: 
   <source>
     *: "Balance"
   </source>
@@ -364,7 +364,7 @@
 <phrase>
   id: LANG_CHANNEL_STEREO
   desc: in sound_settings
-  user:
+  user: 
   <source>
     *: "Stereo"
   </source>
@@ -378,7 +378,7 @@
 <phrase>
   id: LANG_CHANNEL_MONO
   desc: in sound_settings
-  user:
+  user: 
   <source>
     *: "Mono"
   </source>
@@ -392,7 +392,7 @@
 <phrase>
   id: LANG_CHANNEL_CUSTOM
   desc: in sound_settings
-  user:
+  user: 
   <source>
     *: "Custom"
   </source>
@@ -406,7 +406,7 @@
 <phrase>
   id: LANG_CHANNEL_LEFT
   desc: in sound_settings
-  user:
+  user: 
   <source>
     *: "Mono Left"
   </source>
@@ -420,7 +420,7 @@
 <phrase>
   id: LANG_CHANNEL_RIGHT
   desc: in sound_settings
-  user:
+  user: 
   <source>
     *: "Mono Right"
   </source>
@@ -434,7 +434,7 @@
 <phrase>
   id: LANG_CHANNEL_KARAOKE
   desc: in sound_settings
-  user:
+  user: 
   <source>
     *: "Karaoke"
   </source>
@@ -448,7 +448,7 @@
 <phrase>
   id: LANG_STEREO_WIDTH
   desc: in sound_settings
-  user:
+  user: 
   <source>
     *: "Stereo Width"
   </source>
@@ -462,7 +462,7 @@
 <phrase>
   id: LANG_LOUDNESS
   desc: in sound_settings
-  user:
+  user: 
   <source>
     *: none
     masf: "Loudness"
@@ -479,7 +479,7 @@
 <phrase>
   id: LANG_AUTOVOL
   desc: in sound_settings
-  user:
+  user: 
   <source>
     *: none
     masf: "Auto Volume"
@@ -496,7 +496,7 @@
 <phrase>
   id: LANG_DECAY
   desc: in sound_settings
-  user:
+  user: 
   <source>
     *: none
     masf: "AV Decay Time"
@@ -513,7 +513,7 @@
 <phrase>
   id: LANG_SUPERBASS
   desc: in sound settings
-  user:
+  user: 
   <source>
     *: none
     masf: "Super Bass"
@@ -530,7 +530,7 @@
 <phrase>
   id: LANG_MDB_ENABLE
   desc: in sound settings
-  user:
+  user: 
   <source>
     *: none
     masf: "MDB Enable"
@@ -547,7 +547,7 @@
 <phrase>
   id: LANG_MDB_STRENGTH
   desc: in sound settings
-  user:
+  user: 
   <source>
     *: none
     masf: "MDB Strength"
@@ -564,7 +564,7 @@
 <phrase>
   id: LANG_MDB_HARMONICS
   desc: in sound settings
-  user:
+  user: 
   <source>
     *: none
     masf: "MDB Harmonics"
@@ -581,7 +581,7 @@
 <phrase>
   id: LANG_MDB_CENTER
   desc: in sound settings
-  user:
+  user: 
   <source>
     *: none
     masf: "MDB Center Frequency"
@@ -598,7 +598,7 @@
 <phrase>
   id: LANG_MDB_SHAPE
   desc: in sound settings
-  user:
+  user: 
   <source>
     *: none
     masf: "MDB Shape"
@@ -615,7 +615,7 @@
 <phrase>
   id: LANG_CROSSFEED
   desc: in sound settings
-  user:
+  user: 
   <source>
     *: none
     swcodec: "Crossfeed"
@@ -632,7 +632,7 @@
 <phrase>
   id: LANG_EQUALIZER
   desc: in the sound settings menu
-  user:
+  user: 
   <source>
     *: none
     swcodec: "Equalizer"
@@ -649,7 +649,7 @@
 <phrase>
   id: LANG_PLAYBACK
   desc: in settings_menu()
-  user:
+  user: 
   <source>
     *: "Playback"
   </source>
@@ -663,7 +663,7 @@
 <phrase>
   id: LANG_FILE
   desc: in settings_menu()
-  user:
+  user: 
   <source>
     *: "File View"
   </source>
@@ -677,7 +677,7 @@
 <phrase>
   id: LANG_DISPLAY
   desc: in settings_menu()
-  user:
+  user: 
   <source>
     *: "Display"
   </source>
@@ -691,7 +691,7 @@
 <phrase>
   id: LANG_SYSTEM
   desc: in the main menu and settings menu
-  user:
+  user: 
   <source>
     *: "System"
   </source>
@@ -705,7 +705,7 @@
 <phrase>
   id: LANG_BOOKMARK_SETTINGS
   desc: in general settings
-  user:
+  user: 
   <source>
     *: "Bookmarking"
   </source>
@@ -719,7 +719,7 @@
 <phrase>
   id: LANG_LANGUAGE
   desc: in settings_menu
-  user:
+  user: 
   <source>
     *: "Language"
   </source>
@@ -733,7 +733,7 @@
 <phrase>
   id: LANG_VOICE
   desc: root of voice menu
-  user:
+  user: 
   <source>
     *: "Voice"
   </source>
@@ -747,7 +747,7 @@
 <phrase>
   id: LANG_CUSTOM_CFG
   desc: in setting_menu()
-  user:
+  user: 
   <source>
     *: "Browse .cfg files"
   </source>
@@ -761,7 +761,7 @@
 <phrase>
   id: LANG_RESET
   desc: in system_settings_menu()
-  user:
+  user: 
   <source>
     *: "Reset Settings"
   </source>
@@ -775,7 +775,7 @@
 <phrase>
   id: LANG_RESET_DONE_CLEAR
   desc: visual confirmation after settings reset
-  user:
+  user: 
   <source>
     *: "Cleared"
   </source>
@@ -789,7 +789,7 @@
 <phrase>
   id: LANG_SAVE_SETTINGS
   desc: in system_settings_menu()
-  user:
+  user: 
   <source>
     *: "Write .cfg file"
   </source>
@@ -803,7 +803,7 @@
 <phrase>
   id: LANG_RECORDING_SETTINGS
   desc: in the main menu
-  user:
+  user: 
   <source>
     *: none
     recording: "Recording Settings"
@@ -820,7 +820,7 @@
 <phrase>
   id: LANG_EQUALIZER_ENABLED
   desc: in the equalizer settings menu
-  user:
+  user: 
   <source>
     *: none
     swcodec: "Enable EQ"
@@ -837,7 +837,7 @@
 <phrase>
   id: LANG_EQUALIZER_GRAPHICAL
   desc: in the equalizer settings menu
-  user:
+  user: 
   <source>
     *: none
     swcodec: "Graphical EQ"
@@ -854,7 +854,7 @@
 <phrase>
   id: LANG_EQUALIZER_PRECUT
   desc: in eq settings
-  user:
+  user: 
   <source>
     *: none
     swcodec: "Precut"
@@ -871,7 +871,7 @@
 <phrase>
   id: LANG_EQUALIZER_GAIN
   desc: in the equalizer settings menu
-  user:
+  user: 
   <source>
     *: none
     swcodec: "Simple EQ Settings"
@@ -888,7 +888,7 @@
 <phrase>
   id: LANG_EQUALIZER_ADVANCED
   desc: in the equalizer settings menu
-  user:
+  user: 
   <source>
     *: none
     swcodec: "Advanced EQ Settings"
@@ -905,7 +905,7 @@
 <phrase>
   id: LANG_EQUALIZER_SAVE
   desc: in the equalizer settings menu
-  user:
+  user: 
   <source>
     *: none
     swcodec: "Save EQ Preset"
@@ -922,7 +922,7 @@
 <phrase>
   id: LANG_EQUALIZER_BROWSE
   desc: in the equalizer settings menu
-  user:
+  user: 
   <source>
     *: none
     swcodec: "Browse EQ Presets"
@@ -939,7 +939,7 @@
 <phrase>
   id: LANG_EQUALIZER_EDIT_MODE
   desc: in the equalizer settings menu
-  user:
+  user: 
   <source>
     *: none
     swcodec: "Edit mode: %s"
@@ -956,7 +956,7 @@
 <phrase>
   id: LANG_EQUALIZER_GAIN_ITEM
   desc: in the equalizer settings menu
-  user:
+  user: 
   <source>
     *: none
     swcodec: "%d Hz Band Gain"
@@ -973,7 +973,7 @@
 <phrase>
   id: LANG_EQUALIZER_BAND_LOW_SHELF
   desc: in the equalizer settings menu
-  user:
+  user: 
   <source>
     *: none
     swcodec: "Low Shelf Filter"
@@ -990,7 +990,7 @@
 <phrase>
   id: LANG_EQUALIZER_BAND_PEAK
   desc: in the equalizer settings menu
-  user:
+  user: 
   <source>
     *: none
     swcodec: "Peak Filter %d"
@@ -1007,7 +1007,7 @@
 <phrase>
   id: LANG_EQUALIZER_BAND_HIGH_SHELF
   desc: in the equalizer settings menu
-  user:
+  user: 
   <source>
     *: none
     swcodec: "High Shelf Filter"
@@ -1024,7 +1024,7 @@
 <phrase>
   id: LANG_EQUALIZER_BAND_CUTOFF
   desc: in the equalizer settings menu
-  user:
+  user: 
   <source>
     *: none
     swcodec: "Cutoff Frequency"
@@ -1041,7 +1041,7 @@
 <phrase>
   id: LANG_EQUALIZER_BAND_CENTER
   desc: in the equalizer settings menu
-  user:
+  user: 
   <source>
     *: none
     swcodec: "Center Frequency"
@@ -1058,7 +1058,7 @@
 <phrase>
   id: LANG_EQUALIZER_BAND_Q
   desc: in the equalizer settings menu
-  user:
+  user: 
   <source>
     *: none
     swcodec: "Q"
@@ -1075,7 +1075,7 @@
 <phrase>
   id: LANG_CREATE_PLAYLIST
   desc: Menu option for creating a playlist
-  user:
+  user: 
   <source>
     *: "Create Playlist"
   </source>
@@ -1089,7 +1089,7 @@
 <phrase>
   id: LANG_VIEW_DYNAMIC_PLAYLIST
   desc: in playlist menu.
-  user:
+  user: 
   <source>
     *: "View Current Playlist"
   </source>
@@ -1103,7 +1103,7 @@
 <phrase>
   id: LANG_SAVE_DYNAMIC_PLAYLIST
   desc: in playlist menu.
-  user:
+  user: 
   <source>
     *: "Save Current Playlist"
   </source>
@@ -1117,7 +1117,7 @@
 <phrase>
   id: LANG_RECURSE_DIRECTORY
   desc: In playlist menu
-  user:
+  user: 
   <source>
     *: "Recursively Insert Directories"
   </source>
@@ -1131,7 +1131,7 @@
 <phrase>
   id: LANG_WARN_ERASEDYNPLAYLIST_MENU
   desc: in playlist options menu, option to warn when erasing dynamic playlist
-  user:
+  user: 
   <source>
     *: "Warn When Erasing Dynamic Playlist"
   </source>
@@ -1145,7 +1145,7 @@
 <phrase>
   id: LANG_VERSION
   desc: in the info menu
-  user:
+  user: 
   <source>
     *: "Version"
   </source>
@@ -1159,7 +1159,7 @@
 <phrase>
   id: LANG_DEBUG
   desc: in the info menu
-  user:
+  user: 
   <source>
     *: "Debug (Keep Out!)"
   </source>
@@ -1173,7 +1173,7 @@
 <phrase>
   id: LANG_SHUFFLE
   desc: in settings_menu
-  user:
+  user: 
   <source>
     *: "Shuffle"
   </source>
@@ -1187,7 +1187,7 @@
 <phrase>
   id: LANG_REPEAT
   desc: in settings_menu
-  user:
+  user: 
   <source>
     *: "Repeat"
   </source>
@@ -1201,7 +1201,7 @@
 <phrase>
   id: LANG_REPEAT_ONE
   desc: repeat one song
-  user:
+  user: 
   <source>
     *: "One"
   </source>
@@ -1215,7 +1215,7 @@
 <phrase>
   id: LANG_REPEAT_AB
   desc: desc: repeat range from point A to B
-  user:
+  user: 
   <source>
     *: "A-B"
   </source>
@@ -1229,7 +1229,7 @@
 <phrase>
   id: LANG_PLAY_SELECTED
   desc: in settings_menu
-  user:
+  user: 
   <source>
     *: "Play Selected First"
   </source>
@@ -1243,7 +1243,7 @@
 <phrase>
   id: LANG_WIND_MENU
   desc: in the playback sub menu
-  user:
+  user: 
   <source>
     *: "Fast-Forward/Rewind"
   </source>
@@ -1257,7 +1257,7 @@
 <phrase>
   id: LANG_MP3BUFFER_MARGIN
   desc: MP3 buffer margin time
-  user:
+  user: 
   <source>
     *: "Anti-Skip Buffer"
     flash_storage: none
@@ -1274,7 +1274,7 @@
 <phrase>
   id: LANG_FADE_ON_STOP
   desc: options menu to set fade on stop or pause
-  user:
+  user: 
   <source>
     *: "Fade on Stop/Pause"
   </source>
@@ -1288,7 +1288,7 @@
 <phrase>
   id: LANG_PARTY_MODE
   desc: party mode
-  user:
+  user: 
   <source>
     *: "Party Mode"
   </source>
@@ -1302,7 +1302,7 @@
 <phrase>
   id: LANG_CROSSFADE
   desc: in playback settings
-  user:
+  user: 
   <source>
     *: none
     swcodec: "Crossfade"
@@ -1319,7 +1319,7 @@
 <phrase>
   id: LANG_REPLAYGAIN
   desc: in replaygain
-  user:
+  user: 
   <source>
     *: "Replaygain"
   </source>
@@ -1333,7 +1333,7 @@
 <phrase>
   id: LANG_BEEP
   desc: in playback settings
-  user:
+  user: 
   <source>
     *: none
     swcodec: "Beep Volume"
@@ -1350,7 +1350,7 @@
 <phrase>
   id: LANG_WEAK
   desc: in beep volume in playback settings
-  user:
+  user: 
   <source>
     *: none
     swcodec: "Weak"
@@ -1367,7 +1367,7 @@
 <phrase>
   id: LANG_MODERATE
   desc: in beep volume in playback settings
-  user:
+  user: 
   <source>
     *: none
     swcodec: "Moderate"
@@ -1384,7 +1384,7 @@
 <phrase>
   id: LANG_STRONG
   desc: in beep volume in playback settings
-  user:
+  user: 
   <source>
     *: none
     swcodec: "Strong"
@@ -1401,7 +1401,7 @@
 <phrase>
   id: LANG_SPDIF_ENABLE
   desc: in playback settings menu. enable/disable the optical out
-  user:
+  user: 
   <source>
     *: none
     spdif_power: "Optical Output"
@@ -1418,7 +1418,7 @@
 <phrase>
   id: LANG_ID3_ORDER
   desc: in playback settings screen
-  user:
+  user: 
   <source>
     *: "ID3 Tag Priority"
   </source>
@@ -1432,7 +1432,7 @@
 <phrase>
   id: LANG_ID3_V1_FIRST
   desc: in playback settings screen
-  user:
+  user: 
   <source>
     *: "V1 then V2"
   </source>
@@ -1446,7 +1446,7 @@
 <phrase>
   id: LANG_ID3_V2_FIRST
   desc: in playback settings screen
-  user:
+  user: 
   <source>
     *: "V2 then V1"
   </source>
@@ -1460,7 +1460,7 @@
 <phrase>
   id: LANG_NEXT_FOLDER
   desc: in settings_menu. Should we allow move to next/prev folder from last/first track of current one
-  user:
+  user: 
   <source>
     *: "Auto-Change Directory"
   </source>
@@ -1474,7 +1474,7 @@
 <phrase>
   id: LANG_TAGCACHE
   desc: in the main menu and the settings menu
-  user:
+  user: 
   <source>
     *: "Database"
   </source>
@@ -1488,7 +1488,7 @@
 <phrase>
   id: LANG_TAGCACHE_RAM
   desc: in tag cache settings
-  user:
+  user: 
   <source>
     *: none
     tc_ramcache: "Load to RAM"
@@ -1505,7 +1505,7 @@
 <phrase>
   id: LANG_TAGCACHE_FORCE_UPDATE
   desc: in tag cache settings
-  user:
+  user: 
   <source>
     *: "Initialize now"
   </source>
@@ -1519,7 +1519,7 @@
 <phrase>
   id: LANG_TAGCACHE_FORCE_UPDATE_SPLASH
   desc: in tag cache settings
-  user:
+  user: 
   <source>
     *: "Updating in background"
   </source>
@@ -1533,7 +1533,7 @@
 <phrase>
   id: LANG_TAGCACHE_INIT
   desc: while initializing tagcache on boot
-  user:
+  user: 
   <source>
     *: "Committing database"
   </source>
@@ -1547,7 +1547,7 @@
 <phrase>
   id: LANG_RUNTIMEDB_ACTIVE
   desc: in settings_menu.
-  user:
+  user: 
   <source>
     *: "Gather Runtime Data"
   </source>
@@ -1561,7 +1561,7 @@
 <phrase>
   id: LANG_SORT_CASE
   desc: in settings_menu
-  user:
+  user: 
   <source>
     *: "Sort Case Sensitive"
   </source>
@@ -1575,7 +1575,7 @@
 <phrase>
   id: LANG_SORT_DIR
   desc: browser sorting setting
-  user:
+  user: 
   <source>
     *: "Sort Directories"
   </source>
@@ -1589,7 +1589,7 @@
 <phrase>
   id: LANG_SORT_FILE
   desc: browser sorting setting
-  user:
+  user: 
   <source>
     *: "Sort Files"
   </source>
@@ -1603,7 +1603,7 @@
 <phrase>
   id: LANG_SORT_ALPHA
   desc: browser sorting setting
-  user:
+  user: 
   <source>
     *: "Alphabetical"
   </source>
@@ -1617,7 +1617,7 @@
 <phrase>
   id: LANG_SORT_DATE
   desc: browser sorting setting
-  user:
+  user: 
   <source>
     *: "By Date"
   </source>
@@ -1631,7 +1631,7 @@
 <phrase>
   id: LANG_SORT_DATE_REVERSE
   desc: browser sorting setting
-  user:
+  user: 
   <source>
     *: "By Newest Date"
   </source>
@@ -1645,7 +1645,7 @@
 <phrase>
   id: LANG_SORT_TYPE
   desc: browser sorting setting
-  user:
+  user: 
   <source>
     *: "By Type"
   </source>
@@ -1659,7 +1659,7 @@
 <phrase>
   id: LANG_FILTER
   desc: setting name for dir filter
-  user:
+  user: 
   <source>
     *: "Show Files"
   </source>
@@ -1673,7 +1673,7 @@
 <phrase>
   id: LANG_FILTER_SUPPORTED
   desc: show all file types supported by Rockbox
-  user:
+  user: 
   <source>
     *: "Supported"
   </source>
@@ -1687,7 +1687,7 @@
 <phrase>
   id: LANG_FILTER_MUSIC
   desc: show only music-related files
-  user:
+  user: 
   <source>
     *: "Music"
   </source>
@@ -1701,7 +1701,7 @@
 <phrase>
   id: LANG_FOLLOW
   desc: in settings_menu
-  user:
+  user: 
   <source>
     *: "Follow Playlist"
   </source>
@@ -1715,7 +1715,7 @@
 <phrase>
   id: LANG_SHOW_ICONS
   desc: in settings_menu
-  user:
+  user: 
   <source>
     *: "Show Icons"
   </source>
@@ -1729,7 +1729,7 @@
 <phrase>
   id: LANG_CUSTOM_FONT
   desc: in setting_menu()
-  user:
+  user: 
   <source>
     *: none
     lcd_bitmap: "Browse Fonts"
@@ -1746,7 +1746,7 @@
 <phrase>
   id: LANG_WHILE_PLAYING
   desc: in settings_menu()
-  user:
+  user: 
   <source>
     *: "Browse .wps files"
   </source>
@@ -1760,7 +1760,7 @@
 <phrase>
   id: LANG_REMOTE_WHILE_PLAYING
   desc: in settings_menu()
-  user:
+  user: 
   <source>
     *: none
     remote: "Browse .rwps files"
@@ -1777,7 +1777,7 @@
 <phrase>
   id: LANG_LCD_MENU
   desc: in the display sub menu
-  user:
+  user: 
   <source>
     *: "LCD Settings"
   </source>
@@ -1791,7 +1791,7 @@
 <phrase>
   id: LANG_LCD_REMOTE_MENU
   desc: in the display sub menu
-  user:
+  user: 
   <source>
     *: none
     remote: "Remote-LCD Settings"
@@ -1808,7 +1808,7 @@
 <phrase>
   id: LANG_SCROLL_MENU
   desc: in display_settings_menu()
-  user:
+  user: 
   <source>
     *: "Scrolling"
   </source>
@@ -1822,7 +1822,7 @@
 <phrase>
   id: LANG_BARS_MENU
   desc: in the display sub menu
-  user:
+  user: 
   <source>
     *: none
     lcd_bitmap: "Status-/Scrollbar"
@@ -1839,7 +1839,7 @@
 <phrase>
   id: LANG_PM_MENU
   desc: in the display menu
-  user:
+  user: 
   <source>
     *: "Peak Meter"
     masd: none
@@ -1856,7 +1856,7 @@
 <phrase>
   id: LANG_DEFAULT_CODEPAGE
   desc: default encoding used with id3 tags
-  user:
+  user: 
   <source>
     *: "Default Codepage"
   </source>
@@ -1870,7 +1870,7 @@
 <phrase>
   id: LANG_CODEPAGE_LATIN1
   desc: in codepage setting menu
-  user:
+  user: 
   <source>
     *: "Latin1 (ISO-8859-1)"
   </source>
@@ -1884,7 +1884,7 @@
 <phrase>
   id: LANG_CODEPAGE_GREEK
   desc: in codepage setting menu
-  user:
+  user: 
   <source>
     *: "Greek (ISO-8859-7)"
   </source>
@@ -1898,7 +1898,7 @@
 <phrase>
   id: LANG_CODEPAGE_HEBREW
   desc: in codepage setting menu
-  user:
+  user: 
   <source>
     *: none
     lcd_bitmap: "Hebrew (ISO-8859-8)"
@@ -1915,7 +1915,7 @@
 <phrase>
   id: LANG_CODEPAGE_CYRILLIC
   desc: in codepage setting menu
-  user:
+  user: 
   <source>
     *: "Cyrillic (CP1251)"
   </source>
@@ -1929,7 +1929,7 @@
 <phrase>
   id: LANG_CODEPAGE_THAI
   desc: in codepage setting menu
-  user:
+  user: 
   <source>
     *: none
     lcd_bitmap: "Thai (ISO-8859-11)"
@@ -1946,7 +1946,7 @@
 <phrase>
   id: LANG_CODEPAGE_ARABIC
   desc: in codepage setting menu
-  user:
+  user: 
   <source>
     *: none
     lcd_bitmap: "Arabic (CP1256)"
@@ -1963,7 +1963,7 @@
 <phrase>
   id: LANG_CODEPAGE_TURKISH
   desc: in codepage setting menu
-  user:
+  user: 
   <source>
     *: "Turkish (ISO-8859-9)"
   </source>
@@ -1977,7 +1977,7 @@
 <phrase>
   id: LANG_CODEPAGE_LATIN_EXTENDED
   desc: in codepage setting menu
-  user:
+  user: 
   <source>
     *: "Latin Extended (ISO-8859-2)"
   </source>
@@ -1991,7 +1991,7 @@
 <phrase>
   id: LANG_CODEPAGE_JAPANESE
   desc: in codepage setting menu
-  user:
+  user: 
   <source>
     *: none
     lcd_bitmap: "Japanese (SJIS)"
@@ -2008,7 +2008,7 @@
 <phrase>
   id: LANG_CODEPAGE_SIMPLIFIED
   desc: in codepage setting menu
-  user:
+  user: 
   <source>
     *: none
     lcd_bitmap: "Simp. Chinese (GB2312)"
@@ -2025,7 +2025,7 @@
 <phrase>
   id: LANG_CODEPAGE_KOREAN
   desc: in codepage setting menu
-  user:
+  user: 
   <source>
     *: none
     lcd_bitmap: "Korean (KSX1001)"
@@ -2042,7 +2042,7 @@
 <phrase>
   id: LANG_CODEPAGE_TRADITIONAL
   desc: in codepage setting menu
-  user:
+  user: 
   <source>
     *: none
     lcd_bitmap: "Trad. Chinese (BIG5)"
@@ -2059,7 +2059,7 @@
 <phrase>
   id: LANG_CODEPAGE_UTF8
   desc: in codepage setting menu
-  user:
+  user: 
   <source>
     *: "Unicode (UTF-8)"
   </source>
@@ -2073,7 +2073,7 @@
 <phrase>
   id: LANG_BATTERY_MENU
   desc: in the system sub menu
-  user:
+  user: 
   <source>
     *: "Battery"
   </source>
@@ -2087,7 +2087,7 @@
 <phrase>
   id: LANG_DISK_MENU
   desc: in the system sub menu
-  user:
+  user: 
   <source>
     *: "Disk"
   </source>
@@ -2101,7 +2101,7 @@
 <phrase>
   id: LANG_TIME_MENU
   desc: in the system sub menu
-  user:
+  user: 
   <source>
     *: none
     rtc: "Time & Date"
@@ -2118,7 +2118,7 @@
 <phrase>
   id: LANG_POWEROFF_IDLE
   desc: in settings_menu
-  user:
+  user: 
   <source>
     *: "Idle Poweroff"
   </source>
@@ -2132,7 +2132,7 @@
 <phrase>
   id: LANG_SLEEP_TIMER
   desc: sleep timer setting
-  user:
+  user: 
   <source>
     *: "Sleep Timer"
   </source>
@@ -2146,7 +2146,7 @@
 <phrase>
   id: LANG_ALARM_MOD_ALARM_MENU
   desc: The name of the additional entry in the main menu for the RTC alarm mod.
-  user:
+  user: 
   <source>
     *: none
     alarm: "Wake-Up Alarm"
@@ -2163,7 +2163,7 @@
 <phrase>
   id: LANG_LIMITS_MENU
   desc: in the system sub menu
-  user:
+  user: 
   <source>
     *: "Limits"
   </source>
@@ -2177,7 +2177,7 @@
 <phrase>
   id: LANG_LINE_IN
   desc: in the recording settings
-  user:
+  user: 
   <source>
     *: none
     recording,player: "Line In"
@@ -2194,7 +2194,7 @@
 <phrase>
   id: LANG_CAR_ADAPTER_MODE
   desc: Displayed for setting car adapter mode to on/off
-  user:
+  user: 
   <source>
     *: none
     charging: "Car Adapter Mode"
@@ -2211,7 +2211,7 @@
 <phrase>
   id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
   desc: prompt for user to decide to create an bookmark
-  user:
+  user: 
   <source>
     *: "Bookmark on Stop"
   </source>
@@ -2225,7 +2225,7 @@
 <phrase>
   id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
   desc: Save in recent bookmarks only
-  user:
+  user: 
   <source>
     *: "Yes - Recent only"
   </source>
@@ -2239,7 +2239,7 @@
 <phrase>
   id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
   desc: Save in recent bookmarks only
-  user:
+  user: 
   <source>
     *: "Ask - Recent only"
   </source>
@@ -2253,7 +2253,7 @@
 <phrase>
   id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
   desc: prompt for user to decide to create a bookmark
-  user:
+  user: 
   <source>
     *: "Load Last Bookmark"
   </source>
@@ -2267,7 +2267,7 @@
 <phrase>
   id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
   desc: Configuration option to maintain a list of recent bookmarks
-  user:
+  user: 
   <source>
     *: "Maintain a List of Recent Bookmarks?"
   </source>
@@ -2281,7 +2281,7 @@
 <phrase>
   id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
   desc: Save only on bookmark for each playlist in recent bookmarks
-  user:
+  user: 
   <source>
     *: "Unique only"
   </source>
@@ -2295,7 +2295,7 @@
 <phrase>
   id: LANG_VOICE_MENU
   desc: item of voice menu, enable/disable the voice UI
-  user:
+  user: 
   <source>
     *: "Voice Menus"
   </source>
@@ -2309,7 +2309,7 @@
 <phrase>
   id: LANG_VOICE_DIR
   desc: item of voice menu, set the voice mode for directories
-  user:
+  user: 
   <source>
     *: "Voice Directories"
   </source>
@@ -2323,7 +2323,7 @@
 <phrase>
   id: LANG_VOICE_FILE
   desc: item of voice menu, set the voice mode for files
-  user:
+  user: 
   <source>
     *: "Voice Filenames"
   </source>
@@ -2337,7 +2337,7 @@
 <phrase>
   id: LANG_VOICE_NUMBER
   desc: "talkbox" mode for files+directories
-  user:
+  user: 
   <source>
     *: "Numbers"
   </source>
@@ -2351,7 +2351,7 @@
 <phrase>
   id: LANG_VOICE_SPELL
   desc: "talkbox" mode for files+directories
-  user:
+  user: 
   <source>
     *: "Spell"
   </source>
@@ -2365,7 +2365,7 @@
 <phrase>
   id: LANG_VOICE_DIR_HOVER
   desc: "talkbox" mode for directories + files
-  user:
+  user: 
   <source>
     *: ".talk mp3 clip"
   </source>
@@ -2379,7 +2379,7 @@
 <phrase>
   id: LANG_RECORDING_QUALITY
   desc: in the recording settings
-  user:
+  user: 
   <source>
     *: none
     recording_hwcodec: "Quality"
@@ -2396,7 +2396,7 @@
 <phrase>
   id: LANG_RECORDING_FREQUENCY
   desc: in the recording settings
-  user:
+  user: 
   <source>
     *: none
     recording: "Frequency"
@@ -2413,7 +2413,7 @@
 <phrase>
   id: LANG_RECORDING_SOURCE
   desc: in the recording settings
-  user:
+  user: 
   <source>
     *: none
     recording: "Source"
@@ -2430,7 +2430,7 @@
 <phrase>
   id: LANG_RECORDING_SRC_MIC
   desc: in the recording settings
-  user:
+  user: 
   <source>
     *: none
     recording: "Microphone"
@@ -2450,7 +2450,7 @@
 <phrase>
   id: LANG_RECORDING_SRC_DIGITAL
   desc: in the recording settings
-  user:
+  user: 
   <source>
     *: none
     recording: "Digital"
@@ -2467,7 +2467,7 @@
 <phrase>
   id: LANG_RECORDING_EDITABLE
   desc: Editable recordings setting
-  user:
+  user: 
   <source>
     *: none
     recording_hwcodec: "Independent Frames"
@@ -2484,7 +2484,7 @@
 <phrase>
   id: LANG_RECORD_TIMESPLIT
   desc: Record split menu
-  user:
+  user: 
   <source>
     *: none
     recording: "File Split Options"
@@ -2501,7 +2501,7 @@
 <phrase>
   id: LANG_RECORD_PRERECORD_TIME
   desc: in recording settings_menu
-  user:
+  user: 
   <source>
     *: none
     recording: "Prerecord Time"
@@ -2518,7 +2518,7 @@
 <phrase>
   id: LANG_RECORD_DIRECTORY
   desc: in recording settings_menu
-  user:
+  user: 
   <source>
     *: none
     recording: "Directory"
@@ -2535,22 +2535,24 @@
 <phrase>
   id: LANG_RECORD_CURRENT_DIR
   desc: DEPRECATED
-  user:
+  user: 
   <source>
     *: none
     recording: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    recording: ""
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_RECORD_TRIGGER
   desc: in recording settings_menu
-  user:
+  user: 
   <source>
     *: none
     recording: "Trigger"
@@ -2567,7 +2569,7 @@
 <phrase>
   id: LANG_CLIP_LIGHT
   desc: in record settings menu.
-  user:
+  user: 
   <source>
     *: none
     recording: "Clipping Light"
@@ -2584,7 +2586,7 @@
 <phrase>
   id: LANG_MAIN_UNIT
   desc: in record settings menu.
-  user:
+  user: 
   <source>
     *: none
     remote: "Main Unit Only"
@@ -2601,7 +2603,7 @@
 <phrase>
   id: LANG_REMOTE_UNIT
   desc: in record settings menu.
-  user:
+  user: 
   <source>
     *: none
     remote: "Remote Unit Only"
@@ -2618,7 +2620,7 @@
 <phrase>
   id: LANG_REMOTE_MAIN
   desc: in record settings menu.
-  user:
+  user: 
   <source>
     *: none
     remote: "Main and Remote Unit"
@@ -2635,7 +2637,7 @@
 <phrase>
   id: LANG_FFRW_STEP
   desc: in settings_menu
-  user:
+  user: 
   <source>
     *: "FF/RW Min Step"
   </source>
@@ -2649,7 +2651,7 @@
 <phrase>
   id: LANG_FFRW_ACCEL
   desc: in settings_menu
-  user:
+  user: 
   <source>
     *: "FF/RW Accel"
   </source>
@@ -2663,119 +2665,143 @@
 <phrase>
   id: LANG_CROSSFADE_ENABLE
   desc: in crossfade settings menu
-  user:
+  user: 
   <source>
-    *: "Enable Crossfade"
+    *: none
+    swcodec: "Enable Crossfade"
   </source>
   <dest>
-    *: "开启Crossfade"
+    *: none
+    swcodec: "开启Crossfade"
   </dest>
   <voice>
-    *: "Enable Crossfade"
+    *: none
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_TRACKSKIP
   desc: in crossfade settings
-  user:
+  user: 
   <source>
-    *: "Track Skip Only"
+    *: none
+    swcodec: "Track Skip Only"
   </source>
   <dest>
-    *: "Track Skip Only"
+    *: none
+    swcodec: "Track Skip Only"
   </dest>
   <voice>
-    *: "Track Skip Only"
+    *: none
+    swcodec: "Track Skip Only"
   </voice>
 </phrase>
 <phrase>
   id: LANG_CROSSFADE_FADE_IN_DELAY
   desc: in crossfade settings menu
-  user:
+  user: 
   <source>
-    *: "Fade-In Delay"
+    *: none
+    swcodec: "Fade-In Delay"
   </source>
   <dest>
-    *: "淡入延迟"
+    *: none
+    swcodec: "淡入延迟"
   </dest>
   <voice>
-    *: "Fade-In Delay"
+    *: none
+    swcodec: "Fade-In Delay"
   </voice>
 </phrase>
 <phrase>
   id: LANG_CROSSFADE_FADE_IN_DURATION
   desc: in crossfade settings menu
-  user:
+  user: 
   <source>
-    *: "Fade-In Duration"
+    *: none
+    swcodec: "Fade-In Duration"
   </source>
   <dest>
-    *: "淡入长度"
+    *: none
+    swcodec: "淡入长度"
   </dest>
   <voice>
-    *: "Fade-In Duration"
+    *: none
+    swcodec: "Fade-In Duration"
   </voice>
 </phrase>
 <phrase>
   id: LANG_CROSSFADE_FADE_OUT_DELAY
   desc: in crossfade settings menu
-  user:
+  user: 
   <source>
-    *: "Fade-Out Delay"
+    *: none
+    swcodec: "Fade-Out Delay"
   </source>
   <dest>
-    *: "淡出延迟"
+    *: none
+    swcodec: "淡出延迟"
   </dest>
   <voice>
-    *: "Fade-Out Delay"
+    *: none
+    swcodec: "Fade-Out Delay"
   </voice>
 </phrase>
 <phrase>
   id: LANG_CROSSFADE_FADE_OUT_DURATION
   desc: in crossfade settings menu
-  user:
+  user: 
   <source>
-    *: "Fade-Out Duration"
+    *: none
+    swcodec: "Fade-Out Duration"
   </source>
   <dest>
-    *: "淡出长度"
+    *: none
+    swcodec: "淡出长度"
   </dest>
   <voice>
-    *: "Fade-Out Duration"
+    *: none
+    swcodec: "Fade-Out Duration"
   </voice>
 </phrase>
 <phrase>
   id: LANG_CROSSFADE_FADE_OUT_MODE
   desc: in crossfade settings menu
-  user:
+  user: 
   <source>
-    *: "Fade-Out Mode"
+    *: none
+    swcodec: "Fade-Out Mode"
   </source>
   <dest>
-    *: "淡出模式"
+    *: none
+    swcodec: "淡出模式"
   </dest>
   <voice>
-    *: "Fade-Out Mode"
+    *: none
+    swcodec: "Fade-Out Mode"
   </voice>
 </phrase>
 <phrase>
   id: LANG_MIX
   desc: in playback settings, crossfade option
-  user:
+  user: 
   <source>
-    *: "Mix"
+    *: none
+    swcodec: "Mix"
   </source>
   <dest>
-    *: "混合"
+    *: none
+    swcodec: "混合"
   </dest>
   <voice>
-    *: "Mix"
+    *: none
+    swcodec: "Mix"
   </voice>
 </phrase>
 <phrase>
   id: LANG_REPLAYGAIN_ENABLE
   desc: in replaygain
-  user:
+  user: 
   <source>
     *: "Enable Replaygain"
   </source>
@@ -2789,21 +2815,24 @@
 <phrase>
   id: LANG_REPLAYGAIN_NOCLIP
   desc: in replaygain
-  user:
+  user: 
   <source>
-    *: "Prevent Clipping"
+    *: none
+    swcodec: "Prevent Clipping"
   </source>
   <dest>
-    *: "防止截断"
+    *: none
+    swcodec: "防止截断"
   </dest>
   <voice>
-    *: "Prevent Clipping"
+    *: none
+    swcodec: "Prevent Clipping"
   </voice>
 </phrase>
 <phrase>
   id: LANG_REPLAYGAIN_MODE
   desc: in replaygain
-  user:
+  user: 
   <source>
     *: "Replaygain Type"
   </source>
@@ -2817,7 +2846,7 @@
 <phrase>
   id: LANG_ALBUM_GAIN
   desc: in replaygain
-  user:
+  user: 
   <source>
     *: "Album Gain"
   </source>
@@ -2831,7 +2860,7 @@
 <phrase>
   id: LANG_TRACK_GAIN
   desc: in replaygain
-  user:
+  user: 
   <source>
     *: "Track Gain"
   </source>
@@ -2845,7 +2874,7 @@
 <phrase>
   id: LANG_SHUFFLE_GAIN
   desc: use track gain if shuffle mode is on, album gain otherwise
-  user:
+  user: 
   <source>
     *: "Track Gain if Shuffling"
   </source>
@@ -2859,7 +2888,7 @@
 <phrase>
   id: LANG_REPLAYGAIN_PREAMP
   desc: in replaygain settings
-  user:
+  user: 
   <source>
     *: "Pre-amp"
   </source>
@@ -2873,7 +2902,7 @@
 <phrase>
   id: LANG_BACKLIGHT
   desc: in settings_menu
-  user:
+  user: 
   <source>
     *: "Backlight"
   </source>
@@ -2887,21 +2916,24 @@
 <phrase>
   id: LANG_BACKLIGHT_ON_WHEN_CHARGING
   desc: in display_settings_menu, backlight timeout with charger connected
-  user:
+  user: 
   <source>
-    *: "Backlight (While Plugged In)"
+    *: none
+    charging: "Backlight (While Plugged In)"
   </source>
   <dest>
-    *: "背光(使用外部电源时)"
+    *: none
+    charging: "背光(使用外部电源时)"
   </dest>
   <voice>
-    *: "Backlight (While Plugged In)"
+    *: none
+    charging: "Backlight (While Plugged In)"
   </voice>
 </phrase>
 <phrase>
   id: LANG_CAPTION_BACKLIGHT
   desc: in settings_menu
-  user:
+  user: 
   <source>
     *: "Caption Backlight"
   </source>
@@ -2915,49 +2947,58 @@
 <phrase>
   id: LANG_BACKLIGHT_FADE_IN
   desc: in settings_menu
-  user:
+  user: 
   <source>
-    *: "Backlight Fade In"
+    *: none
+    backlight_fade: "Backlight Fade In"
   </source>
   <dest>
-    *: "背光淡入"
+    *: none
+    backlight_fade: "背光淡入"
   </dest>
   <voice>
-    *: "Backlight Fade In"
+    *: none
+    backlight_fade: "Backlight Fade In"
   </voice>
 </phrase>
 <phrase>
   id: LANG_BACKLIGHT_FADE_OUT
   desc: in settings_menu
-  user:
+  user: 
   <source>
-    *: "Backlight Fade Out"
+    *: none
+    backlight_fade: "Backlight Fade Out"
   </source>
   <dest>
-    *: "背光淡出"
+    *: none
+    backlight_fade: "背光淡出"
   </dest>
   <voice>
-    *: "Backlight Fade Out"
+    *: none
+    backlight_fade: "Backlight Fade Out"
   </voice>
 </phrase>
 <phrase>
   id: LANG_BRIGHTNESS
   desc: in settings_menu
-  user:
+  user: 
   <source>
-    *: "Brightness"
+    *: none
+    backlight_brightness: "Brightness"
   </source>
   <dest>
-    *: "亮度"
+    *: none
+    backlight_brightness: "亮度"
   </dest>
   <voice>
-    *: "Brightness"
+    *: none
+    backlight_brightness: "Brightness"
   </voice>
 </phrase>
 <phrase>
   id: LANG_CONTRAST
   desc: in settings_menu
-  user:
+  user: 
   <source>
     *: "Contrast"
   </source>
@@ -2971,9 +3012,9 @@
 <phrase>
   id: LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS
   desc: Backlight behaviour setting
-  user:
+  user: 
   <source>
-    *: "First Keypress Enables Backlight Only"
+    *: "First Buttonpress Enables Backlight Only"
   </source>
   <dest>
     *: "第一次按钮只开启背光"
@@ -2985,175 +3026,194 @@
 <phrase>
   id: LANG_INVERT
   desc: in settings_menu
-  user:
+  user: 
   <source>
-    *: "LCD Mode"
+    *: none
+    lcd_invert: "LCD Mode"
   </source>
   <dest>
-    *: "屏幕显示模式"
+    *: none
+    lcd_invert: "屏幕显示模式"
   </dest>
   <voice>
-    *: "LCD Mode"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INVERT_LCD_NORMAL
-  desc: in settings_menu
-  user:
-  <source>
-    *: "Normal"
-  </source>
-  <dest>
-    *: "一般"
-  </dest>
-  <voice>
-    *: "Normal"
+    *: none
+    lcd_invert: "LCD Mode"
   </voice>
 </phrase>
 <phrase>
   id: LANG_INVERT_LCD_INVERSE
   desc: in settings_menu
-  user:
+  user: 
   <source>
-    *: "Inverse"
+    *: none
+    lcd_invert: "Inverse"
   </source>
   <dest>
-    *: "反转"
+    *: none
+    lcd_invert: "反转"
   </dest>
   <voice>
-    *: "Inverse"
+    *: none
+    lcd_invert: "Inverse"
   </voice>
 </phrase>
 <phrase>
   id: LANG_FLIP_DISPLAY
-  desc: in settings_menu, option to turn display+buttos by 180 degreed
-  user:
+  desc: in settings_menu, option to turn display+buttos by 180 degrees
+  user: 
   <source>
-    *: "Upside Down"
+    *: none
+    lcd_bitmap: "Upside Down"
   </source>
   <dest>
-    *: "上下反转"
+    *: none
+    lcd_bitmap: "上下反转"
   </dest>
   <voice>
-    *: "Upside Down"
+    *: none
+    lcd_bitmap: "Upside Down"
   </voice>
 </phrase>
 <phrase>
   id: LANG_INVERT_CURSOR
   desc: in settings_menu
-  user:
+  user: 
   <source>
-    *: "Line Selector"
+    *: none
+    lcd_bitmap: "Line Selector"
   </source>
   <dest>
-    *: "行选择器"
+    *: none
+    lcd_bitmap: "行选择器"
   </dest>
   <voice>
-    *: "Line Selector"
+    *: none
+    lcd_bitmap: "Line Selector"
   </voice>
 </phrase>
 <phrase>
   id: LANG_INVERT_CURSOR_POINTER
   desc: in settings_menu
-  user:
+  user: 
   <source>
-    *: "Pointer"
+    *: none
+    lcd_bitmap: "Pointer"
   </source>
   <dest>
-    *: "指示器"
+    *: none
+    lcd_bitmap: "指示器"
   </dest>
   <voice>
-    *: "Pointer"
+    *: none
+    lcd_bitmap: "Pointer"
   </voice>
 </phrase>
 <phrase>
   id: LANG_INVERT_CURSOR_BAR
   desc: in settings_menu
-  user:
+  user: 
   <source>
-    *: "Bar (Inverse)"
+    *: none
+    lcd_bitmap: "Bar (Inverse)"
   </source>
   <dest>
-    *: "整行反白"
+    *: none
+    lcd_bitmap: "整行反白"
   </dest>
   <voice>
-    *: "Inverse Bar"
+    *: none
+    lcd_bitmap: "Inverse Bar"
   </voice>
 </phrase>
 <phrase>
   id: LANG_CLEAR_BACKDROP
   desc: text for LCD settings menu
-  user:
+  user: 
   <source>
-    *: "Clear Backdrop"
+    *: none
+    lcd_non-mono: "Clear Backdrop"
   </source>
   <dest>
-    *: "清除背景"
+    *: none
+    lcd_non-mono: "清除背景"
   </dest>
   <voice>
-    *: "Clear Backdrop"
+    *: none
+    lcd_non-mono: "Clear Backdrop"
   </voice>
 </phrase>
 <phrase>
   id: LANG_BACKGROUND_COLOR
   desc: menu entry to set the background color
-  user:
+  user: 
   <source>
-    *: "Background Colour"
+    *: none
+    lcd_non-mono: "Background Colour"
   </source>
   <dest>
-    *: "背景颜色"
+    *: none
+    lcd_non-mono: "背景颜色"
   </dest>
   <voice>
-    *: "Background Colour"
+    *: none
+    lcd_non-mono: "Background Colour"
   </voice>
 </phrase>
 <phrase>
   id: LANG_FOREGROUND_COLOR
   desc: menu entry to set the foreground color
-  user:
+  user: 
   <source>
-    *: "Foreground Colour"
+    *: none
+    lcd_non-mono: "Foreground Colour"
   </source>
   <dest>
-    *: "前景颜色"
+    *: none
+    lcd_non-mono: "前景颜色"
   </dest>
   <voice>
-    *: "Foreground Colour"
+    *: none
+    lcd_non-mono: "Foreground Colour"
   </voice>
 </phrase>
 <phrase>
   id: LANG_RESET_COLORS
   desc: menu
-  user:
+  user: 
   <source>
-    *: "Reset Colours"
+    *: none
+    lcd_non-mono: "Reset Colours"
   </source>
   <dest>
-    *: "重设颜色"
+    *: none
+    lcd_non-mono: "重设颜色"
   </dest>
   <voice>
-    *: "Reset Colours"
+    *: none
+    lcd_non-mono: "Reset Colours"
   </voice>
 </phrase>
 <phrase>
   id: LANG_REDUCE_TICKING
   desc: in remote lcd settings menu
-  user:
+  user: 
   <source>
-    *: "Reduce Ticking"
+    *: none
+    remote_ticking: "Reduce Ticking"
   </source>
   <dest>
-    *: "降低滴答声"
+    *: none
+    remote_ticking: "降低滴答声"
   </dest>
   <voice>
-    *: "Reduce Ticking"
+    *: none
+    remote_ticking: "Reduce Ticking"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SCROLL_SPEED
   desc: in display_settings_menu()
-  user:
+  user: 
   <source>
     *: "Scroll Speed"
   </source>
@@ -3167,7 +3227,7 @@
 <phrase>
   id: LANG_SCROLL
   desc: in settings_menu
-  user:
+  user: 
   <source>
     *: "Scroll Speed Setting Example"
   </source>
@@ -3181,7 +3241,7 @@
 <phrase>
   id: LANG_SCROLL_DELAY
   desc: Delay before scrolling
-  user:
+  user: 
   <source>
     *: "Scroll Start Delay"
   </source>
@@ -3195,7 +3255,7 @@
 <phrase>
   id: LANG_SCROLL_STEP
   desc: Pixels to advance per scroll
-  user:
+  user: 
   <source>
     *: "Scroll Step Size"
   </source>
@@ -3209,7 +3269,7 @@
 <phrase>
   id: LANG_SCROLL_STEP_EXAMPLE
   desc: Pixels to advance per scroll
-  user:
+  user: 
   <source>
     *: "Scroll Step Size Setting Example Text"
   </source>
@@ -3223,7 +3283,7 @@
 <phrase>
   id: LANG_BIDIR_SCROLL
   desc: Bidirectional scroll limit
-  user:
+  user: 
   <source>
     *: "Bidirectional Scroll Limit"
   </source>
@@ -3236,8 +3296,8 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL
-  desc: (player) menu altarnative for jump scroll
-  user:
+  desc: (player) menu alternative for jump scroll
+  user: 
   <source>
     *: "Jump Scroll"
   </source>
@@ -3251,7 +3311,7 @@
 <phrase>
   id: LANG_ONE_TIME
   desc: (player) the jump scroll shall be done "one time"
-  user:
+  user: 
   <source>
     *: "One time"
   </source>
@@ -3265,7 +3325,7 @@
 <phrase>
   id: LANG_JUMP_SCROLL_DELAY
   desc: (player) Delay before making a jump scroll
-  user:
+  user: 
   <source>
     *: "Jump Scroll Delay"
   </source>
@@ -3279,7 +3339,7 @@
 <phrase>
   id: LANG_SCREEN_SCROLL_VIEW
   desc: should lines scroll out of the screen
-  user:
+  user: 
   <source>
     *: "Screen Scrolls Out Of View"
   </source>
@@ -3293,7 +3353,7 @@
 <phrase>
   id: LANG_SCREEN_SCROLL_STEP
   desc: Pixels to advance per Screen scroll
-  user:
+  user: 
   <source>
     *: "Screen Scroll Step Size"
   </source>
@@ -3307,7 +3367,7 @@
 <phrase>
   id: LANG_SCROLL_PAGINATED
   desc: jump to new page when scrolling
-  user:
+  user: 
   <source>
     *: "Paged Scrolling"
   </source>
@@ -3321,245 +3381,293 @@
 <phrase>
   id: LANG_SCROLL_BAR
   desc: display menu, F3 substitute
-  user:
+  user: 
   <source>
-    *: "Scroll Bar"
+    *: none
+    lcd_bitmap: "Scroll Bar"
   </source>
   <dest>
-    *: "卷动轴"
+    *: none
+    lcd_bitmap: "卷动轴"
   </dest>
   <voice>
-    *: "Scroll Bar"
+    *: none
+    lcd_bitmap: "Scroll Bar"
   </voice>
 </phrase>
 <phrase>
   id: LANG_STATUS_BAR
   desc: display menu, F3 substitute
-  user:
+  user: 
   <source>
-    *: "Status Bar"
+    *: none
+    lcd_bitmap: "Status Bar"
   </source>
   <dest>
-    *: "状态列"
+    *: none
+    lcd_bitmap: "状态列"
   </dest>
   <voice>
-    *: "Status Bar"
+    *: none
+    lcd_bitmap: "Status Bar"
   </voice>
 </phrase>
 <phrase>
   id: LANG_BUTTON_BAR
   desc: in settings menu
-  user:
+  user: 
   <source>
-    *: "Button Bar"
+    *: none
+    recorder_pad: "Button Bar"
   </source>
   <dest>
-    *: "按钮列"
+    *: none
+    recorder_pad: "按钮列"
   </dest>
   <voice>
-    *: "Button Bar"
+    *: none
+    recorder_pad: "Button Bar"
   </voice>
 </phrase>
 <phrase>
   id: LANG_VOLUME_DISPLAY
   desc: Volume type title
-  user:
+  user: 
   <source>
-    *: "Volume Display"
+    *: none
+    lcd_bitmap: "Volume Display"
   </source>
   <dest>
-    *: "音量显示"
+    *: none
+    lcd_bitmap: "音量显示"
   </dest>
   <voice>
-    *: "Volume Display"
+    *: none
+    lcd_bitmap: "Volume Display"
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_DISPLAY
   desc: Battery type title
-  user:
+  user: 
   <source>
-    *: "Battery Display"
+    *: none
+    lcd_bitmap: "Battery Display"
   </source>
   <dest>
-    *: "电池显示"
+    *: none
+    lcd_bitmap: "电池显示"
   </dest>
   <voice>
-    *: "Battery Display"
+    *: none
+    lcd_bitmap: "Battery Display"
   </voice>
 </phrase>
 <phrase>
   id: LANG_DISPLAY_GRAPHIC
   desc: Label for type of icon display
-  user:
+  user: 
   <source>
-    *: "Graphic"
+    *: none
+    lcd_bitmap: "Graphic"
   </source>
   <dest>
-    *: "图形"
+    *: none
+    lcd_bitmap: "图形"
   </dest>
   <voice>
-    *: "Graphic"
+    *: none
+    lcd_bitmap: "Graphic"
   </voice>
 </phrase>
 <phrase>
   id: LANG_DISPLAY_NUMERIC
   desc: Label for type of icon display
-  user:
+  user: 
   <source>
-    *: "Numeric"
+    *: none
+    lcd_bitmap: "Numeric"
   </source>
   <dest>
-    *: "数值"
+    *: none
+    lcd_bitmap: "数值"
   </dest>
   <voice>
-    *: "Numeric"
+    *: none
+    lcd_bitmap: "Numeric"
   </voice>
 </phrase>
 <phrase>
   id: LANG_PM_RELEASE
   desc: in the peak meter menu
-  user:
+  user: 
   <source>
     *: "Peak Release"
+    masd: none
   </source>
   <dest>
     *: "Peak Release"
+    masd: none
   </dest>
   <voice>
     *: "Peak Release"
+    masd: none
   </voice>
 </phrase>
 <phrase>
   id: LANG_PM_UNITS_PER_READ
-  desc: in the peak meter menu
-  user:
+  desc: DEPRECATED
+  user: 
   <source>
-    *: "Units Per Read"
+    *: ""
   </source>
   <dest>
-    *: "每次读取单位"
+    *: ""
   </dest>
   <voice>
-    *: "Units Per Read"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PM_PEAK_HOLD
   desc: in the peak meter menu
-  user:
+  user: 
   <source>
     *: "Peak Hold Time"
+    masd: none
   </source>
   <dest>
     *: "Peak Hold Time"
+    masd: none
   </dest>
   <voice>
     *: "Peak Hold Time"
+    masd: none
   </voice>
 </phrase>
 <phrase>
   id: LANG_PM_CLIP_HOLD
   desc: in the peak meter menu
-  user:
+  user: 
   <source>
     *: "Clip Hold Time"
+    masd: none
   </source>
   <dest>
     *: "Clip Hold Time"
+    masd: none
   </dest>
   <voice>
     *: "Clip Hold Time"
+    masd: none
   </voice>
 </phrase>
 <phrase>
   id: LANG_PM_ETERNAL
   desc: in the peak meter menu
-  user:
+  user: 
   <source>
     *: "Eternal"
+    masd: none
   </source>
   <dest>
     *: "Eternal"
+    masd: none
   </dest>
   <voice>
     *: "Eternal"
+    masd: none
   </voice>
 </phrase>
 <phrase>
   id: LANG_PM_SCALE
   desc: in the peak meter menu
-  user:
+  user: 
   <source>
     *: "Scale"
+    masd: none
   </source>
   <dest>
     *: "比例"
+    masd: none
   </dest>
   <voice>
     *: "Scale"
+    masd: none
   </voice>
 </phrase>
 <phrase>
   id: LANG_PM_DBFS
   desc: in the peak meter menu
-  user:
+  user: 
   <source>
     *: "Logarithmic (dB)"
+    masd: none
   </source>
   <dest>
     *: "对数 (dB)"
+    masd: none
   </dest>
   <voice>
     *: "Logarithmic decibel"
+    masd: none
   </voice>
 </phrase>
 <phrase>
   id: LANG_PM_LINEAR
   desc: in the peak meter menu
-  user:
+  user: 
   <source>
     *: "Linear (%)"
+    masd: none
   </source>
   <dest>
     *: "线性 (%)"
+    masd: none
   </dest>
   <voice>
     *: "Linear percent"
+    masd: none
   </voice>
 </phrase>
 <phrase>
   id: LANG_PM_MIN
   desc: in the peak meter menu
-  user:
+  user: 
   <source>
     *: "Minimum Of Range"
+    masd: none
   </source>
   <dest>
     *: "最小范围"
+    masd: none
   </dest>
   <voice>
     *: "Minimum Of Range"
+    masd: none
   </voice>
 </phrase>
 <phrase>
   id: LANG_PM_MAX
   desc: in the peak meter menu
-  user:
+  user: 
   <source>
     *: "Maximum Of Range"
+    masd: none
   </source>
   <dest>
     *: "最大范围"
+    masd: none
   </dest>
   <voice>
     *: "Maximum Of Range"
+    masd: none
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_CAPACITY
   desc: in settings_menu
-  user:
+  user: 
   <source>
     *: "Battery Capacity"
   </source>
@@ -3573,121 +3681,94 @@
 <phrase>
   id: LANG_BATTERY_TYPE
   desc: in battery settings
-  user:
+  user: 
   <source>
-    *: "Battery Type"
+    *: none
+    battery_types: "Battery Type"
   </source>
   <dest>
-    *: "电池类型"
+    *: none
+    battery_types: "电池类型"
   </dest>
   <voice>
-    *: "Battery type"
+    *: none
+    battery_types: "Battery type"
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_ALKALINE
   desc: in battery settings
-  user:
+  user: 
   <source>
-    *: "Alkaline"
+    *: none
+    battery_types: "Alkaline"
   </source>
   <dest>
-    *: "碱性"
+    *: none
+    battery_types: "碱性"
   </dest>
   <voice>
-    *: "Alkaline"
+    *: none
+    battery_types: "Alkaline"
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_NIMH
   desc: in battery settings
-  user:
+  user: 
   <source>
-    *: "NiMH"
+    *: none
+    battery_types: "NiMH"
   </source>
   <dest>
-    *: "NiMH"
+    *: none
+    battery_types: "NiMH"
   </dest>
   <voice>
-    *: "Nickel metal hydride"
+    *: none
+    battery_types: "Nickel metal hydride"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SPINDOWN
   desc: in settings_menu
-  user:
+  user: 
   <source>
     *: "Disk Spindown"
+    flash_storage: none
   </source>
   <dest>
     *: "磁盘复位停止"
+    flash_storage: none
   </dest>
   <voice>
     *: "Disk Spindown"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_POWEROFF
-  desc: disk poweroff flag
-  user:
-  <source>
-    *: "Disk Poweroff"
-  </source>
-  <dest>
-    *: "磁盘电源关闭"
-  </dest>
-  <voice>
-    *: "Disk Poweroff"
+    flash_storage: none
   </voice>
 </phrase>
 <phrase>
   id: LANG_DIRCACHE_ENABLE
   desc: in directory cache settings
-  user:
+  user: 
   <source>
-    *: "Directory Cache"
+    *: none
+    dircache: "Directory Cache"
   </source>
   <dest>
-    *: "目录缓存"
+    *: none
+    dircache: "目录缓存"
   </dest>
   <voice>
-    *: "Directory Cache"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRCACHE_REBOOT
-  desc: when activating directory cache
-  user:
-  <source>
-    *: "Please reboot to enable the cache"
-  </source>
-  <dest>
-    *: "请重新开机以启用缓存"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRCACHE_BUILDING
-  desc: when booting up and rebuilding the cache
-  user:
-  <source>
-    *: "Scanning disk..."
-  </source>
-  <dest>
-    *: "扫描磁盘..."
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    dircache: "Directory Cache"
   </voice>
 </phrase>
 <phrase>
   id: LANG_TIME
-  desc: in settings_menu
-  user:
+  desc: Used on the bookmark select window to label elapsed time
+  user: 
   <source>
-    *: "Set Time/Date"
+    *: "Time"
   </source>
   <dest>
     *: "设定日期时间"
@@ -3699,49 +3780,58 @@
 <phrase>
   id: LANG_TIMEFORMAT
   desc: select the time format of time in status bar
-  user:
+  user: 
   <source>
-    *: "Time Format"
+    *: none
+    rtc: "Time Format"
   </source>
   <dest>
-    *: "时间格式"
+    *: none
+    rtc: "时间格式"
   </dest>
   <voice>
-    *: "Time Format"
+    *: none
+    rtc: "Time Format"
   </voice>
 </phrase>
 <phrase>
   id: LANG_12_HOUR_CLOCK
   desc: option for 12 hour clock
-  user:
+  user: 
   <source>
-    *: "12 Hour Clock"
+    *: none
+    rtc: "12 Hour Clock"
   </source>
   <dest>
-    *: "12小时制"
+    *: none
+    rtc: "12小时制"
   </dest>
   <voice>
-    *: "12 Hour Clock"
+    *: none
+    rtc: "12 Hour Clock"
   </voice>
 </phrase>
 <phrase>
   id: LANG_24_HOUR_CLOCK
   desc: option for 24 hour clock
-  user:
+  user: 
   <source>
-    *: "24 Hour Clock"
+    *: none
+    rtc: "24 Hour Clock"
   </source>
   <dest>
-    *: "24小时制"
+    *: none
+    rtc: "24小时制"
   </dest>
   <voice>
-    *: "24 Hour Clock"
+    *: none
+    rtc: "24 Hour Clock"
   </voice>
 </phrase>
 <phrase>
   id: LANG_MAX_FILES_IN_DIR
   desc: in settings_menu
-  user:
+  user: 
   <source>
     *: "Max Files in Dir Browser"
   </source>
@@ -3755,7 +3845,7 @@
 <phrase>
   id: LANG_MAX_FILES_IN_PLAYLIST
   desc: in settings_menu
-  user:
+  user: 
   <source>
     *: "Max Playlist Size"
   </source>
@@ -3769,7 +3859,7 @@
 <phrase>
   id: LANG_PLAYLIST
   desc: Used when you need to say playlist, also voiced
-  user:
+  user: 
   <source>
     *: "Playlist"
   </source>
@@ -3783,7 +3873,7 @@
 <phrase>
   id: LANG_BOOKMARK_MENU
   desc: Text on main menu to get to bookmark commands
-  user:
+  user: 
   <source>
     *: "Bookmarks"
   </source>
@@ -3797,7 +3887,7 @@
 <phrase>
   id: LANG_MENU_SHOW_ID3_INFO
   desc: Menu option to start tag viewer
-  user:
+  user: 
   <source>
     *: "Show ID3 Info"
   </source>
@@ -3810,8 +3900,8 @@
 </phrase>
 <phrase>
   id: LANG_MENU_SET_RATING
-  desc: in wps context menu
-  user:
+  desc: Set the rating of a file in the wps context menu
+  user: 
   <source>
     *: "Set Song Rating"
   </source>
@@ -3823,23 +3913,9 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RATING
-  desc: in set_rating
-  user:
-  <source>
-    *: "Rating:"
-  </source>
-  <dest>
-    *: "评分:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RENAME
   desc: The verb/action Rename
-  user:
+  user: 
   <source>
     *: "Rename"
   </source>
@@ -3853,7 +3929,7 @@
 <phrase>
   id: LANG_CUT
   desc: The verb/action Cut
-  user:
+  user: 
   <source>
     *: "Cut"
   </source>
@@ -3867,7 +3943,7 @@
 <phrase>
   id: LANG_COPY
   desc: The verb/action Copy
-  user:
+  user: 
   <source>
     *: "Copy"
   </source>
@@ -3881,7 +3957,7 @@
 <phrase>
   id: LANG_PASTE
   desc: The verb/action Paste
-  user:
+  user: 
   <source>
     *: "Paste"
   </source>
@@ -3895,7 +3971,7 @@
 <phrase>
   id: LANG_REALLY_OVERWRITE
   desc: The verb/action Paste
-  user:
+  user: 
   <source>
     *: "File/directory exists. Overwrite?"
   </source>
@@ -3909,7 +3985,7 @@
 <phrase>
   id: LANG_DELETE
   desc: The verb/action Delete
-  user:
+  user: 
   <source>
     *: "Delete"
   </source>
@@ -3923,21 +3999,24 @@
 <phrase>
   id: LANG_SET_AS_BACKDROP
   desc: text for onplay menu entry
-  user:
+  user: 
   <source>
-    *: "Set As Backdrop"
+    *: none
+    lcd_non-mono: "Set As Backdrop"
   </source>
   <dest>
-    *: "设定为背景"
+    *: none
+    lcd_non-mono: "设定为背景"
   </dest>
   <voice>
-    *: "Set As Backdrop"
+    *: none
+    lcd_non-mono: "Set As Backdrop"
   </voice>
 </phrase>
 <phrase>
   id: LANG_DELETE_DIR
   desc: in on+play menu
-  user:
+  user: 
   <source>
     *: "Delete Directory"
   </source>
@@ -3951,7 +4030,7 @@
 <phrase>
   id: LANG_REALLY_DELETE
   desc: Really Delete?
-  user:
+  user: 
   <source>
     *: "Delete?"
   </source>
@@ -3965,7 +4044,7 @@
 <phrase>
   id: LANG_DELETED
   desc: A file has beed deleted
-  user:
+  user: 
   <source>
     *: "Deleted"
   </source>
@@ -3979,7 +4058,7 @@
 <phrase>
   id: LANG_ONPLAY_OPEN_WITH
   desc: Onplay open with
-  user:
+  user: 
   <source>
     *: "Open With..."
   </source>
@@ -3993,7 +4072,7 @@
 <phrase>
   id: LANG_CREATE_DIR
   desc: in main menu
-  user:
+  user: 
   <source>
     *: "Create Directory"
   </source>
@@ -4007,21 +4086,24 @@
 <phrase>
   id: LANG_PITCH
   desc: "pitch" in the pitch screen
-  user:
+  user: 
   <source>
-    *: "Pitch"
+    *: none
+    pitchscreen: "Pitch"
   </source>
   <dest>
-    *: "音调"
+    *: none
+    pitchscreen: "音调"
   </dest>
   <voice>
-    *: "Pitch"
+    *: none
+    pitchscreen: "Pitch"
   </voice>
 </phrase>
 <phrase>
   id: LANG_VIEW
   desc: in on+play menu
-  user:
+  user: 
   <source>
     *: "View"
   </source>
@@ -4035,7 +4117,7 @@
 <phrase>
   id: LANG_SHUFFLE_PLAYLIST
   desc: in playlist menu, reshuffles the order in which songs are played
-  user:
+  user: 
   <source>
     *: "Reshuffle"
   </source>
@@ -4049,7 +4131,7 @@
 <phrase>
   id: LANG_INSERT
   desc: in onplay menu.  insert a track/playlist into dynamic playlist.
-  user:
+  user: 
   <source>
     *: "Insert"
   </source>
@@ -4063,7 +4145,7 @@
 <phrase>
   id: LANG_INSERT_FIRST
   desc: in onplay menu.  insert a track/playlist into dynamic playlist.
-  user:
+  user: 
   <source>
     *: "Insert next"
   </source>
@@ -4077,7 +4159,7 @@
 <phrase>
   id: LANG_INSERT_LAST
   desc: in onplay menu.  append a track/playlist into dynamic playlist.
-  user:
+  user: 
   <source>
     *: "Insert last"
   </source>
@@ -4091,7 +4173,7 @@
 <phrase>
   id: LANG_INSERT_SHUFFLED
   desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
-  user:
+  user: 
   <source>
     *: "Insert shuffled"
   </source>
@@ -4105,7 +4187,7 @@
 <phrase>
   id: LANG_QUEUE
   desc: The verb/action Queue
-  user:
+  user: 
   <source>
     *: "Queue"
   </source>
@@ -4119,7 +4201,7 @@
 <phrase>
   id: LANG_QUEUE_FIRST
   desc: in onplay menu.  queue a track/playlist into dynamic playlist.
-  user:
+  user: 
   <source>
     *: "Queue next"
   </source>
@@ -4133,7 +4215,7 @@
 <phrase>
   id: LANG_QUEUE_LAST
   desc: in onplay menu.  queue a track/playlist at end of playlist.
-  user:
+  user: 
   <source>
     *: "Queue last"
   </source>
@@ -4147,7 +4229,7 @@
 <phrase>
   id: LANG_QUEUE_SHUFFLED
   desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
-  user:
+  user: 
   <source>
     *: "Queue shuffled"
   </source>
@@ -4161,7 +4243,7 @@
 <phrase>
   id: LANG_SEARCH_IN_PLAYLIST
   desc: in playlist menu.
-  user:
+  user: 
   <source>
     *: "Search In Playlist"
   </source>
@@ -4175,9 +4257,9 @@
 <phrase>
   id: LANG_PLAYLIST_SEARCH_MSG
   desc: splash number of tracks inserted
-  user:
+  user: 
   <source>
-    *: "查找中... %d 个 (%s)"
+    *: "Searching... %d found (%s)"
   </source>
   <dest>
     *: "Searching... %d found (%s)"
@@ -4189,7 +4271,7 @@
 <phrase>
   id: LANG_BOOKMARK_MENU_CREATE
   desc: Used off of the bookmark menu to create a bookmark
-  user:
+  user: 
   <source>
     *: "Create Bookmark"
   </source>
@@ -4203,7 +4285,7 @@
 <phrase>
   id: LANG_BOOKMARK_MENU_LIST
   desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
-  user:
+  user: 
   <source>
     *: "List Bookmarks"
   </source>
@@ -4216,10 +4298,10 @@
 </phrase>
 <phrase>
   id: LANG_ROCKBOX_INFO
-  desc: displayed topmost on the info screen
-  user:
+  desc: displayed topmost on the info screen and in the info menu
+  user: 
   <source>
-    *: "Rockbox Info:"
+    *: "Rockbox Info"
   </source>
   <dest>
     *: "Rockbox信息:"
@@ -4229,93 +4311,80 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BUFFER_STAT_PLAYER
-  desc: the buffer size player-screen width, %d MB %d fraction of MB
-  user:
-  <source>
-    *: "Buf: %d.%03dMB"
-  </source>
-  <dest>
-    *: "缓冲区: %d.%03dMB"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BUFFER_STAT_RECORDER
-  desc: the buffer size recorder-screen width, %d MB %d fraction of MB
-  user:
-  <source>
-    *: "Buffer: %d.%03dMB"
-  </source>
-  <dest>
-    *: "缓冲区: %d.%03dMB"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_BATTERY_CHARGE
   desc: tells that the battery is charging, instead of battery level
-  user:
+  user: 
   <source>
-    *: "Battery: Charging"
+    *: none
+    charging: "Battery: Charging"
   </source>
   <dest>
-    *: "电池: 充电中"
+    *: none
+    charging: "电池: 充电中"
   </dest>
   <voice>
-    *: ""
+    *: none
+    charging: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TOPOFF_CHARGE
-  desc: in info display, shows that top off charge is running
-  user:
+  desc: in info display, shows that top off charge is running Only for V1 recorder
+  user: 
   <source>
-    *: "Battery: Top-Off Chg"
+    *: none
+    recorder: "Battery: Top-Off Chg"
   </source>
   <dest>
-    *: "电池: 完成充电"
+    *: none
+    recorder: "电池: 完成充电"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recorder: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TRICKLE_CHARGE
   desc: in info display, shows that trickle charge is running
-  user:
+  user: 
   <source>
-    *: "Battery: Trickle Chg"
+    *: none
+    charging: "Battery: Trickle Chg"
   </source>
   <dest>
-    *: "电池: 涓流充电"
+    *: none
+    charging: "电池: 涓流充电"
   </dest>
   <voice>
-    *: ""
+    *: none
+    charging: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TIME
   desc: battery level in % and estimated time remaining
-  user:
+  user: 
   <source>
-    *: "%d%% %dh %dm"
+    *: "Battery: %d%% %dh %dm"
+    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "%d%% %dh %dm"
+    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: ""
+    h10,ipodmini,ipodmini2g: ""
   </dest>
   <voice>
     *: "Battery level"
+    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: ""
+    h10,ipodmini,ipodmini2g: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_DISK_SIZE_INFO
   desc: disk size info
-  user:
+  user: 
   <source>
     *: "Disk:"
   </source>
@@ -4329,7 +4398,7 @@
 <phrase>
   id: LANG_DISK_FREE_INFO
   desc: disk size info
-  user:
+  user: 
   <source>
     *: "Free:"
   </source>
@@ -4343,77 +4412,95 @@
 <phrase>
   id: LANG_DISK_NAME_INTERNAL
   desc: in info menu; name for internal disk with multivolume (keep short!)
-  user:
+  user: 
   <source>
-    *: "Int:"
+    *: none
+    multivolume: "Int:"
   </source>
   <dest>
-    *: "內建:"
+    *: none
+    multivolume: "內建:"
   </dest>
   <voice>
-    *: "Internal"
+    *: none
+    multivolume: "Internal"
   </voice>
 </phrase>
 <phrase>
   id: LANG_DISK_NAME_MMC
   desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
-  user:
+  user: 
   <source>
-    *: "MMC:"
+    *: none
+    e200: "mSD:"
+    ondio*: "MMC:"
   </source>
   <dest>
-    *: "MMC:"
+    *: none
+    e200: "MMC:"
+    ondio*: none
   </dest>
   <voice>
-    *: "Multimedia card"
+    *: none
+    e200: "Multimedia card"
+    ondio*: ""
   </voice>
 </phrase>
 <phrase>
   id: VOICE_CURRENT_TIME
   desc: spoken only, for wall clock announce
-  user:
+  user: 
   <source>
-    *: ""
+    *: none
+    rtc: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    rtc: none
   </dest>
   <voice>
-    *: "Current time:"
+    *: none
+    rtc: "Current time:"
   </voice>
 </phrase>
 <phrase>
   id: LANG_PITCH_UP
   desc: in wps
-  user:
+  user: 
   <source>
-    *: "Pitch Up"
+    *: none
+    pitchscreen: "Pitch Up"
   </source>
   <dest>
-    *: "音调升高"
+    *: none
+    pitchscreen: "音调升高"
   </dest>
   <voice>
-    *: ""
+    *: none
+    pitchscreen: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PITCH_DOWN
   desc: in wps
-  user:
+  user: 
   <source>
-    *: "Pitch Down"
+    *: none
+    pitchscreen: "Pitch Down"
   </source>
   <dest>
-    *: "音调降低"
+    *: none
+    pitchscreen: "音调降低"
   </dest>
   <voice>
-    *: ""
+    *: none
+    pitchscreen: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PAUSE
-  desc: in wps
-  user:
+  desc: in wps and recording trigger menu
+  user: 
   <source>
     *: "Pause"
   </source>
@@ -4425,179 +4512,9 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_F2_MODE
-  desc: in wps F2 pressed
-  user:
-  <source>
-    *: "Mode:"
-  </source>
-  <dest>
-    *: "模式:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F3_STATUS
-  desc: in wps F3 pressed
-  user:
-  <source>
-    *: "Status"
-  </source>
-  <dest>
-    *: "状态"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F3_SCROLL
-  desc: in wps F3 pressed
-  user:
-  <source>
-    *: "Scroll"
-  </source>
-  <dest>
-    *: "卷动"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F3_BAR
-  desc: in wps F3 pressed
-  user:
-  <source>
-    *: "Bar"
-  </source>
-  <dest>
-    *: "Bar"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
-  desc: From the auto-load screen, allows user to list all bookmarks
-  user:
-  <source>
-    *: "Down = List"
-  </source>
-  <dest>
-    *: "Down = 清单"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_EXIT
-  desc: From the bookmark list screen, allows user to exit
-  user:
-  <source>
-    *: "OFF = Exit"
-  </source>
-  <dest>
-    *: "OFF = 离开"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
-  desc: Used on the bookmark select window to label bookmark number
-  user:
-  <source>
-    *: "Bookmark"
-  </source>
-  <dest>
-    *: "书签"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_INDEX_TEXT
-  desc: Used on the bookmark select window to label index number
-  user:
-  <source>
-    *: "Index"
-  </source>
-  <dest>
-    *: "索引"
-  </dest>
-  <voice>
-    *: "Index"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_TIME_TEXT
-  desc: Used on the bookmark select window to label elapsed time
-  user:
-  <source>
-    *: "Time"
-  </source>
-  <dest>
-    *: "时间"
-  </dest>
-  <voice>
-    *: "Time"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_PLAY
-  desc: Used on the bookmark select window to indicated the play option
-  user:
-  <source>
-    *: "PLAY = Select"
-  </source>
-  <dest>
-    *: "PLAY = 选择"
-    h100,h120,h300: "NAVI = 选择"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_DELETE
-  desc: Used on the bookmark select window to indicated the bookmark delete option
-  user:
-  <source>
-    *: "ON+Play = Delete"
-  </source>
-  <dest>
-    *: "ON+Play = 刪除"
-    h100,h120,h300: "RECORD = 刪除"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_AUTOLOAD_QUERY
-  desc: prompt for user to decide to create a bookmark
-  user:
-  <source>
-    *: "Load Last Bookmark?"
-  </source>
-  <dest>
-    *: "载入最近书签?"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_AUTO_BOOKMARK_QUERY
   desc: prompt for user to decide to create an bookmark
-  user:
+  user: 
   <source>
     *: "Create a Bookmark?"
   </source>
@@ -4611,7 +4528,7 @@
 <phrase>
   id: LANG_BOOKMARK_CREATE_SUCCESS
   desc: Indicates bookmark was successfully created
-  user:
+  user: 
   <source>
     *: "Bookmark Created"
   </source>
@@ -4625,7 +4542,7 @@
 <phrase>
   id: LANG_BOOKMARK_CREATE_FAILURE
   desc: Indicates bookmark was not created
-  user:
+  user: 
   <source>
     *: "Bookmark Failed!"
   </source>
@@ -4639,7 +4556,7 @@
 <phrase>
   id: LANG_BOOKMARK_LOAD_EMPTY
   desc: Indicates bookmark was empty
-  user:
+  user: 
   <source>
     *: "Bookmark Empty"
   </source>
@@ -4651,513 +4568,376 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_TIME_SET
-  desc: used in set_time()
-  user:
-  <source>
-    *: "ON To Set"
-  </source>
-  <dest>
-    *: "ON: 设定"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_TIME_REVERT
   desc: used in set_time()
-  user:
+  user: 
   <source>
-    *: "OFF To Revert"
+    *: none
+    rtc: "OFF = Revert"
+    h100,h120,h300: "STOP = Revert"
+    ipod*,e200: "MENU = Revert"
+    x5,m5: "RECORD = Revert"
+    h10,h10_5gb: "PREV = Revert"
+    gigabeatf: "A = Revert"
   </source>
   <dest>
-    *: "OFF: 回复"
+    *: none
+    rtc: "OFF: 回复"
+    h100,h120,h300: none
+    ipod*,e200: none
+    x5,m5: none
+    h10,h10_5gb: none
+    gigabeatf: none
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_ON_PLAYER
-  desc: displayed when key lock is on
-  user:
-  <source>
-    *: "Key Lock ON"
-  </source>
-  <dest>
-    *: "按键锁定"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_OFF_PLAYER
-  desc: displayed when key lock is turned off
-  user:
-  <source>
-    *: "Key Lock OFF"
-  </source>
-  <dest>
-    *: "解除按键锁"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_ON_RECORDER
-  desc: displayed when key lock is on
-  user:
-  <source>
-    *: "Keylock is ON"
-  </source>
-  <dest>
-    *: "按键锁定"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_OFF_RECORDER
-  desc: displayed when key lock is turned off
-  user:
-  <source>
-    *: "Keylock is OFF"
-  </source>
-  <dest>
-    *: "解除按键锁"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    rtc: ""
+    h100,h120,h300: ""
+    ipod*,e200: ""
+    x5,m5: ""
+    h10,h10_5gb: ""
+    gigabeatf: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_RECORDING_TIME
   desc: Display of recorded time
-  user:
+  user: 
   <source>
-    *: "Time:"
+    *: none
+    recording: "Time:"
   </source>
   <dest>
-    *: "时间:"
+    *: none
+    recording: "时间:"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TIMESPLIT_REC
-  desc: Display of record timer interval setting, on the record screen
-  user:
-  <source>
-    *: "Split Time:"
-  </source>
-  <dest>
-    *: "分割时间:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_SIZE
-  desc: Display of recorded file size
-  user:
-  <source>
-    *: "Size:"
-  </source>
-  <dest>
-    *: "档案大小:"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_RECORD_PRERECORD
   desc: in recording and radio screen
-  user:
+  user: 
   <source>
-    *: "Pre-Recording"
+    *: none
+    recording: "Pre-Recording"
   </source>
   <dest>
-    *: "预录"
+    *: none
+    recording: "预录"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_GAIN
-  desc: in the recording screen
-  user:
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "增益"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_RECORDING_LEFT
   desc: in the recording screen
-  user:
+  user: 
   <source>
-    *: "Gain Left"
+    *: none
+    recording: "Gain Left"
   </source>
   <dest>
-    *: "左增益"
+    *: none
+    recording: "左增益"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_RECORDING_RIGHT
   desc: in the recording screen
-  user:
+  user: 
   <source>
-    *: "Gain Right"
+    *: none
+    recording: "Gain Right"
   </source>
   <dest>
-    *: "右增益"
+    *: none
+    recording: "右增益"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_GAIN_ANALOG
-  desc: in the recording screen
-  user:
-  <source>
-    *: "A"
-  </source>
-  <dest>
-    *: "A"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_GAIN_DIGITAL
-  desc: in the recording screen
-  user:
-  <source>
-    *: "D"
-  </source>
-  <dest>
-    *: "D"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_DISK_FULL
   desc: in recording screen
-  user:
+  user: 
   <source>
-    *: "The disk is full. Press OFF to continue."
+    *: none
+    recording: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
+    m5,x5: "The disk is full. Press POWER to continue."
+    e200: "The disk is full. Press UP to continue."
   </source>
   <dest>
-    *: "磁盘已满，按下OFF继续。"
+    *: none
+    recording: "磁盘已满，按下OFF继续。"
+    h100,h120,h300: none
+    m5,x5: none
+    e200: none
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TRIGGER_MODE
-  desc: in recording settings_menu
-  user:
-  <source>
-    *: "Trigger"
-  </source>
-  <dest>
-    *: "触发"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    recording: ""
+    h100,h120,h300: ""
+    m5,x5: ""
+    e200: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_RECORD_TRIG_NOREARM
   desc: in recording settings_menu
-  user:
+  user: 
   <source>
-    *: "Once"
+    *: none
+    recording: "Once"
   </source>
   <dest>
-    *: "一次"
+    *: none
+    recording: "一次"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TRIG_REARM
-  desc: in recording settings_menu
-  user:
-  <source>
-    *: "Repeat"
-  </source>
-  <dest>
-    *: "重覆"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_RECORD_START_THRESHOLD
   desc: in recording settings_menu
-  user:
+  user: 
   <source>
-    *: "Start Above"
+    *: none
+    recording: "Start Above"
   </source>
   <dest>
-    *: "Start Above"
+    *: none
+    recording: "Start Above"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_MIN_DURATION
-  desc: in recording settings_menu
-  user:
-  <source>
-    *: "for at least"
-  </source>
-  <dest>
-    *: "for at least"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_RECORD_STOP_THRESHOLD
   desc: in recording settings_menu
-  user:
+  user: 
   <source>
-    *: "Stop Below"
+    *: none
+    recording: "Stop Below"
   </source>
   <dest>
-    *: "Stop Below"
+    *: none
+    recording: "Stop Below"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_STOP_POSTREC
-  desc: in recording settings_menu
-  user:
-  <source>
-    *: "for at least"
-  </source>
-  <dest>
-    *: "for at least"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_RECORD_STOP_GAP
   desc: in recording settings_menu
-  user:
+  user: 
   <source>
-    *: "Presplit Gap"
+    *: none
+    recording: "Presplit Gap"
   </source>
   <dest>
-    *: "Presplit Gap"
+    *: none
+    recording: "Presplit Gap"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_DB_INF
   desc: -inf db for values below measurement
-  user:
+  user: 
   <source>
-    *: "-inf"
+    *: none
+    recording: "-inf"
   </source>
   <dest>
-    *: "-inf"
+    *: none
+    recording: "-inf"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TRIG_IDLE
-  desc: waiting for threshold
-  user:
-  <source>
-    *: "Trigger Idle"
-  </source>
-  <dest>
-    *: "Trigger Idle"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TRIGGER_ACTIVE
-  desc: 
-  user:
-  <source>
-    *: "Trigger Active"
-  </source>
-  <dest>
-    *: "Trigger Active"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ALARM_MOD_TIME
   desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
-  user:
+  user: 
   <source>
-    *: "Alarm Time: %02d:%02d"
+    *: none
+    alarm: "Alarm Time: %02d:%02d"
   </source>
   <dest>
-    *: "闹铃时间: %02d:%02d"
+    *: none
+    alarm: "闹铃时间: %02d:%02d"
   </dest>
   <voice>
-    *: ""
+    *: none
+    alarm: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ALARM_MOD_TIME_TO_GO
   desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
-  user:
+  user: 
   <source>
-    *: "Waking Up In %d:%02d"
+    *: none
+    alarm: "Waking Up In %d:%02d"
   </source>
   <dest>
-    *: "在 %d:%02d 內关闭闹铃"
+    *: none
+    alarm: "在 %d:%02d 內关闭闹铃"
   </dest>
   <voice>
-    *: ""
+    *: none
+    alarm: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ALARM_MOD_SHUTDOWN
   desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
-  user:
+  user: 
   <source>
-    *: "Alarm Set"
+    *: none
+    alarm: "Alarm Set"
   </source>
   <dest>
-    *: "已设定闹铃"
+    *: none
+    alarm: "已设定闹铃"
   </dest>
   <voice>
-    *: ""
+    *: none
+    alarm: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ALARM_MOD_ERROR
   desc: The text that tells that the time is incorrect (for the RTC alarm mod).
-  user:
+  user: 
   <source>
-    *: "Alarm Time Is Too Soon!"
+    *: none
+    alarm: "Alarm Time Is Too Soon!"
   </source>
   <dest>
-    *: "闹铃设定时间不正确!"
+    *: none
+    alarm: "闹铃设定时间不正确!"
   </dest>
   <voice>
-    *: ""
+    *: none
+    alarm: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ALARM_MOD_KEYS
   desc: Shown key functions in alarm menu (for the RTC alarm mod).
-  user:
+  user: 
   <source>
-    *: "PLAY=Set OFF=Cancel"
+    *: none
+    alarm: "PLAY=Set OFF=Cancel"
+    ipod*: "SELECT=Set MENU=Cancel"
   </source>
   <dest>
-    *: "PLAY=设定 OFF=取消"
+    *: none
+    alarm: "PLAY=设定 OFF=取消"
+    ipod*: none
   </dest>
   <voice>
-    *: ""
+    *: none
+    alarm: ""
+    ipod*: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ALARM_MOD_DISABLE
   desc: Announce that the RTC alarm has been turned off
-  user:
+  user: 
   <source>
-    *: "Alarm Disabled"
+    *: none
+    alarm: "Alarm Disabled"
   </source>
   <dest>
-    *: "闹铃关闭"
+    *: none
+    alarm: "闹铃关闭"
   </dest>
   <voice>
-    *: ""
+    *: none
+    alarm: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_COLOR_RGB_LABELS
   desc: what to show for the 'R' 'G' 'B' ONE LETTER EACH
-  user:
+  user: 
   <source>
-    *: "RGB"
+    *: none
+    lcd_color: "RGB"
   </source>
   <dest>
-    *: "RGB"
+    *: none
+    lcd_color: "RGB"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_color: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_COLOR_RGB_VALUE
   desc: in color screen
-  user:
+  user: 
   <source>
-    *: "RGB: %02X%02X%02X"
+    *: none
+    lcd_color: "RGB: %02X%02X%02X"
   </source>
   <dest>
-    *: "RGB: %02X%02X%02X"
+    *: none
+    lcd_color: "RGB: %02X%02X%02X"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_color: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_COLOR_UNACCEPTABLE
   desc: splash when user selects an invalid colour
-  user:
+  user: 
   <source>
-    *: "Invalid colour"
+    *: none
+    lcd_non-mono: "Invalid colour"
   </source>
   <dest>
-    *: "无效的颜色"
+    *: none
+    lcd_non-mono: "无效的颜色"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_TITLE
   desc: in tag viewer
-  user:
+  user: 
   <source>
     *: "[Title]"
   </source>
@@ -5171,7 +4951,7 @@
 <phrase>
   id: LANG_ID3_ARTIST
   desc: in tag viewer
-  user:
+  user: 
   <source>
     *: "[Artist]"
   </source>
@@ -5185,7 +4965,7 @@
 <phrase>
   id: LANG_ID3_ALBUM
   desc: in tag viewer
-  user:
+  user: 
   <source>
     *: "[Album]"
   </source>
@@ -5199,7 +4979,7 @@
 <phrase>
   id: LANG_ID3_TRACKNUM
   desc: in tag viewer
-  user:
+  user: 
   <source>
     *: "[Tracknum]"
   </source>
@@ -5213,7 +4993,7 @@
 <phrase>
   id: LANG_ID3_GENRE
   desc: in tag viewer
-  user:
+  user: 
   <source>
     *: "[Genre]"
   </source>
@@ -5227,7 +5007,7 @@
 <phrase>
   id: LANG_ID3_YEAR
   desc: in tag viewer
-  user:
+  user: 
   <source>
     *: "[Year]"
   </source>
@@ -5241,7 +5021,7 @@
 <phrase>
   id: LANG_ID3_LENGTH
   desc: in tag viewer
-  user:
+  user: 
   <source>
     *: "[Length]"
   </source>
@@ -5255,7 +5035,7 @@
 <phrase>
   id: LANG_ID3_PLAYLIST
   desc: in tag viewer
-  user:
+  user: 
   <source>
     *: "[Playlist]"
   </source>
@@ -5269,26 +5049,12 @@
 <phrase>
   id: LANG_ID3_BITRATE
   desc: in tag viewer
-  user:
+  user: 
   <source>
     *: "[Bitrate]"
   </source>
   <dest>
     *: "[Bitrate]"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_UNIT_DB
-  desc: in browse_id3
-  user:
-  <source>
-    *: "dB"
-  </source>
-  <dest>
-    *: "dB"
   </dest>
   <voice>
     *: ""
@@ -5297,7 +5063,7 @@
 <phrase>
   id: LANG_ID3_VBR
   desc: in browse_id3
-  user:
+  user: 
   <source>
     *: " (VBR)"
   </source>
@@ -5311,7 +5077,7 @@
 <phrase>
   id: LANG_ID3_FREQUENCY
   desc: in tag viewer
-  user:
+  user: 
   <source>
     *: "[Frequency]"
   </source>
@@ -5325,7 +5091,7 @@
 <phrase>
   id: LANG_ID3_TRACK_GAIN
   desc: in tag viewer
-  user:
+  user: 
   <source>
     *: "[Track Gain]"
   </source>
@@ -5339,7 +5105,7 @@
 <phrase>
   id: LANG_ID3_ALBUM_GAIN
   desc: in tag viewer
-  user:
+  user: 
   <source>
     *: "[Album Gain]"
   </source>
@@ -5353,7 +5119,7 @@
 <phrase>
   id: LANG_ID3_PATH
   desc: in tag viewer
-  user:
+  user: 
   <source>
     *: "[Path]"
   </source>
@@ -5367,7 +5133,7 @@
 <phrase>
   id: LANG_ID3_NO_INFO
   desc: in tag viewer
-  user:
+  user: 
   <source>
     *: "<No Info>"
   </source>
@@ -5381,273 +5147,330 @@
 <phrase>
   id: LANG_WEEKDAY_SUNDAY
   desc: Maximum 3-letter abbreviation for weekday
-  user:
+  user: 
   <source>
-    *: "Sun"
+    *: none
+    rtc: "Sun"
   </source>
   <dest>
-    *: "日"
+    *: none
+    rtc: "日"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_WEEKDAY_MONDAY
   desc: Maximum 3-letter abbreviation for weekday
-  user:
+  user: 
   <source>
-    *: "Mon"
+    *: none
+    rtc: "Mon"
   </source>
   <dest>
-    *: "一"
+    *: none
+    rtc: "一"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_WEEKDAY_TUESDAY
   desc: Maximum 3-letter abbreviation for weekday
-  user:
+  user: 
   <source>
-    *: "Tue"
+    *: none
+    rtc: "Tue"
   </source>
   <dest>
-    *: "二"
+    *: none
+    rtc: "二"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_WEEKDAY_WEDNESDAY
   desc: Maximum 3-letter abbreviation for weekday
-  user:
+  user: 
   <source>
-    *: "Wed"
+    *: none
+    rtc: "Wed"
   </source>
   <dest>
-    *: "三"
+    *: none
+    rtc: "三"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_WEEKDAY_THURSDAY
   desc: Maximum 3-letter abbreviation for weekday
-  user:
+  user: 
   <source>
-    *: "Thu"
+    *: none
+    rtc: "Thu"
   </source>
   <dest>
-    *: "四"
+    *: none
+    rtc: "四"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_WEEKDAY_FRIDAY
   desc: Maximum 3-letter abbreviation for weekday
-  user:
+  user: 
   <source>
-    *: "Fri"
+    *: none
+    rtc: "Fri"
   </source>
   <dest>
-    *: "五"
+    *: none
+    rtc: "五"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_WEEKDAY_SATURDAY
   desc: Maximum 3-letter abbreviation for weekday
-  user:
+  user: 
   <source>
-    *: "Sat"
+    *: none
+    rtc: "Sat"
   </source>
   <dest>
-    *: "六"
+    *: none
+    rtc: "六"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_MONTH_JANUARY
   desc: Maximum 3-letter abbreviation for monthname
-  user:
+  user: 
   <source>
-    *: "Jan"
+    *: none
+    rtc: "Jan"
   </source>
   <dest>
-    *: "１月"
+    *: none
+    rtc: "１月"
   </dest>
   <voice>
-    *: "January"
+    *: none
+    rtc: "January"
   </voice>
 </phrase>
 <phrase>
   id: LANG_MONTH_FEBRUARY
   desc: Maximum 3-letter abbreviation for monthname
-  user:
+  user: 
   <source>
-    *: "Feb"
+    *: none
+    rtc: "Feb"
   </source>
   <dest>
-    *: "２月"
+    *: none
+    rtc: "２月"
   </dest>
   <voice>
-    *: "February"
+    *: none
+    rtc: "February"
   </voice>
 </phrase>
 <phrase>
   id: LANG_MONTH_MARCH
   desc: Maximum 3-letter abbreviation for monthname
-  user:
+  user: 
   <source>
-    *: "Mar"
+    *: none
+    rtc: "Mar"
   </source>
   <dest>
-    *: "３月"
+    *: none
+    rtc: "３月"
   </dest>
   <voice>
-    *: "March"
+    *: none
+    rtc: "March"
   </voice>
 </phrase>
 <phrase>
   id: LANG_MONTH_APRIL
   desc: Maximum 3-letter abbreviation for monthname
-  user:
+  user: 
   <source>
-    *: "Apr"
+    *: none
+    rtc: "Apr"
   </source>
   <dest>
-    *: "４月"
+    *: none
+    rtc: "４月"
   </dest>
   <voice>
-    *: "April"
+    *: none
+    rtc: "April"
   </voice>
 </phrase>
 <phrase>
   id: LANG_MONTH_MAY
   desc: Maximum 3-letter abbreviation for monthname
-  user:
+  user: 
   <source>
-    *: "May"
+    *: none
+    rtc: "May"
   </source>
   <dest>
-    *: "５月"
+    *: none
+    rtc: "５月"
   </dest>
   <voice>
-    *: "May"
+    *: none
+    rtc: "May"
   </voice>
 </phrase>
 <phrase>
   id: LANG_MONTH_JUNE
   desc: Maximum 3-letter abbreviation for monthname
-  user:
+  user: 
   <source>
-    *: "Jun"
+    *: none
+    rtc: "Jun"
   </source>
   <dest>
-    *: "６月"
+    *: none
+    rtc: "６月"
   </dest>
   <voice>
-    *: "June"
+    *: none
+    rtc: "June"
   </voice>
 </phrase>
 <phrase>
   id: LANG_MONTH_JULY
   desc: Maximum 3-letter abbreviation for monthname
-  user:
+  user: 
   <source>
-    *: "Jul"
+    *: none
+    rtc: "Jul"
   </source>
   <dest>
-    *: "７月"
+    *: none
+    rtc: "７月"
   </dest>
   <voice>
-    *: "July"
+    *: none
+    rtc: "July"
   </voice>
 </phrase>
 <phrase>
   id: LANG_MONTH_AUGUST
   desc: Maximum 3-letter abbreviation for monthname
-  user:
+  user: 
   <source>
-    *: "Aug"
+    *: none
+    rtc: "Aug"
   </source>
   <dest>
-    *: "８月"
+    *: none
+    rtc: "８月"
   </dest>
   <voice>
-    *: "August"
+    *: none
+    rtc: "August"
   </voice>
 </phrase>
 <phrase>
   id: LANG_MONTH_SEPTEMBER
   desc: Maximum 3-letter abbreviation for monthname
-  user:
+  user: 
   <source>
-    *: "Sep"
+    *: none
+    rtc: "Sep"
   </source>
   <dest>
-    *: "９月"
+    *: none
+    rtc: "９月"
   </dest>
   <voice>
-    *: "September"
+    *: none
+    rtc: "September"
   </voice>
 </phrase>
 <phrase>
   id: LANG_MONTH_OCTOBER
   desc: Maximum 3-letter abbreviation for monthname
-  user:
+  user: 
   <source>
-    *: "Oct"
+    *: none
+    rtc: "Oct"
   </source>
   <dest>
-    *: "10月"
+    *: none
+    rtc: "10月"
   </dest>
   <voice>
-    *: "October"
+    *: none
+    rtc: "October"
   </voice>
 </phrase>
 <phrase>
   id: LANG_MONTH_NOVEMBER
   desc: Maximum 3-letter abbreviation for monthname
-  user:
+  user: 
   <source>
-    *: "Nov"
+    *: none
+    rtc: "Nov"
   </source>
   <dest>
-    *: "11月"
+    *: none
+    rtc: "11月"
   </dest>
   <voice>
-    *: "November"
+    *: none
+    rtc: "November"
   </voice>
 </phrase>
 <phrase>
   id: LANG_MONTH_DECEMBER
   desc: Maximum 3-letter abbreviation for monthname
-  user:
+  user: 
   <source>
-    *: "Dec"
+    *: none
+    rtc: "Dec"
   </source>
   <dest>
-    *: "12月"
+    *: none
+    rtc: "12月"
   </dest>
   <voice>
-    *: "December"
+    *: none
+    rtc: "December"
   </voice>
 </phrase>
 <phrase>
   id: VOICE_ZERO
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5661,7 +5484,7 @@
 <phrase>
   id: VOICE_ONE
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5675,7 +5498,7 @@
 <phrase>
   id: VOICE_TWO
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5689,7 +5512,7 @@
 <phrase>
   id: VOICE_THREE
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5703,7 +5526,7 @@
 <phrase>
   id: VOICE_FOUR
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5717,7 +5540,7 @@
 <phrase>
   id: VOICE_FIFE
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5731,7 +5554,7 @@
 <phrase>
   id: VOICE_SIX
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5745,7 +5568,7 @@
 <phrase>
   id: VOICE_SEVEN
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5759,7 +5582,7 @@
 <phrase>
   id: VOICE_EIGHT
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5773,7 +5596,7 @@
 <phrase>
   id: VOICE_NINE
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5787,7 +5610,7 @@
 <phrase>
   id: VOICE_TEN
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5801,7 +5624,7 @@
 <phrase>
   id: VOICE_ELEVEN
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5815,7 +5638,7 @@
 <phrase>
   id: VOICE_TWELVE
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5829,7 +5652,7 @@
 <phrase>
   id: VOICE_THIRTEEN
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5843,7 +5666,7 @@
 <phrase>
   id: VOICE_FOURTEEN
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5857,7 +5680,7 @@
 <phrase>
   id: VOICE_FIFTEEN
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5871,7 +5694,7 @@
 <phrase>
   id: VOICE_SIXTEEN
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5885,7 +5708,7 @@
 <phrase>
   id: VOICE_SEVENTEEN
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5899,7 +5722,7 @@
 <phrase>
   id: VOICE_EIGHTEEN
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5913,7 +5736,7 @@
 <phrase>
   id: VOICE_NINETEEN
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5927,7 +5750,7 @@
 <phrase>
   id: VOICE_TWENTY
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5941,7 +5764,7 @@
 <phrase>
   id: VOICE_THIRTY
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5955,7 +5778,7 @@
 <phrase>
   id: VOICE_FORTY
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5969,7 +5792,7 @@
 <phrase>
   id: VOICE_FIFTY
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5983,7 +5806,7 @@
 <phrase>
   id: VOICE_SIXTY
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -5997,7 +5820,7 @@
 <phrase>
   id: VOICE_SEVENTY
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6011,7 +5834,7 @@
 <phrase>
   id: VOICE_EIGHTY
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6025,7 +5848,7 @@
 <phrase>
   id: VOICE_NINETY
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6039,7 +5862,7 @@
 <phrase>
   id: VOICE_HUNDRED
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6053,7 +5876,7 @@
 <phrase>
   id: VOICE_THOUSAND
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6067,7 +5890,7 @@
 <phrase>
   id: VOICE_MILLION
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6081,7 +5904,7 @@
 <phrase>
   id: VOICE_BILLION
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6095,7 +5918,7 @@
 <phrase>
   id: VOICE_MINUS
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6109,7 +5932,7 @@
 <phrase>
   id: VOICE_PLUS
   desc: spoken only, for composing numbers
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6123,7 +5946,7 @@
 <phrase>
   id: VOICE_MILLISECONDS
   desc: spoken only, a unit postfix
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6137,7 +5960,7 @@
 <phrase>
   id: VOICE_SECOND
   desc: spoken only, a unit postfix
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6151,7 +5974,7 @@
 <phrase>
   id: VOICE_SECONDS
   desc: spoken only, a unit postfix
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6165,7 +5988,7 @@
 <phrase>
   id: VOICE_MINUTE
   desc: spoken only, a unit postfix
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6179,7 +6002,7 @@
 <phrase>
   id: VOICE_MINUTES
   desc: spoken only, a unit postfix
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6193,7 +6016,7 @@
 <phrase>
   id: VOICE_HOUR
   desc: spoken only, a unit postfix
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6207,7 +6030,7 @@
 <phrase>
   id: VOICE_HOURS
   desc: spoken only, a unit postfix
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6221,7 +6044,7 @@
 <phrase>
   id: VOICE_KHZ
   desc: spoken only, a unit postfix
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6235,7 +6058,7 @@
 <phrase>
   id: VOICE_DB
   desc: spoken only, a unit postfix
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6249,7 +6072,7 @@
 <phrase>
   id: VOICE_PERCENT
   desc: spoken only, a unit postfix
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6263,7 +6086,7 @@
 <phrase>
   id: VOICE_MILLIAMPHOURS
   desc: spoken only, a unit postfix
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6277,7 +6100,7 @@
 <phrase>
   id: VOICE_PIXEL
   desc: spoken only, a unit postfix
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6291,7 +6114,7 @@
 <phrase>
   id: VOICE_PER_SEC
   desc: spoken only, a unit postfix
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6305,7 +6128,7 @@
 <phrase>
   id: VOICE_HERTZ
   desc: spoken only, a unit postfix
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6319,7 +6142,7 @@
 <phrase>
   id: LANG_BYTE
   desc: a unit postfix
-  user:
+  user: 
   <source>
     *: "B"
   </source>
@@ -6333,7 +6156,7 @@
 <phrase>
   id: LANG_KILOBYTE
   desc: a unit postfix, also voiced
-  user:
+  user: 
   <source>
     *: "KB"
   </source>
@@ -6347,7 +6170,7 @@
 <phrase>
   id: LANG_MEGABYTE
   desc: a unit postfix, also voiced
-  user:
+  user: 
   <source>
     *: "MB"
   </source>
@@ -6361,7 +6184,7 @@
 <phrase>
   id: LANG_GIGABYTE
   desc: a unit postfix, also voiced
-  user:
+  user: 
   <source>
     *: "GB"
   </source>
@@ -6375,7 +6198,7 @@
 <phrase>
   id: LANG_POINT
   desc: decimal separator for composing numbers
-  user:
+  user: 
   <source>
     *: "."
   </source>
@@ -6389,7 +6212,7 @@
 <phrase>
   id: VOICE_CHAR_A
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6403,7 +6226,7 @@
 <phrase>
   id: VOICE_CHAR_B
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6417,7 +6240,7 @@
 <phrase>
   id: VOICE_CHAR_C
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6431,7 +6254,7 @@
 <phrase>
   id: VOICE_CHAR_D
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6445,7 +6268,7 @@
 <phrase>
   id: VOICE_CHAR_E
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6459,7 +6282,7 @@
 <phrase>
   id: VOICE_CHAR_F
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6473,7 +6296,7 @@
 <phrase>
   id: VOICE_CHAR_G
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6487,7 +6310,7 @@
 <phrase>
   id: VOICE_CHAR_H
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6501,7 +6324,7 @@
 <phrase>
   id: VOICE_CHAR_I
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6515,7 +6338,7 @@
 <phrase>
   id: VOICE_CHAR_J
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6529,7 +6352,7 @@
 <phrase>
   id: VOICE_CHAR_K
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6543,7 +6366,7 @@
 <phrase>
   id: VOICE_CHAR_L
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6557,7 +6380,7 @@
 <phrase>
   id: VOICE_CHAR_M
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6571,7 +6394,7 @@
 <phrase>
   id: VOICE_CHAR_N
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6585,7 +6408,7 @@
 <phrase>
   id: VOICE_CHAR_O
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6599,7 +6422,7 @@
 <phrase>
   id: VOICE_CHAR_P
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6613,7 +6436,7 @@
 <phrase>
   id: VOICE_CHAR_Q
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6627,7 +6450,7 @@
 <phrase>
   id: VOICE_CHAR_R
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6641,7 +6464,7 @@
 <phrase>
   id: VOICE_CHAR_S
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6655,7 +6478,7 @@
 <phrase>
   id: VOICE_CHAR_T
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6669,7 +6492,7 @@
 <phrase>
   id: VOICE_CHAR_U
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6683,7 +6506,7 @@
 <phrase>
   id: VOICE_CHAR_V
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6697,7 +6520,7 @@
 <phrase>
   id: VOICE_CHAR_W
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6711,7 +6534,7 @@
 <phrase>
   id: VOICE_CHAR_X
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6725,7 +6548,7 @@
 <phrase>
   id: VOICE_CHAR_Y
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6739,7 +6562,7 @@
 <phrase>
   id: VOICE_CHAR_Z
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6753,7 +6576,7 @@
 <phrase>
   id: VOICE_DOT
   desc: spoken only, for spelling
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6767,7 +6590,7 @@
 <phrase>
   id: VOICE_PAUSE
   desc: spoken only, for spelling, a split second of silence (difficult to author)
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6781,7 +6604,7 @@
 <phrase>
   id: VOICE_FILE
   desc: spoken only, prefix for file number
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6795,7 +6618,7 @@
 <phrase>
   id: VOICE_DIR
   desc: spoken only, prefix for directory number
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6809,7 +6632,7 @@
 <phrase>
   id: VOICE_EXT_MPA
   desc: spoken only, for file extension
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6823,7 +6646,7 @@
 <phrase>
   id: VOICE_EXT_CFG
   desc: spoken only, for file extension
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6837,7 +6660,7 @@
 <phrase>
   id: VOICE_EXT_WPS
   desc: spoken only, for file extension
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6850,8 +6673,8 @@
 </phrase>
 <phrase>
   id: VOICE_EXT_TXT
-  desc: spoken only, for file extension
-  user:
+  desc: DEPRECATED
+  user: 
   <source>
     *: ""
   </source>
@@ -6859,13 +6682,13 @@
     *: ""
   </dest>
   <voice>
-    *: "text"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: VOICE_EXT_ROCK
   desc: spoken only, for file extension
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6879,7 +6702,7 @@
 <phrase>
   id: VOICE_EXT_FONT
   desc: spoken only, for file extension
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6893,7 +6716,7 @@
 <phrase>
   id: VOICE_EXT_BMARK
   desc: spoken only, for file extension and the word in general
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6905,23 +6728,9 @@
   </voice>
 </phrase>
 <phrase>
-  id: VOICE_EXT_UCL
-  desc: spoken only, for file extension
-  user:
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "flash"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_EXT_AJZ
   desc: spoken only, for file extension
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6935,21 +6744,24 @@
 <phrase>
   id: VOICE_EXT_RWPS
   desc: spoken only, for file extension
-  user:
+  user: 
   <source>
-    *: ""
+    *: none
+    remote: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    remote: none
   </dest>
   <voice>
-    *: "remote while-playing-screen"
+    *: none
+    remote: "remote while-playing-screen"
   </voice>
 </phrase>
 <phrase>
   id: VOICE_EXT_KBD
   desc: spoken only, for file extension
-  user:
+  user: 
   <source>
     *: ""
   </source>
@@ -6961,23 +6773,9 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYLIST_LOAD
-  desc: displayed on screen while loading a playlist
-  user:
-  <source>
-    *: "Loading..."
-  </source>
-  <dest>
-    *: "载入中..."
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYLIST_SHUFFLE
   desc: displayed on screen while shuffling a playlist
-  user:
+  user: 
   <source>
     *: "Shuffling..."
   </source>
@@ -6991,7 +6789,7 @@
 <phrase>
   id: LANG_PLAYLIST_BUFFER_FULL
   desc: in playlist.indices() when playlist is full
-  user:
+  user: 
   <source>
     *: "Playlist Buffer Full"
   </source>
@@ -7003,37 +6801,9 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_END_PLAYLIST_PLAYER
-  desc: when playlist has finished
-  user:
-  <source>
-    *: "End of List"
-  </source>
-  <dest>
-    *: "清单结尾"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_END_PLAYLIST_RECORDER
-  desc: when playlist has finished
-  user:
-  <source>
-    *: "End of Song List"
-  </source>
-  <dest>
-    *: "曲目清单结尾"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CREATING
   desc: Screen feedback during playlist creation
-  user:
+  user: 
   <source>
     *: "Creating"
   </source>
@@ -7047,7 +6817,7 @@
 <phrase>
   id: LANG_PLAYLIST_INSERT_COUNT
   desc: splash number of tracks inserted
-  user:
+  user: 
   <source>
     *: "Inserted %d tracks (%s)"
   </source>
@@ -7061,7 +6831,7 @@
 <phrase>
   id: LANG_PLAYLIST_QUEUE_COUNT
   desc: splash number of tracks queued
-  user:
+  user: 
   <source>
     *: "Queued %d tracks (%s)"
   </source>
@@ -7075,7 +6845,7 @@
 <phrase>
   id: LANG_PLAYLIST_SAVE_COUNT
   desc: splash number of tracks saved
-  user:
+  user: 
   <source>
     *: "Saved %d tracks (%s)"
   </source>
@@ -7089,7 +6859,7 @@
 <phrase>
   id: LANG_RECURSE_DIRECTORY_QUESTION
   desc: Asked from onplay screen
-  user:
+  user: 
   <source>
     *: "Recursively?"
   </source>
@@ -7103,7 +6873,7 @@
 <phrase>
   id: LANG_WARN_ERASEDYNPLAYLIST_PROMPT
   desc: prompt shown when about to erase a modified dynamic playlist
-  user:
+  user: 
   <source>
     *: "Erase dynamic playlist?"
   </source>
@@ -7117,7 +6887,7 @@
 <phrase>
   id: LANG_NOTHING_TO_RESUME
   desc: Error message displayed when resume button pressed but no playlist
-  user:
+  user: 
   <source>
     *: "Nothing to resume"
   </source>
@@ -7131,7 +6901,7 @@
 <phrase>
   id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
   desc: Playlist error
-  user:
+  user: 
   <source>
     *: "Error updating playlist control file"
   </source>
@@ -7145,7 +6915,7 @@
 <phrase>
   id: LANG_PLAYLIST_ACCESS_ERROR
   desc: Playlist error
-  user:
+  user: 
   <source>
     *: "Error accessing playlist file"
   </source>
@@ -7159,7 +6929,7 @@
 <phrase>
   id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
   desc: Playlist error
-  user:
+  user: 
   <source>
     *: "Error accessing playlist control file"
   </source>
@@ -7173,7 +6943,7 @@
 <phrase>
   id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
   desc: Playlist error
-  user:
+  user: 
   <source>
     *: "Error accessing directory"
   </source>
@@ -7187,7 +6957,7 @@
 <phrase>
   id: LANG_PLAYLIST_CONTROL_INVALID
   desc: Playlist resume error
-  user:
+  user: 
   <source>
     *: "Playlist control file is invalid"
   </source>
@@ -7201,357 +6971,330 @@
 <phrase>
   id: LANG_FM_STATION
   desc: in radio screen
-  user:
+  user: 
   <source>
-    *: "Station: %d.%02d MHz"
+    *: none
+    radio: "Station: %d.%02d MHz"
   </source>
   <dest>
-    *: "电台: %d.%02d MHz"
+    *: none
+    radio: "电台: %d.%02d MHz"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_NO_PRESETS
   desc: error when preset list is empty
-  user:
+  user: 
   <source>
-    *: "No presets"
+    *: none
+    radio: "No presets"
   </source>
   <dest>
-    *: "沒有预设"
+    *: none
+    radio: "沒有预设"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_ADD_PRESET
   desc: in radio menu
-  user:
+  user: 
   <source>
-    *: "Add Preset"
+    *: none
+    radio: "Add Preset"
   </source>
   <dest>
-    *: "增加预设"
+    *: none
+    radio: "增加预设"
   </dest>
   <voice>
-    *: "Add Preset"
+    *: none
+    radio: "Add Preset"
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_EDIT_PRESET
   desc: in radio screen
-  user:
+  user: 
   <source>
-    *: "Edit Preset"
+    *: none
+    radio: "Edit Preset"
   </source>
   <dest>
-    *: "编辑预设"
+    *: none
+    radio: "编辑预设"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_DELETE_PRESET
   desc: in radio screen
-  user:
+  user: 
   <source>
-    *: "Remove Preset"
+    *: none
+    radio: "Remove Preset"
   </source>
   <dest>
-    *: "移除预设"
+    *: none
+    radio: "移除预设"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_PRESET_SAVE_FAILED
   desc: in radio screen
-  user:
+  user: 
   <source>
-    *: "Preset Save Failed"
+    *: none
+    radio: "Preset Save Failed"
   </source>
   <dest>
-    *: "储存预设失败"
+    *: none
+    radio: "储存预设失败"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_NO_FREE_PRESETS
   desc: in radio screen
-  user:
+  user: 
   <source>
-    *: "The Preset List is Full"
+    *: none
+    radio: "The Preset List is Full"
   </source>
   <dest>
-    *: "预设清单已满"
+    *: none
+    radio: "预设清单已满"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BUTTONBAR_MENU
   desc: in button bar
-  user:
+  user: 
   <source>
-    *: "Menu"
+    *: none
+    radio_screen_button_bar: "Menu"
   </source>
   <dest>
-    *: "选单"
+    *: none
+    radio_screen_button_bar: "选单"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_BUTTONBAR_EXIT
   desc: in radio screen
-  user:
+  user: 
   <source>
-    *: "Exit"
+    *: none
+    radio_screen_button_bar: "Exit"
   </source>
   <dest>
-    *: "离开"
+    *: none
+    radio_screen_button_bar: "离开"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_BUTTONBAR_ACTION
   desc: in radio screen
-  user:
+  user: 
   <source>
-    *: "Action"
+    *: none
+    radio_screen_button_bar: "Action"
   </source>
   <dest>
-    *: "动作"
+    *: none
+    radio_screen_button_bar: "动作"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_PRESETS
-  desc: in button bar
-  user:
-  <source>
-    *: "Preset"
-  </source>
-  <dest>
-    *: "预设"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_BUTTONBAR_ADD
   desc: in radio screen
-  user:
+  user: 
   <source>
-    *: "Add"
+    *: none
+    radio_screen_button_bar: "Add"
   </source>
   <dest>
-    *: "增加"
+    *: none
+    radio_screen_button_bar: "增加"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_BUTTONBAR_RECORD
   desc: in radio screen
-  user:
+  user: 
   <source>
-    *: "Record"
+    *: none
+    radio_screen_button_bar: "Record"
   </source>
   <dest>
-    *: "录音"
+    *: none
+    radio_screen_button_bar: "录音"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_MONO_MODE
   desc: in radio screen
-  user:
+  user: 
   <source>
-    *: "Force mono"
+    *: none
+    radio: "Force mono"
   </source>
   <dest>
-    *: "强迫使用单声道"
+    *: none
+    radio: "强迫使用单声道"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_FREEZE
   desc: splash screen during freeze in radio mode
-  user:
+  user: 
   <source>
-    *: "Screen frozen!"
+    *: none
+    radio: "Screen frozen!"
   </source>
   <dest>
-    *: "显示冻结!"
+    *: none
+    radio: "显示冻结!"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_SCAN_PRESETS
   desc: in radio menu
-  user:
+  user: 
   <source>
-    *: "Auto-Scan Presets"
+    *: none
+    radio: "Auto-Scan Presets"
   </source>
   <dest>
-    *: "自动扫描预设"
+    *: none
+    radio: "自动扫描预设"
   </dest>
   <voice>
-    *: "Auto scan presets"
+    *: none
+    radio: "Auto scan presets"
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_CLEAR_PRESETS
   desc: confirmation if presets can be cleared
-  user:
+  user: 
   <source>
-    *: "Clear Current Presets?"
+    *: none
+    radio: "Clear Current Presets?"
   </source>
   <dest>
-    *: "清除现在预设?"
+    *: none
+    radio: "清除现在预设?"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_SCANNING
   desc: during auto scan
-  user:
+  user: 
   <source>
-    *: "Scanning %d.%02d MHz"
+    *: none
+    radio: "Scanning %d.%02d MHz"
   </source>
   <dest>
-    *: "扫描 %d.%02d MHz"
+    *: none
+    radio: "扫描 %d.%02d MHz"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_DEFAULT_PRESET_NAME
   desc: default preset name for auto scan mode
-  user:
+  user: 
   <source>
-    *: "%d.%02d MHz"
+    *: none
+    radio: "%d.%02d MHz"
   </source>
   <dest>
-    *: "%d.%02d MHz"
+    *: none
+    radio: "%d.%02d MHz"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_TUNE_MODE
-  desc: in radio screen / menu
-  user:
-  <source>
-    *: "Mode:"
-  </source>
-  <dest>
-    *: "模式:"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_RADIO_SCAN_MODE
   desc: in radio screen / menu
-  user:
+  user: 
   <source>
-    *: "Scan"
+    *: none
+    radio: "Scan"
   </source>
   <dest>
-    *: "扫描"
+    *: none
+    radio: "扫描"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RADIO_PRESET_MODE
-  desc: in radio screen / menu
-  user:
-  <source>
-    *: "Preset"
-  </source>
-  <dest>
-    *: "预设"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRBROWSE_F1
-  desc: in dir browser, F1 button bar text
-  user:
-  <source>
-    *: "Menu"
-  </source>
-  <dest>
-    *: "选单"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRBROWSE_F2
-  desc: in dir browser, F2 button bar text
-  user:
-  <source>
-    *: "Option"
-  </source>
-  <dest>
-    *: "选项"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRBROWSE_F3
-  desc: in dir browser, F3 button bar text
-  user:
-  <source>
-    *: "LCD"
-  </source>
-  <dest>
-    *: "液晶屏幕"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SHOWDIR_BUFFER_FULL
   desc: in showdir(), displayed on screen when you reach buffer limit
-  user:
+  user: 
   <source>
     *: "Dir Buffer is Full!"
   </source>
@@ -7565,7 +7308,7 @@
 <phrase>
   id: LANG_LANGUAGE_LOADED
   desc: shown when a language has been loaded from the dir browser
-  user:
+  user: 
   <source>
     *: "New Language"
   </source>
@@ -7579,7 +7322,7 @@
 <phrase>
   id: LANG_SETTINGS_LOADED
   desc: Feedback shown when a .cfg file is loaded
-  user:
+  user: 
   <source>
     *: "Settings Loaded"
   </source>
@@ -7593,7 +7336,7 @@
 <phrase>
   id: LANG_SETTINGS_SAVED
   desc: Feedback shown when a .cfg file is saved
-  user:
+  user: 
   <source>
     *: "Settings Saved"
   </source>
@@ -7607,7 +7350,7 @@
 <phrase>
   id: LANG_BOOT_CHANGED
   desc: File browser discovered the boot file was changed
-  user:
+  user: 
   <source>
     *: "Boot changed"
   </source>
@@ -7621,7 +7364,7 @@
 <phrase>
   id: LANG_REBOOT_NOW
   desc: Do you want to reboot?
-  user:
+  user: 
   <source>
     *: "Reboot now?"
   </source>
@@ -7635,35 +7378,33 @@
 <phrase>
   id: LANG_OFF_ABORT
   desc: Used on recorder models
-  user:
+  user: 
   <source>
     *: "OFF to abort"
+    player,h100,h120,h300: "STOP to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    x5,m5: "Long PLAY to abort"
+    h10,h10_5gb,e200: "PREV to abort"
   </source>
   <dest>
     *: "OFF: 离开"
+    player,h100,h120,h300: ""
+    ipod*: ""
+    x5,m5: ""
+    h10,h10_5gb,e200: ""
   </dest>
   <voice>
     *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_STOP_ABORT
-  desc: Used on player models
-  user:
-  <source>
-    *: "STOP to abort"
-  </source>
-  <dest>
-    *: "STOP: 离开"
-  </dest>
-  <voice>
-    *: ""
+    player,h100,h120,h300: ""
+    ipod*: ""
+    x5,m5: ""
+    h10,h10_5gb,e200: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_NO_FILES
   desc: in settings_menu
-  user:
+  user: 
   <source>
     *: "No files"
   </source>
@@ -7677,35 +7418,41 @@
 <phrase>
   id: LANG_BACKDROP_LOADED
   desc: text for splash to indicate a new backdrop has been loaded successfully
-  user:
+  user: 
   <source>
-    *: "Backdrop Loaded"
+    *: none
+    lcd_non-mono: "Backdrop Loaded"
   </source>
   <dest>
-    *: "已载入背景"
+    *: none
+    lcd_non-mono: "已载入背景"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BACKDROP_FAILED
   desc: text for splash to indicate a failure to load a bitmap as backdrop
-  user:
+  user: 
   <source>
-    *: "Backdrop Failed"
+    *: none
+    lcd_non-mono: "Backdrop Failed"
   </source>
   <dest>
-    *: "背景载入失败"
+    *: none
+    lcd_non-mono: "背景载入失败"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_KEYBOARD_LOADED
   desc: shown when a keyboard has been loaded from the dir browser
-  user:
+  user: 
   <source>
     *: "New Keyboard"
   </source>
@@ -7717,149 +7464,9 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_ID3DB_ARTISTS
-  desc: ID3 virtual folder name
-  user:
-  <source>
-    *: "Artists"
-  </source>
-  <dest>
-    *: "作者"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_ALBUMS
-  desc: ID3 virtual folder name
-  user:
-  <source>
-    *: "Albums"
-  </source>
-  <dest>
-    *: "专辑"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SONGS
-  desc: ID3 virtual folder name
-  user:
-  <source>
-    *: "Songs"
-  </source>
-  <dest>
-    *: "曲名"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_GENRES
-  desc: in tag cache
-  user:
-  <source>
-    *: "Genres"
-  </source>
-  <dest>
-    *: "类型"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SEARCH
-  desc: ID3 virtual folder name
-  user:
-  <source>
-    *: "Search"
-  </source>
-  <dest>
-    *: "搜寻"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SEARCH_ARTISTS
-  desc: ID3 virtual folder name
-  user:
-  <source>
-    *: "Search Artists"
-  </source>
-  <dest>
-    *: "搜寻作者"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SEARCH_ALBUMS
-  desc: ID3 virtual folder name
-  user:
-  <source>
-    *: "Search Albums"
-  </source>
-  <dest>
-    *: "搜寻专辑"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SEARCH_SONGS
-  desc: ID3 virtual folder name
-  user:
-  <source>
-    *: "Search Songs"
-  </source>
-  <dest>
-    *: "搜寻曲名"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_MATCHES
-  desc: ID3 virtual folder name
-  user:
-  <source>
-    *: "Found %d matches"
-  </source>
-  <dest>
-    *: "找到 %d 笔符合"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_ALL_SONGS
-  desc: ID3 virtual folder name
-  user:
-  <source>
-    *: "<All songs>"
-  </source>
-  <dest>
-    *: "<所有曲目>"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_MOVE
   desc: The verb/action Move
-  user:
+  user: 
   <source>
     *: "Move"
   </source>
@@ -7871,23 +7478,9 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_MOVE_FAILED
-  desc: Error message displayed in playlist viewer
-  user:
-  <source>
-    *: "Move Failed"
-  </source>
-  <dest>
-    *: "移动失败"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SHOW_INDICES
   desc: in playlist viewer menu
-  user:
+  user: 
   <source>
     *: "Show Indices"
   </source>
@@ -7901,7 +7494,7 @@
 <phrase>
   id: LANG_TRACK_DISPLAY
   desc: in playlist viewer on+play menu
-  user:
+  user: 
   <source>
     *: "Track Display"
   </source>
@@ -7915,7 +7508,7 @@
 <phrase>
   id: LANG_DISPLAY_TRACK_NAME_ONLY
   desc: track display options
-  user:
+  user: 
   <source>
     *: "Track Name Only"
   </source>
@@ -7929,7 +7522,7 @@
 <phrase>
   id: LANG_DISPLAY_FULL_PATH
   desc: track display options
-  user:
+  user: 
   <source>
     *: "Full Path"
   </source>
@@ -7943,7 +7536,7 @@
 <phrase>
   id: LANG_REMOVE
   desc: in playlist viewer on+play menu
-  user:
+  user: 
   <source>
     *: "Remove"
   </source>
@@ -7955,23 +7548,9 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FILE_OPTIONS
-  desc: in playlist viewer on+play menu
-  user:
-  <source>
-    *: "File Options"
-  </source>
-  <dest>
-    *: "文件选项"
-  </dest>
-  <voice>
-    *: "File Options"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLUGIN_CANT_OPEN
   desc: Plugin open error message
-  user:
+  user: 
   <source>
     *: "Can't open %s"
   </source>
@@ -7985,7 +7564,7 @@
 <phrase>
   id: LANG_READ_FAILED
   desc: There was an error reading a file
-  user:
+  user: 
   <source>
     *: "Failed reading %s"
   </source>
@@ -7999,7 +7578,7 @@
 <phrase>
   id: LANG_PLUGIN_WRONG_MODEL
   desc: The plugin is not compatible with the archos model trying to run it
-  user:
+  user: 
   <source>
     *: "Incompatible model"
   </source>
@@ -8013,7 +7592,7 @@
 <phrase>
   id: LANG_PLUGIN_WRONG_VERSION
   desc: The plugin is not compatible with the rockbox version trying to run it
-  user:
+  user: 
   <source>
     *: "Incompatible version"
   </source>
@@ -8027,7 +7606,7 @@
 <phrase>
   id: LANG_PLUGIN_ERROR
   desc: The plugin return an error code
-  user:
+  user: 
   <source>
     *: "Plugin returned error"
   </source>
@@ -8041,7 +7620,7 @@
 <phrase>
   id: LANG_FILETYPES_EXTENSION_FULL
   desc: Extension array full
-  user:
+  user: 
   <source>
     *: "Extension array full"
   </source>
@@ -8055,7 +7634,7 @@
 <phrase>
   id: LANG_FILETYPES_FULL
   desc: Filetype array full
-  user:
+  user: 
   <source>
     *: "Filetype array full"
   </source>
@@ -8069,7 +7648,7 @@
 <phrase>
   id: LANG_FILETYPES_PLUGIN_NAME_LONG
   desc: Viewer plugin name too long
-  user:
+  user: 
   <source>
     *: "Plugin name too long"
   </source>
@@ -8081,202 +7660,181 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FILETYPES_STRING_BUFFER_EMPTY
-  desc: Filetype string buffer empty
-  user:
-  <source>
-    *: "Filetype string buffer empty"
-  </source>
-  <dest>
-    *: "文件类型字串缓冲区为空"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESUME_CONFIRM_PLAYER
-  desc: possible answers to resume question
-  user:
-  <source>
-    *: "(PLAY/STOP)"
-  </source>
-  <dest>
-    *: "(PLAY/STOP)"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FM_PRESET_LOAD
   desc: load preset list in fm radio
-  user:
+  user: 
   <source>
-    *: "Load Preset List"
+    *: none
+    radio: "Load Preset List"
   </source>
   <dest>
-    *: "载入预设清单"
+    *: none
+    radio: "载入预设清单"
   </dest>
   <voice>
-    *: "Load Preset List"
+    *: none
+    radio: "Load Preset List"
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_PRESET_SAVE
   desc: Save preset list in fm radio
-  user:
+  user: 
   <source>
-    *: "Save Preset List"
+    *: none
+    radio: "Save Preset List"
   </source>
   <dest>
-    *: "储存预设清单"
+    *: none
+    radio: "储存预设清单"
   </dest>
   <voice>
-    *: "Save Preset List"
+    *: none
+    radio: "Save Preset List"
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_PRESET_CLEAR
   desc: clear preset list in fm radio
-  user:
+  user: 
   <source>
-    *: "Clear Preset List"
+    *: none
+    radio: "Clear Preset List"
   </source>
   <dest>
-    *: "清除预设清单"
+    *: none
+    radio: "清除预设清单"
   </dest>
   <voice>
-    *: "Clear Preset List"
+    *: none
+    radio: "Clear Preset List"
   </voice>
 </phrase>
 <phrase>
   id: LANG_FMR
   desc: Used when you need to say Preset List, also voiced
-  user:
+  user: 
   <source>
-    *: "Preset List"
+    *: none
+    radio: "Preset List"
   </source>
   <dest>
-    *: "预设清单"
+    *: none
+    radio: "预设清单"
   </dest>
   <voice>
-    *: "Preset List"
+    *: none
+    radio: "Preset List"
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_FIRST_AUTOSCAN
   desc: When you run the radio without an fmr file in settings
-  user:
+  user: 
   <source>
-    *: "No Settings found, AutoScan?"
+    *: none
+    radio: "No settings found. Autoscan?"
   </source>
   <dest>
-    *: "找不到设定，自动扫描?"
+    *: none
+    radio: "找不到设定，自动扫描?"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_SAVE_CHANGES
   desc: When you try to exit radio to confirm save
-  user:
+  user: 
   <source>
-    *: "Save Changes?"
+    *: none
+    radio: "Save Changes?"
   </source>
   <dest>
-    *: "储存变动?"
+    *: none
+    radio: "储存变动?"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PIXELS
-  desc: In the settings menu
-  user:
-  <source>
-    *: "pixels"
-  </source>
-  <dest>
-    *: "像素"
-  </dest>
-  <voice>
-    *: "pixels"
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_CROSSFEED_DIRECT_GAIN
   desc: in crossfeed settings
-  user:
+  user: 
   <source>
-    *: "Direct Gain"
+    *: none
+    swcodec: "Direct Gain"
   </source>
   <dest>
-    *: "Direct Gain"
+    *: none
+    swcodec: "Direct Gain"
   </dest>
   <voice>
-    *: "Direct gain"
+    *: none
+    swcodec: "Direct gain"
   </voice>
-</phrase>   
+</phrase>
 <phrase>
   id: LANG_CROSSFEED_CROSS_GAIN
   desc: in crossfeed settings
-  <source>  
-    *: "Cross Gain"
+  user: 
+  <source>
+    *: none
+    swcodec: "Cross Gain"
   </source>
-  <dest>  
-    *: "Cross Gain"
+  <dest>
+    *: none
+    swcodec: "Cross Gain"
   </dest>
-  <voice>  
-    *: "Cross gain"
+  <voice>
+    *: none
+    swcodec: "Cross gain"
   </voice>
 </phrase>
 <phrase>
   id: LANG_CROSSFEED_HF_ATTENUATION
   desc: in crossfeed settings
+  user: 
   <source>
-    *: "High-Frequency Attenuation"
+    *: none
+    swcodec: "High-Frequency Attenuation"
   </source>
   <dest>
-    *: "High-Frequency Attenuation"
+    *: none
+    swcodec: "High-Frequency Attenuation"
   </dest>
   <voice>
-    *: "High-frequency attenuation"
+    *: none
+    swcodec: "High-frequency attenuation"
   </voice>
 </phrase>
 <phrase>
   id: LANG_CROSSFEED_HF_CUTOFF
   desc: in crossfeed settings
+  user: 
   <source>
-    *: "High-Frequency Cutoff"
+    *: none
+    swcodec: "High-Frequency Cutoff"
   </source>
   <dest>
-    *: "High-Frequency Cutoff"
+    *: none
+    swcodec: "High-Frequency Cutoff"
   </dest>
   <voice>
-    *: "High-frequency cutoff"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_UNIT_HERTZ
-  desc: in sound settings
-  <source>
-    *: "Hz"
-  </source>
-  <dest>
-    *: "Hz"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    swcodec: "High-frequency cutoff"
   </voice>
 </phrase>
 <phrase>
   id: LANG_TAGCACHE_BUSY
   desc: when trying to shutdown and tagcache is committing
+  user: 
   <source>
-    *: "Tagcache is not ready"
+    *: "Database is not ready"
   </source>
   <dest>
     *: "标签缓存尚未准备好"
@@ -8288,7 +7846,7 @@
 <phrase>
   id: LANG_TAGNAVI_ALL_TRACKS
   desc: "<All tracks>" entry in tag browser
-  user:
+  user: 
   <source>
     *: "<All tracks>"
   </source>
@@ -8302,7 +7860,7 @@
 <phrase>
   id: LANG_INVALID_FILENAME
   desc: "invalid filename entered" error message
-  user:
+  user: 
   <source>
     *: "Invalid Filename!"
   </source>
@@ -8316,23 +7874,26 @@
 <phrase>
   id: LANG_REMOTE_SCROLL_SETS
   desc: "Remote Scrolling Options" Submenu in "Scrolling Options" menu
-  user:
+  user: 
   <source>
-    *: "Remote Scrolling Options"
+    *: none
+    remote: "Remote Scrolling Options"
   </source>
   <dest>
-    *: "线控卷动设定"
+    *: none
+    remote: "线控卷动设定"
   </dest>
   <voice>
-    *: "Remote Scrolling Options"
+    *: none
+    remote: "Remote Scrolling Options"
   </voice>
 </phrase>
 <phrase>
   id: LANG_TAGCACHE_UPDATE
   desc: in tag cache settings
-  user:
+  user: 
   <source>
-    *: "Update now"
+    *: "Update Now"
   </source>
   <dest>
     *: "立刻更新"
@@ -8344,9 +7905,9 @@
 <phrase>
   id: LANG_TAGCACHE_AUTOUPDATE
   desc: in tag cache settings
-  user:
+  user: 
   <source>
-    *: "Auto update"
+    *: "Auto Update"
   </source>
   <dest>
     *: "自动更新"
@@ -8358,9 +7919,9 @@
 <phrase>
   id: LANG_TAGCACHE_EXPORT
   desc: in tag cache settings
-  user:
+  user: 
   <source>
-    *: "Export modifications"
+    *: "Export Modifications"
   </source>
   <dest>
     *: "导出修改"
@@ -8372,748 +7933,3117 @@
 <phrase>
   id: LANG_SYSFONT_SET_BOOL_YES
   desc: bool true representation
-  user:
+  user: 
   <source>
-    *: "Yes"
+    *: none
+    lcd_bitmap: "Yes"
   </source>
   <dest>
-    *: "Yes"
+    *: none
+    lcd_bitmap: "Yes"
   </dest>
   <voice>
-    *: "Yes"
+    *: none
+    lcd_bitmap: "Yes"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SET_BOOL_NO
   desc: bool false representation
-  user:
+  user: 
   <source>
-    *: "No"
+    *: none
+    lcd_bitmap: "No"
   </source>
   <dest>
-    *: "No"
+    *: none
+    lcd_bitmap: "No"
   </dest>
   <voice>
-    *: "No"
+    *: none
+    lcd_bitmap: "No"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_ON
   desc: Used in a lot of places
-  user:
+  user: 
   <source>
-    *: "On"
+    *: none
+    lcd_bitmap: "On"
   </source>
   <dest>
-    *: "On"
+    *: none
+    lcd_bitmap: "On"
   </dest>
   <voice>
-    *: "On"
+    *: none
+    lcd_bitmap: "On"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_OFF
   desc: Used in a lot of places
-  user:
+  user: 
   <source>
-    *: "Off"
+    *: none
+    lcd_bitmap: "Off"
   </source>
   <dest>
-    *: "Off"
+    *: none
+    lcd_bitmap: "Off"
   </dest>
   <voice>
-    *: "Off"
+    *: none
+    lcd_bitmap: "Off"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_VOLUME
   desc: in sound_settings
-  user:
+  user: 
   <source>
-    *: "Volume"
+    *: none
+    recording: "Volume"
   </source>
   <dest>
-    *: "Volume"
+    *: none
+    recording: "Volume"
   </dest>
   <voice>
-    *: "Volume"
+    *: none
+    recording: "Volume"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_CHANNEL_STEREO
   desc: in sound_settings
-  user:
+  user: 
   <source>
-    *: "Stereo"
+    *: none
+    recording: "Stereo"
   </source>
   <dest>
-    *: "Stereo"
+    *: none
+    recording: "Stereo"
   </dest>
   <voice>
-    *: "Stereo"
+    *: none
+    recording: "Stereo"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_CHANNEL_MONO
   desc: in sound_settings
-  user:
+  user: 
   <source>
-    *: "Mono"
+    *: none
+    recording: "Mono"
   </source>
   <dest>
-    *: "Mono"
+    *: none
+    recording: "Mono"
   </dest>
   <voice>
-    *: "Mono"
+    *: none
+    recording: "Mono"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_EQUALIZER_EDIT_MODE
   desc: in the equalizer settings menu
-  user:
+  user: 
   <source>
-    *: "Edit mode: %s"
+    *: none
+    swcodec: "Edit mode: %s"
   </source>
   <dest>
-    *: "Edit mode: %s"
+    *: none
+    swcodec: "Edit mode: %s"
   </dest>
   <voice>
-    *: ""
+    *: none
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_EQUALIZER_BAND_CUTOFF
   desc: in the equalizer settings menu
-  user:
+  user: 
   <source>
-    *: "Cutoff Frequency"
+    *: none
+    swcodec: "Cutoff Frequency"
   </source>
   <dest>
-    *: "Cutoff Frequency"
+    *: none
+    swcodec: "Cutoff Frequency"
   </dest>
   <voice>
-    *: "Cutoff Frequency"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_EQUALIZER_BAND_GAIN
-  desc: in the equalizer settings menu
-  user:
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Gain"
-  </dest>
-  <voice>
-    *: "Gain"
+    *: none
+    swcodec: "Cutoff Frequency"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SHUFFLE
   desc: in settings_menu
-  user:
+  user: 
   <source>
-    *: "Shuffle"
+    *: none
+    lcd_bitmap: "Shuffle"
   </source>
   <dest>
-    *: "Shuffle"
+    *: none
+    lcd_bitmap: "Shuffle"
   </dest>
   <voice>
-    *: "Shuffle"
+    *: none
+    lcd_bitmap: "Shuffle"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT
   desc: in settings_menu
-  user:
+  user: 
   <source>
-    *: "Repeat"
+    *: none
+    lcd_bitmap: "Repeat"
   </source>
   <dest>
-    *: "Repeat"
+    *: none
+    lcd_bitmap: "Repeat"
   </dest>
   <voice>
-    *: "Repeat"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_REPEAT_ALL
-  desc: repeat playlist once all songs have completed
-  user:
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "All"
-  </dest>
-  <voice>
-    *: "All"
+    *: none
+    lcd_bitmap: "Repeat"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT_ONE
   desc: repeat one song
-  user:
+  user: 
   <source>
-    *: "One"
+    *: none
+    lcd_bitmap: "One"
   </source>
   <dest>
-    *: "One"
+    *: none
+    lcd_bitmap: "One"
   </dest>
   <voice>
-    *: "One"
+    *: none
+    lcd_bitmap: "One"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT_AB
-  desc: repeat one song
-  user:
+  desc: repeat range from point A to B
+  user: 
   <source>
-    *: "A-B"
+    *: none
+    lcd_bitmap: "A-B"
   </source>
   <dest>
-    *: "A-B"
+    *: none
+    lcd_bitmap: "A-B"
   </dest>
   <voice>
-    *: "A-B"
+    *: none
+    lcd_bitmap: "A-B"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER
   desc: setting name for dir filter
-  user:
+  user: 
   <source>
-    *: "Show Files"
+    *: none
+    lcd_bitmap: "Show Files"
   </source>
   <dest>
-    *: "Show Files"
+    *: none
+    lcd_bitmap: "Show Files"
   </dest>
   <voice>
-    *: "Show Files"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_ALL
-  desc: show all files
-  user:
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "All"
-  </dest>
-  <voice>
-    *: "All"
+    *: none
+    lcd_bitmap: "Show Files"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_SUPPORTED
   desc: show all file types supported by Rockbox
-  user:
+  user: 
   <source>
-    *: "Supported"
+    *: none
+    lcd_bitmap: "Supported"
   </source>
   <dest>
-    *: "Supported"
+    *: none
+    lcd_bitmap: "Supported"
   </dest>
   <voice>
-    *: "Supported"
+    *: none
+    lcd_bitmap: "Supported"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_MUSIC
   desc: show only music-related files
-  user:
+  user: 
   <source>
-    *: "Music"
+    *: none
+    lcd_bitmap: "Music"
   </source>
   <dest>
-    *: "Music"
+    *: none
+    lcd_bitmap: "Music"
   </dest>
   <voice>
-    *: "Music"
+    *: none
+    lcd_bitmap: "Music"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_PLAYLIST
   desc: show only playlist
-  user:
+  user: 
   <source>
-    *: "Playlists"
+    *: none
+    lcd_bitmap: "Playlists"
   </source>
   <dest>
-    *: "Playlists"
+    *: none
+    lcd_bitmap: "Playlists"
   </dest>
   <voice>
-    *: "Playlists"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_ID3DB
-  desc: show ID3 Database
-  user:
-  <source>
-    *: "ID3 Database"
-  </source>
-  <dest>
-    *: "ID3 Database"
-  </dest>
-  <voice>
-    *: "ID3 Database"
+    *: none
+    lcd_bitmap: "Playlists"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_QUALITY
   desc: in the recording settings
-  user:
+  user: 
   <source>
-    *: "Quality"
+    *: none
+    recording_hwcodec: "Quality"
   </source>
   <dest>
-    *: "Quality"
+    *: none
+    recording_hwcodec: "Quality"
   </dest>
   <voice>
-    *: "Quality"
+    *: none
+    recording_hwcodec: "Quality"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_FREQUENCY
   desc: in the recording settings
-  user:
+  user: 
   <source>
-    *: "Frequency"
+    *: none
+    recording: "Frequency"
   </source>
   <dest>
-    *: "Frequency"
+    *: none
+    recording: "Frequency"
   </dest>
   <voice>
-    *: "Frequency"
+    *: none
+    recording: "Frequency"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_SOURCE
   desc: in the recording settings
-  user:
+  user: 
   <source>
-    *: "Source"
+    *: none
+    recording: "Source"
   </source>
   <dest>
-    *: "Source"
+    *: none
+    recording: "Source"
   </dest>
   <voice>
-    *: "Source"
+    *: none
+    recording: "Source"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_SRC_MIC
   desc: in the recording settings
-  user:
+  user: 
   <source>
-    *: "Mic"
+    *: none
+    recording: "Int. Mic"
   </source>
   <dest>
-    *: "Mic"
+    *: none
+    recording: "Mic"
   </dest>
   <voice>
-    *: "Microphone"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_LINE
-  desc: in the recording settings
-  user:
-  <source>
-    *: "Line In"
-  </source>
-  <dest>
-    *: "Line In"
-  </dest>
-  <voice>
-    *: "Line In"
+    *: none
+    recording: "Microphone"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_SRC_DIGITAL
   desc: in the recording settings
-  user:
+  user: 
   <source>
-    *: "Digital"
+    *: none
+    recording: "Digital"
   </source>
   <dest>
-    *: "Digital"
+    *: none
+    recording: "Digital"
   </dest>
   <voice>
-    *: "Digital"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_CHANNELS
-  desc: in the recording settings
-  user:
-  <source>
-    *: "Channels"
-  </source>
-  <dest>
-    *: "Channels"
-  </dest>
-  <voice>
-    *: "Channels"
+    *: none
+    recording: "Digital"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORD_TRIGGER
   desc: in recording settings_menu
-  user:
+  user: 
   <source>
-    *: "Trigger"
+    *: none
+    recording: "Trigger"
   </source>
   <dest>
-    *: "Trigger"
+    *: none
+    recording: "Trigger"
   </dest>
   <voice>
-    *: "Trigger"
+    *: none
+    recording: "Trigger"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FLIP_DISPLAY
   desc: in settings_menu, option to turn display+buttos by 180 degreed
-  user:
+  user: 
   <source>
-    *: "Upside Down"
+    *: none
+    lcd_bitmap: "Upside Down"
   </source>
   <dest>
-    *: "Upside Down"
+    *: none
+    lcd_bitmap: "Upside Down"
   </dest>
   <voice>
-    *: "Upside Down"
+    *: none
+    lcd_bitmap: "Upside Down"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SCROLL_BAR
   desc: display menu, F3 substitute
-  user:
+  user: 
   <source>
-    *: "Scroll Bar"
+    *: none
+    lcd_bitmap: "Scroll Bar"
   </source>
   <dest>
-    *: "Scroll Bar"
+    *: none
+    lcd_bitmap: "Scroll Bar"
   </dest>
   <voice>
-    *: "Scroll Bar"
+    *: none
+    lcd_bitmap: "Scroll Bar"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_STATUS_BAR
   desc: display menu, F3 substitute
-  user:
+  user: 
   <source>
-    *: "Status Bar"
+    *: none
+    lcd_bitmap: "Status Bar"
   </source>
   <dest>
-    *: "Status Bar"
+    *: none
+    lcd_bitmap: "Status Bar"
   </dest>
   <voice>
-    *: "Status Bar"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_PITCH
-  desc: "pitch" in the pitch screen
-  user:
-  <source>
-    *: "Pitch"
-  </source>
-  <dest>
-    *: "Pitch"
-  </dest>
-  <voice>
-    *: "Pitch"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_PITCH_UP
-  desc: in wps
-  user:
-  <source>
-    *: "Pitch Up"
-  </source>
-  <dest>
-    *: "Pitch Up"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_PITCH_DOWN
-  desc: in wps
-  user:
-  <source>
-    *: "Pitch Down"
-  </source>
-  <dest>
-    *: "Pitch Down"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_F2_MODE
-  desc: in wps F2 pressed
-  user:
-  <source>
-    *: "Mode:"
-  </source>
-  <dest>
-    *: "Mode:"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    lcd_bitmap: "Status Bar"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_TIME
   desc: Display of recorded time
-  user:
+  user: 
   <source>
-    *: "Time:"
+    *: none
+    recording: "Time:"
   </source>
   <dest>
-    *: "Time:"
+    *: none
+    recording: "Time:"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORD_TIMESPLIT_REC
   desc: Display of record timer interval setting, on the record screen
-  user:
+  user: 
   <source>
-    *: "Split Time:"
+    *: none
+    recording: "Split Time:"
   </source>
   <dest>
-    *: "Split Time:"
+    *: none
+    recording: "Split Time:"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_SIZE
   desc: Display of recorded file size
-  user:
+  user: 
   <source>
-    *: "Size:"
+    *: none
+    recording: "Size:"
   </source>
   <dest>
-    *: "Size:"
+    *: none
+    recording: "Size:"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORD_PRERECORD
   desc: in recording and radio screen
-  user:
+  user: 
   <source>
-    *: "Pre-Recording"
+    *: none
+    recording: "Pre-Recording"
   </source>
   <dest>
-    *: "Pre-Recording"
+    *: none
+    recording: "Pre-Recording"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_GAIN
-  desc: in the recording screen
-  user:
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Gain"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_LEFT
   desc: in the recording screen
-  user:
+  user: 
   <source>
-    *: "Gain Left"
+    *: none
+    recording: "Gain Left"
   </source>
   <dest>
-    *: "Gain Left"
+    *: none
+    recording: "Gain Left"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_RIGHT
   desc: in the recording screen
-  user:
+  user: 
   <source>
-    *: "Gain Right"
+    *: none
+    recording: "Gain Right"
   </source>
   <dest>
-    *: "Gain Right"
+    *: none
+    recording: "Gain Right"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_DISK_FULL
   desc: in recording screen
-  user:
+  user: 
   <source>
-    *: "The disk is full. Press OFF to continue."
+    *: none
+    recording: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "The disk is full. Press LEFT to continue."
   </source>
   <dest>
-    *: "The disk is full. Press OFF to continue."
+    *: none
+    recording: "The disk is full. Press OFF to continue."
+    h100,h120,h300: none
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: none
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
+    h100,h120,h300: ""
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_DIRBROWSE_F1
   desc: in dir browser, F1 button bar text
-  user:
+  user: 
   <source>
-    *: "Menu"
+    *: none
+    recorder_pad: "Menu"
   </source>
   <dest>
-    *: "Menu"
+    *: none
+    recorder_pad: "Menu"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recorder_pad: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_DIRBROWSE_F2
   desc: in dir browser, F2 button bar text
-  user:
+  user: 
   <source>
-    *: "Option"
+    *: none
+    recorder_pad: "Option"
   </source>
   <dest>
-    *: "Option"
+    *: none
+    recorder_pad: "Option"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recorder_pad: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_DIRBROWSE_F3
   desc: in dir browser, F3 button bar text
-  user:
+  user: 
   <source>
-    *: "LCD"
+    *: none
+    recorder_pad: "LCD"
   </source>
   <dest>
-    *: "LCD"
+    *: none
+    recorder_pad: "LCD"
+  </dest>
+  <voice>
+    *: none
+    recorder_pad: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_SAFETY
+  desc: AGC preset
+  user: 
+  <source>
+    *: none
+    agc: "Safety (clip)"
+  </source>
+  <dest>
+    *: none
+    agc: "Safety (clip)"
+  </dest>
+  <voice>
+    *: none
+    agc: "Safety (clip)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_VOICE
+  desc: AGC preset
+  user: 
+  <source>
+    *: none
+    agc: "Voice (fast)"
+  </source>
+  <dest>
+    *: none
+    agc: "Voice (fast)"
+  </dest>
+  <voice>
+    *: none
+    agc: "Voice (fast)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_MEDIUM
+  desc: AGC preset
+  user: 
+  <source>
+    *: none
+    agc: "Medium"
+  </source>
+  <dest>
+    *: none
+    agc: "Medium"
+  </dest>
+  <voice>
+    *: none
+    agc: "Medium"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_LIVE
+  desc: AGC preset
+  user: 
+  <source>
+    *: none
+    agc: "Live (slow)"
+  </source>
+  <dest>
+    *: none
+    agc: "Live (slow)"
+  </dest>
+  <voice>
+    *: none
+    agc: "Live (slow)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_DJSET
+  desc: AGC preset
+  user: 
+  <source>
+    *: none
+    agc: "DJ-Set (slow)"
+  </source>
+  <dest>
+    *: none
+    agc: "DJ-Set (slow)"
+  </dest>
+  <voice>
+    *: none
+    agc: "DJ set (slow)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
+  desc: AGC maximum gain in recording screen
+  user: 
+  <source>
+    *: none
+    agc: "AGC max. gain"
+  </source>
+  <dest>
+    *: none
+    agc: "AGC max. gain"
+  </dest>
+  <voice>
+    *: none
+    agc: "AGC maximum gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
+  desc: in the equalizer settings menu
+  user: 
+  <source>
+    *: none
+    ipodvideo: "Narrow"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Narrow"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Narrow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_PCM_WAV
+  desc: audio format description
+  user: 
+  <source>
+    *: none
+    recording: "PCM Wave"
+  </source>
+  <dest>
+    *: none
+    recording: "PCM Wave"
+  </dest>
+  <voice>
+    *: none
+    recording: "PCM Wave"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PM_UNITS_PER_TICK
+  desc: spoken only, peak meter release unit
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "units per tick"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_AGC_PRESET
+  desc: automatic gain control in record settings
+  user: 
+  <source>
+    *: none
+    agc: "Automatic Gain Control"
+  </source>
+  <dest>
+    *: none
+    agc: "自动调整音量"
+  </dest>
+  <voice>
+    *: none
+    agc: "Automatic gain control"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KBIT_PER_SEC
+  desc: spoken only, a unit postfix
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "kilobits per second"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEVER
+  desc: in lcd settings
+  user: 
+  <source>
+    *: none
+    lcd_sleep: "Never"
+  </source>
+  <dest>
+    *: none
+    lcd_sleep: "从不"
+  </dest>
+  <voice>
+    *: none
+    lcd_sleep: "Never"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_LINE_IN
+  desc: in the recording settings
+  user: 
+  <source>
+    *: none
+    recording: "Line In"
+  </source>
+  <dest>
+    *: none
+    recording: "Line In"
+  </dest>
+  <voice>
+    *: none
+    recording: "Line In"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUILDING_DATABASE
+  desc: splash database building progress
+  user: 
+  <source>
+    *: "Building database... %d found (OFF to return)"
+    h100,h120,h300: "Building database... %d found (STOP to return)"
+    ipod*: "Building database... %d found (PLAY/PAUSE to return)"
+    x5,m5: "Building database... %d found (LEFT to return)"
+    h10,h10_5gb,e200: "Building database... %d found (PREV to return)"
+  </source>
+  <dest>
+    *: "更新资料库... 找到 %d  (按 OFF 退回)"
+    h100,h120,h300: "更新资料库... 找到 %d  (按 STOP 退回)"
+    ipod*: "更新资料库... 找到 %d  (按 PLAY/PAUSE 退回)"
+    x5,m5: "更新资料库... 找到 %d  (按 LEFT 退回)"
+    h10,h10_5gb,e200: "更新资料库... 找到 %d  (按 PREV 退回)"
+  </dest>
+  <voice>
+    *: "entries found for database"
+    h100,h120,h300: ""
+    ipod*: ""
+    x5,m5: ""
+    h10,h10_5gb,e200: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCANNING_DISK
+  desc: when booting up and rebuilding the cache and calculating free space
+  user: 
+  <source>
+    *: "Scanning disk..."
+  </source>
+  <dest>
+    *: "扫描文件..."
+  </dest>
+  <voice>
+    *: "Scanning disk"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIR_BROWSER
+  desc: main menu title
+  user: 
+  <source>
+    *: "Files"
+  </source>
+  <dest>
+    *: "文件"
+  </dest>
+  <voice>
+    *: "Files"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMMENT
+  desc: in tag viewer
+  user: 
+  <source>
+    *: "[Comment]"
+  </source>
+  <dest>
+    *: "[Comment]"
   </dest>
   <voice>
     *: ""
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
-  id: LANG_SYSFONT_AGC_SAFETY
+  id: LANG_AGC_DJSET
   desc: AGC preset
+  user: 
   <source>
-    *: "Safety (clip)"
+    *: none
+    agc: "DJ-Set (slow)"
   </source>
   <dest>
-    *: "Safety (clip)"
+    *: none
+    agc: "DJ-Set (慢)"
   </dest>
   <voice>
-    *: "Safety (clip)"
+    *: none
+    agc: "DJ set (slow)"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
-  id: LANG_SYSFONT_AGC_VOICE
-  desc: AGC preset
+  id: LANG_TAGCACHE_IMPORT
+  desc: in tag cache settings
+  user: 
   <source>
-    *: "Voice (fast)"
+    *: "Import Modifications"
   </source>
   <dest>
-    *: "Voice (fast)"
+    *: "载入更改数据"
   </dest>
   <voice>
-    *: "Voice (fast)"
+    *: "Import Modifications"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
-  id: LANG_SYSFONT_AGC_MEDIUM
-  desc: AGC preset
+  id: LANG_AFMT_WAVPACK
+  desc: audio format description
+  user: 
   <source>
-    *: "Medium"
+    *: none
+    recording_swcodec: "WavPack"
   </source>
   <dest>
-    *: "Medium"
+    *: none
+    recording_swcodec: "WavPack"
   </dest>
   <voice>
-    *: "Medium"
+    *: none
+    recording_swcodec: "WavPack"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
-  id: LANG_SYSFONT_AGC_LIVE
-  desc: AGC preset
+  id: LANG_SYSFONT_ALL
+  desc: repeat playlist once all songs have completed
+  user: 
   <source>
-    *: "Live (slow)"
+    *: none
+    lcd_bitmap: "All"
   </source>
   <dest>
-    *: "Live (slow)"
+    *: none
+    lcd_bitmap: "全部"
   </dest>
   <voice>
-    *: "Live (slow)"
+    *: none
+    lcd_bitmap: "All"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
-  id: LANG_SYSFONT_AGC_DJSET
-  desc: AGC preset
+  id: LANG_LCD_SLEEP_AFTER_BACKLIGHT_OFF
+  desc: In display settings, time to switch LCD chip into power saving state
+  user: 
   <source>
-    *: "DJ-Set (slow)"
+    *: none
+    lcd_sleep: "Sleep (After Backlight Off)"
   </source>
   <dest>
-    *: "DJ-Set (slow)"
+    *: none
+    lcd_sleep: "在关屏幕灯后睡眠"
   </dest>
   <voice>
-    *: "DJ set (slow)"
+    *: none
+    lcd_sleep: "Sleep after backlight off"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
-  id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
-  desc: AGC maximum gain in recording screen
+  id: LANG_REC_SIZE
+  desc: in record timesplit options
+  user: 
   <source>
-    *: "AGC max. gain"
+    *: none
+    recording: "Filesize"
   </source>
   <dest>
-    *: "AGC max. gain"
+    *: none
+    recording: "文件大小"
   </dest>
   <voice>
-    *: "AGC maximum gain"
+    *: none
+    recording: "Filesize"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GAIN
+  desc: Generic string for gain used in EQ menu and recording screen
+  user: 
+  <source>
+    *: "Gain"
+  </source>
+  <dest>
+    *: "添加"
+  </dest>
+  <voice>
+    *: "Gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETING
+  desc: 
+  user: 
+  <source>
+    *: "Deleting..."
+  </source>
+  <dest>
+    *: "正删除中..."
+  </dest>
+  <voice>
+    *: "Deleting"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_CHARGING
+  desc: in Battery menu
+  user: 
+  <source>
+    *: none
+    usb_charging: "Charge During USB Connection"
+  </source>
+  <dest>
+    *: none
+    usb_charging: "连接USB时冲电"
+  </dest>
+  <voice>
+    *: none
+    usb_charging: "Charge During U S B Connection"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_OFF
+  desc: Remote lcd off splash in recording screen
+  user: 
+  <source>
+    *: none
+    remote: "Remote Display OFF"
+  </source>
+  <dest>
+    *: none
+    remote: "关闭遥控屏幕"
+  </dest>
+  <voice>
+    *: none
+    remote: "Remote Display OFF"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOURCE_FREQUENCY
+  desc: when recording source frequency setting must follow source
+  user: 
+  <source>
+    *: none
+    recording: "(Same As Source)"
+  </source>
+  <dest>
+    *: none
+    recording: "(与原文件一样)"
+  </dest>
+  <voice>
+    *: none
+    recording: "Same As Source"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE_UNPLUG_DISABLE_AUTORESUME
+  desc: in pause_phones_menu.
+  user: 
+  <source>
+    *: none
+    headphone_detection: "Disable resume on startup if phones unplugged"
+  </source>
+  <dest>
+    *: none
+    headphone_detection: "如没耳机插入开机时不播放"
+  </dest>
+  <voice>
+    *: none
+    headphone_detection: "Disable resume on startup if phones unplugged"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_RESUME
+  desc: bookmark context menu, resume this bookmark
+  user: 
+  <source>
+    *: "Resume"
+  </source>
+  <dest>
+    *: "恢复播发"
+  </dest>
+  <voice>
+    *: "Resume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_PARTITION
+  desc: if save settings has failed
+  user: 
+  <source>
+    *: "No partition?"
+    player: "Partition?"
+  </source>
+  <dest>
+    *: "没分区?"
+    player: "分区?"
+  </dest>
+  <voice>
+    *: ""
+    player: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_EUROPE
+  desc: fm tuner region europe
+  user: 
+  <source>
+    *: none
+    radio: "Europe"
+  </source>
+  <dest>
+    *: none
+    radio: "Europe"
+  </dest>
+  <voice>
+    *: none
+    radio: "Europe"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_ENABLED
+  desc: in the equalizer settings menu
+  user: 
+  <source>
+    *: none
+    ipodvideo: "Enable Hardware EQ"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "使用硬件 EQ"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Enable hardware equalizer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARNING_BATTERY_LOW
+  desc: general warning
+  user: 
+  <source>
+    *: "WARNING! Low Battery!"
+  </source>
+  <dest>
+    *: "警告! 低电池!"
+  </dest>
+  <voice>
+    *: "WARNING! Low Battery!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENCODER_SETTINGS
+  desc: encoder settings
+  user: 
+  <source>
+    *: none
+    recording: "Encoder Settings"
+  </source>
+  <dest>
+    *: none
+    recording: "编码器设置"
+  </dest>
+  <voice>
+    *: none
+    recording: "Encoder Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLISTVIEWER_SETTINGS
+  desc: title for the playlist viewer settings menus
+  user: 
+  <source>
+    *: "Playlist Viewer Settings"
+  </source>
+  <dest>
+    *: "播放清单设置"
+  </dest>
+  <voice>
+    *: "Playlist Viewer Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_TIME
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    rtc: "Set Time/Date"
+  </source>
+  <dest>
+    *: none
+    rtc: "设置时间/日期"
+  </dest>
+  <voice>
+    *: none
+    rtc: "Set Time and Date"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOW_PLAYING
+  desc: in the main menu
+  user: 
+  <source>
+    *: "Now Playing"
+  </source>
+  <dest>
+    *: "正在播放"
+  </dest>
+  <voice>
+    *: "Now Playing"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_RECORDING
+  desc: in record timesplit options
+  user: 
+  <source>
+    *: none
+    recording: "Stop recording"
+  </source>
+  <dest>
+    *: none
+    recording: "停止录音"
+  </dest>
+  <voice>
+    *: none
+    recording: "Stop recording"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_SAVE_FAILED
+  desc: displayed if save settings has failed
+  user: 
+  <source>
+    *: "Save Failed"
+  </source>
+  <dest>
+    *: "储存失败"
+  </dest>
+  <voice>
+    *: "Save Failed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LISTACCEL_ACCEL_SPEED
+  desc: list acceleration speed
+  user: 
+  <source>
+    *: "List Acceleration Speed"
+    scrollwheel: none
+  </source>
+  <dest>
+    *: "列表加速速度"
+    scrollwheel: none
+  </dest>
+  <voice>
+    *: "List Acceleration Speed"
+    scrollwheel: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_FORMAT
+  desc: audio format item in recording menu
+  user: 
+  <source>
+    *: none
+    recording: "Format"
+  </source>
+  <dest>
+    *: none
+    recording: "格式"
+  </dest>
+  <voice>
+    *: none
+    recording: "Format"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_MENU
+  desc: bookmark selection list context menu
+  user: 
+  <source>
+    *: "Bookmark Actions"
+  </source>
+  <dest>
+    *: "书签动作"
+  </dest>
+  <voice>
+    *: "Bookmark Actions"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_TRACKSKIP
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Shuffle and Track Skip"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Shuffle and Track Skip"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Shuffle and Track Skip"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NORMAL
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Normal"
+  </source>
+  <dest>
+    *: "正常"
+  </dest>
+  <voice>
+    *: "Normal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUFFER_STAT
+  desc: the buffer size, %d MB %d fraction of MB
+  user: 
+  <source>
+    *: "Buffer: %d.%03dMB"
+    player: "Buf: %d.%03dMB"
+  </source>
+  <dest>
+    *: "Buffer: %d.%03dMB"
+    player: "Buf: %d.%03dMB"
+  </dest>
+  <voice>
+    *: ""
+    player: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE_UNPLUG_RESUME
+  desc: in pause_phones_menu.
+  user: 
+  <source>
+    *: none
+    headphone_detection: "Pause and Resume"
+  </source>
+  <dest>
+    *: none
+    headphone_detection: "暂停和恢复播放"
+  </dest>
+  <voice>
+    *: none
+    headphone_detection: "Pause and Resume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_DIR_NOT_WRITABLE
+  desc: 
+  user: 
+  <source>
+    *: none
+    recording: "Can't write to recording directory"
+  </source>
+  <dest>
+    *: none
+    recording: "不能写入录音目录"
+  </dest>
+  <voice>
+    *: none
+    recording: "Can't write to recording directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_CONFIGURATION
+  desc: in sound_settings
+  user: 
+  <source>
+    *: "Channel Configuration"
+  </source>
+  <dest>
+    *: "声道设置"
+  </dest>
+  <voice>
+    *: "Channel Configuration"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONFIRM_WITH_BUTTON
+  desc: Generic string to use to confirm
+  user: 
+  <source>
+    *: "PLAY = Yes"
+    h100,h120,h300: "NAVI = Yes"
+    ipod*,x5,m5,gigabeatf,e200,h10,h10_5gb: "SELECT = Yes"
+    player: "(PLAY/STOP)"
+  </source>
+  <dest>
+    *: "PLAY = 是"
+    h100,h120,h300: "NAVI = 是"
+    ipod*,x5,m5,gigabeatf,e200,h10,h10_5gb: "SELECT = 是"
+    player: "(PLAY/STOP)"
+  </dest>
+  <voice>
+    *: ""
+    h100,h120,h300: ""
+    ipod*,x5,m5,gigabeatf,e200,h10,h10_5gb: ""
+    player: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME_SET_BUTTON
+  desc: used in set_time()
+  user: 
+  <source>
+    *: none
+    rtc: "ON = Set"
+    h100,h120,h300: "NAVI = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,gigabeatf: "SELECT = Set"
+  </source>
+  <dest>
+    *: none
+    rtc: "ON = 设定"
+    h100,h120,h300: "NAVI = 设定"
+    ipod*,x5,m5,h10,h10_5gb,e200,gigabeatf: "SELECT = 设定"
+  </dest>
+  <voice>
+    *: none
+    rtc: ""
+    h100,h120,h300: ""
+    ipod*,x5,m5,h10,h10_5gb,e200,gigabeatf: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANCEL_WITH_ANY
+  desc: Generic string to use to cancel
+  user: 
+  <source>
+    *: "Any Other = No"
+    player: none
+  </source>
+  <dest>
+    *: "Any Other = 否"
+    player: none
+  </dest>
+  <voice>
+    *: ""
+    player: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSE_CUESHEET
+  desc: 
+  user: 
+  <source>
+    *: "Browse Cuesheet"
+  </source>
+  <dest>
+    *: "浏览 Cuesheet"
+  </dest>
+  <voice>
+    *: "Browse Cuesheet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_DEMOS
+  desc: in the main menu
+  user: 
+  <source>
+    *: "Demos"
+  </source>
+  <dest>
+    *: "Demos"
+  </dest>
+  <voice>
+    *: "Demos"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BITRATE
+  desc: bits-kilobits per unit time
+  user: 
+  <source>
+    *: none
+    recording_swcodec: "Bitrate"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "码率"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Bitrate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_TIME
+  desc: in run time screen
+  user: 
+  <source>
+    *: "Top Time"
+  </source>
+  <dest>
+    *: "最高时间"
+  </dest>
+  <voice>
+    *: "Top Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_FILE_TALK
+  desc: Item of voice menu, whether to use file .talk clips
+  user: 
+  <source>
+    *: "Use File .talk Clips"
+  </source>
+  <dest>
+    *: "使用 .talk 文件"
+  </dest>
+  <voice>
+    *: "Use File .talk Clips"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RANDOM
+  desc: random folder
+  user: 
+  <source>
+    *: "Random"
+  </source>
+  <dest>
+    *: "随机"
+  </dest>
+  <voice>
+    *: "Random"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALL
+  desc: generic string used both in dir file filter and repeat mode selection
+  user: 
+  <source>
+    *: "All"
+  </source>
+  <dest>
+    *: "全部"
+  </dest>
+  <voice>
+    *: "All"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_NEWFILESTP
+  desc: trigger types
+  user: 
+  <source>
+    *: none
+    recording: "New file"
+  </source>
+  <dest>
+    *: none
+    recording: "新文件"
+  </dest>
+  <voice>
+    *: none
+    recording: "New file"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_FAVES
+  desc: 
+  user: 
+  <source>
+    *: "Add to shortcuts"
+  </source>
+  <dest>
+    *: "添加到快捷"
+  </dest>
+  <voice>
+    *: "Add to shortcuts"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PRESET
+  desc: in button bar and radio screen / menu
+  user: 
+  <source>
+    *: none
+    radio: "Preset"
+  </source>
+  <dest>
+    *: none
+    radio: "预设"
+  </dest>
+  <voice>
+    *: none
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU
+  desc: in start screen setting
+  user: 
+  <source>
+    *: "Main Menu"
+  </source>
+  <dest>
+    *: "主菜单"
+  </dest>
+  <voice>
+    *: "Main Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_GAMES
+  desc: in the main menu
+  user: 
+  <source>
+    *: "Games"
+  </source>
+  <dest>
+    *: "游戏"
+  </dest>
+  <voice>
+    *: "Games"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_END_PLAYLIST
+  desc: when playlist has finished
+  user: 
+  <source>
+    *: "End of Song List"
+    player: "End of List"
+  </source>
+  <dest>
+    *: "列表结束"
+    player: "列表结束"
+  </dest>
+  <voice>
+    *: "End of Song List"
+    player: "End of List"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_GAIN
+  desc: in the equalizer settings menu
+  user: 
+  <source>
+    *: none
+    lcd_bitmap: "Gain"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "增加"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_WAKEUP_SCREEN
+  desc: in alarm menu setting
+  user: 
+  <source>
+    *: none
+    alarm: "Alarm Wake up Screen"
+  </source>
+  <dest>
+    *: none
+    alarm: "闹钟开机画面"
+  </dest>
+  <voice>
+    *: none
+    alarm: "Alarm Wake up Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_REC_DIR
+  desc: 
+  user: 
+  <source>
+    *: none
+    recording: "Clear Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "清除录音目录"
+  </dest>
+  <voice>
+    *: none
+    recording: "Clear Recording Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYLOCK_OFF
+  desc: displayed when key lock is turned off
+  user: 
+  <source>
+    *: "Buttons Unlocked"
+  </source>
+  <dest>
+    *: "键盘开锁"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_LIVE
+  desc: AGC preset
+  user: 
+  <source>
+    *: none
+    agc: "Live (slow)"
+  </source>
+  <dest>
+    *: none
+    agc: "实时 (慢)"
+  </dest>
+  <voice>
+    *: none
+    agc: "Live (slow)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_THEME
+  desc: save a theme file
+  user: 
+  <source>
+    *: "Save Theme Settings"
+  </source>
+  <dest>
+    *: "储存主题设置"
+  </dest>
+  <voice>
+    *: "Save Theme Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_AIFF
+  desc: audio format description
+  user: 
+  <source>
+    *: none
+    recording: "AIFF"
+  </source>
+  <dest>
+    *: none
+    recording: "AIFF"
+  </dest>
+  <voice>
+    *: none
+    recording: "AIFF"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_MODE
+  desc: in wps F2 pressed
+  user: 
+  <source>
+    *: none
+    lcd_bitmap: "Mode:"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Mode:"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_VOICE
+  desc: AGC preset
+  user: 
+  <source>
+    *: none
+    agc: "Voice (fast)"
+  </source>
+  <dest>
+    *: none
+    agc: "人声 (fast)"
+  </dest>
+  <voice>
+    *: none
+    agc: "Voice (fast)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_SETTINGS
+  desc: when something has settings in a certain context
+  user: 
+  <source>
+    *: none
+    recording: "(No Settings)"
+  </source>
+  <dest>
+    *: none
+    recording: "(没设置)"
+  </dest>
+  <voice>
+    *: none
+    recording: "No settings available"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIN_DURATION
+  desc: in recording settings_menu
+  user: 
+  <source>
+    *: none
+    recording: "for at least"
+  </source>
+  <dest>
+    *: none
+    recording: "最少"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_SIZE
+  desc: in record timesplit options
+  user: 
+  <source>
+    *: none
+    recording: "Split Filesize"
+  </source>
+  <dest>
+    *: none
+    recording: "文件分割大小"
+  </dest>
+  <voice>
+    *: none
+    recording: "Split Filesize"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNELS
+  desc: in sound_settings
+  user: 
+  <source>
+    *: "Channels"
+  </source>
+  <dest>
+    *: "声道"
+  </dest>
+  <voice>
+    *: "Channels"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_ON
+  desc: Remote lcd off splash in recording screen
+  user: 
+  <source>
+    *: none
+    remote: "(Vol- : Re-enable)"
+  </source>
+  <dest>
+    *: none
+    remote: "(Vol- : 重新使用)"
+  </dest>
+  <voice>
+    *: none
+    remote: "(Vol- : Re-enable)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ASK
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Ask"
+  </source>
+  <dest>
+    *: "每次提问"
+  </dest>
+  <voice>
+    *: "Ask"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MODE
+  desc: in wps F2 pressed and radio screen
+  user: 
+  <source>
+    *: "Mode:"
+  </source>
+  <dest>
+    *: "Mode:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_MEDIUM
+  desc: AGC preset
+  user: 
+  <source>
+    *: none
+    agc: "Medium"
+  </source>
+  <dest>
+    *: none
+    agc: "中等"
+  </dest>
+  <voice>
+    *: none
+    agc: "Medium"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH_DOWN_SEMITONE
+  desc: in wps
+  user: 
+  <source>
+    *: none
+    pitchscreen: "Semitone Down"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "调低半音"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_FILENAME
+  desc: Filename header in recording screen
+  user: 
+  <source>
+    *: none
+    recording: "Filename:"
+  </source>
+  <dest>
+    *: none
+    recording: "文件名:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_SAFETY
+  desc: AGC preset
+  user: 
+  <source>
+    *: none
+    agc: "Safety (clip)"
+  </source>
+  <dest>
+    *: none
+    agc: "安全 (clip)"
+  </dest>
+  <voice>
+    *: none
+    agc: "Safety (clip)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_PLAYBACK
+  desc: in the main menu
+  user: 
+  <source>
+    *: "Resume Playback"
+  </source>
+  <dest>
+    *: "恢复播放"
+  </dest>
+  <voice>
+    *: "Resume Playback"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE_UNPLUG
+  desc: in settings_menu.
+  user: 
+  <source>
+    *: none
+    headphone_detection: "Pause on Headphone Unplug"
+  </source>
+  <dest>
+    *: none
+    headphone_detection: "耳机拔出后暂停"
+  </dest>
+  <voice>
+    *: none
+    headphone_detection: "Pause on Headphone Unplug"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLACE
+  desc: in onplay menu.  Replace the current playlist with a new one.
+  user: 
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "下一个播放"
+  </dest>
+  <voice>
+    *: "Play Next"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG
+  desc: in onplay menu
+  user: 
+  <source>
+    *: "Playlist Catalog"
+  </source>
+  <dest>
+    *: "播放清单库"
+  </dest>
+  <voice>
+    *: "Playlist Catalog"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_MEASURE
+  desc: in record timesplit options
+  user: 
+  <source>
+    *: none
+    recording: "Split Measure"
+  </source>
+  <dest>
+    *: none
+    recording: "分割 Measure"
+  </dest>
+  <voice>
+    *: none
+    recording: "Split Measure"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_GROUPING
+  desc: in tag viewer
+  user: 
+  <source>
+    *: "[Work]"
+  </source>
+  <dest>
+    *: "[Work]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARNING_BATTERY_EMPTY
+  desc: general warning
+  user: 
+  <source>
+    *: "Battery empty! RECHARGE!"
+  </source>
+  <dest>
+    *: "电池没电! 请冲电!"
+  </dest>
+  <voice>
+    *: "Battery empty! RECHARGE!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_KOREA
+  desc: fm region korea
+  user: 
+  <source>
+    *: none
+    radio: "Korea"
+  </source>
+  <dest>
+    *: none
+    radio: "Korea"
+  </dest>
+  <voice>
+    *: none
+    radio: "Korea"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUNNING_TIME
+  desc: in run time screen
+  user: 
+  <source>
+    *: "Running Time"
+  </source>
+  <dest>
+    *: "运行时间"
+  </dest>
+  <voice>
+    *: "Running Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_US
+  desc: fm region us / canada
+  user: 
+  <source>
+    *: none
+    radio: "US / Canada"
+  </source>
+  <dest>
+    *: none
+    radio: "US / Canada"
+  </dest>
+  <voice>
+    *: none
+    radio: "US and Canada"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_AGC_PRESET
+  desc: automatic gain control in recording screen
+  user: 
+  <source>
+    *: none
+    agc: "AGC"
+  </source>
+  <dest>
+    *: none
+    agc: "AGC"
+  </dest>
+  <voice>
+    *: none
+    agc: "AGC"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_REGION
+  desc: fm tuner region setting
+  user: 
+  <source>
+    *: none
+    radio: "Region"
+  </source>
+  <dest>
+    *: none
+    radio: "地区"
+  </dest>
+  <voice>
+    *: none
+    radio: "Region"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE_UNPLUG_RW
+  desc: in pause_phones_menu.
+  user: 
+  <source>
+    *: none
+    headphone_detection: "Duration to Rewind"
+  </source>
+  <dest>
+    *: none
+    headphone_detection: "倒退时间"
+  </dest>
+  <voice>
+    *: none
+    headphone_detection: "Duration to Rewind"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH_UP_SEMITONE
+  desc: in wps
+  user: 
+  <source>
+    *: none
+    pitchscreen: "Semitone Up"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "调高半音"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ROCKBOX_TITLE
+  desc: main menu title
+  user: 
+  <source>
+    *: "Rockbox"
+  </source>
+  <dest>
+    *: "Rockbox"
+  </dest>
+  <voice>
+    *: "Rockbox"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO_NEW
+  desc: in onplay playlist catalog submenu
+  user: 
+  <source>
+    *: "Add to New Playlist"
+  </source>
+  <dest>
+    *: "增加到新播放清单"
+  </dest>
+  <voice>
+    *: "Add to New Playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_STOP
+  desc: trigger types
+  user: 
+  <source>
+    *: none
+    recording: "Stop"
+  </source>
+  <dest>
+    *: none
+    recording: "停止"
+  </dest>
+  <voice>
+    *: none
+    recording: "Stop"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BOOKMARK_SELECT_INDEX_TEXT
+  desc: voice only, used in the bookmark list to label index number
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Index"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TIME
+  desc: in record timesplit options
+  user: 
+  <source>
+    *: none
+    recording: "Split Time"
+  </source>
+  <dest>
+    *: none
+    recording: "分割时间"
+  </dest>
+  <voice>
+    *: none
+    recording: "Split Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLEASE_REBOOT
+  desc: when activating an option that requires a reboot
+  user: 
+  <source>
+    *: "Please reboot to enable"
+  </source>
+  <dest>
+    *: "请先重启再使用"
+  </dest>
+  <voice>
+    *: "Please reboot to enable"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_MENU_TITLE
+  desc: title for the onplay menus
+  user: 
+  <source>
+    *: "Context Menu"
+  </source>
+  <dest>
+    *: "有关菜单"
+  </dest>
+  <voice>
+    *: "Context Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVIOUS_SCREEN
+  desc: in start screen setting
+  user: 
+  <source>
+    *: "Previous Screen"
+  </source>
+  <dest>
+    *: "最后关机画面"
+  </dest>
+  <voice>
+    *: "Previous Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO
+  desc: in onplay playlist catalog submenu
+  user: 
+  <source>
+    *: "Add to Playlist"
+  </source>
+  <dest>
+    *: "添加到播放菜单"
+  </dest>
+  <voice>
+    *: "Add to Playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONLIGHT_BRIGHTNESS
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    gigabeatf: "Button Light Brightness"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "按钮光度"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "Button Light Brightness"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUESHEET_ENABLE
+  desc: cuesheet support option
+  user: 
+  <source>
+    *: "Cuesheet Support"
+  </source>
+  <dest>
+    *: "使用 Cuesheet"
+  </dest>
+  <voice>
+    *: "Cuesheet Support"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_DISCNUM
+  desc: in tag viewer
+  user: 
+  <source>
+    *: "[Discnum]"
+  </source>
+  <dest>
+    *: "[Discnum]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_FILENAME_EXT
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Show Filename Extensions"
+  </source>
+  <dest>
+    *: "显示文件后缀"
+  </dest>
+  <voice>
+    *: "Show filename extensions"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOADING_PERCENT
+  desc: splash number of percents loaded
+  user: 
+  <source>
+    *: "Loading... %d%% done (%s)"
+  </source>
+  <dest>
+    *: "正在处理... %d%% (%s)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_NEW_FILE
+  desc: in record timesplit options
+  user: 
+  <source>
+    *: none
+    recording: "Start new file"
+  </source>
+  <dest>
+    *: none
+    recording: "开始新文件"
+  </dest>
+  <voice>
+    *: none
+    recording: "Start new file"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TYPE
+  desc: in record timesplit options
+  user: 
+  <source>
+    *: none
+    recording: "What to do when Splitting"
+  </source>
+  <dest>
+    *: none
+    recording: "分割时做什么"
+  </dest>
+  <voice>
+    *: none
+    recording: "What to do when Splitting"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_SCREEN
+  desc: in the system sub menu
+  user: 
+  <source>
+    *: "Start Screen"
+  </source>
+  <dest>
+    *: "开始画面"
+  </dest>
+  <voice>
+    *: "Start Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_SPLIT_SIZE
+  desc: in record timesplit options
+  user: 
+  <source>
+    *: none
+    recording: "Split Filesize"
+  </source>
+  <dest>
+    *: none
+    recording: "文件分割大小"
+  </dest>
+  <voice>
+    *: none
+    recording: "Split Filesize"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE
+  desc: in the sound settings menu
+  user: 
+  <source>
+    *: none
+    ipodvideo: "Hardware Equalizer"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "硬件调衡器"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Hardware equalizer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_DONT_RESUME
+  desc: top item in the list when asking user about bookmark auto load
+  user: 
+  <source>
+    *: "<Don't Resume>"
+  </source>
+  <dest>
+    *: "<不要恢复书签>"
+  </dest>
+  <voice>
+    *: "Do not resume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_DELETE
+  desc: bookmark context menu, delete this bookmark
+  user: 
+  <source>
+    *: "Delete"
+  </source>
+  <dest>
+    *: "删除"
+  </dest>
+  <voice>
+    *: "Delete"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_JAPAN
+  desc: fm region japan
+  user: 
+  <source>
+    *: none
+    radio: "Japan"
+  </source>
+  <dest>
+    *: none
+    radio: "Japan"
+  </dest>
+  <voice>
+    *: none
+    radio: "Japan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Show Path"
+  </source>
+  <dest>
+    *: "显示全文件径"
+  </dest>
+  <voice>
+    *: "Show Path"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SELECT_BOOKMARK
+  desc: bookmark selection list title
+  user: 
+  <source>
+    *: "Select Bookmark"
+  </source>
+  <dest>
+    *: "选择书签"
+  </dest>
+  <voice>
+    *: "Select Bookmark"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DITHERING
+  desc: in the sound settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Dithering"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Dithering"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Dithering"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_APPS
+  desc: in the main menu
+  user: 
+  <source>
+    *: "Applications"
+  </source>
+  <dest>
+    *: "应用程序"
+  </dest>
+  <voice>
+    *: "Applications"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LISTACCEL_START_DELAY
+  desc: Delay before list starts accelerating
+  user: 
+  <source>
+    *: "List Acceleration Start Delay"
+    scrollwheel: none
+  </source>
+  <dest>
+    *: "列表加速缓冲"
+    scrollwheel: none
+  </dest>
+  <voice>
+    *: "List Acceleration Start Delay"
+    scrollwheel: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVING
+  desc: 
+  user: 
+  <source>
+    *: "Moving..."
+  </source>
+  <dest>
+    *: "正在移动..."
+  </dest>
+  <voice>
+    *: "Moving"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BANDWIDTH
+  desc: in the equalizer settings menu
+  user: 
+  <source>
+    *: none
+    ipodvideo: "Bandwidth"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Bandwidth"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Bandwidth"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_DIR_TALK
+  desc: Item of voice menu, whether to use directory .talk clips
+  user: 
+  <source>
+    *: "Use Directory .talk Clips"
+  </source>
+  <dest>
+    *: "使用 .talk 文件夹"
+  </dest>
+  <voice>
+    *: "Use Directory .talk Clips"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES
+  desc: browser file/dir properties
+  user: 
+  <source>
+    *: "Properties"
+  </source>
+  <dest>
+    *: "属性"
+  </dest>
+  <voice>
+    *: "Properties"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_VIEW
+  desc: in onplay playlist catalog submenu
+  user: 
+  <source>
+    *: "View Catalog"
+  </source>
+  <dest>
+    *: "查看播放清单库"
+  </dest>
+  <voice>
+    *: "View Catalog"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_CUESHEET
+  desc: 
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "cuesheet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SHUFFLE
+  desc: bookmark selection list, bookmark enables shuffle
+  user: 
+  <source>
+    *: ", Shuffle"
+  </source>
+  <dest>
+    *: ", 乱序"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_INVALID
+  desc: bookmark selection list, bookmark couldn't be parsed
+  user: 
+  <source>
+    *: "<Invalid Bookmark>"
+  </source>
+  <dest>
+    *: "<无效书签>"
+  </dest>
+  <voice>
+    *: "Invalid Bookmark"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_AGC_CLIPTIME
+  desc: in record settings
+  user: 
+  <source>
+    *: none
+    agc: "AGC clip time"
+  </source>
+  <dest>
+    *: none
+    agc: "AGC clip time"
+  </dest>
+  <voice>
+    *: none
+    agc: "AGC clip time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONLIGHT_TIMEOUT
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    e200: "Wheel Light Timeout"
+    gigabeatf: "Button Light Timeout"
+  </source>
+  <dest>
+    *: none
+    e200: "转盘灯自动关时间"
+    gigabeatf: "按钮灯自动关时间"
+  </dest>
+  <voice>
+    *: none
+    e200: "Wheel Light Timeout"
+    gigabeatf: "Button Light Timeout"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUMARTIST
+  desc: in tag viewer
+  user: 
+  <source>
+    *: "[Album Artist]"
+  </source>
+  <dest>
+    *: "[Album Artist]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_MPA_L3
+  desc: audio format description
+  user: 
+  <source>
+    *: none
+    recording: "MPEG Layer 3"
+  </source>
+  <dest>
+    *: none
+    recording: "MPEG Layer 3"
+  </dest>
+  <voice>
+    *: none
+    recording: "MPEG Layer 3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH_CURRENT
+  desc: in show path menu
+  user: 
+  <source>
+    *: "Current Directory Only"
+  </source>
+  <dest>
+    *: "只显示本文件夹"
+  </dest>
+  <voice>
+    *: "Current Directory Only"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_CHANNELS
+  desc: in the recording settings
+  user: 
+  <source>
+    *: none
+    recording: "Channels"
+  </source>
+  <dest>
+    *: none
+    recording: "声道"
+  </dest>
+  <voice>
+    *: none
+    recording: "Channels"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLISTS
+  desc: in the main menu and  file vew setting
+  user: 
+  <source>
+    *: "Playlists"
+  </source>
+  <dest>
+    *: "播放清单"
+  </dest>
+  <voice>
+    *: "Playlists"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EXT_ONLY_VIEW_ALL
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Only When Viewing All Types"
+  </source>
+  <dest>
+    *: "浏览所有格式时才显示"
+  </dest>
+  <voice>
+    *: "Only when viewing all types"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNKNOWN_TYPES
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Only Unknown Types"
+  </source>
+  <dest>
+    *: "不明格式才显示"
+  </dest>
+  <voice>
+    *: "Only unknown types"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE
+  desc: in the equalizer settings menu
+  user: 
+  <source>
+    *: none
+    ipodvideo: "Wide"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "宽"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Wide"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYLOCK_ON
+  desc: displayed when key lock is on
+  user: 
+  <source>
+    *: "Buttons Locked"
+  </source>
+  <dest>
+    *: "键盘已锁"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_TIME
+  desc: in run time screen
+  user: 
+  <source>
+    *: "Current Time"
+  </source>
+  <dest>
+    *: "现在时间"
+  </dest>
+  <voice>
+    *: "Current Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_TIME
+  desc: in run time screen
+  user: 
+  <source>
+    *: "Clear Time?"
+  </source>
+  <dest>
+    *: "清除时间?"
+  </dest>
+  <voice>
+    *: "Clear Time?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUDIOSCROBBLER
+  desc: "Last.fm Log" in the playback menu
+  user: 
+  <source>
+    *: "Last.fm Log"
+  </source>
+  <dest>
+    *: "Last.fm 标签"
+  </dest>
+  <voice>
+    *: "Last.fm Log"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_BUTTON_HOLD
+  desc: in lcd settings
+  user: 
+  <source>
+    *: none
+    hold_button: "Backlight on Hold"
+  </source>
+  <dest>
+    *: none
+    hold_button: "键盘锁定时的屏幕背灯"
+  </dest>
+  <voice>
+    *: none
+    hold_button: "Backlight on hold"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS
+  desc:  in main menu and visual confirmation after settings reset
+  user: 
+  <source>
+    *: "Settings"
+  </source>
+  <dest>
+    *: "设置"
+  </dest>
+  <voice>
+    *: "Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANCEL
+  desc: Visual confirmation of canceling a changed setting
+  user: 
+  <source>
+    *: "Cancelled"
+  </source>
+  <dest>
+    *: "已取消"
+  </dest>
+  <voice>
+    *: "Cancelled"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OF
+  desc: spoken only, as in 3/8 => 3 of 8
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "of"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_ASK
+  desc: confirm to reset settings
+  user: 
+  <source>
+    *: "Are You Sure?"
+  </source>
+  <dest>
+    *: "你肯定吗?"
+  </dest>
+  <voice>
+    *: "Are You Sure?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_DIRECTORY
+  desc: error message when playlist catalog directory doesn't exist
+  user: 
+  <source>
+    *: "%s doesn't exist"
+  </source>
+  <dest>
+    *: "%s 不存在"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_PLAYLISTS
+  desc: error message when no playlists for playlist catalog
+  user: 
+  <source>
+    *: "No Playlists"
+  </source>
+  <dest>
+    *: "没有播发清单"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COPYING
+  desc: 
+  user: 
+  <source>
+    *: "Copying..."
+  </source>
+  <dest>
+    *: "正在复制中..."
+  </dest>
+  <voice>
+    *: "Copying"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_TYPE
+  desc: in recording trigger menu
+  user: 
+  <source>
+    *: none
+    recording: "Trigtype"
+  </source>
+  <dest>
+    *: none
+    recording: "Trigtype"
+  </dest>
+  <voice>
+    *: none
+    recording: "Trigtype"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_REC_DIR
+  desc: used in the onplay menu to set a recording dir
+  user: 
+  <source>
+    *: none
+    recording: "Set As Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "设为录音目录"
+  </dest>
+  <voice>
+    *: none
+    recording: "Set As Recording Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_MENU
+  desc: fm menu title
+  user: 
+  <source>
+    *: none
+    radio: "FM Radio Menu"
+  </source>
+  <dest>
+    *: none
+    radio: "FM 收音机菜单"
+  </dest>
+  <voice>
+    *: none
+    radio: "FM Radio Menu"
   </voice>
 </phrase>
