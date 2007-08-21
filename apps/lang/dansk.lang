@@ -101,7 +101,7 @@
     *: "Åbner..."
   </dest>
   <voice>
-    *: ""
+    *: "Åbner"
   </voice>
 </phrase>
 <phrase>
@@ -132,7 +132,7 @@
     *: "Lukker ned..."
   </dest>
   <voice>
-    *: ""
+    *: "Lukker ned"
   </voice>
 </phrase>
 <phrase>
@@ -180,7 +180,7 @@
     *: "fejlede"
   </dest>
   <voice>
-    *: ""
+    *: "fejlede"
   </voice>
 </phrase>
 <phrase>
@@ -779,7 +779,7 @@
     *: "Nulstillet"
   </dest>
   <voice>
-    *: ""
+    *: "Nulstillet"
   </voice>
 </phrase>
 <phrase>
@@ -3394,7 +3394,7 @@
     *: "Slet?"
   </dest>
   <voice>
-    *: ""
+    *: "Vil du slette?"
   </voice>
 </phrase>
 <phrase>
@@ -3408,7 +3408,7 @@
     *: "Slettet"
   </dest>
   <voice>
-    *: ""
+    *: "Slettet"
   </voice>
 </phrase>
 <phrase>
@@ -3805,7 +3805,7 @@
     *: "Pause"
   </dest>
   <voice>
-    *: ""
+    *: "Pause"
   </voice>
 </phrase>
 <phrase>
@@ -3819,7 +3819,7 @@
     *: "Opret bogmærke?"
   </dest>
   <voice>
-    *: ""
+    *: "Vil du oprette bogmærke?"
   </voice>
 </phrase>
 <phrase>
@@ -3833,7 +3833,7 @@
     *: "Bogmærke oprettet"
   </dest>
   <voice>
-    *: ""
+    *: "Bogmærke oprettet"
   </voice>
 </phrase>
 <phrase>
@@ -3847,7 +3847,7 @@
     *: "Bogmærke fejlede!"
   </dest>
   <voice>
-    *: ""
+    *: "Bogmærke fejlede"
   </voice>
 </phrase>
 <phrase>
@@ -3861,7 +3861,7 @@
     *: "Bogmærke tomt"
   </dest>
   <voice>
-    *: ""
+    *: "Bogmærke tomt"
   </voice>
 </phrase>
 <phrase>
@@ -6012,10 +6012,10 @@
     *: "Playlist Buffer Full"
   </source>
   <dest>
-    *: "Sætliste Bufferen er fuld"
+    *: "Sætliste bufferen er fuld"
   </dest>
   <voice>
-    *: ""
+    *: "Sætliste bufferen er fuld"
   </voice>
 </phrase>
 <phrase>
@@ -6040,10 +6040,10 @@
     *: "Inserted %d tracks (%s)"
   </source>
   <dest>
-    *: "Har indsat %d sange (%s)"
+    *: "Har tilføjet %d sange (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "sange tilføjet"
   </voice>
 </phrase>
 <phrase>
@@ -6057,7 +6057,7 @@
     *: "Har sat %d sange i kø (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "sange sat i kø"
   </voice>
 </phrase>
 <phrase>
@@ -6071,7 +6071,7 @@
     *: "Har gemt %d sange (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "sange gemt"
   </voice>
 </phrase>
 <phrase>
@@ -6085,7 +6085,7 @@
     *: "Indsæt undermapper?"
   </dest>
   <voice>
-    *: ""
+    *: "Vil du indsætte undermapper?"
   </voice>
 </phrase>
 <phrase>
@@ -6099,7 +6099,7 @@
     *: "Intet at fortsætte"
   </dest>
   <voice>
-    *: ""
+    *: "Intet at fortsætte"
   </voice>
 </phrase>
 <phrase>
@@ -6113,7 +6113,7 @@
     *: "Fejl under opdatering af kontrol fil"
   </dest>
   <voice>
-    *: ""
+    *: "Fejl under opdatering af kontrol fil"
   </voice>
 </phrase>
 <phrase>
@@ -6127,7 +6127,7 @@
     *: "Fejl ved tilgang af sætliste fil"
   </dest>
   <voice>
-    *: ""
+    *: "Fejl ved tilgang af sætliste fil"
   </voice>
 </phrase>
 <phrase>
@@ -6141,7 +6141,7 @@
     *: "Fejl ved tilgang af sætliste kontrol fil"
   </dest>
   <voice>
-    *: ""
+    *: "Fejl ved tilgang af sætliste kontrol fil"
   </voice>
 </phrase>
 <phrase>
@@ -6155,7 +6155,7 @@
     *: "Fejl ved tilgang af mappe"
   </dest>
   <voice>
-    *: ""
+    *: "Fejl ved tilgang af mappe"
   </voice>
 </phrase>
 <phrase>
@@ -6169,7 +6169,7 @@
     *: "Sætliste kontrol fil er ugyldig"
   </dest>
   <voice>
-    *: ""
+    *: "Sætliste kontrol fil er ugyldig"
   </voice>
 </phrase>
 <phrase>
@@ -6506,7 +6506,7 @@
     *: "Mappe buffer er fuld!"
   </dest>
   <voice>
-    *: ""
+    *: "Mappe buffer er fuld!"
   </voice>
 </phrase>
 <phrase>
@@ -6520,7 +6520,7 @@
     *: "Nyt sprog"
   </dest>
   <voice>
-    *: ""
+    *: "Nyt sprog"
   </voice>
 </phrase>
 <phrase>
@@ -6534,7 +6534,7 @@
     *: "Indstillinger Hentet"
   </dest>
   <voice>
-    *: ""
+    *: "Indstillinger Hentet"
   </voice>
 </phrase>
 <phrase>
@@ -6548,7 +6548,7 @@
     *: "Indstillinger Gemt"
   </dest>
   <voice>
-    *: ""
+    *: "Indstillinger Gemt"
   </voice>
 </phrase>
 <phrase>
@@ -6562,7 +6562,7 @@
     *: "Boot ændret"
   </dest>
   <voice>
-    *: ""
+    *: "Boot ændret"
   </voice>
 </phrase>
 <phrase>
@@ -6576,7 +6576,7 @@
     *: "Genstart nu?"
   </dest>
   <voice>
-    *: ""
+    *: "Genstart nu?"
   </voice>
 </phrase>
 <phrase>
@@ -6616,7 +6616,7 @@
     *: "Ingen filer"
   </dest>
   <voice>
-    *: ""
+    *: "Ingen filer"
   </voice>
 </phrase>
 <phrase>
@@ -6784,7 +6784,7 @@
     *: "Fil-endelse tabel fuld"
   </dest>
   <voice>
-    *: ""
+    *: "Fil-endelse tabel fuld"
   </voice>
 </phrase>
 <phrase>
@@ -6798,7 +6798,7 @@
     *: "Filtype tabel fuld"
   </dest>
   <voice>
-    *: ""
+    *: "Filtype tabel fuld"
   </voice>
 </phrase>
 <phrase>
@@ -6812,7 +6812,7 @@
     *: "Plugin navn for langt"
   </dest>
   <voice>
-    *: ""
+    *: "Plugin navn for langt"
   </voice>
 </phrase>
 <phrase>
@@ -6874,7 +6874,7 @@
     *: "Gemmer database"
   </dest>
   <voice>
-    *: ""
+    *: "Gemmer database"
   </voice>
 </phrase>
 <phrase>
@@ -7001,7 +7001,7 @@
     *: "Slet dynamisk sætliste?"
   </dest>
   <voice>
-    *: ""
+    *: "Slet dynamisk sætliste?"
   </voice>
 </phrase>
 <phrase>
@@ -7110,11 +7110,11 @@
   </source>
   <dest>
     *: none
-    radio: "Indlæs kanaler"
+    radio: "Indlæs stationer"
   </dest>
   <voice>
     *: none
-    radio: "Indlæs kanaler"
+    radio: "Indlæs stationer"
   </voice>
 </phrase>
 <phrase>
@@ -7203,11 +7203,11 @@
   </source>
   <dest>
     *: none
-    radio: "Kanaler"
+    radio: "Stationer"
   </dest>
   <voice>
     *: none
-    radio: "Kanaler"
+    radio: "Stationer"
   </voice>
 </phrase>
 <phrase>
@@ -7342,7 +7342,7 @@
     *: "Fil/mappe eksisterer. Overskriv?"
   </dest>
   <voice>
-    *: ""
+    *: "Fil eller mappe eksisterer. Vil du overskrive?"
   </voice>
 </phrase>
 <phrase>
@@ -7406,11 +7406,11 @@
   </source>
   <dest>
     *: none
-    radio: "Ingen kanaler fundet, skan automatisk?"
+    radio: "Ingen stationer fundet, skan automatisk?"
   </dest>
   <voice>
     *: none
-    radio: "Ingen kanaler fundet, skan automatisk?"
+    radio: "Ingen stationer fundet, skan automatisk?"
   </voice>
 </phrase>
 <phrase>
@@ -7505,11 +7505,11 @@
   </source>
   <dest>
     *: none
-    radio: "Slet kanaler"
+    radio: "Slet stationer"
   </dest>
   <voice>
     *: none
-    radio: "Slet kanaler"
+    radio: "Slet stationer"
   </voice>
 </phrase>
 <phrase>
@@ -7523,7 +7523,7 @@
     *: "Nyt tastatur"
   </dest>
   <voice>
-    *: ""
+    *: "Nyt tastatur"
   </voice>
 </phrase>
 <phrase>
@@ -7550,11 +7550,11 @@
   </source>
   <dest>
     *: none
-    radio: "Gem kanaler"
+    radio: "Gem stationer"
   </dest>
   <voice>
     *: none
-    radio: "Gem kanaler"
+    radio: "Gem stationer"
   </voice>
 </phrase>
 <phrase>
@@ -7769,7 +7769,7 @@
     *: "Opdaterer i baggrunden"
   </dest>
   <voice>
-    *: ""
+    *: "Opdaterer i baggrunden"
   </voice>
 </phrase>
 <phrase>
@@ -9424,7 +9424,7 @@
     *: "ADVARSEL! Batteri niveau lavt!"
   </dest>
   <voice>
-    *: ""
+    *: "ADVARSEL! Batteri niveau lavt!"
   </voice>
 </phrase>
 <phrase>
@@ -9686,7 +9686,7 @@
     *: "Batteri tomt! LAD OP!"
   </dest>
   <voice>
-    *: ""
+    *: "Batteri tomt! LAD OP!"
   </voice>
 </phrase>
 <phrase>
@@ -9796,7 +9796,7 @@
     *: "Genstart venligst for at aktivere"
   </dest>
   <voice>
-    *: ""
+    *: "Genstart venligst for at aktivere"
   </voice>
 </phrase>
 <phrase>
@@ -10646,7 +10646,7 @@
   </source>
   <dest>
     *: none
-    radio: "Kanal"
+    radio: "Station"
   </dest>
   <voice>
     *: none
@@ -10878,13 +10878,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Show filename extensions"
+    *: "Show Filename Extensions"
   </source>
   <dest>
-    *: "Show filename extensions"
+    *: "Vis fil-endelser"
   </dest>
   <voice>
-    *: "Show filename extensions"
+    *: "Vis fil-endelser"
   </voice>
 </phrase>
 <phrase>
@@ -10951,13 +10951,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Only unknown types"
+    *: "Only Unknown Types"
   </source>
   <dest>
-    *: "Only unknown types"
+    *: "Kun ikke-genkendte typer"
   </dest>
   <voice>
-    *: "Only unknown types"
+    *: "Kun ikke-genkendte typer"
   </voice>
 </phrase>
 <phrase>
@@ -11035,7 +11035,7 @@
   desc: in settings_menu
   user: 
   <source>
-    *: "Only when viewing all types"
+    *: "Only When Viewing All Types"
   </source>
   <dest>
     *: "Kun når alle typer vises"
