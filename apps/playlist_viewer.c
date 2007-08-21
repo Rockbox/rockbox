@@ -574,17 +574,10 @@ bool playlist_viewer_ex(char* filename)
     while (!exit)
     {
         int track;
-        if (global_status.resume_index == -1)
-        {
-            /* Play has stopped */
-            gui_syncsplash(HZ, str(LANG_END_PLAYLIST));
-            goto exit;
-        }
-
         if (viewer.move_track != -1)
             gui_synclist_flash(&playlist_lists);
 
-        if (!viewer.playlist)
+        if (global_status.resume_index != -1 && !viewer.playlist)
             playlist_get_resume_info(&track);
         else
             track = -1;
@@ -595,6 +588,9 @@ bool playlist_viewer_ex(char* filename)
             /* Playlist has changed (new track started?) */
             if (!update_playlist(false))
                 goto exit;
+            /*Needed because update_playlist gives wrong value when
+                                                            playing is stopped*/
+            viewer.current_playing_track = track;
             gui_synclist_set_nb_items(&playlist_lists, viewer.num_tracks);
             /* Abort move on playlist change */
             viewer.move_track = -1;
