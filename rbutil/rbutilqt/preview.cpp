@@ -37,7 +37,8 @@ void PreviewDlg::setText(QString text)
 
 void PreviewDlg::setPixmap(QPixmap p)
 {
-   this->setFixedSize(p.size());
+   ui.themePreview->setFixedSize(p.size());
+   this->resize(QSize(10,10));
    ui.themePreview->setPixmap(p); 
 }
 
