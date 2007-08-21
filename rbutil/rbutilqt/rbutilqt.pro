@@ -33,7 +33,8 @@ SOURCES += rbutilqt.cpp \
  installthemes.cpp \
  uninstall.cpp \
  uninstallwindow.cpp \
- browseof.cpp
+ browseof.cpp \
+ preview.cpp
 
 HEADERS += rbutilqt.h \
  install.h \
@@ -67,7 +68,8 @@ HEADERS += rbutilqt.h \
  installthemes.h \
  uninstall.h \
  uninstallwindow.h \
- browseof.h
+ browseof.h \
+ preview.h
 
 # Needed by QT on Win
 INCLUDEPATH = . irivertools zip zlib ../ipodpatcher ../sansapatcher
@@ -88,7 +90,8 @@ FORMS += rbutilqtfrm.ui \
  installtalkfrm.ui \
  installthemesfrm.ui \
  uninstallfrm.ui \
- browseoffrm.ui
+ browseoffrm.ui \
+ previewfrm.ui
 
 RESOURCES += rbutilqt.qrc
 

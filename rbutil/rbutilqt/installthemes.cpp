@@ -191,21 +191,17 @@ void ThemesInstallWindow::updateImage(bool error)
     qDebug() << "updateImage(bool) =" << error;
     if(error) return;
     
-    QPixmap p, q;
-    QSize img;
-    img.setHeight(ui.themePreview->height());
-    img.setWidth(ui.themePreview->width());
+    QPixmap p;
     if(!error) {
         imgData = igetter.readAll();
         if(imgData.isNull()) return;
         p.loadFromData(imgData);
-        q = p.scaled(img, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        ui.themePreview->setScaledContents(false);
-        if(q.isNull()) {
+        if(p.isNull()) {
             ui.themePreview->clear();
             ui.themePreview->setText(tr("no theme preview"));
         }
-        else ui.themePreview->setPixmap(q);
+        else 
+            ui.themePreview->setPixmap(p);
     }
 }
 
