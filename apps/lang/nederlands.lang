@@ -10931,7 +10931,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Show filename extensions"
+    *: "Show Filename Extensions"
   </source>
   <dest>
     *: "Bestandsextenties tonen"
@@ -10945,7 +10945,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Only unknown types"
+    *: "Only Unknown Types"
   </source>
   <dest>
     *: "Enkel onbekende types"
@@ -10959,7 +10959,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Only when viewing all types"
+    *: "Only When Viewing All Types"
   </source>
   <dest>
     *: "Enkel bij tonen alle bestanden"
@@ -10980,5 +10980,56 @@
   </dest>
   <voice>
     *: "eenheden per tick"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_AM
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "A M"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PM
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "P M"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OCLOCK
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: ""
   </voice>
 </phrase>
