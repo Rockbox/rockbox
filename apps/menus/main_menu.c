@@ -209,9 +209,52 @@ static bool show_info(void)
                 {
                     struct tm* tm = get_time();
                     talk_id(VOICE_CURRENT_TIME, true);
-                    talk_value(tm->tm_hour, UNIT_HOUR, true);
-                    talk_value(tm->tm_min, UNIT_MIN, true);
-                    talk_value(tm->tm_sec, UNIT_SEC, true);
+                    if (global_settings.timeformat == 1)
+                    {
+                        /* Voice the time in 12 hour format */
+                        if (tm->tm_hour == 0)
+                        {
+                            /* Make it say 12 am instead of 0 am */
+                            talk_value(12, UNIT_INT, true); 
+                        }
+                        else if (tm->tm_hour <= 12) 
+                        {
+                            /* If between 0 and 12, we voice the hour as-is */
+                            talk_value(tm->tm_hour, UNIT_INT, true); 
+                        }
+                        else 
+                        {
+                            /* Subtract 12 hours if we're past noon */
+                            talk_value(tm->tm_hour-12, UNIT_INT, true);
+                        }
+
+                        /* Voice the minutes */
+                        if (tm->tm_min == 0)
+                        {
+                            /*say o'clock if the minute is 0. */
+                            talk_id(VOICE_OCLOCK, true);
+                        }
+                        else
+                        {
+                            talk_value(tm->tm_min, UNIT_INT, true);
+                        }
+
+                        /* Voice the suffix */
+                        if (tm->tm_hour >= 12)
+                        {
+                            talk_id(VOICE_PM, true);
+                        }
+                        else
+                        {
+                            talk_id(VOICE_AM, true);
+                        }
+                    }
+                    else
+                    {
+                        /*voice the time in 24 hour format*/
+                        talk_value(tm->tm_hour, UNIT_HOUR, true);
+                        talk_value(tm->tm_min, UNIT_MIN, true);
+                    }
                     talk_id(LANG_MONTH_JANUARY + tm->tm_mon, true);
                     talk_number(tm->tm_mday, true);
                     talk_number(1900 + tm->tm_year, true);
