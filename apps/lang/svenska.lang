@@ -2354,7 +2354,7 @@
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PLAY/PAUSE to return)"
-    x5,m5: "Building database... %d found (Left to return)"
+    x5,m5: "Building database... %d found (LEFT to return)"
     h10,h10_5gb,e200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
@@ -2637,7 +2637,7 @@
   user:
   <source>
     *: none
-    hold_button: "Backlight (On Hold Key)"
+    hold_button: "Backlight on Hold"
   </source>
   <dest>
     *: none
@@ -2645,7 +2645,7 @@
   </dest>
   <voice>
     *: none
-    hold_button: "Backlight on hold key"
+    hold_button: "Backlight on hold"
   </voice>
 </phrase>
 <phrase>
@@ -2701,13 +2701,13 @@
   desc: Backlight behaviour setting
   user:
   <source>
-    *: "First Keypress Enables Backlight Only"
+    *: "First Buttonpress Enables Backlight Only"
   </source>
   <dest>
     *: "Första knapptryck tänder endast belysning"
   </dest>
   <voice>
-    *: "First Keypress Enables Backlight Only"
+    *: "First Buttonpress Enables Backlight Only"
   </voice>
 </phrase>
 <phrase>
@@ -3500,19 +3500,16 @@
 </phrase>
 <phrase>
   id: LANG_PM_UNITS_PER_READ
-  desc: in the peak meter menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Units Per Read"
-    masd: none
+    *: ""
   </source>
   <dest>
-    *: "enheter per läsning"
-    masd: none
+    *: ""
   </dest>
   <voice>
-    *: "Units Per Read"
-    masd: none
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6081,19 +6078,19 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_CURRENT_DIR
-  desc: in recording directory options
+  desc: DEPRECATED
   user:
   <source>
     *: none
-    recording: "Current Directory"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Aktuell katalog"
+    recording: deprecated
   </dest>
   <voice>
     *: none
-    recording: "Current directory"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -8213,12 +8210,10 @@
   desc: displayed when key lock is on
   user:
   <source>
-    *: "Keylock is ON"
-    player: "Key Lock ON"
+    *: "Buttons Locked"
   </source>
   <dest>
-    *: "Knapplåset är på"
-    player: "Knapplås på"
+    *: "Knappar låsta"
   </dest>
   <voice>
     *: ""
@@ -8229,12 +8224,10 @@
   desc: displayed when key lock is turned off
   user:
   <source>
-    *: "Keylock is OFF"
-    player: "Key Lock OFF"
+    *: "Buttons Unlocked"
   </source>
   <dest>
-    *: "Knapplåset är av"
-    player: "Knapplås av"
+    *: "Knappar upplåsta"
   </dest>
   <voice>
     *: ""
@@ -8263,15 +8256,21 @@
   user:
   <source>
     *: none
-    recording: "The disk is full. Press STOP to continue."
+    recording: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
+    m5,x5: "The disk is full. Press POWER to continue."
+    e200: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
-    recording: "Disken är full. Tryck STOPP för att fortsätta."
+    recording: "Disken är full. Tryck AV för att fortsätta."
+    h100,h120,h300: "Disken är full. Tryck STOPP för att fortsätta."
+    m5,x5: "Disken är full. Tryck PÅ/AV för att fortsätta."
+    e200: "Disken är full. Tryck UPP för att fortsätta."
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording,h100,h120,h300,m5,x5,e200: ""
   </voice>
 </phrase>
 <phrase>
@@ -8601,7 +8600,7 @@
   </source>
   <dest>
     *: none
-    recorder: "Batteri: Top-off-laddning"
+    recorder: "Batteri: Normal laddning"
   </dest>
   <voice>
     *: none
@@ -9873,16 +9872,16 @@
 </phrase>
 <phrase>
   id: VOICE_EXT_TXT
-  desc: spoken only, for file extension
+  desc: DEPRECATED
   user:
   <source>
     *: ""
   </source>
   <dest>
-    *: ""
+    *: deprecated
   </dest>
   <voice>
-    *: "text"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10414,15 +10413,19 @@
   user:
   <source>
     *: none
-    recording: "The disk is full. Press STOP to continue."
+    recording: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "The disk is full. Press LEFT to continue."
   </source>
   <dest>
     *: none
-    recording: "Disken är full. Tryck STOPP för att fortsätta."
+    recording: "Disken är full. Tryck AV för att fortsätta."
+    h100,h120,h300: "Disken är full. Tryck STOPP för att fortsätta."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "Disken är full. Tryck VÄNSTER för att fortsätta."
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: ""
   </voice>
 </phrase>
 <phrase>
@@ -10934,13 +10937,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Show filename extensions"
+    *: "Show Filename Extensions"
   </source>
   <dest>
     *: "Visa filändelser"
   </dest>
   <voice>
-    *: "Show filename extensions"
+    *: "Show Filename Extensions"
   </voice>
 </phrase>
 <phrase>
@@ -10948,13 +10951,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Only unknown types"
+    *: "Only Unknown Types"
   </source>
   <dest>
     *: "Bara för filer som ej stödjs"
   </dest>
   <voice>
-    *: "Only unknown types"
+    *: "Only Unknown Types"
   </voice>
 </phrase>
 <phrase>
@@ -10962,12 +10965,26 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Only when viewing all types"
+    *: "Only When Viewing All Types"
   </source>
   <dest>
     *: "Bara när alla filer visas"
   </dest>
   <voice>
-    *: "Only when viewing all types"
+    *: "Only When Viewing All Types"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PM_UNITS_PER_TICK
+  desc: spoken only, peak meter release unit
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "units per tick"
   </voice>
 </phrase>
