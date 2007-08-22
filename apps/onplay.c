@@ -767,7 +767,7 @@ static bool clipboard_pastefile(const char *src, const char *target, bool copy)
                 result = clipboard_pastefile(src, target, true);
 
                 if (result) {
-                    result = remove(src);
+                    result = remove(src) == 0;
                 }
             }
         }
