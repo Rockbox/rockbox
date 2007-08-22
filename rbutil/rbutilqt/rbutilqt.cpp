@@ -68,9 +68,9 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     }
     
     // manual tab
-    ui.buttonDownloadManual->setEnabled(false);
     updateManual();
     updateDevice();
+    ui.radioPdf->setChecked(true);
 
     connect(ui.actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
     connect(ui.action_About, SIGNAL(triggered()), this, SLOT(about()));
@@ -85,6 +85,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     connect(ui.buttonThemes, SIGNAL(clicked()), this, SLOT(installThemes()));
     connect(ui.buttonRemoveRockbox, SIGNAL(clicked()), this, SLOT(uninstall()));
     connect(ui.buttonRemoveBootloader, SIGNAL(clicked()), this, SLOT(uninstallBootloader()));
+    connect(ui.buttonDownloadManual, SIGNAL(clicked()), this, SLOT(downloadManual()));
     // disable unimplemented stuff
     ui.buttonSmall->setEnabled(false);
     ui.buttonComplete->setEnabled(false);
@@ -490,4 +491,55 @@ void RbUtilQt::uninstallBootloader(void)
     blinstaller.setBootloaderBaseUrl(devices->value("bootloader_url").toString());
     blinstaller.uninstall(logger);
     
+}
+
+
+void RbUtilQt::downloadManual(void)
+{
+    if(QMessageBox::question(this, tr("Confirm download"),
+       tr("Do you really want to download the manual? The manual will be saved "
+            "to the root folder of your player."),
+        QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
+        return;
+    
+    buildInfo.open();
+    QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
+    buildInfo.close();
+    
+    devices->beginGroup(userSettings->value("defaults/platform").toString());
+    QString manual;
+    manual = devices->value("manualname", "rockbox-" + devices->value("platform").toString()).toString();
+    devices->endGroup();
+
+    QString date = (info.value("dailies/date").toString());
+    
+    QString manualurl;
+    QString target;
+    QString section;
+    if(ui.radioPdf->isChecked()) {
+        target = "/" + manual + ".pdf";
+        section = "Manual (PDF)";
+    }
+    else {
+        target = "/" + manual + "-" + date + "-html.zip";
+        section = "Manual (HTML)";
+    }
+    manualurl = devices->value("manual_url").toString() + "/" + target;
+    qDebug() << "manualurl =" << manualurl;
+
+    ProgressLoggerGui* logger = new ProgressLoggerGui(this);
+    logger->show();
+    installer = new ZipInstaller(this);
+    installer->setMountPoint(userSettings->value("defaults/mountpoint").toString());
+    if(userSettings->value("defaults/proxytype") == "manual")
+        installer->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
+#ifdef __linux
+    else if(userSettings->value("defaults/proxytype") == "system")
+        installer->setProxy(QUrl(getenv("http_proxy")));
+#endif
+    installer->setLogSection(section);
+    installer->setUrl(manualurl);
+    installer->setUnzip(false);
+    installer->setTarget(target);
+    installer->install(logger);
 }

@@ -69,6 +69,7 @@ class RbUtilQt : public QMainWindow
         void installThemes(void);
         void uninstall(void);
         void uninstallBootloader(void);
+        void downloadManual(void);
 };
 
 #endif
