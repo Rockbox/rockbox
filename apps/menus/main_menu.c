@@ -211,12 +211,12 @@ static bool show_info(void)
                     talk_id(VOICE_CURRENT_TIME, true);
                     if (global_settings.timeformat == 1)
                     {
-                        bool pm = false;
+                        long am_pm_id = VOICE_AM;
                         int hour = tm->tm_hour;
-                        
+
                         if (hour >= 12)
                         {
-                            pm = true;
+                            am_pm_id = VOICE_PM;
                             hour -= 12;
                         }
                         if (hour == 0)
@@ -235,7 +235,7 @@ static bool show_info(void)
                             talk_value(tm->tm_min, UNIT_INT, true);
                         }
 
-                        talk_id(pm ? VOICE_PM : VOICE_AM, true);
+                        talk_id(am_pm_id, true);
                     }
                     else
                     {
