@@ -21,6 +21,10 @@
 #include <QtGui>
 #include "rbutilqt.h"
 
+#ifdef STATIC
+#include <QtPlugin>
+Q_IMPORT_PLUGIN(qtaccessiblewidgets)
+#endif
 
 int main( int argc, char ** argv ) {
     QApplication app( argc, argv );
