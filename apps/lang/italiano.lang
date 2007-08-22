@@ -6517,7 +6517,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Nessuna stazione"
   </voice>
 </phrase>
 <phrase>
@@ -7566,7 +7566,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""Nessun file stazioni trovato. Ricercare automaticamente?"
+    radio: "Nessun file stazioni trovato. Ricercare automaticamente?"
   </voice>
 </phrase>
 <phrase>
@@ -11010,5 +11010,56 @@
   </dest>
   <voice>
     *: "unita' per tick"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OCLOCK
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "In punto"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PM
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "P M"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_AM
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "A M"
   </voice>
 </phrase>
