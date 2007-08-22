@@ -70,6 +70,7 @@ class RbUtilQt : public QMainWindow
         void uninstall(void);
         void uninstallBootloader(void);
         void downloadManual(void);
+        void installPortable(void);
 };
 
 #endif

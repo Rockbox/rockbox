@@ -89,6 +89,11 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     // disable unimplemented stuff
     ui.buttonSmall->setEnabled(false);
     ui.buttonComplete->setEnabled(false);
+#if !defined(STATIC)
+    ui.actionInstall_Rockbox_Utility_on_player->setEnabled(false);
+#else
+    connect(ui.actionInstall_Rockbox_Utility_on_player, SIGNAL(triggered()), this, SLOT(installPortable()));
+#endif
 
     initIpodpatcher();
     initSansapatcher();
@@ -543,3 +548,45 @@ void RbUtilQt::downloadManual(void)
     installer->setTarget(target);
     installer->install(logger);
 }
+
+
+void RbUtilQt::installPortable(void)
+{
+    if(QMessageBox::question(this, tr("Confirm installation"),
+       tr("Do you really want to install Rockbox Utility to your player? "
+        "After installation you can run it from the players hard drive."),
+        QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
+        return;
+
+    ProgressLoggerGui* logger = new ProgressLoggerGui(this);
+    logger->show();
+    logger->addItem(tr("Installing Rockbox Utility"), LOGINFO);
+
+    // check mountpoint
+    if(!QFileInfo(userSettings->value("defaults/mountpoint").toString()).isDir()) {
+        logger->addItem(tr("Mount point is wrong!"),LOGERROR);
+        logger->abort();
+        return;
+    }
+
+    // remove old files first.
+    QFile::remove(userSettings->value("defaults/mountpoint").toString() + "/RockboxUtility.exe");
+    QFile::remove(userSettings->value("defaults/mountpoint").toString() + "/RockboxUtility.ini");
+    // copy currently running binary and currently used settings file
+    if(!QFile::copy(qApp->applicationFilePath(), userSettings->value("defaults/mountpoint").toString() + "/RockboxUtility.exe")) {
+        logger->addItem(tr("Error installing Rockbox Utility"), LOGERROR);
+        logger->abort();
+        return;
+    }
+    logger->addItem(tr("Installing user configuration"), LOGINFO);
+    if(!QFile::copy(userSettings->fileName(), userSettings->value("defaults/mountpoint").toString() + "/RockboxUtility.ini")) {
+        logger->addItem(tr("Error installing user configuration"), LOGERROR);
+        logger->abort();
+        return;
+    }
+    logger->addItem(tr("Successfully installed Rockbox Utility."), LOGOK);
+    logger->abort();
+    
+}
+
+
