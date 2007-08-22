@@ -30,7 +30,7 @@ specific to that target.
 :Archos Recorder 8MB:
 :Archos FM Recorder:
 :Archos Recorder v2:
-:Archos Ondio FM: Jens Arnold
+:Archos Ondio FM: Jens Arnold, Marianne Arnold
 :Archos Ondio SP:
 :Iriver H100/H115:
 :Iriver H120/H140: Miika Pekkarinen, Linus Nielsen Feltzing
@@ -46,7 +46,7 @@ specific to that target.
 :Iriver H10 20GB:
 :Iriver H10 5GB/6GB:
 :Iaudio X5: Linus Nielsen Feltzing
-:Iaudio M5:
+:Iaudio M5: Marianne Arnold
 :Sansa E200: Michael Sevakis
 :Toshiba Gigabeat F: Michael Sevakis
 :Toshiba Gigabeat X:
@@ -123,6 +123,7 @@ the person(s) named next to "General".
 :Dutch: Peter D'Hoye
 :Swedish: Magnus Holmgren
 :Danish: Jonas Häggqvist
+:German: Marianne Arnold
 
 
 Plugins
