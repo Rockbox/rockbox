@@ -57,7 +57,8 @@
 #define FIFO_EMPTY      (1 << 6)
 
 #define CMD_OK          0x0 /* Command was successful */
-#define CMD_ERROR_2     0x2 /* Seen when SD card is not inserted */
+#define CMD_ERROR_2     0x2 /* SD did not respond to command (either it doesn't
+                               understand the command or is not inserted) */
 
 /* SD States */
 #define IDLE            0
@@ -80,6 +81,7 @@
 #define SWITCH_FUNC           6
 #define SELECT_CARD           7
 #define DESELECT_CARD         7
+#define SEND_IF_COND          8
 #define SEND_CSD              9
 #define SEND_CID             10
 #define STOP_TRANSMISSION    12
@@ -244,12 +246,12 @@ static int sd_command(unsigned int cmd, unsigned long arg1,
     }
     else
     {
-        /* Response types 1, 1b, 3, 6 have the following structure:
+        /* Response types 1, 1b, 3, 6, 7 have the following structure:
          * Types 4 and 5 are not supported.
          *
          *     [47] Start bit - '0'
          *     [46] Transmission bit - '0'
-         *  [45:40] R1, R1b, R6: Command index
+         *  [45:40] R1, R1b, R6, R7: Command index
          *          R3: Reserved - '111111'
          *   [39:8] R1, R1b: Card Status
          *          R3: OCR Register
@@ -266,6 +268,8 @@ static int sd_command(unsigned int cmd, unsigned long arg1,
          *                      [3] AKE_SEQ_ERROR
          *                      [2] Reserved
          *                    [1:0] Reserved for test mode
+         *          R7: [19:16] Voltage accepted
+         *              [15:8]  echo-back of check pattern
          *    [7:1] R1, R1b: CRC7
          *          R3: Reserved - '1111111'
          *      [0] End Bit - '1'
@@ -544,6 +548,7 @@ static void sd_card_mux(int card_no)
 static void sd_init_device(int card_no)
 {
 /* SD Protocol registers */
+    unsigned int response = 0;
     unsigned int  i;
     unsigned int  c_size;
     unsigned long c_mult;
@@ -581,13 +586,32 @@ static void sd_init_device(int card_no)
         goto card_init_error;
 
     check_time[EC_POWER_UP] = USEC_TIMER;
+    
+    /* Check for SDHC:
+       - non-SDHC cards simply ignore SEND_IF_COND (CMD8) and we get error -219,
+         which we can just ignore and assume we're dealing with standard SD.
+       - SDHC cards echo back the argument into the response. This is how we
+         tell if the card is SDHC.
+     */
+    ret = sd_command(SEND_IF_COND,0x1aa, &response,7);
+    if ( (ret < 0) && (ret!=-219) )
+            goto card_init_error;
+
     while ((currcard->ocr & (1 << 31)) == 0) /* until card is powered up */
     {
         ret = sd_command(APP_CMD, currcard->rca, NULL, 1);
         if (ret < 0)
             goto card_init_error;
 
-        ret = sd_command(SD_APP_OP_COND, 0x100000, &currcard->ocr, 3);
+        if(response == 0x1aa)
+        {
+            /* SDHC */
+            ret = sd_command(SD_APP_OP_COND, (1<<30)|0x100000,
+                             &currcard->ocr, 3);
+        } else {
+            /* SD Standard */
+            ret = sd_command(SD_APP_OP_COND, 0x100000, &currcard->ocr, 3);
+        }
         if (ret < 0)
             goto card_init_error;
 
@@ -611,13 +635,26 @@ static void sd_init_device(int card_no)
         goto card_init_error;
 
     /* These calculations come from the Sandisk SD card product manual */
-    c_size = ((currcard->csd[2] & 0x3ff) << 2) + (currcard->csd[1] >> 30) + 1;
-    c_mult = 4 << ((currcard->csd[1] >> 15) & 7);
-    currcard->max_read_bl_len = 1 << ((currcard->csd[2] >> 16) & 15);
-    currcard->block_size = BLOCK_SIZE;     /* Always use 512 byte blocks */
-    currcard->numblocks = c_size * c_mult * (currcard->max_read_bl_len / 512);
-    currcard->capacity = currcard->numblocks * currcard->block_size;
-
+    if( (currcard->csd[3]>>30) == 0)
+    {
+        /* CSD version 1.0 */
+        c_size = ((currcard->csd[2] & 0x3ff) << 2) + (currcard->csd[1]>>30) + 1;
+        c_mult = 4 << ((currcard->csd[1] >> 15) & 7);
+        currcard->max_read_bl_len = 1 << ((currcard->csd[2] >> 16) & 15);
+        currcard->block_size = BLOCK_SIZE;     /* Always use 512 byte blocks */
+        currcard->numblocks = c_size * c_mult * (currcard->max_read_bl_len/512);
+        currcard->capacity = currcard->numblocks * currcard->block_size;
+    }
+    else if( (currcard->csd[3]>>30) == 1)
+    {
+        /* CSD version 2.0 */
+        c_size = ((currcard->csd[2] & 0x3f) << 16) + (currcard->csd[1]>>16) + 1;
+        currcard->max_read_bl_len = 1 << ((currcard->csd[2] >> 16) & 0xf);
+        currcard->block_size = BLOCK_SIZE;     /* Always use 512 byte blocks */
+        currcard->numblocks = c_size;
+        currcard->capacity = currcard->numblocks * currcard->block_size;
+    }
+    
     REG_1 = 0;
 
     ret = sd_command(SELECT_CARD, currcard->rca, NULL, 129);
@@ -638,8 +675,9 @@ static void sd_init_device(int card_no)
 
     BLOCK_SIZE_REG = currcard->block_size;
 
-    /* If this card is > 4Gb, then we need to enable bank switching */
-    if (currcard->numblocks >= BLOCKS_PER_BANK)
+    /* If this card is >4GB & not SDHC, then we need to enable bank switching */
+    if( (currcard->numblocks >= BLOCKS_PER_BANK) &&
+        ((currcard->ocr & (1<<30)) == 0) )
     {
         SD_STATE_REG = TRAN;
         BLOCK_COUNT_REG = 1;
@@ -737,16 +775,20 @@ ata_read_retry:
 
     last_disk_activity = current_tick;
 
-    bank = start / BLOCKS_PER_BANK;
-
-    if (currcard->current_bank != bank)
+    /* Only switch banks with non-SDHC cards */
+    if((currcard->ocr & (1<<30))==0)
     {
-        ret = sd_select_bank(bank);
-        if (ret < 0)
-            goto ata_read_error;
-    }
+        bank = start / BLOCKS_PER_BANK;
 
-    start -= bank * BLOCKS_PER_BANK;
+        if (currcard->current_bank != bank)
+        {
+            ret = sd_select_bank(bank);
+            if (ret < 0)
+                goto ata_read_error;
+        }
+    
+        start -= bank * BLOCKS_PER_BANK;
+    }
 
     ret = sd_wait_for_state(TRAN, EC_TRAN_READ_ENTRY);
     if (ret < 0)
@@ -754,7 +796,15 @@ ata_read_retry:
 
     BLOCK_COUNT_REG = incount;
 
-    ret = sd_command(READ_MULTIPLE_BLOCK, start * BLOCK_SIZE, NULL, 0x1c25);
+    if(currcard->ocr & (1<<30) )
+    {
+        /* SDHC */
+        ret = sd_command(READ_MULTIPLE_BLOCK, start, NULL, 0x1c25);
+    }
+    else
+    {
+        ret = sd_command(READ_MULTIPLE_BLOCK, start * BLOCK_SIZE, NULL, 0x1c25);
+    }
     if (ret < 0)
         goto ata_read_error;
 
@@ -833,16 +883,20 @@ ata_write_retry:
         goto ata_write_error;
     }
 
-    bank = start / BLOCKS_PER_BANK;
-
-    if (currcard->current_bank != bank)
+    /* Only switch banks with non-SDHC cards */
+    if((currcard->ocr & (1<<30))==0)
     {
-        ret = sd_select_bank(bank);
-        if (ret < 0)
-            goto ata_write_error;
-    }
+        bank = start / BLOCKS_PER_BANK;
 
-    start -= bank * BLOCKS_PER_BANK;
+        if (currcard->current_bank != bank)
+        {
+            ret = sd_select_bank(bank);
+            if (ret < 0)
+                goto ata_write_error;
+        }
+    
+        start -= bank * BLOCKS_PER_BANK;
+    }
 
     check_time[EC_WRITE_TIMEOUT] = USEC_TIMER;
 
@@ -852,8 +906,15 @@ ata_write_retry:
 
     BLOCK_COUNT_REG = count;
 
-    ret = sd_command(WRITE_MULTIPLE_BLOCK, start * SECTOR_SIZE,
-                     NULL, 0x1c2d);
+    if(currcard->ocr & (1<<30) )
+    {
+        /* SDHC */
+        ret = sd_command(WRITE_MULTIPLE_BLOCK, start, NULL, 0x1c2d);
+    }
+    else
+    {
+        ret = sd_command(WRITE_MULTIPLE_BLOCK, start*BLOCK_SIZE, NULL, 0x1c2d);
+    }
     if (ret < 0)
         goto ata_write_error;
 
