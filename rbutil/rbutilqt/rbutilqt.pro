@@ -110,4 +110,10 @@ unix {
     SOURCES +=  ../sansapatcher/sansaio-posix.c
 }
 
+static {
+    QTPLUGIN += qtaccessiblewidgets
+    LIBS += -L$$(QT_BUILD_TREE)/plugins/accessible -lqtaccessiblewidgets
+    DEFINES += STATIC
+    message("using static plugin")
+}
 
