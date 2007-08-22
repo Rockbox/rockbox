@@ -222,7 +222,7 @@ static bool show_info(void)
                         if (hour == 0)
                             hour = 12;
                             
-                        talk_value(hour, UNIT_INT, true);
+                        talk_number(hour, true);
 
                         /* Voice the minutes */
                         if (tm->tm_min == 0)
@@ -232,7 +232,7 @@ static bool show_info(void)
                         }
                         else
                         {
-                            talk_value(tm->tm_min, UNIT_INT, true);
+                            talk_number(tm->tm_min, true);
                         }
 
                         talk_id(am_pm_id, true);
@@ -240,8 +240,16 @@ static bool show_info(void)
                     else
                     {
                         /*voice the time in 24 hour format*/
-                        talk_value(tm->tm_hour, UNIT_HOUR, true);
-                        talk_value(tm->tm_min, UNIT_MIN, true);
+                        talk_number(tm->tm_hour, true);
+                        if (tm->tm_min == 0)
+                        {
+                            /*say o'clock if the minute is 0. */
+                            talk_id(VOICE_OCLOCK, true);
+                        }
+                        else
+                        {
+                            talk_number(tm->tm_min, true);
+                        }
                     }
                     talk_id(LANG_MONTH_JANUARY + tm->tm_mon, true);
                     talk_number(tm->tm_mday, true);
