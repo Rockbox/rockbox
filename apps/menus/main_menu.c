@@ -211,22 +211,18 @@ static bool show_info(void)
                     talk_id(VOICE_CURRENT_TIME, true);
                     if (global_settings.timeformat == 1)
                     {
-                        /* Voice the time in 12 hour format */
-                        if (tm->tm_hour == 0)
+                        bool pm = false;
+                        int hour = tm->tm_hour;
+                        
+                        if (hour >= 12)
                         {
-                            /* Make it say 12 am instead of 0 am */
-                            talk_value(12, UNIT_INT, true); 
+                            pm = true;
+                            hour -= 12;
                         }
-                        else if (tm->tm_hour <= 12) 
-                        {
-                            /* If between 0 and 12, we voice the hour as-is */
-                            talk_value(tm->tm_hour, UNIT_INT, true); 
-                        }
-                        else 
-                        {
-                            /* Subtract 12 hours if we're past noon */
-                            talk_value(tm->tm_hour-12, UNIT_INT, true);
-                        }
+                        if (hour == 0)
+                            hour = 12;
+                            
+                        talk_value(hour, UNIT_INT, true);
 
                         /* Voice the minutes */
                         if (tm->tm_min == 0)
@@ -239,15 +235,7 @@ static bool show_info(void)
                             talk_value(tm->tm_min, UNIT_INT, true);
                         }
 
-                        /* Voice the suffix */
-                        if (tm->tm_hour >= 12)
-                        {
-                            talk_id(VOICE_PM, true);
-                        }
-                        else
-                        {
-                            talk_id(VOICE_AM, true);
-                        }
+                        talk_id(pm ? VOICE_PM : VOICE_AM, true);
                     }
                     else
                     {
