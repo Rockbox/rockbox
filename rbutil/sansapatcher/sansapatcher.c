@@ -317,7 +317,7 @@ static int sansa_seek_and_read(struct sansa_t* sansa, loff_t pos, unsigned char*
 /* We identify an E200 based on the following criteria:
 
    1) Exactly two partitions;
-   2) First partition is type "W95 FAT32" (0x0b);
+   2) First partition is type "W95 FAT32" (0x0b or 0x0c);
    3) Second partition is type "OS/2 hidden C: drive" (0x84);
    4) The "PPBL" string appears at offset 0 in the 2nd partition;
    5) The "PPMI" string appears at offset PPMI_OFFSET in the 2nd partition.
@@ -330,8 +330,10 @@ int is_e200(struct sansa_t* sansa)
 
     /* Check partition layout */
 
-    if ((sansa->pinfo[0].type != 0x0b) || (sansa->pinfo[1].type != 0x84) ||
-        (sansa->pinfo[2].type != 0x00) || (sansa->pinfo[3].type != 0x00)) {
+    if (((sansa->pinfo[0].type != 0x0b) && (sansa->pinfo[0].type != 0x0c)) || 
+        (sansa->pinfo[1].type != 0x84) ||
+        (sansa->pinfo[2].type != 0x00) || 
+        (sansa->pinfo[3].type != 0x00)) {
         /* Bad partition layout, abort */
         return -1;
     }
