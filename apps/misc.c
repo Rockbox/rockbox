@@ -601,6 +601,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 #ifdef SIMULATOR
     (void)callback;
     (void)parameter;
+    bookmark_autobookmark();
     call_ata_idle_notifys(true);
     exit(0);
 #else
@@ -664,6 +665,8 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
                     sleep(1);
             }
 #endif
+            bookmark_autobookmark();
+
             /* audio_stop_recording == audio_stop for HWCODEC */
             audio_stop();
 
