@@ -52,11 +52,11 @@ bool Autodetection::detect()
             }
         }
     }
-
+    int n;
+    
     //try ipodpatcher
     struct ipod_t ipod;
-
-    int n = ipod_scan(&ipod);
+    n = ipod_scan(&ipod);
     if(n == 1) {
         qDebug() << "Ipod found:" << ipod.modelstr << "at" << ipod.diskname;
         m_device = ipod.targetname;
@@ -65,7 +65,14 @@ bool Autodetection::detect()
     }
     
     //try sansapatcher
-    
+    struct sansa_t sansa;
+    n = sansa_scan(&sansa);
+    if(n == 1) {
+        qDebug() << "Sansa found:" << "sansae200" << "at" << sansa.diskname;
+        m_device = "sansae200";
+        m_mountpoint = resolveMountPoint(sansa.diskname);
+        return true;
+    }
     
     return false;
 }
@@ -119,6 +126,7 @@ QString Autodetection::resolveMountPoint(QString device)
             QString directory = dir;
             free( dev );
             free( dir );
+            fclose(fp);
             return directory;
         }
         free( dev );
