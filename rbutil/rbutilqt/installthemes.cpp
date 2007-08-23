@@ -219,7 +219,7 @@ void ThemesInstallWindow::resizeEvent(QResizeEvent* e)
     if(p.isNull()) return;
     q = p.scaled(img, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     ui.themePreview->setScaledContents(false);
-    ui.themePreview->setPixmap(q);
+    ui.themePreview->setPixmap(p);
 }
 
 
