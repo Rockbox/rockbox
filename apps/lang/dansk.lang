@@ -1,3 +1,25 @@
+# Rockbox danish language file
+# Translated by:
+# - Rune Wiinberg
+# - Jakob Givoni
+# - Jonas Häggqvist
+#
+# Try to follow the guidelines from http://www.sslug.dk/locale/ Specifically
+# try to avoid english words at (almost) all costs.
+#
+# Local conventions:
+# "Settings" is removed from translations used in the menu since it's all
+# settings there ("Sound Settings > Lyd").
+# No excessive capitals ("Håndter opsætning" - not "Håndter Opsætning")
+#
+# Strings that need attention:
+# - LANG_CROSSFEED_HF_CUTOFF
+# - LANG_CROSSFEED_CROSS_GAIN
+# - LANG_CROSSFEED_HF_ATTENUATION
+# - LANG_CROSSFEED_DIRECT_GAIN
+# - LANG_EQUALIZER_BAND_LOW_SHELF
+# - LANG_EQUALIZER_BAND_HIGH_SHELF
+# - All strings with "Equalizer" in them.
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -11085,5 +11107,22 @@
   <voice>
     *: none
     rtc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OH
+  desc: spoken only, for wall clock announce
+  user: 
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "nul"
   </voice>
 </phrase>
