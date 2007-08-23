@@ -31,7 +31,7 @@ bool Autodetection::detect()
     
     // Try detection via rockbox.info
     QStringList mountpoints = getMountpoints();
-    
+
     for(int i=0; i< mountpoints.size();i++)
     {
         QDir dir(mountpoints.at(i));
@@ -54,9 +54,18 @@ bool Autodetection::detect()
     }
 
     //try ipodpatcher
-        
+    struct ipod_t ipod;
+
+    int n = ipod_scan(&ipod);
+    if(n == 1) {
+        qDebug() << "Ipod found:" << ipod.modelstr << "at" << ipod.diskname;
+        m_device = ipod.targetname;
+        m_mountpoint = resolveMountPoint(ipod.diskname);
+        return true;
+    }
     
     //try sansapatcher
+    
     
     return false;
 }
@@ -96,4 +105,28 @@ QStringList Autodetection::getMountpoints()
 #endif
 }
 
+QString Autodetection::resolveMountPoint(QString device)
+{
+    qDebug() << "Autodetection::resolveMountPoint(QString)" << device;
+#if defined(Q_OS_LINUX)
+    FILE *fp = fopen( "/proc/mounts", "r" );
+    if( !fp ) return QString("");
+    char *dev, *dir;
+    while( fscanf( fp, "%as %as %*s %*s %*s %*s", &dev, &dir ) != EOF )
+    {
+        if( QString(dev).startsWith(device) )
+        {
+            QString directory = dir;
+            free( dev );
+            free( dir );
+            return directory;
+        }
+        free( dev );
+        free( dir );
+    }
+    fclose( fp );
+    
+#endif
+    return QString("");
 
+}
