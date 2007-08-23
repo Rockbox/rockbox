@@ -117,7 +117,7 @@ static int track_write_idx = 0;
 #endif /* !SIMULATOR */
 
 /* Callback function to call when current track has really changed. */
-void (*track_changed_callback)(struct mp3entry *id3);
+void (*track_changed_callback)(struct mp3entry *id3) = NULL;
 void (*track_buffer_callback)(struct mp3entry *id3, bool last_track);
 void (*track_unbuffer_callback)(struct mp3entry *id3, bool last_track);
 
@@ -149,6 +149,7 @@ static int audiobuf_read;
 static int mpeg_file;
 
 static bool play_pending; /* We are about to start playing */
+static bool play_pending_track_change;  /* When starting play we're starting a new file */
 static bool filling;      /* We are filling the buffer with data from disk */
 static bool dma_underrun; /* True when the DMA has stopped because of
                              slow disk reading (read error, shaking) */
@@ -1027,16 +1028,42 @@ static int new_file(int steps)
 
 static void stop_playing(void)
 {
+    struct trackdata *track;
+
     /* Stop the current stream */
     mp3_play_stop();
     playing = false;
     filling = false;
+
+    track = get_trackdata(0);
+    if (track != NULL)
+        prev_track_elapsed = track->id3.elapsed;
+
     if(mpeg_file >= 0)
         close(mpeg_file);
     mpeg_file = -1;
     remove_all_tags();
     generate_unbuffer_events();
     reset_mp3_buffer();
+}
+
+static void end_current_track(void) {
+    struct trackdata *track;
+
+    play_pending = false;
+    playing = false;
+    mp3_play_pause(false);
+
+    track = get_trackdata(0);
+    if (track != NULL)
+        prev_track_elapsed = track->id3.elapsed;
+
+    reset_mp3_buffer();
+    remove_all_tags();
+    generate_unbuffer_events();
+
+    if(mpeg_file >= 0)
+        close(mpeg_file);
 }
 
 /* Is this a really the end of playback or is a new playlist starting */
@@ -1134,8 +1161,12 @@ static void start_playback_if_ready(void)
             if (play_pending) /* don't do this when recovering from DMA underrun */
             {
                 generate_postbuffer_events(); /* signal first track as buffered */
-                if (track_changed_callback)
-                    track_changed_callback(audio_current_track());
+                if (play_pending_track_change)
+                {
+                    play_pending_track_change = false;
+                    if(track_changed_callback)
+                        track_changed_callback(audio_current_track());
+                }
                 play_pending = false;
             }
             playing = true;
@@ -1260,17 +1291,8 @@ static void mpeg_thread(void)
 #endif /* CONFIG_TUNER */
 
                 /* Stop the current stream */
-                play_pending = false;
-                playing = false;
                 paused = false;
-                mp3_play_pause(false);
-
-                reset_mp3_buffer();
-                remove_all_tags();
-                generate_unbuffer_events();
-
-                if(mpeg_file >= 0)
-                    close(mpeg_file);
+                end_current_track();
 
                 if ( new_file(0) == -1 )
                 {
@@ -1303,6 +1325,7 @@ static void mpeg_thread(void)
                 /* Tell the file loading code that we want to start playing
                    as soon as we have some data */
                 play_pending = true;
+                play_pending_track_change = true;
 
                 update_playlist();
                 current_track_counter++;
@@ -1390,18 +1413,8 @@ static void mpeg_thread(void)
                         break;
 
                     /* stop the current stream */
-                    play_pending = false;
-                    playing = false;
-                    mp3_play_pause(false);
+                    end_current_track();
 
-                    reset_mp3_buffer();
-                    remove_all_tags();
-                    generate_unbuffer_events();
-
-                    /* Open the next file */
-                    if (mpeg_file >= 0)
-                        close(mpeg_file);
-                    
                     if (new_file(1) < 0) {
                         DEBUGF("No more files to play\n");
                         filling = false;
@@ -1416,6 +1429,7 @@ static void mpeg_thread(void)
                         /* Tell the file loading code that we want
                            to start playing as soon as we have some data */
                         play_pending = true;
+                        play_pending_track_change = true;
 
                         update_playlist();
                         current_track_counter++;
@@ -1430,18 +1444,9 @@ static void mpeg_thread(void)
                     break;
                 
                 /* stop the current stream */
-                play_pending = false;
-                playing = false;
-                mp3_play_pause(false);
-
-                reset_mp3_buffer();
-                remove_all_tags();
-                generate_unbuffer_events();
+                end_current_track();
 
                 /* Open the next file */
-                if (mpeg_file >= 0)
-                    close(mpeg_file);
-
                 if (new_file(-1) < 0) {
                     DEBUGF("No more files to play\n");
                     filling = false;
@@ -1456,6 +1461,7 @@ static void mpeg_thread(void)
                     /* Tell the file loading code that we want to
                        start playing as soon as we have some data */
                     play_pending = true;
+                    play_pending_track_change = true;
 
                     update_playlist();
                     current_track_counter++;
@@ -2905,7 +2911,6 @@ void audio_init(void)
     mpeg_errno = 0;
     track_buffer_callback = NULL;
     track_unbuffer_callback = NULL;
-    track_changed_callback = NULL;
 
 #ifndef SIMULATOR
     audiobuflen = audiobufend - audiobuf;
