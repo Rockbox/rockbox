@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Wenger
- *   $Id: installtalkwindow.h 14151 2007-08-02 22:27:51Z domonoky $
+ *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
