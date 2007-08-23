@@ -227,30 +227,40 @@ static bool show_info(void)
                         /* Voice the minutes */
                         if (tm->tm_min == 0)
                         {
-                            /*say o'clock if the minute is 0. */
+                            /* Say o'clock if the minute is 0. */
                             talk_id(VOICE_OCLOCK, true);
                         }
                         else
                         {
+                            /* Pronounce the leading 0 */
+                            if(tm->tm_min < 10)
+                            {
+                                talk_id(VOICE_OH, true);
+                            }
                             talk_number(tm->tm_min, true);
                         }
-
                         talk_id(am_pm_id, true);
                     }
                     else
                     {
-                        /*voice the time in 24 hour format*/
+                        /* Voice the time in 24 hour format */
                         talk_number(tm->tm_hour, true);
                         if (tm->tm_min == 0)
                         {
-                            /*say o'clock if the minute is 0. */
-                            talk_id(VOICE_OCLOCK, true);
+                            talk_id(VOICE_HUNDRED, true);
+                            talk_id(VOICE_HOUR, true);
                         }
                         else
                         {
+                            /* Pronounce the leading 0 */
+                            if(tm->tm_min < 10)
+                            {
+                                talk_id(VOICE_OH, true);
+                            }
                             talk_number(tm->tm_min, true);
                         }
                     }
+                    
                     talk_id(LANG_MONTH_JANUARY + tm->tm_mon, true);
                     talk_number(tm->tm_mday, true);
                     talk_number(1900 + tm->tm_year, true);
