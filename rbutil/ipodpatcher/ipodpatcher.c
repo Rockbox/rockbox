@@ -1177,7 +1177,7 @@ int getmodel(struct ipod_t* ipod, int ipod_version)
             ipod->modelstr="1st Generation Mini";
             ipod->modelnum = 9;
             ipod->modelname = "mini";
-            ipod->targetname = "ipodmini";
+            ipod->targetname = "ipodmini1g";
 #ifdef WITH_BOOTOBJS
             ipod->bootloader = ipodmini;
             ipod->bootloader_len = LEN_ipodmini;
@@ -1187,7 +1187,7 @@ int getmodel(struct ipod_t* ipod, int ipod_version)
             ipod->modelstr="4th Generation";
             ipod->modelnum = 8;
             ipod->modelname = "ip4g";
-            ipod->targetname = "ipod4g";
+            ipod->targetname = "ipod4gray";
 #ifdef WITH_BOOTOBJS
             ipod->bootloader = ipod4g;
             ipod->bootloader_len = LEN_ipod4g;
