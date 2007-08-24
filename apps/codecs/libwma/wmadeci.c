@@ -30,7 +30,7 @@
 #include "bitstream.h"
 
 
-#define VLCBITS 7		/*7 is the lowest without glitching*/
+#define VLCBITS 7       /*7 is the lowest without glitching*/
 #define VLCMAX ((22+VLCBITS-1)/VLCBITS)
 
 #define EXPVLCBITS 7
@@ -390,7 +390,7 @@ void vector_fmul_add_add(fixed32 *dst, const fixed32 *data, const fixed32 *windo
                   "smull r8, r9, r0, r4;"
 
                   "ldmia %[dst], {r0, r4};"
-				  "add   r0, r0, r9, lsl #1;"  /* *dst=*dst+(r9<<1)*/
+                  "add   r0, r0, r9, lsl #1;"  /* *dst=*dst+(r9<<1)*/
                   "smull r8, r9, r1, r5;"
                   "add   r1, r4, r9, lsl #1;"
                   "stmia %[dst]!, {r0, r1};"
@@ -433,7 +433,7 @@ static inline void vector_fmul_reverse(fixed32 *dst, const fixed32 *src0, const 
   * We ensure that when the windows overlap their squared sum
   * is always 1 (MDCT reconstruction rule).
   *
-  *	The Vorbis I spec has a great diagram explaining this process.
+  * The Vorbis I spec has a great diagram explaining this process.
   * See section 1.3.2.3 of http://xiph.org/vorbis/doc/Vorbis_I_spec.html
   */
  static void wma_window(WMADecodeContext *s, fixed32 *in, fixed32 *out)
@@ -450,7 +450,7 @@ static inline void vector_fmul_reverse(fixed32 *dst, const fixed32 *src0, const 
          vector_fmul_add_add(out, in, s->windows[bsize], block_len);
 
      } else {
-		 /*previous block was smaller or the same size, so use it's size to set the window length*/
+         /*previous block was smaller or the same size, so use it's size to set the window length*/
          block_len = 1 << s->prev_block_len_bits;
          /*find the middle of the two overlapped blocks, this will be the first overlapped sample*/
          n = (s->block_len - block_len) / 2;
@@ -460,10 +460,10 @@ static inline void vector_fmul_reverse(fixed32 *dst, const fixed32 *src0, const 
 
          memcpy(out+n+block_len, in+n+block_len, n*sizeof(fixed32));
      }
-	/* Advance to the end of the current block and prepare to window it for the next block.
-	 * Since the window function needs to be reversed, we do it backwards starting with the
-	 * last sample and moving towards the first
-	 */
+    /* Advance to the end of the current block and prepare to window it for the next block.
+     * Since the window function needs to be reversed, we do it backwards starting with the
+     * last sample and moving towards the first
+     */
      out += s->block_len;
      in += s->block_len;
 
@@ -1169,7 +1169,7 @@ static int wma_decode_block(WMADecodeContext *s)
     int nb_coefs[MAX_CHANNELS];
     fixed32 mdct_norm;
 
-	DEBUGF("***decode_block: %d of (%d samples) (%d)\n",  s->block_num, s->frame_len, s->block_len);
+    DEBUGF("***decode_block: %d of (%d samples) (%d)\n",  s->block_num, s->frame_len, s->block_len);
 
    /* compute current block length */
     if (s->use_variable_block_len)
@@ -1456,14 +1456,22 @@ static int wma_decode_block(WMADecodeContext *s)
             coefs1 = s->coefs1[ch];
             exponents = s->exponents[ch];
             esize = s->exponents_bsize[ch];
-            mult = fixdiv64(pow_table[total_gain+20],Fixed32To64(s->max_exponent[ch]));
-            mult = fixmul64byfixed(mult, mdct_norm);        //what the hell?  This is actually fixed64*2^16!
             coefs = (*(s->coefs))[ch];
 
-               n=0;
+            n=0;
+
+          /*
+          *  Previously the IMDCT was run in 17.15 precision to avoid overflow. However rare files could
+          *  overflow here as well, so switch to 17.15 during coefs calculation.
+          */
+
 
             if (s->use_noise_coding)
             {
+                /*TODO:  mult should be converted to 32 bit to speed up noise coding*/
+
+                mult = fixdiv64(pow_table[total_gain+20],Fixed32To64(s->max_exponent[ch]));
+                mult = mult* mdct_norm;        //what the hell?  This is actually fixed64*2^16!
                 mult1 = mult;
 
                 /* very low freqs : noise */
@@ -1565,29 +1573,23 @@ static int wma_decode_block(WMADecodeContext *s)
             }
             else
             {
+                /*Noise coding not used, simply convert from exp to fixed representation*/
 
-                /* XXX: optimize more */
+
+                fixed32 mult3 = (fixed32)(fixdiv64(pow_table[total_gain+20],Fixed32To64(s->max_exponent[ch])));
+                mult3 = fixmul32(mult3, mdct_norm);
 
                 n = nb_coefs[ch];
 
+                /* XXX: optimize more, unrolling this loop in asm might be a good idea */
+
                 for(i = 0;i < n; ++i)
                 {
-      /*
-      *  Previously the IMDCT was run in 17.15 precision to avoid overflow. However rare files could
-      *  overflow here as well, so switch to 17.15 now.  As a bonus, this saves us a shift later on.
-      */
-
-
-                  atemp = (fixed32)(coefs1[i]*mult>>17);
-                //this "works" in the sense that the mdcts converge
-                 //atemp= ftofix32(coefs1[i] * fixtof64(exponents[i]) * fixtof64(mult>>16));
-
-                  *coefs++=fixmul32(atemp,exponents[i<<bsize>>esize]);
-
-               }
+                    atemp = (coefs1[i] * mult3)>>1;
+                    *coefs++=fixmul32(atemp,exponents[i<<bsize>>esize]);
+                }
                 n = s->block_len - s->coefs_end[bsize];
-                for(i = 0;i < n; ++i)
-                    *coefs++ = 0;
+                memset(coefs, 0, n*sizeof(fixed32));
             }
         }
     }
