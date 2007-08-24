@@ -17,6 +17,8 @@
  *
  ****************************************************************************/
 
+#include "config.h"
+
 /* uncomment this to make filtering calculate lower bits after shifting.
  * without this, "shift" of the lower bits will be lost here.
  */
@@ -26,7 +28,11 @@
  * void eq_filter(int32_t **x, struct eqfilter *f, unsigned num,
  *                unsigned channels, unsigned shift)
  */
+#if CONFIG_CPU == PP5002
+    .section    .icode,"ax",%progbits
+#else
     .text
+#endif
     .global eq_filter
 eq_filter:
     ldr r12, [sp]             @ get shift parameter
