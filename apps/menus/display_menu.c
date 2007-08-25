@@ -401,7 +401,8 @@ MENUITEM_SETTING(peak_meter_hold,
                  &global_settings.peak_meter_hold, peakmeter_callback);
 MENUITEM_SETTING(peak_meter_clip_hold, 
                  &global_settings.peak_meter_clip_hold, peakmeter_callback);
-
+MENUITEM_SETTING(peak_meter_clipcounter, 
+                 &global_settings.peak_meter_clipcounter, NULL);
 MENUITEM_SETTING(peak_meter_release, 
                  &global_settings.peak_meter_release, peakmeter_callback);
 /**
@@ -529,7 +530,7 @@ MENUITEM_FUNCTION(peak_meter_max_item, 0, ID2P(LANG_PM_MAX),
                     peak_meter_max, NULL, NULL, Icon_NOICON);
 MAKE_MENU(peak_meter_menu, ID2P(LANG_PM_MENU), NULL, Icon_NOICON,
           &peak_meter_release, &peak_meter_hold, 
-          &peak_meter_clip_hold,
+          &peak_meter_clip_hold, &peak_meter_clipcounter,
           &peak_meter_scale_item, &peak_meter_min_item, &peak_meter_max_item);
 #endif /*  HAVE_LCD_BITMAP */
 /*    PEAK METER MENU              */

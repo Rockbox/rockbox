@@ -26,6 +26,10 @@
 extern bool peak_meter_histogram(void);
 #endif
 
+extern int pm_get_clipcount(void);
+extern void pm_reset_clipcount(void);
+extern void pm_activate_clipcount(bool active);
+
 extern bool peak_meter_enabled;
 
 extern void peak_meter_playback(bool playback);

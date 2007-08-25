@@ -53,7 +53,9 @@
 #endif
 #include "tree.h"
 #include "eeprom_settings.h"
-
+#ifdef HAVE_RECORDING
+#include "recording.h"
+#endif
 #ifdef HAVE_LCD_BITMAP
 #include "bmp.h"
 #include "icons.h"
@@ -659,7 +661,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 #if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
             if (audio_stat & AUDIO_STATUS_RECORD)
             {
-                audio_stop_recording();
+                rec_command(RECORDING_CMD_STOP);
                 /* wait for stop to complete */
                 while (audio_status() & AUDIO_STATUS_RECORD)
                     sleep(1);

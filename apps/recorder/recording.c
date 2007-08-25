@@ -694,19 +694,38 @@ void rec_set_recording_options(struct audio_recording_options *options)
     audio_set_recording_options(options);
 }
 
-/* steals mp3 buffer, creates unique filename and starts recording */
-void rec_record(void)
+void rec_command(enum recording_command cmd)
 {
+    switch(cmd)
+    {
+        case RECORDING_CMD_STOP:
+            pm_activate_clipcount(false);
+            audio_stop_recording();
+            break;
+        case RECORDING_CMD_START:
+            /* steal mp3 buffer, create unique filename and start recording */
+            pm_reset_clipcount();
+            pm_activate_clipcount(true);
 #if CONFIG_CODEC != SWCODEC
-    talk_buffer_steal(); /* we use the mp3 buffer */
+            talk_buffer_steal(); /* we use the mp3 buffer */
 #endif
-    audio_record(rec_create_filename(path_buffer));
-}
-
-/* creates unique filename and starts recording */
-void rec_new_file(void)
-{
-    audio_new_file(rec_create_filename(path_buffer));
+            audio_record(rec_create_filename(path_buffer));
+            break;
+        case RECORDING_CMD_START_NEWFILE:
+            /* create unique filename and start recording*/
+            pm_reset_clipcount();
+            pm_activate_clipcount(true); /* just to be sure */
+            audio_new_file(rec_create_filename(path_buffer));
+            break;
+        case RECORDING_CMD_PAUSE:
+            pm_activate_clipcount(false);
+            audio_pause_recording();
+            break;
+        case RECORDING_CMD_RESUME:
+            pm_activate_clipcount(true);
+            audio_resume_recording();
+            break;
+    }
 }
 
 /* used in trigger_listerner and recording_screen */
@@ -725,7 +744,7 @@ static void trigger_listener(int trigger_status)
             if(!(audio_status() & AUDIO_STATUS_RECORD))
             {
                 rec_status |= RCSTAT_HAVE_RECORDED;
-                rec_record();
+                rec_command(RECORDING_CMD_START);
 #if CONFIG_CODEC != SWCODEC
                 /* give control to mpeg thread so that it can start
                    recording */
@@ -738,11 +757,13 @@ static void trigger_listener(int trigger_status)
             {
                 if((audio_status() & AUDIO_STATUS_PAUSE) &&
                        (global_settings.rec_trigger_type == 1))
-                    audio_resume_recording();
+                {
+                    rec_command(RECORDING_CMD_RESUME);
+                }
                 /* New file on trig start*/
                 else if (global_settings.rec_trigger_type != 2)
                 {
-                    rec_new_file();
+                    rec_command(RECORDING_CMD_START_NEWFILE);
                     /* tell recording_screen to reset the time */
                     last_seconds = 0;
                 }
@@ -756,15 +777,15 @@ static void trigger_listener(int trigger_status)
                 switch(global_settings.rec_trigger_type)
                 {
                     case 0: /* Stop */
-                        audio_stop_recording();
+                        rec_command(RECORDING_CMD_STOP);
                         break;
 
                     case 1: /* Pause */
-                        audio_pause_recording();
+                        rec_command(RECORDING_CMD_PAUSE);
                         break;
 
                     case 2: /* New file on trig stop*/
-                        rec_new_file();
+                        rec_command(RECORDING_CMD_START_NEWFILE);
                         /* tell recording_screen to reset the time */
                         last_seconds = 0;
                         break;
@@ -825,6 +846,9 @@ bool recording_screen(bool no_source)
     int trig_xpos[NB_SCREENS];
     int trig_ypos[NB_SCREENS];
     int trig_width[NB_SCREENS];
+    /* pm_x = offset pm to put clipcount in front.
+       Use lcd_getstringsize() when not using SYSFONT */
+    int pm_x = global_settings.peak_meter_clipcounter ? 30 : 0;
 
     static const unsigned char *byte_units[] = {
         ID2P(LANG_BYTE),
@@ -881,6 +905,8 @@ bool recording_screen(bool no_source)
     rec_init_filename();
 #endif
 
+    pm_reset_clipcount();
+    pm_activate_clipcount(false);
     settings_apply_trigger();
 
 #ifdef HAVE_AGC
@@ -973,7 +999,7 @@ bool recording_screen(bool no_source)
 #endif /* CONFIG_LED */
 
         /* Wait for a button a while (HZ/10) drawing the peak meter */
-        button = peak_meter_draw_get_btn(0, pm_y, h * PM_HEIGHT, screen_update);
+        button = peak_meter_draw_get_btn(pm_x, pm_y, h * PM_HEIGHT, screen_update);
 
         if (last_audio_stat != audio_stat)
         {
@@ -1021,7 +1047,7 @@ bool recording_screen(bool no_source)
 
                 if(audio_stat & AUDIO_STATUS_RECORD)
                 {
-                    audio_stop_recording();
+                    rec_command(RECORDING_CMD_STOP);
                 }
                 else
                 {
@@ -1045,7 +1071,7 @@ bool recording_screen(bool no_source)
                     {
                         /* manual recording */
                         rec_status |= RCSTAT_HAVE_RECORDED;
-                        rec_record();
+                        rec_command(RECORDING_CMD_START);
                         last_seconds = 0;
                         if (global_settings.talk_menu)
                         {   
@@ -1068,7 +1094,7 @@ bool recording_screen(bool no_source)
                     /*if new file button pressed, start new file */
                     if (button == ACTION_REC_NEWFILE)
                     {
-                        rec_new_file();
+                        rec_command(RECORDING_CMD_START_NEWFILE);
                         last_seconds = 0;
                     }
                     else
@@ -1076,7 +1102,7 @@ bool recording_screen(bool no_source)
                     {
                         if(audio_stat & AUDIO_STATUS_PAUSE)
                         {
-                            audio_resume_recording();
+                            rec_command(RECORDING_CMD_RESUME);
                             if (global_settings.talk_menu)
                             {   
                                 /* no voice possible here, but a beep */
@@ -1085,7 +1111,7 @@ bool recording_screen(bool no_source)
                         }
                         else
                         {
-                            audio_pause_recording();
+                            rec_command(RECORDING_CMD_PAUSE);
                         }
                     }
                 }
@@ -1332,7 +1358,7 @@ bool recording_screen(bool no_source)
             case ACTION_REC_F3:
                 if(audio_stat & AUDIO_STATUS_RECORD)
                 {
-                    rec_new_file();
+                    rec_command(RECORDING_CMD_START_NEWFILE);
                     last_seconds = 0;
                 }
                 else
@@ -1497,16 +1523,31 @@ bool recording_screen(bool no_source)
                 if (!(global_settings.rec_split_type)
                      || (num_recorded_bytes >= MAX_FILE_SIZE))
                 {
-                    rec_new_file();
+                    rec_command(RECORDING_CMD_START_NEWFILE);
                     last_seconds = 0;
                 }
                 else
                 {
                     peak_meter_trigger(false);
                     peak_meter_set_trigger_listener(NULL);
-                    audio_stop_recording();
+                    rec_command(RECORDING_CMD_STOP);
                 }
                 update_countdown = 1;
+            }
+
+            /* draw the clipcounter just in front of the peakmeter */
+            if(global_settings.peak_meter_clipcounter)
+            {
+                char clpstr[32];
+                snprintf(clpstr, 32, "%4d", pm_get_clipcount());
+                for(i = 0; i < screen_update; i++)
+                {
+                    if(PM_HEIGHT > 1)
+                        screens[i].puts(0, 2 + filename_offset[i],
+                                                        str(LANG_PM_CLIPCOUNT));
+                    screens[i].puts(0, 1 + PM_HEIGHT + filename_offset[i],
+                                                                        clpstr);
+                }
             }
 
             snprintf(buf, sizeof(buf), "%s: %s", str(LANG_SYSFONT_VOLUME),
@@ -1749,7 +1790,7 @@ bool recording_screen(bool no_source)
             for(i = 0; i < screen_update; i++)
             {
                 gui_statusbar_draw(&(statusbars.statusbars[i]), true);
-                peak_meter_screen(&screens[i], 0, pm_y[i], h*PM_HEIGHT);
+                peak_meter_screen(&screens[i], pm_x, pm_y[i], h*PM_HEIGHT);
                 screens[i].update();                
             }
 
@@ -1805,7 +1846,7 @@ bool recording_screen(bool no_source)
     }
 
 #if CONFIG_CODEC == SWCODEC
-    audio_stop_recording(); 
+    rec_command(RECORDING_CMD_STOP);
     audio_close_recording();
 
 #ifdef HAVE_FMRADIO_REC

@@ -465,6 +465,7 @@ struct user_settings
     bool peak_meter_dbfs;     /* show linear or dbfs values */
     int peak_meter_min; /* range minimum */
     int peak_meter_max; /* range maximum */
+    bool peak_meter_clipcounter;    /* clipping count indicator */
     bool car_adapter_mode; /* 0=off 1=on */
 
     /* show status bar */

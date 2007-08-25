@@ -42,10 +42,17 @@ void rec_init_recording_options(struct audio_recording_options *options);
 /* SRCF_RECORDING is implied for SWCODEC */
 void rec_set_recording_options(struct audio_recording_options *options);
 
-/* steals mp3 buffer, creates unique filename and starts recording */
-void rec_record(void);
+enum recording_command
+{
+    RECORDING_CMD_STOP,
+    RECORDING_CMD_START, /* steal mp3 buffer, create unique filename and
+                                                              start recording */
+    RECORDING_CMD_START_NEWFILE, /* create unique filename and start recording*/
+    RECORDING_CMD_PAUSE,
+    RECORDING_CMD_RESUME
+};
 
-/* creates unique filename and starts recording */
-void rec_new_file(void);
+/* centralized way to start/stop/... recording */
+void rec_command(enum recording_command rec_cmd);
 
 #endif /* RECORDING_H */

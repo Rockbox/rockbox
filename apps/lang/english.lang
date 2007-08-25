@@ -11122,3 +11122,31 @@
     rtc: "oh"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNTER
+  desc: in settings, for recording peak meter
+  user:
+  <source>
+    *: "Peak meter clipcounter"
+  </source>
+  <dest>
+    *: "Peak meter clipcounter"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNT
+  desc: in recording GUI, for recording peak meter
+  user:
+  <source>
+    *: "CLIP:"
+  </source>
+  <dest>
+    *: "CLIP:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>

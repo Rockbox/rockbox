@@ -712,6 +712,8 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0,peak_meter_dbfs,LANG_PM_DBFS,true,"peak meter dbfs",NULL),
     {F_T_INT,&global_settings.peak_meter_min,LANG_PM_MIN,INT(60),"peak meter min",NULL,UNUSED},
     {F_T_INT,&global_settings.peak_meter_max,LANG_PM_MAX,INT(0),"peak meter max",NULL,UNUSED},
+    OFFON_SETTING(0,peak_meter_clipcounter,LANG_PM_CLIPCOUNTER,false,
+        "peak meter clipcounter",NULL),
 #endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     SOUND_SETTING(0, mdb_strength, LANG_MDB_STRENGTH,
