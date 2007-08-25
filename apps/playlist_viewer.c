@@ -281,6 +281,12 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
         /* Try to restore the list from control file */
         have_list = (playlist_resume() != -1);
     }
+    if (!have_list && (playlist_amount() > 0))
+    {
+         /*If dynamic playlist still exists, view it anyway even 
+        if playback has reached the end of the playlist */
+        have_list = true;
+    }
     if (!have_list)
     {
         /* Nothing to view, exit */
