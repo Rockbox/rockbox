@@ -429,34 +429,22 @@ long parse_replaygain_int(bool album, long gain, long peak,
         gain = convert_gain(gain * FP_ONE / 512);
     }
 
-    DEBUGF("    Album: %d\n", album);
-    DEBUGF("    Gain: %ld.%06ld\n", gain >> 24,
-        (long) (((long long) (abs(gain) & 0x00ffffff) * 1000000) / 0x01000000));
-    DEBUGF("    Peak: %ld.%06ld\n", peak >> 24,
-        (long) (((long long) (abs(peak) & 0x00ffffff) * 1000000) / 0x01000000));
-
     if (album)
     {
-        if (!entry->album_gain) 
-        {
-            entry->album_gain = gain;
-            entry->album_gain_string = buffer;
-        }
+        entry->album_gain = gain;
+        entry->album_gain_string = buffer;
 
-        if (!entry->album_peak)
+        if (peak)
         {
             entry->album_peak = peak;
         }
     }
     else
     {
-        if (!entry->track_gain)
-        {
-            entry->track_gain = gain;
-            entry->track_gain_string = buffer;
-        }
+        entry->track_gain = gain;
+        entry->track_gain_string = buffer;
 
-        if (!entry->track_peak)
+        if (peak)
         {
             entry->track_peak = peak;
         }

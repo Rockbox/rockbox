@@ -467,10 +467,8 @@ static int parserva2( struct mp3entry* entry, char* tag, int bufferpos )
             gain = 0;
         }
             
-        if (gain) {
-            value_len = parse_replaygain_int(album, gain, peak * 2, entry, 
-                tag, sizeof(entry->id3v2buf) - (tag - entry->id3v2buf));
-        }
+        value_len = parse_replaygain_int(album, gain, peak * 2, entry,
+            tag, sizeof(entry->id3v2buf) - (tag - entry->id3v2buf));
     }
 
     return tag - entry->id3v2buf + value_len;
