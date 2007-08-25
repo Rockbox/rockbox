@@ -28,10 +28,6 @@
 #include "id3.h"
 #include "debug.h"
 
-/* Type of channel for RVA2 frame. There are more than this defined in the spec
-   but we don't use them. */
-#define MASTER_CHANNEL 1
-
 /* The fixed point math routines (with the exception of fp_atof) are based
  * on oMathFP by Dan Carter (http://orbisstudios.com).
  */
@@ -306,12 +302,12 @@ static long convert_gain(long gain)
     return gain;
 }
 
-long get_replaygain_int(long int_gain)
-{
-    return convert_gain(int_gain * FP_ONE / 100);
-}
-
-long get_replaygain(const char* str)
+/* Get the sample scale factor in Q7.24 format from a gain value. Returns 0
+ * for no gain.
+ *
+ * str  Gain in dB as a string. E.g., "-3.45 dB"; the "dB" part is ignored.
+ */
+static long get_replaygain(const char* str)
 {
     long gain = 0;
 
@@ -324,7 +320,11 @@ long get_replaygain(const char* str)
     return gain;
 }
 
-long get_replaypeak(const char* str)
+/* Get the peak volume in Q7.24 format.
+ *
+ * str  Peak volume. Full scale is specified as "1.0". Returns 0 for no peak.
+ */
+static long get_replaypeak(const char* str)
 {
     long peak = 0;
 
@@ -336,12 +336,24 @@ long get_replaypeak(const char* str)
     return peak;
 }
 
-/* Check for a ReplayGain tag conforming to the "VorbisGain standard". If
- * found, set the mp3entry accordingly. buffer is where to store the text
- * contents of the gain tags; up to length bytes (including end nil) can be
- * written. Returns number of bytes written to the tag text buffer, or zero
- * if no ReplayGain tag was found (or nothing was copied to the buffer for
- * other reasons).
+/* Get a sample scale factor in Q7.24 format from a gain value.
+ *
+ * int_gain  Gain in dB, multiplied by 100.
+ */
+long get_replaygain_int(long int_gain)
+{
+    return convert_gain(int_gain * FP_ONE / 100);
+}
+
+/* Parse a ReplayGain tag conforming to the "VorbisGain standard". If a
+ * valid tag is found, update mp3entry struct accordingly. Existing values 
+ * are not overwritten. Returns number of bytes written to buffer.
+ *
+ * key     Name of the tag.
+ * value   Value of the tag.
+ * entry   mp3entry struct to update.
+ * buffer  Where to store the text for gain values (for later display).
+ * length  Bytes left in buffer.
  */
 long parse_replaygain(const char* key, const char* value,
     struct mp3entry* entry, char* buffer, int length)
@@ -390,74 +402,65 @@ long parse_replaygain(const char* key, const char* value,
     return 0;
 }
 
-static long get_rva_values(const char *frame, long *gain, long *peak,
-    char **string, char *buffer, int length)
-{
-    long value, len;
-    int negative = 0;
-    char tmpbuf[10];
-    int peakbits, peakbytes, shift;
-    unsigned long peakvalue = 0;
-
-    value = 256 * ((unsigned char)*frame) + ((unsigned char)*(frame + 1));
-    if (value & 0x8000)
-    {
-        value = -(value | ~0xFFFF);
-        negative = 1;
-    }
-
-    len = snprintf(tmpbuf, sizeof(tmpbuf), "%s%d.%02d dB", negative ? "-" : "",
-        value / 512, (value & 0x1FF) * 195 / 1000);
-
-    *gain = get_replaygain(tmpbuf);
-
-    len = MIN(len, length - 1);
-    if (len > 1)
-    {
-        strncpy(buffer, tmpbuf, len);
-        buffer[len] = 0;
-        *string = buffer;
-    }
-
-    frame += 2;
-    peakbits = *(unsigned char *)frame++;
-    peakbytes = MIN(4, (peakbits + 7) >> 3);
-    shift = ((8 - (peakbits & 7)) & 7) + (4 - peakbytes) * 8;
-
-    for (; peakbytes; peakbytes--)
-    {
-            peakvalue <<= 8;
-            peakvalue += (unsigned long)*frame++;
-    }
-
-    peakvalue <<= shift;
-
-    if (peakbits > 32)
-        peakvalue += (unsigned long)*frame >> (8 - shift);
-
-    snprintf(tmpbuf, sizeof(tmpbuf), "%d.%06d", peakvalue >> 31,
-        (peakvalue & ~(1 << 31)) / 2147);
-
-    *peak = get_replaypeak(tmpbuf);
-
-    return len + 1;
-}
-
-long parse_replaygain_rva(const char* key, const char* value,
+/* Set ReplayGain values from integers. Existing values are not overwritten. 
+ * Returns number of bytes written to buffer.
+ *
+ * album   If true, set album values, otherwise set track values.
+ * gain    Gain value in dB, multiplied by 512. 0 for no gain.
+ * peak    Peak volume in Q7.24 format, where 1.0 is full scale. 0 for no 
+ *         peak volume.
+ * buffer  Where to store the text for gain values (for later display).
+ * length  Bytes left in buffer.
+ */
+long parse_replaygain_int(bool album, long gain, long peak,
     struct mp3entry* entry, char* buffer, int length)
 {
-    /* Values will be overwritten if they already exist. This gives priority to
-       replaygain in RVA2 fields over TXXX fields for ID3v2.4. */
-    if ((strcasecmp(key, "track") == 0) && *value == MASTER_CHANNEL)
+    long len = 0;
+
+    if (buffer != NULL)
     {
-        return get_rva_values(value + 1, &(entry->track_gain), &(entry->track_peak),
-            &(entry->track_gain_string), buffer, length);
-    }
-    else if ((strcasecmp(key, "album") == 0) && *value == MASTER_CHANNEL)
-    {
-        return get_rva_values(value + 1, &(entry->album_gain), &(entry->album_peak),
-            &(entry->album_gain_string), buffer, length);
+        len = snprintf(buffer, length, "%d.%02d dB", gain / 512,
+            ((abs(gain) & 0x01ff) * 100 + 256) / 512);
+        len++;
     }
 
-    return 0;
+    if (gain != 0)
+    {
+        gain = convert_gain(gain * FP_ONE / 512);
+    }
+
+    DEBUGF("    Album: %d\n", album);
+    DEBUGF("    Gain: %ld.%06ld\n", gain >> 24,
+        (long) (((long long) (abs(gain) & 0x00ffffff) * 1000000) / 0x01000000));
+    DEBUGF("    Peak: %ld.%06ld\n", peak >> 24,
+        (long) (((long long) (abs(peak) & 0x00ffffff) * 1000000) / 0x01000000));
+
+    if (album)
+    {
+        if (!entry->album_gain) 
+        {
+            entry->album_gain = gain;
+            entry->album_gain_string = buffer;
+        }
+
+        if (!entry->album_peak)
+        {
+            entry->album_peak = peak;
+        }
+    }
+    else
+    {
+        if (!entry->track_gain)
+        {
+            entry->track_gain = gain;
+            entry->track_gain_string = buffer;
+        }
+
+        if (!entry->track_peak)
+        {
+            entry->track_peak = peak;
+        }
+    }
+    
+    return len;
 }
