@@ -288,7 +288,8 @@ whichadvanced () {
 
     # Ask about languages to build
     echo "Select a number for the language to use (default is english)"
-    echo "You may enter a comma-separated list of languages to build"
+    # The multiple-language feature is currently broken
+    # echo "You may enter a comma-separated list of languages to build"
 
     picklang
     voicelanguage=`whichlang`
@@ -329,7 +330,7 @@ voiceconfig () {
 
     if [ -f "`which flite`" ]; then
         FLITE="F(l)ite "
-        FLITE_OPTS="FLITE_OPTS=\"\""
+        FLITE_OPTS=""
         DEFAULT_TTS="flite"
         DEFAULT_TTS_OPTS=$FLITE_OPTS
         DEFAULT_NOISEFLOOR="500"
@@ -337,7 +338,7 @@ voiceconfig () {
     fi
     if [ -f "`which espeak`" ]; then
         ESPEAK="(e)Speak "
-        ESPEAK_OPTS="ESPEAK_OPTS=\"\""
+        ESPEAK_OPTS=""
         DEFAULT_TTS="espeak"
         DEFAULT_TTS_OPTS=$ESPEAK_OPTS
         DEFAULT_NOISEFLOOR="500"
@@ -345,7 +346,23 @@ voiceconfig () {
     fi
     if [ -f "`which festival`" ]; then
         FESTIVAL="(F)estival "
-        FESTIVAL_OPTS="FESTIVAL_OPTS=\"\""
+        case "$thislang" in
+            "italiano")
+            FESTIVAL_OPTS="--language italian"
+            ;;
+            "espanol")
+            FESTIVAL_OPTS="--language spanish"
+            ;;
+            "finnish")
+            FESTIVAL_OPTS="--language finnish"
+            ;;
+            "czech")
+            FESTIVAL_OPTS="--language czech"
+            ;;
+            *)
+            FESTIVAL_OPTS=""
+            ;;
+        esac
         DEFAULT_TTS="festival"
         DEFAULT_TTS_OPTS=$FESTIVAL_OPTS
         DEFAULT_NOISEFLOOR="500"
@@ -354,7 +371,7 @@ voiceconfig () {
     # Allow SAPI if Windows is in use
     if [ -f "`which winver`" ]; then
         SAPI5="(S)API5 "
-        SAPI5_OPTS="SAPI5_OPTS=\"\""
+        SAPI5_OPTS=""
         DEFAULT_TTS="sapi5"
         DEFAULT_TTS_OPTS=$SAPI5_OPTS
         DEFAULT_NOISEFLOOR="500"
@@ -397,10 +414,10 @@ voiceconfig () {
     echo "Using $TTS_ENGINE for TTS"
 
     # Allow the user to input manual commandline options
-    printf "Enter $TTS_ENGINE options (enter for defaults `echo $TTS_OPTS |sed 's/.*=//'`): "
+    printf "Enter $TTS_ENGINE options (enter for defaults \"$TTS_OPTS\"): "
     USER_TTS_OPTS=`input`
     if [ -n "$USER_TTS_OPTS" ]; then
-        TTS_OPTS="`echo $TTS_OPTS | sed 's/=.*//'`=\"$USER_TTS_OPTS\""
+        TTS_OPTS="$USER_TTS_OPTS"
     fi
 
     echo ""
@@ -408,7 +425,7 @@ voiceconfig () {
     if [ -f "`which oggenc`" ]; then
         OGGENC="(O)ggenc "
         DEFAULT_ENC="oggenc"
-        VORBIS_OPTS="VORBIS_OPTS=\"-q0 --downmix\""
+        VORBIS_OPTS="-q0 --downmix"
         DEFAULT_ENC_OPTS=$VORBIS_OPTS
         DEFAULT_CHOICE="O"
     fi
@@ -422,7 +439,7 @@ voiceconfig () {
     if [ -f "`which lame`" ]; then
         LAME="(L)ame "
         DEFAULT_ENC="lame"
-        LAME_OPTS="LAME_OPTS=\"--resample 12 -t -m m -h -V 9 -S\""
+        LAME_OPTS="--resample 12 -t -m m -h -V 9 -S -B 64 --vbr-new"
         DEFAULT_ENC_OPTS=$LAME_OPTS
         DEFAULT_CHOICE="L"
     fi
@@ -456,25 +473,16 @@ voiceconfig () {
     echo "Using $ENCODER for encoding voice clips"
 
     # Allow the user to input manual commandline options
-    printf "Enter $ENCODER options (enter for defaults `echo $ENC_OPTS |sed 's/.*=//'`): "
+    printf "Enter $ENCODER options (enter for defaults \"$ENC_OPTS\"): "
     USER_ENC_OPTS=`input`
     if [ -n "$USER_ENC_OPTS" ]; then
-        ENC_OPTS="`echo $ENC_OPTS | sed 's/=.*//'`=\"$USER_ENC_OPTS\""
+        ENC_OPTS=$USER_ENC_OPTS
     fi
 
     TEMPDIR="${pwd}"
     if [ -f "`which cygpath`" ]; then
         TEMPDIR=`cygpath . -a -w`
     fi
-
-    cat > voicesettings-$thislang.sh <<EOF
-TTS_ENGINE="${TTS_ENGINE}"
-ENCODER="${ENCODER}"
-TEMPDIR="$TEMPDIR"
-NOISEFLOOR="${NOISEFLOOR}"
-${TTS_OPTS}
-${ENC_OPTS}
-EOF
 }
 
 picklang() {
@@ -1664,6 +1672,10 @@ sed > Makefile \
  -e "${simmagic1}" \
  -e "${simmagic2}" \
  -e "s,@MANUALDEV@,${manualdev},g" \
+ -e "s,@ENCODER@,${ENCODER},g" \
+ -e "s,@ENC_OPTS@,${ENC_OPTS},g" \
+ -e "s,@TTS_ENGINE@,${TTS_ENGINE},g" \
+ -e "s,@TTS_OPTS@,${TTS_OPTS},g" \
 <<EOF
 ## Automaticly generated. http://www.rockbox.org/
 
@@ -1732,6 +1744,10 @@ export GCCVER=@GCCVER@
 export GCCNUM=@GCCNUM@
 export UNAME=@UNAME@
 export MANUALDEV=@MANUALDEV@
+export TTS_OPTS=@TTS_OPTS@
+export TTS_ENGINE=@TTS_ENGINE@
+export ENC_OPTS=@ENC_OPTS@
+export ENCODER=@ENCODER@
 
 # Do not print "Entering directory ..."
 MAKEFLAGS += --no-print-directory
@@ -1866,7 +1882,7 @@ if [ "yes" = "$voice" ]; then
 
 voice: tools features
 	\$(SILENT)for f in \`cat \$(BUILDDIR)/${apps}/features\`; do feat="\$\$feat:\$\$f" ; done ; \\
-	for lang in \`echo \$(VOICELANGUAGE) |sed "s/,/ /g"\`; do \$(TOOLSDIR)/genvoice.sh \$(ROOTDIR) \$\$lang \$(ARCHOS)\$\$feat \$(TARGET_ID) voicesettings-\$\$lang.sh ; done \\
+	for lang in \`echo \$(VOICELANGUAGE) |sed "s/,/ /g"\`; do \$(TOOLSDIR)/voice.pl -V -l=\$\$lang -t=\$(ARCHOS)\$\$feat -i=\$(TARGET_ID) -e=\$(ENCODER) -E="\$(ENC_OPTS)" -s=\$(TTS_ENGINE) -S="\$(TTS_OPTS)"; done \\
 EOF
 
 fi
