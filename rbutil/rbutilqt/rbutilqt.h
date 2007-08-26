@@ -56,18 +56,36 @@ class RbUtilQt : public QMainWindow
         BootloaderInstaller* blinstaller;
         QUrl proxy(void);
         QMap<QString, QString> versmap;
+        
+        volatile bool m_installed;
+        volatile bool m_error;
 
     private slots:
         void about(void);
         void configDialog(void);
         void updateDevice(void);
         void updateSettings(void);
+        
         void completeInstall(void);
         void smallInstall(void);
+        void installdone(bool error);
+        
+        void installBtn(void);
+        bool installAuto(void);
         void install(void);
-        void installBl(void);
+        
+        void installBootloaderBtn(void);
+        bool installBootloaderAuto(void);
+        void installBootloader(void);
+                
+        void installFontsBtn(void);
+        bool installFontsAuto(void);
         void installFonts(void);
+        
+        void installDoomBtn(void);
+        bool installDoomAuto(void);
         void installDoom(void);
+        
         void createTalkFiles(void);
         void downloadDone(bool);
         void downloadDone(int, bool);

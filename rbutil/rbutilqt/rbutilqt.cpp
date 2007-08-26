@@ -84,10 +84,10 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     connect(ui.action_About, SIGNAL(triggered()), this, SLOT(about()));
     connect(ui.action_Configure, SIGNAL(triggered()), this, SLOT(configDialog()));
     connect(ui.buttonChangeDevice, SIGNAL(clicked()), this, SLOT(configDialog()));
-    connect(ui.buttonRockbox, SIGNAL(clicked()), this, SLOT(install()));
-    connect(ui.buttonBootloader, SIGNAL(clicked()), this, SLOT(installBl()));
-    connect(ui.buttonFonts, SIGNAL(clicked()), this, SLOT(installFonts()));
-    connect(ui.buttonGames, SIGNAL(clicked()), this, SLOT(installDoom()));
+    connect(ui.buttonRockbox, SIGNAL(clicked()), this, SLOT(installBtn()));
+    connect(ui.buttonBootloader, SIGNAL(clicked()), this, SLOT(installBootloaderBtn()));
+    connect(ui.buttonFonts, SIGNAL(clicked()), this, SLOT(installFontsBtn()));
+    connect(ui.buttonGames, SIGNAL(clicked()), this, SLOT(installDoomBtn()));
     connect(ui.buttonTalk, SIGNAL(clicked()), this, SLOT(createTalkFiles()));
     connect(ui.buttonVoice, SIGNAL(clicked()), this, SLOT(installVoice()));
     connect(ui.buttonThemes, SIGNAL(clicked()), this, SLOT(installThemes()));
@@ -305,27 +305,78 @@ void RbUtilQt::completeInstall()
            tr("Do you really want to make a complete Installation?"),
               QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
     
-    MultiInstaller installer(this);  
-    installer.setUserSettings(userSettings);
-    installer.setDeviceSettings(devices);
-    installer.setProxy(proxy());
-    
-    buildInfo.open();
-    QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
-    buildInfo.close();
-
-    devices->beginGroup(platform);
-    QString released = devices->value("released").toString();
-    devices->endGroup();
-    if(released == "yes") {
-        // only set the keys if needed -- querying will yield an empty string
-        // if not set.
-        versmap.insert("rel_rev", devices->value("last_release").toString());
-        versmap.insert("rel_date", ""); // FIXME: provide the release timestamp
+    // create logger
+    logger = new ProgressLoggerGui(this);
+    logger->show();
+                     
+    QString mountpoint = userSettings->value("defaults/mountpoint").toString();
+    // show dialog with error if mount point is wrong
+    if(!QFileInfo(mountpoint).isDir()) {
+        logger->addItem(tr("Mount point is wrong!"),LOGERROR);
+        logger->abort();
+        return;
+    }  
+    // Bootloader
+    m_error = false;
+    m_installed = false;
+    if(!installBootloaderAuto())
+        return;
+    else
+    {
+        // wait for boot loader installation finished
+        while(!m_installed)
+            QApplication::processEvents();
     }
-    installer.setVersionStrings(versmap);
-    
-    installer.installComplete();
+    if(m_error) return;
+    logger->undoAbort();
+        
+    // Rockbox
+    m_error = false;
+    m_installed = false;
+    if(!installAuto())
+        return;
+    else
+    {
+        // wait for boot loader installation finished
+        while(!m_installed)
+           QApplication::processEvents();
+    }
+    if(m_error) return;
+    logger->undoAbort();
+        
+    // Fonts
+    m_error = false;
+    m_installed = false;
+    if(!installFontsAuto())
+        return;
+    else
+    {
+        // wait for boot loader installation finished
+        while(!m_installed)
+           QApplication::processEvents();
+    }
+    if(m_error) return;
+    logger->undoAbort();
+        
+    // Doom
+    m_error = false;
+    m_installed = false;
+    if(!installDoomAuto())
+        return;
+    else
+    {
+        // wait for boot loader installation finished
+        while(!m_installed)
+           QApplication::processEvents();
+    }
+    if(m_error) return;
+        
+        
+    // theme
+    // this is a window
+    // it has its own logger window,so close our.
+    logger->close();
+    installThemes();
         
 }
 
@@ -335,10 +386,61 @@ void RbUtilQt::smallInstall()
            tr("Do you really want to make a small Installation?"),
               QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
     
-    MultiInstaller installer(this);   
-    installer.setUserSettings(userSettings);
-    installer.setDeviceSettings(devices);
-    installer.setProxy(proxy());
+    // create logger
+    logger = new ProgressLoggerGui(this);
+    logger->show();
+                         
+    QString mountpoint = userSettings->value("defaults/mountpoint").toString();
+    // show dialog with error if mount point is wrong
+    if(!QFileInfo(mountpoint).isDir()) {
+        logger->addItem(tr("Mount point is wrong!"),LOGERROR);
+        logger->abort();
+        return;
+    }  
+    // Bootloader
+    m_error = false;
+    m_installed = false;
+    if(!installBootloaderAuto())
+        return;
+    else
+    {
+        // wait for boot loader installation finished
+        while(!m_installed)
+            QApplication::processEvents();
+    }
+    if(m_error) return;
+    logger->undoAbort();
+            
+    // Rockbox
+    m_error = false;
+    m_installed = false;
+    if(!installAuto())
+        return;
+    else
+    {
+       // wait for boot loader installation finished
+       while(!m_installed)
+          QApplication::processEvents();
+    }
+}
+
+void RbUtilQt::installdone(bool error)
+{
+    qDebug() << "install done";
+    m_installed = true;
+    m_error = error;
+}
+
+void RbUtilQt::installBtn()
+{
+    install();
+}
+
+bool RbUtilQt::installAuto()
+{
+    QString file = QString("%1%2/rockbox.zip")
+            .arg(devices->value("bleeding_url").toString(),
+        userSettings->value("defaults/platform").toString());
     
     buildInfo.open();
     QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
@@ -353,10 +455,20 @@ void RbUtilQt::smallInstall()
         versmap.insert("rel_rev", devices->value("last_release").toString());
         versmap.insert("rel_date", ""); // FIXME: provide the release timestamp
     }
-    installer.setVersionStrings(versmap);
     
-    installer.installSmall();
+    QString myversion = "r" + versmap.value("bleed_rev");
         
+    ZipInstaller* installer = new ZipInstaller(this);
+    installer->setUrl(file);
+    installer->setProxy(proxy());
+    installer->setLogSection("rockboxbase");
+    installer->setLogVersion(myversion);
+    installer->setMountPoint(userSettings->value("defaults/mountpoint").toString());
+    installer->install(logger);
+           
+    connect(installer, SIGNAL(done(bool)), this, SLOT(installdone(bool)));
+        
+    return true;
 }
 
 void RbUtilQt::install()
@@ -384,17 +496,28 @@ void RbUtilQt::install()
     installWindow->show();
 }
 
+bool RbUtilQt::installBootloaderAuto()
+{
+    installBootloader();
+    connect(blinstaller,SIGNAL(done(bool)),this,SLOT(installdone(bool)));
+    return !m_error;
+}
 
-void RbUtilQt::installBl()
+void RbUtilQt::installBootloaderBtn()
 {
     if(QMessageBox::question(this, tr("Confirm Installation"),
-       tr("Do you really want to install the Bootloader?"),
-          QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
-   
+           tr("Do you really want to install the Bootloader?"),
+              QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
+       
     // create logger
     logger = new ProgressLoggerGui(this);
     logger->show();
     
+    installBootloader();
+}
+
+void RbUtilQt::installBootloader()
+{   
     QString platform = userSettings->value("defaults/platform").toString();
 
     // create installer
@@ -412,6 +535,7 @@ void RbUtilQt::installBl()
     {
         logger->addItem(tr("Could not get the bootloader info file!"),LOGERROR);
         logger->abort();
+        m_error = true;
         return;
     }
     
@@ -420,15 +544,20 @@ void RbUtilQt::installBl()
         int ret = QMessageBox::question(this, tr("Bootloader Installation"),
                            tr("It seem your Bootloader is already uptodate.\n"
                               "Do really want to install it?"),
-                           QMessageBox::Ok | QMessageBox::Cancel,
+                           QMessageBox::Ok | QMessageBox::Ignore  |QMessageBox::Cancel,
                            QMessageBox::Cancel);
         if(ret == QMessageBox::Cancel)
         {
             logger->addItem(tr("Bootloader installation Canceled!"),LOGERROR);
             logger->abort();
+            m_error = true;
             return;
         }
-        
+        else if(ret == QMessageBox::Ignore)
+        {
+            m_installed = true;
+            return;
+        }
     }
     
     // if fwpatcher , ask for extra file
@@ -445,6 +574,7 @@ void RbUtilQt::installBl()
             {
                 logger->addItem(tr("Original Firmware Path is wrong!"),LOGERROR);
                 logger->abort();
+                m_error = true;
                 return;
             }
             else
@@ -457,26 +587,34 @@ void RbUtilQt::installBl()
         {
             logger->addItem(tr("Original Firmware selection Canceled!"),LOGERROR);
             logger->abort();
+            m_error = true;
             return;
         }
     }
     blinstaller->setOrigFirmwarePath(offirmware);
     
-    
     blinstaller->install(logger);
-
 }
 
-
-void RbUtilQt::installFonts()
+void RbUtilQt::installFontsBtn()
 {
     if(QMessageBox::question(this, tr("Confirm Installation"),
-        tr("Do you really want to install the fonts package?"),
-           QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
+           tr("Do you really want to install the fonts package?"),
+              QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
     // create logger
     logger = new ProgressLoggerGui(this);
     logger->show();
-    
+}
+
+bool RbUtilQt::installFontsAuto()
+{
+    installFonts();
+    connect(installer, SIGNAL(done(bool)), this, SLOT(installdone(bool)));
+    return !m_error;
+}
+
+void RbUtilQt::installFonts()
+{
     // create zip installer
     installer = new ZipInstaller(this);
        
@@ -485,9 +623,7 @@ void RbUtilQt::installFonts()
     installer->setLogSection("Fonts");
     installer->setLogVersion(versmap.value("arch_date"));
     installer->setMountPoint(userSettings->value("defaults/mountpoint").toString());
-    installer->install(logger);
-    
-   // connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));
+    installer->install(logger);    
 }
 
 
@@ -520,16 +656,26 @@ void RbUtilQt::installVoice()
     //connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));
 }
 
-
-void RbUtilQt::installDoom()
+void RbUtilQt::installDoomBtn()
 {
     if(QMessageBox::question(this, tr("Confirm Installation"),
-       tr("Do you really want to install the game addon files?"),
-       QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
+           tr("Do you really want to install the game addon files?"),
+           QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
     // create logger
     logger = new ProgressLoggerGui(this);
     logger->show();
     
+    installDoom();
+}
+bool RbUtilQt::installDoomAuto()
+{
+    installDoom();
+    connect(installer, SIGNAL(done(bool)), this, SLOT(installdone(bool)));
+    return !m_error;
+}
+
+void RbUtilQt::installDoom()
+{
     // create zip installer
     installer = new ZipInstaller(this);
    
@@ -539,8 +685,6 @@ void RbUtilQt::installDoom()
     installer->setLogVersion(versmap.value("arch_date"));
     installer->setMountPoint(userSettings->value("defaults/mountpoint").toString());
     installer->install(logger);
-    
-   // connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));
 
 }
 
