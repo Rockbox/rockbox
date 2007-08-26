@@ -44,11 +44,13 @@ void PreviewDlg::setPixmap(QPixmap p)
 
 void PreviewDlg::mouseMoveEvent(QMouseEvent * event)
 {
+    (void) event;
     this->close();
 }
 
 void PreviewDlg::leaveEvent(QEvent * event)
 {
+    (void) event;
     this->close();
 }
 
@@ -72,10 +74,12 @@ void PreviewLabel::mouseMoveEvent(QMouseEvent * event)
 }
 void PreviewLabel::enterEvent(QEvent * event)
 {
+    (void) event;
     hovertimer.start();
 }
 void PreviewLabel::leaveEvent(QEvent * event)
 {
+    (void) event;
     hovertimer.stop();
 }
 

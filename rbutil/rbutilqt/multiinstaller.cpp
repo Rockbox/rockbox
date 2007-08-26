@@ -16,7 +16,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
+#include <QtGui>
+#include <QtNetwork>
+        
 #include "multiinstaller.h"
 
 #include "installbootloader.h"
