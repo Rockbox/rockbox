@@ -81,8 +81,13 @@ void Install::accept()
     }
 
     if(ui.radioStable->isChecked()) {
-        file = "stable"; // FIXME: this is wrong!
-        fileName = QString("rockbox.zip");
+        file = QString("%1/rockbox-%2-%3.zip")
+                .arg(devices->value("download_url").toString(),
+                    devices->value("last_release").toString(),
+                    userSettings->value("defaults/platform").toString());
+        fileName = QString("rockbox-%1-%2.zip")
+                   .arg(devices->value("last_release").toString(),
+                   userSettings->value("defaults/platform").toString());
         userSettings->setValue("defaults/build", "stable");
     }
     else if(ui.radioArchived->isChecked()) {
