@@ -82,6 +82,13 @@ void ProgressLoggerGui::abort()
     emit aborted();
 }
 
+void ProgressLoggerGui::undoAbort()
+{
+    dp.buttonAbort->setText(tr("&Abort"));
+    dp.buttonAbort->setIcon(QIcon(QString::fromUtf8(":/icons/icons/process-stop.png")));
+    connect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(abort()));
+}
+
 void ProgressLoggerGui::close()
 {
     downloadProgress->close();

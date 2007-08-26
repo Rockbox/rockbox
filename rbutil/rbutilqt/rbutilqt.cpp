@@ -31,6 +31,7 @@
 #include "installthemes.h"
 #include "uninstallwindow.h"
 #include "browseof.h"
+#include "multiinstaller.h"
 
 #ifdef __linux
 #include <stdio.h>
@@ -93,10 +94,9 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     connect(ui.buttonRemoveRockbox, SIGNAL(clicked()), this, SLOT(uninstall()));
     connect(ui.buttonRemoveBootloader, SIGNAL(clicked()), this, SLOT(uninstallBootloader()));
     connect(ui.buttonDownloadManual, SIGNAL(clicked()), this, SLOT(downloadManual()));
-
-    // disable unimplemented stuff
-    ui.buttonSmall->setEnabled(false);
-    ui.buttonComplete->setEnabled(false);
+    connect(ui.buttonSmall, SIGNAL(clicked()), this, SLOT(smallInstall()));
+    connect(ui.buttonComplete, SIGNAL(clicked()), this, SLOT(completeInstall()));
+    
 #if !defined(STATIC)
     ui.actionInstall_Rockbox_Utility_on_player->setEnabled(false);
 #else
@@ -299,6 +299,65 @@ void RbUtilQt::updateManual()
     }
 }
 
+void RbUtilQt::completeInstall()
+{
+    if(QMessageBox::question(this, tr("Confirm Installation"),
+           tr("Do you really want to make a complete Installation?"),
+              QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
+    
+    MultiInstaller installer(this);  
+    installer.setUserSettings(userSettings);
+    installer.setDeviceSettings(devices);
+    installer.setProxy(proxy());
+    
+    buildInfo.open();
+    QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
+    buildInfo.close();
+
+    devices->beginGroup(platform);
+    QString released = devices->value("released").toString();
+    devices->endGroup();
+    if(released == "yes") {
+        // only set the keys if needed -- querying will yield an empty string
+        // if not set.
+        versmap.insert("rel_rev", devices->value("last_release").toString());
+        versmap.insert("rel_date", ""); // FIXME: provide the release timestamp
+    }
+    installer.setVersionStrings(versmap);
+    
+    installer.installComplete();
+        
+}
+
+void RbUtilQt::smallInstall()
+{
+    if(QMessageBox::question(this, tr("Confirm Installation"),
+           tr("Do you really want to make a small Installation?"),
+              QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
+    
+    MultiInstaller installer(this);   
+    installer.setUserSettings(userSettings);
+    installer.setDeviceSettings(devices);
+    installer.setProxy(proxy());
+    
+    buildInfo.open();
+    QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
+    buildInfo.close();
+
+    devices->beginGroup(platform);
+    QString released = devices->value("released").toString();
+    devices->endGroup();
+    if(released == "yes") {
+        // only set the keys if needed -- querying will yield an empty string
+        // if not set.
+        versmap.insert("rel_rev", devices->value("last_release").toString());
+        versmap.insert("rel_date", ""); // FIXME: provide the release timestamp
+    }
+    installer.setVersionStrings(versmap);
+    
+    installer.installSmall();
+        
+}
 
 void RbUtilQt::install()
 {

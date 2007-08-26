@@ -30,6 +30,7 @@
 #include "progressloggergui.h"
 #include "installbootloader.h"
 
+
 class RbUtilQt : public QMainWindow
 {
     Q_OBJECT
@@ -61,6 +62,8 @@ class RbUtilQt : public QMainWindow
         void configDialog(void);
         void updateDevice(void);
         void updateSettings(void);
+        void completeInstall(void);
+        void smallInstall(void);
         void install(void);
         void installBl(void);
         void installFonts(void);
@@ -78,6 +81,7 @@ class RbUtilQt : public QMainWindow
         void installPortable(void);
         void updateInfo(void);
         void updateTabs(int);
+
 };
 
 #endif

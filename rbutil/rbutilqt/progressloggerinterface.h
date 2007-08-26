@@ -47,6 +47,7 @@ signals:
 
 public slots:
     virtual void abort()=0;
+    virtual void undoAbort() =0;
     virtual void close()=0;
     virtual void show()=0;
     

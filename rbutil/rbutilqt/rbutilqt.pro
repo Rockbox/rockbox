@@ -34,7 +34,8 @@ SOURCES += rbutilqt.cpp \
  uninstall.cpp \
  uninstallwindow.cpp \
  browseof.cpp \
- preview.cpp
+ preview.cpp \
+ multiinstaller.cpp
 
 HEADERS += rbutilqt.h \
  install.h \
@@ -69,7 +70,8 @@ HEADERS += rbutilqt.h \
  uninstall.h \
  uninstallwindow.h \
  browseof.h \
- preview.h
+ preview.h \
+ multiinstaller.h
 
 # Needed by QT on Win
 INCLUDEPATH = . irivertools zip zlib ../ipodpatcher ../sansapatcher

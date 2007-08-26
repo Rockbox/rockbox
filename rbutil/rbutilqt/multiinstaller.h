@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Wenger
- *   $Id$
+ *   $Id: multiinstaller.h 14462 2007-08-26 16:44:23Z domonoky $
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,43 +16,51 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef PROGRESSLOGGERGUI_H
-#define PROGRESSLOGGERGUI_H
  
+#ifndef MULTIINSTALLER_H
+#define MULTIINSTALLER_H
+
 #include <QtGui>
 
 #include "progressloggerinterface.h"
-#include "ui_installprogressfrm.h"
 
-class ProgressLoggerGui :public ProgressloggerInterface 
+
+class MultiInstaller : public QObject
 {
     Q_OBJECT
+    
 public:
-    ProgressLoggerGui(QObject * parent);
-    
-    virtual void addItem(QString text) ;  //adds a string to the list
-    
-    virtual void addItem(QString text, int flag) ;  //adds a string to the list
-    
-    virtual void setProgressValue(int value);
-    virtual void setProgressMax(int max);
-    virtual int getProgressMax();
+    MultiInstaller(QObject* parent);
 
-signals:
-    virtual void aborted();
-    virtual void closed();
-
-public slots:
-    virtual void abort();
-    virtual void undoAbort();
-    virtual void close();
-    virtual void show();
+    void setUserSettings(QSettings*);
+    void setDeviceSettings(QSettings*);
+    void setProxy(QUrl proxy);
+    void setVersionStrings(QMap<QString, QString>);
     
-private:    
-    Ui::InstallProgressFrm dp;
-    QDialog *downloadProgress;
+    void installComplete();
+    void installSmall();
 
+    
+private slots:
+    void installdone(bool error);
+    
+private:
+    bool installBootloader();
+    bool installRockbox();
+    bool installDoom();
+    bool installFonts();
+    bool installThemes();
+    
+    ProgressloggerInterface* logger;
+    QSettings *devices;
+    QSettings *userSettings;
+    
+    QString m_mountpoint,m_plattform;
+    QUrl m_proxy;
+    QMap<QString, QString> version;
+    
+    
+    volatile bool installed;
+    volatile bool m_error;
 };
-
 #endif
-
