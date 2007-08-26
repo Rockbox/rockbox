@@ -192,6 +192,7 @@ void ZipInstaller::downloadDone(bool error)
         installlog.setValue(zipContents.at(i), m_logver);
     }
     installlog.endGroup();
+    installlog.sync();
 
     emit cont();
 }

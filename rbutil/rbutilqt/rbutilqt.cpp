@@ -337,6 +337,40 @@ void RbUtilQt::installBl()
     logger->show();
     
     QString platform = userSettings->value("defaults/platform").toString();
+
+    // create installer
+    blinstaller  = new BootloaderInstaller(this);
+    
+    blinstaller->setMountPoint(userSettings->value("defaults/mountpoint").toString());
+    
+    blinstaller->setProxy(proxy());
+    blinstaller->setDevice(platform);
+    blinstaller->setBootloaderMethod(devices->value(platform + "/bootloadermethod").toString());
+    blinstaller->setBootloaderName(devices->value(platform + "/bootloadername").toString());
+    blinstaller->setBootloaderBaseUrl(devices->value("bootloader_url").toString());
+    blinstaller->setBootloaderInfoUrl(devices->value("bootloader_info_url").toString());
+    if(!blinstaller->downloadInfo())
+    {
+        logger->addItem(tr("Could not get the bootloader info file!"),LOGERROR);
+        logger->abort();
+        return;
+    }
+    
+    if(blinstaller->uptodate())
+    {
+        int ret = QMessageBox::question(this, tr("Bootloader Installation"),
+                           tr("It seem your Bootloader is already uptodate.\n"
+                              "Do really want to install it?"),
+                           QMessageBox::Ok | QMessageBox::Cancel,
+                           QMessageBox::Cancel);
+        if(ret == QMessageBox::Cancel)
+        {
+            logger->addItem(tr("Bootloader installation Canceled!"),LOGERROR);
+            logger->abort();
+            return;
+        }
+        
+    }
     
     // if fwpatcher , ask for extra file
     QString offirmware;
@@ -367,22 +401,11 @@ void RbUtilQt::installBl()
             return;
         }
     }
-    
-    // create installer
-    blinstaller  = new BootloaderInstaller(this);
-    
-    blinstaller->setMountPoint(userSettings->value("defaults/mountpoint").toString());
-    
-    blinstaller->setProxy(proxy());
-    blinstaller->setDevice(platform);
-    blinstaller->setBootloaderMethod(devices->value(platform + "/bootloadermethod").toString());
-    blinstaller->setBootloaderName(devices->value(platform + "/bootloadername").toString());
-    blinstaller->setBootloaderBaseUrl(devices->value("bootloader_url").toString());
     blinstaller->setOrigFirmwarePath(offirmware);
     
-    blinstaller->install(logger);
     
-    // connect(blinstaller, SIGNAL(done(bool)), this, SLOT(done(bool)));  
+    blinstaller->install(logger);
+
 }
 
 
@@ -507,6 +530,14 @@ void RbUtilQt::uninstallBootloader(void)
     blinstaller.setBootloaderMethod(devices->value(plattform + "/bootloadermethod").toString());
     blinstaller.setBootloaderName(devices->value(plattform + "/bootloadername").toString());
     blinstaller.setBootloaderBaseUrl(devices->value("bootloader_url").toString());
+    blinstaller.setBootloaderInfoUrl(devices->value("bootloader_info_url").toString());
+    if(!blinstaller.downloadInfo())
+    {
+        logger->addItem(tr("Could not get the bootloader info file!"),LOGERROR);
+        logger->abort();
+        return;
+    }
+    
     blinstaller.uninstall(logger);
     
 }

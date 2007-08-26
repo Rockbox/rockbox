@@ -48,23 +48,31 @@ public:
     
     void setMountPoint(QString mountpoint) {m_mountpoint = mountpoint;}
     void setProxy(QUrl proxy) {m_proxy= proxy;}
-    void setDevice(QString device) {m_device= device;}  // the current plattform
+    void setDevice(QString device) {m_device= device;}  //!< the current plattform
     void setBootloaderMethod(QString method) {m_bootloadermethod= method;}
     void setBootloaderName(QString name){m_bootloadername= name;}
     void setBootloaderBaseUrl(QString baseUrl){m_bootloaderUrlBase = baseUrl;}
-    void setOrigFirmwarePath(QString path) {m_origfirmware = path;}  //for iriver original firmware
-   
+    void setOrigFirmwarePath(QString path) {m_origfirmware = path;}  //!< for iriver original firmware
+    void setBootloaderInfoUrl(QString url) {m_bootloaderinfoUrl =url; } //!< the url for the info file
+    bool downloadInfo(); //!< should be called before install/uninstall, blocks until downloaded.
+    bool uptodate(); //!< returns wether the bootloader is uptodate
+    
 signals:
     void done(bool error);  //installation finished.
     
-    // internal signals. Dont use this from out side.
+signals:   // internal signals. Dont use this from out side.
     void prepare();
-    void finish();    
+    void finish();  
    
 private slots:
+    void createInstallLog();  // adds the bootloader entry to the log
+    void removeInstallLog(); // removes the bootloader entry from the log
+
     void updateDataReadProgress(int, int);
     void downloadDone(bool);
     void downloadRequestFinished(int, bool);
+    void infoDownloadDone(bool);
+    void infoRequestFinished(int, bool);
     void installEnded(bool);
     
     // gigabeat specific routines
@@ -92,9 +100,16 @@ private slots:
     void iriverFinish();
     
 private:
+    
+    HttpGet *infodownloader;
+    QTemporaryFile bootloaderInfo;
+    volatile bool infoDownloaded;
+    volatile bool infoError;
+    
     QString m_mountpoint, m_device,m_bootloadermethod,m_bootloadername;
     QString m_bootloaderUrlBase,m_tempfilename,m_origfirmware;
     QUrl m_proxy;
+    QString m_bootloaderinfoUrl;
     bool m_install;
     
     int series,table_entry;  // for fwpatcher

@@ -22,7 +22,7 @@
 
 BootloaderInstaller::BootloaderInstaller(QObject* parent): QObject(parent) 
 {
-
+    
 }
 
 void BootloaderInstaller::install(ProgressloggerInterface* dp)
@@ -179,6 +179,108 @@ void BootloaderInstaller::installEnded(bool error)
     m_dp->abort();
 }
 
+bool BootloaderInstaller::downloadInfo()
+{
+    // try to get the current build information
+   infodownloader = new HttpGet(this);
+    
+   connect(infodownloader, SIGNAL(done(bool)), this, SLOT(infoDownloadDone(bool)));
+   connect(infodownloader, SIGNAL(requestFinished(int, bool)), this, SLOT(infoRequestFinished(int, bool)));
+
+   infodownloader->setProxy(m_proxy);
+
+   qDebug() << "downloading bootloader info";
+   infodownloader->setFile(&bootloaderInfo);
+   infodownloader->getFile(QUrl(m_bootloaderinfoUrl));
+   
+   // block until its downloaded
+   qDebug() << "Waiting for Download finished";
+   infoDownloaded=false;
+   infoError = false;
+   while(!infoDownloaded )
+       QApplication::processEvents();
+   return !infoError;
+}
+
+void BootloaderInstaller::infoDownloadDone(bool error)
+{
+    if(error) 
+    {
+        qDebug() << "network error:" << infodownloader->error();
+        return;
+    }
+    qDebug() << "network status:" << infodownloader->error();
+    
+    infoDownloaded = true;
+}
+
+void BootloaderInstaller::infoRequestFinished(int id, bool error)
+{
+    
+    if(error)
+    {   
+        QString errorString;
+        errorString = tr("Network error: %1. Please check your network and proxy settings.")
+               .arg(infodownloader->errorString());
+        if(error) QMessageBox::about(NULL, "Network Error", errorString);
+          qDebug() << "downloadDone:" << id << error;
+        
+        infoError = true;
+        infoDownloaded = true;
+    }
+    qDebug() << "infoRequestFinished:" << id << error;
+}
+
+
+void BootloaderInstaller::createInstallLog()
+{
+    m_dp->addItem(tr("Creating installation log"),LOGINFO);
+    QSettings installlog(m_mountpoint + "/.rockbox/rbutil.log", QSettings::IniFormat, 0);
+
+    bootloaderInfo.open();
+    QSettings info(bootloaderInfo.fileName(), QSettings::IniFormat, this);
+    bootloaderInfo.close();
+    info.beginGroup(m_device);
+    
+    installlog.beginGroup("Bootloader");
+    installlog.setValue("md5sum",info.value("md5sum").toString());
+    installlog.endGroup();
+    installlog.sync();
+}
+
+void BootloaderInstaller::removeInstallLog()
+{
+    m_dp->addItem(tr("Editing installation log"),LOGINFO);
+    QSettings installlog(m_mountpoint + "/.rockbox/rbutil.log", QSettings::IniFormat, 0);
+    installlog.beginGroup("Bootloader");
+    installlog.remove("md5sum");
+    installlog.endGroup();
+    installlog.sync();
+}
+
+
+bool BootloaderInstaller::uptodate()
+{
+    QString installedMd5;
+    QString serverMd5;
+    
+    QSettings installlog(m_mountpoint + "/.rockbox/rbutil.log", QSettings::IniFormat, 0);
+    installlog.beginGroup("Bootloader");
+    installedMd5 = installlog.value("md5sum").toString();
+    installlog.endGroup();
+    
+    bootloaderInfo.open();
+    QSettings info(bootloaderInfo.fileName(), QSettings::IniFormat, this);
+    bootloaderInfo.close();
+    info.beginGroup(m_device);
+    serverMd5 = info.value("md5sum").toString();
+    info.endGroup();
+    
+    if(installedMd5 != serverMd5)
+        return false;
+    else
+        return true;
+}
 
 /**************************************************
 *** gigabeat secific code 
@@ -244,6 +346,8 @@ void BootloaderInstaller::gigabeatPrepare()
             return;        
         }
         
+        removeInstallLog();
+        
         emit done(false);  //success
    }
    
@@ -301,6 +405,8 @@ void BootloaderInstaller::gigabeatFinish()
     
     downloadFile.remove();
 
+    createInstallLog();
+    
     m_dp->addItem(tr("Bootloader install finished successfully."),LOGOK);
     m_dp->addItem(tr("To finish the Bootloader installation, follow the steps below."),LOGINFO);
     m_dp->addItem(tr("1. Eject/Unmount your Device."),LOGINFO);
@@ -357,6 +463,8 @@ void BootloaderInstaller::iaudioFinish()
     
     downloadFile.remove();
 
+    createInstallLog();
+        
     m_dp->addItem(tr("Bootloader install finished successfully."),LOGOK);
     m_dp->addItem(tr("To finish the Bootloader installation, follow the steps below."),LOGINFO);
     m_dp->addItem(tr("1. Eject/Unmount your Device."),LOGINFO);
@@ -448,6 +556,8 @@ void BootloaderInstaller::h10Prepare()
             return;        
         }
         
+        removeInstallLog();
+        
         emit done(false);  //success
     
     }
@@ -503,7 +613,9 @@ void BootloaderInstaller::h10Finish()
     }
     
     downloadFile.remove();
-
+    
+    createInstallLog();
+        
     m_dp->addItem(tr("Bootloader install finished successfully."),LOGOK);
     m_dp->abort();
     
@@ -639,6 +751,7 @@ void BootloaderInstaller::ipodPrepare()
         if (delete_bootloader(&ipod)==0) 
         {
             m_dp->addItem(tr("Successfully removed Bootloader"),LOGOK);
+            removeInstallLog();
             emit done(false);
             ipod_close(&ipod);
             return;      
@@ -729,6 +842,7 @@ void BootloaderInstaller::ipodFinish()
     if (add_bootloader(&ipod, m_tempfilename.toLatin1().data(), FILETYPE_DOT_IPOD)==0) 
     {
         m_dp->addItem(tr("Successfully added Bootloader"),LOGOK);
+        createInstallLog();
         emit done(false);
         ipod_close(&ipod);
         return;      
@@ -839,6 +953,7 @@ void BootloaderInstaller::sansaPrepare()
         if (sansa_delete_bootloader(&sansa)==0) 
         {
             m_dp->addItem(tr("Successfully removed Bootloader"),LOGOK);
+            removeInstallLog();
             emit done(false);
             sansa_close(&sansa);
             return;      
@@ -903,6 +1018,7 @@ void BootloaderInstaller::sansaFinish()
     if (sansa_add_bootloader(&sansa, m_tempfilename.toLatin1().data(), FILETYPE_MI4)==0) 
     {
         m_dp->addItem(tr("Successfully added Bootloader"),LOGOK);
+        createInstallLog();
         emit done(false);
         sansa_close(&sansa);
         return;      
@@ -1070,7 +1186,10 @@ void BootloaderInstaller::iriverFinish()
             dest = m_mountpoint + "/ihp_120.hex";
     else if(series == 300)
             dest = m_mountpoint + "/H300.hex";
+   
     // copy file
+    QFile destfile(dest);
+    if(destfile.exists()) destfile.remove();
     if(!newHex.copy(dest))
     {
         m_dp->addItem(tr("Could not copy: %1 to %2")
@@ -1082,6 +1201,8 @@ void BootloaderInstaller::iriverFinish()
     downloadFile.remove();
     newHex.remove();
 
+    createInstallLog();
+    
     m_dp->addItem(tr("Bootloader install finished successfully."),LOGOK);
     m_dp->addItem(tr("To finish the Bootloader installation, follow the steps below."),LOGINFO);
     m_dp->addItem(tr("1. Eject/Unmount your Device."),LOGINFO);
