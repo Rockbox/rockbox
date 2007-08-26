@@ -51,6 +51,7 @@ class RbUtilQt : public QMainWindow
         ProgressLoggerGui *logger;
         ZipInstaller *installer;
         BootloaderInstaller* blinstaller;
+        QUrl proxy(void);
 
     private slots:
         void about(void);

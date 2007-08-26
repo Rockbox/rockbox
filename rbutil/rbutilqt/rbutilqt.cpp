@@ -110,12 +110,7 @@ void RbUtilQt::downloadInfo()
     daily = new HttpGet(this);
     connect(daily, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
     connect(daily, SIGNAL(requestFinished(int, bool)), this, SLOT(downloadDone(int, bool)));
-    if(userSettings->value("defaults/proxytype") == "manual")
-        daily->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
-#ifdef __linux
-    else if(userSettings->value("defaults/proxytype") == "system")
-        daily->setProxy(QUrl(getenv("http_proxy")));
-#endif
+    daily->setProxy(proxy());
 
     qDebug() << "downloading build info";
     daily->setFile(&buildInfo);
@@ -260,12 +255,7 @@ void RbUtilQt::install()
     Install *installWindow = new Install(this);
     installWindow->setUserSettings(userSettings);
     installWindow->setDeviceSettings(devices);
-    if(userSettings->value("defaults/proxytype") == "manual")
-        installWindow->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
-#ifdef __linux
-    else if(userSettings->value("defaults/proxytype") == "system")
-        installWindow->setProxy(QUrl(getenv("http_proxy")));
-#endif
+    installWindow->setProxy(proxy());
 
     buildInfo.open();
     QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
@@ -331,13 +321,7 @@ void RbUtilQt::installBl()
     
     blinstaller->setMountPoint(userSettings->value("defaults/mountpoint").toString());
     
-    if(userSettings->value("defaults/proxytype") == "manual")
-        blinstaller->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
-#ifdef __linux
-    else if(userSettings->value("defaults/proxytype") == "system")
-        blinstaller->setProxy(QUrl(getenv("http_proxy")));
-#endif
-
+    blinstaller->setProxy(proxy());
     blinstaller->setDevice(platform);
     blinstaller->setBootloaderMethod(devices->value(platform + "/bootloadermethod").toString());
     blinstaller->setBootloaderName(devices->value(platform + "/bootloadername").toString());
@@ -361,15 +345,9 @@ void RbUtilQt::installFonts()
     
     // create zip installer
     installer = new ZipInstaller(this);
-   
+       
     installer->setUrl(devices->value("font_url").toString());
-    if(userSettings->value("defaults/proxytype") == "manual")
-        installer->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
-#ifdef __linux
-    else if(userSettings->value("defaults/proxytype") == "system")
-        installer->setProxy(QUrl(getenv("http_proxy")));
-#endif
-
+    installer->setProxy(proxy());
     installer->setLogSection("Fonts");
     installer->setMountPoint(userSettings->value("defaults/mountpoint").toString());
     installer->install(logger);
@@ -390,7 +368,7 @@ void RbUtilQt::installVoice()
     // create zip installer
     installer = new ZipInstaller(this);
     installer->setUnzip(false);
-    buildInfo.open();
+buildInfo.open();
     QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
     buildInfo.close();
     QString datestring = info.value("dailies/date").toString();
@@ -399,13 +377,8 @@ void RbUtilQt::installVoice()
         userSettings->value("defaults/platform").toString() + "-" +
         datestring + "-english.voice";
     qDebug() << voiceurl;
-     if(userSettings->value("defaults/proxytype") == "manual")
-         installer->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
- #ifdef __linux
-     else if(userSettings->value("defaults/proxytype") == "system")
-         installer->setProxy(QUrl(getenv("http_proxy")));
- #endif
 
+    installer->setProxy(proxy());
     installer->setUrl(voiceurl);
     installer->setLogSection("Voice");
     installer->setMountPoint(userSettings->value("defaults/mountpoint").toString());
@@ -429,13 +402,7 @@ void RbUtilQt::installDoom()
     installer = new ZipInstaller(this);
    
     installer->setUrl(devices->value("doom_url").toString());
-    if(userSettings->value("defaults/proxytype") == "manual")
-        installer->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
-#ifdef __linux
-    else if(userSettings->value("defaults/proxytype") == "system")
-        installer->setProxy(QUrl(getenv("http_proxy")));
-#endif
-
+    installer->setProxy(proxy());
     installer->setLogSection("GameAddons");
     installer->setMountPoint(userSettings->value("defaults/mountpoint").toString());
     installer->install(logger);
@@ -450,12 +417,7 @@ void RbUtilQt::installThemes()
     ThemesInstallWindow* tw = new ThemesInstallWindow(this);
     tw->setDeviceSettings(devices);
     tw->setUserSettings(userSettings);
-    if(userSettings->value("defaults/proxytype") == "manual")
-        tw->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
-#ifdef __linux
-    else if(userSettings->value("defaults/proxytype") == "system")
-        tw->setProxy(QUrl(getenv("http_proxy")));
-#endif
+    tw->setProxy(proxy());
     tw->setModal(true);
     tw->show();
 }
@@ -536,12 +498,7 @@ void RbUtilQt::downloadManual(void)
     logger->show();
     installer = new ZipInstaller(this);
     installer->setMountPoint(userSettings->value("defaults/mountpoint").toString());
-    if(userSettings->value("defaults/proxytype") == "manual")
-        installer->setProxy(QUrl(userSettings->value("defaults/proxy").toString()));
-#ifdef __linux
-    else if(userSettings->value("defaults/proxytype") == "system")
-        installer->setProxy(QUrl(getenv("http_proxy")));
-#endif
+    installer->setProxy(proxy());
     installer->setLogSection(section);
     installer->setUrl(manualurl);
     installer->setUnzip(false);
@@ -589,4 +546,15 @@ void RbUtilQt::installPortable(void)
     
 }
 
+
+QUrl RbUtilQt::proxy()
+{
+    if(userSettings->value("defaults/proxytype") == "manual")
+        return QUrl(userSettings->value("defaults/proxy").toString());
+#ifdef __linux
+    else if(userSettings->value("defaults/proxytype") == "system")
+        return QUrl(getenv("http_proxy"));
+#endif
+    return QUrl("");
+}
 
