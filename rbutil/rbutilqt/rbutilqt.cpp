@@ -31,7 +31,6 @@
 #include "installthemes.h"
 #include "uninstallwindow.h"
 #include "browseof.h"
-#include "multiinstaller.h"
 
 #ifdef __linux
 #include <stdio.h>
@@ -604,6 +603,7 @@ void RbUtilQt::installFontsBtn()
     // create logger
     logger = new ProgressLoggerGui(this);
     logger->show();
+    installFonts();
 }
 
 bool RbUtilQt::installFontsAuto()
