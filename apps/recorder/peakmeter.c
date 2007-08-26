@@ -76,10 +76,6 @@ static bool pm_clip_right = false;
 static long pm_clip_timeout_l;     /* clip hold timeouts */
 static long pm_clip_timeout_r;
 
-/* clipping counter (only used for recording) */
-static unsigned int pm_clipcount = 0;       /* clipping count */
-static bool pm_clipcount_active = false;    /* counting or not */
-
 /* Temporarily en- / disables peak meter. This is especially for external
    applications to detect if the peak_meter is in use and needs drawing at all */
 bool peak_meter_enabled = true;
@@ -118,6 +114,10 @@ static long trig_lowtime;
 static int trig_status = TRIG_OFF;
 
 static void (*trigger_listener)(int) = NULL;
+
+/* clipping counter (only used for recording) */
+static unsigned int pm_clipcount = 0;       /* clipping count */
+static bool pm_clipcount_active = false;    /* counting or not */
 #endif
 
 /* debug only */
@@ -496,6 +496,7 @@ void peak_meter_init_times(int release, int hold, int clip_hold)
     pm_clip_hold = clip_hold;
 }
 
+#ifdef HAVE_RECORDING
 /**
  * Enable/disable clip counting
  */
@@ -519,6 +520,7 @@ void pm_reset_clipcount(void)
 {
     pm_clipcount = 0;
 }
+#endif
 
 /**
  * Set the source of the peak meter to playback or to 
@@ -566,7 +568,9 @@ static void set_trig_status(int new_state)
 void peak_meter_peek(void)
 {
     int left, right;
+#ifdef HAVE_RECORDING
     bool was_clipping = pm_clip_left || pm_clip_right;
+#endif
    /* read current values */
 #if CONFIG_CODEC == SWCODEC
     if (pm_playback)
@@ -617,12 +621,14 @@ void peak_meter_peek(void)
             current_tick + clip_time_out[pm_clip_hold];
     }
 
+#ifdef HAVE_RECORDING
     if(!was_clipping && (pm_clip_left || pm_clip_right))
     {
         if(pm_clipcount_active)
             pm_clipcount++;
     }
-    
+#endif
+
     /* peaks are searched -> we have to find the maximum. When
        many calls of peak_meter_peek the maximum value will be
        stored in pm_max_xxx. This maximum is reset by the

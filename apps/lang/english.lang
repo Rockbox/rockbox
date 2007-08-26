@@ -11127,13 +11127,16 @@
   desc: in settings, for recording peak meter
   user:
   <source>
-    *: "Clip Counter"
+    *: none
+    recording: "Clip Counter"
   </source>
   <dest>
-    *: "Clip Counter"
+    *: none
+    recording: "Clip Counter"
   </dest>
   <voice>
-    *: "Clip Counter"
+    *: none
+    recording: "Clip Counter"
   </voice>
 </phrase>
 <phrase>
@@ -11141,12 +11144,15 @@
   desc: in recording GUI, for recording peak meter. MAX 5 characters!
   user:
   <source>
-    *: "CLIP:"
+    *: none
+    recording: "CLIP:"
   </source>
   <dest>
-    *: "CLIP:"
+    *: none
+    recording: "CLIP:"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
