@@ -34,10 +34,9 @@ class Install : public QDialog
     public:
         Install(QWidget *parent = 0);
         void setProxy(QUrl);
-        void setReleased(QString);
         void setUserSettings(QSettings*);
         void setDeviceSettings(QSettings*);
-        void setArchivedString(QString);
+        void setVersionStrings(QMap<QString, QString>);
 
     public slots:
         void accept(void);
@@ -46,15 +45,14 @@ class Install : public QDialog
         Ui::InstallFrm ui;
         ProgressLoggerGui* logger;
         QUrl proxy;
-        QString releasever;
         QSettings *devices;
         QSettings *userSettings;
         QHttp *download;
         QFile *target;
         QString file;
         QString fileName;
-        QString archived;
         ZipInstaller* installer;
+        QMap<QString, QString> version;
 
     private slots:
         void setCached(bool);

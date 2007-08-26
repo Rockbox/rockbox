@@ -45,13 +45,16 @@ class RbUtilQt : public QMainWindow
         QString deviceName(QString);
         QString platform;
         HttpGet *daily;
+        HttpGet *bleeding;
         QString absolutePath;
         QTemporaryFile buildInfo;
+        QTemporaryFile bleedingInfo;
         void updateManual(void);
         ProgressLoggerGui *logger;
         ZipInstaller *installer;
         BootloaderInstaller* blinstaller;
         QUrl proxy(void);
+        QMap<QString, QString> versmap;
 
     private slots:
         void about(void);
@@ -65,6 +68,7 @@ class RbUtilQt : public QMainWindow
         void createTalkFiles(void);
         void downloadDone(bool);
         void downloadDone(int, bool);
+        void downloadBleedingDone(bool);
         void downloadInfo(void);
         void installVoice(void);
         void installThemes(void);
@@ -72,6 +76,8 @@ class RbUtilQt : public QMainWindow
         void uninstallBootloader(void);
         void downloadManual(void);
         void installPortable(void);
+        void updateInfo(void);
+        void updateTabs(int);
 };
 
 #endif

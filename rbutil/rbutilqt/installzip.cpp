@@ -36,6 +36,7 @@ void ZipInstaller::install(ProgressloggerInterface *dp)
     connect(this, SIGNAL(cont()), this, SLOT(installContinue()));
     m_url = m_urllist.at(runner);
     m_logsection = m_loglist.at(runner);
+    m_logver = m_verlist.at(runner);
     installStart();
 
 }
@@ -52,6 +53,8 @@ void ZipInstaller::installContinue()
         m_dp->addItem(tr("done."), LOGOK);
         m_url = m_urllist.at(runner);
         m_logsection = m_loglist.at(runner);
+        if(runner < m_verlist.size()) m_logver = m_verlist.at(runner);
+        else m_logver = "0";
         installStart();
     }
     else {
@@ -186,7 +189,7 @@ void ZipInstaller::downloadDone(bool error)
     installlog.beginGroup(m_logsection);
     for(int i = 0; i < zipContents.size(); i++)
     {
-        installlog.setValue(zipContents.at(i),installlog.value(zipContents.at(i),0).toInt()+1);
+        installlog.setValue(zipContents.at(i), m_logver);
     }
     installlog.endGroup();
 

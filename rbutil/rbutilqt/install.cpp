@@ -37,29 +37,6 @@ void Install::setCached(bool cache)
 }
 
 
-void Install::setReleased(QString rel)
-{
-    releasever = rel;
-    if(!rel.isEmpty()) {
-        ui.radioStable->setChecked(true);
-        ui.radioStable->setEnabled(true);
-        QFont font;
-        font.setBold(true);
-        ui.radioStable->setFont(font);
-    }
-    else {
-        ui.radioCurrent->setChecked(true);
-        ui.radioStable->setEnabled(false);
-        ui.radioStable->setChecked(false);
-        QFont font;
-        font.setBold(true);
-        ui.radioCurrent->setFont(font);
-    }
-    qDebug() << "Install::setReleased" << releasever;
-
-}
-
-
 void Install::setProxy(QUrl proxy_url)
 {
     proxy = proxy_url;
@@ -80,6 +57,7 @@ void Install::accept()
         return;
     }
 
+    QString myversion;
     if(ui.radioStable->isChecked()) {
         file = QString("%1/rockbox-%2-%3.zip")
                 .arg(devices->value("download_url").toString(),
@@ -89,17 +67,19 @@ void Install::accept()
                    .arg(devices->value("last_release").toString(),
                    userSettings->value("defaults/platform").toString());
         userSettings->setValue("defaults/build", "stable");
+        myversion = version.value("rel_rev");
     }
     else if(ui.radioArchived->isChecked()) {
         file = QString("%1%2/rockbox-%3-%4.zip")
             .arg(devices->value("daily_url").toString(),
             userSettings->value("defaults/platform").toString(),
             userSettings->value("defaults/platform").toString(),
-            archived);
+            version.value("arch_date"));
         fileName = QString("rockbox-%1-%2.zip")
             .arg(userSettings->value("defaults/platform").toString(),
-            archived);
+            version.value("arch_date"));
         userSettings->setValue("defaults/build", "archived");
+        myversion = "r" + version.value("arch_rev") + "-" + version.value("arch_date");
     }
     else if(ui.radioCurrent->isChecked()) {
         file = QString("%1%2/rockbox.zip")
@@ -107,6 +87,7 @@ void Install::accept()
         userSettings->value("defaults/platform").toString());
         fileName = QString("rockbox.zip");
         userSettings->setValue("defaults/build", "current");
+        myversion = "r" + version.value("bleed_rev");
     }
     else {
         qDebug() << "no build selected -- this shouldn't happen";
@@ -118,6 +99,7 @@ void Install::accept()
     installer->setUrl(file);
     installer->setProxy(proxy);
     installer->setLogSection("rockboxbase");
+    installer->setLogVersion(myversion);
     installer->setMountPoint(mountPoint);
     installer->install(logger);
     
@@ -147,8 +129,9 @@ void Install::setDetailsCurrent(bool show)
     if(show) {
         ui.labelDetails->setText(tr("This is the absolute up to the minute "
                 "Rockbox built. A current build will get updated every time "
-                "a change is made."));
-        if(releasever == "")
+                "a change is made. Latest version is r%1 (%2).")
+                .arg(version.value("bleed_rev"), version.value("bleed_date")));
+        if(version.value("rel_rev").isEmpty())
             ui.labelNote->setText(tr("<b>Note:</b> This option will always "
                 "download a fresh copy. "
                 "<b>This is the recommended version.</b>"));
@@ -165,9 +148,11 @@ void Install::setDetailsStable(bool show)
         ui.labelDetails->setText(
             tr("This is the last released version of Rockbox."));
 
-        if(releasever != "") ui.labelNote->setText(tr("<b>Note:</b>"
+        if(!version.value("rel_rev").isEmpty())
+            ui.labelNote->setText(tr("<b>Note:</b>"
             "The lastest released version is %1. "
-            "<b>This is the recommended version.</b>").arg(releasever));
+            "<b>This is the recommended version.</b>")
+                    .arg(version.value("rel_rev")));
         else ui.labelNote->setText("");
     }
 }
@@ -180,8 +165,8 @@ void Install::setDetailsArchived(bool show)
         "from the current development source code. This generally has more "
         "features than the last release but may be much less stable. "
         "Features may change regularly."));
-        ui.labelNote->setText(tr("<b>Note:</b> archived version is %1.")
-            .arg(archived));
+        ui.labelNote->setText(tr("<b>Note:</b> archived version is r%1 (%2).")
+            .arg(version.value("arch_rev"), version.value("arch_date")));
     }
 }
 
@@ -193,14 +178,35 @@ void Install::setDeviceSettings(QSettings *dev)
 }
 
 
-void Install::setArchivedString(QString string)
+void Install::setVersionStrings(QMap<QString, QString> ver)
 {
-    archived = string;
-    if(archived.isEmpty()) {
+    version = ver;
+    // version strings map is as following:
+    // rel_rev release version revision id
+    // rel_date release version release date
+    // same for arch_* and bleed_*
+    
+    if(version.value("arch_rev").isEmpty()) {
         ui.radioArchived->setEnabled(false);
         qDebug() << "no information about archived version available!";
     }
-    qDebug() << "Install::setArchivedString" << archived;
+    
+    if(!version.value("rel_rev").isEmpty()) {
+        ui.radioStable->setChecked(true);
+        ui.radioStable->setEnabled(true);
+        QFont font;
+        font.setBold(true);
+        ui.radioStable->setFont(font);
+    }
+    else {
+        ui.radioCurrent->setChecked(true);
+        ui.radioStable->setEnabled(false);
+        ui.radioStable->setChecked(false);
+        QFont font;
+        font.setBold(true);
+        ui.radioCurrent->setFont(font);
+    }
+    qDebug() << "Install::setVersionStrings" << version;
 }
 
 void Install::setUserSettings(QSettings *user)

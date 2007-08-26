@@ -175,7 +175,8 @@ void ThemesInstallWindow::updateDetails(int row)
     QString text;
     text = tr("<b>Author:</b> %1<hr/>").arg(iniDetails.value("author", tr("unknown")).toString());
     text += tr("<b>Version:</b> %1<hr/>").arg(iniDetails.value("version", tr("unknown")).toString());
-    text += tr("<b>Description:</b> %1<br/>").arg(iniDetails.value("about", tr("no description")).toString());
+    text += tr("<b>Description:</b> %1<hr/>").arg(iniDetails.value("about", tr("no description")).toString());
+    
     ui.themeDescription->setHtml(text);
     iniDetails.endGroup();
 
@@ -259,13 +260,19 @@ void ThemesInstallWindow::accept()
     }
     QStringList themes;
     QStringList names;
+    QStringList version;
     QString zip;
     QSettings iniDetails(themesInfo.fileName(), QSettings::IniFormat, this);
     for(int i = 0; i < ui.listThemes->selectedItems().size(); i++) {
         iniDetails.beginGroup(ui.listThemes->selectedItems().at(i)->data(Qt::UserRole).toString());
-        zip = devices->value("themes_url").toString() + "/" + iniDetails.value("archive").toString();
+        zip = devices->value("themes_url").toString()
+                + "/" + iniDetails.value("archive").toString();
         themes.append(zip);
-        names.append("Theme: " + ui.listThemes->selectedItems().at(i)->data(Qt::DisplayRole).toString());
+        names.append("Theme: " +
+                ui.listThemes->selectedItems().at(i)->data(Qt::DisplayRole).toString());
+        // if no version info is available use installation (current) date
+        version.append(iniDetails.value("version",
+                QDate().currentDate().toString("yyyyMMdd")).toString());
         iniDetails.endGroup();
     }
     qDebug() << "installing themes:" << themes;
@@ -285,6 +292,7 @@ void ThemesInstallWindow::accept()
     installer->setUrl(themes);
     installer->setProxy(proxy);
     installer->setLogSection(names);
+    installer->setLogVersion(version);
     installer->setMountPoint(mountPoint);
     installer->install(logger);
     connect(logger, SIGNAL(closed()), this, SLOT(close()));

@@ -72,6 +72,13 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     updateDevice();
     ui.radioPdf->setChecked(true);
 
+    // info tab
+    ui.treeInfo->setAlternatingRowColors(true);
+    ui.treeInfo->setHeaderLabels(QStringList() << tr("File") << tr("Version"));
+    ui.treeInfo->expandAll();
+    ui.treeInfo->setColumnCount(2);
+
+    connect(ui.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(updateTabs(int)));
     connect(ui.actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
     connect(ui.action_About, SIGNAL(triggered()), this, SLOT(about()));
     connect(ui.action_Configure, SIGNAL(triggered()), this, SLOT(configDialog()));
@@ -86,6 +93,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     connect(ui.buttonRemoveRockbox, SIGNAL(clicked()), this, SLOT(uninstall()));
     connect(ui.buttonRemoveBootloader, SIGNAL(clicked()), this, SLOT(uninstallBootloader()));
     connect(ui.buttonDownloadManual, SIGNAL(clicked()), this, SLOT(downloadManual()));
+
     // disable unimplemented stuff
     ui.buttonSmall->setEnabled(false);
     ui.buttonComplete->setEnabled(false);
@@ -102,6 +110,16 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
 }
 
 
+void RbUtilQt::updateTabs(int count)
+{
+    switch(count) {
+        case 6:
+            updateInfo();
+            break;
+        default:
+            break;
+    }
+}
 
 
 void RbUtilQt::downloadInfo()
@@ -115,14 +133,44 @@ void RbUtilQt::downloadInfo()
     qDebug() << "downloading build info";
     daily->setFile(&buildInfo);
     daily->getFile(QUrl(devices->value("server_conf_url").toString()));
+
 }
 
 
 void RbUtilQt::downloadDone(bool error)
 {
-    if(error) qDebug() << "network error:" << daily->error();
+    if(error) {
+        qDebug() << "network error:" << daily->error();
+        return;
+    }
     qDebug() << "network status:" << daily->error();
+    
+    buildInfo.open();
+    QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
+    buildInfo.close();
+    versmap.insert("arch_rev", info.value("dailies/rev").toString());
+    versmap.insert("arch_date", info.value("dailies/date").toString());
 
+    bleeding = new HttpGet(this);
+    connect(bleeding, SIGNAL(done(bool)), this, SLOT(downloadBleedingDone(bool)));
+    connect(bleeding, SIGNAL(requestFinished(int, bool)), this, SLOT(downloadDone(int, bool)));
+    bleeding->setProxy(proxy());
+
+    bleeding->setFile(&bleedingInfo);
+    bleeding->getFile(QUrl(devices->value("bleeding_info").toString()));
+}
+
+
+void RbUtilQt::downloadBleedingDone(bool error)
+{
+    if(error) qDebug() << "network error:" << bleeding->error();
+
+    bleedingInfo.open();
+    QSettings info(bleedingInfo.fileName(), QSettings::IniFormat, this);
+    bleedingInfo.close();
+    versmap.insert("bleed_rev", info.value("bleeding/rev").toString());
+    versmap.insert("bleed_date", info.value("bleeding/timestamp").toString());
+    qDebug() << "versmap =" << versmap;
 }
 
 
@@ -131,7 +179,9 @@ void RbUtilQt::downloadDone(int id, bool error)
     QString errorString;
     errorString = tr("Network error: %1. Please check your network and proxy settings.")
         .arg(daily->errorString());
-    if(error) QMessageBox::about(this, "Network Error", errorString);
+    if(error) {
+        QMessageBox::about(this, "Network Error", errorString);
+    }
     qDebug() << "downloadDone:" << id << error;
 }
 
@@ -260,15 +310,17 @@ void RbUtilQt::install()
     buildInfo.open();
     QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
     buildInfo.close();
-    installWindow->setArchivedString(info.value("dailies/date").toString());
 
     devices->beginGroup(platform);
     QString released = devices->value("released").toString();
     devices->endGroup();
-    if(released == "yes")
-        installWindow->setReleased(devices->value("last_release", "").toString());
-    else
-        installWindow->setReleased(0);
+    if(released == "yes") {
+        // only set the keys if needed -- querying will yield an empty string
+        // if not set.
+        versmap.insert("rel_rev", devices->value("last_release").toString());
+        versmap.insert("rel_date", ""); // FIXME: provide the release timestamp
+    }
+    installWindow->setVersionStrings(versmap);
 
     installWindow->show();
 }
@@ -349,6 +401,7 @@ void RbUtilQt::installFonts()
     installer->setUrl(devices->value("font_url").toString());
     installer->setProxy(proxy());
     installer->setLogSection("Fonts");
+    installer->setLogVersion(versmap.value("arch_date"));
     installer->setMountPoint(userSettings->value("defaults/mountpoint").toString());
     installer->install(logger);
     
@@ -368,19 +421,16 @@ void RbUtilQt::installVoice()
     // create zip installer
     installer = new ZipInstaller(this);
     installer->setUnzip(false);
-buildInfo.open();
-    QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
-    buildInfo.close();
-    QString datestring = info.value("dailies/date").toString();
-    
+   
     QString voiceurl = devices->value("voice_url").toString() + "/" +
         userSettings->value("defaults/platform").toString() + "-" +
-        datestring + "-english.voice";
+        versmap.value("arch_date") + "-english.voice";
     qDebug() << voiceurl;
 
     installer->setProxy(proxy());
     installer->setUrl(voiceurl);
     installer->setLogSection("Voice");
+    installer->setLogVersion(versmap.value("arch_date"));
     installer->setMountPoint(userSettings->value("defaults/mountpoint").toString());
     installer->setTarget("/.rockbox/langs/english.voice");
     installer->install(logger);
@@ -403,7 +453,8 @@ void RbUtilQt::installDoom()
    
     installer->setUrl(devices->value("doom_url").toString());
     installer->setProxy(proxy());
-    installer->setLogSection("GameAddons");
+    installer->setLogSection("Game Addons");
+    installer->setLogVersion(versmap.value("arch_date"));
     installer->setMountPoint(userSettings->value("defaults/mountpoint").toString());
     installer->install(logger);
     
@@ -544,6 +595,69 @@ void RbUtilQt::installPortable(void)
     logger->addItem(tr("Successfully installed Rockbox Utility."), LOGOK);
     logger->abort();
     
+}
+
+
+void RbUtilQt::updateInfo()
+{
+    qDebug() << "RbUtilQt::updateInfo()";
+
+    QSettings log(userSettings->value("defaults/mountpoint").toString() + "/.rockbox/rbutil.log", QSettings::IniFormat, this);
+    QStringList groups = log.childGroups();
+    QList<QTreeWidgetItem *> items;
+    QTreeWidgetItem *w, *w2;
+    QString min, max;
+    int olditems = 0;
+
+    // remove old list entries (if any)
+    int l = ui.treeInfo->topLevelItemCount();
+    while(l--) {
+        QTreeWidgetItem *m;
+        m = ui.treeInfo->takeTopLevelItem(l);
+        // delete childs (single level deep, no recursion here)
+        int n = m->childCount();
+        while(n--)
+            delete m->child(n);
+    }
+    // get and populate new items
+    for(int a = 0; a < groups.size(); a++) {
+        log.beginGroup(groups.at(a));
+        QStringList keys = log.allKeys();
+        w = new QTreeWidgetItem;
+        w->setFlags(Qt::ItemIsEnabled);
+        w->setText(0, groups.at(a));
+        items.append(w);
+        // get minimum and maximum version information so we can hilight old files
+        min = max = log.value(keys.at(0)).toString();
+        for(int b = 0; b < keys.size(); b++) {
+            if(log.value(keys.at(b)).toString() > max)
+                max = log.value(keys.at(b)).toString();
+            if(log.value(keys.at(b)).toString() < min)
+                min = log.value(keys.at(b)).toString();
+        }
+        
+        for(int b = 0; b < keys.size(); b++) {
+            QString file;
+            file = userSettings->value("defaults/mountpoint").toString() + "/" + keys.at(b);
+            if(QFileInfo(file).isDir())
+                continue;
+            w2 = new QTreeWidgetItem(w, QStringList() << "/"
+                    + keys.at(b) << log.value(keys.at(b)).toString());
+            if(log.value(keys.at(b)).toString() != max) {
+                w2->setForeground(0, QBrush(QColor(255, 0, 0)));
+                w2->setForeground(1, QBrush(QColor(255, 0, 0)));
+                olditems++;
+            }
+            items.append(w2);
+        }
+        log.endGroup();
+        if(min != max)
+            w->setData(1, Qt::DisplayRole, QString("%1 / %2").arg(min, max));
+        else
+            w->setData(1, Qt::DisplayRole, max);
+    }
+    ui.treeInfo->insertTopLevelItems(0, items);
+    ui.treeInfo->resizeColumnToContents(0);
 }
 
 

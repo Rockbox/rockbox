@@ -42,6 +42,8 @@ public:
     void setProxy(QUrl proxy) {m_proxy= proxy;}
     void setLogSection(QString name) {m_loglist = QStringList(name);}
     void setLogSection(QStringList name) { m_loglist = name; }
+    void setLogVersion(QString v) { m_verlist = QStringList(v); qDebug() << m_verlist;}
+    void setLogVersion(QStringList v) { m_verlist = v; qDebug() << m_verlist;}
     void setUnzip(bool i) { m_unzip = i; }
     void setTarget(QString t) { m_target = t; }
     
@@ -58,8 +60,8 @@ private slots:
 
 private:
     void installSingle(ProgressloggerInterface *dp);
-    QString m_url, m_file, m_mountpoint, m_logsection;
-    QStringList m_urllist, m_loglist;
+    QString m_url, m_file, m_mountpoint, m_logsection, m_logver;
+    QStringList m_urllist, m_loglist, m_verlist;
     QUrl m_proxy;
     bool m_unzip;
     QString m_target;
