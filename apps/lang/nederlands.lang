@@ -11033,3 +11033,48 @@
     rtc: ""
   </voice>
 </phrase>
+<phrase>
+  id: VOICE_OH
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "uur"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNTER
+  desc: in settings, for recording peak meter
+  user:
+  <source>
+    *: "Clip Counter"
+  </source>
+  <dest>
+    *: "Clip Teller"
+  </dest>
+  <voice>
+    *: "Clip Teller"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNT
+  desc: in recording GUI, for recording peak meter. MAX 5 characters!
+  user:
+  <source>
+    *: "CLIP:"
+  </source>
+  <dest>
+    *: "CLIP:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>

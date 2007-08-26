@@ -11127,18 +11127,18 @@
   desc: in settings, for recording peak meter
   user:
   <source>
-    *: "Peak meter clipcounter"
+    *: "Clip Counter"
   </source>
   <dest>
-    *: "Peak meter clipcounter"
+    *: "Clip Counter"
   </dest>
   <voice>
-    *: ""
+    *: "Clip Counter"
   </voice>
 </phrase>
 <phrase>
   id: LANG_PM_CLIPCOUNT
-  desc: in recording GUI, for recording peak meter
+  desc: in recording GUI, for recording peak meter. MAX 5 characters!
   user:
   <source>
     *: "CLIP:"
