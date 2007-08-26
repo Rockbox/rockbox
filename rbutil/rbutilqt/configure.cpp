@@ -134,7 +134,7 @@ void Config::setUserSettings(QSettings *user)
 {
     userSettings = user;
     // set proxy
-    QUrl proxy = userSettings->value("defaults/proxy").toString();
+    proxy = userSettings->value("defaults/proxy").toString();
 
     if(proxy.port() > 0)
         ui.proxyPort->setText(QString("%1").arg(proxy.port()));
