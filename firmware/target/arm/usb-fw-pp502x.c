@@ -27,11 +27,10 @@
 #include "button.h"
 #include "ata.h"
 #include "string.h"
+#include "arcotg_udc.h"
 
 #ifdef HAVE_USBSTACK
 #include "usbstack.h"
-#else
-#include "arcotg_udc.h"
 #endif
 
 void usb_init_device(void)
