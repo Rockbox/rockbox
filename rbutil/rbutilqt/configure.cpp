@@ -176,7 +176,7 @@ void Config::setUserSettings(QSettings *user)
     if(!QFileInfo(userSettings->value("defaults/cachepath").toString()).isDir())
         userSettings->setValue("defaults/cachepath", QDir::tempPath());
     ui.cachePath->setText(userSettings->value("defaults/cachepath").toString());
-    ui.cacheDisable->setChecked(userSettings->value("defaults/cachedisable").toBool());
+    ui.cacheDisable->setChecked(userSettings->value("defaults/cachedisable", true).toBool());
     ui.cacheOfflineMode->setChecked(userSettings->value("defaults/offline").toBool());
     QList<QFileInfo> fs = QDir(userSettings->value("defaults/cachepath").toString() + "/rbutil-cache/").entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
     qint64 sz = 0;
