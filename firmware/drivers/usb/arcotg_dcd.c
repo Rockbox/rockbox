@@ -219,8 +219,6 @@ void usb_arcotg_dcd_stop(void) {
 
 void usb_arcotg_dcd_irq(void) {
 
-    int i;
-
     if (dcd_controller.stopped == true) {
         return;
     }

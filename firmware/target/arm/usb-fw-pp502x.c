@@ -24,6 +24,8 @@
 #include "config.h"
 #include "system.h"
 #include "usb.h"
+#include "button.h"
+#include "ata.h"
 #include "arcotg_udc.h"
 
 #ifdef HAVE_USBSTACK
