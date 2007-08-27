@@ -128,8 +128,8 @@ static int set_config(int config);
 
 /*-------------------------------------------------------------------------*/
 
-void usb_storage_driver_init(void) {
-
+void usb_storage_driver_init(void)
+{
     logf("usb storage: register");
     usb_device_driver_register(&usb_storage_driver);
 }
@@ -137,41 +137,41 @@ void usb_storage_driver_init(void) {
 /*-------------------------------------------------------------------------*/
 /* device driver ops */
 
-void usb_storage_driver_bind(void* controler_ops) {
-
+void usb_storage_driver_bind(void* controler_ops)
+{
     ops = controler_ops;
-    
+
     /* serach and asign endpoints */
     usb_ep_autoconfig_reset();
-    
+
     dev.in = usb_ep_autoconfig(&storage_bulk_in_desc);
-	if (!dev.in) {
-		goto autoconf_fail;
-	}
-	dev.in->claimed = true;
-	logf("usb storage: in: %s", dev.in->name);
-	
-	dev.out = usb_ep_autoconfig(&storage_bulk_out_desc);
-	if (!dev.out) {
-		goto autoconf_fail;
-	}
-	dev.out->claimed = true;
-	logf("usb storage: out: %s", dev.out->name);
-	
-	return;
-	
+    if (!dev.in) {
+        goto autoconf_fail;
+    }
+    dev.in->claimed = true;
+    logf("usb storage: in: %s", dev.in->name);
+
+    dev.out = usb_ep_autoconfig(&storage_bulk_out_desc);
+    if (!dev.out) {
+        goto autoconf_fail;
+    }
+    dev.out->claimed = true;
+    logf("usb storage: out: %s", dev.out->name);
+
+    return;
+
 autoconf_fail:
-	logf("failed to find endpoints");
+    logf("failed to find endpoints");
 }
 
-int usb_storage_driver_request(struct usb_ctrlrequest* request) {
-
+int usb_storage_driver_request(struct usb_ctrlrequest* request)
+{
     int ret = -EOPNOTSUPP;
     logf("usb storage: request");
 
     res.length = 0;
     res.buf = NULL;
-    
+
     switch (request->bRequestType & USB_TYPE_MASK) {
     case USB_TYPE_STANDARD:
 
@@ -187,12 +187,12 @@ int usb_storage_driver_request(struct usb_ctrlrequest* request) {
 
             case USB_DT_CONFIG:
                 logf("usb storage: sending config desc");
-                
-    			ret = config_buf(buf, request->wValue >> 8, request->wValue & 0xff);
-    			if (ret >= 0) {
-    				logf("%d, vs %d", request->wLength, ret);
-    				ret = MIN(request->wLength, (uint16_t)ret);
-    			}
+
+                ret = config_buf(buf, request->wValue >> 8, request->wValue & 0xff);
+                if (ret >= 0) {
+                    logf("%d, vs %d", request->wLength, ret);
+                    ret = MIN(request->wLength, (uint16_t)ret);
+                }
                 res.buf = buf;
                 break;
             }
@@ -202,68 +202,68 @@ int usb_storage_driver_request(struct usb_ctrlrequest* request) {
             logf("usb storage: set configuration %d", request->wValue);
             ret = set_config(request->wValue);
             break;
-            
+
         case USB_REQ_SET_INTERFACE:
             logf("usb storage: set interface");
             ret = 0;
             break;
         }
-        
+
     case USB_TYPE_CLASS:
-    	
-    	switch (request->bRequest) {
-    	case USB_BULK_RESET_REQUEST:
-    		logf("usb storage: bulk reset");
-    		break;
-    		
-    	case USB_BULK_GET_MAX_LUN_REQUEST:
-    		logf("usb storage: get max lun");
-    		/* we support no LUNs (Logical Unit Number) */
-    		buf[0] = 0;
-    		ret = 1;
-    		break;
-    	}
-    	break;
+
+        switch (request->bRequest) {
+        case USB_BULK_RESET_REQUEST:
+            logf("usb storage: bulk reset");
+            break;
+
+        case USB_BULK_GET_MAX_LUN_REQUEST:
+            logf("usb storage: get max lun");
+            /* we support no LUNs (Logical Unit Number) */
+            buf[0] = 0;
+            ret = 1;
+            break;
+        }
+        break;
     }
 
     if (ret >= 0) {
         res.length = ret;
         ret = ops->send(NULL, &res);
     }
-    
+
     return ret;
 }
 
 /*-------------------------------------------------------------------------*/
 /* S/GET CONFIGURATION helpers */
 
-static int config_buf(uint8_t *buf, uint8_t type, unsigned index) {
-    
-	int len;
+static int config_buf(uint8_t *buf, uint8_t type, unsigned index)
+{
+    int len;
 
-	/* only one configuration */
-	if (index != 0) {
-		return -EINVAL;
-	}
-	
-	len = usb_stack_configdesc(&storage_config_desc, buf, BUFFER_SIZE, storage_fullspeed_function);
-	if (len < 0) {
-		return len;
-	}
-	((struct usb_config_descriptor *)buf)->bDescriptorType = type;
-	return len;
+    /* only one configuration */
+    if (index != 0) {
+        return -EINVAL;
+    }
+
+    len = usb_stack_configdesc(&storage_config_desc, buf, BUFFER_SIZE, storage_fullspeed_function);
+    if (len < 0) {
+        return len;
+    }
+    ((struct usb_config_descriptor *)buf)->bDescriptorType = type;
+    return len;
 }
 
-static int set_config(int config) {
-
+static int set_config(int config)
+{
     /* enable endpoints */
     logf("setup %s", dev.in->name);
     ops->enable(dev.in);
     logf("setup %s", dev.out->name);
     ops->enable(dev.out);
-    
+
     /* setup buffers */
-    
+
     return 0;
 }
 

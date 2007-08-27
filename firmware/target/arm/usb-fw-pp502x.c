@@ -150,7 +150,7 @@ bool usb_detect(void)
     if ((usbstatus1 == true) && (prev_usbstatus1 == false)) {
         usb_stack_start();
     } else if ((usbstatus1 == false) && (prev_usbstatus1 == true)) {
-    	usb_stack_stop();
+        usb_stack_stop();
     }
 #else
     if ((usbstatus1 == true) && (prev_usbstatus1 == false)) {

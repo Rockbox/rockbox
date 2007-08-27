@@ -41,7 +41,7 @@ struct usb_config_descriptor;
 struct usb_descriptor_header;
 
 int usb_stack_configdesc(const struct usb_config_descriptor* config,
-						void* buf, unsigned length,
-						struct usb_descriptor_header** desc);
+                         void* buf, unsigned length,
+                         struct usb_descriptor_header** desc);
 
 #endif /*_USBSTACK_DEVICE_H_*/

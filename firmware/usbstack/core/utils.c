@@ -20,98 +20,98 @@
 #include <string.h>
 #include "usbstack/core.h"
 
-void into_usb_ctrlrequest(struct usb_ctrlrequest* request) {
+void into_usb_ctrlrequest(struct usb_ctrlrequest* request)
+{
+    char* type = "";
+    char* req = "";
+    char* extra = 0;
 
-	char* type = "";
-	char* req = "";
-	char* extra = 0;
-	
-	logf("-usb request-");
+    logf("-usb request-");
     /* check if packet is okay */
-	if (request->bRequestType == 0 &&
+    if (request->bRequestType == 0 &&
         request->bRequest == 0 &&
         request->wValue == 0 &&
         request->wIndex == 0 &&
         request->wLength == 0) {
         logf(" -> INVALID <-");
         return;
-	}	
-	
+    }
+
     switch (request->bRequestType & USB_TYPE_MASK) {
-	case USB_TYPE_STANDARD:
-		type = "standard";
-		
+    case USB_TYPE_STANDARD:
+        type = "standard";
+
         switch (request->bRequest) {
         case USB_REQ_GET_STATUS:
-        	req  = "get status";
+            req  = "get status";
             break;
         case USB_REQ_CLEAR_FEATURE:
-        	req = "clear feature";
+            req = "clear feature";
             break;
         case USB_REQ_SET_FEATURE:
-        	req = "set feature";
+            req = "set feature";
             break;
         case USB_REQ_SET_ADDRESS:
-        	req = "set address";
+            req = "set address";
             break;
         case USB_REQ_GET_DESCRIPTOR:
-        	req = "get descriptor";
-        	
-    		switch (request->wValue >> 8) {
-    		case USB_DT_DEVICE:
-    			extra = "get device descriptor";
-    			break;
-    		case USB_DT_DEVICE_QUALIFIER:
-    			extra = "get device qualifier";
-    			break;
-    		case USB_DT_OTHER_SPEED_CONFIG:
-    			extra = "get other-speed config descriptor";
-    		case USB_DT_CONFIG:
-    			extra = "get configuration descriptor";
-    			break;
-    		case USB_DT_STRING:
-    			extra = "get string descriptor";
-    			break;
-    		case USB_DT_DEBUG:
-    			extra = "debug";
-    			break;
-    		}
-    		break;        	
-        	
+            req = "get descriptor";
+
+            switch (request->wValue >> 8) {
+            case USB_DT_DEVICE:
+                extra = "get device descriptor";
+                break;
+            case USB_DT_DEVICE_QUALIFIER:
+                extra = "get device qualifier";
+                break;
+            case USB_DT_OTHER_SPEED_CONFIG:
+                extra = "get other-speed config descriptor";
+            case USB_DT_CONFIG:
+                extra = "get configuration descriptor";
+                break;
+            case USB_DT_STRING:
+                extra = "get string descriptor";
+                break;
+            case USB_DT_DEBUG:
+                extra = "debug";
+                break;
+            }
+            break;
+
             break;
         case USB_REQ_SET_DESCRIPTOR:
-        	req = "set descriptor";
+            req = "set descriptor";
             break;
         case USB_REQ_GET_CONFIGURATION:
-        	req = "get configuration";
+            req = "get configuration";
             break;
         case USB_REQ_SET_CONFIGURATION:
-        	req = "set configuration";
+            req = "set configuration";
             break;
         case USB_REQ_GET_INTERFACE:
-        	req = "get interface";
+            req = "get interface";
             break;
         case USB_REQ_SET_INTERFACE:
-        	req = "set interface";
+            req = "set interface";
             break;
         case USB_REQ_SYNCH_FRAME:
-        	req = "sync frame";
+            req = "sync frame";
             break;
         default:
-        	req = "unkown";
-        	break;
+            req = "unkown";
+            break;
         }
 
         break;
     case USB_TYPE_CLASS:
-    	type = "class";
+        type = "class";
         break;
 
     case USB_TYPE_VENDOR:
-    	type = "vendor";
+        type = "vendor";
         break;
     }
-        
+
     logf(" -b 0x%x", request->bRequestType);
     logf(" -b 0x%x", request->bRequest);
     logf(" -b 0x%x", request->wValue);
@@ -120,6 +120,6 @@ void into_usb_ctrlrequest(struct usb_ctrlrequest* request) {
     logf(" -> t: %s", type);
     logf(" -> r: %s", req);
     if (extra != 0) {
-    	logf(" -> e: %s", extra);
+        logf(" -> e: %s", extra);
     }
 }

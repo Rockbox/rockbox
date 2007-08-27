@@ -25,7 +25,7 @@
 #define USBSTACK_CAPS 0
 #endif
 
-#define CONTROLLER_DEVICE	 (1 << 0)
+#define CONTROLLER_DEVICE    (1 << 0)
 #define CONTROLLER_HOST      (1 << 1)
 
 #endif /*_USBSTACK_CONFIG_H_*/

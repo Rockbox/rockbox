@@ -25,7 +25,7 @@
  */
 struct usb_host_driver {
     const char* name;
-    void* data;			/* used to store controller specific ops struct */
+    void* data;        /* used to store controller specific ops struct */
 };
 
 #endif /*_USBSTACK_HOST_H_*/

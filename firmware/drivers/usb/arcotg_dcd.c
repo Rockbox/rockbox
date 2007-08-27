@@ -118,14 +118,15 @@ timer_expired(struct timer * timer)
 /* gets called by usb_stack_init() to register 
  * this arcotg device conrtollder driver in the 
  * stack. */
-void usb_dcd_init(void) {
+void usb_dcd_init(void)
+{
     usb_controller_register(&arcotg_dcd);
 }
 
 /*-------------------------------------------------------------------------*/
 
-void usb_arcotg_dcd_init(void) {
-
+void usb_arcotg_dcd_init(void)
+{
     struct timer t;
     int i, ep_num = 0;
 
@@ -180,35 +181,36 @@ void usb_arcotg_dcd_init(void) {
     /* put controller in device mode */
     UDC_USBMODE |= USB_MODE_CTRL_MODE_DEVICE;
 
-    /* init queue heads */    
+    /* init queue heads */
     qh_init(0, USB_RECV, USB_ENDPOINT_XFER_CONTROL, USB_MAX_CTRL_PAYLOAD, 0, 0);
-    qh_init(0, USB_SEND, USB_ENDPOINT_XFER_CONTROL, USB_MAX_CTRL_PAYLOAD, 0, 0);    
+    qh_init(0, USB_SEND, USB_ENDPOINT_XFER_CONTROL, USB_MAX_CTRL_PAYLOAD, 0, 0);
 
     UDC_ENDPOINTLISTADDR = (unsigned int)dev_qh;
 }
 
-void usb_arcotg_dcd_shutdown(void) {
+void usb_arcotg_dcd_shutdown(void)
+{
 
 }
 
-void usb_arcotg_dcd_start(void) {
-
+void usb_arcotg_dcd_start(void)
+{
     logf("start");
 
     if (arcotg_dcd.device_driver != NULL) {
-    	logf("YEEEEEEESSSSSSS");
+        logf("YEEEEEEESSSSSSS");
     } else {
-    	logf("NOOOOOO");
+        logf("NOOOOOO");
     }
-    
+
     /* clear stopped bit */
-    dcd_controller.stopped = false;   
+    dcd_controller.stopped = false;
 
     UDC_USBCMD |= USB_CMD_RUN;
 }
 
-void usb_arcotg_dcd_stop(void) {
-
+void usb_arcotg_dcd_stop(void)
+{
     logf("stop");
 
     /* set stopped bit */
@@ -217,8 +219,8 @@ void usb_arcotg_dcd_stop(void) {
     UDC_USBCMD &= ~USB_CMD_RUN;
 }
 
-void usb_arcotg_dcd_irq(void) {
-
+void usb_arcotg_dcd_irq(void)
+{
     if (dcd_controller.stopped == true) {
         return;
     }
@@ -241,10 +243,10 @@ void usb_arcotg_dcd_irq(void) {
         }
 
         if (UDC_ENDPTCOMPLETE) {
-        	UDC_ENDPTCOMPLETE = UDC_ENDPTCOMPLETE;
+            UDC_ENDPTCOMPLETE = UDC_ENDPTCOMPLETE;
         }
     }
-    
+
     if (UDC_USBSTS & USB_STS_PORT_CHANGE) {
         port_change_int();
     }
@@ -269,12 +271,12 @@ void usb_arcotg_dcd_irq(void) {
 /*-------------------------------------------------------------------------*/
 /* interrupt handlers */
 
-static void setup_received_int(struct usb_ctrlrequest* request) {
-
+static void setup_received_int(struct usb_ctrlrequest* request)
+{
     int error = 0;
     uint8_t address = 0;
     int handled = 0;    /* set to zero if we do not handle the message, */
-                        /* and should pass it to the driver */	
+                        /* and should pass it to the driver */
 
     logf("setup_int");
     into_usb_ctrlrequest(request);
@@ -324,16 +326,16 @@ static void setup_received_int(struct usb_ctrlrequest* request) {
                 }
 
                 if (handled == 0) {
-                	handled = 1; /* dont pass it to driver */
+                    handled = 1; /* dont pass it to driver */
                 }
             }
-#if 0            
+#if 0
             if (rc == 0) {
                 /* send status only if _arcotg_ep_set_halt success */
                 if (ep0_prime_status(udc, EP_DIR_IN))
                     Ep0Stall(udc);
-            }		
-#endif		
+            }
+#endif
             break;
     }
 
@@ -358,8 +360,8 @@ static void setup_received_int(struct usb_ctrlrequest* request) {
     }
 }
 
-static void port_change_int(void) {
-
+static void port_change_int(void)
+{
     //logf("port_change_int");
     uint32_t tmp;
     enum usb_device_speed speed = USB_SPEED_UNKNOWN; 
@@ -386,7 +388,7 @@ static void port_change_int(void) {
 
     /* update speed */
     arcotg_dcd.speed = speed;
-    
+
     /* update USB state */
     if (!dcd_controller.resume_state) {
         dcd_controller.usb_state = USB_STATE_DEFAULT;
@@ -398,8 +400,8 @@ static void port_change_int(void) {
     }
 }
 
-static void suspend_int(void) {
-
+static void suspend_int(void)
+{
     //logf("suspend_int");
     dcd_controller.resume_state = dcd_controller.usb_state;
     dcd_controller.usb_state = USB_STATE_SUSPENDED;
@@ -410,8 +412,8 @@ static void suspend_int(void) {
     }
 }
 
-static void resume_int(void) {
-
+static void resume_int(void)
+{
     //logf("resume_int");
     dcd_controller.usb_state = dcd_controller.resume_state;
     dcd_controller.resume_state = USB_STATE_NOTATTACHED;
@@ -422,8 +424,8 @@ static void resume_int(void) {
     }
 }
 
-static void reset_int(void) {
-
+static void reset_int(void)
+{
     //logf("reset_int");
     struct timer t;
 
@@ -459,12 +461,12 @@ static void reset_int(void) {
 /*-------------------------------------------------------------------------*/
 /* usb controller ops */
 
-int usb_arcotg_dcd_enable(struct usb_ep* ep) {
-
+int usb_arcotg_dcd_enable(struct usb_ep* ep)
+{
     unsigned short max = 0;
     unsigned char mult = 0, zlt = 0;
     int retval = 0;
-    char *val = NULL;	/* for debug */
+    char *val = NULL;    /* for debug */
 
     /* catch bogus parameter */
     if (!ep) {
@@ -496,105 +498,105 @@ int usb_arcotg_dcd_enable(struct usb_ep* ep) {
 
 #if 0
     switch (ep->desc->bmAttributes & 0x03) {
-	case USB_ENDPOINT_XFER_BULK:
-		if (strstr(ep->ep.name, "-iso") || strstr(ep->ep.name, "-int")) {
-			goto en_done;
-		}
-		mult = 0;
-		zlt = 1;
-		
-		switch (arcotg_dcd.speed) {
-		case USB_SPEED_HIGH:
-			if ((max == 128) || (max == 256) || (max == 512)) {
-				break;
-			}
-		default:
-			switch (max) {
-			case 4:
-			case 8:
-			case 16:
-			case 32:
-			case 64:
-				break;
-			default:
-	+			case USB_SPEED_LOW:
-	+				goto en_done;
-	+			}
-	+		}
-	+		break;
-	+	case USB_ENDPOINT_XFER_INT:
-	+		if (strstr(ep->ep.name, "-iso"))	/* bulk is ok */
-	+			goto en_done;
-	+		mult = 0;
-	+		zlt = 1;
-	+		switch (udc->gadget.speed) {
-	+		case USB_SPEED_HIGH:
-	+			if (max <= 1024)
-	+				break;
-	+		case USB_SPEED_FULL:
-	+			if (max <= 64)
-	+				break;
-	+		default:
-	+			if (max <= 8)
-	+				break;
-	+			goto en_done;
-	+		}
-	+		break;
-	+	case USB_ENDPOINT_XFER_ISOC:
-	+		if (strstr(ep->ep.name, "-bulk") || strstr(ep->ep.name, "-int"))
-	+			goto en_done;
-	+		mult = (unsigned char)
-	+		    (1 + ((le16_to_cpu(desc->wMaxPacketSize) >> 11) & 0x03));
-	+		zlt = 0;
-	+		switch (udc->gadget.speed) {
-	+		case USB_SPEED_HIGH:
-	+			if (max <= 1024)
-	+				break;
-	+		case USB_SPEED_FULL:
-	+			if (max <= 1023)
-	+				break;
-	+		default:
-	+			goto en_done;
-	+		}
-	+		break;
-	+	case USB_ENDPOINT_XFER_CONTROL:
-	+		if (strstr(ep->ep.name, "-iso") || strstr(ep->ep.name, "-int"))
-	+			goto en_done;
-	+		mult = 0;
-	+		zlt = 1;
-	+		switch (udc->gadget.speed) {
-	+		case USB_SPEED_HIGH:
-	+		case USB_SPEED_FULL:
-	+			switch (max) {
-	+			case 1:
-	+			case 2:
-	+			case 4:
-	+			case 8:
-	+			case 16:
-	+			case 32:
-	+			case 64:
-	+				break;
-	+			default:
-	+				goto en_done;
-	+			}
-	+		case USB_SPEED_LOW:
-	+			switch (max) {
-	+			case 1:
-	+			case 2:
-	+			case 4:
-	+			case 8:
-	+				break;
-	+			default:
-	+				goto en_done;
-	+			}
-	+		default:
-	+			goto en_done;
-	+		}
-	+		break;
-	+
-	+	default:
-	+		goto en_done;
-	+	}
+    case USB_ENDPOINT_XFER_BULK:
+        if (strstr(ep->ep.name, "-iso") || strstr(ep->ep.name, "-int")) {
+            goto en_done;
+        }
+        mult = 0;
+        zlt = 1;
+
+        switch (arcotg_dcd.speed) {
+        case USB_SPEED_HIGH:
+            if ((max == 128) || (max == 256) || (max == 512)) {
+                break;
+            }
+        default:
+            switch (max) {
+            case 4:
+            case 8:
+            case 16:
+            case 32:
+            case 64:
+                break;
+            default:
+    +            case USB_SPEED_LOW:
+    +                goto en_done;
+    +            }
+    +        }
+    +        break;
+    +    case USB_ENDPOINT_XFER_INT:
+    +        if (strstr(ep->ep.name, "-iso"))    /* bulk is ok */
+    +            goto en_done;
+    +        mult = 0;
+    +        zlt = 1;
+    +        switch (udc->gadget.speed) {
+    +        case USB_SPEED_HIGH:
+    +            if (max <= 1024)
+    +                break;
+    +        case USB_SPEED_FULL:
+    +            if (max <= 64)
+    +                break;
+    +        default:
+    +            if (max <= 8)
+    +                break;
+    +            goto en_done;
+    +        }
+    +        break;
+    +    case USB_ENDPOINT_XFER_ISOC:
+    +        if (strstr(ep->ep.name, "-bulk") || strstr(ep->ep.name, "-int"))
+    +            goto en_done;
+    +        mult = (unsigned char)
+    +            (1 + ((le16_to_cpu(desc->wMaxPacketSize) >> 11) & 0x03));
+    +        zlt = 0;
+    +        switch (udc->gadget.speed) {
+    +        case USB_SPEED_HIGH:
+    +            if (max <= 1024)
+    +                break;
+    +        case USB_SPEED_FULL:
+    +            if (max <= 1023)
+    +                break;
+    +        default:
+    +            goto en_done;
+    +        }
+    +        break;
+    +    case USB_ENDPOINT_XFER_CONTROL:
+    +        if (strstr(ep->ep.name, "-iso") || strstr(ep->ep.name, "-int"))
+    +            goto en_done;
+    +        mult = 0;
+    +        zlt = 1;
+    +        switch (udc->gadget.speed) {
+    +        case USB_SPEED_HIGH:
+    +        case USB_SPEED_FULL:
+    +            switch (max) {
+    +            case 1:
+    +            case 2:
+    +            case 4:
+    +            case 8:
+    +            case 16:
+    +            case 32:
+    +            case 64:
+    +                break;
+    +            default:
+    +                goto en_done;
+    +            }
+    +        case USB_SPEED_LOW:
+    +            switch (max) {
+    +            case 1:
+    +            case 2:
+    +            case 4:
+    +            case 8:
+    +                break;
+    +            default:
+    +                goto en_done;
+    +            }
+    +        default:
+    +            goto en_done;
+    +        }
+    +        break;
+    +
+    +    default:
+    +        goto en_done;
+    +    }
 #endif
 
     /* here initialize variable of ep */
@@ -643,8 +645,8 @@ int usb_arcotg_dcd_enable(struct usb_ep* ep) {
     return retval;
 }
 
-int usb_arcotg_dcd_set_halt(struct usb_ep* ep, bool halt) {
-
+int usb_arcotg_dcd_set_halt(struct usb_ep* ep, bool halt)
+{
     int status = -EOPNOTSUPP; /* operation not supported */
     unsigned char dir = 0;
     unsigned int tmp_epctrl = 0;
@@ -688,8 +690,8 @@ out:
     return status;
 }
 
-int usb_arcotg_dcd_send(struct usb_ep* ep, struct usb_response* res) {
-
+int usb_arcotg_dcd_send(struct usb_ep* ep, struct usb_response* res)
+{
     char* ptr;
     int todo, error, size, done = 0;
     int index = 1; /* use as default ep0 tx qh and td */
@@ -750,8 +752,8 @@ int usb_arcotg_dcd_send(struct usb_ep* ep, struct usb_response* res) {
     return done;
 }
 
-int usb_arcotg_dcd_receive(struct usb_ep* ep, struct usb_response* res) {
-
+int usb_arcotg_dcd_receive(struct usb_ep* ep, struct usb_response* res)
+{
     char* ptr;
     int todo, error, size, done = 0;
     int index = 0; /* use as default ep0 rx qh and td */
@@ -812,9 +814,9 @@ int usb_arcotg_dcd_receive(struct usb_ep* ep, struct usb_response* res) {
 /* lifecylce */
 
 static void qh_init(unsigned char ep_num, unsigned char dir, unsigned char ep_type,
-                    unsigned int max_pkt_len, unsigned int zlt, unsigned char mult) {
-
-    struct dqh *qh = &dev_qh[2 * ep_num + dir];   
+                    unsigned int max_pkt_len, unsigned int zlt, unsigned char mult)
+{
+    struct dqh *qh = &dev_qh[2 * ep_num + dir];
     uint32_t tmp = 0;
     memset(qh, 0, sizeof(struct dqh));
 
@@ -856,8 +858,8 @@ static void qh_init(unsigned char ep_num, unsigned char dir, unsigned char ep_ty
     logf("qh: init %d", (2 * ep_num + dir));
 }
 
-static void td_init(struct dtd* td, void* buffer, uint32_t todo) {
-
+static void td_init(struct dtd* td, void* buffer, uint32_t todo)
+{
     /* see 32.14.5.2 Building a Transfer Descriptor */
 
     /* init first 7 dwords with 0 */
@@ -878,8 +880,8 @@ static void td_init(struct dtd* td, void* buffer, uint32_t todo) {
     td->buf_ptr0 = (uint32_t)buffer;
 }
 
-static void ep_setup(unsigned char ep_num, unsigned char dir, unsigned char ep_type) {
-
+static void ep_setup(unsigned char ep_num, unsigned char dir, unsigned char ep_type)
+{
     unsigned int tmp_epctrl = 0;
     struct timer t;
 
@@ -901,23 +903,23 @@ static void ep_setup(unsigned char ep_num, unsigned char dir, unsigned char ep_t
     }
 
     UDC_ENDPTCTRL(ep_num) = tmp_epctrl;
-    
+
     /* wait for the write reg to finish */
 
-    timer_set(&t, SETUP_TIMER);    
+    timer_set(&t, SETUP_TIMER);
     while (!(UDC_ENDPTCTRL(ep_num) & (tmp_epctrl & (EPCTRL_TX_ENABLE | EPCTRL_RX_ENABLE)))) {
         if (timer_expired(&t)) {
-        	logf("TIMEOUT: enable ep");
+            logf("TIMEOUT: enable ep");
             return;
-        }    	
+        }
     }
 }
 
 /*-------------------------------------------------------------------------*/
 /* helpers for sending/receiving */
 
-static int td_enqueue(struct dtd* td, struct dqh* qh, unsigned int mask) {
-
+static int td_enqueue(struct dtd* td, struct dqh* qh, unsigned int mask)
+{
     struct timer t;
 
     qh->dtd_ovrl.next_dtd   = (unsigned int)td;
@@ -940,8 +942,8 @@ static int td_enqueue(struct dtd* td, struct dqh* qh, unsigned int mask) {
     return 0;
 }
 
-static int td_wait(struct dtd* td, unsigned int mask) {
-
+static int td_wait(struct dtd* td, unsigned int mask)
+{
     struct timer t;
     timer_set(&t, TRANSFER_TIMER);
 
@@ -960,8 +962,8 @@ static int td_wait(struct dtd* td, unsigned int mask) {
     }
 }
 
-static int usb_ack(struct usb_ctrlrequest * s, int error) {
-
+static int usb_ack(struct usb_ctrlrequest * s, int error)
+{
     if (error) {
         logf("STALLing ep0");
         UDC_ENDPTCTRL0 |= 1 << 16; /* stall */

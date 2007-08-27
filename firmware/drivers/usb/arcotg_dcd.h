@@ -42,8 +42,8 @@
 
 #define ep_is_in(EP)    (((EP)->desc->bEndpointAddress & USB_DIR_IN)==USB_DIR_IN)
 
-#define EP_DIR_IN	1
-#define EP_DIR_OUT	0
+#define EP_DIR_IN       1
+#define EP_DIR_OUT      0
 
 /*-------------------------------------------------------------------------*/
 

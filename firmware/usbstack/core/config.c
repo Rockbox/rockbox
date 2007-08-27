@@ -23,58 +23,58 @@
 #include <string.h>
 #include "usbstack/core.h"
 
-static int usb_descriptor_fillbuf(void* buf, unsigned buflen, struct usb_descriptor_header** src) {
-	
-	uint8_t* dest = buf;
+static int usb_descriptor_fillbuf(void* buf, unsigned buflen, struct usb_descriptor_header** src)
+{
+    uint8_t* dest = buf;
 
-	if (!src) {
-		return -EINVAL;
-	}
+    if (!src) {
+        return -EINVAL;
+    }
 
-	/* fill buffer from src[] until null descriptor ptr */
-	for (; 0 != *src; src++) {
-		unsigned len = (*src)->bLength;
+    /* fill buffer from src[] until null descriptor ptr */
+    for (; 0 != *src; src++) {
+        unsigned len = (*src)->bLength;
 
-		logf("len: %d", len);
-		
-		if (len > buflen)
-			return -EINVAL;
-		memcpy(dest, *src, len);
-		buflen -= len;
-		dest += len;
-	}
-	return dest - (uint8_t *)buf;
+        logf("len: %d", len);
+
+        if (len > buflen)
+            return -EINVAL;
+        memcpy(dest, *src, len);
+        buflen -= len;
+        dest += len;
+    }
+    return dest - (uint8_t *)buf;
 }
 
-int usb_stack_configdesc(const struct usb_config_descriptor* config, void* buf, unsigned length, struct usb_descriptor_header** desc) {
-	
+int usb_stack_configdesc(const struct usb_config_descriptor* config, void* buf, unsigned length, struct usb_descriptor_header** desc)
+{
     struct usb_config_descriptor* cp = buf;
-	int len;
+    int len;
 
-	if (length < USB_DT_CONFIG_SIZE || !desc) {
-		return -EINVAL;
-	}
-	
-	/* config descriptor first */
-	*cp = *config; 
+    if (length < USB_DT_CONFIG_SIZE || !desc) {
+        return -EINVAL;
+    }
 
-	/* then interface/endpoint/class/vendor/... */
-	len = usb_descriptor_fillbuf(USB_DT_CONFIG_SIZE + (uint8_t*)buf, length - USB_DT_CONFIG_SIZE, desc);
-	
-	if (len < 0) {
-		return len;
-	}
-	
-	len += USB_DT_CONFIG_SIZE;
-	if (len > 0xffff) {
-		return -EINVAL;
-	}
+    /* config descriptor first */
+    *cp = *config; 
 
-	/* patch up the config descriptor */
-	cp->bLength = USB_DT_CONFIG_SIZE;
-	cp->bDescriptorType = USB_DT_CONFIG;
-	cp->wTotalLength = len;
-	cp->bmAttributes |= USB_CONFIG_ATT_ONE;
-	
-	return len;
+    /* then interface/endpoint/class/vendor/... */
+    len = usb_descriptor_fillbuf(USB_DT_CONFIG_SIZE + (uint8_t*)buf, length - USB_DT_CONFIG_SIZE, desc);
+
+    if (len < 0) {
+        return len;
+    }
+
+    len += USB_DT_CONFIG_SIZE;
+    if (len > 0xffff) {
+        return -EINVAL;
+    }
+
+    /* patch up the config descriptor */
+    cp->bLength = USB_DT_CONFIG_SIZE;
+    cp->bDescriptorType = USB_DT_CONFIG;
+    cp->wTotalLength = len;
+    cp->bmAttributes |= USB_CONFIG_ATT_ONE;
+
+    return len;
 }

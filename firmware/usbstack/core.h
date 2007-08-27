@@ -38,7 +38,7 @@ struct usb_response {
 struct usb_ep {
     const char name[15];
     uint8_t type;
-    uint32_t ep_num;	/* which endpoint? */
+    uint32_t ep_num;    /* which endpoint? */
     uint32_t pipe_num;  /* which pipe? */
     uint32_t maxpacket;
     bool claimed;
