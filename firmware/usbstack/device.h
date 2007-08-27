@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: arcotg_udc.c 12340 2007-02-16 22:13:21Z barrywardell $
+ * $Id$
  *
  * Copyright (C) 2007 by Christian Gmeiner
  *
