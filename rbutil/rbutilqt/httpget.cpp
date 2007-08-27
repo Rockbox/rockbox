@@ -27,8 +27,10 @@
 HttpGet::HttpGet(QObject *parent)
     : QObject(parent)
 {
+    m_usecache = false;
     qDebug() << "--> HttpGet::HttpGet()";
     outputToBuffer = true;
+    cached = false;
     getRequest = -1;
     connect(&http, SIGNAL(done(bool)), this, SLOT(httpDone(bool)));
     connect(&http, SIGNAL(dataReadProgress(int, int)), this, SLOT(httpProgress(int, int)));
@@ -39,6 +41,27 @@ HttpGet::HttpGet(QObject *parent)
 
     connect(&http, SIGNAL(readyRead(const QHttpResponseHeader&)), this, SLOT(httpResponseHeader(const QHttpResponseHeader&)));
 
+}
+
+
+void HttpGet::setCache(QDir d)
+{
+    m_cachedir = d;
+    bool result = true;
+    
+    QString p = m_cachedir.absolutePath() + "/rbutil-cache";
+    if(QFileInfo(m_cachedir.absolutePath()).isDir())
+        if(!QFileInfo(p).isDir())
+            result = m_cachedir.mkdir("rbutil-cache");
+    else result = false;
+    qDebug() << "HttpGet::setCache(QDir)" << result;
+    m_usecache = !result;
+}
+
+
+void HttpGet::setCache(bool c)
+{
+    m_usecache = c;
 }
 
 
@@ -108,6 +131,40 @@ bool HttpGet::getFile(const QUrl &url)
             return false;
         }
     }
+    // put hash generation here so it can get reused later
+    QString hash = QCryptographicHash::hash(url.toEncoded(), QCryptographicHash::Md5).toHex();
+    cachefile = m_cachedir.absolutePath() + "/rbutil-cache/" + hash;
+    if(m_usecache) {
+        // check if the file is present in cache
+        qDebug() << "[HTTP] cache ENABLED for" << url.toEncoded();
+        if(QFileInfo(cachefile).isReadable() && QFileInfo(cachefile).size() > 0) {
+            qDebug() << "[HTTP] cached file found!" << cachefile;
+            getRequest = -1;
+            QFile c(cachefile);
+            if(!outputToBuffer) {
+                qDebug() << outputFile->fileName();
+                c.open(QIODevice::ReadOnly);
+                outputFile->open(QIODevice::ReadWrite);
+                outputFile->write(c.readAll());
+                outputFile->close();
+                c.close();
+            }
+            else {
+                c.open(QIODevice::ReadOnly);
+                dataBuffer = c.readAll();
+                c.close();
+            }
+            response = 200; // fake "200 OK" HTTP response
+            cached = true;
+            httpDone(false); // we're done now. This will emit the correct signal too.
+            return true;
+        }
+        else qDebug() << "[HTTP] file not cached, downloading to" << cachefile;
+
+    }
+    else {
+        qDebug() << "[HTTP] cache DISABLED";
+    }
     http.setHost(url.host(), url.port(80));
     // construct query (if any)
     QList<QPair<QString, QString> > qitems = url.queryItems();
@@ -119,14 +176,14 @@ bool HttpGet::getFile(const QUrl &url)
     }
 
     if(outputToBuffer) {
-        qDebug() << "downloading to buffer:" << url.toString();
+        qDebug() << "[HTTP] downloading to buffer:" << url.toString();
         getRequest = http.get(url.path() + query);
     }
     else {
-        qDebug() << "downloading to file:" << url.toString() << qPrintable(outputFile->fileName());
+        qDebug() << "[HTTP] downloading to file:" << url.toString() << qPrintable(outputFile->fileName());
         getRequest = http.get(url.path() + query, outputFile);
     }
-    qDebug() << "request scheduled: GET" << getRequest;
+    qDebug() << "[HTTP] request scheduled: GET" << getRequest;
     
     return true;
 }
@@ -135,11 +192,25 @@ bool HttpGet::getFile(const QUrl &url)
 void HttpGet::httpDone(bool error)
 {
     if (error) {
-        qDebug() << "Error: " << qPrintable(http.errorString()) << httpResponse();
+        qDebug() << "[HTTP] Error: " << qPrintable(http.errorString()) << httpResponse();
     }
     if(!outputToBuffer)
         outputFile->close();
-    
+
+    if(m_usecache && !cached) {
+        qDebug() << "[HTTP] creating cache file" << cachefile;
+        QFile c(cachefile);
+        c.open(QIODevice::ReadWrite);
+        if(!outputToBuffer) {
+            outputFile->open(QIODevice::ReadOnly | QIODevice::Truncate);
+            c.write(outputFile->readAll());
+            outputFile->close();
+        }
+        else
+            c.write(dataBuffer);
+
+        c.close();
+    }
     emit done(error);
 }
 

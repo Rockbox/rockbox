@@ -25,6 +25,7 @@
 ZipInstaller::ZipInstaller(QObject* parent): QObject(parent) 
 {
     m_unzip = true;
+    m_cache = "";
 }
 
 
@@ -86,6 +87,10 @@ void ZipInstaller::installStart()
     // get the real file.
     getter = new HttpGet(this);
     getter->setProxy(m_proxy);
+    if(m_cache.exists()) {
+        getter->setCache(m_cache);
+        qDebug() << "installzip: setting cache to" << m_cache;
+    }
     getter->setFile(downloadFile);
     getter->getFile(QUrl(m_url));
 
@@ -117,12 +122,13 @@ void ZipInstaller::downloadDone(bool error)
         m_dp->setProgressMax(max);
     }
     m_dp->setProgressValue(max);
-    if(getter->httpResponse() != 200) {
+    if(getter->httpResponse() != 200 && !getter->isCached()) {
         m_dp->addItem(tr("Download error: received HTTP error %1.").arg(getter->httpResponse()),LOGERROR);
         m_dp->abort();
         emit done(true);
         return;
     }
+    if(getter->isCached()) m_dp->addItem(tr("Cached file used."), LOGINFO);
     if(error) {
         m_dp->addItem(tr("Download error: %1").arg(getter->errorString()),LOGERROR);
         m_dp->abort();
@@ -204,4 +210,5 @@ void ZipInstaller::updateDataReadProgress(int read, int total)
     //qDebug() << "progress:" << read << "/" << total;
 
 }
+
 

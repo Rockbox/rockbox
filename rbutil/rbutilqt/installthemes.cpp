@@ -77,6 +77,8 @@ void ThemesInstallWindow::downloadInfo()
     qDebug() << "downloadInfo()" << url;
     qDebug() << url.queryItems();
     getter->setProxy(proxy);
+    if(userSettings->value("defaults/offline").toBool())
+        getter->setCache(userSettings->value("defaults/cachepath", QDir::tempPath()).toString());
     getter->setFile(&themesInfo);
     getter->getFile(url);
 }
@@ -182,6 +184,8 @@ void ThemesInstallWindow::updateDetails(int row)
 
     igetter.abort();
     igetter.setProxy(proxy);
+    if(!userSettings->value("defaults/cachedisable").toBool())
+        igetter.setCache(userSettings->value("defaults/cachepath", QDir::tempPath()).toString());
     igetter.getFile(img);
     connect(&igetter, SIGNAL(done(bool)), this, SLOT(updateImage(bool)));
 }
@@ -294,6 +298,8 @@ void ThemesInstallWindow::accept()
     installer->setLogSection(names);
     installer->setLogVersion(version);
     installer->setMountPoint(mountPoint);
+    if(!userSettings->value("defaults/cachedisable").toBool())
+        installer->setCache(userSettings->value("defaults/cachepath", QDir::tempPath()).toString());
     installer->install(logger);
     connect(logger, SIGNAL(closed()), this, SLOT(close()));
 }

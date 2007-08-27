@@ -128,11 +128,11 @@ void RbUtilQt::downloadInfo()
     connect(daily, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
     connect(daily, SIGNAL(requestFinished(int, bool)), this, SLOT(downloadDone(int, bool)));
     daily->setProxy(proxy());
-
+    if(userSettings->value("defaults/offline").toBool())
+        daily->setCache(userSettings->value("defaults/cachepath", QDir::tempPath()).toString());
     qDebug() << "downloading build info";
     daily->setFile(&buildInfo);
     daily->getFile(QUrl(devices->value("server_conf_url").toString()));
-
 }
 
 
@@ -154,7 +154,8 @@ void RbUtilQt::downloadDone(bool error)
     connect(bleeding, SIGNAL(done(bool)), this, SLOT(downloadBleedingDone(bool)));
     connect(bleeding, SIGNAL(requestFinished(int, bool)), this, SLOT(downloadDone(int, bool)));
     bleeding->setProxy(proxy());
-
+    if(userSettings->value("defaults/offline").toBool())
+        bleeding->setCache(userSettings->value("defaults/cachepath", QDir::tempPath()).toString());
     bleeding->setFile(&bleedingInfo);
     bleeding->getFile(QUrl(devices->value("bleeding_info").toString()));
 }
@@ -462,6 +463,8 @@ bool RbUtilQt::installAuto()
     installer->setProxy(proxy());
     installer->setLogSection("rockboxbase");
     installer->setLogVersion(myversion);
+    if(!userSettings->value("defaults/cachedisable").toBool())
+        installer->setCache(userSettings->value("defaults/cachepath", QDir::tempPath()).toString());
     installer->setMountPoint(userSettings->value("defaults/mountpoint").toString());
     installer->install(logger);
            
@@ -623,6 +626,8 @@ void RbUtilQt::installFonts()
     installer->setLogSection("Fonts");
     installer->setLogVersion(versmap.value("arch_date"));
     installer->setMountPoint(userSettings->value("defaults/mountpoint").toString());
+    if(!userSettings->value("defaults/cachedisable").toBool())
+        installer->setCache(userSettings->value("defaults/cachepath", QDir::tempPath()).toString());
     installer->install(logger);    
 }
 
@@ -651,6 +656,8 @@ void RbUtilQt::installVoice()
     installer->setLogVersion(versmap.value("arch_date"));
     installer->setMountPoint(userSettings->value("defaults/mountpoint").toString());
     installer->setTarget("/.rockbox/langs/english.voice");
+    if(!userSettings->value("defaults/cachedisable").toBool())
+        installer->setCache(userSettings->value("defaults/cachepath", QDir::tempPath()).toString());
     installer->install(logger);
     
     //connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));
@@ -684,6 +691,8 @@ void RbUtilQt::installDoom()
     installer->setLogSection("Game Addons");
     installer->setLogVersion(versmap.value("arch_date"));
     installer->setMountPoint(userSettings->value("defaults/mountpoint").toString());
+    if(!userSettings->value("defaults/cachedisable").toBool())
+        installer->setCache(userSettings->value("defaults/cachepath", QDir::tempPath()).toString());
     installer->install(logger);
 
 }
@@ -783,6 +792,8 @@ void RbUtilQt::downloadManual(void)
     logger->show();
     installer = new ZipInstaller(this);
     installer->setMountPoint(userSettings->value("defaults/mountpoint").toString());
+    if(!userSettings->value("defaults/cachedisable").toBool())
+        installer->setCache(userSettings->value("defaults/cachepath", QDir::tempPath()).toString());
     installer->setProxy(proxy());
     installer->setLogSection(section);
     installer->setUrl(manualurl);

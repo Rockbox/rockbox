@@ -46,6 +46,8 @@ public:
     void setLogVersion(QStringList v) { m_verlist = v; qDebug() << m_verlist;}
     void setUnzip(bool i) { m_unzip = i; }
     void setTarget(QString t) { m_target = t; }
+    void setCache(QDir c) { m_cache = c; };
+    void setCache(QString c) { m_cache = QDir(c); qDebug() << "!!!set cache:" << m_cache;}
     
 signals:
     void done(bool error);
@@ -66,6 +68,7 @@ private:
     bool m_unzip;
     QString m_target;
     int runner;
+    QDir m_cache;
     
     HttpGet *getter;
     QTemporaryFile *downloadFile;

@@ -21,8 +21,8 @@
 #ifndef HTTPGET_H
 #define HTTPGET_H
 
-#include <QFile>
-#include <QHttp>
+#include <QtCore>
+#include <QtNetwork>
 
 class QUrl;
 
@@ -38,8 +38,11 @@ class HttpGet : public QObject
         QHttp::Error error(void);
         QString errorString(void);
         void setFile(QFile*);
+        void setCache(QDir);
+        void setCache(bool);
         int httpResponse(void);
         QByteArray readAll(void);
+        bool isCached() { return cached; }
 
     public slots:
         void abort(void);
@@ -65,6 +68,10 @@ class HttpGet : public QObject
         QByteArray dataBuffer;
         bool outputToBuffer;
         QString query;
+        bool m_usecache;
+        QDir m_cachedir;
+        QString cachefile;
+        bool cached;
 };
 
 #endif

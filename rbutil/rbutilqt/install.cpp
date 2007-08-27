@@ -99,6 +99,8 @@ void Install::accept()
     installer->setUrl(file);
     installer->setProxy(proxy);
     installer->setLogSection("rockboxbase");
+    if(!userSettings->value("defaults/cachedisable").toBool())
+        installer->setCache(userSettings->value("defaults/cachepath", QDir::tempPath()).toString());
     installer->setLogVersion(myversion);
     installer->setMountPoint(mountPoint);
     installer->install(logger);

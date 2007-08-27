@@ -66,14 +66,9 @@ Config::Config(QWidget *parent) : QDialog(parent)
     connect(ui.radioSystemProxy, SIGNAL(toggled(bool)), this, SLOT(setSystemProxy(bool)));
     connect(ui.browseMountPoint, SIGNAL(clicked()), this, SLOT(browseFolder()));
     connect(ui.buttonAutodetect,SIGNAL(clicked()),this,SLOT(autodetect()));
-    
-    // disable unimplemented stuff
-    ui.buttonCacheBrowse->setEnabled(false);
-    ui.cacheDisable->setEnabled(false);
-    ui.cacheOfflineMode->setEnabled(false);
-    ui.buttonCacheClear->setEnabled(false);
+    connect(ui.buttonCacheBrowse, SIGNAL(clicked()), this, SLOT(browseCache()));
+    connect(ui.buttonCacheClear, SIGNAL(clicked()), this, SLOT(cacheClear()));
 
-    //ui.buttonAutodetect->setEnabled(false);
 }
 
 
@@ -115,6 +110,14 @@ void Config::accept()
         nplat = ui.treeDevices->selectedItems().at(0)->data(0, Qt::UserRole).toString();
         userSettings->setValue("defaults/platform", nplat);
     }
+
+    // cache settings
+    if(QFileInfo(ui.cachePath->text()).isDir())
+        userSettings->setValue("defaults/cachepath", ui.cachePath->text());
+    else // default to system temp path
+        userSettings->setValue("defaults/cachepath", QDir::tempPath());
+    userSettings->setValue("defaults/cachedisable", ui.cacheDisable->isChecked());
+    userSettings->setValue("defaults/offline", ui.cacheOfflineMode->isChecked());
 
     // sync settings
     userSettings->sync();
@@ -169,6 +172,20 @@ void Config::setUserSettings(QSettings *user)
     // devices tab
     ui.mountPoint->setText(userSettings->value("defaults/mountpoint").toString());
 
+    // cache tab
+    if(!QFileInfo(userSettings->value("defaults/cachepath").toString()).isDir())
+        userSettings->setValue("defaults/cachepath", QDir::tempPath());
+    ui.cachePath->setText(userSettings->value("defaults/cachepath").toString());
+    ui.cacheDisable->setChecked(userSettings->value("defaults/cachedisable").toBool());
+    ui.cacheOfflineMode->setChecked(userSettings->value("defaults/offline").toBool());
+    QList<QFileInfo> fs = QDir(userSettings->value("defaults/cachepath").toString() + "/rbutil-cache/").entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+    qint64 sz = 0;
+    for(int i = 0; i < fs.size(); i++) {
+        sz += fs.at(i).size();
+        qDebug() << fs.at(i).fileName() << fs.at(i).size();
+    }
+    ui.cacheSize->setText(tr("Current cache size is %1 kiB.")
+            .arg(sz/1024));
 }
 
 
@@ -344,9 +361,29 @@ void Config::browseFolder()
 }
 
 
+void Config::browseCache()
+{
+    cbrowser = new BrowseDirtree(this);
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
+    cbrowser->setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+#elif defined(Q_OS_WIN32)
+    cbrowser->setFilter(QDir::Drives);
+#endif
+    QDir d(ui.cachePath->text());
+    cbrowser->setDir(d);
+    cbrowser->show();
+    connect(cbrowser, SIGNAL(itemChanged(QString)), this, SLOT(setCache(QString)));
+}
+
 void Config::setMountpoint(QString m)
 {
     ui.mountPoint->setText(m);
+}
+
+
+void Config::setCache(QString c)
+{
+    ui.cachePath->setText(c);
 }
 
 
@@ -403,3 +440,29 @@ void Config::autodetect()
     }
 }
 
+void Config::cacheClear()
+{
+    if(QMessageBox::critical(this, tr("Really delete cache?"),
+       tr("Do you really want to delete the cache? "
+         "Make absolutely sure this setting is correct as it will "
+         "remove <b>all</b> files in this folder!").arg(ui.cachePath->text()),
+       QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
+        return;
+    
+    QString cache = ui.cachePath->text() + "/rbutil-cache/";
+    if(!QFileInfo(cache).isDir()) {
+        QMessageBox::critical(this, tr("Path wrong!"),
+            tr("The cache path is invalid. Aborting."), QMessageBox::Ok);
+        return;
+    }
+    QDir dir(cache);
+    QStringList fn;
+    fn = dir.entryList(QStringList("*"), QDir::Files, QDir::Name);
+    qDebug() << fn;
+
+    for(int i = 0; i < fn.size(); i++) {
+        QString f = cache + fn.at(i);
+        QFile::remove(f);
+        qDebug() << "removed:" << f;
+    }
+}

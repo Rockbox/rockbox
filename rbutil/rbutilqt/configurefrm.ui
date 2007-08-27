@@ -270,6 +270,9 @@
       <attribute name="title" >
        <string>Cac&amp;he</string>
       </attribute>
+      <attribute name="icon" >
+       <iconset resource="rbutilqt.qrc" >:/icons/icons/package-x-generic.png</iconset>
+      </attribute>
       <attribute name="toolTip" >
        <string>Download cache settings</string>
       </attribute>
@@ -304,7 +307,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="cachePath" />
+          <widget class="QLineEdit" name="cachePath" >
+           <property name="toolTip" >
+            <string>Entering an invalid folder will reset the path to the systems temporary path.</string>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QPushButton" name="buttonCacheBrowse" >
@@ -329,6 +336,9 @@
          </item>
          <item>
           <widget class="QCheckBox" name="cacheOfflineMode" >
+           <property name="toolTip" >
+            <string>This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.</string>
+           </property>
            <property name="text" >
             <string>O&amp;ffline mode</string>
            </property>
@@ -366,6 +376,9 @@
         <widget class="QPushButton" name="buttonCacheClear" >
          <property name="text" >
           <string>Clean cache &amp;now</string>
+         </property>
+         <property name="icon" >
+          <iconset resource="rbutilqt.qrc" >:/icons/icons/user-trash-full.png</iconset>
          </property>
         </widget>
        </item>
