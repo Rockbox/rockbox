@@ -27,14 +27,60 @@
 #include "button.h"
 #include "ata.h"
 #include "string.h"
-#include "arcotg_udc.h"
 
 #ifdef HAVE_USBSTACK
 #include "usbstack.h"
+#else
+#include "arcotg_udc.h"
 #endif
 
 void usb_init_device(void)
 {
+    int r0;  
+    outl(inl(0x70000084) | 0x200, 0x70000084);  
+   
+    outl(inl(0x7000002C) | 0x3000000, 0x7000002C);  
+    DEV_EN |= DEV_USB;  
+   
+    DEV_RS |= DEV_USB; /* reset usb start */  
+    DEV_RS &=~DEV_USB;/* reset usb end */  
+   
+    DEV_INIT |= INIT_USB;  
+    while ((inl(0x70000028) & 0x80) == 0);  
+   
+    UDC_PORTSC1 |= PORTSCX_PORT_RESET;  
+    while ((UDC_PORTSC1 & PORTSCX_PORT_RESET) != 0);  
+   
+    UDC_OTGSC |= 0x5F000000;  
+    if( (UDC_OTGSC & 0x100) == 0) {  
+        UDC_USBMODE &=~ USB_MODE_CTRL_MODE_HOST;  
+        UDC_USBMODE |= USB_MODE_CTRL_MODE_DEVICE;  
+        outl(inl(0x70000028) | 0x4000, 0x70000028);  
+        outl(inl(0x70000028) | 0x2, 0x70000028);  
+    } else {  
+        UDC_USBMODE |= USB_MODE_CTRL_MODE_DEVICE;  
+        outl(inl(0x70000028) &~0x4000, 0x70000028);  
+        outl(inl(0x70000028) | 0x2, 0x70000028);  
+    }  
+   
+   
+    UDC_USBCMD |= USB_CMD_CTRL_RESET;  
+    while((UDC_USBCMD & USB_CMD_CTRL_RESET) != 0);  
+   
+    r0 = UDC_PORTSC1;  
+   
+    /* Note from IPL source (referring to next 5 lines of code:  
+       THIS NEEDS TO BE CHANGED ONCE THERE IS KERNEL USB */  
+    DEV_INIT |= INIT_USB;  
+    DEV_EN |= DEV_USB;  
+    while ((inl(0x70000028) & 0x80) == 0);  
+    outl(inl(0x70000028) | 0x2, 0x70000028);  
+   
+    udelay(0x186A0);  
+
+#ifndef HAVE_USBSTACK   
+    dr_controller_setup();
+#endif
 
 #if defined(IPOD_COLOR) || defined(IPOD_4G) \
  || defined(IPOD_MINI)  || defined(IPOD_MINI2G)
@@ -106,6 +152,12 @@ bool usb_detect(void)
         usb_stack_start();
     } else if ((usbstatus1 == false) && (prev_usbstatus1 == true)) {
     	usb_stack_stop();
+    }
+#else
+    if ((usbstatus1 == true) && (prev_usbstatus1 == false)) {
+        dr_controller_run();
+    } else if ((usbstatus1 == false) && (prev_usbstatus1 == true)) {
+        dr_controller_stop();
     }
 #endif
     prev_usbstatus1 = usbstatus1;

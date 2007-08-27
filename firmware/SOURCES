@@ -243,7 +243,11 @@ drivers/isp1362.c
 #if CONFIG_USBOTG == USBOTG_M5636
 drivers/m5636.c
 #elif CONFIG_USBOTG == USBOTG_ARC
+#ifdef HAVE_USBSTACK
 drivers/usb/arcotg_dcd.c
+#else
+drivers/usb/arcotg_udc.c
+#endif
 #endif /* CONFIG_USBOTG */
 #endif /* !defined(BOOTLOADER) */
 #endif /* !defined(SIMULATOR) */

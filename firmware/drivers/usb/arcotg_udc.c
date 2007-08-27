@@ -33,6 +33,7 @@
  ****************************************************************************/
 #include "arcotg_udc.h"
 #include "logf.h"
+#include "errno.h"
 
 static int timeout;
 
@@ -52,7 +53,7 @@ int dr_controller_setup(void)
 #endif
 
     /* Stop and reset the usb controller */
-    UDC_USBCMD &= ~USB_CMD_RUN_STOP;
+    UDC_USBCMD &= ~USB_CMD_RUN;
 
     UDC_USBCMD |= USB_CMD_CTRL_RESET;
 
@@ -102,7 +103,7 @@ void dr_controller_run(void)
     UDC_USBMODE |= USB_MODE_CTRL_MODE_DEVICE;
 
     /* Set controller to Run */
-    UDC_USBCMD |= USB_CMD_RUN_STOP;
+    UDC_USBCMD |= USB_CMD_RUN;
 
     return;
 }
@@ -131,5 +132,5 @@ void dr_controller_stop(void)
     udc->stopped = 1;
 #endif
     /* Set controller to Stop */
-    UDC_USBCMD &= ~USB_CMD_RUN_STOP;
+    UDC_USBCMD &= ~USB_CMD_RUN;
 }
