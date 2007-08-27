@@ -153,3 +153,6 @@ usb_charging
 #endif
 #endif
 
+#if HAVE_USBSTACK
+usbstack
+#endif

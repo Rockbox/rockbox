@@ -11161,13 +11161,15 @@
   desc: in settings_menu
   user:
   <source>
-    *: "USB Stack"
+    *: none
+    usbstack: "USB Stack"
   </source>
   <dest>
     *: "USB Stack"
   </dest>
   <voice>
-    *: "USB Stack"
+    *: none
+    usbstack: "USB Stack"
   </voice>
 </phrase>
 <phrase>
@@ -11175,13 +11177,16 @@
   desc: in usbstack settings
   user:
   <source>
-    *: "USB Stack Mode"
+    *: none
+    usbstack: "USB Stack Mode"
   </source>
   <dest>
-    *: "USB Stack Mode"
+    *: none
+    usbstack: "USB Stack Mode"
   </dest>
   <voice>
-    *: "USB Stack Mode"
+    *: none
+    usbstack: "USB Stack Mode"
   </voice>
 </phrase>
 <phrase>
@@ -11189,13 +11194,16 @@
   desc: in usbstack settings
   user:
   <source>
-    *: "Device"
+    *: none
+    usbstack: "Device"
   </source>
   <dest>
-    *: "Device"
+    *: none
+    usbstack: "Device"
   </dest>
   <voice>
-    *: "Device"
+    *: none
+    usbstack: "Device"
   </voice>
 </phrase>
 <phrase>
@@ -11203,13 +11211,16 @@
   desc: in usbstack settings
   user:
   <source>
-    *: "Host"
+    *: none
+    usbstack: "Host"
   </source>
   <dest>
-    *: "Host"
+    *: none
+    usbstack: "Host"
   </dest>
   <voice>
-    *: "Host"
+    *: none
+    usbstack: "Host"
   </voice>
 </phrase>
 <phrase>
@@ -11217,12 +11228,15 @@
   desc: in usbstack settings
   user:
   <source>
-    *: "Device Driver"
+    *: none
+    usbstack: "Device Driver"
   </source>
   <dest>
-    *: "Device Driver"
+    *: none
+    usbstack: "Device Driver"
   </dest>
   <voice>
-    *: "Device Driver"
+    *: none
+    usbstack: "Device Driver"
   </voice>
 </phrase>
