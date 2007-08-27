@@ -148,7 +148,7 @@
 #define FIRMWARE_OFFSET_FILE_DATA   0x8
 
 /* #define USB_IPODSTYLE */
-#define HAVE_USBSTACK
+/*#define HAVE_USBSTACK*/
 #define USBSTACK_CAPS CONTROLLER_DEVICE
 
 /* USB On-the-go */
