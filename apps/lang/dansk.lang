@@ -1,25 +1,3 @@
-# Rockbox danish language file
-# Translated by:
-# - Rune Wiinberg
-# - Jakob Givoni
-# - Jonas Häggqvist
-#
-# Try to follow the guidelines from http://www.sslug.dk/locale/ Specifically
-# try to avoid english words at (almost) all costs.
-#
-# Local conventions:
-# "Settings" is removed from translations used in the menu since it's all
-# settings there ("Sound Settings > Lyd").
-# No excessive capitals ("Håndter opsætning" - not "Håndter Opsætning")
-#
-# Strings that need attention:
-# - LANG_CROSSFEED_HF_CUTOFF
-# - LANG_CROSSFEED_CROSS_GAIN
-# - LANG_CROSSFEED_HF_ATTENUATION
-# - LANG_CROSSFEED_DIRECT_GAIN
-# - LANG_EQUALIZER_BAND_LOW_SHELF
-# - LANG_EQUALIZER_BAND_HIGH_SHELF
-# - All strings with "Equalizer" in them.
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -11124,5 +11102,124 @@
   <voice>
     *: none
     rtc: "nul"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    usbstack: "USB Stack"
+  </source>
+  <dest>
+    *: none
+    usbstack: "USB stak"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "USB stak"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNTER
+  desc: in settings, for recording peak meter
+  user:
+  <source>
+    *: none
+    recording: "Clip Counter"
+  </source>
+  <dest>
+    *: none
+    recording: "Klip tæller"
+  </dest>
+  <voice>
+    *: none
+    recording: "Klip tæller"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_HOST
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Host"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Vært"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Vært"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_MODE
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "USB Stack Mode"
+  </source>
+  <dest>
+    *: none
+    usbstack: "USB stak tilstand"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "USB stak tilstand"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Device"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Enhed"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Enhed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE_DRIVER
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Device Driver"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Enhedsdriver"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Enhedsdriver"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNT
+  desc: in recording GUI, for recording peak meter. MAX 5 characters!
+  user:
+  <source>
+    *: none
+    recording: "CLIP:"
+  </source>
+  <dest>
+    *: none
+    recording: "KLIP:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
   </voice>
 </phrase>

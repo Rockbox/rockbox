@@ -773,7 +773,6 @@
 <phrase>
   id: LANG_VERSION
   desc: in the info menu
-  desc: in the info menu
   user:
   <source>
     *: "Version"
@@ -787,7 +786,6 @@
 </phrase>
 <phrase>
   id: LANG_DEBUG
-  desc: in the info menu
   desc: in the info menu
   user:
   <source>
@@ -1491,7 +1489,6 @@
 <phrase>
   id: LANG_VOICE_DIR_HOVER
   desc: "talkbox" mode for directories + files
-  desc: "talkbox" mode for directories + files
   user:
   <source>
     *: ".talk mp3 clip"
@@ -1561,6 +1558,7 @@
     h100,h120,h300: "Internal Microphone"
   </source>
   <dest>
+    *: ""
     recording: "Micròfon"
     h100,h120,h300: "Micròfon intern"
   </dest>
@@ -1650,18 +1648,17 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_CURRENT_DIR
-  desc: in recording directory options
+  desc: DEPRECATED
   user:
   <source>
     *: none
-    recording: "Current Directory"
+    recording: ""
   </source>
   <dest>
-    *: none
-    recording: "Directori Actual"
+    *: ""
   </dest>
   <voice>
-    *: "Directori Actual"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2102,18 +2099,16 @@
 </phrase>
 <phrase>
   id: LANG_PM_UNITS_PER_READ
-  desc: in the peak meter menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Units Per Read"
-    masd: none
+    *: ""
   </source>
   <dest>
-    *: "Unitats per lectura"
-    masd: none
+    *: ""
   </dest>
   <voice>
-    *: "Unitats per lectura"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2999,14 +2994,24 @@
   user:
   <source>
     *: none
-    recording: "The disk is full. Press STOP to continue."
+    recording: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
+    m5,x5: "The disk is full. Press POWER to continue."
+    e200: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
-    recording: "Disc ple. Apreta OFF per continuar"
+    recording: "Disc ple. Prem OFF per continuar"
+    h100,h120,h300: "Disc ple. Prem STOP per continuar"
+    m5,x5: "Disc ple. Prem POWER per continuar"
+    e200: "Disc ple. Prem UP per continuar"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
+    h100,h120,h300: ""
+    m5,x5: ""
+    e200: ""
   </voice>
 </phrase>
 <phrase>
@@ -3084,7 +3089,6 @@
   </source>
   <dest>
     *: none
-    alarm: "PLAY=Accepta OFF=Cancela"
     alarm: "SELECT=Accepta MENU=Cancela"
   </dest>
   <voice>
@@ -3166,7 +3170,6 @@
 <phrase>
   id: LANG_ID3_GENRE
   desc: in tag viewer
-  desc: in tag viewer
   user:
   <source>
     *: "[Genre]"
@@ -3208,7 +3211,6 @@
 </phrase>
 <phrase>
   id: LANG_ID3_BITRATE
-  desc: in tag viewer
   desc: in tag viewer
   user:
   <source>
@@ -3454,7 +3456,7 @@
     rtc: "Jun"
   </dest>
   <voice>
-    *: "Juny
+    *: "Juny"
   </voice>
 </phrase>
 <phrase>
@@ -4759,7 +4761,7 @@
 </phrase>
 <phrase>
   id: VOICE_EXT_TXT
-  desc: spoken only, for file extension
+  desc: DEPRECATED
   user:
   <source>
     *: ""
@@ -4768,7 +4770,7 @@
     *: ""
   </dest>
   <voice>
-    *: "text"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5909,7 +5911,6 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap:: "Japonès (SJIS)"
   </dest>
   <voice>
     *: "Japanese"
@@ -5994,6 +5995,7 @@
 <phrase>
   id: LANG_TAGCACHE_BUSY
   desc: when trying to shutdown and tagcache is committing
+  user:
   <source>
     *: "Database is not ready"
   </source>
@@ -6071,7 +6073,7 @@
   desc: Backlight behaviour setting
   user:
   <source>
-    *: "First Keypress Enables Backlight Only"
+    *: "First Buttonpress Enables Backlight Only"
   </source>
   <dest>
     *: "Primera tecla només activa il·luminació"
@@ -6481,6 +6483,7 @@
 <phrase>
   id: LANG_CROSSFEED_HF_CUTOFF
   desc: in crossfeed settings
+  user:
   <source>
     *: none
     swcodec: "High-Frequency Cutoff"
@@ -6566,7 +6569,8 @@
     lcd_non-mono: "Color Invàlid"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
@@ -7112,6 +7116,7 @@
 <phrase>
   id: LANG_CROSSFEED_CROSS_GAIN
   desc: in crossfeed settings
+  user:
   <source>  
     *: none
     swcodec: "Cross Gain"
@@ -7169,7 +7174,8 @@
     lcd_color: "RGB: %02X%02X%02X"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_color: ""
   </voice>
 </phrase>
 <phrase>
@@ -7287,6 +7293,7 @@
 <phrase>
   id: LANG_CROSSFEED_HF_ATTENUATION
   desc: in crossfeed settings
+  user:
   <source>
     *: none
     swcodec: "High-Frequency Attenuation"
@@ -7643,6 +7650,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
   desc: AGC maximum gain in recording screen
+  user:
   <source>
     *: none
     agc: "AGC max. gain"
@@ -7727,6 +7735,7 @@
 <phrase>
   id: LANG_RECORD_AGC_PRESET
   desc: automatic gain control in record settings
+  user:
   <source>
     *: none
     agc: "Automatic Gain Control"
@@ -7847,18 +7856,22 @@
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PLAY/PAUSE to return)"
-    x5,m5: "Building database... %d found (Left to return)"
+    x5,m5: "Building database... %d found (LEFT to return)"
     h10,h10_5gb,e200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Construint Base de dades... %d trobats (OFF per tornar)"
     h100,h120,h300: "Construint Base de dades... %d trobats (STOP per tornar)"
     ipod*: "Construint Base de dades... %d trobats (PLAY/PAUSE per tornar)"
-    x5,m5: "Construint Base de dades... %d trobats (Left per tornar)"
+    x5,m5: "Construint Base de dades... %d trobats (LEFT per tornar)"
     h10,h10_5gb,e200: "Construint Base de dades... %d trobats (PREV per tornar)"
   </dest>
   <voice>
     *: "entries trobats for database"
+    h100,h120,h300: ""
+    ipod*: ""
+    x5,m5: ""
+    h10,h10_5gb,e200: ""
   </voice>
 </phrase>
 <phrase>
@@ -7906,6 +7919,7 @@
 <phrase>
   id: LANG_AGC_DJSET
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "DJ-Set (slow)"
@@ -8041,15 +8055,21 @@
   user:
   <source>
     *: none
-    recording: "The disk is full. Press STOP to continue."
+    recording: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "The disk is full. Press LEFT to continue."
   </source>
   <dest>
     *: none
-    recording: "El disc és ple. Prem STOP per continuar."
+    recording: "El disc és ple. Prem OFF per continuar."
+    h100,h120,h300: "El disc és ple. Prem STOP per continuar."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "El disc és ple. Prem LEFT per continuar."
   </dest>
   <voice>
     *: none
     recording: ""
+    h100,h120,h300: ""
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: ""
   </voice>
 </phrase>
 <phrase>
@@ -8185,6 +8205,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_SAFETY
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Safety (clip)"
@@ -8231,6 +8252,7 @@
 <phrase>
   id: LANG_FM_EUROPE
   desc: fm tuner region europe
+  user:
   <source>
     *: none
     radio: "Europe"
@@ -8716,6 +8738,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_MEDIUM
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Medium"
@@ -8822,6 +8845,7 @@
 <phrase>
   id: LANG_RANDOM
   desc: random folder
+  user:
   <source>
     *: "Random"
   </source>
@@ -8849,6 +8873,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_NEWFILESTP
   desc: trigger types
+  user:
   <source>
     *: none
     recording: "New file"
@@ -8994,12 +9019,10 @@
   desc: displayed when key lock is turned off
   user:
   <source>
-    *: "Keylock is OFF"
-    player: "Key Lock OFF"
+    *: "Buttons Unlocked"
   </source>
   <dest>
     *: "Desbloquejat"
-    player: "Desbloquejat"
   </dest>
   <voice>
     *: ""
@@ -9008,6 +9031,7 @@
 <phrase>
   id: LANG_AGC_LIVE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Live (slow)"
@@ -9106,6 +9130,7 @@
 <phrase>
   id: LANG_AGC_VOICE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Voice (fast)"
@@ -9170,6 +9195,7 @@
 <phrase>
   id: LANG_SPLIT_SIZE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Filesize"
@@ -9245,6 +9271,7 @@
 <phrase>
   id: LANG_AGC_MEDIUM
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Medium"
@@ -9295,6 +9322,7 @@
 <phrase>
   id: LANG_AGC_SAFETY
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Safety (clip)"
@@ -9387,6 +9415,7 @@
 <phrase>
   id: LANG_SPLIT_MEASURE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Measure"
@@ -9431,6 +9460,7 @@
 <phrase>
   id: LANG_FM_KOREA
   desc: fm region korea
+  user:
   <source>
     *: none
     radio: "Korea"
@@ -9478,6 +9508,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_DJSET
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "DJ-Set (slow)"
@@ -9528,6 +9559,7 @@
 <phrase>
   id: LANG_FM_US
   desc: fm region us / canada
+  user:
   <source>
     *: none
     radio: "US / Canada"
@@ -9578,6 +9610,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_PRESET
   desc: automatic gain control in recording screen
+  user:
   <source>
     *: none
     agc: "AGC"
@@ -9594,6 +9627,7 @@
 <phrase>
   id: LANG_FM_REGION
   desc: fm tuner region setting
+  user:
   <source>
     *: none
     radio: "Region"
@@ -9672,6 +9706,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_STOP
   desc: trigger types
+  user:
   <source>
     *: none
     recording: "Stop"
@@ -9688,6 +9723,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_VOICE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Voice (fast)"
@@ -9735,6 +9771,7 @@
 <phrase>
   id: LANG_SPLIT_TIME
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Time"
@@ -9934,6 +9971,7 @@
 <phrase>
   id: LANG_SPLIT_TYPE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "What to do when Splitting"
@@ -9964,6 +10002,7 @@
 <phrase>
   id: LANG_SYSFONT_SPLIT_SIZE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Filesize"
@@ -10025,6 +10064,7 @@
 <phrase>
   id: LANG_FM_JAPAN
   desc: fm region japan
+  user:
   <source>
     *: none
     radio: "Japan"
@@ -10162,6 +10202,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_LIVE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Live (slow)"
@@ -10248,6 +10289,7 @@
 <phrase>
   id: LANG_RECORD_AGC_CLIPTIME
   desc: in record settings
+  user:
   <source>
     *: none
     agc: "AGC clip time"
@@ -10396,12 +10438,10 @@
   desc: displayed when key lock is on
   user:
   <source>
-    *: "Keylock is ON"
-    player: "Key Lock ON"
+    *: "Buttons Locked"
   </source>
   <dest>
     *: "Bloquejat"
-    player: "Bloquejat"
   </dest>
   <voice>
     *: ""
@@ -10523,11 +10563,11 @@
   user:
   <source>
     *: none
-    hold_button: "Backlight (On Hold Key)"
+    hold_button: "Backlight on Hold"
   </source>
   <dest>
     *: none
-    hold_button: "Llum (Quan Bloquejat)"
+    hold_button: "Llum quan Bloquejat"
   </dest>
   <voice>
     *: none
@@ -10669,6 +10709,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_TYPE
   desc: in recording trigger menu
+  user:
   <source>
     *: none
     recording: "Trigtype"
@@ -10721,7 +10762,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Show filename extensions"
+    *: "Show Filename Extensions"
   </source>
   <dest>
     *: "Mostrar les extensions dels fitxers"
@@ -10735,7 +10776,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Only when viewing all types"
+    *: "Only When Viewing All Types"
   </source>
   <dest>
     *: "Només quan es mostres tots els tipus"
@@ -10749,12 +10790,213 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Only unknown types"
+    *: "Only Unknown Types"
   </source>
   <dest>
     *: "Només els tipus desconeguts"
   </dest>
   <voice>
     *: "Only unknown types"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PM_UNITS_PER_TICK
+  desc: spoken only, peak meter release unit
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "unitats per tic"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    usbstack: "USB Stack"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Stack USB"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Stack USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNTER
+  desc: in settings, for recording peak meter
+  user: 
+  <source>
+    *: none
+    recording: "Clip Counter"
+  </source>
+  <dest>
+    *: none
+    recording: "Comptador de Saturació"
+  </dest>
+  <voice>
+    *: none
+    recording: "Comptador de Saturació"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_AM
+  desc: spoken only, for wall clock announce
+  user: 
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "A M"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_HOST
+  desc: in usbstack settings
+  user: 
+  <source>
+    *: none
+    usbstack: "Host"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Host"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Host"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OH
+  desc: spoken only, for wall clock announce
+  user: 
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "oh"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_MODE
+  desc: in usbstack settings
+  user: 
+  <source>
+    *: none
+    usbstack: "USB Stack Mode"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Mode USB Stack"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Mode USB Stack"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE
+  desc: in usbstack settings
+  user: 
+  <source>
+    *: none
+    usbstack: "Device"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Dispositiu"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Dispositiu"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PM
+  desc: spoken only, for wall clock announce
+  user: 
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "P M"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE_DRIVER
+  desc: in usbstack settings
+  user: 
+  <source>
+    *: none
+    usbstack: "Device Driver"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Controlador de Dispositiu"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Controlador de Dispositiu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNT
+  desc: in recording GUI, for recording peak meter. MAX 5 characters!
+  user: 
+  <source>
+    *: none
+    recording: "CLIP:"
+  </source>
+  <dest>
+    *: none
+    recording: "SAT:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OCLOCK
+  desc: spoken only, for wall clock announce
+  user: 
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "en punt"
   </voice>
 </phrase>
