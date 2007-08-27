@@ -11165,7 +11165,8 @@
     usbstack: "USB Stack"
   </source>
   <dest>
-    *: "USB Stack"
+    *: none
+    usbstack: "USB Stack"
   </dest>
   <voice>
     *: none

@@ -31,7 +31,6 @@ struct usb_device_driver {
     void (*suspend)(void);
     void (*resume)(void);
     void (*speed)(enum usb_device_speed speed);
-    struct usb_descriptors* descriptors;
     void* data; /* used to store controller specific ops struct */
 };
 
