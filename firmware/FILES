@@ -13,9 +13,13 @@ drivers/*.[chS]
 drivers/audio/*.[chS]
 drivers/rtc/*.[chS]
 drivers/tuner/*.[chS]
+drivers/usb/*.[ch]
 export/*.h
 include/*.h
 include/sys/*.h
+usbstack/*.h
+usbstack/core/*.c
+usbstack/drivers/device/*.[ch]
 target/arm/*.[chS]
 target/arm/archos/av300/*.[chS]
 target/arm/s3c2440/gigabeat-fx/*.[chS]
