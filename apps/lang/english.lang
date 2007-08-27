@@ -11156,3 +11156,73 @@
     recording: ""
   </voice>
 </phrase>
+<phrase>
+  id: LANG_USBSTACK
+  desc: in settings_menu
+  user:
+  <source>
+    *: "USB Stack"
+  </source>
+  <dest>
+    *: "USB Stack"
+  </dest>
+  <voice>
+    *: "USB Stack"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_MODE
+  desc: in usbstack settings
+  user:
+  <source>
+    *: "USB Stack Mode"
+  </source>
+  <dest>
+    *: "USB Stack Mode"
+  </dest>
+  <voice>
+    *: "USB Stack Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE
+  desc: in usbstack settings
+  user:
+  <source>
+    *: "Device"
+  </source>
+  <dest>
+    *: "Device"
+  </dest>
+  <voice>
+    *: "Device"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_HOST
+  desc: in usbstack settings
+  user:
+  <source>
+    *: "Host"
+  </source>
+  <dest>
+    *: "Host"
+  </dest>
+  <voice>
+    *: "Host"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE_DRIVER
+  desc: in usbstack settings
+  user:
+  <source>
+    *: "Device Driver"
+  </source>
+  <dest>
+    *: "Device Driver"
+  </dest>
+  <voice>
+    *: "Device Driver"
+  </voice>
+</phrase>

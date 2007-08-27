@@ -101,6 +101,7 @@ drivers/dac.c
 drivers/serial.c
 #endif /* SIMULATOR */
 
+
 /* Storage */
 #ifndef SIMULATOR
 #ifdef HAVE_MMC
@@ -221,6 +222,18 @@ drivers/audio/mas35xx.c
 #endif /* defined(HAVE_*) */
 #endif /* SIMULATOR */
 
+/* USB Stack */
+#if !defined(SIMULATOR)
+#ifdef HAVE_USBSTACK
+usbstack/core/core.c
+usbstack/core/epsetup.c
+usbstack/core/utils.c
+usbstack/core/config.c
+usbstack/drivers/device/usb_serial.c
+usbstack/drivers/device/usb_storage.c
+#endif
+#endif
+
 /* USBOTG */
 #if !defined(SIMULATOR)
 #if CONFIG_USBOTG == USBOTG_ISP1362
@@ -230,7 +243,7 @@ drivers/isp1362.c
 #if CONFIG_USBOTG == USBOTG_M5636
 drivers/m5636.c
 #elif CONFIG_USBOTG == USBOTG_ARC
-drivers/arcotg_udc.c
+drivers/usb/arcotg_dcd.c
 #endif /* CONFIG_USBOTG */
 #endif /* !defined(BOOTLOADER) */
 #endif /* !defined(SIMULATOR) */

@@ -748,6 +748,10 @@ struct user_settings
     int list_accel_start_delay; /* ms before we start increaseing step size */
     int list_accel_wait; /* ms between increases */
 #endif
+#ifdef HAVE_USBSTACK
+    int usb_stack_mode;	/* device or host */
+    unsigned char usb_stack_device_driver[32]; /* usb device driver to load */
+#endif
 };
 
 /** global variables **/

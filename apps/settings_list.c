@@ -47,6 +47,9 @@
 #include "radio.h"
 #endif
 
+#ifdef HAVE_USBSTACK
+#include "usbstack.h"
+#endif
 
 #define NVRAM(bytes) (bytes<<F_NVRAM_MASK_SHIFT)
 /** NOTE: NVRAM_CONFIG_VERSION is in settings_list.h
@@ -1260,6 +1263,14 @@ const struct settings_list settings[] = {
                 3, "list_accel_wait", UNIT_SEC, 1, 10, 1, 
                 scanaccel_formatter, scanaccel_getlang, NULL),
 #endif /* HAVE_SCROLLWHEEL */
+#ifdef HAVE_USBSTACK
+    CHOICE_SETTING(0, usb_stack_mode, LANG_USBSTACK_MODE, 0, "usb mode",
+                 "device,host",
+                 usb_controller_select,
+                 2, ID2P(LANG_USBSTACK_DEVICE), ID2P(LANG_USBSTACK_HOST)),
+    FILENAME_SETTING(0, usb_stack_device_driver, "usb device driver",
+                 "storage", NULL, NULL, 32),                 
+#endif /* HAVE_USBSTACK */               
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

@@ -37,8 +37,6 @@
 
 #include "cpu.h"
 
-#define ETIMEDOUT               1
-
 #define USB_MAX_ENDPOINTS       8
 #define USB_MAX_PIPES           (USB_MAX_ENDPOINTS*2)
 #define USB_MAX_CTRL_PAYLOAD    64
@@ -99,7 +97,7 @@
 #define  USB_FRINDEX_MASKS                      (0x3fff)
 
 /* USB CMD  Register Bit Masks */
-#define  USB_CMD_RUN_STOP                       (0x00000001)
+#define  USB_CMD_RUN                            (0x00000001)
 #define  USB_CMD_CTRL_RESET                     (0x00000002)
 #define  USB_CMD_PERIODIC_SCHEDULE_EN           (0x00000010)
 #define  USB_CMD_ASYNC_SCHEDULE_EN              (0x00000020)

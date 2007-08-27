@@ -35,13 +35,20 @@ extern void clickwheel_int(void);
 extern void microsd_int(void);
 #endif
 
+#ifdef HAVE_USBSTACK
+#include "usbstack/core.h"
+#endif
+
 void irq(void)
 {
     if(CURRENT_CORE == CPU)
     {
-        if (CPU_INT_STAT & TIMER1_MASK)
+        if (CPU_INT_STAT & TIMER1_MASK) {
             TIMER1();
-        else if (CPU_INT_STAT & TIMER2_MASK)
+#ifdef HAVE_USBSTACK
+            usb_stack_irq();
+#endif
+        } else if (CPU_INT_STAT & TIMER2_MASK)
             TIMER2();
 #if defined(IPOD_MINI) /* Mini 1st gen only, mini 2nd gen uses iPod 4G code */
         else if (CPU_HI_INT_STAT & GPIO_MASK)
