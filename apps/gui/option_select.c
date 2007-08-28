@@ -452,35 +452,42 @@ bool option_screen(struct settings_list *setting,
     Compatability functions 
 *******************************************************/
 #define MAX_OPTIONS 32
+const struct opt_items *set_option_options;
+void set_option_formatter(char* buf, size_t size, int item, const char* unit)
+{
+    (void)unit;
+    const unsigned char *text = set_option_options[item].string;
+    snprintf(buf, size, "%s", P2STR(text));
+}
+long set_option_get_talk_id(int value)
+{
+    return set_option_options[value].voice_id;
+}
 bool set_option(const char* string, void* variable, enum optiontype type,
                 const struct opt_items* options, 
                 int numoptions, void (*function)(int))
 {
     int temp;
-    char *strings[MAX_OPTIONS];
-    struct choice_setting data;
     struct settings_list item;
-    for (temp=0; temp<MAX_OPTIONS && temp<numoptions; temp++)
-        strings[temp] = (char*)options[temp].string;
-    if (type == BOOL)
-    {
-        temp = *(bool*)variable? 1: 0;
-        item.setting = &temp;
-    }
-    else 
-        item.setting = variable;
-    item.flags = F_CHOICE_SETTING|F_T_INT;
+    struct int_setting data = {
+        function, UNIT_INT, 0, numoptions-1, 1,
+        set_option_formatter, set_option_get_talk_id
+    };
+    set_option_options = options;
+    item.int_setting = &data;
+    item.flags = F_INT_SETTING|F_T_INT;
     item.lang_id = -1;
     item.cfg_vals = (char*)string;
-    data.count = numoptions<MAX_OPTIONS ? numoptions: MAX_OPTIONS;
-    data.desc = (void*)strings; /* shutup gcc... */
-    data.option_callback = function;
-    item.choice_setting = &data;
+    item.setting = &temp;
+    if (type == BOOL)
+        temp = *(bool*)variable? 1: 0;
+    else 
+        temp = *(int*)variable;
     option_screen(&item, false, NULL);
     if (type == BOOL)
-    {
         *(bool*)variable = (temp == 1? true: false);
-    }
+    else
+        *(int*)variable = temp;
     return false;
 }
 
