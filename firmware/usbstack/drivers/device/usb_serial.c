@@ -81,7 +81,7 @@ static struct usb_interface_descriptor serial_bulk_interface_desc = {
     .iInterface =           GS_DATA_STR_ID,
 };
 
-static struct usb_endpoint_descriptor serial_fullspeed_in_desc = {
+static struct usb_endpoint_descriptor serial_fs_in_desc = {
     .bLength =              USB_DT_ENDPOINT_SIZE,
     .bDescriptorType =      USB_DT_ENDPOINT,
     .bEndpointAddress =     USB_DIR_IN,
@@ -89,7 +89,7 @@ static struct usb_endpoint_descriptor serial_fullspeed_in_desc = {
     .wMaxPacketSize =       8,
 };
 
-static struct usb_endpoint_descriptor serial_fullspeed_out_desc = {
+static struct usb_endpoint_descriptor serial_fs_out_desc = {
     .bLength =              USB_DT_ENDPOINT_SIZE,
     .bDescriptorType =      USB_DT_ENDPOINT,
     .bEndpointAddress =     USB_DIR_OUT,
@@ -110,10 +110,34 @@ static struct usb_qualifier_descriptor serial_qualifier_desc = {
     .bNumConfigurations =  1,
 };
 
-struct usb_descriptor_header *serial_bulk_fullspeed_function[] = {
+struct usb_descriptor_header *serial_fs_function[] = {
     (struct usb_descriptor_header *) &serial_bulk_interface_desc,
-    (struct usb_descriptor_header *) &serial_fullspeed_in_desc,
-    (struct usb_descriptor_header *) &serial_fullspeed_out_desc,
+    (struct usb_descriptor_header *) &serial_fs_in_desc,
+    (struct usb_descriptor_header *) &serial_fs_out_desc,
+    NULL,
+};
+
+/* USB 2.0 */
+static struct usb_endpoint_descriptor serial_hs_in_desc = {
+    .bLength =              USB_DT_ENDPOINT_SIZE,
+    .bDescriptorType =      USB_DT_ENDPOINT,
+    .bEndpointAddress =     USB_DIR_IN,
+    .bmAttributes =         USB_ENDPOINT_XFER_BULK,
+    .wMaxPacketSize =       512,
+};
+
+static struct usb_endpoint_descriptor serial_hs_out_desc = {
+    .bLength =              USB_DT_ENDPOINT_SIZE,
+    .bDescriptorType =      USB_DT_ENDPOINT,
+    .bEndpointAddress =     USB_DIR_IN,
+    .bmAttributes =         USB_ENDPOINT_XFER_BULK,
+    .wMaxPacketSize =       512,
+};
+
+struct usb_descriptor_header *serial_hs_function[] = {
+    (struct usb_descriptor_header *) &serial_bulk_interface_desc,
+    (struct usb_descriptor_header *) &serial_hs_in_desc,
+    (struct usb_descriptor_header *) &serial_hs_out_desc,
     NULL,
 };
 
@@ -126,11 +150,11 @@ struct usb_response res;
 static int config_buf(uint8_t *buf, uint8_t type, unsigned index);
 static int set_config(int config);
 
-
 struct device {
     struct usb_ep* in;
     struct usb_ep* out;
     uint32_t used_config;
+    struct usb_descriptor_header** descriptors;
 };
 
 static struct device dev;
@@ -153,14 +177,14 @@ void usb_serial_driver_bind(void* controler_ops)
     /* serach and asign endpoints */
     usb_ep_autoconfig_reset();
 
-    dev.in = usb_ep_autoconfig(&serial_fullspeed_in_desc);
+    dev.in = usb_ep_autoconfig(&serial_fs_in_desc);
     if (!dev.in) {
         goto autoconf_fail;
     }
     dev.in->claimed = true;
     logf("usb serial: in: %s", dev.in->name);
 
-    dev.out = usb_ep_autoconfig(&serial_fullspeed_out_desc);
+    dev.out = usb_ep_autoconfig(&serial_fs_out_desc);
     if (!dev.out) {
         goto autoconf_fail;
     }
@@ -180,7 +204,7 @@ void usb_serial_driver_bind(void* controler_ops)
     return;
 
 autoconf_fail:
-    logf("failed to find endpoiunts");
+    logf("failed to find endpoints");
 }
 
 int usb_serial_driver_request(struct usb_ctrlrequest* request)
@@ -252,15 +276,13 @@ int usb_serial_driver_request(struct usb_ctrlrequest* request)
 void usb_serial_driver_speed(enum usb_device_speed speed)
 {
     switch (speed) {
-    case USB_SPEED_LOW:
-    case USB_SPEED_FULL:
-        logf("usb serial: using fullspeed");
-        break;
     case USB_SPEED_HIGH:
         logf("usb serial: using highspeed");
+        dev.descriptors = serial_hs_function;
         break;
     default:
-        logf("speed: hmm");
+        logf("usb serial: using fullspeed");
+        dev.descriptors = serial_fs_function;
         break;
     }
 }
@@ -274,7 +296,7 @@ static int config_buf(uint8_t *buf, uint8_t type, unsigned index)
 
     /* TODO check index*/
 
-    len = usb_stack_configdesc(&serial_bulk_config_desc, buf, BUFFER_SIZE, serial_bulk_fullspeed_function);
+    len = usb_stack_configdesc(&serial_bulk_config_desc, buf, BUFFER_SIZE, dev.descriptors);
     if (len < 0) {
         return len;
     }
@@ -288,9 +310,9 @@ static int set_config(int config)
 
     /* enable endpoints */
     logf("setup %s", dev.in->name);
-    ops->enable(dev.in);
+    ops->enable(dev.in, (struct usb_endpoint_descriptor*)dev.descriptors[1]);
     logf("setup %s", dev.out->name);
-    ops->enable(dev.out);
+    ops->enable(dev.out, (struct usb_endpoint_descriptor*)dev.descriptors[2]);
 
     /* store config */
     logf("using config %d", config);

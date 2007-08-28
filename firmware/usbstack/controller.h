@@ -38,14 +38,14 @@ struct usb_controller {
 
 struct usb_dcd_controller_ops {
     /* endpoint management */
-    int (*enable)(struct usb_ep* ep);
+    int (*enable)(struct usb_ep* ep, struct usb_endpoint_descriptor* desc);
     int (*disable)(struct usb_ep* ep);
     int (*set_halt)(struct usb_ep* ep, bool hald);
-    
+
     /* transmitting */
     int (*send)(struct usb_ep* ep, struct usb_response* req);
     int (*receive)(struct usb_ep* ep, struct usb_response* res);
-    
+
     /* ep0 */
     struct usb_ep* ep0;
 };

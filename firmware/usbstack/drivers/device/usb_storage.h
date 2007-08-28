@@ -27,5 +27,6 @@ void usb_storage_driver_init(void);
 
 void usb_storage_driver_bind(void* controller_ops);
 int usb_storage_driver_request(struct usb_ctrlrequest* req);
+void usb_storage_driver_speed(enum usb_device_speed speed);
 
 #endif /*_STORGAGE_H_*/

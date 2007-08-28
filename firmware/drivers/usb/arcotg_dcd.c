@@ -197,12 +197,6 @@ void usb_arcotg_dcd_start(void)
 {
     logf("start");
 
-    if (arcotg_dcd.device_driver != NULL) {
-        logf("YEEEEEEESSSSSSS");
-    } else {
-        logf("NOOOOOO");
-    }
-
     /* clear stopped bit */
     dcd_controller.stopped = false;
 
@@ -461,7 +455,7 @@ static void reset_int(void)
 /*-------------------------------------------------------------------------*/
 /* usb controller ops */
 
-int usb_arcotg_dcd_enable(struct usb_ep* ep)
+int usb_arcotg_dcd_enable(struct usb_ep* ep, struct usb_endpoint_descriptor* desc)
 {
     unsigned short max = 0;
     unsigned char mult = 0, zlt = 0;
@@ -473,14 +467,12 @@ int usb_arcotg_dcd_enable(struct usb_ep* ep)
         return -EINVAL;
     }
 
-    logf("ahhh %d", ep->desc->wMaxPacketSize);
-    max = ep->desc->wMaxPacketSize;
+    max = desc->wMaxPacketSize;
     retval = -EINVAL;
 
     /* check the max package size validate for this endpoint */
-    /* Refer to USB2.0 spec table 9-13,
-     */
-    switch (ep->desc->bmAttributes & 0x03) {
+    /* Refer to USB2.0 spec table 9-13. */
+    switch (desc->bmAttributes & 0x03) {
     case USB_ENDPOINT_XFER_BULK:
         zlt = 1;
         break;
@@ -493,6 +485,7 @@ int usb_arcotg_dcd_enable(struct usb_ep* ep)
         break;
 
     case USB_ENDPOINT_XFER_CONTROL:
+        zlt = 1;
         break;
     }
 
@@ -599,28 +592,32 @@ int usb_arcotg_dcd_enable(struct usb_ep* ep)
     +    }
 #endif
 
+    /* set address of used ep in desc */
+    desc->bEndpointAddress |= ep->ep_num;
+
     /* here initialize variable of ep */
     ep->maxpacket = max;
+    ep->desc = desc;
 
     /* hardware special operation */
 
     /* Init EPx Queue Head (Ep Capabilites field in QH
      * according to max, zlt, mult) */
     qh_init(ep->ep_num,
-            (ep->desc->bEndpointAddress & USB_DIR_IN) ? USB_RECV : USB_SEND, 
-            (unsigned char) (ep->desc->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK),
+            (desc->bEndpointAddress & USB_DIR_IN) ? USB_RECV : USB_SEND, 
+            (unsigned char) (desc->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK),
             max, zlt, mult);
 
     /* Init endpoint x at here */
-    ep_setup(ep->ep_num, 
-            (unsigned char)((ep->desc->bEndpointAddress & USB_DIR_IN) ? USB_RECV : USB_SEND),
-            (unsigned char)(ep->desc->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK));
+    ep_setup(ep->ep_num,    		
+            (unsigned char)(desc->bEndpointAddress & USB_DIR_IN) ? USB_RECV : USB_SEND,
+            (unsigned char)(desc->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK));
 
     /* Now HW will be NAKing transfers to that EP,
      * until a buffer is queued to it. */
 
     retval = 0;
-    switch (ep->desc->bmAttributes & 0x03) {
+    switch (desc->bmAttributes & 0x03) {
     case USB_ENDPOINT_XFER_BULK:
         val = "bulk";
         break;
@@ -638,8 +635,8 @@ int usb_arcotg_dcd_enable(struct usb_ep* ep)
     logf("ep num %d", (int)ep->ep_num);
 
     logf("enabled %s (ep%d%s-%s)", ep->name,
-         ep->desc->bEndpointAddress & 0x0f,
-        (ep->desc->bEndpointAddress & USB_DIR_IN) ? "in" : "out", val);
+         desc->bEndpointAddress & 0x0f,
+        (desc->bEndpointAddress & USB_DIR_IN) ? "in" : "out", val);
     logf(" maxpacket %d", max);
 
     return retval;

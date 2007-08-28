@@ -31,16 +31,8 @@ struct usb_device_driver usb_storage_driver = {
     .request =      usb_storage_driver_request,
     .suspend =      NULL,
     .resume =       NULL,
-    .speed =        NULL,
+    .speed =        usb_storage_driver_speed,
 };
-
-struct device {
-    struct usb_ep* in;
-    struct usb_ep* out;
-    struct usb_ep* intr;
-};
-
-static struct device dev;
 
 /*-------------------------------------------------------------------------*/
 
@@ -92,8 +84,31 @@ static struct usb_interface_descriptor storage_interface_desc = {
     .iInterface =           0,
 };
 
-/* endpoint I -> bulk in */
-static struct usb_endpoint_descriptor storage_bulk_in_desc = {
+static struct usb_endpoint_descriptor storage_fs_bulk_in_desc = {
+    .bLength =              USB_DT_ENDPOINT_SIZE,
+    .bDescriptorType =      USB_DT_ENDPOINT,
+    .bEndpointAddress =     USB_DIR_IN,
+    .bmAttributes =         USB_ENDPOINT_XFER_BULK,
+    .wMaxPacketSize =       64,
+};
+
+static struct usb_endpoint_descriptor storage_fs_bulk_out_desc = {
+    .bLength =              USB_DT_ENDPOINT_SIZE,
+    .bDescriptorType =      USB_DT_ENDPOINT,
+    .bEndpointAddress =     USB_DIR_OUT,
+    .bmAttributes =         USB_ENDPOINT_XFER_BULK,
+    .wMaxPacketSize =       64,
+};
+
+struct usb_descriptor_header *storage_fs_function[] = {
+    (struct usb_descriptor_header *) &storage_interface_desc,
+    (struct usb_descriptor_header *) &storage_fs_bulk_in_desc,
+    (struct usb_descriptor_header *) &storage_fs_bulk_out_desc,
+    NULL,
+};
+
+/* USB 2.0 */
+static struct usb_endpoint_descriptor storage_hs_bulk_in_desc = {
     .bLength =              USB_DT_ENDPOINT_SIZE,
     .bDescriptorType =      USB_DT_ENDPOINT,
     .bEndpointAddress =     USB_DIR_IN,
@@ -101,8 +116,7 @@ static struct usb_endpoint_descriptor storage_bulk_in_desc = {
     .wMaxPacketSize =       512,
 };
 
-/* endpoint II -> bulk out */
-static struct usb_endpoint_descriptor storage_bulk_out_desc = {
+static struct usb_endpoint_descriptor storage_hs_bulk_out_desc = {
     .bLength =              USB_DT_ENDPOINT_SIZE,
     .bDescriptorType =      USB_DT_ENDPOINT,
     .bEndpointAddress =     USB_DIR_OUT,
@@ -110,10 +124,10 @@ static struct usb_endpoint_descriptor storage_bulk_out_desc = {
     .wMaxPacketSize =       512,
 };
 
-struct usb_descriptor_header *storage_fullspeed_function[] = {
+struct usb_descriptor_header *storage_hs_function[] = {
     (struct usb_descriptor_header *) &storage_interface_desc,
-    (struct usb_descriptor_header *) &storage_bulk_in_desc,
-    (struct usb_descriptor_header *) &storage_bulk_out_desc,
+    (struct usb_descriptor_header *) &storage_hs_bulk_in_desc,
+    (struct usb_descriptor_header *) &storage_hs_bulk_out_desc,
     NULL,
 };
 
@@ -125,6 +139,15 @@ struct usb_response res;
 /* helper functions */
 static int config_buf(uint8_t *buf, uint8_t type, unsigned index);
 static int set_config(int config);
+
+struct device {
+    struct usb_ep* in;
+    struct usb_ep* out;
+    struct usb_ep* intr;
+    struct usb_descriptor_header** descriptors;
+};
+
+static struct device dev;
 
 /*-------------------------------------------------------------------------*/
 
@@ -144,14 +167,14 @@ void usb_storage_driver_bind(void* controler_ops)
     /* serach and asign endpoints */
     usb_ep_autoconfig_reset();
 
-    dev.in = usb_ep_autoconfig(&storage_bulk_in_desc);
+    dev.in = usb_ep_autoconfig(&storage_fs_bulk_in_desc);
     if (!dev.in) {
         goto autoconf_fail;
     }
     dev.in->claimed = true;
     logf("usb storage: in: %s", dev.in->name);
 
-    dev.out = usb_ep_autoconfig(&storage_bulk_out_desc);
+    dev.out = usb_ep_autoconfig(&storage_fs_bulk_out_desc);
     if (!dev.out) {
         goto autoconf_fail;
     }
@@ -234,6 +257,20 @@ int usb_storage_driver_request(struct usb_ctrlrequest* request)
     return ret;
 }
 
+void usb_storage_driver_speed(enum usb_device_speed speed)
+{
+    switch (speed) {
+    case USB_SPEED_HIGH:
+        logf("usb storage: using highspeed");
+        dev.descriptors = storage_hs_function;
+        break;
+    default:
+        logf("usb storage: using fullspeed");
+        dev.descriptors = storage_fs_function;
+        break;
+    }
+}
+
 /*-------------------------------------------------------------------------*/
 /* S/GET CONFIGURATION helpers */
 
@@ -241,12 +278,8 @@ static int config_buf(uint8_t *buf, uint8_t type, unsigned index)
 {
     int len;
 
-    /* only one configuration */
-    if (index != 0) {
-        return -EINVAL;
-    }
-
-    len = usb_stack_configdesc(&storage_config_desc, buf, BUFFER_SIZE, storage_fullspeed_function);
+    len = usb_stack_configdesc(&storage_config_desc, buf, BUFFER_SIZE, dev.descriptors);
+    logf("result %d", len);
     if (len < 0) {
         return len;
     }
@@ -258,9 +291,9 @@ static int set_config(int config)
 {
     /* enable endpoints */
     logf("setup %s", dev.in->name);
-    ops->enable(dev.in);
+    ops->enable(dev.in, (struct usb_endpoint_descriptor*)dev.descriptors[1]);
     logf("setup %s", dev.out->name);
-    ops->enable(dev.out);
+    ops->enable(dev.out, (struct usb_endpoint_descriptor*)dev.descriptors[2]);
 
     /* setup buffers */
 

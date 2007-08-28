@@ -164,23 +164,6 @@ static int ep_matches(struct usb_ep* ep, struct usb_endpoint_descriptor* desc)
     }
 
     /* MATCH!! */
-
-    /* report address */
-    desc->bEndpointAddress |= ep->ep_num;
-
-    /* report (variable) full speed bulk maxpacket */
-    if (type == USB_ENDPOINT_XFER_BULK) {
-        int size = max;
-
-        /* min() doesn't work on bitfields with gcc-3.5 */
-        if (size > 64) {
-            size = 64;
-        }
-        desc->wMaxPacketSize = size;
-    }
-
-    /* save desc in endpoint */
-    ep->desc = desc;
-
+    
     return 1;
 }

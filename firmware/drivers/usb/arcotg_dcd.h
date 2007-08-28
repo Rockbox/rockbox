@@ -146,7 +146,7 @@ void usb_arcotg_dcd_start(void);
 void usb_arcotg_dcd_stop(void);
 
 /* usb controller ops */
-int usb_arcotg_dcd_enable(struct usb_ep* ep);
+int usb_arcotg_dcd_enable(struct usb_ep* ep, struct usb_endpoint_descriptor* desc);
 int usb_arcotg_dcd_disable(struct usb_ep* ep);
 int usb_arcotg_dcd_set_halt(struct usb_ep* ep, bool halt);
 int usb_arcotg_dcd_send(struct usb_ep* ep, struct usb_response* request);
