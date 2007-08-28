@@ -221,6 +221,9 @@ static void init_tagcache(void)
 
         if (ret > 0)
         {
+#if CONFIG_CODEC == SWCODEC
+            /* hwcodec can't use voice here, as the database commit
+             * uses the audio buffer. */
             static long talked_tick = 0;
             if(talk_menus_enabled()
                && (talked_tick == 0
@@ -232,6 +235,7 @@ static void init_tagcache(void)
                 talk_id(VOICE_OF, true);
                 talk_number(tagcache_get_max_commit_step(), true);
             }
+#endif
 #ifdef HAVE_LCD_BITMAP
             gui_syncsplash(0, "%s [%d/%d]",
                 str(LANG_TAGCACHE_INIT), ret, 
