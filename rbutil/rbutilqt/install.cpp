@@ -98,7 +98,7 @@ void Install::accept()
     installer = new ZipInstaller(this);
     installer->setUrl(file);
     installer->setProxy(proxy);
-    installer->setLogSection("rockboxbase");
+    installer->setLogSection("Rockbox (Base)");
     if(!userSettings->value("defaults/cachedisable").toBool()
         && !ui.radioCurrent->isChecked()
         && !ui.checkBoxCache->isChecked())

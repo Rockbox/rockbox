@@ -461,7 +461,7 @@ bool RbUtilQt::installAuto()
     ZipInstaller* installer = new ZipInstaller(this);
     installer->setUrl(file);
     installer->setProxy(proxy());
-    installer->setLogSection("rockboxbase");
+    installer->setLogSection("Rockbox (Base)");
     installer->setLogVersion(myversion);
     if(!userSettings->value("defaults/cachedisable").toBool())
         installer->setCache(userSettings->value("defaults/cachepath", QDir::tempPath()).toString());
