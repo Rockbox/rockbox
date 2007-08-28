@@ -160,7 +160,7 @@ void usb_storage_driver_init(void)
 /*-------------------------------------------------------------------------*/
 /* device driver ops */
 
-void usb_storage_driver_bind(void* controler_ops)
+int usb_storage_driver_bind(void* controler_ops)
 {
     ops = controler_ops;
 
@@ -181,10 +181,11 @@ void usb_storage_driver_bind(void* controler_ops)
     dev.out->claimed = true;
     logf("usb storage: out: %s", dev.out->name);
 
-    return;
+    return 0;
 
 autoconf_fail:
     logf("failed to find endpoints");
+    return -EOPNOTSUPP;
 }
 
 int usb_storage_driver_request(struct usb_ctrlrequest* request)

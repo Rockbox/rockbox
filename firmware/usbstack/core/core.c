@@ -378,6 +378,8 @@ static void update_driver_names(unsigned char* result) {
 
 static void bind_device_driver(struct usb_device_driver* driver) {
 
+    int ret = 0;
+
     /* look if there is an old driver */
     if (usbcore.active_controller->device_driver != NULL) {
         usbcore.active_controller->device_driver->unbind();
@@ -387,7 +389,11 @@ static void bind_device_driver(struct usb_device_driver* driver) {
     usbcore.active_controller->device_driver = driver;
 
     /* init dirver */
-    driver->bind(usbcore.active_controller->controller_ops);
+    ret = driver->bind(usbcore.active_controller->controller_ops);
+
+    if (ret != 0) {
+        logf("binding of %s failed", driver->name);
+        usbcore.active_controller->device_driver = NULL;
+        usbcore.device_driver = NULL;
+    }
 }
-
-

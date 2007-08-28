@@ -25,7 +25,7 @@
  */
 struct usb_device_driver {
     const char* name;
-    void (*bind)(void* controller_ops);
+    int (*bind)(void* controller_ops);
     void (*unbind)(void);
     int (*request)(struct usb_ctrlrequest* req);
     void (*suspend)(void);

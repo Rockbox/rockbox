@@ -25,7 +25,7 @@
 /* register serial driver in usb stack */
 void usb_serial_driver_init(void);
 
-void usb_serial_driver_bind(void* controller_ops);
+int usb_serial_driver_bind(void* controller_ops);
 int usb_serial_driver_request(struct usb_ctrlrequest* req);
 void usb_serial_driver_speed(enum usb_device_speed speed);
 

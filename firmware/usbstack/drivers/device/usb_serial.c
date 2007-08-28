@@ -169,7 +169,7 @@ void usb_serial_driver_init(void)
 
 /*-------------------------------------------------------------------------*/
 
-void usb_serial_driver_bind(void* controler_ops)
+int usb_serial_driver_bind(void* controler_ops)
 {
     logf("usb serial: bind");
     ops = controler_ops;
@@ -201,10 +201,11 @@ void usb_serial_driver_bind(void* controler_ops)
     serial_debug_desc.bDebugInEndpoint = dev.in->ep_num;
     serial_debug_desc.bDebugOutEndpoint = dev.out->ep_num;
 
-    return;
+    return 0;
 
 autoconf_fail:
     logf("failed to find endpoints");
+    return -EOPNOTSUPP;
 }
 
 int usb_serial_driver_request(struct usb_ctrlrequest* request)
