@@ -32,7 +32,7 @@ class InstallTalkWindow : public QDialog
 {
     Q_OBJECT
     public:
-    	InstallTalkWindow(QWidget *parent = 0);
+        InstallTalkWindow(QWidget *parent = 0);
         void setUserSettings(QSettings*);
         void setDeviceSettings(QSettings*);
 
@@ -40,27 +40,16 @@ class InstallTalkWindow : public QDialog
         void accept(void);
 
     private slots:
-    	void browseFolder(void);
-    	void browseTTS(void);
-    	void browseEncoder(void);
-        
-    	void setTalkFolder(QString folder);
-    	void setTTSExec(QString path);
-    	void setEncoderExec(QString path);
-    	
-    	void setEncoderOptions(int index);
-    	void setTTSOptions(int index);
-    	void setEncoderOptions(QString options);
-    	void setTTSOptions(QString options);
-    	
+        void browseFolder(void);
+        void setTalkFolder(QString folder);
+
     private:
-    	TalkFileCreator* talkcreator;
+        TalkFileCreator* talkcreator;
         Ui::InstallTalkFrm ui;
         ProgressLoggerGui* logger;
         QSettings *devices;
         QSettings *userSettings;
 
 };
-
 
 #endif

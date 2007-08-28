@@ -4,6 +4,7 @@
         <file>gpl-2.0.html</file>
     </qresource>
     <qresource prefix="/icons" >
+        <file>icons/audio-input-microphone.png</file>
         <file>icons/bootloader_btn.png</file>
         <file>icons/dialog-error.png</file>
         <file>icons/dialog-information.png</file>

@@ -35,23 +35,13 @@ public:
     void setTTSexe(QString exe){m_TTSexec=exe;}
     void setEncexe(QString exe){m_EncExec=exe;}
 
-    void setSupportedTTS(QStringList list) {m_supportedTTS=list;}
-    void setSupportedTTSOptions(QStringList list) {m_supportedTTSOpts=list;}
-    void setSupportedTTSTemplates(QStringList list) {m_supportedTTSTemplates=list;}
-               
-    QStringList getSupportedTTS(){return m_supportedTTS;}
-    void setTTsType(QString tts);
-    QString getTTsOpts(QString ttsname);
+    void setTTsType(QString tts) { m_curTTS = tts; }
     void setTTsOpts(QString opts) {m_TTSOpts=opts;}
-
-    void setSupportedEnc(QStringList list) {m_supportedEnc=list;}
-    void setSupportedEncOptions(QStringList list) {m_supportedEncOpts=list;}
-    void setSupportedEncTemplates(QStringList list) {m_supportedEncTemplates=list;}
+    void setTTsTemplate(QString t) { m_curTTSTemplate = t; }
     
-    QStringList getSupportedEnc(){return m_supportedEnc;}
-    void setEncType(QString enc);
-    QString getEncOpts(QString encname);
+    void setEncType(QString enc) { m_curEnc = enc; }
     void setEncOpts(QString opts) {m_EncOpts=opts;}
+    void setEncTemplate(QString t) { m_curEncTemplate = t; }
 
     void setDir(QString dir){m_dir = dir; }
     void setMountPoint(QString mountpoint) {m_mountpoint =mountpoint; }
@@ -78,17 +68,11 @@ private:
     QString m_mountpoint;
     QString m_curTTS;
     QString m_TTSexec;
-    QStringList m_supportedTTS;
-    QStringList m_supportedTTSOpts;
-    QStringList m_supportedTTSTemplates;
     QString m_TTSOpts;
     QString m_curTTSTemplate;
 
     QString m_curEnc;
     QString m_EncExec;
-    QStringList m_supportedEnc;
-    QStringList m_supportedEncOpts;
-    QStringList m_supportedEncTemplates;
     QString m_EncOpts;
     QString m_curEncTemplate;
     

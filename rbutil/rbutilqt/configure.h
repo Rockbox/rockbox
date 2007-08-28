@@ -63,6 +63,9 @@ class Config : public QDialog
         void setMountpoint(QString);
         void setCache(QString);
         void cacheClear(void);
+        void browseTts(void);
+        void updateTtsOpts(int);
+        void updateEncOpts(int);
 };
 
 #endif

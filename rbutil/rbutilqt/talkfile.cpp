@@ -24,19 +24,6 @@ TalkFileCreator::TalkFileCreator(QObject* parent): QObject(parent)
    
 }
 
-void TalkFileCreator::setTTsType(QString tts)
-{
-	m_curTTS = tts;
-	int index = m_supportedTTS.indexOf(m_curTTS);
-	m_curTTSTemplate = m_supportedTTSTemplates.at(index);
-}
-
-void TalkFileCreator::setEncType(QString enc)
-{
-	m_curEnc = enc;
-	int index = m_supportedEnc.indexOf(m_curEnc);
-	m_curEncTemplate = m_supportedEncTemplates.at(index);
-}
 
 bool TalkFileCreator::initEncoder()
 {
@@ -203,17 +190,4 @@ bool TalkFileCreator::encode(QString input,QString output)
 
 }
 
-QString TalkFileCreator::getTTsOpts(QString ttsname)
-{
-    int index = m_supportedTTS.indexOf(ttsname);
-
-    return m_supportedTTSOpts.at(index);
-}
-
-QString TalkFileCreator::getEncOpts(QString encname)
-{
-    int index = m_supportedEnc.indexOf(encname);
-
-    return m_supportedEncOpts.at(index);
-}
 

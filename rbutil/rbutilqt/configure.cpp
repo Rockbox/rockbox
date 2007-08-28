@@ -68,6 +68,10 @@ Config::Config(QWidget *parent) : QDialog(parent)
     connect(ui.buttonAutodetect,SIGNAL(clicked()),this,SLOT(autodetect()));
     connect(ui.buttonCacheBrowse, SIGNAL(clicked()), this, SLOT(browseCache()));
     connect(ui.buttonCacheClear, SIGNAL(clicked()), this, SLOT(cacheClear()));
+    connect(ui.browseTts, SIGNAL(clicked()), this, SLOT(browseTts()));
+    connect(ui.comboEncoder, SIGNAL(currentIndexChanged(int)), this, SLOT(updateEncOpts(int)));
+    connect(ui.comboTts, SIGNAL(currentIndexChanged(int)), this, SLOT(updateTtsOpts(int)));
+
 
 }
 
@@ -118,6 +122,19 @@ void Config::accept()
         userSettings->setValue("defaults/cachepath", QDir::tempPath());
     userSettings->setValue("defaults/cachedisable", ui.cacheDisable->isChecked());
     userSettings->setValue("defaults/offline", ui.cacheOfflineMode->isChecked());
+
+    // tts settings
+    if(QFileInfo(ui.ttsExecutable->text()).isExecutable())
+        userSettings->setValue("ttsbin", ui.ttsExecutable->text());
+    userSettings->setValue("ttsopts", ui.ttsOptions->text());
+    if(QFileInfo(ui.encoderExecutable->text()).isExecutable())
+        userSettings->setValue("encbin", ui.encoderExecutable->text());
+    userSettings->setValue("ttsopts", ui.ttsOptions->text());
+    QString preset;
+    preset = ui.comboEncoder->itemData(ui.comboEncoder->currentIndex(), Qt::UserRole).toString();
+    userSettings->setValue("encpreset", preset);
+    preset = ui.comboTts->itemData(ui.comboTts->currentIndex(), Qt::UserRole).toString();
+    userSettings->setValue("ttspreset", preset);
 
     // sync settings
     userSettings->sync();
@@ -186,6 +203,7 @@ void Config::setUserSettings(QSettings *user)
     }
     ui.cacheSize->setText(tr("Current cache size is %1 kiB.")
             .arg(sz/1024));
+
 }
 
 
@@ -262,6 +280,58 @@ void Config::setDevices(QSettings *dev)
     ui.treeDevices->insertTopLevelItems(0, items);
     if(w3 != 0)
         ui.treeDevices->setCurrentItem(w3); // hilight old selection
+
+    // tts / encoder tab
+    QStringList keys;
+    
+    devices->beginGroup("encoders");
+    keys = devices->allKeys();
+    for(int i=0; i < keys.size();i++)
+        ui.comboEncoder->addItem(devices->value(keys.at(i), "null").toString(),
+                                 keys.at(i));
+    devices->endGroup();
+
+    devices->beginGroup("tts");
+    keys = devices->allKeys();
+    for(int i=0; i < keys.size();i++)
+        ui.comboTts->addItem(devices->value(keys.at(i), "null").toString(), keys.at(i));
+    devices->endGroup();
+
+    int index;
+    index = ui.comboTts->findData(userSettings->value("ttspreset").toString(),
+                            Qt::UserRole, Qt::MatchExactly);
+    ui.comboTts->setCurrentIndex(index);
+    updateTtsOpts(index);
+    ui.ttsExecutable->setText(userSettings->value("ttsbin").toString());
+
+    index = ui.comboEncoder->findData(userSettings->value("encpreset").toString(),
+                            Qt::UserRole, Qt::MatchExactly);
+    ui.comboEncoder->setCurrentIndex(index);
+    updateEncOpts(index);
+    ui.encoderExecutable->setText(userSettings->value("encbin").toString());
+
+}
+
+
+void Config::updateEncOpts(int index)
+{
+    qDebug() << "updateEncOpts()";
+    QString c = ui.comboEncoder->itemData(index, Qt::UserRole).toString();
+    devices->beginGroup(c);
+    ui.encoderOptions->setText(devices->value("options").toString());
+    ui.encoderOptions->setEnabled(devices->value("edit").toBool());
+    devices->endGroup();
+}
+
+
+void Config::updateTtsOpts(int index)
+{
+    QString c = ui.comboTts->itemData(index, Qt::UserRole).toString();
+    devices->beginGroup(c);
+    qDebug() << devices->value("edit").toBool();
+    ui.ttsOptions->setText(devices->value("options").toString());
+    ui.ttsOptions->setEnabled(devices->value("edit").toBool());
+    devices->endGroup();
 }
 
 
@@ -465,4 +535,26 @@ void Config::cacheClear()
         QFile::remove(f);
         qDebug() << "removed:" << f;
     }
+}
+
+
+void Config::browseTts()
+{
+    BrowseDirtree browser(this);
+    browser.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
+    
+    if(QFileInfo(ui.ttsExecutable->text()).isDir())
+    {
+        QDir d(ui.ttsExecutable->text());
+        browser.setDir(d);
+    }
+    if(browser.exec() == QDialog::Accepted)
+    {
+        qDebug() << browser.getSelected();
+        QString exe = browser.getSelected();
+        if(!QFileInfo(exe).isExecutable())
+            return;
+        ui.ttsExecutable->setText(exe);
+    }
+    
 }
