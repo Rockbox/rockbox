@@ -91,7 +91,9 @@ void usb_init_device(void)
 
 void usb_enable(bool on)
 {
-#ifndef HAVE_USBSTACK
+#ifdef HAVE_USBSTACK
+	(void)on;
+#else	
     /* This device specific code will eventually give way to proper USB
        handling, which should be the same for all PP502x targets. */
     if (on)
@@ -102,7 +104,7 @@ void usb_enable(bool on)
 
 #if defined(IRIVER_H10) || defined (IRIVER_H10_5GB)
         if(button_status()==BUTTON_RIGHT)
-#endif
+#endif /* defined(IRIVER_H10) || defined (IRIVER_H10_5GB) */
         {
             ata_sleepnow(); /* Immediately spindown the disk. */
             sleep(HZ*2);
@@ -112,14 +114,14 @@ void usb_enable(bool on)
             memcpy((void *)0x40017f00, "diskmode\0\0hotstuff\0\0\1", 21);
 #elif CONFIG_CPU == PP5022
             memcpy((void *)0x4001ff00, "diskmode\0\0hotstuff\0\0\1", 21);
-#endif
-#endif
+#endif /* CONFIG_CPU */
+#endif /* IPOD_ARCH */
 
             system_reboot(); /* Reboot */
         }
-#endif
+#endif /*defined(IPOD_ARCH) || defined(IRIVER_H10) || defined (IRIVER_H10_5GB)*/
     }
-#endif
+#endif /* !HAVE_USBSTACK */
 }
 
 bool usb_detect(void)
