@@ -975,7 +975,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: ""
+    swcodec: "Filtro picco"
   </voice>
 </phrase>
 <phrase>
@@ -1732,11 +1732,11 @@
     masd: none
   </source>
   <dest>
-    *: "Misuratore di picco"
+    *: "Indicatore di picco"
     masd: none
   </dest>
   <voice>
-    *: "Misuratore di Picco"
+    *: "Indicatore di Picco"
     masd: none
   </voice>
 </phrase>
@@ -4274,17 +4274,17 @@
   user:
   <source>
     *: none
-    recording: "The disk is full. Press STOP to continue."
-    h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5: "The disk is full. Press POWER to continue."
-    e200: "The disk is full. Press UP to continue."
+    recording: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
+    m5,x5: "The disk is full. Press POWER to continue."
+    e200: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
     recording: "Disco pieno. Premi STOP per continuare."
-    h100,h120,h300: "Disco pieno. Premi stop per continuare."
-    m5,x5: "Disco pieno. Premi POWER per continuare."
-    e200: "Disco pieno. Premi UP per continuare."
+    h100,h120,h300: "Disco pieno. Premi stop per continuare."
+    m5,x5: "Disco pieno. Premi POWER per continuare."
+    e200: "Disco pieno. Premi UP per continuare."
   </dest>
   <voice>
     *: none
@@ -4305,7 +4305,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Una volta"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -4322,7 +4322,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Livello avvio"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -4339,7 +4339,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Livello arresto"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -4356,7 +4356,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Soglia di separazione"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -4373,7 +4373,7 @@
   </dest>
   <voice>
     *: none
-    recording: "-inf"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -4603,7 +4603,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: "bitreit variabile"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6513,11 +6513,11 @@
   </source>
   <dest>
     *: none
-    radio: "Nessuna stazione"
+    radio: "Nessuna stazione memorizzata!"
   </dest>
   <voice>
     *: none
-    radio: "Nessuna stazione"
+    radio: "Nessuna stazione memorizzata!"
   </voice>
 </phrase>
 <phrase>
@@ -6910,7 +6910,6 @@
     ipod*: "PLAY/PAUSA = Annulla"
     x5,m5: "PLAY LUNGO = Annulla"
     h10,h10_5gb,e200: "PREV = Annulla"
-    e200: "PREV = Annulla"
   </dest>
   <voice>
     *: ""
@@ -6944,7 +6943,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Sfondo Caricato"
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
@@ -6961,7 +6960,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Sfondo non valido"
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
@@ -7419,7 +7418,7 @@
   desc: splash when user selects an invalid colour
   user:
   <source>
-   *: none
+    *: none
     lcd_non-mono: "Invalid colour"
   </source>
   <dest>
@@ -7562,11 +7561,11 @@
   </source>
   <dest>
     *: none
-    radio: "Nessun file stazioni trovato. Ricercare automaticamente?"
+    radio: "Nessuna impostazione trovata. Ricercare automaticamente?"
   </dest>
   <voice>
     *: none
-    radio: "Nessun file stazioni trovato. Ricercare automaticamente?"
+    radio: "Nessuna impostazione trovata. Ricercare automaticamente?"
   </voice>
 </phrase>
 <phrase>
@@ -7684,7 +7683,7 @@
   desc: in color screen
   user:
   <source>
-   *: none
+    *: none
     lcd_color: "RGB: %02X%02X%02X"
   </source>
   <dest>
@@ -7845,7 +7844,7 @@
     *: "Nome file non valido!"
   </dest>
   <voice>
-    *: "Nome file non valido"
+    *: "Nome file non valido!"
   </voice>
 </phrase>
 <phrase>
@@ -8300,16 +8299,15 @@
   user:
   <source>
     *: none
-    recording: "The disk is full. Press STOP to continue."
-    h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "The disk is full. Press LEFT to continue."
-    e200: "The disk is full. Press UP to continue."
+    recording: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "The disk is full. Press LEFT to continue."
   </source>
   <dest>
     *: none
     recording: "Disco pieno. Premere OFF per continuare."
-    h100,h120,h300: "Disco pieno. Premi stop per continuare."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "Disco pieno. Premi LEFT per continuare."
+    h100,h120,h300: "Disco pieno. Premi stop per continuare."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "Disco pieno. Premi LEFT per continuare."
   </dest>
   <voice>
     *: none
@@ -10632,7 +10630,7 @@
   desc: displayed when key lock is turned off
   user:
   <source>
-    *: "Buttons Unlocked"        
+    *: "Buttons Unlocked"
   </source>
   <dest>
     *: "Tasti Sbloccati"
@@ -10961,7 +10959,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Show filename extensions"
+    *: "Show Filename Extensions"
   </source>
   <dest>
     *: "Mostra estensione nome file"
@@ -10975,7 +10973,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Only unknown types"
+    *: "Only Unknown Types"
   </source>
   <dest>
     *: "Solo tipi sconosciuti"
@@ -10989,7 +10987,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Only when viewing all types"
+    *: "Only When Viewing All Types"
   </source>
   <dest>
     *: "Solo quando visualizza tutti i tipi"
@@ -11061,5 +11059,141 @@
   <voice>
     *: none
     rtc: "A M"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OH
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "e"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNTER
+  desc: in settings, for recording peak meter
+  user:
+  <source>
+    *: none
+    recording: "Clip Counter"
+  </source>
+  <dest>
+    *: none
+    recording: "Contatore di Clip"
+  </dest>
+  <voice>
+    *: none
+    recording: "Contatore di Clip"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNT
+  desc: in recording GUI, for recording peak meter. MAX 5 characters!
+  user:
+  <source>
+    *: none
+    recording: "CLIP:"
+  </source>
+  <dest>
+    *: none
+    recording: "CLIP:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    usbstack: "USB Stack"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Stack USB"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Stack USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_MODE
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "USB Stack Mode"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Modo Stack USB"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Modo Stack USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Device"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Dispositivo"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Dispositivo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_HOST
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Host"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Host"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Host"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE_DRIVER
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Device Driver"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Driver Dispositivo"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Driver Dispositivo"
   </voice>
 </phrase>
