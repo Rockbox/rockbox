@@ -316,22 +316,64 @@ void Config::setDevices(QSettings *dev)
 void Config::updateEncOpts(int index)
 {
     qDebug() << "updateEncOpts()";
+    QString encoder;
+    bool edit;
     QString c = ui.comboEncoder->itemData(index, Qt::UserRole).toString();
     devices->beginGroup(c);
     ui.encoderOptions->setText(devices->value("options").toString());
-    ui.encoderOptions->setEnabled(devices->value("edit").toBool());
+    edit = devices->value("edit").toBool();
+    ui.encoderOptions->setEnabled(edit);
+    encoder = devices->value("encoder").toString();
     devices->endGroup();
+
+    // try to autodetect encoder
+#if defined(Q_OS_LINUX)
+    QStringList path = QString(getenv("PATH")).split(":", QString::SkipEmptyParts);
+    qDebug() << path;
+    ui.encoderExecutable->setEnabled(true);
+    for(int i = 0; i < path.size(); i++) {
+        QString executable = path.at(i) + "/" + encoder;
+        if(QFileInfo(executable).isExecutable()) {
+            qDebug() << "found:" << executable;
+            ui.encoderExecutable->setText(executable);
+            // disallow changing the detected path if non-customizable profile
+            if(!edit)
+                ui.encoderExecutable->setEnabled(false);
+            break;
+        }
+    }
+#endif
 }
 
 
 void Config::updateTtsOpts(int index)
 {
+    bool edit;
+    QString e;
     QString c = ui.comboTts->itemData(index, Qt::UserRole).toString();
     devices->beginGroup(c);
-    qDebug() << devices->value("edit").toBool();
+    edit = devices->value("edit").toBool();
     ui.ttsOptions->setText(devices->value("options").toString());
     ui.ttsOptions->setEnabled(devices->value("edit").toBool());
+    e = devices->value("tts").toString();
     devices->endGroup();
+
+#if defined(Q_OS_LINUX)
+    QStringList path = QString(getenv("PATH")).split(":", QString::SkipEmptyParts);
+    qDebug() << path;
+    ui.ttsExecutable->setEnabled(true);
+    for(int i = 0; i < path.size(); i++) {
+        QString executable = path.at(i) + "/" + e;
+        if(QFileInfo(executable).isExecutable()) {
+            qDebug() << "found:" << executable;
+            ui.ttsExecutable->setText(executable);
+            // disallow changing the detected path if non-customizable profile
+            if(!edit)
+                ui.ttsExecutable->setEnabled(false);
+            break;
+        }
+    }
+#endif
 }
 
 
