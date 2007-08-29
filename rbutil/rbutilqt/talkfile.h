@@ -53,7 +53,7 @@ public:
     void setStripExtensions(bool ov) {m_stripExtensions = ov;}
 
 private slots:
-	void abort();
+    void abort();
 
 private:
 

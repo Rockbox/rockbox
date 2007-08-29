@@ -21,7 +21,7 @@
 
 TalkFileCreator::TalkFileCreator(QObject* parent): QObject(parent)
 {
-   
+
 }
 
 
@@ -54,7 +54,7 @@ bool TalkFileCreator::initTTS()
 
 bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
 {
-	m_abort = false;
+    m_abort = false;
     m_logger = logger;
     m_logger->addItem("Starting Talkfile generation",LOGINFO);
     if(!initTTS())
@@ -77,21 +77,21 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
     // iterate over all entrys
     while (it.hasNext()) 
     {
-    	if(m_abort)
-    	{
-    		m_logger->addItem("Talkfile creation aborted",LOGERROR);
-    		return false;
-    	}
-    	
-    	QApplication::processEvents();  
+        if(m_abort)
+        {
+            m_logger->addItem("Talkfile creation aborted",LOGERROR);
+            return false;
+        }
+
+        QApplication::processEvents();
         QFileInfo fileInf = it.fileInfo();
         QString toSpeak;
         QString filename;
         QString wavfilename;
         
         if(fileInf.fileName() == "." || fileInf.fileName() == ".." || fileInf.suffix() == "talk")
-        { 	
-        	it.next();
+        {
+            it.next();
             continue;
         }
         if(fileInf.isDir())  // if it is a dir
@@ -158,35 +158,35 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
 
 void TalkFileCreator::abort()
 {
-	m_abort = true;
+    m_abort = true;
 }
 
 bool TalkFileCreator::voice(QString text,QString wavfile)
 {
-           
-   QString execstring = m_curTTSTemplate;
-    	
-   execstring.replace("%exe",m_TTSexec);
-   execstring.replace("%options",m_TTSOpts);
-   execstring.replace("%wavfile",wavfile);
-   execstring.replace("%text",text);
-        
-   QProcess::execute(execstring);
-   return true;
-   
+
+    QString execstring = m_curTTSTemplate;
+
+    execstring.replace("%exe",m_TTSexec);
+    execstring.replace("%options",m_TTSOpts);
+    execstring.replace("%wavfile",wavfile);
+    execstring.replace("%text",text);
+
+    QProcess::execute(execstring);
+    return true;
+
 }
 
 bool TalkFileCreator::encode(QString input,QString output)
 {
-   	QString execstring = m_curEncTemplate;
-        	
+    QString execstring = m_curEncTemplate;
+
     execstring.replace("%exe",m_EncExec);
     execstring.replace("%options",m_EncOpts);
     execstring.replace("%input",input);
     execstring.replace("%output",output);
-           
-   QProcess::execute(execstring);
-   return true;
+
+    QProcess::execute(execstring);
+    return true;
 
 }
 
