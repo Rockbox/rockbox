@@ -242,7 +242,9 @@ int usb_serial_driver_request(struct usb_ctrlrequest* request)
                 logf("usb serial: sending qualifier dec");
                 ret = MIN(sizeof(struct usb_qualifier_descriptor), request->wLength);
                 res.buf = &serial_qualifier_desc;
+                break;
 
+            case USB_DT_OTHER_SPEED_CONFIG:
             case USB_DT_CONFIG:
                 logf("usb serial: sending config desc");
 

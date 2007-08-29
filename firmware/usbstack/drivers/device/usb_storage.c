@@ -99,6 +99,14 @@ static struct usb_endpoint_descriptor storage_fs_bulk_out_desc = {
     .wMaxPacketSize =       64,
 };
 
+static struct usb_qualifier_descriptor storage_qualifier_desc = {
+    .bLength =             sizeof(struct usb_qualifier_descriptor),
+    .bDescriptorType =     USB_DT_DEVICE_QUALIFIER,
+    .bcdUSB =              0x0200,
+    .bDeviceClass =        0,
+    .bNumConfigurations =  1,
+};
+
 struct usb_descriptor_header *storage_fs_function[] = {
     (struct usb_descriptor_header *) &storage_interface_desc,
     (struct usb_descriptor_header *) &storage_fs_bulk_in_desc,
@@ -220,6 +228,13 @@ int usb_storage_driver_request(struct usb_ctrlrequest* request)
                 res.buf = &storage_device_desc;
                 break;
 
+            case USB_DT_DEVICE_QUALIFIER:
+                logf("usb storage: sending qualifier dec");
+                ret = MIN(sizeof(struct usb_qualifier_descriptor), request->wLength);
+                res.buf = &storage_qualifier_desc;
+                break;
+
+            case USB_DT_OTHER_SPEED_CONFIG:
             case USB_DT_CONFIG:
                 logf("usb storage: sending config desc");
 
