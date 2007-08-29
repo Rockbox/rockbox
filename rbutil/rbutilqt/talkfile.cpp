@@ -133,6 +133,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
             }
         }
         
+        QString now = QDate::currentDate().toString("yyyyMMdd");
         if(m_removeWav)
         {
             QFile wavfile(wavfilename);
@@ -140,9 +141,9 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
             installlog.remove(wavfilename);
         }
         else
-            installlog.setValue(wavfilename.remove(m_mountpoint),installlog.value(wavfilename,0).toInt()+1);
+            installlog.setValue(wavfilename.remove(m_mountpoint),now);
         
-        installlog.setValue(filename.remove(m_mountpoint),installlog.value(filename,0).toInt()+1);
+        installlog.setValue(filename.remove(m_mountpoint),now);
         it.next();
     }
     
