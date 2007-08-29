@@ -936,7 +936,7 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     <message>
         <location filename="" line="0"/>
         <source>&lt;b&gt;%1 %2&lt;/b&gt; at &lt;b&gt;%3&lt;/b&gt;</source>
-        <translation>&lt;b&gt;%1 %2&lt;/b&gt; at &lt;b&gt;%3&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;%1 %2&lt;/b&gt; sur &lt;b&gt;%3&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="" line="0"/>
