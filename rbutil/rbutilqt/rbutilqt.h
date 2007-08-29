@@ -62,6 +62,7 @@ class RbUtilQt : public QMainWindow
 
     private slots:
         void about(void);
+        void help(void);
         void configDialog(void);
         void updateDevice(void);
         void updateSettings(void);

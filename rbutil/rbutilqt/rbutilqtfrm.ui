@@ -819,6 +819,8 @@ p, li { white-space: pre-wrap; }
     </property>
     <addaction name="action_About" />
     <addaction name="actionAbout_Qt" />
+    <addaction name="separator" />
+    <addaction name="action_Help" />
    </widget>
    <addaction name="menu_File" />
    <addaction name="menuAbout" />
@@ -855,6 +857,11 @@ p, li { white-space: pre-wrap; }
   <action name="actionAbout_Qt" >
    <property name="text" >
     <string>About &amp;Qt</string>
+   </property>
+  </action>
+  <action name="action_Help" >
+   <property name="text" >
+    <string>&amp;Help</string>
    </property>
   </action>
  </widget>

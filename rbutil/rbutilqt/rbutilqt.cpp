@@ -81,6 +81,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     connect(ui.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(updateTabs(int)));
     connect(ui.actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
     connect(ui.action_About, SIGNAL(triggered()), this, SLOT(about()));
+    connect(ui.action_Help, SIGNAL(triggered()), this, SLOT(help()));
     connect(ui.action_Configure, SIGNAL(triggered()), this, SLOT(configDialog()));
     connect(ui.buttonChangeDevice, SIGNAL(clicked()), this, SLOT(configDialog()));
     connect(ui.buttonRockbox, SIGNAL(clicked()), this, SLOT(installBtn()));
@@ -205,12 +206,19 @@ void RbUtilQt::about()
     QString rline = r.readAll();
     about.browserCredits->insertPlainText(rline);
     about.browserCredits->moveCursor(QTextCursor::Start, QTextCursor::MoveAnchor);
-    QString title = QString("<b>The Rockbox Utility</b> Version %1").arg(VERSION);
+    QString title = QString("<b>The Rockbox Utility</b><br/>Version %1").arg(VERSION);
     about.labelTitle->setText(title);
     about.labelHomepage->setText("<a href='http://www.rockbox.org'>http://www.rockbox.org</a>");
 
     window->show();
 
+}
+
+
+void RbUtilQt::help()
+{
+    QUrl helpurl("http://www.rockbox.org/wiki/RockboxUtilityQt");
+    QDesktopServices::openUrl(helpurl);
 }
 
 
