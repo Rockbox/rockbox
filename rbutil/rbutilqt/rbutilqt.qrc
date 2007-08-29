@@ -19,9 +19,10 @@
         <file>icons/process-stop.png</file>
         <file>icons/rbinstall_btn.png</file>
         <file>icons/rblogo.xpm</file>
-        <file>icons/rbutil.xpm</file>
         <file>icons/rembootloader_btn.png</file>
         <file>icons/remrb_btn.png</file>
+        <file>icons/rockbox-1.png</file>
+        <file>icons/rockbox-5.png</file>
         <file>icons/system-search.png</file>
         <file>icons/talkfile_btn.png</file>
         <file>icons/themes_btn.png</file>
