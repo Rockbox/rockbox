@@ -18,7 +18,8 @@
         <file>icons/preferences-desktop-locale.png</file>
         <file>icons/process-stop.png</file>
         <file>icons/rbinstall_btn.png</file>
-        <file>icons/rblogo.xpm</file>
+        <file>icons/rblogo.png</file>
+        <file>icons/rbutil.png</file>
         <file>icons/rembootloader_btn.png</file>
         <file>icons/remrb_btn.png</file>
         <file>icons/rockbox-1.png</file>

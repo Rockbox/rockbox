@@ -30,7 +30,7 @@
        <string>&amp;Device</string>
       </attribute>
       <attribute name="icon" >
-       <iconset resource="rbutilqt.qrc" >:/icons/icons/rbutil.xpm</iconset>
+       <iconset resource="rbutilqt.qrc" >:/icons/icons/rbutil.png</iconset>
       </attribute>
       <layout class="QGridLayout" >
        <item row="0" column="0" >

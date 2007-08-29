@@ -53,7 +53,7 @@
          <string comment="Welcome to Rockbox Utility, the installation and housekeeping tool for Rockbox." />
         </property>
         <property name="pixmap" >
-         <pixmap resource="rbutilqt.qrc" >:/icons/icons/rblogo.xpm</pixmap>
+         <pixmap resource="rbutilqt.qrc" >:/icons/icons/rblogo.png</pixmap>
         </property>
        </widget>
       </item>
