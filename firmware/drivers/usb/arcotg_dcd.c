@@ -613,10 +613,6 @@ int usb_arcotg_dcd_enable(struct usb_ep* ep,
     +    }
 #endif
 
-    /* set address of used ep in desc */
-    logf("ep address %x", desc->bEndpointAddress);
-    desc->bEndpointAddress |= ep->ep_num;
-
     /* here initialize variable of ep */
     ep->maxpacket = max;
     ep->desc = desc;

@@ -164,6 +164,12 @@ static int ep_matches(struct usb_ep* ep, struct usb_endpoint_descriptor* desc)
     }
 
     /* MATCH!! */
-    
+
+    /* set address of used ep in desc */
+    logf("ep address %x", desc->bEndpointAddress);
+    desc->bEndpointAddress |= ep->ep_num;
+
+    ep->desc = desc;
+
     return 1;
 }

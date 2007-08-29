@@ -53,7 +53,6 @@ static struct usb_device_descriptor storage_device_desc = {
     .bDeviceClass =         0,
     .bDeviceSubClass =      0,
     .bDeviceProtocol =      0,
-    .bMaxPacketSize0 =      64,
     .idVendor =             0xffff,
     .idProduct =            0x0001,
     .iManufacturer =        0,
@@ -180,6 +179,13 @@ int usb_storage_driver_bind(void* controler_ops)
     }
     dev.out->claimed = true;
     logf("usb storage: out: %s", dev.out->name);
+
+    /* update device decsriptor */
+    storage_device_desc.bMaxPacketSize0 = ops->ep0->maxpacket;
+
+    /* update hs descriptors as we asume that endpoints are the same for fs and hs */
+    storage_hs_bulk_in_desc.bEndpointAddress = storage_fs_bulk_in_desc.bEndpointAddress;
+    storage_hs_bulk_out_desc.bEndpointAddress = storage_fs_bulk_out_desc.bEndpointAddress;
 
     return 0;
 

@@ -201,6 +201,10 @@ int usb_serial_driver_bind(void* controler_ops)
     serial_debug_desc.bDebugInEndpoint = dev.in->ep_num;
     serial_debug_desc.bDebugOutEndpoint = dev.out->ep_num;
 
+    /* update hs descriptors as we asume that endpoints are the same for fs and hs */
+    serial_hs_in_desc.bEndpointAddress = serial_fs_in_desc.bEndpointAddress;
+    serial_hs_out_desc.bEndpointAddress = serial_fs_out_desc.bEndpointAddress;
+
     return 0;
 
 autoconf_fail:
