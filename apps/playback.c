@@ -658,8 +658,7 @@ void audio_play(long offset)
 #ifdef PLAYBACK_VOICE
     /* Truncate any existing voice output so we don't have spelling
      * etc. over the first part of the played track */
-    LOGFQUEUE("mp3 > voice Q_VOICE_STOP");
-    queue_post(&voice_queue, Q_VOICE_STOP, 1);
+    do_shutup();
 #endif
 
     /* Start playback */
@@ -943,8 +942,7 @@ static void voice_stop(void)
     if (!voice_codec_loaded)
         return;
 
-    LOGFQUEUE("mp3 > voice Q_VOICE_STOP");
-    queue_post(&voice_queue, Q_VOICE_STOP, 0);
+    do_shutup();
 
     /* Loop until voice empties it's queue, stops and picks up on the new
        track; the voice thread must be stopped and waiting for messages

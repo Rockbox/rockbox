@@ -141,7 +141,6 @@ static int queue_clip(unsigned char* buf, long size, bool enqueue);
 static int open_voicefile(void);
 static unsigned char* get_clip(long id, long* p_size);
 static int shutup(void); /* Interrupt voice, as when enqueue is false */
-static int do_shutup(void); /* kill voice unconditionally */
 
 /***************** Private implementation *****************/
 
@@ -311,7 +310,7 @@ re_check:
 }
 
 /* stop the playback and the pending clips */
-static int do_shutup(void)
+int do_shutup(void)
 {
 #if CONFIG_CODEC != SWCODEC
     unsigned char* pos;
