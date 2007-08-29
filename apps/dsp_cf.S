@@ -415,11 +415,11 @@ channels_process_sound_chan_karaoke:
     .align      2
     .global    sample_output_stereo
 sample_output_stereo:
-    lea.l       -44(%sp), %sp             | save registers
+    lea.l       -48(%sp), %sp             | save registers
     move.l      %macsr, %d1               | do it now as at many lines will
-    movem.l     %d1-%d7/%a2-%a5, (%sp)    | be the far more common condition
+    movem.l     %d1-%d7/%a2-%a6, (%sp)    | be the far more common condition
     move.l      #0x80, %macsr             | put emac unit in signed int mode
-    movem.l     48(%sp), %a0-%a2/%a4      |
+    movem.l     52(%sp), %a0-%a2/%a4      |
     lea.l       (%a4, %a0.l*4), %a0       | %a0 = end address     
     move.l      (%a1), %d1                | %a1 = multiplier: (1 << (16 - scale))
     sub.l       #16, %d1                  |
@@ -427,6 +427,7 @@ sample_output_stereo:
     moveq.l     #1, %d0                   |
     asl.l       %d1, %d0                  |
     move.l      %d0, %a1                  |
+    move.l      #0x8000, %a6              | %a6 = rounding term
     movem.l     (%a2), %a2-%a3            | get L/R channel pointers
     moveq.l     #28, %d0                  | %d0 = second line bound
     add.l       %a4, %d0                  |
@@ -438,6 +439,8 @@ sample_output_stereo:
     bls.b       20f | line loop start     | no? start line loop
 10: | long loop 0                         |
     move.l      (%a2)+, %d1               | read longword from L and R
+    move.l      %a6, %acc0                |
+    move.l      %acc0, %acc1              |
     mac.l       %d1, %a1, (%a3)+, %d2, %acc0 | shift L to high word
     mac.l       %d2, %a1, %acc1           | shift R to high word
     movclr.l    %acc0, %d1                | get possibly saturated results
@@ -451,6 +454,10 @@ sample_output_stereo:
     lea.l       -12(%a0), %a5             | %a5 = at or just before last line bound
 30: | line loop                           |
     move.l      (%a3)+, %d4               | get next 4 R samples and scale
+    move.l      %a6, %acc0                |
+    move.l      %acc0, %acc1              |
+    move.l      %acc1, %acc2              |
+    move.l      %acc2, %acc3              |
     mac.l       %d4, %a1, (%a3)+, %d5, %acc0 | with saturation
     mac.l       %d5, %a1, (%a3)+, %d6, %acc1 |
     mac.l       %d6, %a1, (%a3)+, %d7, %acc2 |
@@ -460,6 +467,10 @@ sample_output_stereo:
     movclr.l    %acc1, %d5                |
     movclr.l    %acc2, %d6                |
     movclr.l    %acc3, %d7                |
+    move.l      %a6, %acc0                |
+    move.l      %acc0, %acc1              |
+    move.l      %acc1, %acc2              |
+    move.l      %acc2, %acc3              |
     mac.l       %d0, %a1, (%a2)+, %d1, %acc0 | get next 4 L samples and scale
     mac.l       %d1, %a1, (%a2)+, %d2, %acc1 | with saturation
     mac.l       %d2, %a1, (%a2)+, %d3, %acc2 |
@@ -484,6 +495,8 @@ sample_output_stereo:
     bls.b       60f | output end          | no? stop
 50: | long loop 1                         |
     move.l      (%a2)+, %d1               | handle trailing longwords
+    move.l      %a6, %acc0                |
+    move.l      %acc0, %acc1              |
     mac.l       %d1, %a1, (%a3)+, %d2, %acc0 | the same way as leading ones
     mac.l       %d2, %a1, %acc1           |
     movclr.l    %acc0, %d1                |
@@ -494,9 +507,9 @@ sample_output_stereo:
     cmp.l       %a4, %a0                  |
     bhi.b       50b                       | long loop 1
 60: | output end                          |
-    movem.l     (%sp), %d1-%d7/%a2-%a5    | restore registers
+    movem.l     (%sp), %d1-%d7/%a2-%a6    | restore registers
     move.l      %d1, %macsr               |
-    lea.l       44(%sp), %sp              | cleanup
+    lea.l       48(%sp), %sp              | cleanup
     rts                                   |
     .size      sample_output_stereo, .-sample_output_stereo
 
@@ -510,17 +523,18 @@ sample_output_stereo:
     .align      2
     .global    sample_output_mono
 sample_output_mono:
-    lea.l       -28(%sp), %sp             | save registers
+    lea.l       -32(%sp), %sp             | save registers
     move.l      %macsr, %d1               | do it now as at many lines will
-    movem.l     %d1-%d5/%a2-%a3, (%sp)    | be the far more common condition
+    movem.l     %d1-%d5/%a2-%a4, (%sp)    | be the far more common condition
     move.l      #0x80, %macsr             | put emac unit in signed int mode
-    movem.l     32(%sp), %a0-%a3          |
+    movem.l     36(%sp), %a0-%a3          |
     lea.l       (%a3, %a0.l*4), %a0       | %a0 = end address     
     move.l      (%a1), %d1                | %d5 = multiplier: (1 << (16 - scale))
     sub.l       #16, %d1                  |
     neg.l       %d1                       |
     moveq.l     #1, %d5                   |
     asl.l       %d1, %d5                  |
+    move.l      #0x8000, %a4              | %a4 = rounding term
     movem.l     (%a2), %a2                | get source channel pointer
     moveq.l     #28, %d0                  | %d0 = second line bound
     add.l       %a3, %d0                  |
@@ -532,6 +546,7 @@ sample_output_mono:
     bls.b       20f | line loop start     | no? start line loop
 10: | long loop 0                         |
     move.l      (%a2)+, %d1               | read longword from L and R
+    move.l      %a4, %acc0                |
     mac.l       %d1, %d5, %acc0           | shift L to high word
     movclr.l    %acc0, %d1                | get possibly saturated results
     move.l      %d1, %d2                  |
@@ -544,6 +559,10 @@ sample_output_mono:
     lea.l       -12(%a0), %a1             | %a1 = at or just before last line bound
 30: | line loop                           |
     move.l      (%a2)+, %d0               | get next 4 L samples and scale
+    move.l      %a4, %acc0                |
+    move.l      %acc0, %acc1              |
+    move.l      %acc1, %acc2              |
+    move.l      %acc2, %acc3              |
     mac.l       %d0, %d5, (%a2)+, %d1, %acc0 | with saturation
     mac.l       %d1, %d5, (%a2)+, %d2, %acc1 |
     mac.l       %d2, %d5, (%a2)+, %d3, %acc2 |
@@ -573,6 +592,7 @@ sample_output_mono:
     bls.b       60f | output end          | no? stop
 50: | loop loop 1                         |
     move.l      (%a2)+, %d1               | handle trailing longwords
+    move.l      %a4, %acc0                |
     mac.l       %d1, %d5, %acc0           | the same way as leading ones
     movclr.l    %acc0, %d1                |
     move.l      %d1, %d2                  |
@@ -582,8 +602,8 @@ sample_output_mono:
     cmp.l       %a3, %a0                  |
     bhi.b       50b | long loop 1         |
 60: | output end                          |
-    movem.l     (%sp), %d1-%d5/%a2-%a3    | restore registers
+    movem.l     (%sp), %d1-%d5/%a2-%a4    | restore registers
     move.l      %d1, %macsr               |
-    lea.l       28(%sp), %sp              | cleanup
+    lea.l       32(%sp), %sp              | cleanup
     rts                                   |
     .size      sample_output_mono, .-sample_output_mono

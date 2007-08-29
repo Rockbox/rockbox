@@ -414,10 +414,11 @@ static void sample_output_mono(int count, struct dsp_data *data,
 {
     const int32_t *s0 = src[0];
     const int scale = data->output_scale;
+    const int dc_bias = 1 << (scale - 1);
 
     do
     {
-        int32_t lr = clip_sample_16(*s0++ >> scale);
+        int32_t lr = clip_sample_16((*s0++ + dc_bias) >> scale);
         *dst++ = lr;
         *dst++ = lr;
     }
@@ -433,11 +434,12 @@ static void sample_output_stereo(int count, struct dsp_data *data,
     const int32_t *s0 = src[0];
     const int32_t *s1 = src[1];
     const int scale = data->output_scale;
+    const int dc_bias = 1 << (scale - 1);
 
     do
     {
-        *dst++ = clip_sample_16(*s0++ >> scale);
-        *dst++ = clip_sample_16(*s1++ >> scale);
+        *dst++ = clip_sample_16((*s0++ + dc_bias) >> scale);
+        *dst++ = clip_sample_16((*s1++ + dc_bias) >> scale);
     }
     while (--count > 0);
 }
