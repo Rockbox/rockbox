@@ -24,9 +24,7 @@
 #include "ui_configurefrm.h"
 #include "browsedirtree.h"
 
-#ifdef __linux
 #include <stdio.h>
-#endif
 
 #define DEFAULT_LANG "English (builtin)"
 
@@ -316,33 +314,40 @@ void Config::setDevices(QSettings *dev)
 void Config::updateEncOpts(int index)
 {
     qDebug() << "updateEncOpts()";
-    QString encoder;
+    QString e;
     bool edit;
     QString c = ui.comboEncoder->itemData(index, Qt::UserRole).toString();
     devices->beginGroup(c);
     ui.encoderOptions->setText(devices->value("options").toString());
     edit = devices->value("edit").toBool();
     ui.encoderOptions->setEnabled(edit);
-    encoder = devices->value("encoder").toString();
+    e = devices->value("encoder").toString();
     devices->endGroup();
 
     // try to autodetect encoder
-#if defined(Q_OS_LINUX)
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
     QStringList path = QString(getenv("PATH")).split(":", QString::SkipEmptyParts);
+#elif defined(Q_OS_WIN)
+    QStringList path = QString(getenv("PATH")).split(";", QString::SkipEmptyParts);
+#endif
     qDebug() << path;
     ui.encoderExecutable->setEnabled(true);
     for(int i = 0; i < path.size(); i++) {
-        QString executable = path.at(i) + "/" + encoder;
+        QString executable = QDir::fromNativeSeparators(path.at(i)) + "/" + e;
+#if defined(Q_OS_WIN)
+	executable += ".exe";
+	QStringList ex = executable.split("\"", QString::SkipEmptyParts);
+	executable = ex.join("");
+#endif
         if(QFileInfo(executable).isExecutable()) {
             qDebug() << "found:" << executable;
-            ui.encoderExecutable->setText(executable);
+            ui.encoderExecutable->setText(QDir::toNativeSeparators(executable));
             // disallow changing the detected path if non-customizable profile
             if(!edit)
                 ui.encoderExecutable->setEnabled(false);
             break;
         }
     }
-#endif
 }
 
 
@@ -358,22 +363,29 @@ void Config::updateTtsOpts(int index)
     e = devices->value("tts").toString();
     devices->endGroup();
 
-#if defined(Q_OS_LINUX)
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
     QStringList path = QString(getenv("PATH")).split(":", QString::SkipEmptyParts);
+#elif defined(Q_OS_WIN)
+    QStringList path = QString(getenv("PATH")).split(";", QString::SkipEmptyParts);
+#endif
     qDebug() << path;
     ui.ttsExecutable->setEnabled(true);
     for(int i = 0; i < path.size(); i++) {
-        QString executable = path.at(i) + "/" + e;
+        QString executable = QDir::fromNativeSeparators(path.at(i)) + "/" + e;
+#if defined(Q_OS_WIN)
+	executable += ".exe";
+	QStringList ex = executable.split("\"", QString::SkipEmptyParts);
+	executable = ex.join("");
+#endif
+	qDebug() << executable;
         if(QFileInfo(executable).isExecutable()) {
-            qDebug() << "found:" << executable;
-            ui.ttsExecutable->setText(executable);
+            ui.ttsExecutable->setText(QDir::toNativeSeparators(executable));
             // disallow changing the detected path if non-customizable profile
             if(!edit)
                 ui.ttsExecutable->setEnabled(false);
             break;
         }
     }
-#endif
 }
 
 
