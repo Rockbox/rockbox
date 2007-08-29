@@ -397,6 +397,10 @@ static void port_change_int(void)
         }
     }
 
+    if (arcotg_dcd.speed == speed) {
+        return;
+    }
+
     /* update speed */
     arcotg_dcd.speed = speed;
 
