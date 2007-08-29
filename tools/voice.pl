@@ -189,21 +189,21 @@ sub voicestring {
 sub encodewav {
     our $verbose;
     my ($input, $output, $encoder, $encoder_opts) = @_;
+    my $cmd = '';
     printf("Encode \"%s\" with %s in file %s\n", $input, $encoder, $output) if $verbose;
     switch ($encoder) {
         case 'lame' {
-            my $cmd = "lame $encoder_opts \"$input\" \"$output\"";
-            print("> $cmd\n") if $verbose;
-            `lame $encoder_opts "$input" "$output"`;
-            `$cmd`;
+            $cmd = "lame $encoder_opts \"$input\" \"$output\"";
         }
         case 'vorbis' {
-            `oggenc $encoder_opts "$input" -o "$output"`;
+            $cmd = "oggenc $encoder_opts \"$input\" -o \"$output\"";
         }
         case 'speexenc' {
-            `speexenc $encoder_opts "$input" "$output"`;
+            $cmd = "speexenc $encoder_opts \"$input\" \"$output\"";
         }
     }
+    print("> $cmd\n") if $verbose;
+    `$cmd`;
 }
 
 sub wavtrim {
