@@ -519,7 +519,7 @@ void BootloaderInstaller::h10Prepare()
             firmwareFI.setFile(firmware);
             if(!firmwareFI.exists())  //Firmware dosent exists on player
             {
-                m_dp->addItem(tr("Firmware doesn not exist: %1")
+                m_dp->addItem(tr("Firmware does not exist: %1")
                                 .arg(firmware),LOGERROR);
                 emit done(true);
                 return;
@@ -529,7 +529,7 @@ void BootloaderInstaller::h10Prepare()
         QFileInfo firmwareOrigFI(firmwareOrig);
         if(!firmwareOrigFI.exists())  //Original Firmware dosent exists on player
         {
-            m_dp->addItem(tr("Original Firmware doesn not exist: %1")
+            m_dp->addItem(tr("Original Firmware does not exist: %1")
                                 .arg(firmwareOrig),LOGERROR);
             emit done(true);
             return;
