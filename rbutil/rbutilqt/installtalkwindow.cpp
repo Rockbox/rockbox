@@ -68,11 +68,12 @@ void InstallTalkWindow::accept()
 {
     logger = new ProgressLoggerGui(this);
     logger->show();
+    connect(logger,SIGNAL(closed()),this,SLOT(close()));
     
     QString folderToTalk = ui.lineTalkFolder->text();
     QString pathEncoder = userSettings->value("encbin").toString();
     QString pathTTS = userSettings->value("ttsbin").toString();
-    
+
     if(!QFileInfo(folderToTalk).isDir())
     {
     	 logger->addItem(tr("The Folder to Talk is wrong!"),LOGERROR);
@@ -122,7 +123,6 @@ void InstallTalkWindow::accept()
     talkcreator->setStripExtensions(ui.StripExtensions->isChecked());
 
     talkcreator->createTalkFiles(logger);
-    connect(logger,SIGNAL(closed()),this,SLOT(close()));
 }
 
 
