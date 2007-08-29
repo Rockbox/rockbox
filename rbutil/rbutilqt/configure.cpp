@@ -67,10 +67,9 @@ Config::Config(QWidget *parent) : QDialog(parent)
     connect(ui.buttonCacheBrowse, SIGNAL(clicked()), this, SLOT(browseCache()));
     connect(ui.buttonCacheClear, SIGNAL(clicked()), this, SLOT(cacheClear()));
     connect(ui.browseTts, SIGNAL(clicked()), this, SLOT(browseTts()));
+    connect(ui.browseEncoder, SIGNAL(clicked()), this, SLOT(browseEnc()));
     connect(ui.comboEncoder, SIGNAL(currentIndexChanged(int)), this, SLOT(updateEncOpts(int)));
     connect(ui.comboTts, SIGNAL(currentIndexChanged(int)), this, SLOT(updateTtsOpts(int)));
-
-
 }
 
 
@@ -609,6 +608,28 @@ void Config::browseTts()
         if(!QFileInfo(exe).isExecutable())
             return;
         ui.ttsExecutable->setText(exe);
+    }
+    
+}
+
+
+void Config::browseEnc()
+{
+    BrowseDirtree browser(this);
+    browser.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
+    
+    if(QFileInfo(ui.encoderExecutable->text()).isDir())
+    {
+        QDir d(ui.encoderExecutable->text());
+        browser.setDir(d);
+    }
+    if(browser.exec() == QDialog::Accepted)
+    {
+        qDebug() << browser.getSelected();
+        QString exe = browser.getSelected();
+        if(!QFileInfo(exe).isExecutable())
+            return;
+        ui.encoderExecutable->setText(exe);
     }
     
 }
