@@ -127,6 +127,11 @@
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_ARC
 
+/* enable these for the experimental usb stack
+#define HAVE_USBSTACK
+#define USBSTACK_CAPS CONTROLLER_DEVICE
+*/
+
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
 
