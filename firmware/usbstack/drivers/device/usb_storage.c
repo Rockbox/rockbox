@@ -77,7 +77,7 @@ static struct usb_interface_descriptor storage_interface_desc = {
     .bLength =              USB_DT_INTERFACE_SIZE,
     .bDescriptorType =      USB_DT_INTERFACE,
     .bInterfaceNumber =     0,
-    .bNumEndpoints =        3,
+    .bNumEndpoints =        2,
     .bInterfaceClass =      USB_CLASS_MASS_STORAGE,
     .bInterfaceSubClass =   SUBCL_SCSI,
     .bInterfaceProtocol =   PROTO_BULK,
@@ -293,7 +293,7 @@ static int config_buf(uint8_t *buf, uint8_t type, unsigned index)
 static int set_config(int config)
 {
     (void)config;
-	
+
     /* enable endpoints */
     logf("setup %s", dev.in->name);
     ops->enable(dev.in, (struct usb_endpoint_descriptor*)dev.descriptors[1]);

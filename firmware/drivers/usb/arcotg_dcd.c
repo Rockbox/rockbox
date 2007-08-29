@@ -219,6 +219,8 @@ void usb_arcotg_dcd_stop(void)
 
 void usb_arcotg_dcd_irq(void)
 {
+    int i;
+
     if (dcd_controller.stopped == true) {
         return;
     }
@@ -240,9 +242,16 @@ void usb_arcotg_dcd_irq(void)
             UDC_ENDPTSETUPSTAT = UDC_ENDPTSETUPSTAT;
             setup_received_int(&dcd_controller.local_setup_buff);
         }
-
+/*
         if (UDC_ENDPTCOMPLETE) {
             UDC_ENDPTCOMPLETE = UDC_ENDPTCOMPLETE;
+        }*/
+    }
+
+    for (i = 0; i < USB_MAX_ENDPOINTS; i++) {
+        if ((UDC_ENDPTCOMPLETE & (1 << i)) == 1) {
+            logf("COMPLETE on %d", i);
+            UDC_ENDPTCOMPLETE |= (1 << i);
         }
     }
 
@@ -605,6 +614,7 @@ int usb_arcotg_dcd_enable(struct usb_ep* ep,
 #endif
 
     /* set address of used ep in desc */
+    logf("ep address %x", desc->bEndpointAddress);
     desc->bEndpointAddress |= ep->ep_num;
 
     /* here initialize variable of ep */
