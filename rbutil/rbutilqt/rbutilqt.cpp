@@ -557,6 +557,8 @@ void RbUtilQt::installBootloader()
         }
         else if(ret == QMessageBox::Ignore)
         {
+            logger->addItem(tr("Bootloader installation Skipped!"),LOGERROR);
+            logger->abort();
             m_installed = true;
             return;
         }
