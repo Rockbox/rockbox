@@ -151,6 +151,7 @@ struct device {
     struct usb_ep* in;
     struct usb_ep* out;
     struct usb_ep* intr;
+    uint32_t used_config;
     struct usb_descriptor_header** descriptors;
 };
 
@@ -253,6 +254,12 @@ int usb_storage_driver_request(struct usb_ctrlrequest* request)
             ret = set_config(request->wValue);
             break;
 
+        case USB_REQ_GET_CONFIGURATION:
+            logf("usb storage: get configuration");
+            ret = 1;
+            res.buf = &dev.used_config;
+            break;
+
         case USB_REQ_SET_INTERFACE:
             logf("usb storage: set interface");
             ret = 0;
@@ -325,6 +332,8 @@ static int set_config(int config)
     ops->enable(dev.in, (struct usb_endpoint_descriptor*)dev.descriptors[1]);
     logf("setup %s", dev.out->name);
     ops->enable(dev.out, (struct usb_endpoint_descriptor*)dev.descriptors[2]);
+
+    dev.used_config = config;
 
     /* setup buffers */
 
