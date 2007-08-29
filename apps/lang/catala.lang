@@ -10967,7 +10967,7 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PM_CLIPCOUNT
+  id: LANG_SYSFONT_PM_CLIPCOUNT
   desc: in recording GUI, for recording peak meter. MAX 5 characters!
   user: 
   <source>

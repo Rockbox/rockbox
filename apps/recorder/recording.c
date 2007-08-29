@@ -1544,7 +1544,7 @@ bool recording_screen(bool no_source)
                 {
                     if(PM_HEIGHT > 1)
                         screens[i].puts(0, 2 + filename_offset[i],
-                                                        str(LANG_PM_CLIPCOUNT));
+                                                str(LANG_SYSFONT_PM_CLIPCOUNT));
                     screens[i].puts(0, 1 + PM_HEIGHT + filename_offset[i],
                                                                         clpstr);
                 }
