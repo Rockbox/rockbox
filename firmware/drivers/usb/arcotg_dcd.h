@@ -40,7 +40,7 @@
 
 /*-------------------------------------------------------------------------*/
 
-#define ep_is_in(EP)    (((EP)->desc->bEndpointAddress & USB_DIR_IN)==USB_DIR_IN)
+#define ep_is_in(EP)   (((EP)->desc->bEndpointAddress & USB_DIR_IN)==USB_DIR_IN)
 
 #define EP_DIR_IN       1
 #define EP_DIR_OUT      0
@@ -52,30 +52,30 @@
 #define USB_SEND    (1) /* IN EP */
 
 /* Shared Bit Masks for Endpoint Queue Head and Endpoint Transfer Descriptor */
-#define  TERMINATE                              (1 << 0)
-#define  STATUS_ACTIVE                          (1 << 7)
-#define  STATUS_HALTED                          (1 << 6)
-#define  STATUS_DATA_BUFF_ERR                   (1 << 5)
-#define  STATUS_TRANSACTION_ERR                 (1 << 4)
-#define  INTERRUPT_ON_COMPLETE                  (1 << 15)
-#define  LENGTH_BIT_POS                         (16)
-#define  ADDRESS_MASK                           (0xFFFFFFE0)
-#define  ERROR_MASK                             (DTD_STATUS_HALTED | \
-                                                DTD_STATUS_DATA_BUFF_ERR | \
-                                                DTD_STATUS_TRANSACTION_ERR)
+#define  TERMINATE                          (1 << 0)
+#define  STATUS_ACTIVE                      (1 << 7)
+#define  STATUS_HALTED                      (1 << 6)
+#define  STATUS_DATA_BUFF_ERR               (1 << 5)
+#define  STATUS_TRANSACTION_ERR             (1 << 4)
+#define  INTERRUPT_ON_COMPLETE              (1 << 15)
+#define  LENGTH_BIT_POS                     (16)
+#define  ADDRESS_MASK                       (0xFFFFFFE0)
+#define  ERROR_MASK                         (DTD_STATUS_HALTED | \
+                                            DTD_STATUS_DATA_BUFF_ERR | \
+                                            DTD_STATUS_TRANSACTION_ERR)
 
-#define  RESERVED_FIELDS                        ((1 << 0) | (1 << 2) | (1 << 4) | \
-                                                (1 << 8) | (1 << 9) | (1 << 12)| \
-                                                (1 << 13)| (1 << 14)| (1 << 31))
+#define  RESERVED_FIELDS                    ((1 << 0) | (1 << 2) | (1 << 4) | \
+                                            (1 << 8) | (1 << 9) | (1 << 12)| \
+                                            (1 << 13)| (1 << 14)| (1 << 31))
 
 /* Endpoint Queue Head Bit Masks */
-#define  EP_QUEUE_HEAD_MULT_POS               (30)
-#define  EP_QUEUE_HEAD_ZLT_SEL                (0x20000000)
-#define  EP_QUEUE_HEAD_MAX_PKT_LEN(ep_info)   (((ep_info)>>16)&0x07ff)
-#define  EP_QUEUE_HEAD_MULTO                  (0x00000C00)
-#define  EP_QUEUE_CURRENT_OFFSET_MASK         (0x00000FFF)
-#define  EP_QUEUE_FRINDEX_MASK                (0x000007FF)
-#define  EP_MAX_LENGTH_TRANSFER               (0x4000)
+#define  EP_QUEUE_HEAD_MULT_POS             (30)
+#define  EP_QUEUE_HEAD_ZLT_SEL              (0x20000000)
+#define  EP_QUEUE_HEAD_MAX_PKT_LEN(ep_info) (((ep_info)>>16)&0x07ff)
+#define  EP_QUEUE_HEAD_MULTO                (0x00000C00)
+#define  EP_QUEUE_CURRENT_OFFSET_MASK       (0x00000FFF)
+#define  EP_QUEUE_FRINDEX_MASK              (0x000007FF)
+#define  EP_MAX_LENGTH_TRANSFER             (0x4000)
 
 /*-------------------------------------------------------------------------*/
 
@@ -104,8 +104,10 @@ static const char* ep_name[] = {
 
 /* Endpoint Transfer Descriptor data struct */
 struct dtd {
-    uint32_t next_dtd;       /* Next TD pointer(31-5), T(0) set indicate invalid */
-    uint32_t dtd_token;      /* Total bytes (30-16), IOC (15), MultO(11-10), STS (7-0)  */
+    uint32_t next_dtd;       /* Next TD pointer(31-5),
+                                T(0) set indicate invalid */
+    uint32_t dtd_token;      /* Total bytes (30-16), IOC (15),
+                                MultO(11-10), STS (7-0)  */
     uint32_t buf_ptr0;       /* Buffer pointer Page 0 */
     uint32_t buf_ptr1;       /* Buffer pointer Page 1 */
     uint32_t buf_ptr2;       /* Buffer pointer Page 2 */
@@ -146,7 +148,8 @@ void usb_arcotg_dcd_start(void);
 void usb_arcotg_dcd_stop(void);
 
 /* usb controller ops */
-int usb_arcotg_dcd_enable(struct usb_ep* ep, struct usb_endpoint_descriptor* desc);
+int usb_arcotg_dcd_enable(struct usb_ep* ep,
+                          struct usb_endpoint_descriptor* desc);
 int usb_arcotg_dcd_disable(struct usb_ep* ep);
 int usb_arcotg_dcd_set_halt(struct usb_ep* ep, bool halt);
 int usb_arcotg_dcd_send(struct usb_ep* ep, struct usb_response* request);
@@ -160,10 +163,12 @@ static void suspend_int(void);
 static void resume_int(void);
 
 /* life cycle */
-static void qh_init(unsigned char ep_num, unsigned char dir, unsigned char ep_type,
-                    unsigned int max_pkt_len, unsigned int zlt, unsigned char mult);
+static void qh_init(unsigned char ep_num, unsigned char dir,
+                    unsigned char ep_type, unsigned int max_pkt_len,
+                    unsigned int zlt, unsigned char mult);
 static void td_init(struct dtd* td, void* buffer, uint32_t todo);
-static void ep_setup(unsigned char ep_num, unsigned char dir, unsigned char ep_type);
+static void ep_setup(unsigned char ep_num, unsigned char dir,
+                     unsigned char ep_type);
 
 /* helpers for tx/rx */
 static int td_enqueue(struct dtd* td, struct dqh* qh, unsigned int mask);

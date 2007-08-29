@@ -147,14 +147,18 @@ void usb_arcotg_dcd_init(void)
             ep_num++;
         }
 
-        logf("pipe %d -> ep %d %s", dcd_controller.endpoints[i].pipe_num, dcd_controller.endpoints[i].ep_num, dcd_controller.endpoints[i].name);
+        logf("pipe %d -> ep %d %s", dcd_controller.endpoints[i].pipe_num,
+                                    dcd_controller.endpoints[i].ep_num,
+                                    dcd_controller.endpoints[i].name);
 
         if (ep_name[i] != NULL) {
-            memcpy(&dcd_controller.endpoints[i].name, ep_name[i], sizeof(dcd_controller.endpoints[i].name));
+            memcpy(&dcd_controller.endpoints[i].name, ep_name[i],
+            sizeof(dcd_controller.endpoints[i].name));
 
             if (i != 0) {
                 /* add to list of configurable endpoints */
-                list_add_tail(&dcd_controller.endpoints[i].list, &arcotg_dcd.endpoints.list);
+                list_add_tail(&dcd_controller.endpoints[i].list,
+                              &arcotg_dcd.endpoints.list);
             }
         }
     }
@@ -230,7 +234,8 @@ void usb_arcotg_dcd_irq(void)
         /* setup packet, we only support ep0 as control ep */
         if (UDC_ENDPTSETUPSTAT & EP_SETUP_STATUS_EP0) {
             /* copy data from queue head to local buffer */
-            memcpy(&dcd_controller.local_setup_buff, (uint8_t *) &dev_qh[0].setup_buffer, 8);
+            memcpy(&dcd_controller.local_setup_buff,
+                   (uint8_t *) &dev_qh[0].setup_buffer, 8);
             /* ack setup packet*/
             UDC_ENDPTSETUPSTAT = UDC_ENDPTSETUPSTAT;
             setup_received_int(&dcd_controller.local_setup_buff);
@@ -306,7 +311,9 @@ static void setup_received_int(struct usb_ctrlrequest* request)
                 int num = (request->wIndex & 0x000f);
                 struct usb_ep *ep;
 
-                if (request->wValue != 0 || request->wLength != 0 || (num * 2 + dir) > USB_MAX_PIPES) {
+                if (request->wValue != 0 ||
+                    request->wLength != 0 ||
+                    (num * 2 + dir) > USB_MAX_PIPES) {
                     break;
                 }
                 ep = &dcd_controller.endpoints[num * 2 + dir];
@@ -335,7 +342,8 @@ static void setup_received_int(struct usb_ctrlrequest* request)
 
     /* if dcd can not handle reqeust, ask driver */
     if (handled == 0) {
-        if (arcotg_dcd.device_driver != NULL && arcotg_dcd.device_driver->request != NULL) {
+        if (arcotg_dcd.device_driver != NULL && 
+            arcotg_dcd.device_driver->request != NULL) {
             handled = arcotg_dcd.device_driver->request(request);
             logf("result from driver %d", handled);
         }
@@ -389,7 +397,8 @@ static void port_change_int(void)
     }
 
     /* inform device driver */
-    if (arcotg_dcd.device_driver != NULL && arcotg_dcd.device_driver->speed != NULL) {
+    if (arcotg_dcd.device_driver != NULL &&
+        arcotg_dcd.device_driver->speed != NULL) {
         arcotg_dcd.device_driver->speed(speed);
     }
 }
@@ -401,7 +410,8 @@ static void suspend_int(void)
     dcd_controller.usb_state = USB_STATE_SUSPENDED;
 
     /* report suspend to the driver */
-    if (arcotg_dcd.device_driver != NULL && arcotg_dcd.device_driver->suspend != NULL) {
+    if (arcotg_dcd.device_driver != NULL &&
+        arcotg_dcd.device_driver->suspend != NULL) {
         arcotg_dcd.device_driver->suspend();
     }
 }
@@ -413,7 +423,8 @@ static void resume_int(void)
     dcd_controller.resume_state = USB_STATE_NOTATTACHED;
 
     /* report resume to the driver */
-    if (arcotg_dcd.device_driver != NULL && arcotg_dcd.device_driver->resume != NULL) {
+    if (arcotg_dcd.device_driver != NULL &&
+        arcotg_dcd.device_driver->resume != NULL) {
         arcotg_dcd.device_driver->resume();
     }
 }
@@ -455,7 +466,8 @@ static void reset_int(void)
 /*-------------------------------------------------------------------------*/
 /* usb controller ops */
 
-int usb_arcotg_dcd_enable(struct usb_ep* ep, struct usb_endpoint_descriptor* desc)
+int usb_arcotg_dcd_enable(struct usb_ep* ep,
+                          struct usb_endpoint_descriptor* desc)
 {
     unsigned short max = 0;
     unsigned char mult = 0, zlt = 0;
@@ -610,7 +622,8 @@ int usb_arcotg_dcd_enable(struct usb_ep* ep, struct usb_endpoint_descriptor* des
 
     /* Init endpoint x at here */
     ep_setup(ep->ep_num,    		
-            (unsigned char)(desc->bEndpointAddress & USB_DIR_IN) ? USB_RECV : USB_SEND,
+            (unsigned char)(desc->bEndpointAddress & USB_DIR_IN) ?
+                                                            USB_RECV : USB_SEND,
             (unsigned char)(desc->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK));
 
     /* Now HW will be NAKing transfers to that EP,
@@ -810,8 +823,9 @@ int usb_arcotg_dcd_receive(struct usb_ep* ep, struct usb_response* res)
 /*-------------------------------------------------------------------------*/
 /* lifecylce */
 
-static void qh_init(unsigned char ep_num, unsigned char dir, unsigned char ep_type,
-                    unsigned int max_pkt_len, unsigned int zlt, unsigned char mult)
+static void qh_init(unsigned char ep_num, unsigned char dir,
+                    unsigned char ep_type, unsigned int max_pkt_len,
+                    unsigned int zlt, unsigned char mult)
 {
     struct dqh *qh = &dev_qh[2 * ep_num + dir];
     uint32_t tmp = 0;
@@ -824,7 +838,8 @@ static void qh_init(unsigned char ep_num, unsigned char dir, unsigned char ep_ty
         tmp = (max_pkt_len << LENGTH_BIT_POS) | INTERRUPT_ON_COMPLETE;
         break;
     case USB_ENDPOINT_XFER_ISOC:
-        tmp = (max_pkt_len << LENGTH_BIT_POS) | (mult << EP_QUEUE_HEAD_MULT_POS);
+        tmp = (max_pkt_len << LENGTH_BIT_POS) |
+              (mult << EP_QUEUE_HEAD_MULT_POS);
         break;
     case USB_ENDPOINT_XFER_BULK:
     case USB_ENDPOINT_XFER_INT:
@@ -840,7 +855,8 @@ static void qh_init(unsigned char ep_num, unsigned char dir, unsigned char ep_ty
 
     /* see 32.14.4.1 Queue Head Initialization */
 
-    /* write the wMaxPacketSize field as required by the USB Chapter9 or application specific portocol */
+    /* write the wMaxPacketSize field as required by the USB Chapter9 or
+       application specific portocol */
     qh->endpt_cap = tmp;
 
     /* write the next dTD Terminate bit fild to 1 */
@@ -871,13 +887,15 @@ static void td_init(struct dtd* td, void* buffer, uint32_t todo)
     /* set interrupt on compilte if desierd */
     td->dtd_token |= INTERRUPT_ON_COMPLETE;
 
-    /* initialize the status field with the active bit set to 1 and all remaining status bits to 0 */
+    /* initialize the status field with the active bit set to 1 and all
+       remaining status bits to 0 */
     td->dtd_token |= STATUS_ACTIVE;
 
     td->buf_ptr0 = (uint32_t)buffer;
 }
 
-static void ep_setup(unsigned char ep_num, unsigned char dir, unsigned char ep_type)
+static void ep_setup(unsigned char ep_num, unsigned char dir,
+                     unsigned char ep_type)
 {
     unsigned int tmp_epctrl = 0;
     struct timer t;
@@ -904,7 +922,8 @@ static void ep_setup(unsigned char ep_num, unsigned char dir, unsigned char ep_t
     /* wait for the write reg to finish */
 
     timer_set(&t, SETUP_TIMER);
-    while (!(UDC_ENDPTCTRL(ep_num) & (tmp_epctrl & (EPCTRL_TX_ENABLE | EPCTRL_RX_ENABLE)))) {
+    while (!(UDC_ENDPTCTRL(ep_num) &
+             (tmp_epctrl & (EPCTRL_TX_ENABLE | EPCTRL_RX_ENABLE)))) {
         if (timer_expired(&t)) {
             logf("TIMEOUT: enable ep");
             return;
