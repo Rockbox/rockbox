@@ -2542,7 +2542,7 @@
   </source>
   <dest>
     *: none
-    recording: ""
+    recording: deprecated
   </dest>
   <voice>
     *: none
@@ -2576,7 +2576,7 @@
   </source>
   <dest>
     *: none
-    recording: "Clipping Light"
+    recording: "削波显示灯"
   </dest>
   <voice>
     *: none
@@ -11045,5 +11045,192 @@
   <voice>
     *: none
     radio: "FM Radio Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    usbstack: "USB Stack"
+  </source>
+  <dest>
+    *: none
+    usbstack: "USB 接口"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "USB Stack"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNTER
+  desc: in settings, for recording peak meter
+  user: 
+  <source>
+    *: none
+    recording: "Clip Counter"
+  </source>
+  <dest>
+    *: none
+    recording: "削波屡计"
+  </dest>
+  <voice>
+    *: none
+    recording: "Clip Counter"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_AM
+  desc: spoken only, for wall clock announce
+  user: 
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "A M"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_HOST
+  desc: in usbstack settings
+  user: 
+  <source>
+    *: none
+    usbstack: "Host"
+  </source>
+  <dest>
+    *: none
+    usbstack: "USB主控"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Host"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OH
+  desc: spoken only, for wall clock announce
+  user: 
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "oh"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_MODE
+  desc: in usbstack settings
+  user: 
+  <source>
+    *: none
+    usbstack: "USB Stack Mode"
+  </source>
+  <dest>
+    *: none
+    usbstack: "USB接口模式"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "USB Stack Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE
+  desc: in usbstack settings
+  user: 
+  <source>
+    *: none
+    usbstack: "Device"
+  </source>
+  <dest>
+    *: none
+    usbstack: "仪器"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Device"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PM
+  desc: spoken only, for wall clock announce
+  user: 
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "P M"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE_DRIVER
+  desc: in usbstack settings
+  user: 
+  <source>
+    *: none
+    usbstack: "Device Driver"
+  </source>
+  <dest>
+    *: none
+    usbstack: "驱动程序"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Device Driver"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PM_CLIPCOUNT
+  desc: in recording GUI, for recording peak meter. MAX 5 characters!
+  user: 
+  <source>
+    *: none
+    recording: "CLIP:"
+  </source>
+  <dest>
+    *: none
+    recording: "CLIP:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OCLOCK
+  desc: spoken only, for wall clock announce
+  user: 
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "o'clock"
   </voice>
 </phrase>
