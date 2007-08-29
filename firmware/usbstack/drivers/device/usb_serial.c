@@ -296,7 +296,7 @@ static int config_buf(uint8_t *buf, uint8_t type, unsigned index)
     int len;
 
     /* TODO check index*/
-	(void)index;
+    (void)index;
 
     len = usb_stack_configdesc(&serial_bulk_config_desc, buf, BUFFER_SIZE, dev.descriptors);
     if (len < 0) {

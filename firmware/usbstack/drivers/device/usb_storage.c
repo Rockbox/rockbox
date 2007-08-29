@@ -279,8 +279,8 @@ static int config_buf(uint8_t *buf, uint8_t type, unsigned index)
 {
     int len;
 
-	(void)index;
-	
+    (void)index;
+
     len = usb_stack_configdesc(&storage_config_desc, buf, BUFFER_SIZE, dev.descriptors);
     logf("result %d", len);
     if (len < 0) {
@@ -292,7 +292,7 @@ static int config_buf(uint8_t *buf, uint8_t type, unsigned index)
 
 static int set_config(int config)
 {
-	(void)config;
+    (void)config;
 	
     /* enable endpoints */
     logf("setup %s", dev.in->name);
