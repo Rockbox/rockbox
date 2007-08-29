@@ -13,7 +13,7 @@
    <string>Rockbox Utility</string>
   </property>
   <property name="windowIcon" >
-   <iconset resource="rbutilqt.qrc" >:/icons/icons/rbutil.xpm</iconset>
+   <iconset resource="rbutilqt.qrc" >:/icons/icons/rockbox-1.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget" >
    <layout class="QGridLayout" >
