@@ -25,7 +25,7 @@ static struct usb_dcd_controller_ops* ops;
 struct usb_device_driver usb_serial_driver = {
     .name =         "serial",
     .bind =         usb_serial_driver_bind,
-    .unbind =       NULL,
+    .unbind =       usb_serial_driver_unbind,
     .request =      usb_serial_driver_request,
     .suspend =      NULL,
     .resume =       NULL,
@@ -210,6 +210,11 @@ int usb_serial_driver_bind(void* controler_ops)
 autoconf_fail:
     logf("failed to find endpoints");
     return -EOPNOTSUPP;
+}
+
+void usb_serial_driver_unbind(void) {
+
+    /* disable endpoints... */
 }
 
 int usb_serial_driver_request(struct usb_ctrlrequest* request)

@@ -479,7 +479,7 @@ int usbdriver_menuitem(void)
                    global_settings.usb_stack_device_driver))
             break;
     }
-    
+
     gui_synclist_init(&lists, usb_menu_getname, drivers, false, 1);
     gui_synclist_set_title(&lists, str(LANG_USBSTACK_DEVICE_DRIVER), NOICON);
     gui_synclist_set_icon_callback(&lists, NULL);
@@ -495,14 +495,17 @@ int usbdriver_menuitem(void)
             continue;
         if (action == ACTION_STD_CANCEL)
         {
-            // setting was canceled
+            /* setting was canceled */
             break;
         }
         else if (action == ACTION_STD_OK)
         {
-            // setting was accepted... save
-            strcpy(global_settings.usb_stack_device_driver, 
+            /* setting was accepted... save */
+            strcpy(global_settings.usb_stack_device_driver,
                   drivers[gui_synclist_get_sel_pos(&lists)]);
+
+            /* switch device driver */
+            usb_device_driver_bind(drivers[gui_synclist_get_sel_pos(&lists)]);
             break;
         }
         else if (action == ACTION_REDRAW)
