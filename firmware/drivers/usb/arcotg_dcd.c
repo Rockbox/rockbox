@@ -385,7 +385,6 @@ static void setup_received_int(struct usb_ctrlrequest* request)
 
 static void port_change_int(void)
 {
-    //logf("port_change_int");
     uint32_t tmp;
     enum usb_device_speed speed = USB_SPEED_UNKNOWN; 
 
@@ -430,7 +429,6 @@ static void port_change_int(void)
 
 static void suspend_int(void)
 {
-    //logf("suspend_int");
     dcd_controller.resume_state = dcd_controller.usb_state;
     dcd_controller.usb_state = USB_STATE_SUSPENDED;
 
@@ -443,7 +441,6 @@ static void suspend_int(void)
 
 static void resume_int(void)
 {
-    //logf("resume_int");
     dcd_controller.usb_state = dcd_controller.resume_state;
     dcd_controller.resume_state = USB_STATE_NOTATTACHED;
 
@@ -744,9 +741,6 @@ int usb_arcotg_dcd_send(struct usb_ep* ep, struct usb_response* res)
     if (ep != NULL) {
         index = ep->pipe_num;
     }
-
-    logf("buff: %x", res->buf);
-    logf("len: %d", res->length);
 
     ptr = res->buf;
     size = res->length;

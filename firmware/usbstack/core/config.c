@@ -35,10 +35,9 @@ static int usb_descriptor_fillbuf(void* buf, unsigned buflen, struct usb_descrip
     for (; 0 != *src; src++) {
         unsigned len = (*src)->bLength;
 
-        logf("len: %d", len);
-
         if (len > buflen)
             return -EINVAL;
+
         memcpy(dest, *src, len);
         buflen -= len;
         dest += len;
