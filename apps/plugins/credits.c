@@ -21,6 +21,66 @@
 
 PLUGIN_HEADER
 
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+
+#define QUIT BUTTON_OFF
+#define UP BUTTON_UP
+#define DOWN BUTTON_DOWN
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+
+#define QUIT BUTTON_OFF
+#define UP BUTTON_UP
+#define DOWN BUTTON_DOWN
+
+#elif CONFIG_KEYPAD == RECORDER_PAD
+
+#define QUIT BUTTON_OFF
+#define UP BUTTON_UP
+#define DOWN BUTTON_DOWN
+
+#elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
+
+#define QUIT BUTTON_OFF
+#define UP BUTTON_UP
+#define DOWN BUTTON_DOWN
+
+#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_4G_PAD)
+
+#define QUIT BUTTON_MENU
+#define UP BUTTON_SCROLL_BACK
+#define DOWN BUTTON_SCROLL_FWD
+
+#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
+
+#define QUIT BUTTON_A
+#define UP BUTTON_UP
+#define DOWN BUTTON_DOWN
+
+#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD /* grayscale at the moment */
+
+#define QUIT BUTTON_POWER
+#define UP BUTTON_UP
+#define DOWN BUTTON_DOWN
+
+#elif CONFIG_KEYPAD == SANSA_E200_PAD
+
+#define QUIT BUTTON_POWER
+#define UP BUTTON_SCROLL_UP
+#define DOWN BUTTON_SCROLL_DOWN
+
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD /* grayscale at the moment */
+
+#define QUIT BUTTON_POWER
+#define UP BUTTON_SCROLL_UP
+#define DOWN BUTTON_SCROLL_DOWN
+
+#else
+#error Unsupported keypad
+#endif
+
+
 void roll_credits(void);
 const char* const credits[] = {
 #include "credits.raw" /* generated list of names from docs/CREDITS */
@@ -49,7 +109,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->sleep((HZ*2)/10);
 
         btn = rb->button_get(false);
-        if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
+        if (btn !=  BUTTON_NONE && (btn & QUIT))
             goto end_of_proc;
     }
 
@@ -107,7 +167,7 @@ void roll_credits(void)
         rb->lcd_update();
 
         /* abort on keypress */
-        if (rb->button_get_w_tmo(HZ/8) & BUTTON_REL)
+        if (rb->button_get_w_tmo(HZ/8) & QUIT)
             return;
 
         if (++curr_index >= curr_len)
@@ -147,7 +207,7 @@ void roll_credits(void)
     #define NUM_VISIBLE_LINES (LCD_HEIGHT/font_h - 1)
     #define CREDITS_TARGETPOS ((LCD_WIDTH/2)-(credits_w/2))
 
-    int i=0, j=0, namepos=0, offset_dummy, btn;
+    int i=0, j=0, k=0, namepos=0, offset_dummy, btn;
     int name_w, name_h, name_targetpos=1, font_h;
     int credits_w, credits_pos;
     int numnames = (sizeof(credits)/sizeof(char*));
@@ -197,9 +257,9 @@ void roll_credits(void)
             rb->lcd_update_rect(0, font_h*(i+1), LCD_WIDTH, font_h);
             rb->lcd_update_rect(CREDITS_TARGETPOS, 0, credits_w, font_h);
 
-            /* exit on keypress */
+            /* exit on power key */
             btn = rb->button_get_w_tmo(HZ/ANIM_SPEED);
-            if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
+            if (btn !=  BUTTON_NONE && (btn & QUIT))
                 return;
         }
     }
@@ -207,52 +267,91 @@ void roll_credits(void)
 
     /* pause for a bit if needed */
     btn = rb->button_get_w_tmo(HZ*PAUSE_TIME); /* exit on keypress */
-    if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
+    if (btn !=  BUTTON_NONE && (btn & QUIT))
         return;
 
     /* now begin looping the in-out animation */
-    while(j < numnames)
-    {
-        /* just a screen's worth at a time */
-        for(i=0; i<NUM_VISIBLE_LINES; i++)
+    do {
+      for(; j < numnames; j+=i)
         {
-            if(j+i >= numnames)
+          /* just a screen's worth at a time */
+          for(i=0; i<NUM_VISIBLE_LINES; i++)
+            {
+              if(j+i >= numnames)
                 break;
 
-            offset_dummy=1;
+              offset_dummy=1;
 
-            rb->snprintf(name, sizeof(name), "%s", credits[j+i-NUM_VISIBLE_LINES]);
-            rb->lcd_getstringsize(name, &name_w, &name_h);
+              rb->snprintf(name, sizeof(name), "%s", 
+                           credits[(j>=NUM_VISIBLE_LINES)?
+                                 j+i-NUM_VISIBLE_LINES:j+i]);
+              rb->lcd_getstringsize(name, &name_w, &name_h);
 
-            /* fly out an existing line.. */
-            while(namepos<LCD_WIDTH+offset_dummy)
-            {
+              /* fly out an existing line.. */
+              while(namepos<LCD_WIDTH+offset_dummy)
+              {
                 rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
                 rb->lcd_fillrect(0, font_h*(i+1), LCD_WIDTH, font_h); /* clear trails */
                 rb->lcd_set_drawmode(DRMODE_SOLID);
                 rb->lcd_putsxy(namepos, font_h*(i+1), name);
                 rb->lcd_update_rect(0, font_h*(i+1), LCD_WIDTH, font_h);
 
-                /* exit on keypress */
+                /* exit on keypress, react to scrolling */
                 btn = rb->button_get_w_tmo(HZ/ANIM_SPEED);
-                if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
+                if (btn !=  BUTTON_NONE) 
+                {
+                  if (btn & QUIT)
                     return;
-
+                  else if ((btn & UP) ^ (btn & DOWN)) 
+                  {
+                    /* compute the new position */
+                    j+=((btn & UP)?-1:1)*(NUM_VISIBLE_LINES/2);
+                    if (j+i >= numnames) j=numnames-i-1;
+                    if (j < 0) j = 0;
+                  
+                    /* and refresh the whole screen */
+                    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                    rb->lcd_fillrect(0, 0, LCD_WIDTH, 
+                                     font_h * (NUM_VISIBLE_LINES+1));
+                    rb->lcd_set_drawmode(DRMODE_SOLID);
+                    
+                    rb->snprintf(elapsednames, sizeof(elapsednames), 
+                                 "[Credits] %d/%d", j+i+1, numnames);
+                    rb->lcd_getstringsize(elapsednames, &credits_w, NULL);
+                    rb->lcd_putsxy(CREDITS_TARGETPOS, 0, elapsednames);
+                    
+                    for (k=0; k<NUM_VISIBLE_LINES; k++)
+                      if (k!=i)
+                      {
+                        rb->snprintf(name, sizeof(name), "%s", 
+                                     credits[(j>=NUM_VISIBLE_LINES)?
+                                             ((k<i)?
+                                              (j+k):(j+k-NUM_VISIBLE_LINES)):
+                                             j+k]);
+                        rb->lcd_putsxy(0, font_h*(k+1), name);
+                      }
+                    rb->lcd_update_rect(0, font_h, LCD_WIDTH, 
+                                        font_h * (NUM_VISIBLE_LINES+1));
+                    break;
+                  }
+                }
                 namepos += offset_dummy;
                 offset_dummy++;
-            }
+              }
 
-            rb->snprintf(name, sizeof(name), "%s", credits[j+i]);
-            rb->lcd_getstringsize(name, &name_w, &name_h);
+              rb->snprintf(name, sizeof(name), "%s", credits[j+i]);
+              rb->lcd_getstringsize(name, &name_w, &name_h);
 
-            rb->snprintf(elapsednames, sizeof(elapsednames), "[Credits] %d/%d",
-                         j+i+1, numnames);
-            rb->lcd_getstringsize(elapsednames, &credits_w, NULL);
-            rb->lcd_putsxy(CREDITS_TARGETPOS, 0, elapsednames);
+              rb->snprintf(elapsednames, sizeof(elapsednames), "[Credits] %d/%d",
+                           j+i+1, numnames);
+              rb->lcd_getstringsize(elapsednames, &credits_w, NULL);
+              rb->lcd_putsxy(CREDITS_TARGETPOS, 0, elapsednames);
+              if (j+i < NUM_VISIBLE_LINES) /* takes care of trail on loop */
+                rb->lcd_update_rect(0, 0, LCD_WIDTH, font_h);
 
-            for(namepos = 0-name_w; namepos <= name_targetpos;
-                namepos += (name_targetpos - namepos + 14) / 7)
-            {
+              for(namepos = 0-name_w; namepos <= name_targetpos;
+                  namepos += (name_targetpos - namepos + 14) / 7)
+              {
                 rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
                 rb->lcd_fillrect(0, font_h*(i+1), LCD_WIDTH, font_h);
                 rb->lcd_set_drawmode(DRMODE_SOLID);
@@ -262,23 +361,30 @@ void roll_credits(void)
 
                 /* exit on keypress */
                 btn = rb->button_get_w_tmo(HZ/ANIM_SPEED);
-                if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
-                    return;
+                if (btn !=  BUTTON_NONE && (btn & QUIT))
+                  return;
+              }
+
+              namepos = name_targetpos;
+
+              /* ..and repeat. */
             }
 
-            namepos = name_targetpos;
-
-            /* ..and repeat. */
-        }
-        j+=i;
-
-        btn = rb->button_get_w_tmo(HZ*PAUSE_TIME); /* exit on keypress */
-        if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
+          btn = rb->button_get_w_tmo(HZ*PAUSE_TIME); /* exit on keypress */
+          if (btn !=  BUTTON_NONE && (btn & QUIT))
             return;
-    }
+        }
+
+      j = 0;
+      if(k) {
+        /* on loop, the new credit line might shorten */
+        rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        rb->lcd_fillrect(0, 0, LCD_WIDTH, font_h);
+      }
+    } while(k); /* repeat in-out animation forever if scrolling occured */
 
     btn = rb->button_get_w_tmo(HZ*2.5); /* exit on keypress */
-    if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
+    if (btn !=  BUTTON_NONE && (btn & QUIT))
         return;
 
     offset_dummy = 1;
