@@ -140,16 +140,6 @@
     </message>
     <message>
         <location filename="" line="0"/>
-        <source>Firmware doesn not exist: %1</source>
-        <translation type="obsolete">Le firmware n&apos;existe pas : %1</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>Original Firmware doesn not exist: %1</source>
-        <translation type="obsolete">Le firmware original n&apos;existe pas : %1</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
         <source>Firmware does not exist: %1</source>
         <translation>Le firmware n&apos;existe pas : %1</translation>
     </message>
@@ -956,7 +946,7 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     <message>
         <location filename="" line="0"/>
         <source>&lt;a href=&apos;%1&apos;&gt;Manual Overview&lt;/a&gt;</source>
-        <translation>&lt;a href=&apos;%1&apos;&gt;Vue d&apos;ensemble du manuel&lt;/a&gt;</translation>
+        <translation>&lt;a href=&apos;%1&apos;&gt;Tous les manuels&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="" line="0"/>
@@ -1084,6 +1074,11 @@ Voulez-vous vraiment l&apos;installer ?</translation>
         <location filename="" line="0"/>
         <source>Successfully installed Rockbox Utility.</source>
         <translation>Installation de l&apos;utilitaire Rockbox terminée avec succès.</translation>
+    </message>
+    <message>
+        <location filename="" line="0"/>
+        <source>Bootloader installation Skipped!</source>
+        <translation>Etape d&apos;instllation du bootloader sautée !</translation>
     </message>
 </context>
 <context>
@@ -1462,6 +1457,11 @@ p, li { white-space: pre-wrap; }
         <location filename="" line="0"/>
         <source>About &amp;Qt</source>
         <translation>A propos de &amp;Qt</translation>
+    </message>
+    <message>
+        <location filename="" line="0"/>
+        <source>&amp;Help</source>
+        <translation>&amp;Aide</translation>
     </message>
 </context>
 <context>
