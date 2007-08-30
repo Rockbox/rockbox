@@ -283,6 +283,7 @@ static void setup_received_int(struct usb_ctrlrequest* request)
 {
     int error = 0;
     uint8_t address = 0;
+    bool set_config = false;
     int handled = 0;    /* set to zero if we do not handle the message, */
                         /* and should pass it to the driver */
 
@@ -295,15 +296,17 @@ static void setup_received_int(struct usb_ctrlrequest* request)
 
         switch (request->bRequest) {
         case USB_REQ_SET_ADDRESS:
-
             /* store address as we need to ack before setting it */
             address = (uint8_t)request->wValue;
 
             handled = 1;
             break;
 
-        case USB_REQ_GET_STATUS:
+        case USB_REQ_SET_CONFIGURATION:
+            set_config = true;
+            break;
 
+        case USB_REQ_GET_STATUS:
             logf("sending status..");
             response.buf = &dcd_controller.usb_state;
             response.length = 2;
@@ -365,9 +368,18 @@ static void setup_received_int(struct usb_ctrlrequest* request)
     /* ack transfer */
     usb_ack(request, error);
 
+    /* set address and usb state after USB_REQ_SET_ADDRESS */
     if (address != 0) {
         logf("setting address to %d", address);
         UDC_DEVICEADDR = address << 25;
+        dcd_controller.usb_state = USB_STATE_ADDRESS;
+    }
+
+    /* update usb state after successfull USB_REQ_SET_CONFIGURATION */
+    if (set_config) {
+        if (handled > 0) {
+            dcd_controller.usb_state = USB_STATE_CONFIGURED;
+        }
     }
 }
 
@@ -444,8 +456,13 @@ static void resume_int(void)
 
 static void reset_int(void)
 {
-    //logf("reset_int");
     struct timer t;
+
+    /* clear device address */
+    UDC_DEVICEADDR = 0 << 25;
+
+    /* update usb state */
+    dcd_controller.usb_state = USB_STATE_DEFAULT;
 
     timer_set(&t, RESET_TIMER);
 
@@ -682,7 +699,7 @@ int usb_arcotg_dcd_set_halt(struct usb_ep* ep, bool halt)
     }
 
     status = 0;
-    dir = ep_is_in(ep) ? USB_SEND : USB_RECV;
+    dir = ep_is_in(ep) ? USB_RECV : USB_SEND;
 
     tmp_epctrl = UDC_ENDPTCTRL(ep->ep_num);
 
@@ -706,7 +723,7 @@ int usb_arcotg_dcd_set_halt(struct usb_ep* ep, bool halt)
     UDC_ENDPTCTRL(ep->ep_num) = tmp_epctrl;
 
 out:
-    logf(" %s %s halt rc=%d", ep->name, halt ? "set" : "clear", status);
+    logf("%s %s halt rc=%d", ep->name, halt ? "set" : "clear", status);
     return status;
 }
 
