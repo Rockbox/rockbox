@@ -88,6 +88,12 @@ PLUGIN_HEADER
 #define UP BUTTON_SCROLL_BACK
 #define DOWN BUTTON_SCROLL_FWD
 
+#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
+
+#define QUIT BUTTON_PLAY
+#define UP BUTTON_UP
+#define DOWN BUTTON_DOWN
+
 #else
 #error Unsupported keypad
 #endif
