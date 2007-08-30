@@ -297,12 +297,14 @@ void Config::setDevices(QSettings *dev)
     int index;
     index = ui.comboTts->findData(userSettings->value("ttspreset").toString(),
                             Qt::UserRole, Qt::MatchExactly);
+    if(index < 0) index = 0;
     ui.comboTts->setCurrentIndex(index);
     updateTtsOpts(index);
     ui.ttsExecutable->setText(userSettings->value("ttsbin").toString());
 
     index = ui.comboEncoder->findData(userSettings->value("encpreset").toString(),
                             Qt::UserRole, Qt::MatchExactly);
+    if(index < 0) index = 0;
     ui.comboEncoder->setCurrentIndex(index);
     updateEncOpts(index);
     ui.encoderExecutable->setText(userSettings->value("encbin").toString());
