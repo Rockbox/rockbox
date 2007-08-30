@@ -549,7 +549,7 @@
   </dest>
   <voice>
     *: none
-    masf: "Intensita'� MDB"
+    masf: "Intensità MDB"
   </voice>
 </phrase>
 <phrase>
@@ -1386,7 +1386,7 @@
     *: "Priorità info ID3"
   </dest>
   <voice>
-    *: "Priorita' ID3 tag"
+    *: "Priorità ID3 tag"
   </voice>
 </phrase>
 <phrase>
@@ -1526,7 +1526,7 @@
     *: "Dal più recente"
   </dest>
   <voice>
-    *: "dal piu' recente"
+    *: "dal più recente"
   </voice>
 </phrase>
 <phrase>
@@ -1999,7 +1999,7 @@
     *: "Spegnimento per inattività"
   </dest>
   <voice>
-    *: "Spegnimento per Inattivita'"
+    *: "Spegnimento per Inattività"
   </voice>
 </phrase>
 <phrase>
@@ -2078,7 +2078,7 @@
   </dest>
   <voice>
     *: none
-    charging: "Modalita' Adattatore Auto"
+    charging: "Modalità Adattatore Auto"
   </voice>
 </phrase>
 <phrase>
@@ -2263,7 +2263,7 @@
   </dest>
   <voice>
     *: none
-    recording_hwcodec: "Qualita'"
+    recording_hwcodec: "Qualità"
   </voice>
 </phrase>
 <phrase>
@@ -2566,7 +2566,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Modalita' fade out"
+    swcodec: "Modalità fade out"
   </voice>
 </phrase>
 <phrase>
@@ -2780,7 +2780,7 @@
   </dest>
   <voice>
     *: none
-    backlight_brightness: "Luminosita'"
+    backlight_brightness: "Luminosità"
   </voice>
 </phrase>
 <phrase>
@@ -2944,7 +2944,7 @@
     *: "Velocità scorrimento"
   </dest>
   <voice>
-    *: "Velocita' scorrimento"
+    *: "Velocità scorrimento"
   </voice>
 </phrase>
 <phrase>
@@ -3384,7 +3384,7 @@
     *: "Capacità batteria"
   </dest>
   <voice>
-    *: "Capacita' Batteria"
+    *: "Capacità Batteria"
   </voice>
 </phrase>
 <phrase>
@@ -6602,7 +6602,7 @@
   </dest>
   <voice>
     *: none
-    radio: "La lista delle stazioni e' piena"
+    radio: "La lista delle stazioni è piena"
   </voice>
 </phrase>
 <phrase>
@@ -6820,7 +6820,7 @@
     *: "Il buffer cartella è pieno!"
   </dest>
   <voice>
-    *: "Il buffer cartella e' pieno!"
+    *: "Il buffer cartella è pieno!"
   </voice>
 </phrase>
 <phrase>
@@ -7283,7 +7283,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Unita' principale e telecomando"
+    remote: "Unità principale e telecomando"
   </voice>
 </phrase>
 <phrase>
@@ -7314,7 +7314,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Solo unita' principale"
+    remote: "Solo unità principale"
   </voice>
 </phrase>
 <phrase>
@@ -7379,7 +7379,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Velocita'"
+    pitchscreen: "Velocità"
   </voice>
 </phrase>
 <phrase>
@@ -8821,7 +8821,7 @@
   </dest>
   <voice>
     *: none
-    lcd_sleep: "Sospendi Quando la luce e' spenta"
+    lcd_sleep: "Sospendi Quando la luce è spenta"
   </voice>
 </phrase>
 <phrase>
@@ -9624,7 +9624,7 @@
     *: "Proprietà"
   </dest>
   <voice>
-    *: "Proprieta'"
+    *: "Proprietà"
   </voice>
 </phrase>
 <phrase>
