@@ -125,8 +125,12 @@ void Install::done(bool error)
     }
 
     // no error, close the window, when the logger is closed
-    connect(logger,SIGNAL(closed()),this,SLOT(close()));     
-
+    connect(logger,SIGNAL(closed()),this,SLOT(close()));
+    // add platform info to log file for later detection
+    QSettings installlog(userSettings->value("defaults/mountpoint").toString()
+            + "/.rockbox/rbutil.log", QSettings::IniFormat, 0);
+    installlog.setValue("platform", userSettings->value("defaults/platform").toString());
+    installlog.sync();
 }
 
 

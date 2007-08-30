@@ -28,15 +28,28 @@ bool Autodetection::detect()
 {
     m_device = "";
     m_mountpoint = "";
-    
-    // Try detection via rockbox.info
+
+    // Try detection via rockbox.info / rbutil.log
     QStringList mountpoints = getMountpoints();
 
     for(int i=0; i< mountpoints.size();i++)
     {
+        // do the file checking
         QDir dir(mountpoints.at(i));
         if(dir.exists())
         {
+            // check logfile first.
+            if(QFile(mountpoints.at(i) + "/.rockbox/rbutil.log").exists()) {
+                QSettings log(mountpoints.at(i) + "/.rockbox/rbutil.log",
+                              QSettings::IniFormat, this);
+                if(!log.value("platform").toString().isEmpty()) {
+                    m_device = log.value("platform").toString();
+                    m_mountpoint = mountpoints.at(i);
+                    return true;
+                }
+            }
+
+            // check rockbox-info.txt afterwards.
             QFile file(mountpoints.at(i) + "/.rockbox/rockbox-info.txt");
             if(file.exists())
             {
@@ -51,6 +64,7 @@ bool Autodetection::detect()
                 }
             }
         }
+
     }
     int n;
     
