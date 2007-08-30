@@ -517,13 +517,16 @@ void Config::autodetect()
     if(detector.detect())  //let it detect
     {
         QString devicename = detector.getDevice();
-        //deexpand the platform
-        ui.treeDevices->selectedItems().at(0)->parent()->setExpanded(false);
-        //deselect the selected item
-        ui.treeDevices->selectedItems().at(0)->setSelected(false);
+        
+        if(ui.treeDevices->selectedItems().size() > 0) {
+            // deexpand the platform
+            ui.treeDevices->selectedItems().at(0)->parent()->setExpanded(false);
+            //deselect the selected item
+            ui.treeDevices->selectedItems().at(0)->setSelected(false);
+        }
 
         // find the new item
-        //enumerate al plattform items
+        // enumerate all platform items
         QList<QTreeWidgetItem*> itmList= ui.treeDevices->findItems("*",Qt::MatchWildcard);
         for(int i=0; i< itmList.size();i++)
         {
@@ -532,7 +535,7 @@ void Config::autodetect()
             {
                 QString data = itmList.at(i)->child(j)->data(0, Qt::UserRole).toString();
                 
-                if( devicename.contains(data)) //item found
+                if(devicename == data) // item found
                 {
                     itmList.at(i)->child(j)->setSelected(true); //select the item
                     itmList.at(i)->setExpanded(true); //expand the platform item
