@@ -58,33 +58,31 @@ void Install::accept()
     }
 
     QString myversion;
+    QString buildname;
+    devices->beginGroup(userSettings->value("defaults/platform").toString());
+    buildname = devices->value("platform").toString();
+    devices->endGroup();
     if(ui.radioStable->isChecked()) {
         file = QString("%1/rockbox-%2-%3.zip")
                 .arg(devices->value("download_url").toString(),
-                    devices->value("last_release").toString(),
-                    userSettings->value("defaults/platform").toString());
+                    devices->value("last_release").toString(), buildname);
         fileName = QString("rockbox-%1-%2.zip")
-                   .arg(devices->value("last_release").toString(),
-                   userSettings->value("defaults/platform").toString());
+                   .arg(devices->value("last_release").toString(), buildname);
         userSettings->setValue("defaults/build", "stable");
         myversion = version.value("rel_rev");
     }
     else if(ui.radioArchived->isChecked()) {
         file = QString("%1%2/rockbox-%3-%4.zip")
             .arg(devices->value("daily_url").toString(),
-            userSettings->value("defaults/platform").toString(),
-            userSettings->value("defaults/platform").toString(),
-            version.value("arch_date"));
+            buildname, buildname, version.value("arch_date"));
         fileName = QString("rockbox-%1-%2.zip")
-            .arg(userSettings->value("defaults/platform").toString(),
-            version.value("arch_date"));
+            .arg(buildname, version.value("arch_date"));
         userSettings->setValue("defaults/build", "archived");
         myversion = "r" + version.value("arch_rev") + "-" + version.value("arch_date");
     }
     else if(ui.radioCurrent->isChecked()) {
         file = QString("%1%2/rockbox.zip")
-            .arg(devices->value("bleeding_url").toString(),
-        userSettings->value("defaults/platform").toString());
+            .arg(devices->value("bleeding_url").toString(), buildname);
         fileName = QString("rockbox.zip");
         userSettings->setValue("defaults/build", "current");
         myversion = "r" + version.value("bleed_rev");
