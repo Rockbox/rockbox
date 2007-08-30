@@ -14,7 +14,13 @@ ifdef APPEXTRA
    INCLUDES += $(patsubst %,-I$(APPSDIR)/%,$(subst :, ,$(APPEXTRA)))
 endif
 
-MUSEPACKOPTS = -O2
+# libmusepack is faster on ARM-targets with -O1 instead of -O2
+ifeq ($(CPU),arm)
+   MUSEPACKOPTS += -O1
+else
+   MUSEPACKOPTS += -O2
+endif
+
 CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET_INC) $(MUSEPACKOPTS) $(TARGET) \
 $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE} $(PROFILE_OPTS)
 
