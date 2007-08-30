@@ -517,13 +517,12 @@ void Config::autodetect()
     if(detector.detect())  //let it detect
     {
         QString devicename = detector.getDevice();
-        
-        if(ui.treeDevices->selectedItems().size() > 0) {
-            // deexpand the platform
-            ui.treeDevices->selectedItems().at(0)->parent()->setExpanded(false);
-            //deselect the selected item
-            ui.treeDevices->selectedItems().at(0)->setSelected(false);
-        }
+        // deexpand all items
+        for(int a = 0; a < ui.treeDevices->topLevelItemCount(); a++)
+            ui.treeDevices->topLevelItem(a)->setExpanded(false);
+        //deselect the selected item(s)
+        for(int a = 0; a < ui.treeDevices->selectedItems().size(); a++) 
+            ui.treeDevices->selectedItems().at(a)->setSelected(false);
 
         // find the new item
         // enumerate all platform items
