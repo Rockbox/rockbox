@@ -238,20 +238,14 @@ void usb_arcotg_dcd_irq(void)
             /* copy data from queue head to local buffer */
             memcpy(&dcd_controller.local_setup_buff,
                    (uint8_t *) &dev_qh[0].setup_buffer, 8);
+
             /* ack setup packet*/
             UDC_ENDPTSETUPSTAT = UDC_ENDPTSETUPSTAT;
             setup_received_int(&dcd_controller.local_setup_buff);
         }
-/*
-        if (UDC_ENDPTCOMPLETE) {
-            UDC_ENDPTCOMPLETE = UDC_ENDPTCOMPLETE;
-        }*/
-    }
 
-    for (i = 0; i < USB_MAX_ENDPOINTS; i++) {
-        if ((UDC_ENDPTCOMPLETE & (1 << i)) == 1) {
-            logf("COMPLETE on %d", i);
-            UDC_ENDPTCOMPLETE |= (1 << i);
+        if (UDC_ENDPTCOMPLETE) {
+            dtd_complete();
         }
     }
 
@@ -287,7 +281,6 @@ static void setup_received_int(struct usb_ctrlrequest* request)
     int handled = 0;    /* set to zero if we do not handle the message, */
                         /* and should pass it to the driver */
 
-    logf("setup_int");
     into_usb_ctrlrequest(request);
 
     /* handle all requests we support */
@@ -307,7 +300,6 @@ static void setup_received_int(struct usb_ctrlrequest* request)
             break;
 
         case USB_REQ_GET_STATUS:
-            logf("sending status..");
             response.buf = &dcd_controller.usb_state;
             response.length = 2;
 
@@ -317,38 +309,33 @@ static void setup_received_int(struct usb_ctrlrequest* request)
 
         case USB_REQ_CLEAR_FEATURE:
         case USB_REQ_SET_FEATURE:
-            /* we only support set/clear feature for endpoint */
-            if (request->bRequestType == USB_RECIP_ENDPOINT) {
-                int dir = (request->wIndex & 0x0080) ? EP_DIR_IN : EP_DIR_OUT;
-                int num = (request->wIndex & 0x000f);
-                struct usb_ep *ep;
-
-                if (request->wValue != 0 ||
-                    request->wLength != 0 ||
-                    (num * 2 + dir) > USB_MAX_PIPES) {
-                    break;
-                }
-                ep = &dcd_controller.endpoints[num * 2 + dir];
-
-                if (request->bRequest == USB_REQ_SET_FEATURE) {
-                    logf("SET_FEATURE doing set_halt");
-                    handled = usb_arcotg_dcd_set_halt(ep, 1);
-                } else {
-                    logf("CLEAR_FEATURE doing clear_halt");
-                    handled = usb_arcotg_dcd_set_halt(ep, 0);
-                }
-
-                if (handled == 0) {
-                    handled = 1; /* dont pass it to driver */
-                }
+            if (request->bRequestType != USB_RECIP_ENDPOINT) {
+                break;
             }
-#if 0
-            if (rc == 0) {
-                /* send status only if _arcotg_ep_set_halt success */
-                if (ep0_prime_status(udc, EP_DIR_IN))
-                    Ep0Stall(udc);
+
+            int dir = (request->wIndex & 0x0080) ? EP_DIR_IN : EP_DIR_OUT;
+            int num = (request->wIndex & 0x000f);
+            struct usb_ep *ep;
+
+            if (request->wValue != 0 ||
+                request->wLength != 0 ||
+                (num * 2 + dir) > USB_MAX_PIPES) {
+                break;
             }
-#endif
+            ep = &dcd_controller.endpoints[num * 2 + dir];
+
+            if (request->bRequest == USB_REQ_SET_FEATURE) {
+                logf("HALT");
+                handled = usb_arcotg_dcd_set_halt(ep, true);
+            } else {
+                logf("UNHALT");
+                handled = usb_arcotg_dcd_set_halt(ep, false);
+            }
+
+            if (handled == 0) {
+                handled = 1; /* dont pass it to driver */
+            }
+
             break;
     }
 
@@ -427,6 +414,35 @@ static void port_change_int(void)
     }
 }
 
+static void dtd_complete(void) {
+
+    uint32_t bit_pos;
+    int i, ep_num, direction, bit_mask, status;
+
+    /* clear the bits in the register */
+    bit_pos = UDC_ENDPTCOMPLETE;
+    UDC_ENDPTCOMPLETE = bit_pos;
+
+    if (!bit_pos) {
+        return;
+    }
+
+    for (i = 0; i < USB_MAX_ENDPOINTS * 2; i++) {
+        ep_num = i >> 1;
+        direction = i % 2;
+
+        bit_mask = 1 << (ep_num + 16 * direction);
+
+        if (!(bit_pos & bit_mask)) {
+            continue;
+        }
+
+        logf("   ");
+        logf("TRAFFIC");
+        logf("  -> on ep %d dir %d", i, direction);
+    }
+}
+
 static void suspend_int(void)
 {
     dcd_controller.resume_state = dcd_controller.usb_state;
@@ -500,6 +516,7 @@ int usb_arcotg_dcd_enable(struct usb_ep* ep,
     unsigned char mult = 0, zlt = 0;
     int retval = 0;
     char *val = NULL;    /* for debug */
+    struct timer t;
 
     /* catch bogus parameter */
     if (!ep) {
@@ -695,33 +712,41 @@ int usb_arcotg_dcd_set_halt(struct usb_ep* ep, bool halt)
         goto out;
     }
 
-    status = 0;
     dir = ep_is_in(ep) ? USB_RECV : USB_SEND;
 
+    logf("modify halt of %d", ep->ep_num);
     tmp_epctrl = UDC_ENDPTCTRL(ep->ep_num);
+    logf("reg %x", tmp_epctrl);
 
     if (halt) {
+        logf("halting...");
         /* set the stall bit */
         if (dir) {
+            logf("..tx..");
             tmp_epctrl |= EPCTRL_TX_EP_STALL;
         } else {
+            logf("..rx..");
             tmp_epctrl |= EPCTRL_RX_EP_STALL;
         }
     } else {
+        logf("UNhalting...");
         /* clear the stall bit and reset data toggle */
         if (dir) {
+            logf("..tx..");
             tmp_epctrl &= ~EPCTRL_TX_EP_STALL;
             tmp_epctrl |= EPCTRL_TX_DATA_TOGGLE_RST;
         } else {
+            logf("..rx..");
             tmp_epctrl &= ~EPCTRL_RX_EP_STALL;
             tmp_epctrl |= EPCTRL_RX_DATA_TOGGLE_RST;
         }
     }
     UDC_ENDPTCTRL(ep->ep_num) = tmp_epctrl;
+    logf("reg %x", tmp_epctrl);
 
 out:
-    logf("%s %s halt rc=%d", ep->name, halt ? "set" : "clear", status);
-    return status;
+    logf("%s %s halt", ep->name, halt ? "set" : "clear");
+    return 0;
 }
 
 int usb_arcotg_dcd_send(struct usb_ep* ep, struct usb_response* res)
@@ -748,7 +773,6 @@ int usb_arcotg_dcd_send(struct usb_ep* ep, struct usb_response* res)
     td = &dev_td[index];
     qh = &dev_qh[index];
     mask = 1 << (15 + index);
-    logf("sending mask: %x", mask);
 
     do {
         /* calculate how much to copy and send */
@@ -1011,10 +1035,8 @@ static int usb_ack(struct usb_ctrlrequest * s, int error)
     res.length = 0;
 
     if (s->bRequestType & 0x80) {
-        logf("ack in");
         return usb_arcotg_dcd_receive(NULL, &res);
     } else {
-        logf("ack out");
         return usb_arcotg_dcd_send(NULL, &res);
     }
 }

@@ -158,6 +158,7 @@ int usb_arcotg_dcd_receive(struct usb_ep* ep, struct usb_response* res);
 /* interrupt handlers */
 static void setup_received_int(struct usb_ctrlrequest* request);
 static void port_change_int(void);
+static void dtd_complete(void);
 static void reset_int(void);
 static void suspend_int(void);
 static void resume_int(void);
