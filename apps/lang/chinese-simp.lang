@@ -622,7 +622,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Crossfeed"
+    swcodec: "交叉供音"
   </dest>
   <voice>
     *: none
@@ -1309,7 +1309,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Crossfade"
+    swcodec: "交叉淡变"
   </dest>
   <voice>
     *: none
@@ -2064,7 +2064,7 @@
     *: "Unicode (UTF-8)"
   </source>
   <dest>
-    *: "Unicode (UTF-8)"
+    *: "万国码 (UTF-8)"
   </dest>
   <voice>
     *: "Unicode"
@@ -2689,7 +2689,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Track Skip Only"
+    swcodec: "仅在跳文件时"
   </dest>
   <voice>
     *: none
@@ -2893,7 +2893,7 @@
     *: "Pre-amp"
   </source>
   <dest>
-    *: "Pre-amp"
+    *: "前置放大"
   </dest>
   <voice>
     *: "Preamp"
@@ -4262,7 +4262,7 @@
     *: "Searching... %d found (%s)"
   </source>
   <dest>
-    *: "Searching... %d found (%s)"
+    *: "正在寻找... %d 已找到 (%s)"
   </dest>
   <voice>
     *: ""
@@ -4371,9 +4371,9 @@
     h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
-    *: "%d%% %dh %dm"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: ""
-    h10,ipodmini,ipodmini2g: ""
+    *: "电池: %d%% %dh %dm"
+    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "%d%% %dh %dm"
   </dest>
   <voice>
     *: "Battery level"
@@ -4582,12 +4582,12 @@
   </source>
   <dest>
     *: none
-    rtc: "OFF: 回复"
-    h100,h120,h300: none
-    ipod*,e200: none
-    x5,m5: none
-    h10,h10_5gb: none
-    gigabeatf: none
+    rtc: "OFF = 恢复"
+    h100,h120,h300: "STOP = 恢复"
+    ipod*,e200: "MENU = 恢复"
+    x5,m5: "RECORD = 恢复"
+    h10,h10_5gb: "PREV = 恢复"
+    gigabeatf: "A = 恢复"
   </dest>
   <voice>
     *: none
@@ -4681,9 +4681,9 @@
   <dest>
     *: none
     recording: "磁盘已满，按下OFF继续。"
-    h100,h120,h300: none
-    m5,x5: none
-    e200: none
+    h100,h120,h300: "磁盘已满，按下STOP继续。"
+    m5,x5: "磁盘已满，按下POWER继续。"
+    e200: "磁盘已满，按下UP继续。"
   </dest>
   <voice>
     *: none
@@ -4720,7 +4720,7 @@
   </source>
   <dest>
     *: none
-    recording: "Start Above"
+    recording: "在之上开始"
   </dest>
   <voice>
     *: none
@@ -4737,7 +4737,7 @@
   </source>
   <dest>
     *: none
-    recording: "Stop Below"
+    recording: "在之下停止"
   </dest>
   <voice>
     *: none
@@ -4754,7 +4754,7 @@
   </source>
   <dest>
     *: none
-    recording: "Presplit Gap"
+    recording: "先设分割的间隔"
   </dest>
   <voice>
     *: none
@@ -4858,7 +4858,7 @@
   <dest>
     *: none
     alarm: "PLAY=设定 OFF=取消"
-    ipod*: none
+    ipod*: "SELECT=设定 MENU=取消"
   </dest>
   <voice>
     *: none
@@ -4942,7 +4942,7 @@
     *: "[Title]"
   </source>
   <dest>
-    *: "[Title]"
+    *: "[标题]"
   </dest>
   <voice>
     *: ""
@@ -4956,7 +4956,7 @@
     *: "[Artist]"
   </source>
   <dest>
-    *: "[Artist]"
+    *: "[艺术家]"
   </dest>
   <voice>
     *: ""
@@ -4970,7 +4970,7 @@
     *: "[Album]"
   </source>
   <dest>
-    *: "[Album]"
+    *: "[专辑]"
   </dest>
   <voice>
     *: ""
@@ -4984,7 +4984,7 @@
     *: "[Tracknum]"
   </source>
   <dest>
-    *: "[Tracknum]"
+    *: "[曲目编号]"
   </dest>
   <voice>
     *: ""
@@ -4998,7 +4998,7 @@
     *: "[Genre]"
   </source>
   <dest>
-    *: "[Genre]"
+    *: "[流派]"
   </dest>
   <voice>
     *: ""
@@ -5012,7 +5012,7 @@
     *: "[Year]"
   </source>
   <dest>
-    *: "[Year]"
+    *: "[年份]"
   </dest>
   <voice>
     *: ""
@@ -5026,7 +5026,7 @@
     *: "[Length]"
   </source>
   <dest>
-    *: "[Length]"
+    *: "[长度]"
   </dest>
   <voice>
     *: ""
@@ -5040,7 +5040,7 @@
     *: "[Playlist]"
   </source>
   <dest>
-    *: "[Playlist]"
+    *: "[播放清单]"
   </dest>
   <voice>
     *: ""
@@ -5054,7 +5054,7 @@
     *: "[Bitrate]"
   </source>
   <dest>
-    *: "[Bitrate]"
+    *: "[码率]"
   </dest>
   <voice>
     *: ""
@@ -5082,7 +5082,7 @@
     *: "[Frequency]"
   </source>
   <dest>
-    *: "[Frequency]"
+    *: "[频率]"
   </dest>
   <voice>
     *: ""
@@ -5124,7 +5124,7 @@
     *: "[Path]"
   </source>
   <dest>
-    *: "[Path]"
+    *: "[路径]"
   </dest>
   <voice>
     *: ""
@@ -5138,7 +5138,7 @@
     *: "<No Info>"
   </source>
   <dest>
-    *: "<No Info>"
+    *: "<没资料>"
   </dest>
   <voice>
     *: ""
@@ -6836,7 +6836,7 @@
     *: "Queued %d tracks (%s)"
   </source>
   <dest>
-    *: "Queued %d tracks (%s)"
+    *: "列入了 %d 首歌曲 (%s)"
   </dest>
   <voice>
     *: ""
@@ -7387,11 +7387,11 @@
     h10,h10_5gb,e200: "PREV to abort"
   </source>
   <dest>
-    *: "OFF: 离开"
-    player,h100,h120,h300: ""
-    ipod*: ""
-    x5,m5: ""
-    h10,h10_5gb,e200: ""
+    *: "OFF: 取消"
+    player,h100,h120,h300: "STOP: 取消"
+    ipod*: "PLAY/PAUSE: 取消"
+    x5,m5: "Long PLAY: 取消"
+    h10,h10_5gb,e200: "PREV: 取消"
   </dest>
   <voice>
     *: ""
@@ -7771,7 +7771,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Direct Gain"
+    swcodec: "直接增加"
   </dest>
   <voice>
     *: none
@@ -7788,7 +7788,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Cross Gain"
+    swcodec: "交叉增加"
   </dest>
   <voice>
     *: none
@@ -7805,7 +7805,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "High-Frequency Attenuation"
+    swcodec: "高频度加重"
   </dest>
   <voice>
     *: none
@@ -7822,7 +7822,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "High-Frequency Cutoff"
+    swcodec: "高频度削去"
   </dest>
   <voice>
     *: none
@@ -8660,7 +8660,7 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "Narrow"
+    ipodvideo: "窄"
   </dest>
   <voice>
     *: none
@@ -8825,7 +8825,7 @@
     *: "[Comment]"
   </source>
   <dest>
-    *: "[Comment]"
+    *: "[注解]"
   </dest>
   <voice>
     *: ""
@@ -9067,7 +9067,7 @@
   </source>
   <dest>
     *: none
-    radio: "Europe"
+    radio: "欧洲"
   </dest>
   <voice>
     *: none
@@ -9256,7 +9256,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Shuffle and Track Skip"
+    swcodec: "随机与文件跳过"
   </dest>
   <voice>
     *: none
@@ -9286,7 +9286,7 @@
     player: "Buf: %d.%03dMB"
   </source>
   <dest>
-    *: "Buffer: %d.%03dMB"
+    *: "缓冲: %d.%03dMB"
     player: "Buf: %d.%03dMB"
   </dest>
   <voice>
@@ -9427,7 +9427,7 @@
     *: "Demos"
   </source>
   <dest>
-    *: "Demos"
+    *: "样品程序"
   </dest>
   <voice>
     *: "Demos"
@@ -9850,7 +9850,7 @@
     *: "Mode:"
   </source>
   <dest>
-    *: "Mode:"
+    *: "模式:"
   </dest>
   <voice>
     *: ""
@@ -10008,7 +10008,7 @@
     *: "[Work]"
   </source>
   <dest>
-    *: "[Work]"
+    *: "[作品]"
   </dest>
   <voice>
     *: ""
@@ -10038,7 +10038,7 @@
   </source>
   <dest>
     *: none
-    radio: "Korea"
+    radio: "韩国"
   </dest>
   <voice>
     *: none
@@ -10069,7 +10069,7 @@
   </source>
   <dest>
     *: none
-    radio: "US / Canada"
+    radio: "美国 / 加拿大"
   </dest>
   <voice>
     *: none
@@ -10315,7 +10315,7 @@
     *: "[Discnum]"
   </source>
   <dest>
-    *: "[Discnum]"
+    *: "[唱片编号]"
   </dest>
   <voice>
     *: ""
@@ -10469,7 +10469,7 @@
   </source>
   <dest>
     *: none
-    radio: "Japan"
+    radio: "日本"
   </dest>
   <voice>
     *: none
@@ -10514,7 +10514,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Dithering"
+    swcodec: "添加抖动"
   </dest>
   <voice>
     *: none
@@ -10576,7 +10576,7 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "Bandwidth"
+    ipodvideo: "频宽"
   </dest>
   <voice>
     *: none
@@ -10677,7 +10677,7 @@
   </source>
   <dest>
     *: none
-    agc: "AGC clip time"
+    agc: "AGC 削减时间"
   </dest>
   <voice>
     *: none
@@ -10712,7 +10712,7 @@
     *: "[Album Artist]"
   </source>
   <dest>
-    *: "[Album Artist]"
+    *: "[专辑艺术家]"
   </dest>
   <voice>
     *: ""
@@ -11006,7 +11006,7 @@
   </source>
   <dest>
     *: none
-    recording: "Trigtype"
+    recording: "触发模式"
   </dest>
   <voice>
     *: none
