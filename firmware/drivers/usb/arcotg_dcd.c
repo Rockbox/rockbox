@@ -219,8 +219,6 @@ void usb_arcotg_dcd_stop(void)
 
 void usb_arcotg_dcd_irq(void)
 {
-    int i;
-
     if (dcd_controller.stopped == true) {
         return;
     }
@@ -239,7 +237,7 @@ void usb_arcotg_dcd_irq(void)
             memcpy(&dcd_controller.local_setup_buff,
                    (uint8_t *) &dev_qh[0].setup_buffer, 8);
 
-            /* ack setup packet*/
+            /* ack setup packet */
             UDC_ENDPTSETUPSTAT = UDC_ENDPTSETUPSTAT;
             setup_received_int(&dcd_controller.local_setup_buff);
         }
@@ -516,7 +514,6 @@ int usb_arcotg_dcd_enable(struct usb_ep* ep,
     unsigned char mult = 0, zlt = 0;
     int retval = 0;
     char *val = NULL;    /* for debug */
-    struct timer t;
 
     /* catch bogus parameter */
     if (!ep) {
@@ -662,7 +659,7 @@ int usb_arcotg_dcd_enable(struct usb_ep* ep,
             max, zlt, mult);
 
     /* Init endpoint x at here */
-    ep_setup(ep->ep_num,    		
+    ep_setup(ep->ep_num,
             (unsigned char)(desc->bEndpointAddress & USB_DIR_IN) ?
                                                             USB_RECV : USB_SEND,
             (unsigned char)(desc->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK));
