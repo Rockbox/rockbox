@@ -132,14 +132,14 @@ void InstallTalkWindow::setDeviceSettings(QSettings *dev)
     qDebug() << "Install::setDeviceSettings:" << devices;
     
     QString profile;
-    
-    profile = userSettings->value("ttspreset").toString();
+
+    profile = userSettings->value("ttspreset", "none").toString();
     devices->beginGroup("tts");
     ui.labelTtsProfile->setText(tr("TTS Profile: <b>%1</b>")
         .arg(devices->value(profile, tr("Invalid TTS profile!")).toString()));
     qDebug() << profile;
     devices->endGroup();
-    profile = userSettings->value("encpreset").toString();
+    profile = userSettings->value("encpreset", "none").toString();
     devices->beginGroup("encoders");
     ui.labelEncProfile->setText(tr("Encoder Profile: <b>%1</b>")
         .arg(devices->value(profile, tr("Invalid encoder profile!")).toString()));
