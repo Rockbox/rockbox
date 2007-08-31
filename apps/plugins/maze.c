@@ -30,6 +30,7 @@
 
 #include "plugin.h"
 #include "pluginlib_actions.h"
+#include "helper.h"
 
 PLUGIN_HEADER
 
@@ -93,43 +94,51 @@ const struct button_mapping *plugin_contexts[]
 #define MAZE_HEIGHT 24
 #endif
 
-struct coord_stack{
+struct coord_stack
+{
     int data[MAZE_WIDTH*MAZE_HEIGHT];
     int stp;
 };
 
-void coord_stack_init(struct coord_stack* stack){
+void coord_stack_init(struct coord_stack* stack)
+{
     stack->stp=0;
 }
 
-void coord_stack_push(struct coord_stack* stack, int x, int y){
+void coord_stack_push(struct coord_stack* stack, int x, int y)
+{
     stack->data[stack->stp] = ((x<<8)|y);
     stack->stp++;
 }
 
-void coord_stack_get(struct coord_stack* stack, int index, int* x, int* y){
+void coord_stack_get(struct coord_stack* stack, int index, int* x, int* y)
+ {
     *y = stack->data[index];
     *y &= 0xff;
     *x = (stack->data[index])>>8;
 }
 
-void coord_stack_pop(struct coord_stack* stack, int* x, int* y){
+void coord_stack_pop(struct coord_stack* stack, int* x, int* y)
+{
     stack->stp--;
     coord_stack_get(stack, stack->stp, x, y);
 }
 
-int coord_stack_count(struct coord_stack* stack){
+int coord_stack_count(struct coord_stack* stack)
+{
     return(stack->stp);
 }
 
-struct maze{
-    unsigned short maze[MAZE_WIDTH][MAZE_HEIGHT];
+struct maze
+{
     int solved;
     int player_x;
     int player_y;
+    unsigned short maze[MAZE_WIDTH][MAZE_HEIGHT];
 };
 
-void maze_init(struct maze* maze){
+void maze_init(struct maze* maze)
+{
     int x, y;
     rb->memset(maze->maze, 0, sizeof(maze->maze));
     maze->solved = false;
@@ -155,7 +164,8 @@ void maze_init(struct maze* maze){
     }
 }
 
-void maze_draw(struct maze* maze, struct screen* display){
+void maze_draw(struct maze* maze, struct screen* display)
+{
     int x, y;
     int wx, wy;
     int point_width, point_height, point_offset_x, point_offset_y;
@@ -254,7 +264,8 @@ void maze_draw(struct maze* maze, struct screen* display){
 
 
 int maze_pick_random_neighbour_cell_with_walls(struct maze* maze, 
-                                     int x, int y, int *pnx, int *pny){
+                                     int x, int y, int *pnx, int *pny)
+{
 
     int ncount = 0;
     struct coord_stack neighbours;
@@ -299,7 +310,8 @@ int maze_pick_random_neighbour_cell_with_walls(struct maze* maze,
 }
 
 /* Removes the wall between the cell (x,y) and the cell (nx,ny) */
-void maze_remove_wall(struct maze* maze, int x, int y, int nx, int ny){
+void maze_remove_wall(struct maze* maze, int x, int y, int nx, int ny)
+{
     /* where is our neighbour? */
 
     /* north or south */
@@ -329,7 +341,8 @@ void maze_remove_wall(struct maze* maze, int x, int y, int nx, int ny){
     }
 }
 
-void maze_generate(struct maze* maze){
+void maze_generate(struct maze* maze)
+{
     int total_cells = MAZE_WIDTH * MAZE_HEIGHT;
     int visited_cells;
     int available_neighbours;
@@ -366,11 +379,12 @@ void maze_generate(struct maze* maze){
 }
 
 
-void maze_solve(struct maze* maze){
+void maze_solve(struct maze* maze)
+{
     int x, y;
+    int dead_ends = 1;
     unsigned short cell;
     unsigned short  w;
-    int dead_ends = 1;
     unsigned short solved_maze[MAZE_WIDTH][MAZE_HEIGHT];
 
     maze->solved = ~(maze->solved);
@@ -414,7 +428,8 @@ void maze_solve(struct maze* maze){
     }
 }
 
-void maze_move_player_down(struct maze* maze){
+void maze_move_player_down(struct maze* maze)
+{
     unsigned short cell=maze->maze[maze->player_x][maze->player_y];
     if( !(cell & WALL_S) &&
         !(cell & BORDER_S)){
@@ -422,7 +437,8 @@ void maze_move_player_down(struct maze* maze){
     }
 }
 
-void maze_move_player_up(struct maze* maze){
+void maze_move_player_up(struct maze* maze)
+{
     unsigned short cell=maze->maze[maze->player_x][maze->player_y];
     if( !(cell & WALL_N) &&
         !(cell & BORDER_N)){
@@ -430,7 +446,8 @@ void maze_move_player_up(struct maze* maze){
     }
 }
 
-void maze_move_player_left(struct maze* maze){
+void maze_move_player_left(struct maze* maze)
+{
     unsigned short cell=maze->maze[maze->player_x][maze->player_y];
     if( !(cell & WALL_W) &&
         !(cell & BORDER_W)){
@@ -438,7 +455,8 @@ void maze_move_player_left(struct maze* maze){
     }
 }
 
-void maze_move_player_right(struct maze* maze){
+void maze_move_player_right(struct maze* maze)
+{
     unsigned short cell=maze->maze[maze->player_x][maze->player_y];
     if( !(cell & WALL_E) &&
         !(cell & BORDER_E)){
@@ -448,7 +466,8 @@ void maze_move_player_right(struct maze* maze){
 /**********************************/
 /* this is the plugin entry point */
 /**********************************/
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
+enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+{
     int button, lastbutton = BUTTON_NONE;
     int quit = 0;
     int i;
@@ -456,7 +475,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
     (void)parameter;
     rb = api;
 
-    rb->backlight_set_timeout(1);
+    /* Turn off backlight timeout */
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
     
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
@@ -520,19 +540,21 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
             break;
         case MAZE_QUIT:
             /* quit plugin */
-            quit=true;
-            return PLUGIN_OK;
+            quit=1;
             break;
         default:
             if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
-                return PLUGIN_USB_CONNECTED;
+                /* quit plugin */
+                quit=2;
             }
             break;
         }
         if( button != BUTTON_NONE )
             lastbutton = button;
-        rb->yield();
+        if(!quit)
+            rb->yield(); /* BUG alert: always yielding causes data abort */
     }
-    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
-    return PLUGIN_OK;
+    /* Turn on backlight timeout (revert to settings) */
+    backlight_use_settings(rb); /* backlight control in lib/helper.c */
+    return ((quit == 1) ? PLUGIN_OK : PLUGIN_USB_CONNECTED);
 }
