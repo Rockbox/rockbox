@@ -2074,11 +2074,11 @@
   </source>
   <dest>
     *: none
-    charging: "Modalità adattatore auto"
+    charging: "Modo adattatore auto"
   </dest>
   <voice>
     *: none
-    charging: "Modalità Adattatore Auto"
+    charging: "Modo Adattatore Auto"
   </voice>
 </phrase>
 <phrase>
@@ -2562,11 +2562,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Modalità fade out"
+    swcodec: "Modo fade out"
   </dest>
   <voice>
     *: none
-    swcodec: "Modalità fade out"
+    swcodec: "Modo fade out"
   </voice>
 </phrase>
 <phrase>
@@ -6802,7 +6802,7 @@
   </source>
   <dest>
     *: none
-    radio: "Modalità Scan"
+    radio: "Modo Scan"
   </dest>
   <voice>
     *: none
@@ -9999,11 +9999,11 @@
   </source>
   <dest>
     *: none
-    gigabeatf: "Luminosit� Tasti"
+    gigabeatf: "Luminosità Tasti"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Luminosita' Tasti"
+    gigabeatf: "Luminosità Tasti"
   </voice>
 </phrase>
 <phrase>
@@ -10183,11 +10183,11 @@
     scrollwheel: none
   </source>
   <dest>
-    *: "Velocit� Accelerazione Lista"
+    *: "Velocità Accelerazione Lista"
     scrollwheel: none
   </dest>
   <voice>
-    *: "Velocita' Accelerazione Lista"
+    *: "Velocità Accelerazione Lista"
     scrollwheel: none
   </voice>
 </phrase>
