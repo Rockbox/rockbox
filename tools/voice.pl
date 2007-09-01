@@ -184,6 +184,11 @@ sub voicestring {
         case "sapi5" {
             print({$$tts_object{"stdin"}} sprintf("SPEAK\t%s\t%s\r\n", $output, $string));
         }
+        case "swift" {
+            $cmd = "swift $tts_engine_opts -o $output \"$string\"";
+            print("> $cmd\n") if $verbose;
+            system($cmd);
+        }
     }
 }
 

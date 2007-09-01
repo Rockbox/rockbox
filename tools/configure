@@ -368,6 +368,14 @@ voiceconfig () {
         DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="F"
     fi
+    if [ -f "`which swift`" ]; then
+        SWIFT="S(w)ift "
+        SWIFT_OPTS=""
+        DEFAULT_TTS="swift"
+        DEFAULT_TTS_OPTS=$SWIFT_OPTS
+        DEFAULT_NOISEFLOOR="500"
+        DEFAULT_CHOICE="w"
+    fi
     # Allow SAPI if Windows is in use
     if [ -f "`which winver`" ]; then
         SAPI5="(S)API5 "
@@ -378,12 +386,12 @@ voiceconfig () {
         DEFAULT_CHOICE="S"
     fi
 
-    if [ "$FESTIVAL" = "$FLITE" ] && [ "$FLITE" = "$ESPEAK" ] && [ "$ESPEAK" = "$SAPI5" ]; then
+    if [ "$FESTIVAL" = "$FLITE" ] && [ "$FLITE" = "$ESPEAK" ] && [ "$ESPEAK" = "$SAPI5" ] && [ "$SAPI5" = "$SWIFT" ]; then
         echo "You need Festival, eSpeak or Flite in your path, or SAPI5 available to build voice files"
         exit
     fi
 
-    echo "TTS engine to use: ${FLITE}${FESTIVAL}${ESPEAK}${SAPI5}(${DEFAULT_CHOICE})?"
+    echo "TTS engine to use: ${FLITE}${FESTIVAL}${ESPEAK}${SAPI5}${SWIFT}(${DEFAULT_CHOICE})?"
     option=`input`
     case "$option" in
         [Ll])
@@ -406,6 +414,11 @@ voiceconfig () {
         NOISEFLOOR="500"
         TTS_OPTS=$SAPI5_OPTS
         ;;
+	[Ww])
+        TTS_ENGINE="swift"
+        NOISEFLOOR="500"
+        TTS_OPTS=$SWIFT_OPTS
+	;;
         *)
         TTS_ENGINE=$DEFAULT_TTS
         TTS_OPTS=$DEFAULT_TTS_OPTS
