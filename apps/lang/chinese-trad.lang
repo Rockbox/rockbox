@@ -1214,7 +1214,7 @@
 </phrase>
 <phrase>
   id: LANG_REPEAT_AB
-  desc: desc: repeat range from point A to B
+  desc: repeat range from point A to B
   user:
   <source>
     *: "A-B"
