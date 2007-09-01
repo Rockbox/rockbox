@@ -111,6 +111,11 @@ unix {
     SOURCES +=  ../sansapatcher/sansaio-posix.c
 }
 
+macx {
+    QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.4u.sdk
+    CONFIG+=x86 ppc
+}
+
 static {
     QTPLUGIN += qtaccessiblewidgets
     LIBS += -L$$(QT_BUILD_TREE)/plugins/accessible -lqtaccessiblewidgets
