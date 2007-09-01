@@ -122,6 +122,13 @@ my $input = $ARGV[0];
 my @m;
 my $m="blank";
 
+sub trim {
+    my ($string) = @_;
+    $string =~ s/^\s+//;
+    $string =~ s/\s+$//;
+    return $string;
+}
+
 sub match {
     my ($string, $pattern)=@_;
 
@@ -302,7 +309,7 @@ sub compare {
     for my $l (@$locref) {
         if($l =~ /^ *desc: (.*)/) {
             $ldesc=$1;
-            if($edesc ne $ldesc) {
+            if(trim($edesc) ne trim($ldesc)) {
                 $l = "### The 'desc' field differs from the english!\n### the previously used desc is commented below:\n### desc: $ldesc\n  desc: $edesc\n";
             }
             push @show, $l;
@@ -315,7 +322,7 @@ sub compare {
             if($l =~ / *\<\/source\>/i) {
                 $mode = 0;
                 print @show;
-                if($esource ne $lsource) {
+                if(trim($esource) ne trim($lsource)) {
                     print "### The <source> section differs from the english!\n",
                     "### the previously used one is commented below:\n";
                     for(split("\n", $lsource)) {
