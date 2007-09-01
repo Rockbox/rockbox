@@ -21,6 +21,7 @@ use File::Basename;
 use File::Copy;
 use Switch;
 use vars qw($V $C $t $l $e $E $s $S $i $v);
+use IPC::Open2;
 use IPC::Open3;
 use Digest::MD5 qw(md5_hex);
 
@@ -69,43 +70,44 @@ USAGE
 sub init_tts {
     our $verbose;
     my ($tts_engine, $tts_engine_opts, $language) = @_;
-    my $ret = undef;
+    my %ret = ("name" => $tts_engine);
     switch($tts_engine) {
         case "festival" {
             print("> festival $tts_engine_opts --server\n") if $verbose;
             my $pid = open(FESTIVAL_SERVER, "| festival $tts_engine_opts --server > /dev/null 2>&1");
-            $ret = *FESTIVAL_SERVER;
-            $ret = $pid;
+            my $dummy = *FESTIVAL_SERVER; #suppress warning
             $SIG{INT} = sub { kill TERM => $pid; print("foo"); panic_cleanup(); };
             $SIG{KILL} = sub { kill TERM => $pid; print("boo"); panic_cleanup(); };
+            $ret{"pid"} = $pid;
         }
         case "sapi5" {
             my $toolsdir = dirname($0);
             my $path = `cygpath $toolsdir -a -w`;
             chomp($path);
-            $path = $path . "\\sapi5_voice_new.vbs $language $tts_engine_opts";
-            $path =~ s/\\/\\\\/g;
-            print("> cscript /B $path\n") if $verbose;
-            my $pid = open(F, "| cscript /B $path");
-            $ret = *F;
-            $SIG{INT} = sub { print($ret "\r\n\r\n"); panic_cleanup(); };
-            $SIG{KILL} = sub { print($ret "\r\n\r\n"); panic_cleanup(); };
+            $path = $path . '\\';
+            my $cmd = $path . "sapi5_voice_new.vbs $language $tts_engine_opts";
+            $cmd =~ s/\\/\\\\/g;
+            print("> cscript //nologo $cmd\n") if $verbose;
+            my $pid = open2(*CMD_OUT, *CMD_IN, "cscript //nologo $cmd");
+            $SIG{INT} = sub { print(CMD_IN "QUIT\r\n"); panic_cleanup(); };
+            $SIG{KILL} = sub { print(CMD_IN "QUIT\r\n"); panic_cleanup(); };
+            %ret = (%ret, "stdin" => *CMD_IN, "stdout" => *CMD_OUT, "toolspath" => $path);
         }
     }
-    return $ret;
+    return \%ret;
 }
 
 # Shutdown TTS engine if necessary.
 sub shutdown_tts {
-    my ($tts_engine, $tts_object) = @_;
-    switch($tts_engine) {
+    my ($tts_object) = @_;
+    switch($$tts_object{"name"}) {
         case "festival" {
             # Send SIGTERM to festival server
-            kill TERM => $tts_object;
+            kill TERM => $$tts_object{"pid"};
         }
         case "sapi5" {
-            print($tts_object "\r\n\r\n");
-            close($tts_object);
+            print({$$tts_object{"stdin"}} "QUIT\r\n");
+            close($$tts_object{"stdin"});
         }
     }
 }
@@ -113,14 +115,14 @@ sub shutdown_tts {
 # Apply corrections to a voice-string to make it sound better
 sub correct_string {
     our $verbose;
-    my ($string, $language, $tts_engine) = @_;
+    my ($string, $language, $tts_object) = @_;
     my $orig = $string;
     switch($language) {
         # General for all engines and languages (perhaps - just an example)
         $string =~ s/USB/U S B/;
 
         case ("deutsch") {
-            switch($tts_engine) {
+            switch($$tts_object{"name"}) {
                 $string =~ s/alphabet/alfabet/;
                 $string =~ s/alkaline/alkalein/;
                 $string =~ s/ampere/amper/;
@@ -146,10 +148,10 @@ sub correct_string {
 # Produce a wav file of the text given
 sub voicestring {
     our $verbose;
-    my ($string, $output, $tts_engine, $tts_engine_opts, $tts_object) = @_;
+    my ($string, $output, $tts_engine_opts, $tts_object) = @_;
     my $cmd;
-    printf("Generate \"%s\" with %s in file %s\n", $string, $tts_engine, $output) if $verbose;
-    switch($tts_engine) {
+    printf("Generate \"%s\" with %s in file %s\n", $string, $$tts_object{"name"}, $output) if $verbose;
+    switch($$tts_object{"name"}) {
         case "festival" {
             # festival_client lies to us, so we have to do awful soul-eating
             # work with IPC::open3()
@@ -180,15 +182,31 @@ sub voicestring {
             close(ESPEAK);
         }
         case "sapi5" {
-            print($tts_object sprintf("%s\r\n%s\r\n", $string, $output));
+            print({$$tts_object{"stdin"}} sprintf("SPEAK\t%s\t%s\r\n", $output, $string));
         }
+    }
+}
+
+# trim leading / trailing silence from the clip
+sub wavtrim {
+    our $verbose;
+    my ($file, $threshold, $tts_object) = @_;
+    printf("Trim \"%s\"\n", $file) if $verbose;
+    if ($$tts_object{"name"} eq "sapi5") {
+        my $cmd = $$tts_object{"toolspath"}."wavtrim $file $threshold";
+        print({$$tts_object{"stdin"}} sprintf("EXEC\t%s\r\n", $cmd));
+    }
+    else {
+        my $cmd = dirname($0) . "/wavtrim $file $threshold";
+        print("> $cmd\n") if $verbose;
+        `$cmd`;
     }
 }
 
 # Encode a wav file into the given destination file
 sub encodewav {
     our $verbose;
-    my ($input, $output, $encoder, $encoder_opts) = @_;
+    my ($input, $output, $encoder, $encoder_opts, $tts_object) = @_;
     my $cmd = '';
     printf("Encode \"%s\" with %s in file %s\n", $input, $encoder, $output) if $verbose;
     switch ($encoder) {
@@ -202,16 +220,23 @@ sub encodewav {
             $cmd = "speexenc $encoder_opts \"$input\" \"$output\"";
         }
     }
-    print("> $cmd\n") if $verbose;
-    `$cmd`;
+    if ($$tts_object{"name"} eq "sapi5") {
+        print({$$tts_object{"stdin"}} sprintf("EXEC\t%s\r\n", $cmd));
+    }
+    else {
+        print("> $cmd\n") if $verbose;
+        `$cmd`;
+    }
 }
 
-sub wavtrim {
-    our $verbose;
-    my ($file) = @_;
-    my $cmd = dirname($0) . "/wavtrim \"$file\"";
-    print("> $cmd\n") if $verbose;
-    `$cmd`;
+# synchronize the clip generation / processing if it's running in another process
+sub synchronize {
+    my ($tts_object) = @_;
+    if ($$tts_object{"name"} eq "sapi5") {
+        print({$$tts_object{"stdin"}} "SYNC\t42\r\n");
+        my $wait = readline($$tts_object{"stdout"});
+        #ignore what's actually returned
+    }
 }
 
 # Run genlang and create voice clips for each string
@@ -267,11 +292,13 @@ sub generateclips {
                         copy(dirname($0)."/VOICE_PAUSE.wav", $wav);
                     }
                     else {
-                        voicestring($voice, $wav, $tts_engine, $tts_engine_opts, $tts_object);
-                        wavtrim($wav, 500); # 500 seems to be a reasonable default for now
+                        voicestring($voice, $wav, $tts_engine_opts, $tts_object);
+                        wavtrim($wav, 500, $tts_object);
+                        # 500 seems to be a reasonable default for now
                     }
 
-                    encodewav($wav, $mp3, $encoder, $encoder_opts);
+                    encodewav($wav, $mp3, $encoder, $encoder_opts, $tts_object);
+                    synchronize($tts_object);
                     if (defined($ENV{'POOL'})) {
                         copy($mp3, $pool_file);
                     }
@@ -284,7 +311,7 @@ sub generateclips {
     }
     print("\n");
     close(VOICEFONTIDS);
-    shutdown_tts($tts_engine, $tts_object);
+    shutdown_tts($tts_object);
 }
 
 # Assemble the voicefile

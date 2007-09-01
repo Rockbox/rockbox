@@ -20,11 +20,13 @@
 
 'To be done:
 ' - Allow user to override voice, speed and/or format (currently uses Control Panel defaults for voice/speed)
-' - Voice specific replacements/corrections for pronounciation (this should be at a higher level really)
+
+Option Explicit
 
 Const SSFMCreateForWrite = 3
 
-Const SPSF_8kHz16BitMono = 6
+' Audio formats for SAPI5 filestream object
+Const SPSF_8kHz16BitMono  = 6
 Const SPSF_11kHz16BitMono = 10
 Const SPSF_12kHz16BitMono = 14
 Const SPSF_16kHz16BitMono = 18
@@ -34,34 +36,59 @@ Const SPSF_32kHz16BitMono = 30
 Const SPSF_44kHz16BitMono = 34
 Const SPSF_48kHz16BitMono = 38
 
-Dim oSpVoice, oSpFS, nAudioFormat, sText, sOutputFile
+Dim oShell, oEnv
+Dim oSpVoice, oSpFS ' SAPI5 voice and filestream
+Dim aLine, aData    ' used in command reading
+Dim nAudioFormat   
+Dim bVerbose
+
+
+On Error Resume Next
 
 nAudioFormat = SPSF_22kHz16BitMono 'Audio format to use, recommended settings:
 '- for AT&T natural voices, use SPSF_32kHz16BitMono
 '- for MS voices, use SPSF_22kHz16BitMono
 
+Set oShell = CreateObject("WScript.Shell")
+Set oEnv = oShell.Environment("Process")
+bVerbose = (oEnv("V") <> "")
+
 Set oSpVoice = CreateObject("SAPI.SpVoice")
 If Err.Number <> 0 Then
-    WScript.Echo "Error - could not get SpVoice object. " & _
-    "SAPI 5 not installed?"
+    WScript.StdErr.WriteLine "Error - could not get SpVoice object. " & _
+                             "SAPI 5 not installed?"
     Err.Clear
     WScript.Quit 1
 End If
 
-While 1 > 0
-    sText = WScript.StdIn.ReadLine
-    sOutputFile = WScript.StdIn.ReadLine
-    If sOutputFile = "" Then
-        Set oSpFS = Nothing
-        Set oSpVoice = Nothing
-        Set oArgs = Nothing
-        WScript.Quit 0
+Set oSpFS = CreateObject("SAPI.SpFileStream")
+oSpFS.Format.Type = nAudioFormat
+
+On Error Goto 0
+
+Do
+    aLine = Split(WScript.StdIn.ReadLine, vbTab, 2)
+    If Err.Number <> 0 Then
+        WScript.StdErr.WriteLine "Error " & Err.Number & ": " & Err.Description
+        WScript.Quit 1
     End If
-    ' WScript.Echo "Saying " + sText + " in " + sOutputFile
-    Set oSpFS = CreateObject("SAPI.SpFileStream")
-    oSpFS.Format.Type = nAudioFormat
-    oSpFS.Open sOutputFile, SSFMCreateForWrite, False
-    Set oSpVoice.AudioOutputStream = oSpFS
-    oSpVoice.Speak sText
-    oSpFS.Close
-Wend
+    Select Case aLine(0) ' command
+        Case "SPEAK"
+            aData = Split(aLine(1), vbTab, 2)
+            If bVerbose Then WScript.StdErr.WriteLine "Saying " & aData(1) _
+                                                      & " in " & aData(0)
+            oSpFS.Open aData(0), SSFMCreateForWrite, false
+            Set oSpVoice.AudioOutputStream = oSpFS
+            oSpVoice.Speak aData(1)
+            oSpFS.Close
+        Case "EXEC"
+            If bVerbose Then WScript.StdErr.WriteLine "> " & aLine(1)
+            oShell.Run aLine(1), 0, true
+        Case "SYNC"
+            If bVerbose Then WScript.StdErr.WriteLine "Syncing"
+            WScript.StdOut.WriteLine aLine(1) ' Just echo what was passed
+        Case "QUIT"
+            If bVerbose Then WScript.StdErr.WriteLine "Quitting"
+            WScript.Quit 0
+    End Select
+Loop
