@@ -76,6 +76,25 @@ static void get_geometry(struct ipod_t* ipod)
     #error No sector-size detection implemented for this platform
 #endif
 
+#if defined(__APPLE__) && defined(__MACH__)
+static int ipod_unmount(struct ipod_t* ipod)
+{
+    char cmd[4096];
+    int res;
+
+    sprintf(cmd, "/usr/sbin/diskutil unmount \"%ss2\"",ipod->diskname);
+    fprintf(stderr,"[INFO] ");
+    res = system(cmd);
+
+    if (res==0) {
+        return 0;
+    } else {
+        perror("Unmount failed");
+        return -1;
+    }
+}
+#endif
+
 void print_error(char* msg)
 {
     perror(msg);
@@ -107,6 +126,11 @@ int ipod_open(struct ipod_t* ipod, int silent)
 
 int ipod_reopen_rw(struct ipod_t* ipod)
 {
+#if defined(__APPLE__) && defined(__MACH__)
+    if (ipod_unmount(ipod) < 0)
+        return -1;
+#endif
+
     close(ipod->dh);
     ipod->dh=open(ipod->diskname,O_RDWR);
     if (ipod->dh < 0) {
