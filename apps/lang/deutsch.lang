@@ -3490,18 +3490,17 @@
 </phrase>
 <phrase>
   id: LANG_PM_UNITS_PER_READ
-  desc: in the peak meter menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Units Per Read"
-    masd: none
+    *: ""
   </source>
   <dest>
-    *: "Einheiten pro gelesenem Wert"
+    *: ""
     masd: none
   </dest>
   <voice>
-    *: "Einheiten pro gelesenem Wert"
+    *: ""
     masd: none
   </voice>
 </phrase>
@@ -10930,7 +10929,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Show filename extensions"
+    *: "Show Filename Extensions"
   </source>
   <dest>
     *: "Zeige Dateiendungen"
@@ -10944,7 +10943,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Only unknown types"
+    *: "Only Unknown Types"
   </source>
   <dest>
     *: "Nur unbekannte Typen"
@@ -10958,12 +10957,213 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Only when viewing all types"
+    *: "Only When Viewing All Types"
   </source>
   <dest>
     *: "Nur bei Anzeige aller Typen"
   </dest>
   <voice>
     *: "Nur bei Anzeige aller Typen"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PM_UNITS_PER_TICK
+  desc: spoken only, peak meter release unit
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Einheiten pro Tick"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    usbstack: "USB Stack"
+  </source>
+  <dest>
+    *: none
+    usbstack: "USB"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNTER
+  desc: in settings, for recording peak meter
+  user:
+  <source>
+    *: none
+    recording: "Clip Counter"
+  </source>
+  <dest>
+    *: none
+    recording: "Übersteuerungszähler"
+  </dest>
+  <voice>
+    *: none
+    recording: "Übersteuerungszähler"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_AM
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "Vormittag"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_HOST
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Host"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Host"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Host"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OH
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_MODE
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "USB Stack Mode"
+  </source>
+  <dest>
+    *: none
+    usbstack: "USB-Modus"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "USB-Modus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Device"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Gerät"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Gerät"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PM
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "Nachmittag"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PM_CLIPCOUNT
+  desc: in recording GUI, for recording peak meter. MAX 5 characters!
+  user:
+  <source>
+    *: none
+    recording: "CLIP:"
+  </source>
+  <dest>
+    *: none
+    recording: "CLIP:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE_DRIVER
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Device Driver"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Gerätetreiber"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Gerätetreiber"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OCLOCK
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "Uhr"
   </voice>
 </phrase>
