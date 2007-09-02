@@ -1116,10 +1116,9 @@ static short i,alpha,beta,score,tempb,tempc,tempsf,tempst,xside,rpt;
   /*OutputMove();*/
 
   short index;
-  for (index=0;index<4;index++){
-    move_buffer[index] = mvstr1[index];
+  for (index=0;index<5;index++){
+      move_buffer[index] = mvstr1[index];
   }
-  move_buffer[index] = '\0';
 
   if (score == -9999 || score == 9998) mate = true;
   if (mate) hint = 0;
@@ -2231,26 +2230,30 @@ void SetTimeControl( void )
   ExitChess();
 }*/
 
-int VerifyMove(char s[],short iop,unsigned short *mv)
+int VerifyMove(short player, char s[],short iop,unsigned short *mv, char *move_buffer)
 
 /*
    Compare the string 's' to the list of legal moves available for the 
-   opponent. If a match is found, make the move on the board. 
+   player. If a match is found, make the move on the board. This was originally
+   fixed for the opponent, but allowing the player to be specified will make
+   possible to use GnuChess as a human vs human game verifier. It also allows
+   the PGN functions to verify checkmates.
 */
 
 {
 static short pnt,tempb,tempc,tempsf,tempst,cnt;
 static struct leaf xnode;
 struct leaf *node;
+short opponent_player = (player == white)?black:white;
 
   *mv = 0;
   if (iop == 2)
     {
-      UnmakeMove(opponent,&xnode,&tempb,&tempc,&tempsf,&tempst);
+      UnmakeMove(player,&xnode,&tempb,&tempc,&tempsf,&tempst);
       return(false);
     }
   cnt = 0;
-  MoveList(opponent,2);
+  MoveList(player,2);
   pnt = TrPnt[2];
   while (pnt < TrPnt[3])
     {
@@ -2264,10 +2267,10 @@ struct leaf *node;
     }
   if (cnt == 1)
     {
-      MakeMove(opponent,&xnode,&tempb,&tempc,&tempsf,&tempst);
-      if (SqAtakd(PieceList[opponent][0],computer))
+      MakeMove(player,&xnode,&tempb,&tempc,&tempsf,&tempst);
+      if (SqAtakd(PieceList[player][0],opponent_player))
         {
-          UnmakeMove(opponent,&xnode,&tempb,&tempc,&tempsf,&tempst);
+          UnmakeMove(player,&xnode,&tempb,&tempc,&tempsf,&tempst);
           /*ShowMessage("Illegal Move!!");*/
           return(false);
         }
@@ -2283,10 +2286,20 @@ struct leaf *node;
           GameList[GameCnt].nodes = 0;
           ElapsedTime(1);
           GameList[GameCnt].time = (short)et;
-          TimeControl.clock[opponent] -= et;
-          --TimeControl.moves[opponent];
+          TimeControl.clock[player] -= et;
+          --TimeControl.moves[player];
           *mv = (xnode.f << 8) + xnode.t;
           algbr(xnode.f,xnode.t,false);
+
+          short index;
+          for (index=0;index<5;index++){
+              move_buffer[index] = mvstr1[index];
+          }
+          if (SqAtakd(PieceList[opponent_player][0],player)){
+              move_buffer[4] = '+';
+              move_buffer[5] = '\0';
+          }
+
           return(true);
         } 
     }

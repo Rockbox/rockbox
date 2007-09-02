@@ -49,7 +49,7 @@ extern struct plugin_api* rb;
 /* ---- The beginning of a GNUChess v2 APIfication ---- */
 void SetTimeControl(void);
 void GNUChess_Initialize(void);
-int  VerifyMove(char s[],short iop,unsigned short *mv);
+int  VerifyMove(short player, char s[],short iop,unsigned short *mv, char *move_buffer);
 int  SelectMove ( short side, short iop , void (*callback)(void), char *move_buffer );
 void InitializeStats ( void );
 void ElapsedTime ( short iop );
