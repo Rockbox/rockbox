@@ -117,17 +117,15 @@ QStringList Autodetection::getMountpoints()
 #elif defined(Q_OS_LINUX)
     QStringList tempList;
 
-    FILE *fp = fopen( "/proc/mounts", "r" );
-    if( !fp ) return tempList;
-    char *dev, *dir;
-    while( fscanf( fp, "%as %as %*s %*s %*s %*s", &dev, &dir ) != EOF )
-    {
-        tempList << dir;
-        free( dev );
-        free( dir );
-    }
-    fclose( fp );
-
+    FILE *mn = setmntent("/etc/mtab", "r");
+    if(!mn)
+        return QStringList("");
+    
+    struct mntent *ent;
+    while((ent = getmntent(mn)))
+        tempList << QString(ent->mnt_dir);
+    endmntent(mn);
+    
     return tempList;
 #else
 #error Unknown Plattform
