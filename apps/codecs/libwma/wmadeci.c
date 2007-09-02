@@ -1111,7 +1111,7 @@ static int decode_exp_vlc(WMADecodeContext *s, int ch)
     fixed32 *q,*q_end;
 
     /*accommodate the 16 negative indices */
-    fixed32 *pow_10_to_yover16_ptr = &pow_10_to_yover16[16];
+    const fixed32 *pow_10_to_yover16_ptr = &pow_10_to_yover16[16];
 
     band_ptr = s->exponent_bands[s->frame_len_bits - s->block_len_bits];
     ptr = band_ptr;
