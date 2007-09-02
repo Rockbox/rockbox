@@ -257,6 +257,7 @@ sub generateclips {
     my $pool_file;
     open(VOICEFONTIDS, "> voicefontids");
     my $i = 0;
+    local $| = 1; # make progress indicator work reliably
 
     my $tts_object = init_tts($tts_engine, $tts_engine_opts, $language);
     print("Generating voice clips");
