@@ -1,0 +1,2 @@
+SUBDIRS = rbutilqt
+TEMPLATE = subdirs
