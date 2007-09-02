@@ -80,12 +80,12 @@ sub init_tts {
             $SIG{KILL} = sub { kill TERM => $pid; print("boo"); panic_cleanup(); };
             $ret{"pid"} = $pid;
         }
-        case "sapi5" {
+        case "sapi" {
             my $toolsdir = dirname($0);
             my $path = `cygpath $toolsdir -a -w`;
             chomp($path);
             $path = $path . '\\';
-            my $cmd = $path . "sapi5_voice_new.vbs $language $tts_engine_opts";
+            my $cmd = $path . "sapi_voice.vbs /language:$language $tts_engine_opts";
             $cmd =~ s/\\/\\\\/g;
             print("> cscript //nologo $cmd\n") if $verbose;
             my $pid = open2(*CMD_OUT, *CMD_IN, "cscript //nologo $cmd");
@@ -105,7 +105,7 @@ sub shutdown_tts {
             # Send SIGTERM to festival server
             kill TERM => $$tts_object{"pid"};
         }
-        case "sapi5" {
+        case "sapi" {
             print({$$tts_object{"stdin"}} "QUIT\r\n");
             close($$tts_object{"stdin"});
         }
@@ -181,8 +181,8 @@ sub voicestring {
             print ESPEAK $string . "\n";
             close(ESPEAK);
         }
-        case "sapi5" {
-            print({$$tts_object{"stdin"}} sprintf("SPEAK\t%s\t%s\r\n", $output, $string));
+        case "sapi" {
+            print({$$tts_object{"stdin"}} "SPEAK\t$output\t$string\r\n");
         }
         case "swift" {
             $cmd = "swift $tts_engine_opts -o $output \"$string\"";
@@ -197,9 +197,9 @@ sub wavtrim {
     our $verbose;
     my ($file, $threshold, $tts_object) = @_;
     printf("Trim \"%s\"\n", $file) if $verbose;
-    if ($$tts_object{"name"} eq "sapi5") {
+    if ($$tts_object{"name"} eq "sapi") {
         my $cmd = $$tts_object{"toolspath"}."wavtrim $file $threshold";
-        print({$$tts_object{"stdin"}} sprintf("EXEC\t%s\r\n", $cmd));
+        print({$$tts_object{"stdin"}} "EXEC\t$cmd\r\n");
     }
     else {
         my $cmd = dirname($0) . "/wavtrim $file $threshold";
@@ -225,8 +225,8 @@ sub encodewav {
             $cmd = "speexenc $encoder_opts \"$input\" \"$output\"";
         }
     }
-    if ($$tts_object{"name"} eq "sapi5") {
-        print({$$tts_object{"stdin"}} sprintf("EXEC\t%s\r\n", $cmd));
+    if ($$tts_object{"name"} eq "sapi") {
+        print({$$tts_object{"stdin"}} "EXEC\t$cmd\r\n");
     }
     else {
         print("> $cmd\n") if $verbose;
@@ -237,7 +237,7 @@ sub encodewav {
 # synchronize the clip generation / processing if it's running in another process
 sub synchronize {
     my ($tts_object) = @_;
-    if ($$tts_object{"name"} eq "sapi5") {
+    if ($$tts_object{"name"} eq "sapi") {
         print({$$tts_object{"stdin"}} "SYNC\t42\r\n");
         my $wait = readline($$tts_object{"stdout"});
         #ignore what's actually returned
