@@ -75,15 +75,15 @@ HEADERS += rbutilqt.h \
 INCLUDEPATH = . irivertools zip zlib ../ipodpatcher ../sansapatcher
  
 TEMPLATE = app
-CONFIG += thread \
-          qt
-!debug {
-    CONFIG += release
-    DEFINES += QT_NO_DEBUG_OUTPUT
+dbg {
+    CONFIG += debug thread qt warn_on
+    DEFINES -= QT_NO_DEBUG_OUTPUT
+    message("debug")
 }
-debug {
-    CONFIG += debug \
-              warn_on
+!dbg {
+    CONFIG += release thread qt
+    DEFINES += QT_NO_DEBUG_OUTPUT
+    message("release")
 }
 
 TARGET = rbutilqt
