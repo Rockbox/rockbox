@@ -34,7 +34,7 @@ Const SPSF_48kHz16BitMono = 38
 
 Dim oShell, oArgs, oEnv
 Dim bVerbose, bSAPI4
-Dim sLanguage, sVoice
+Dim sLanguage, sVoice, sSpeed
 
 Dim oSpVoice, oSpFS ' SAPI5 voice and filestream
 Dim oTTS, nMode ' SAPI4 TTS object, mode selector
@@ -53,6 +53,7 @@ Set oArgs = WScript.Arguments.Named
 bSAPI4 = oArgs.Exists("sapi4")
 sLanguage = oArgs.Item("language")
 sVoice = oArgs.Item("voice")
+sRate = oArgs.Item("speed")
 
 If bSAPI4 Then
     ' Create SAPI4 ActiveVoice object
@@ -92,6 +93,9 @@ If bSAPI4 Then
         WScript.Quit 1
     End If
     oTTS.Select nMode
+
+    ' Speed selection
+    If sRate <> "" Then oSpVoice.Speed = sSpeed
 Else ' SAPI5
     ' Create SAPI5 object
     Set oSpVoice = CreateObject("SAPI.SpVoice")
@@ -122,6 +126,9 @@ Else ' SAPI5
                                  & sLanguage & ", " & sVoice
         WScript.Quit 1
     End If
+
+    ' Speed selection
+    If sRate <> "" Then oSpVoice.Rate = sSpeed
 
     ' Filestream object for output
     Set oSpFS = CreateObject("SAPI.SpFileStream")
