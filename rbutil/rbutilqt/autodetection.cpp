@@ -70,12 +70,49 @@ bool Autodetection::detect()
                     return true;
                 }
             }
+            // check for some specific files in root folder
+            QDir root(mountpoints.at(i));
+            QStringList rootentries = root.entryList(QDir::Files);
+            if(rootentries.contains("archos.mod", Qt::CaseSensitive))
+            {
+                // archos.mod in root folder -> Archos Player
+                m_device = "player";
+                m_mountpoint = mountpoints.at(i);
+                return true;
+            }
+            if(rootentries.contains("ONDIOST.BIN"))
+            {
+                // ONDIOST.BIN in root -> Ondio FM
+                m_device = "ondiofm";
+                m_mountpoint = mountpoints.at(i);
+                return true;
+            }
+            if(rootentries.contains("ONDIOSP.BIN"))
+            {
+                // ONDIOSP.BIN in root -> Ondio SP
+                m_device = "ondiosp";
+                m_mountpoint = mountpoints.at(i);
+                return true;
+            }
+            if(rootentries.contains("ajbrec.ajz"))
+            {
+                qDebug() << "it's an archos. further detection needed";
+            }
+            // detection based on player specific folders
+            QStringList rootfolders = root.entryList(QDir::Dirs);
+            if(rootfolders.contains("GBSYSTEM"))
+            {
+                // GBSYSTEM folder -> Gigabeat
+                m_device = "gigabeatf";
+                m_mountpoint = mountpoints.at(i);
+                return true;
+            }
+            qDebug() << rootfolders;
         }
 
     }
-
-    int n;
     
+    int n;
     //try ipodpatcher
     struct ipod_t ipod;
     n = ipod_scan(&ipod);
@@ -85,7 +122,7 @@ bool Autodetection::detect()
         m_mountpoint = resolveMountPoint(ipod.diskname);
         return true;
     }
-    
+
     //try sansapatcher
     struct sansa_t sansa;
     n = sansa_scan(&sansa);
@@ -95,7 +132,7 @@ bool Autodetection::detect()
         m_mountpoint = resolveMountPoint(sansa.diskname);
         return true;
     }
-    
+
     return false;
 }
 
