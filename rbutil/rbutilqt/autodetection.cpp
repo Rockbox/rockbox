@@ -19,6 +19,11 @@
 
 #include "autodetection.h"
 
+#if defined(Q_OS_LINUX)
+#include <stdio.h>
+#include <mntent.h>
+#endif
+
 Autodetection::Autodetection(QObject* parent): QObject(parent)
 {
 
@@ -45,6 +50,7 @@ bool Autodetection::detect()
                 if(!log.value("platform").toString().isEmpty()) {
                     m_device = log.value("platform").toString();
                     m_mountpoint = mountpoints.at(i);
+                    qDebug() << "rbutil.log detected:" << m_device << m_mountpoint;
                     return true;
                 }
             }
@@ -58,14 +64,16 @@ bool Autodetection::detect()
                 if(line.startsWith("Target: "))
                 {
                     line.remove("Target: ");
-                    m_device = line;
+                    m_device = line.trimmed(); // trim whitespaces
                     m_mountpoint = mountpoints.at(i);
+                    qDebug() << "rockbox-info.txt detected:" << m_device << m_mountpoint;
                     return true;
                 }
             }
         }
 
     }
+
     int n;
     
     //try ipodpatcher
@@ -129,25 +137,21 @@ QStringList Autodetection::getMountpoints()
 QString Autodetection::resolveMountPoint(QString device)
 {
     qDebug() << "Autodetection::resolveMountPoint(QString)" << device;
+
 #if defined(Q_OS_LINUX)
-    FILE *fp = fopen( "/proc/mounts", "r" );
-    if( !fp ) return QString("");
-    char *dev, *dir;
-    while( fscanf( fp, "%as %as %*s %*s %*s %*s", &dev, &dir ) != EOF )
-    {
-        if( QString(dev).startsWith(device) )
-        {
-            QString directory = dir;
-            free( dev );
-            free( dir );
-            fclose(fp);
-            return directory;
-        }
-        free( dev );
-        free( dir );
-    }
-    fclose( fp );
+    FILE *mn = setmntent("/etc/mtab", "r");
+    if(!mn)
+        return QString("");
     
+    struct mntent *ent;
+    while((ent = getmntent(mn))) {
+        if(QString(ent->mnt_fsname).startsWith(device)) {
+            endmntent(mn);
+            return QString(ent->mnt_dir);
+        }
+    }
+    endmntent(mn);
+
 #endif
     return QString("");
 
