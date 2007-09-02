@@ -97,6 +97,7 @@ void dircache_copy_path(const struct dircache_entry *entry, char *buf, int size)
 
 void dircache_bind(int fd, const char *path);
 void dircache_update_filesize(int fd, long newsize, long startcluster);
+void dircache_update_filetime(int fd);
 void dircache_mkdir(const char *path);
 void dircache_rmdir(const char *path);
 void dircache_remove(const char *name);

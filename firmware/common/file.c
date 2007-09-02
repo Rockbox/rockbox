@@ -250,6 +250,7 @@ int close(int fd)
             return rc * 10 - 3;
 #ifdef HAVE_DIRCACHE
         dircache_update_filesize(fd, file->size, file->fatfile.firstcluster);
+        dircache_update_filetime(fd);
 #endif
     }
 

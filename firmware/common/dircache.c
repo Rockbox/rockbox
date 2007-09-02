@@ -37,6 +37,10 @@
 #include "usb.h"
 #include "file.h"
 #include "buffer.h"
+#if CONFIG_RTC
+#include "time.h"
+#include "timefuncs.h"
+#endif
 
 /* Queue commands. */
 #define DIRCACHE_BUILD 1
@@ -955,6 +959,31 @@ void dircache_update_filesize(int fd, long newsize, long startcluster)
     
     fd_bindings[fd]->size = newsize;
     fd_bindings[fd]->startcluster = startcluster;
+}
+void dircache_update_filetime(int fd)
+{
+#if CONFIG_RTC == 0
+    (void)fd;
+#else
+    short year;
+    struct tm *now = get_time();
+    if (!dircache_initialized || fd < 0)
+        return ;
+
+    if (fd_bindings[fd] == NULL)
+    {
+        logf("dircache fd access error");
+        dircache_initialized = false;
+        return ;
+    }
+    year = now->tm_year+1900-1980;
+    fd_bindings[fd]->wrtdate = (((year)&0x7f)<<9)           |
+                               (((now->tm_mon+1)&0xf)<<5)   |
+                               (((now->tm_mday)&0x1f));
+    fd_bindings[fd]->wrttime = (((now->tm_hour)&0x1f)<<11)  |
+                               (((now->tm_min)&0x3f)<<5)    |
+                               (((now->tm_sec/2)&0x1f));
+#endif
 }
 
 void dircache_mkdir(const char *path)
