@@ -1110,6 +1110,9 @@ static int decode_exp_vlc(WMADecodeContext *s, int ch)
     fixed32 v, max_scale;
     fixed32 *q,*q_end;
 
+    /*accommodate the 16 negative indices */
+    fixed32 *pow_10_to_yover16_ptr = &pow_10_to_yover16[16];
+
     band_ptr = s->exponent_bands[s->frame_len_bits - s->block_len_bits];
     ptr = band_ptr;
     q = s->exponents[ch];
@@ -1142,7 +1145,7 @@ static int decode_exp_vlc(WMADecodeContext *s, int ch)
         /* NOTE: this offset is the same as MPEG4 AAC ! */
         last_exp += code - 60;
         /* XXX: use a table */
-        v = pow_10_to_yover16[last_exp];
+        v = pow_10_to_yover16_ptr[last_exp];
         if (v > max_scale)
         {
             max_scale = v;
