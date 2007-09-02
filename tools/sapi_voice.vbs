@@ -53,7 +53,7 @@ Set oArgs = WScript.Arguments.Named
 bSAPI4 = oArgs.Exists("sapi4")
 sLanguage = oArgs.Item("language")
 sVoice = oArgs.Item("voice")
-sRate = oArgs.Item("speed")
+sSpeed = oArgs.Item("speed")
 
 If bSAPI4 Then
     ' Create SAPI4 ActiveVoice object
@@ -95,7 +95,7 @@ If bSAPI4 Then
     oTTS.Select nMode
 
     ' Speed selection
-    If sRate <> "" Then oSpVoice.Speed = sSpeed
+    If sSpeed <> "" Then oSpVoice.Speed = sSpeed
 Else ' SAPI5
     ' Create SAPI5 object
     Set oSpVoice = CreateObject("SAPI.SpVoice")
@@ -128,7 +128,7 @@ Else ' SAPI5
     End If
 
     ' Speed selection
-    If sRate <> "" Then oSpVoice.Rate = sSpeed
+    If sSpeed <> "" Then oSpVoice.Rate = sSpeed
 
     ' Filestream object for output
     Set oSpFS = CreateObject("SAPI.SpFileStream")
