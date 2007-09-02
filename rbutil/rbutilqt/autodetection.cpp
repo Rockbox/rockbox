@@ -73,34 +73,34 @@ bool Autodetection::detect()
             // check for some specific files in root folder
             QDir root(mountpoints.at(i));
             QStringList rootentries = root.entryList(QDir::Files);
-            if(rootentries.contains("archos.mod", Qt::CaseSensitive))
+            if(rootentries.contains("archos.mod", Qt::CaseInsensitive))
             {
                 // archos.mod in root folder -> Archos Player
                 m_device = "player";
                 m_mountpoint = mountpoints.at(i);
                 return true;
             }
-            if(rootentries.contains("ONDIOST.BIN"))
+            if(rootentries.contains("ONDIOST.BIN"), Qt::CaseInsensitive)
             {
                 // ONDIOST.BIN in root -> Ondio FM
                 m_device = "ondiofm";
                 m_mountpoint = mountpoints.at(i);
                 return true;
             }
-            if(rootentries.contains("ONDIOSP.BIN"))
+            if(rootentries.contains("ONDIOSP.BIN"), Qt::CaseInsensitive)
             {
                 // ONDIOSP.BIN in root -> Ondio SP
                 m_device = "ondiosp";
                 m_mountpoint = mountpoints.at(i);
                 return true;
             }
-            if(rootentries.contains("ajbrec.ajz"))
+            if(rootentries.contains("ajbrec.ajz"), Qt::CaseInsensitive)
             {
                 qDebug() << "it's an archos. further detection needed";
             }
             // detection based on player specific folders
-            QStringList rootfolders = root.entryList(QDir::Dirs);
-            if(rootfolders.contains("GBSYSTEM"))
+            QStringList rootfolders = root.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+            if(rootfolders.contains("GBSYSTEM"), Qt::CaseInsensitive)
             {
                 // GBSYSTEM folder -> Gigabeat
                 m_device = "gigabeatf";
@@ -111,7 +111,7 @@ bool Autodetection::detect()
         }
 
     }
-    
+
     int n;
     //try ipodpatcher
     struct ipod_t ipod;
@@ -180,7 +180,8 @@ QString Autodetection::resolveMountPoint(QString device)
     
     struct mntent *ent;
     while((ent = getmntent(mn))) {
-        if(QString(ent->mnt_fsname).startsWith(device)) {
+        if(QString(ent->mnt_fsname).startsWith(device)
+           && QString(ent->mnt_type).contains("vfat", Qt::CaseInsensitive)) {
             endmntent(mn);
             return QString(ent->mnt_dir);
         }
