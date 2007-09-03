@@ -48,8 +48,8 @@ void Install::accept()
 {
     logger = new ProgressLoggerGui(this);
     logger->show();
-    QString mountPoint = userSettings->value("defaults/mountpoint").toString();
-    qDebug() << "mountpoint:" << userSettings->value("defaults/mountpoint").toString();
+    QString mountPoint = userSettings->value("mountpoint").toString();
+    qDebug() << "mountpoint:" << userSettings->value("mountpoint").toString();
     // show dialog with error if mount point is wrong
     if(!QFileInfo(mountPoint).isDir()) {
         logger->addItem(tr("Mount point is wrong!"),LOGERROR);
@@ -59,7 +59,7 @@ void Install::accept()
 
     QString myversion;
     QString buildname;
-    devices->beginGroup(userSettings->value("defaults/platform").toString());
+    devices->beginGroup(userSettings->value("platform").toString());
     buildname = devices->value("platform").toString();
     devices->endGroup();
     if(ui.radioStable->isChecked()) {
@@ -68,7 +68,7 @@ void Install::accept()
                     devices->value("last_release").toString(), buildname);
         fileName = QString("rockbox-%1-%2.zip")
                    .arg(devices->value("last_release").toString(), buildname);
-        userSettings->setValue("defaults/build", "stable");
+        userSettings->setValue("build", "stable");
         myversion = version.value("rel_rev");
     }
     else if(ui.radioArchived->isChecked()) {
@@ -77,14 +77,14 @@ void Install::accept()
             buildname, buildname, version.value("arch_date"));
         fileName = QString("rockbox-%1-%2.zip")
             .arg(buildname, version.value("arch_date"));
-        userSettings->setValue("defaults/build", "archived");
+        userSettings->setValue("build", "archived");
         myversion = "r" + version.value("arch_rev") + "-" + version.value("arch_date");
     }
     else if(ui.radioCurrent->isChecked()) {
         file = QString("%1%2/rockbox.zip")
             .arg(devices->value("bleeding_url").toString(), buildname);
         fileName = QString("rockbox.zip");
-        userSettings->setValue("defaults/build", "current");
+        userSettings->setValue("build", "current");
         myversion = "r" + version.value("bleed_rev");
     }
     else {
@@ -97,10 +97,10 @@ void Install::accept()
     installer->setUrl(file);
     installer->setProxy(proxy);
     installer->setLogSection("Rockbox (Base)");
-    if(!userSettings->value("defaults/cachedisable").toBool()
+    if(!userSettings->value("cachedisable").toBool()
         && !ui.radioCurrent->isChecked()
         && !ui.checkBoxCache->isChecked())
-        installer->setCache(userSettings->value("defaults/cachepath",
+        installer->setCache(userSettings->value("cachepath",
                             QDir::tempPath()).toString());
 
     installer->setLogVersion(myversion);
@@ -125,9 +125,9 @@ void Install::done(bool error)
     // no error, close the window, when the logger is closed
     connect(logger,SIGNAL(closed()),this,SLOT(close()));
     // add platform info to log file for later detection
-    QSettings installlog(userSettings->value("defaults/mountpoint").toString()
+    QSettings installlog(userSettings->value("mountpoint").toString()
             + "/.rockbox/rbutil.log", QSettings::IniFormat, 0);
-    installlog.setValue("platform", userSettings->value("defaults/platform").toString());
+    installlog.setValue("platform", userSettings->value("platform").toString());
     installlog.sync();
 }
 

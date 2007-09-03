@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 
-#define DEFAULT_LANG "English (builtin)"
+#define DEFAULT_LANG "English (C)"
 
 Config::Config(QWidget *parent) : QDialog(parent)
 {
@@ -43,7 +43,7 @@ Config::Config(QWidget *parent) : QDialog(parent)
     // build language list and sort alphabetically
     QStringList langs = findLanguageFiles();
     for(int i = 0; i < langs.size(); ++i)
-        lang.insert(languageName(langs[i]), langs[i]);
+        lang.insert(languageName(langs.at(i)) + tr(" (%1)").arg(langs.at(i)), langs.at(i));
     lang.insert(DEFAULT_LANG, "");
     QMap<QString, QString>::const_iterator i = lang.constBegin();
     while (i != lang.constEnd()) {
@@ -85,40 +85,40 @@ void Config::accept()
         proxy.setHost(ui.proxyHost->text());
         proxy.setPort(ui.proxyPort->text().toInt());
     }
-    userSettings->setValue("defaults/proxy", proxy.toString());
+    userSettings->setValue("proxy", proxy.toString());
     qDebug() << "new proxy:" << proxy;
     // proxy type
     QString proxyType;
     if(ui.radioNoProxy->isChecked()) proxyType = "none";
     else if(ui.radioSystemProxy->isChecked()) proxyType = "system";
     else proxyType = "manual";
-    userSettings->setValue("defaults/proxytype", proxyType);
+    userSettings->setValue("proxytype", proxyType);
 
     // language
-    if(userSettings->value("defaults/lang").toString() != language)
+    if(userSettings->value("lang").toString() != language)
         QMessageBox::information(this, tr("Language changed"),
             tr("You need to restart the application for the changed language to take effect."));
-    userSettings->setValue("defaults/lang", language);
+    userSettings->setValue("lang", language);
 
     // mountpoint
     QString mp = ui.mountPoint->text();
     if(QFileInfo(mp).isDir())
-        userSettings->setValue("defaults/mountpoint", mp);
+        userSettings->setValue("mountpoint", mp);
 
     // platform
     QString nplat;
     if(ui.treeDevices->selectedItems().size() != 0) {
         nplat = ui.treeDevices->selectedItems().at(0)->data(0, Qt::UserRole).toString();
-        userSettings->setValue("defaults/platform", nplat);
+        userSettings->setValue("platform", nplat);
     }
 
     // cache settings
     if(QFileInfo(ui.cachePath->text()).isDir())
-        userSettings->setValue("defaults/cachepath", ui.cachePath->text());
+        userSettings->setValue("cachepath", ui.cachePath->text());
     else // default to system temp path
-        userSettings->setValue("defaults/cachepath", QDir::tempPath());
-    userSettings->setValue("defaults/cachedisable", ui.cacheDisable->isChecked());
-    userSettings->setValue("defaults/offline", ui.cacheOfflineMode->isChecked());
+        userSettings->setValue("cachepath", QDir::tempPath());
+    userSettings->setValue("cachedisable", ui.cacheDisable->isChecked());
+    userSettings->setValue("offline", ui.cacheOfflineMode->isChecked());
 
     // tts settings
     if(QFileInfo(ui.ttsExecutable->text()).isExecutable())
@@ -151,7 +151,7 @@ void Config::setUserSettings(QSettings *user)
 {
     userSettings = user;
     // set proxy
-    proxy = userSettings->value("defaults/proxy").toString();
+    proxy = userSettings->value("proxy").toString();
 
     if(proxy.port() > 0)
         ui.proxyPort->setText(QString("%1").arg(proxy.port()));
@@ -160,7 +160,7 @@ void Config::setUserSettings(QSettings *user)
     ui.proxyUser->setText(proxy.userName());
     ui.proxyPass->setText(proxy.password());
 
-    QString proxyType = userSettings->value("defaults/proxytype").toString();
+    QString proxyType = userSettings->value("proxytype").toString();
     if(proxyType == "manual") ui.radioManualProxy->setChecked(true);
     else if(proxyType == "system") ui.radioSystemProxy->setChecked(true);
     else ui.radioNoProxy->setChecked(true);
@@ -171,7 +171,7 @@ void Config::setUserSettings(QSettings *user)
     // find key for lang value
     QMap<QString, QString>::const_iterator i = lang.constBegin();
     while (i != lang.constEnd()) {
-        if(i.value() == userSettings->value("defaults/lang").toString() + ".qm") {
+        if(i.value() == userSettings->value("lang").toString()) {
             b = i.key();
             break;
         }
@@ -184,15 +184,15 @@ void Config::setUserSettings(QSettings *user)
         ui.listLanguages->setCurrentItem(a.at(0));
 
     // devices tab
-    ui.mountPoint->setText(userSettings->value("defaults/mountpoint").toString());
+    ui.mountPoint->setText(userSettings->value("mountpoint").toString());
 
     // cache tab
-    if(!QFileInfo(userSettings->value("defaults/cachepath").toString()).isDir())
-        userSettings->setValue("defaults/cachepath", QDir::tempPath());
-    ui.cachePath->setText(userSettings->value("defaults/cachepath").toString());
-    ui.cacheDisable->setChecked(userSettings->value("defaults/cachedisable", true).toBool());
-    ui.cacheOfflineMode->setChecked(userSettings->value("defaults/offline").toBool());
-    QList<QFileInfo> fs = QDir(userSettings->value("defaults/cachepath").toString() + "/rbutil-cache/").entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+    if(!QFileInfo(userSettings->value("cachepath").toString()).isDir())
+        userSettings->setValue("cachepath", QDir::tempPath());
+    ui.cachePath->setText(userSettings->value("cachepath").toString());
+    ui.cacheDisable->setChecked(userSettings->value("cachedisable", true).toBool());
+    ui.cacheOfflineMode->setChecked(userSettings->value("offline").toBool());
+    QList<QFileInfo> fs = QDir(userSettings->value("cachepath").toString() + "/rbutil-cache/").entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
     qint64 sz = 0;
     for(int i = 0; i < fs.size(); i++) {
         sz += fs.at(i).size();
@@ -230,7 +230,7 @@ void Config::setDevices(QSettings *dev)
     }
 
     QString platform;
-    platform = devcs.value(userSettings->value("defaults/platform").toString());
+    platform = devcs.value(userSettings->value("platform").toString());
 
     // set up devices table
     ui.treeDevices->header()->hide();
@@ -248,7 +248,6 @@ void Config::setDevices(QSettings *dev)
         w = new QTreeWidgetItem();
         w->setFlags(Qt::ItemIsEnabled);
         w->setText(0, brands.at(c));
-//        w->setData(0, Qt::DecorationRole, <icon>);
         items.append(w);
         
         // go through platforms again for sake of order
@@ -261,11 +260,16 @@ void Config::setDevices(QSettings *dev)
             devices->beginGroup(curdev);
             curname = devices->value("name", "null").toString();
             QString curbrand = devices->value("brand", "").toString();
+            QString curicon = devices->value("icon", "").toString();
             devices->endGroup();
             if(curbrand != brands.at(c)) continue;
             qDebug() << "adding:" << brands.at(c) << curname << curdev;
             w2 = new QTreeWidgetItem(w, QStringList(curname));
             w2->setData(0, Qt::UserRole, curdev);
+//            QIcon icon;
+//            icon.addFile(":/icons/devices/" + curicon + "-tiny.png");
+//            w2->setIcon(0, icon);
+//            ui.treeDevices->setIconSize(QSize(32, 32));
             if(platform.contains(curname)) {
                 w2->setSelected(true);
                 w->setExpanded(true);
@@ -439,15 +443,22 @@ QStringList Config::findLanguageFiles()
 {
     QDir dir(programPath);
     QStringList fileNames;
+    QStringList langs;
     fileNames = dir.entryList(QStringList("*.qm"), QDir::Files, QDir::Name);
 
     QDir resDir(":/lang");
     fileNames += resDir.entryList(QStringList("*.qm"), QDir::Files, QDir::Name);
 
-    fileNames.sort();
-    qDebug() << "Config::findLanguageFiles()" << fileNames;
+    QRegExp exp("^rbutil_(.*)\\.qm");
+    for(int i = 0; i < fileNames.size(); i++) {
+        QString a = fileNames.at(i);
+        a.replace(exp, "\\1");
+        langs.append(a);
+    }
+    langs.sort();
+    qDebug() << "Config::findLanguageFiles()" << langs;
 
-    return fileNames;
+    return langs;
 }
 
 
@@ -455,8 +466,9 @@ QString Config::languageName(const QString &qmFile)
 {
     QTranslator translator;
 
-    if(!translator.load(qmFile, programPath))
-        translator.load(qmFile, ":/lang");
+    QString file = "rbutil_" + qmFile;
+    if(!translator.load(file, programPath))
+        translator.load(file, ":/lang");
 
     return translator.translate("Configure", "English");
 }
@@ -467,7 +479,8 @@ void Config::updateLanguage()
     qDebug() << "updateLanguage()";
     QList<QListWidgetItem*> a = ui.listLanguages->selectedItems();
     if(a.size() > 0)
-        language = QFileInfo(lang.value(a.at(0)->text())).baseName();
+        language = lang.value(a.at(0)->text());
+    qDebug() << language;
 }
 
 
@@ -540,6 +553,7 @@ void Config::autodetect()
                 {
                     itmList.at(i)->child(j)->setSelected(true); //select the item
                     itmList.at(i)->setExpanded(true); //expand the platform item
+                    //ui.treeDevices->indexOfTopLevelItem(itmList.at(i)->child(j));
                     break;
                 }
             }

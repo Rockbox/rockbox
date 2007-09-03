@@ -41,7 +41,7 @@ ThemesInstallWindow::ThemesInstallWindow(QWidget *parent) : QDialog(parent)
 QString ThemesInstallWindow::resolution()
 {
     QString resolution;
-    devices->beginGroup(userSettings->value("defaults/platform").toString());
+    devices->beginGroup(userSettings->value("platform").toString());
     resolution = devices->value("resolution").toString();
     devices->endGroup();
     return resolution;
@@ -77,8 +77,8 @@ void ThemesInstallWindow::downloadInfo()
     qDebug() << "downloadInfo()" << url;
     qDebug() << url.queryItems();
     getter->setProxy(proxy);
-    if(userSettings->value("defaults/offline").toBool())
-        getter->setCache(userSettings->value("defaults/cachepath", QDir::tempPath()).toString());
+    if(userSettings->value("offline").toBool())
+        getter->setCache(userSettings->value("cachepath", QDir::tempPath()).toString());
     getter->setFile(&themesInfo);
     getter->getFile(url);
 }
@@ -184,8 +184,8 @@ void ThemesInstallWindow::updateDetails(int row)
 
     igetter.abort();
     igetter.setProxy(proxy);
-    if(!userSettings->value("defaults/cachedisable").toBool())
-        igetter.setCache(userSettings->value("defaults/cachepath", QDir::tempPath()).toString());
+    if(!userSettings->value("cachedisable").toBool())
+        igetter.setCache(userSettings->value("cachepath", QDir::tempPath()).toString());
     igetter.getFile(img);
     connect(&igetter, SIGNAL(done(bool)), this, SLOT(updateImage(bool)));
 }
@@ -283,8 +283,8 @@ void ThemesInstallWindow::accept()
     
     logger = new ProgressLoggerGui(this);
     logger->show();
-    QString mountPoint = userSettings->value("defaults/mountpoint").toString();
-    qDebug() << "mountpoint:" << userSettings->value("defaults/mountpoint").toString();
+    QString mountPoint = userSettings->value("mountpoint").toString();
+    qDebug() << "mountpoint:" << userSettings->value("mountpoint").toString();
     // show dialog with error if mount point is wrong
     if(!QFileInfo(mountPoint).isDir()) {
         logger->addItem(tr("Mount point is wrong!"),LOGERROR);
@@ -298,8 +298,8 @@ void ThemesInstallWindow::accept()
     installer->setLogSection(names);
     installer->setLogVersion(version);
     installer->setMountPoint(mountPoint);
-    if(!userSettings->value("defaults/cachedisable").toBool())
-        installer->setCache(userSettings->value("defaults/cachepath", QDir::tempPath()).toString());
+    if(!userSettings->value("cachedisable").toBool())
+        installer->setCache(userSettings->value("cachepath", QDir::tempPath()).toString());
     installer->install(logger);
     connect(logger, SIGNAL(closed()), this, SLOT(close()));
 }

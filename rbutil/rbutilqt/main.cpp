@@ -38,11 +38,10 @@ int main( int argc, char ** argv ) {
     else user = new QSettings(QSettings::IniFormat, QSettings::UserScope, "rockbox.org", "RockboxUtility");
 
     QTranslator translator;
-    if(user->value("defaults/lang").toString() != "")
     // install translator
-    if(user->value("defaults/lang", "").toString() != "") {
-        if(!translator.load(user->value("defaults/lang").toString(), absolutePath))
-            translator.load(user->value("defaults/lang").toString(), ":/lang");
+    if(!user->value("lang", "").toString().isEmpty()) {
+        if(!translator.load("rbutil_" + user->value("lang").toString(), absolutePath))
+            translator.load("rbutil_" + user->value("lang").toString(), ":/lang");
     }
     delete user;
     app.installTranslator(&translator);

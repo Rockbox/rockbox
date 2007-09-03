@@ -78,7 +78,7 @@ void UninstallWindow::setUserSettings(QSettings *user)
 {
     userSettings = user;
     
-    QString mountpoint =userSettings->value("defaults/mountpoint").toString();
+    QString mountpoint =userSettings->value("mountpoint").toString();
     uninstaller = new Uninstaller(this,mountpoint);
     
     // disable smart uninstall, if not possible

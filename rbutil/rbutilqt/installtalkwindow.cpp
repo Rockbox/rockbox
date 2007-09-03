@@ -154,7 +154,7 @@ void InstallTalkWindow::setUserSettings(QSettings *user)
 {
     userSettings = user;
     
-    talkcreator->setMountPoint(userSettings->value("defaults/mountpoint").toString());
+    talkcreator->setMountPoint(userSettings->value("mountpoint").toString());
    
     setTalkFolder(userSettings->value("last_talked_folder").toString());
 
