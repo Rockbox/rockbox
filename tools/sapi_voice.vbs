@@ -38,7 +38,7 @@ Dim sLanguage, sVoice, sSpeed
 
 Dim oSpVoice, oSpFS ' SAPI5 voice and filestream
 Dim oTTS, nMode ' SAPI4 TTS object, mode selector
-Dim aLangIDs, sLangID, sSelectString
+Dim nLangID, sSelectString
 
 Dim aLine, aData    ' used in command reading
 
@@ -70,16 +70,14 @@ If bSAPI4 Then
     oTTS.Initialized = 1
 
     ' Select matching voice
-    aLangIDs = LangIDs(sLanguage)
-    For Each sLangID in aLangIDs
-        sLangID = HexToDec(sLangID) ' SAPI4 wants it decimal
-        sSelectString = "LanguageID=" & sLangID
+    For Each nLangID in LangIDs(sLanguage)
+        sSelectString = "LanguageID=" & nLangID
         If sVoice <> "" Then
             sSelectString = sSelectString & ";Speaker=" & sVoice _
                             & ";ModeName=" & sVoice
         End If
         nMode = oTTS.Find(sSelectString)
-        If oTTS.LanguageID(nMode) = sLangID And (sVoice = "" Or _
+        If oTTS.LanguageID(nMode) = nLangID And (sVoice = "" Or _
            oTTS.Speaker(nMode) = sVoice Or oTTS.ModeName(nMode) = sVoice) Then
             If bVerbose Then WScript.StdErr.WriteLine "Using " & sSelectString
             Exit For
@@ -106,9 +104,8 @@ Else ' SAPI5
     End If
 
     ' Select matching voice
-    aLangIDs = LangIDs(sLanguage)
-    For Each sLangID in aLangIDs
-        sSelectString = "Language=" & sLangID
+    For Each nLangID in LangIDs(sLanguage)
+        sSelectString = "Language=" & Hex(nLangID)
         If sVoice <> "" Then
             sSelectString = sSelectString & ";Name=" & sVoice
         End If
@@ -144,6 +141,7 @@ Do
     Select Case aLine(0) ' command
         Case "SPEAK"
             aData = Split(aLine(1), vbTab, 2)
+            aData(1) = UTF8decode(aData(1))
             If bVerbose Then WScript.StdErr.WriteLine "Saying " & aData(1) _
                                                       & " in " & aData(0)
             If bSAPI4 Then
@@ -174,8 +172,61 @@ Loop
 ' Subroutines
 ' -----------
 
+' Decode an UTF-8 string into a standard windows unicode string (UTF-16)
+Function UTF8decode(ByRef sText)
+    Dim i, c, nCode, nTail, nTextLen
+    
+    UTF8decode = ""
+    nTail = 0
+    nTextLen = Len(sText)
+    i = 1
+    While i <= nTextLen
+        c = Asc(Mid(sText, i, 1))
+        i = i + 1
+        If c <= &h7F Or c >= &hC2 Then ' Start of new character
+            If c < &h80 Then     ' U-00000000 - U-0000007F, 1 byte
+                nCode = c
+            ElseIf c < &hE0 Then ' U-00000080 - U-000007FF, 2 bytes
+                nTail = 1
+                nCode = c And &h1F
+            ElseIf c < &hF0 Then ' U-00000800 - U-0000FFFF, 3 bytes
+                nTail = 2
+                nCode = c And &h0F
+            ElseIf c < &hF5 Then ' U-00010000 - U-001FFFFF, 4 bytes
+                nTail = 3
+                nCode = c And 7
+            Else                 ' Invalid size
+                nCode = &hFFFD
+            End If
+
+            While nTail > 0 And i <= nTextLen
+                nTail = nTail - 1
+                c = Asc(Mid(sText, i, 1))
+                i = i + 1
+                If (c And &hC0) = &h80 Then ' Valid continuation char
+                    nCode = nCode * &h40 + (c And &h3F)
+                Else                        ' Invalid continuation char
+                    nCode = &hFFFD
+                    i = i - 1
+                    nTail = 0
+                End If
+            Wend
+
+        Else
+            nCode = &hFFFD
+        End If
+        If nCode >= &h10000 Then ' Character outside BMP - use surrogate pair
+            nCode = nCode - &h10000
+            c = &hD800 + ((nCode \ &h400) And &h3FF) ' high surrogate
+            UTF8decode = UTF8decode & ChrW(c)
+            nCode = &hDC00 + (nCode And &h3FF)       ' low surrogate
+        End If
+        UTF8decode = UTF8decode & ChrW(nCode)
+    Wend
+End Function
+
 ' SAPI5 output format selection based on engine
-Function AudioFormat(sVendor)
+Function AudioFormat(ByRef sVendor)
     Select Case sVendor
         Case "Microsoft"
             AudioFormat = SPSF_22kHz16BitMono
@@ -188,52 +239,42 @@ Function AudioFormat(sVendor)
     End Select
 End Function
 
-Function HexToDec(sHex)
-    Dim i, nDig
-
-    HexToDec = 0
-    For i = 1 To Len(sHex)
-        nDig = InStr("0123456789abcdef", LCase(Mid(sHex, i, 1))) - 1
-        HexToDec = 16 * HexToDec + nDig
-    Next
-End Function
-
-' Language mapping rockbox->windows (hex strings as needed by SAPI)
-Function LangIDs(sLanguage)
+' Language mapping rockbox->windows
+Function LangIDs(ByRef sLanguage)
     Dim aIDs
 
     Select Case sLanguage
         Case "afrikaans"
-            LangIDs = Array("436")
+            LangIDs = Array(&h436)
         Case "bulgarian"
-            LangIDs = Array("402")
+            LangIDs = Array(&h402)
         Case "catala"
-            LangIDs = Array("403")
+            LangIDs = Array(&h403)
         Case "chinese-simp"
-            LangIDs = Array("804") ' PRC
+            LangIDs = Array(&h804) ' PRC
         Case "chinese-trad"
-            LangIDs = Array("404") ' Taiwan. Perhaps also Hong Kong, Singapore, Macau?
+            LangIDs = Array(&h404) ' Taiwan. Perhaps also Hong Kong, Singapore, Macau?
         Case "czech"
-            LangIDs = Array("405")
+            LangIDs = Array(&h405)
         Case "dansk"
-            LangIDs = Array("406")
+            LangIDs = Array(&h406)
         Case "deutsch"
-            LangIDs = Array("407", "c07", "1007", "1407") 
+            LangIDs = Array(&h407, &hc07, &h1007, &h1407) 
             ' Standard, Austrian, Luxembourg, Liechtenstein (Swiss -> wallisertitsch)
         Case "eesti"
-            LangIDs = Array("425")
+            LangIDs = Array(&h425)
         Case "english"
-            LangIDs = Array("809", "409", "c09", "1009", "1409", "1809", _
-                            "1c09", "2009", "2409", "2809", "2c09", "3009", _
-                            "3409")
+            LangIDs = Array( &h809,  &h409,  &hc09, &h1009, &h1409, &h1809, _
+                            &h1c09, &h2009, &h2409, &h2809, &h2c09, &h3009, _
+                            &h3409)
             ' Britsh, American, Australian, Canadian, New Zealand, Ireland,
             ' South Africa, Jamaika, Caribbean, Belize, Trinidad, Zimbabwe,
             ' Philippines
         Case "espanol"
-            LangIDs = Array("40a", "c0a", "80a", "100a", "140a", "180a", _
-                            "1c0a", "200a", "240a", "280a", "2c0a", "300a", _
-                            "340a", "380a", "3c0a", "400a", "440a", "480a", _
-                            "4c0a", "500a")
+            LangIDs = Array( &h40a,  &hc0a,  &h80a, &h100a, &h140a, &h180a, _
+                            &h1c0a, &h200a, &h240a, &h280a, &h2c0a, &h300a, _
+                            &h340a, &h380a, &h3c0a, &h400a, &h440a, &h480a, _
+                            &h4c0a, &h500a)
             ' trad. sort., mordern sort., Mexican, Guatemala, Costa Rica,
             ' Panama, Dominican Republic, Venezuela, Colombia, Peru, Argentina,
             ' Ecuador, Chile, Uruguay, Paraguay, Bolivia, El Salvador,
@@ -242,47 +283,47 @@ Function LangIDs(sLanguage)
             WScript.StdErr.WriteLine "Error: no esperanto support in Windows"
             WScript.Quit 1
         Case "finnish"
-            LangIDs = Array("40b")
+            LangIDs = Array(&h40b)
         Case "francais"
-            LangIDs = Array("40c", "80c", "c0c", "100c", "140c", "180c")
+            LangIDs = Array(&h40c, &h80c, &hc0c, &h100c, &h140c, &h180c)
             ' Standard, Belgian, Canadian, Swiss, Luxembourg, Monaco
         Case "galego"
-            LangIDs = Array("456")
+            LangIDs = Array(&h456)
         Case "greek"
-            LangIDs = Array("408")
+            LangIDs = Array(&h408)
         Case "hebrew"
-            LangIDs = Array("40d")
+            LangIDs = Array(&h40d)
         Case "islenska"
-            LangIDs = Array("40f")
+            LangIDs = Array(&h40f)
         Case "italiano"
-            LangIDs = Array("410", "810") ' Standard, Swiss
+            LangIDs = Array(&h410, &h810) ' Standard, Swiss
         Case "japanese"
-            LangIDs = Array("411")
+            LangIDs = Array(&h411)
         Case "korean"
-            LangIDs = Array("412")
+            LangIDs = Array(&h412)
         Case "magyar"
-            LangIDs = Array("40e")
+            LangIDs = Array(&h40e)
         Case "nederlands"
-            LangIDs = Array("413", "813") ' Standard, Belgian
+            LangIDs = Array(&h413, &h813) ' Standard, Belgian
         Case "norsk"
-            LangIDs = Array("414") ' Bokmal
+            LangIDs = Array(&h414) ' Bokmal
         Case "norsk-nynorsk"
-            LangIDs = Array("814")
+            LangIDs = Array(&h814)
         Case "polski"
-            LangIDs = Array("415")
+            LangIDs = Array(&h415)
         Case "portugues"
-            LangIDs = Array("816", "416") ' Standard, Brazilian
+            LangIDs = Array(&h816, &h416) ' Standard, Brazilian
         Case "romaneste"
-            LangIDs = Array("418")
+            LangIDs = Array(&h418)
         Case "russian"
-            LangIDs = Array("419")
+            LangIDs = Array(&h419)
         Case "slovenscina"
-            LangIDs = Array("424")
+            LangIDs = Array(&h424)
         Case "svenska"
-            LangIDs = Array("41d", "81d") ' Standard, Finland
+            LangIDs = Array(&h41d, &h81d) ' Standard, Finland
         Case "turkce"
-            LangIDs = Array("41f")
+            LangIDs = Array(&h41f)
         Case "wallisertitsch"
-            LangIDs = Array("807") ' Swiss German
+            LangIDs = Array(&h807) ' Swiss German
     End Select
 End Function
