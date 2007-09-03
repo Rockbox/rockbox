@@ -200,7 +200,8 @@ static inline bool tea_test_key(unsigned char magic_enc[8], uint32_t * key, int 
 
 static int tea_find_key(struct mi4header_t *mi4header, int fd)
 {
-    int i, rc;
+    unsigned int i;
+    int rc;
     unsigned int j;
     uint32_t key[4];
     unsigned char magic_enc[8];
