@@ -112,11 +112,12 @@ struct tea_key {
   uint32_t     key[4];
 };
 
-#define NUM_KEYS 11
+#define NUM_KEYS (sizeof(tea_keytable)/sizeof(tea_keytable[0]))
 struct tea_key tea_keytable[] = {
   { "default" ,          { 0x20d36cc0, 0x10e8c07d, 0xc0e7dcaa, 0x107eb080 } },
   { "sansa",             { 0xe494e96e, 0x3ee32966, 0x6f48512b, 0xa93fbb42 } },
   { "sansa_gh",          { 0xd7b10538, 0xc662945b, 0x1b3fce68, 0xf389c0e6 } },
+  { "sansa_103",         { 0x1d29ddc0, 0x2579c2cd, 0xce339e1a, 0x75465dfe } },
   { "rhapsody",          { 0x7aa9c8dc, 0xbed0a82a, 0x16204cc7, 0x5904ef38 } },
   { "p610",              { 0x950e83dc, 0xec4907f9, 0x023734b9, 0x10cfb7c7 } },
   { "p640",              { 0x220c5f23, 0xd04df68e, 0x431b5e25, 0x4dcc1fa1 } },
@@ -125,6 +126,7 @@ struct tea_key tea_keytable[] = {
   { "20gc_fre",          { 0xbede8817, 0xb23bfe4f, 0x80aa682d, 0xd13f598c } },
   { "elio_p722",         { 0x6af3b9f8, 0x777483f5, 0xae8181cc, 0xfa6d8a84 } },
   { "c200",              { 0xbf2d06fa, 0xf0e23d59, 0x29738132, 0xe2d04ca7 } },
+  { "c200_106",          { 0xa913d139, 0xf842f398, 0x3e03f1a6, 0x060ee012 } },
 };
 
 /*
