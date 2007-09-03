@@ -504,6 +504,27 @@ static const struct tag_resolver taglist[] = {
 
 #define TAGLIST_SIZE ((int)(sizeof(taglist) / sizeof(taglist[0])))
 
+/* Get the length of an ID3 string in the given encoding. Returns the length
+ * in bytes, including end nil, or -1 if the encoding is unknown.
+ */
+static int unicode_len(char encoding, const void* string)
+{
+    int len = 0;
+
+    if (encoding == 0x01 || encoding == 0x02) {
+        short* s = (short*) string;
+        
+        while (*s++) {
+        }
+        
+        len = (void*) s - string;
+    } else {
+        len = strlen((char*) string) + 1;
+    }
+    
+    return len;
+}
+
 /* Checks to see if the passed in string is a 16-bit wide Unicode v2
    string.  If it is, we convert it to a UTF-8 string.  If it's not unicode,
    we convert from the default codepage */
@@ -892,7 +913,6 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             char** ptag = tr->offset ? (char**) (((char*)entry) + tr->offset)
                 : NULL;
             char* tag;
-            int comm_offset=0;
 
             /* Only ID3_VER_2_2 uses frames with three-character names. */
             if (((version == ID3_VER_2_2) && (tr->tag_length != 3))
@@ -930,14 +950,15 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                  */
                  
                 if(!memcmp( header, "COMM", 4 )) {
-                    /* ignore comments with iTunes 7 gapless data */
-                    if(!strcmp(tag+4, "iTunNORM"))
+                    int offset;
+                    /* ignore comments with iTunes 7 soundcheck/gapless data */
+                    if(!strcmp(tag+4, "iTun"))
                         break;
-                    comm_offset = 3 + strlen(tag+4) + 1;
-                    if(bytesread>comm_offset) {
-                        bytesread-=comm_offset;
-                        memmove(tag+1, tag+comm_offset+1, bytesread-1);
-                    }   
+                    offset = 3 + unicode_len(*tag, tag + 4);
+                    if(bytesread > offset) {
+                        bytesread -= offset;
+                        memmove(tag + 1, tag + 1 + offset, bytesread - 1);
+                    }
                 }
 
                 /* Attempt to parse Unicode string only if the tag contents
