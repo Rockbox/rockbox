@@ -1082,7 +1082,7 @@ MENUITEM_FUNCTION(set_recdir_item, 0, ID2P(LANG_SET_AS_REC_DIR),
 #endif
 static bool add_to_faves(void)
 {
-    if(PLUGIN_USB_CONNECTED == filetype_load_plugin("shortcuts",
+    if(PLUGIN_USB_CONNECTED == filetype_load_plugin("shortcuts_append",
                                                     selected_file))
         onplay_result = ONPLAY_RELOAD_DIR;
     return false;

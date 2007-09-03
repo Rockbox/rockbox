@@ -1,6 +1,7 @@
 #ifndef IRIVER_IFP7XX_SERIES
 
 /* For all targets */
+shortcuts
 
 /* For various targets... */
 

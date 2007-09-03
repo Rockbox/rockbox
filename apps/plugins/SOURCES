@@ -13,7 +13,6 @@ random_folder_advance_config.c
 rockblox.c
 rockbox_flash.c
 search.c
-shortcuts.c
 snow.c
 sort.c
 stats.c

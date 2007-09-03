@@ -58,7 +58,8 @@ rocklife,games
 rockpaint,apps
 search,viewers
 searchengine,viewers
-shortcuts,viewers
+shortcuts_view,viewers
+shortcuts_append,viewers
 sliding_puzzle,games
 snake2,games
 snake,games
