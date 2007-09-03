@@ -128,6 +128,7 @@ void RbUtilQt::downloadInfo()
     daily = new HttpGet(this);
     connect(daily, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
     connect(daily, SIGNAL(requestFinished(int, bool)), this, SLOT(downloadDone(int, bool)));
+    connect(qApp, SIGNAL(lastWindowClosed()), daily, SLOT(abort()));
     daily->setProxy(proxy());
     if(userSettings->value("defaults/offline").toBool())
         daily->setCache(userSettings->value("defaults/cachepath", QDir::tempPath()).toString());
@@ -154,6 +155,7 @@ void RbUtilQt::downloadDone(bool error)
     bleeding = new HttpGet(this);
     connect(bleeding, SIGNAL(done(bool)), this, SLOT(downloadBleedingDone(bool)));
     connect(bleeding, SIGNAL(requestFinished(int, bool)), this, SLOT(downloadDone(int, bool)));
+    connect(qApp, SIGNAL(lastWindowClosed()), daily, SLOT(abort()));
     bleeding->setProxy(proxy());
     if(userSettings->value("defaults/offline").toBool())
         bleeding->setCache(userSettings->value("defaults/cachepath", QDir::tempPath()).toString());
