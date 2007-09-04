@@ -94,7 +94,6 @@ sub init_tts {
             print(CMD_IN "QUERY\tVENDOR\r\n");
             my $vendor = readline(CMD_OUT);
             $vendor =~ s/\r\n//;
-            print("$vendor\n");
             %ret = (%ret, 
                     "stdin" => *CMD_IN,
                     "stdout" => *CMD_OUT,
