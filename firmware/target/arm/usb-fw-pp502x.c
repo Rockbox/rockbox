@@ -147,7 +147,9 @@ int usb_detect(void)
         {
             countdown = 0;
             status = usbstatus2 ? USB_INSERTED : USB_POWERED;
+#ifndef HAVE_USBSTACK
             dr_controller_stop();
+#endif
 
 #ifdef HAVE_USBSTACK
             /* TODO: Move this call - it shouldn't be done in this function */
@@ -206,7 +208,9 @@ int usb_detect(void)
     /* Run the USB controller for long enough to detect if we're connected
        to a computer, then stop it again. */
 
+#ifndef HAVE_USBSTACK    
     dr_controller_run();
+#endif
 
     /* Wait for 50 ticks (500ms) before deciding there is no computer
        attached.  The required value varied a lot between different users
