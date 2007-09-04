@@ -11,8 +11,9 @@ sample.emacs
 *.inc
 fwpatcher/*.[ch]
 fwpatcher/Makefile
-fwpatcher/favicon.ico
+fwpatcher/*.ico
 fwpatcher/resource.rc
+fwpatcher/mksums.pl
 ucl/Makefile
 ucl/*.[ch]
 ucl/src/*.[ch]
