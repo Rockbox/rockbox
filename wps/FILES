@@ -1,4 +1,5 @@
 WPSLIST
+FILES
 *.wps
 wpsbuild.pl
 ipodVOL/*.bmp

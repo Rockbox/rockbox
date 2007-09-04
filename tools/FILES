@@ -9,6 +9,7 @@ rockbox-style.el
 sample.emacs
 *.pl
 *.inc
+*.pm
 fwpatcher/*.[ch]
 fwpatcher/Makefile
 fwpatcher/*.ico
