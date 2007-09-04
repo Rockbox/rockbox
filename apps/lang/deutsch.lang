@@ -416,7 +416,7 @@
     *: "Playlists"
   </dest>
   <voice>
-    *: "Playlists"
+    *: "Abspiellisten"
   </voice>
 </phrase>
 <phrase>
@@ -3146,7 +3146,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Remote-Scroll-Einstellungen"
+    remote: "Fernbedienungs-Scroll-Einstellungen"
   </voice>
 </phrase>
 <phrase>
@@ -5493,7 +5493,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Clear Preset List"
+    radio: "Senderliste löschen"
   </voice>
 </phrase>
 <phrase>
@@ -5912,11 +5912,11 @@
   </source>
   <dest>
     *: none
-    recording: "Aufteilungeinstellungen"
+    recording: "Aufteilungseinstellungen"
   </dest>
   <voice>
     *: none
-    recording: "Aufteilungeinstellungen"
+    recording: "Aufteilungseinstellungen"
   </voice>
 </phrase>
 <phrase>
@@ -7266,7 +7266,7 @@
     *: "Keine Playlists"
   </dest>
   <voice>
-    *: "Keine Abspielliste"
+    *: "Keine Abspiellisten"
   </voice>
 </phrase>
 <phrase>
