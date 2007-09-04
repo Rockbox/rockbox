@@ -144,10 +144,10 @@
   desc: splash number of percents loaded
   user:
   <source>
-    *: "Carregando... %d%% Feito (%s)"
+    *: "Loading... %d%% done (%s)"
   </source>
   <dest>
-    *: "Loading... %d%% done (%s)"
+    *: "Carregando... %d%% Feito (%s)"
   </dest>
   <voice>
     *: ""
@@ -349,7 +349,7 @@
   desc: in the main menu
   user:
   <source>
-    *: "Tocando"
+    *: "Now Playing"
   </source>
   <dest>
     *: "Tocando"
@@ -1493,7 +1493,7 @@
 </phrase>
 <phrase>
   id: LANG_REPEAT_AB
-  desc: desc: repeat range from point A to B
+  desc: repeat range from point A to B
   user:
   <source>
     *: "A-B"
@@ -10418,15 +10418,15 @@
   user:
   <source>
     *: none
-    recording: "O disco está cheio. Pressione OFF para continuar."
-    h100,h120,h300: "O disco está cheio. Pressione STOP para continuar."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "O disco está cheio. Pressione LEFT para continuar."
-  </source>
-  <dest>
-    *: none
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "The disk is full. Press LEFT to continue."
+  </source>
+  <dest>
+    *: none
+    recording: "O disco está cheio. Pressione OFF para continuar."
+    h100,h120,h300: "O disco está cheio. Pressione STOP para continuar."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "O disco está cheio. Pressione LEFT para continuar."
   </dest>
   <voice>
     *: none
