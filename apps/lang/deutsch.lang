@@ -1557,7 +1557,7 @@
   <dest>
     *: "Puffer vorzeitig füllen"
     flash_storage: none
-	</dest>
+  </dest>
   <voice>
     *: "Puffer vorzeitig füllen"
     flash_storage: none
@@ -2542,7 +2542,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap:	"Zeige Schriftarten"
+    lcd_bitmap: "Zeige Schriftarten"
   </voice>
 </phrase>
 <phrase>
