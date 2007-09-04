@@ -35,6 +35,7 @@
 #include <string.h>
 #ifdef SANSA_E200
 #include "usb.h"
+#include "arcotg_udc.h"
 #endif
 
 
@@ -460,7 +461,7 @@ void* main(void)
     btn = button_read_device();
 #ifdef SANSA_E200
     usb_init();
-    while (usb_retry < 5 && !usb)
+    while ((UDC_OTGSC&0x800) && usb_retry < 5 && !usb)
     {
         usb_retry++;
         sleep(HZ/4);
