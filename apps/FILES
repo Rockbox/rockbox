@@ -81,6 +81,8 @@ plugins/rockboy/README
 plugins/rockboy/Version
 plugins/searchengine/*.[ch]
 plugins/searchengine/Makefile
+plugins/shortcuts/*.[ch]
+plugins/shortcuts/Makefile
 plugins/sudoku/*.[ch]
 plugins/sudoku/Makefile
 plugins/sudoku/SOURCES
