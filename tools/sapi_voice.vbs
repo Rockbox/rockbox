@@ -312,7 +312,9 @@ Function LangIDs(ByRef sLanguage)
         Case "polski"
             LangIDs = Array(&h415)
         Case "portugues"
-            LangIDs = Array(&h816, &h416) ' Standard, Brazilian
+            LangIDs = Array(&h816)
+        Case "portugues-brasileiro"
+            LangIDs = Array(&h416)
         Case "romaneste"
             LangIDs = Array(&h418)
         Case "russian"
