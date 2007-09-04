@@ -37,10 +37,10 @@ void usb_init_device(void)
 {
 }
 
-bool usb_detect(void)
+int usb_detect(void)
 {
     /* TODO: Implement USB_ISP1582 */
-    return false;
+    return USB_EXTRACTED;
 }
 
 void usb_enable(bool on)

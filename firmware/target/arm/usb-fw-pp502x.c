@@ -92,7 +92,7 @@ void usb_init_device(void)
 void usb_enable(bool on)
 {
 #ifdef HAVE_USBSTACK
-	(void)on;
+    (void)on;
 #else	
     /* This device specific code will eventually give way to proper USB
        handling, which should be the same for all PP502x targets. */
@@ -124,17 +124,41 @@ void usb_enable(bool on)
 #endif /* !HAVE_USBSTACK */
 }
 
-bool usb_detect(void)
+int usb_detect(void)
 {
+    static int countdown = 0;
+    static int status = USB_EXTRACTED;
     static bool prev_usbstatus1 = false;
-    bool usbstatus1,usbstatus2;
+    bool usbstatus1, usbstatus2;
 
 #if defined(IPOD_COLOR) || defined(IPOD_4G) \
  || defined(IPOD_MINI)  || defined(IPOD_MINI2G)
     /* GPIO C bit 1 is firewire detect */
     if (!(GPIOC_INPUT_VAL & 0x02))
-        return true;
+        return USB_INSERTED;
 #endif
+
+    if (countdown > 0)
+    {
+        countdown--;
+
+        usbstatus2 = (UDC_PORTSC1 & PORTSCX_CURRENT_CONNECT_STATUS) ? true : false;
+        if ((countdown == 0) || usbstatus2)
+        {
+            countdown = 0;
+            status = usbstatus2 ? USB_INSERTED : USB_POWERED;
+            dr_controller_stop();
+
+#ifdef HAVE_USBSTACK
+            /* TODO: Move this call - it shouldn't be done in this function */
+            if (status == USB_INSERTED)
+            {
+                usb_stack_start();
+            }
+#endif
+        }
+        return status;
+    }
 
     /* UDC_ID should have the bit format:
         [31:24] = 0x0
@@ -144,29 +168,51 @@ bool usb_detect(void)
         [7:6]   = 0x0 (Reserved)
         [5:0]   = 0x05 (ID) */
     if (UDC_ID != 0x22FA05) {
-        return false;
+        /* This should never occur - do we even need to test? */
+        return USB_EXTRACTED;
     }
 
     usbstatus1 = (UDC_OTGSC & 0x800) ? true : false;
-#ifdef HAVE_USBSTACK
-    if ((usbstatus1 == true) && (prev_usbstatus1 == false)) {
-        usb_stack_start();
-    } else if ((usbstatus1 == false) && (prev_usbstatus1 == true)) {
-        usb_stack_stop();
-    }
-#else
-    if ((usbstatus1 == true) && (prev_usbstatus1 == false)) {
-        dr_controller_run();
-    } else if ((usbstatus1 == false) && (prev_usbstatus1 == true)) {
-        dr_controller_stop();
-    }
-#endif
-    prev_usbstatus1 = usbstatus1;
-    usbstatus2 = (UDC_PORTSC1 & PORTSCX_CURRENT_CONNECT_STATUS) ? true : false;
 
-    if (usbstatus1 && usbstatus2) {
-        return true;
-    } else {
-        return false;
+    if (usbstatus1 == prev_usbstatus1)
+    {
+        /* Nothing has changed, so just return previous status */
+        return status;
     }
+    prev_usbstatus1 = usbstatus1;
+
+    if (!usbstatus1)
+    {   /* We have just been disconnected */
+        status = USB_EXTRACTED;
+#ifdef HAVE_USBSTACK
+        /* TODO: Move this call - it shouldn't be done in this function */
+        usb_stack_stop();
+#endif
+        return status;
+    }
+
+    /* We now know that we have just been connected to either a charger
+       or a computer */
+
+    if((button_status() & ~USBPOWER_BTN_IGNORE) == USBPOWER_BUTTON)
+    {   
+        /* The user wants to charge, so it doesn't matter what we are
+           connected to. */
+
+        status = USB_POWERED;
+        return status;
+    }
+
+    /* Run the USB controller for long enough to detect if we're connected
+       to a computer, then stop it again. */
+
+    dr_controller_run();
+
+    /* Wait for 50 ticks (500ms) before deciding there is no computer
+       attached.  The required value varied a lot between different users
+       when this feature was being tested. */
+
+    countdown = 50;
+
+    return status;
 }

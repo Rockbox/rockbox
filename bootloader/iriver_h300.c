@@ -169,7 +169,7 @@ void main(void)
 
     /* Turn off if we believe the start was accidental */
     if(!(rtc_alarm || on_button || rc_on_button ||
-         usb_detect() || charger_inserted())) {
+         (usb_detect() == USB_INSERTED) || charger_inserted())) {
         __reset_cookie();
         power_off();
     }
@@ -222,7 +222,8 @@ void main(void)
     {
         hold_status = true;
     }
-    if (hold_status && !rtc_alarm && !usb_detect() && !charger_inserted())
+    if (hold_status && !rtc_alarm && (usb_detect() != USB_INSERTED) && 
+        !charger_inserted())
     {
         if (detect_original_firmware())
         {
@@ -282,7 +283,7 @@ void main(void)
                 break;
             }
 
-            if(usb_detect())
+            if(usb_detect() == USB_INSERTED)
                 request_start = true;
         }
         if(!request_start)
@@ -297,7 +298,7 @@ void main(void)
     usb_init();
 
     /* A hack to enter USB mode without using the USB thread */
-    if(usb_detect())
+    if(usb_detect() == USB_INSERTED)
     {
         const char msg[] = "Bootloader USB mode";
         int w, h;
@@ -314,7 +315,7 @@ void main(void)
         sleep(HZ/20);
         usb_enable(true);
         cpu_idle_mode(true);
-        while (usb_detect())
+        while (usb_detect() == USB_INSERTED)
         {
             /* Print the battery status. */
             line = 0;

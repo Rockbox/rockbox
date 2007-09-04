@@ -21,6 +21,7 @@
 #include "system.h"
 #include "kernel.h"
 #include "ata.h"
+#include "usb.h"
 
 #define USB_RST_ASSERT   GPBDAT &= ~(1 << 4)
 #define USB_RST_DEASSERT GPBDAT |=  (1 << 4)
@@ -35,9 +36,12 @@
 #define USB_CRADLE_BUS_DISABLE GPHDAT &= ~(1 << 8)
 
 /* The usb detect is one pin to the cpu active low */
-inline bool usb_detect(void)
+int usb_detect(void)
 {
-    return USB_UNIT_IS_PRESENT | USB_CRADLE_IS_PRESENT;
+   if (USB_UNIT_IS_PRESENT | USB_CRADLE_IS_PRESENT)
+       return USB_INSERTED;
+   else
+       return USB_EXTRACTED;
 }
 
 void usb_init_device(void)

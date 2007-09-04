@@ -20,6 +20,41 @@
 #define _USB_H_
 
 #include "kernel.h"
+#include "button.h"
+
+/* Messages from usb_tick and thread states */
+#define USB_INSERTED    1
+#define USB_EXTRACTED   2 
+#ifdef HAVE_MMC
+#define USB_REENABLE    3
+#endif
+
+#ifdef HAVE_USB_POWER
+#define USB_POWERED     4
+
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define USBPOWER_BUTTON BUTTON_F1
+#define USBPOWER_BTN_IGNORE BUTTON_ON
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define USBPOWER_BUTTON BUTTON_MENU
+#define USBPOWER_BTN_IGNORE BUTTON_OFF
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define USBPOWER_BUTTON BUTTON_MENU
+#define USBPOWER_BTN_IGNORE BUTTON_PLAY
+#elif CONFIG_KEYPAD == IRIVER_H300_PAD
+#define USBPOWER_BUTTON BUTTON_REC
+#define USBPOWER_BTN_IGNORE BUTTON_ON
+#elif CONFIG_KEYPAD == GIGABEAT_PAD
+#define USBPOWER_BUTTON BUTTON_MENU
+#define USBPOWER_BTN_IGNORE BUTTON_POWER
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+#define USBPOWER_BUTTON BUTTON_NONE
+#define USBPOWER_BTN_IGNORE BUTTON_POWER
+#elif CONFIG_KEYPAD == SANSA_E200_PAD
+#define USBPOWER_BUTTON BUTTON_SELECT
+#define USBPOWER_BTN_IGNORE BUTTON_POWER
+#endif
+#endif /* HAVE_USB_POWER */
 
 void usb_init(void);
 void usb_enable(bool on);
@@ -28,7 +63,7 @@ void usb_acknowledge(long id);
 void usb_wait_for_disconnect(struct event_queue *q);
 int usb_wait_for_disconnect_w_tmo(struct event_queue *q, int ticks);
 bool usb_inserted(void); /* return the official value, what's been reported to the threads */
-bool usb_detect(void); /* return the raw hardware value */
+int usb_detect(void); /* return the raw hardware value - nothing/pc/charger */
 #ifdef HAVE_USB_POWER
 bool usb_powered(void);
 #ifdef CONFIG_CHARGING

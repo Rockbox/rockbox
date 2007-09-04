@@ -388,7 +388,7 @@ void main(void)
     power_init();
 
     /* Turn off if neither ON button is pressed */
-    if(!(on_button || rc_on_button || usb_detect()))
+    if(!(on_button || rc_on_button || (usb_detect() == USB_INSERTED)))
     {
         __reset_cookie();
         power_off();
@@ -439,7 +439,7 @@ void main(void)
     }
     
 # ifdef EEPROM_SETTINGS
-    if (!hold_status && !usb_detect() && !recovery_mode)
+    if (!hold_status && (usb_detect() != USB_INSERTED) && !recovery_mode)
         try_flashboot();
 # endif
 
@@ -467,7 +467,7 @@ void main(void)
 
     /* Don't start if the Hold button is active on the device you
        are starting with */
-    if (!usb_detect() && (hold_status
+    if ((usb_detect() != USB_INSERTED) && (hold_status
 #ifdef HAVE_EEPROM_SETTINGS
                           || recovery_mode
 #endif
@@ -494,7 +494,7 @@ void main(void)
     usb_init();
 
     /* A hack to enter USB mode without using the USB thread */
-    if(usb_detect())
+    if(usb_detect() == USB_INSERTED)
     {
         const char msg[] = "Bootloader USB mode";
         int w, h;
@@ -520,7 +520,7 @@ void main(void)
         sleep(HZ/20);
         usb_enable(true);
         cpu_idle_mode(true);
-        while (usb_detect())
+        while (usb_detect() == USB_INSERTED)
         {
             /* Print the battery status. */
             line = 0;

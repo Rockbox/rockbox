@@ -20,10 +20,11 @@
 #include <stdbool.h>
 #include "cpu.h"
 #include "system.h"
+#include "usb.h"
 
-bool usb_detect(void)
+int usb_detect(void)
 {
-    return (PADR & 0x8000) ? false : true;
+    return (PADR & 0x8000) ? USB_INSERTED : USB_EXTRACTED;
 }
 
 void usb_enable(bool on)

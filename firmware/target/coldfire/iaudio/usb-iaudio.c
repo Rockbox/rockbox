@@ -20,6 +20,7 @@
 #include <stdbool.h>
 #include "cpu.h"
 #include "system.h"
+#include "usb.h"
 
 void usb_init_device(void)
 {
@@ -30,9 +31,9 @@ void usb_init_device(void)
     or_l(0x00800000, &GPIO1_FUNCTION);  /* USB detect */
 }
 
-bool usb_detect(void)
+int usb_detect(void)
 {
-    return (GPIO1_READ & 0x00800000)?true:false;
+    return (GPIO1_READ & 0x00800000) ? USB_INSERTED : USB_EXTRACTED;
 }
 
 void usb_enable(bool on)

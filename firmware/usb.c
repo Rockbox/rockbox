@@ -51,39 +51,6 @@ void screen_dump(void);   /* Nasty again. Defined in apps/ too */
 
 #if !defined(SIMULATOR) && !defined(USB_NONE)
 
-/* Messages from usb_tick and thread states */
-#define USB_INSERTED    1
-#define USB_EXTRACTED   2 
-#ifdef HAVE_MMC
-#define USB_REENABLE    3
-#endif
-#ifdef HAVE_USB_POWER
-#define USB_POWERED     4
-
-#if CONFIG_KEYPAD == RECORDER_PAD
-#define USBPOWER_BUTTON BUTTON_F1
-#define USBPOWER_BTN_IGNORE BUTTON_ON
-#elif CONFIG_KEYPAD == ONDIO_PAD
-#define USBPOWER_BUTTON BUTTON_MENU
-#define USBPOWER_BTN_IGNORE BUTTON_OFF
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
-#define USBPOWER_BUTTON BUTTON_MENU
-#define USBPOWER_BTN_IGNORE BUTTON_PLAY
-#elif CONFIG_KEYPAD == IRIVER_H300_PAD
-#define USBPOWER_BUTTON BUTTON_REC
-#define USBPOWER_BTN_IGNORE BUTTON_ON
-#elif CONFIG_KEYPAD == GIGABEAT_PAD
-#define USBPOWER_BUTTON BUTTON_MENU
-#define USBPOWER_BTN_IGNORE BUTTON_POWER
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD
-#define USBPOWER_BUTTON BUTTON_NONE
-#define USBPOWER_BTN_IGNORE BUTTON_POWER
-#elif CONFIG_KEYPAD == SANSA_E200_PAD
-#define USBPOWER_BUTTON BUTTON_SELECT
-#define USBPOWER_BTN_IGNORE BUTTON_POWER
-#endif
-#endif /* HAVE_USB_POWER */
-
 #define NUM_POLL_READINGS (HZ/5)
 static int countdown;
 
@@ -100,7 +67,7 @@ static long usb_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
 static const char usb_thread_name[] = "usb";
 #endif
 static struct event_queue usb_queue;
-static bool last_usb_status;
+static int last_usb_status;
 static bool usb_monitor_enabled;
 
 
@@ -161,6 +128,11 @@ static void usb_thread(void)
         queue_wait(&usb_queue, &ev);
         switch(ev.id)
         {
+#ifdef HAVE_USB_POWER
+            case USB_POWERED:
+                usb_state = USB_POWERED;
+                break;
+#endif
             case USB_INSERTED:
 #ifdef HAVE_LCD_BITMAP
                 if(do_screendump_instead_of_usb)
@@ -278,7 +250,7 @@ static void usb_thread(void)
 #ifndef BOOTLOADER
 static void usb_tick(void)
 {
-    bool current_status;
+    int current_status;
 
     if(usb_monitor_enabled)
     {
@@ -300,10 +272,7 @@ static void usb_tick(void)
                readings in a row */
             if(countdown == 0)
             {
-                if(current_status)
-                    queue_post(&usb_queue, USB_INSERTED, 0);
-                else
-                    queue_post(&usb_queue, USB_EXTRACTED, 0);
+                queue_post(&usb_queue, current_status, 0);
             }
         }
     }
@@ -463,9 +432,9 @@ void usb_start_monitoring(void)
 {
 }
 
-bool usb_detect(void)
+int usb_detect(void)
 {
-    return false;
+    return USB_EXTRACTED;
 }
 
 void usb_wait_for_disconnect(struct event_queue *q)

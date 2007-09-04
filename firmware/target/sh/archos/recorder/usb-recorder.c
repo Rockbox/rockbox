@@ -22,10 +22,11 @@
 #include "cpu.h"
 #include "hwcompat.h"
 #include "system.h"
+#include "usb.h"
 
-bool usb_detect(void)
+int usb_detect(void)
 {
-    return (adc_read(ADC_USB_POWER) > 500) ? true : false;
+    return (adc_read(ADC_USB_POWER) > 500) ? USB_INSERTED : USB_EXTRACTED;
 }
 
 void usb_enable(bool on)

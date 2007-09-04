@@ -464,7 +464,7 @@ void* main(void)
     {
         usb_retry++;
         sleep(HZ/4);
-        usb = usb_detect();
+        usb = (usb_detect() == USB_INSERTED);
     }
     if (usb)
         btn |= BOOTLOADER_BOOT_OF;

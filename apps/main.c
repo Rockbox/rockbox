@@ -444,7 +444,7 @@ static void init(void)
 #endif
     
     usb_start_monitoring();
-    while (usb_detect())
+    while (usb_detect() == USB_INSERTED)
     {   
 #ifdef HAVE_EEPROM_SETTINGS
         firmware_settings.disk_clean = false;

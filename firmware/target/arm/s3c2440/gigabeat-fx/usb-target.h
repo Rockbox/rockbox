@@ -20,7 +20,6 @@
 #define USB_TARGET_H
 
 bool usb_init_device(void);
-bool usb_detect(void);
 void usb_enable(bool on);
 
 #endif
