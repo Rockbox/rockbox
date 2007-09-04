@@ -94,7 +94,7 @@ sub init_tts {
             print(CMD_IN "QUERY\tVENDOR\r\n");
             my $vendor = readline(CMD_OUT);
             $vendor =~ s/\r\n//;
-            %ret = (%ret, 
+            %ret = (%ret,
                     "stdin" => *CMD_IN,
                     "stdout" => *CMD_OUT,
                     "toolspath" => $path,
@@ -126,8 +126,8 @@ sub correct_string {
     my $orig = $string;
     switch($language) {
         # General for all engines and languages
-        $string =~ s/USB/U S B/ig;
-        $string =~ s/ID3/I D 3/ig;
+        $string =~ s/USB/U S B/g;
+        $string =~ s/ID3/I D 3/g;
 
         case "english" {
             switch($$tts_object{"name"}) {
