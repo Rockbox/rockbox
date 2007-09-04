@@ -91,7 +91,15 @@ sub init_tts {
             my $pid = open2(*CMD_OUT, *CMD_IN, "cscript //nologo $cmd");
             $SIG{INT} = sub { print(CMD_IN "QUIT\r\n"); panic_cleanup(); };
             $SIG{KILL} = sub { print(CMD_IN "QUIT\r\n"); panic_cleanup(); };
-            %ret = (%ret, "stdin" => *CMD_IN, "stdout" => *CMD_OUT, "toolspath" => $path);
+            print(CMD_IN "QUERY\tVENDOR\r\n");
+            my $vendor = readline(CMD_OUT);
+            $vendor =~ s/\r\n//;
+            print("$vendor\n");
+            %ret = (%ret, 
+                    "stdin" => *CMD_IN,
+                    "stdout" => *CMD_OUT,
+                    "toolspath" => $path,
+                    "vendor" => $vendor);
         }
     }
     return \%ret;
@@ -118,24 +126,45 @@ sub correct_string {
     my ($string, $language, $tts_object) = @_;
     my $orig = $string;
     switch($language) {
-        # General for all engines and languages (perhaps - just an example)
-        $string =~ s/USB/U S B/;
+        # General for all engines and languages
+        $string =~ s/USB/U S B/ig;
+        $string =~ s/ID3/I D 3/ig;
 
-        case ("deutsch") {
+        case "english" {
             switch($$tts_object{"name"}) {
-                $string =~ s/alphabet/alfabet/;
-                $string =~ s/alkaline/alkalein/;
-                $string =~ s/ampere/amper/;
-                $string =~ s/byte(s?)\b/beit$1/;
-                $string =~ s/\bdezibel\b/de-zibell/;
-                $string =~ s/energie\b/ener-gie/;
-                $string =~ s/\bflash\b/fläsh/g;
-                $string =~ s/\bfirmware(s?)\b/firmwer$1/;
-                $string =~ s/\bid3 tag\b/id3 täg/g; # can't just use "tag" here
-                $string =~ s/\bloudness\b/laudness/;
-                $string =~ s/\bnumerisch\b/numehrisch/;
-                $string =~ s/\brücklauf\b/rück-lauf/;
-                $string =~ s/\bsuchlauf\b/such-lauf/;
+                case "sapi" {   # just for SAPI
+                    $string =~ s/plugin(s?)/plug-in$1/ig;
+                }
+            }
+        }
+        case "deutsch" {
+            # for all german engines (e.g. for english words)
+            $string =~ s/alkaline/alkalein/ig;
+            $string =~ s/byte(s?)/beit$1/ig;
+            $string =~ s/clip(s?)/klipp$1/ig;
+            $string =~ s/cuesheet/kjuschiet/ig;
+            $string =~ s/dither/didder/ig;
+            $string =~ s/equalizer/iquileiser/ig;
+            $string =~ s/\bflash\b/fläsh/ig;
+            $string =~ s/\bfirmware(s?)\b/firmwer$1/ig;
+            $string =~ s/\bI D 3 tag\b/I D 3 täg/ig; # can't just use "tag" here
+            $string =~ s/\bloudness\b/laudness/ig;
+            $string =~ s/\bunicode\b/unikod/ig;
+            switch($$tts_object{"name"}) {
+                 case "sapi" {   # just for SAPI
+                    switch($$tts_object{"vendor"}) {
+                        case "AT&T Labs" {
+                            $string =~ s/alphabet/alfabet/ig;
+                            $string =~ s/ampere/amper/ig;
+                            $string =~ s/\bdezibel\b/de-zibell/ig;
+                            $string =~ s/diddering/didde-ring/ig;
+                            $string =~ s/energie\b/ener-gie/ig;
+                            $string =~ s/\bnumerisch\b/numehrisch/ig;
+                            $string =~ s/\brücklauf\b/rück-lauf/ig;
+                            $string =~ s/\bsuchlauf\b/such-lauf/ig;
+                        }
+                    }
+                }
             }
         }
     }
@@ -280,11 +309,13 @@ sub generateclips {
                 }
 
                 # Apply corrections to the string
-                $voice = correct_string($voice);
+                $voice = correct_string($voice, $language, $tts_object);
 
-                # If we have a pool of snippes, see if the string exists there first
+                # If we have a pool of snippets, see if the string exists there first
                 if (defined($ENV{'POOL'})) {
-                    $pool_file = sprintf("%s/%s-%s-%s.mp3", $ENV{'POOL'}, md5_hex($voice), $language, $tts_engine);
+                    $pool_file = sprintf("%s/%s-%s.mp3", $ENV{'POOL'}, 
+                                         md5_hex("$voice $tts_engine $tts_engine_opts $encoder_opts"),
+                                         $language);
                     if (-f $pool_file) {
                         printf("Re-using %s (%s) from pool\n", $id, $voice) if $verbose;
                         copy($pool_file, $mp3);

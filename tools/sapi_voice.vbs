@@ -139,6 +139,15 @@ Do
         WScript.Quit 1
     End If
     Select Case aLine(0) ' command
+        Case "QUERY"
+            Select Case aLine(1)
+                Case "VENDOR"
+                    If bSAPI4 Then
+                        WScript.StdOut.WriteLine oTTS.MfgName(nMode)
+                    Else
+                        WScript.StdOut.WriteLine oSpVoice.Voice.GetAttribute("Vendor")
+                    End If
+            End Select
         Case "SPEAK"
             aData = Split(aLine(1), vbTab, 2)
             aData(1) = UTF8decode(aData(1))
