@@ -952,7 +952,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                 if(!memcmp( header, "COMM", 4 )) {
                     int offset;
                     /* ignore comments with iTunes 7 soundcheck/gapless data */
-                    if(!strcmp(tag+4, "iTun"))
+                    if(!strncmp(tag+4, "iTun", 4))
                         break;
                     offset = 3 + unicode_len(*tag, tag + 4);
                     if(bytesread > offset) {
