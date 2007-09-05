@@ -35,49 +35,49 @@
 
 void usb_init_device(void)
 {
-    int r0;  
+    int r0;
     outl(inl(0x70000084) | 0x200, 0x70000084);  
-   
+
     outl(inl(0x7000002C) | 0x3000000, 0x7000002C);  
-    DEV_EN |= DEV_USB;  
-   
+    DEV_EN |= DEV_USB;
+
     DEV_RS |= DEV_USB; /* reset usb start */  
     DEV_RS &=~DEV_USB;/* reset usb end */  
-   
-    DEV_INIT |= INIT_USB;  
-    while ((inl(0x70000028) & 0x80) == 0);  
-   
+
+    DEV_INIT |= INIT_USB;
+    while ((inl(0x70000028) & 0x80) == 0);
+
     UDC_PORTSC1 |= PORTSCX_PORT_RESET;  
-    while ((UDC_PORTSC1 & PORTSCX_PORT_RESET) != 0);  
-   
-    UDC_OTGSC |= 0x5F000000;  
+    while ((UDC_PORTSC1 & PORTSCX_PORT_RESET) != 0);
+
+    UDC_OTGSC |= 0x5F000000;
     if( (UDC_OTGSC & 0x100) == 0) {  
-        UDC_USBMODE &=~ USB_MODE_CTRL_MODE_HOST;  
-        UDC_USBMODE |= USB_MODE_CTRL_MODE_DEVICE;  
-        outl(inl(0x70000028) | 0x4000, 0x70000028);  
-        outl(inl(0x70000028) | 0x2, 0x70000028);  
-    } else {  
-        UDC_USBMODE |= USB_MODE_CTRL_MODE_DEVICE;  
-        outl(inl(0x70000028) &~0x4000, 0x70000028);  
-        outl(inl(0x70000028) | 0x2, 0x70000028);  
-    }  
-   
-   
-    UDC_USBCMD |= USB_CMD_CTRL_RESET;  
-    while((UDC_USBCMD & USB_CMD_CTRL_RESET) != 0);  
-   
-    r0 = UDC_PORTSC1;  
-   
+        UDC_USBMODE &=~ USB_MODE_CTRL_MODE_HOST;
+        UDC_USBMODE |= USB_MODE_CTRL_MODE_DEVICE;
+        outl(inl(0x70000028) | 0x4000, 0x70000028);
+        outl(inl(0x70000028) | 0x2, 0x70000028);
+    } else {
+        UDC_USBMODE |= USB_MODE_CTRL_MODE_DEVICE;
+        outl(inl(0x70000028) &~0x4000, 0x70000028);
+        outl(inl(0x70000028) | 0x2, 0x70000028);
+    }
+
+
+    UDC_USBCMD |= USB_CMD_CTRL_RESET;
+    while((UDC_USBCMD & USB_CMD_CTRL_RESET) != 0);
+
+    r0 = UDC_PORTSC1;
+
     /* Note from IPL source (referring to next 5 lines of code:  
        THIS NEEDS TO BE CHANGED ONCE THERE IS KERNEL USB */  
-    DEV_INIT |= INIT_USB;  
-    DEV_EN |= DEV_USB;  
-    while ((inl(0x70000028) & 0x80) == 0);  
-    outl(inl(0x70000028) | 0x2, 0x70000028);  
-   
-    udelay(0x186A0);  
+    DEV_INIT |= INIT_USB;
+    DEV_EN |= DEV_USB;
+    while ((inl(0x70000028) & 0x80) == 0);
+    outl(inl(0x70000028) | 0x2, 0x70000028);
 
-#ifndef HAVE_USBSTACK   
+    udelay(0x186A0);
+
+#ifndef HAVE_USBSTACK
     dr_controller_setup();
 #endif
 
@@ -93,7 +93,7 @@ void usb_enable(bool on)
 {
 #ifdef HAVE_USBSTACK
     (void)on;
-#else	
+#else
     /* This device specific code will eventually give way to proper USB
        handling, which should be the same for all PP502x targets. */
     if (on)
@@ -149,14 +149,8 @@ int usb_detect(void)
             status = usbstatus2 ? USB_INSERTED : USB_POWERED;
 #ifndef HAVE_USBSTACK
             dr_controller_stop();
-#endif
-
-#ifdef HAVE_USBSTACK
-            /* TODO: Move this call - it shouldn't be done in this function */
-            if (status == USB_INSERTED)
-            {
-                usb_stack_start();
-            }
+#else
+            usb_stack_stop();
 #endif
         }
         return status;
@@ -186,10 +180,6 @@ int usb_detect(void)
     if (!usbstatus1)
     {   /* We have just been disconnected */
         status = USB_EXTRACTED;
-#ifdef HAVE_USBSTACK
-        /* TODO: Move this call - it shouldn't be done in this function */
-        usb_stack_stop();
-#endif
         return status;
     }
 
@@ -208,8 +198,10 @@ int usb_detect(void)
     /* Run the USB controller for long enough to detect if we're connected
        to a computer, then stop it again. */
 
-#ifndef HAVE_USBSTACK    
+#ifndef HAVE_USBSTACK
     dr_controller_run();
+#else
+    usb_stack_start();
 #endif
 
     /* Wait for 50 ticks (500ms) before deciding there is no computer
