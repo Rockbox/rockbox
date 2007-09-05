@@ -20,10 +20,13 @@
 #include "cpu.h"
 
     .section .init.text,"ax",%progbits
-
-    .global    start
+	
+	.global    start
 start:
+    b	   newstart	
+	.space 4*16
 
+    
 /* Arm bootloader and startup code based on startup.s from the iPodLinux loader
  *
  * Copyright (c) 2003, Daniel Palffy (dpalffy (at) rainstorm.org)
@@ -31,17 +34,16 @@ start:
  *
  */
 
+newstart:
 #if CONFIG_CPU == IMX31L
-    mrs r0, cpsr
-    bic r0, r0, #0x100
-    add r0,r0,#0xD3
-    msr cpsr_c, r0
+	mov r0,#0xD3
+    msr cpsr, r0
 #else
-    msr    cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ */
+    msr    cpsr, #0xd3 /* enter supervisor mode, disable IRQ */
 #endif  
 
 #ifndef BOOTLOADER
-
+	
 #ifndef DEBUG
     /* Copy exception handler code to address 0 */
     ldr    r2, =_vectorsstart
@@ -100,7 +102,7 @@ start:
     cmp    r3, r2
     strhi  r4, [r2], #4
     bhi    1b
-
+    
 #ifdef BOOTLOADER
 /* Code for ARM bootloader targets other than iPod go here */
 
@@ -127,6 +129,7 @@ start_loc:
      bl main
 
 #elif CONFIG_CPU == IMX31L
+          
     mov r0, #0
     mcr 15, 0, r0, c7, c7, 0        /* invalidate I cache and D cache */
     mcr 15, 0, r0, c8, c7, 0        /* invalidate TLBs */
@@ -166,48 +169,118 @@ L2_loop:
     cmp r2, #0
     bne L2_loop
     /*** End of L2 operations ***/
-	
-	/* Set up stack for IRQ mode */ 
-    mrs    r0,cpsr
-    orr    r0,r0,#0xd2
-    msr    cpsr_c,r0
+		 /* Set up stack for IRQ mode */ 
+	mov    r0,#0xd2
+    msr    cpsr, r0
     ldr    sp, =irq_stack
     /* Set up stack for FIQ mode */ 
-    mrs    r0,cpsr
-    orr    r0,r0,#0xd1
-    msr    cpsr_c,r0
+    mov    r0,#0xd1
+    msr    cpsr, r0
     ldr    sp, =fiq_stack
 
     /* Let abort and undefined modes use IRQ stack */
-    mrs    r0,cpsr
-    orr    r0,r0,#0xd7
-    msr    cpsr_c,r0
+    mov    r0,#0xd7
+    msr    cpsr, r0
     ldr    sp, =irq_stack
-    mrs    r0,cpsr
-    orr    r0,r0,#0xdb
-    msr    cpsr_c,r0
+    mov    r0,#0xdb
+    msr    cpsr, r0
     ldr    sp, =irq_stack
     /* Switch to supervisor mode */
-    mrs    r0,cpsr
-    orr    r0,r0,#0xdb
-    msr    cpsr_c,r0
+    mov    r0,#0xd3
+    msr    cpsr, r0
     ldr    sp, =stackend
-	
-    bl main
     
-    /* 256 words of IRQ stack */
-    .space 256*4
-	irq_stack:
+    /*remap memory as well as exception vectors*/
+    /*for now this will be done in bootloader, especially
+      if usb will be needed within the bootloader to load the 
+      main firmware file. Interrupts will be needed for this
+      (whether they be swi or irq)*/
+	bl memory_init
+	mov r0,#0
+	ldr r1,=_vectorstart
+	mov r2,#0
+	
+lp: ldr r3,[r1]
+	add r1,r1,#4
+	str r3,[r0]
+	add r0,r0,#4
+	add r2,r2,#1
+	cmp r2,#16
+	bne lp
+	bl main
 
-	/* 256 words of FIQ stack */
+.section .vectors,"aw"
+_vectorstart:
+    ldr    pc, [pc, #24]
+    ldr    pc, [pc, #24]
+    ldr    pc, [pc, #24]
+    ldr    pc, [pc, #24]
+    ldr    pc, [pc, #24]
+    ldr    pc, [pc, #24]
+    ldr    pc, [pc, #24]
+    ldr    pc, [pc, #24]
+
+    /* Exception vectors */
+    .global vectors
+vectors:
+    .word  start 
+    .word  undef_instr_handler
+    .word  software_int_handler
+    .word  prefetch_abort_handler
+    .word  data_abort_handler
+    .word  reserved_handler
+    .word  irqz
+    .word  fiqz
+
+    .text
+    .global irq
+    .global fiq
+    .global UIE
+
+undef_instr_handler:
+    mov    r0, lr
+    mov    r1, #0
+    b      UIE
+
+software_int_handler:
+reserved_handler:
+	bl     irq_handler
+    movs   pc, lr
+
+prefetch_abort_handler:
+    sub    r0, lr, #4
+    mov    r1, #1
+    b      UIE
+
+data_abort_handler:
+    sub    r0, lr, #8 
+    mov    r1, #2
+    b      UIE
+
+/*not working....if we get here, let someone
+know....*/
+irqz: bl irq_handler
+fiqz: bl fiq_handler
+
+UIE:
+    b UIE
+
+/* 256 words of IRQ stack */
     .space 256*4
-	fiq_stack:
+irq_stack:
+
+/* 256 words of FIQ stack */
+    .space 256*4
+fiq_stack:
 
 #endif
 
 #else /* BOOTLOADER */
     
-    /* Set up stack for IRQ mode */ 
+
+
+
+	 /* Set up stack for IRQ mode */ 
     msr    cpsr_c, #0xd2
     ldr    sp, =irq_stack
     /* Set up stack for FIQ mode */ 
@@ -224,8 +297,11 @@ L2_loop:
     ldr    sp, =stackend
     bl     main
     /* main() should never return */
-   
+
 /* Exception handlers. Will be copied to address 0 after memory remapping */
+#ifdef CONFIG_CPU == IMX31 
+_vectorstart:
+#endif
     .section .vectors,"aw"
     ldr    pc, [pc, #24]
     ldr    pc, [pc, #24]

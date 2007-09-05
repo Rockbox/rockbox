@@ -22,6 +22,10 @@ void irq_handler(void)
 {
 }
 
+void fiq_handler(void)
+{
+}
+
 void system_reboot(void)
 {
 }

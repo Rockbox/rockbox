@@ -23,8 +23,9 @@
  
 /*Frame Buffer and TTB defines from gigabeat f/x build*/
 #define LCDSADDR1 (*(volatile int *)0x80100000) /* STN/TFT: frame buffer start address 1 */
-#define FRAME1 ((short *)0x80100000)
-#define FRAME2 ((short *)0x84100000)
+#define FRAME1 ((short *)0x80100000) //Foreground FB 
+#define FRAME2 ((short *)0x84100000) //Background FB - Set to Graphic Window, hence the reason why text is only visible
+									 //when background memory is written.
 #define LCD_BUFFER_SIZE ((320*240*2))
 #define TTB_SIZE (0x4000)
 #define TTB_BASE (0x80000000 + (32*1024*1024*2)-TTB_SIZE); /*64 megs*/

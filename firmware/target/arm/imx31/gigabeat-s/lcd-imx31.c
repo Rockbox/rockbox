@@ -57,7 +57,7 @@ void lcd_init_device(void)
        but we don't want what's shown on the LCD to change until we do an
        lcd_update(), so copy the data from the old framebuffer to the new one */
     unsigned short *buf = (unsigned short*)FRAME1;
-
+	
     memcpy(FRAME1, (short *)((LCDSADDR1)<<1), 320*240*2);
 
     /* The Rockbox bootloader is transitioning from RGB555I to RGB565 mode
