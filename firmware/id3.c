@@ -512,13 +512,12 @@ static int unicode_len(char encoding, const void* string)
     int len = 0;
 
     if (encoding == 0x01 || encoding == 0x02) {
-        bool iswchar;
+        char first;
         const char *s = string;
         /* string might be unaligned, so using short* can crash on ARM and SH1 */
         do {
-            iswchar  = (*s++ != 0);
-            iswchar |= (*s++ != 0);
-        } while (iswchar);
+            first = *s++;
+        } while ((first | *s++) != 0);
 
         len = s - (const char*) string;
     } else {
