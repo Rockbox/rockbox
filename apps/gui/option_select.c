@@ -433,7 +433,7 @@ bool option_screen(struct settings_list *setting,
             function(*variable);
     }
     
-    if (oldvalue != *variable)
+    if (oldvalue != *variable && (action != ACTION_STD_CANCEL))
     {
         if (use_temp_var)
         {
