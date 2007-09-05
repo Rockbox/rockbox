@@ -92,7 +92,9 @@ void usb_init_device(void)
 void usb_enable(bool on)
 {
 #ifdef HAVE_USBSTACK
-    (void)on;
+    if (!on) {
+        usb_stack_stop();
+    }
 #else
     /* This device specific code will eventually give way to proper USB
        handling, which should be the same for all PP502x targets. */
@@ -149,8 +151,6 @@ int usb_detect(void)
             status = usbstatus2 ? USB_INSERTED : USB_POWERED;
 #ifndef HAVE_USBSTACK
             dr_controller_stop();
-#else
-            usb_stack_stop();
 #endif
         }
         return status;
