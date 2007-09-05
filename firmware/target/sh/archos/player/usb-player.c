@@ -24,7 +24,7 @@
 
 int usb_detect(void)
 {
-    return (PADR & 0x8000) ? USB_INSERTED : USB_EXTRACTED;
+    return (PADR & 0x8000) ? USB_EXTRACTED : USB_INSERTED;
 }
 
 void usb_enable(bool on)
