@@ -241,6 +241,12 @@ Function AudioFormat(ByRef sVendor)
             AudioFormat = SPSF_22kHz16BitMono
         Case "AT&T Labs"
             AudioFormat = SPSF_32kHz16BitMono
+        Case "Loquendo"
+            AudioFormat = SPSF_16kHz16BitMono
+        Case "ScanSoft, Inc"
+            AudioFormat = SPSF_22kHz16BitMono
+        Case "Voiceware"
+            AudioFormat = SPSF_16kHz16BitMono
         Case Else
             AudioFormat = SPSF_22kHz16BitMono
             WScript.StdErr.WriteLine "Warning - unknown vendor """ & sVendor _
