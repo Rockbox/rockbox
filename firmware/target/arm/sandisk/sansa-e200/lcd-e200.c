@@ -224,8 +224,8 @@ static void lcd_power_on(void)
     lcd_write_reg(R_ENTRY_MODE, 0x6020);
     lcd_write_reg(R_COMPARE_REG1, 0x0000);
     lcd_write_reg(R_COMPARE_REG2, 0x0000);
-    /* FP3-0=0001, BP3-0=0010 */
-    lcd_write_reg(R_DISP_CONTROL2, 0x0102);
+    /* FP3-0=0010, BP3-0=0010 */
+    lcd_write_reg(R_DISP_CONTROL2, 0x0202);
     /* PTG1-0=00 (normal scan), ISC3-0=0000 (ignored) */
     lcd_write_reg(R_DISP_CONTROL3, 0x0000);
     /* NO2-0=01, SDT1-0=00, EQ1-0=01, DIV1-0=00, RTN3-0=0000 */
@@ -397,7 +397,7 @@ void lcd_init_device(void)
     LCD_REG_7 &= (0xfffff800);
 
     LCD_REG_8 = (LCD_REG_8 & (0xf800ffff)) | (0xb0 << 16);
-    LCD_REG_8 = (LCD_REG_8 & (0xfffff800)) | (0xde); /* X-Y Geometry? */
+    LCD_REG_8 = (LCD_REG_8 & (0xfffff800)) | (0xdc); /* X-Y Geometry? */
 
     LCD_REG_5 |= 0xc;
     LCD_REG_5 = (LCD_REG_5 & ~(0x70)) | (0x3 << 4);
