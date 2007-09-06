@@ -4430,12 +4430,12 @@
   user:
   <source>
     *: none
-    e200: "mSD:"
+    e200,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
-    e200: "mSD:"
+    e200,c200: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
@@ -4572,7 +4572,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200: "MENU = Revert"
+    ipod*,e200,c200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
@@ -4581,7 +4581,7 @@
     *: none
     rtc: "OFF = terugzetten"
     h100,h120,h300: "STOP = terugzetten"
-    ipod*,e200: "MENU = terugzetten"
+    ipod*,e200,c200: "MENU = terugzetten"
     x5,m5: "RECORD = terugzetten"
     h10,h10_5gb: "PREV = terugzetten"
     gigabeatf: "POWER = terugzetten"
@@ -4667,14 +4667,14 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200: "The disk is full. Press UP to continue."
+    e200,c200: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
     recording: "De schijf is vol. Druk OFF om door te gaan."
     h100,h120,h300: "De schijf is vol. Druk STOP om door te gaan."
     m5,x5: "De schijf is vol. Druk POWER om door te gaan."
-    e200: "De schijf is vol. Druk UP om door te gaan."
+    e200,c200: "De schijf is vol. Druk UP om door te gaan."
   </dest>
   <voice>
     *: ""
@@ -7370,14 +7370,14 @@
     player,h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200: "PREV to abort"
+    h10,h10_5gb,e200,c200: "PREV to abort"
   </source>
   <dest>
     *: "OFF om af te breken"
     player,h100,h120,h300: "STOP om af te breken"
     ipod*: "PLAY/PAUSE om af te breken"
     x5,m5: "Long PLAY om af te breken"
-    h10,h10_5gb,e200: "PREV om af te breken"
+    h10,h10_5gb,e200,c200: "PREV om af te breken"
   </dest>
   <voice>
     *: ""
@@ -8758,13 +8758,13 @@
     *: none
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "The disk is full. Press LEFT to continue."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "The disk is full. Press LEFT to continue."
   </source>
   <dest>
     *: none
     recording: "De schijf is vol. Druk OFF om door te gaan."
     h100,h120,h300: "De schijf is vol. Druk STOP om door te gaan."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "De schijf is vol. Druk LEFT om door te gaan."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "De schijf is vol. Druk LEFT om door te gaan."
   </dest>
   <voice>
     *: ""
@@ -9901,14 +9901,14 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PLAY/PAUSE to return)"
     x5,m5: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Aanmaken van database... %d gevonden (OFF = terug)"
     h100,h120,h300: "Aanmaken van database... %d gevonden (STOP = terug)"
     ipod*: "Aanmaken van database... %d gevonden (PLAY/PAUSE = terug)"
     x5,m5: "Aanmaken van database... %d gevonden (LINKS = terug)"
-    h10,h10_5gb,e200: "Aanmaken van database... %d gevonden (PREV = terug)"
+    h10,h10_5gb,e200,c200: "Aanmaken van database... %d gevonden (PREV = terug)"
   </dest>
   <voice>
     *: ""
@@ -10468,13 +10468,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200,h10,h10_5gb: "SELECT = Yes"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Ja"
     h100,h120,h300: "NAVI = Ja"
-    ipod*,x5,m5,gigabeatf,e200,h10,h10_5gb: "SELECT = Ja"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Ja"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -10489,13 +10489,13 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,gigabeatf: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Instellen"
     h100,h120,h300: "NAVI = Instellen"
-    ipod*,x5,m5,h10,h10_5gb,e200,gigabeatf: "SELECT = Instellen"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Instellen"
   </dest>
   <voice>
     *: none
