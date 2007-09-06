@@ -60,7 +60,7 @@ start:
 .space 60*4 /* (more than enough) space for exception vectors and mi4 magic */
 
 pad_skip:
-#ifdef SANSA_E200
+#if defined(SANSA_E200) || defined(SANSA_C200)
     /* On the Sansa, copying the vectors fails if the cache is initialised */
     ldr    r1, =CACHE_CTRL
     mov    r2, #0x0

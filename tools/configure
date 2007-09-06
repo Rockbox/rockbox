@@ -616,6 +616,7 @@ cat <<EOF
  ==iAudio==            ==Toshiba==            ==SanDisk==
  30) X5/X5V/X5L        40) Gigabeat F         50) Sansa e200
  31) M5/M5L                                   51) Sansa e200R
+                                              52) Sansa c200
 
  ==Tatung==
  60) Elio TPJ-1022
@@ -1311,6 +1312,32 @@ EOF
     t_model="sansa-e200"
     ;;
 
+   52|c200)
+    target_id=30
+    archos="c200"
+    target="-DSANSA_C200"
+    memory=32 # supposedly
+    arm7tdmicc
+    tool="$rootdir/tools/scramble -mi4v3 -model=c200 -type=RBOS"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.mi4"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins=""
+    swcodec="yes"
+    boottool="$rootdir/tools/scramble -mi4v3 -model=c200 -type=RBBL"
+    bootoutput="firmware.mi4"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$genericbitmaptools scramble"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="sandisk"
+    t_model="sansa-c200"
+    ;;
+
    60|tpj1022)
     target_id=25
     archos="tpj1022"
@@ -1453,7 +1480,7 @@ fi
       ;;
     [Mm])
       appsdir='\$(ROOTDIR)/manual'
-      firmdir='\$(ROOTDIR)/manual/platform' # No Makefile here.  Effectively ignores target
+      firmdir='\$(ROOTDIR)/manual/platform' # No Makefile here.  Effectively ig:res target
       toolsdir=$firmdir;
       toolset='';
       apps="manual"

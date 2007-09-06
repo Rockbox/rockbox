@@ -519,6 +519,7 @@ static int sd_select_bank(unsigned char bank)
 static void sd_card_mux(int card_no)
 {
 /* Set the current card mux */
+#ifdef SANSA_E200
     if (card_no == 0)
     {
         outl(inl(0x70000080) | 0x4, 0x70000080);
@@ -543,6 +544,32 @@ static void sd_card_mux(int card_no)
 
         outl(inl(0x70000014) & ~(0x3ffff), 0x70000014);
     }
+#else /* SANSA_C200 */
+    if (card_no == 0)
+    {
+        outl(inl(0x70000080) | 0x4, 0x70000080);
+
+        GPIOD_ENABLE     &= ~0x1f;
+        GPIOD_OUTPUT_EN  &= ~0x1f;
+        GPIOA_ENABLE     |=  0x7a;
+        GPIOA_OUTPUT_VAL |=  0x7a;
+        GPIOA_OUTPUT_EN  |=  0x7a;
+
+        outl(inl(0x70000014) & ~(0x3ffff), 0x70000014);
+    }
+    else
+    {
+        outl(inl(0x70000080) & ~0x4, 0x70000080);
+
+        GPIOA_ENABLE     &= ~0x7a;
+        GPIOA_OUTPUT_EN  &= ~0x7a;
+        GPIOD_ENABLE     |=  0x1f;
+        GPIOD_OUTPUT_VAL |=  0x1f;
+        GPIOD_OUTPUT_EN  |=  0x1f;
+
+        outl((inl(0x70000014) & ~(0x3ffff)) | 0x255aa, 0x70000014);
+    }
+#endif
 }
 
 static void sd_init_device(int card_no)

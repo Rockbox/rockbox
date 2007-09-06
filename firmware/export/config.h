@@ -63,8 +63,9 @@
 #define GIGABEAT_PAD       11
 #define IRIVER_H10_PAD     12
 #define SANSA_E200_PAD     13
-#define ELIO_TPJ1022_PAD   14
-#define ARCHOS_AV300_PAD   15
+#define SANSA_C200_PAD     14
+#define ELIO_TPJ1022_PAD   15
+#define ARCHOS_AV300_PAD   16
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -95,6 +96,7 @@
 #define LCD_H10_5GB  14 /* as used by iriver H10 5Gb */
 #define LCD_TPJ1022  15 /* as used by Tatung Elio TPJ-1022 */
 #define LCD_DSC25    16 /* as used by Archos AV300 */
+#define LCD_C200     17 /* as used by Sandisk Sansa c200 */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -191,6 +193,8 @@
 #include "config-h10_5gb.h"
 #elif defined(SANSA_E200)
 #include "config-e200.h"
+#elif defined(SANSA_C200)
+#include "config-c200.h"
 #elif defined(ELIO_TPJ1022)
 #include "config-tpj1022.h"
 #else
@@ -249,7 +253,7 @@
 /* Enable the directory cache and tagcache in RAM if we have
  * plenty of RAM. Both features can be enabled independently. */
 #if ((defined(MEMORYSIZE) && (MEMORYSIZE > 8)) || MEM > 8) && \
- !defined(BOOTLOADER) && !defined(SANSA_E200)
+ !defined(BOOTLOADER) && !defined(SANSA_E200) && !defined(SANSA_C200)
 #define HAVE_DIRCACHE
 #ifdef HAVE_TAGCACHE
 #define HAVE_TC_RAMCACHE

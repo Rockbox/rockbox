@@ -1010,7 +1010,8 @@ static bool dbg_spdif(void)
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #   define DEBUG_CANCEL  BUTTON_REW
 
-#elif CONFIG_KEYPAD == SANSA_E200_PAD
+#elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
+      (CONFIG_KEYPAD == SANSA_C200_PAD)
 #   define DEBUG_CANCEL  BUTTON_LEFT
 #endif /* key definitios */
 
@@ -2007,7 +2008,7 @@ static bool dbg_save_roms(void)
 
     return false;
 }
-#elif defined(CPU_PP) && !defined(SANSA_E200)
+#elif defined(CPU_PP) && !(defined(SANSA_E200) || defined(SANSA_C200))
 static bool dbg_save_roms(void)
 {
     int fd;
@@ -2254,7 +2255,7 @@ static const struct the_menu_item menuitems[] = {
         { "LCD Power Off", dbg_lcd_power_off },
 #endif
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || \
-    (defined(CPU_PP) && !defined(SANSA_E200))
+    (defined(CPU_PP) && !(defined(SANSA_E200) || defined(SANSA_C200)))
         { "Dump ROM contents", dbg_save_roms },
 #endif
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || defined(CPU_PP) || CONFIG_CPU == S3C2440

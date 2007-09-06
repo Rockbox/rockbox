@@ -53,7 +53,11 @@ void power_off(void)
 
 bool charger_inserted(void)
 {
+#ifdef SANSA_E200
     if(GPIOB_INPUT_VAL & 0x10)
+#else /* SANSA_C200 */
+    if(GPIOH_INPUT_VAL & 0x2)
+#endif
         return true;
     return false;
 }
@@ -63,6 +67,7 @@ void ide_power_enable(bool on)
     (void)on;
 }
 
+#if CONFIG_TUNER
 /** Tuner **/
 static bool powered = false;
 
@@ -125,3 +130,5 @@ bool tuner_power(bool status)
     lv24020lp_unlock();
     return old_status;
 }
+
+#endif

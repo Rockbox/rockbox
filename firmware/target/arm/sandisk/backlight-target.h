@@ -25,6 +25,8 @@ void __backlight_off(void);
 void __backlight_set_brightness(int brightness);
 int  __backlight_is_on(void);
 
+#ifdef HAVE_BUTTON_LIGHT
 void __button_backlight_on(void);
 void __button_backlight_off(void);
+#endif
 #endif

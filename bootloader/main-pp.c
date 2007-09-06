@@ -33,7 +33,7 @@
 #include "disk.h"
 #include "crc32-mi4.h"
 #include <string.h>
-#ifdef SANSA_E200
+#if defined(SANSA_E200) || defined(SANSA_C200)
 #include "usb.h"
 #include "arcotg_udc.h"
 #endif
@@ -44,6 +44,9 @@
 #define BOOTLOADER_BOOT_OF      BUTTON_LEFT
 
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
+#define BOOTLOADER_BOOT_OF      BUTTON_LEFT
+
+#elif CONFIG_KEYPAD == SANSA_C200_PAD
 #define BOOTLOADER_BOOT_OF      BUTTON_LEFT
 
 #endif
@@ -58,7 +61,7 @@ unsigned char *loadbuffer = (unsigned char *)DRAM_START;
 char version[] = APPSVERSION;
         
 /* Locations and sizes in hidden partition on Sansa */
-#ifdef SANSA_E200
+#if defined(SANSA_E200) || defined(SANSA_C200)
 #define PPMI_SECTOR_OFFSET  1024
 #define PPMI_SECTORS        1
 #define MI4_HEADER_SECTORS  1
@@ -335,6 +338,7 @@ int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
     return EOK;
 }
 
+#if defined(SANSA_E200) || defined(SANSA_C200)
 #ifdef SANSA_E200
 struct OFDB_info {
     char *version;
@@ -346,6 +350,17 @@ struct OFDB_info {
     { "PP5022AF-05.51-S301-00.12-S301.00.12E-D", 39, 0x3c5c, 0x2 },
     { "PP5022AF-05.51-S301-00.12-S301.00.12A-D", 39, 0x3c08, 0xe1 },
 };
+#else /* SANSA_C200 */
+/* TODO: need to determine these for the c200 */
+struct OFDB_info {
+    char *version;
+    int version_length;
+    int sector;
+    int offset;
+} OFDatabaseOffsets[] = {
+    { "PP5022AF-05.51-S301-01.11-S301.01.11A-D", 39, 0x3c08, 0xe1 },
+};
+#endif
 
 /* Load mi4 firmware from a hidden disk partition */
 int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
@@ -432,18 +447,17 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
 
 void* main(void)
 {
-#ifndef SANSA_E200
-    char buf[256];
-    unsigned short* identify_info;
-#endif
     int i;
     int btn;
     int rc;
     int num_partitions;
     struct partinfo* pinfo;
-#ifdef SANSA_E200
+#if defined(SANSA_E200) || defined(SANSA_C200)
     int usb_retry = 0;
     bool usb = false;
+#else
+    char buf[256];
+    unsigned short* identify_info;
 #endif
 
     chksum_crc32gentab ();
@@ -459,7 +473,7 @@ void* main(void)
     lcd_clear_display();
     
     btn = button_read_device();
-#ifdef SANSA_E200
+#if defined(SANSA_E200) || defined(SANSA_C200)
     usb_init();
     while ((UDC_OTGSC&0x800) && usb_retry < 5 && !usb)
     {
@@ -481,7 +495,7 @@ void* main(void)
     printf(MODEL_NAME);
 
     i=ata_init();
-#ifndef SANSA_E200
+#if !defined(SANSA_E200) && !defined(SANSA_C200)
     if (i==0) {
         identify_info=ata_get_identify();
         /* Show model */
@@ -525,7 +539,7 @@ void* main(void)
         */
         printf("Loading original firmware...");
 
-#ifdef SANSA_E200        
+#if defined(SANSA_E200) || defined(SANSA_C200)
         /* First try a (hidden) firmware partition */
         printf("Trying firmware partition");
         pinfo = disk_partinfo(1);
@@ -576,7 +590,7 @@ void* main(void)
                 {
                     printf("dumping sector %d", i);
                 }
-                ata_read_sectors(pinfo->start + i,1 , sector);
+                ata_read_sectors(0, pinfo->start + i, 1, sector);
                 write(fd,sector,512);
             }
             close(fd);
@@ -588,19 +602,21 @@ void* main(void)
             printf("Can't load %s:", BOOTFILE);
             printf(strerror(rc));
 
+#ifdef OLD_BOOTFILE
             /* Try loading rockbox from old rockbox.e200/rockbox.h10 format */
             rc=load_firmware(loadbuffer, OLD_BOOTFILE, MAX_LOADSIZE);
             if (rc < EOK) {
                 printf("Can't load %s:", OLD_BOOTFILE);
                 error(EBOOTFILE, rc);
             }
+#endif
         }
     }
     
     return (void*)loadbuffer;
 }
 
-#ifndef SANSA_E200
+#if !defined(SANSA_E200) && !defined(SANSA_C200)
 /* These functions are present in the firmware library, but we reimplement
    them here because the originals do a lot more than we want */
 void usb_acknowledge(void)

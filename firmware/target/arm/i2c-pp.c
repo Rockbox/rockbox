@@ -198,10 +198,27 @@ void i2c_init(void)
     outl(0x0, 0x600060a4);
     outl(0x80 | (0 << 8), 0x600060a4);
 #elif CONFIG_I2C == I2C_PP5024
+#ifdef SANSA_E200
     /* Sansa OF sets this to 0x20 first, communicates with the AS3514
        then sets it to 0x23 - this still works fine though */
     outl(0x0, 0x600060a4);
     outl(0x23, 0x600060a4);
+#elif defined(SANSA_C200)
+    /* This is the init sequence from the Sansa c200 bootloader.
+       I'm not sure what's really necessary. */
+    pp_i2c_wait_not_busy();
+
+    outl(0, 0x600060a4);
+    outl(0x64, 0x600060a4);
+
+    outl(0x55, 0x7000c02c);
+    outl(0x54, 0x7000c030);
+
+    outl(0, 0x600060a4);
+    outl(0x1e, 0x600060a4);
+
+    pp_i2c_send(0x46, 0x24, 5);
+#endif
 #endif
 
     spinlock_init(&i2c_mutex);

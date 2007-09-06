@@ -120,7 +120,7 @@ static void pp_set_cpu_frequency(long frequency)
     while (test_and_set(&boostctrl_mtx.locked, 1)) ;
 #endif
 
-#ifdef SANSA_E200
+#if defined(SANSA_E200) || defined(SANSA_C200)
     i2s_scale_attn_level(CPUFREQ_DEFAULT);
 #endif
 
@@ -183,7 +183,7 @@ static void pp_set_cpu_frequency(long frequency)
     CLCD_CLOCK_SRC;             /* dummy read (to sync the write pipeline??) */
     CLCD_CLOCK_SRC = clcd_clock_src; /* restore saved value */
 
-#ifdef SANSA_E200
+#if defined(SANSA_E200) || defined(SANSA_C200)
     i2s_scale_attn_level(frequency);
 #endif
 
@@ -231,7 +231,7 @@ void system_init(void)
         GPIOK_INT_EN        = 0;
         GPIOL_INT_EN        = 0;
 
-#ifdef SANSA_E200
+#if defined(SANSA_E200) || defined(SANSA_C200)
         /* outl(0x00000000, 0x6000b000); */
         outl(inl(0x6000a000) | 0x80000000, 0x6000a000); /* Init DMA controller? */
 #endif 

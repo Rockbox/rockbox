@@ -36,17 +36,21 @@ void __backlight_set_brightness(int brightness)
 
 void __backlight_on(void)
 {
+#ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd */
+#endif
     pp_i2c_send( 0x46, 0x23, backlight_brightness);
 }
 
 void __backlight_off(void)
 {
     pp_i2c_send( 0x46, 0x23, 0x0);
+#ifdef HAVE_LCD_ENABLE
     lcd_enable(false); /* power off lcd */
+#endif
 }
 
-
+#ifdef HAVE_BUTTON_LIGHT
 void __button_backlight_on(void)
 {
     GPIOG_OUTPUT_VAL |=0x80;
@@ -56,3 +60,4 @@ void __button_backlight_off(void)
 {
     GPIOG_OUTPUT_VAL &=~ 0x80;
 }
+#endif

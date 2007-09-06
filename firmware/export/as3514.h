@@ -70,7 +70,7 @@ extern void audiohw_set_monitor(int enable);
 #define VOLUME_MIN -735
 #define VOLUME_MAX   60
 
-#ifdef SANSA_E200
+#if defined(SANSA_E200) || defined(SANSA_C200)
 #define AS3514_I2C_ADDR 0x46
 #endif
 
