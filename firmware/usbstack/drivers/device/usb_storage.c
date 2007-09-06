@@ -46,6 +46,21 @@ struct usb_device_driver usb_storage_driver = {
 /*-------------------------------------------------------------------------*/
 /* usb descriptors */
 
+#define MANUFACTURER_STR_ID  1
+#define PRODUCT_STR_ID       2
+#define SERIAL_STR_ID        3
+#define CONFIG_STR_ID        4
+#define DATA_STR_ID          5
+
+/* static strings, in UTF-8 */
+static struct usb_string strings[] = {
+    { MANUFACTURER_STR_ID, "RockBox" },
+    { PRODUCT_STR_ID, "RockBox Storage Driver" },
+    { SERIAL_STR_ID, "0" },
+    { CONFIG_STR_ID, "Storage Bulk" },
+    { DATA_STR_ID, "Storage Data" },
+};
+
 static struct usb_device_descriptor storage_device_desc = {
     .bLength =              USB_DT_DEVICE_SIZE,
     .bDescriptorType =      USB_DT_DEVICE,
@@ -55,9 +70,9 @@ static struct usb_device_descriptor storage_device_desc = {
     .bDeviceProtocol =      0,
     .idVendor =             0xffff,
     .idProduct =            0x0001,
-    .iManufacturer =        0,
-    .iProduct =             0,
-    .iSerialNumber =        0,
+    .iManufacturer =        MANUFACTURER_STR_ID,
+    .iProduct =             PRODUCT_STR_ID,
+    .iSerialNumber =        SERIAL_STR_ID,
     .bNumConfigurations =   1,
 };
 
@@ -67,7 +82,7 @@ static struct usb_config_descriptor storage_config_desc = {
 
     .bNumInterfaces =       1,
     .bConfigurationValue =  1,
-    .iConfiguration =       0,
+    .iConfiguration =       CONFIG_STR_ID,
     .bmAttributes =         USB_CONFIG_ATT_ONE | USB_CONFIG_ATT_SELFPOWER,
     .bMaxPower =            1,
 };
@@ -80,7 +95,7 @@ static struct usb_interface_descriptor storage_interface_desc = {
     .bInterfaceClass =      USB_CLASS_MASS_STORAGE,
     .bInterfaceSubClass =   SUBCL_SCSI,
     .bInterfaceProtocol =   PROTO_BULK,
-    .iInterface =           0,
+    .iInterface =           DATA_STR_ID,
 };
 
 static struct usb_endpoint_descriptor storage_fs_bulk_in_desc = {
@@ -244,6 +259,13 @@ int usb_storage_driver_request(struct usb_ctrlrequest* request)
                     logf("%d, vs %d", request->wLength, ret);
                     ret = MIN(request->wLength, (uint16_t)ret);
                 }
+                res.buf = buf;
+                break;
+
+            case USB_DT_STRING:
+                logf("usb storage: sending string desc");
+                ret = usb_stack_get_string(strings, request->wValue & 0xff, buf);
+                ret = MIN(ret, request->wLength);
                 res.buf = buf;
                 break;
             }

@@ -9,6 +9,9 @@
  *
  * Copyright (C) 2007 by Christian Gmeiner
  *
+ * Based on linux/drivers/usb/gadget/usbstring.c
+ *   Copyright (C) 2003 David Brownell 
+ *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
  *
@@ -122,4 +125,52 @@ void into_usb_ctrlrequest(struct usb_ctrlrequest* request)
     if (extra != 0) {
         logf(" -> e: %s", extra);
     }
+}
+
+int usb_stack_get_string(struct usb_string* strings, int id, uint8_t* buf)
+{
+    struct usb_string* tmp;
+    char* sp, *dp;
+    int len;
+
+    /* if id is 0, then we need to send back all supported
+     * languages. In our case we only support one
+     * language: en-us (0x0409) */
+    if (id == 0) {
+        buf [0] = 4;
+        buf [1] = USB_DT_STRING;
+        buf [2] = (uint8_t) 0x0409;
+        buf [3] = (uint8_t) (0x0409 >> 8);
+        return 4;
+    }
+
+    /* look for string */
+    for (tmp = strings; tmp && tmp->s; tmp++) {
+        if (tmp->id == id) {
+            break;
+        }
+    }
+
+    /* did we found it? */
+    if (!tmp || !tmp->s) {
+        return -EINVAL;
+    }
+
+    len = MIN ((size_t) 126, strlen (tmp->s));
+    memset(buf + 2, 0, 2 * len);
+
+    /* convert to utf-16le */
+    sp = (char*)tmp->s;
+    dp = (char*)&buf[2];
+
+    while (*sp) {
+        *dp++ = *sp++;
+        *dp++ = 0;
+    }
+
+    /* write len and tag */
+    buf [0] = (len + 1) * 2;
+    buf [1] = USB_DT_STRING;
+
+    return buf[0];
 }

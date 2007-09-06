@@ -35,14 +35,22 @@ struct usb_device_driver usb_serial_driver = {
 /*-------------------------------------------------------------------------*/
 /* usb descriptors */
 
-/* TODO: implement strings */
-#define GS_MANUFACTURER_STR_ID  0
-#define GS_PRODUCT_STR_ID       0
-#define GS_SERIAL_STR_ID        0
-#define GS_BULK_CONFIG_STR_ID   0
-#define GS_DATA_STR_ID          0
+#define MANUFACTURER_STR_ID  1
+#define PRODUCT_STR_ID       2
+#define SERIAL_STR_ID        3
+#define BULK_CONFIG_STR_ID   4
+#define DATA_STR_ID          5
 
-#define GS_BULK_CONFIG_ID       1
+/* static strings, in UTF-8 */
+static struct usb_string strings[] = {
+    { MANUFACTURER_STR_ID, "RockBox" },
+    { PRODUCT_STR_ID, "RockBox Serial Driver" },
+    { SERIAL_STR_ID, "0" },
+    { BULK_CONFIG_STR_ID, "Serial Bulk" },
+    { DATA_STR_ID, "Serial Data" },
+};
+
+#define BULK_CONFIG_ID       1
 
 static struct usb_device_descriptor serial_device_desc = {
     .bLength =              USB_DT_DEVICE_SIZE,
@@ -53,9 +61,9 @@ static struct usb_device_descriptor serial_device_desc = {
     .bDeviceProtocol =      0,
     .idVendor =             0x0525,
     .idProduct =            0xa4a6,
-    .iManufacturer =        GS_MANUFACTURER_STR_ID,
-    .iProduct =             GS_PRODUCT_STR_ID,
-    .iSerialNumber =        GS_SERIAL_STR_ID,
+    .iManufacturer =        MANUFACTURER_STR_ID,
+    .iProduct =             PRODUCT_STR_ID,
+    .iSerialNumber =        SERIAL_STR_ID,
     .bNumConfigurations =   1,
 };
 
@@ -64,8 +72,8 @@ static struct usb_config_descriptor serial_bulk_config_desc = {
     .bDescriptorType =      USB_DT_CONFIG,
 
     .bNumInterfaces =       1,
-    .bConfigurationValue =  GS_BULK_CONFIG_ID,
-    .iConfiguration =       GS_BULK_CONFIG_STR_ID,
+    .bConfigurationValue =  BULK_CONFIG_ID,
+    .iConfiguration =       BULK_CONFIG_STR_ID,
     .bmAttributes =         USB_CONFIG_ATT_ONE | USB_CONFIG_ATT_SELFPOWER,
     .bMaxPower =            1,
 };
@@ -78,7 +86,7 @@ static struct usb_interface_descriptor serial_bulk_interface_desc = {
     .bInterfaceClass =      USB_CLASS_CDC_DATA,
     .bInterfaceSubClass =   0,
     .bInterfaceProtocol =   0,
-    .iInterface =           GS_DATA_STR_ID,
+    .iInterface =           DATA_STR_ID,
 };
 
 static struct usb_endpoint_descriptor serial_fs_in_desc = {
@@ -260,6 +268,13 @@ int usb_serial_driver_request(struct usb_ctrlrequest* request)
                 logf("usb serial: sending debug desc");
                 ret = MIN(sizeof(struct usb_debug_descriptor), request->wLength);
                 res.buf = &serial_debug_desc;
+                break;
+
+            case USB_DT_STRING:
+                logf("usb serial: sending string desc");
+                ret = usb_stack_get_string(strings, request->wValue & 0xff, buf);
+                ret = MIN(ret, request->wLength);
+                res.buf = buf;
                 break;
             }
             break;
