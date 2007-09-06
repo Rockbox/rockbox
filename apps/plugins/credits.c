@@ -142,7 +142,7 @@ void roll_credits(void)
     int name_w, name_h, name_targetpos=1, font_h;
     int credits_w, credits_pos;
     int numnames = (sizeof(credits)/sizeof(char*));
-    char name[40], elapsednames[20];
+    char name[40], elapsednames[32];
     int action = ACTION_NONE;
 
     /* control if scrolling is automatic (with animation) or manual */
@@ -310,7 +310,8 @@ void roll_credits(void)
         {
             rb->lcd_clear_display();
             rb->snprintf(elapsednames, sizeof(elapsednames),
-                         "[Credits] %d/%d", j+NUM_VISIBLE_LINES, numnames);
+                         "[Credits] %d-%d/%d", j+1,
+                         j+NUM_VISIBLE_LINES, numnames);
             rb->lcd_getstringsize(elapsednames, &credits_w, NULL);
             rb->lcd_putsxy(CREDITS_TARGETPOS, 0, elapsednames);
             
