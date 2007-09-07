@@ -413,10 +413,10 @@
     *: "Playlists"
   </source>
   <dest>
-    *: "Playlists"
+    *: "Wiedergabelisten"
   </dest>
   <voice>
-    *: "Abspiellisten"
+    *: "Wiedergabelisten"
   </voice>
 </phrase>
 <phrase>
@@ -4532,10 +4532,10 @@
     *: "Max Playlist Size"
   </source>
   <dest>
-    *: "Max Playlist-Länge"
+    *: "Max Wiedergabelisten-Länge"
   </dest>
   <voice>
-    *: "Maximale Länge der Abspielliste"
+    *: "Maximale Länge der Wiedergabeliste"
   </voice>
 </phrase>
 <phrase>
@@ -6559,10 +6559,10 @@
     *: "Create Playlist"
   </source>
   <dest>
-    *: "Erstelle Playlist"
+    *: "Erstelle Wiedergabeliste"
   </dest>
   <voice>
-    *: "Erstelle Abspielliste"
+    *: "Erstelle Wiedergabeliste"
   </voice>
 </phrase>
 <phrase>
@@ -6573,10 +6573,10 @@
     *: "Playlist Viewer Settings"
   </source>
   <dest>
-    *: "Playlistanzeige-Einstellungen"
+    *: "Wiedergabelistenanzeige-Einstellungen"
   </dest>
   <voice>
-    *: "Playlistanzeige-Einstellungen"
+    *: "Wiedergabelistenanzeige-Einstellungen"
   </voice>
 </phrase>
 <phrase>
@@ -6587,10 +6587,10 @@
     *: "View Current Playlist"
   </source>
   <dest>
-    *: "Zeige aktuelle Playlist"
+    *: "Zeige aktuelle Wiedergabeliste"
   </dest>
   <voice>
-    *: "Zeige aktuelle Abspielliste"
+    *: "Zeige aktuelle Wiedergabeliste"
   </voice>
 </phrase>
 <phrase>
@@ -6671,10 +6671,10 @@
     *: "Save Current Playlist"
   </source>
   <dest>
-    *: "Speichere aktuelle Playlist"
+    *: "Speichere aktuelle Wiedergabeliste"
   </dest>
   <voice>
-    *: "Speichere aktuelle Abspielliste"
+    *: "Speichere aktuelle Wiedergabeliste"
   </voice>
 </phrase>
 <phrase>
@@ -6699,10 +6699,10 @@
     *: "Playlist Catalog"
   </source>
   <dest>
-    *: "Playlist-Katalog"
+    *: "Wiedergabelisten-Katalog"
   </dest>
   <voice>
-    *: "Abspiellisten-Katalog"
+    *: "Wiedergabelisten-Katalog"
   </voice>
 </phrase>
 <phrase>
@@ -6741,10 +6741,10 @@
     *: "Warn When Erasing Dynamic Playlist"
   </source>
   <dest>
-    *: "Warnen beim Löschen einer dynamischen Playlist"
+    *: "Warnen beim Löschen einer dynamischen Wiedergabeliste"
   </dest>
   <voice>
-    *: "Warnen beim Löschen einer dynamischen Abspielliste"
+    *: "Warnen beim Löschen einer dynamischen Wiedergabeliste"
   </voice>
 </phrase>
 <phrase>
@@ -6755,7 +6755,7 @@
     *: "Erase dynamic playlist?"
   </source>
   <dest>
-    *: "Dynamische Playlist löschen?"
+    *: "Dynamische Wiedergabeliste löschen?"
   </dest>
   <voice>
     *:""
@@ -6983,10 +6983,10 @@
     *: "Playlist"
   </source>
   <dest>
-    *: "Playlist"
+    *: "Wiedergabeliste"
   </dest>
   <voice>
-    *: "Abspielliste"
+    *: "Wiedergabeliste"
   </voice>
 </phrase>
 <phrase>
@@ -7165,10 +7165,10 @@
     *: "Search In Playlist"
   </source>
   <dest>
-    *: "Playlist durchsuchen"
+    *: Wiedergabeliste durchsuchen"
   </dest>
   <voice>
-    *: "Abspielliste durchsuchen"
+    *: "Wiedergabeliste durchsuchen"
   </voice>
 </phrase>
 <phrase>
@@ -7221,10 +7221,10 @@
     *: "Add to Playlist"
   </source>
   <dest>
-    *: "Zu Playlist hinzufügen"
+    *: "Zu Wiedergabeliste hinzufügen"
   </dest>
   <voice>
-    *: "Zu Abspielliste hinzufügen"
+    *: "Zu Wiedergabeliste hinzufügen"
   </voice>
 </phrase>
 <phrase>
@@ -7235,10 +7235,10 @@
     *: "Add to New Playlist"
   </source>
   <dest>
-    *: "Zu neuer Playlist hinzufügen"
+    *: "Zu neuer Wiedergabeliste hinzufügen"
   </dest>
   <voice>
-    *: "Zu neuer Abspielliste hinzufügen"
+    *: "Zu neuer Wiedergabeliste hinzufügen"
   </voice>
 </phrase>
 <phrase>
@@ -7263,10 +7263,10 @@
     *: "No Playlists"
   </source>
   <dest>
-    *: "Keine Playlists"
+    *: "Keine Wiedergabelisten"
   </dest>
   <voice>
-    *: "Keine Abspiellisten"
+    *: "Keine Wiedergabelisten"
   </voice>
 </phrase>
 <phrase>
@@ -7473,7 +7473,7 @@
     *: "[Playlist]"
   </source>
   <dest>
-    *: "[Playlist]"
+    *: "[Wiedergabeliste]"
   </dest>
   <voice>
     *: ""
@@ -7987,7 +7987,7 @@
     *: "Playlist Buffer Full"
   </source>
   <dest>
-    *: "Playlist-Puffer voll"
+    *: "Wiedergabelisten-Puffer voll"
   </dest>
   <voice>
     *: ""
@@ -8002,12 +8002,11 @@
     player: "End of List"
   </source>
   <dest>
-    *: "Playlist zu Ende"
-    player: "Ende der Liste"
+    *: "Wiedergabeliste zu Ende"
+    player: "Liste zu Ende"
   </dest>
   <voice>
-    *: "Playlist zu Ende"
-    player: "Ende der Liste"
+    *: "Wiedergabeliste zu Ende"
   </voice>
 </phrase>
 <phrase>
@@ -8046,10 +8045,10 @@
     *: "Error updating playlist control file"
   </source>
   <dest>
-    *: "Fehler beim Anpassen der Playlist-Steuerdatei"
+    *: "Fehler beim Anpassen der Wiedergabelisten-Steuerdatei"
   </dest>
   <voice>
-    *: "Fehler beim Anpassen der Playlist-Steuerdatei"
+    *: "Fehler beim Anpassen der Wiedergabelisten-Steuerdatei"
   </voice>
 </phrase>
 <phrase>
@@ -8060,10 +8059,10 @@
     *: "Error accessing playlist file"
   </source>
   <dest>
-    *: "Fehler beim Zugriff auf Playlist"
+    *: "Fehler beim Zugriff auf Wiedergabeliste"
   </dest>
   <voice>
-    *: "Fehler beim Zugriff auf Abspielliste"
+    *: "Fehler beim Zugriff auf Wiedergabeliste"
   </voice>
 </phrase>
 <phrase>
@@ -8074,10 +8073,10 @@
     *: "Error accessing playlist control file"
   </source>
   <dest>
-    *: "Fehler beim Zugriff auf Playlist-Steuerdatei"
+    *: "Fehler beim Zugriff auf Wiedergabelisten-Steuerdatei"
   </dest>
   <voice>
-    *: "ehler beim Zugriff auf Playlist-Steuerdatei"
+    *: "ehler beim Zugriff auf Wiedergabelisten-Steuerdatei"
   </voice>
 </phrase>
 <phrase>
@@ -8102,10 +8101,10 @@
     *: "Playlist control file is invalid"
   </source>
   <dest>
-    *: "Playlist-Steuerdatei ist ungültig"
+    *: "Wiedergabelisten-Steuerdatei ist ungültig"
   </dest>
   <voice>
-    *: "Playlist-Steuerdatei ist ungültig""
+    *: "Wiedergabelisten-Steuerdatei ist ungültig""
   </voice>
 </phrase>
 <phrase>
@@ -10273,11 +10272,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Playlisten"
+    lcd_bitmap: "Wiedergabelisten"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Abspiellisten"
+    lcd_bitmap: "Wiedergabelisten"
   </voice>
 </phrase>
 <phrase>
