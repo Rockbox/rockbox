@@ -589,7 +589,8 @@ static
 void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 		unsigned int nch, unsigned int ns)
 {
-  unsigned int phase, ch, s, sb, p;
+  int sb;
+  unsigned int phase, ch, s, p;
   mad_fixed_t *pcm, (*filter)[2][2][16][8];
   mad_fixed_t const (*sbsample)[36][32];
   mad_fixed_t (*fe)[8], (*fx)[8], (*fo)[8];
@@ -1190,8 +1191,8 @@ static
 void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 		unsigned int nch, unsigned int ns)
 {
-  int          p;
-  unsigned int phase, ch, s, sb;
+  int          p, sb;
+  unsigned int phase, ch, s;
   mad_fixed_t *pcm, (*filter)[2][2][16][8];
   mad_fixed_t const (*sbsample)[36][32];
   mad_fixed_t (*fe)[8], (*fx)[8], (*fo)[8];

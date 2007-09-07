@@ -82,14 +82,18 @@ unsigned short const crc_table[256] = {
 
 # define CRC_POLY  0x8005
 
+#if INT_MAX != 0x7fffffff
+#warning current libmad bit handling is optimized for architectures using 32 bit integers
+#endif
+
 /*
  * NAME:	bit->init()
  * DESCRIPTION:	initialize bit pointer struct
  */
 void mad_bit_init(struct mad_bitptr *bitptr, unsigned char const *byte)
 {
-  bitptr->ptr     = (unsigned long*)((long)byte & ~3);
-  bitptr->readbit = ((unsigned long)byte & 3) << 3;
+  bitptr->ptr     = (uint32_t*)((uintptr_t)byte & ~3);
+  bitptr->readbit = ((uintptr_t)byte & 3) << 3;
 }
 
 /*
@@ -129,14 +133,14 @@ void mad_bit_skip(struct mad_bitptr *bitptr, unsigned int len)
  * DESCRIPTION:	read an arbitrary number of bits and return their UIMSBF value
  */
 
-unsigned long mad_bit_read(struct mad_bitptr *bitptr, unsigned int len) ICODE_ATTR;
-unsigned long mad_bit_read(struct mad_bitptr *bitptr, unsigned int len)
+uint32_t mad_bit_read(struct mad_bitptr *bitptr, unsigned int len) ICODE_ATTR;
+uint32_t mad_bit_read(struct mad_bitptr *bitptr, unsigned int len)
 {
-  unsigned long *curr = &bitptr->ptr[bitptr->readbit>>5];
+  uint32_t *curr = &bitptr->ptr[bitptr->readbit>>5];
 
   if(len)
   {
-    unsigned long r = betoh32(curr[0]) << (bitptr->readbit & 31);
+    uint32_t r = betoh32(curr[0]) << (bitptr->readbit & 31);
 
     if((bitptr->readbit & 31) + len > 32)
       r += betoh32(curr[1]) >> (-bitptr->readbit & 31);
@@ -154,7 +158,7 @@ unsigned long mad_bit_read(struct mad_bitptr *bitptr, unsigned int len)
  * DESCRIPTION:	write an arbitrary number of bits
  */
 void mad_bit_write(struct mad_bitptr *bitptr, unsigned int len,
-		   unsigned long value)
+		   uint32_t value)
 {
   unsigned char *ptr;
 
@@ -174,7 +178,7 @@ unsigned short mad_bit_crc(struct mad_bitptr bitptr, unsigned int len,
   register unsigned int crc;
 
   for (crc = init; len >= 32; len -= 32) {
-    register unsigned long data;
+    register uint32_t data;
 
     data = mad_bit_read(&bitptr, 32);
 
