@@ -1571,6 +1571,12 @@ else
    GCCOPTS="$GCCOPTS -fno-strict-aliasing"
  fi
 
+ if test "$gccnum" -ge "402"; then
+   # disable warning about "warning: initialized field overwritten" as gcc 4.2
+   # and later would throw it for several valid cases
+   GCCOPTS="$GCCOPTS -Wno-override-init"
+ fi
+
 fi
 
 # check the compiler for SH platforms
