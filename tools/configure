@@ -631,7 +631,7 @@ EOF
   archosbitmaptools="$toolset scramble descramble sh2d uclpack bmp2rb"
   iriverbitmaptools="$toolset scramble descramble mkboot bmp2rb"
   iaudiobitmaptools="$toolset scramble descramble mkboot bmp2rb"
-  ipodbitmaptools="$toolset scramble ipod_fw bmp2rb codepages"
+  ipodbitmaptools="$toolset scramble ipod_fw bmp2rb"
   gigabeatbitmaptools="$toolset scramble descramble bmp2rb"
   # generic is used by IFP, H10, Sansa-e200
   genericbitmaptools="$toolset bmp2rb"
@@ -825,7 +825,7 @@ EOF
     swcodec=""
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset="$toolset scramble descramble bmp2rb codepages"
+    toolset="$toolset scramble descramble bmp2rb"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
     t_manufacturer="archos"
