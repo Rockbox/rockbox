@@ -22,7 +22,7 @@ endif
 NATIVECC = gcc
 CC = $(CROSS)gcc
 
-SRC = main.c ipodpatcher.c fat32format.c parttypes.h
+SRC = main.c ipodpatcher.c fat32format.c parttypes.h arc4.c
 
 all: $(OUTPUT)
 

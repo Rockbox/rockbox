@@ -47,6 +47,8 @@ int list_images(struct ipod_t* ipod);
 int getmodel(struct ipod_t* ipod, int ipod_version);
 int ipod_scan(struct ipod_t* ipod);
 int write_dos_partition_table(struct ipod_t* ipod);
+int read_aupd(struct ipod_t* ipod, char* filename);
+int write_aupd(struct ipod_t* ipod, char* filename);
 off_t filesize(int fd);
 
 #endif
