@@ -579,10 +579,10 @@ void button_event(int key, bool pressed)
         new_btn = BUTTON_SELECT;
         break;
     case SDLK_KP7:
-        new_btn = BUTTON_VOL_UP;
+        new_btn = BUTTON_VOL_DOWN;
         break;
     case SDLK_KP9:
-        new_btn = BUTTON_VOL_DOWN;
+        new_btn = BUTTON_VOL_UP;
         break;
 
 #endif /* CONFIG_KEYPAD */
