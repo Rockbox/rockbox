@@ -47,7 +47,10 @@
 #define MAX_PATH 260
 
 #include <fcntl.h>
-
+#include <SDL.h>
+#include <SDL_thread.h>
+#include "thread.h"
+#include "kernel.h"
 #include "debug.h"
 #include "config.h"
 
@@ -175,6 +178,131 @@ static unsigned int rockbox2sim(int opt)
 }
 #endif
 
+/** Simulator I/O engine routines **/
+enum
+{
+    IO_QUIT = -1,
+    IO_OPEN,
+    IO_CLOSE,
+    IO_READ,
+    IO_WRITE,
+};
+
+struct sim_io
+{
+    SDL_mutex *m; /* Mutex for condition */
+    SDL_cond *c;  /* Condition for synchronizing threads */
+    SDL_Thread *t; /* The I/O thread */
+    struct mutex sim_mutex; /* Rockbox mutex */
+    volatile int cmd; /* The command to perform */
+    volatile int ready; /* I/O ready flag - 1= ready */
+    volatile int fd; /* The file to read/write */
+    void* volatile buf; /* The buffer to read/write */
+    volatile size_t count; /* Number of bytes to read/write */
+    ssize_t result; /* Result of operation */
+};
+
+static struct sim_io io;
+
+static int io_thread(void *data)
+{
+    SDL_LockMutex(io.m);
+
+    io.ready = 1; /* Indication mutex has been locked */
+
+    for (;;)
+    {
+        SDL_CondWait(io.c, io.m); /* unlock mutex and wait */
+
+        switch (io.cmd)
+        {
+        case IO_READ:
+            io.result = read(io.fd, io.buf, io.count);
+            io.ready = 1;
+            break;
+        case IO_WRITE:
+            io.result = write(io.fd, io.buf, io.count);
+            io.ready = 1;
+            break;
+        case IO_QUIT:
+            SDL_UnlockMutex(io.m);
+            return 0;
+        }
+    }
+
+    (void)data;
+}
+
+void sim_io_init(void)
+{
+    mutex_init(&io.sim_mutex);
+
+    io.ready = 0;
+
+    io.m = SDL_CreateMutex();
+    if (io.m == NULL)
+    {
+        fprintf(stderr, "Failed to create IO mutex\n");
+        exit(-1);
+    }
+
+    io.c = SDL_CreateCond();
+    if (io.c == NULL)
+    {
+        fprintf(stderr, "Failed to create IO cond\n");
+        exit(-1);
+    }
+
+    io.t = SDL_CreateThread(io_thread, NULL);
+    if (io.t == NULL)
+    {
+        fprintf(stderr, "Failed to create IO thread\n");
+        exit(-1);
+    }
+
+    /* Wait for IO thread to lock mutex */
+    while (!io.ready);
+
+    /* Wait for it to unlock */
+    SDL_LockMutex(io.m);
+    /* Free it for another thread */
+    SDL_UnlockMutex(io.m);
+}
+
+void sim_io_shutdown(void)
+{
+    SDL_LockMutex(io.m);
+
+    io.cmd = IO_QUIT;
+
+    SDL_CondSignal(io.c);
+    SDL_UnlockMutex(io.m);
+
+    SDL_WaitThread(io.t, NULL);
+
+    SDL_DestroyMutex(io.m);
+    SDL_DestroyCond(io.c);
+}
+
+static void io_trigger_and_wait(int cmd)
+{
+    /* Lock mutex before setting up new params and signaling condition */
+    SDL_LockMutex(io.m);
+
+    io.cmd = cmd;
+    io.ready = 0;
+
+    /* Get thread started */
+    SDL_CondSignal(io.c);
+
+    /* Let it run */
+    SDL_UnlockMutex(io.m);
+
+    /* Wait for IO to complete */
+    while (!io.ready)
+        yield();
+}
+
 MYDIR *sim_opendir(const char *name)
 {
     char buffer[MAX_PATH]; /* sufficiently big */
@@ -286,6 +414,45 @@ int sim_creat(const char *name)
     return OPEN(name, O_BINARY | O_WRONLY | O_CREAT | O_TRUNC, 0666);
 #endif
 }      
+
+ssize_t sim_read(int fd, void *buf, size_t count)
+{
+    ssize_t result;
+
+    mutex_lock(&io.sim_mutex);
+
+    /* Setup parameters */
+    io.fd = fd;
+    io.buf = buf;
+    io.count = count;
+
+    io_trigger_and_wait(IO_READ);
+
+    result = io.result;
+
+    mutex_unlock(&io.sim_mutex);
+
+    return result;
+}
+
+ssize_t sim_write(int fd, const void *buf, size_t count)
+{
+    ssize_t result;
+
+    mutex_lock(&io.sim_mutex);
+
+    io.fd = fd;
+    io.buf = (void*)buf;
+    io.count = count;
+
+    io_trigger_and_wait(IO_WRITE);
+
+    result = io.result;
+
+    mutex_unlock(&io.sim_mutex);
+
+    return result;
+}
 
 int sim_mkdir(const char *name)
 {

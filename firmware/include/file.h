@@ -55,6 +55,8 @@
 #define fsync(x) sim_fsync(x)
 #define ftruncate(x,y) sim_ftruncate(x,y)
 #define lseek(x,y,z) sim_lseek(x,y,z)
+#define read(x,y,z) sim_read(x,y,z)
+#define write(x,y,z) sim_write(x,y,z)
 #endif
 
 typedef int (*open_func)(const char* pathname, int flags);

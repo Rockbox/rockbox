@@ -76,7 +76,13 @@ struct regs
     void         *start; /* Thread start address, or NULL when started */
 };
 # endif
-
+#else
+struct regs
+{
+    void *t;             /* Simulator OS thread */
+    void *c;             /* Condition for blocking and sync */
+    void (*start)(void); /* Start function */
+};
 #endif /* !SIMULATOR */
 
 #define STATE_RUNNING             0x00000000
@@ -97,9 +103,7 @@ struct regs
 #define SET_BOOST_STATE(var)      (var |= STATE_BOOSTED)
 
 struct thread_entry {
-#ifndef SIMULATOR
     struct regs context;
-#endif
     const char *name;
     void *stack;
     unsigned long statearg;

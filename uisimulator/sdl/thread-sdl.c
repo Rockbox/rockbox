@@ -21,41 +21,157 @@
 #include <SDL.h>
 #include <SDL_thread.h>
 #include <stdlib.h>
+#include <memory.h>
 #include "thread-sdl.h"
 #include "kernel.h"
 #include "thread.h"
 #include "debug.h"
 
-SDL_Thread          *threads[256];
-int                 threadCount = 0;
-volatile long       current_tick = 0;
-SDL_mutex *m;
+/* Define this as 1 to show informational messages that are not errors. */
+#define THREAD_SDL_DEBUGF_ENABLED 0
 
-void yield(void)
+#if THREAD_SDL_DEBUGF_ENABLED
+#define THREAD_SDL_DEBUGF(...) DEBUGF(__VA_ARGS__)
+static char __name[32];
+#define THREAD_SDL_GET_NAME(thread) \
+    ({ thread_get_name(__name, sizeof(__name)/sizeof(__name[0]), thread); __name; })
+#else
+#define THREAD_SDL_DEBUGF(...)
+#define THREAD_SDL_GET_NAME(thread)
+#endif
+
+#define THREAD_PANICF(str...) \
+    ({ fprintf(stderr, str); exit(-1); })
+
+struct thread_entry threads[MAXTHREADS];            /* Thread entries as in core */
+static SDL_mutex *m;
+static SDL_sem *s;
+static struct thread_entry *running;
+
+void kill_sim_threads(void)
 {
-    static int counter = 0;
-
-    SDL_mutexV(m);
-    if (counter++ >= 50)
+    int i;
+    SDL_LockMutex(m);
+    for (i = 0; i < MAXTHREADS; i++)
     {
-        SDL_Delay(1);
-        counter = 0;
+        struct thread_entry *thread = &threads[i];
+        if (thread->context.t != NULL)
+        {
+            SDL_LockMutex(m);
+            if (thread->statearg == STATE_RUNNING)
+                SDL_SemPost(s);
+            else
+                SDL_CondSignal(thread->context.c);
+            SDL_KillThread(thread->context.t);
+            SDL_DestroyCond(thread->context.c);
+        }
     }
-    SDL_mutexP(m);
+    SDL_DestroyMutex(m);
+    SDL_DestroySemaphore(s);
 }
 
-void sim_sleep(int ticks)
+static int find_empty_thread_slot(void)
 {
-    SDL_mutexV(m);
-    SDL_Delay((1000/HZ) * ticks);
-    SDL_mutexP(m);
+    int n;
+
+    for (n = 0; n < MAXTHREADS; n++)
+    {
+        if (threads[n].name == NULL)
+            break;
+    }
+
+    return n;
+}
+
+static void add_to_list(struct thread_entry **list,
+                        struct thread_entry *thread)
+{
+    if (*list == NULL)
+    {
+        /* Insert into unoccupied list */
+        thread->next = thread;
+        thread->prev = thread;
+        *list = thread;
+    }
+    else
+    {
+        /* Insert last */
+        thread->next = *list;
+        thread->prev = (*list)->prev;
+        thread->prev->next = thread;
+        (*list)->prev = thread;
+    }
+}
+
+static void remove_from_list(struct thread_entry **list,
+                             struct thread_entry *thread)
+{
+    if (thread == thread->next)
+    {
+        /* The only item */
+        *list = NULL;
+        return;
+    }
+
+    if (thread == *list)
+    {
+        /* List becomes next item */
+        *list = thread->next;
+    }
+
+    /* Fix links to jump over the removed entry. */
+    thread->prev->next = thread->next;
+    thread->next->prev = thread->prev;
+}
+
+struct thread_entry *thread_get_current(void)
+{
+    return running;
+}
+
+void switch_thread(bool save_context, struct thread_entry **blocked_list)
+{
+    struct thread_entry *current = running;
+
+    SDL_UnlockMutex(m);
+
+    SDL_SemWait(s);
+
+    SDL_LockMutex(m);
+    running = current;
+
+    SDL_SemPost(s);
+
+    (void)save_context; (void)blocked_list;
+}
+
+void sleep_thread(int ticks)
+{
+    struct thread_entry *current;
+
+    current = running;
+    current->statearg = STATE_SLEEPING;
+
+    SDL_CondWaitTimeout(current->context.c, m, (1000/HZ) * ticks);
+    running = current;
+
+    current->statearg = STATE_RUNNING;
 }
 
 int runthread(void *data)
 {
-    SDL_mutexP(m);
-    ((void(*)())data) ();
-    SDL_mutexV(m);
+    struct thread_entry *current;
+
+    /* Cannot access thread variables before locking the mutex as the
+       data structures may not be filled-in yet. */
+    SDL_LockMutex(m);
+    running = (struct thread_entry *)data;
+    current = running;
+    current->context.start();
+
+    THREAD_SDL_DEBUGF("Thread Done: %d (%s)\n",
+                      current - threads, THREAD_SDL_GET_NAME(current));
+    remove_thread(NULL);
     return 0;
 }
 
@@ -64,37 +180,198 @@ struct thread_entry*
                   const char *name)
 {
     /** Avoid compiler warnings */
-    (void)stack;
-    (void)stack_size;
-    (void)name;
     SDL_Thread* t;
+    SDL_cond *cond;
+    int slot;
 
-    if (threadCount == 256) {
+    THREAD_SDL_DEBUGF("Creating thread: (%s)\n", name ? name : "");
+
+    slot = find_empty_thread_slot();
+    if (slot >= MAXTHREADS)
+    {
+        DEBUGF("Failed to find thread slot\n");
         return NULL;
     }
 
-    t = SDL_CreateThread(runthread, function);
-    threads[threadCount++] = t;
+    cond = SDL_CreateCond();
+    if (cond == NULL)
+    {
+        DEBUGF("Failed to create condition variable\n");
+        return NULL;
+    }
 
-    yield();
+    t = SDL_CreateThread(runthread, &threads[slot]);
+    if (t == NULL)
+    {
+        DEBUGF("Failed to create SDL thread\n");
+        SDL_DestroyCond(cond);
+        return NULL;
+    }
 
-    /* The return value is never de-referenced outside thread.c so this
-       nastiness should be fine.  However, a better solution would be nice.
-      */
-    return (struct thread_entry*)t;
+    threads[slot].stack = stack;
+    threads[slot].stack_size = stack_size;
+    threads[slot].name = name;
+    threads[slot].statearg = STATE_RUNNING;
+    threads[slot].context.start = function;
+    threads[slot].context.t = t;
+    threads[slot].context.c = cond;
+
+    THREAD_SDL_DEBUGF("New Thread: %d (%s)\n",
+                      slot, THREAD_SDL_GET_NAME(&threads[slot]));
+
+    return &threads[slot];
+}
+
+void block_thread(struct thread_entry **list)
+{
+    struct thread_entry *thread = running;
+
+    thread->statearg = STATE_BLOCKED;
+    add_to_list(list, thread);
+
+    SDL_CondWait(thread->context.c, m);
+    running = thread;
+}
+
+void block_thread_w_tmo(struct thread_entry **list, int ticks)
+{
+    struct thread_entry *thread = running;
+
+    thread->statearg = STATE_BLOCKED_W_TMO;
+    add_to_list(list, thread);
+
+    SDL_CondWaitTimeout(thread->context.c, m, (1000/HZ) * ticks);
+    running = thread;
+
+    if (thread->statearg == STATE_BLOCKED_W_TMO)
+    {
+        /* Timed out */
+        remove_from_list(list, thread);
+        thread->statearg = STATE_RUNNING;
+    }
+}
+
+void wakeup_thread(struct thread_entry **list)
+{
+    struct thread_entry *thread = *list;
+
+    if (thread == NULL)
+    {
+        return;
+    }
+
+    switch (thread->statearg)
+    {
+    case STATE_BLOCKED:
+    case STATE_BLOCKED_W_TMO:
+        remove_from_list(list, thread);
+        thread->statearg = STATE_RUNNING;
+        SDL_CondSignal(thread->context.c);
+        break;
+    }
 }
 
 void init_threads(void)
 {
-    m = SDL_CreateMutex();
+    int slot;
 
-    if (SDL_mutexP(m) == -1) {
-        fprintf(stderr, "Couldn't lock mutex\n");
-        exit(-1);
+    m = SDL_CreateMutex();
+    s = SDL_CreateSemaphore(0);
+
+    memset(threads, 0, sizeof(threads));
+
+    slot = find_empty_thread_slot();
+    if (slot >= MAXTHREADS)
+    {
+        THREAD_PANICF("Couldn't find slot for main thread.\n");
+    }
+
+    threads[slot].stack = "       ";
+    threads[slot].stack_size = 8;
+    threads[slot].name = "main";
+    threads[slot].statearg = STATE_RUNNING;
+    threads[slot].context.t = gui_thread;
+    threads[slot].context.c = SDL_CreateCond();
+
+    running = &threads[slot];
+
+    THREAD_SDL_DEBUGF("First Thread: %d (%s)\n",
+            slot, THREAD_SDL_GET_NAME(&threads[slot]));
+
+    if (SDL_LockMutex(m) == -1) {
+        THREAD_PANICF("Couldn't lock mutex\n");
+    }
+
+    if (SDL_SemPost(s) == -1) {
+        THREAD_PANICF("Couldn't post to semaphore\n");
     }
 }
 
 void remove_thread(struct thread_entry *thread)
 {
-    SDL_KillThread((SDL_Thread*) thread);
+    struct thread_entry *current = running;
+    SDL_Thread *t;
+    SDL_cond *c;
+
+    if (thread == NULL)
+    {
+        thread = current;
+    }
+
+    t = thread->context.t;
+    c = thread->context.c;
+    thread->context.t = NULL;
+
+    if (thread != current)
+    {
+        if (thread->statearg == STATE_RUNNING)
+            SDL_SemPost(s);
+        else
+            SDL_CondSignal(c);
+    }
+
+    THREAD_SDL_DEBUGF("Removing thread: %d (%s)\n",
+        thread - threads, THREAD_SDL_GET_NAME(thread));
+
+    thread->name = NULL;
+
+    SDL_DestroyCond(c);
+
+    if (thread == current)
+    {
+        SDL_UnlockMutex(m);
+    }
+
+    SDL_KillThread(t);
+}
+
+int thread_stack_usage(const struct thread_entry *thread)
+{
+    return 50;
+    (void)thread;
+}
+
+int thread_get_status(const struct thread_entry *thread)
+{
+    return thread->statearg;
+}
+
+/* Return name if one or ID if none */
+void thread_get_name(char *buffer, int size,
+                     struct thread_entry *thread)
+{
+    if (size <= 0)
+        return;
+
+    *buffer = '\0';
+
+    if (thread)
+    {
+        /* Display thread name if one or ID if none */
+        bool named = thread->name && *thread->name;
+        const char *fmt = named ? "%s" : "%08lX";
+        intptr_t name = named ?
+            (intptr_t)thread->name : (intptr_t)thread;
+        snprintf(buffer, size, fmt, name);
+    }
 }

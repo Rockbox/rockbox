@@ -181,7 +181,6 @@ static bool dbg_list(struct action_callback_info *info)
 extern struct thread_entry threads[MAXTHREADS];
 
 
-#ifndef SIMULATOR
 static char thread_status_char(int status)
 {
     switch (status)
@@ -256,7 +255,6 @@ static bool dbg_os(void)
     info.dbg_getname = threads_getname;
     return dbg_list(&info);
 }
-#endif /* !SIMULATOR */
 
 #ifdef HAVE_LCD_BITMAP
 #if CONFIG_CODEC != SWCODEC
@@ -2270,9 +2268,7 @@ static const struct the_menu_item menuitems[] = {
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE)
         { "Catch mem accesses", dbg_set_memory_guard },
 #endif
-#ifndef SIMULATOR
         { "View OS stacks", dbg_os },
-#endif
 #ifdef HAVE_LCD_BITMAP
 #ifndef SIMULATOR
         { "View battery", view_battery },

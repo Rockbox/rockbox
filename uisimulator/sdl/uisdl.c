@@ -41,6 +41,8 @@
 extern void                 app_main (void *); /* mod entry point */
 extern void                 new_key(int key);
 extern void                 sim_tick_tasks(void);
+extern void sim_io_init(void);
+extern void sim_io_shutdown(void);
 
 void button_event(int key, bool pressed);
 
@@ -167,16 +169,9 @@ bool gui_startup(void)
 
 bool gui_shutdown(void)
 {
-    int i;
-
-    SDL_KillThread(gui_thread);
     SDL_RemoveTimer(tick_timer_id);
-
-    for (i = 0; i < threadCount; i++)
-    {
-        SDL_KillThread(threads[i]);
-    }
-
+    kill_sim_threads();
+    sim_io_shutdown();
     return true;
 }
 
@@ -235,6 +230,8 @@ int main(int argc, char *argv[])
     if (display_zoom > 1) {
         background = false;
     }
+
+    sim_io_init();
 
     if (!gui_startup())
         return -1;

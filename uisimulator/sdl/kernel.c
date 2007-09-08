@@ -25,17 +25,12 @@
 #include "thread.h"
 #include "debug.h"
 
+volatile long current_tick = 0;
 static void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
 
 /* This array holds all queues that are initiated. It is used for broadcast. */
 static struct event_queue *all_queues[32];
 static int num_queues = 0;
-
-int set_irq_level (int level)
-{
-    static int _lv = 0;
-    return (_lv = level);
-}
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
 /* Moves waiting thread's descriptor to the current sender when a
@@ -43,7 +38,6 @@ int set_irq_level (int level)
 static void queue_fetch_sender(struct queue_sender_list *send,
                                unsigned int i)
 {
-    int old_level = set_irq_level(15<<4);
     struct thread_entry **spp = &send->senders[i];
 
     if(*spp)
@@ -51,8 +45,6 @@ static void queue_fetch_sender(struct queue_sender_list *send,
         send->curr_sender = *spp;
         *spp = NULL;
     }
-
-    set_irq_level(old_level);
 }
 
 /* Puts the specified return value in the waiting thread's return value
@@ -61,7 +53,12 @@ static void queue_release_sender(struct thread_entry **sender,
                                  intptr_t retval)
 {
     (*sender)->retval = retval;
-    *sender = NULL;
+    wakeup_thread(sender);
+    if(*sender != NULL)
+    {
+        fprintf(stderr, "queue->send slot ovf: %08X\n", (int)*sender);
+        exit(-1);
+    }
 }
 
 /* Releases any waiting threads that are queued with queue_send -
@@ -88,8 +85,12 @@ static void queue_release_all_senders(struct event_queue *q)
 void queue_enable_queue_send(struct event_queue *q,
                              struct queue_sender_list *send)
 {
-    q->send = send;
-    memset(send, 0, sizeof(*send));
+    q->send = NULL;
+    if(send)
+    {
+        q->send = send;
+        memset(send, 0, sizeof(*send));
+    }
 }
 #endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
 
@@ -104,6 +105,11 @@ void queue_init(struct event_queue *q, bool register_queue)
 
     if(register_queue)
     {
+        if(num_queues >= 32)
+        {
+            fprintf(stderr, "queue_init->out of queues");
+            exit(-1);
+        }
         /* Add it to the all_queues array */
         all_queues[num_queues++] = q;
     }
@@ -114,13 +120,6 @@ void queue_delete(struct event_queue *q)
     int i;
     bool found = false;
 
-#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
-    /* Release waiting threads and reply to any dequeued message
-       waiting for one. */
-    queue_release_all_senders(q);
-    queue_reply(q, 0);
-#endif
-    
     /* Find the queue to be deleted */
     for(i = 0;i < num_queues;i++)
     {
@@ -141,15 +140,28 @@ void queue_delete(struct event_queue *q)
         
         num_queues--;
     }
+
+    /* Release threads waiting on queue head */
+    wakeup_thread(&q->thread);
+
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+    /* Release waiting threads and reply to any dequeued message
+       waiting for one. */
+    queue_release_all_senders(q);
+    queue_reply(q, 0);
+#endif
+
+    q->read = 0;
+    q->write = 0;
 }
 
 void queue_wait(struct event_queue *q, struct event *ev)
 {
     unsigned int rd;
 
-    while(q->read == q->write)
+    if (q->read == q->write)
     {
-        switch_thread(true, NULL);
+        block_thread(&q->thread);
     }
 
     rd = q->read++ & QUEUE_LENGTH_MASK;
@@ -166,11 +178,9 @@ void queue_wait(struct event_queue *q, struct event *ev)
 
 void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks)
 {
-    unsigned int timeout = current_tick + ticks;
-
-    while(q->read == q->write && TIME_BEFORE( current_tick, timeout ))
+    if (q->read == q->write && ticks > 0)
     {
-        sim_sleep(1);
+        block_thread_w_tmo(&q->thread, ticks);
     }
 
     if(q->read != q->write)
@@ -194,7 +204,6 @@ void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks)
 
 void queue_post(struct event_queue *q, long id, intptr_t data)
 {
-    int oldlevel = set_irq_level(15<<4);
     unsigned int wr = q->write++ & QUEUE_LENGTH_MASK;
 
     q->events[wr].id   = id;
@@ -213,13 +222,12 @@ void queue_post(struct event_queue *q, long id, intptr_t data)
     }
 #endif
 
-    set_irq_level(oldlevel);
+    wakeup_thread(&q->thread);
 }
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
 intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
 {
-    int oldlevel = set_irq_level(15<<4);
     unsigned int wr = q->write++ & QUEUE_LENGTH_MASK;
 
     q->events[wr].id   = id;
@@ -228,7 +236,6 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
     if(q->send)
     {
         struct thread_entry **spp = &q->send->senders[wr];
-        static struct thread_entry sender;
 
         if(*spp)
         {
@@ -236,19 +243,13 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
             queue_release_sender(spp, 0);
         }
 
-        *spp = &sender;
+        wakeup_thread(&q->thread);
 
-        set_irq_level(oldlevel);
-        while (*spp != NULL)
-        {
-            switch_thread(true, NULL);
-        }
-
-        return sender.retval;
+        block_thread(spp);
+        return thread_get_current()->retval;
     }
 
     /* Function as queue_post if sending is not enabled */
-    set_irq_level(oldlevel);
     return 0;
 }
 
@@ -289,8 +290,6 @@ void queue_clear(struct event_queue* q)
 
 void queue_remove_from_head(struct event_queue *q, long id)
 {
-    int oldlevel = set_irq_level(15<<4);
-    
     while(q->read != q->write)
     {
         unsigned int rd = q->read & QUEUE_LENGTH_MASK;
@@ -314,8 +313,6 @@ void queue_remove_from_head(struct event_queue *q, long id)
 #endif
         q->read++;
     }
-    
-    set_irq_level(oldlevel);
 }
 
 int queue_count(const struct event_queue *q)
@@ -335,12 +332,14 @@ int queue_broadcast(long id, intptr_t data)
     return num_queues;
 }
 
-void switch_thread(bool save_context, struct thread_entry **blocked_list)
+void yield(void)
 {
-    (void)save_context;
-    (void)blocked_list;
-    
-    yield ();
+    switch_thread(true, NULL);
+}
+
+void sleep(int ticks)
+{
+    sleep_thread(ticks);
 }
 
 void sim_tick_tasks(void)
@@ -370,7 +369,8 @@ int tick_add_task(void (*f)(void))
             return 0;
         }
     }
-    DEBUGF("Error! tick_add_task(): out of tasks");
+    fprintf(stderr, "Error! tick_add_task(): out of tasks");
+    exit(-1);
     return -1;
 }
 
@@ -395,29 +395,39 @@ int tick_remove_task(void (*f)(void))
    multitasking, but is better than nothing at all */
 void mutex_init(struct mutex *m)
 {
-    m->locked = false;
+    m->thread = NULL;
+    m->locked = 0;
 }
 
 void mutex_lock(struct mutex *m)
 {
-    while(m->locked)
-        switch_thread(true, NULL);
-    m->locked = true;
+    if (test_and_set(&m->locked, 1))
+    {
+        block_thread(&m->thread);
+    }
 }
 
 void mutex_unlock(struct mutex *m)
 {
-    m->locked = false;
+    if (m->thread != NULL)
+    {
+        wakeup_thread(&m->thread);
+    }
+    else
+    {
+        m->locked = 0;
+    }
 }
 
-void spinlock_lock(struct mutex *m)
+void spinlock_lock(struct mutex *l)
 {
-    while(m->locked)
+    while(test_and_set(&l->locked, 1))
+    {
         switch_thread(true, NULL);
-    m->locked = true;
+    }
 }
 
-void spinlock_unlock(struct mutex *m)
+void spinlock_unlock(struct mutex *l)
 {
-    m->locked = false;
+    l->locked = 0;
 }

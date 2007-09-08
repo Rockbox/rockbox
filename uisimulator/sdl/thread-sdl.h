@@ -22,9 +22,8 @@
 
 #include "SDL_thread.h"
 
-extern SDL_Thread* threads[256];
-extern int         threadCount;
-extern SDL_mutex*  mutex;
+extern SDL_Thread *gui_thread;   /* The "main" thread */
+void kill_sim_threads();         /* Kill all the rockbox sim threads */
 
 #endif /* #ifndef __THREADSDL_H__ */
 
