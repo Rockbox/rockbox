@@ -1537,6 +1537,10 @@ fi
 # Now, figure out version number of the (gcc) compiler we are about to use
 gccver=`$CC -dumpversion`;
 
+# figure out the binutil version too and display it, mostly for the build
+# system etc to be able to see it easier
+ldver=`$LD --version | head -n 1 | cut "-d " -f4`
+
 if [ -z "$gccver" ]; then
   echo "WARNING: The compiler you must use ($CC) is not in your path!"
   echo "WARNING: this may cause your build to fail since we cannot do the"
@@ -1578,6 +1582,8 @@ else
  fi
 
 fi
+
+echo "Using $LD $ldver"
 
 # check the compiler for SH platforms
 if test "$CC" = "sh-elf-gcc"; then
