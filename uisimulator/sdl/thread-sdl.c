@@ -152,7 +152,7 @@ void sleep_thread(int ticks)
     current = running;
     current->statearg = STATE_SLEEPING;
 
-    SDL_CondWaitTimeout(current->context.c, m, (1000/HZ) * ticks);
+    SDL_CondWaitTimeout(current->context.c, m, (1000/HZ) * ticks + (500/HZ));
     running = current;
 
     current->statearg = STATE_RUNNING;
