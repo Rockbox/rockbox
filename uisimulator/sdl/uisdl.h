@@ -259,6 +259,16 @@
 #define UI_LCD_WIDTH                LCD_WIDTH /* * 1.5 */
 #define UI_LCD_HEIGHT               LCD_HEIGHT  /* * 1.5 */
 
+#elif defined(SANSA_C200)
+#define UI_TITLE                    "Sansa c200"
+#define UI_WIDTH                    350 /* width of GUI window */
+#define UI_HEIGHT                   152 /* height of GUI window */
+/* high-colour */
+#define UI_LCD_POSX                 42 /* x position of lcd */
+#define UI_LCD_POSY                 35  /* y position of lcd (74 for real aspect) */
+#define UI_LCD_WIDTH                LCD_WIDTH /* * 1.5 */
+#define UI_LCD_HEIGHT               LCD_HEIGHT  /* * 1.5 */
+
 #elif defined(IRIVER_IFP7XX)
 #define UI_TITLE                    "iriver iFP7xx"
 #define UI_WIDTH                    425 /* width of GUI window */
