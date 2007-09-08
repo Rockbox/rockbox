@@ -56,7 +56,7 @@ static void queue_release_sender(struct thread_entry **sender,
     wakeup_thread(sender);
     if(*sender != NULL)
     {
-        fprintf(stderr, "queue->send slot ovf: %08X\n", (int)*sender);
+        fprintf(stderr, "queue->send slot ovf: %p\n", *sender);
         exit(-1);
     }
 }
