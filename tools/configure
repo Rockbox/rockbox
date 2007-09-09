@@ -1539,7 +1539,7 @@ gccver=`$CC -dumpversion`;
 
 # figure out the binutil version too and display it, mostly for the build
 # system etc to be able to see it easier
-ldver=`$LD --version | head -n 1 | cut "-d " -f4`
+ldver=`$LD --version | head -n 1 | sed -e 's/[^0-9.]//g'`
 
 if [ -z "$gccver" ]; then
   echo "WARNING: The compiler you must use ($CC) is not in your path!"
