@@ -6,7 +6,11 @@ ipod.c
 gigabeat.c
 #elif defined(IRIVER_H10) || defined(IRIVER_H10_5GB) || \
       defined(SANSA_E200) || defined(SANSA_C200)
+#ifdef E200R_INSTALLER
+main-e200r-installer.c
+#else
 main-pp.c
+#endif
 #elif defined(ELIO_TPJ1022)
 tpj1022.c
 #elif defined(IAUDIO_X5) || defined(IAUDIO_M5)

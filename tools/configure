@@ -1424,6 +1424,9 @@ fi
     ifp7xx)
        gdbstub="(G)DB stub, "
        ;;
+    e200r|e200)
+       gdbstub="(I)installer, "
+       ;;
     *)
        ;;
   esac
@@ -1434,6 +1437,13 @@ fi
   option=`input`;
 
   case $option in
+    [Ii])
+      appsdir='\$(ROOTDIR)/bootloader'
+      apps="bootloader"
+      extradefines="-DBOOTLOADER -DE200R_INSTALLER -ffunction-sections -fdata-sections"
+      bootloader="1"
+      echo "e200R-installer build selected"
+      ;;
     [Bb])
       if test $t_manufacturer = "archos"; then
           # Archos SH-based players do this somewhat differently for

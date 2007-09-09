@@ -51,7 +51,7 @@ start:
 #endif
 
     msr    cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ */
-
+#ifndef E200R_INSTALLER
 /* 1 - Copy the bootloader to IRAM */
     /* get the high part of our execute address */
     ldr    r7, =0xffffff00
@@ -79,6 +79,7 @@ pad_skip:
 
 /* 2 - Jump both CPU and COP there */
     ldr    pc, =start_loc    /* jump to the relocated start_loc:  */
+#endif /* E200R_INSTALLER */
 
 start_loc:
 

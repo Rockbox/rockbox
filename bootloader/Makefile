@@ -18,7 +18,7 @@ ifdef DEBUG
     CFLAGS += -g
 endif
 
-SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P -include "config.h" - )
+SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -include "config.h" - )
 DIRS = .
 
 ifdef APPEXTRA
@@ -50,7 +50,7 @@ endif
 dep: $(DEPFILE)
 
 $(LINKFILE): $(LDS)
-	$(call PRINTS,Build $(@F))cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
+	$(call PRINTS,Build $(@F))cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES)  $(DEFINES) -E -P $(ROMBUILD) - >$@
 
 $(MAXOUTFILE):
 	$(SILENT)echo '#include "config.h"' > $(MAXINFILE)
