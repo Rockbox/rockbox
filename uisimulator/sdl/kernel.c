@@ -225,6 +225,15 @@ void queue_post(struct event_queue *q, long id, intptr_t data)
     wakeup_thread(&q->thread);
 }
 
+/* Special thread-synced queue_post for button driver or any other preemptive sim thread */
+void queue_syncpost(struct event_queue *q, long id, intptr_t data)
+{
+    thread_sdl_lock();
+    /* No rockbox threads can be running here */
+    queue_post(q, id, data);
+    thread_sdl_unlock();
+}
+
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
 intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
 {
@@ -330,6 +339,17 @@ int queue_broadcast(long id, intptr_t data)
     }
    
     return num_queues;
+}
+
+/* Special thread-synced queue_broadcast for button driver or any other preemptive sim thread */
+int queue_syncbroadcast(long id, intptr_t data)
+{
+    int i;
+    thread_sdl_lock();
+    /* No rockbox threads can be running here */
+    i = queue_broadcast(id, data);
+    thread_sdl_unlock();
+    return i;
 }
 
 void yield(void)

@@ -48,6 +48,8 @@ static SDL_mutex *m;
 static SDL_sem *s;
 static struct thread_entry *running;
 
+extern long start_tick;
+
 void kill_sim_threads(void)
 {
     int i;
@@ -62,6 +64,7 @@ void kill_sim_threads(void)
                 SDL_SemPost(s);
             else
                 SDL_CondSignal(thread->context.c);
+            SDL_Delay(10);
             SDL_KillThread(thread->context.t);
             SDL_DestroyCond(thread->context.c);
         }
@@ -129,6 +132,16 @@ struct thread_entry *thread_get_current(void)
     return running;
 }
 
+void thread_sdl_lock(void)
+{
+    SDL_LockMutex(m);
+}
+
+void thread_sdl_unlock(void)
+{
+    SDL_UnlockMutex(m);
+}
+
 void switch_thread(bool save_context, struct thread_entry **blocked_list)
 {
     struct thread_entry *current = running;
@@ -136,6 +149,8 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
     SDL_UnlockMutex(m);
 
     SDL_SemWait(s);
+
+    SDL_Delay(0);
 
     SDL_LockMutex(m);
     running = current;
@@ -148,11 +163,19 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
 void sleep_thread(int ticks)
 {
     struct thread_entry *current;
+    int rem;
 
     current = running;
     current->statearg = STATE_SLEEPING;
 
-    SDL_CondWaitTimeout(current->context.c, m, (1000/HZ) * ticks + (500/HZ));
+    rem = (SDL_GetTicks() - start_tick) % (1000/HZ);
+    if (rem < 0)
+        rem = 0;
+
+    SDL_UnlockMutex(m);
+    SDL_Delay((1000/HZ) * ticks + ((1000/HZ)-1) - rem);
+    SDL_LockMutex(m);
+
     running = current;
 
     current->statearg = STATE_RUNNING;

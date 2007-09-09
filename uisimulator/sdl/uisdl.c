@@ -41,8 +41,8 @@
 extern void                 app_main (void *); /* mod entry point */
 extern void                 new_key(int key);
 extern void                 sim_tick_tasks(void);
-extern void sim_io_init(void);
-extern void sim_io_shutdown(void);
+extern void                 sim_io_init(void);
+extern void                 sim_io_shutdown(void);
 
 void button_event(int key, bool pressed);
 
@@ -69,7 +69,7 @@ Uint32 tick_timer(Uint32 interval, void *param)
     (void) interval;
     (void) param;
     
-    new_tick = (SDL_GetTicks() - start_tick) * HZ / 1000;
+    new_tick = (SDL_GetTicks() - start_tick) / (1000/HZ);
         
     if (new_tick != current_tick) {
         long i;

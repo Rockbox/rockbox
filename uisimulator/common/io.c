@@ -261,7 +261,8 @@ void sim_io_init(void)
     }
 
     /* Wait for IO thread to lock mutex */
-    while (!io.ready);
+    while (!io.ready)
+        SDL_Delay(0);
 
     /* Wait for it to unlock */
     SDL_LockMutex(io.m);

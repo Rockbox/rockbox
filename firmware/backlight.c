@@ -487,7 +487,12 @@ void backlight_thread(void)
                 lcd_remote_off();
                 break;
 #endif /* defined(HAVE_REMOTE_LCD) && !defined(SIMULATOR) */
-
+#ifdef SIMULATOR
+            /* This one here too for lack of a better place */
+            case SYS_SCREENDUMP:
+                screen_dump();
+                break;
+#endif
             case SYS_USB_CONNECTED:
                 /* Tell the USB thread that we are safe */
                 DEBUGF("backlight_thread got SYS_USB_CONNECTED\n");
