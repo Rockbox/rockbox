@@ -802,7 +802,7 @@ static int peak_meter_read_l(void)
        get fooled by an old maximum value */
     pm_max_left = pm_cur_left;
     
-#ifdef SIMULATOR
+#if defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
     srand(current_tick);
     retval = rand()%MAX_PEAK;
 #endif
@@ -833,7 +833,7 @@ static int peak_meter_read_r(void)
        get fooled by an old maximum value */
     pm_max_right = pm_cur_right;
 
-#ifdef SIMULATOR
+#if defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
     srand(current_tick);
     retval = rand()%MAX_PEAK;
 #endif
