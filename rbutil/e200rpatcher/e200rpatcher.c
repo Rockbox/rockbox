@@ -121,10 +121,6 @@ void do_patching(void)
     /* C calling convention, it's not nice to use global stuff */
     busses = usb_get_busses();
 
-    usb_init();
-    usb_find_busses();
-    usb_find_devices();
-
     for (bus = busses; bus; bus = bus->next) {
         for (tmp_dev = bus->devices; tmp_dev; tmp_dev = tmp_dev->next) {
             if (tmp_dev->descriptor.idVendor == E200R_VENDORID &&
