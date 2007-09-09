@@ -69,7 +69,6 @@ static int spi_transfer(int address, long data, long* buffer, bool read) {
 
 void spi_send(int address, unsigned long data) {
     long dummy;
-    DEBUGF("SPI send %X to %d", data, address);
     if(spi_transfer(address, data, &dummy, false)) {
         DEBUGF("SPI Send timed out");
     }
