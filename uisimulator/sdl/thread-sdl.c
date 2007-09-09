@@ -45,7 +45,6 @@ static char __name[32];
 
 struct thread_entry threads[MAXTHREADS];            /* Thread entries as in core */
 static SDL_mutex *m;
-static SDL_sem *s;
 static struct thread_entry *running;
 
 extern long start_tick;
@@ -60,9 +59,7 @@ void kill_sim_threads(void)
         if (thread->context.t != NULL)
         {
             SDL_LockMutex(m);
-            if (thread->statearg == STATE_RUNNING)
-                SDL_SemPost(s);
-            else
+            if (thread->statearg != STATE_RUNNING)
                 SDL_CondSignal(thread->context.c);
             SDL_Delay(10);
             SDL_KillThread(thread->context.t);
@@ -70,7 +67,6 @@ void kill_sim_threads(void)
         }
     }
     SDL_DestroyMutex(m);
-    SDL_DestroySemaphore(s);
 }
 
 static int find_empty_thread_slot(void)
@@ -144,18 +140,19 @@ void thread_sdl_unlock(void)
 
 void switch_thread(bool save_context, struct thread_entry **blocked_list)
 {
+    static int counter = 0;
     struct thread_entry *current = running;
 
     SDL_UnlockMutex(m);
 
-    SDL_SemWait(s);
-
-    SDL_Delay(0);
+    if (counter++ >= 50)
+    {
+        SDL_Delay(0);
+        counter = 0;
+    }
 
     SDL_LockMutex(m);
     running = current;
-
-    SDL_SemPost(s);
 
     (void)save_context; (void)blocked_list;
 }
@@ -299,7 +296,6 @@ void init_threads(void)
     int slot;
 
     m = SDL_CreateMutex();
-    s = SDL_CreateSemaphore(0);
 
     memset(threads, 0, sizeof(threads));
 
@@ -324,10 +320,6 @@ void init_threads(void)
     if (SDL_LockMutex(m) == -1) {
         THREAD_PANICF("Couldn't lock mutex\n");
     }
-
-    if (SDL_SemPost(s) == -1) {
-        THREAD_PANICF("Couldn't post to semaphore\n");
-    }
 }
 
 void remove_thread(struct thread_entry *thread)
@@ -347,9 +339,7 @@ void remove_thread(struct thread_entry *thread)
 
     if (thread != current)
     {
-        if (thread->statearg == STATE_RUNNING)
-            SDL_SemPost(s);
-        else
+        if (thread->statearg != STATE_RUNNING)
             SDL_CondSignal(c);
     }
 
