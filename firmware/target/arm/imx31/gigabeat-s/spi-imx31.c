@@ -21,6 +21,10 @@
 #include "debug.h"
 #include "kernel.h"
 
+    /* This is all based on communicating with the MC13783 PMU which is on 
+     * CSPI2 with the chip select at 0. The LCD controller resides on
+     * CSPI3 cs1, but we have no idea how to communicate to it */
+
 void spi_init(void) {
     CSPI_CONREG2 |= (2 << 20);      // Burst will be triggered at SPI_RDY low
     CSPI_CONREG2 |= (2 << 16);      // Clock = IPG_CLK/16  - we want about 20mhz
@@ -30,33 +34,49 @@ void spi_init(void) {
     CSPI_CONREG2 |= 1;              // Enable CSPI2;
 }
 
-void spi_send(int address, unsigned long data) {
-    /* This is all based on communicating with the MC13783 PMU which is on 
-     * CSPI2 with the chip select at 0. The LCD controller resides on
-     * CSPI3 cs1, but we have no idea how to communicate to it */
+static int spi_transfer(int address, long data, long* buffer, bool read) {
     unsigned long packet = 0;
-    packet |= (1<<31);              // This is a write
+    if(!read) {
+        /* Set the appropriate bit in the packet to indicate a write */
+        packet |= (1<<31);
+    }
+    /* Set the address of the packet */
     packet |= (address << 25);
-    data &= ~(DATAMASK);            // Ensure that data is only 24 bits
+
+    /* Ensure data only occupies 24 bits, then mash the data into the packet */
+    data &= ~(DATAMASK);
     packet |= data;
 
-    while(CSPI_STATREG2 & (1<<2));  // Don't write while TXFIFO is full
+    /* Wait for some room in TXFIFO */
+    while(CSPI_STATREG2 & (1<<2));
+
+    /* Send the packet */
     CSPI_TXDATA2 = packet;
+
+    /* Poll the XCH bit to wait for the end of the transfer, with
+     * a one second timeout */
+    int newtick = current_tick + HZ;
+    while((CSPI_CONREG2 & (1<<2)) && (current_tick < newtick));
+
+    if(newtick > current_tick) {
+        *buffer = CSPI_RXDATA2;
+        return 0;
+    } else {
+        /* Indicate the fact that the transfer timed out */
+        return -1;
+    }
+}
+
+void spi_send(int address, unsigned long data) {
+    long dummy;
+    DEBUGF("SPI send %X to %d", data, address);
+    if(spi_transfer(address, data, &dummy, false)) {
+        DEBUGF("SPI Send timed out");
+    }
 }
 
 void spi_read(int address, unsigned long* buffer) {
-    unsigned long packet = 0;
-    packet |= (address << 25);
-    
-    while(CSPI_STATREG2 & (1<<2));  // Wait till TXFIFO is empty
-    CSPI_TXDATA2 = packet;
-
-    short newtick = current_tick + HZ;
-    // Wait till we have a word to read (or 1 second has elapsed)
-    while(!(CSPI_TESTREG2 & 0xF0) && (newtick > current_tick));
-    if(newtick >= current_tick) {
-        *buffer = CSPI_RXDATA2;
-    } else {
+    if(spi_transfer(address, 0, buffer, true)) {
         DEBUGF("SPI read timed out");
     }
 }
