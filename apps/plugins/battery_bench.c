@@ -118,8 +118,13 @@ bool thread_stopped = false;
 /* Struct for battery information */
 struct batt_info
 {
-    int ticks, level, eta;
+    /* the size of the struct elements is optimised to make the struct size
+     * a power of 2 */
+    long ticks;
+    int eta;
     unsigned int voltage;
+    short level;
+    unsigned short flags;
 } bat[BUF_SIZE/sizeof(struct batt_info)];
 
 struct event_queue thread_q;
@@ -150,9 +155,9 @@ bool exit_tsr(bool reenter)
     else return false;
 }
 
-#define BIT_CHARGER     0x1000
-#define BIT_CHARGING    0x2000
-#define BIT_USB_POWER   0x4000
+#define BIT_CHARGER     0x1
+#define BIT_CHARGING    0x2
+#define BIT_USB_POWER   0x4
 
 #define HMS(x) (x)/3600,((x)%3600)/60,((x)%3600)%60 
 
@@ -248,21 +253,16 @@ void thread(void)
                                 
                                 HMS(secs), secs, bat[j].level,
                                 bat[j].eta / 60, bat[j].eta % 60, 
-#if CONFIG_CHARGING || defined(HAVE_USB_POWER)
-                                (bat[j].voltage & 
-                                 (~(BIT_CHARGER|BIT_CHARGING|BIT_USB_POWER))),
-#else
                                 bat[j].voltage,
-#endif
                                 temp + 1 + (j-i)
 #if CONFIG_CHARGING
-                                ,(bat[j].voltage & BIT_CHARGER)?'A':'-' 
+                                ,(bat[j].flags & BIT_CHARGER)?'A':'-'
 #if CONFIG_CHARGING == CHARGING_MONITOR
-                                ,(bat[j].voltage & BIT_CHARGING)?'C':'-'
+                                ,(bat[j].flags & BIT_CHARGING)?'C':'-'
 #endif
 #endif
 #ifdef HAVE_USB_POWER
-                                ,(bat[j].voltage & BIT_USB_POWER)?'U':'-'
+                                ,(bat[j].flags & BIT_USB_POWER)?'U':'-'
 #endif
                                         
                                         );
@@ -313,7 +313,7 @@ void thread(void)
                 bat[i].eta = rb->battery_time();
                 last_voltage = bat[i].voltage = current_voltage;
 #if CONFIG_CHARGING || defined(HAVE_USB_POWER)
-                bat[i].voltage |= last_state = charge_state();
+                bat[i].flags = last_state = charge_state();
 #endif                
                 i++;
                 got_info = true;
