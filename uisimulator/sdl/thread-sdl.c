@@ -17,11 +17,13 @@
  *
  ****************************************************************************/
 
+#include <stdbool.h>
 #include <time.h>
 #include <SDL.h>
 #include <SDL_thread.h>
 #include <stdlib.h>
 #include <memory.h>
+#include <setjmp.h>
 #include "thread-sdl.h"
 #include "kernel.h"
 #include "thread.h"
@@ -43,30 +45,113 @@ static char __name[32];
 #define THREAD_PANICF(str...) \
     ({ fprintf(stderr, str); exit(-1); })
 
-struct thread_entry threads[MAXTHREADS];            /* Thread entries as in core */
+/* Thread entries as in core */
+struct thread_entry threads[MAXTHREADS];
+/* Jump buffers for graceful exit - kernel threads don't stay neatly
+ * in their start routines responding to messages so this is the only
+ * way to get them back in there so they may exit */
+static jmp_buf thread_jmpbufs[MAXTHREADS];
 static SDL_mutex *m;
 static struct thread_entry *running;
+static bool threads_exit = false;
 
 extern long start_tick;
 
-void kill_sim_threads(void)
+void thread_sdl_shutdown(void)
 {
     int i;
+    /* Take control */
     SDL_LockMutex(m);
+
+    /* Tell all threads jump back to their start routines, unlock and exit
+       gracefully - we'll check each one in turn for it's status. Threads
+       _could_ terminate via remove_thread or multiple threads could exit
+       on each unlock but that is safe. */
+    threads_exit = true;
+
     for (i = 0; i < MAXTHREADS; i++)
     {
         struct thread_entry *thread = &threads[i];
         if (thread->context.t != NULL)
         {
+            /* Signal thread on delay or block */
+            SDL_Thread *t = thread->context.t;
+            SDL_CondSignal(thread->context.c);
+            SDL_UnlockMutex(m);
+            /* Wait for it to finish */
+            SDL_WaitThread(t, NULL);
+            /* Relock for next thread signal */
             SDL_LockMutex(m);
-            if (thread->statearg != STATE_RUNNING)
-                SDL_CondSignal(thread->context.c);
-            SDL_Delay(10);
-            SDL_KillThread(thread->context.t);
-            SDL_DestroyCond(thread->context.c);
-        }
+        }        
     }
+
+    SDL_UnlockMutex(m);
     SDL_DestroyMutex(m);
+}
+
+/* Do main thread creation in this file scope to avoid the need to double-
+   return to a prior call-level which would be unaware of the fact setjmp
+   was used */
+extern void app_main(void *param);
+static int thread_sdl_app_main(void *param)
+{
+    SDL_LockMutex(m);
+    running = &threads[0];
+
+    /* Set the jump address for return */
+    if (setjmp(thread_jmpbufs[0]) == 0)
+    {
+        app_main(param);
+        /* should not ever be reached but... */
+        THREAD_PANICF("app_main returned!\n");
+    }
+
+    /* Unlock and exit */
+    SDL_UnlockMutex(m);
+    return 0;
+}
+
+/* Initialize SDL threading */
+bool thread_sdl_init(void *param)
+{
+    memset(threads, 0, sizeof(threads));
+
+    m = SDL_CreateMutex();
+
+    if (SDL_LockMutex(m) == -1)
+    {
+        fprintf(stderr, "Couldn't lock mutex\n");
+        return false;
+    }
+
+    /* Slot 0 is reserved for the main thread - initialize it here and
+       then create the SDL thread - it is possible to have a quick, early
+       shutdown try to access the structure. */
+    running = &threads[0];
+    running->stack = "       ";
+    running->stack_size = 8;
+    running->name = "main";
+    running->statearg = STATE_RUNNING;
+    running->context.c = SDL_CreateCond();
+
+    if (running->context.c == NULL)
+    {
+        fprintf(stderr, "Failed to create main condition variable\n");
+        return false;
+    }
+
+    running->context.t = SDL_CreateThread(thread_sdl_app_main, param);
+
+    if (running->context.t == NULL)
+    {
+        fprintf(stderr, "Failed to create main thread\n");
+        return false;
+    }
+
+    THREAD_SDL_DEBUGF("Main thread: %p\n", running);
+
+    SDL_UnlockMutex(m);
+    return true;
 }
 
 static int find_empty_thread_slot(void)
@@ -154,6 +239,9 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
     SDL_LockMutex(m);
     running = current;
 
+    if (threads_exit)
+        remove_thread(NULL);
+
     (void)save_context; (void)blocked_list;
 }
 
@@ -169,29 +257,57 @@ void sleep_thread(int ticks)
     if (rem < 0)
         rem = 0;
 
-    SDL_UnlockMutex(m);
-    SDL_Delay((1000/HZ) * ticks + ((1000/HZ)-1) - rem);
-    SDL_LockMutex(m);
+    rem = (1000/HZ) * ticks + ((1000/HZ)-1) - rem;
+
+    if (rem == 0)
+    {
+        /* Unlock and give up rest of quantum */
+        SDL_UnlockMutex(m);
+        SDL_Delay(0);
+        SDL_LockMutex(m);
+    }
+    else
+    {
+        /* These sleeps must be signalable for thread exit */
+        SDL_CondWaitTimeout(current->context.c, m, rem);
+    }
 
     running = current;
 
     current->statearg = STATE_RUNNING;
+
+    if (threads_exit)
+        remove_thread(NULL);
 }
 
 int runthread(void *data)
 {
     struct thread_entry *current;
+    jmp_buf *current_jmpbuf;
 
     /* Cannot access thread variables before locking the mutex as the
        data structures may not be filled-in yet. */
     SDL_LockMutex(m);
     running = (struct thread_entry *)data;
     current = running;
-    current->context.start();
+    current_jmpbuf = &thread_jmpbufs[running - threads];
 
-    THREAD_SDL_DEBUGF("Thread Done: %d (%s)\n",
-                      current - threads, THREAD_SDL_GET_NAME(current));
-    remove_thread(NULL);
+    /* Setup jump for exit */
+    if (setjmp(*current_jmpbuf) == 0)
+    {
+        /* Run the thread routine */
+        current->context.start();
+        THREAD_SDL_DEBUGF("Thread Done: %d (%s)\n",
+                          current - threads, THREAD_SDL_GET_NAME(current));
+        /* Thread routine returned - suicide */
+        remove_thread(NULL);
+    }
+    else
+    {
+        /* Unlock and exit */
+        SDL_UnlockMutex(m);
+    }
+
     return 0;
 }
 
@@ -251,6 +367,9 @@ void block_thread(struct thread_entry **list)
 
     SDL_CondWait(thread->context.c, m);
     running = thread;
+
+    if (threads_exit)
+        remove_thread(NULL);
 }
 
 void block_thread_w_tmo(struct thread_entry **list, int ticks)
@@ -269,6 +388,9 @@ void block_thread_w_tmo(struct thread_entry **list, int ticks)
         remove_from_list(list, thread);
         thread->statearg = STATE_RUNNING;
     }
+
+    if (threads_exit)
+        remove_thread(NULL);
 }
 
 void wakeup_thread(struct thread_entry **list)
@@ -293,33 +415,14 @@ void wakeup_thread(struct thread_entry **list)
 
 void init_threads(void)
 {
-    int slot;
-
-    m = SDL_CreateMutex();
-
-    memset(threads, 0, sizeof(threads));
-
-    slot = find_empty_thread_slot();
-    if (slot >= MAXTHREADS)
+    /* Main thread is already initialized */
+    if (running != &threads[0])
     {
-        THREAD_PANICF("Couldn't find slot for main thread.\n");
+        THREAD_PANICF("Wrong main thread in init_threads: %p\n", running);
     }
-
-    threads[slot].stack = "       ";
-    threads[slot].stack_size = 8;
-    threads[slot].name = "main";
-    threads[slot].statearg = STATE_RUNNING;
-    threads[slot].context.t = gui_thread;
-    threads[slot].context.c = SDL_CreateCond();
-
-    running = &threads[slot];
 
     THREAD_SDL_DEBUGF("First Thread: %d (%s)\n",
-            slot, THREAD_SDL_GET_NAME(&threads[slot]));
-
-    if (SDL_LockMutex(m) == -1) {
-        THREAD_PANICF("Couldn't lock mutex\n");
-    }
+            0, THREAD_SDL_GET_NAME(&threads[0]));
 }
 
 void remove_thread(struct thread_entry *thread)
@@ -338,10 +441,7 @@ void remove_thread(struct thread_entry *thread)
     thread->context.t = NULL;
 
     if (thread != current)
-    {
-        if (thread->statearg != STATE_RUNNING)
-            SDL_CondSignal(c);
-    }
+        SDL_CondSignal(c);
 
     THREAD_SDL_DEBUGF("Removing thread: %d (%s)\n",
         thread - threads, THREAD_SDL_GET_NAME(thread));
@@ -352,7 +452,9 @@ void remove_thread(struct thread_entry *thread)
 
     if (thread == current)
     {
-        SDL_UnlockMutex(m);
+        /* Do a graceful exit - perform the longjmp back into the thread
+           function to return */
+        longjmp(thread_jmpbufs[current - threads], 1);
     }
 
     SDL_KillThread(t);

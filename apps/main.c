@@ -282,6 +282,7 @@ static void init(void)
     /* Must be done before any code uses the multi-screen APi */
     screen_access_init();
     gui_syncstatusbar_init(&statusbars);
+    ata_init();
     settings_reset();
     settings_load(SETTINGS_ALL);
     gui_sync_wps_init();

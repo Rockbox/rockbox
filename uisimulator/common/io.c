@@ -233,31 +233,29 @@ static int io_thread(void *data)
     (void)data;
 }
 
-void sim_io_init(void)
+bool sim_io_init(void)
 {
-    mutex_init(&io.sim_mutex);
-
     io.ready = 0;
 
     io.m = SDL_CreateMutex();
     if (io.m == NULL)
     {
         fprintf(stderr, "Failed to create IO mutex\n");
-        exit(-1);
+        return false;
     }
 
     io.c = SDL_CreateCond();
     if (io.c == NULL)
     {
         fprintf(stderr, "Failed to create IO cond\n");
-        exit(-1);
+        return false;
     }
 
     io.t = SDL_CreateThread(io_thread, NULL);
     if (io.t == NULL)
     {
         fprintf(stderr, "Failed to create IO thread\n");
-        exit(-1);
+        return false;
     }
 
     /* Wait for IO thread to lock mutex */
@@ -268,6 +266,15 @@ void sim_io_init(void)
     SDL_LockMutex(io.m);
     /* Free it for another thread */
     SDL_UnlockMutex(io.m);
+
+    return true;
+}
+
+int ata_init(void)
+{
+    /* Initialize the rockbox kernel objects on a rockbox thread */
+    mutex_init(&io.sim_mutex);
+    return 1;
 }
 
 void sim_io_shutdown(void)

@@ -19,6 +19,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <setjmp.h>
 #include "autoconf.h"
 #include "button.h"
 #include "thread.h"
@@ -41,7 +42,7 @@
 extern void                 app_main (void *); /* mod entry point */
 extern void                 new_key(int key);
 extern void                 sim_tick_tasks(void);
-extern void                 sim_io_init(void);
+extern bool                 sim_io_init(void);
 extern void                 sim_io_shutdown(void);
 
 void button_event(int key, bool pressed);
@@ -49,7 +50,6 @@ void button_event(int key, bool pressed);
 SDL_Surface *gui_surface;
 bool background = false;        /* Don't use backgrounds by default */
 
-SDL_Thread *gui_thread;
 SDL_TimerID tick_timer_id;
 
 bool lcd_display_redraw = true;         /* Used for player simulator */
@@ -170,19 +170,11 @@ bool gui_startup(void)
 bool gui_shutdown(void)
 {
     SDL_RemoveTimer(tick_timer_id);
-    kill_sim_threads();
+    /* Order here is relevent to prevent deadlocks and use of destroyed
+       sync primitives by kernel threads */
+    thread_sdl_shutdown();
     sim_io_shutdown();
     return true;
-}
-
-/**
- * Thin wrapper around normal app_main() to stop gcc complaining about types.
- */
-int sim_app_main(void *param)
-{
-    app_main(param);
-
-    return 0;
 }
 
 #if defined(WIN32) && defined(main)
@@ -231,14 +223,19 @@ int main(int argc, char *argv[])
         background = false;
     }
 
-    sim_io_init();
-
-    if (!gui_startup())
+    if (!sim_io_init()) {
+        fprintf(stderr, "sim_io_init failed\n");
         return -1;
+    }
 
-    gui_thread = SDL_CreateThread(sim_app_main, NULL);
-    if (gui_thread == NULL) {
-        printf("Error creating GUI thread!\n");
+    if (!gui_startup()) {
+        fprintf(stderr, "gui_startup failed\n");
+        return -1;
+    }
+
+    /* app_main will be called by the new main thread */
+    if (!thread_sdl_init(NULL)) {
+        fprintf(stderr, "thread_sdl_init failed\n");
         return -1;
     }
 
