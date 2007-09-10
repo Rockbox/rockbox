@@ -68,7 +68,7 @@ static bool loadFile( const char * name, unsigned char * buf, int len )
 {
     char filename[MAX_PATH];
 
-    rb->snprintf(filename,sizeof(filename),"/.rockbox/pacman/%s",name);
+    rb->snprintf(filename,sizeof(filename), ROCKBOX_DIR "/pacman/%s",name);
 
     int fd = rb->open( filename, O_RDONLY);
 
@@ -419,7 +419,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                             SETTINGS_VERSION);
         }
     } else {
-        rb->splash(HZ*2, "No ROMs in /.rockbox/pacman/");
+        rb->splash(HZ*2, "No ROMs in %s/pacman/", ROCKBOX_DIR);
     }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ

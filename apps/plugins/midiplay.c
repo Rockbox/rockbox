@@ -237,7 +237,8 @@ int midimain(void * filename)
         return -1;
     }
 
-    if (initSynth(mf, "/.rockbox/patchset/patchset.cfg", "/.rockbox/patchset/drums.cfg") == -1)
+    if (initSynth(mf, ROCKBOX_DIR "/patchset/patchset.cfg",
+        ROCKBOX_DIR "/patchset/drums.cfg") == -1)
         return -1;
 
 //#ifndef SIMULATOR

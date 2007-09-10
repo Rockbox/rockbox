@@ -107,7 +107,8 @@ int midimain(void * filename)
     struct MIDIfile * mf = loadFile(filename);
 
     rb->splash(HZ/5, "LOADING PATCHES");
-    if (initSynth(mf, "/.rockbox/patchset/patchset.cfg", "/.rockbox/patchset/drums.cfg") == -1)
+    if (initSynth(mf, ROCKBOX_DIR "/patchset/patchset.cfg",
+        ROCKBOX_DIR "/patchset/drums.cfg") == -1)
     {
         return -1;
     }

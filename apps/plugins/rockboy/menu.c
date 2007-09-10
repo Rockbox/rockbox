@@ -35,7 +35,7 @@ static void do_slot_menu(bool is_load);
 static void munge_name(char *buf, size_t bufsiz);
 
 /* directory ROM save slots belong in */
-#define STATE_DIR "/.rockbox/rockboy"
+#define STATE_DIR ROCKBOX_DIR "/rockboy"
 
 int getbutton(char *text)
 {

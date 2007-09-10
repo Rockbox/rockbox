@@ -121,6 +121,6 @@ struct options {
 bool plugbuf;
 
 extern struct options options;
-#define savedir "/.rockbox/rockboy"
+#define savedir ROCKBOX_DIR "/rockboy"
 
 #endif

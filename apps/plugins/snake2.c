@@ -370,7 +370,7 @@ int load_all_levels(void)
     return 0;
 }
 
-/*Hi-Score reading and writing to file "/.rockbox/snake2.levels" function */
+/*Hi-Score reading and writing to file "/.rockbox/rocks/games/snake2.levels" function */
 void iohiscore(void)
 {
     int fd;

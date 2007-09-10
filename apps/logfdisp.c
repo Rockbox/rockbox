@@ -108,7 +108,7 @@ bool logfdump(void)
         /* nothing is logged just yet */
         return false;
     
-    fd = open("/.rockbox/logf.txt", O_CREAT|O_WRONLY|O_TRUNC);
+    fd = open(ROCKBOX_DIR "/logf.txt", O_CREAT|O_WRONLY|O_TRUNC);
     if(-1 != fd) {
         unsigned char buffer[MAX_LOGF_ENTRY +1];
         int index = logfindex-1;
