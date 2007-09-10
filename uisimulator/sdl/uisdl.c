@@ -112,7 +112,7 @@ bool gui_startup(void)
     int width, height;
 
     if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_TIMER)) {
-        fprintf(stderr, "fatal: %s", SDL_GetError());
+        fprintf(stderr, "fatal: %s\n", SDL_GetError());
         return false;
     }
 
@@ -123,7 +123,7 @@ bool gui_startup(void)
         picture_surface = SDL_LoadBMP("UI256.bmp");
         if (picture_surface == NULL) {
             background = false;
-            fprintf(stderr, "warn: %s", SDL_GetError());
+            fprintf(stderr, "warn: %s\n", SDL_GetError());
         }
     }
 
