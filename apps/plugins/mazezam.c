@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "plugin.h"
 #include "configfile.h"
+#include "helper.h"
 
 /* Include standard plugin macro */
 PLUGIN_HEADER
@@ -225,7 +226,8 @@ static const struct textpage title_page = {
 static const struct textpage help_page[] = {
     {4,{"Instructions","10 mazezams","bar your way","to freedom"}},
     {4,{"Instructions","Push the rows","left and right","to escape"}},
-    {4,{"Instructions","Press " MAZEZAM_RETRY_KEYNAME " to","retry a level","(lose 1 life)"}},
+    {4,{"Instructions","Press " MAZEZAM_RETRY_KEYNAME " to","retry a level",
+                                                              "(lose 1 life)"}},
     {4,{"Instructions","Press " MAZEZAM_QUIT_KEYNAME,"to quit","the game"}}
 };
 
@@ -367,7 +369,8 @@ struct resume_data {
 /* Display a screen of text. line[0] is the heading.
  * line[highlight] will be highlighted, unless highlight == 0
  */
-static void display_text_page(struct textpage text, int highlight) {
+static void display_text_page(struct textpage text, int highlight)
+{
     int w[text.num_lines], h[text.num_lines];
     int hsum,i,vgap,vnext;
 
@@ -390,13 +393,15 @@ static void display_text_page(struct textpage text, int highlight) {
     rb->lcd_set_foreground(MAZEZAM_BORDER_GRAY);
 #endif
     rb->lcd_drawrect((LCD_WIDTH-w[0])/2-MAZEZAM_MENU_BORDER,
-            vgap-MAZEZAM_MENU_BORDER, w[0] + 2*MAZEZAM_MENU_BORDER,
-            h[0] + 2*MAZEZAM_MENU_BORDER);
+                     vgap-MAZEZAM_MENU_BORDER, w[0] + 2*MAZEZAM_MENU_BORDER,
+                     h[0] + 2*MAZEZAM_MENU_BORDER);
     rb->lcd_drawrect((LCD_WIDTH-w[0])/2-MAZEZAM_MENU_BORDER*2,
-            vgap-MAZEZAM_MENU_BORDER*2, w[0] + 4*MAZEZAM_MENU_BORDER,
-            h[0] + 4*MAZEZAM_MENU_BORDER);
-    rb->lcd_drawline(0,vgap + h[0]/2,(LCD_WIDTH-w[0])/2-MAZEZAM_MENU_BORDER*2,vgap + h[0]/2);
-    rb->lcd_drawline((LCD_WIDTH-w[0])/2+w[0]+MAZEZAM_MENU_BORDER*2,vgap + h[0]/2,LCD_WIDTH-1,vgap + h[0]/2);
+                     vgap-MAZEZAM_MENU_BORDER*2, w[0] + 4*MAZEZAM_MENU_BORDER,
+                     h[0] + 4*MAZEZAM_MENU_BORDER);
+    rb->lcd_drawline(0,vgap + h[0]/2,(LCD_WIDTH-w[0])/2-MAZEZAM_MENU_BORDER*2,
+                     vgap + h[0]/2);
+    rb->lcd_drawline((LCD_WIDTH-w[0])/2+w[0]+MAZEZAM_MENU_BORDER*2,
+                     vgap + h[0]/2,LCD_WIDTH-1,vgap + h[0]/2);
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(MAZEZAM_HEADING_COLOR);
 #elif LCD_DEPTH > 1
@@ -433,7 +438,8 @@ static void display_text_page(struct textpage text, int highlight) {
  * replaced by a file read. Returns true if the level parsed correctly.
  */
 static bool parse_level(short level, struct chunk_data *cd,
-        short *width, short *height, short *entrance, short *exit) {
+        short *width, short *height, short *entrance, short *exit)
+{
     int i,j;
     char c,clast;
 
@@ -479,7 +485,8 @@ static void draw_level(
         short entrance,
         short exit,
         short x, /* player's x and y coords */
-        short y) {
+        short y)
+{
     /* The number of pixels the side of a square should be */
     short size = (LCD_WIDTH/(width+2)) < (LCD_HEIGHT/height) ?
                  (LCD_WIDTH/(width+2)) : (LCD_HEIGHT/height);
@@ -513,15 +520,20 @@ static void draw_level(
     /* draw the upper wall */
     rb->lcd_fillrect(0,0,xOff,yOff+(size*entrance));
     rb->lcd_fillrect(xOff,0,size*width,yOff);
-    rb->lcd_fillrect(xOff+(size*width),0,LCD_WIDTH-xOff-(size*width),yOff+(size*exit));
+    rb->lcd_fillrect(xOff+(size*width),0,LCD_WIDTH-xOff-(size*width),
+                     yOff+(size*exit));
 
     /* draw the lower wall */
-    rb->lcd_fillrect(0,yOff+(size*entrance)+size,xOff,LCD_HEIGHT-yOff-(size*entrance)-size);
-    rb->lcd_fillrect(xOff,yOff+(size*height),size*width,LCD_HEIGHT-yOff-(size*height));
+    rb->lcd_fillrect(0,yOff+(size*entrance)+size,xOff,
+                     LCD_HEIGHT-yOff-(size*entrance)-size);
+    rb->lcd_fillrect(xOff,yOff+(size*height),size*width,
+                     LCD_HEIGHT-yOff-(size*height));
     /* Note: the exit is made one pixel thinner than necessary as a visual
      * clue that chunks cannot be pushed into it
      */
-    rb->lcd_fillrect(xOff+(size*width),yOff+(size*exit)+size-1,LCD_WIDTH-xOff+(size*width),LCD_HEIGHT-yOff-(size*exit)-size+1);
+    rb->lcd_fillrect(xOff+(size*width),yOff+(size*exit)+size-1,
+                     LCD_WIDTH-xOff+(size*width),
+                     LCD_HEIGHT-yOff-(size*exit)-size+1);
 
     /* draw the chunks */
     for (i = 0; i<height; i++) {
@@ -529,35 +541,47 @@ static void draw_level(
         /* adding width to i should have a fixed, but randomising effect on
          * the choice of the colours of the top line of chunks
          */
-        rb->lcd_set_foreground(chunk_colors[(i+width) % MAZEZAM_NUM_CHUNK_COLORS]);
+        rb->lcd_set_foreground(chunk_colors[(i+width) % 
+                               MAZEZAM_NUM_CHUNK_COLORS]);
 #endif
         for (j = 0; j<cd->l_num[i]; j++) {
 #ifdef HAVE_LCD_COLOR
-            rb->lcd_fillrect(xOff+size*shift[i]+size*cd->c_inset[i][j],yOff+size*i,
-                    cd->c_width[i][j]*size,size);
+            rb->lcd_fillrect(xOff+size*shift[i]+size*cd->c_inset[i][j],
+                             yOff+size*i, cd->c_width[i][j]*size,size);
 #elif LCD_DEPTH > 1
             rb->lcd_set_foreground(MAZEZAM_CHUNK_EDGE_GRAY);
-            rb->lcd_drawrect(xOff+size*shift[i]+size*cd->c_inset[i][j],yOff+size*i,
-                    cd->c_width[i][j]*size,size);
+            rb->lcd_drawrect(xOff+size*shift[i]+size*cd->c_inset[i][j],
+                             yOff+size*i, cd->c_width[i][j]*size,size);
 
             /* draw shade */
-            rb->lcd_set_foreground(chunk_gray_shade[(i+width) % MAZEZAM_NUM_CHUNK_GRAYS]);
-            rb->lcd_drawline(xOff+size*shift[i]+size*cd->c_inset[i][j]+1,yOff+size*i+size-2,
-                    xOff+size*shift[i]+size*cd->c_inset[i][j]+cd->c_width[i][j]*size-3,yOff+size*i+size-2);
-            rb->lcd_drawline(xOff+size*shift[i]+size*cd->c_inset[i][j]+cd->c_width[i][j]*size-2,yOff+size*i,
-                    xOff+size*shift[i]+size*cd->c_inset[i][j]+cd->c_width[i][j]*size-2,yOff+size*i+size-2);
+            rb->lcd_set_foreground(chunk_gray_shade[(i+width) %
+                                   MAZEZAM_NUM_CHUNK_GRAYS]);
+            rb->lcd_drawline(xOff+size*shift[i]+size*cd->c_inset[i][j]+1,
+                             yOff+size*i+size-2,
+                             xOff+size*shift[i]+size*cd->c_inset[i][j]+
+                                                       cd->c_width[i][j]*size-3,
+                             yOff+size*i+size-2);
+            rb->lcd_drawline(xOff+size*shift[i]+size*cd->c_inset[i][j]+
+                                                       cd->c_width[i][j]*size-2,
+                             yOff+size*i,
+                             xOff+size*shift[i]+size*cd->c_inset[i][j]+
+                                                       cd->c_width[i][j]*size-2,
+                             yOff+size*i+size-2);
 
             /* draw fill */
-            rb->lcd_set_foreground(chunk_gray[(i+width) % MAZEZAM_NUM_CHUNK_GRAYS]);
+            rb->lcd_set_foreground(chunk_gray[(i+width) %
+                                   MAZEZAM_NUM_CHUNK_GRAYS]);
             for (k = yOff+size*i+2; k <  yOff+size*i+size-2; k += 2)
                 rb->lcd_drawline(xOff+size*shift[i]+size*cd->c_inset[i][j]+2,k,
-                    xOff+size*shift[i]+size*cd->c_inset[i][j]+cd->c_width[i][j]*size-3,k);
+                                 xOff+size*shift[i]+size*cd->c_inset[i][j]+
+                                                    cd->c_width[i][j]*size-3,k);
 #else
-            rb->lcd_drawrect(xOff+size*shift[i]+size*cd->c_inset[i][j],yOff+size*i,
-                    cd->c_width[i][j]*size,size);
+            rb->lcd_drawrect(xOff+size*shift[i]+size*cd->c_inset[i][j],
+                             yOff+size*i, cd->c_width[i][j]*size,size);
             for (k = xOff+size*shift[i]+size*cd->c_inset[i][j]+2;
-                    k < xOff+size*shift[i]+size*cd->c_inset[i][j]+cd->c_width[i][j]*size;
-                    k += 2 + (i & 1))
+                 k < xOff+size*shift[i]+size*cd->c_inset[i][j]+
+                                                         cd->c_width[i][j]*size;
+                 k += 2 + (i & 1))
                 for (l = yOff+size*i+2; l <  yOff+size*i+size; l += 2 + (i & 1))
                      rb->lcd_drawpixel(k, l);
 #endif
@@ -598,7 +622,8 @@ static void draw_level(
 }
 
 /* Manage the congratulations screen */
-static enum text_state welldone_screen(void) {
+static enum text_state welldone_screen(void)
+{
     int button = BUTTON_NONE;
     enum text_state state = TEXT_STATE_LOOPING;
 
@@ -630,7 +655,8 @@ static enum text_state welldone_screen(void) {
 }
 
 /* Manage the quit confimation screen */
-static enum text_state quitconfirm_loop(void) {
+static enum text_state quitconfirm_loop(void)
+{
     int button = BUTTON_NONE;
     enum text_state state = TEXT_STATE_LOOPING;
     short select = 2;
@@ -678,7 +704,8 @@ static enum text_state quitconfirm_loop(void) {
 }
 
 /* Manage the playing of a level */
-static enum level_state level_loop(short level, short lives) {
+static enum level_state level_loop(short level, short lives)
+{
     struct chunk_data cd;
     short shift[MAZEZAM_MAX_LINES]; /* amount each line has been shifted */
     short width;
@@ -708,7 +735,8 @@ static enum level_state level_loop(short level, short lives) {
      */
     rb->lcd_remote_clear_display();
 #endif
-    rb->splash(MAZEZAM_LEVEL_LIVES_DELAY, MAZEZAM_LEVEL_LIVES_TEXT, level+1, lives);
+    rb->splash(MAZEZAM_LEVEL_LIVES_DELAY, MAZEZAM_LEVEL_LIVES_TEXT,
+               level+1, lives);
 
     /* ensure keys pressed during the splash screen are ignored */
     rb->button_clear_queue();
@@ -724,8 +752,10 @@ static enum level_state level_loop(short level, short lives) {
             case MAZEZAM_UP | BUTTON_REPEAT:
                 if ((y > 0) && (x >= 0) && (x < width)) {
                     for (i = 0; i < cd.l_num[y-1]; i++)
-                        blocked = blocked || ((x>=shift[y-1]+cd.c_inset[y-1][i])
-                                && (x<shift[y-1]+cd.c_inset[y-1][i]+cd.c_width[y-1][i]));
+                        blocked = blocked ||
+                                  ((x>=shift[y-1]+cd.c_inset[y-1][i]) &&
+                                   (x<shift[y-1]+cd.c_inset[y-1][i]+
+                                                           cd.c_width[y-1][i]));
                     if (!blocked) y -= 1;
                 }
                 break;
@@ -734,8 +764,10 @@ static enum level_state level_loop(short level, short lives) {
             case MAZEZAM_DOWN | BUTTON_REPEAT:
                 if ((y < height-1) && (x >= 0) && (x < width)) {
                     for (i = 0; i < cd.l_num[y+1]; i++)
-                        blocked = blocked || ((x>=shift[y+1]+cd.c_inset[y+1][i])
-                                && (x<shift[y+1]+cd.c_inset[y+1][i]+cd.c_width[y+1][i]));
+                        blocked = blocked ||
+                                  ((x>=shift[y+1]+cd.c_inset[y+1][i]) &&
+                                   (x<shift[y+1]+cd.c_inset[y+1][i]+
+                                                           cd.c_width[y+1][i]));
                     if (!blocked) y += 1;
                 }
                 break;
@@ -744,7 +776,9 @@ static enum level_state level_loop(short level, short lives) {
             case MAZEZAM_LEFT | BUTTON_REPEAT:
                 if (x > 0) {
                     for (i = 0; i < cd.l_num[y]; i++)
-                        blocked = blocked || (x == shift[y]+cd.c_inset[y][i]+cd.c_width[y][i]);
+                        blocked = blocked ||
+                                  (x == shift[y]+cd.c_inset[y][i]+
+                                                              cd.c_width[y][i]);
                     if (!blocked) x -= 1;
                     else if (shift[y] + cd.c_inset[y][0] > 0) {
                         x -= 1;
@@ -759,7 +793,8 @@ static enum level_state level_loop(short level, short lives) {
                     for (i = 0; i < cd.l_num[y]; i++)
                         blocked = blocked || (x+1 == shift[y]+cd.c_inset[y][i]);
                     if (!blocked) x += 1;
-                    else if (shift[y] + cd.c_inset[y][cd.l_num[y]-1] + cd.c_width[y][cd.l_num[y]-1] < width) {
+                    else if (shift[y] + cd.c_inset[y][cd.l_num[y]-1] +
+                                         cd.c_width[y][cd.l_num[y]-1] < width) {
                         x += 1;
                         shift[y] += 1;
                     }
@@ -798,7 +833,8 @@ static enum level_state level_loop(short level, short lives) {
 }
 
 /* The loop which manages a full game of MazezaM */
-static enum game_state game_loop(struct resume_data *r) {
+static enum game_state game_loop(struct resume_data *r)
+{
     enum game_state state = GAME_STATE_LOOPING;
     int level = r->level;
     int lives = MAZEZAM_START_LIVES;
@@ -880,7 +916,8 @@ static enum game_state game_loop(struct resume_data *r) {
 }
 
 /* Manage the instruction screen */
-static enum text_state instruction_loop(void) {
+static enum text_state instruction_loop(void)
+{
     int button;
     enum text_state state = TEXT_STATE_LOOPING;
     int page = 0;
@@ -922,7 +959,8 @@ static enum text_state instruction_loop(void) {
 /* Manage the text screen that offers the user the option of
  * resuming or starting a new game
  */
-static enum text_state resume_game_loop (struct resume_data *r) {
+static enum text_state resume_game_loop (struct resume_data *r)
+{
     int button = BUTTON_NONE;
     enum text_state state = TEXT_STATE_LOOPING;
     short select = 0;
@@ -979,12 +1017,15 @@ static enum text_state resume_game_loop (struct resume_data *r) {
 /* Load the resume data from the config file. The data is
  * stored in both r and old.
  */
-static void resume_load_data (struct resume_data *r, struct resume_data *old) {
+static void resume_load_data (struct resume_data *r, struct resume_data *old)
+{
     struct configdata config[] = {
-        {TYPE_INT,0,MAZEZAM_NUM_LEVELS-1,&(r->level),MAZEZAM_CONFIG_LEVELS_NAME,NULL,NULL}
+        {TYPE_INT,0,MAZEZAM_NUM_LEVELS-1,&(r->level),
+         MAZEZAM_CONFIG_LEVELS_NAME,NULL,NULL}
     };
 
-    if (configfile_load(MAZEZAM_CONFIG_FILENAME,config,MAZEZAM_CONFIG_NUM_ITEMS,MAZEZAM_CONFIG_VERSION) < 0)
+    if (configfile_load(MAZEZAM_CONFIG_FILENAME,config,MAZEZAM_CONFIG_NUM_ITEMS,
+                        MAZEZAM_CONFIG_VERSION) < 0)
         r->level = 0;
     /* an extra precaution */
     else if ((r->level < 0) || (MAZEZAM_NUM_LEVELS <= r->level))
@@ -994,20 +1035,24 @@ static void resume_load_data (struct resume_data *r, struct resume_data *old) {
 }
 
 /* Save the resume data in the config file, but only if necessary */
-static void resume_save_data (struct resume_data *r, struct resume_data *old) {
+static void resume_save_data (struct resume_data *r, struct resume_data *old)
+{
     struct configdata config[] = {
-        {TYPE_INT,0,MAZEZAM_NUM_LEVELS-1,&(r->level),MAZEZAM_CONFIG_LEVELS_NAME,NULL,NULL}
+        {TYPE_INT,0,MAZEZAM_NUM_LEVELS-1,&(r->level),
+         MAZEZAM_CONFIG_LEVELS_NAME,NULL,NULL}
     };
 
     /* To reduce disk usage, only write the file if the resume data has
      * changed.
      */
     if (old->level != r->level)
-      configfile_save(MAZEZAM_CONFIG_FILENAME,config,MAZEZAM_CONFIG_NUM_ITEMS,MAZEZAM_CONFIG_MINVERSION);
+        configfile_save(MAZEZAM_CONFIG_FILENAME,config,MAZEZAM_CONFIG_NUM_ITEMS,
+                        MAZEZAM_CONFIG_MINVERSION);
 }
 
 /* The loop which manages the welcome screen and menu */
-static enum text_state welcome_loop(void) {
+static enum text_state welcome_loop(void)
+{
     int button;
     short select = 0;
     enum text_state state = TEXT_STATE_LOOPING;
@@ -1026,7 +1071,8 @@ static enum text_state welcome_loop(void) {
                 break;
 
             case MAZEZAM_UP:
-                select = (select + (title_page.num_lines - 2)) % (title_page.num_lines - 1);
+                select = (select + (title_page.num_lines - 2)) %
+                         (title_page.num_lines - 1);
                 break;
 
             case MAZEZAM_DOWN:
@@ -1106,12 +1152,16 @@ static enum text_state welcome_loop(void) {
 }
 
 /* Plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
+enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+{
     enum plugin_status state;
 
     /* Usual plugin stuff */
     (void)parameter;
     rb = api;
+
+    /* Turn off backlight timeout */
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
 
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_background(MAZEZAM_BG_COLOR);
@@ -1137,6 +1187,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
             state = PLUGIN_OK;
             break;
     }
+
+    /* Turn on backlight timeout (revert to settings) */
+    backlight_use_settings(rb); /* backlight control in lib/helper.c */
 
     return state;
 }

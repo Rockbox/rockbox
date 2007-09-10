@@ -112,7 +112,7 @@ void coord_stack_push(struct coord_stack* stack, int x, int y)
 }
 
 void coord_stack_get(struct coord_stack* stack, int index, int* x, int* y)
- {
+{
     *y = stack->data[index];
     *y &= 0xff;
     *x = (stack->data[index])>>8;
@@ -390,7 +390,8 @@ void maze_solve(struct maze* maze)
     maze->solved = ~(maze->solved);
 
     /* copy maze for solving */
-    rb->memcpy(solved_maze, maze->maze, (MAZE_HEIGHT*MAZE_WIDTH*sizeof(maze->maze[0][0])));
+    rb->memcpy(solved_maze, maze->maze,
+               (MAZE_HEIGHT*MAZE_WIDTH*sizeof(maze->maze[0][0])));
 
 
     /* remove some  borders and walls on start and end point */
