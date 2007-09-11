@@ -582,13 +582,13 @@ int radio_screen(void)
 #ifndef SIMULATOR
                 if(audio_status() == AUDIO_STATUS_RECORD)
                 {
-                    rec_new_file();
+                    rec_command(RECORDING_CMD_START_NEWFILE);
                     update_screen = true;
                 }
                 else
                 {
                     have_recorded = true;
-                    rec_record();
+                    rec_command(RECORDING_CMD_START);
                     update_screen = true;
                 }
 #endif /* SIMULATOR */

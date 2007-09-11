@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Wenger
- *   $Id: installzip.h 13990 2007-07-25 22:26:10Z Dominik Wenger $
+ *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -42,8 +42,12 @@ public:
     void setProxy(QUrl proxy) {m_proxy= proxy;}
     void setLogSection(QString name) {m_loglist = QStringList(name);}
     void setLogSection(QStringList name) { m_loglist = name; }
+    void setLogVersion(QString v) { m_verlist = QStringList(v); qDebug() << m_verlist;}
+    void setLogVersion(QStringList v) { m_verlist = v; qDebug() << m_verlist;}
     void setUnzip(bool i) { m_unzip = i; }
     void setTarget(QString t) { m_target = t; }
+    void setCache(QDir c) { m_cache = c; };
+    void setCache(QString c) { m_cache = QDir(c);}
     
 signals:
     void done(bool error);
@@ -58,12 +62,13 @@ private slots:
 
 private:
     void installSingle(ProgressloggerInterface *dp);
-    QString m_url, m_file, m_mountpoint, m_logsection;
-    QStringList m_urllist, m_loglist;
+    QString m_url, m_file, m_mountpoint, m_logsection, m_logver;
+    QStringList m_urllist, m_loglist, m_verlist;
     QUrl m_proxy;
     bool m_unzip;
     QString m_target;
     int runner;
+    QDir m_cache;
     
     HttpGet *getter;
     QTemporaryFile *downloadFile;
@@ -74,4 +79,5 @@ private:
  
 
 #endif
+
 

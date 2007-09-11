@@ -29,3 +29,4 @@ void digital_clock_draw(struct screen* display, struct time* time,
                         struct counter* counter, int skin);
 
 #endif /* _DIGITAL_CLOCK_ */
+

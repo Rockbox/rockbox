@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Riebeling
- *   $Id: version.h 13990 2007-07-25 22:26:10Z bluebrother $
+ *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -17,4 +17,5 @@
  *
  ****************************************************************************/
 
-#define VERSION "0.1qt"
+#define VERSION "SVN $Revision$ (m1.0.1)"
+

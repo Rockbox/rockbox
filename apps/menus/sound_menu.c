@@ -36,7 +36,9 @@
 /***********************************/
 /*    SOUND MENU                   */
 #if CONFIG_CODEC == SWCODEC
-int soundmenu_callback(int action,const struct menu_item_ex *this_item)
+/* This callback is also used in the eq menu to toggle low latency mode.
+   So, remember this if the callback is used for anything other than the togging */
+int soundmenu_callback(int action, const struct menu_item_ex *this_item)
 {
     (void)this_item;
     switch (action)

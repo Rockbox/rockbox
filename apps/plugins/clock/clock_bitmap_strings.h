@@ -29,3 +29,4 @@ void draw_string(struct screen* display, const struct picture* bitmaps,
 void getstringsize(const struct picture* bitmaps, char* str, int *w, int *h );
 
 #endif /* _CLOCK_BITMAP_STRINGS_ */
+

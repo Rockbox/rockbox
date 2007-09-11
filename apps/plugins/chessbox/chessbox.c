@@ -672,7 +672,6 @@ void cb_start_viewer(char* filename){
                             curr_ply = curr_ply->prev_node;
                         } else {
                             rb->splash ( 200 , "At the begining of the game" );
-                            cb_drawboard();
                             break;
                         }
                         board[locn[curr_ply->row_from][curr_ply->column_from]] 
@@ -952,7 +951,8 @@ struct cb_command cb_getcommand (void) {
 /* ---- game main loop ---- */
 void cb_play_game(void) {
     struct cb_command command;
-    char move_buffer[10];
+    struct pgn_game_node *game;
+    char move_buffer[20];
 
     /* init status */
     bool exit = false;
@@ -961,9 +961,13 @@ void cb_play_game(void) {
 
     /* init board */
     GNUChess_Initialize();
+
+    /* init PGN history data structures */
+    game = pgn_init_game(rb);
     
     /* restore saved position, if saved */
     cb_restoreposition();
+    /* TODO: save/restore the PGN history of unfinished games */
     
     /* draw the board */
     /* I don't like configscreens, start game inmediatly */
@@ -973,17 +977,23 @@ void cb_play_game(void) {
         if ( mate ) {
             rb->splash ( 500 , "Checkmate!" );
             rb->button_get(true);
+            pgn_store_game(rb, game);
             GNUChess_Initialize();
+            game = pgn_init_game(rb);
             cb_drawboard();
         }
         command = cb_getcommand ();
         switch (command.type) {
             case COMMAND_MOVE:
-                if ( ! VerifyMove ( command.mv_s , 0 , &command.mv ) ) {
+                if ( ! VerifyMove (opponent, command.mv_s , 0 , &command.mv, move_buffer ) ) {
                     rb->splash ( 50 , "Illegal move!" );
                     cb_drawboard();
                 } else {
                     cb_drawboard();
+
+                    /* Add the ply to the PGN history (in algebraic notation) */
+                    pgn_append_ply(rb, game, opponent, move_buffer, mate);
+
                     rb->splash ( 0 , "Thinking..." );
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
                     rb->cpu_boost ( true );
@@ -992,6 +1002,15 @@ void cb_play_game(void) {
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
                     rb->cpu_boost ( false );
 #endif
+                    /* Add the ply to the PGN history (in algebraic notation) and check
+                     * for the result of the game which is only calculated in SelectMove
+                     */
+                    if (move_buffer[0] != '\0'){
+                        pgn_append_ply(rb, game, computer, move_buffer, mate);
+                    } else {
+                        pgn_set_result(rb, game, mate);
+                    }
+
                     if ( wt_command == COMMAND_QUIT ) {
                         exit = true;
                         break;
@@ -1002,6 +1021,7 @@ void cb_play_game(void) {
 #ifdef COMMAND_RESTART
             case COMMAND_RESTART:
                 GNUChess_Initialize();
+                game = pgn_init_game(rb);
                 cb_drawboard();
                 break;
 #endif
@@ -1017,7 +1037,10 @@ void cb_play_game(void) {
 
                 /* init board */
                 GNUChess_Initialize();
-    
+
+                /* init PGN history data structures */
+                game = pgn_init_game(rb);
+
                 /* restore saved position, if saved */
                 cb_restoreposition();
 
@@ -1040,6 +1063,16 @@ void cb_play_game(void) {
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
                 rb->cpu_boost ( false );
 #endif
+
+                /* Add the ply to the PGN history (in algebraic notation) and check
+                 * for the result of the game which is only calculated in SelectMove
+                 */
+                if (move_buffer[0] != '\0'){
+                    pgn_append_ply(rb, game, computer, move_buffer, mate);
+                } else {
+                    pgn_set_result(rb, game, mate);
+                }
+
                 if ( wt_command == COMMAND_QUIT ) {
                     exit = true;
                     break;
@@ -1057,6 +1090,7 @@ void cb_play_game(void) {
     }
     
     cb_saveposition();
+    /* TODO: save/restore the PGN history of unfinished games */
     rb->lcd_setfont(FONT_UI);
 
 }

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Riebeling
- *   $Id: main.cpp 14260 2007-08-09 18:40:32Z bluebrother $
+ *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -21,6 +21,10 @@
 #include <QtGui>
 #include "rbutilqt.h"
 
+#ifdef STATIC
+#include <QtPlugin>
+Q_IMPORT_PLUGIN(qtaccessiblewidgets)
+#endif
 
 int main( int argc, char ** argv ) {
     QApplication app( argc, argv );
@@ -34,11 +38,10 @@ int main( int argc, char ** argv ) {
     else user = new QSettings(QSettings::IniFormat, QSettings::UserScope, "rockbox.org", "RockboxUtility");
 
     QTranslator translator;
-    if(user->value("defaults/lang").toString() != "")
     // install translator
-    if(user->value("defaults/lang", "").toString() != "") {
-        if(!translator.load(user->value("defaults/lang").toString(), absolutePath))
-            translator.load(user->value("defaults/lang").toString(), ":/lang");
+    if(!user->value("lang", "").toString().isEmpty()) {
+        if(!translator.load("rbutil_" + user->value("lang").toString(), absolutePath))
+            translator.load("rbutil_" + user->value("lang").toString(), ":/lang");
     }
     delete user;
     app.installTranslator(&translator);
@@ -50,3 +53,4 @@ int main( int argc, char ** argv ) {
     return app.exec();
 
 }
+

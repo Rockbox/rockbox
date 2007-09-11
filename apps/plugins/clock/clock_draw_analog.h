@@ -30,3 +30,4 @@ void analog_clock_draw(struct screen* display, struct time* time,
                        int skin);
 
 #endif /* _ANALOG_CLOCK_ */
+

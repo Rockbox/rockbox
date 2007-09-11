@@ -42,6 +42,10 @@
 #endif
 
 #ifdef SIMULATOR
+/* TODO: find a better way to do it but we need a kernel thread somewhere to
+   handle this */
+extern void screen_dump(void);
+
 static inline void __backlight_on(void)
 {
     sim_backlight(100);

@@ -37,7 +37,7 @@
 
 #define COMPRESS_SAVE 1
 
-static char quick_snap_file[]="/.rockbox/zxboxq.z80";
+static char quick_snap_file[]= ROCKBOX_DIR "/zxboxq.z80";
 
 typedef struct {
   int isfile;

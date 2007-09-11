@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Riebeling
- *   $Id: uninstallwindow.cpp 14151 2007-08-02 22:27:51Z bluebrother $
+ *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -78,7 +78,7 @@ void UninstallWindow::setUserSettings(QSettings *user)
 {
     userSettings = user;
     
-    QString mountpoint =userSettings->value("defaults/mountpoint").toString();
+    QString mountpoint =userSettings->value("mountpoint").toString();
     uninstaller = new Uninstaller(this,mountpoint);
     
     // disable smart uninstall, if not possible
@@ -94,3 +94,4 @@ void UninstallWindow::setUserSettings(QSettings *user)
        ui.UninstalllistWidget->addItems(uninstaller->getAllSections());    
     }
 }
+

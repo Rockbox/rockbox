@@ -251,3 +251,4 @@ void analog_clock_draw(struct screen* display, struct time* time,
         draw_date(display, time, settings->general.date_format);
     draw_center_cover(display);
 }
+

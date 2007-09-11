@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Riebeling
- *   $Id: rbutilqt.h 14363 2007-08-15 21:54:15Z bluebrother $
+ *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -30,6 +30,7 @@
 #include "progressloggergui.h"
 #include "installbootloader.h"
 
+
 class RbUtilQt : public QMainWindow
 {
     Q_OBJECT
@@ -45,30 +46,62 @@ class RbUtilQt : public QMainWindow
         QString deviceName(QString);
         QString platform;
         HttpGet *daily;
+        HttpGet *bleeding;
         QString absolutePath;
         QTemporaryFile buildInfo;
+        QTemporaryFile bleedingInfo;
         void updateManual(void);
         ProgressLoggerGui *logger;
         ZipInstaller *installer;
         BootloaderInstaller* blinstaller;
+        QUrl proxy(void);
+        QMap<QString, QString> versmap;
+        
+        volatile bool m_installed;
+        volatile bool m_error;
 
     private slots:
         void about(void);
+        void help(void);
         void configDialog(void);
         void updateDevice(void);
         void updateSettings(void);
+        
+        void completeInstall(void);
+        void smallInstall(void);
+        void installdone(bool error);
+        
+        void installBtn(void);
+        bool installAuto(void);
         void install(void);
-        void installBl(void);
+        
+        void installBootloaderBtn(void);
+        bool installBootloaderAuto(void);
+        void installBootloader(void);
+                
+        void installFontsBtn(void);
+        bool installFontsAuto(void);
         void installFonts(void);
+        
+        void installDoomBtn(void);
+        bool installDoomAuto(void);
         void installDoom(void);
+        
         void createTalkFiles(void);
         void downloadDone(bool);
         void downloadDone(int, bool);
+        void downloadBleedingDone(bool);
         void downloadInfo(void);
         void installVoice(void);
         void installThemes(void);
         void uninstall(void);
         void uninstallBootloader(void);
+        void downloadManual(void);
+        void installPortable(void);
+        void updateInfo(void);
+        void updateTabs(int);
+
 };
 
 #endif
+

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Wenger
- *   $Id: installtalkwindow.h 14151 2007-08-02 22:27:51Z domonoky $
+ *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -32,7 +32,7 @@ class InstallTalkWindow : public QDialog
 {
     Q_OBJECT
     public:
-    	InstallTalkWindow(QWidget *parent = 0);
+        InstallTalkWindow(QWidget *parent = 0);
         void setUserSettings(QSettings*);
         void setDeviceSettings(QSettings*);
 
@@ -40,21 +40,11 @@ class InstallTalkWindow : public QDialog
         void accept(void);
 
     private slots:
-    	void browseFolder(void);
-    	void browseTTS(void);
-    	void browseEncoder(void);
-        
-    	void setTalkFolder(QString folder);
-    	void setTTSExec(QString path);
-    	void setEncoderExec(QString path);
-    	
-    	void setEncoderOptions(int index);
-    	void setTTSOptions(int index);
-    	void setEncoderOptions(QString options);
-    	void setTTSOptions(QString options);
-    	
+        void browseFolder(void);
+        void setTalkFolder(QString folder);
+
     private:
-    	TalkFileCreator* talkcreator;
+        TalkFileCreator* talkcreator;
         Ui::InstallTalkFrm ui;
         ProgressLoggerGui* logger;
         QSettings *devices;
@@ -62,5 +52,5 @@ class InstallTalkWindow : public QDialog
 
 };
 
-
 #endif
+

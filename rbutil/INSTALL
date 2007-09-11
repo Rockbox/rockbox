@@ -1,0 +1,32 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
+This is Rockbox Utility, the graphical installer and housekeeping utility
+for Rockbox.
+
+Requirements:
+- Qt 4.3.0 or greater
+
+Building:
+- run qmake
+- run make
+The resulting binary will be located in the rbutilqt subfolder. If you have
+multiple versions of Qt installed make sure to pick the correct one.
+
+The website for Rockbox Utility is 
+http://www.rockbox.org/wiki/RockboxUtility
+

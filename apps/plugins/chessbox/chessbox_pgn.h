@@ -33,6 +33,8 @@ struct pgn_ply_node {
     bool enpassant;
     bool castle;
     bool promotion;
+    bool checkmate;
+    bool draw;
     struct pgn_ply_node* prev_node;
     struct pgn_ply_node* next_node;
 };
@@ -54,14 +56,35 @@ struct pgn_game_node {
  * the user selects a game, that obviously saves processing
  * and speeds up response when the user selects the file
  */
-struct pgn_game_node* pgn_list_games(struct plugin_api* api, const char* filename);
+struct pgn_game_node* pgn_list_games(struct plugin_api* api,
+                                     const char* filename);
 
 /* Show the list of games found in a file and allow the user
  * to select a game to be parsed and showed
  */
-struct pgn_game_node* pgn_show_game_list(struct plugin_api* api, struct pgn_game_node* first_game);
+struct pgn_game_node* pgn_show_game_list(struct plugin_api* api,
+                                         struct pgn_game_node* first_game);
 
 /* Parse the pgn string of a game and assign it to the move
  * list in the structure
  */
-void pgn_parse_game(struct plugin_api* api, const char* filename, struct pgn_game_node* selected_game);
+void pgn_parse_game(struct plugin_api* api, const char* filename,
+                    struct pgn_game_node* selected_game);
+
+/* Initialize a new game structure with default values and make
+ * it ready to store the history of a newly played match
+ */
+struct pgn_game_node* pgn_init_game(struct plugin_api* api);
+
+/* Add a new ply to the game structure based on the positions */
+void pgn_append_ply(struct plugin_api* api, struct pgn_game_node* game,
+                    unsigned short ply_player, char *move_buffer, bool is_mate);
+
+/* Set the result of the game if it was reached during the opponent's ply
+ */
+void pgn_set_result(struct plugin_api* api, struct pgn_game_node* game,
+                    bool is_mate);
+
+/* Store a complete game in the PGN history file
+ */
+void pgn_store_game(struct plugin_api* api, struct pgn_game_node* game);

@@ -451,14 +451,14 @@ static void init_mad(void* mad_frame_overlap)
 #else
 /* Don't know what this is - use bytewise comparisons */
 #define CMP_3_CONST(a, b) \
-    (( ((a)[0] ^ ((b)       >> 24)) | \
-       ((a)[1] ^ ((b) <<  8 >> 24)) | \
-       ((a)[2] ^ ((b) << 16 >> 24)) ) == 0)
+    (( ((a)[0] ^ (((b) >> 24) & 0xff)) | \
+       ((a)[1] ^ (((b) >> 16) & 0xff)) | \
+       ((a)[2] ^ (((b) >> 8) & 0xff)) ) == 0)
 #define CMP_4_CONST(a, b) \
-    (( ((a)[0] ^ ((b)       >> 24)) | \
-       ((a)[1] ^ ((b) <<  8 >> 24)) | \
-       ((a)[2] ^ ((b) << 16 >> 24)) | \
-       ((a)[3] ^ ((b) << 24 >> 24)) ) == 0)
+    (( ((a)[0] ^ (((b) >> 24) & 0xff)) | \
+       ((a)[1] ^ (((b) >> 16) & 0xff)) | \
+       ((a)[2] ^ (((b) >> 8) & 0xff)) | \
+       ((a)[3] ^ ((b) & 0xff)) ) == 0)
 #endif
 
 /* Codes for various header byte sequences - MSB represents lowest memory

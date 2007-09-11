@@ -51,14 +51,23 @@ class Config : public QDialog
         QUrl proxy;
         
         BrowseDirtree *browser;
+        BrowseDirtree *cbrowser;
         
     private slots:
         void setNoProxy(bool);
         void setSystemProxy(bool);
         void updateLanguage(void);
         void browseFolder(void);
+        void browseCache(void);
         void autodetect(void);
         void setMountpoint(QString);
+        void setCache(QString);
+        void cacheClear(void);
+        void browseTts(void);
+        void browseEnc(void);
+        void updateTtsOpts(int);
+        void updateEncOpts(int);
 };
 
 #endif
+

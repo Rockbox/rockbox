@@ -9,10 +9,12 @@ rockbox-style.el
 sample.emacs
 *.pl
 *.inc
+*.pm
 fwpatcher/*.[ch]
 fwpatcher/Makefile
-fwpatcher/favicon.ico
+fwpatcher/*.ico
 fwpatcher/resource.rc
+fwpatcher/mksums.pl
 ucl/Makefile
 ucl/*.[ch]
 ucl/src/*.[ch]
@@ -22,3 +24,5 @@ ucl/include/ucl/*.h
 profile_reader/*.pl
 ipodpatcher/Makefile
 ipodpatcher/*.[ch]
+*.vbs
+VOICE_PAUSE.wav

@@ -58,3 +58,4 @@ void timer_unregister(void)
     SDL_RemoveTimer (timerId);
     timer_prio = -1;
 }
+

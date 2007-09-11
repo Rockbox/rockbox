@@ -38,3 +38,4 @@ void vertical_picture_draw_sprite(struct screen* display, const struct picture* 
                          int sprite_no,
                          int x, int y);
 #endif
+

@@ -218,7 +218,7 @@ static void load_memo(struct shown *shown)
     for (k = 0; k < 7; k++)
         wday_has_memo[k] = false;
     memos_in_memory = 0;
-    fp = rb->open("/.rockbox/.memo",O_RDONLY);
+    fp = rb->open(ROCKBOX_DIR "/.memo",O_RDONLY);
     if (fp > -1)
     {
         int count = rb->filesize(fp);
@@ -315,8 +315,8 @@ static void load_memo(struct shown *shown)
 static bool save_memo(int changed, bool new_mod, struct shown *shown)
 {
     int fp,fq;
-    fp = rb->open("/.rockbox/.memo",O_RDONLY | O_CREAT);
-    fq = rb->creat("/.rockbox/~temp");
+    fp = rb->open(ROCKBOX_DIR "/.memo",O_RDONLY | O_CREAT);
+    fq = rb->creat(ROCKBOX_DIR "/~temp");
     if ( (fq != -1) && (fp != -1) )
     {
         int i;
@@ -345,7 +345,7 @@ static bool save_memo(int changed, bool new_mod, struct shown *shown)
             rb->write(fq,temp,1);
         }
         rb->close(fp);
-        fp = rb->creat("/.rockbox/.memo");
+        fp = rb->creat(ROCKBOX_DIR "/.memo");
         rb->lseek(fp, 0, SEEK_SET);
         rb->lseek(fq, 0, SEEK_SET);
         for (i = 0; i < rb->filesize(fq); i++)
@@ -355,7 +355,7 @@ static bool save_memo(int changed, bool new_mod, struct shown *shown)
         }
         rb->close(fp);
         rb->close(fq);
-        rb->remove("/.rockbox/~temp");
+        rb->remove(ROCKBOX_DIR "/~temp");
         load_memo(shown);
         return true;
     }

@@ -39,7 +39,6 @@
 #define LCD_WIDTH  160
 #define LCD_HEIGHT 128
 #define LCD_DEPTH  2   /* 4 colours - 2bpp */
-
 #define LCD_PIXELFORMAT HORIZONTAL_PACKING
 
 /* LCD contrast */
@@ -84,7 +83,7 @@
 
 #define BATTERY_CAPACITY_DEFAULT 630 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 630  /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 1000 /* max. capacity selectable */
+#define BATTERY_CAPACITY_MAX 1200 /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 10   /* capacity increment */
 #define BATTERY_TYPES_COUNT  1    /* only one type */
 
@@ -129,6 +128,11 @@
 
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_ARC
+
+/* enable these for the experimental usb stack
+#define HAVE_USBSTACK
+#define USBSTACK_CAPS CONTROLLER_DEVICE
+*/
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL

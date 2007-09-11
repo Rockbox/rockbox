@@ -1014,9 +1014,8 @@ bool bookmark_exist(void)
 static bool system_check(void)
 {
     int resume_index = 0;
-    struct mp3entry *id3 = audio_current_track();
 
-    if (!id3)
+    if (!(audio_status() && audio_current_track()))
     {
         /* no track playing */
         return false; 

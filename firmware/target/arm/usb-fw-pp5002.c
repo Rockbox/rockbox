@@ -56,15 +56,15 @@ void usb_enable(bool on)
     }
 }
 
-bool usb_detect(void)
+int usb_detect(void)
 {
 #if defined(IPOD_1G2G) || defined(IPOD_3G)
     /* GPIO C bit 7 is firewire detect */
     if (!(GPIOC_INPUT_VAL & 0x80))
-        return true;
+        return USB_INSERTED;
 #endif
 
     /* TODO: add USB detection for iPod 3rd gen */
 
-    return false;
+    return USB_EXTRACTED;
 }

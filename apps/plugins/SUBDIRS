@@ -2,6 +2,7 @@
 #ifndef GIGABEAT_S
 
 /* For all targets */
+shortcuts
 
 /* For various targets... */
 

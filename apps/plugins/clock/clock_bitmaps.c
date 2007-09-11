@@ -103,3 +103,4 @@ const struct picture smallsegments[]={
     BMPWIDTH_clock_smallsegments_remote,BMPHEIGHT_clock_smallsegments_remote/13}
 #endif
 };
+

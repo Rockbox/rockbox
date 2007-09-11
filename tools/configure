@@ -288,7 +288,8 @@ whichadvanced () {
 
     # Ask about languages to build
     echo "Select a number for the language to use (default is english)"
-    echo "You may enter a comma-separated list of languages to build"
+    # The multiple-language feature is currently broken
+    # echo "You may enter a comma-separated list of languages to build"
 
     picklang
     voicelanguage=`whichlang`
@@ -329,7 +330,7 @@ voiceconfig () {
 
     if [ -f "`which flite`" ]; then
         FLITE="F(l)ite "
-        FLITE_OPTS="FLITE_OPTS=\"\""
+        FLITE_OPTS=""
         DEFAULT_TTS="flite"
         DEFAULT_TTS_OPTS=$FLITE_OPTS
         DEFAULT_NOISEFLOOR="500"
@@ -337,7 +338,7 @@ voiceconfig () {
     fi
     if [ -f "`which espeak`" ]; then
         ESPEAK="(e)Speak "
-        ESPEAK_OPTS="ESPEAK_OPTS=\"\""
+        ESPEAK_OPTS=""
         DEFAULT_TTS="espeak"
         DEFAULT_TTS_OPTS=$ESPEAK_OPTS
         DEFAULT_NOISEFLOOR="500"
@@ -345,28 +346,52 @@ voiceconfig () {
     fi
     if [ -f "`which festival`" ]; then
         FESTIVAL="(F)estival "
-        FESTIVAL_OPTS="FESTIVAL_OPTS=\"\""
+        case "$thislang" in
+            "italiano")
+            FESTIVAL_OPTS="--language italian"
+            ;;
+            "espanol")
+            FESTIVAL_OPTS="--language spanish"
+            ;;
+            "finnish")
+            FESTIVAL_OPTS="--language finnish"
+            ;;
+            "czech")
+            FESTIVAL_OPTS="--language czech"
+            ;;
+            *)
+            FESTIVAL_OPTS=""
+            ;;
+        esac
         DEFAULT_TTS="festival"
         DEFAULT_TTS_OPTS=$FESTIVAL_OPTS
         DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="F"
     fi
+    if [ -f "`which swift`" ]; then
+        SWIFT="S(w)ift "
+        SWIFT_OPTS=""
+        DEFAULT_TTS="swift"
+        DEFAULT_TTS_OPTS=$SWIFT_OPTS
+        DEFAULT_NOISEFLOOR="500"
+        DEFAULT_CHOICE="w"
+    fi
     # Allow SAPI if Windows is in use
     if [ -f "`which winver`" ]; then
-        SAPI5="(S)API5 "
-        SAPI5_OPTS="SAPI5_OPTS=\"\""
-        DEFAULT_TTS="sapi5"
-        DEFAULT_TTS_OPTS=$SAPI5_OPTS
+        SAPI="(S)API "
+        SAPI_OPTS=""
+        DEFAULT_TTS="sapi"
+        DEFAULT_TTS_OPTS=$SAPI_OPTS
         DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="S"
     fi
 
-    if [ "$FESTIVAL" = "$FLITE" ] && [ "$FLITE" = "$ESPEAK" ] && [ "$ESPEAK" = "$SAPI5" ]; then
-        echo "You need Festival, eSpeak or Flite in your path, or SAPI5 available to build voice files"
+    if [ "$FESTIVAL" = "$FLITE" ] && [ "$FLITE" = "$ESPEAK" ] && [ "$ESPEAK" = "$SAPI" ] && [ "$SAPI" = "$SWIFT" ]; then
+        echo "You need Festival, eSpeak or Flite in your path, or SAPI available to build voice files"
         exit
     fi
 
-    echo "TTS engine to use: ${FLITE}${FESTIVAL}${ESPEAK}${SAPI5}(${DEFAULT_CHOICE})?"
+    echo "TTS engine to use: ${FLITE}${FESTIVAL}${ESPEAK}${SAPI}${SWIFT}(${DEFAULT_CHOICE})?"
     option=`input`
     case "$option" in
         [Ll])
@@ -385,10 +410,15 @@ voiceconfig () {
         TTS_OPTS=$FESTIVAL_OPTS
         ;;
         [Ss])
-        TTS_ENGINE="sapi5"
+        TTS_ENGINE="sapi"
         NOISEFLOOR="500"
-        TTS_OPTS=$SAPI5_OPTS
+        TTS_OPTS=$SAPI_OPTS
         ;;
+	[Ww])
+        TTS_ENGINE="swift"
+        NOISEFLOOR="500"
+        TTS_OPTS=$SWIFT_OPTS
+	;;
         *)
         TTS_ENGINE=$DEFAULT_TTS
         TTS_OPTS=$DEFAULT_TTS_OPTS
@@ -397,10 +427,10 @@ voiceconfig () {
     echo "Using $TTS_ENGINE for TTS"
 
     # Allow the user to input manual commandline options
-    printf "Enter $TTS_ENGINE options (enter for defaults `echo $TTS_OPTS |sed 's/.*=//'`): "
+    printf "Enter $TTS_ENGINE options (enter for defaults \"$TTS_OPTS\"): "
     USER_TTS_OPTS=`input`
     if [ -n "$USER_TTS_OPTS" ]; then
-        TTS_OPTS="`echo $TTS_OPTS | sed 's/=.*//'`=\"$USER_TTS_OPTS\""
+        TTS_OPTS="$USER_TTS_OPTS"
     fi
 
     echo ""
@@ -408,7 +438,7 @@ voiceconfig () {
     if [ -f "`which oggenc`" ]; then
         OGGENC="(O)ggenc "
         DEFAULT_ENC="oggenc"
-        VORBIS_OPTS="VORBIS_OPTS=\"-q0 --downmix\""
+        VORBIS_OPTS="-q0 --downmix"
         DEFAULT_ENC_OPTS=$VORBIS_OPTS
         DEFAULT_CHOICE="O"
     fi
@@ -422,7 +452,7 @@ voiceconfig () {
     if [ -f "`which lame`" ]; then
         LAME="(L)ame "
         DEFAULT_ENC="lame"
-        LAME_OPTS="LAME_OPTS=\"--resample 12 -t -m m -h -V 9 -S\""
+        LAME_OPTS="--resample 12 -t -m m -h -V 9 -S -B 64 --vbr-new"
         DEFAULT_ENC_OPTS=$LAME_OPTS
         DEFAULT_CHOICE="L"
     fi
@@ -456,25 +486,16 @@ voiceconfig () {
     echo "Using $ENCODER for encoding voice clips"
 
     # Allow the user to input manual commandline options
-    printf "Enter $ENCODER options (enter for defaults `echo $ENC_OPTS |sed 's/.*=//'`): "
+    printf "Enter $ENCODER options (enter for defaults \"$ENC_OPTS\"): "
     USER_ENC_OPTS=`input`
     if [ -n "$USER_ENC_OPTS" ]; then
-        ENC_OPTS="`echo $ENC_OPTS | sed 's/=.*//'`=\"$USER_ENC_OPTS\""
+        ENC_OPTS=$USER_ENC_OPTS
     fi
 
     TEMPDIR="${pwd}"
     if [ -f "`which cygpath`" ]; then
         TEMPDIR=`cygpath . -a -w`
     fi
-
-    cat > voicesettings-$thislang.sh <<EOF
-TTS_ENGINE="${TTS_ENGINE}"
-ENCODER="${ENCODER}"
-TEMPDIR="$TEMPDIR"
-NOISEFLOOR="${NOISEFLOOR}"
-${TTS_OPTS}
-${ENC_OPTS}
-EOF
 }
 
 picklang() {
@@ -595,6 +616,7 @@ cat <<EOF
  ==iAudio==            ==Toshiba==            ==SanDisk==
  30) X5/X5V/X5L        40) Gigabeat F         50) Sansa e200
  31) M5/M5L            41) Gigabeat S         51) Sansa e200R
+                                              52) Sansa c200
 
  ==Tatung==
  60) Elio TPJ-1022
@@ -609,7 +631,7 @@ EOF
   archosbitmaptools="$toolset scramble descramble sh2d uclpack bmp2rb"
   iriverbitmaptools="$toolset scramble descramble mkboot bmp2rb"
   iaudiobitmaptools="$toolset scramble descramble mkboot bmp2rb"
-  ipodbitmaptools="$toolset scramble ipod_fw bmp2rb codepages"
+  ipodbitmaptools="$toolset scramble ipod_fw bmp2rb"
   gigabeatbitmaptools="$toolset scramble descramble bmp2rb"
   # generic is used by IFP, H10, Sansa-e200
   genericbitmaptools="$toolset bmp2rb"
@@ -803,7 +825,7 @@ EOF
     swcodec=""
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset="$toolset scramble descramble bmp2rb codepages"
+    toolset="$toolset scramble descramble bmp2rb"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
     t_manufacturer="archos"
@@ -1290,6 +1312,32 @@ EOF
     t_model="sansa-e200"
     ;;
 
+   52|c200)
+    target_id=30
+    archos="c200"
+    target="-DSANSA_C200"
+    memory=32 # supposedly
+    arm7tdmicc
+    tool="$rootdir/tools/scramble -mi4v3 -model=c200 -type=RBOS"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.mi4"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins=""
+    swcodec="yes"
+    boottool="$rootdir/tools/scramble -mi4v3 -model=c200 -type=RBBL"
+    bootoutput="firmware.mi4"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$genericbitmaptools scramble"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="sandisk"
+    t_model="sansa-c200"
+    ;;
+
    60|tpj1022)
     target_id=25
     archos="tpj1022"
@@ -1401,6 +1449,9 @@ fi
     ifp7xx)
        gdbstub="(G)DB stub, "
        ;;
+    e200r|e200)
+       gdbstub="(I)installer, "
+       ;;
     *)
        ;;
   esac
@@ -1411,6 +1462,13 @@ fi
   option=`input`;
 
   case $option in
+    [Ii])
+      appsdir='\$(ROOTDIR)/bootloader'
+      apps="bootloader"
+      extradefines="-DBOOTLOADER -DE200R_INSTALLER -ffunction-sections -fdata-sections"
+      bootloader="1"
+      echo "e200R-installer build selected"
+      ;;
     [Bb])
       if test $t_manufacturer = "archos"; then
           # Archos SH-based players do this somewhat differently for
@@ -1457,7 +1515,7 @@ fi
       ;;
     [Mm])
       appsdir='\$(ROOTDIR)/manual'
-      firmdir='\$(ROOTDIR)/manual/platform' # No Makefile here.  Effectively ignores target
+      firmdir='\$(ROOTDIR)/manual/platform' # No Makefile here.  Effectively ig:res target
       toolsdir=$firmdir;
       toolset='';
       apps="manual"
@@ -1514,6 +1572,10 @@ fi
 # Now, figure out version number of the (gcc) compiler we are about to use
 gccver=`$CC -dumpversion`;
 
+# figure out the binutil version too and display it, mostly for the build
+# system etc to be able to see it easier
+ldver=`$LD --version | head -n 1 | sed -e 's/[^0-9.]//g'`
+
 if [ -z "$gccver" ]; then
   echo "WARNING: The compiler you must use ($CC) is not in your path!"
   echo "WARNING: this may cause your build to fail since we cannot do the"
@@ -1548,7 +1610,15 @@ else
    GCCOPTS="$GCCOPTS -fno-strict-aliasing"
  fi
 
+ if test "$gccnum" -ge "402"; then
+   # disable warning about "warning: initialized field overwritten" as gcc 4.2
+   # and later would throw it for several valid cases
+   GCCOPTS="$GCCOPTS -Wno-override-init"
+ fi
+
 fi
+
+echo "Using $LD $ldver"
 
 # check the compiler for SH platforms
 if test "$CC" = "sh-elf-gcc"; then
@@ -1689,6 +1759,10 @@ sed > Makefile \
  -e "${simmagic1}" \
  -e "${simmagic2}" \
  -e "s,@MANUALDEV@,${manualdev},g" \
+ -e "s,@ENCODER@,${ENCODER},g" \
+ -e "s,@ENC_OPTS@,${ENC_OPTS},g" \
+ -e "s,@TTS_ENGINE@,${TTS_ENGINE},g" \
+ -e "s,@TTS_OPTS@,${TTS_OPTS},g" \
 <<EOF
 ## Automaticly generated. http://www.rockbox.org/
 
@@ -1757,6 +1831,10 @@ export GCCVER=@GCCVER@
 export GCCNUM=@GCCNUM@
 export UNAME=@UNAME@
 export MANUALDEV=@MANUALDEV@
+export TTS_OPTS=@TTS_OPTS@
+export TTS_ENGINE=@TTS_ENGINE@
+export ENC_OPTS=@ENC_OPTS@
+export ENCODER=@ENCODER@
 
 # Do not print "Entering directory ..."
 MAKEFLAGS += --no-print-directory
@@ -1891,7 +1969,7 @@ if [ "yes" = "$voice" ]; then
 
 voice: tools features
 	\$(SILENT)for f in \`cat \$(BUILDDIR)/${apps}/features\`; do feat="\$\$feat:\$\$f" ; done ; \\
-	for lang in \`echo \$(VOICELANGUAGE) |sed "s/,/ /g"\`; do \$(TOOLSDIR)/genvoice.sh \$(ROOTDIR) \$\$lang \$(ARCHOS)\$\$feat \$(TARGET_ID) voicesettings-\$\$lang.sh ; done \\
+	for lang in \`echo \$(VOICELANGUAGE) |sed "s/,/ /g"\`; do \$(TOOLSDIR)/voice.pl -V -l=\$\$lang -t=\$(ARCHOS)\$\$feat -i=\$(TARGET_ID) -e=\$(ENCODER) -E="\$(ENC_OPTS)" -s=\$(TTS_ENGINE) -S="\$(TTS_OPTS)"; done \\
 EOF
 
 fi

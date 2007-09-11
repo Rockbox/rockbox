@@ -22,9 +22,9 @@
 #include "kernel.h"
 #include "ata.h"
 
-inline bool usb_detect(void)
+inline int usb_detect(void)
 {
-    return false;
+    return 0;
 }
 
 void usb_init_device(void)

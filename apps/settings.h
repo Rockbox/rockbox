@@ -465,6 +465,9 @@ struct user_settings
     bool peak_meter_dbfs;     /* show linear or dbfs values */
     int peak_meter_min; /* range minimum */
     int peak_meter_max; /* range maximum */
+#ifdef HAVE_RECORDING
+    bool peak_meter_clipcounter;    /* clipping count indicator */
+#endif
     bool car_adapter_mode; /* 0=off 1=on */
 
     /* show status bar */
@@ -744,6 +747,10 @@ struct user_settings
 #ifndef HAVE_SCROLLWHEEL
     int list_accel_start_delay; /* ms before we start increaseing step size */
     int list_accel_wait; /* ms between increases */
+#endif
+#ifdef HAVE_USBSTACK
+    int usb_stack_mode;	/* device or host */
+    unsigned char usb_stack_device_driver[32]; /* usb device driver to load */
 #endif
 };
 

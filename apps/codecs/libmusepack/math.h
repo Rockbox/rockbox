@@ -44,174 +44,192 @@
 
 #ifdef MPC_FIXED_POINT
 
+   #ifdef _WIN32_WCE
+      #include <cmnintrin.h>
+      #define MPC_HAVE_MULHIGH
+   #endif
+   
+   #define MPC_FIXED_POINT_SCALE_SHIFT (MPC_FIXED_POINT_SHIFT + MPC_FIXED_POINT_FRACTPART)
+   #define MPC_FIXED_POINT_SCALE (1 << (MPC_FIXED_POINT_SCALE_SHIFT - 1))
+   //in fixedpoint mode, results in decode output buffer are in -MPC_FIXED_POINT_SCALE ... MPC_FIXED_POINT_SCALE range
+   
+   #define MPC_FIXED_POINT_FRACTPART 14
+   typedef mpc_int32_t MPC_SAMPLE_FORMAT;
+   typedef mpc_int64_t MPC_SAMPLE_FORMAT_MULTIPLY;
+   
+   #define MAKE_MPC_SAMPLE(X)      (MPC_SAMPLE_FORMAT)((double)(X) * (double)(((mpc_int64_t)1)<<MPC_FIXED_POINT_FRACTPART))
+   #define MAKE_MPC_SAMPLE_EX(X,Y) (MPC_SAMPLE_FORMAT)((double)(X) * (double)(((mpc_int64_t)1)<<(Y)))
+   
+   #define MPC_SHR_RND(X, Y)       ((X+(1<<(Y-1)))>>Y)
 
-#ifdef _WIN32_WCE
+   #if defined(CPU_COLDFIRE)
 
-#include <cmnintrin.h>
+      #define MPC_MULTIPLY(X,Y)      mpc_multiply((X), (Y))
+      #define MPC_MULTIPLY_EX(X,Y,Z) mpc_multiply_ex((X), (Y), (Z))
+      
+      static inline MPC_SAMPLE_FORMAT mpc_multiply(MPC_SAMPLE_FORMAT x,
+                                                   MPC_SAMPLE_FORMAT y)
+      {
+          MPC_SAMPLE_FORMAT t1, t2;
+          asm volatile (
+              "mac.l   %[x],%[y],%%acc0\n" /* multiply */
+              "mulu.l  %[y],%[x]   \n"     /* get lower half, avoid emac stall */
+              "movclr.l %%acc0,%[t1]   \n" /* get higher half */
+              "moveq.l #17,%[t2]   \n"
+              "asl.l   %[t2],%[t1] \n"     /* hi <<= 17, plus one free */
+              "moveq.l #14,%[t2]   \n"
+              "lsr.l   %[t2],%[x]  \n"     /* (unsigned)lo >>= 14 */
+              "or.l    %[x],%[t1]  \n"     /* combine result */
+              : /* outputs */
+              [t1]"=&d"(t1),
+              [t2]"=&d"(t2),
+              [x] "+d" (x)
+              : /* inputs */
+              [y] "d"  (y)
+          );
+          return t1;
+      }
 
-#define MPC_HAVE_MULHIGH
+      static inline MPC_SAMPLE_FORMAT mpc_multiply_ex(MPC_SAMPLE_FORMAT x,
+                                                      MPC_SAMPLE_FORMAT y,
+                                                      unsigned shift)
+      {
+          MPC_SAMPLE_FORMAT t1, t2;
+          asm volatile (
+              "mac.l   %[x],%[y],%%acc0\n" /* multiply */
+              "mulu.l  %[y],%[x]   \n"     /* get lower half, avoid emac stall */
+              "movclr.l %%acc0,%[t1]   \n" /* get higher half */
+              "moveq.l #31,%[t2]   \n"
+              "sub.l   %[sh],%[t2] \n"     /* t2 = 31 - shift */
+              "ble.s   1f          \n"
+              "asl.l   %[t2],%[t1] \n"     /* hi <<= 31 - shift */
+              "lsr.l   %[sh],%[x]  \n"     /* (unsigned)lo >>= shift */
+              "or.l    %[x],%[t1]  \n"     /* combine result */
+              "bra.s   2f          \n"
+          "1:                      \n"
+              "neg.l   %[t2]       \n"     /* t2 = shift - 31 */
+              "asr.l   %[t2],%[t1] \n"     /* hi >>= t2 */
+          "2:                      \n"
+              : /* outputs */
+              [t1]"=&d"(t1),
+              [t2]"=&d"(t2),
+              [x] "+d" (x)
+              : /* inputs */
+              [y] "d"  (y),
+              [sh]"d"  (shift)
+          );
+          return t1;
+      }
+   #elif defined(CPU_ARM)
+      // borrowed and adapted from libMAD
+      #define MPC_MULTIPLY(X,Y) \
+         ({ \
+            MPC_SAMPLE_FORMAT low; \
+            MPC_SAMPLE_FORMAT high; \
+            asm volatile (                   /* will calculate: result = (X*Y)>>14 */ \
+               "smull  %0,%1,%2,%3 \n\t"     /* multiply with result %0 [0..31], %1 [32..63] */ \
+               "mov %0, %0, lsr #14 \n\t"    /* %0 = %0 >> 14 */ \
+               "orr %0, %0, %1, lsl #18 \n\t"/* result = %0 OR (%1 << 18) */ \
+               : "=&r"(low), "=&r" (high) \
+               : "r"(X),"r"(Y)); \
+            low; \
+         })
+      
+      // borrowed and adapted from libMAD
+      #define MPC_MULTIPLY_EX(X,Y,Z) \
+         ({ \
+            MPC_SAMPLE_FORMAT low; \
+            MPC_SAMPLE_FORMAT high; \
+            asm volatile (                   /* will calculate: result = (X*Y)>>Z */ \
+               "smull  %0,%1,%2,%3 \n\t"     /* multiply with result %0 [0..31], %1 [32..63] */ \
+               "mov %0, %0, lsr %4 \n\t"     /* %0 = %0 >> Z */ \
+               "orr %0, %0, %1, lsl %5 \n\t" /* result = %0 OR (%1 << (32-Z)) */ \
+               : "=&r"(low), "=&r" (high) \
+               : "r"(X),"r"(Y),"r"(Z),"r"(32-Z)); \
+            low; \
+         })
+   #else /* libmusepack standard */
 
-#endif
+      #define MPC_MULTIPLY_NOTRUNCATE(X,Y) \
+         (((MPC_SAMPLE_FORMAT_MULTIPLY)(X) * (MPC_SAMPLE_FORMAT_MULTIPLY)(Y)) >> MPC_FIXED_POINT_FRACTPART)
 
+      #define MPC_MULTIPLY_EX_NOTRUNCATE(X,Y,Z) \
+         (((MPC_SAMPLE_FORMAT_MULTIPLY)(X) * (MPC_SAMPLE_FORMAT_MULTIPLY)(Y)) >> (Z))
 
-#define MPC_FIXED_POINT_SCALE_SHIFT (MPC_FIXED_POINT_SHIFT + MPC_FIXED_POINT_FRACTPART)
-#define MPC_FIXED_POINT_SCALE (1 << (MPC_FIXED_POINT_SCALE_SHIFT - 1))
+      #ifdef _DEBUG
+         static inline MPC_SAMPLE_FORMAT MPC_MULTIPLY(MPC_SAMPLE_FORMAT item1,MPC_SAMPLE_FORMAT item2)
+         {
+            MPC_SAMPLE_FORMAT_MULTIPLY temp = MPC_MULTIPLY_NOTRUNCATE(item1,item2);
+            assert(temp == (MPC_SAMPLE_FORMAT_MULTIPLY)(MPC_SAMPLE_FORMAT)temp);
+            return (MPC_SAMPLE_FORMAT)temp;
+         }
+         
+         static inline MPC_SAMPLE_FORMAT MPC_MULTIPLY_EX(MPC_SAMPLE_FORMAT item1,MPC_SAMPLE_FORMAT item2,unsigned shift)
+         {
+            MPC_SAMPLE_FORMAT_MULTIPLY temp = MPC_MULTIPLY_EX_NOTRUNCATE(item1,item2,shift);
+            assert(temp == (MPC_SAMPLE_FORMAT_MULTIPLY)(MPC_SAMPLE_FORMAT)temp);
+            return (MPC_SAMPLE_FORMAT)temp;
+         }
+      #else
+         #define MPC_MULTIPLY(X,Y) ((MPC_SAMPLE_FORMAT)MPC_MULTIPLY_NOTRUNCATE(X,Y))
+         #define MPC_MULTIPLY_EX(X,Y,Z) ((MPC_SAMPLE_FORMAT)MPC_MULTIPLY_EX_NOTRUNCATE(X,Y,Z))
+      #endif
 
+   #endif
 
-//in fixedpoint mode, results in decode output buffer are in -MPC_FIXED_POINT_SCALE ... MPC_FIXED_POINT_SCALE range
+   #ifdef MPC_HAVE_MULHIGH
+      #define MPC_MULTIPLY_FRACT(X,Y) _MulHigh(X,Y)
+   #else
+      #if defined(CPU_COLDFIRE)
+         /* loses one bit of accuracy. The rest of the macros won't be as easy as this... */
+         #define MPC_MULTIPLY_FRACT(X,Y) \
+            ({ \
+               MPC_SAMPLE_FORMAT t; \
+               asm volatile ( \
+                  "mac.l %[A], %[B], %%acc0\n\t" \
+                  "movclr.l %%acc0, %[t]\n\t" \
+                  "asr.l #1, %[t]\n\t" \
+                  : [t] "=d" (t) \
+                  : [A] "r" ((X)), [B] "r" ((Y))); \
+               t; \
+            })
+      #elif defined(CPU_ARM)
+         // borrowed and adapted from libMAD
+         #define MPC_MULTIPLY_FRACT(X,Y) \
+            ({ \
+               MPC_SAMPLE_FORMAT low; \
+               MPC_SAMPLE_FORMAT high; \
+               asm volatile (                /* will calculate: result = (X*Y)>>32 */ \
+                  "smull  %0,%1,%2,%3 \n\t"  /* multiply with result %0 [0..31], %1 [32..63] */ \
+                  : "=&r"(low), "=&r" (high) /* result = %1 [32..63], saves the >>32 */ \
+                  : "r"(X),"r"(Y)); \
+               high; \
+            })
+      #else
+         #define MPC_MULTIPLY_FRACT(X,Y) MPC_MULTIPLY_EX(X,Y,32)
+      #endif
+   #endif
 
-#define MPC_FIXED_POINT_FRACTPART 14
-typedef mpc_int32_t MPC_SAMPLE_FORMAT;
+   #define MPC_MAKE_FRACT_CONST(X) (MPC_SAMPLE_FORMAT)((X) * (double)(((mpc_int64_t)1)<<32) )
+   
+   #define MPC_MULTIPLY_FLOAT_INT(X,Y) ((X)*(Y))
 
-typedef mpc_int64_t MPC_SAMPLE_FORMAT_MULTIPLY;
-
-#define MAKE_MPC_SAMPLE(X) (MPC_SAMPLE_FORMAT)((double)(X) * (double)(((mpc_int64_t)1)<<MPC_FIXED_POINT_FRACTPART))
-#define MAKE_MPC_SAMPLE_EX(X,Y) (MPC_SAMPLE_FORMAT)((double)(X) * (double)(((mpc_int64_t)1)<<(Y)))
-
-#if defined(CPU_COLDFIRE)
-
-#define MPC_MULTIPLY(X,Y) mpc_multiply((X), (Y))
-#define MPC_MULTIPLY_EX(X,Y,Z) mpc_multiply_ex((X), (Y), (Z))
-
-static inline MPC_SAMPLE_FORMAT mpc_multiply(MPC_SAMPLE_FORMAT x,
-                                             MPC_SAMPLE_FORMAT y)
-{
-    MPC_SAMPLE_FORMAT t1, t2;
-    asm volatile (
-        "mac.l   %[x],%[y],%%acc0\n" /* multiply */
-        "mulu.l  %[y],%[x]   \n"     /* get lower half, avoid emac stall */
-        "movclr.l %%acc0,%[t1]   \n" /* get higher half */
-        "moveq.l #17,%[t2]   \n"
-        "asl.l   %[t2],%[t1] \n"     /* hi <<= 17, plus one free */
-        "moveq.l #14,%[t2]   \n"
-        "lsr.l   %[t2],%[x]  \n"     /* (unsigned)lo >>= 14 */
-        "or.l    %[x],%[t1]  \n"     /* combine result */
-        : /* outputs */
-        [t1]"=&d"(t1),
-        [t2]"=&d"(t2),
-        [x] "+d" (x)
-        : /* inputs */
-        [y] "d"  (y)
-    );
-    return t1;
-}
-
-static inline MPC_SAMPLE_FORMAT mpc_multiply_ex(MPC_SAMPLE_FORMAT x,
-                                                MPC_SAMPLE_FORMAT y,
-                                                unsigned shift)
-{
-    MPC_SAMPLE_FORMAT t1, t2;
-    asm volatile (
-        "mac.l   %[x],%[y],%%acc0\n" /* multiply */
-        "mulu.l  %[y],%[x]   \n"     /* get lower half, avoid emac stall */
-        "movclr.l %%acc0,%[t1]   \n" /* get higher half */
-        "moveq.l #31,%[t2]   \n"
-        "sub.l   %[sh],%[t2] \n"     /* t2 = 31 - shift */
-        "ble.s   1f          \n"
-        "asl.l   %[t2],%[t1] \n"     /* hi <<= 31 - shift */
-        "lsr.l   %[sh],%[x]  \n"     /* (unsigned)lo >>= shift */
-        "or.l    %[x],%[t1]  \n"     /* combine result */
-        "bra.s   2f          \n"
-    "1:                      \n"
-        "neg.l   %[t2]       \n"     /* t2 = shift - 31 */
-        "asr.l   %[t2],%[t1] \n"     /* hi >>= t2 */
-    "2:                      \n"
-        : /* outputs */
-        [t1]"=&d"(t1),
-        [t2]"=&d"(t2),
-        [x] "+d" (x)
-        : /* inputs */
-        [y] "d"  (y),
-        [sh]"d"  (shift)
-    );
-    return t1;
-}
-#else /* libmusepack standard */
-
-#define MPC_MULTIPLY_NOTRUNCATE(X,Y) \
-	(((MPC_SAMPLE_FORMAT_MULTIPLY)(X) * (MPC_SAMPLE_FORMAT_MULTIPLY)(Y)) >> MPC_FIXED_POINT_FRACTPART)
-
-#define MPC_MULTIPLY_EX_NOTRUNCATE(X,Y,Z) \
-	(((MPC_SAMPLE_FORMAT_MULTIPLY)(X) * (MPC_SAMPLE_FORMAT_MULTIPLY)(Y)) >> (Z))
-
-#ifdef _DEBUG
-static inline MPC_SAMPLE_FORMAT MPC_MULTIPLY(MPC_SAMPLE_FORMAT item1,MPC_SAMPLE_FORMAT item2)
-{
-	MPC_SAMPLE_FORMAT_MULTIPLY temp = MPC_MULTIPLY_NOTRUNCATE(item1,item2);
-	assert(temp == (MPC_SAMPLE_FORMAT_MULTIPLY)(MPC_SAMPLE_FORMAT)temp);
-	return (MPC_SAMPLE_FORMAT)temp;
-}
-
-static inline MPC_SAMPLE_FORMAT MPC_MULTIPLY_EX(MPC_SAMPLE_FORMAT item1,MPC_SAMPLE_FORMAT item2,unsigned shift)
-{
-	MPC_SAMPLE_FORMAT_MULTIPLY temp = MPC_MULTIPLY_EX_NOTRUNCATE(item1,item2,shift);
-	assert(temp == (MPC_SAMPLE_FORMAT_MULTIPLY)(MPC_SAMPLE_FORMAT)temp);
-	return (MPC_SAMPLE_FORMAT)temp;
-}
 #else
-#define MPC_MULTIPLY(X,Y) ((MPC_SAMPLE_FORMAT)MPC_MULTIPLY_NOTRUNCATE(X,Y))
-#define MPC_MULTIPLY_EX(X,Y,Z) ((MPC_SAMPLE_FORMAT)MPC_MULTIPLY_EX_NOTRUNCATE(X,Y,Z))
-#endif
+   //in floating-point mode, decoded samples are in -1...1 range
 
-#endif
-
-#ifdef MPC_HAVE_MULHIGH
-#define MPC_MULTIPLY_FRACT(X,Y) _MulHigh(X,Y)
-#else
-#if defined(CPU_COLDFIRE)
-/* loses one bit of accuracy.
-   the rest of the macros won't be as easy as this... */
-#define MPC_MULTIPLY_FRACT(X,Y) \
-    ({ \
-        MPC_SAMPLE_FORMAT t; \
-        asm volatile ( \
-            "mac.l %[A], %[B], %%acc0\n\t" \
-            "movclr.l %%acc0, %[t]\n\t" \
-            "asr.l #1, %[t]\n\t" \
-            : [t] "=d" (t) \
-            : [A] "r" ((X)), [B] "r" ((Y))); \
-        t; \
-    })
-#else
-#define MPC_MULTIPLY_FRACT(X,Y) MPC_MULTIPLY_EX(X,Y,32)
-#endif
-#endif
-
-#define MPC_MAKE_FRACT_CONST(X) (MPC_SAMPLE_FORMAT)((X) * (double)(((mpc_int64_t)1)<<32) )
-#define MPC_MULTIPLY_FRACT_CONST(X,Y) MPC_MULTIPLY_FRACT(X,MPC_MAKE_FRACT_CONST(Y))
-#define MPC_MULTIPLY_FRACT_CONST_FIX(X,Y,Z) ( MPC_MULTIPLY_FRACT(X,MPC_MAKE_FRACT_CONST( Y / (1<<(Z)) )) << (Z) )
-#define MPC_MULTIPLY_FRACT_CONST_SHR(X,Y,Z) MPC_MULTIPLY_FRACT(X,MPC_MAKE_FRACT_CONST( Y / (1<<(Z)) ))
-
-#define MPC_MULTIPLY_FLOAT_INT(X,Y) ((X)*(Y))
-#define MPC_SCALE_CONST(X,Y,Z) MPC_MULTIPLY_EX(X,MAKE_MPC_SAMPLE_EX(Y,Z),(Z))
-#define MPC_SCALE_CONST_SHL(X,Y,Z,S) MPC_MULTIPLY_EX(X,MAKE_MPC_SAMPLE_EX(Y,Z),(Z)-(S))
-#define MPC_SCALE_CONST_SHR(X,Y,Z,S) MPC_MULTIPLY_EX(X,MAKE_MPC_SAMPLE_EX(Y,Z),(Z)+(S))
-#define MPC_SHR(X,Y) ((X)>>(Y))
-#define MPC_SHL(X,Y) ((X)<<(Y))
-
-#else
-
-//in floating-point mode, decoded samples are in -1...1 range
-
-typedef float MPC_SAMPLE_FORMAT;
-
-#define MAKE_MPC_SAMPLE(X) ((MPC_SAMPLE_FORMAT)(X))
-#define MAKE_MPC_SAMPLE_EX(X,Y) ((MPC_SAMPLE_FORMAT)(X))
-
-#define MPC_MULTIPLY_FRACT(X,Y) ((X)*(Y))
-#define MPC_MAKE_FRACT_CONST(X) (X)
-#define MPC_MULTIPLY_FRACT_CONST(X,Y) MPC_MULTPLY_FRACT(X,MPC_MAKE_FRACT_CONST(Y))
-#define MPC_MULTIPLY_FRACT_CONST_SHR(X,Y,Z) MPC_MULTIPLY_FRACT(X,MPC_MAKE_FRACT_CONST( Y ))
-#define MPC_MULTIPLY_FRACT_CONST_FIX(X,Y,Z) MPC_MULTIPLY_FRACT(X,MPC_MAKE_FRACT_CONST( Y ))
-
-#define MPC_MULTIPLY_FLOAT_INT(X,Y) ((X)*(Y))
-#define MPC_MULTIPLY(X,Y) ((X)*(Y))
-#define MPC_MULTIPLY_EX(X,Y,Z) ((X)*(Y))
-#define MPC_SCALE_CONST(X,Y,Z) ((X)*(Y))
-#define MPC_SCALE_CONST_SHL(X,Y,Z,S) ((X)*(Y))
-#define MPC_SCALE_CONST_SHR(X,Y,Z,S) ((X)*(Y))
-#define MPC_SHR(X,Y) (X)
-#define MPC_SHL(X,Y) (X)
+   typedef float MPC_SAMPLE_FORMAT;
+   
+   #define MAKE_MPC_SAMPLE(X)      ((MPC_SAMPLE_FORMAT)(X))
+   #define MAKE_MPC_SAMPLE_EX(X,Y) ((MPC_SAMPLE_FORMAT)(X))
+   
+   #define MPC_MULTIPLY_FRACT(X,Y) ((X)*(Y))
+   #define MPC_MAKE_FRACT_CONST(X) (X)
+   
+   #define MPC_MULTIPLY_FLOAT_INT(X,Y) ((X)*(Y))
+   #define MPC_MULTIPLY(X,Y)           ((X)*(Y))
+   #define MPC_MULTIPLY_EX(X,Y,Z)      ((X)*(Y))
+   
+   #define MPC_SHR_RND(X, Y) (X)
 
 #endif
 

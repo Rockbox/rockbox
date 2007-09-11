@@ -131,7 +131,7 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
         while(readChar(file)!=' ' && !eof(file));
         readTextBlock(file, name);
 
-        rb->snprintf(fn, 40, "/.rockbox/patchset/%s.pat", name);
+        rb->snprintf(fn, 40, ROCKBOX_DIR "/patchset/%s.pat", name);
 /*        printf("\nLOADING: <%s> ", fn); */
 
         if(patchUsed[a]==1)
@@ -162,7 +162,7 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
     {
         readTextBlock(file, number);
         readTextBlock(file, name);
-        rb->snprintf(fn, 40, "/.rockbox/patchset/%s.pat", name);
+        rb->snprintf(fn, 40, ROCKBOX_DIR "/patchset/%s.pat", name);
 
         idx = rb->atoi(number);
         if(idx == 0)

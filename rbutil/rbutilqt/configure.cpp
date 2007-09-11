@@ -24,11 +24,9 @@
 #include "ui_configurefrm.h"
 #include "browsedirtree.h"
 
-#ifdef __linux
 #include <stdio.h>
-#endif
 
-#define DEFAULT_LANG "English (builtin)"
+#define DEFAULT_LANG "English (C)"
 
 Config::Config(QWidget *parent) : QDialog(parent)
 {
@@ -45,7 +43,7 @@ Config::Config(QWidget *parent) : QDialog(parent)
     // build language list and sort alphabetically
     QStringList langs = findLanguageFiles();
     for(int i = 0; i < langs.size(); ++i)
-        lang.insert(languageName(langs[i]), langs[i]);
+        lang.insert(languageName(langs.at(i)) + tr(" (%1)").arg(langs.at(i)), langs.at(i));
     lang.insert(DEFAULT_LANG, "");
     QMap<QString, QString>::const_iterator i = lang.constBegin();
     while (i != lang.constEnd()) {
@@ -66,14 +64,12 @@ Config::Config(QWidget *parent) : QDialog(parent)
     connect(ui.radioSystemProxy, SIGNAL(toggled(bool)), this, SLOT(setSystemProxy(bool)));
     connect(ui.browseMountPoint, SIGNAL(clicked()), this, SLOT(browseFolder()));
     connect(ui.buttonAutodetect,SIGNAL(clicked()),this,SLOT(autodetect()));
-    
-    // disable unimplemented stuff
-    ui.buttonCacheBrowse->setEnabled(false);
-    ui.cacheDisable->setEnabled(false);
-    ui.cacheOfflineMode->setEnabled(false);
-    ui.buttonCacheClear->setEnabled(false);
-
-    //ui.buttonAutodetect->setEnabled(false);
+    connect(ui.buttonCacheBrowse, SIGNAL(clicked()), this, SLOT(browseCache()));
+    connect(ui.buttonCacheClear, SIGNAL(clicked()), this, SLOT(cacheClear()));
+    connect(ui.browseTts, SIGNAL(clicked()), this, SLOT(browseTts()));
+    connect(ui.browseEncoder, SIGNAL(clicked()), this, SLOT(browseEnc()));
+    connect(ui.comboEncoder, SIGNAL(currentIndexChanged(int)), this, SLOT(updateEncOpts(int)));
+    connect(ui.comboTts, SIGNAL(currentIndexChanged(int)), this, SLOT(updateTtsOpts(int)));
 }
 
 
@@ -89,32 +85,53 @@ void Config::accept()
         proxy.setHost(ui.proxyHost->text());
         proxy.setPort(ui.proxyPort->text().toInt());
     }
-    userSettings->setValue("defaults/proxy", proxy.toString());
+    userSettings->setValue("proxy", proxy.toString());
     qDebug() << "new proxy:" << proxy;
     // proxy type
     QString proxyType;
     if(ui.radioNoProxy->isChecked()) proxyType = "none";
     else if(ui.radioSystemProxy->isChecked()) proxyType = "system";
     else proxyType = "manual";
-    userSettings->setValue("defaults/proxytype", proxyType);
+    userSettings->setValue("proxytype", proxyType);
 
     // language
-    if(userSettings->value("defaults/lang").toString() != language)
+    if(userSettings->value("lang").toString() != language)
         QMessageBox::information(this, tr("Language changed"),
             tr("You need to restart the application for the changed language to take effect."));
-    userSettings->setValue("defaults/lang", language);
+    userSettings->setValue("lang", language);
 
     // mountpoint
     QString mp = ui.mountPoint->text();
     if(QFileInfo(mp).isDir())
-        userSettings->setValue("defaults/mountpoint", mp);
+        userSettings->setValue("mountpoint", mp);
 
     // platform
     QString nplat;
     if(ui.treeDevices->selectedItems().size() != 0) {
         nplat = ui.treeDevices->selectedItems().at(0)->data(0, Qt::UserRole).toString();
-        userSettings->setValue("defaults/platform", nplat);
+        userSettings->setValue("platform", nplat);
     }
+
+    // cache settings
+    if(QFileInfo(ui.cachePath->text()).isDir())
+        userSettings->setValue("cachepath", ui.cachePath->text());
+    else // default to system temp path
+        userSettings->setValue("cachepath", QDir::tempPath());
+    userSettings->setValue("cachedisable", ui.cacheDisable->isChecked());
+    userSettings->setValue("offline", ui.cacheOfflineMode->isChecked());
+
+    // tts settings
+    if(QFileInfo(ui.ttsExecutable->text()).isExecutable())
+        userSettings->setValue("ttsbin", ui.ttsExecutable->text());
+    userSettings->setValue("ttsopts", ui.ttsOptions->text());
+    if(QFileInfo(ui.encoderExecutable->text()).isExecutable())
+        userSettings->setValue("encbin", ui.encoderExecutable->text());
+    userSettings->setValue("ttsopts", ui.ttsOptions->text());
+    QString preset;
+    preset = ui.comboEncoder->itemData(ui.comboEncoder->currentIndex(), Qt::UserRole).toString();
+    userSettings->setValue("encpreset", preset);
+    preset = ui.comboTts->itemData(ui.comboTts->currentIndex(), Qt::UserRole).toString();
+    userSettings->setValue("ttspreset", preset);
 
     // sync settings
     userSettings->sync();
@@ -134,7 +151,7 @@ void Config::setUserSettings(QSettings *user)
 {
     userSettings = user;
     // set proxy
-    QUrl proxy = userSettings->value("defaults/proxy").toString();
+    proxy = userSettings->value("proxy").toString();
 
     if(proxy.port() > 0)
         ui.proxyPort->setText(QString("%1").arg(proxy.port()));
@@ -143,7 +160,7 @@ void Config::setUserSettings(QSettings *user)
     ui.proxyUser->setText(proxy.userName());
     ui.proxyPass->setText(proxy.password());
 
-    QString proxyType = userSettings->value("defaults/proxytype").toString();
+    QString proxyType = userSettings->value("proxytype").toString();
     if(proxyType == "manual") ui.radioManualProxy->setChecked(true);
     else if(proxyType == "system") ui.radioSystemProxy->setChecked(true);
     else ui.radioNoProxy->setChecked(true);
@@ -154,7 +171,7 @@ void Config::setUserSettings(QSettings *user)
     // find key for lang value
     QMap<QString, QString>::const_iterator i = lang.constBegin();
     while (i != lang.constEnd()) {
-        if(i.value() == userSettings->value("defaults/lang").toString() + ".qm") {
+        if(i.value() == userSettings->value("lang").toString()) {
             b = i.key();
             break;
         }
@@ -167,7 +184,22 @@ void Config::setUserSettings(QSettings *user)
         ui.listLanguages->setCurrentItem(a.at(0));
 
     // devices tab
-    ui.mountPoint->setText(userSettings->value("defaults/mountpoint").toString());
+    ui.mountPoint->setText(userSettings->value("mountpoint").toString());
+
+    // cache tab
+    if(!QFileInfo(userSettings->value("cachepath").toString()).isDir())
+        userSettings->setValue("cachepath", QDir::tempPath());
+    ui.cachePath->setText(userSettings->value("cachepath").toString());
+    ui.cacheDisable->setChecked(userSettings->value("cachedisable", true).toBool());
+    ui.cacheOfflineMode->setChecked(userSettings->value("offline").toBool());
+    QList<QFileInfo> fs = QDir(userSettings->value("cachepath").toString() + "/rbutil-cache/").entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+    qint64 sz = 0;
+    for(int i = 0; i < fs.size(); i++) {
+        sz += fs.at(i).size();
+        qDebug() << fs.at(i).fileName() << fs.at(i).size();
+    }
+    ui.cacheSize->setText(tr("Current cache size is %1 kiB.")
+            .arg(sz/1024));
 
 }
 
@@ -198,7 +230,7 @@ void Config::setDevices(QSettings *dev)
     }
 
     QString platform;
-    platform = devcs.value(userSettings->value("defaults/platform").toString());
+    platform = devcs.value(userSettings->value("platform").toString());
 
     // set up devices table
     ui.treeDevices->header()->hide();
@@ -216,7 +248,6 @@ void Config::setDevices(QSettings *dev)
         w = new QTreeWidgetItem();
         w->setFlags(Qt::ItemIsEnabled);
         w->setText(0, brands.at(c));
-//        w->setData(0, Qt::DecorationRole, <icon>);
         items.append(w);
         
         // go through platforms again for sake of order
@@ -229,11 +260,16 @@ void Config::setDevices(QSettings *dev)
             devices->beginGroup(curdev);
             curname = devices->value("name", "null").toString();
             QString curbrand = devices->value("brand", "").toString();
+            QString curicon = devices->value("icon", "").toString();
             devices->endGroup();
             if(curbrand != brands.at(c)) continue;
             qDebug() << "adding:" << brands.at(c) << curname << curdev;
             w2 = new QTreeWidgetItem(w, QStringList(curname));
             w2->setData(0, Qt::UserRole, curdev);
+//            QIcon icon;
+//            icon.addFile(":/icons/devices/" + curicon + "-tiny.png");
+//            w2->setIcon(0, icon);
+//            ui.treeDevices->setIconSize(QSize(32, 32));
             if(platform.contains(curname)) {
                 w2->setSelected(true);
                 w->setExpanded(true);
@@ -245,6 +281,116 @@ void Config::setDevices(QSettings *dev)
     ui.treeDevices->insertTopLevelItems(0, items);
     if(w3 != 0)
         ui.treeDevices->setCurrentItem(w3); // hilight old selection
+
+    // tts / encoder tab
+    QStringList keys;
+    
+    devices->beginGroup("encoders");
+    keys = devices->allKeys();
+    for(int i=0; i < keys.size();i++)
+        ui.comboEncoder->addItem(devices->value(keys.at(i), "null").toString(),
+                                 keys.at(i));
+    devices->endGroup();
+
+    devices->beginGroup("tts");
+    keys = devices->allKeys();
+    for(int i=0; i < keys.size();i++)
+        ui.comboTts->addItem(devices->value(keys.at(i), "null").toString(), keys.at(i));
+    devices->endGroup();
+
+    int index;
+    index = ui.comboTts->findData(userSettings->value("ttspreset").toString(),
+                            Qt::UserRole, Qt::MatchExactly);
+    if(index < 0) index = 0;
+    ui.comboTts->setCurrentIndex(index);
+    updateTtsOpts(index);
+    ui.ttsExecutable->setText(userSettings->value("ttsbin").toString());
+
+    index = ui.comboEncoder->findData(userSettings->value("encpreset").toString(),
+                            Qt::UserRole, Qt::MatchExactly);
+    if(index < 0) index = 0;
+    ui.comboEncoder->setCurrentIndex(index);
+    updateEncOpts(index);
+    ui.encoderExecutable->setText(userSettings->value("encbin").toString());
+
+}
+
+
+void Config::updateEncOpts(int index)
+{
+    qDebug() << "updateEncOpts()";
+    QString e;
+    bool edit;
+    QString c = ui.comboEncoder->itemData(index, Qt::UserRole).toString();
+    devices->beginGroup(c);
+    ui.encoderOptions->setText(devices->value("options").toString());
+    edit = devices->value("edit").toBool();
+    ui.encoderOptions->setEnabled(edit);
+    e = devices->value("encoder").toString();
+    devices->endGroup();
+
+    // try to autodetect encoder
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
+    QStringList path = QString(getenv("PATH")).split(":", QString::SkipEmptyParts);
+#elif defined(Q_OS_WIN)
+    QStringList path = QString(getenv("PATH")).split(";", QString::SkipEmptyParts);
+#endif
+    qDebug() << path;
+    ui.encoderExecutable->setEnabled(true);
+    for(int i = 0; i < path.size(); i++) {
+        QString executable = QDir::fromNativeSeparators(path.at(i)) + "/" + e;
+#if defined(Q_OS_WIN)
+	executable += ".exe";
+	QStringList ex = executable.split("\"", QString::SkipEmptyParts);
+	executable = ex.join("");
+#endif
+        if(QFileInfo(executable).isExecutable()) {
+            qDebug() << "found:" << executable;
+            ui.encoderExecutable->setText(QDir::toNativeSeparators(executable));
+            // disallow changing the detected path if non-customizable profile
+            if(!edit)
+                ui.encoderExecutable->setEnabled(false);
+            break;
+        }
+    }
+}
+
+
+void Config::updateTtsOpts(int index)
+{
+    bool edit;
+    QString e;
+    QString c = ui.comboTts->itemData(index, Qt::UserRole).toString();
+    devices->beginGroup(c);
+    edit = devices->value("edit").toBool();
+    ui.ttsOptions->setText(devices->value("options").toString());
+    ui.ttsOptions->setEnabled(devices->value("edit").toBool());
+    e = devices->value("tts").toString();
+    devices->endGroup();
+
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
+    QStringList path = QString(getenv("PATH")).split(":", QString::SkipEmptyParts);
+#elif defined(Q_OS_WIN)
+    QStringList path = QString(getenv("PATH")).split(";", QString::SkipEmptyParts);
+#endif
+    qDebug() << path;
+    ui.ttsExecutable->setEnabled(true);
+    for(int i = 0; i < path.size(); i++) {
+        QString executable = QDir::fromNativeSeparators(path.at(i)) + "/" + e;
+#if defined(Q_OS_WIN)
+	executable += ".exe";
+	QStringList ex = executable.split("\"", QString::SkipEmptyParts);
+	executable = ex.join("");
+#endif
+	qDebug() << executable;
+        if(QFileInfo(executable).isExecutable()) {
+            ui.ttsExecutable->setText(QDir::toNativeSeparators(executable));
+            // disallow changing the detected path if non-customizable profile
+            if(!edit)
+                ui.ttsExecutable->setEnabled(false);
+            break;
+        }
+    }
 }
 
 
@@ -297,15 +443,22 @@ QStringList Config::findLanguageFiles()
 {
     QDir dir(programPath);
     QStringList fileNames;
+    QStringList langs;
     fileNames = dir.entryList(QStringList("*.qm"), QDir::Files, QDir::Name);
 
     QDir resDir(":/lang");
     fileNames += resDir.entryList(QStringList("*.qm"), QDir::Files, QDir::Name);
 
-    fileNames.sort();
-    qDebug() << "Config::findLanguageFiles()" << fileNames;
+    QRegExp exp("^rbutil_(.*)\\.qm");
+    for(int i = 0; i < fileNames.size(); i++) {
+        QString a = fileNames.at(i);
+        a.replace(exp, "\\1");
+        langs.append(a);
+    }
+    langs.sort();
+    qDebug() << "Config::findLanguageFiles()" << langs;
 
-    return fileNames;
+    return langs;
 }
 
 
@@ -313,8 +466,9 @@ QString Config::languageName(const QString &qmFile)
 {
     QTranslator translator;
 
-    if(!translator.load(qmFile, programPath))
-        translator.load(qmFile, ":/lang");
+    QString file = "rbutil_" + qmFile;
+    if(!translator.load(file, programPath))
+        translator.load(file, ":/lang");
 
     return translator.translate("Configure", "English");
 }
@@ -325,7 +479,8 @@ void Config::updateLanguage()
     qDebug() << "updateLanguage()";
     QList<QListWidgetItem*> a = ui.listLanguages->selectedItems();
     if(a.size() > 0)
-        language = QFileInfo(lang.value(a.at(0)->text())).baseName();
+        language = lang.value(a.at(0)->text());
+    qDebug() << language;
 }
 
 
@@ -344,9 +499,29 @@ void Config::browseFolder()
 }
 
 
+void Config::browseCache()
+{
+    cbrowser = new BrowseDirtree(this);
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
+    cbrowser->setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+#elif defined(Q_OS_WIN32)
+    cbrowser->setFilter(QDir::Drives);
+#endif
+    QDir d(ui.cachePath->text());
+    cbrowser->setDir(d);
+    cbrowser->show();
+    connect(cbrowser, SIGNAL(itemChanged(QString)), this, SLOT(setCache(QString)));
+}
+
 void Config::setMountpoint(QString m)
 {
     ui.mountPoint->setText(m);
+}
+
+
+void Config::setCache(QString c)
+{
+    ui.cachePath->setText(c);
 }
 
 
@@ -357,13 +532,15 @@ void Config::autodetect()
     if(detector.detect())  //let it detect
     {
         QString devicename = detector.getDevice();
-        //deexpand the platform
-        ui.treeDevices->selectedItems().at(0)->parent()->setExpanded(false);
-        //deselect the selected item
-        ui.treeDevices->selectedItems().at(0)->setSelected(false);
+        // deexpand all items
+        for(int a = 0; a < ui.treeDevices->topLevelItemCount(); a++)
+            ui.treeDevices->topLevelItem(a)->setExpanded(false);
+        //deselect the selected item(s)
+        for(int a = 0; a < ui.treeDevices->selectedItems().size(); a++) 
+            ui.treeDevices->selectedItems().at(a)->setSelected(false);
 
         // find the new item
-        //enumerate al plattform items
+        // enumerate all platform items
         QList<QTreeWidgetItem*> itmList= ui.treeDevices->findItems("*",Qt::MatchWildcard);
         for(int i=0; i< itmList.size();i++)
         {
@@ -372,10 +549,11 @@ void Config::autodetect()
             {
                 QString data = itmList.at(i)->child(j)->data(0, Qt::UserRole).toString();
                 
-                if( devicename.contains(data)) //item found
+                if(devicename == data) // item found
                 {
                     itmList.at(i)->child(j)->setSelected(true); //select the item
                     itmList.at(i)->setExpanded(true); //expand the platform item
+                    //ui.treeDevices->indexOfTopLevelItem(itmList.at(i)->child(j));
                     break;
                 }
             }
@@ -401,5 +579,76 @@ void Config::autodetect()
                    QMessageBox::Ok ,QMessageBox::Ok);
         
     }
+}
+
+void Config::cacheClear()
+{
+    if(QMessageBox::critical(this, tr("Really delete cache?"),
+       tr("Do you really want to delete the cache? "
+         "Make absolutely sure this setting is correct as it will "
+         "remove <b>all</b> files in this folder!").arg(ui.cachePath->text()),
+       QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
+        return;
+    
+    QString cache = ui.cachePath->text() + "/rbutil-cache/";
+    if(!QFileInfo(cache).isDir()) {
+        QMessageBox::critical(this, tr("Path wrong!"),
+            tr("The cache path is invalid. Aborting."), QMessageBox::Ok);
+        return;
+    }
+    QDir dir(cache);
+    QStringList fn;
+    fn = dir.entryList(QStringList("*"), QDir::Files, QDir::Name);
+    qDebug() << fn;
+
+    for(int i = 0; i < fn.size(); i++) {
+        QString f = cache + fn.at(i);
+        QFile::remove(f);
+        qDebug() << "removed:" << f;
+    }
+}
+
+
+void Config::browseTts()
+{
+    BrowseDirtree browser(this);
+    browser.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
+    
+    if(QFileInfo(ui.ttsExecutable->text()).isDir())
+    {
+        QDir d(ui.ttsExecutable->text());
+        browser.setDir(d);
+    }
+    if(browser.exec() == QDialog::Accepted)
+    {
+        qDebug() << browser.getSelected();
+        QString exe = browser.getSelected();
+        if(!QFileInfo(exe).isExecutable())
+            return;
+        ui.ttsExecutable->setText(exe);
+    }
+    
+}
+
+
+void Config::browseEnc()
+{
+    BrowseDirtree browser(this);
+    browser.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
+    
+    if(QFileInfo(ui.encoderExecutable->text()).isDir())
+    {
+        QDir d(ui.encoderExecutable->text());
+        browser.setDir(d);
+    }
+    if(browser.exec() == QDialog::Accepted)
+    {
+        qDebug() << browser.getSelected();
+        QString exe = browser.getSelected();
+        if(!QFileInfo(exe).isExecutable())
+            return;
+        ui.encoderExecutable->setText(exe);
+    }
+    
 }
 

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Wenger
- *   $Id: progressloggergui.cpp 14027 2007-07-27 17:42:49Z domonoky $
+ *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -82,6 +82,13 @@ void ProgressLoggerGui::abort()
     emit aborted();
 }
 
+void ProgressLoggerGui::undoAbort()
+{
+    dp.buttonAbort->setText(tr("&Abort"));
+    dp.buttonAbort->setIcon(QIcon(QString::fromUtf8(":/icons/icons/process-stop.png")));
+    connect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(abort()));
+}
+
 void ProgressLoggerGui::close()
 {
     downloadProgress->close();
@@ -91,5 +98,6 @@ void ProgressLoggerGui::show()
 {
     downloadProgress->show();
 }
+
 
 

@@ -221,7 +221,8 @@ static bool pcmbuf_insert_wav(const void *ch1, const void *ch2, int count)
     const int32_t* data1_32;
     const int32_t* data2_32;
     unsigned char* p = wavbuffer;
-    int scale = wavinfo.sampledepth - 15;
+    const int scale = wavinfo.sampledepth - 15;
+    const int dc_bias = 1 << (scale - 1);
 
     /* Prevent idle poweroff */
     rb->reset_poweroff_timer();
@@ -266,18 +267,18 @@ static bool pcmbuf_insert_wav(const void *ch1, const void *ch2, int count)
         {
             case STEREO_INTERLEAVED:
                 while (count--) {
-                    int2le16(p, clip_sample((*data1_32++) >> scale));
+                    int2le16(p, clip_sample((*data1_32++ + dc_bias) >> scale));
                     p += 2;
-                    int2le16(p, clip_sample((*data1_32++) >> scale));
+                    int2le16(p, clip_sample((*data1_32++ + dc_bias) >> scale));
                     p += 2;
                 }
                 break;
  
             case STEREO_NONINTERLEAVED:
                 while (count--) {
-                    int2le16(p, clip_sample((*data1_32++) >> scale));
+                    int2le16(p, clip_sample((*data1_32++ + dc_bias) >> scale));
                     p += 2;
-                    int2le16(p, clip_sample((*data2_32++) >> scale));
+                    int2le16(p, clip_sample((*data2_32++ + dc_bias) >> scale));
                     p += 2;
                 }
 
@@ -285,7 +286,7 @@ static bool pcmbuf_insert_wav(const void *ch1, const void *ch2, int count)
      
             case STEREO_MONO:
                 while (count--) {
-                    int2le16(p, clip_sample((*data1_32++) >> scale));
+                    int2le16(p, clip_sample((*data1_32++ + dc_bias) >> scale));
                     p += 2;
                 }
                 break;

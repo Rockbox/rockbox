@@ -23,6 +23,12 @@
 
 #include <QtGui>
 
+extern "C" {
+    // Ipodpatcher
+#include "../ipodpatcher/ipodpatcher.h"
+#include "../sansapatcher/sansapatcher.h"
+};
+
 class Autodetection :public QObject
 {
     Q_OBJECT
@@ -36,7 +42,8 @@ public:
     QString getMountPoint() {return m_mountpoint;}
 
 private:
-    QStringList getMountpoints();
+    QStringList getMountpoints(void);
+    QString resolveMountPoint(QString);
     
     QString m_device;
     QString m_mountpoint;

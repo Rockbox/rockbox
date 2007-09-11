@@ -98,6 +98,7 @@ long gui_wps_show(void)
     bool restore = false;
     long restoretimer = 0; /* timer to delay screen redraw temporarily */
     bool exit = false;
+    bool bookmark = false;
     bool update_track = false;
     int i;
     long last_left = 0, last_right = 0;
@@ -585,6 +586,7 @@ long gui_wps_show(void)
             case ACTION_WPS_STOP:
                 if (global_settings.party_mode)
                     break;
+                bookmark = true;
                 exit = true;
                 break;
 
@@ -624,7 +626,6 @@ long gui_wps_show(void)
                 break;
 #endif
             case SYS_POWEROFF:
-                bookmark_autobookmark();
 #if LCD_DEPTH > 1
                 show_main_backdrop();
 #endif
@@ -676,7 +677,8 @@ long gui_wps_show(void)
 
             FOR_NB_SCREENS(i)
                 gui_wps[i].display->stop_scroll();
-            bookmark_autobookmark();
+            if (bookmark)
+                bookmark_autobookmark();
             audio_stop();
 #ifdef AB_REPEAT_ENABLE
             ab_reset_markers();

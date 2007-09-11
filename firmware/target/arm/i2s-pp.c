@@ -142,7 +142,7 @@ void i2s_reset(void)
     IISFIFO_CFG |= 0x1100;
 }
 
-#ifdef SANSA_E200
+#if defined(SANSA_E200) || defined(SANSA_C200)
 void i2s_scale_attn_level(long frequency)
 {
     unsigned int iisfifo_cfg = IISFIFO_CFG & ~0xff;

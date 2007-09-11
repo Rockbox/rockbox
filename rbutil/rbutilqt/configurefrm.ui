@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>500</width>
-    <height>400</height>
+    <height>435</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -20,39 +20,6 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0" >
-    <spacer>
-     <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" >
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="2" column="1" >
-    <widget class="QPushButton" name="buttonOk" >
-     <property name="text" >
-      <string>&amp;Ok</string>
-     </property>
-     <property name="icon" >
-      <iconset resource="rbutilqt.qrc" >:/icons/icons/go-next.png</iconset>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2" >
-    <widget class="QPushButton" name="buttonCancel" >
-     <property name="text" >
-      <string>&amp;Cancel</string>
-     </property>
-     <property name="icon" >
-      <iconset resource="rbutilqt.qrc" >:/icons/icons/process-stop.png</iconset>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="0" colspan="3" >
     <widget class="QTabWidget" name="tabConfiguration" >
      <property name="currentIndex" >
@@ -63,7 +30,7 @@
        <string>&amp;Device</string>
       </attribute>
       <attribute name="icon" >
-       <iconset resource="rbutilqt.qrc" >:/icons/icons/rbutil.xpm</iconset>
+       <iconset resource="rbutilqt.qrc" >:/icons/icons/rbutil.png</iconset>
       </attribute>
       <layout class="QGridLayout" >
        <item row="0" column="0" >
@@ -270,6 +237,9 @@
       <attribute name="title" >
        <string>Cac&amp;he</string>
       </attribute>
+      <attribute name="icon" >
+       <iconset resource="rbutilqt.qrc" >:/icons/icons/package-x-generic.png</iconset>
+      </attribute>
       <attribute name="toolTip" >
        <string>Download cache settings</string>
       </attribute>
@@ -304,7 +274,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="cachePath" />
+          <widget class="QLineEdit" name="cachePath" >
+           <property name="toolTip" >
+            <string>Entering an invalid folder will reset the path to the systems temporary path.</string>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QPushButton" name="buttonCacheBrowse" >
@@ -312,7 +286,7 @@
             <string>&amp;Browse</string>
            </property>
            <property name="icon" >
-            <iconset resource="rbutilqt.qrc" >:/icons/icons/system-search.png</iconset>
+            <iconset resource="rbutilqt.qrc" >:/icons/icons/edit-find.png</iconset>
            </property>
           </widget>
          </item>
@@ -329,6 +303,9 @@
          </item>
          <item>
           <widget class="QCheckBox" name="cacheOfflineMode" >
+           <property name="toolTip" >
+            <string>This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.</string>
+           </property>
            <property name="text" >
             <string>O&amp;ffline mode</string>
            </property>
@@ -367,10 +344,185 @@
          <property name="text" >
           <string>Clean cache &amp;now</string>
          </property>
+         <property name="icon" >
+          <iconset resource="rbutilqt.qrc" >:/icons/icons/user-trash-full.png</iconset>
+         </property>
         </widget>
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tabTts" >
+      <attribute name="title" >
+       <string>&amp;TTS &amp;&amp; Encoder</string>
+      </attribute>
+      <attribute name="icon" >
+       <iconset resource="rbutilqt.qrc" >:/icons/icons/audio-input-microphone.png</iconset>
+      </attribute>
+      <layout class="QGridLayout" >
+       <item row="0" column="0" colspan="2" >
+        <widget class="QGroupBox" name="groupBox_2" >
+         <property name="title" >
+          <string>TTS Engine</string>
+         </property>
+         <layout class="QGridLayout" >
+          <item row="0" column="0" >
+           <widget class="QLabel" name="labelTts" >
+            <property name="text" >
+             <string>&amp;Select TTS profile</string>
+            </property>
+            <property name="buddy" >
+             <cstring>comboTts</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" colspan="2" >
+           <widget class="QComboBox" name="comboTts" />
+          </item>
+          <item row="1" column="0" >
+           <widget class="QLabel" name="labelTtsExecutable" >
+            <property name="text" >
+             <string>TTS executable</string>
+            </property>
+            <property name="buddy" >
+             <cstring>ttsExecutable</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" >
+           <widget class="QLineEdit" name="ttsExecutable" />
+          </item>
+          <item row="1" column="2" >
+           <widget class="QPushButton" name="browseTts" >
+            <property name="text" >
+             <string>&amp;Browse</string>
+            </property>
+            <property name="icon" >
+             <iconset resource="rbutilqt.qrc" >:/icons/icons/edit-find.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" >
+           <widget class="QLabel" name="labelTtsOptions" >
+            <property name="text" >
+             <string>TTS Options</string>
+            </property>
+            <property name="buddy" >
+             <cstring>ttsOptions</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1" colspan="2" >
+           <widget class="QLineEdit" name="ttsOptions" />
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item rowspan="2" row="1" column="0" colspan="2" >
+        <widget class="QGroupBox" name="groupBox_3" >
+         <property name="title" >
+          <string>Encoder Engine</string>
+         </property>
+         <layout class="QGridLayout" >
+          <item row="0" column="0" >
+           <widget class="QLabel" name="labelEncoder" >
+            <property name="text" >
+             <string>Select &amp;encoder profile</string>
+            </property>
+            <property name="buddy" >
+             <cstring>comboEncoder</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" colspan="2" >
+           <widget class="QComboBox" name="comboEncoder" />
+          </item>
+          <item row="1" column="0" >
+           <widget class="QLabel" name="labelEncoderExecutable" >
+            <property name="text" >
+             <string>Encoder executable</string>
+            </property>
+            <property name="buddy" >
+             <cstring>encoderExecutable</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" >
+           <widget class="QLineEdit" name="encoderExecutable" />
+          </item>
+          <item row="1" column="2" >
+           <widget class="QPushButton" name="browseEncoder" >
+            <property name="text" >
+             <string>B&amp;rowse</string>
+            </property>
+            <property name="icon" >
+             <iconset resource="rbutilqt.qrc" >:/icons/icons/edit-find.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" >
+           <widget class="QLabel" name="labelEncoderOptions" >
+            <property name="text" >
+             <string>Encoder options</string>
+            </property>
+            <property name="buddy" >
+             <cstring>encoderOptions</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1" colspan="2" >
+           <widget class="QLineEdit" name="encoderOptions" />
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="3" column="0" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item row="2" column="0" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="2" column="1" >
+    <widget class="QPushButton" name="buttonOk" >
+     <property name="text" >
+      <string>&amp;Ok</string>
+     </property>
+     <property name="icon" >
+      <iconset resource="rbutilqt.qrc" >:/icons/icons/go-next.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2" >
+    <widget class="QPushButton" name="buttonCancel" >
+     <property name="text" >
+      <string>&amp;Cancel</string>
+     </property>
+     <property name="icon" >
+      <iconset resource="rbutilqt.qrc" >:/icons/icons/process-stop.png</iconset>
+     </property>
     </widget>
    </item>
   </layout>

@@ -767,7 +767,7 @@ static bool clipboard_pastefile(const char *src, const char *target, bool copy)
                 result = clipboard_pastefile(src, target, true);
 
                 if (result) {
-                    result = remove(src);
+                    result = remove(src) == 0;
                 }
             }
         }
@@ -1082,14 +1082,13 @@ MENUITEM_FUNCTION(set_recdir_item, 0, ID2P(LANG_SET_AS_REC_DIR),
 #endif
 static bool add_to_faves(void)
 {
-    if(PLUGIN_USB_CONNECTED == filetype_load_plugin("shortcuts",
+    if(PLUGIN_USB_CONNECTED == filetype_load_plugin("shortcuts_append",
                                                     selected_file))
         onplay_result = ONPLAY_RELOAD_DIR;
     return false;
 }
 MENUITEM_FUNCTION(add_to_faves_item, 0, ID2P(LANG_ADD_TO_FAVES),
                   add_to_faves, NULL, clipboard_callback, Icon_NOICON);
-
 
 static int clipboard_callback(int action,const struct menu_item_ex *this_item)
 {

@@ -99,6 +99,10 @@
 #include "lcd-remote.h"
 #endif
 
+#ifdef HAVE_USBSTACK
+#include "usbstack.h"
+#endif
+
 #if CONFIG_USBOTG == USBOTG_ISP1362
 #include "isp1362.h"
 #endif
@@ -217,6 +221,9 @@ static void init_tagcache(void)
 
         if (ret > 0)
         {
+#if CONFIG_CODEC == SWCODEC
+            /* hwcodec can't use voice here, as the database commit
+             * uses the audio buffer. */
             static long talked_tick = 0;
             if(talk_menus_enabled()
                && (talked_tick == 0
@@ -228,6 +235,8 @@ static void init_tagcache(void)
                 talk_id(VOICE_OF, true);
                 talk_number(tagcache_get_max_commit_step(), true);
             }
+#endif
+
 #ifdef HAVE_LCD_BITMAP
             gui_syncsplash(0, "%s [%d/%d]",
                 str(LANG_TAGCACHE_INIT), ret, 
@@ -274,6 +283,7 @@ static void init(void)
     /* Must be done before any code uses the multi-screen APi */
     screen_access_init();
     gui_syncstatusbar_init(&statusbars);
+    ata_init();
     settings_reset();
     settings_load(SETTINGS_ALL);
     gui_sync_wps_init();
@@ -373,7 +383,10 @@ static void init(void)
 #endif
 
     adc_init();
-    
+
+#ifdef HAVE_USBSTACK
+    usb_stack_init();
+#endif
     usb_init();
 #if CONFIG_USBOTG == USBOTG_ISP1362
     isp1362_init();
@@ -433,7 +446,7 @@ static void init(void)
 #endif
     
     usb_start_monitoring();
-    while (usb_detect())
+    while (usb_detect() == USB_INSERTED)
     {   
 #ifdef HAVE_EEPROM_SETTINGS
         firmware_settings.disk_clean = false;

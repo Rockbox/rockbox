@@ -8,7 +8,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>700</width>
+    <width>600</width>
     <height>450</height>
    </rect>
   </property>
@@ -29,7 +29,7 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="1" colspan="2" >
+   <item row="0" column="1" colspan="3" >
     <widget class="QLabel" name="label_4" >
      <property name="text" >
       <string>Please select the Rockbox version you want to install on your player:</string>
@@ -39,7 +39,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="1" colspan="2" >
+   <item row="1" column="1" colspan="3" >
     <widget class="QGroupBox" name="groupBox" >
      <property name="title" >
       <string>Version</string>
@@ -69,7 +69,7 @@
      </layout>
     </widget>
    </item>
-   <item row="2" column="1" colspan="2" >
+   <item row="2" column="1" colspan="3" >
     <widget class="QGroupBox" name="groupBox_2" >
      <property name="title" >
       <string>Details</string>
@@ -98,7 +98,7 @@
      </layout>
     </widget>
    </item>
-   <item row="3" column="1" >
+   <item row="3" column="1" colspan="2" >
     <widget class="QCheckBox" name="checkBoxCache" >
      <property name="toolTip" >
       <string>Rockbox Utility stores copies of Rockbox it has downloaded on the local hard disk to save network traffic. If your local copy is no longer working, tick this box to download a fresh copy.</string>
@@ -108,15 +108,15 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="2" >
+   <item row="4" column="3" >
     <spacer>
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
      </property>
      <property name="sizeHint" >
       <size>
-       <width>131</width>
-       <height>41</height>
+       <width>20</width>
+       <height>40</height>
       </size>
      </property>
     </spacer>
@@ -128,13 +128,13 @@
      </property>
      <property name="sizeHint" >
       <size>
-       <width>291</width>
+       <width>40</width>
        <height>20</height>
       </size>
      </property>
     </spacer>
    </item>
-   <item row="5" column="2" >
+   <item row="5" column="2" colspan="2" >
     <layout class="QHBoxLayout" >
      <item>
       <widget class="QPushButton" name="buttonOk" >

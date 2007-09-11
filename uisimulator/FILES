@@ -2,7 +2,11 @@ FILES
 common/*.[ch]
 common/Makefile
 common/SOURCES
+common/player_icons/*.bmp
+common/player_icons/Makefile
+common/README
 sdl/*.[ch]
 sdl/UI-*.bmp
 sdl/Makefile
 sdl/SOURCES
+sdl/README

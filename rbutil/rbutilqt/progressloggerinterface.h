@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Wenger
- *   $Id: progressloggerinterface.h 14027 2007-07-27 17:42:49Z domonoky $
+ *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -47,6 +47,7 @@ signals:
 
 public slots:
     virtual void abort()=0;
+    virtual void undoAbort() =0;
     virtual void close()=0;
     virtual void show()=0;
     
@@ -55,4 +56,5 @@ private:
 };
 
 #endif
+
 

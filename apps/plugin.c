@@ -209,10 +209,10 @@ static const struct plugin_api rockbox_api = {
     /* file */
     (open_func)PREFIX(open),
     close,
-    (read_func)read,
+    (read_func)PREFIX(read),
     PREFIX(lseek),
     (creat_func)PREFIX(creat),
-    (write_func)write,
+    (write_func)PREFIX(write),
     PREFIX(remove),
     PREFIX(rename),
     PREFIX(ftruncate),

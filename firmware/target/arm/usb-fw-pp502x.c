@@ -22,45 +22,36 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include "cpu.h"
-#include "kernel.h"
-#include "thread.h"
 #include "system.h"
-#include "debug.h"
-#include "ata.h"
-#include "fat.h"
-#include "disk.h"
-#include "panic.h"
-#include "lcd.h"
-#include "adc.h"
 #include "usb.h"
 #include "button.h"
-#include "sprintf.h"
+#include "ata.h"
 #include "string.h"
-#include "hwcompat.h"
-
-#include "usb-target.h"
 #include "arcotg_udc.h"
+
+#ifdef HAVE_USBSTACK
+#include "usbstack.h"
+#endif
 
 void usb_init_device(void)
 {
     int r0;
-    outl(inl(0x70000084) | 0x200, 0x70000084);
+    outl(inl(0x70000084) | 0x200, 0x70000084);  
 
-    outl(inl(0x7000002C) | 0x3000000, 0x7000002C);
+    outl(inl(0x7000002C) | 0x3000000, 0x7000002C);  
     DEV_EN |= DEV_USB;
 
-    DEV_RS |= DEV_USB; /* reset usb start */
-    DEV_RS &=~DEV_USB;/* reset usb end */
+    DEV_RS |= DEV_USB; /* reset usb start */  
+    DEV_RS &=~DEV_USB;/* reset usb end */  
 
     DEV_INIT |= INIT_USB;
     while ((inl(0x70000028) & 0x80) == 0);
 
-    UDC_PORTSC1 |= PORTSCX_PORT_RESET;
+    UDC_PORTSC1 |= PORTSCX_PORT_RESET;  
     while ((UDC_PORTSC1 & PORTSCX_PORT_RESET) != 0);
 
     UDC_OTGSC |= 0x5F000000;
-    if( (UDC_OTGSC & 0x100) == 0) {
+    if( (UDC_OTGSC & 0x100) == 0) {  
         UDC_USBMODE &=~ USB_MODE_CTRL_MODE_HOST;
         UDC_USBMODE |= USB_MODE_CTRL_MODE_DEVICE;
         outl(inl(0x70000028) | 0x4000, 0x70000028);
@@ -70,15 +61,15 @@ void usb_init_device(void)
         outl(inl(0x70000028) &~0x4000, 0x70000028);
         outl(inl(0x70000028) | 0x2, 0x70000028);
     }
-    
-    
+
+
     UDC_USBCMD |= USB_CMD_CTRL_RESET;
     while((UDC_USBCMD & USB_CMD_CTRL_RESET) != 0);
-    
+
     r0 = UDC_PORTSC1;
 
-    /* Note from IPL source (referring to next 5 lines of code: 
-       THIS NEEDS TO BE CHANGED ONCE THERE IS KERNEL USB */
+    /* Note from IPL source (referring to next 5 lines of code:  
+       THIS NEEDS TO BE CHANGED ONCE THERE IS KERNEL USB */  
     DEV_INIT |= INIT_USB;
     DEV_EN |= DEV_USB;
     while ((inl(0x70000028) & 0x80) == 0);
@@ -86,7 +77,9 @@ void usb_init_device(void)
 
     udelay(0x186A0);
 
+#ifndef HAVE_USBSTACK
     dr_controller_setup();
+#endif
 
 #if defined(IPOD_COLOR) || defined(IPOD_4G) \
  || defined(IPOD_MINI)  || defined(IPOD_MINI2G)
@@ -98,6 +91,11 @@ void usb_init_device(void)
 
 void usb_enable(bool on)
 {
+#ifdef HAVE_USBSTACK
+    if (!on) {
+        usb_stack_stop();
+    }
+#else
     /* This device specific code will eventually give way to proper USB
        handling, which should be the same for all PP502x targets. */
     if (on)
@@ -108,7 +106,7 @@ void usb_enable(bool on)
 
 #if defined(IRIVER_H10) || defined (IRIVER_H10_5GB)
         if(button_status()==BUTTON_RIGHT)
-#endif
+#endif /* defined(IRIVER_H10) || defined (IRIVER_H10_5GB) */
         {
             ata_sleepnow(); /* Immediately spindown the disk. */
             sleep(HZ*2);
@@ -118,26 +116,45 @@ void usb_enable(bool on)
             memcpy((void *)0x40017f00, "diskmode\0\0hotstuff\0\0\1", 21);
 #elif CONFIG_CPU == PP5022
             memcpy((void *)0x4001ff00, "diskmode\0\0hotstuff\0\0\1", 21);
-#endif
-#endif
+#endif /* CONFIG_CPU */
+#endif /* IPOD_ARCH */
 
             system_reboot(); /* Reboot */
         }
-#endif
+#endif /*defined(IPOD_ARCH) || defined(IRIVER_H10) || defined (IRIVER_H10_5GB)*/
     }
+#endif /* !HAVE_USBSTACK */
 }
 
-bool usb_detect(void)
+int usb_detect(void)
 {
+    static int countdown = 0;
+    static int status = USB_EXTRACTED;
     static bool prev_usbstatus1 = false;
-    bool usbstatus1,usbstatus2;
+    bool usbstatus1, usbstatus2;
 
 #if defined(IPOD_COLOR) || defined(IPOD_4G) \
  || defined(IPOD_MINI)  || defined(IPOD_MINI2G)
     /* GPIO C bit 1 is firewire detect */
     if (!(GPIOC_INPUT_VAL & 0x02))
-        return true;
+        return USB_INSERTED;
 #endif
+
+    if (countdown > 0)
+    {
+        countdown--;
+
+        usbstatus2 = (UDC_PORTSC1 & PORTSCX_CURRENT_CONNECT_STATUS) ? true : false;
+        if ((countdown == 0) || usbstatus2)
+        {
+            countdown = 0;
+            status = usbstatus2 ? USB_INSERTED : USB_POWERED;
+#ifndef HAVE_USBSTACK
+            dr_controller_stop();
+#endif
+        }
+        return status;
+    }
 
     /* UDC_ID should have the bit format:
         [31:24] = 0x0
@@ -147,22 +164,52 @@ bool usb_detect(void)
         [7:6]   = 0x0 (Reserved)
         [5:0]   = 0x05 (ID) */
     if (UDC_ID != 0x22FA05) {
-        return false;
+        /* This should never occur - do we even need to test? */
+        return USB_EXTRACTED;
     }
 
     usbstatus1 = (UDC_OTGSC & 0x800) ? true : false;
-    if ((usbstatus1 == true) && (prev_usbstatus1 == false)) {
-        dr_controller_run();
-    } else if ((usbstatus1 == false) && (prev_usbstatus1 == true)) {
-        dr_controller_stop();
-    }
 
+    if (usbstatus1 == prev_usbstatus1)
+    {
+        /* Nothing has changed, so just return previous status */
+        return status;
+    }
     prev_usbstatus1 = usbstatus1;
-    usbstatus2 = (UDC_PORTSC1 & PORTSCX_CURRENT_CONNECT_STATUS) ? true : false;
 
-    if (usbstatus1 && usbstatus2) {
-        return true;
-    } else {
-        return false;
+    if (!usbstatus1)
+    {   /* We have just been disconnected */
+        status = USB_EXTRACTED;
+        return status;
     }
+
+    /* We now know that we have just been connected to either a charger
+       or a computer */
+
+    if((button_status() & ~USBPOWER_BTN_IGNORE) == USBPOWER_BUTTON)
+    {   
+        /* The user wants to charge, so it doesn't matter what we are
+           connected to. */
+
+        status = USB_POWERED;
+        return status;
+    }
+
+    /* Run the USB controller for long enough to detect if we're connected
+       to a computer, then stop it again. */
+
+#ifndef HAVE_USBSTACK
+    dr_controller_run();
+#else
+    usb_stack_start();
+#endif
+
+    /* Wait for 50 ticks (500ms) before deciding there is no computer
+       attached.  The required value varied a lot between different users
+       when this feature was being tested. */
+
+    countdown = 50;
+
+    return status;
 }
+

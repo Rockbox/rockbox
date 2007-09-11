@@ -42,6 +42,26 @@
 
 #include "sansaio.h"
 
+#if defined(__APPLE__) && defined(__MACH__)
+static int sansa_unmount(struct sansa_t* sansa)
+{
+    char cmd[4096];
+    int res;
+
+    sprintf(cmd, "/usr/sbin/diskutil unmount \"%ss1\"",sansa->diskname);
+    fprintf(stderr,"[INFO] ");
+    res = system(cmd);
+
+    if (res==0) {
+        return 0;
+    } else {
+        perror("Unmount failed");
+        return -1;
+    }
+}
+#endif
+
+
 #ifndef RBUTIL
 void print_error(char* msg)
 {
@@ -70,6 +90,11 @@ int sansa_open(struct sansa_t* sansa, int silent)
 
 int sansa_reopen_rw(struct sansa_t* sansa)
 {
+#if defined(__APPLE__) && defined(__MACH__)
+    if (sansa_unmount(sansa) < 0)
+        return -1;
+#endif
+
     close(sansa->dh);
     sansa->dh=open(sansa->diskname,O_RDWR);
     if (sansa->dh < 0) {

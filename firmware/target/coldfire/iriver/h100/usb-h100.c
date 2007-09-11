@@ -21,6 +21,7 @@
 #include "cpu.h"
 #include "system.h"
 #include "kernel.h"
+#include "usb.h"
 
 void usb_init_device(void)
 {
@@ -30,9 +31,9 @@ void usb_init_device(void)
     or_l(0x01000040, &GPIO_FUNCTION);
 }
 
-bool usb_detect(void)
+int usb_detect(void)
 {
-    return (GPIO1_READ & 0x80)?true:false;
+    return (GPIO1_READ & 0x80) ? USB_INSERTED : USB_EXTRACTED;
 }
 
 void usb_enable(bool on)

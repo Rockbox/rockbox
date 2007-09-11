@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Wenger
- *   $Id: talkfile.cpp 14027 2007-07-27 17:42:49Z domonoky $
+ *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -21,22 +21,9 @@
 
 TalkFileCreator::TalkFileCreator(QObject* parent): QObject(parent)
 {
-   
+
 }
 
-void TalkFileCreator::setTTsType(QString tts)
-{
-	m_curTTS = tts;
-	int index = m_supportedTTS.indexOf(m_curTTS);
-	m_curTTSTemplate = m_supportedTTSTemplates.at(index);
-}
-
-void TalkFileCreator::setEncType(QString enc)
-{
-	m_curEnc = enc;
-	int index = m_supportedEnc.indexOf(m_curEnc);
-	m_curEncTemplate = m_supportedEncTemplates.at(index);
-}
 
 bool TalkFileCreator::initEncoder()
 {
@@ -67,7 +54,7 @@ bool TalkFileCreator::initTTS()
 
 bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
 {
-	m_abort = false;
+    m_abort = false;
     m_logger = logger;
     m_logger->addItem("Starting Talkfile generation",LOGINFO);
     if(!initTTS())
@@ -90,21 +77,21 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
     // iterate over all entrys
     while (it.hasNext()) 
     {
-    	if(m_abort)
-    	{
-    		m_logger->addItem("Talkfile creation aborted",LOGERROR);
-    		return false;
-    	}
-    	
-    	QApplication::processEvents();  
+        if(m_abort)
+        {
+            m_logger->addItem("Talkfile creation aborted",LOGERROR);
+            return false;
+        }
+
+        QApplication::processEvents();
         QFileInfo fileInf = it.fileInfo();
         QString toSpeak;
         QString filename;
         QString wavfilename;
         
         if(fileInf.fileName() == "." || fileInf.fileName() == ".." || fileInf.suffix() == "talk")
-        { 	
-        	it.next();
+        {
+            it.next();
             continue;
         }
         if(fileInf.isDir())  // if it is a dir
@@ -146,6 +133,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
             }
         }
         
+        QString now = QDate::currentDate().toString("yyyyMMdd");
         if(m_removeWav)
         {
             QFile wavfile(wavfilename);
@@ -153,9 +141,9 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
             installlog.remove(wavfilename);
         }
         else
-            installlog.setValue(wavfilename.remove(m_mountpoint),installlog.value(wavfilename,0).toInt()+1);
+            installlog.setValue(wavfilename.remove(m_mountpoint),now);
         
-        installlog.setValue(filename.remove(m_mountpoint),installlog.value(filename,0).toInt()+1);
+        installlog.setValue(filename.remove(m_mountpoint),now);
         it.next();
     }
     
@@ -171,49 +159,37 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
 
 void TalkFileCreator::abort()
 {
-	m_abort = true;
+    m_abort = true;
 }
 
 bool TalkFileCreator::voice(QString text,QString wavfile)
 {
-           
-   QString execstring = m_curTTSTemplate;
-    	
-   execstring.replace("%exe",m_TTSexec);
-   execstring.replace("%options",m_TTSOpts);
-   execstring.replace("%wavfile",wavfile);
-   execstring.replace("%text",text);
-        
-   QProcess::execute(execstring);
-   return true;
-   
+
+    QString execstring = m_curTTSTemplate;
+
+    execstring.replace("%exe",m_TTSexec);
+    execstring.replace("%options",m_TTSOpts);
+    execstring.replace("%wavfile",wavfile);
+    execstring.replace("%text",text);
+
+    QProcess::execute(execstring);
+    return true;
+
 }
 
 bool TalkFileCreator::encode(QString input,QString output)
 {
-   	QString execstring = m_curEncTemplate;
-        	
+    QString execstring = m_curEncTemplate;
+
     execstring.replace("%exe",m_EncExec);
     execstring.replace("%options",m_EncOpts);
     execstring.replace("%input",input);
     execstring.replace("%output",output);
-           
-   QProcess::execute(execstring);
-   return true;
+
+    QProcess::execute(execstring);
+    return true;
 
 }
 
-QString TalkFileCreator::getTTsOpts(QString ttsname)
-{
-    int index = m_supportedTTS.indexOf(ttsname);
 
-    return m_supportedTTSOpts.at(index);
-}
-
-QString TalkFileCreator::getEncOpts(QString encname)
-{
-    int index = m_supportedEnc.indexOf(encname);
-
-    return m_supportedEncOpts.at(index);
-}
 

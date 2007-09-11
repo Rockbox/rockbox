@@ -47,6 +47,9 @@
 #include "radio.h"
 #endif
 
+#ifdef HAVE_USBSTACK
+#include "usbstack.h"
+#endif
 
 #define NVRAM(bytes) (bytes<<F_NVRAM_MASK_SHIFT)
 /** NOTE: NVRAM_CONFIG_VERSION is in settings_list.h
@@ -712,7 +715,11 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0,peak_meter_dbfs,LANG_PM_DBFS,true,"peak meter dbfs",NULL),
     {F_T_INT,&global_settings.peak_meter_min,LANG_PM_MIN,INT(60),"peak meter min",NULL,UNUSED},
     {F_T_INT,&global_settings.peak_meter_max,LANG_PM_MAX,INT(0),"peak meter max",NULL,UNUSED},
-#endif
+#ifdef HAVE_RECORDING
+    OFFON_SETTING(0,peak_meter_clipcounter,LANG_PM_CLIPCOUNTER,false,
+        "peak meter clipcounter",NULL),
+#endif /* HAVE_RECORDING */
+#endif /* HAVE_LCD_BITMAP */
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     SOUND_SETTING(0, mdb_strength, LANG_MDB_STRENGTH,
         "mdb strength", SOUND_MDB_STRENGTH),
@@ -1256,6 +1263,14 @@ const struct settings_list settings[] = {
                 3, "list_accel_wait", UNIT_SEC, 1, 10, 1, 
                 scanaccel_formatter, scanaccel_getlang, NULL),
 #endif /* HAVE_SCROLLWHEEL */
+#ifdef HAVE_USBSTACK
+    CHOICE_SETTING(0, usb_stack_mode, LANG_USBSTACK_MODE, 0, "usb mode",
+                 "device,host",
+                 usb_controller_select,
+                 2, ID2P(LANG_USBSTACK_DEVICE), ID2P(LANG_USBSTACK_HOST)),
+    FILENAME_SETTING(0, usb_stack_device_driver, "usb device driver",
+                 "storage", NULL, NULL, 32),                 
+#endif /* HAVE_USBSTACK */               
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

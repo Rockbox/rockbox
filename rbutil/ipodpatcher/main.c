@@ -45,6 +45,8 @@ enum {
    ADD_BOOTLOADER,
    READ_FIRMWARE,
    WRITE_FIRMWARE,
+   READ_AUPD,
+   WRITE_AUPD,
    READ_PARTITION,
    WRITE_PARTITION,
    FORMAT_PARTITION,
@@ -89,6 +91,8 @@ void print_usage(void)
     fprintf(stderr,"  -d,   --delete-bootloader\n");
     fprintf(stderr,"  -f,   --format\n");
     fprintf(stderr,"  -c,   --convert\n");
+    fprintf(stderr,"        --read-aupd          filename.bin\n");
+    fprintf(stderr,"        --write-aupd         filename.bin\n");
     fprintf(stderr,"\n");
 
 #ifdef __WIN32__
@@ -299,6 +303,18 @@ int main(int argc, char* argv[])
                    (strcmp(argv[i],"--format")==0)) {
             action = FORMAT_PARTITION;
             i++;
+        } else if (strcmp(argv[i],"--read-aupd")==0) {
+            action = READ_AUPD;
+            i++;
+            if (i == argc) { print_usage(); return 1; }
+            filename=argv[i];
+            i++;
+        } else if (strcmp(argv[i],"--write-aupd")==0) {
+            action = WRITE_AUPD;
+            i++;
+            if (i == argc) { print_usage(); return 1; }
+            filename=argv[i];
+            i++;
         } else if ((strcmp(argv[i],"-c")==0) || 
                    (strcmp(argv[i],"--convert")==0)) {
             action = CONVERT_TO_FAT32;
@@ -443,6 +459,22 @@ int main(int argc, char* argv[])
             fprintf(stderr,"[INFO] Firmware read to file %s.\n",filename);
         } else {
             fprintf(stderr,"[ERR]  --read-firmware failed.\n");
+        }
+    } else if (action==READ_AUPD) {
+        if (read_aupd(&ipod, filename)==0) {
+            fprintf(stderr,"[INFO] AUPD image read to file %s.\n",filename);
+        } else {
+            fprintf(stderr,"[ERR]  --read-aupd failed.\n");
+        }
+    } else if (action==WRITE_AUPD) {
+        if (ipod_reopen_rw(&ipod) < 0) {
+            return 5;
+        }
+
+        if (write_aupd(&ipod, filename)==0) {
+            fprintf(stderr,"[INFO] AUPD image %s written to device.\n",filename);
+        } else {
+            fprintf(stderr,"[ERR]  --write-aupd failed.\n");
         }
     } else if (action==READ_PARTITION) {
         outfile = open(filename,O_CREAT|O_TRUNC|O_WRONLY|O_BINARY,S_IREAD|S_IWRITE);

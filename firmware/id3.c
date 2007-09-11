@@ -400,8 +400,6 @@ static int parseuser( struct mp3entry* entry, char* tag, int bufferpos )
     int desc_len = strlen(tag);
     int value_len = 0;
 
-    /* Note: for ID3v2.4, parse_replaygain will not overwrite replaygain
-       values already parsed from RVA2 tags */
     if ((tag - entry->id3v2buf + desc_len + 2) < bufferpos) {
         /* At least part of the value was read, so we can safely try to
          * parse it
@@ -411,37 +409,69 @@ static int parseuser( struct mp3entry* entry, char* tag, int bufferpos )
             bufferpos - (tag - entry->id3v2buf));
     }
 
-    if (value_len) {
-        bufferpos = tag - entry->id3v2buf + value_len;
-    } else {
-        bufferpos = tag - entry->id3v2buf;
-    }
-
-    return bufferpos;
+    return tag - entry->id3v2buf + value_len;
 }
 
 /* parse RVA2 binary data and convert to replaygain information. */
 static int parserva2( struct mp3entry* entry, char* tag, int bufferpos )
 {
-    char* value = NULL;
     int desc_len = strlen(tag);
+    int end_pos = tag - entry->id3v2buf + desc_len + 5;
     int value_len = 0;
+    unsigned char* value = tag + desc_len + 1;
 
-    /* Only parse RVA2 replaygain tags if tag version == 2.4 */
-    if (entry->id3version == ID3_VER_2_4 &&
-        (tag - entry->id3v2buf + desc_len + 2) < bufferpos) {
-        value = tag + desc_len + 1;
-        value_len = parse_replaygain_rva(tag, value, entry, tag,
-            bufferpos - (tag - entry->id3v2buf));
+    /* Only parse RVA2 replaygain tags if tag version == 2.4 and channel
+     * type is master volume.
+     */
+    if (entry->id3version == ID3_VER_2_4 && end_pos < bufferpos 
+            && *value++ == 1) {
+        long gain = 0;
+        long peak = 0;
+        long peakbits;
+        long peakbytes;
+        bool album = false;
+
+        /* The RVA2 specification is unclear on some things (id string and
+         * peak volume), but this matches how Quod Libet use them.
+         */
+            
+        gain = (int16_t) ((value[0] << 8) | value[1]);
+        value += 2;
+        peakbits = *value++;
+        peakbytes = (peakbits + 7) / 8;
+    
+        /* Only use the topmost 24 bits for peak volume */
+        if (peakbytes > 3) {
+            peakbytes = 3;
+        }
+
+        /* Make sure the peak bits were read */
+        if (end_pos + peakbytes < bufferpos) {
+            long shift = ((8 - (peakbits & 7)) & 7) + (3 - peakbytes) * 8;
+
+            for ( ; peakbytes; peakbytes--) {
+                peak <<= 8;
+                peak += *value++;
+            }
+    
+            peak <<= shift;
+    
+            if (peakbits > 24) {
+                peak += *value >> (8 - shift);
+            }
+        }
+    
+        if (strcasecmp(tag, "album") == 0) {
+            album = true;
+        } else if (strcasecmp(tag, "track") != 0) {
+            gain = 0;
+        }
+            
+        value_len = parse_replaygain_int(album, gain, peak * 2, entry,
+            tag, sizeof(entry->id3v2buf) - (tag - entry->id3v2buf));
     }
 
-    if (value_len) {
-        bufferpos = tag - entry->id3v2buf + value_len;
-    } else {
-        bufferpos = tag - entry->id3v2buf;
-    }
-
-    return bufferpos;
+    return tag - entry->id3v2buf + value_len;
 }
 #endif
 
@@ -473,6 +503,29 @@ static const struct tag_resolver taglist[] = {
 };
 
 #define TAGLIST_SIZE ((int)(sizeof(taglist) / sizeof(taglist[0])))
+
+/* Get the length of an ID3 string in the given encoding. Returns the length
+ * in bytes, including end nil, or -1 if the encoding is unknown.
+ */
+static int unicode_len(char encoding, const void* string)
+{
+    int len = 0;
+
+    if (encoding == 0x01 || encoding == 0x02) {
+        char first;
+        const char *s = string;
+        /* string might be unaligned, so using short* can crash on ARM and SH1 */
+        do {
+            first = *s++;
+        } while ((first | *s++) != 0);
+
+        len = s - (const char*) string;
+    } else {
+        len = strlen((char*) string) + 1;
+    }
+
+    return len;
+}
 
 /* Checks to see if the passed in string is a 16-bit wide Unicode v2
    string.  If it is, we convert it to a UTF-8 string.  If it's not unicode,
@@ -862,7 +915,6 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             char** ptag = tr->offset ? (char**) (((char*)entry) + tr->offset)
                 : NULL;
             char* tag;
-            int comm_offset=0;
 
             /* Only ID3_VER_2_2 uses frames with three-character names. */
             if (((version == ID3_VER_2_2) && (tr->tag_length != 3))
@@ -900,14 +952,15 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                  */
                  
                 if(!memcmp( header, "COMM", 4 )) {
-                    /* ignore comments with iTunes 7 gapless data */
-                    if(!strcmp(tag+4, "iTunNORM"))
+                    int offset;
+                    /* ignore comments with iTunes 7 soundcheck/gapless data */
+                    if(!strncmp(tag+4, "iTun", 4))
                         break;
-                    comm_offset = 3 + strlen(tag+4) + 1;
-                    if(bytesread>comm_offset) {
-                        bytesread-=comm_offset;
-                        memmove(tag+1, tag+comm_offset+1, bytesread-1);
-                    }   
+                    offset = 3 + unicode_len(*tag, tag + 4);
+                    if(bytesread > offset) {
+                        bytesread -= offset;
+                        memmove(tag + 1, tag + 1 + offset, bytesread - 1);
+                    }
                 }
 
                 /* Attempt to parse Unicode string only if the tag contents

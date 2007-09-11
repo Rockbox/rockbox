@@ -33,7 +33,7 @@ void get_cfg_filename(char* buf, int buf_len, const char* filename)
     s = cfg_rb->strrchr(buf, '/');
     if (!s) /* should never happen */
     {
-        cfg_rb->snprintf(buf, buf_len, "/.rockbox/rocks/%s", filename);
+        cfg_rb->snprintf(buf, buf_len, PLUGIN_DIR "/%s", filename);
     }
     else
     {

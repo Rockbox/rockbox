@@ -181,7 +181,6 @@ static bool dbg_list(struct action_callback_info *info)
 extern struct thread_entry threads[MAXTHREADS];
 
 
-#ifndef SIMULATOR
 static char thread_status_char(int status)
 {
     switch (status)
@@ -256,7 +255,6 @@ static bool dbg_os(void)
     info.dbg_getname = threads_getname;
     return dbg_list(&info);
 }
-#endif /* !SIMULATOR */
 
 #ifdef HAVE_LCD_BITMAP
 #if CONFIG_CODEC != SWCODEC
@@ -1010,7 +1008,8 @@ static bool dbg_spdif(void)
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #   define DEBUG_CANCEL  BUTTON_REW
 
-#elif CONFIG_KEYPAD == SANSA_E200_PAD
+#elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
+      (CONFIG_KEYPAD == SANSA_C200_PAD)
 #   define DEBUG_CANCEL  BUTTON_LEFT
 #endif /* key definitios */
 
@@ -1204,13 +1203,11 @@ bool dbg_ports(void)
 
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
         line++;
-        snprintf(buf, sizeof(buf), "ADC_BATTERY:   %02x", adc_read(ADC_BATTERY));
+        snprintf(buf, sizeof(buf), "BATT: %03x UNK1: %03x", adc_read(ADC_BATTERY),
+                                                            adc_read(ADC_UNKNOWN_1));
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "ADC_UNKNOWN_1: %02x", adc_read(ADC_UNKNOWN_1));
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "ADC_REMOTE:    %02x", adc_read(ADC_REMOTE));
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "ADC_SCROLLPAD: %02x", adc_read(ADC_SCROLLPAD));
+        snprintf(buf, sizeof(buf), "REM:  %03x PAD: %03x", adc_read(ADC_REMOTE),
+                                                           adc_read(ADC_SCROLLPAD));
         lcd_puts(0, line++, buf);
 #elif defined(SANSA_E200)
         line++;
@@ -2009,7 +2006,7 @@ static bool dbg_save_roms(void)
 
     return false;
 }
-#elif defined(CPU_PP) && !defined(SANSA_E200)
+#elif defined(CPU_PP) && !(defined(SANSA_E200) || defined(SANSA_C200))
 static bool dbg_save_roms(void)
 {
     int fd;
@@ -2256,7 +2253,7 @@ static const struct the_menu_item menuitems[] = {
         { "LCD Power Off", dbg_lcd_power_off },
 #endif
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || \
-    (defined(CPU_PP) && !defined(SANSA_E200))
+    (defined(CPU_PP) && !(defined(SANSA_E200) || defined(SANSA_C200)))
         { "Dump ROM contents", dbg_save_roms },
 #endif
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || defined(CPU_PP) || CONFIG_CPU == S3C2440
@@ -2271,9 +2268,7 @@ static const struct the_menu_item menuitems[] = {
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE)
         { "Catch mem accesses", dbg_set_memory_guard },
 #endif
-#ifndef SIMULATOR
         { "View OS stacks", dbg_os },
-#endif
 #ifdef HAVE_LCD_BITMAP
 #ifndef SIMULATOR
         { "View battery", view_battery },

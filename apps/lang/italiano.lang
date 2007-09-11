@@ -79,7 +79,7 @@
     *: "Caricamento..."
   </dest>
   <voice>
-    *: ""
+    *: "Caricamento in corso!"
   </voice>
 </phrase>
 <phrase>
@@ -110,7 +110,7 @@
     *: "Spegnimento..."
   </dest>
   <voice>
-    *: ""
+    *: "Spegnimento in corso!"
   </voice>
 </phrase>
 <phrase>
@@ -127,7 +127,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Ripresa esecuzione..."
+    swcodec: "Ripresa esecuzione!"
   </voice>
 </phrase>
 <phrase>
@@ -158,7 +158,7 @@
     *: "Fallito"
   </dest>
   <voice>
-    *: ""
+    *: "Fallito"
   </voice>
 </phrase>
 <phrase>
@@ -545,11 +545,11 @@
   </source>
   <dest>
     *: none
-    masf: "IntensitÃ  MDB"
+    masf: "Intensità MDB"
   </dest>
   <voice>
     *: none
-    masf: "IntensitÃ  MDB"
+    masf: "Intensità MDB"
   </voice>
 </phrase>
 <phrase>
@@ -771,10 +771,10 @@
     *: "Cleared"
   </source>
   <dest>
-    *: "Ripristinato"
+    *: "Ripristinate"
   </dest>
   <voice>
-    *: ""
+    *: "Impostazioni ripristinate"
   </voice>
 </phrase>
 <phrase>
@@ -805,7 +805,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Impostazioni di registrazione"
+    recording: "Impostazioni registrazione"
   </voice>
 </phrase>
 <phrase>
@@ -975,7 +975,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: ""
+    swcodec: "Filtro picco"
   </voice>
 </phrase>
 <phrase>
@@ -1188,7 +1188,7 @@
 </phrase>
 <phrase>
   id: LANG_REPEAT_AB
-  desc: desc: repeat range from point A to B
+  desc: repeat range from point A to B
   user:
   <source>
     *: "A-B"
@@ -1383,10 +1383,10 @@
     *: "ID3 Tag Priority"
   </source>
   <dest>
-    *: "PrioritÃ  info ID3"
+    *: "Priorità info ID3"
   </dest>
   <voice>
-    *: "PrioritÃ  ID3 tag"
+    *: "Priorità ID3 tag"
   </voice>
 </phrase>
 <phrase>
@@ -1523,10 +1523,10 @@
     *: "By Newest Date"
   </source>
   <dest>
-    *: "Dal piÃ¹ recente"
+    *: "Dal più recente"
   </dest>
   <voice>
-    *: "dal piÃ¹ recente"
+    *: "dal più recente"
   </voice>
 </phrase>
 <phrase>
@@ -1732,11 +1732,11 @@
     masd: none
   </source>
   <dest>
-    *: "Misuratore di picco"
+    *: "Indicatore di picco"
     masd: none
   </dest>
   <voice>
-    *: "Misuratore di Picco"
+    *: "Indicatore di Picco"
     masd: none
   </voice>
 </phrase>
@@ -1996,10 +1996,10 @@
     *: "Idle Poweroff"
   </source>
   <dest>
-    *: "Spegnimento per inattivitÃ "
+    *: "Spegnimento per inattività"
   </dest>
   <voice>
-    *: "Spegnimento per InattivitÃ "
+    *: "Spegnimento per Inattività"
   </voice>
 </phrase>
 <phrase>
@@ -2074,11 +2074,11 @@
   </source>
   <dest>
     *: none
-    charging: "ModalitÃ  adattatore auto"
+    charging: "Modo adattatore auto"
   </dest>
   <voice>
     *: none
-    charging: "ModalitÃ  Adattatore Auto"
+    charging: "Modo Adattatore Auto"
   </voice>
 </phrase>
 <phrase>
@@ -2092,7 +2092,7 @@
     *: "Segnalibro allo stop"
   </dest>
   <voice>
-    *: ""
+    *: "Segnalibro Allo Stop"
   </voice>
 </phrase>
 <phrase>
@@ -2259,11 +2259,11 @@
   </source>
   <dest>
     *: none
-    recording_hwcodec: "QualitÃ "
+    recording_hwcodec: "Qualità"
   </dest>
   <voice>
     *: none
-    recording_hwcodec: "QualitÃ "
+    recording_hwcodec: "Qualità"
   </voice>
 </phrase>
 <phrase>
@@ -2407,19 +2407,19 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_CURRENT_DIR
-  desc: in recording directory options
+  desc: DEPRECATED
   user:
   <source>
     *: none
-    recording: "Current Directory"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Cartella Corrente"
+    recording: deprecated
   </dest>
   <voice>
     *: none
-    recording: "Cartella Corrente"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -2562,11 +2562,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "ModalitÃ  fade out"
+    swcodec: "Modo fade out"
   </dest>
   <voice>
     *: none
-    swcodec: "ModalitÃ  fade out"
+    swcodec: "Modo fade out"
   </voice>
 </phrase>
 <phrase>
@@ -2776,11 +2776,11 @@
   </source>
   <dest>
     *: none
-    backlight_brightness: "LuminositÃ "
+    backlight_brightness: "Luminosità"
   </dest>
   <voice>
     *: none
-    backlight_brightness: "LuminositÃ "
+    backlight_brightness: "Luminosità"
   </voice>
 </phrase>
 <phrase>
@@ -2941,10 +2941,10 @@
     *: "Scroll Speed"
   </source>
   <dest>
-    *: "VelocitÃ  scorrimento"
+    *: "Velocità scorrimento"
   </dest>
   <voice>
-    *: "VelocitÃ  Scorrimento"
+    *: "Velocità scorrimento"
   </voice>
 </phrase>
 <phrase>
@@ -2955,7 +2955,7 @@
     *: "Scroll Speed Setting Example"
   </source>
   <dest>
-    *: "Esempio velocitÃ  scorrimento impostata"
+    *: "Esempio velocità scorrimento impostata"
   </dest>
   <voice>
     *: ""
@@ -3225,19 +3225,16 @@
 </phrase>
 <phrase>
   id: LANG_PM_UNITS_PER_READ
-  desc: in the peak meter menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Units Per Read"
-    masd: none
+    *: ""
   </source>
   <dest>
-    *: "UnitÃ  per lettura"
-    masd: none
+    *: ""
   </dest>
   <voice>
-    *: "UnitÃ  per lettura"
-    masd: none
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3384,10 +3381,10 @@
     *: "Battery Capacity"
   </source>
   <dest>
-    *: "CapacitÃ  batteria"
+    *: "Capacità batteria"
   </dest>
   <voice>
-    *: "CapacitÃ  Batteria"
+    *: "Capacità Batteria"
   </voice>
 </phrase>
 <phrase>
@@ -3694,7 +3691,7 @@
     *: "Cancellare?"
   </dest>
   <voice>
-    *: ""
+    *: "Cancellare?"
   </voice>
 </phrase>
 <phrase>
@@ -3708,7 +3705,7 @@
     *: "Cancellato"
   </dest>
   <voice>
-    *: ""
+    *: "Cancellato"
   </voice>
 </phrase>
 <phrase>
@@ -3918,7 +3915,7 @@
     *: "Rockbox Info"
   </dest>
   <voice>
-    *: ""
+    *: "Rockbox Info"
   </voice>
 </phrase>
 <phrase>
@@ -4041,17 +4038,17 @@
   user:
   <source>
     *: none
-    e200: "mSD:"
+    e200,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
-    e200: "mSD"
+    e200,c200: "mSD"
     ondio*: "MMC"
   </dest>
   <voice>
     *: none
-    e200: "Micro SD"
+    e200,c200: "Micro SD"
     ondio*: "Multimedia Card"
   </voice>
 </phrase>
@@ -4082,7 +4079,7 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Incremento velocitÃ "
+    pitchscreen: "Incremento velocità"
   </dest>
   <voice>
     *: none
@@ -4099,7 +4096,7 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Decremento velocitÃ "
+    pitchscreen: "Decremento velocità"
   </dest>
   <voice>
     *: none
@@ -4117,7 +4114,7 @@
     *: "Pausa"
   </dest>
   <voice>
-    *: ""
+    *: "Pausa"
   </voice>
 </phrase>
 <phrase>
@@ -4128,10 +4125,10 @@
     *: "Create a Bookmark?"
   </source>
   <dest>
-    *: "Creo un segnalibro?"
+    *: "Creare un segnalibro?"
   </dest>
   <voice>
-    *: ""
+    *: "Creare un segnalibro?"
   </voice>
 </phrase>
 <phrase>
@@ -4145,7 +4142,7 @@
     *: "Segnalibro creato"
   </dest>
   <voice>
-    *: ""
+    *: "Segnalibro creato"
   </voice>
 </phrase>
 <phrase>
@@ -4156,10 +4153,10 @@
     *: "Bookmark Failed!"
   </source>
   <dest>
-    *: "Creazione segnalibro fallita"
+    *: "Segnalibro fallito!"
   </dest>
   <voice>
-    *: ""
+    *: "Segnalibro fallito!"
   </voice>
 </phrase>
 <phrase>
@@ -4173,7 +4170,7 @@
     *: "Segnalibro vuoto"
   </dest>
   <voice>
-    *: ""
+    *: "Segnalibro vuoto"
   </voice>
 </phrase>
 <phrase>
@@ -4184,7 +4181,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200: "MENU = Revert"
+    ipod*,e200,c200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
@@ -4193,13 +4190,14 @@
     *: none
     rtc: "OFF = Annulla"
     h100,h120,h300: "STOP = Annulla"
-    ipod*,e200: "MENU = Annulla"
+    ipod*,e200,c200: "MENU = Annulla"
     x5,m5: "RECORD = Annulla"
     h10,h10_5gb: "PREV = Annulla"
     gigabeatf: "A = Annulla"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_gb,gigabeatf: ""
   </voice>
 </phrase>
 <phrase>
@@ -4276,15 +4274,21 @@
   user:
   <source>
     *: none
-    recording: "The disk is full. Press STOP to continue."
+    recording: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
+    m5,x5: "The disk is full. Press POWER to continue."
+    e200,c200: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
     recording: "Disco pieno. Premi STOP per continuare."
+    h100,h120,h300: "Disco pieno. Premi stop per continuare."
+    m5,x5: "Disco pieno. Premi POWER per continuare."
+    e200,c200: "Disco pieno. Premi UP per continuare."
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording,h100,h120,h300,m5,x5,e200,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -4301,7 +4305,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Una volta"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -4318,7 +4322,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Livello avvio"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -4335,7 +4339,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Livello arresto"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -4352,7 +4356,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Soglia di separazione"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -4369,7 +4373,7 @@
   </dest>
   <voice>
     *: none
-    recording: "-inf"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -4432,8 +4436,8 @@
     alarm: "Alarm Time Is Too Soon!"
   </source>
   <dest>
-    *: ""
-    alarm: "L'orario impostato Ã¨ troppo vicino!"
+    *: none
+    alarm: "L'orario impostato è troppo vicino!"
   </dest>
   <voice>
     *: none
@@ -4599,7 +4603,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: "bitreit variabile"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4627,7 +4631,7 @@
     *: "[Guadagno Traccia]"
   </dest>
   <voice>
-    *: "Guadagno Traccia"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4641,7 +4645,7 @@
     *: "[Guadagno Album]"
   </dest>
   <voice>
-    *: "Guadagno Album"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5468,7 +5472,7 @@
     *: ""
   </dest>
   <voice>
-    *: "piÃ¹"
+    *: "piu'"
   </voice>
 </phrase>
 <phrase>
@@ -6201,16 +6205,16 @@
 </phrase>
 <phrase>
   id: VOICE_EXT_TXT
-  desc: spoken only, for file extension
+  desc: DEPRECATED
   user:
   <source>
     *: ""
   </source>
   <dest>
-    *: ""
+    *: deprecated
   </dest>
   <voice>
-    *: "testo"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6224,7 +6228,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plaghin"
+    *: "plugin"
   </voice>
 </phrase>
 <phrase>
@@ -6311,7 +6315,7 @@
     *: "Buffer Playlist pieno"
   </dest>
   <voice>
-    *: ""
+    *: "Buffer Playlist pieno"
   </voice>
 </phrase>
 <phrase>
@@ -6339,7 +6343,7 @@
     *: "Inserite %d tracce (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "Traccie inserite"
   </voice>
 </phrase>
 <phrase>
@@ -6353,7 +6357,7 @@
     *: "Accodate %d tracce (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "Traccie accodate"
   </voice>
 </phrase>
 <phrase>
@@ -6367,7 +6371,7 @@
     *: "Salvate %d tracce (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "Traccie salvate"
   </voice>
 </phrase>
 <phrase>
@@ -6381,7 +6385,7 @@
     *: "In modo ricorsivo?"
   </dest>
   <voice>
-    *: ""
+    *: "In modo ricorsivo?"
   </voice>
 </phrase>
 <phrase>
@@ -6395,7 +6399,7 @@
     *: "Cancellare la Playlist dinamica?"
   </dest>
   <voice>
-    *: ""
+    *: "Cancellare la Playlist dinamica?"
   </voice>
 </phrase>
 <phrase>
@@ -6409,7 +6413,7 @@
     *: "Niente da riprendere"
   </dest>
   <voice>
-    *: ""
+    *: "Niente da riprendere"
   </voice>
 </phrase>
 <phrase>
@@ -6423,7 +6427,7 @@
     *: "Errore di aggiornamento file controllo playlist"
   </dest>
   <voice>
-    *: ""
+    *: "Errore di aggiornamento file controllo playlist"
   </voice>
 </phrase>
 <phrase>
@@ -6437,7 +6441,7 @@
     *: "Errore di accesso file playlist"
   </dest>
   <voice>
-    *: ""
+    *: "Errore di accesso file playlist"
   </voice>
 </phrase>
 <phrase>
@@ -6451,7 +6455,7 @@
     *: "Errore di accesso file controllo playlist"
   </dest>
   <voice>
-    *: ""
+    *: "Errore di accesso file controllo playlist"
   </voice>
 </phrase>
 <phrase>
@@ -6465,7 +6469,7 @@
     *: "Errore di accesso directory"
   </dest>
   <voice>
-    *: ""
+    *: "Errore di accesso directory"
   </voice>
 </phrase>
 <phrase>
@@ -6479,7 +6483,7 @@
     *: "File controllo playlist non valido"
   </dest>
   <voice>
-    *: ""
+    *: "File controllo playlist non valido"
   </voice>
 </phrase>
 <phrase>
@@ -6509,11 +6513,11 @@
   </source>
   <dest>
     *: none
-    radio: "Nessuna stazione"
+    radio: "Nessuna stazione memorizzata!"
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Nessuna stazione memorizzata!"
   </voice>
 </phrase>
 <phrase>
@@ -6581,7 +6585,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Salvataggio stazione fallito"
   </voice>
 </phrase>
 <phrase>
@@ -6594,11 +6598,11 @@
   </source>
   <dest>
     *: none
-    radio: "La lista delle stazioni Ã¨ piena"
+    radio: "La lista delle stazioni è piena"
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "La lista delle stazioni è piena"
   </voice>
 </phrase>
 <phrase>
@@ -6611,7 +6615,7 @@
   </source>
   <dest>
     *: none
-    radio_screen_button_bar: "MenÃ¹"
+    radio_screen_button_bar: "Menu"
   </dest>
   <voice>
     *: none
@@ -6747,11 +6751,11 @@
   </source>
   <dest>
     *: none
-    radio: "Cancellare la stazione corrente?"
+    radio: "Cancellare le stazioni correnti?"
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Cancellare le stazioni correnti?"
   </voice>
 </phrase>
 <phrase>
@@ -6798,7 +6802,7 @@
   </source>
   <dest>
     *: none
-    radio: "ModalitÃ  Scan"
+    radio: "Modo Scan"
   </dest>
   <voice>
     *: none
@@ -6813,10 +6817,10 @@
     *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "Il buffer cartella Ã¨ pieno!"
+    *: "Il buffer cartella è pieno!"
   </dest>
   <voice>
-    *: ""
+    *: "Il buffer cartella è pieno!"
   </voice>
 </phrase>
 <phrase>
@@ -6830,7 +6834,7 @@
     *: "Nuova lingua"
   </dest>
   <voice>
-    *: ""
+    *: "Nuova lingua"
   </voice>
 </phrase>
 <phrase>
@@ -6844,7 +6848,7 @@
     *: "Impostazioni Caricate"
   </dest>
   <voice>
-    *: ""
+    *: "Impostazioni Caricate"
   </voice>
 </phrase>
 <phrase>
@@ -6858,7 +6862,7 @@
     *: "Impostazioni Salvate"
   </dest>
   <voice>
-    *: ""
+    *: "Impostazioni Salvate"
   </voice>
 </phrase>
 <phrase>
@@ -6872,7 +6876,7 @@
     *: "Dati di avvio modificati"
   </dest>
   <voice>
-    *: ""
+    *: "Dati di avvio modificati"
   </voice>
 </phrase>
 <phrase>
@@ -6886,7 +6890,7 @@
     *: "Riavviare adesso?"
   </dest>
   <voice>
-    *: ""
+    *: "Riavviare adesso?"
   </voice>
 </phrase>
 <phrase>
@@ -6898,15 +6902,14 @@
     player,h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200: "PREV to abort"
+    h10,h10_5gb,e200,c200: "PREV to abort"
   </source>
   <dest>
     *: "OFF = Annulla"
     player,h100,h120,h300: "STOP = Annulla"
     ipod*: "PLAY/PAUSA = Annulla"
     x5,m5: "PLAY LUNGO = Annulla"
-    h10,h10_5gb,e200: "PREV = Annulla"
-    e200: "PREV = Annulla"
+    h10,h10_5gb,e200,c200: "PREV = Annulla"
   </dest>
   <voice>
     *: ""
@@ -6920,10 +6923,10 @@
     *: "No files"
   </source>
   <dest>
-    *: "Nessun file presente"
+    *: "Nessun file"
   </dest>
   <voice>
-    *: ""
+    *: "Nessun file"
   </voice>
 </phrase>
 <phrase>
@@ -6940,7 +6943,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Sfondo Caricato"
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
@@ -6957,7 +6960,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Sfondo non valido"
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
@@ -7125,7 +7128,7 @@
     *: "Elenco estensioni pieno"
   </dest>
   <voice>
-    *: ""
+    *: "Elenco estensioni pieno"
   </voice>
 </phrase>
 <phrase>
@@ -7139,7 +7142,7 @@
     *: "Elenco nomi file pieno"
   </dest>
   <voice>
-    *: ""
+    *: "Elenco nomi file pieno"
   </voice>
 </phrase>
 <phrase>
@@ -7153,7 +7156,7 @@
     *: "Nome plugin troppo lungo"
   </dest>
   <voice>
-    *: ""
+    *: "Nome plugin troppo lungo"
   </voice>
 </phrase>
 <phrase>
@@ -7170,7 +7173,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Salvare le modifiche?"
   </voice>
 </phrase>
 <phrase>
@@ -7184,7 +7187,7 @@
     *: "Inizializzazione Database"
   </dest>
   <voice>
-    *: ""
+    *: "Inizializzazione Database"
   </voice>
 </phrase>
 <phrase>
@@ -7257,7 +7260,7 @@
   desc: Backlight behaviour setting
   user:
   <source>
-    *: "First Keypress Enables Backlight Only"
+    *: "First Buttonpress Enables Backlight Only"
   </source>
   <dest>
     *: "La prima pressione attiva la luce"
@@ -7276,11 +7279,11 @@
   </source>
   <dest>
     *: none
-    remote: "UnitÃ  principale e telecomando"
+    remote: "Unità principale e telecomando"
   </dest>
   <voice>
     *: none
-    remote: "UnitÃ  principale e telecomando"
+    remote: "Unità principale e telecomando"
   </voice>
 </phrase>
 <phrase>
@@ -7307,11 +7310,11 @@
   </source>
   <dest>
     *: none
-    remote: "Solo unitÃ  principale"
+    remote: "Solo unità principale"
   </dest>
   <voice>
     *: none
-    remote: "Solo unitÃ  principale"
+    remote: "Solo unità principale"
   </voice>
 </phrase>
 <phrase>
@@ -7372,11 +7375,11 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "VelocitÃ "
+    pitchscreen: "Velocità"
   </dest>
   <voice>
     *: none
-    pitchscreen: "VelocitÃ "
+    pitchscreen: "Velocità"
   </voice>
 </phrase>
 <phrase>
@@ -7415,7 +7418,7 @@
   desc: splash when user selects an invalid colour
   user:
   <source>
-   *: none
+    *: none
     lcd_non-mono: "Invalid colour"
   </source>
   <dest>
@@ -7508,10 +7511,10 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "File/Cartella esistente. Sostituire?"
+    *: "File/cartella esistente. Sostituire?"
   </dest>
   <voice>
-    *: ""
+    *: "File o cartella esistente. Sostituire?"
   </voice>
 </phrase>
 <phrase>
@@ -7558,11 +7561,11 @@
   </source>
   <dest>
     *: none
-    radio: "Nessun file stazioni trovato. Ricercare automaticamente?"
+    radio: "Nessuna impostazione trovata. Ricercare automaticamente?"
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Nessuna impostazione trovata. Ricercare automaticamente?"
   </voice>
 </phrase>
 <phrase>
@@ -7641,7 +7644,7 @@
     *: "Nuova tastiera"
   </dest>
   <voice>
-    *: ""
+    *: "Nuova tastiera"
   </voice>
 </phrase>
 <phrase>
@@ -7680,7 +7683,7 @@
   desc: in color screen
   user:
   <source>
-   *: none
+    *: none
     lcd_color: "RGB: %02X%02X%02X"
   </source>
   <dest>
@@ -7717,7 +7720,7 @@
     *: "Aggiornamento in background"
   </dest>
   <voice>
-    *: ""
+    *: "Aggiornamento in background"
   </voice>
 </phrase>
 <phrase>
@@ -7841,7 +7844,7 @@
     *: "Nome file non valido!"
   </dest>
   <voice>
-    *: "Nome file non valido"
+    *: "Nome file non valido!"
   </voice>
 </phrase>
 <phrase>
@@ -8296,15 +8299,19 @@
   user:
   <source>
     *: none
-    recording: "The disk is full. Press STOP to continue."
+    recording: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "The disk is full. Press LEFT to continue."
   </source>
   <dest>
     *: none
     recording: "Disco pieno. Premere OFF per continuare."
+    h100,h120,h300: "Disco pieno. Premi stop per continuare."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "Disco pieno. Premi LEFT per continuare."
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -8691,11 +8698,11 @@
   </source>
   <dest>
     *: none
-    recording_hwcodec: "QualitÃ "
+    recording_hwcodec: "Qualità"
   </dest>
   <voice>
     *: none
-    recording_hwcodec: "QualitÃ "
+    recording_hwcodec: "Qualita'"
   </voice>
 </phrase>
 <phrase>
@@ -8810,11 +8817,11 @@
   </source>
   <dest>
     *: none
-    lcd_sleep: "Sospendi (Quando la luce Ã¨ spenta)"
+    lcd_sleep: "Sospendi (Quando la luce è spenta)"
   </dest>
   <voice>
     *: none
-    lcd_sleep: "Sospendi Quando la luce Ã¨ spenta"
+    lcd_sleep: "Sospendi Quando la luce è spenta"
   </voice>
 </phrase>
 <phrase>
@@ -8823,11 +8830,11 @@
   user:
   <source>
     *: none
-    hold_button: "Backlight (On Hold Key)"
+    hold_button: "Backlight on Hold"
   </source>
   <dest>
     *: none
-    hold_button: "Retroilluminazione (Sul tasto di blocco)"
+    hold_button: "Retroilluminazione Sul tasto di blocco"
   </dest>
   <voice>
     *: none
@@ -9221,7 +9228,7 @@
     *: "Riavvia per abilitare"
   </dest>
   <voice>
-    *: ""
+    *: "Riavvia per abilitare"
   </voice>
 </phrase>
 <phrase>
@@ -9450,10 +9457,10 @@
     *: "WARNING! Low Battery!"
   </source>
   <dest>
-    *: "Attenzione! Batteria Debole!"
+    *: "Attenzione! Batteria quasi scarica!"
   </dest>
   <voice>
-    *: ""
+    *: "Attenzione! Batteria quasi scarica!"
   </voice>
 </phrase>
 <phrase>
@@ -9467,7 +9474,7 @@
     *: "Batteria scarica! Ricaricare!"
   </dest>
   <voice>
-    *: ""
+    *: "Batteria scarica! Ricaricare!"
   </voice>
 </phrase>
 <phrase>
@@ -9614,10 +9621,10 @@
     *: "Properties"
   </source>
   <dest>
-    *: "ProprietÃ "
+    *: "Proprietà"
   </dest>
   <voice>
-    *: "ProprietÃ "
+    *: "Proprietà"
   </voice>
 </phrase>
 <phrase>
@@ -9920,22 +9927,18 @@
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PLAY/PAUSE to return)"
-    x5,m5: "Building database... %d found (Left to return)"
-    h10,h10_5gb,e200: "Building database... %d found (PREV to return)"
+    x5,m5: "Building database... %d found (LEFT to return)"
+    h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Costruzione database... %d trovato (OFF per uscire)"
     h100,h120,h300: "Costruzione database... %d trovato (STOP per uscire)"
     ipod*: "Costruzione database... %d trovato (PLAY/PAUSE per uscire)"
-    x5,m5: "Costruzione database... %d trovato (LEFT per uscire)"
-    h10,h10_5gb,e200: "Costruzione database... %d trovato (PREV per uscire)"
+    x5,m5: "Costruzione database... %d trovato (Sinistra per uscire)"
+    h10,h10_5gb,e200,c200: "Costruzione database... %d trovato (PREV per uscire)"
   </dest>
   <voice>
-    *: ""
-    h100,h120,h300: ""
-    ipod*: ""
-    x5,m5: ""
-    h10,h10_5gb,e200: ""
+    *: "Elementi trovati per il database"
   </voice>
 </phrase>
 <phrase>
@@ -9996,10 +9999,11 @@
   </source>
   <dest>
     *: none
-    gigabeatf: "LuminositÃ Tasti"
+    gigabeatf: "Luminosità Tasti"
   </dest>
   <voice>
     *: none
+    gigabeatf: "Luminosità Tasti"
   </voice>
 </phrase>
 <phrase>
@@ -10027,7 +10031,7 @@
     *: "Cancellazione..."
   </dest>
   <voice>
-    *: "Cancellazione"
+    *: "Cancellazione in corso!"
   </voice>
 </phrase>
 <phrase>
@@ -10041,7 +10045,7 @@
     *: "Spostamento..."
   </dest>
   <voice>
-    *: "Spostamento"
+    *: "Spostamento in corso!"
   </voice>
 </phrase>
 <phrase>
@@ -10055,7 +10059,7 @@
     *: "Copia..."
   </dest>
   <voice>
-    *: "Copia"
+    *: "Copia in corso!"
   </voice>
 </phrase>
 <phrase>
@@ -10179,11 +10183,11 @@
     scrollwheel: none
   </source>
   <dest>
-    *: "VelocitÃ Accelerazione Lista"
+    *: "Velocità Accelerazione Lista"
     scrollwheel: none
   </dest>
   <voice>
-    *: "VelocitÃ Accelerazione Lista"
+    *: "Velocità Accelerazione Lista"
     scrollwheel: none
   </voice>
 </phrase>
@@ -10226,10 +10230,10 @@
     *: "Use Directory .talk Clips"
   </source>
   <dest>
-    *: ""
+    *: "Usa Cartelle con Clip audio .talk"
   </dest>
   <voice>
-    *: ""
+    *: "Usa Cartelle con Clip audio .talk"
   </voice>
 </phrase>
 <phrase>
@@ -10246,6 +10250,7 @@
   </dest>
   <voice>
     *: none
+    recording: "Impossibile scrivere nella cartella di registrazione"
   </voice>
 </phrase>
 <phrase>
@@ -10267,7 +10272,7 @@
 </phrase>
 <phrase>
   id: LANG_SET_AS_REC_DIR
-  desc:
+  desc: used in the onplay menu to set a recording dir
   user:
   <source>
     *: none
@@ -10338,7 +10343,7 @@
     *: "Scansione disco..."
   </dest>
   <voice>
-    *: ""
+    *: "Scansione disco in corso!"
   </voice>
 </phrase>
 <phrase>
@@ -10382,11 +10387,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Disabilita ripresa in avvio se cuffia scollegata"
+    headphone_detection: "Disabilita riprendi all'avvio se la cuffia è scollegata"
   </dest>
   <voice>
     *: none
-    headphone_detection: "Disabilita ripresa in avvio se cuffia scollegata"
+    headphone_detection: "Disabilita riprendi all'avvio se la cuffia è scollegata"
   </voice>
 </phrase>
 <phrase>
@@ -10398,7 +10403,7 @@
     player: "Partition?"
   </source>
   <dest>
-    *: "Partizione non presente?"
+    *: "Nessuna partizione?"
     player: "Partizione?"
   </dest>
   <voice>
@@ -10430,10 +10435,10 @@
     *: "Save Failed"
   </source>
   <dest>
-    *: "Salvataggio non riuscito"
+    *: "Salvataggio fallito"
   </dest>
   <voice>
-    *: ""
+    *: "Salvataggio fallito"
   </voice>
 </phrase>
 <phrase>
@@ -10476,11 +10481,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Pausa e Ripresa"
+    headphone_detection: "Pausa e Riprendi"
   </dest>
   <voice>
     *: none
-    headphone_detection: "Pausa e Ripresa"
+    headphone_detection: "Pausa e Riprendi"
   </voice>
 </phrase>
 <phrase>
@@ -10504,13 +10509,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200,h10,h10_5gb: "SELECT = Yes"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Si"
     h100,h120,h300: "NAVI = Si"
-    ipod*,x5,m5,gigabeatf,e200,h10,h10_5gb: "SELECT = Si"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Si"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -10525,17 +10530,17 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,gigabeatf: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Imposta"
     h100,h120,h300: "NAVI = Imposta"
-    ipod*,x5,m5,h10,h10_5gb,e200,gigabeatf: "SELECT = Imposta"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Imposta"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200,gigabeatf: ""
+    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200,c200,gigabeatf: ""
   </voice>
 </phrase>
 <phrase>
@@ -10599,7 +10604,8 @@
     player: "Fine della lista"
   </dest>
   <voice>
-    *: ""
+    *: "Fine della Lista dei Brani"
+    player: "Fine della lista"
   </voice>
 </phrase>
 <phrase>
@@ -10624,12 +10630,10 @@
   desc: displayed when key lock is turned off
   user:
   <source>
-    *: "Keylock is OFF"
-    player: "Key Lock OFF"
+    *: "Buttons Unlocked"
   </source>
   <dest>
-    *: "Tastiera Attiva"
-    player: "Tastiera Attiva"
+    *: "Tasti Sbloccati"
   </dest>
   <voice>
     *: ""
@@ -10773,7 +10777,7 @@
     *: ""
   </source>
   <dest>
-     *: ""
+    *: ""
   </dest>
   <voice>
     *: "cuesheet"
@@ -10815,12 +10819,10 @@
   desc: displayed when key lock is on
   user:
   <source>
-    *: "Keylock is ON"
-    player: "Key Lock ON"
+    *: "Buttons Locked"
   </source>
   <dest>
-    *: "Tastiera bloccata"
-    player: "Tast. bloccata"
+    *: "Tasti bloccati"
   </dest>
   <voice>
     *: ""
@@ -10851,7 +10853,7 @@
     *: "Annullato"
   </dest>
   <voice>
-    *: ""
+    *: "Annullato"
   </voice>
 </phrase>
 <phrase>
@@ -10865,7 +10867,7 @@
     *: "Sei Sicuro?"
   </dest>
   <voice>
-    *: ""
+    *: "Sei Sicuro?"
   </voice>
 </phrase>
 <phrase>
@@ -10955,42 +10957,243 @@
 <phrase>
   id: LANG_SHOW_FILENAME_EXT
   desc: in settings_menu
-  user: 
+  user:
   <source>
-    *: "Show filename extensions"
+    *: "Show Filename Extensions"
   </source>
   <dest>
-    *: "Mostrare le estensioni di nome file"
+    *: "Mostra estensione nome file"
   </dest>
   <voice>
-    *: "Mostrare le estensioni di nome file"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EXT_ONLY_VIEW_ALL
-  desc: in settings_menu
-  user: 
-  <source>
-    *: "Only when viewing all types"
-  </source>
-  <dest>
-    *: "Soltanto quando osservare tutto batte a macchina"
-  </dest>
-  <voice>
-    *: "Soltanto quando osservare tutto batte a macchina"
+    *: "Mostra estensione nome file"
   </voice>
 </phrase>
 <phrase>
   id: LANG_UNKNOWN_TYPES
   desc: in settings_menu
-  user: 
+  user:
   <source>
-    *: "Only unknown types"
+    *: "Only Unknown Types"
   </source>
   <dest>
-    *: "I tipi soltanto sconosciuti"
+    *: "Solo tipi sconosciuti"
   </dest>
   <voice>
-    *: "I tipi soltanto sconosciuti"
+    *: "Solo tipi sconosciuti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EXT_ONLY_VIEW_ALL
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Only When Viewing All Types"
+  </source>
+  <dest>
+    *: "Solo quando visualizza tutti i tipi"
+  </dest>
+  <voice>
+    *: "Solo quando visualizza tutti i tipi"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PM_UNITS_PER_TICK
+  desc: spoken only, peak meter release unit
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "unita' per tick"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OCLOCK
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "In punto"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PM
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "P M"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_AM
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "A M"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OH
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "e"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNTER
+  desc: in settings, for recording peak meter
+  user:
+  <source>
+    *: none
+    recording: "Clip Counter"
+  </source>
+  <dest>
+    *: none
+    recording: "Contatore di Clip"
+  </dest>
+  <voice>
+    *: none
+    recording: "Contatore di Clip"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PM_CLIPCOUNT
+  desc: in recording GUI, for recording peak meter. MAX 5 characters!
+  user:
+  <source>
+    *: none
+    recording: "CLIP:"
+  </source>
+  <dest>
+    *: none
+    recording: "CLIP:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    usbstack: "USB Stack"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Stack USB"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Stack USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_MODE
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "USB Stack Mode"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Modo Stack USB"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Modo Stack USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Device"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Dispositivo"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Dispositivo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_HOST
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Host"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Host"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Host"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE_DRIVER
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Device Driver"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Driver Dispositivo"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Driver Dispositivo"
   </voice>
 </phrase>

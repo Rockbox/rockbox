@@ -104,7 +104,8 @@ void usage(void)
            "\t                      type of binary, eg. RBOS, RBBL\n"
            "\t-add=X  Rockbox generic \"add-up\" checksum format\n"
            "\t        (X values: h100, h120, h140, h300, ipco, nano, ipvd, mn2g\n"
-           "\t                   ip3g, ip4g, mini, iax5, h10, h10_5gb, tpj2, e200)\n"
+           "\t                   ip3g, ip4g, mini, iax5, h10, h10_5gb, tpj2,\n"
+           "\t                   c200, e200)\n"
            "\nNo option results in Archos standard player/recorder format.\n");
 
     exit(1);
@@ -228,8 +229,12 @@ int main (int argc, char** argv)
             modelnum = 17;
         else if(!strcmp(&argv[1][5], "giga"))
             modelnum = 18;
-        else if(!strcmp(&argv[1][5], "gigs"))
+       else if(!strcmp(&argv[1][5], "1g2g"))
             modelnum = 19;
+        else if(!strcmp(&argv[1][5], "c200"))
+            modelnum = 20;
+	     else if(!strcmp(&argv[1][5], "gigs"))
+            modelnum = 21;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

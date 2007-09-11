@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Wenger
- *   $Id: uninstall.cpp 13990 2007-07-25 22:26:10Z Dominik Wenger $
+ *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -113,7 +113,9 @@ void Uninstaller::uninstall(ProgressloggerInterface* dp)
 QStringList Uninstaller::getAllSections()
 {
     QSettings installlog(m_mountpoint + "/.rockbox/rbutil.log", QSettings::IniFormat, 0);
-    return installlog.childGroups();
+    QStringList allSections = installlog.childGroups();
+    allSections.removeAt(allSections.lastIndexOf("Bootloader"));
+    return allSections;
 }
 
 
@@ -121,3 +123,4 @@ bool Uninstaller::uninstallPossible()
 {
     return QFileInfo(m_mountpoint +"/.rockbox/rbutil.log").exists(); 
 }
+

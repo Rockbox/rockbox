@@ -41,6 +41,7 @@
 #define SYS_EVENT_CLS_POWER   2
 #define SYS_EVENT_CLS_FILESYS 3
 #define SYS_EVENT_CLS_PLUG    4
+#define SYS_EVENT_CLS_MISC    5
 /* make sure SYS_EVENT_CLS_BITS has enough range */
 
 /* Bit 31->|S|c...c|i...i| */
@@ -68,6 +69,7 @@
 #define SYS_PHONE_UNPLUGGED       MAKE_SYS_EVENT(SYS_EVENT_CLS_PLUG, 3)
 #define SYS_REMOTE_PLUGGED        MAKE_SYS_EVENT(SYS_EVENT_CLS_PLUG, 4)
 #define SYS_REMOTE_UNPLUGGED      MAKE_SYS_EVENT(SYS_EVENT_CLS_PLUG, 5)
+#define SYS_SCREENDUMP            MAKE_SYS_EVENT(SYS_EVENT_CLS_MISC, 0)
 
 struct event
 {

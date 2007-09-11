@@ -320,3 +320,4 @@ int rmdir_uncached(const char* name)
     closedir_uncached(dir);
     return rc;
 }
+

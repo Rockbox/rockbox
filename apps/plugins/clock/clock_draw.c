@@ -101,3 +101,4 @@ void clock_draw(struct screen* display, struct time* time,
         binary_clock_draw(display, time, skin);
     display->update();
 }
+

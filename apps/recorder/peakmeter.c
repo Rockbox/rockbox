@@ -16,6 +16,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifdef SIMULATOR
+#include <stdlib.h> /* sim uses rand for peakmeter simulation */
+#endif
 #include "config.h"
 #include "mas.h"
 #include "thread.h"
@@ -47,7 +50,6 @@
 #endif
 
 static bool pm_playback = true; /* selects between playback and recording peaks */
-
 #endif
 
 static struct meter_scales scales[NB_SCREENS];
@@ -112,6 +114,10 @@ static long trig_lowtime;
 static int trig_status = TRIG_OFF;
 
 static void (*trigger_listener)(int) = NULL;
+
+/* clipping counter (only used for recording) */
+static unsigned int pm_clipcount = 0;       /* clipping count */
+static bool pm_clipcount_active = false;    /* counting or not */
 #endif
 
 /* debug only */
@@ -490,6 +496,32 @@ void peak_meter_init_times(int release, int hold, int clip_hold)
     pm_clip_hold = clip_hold;
 }
 
+#ifdef HAVE_RECORDING
+/**
+ * Enable/disable clip counting
+ */
+void pm_activate_clipcount(bool active)
+{
+    pm_clipcount_active = active;
+}
+
+/**
+ * Get clipping counter value
+ */
+int pm_get_clipcount(void)
+{
+    return pm_clipcount;
+}
+
+/**
+ * Set clipping counter to zero (typically at start of recording or playback) 
+ */
+void pm_reset_clipcount(void)
+{
+    pm_clipcount = 0;
+}
+#endif
+
 /**
  * Set the source of the peak meter to playback or to 
  * record.
@@ -523,6 +555,7 @@ static void set_trig_status(int new_state)
         }
     }
 }
+
 #endif
 
 /**
@@ -535,6 +568,9 @@ static void set_trig_status(int new_state)
 void peak_meter_peek(void)
 {
     int left, right;
+#ifdef HAVE_RECORDING
+    bool was_clipping = pm_clip_left || pm_clip_right;
+#endif
    /* read current values */
 #if CONFIG_CODEC == SWCODEC
     if (pm_playback)
@@ -584,6 +620,14 @@ void peak_meter_peek(void)
         pm_clip_timeout_r = 
             current_tick + clip_time_out[pm_clip_hold];
     }
+
+#ifdef HAVE_RECORDING
+    if(!was_clipping && (pm_clip_left || pm_clip_right))
+    {
+        if(pm_clipcount_active)
+            pm_clipcount++;
+    }
+#endif
 
     /* peaks are searched -> we have to find the maximum. When
        many calls of peak_meter_peek the maximum value will be
@@ -757,6 +801,12 @@ static int peak_meter_read_l(void)
     /* reset pm_max_left so that subsequent calls of peak_meter_peek don't
        get fooled by an old maximum value */
     pm_max_left = pm_cur_left;
+    
+#if defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
+    srand(current_tick);
+    retval = rand()%MAX_PEAK;
+#endif
+
     return retval;
 }
 
@@ -782,6 +832,12 @@ static int peak_meter_read_r(void)
     /* reset pm_max_right so that subsequent calls of peak_meter_peek don't
        get fooled by an old maximum value */
     pm_max_right = pm_cur_right;
+
+#if defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
+    srand(current_tick);
+    retval = rand()%MAX_PEAK;
+#endif
+
     return retval;
 }
 
@@ -860,7 +916,7 @@ unsigned short peak_meter_scale_value(unsigned short val, int meterwidth)
 void peak_meter_screen(struct screen *display, int x, int y, int height)
 {
     peak_meter_draw(display, &scales[display->screen_type], x, y,
-                        display->width, height);
+                        display->width - x, height);
 }           
 /**
  * Draws a peak meter in the specified size at the specified position.
@@ -879,7 +935,8 @@ void peak_meter_draw(struct screen *display, struct meter_scales *scales,
     static int left_level = 0, right_level = 0;
     int left = 0, right = 0;
     int meterwidth = width - 3;
-    int i;
+    int i, delta;
+    static long peak_release_tick = 0;
     static long peak_release_tick = 0;
 
 #ifdef PM_DEBUG
@@ -935,17 +992,11 @@ void peak_meter_draw(struct screen *display, struct meter_scales *scales,
         }
 
         /* apply release */
-        if(current_tick != peak_release_tick)
-        {
-            peak_release_tick = current_tick;
-            left  = MAX(left , scales->last_left  - pm_peak_release);
-            right = MAX(right, scales->last_right - pm_peak_release);
-        }
-        else
-        {
-            left  = MAX(left , scales->last_left);
-            right = MAX(right, scales->last_right);
-        }
+        delta = current_tick - peak_release_tick;
+        peak_release_tick = current_tick;
+        left  = MAX(left , scales->last_left  - delta * pm_peak_release);
+        right = MAX(right, scales->last_right - delta * pm_peak_release);
+
         /* reset max values after timeout */
         if (TIME_AFTER(current_tick, scales->pm_peak_timeout_l)){
             scales->pm_peak_left = 0;
@@ -1288,7 +1339,7 @@ int peak_meter_draw_get_btn(int x, int y[], int height, int nb_screens)
             for(i = 0; i < nb_screens; i++)
             {
                 peak_meter_screen(&screens[i], x, y[i], height);
-                screens[i].update_rect(x, y[i], screens[i].width, height);
+                screens[i].update_rect(x, y[i], screens[i].width - x, height);
             }
             next_refresh += HZ / PEAK_METER_FPS;
             dopeek = true;

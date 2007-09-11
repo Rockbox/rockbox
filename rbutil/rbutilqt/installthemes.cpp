@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Riebeling
- *   $Id: installthemes.cpp 14363 2007-08-15 21:54:15Z bluebrother $
+ *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -41,7 +41,7 @@ ThemesInstallWindow::ThemesInstallWindow(QWidget *parent) : QDialog(parent)
 QString ThemesInstallWindow::resolution()
 {
     QString resolution;
-    devices->beginGroup(userSettings->value("defaults/platform").toString());
+    devices->beginGroup(userSettings->value("platform").toString());
     resolution = devices->value("resolution").toString();
     devices->endGroup();
     return resolution;
@@ -77,6 +77,8 @@ void ThemesInstallWindow::downloadInfo()
     qDebug() << "downloadInfo()" << url;
     qDebug() << url.queryItems();
     getter->setProxy(proxy);
+    if(userSettings->value("offline").toBool())
+        getter->setCache(userSettings->value("cachepath", QDir::tempPath()).toString());
     getter->setFile(&themesInfo);
     getter->getFile(url);
 }
@@ -175,12 +177,15 @@ void ThemesInstallWindow::updateDetails(int row)
     QString text;
     text = tr("<b>Author:</b> %1<hr/>").arg(iniDetails.value("author", tr("unknown")).toString());
     text += tr("<b>Version:</b> %1<hr/>").arg(iniDetails.value("version", tr("unknown")).toString());
-    text += tr("<b>Description:</b> %1<br/>").arg(iniDetails.value("about", tr("no description")).toString());
+    text += tr("<b>Description:</b> %1<hr/>").arg(iniDetails.value("about", tr("no description")).toString());
+    
     ui.themeDescription->setHtml(text);
     iniDetails.endGroup();
 
     igetter.abort();
     igetter.setProxy(proxy);
+    if(!userSettings->value("cachedisable").toBool())
+        igetter.setCache(userSettings->value("cachepath", QDir::tempPath()).toString());
     igetter.getFile(img);
     connect(&igetter, SIGNAL(done(bool)), this, SLOT(updateImage(bool)));
 }
@@ -191,21 +196,17 @@ void ThemesInstallWindow::updateImage(bool error)
     qDebug() << "updateImage(bool) =" << error;
     if(error) return;
     
-    QPixmap p, q;
-    QSize img;
-    img.setHeight(ui.themePreview->height());
-    img.setWidth(ui.themePreview->width());
+    QPixmap p;
     if(!error) {
         imgData = igetter.readAll();
         if(imgData.isNull()) return;
         p.loadFromData(imgData);
-        q = p.scaled(img, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        ui.themePreview->setScaledContents(false);
-        if(q.isNull()) {
+        if(p.isNull()) {
             ui.themePreview->clear();
             ui.themePreview->setText(tr("no theme preview"));
         }
-        else ui.themePreview->setPixmap(q);
+        else 
+            ui.themePreview->setPixmap(p);
     }
 }
 
@@ -223,7 +224,7 @@ void ThemesInstallWindow::resizeEvent(QResizeEvent* e)
     if(p.isNull()) return;
     q = p.scaled(img, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     ui.themePreview->setScaledContents(false);
-    ui.themePreview->setPixmap(q);
+    ui.themePreview->setPixmap(p);
 }
 
 
@@ -263,21 +264,27 @@ void ThemesInstallWindow::accept()
     }
     QStringList themes;
     QStringList names;
+    QStringList version;
     QString zip;
     QSettings iniDetails(themesInfo.fileName(), QSettings::IniFormat, this);
     for(int i = 0; i < ui.listThemes->selectedItems().size(); i++) {
         iniDetails.beginGroup(ui.listThemes->selectedItems().at(i)->data(Qt::UserRole).toString());
-        zip = devices->value("themes_url").toString() + "/" + iniDetails.value("archive").toString();
+        zip = devices->value("themes_url").toString()
+                + "/" + iniDetails.value("archive").toString();
         themes.append(zip);
-        names.append("Theme: " + ui.listThemes->selectedItems().at(i)->data(Qt::DisplayRole).toString());
+        names.append("Theme: " +
+                ui.listThemes->selectedItems().at(i)->data(Qt::DisplayRole).toString());
+        // if no version info is available use installation (current) date
+        version.append(iniDetails.value("version",
+                QDate().currentDate().toString("yyyyMMdd")).toString());
         iniDetails.endGroup();
     }
     qDebug() << "installing themes:" << themes;
     
     logger = new ProgressLoggerGui(this);
     logger->show();
-    QString mountPoint = userSettings->value("defaults/mountpoint").toString();
-    qDebug() << "mountpoint:" << userSettings->value("defaults/mountpoint").toString();
+    QString mountPoint = userSettings->value("mountpoint").toString();
+    qDebug() << "mountpoint:" << userSettings->value("mountpoint").toString();
     // show dialog with error if mount point is wrong
     if(!QFileInfo(mountPoint).isDir()) {
         logger->addItem(tr("Mount point is wrong!"),LOGERROR);
@@ -289,8 +296,12 @@ void ThemesInstallWindow::accept()
     installer->setUrl(themes);
     installer->setProxy(proxy);
     installer->setLogSection(names);
+    installer->setLogVersion(version);
     installer->setMountPoint(mountPoint);
+    if(!userSettings->value("cachedisable").toBool())
+        installer->setCache(userSettings->value("cachepath", QDir::tempPath()).toString());
     installer->install(logger);
     connect(logger, SIGNAL(closed()), this, SLOT(close()));
 }
+
 

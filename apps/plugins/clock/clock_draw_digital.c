@@ -86,3 +86,4 @@ void digital_clock_draw(struct screen* display,
                     display->height-str_h);
     }
 }
+

@@ -188,7 +188,8 @@
     #error CHESSBOX: Unsupported keypad
 #endif
 
-#define LOG_FILE  PLUGIN_DIR "/chessbox.log"
+#define PGN_FILE  PLUGIN_GAMES_DIR  "/chessbox.pgn"
+#define LOG_FILE  PLUGIN_GAMES_DIR  "/chessbox.log"
 int loghandler;
 
 struct plugin_api* rb;
@@ -520,6 +521,180 @@ void pgn_to_coords(struct pgn_ply_node* ply){
     color[locn[ply->row_from][ply->column_from]] = neutral;
 }
 
+void coords_to_pgn(struct pgn_ply_node* ply){
+    int pos = 0,i,j;
+    unsigned short moving_piece = board[locn[ply->row_from][ply->column_from]];
+    char unambiguous_position;
+    bool found = false;
+    char alg_move[5];
+    char move_buffer[10];
+    short move;
+    if (moving_piece == king){
+        /* check castling */
+        if (ply->column_from == 4 && ply->column_to == 6){
+            /* castling kingside */
+            rb->strcpy(ply->pgn_text,"O-O");
+            ply->castle = true;
+        } else if (ply->column_from == 4 && ply->column_to == 2){
+            /* castling queenside */
+            rb->strcpy(ply->pgn_text,"O-O-O");
+        } else {
+            if (board[locn[ply->row_to][ply->column_to]] != no_piece){
+                rb->snprintf(ply->pgn_text,10,"Kx%c%c",'a'+ply->column_to,
+                                   '1'+ply->row_to);
+            } else {
+                rb->snprintf(ply->pgn_text,10,"K%c%c",'a'+ply->column_to,
+                                   '1'+ply->row_to);
+            }
+        }
+    } else if (moving_piece == pawn){
+        if (ply->column_from != ply->column_to){
+            /* check enpassant */
+            if (board[locn[ply->row_to][ply->column_to]] == no_piece){
+                ply->enpassant = true;
+            }
+            /* check promotions when taking a piece */
+            if (ply->row_to == 0 || ply->row_to == 7) {
+                ply->promotion = true;
+                ply->promotion_piece = queen;
+                rb->snprintf(ply->pgn_text,10,"%cx%c%c=D", 'a'+ply->column_from,
+                                   'a'+ply->column_to,'1'+ply->row_to);
+            } else {
+                rb->snprintf(ply->pgn_text,10,"%cx%c%c", 'a'+ply->column_from,
+                                   'a'+ply->column_to,'1'+ply->row_to);
+            }
+        } else {
+            /* check promotions when not taking a piece */
+            if (ply->row_to == 0 || ply->row_to == 7) {
+                ply->promotion = true;
+                ply->promotion_piece = queen;
+                rb->snprintf(ply->pgn_text,10,"%c%c=D", 'a'+ply->column_to,
+                                   '1'+ply->row_to);
+            } else {
+                rb->snprintf(ply->pgn_text,10,"%c%c", 'a'+ply->column_to,
+                                   '1'+ply->row_to);
+            }
+        }
+    } else {
+        /* verify ambiguous moves for the different kinds of pieces */
+        unambiguous_position = '\0';
+        if (moving_piece == knight){
+            for (i=0;i<8;i++){
+                if (ply->row_to + kn_offs[i][0] >= 0 && ply->row_to + kn_offs[i][0] <= 7
+                    && ply->column_to + kn_offs[i][1] >= 0 && ply->column_to + kn_offs[i][1] <= 7
+                    && board[locn[ply->row_to + kn_offs[i][0]][ply->column_to + kn_offs[i][1]]] == knight
+                    && color[locn[ply->row_to + kn_offs[i][0]][ply->column_to + kn_offs[i][1]]] == ply->player
+                    && (ply->row_to + kn_offs[i][0] != ply->row_from 
+                        || ply->column_to + kn_offs[i][1] != ply->column_from)){
+                    if (ply->row_to + kn_offs[i][0] != ply->row_from){
+                        unambiguous_position = '1' + ply->row_from;
+                    } else {
+                        unambiguous_position = 'a' + ply->column_from;
+                    }
+                    break;
+                }
+            }
+        }
+        if (moving_piece == rook || moving_piece == queen){
+            found = false;
+            for (i=0;i<4;i++){
+                j=1;
+                while (ply->row_to+(j*rk_offs[i][0]) >= 0 && ply->row_to+(j*rk_offs[i][0]) <= 7 &&
+                       ply->column_to+(j*rk_offs[i][1]) >= 0 && ply->column_to+(j*rk_offs[i][1]) <= 7){
+                    if (board[locn[ply->row_to+(j*rk_offs[i][0])][ply->column_to+(j*rk_offs[i][1])]] != no_piece) {
+                        if (board[locn[ply->row_to+(j*rk_offs[i][0])][ply->column_to+(j*rk_offs[i][1])]] == moving_piece &&
+                            color[locn[ply->row_to+(j*rk_offs[i][0])][ply->column_to+(j*rk_offs[i][1])]] == ply->player &&
+                            (ply->row_to+(j*rk_offs[i][0]) != ply->row_from
+                             || ply->column_to+(j*rk_offs[i][1]) != ply->column_from)) {
+                            if (ply->row_to+(j*rk_offs[i][0]) != ply->row_from){
+                                unambiguous_position = '1' + ply->row_from;
+                            } else {
+                                unambiguous_position = 'a' + ply->column_from;
+                            }
+                            found = true;
+                        }
+                        break;
+                    }
+                    j++;
+                }
+                if (found) {
+                    break;
+                }
+            }
+        }
+        if (moving_piece == bishop || (moving_piece == queen && !found)){
+            for (i=0;i<4;i++){
+                j=1;
+                while (ply->row_to+(j*bp_offs[i][0]) >= 0 && ply->row_to+(j*bp_offs[i][0]) <= 7 &&
+                       ply->column_to+(j*bp_offs[i][1]) >= 0 && ply->column_to+(j*bp_offs[i][1]) <= 7){
+                    if (board[locn[ply->row_to+(j*bp_offs[i][0])][ply->column_to+(j*bp_offs[i][1])]] != no_piece) {
+                        if (board[locn[ply->row_to+(j*bp_offs[i][0])][ply->column_to+(j*bp_offs[i][1])]] == moving_piece &&
+                            color[locn[ply->row_to+(j*bp_offs[i][0])][ply->column_to+(j*bp_offs[i][1])]] == ply->player &&
+                            (ply->row_to+(j*bp_offs[i][0]) != ply->row_from
+                             || ply->column_to+(j*bp_offs[i][1]) != ply->column_from)) {
+                            if (ply->row_to+(j*bp_offs[i][0]) != ply->row_from){
+                                unambiguous_position = '1' + ply->row_from;
+                            } else {
+                                unambiguous_position = 'a' + ply->column_from;
+                            }
+                            found = true;
+                        }
+                        break;
+                    }
+                    j++;
+                }
+                if (found) {
+                    break;
+                }
+            }
+        }
+        /* generate the first portion of the PGN text
+         * always as white so all uppercase, black/white considerations
+         * will be useful for FEN notation but not in this case
+         */
+        if (unambiguous_position == '\0'){
+            if (board[locn[ply->row_to][ply->column_to]] != no_piece){
+                rb->snprintf(ply->pgn_text,10,"%cx%c%c",
+                                   pgn_from_piece(moving_piece,white) ,
+                                   'a'+ply->column_to, '1'+ply->row_to);
+            } else {
+                rb->snprintf(ply->pgn_text,10,"%c%c%c",
+                                   pgn_from_piece(moving_piece,white) ,
+                                   'a'+ply->column_to, '1'+ply->row_to);
+            }
+        } else {
+            if (board[locn[ply->row_to][ply->column_to]] != no_piece){
+                rb->snprintf(ply->pgn_text,10,"%c%cx%c%c",
+                                   pgn_from_piece(moving_piece,white) ,
+                                   unambiguous_position, 'a'+ply->column_to,
+                                   '1'+ply->row_to);
+            } else {
+                rb->snprintf(ply->pgn_text,10,"%c%c%c%c",
+                                   pgn_from_piece(moving_piece,white) ,
+                                   unambiguous_position, 'a'+ply->column_to,
+                                   '1'+ply->row_to);
+            }
+        }
+    }
+    /* update the board */
+    rb->snprintf(alg_move,5,"%c%c%c%c",'a' + ply->column_from, '1' + ply->row_from,
+                'a' + ply->column_to, '1' + ply->row_to);
+    /* The function returns false if the move is invalid, but since we're
+     * replaying the game, that should not be posible
+     */
+    VerifyMove (ply->player, alg_move , 0 , &move, move_buffer );
+
+    /* add check/mate indicators */
+    for (pos=0;ply->pgn_text[pos] != '\0';pos++);
+    if (ply->checkmate) {
+        ply->pgn_text[pos] = '#'; pos++;
+        ply->pgn_text[pos] = '\0'; pos++;
+    } else if (move_buffer[4] == '+'){
+        ply->pgn_text[pos] = '+'; pos++;
+        ply->pgn_text[pos] = '\0'; pos++;
+    }
+}
+
 char * get_game_text(int selected_item, void *data, char *buffer){
     int i;
     struct pgn_game_node *temp_node = (struct pgn_game_node *)data;
@@ -538,11 +713,21 @@ char * get_game_text(int selected_item, void *data, char *buffer){
     return buffer;
 }
 
+void write_pgn_token(int fhandler, char *buffer, size_t *line_length){
+    if (*line_length + rb->strlen(buffer) + 1 > 80){
+        rb->fdprintf(fhandler,"\n");
+        *line_length = 0;
+    }
+    rb->fdprintf(fhandler,"%s ",buffer);
+    *line_length += (rb->strlen(buffer) + 1);
+}
+
 /* ---- api functions ---- */
 struct pgn_game_node* pgn_list_games(struct plugin_api* api,const char* filename){
     int fhandler;
     char line_buffer[128];
-    struct pgn_game_node size_node, *first_game = NULL, *curr_node = NULL, *temp_node;
+    struct pgn_game_node size_node, *first_game = NULL;
+    struct pgn_game_node *curr_node = NULL, *temp_node;
     unsigned short game_count = 1;
     int line_count = 0;
     bool header_start = true, game_start = false;
@@ -577,7 +762,9 @@ struct pgn_game_node* pgn_list_games(struct plugin_api* api,const char* filename
         } else {
             if (line_buffer[0] == '['){
                 process_tag(curr_node, line_buffer);
-            } else if (line_buffer[0] == '\r' || line_buffer[0] == '\n' || line_buffer[0] == '\0'){
+            } else if (line_buffer[0] == '\r'
+                       || line_buffer[0] == '\n'
+                       || line_buffer[0] == '\0'){
                 if (game_start) {
                     game_start = false;
                 } else {
@@ -594,7 +781,8 @@ struct pgn_game_node* pgn_list_games(struct plugin_api* api,const char* filename
     return first_game;
 }
 
-struct pgn_game_node* pgn_show_game_list(struct plugin_api* api, struct pgn_game_node* first_game){
+struct pgn_game_node* pgn_show_game_list(struct plugin_api* api,
+                                         struct pgn_game_node* first_game){
     int curr_selection = 0;
     int button;
     struct gui_synclist games_list;
@@ -638,8 +826,10 @@ struct pgn_game_node* pgn_show_game_list(struct plugin_api* api, struct pgn_game
     }
 }
 
-void pgn_parse_game(struct plugin_api* api, const char* filename, struct pgn_game_node* selected_game){
-    struct pgn_ply_node size_ply, *first_ply = NULL, *temp_ply = NULL, *curr_node = NULL;
+void pgn_parse_game(struct plugin_api* api, const char* filename,
+                    struct pgn_game_node* selected_game){
+    struct pgn_ply_node size_ply, *first_ply = NULL;
+    struct pgn_ply_node *temp_ply = NULL, *curr_node = NULL;
     int fhandler, i;
     char line_buffer[128];
     char token_buffer[10];
@@ -682,16 +872,20 @@ void pgn_parse_game(struct plugin_api* api, const char* filename, struct pgn_gam
                     temp_ply->prev_node = curr_node;
                     curr_node = temp_ply;
                 }
-                rb->fdprintf(loghandler,"player: %u; pgn: %s; from: %u,%u; to: %u,%u; taken: %u.\n",
-                             temp_ply->player, temp_ply->pgn_text, temp_ply->row_from, temp_ply->column_from,
-                             temp_ply->row_to, temp_ply->column_to, temp_ply->taken_piece);
+                rb->fdprintf(loghandler,
+                    "player: %u; pgn: %s; from: %u,%u; to: %u,%u; taken: %u.\n",
+                             temp_ply->player, temp_ply->pgn_text, temp_ply->row_from,
+                             temp_ply->column_from, temp_ply->row_to,
+                             temp_ply->column_to, temp_ply->taken_piece);
             }
         }
     }
 
     rb->close(loghandler);
 
-    /* additional dummy ply to represent end of file without loosing the previous node's pointer */
+    /* additional dummy ply to represent end of file without
+     *loosing the previous node's pointer
+     */
     if (first_ply != NULL){
         temp_ply = (struct pgn_ply_node *)pl_malloc(sizeof size_ply);
         temp_ply->player = neutral;
@@ -700,4 +894,171 @@ void pgn_parse_game(struct plugin_api* api, const char* filename, struct pgn_gam
     }
     selected_game->first_ply = first_ply;
     rb->close(fhandler);
+}
+
+struct pgn_game_node* pgn_init_game(struct plugin_api* api){
+    struct pgn_game_node game_size, *game;
+    struct pgn_ply_node ply_size, *ply;
+    struct tm *current_time;
+
+    rb = api;
+
+    if (bufptr == NULL){
+        pl_malloc_init();
+    }
+
+    /* create an "end of game" dummy ply and assign defaults */
+    ply = (struct pgn_ply_node *)pl_malloc(sizeof ply_size);
+    ply->player = neutral;
+    ply->pgn_text[0] = '\0';
+    ply->prev_node = NULL;
+    ply->next_node = NULL;
+
+    /* create the game and assign defaults */
+    game = (struct pgn_game_node *)pl_malloc(sizeof game_size);
+    game->game_number = 0;
+    rb->strcpy(game->white_player,"Player");
+    rb->strcpy(game->black_player,"GnuChess");
+    current_time = rb->get_time();
+    if (current_time->tm_year < 100){
+        rb->snprintf(game->game_date,11,"????.??.??");
+    } else {
+        rb->snprintf(game->game_date,11,"%4u.%2u.%2u",current_time->tm_year + 1900,
+                     current_time->tm_mon + 1, current_time->tm_mday);
+    }
+    rb->strcpy(game->result,"*");
+    game->pgn_line = 0;
+    game->first_ply = ply;
+    game->next_node = NULL;
+
+    return game;
+}
+
+void pgn_append_ply(struct plugin_api* api, struct pgn_game_node* game,
+                    unsigned short ply_player, char *move_buffer, bool is_mate){
+    struct pgn_ply_node ply_size, *ply, *temp;
+
+    rb = api;
+
+    ply = (struct pgn_ply_node *)pl_malloc(sizeof ply_size);
+    ply->player = ply_player;
+    ply->column_from = move_buffer[0] - 'a';
+    ply->row_from = move_buffer[1] - '1';
+    ply->column_to = move_buffer[2] - 'a';
+    ply->row_to = move_buffer[3] - '1';
+    ply->castle = false;
+    ply->promotion = false;
+    ply->enpassant = false;
+    ply->promotion_piece = no_piece;
+    ply->taken_piece = no_piece;
+    ply->draw = false;
+    ply->checkmate = is_mate;
+
+    /* move the pointer to the "end of game" marker ply */
+    for (temp=game->first_ply;temp->next_node!=NULL;temp=temp->next_node);
+
+    /* arrange the pointers to insert the ply before the marker */
+    ply->next_node = temp;
+    ply->prev_node = temp->prev_node;
+    if (temp->prev_node == NULL){
+        game->first_ply = ply;
+    } else {
+        temp->prev_node->next_node = ply;
+    }
+    temp->prev_node = ply;
+}
+
+void pgn_set_result(struct plugin_api* api, struct pgn_game_node* game,
+                    bool is_mate){
+
+    rb = api;
+
+    struct pgn_ply_node *ply;
+    for(ply=game->first_ply;ply->next_node != NULL;ply=ply->next_node);
+    if (is_mate){
+        ply->prev_node->checkmate = true;
+    } else {
+        ply->prev_node->draw = true;
+    }
+}
+
+void pgn_store_game(struct plugin_api* api, struct pgn_game_node* game){
+    int fhandler;
+    struct pgn_ply_node *ply;
+    unsigned ply_count;
+    size_t line_length=0;
+    char buffer[10];
+
+    rb = api;
+
+    GNUChess_Initialize();
+
+    ply_count=0;
+    ply=game->first_ply;
+    while (ply->next_node!=NULL){
+        coords_to_pgn(ply);
+        if (ply->checkmate){
+            if (ply->player == white){
+                rb->strcpy(game->result,"1-0");
+            } else {
+                rb->strcpy(game->result,"0-1");
+            }
+        }
+        if (ply->draw){
+            rb->strcpy(game->result,"1/2-1/2");
+        }
+        ply=ply->next_node;
+        ply_count++;
+    }
+
+    fhandler = rb->open(PGN_FILE, O_WRONLY|O_CREAT|O_APPEND);
+
+
+    /* the first 7 tags are mandatory according to the PGN specification so we
+     * have to include them even if the values don't make much sense
+     */
+    rb->fdprintf(fhandler,"[Event \"Casual Game\"]\n");
+    rb->fdprintf(fhandler,"[Site \"?\"]\n");
+    rb->fdprintf(fhandler,"[Date \"%s\"]\n",game->game_date);
+    rb->fdprintf(fhandler,"[Round \"?\"]\n");
+    rb->fdprintf(fhandler,"[White \"%s\"]\n",game->white_player);
+    rb->fdprintf(fhandler,"[Black \"%s\"]\n",game->black_player);
+    rb->fdprintf(fhandler,"[Result \"%s\"]\n",game->result);
+    rb->fdprintf(fhandler,"[PlyCount \"%u\"]\n",ply_count);
+
+    /* leave a blank line between the tag section and the game section */
+    rb->fdprintf(fhandler,"\n");
+
+    /* write the plies in several lines of up to 80 characters */
+    for (ply_count=0, ply=game->first_ply;ply->next_node!=NULL;
+         ply=ply->next_node,ply_count++){
+        /* write the move number */
+        if (ply->player == white){
+            rb->snprintf(buffer,10,"%u.",(ply_count/2)+1);
+            write_pgn_token(fhandler, buffer, &line_length);
+        }
+        /* write the actual move */
+        write_pgn_token(fhandler,ply->pgn_text,&line_length);
+        /* write the result of the game at the end */
+        if (ply->checkmate){
+            if (ply->player == white){
+                write_pgn_token(fhandler,"1-0",&line_length);
+            } else {
+                write_pgn_token(fhandler,"0-1",&line_length);
+            }
+            break;
+        } else if (ply->draw){
+            write_pgn_token(fhandler,"1/2-1/2",&line_length);
+            break;
+        } else if (ply->next_node->player == neutral) {
+            /* unknown end of the game */
+            write_pgn_token(fhandler,"*",&line_length);
+            break;
+        }
+    }
+
+    /* leave a blank line between the tag section and the game section */
+    rb->fdprintf(fhandler,"\n\n");
+
+    rb->close(fhandler);    
 }

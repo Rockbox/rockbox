@@ -225,7 +225,7 @@ int sram_load(void)
     int fd;
     char meow[500];
 
-    if (!mbc.batt || !sramfile || !*sramfile) return -1;
+    if (!mbc.batt || !*sramfile) return -1;
 
     /* Consider sram loaded at this point, even if file doesn't exist */
     ram.loaded = 1;
@@ -249,7 +249,7 @@ int sram_save(void)
     char meow[500];
 
     /* If we crash before we ever loaded sram, DO NOT SAVE! */
-    if (!mbc.batt || !sramfile || !ram.loaded || !mbc.ramsize)
+    if (!mbc.batt || !ram.loaded || !mbc.ramsize)
         return -1;
     fd = open(sramfile, O_WRONLY|O_CREAT|O_TRUNC);
     if (fd<0) return -1;

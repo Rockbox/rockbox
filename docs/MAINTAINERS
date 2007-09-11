@@ -1,4 +1,4 @@
-$Id: MAINTAINERS 14382 2007-08-18 06:00:10Z amiconn $
+$Id$
                __________               __   ___.
      Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
      Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
@@ -30,7 +30,7 @@ specific to that target.
 :Archos Recorder 8MB:
 :Archos FM Recorder:
 :Archos Recorder v2:
-:Archos Ondio FM: Jens Arnold
+:Archos Ondio FM: Jens Arnold, Marianne Arnold
 :Archos Ondio SP:
 :Iriver H100/H115:
 :Iriver H120/H140: Miika Pekkarinen, Linus Nielsen Feltzing
@@ -46,7 +46,7 @@ specific to that target.
 :Iriver H10 20GB:
 :Iriver H10 5GB/6GB:
 :Iaudio X5: Linus Nielsen Feltzing
-:Iaudio M5:
+:Iaudio M5: Marianne Arnold
 :Sansa E200: Michael Sevakis
 :Toshiba Gigabeat F: Michael Sevakis
 :Toshiba Gigabeat X:
@@ -122,7 +122,10 @@ the person(s) named next to "General".
 :Italian: Alessio Lenzi
 :Dutch: Peter D'Hoye
 :Swedish: Magnus Holmgren
-:[Language 2]:
+:Danish: Jonas Häggqvist
+:German: Marianne Arnold
+:Finnish: Jani Kinnunen
+:Français: Mustapha Senhaji
 
 
 Plugins
@@ -288,6 +291,7 @@ Build Tools
 :scramble: Linus Nielsen Feltzing
 :descramble: Linus Nielsen Feltzing
 :mkinfo: Daniel Stenberg
+:voice perl script: Jonas Häggqvist
 
 Install Tools
 -------------
@@ -307,3 +311,4 @@ Web site stuff
 --------------
 
 :web site scripts and server-side admin:Daniel Stenberg,Björn Stenberg,Linus Nielsen Feltzing
+

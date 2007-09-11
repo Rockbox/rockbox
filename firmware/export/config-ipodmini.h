@@ -98,6 +98,17 @@
 /* Define this if you want to use the PP5020 i2c interface */
 #define CONFIG_I2C I2C_PP5020
 
+/* define this if the unit can be powered or charged via USB */
+#define HAVE_USB_POWER
+
+#ifndef SIMULATOR
+
+/* Define this if you have a PortalPlayer PP5020 */
+#define CONFIG_CPU PP5020
+
+/* Define this if you want to use the PP5020 i2c interface */
+#define CONFIG_I2C I2C_PP5020
+
 /* define this if the hardware can be powered off while charging */
 //#define HAVE_POWEROFF_WHILE_CHARGING
 
@@ -125,6 +136,11 @@
 
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_ARC
+
+/* enable these for the experimental usb stack
+#define HAVE_USBSTACK
+#define USBSTACK_CAPS CONTROLLER_DEVICE
+*/
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL

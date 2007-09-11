@@ -33,7 +33,8 @@ SOURCES += rbutilqt.cpp \
  installthemes.cpp \
  uninstall.cpp \
  uninstallwindow.cpp \
- browseof.cpp
+ browseof.cpp \
+ preview.cpp 
 
 HEADERS += rbutilqt.h \
  install.h \
@@ -67,16 +68,24 @@ HEADERS += rbutilqt.h \
  installthemes.h \
  uninstall.h \
  uninstallwindow.h \
- browseof.h
-
+ browseof.h \
+ preview.h 
+ 
 # Needed by QT on Win
 INCLUDEPATH = . irivertools zip zlib ../ipodpatcher ../sansapatcher
  
 TEMPLATE = app
-CONFIG += release \
-          warn_on \
-          thread \
-          qt
+dbg {
+    CONFIG += debug thread qt warn_on
+    DEFINES -= QT_NO_DEBUG_OUTPUT
+    message("debug")
+}
+!dbg {
+    CONFIG += release thread qt
+    DEFINES += QT_NO_DEBUG_OUTPUT
+    message("release")
+}
+
 TARGET = rbutilqt
 
 FORMS += rbutilqtfrm.ui \
@@ -88,11 +97,13 @@ FORMS += rbutilqtfrm.ui \
  installtalkfrm.ui \
  installthemesfrm.ui \
  uninstallfrm.ui \
- browseoffrm.ui
+ browseoffrm.ui \
+ previewfrm.ui
 
 RESOURCES += rbutilqt.qrc
 
 TRANSLATIONS += rbutil_de.ts
+TRANSLATIONS += rbutil_fr.ts
 QT += network
 DEFINES += RBUTIL _LARGEFILE64_SOURCE
 
@@ -107,4 +118,15 @@ unix {
     SOURCES +=  ../sansapatcher/sansaio-posix.c
 }
 
+macx {
+    QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.4u.sdk
+    CONFIG+=x86 ppc
+}
+
+static {
+    QTPLUGIN += qtaccessiblewidgets
+    LIBS += -L$$(QT_BUILD_TREE)/plugins/accessible -lqtaccessiblewidgets
+    DEFINES += STATIC
+    message("using static plugin")
+}
 

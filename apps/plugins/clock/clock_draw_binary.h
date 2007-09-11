@@ -25,3 +25,4 @@
 void binary_clock_draw(struct screen* display, struct time* time, int skin);
 
 #endif /* _BINARY_CLOCK_ */
+

@@ -250,6 +250,17 @@ static void talk_menu_item(const struct menu_item_ex *menu,
                    talk_id(id,false);
             }
         }
+        else if(((menu->flags&MENU_TYPE_MASK) == MT_RETURN_ID))
+        {
+            if ((menu->flags&MENU_DYNAMIC_DESC) == 0)
+            {
+                unsigned char *s = (unsigned char *)menu->strings[sel];
+                /* string list, try to talk it if ID2P was used */
+                id = P2ID(s);
+                if (id != -1)
+                    talk_id(id,false);
+            }
+        }
     }
 }
 #define MAX_OPTIONS 32

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Wenger
- *   $Id: installzip.cpp 13990 2007-07-25 22:26:10Z Dominik Wenger $
+ *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -25,6 +25,7 @@
 ZipInstaller::ZipInstaller(QObject* parent): QObject(parent) 
 {
     m_unzip = true;
+    m_cache = "";
 }
 
 
@@ -36,6 +37,7 @@ void ZipInstaller::install(ProgressloggerInterface *dp)
     connect(this, SIGNAL(cont()), this, SLOT(installContinue()));
     m_url = m_urllist.at(runner);
     m_logsection = m_loglist.at(runner);
+    m_logver = m_verlist.at(runner);
     installStart();
 
 }
@@ -52,6 +54,8 @@ void ZipInstaller::installContinue()
         m_dp->addItem(tr("done."), LOGOK);
         m_url = m_urllist.at(runner);
         m_logsection = m_loglist.at(runner);
+        if(runner < m_verlist.size()) m_logver = m_verlist.at(runner);
+        else m_logver = "0";
         installStart();
     }
     else {
@@ -83,6 +87,10 @@ void ZipInstaller::installStart()
     // get the real file.
     getter = new HttpGet(this);
     getter->setProxy(m_proxy);
+    if(m_cache.exists()) {
+        getter->setCache(m_cache);
+        qDebug() << "installzip: setting cache to" << m_cache;
+    }
     getter->setFile(downloadFile);
     getter->getFile(QUrl(m_url));
 
@@ -114,12 +122,13 @@ void ZipInstaller::downloadDone(bool error)
         m_dp->setProgressMax(max);
     }
     m_dp->setProgressValue(max);
-    if(getter->httpResponse() != 200) {
+    if(getter->httpResponse() != 200 && !getter->isCached()) {
         m_dp->addItem(tr("Download error: received HTTP error %1.").arg(getter->httpResponse()),LOGERROR);
         m_dp->abort();
         emit done(true);
         return;
     }
+    if(getter->isCached()) m_dp->addItem(tr("Cached file used."), LOGINFO);
     if(error) {
         m_dp->addItem(tr("Download error: %1").arg(getter->errorString()),LOGERROR);
         m_dp->abort();
@@ -127,13 +136,14 @@ void ZipInstaller::downloadDone(bool error)
         return;
     }
     else m_dp->addItem(tr("Download finished."),LOGOK);
-
+    QApplication::processEvents();
     if(m_unzip) {
         // unzip downloaded file
         qDebug() << "about to unzip the downloaded file" << m_file << "to" << m_mountpoint;
 
         m_dp->addItem(tr("Extracting file."),LOGINFO);
-        
+        QApplication::processEvents();
+
         qDebug() << "file to unzip: " << m_file;
         UnZip::ErrorCode ec;
         UnZip uz;
@@ -186,9 +196,10 @@ void ZipInstaller::downloadDone(bool error)
     installlog.beginGroup(m_logsection);
     for(int i = 0; i < zipContents.size(); i++)
     {
-        installlog.setValue(zipContents.at(i),installlog.value(zipContents.at(i),0).toInt()+1);
+        installlog.setValue(zipContents.at(i), m_logver);
     }
     installlog.endGroup();
+    installlog.sync();
 
     emit cont();
 }
@@ -200,4 +211,6 @@ void ZipInstaller::updateDataReadProgress(int read, int total)
     //qDebug() << "progress:" << read << "/" << total;
 
 }
+
+
 

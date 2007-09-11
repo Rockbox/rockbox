@@ -296,10 +296,10 @@ struct plugin_api {
     /* file */
     int (*PREFIX(open))(const char* pathname, int flags);
     int (*close)(int fd);
-    ssize_t (*read)(int fd, void* buf, size_t count);
+    ssize_t (*PREFIX(read))(int fd, void* buf, size_t count);
     off_t (*PREFIX(lseek))(int fd, off_t offset, int whence);
     int (*PREFIX(creat))(const char *pathname);
-    ssize_t (*write)(int fd, const void* buf, size_t count);
+    ssize_t (*PREFIX(write))(int fd, const void* buf, size_t count);
     int (*PREFIX(remove))(const char* pathname);
     int (*PREFIX(rename))(const char* path, const char* newname);
     int (*PREFIX(ftruncate))(int fd, off_t length);

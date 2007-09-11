@@ -51,3 +51,4 @@ void binary_clock_draw(struct screen* display, struct time* time, int skin){
                     binary_bitmaps->height*i+y_offset);
     }
 }
+

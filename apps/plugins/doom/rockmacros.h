@@ -43,20 +43,24 @@ char *my_strtok( char * s, const char * delim );
 #undef open
 #undef lseek
 #undef filesize
+#undef read
+#undef write
 #define open(a,b)          rb->sim_open((a),(b))
 #define lseek(a,b,c)       rb->sim_lseek((a),(b),(c))
 #define filesize(a)        rb->sim_filesize((a))
+#define read(a,b,c)        rb->sim_read((a),(b),(c))
+#define write(a,b,c)       rb->sim_write((a),(b),(c))
 #else /* !SIMULATOR */
 #define open(a,b)          my_open((a),(b))
 #define close(a)           my_close((a))
 #define lseek(a,b,c)       rb->lseek((a),(b),(c))
 #define filesize(a)        rb->filesize((a))
+#define read(a,b,c)        rb->read((a),(b),(c))
+#define write(a,b,c)       rb->write((a),(b),(c))
 #endif /* !SIMULATOR */
 
 #define strtok(a,b)        my_strtok((a),(b))
 #define strcat(a,b)        rb->strcat((a),(b))
-#define read(a,b,c)        rb->read((a),(b),(c))
-#define write(a,b,c)       rb->write((a),(b),(c))
 #define memset(a,b,c)      rb->memset((a),(b),(c))
 #define memmove(a,b,c)     rb->memmove((a),(b),(c))
 #define memcmp(a,b,c)      rb->memcmp((a),(b),(c))

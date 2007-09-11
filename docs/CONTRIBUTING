@@ -44,6 +44,13 @@ When changing code, follow the code style of the file you are editing.
 
 When writing new files, you may use the brace placement style of your choice.
 
+Braces for function declarations are put in a new line under the name, as in:
+
+  int foo(char *name)
+  {
+     return FOO_NAME:
+  }
+
 Always indent your code with four spaces. Don't use TAB characters, as that
 will mess up code display in CVS, printing, and a zillion other places.
 

@@ -68,3 +68,4 @@ void vertical_picture_draw_sprite(struct screen* display, const struct picture* 
                        int x, int y){
     vertical_picture_draw_part(display, picture, sprite_no*picture->height, x, y);
 }
+
