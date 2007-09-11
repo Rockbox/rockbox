@@ -26,12 +26,13 @@ e200rpatcher.exe:  e200rpatcher.c bootimg.c
 
 e200rpatcher-mac: e200rpatcher-i386 e200rpatcher-ppc
 	lipo -create e200rpatcher-ppc e200rpatcher-i386 -output e200rpatcher-mac
-e200rpatcher-i386:  e200rpatcher.c  bootimg.c
-	gcc -isysroot /Developer/SDKs/MacOSX10.4u.sdk -o bin/i386/program -arch i386 $(CFLAGS) $(LIBS) -o e200rpatcher-i386 e200rpatcher.c bootimg.c
+
+e200rpatcher-i386:  e200rpatcher.c  bootimg.c usb.h libusb-i386.a
+	gcc -isysroot /Developer/SDKs/MacOSX10.4u.sdk -framework iokit -framework coreservices -arch i386 $(CFLAGS) -o e200rpatcher-i386 e200rpatcher.c bootimg.c -I. libusb-i386.a
 	strip e200rpatcher-i386
 
-e200rpatcher-ppc: e200rpatcher.c bootimg.c
-	gcc -arch ppc $(CFLAGS) $(LIBS) -o e200rpatcher-ppc e200rpatcher.c bootimg.c
+e200rpatcher-ppc: e200rpatcher.c bootimg.c usb.h libusb-ppc.a
+	gcc -isysroot /Developer/SDKs/MacOSX10.4u.sdk -framework iokit -framework coreservices -arch ppc $(CFLAGS) -o e200rpatcher-ppc e200rpatcher.c bootimg.c -I. libusb-ppc.a
 	strip e200rpatcher-ppc
 
 bin2c: ../sansapatcher/bin2c.c

@@ -1,0 +1,48 @@
+INTRODUCTION
+
+e200rpatcher is a tool for uploading and executing an application to
+an E200R in manufacturing mode.  It is intended to be used to upload
+the patching application to allow Rockbox installs.
+
+e200rpatcher requires libusb (v0.1.2 has been tested successfully) for
+cross-platform USB access.  No-one has yet successfully installed
+e200rpatcher on Windows, but it works on Linux and Mac OS X (and
+should be fine on other Unix-like systems that libusb supports).
+
+GENERAL BUILD INSTRUCTIONS
+
+A pre-requisite for compiling e200rpatcher is a file called
+"bootloader.bin" - this is the output of running an "I" (installer)
+build for the E200R target.
+
+In the Rockbox source directory, do:
+
+mkdir build-e200rbootbin
+cd build-e200rbootbin
+../tools/configure
+[Select E200R, then I for installer]
+make
+
+This should give you a bootloader/bootloader/bin file which you should
+copy to the e200rpatcher source directory.
+
+BUILDING ON LINUX
+
+The Makefile expects libusb (and the headers) to be installed on your
+system and will link dynamically.  Just type "make".
+
+BUILDING ON A MAC
+
+To build the mac version (target e200rpatcher-mac in the Makefile)
+requires three files from libusb to be copied to the current
+directory:
+
+usb.h (copied from your libusb build directory)
+libusb-i386.a (copied and renamed from .libs/libusb.a in an i386 build)
+libusb-ppc.a (copied and renamed from .libs/libusb.a in a PPC build)
+
+To build the required libusb.a files, just run ./configure && make for
+libusb.  If anyone knows how to cross-compile a static libusb.a please
+make the information known - this is currently done by compiling
+natively on the appropriate hardware.
+
