@@ -10,25 +10,31 @@
 
 # Usage: svnversion.sh [source-root]
 
+# Prints the revision "rXYZ" of the first argument, as reported by svnversion.
+# Prints "unknown" if svnversion fails or says "exported".
+svnversion_safe() {
+    # LANG=C forces svnversion to not localize "exported".
+    if OUTPUT=`LANG=C svnversion "$@"`; then
+        if [ "$OUTPUT" = "exported" ]; then
+            echo "unknown"
+        else
+            echo "r$OUTPUT"
+        fi
+    else
+        echo "unknown"
+    fi
+}
+
 VERSIONFILE=docs/VERSION
 if [ -n "$1" ]; then TOP=$1; else TOP=..; fi
 if [ -r $TOP/$VERSIONFILE ]; then SVNVER=`cat $TOP/$VERSIONFILE`; 
-else if [ `which svnversion 2>/dev/null` ]; then 
-    SVNALT=`svnversion $1`;
-    if [ "$SVNALT" = "exported" ]; then 
+else
+    SVNVER=`svnversion_safe $TOP`;
+    if [ "$SVNVER" = "unknown" ]; then
         # try getting it from a subdir to test if perhaps they are symlinked
         # from the root
-        SVNALT=`svnversion $1/tools`
-        if [ "$SVNALT" != exported ]; then
-            # yeah, it is there so we use this
-            SVNVER="r$SVNALT"
-        else
-            SVNALT="unknown";
-        fi
-    else
-        SVNVER="r$SVNALT";
+        SVNVER=`svnversion_safe $TOP/tools`;
     fi
-else SVNVER="unknown"; fi
 fi
 VERSION=$SVNVER-`date -u +%y%m%d`
 echo $VERSION
