@@ -194,7 +194,7 @@ $(BUILDDIR)/rombox.ucl: $(OBJDIR)/rombox.bin $(MAXOUTFILE)
 
 $(BUILDDIR)/rombox.iriver: $(OBJDIR)/rombox.bin
 	$(call PRINTS,Build ROM file)$(MKFIRMWARE) $< $@
-    
+
 include $(TOOLSDIR)/make.inc
 
 # apps/features.txt is a file that (is preprocessed and) lists named features
@@ -204,13 +204,13 @@ include $(TOOLSDIR)/make.inc
 #
 
 $(OBJDIR)/features: features.txt
+	$(SILENT)mkdir -p `dirname $@`
 	$(SILENT)cat $< | $(HOSTCC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
 	$(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -imacros "config.h" -imacros "button.h" - | \
 	grep -v "^\#" | grep -v "^$$" > $@; \
 	echo "" >/dev/null 
 
 $(OBJDIR)/lang.o: lang/$(LANGUAGE).lang $(OBJDIR)/features
-	$(SILENT)mkdir -p `dirname $@`
 	$(SILENT)for f in `cat $(OBJDIR)/features`; do feat="$$feat:$$f" ; done; \
 	perl -s $(TOOLSDIR)/genlang -p=$(BUILDDIR)/lang -t=$(ARCHOS)$$feat $<
 	$(call PRINTS,CC lang.c)$(CC) $(CFLAGS) -c $(BUILDDIR)/lang.c -o $@
