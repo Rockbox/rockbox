@@ -745,5 +745,9 @@ target/arm/pnx0101/iriver-ifp7xx/lcd-ifp7xx.c
 target/arm/pnx0101/iriver-ifp7xx/power-ifp7xx.c
 target/arm/pnx0101/iriver-ifp7xx/powermgmt-ifp7xx.c
 target/arm/pnx0101/iriver-ifp7xx/usb-ifp7xx.c
+#ifndef BOOTLOADER
+target/arm/pnx0101/pcm-pnx0101.c
 #endif
 #endif
+#endif
+
