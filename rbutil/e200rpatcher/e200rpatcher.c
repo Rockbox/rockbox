@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <inttypes.h>
 #include <usb.h>
+#include <string.h>
 
 #include "bootimg.h"
 
@@ -69,6 +70,7 @@ int upload_app(usb_dev_handle* dh)
     if (err < 0)
     {
         fprintf(stderr,"[ERR]  Error writing data length\n");
+        fprintf(stderr,"[ERR]  Bulk write error (%d, %s)\n", err, strerror(-err));
         return -1;
     }
 
@@ -83,6 +85,7 @@ int upload_app(usb_dev_handle* dh)
         if (err < 0)
         {
             fprintf(stderr,"[ERR]  Error writing data\n");
+            fprintf(stderr,"[ERR]  Bulk write error (%d, %s)\n", err, strerror(-err));
             return -1;
         }
 
