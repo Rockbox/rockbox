@@ -237,9 +237,10 @@ void* main(void)
        reset the settings in rockbox. */
     button_was_held = button_hold();
 
+#ifndef HAVE_BACKLIGHT_INVERSION
     /* Turn on the backlight */
-
     __backlight_on();
+#endif
 
     system_init();
     kernel_init();
