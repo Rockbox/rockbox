@@ -627,7 +627,6 @@ void lcd_blit(const fb_data* data, int x, int by, int width,
 
 /* Line write helper function for lcd_yuv_blit. Write two lines of yuv420. */
 extern void lcd_write_yuv420_lines(fb_data *dst,
-                                   unsigned char chroma_buf[LCD_HEIGHT/2*3],
                                    unsigned char const * const src[3],
                                    int width,
                                    int stride);
@@ -638,9 +637,6 @@ void lcd_yuv_blit(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
-    /* Caches for chroma data so it only need be recaculated every other
-       line */
-    static unsigned char chroma_buf[LCD_HEIGHT/2*3]; /* 330 bytes */
     unsigned char const * yuv_src[3];
     off_t z;
 
@@ -661,8 +657,7 @@ void lcd_yuv_blit(unsigned char * const src[3],
 
     do
     {
-        lcd_write_yuv420_lines(dst, chroma_buf, yuv_src, width,
-                               stride);
+        lcd_write_yuv420_lines(dst, yuv_src, width, stride);
         yuv_src[0] += stride << 1; /* Skip down two luma lines */
         yuv_src[1] += stride >> 1; /* Skip down one chroma line */
         yuv_src[2] += stride >> 1;

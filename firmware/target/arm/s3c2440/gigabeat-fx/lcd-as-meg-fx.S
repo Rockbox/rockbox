@@ -103,8 +103,7 @@ lcd_copy_buffer_rect:                   @
 
 /****************************************************************************
  * void lcd_write_yuv_420_lines(fb_data *dst,
- *                              unsigned char chroma_buf[LCD_HEIGHT/2*3],
-                                unsigned char const * const src[3],
+ *                              unsigned char const * const src[3],
  *                              int width,
  *                              int stride);
  *
@@ -115,189 +114,166 @@ lcd_copy_buffer_rect:                   @
  *   |R|   |74   0 101| |Y' -  16| >> 9
  *   |G| = |74 -24 -51| |Cb - 128| >> 8
  *   |B|   |74 128   0| |Cr - 128| >> 9
+ *
+ * Write four RGB565 pixels in the following order on each loop:
+ * 1 3 + > down
+ * 2 4 \/ left
  */
     .section    .icode, "ax", %progbits
     .align      2
     .global     lcd_write_yuv420_lines
     .type       lcd_write_yuv420_lines, %function
 lcd_write_yuv420_lines:
-                                        @ r0   = dst
-                                        @ r1   = chroma_buf
-                                        @ r2   = yuv_src
-                                        @ r3   = width
-                                        @ [sp] = stride
-    stmfd       sp!, { r4-r12, lr }     @ save non-scratch
-    stmfd       sp!, { r0, r3 }         @ save dst and width
-    mov         r14, #74                @ r14 = Y factor
-    ldmia       r2, { r4, r5, r6 }      @ r4 = yuv_src[0] = Y'_p
+                                        @ r0 = dst
+                                        @ r1 = yuv_src
+                                        @ r2 = width
+                                        @ r3 = stride
+    stmfd       sp!, { r4-r12 }         @ save non-scratch
+    ldmia       r1, { r4, r5, r6 }      @ r4 = yuv_src[0] = Y'_p
                                         @ r5 = yuv_src[1] = Cb_p
                                         @ r6 = yuv_src[2] = Cr_p
-10: @ loop line 1                       @
-    ldrb        r2, [r4], #1            @ r2  = *Y'_p++;
-    ldrb        r8, [r5], #1            @ r8  = *Cb_p++;
-    ldrb        r11, [r6], #1           @ r11 = *Cr_p++;
+                                        @ r1 = scratch
+10: @ loop line                         @
+    ldrb        r7, [r4]                @ r7 = *Y'_p;
+    ldrb        r8, [r5], #1            @ r8 = *Cb_p++;
+    ldrb        r9, [r6], #1            @ r9 = *Cr_p++;
                                         @
-                                        @ compute Y
-    sub         r2, r2, #16             @ r7 = Y = (Y' - 16)*74
-    mul         r7, r2, r14             @
+    sub         r7, r7, #16             @ r7 = Y = (Y' - 16)*74
+    add         r12, r7, r7, asl #2     @ actually (Y' - 16)*37 and shift right
+    add         r7, r12, r7, asl #5     @ by one less when adding - same for all
                                         @
     sub         r8, r8, #128            @ Cb -= 128
-    sub         r11, r11, #128          @ Cr -= 128
+    sub         r9, r9, #128            @ Cr -= 128
                                         @
-    mvn         r2, #23                 @ compute guv
-    mul         r10, r2, r8             @ r10 = Cb*-24
-    mvn         r2, #50                 @
-    mla         r10, r2, r11, r10       @ r10 = r10 + Cr*-51
+    add         r10, r9, r9, asl #1     @ r10 = Cr*51 + Cb*24
+    add         r10, r10, r10, asl #4   @
+    add         r10, r10, r8, asl #3    @
+    add         r10, r10, r8, asl #4    @
                                         @
-    mov         r2, #101                @ compute rv
-    mul         r9, r11, r2             @ r9 = rv = Cr*101
+    add         r11, r9, r9, asl #2     @ r9 = Cr*101
+    add         r11, r11, r9, asl #5    @
+    add         r9, r11, r9, asl #6     @
                                         @
-                                        @ store chromas in line buffer
-    add         r8, r8, #2              @ bu = (Cb + 2) >> 2
-    mov         r8, r8, asr #2          @ 
-    strb        r8, [r1], #1            @
-    add         r9, r9, #256            @ rv = (Cr + 256) >> 9
+    add         r8, r8, #2              @ r8 = bu = (Cb*128 + 128) >> 8
+    mov         r8, r8, asr #2          @
+    add         r9, r9, #256            @ r9 = rv = (r9 + 256) >> 9
     mov         r9, r9, asr #9          @
-    strb        r9, [r1], #1            @
-    mov         r10, r10, asr #8        @ guv >>= 8
-    strb        r10, [r1], #1           @
+    rsb         r10, r10, #128          @ r10 = guv = (-r10 + 128) >> 8
+    mov         r10, r10, asr #8        @
                                         @ compute R, G, and B
-    add         r2, r8, r7, asr #9      @ r2  = b = (Y >> 9) + bu
-    add         r11, r9, r7, asr #9     @ r11 = r = (Y >> 9) + rv
-    add         r7, r10, r7, asr #8     @ r7  = g = (Y >> 8) + guv
+    add         r1, r8, r7, asr #8      @ r1  = b = (Y >> 9) + bu
+    add         r11, r9, r7, asr #8     @ r11 = r = (Y >> 9) + rv
+    add         r7, r10, r7, asr #7     @ r7  = g = (Y >> 8) + guv
                                         @
-    orr         r12, r2, r11            @ check if clamping is needed...
+    orr         r12, r1, r11            @ check if clamping is needed...
     orr         r12, r12, r7, asr #1    @ ...at all
     cmp         r12, #31                @
     bls         15f @ no clamp          @
-    mov         r12, #31                @
-    cmp         r12, r2                 @ clamp b
-    andlo       r2, r12, r2, asr #31    @
-    eorlo       r2, r2, r12             @
-    cmp         r12, r11                @ clamp r
-    andlo       r11, r12, r11, asr #31  @
-    eorlo       r11, r11, r12           @
-    cmp         r12, r7, asr #1         @ clamp g
-    andlo       r7, r12, r7, asr #31    @
-    eorlo       r7, r7, r12             @
-    orrlo       r7, r7, r7, asl #1      @
+    cmp         r1, #31                 @ clamp b
+    mvnhi       r1, r1, asr #31         @
+    andhi       r1, r1, #31             @
+    cmp         r11, #31                @ clamp r
+    mvnhi       r11, r11, asr #31       @
+    andhi       r11, r11, #31           @
+    cmp         r7, #63                 @ clamp g
+    mvnhi       r7, r7, asr #31         @
+    andhi       r7, r7, #63             @
 15: @ no clamp                          @
                                         @
-    orr         r12, r2, r7, lsl #5     @ r4 |= (g << 5)
-    ldrb        r2, [r4], #1            @ r2 = Y' = *Y'_p++
+    orr         r12, r1, r7, lsl #5     @ r4 |= (g << 5)
+    ldrb        r7, [r4, r3]            @ r7 = Y' = *(Y'_p + stride)
     orr         r12, r12, r11, lsl #11  @ r4 = b | (r << 11)
-    strh        r12, [r0], #LCD_WIDTH   @ store pixel
+    strh        r12, [r0]               @ store pixel
                                         @
-    sub         r2, r2, #16             @ r7 = Y = (Y' - 16)*74
-    mul         r7, r2, r14             @ next Y
+    sub         r7, r7, #16             @ r7 = Y = (Y' - 16)*74
+    add         r12, r7, r7, asl #2     @
+    add         r7, r12, r7, asl #5     @
                                         @ compute R, G, and B
-    add         r2, r8, r7, asr #9      @ r2  = b = (Y >> 9) + bu
-    add         r11, r9, r7, asr #9     @ r11 = r = (Y >> 9) + rv
-    add         r7, r10, r7, asr #8     @ r7  = g = (Y >> 8) + guv
+    add         r1, r8, r7, asr #8      @ r1  = b = (Y >> 9) + bu
+    add         r11, r9, r7, asr #8     @ r11 = r = (Y >> 9) + rv
+    add         r7, r10, r7, asr #7     @ r7  = g = (Y >> 8) + guv
                                         @
-    orr         r12, r2, r11            @ check if clamping is needed...
+    orr         r12, r1, r11            @ check if clamping is needed...
     orr         r12, r12, r7, asr #1    @ ...at all
     cmp         r12, #31                @
     bls         15f @ no clamp          @
-    mov         r12, #31                @
-    cmp         r12, r2                 @ clamp b
-    andlo       r2, r12, r2, asr #31    @
-    eorlo       r2, r2, r12             @
-    cmp         r12, r11                @ clamp r
-    andlo       r11, r12, r11, asr #31  @
-    eorlo       r11, r11, r12           @
-    cmp         r12, r7, asr #1         @ clamp g
-    andlo       r7, r12, r7, asr #31    @
-    eorlo       r7, r7, r12             @
-    orrlo       r7, r7, r7, asl #1      @
+    cmp         r1, #31                 @ clamp b
+    mvnhi       r1, r1, asr #31         @
+    andhi       r1, r1, #31             @
+    cmp         r11, #31                @ clamp r
+    mvnhi       r11, r11, asr #31       @
+    andhi       r11, r11, #31           @
+    cmp         r7, #63                 @ clamp g
+    mvnhi       r7, r7, asr #31         @
+    andhi       r7, r7, #63             @
 15: @ no clamp                          @
                                         @
-    orr         r12, r2, r11, lsl #11   @ r4 = b | (r << 11)
-    orr         r12, r12, r7, lsl #5    @ r4 |= (g << 5)
-    strh        r12, [r0, #LCD_WIDTH]!  @ store pixel
+    orr         r12, r1, r11, lsl #11   @ r12 = b | (r << 11)
+    orr         r12, r12, r7, lsl #5    @ r12 |= (g << 5)
+    ldrb        r7, [r4, #1]!           @ r7 = Y' = *(++Y'_p)
+    strh        r12, [r0, #-2]          @ store pixel
     add         r0, r0, #2*LCD_WIDTH    @
                                         @
-    subs        r3, r3, #2              @
-    bgt         10b @ loop line 1       @
-                                        @ do second line
-                                        @
-    ldmfd       sp!, { r0, r3 }         @ pop dst and width
-    sub         r0, r0, #2              @ set dst to start of next line
-    sub         r1, r1, r3, asl #1      @ rewind chroma pointer...
-    ldr         r2, [sp, #40]           @ r2 = stride
-    add         r1, r1, r3, asr #1      @ ... (r1 -= width/2*3)
-                                        @ move sources to start of next line
-    sub         r2, r2, r3              @ r2 = skip = stride - width
-    add         r4, r4, r2              @ r4 = Y'_p + skip
-                                        @
-20: @ loop line 2                       @
-    ldrb        r2, [r4], #1            @ r7 = Y' = *Y'_p++
-    ldrsb       r8, [r1], #1            @ reload saved chromas
-    ldrsb       r9, [r1], #1            @
-    ldrsb       r10, [r1], #1           @
-                                        @
-    sub         r2, r2, #16             @ r2 = Y = (Y' - 16)*74
-    mul         r7, r2, r14             @
+    sub         r7, r7, #16             @ r7 = Y = (Y' - 16)*74
+    add         r12, r7, r7, asl #2     @
+    add         r7, r12, r7, asl #5     @
                                         @ compute R, G, and B
-    add         r2, r8, r7, asr #9      @ r2  = b = (Y >> 9) + bu
-    add         r11, r9, r7, asr #9     @ r11 = r = (Y >> 9) + rv
-    add         r7, r10, r7, asr #8     @ r7  = g = (Y >> 8) + guv
+    add         r1, r8, r7, asr #8      @ r1  = b = (Y >> 9) + bu
+    add         r11, r9, r7, asr #8     @ r11 = r = (Y >> 9) + rv
+    add         r7, r10, r7, asr #7     @ r7  = g = (Y >> 8) + guv
                                         @
-    orr         r12, r2, r11            @ check if clamping is needed...
+    orr         r12, r1, r11            @ check if clamping is needed...
     orr         r12, r12, r7, asr #1    @ ...at all
     cmp         r12, #31                @
-    bls         25f @ no clamp          @
-    mov         r12, #31                @
-    cmp         r12, r2                 @ clamp b
-    andlo       r2, r12, r2, asr #31    @
-    eorlo       r2, r2, r12             @
-    cmp         r12, r11                @ clamp r
-    andlo       r11, r12, r11, asr #31  @
-    eorlo       r11, r11, r12           @
-    cmp         r12, r7, asr #1         @ clamp g
-    andlo       r7, r12, r7, asr #31    @
-    eorlo       r7, r7, r12             @
-    orrlo       r7, r7, r7, asl #1      @
-25: @ no clamp                          @
+    bls         15f @ no clamp          @
+    cmp         r1, #31                 @ clamp b
+    mvnhi       r1, r1, asr #31         @
+    andhi       r1, r1, #31             @
+    cmp         r11, #31                @ clamp r
+    mvnhi       r11, r11, asr #31       @
+    andhi       r11, r11, #31           @
+    cmp         r7, #63                 @ clamp g
+    mvnhi       r7, r7, asr #31         @
+    andhi       r7, r7, #63             @
+15: @ no clamp                          @
                                         @
-    orr         r12, r2, r11, lsl #11   @ r4 = b | (r << 11)
-    ldrb        r2, [r4], #1            @ r2 = Y' = *Y'_p++
-    orr         r12, r12, r7, lsl #5    @ r4 |= (g << 5)
-    strh        r12, [r0], #LCD_WIDTH   @ store pixel
+    orr         r12, r1, r7, lsl #5     @ r12 = b | (g << 5)
+    ldrb        r7, [r4, r3]            @ r7 = Y' = *(Y'_p + stride)
+    orr         r12, r12, r11, lsl #11  @ r12 |= (r << 11)
+    strh        r12, [r0]               @ store pixel
                                         @
-                                        @ do second pixel
-                                        @
-    sub         r2, r2, #16             @ r2 = Y = (Y' - 16)*74
-    mul         r7, r2, r14             @
+    sub         r7, r7, #16             @ r7 = Y = (Y' - 16)*74
+    add         r12, r7, r7, asl #2     @
+    add         r7, r12, r7, asl #5     @
                                         @ compute R, G, and B
-    add         r2, r8, r7, asr #9      @ r2  = b = (Y >> 9) + bu
-    add         r11, r9, r7, asr #9     @ r11 = r = (Y >> 9) + rv
-    add         r7, r10, r7, asr #8     @ r7  = g = (Y >> 8) + guv
+    add         r1, r8, r7, asr #8      @ r1  = b = (Y >> 9) + bu
+    add         r11, r9, r7, asr #8     @ r11 = r = (Y >> 9) + rv
+    add         r7, r10, r7, asr #7     @ r7  = g = (Y >> 8) + guv
                                         @
-    orr         r12, r2, r11            @ check if clamping is needed...
+    orr         r12, r1, r11            @ check if clamping is needed...
     orr         r12, r12, r7, asr #1    @ ...at all
     cmp         r12, #31                @
-    bls         25f @ no clamp          @
-    mov         r12, #31                @
-    cmp         r12, r2                 @ clamp b
-    andlo       r2, r12, r2, asr #31    @
-    eorlo       r2, r2, r12             @
-    cmp         r12, r11                @ clamp r
-    andlo       r11, r12, r11, asr #31  @
-    eorlo       r11, r11, r12           @
-    cmp         r12, r7, asr #1         @ clamp g
-    andlo       r7, r12, r7, asr #31    @
-    eorlo       r7, r7, r12             @
-    orrlo       r7, r7, r7, asl #1      @
-25: @ no clamp                          @
+    bls         15f @ no clamp          @
+    cmp         r1, #31                 @ clamp b
+    mvnhi       r1, r1, asr #31         @
+    andhi       r1, r1, #31             @
+    cmp         r11, #31                @ clamp r
+    mvnhi       r11, r11, asr #31       @
+    andhi       r11, r11, #31           @
+    cmp         r7, #63                 @ clamp g
+    mvnhi       r7, r7, asr #31         @
+    andhi       r7, r7, #63             @
+15: @ no clamp                          @
                                         @
-    orr         r12, r2, r11, lsl #11   @ r4 = b | (r << 11)
-    orr         r12, r12, r7, lsl #5    @ r4 |= (g << 5)
-    strh        r12, [r0, #LCD_WIDTH]!  @ store pixel
+    orr         r12, r1, r11, lsl #11   @ r12 = b | (r << 11)
+    orr         r12, r12, r7, lsl #5    @ r12 |= (g << 5)
+    strh        r12, [r0, #-2]          @ store pixel
     add         r0, r0, #2*LCD_WIDTH    @
+    add         r4, r4, #1              @
                                         @
-    subs        r3, r3, #2              @
-    bgt         20b @ loop line 2       @
+    subs        r2, r2, #2              @ subtract block from width
+    bgt         10b @ loop line         @
                                         @
-    ldmfd       sp!, { r4-r12, pc }     @ restore registers and return
+    ldmfd       sp!, { r4-r12 }         @ restore registers and return
+    bx          lr                      @
     .size   lcd_write_yuv420_lines, .-lcd_write_yuv420_lines
