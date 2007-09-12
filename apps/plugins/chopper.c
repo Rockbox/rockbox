@@ -25,13 +25,17 @@
 
 PLUGIN_HEADER
 
-/*Still To do:*/
-/* - Make original speed and further increases in speed depend more on screen size*/
-/* - attempt to make the tunnels get narrower as the game goes on*/
-/* - make the chopper look better, maybe a picture, and scale according to screen size*/
-/* - use textures for the color screens for background and terrain, eg stars on background*/
-/* - allow choice of different levels [later: different screen themes]*/
-/* - better high score handling, improved screen etc. */
+/*
+Still To do:
+ - Make original speed and further increases in speed depend more on screen size
+ - attempt to make the tunnels get narrower as the game goes on
+ - make the chopper look better, maybe a picture, and scale according
+   to screen size
+ - use textures for the color screens for background and terrain,
+   eg stars on background
+ - allow choice of different levels [later: different screen themes]
+ - better high score handling, improved screen etc.
+*/
 
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 
@@ -177,7 +181,7 @@ static void chopRenderTerrain(struct CTerrain *ter);
 void chopper_load(bool newgame);
 void cleanup_chopper(void);
 
-static void chopDrawPlayer(int x,int y) /* These are SCREEN coords, not world! */
+static void chopDrawPlayer(int x,int y) /* These are SCREEN coords, not world!*/
 {
 
 #if LCD_DEPTH > 2
@@ -201,7 +205,8 @@ static void chopDrawPlayer(int x,int y) /* These are SCREEN coords, not world! *
 #elif LCD_DEPTH == 2
     rb->lcd_set_foreground(LCD_BLACK);
 #endif
-    rb->lcd_drawline(SCALE(x), SCALE(y+iRotorOffset), SCALE(x+20), SCALE(y-iRotorOffset));
+    rb->lcd_drawline(SCALE(x), SCALE(y+iRotorOffset), SCALE(x+20),
+                     SCALE(y-iRotorOffset));
 
 #if LCD_DEPTH > 2
     rb->lcd_set_foreground(LCD_RGBPACK(20,20,50));
@@ -871,13 +876,18 @@ static void chopRenderTerrain(struct CTerrain *ter)
 
         rb->lcd_drawline(SCALE(x), SCALE(y), SCALE(x2), SCALE(y2));
 
-        xlcd_filltriangle(SCALE(x), SCALE(y), SCALE(x2), SCALE(y2), SCALE(x2), SCALE(ay));
-        xlcd_filltriangle(SCALE(x), SCALE(ay), SCALE(x2), SCALE(y2), SCALE(x2), SCALE(ay));
+        xlcd_filltriangle(SCALE(x), SCALE(y), SCALE(x2), SCALE(y2),
+                          SCALE(x2), SCALE(ay));
+        xlcd_filltriangle(SCALE(x), SCALE(ay), SCALE(x2), SCALE(y2),
+                          SCALE(x2), SCALE(ay));
 
         if (ay == 0)
-            xlcd_filltriangle(SCALE(x), SCALE(ay), SCALE(x), SCALE(y), SCALE(x2), SCALE(y2 / 2));
+            xlcd_filltriangle(SCALE(x), SCALE(ay), SCALE(x), SCALE(y),
+                              SCALE(x2), SCALE(y2 / 2));
         else
-            xlcd_filltriangle(SCALE(x), SCALE(ay), SCALE(x), SCALE(y), SCALE(x2), SCALE((LCD_HEIGHT*SIZE) - ((LCD_HEIGHT*SIZE) - y2) / 2));
+            xlcd_filltriangle(SCALE(x), SCALE(ay), SCALE(x), SCALE(y),
+                              SCALE(x2), SCALE((LCD_HEIGHT*SIZE) -
+                              ((LCD_HEIGHT*SIZE) - y2) / 2));
 
         oldx = x;
         i++;
