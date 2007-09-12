@@ -623,13 +623,9 @@ void backlight_init(void)
 # endif
     }
 #endif
-    backlight_on();
-#ifdef HAVE_REMOTE_LCD
-    remote_backlight_on();
-#endif
-#ifdef HAVE_BUTTON_LIGHT
-    button_backlight_on();
-#endif
+    /* Leave all lights as set by the bootloader here. The settings load will
+     * call the appropriate backlight_set_*() functions, only changing light
+     * status if necessary. */
 
     create_thread(backlight_thread, backlight_stack,
                   sizeof(backlight_stack), backlight_thread_name
