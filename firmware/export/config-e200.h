@@ -171,25 +171,6 @@
 
 #define ICODE_ATTR_TREMOR_NOT_MDCT
 
-<<<<<<< .working
-#define INCLUDE_TIMEOUT_API
-
-#endif /* SIMULATOR */
-
-/** Port-specific settings **/
-
-/* Main LCD backlight brightness range and defaults */
-#define MIN_BRIGHTNESS_SETTING      1
-#define MAX_BRIGHTNESS_SETTING     12
-#define DEFAULT_BRIGHTNESS_SETTING  6
-
-/* Default recording levels */
-#define DEFAULT_REC_MIC_GAIN    23
-#define DEFAULT_REC_LEFT_GAIN   23
-#define DEFAULT_REC_RIGHT_GAIN  23
-
-
-=======
 #define INCLUDE_TIMEOUT_API
 
 #endif /* SIMULATOR */
@@ -210,4 +191,3 @@
 #define IRAMORIG 0x40004000
 #endif
 
->>>>>>> .merge-right.r14665
