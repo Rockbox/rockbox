@@ -53,6 +53,7 @@
 #include "kernel.h"
 #include "debug.h"
 #include "config.h"
+#include "ata.h" /* for IF_MV2 et al. */
 
 /* Windows (and potentially other OSes) distinguish binary and text files.
  * Define a dummy for the others. */
@@ -559,8 +560,19 @@ long sim_filesize(int fd)
 #endif
 }
 
-void fat_size(unsigned int* size, unsigned int* free)
+void fat_size(IF_MV2(int volume,) unsigned long* size, unsigned long* free)
 {
+#ifdef HAVE_MULTIVOLUME
+    if (volume != 0) {
+        debugf("io.c: fat_size(volume=%d); simulator only supports volume 0\n",
+            volume);
+        
+        if (size) *size = 0;
+        if (free) *free = 0;
+        return;
+    }
+#endif
+
 #ifdef WIN32
     long secperclus, bytespersec, free_clusters, num_clusters;
 
