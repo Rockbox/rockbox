@@ -1658,9 +1658,9 @@ static void write_line(struct screen *display,
                        bool scroll)
 {
 
-    int left_width,   left_xpos;
-    int center_width, center_xpos;
-    int right_width,  right_xpos;
+    int left_width = 0; /* left_xpos would always be 0 */
+    int center_width = 0, center_xpos;
+    int right_width = 0,  right_xpos;
     int ypos;
     int space_width;
     int string_height;
@@ -1671,27 +1671,19 @@ static void write_line(struct screen *display,
         display->getstringsize((unsigned char *)format_align->left,
                                 &left_width, &string_height);
     }
-    else {
-        left_width = 0;
-    }
-    left_xpos = 0;
 
     if (format_align->center != 0) {
         display->getstringsize((unsigned char *)format_align->center,
                                 &center_width, &string_height);
     }
-    else {
-        center_width = 0;
-    }
+
     center_xpos=(display->width - center_width) / 2;
 
     if (format_align->right != 0) {
         display->getstringsize((unsigned char *)format_align->right,
                                 &right_width, &string_height);
     }
-    else {
-        right_width = 0;
-    }
+
     right_xpos = (display->width - right_width);
 
     /* Checks for overlapping strings.
@@ -1701,24 +1693,22 @@ static void write_line(struct screen *display,
     /* CASE 1: left and centered string overlap */
     /* there is a left string, need to merge left and center */
     if ((left_width != 0 && center_width != 0) &&
-        (left_xpos + left_width + space_width > center_xpos)) {
+        (left_width + space_width > center_xpos)) {
         /* replace the former separator '\0' of left and
             center string with a space */
         *(--format_align->center) = ' ';
         /* calculate the new width and position of the merged string */
         left_width = left_width + space_width + center_width;
-        left_xpos = 0;
         /* there is no centered string anymore */
         center_width = 0;
     }
     /* there is no left string, move center to left */
     if ((left_width == 0 && center_width != 0) &&
-        (left_xpos + left_width > center_xpos)) {
+        (left_width > center_xpos)) {
         /* move the center string to the left string */
         format_align->left = format_align->center;
         /* calculate the new width and position of the string */
         left_width = center_width;
-        left_xpos = 0;
         /* there is no centered string anymore */
         center_width = 0;
     }
@@ -1755,24 +1745,22 @@ static void write_line(struct screen *display,
         was one or it has been merged in case 1 or 2 */
     /* there is a left string, need to merge left and right */
     if ((left_width != 0 && center_width == 0 && right_width != 0) &&
-        (left_xpos + left_width + space_width > right_xpos)) {
+        (left_width + space_width > right_xpos)) {
         /* replace the former separator '\0' of left and
             right string with a space */
         *(--format_align->right) = ' ';
         /* calculate the new width and position of the string */
         left_width = left_width + space_width + right_width;
-        left_xpos = 0;
         /* there is no right string anymore */
         right_width = 0;
     }
     /* there is no left string, move right to left */
     if ((left_width == 0 && center_width == 0 && right_width != 0) &&
-        (left_xpos + left_width > right_xpos)) {
+        (left_width > right_xpos)) {
         /* move the right string to the left string */
         format_align->left = format_align->right;
         /* calculate the new width and position of the string */
         left_width = right_width;
-        left_xpos = 0;
         /* there is no right string anymore */
         right_width = 0;
     }
@@ -1801,7 +1789,7 @@ static void write_line(struct screen *display,
         /* print aligned strings */
         if (left_width != 0)
         {
-            display->putsxy(left_xpos, ypos,
+            display->putsxy(0, ypos,
                             (unsigned char *)format_align->left);
         }
         if (center_width != 0)
