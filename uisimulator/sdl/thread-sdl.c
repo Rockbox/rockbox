@@ -225,17 +225,10 @@ void thread_sdl_unlock(void)
 
 void switch_thread(bool save_context, struct thread_entry **blocked_list)
 {
-    static int counter = 0;
     struct thread_entry *current = running;
 
     SDL_UnlockMutex(m);
-
-    if (counter++ >= 50)
-    {
-        SDL_Delay(0);
-        counter = 0;
-    }
-
+    /* Any other thread waiting already will get it first */
     SDL_LockMutex(m);
     running = current;
 
