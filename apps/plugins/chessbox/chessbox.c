@@ -50,7 +50,6 @@ PLUGIN_HEADER
 #define CB_RIGHT   BUTTON_RIGHT
 #define CB_PLAY    (BUTTON_SELECT | BUTTON_PLAY)
 #define CB_LEVEL   (BUTTON_SELECT | BUTTON_RIGHT)
-#define CB_RESTART (BUTTON_SELECT | BUTTON_LEFT)
 #define CB_MENU    (BUTTON_SELECT | BUTTON_MENU)
 
 #define CB_SCROLL_UP     (BUTTON_SCROLL_FWD|BUTTON_REPEAT)
@@ -66,7 +65,6 @@ PLUGIN_HEADER
 #define CB_RIGHT   BUTTON_RIGHT
 #define CB_PLAY    BUTTON_PLAY
 #define CB_LEVEL   BUTTON_REC
-#define CB_RESTART (BUTTON_SELECT | BUTTON_PLAY)
 #define CB_MENU    BUTTON_POWER
 
 #define CB_SCROLL_UP     (BUTTON_UP|BUTTON_REPEAT)
@@ -82,7 +80,6 @@ PLUGIN_HEADER
 #define CB_RIGHT   BUTTON_RIGHT
 #define CB_PLAY    BUTTON_ON
 #define CB_LEVEL   BUTTON_MODE
-#define CB_RESTART BUTTON_REC
 #define CB_MENU    BUTTON_OFF
 
 #define CB_RC_QUIT BUTTON_RC_STOP
@@ -115,7 +112,6 @@ PLUGIN_HEADER
 #define CB_RIGHT   BUTTON_RIGHT
 #define CB_PLAY    BUTTON_ON
 #define CB_LEVEL   BUTTON_F1
-#define CB_RESTART BUTTON_F3
 #define CB_MENU    BUTTON_OFF
 
 #define CB_SCROLL_UP     (BUTTON_UP|BUTTON_REPEAT)
@@ -131,7 +127,6 @@ PLUGIN_HEADER
 #define CB_RIGHT   BUTTON_RIGHT
 #define CB_PLAY    BUTTON_ON
 #define CB_LEVEL   BUTTON_F1
-#define CB_RESTART BUTTON_F3
 #define CB_MENU    BUTTON_OFF
 
 #define CB_SCROLL_UP     (BUTTON_UP|BUTTON_REPEAT)
@@ -149,7 +144,6 @@ PLUGIN_HEADER
 #define CB_PLAY_PRE BUTTON_MENU
 #define CB_PLAY    (BUTTON_MENU|BUTTON_REPEAT)
 #define CB_LEVEL   (BUTTON_MENU|BUTTON_OFF)
-#define CB_RESTART (BUTTON_MENU|BUTTON_LEFT)
 #define CB_MENU    BUTTON_OFF
 
 #define CB_SCROLL_UP     (BUTTON_UP|BUTTON_REPEAT)
@@ -180,7 +174,6 @@ PLUGIN_HEADER
 #define CB_RIGHT   BUTTON_RIGHT
 #define CB_PLAY    BUTTON_PLAY
 #define CB_LEVEL   BUTTON_FF
-#define CB_RESTART (BUTTON_REW | BUTTON_PLAY)
 #define CB_MENU    BUTTON_POWER
 
 #define CB_SCROLL_UP     (BUTTON_SCROLL_UP|BUTTON_REPEAT)
@@ -196,7 +189,6 @@ PLUGIN_HEADER
 #define CB_RIGHT   BUTTON_RIGHT
 #define CB_PLAY    (BUTTON_SELECT | BUTTON_RIGHT)
 #define CB_LEVEL   BUTTON_REC
-#define CB_RESTART (BUTTON_SELECT | BUTTON_REPEAT)
 #define CB_MENU    BUTTON_POWER
 
 #define CB_SCROLL_UP     (BUTTON_SCROLL_UP|BUTTON_REPEAT)
@@ -835,11 +827,6 @@ struct cb_command cb_getcommand (void) {
             case CB_MENU:
                 result.type = cb_menu();
                 return result;
-#ifdef CB_RESTART
-            case CB_RESTART:
-                result.type = COMMAND_RESTART;
-                return result;
-#endif
             case CB_LEVEL:
                 result.type = COMMAND_LEVEL;
                 return result;
