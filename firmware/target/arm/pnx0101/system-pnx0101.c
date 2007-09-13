@@ -26,7 +26,7 @@ static struct
   unsigned char freq;
   unsigned char sys_mult;
   unsigned char sys_div;
-  unsigned char mem_conf[9];
+  unsigned char mem_conf[10];
 }
 perf_modes[3] ICONST_ATTR =
 {
