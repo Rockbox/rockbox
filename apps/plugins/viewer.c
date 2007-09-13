@@ -1045,80 +1045,77 @@ static void viewer_reset_settings(void)
 
 static void viewer_load_settings(void) /* same name as global, but not the same file.. */
 {
-    int settings_fd;
-
+    int settings_fd, i;
+    struct bookmark_file_data *data;
+    
+    /* read settings file */
     settings_fd=rb->open(SETTINGS_FILE, O_RDONLY);
-    if (settings_fd < 0)
+    if ((settings_fd < 0) || (rb->filesize(settings_fd) != sizeof(struct preferences)))
     {
-        rb->splash(HZ*2, "No Settings File");
-        return;
-    }
-    if (rb->filesize(settings_fd) != sizeof(struct preferences))
+        rb->splash(HZ*2, "No Valid Settings File");
+    } 
+    else 
     {
-        rb->splash(HZ*2, "Settings File Invalid");
-        return;
-    }
+        rb->read(settings_fd, &prefs, sizeof(struct preferences));
+        rb->close(settings_fd);
+    }    
 
-    rb->read(settings_fd, &prefs, sizeof(struct preferences));
-    rb->close(settings_fd);
+    data = (struct bookmark_file_data*)buffer; /* grab the text buffer */
+    data->bookmarked_files_count = 0;
+
+    /* read bookmarks if file exists */
     settings_fd = rb->open(BOOKMARKS_FILE, O_RDONLY);
     if (settings_fd >= 0)
     {
-        struct bookmark_file_data *data = (struct bookmark_file_data*)buffer; /* grab the text buffer */
-        int i;
-        data->bookmarked_files_count = 0;
-        rb->read(settings_fd, &data->bookmarked_files_count, sizeof(signed int)); /* figure out how many items to read */
+        /* figure out how many items to read */
+        rb->read(settings_fd, &data->bookmarked_files_count, sizeof(signed int)); 
         if (data->bookmarked_files_count > MAX_BOOKMARKED_FILES)
-            data->bookmarked_files_count = MAX_BOOKMARKED_FILES; /* dump the older files */
+            data->bookmarked_files_count = MAX_BOOKMARKED_FILES;
         rb->read(settings_fd, data->bookmarks, 
                  sizeof(struct bookmarked_file_info) * data->bookmarked_files_count);
         rb->close(settings_fd);
-        for (i=0; i < data->bookmarked_files_count; i++)
+    } 
+
+    /* check if current file is in list */
+    for (i=0; i < data->bookmarked_files_count; i++)
+    {
+        if (!rb->strcmp(file_name, data->bookmarks[i].filename)) 
         {
-            if (!rb->strcmp(file_name, data->bookmarks[i].filename))
-                break;
-        }
-        if (i < data->bookmarked_files_count)
-        {
-            /* it is in the list, write everything back in the correct order, and reload the file correctly */
-            settings_fd = rb->creat(BOOKMARKS_FILE);
-            if (settings_fd >=0 )
-            {
-                if (data->bookmarked_files_count > MAX_BOOKMARKED_FILES)
-                    data->bookmarked_files_count = MAX_BOOKMARKED_FILES; /* dump the older files */
-                rb->write (settings_fd, &data->bookmarked_files_count, sizeof(signed int));
-                /* write this item, then all up to it, then all after it */
-                rb->write (settings_fd, &data->bookmarks[i], sizeof(struct bookmarked_file_info));
-                rb->write (settings_fd, data->bookmarks, sizeof(struct bookmarked_file_info)*i);
-                rb->write (settings_fd, &data->bookmarks[i+1], 
-                           sizeof(struct bookmarked_file_info)*(data->bookmarked_files_count-i-1));
-                rb->close(settings_fd);
-            }
             file_pos = data->bookmarks[i].file_position;
             screen_top_ptr = buffer + data->bookmarks[i].top_ptr_pos;
-        }
-        else /* not in list, write the list to the file */
-        {
-            settings_fd = rb->creat(BOOKMARKS_FILE);
-            if (settings_fd >=0 )
-            {
-                if ((data->bookmarked_files_count + 1) > MAX_BOOKMARKED_FILES)
-                    data->bookmarked_files_count = MAX_BOOKMARKED_FILES; /* dump the older files */
-				else data->bookmarked_files_count++;
-                rb->write (settings_fd, &data->bookmarked_files_count, sizeof(signed int));
-                rb->PREFIX(lseek)(settings_fd,sizeof(struct bookmarked_file_info),SEEK_CUR);
-                //   rb->memset(&dummy,0,sizeof(struct bookmarked_file_info)); /* the actual info will be written on exit */
-                //rb->write (settings_fd, &dummy, sizeof(struct bookmarked_file_info));
-                rb->write (settings_fd, data->bookmarks, sizeof(struct bookmarked_file_info)*(data->bookmarked_files_count));
-                rb->close(settings_fd);
-            }
-        }
-    } /* BOOKMARKS_FILE opened ok */
+            break;
+        }    
+    }
+
+    /* prevent potential slot overflow */
+    if (i >= data->bookmarked_files_count) 
+    {
+        if (i < MAX_BOOKMARKED_FILES) 
+            data->bookmarked_files_count++;    
+        else        
+            i = MAX_BOOKMARKED_FILES-1;
+    }    
+
+    /* write bookmark file with spare slot in first position 
+       to be filled in by viewer_save_settings */
+    settings_fd = rb->open(BOOKMARKS_FILE, O_WRONLY|O_CREAT);
+    if (settings_fd >=0 )
+    {     
+        /* write count and skip first slot */
+        rb->write (settings_fd, &data->bookmarked_files_count, sizeof(signed int));
+        rb->PREFIX(lseek)(settings_fd,sizeof(struct bookmarked_file_info),SEEK_CUR);
+
+        /* shuffle up bookmarks */
+        rb->write (settings_fd, data->bookmarks, sizeof(struct bookmarked_file_info)*i);
+        rb->close(settings_fd);
+    }
+
     init_need_scrollbar();
 
     buffer_end = BUFFER_END();  /* Update whenever file_pos changes */
 
-    if (BUFFER_OOB(screen_top_ptr)) {
+    if (BUFFER_OOB(screen_top_ptr)) 
+    {
         screen_top_ptr = buffer;
     }
 
