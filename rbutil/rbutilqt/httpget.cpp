@@ -48,11 +48,13 @@ void HttpGet::setCache(QDir d)
 {
     m_cachedir = d;
     bool result = true;
-    
-    QString p = m_cachedir.absolutePath() + "rbutil-cache";
+
+    QString p = m_cachedir.absolutePath() + "/rbutil-cache";
     if(QFileInfo(m_cachedir.absolutePath()).isDir())
+    {
         if(!QFileInfo(p).isDir())
             result = m_cachedir.mkdir("rbutil-cache");
+    }
     else result = false;
     qDebug() << "HttpGet::setCache(QDir)" << result;
     m_usecache = result;
@@ -184,7 +186,7 @@ bool HttpGet::getFile(const QUrl &url)
         getRequest = http.get(url.path() + query, outputFile);
     }
     qDebug() << "[HTTP] request scheduled: GET" << getRequest;
-    
+
     return true;
 }
 
