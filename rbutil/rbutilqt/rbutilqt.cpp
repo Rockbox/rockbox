@@ -677,13 +677,19 @@ void RbUtilQt::installVoice()
 
 void RbUtilQt::installDoomBtn()
 {
+    QFile doomrock(userSettings->value("mountpoint").toString()+"/.rockbox/rocks/games/doom.rock");
+    if(!doomrock.exists()){
+        QMessageBox::critical(this, tr("Error"), tr("Your device doesn't have a doom plugin. Aborting."));
+        return;
+    }
+
     if(QMessageBox::question(this, tr("Confirm Installation"),
            tr("Do you really want to install the game addon files?"),
            QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
     // create logger
     logger = new ProgressLoggerGui(this);
     logger->show();
-    
+
     installDoom();
 }
 bool RbUtilQt::installDoomAuto()
