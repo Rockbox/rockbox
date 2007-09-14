@@ -495,13 +495,11 @@ void Config::browseFolder()
 #if defined(Q_OS_MACX)
     browser->setRoot("/Volumes");
 #elif defined(Q_OS_LINUX)
-    QDir a("/media");
-    browser->setDir(a);
+    browser->setDir("/media");
 #endif
     if( ui.mountPoint->text() != "" )
     {
-        QDir d(ui.mountPoint->text());
-        browser->setDir(d);
+        browser->setDir(ui.mountPoint->text());
     }
     browser->show();
     connect(browser, SIGNAL(itemChanged(QString)), this, SLOT(setMountpoint(QString)));
@@ -516,8 +514,7 @@ void Config::browseCache()
 #elif defined(Q_OS_WIN32)
     cbrowser->setFilter(QDir::Drives);
 #endif
-    QDir d(ui.cachePath->text());
-    cbrowser->setDir(d);
+    cbrowser->setDir(ui.cachePath->text());
     cbrowser->show();
     connect(cbrowser, SIGNAL(itemChanged(QString)), this, SLOT(setCache(QString)));
 }
@@ -625,8 +622,7 @@ void Config::browseTts()
     
     if(QFileInfo(ui.ttsExecutable->text()).isDir())
     {
-        QDir d(ui.ttsExecutable->text());
-        browser.setDir(d);
+        browser.setDir(ui.ttsExecutable->text());
     }
     if(browser.exec() == QDialog::Accepted)
     {
@@ -647,8 +643,7 @@ void Config::browseEnc()
     
     if(QFileInfo(ui.encoderExecutable->text()).isDir())
     {
-        QDir d(ui.encoderExecutable->text());
-        browser.setDir(d);
+        browser.setDir(ui.encoderExecutable->text());
     }
     if(browser.exec() == QDialog::Accepted)
     {

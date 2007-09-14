@@ -43,8 +43,7 @@ void BrowseOF::onBrowse()
        
     if(QFileInfo(ui.OFlineEdit->text()).exists())
     {
-        QDir d(ui.OFlineEdit->text());
-        browser.setDir(d);
+        browser.setDir(ui.OFlineEdit->text());
     }
     
     if(browser.exec() == QDialog::Accepted)

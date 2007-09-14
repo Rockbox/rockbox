@@ -29,18 +29,19 @@ class BrowseDirtree : public QDialog
 
     public:
         BrowseDirtree(QWidget *parent = 0);
-        void setFilter(QDir::Filters);
-        void setDir(QDir&);
+        void setFilter(const QDir::Filters&);
+        void setDir(const QDir&);
+        void setDir(const QString&);
         QString getSelected();
-        void setRoot(QString dir);
-        
+        void setRoot(const QString&);
+
     signals:
         void itemChanged(QString);
 
     private:
         Ui::BrowseDirtreeFrm ui;
         QDirModel model;
-        
+
     private slots:
         void accept(void);
 };

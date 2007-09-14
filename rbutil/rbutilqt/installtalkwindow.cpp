@@ -43,13 +43,11 @@ void InstallTalkWindow::browseFolder()
     
     if(QFileInfo(ui.lineTalkFolder->text()).isDir())
     {
-        QDir d(ui.lineTalkFolder->text());
-        browser.setDir(d);
+        browser.setDir(ui.lineTalkFolder->text());
     }
     else
     {
-        QDir d("/media");
-        browser.setDir(d);
+        browser.setDir("/media"); // FIXME: This looks Linux specific
     }
     if(browser.exec() == QDialog::Accepted)
     {

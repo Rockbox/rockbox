@@ -30,7 +30,7 @@ BrowseDirtree::BrowseDirtree(QWidget *parent) : QDialog(parent)
     ui.tree->setModel(&model);
     model.setReadOnly(true);
     model.setSorting(QDir::Name | QDir::DirsFirst | QDir::IgnoreCase);
-    
+
     // disable size / date / type columns
     ui.tree->setColumnHidden(1, true);
     ui.tree->setColumnHidden(2, true);
@@ -39,7 +39,7 @@ BrowseDirtree::BrowseDirtree(QWidget *parent) : QDialog(parent)
 }
 
 
-void BrowseDirtree::setDir(QDir &dir)
+void BrowseDirtree::setDir(const QDir &dir)
 {
     qDebug() << "BrowseDirtree::setDir()" << model.index(dir.absolutePath());
 
@@ -49,17 +49,24 @@ void BrowseDirtree::setDir(QDir &dir)
     if(model.index(dir.absolutePath()).isValid()) {
         QModelIndex p = model.index(dir.absolutePath());
         ui.tree->setCurrentIndex(p);
+        ui.tree->expand(p);
         ui.tree->scrollTo(p);
         ui.tree->resizeColumnToContents(0);
     }
 }
 
-void BrowseDirtree::setRoot(QString dir)
+void BrowseDirtree::setDir(const QString &dir)
+{
+    QDir d(dir);
+    setDir(d);
+}
+
+void BrowseDirtree::setRoot(const QString &dir)
 {
     ui.tree->setRootIndex(model.index(dir));
 }
 
-void BrowseDirtree::setFilter(QDir::Filters filters)
+void BrowseDirtree::setFilter(const QDir::Filters &filters)
 {
     model.setFilter(filters);
 }
@@ -72,7 +79,7 @@ void BrowseDirtree::accept()
 
     this->close();
     emit itemChanged(QDir::toNativeSeparators(path));
-    setResult(QDialog::Accepted); 
+    setResult(QDialog::Accepted);
 }
 
 QString BrowseDirtree::getSelected()
