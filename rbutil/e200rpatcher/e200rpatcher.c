@@ -156,7 +156,7 @@ found:
     }
 
 
-    fprintf(stderr,"[ERR]  Found E200R, uploading patching application.\n");
+    fprintf(stderr,"[INFO] Found E200R, uploading patching application.\n");
 
     /* Now we can transfer the application to the device. */ 
 
