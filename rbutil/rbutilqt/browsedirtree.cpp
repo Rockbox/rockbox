@@ -54,6 +54,10 @@ void BrowseDirtree::setDir(QDir &dir)
     }
 }
 
+void BrowseDirtree::setRoot(QString dir)
+{
+    ui.tree->setRootIndex(model.index(dir));
+}
 
 void BrowseDirtree::setFilter(QDir::Filters filters)
 {

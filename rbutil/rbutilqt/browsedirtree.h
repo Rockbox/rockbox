@@ -32,6 +32,7 @@ class BrowseDirtree : public QDialog
         void setFilter(QDir::Filters);
         void setDir(QDir&);
         QString getSelected();
+        void setRoot(QString dir);
         
     signals:
         void itemChanged(QString);
