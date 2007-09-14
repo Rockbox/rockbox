@@ -34,13 +34,14 @@ class ThemesInstallWindow : public QDialog
 
     public:
         ThemesInstallWindow(QWidget* parent = 0);
+        ~ThemesInstallWindow();
         void setDeviceSettings(QSettings*);
         void setUserSettings(QSettings *);
         void setProxy(QUrl);
         void downloadInfo(void);
         void show(void);
         void accept(void);
-        
+
     public slots:
 
     private:
@@ -59,7 +60,9 @@ class ThemesInstallWindow : public QDialog
         ZipInstaller *installer;
         QString file;
         QString fileName;
-        
+
+        QString infocachedir;
+
     private slots:
         void downloadDone(bool);
         void downloadDone(int, bool);

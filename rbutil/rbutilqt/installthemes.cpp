@@ -23,7 +23,7 @@
 #include "installthemes.h"
 #include "installzip.h"
 #include "progressloggergui.h"
-
+#include "utils.h"
 
 ThemesInstallWindow::ThemesInstallWindow(QWidget *parent) : QDialog(parent)
 {
@@ -32,11 +32,16 @@ ThemesInstallWindow::ThemesInstallWindow(QWidget *parent) : QDialog(parent)
     ui.listThemes->setSelectionMode(QAbstractItemView::ExtendedSelection);
     ui.themePreview->clear();
     ui.themePreview->setText(tr("no theme selected"));
-    
+
     connect(ui.buttonCancel, SIGNAL(clicked()), this, SLOT(close()));
     connect(ui.buttonOk, SIGNAL(clicked()), this, SLOT(accept()));
 }
 
+ThemesInstallWindow::~ThemesInstallWindow()
+{
+    if(infocachedir!="")
+        recRmdir(infocachedir);
+}
 
 QString ThemesInstallWindow::resolution()
 {
@@ -186,6 +191,16 @@ void ThemesInstallWindow::updateDetails(int row)
     igetter.setProxy(proxy);
     if(!userSettings->value("cachedisable").toBool())
         igetter.setCache(userSettings->value("cachepath", QDir::tempPath()).toString());
+    else
+    {
+        if(infocachedir=="")
+        {
+            infocachedir = QDir::tempPath()+"rbutil-themeinfo";
+            QDir d = QDir::temp();
+            d.mkdir("rbutil-themeinfo");
+        }
+        igetter.setCache(infocachedir);
+    }
     igetter.getFile(img);
     connect(&igetter, SIGNAL(done(bool)), this, SLOT(updateImage(bool)));
 }

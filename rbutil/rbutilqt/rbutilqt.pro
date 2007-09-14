@@ -33,6 +33,7 @@ SOURCES += rbutilqt.cpp \
  installthemes.cpp \
  uninstall.cpp \
  uninstallwindow.cpp \
+ utils.cpp \
  browseof.cpp \
  preview.cpp 
 
@@ -68,6 +69,7 @@ HEADERS += rbutilqt.h \
  installthemes.h \
  uninstall.h \
  uninstallwindow.h \
+ utils.h \
  browseof.h \
  preview.h 
  

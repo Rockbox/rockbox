@@ -16,11 +16,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "uninstall.h"
+#include "utils.h"
 
-
-Uninstaller::Uninstaller(QObject* parent,QString mountpoint): QObject(parent) 
+Uninstaller::Uninstaller(QObject* parent,QString mountpoint): QObject(parent)
 {
     m_mountpoint = mountpoint;
 }
@@ -37,45 +37,22 @@ void Uninstaller::deleteAll(ProgressloggerInterface* dp)
     m_dp->addItem(tr("Finished Uninstallation"),LOGOK);
     m_dp->abort();
 }
-// recursiv function to delete a dir with files
-bool Uninstaller::recRmdir( QString &dirName )
-{
-  QString dirN = dirName;
-  QDir dir(dirN);
-  QStringList list = dir.entryList(QDir::AllEntries); // make list of entries in directory
-  QFileInfo fileInfo;
-  QString curItem, lstAt;
-  for(int i = 0; i < list.size(); i++){ // loop through all items of list
-    QString name = list.at(i);
-    if(!(name == ".") && !(name == "..")){
-      curItem = dirN + "/" + name;
-      fileInfo.setFile(curItem);
-      if(fileInfo.isDir())      // is directory
-        recRmdir(curItem);      // call recRmdir() recursively for deleting subdirectory
-      else                      // is file
-        QFile::remove(curItem); // ok, delete file
-    }
-  }
-  dir.cdUp();
-  return dir.rmdir(dirN); // delete empty dir and return if (now empty) dir-removing was successfull
-}
-
 
 void Uninstaller::uninstall(ProgressloggerInterface* dp)
 {
     m_dp = dp;
     m_dp->setProgressMax(0);
     m_dp->addItem(tr("Starting Uninstallation"),LOGINFO);
-    
+
     QSettings installlog(m_mountpoint + "/.rockbox/rbutil.log", QSettings::IniFormat, 0);
-    
+
     for(int i=0; i< uninstallSections.size() ; i++)
     {
         m_dp->addItem(tr("Uninstalling ") + uninstallSections.at(i) + " ...",LOGINFO);
         installlog.beginGroup(uninstallSections.at(i));
         QStringList toDeleteList = installlog.allKeys();
         QStringList dirList;
-        
+
         // iterate over all entrys
         for(int j =0; j < toDeleteList.size(); j++ )
         {
@@ -101,7 +78,7 @@ void Uninstaller::uninstall(ProgressloggerInterface* dp)
 
         installlog.endGroup();
         //installlog.removeGroup(uninstallSections.at(i))
-    }  
+    }
     uninstallSections.clear();
     installlog.sync();
     m_dp->setProgressMax(1);
@@ -121,5 +98,5 @@ QStringList Uninstaller::getAllSections()
 
 bool Uninstaller::uninstallPossible()
 {
-    return QFileInfo(m_mountpoint +"/.rockbox/rbutil.log").exists(); 
+    return QFileInfo(m_mountpoint +"/.rockbox/rbutil.log").exists();
 }
