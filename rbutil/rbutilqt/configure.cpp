@@ -486,7 +486,7 @@ void Config::updateLanguage()
 
 void Config::browseFolder()
 {
-    browser = new BrowseDirtree(this);
+    browser = new BrowseDirtree(this,tr("Select your device"));
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
     browser->setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
 #elif defined(Q_OS_WIN32)

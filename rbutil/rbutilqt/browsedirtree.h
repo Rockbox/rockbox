@@ -28,7 +28,7 @@ class BrowseDirtree : public QDialog
     Q_OBJECT
 
     public:
-        BrowseDirtree(QWidget *parent = 0);
+        BrowseDirtree(QWidget *parent = 0, const QString &caption="");
         void setFilter(const QDir::Filters&);
         void setDir(const QDir&);
         void setDir(const QString&);

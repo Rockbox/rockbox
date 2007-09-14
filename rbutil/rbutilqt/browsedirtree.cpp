@@ -23,13 +23,16 @@
 #include "ui_browsedirtreefrm.h"
 
 
-BrowseDirtree::BrowseDirtree(QWidget *parent) : QDialog(parent)
+BrowseDirtree::BrowseDirtree(QWidget *parent, const QString &caption) : QDialog(parent)
 {
     ui.setupUi(this);
     this->setModal(true);
     ui.tree->setModel(&model);
     model.setReadOnly(true);
     model.setSorting(QDir::Name | QDir::DirsFirst | QDir::IgnoreCase);
+
+    if(caption!="")
+        setWindowTitle(caption);
 
     // disable size / date / type columns
     ui.tree->setColumnHidden(1, true);
