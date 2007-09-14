@@ -92,16 +92,16 @@ enum {
 /* builtin C-based proportional/fixed font structure */
 /* based on The Microwindows Project http://microwindows.org */
 struct font {
-    int		maxwidth;	/* max width in pixels*/
-    unsigned int height;	/* height in pixels*/
-    int		ascent;		/* ascent (baseline) height*/
-    int		firstchar;	/* first character in bitmap*/
-    int		size;		/* font size in glyphs*/
-    const unsigned char *bits;		/* 8-bit column bitmap data*/
-    const unsigned short *offset;	/* offsets into bitmap data*/
-    const unsigned char *width;	/* character widths or NULL if fixed*/
-    int		defaultchar;	/* default char (not glyph index)*/
-    int32_t       bits_size;       /* # bytes of glyph bits*/
+    int          maxwidth;        /* max width in pixels*/
+    unsigned int height;          /* height in pixels*/
+    int          ascent;          /* ascent (baseline) height*/
+    int          firstchar;       /* first character in bitmap*/
+    int          size;            /* font size in glyphs*/
+    const unsigned char *bits;    /* 8-bit column bitmap data*/
+    const unsigned short *offset; /* offsets into bitmap data*/
+    const unsigned char *width;   /* character widths or NULL if fixed*/
+    int          defaultchar;     /* default char (not glyph index)*/
+    int32_t      bits_size;       /* # bytes of glyph bits*/
 };
 
 /* font routines*/
@@ -122,6 +122,3 @@ void glyph_cache_save(void);
 #endif
 
 #endif
-/* -----------------------------------------------------------------
- * vim: et sw=4 ts=8 sts=4 tw=78
- */
