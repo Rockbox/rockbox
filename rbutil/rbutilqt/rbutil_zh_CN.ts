@@ -1,0 +1,1578 @@
+<!DOCTYPE TS><TS>
+<defaultcodec></defaultcodec>
+<context>
+    <name>BootloaderInstaller</name>
+    <message>
+        <source>Starting bootloader installation</source>
+        <translation>开始安装启动程式</translation>
+    </message>
+    <message>
+        <source>unsupported install Method</source>
+        <translation>不支持的安装方式</translation>
+    </message>
+    <message>
+        <source>Starting bootloader uninstallation</source>
+        <translation>开始卸载启动程式</translation>
+    </message>
+    <message>
+        <source>No uninstallation possible</source>
+        <translation>不可以卸载</translation>
+    </message>
+    <message>
+        <source>Download error: received HTTP error %1.</source>
+        <translation>下载错误: 接到 HTTP 错误 %1. </translation>
+    </message>
+    <message>
+        <source>Download error: %1</source>
+        <translation>下载错误: %1</translation>
+    </message>
+    <message>
+        <source>Download finished.</source>
+        <translation>完成下载.</translation>
+    </message>
+    <message>
+        <source>Network error: %1. Please check your network and proxy settings.</source>
+        <translation>网络错误： %1. 请检查你的网络和代理服务的设置.</translation>
+    </message>
+    <message>
+        <source>Creating installation log</source>
+        <translation>正在添加安装日志</translation>
+    </message>
+    <message>
+        <source>Editing installation log</source>
+        <translation>正在写入安装日志</translation>
+    </message>
+    <message>
+        <source>Downloading file %1.%2</source>
+        <translation>正在下载文件 %1.%2</translation>
+    </message>
+    <message>
+        <source>Could not find the Original Firmware at: %1</source>
+        <translation>找不到厂家固件在: %1</translation>
+    </message>
+    <message>
+        <source>Could not remove the Firmware at: %1</source>
+        <translation>删除不了固件在: %1</translation>
+    </message>
+    <message>
+        <source>Could not copy the Firmware from: %1 to %2</source>
+        <translation>不能复制固件从 %1 到 %2 </translation>
+    </message>
+    <message>
+        <source>Finishing bootloader install</source>
+        <translation>启动程式安装完成</translation>
+    </message>
+    <message>
+        <source>Could not find the Firmware at: %1</source>
+        <translation>找不到固件在: %1</translation>
+    </message>
+    <message>
+        <source>Could not rename: %1 to %2</source>
+        <translation>不能把 %1 重命名为 %2</translation>
+    </message>
+    <message>
+        <source>Could not copy: %1 to %2</source>
+        <translation>不能复制 %1 到 %2</translation>
+    </message>
+    <message>
+        <source>Bootloader install finished successfully.</source>
+        <translation>成功安装启动程序</translation>
+    </message>
+    <message>
+        <source>To finish the Bootloader installation, follow the steps below.</source>
+        <translation>请按照以下步骤完成启动程序的安装</translation>
+    </message>
+    <message>
+        <source>1. Eject/Unmount your Device.</source>
+        <translation>1. 弹出/退出你的播放机.</translation>
+    </message>
+    <message>
+        <source>2. Unplug USB and any Power adapters.</source>
+        <translation>2. 拔出USB接线, 断离所有冲电设备.</translation>
+    </message>
+    <message>
+        <source>3. Hold POWER to turn the Device off.</source>
+        <translation>3. 按POWER关机.</translation>
+    </message>
+    <message>
+        <source>4. Toggle the Battery switch on the Device.</source>
+        <translation>4. 先关再开电池开关.</translation>
+    </message>
+    <message>
+        <source>5. Hold POWER to boot the Rockbox bootloader.</source>
+        <translation>5. 按POWER启动 Rockbox 的启动程序.</translation>
+    </message>
+    <message>
+        <source>2. Turn you Device OFF.</source>
+        <translation>2. 关闭你的播放器.</translation>
+    </message>
+    <message>
+        <source>3. Insert Charger.</source>
+        <translation>3. 插入充电器.</translation>
+    </message>
+    <message>
+        <source>Firmware does not exist: %1</source>
+        <translation>固件不存在: %1</translation>
+    </message>
+    <message>
+        <source>Searching for ipods</source>
+        <translation>正在寻找 iPods</translation>
+    </message>
+    <message>
+        <source>No Ipods found</source>
+        <translation>找不到 iPods</translation>
+    </message>
+    <message>
+        <source>Too many Ipods found</source>
+        <translation>找到太多的 iPods</translation>
+    </message>
+    <message>
+        <source>could not open ipod</source>
+        <translation>打开不了 iPods</translation>
+    </message>
+    <message>
+        <source>could not read partitiontable</source>
+        <translation>读不了分区表</translation>
+    </message>
+    <message>
+        <source>No partition 0 on disk</source>
+        <translation>硬盘上没有0分区</translation>
+    </message>
+    <message>
+        <source>[INFO] Part    Start Sector    End Sector   Size (MB)   Type</source>
+        <translation type="obsolete">[INFO] 分区    开始磁区    结算磁区   大小 (MB)   类别</translation>
+    </message>
+    <message>
+        <source>[INFO]    %1      %2    %3  %4   %5 (%6)</source>
+        <translation>[INFO]    %1      %2    %3  %4   %5 (%6)</translation>
+    </message>
+    <message>
+        <source>Failed to read firmware directory</source>
+        <translation>读不了固件文件夹</translation>
+    </message>
+    <message>
+        <source>Unknown version number in firmware (%1)</source>
+        <translation>固件版本不明 (%1)</translation>
+    </message>
+    <message>
+        <source>Warning this is a MacPod, Rockbox doesnt work on this. Convert it to WinPod</source>
+        <translation>警告: 这是苹果格式的iPod, Rockbox 不能在这运行. 请转换成 Windows 格式的iPod.</translation>
+    </message>
+    <message>
+        <source>Could not open Ipod in RW mode</source>
+        <translation>不能以读写方式打开iPod</translation>
+    </message>
+    <message>
+        <source>No bootloader detected.</source>
+        <translation>找不到启动程序.</translation>
+    </message>
+    <message>
+        <source>Successfully removed Bootloader</source>
+        <translation>成功删除启动程序</translation>
+    </message>
+    <message>
+        <source>--delete-bootloader failed.</source>
+        <translation>--删除启动程序失败.</translation>
+    </message>
+    <message>
+        <source>Successfully added Bootloader</source>
+        <translation>成功添加启动程序</translation>
+    </message>
+    <message>
+        <source>failed to add Bootloader</source>
+        <translation>添加启动程序失败</translation>
+    </message>
+    <message>
+        <source>Searching for sansas</source>
+        <translation>正在寻找 sansas</translation>
+    </message>
+    <message>
+        <source>No Sansa found</source>
+        <translation>找不到 Sansa</translation>
+    </message>
+    <message>
+        <source>Too many Sansas found</source>
+        <translation>找到了太多的 sansas</translation>
+    </message>
+    <message>
+        <source>could not open Sansa</source>
+        <translation>打开不了 sansa</translation>
+    </message>
+    <message>
+        <source>Disk is not an E200 (%1), aborting.</source>
+        <translation>硬盘不是 E200 (%1), 正在取消...</translation>
+    </message>
+    <message>
+        <source>********************************************
+OLD ROCKBOX INSTALLATION DETECTED, ABORTING.
+You must reinstall the original Sansa firmware before running
+sansapatcher for the first time.
+See http://www.rockbox.org/twiki/bin/view/Main/SansaE200Install
+*********************************************
+</source>
+        <translation>********************************************
+找到了旧 ROCKBOX, 正在取消...
+你必须重新安装厂家固件才可以第一次
+运行 sansapatcher
+参考 http://www.rockbox.org/twiki/bin/view/Main/SansaE200Install (英文)
+*********************************************
+</translation>
+    </message>
+    <message>
+        <source>Could not open Sansa in RW mode</source>
+        <translation>不能以读写方式打开 sansa</translation>
+    </message>
+    <message>
+        <source>Could not MD5Sum original firmware</source>
+        <translation>不能验证厂家固件的MD5sum</translation>
+    </message>
+    <message>
+        <source>Could not detect firmware type</source>
+        <translation>找不到固件类别</translation>
+    </message>
+    <message>
+        <source>Error in descramble</source>
+        <translation>descramble 错误</translation>
+    </message>
+    <message>
+        <source>Error in patching</source>
+        <translation>补丁过程错误</translation>
+    </message>
+    <message>
+        <source>Error in scramble</source>
+        <translation>scramble 错误</translation>
+    </message>
+    <message>
+        <source>Error in checksumming</source>
+        <translation>验证错误</translation>
+    </message>
+    <message>
+        <source>2. Boot into the original Firmware.</source>
+        <translation>2. 启动到厂家固件.</translation>
+    </message>
+    <message>
+        <source>3. Use the Firmware flash option in the Original Firmware.</source>
+        <translation>3. 在厂家固件里选择快闪记忆体.</translation>
+    </message>
+    <message>
+        <source>4. Reboot.</source>
+        <translation>4. 重新开机.</translation>
+    </message>
+    <message>
+        <source>Original Firmware does not exist: %1</source>
+        <translation>厂家固件不存在 : %1</translation>
+    </message>
+    <message>
+        <source>[INFO] Part    Start Sector    End Sector   Size (MB)   Type
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BrowseDirtreeFrm</name>
+    <message>
+        <source>Find Directory</source>
+        <translation>寻找文件夹</translation>
+    </message>
+    <message>
+        <source>Browse to the destination folder</source>
+        <translation>浏览目的地文件夹</translation>
+    </message>
+    <message>
+        <source>&amp;Ok</source>
+        <translation>&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;取消</translation>
+    </message>
+</context>
+<context>
+    <name>BrowseOFFrm</name>
+    <message>
+        <source>Find original Firmware</source>
+        <translation>寻找厂家固件</translation>
+    </message>
+    <message>
+        <source>Browse for a downloaded copy of the original firmware</source>
+        <translation>寻找已下载的厂家固件</translation>
+    </message>
+    <message>
+        <source>Browse</source>
+        <translation>浏览</translation>
+    </message>
+    <message>
+        <source>&amp;Ok</source>
+        <translation>&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;取消</translation>
+    </message>
+</context>
+<context>
+    <name>Config</name>
+    <message>
+        <source>Language changed</source>
+        <translation>语言已改变</translation>
+    </message>
+    <message>
+        <source>You need to restart the application for the changed language to take effect.</source>
+        <translation>你需要重新开启本软件才能使用新语言.</translation>
+    </message>
+    <message>
+        <source>Current cache size is %1 kiB.</source>
+        <translation>现在缓冲的大小是 %1 kiB.</translation>
+    </message>
+    <message>
+        <source>Autodetection</source>
+        <translation>自动识别</translation>
+    </message>
+    <message>
+        <source>Could not detect a Mountpoint.
+Select your Mountpoint manually.</source>
+        <translation>找不到 mountpoint
+请手动选择你的 mountpoing.</translation>
+    </message>
+    <message>
+        <source>Could not detect a device.
+Select your device and Mountpoint manually.</source>
+        <translation>不能识别你的播放器
+请手动选择.</translation>
+    </message>
+    <message>
+        <source>Really delete cache?</source>
+        <translation>你肯定要删除缓冲吗?</translation>
+    </message>
+    <message>
+        <source>Do you really want to delete the cache? Make absolutely sure this setting is correct as it will remove &lt;b&gt;all&lt;/b&gt; files in this folder!</source>
+        <translation>你真的肯定要删除缓冲吗? 请确认你的设定是正确的因为这会删除 &lt;b&gt;全部&lt;/b&gt; 的文件在此文件夹 !</translation>
+    </message>
+    <message>
+        <source>Path wrong!</source>
+        <translation>路径错误!</translation>
+    </message>
+    <message>
+        <source>The cache path is invalid. Aborting.</source>
+        <translation>缓冲路径错误. 正在取消.</translation>
+    </message>
+    <message>
+        <source> (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ConfigForm</name>
+    <message>
+        <source>Configuration</source>
+        <translation>设置</translation>
+    </message>
+    <message>
+        <source>Configure Rockbox Utility</source>
+        <translation>设置 Rockbox 安装程序</translation>
+    </message>
+    <message>
+        <source>&amp;Device</source>
+        <translation>&amp;播放器</translation>
+    </message>
+    <message>
+        <source>Select your device in the &amp;filesystem</source>
+        <translation>请选择你的播放器在你的 &amp;文件系统</translation>
+    </message>
+    <message>
+        <source>&amp;Browse</source>
+        <translation>&amp;浏览</translation>
+    </message>
+    <message>
+        <source>&amp;Select your audio player</source>
+        <translation>&amp;选择你的音乐播放器</translation>
+    </message>
+    <message>
+        <source>1</source>
+        <translation>1</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>自动识别(&amp;A)</translation>
+    </message>
+    <message>
+        <source>&amp;Proxy</source>
+        <translation>网络代理服务(&amp;P)</translation>
+    </message>
+    <message>
+        <source>&amp;No Proxy</source>
+        <translation>没有网络代理服务(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Use S&amp;ystem values</source>
+        <translation>使用系统值(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Manual Proxy settings</source>
+        <translation>手动设置代理服务(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Proxy Values</source>
+        <translation>代理服务值</translation>
+    </message>
+    <message>
+        <source>&amp;Host:</source>
+        <translation>&amp;主机:</translation>
+    </message>
+    <message>
+        <source>&amp;Port:</source>
+        <translation>&amp;接口:</translation>
+    </message>
+    <message>
+        <source>&amp;Username</source>
+        <translation>&amp;用户名</translation>
+    </message>
+    <message>
+        <source>Pass&amp;word</source>
+        <translation>&amp;密码</translation>
+    </message>
+    <message>
+        <source>&amp;Language</source>
+        <translation>&amp;语言</translation>
+    </message>
+    <message>
+        <source>Cac&amp;he</source>
+        <translation>&amp;缓冲</translation>
+    </message>
+    <message>
+        <source>Download cache settings</source>
+        <translation>下载缓冲设置</translation>
+    </message>
+    <message>
+        <source>Rockbox Utility uses a local download cache to save network traffic. You can change the path to the cache and use it as local repository by enabling Offline mode.</source>
+        <translation>Rockbox 安装程序使用本机缓冲来保存网络资料. 你可以改变这个缓冲的路径. 启动下线模式后, 你还可以用路径来保存文件.</translation>
+    </message>
+    <message>
+        <source>Current cache size is %1</source>
+        <translation>现在缓冲大小是 %1</translation>
+    </message>
+    <message>
+        <source>P&amp;ath</source>
+        <translation>&amp;路径</translation>
+    </message>
+    <message>
+        <source>Entering an invalid folder will reset the path to the systems temporary path.</source>
+        <translation>输入无效地址会重设到系统临时文件夹.</translation>
+    </message>
+    <message>
+        <source>Disable local &amp;download cache</source>
+        <translation>&amp;不使用本机缓冲</translation>
+    </message>
+    <message>
+        <source>This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.</source>
+        <translation>所有资料, 包括更新资料, 将会从本机缓冲里拿取. 不要选择此模式如果你不需要下线安装. 注意: 你需要先用网络做至少一次安装才可以下载到需要的文件.</translation>
+    </message>
+    <message>
+        <source>O&amp;ffline mode</source>
+        <translation>&amp;下线安装</translation>
+    </message>
+    <message>
+        <source>Clean cache &amp;now</source>
+        <translation>&amp;现在清除缓冲文件夹</translation>
+    </message>
+    <message>
+        <source>&amp;TTS &amp;&amp; Encoder</source>
+        <translation>&amp;TTS &amp;&amp; 信号转换器</translation>
+    </message>
+    <message>
+        <source>TTS Engine</source>
+        <translation>TTS 引擎</translation>
+    </message>
+    <message>
+        <source>&amp;Select TTS profile</source>
+        <translation>&amp; 选择 TTS 个人设置</translation>
+    </message>
+    <message>
+        <source>TTS executable</source>
+        <translation>TTS 可执行文件</translation>
+    </message>
+    <message>
+        <source>TTS Options</source>
+        <translation>TTS 设置</translation>
+    </message>
+    <message>
+        <source>Encoder Engine</source>
+        <translation>信号转换器引擎</translation>
+    </message>
+    <message>
+        <source>Select &amp;encoder profile</source>
+        <translation>&amp;选择引擎设置</translation>
+    </message>
+    <message>
+        <source>Encoder executable</source>
+        <translation>引擎可执行文件</translation>
+    </message>
+    <message>
+        <source>B&amp;rowse</source>
+        <translation>&amp;浏览</translation>
+    </message>
+    <message>
+        <source>Encoder options</source>
+        <translation>信号转换器设置</translation>
+    </message>
+    <message>
+        <source>&amp;Ok</source>
+        <translation>&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;取消</translation>
+    </message>
+</context>
+<context>
+    <name>Configure</name>
+    <message>
+        <source>English</source>
+        <translation type="unfinished">中文 (Chinese Simplified)</translation>
+    </message>
+</context>
+<context>
+    <name>Install</name>
+    <message>
+        <source>Mount point is wrong!</source>
+        <translation>Mountpoint 错误!</translation>
+    </message>
+    <message>
+        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
+        <translation>这是最新的Rockbox版本. 每一个更改后这版本就会更新. 最新的版本是 r%1 (%2).</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Note:&lt;/b&gt; This option will always download a fresh copy. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
+        <translation>&lt;b&gt;注意:&lt;/b&gt; 选择这会每一次自动下载新的版本. &lt;b&gt;(推荐)&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Note:&lt;/b&gt; This option will always download a fresh copy.</source>
+        <translation>&lt;b&gt;注意:&lt;/b&gt; 选择这会每一次自动下载新的版本. </translation>
+    </message>
+    <message>
+        <source>This is the last released version of Rockbox.</source>
+        <translation>这是最新的Rockbox版本.</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Note:&lt;/b&gt;The lastest released version is %1. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
+        <translation>&lt;b&gt;注意:&lt;/b&gt; 最新的版本是 %1. &lt;b&gt;这是建议使用的版本.&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>These are automatically built each day from the current development source code. This generally has more features than the last release but may be much less stable. Features may change regularly.</source>
+        <translation>这是每天自动更新的版本. 这一般来说比发行版本要多功能, 但可能没有那么稳定. 功能可能会随时改变.</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
+        <translation>&lt;b&gt;注意:&lt;/b&gt; 存档的版本是 r%1 (%2).</translation>
+    </message>
+</context>
+<context>
+    <name>InstallFrm</name>
+    <message>
+        <source>Install Rockbox</source>
+        <translation>安装 Rockbox</translation>
+    </message>
+    <message>
+        <source>Please select the Rockbox version you want to install on your player:</source>
+        <translation>请选择你要安装在你的播放器上的版本:</translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation>版本</translation>
+    </message>
+    <message>
+        <source>Rockbox &amp;stable</source>
+        <translation>&amp;稳定的 Rockbox</translation>
+    </message>
+    <message>
+        <source>&amp;Archived Build</source>
+        <translation>&amp;存档的版本</translation>
+    </message>
+    <message>
+        <source>&amp;Current Build</source>
+        <translation>&amp;最新的版本</translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation>细节</translation>
+    </message>
+    <message>
+        <source>Details about the selected version</source>
+        <translation>被选择版本的细节</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>注意</translation>
+    </message>
+    <message>
+        <source>Rockbox Utility stores copies of Rockbox it has downloaded on the local hard disk to save network traffic. If your local copy is no longer working, tick this box to download a fresh copy.</source>
+        <translation>Rockbox安装程序储存以前下载的文件在你的硬盘上以减少网络交通. 如果你的Rockbox不能使用, 选择这项去下载一份新的文件</translation>
+    </message>
+    <message>
+        <source>&amp;Don&apos;t use locally cached copy</source>
+        <translation>&amp;不使用硬盘上缓冲的文件</translation>
+    </message>
+    <message>
+        <source>&amp;Ok</source>
+        <translation>&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;取消</translation>
+    </message>
+</context>
+<context>
+    <name>InstallProgressFrm</name>
+    <message>
+        <source>Progress</source>
+        <translation>进程</translation>
+    </message>
+    <message>
+        <source>&amp;Abort</source>
+        <translation>&amp;取消</translation>
+    </message>
+</context>
+<context>
+    <name>InstallTalkFrm</name>
+    <message>
+        <source>Install Talk Files</source>
+        <translation>安装说话文件</translation>
+    </message>
+    <message>
+        <source>Select the Folder to generate Talkfiles for.</source>
+        <translation>选择需要安装说话文件的文件夹</translation>
+    </message>
+    <message>
+        <source>&amp;Browse</source>
+        <translation>&amp;浏览</translation>
+    </message>
+    <message>
+        <source>Generation settings</source>
+        <translation>语音合成设置</translation>
+    </message>
+    <message>
+        <source>Encoder profile:</source>
+        <translation>转化器设置:</translation>
+    </message>
+    <message>
+        <source>TTS profile:</source>
+        <translation>TTS 设置:</translation>
+    </message>
+    <message>
+        <source>Generation options</source>
+        <translation>语音合成设置</translation>
+    </message>
+    <message>
+        <source>Overwrite Wavefiles</source>
+        <translation>覆盖已存在的 Wavefiles</translation>
+    </message>
+    <message>
+        <source>Remove Wavefiles</source>
+        <translation>删除 Wavefiles</translation>
+    </message>
+    <message>
+        <source>Run recursive</source>
+        <translation>递归寻找</translation>
+    </message>
+    <message>
+        <source>Strip Extensions</source>
+        <translation>除去后缀</translation>
+    </message>
+    <message>
+        <source>Overwrite Talkfiles</source>
+        <translation>删除语音文件</translation>
+    </message>
+    <message>
+        <source>&amp;Ok</source>
+        <translation>&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;取消</translation>
+    </message>
+</context>
+<context>
+    <name>InstallTalkWindow</name>
+    <message>
+        <source>The Folder to Talk is wrong!</source>
+        <translation>要支持语音的文件夹错误!</translation>
+    </message>
+    <message>
+        <source>Path to Encoder is wrong!</source>
+        <translation>语音生成转换器的路径错误!</translation>
+    </message>
+    <message>
+        <source>Path to TTS is wrong!</source>
+        <translation>TTS引擎的路径错误!</translation>
+    </message>
+    <message>
+        <source>TTS Profile: &lt;b&gt;%1&lt;/b&gt;</source>
+        <translation>TTS 设置: &lt;b&gt;%1&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Invalid TTS profile!</source>
+        <translation>无效TTS设置 !</translation>
+    </message>
+    <message>
+        <source>Encoder Profile: &lt;b&gt;%1&lt;/b&gt;</source>
+        <translation>转换器设置: &lt;b&gt;%1&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Invalid encoder profile!</source>
+        <translation>无效转化器设置!</translation>
+    </message>
+</context>
+<context>
+    <name>PreviewFrm</name>
+    <message>
+        <source>Preview</source>
+        <translation>预览</translation>
+    </message>
+</context>
+<context>
+    <name>ProgressLoggerGui</name>
+    <message>
+        <source>&amp;Ok</source>
+        <translation>&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Abort</source>
+        <translation>&amp;取消</translation>
+    </message>
+</context>
+<context>
+    <name>RbUtilQt</name>
+    <message>
+        <source>File</source>
+        <translation>文件</translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation>版本</translation>
+    </message>
+    <message>
+        <source>Network error: %1. Please check your network and proxy settings.</source>
+        <translation>网络错误： %1. 请检查你的网络和代理服务的设置.</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;%1 %2&lt;/b&gt; at &lt;b&gt;%3&lt;/b&gt;</source>
+        <translation>&lt;b&gt;%1 %2&lt;/b&gt; 在 &lt;b&gt;%3&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;a href=&apos;%1&apos;&gt;PDF Manual&lt;/a&gt;</source>
+        <translation>&lt;a href=&apos;%1&apos;&gt;PDF 用户手册(英文)&lt;/a&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;a href=&apos;%1&apos;&gt;HTML Manual (opens in browser)&lt;/a&gt;</source>
+        <translation>&lt;a href=&apos;%1&apos;&gt;HTML 用户手册(英文,在浏览器打开)&lt;/a&gt;</translation>
+    </message>
+    <message>
+        <source>Select a device for a link to the correct manual</source>
+        <translation>请选择你的播放器</translation>
+    </message>
+    <message>
+        <source>&lt;a href=&apos;%1&apos;&gt;Manual Overview&lt;/a&gt;</source>
+        <translation>&lt;a href=&apos;%1&apos;&gt;用户手册总观&lt;/a&gt;</translation>
+    </message>
+    <message>
+        <source>Confirm Installation</source>
+        <translation>确认安装</translation>
+    </message>
+    <message>
+        <source>Do you really want to make a complete Installation?</source>
+        <translation>你确认要一个完整的安装?</translation>
+    </message>
+    <message>
+        <source>Mount point is wrong!</source>
+        <translation>Mountpoint 错误!</translation>
+    </message>
+    <message>
+        <source>Do you really want to make a small Installation?</source>
+        <translation>你确认要一个智能的安装?</translation>
+    </message>
+    <message>
+        <source>Do you really want to install the Bootloader?</source>
+        <translation>你确认要安装启动程序?</translation>
+    </message>
+    <message>
+        <source>Could not get the bootloader info file!</source>
+        <translation>找不到启动程序的资料!</translation>
+    </message>
+    <message>
+        <source>Bootloader Installation</source>
+        <translation>安装启动程序</translation>
+    </message>
+    <message>
+        <source>It seem your Bootloader is already uptodate.
+Do really want to install it?</source>
+        <translation>你的启动程序好象已经是最新版本.
+你确认要再安装?</translation>
+    </message>
+    <message>
+        <source>Bootloader installation Canceled!</source>
+        <translation>启动程序安装被取消!</translation>
+    </message>
+    <message>
+        <source>Original Firmware Path is wrong!</source>
+        <translation>厂家固件路径错误!</translation>
+    </message>
+    <message>
+        <source>Original Firmware selection Canceled!</source>
+        <translation>厂家固件安装被取消!</translation>
+    </message>
+    <message>
+        <source>Do you really want to install the fonts package?</source>
+        <translation>你确认要安装字体包裹吗?</translation>
+    </message>
+    <message>
+        <source>Do you really want to install the voice file?</source>
+        <translation>你确认要安装语音文件吗?</translation>
+    </message>
+    <message>
+        <source>Do you really want to install the game addon files?</source>
+        <translation>你确认要安装游戏附件吗?</translation>
+    </message>
+    <message>
+        <source>Confirm Uninstallation</source>
+        <translation>确认安装</translation>
+    </message>
+    <message>
+        <source>Do you really want to uninstall the Bootloader?</source>
+        <translation>你确认要卸载启动程序吗?</translation>
+    </message>
+    <message>
+        <source>Confirm download</source>
+        <translation>确认下载</translation>
+    </message>
+    <message>
+        <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
+        <translation>你确认要下载用户手册吗? 用户手册将会被放在你播放器的主目录里.</translation>
+    </message>
+    <message>
+        <source>Confirm installation</source>
+        <translation>确认安装</translation>
+    </message>
+    <message>
+        <source>Do you really want to install Rockbox Utility to your player? After installation you can run it from the players hard drive.</source>
+        <translation>你确认要安装Rockbox安装程序到你的播放器上吗? 安装后你可以从你播放器上运行此程序.</translation>
+    </message>
+    <message>
+        <source>Installing Rockbox Utility</source>
+        <translation>安装 Rockbox安装程序</translation>
+    </message>
+    <message>
+        <source>Error installing Rockbox Utility</source>
+        <translation>安装 Rockbox安装程序错误!</translation>
+    </message>
+    <message>
+        <source>Installing user configuration</source>
+        <translation>安装用户设置</translation>
+    </message>
+    <message>
+        <source>Error installing user configuration</source>
+        <translation>安装用户设置错误</translation>
+    </message>
+    <message>
+        <source>Successfully installed Rockbox Utility.</source>
+        <translation>成功安装 Rockbox安装程序.</translation>
+    </message>
+    <message>
+        <source>Bootloader installation Skipped!</source>
+        <translation>启动程序安装过程被跳过!</translation>
+    </message>
+</context>
+<context>
+    <name>RbUtilQtFrm</name>
+    <message>
+        <source>Rockbox Utility</source>
+        <translation>Rockbox 安装程序</translation>
+    </message>
+    <message>
+        <source>Device</source>
+        <translation>播放器</translation>
+    </message>
+    <message>
+        <source>Selected device:</source>
+        <translation>选择的播放器:</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;none&lt;/span&gt; at &lt;span style=&quot; font-weight:600;&quot;&gt;unknown&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;none&lt;/span&gt; at &lt;span style=&quot; font-weight:600;&quot;&gt;不明&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <source>&amp;Change</source>
+        <translation>&amp;更改</translation>
+    </message>
+    <message>
+        <source>&amp;Quick Start</source>
+        <translation>&amp;快速开始</translation>
+    </message>
+    <message>
+        <source>Welcome</source>
+        <translation>欢迎</translation>
+    </message>
+    <message>
+        <source>...</source>
+        <translation>...</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Complete Installation&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This installs the bootloader, a current build and the extras package. This is the recommended method for new installations.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;完整安装&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;这将安装启动程序, 最新版本和附加功能. 如果这是你第一次安装, 这是建议的安装.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Small installation&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This installs bootloader and the current build of Rockbox. If you don&apos;t want the extras package, choose this option.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;最小安装&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;这将安装启动程序和最新版本.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <source>&amp;Installation</source>
+        <translation>&amp;安装</translation>
+    </message>
+    <message>
+        <source>Basic Rockbox installation</source>
+        <translation>基本Rockbox安装</translation>
+    </message>
+    <message>
+        <source>Install Bootloader</source>
+        <translation>安装启动程序</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Install the bootloader&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Before Rockbox can be run on your audio player, you may have to install a bootloader. This is only necessary the first time Rockbox is installed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;安装启动程序&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;ROCKBOX 可能需要安装启动程序后才可以运行.你只需要安装启动程序如果这是你的第一次安装.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <source>Install Rockbox</source>
+        <translation>安装 Rockbox</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Install Rockbox&lt;/span&gt; on your audio player&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;安装 Rockbox&lt;/span&gt; 在你的音乐播放器里&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <source>&amp;Extras</source>
+        <translation>&amp;附加功能</translation>
+    </message>
+    <message>
+        <source>Install extras for Rockbox</source>
+        <translation>安装附加功能</translation>
+    </message>
+    <message>
+        <source>Install Fonts package</source>
+        <translation>安装字体包裹</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Fonts Package&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The Fonts Package contains a couple of commonly used fonts. Installation is highly recommended.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;字体包裹&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;字体包裹里包含一些常用的字体. 强烈建议安装此包裹.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <source>Install themes</source>
+        <translation>安装主题</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Install Themes&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Rockbox&apos; look can be customized by themes. You can choose and install several officially distributed themes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;安装主题&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Rockbox 的外观可以被个人化. 你可以选择并安装几个官方认证的主题. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <source>Install game files</source>
+        <translation>安装游戏文件</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Install Game Files&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Doom needs a base wad file to run.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;安装游戏文件&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Doom游戏需要wad文件才可以运行.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <source>&amp;Accessibility</source>
+        <translation>&amp;辅助</translation>
+    </message>
+    <message>
+        <source>Install accessibility add-ons</source>
+        <translation>安装辅助功能</translation>
+    </message>
+    <message>
+        <source>Install Voice files</source>
+        <translation>安装语音文件</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Install Voice file&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Voice files are needed to make Rockbox speak the user interface. Speaking is enabled by default, so if you installed the voice file Rockbox will speak.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;安装语音文件&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;如果你需要Rockbox用语音说出用户界面, 你需要安装语音文件. 语音界面将会被自动开启,所以你安装语音文件后Rockbox就会对你说话.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <source>Install Talk files</source>
+        <translation>安装说话文件</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Create Talk Files&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Talkfiles are needed to let Rockbox speak File and Foldernames&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;建立说话文件&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;如果你需要Rockbox说出你文件和文件夹的名称, 你要安装说话文件. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <source>&amp;Uninstallation</source>
+        <translation>&amp;卸载</translation>
+    </message>
+    <message>
+        <source>Uninstall Rockbox</source>
+        <translation>卸载 Rockbox</translation>
+    </message>
+    <message>
+        <source>Uninstall Bootloader</source>
+        <translation>卸载启动程序</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Remove the bootloader&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;After removing the bootloader you won&apos;t be able to start Rockbox.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;卸载启动程序&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;卸载启动程序后你就不能启动 Rockbox 了.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Uninstall Rockbox&lt;/span&gt; from your audio player.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This will leave the bootloader in place (you need to remove it manually).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;把 Rockbox&lt;/span&gt; 在你音乐播放器里删除.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;这不会卸载启动程序(你需要手动卸载启动程序).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <source>&amp;Manual</source>
+        <translation>&amp;用户手册</translation>
+    </message>
+    <message>
+        <source>View and download the manual</source>
+        <translation>查看和下载用户手册</translation>
+    </message>
+    <message>
+        <source>Read the manual</source>
+        <translation>查看用户手册</translation>
+    </message>
+    <message>
+        <source>PDF manual</source>
+        <translation>PDF 用户手册</translation>
+    </message>
+    <message>
+        <source>HTML manual</source>
+        <translation>HTML 用户手册</translation>
+    </message>
+    <message>
+        <source>Download the manual</source>
+        <translation>下载用户手册</translation>
+    </message>
+    <message>
+        <source>&amp;PDF version</source>
+        <translation>PDF 版本</translation>
+    </message>
+    <message>
+        <source>&amp;HTML version (zip file)</source>
+        <translation>HTML 版本 (zip)</translation>
+    </message>
+    <message>
+        <source>Down&amp;load</source>
+        <translation>下载</translation>
+    </message>
+    <message>
+        <source>Inf&amp;o</source>
+        <translation>&amp;信息</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;已经安装的部分.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note&lt;/span&gt;: if you manually installed packages this might not be correct!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Composants actuellement installés.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;注意&lt;/span&gt;: 如果你手动安装Rockbox, 这可能显示不正确的信息!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <source>1</source>
+        <translation>1</translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>&amp;文件</translation>
+    </message>
+    <message>
+        <source>&amp;About</source>
+        <translation>&amp;关于</translation>
+    </message>
+    <message>
+        <source>Empty local download cache</source>
+        <translation>清除本机下载缓冲</translation>
+    </message>
+    <message>
+        <source>Install Rockbox Utility on player</source>
+        <translation>安装Rockbox安装程序到你的播放器</translation>
+    </message>
+    <message>
+        <source>&amp;Configure</source>
+        <translation>&amp;设置</translation>
+    </message>
+    <message>
+        <source>E&amp;xit</source>
+        <translation>&amp;退出</translation>
+    </message>
+    <message>
+        <source>Ctrl+Q</source>
+        <translation>Ctrl+Q</translation>
+    </message>
+    <message>
+        <source>About &amp;Qt</source>
+        <translation>关于&amp;Qt</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;帮助</translation>
+    </message>
+</context>
+<context>
+    <name>ThemeInstallFrm</name>
+    <message>
+        <source>Theme Installation</source>
+        <translation>安装主题</translation>
+    </message>
+    <message>
+        <source>Selected Theme</source>
+        <translation>被选择的主题</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation>描述</translation>
+    </message>
+    <message>
+        <source>Download size:</source>
+        <translation>下载大小:</translation>
+    </message>
+    <message>
+        <source>&amp;Ok</source>
+        <translation>&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;取消</translation>
+    </message>
+</context>
+<context>
+    <name>ThemesInstallWindow</name>
+    <message>
+        <source>no theme selected</source>
+        <translation>没有选择主题</translation>
+    </message>
+    <message>
+        <source>Network error: %1.
+Please check your network and proxy settings.</source>
+        <translation>网络错误： %1. 
+请检查你的网络和代理服务的设置.</translation>
+    </message>
+    <message>
+        <source>???????:
+%1</source>
+        <translation type="obsolete">L&apos;erreur suivante s&apos;est produite :
+%1</translation>
+    </message>
+    <message>
+        <source>done.</source>
+        <translation>完成.</translation>
+    </message>
+    <message>
+        <source>fetching details for %1</source>
+        <translation>正在拿取 %1 的细节</translation>
+    </message>
+    <message>
+        <source>fetching preview ...</source>
+        <translation>正在拿取预览...</translation>
+    </message>
+    <message>
+        <source>Download size %1 kiB</source>
+        <translation>下载大小 %1 kiB</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Author:&lt;/b&gt; %1&lt;hr/&gt;</source>
+        <translation>&lt;b&gt;作者:&lt;/b&gt; %1&lt;hr/&gt;</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>不明</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Version:&lt;/b&gt; %1&lt;hr/&gt;</source>
+        <translation>&lt;b&gt;版本:&lt;/b&gt; %1&lt;hr/&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Description:&lt;/b&gt; %1&lt;hr/&gt;</source>
+        <translation>&lt;b&gt;描述:&lt;/b&gt; %1&lt;hr/&gt;</translation>
+    </message>
+    <message>
+        <source>no description</source>
+        <translation>无描述</translation>
+    </message>
+    <message>
+        <source>no theme preview</source>
+        <translation>无主题预览</translation>
+    </message>
+    <message>
+        <source>getting themes information ...</source>
+        <translation>正在拿取主题信息...</translation>
+    </message>
+    <message>
+        <source>Mount point is wrong!</source>
+        <translation>Mountpoint 错误!</translation>
+    </message>
+    <message>
+        <source>the following error occured:
+%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UnZip</name>
+    <message>
+        <source>ZIP operation completed successfully.</source>
+        <translation>成功完成 ZIP 程序.</translation>
+    </message>
+    <message>
+        <source>Failed to initialize or load zlib library.</source>
+        <translation>初始化zlib失败.</translation>
+    </message>
+    <message>
+        <source>zlib library error.</source>
+        <translation>zlib错误.</translation>
+    </message>
+    <message>
+        <source>Unable to create or open file.</source>
+        <translation>无法建立或打开文件.</translation>
+    </message>
+    <message>
+        <source>Partially corrupted archive. Some files might be extracted.</source>
+        <translation>压缩文件部分损坏. 一些文件可能可以被恢复. </translation>
+    </message>
+    <message>
+        <source>Corrupted archive.</source>
+        <translation>压缩文件损坏.</translation>
+    </message>
+    <message>
+        <source>Wrong password.</source>
+        <translation>密码不正确.</translation>
+    </message>
+    <message>
+        <source>No archive has been created yet.</source>
+        <translation>压缩文件还没有被建立.</translation>
+    </message>
+    <message>
+        <source>File or directory does not exist.</source>
+        <translation>文件或文件夹不存在.</translation>
+    </message>
+    <message>
+        <source>File read error.</source>
+        <translation>文件读取错误.</translation>
+    </message>
+    <message>
+        <source>File write error.</source>
+        <translation>文件写入错误.</translation>
+    </message>
+    <message>
+        <source>File seek error.</source>
+        <translation>文件内寻找错误.</translation>
+    </message>
+    <message>
+        <source>Unable to create a directory.</source>
+        <translation>无法建立文件夹.</translation>
+    </message>
+    <message>
+        <source>Invalid device.</source>
+        <translation>无效播放器.</translation>
+    </message>
+    <message>
+        <source>Invalid or incompatible zip archive.</source>
+        <translation>无效或不支持压缩文件.</translation>
+    </message>
+    <message>
+        <source>Inconsistent headers. Archive might be corrupted.</source>
+        <translation>文件头不正常. 压缩文件可能已损坏. </translation>
+    </message>
+    <message>
+        <source>Unknown error.</source>
+        <translation>不明错误.</translation>
+    </message>
+</context>
+<context>
+    <name>UninstallFrm</name>
+    <message>
+        <source>Uninstall Rockbox</source>
+        <translation>卸载 Rockbox</translation>
+    </message>
+    <message>
+        <source>Please select the Uninstallation Methodl</source>
+        <translation>请选择卸载模式</translation>
+    </message>
+    <message>
+        <source>Uninstallation Method</source>
+        <translation>卸载模式</translation>
+    </message>
+    <message>
+        <source>Complete Uninstallation</source>
+        <translation>完全卸载</translation>
+    </message>
+    <message>
+        <source>Smart Uninstallation</source>
+        <translation>智能卸载</translation>
+    </message>
+    <message>
+        <source>Please select what you want to uninstall</source>
+        <translation>请选择卸载部分</translation>
+    </message>
+    <message>
+        <source>Installed Parts</source>
+        <translation>已安装的部分</translation>
+    </message>
+    <message>
+        <source>&amp;Ok</source>
+        <translation>&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;取消</translation>
+    </message>
+</context>
+<context>
+    <name>Uninstaller</name>
+    <message>
+        <source>Starting Uninstallation</source>
+        <translation>开始卸载</translation>
+    </message>
+    <message>
+        <source>Finished Uninstallation</source>
+        <translation>完成卸载</translation>
+    </message>
+    <message>
+        <source>Uninstalling </source>
+        <translation>正在卸载</translation>
+    </message>
+    <message>
+        <source>Could not delete: </source>
+        <translation>无法删除: </translation>
+    </message>
+    <message>
+        <source>Uninstallation finished</source>
+        <translation>完成卸载</translation>
+    </message>
+</context>
+<context>
+    <name>Zip</name>
+    <message>
+        <source>ZIP operation completed successfully.</source>
+        <translation>成功完成 ZIP 程序.</translation>
+    </message>
+    <message>
+        <source>Failed to initialize or load zlib library.</source>
+        <translation>初始化zlib失败.</translation>
+    </message>
+    <message>
+        <source>zlib library error.</source>
+        <translation>zlib错误.</translation>
+    </message>
+    <message>
+        <source>Unable to create or open file.</source>
+        <translation>无法建立或打开文件.</translation>
+    </message>
+    <message>
+        <source>No archive has been created yet.</source>
+        <translation>压缩文件还没有被建立.</translation>
+    </message>
+    <message>
+        <source>File or directory does not exist.</source>
+        <translation>文件或文件夹不存在.</translation>
+    </message>
+    <message>
+        <source>File read error.</source>
+        <translation>文件读取错误.</translation>
+    </message>
+    <message>
+        <source>File write error.</source>
+        <translation>文件写入错误.</translation>
+    </message>
+    <message>
+        <source>File seek error.</source>
+        <translation>文件内寻找错误.</translation>
+    </message>
+    <message>
+        <source>Unknown error.</source>
+        <translation>不明错误.</translation>
+    </message>
+</context>
+<context>
+    <name>ZipInstaller</name>
+    <message>
+        <source>done.</source>
+        <translation>完成.</translation>
+    </message>
+    <message>
+        <source>Installation finished successfully.</source>
+        <translation>成功完成安装.</translation>
+    </message>
+    <message>
+        <source>Downloading file %1.%2</source>
+        <translation>正在下载文件 %1.%2</translation>
+    </message>
+    <message>
+        <source>Download error: received HTTP error %1.</source>
+        <translation>下载错误: 接到 HTTP 错误 %1. </translation>
+    </message>
+    <message>
+        <source>Cached file used.</source>
+        <translation>使用缓冲文件.</translation>
+    </message>
+    <message>
+        <source>Download error: %1</source>
+        <translation>下载错误: %1</translation>
+    </message>
+    <message>
+        <source>Download finished.</source>
+        <translation>完成下载.</translation>
+    </message>
+    <message>
+        <source>Extracting file.</source>
+        <translation>正在解压文件.</translation>
+    </message>
+    <message>
+        <source>Opening archive failed: %1.</source>
+        <translation>打开压缩文件错误: %1.</translation>
+    </message>
+    <message>
+        <source>Extracting failed: %1.</source>
+        <translation>解压错误: %1.</translation>
+    </message>
+    <message>
+        <source>Installing file.</source>
+        <translation>正在安装文件.</translation>
+    </message>
+    <message>
+        <source>Installing file failed.</source>
+        <translation>安装文件失败.</translation>
+    </message>
+    <message>
+        <source>Creating installation log</source>
+        <translation>正在建立安装日志</translation>
+    </message>
+</context>
+<context>
+    <name>aboutBox</name>
+    <message>
+        <source>About Rockbox Utility</source>
+        <translation>关于Rockbox安装程序</translation>
+    </message>
+    <message>
+        <source>The Rockbox Utility</source>
+        <translation>Rockbox安装程序</translation>
+    </message>
+    <message encoding="UTF-8">
+        <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.
+
+© 2005 - 2007 The Rockbox Team.
+Released under the GNU General Public License v2.</source>
+        <translation>安装程序和一般管理程序为 Roxkbox 准备. Roxkbox 是一个开源的音乐播放器固件.
+
+© 2005 - 2007 Rockbox 团队.
+授权于 GNU General Public License v2.</translation>
+    </message>
+    <message>
+        <source>http://www.rockbox.org</source>
+        <translation>http://www.rockbox.org</translation>
+    </message>
+    <message>
+        <source>&amp;Credits</source>
+        <translation>&amp;特别鸣谢</translation>
+    </message>
+    <message>
+        <source>&amp;License</source>
+        <translation>&amp;授权</translation>
+    </message>
+    <message>
+        <source>&amp;Ok</source>
+        <translation>&amp;OK</translation>
+    </message>
+</context>
+</TS>

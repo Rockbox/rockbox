@@ -102,8 +102,10 @@ FORMS += rbutilqtfrm.ui \
 
 RESOURCES += rbutilqt.qrc
 
-TRANSLATIONS += rbutil_de.ts
-TRANSLATIONS += rbutil_fr.ts
+TRANSLATIONS += rbutil_de.ts \
+ rbutil_fr.ts \
+ rbutil_zh_CN.ts \
+ rbutil_zh_TW.ts
 QT += network
 DEFINES += RBUTIL _LARGEFILE64_SOURCE
 
