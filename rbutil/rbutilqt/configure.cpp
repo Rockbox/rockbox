@@ -492,13 +492,17 @@ void Config::browseFolder()
 #elif defined(Q_OS_WIN32)
     browser->setFilter(QDir::Drives);
 #endif
-    QDir d(ui.mountPoint->text());
-    browser->setDir(d);
 #if defined(Q_OS_MACX)
     browser->setRoot("/Volumes");
 #elif defined(Q_OS_LINUX)
-    browser->setRoot("/media");
+    QDir a("/media");
+    browser->setDir(a);
 #endif
+    if( ui.mountPoint->text() != "" )
+    {
+        QDir d(ui.mountPoint->text());
+        browser->setDir(d);
+    }
     browser->show();
     connect(browser, SIGNAL(itemChanged(QString)), this, SLOT(setMountpoint(QString)));
 }
