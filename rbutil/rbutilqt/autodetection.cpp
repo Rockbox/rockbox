@@ -19,9 +19,10 @@
 
 #include "autodetection.h"
 
-#if defined(Q_OS_LINUX)
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
 #include <stdio.h>
 #include <mntent.h>
+#include <usb.h>
 #endif
 
 Autodetection::Autodetection(QObject* parent): QObject(parent)
@@ -33,6 +34,9 @@ bool Autodetection::detect()
 {
     m_device = "";
     m_mountpoint = "";
+    m_errdev = "";
+
+    detectUsb();
 
     // Try detection via rockbox.info / rbutil.log
     QStringList mountpoints = getMountpoints();
@@ -48,7 +52,8 @@ bool Autodetection::detect()
                 QSettings log(mountpoints.at(i) + "/.rockbox/rbutil.log",
                               QSettings::IniFormat, this);
                 if(!log.value("platform").toString().isEmpty()) {
-                    m_device = log.value("platform").toString();
+                    if(m_device.isEmpty())
+                        m_device = log.value("platform").toString();
                     m_mountpoint = mountpoints.at(i);
                     qDebug() << "rbutil.log detected:" << m_device << m_mountpoint;
                     return true;
@@ -64,7 +69,8 @@ bool Autodetection::detect()
                 if(line.startsWith("Target: "))
                 {
                     line.remove("Target: ");
-                    m_device = line.trimmed(); // trim whitespaces
+                    if(m_device.isEmpty())
+                        m_device = line.trimmed(); // trim whitespaces
                     m_mountpoint = mountpoints.at(i);
                     qDebug() << "rockbox-info.txt detected:" << m_device << m_mountpoint;
                     return true;
@@ -133,7 +139,9 @@ bool Autodetection::detect()
         return true;
     }
 
-    return false;
+    if(m_mountpoint.isEmpty() && m_device.isEmpty() && m_errdev.isEmpty())
+        return false;
+    return true;
 }
 
 
@@ -191,4 +199,75 @@ QString Autodetection::resolveMountPoint(QString device)
 #endif
     return QString("");
 
+}
+
+
+/** @brief detect devices based on usb pid / vid.
+ *  @return true upon success, false otherwise.
+ */
+bool Autodetection::detectUsb()
+{
+        // autodetection only uses the buildin device settings only
+    QSettings dev(":/ini/rbutil.ini", QSettings::IniFormat, this);
+
+    // get a list of ID -> target name
+    QStringList platforms;
+    dev.beginGroup("platforms");
+    platforms = dev.childKeys();
+    dev.endGroup();
+
+    // usbids holds the mapping in the form
+    // ((VID<<16)|(PID)), targetname
+    // the ini file needs to hold the IDs as hex values.
+    QMap<int, QString> usbids;
+    QMap<int, QString> usberror;
+    
+    for(int i = 0; i < platforms.size(); i++) {
+        dev.beginGroup("platforms");
+        QString target = dev.value(platforms.at(i)).toString();
+        dev.endGroup();
+        dev.beginGroup(target);
+        if(!dev.value("usbid").toString().isEmpty())
+            usbids.insert(dev.value("usbid").toString().toInt(0, 16), target);
+        if(!dev.value("usberror").toString().isEmpty())
+            usberror.insert(dev.value("usberror").toString().toInt(0, 16), target);
+        dev.endGroup();
+    }
+
+    // usb pid detection
+#if defined(Q_OS_LINUX) | defined(Q_OS_MACX)
+    usb_init();
+    usb_find_busses();
+    usb_find_devices();
+    struct usb_bus *b;
+    b = usb_get_busses();
+
+    while(b) {
+        qDebug() << "bus:" << b->dirname << b->devices;
+        if(b->devices) {
+            qDebug() << "devices present.";
+            struct usb_device *u;
+            u = b->devices;
+            while(u) {
+                uint32_t id;
+                id = u->descriptor.idVendor << 16 | u->descriptor.idProduct;
+                qDebug("%x", id);
+
+                if(usbids.contains(id)) {
+                    m_device = usbids.value(id);
+                    return true;
+                }
+                if(usberror.contains(id)) {
+                    m_errdev = usberror.value(id);
+                    // we detected something, so return true
+                    qDebug() << "detected device with problems via usb!";
+                    return true;
+                }
+                u = u->next;
+            }
+        }
+        b = b->next;
+    }
+#endif
+    return false;
 }

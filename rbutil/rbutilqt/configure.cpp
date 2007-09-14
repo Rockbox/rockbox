@@ -565,6 +565,20 @@ void Config::autodetect()
             }
         }
 
+        if(!detector.errdev().isEmpty()) {
+            QString text;
+            if(detector.errdev() == "sansae200")
+                text = tr("Sansa e200 in MTP mode found!\n"
+                        "You need to change your player to MSC mode for installation. ");
+            if(detector.errdev() == "h10")
+                text = tr("H10 20GB in MTP mode found!\n"
+                        "You need to change your player to UMS mode for installation. ");
+            text += tr("Unless you changed this installation will fail!");
+
+            QMessageBox::critical(this, tr("Fatal error"), text, QMessageBox::Ok);
+            return;
+        }
+        
         if(detector.getMountPoint() != "" )
         {
             ui.mountPoint->setText(detector.getMountPoint());

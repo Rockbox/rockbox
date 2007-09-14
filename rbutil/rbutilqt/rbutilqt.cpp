@@ -66,7 +66,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
             QSettings::UserScope, "rockbox.org", "RockboxUtility");
         qDebug() << "config: system";
     }
-    
+
     // manual tab
     updateManual();
     updateDevice();
