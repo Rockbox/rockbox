@@ -497,7 +497,7 @@ void Config::browseFolder()
 #if defined(Q_OS_MACX)
     browser->setRoot("/Volumes");
 #elif defined(Q_OS_LINUX)
-    browser->setRoot("/Media");
+    browser->setRoot("/media");
 #endif
     browser->show();
     connect(browser, SIGNAL(itemChanged(QString)), this, SLOT(setMountpoint(QString)));
