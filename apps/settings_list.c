@@ -382,10 +382,10 @@ static long jumpscroll_getlang(int value)
                     
 const struct settings_list settings[] = {
     /* sound settings */
-    SOUND_SETTING(0,volume, LANG_VOLUME, "volume", SOUND_VOLUME),
+    SOUND_SETTING(F_NO_WRAP,volume, LANG_VOLUME, "volume", SOUND_VOLUME),
     SOUND_SETTING(BALANCE_FLIP, balance, LANG_BALANCE, "balance", SOUND_BALANCE),
-    SOUND_SETTING(0,bass, LANG_BASS, "bass", SOUND_BASS),
-    SOUND_SETTING(0,treble, LANG_TREBLE, "treble", SOUND_TREBLE),
+    SOUND_SETTING(F_NO_WRAP,bass, LANG_BASS, "bass", SOUND_BASS),
+    SOUND_SETTING(F_NO_WRAP,treble, LANG_TREBLE, "treble", SOUND_TREBLE),
     
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     SOUND_SETTING(0,loudness, LANG_LOUDNESS, "loudness", SOUND_LOUDNESS),

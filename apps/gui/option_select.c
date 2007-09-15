@@ -293,7 +293,7 @@ bool option_screen(struct settings_list *setting,
     struct gui_synclist lists;
     int oldvalue, nb_items = 0, selected = 0, temp_var;
     int *variable;
-    bool allow_wrap = ((int*)setting->setting != &global_settings.volume);
+    bool allow_wrap = setting->flags & F_NO_WRAP ? false : true;
     int var_type = setting->flags&F_T_MASK;
     void (*function)(int) = NULL;
     char *title;
