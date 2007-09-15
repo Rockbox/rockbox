@@ -2,8 +2,8 @@ bitstream.c
 decoder.c
 shndec.c
 tables.c
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE)
 coldfire.S
-#elif defined(CPU_ARM) && !defined(SIMULATOR)
+#elif defined(CPU_ARM)
 arm.S
 #endif
