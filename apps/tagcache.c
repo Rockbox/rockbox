@@ -1518,7 +1518,7 @@ static struct tagfile_entry *get_tag(const struct index_entry *entry, int tag)
 
 static long get_tag_numeric(const struct index_entry *entry, int tag)
 {
-    return entry->tag_seek[tag];
+    return check_virtual_tags(tag, entry);
 }
 
 static char* get_tag_string(const struct index_entry *entry, int tag)
