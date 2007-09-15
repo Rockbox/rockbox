@@ -94,8 +94,8 @@
      </property>
      <property name="sizeHint" >
       <size>
-       <width>368</width>
-       <height>20</height>
+       <width>261</width>
+       <height>34</height>
       </size>
      </property>
     </spacer>
@@ -106,6 +106,16 @@
       <widget class="QPushButton" name="buttonOk" >
        <property name="text" >
         <string>&amp;Install</string>
+       </property>
+       <property name="icon" >
+        <iconset resource="rbutilqt.qrc" >:/icons/icons/go-next.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="buttonOkAll" >
+       <property name="text" >
+        <string>Install &amp;All</string>
        </property>
        <property name="icon" >
         <iconset resource="rbutilqt.qrc" >:/icons/icons/go-next.png</iconset>

@@ -40,9 +40,10 @@ class ThemesInstallWindow : public QDialog
         void setProxy(QUrl);
         void downloadInfo(void);
         void show(void);
-        void accept(void);
 
     public slots:
+        void accept(void);
+        void acceptAll(void);
 
     private:
         Ui::ThemeInstallFrm ui;

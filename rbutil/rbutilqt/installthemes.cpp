@@ -35,6 +35,7 @@ ThemesInstallWindow::ThemesInstallWindow(QWidget *parent) : QDialog(parent)
 
     connect(ui.buttonCancel, SIGNAL(clicked()), this, SLOT(close()));
     connect(ui.buttonOk, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(ui.buttonOkAll, SIGNAL(clicked()), this, SLOT(acceptAll()));
 }
 
 ThemesInstallWindow::~ThemesInstallWindow()
@@ -270,6 +271,12 @@ void ThemesInstallWindow::setProxy(QUrl p)
     qDebug() << "setProxy()" << proxy;
 }
 
+
+void ThemesInstallWindow::acceptAll()
+{
+    ui.listThemes->selectAll();
+    accept();
+}
 
 void ThemesInstallWindow::accept()
 {
