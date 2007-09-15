@@ -10,6 +10,7 @@ CROSS=i586-mingw32msvc-
 endif
 
 LIBS = -lusb
+WINLIBS = -I libusb-win32-device-bin-0.1.12.1/include libusb-win32-device-bin-0.1.12.1/lib/dynamic/libusb_dyn.c 
 
 NATIVECC = gcc
 CC = $(CROSS)gcc
@@ -21,7 +22,7 @@ e200rpatcher: e200rpatcher.c bootimg.c
 	strip e200rpatcher
 
 e200rpatcher.exe:  e200rpatcher.c bootimg.c
-	$(CC) $(CFLAGS) $(LIBS) -o e200rpatcher.exe e200rpatcher.c bootimg.c
+	$(CC) $(CFLAGS) $(WINLIBS) -o e200rpatcher.exe e200rpatcher.c bootimg.c
 	$(CROSS)strip e200rpatcher.exe
 
 e200rpatcher-mac: e200rpatcher-i386 e200rpatcher-ppc
