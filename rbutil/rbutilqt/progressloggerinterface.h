@@ -16,43 +16,43 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #ifndef PROGRESSLOGGERINTERFACE_H
 #define PROGRESSLOGGERINTERFACE_H
- 
+
 #include <QtGui>
 
-#define LOGOK 1
-#define LOGINFO 2 
-#define LOGWARNING 3
-#define LOGERROR 4
- 
- 
+enum {
+    LOGNOICON, LOGOK, LOGINFO, LOGWARNING, LOGERROR
+};
+
+
+
 class ProgressloggerInterface : public QObject
 {
    Q_OBJECT
-   
-public:   
+
+public:
     ProgressloggerInterface(QObject* parent) : QObject(parent) {}
-    virtual void addItem(QString text) =0 ;  //adds a string to the list
-    virtual void addItem(QString text,int flag) =0 ;  //adds a string to the list, with icon
-    
+    virtual void addItem(const QString &text)=0;  //adds a string to the list
+    virtual void addItem(const QString &text, int flag)=0;  //adds a string to the list, with icon
+
     virtual void setProgressValue(int value)=0;
     virtual void setProgressMax(int max)=0;
     virtual int getProgressMax()=0;
-    
+
 signals:
     virtual void aborted()=0;
-    
+
 
 public slots:
     virtual void abort()=0;
-    virtual void undoAbort() =0;
+    virtual void undoAbort()=0;
     virtual void close()=0;
     virtual void show()=0;
-    
+
 private:
- 
+
 };
 
 #endif

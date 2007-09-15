@@ -16,7 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "progressloggergui.h"
 
 ProgressLoggerGui::ProgressLoggerGui(QObject* parent): ProgressloggerInterface(parent)
@@ -28,18 +28,19 @@ ProgressLoggerGui::ProgressLoggerGui(QObject* parent): ProgressloggerInterface(p
     connect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(abort()));
 }
 
-
-void ProgressLoggerGui::addItem(QString text)
+void ProgressLoggerGui::addItem(const QString &text)
 {
-    dp.listProgress->addItem(text);
-} 
+    addItem(text, LOGNOICON);
+}
 
-void ProgressLoggerGui::addItem(QString text,int flag)
+void ProgressLoggerGui::addItem(const QString &text, int flag)
 {
     QListWidgetItem* item = new QListWidgetItem(text);
-    
+
     switch(flag)
     {
+        case LOGNOICON:
+            break;
         case LOGOK:
             item->setIcon(QIcon(":/icons/icons/go-next.png"));
             break;
@@ -53,14 +54,15 @@ void ProgressLoggerGui::addItem(QString text,int flag)
             item->setIcon(QIcon(":/icons/icons/dialog-error.png"));
             break;
     }
-    
+
     dp.listProgress->addItem(item);
-} 
+    dp.listProgress->scrollToItem(item);
+}
 
 void ProgressLoggerGui::setProgressValue(int  value)
 {
     dp.progressBar->setValue(value);
-} 
+}
 
 void ProgressLoggerGui::setProgressMax(int max)
 {
@@ -70,7 +72,7 @@ void ProgressLoggerGui::setProgressMax(int max)
 int ProgressLoggerGui::getProgressMax()
 {
     return dp.progressBar->maximum();
-} 
+}
 
 void ProgressLoggerGui::abort()
 {

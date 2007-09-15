@@ -18,22 +18,22 @@
  ****************************************************************************/
 #ifndef PROGRESSLOGGERGUI_H
 #define PROGRESSLOGGERGUI_H
- 
+
 #include <QtGui>
 
 #include "progressloggerinterface.h"
 #include "ui_installprogressfrm.h"
 
-class ProgressLoggerGui :public ProgressloggerInterface 
+class ProgressLoggerGui :public ProgressloggerInterface
 {
     Q_OBJECT
 public:
     ProgressLoggerGui(QObject * parent);
-    
-    virtual void addItem(QString text) ;  //adds a string to the list
-    
-    virtual void addItem(QString text, int flag) ;  //adds a string to the list
-    
+
+    virtual void addItem(const QString &text);  //adds a string to the list
+
+    virtual void addItem(const QString &text, int flag);  //adds a string to the list
+
     virtual void setProgressValue(int value);
     virtual void setProgressMax(int max);
     virtual int getProgressMax();
@@ -47,8 +47,8 @@ public slots:
     virtual void undoAbort();
     virtual void close();
     virtual void show();
-    
-private:    
+
+private:
     Ui::InstallProgressFrm dp;
     QDialog *downloadProgress;
 
