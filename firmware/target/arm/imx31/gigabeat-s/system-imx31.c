@@ -22,9 +22,11 @@ void irq_handler(void)
 {
 }
 
+#ifdef BOOTLOADER
 void fiq_handler(void)
 {
 }
+#endif
 
 void system_reboot(void)
 {

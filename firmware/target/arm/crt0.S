@@ -299,7 +299,7 @@ fiq_stack:
     /* main() should never return */
 
 /* Exception handlers. Will be copied to address 0 after memory remapping */
-#ifdef CONFIG_CPU == IMX31 
+#if CONFIG_CPU == IMX31L
 _vectorstart:
 #endif
     .section .vectors,"aw"

@@ -937,7 +937,6 @@ void peak_meter_draw(struct screen *display, struct meter_scales *scales,
     int meterwidth = width - 3;
     int i, delta;
     static long peak_release_tick = 0;
-    static long peak_release_tick = 0;
 
 #ifdef PM_DEBUG
     static long pm_tick = 0;
