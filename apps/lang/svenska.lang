@@ -259,7 +259,7 @@
   <dest>
     *: "SPELA = Ja"
     h100,h120,h300: "NAVI = Ja"
-    ipod*,x5,m5,gigabeatf,e200,h10,h10_5gb: "VÄLJ = Ja"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "VÄLJ = Ja"
     player: "SPELA/STOPP"
   </dest>
   <voice>
@@ -2362,7 +2362,7 @@
     h100,h120,h300: "Skapar databas... %d hittade (STOPP = Återgå)"
     ipod*: "Skapar databas... %d hittade (SPELA/PAUS = Återgå)"
     x5,m5: "Skapar databas... %d hittade (VÄNSTER = Återgå)"
-    h10,h10_5gb,e200: "Skapar databas... %d hittade (FÖREGÅENDE = Återgå)"
+    h10,h10_5gb,e200,c200: "Skapar databas... %d hittade (FÖREGÅENDE = Återgå)"
   </dest>
   <voice>
     *: "entries found for database"
@@ -4113,17 +4113,17 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,gigabeatf: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "PÅ = Ställ"
     h100,h120,h300: "NAVI = Ställ"
-    ipod*,x5,m5,h10,h10_5gb,e200,gigabeatf: "VÄLJ = Ställ"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "VÄLJ = Ställ"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200,gigabeatf: ""
+    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200,c200,gigabeatf: ""
   </voice>
 </phrase>
 <phrase>
@@ -4143,14 +4143,14 @@
     *: none
     rtc: "AV = Avbryt"
     h100,h120,h300: "STOPP = Avbryt"
-    ipod*,e200: "MENY = Avbryt"
+    ipod*,e200,c200: "MENY = Avbryt"
     x5,m5: "SPELA IN = Avbryt"
     h10,h10_5gb: "FÖREGÅENDE = Avbryt"
     gigabeatf: "A = Avbryt"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,ipod*,e200,x5,m5,h10,h10_gb,gigabeatf: ""
+    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_gb,gigabeatf: ""
   </voice>
 </phrase>
 <phrase>
@@ -6885,17 +6885,17 @@
   user:
   <source>
     *: none
-    e200: "mSD:"
+    e200,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
-    e200: "mSD:"
+    e200,c200: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
-    e200: "micro Secure Digital card:"
+    e200,c200: "micro Secure Digital card:"
     ondio*: "Multimedia card"
   </voice>
 </phrase>
@@ -8259,18 +8259,18 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200: "The disk is full. Press UP to continue."
+    e200,c200: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
     recording: "Disken är full. Tryck AV för att fortsätta."
     h100,h120,h300: "Disken är full. Tryck STOPP för att fortsätta."
     m5,x5: "Disken är full. Tryck PÅ/AV för att fortsätta."
-    e200: "Disken är full. Tryck UPP för att fortsätta."
+    e200,c200: "Disken är full. Tryck UPP för att fortsätta."
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,e200: ""
+    recording,h100,h120,h300,m5,x5,e200,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -8361,14 +8361,14 @@
     player,h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200: "PREV to abort"
+    h10,h10_5gb,e200,c200: "PREV to abort"
   </source>
   <dest>
     *: "AV = avbryt"
     player,h100,h120,h300: "STOPP = Avbryt"
     ipod*: "SPELA/PAUSA = Avbryt"
     x5,m5: "Lång SPELA = Avbryt"
-    h10,h10_5gb,e200: "FÖREGÅENDE = Avbryt"
+    h10,h10_5gb,e200,c200: "FÖREGÅENDE = Avbryt"
   </dest>
   <voice>
     *: ""
@@ -10415,17 +10415,17 @@
     *: none
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "The disk is full. Press LEFT to continue."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "The disk is full. Press LEFT to continue."
   </source>
   <dest>
     *: none
     recording: "Disken är full. Tryck AV för att fortsätta."
     h100,h120,h300: "Disken är full. Tryck STOPP för att fortsätta."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "Disken är full. Tryck VÄNSTER för att fortsätta."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "Disken är full. Tryck VÄNSTER för att fortsätta."
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: ""
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -10986,5 +10986,192 @@
   </dest>
   <voice>
     *: "units per tick"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OCLOCK
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "o'clock"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PM
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "P M"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_AM
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "A M"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OH
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "oh"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNTER
+  desc: in settings, for recording peak meter
+  user:
+  <source>
+    *: none
+    recording: "Clip Counter"
+  </source>
+  <dest>
+    *: none
+    recording: "Klippräknare"
+  </dest>
+  <voice>
+    *: none
+    recording: "Clip Counter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PM_CLIPCOUNT
+  desc: in recording GUI, for recording peak meter. MAX 5 characters!
+  user:
+  <source>
+    *: none
+    recording: "CLIP:"
+  </source>
+  <dest>
+    *: none
+    recording: "KLIP:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    usbstack: "USB Stack"
+  </source>
+  <dest>
+    *: none
+    usbstack: "USB"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "USB Stack"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_MODE
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "USB Stack Mode"
+  </source>
+  <dest>
+    *: none
+    usbstack: "USB-läge"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "USB Stack Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Device"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Enhet"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Device"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_HOST
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Host"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Värd"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Host"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE_DRIVER
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Device Driver"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Drivrutin"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Device Driver"
   </voice>
 </phrase>
