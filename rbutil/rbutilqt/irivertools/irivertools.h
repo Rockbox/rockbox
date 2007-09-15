@@ -30,8 +30,8 @@
 #define ESTF_SIZE 32
 
 struct sumpairs {
-    char *unpatched;
-    char *patched;
+    const char *unpatched;
+    const char *patched;
 };
 
 
