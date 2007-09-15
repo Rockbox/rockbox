@@ -83,6 +83,7 @@ class RbUtilQt : public QMainWindow
         bool installFontsAuto(void);
         void installFonts(void);
         
+        bool hasDoom(void);
         void installDoomBtn(void);
         bool installDoomAuto(void);
         void installDoom(void);

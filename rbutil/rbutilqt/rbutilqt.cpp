@@ -327,18 +327,20 @@ void RbUtilQt::completeInstall()
         return;
     }  
     // Bootloader
-    m_error = false;
-    m_installed = false;
-    if(!installBootloaderAuto())
-        return;
-    else
-    {
-        // wait for boot loader installation finished
-        while(!m_installed)
-            QApplication::processEvents();
+    if(devices->value("needsbootloader", "") == "yes") {
+        m_error = false;
+        m_installed = false;
+        if(!installBootloaderAuto())
+            return;
+        else
+        {
+            // wait for boot loader installation finished
+            while(!m_installed)
+                QApplication::processEvents();
+        }
+        if(m_error) return;
+        logger->undoAbort();
     }
-    if(m_error) return;
-    logger->undoAbort();
         
     // Rockbox
     m_error = false;
@@ -369,17 +371,20 @@ void RbUtilQt::completeInstall()
     logger->undoAbort();
         
     // Doom
-    m_error = false;
-    m_installed = false;
-    if(!installDoomAuto())
-        return;
-    else
+    if(hasDoom())
     {
-        // wait for boot loader installation finished
-        while(!m_installed)
-           QApplication::processEvents();
+        m_error = false;
+        m_installed = false;
+        if(!installDoomAuto())
+            return;
+        else
+        {
+            // wait for boot loader installation finished
+            while(!m_installed)
+               QApplication::processEvents();
+        }
+        if(m_error) return;
     }
-    if(m_error) return;
         
         
     // theme
@@ -408,18 +413,20 @@ void RbUtilQt::smallInstall()
         return;
     }  
     // Bootloader
-    m_error = false;
-    m_installed = false;
-    if(!installBootloaderAuto())
-        return;
-    else
-    {
-        // wait for boot loader installation finished
-        while(!m_installed)
-            QApplication::processEvents();
+    if(devices->value("needsbootloader", "") == "yes") {
+        m_error = false;
+        m_installed = false;
+        if(!installBootloaderAuto())
+            return;
+        else
+        {
+            // wait for boot loader installation finished
+            while(!m_installed)
+                QApplication::processEvents();
+        }
+        if(m_error) return;
+        logger->undoAbort();
     }
-    if(m_error) return;
-    logger->undoAbort();
             
     // Rockbox
     m_error = false;
@@ -677,8 +684,7 @@ void RbUtilQt::installVoice()
 
 void RbUtilQt::installDoomBtn()
 {
-    QFile doomrock(userSettings->value("mountpoint").toString()+"/.rockbox/rocks/games/doom.rock");
-    if(!doomrock.exists()){
+    if(!hasDoom()){
         QMessageBox::critical(this, tr("Error"), tr("Your device doesn't have a doom plugin. Aborting."));
         return;
     }
@@ -697,6 +703,12 @@ bool RbUtilQt::installDoomAuto()
     installDoom();
     connect(installer, SIGNAL(done(bool)), this, SLOT(installdone(bool)));
     return !m_error;
+}
+
+bool RbUtilQt::hasDoom()
+{
+    QFile doomrock(userSettings->value("mountpoint").toString()+"/.rockbox/rocks/games/doom.rock");
+    return doomrock.exists();
 }
 
 void RbUtilQt::installDoom()
