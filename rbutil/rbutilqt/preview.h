@@ -30,27 +30,27 @@ class PreviewDlg : public QDialog
 
 public:
     PreviewDlg(QWidget *parent = 0);
-    void setPixmap(QPixmap p); 
+    void setPixmap(QPixmap p);
     void setText(QString text);
-        
+
 private slots:
     void mouseMoveEvent(QMouseEvent * event);
     void leaveEvent(QEvent * event);
-    
+
 private:
     Ui::PreviewFrm ui;
-        
-        
+
+
 };
 
 
 class PreviewLabel : public QLabel
 {
     Q_OBJECT
-    
+
 public:
     PreviewLabel(QWidget * parent = 0, Qt::WindowFlags f = 0);
-    
+
     void setPixmap(QPixmap p);
     void setText(QString text);
 private slots:
@@ -58,7 +58,7 @@ private slots:
     void enterEvent(QEvent * event);
     void leaveEvent(QEvent * event);
     void timeout();
-    
+
 private:
     QTimer hovertimer;
     int mousex;

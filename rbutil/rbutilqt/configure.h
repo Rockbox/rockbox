@@ -49,10 +49,10 @@ class Config : public QDialog
         QString language;
         QString programPath;
         QUrl proxy;
-        
+
         BrowseDirtree *browser;
         BrowseDirtree *cbrowser;
-        
+
     private slots:
         void setNoProxy(bool);
         void setSystemProxy(bool);

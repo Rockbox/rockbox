@@ -57,7 +57,7 @@ Config::Config(QWidget *parent) : QDialog(parent)
     ui.listLanguages->setAlternatingRowColors(true);
 
     this->setModal(true);
-    
+
     connect(ui.buttonOk, SIGNAL(clicked()), this, SLOT(accept()));
     connect(ui.buttonCancel, SIGNAL(clicked()), this, SLOT(abort()));
     connect(ui.radioNoProxy, SIGNAL(toggled(bool)), this, SLOT(setNoProxy(bool)));
@@ -212,7 +212,7 @@ void Config::setDevices(QSettings *dev)
     devices->beginGroup("platforms");
     QStringList a = devices->childKeys();
     devices->endGroup();
-    
+
     QMap <QString, QString> manuf;
     QMap <QString, QString> devcs;
     for(int it = 0; it < a.size(); it++) {
@@ -249,7 +249,7 @@ void Config::setDevices(QSettings *dev)
         w->setFlags(Qt::ItemIsEnabled);
         w->setText(0, brands.at(c));
         items.append(w);
-        
+
         // go through platforms again for sake of order
         for(int it = 0; it < a.size(); it++) {
             QString curdev;
@@ -284,7 +284,7 @@ void Config::setDevices(QSettings *dev)
 
     // tts / encoder tab
     QStringList keys;
-    
+
     devices->beginGroup("encoders");
     keys = devices->allKeys();
     for(int i=0; i < keys.size();i++)
@@ -542,7 +542,7 @@ void Config::autodetect()
         for(int a = 0; a < ui.treeDevices->topLevelItemCount(); a++)
             ui.treeDevices->topLevelItem(a)->setExpanded(false);
         //deselect the selected item(s)
-        for(int a = 0; a < ui.treeDevices->selectedItems().size(); a++) 
+        for(int a = 0; a < ui.treeDevices->selectedItems().size(); a++)
             ui.treeDevices->selectedItems().at(a)->setSelected(false);
 
         // find the new item
@@ -554,7 +554,7 @@ void Config::autodetect()
             for(int j=0;j < itmList.at(i)->childCount();j++)
             {
                 QString data = itmList.at(i)->child(j)->data(0, Qt::UserRole).toString();
-                
+
                 if(devicename == data) // item found
                 {
                     itmList.at(i)->child(j)->setSelected(true); //select the item
@@ -578,7 +578,7 @@ void Config::autodetect()
             QMessageBox::critical(this, tr("Fatal error"), text, QMessageBox::Ok);
             return;
         }
-        
+
         if(detector.getMountPoint() != "" )
         {
             ui.mountPoint->setText(detector.getMountPoint());
@@ -597,7 +597,7 @@ void Config::autodetect()
                 tr("Could not detect a device.\n"
                    "Select your device and Mountpoint manually."),
                    QMessageBox::Ok ,QMessageBox::Ok);
-        
+
     }
 }
 
@@ -609,7 +609,7 @@ void Config::cacheClear()
          "remove <b>all</b> files in this folder!").arg(ui.cachePath->text()),
        QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
         return;
-    
+
     QString cache = ui.cachePath->text() + "/rbutil-cache/";
     if(!QFileInfo(cache).isDir()) {
         QMessageBox::critical(this, tr("Path wrong!"),
@@ -633,7 +633,7 @@ void Config::browseTts()
 {
     BrowseDirtree browser(this);
     browser.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
-    
+
     if(QFileInfo(ui.ttsExecutable->text()).isDir())
     {
         browser.setDir(ui.ttsExecutable->text());
@@ -646,7 +646,7 @@ void Config::browseTts()
             return;
         ui.ttsExecutable->setText(exe);
     }
-    
+
 }
 
 
@@ -654,7 +654,7 @@ void Config::browseEnc()
 {
     BrowseDirtree browser(this);
     browser.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
-    
+
     if(QFileInfo(ui.encoderExecutable->text()).isDir())
     {
         browser.setDir(ui.encoderExecutable->text());
@@ -667,5 +667,5 @@ void Config::browseEnc()
             return;
         ui.encoderExecutable->setText(exe);
     }
-    
+
 }

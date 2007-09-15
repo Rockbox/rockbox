@@ -16,13 +16,13 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "installzip.h"
 
 #include "zip/zip.h"
 #include "zip/unzip.h"
 
-ZipInstaller::ZipInstaller(QObject* parent): QObject(parent) 
+ZipInstaller::ZipInstaller(QObject* parent): QObject(parent)
 {
     m_unzip = true;
     m_cache = "";
@@ -46,7 +46,7 @@ void ZipInstaller::install(ProgressloggerInterface *dp)
 void ZipInstaller::installContinue()
 {
     qDebug() << "installContinue()";
-    
+
     runner++; // this gets called when a install finished, so increase first.
     qDebug() << "runner is now at" << runner << "size is" << m_urllist.size();
     if(runner < m_urllist.size()) {
@@ -115,7 +115,7 @@ void ZipInstaller::downloadDone(bool error)
     qDebug() << "Install::downloadDone, error:" << error;
     QStringList zipContents; // needed later
      // update progress bar
-     
+
     int max = m_dp->getProgressMax();
     if(max == 0) {
         max = 100;
@@ -155,7 +155,7 @@ void ZipInstaller::downloadDone(bool error)
             emit done(false);
             return;
         }
-        
+
         ec = uz.extractAll(m_mountpoint);
         if(ec != UnZip::Ok) {
             m_dp->addItem(tr("Extracting failed: %1.")
@@ -185,7 +185,7 @@ void ZipInstaller::downloadDone(bool error)
             emit done(false);
             return;
         }
-        
+
         // add file to log
         zipContents.append( m_target);
     }

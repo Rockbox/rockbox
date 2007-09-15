@@ -26,7 +26,7 @@ InstallTalkWindow::InstallTalkWindow(QWidget *parent) : QDialog(parent)
 {
     ui.setupUi(this);
     talkcreator = new TalkFileCreator(this);
-    
+
     connect(ui.buttonBrowse, SIGNAL(clicked()), this, SLOT(browseFolder()));
 
     ui.OverwriteWav->setChecked(true);
@@ -40,7 +40,7 @@ void InstallTalkWindow::browseFolder()
 {
     BrowseDirtree browser(this);
     browser.setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
-    
+
     if(QFileInfo(ui.lineTalkFolder->text()).isDir())
     {
         browser.setDir(ui.lineTalkFolder->text());
@@ -67,7 +67,7 @@ void InstallTalkWindow::accept()
     logger = new ProgressLoggerGui(this);
     logger->show();
     connect(logger,SIGNAL(closed()),this,SLOT(close()));
-    
+
     QString folderToTalk = ui.lineTalkFolder->text();
     QString pathEncoder = userSettings->value("encbin").toString();
     QString pathTTS = userSettings->value("ttsbin").toString();
@@ -78,23 +78,23 @@ void InstallTalkWindow::accept()
     	 logger->abort();
     	 return;
     }
-    
+
     if(!QFileInfo(pathEncoder).isExecutable())
     {
       	 logger->addItem(tr("Path to Encoder is wrong!"),LOGERROR);
        	 logger->abort();
        	 return;
     }
-    
+
     if(!QFileInfo(pathTTS).isExecutable())
     {
          logger->addItem(tr("Path to TTS is wrong!"),LOGERROR);
          logger->abort();
          return;
     }
-    
+
     userSettings->setValue("last_talked_folder", folderToTalk);
-    
+
     userSettings->sync();
 
     talkcreator->setDir(folderToTalk);
@@ -102,7 +102,7 @@ void InstallTalkWindow::accept()
     talkcreator->setEncexe(pathEncoder);
     talkcreator->setEncOpts(userSettings->value("encopts").toString());
     talkcreator->setTTsOpts(userSettings->value("ttsopts").toString());
-    
+
     devices->beginGroup(userSettings->value("ttspreset").toString());
     talkcreator->setTTsType(devices->value("tts").toString());
     talkcreator->setTTsOpts(devices->value("options").toString());
@@ -113,7 +113,7 @@ void InstallTalkWindow::accept()
     talkcreator->setEncOpts(devices->value("options").toString());
     talkcreator->setEncTemplate(devices->value("template").toString());
     devices->endGroup();
-    
+
     talkcreator->setOverwriteTalk(ui.OverwriteTalk->isChecked());
     talkcreator->setOverwriteWav(ui.OverwriteWav->isChecked());
     talkcreator->setRemoveWav(ui.RemoveWav->isChecked());
@@ -128,7 +128,7 @@ void InstallTalkWindow::setDeviceSettings(QSettings *dev)
 {
     devices = dev;
     qDebug() << "Install::setDeviceSettings:" << devices;
-    
+
     QString profile;
 
     profile = userSettings->value("ttspreset", "none").toString();
@@ -151,9 +151,9 @@ void InstallTalkWindow::setDeviceSettings(QSettings *dev)
 void InstallTalkWindow::setUserSettings(QSettings *user)
 {
     userSettings = user;
-    
+
     talkcreator->setMountPoint(userSettings->value("mountpoint").toString());
-   
+
     setTalkFolder(userSettings->value("last_talked_folder").toString());
 
 }

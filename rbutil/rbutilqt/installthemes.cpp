@@ -153,7 +153,7 @@ void ThemesInstallWindow::downloadDone(bool error)
 void ThemesInstallWindow::updateDetails(int row)
 {
     if(row == currentItem) return;
-    
+
     currentItem = row;
     qDebug() << "updateDetails(int) =" << row;
     QSettings iniDetails(themesInfo.fileName(), QSettings::IniFormat, this);
@@ -161,7 +161,7 @@ void ThemesInstallWindow::updateDetails(int row)
         .arg(ui.listThemes->item(row)->data(Qt::DisplayRole).toString()));
     ui.themePreview->clear();
     ui.themePreview->setText(tr("fetching preview ..."));
-    
+
     int size = 0;
 
     iniDetails.beginGroup(ui.listThemes->item(row)->data(Qt::UserRole).toString());
@@ -184,7 +184,7 @@ void ThemesInstallWindow::updateDetails(int row)
     text = tr("<b>Author:</b> %1<hr/>").arg(iniDetails.value("author", tr("unknown")).toString());
     text += tr("<b>Version:</b> %1<hr/>").arg(iniDetails.value("version", tr("unknown")).toString());
     text += tr("<b>Description:</b> %1<hr/>").arg(iniDetails.value("about", tr("no description")).toString());
-    
+
     ui.themeDescription->setHtml(text);
     iniDetails.endGroup();
 
@@ -211,7 +211,7 @@ void ThemesInstallWindow::updateImage(bool error)
 {
     qDebug() << "updateImage(bool) =" << error;
     if(error) return;
-    
+
     QPixmap p;
     if(!error) {
         imgData = igetter.readAll();
@@ -221,7 +221,7 @@ void ThemesInstallWindow::updateImage(bool error)
             ui.themePreview->clear();
             ui.themePreview->setText(tr("no theme preview"));
         }
-        else 
+        else
             ui.themePreview->setPixmap(p);
     }
 }
@@ -302,7 +302,7 @@ void ThemesInstallWindow::accept()
         iniDetails.endGroup();
     }
     qDebug() << "installing themes:" << themes;
-    
+
     logger = new ProgressLoggerGui(this);
     logger->show();
     QString mountPoint = userSettings->value("mountpoint").toString();

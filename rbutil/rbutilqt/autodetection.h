@@ -35,9 +35,9 @@ class Autodetection :public QObject
 
 public:
     Autodetection(QObject* parent=0);
-    
+
     bool detect();
-    
+
     QString getDevice() {return m_device;}
     QString getMountPoint() {return m_mountpoint;}
     QString errdev(void) { return m_errdev; }
@@ -46,7 +46,7 @@ private:
     QStringList getMountpoints(void);
     QString resolveMountPoint(QString);
     bool detectUsb(void);
-    
+
     QString m_device;
     QString m_mountpoint;
     QString m_errdev;

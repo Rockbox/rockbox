@@ -106,9 +106,9 @@ void Install::accept()
     installer->setLogVersion(myversion);
     installer->setMountPoint(mountPoint);
     installer->install(logger);
-    
+
     connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));
-  
+
 }
 
 // Zip installer has finished
@@ -193,12 +193,12 @@ void Install::setVersionStrings(QMap<QString, QString> ver)
     // rel_rev release version revision id
     // rel_date release version release date
     // same for arch_* and bleed_*
-    
+
     if(version.value("arch_rev").isEmpty()) {
         ui.radioArchived->setEnabled(false);
         qDebug() << "no information about archived version available!";
     }
-    
+
     if(!version.value("rel_rev").isEmpty()) {
         ui.radioStable->setChecked(true);
         ui.radioStable->setEnabled(true);

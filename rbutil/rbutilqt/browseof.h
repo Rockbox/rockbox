@@ -31,11 +31,11 @@ class BrowseOF : public QDialog
         BrowseOF(QWidget *parent = 0);
         void setFile(QString file);
         QString getFile();
-        
+
 
     private slots:
         void onBrowse();
-    
+
     private:
         Ui::BrowseOFFrm ui;
 

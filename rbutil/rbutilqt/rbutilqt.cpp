@@ -96,7 +96,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     connect(ui.buttonDownloadManual, SIGNAL(clicked()), this, SLOT(downloadManual()));
     connect(ui.buttonSmall, SIGNAL(clicked()), this, SLOT(smallInstall()));
     connect(ui.buttonComplete, SIGNAL(clicked()), this, SLOT(completeInstall()));
-    
+
 #if !defined(STATIC)
     ui.actionInstall_Rockbox_Utility_on_player->setEnabled(false);
 #else
@@ -145,7 +145,7 @@ void RbUtilQt::downloadDone(bool error)
         return;
     }
     qDebug() << "network status:" << daily->error();
-    
+
     buildInfo.open();
     QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
     buildInfo.close();
@@ -195,7 +195,7 @@ void RbUtilQt::about()
     Ui::aboutBox about;
     about.setupUi(window);
     window->setModal(true);
-    
+
     QFile licence(":/docs/gpl-2.0.html");
     licence.open(QIODevice::ReadOnly);
     QTextStream c(&licence);
@@ -288,7 +288,7 @@ void RbUtilQt::updateManual()
         devices->beginGroup(userSettings->value("platform").toString());
         QString manual;
         manual = devices->value("manualname", "").toString();
-        
+
         if(manual == "")
             manual = "rockbox-" + devices->value("platform").toString();
         devices->endGroup();
@@ -314,18 +314,18 @@ void RbUtilQt::completeInstall()
     if(QMessageBox::question(this, tr("Confirm Installation"),
            tr("Do you really want to make a complete Installation?"),
               QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
-    
+
     // create logger
     logger = new ProgressLoggerGui(this);
     logger->show();
-                     
+
     QString mountpoint = userSettings->value("mountpoint").toString();
     // show dialog with error if mount point is wrong
     if(!QFileInfo(mountpoint).isDir()) {
         logger->addItem(tr("Mount point is wrong!"),LOGERROR);
         logger->abort();
         return;
-    }  
+    }
     // Bootloader
     devices->beginGroup(userSettings->value("platform").toString());
     if(devices->value("needsbootloader", "") == "yes") {
@@ -357,7 +357,7 @@ void RbUtilQt::completeInstall()
     }
     if(m_error) return;
     logger->undoAbort();
-        
+
     // Fonts
     m_error = false;
     m_installed = false;
@@ -371,7 +371,7 @@ void RbUtilQt::completeInstall()
     }
     if(m_error) return;
     logger->undoAbort();
-        
+
     // Doom
     if(hasDoom())
     {
@@ -393,7 +393,7 @@ void RbUtilQt::completeInstall()
     // it has its own logger window,so close our.
     logger->close();
     installThemes();
-        
+
 }
 
 void RbUtilQt::smallInstall()
@@ -401,7 +401,7 @@ void RbUtilQt::smallInstall()
     if(QMessageBox::question(this, tr("Confirm Installation"),
            tr("Do you really want to make a small Installation?"),
               QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
-    
+
     // create logger
     logger = new ProgressLoggerGui(this);
     logger->show();
@@ -412,7 +412,7 @@ void RbUtilQt::smallInstall()
         logger->addItem(tr("Mount point is wrong!"),LOGERROR);
         logger->abort();
         return;
-    }  
+    }
     // Bootloader
     devices->beginGroup(userSettings->value("platform").toString());
     if(devices->value("needsbootloader", "") == "yes") {
@@ -461,7 +461,7 @@ bool RbUtilQt::installAuto()
     QString file = QString("%1%2/rockbox.zip")
             .arg(devices->value("bleeding_url").toString(),
         userSettings->value("platform").toString());
-    
+
     buildInfo.open();
     QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
     buildInfo.close();
@@ -475,9 +475,9 @@ bool RbUtilQt::installAuto()
         versmap.insert("rel_rev", devices->value("last_release").toString());
         versmap.insert("rel_date", ""); // FIXME: provide the release timestamp
     }
-    
+
     QString myversion = "r" + versmap.value("bleed_rev");
-        
+
     ZipInstaller* installer = new ZipInstaller(this);
     installer->setUrl(file);
     installer->setProxy(proxy());
@@ -487,9 +487,9 @@ bool RbUtilQt::installAuto()
         installer->setCache(userSettings->value("cachepath", QDir::tempPath()).toString());
     installer->setMountPoint(userSettings->value("mountpoint").toString());
     installer->install(logger);
-           
+
     connect(installer, SIGNAL(done(bool)), this, SLOT(installdone(bool)));
-        
+
     return true;
 }
 
@@ -530,23 +530,23 @@ void RbUtilQt::installBootloaderBtn()
     if(QMessageBox::question(this, tr("Confirm Installation"),
            tr("Do you really want to install the Bootloader?"),
               QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
-       
+
     // create logger
     logger = new ProgressLoggerGui(this);
     logger->show();
-    
+
     installBootloader();
 }
 
 void RbUtilQt::installBootloader()
-{   
+{
     QString platform = userSettings->value("platform").toString();
 
     // create installer
     blinstaller  = new BootloaderInstaller(this);
-    
+
     blinstaller->setMountPoint(userSettings->value("mountpoint").toString());
-    
+
     blinstaller->setProxy(proxy());
     blinstaller->setDevice(platform);
     blinstaller->setBootloaderMethod(devices->value(platform + "/bootloadermethod").toString());
@@ -560,7 +560,7 @@ void RbUtilQt::installBootloader()
         m_error = true;
         return;
     }
-    
+
     if(blinstaller->uptodate())
     {
         int ret = QMessageBox::question(this, tr("Bootloader Installation"),
@@ -583,7 +583,7 @@ void RbUtilQt::installBootloader()
             return;
         }
     }
-    
+
     // if fwpatcher , ask for extra file
     QString offirmware;
     if(devices->value(platform + "/bootloadermethod").toString() == "fwpatcher")
@@ -616,7 +616,7 @@ void RbUtilQt::installBootloader()
         }
     }
     blinstaller->setOrigFirmwarePath(offirmware);
-    
+
     blinstaller->install(logger);
 }
 
@@ -642,7 +642,7 @@ void RbUtilQt::installFonts()
 {
     // create zip installer
     installer = new ZipInstaller(this);
-       
+
     installer->setUrl(devices->value("font_url").toString());
     installer->setProxy(proxy());
     installer->setLogSection("Fonts");
@@ -650,7 +650,7 @@ void RbUtilQt::installFonts()
     installer->setMountPoint(userSettings->value("mountpoint").toString());
     if(!userSettings->value("cachedisable").toBool())
         installer->setCache(userSettings->value("cachepath", QDir::tempPath()).toString());
-    installer->install(logger);    
+    installer->install(logger);
 }
 
 
@@ -666,7 +666,7 @@ void RbUtilQt::installVoice()
     // create zip installer
     installer = new ZipInstaller(this);
     installer->setUnzip(false);
-   
+
     QString voiceurl = devices->value("voice_url").toString() + "/" +
         userSettings->value("platform").toString() + "-" +
         versmap.value("arch_date") + "-english.voice";
@@ -681,7 +681,7 @@ void RbUtilQt::installVoice()
     if(!userSettings->value("cachedisable").toBool())
         installer->setCache(userSettings->value("cachepath", QDir::tempPath()).toString());
     installer->install(logger);
-    
+
     //connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));
 }
 
@@ -718,7 +718,7 @@ void RbUtilQt::installDoom()
 {
     // create zip installer
     installer = new ZipInstaller(this);
-   
+
     installer->setUrl(devices->value("doom_url").toString());
     installer->setProxy(proxy());
     installer->setLogSection("Game Addons");
@@ -767,7 +767,7 @@ void RbUtilQt::uninstallBootloader(void)
     // create logger
     ProgressLoggerGui* logger = new ProgressLoggerGui(this);
     logger->show();
-    
+
     QString plattform = userSettings->value("platform").toString();
     BootloaderInstaller blinstaller(this);
     blinstaller.setMountPoint(userSettings->value("mountpoint").toString());
@@ -782,9 +782,9 @@ void RbUtilQt::uninstallBootloader(void)
         logger->abort();
         return;
     }
-    
+
     blinstaller.uninstall(logger);
-    
+
 }
 
 
@@ -795,18 +795,18 @@ void RbUtilQt::downloadManual(void)
             "to the root folder of your player."),
         QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
         return;
-    
+
     buildInfo.open();
     QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
     buildInfo.close();
-    
+
     devices->beginGroup(userSettings->value("platform").toString());
     QString manual;
     manual = devices->value("manualname", "rockbox-" + devices->value("platform").toString()).toString();
     devices->endGroup();
 
     QString date = (info.value("dailies/date").toString());
-    
+
     QString manualurl;
     QString target;
     QString section;
@@ -872,7 +872,7 @@ void RbUtilQt::installPortable(void)
     }
     logger->addItem(tr("Successfully installed Rockbox Utility."), LOGOK);
     logger->abort();
-    
+
 }
 
 
@@ -913,7 +913,7 @@ void RbUtilQt::updateInfo()
             if(log.value(keys.at(b)).toString() < min)
                 min = log.value(keys.at(b)).toString();
         }
-        
+
         for(int b = 0; b < keys.size(); b++) {
             QString file;
             file = userSettings->value("mountpoint").toString() + "/" + keys.at(b);

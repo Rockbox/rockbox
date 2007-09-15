@@ -24,7 +24,7 @@
 UninstallWindow::UninstallWindow(QWidget *parent) : QDialog(parent)
 {
     ui.setupUi(this);
-    ui.UninstalllistWidget->setAlternatingRowColors(true);    
+    ui.UninstalllistWidget->setAlternatingRowColors(true);
     connect(ui.UninstalllistWidget,SIGNAL(itemSelectionChanged()),this,SLOT(selectionChanged()));
     connect(ui.CompleteRadioBtn,SIGNAL(toggled(bool)),this,SLOT(UninstallMethodChanged(bool)));
 }
@@ -43,7 +43,7 @@ void UninstallWindow::accept()
     {
         uninstaller->uninstall(logger);
     }
-    connect(logger,SIGNAL(closed()),this,SLOT(close()));    
+    connect(logger,SIGNAL(closed()),this,SLOT(close()));
 }
 
 
@@ -55,7 +55,7 @@ void UninstallWindow::selectionChanged()
     {
         seletedStrings << itemlist.at(i)->text();
     }
-    
+
     uninstaller->setSections(seletedStrings);
 }
 
@@ -64,7 +64,7 @@ void UninstallWindow::UninstallMethodChanged(bool complete)
     if(complete)
        ui.smartGroupBox->setEnabled(false);
     else
-       ui.smartGroupBox->setEnabled(true); 
+       ui.smartGroupBox->setEnabled(true);
 }
 
 void UninstallWindow::setDeviceSettings(QSettings *dev)
@@ -77,12 +77,12 @@ void UninstallWindow::setDeviceSettings(QSettings *dev)
 void UninstallWindow::setUserSettings(QSettings *user)
 {
     userSettings = user;
-    
+
     QString mountpoint =userSettings->value("mountpoint").toString();
     uninstaller = new Uninstaller(this,mountpoint);
-    
+
     // disable smart uninstall, if not possible
-    if(!uninstaller->uninstallPossible()) 
+    if(!uninstaller->uninstallPossible())
     {
         ui.smartRadioButton->setEnabled(false);
         ui.smartGroupBox->setEnabled(false);
@@ -90,7 +90,7 @@ void UninstallWindow::setUserSettings(QSettings *user)
     }
     else // fill in installed parts
     {
-       ui.smartRadioButton->setChecked(true); 
-       ui.UninstalllistWidget->addItems(uninstaller->getAllSections());    
+       ui.smartRadioButton->setChecked(true);
+       ui.UninstalllistWidget->addItems(uninstaller->getAllSections());
     }
 }

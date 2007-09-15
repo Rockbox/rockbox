@@ -27,7 +27,7 @@ PreviewDlg::PreviewDlg(QWidget *parent) : QDialog(parent)
     this->setModal(true);
     this->setMouseTracking(true);
     this->setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint);
-    
+
 }
 
 void PreviewDlg::setText(QString text)
@@ -39,7 +39,7 @@ void PreviewDlg::setPixmap(QPixmap p)
 {
    ui.themePreview->setFixedSize(p.size());
    this->resize(QSize(10,10));
-   ui.themePreview->setPixmap(p); 
+   ui.themePreview->setPixmap(p);
 }
 
 void PreviewDlg::mouseMoveEvent(QMouseEvent * event)
@@ -58,9 +58,9 @@ PreviewLabel::PreviewLabel(QWidget * parent, Qt::WindowFlags f)
             :QLabel(parent,f)
 {
     this->setMouseTracking(true);
-    
+
     preview = new PreviewDlg(parent);
-    
+
     hovertimer.setInterval(1500);  // wait for 1.5 seconds before showing the Fullsize Preview
     hovertimer.setSingleShot(true);
     connect(&hovertimer,SIGNAL(timeout ()),this,SLOT(timeout()));
@@ -89,11 +89,11 @@ void PreviewLabel::timeout()
     preview->setVisible(true);
 }
 
-void PreviewLabel::setPixmap(QPixmap p) 
+void PreviewLabel::setPixmap(QPixmap p)
 {
     // set the image for the Fullsize Preview
-    preview->setPixmap(p); 
-    
+    preview->setPixmap(p);
+
     //scale the image for use in the label
     QSize img;
     img.setHeight(this->height());

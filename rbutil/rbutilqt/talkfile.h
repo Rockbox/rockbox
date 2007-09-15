@@ -38,7 +38,7 @@ public:
     void setTTsType(QString tts) { m_curTTS = tts; }
     void setTTsOpts(QString opts) {m_TTSOpts=opts;}
     void setTTsTemplate(QString t) { m_curTTSTemplate = t; }
-    
+
     void setEncType(QString enc) { m_curEnc = enc; }
     void setEncOpts(QString opts) {m_EncOpts=opts;}
     void setEncTemplate(QString t) { m_curEncTemplate = t; }
@@ -75,15 +75,15 @@ private:
     QString m_EncExec;
     QString m_EncOpts;
     QString m_curEncTemplate;
-    
+
     bool m_overwriteTalk;
     bool m_overwriteWav;
     bool m_removeWav;
     bool m_recursive;
     bool m_stripExtensions;
-    
+
     ProgressloggerInterface* m_logger;
-    
+
     bool m_abort;
 };
 

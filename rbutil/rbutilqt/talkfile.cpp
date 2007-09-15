@@ -41,7 +41,7 @@ bool TalkFileCreator::initEncoder()
 bool TalkFileCreator::initTTS()
 {
     QFileInfo tts(m_TTSexec);
-    
+
     if(tts.exists())
     {
         return true;
@@ -68,14 +68,14 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
         return false;
     }
     QApplication::processEvents();
-    
+
     connect(logger,SIGNAL(aborted()),this,SLOT(abort()));
     m_logger->setProgressMax(0);
     QDirIterator it(m_dir,QDirIterator::Subdirectories);
     QSettings installlog(m_mountpoint + "/.rockbox/rbutil.log", QSettings::IniFormat, 0);
     installlog.beginGroup("talkfiles");
     // iterate over all entrys
-    while (it.hasNext()) 
+    while (it.hasNext())
     {
         if(m_abort)
         {
@@ -88,7 +88,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
         QString toSpeak;
         QString filename;
         QString wavfilename;
-        
+
         if(fileInf.fileName() == "." || fileInf.fileName() == ".." || fileInf.suffix() == "talk")
         {
             it.next();
@@ -108,10 +108,10 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
             filename = fileInf.absoluteFilePath() + ".talk";
         }
         wavfilename = filename + ".wav";
-        
+
         QFileInfo filenameInf(filename);
         QFileInfo wavfilenameInf(wavfilename);
-        
+
         if(!filenameInf.exists() || m_overwriteTalk)
         {
             if(!wavfilenameInf.exists() || m_overwriteWav)
@@ -132,7 +132,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
                 return false;
             }
         }
-        
+
         QString now = QDate::currentDate().toString("yyyyMMdd");
         if(m_removeWav)
         {
@@ -142,18 +142,18 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
         }
         else
             installlog.setValue(wavfilename.remove(m_mountpoint),now);
-        
+
         installlog.setValue(filename.remove(m_mountpoint),now);
         it.next();
     }
-    
+
     installlog.endGroup();
     m_logger->addItem("Finished creating Talkfiles",LOGOK);
     m_logger->setProgressMax(1);
     m_logger->setProgressValue(1);
     m_logger->abort();
-    
-    return true; 
+
+    return true;
 
 }
 

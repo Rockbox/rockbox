@@ -16,11 +16,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
- 
+
+
 #ifndef INSTALLZIP_H
 #define INSTALLZIP_H
- 
+
 
 
 #include <QtGui>
@@ -28,9 +28,9 @@
 
 #include "progressloggerinterface.h"
 #include "httpget.h"
- 
+
 class ZipInstaller : public QObject
-{ 
+{
     Q_OBJECT
 public:
     ZipInstaller(QObject* parent) ;
@@ -48,11 +48,11 @@ public:
     void setTarget(QString t) { m_target = t; }
     void setCache(QDir c) { m_cache = c; };
     void setCache(QString c) { m_cache = QDir(c);}
-    
+
 signals:
     void done(bool error);
     void cont();
-    
+
 private slots:
     void updateDataReadProgress(int, int);
     void downloadDone(bool);
@@ -69,14 +69,14 @@ private:
     QString m_target;
     int runner;
     QDir m_cache;
-    
+
     HttpGet *getter;
     QTemporaryFile *downloadFile;
-    
+
     ProgressloggerInterface* m_dp;
 };
- 
- 
+
+
 
 #endif
 

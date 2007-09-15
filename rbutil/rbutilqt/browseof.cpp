@@ -27,25 +27,25 @@ BrowseOF::BrowseOF(QWidget *parent) : QDialog(parent)
 {
     ui.setupUi(this);
     this->setModal(true);
-    
+
     connect(ui.browseOFButton,SIGNAL(clicked()),this,SLOT(onBrowse()));
 }
 
 void BrowseOF::setFile(QString file)
 {
-    ui.OFlineEdit->setText(file);    
+    ui.OFlineEdit->setText(file);
 }
 
 void BrowseOF::onBrowse()
 {
     BrowseDirtree browser(this);
     browser.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
-       
+
     if(QFileInfo(ui.OFlineEdit->text()).exists())
     {
         browser.setDir(ui.OFlineEdit->text());
     }
-    
+
     if(browser.exec() == QDialog::Accepted)
     {
         qDebug() << browser.getSelected();

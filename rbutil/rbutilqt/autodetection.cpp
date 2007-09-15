@@ -155,22 +155,22 @@ QStringList Autodetection::getMountpoints()
         tempList << list.at(i).absolutePath();
     }
     return tempList;
-    
+
 #elif defined(Q_OS_MACX)
     QDir dir("/Volumes");
-    return dir.entryList(); 
+    return dir.entryList();
 #elif defined(Q_OS_LINUX)
     QStringList tempList;
 
     FILE *mn = setmntent("/etc/mtab", "r");
     if(!mn)
         return QStringList("");
-    
+
     struct mntent *ent;
     while((ent = getmntent(mn)))
         tempList << QString(ent->mnt_dir);
     endmntent(mn);
-    
+
     return tempList;
 #else
 #error Unknown Plattform
@@ -185,7 +185,7 @@ QString Autodetection::resolveMountPoint(QString device)
     FILE *mn = setmntent("/etc/mtab", "r");
     if(!mn)
         return QString("");
-    
+
     struct mntent *ent;
     while((ent = getmntent(mn))) {
         if(QString(ent->mnt_fsname).startsWith(device)
@@ -221,7 +221,7 @@ bool Autodetection::detectUsb()
     // the ini file needs to hold the IDs as hex values.
     QMap<int, QString> usbids;
     QMap<int, QString> usberror;
-    
+
     for(int i = 0; i < platforms.size(); i++) {
         dev.beginGroup("platforms");
         QString target = dev.value(platforms.at(i)).toString();

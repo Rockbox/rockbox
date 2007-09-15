@@ -16,7 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #ifndef INSTALLBOOTLOADER_H
 #define INSTALLBOOTLOADER_H
 
@@ -38,14 +38,14 @@ bool initSansapatcher();
 class BootloaderInstaller : public QObject
 {
     Q_OBJECT
-    
+
 public:
     BootloaderInstaller(QObject* parent);
     ~BootloaderInstaller() {}
 
     void install(ProgressloggerInterface* dp);
     void uninstall(ProgressloggerInterface* dp);
-    
+
     void setMountPoint(QString mountpoint) {m_mountpoint = mountpoint;}
     void setProxy(QUrl proxy) {m_proxy= proxy;}
     void setDevice(QString device) {m_device= device;}  //!< the current plattform
@@ -56,14 +56,14 @@ public:
     void setBootloaderInfoUrl(QString url) {m_bootloaderinfoUrl =url; } //!< the url for the info file
     bool downloadInfo(); //!< should be called before install/uninstall, blocks until downloaded.
     bool uptodate(); //!< returns wether the bootloader is uptodate
-    
+
 signals:
     void done(bool error);  //installation finished.
-    
+
 signals:   // internal signals. Dont use this from out side.
     void prepare();
-    void finish();  
-   
+    void finish();
+
 private slots:
     void createInstallLog();  // adds the bootloader entry to the log
     void removeInstallLog(); // removes the bootloader entry from the log
@@ -74,23 +74,23 @@ private slots:
     void infoDownloadDone(bool);
     void infoRequestFinished(int, bool);
     void installEnded(bool);
-    
+
     // gigabeat specific routines
     void gigabeatPrepare();
     void gigabeatFinish();
-    
+
     //iaudio specific routines
     void iaudioPrepare();
     void iaudioFinish();
-    
+
     //h10 specific routines
     void h10Prepare();
     void h10Finish();
-    
+
     //ipod specific routines
     void ipodPrepare();
     void ipodFinish();
-    
+
     //sansa specific routines
     void sansaPrepare();
     void sansaFinish();
@@ -98,25 +98,25 @@ private slots:
     //iriver specific routines
     void iriverPrepare();
     void iriverFinish();
-    
+
 private:
-    
+
     HttpGet *infodownloader;
     QTemporaryFile bootloaderInfo;
     volatile bool infoDownloaded;
     volatile bool infoError;
-    
+
     QString m_mountpoint, m_device,m_bootloadermethod,m_bootloadername;
     QString m_bootloaderUrlBase,m_tempfilename,m_origfirmware;
     QUrl m_proxy;
     QString m_bootloaderinfoUrl;
     bool m_install;
-    
+
     int series,table_entry;  // for fwpatcher
-    
+
     HttpGet *getter;
     QTemporaryFile downloadFile;
-    
+
     ProgressloggerInterface* m_dp;
 
 };

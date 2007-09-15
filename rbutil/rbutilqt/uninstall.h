@@ -16,11 +16,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
- 
+
+
 #ifndef UNINSTALL_H
 #define UNINSTALL_H
- 
+
 
 
 #include <QtGui>
@@ -28,36 +28,36 @@
 
 #include "progressloggerinterface.h"
 
- 
+
 class Uninstaller : public QObject
-{ 
+{
     Q_OBJECT
 public:
     Uninstaller(QObject* parent,QString mountpoint) ;
     ~Uninstaller(){}
-    
+
     void deleteAll(ProgressloggerInterface* dp);
     void uninstall(ProgressloggerInterface* dp);
-      
+
     bool uninstallPossible();
-    
+
     QStringList getAllSections();
 
     void setSections(QStringList sections) {uninstallSections = sections;}
-    
-    
+
+
 private slots:
 
 
 private:
     QString m_mountpoint;
-    
+
     QStringList uninstallSections;
 
     ProgressloggerInterface* m_dp;
 };
- 
- 
+
+
 
 #endif
 
