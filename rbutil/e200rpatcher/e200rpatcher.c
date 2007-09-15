@@ -106,6 +106,7 @@ void do_patching(void)
     struct usb_device *tmp_dev;
     struct usb_device *dev = NULL;
     usb_dev_handle *dh;
+    int err;
 
     fprintf(stderr,"[INFO] Searching for E200R\n");
  
@@ -148,13 +149,21 @@ found:
         return;
     }
 
-    /* "must be called" written in the libusb documentation */
-    if (usb_claim_interface(dh, dev->config->interface->altsetting->bInterfaceNumber)) {
-        fprintf(stderr, "[ERR]  Device is busy.  (I was unable to claim its interface.)\n");
+    err = usb_set_configuration(dh, 1);
+
+    if (err < 0)  {
+        fprintf(stderr, "[ERR]  usb_set_configuration failed (%d)\n", err);
         usb_close(dh);
         return;
     }
 
+    /* "must be called" written in the libusb documentation */
+    err = usb_claim_interface(dh, dev->config->interface->altsetting->bInterfaceNumber);
+    if (err < 0) {
+        fprintf(stderr, "[ERR]  Unable to claim interface (%d)\n", err);
+        usb_close(dh);
+        return;
+    }
 
     fprintf(stderr,"[INFO] Found E200R, uploading patching application.\n");
 
