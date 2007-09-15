@@ -69,6 +69,7 @@ class RbUtilQt : public QMainWindow
 
         void completeInstall(void);
         void smallInstall(void);
+        bool smallInstallInner(void);
         void installdone(bool error);
 
         void installBtn(void);

@@ -319,44 +319,8 @@ void RbUtilQt::completeInstall()
     logger = new ProgressLoggerGui(this);
     logger->show();
 
-    QString mountpoint = userSettings->value("mountpoint").toString();
-    // show dialog with error if mount point is wrong
-    if(!QFileInfo(mountpoint).isDir()) {
-        logger->addItem(tr("Mount point is wrong!"),LOGERROR);
-        logger->abort();
+    if(smallInstallInner())
         return;
-    }
-    // Bootloader
-    devices->beginGroup(userSettings->value("platform").toString());
-    if(devices->value("needsbootloader", "") == "yes") {
-        m_error = false;
-        m_installed = false;
-        if(!installBootloaderAuto())
-            return;
-        else
-        {
-            // wait for boot loader installation finished
-            while(!m_installed)
-                QApplication::processEvents();
-        }
-        if(m_error) return;
-        logger->undoAbort();
-    }
-    devices->endGroup();
-
-    // Rockbox
-    m_error = false;
-    m_installed = false;
-    if(!installAuto())
-        return;
-    else
-    {
-        // wait for installation finished
-        while(!m_installed)
-           QApplication::processEvents();
-    }
-    if(m_error) return;
-    logger->undoAbort();
 
     // Fonts
     m_error = false;
@@ -406,12 +370,17 @@ void RbUtilQt::smallInstall()
     logger = new ProgressLoggerGui(this);
     logger->show();
 
+    smallInstallInner();
+}
+
+bool RbUtilQt::smallInstallInner()
+{
     QString mountpoint = userSettings->value("mountpoint").toString();
     // show dialog with error if mount point is wrong
     if(!QFileInfo(mountpoint).isDir()) {
         logger->addItem(tr("Mount point is wrong!"),LOGERROR);
         logger->abort();
-        return;
+        return true;
     }
     // Bootloader
     devices->beginGroup(userSettings->value("platform").toString());
@@ -419,14 +388,14 @@ void RbUtilQt::smallInstall()
         m_error = false;
         m_installed = false;
         if(!installBootloaderAuto())
-            return;
+            return true;
         else
         {
             // wait for boot loader installation finished
             while(!m_installed)
                 QApplication::processEvents();
         }
-        if(m_error) return;
+        if(m_error) return true;
         logger->undoAbort();
     }
     devices->endGroup();
@@ -435,13 +404,15 @@ void RbUtilQt::smallInstall()
     m_error = false;
     m_installed = false;
     if(!installAuto())
-        return;
+        return true;
     else
     {
        // wait for installation finished
        while(!m_installed)
           QApplication::processEvents();
     }
+
+    return false;
 }
 
 void RbUtilQt::installdone(bool error)
