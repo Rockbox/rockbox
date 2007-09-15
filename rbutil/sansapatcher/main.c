@@ -30,7 +30,7 @@
 #include "sansaio.h"
 #include "parttypes.h"
 
-#define VERSION "0.2 with r12896 bootloader"
+#define VERSION "0.3 with v2 bootloader"
 
 unsigned char* sectorbuf;
 
