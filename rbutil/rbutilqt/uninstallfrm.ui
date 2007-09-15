@@ -125,7 +125,7 @@
      <item>
       <widget class="QPushButton" name="buttonOk" >
        <property name="text" >
-        <string>&amp;Ok</string>
+        <string>&amp;Uninstall</string>
        </property>
        <property name="icon" >
         <iconset resource="rbutilqt.qrc" >:/icons/icons/go-next.png</iconset>
