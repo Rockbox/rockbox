@@ -69,7 +69,7 @@ HEADERS += rbutilqt.h \
  installthemes.h \
  uninstall.h \
  uninstallwindow.h \
- utils.h \
+ utils.h \
  browseof.h \
  preview.h 
  
