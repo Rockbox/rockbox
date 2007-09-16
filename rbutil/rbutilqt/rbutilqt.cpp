@@ -161,6 +161,16 @@ void RbUtilQt::downloadDone(bool error)
         bleeding->setCache(userSettings->value("cachepath", QDir::tempPath()).toString());
     bleeding->setFile(&bleedingInfo);
     bleeding->getFile(QUrl(devices->value("bleeding_info").toString()));
+
+    if(chkConfig(false)) {
+        QApplication::processEvents();
+        QMessageBox::critical(this, tr("Configuration error"),
+            tr("Your configuration is invalid. This is most likely due "
+                "to a new installation of Rockbox Utility or a changed device "
+                "path. The configuation dialog will now open to allow you "
+                "correcting the problem."));
+        configDialog();
+    }
 }
 
 
@@ -311,6 +321,7 @@ void RbUtilQt::updateManual()
 
 void RbUtilQt::completeInstall()
 {
+    if(chkConfig(true)) return;
     if(QMessageBox::question(this, tr("Confirm Installation"),
            tr("Do you really want to make a complete Installation?"),
               QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
@@ -362,6 +373,7 @@ void RbUtilQt::completeInstall()
 
 void RbUtilQt::smallInstall()
 {
+    if(chkConfig(true)) return;
     if(QMessageBox::question(this, tr("Confirm Installation"),
            tr("Do you really want to make a small Installation?"),
               QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
@@ -424,6 +436,7 @@ void RbUtilQt::installdone(bool error)
 
 void RbUtilQt::installBtn()
 {
+    if(chkConfig(true)) return;
     install();
 }
 
@@ -498,6 +511,7 @@ bool RbUtilQt::installBootloaderAuto()
 
 void RbUtilQt::installBootloaderBtn()
 {
+    if(chkConfig(true)) return;
     if(QMessageBox::question(this, tr("Confirm Installation"),
            tr("Do you really want to install the Bootloader?"),
               QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
@@ -593,6 +607,7 @@ void RbUtilQt::installBootloader()
 
 void RbUtilQt::installFontsBtn()
 {
+    if(chkConfig(true)) return;
     if(QMessageBox::question(this, tr("Confirm Installation"),
            tr("Do you really want to install the fonts package?"),
               QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
@@ -627,6 +642,7 @@ void RbUtilQt::installFonts()
 
 void RbUtilQt::installVoice()
 {
+    if(chkConfig(true)) return;
     if(QMessageBox::question(this, tr("Confirm Installation"),
        tr("Do you really want to install the voice file?"),
        QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
@@ -658,6 +674,7 @@ void RbUtilQt::installVoice()
 
 void RbUtilQt::installDoomBtn()
 {
+    if(chkConfig(true)) return;
     if(!hasDoom()){
         QMessageBox::critical(this, tr("Error"), tr("Your device doesn't have a doom plugin. Aborting."));
         return;
@@ -704,6 +721,7 @@ void RbUtilQt::installDoom()
 
 void RbUtilQt::installThemes()
 {
+    if(chkConfig(true)) return;
     ThemesInstallWindow* tw = new ThemesInstallWindow(this);
     tw->setDeviceSettings(devices);
     tw->setUserSettings(userSettings);
@@ -715,6 +733,7 @@ void RbUtilQt::installThemes()
 
 void RbUtilQt::createTalkFiles(void)
 {
+    if(chkConfig(true)) return;
     InstallTalkWindow *installWindow = new InstallTalkWindow(this);
     installWindow->setUserSettings(userSettings);
     installWindow->setDeviceSettings(devices);
@@ -724,6 +743,7 @@ void RbUtilQt::createTalkFiles(void)
 
 void RbUtilQt::uninstall(void)
 {
+    if(chkConfig(true)) return;
     UninstallWindow *uninstallWindow = new UninstallWindow(this);
     uninstallWindow->setUserSettings(userSettings);
     uninstallWindow->setDeviceSettings(devices);
@@ -732,6 +752,7 @@ void RbUtilQt::uninstall(void)
 
 void RbUtilQt::uninstallBootloader(void)
 {
+    if(chkConfig(true)) return;
     if(QMessageBox::question(this, tr("Confirm Uninstallation"),
            tr("Do you really want to uninstall the Bootloader?"),
            QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
@@ -761,6 +782,7 @@ void RbUtilQt::uninstallBootloader(void)
 
 void RbUtilQt::downloadManual(void)
 {
+    if(chkConfig(true)) return;
     if(QMessageBox::question(this, tr("Confirm download"),
        tr("Do you really want to download the manual? The manual will be saved "
             "to the root folder of your player."),
@@ -919,5 +941,21 @@ QUrl RbUtilQt::proxy()
         return QUrl(getenv("http_proxy"));
 #endif
     return QUrl("");
+}
+
+
+bool RbUtilQt::chkConfig(bool warn)
+{
+    bool error = false;
+    if(userSettings->value("platform").toString().isEmpty()
+        || userSettings->value("mountpoint").toString().isEmpty()
+        || !QFileInfo(userSettings->value("mountpoint").toString()).isWritable()) {
+        error = true;
+
+        if(warn) QMessageBox::critical(this, tr("Configuration error"),
+            tr("You configuration is invalid. Please go to the configuration "
+                "dialog and make sure the selected values are correct."));
+    }
+    return error;
 }
 

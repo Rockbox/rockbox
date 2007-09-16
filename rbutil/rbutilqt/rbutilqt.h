@@ -56,6 +56,7 @@ class RbUtilQt : public QMainWindow
         BootloaderInstaller* blinstaller;
         QUrl proxy(void);
         QMap<QString, QString> versmap;
+        bool chkConfig(bool);
 
         volatile bool m_installed;
         volatile bool m_error;
