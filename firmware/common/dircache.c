@@ -531,7 +531,6 @@ static int dircache_do_rebuild(void)
     
     /* Measure how long it takes build the cache. */
     start_tick = current_tick;
-    remove(DIRCACHE_FILE);
     dircache_initializing = true;
     
 #ifdef SIMULATOR
