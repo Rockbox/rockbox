@@ -28,6 +28,7 @@
 #include <inttypes.h>
 #include <usb.h>
 #include <string.h>
+#include "stdbool.h"
 
 #include "bootimg.h"
 
@@ -183,37 +184,56 @@ found:
 
     usb_close(dh);
 }
-
+void print_usage(void)
+{
+    fprintf(stderr,"Usage: e200rpatcher [options]\n");
+    fprintf(stderr,"Options:\n");
+    fprintf(stderr,"  -s,  --silent\t\tDont display instructions\n");
+}
 
 int main(int argc, char* argv[])
 {
     char input[4];
-
-    /* We don't use the arguments */
-    (void)argc;
-    (void)argv;
+    int silent = 0;
+    int i;
+    
+    /* check args */
+    if ((argc > 1) && ((strcmp(argv[1],"-h")==0) || (strcmp(argv[1],"--help")==0))) {
+        print_usage();
+        return 1;
+    }
+    for (i=1;i<argc;i++)
+    {
+        if (!strcmp(argv[i], "--silent") || !strcmp(argv[i], "-s"))
+            silent = 1;
+    }
 
     printf("e200rpatcher v" VERSION " - (C) 2007 Jonathan Gordon & Dave Chapman\n");
     printf("This is free software; see the source for copying conditions.  There is NO\n");
     printf("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
 
-    printf("Attach your E200R in \"manufacturing mode\" as follows:\n");
-    printf("   1) Power-off your E200R\n");
-    printf("   2) Turn ON the lock/hold switch\n");
-    printf("   3) Press and hold the SELECT button and whilst it is held down,\n");
-    printf("      attach your E200R to your computer via USB\n");
-    printf("   4) After attaching to USB, keep the SELECT button held for 10 seconds.\n");
-    printf("\n");
-    printf("NOTE: If your E200R starts in the normal Sansa firmware, you have\n");
-    printf("      failed to enter manufacturing mode and should try again at step 1).\n\n");
-
-    printf("[INFO] Press Enter to continue:");
-    fgets(input, 4, stdin);
-
+    if (!silent)
+    {
+        printf("Attach your E200R in \"manufacturing mode\" as follows:\n");
+        printf("   1) Power-off your E200R\n");
+        printf("   2) Turn ON the lock/hold switch\n");
+        printf("   3) Press and hold the SELECT button and whilst it is held down,\n");
+        printf("      attach your E200R to your computer via USB\n");
+        printf("   4) After attaching to USB, keep the SELECT button held for 10 seconds.\n");
+        printf("\n");
+        printf("NOTE: If your E200R starts in the normal Sansa firmware, you have\n");
+        printf("      failed to enter manufacturing mode and should try again at step 1).\n\n");
+    
+        printf("[INFO] Press Enter to continue:");
+        fgets(input, 4, stdin);
+    }
     do_patching();
 
-    printf("[INFO] Press ENTER to exit: ");
-    fgets(input, 4, stdin);
+    if (!silent)
+    {
+        printf("[INFO] Press ENTER to exit: ");
+        fgets(input, 4, stdin);
+    }
 
     return 0;
 }
