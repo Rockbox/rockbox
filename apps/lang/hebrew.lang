@@ -779,7 +779,7 @@
     x5: "SELECT = Yes"
     h10,h10_5gb: "SELECT = Yes"
     gigabeatf: "SELECT = Yes"
-    e200: "SELECT = Yes"
+    e200,c200: "SELECT = Yes"
   </source>
   <dest>
     *: "נגן = כן"
@@ -788,7 +788,7 @@
     x5: "בחר = כן"
     h10,h10_5gb: "בחר = כן"
     gigabeatf: "בחר = כן"
-    e200: "בחר = כן"
+    e200,c200: "בחר = כן"
   </dest>
   <voice>
     *: ""
@@ -3789,7 +3789,7 @@
     x5: "SELECT = Set"
     h10,h10_5gb: "SELECT = Set"
     gigabeatf: "SELECT = Set"
-    e200: "SELECT = Set"
+    e200,c200: "SELECT = Set"
   </source>
   <dest>
     *: "הפעל = אישור"
@@ -3798,7 +3798,7 @@
     x5: "בחר = אישור"
     h10,h10_5gb: "הבא = אישור"
     gigabeatf: "בחר = אישור"
-    e200: "בחר = אישור"
+    e200,c200: "בחר = אישור"
   </dest>
   <voice>
     *: ""
@@ -3815,7 +3815,7 @@
     x5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "POWER = Revert"
-    e200: "PREV = Revert"
+    e200,c200: "PREV = Revert"
   </source>
   <dest>
     *: "כבה = ביטול"
@@ -3824,7 +3824,7 @@
     x5: "הקלטה = ביטול"
     h10,h10_5gb: "אחורה = ביטול"
     gigabeatf: "הפעל = ביטול"
-    e200: "אחורה = ביטול"
+    e200,c200: "אחורה = ביטול"
   </dest>
   <voice>
     *: ""
@@ -6548,7 +6548,7 @@
     ipod*: "PLAY/PAUSE to abort"
     x5: "Long PLAY to abort"
     h10,h10_5gb: "PREV to abort"
-    e200: "PREV to abort"
+    e200,c200: "PREV to abort"
   </source>
   <dest>
     *: "כבה כדי לבטל"
@@ -6556,7 +6556,7 @@
     ipod*: "נגן\עצור כדי לבטל"
     x5: "החזק נגן כדי לבטל"
     h10,h10_5gb: "אחורה כדי לבטל"
-    e200: "אחורה כדי לבטל"
+    e200,c200: "אחורה כדי לבטל"
   </dest>
   <voice>
     *: ""
@@ -10347,7 +10347,7 @@
     ipod*: "Building database... %d found (PLAY/PAUSE to return)"
     x5: "Building database... %d found (Long PLAY to return)"
     h10,h10_5gb: "Building database... %d found (PREV to return)"
-    e200: "Building database... %d found (PREV to return)"
+    e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: " בונה מסד נתונים... %d (כבה כדי לחזור) נמצאו"
@@ -10355,7 +10355,7 @@
     ipod*: "בונה מסד נתונים... %d (עצור כדי לחזור) נמצאו"
     x5: "בונה מסד נתונים... %d (החזק נגן כדי לחזור) נמצאו"
     h10,h10_5gb: " בונה מסד נתונים... %d (אחורה כדי לחזור) נמצאו"
-    e200: " בונה מסד נתונים... %d (אחורה כדי לחזור) נמצאו"
+    e200,c200: " בונה מסד נתונים... %d (אחורה כדי לחזור) נמצאו"
   </dest>
   <voice>
     *: ""

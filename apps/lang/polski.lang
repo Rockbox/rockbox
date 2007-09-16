@@ -4423,17 +4423,17 @@
   user: 
   <source>
     *: none
-    e200: "mSD:"
+    e200,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
-    e200: "MMC:"
+    e200,c200: "MMC:"
     ondio*: none
   </dest>
   <voice>
     *: none
-    e200: "Karta MMC"
+    e200,c200: "Karta MMC"
     ondio*: ""
   </voice>
 </phrase>
@@ -4566,7 +4566,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200: "MENU = Revert"
+    ipod*,e200,c200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
@@ -4575,7 +4575,7 @@
     *: none
     rtc: "OFF = Przywróć"
     h100,h120,h300: "STOP = Przywróć"
-    ipod*,e200: "MENU = Przywróć"
+    ipod*,e200,c200: "MENU = Przywróć"
     x5,m5: "REC = Przywróć"
     h10,h10_5gb: "COFNIJ = Przywróć"
     gigabeatf: "A = Przywróć"
@@ -4584,7 +4584,7 @@
     *: none
     rtc: ""
     h100,h120,h300: ""
-    ipod*,e200: ""
+    ipod*,e200,c200: ""
     x5,m5: ""
     h10,h10_5gb: ""
     gigabeatf: ""
@@ -4667,21 +4667,21 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200: "The disk is full. Press UP to continue."
+    e200,c200: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
     recording: "Pamięć jest pełna. Wciśnij OFF żeby kontynuować."
     h100,h120,h300: "Pamięć jest pełna. Wciśnij STOP żeby kontynuować."
     m5,x5: "Pamięć jest pełna. Wciśnij POWER żeby kontynuować."
-    e200: "Pamięć jest pełna. Wciśnij GÓRA żeby kontynuować."
+    e200,c200: "Pamięć jest pełna. Wciśnij GÓRA żeby kontynuować."
   </dest>
   <voice>
     *: none
     recording: ""
     h100,h120,h300: ""
     m5,x5: ""
-    e200: ""
+    e200,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -7375,21 +7375,21 @@
     player,h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200: "PREV to abort"
+    h10,h10_5gb,e200,c200: "PREV to abort"
   </source>
   <dest>
     *: "OFF = Anuluj"
     player,h100,h120,h300: "STOP = Anuluj"
     ipod*: "PLAY/PAUSE = Anuluj"
     x5,m5: "Przytrzymaj PLAY = Anuluj"
-    h10,h10_5gb,e200: "COFNIJ = Anuluj"
+    h10,h10_5gb,e200,c200: "COFNIJ = Anuluj"
   </dest>
   <voice>
     *: ""
     player,h100,h120,h300: ""
     ipod*: ""
     x5,m5: ""
-    h10,h10_5gb,e200: ""
+    h10,h10_5gb,e200,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -8775,19 +8775,19 @@
     *: none
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "The disk is full. Press LEFT to continue."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "The disk is full. Press LEFT to continue."
   </source>
   <dest>
     *: "Pamięć jest pełna. Wciśnij OFF żeby kontynuować."
     recording: "Pamięć jest pełna. Wciśnij OFF żeby kontynuować."
     h100,h120,h300: "Dysk jest pełny. Wciśnij STOP żeby kontynuować."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "Pamięć jest pełna. Wciśnij LEWO żeby kontynuować."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "Pamięć jest pełna. Wciśnij LEWO żeby kontynuować."
   </dest>
   <voice>
     *: none
     recording: ""
     h100,h120,h300: ""
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: ""
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -9771,21 +9771,21 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PLAY/PAUSE to return)"
     x5,m5: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Budowanie bazy danych... %d znalezionych (OFF żeby wrócić)"
     h100,h120,h300: "Budowanie bazy danych... %d znalezionych (STOP żeby wrócić)"
     ipod*: "Budowanie bazy danych... %d znalezionych (PLAY/PAUSE żeby wrócić)"
     x5,m5: "Budowanie bazy danych... %d znalezionych (LEWO żeby wrócić)"
-    h10,h10_5gb,e200: "Budowanie bazy danych... %d znalezionych (COFNIJ żeby wrócić)"
+    h10,h10_5gb,e200,c200: "Budowanie bazy danych... %d znalezionych (COFNIJ żeby wrócić)"
   </dest>
   <voice>
     *: "Znaleziono wpisy do bazy danych"
     h100,h120,h300: ""
     ipod*: ""
     x5,m5: ""
-    h10,h10_5gb,e200: ""
+    h10,h10_5gb,e200,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -10116,19 +10116,19 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200,h10,h10_5gb: "SELECT = Yes"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Tak"
     h100,h120,h300: "NAVI = Tak"
-    ipod*,x5,m5,gigabeatf,e200,h10,h10_5gb: "WYBIERZ = Tak"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "WYBIERZ = Tak"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
     *: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,gigabeatf,e200,h10,h10_5gb: ""
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: ""
     player: ""
   </voice>
 </phrase>
@@ -10140,19 +10140,19 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,gigabeatf: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Ustaw"
     h100,h120,h300: "NAVI = Ustaw"
-    ipod*,x5,m5,h10,h10_5gb,e200,gigabeatf: "WYBIERZ = Ustaw"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "WYBIERZ = Ustaw"
   </dest>
   <voice>
     *: none
     rtc: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,h10,h10_5gb,e200,gigabeatf: ""
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: ""
   </voice>
 </phrase>
 <phrase>

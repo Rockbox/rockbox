@@ -835,7 +835,7 @@
     x5: "SELECT = Yes"
     h10,h10_5gb: "SELECT = Yes"
     gigabeatf: "SELECT = Yes"
-    e200: "SELECT = Yes"
+    e200,c200: "SELECT = Yes"
   </source>
   <dest>
     *: "SPILL = Ja"
@@ -844,7 +844,7 @@
     x5: "VELG = Ja"
     h10,h10_5gb: "VELG = Ja"
     gigabeatf: "VELG = Ja"
-    e200: "VELG = Ja"
+    e200,c200: "VELG = Ja"
   </dest>
   <voice>
     *: ""
@@ -4058,7 +4058,7 @@
     x5: "RECORD = Exit"
     h10,h10_5gb: "PREV = Exit"
     gigabeatf: "A = Exit"
-    e200: "POWER = Exit"
+    e200,c200: "POWER = Exit"
   </source>
   <dest>
     *: "AV = Avslutt"
@@ -4067,7 +4067,7 @@
     x5: "OPPTAK = Avslutt"
     h10,h10_5gb: "FORRIGE = Avslutt"
     gigabeatf: "A = Avslutt"
-    e200: "POWER = Avslutt"
+    e200,c200: "POWER = Avslutt"
   </dest>
   <voice>
     *: ""
@@ -4126,7 +4126,7 @@
     x5: "SELECT = Select"
     h10,h10_5gb: "SELECT = Select"
     gigabeatf: "SELECT = Select"
-    e200: "SELECT = Select"
+    e200,c200: "SELECT = Select"
   </source>
   <dest>
     *: "SPILL = Velg"
@@ -4135,7 +4135,7 @@
     x5: "VELG = Velg"
     h10,h10_5gb: "VELG = Velg"
     gigabeatf: "VELG = Velg"
-    e200: "VELG = Velg"
+    e200,c200: "VELG = Velg"
   </dest>
   <voice>
     *: ""
@@ -4152,7 +4152,7 @@
     x5: "Long RECORD = Delete"
     h10,h10_5gb: "REWIND = Delete"
     gigabeatf: "POWER = Delete"
-    e200: "PLAY = Delete"
+    e200,c200: "PLAY = Delete"
   </source>
   <dest>
     *: "PÅ+Spill = Slett"
@@ -4161,7 +4161,7 @@
     x5: "Lang OPPTAK = Slett"
     h10,h10_5gb: "SPOL TILBAKE = Slett"
     gigabeatf: "POWER = Slett"
-    e200: "SPILL AV = Slett"
+    e200,c200: "SPILL AV = Slett"
   </dest>
   <voice>
     *: ""
@@ -4248,7 +4248,7 @@
     x5: "SELECT = Set"
     h10,h10_5gb: "SELECT = Set"
     gigabeatf: "SELECT = Set"
-    e200: "SELECT = Set"
+    e200,c200: "SELECT = Set"
   </source>
   <dest>
     *: "PÅ for å stille"
@@ -4257,7 +4257,7 @@
     x5: "VELG = Still"
     h10,h10_5gb: "VELG = Still"
     gigabeatf: "VELG = Still"
-    e200: "VELG = Still"
+    e200,c200: "VELG = Still"
   </dest>
   <voice>
     *: ""
@@ -4274,7 +4274,7 @@
     x5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "POWER = Revert"
-    e200: "PREV = Revert"
+    e200,c200: "PREV = Revert"
   </source>
   <dest>
     *: "AV for å tilbakestille"
@@ -4283,7 +4283,7 @@
     x5: "OPPTAK = Tilbakestill"
     h10,h10_5gb: "FORRIGE = Tilbakestill"
     gigabeatf: "POWER = Tilbakestill"
-    e200: "FORRIGE = Tilbakestill"
+    e200,c200: "FORRIGE = Tilbakestill"
   </dest>
   <voice>
     *: ""
@@ -7147,7 +7147,7 @@
     ipod*: "PLAY/PAUSE to abort"
     x5: "Long PLAY to abort"
     h10,h10_5gb: "PREV to abort"
-    e200: "PREV to abort"
+    e200,c200: "PREV to abort"
   </source>
   <dest>
     *: "AV for å avbryte"
@@ -7155,7 +7155,7 @@
     ipod*: "SPILL/PAUSE for å avbryte"
     x5: "Lang SPILL for å avbryte"
     h10,h10_5gb: "FORRIGE for å avbryte"
-    e200: "FORRIGE for å avbryte"
+    e200,c200: "FORRIGE for å avbryte"
   </dest>
   <voice>
     *: ""
@@ -10470,7 +10470,7 @@
     ipod*: "Building database... %d found (PLAY/PAUSE to return)"
     x5: "Building database... %d found (Long PLAY to return)"
     h10,h10_5gb: "Building database... %d found (PREV to return)"
-    e200: "Building database... %d found (PREV to return)"
+    e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Bygger database... %d funnet (AV for å gå tilbake)"
@@ -10478,7 +10478,7 @@
     ipod*: "Bygger database... %d funnet (SPILL/PAUSE for å gå tilbake)"
     x5: "Bygger database... %d funnet (Lang SPILL for å gå tilbake)"
     h10,h10_5gb: "Bygger database... %d funnet (FORRIGE to for å gå tilbake)"
-    e200: "Bygger database... %d funnet (FORRIGE to for å gå tilbake)"
+    e200,c200: "Bygger database... %d funnet (FORRIGE to for å gå tilbake)"
   </dest>
   <voice>
     *: ""

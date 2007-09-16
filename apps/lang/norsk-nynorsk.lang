@@ -4280,11 +4280,11 @@
   user:
   <source>
     *: none
-    e200: "mSD:"
+    e200,c200: "mSD:"
     ondio*: "MMC:"
   </source>
     *: none
-    e200:   <dest>
+    e200,c200:   <dest>
     *: "MMC:"
   </dest>
   <voice>
@@ -4417,7 +4417,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200: "MENU = Revert"
+    ipod*,e200,c200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
@@ -4426,7 +4426,7 @@
     *: none
     rtc: "AV = tilbakestill"
     h100,h120,h300: "STOPP = tilbakestill"
-    ipod*,e200: "MENY = tilbakestill"
+    ipod*,e200,c200: "MENY = tilbakestill"
     x5,m5: "OPPTAK = tilbakestill"
     h10,h10_5gb: "FØRRE = tilbakestill"
     gigabeatf: "A = tilbakestill"
@@ -4508,7 +4508,7 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200: "The disk is full. Press UP to continue."
+    e200,c200: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
@@ -7156,14 +7156,14 @@
     player,h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200: "PREV to abort"
+    h10,h10_5gb,e200,c200: "PREV to abort"
   </source>
   <dest>
     *: "AV for å avbryta"
     h100,h120,h300: "STOPP for å avbryta"
     ipod*: "SPEL/PAUSE for å avbryta"
     x5,m5: "SPEL (lenge) for å avbryta"
-    h10,h10_5gb,e200: "FØRRE for å avbryta"
+    h10,h10_5gb,e200,c200: "FØRRE for å avbryta"
   </dest>
   <voice>
     *: ""
@@ -8407,7 +8407,7 @@
     *: none
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "The disk is full. Press LEFT to continue."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "The disk is full. Press LEFT to continue."
   </source>
   <dest>
     *: none
@@ -9453,13 +9453,13 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PLAY/PAUSE to return)"
     x5,m5: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     h100,h120,h300: "Byggjer database … Fann %d. (STOPP for å gå tilbake.)"
     ipod*: "Byggjer database … Fann %d. (SPEL/PAUSE for å gå tilbake.)"
     x5,m5: "Byggjer database … Fann %d. (VENSTRE for å gå tilbake.)"
-    h10,h10_5gb,e200: "Byggjer database … Fann %d. (FØRRE for å gå tilbake.)"
+    h10,h10_5gb,e200,c200: "Byggjer database … Fann %d. (FØRRE for å gå tilbake.)"
   </dest>
   <voice>
     *: ""
@@ -9995,13 +9995,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200,h10,h10_5gb: "SELECT = Yes"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "SPEL = ja"
     h100,h120,h300: "NAVI = ja"
-    ipod*,x5,m5,gigabeatf,e200,h10,h10_5gb: "VEL = ja"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "VEL = ja"
     player: "(SPEL/STOPP)"
   </dest>
   <voice>
@@ -10016,17 +10016,17 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,gigabeatf: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "PÅ = vel"
     h100,h120,h300: "NAVI = vel"
-    ipod*,x5,m5,h10,h10_5gb,e200,gigabeatf: "VEL = vel"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "VEL = vel"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200,gigabeatf: ""
+    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200,c200,gigabeatf: ""
   </voice>
 </phrase>
 <phrase>

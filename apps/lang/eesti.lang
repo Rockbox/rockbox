@@ -835,7 +835,7 @@
     x5: "SELECT = Yes"
     h10,h10_5gb: "SELECT = Yes"
     gigabeatf: "SELECT = Yes"
-    e200: "SELECT = Yes"
+    e200,c200: "SELECT = Yes"
   </source>
   <dest>
     *: "PLAY = Jah"
@@ -844,7 +844,7 @@
     x5: "SELECT = Jah"
     h10,h10_5gb: "SELECT = Jah"
     gigabeatf: "SELECT = Jah"
-    e200: "SELECT = Jah"
+    e200,c200: "SELECT = Jah"
   </dest>
   <voice>
     *: ""
@@ -4855,7 +4855,7 @@
     x5: "SELECT = Set"
     h10,h10_5gb: "SELECT = Set"
     gigabeatf: "SELECT = Set"
-    e200: "SELECT = Set"
+    e200,c200: "SELECT = Set"
   </source>
   <dest>
     *: "ON muutmiseks"
@@ -4864,7 +4864,7 @@
     x5: "SELECT muutmiseks"
     h10,h10_5gb: "SELECT muutmiseks"
     gigabeatf: "SELECT muutmiseks"
-    e200: "SELECT muutmiseks"
+    e200,c200: "SELECT muutmiseks"
   </dest>
   <voice>
     *: ""
@@ -4877,7 +4877,7 @@
   <source>
     *: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200: "MENU = Revert"
+    ipod*,e200,c200: "MENU = Revert"
     x5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "POWER = Revert"
@@ -4885,7 +4885,7 @@
   <dest>
     *: "OFF tagasi pöördumiseks"
     h100,h120,h300: "STOP tagasi pöördumiseks"
-    ipod*,e200: "MENU tagasi pöördumiseks"
+    ipod*,e200,c200: "MENU tagasi pöördumiseks"
     x5: "RECORD tagasi pöördumiseks"
     h10,h10_5gb: "PREV tagasi pöördumiseks"
     gigabeatf: "POWER tagasi pöördumiseks"
@@ -7862,7 +7862,7 @@
     ipod*: "PLAY/PAUSE to abort"
     x5: "Long PLAY to abort"
     h10,h10_5gb: "PREV to abort"
-    e200: "PREV to abort"
+    e200,c200: "PREV to abort"
   </source>
   <dest>
     *: "OFF katkestamiseks"
@@ -7870,7 +7870,7 @@
     ipod*: "PLAY/PAUSE katkestamiseks"
     x5: "Long PLAY katkestamiseks"
     h10,h10_5gb: "PREV katkestamiseks"
-    e200: "PREV katkestamiseks"
+    e200,c200: "PREV katkestamiseks"
   </dest>
   <voice>
     *: ""

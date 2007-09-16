@@ -1,3 +1,25 @@
+# Rockbox danish language file
+# Translated by:
+# - Rune Wiinberg
+# - Jakob Givoni
+# - Jonas Häggqvist
+#
+# Try to follow the guidelines from http://www.sslug.dk/locale/ Specifically
+# try to avoid english words at (almost) all costs.
+#
+# Local conventions:
+# "Settings" is removed from translations used in the menu since it's all
+# settings there ("Sound Settings > Lyd").
+# No excessive capitals ("Håndter opsætning" - not "Håndter Opsætning")
+#
+# Strings that need attention:
+# - LANG_CROSSFEED_HF_CUTOFF
+# - LANG_CROSSFEED_CROSS_GAIN
+# - LANG_CROSSFEED_HF_ATTENUATION
+# - LANG_CROSSFEED_DIRECT_GAIN
+# - LANG_EQUALIZER_BAND_LOW_SHELF
+# - LANG_EQUALIZER_BAND_HIGH_SHELF
+# - All strings with "Equalizer" in them.
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -3707,17 +3729,17 @@
   user:
   <source>
     *: none
-    e200: "mSD:"
+    e200,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
-    *: ""
-    e200: "mSD:"
+    *: none
+    e200,c200: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
-    *: ""
-    e200: "Mikro SD kort"
+    *: none
+    e200,c200: "Mikro SD kort"
     ondio*: "Multimedie kort"
   </voice>
 </phrase>
@@ -3850,7 +3872,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200: "MENU = Revert"
+    ipod*,e200,c200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
@@ -3859,7 +3881,7 @@
     *: "SLUK: Fortryd"
     rtc: "SLUK = Fortryd"
     h100,h120,h300: "STOP = Fortryd"
-    ipod*,e200: "MENI = Fortryd"
+    ipod*,e200,c200: "MENU = Fortryd"
     x5,m5: "OPTAG = Fortryd"
     h10,h10_5gb: "FORRIGE = Fortryd"
     gigabeatf: "TÆND/SLUK = Fortryd"
@@ -3868,7 +3890,7 @@
     *: none
     rtc: ""
     h100,h120,h300: ""
-    ipod*,e200: ""
+    ipod*,e200,c200: ""
     x5,m5: ""
     h10,h10_5gb: ""
     gigabeatf: ""
@@ -3951,21 +3973,21 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200: "The disk is full. Press UP to continue."
+    e200,c200: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
     recording: "Disken er fuld. Tryk SLUK for at fortsætte."
     h100,h120,h300: "Disken er fuld. Tryk STOP for at fortsætte."
     m5,x5: "Disken er fuld. Tryk TÆND/SLUK for at fortsætte."
-    e200: "Disken er fuld. Tryk SLUK for at fortsætte."
+    e200,c200: "Disken er fuld. Tryk OP for at fortsætte."
   </dest>
   <voice>
     *: none
     recording: ""
     h100,h120,h300: ""
     m5,x5: ""
-    e200: ""
+    e200,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -6566,21 +6588,21 @@
     player,h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200: "PREV to abort"
+    h10,h10_5gb,e200,c200: "PREV to abort"
   </source>
   <dest>
     *: "SLUK for at afbryde"
     player,h100,h120,h300: "STOP for at afbryde"
     ipod*: "SPIL/PAUSE for at afbryde"
     x5,m5: "Lang SPIL for at afbryde"
-    h10,h10_5gb,e200: "FORRIGE for at afbryde"
+    h10,h10_5gb,e200,c200: "FORRIGE for at afbryde"
   </dest>
   <voice>
     *: ""
     player,h100,h120,h300: ""
     ipod*: ""
     x5,m5: ""
-    h10,h10_5gb,e200: ""
+    h10,h10_5gb,e200,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -8688,19 +8710,19 @@
     *: none
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "The disk is full. Press LEFT to continue."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "The disk is full. Press LEFT to continue."
   </source>
   <dest>
     *: none
     recording: "Disken er fuld. Tryk SLUK for at fortsætte."
     h100,h120,h300: "Disken er fuld. Tryk STOP for at fortsætte."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: "Disken er fuld. Tryk VENSTRE for at fortsætte."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "Disken er fuld. Tryk VENSTRE for at fortsætte."
   </dest>
   <voice>
     *: none
     recording: ""
     h100,h120,h300: ""
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200: ""
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -9278,21 +9300,21 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PLAY/PAUSE to return)"
     x5,m5: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Bygger database... %d fundet (SLUK for at stoppe)"
     h100,h120,h300: "Bygger database... %d fundet (STOP for at stoppe)"
     ipod*: "Bygger database... %d fundet (SPIL/PAUSE for at stoppe)"
     x5,m5: "Bygger database... %d fundet (VENSTRE for at stoppe)"
-    h10,h10_5gb,e200: "Bygger database... %d fundet (FORRIGE for at stoppe)"
+    h10,h10_5gb,e200,c200: "Bygger database... %d fundet (FORRIGE for at stoppe)"
   </dest>
   <voice>
     *: "filer fundet til databasen"
     h100,h120,h300: ""
     ipod*: ""
     x5,m5: ""
-    h10,h10_5gb,e200: ""
+    h10,h10_5gb,e200,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -10516,19 +10538,19 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200,h10,h10_5gb: "SELECT = Yes"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "SPIL = Ja"
     h100,h120,h300: "NAVI = Ja"
-    ipod*,x5,m5,gigabeatf,e200,h10,h10_5gb: "VÆLG = Ja"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "VÆLG = Ja"
     player: "(SPIL/STOP)"
   </dest>
   <voice>
     *: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,gigabeatf,e200,h10,h10_5gb: ""
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: ""
     player: ""
   </voice>
 </phrase>
@@ -10540,19 +10562,19 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,gigabeatf: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "Tænd = Indstil"
     h100,h120,h300: "NAVI = Indstil"
-    ipod*,x5,m5,h10,h10_5gb,e200,gigabeatf: "Vælg = Indstil"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "VÆLG = Indstil"
   </dest>
   <voice>
     *: none
     rtc: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,h10,h10_5gb,e200,gigabeatf: ""
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: ""
   </voice>
 </phrase>
 <phrase>
