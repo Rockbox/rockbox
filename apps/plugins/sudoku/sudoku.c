@@ -57,6 +57,7 @@ Example ".ss" file, and one with a saved state:
 */
 
 #include "plugin.h"
+#include "lib/configfile.h"
 #include "lib/oldmenuapi.h"
 
 #ifdef HAVE_LCD_BITMAP
@@ -170,6 +171,28 @@ static const char default_game[9][9] =
 #endif
 
 #endif /* Layout */
+
+#define CFGFILE_VERSION 0     /* Current config file version */
+#define CFGFILE_MINVERSION 0  /* Minimum config file version to accept */
+
+#ifdef HAVE_LCD_COLOR
+/* settings */
+struct sudoku_config {
+    int number_display;
+};
+struct sudoku_config sudcfg_disk = { 0 };
+struct sudoku_config sudcfg;
+
+static const char cfg_filename[] =  "sudoku.cfg";
+static char *number_str[2] = { "black", "coloured" };
+
+struct configdata disk_config[] = {
+   { TYPE_ENUM, 0, 2, &sudcfg_disk.number_display, "numbers", number_str, NULL },
+};
+#define NUMBER_TYPE (sudcfg.number_display*CELL_WIDTH)
+#else
+#define NUMBER_TYPE 0
+#endif
 
 /* Size dependent build-time calculations */
 #ifdef SMALL_BOARD
@@ -767,20 +790,20 @@ void update_cell(struct sudoku_state_t* state, int r, int c)
     */
 
     if ((r==state->y) && (c==state->x)) {
-        rb->lcd_bitmap_part(sudoku_inverse,0,
+        rb->lcd_bitmap_part(sudoku_inverse,NUMBER_TYPE,
                             BITMAP_HEIGHT*(state->currentboard[r][c]-'0'),
                             BITMAP_STRIDE,
                             XOFS+cellxpos[c],YOFS+cellypos[r],CELL_WIDTH,
                             CELL_HEIGHT);
     } else {
         if (state->startboard[r][c]!='0') {
-            rb->lcd_bitmap_part(sudoku_start,0,
+            rb->lcd_bitmap_part(sudoku_start,NUMBER_TYPE,
                                 BITMAP_HEIGHT*(state->startboard[r][c]-'0'),
                                 BITMAP_STRIDE,
                                 XOFS+cellxpos[c],YOFS+cellypos[r],
                                 CELL_WIDTH,CELL_HEIGHT);
         } else {
-            rb->lcd_bitmap_part(sudoku_normal,0,
+            rb->lcd_bitmap_part(sudoku_normal,NUMBER_TYPE,
                                 BITMAP_HEIGHT*(state->currentboard[r][c]-'0'),
                                 BITMAP_STRIDE,
                                 XOFS+cellxpos[c],YOFS+cellypos[r],
@@ -862,9 +885,9 @@ void display_board(struct sudoku_state_t* state)
                           YOFSSCRATCHPAD+CELL_HEIGHT+1);
 #endif
         if ((r>0) && state->possiblevals[state->y][state->x]&(1<<(r)))
-            rb->lcd_bitmap_part(sudoku_normal,0,BITMAP_HEIGHT*r,BITMAP_STRIDE,
-                                XOFS+cellxpos[r-1],YOFSSCRATCHPAD+1,
-                                CELL_WIDTH,CELL_HEIGHT);
+            rb->lcd_bitmap_part(sudoku_normal,NUMBER_TYPE,BITMAP_HEIGHT*r,
+                                BITMAP_STRIDE,XOFS+cellxpos[r-1],
+                                YOFSSCRATCHPAD+1,CELL_WIDTH,CELL_HEIGHT);
     }
     rb->lcd_vline(XOFS+cellxpos[8]+CELL_WIDTH,YOFSSCRATCHPAD,
                   YOFSSCRATCHPAD+CELL_HEIGHT+1);
@@ -873,8 +896,8 @@ void display_board(struct sudoku_state_t* state)
                   YOFSSCRATCHPAD+CELL_HEIGHT+1);
 #endif
     if (state->possiblevals[state->y][state->x]&(1<<(r)))
-        rb->lcd_bitmap_part(sudoku_normal,0,BITMAP_HEIGHT*r,BITMAP_STRIDE,
-                            XOFS+cellxpos[8],YOFSSCRATCHPAD+1,
+        rb->lcd_bitmap_part(sudoku_normal,NUMBER_TYPE,BITMAP_HEIGHT*r,
+                            BITMAP_STRIDE,XOFS+cellxpos[8],YOFSSCRATCHPAD+1,
                             CELL_WIDTH,CELL_HEIGHT);
 #else /* Horizontal layout */
     rb->lcd_vline(XOFSSCRATCHPAD,YOFS,YOFS+BOARD_HEIGHT-1);
@@ -901,9 +924,9 @@ void display_board(struct sudoku_state_t* state)
                           YOFS+cellypos[r]-2);
 #endif
         if ((r>0) && state->possiblevals[state->y][state->x]&(1<<(r)))
-            rb->lcd_bitmap_part(sudoku_normal,0,BITMAP_HEIGHT*r,BITMAP_STRIDE,
-                                XOFSSCRATCHPAD+1,YOFS+cellypos[r-1],
-                                CELL_WIDTH,CELL_HEIGHT);
+            rb->lcd_bitmap_part(sudoku_normal,NUMBER_TYPE,BITMAP_HEIGHT*r,
+                                BITMAP_STRIDE,XOFSSCRATCHPAD+1,
+                                YOFS+cellypos[r-1],CELL_WIDTH,CELL_HEIGHT);
     }
     rb->lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
                   YOFS+cellypos[8]+CELL_HEIGHT);
@@ -912,8 +935,8 @@ void display_board(struct sudoku_state_t* state)
                   YOFS+cellypos[8]+CELL_HEIGHT+1);
 #endif
     if (state->possiblevals[state->y][state->x]&(1<<(r)))
-        rb->lcd_bitmap_part(sudoku_normal,0,BITMAP_HEIGHT*r,BITMAP_STRIDE,
-                            XOFSSCRATCHPAD+1,YOFS+cellypos[8],
+        rb->lcd_bitmap_part(sudoku_normal,NUMBER_TYPE,BITMAP_HEIGHT*r,
+                            BITMAP_STRIDE,XOFSSCRATCHPAD+1,YOFS+cellypos[8],
                             CELL_WIDTH,CELL_HEIGHT);
 #endif /* Layout */
 #endif /* SUDOKU_BUTTON_POSSIBLE */
@@ -928,7 +951,7 @@ void display_board(struct sudoku_state_t* state)
             */
             
             if ((r==state->y) && (c==state->x)) {
-                rb->lcd_bitmap_part(sudoku_inverse,0,
+                rb->lcd_bitmap_part(sudoku_inverse,NUMBER_TYPE,
                                     BITMAP_HEIGHT*(state->currentboard[r][c]-
                                                    '0'),
                                     BITMAP_STRIDE,
@@ -936,14 +959,14 @@ void display_board(struct sudoku_state_t* state)
                                     CELL_WIDTH,CELL_HEIGHT);
             } else {
                 if (state->startboard[r][c]!='0') {
-                    rb->lcd_bitmap_part(sudoku_start,0,
+                    rb->lcd_bitmap_part(sudoku_start,NUMBER_TYPE,
                                         BITMAP_HEIGHT*(state->startboard[r][c]-
                                                        '0'),
                                         BITMAP_STRIDE,
                                         XOFS+cellxpos[c],YOFS+cellypos[r],
                                         CELL_WIDTH,CELL_HEIGHT);
                 } else {
-                    rb->lcd_bitmap_part(sudoku_normal,0,
+                    rb->lcd_bitmap_part(sudoku_normal,NUMBER_TYPE,
                                         BITMAP_HEIGHT*
                                         (state->currentboard[r][c]-'0'),
                                         BITMAP_STRIDE,
@@ -992,20 +1015,50 @@ bool sudoku_generate(struct sudoku_state_t* state)
     return res;
 }
 
+#ifdef HAVE_LCD_COLOR
+static bool numdisplay_setting(void)
+{
+    static const struct opt_items names[] = {
+        {"Black",  -1},
+        {"Coloured",  -1},
+    };
+
+    return rb->set_option("Number Display", &sudcfg.number_display, INT, names,
+                          sizeof(names) / sizeof(names[0]), NULL);
+}
+#endif
+
+enum {
+    SM_AUDIO_PLAYBACK = 0,
+#ifdef HAVE_LCD_COLOR
+    SM_NUMBER_DISPLAY,
+#endif
+    SM_SAVE,
+    SM_RELOAD,
+    SM_CLEAR,
+    SM_SOLVE,
+    SM_GENERATE,
+    SM_NEW,
+    SM_QUIT,
+};
+
 bool sudoku_menu(struct sudoku_state_t* state)
 {
     int m;
     int result;
 
     static const struct menu_item items[] = {
-        { "Audio Playback", NULL },
-        { "Save", NULL },
-        { "Reload", NULL },
-        { "Clear", NULL },
-        { "Solve", NULL },
-        { "Generate", NULL },
-        { "New", NULL },
-        { "Quit", NULL },
+        [SM_AUDIO_PLAYBACK] = { "Audio Playback", NULL },
+#ifdef HAVE_LCD_COLOR
+        [SM_NUMBER_DISPLAY] = { "Number Display", NULL },
+#endif
+        [SM_SAVE]     = { "Save", NULL },
+        [SM_RELOAD]   = { "Reload", NULL },
+        [SM_CLEAR]    = { "Clear", NULL },
+        [SM_SOLVE]    = { "Solve", NULL },
+        [SM_GENERATE] = { "Generate", NULL },
+        [SM_NEW]      = { "New", NULL },
+        [SM_QUIT]     = { "Quit", NULL },
     };
     
     m = menu_init(rb,items, sizeof(items) / sizeof(*items),
@@ -1014,36 +1067,41 @@ bool sudoku_menu(struct sudoku_state_t* state)
     result=menu_show(m);
 
     switch (result) {
-        case 0: /* Audio playback */
+        case SM_AUDIO_PLAYBACK:
             playback_control(rb);
             break;
 
-        case 1: /* Save state */
+#ifdef HAVE_LCD_COLOR
+        case SM_NUMBER_DISPLAY:
+            numdisplay_setting();
+            break;
+#endif
+        case SM_SAVE:
             save_sudoku(state);
             break;
 
-        case 2: /* Restore state */
+        case SM_RELOAD:
             restore_state(state);
             break;
 
-        case 3: /* Clear all */
+        case SM_CLEAR:
             clear_board(state);
             break;
 
-        case 4: /* Solve */
+        case SM_SOLVE:
             sudoku_solve(state);
             break;
 
-        case 5: /* Generate Game */
+        case SM_GENERATE:
             sudoku_generate(state);
             break;
 
-        case 6: /* Create a new game manually */
+        case SM_NEW:
             clear_state(state);
             state->editmode=1;
             break;
 
-        case 7: /* Quit */
+        case SM_QUIT:
             save_sudoku(state);
             menu_exit(m);
             return true;
@@ -1126,12 +1184,21 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int button;
     int lastbutton = BUTTON_NONE;
     int res;
+    int rc = PLUGIN_OK;
     long ticks;
     struct sudoku_state_t state;
 
     /* plugin init */
     rb = api;
     /* end of plugin init */
+    
+#ifdef HAVE_LCD_COLOR
+    configfile_init(rb);
+    configfile_load(cfg_filename, disk_config,
+                    sizeof(disk_config) / sizeof(disk_config[0]),
+                    CFGFILE_MINVERSION);
+    rb->memcpy(&sudcfg, &sudcfg_disk, sizeof(sudcfg)); /* copy to running config */
+#endif
 
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
@@ -1173,7 +1240,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                     rb->button_clear_queue();
                 } else {
                     save_sudoku(&state);
-                    exit=1;
+                    exit=true;
                 }
                 break;
 #endif
@@ -1324,13 +1391,15 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                     if (state.editmode) {
                         res = sudoku_edit_menu(&state);
                         if (res == MENU_ATTACHED_USB) {
-                            return PLUGIN_USB_CONNECTED;
+                            rc = PLUGIN_USB_CONNECTED;
+                            exit = true;
                         } else if (res == 1) { /* Quit */
-                            return PLUGIN_OK;
+                            exit = true;
                         }
                     } else {
                         if (sudoku_menu(&state)) {
-                            return PLUGIN_USB_CONNECTED;
+                            rc = PLUGIN_USB_CONNECTED;
+                            exit = true;
                         }
                     }
                 }
@@ -1347,7 +1416,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             default:
                 if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
                     /* Quit if USB has been connected */
-                    return PLUGIN_USB_CONNECTED;
+                    rc = PLUGIN_USB_CONNECTED;
+                    exit = true;
                 }
                 break;
         }
@@ -1356,8 +1426,16 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
         display_board(&state);
     }
-
-    return PLUGIN_OK;
+#ifdef HAVE_LCD_COLOR
+    if (rb->memcmp(&sudcfg, &sudcfg_disk, sizeof(sudcfg))) /* save settings if changed */
+    {
+        rb->memcpy(&sudcfg_disk, &sudcfg, sizeof(sudcfg));
+        configfile_save(cfg_filename, disk_config,
+                        sizeof(disk_config) / sizeof(disk_config[0]),
+                        CFGFILE_VERSION);
+    }
+#endif
+    return rc;
 }
 
 #endif
