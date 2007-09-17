@@ -23,7 +23,8 @@
 #include <string.h>
 #include "usbstack/core.h"
 
-static int usb_descriptor_fillbuf(void* buf, unsigned buflen, struct usb_descriptor_header** src)
+static int usb_descriptor_fillbuf(void* buf, unsigned buflen,
+                                  struct usb_descriptor_header** src)
 {
     uint8_t* dest = buf;
 
@@ -45,7 +46,8 @@ static int usb_descriptor_fillbuf(void* buf, unsigned buflen, struct usb_descrip
     return dest - (uint8_t *)buf;
 }
 
-int usb_stack_configdesc(const struct usb_config_descriptor* config, void* buf, unsigned length, struct usb_descriptor_header** desc)
+int usb_stack_configdesc(const struct usb_config_descriptor* config, void* buf,
+                         unsigned length, struct usb_descriptor_header** desc)
 {
     struct usb_config_descriptor* cp = buf;
     int len;
@@ -58,7 +60,8 @@ int usb_stack_configdesc(const struct usb_config_descriptor* config, void* buf, 
     *cp = *config; 
 
     /* then interface/endpoint/class/vendor/... */
-    len = usb_descriptor_fillbuf(USB_DT_CONFIG_SIZE + (uint8_t*)buf, length - USB_DT_CONFIG_SIZE, desc);
+    len = usb_descriptor_fillbuf(USB_DT_CONFIG_SIZE + (uint8_t*)buf,
+                                 length - USB_DT_CONFIG_SIZE, desc);
 
     if (len < 0) {
         return len;

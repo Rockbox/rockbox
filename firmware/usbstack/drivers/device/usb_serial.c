@@ -209,7 +209,8 @@ int usb_serial_driver_bind(void* controler_ops)
     serial_debug_desc.bDebugInEndpoint = dev.in->ep_num;
     serial_debug_desc.bDebugOutEndpoint = dev.out->ep_num;
 
-    /* update hs descriptors as we asume that endpoints are the same for fs and hs */
+    /* update hs descriptors as we asume that endpoints
+       are the same for fs and hs */
     serial_hs_in_desc.bEndpointAddress = serial_fs_in_desc.bEndpointAddress;
     serial_hs_out_desc.bEndpointAddress = serial_fs_out_desc.bEndpointAddress;
 
@@ -242,13 +243,15 @@ int usb_serial_driver_request(struct usb_ctrlrequest* request)
             switch (request->wValue >> 8) {
             case USB_DT_DEVICE:
                 logf("usb serial: sending device desc");
-                ret = MIN(sizeof(struct usb_device_descriptor), request->wLength);
+                ret = MIN(sizeof(struct usb_device_descriptor),
+                          request->wLength);
                 res.buf = &serial_device_desc;
                 break;
 
             case USB_DT_DEVICE_QUALIFIER:
                 logf("usb serial: sending qualifier dec");
-                ret = MIN(sizeof(struct usb_qualifier_descriptor), request->wLength);
+                ret = MIN(sizeof(struct usb_qualifier_descriptor),
+                          request->wLength);
                 res.buf = &serial_qualifier_desc;
                 break;
 
@@ -256,7 +259,8 @@ int usb_serial_driver_request(struct usb_ctrlrequest* request)
             case USB_DT_CONFIG:
                 logf("usb serial: sending config desc");
 
-                ret = config_buf(buf, request->wValue >> 8, request->wValue & 0xff);
+                ret = config_buf(buf, request->wValue >> 8,
+                                 request->wValue & 0xff);
                 if (ret >= 0) {
                     logf("%d, vs %d", request->wLength, ret);
                     ret = MIN(request->wLength, (uint16_t)ret);
@@ -266,13 +270,15 @@ int usb_serial_driver_request(struct usb_ctrlrequest* request)
 
             case USB_DT_DEBUG:
                 logf("usb serial: sending debug desc");
-                ret = MIN(sizeof(struct usb_debug_descriptor), request->wLength);
+                ret = MIN(sizeof(struct usb_debug_descriptor),
+                          request->wLength);
                 res.buf = &serial_debug_desc;
                 break;
 
             case USB_DT_STRING:
                 logf("usb serial: sending string desc");
-                ret = usb_stack_get_string(strings, request->wValue & 0xff, buf);
+                ret = usb_stack_get_string(strings, request->wValue & 0xff,
+                                           buf);
                 ret = MIN(ret, request->wLength);
                 res.buf = buf;
                 break;
@@ -324,7 +330,8 @@ static int config_buf(uint8_t *buf, uint8_t type, unsigned index)
     /* TODO check index*/
     (void)index;
 
-    len = usb_stack_configdesc(&serial_bulk_config_desc, buf, BUFFER_SIZE, dev.descriptors);
+    len = usb_stack_configdesc(&serial_bulk_config_desc, buf, BUFFER_SIZE,
+                               dev.descriptors);
     if (len < 0) {
         return len;
     }

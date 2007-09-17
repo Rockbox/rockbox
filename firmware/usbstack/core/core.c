@@ -99,7 +99,8 @@ void usb_stack_start(void)
      * and if it has a device driver bind to it */
     logf("check for auto bind");
     if (usbcore.active_controller->type == DEVICE) {
-        if (usbcore.active_controller->device_driver == NULL && usbcore.device_driver != NULL) {
+        if (usbcore.active_controller->device_driver == NULL && 
+            usbcore.device_driver != NULL) {
             /* bind driver */
             logf("binding...");
             bind_device_driver(usbcore.device_driver);
@@ -130,7 +131,8 @@ void usb_stack_stop(void)
 void usb_stack_irq(void)
 {
     /* simply notify usb controller */
-    if (usbcore.active_controller != NULL && usbcore.active_controller->irq != NULL) {
+    if (usbcore.active_controller != NULL &&
+        usbcore.active_controller->irq != NULL) {
         usbcore.active_controller->irq();
     }
 }
@@ -190,7 +192,8 @@ int usb_controller_register(struct usb_controller* ctrl)
  * @param ctrl pointer to controller to unregister.
  * @return 0 on success else a defined error code. 
  */
-int usb_controller_unregister(struct usb_controller* ctrl) {
+int usb_controller_unregister(struct usb_controller* ctrl)
+{
 
     if (ctrl == NULL) {
         return EINVAL;
@@ -226,7 +229,8 @@ void usb_controller_select(int type)
     struct usb_controller* new = NULL;
 
     /* check if a controller of the wanted type is already loaded */
-    if (usbcore.active_controller != NULL && (int)usbcore.active_controller->type == type) {
+    if (usbcore.active_controller != NULL &&
+        (int)usbcore.active_controller->type == type) {
         logf("controller already set");
         return;
     }
@@ -263,7 +267,8 @@ void usb_controller_select(int type)
     usbcore.active_controller->init();
 }
 
-int usb_stack_get_mode(void) {
+int usb_stack_get_mode(void)
+{
     return usbcore.mode;
 }
 
@@ -296,8 +301,8 @@ int usb_device_driver_register(struct usb_device_driver* driver)
     return 0;
 }
 
-int usb_device_driver_bind(const char* name) {
-
+int usb_device_driver_bind(const char* name)
+{
     int i;
     struct usb_device_driver *tmp = NULL;
     struct usb_device_driver *driver = NULL;
@@ -340,8 +345,8 @@ int usb_device_driver_bind(const char* name) {
     return 0;
 }
 
-void usb_device_driver_unbind(void) {
-
+void usb_device_driver_unbind(void)
+{
     logf("usb_device_driver_unbind");
     if (usbcore.active_controller->device_driver != NULL) {
         usbcore.active_controller->device_driver->unbind();
@@ -351,8 +356,8 @@ void usb_device_driver_unbind(void) {
     usbcore.device_driver = NULL;
 }
 
-static void update_driver_names(unsigned char* result) {
-
+static void update_driver_names(unsigned char* result)
+{
     int i;
     int pos = 0;
     unsigned char terminator = ',';
@@ -376,8 +381,8 @@ static void update_driver_names(unsigned char* result) {
     }
 }
 
-static void bind_device_driver(struct usb_device_driver* driver) {
-
+static void bind_device_driver(struct usb_device_driver* driver)
+{
     int ret = 0;
 
     /* look if there is an old driver */

@@ -151,13 +151,15 @@ static int ep_matches(struct usb_ep* ep, struct usb_endpoint_descriptor* desc)
     switch (type) {
     case USB_ENDPOINT_XFER_INT:
         /* INT:  limit 64 bytes full speed, 1024 high speed */
-        if ((usbcore.active_controller->speed != USB_SPEED_HIGH) && (max > 64)) {
+        if ((usbcore.active_controller->speed != USB_SPEED_HIGH) && 
+            (max > 64)) {
             return 0;
         }
         /* FALLTHROUGH */
 
     case USB_ENDPOINT_XFER_ISOC:
-        if ((usbcore.active_controller->speed != USB_SPEED_HIGH) && (max > 1023)) {
+        if ((usbcore.active_controller->speed != USB_SPEED_HIGH) &&
+            (max > 1023)) {
             return 0;
         }
         break;

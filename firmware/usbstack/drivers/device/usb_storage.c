@@ -207,9 +207,12 @@ int usb_storage_driver_bind(void* controler_ops)
     /* update device decsriptor */
     storage_device_desc.bMaxPacketSize0 = ops->ep0->maxpacket;
 
-    /* update hs descriptors as we asume that endpoints are the same for fs and hs */
-    storage_hs_bulk_in_desc.bEndpointAddress = storage_fs_bulk_in_desc.bEndpointAddress;
-    storage_hs_bulk_out_desc.bEndpointAddress = storage_fs_bulk_out_desc.bEndpointAddress;
+    /* update hs descriptors as we asume that endpoints
+       are the same for fs and hs */
+    storage_hs_bulk_in_desc.bEndpointAddress = 
+                                       storage_fs_bulk_in_desc.bEndpointAddress;
+    storage_hs_bulk_out_desc.bEndpointAddress =
+                                      storage_fs_bulk_out_desc.bEndpointAddress;
 
     return 0;
 
@@ -218,7 +221,8 @@ autoconf_fail:
     return -EOPNOTSUPP;
 }
 
-void usb_storage_driver_unbind(void) {
+void usb_storage_driver_unbind(void)
+{
 
     /* disable endpoints... */
 }
@@ -240,13 +244,15 @@ int usb_storage_driver_request(struct usb_ctrlrequest* request)
             switch (request->wValue >> 8) {
             case USB_DT_DEVICE:
                 logf("usb storage: sending device desc");
-                ret = MIN(sizeof(struct usb_device_descriptor), request->wLength);
+                ret = MIN(sizeof(struct usb_device_descriptor),
+                          request->wLength);
                 res.buf = &storage_device_desc;
                 break;
 
             case USB_DT_DEVICE_QUALIFIER:
                 logf("usb storage: sending qualifier dec");
-                ret = MIN(sizeof(struct usb_qualifier_descriptor), request->wLength);
+                ret = MIN(sizeof(struct usb_qualifier_descriptor),
+                          request->wLength);
                 res.buf = &storage_qualifier_desc;
                 break;
 
@@ -254,7 +260,8 @@ int usb_storage_driver_request(struct usb_ctrlrequest* request)
             case USB_DT_CONFIG:
                 logf("usb storage: sending config desc");
 
-                ret = config_buf(buf, request->wValue >> 8, request->wValue & 0xff);
+                ret = config_buf(buf, request->wValue >> 8,
+                                 request->wValue & 0xff);
                 if (ret >= 0) {
                     logf("%d, vs %d", request->wLength, ret);
                     ret = MIN(request->wLength, (uint16_t)ret);
@@ -264,7 +271,8 @@ int usb_storage_driver_request(struct usb_ctrlrequest* request)
 
             case USB_DT_STRING:
                 logf("usb storage: sending string desc");
-                ret = usb_stack_get_string(strings, request->wValue & 0xff, buf);
+                ret = usb_stack_get_string(strings, request->wValue & 0xff,
+                                           buf);
                 ret = MIN(ret, request->wLength);
                 res.buf = buf;
                 break;
@@ -336,7 +344,8 @@ static int config_buf(uint8_t *buf, uint8_t type, unsigned index)
 
     (void)index;
 
-    len = usb_stack_configdesc(&storage_config_desc, buf, BUFFER_SIZE, dev.descriptors);
+    len = usb_stack_configdesc(&storage_config_desc, buf, BUFFER_SIZE,
+                               dev.descriptors);
     logf("result %d", len);
     if (len < 0) {
         return len;
