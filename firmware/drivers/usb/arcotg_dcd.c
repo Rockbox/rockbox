@@ -523,29 +523,11 @@ int usb_arcotg_dcd_enable(struct usb_ep* ep,
     max = desc->wMaxPacketSize;
     retval = -EINVAL;
 
-    /* check the max package size validate for this endpoint */
-    /* Refer to USB2.0 spec table 9-13. */
+    /* check the max package size validate for this endpoint
+     * Refer to USB2.0 spec table 9-13, */
     switch (desc->bmAttributes & 0x03) {
     case USB_ENDPOINT_XFER_BULK:
-        zlt = 1;
-        break;
-
-    case USB_ENDPOINT_XFER_INT:
-        zlt = 1;
-    break;
-
-    case USB_ENDPOINT_XFER_ISOC:
-        break;
-
-    case USB_ENDPOINT_XFER_CONTROL:
-        zlt = 1;
-        break;
-    }
-
-#if 0
-    switch (ep->desc->bmAttributes & 0x03) {
-    case USB_ENDPOINT_XFER_BULK:
-        if (strstr(ep->ep.name, "-iso") || strstr(ep->ep.name, "-int")) {
+        if (strstr(ep->name, "-iso") || strstr(ep->name, "-int")) {
             goto en_done;
         }
         mult = 0;
@@ -565,85 +547,98 @@ int usb_arcotg_dcd_enable(struct usb_ep* ep,
             case 64:
                 break;
             default:
-    +            case USB_SPEED_LOW:
-    +                goto en_done;
-    +            }
-    +        }
-    +        break;
-    +    case USB_ENDPOINT_XFER_INT:
-    +        if (strstr(ep->ep.name, "-iso"))    /* bulk is ok */
-    +            goto en_done;
-    +        mult = 0;
-    +        zlt = 1;
-    +        switch (udc->gadget.speed) {
-    +        case USB_SPEED_HIGH:
-    +            if (max <= 1024)
-    +                break;
-    +        case USB_SPEED_FULL:
-    +            if (max <= 64)
-    +                break;
-    +        default:
-    +            if (max <= 8)
-    +                break;
-    +            goto en_done;
-    +        }
-    +        break;
-    +    case USB_ENDPOINT_XFER_ISOC:
-    +        if (strstr(ep->ep.name, "-bulk") || strstr(ep->ep.name, "-int"))
-    +            goto en_done;
-    +        mult = (unsigned char)
-    +            (1 + ((le16_to_cpu(desc->wMaxPacketSize) >> 11) & 0x03));
-    +        zlt = 0;
-    +        switch (udc->gadget.speed) {
-    +        case USB_SPEED_HIGH:
-    +            if (max <= 1024)
-    +                break;
-    +        case USB_SPEED_FULL:
-    +            if (max <= 1023)
-    +                break;
-    +        default:
-    +            goto en_done;
-    +        }
-    +        break;
-    +    case USB_ENDPOINT_XFER_CONTROL:
-    +        if (strstr(ep->ep.name, "-iso") || strstr(ep->ep.name, "-int"))
-    +            goto en_done;
-    +        mult = 0;
-    +        zlt = 1;
-    +        switch (udc->gadget.speed) {
-    +        case USB_SPEED_HIGH:
-    +        case USB_SPEED_FULL:
-    +            switch (max) {
-    +            case 1:
-    +            case 2:
-    +            case 4:
-    +            case 8:
-    +            case 16:
-    +            case 32:
-    +            case 64:
-    +                break;
-    +            default:
-    +                goto en_done;
-    +            }
-    +        case USB_SPEED_LOW:
-    +            switch (max) {
-    +            case 1:
-    +            case 2:
-    +            case 4:
-    +            case 8:
-    +                break;
-    +            default:
-    +                goto en_done;
-    +            }
-    +        default:
-    +            goto en_done;
-    +        }
-    +        break;
-    +
-    +    default:
-    +        goto en_done;
-    +    }
-#endif
+            case USB_SPEED_LOW:
+                goto en_done;
+            }
+        }
+        break;
+
+    case USB_ENDPOINT_XFER_INT:
+        if (strstr(ep->name, "-iso")) { /* bulk is ok */
+            goto en_done;
+        }
+        mult = 0;
+        zlt = 1;
+
+        switch (arcotg_dcd.speed) {
+        case USB_SPEED_HIGH:
+            if (max <= 1024) {
+                break;
+            }
+        case USB_SPEED_FULL:
+            if (max <= 64) {
+                break;
+            }
+        default:
+            if (max <= 8) {
+                break;
+            }
+            goto en_done;
+        }
+        break;
+
+    case USB_ENDPOINT_XFER_ISOC:
+        if (strstr(ep->name, "-bulk") || strstr(ep->name, "-int")) {
+            goto en_done;
+        }
+        mult = (unsigned char) (1 +((desc->wMaxPacketSize >> 11) & 0x03));
+        zlt = 0;
+
+        switch (arcotg_dcd.speed) {
+        case USB_SPEED_HIGH:
+            if (max <= 1024) {
+                break;
+            }
+        case USB_SPEED_FULL:
+            if (max <= 1023) {
+                break;
+            }
+        default:
+            goto en_done;
+        }
+        break;
+
+        case USB_ENDPOINT_XFER_CONTROL:
+        if (strstr(ep->name, "-iso")	|| strstr(ep->name, "-int")) {
+            goto en_done;
+        }
+        mult = 0;
+        zlt = 1;
+
+        switch (arcotg_dcd.speed) {
+        case USB_SPEED_HIGH:
+        case USB_SPEED_FULL:
+            switch (max) {
+            case 1:
+            case 2:
+            case 4:
+            case 8:
+            case 16:
+            case 32:
+            case 64:
+                break;
+            default:
+                goto en_done;
+            }
+        case USB_SPEED_LOW:
+            switch (max) {
+            case 1:
+            case 2:
+            case 4:
+            case 8:
+                break;
+            default:
+                goto en_done;
+            }
+        default:
+            goto en_done;
+        }
+        break;
+
+    default:
+        goto en_done;
+    }
+
 
     /* here initialize variable of ep */
     ep->maxpacket = max;
@@ -690,6 +685,7 @@ int usb_arcotg_dcd_enable(struct usb_ep* ep,
         (desc->bEndpointAddress & USB_DIR_IN) ? "in" : "out", val);
     logf(" maxpacket %d", max);
 
+en_done:
     return retval;
 }
 
