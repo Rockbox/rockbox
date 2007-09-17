@@ -53,7 +53,7 @@ unsigned char buffer[BUFFER_SIZE] IBSS_ATTR;
 /* description of our device driver operations */
 struct usb_dcd_controller_ops arotg_dcd_ops = {
     .enable          = usb_arcotg_dcd_enable,
-    .disable         = NULL,
+    .disable         = usb_arcotg_dcd_disable,
     .set_halt        = usb_arcotg_dcd_set_halt,
     .send            = usb_arcotg_dcd_send,
     .receive         = usb_arcotg_dcd_receive,
@@ -691,6 +691,19 @@ int usb_arcotg_dcd_enable(struct usb_ep* ep,
     logf(" maxpacket %d", max);
 
     return retval;
+}
+
+int usb_arcotg_dcd_disable(struct usb_ep* ep)
+{
+    if (ep == NULL || ep->desc == NULL) {
+        logf("failed to disabled %s",  ep ? ep->name : NULL);
+        return -EINVAL;
+    }
+
+    ep->desc = NULL;
+
+    logf("disabled %s", ep->name);
+    return 0;
 }
 
 int usb_arcotg_dcd_set_halt(struct usb_ep* ep, bool halt)
