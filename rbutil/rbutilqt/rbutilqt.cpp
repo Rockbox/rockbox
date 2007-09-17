@@ -953,7 +953,7 @@ bool RbUtilQt::chkConfig(bool warn)
         error = true;
 
         if(warn) QMessageBox::critical(this, tr("Configuration error"),
-            tr("You configuration is invalid. Please go to the configuration "
+            tr("Your configuration is invalid. Please go to the configuration "
                 "dialog and make sure the selected values are correct."));
     }
     return error;
