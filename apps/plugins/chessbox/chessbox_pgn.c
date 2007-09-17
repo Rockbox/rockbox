@@ -808,7 +808,7 @@ struct pgn_game_node* pgn_show_game_list(struct plugin_api* api,
         rb->gui_synclist_draw(&games_list);
         curr_selection = rb->gui_synclist_get_sel_pos(&games_list);
         button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
-        if (rb->gui_synclist_do_button(&games_list,button,LIST_WRAP_OFF)){
+        if (rb->gui_synclist_do_button(&games_list,&button,LIST_WRAP_OFF)){
             continue;
         }
         switch (button) {

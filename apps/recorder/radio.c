@@ -1266,7 +1266,7 @@ static int handle_radio_presets(void)
         gui_syncstatusbar_draw(&statusbars, true);
         action = get_action(CONTEXT_STD, HZ);
 
-        gui_synclist_do_button(&lists, action, LIST_WRAP_UNLESS_HELD);
+        gui_synclist_do_button(&lists, &action, LIST_WRAP_UNLESS_HELD);
         switch (action)
         {
             case ACTION_STD_MENU:

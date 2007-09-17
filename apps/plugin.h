@@ -112,12 +112,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 73
+#define PLUGIN_API_VERSION 74
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 73
+#define PLUGIN_MIN_API_VERSION 74
 
 /* plugin return codes */
 enum plugin_status {
@@ -280,8 +280,8 @@ struct plugin_api {
     void (*gui_synclist_del_item)(struct gui_synclist * lists);
     void (*gui_synclist_limit_scroll)(struct gui_synclist * lists, bool scroll);
     void (*gui_synclist_flash)(struct gui_synclist * lists);
-    unsigned (*gui_synclist_do_button)(struct gui_synclist * lists,
-                                         unsigned button,enum list_wrap wrap);
+    bool (*gui_synclist_do_button)(struct gui_synclist * lists,
+                                         unsigned *action, enum list_wrap wrap);
     void (*gui_synclist_set_title)(struct gui_synclist *lists, char* title, int icon);
 
     /* button */

@@ -552,7 +552,7 @@ static int dirbrowse()
     int numentries=0;
     char buf[MAX_PATH];
     int lasti = -1;
-    unsigned button, returned_button;
+    unsigned button, oldbutton;
     bool reload_root = false;
     int lastfilter = *tc.dirfilter;
     bool lastsortcase = global_settings.sort_case;
@@ -605,12 +605,8 @@ static int dirbrowse()
         }
 #endif
         button = get_action(CONTEXT_TREE,HZ/5);
-        returned_button = gui_synclist_do_button(&tree_lists, button,LIST_WRAP_UNLESS_HELD);
-        if (returned_button)
-            need_update = true;
-        if (returned_button == ACTION_STD_CANCEL)
-            button = ACTION_STD_CANCEL;
-
+        oldbutton = button;
+        need_update = gui_synclist_do_button(&tree_lists, &button,LIST_WRAP_UNLESS_HELD);
         tc.selected_item = gui_synclist_get_sel_pos(&tree_lists);
         switch ( button ) {
             case ACTION_STD_OK:
@@ -640,9 +636,11 @@ static int dirbrowse()
                 if ((*tc.dirfilter == SHOW_ID3DB && tc.dirlevel == 0) ||
                     ((*tc.dirfilter != SHOW_ID3DB && !strcmp(currdir,"/"))))
                 {
-                    if (returned_button == ACTION_STD_CANCEL)
+#ifdef HAVE_LCD_BITMAP /* charcell doesnt have ACTION_TREE_PGLEFT so this isnt needed */
+                    if (oldbutton == ACTION_TREE_PGLEFT)
                         break;
                     else
+#endif
                         return GO_TO_ROOT;
                 }
                 

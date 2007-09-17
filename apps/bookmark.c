@@ -659,7 +659,7 @@ static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resu
         }
 
         action = get_action(CONTEXT_BOOKMARKSCREEN, HZ / 2);
-        gui_synclist_do_button(&list, action, LIST_WRAP_UNLESS_HELD);
+        gui_synclist_do_button(&list, &action, LIST_WRAP_UNLESS_HELD);
         item = gui_synclist_get_sel_pos(&list) / 2;
 
         if (bookmarks->show_dont_resume)

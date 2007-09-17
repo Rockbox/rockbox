@@ -162,7 +162,7 @@ static bool dbg_list(struct action_callback_info *info)
     {
         gui_syncstatusbar_draw(&statusbars, true);
         action = get_action(CONTEXT_STD, HZ/5); 
-        if (gui_synclist_do_button(&lists, action, LIST_WRAP_UNLESS_HELD))
+        if (gui_synclist_do_button(&lists, &action, LIST_WRAP_UNLESS_HELD))
             continue;
         if (info->action_callback)
             action = info->action_callback(action, info);

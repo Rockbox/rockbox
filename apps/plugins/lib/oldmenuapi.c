@@ -107,7 +107,7 @@ int menu_show(int m)
          */
         if( menus[m].callback != NULL )
             key = menus[m].callback(key, m);
-        rb->gui_synclist_do_button(&(menus[m].synclist), key,LIST_WRAP_UNLESS_HELD);
+        rb->gui_synclist_do_button(&(menus[m].synclist), &key,LIST_WRAP_UNLESS_HELD);
         switch( key ) {
             case ACTION_STD_OK:
                 return rb->gui_synclist_get_sel_pos(&(menus[m].synclist));

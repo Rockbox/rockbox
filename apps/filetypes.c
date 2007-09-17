@@ -476,7 +476,7 @@ int filetype_list_viewers(const char* current_file)
         gui_syncstatusbar_draw(&statusbars, true);
         action = get_action(CONTEXT_MAINMENU,HZ);
         if ((action == ACTION_NONE) ||
-            gui_synclist_do_button(&lists, action, LIST_WRAP_UNLESS_HELD))
+            gui_synclist_do_button(&lists, &action, LIST_WRAP_UNLESS_HELD))
             continue;
         else if (action == ACTION_STD_OK)
         {

@@ -318,7 +318,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
     while(!quit)
     {
         button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
-        if (rb->gui_synclist_do_button(&properties_lists,button,LIST_WRAP_ON))
+        if (rb->gui_synclist_do_button(&properties_lists,&button,LIST_WRAP_ON))
             continue;
         switch(button)
         {

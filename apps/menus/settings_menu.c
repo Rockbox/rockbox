@@ -491,7 +491,7 @@ int usbdriver_menuitem(void)
     {
         gui_syncstatusbar_draw(&statusbars, true);
         action = get_action(CONTEXT_STD, HZ/5); 
-        if (gui_synclist_do_button(&lists, action, LIST_WRAP_UNLESS_HELD))
+        if (gui_synclist_do_button(&lists, &action, LIST_WRAP_UNLESS_HELD))
             continue;
         if (action == ACTION_STD_CANCEL)
         {

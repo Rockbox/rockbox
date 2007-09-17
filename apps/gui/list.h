@@ -218,16 +218,11 @@ extern void gui_synclist_hide_selection_marker(struct gui_synclist *lists,
                                                 bool hide);
 /*
  * Do the action implied by the given button,
- * returns the action taken if any, 0 else
- *  - lists : the synchronized lists
- *  - button : the keycode of a pressed button
- *  - specifies weather to allow the list to wrap or not, values at top of page
- * returned value :
- *  - ACTION_STD_NEXT when moving forward (next item or pgup)
- *  - ACTION_STD_PREV when moving backward (previous item or pgdown)
+ * returns true if the action was handled.
+ * NOTE: *action may be changed regardless of return value
  */
-extern unsigned gui_synclist_do_button(struct gui_synclist * lists,
-                                       unsigned button,
+extern bool gui_synclist_do_button(struct gui_synclist * lists,
+                                       unsigned *action,
                                        enum list_wrap);
 
 #endif /* _GUI_LIST_H_ */

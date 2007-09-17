@@ -345,7 +345,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
             }
         }
 
-        if (gui_synclist_do_button(&lists,action,LIST_WRAP_UNLESS_HELD))
+        if (gui_synclist_do_button(&lists, &action, LIST_WRAP_UNLESS_HELD))
         {
             talk_menu_item(menu, &lists);
             continue;

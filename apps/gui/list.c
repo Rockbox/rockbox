@@ -889,9 +889,10 @@ static void gui_synclist_scroll_left(struct gui_synclist * lists)
 
 extern intptr_t get_action_data(void);
 
-unsigned gui_synclist_do_button(struct gui_synclist * lists,
-                                unsigned button,enum list_wrap wrap)
+bool gui_synclist_do_button(struct gui_synclist * lists,
+                            unsigned *actionptr, enum list_wrap wrap)
 {
+    int action = *actionptr;
 #ifdef HAVE_LCD_BITMAP
     static bool scrolling_left = false;
 #endif
@@ -937,16 +938,16 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists,
             gui_synclist_limit_scroll(lists, true);
         break;
         case LIST_WRAP_UNLESS_HELD:
-            if (button == ACTION_STD_PREVREPEAT ||
-                button == ACTION_STD_NEXTREPEAT ||
-                button == ACTION_LISTTREE_PGUP  ||
-                button == ACTION_LISTTREE_PGDOWN)
+            if (action == ACTION_STD_PREVREPEAT ||
+                action == ACTION_STD_NEXTREPEAT ||
+                action == ACTION_LISTTREE_PGUP  ||
+                action == ACTION_LISTTREE_PGDOWN)
                 gui_synclist_limit_scroll(lists, true);
             else gui_synclist_limit_scroll(lists, false);
         break;
     };
 
-    switch(button)
+    switch (action)
     {
 #ifdef HAVE_VOLUME_IN_LIST
         case ACTION_LIST_VOLUP:
@@ -955,7 +956,7 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists,
         case ACTION_LIST_VOLDOWN:
             global_settings.volume--;
             setvol();
-            return button;
+            return true;
 #endif
         case ACTION_STD_PREV:
         case ACTION_STD_PREVREPEAT:
@@ -968,7 +969,8 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists,
                 gui_synclist_draw(lists);
             }
             yield();
-            return ACTION_STD_PREV;
+            *actionptr = ACTION_STD_PREV;
+            return true;
 
         case ACTION_STD_NEXT:
         case ACTION_STD_NEXTREPEAT:
@@ -981,13 +983,14 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists,
                 gui_synclist_draw(lists);
             }
             yield();
-            return ACTION_STD_NEXT;
+            *actionptr = ACTION_STD_NEXT;
+            return true;
 
 #ifdef HAVE_LCD_BITMAP
         case ACTION_TREE_PGRIGHT:
             gui_synclist_scroll_right(lists);
             gui_synclist_draw(lists);
-            return ACTION_TREE_PGRIGHT;
+            return true;
         case ACTION_TREE_ROOT_INIT:
          /* After this button press ACTION_TREE_PGLEFT is allowed
             to skip to root. ACTION_TREE_ROOT_INIT must be defined in the
@@ -997,16 +1000,21 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists,
             if (lists->gui_list[0].offset_position == 0)
             {
                 scrolling_left = false;
-                return ACTION_STD_CANCEL;
+                *actionptr = ACTION_STD_CANCEL;
+                return true;
             }
+            *actionptr = ACTION_TREE_PGLEFT;
         case ACTION_TREE_PGLEFT:
             if(!scrolling_left && (lists->gui_list[0].offset_position == 0))
-                return ACTION_STD_CANCEL;
+            {
+                *actionptr = ACTION_STD_CANCEL;
+                return false;
+            }
             gui_synclist_scroll_left(lists);
             gui_synclist_draw(lists);
             scrolling_left = true; /* stop ACTION_TREE_PAGE_LEFT
                                       skipping to root */
-            return ACTION_TREE_PGLEFT;
+            return true;
 #endif
 
 /* for pgup / pgdown, we are obliged to have a different behaviour depending
@@ -1023,8 +1031,9 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists,
             gui_synclist_select_previous_page(lists, screen);
             gui_synclist_draw(lists);
             yield();
+            *actionptr = ACTION_STD_NEXT;
         }
-        return ACTION_STD_NEXT;
+        return true;
 
         case ACTION_LISTTREE_PGDOWN:
         {
@@ -1037,8 +1046,9 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists,
             gui_synclist_select_next_page(lists, screen);
             gui_synclist_draw(lists);
             yield();
+            *actionptr = ACTION_STD_PREV;
         }
-        return ACTION_STD_PREV;
+        return true;
     }
-    return 0;
+    return false;
 }

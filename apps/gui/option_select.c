@@ -381,7 +381,7 @@ bool option_screen(struct settings_list *setting,
         action = get_action(CONTEXT_LIST, TIMEOUT_BLOCK);
         if (action == ACTION_NONE)
             continue;
-        if (gui_synclist_do_button(&lists,action,
+        if (gui_synclist_do_button(&lists, &action,
             allow_wrap? LIST_WRAP_UNLESS_HELD: LIST_WRAP_OFF))
         {
             selected = gui_synclist_get_sel_pos(&lists);

@@ -1282,7 +1282,7 @@ bool browse_id3(void)
         gui_syncstatusbar_draw(&statusbars, false);
         key = get_action(CONTEXT_LIST,HZ/2);
         if(key!=ACTION_NONE && key!=ACTION_UNKNOWN
-        && !gui_synclist_do_button(&id3_lists, key,LIST_WRAP_UNLESS_HELD))
+        && !gui_synclist_do_button(&id3_lists, &key,LIST_WRAP_UNLESS_HELD))
         {
             return(default_event_handler(key) == SYS_USB_CONNECTED);
         }
@@ -1342,7 +1342,7 @@ bool view_runtime(void)
         gui_synclist_draw(&lists);
         gui_syncstatusbar_draw(&statusbars, true);
         action = get_action(CONTEXT_STD, HZ);
-        gui_synclist_do_button(&lists, action, LIST_WRAP_UNLESS_HELD);
+        gui_synclist_do_button(&lists, &action, LIST_WRAP_UNLESS_HELD);
         if(action == ACTION_STD_CANCEL)
             break;
         if(action == ACTION_STD_OK) {

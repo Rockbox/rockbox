@@ -59,7 +59,7 @@ enum sc_list_action_type draw_sc_list(struct gui_synclist gui_sc)
         rb->gui_syncstatusbar_draw(rb->statusbars, true);
         /* user input */
         button = rb->get_action(CONTEXT_LIST, TIMEOUT_BLOCK);
-        if (rb->gui_synclist_do_button(&gui_sc, button,
+        if (rb->gui_synclist_do_button(&gui_sc, &button,
                                             LIST_WRAP_UNLESS_HELD)) {
             /* automatic handling of user input.
             * _UNLESS_HELD can be _ON or _OFF also
