@@ -1,19 +1,19 @@
 % $Id$ %
 \subsection{JPEG viewer}
-Open a JPEG file in the \setting{File Browser} to view it
-\opt{recorder,recorderv2fm,ondio,h1xx,ipod4g,ipod3g,ipodmini}{ using Rockbox's 
+Open a JPEG file in the \setting{File Browser} to view it%
+\nopt{HAVE_LCD_COLOR}{ using Rockbox's 
 greyscale library}.
 \opt{SWCODEC}{
-\note{When an audio file is playing the size of the image is limited as 
-the decoding process needs to share memory with audio tracks. To be able to
-view a bigger file you may need to stop playback.}
+  \note{When an audio file is playing the size of the image is limited as 
+  the decoding process needs to share memory with audio tracks. To be able to
+  view a bigger file you may need to stop playback.}
 }
 \opt{MASCODEC}{
 \note{This plugin will cause playback to stop.}
 }
 \begin{table}
 \begin{btnmap}{}{}
-    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD}
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,GIGABEAT_PAD}
         {\ButtonUp\ / \ButtonDown}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu\ / \ButtonPlay}
     \opt{IRIVER_H10_PAD}{\ButtonScrollUp\ / \ButtonScrollDown}
@@ -24,6 +24,7 @@ view a bigger file you may need to stop playback.}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD}{\ButtonSelect}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd}
     \opt{IRIVER_H10_PAD}{\ButtonPlay}
+    \opt{GIGABEAT_PAD}{\ButtonVolUp}
     & Zoom in\\
     \opt{RECORDER_PAD}{\ButtonOn}
     \opt{ONDIO_PAD}{\ButtonMenu+\ButtonDown}
@@ -31,6 +32,7 @@ view a bigger file you may need to stop playback.}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollBack}
     \opt{IAUDIO_X5_PAD,SANSA_E200_PAD}{Long \ButtonSelect}
     \opt{IRIVER_H10_PAD}{Long \ButtonPlay}
+    \opt{GIGABEAT_PAD}{\ButtonVolDown}
     & Zoom out\\
     \opt{RECORDER_PAD}{\ButtonFThree}
     \opt{ONDIO_PAD}{\ButtonMenu+\ButtonRight}
@@ -40,6 +42,7 @@ view a bigger file you may need to stop playback.}
     \opt{IAUDIO_X5_PAD}{\ButtonPlay}
     \opt{IRIVER_H10_PAD}{\ButtonFF}
     \opt{SANSA_E200_PAD}{\ButtonScrollDown}
+    \opt{GIGABEAT_PAD}{\ButtonA+\ButtonRight}
     & Next jpeg in folder\\
     \opt{RECORDER_PAD}{\ButtonFTwo}
     \opt{ONDIO_PAD}{\ButtonMenu+\ButtonLeft}
@@ -48,11 +51,13 @@ view a bigger file you may need to stop playback.}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonLeft}
     \opt{IRIVER_H10_PAD}{\ButtonRew}
     \opt{SANSA_E200_PAD}{\ButtonScrollUp}
+    \opt{GIGABEAT_PAD}{\ButtonA+\ButtonLeft}
     & Previous jpeg in folder\\
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonMenu}
     \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPower}
     \opt{SANSA_E200_PAD}{\ButtonRec}
+    \opt{GIGABEAT_PAD}{\ButtonMenu}
     & Show menu\\
 \end{btnmap}
 \end{table}
