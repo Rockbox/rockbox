@@ -51,18 +51,20 @@ typedef void screen_bitmap_part_func(const void *src, int src_x, int src_y,
 typedef void screen_bitmap_func(const void *src, int x, int y, int width,
                               int height);
 
+/* if this struct is changed the plugin api may break so bump the api
+   versions in plugin.h */
 struct screen
 {
-    int width, height;
-    int nb_lines;
     enum screen_type screen_type;
+    int width, height;
     int depth;
-    bool is_color;
+    int nb_lines;
 #ifdef HAVE_LCD_BITMAP
     int pixel_format;
 #endif
     int char_width;
     int char_height;
+    bool is_color;
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
     bool has_disk_led;
 #endif
@@ -72,7 +74,6 @@ struct screen
     void (*setmargins)(int x, int y);
     int (*getxmargin)(void);
     int (*getymargin)(void);
-
     int (*getstringsize)(const unsigned char *str, int *w, int *h);
 #if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD) /* always bitmap */
     void (*setfont)(int newfont);
@@ -124,7 +125,6 @@ struct screen
     void (*define_pattern)(unsigned long ucs, const char *pattern);
     void (*unlock_pattern)(unsigned long ucs);
 #endif
-    void (*init)(void);
     void (*putsxy)(int x, int y, const unsigned char *str);
     void (*puts)(int x, int y, const unsigned char *str);
     void (*puts_offset)(int x, int y, const unsigned char *str, int offset);
@@ -141,13 +141,6 @@ struct screen
     bool (*is_backlight_on)(void);
     void (*backlight_set_timeout)(int index);
 };
-
-/*
- * Initializes the given screen structure for a given display
- * - screen : the screen structure
- * - display_type : currently 2 possibles values : MAIN or REMOTE
- */
-extern void screen_init(struct screen * screen, enum screen_type screen_type);
 
 #ifdef HAS_BUTTONBAR
 /*
