@@ -7,39 +7,32 @@
  *                     \/            \/     \/    \/            \/
  * $Id: $
  *
- * Copyright (C) 2007 by Christian Gmeiner
+ * Copyright (C) 1991, 1992  Linus Torvalds
+ * (from linux/lib/string.c)
  *
  ****************************************************************************/
 
 #include <string.h>
 
 /**
- * Locate substring.
- * @param search c string to be scanned.
- * @param find c string containing the sequence of characters to match.
- * @return a pointer to the first occurrence in search of any of the 
- *         entire sequence of characters specified in find, or a
- *         null pointer if the sequence is not present in search.
+ * strstr - Find the first substring in a %NUL terminated string
+ * @s1: The string to be searched
+ * @s2: The string to search for
  */
-char *strstr(const char *search, const char *find)
+char *strstr(const char *s1, const char *s2)
 {
-    char *hend;
-    char *a, *b;
+    int l1, l2;
 
-    if (*find == 0) return (char*)search;
-    hend = (char *)search + strlen(search) - strlen(find) + 1;
-    while (search < hend) {
-        if (*search == *find) {
-            a = (char *)search;
-            b = (char *)find;
-            for (;;) {
-                if (*b == 0) return (char*)search;
-                if (*a++ != *b++) {
-                    break;
-                }
-            }
-        }
-        search++;
+    l2 = strlen(s2);
+    if (!l2)
+        return (char *)s1;
+    l1 = strlen(s1);
+    while (l1 >= l2) {
+        l1--;
+        if (!memcmp(s1, s2, l2))
+            return (char *)s1;
+        s1++;
     }
-    return 0;
+    return NULL;
 }
+
