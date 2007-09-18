@@ -22,6 +22,7 @@
 #include "system.h"
 #include "button.h"
 #include "backlight.h"
+#include "powermgmt.h"
 
 #define WHEEL_REPEAT_INTERVAL   300000
 #define WHEEL_FAST_ON_INTERVAL   20000
@@ -196,6 +197,7 @@ void clickwheel_int(void)
                 next_backlight_on = current_tick + HZ/4;
                 backlight_on();
                 button_backlight_on();
+                reset_poweroff_timer();
             }
 
             if (btn != BUTTON_NONE)
