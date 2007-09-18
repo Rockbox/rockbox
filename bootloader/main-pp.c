@@ -130,6 +130,7 @@ struct tea_key tea_keytable[] = {
   { "20gc_fre",          { 0xbede8817, 0xb23bfe4f, 0x80aa682d, 0xd13f598c } },
   { "elio_p722",         { 0x6af3b9f8, 0x777483f5, 0xae8181cc, 0xfa6d8a84 } },
   { "c200",              { 0xbf2d06fa, 0xf0e23d59, 0x29738132, 0xe2d04ca7 } },
+  { "c200_103",          { 0x2a7968de, 0x15127979, 0x142e60a7, 0xe49c1893 } },
   { "c200_106",          { 0xa913d139, 0xf842f398, 0x3e03f1a6, 0x060ee012 } },
 };
 
