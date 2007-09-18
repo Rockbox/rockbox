@@ -29,7 +29,7 @@
 #include "ipodpatcher.h"
 #include "ipodio.h"
 
-#define VERSION "1.1-svn"
+#define VERSION "2.0 with v2.0 bootloaders"
 
 int verbose = 0;
 
