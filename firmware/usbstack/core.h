@@ -27,26 +27,6 @@
 
 #include "usbstack.h"
 
-/*
- * stack datatypes
- */
-struct usb_response {
-    void* buf;
-    uint32_t length;
-};
-
-struct usb_ep {
-    const char name[15];
-    uint8_t type;
-    uint32_t ep_num;    /* which endpoint? */
-    uint32_t pipe_num;  /* which pipe? */
-    uint32_t maxpacket;
-    bool claimed;
-
-    struct usb_endpoint_descriptor *desc;
-    struct list_head list;
-};
-
 #include "usbstack/controller.h"
 #include "usbstack/device.h"
 #include "usbstack/host.h"

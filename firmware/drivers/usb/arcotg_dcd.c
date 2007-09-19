@@ -116,7 +116,7 @@ timer_expired(struct timer * timer)
 /*-------------------------------------------------------------------------*/
 
 /* gets called by usb_stack_init() to register 
- * this arcotg device conrtollder driver in the 
+ * this arcotg device controller driver in the 
  * stack. */
 void usb_dcd_init(void)
 {
@@ -415,7 +415,7 @@ static void port_change_int(void)
 static void dtd_complete(void) {
 
     uint32_t bit_pos;
-    int i, ep_num, direction, bit_mask, status;
+    int i, ep_num, direction, bit_mask /*, status*/;
 
     /* clear the bits in the register */
     bit_pos = UDC_ENDPTCOMPLETE;

@@ -17,8 +17,9 @@
  *
  ****************************************************************************/
 
-#include "usb_serial.h"
 #include <string.h>
+#include "usb_serial.h"
+#include "usbstack/utils.h"
 
 static struct usb_dcd_controller_ops* ops;
 
