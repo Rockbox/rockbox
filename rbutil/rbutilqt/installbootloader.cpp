@@ -887,7 +887,8 @@ void BootloaderInstaller::sansaPrepare()
 
     if(m_install)         // Installation
     {
-        QString url = m_bootloaderUrlBase + "/sandisk-sansa/e200/" + m_bootloadername;
+        QString url = m_bootloaderUrlBase + "/sandisk-sansa/"
+                + QString(sansa.targetname) + "/" + m_bootloadername;
 
         m_dp->addItem(tr("Downloading file %1.%2")
           .arg(QFileInfo(url).baseName(), QFileInfo(url).completeSuffix()),LOGINFO);
