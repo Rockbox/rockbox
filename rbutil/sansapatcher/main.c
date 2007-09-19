@@ -73,7 +73,7 @@ void print_usage(void)
     fprintf(stderr,"DISKNO is the number (e.g. 2) Windows has assigned to your sansa's hard disk.\n");
     fprintf(stderr,"The first hard disk in your computer (i.e. C:\\) will be disk 0, the next disk\n");
     fprintf(stderr,"will be disk 1 etc.  sansapatcher will refuse to access a disk unless it\n");
-    fprintf(stderr,"can identify it as being an E200.\n");
+    fprintf(stderr,"can identify it as being an E200 or C200.\n");
     fprintf(stderr,"\n");
 #else
 #if defined(linux) || defined (__linux)
@@ -84,7 +84,7 @@ void print_usage(void)
     fprintf(stderr,"\"device\" is the device node (e.g. /dev/disk1) assigned to your sansa.\n");
 #endif
     fprintf(stderr,"sansapatcher will refuse to access a disk unless it can identify it as being\n");
-    fprintf(stderr,"an E200.\n");
+    fprintf(stderr,"an E200 or C200.\n");
 #endif
 }
 
@@ -154,7 +154,7 @@ int main(int argc, char* argv[])
 
     if ((argc > 1) && (strcmp(argv[1],"--scan")==0)) {
         if (sansa_scan(&sansa) == 0)
-            fprintf(stderr,"[ERR]  No E200s found.\n");
+            fprintf(stderr,"[ERR]  No E200s or C200s found.\n");
         return 0;
     }
 
@@ -168,13 +168,13 @@ int main(int argc, char* argv[])
 #endif
         i = 2;
     } else {
-        /* Autoscan for E200s */
+        /* Autoscan for C200/E200s */
         n = sansa_scan(&sansa);
         if (n==0) {
-            fprintf(stderr,"[ERR]  No E200s found, aborting\n");
+            fprintf(stderr,"[ERR]  No E200s or C200s found, aborting\n");
             fprintf(stderr,"[ERR]  Please connect your sansa and ensure it is in UMS mode\n");
 #if defined(__APPLE__) && defined(__MACH__)
-            fprintf(stderr,"[ERR]  Also ensure that your E200's main partition is not mounted.\n");
+            fprintf(stderr,"[ERR]  Also ensure that your Sansa's main partition is not mounted.\n");
 #elif !defined(__WIN32__)
             if (geteuid()!=0) {
                 fprintf(stderr,"[ERR]  You may also need to run sansapatcher as root.\n");
@@ -182,8 +182,8 @@ int main(int argc, char* argv[])
 #endif
             fprintf(stderr,"[ERR]  Please refer to the Rockbox manual if you continue to have problems.\n");
         } else if (n > 1) {
-            fprintf(stderr,"[ERR]  %d E200s found, aborting\n",n);
-            fprintf(stderr,"[ERR]  Please connect only one E200 and re-run sansapatcher.\n");
+            fprintf(stderr,"[ERR]  %d Sansas found, aborting\n",n);
+            fprintf(stderr,"[ERR]  Please connect only one Sansa and re-run sansapatcher.\n");
         }
 
         if (n != 1) {
@@ -253,11 +253,13 @@ int main(int argc, char* argv[])
 
     display_partinfo(&sansa);
 
-    i = is_e200(&sansa);
+    i = is_sansa(&sansa);
     if (i < 0) {
-        fprintf(stderr,"[ERR]  Disk is not an E200 (%d), aborting.\n",i);
+        fprintf(stderr,"[ERR]  Disk is not an E200 or C200 (%d), aborting.\n",i);
         return 3;
     }
+
+    fprintf(stderr,"[INFO] Sansa %s detected\n",sansa.targetname);
 
     if (sansa.hasoldbootloader) {
         printf("[ERR]  ************************************************************************\n");

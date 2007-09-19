@@ -59,6 +59,7 @@ struct sansa_t {
     int sector_size;
     struct sansa_partinfo_t pinfo[4];
     int hasoldbootloader;
+    char* targetname; /* "e200" or "c200" */
     loff_t start;  /* Offset in bytes of firmware partition from start of disk */
 };
 

@@ -30,7 +30,8 @@
 #include "sansapatcher.h"
 
 #ifndef RBUTIL
-    #include "bootimg.h"
+    #include "bootimg_c200.h"
+    #include "bootimg_e200.h"
 #endif
 /* The offset of the MI4 image header in the firmware partition */
 #define PPMI_OFFSET 0x80000
@@ -121,6 +122,60 @@ int sansa_read_partinfo(struct sansa_t* sansa, int silent)
     return 0;
 }
 
+/* NOTE: memmem implementation copied from glibc-2.2.4 - it's a GNU
+   extension and is not universally.  In addition, early versions of
+   memmem had a serious bug - the meaning of needle and haystack were
+   reversed. */
+
+/* Copyright (C) 1991,92,93,94,96,97,98,2000 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, write to the Free
+   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+   02111-1307 USA.  */
+
+/* Return the first occurrence of NEEDLE in HAYSTACK.  */
+static void *
+sansa_memmem (haystack, haystack_len, needle, needle_len)
+     const void *haystack;
+     size_t haystack_len;
+     const void *needle;
+     size_t needle_len;
+{
+  const char *begin;
+  const char *const last_possible
+    = (const char *) haystack + haystack_len - needle_len;
+
+  if (needle_len == 0)
+    /* The first occurrence of the empty string is deemed to occur at
+       the beginning of the string.  */
+    return (void *) haystack;
+
+  /* Sanity check, otherwise the loop might search through the whole
+     memory.  */
+  if (__builtin_expect (haystack_len < needle_len, 0))
+    return NULL;
+
+  for (begin = (const char *) haystack; begin <= last_possible; ++begin)
+    if (begin[0] == ((const char *) needle)[0] &&
+	!memcmp ((const void *) &begin[1],
+		 (const void *) ((const char *) needle + 1),
+		 needle_len - 1))
+      return (void *) begin;
+
+  return NULL;
+}
 
 /*
  * CRC32 implementation taken from:
@@ -191,7 +246,7 @@ static void chksum_crc32gentab (void)
 }
 
 /* Known keys for Sansa E200 and C200 firmwares: */
-#define NUM_KEYS (sizeof(keys)/sizeof(keys[0]))
+#define NUM_KEYS ((int)(sizeof(keys)/sizeof(keys[0])))
 static uint32_t keys[][4] = {
     { 0xe494e96e, 0x3ee32966, 0x6f48512b, 0xa93fbb42 }, /* "sansa" */
     { 0xd7b10538, 0xc662945b, 0x1b3fce68, 0xf389c0e6 }, /* "sansa_gh" */
@@ -328,10 +383,11 @@ static int sansa_seek_and_read(struct sansa_t* sansa, loff_t pos, unsigned char*
    5) The "PPMI" string appears at offset PPMI_OFFSET in the 2nd partition.
 */
 
-int is_e200(struct sansa_t* sansa)
+int is_sansa(struct sansa_t* sansa)
 {
     struct mi4header_t mi4header;
     int ppmi_length;
+    int ppbl_length;
 
     /* Check partition layout */
 
@@ -354,10 +410,31 @@ int is_e200(struct sansa_t* sansa)
         /* No bootloader header, abort */
         return -4;
     }
+    ppbl_length = (le2int(sectorbuf+4) + 0x1ff) & ~0x1ff;
 
+    /* Sanity/safety check - the bootloader can't be larger than PPMI_OFFSET */
+    if (ppbl_length > PPMI_OFFSET)
+    {
+        return -5;
+    }
+
+    /* Load Sansa bootloader and check for "Sansa C200" magic string */
+    if (sansa_seek_and_read(sansa, sansa->start + 0x200, sectorbuf, ppbl_length) < 0) {
+        fprintf(stderr,"[ERR]  Seek and read to 0x%08llx in is_sansa failed.\n",
+                       sansa->start+0x200);
+        return -6;
+    }
+    if (sansa_memmem(sectorbuf, ppbl_length, "Sansa C200", 10) != NULL) {
+        /* C200 */
+        sansa->targetname="c200";
+    } else {
+        /* E200 */
+        sansa->targetname="e200";
+    }
+    
     /* Check Main firmware header */
     if (sansa_seek_and_read(sansa, sansa->start+PPMI_OFFSET, sectorbuf, 0x200) < 0) {
-        fprintf(stderr,"[ERR]  Seek to 0x%08llx in is_e200 failed.\n",
+        fprintf(stderr,"[ERR]  Seek to 0x%08llx in is_sansa failed.\n",
                        sansa->start+PPMI_OFFSET);
         return -5;
     }
@@ -369,7 +446,7 @@ int is_e200(struct sansa_t* sansa)
 
     /* Check main mi4 file header */
     if (sansa_seek_and_read(sansa, sansa->start+PPMI_OFFSET+0x200, sectorbuf, 0x200) < 0) {
-        fprintf(stderr,"[ERR]  Seek to 0x%08llx in is_e200 failed.\n",
+        fprintf(stderr,"[ERR]  Seek to 0x%08llx in is_sansa failed.\n",
                        sansa->start+PPMI_OFFSET+0x200);
         return -5;
     }
@@ -435,7 +512,7 @@ int sansa_scan(struct sansa_t* sansa)
              continue;
          }
 
-         if (is_e200(sansa) < 0) {
+         if (is_sansa(sansa) < 0) {
              continue;
          }
 
@@ -602,7 +679,11 @@ int sansa_add_bootloader(struct sansa_t* sansa, char* filename, int type)
         bl_length = filesize(infile);
     } else {
         #ifndef RBUTIL
-        bl_length = LEN_bootimg;
+        if (strcmp(sansa->targetname,"c200") == 0) {
+            bl_length = LEN_bootimg_c200;
+        } else {
+            bl_length = LEN_bootimg_e200;
+        }
         #endif
     }
 
@@ -629,7 +710,11 @@ int sansa_add_bootloader(struct sansa_t* sansa, char* filename, int type)
         }
     } else {
         #ifndef RBUTIL
-        memcpy(sectorbuf+0x200,bootimg,LEN_bootimg);
+        if (strcmp(sansa->targetname,"c200") == 0) {
+            memcpy(sectorbuf+0x200,bootimg_c200,LEN_bootimg_c200);
+        } else {
+            memcpy(sectorbuf+0x200,bootimg_e200,LEN_bootimg_e200);
+        }
         #endif
     }
 
