@@ -166,7 +166,16 @@ cpu:
     mov    r3, #WAKE
     str    r3, [r4]
 
-    mov    pc, r0
+#ifdef SANSA_C200
+    /* Magic for loading the c200 OF */
+    ldr    r0, =0xb00d10ad
+    mov    r1, #0x700
+    ldr    r2, =0xfff0
+    mov    r3, #0x7
+#endif
+
+    ldr    r4, =startup_loc
+    ldr    pc, [r4]
 
 startup_loc:
     .word    0x0
