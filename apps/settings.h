@@ -525,8 +525,6 @@ struct user_settings
 
     bool   line_in;       /* false=off, true=active */
 
-    bool id3_v1_first;    /* true = ID3V1 has prio over ID3V2 tag */
-
     /* playlist viewer settings */
     bool playlist_viewer_icons; /* display icons on viewer */
     bool playlist_viewer_indices; /* display playlist indices on viewer */

@@ -573,7 +573,7 @@ struct plugin_api {
 #endif
     struct user_settings* global_settings;
     struct system_status *global_status;
-    bool (*mp3info)(struct mp3entry *entry, const char *filename, bool v1first);
+    bool (*mp3info)(struct mp3entry *entry, const char *filename);
     int (*count_mp3_frames)(int fd, int startpos, int filesize,
                             void (*progressfunc)(int));
     int (*create_xing_header)(int fd, long startpos, long filesize,
@@ -620,8 +620,7 @@ struct plugin_api {
 
     int (*codec_load_file)(const char* codec, struct codec_api *api);
     const char *(*get_codec_filename)(int cod_spec);
-    bool (*get_metadata)(struct mp3entry* id3, int fd, const char* trackname,
-                         bool v1first);
+    bool (*get_metadata)(struct mp3entry* id3, int fd, const char* trackname);
 #endif
     void (*led)(bool on);
 };

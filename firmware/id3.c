@@ -1164,10 +1164,8 @@ static int getsonglength(int fd, struct mp3entry *entry)
  * about an MP3 file and updates it's entry accordingly.
  *
   Note, that this returns true for successful, false for error! */
-bool get_mp3_metadata(int fd, struct mp3entry *entry, const char *filename, bool v1first)
+bool get_mp3_metadata(int fd, struct mp3entry *entry, const char *filename)
 {
-    int v1found = false;
-
 #if CONFIG_CODEC != SWCODEC
     memset(entry, 0, sizeof(struct mp3entry));
 #endif
@@ -1180,10 +1178,7 @@ bool get_mp3_metadata(int fd, struct mp3entry *entry, const char *filename, bool
     entry->tracknum = 0;
     entry->discnum = 0;
 
-    if(v1first)
-        v1found = setid3v1title(fd, entry);
-
-    if (!v1found && entry->id3v2len)
+    if (entry->id3v2len)
         setid3v2title(fd, entry);
     int len = getsonglength(fd, entry);
     if (len < 0)
@@ -1194,9 +1189,8 @@ bool get_mp3_metadata(int fd, struct mp3entry *entry, const char *filename, bool
        the true size of the MP3 stream */
     entry->filesize -= entry->first_frame_offset;
 
-    /* only seek to end of file if no id3v2 tags were found,
-       and we already haven't looked for a v1 tag */
-    if (!v1first && !entry->id3v2len) {
+    /* only seek to end of file if no id3v2 tags were found */
+    if (!entry->id3v2len) {
         setid3v1title(fd, entry);
     }
 
@@ -1209,7 +1203,7 @@ bool get_mp3_metadata(int fd, struct mp3entry *entry, const char *filename, bool
 }
 
 /* Note, that this returns false for successful, true for error! */
-bool mp3info(struct mp3entry *entry, const char *filename, bool v1first)
+bool mp3info(struct mp3entry *entry, const char *filename)
 {
     int fd;
     bool result;
@@ -1218,7 +1212,7 @@ bool mp3info(struct mp3entry *entry, const char *filename, bool v1first)
     if (fd < 0)
         return true;
 
-    result = !get_mp3_metadata(fd, entry, filename, v1first);
+    result = !get_mp3_metadata(fd, entry, filename);
 
     close(fd);
 

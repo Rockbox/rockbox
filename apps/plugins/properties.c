@@ -100,9 +100,9 @@ static bool file_properties(char* selected_file)
 #if (CONFIG_CODEC == SWCODEC)
                 int fd = rb->open(selected_file, O_RDONLY);
                 if (fd >= 0 &&
-                    rb->get_metadata(&id3, fd, selected_file, false))
+                    rb->get_metadata(&id3, fd, selected_file))
 #else
-                if (!rb->mp3info(&id3, selected_file, false))
+                if (!rb->mp3info(&id3, selected_file))
 #endif
                 {
                     rb->snprintf(str_artist, sizeof str_artist,

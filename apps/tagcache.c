@@ -1660,7 +1660,7 @@ static void add_tagcache(char *path)
     memset(&track, 0, sizeof(struct track_info));
     memset(&entry, 0, sizeof(struct temp_file_entry));
     memset(&tracknumfix, 0, sizeof(tracknumfix));
-    ret = get_metadata(&(track.id3), fd, path, false);
+    ret = get_metadata(&(track.id3), fd, path);
     close(fd);
 
     if (!ret)

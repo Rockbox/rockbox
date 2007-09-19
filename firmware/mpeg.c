@@ -127,8 +127,6 @@ static bool (*cuesheet_callback)(const char *filename) = NULL;
 static const char mpeg_thread_name[] = "mpeg";
 static unsigned int mpeg_errno;
 
-static bool v1first = false;
-
 static bool playing = false;    /* We are playing an MP3 stream */
 static bool is_playing = false; /* We are (attempting to) playing MP3 files */
 static bool paused;             /* playback is paused */
@@ -922,7 +920,7 @@ static struct trackdata *add_track_to_tag_list(const char *filename)
     
     /* grab id3 tag of new file and
        remember where in memory it starts */
-    if(mp3info(&track->id3, filename, v1first))
+    if(mp3info(&track->id3, filename))
     {
         DEBUGF("Bad mp3\n");
         return NULL;
@@ -2098,11 +2096,6 @@ static void mpeg_thread(void)
 }
 #endif /* !SIMULATOR */
 
-void mpeg_id3_options(bool _v1first)
-{
-   v1first = _v1first;
-}
-
 struct mp3entry* audio_current_track()
 {
 #ifdef SIMULATOR
@@ -2707,7 +2700,7 @@ void audio_play(long offset)
         trackname = playlist_peek( steps );
         if (!trackname)
             break;
-        if(mp3info(&taginfo, trackname, v1first)) {
+        if(mp3info(&taginfo, trackname)) {
             /* bad mp3, move on */
             if(++steps > playlist_amount())
                 break;
@@ -2793,7 +2786,7 @@ void audio_next(void)
         file = playlist_peek(steps);
         if(!file)
             break;
-        if(mp3info(&taginfo, file, v1first)) {
+        if(mp3info(&taginfo, file)) {
             if(++steps > playlist_amount())
                 break;
             continue;
@@ -2822,7 +2815,7 @@ void audio_prev(void)
         file = playlist_peek(steps);
         if(!file)
             break;
-        if(mp3info(&taginfo, file, v1first)) {
+        if(mp3info(&taginfo, file)) {
             steps--;
             continue;
         }

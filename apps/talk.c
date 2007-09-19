@@ -652,7 +652,7 @@ int talk_file(const char* filename, bool enqueue)
     if (p_thumbnail == NULL || size_for_thumbnail <= 0)
         return -1;
 
-    if(mp3info(&info, filename, false)) /* use this to find real start */
+    if(mp3info(&info, filename)) /* use this to find real start */
     {   
         return 0; /* failed to open, or invalid */
     }

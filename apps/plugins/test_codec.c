@@ -537,8 +537,7 @@ static enum plugin_status test_track(char* filename)
     /* Clear the id3 struct */
     rb->memset(&track.id3, 0, sizeof(struct mp3entry));
 
-    if (!rb->get_metadata(&(track.id3), fd, filename,
-		      rb->global_settings->id3_v1_first))
+    if (!rb->get_metadata(&(track.id3), fd, filename))
     {
         log_text("Cannot read metadata",true);
         return PLUGIN_ERROR;

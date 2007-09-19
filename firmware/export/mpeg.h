@@ -55,7 +55,6 @@ unsigned long mpeg_get_last_header(void);
 /* in order to keep the recording here, I have to expose this */
 void rec_tick(void);
 void playback_tick(void); /* FixMe: get rid of this, use mp3_get_playtime() */
-void mpeg_id3_options(bool _v1first);
 
 void audio_set_track_changed_event(void (*handler)(struct mp3entry *id3));
 void audio_set_track_buffer_event(void (*handler)(struct mp3entry *id3,

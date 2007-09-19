@@ -722,8 +722,6 @@ void settings_apply(void)
 #if (CONFIG_CODEC == MAS3507D) && !defined(SIMULATOR)
     dac_line_in(global_settings.line_in);
 #endif
-    mpeg_id3_options(global_settings.id3_v1_first);
-
     set_poweroff_timeout(global_settings.poweroff);
 
     set_battery_capacity(global_settings.battery_capacity);

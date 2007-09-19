@@ -757,9 +757,6 @@ const struct settings_list settings[] = {
         "sort dirs", "alpha,oldest,newest", NULL, 3,
         ID2P(LANG_SORT_ALPHA), ID2P(LANG_SORT_DATE),
         ID2P(LANG_SORT_DATE_REVERSE)),
-    BOOL_SETTING(0, id3_v1_first, LANG_ID3_ORDER, false,
-        "id3 tag priority", "v2-v1,v1-v2",
-        LANG_ID3_V1_FIRST, LANG_ID3_V2_FIRST, mpeg_id3_options),
 
 #ifdef HAVE_RECORDING
     /* recording */

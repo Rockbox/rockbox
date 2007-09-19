@@ -143,7 +143,7 @@ static bool vbr_fix(char *selected_file)
 
     xingupdate(0);
 
-    rc = rb->mp3info(&entry, selected_file, false);
+    rc = rb->mp3info(&entry, selected_file);
     if(rc < 0) {
         fileerror(rc);
         return true;

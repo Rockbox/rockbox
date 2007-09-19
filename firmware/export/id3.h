@@ -235,8 +235,8 @@ enum {
     ID3_VER_2_4
 };
 
-bool get_mp3_metadata(int fd, struct mp3entry *entry, const char *filename, bool v1first);
-bool mp3info(struct mp3entry *entry, const char *filename, bool v1first);
+bool get_mp3_metadata(int fd, struct mp3entry *entry, const char *filename);
+bool mp3info(struct mp3entry *entry, const char *filename);
 char* id3_get_num_genre(const unsigned int genre_num);
 char* id3_get_codec(const struct mp3entry* id3);
 int getid3v2len(int fd);

@@ -263,7 +263,6 @@ static size_t conf_watermark = 0; /* Level to trigger filebuf fill (A/C) FIXME *
 static size_t conf_filechunk = 0; /* Largest chunk the codec accepts (A/C) FIXME */
 static size_t conf_preseek   = 0; /* Codec pre-seek margin (A/C) FIXME */
 static size_t buffer_margin  = 0; /* Buffer margin aka anti-skip buffer (A/C-) */
-static bool v1first = false;      /* ID3 data control, true if V1 then V2 (A) */
 #if MEM > 8
 static size_t high_watermark = 0; /* High watermark for rebuffer (A/V/other) */
 #endif
@@ -393,11 +392,6 @@ void mp3_play_pause(bool play)
 bool mp3_is_playing(void)
 {
     return voice_is_playing;
-}
-
-void mpeg_id3_options(bool _v1first)
-{
-    v1first = _v1first;
 }
 
 /* If voice could be swapped out - wait for it to return
@@ -2744,7 +2738,7 @@ static bool audio_load_track(int offset, bool start_play, bool rebuffer)
     /* Get track metadata if we don't already have it. */
     if (!tracks[track_widx].taginfo_ready) 
     {
-        if (get_metadata(&(tracks[track_widx].id3),current_fd,trackname,v1first))
+        if (get_metadata(&(tracks[track_widx].id3),current_fd,trackname))
         {
             tracks[track_widx].taginfo_ready = true;
             if (start_play) 
@@ -2886,7 +2880,7 @@ static bool audio_read_next_metadata(void)
     if (fd < 0)
         return false;
 
-    status = get_metadata(&(tracks[next_idx].id3),fd,trackname,v1first);
+    status = get_metadata(&(tracks[next_idx].id3),fd,trackname);
     /* Preload the glyphs in the tags */
     if (status) 
     {

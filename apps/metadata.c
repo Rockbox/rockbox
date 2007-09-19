@@ -93,8 +93,7 @@ unsigned int probe_file_format(const char *filename)
 /* Get metadata for track - return false if parsing showed problems with the
  * file that would prevent playback.
  */
-bool get_metadata(struct mp3entry* id3, int fd, const char* trackname,
-                  bool v1first) 
+bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
 {
 #if CONFIG_CODEC == SWCODEC
     unsigned char* buf;
@@ -111,7 +110,7 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname,
     case AFMT_MPA_L1:
     case AFMT_MPA_L2:
     case AFMT_MPA_L3:
-        if (!get_mp3_metadata(fd, id3, trackname, v1first))
+        if (!get_mp3_metadata(fd, id3, trackname))
         {
             return false;
         }
