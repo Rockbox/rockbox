@@ -517,9 +517,9 @@ int sansa_scan(struct sansa_t* sansa)
          }
 
 #ifdef __WIN32__
-         printf("[INFO] E200 found - disk device %d\n",i);
+         printf("[INFO] %s found - disk device %d\n",sansa->targetname, i);
 #else
-         printf("[INFO] E200 found - %s\n",sansa->diskname);
+         printf("[INFO] %s found - %s\n",sansa->targetname, sansa->diskname);
 #endif
          n++;
          strcpy(last_disk,sansa->diskname);

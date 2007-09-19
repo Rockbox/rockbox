@@ -30,7 +30,7 @@
 #include "sansaio.h"
 #include "parttypes.h"
 
-#define VERSION "0.3 with v2 bootloader"
+#define VERSION "0.4-svn"
 
 unsigned char* sectorbuf;
 
@@ -258,8 +258,6 @@ int main(int argc, char* argv[])
         fprintf(stderr,"[ERR]  Disk is not an E200 or C200 (%d), aborting.\n",i);
         return 3;
     }
-
-    fprintf(stderr,"[INFO] Sansa %s detected\n",sansa.targetname);
 
     if (sansa.hasoldbootloader) {
         printf("[ERR]  ************************************************************************\n");
