@@ -133,8 +133,8 @@ bool Autodetection::detect()
     struct sansa_t sansa;
     n = sansa_scan(&sansa);
     if(n == 1) {
-        qDebug() << "Sansa found:" << "sansae200" << "at" << sansa.diskname;
-        m_device = "sansae200";
+        qDebug() << "Sansa found:" << sansa.targetname << "at" << sansa.diskname;
+        m_device = QString("sansa%1").arg(sansa.targetname);
         m_mountpoint = resolveMountPoint(sansa.diskname);
         return true;
     }

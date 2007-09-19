@@ -923,9 +923,9 @@ void BootloaderInstaller::sansaPrepare()
             return;
         }
 
-        int i = is_e200(&sansa);
+        int i = is_sansa(&sansa);
         if (i < 0) {
-            m_dp->addItem(tr("Disk is not an E200 (%1), aborting.").arg(i),LOGERROR);
+            m_dp->addItem(tr("Disk is not a Sansa (%1), aborting.").arg(i),LOGERROR);
             emit done(true);
             return;
         }
@@ -988,10 +988,10 @@ void BootloaderInstaller::sansaFinish()
     }
 
 
-    int i = is_e200(&sansa);
+    int i = is_sansa(&sansa);
     if (i < 0) {
 
-        m_dp->addItem(tr("Disk is not an E200 (%1), aborting.").arg(i),LOGERROR);
+        m_dp->addItem(tr("Disk is not a Sansa (%1), aborting.").arg(i),LOGERROR);
         emit done(true);
         return;
     }
