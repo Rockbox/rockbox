@@ -335,7 +335,10 @@ int is_e200(struct sansa_t* sansa)
 
     /* Check partition layout */
 
-    if (((sansa->pinfo[0].type != 0x0b) && (sansa->pinfo[0].type != 0x0c)) || 
+    if (((sansa->pinfo[0].type != 0x06) &&
+         (sansa->pinfo[0].type != 0x0b) &&
+         (sansa->pinfo[0].type != 0x0c) &&
+         (sansa->pinfo[0].type != 0x0e)) ||
         (sansa->pinfo[1].type != 0x84) ||
         (sansa->pinfo[2].type != 0x00) || 
         (sansa->pinfo[3].type != 0x00)) {
