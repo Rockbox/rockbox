@@ -5286,7 +5286,7 @@
     *: none
     radio_screen_button_bar: ""
   </voice>
-</phrase>-->
+</phrase>
 <phrase>
   id: LANG_PRESET
   desc: in button bar and radio screen / menu

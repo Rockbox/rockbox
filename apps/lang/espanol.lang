@@ -5072,7 +5072,7 @@
   desc: spoken only, for spelling
   user:
   <source>
-?   *: ""
+    *: ""
   </source>
   <dest>
     *: ""
