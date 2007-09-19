@@ -201,11 +201,11 @@ static const struct button_mapping button_context_settings_right_is_inc[]  = {
 }; /* button_context_settings_right_is_inc */
 
 static const struct button_mapping button_context_settings_time[] = {
-    { ACTION_STD_PREV,          BUTTON_UP|BUTTON_REL,           BUTTON_NONE },
-    { ACTION_STD_PREVREPEAT,    BUTTON_UP|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_STD_PREV,          BUTTON_LEFT|BUTTON_REL,           BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT,    BUTTON_LEFT|BUTTON_REPEAT,        BUTTON_NONE },
     
-    { ACTION_STD_NEXT,          BUTTON_DOWN|BUTTON_REL,         BUTTON_NONE },
-    { ACTION_STD_NEXTREPEAT,    BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_STD_NEXT,          BUTTON_RIGHT|BUTTON_REL,         BUTTON_NONE },
+    { ACTION_STD_NEXTREPEAT,    BUTTON_RIGHT|BUTTON_REPEAT,      BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
 }; /* button_context_settings_time */
