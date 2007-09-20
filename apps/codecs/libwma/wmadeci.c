@@ -28,6 +28,7 @@
 #include "wmadec.h"
 #include "wmafixed.h"
 #include "bitstream.h"
+#include "mdct.h"
 
 
 #define VLCBITS 7       /*7 is the lowest without glitching*/
@@ -39,71 +40,6 @@
 #define HGAINVLCBITS 9
 #define HGAINMAX ((13+HGAINVLCBITS-1)/HGAINVLCBITS)
 
-
-#ifdef CPU_ARM
-static inline
-void CMUL(fixed32 *x, fixed32 *y,
-          fixed32  a, fixed32  b,
-          fixed32  t, fixed32  v)
-{
-    /* This version loses one bit of precision. Could be solved at the cost
-     * of 2 extra cycles if it becomes an issue. */
-    int x1, y1, l;
-    asm(
-        "smull    %[l], %[y1], %[b], %[t] \n"
-        "smlal    %[l], %[y1], %[a], %[v] \n"
-        "rsb      %[b], %[b], #0          \n"
-        "smull    %[l], %[x1], %[a], %[t] \n"
-        "smlal    %[l], %[x1], %[b], %[v] \n"
-        : [l] "=&r" (l), [x1]"=&r" (x1), [y1]"=&r" (y1), [b] "+r" (b)
-        : [a] "r" (a),   [t] "r" (t),    [v] "r" (v)
-        : "cc"
-    );
-    *x = x1 << 1;
-    *y = y1 << 1;
-}
-#elif defined CPU_COLDFIRE
-static inline
-void CMUL(fixed32 *x, fixed32 *y,
-          fixed32  a, fixed32  b,
-          fixed32  t, fixed32  v)
-{
-  asm volatile ("mac.l %[a], %[t], %%acc0;"
-                "msac.l %[b], %[v], %%acc0;"
-                "mac.l %[b], %[t], %%acc1;"
-                "mac.l %[a], %[v], %%acc1;"
-                "movclr.l %%acc0, %[a];"
-                "move.l %[a], (%[x]);"
-                "movclr.l %%acc1, %[a];"
-                "move.l %[a], (%[y]);"
-                : [a] "+&r" (a)
-                : [x] "a" (x), [y] "a" (y),
-                  [b] "r" (b), [t] "r" (t), [v] "r" (v)
-                : "cc", "memory");
-}
-#else
-// PJJ : reinstate macro
-void CMUL(fixed32 *pre,
-          fixed32 *pim,
-          fixed32 are,
-          fixed32 aim,
-          fixed32 bre,
-          fixed32 bim)
-{
-    //int64_t x,y;
-    fixed32 _aref = are;
-    fixed32 _aimf = aim;
-    fixed32 _bref = bre;
-    fixed32 _bimf = bim;
-    fixed32 _r1 = fixmul32b(_bref, _aref);
-    fixed32 _r2 = fixmul32b(_bimf, _aimf);
-    fixed32 _r3 = fixmul32b(_bref, _aimf);
-    fixed32 _r4 = fixmul32b(_bimf, _aref);
-    *pre = _r1 - _r2;
-    *pim = _r3 + _r4;
-
-}
-#endif
 
 typedef struct CoefVLCTable
 {
@@ -120,13 +56,6 @@ fixed32 coefsarray[MAX_CHANNELS][BLOCK_MAX_SIZE] IBSS_ATTR;
 
 //static variables that replace malloced stuff
 fixed32 stat0[2048], stat1[1024], stat2[512], stat3[256], stat4[128];    //these are the MDCT reconstruction windows
-
-fixed32 *tcosarray[5], *tsinarray[5];
-fixed32 tcos0[1024], tcos1[512], tcos2[256], tcos3[128], tcos4[64];        //these are the sin and cos rotations used by the MDCT
-fixed32 tsin0[1024], tsin1[512], tsin2[256], tsin3[128], tsin4[64];
-
-FFTComplex  exptab0[512] IBSS_ATTR;
-uint16_t revtab0[1024];
 
 uint16_t *runtabarray[2], *levtabarray[2];                                        //these are VLC lookup tables
 
@@ -145,225 +74,6 @@ VLC_TYPE vlcbuf4[540][2];
 
 #include "wmadata.h" // PJJ
 
-
-/* butter fly op */
-#define BF(pre, pim, qre, qim, pre1, pim1, qre1, qim1) \
-{\
-  fixed32 ax, ay, bx, by;\
-  bx=pre1;\
-  by=pim1;\
-  ax=qre1;\
-  ay=qim1;\
-  pre = (bx + ax);\
-  pim = (by + ay);\
-  qre = (bx - ax);\
-  qim = (by - ay);\
-}
-
-
-int fft_calc_unscaled(FFTContext *s, FFTComplex *z)
-{
-    int ln = s->nbits;
-    int j, np, np2;
-    int nblocks, nloops;
-    register FFTComplex *p, *q;
-   // FFTComplex *exptab = s->exptab;
-    int l;
-    fixed32 tmp_re, tmp_im;
-    int tabshift = 10-ln;
-
-    np = 1 << ln;
-
-
-    /* pass 0 */
-
-    p=&z[0];
-    j=(np >> 1);
-    do
-    {
-        BF(p[0].re, p[0].im, p[1].re, p[1].im,
-           p[0].re, p[0].im, p[1].re, p[1].im);
-        p+=2;
-    }
-    while (--j != 0);
-
-    /* pass 1 */
-
-
-    p=&z[0];
-    j=np >> 2;
-    if (s->inverse)
-    {
-        do
-        {
-            BF(p[0].re, p[0].im, p[2].re, p[2].im,
-               p[0].re, p[0].im, p[2].re, p[2].im);
-            BF(p[1].re, p[1].im, p[3].re, p[3].im,
-               p[1].re, p[1].im, -p[3].im, p[3].re);
-            p+=4;
-        }
-        while (--j != 0);
-    }
-    else
-    {
-        do
-        {
-            BF(p[0].re, p[0].im, p[2].re, p[2].im,
-               p[0].re, p[0].im, p[2].re, p[2].im);
-            BF(p[1].re, p[1].im, p[3].re, p[3].im,
-               p[1].re, p[1].im, p[3].im, -p[3].re);
-            p+=4;
-        }
-        while (--j != 0);
-    }
-    /* pass 2 .. ln-1 */
-
-    nblocks = np >> 3;
-    nloops = 1 << 2;
-    np2 = np >> 1;
-    do
-    {
-        p = z;
-        q = z + nloops;
-        for (j = 0; j < nblocks; ++j)
-        {
-            BF(p->re, p->im, q->re, q->im,
-               p->re, p->im, q->re, q->im);
-
-            p++;
-            q++;
-            for(l = nblocks; l < np2; l += nblocks)
-            {
-                CMUL(&tmp_re, &tmp_im, exptab0[(l<<tabshift)].re, exptab0[(l<<tabshift)].im, q->re, q->im);
-                //CMUL(&tmp_re, &tmp_im, exptab[l].re, exptab[l].im, q->re, q->im);
-                BF(p->re, p->im, q->re, q->im,
-                   p->re, p->im, tmp_re, tmp_im);
-                p++;
-                q++;
-            }
-
-            p += nloops;
-            q += nloops;
-        }
-        nblocks = nblocks >> 1;
-        nloops = nloops << 1;
-    }
-    while (nblocks != 0);
-    return 0;
-}
-
-/**
- * init MDCT or IMDCT computation.
- */
-int ff_mdct_init(MDCTContext *s, int nbits, int inverse)
-{
-    int n, n4, i;
-   // fixed32 alpha;
-
-
-    memset(s, 0, sizeof(*s));
-    n = 1 << nbits;            //nbits ranges from 12 to 8 inclusive
-    s->nbits = nbits;
-    s->n = n;
-    n4 = n >> 2;
-    s->tcos = tcosarray[12-nbits];
-    s->tsin = tsinarray[12-nbits];
-    for(i=0;i<n4;i++)
-    {
-        //fixed32 pi2 = fixmul32(0x20000, M_PI_F);
-        fixed32 ip = itofix32(i) + 0x2000;
-        ip = ip >> nbits;
-        //ip = fixdiv32(ip,itofix32(n)); // PJJ optimize
-        //alpha = fixmul32(TWO_M_PI_F, ip);
-        //s->tcos[i] = -fixcos32(alpha);        //alpha between 0 and pi/2
-        //s->tsin[i] = -fixsin32(alpha);
-
-    s->tsin[i] = - fsincos(ip<<16, &(s->tcos[i]));            //I can't remember why this works, but it seems to agree for ~24 bits, maybe more!
-    s->tcos[i] *=-1;
-  }
-    (&s->fft)->nbits = nbits-2;
-
-    (&s->fft)->inverse = inverse;
-
-    return 0;
-
-}
-
-/**
- * Compute inverse MDCT of size N = 2^nbits
- * @param output N samples
- * @param input N/2 samples
- * @param tmp N/2 samples
- */
-void ff_imdct_calc(MDCTContext *s,
-                   fixed32 *output,
-                   fixed32 *input)
-{
-    int k, n8, n4, n2, n, j,scale;
-    const fixed32 *tcos = s->tcos;
-    const fixed32 *tsin = s->tsin;
-    const fixed32 *in1, *in2;
-    FFTComplex *z1 = (FFTComplex *)output;
-    FFTComplex *z2 = (FFTComplex *)input;
-    int revtabshift = 12 - s->nbits;
-
-    n = 1 << s->nbits;
-
-    n2 = n >> 1;
-    n4 = n >> 2;
-    n8 = n >> 3;
-
-
-    /* pre rotation */
-    in1 = input;
-    in2 = input + n2 - 1;
-
-    for(k = 0; k < n4; k++)
-    {
-        j=revtab0[k<<revtabshift];
-        CMUL(&z1[j].re, &z1[j].im, *in2, *in1, tcos[k], tsin[k]);
-        in1 += 2;
-        in2 -= 2;
-    }
-
-        scale = fft_calc_unscaled(&s->fft, z1);
-
-    /* post rotation + reordering */
-
-    for(k = 0; k < n4; k++)
-    {
-        CMUL(&z2[k].re, &z2[k].im, (z1[k].re), (z1[k].im), tcos[k], tsin[k]);
-    }
-
-    for(k = 0; k < n8; k++)
-    {
-        fixed32 r1,r2,r3,r4,r1n,r2n,r3n;
-
-        r1 = z2[n8 + k].im;
-        r1n = r1 * -1;
-        r2 = z2[n8-1-k].re;
-        r2n = r2 * -1;
-        r3 = z2[k+n8].re;
-        r3n = r3 * -1;
-        r4 = z2[n8-k-1].im;
-
-        output[2*k] = r1n;
-        output[n2-1-2*k] = r1;
-
-        output[2*k+1] = r2;
-        output[n2-1-2*k-1] = r2n;
-
-        output[n2 + 2*k]= r3n;
-        output[n-1- 2*k]= r3n;
-
-        output[n2 + 2*k+1]= r4;
-        output[n-2 - 2 * k] = r4;
-    }
-
-
-
-
-}
 
 
 /*
@@ -524,7 +234,7 @@ static void init_coef_vlc(VLC *vlc,
 int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
 {
     //WMADecodeContext *s = avctx->priv_data;
-    int i, m, j, flags1, flags2;
+    int i, flags1, flags2;
     fixed32 *window;
     uint8_t *extradata;
     fixed64 bps1;
@@ -800,47 +510,12 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
         }
     }
 
-    /* init MDCT */
-    /*TODO:  figure out how to fold this up into one array*/
-    tcosarray[0] = tcos0; tcosarray[1] = tcos1; tcosarray[2] = tcos2; tcosarray[3] = tcos3;tcosarray[4] = tcos4;
-    tsinarray[0] = tsin0; tsinarray[1] = tsin1; tsinarray[2] = tsin2; tsinarray[3] = tsin3;tsinarray[4] = tsin4;
+    mdct_init_global();
 
     s->mdct_tmp = mdct_tmp; /* temporary storage for imdct */
     for(i = 0; i < s->nb_block_sizes; ++i)
     {
         ff_mdct_init(&s->mdct_ctx[i], s->frame_len_bits - i + 1, 1);
-    }
-
-    {
-        int i, n;
-        fixed32 c1, s1, s2;
-
-        n=1<<10;
-        s2 = 1 ? 1 : -1;
-        for(i=0;i<(n/2);++i)
-        {
-            fixed32 ifix = itofix32(i);
-            fixed32 nfix = itofix32(n);
-            fixed32 res = fixdiv32(ifix,nfix);
-
-            s1 = fsincos(res<<16, &c1);
-
-            exptab0[i].re = c1;
-            exptab0[i].im = s1*s2;
-        }
-    }
-
-    /* init the MDCT bit reverse table here rather then in fft_init */
-
-    for(i=0;i<1024;i++)           /*hard coded to a 2048 bit rotation*/
-    {                             /*smaller sizes can reuse the largest*/
-        m=0;
-        for(j=0;j<10;j++)
-        {
-            m |= ((i >> j) & 1) << (10-j-1);
-        }
-
-       revtab0[i]=m;
     }
 
     /*ffmpeg uses malloc to only allocate as many window sizes as needed.  However, we're really only interested in the worst case memory usage.

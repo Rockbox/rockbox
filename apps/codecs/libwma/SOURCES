@@ -1,3 +1,5 @@
 wmadeci.c
 wmafixed.c
 bitstream.c
+fft.c
+mdct.c
