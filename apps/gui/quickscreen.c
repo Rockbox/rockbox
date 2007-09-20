@@ -50,11 +50,6 @@ void gui_quickscreen_init(struct gui_quickscreen * qs,
  */
 static void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * display)
 {
-    #define PUTS_CENTER (display->height/2/font_h)
-    #define PUTS_BOTTOM (display->height/font_h)
-    #define PUTSXY_CENTER (display->height/2)
-    #define PUTSXY_BOTTOM (display->height)
-
     const unsigned char *option;
     const unsigned char *title;
     int w, font_h;
@@ -69,13 +64,19 @@ static void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * di
     }
     display->getstringsize("A", NULL, &font_h);
 
+    /* do these calculations once */
+    const unsigned int puts_center = display->height/2/font_h;
+    const unsigned int puts_bottom = display->height/font_h;
+    const unsigned int putsxy_center = display->height/2;
+    const unsigned int putsxy_bottom = display->height;
+
     /* Displays the first line of text */
     option=(unsigned char *)option_select_get_text(qs->left_option);
     title=(unsigned char *)qs->left_option->title;
-    display->puts_scroll(2, PUTS_CENTER-4+!statusbar, title);
-    display->puts_scroll(2, PUTS_CENTER-3+!statusbar, option);
+    display->puts_scroll(2, puts_center-4+!statusbar, title);
+    display->puts_scroll(2, puts_center-3+!statusbar, option);
     display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward], 1,
-                         PUTSXY_CENTER-(font_h*3), 7, 8);
+                         putsxy_center-(font_h*3), 7, 8);
 
     /* Displays the second line of text */
     option=(unsigned char *)option_select_get_text(qs->right_option);
@@ -83,21 +84,21 @@ static void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * di
     display->getstringsize(title, &w, NULL);
     if(w > display->width - 8)
     {
-        display->puts_scroll(2, PUTS_CENTER-2+!statusbar, title);
+        display->puts_scroll(2, puts_center-2+!statusbar, title);
         display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward], 1,
-                             PUTSXY_CENTER-font_h, 7, 8);
+                             putsxy_center-font_h, 7, 8);
     }
     else
     {
-        display->putsxy(display->width - w - 12, PUTSXY_CENTER-font_h, title);
+        display->putsxy(display->width - w - 12, putsxy_center-font_h, title);
         display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
-                        display->width - 8, PUTSXY_CENTER-font_h, 7, 8);
+                        display->width - 8, putsxy_center-font_h, 7, 8);
     }
     display->getstringsize(option, &w, NULL);
     if(w > display->width)
-        display->puts_scroll(0, PUTS_CENTER-1+!statusbar, option);
+        display->puts_scroll(0, puts_center-1+!statusbar, option);
     else
-        display->putsxy(display->width -w-12, PUTSXY_CENTER, option);
+        display->putsxy(display->width -w-12, putsxy_center, option);
 
     /* Displays the third line of text */
     option=(unsigned char *)option_select_get_text(qs->bottom_option);
@@ -105,17 +106,17 @@ static void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * di
 
     display->getstringsize(title, &w, NULL);
     if(w > display->width)
-        display->puts_scroll(0, PUTS_BOTTOM-4+!statusbar, title);
+        display->puts_scroll(0, puts_bottom-4+!statusbar, title);
     else
-        display->putsxy(display->width/2-w/2, PUTSXY_BOTTOM-(font_h*3), title);
+        display->putsxy(display->width/2-w/2, putsxy_bottom-(font_h*3), title);
 
     display->getstringsize(option, &w, NULL);
     if(w > display->width)
-        display->puts_scroll(0, PUTS_BOTTOM-3+!statusbar, option);
+        display->puts_scroll(0, puts_bottom-3+!statusbar, option);
     else
-        display->putsxy(display->width/2-w/2, PUTSXY_BOTTOM-(font_h*2), option);
+        display->putsxy(display->width/2-w/2, putsxy_bottom-(font_h*2), option);
     display->mono_bitmap(bitmap_icons_7x8[Icon_DownArrow], display->width/2-4,
-                         PUTSXY_BOTTOM-font_h, 7, 8);
+                         putsxy_bottom-font_h, 7, 8);
 
     gui_textarea_update(display);
     display->setfont(FONT_UI);
