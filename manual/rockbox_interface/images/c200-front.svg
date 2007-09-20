@@ -1,0 +1,1282 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Creator: CorelDRAW -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xml:space="preserve"
+   width="210mm"
+   height="297mm"
+   shape-rendering="geometricPrecision"
+   text-rendering="geometricPrecision"
+   image-rendering="optimizeQuality"
+   fill-rule="evenodd"
+   viewBox="0 0 21000 29700"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.44"
+   sodipodi:docname="c200.svg"
+   sodipodi:docbase="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200"><metadata
+   id="metadata317"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><defs
+   id="defs315"><radialGradient
+   fy="1926.5839"
+   fx="2530.7678"
+   r="956.84"
+   cy="1926.5839"
+   cx="2530.7678"
+   gradientUnits="userSpaceOnUse"
+   id="radialGradient5049"
+   gradientTransform="matrix(1.021143,0,0,0.949043,-100.8768,92.91646)">
+    <stop
+   id="stop5051"
+   stop-color="#000000"
+   offset="0" />
+    <stop
+   id="stop5053"
+   stop-color="#343434"
+   offset="0.60222811"
+   style="stop-color:#282828;stop-opacity:1;" />
+    <stop
+   id="stop5055"
+   stop-color="#5A5A5A"
+   offset="0.75451565" /><stop
+   offset="0.87725782"
+   stop-color="#5A5A5A"
+   id="stop5057"
+   style="stop-color:#313131;stop-opacity:1;" /><stop
+   style="stop-color:#181818;stop-opacity:1;"
+   id="stop5059"
+   stop-color="#5A5A5A"
+   offset="0.97860456" /><stop
+   offset="1"
+   stop-color="#5A5A5A"
+   id="stop5061"
+   style="stop-color:#121212;stop-opacity:1;" />
+    
+    <stop
+   id="stop5063"
+   stop-color="#000000"
+   offset="1" />
+    
+   </radialGradient><radialGradient
+   xlink:href="#id3"
+   id="radialGradient5035"
+   gradientUnits="userSpaceOnUse"
+   cx="2503.76"
+   cy="7566.7598"
+   r="956.84003"
+   fx="2503.76"
+   fy="7566.7598"
+   spreadMethod="pad">
+    <stop
+   offset="0"
+   stop-color="#000000"
+   id="stop5037" />
+    <stop
+   offset="0.239216"
+   stop-color="#222222"
+   id="stop5039" />
+    <stop
+   offset="0.341176"
+   stop-color="#5A5A5A"
+   id="stop5041" />
+    <stop
+   offset="0.509804"
+   stop-color="#000000"
+   id="stop5043" />
+    <stop
+   offset="1"
+   stop-color="#000000"
+   id="stop5045" />
+    <stop
+   offset="1"
+   stop-color="#000000"
+   id="stop5047" />
+   </radialGradient><radialGradient
+   gradientTransform="matrix(1.021143,0,0,0.949043,-100.8768,92.91646)"
+   id="radialGradient5017"
+   gradientUnits="userSpaceOnUse"
+   cx="2530.7678"
+   cy="1926.5839"
+   r="956.84"
+   fx="2530.7678"
+   fy="1926.5839">
+    <stop
+   offset="0"
+   stop-color="#000000"
+   id="stop5019" />
+    <stop
+   style="stop-color:#292929;stop-opacity:1;"
+   offset="0.60222811"
+   stop-color="#343434"
+   id="stop5021" />
+    <stop
+   offset="0.75451565"
+   stop-color="#5A5A5A"
+   id="stop5023" /><stop
+   style="stop-color:#313131;stop-opacity:1;"
+   id="stop5025"
+   stop-color="#5A5A5A"
+   offset="0.87725782" /><stop
+   offset="0.97860456"
+   stop-color="#5A5A5A"
+   id="stop5027"
+   style="stop-color:#181818;stop-opacity:1;" /><stop
+   style="stop-color:#121212;stop-opacity:1;"
+   id="stop5029"
+   stop-color="#5A5A5A"
+   offset="1" />
+    
+    <stop
+   offset="1"
+   stop-color="#000000"
+   id="stop5031" />
+    
+   </radialGradient>
+  <defs
+   id="defs5">
+   <linearGradient
+   y2="903.42"
+   x2="8330.76"
+   y1="831.72"
+   x1="8330.76"
+   gradientUnits="userSpaceOnUse"
+   id="id1"
+   gradientTransform="translate(-1102.918,709.0186)">
+    <stop
+   id="stop8"
+   stop-color="#F2F8FA"
+   offset="0" />
+    <stop
+   id="stop10"
+   stop-color="#BFC0C0"
+   offset="0.290196" />
+    <stop
+   id="stop12"
+   stop-color="#9FA0A0"
+   offset="0.419608" />
+    <stop
+   id="stop14"
+   stop-color="#828282"
+   offset="1" />
+    <stop
+   id="stop16"
+   stop-color="#828282"
+   offset="1" />
+   </linearGradient>
+   <linearGradient
+   y2="8706.83"
+   x2="10778.4"
+   y1="8778.53"
+   x1="10778.4"
+   gradientUnits="userSpaceOnUse"
+   id="id2"
+   gradientTransform="translate(-1102.918,709.0186)">
+    <stop
+   id="stop19"
+   stop-color="#F2F8FA"
+   offset="0" />
+    <stop
+   id="stop21"
+   stop-color="#BFC0C0"
+   offset="0.290196" />
+    <stop
+   id="stop23"
+   stop-color="#9FA0A0"
+   offset="0.419608" />
+    <stop
+   id="stop25"
+   stop-color="#828282"
+   offset="1" />
+    <stop
+   id="stop27"
+   stop-color="#828282"
+   offset="1" />
+   </linearGradient>
+   <radialGradient
+   fy="1926.5839"
+   fx="2530.7678"
+   r="956.84"
+   cy="1926.5839"
+   cx="2530.7678"
+   gradientUnits="userSpaceOnUse"
+   id="id3"
+   gradientTransform="matrix(1.021143,0,0,0.949043,-100.8768,92.91646)">
+    <stop
+   id="stop30"
+   stop-color="#000000"
+   offset="0" />
+    <stop
+   id="stop32"
+   stop-color="#343434"
+   offset="0.60222811"
+   style="stop-color:#292929;stop-opacity:1;" />
+    <stop
+   id="stop34"
+   stop-color="#5A5A5A"
+   offset="0.75451565" /><stop
+   offset="0.87725782"
+   stop-color="#5A5A5A"
+   id="stop3231"
+   style="stop-color:#313131;stop-opacity:1;" /><stop
+   style="stop-color:#181818;stop-opacity:1;"
+   id="stop3233"
+   stop-color="#5A5A5A"
+   offset="0.97860456" /><stop
+   offset="1"
+   stop-color="#5A5A5A"
+   id="stop3235"
+   style="stop-color:#121212;stop-opacity:1;" />
+    
+    <stop
+   id="stop38"
+   stop-color="#000000"
+   offset="1" />
+    
+   </radialGradient>
+   <radialGradient
+   fy="2043.48"
+   fx="18631.9"
+   r="956.84"
+   cy="2043.48"
+   cx="18631.9"
+   gradientUnits="userSpaceOnUse"
+   id="id4">
+    <stop
+   id="stop43"
+   stop-color="#000000"
+   offset="0" />
+    <stop
+   id="stop45"
+   stop-color="#343434"
+   offset="0.25098" />
+    <stop
+   id="stop47"
+   stop-color="#5A5A5A"
+   offset="0.4" />
+    <stop
+   id="stop49"
+   stop-color="#1F1F1F"
+   offset="0.670588" />
+    <stop
+   id="stop51"
+   stop-color="#000000"
+   offset="1" />
+    <stop
+   id="stop53"
+   stop-color="#000000"
+   offset="1" />
+   </radialGradient>
+   <radialGradient
+   fy="7566.7598"
+   fx="2503.76"
+   r="956.84003"
+   cy="7566.7598"
+   cx="2503.76"
+   gradientUnits="userSpaceOnUse"
+   id="id5"
+   xlink:href="#id14">
+    <stop
+   id="stop56"
+   stop-color="#000000"
+   offset="0" />
+    <stop
+   id="stop58"
+   stop-color="#222222"
+   offset="0.239216" />
+    <stop
+   id="stop60"
+   stop-color="#5A5A5A"
+   offset="0.341176" />
+    <stop
+   id="stop62"
+   stop-color="#000000"
+   offset="0.509804" />
+    <stop
+   id="stop64"
+   stop-color="#000000"
+   offset="1" />
+    <stop
+   id="stop66"
+   stop-color="#000000"
+   offset="1" />
+   </radialGradient>
+   <radialGradient
+   fy="7566.76"
+   fx="18570.9"
+   r="956.84"
+   cy="7566.76"
+   cx="18570.9"
+   gradientUnits="userSpaceOnUse"
+   id="id6">
+    <stop
+   id="stop69"
+   stop-color="#000000"
+   offset="0" />
+    <stop
+   id="stop71"
+   stop-color="#222222"
+   offset="0.239216" />
+    <stop
+   id="stop73"
+   stop-color="#5A5A5A"
+   offset="0.341176" />
+    <stop
+   id="stop75"
+   stop-color="#000000"
+   offset="0.509804" />
+    <stop
+   id="stop77"
+   stop-color="#000000"
+   offset="1" />
+    <stop
+   id="stop79"
+   stop-color="#000000"
+   offset="1" />
+   </radialGradient>
+   <linearGradient
+   y2="1324.37"
+   x2="-2211.52"
+   y1="8285.91"
+   x1="23306.5"
+   gradientUnits="userSpaceOnUse"
+   id="id7"
+   gradientTransform="translate(-1102.918,709.0186)">
+    <stop
+   id="stop82"
+   stop-color="#484A4C"
+   offset="0" />
+    <stop
+   id="stop84"
+   stop-color="#252425"
+   offset="0.509804" />
+    <stop
+   id="stop86"
+   stop-color="#494747"
+   offset="1" />
+    <stop
+   id="stop88"
+   stop-color="#494747"
+   offset="1" />
+   </linearGradient>
+   <linearGradient
+   y2="3786.58"
+   x2="12218.7"
+   y1="5823.52"
+   x1="19685.2"
+   gradientUnits="userSpaceOnUse"
+   id="id8"
+   gradientTransform="translate(-1102.918,709.0186)">
+    <stop
+   id="stop91"
+   stop-color="#484A4C"
+   offset="0" />
+    <stop
+   id="stop93"
+   stop-color="#252425"
+   offset="0.509804" />
+    <stop
+   id="stop95"
+   stop-color="#494747"
+   offset="1" />
+    <stop
+   id="stop97"
+   stop-color="#494747"
+   offset="1" />
+   </linearGradient>
+   <linearGradient
+   y2="6534.4"
+   x2="17018.9"
+   y1="7031.38"
+   x1="18840.6"
+   gradientUnits="userSpaceOnUse"
+   id="id9"
+   gradientTransform="translate(-1102.918,709.0186)">
+    <stop
+   id="stop100"
+   stop-color="#484A4C"
+   offset="0" />
+    <stop
+   id="stop102"
+   stop-color="#252425"
+   offset="0.509804" />
+    <stop
+   id="stop104"
+   stop-color="#494747"
+   offset="1" />
+    <stop
+   id="stop106"
+   stop-color="#494747"
+   offset="1" />
+   </linearGradient>
+   <linearGradient
+   y2="6564.74"
+   x2="17130.2"
+   y1="7001.02"
+   x1="18729.4"
+   gradientUnits="userSpaceOnUse"
+   id="id10"
+   gradientTransform="translate(-1102.918,709.0186)">
+    <stop
+   id="stop109"
+   stop-color="#484A4C"
+   offset="0" />
+    <stop
+   id="stop111"
+   stop-color="#252425"
+   offset="0.509804" />
+    <stop
+   id="stop113"
+   stop-color="#494747"
+   offset="1" />
+    <stop
+   id="stop115"
+   stop-color="#494747"
+   offset="1" />
+   </linearGradient>
+   <linearGradient
+   y2="8223.12"
+   x2="10547.5"
+   y1="8706.82"
+   x1="10547.5"
+   gradientUnits="userSpaceOnUse"
+   id="id11">
+    <stop
+   id="stop118"
+   stop-color="#000000"
+   offset="0" />
+    <stop
+   id="stop120"
+   stop-color="#5A5A5A"
+   offset="0.768627" />
+    <stop
+   id="stop122"
+   stop-color="#3C3C3C"
+   offset="1" />
+    <stop
+   id="stop124"
+   stop-color="#3C3C3C"
+   offset="1" />
+   </linearGradient>
+   <linearGradient
+   y2="4805.1"
+   x2="19263.3"
+   y1="4805.1"
+   x1="19629.5"
+   gradientUnits="userSpaceOnUse"
+   id="id12"
+   gradientTransform="translate(-1102.918,709.0186)">
+    <stop
+   id="stop127"
+   stop-color="#000000"
+   offset="0" />
+    <stop
+   id="stop129"
+   stop-color="#5A5A5A"
+   offset="0.768627" />
+    <stop
+   id="stop131"
+   stop-color="#3C3C3C"
+   offset="1" />
+    <stop
+   id="stop133"
+   stop-color="#3C3C3C"
+   offset="1" />
+   </linearGradient>
+   <linearGradient
+   y2="4805.13"
+   x2="1831.71"
+   y1="4805.13"
+   x1="1465.47"
+   gradientUnits="userSpaceOnUse"
+   id="id13"
+   gradientTransform="translate(-1102.918,709.0186)">
+    <stop
+   id="stop136"
+   stop-color="#000000"
+   offset="0" />
+    <stop
+   id="stop138"
+   stop-color="#5A5A5A"
+   offset="0.768627" />
+    <stop
+   id="stop140"
+   stop-color="#3C3C3C"
+   offset="1" />
+    <stop
+   id="stop142"
+   stop-color="#3C3C3C"
+   offset="1" />
+   </linearGradient>
+   <linearGradient
+   y2="1387.17"
+   x2="10547.5"
+   y1="903.40997"
+   x1="10547.5"
+   gradientUnits="userSpaceOnUse"
+   id="id15"
+   xlink:href="#id3">
+    <stop
+   id="stop145"
+   stop-color="#000000"
+   offset="0"
+   style="stop-color:#060606;stop-opacity:1;" /><stop
+   offset="0.30213919"
+   stop-color="#000000"
+   id="stop5007"
+   style="stop-color:#1c1c1c;stop-opacity:1;" /><stop
+   style="stop-color:#3d3d3d;stop-opacity:1;"
+   id="stop5009"
+   stop-color="#000000"
+   offset="0.53988808" />
+    <stop
+   id="stop147"
+   stop-color="#5A5A5A"
+   offset="0.69724768" />
+    <stop
+   id="stop149"
+   stop-color="#3C3C3C"
+   offset="1"
+   style="stop-color:#272727;stop-opacity:1;" />
+    <stop
+   id="stop151"
+   stop-color="#3C3C3C"
+   offset="1" />
+   </linearGradient>
+   <linearGradient
+   y2="886.55"
+   x2="15866.4"
+   y1="971.13"
+   x1="15866.4"
+   gradientUnits="userSpaceOnUse"
+   id="id16"
+   gradientTransform="translate(-1102.918,709.0186)">
+    <stop
+   id="stop154"
+   stop-color="#F2F8FA"
+   offset="0" />
+    <stop
+   id="stop156"
+   stop-color="#BFC0C0"
+   offset="0.290196" />
+    <stop
+   id="stop158"
+   stop-color="#9FA0A0"
+   offset="0.419608" />
+    <stop
+   id="stop160"
+   stop-color="#828282"
+   offset="1" />
+    <stop
+   id="stop162"
+   stop-color="#828282"
+   offset="1" />
+   </linearGradient>
+  </defs>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+ <radialGradient
+   inkscape:collect="always"
+   xlink:href="#radialGradient5049"
+   id="radialGradient5033"
+   gradientUnits="userSpaceOnUse"
+   gradientTransform="matrix(1.021143,0,0,0.949043,-1203.795,801.935)"
+   cx="2530.7678"
+   cy="1926.5839"
+   fx="2530.7678"
+   fy="1926.5839"
+   r="956.84003" /><radialGradient
+   inkscape:collect="always"
+   xlink:href="#radialGradient5049"
+   id="radialGradient5948"
+   gradientUnits="userSpaceOnUse"
+   gradientTransform="matrix(-1.021143,0,0,0.949043,20092.97,801.9345)"
+   cx="2530.7678"
+   cy="1926.5839"
+   fx="2530.7678"
+   fy="1926.5839"
+   r="956.84003" /><linearGradient
+   inkscape:collect="always"
+   xlink:href="#id15"
+   id="linearGradient6006"
+   gradientUnits="userSpaceOnUse"
+   gradientTransform="matrix(1,0,0,-1,-1102.918,10319.3)"
+   x1="10547.5"
+   y1="903.40997"
+   x2="10547.5"
+   y2="1387.17" /><radialGradient
+   inkscape:collect="always"
+   xlink:href="#radialGradient5049"
+   id="radialGradient6009"
+   gradientUnits="userSpaceOnUse"
+   gradientTransform="matrix(-1.021143,0,0,-0.949043,20092.97,10226.38)"
+   cx="2530.7678"
+   cy="1926.5839"
+   fx="2530.7678"
+   fy="1926.5839"
+   r="956.84003" /><radialGradient
+   inkscape:collect="always"
+   xlink:href="#radialGradient5049"
+   id="radialGradient6012"
+   gradientUnits="userSpaceOnUse"
+   gradientTransform="matrix(1.021143,0,0,-0.949043,-1203.795,10226.39)"
+   cx="2530.7678"
+   cy="1926.5839"
+   fx="2530.7678"
+   fy="1926.5839"
+   r="956.84003" /><linearGradient
+   inkscape:collect="always"
+   xlink:href="#id14"
+   id="linearGradient7085"
+   gradientUnits="userSpaceOnUse"
+   x1="9890.9297"
+   y1="4742.0801"
+   x2="9890.9297"
+   y2="5280.6401" /><linearGradient
+   inkscape:collect="always"
+   xlink:href="#id15"
+   id="linearGradient7087"
+   gradientUnits="userSpaceOnUse"
+   x1="10547.5"
+   y1="903.40997"
+   x2="10547.5"
+   y2="1387.17"
+   gradientTransform="translate(-1102.918,709.0186)" /></defs><sodipodi:namedview
+   inkscape:window-height="968"
+   inkscape:window-width="1280"
+   inkscape:pageshadow="2"
+   inkscape:pageopacity="0.0"
+   guidetolerance="10.0"
+   gridtolerance="10.0"
+   objecttolerance="10.0"
+   borderopacity="1.0"
+   bordercolor="#666666"
+   pagecolor="#ffffff"
+   id="base"
+   inkscape:zoom="1.4142136"
+   inkscape:cx="300.79106"
+   inkscape:cy="809.94433"
+   inkscape:window-x="-4"
+   inkscape:window-y="-4"
+   inkscape:current-layer="svg2"
+   showguides="true"
+   inkscape:guide-bbox="true" />
+ <path
+   style="fill:#bdbdbd"
+   id="path164"
+   d="M 13223.482,1588.0686 L 16330.322,1588.0686 L 16330.322,1612.4286 L 16264.322,1612.4286 L 16197.262,1634.4986 C 16180.902,1640.0786 16159.552,1643.0086 16137.692,1642.8586 L 13389.302,1642.8586 C 13367.502,1643.0086 13346.322,1640.0786 13329.602,1634.4986 L 13262.632,1612.4286 L 13223.482,1612.4286 L 13223.482,1588.0686 L 13223.482,1588.0686 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><g
+   id="g166"
+   transform="translate(-1102.918,709.0186)"
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300">
+   <defs
+   id="defs168">
+    <linearGradient
+   y2="8706.8203"
+   x2="7268.6802"
+   y1="8806.04"
+   x1="7268.6802"
+   gradientUnits="userSpaceOnUse"
+   id="id0">
+     <stop
+   id="stop171"
+   stop-color="#F2F8FA"
+   offset="0" />
+     <stop
+   id="stop173"
+   stop-color="#BFC0C0"
+   offset="0.290196" />
+     <stop
+   id="stop175"
+   stop-color="#9FA0A0"
+   offset="0.419608" />
+     <stop
+   id="stop177"
+   stop-color="#828282"
+   offset="1" />
+     <stop
+   id="stop179"
+   stop-color="#828282"
+   offset="1" />
+    </linearGradient>
+   </defs>
+   <path
+   style="fill:#b5b5b5"
+   id="path181"
+   d="M 7614.72,8813.54 L 7614.9,8813.54 L 7694.9,8813.54 L 7694.9,8798.54 C 7682.04,8798.54 7670.5,8792.71 7662.8,8783.57 C 7661.24,8781.72 7659.86,8779.8 7658.74,8777.89 C 7657.58,8775.92 7656.54,8773.76 7655.68,8771.5 L 7655.66,8771.51 L 7655.62,8771.4 C 7654.77,8769.13 7651.04,8766.51 7648.62,8766.51 L 7568.62,8766.51 C 7563.56,8766.51 7559.84,8771.91 7561.62,8776.65 C 7566.7,8790.14 7576.77,8801.2 7589.53,8807.57 C 7591.98,8808.79 7594.59,8809.87 7597.31,8810.75 L 7597.33,8810.75 C 7602.83,8812.53 7608.7,8813.52 7614.72,8813.54 L 7614.72,8813.54 L 7614.72,8813.54 L 7614.72,8813.54 z " />
+   <path
+   style="fill:#b5b5b5"
+   id="path183"
+   d="M 7414.72,8813.54 L 7414.9,8813.54 L 7494.9,8813.54 L 7494.9,8798.54 C 7482.04,8798.54 7470.5,8792.71 7462.8,8783.57 C 7461.24,8781.72 7459.86,8779.8 7458.74,8777.89 C 7457.58,8775.92 7456.54,8773.76 7455.68,8771.5 L 7455.66,8771.51 L 7455.62,8771.4 C 7454.77,8769.13 7451.04,8766.51 7448.62,8766.51 L 7368.62,8766.51 C 7363.56,8766.51 7359.84,8771.91 7361.62,8776.65 C 7366.7,8790.14 7376.77,8801.2 7389.53,8807.57 C 7391.98,8808.79 7394.59,8809.87 7397.31,8810.75 L 7397.33,8810.75 C 7402.83,8812.53 7408.7,8813.52 7414.72,8813.54 L 7414.72,8813.54 L 7414.72,8813.54 L 7414.72,8813.54 z " />
+   <path
+   style="fill:#b5b5b5"
+   id="path185"
+   d="M 7214.72,8813.54 L 7214.9,8813.54 L 7294.9,8813.54 L 7294.9,8798.54 C 7282.04,8798.54 7270.5,8792.71 7262.8,8783.57 C 7261.24,8781.72 7259.86,8779.8 7258.74,8777.89 C 7257.58,8775.92 7256.54,8773.76 7255.68,8771.5 L 7255.66,8771.51 L 7255.62,8771.4 C 7254.77,8769.13 7251.04,8766.51 7248.62,8766.51 L 7168.62,8766.51 C 7163.56,8766.51 7159.84,8771.91 7161.62,8776.65 C 7166.7,8790.14 7176.77,8801.2 7189.53,8807.57 C 7191.98,8808.79 7194.59,8809.87 7197.31,8810.75 L 7197.33,8810.75 C 7202.83,8812.53 7208.7,8813.52 7214.72,8813.54 L 7214.72,8813.54 L 7214.72,8813.54 L 7214.72,8813.54 z " />
+   <path
+   style="fill:#b5b5b5"
+   id="path187"
+   d="M 7014.72,8813.54 L 7014.9,8813.54 L 7094.9,8813.54 L 7094.9,8798.54 C 7082.04,8798.54 7070.5,8792.71 7062.8,8783.57 C 7061.24,8781.72 7059.86,8779.8 7058.74,8777.89 C 7057.58,8775.92 7056.54,8773.76 7055.68,8771.5 L 7055.66,8771.51 L 7055.62,8771.4 C 7054.77,8769.13 7051.04,8766.51 7048.62,8766.51 L 6968.62,8766.51 C 6963.56,8766.51 6959.84,8771.91 6961.62,8776.65 C 6966.7,8790.14 6976.77,8801.2 6989.53,8807.57 C 6991.98,8808.79 6994.59,8809.87 6997.31,8810.75 L 6997.33,8810.75 C 7002.83,8812.53 7008.7,8813.52 7014.72,8813.54 L 7014.72,8813.54 L 7014.72,8813.54 L 7014.72,8813.54 z " />
+   <path
+   style="fill:url(#id0);stroke:#595959;stroke-width:15"
+   id="path189"
+   d="M 7741.19,8774.01 L 8182.25,8774.01 L 8222.25,8706.83 L 6480.56,8706.83 L 6520.56,8774.01 L 7048.62,8774.01 C 7055.68,8792.72 7073.75,8806.04 7094.9,8806.04 C 7116.06,8806.04 7134.12,8792.72 7141.19,8774.01 L 7248.62,8774.01 C 7255.68,8792.72 7273.75,8806.04 7294.9,8806.04 C 7316.06,8806.04 7334.12,8792.72 7341.19,8774.01 L 7448.62,8774.01 C 7455.68,8792.72 7473.75,8806.04 7494.9,8806.04 C 7516.06,8806.04 7534.12,8792.72 7541.19,8774.01 L 7648.62,8774.01 C 7655.68,8792.72 7673.75,8806.04 7694.9,8806.04 C 7716.06,8806.04 7734.12,8792.72 7741.19,8774.01 L 7741.19,8774.01 L 7741.19,8774.01 L 7741.19,8774.01 z " />
+  </g><path
+   style="fill:url(#id1);stroke:#595959;stroke-width:15"
+   id="path191"
+   d="M 9643.6822,1612.4386 L 9603.6822,1540.7386 L 4852.0022,1540.7386 L 4812.0022,1612.4386 L 9643.6822,1612.4386 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:url(#id2);stroke:#595959;stroke-width:15"
+   id="path193"
+   d="M 8583.4522,9415.8486 L 10767.512,9415.8486 L 10727.512,9487.5486 L 8623.4522,9487.5486 L 8583.4522,9415.8486 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:none;stroke:#bdbdbd;stroke-width:30;stroke-linecap:round;stroke-linejoin:round"
+   id="path195"
+   d="M 9679.8822,1577.4286 L 17508.652,1577.4286 L 17508.722,1577.4286 L 17508.872,1577.4286 C 17605.282,1577.4486 17698.892,1590.6386 17787.902,1615.2786 C 17816.822,1623.2786 17845.312,1632.5286 17873.272,1642.9186 C 18016.882,1696.3486 18145.912,1780.2786 18252.332,1886.7186 C 18347.682,1982.0686 18424.982,2095.5686 18478.442,2221.4186 C 18490.152,2248.9686 18500.712,2277.0986 18510.052,2305.7286 C 18519.412,2334.3786 18527.572,2363.5786 18534.452,2393.2286 C 18552.172,2469.4886 18561.562,2548.8386 18561.572,2630.1986 L 18561.572,2630.3486 L 18561.572,8397.9186 L 18561.572,8397.9886 L 18561.572,8398.1386 C 18561.552,8494.5486 18548.362,8588.1586 18523.722,8677.1686 C 18515.722,8706.0886 18506.482,8734.5886 18496.082,8762.5386 C 18442.672,8906.1386 18358.722,9035.1786 18252.292,9141.5986 C 18156.942,9236.9486 18043.432,9314.2486 17917.582,9367.7086 C 17890.042,9379.4186 17861.902,9389.9786 17833.282,9399.3186 C 17804.632,9408.6786 17775.432,9416.8386 17745.782,9423.7186 C 17669.522,9441.4386 17590.162,9450.8286 17508.802,9450.8386 L 17508.652,9450.8386 L 10803.712,9450.8386 M 8547.1722,9450.8386 L 7155.5322,9450.8386 M 4817.8222,9450.8386 L 1380.4422,9450.8386 L 1380.3722,9450.8386 L 1380.2222,9450.8386 C 1283.8122,9450.8186 1190.2022,9437.6286 1101.2022,9412.9886 C 1072.2822,9404.9886 1043.7822,9395.7486 1015.8322,9385.3486 C 872.23223,9331.9386 743.18223,9247.9886 636.76223,9141.5586 C 541.42223,9046.2086 464.12223,8932.7086 410.65223,8806.8586 C 398.96223,8779.3286 388.38223,8751.1786 379.04223,8722.5486 C 369.69223,8693.8886 361.52223,8664.6986 354.64223,8635.0486 C 336.92223,8558.7886 327.53223,8479.4286 327.52223,8398.0686 L 327.52223,8397.9186 L 327.52223,2630.3486 L 327.52223,2630.2786 L 327.52223,2630.1286 C 327.54223,2533.7186 340.73223,2440.1086 365.37223,2351.1086 C 373.37223,2322.1886 382.62223,2293.6986 393.01223,2265.7386 C 446.43223,2122.1386 530.37223,1993.0886 636.81223,1886.6686 C 732.16223,1791.3286 845.66223,1714.0186 971.51223,1660.5586 C 999.05223,1648.8686 1027.1922,1638.2886 1055.8222,1628.9486 C 1084.4822,1619.5986 1113.6722,1611.4286 1143.3222,1604.5486 C 1219.5822,1586.8286 1298.9322,1577.4386 1380.2922,1577.4286 L 1380.4422,1577.4286 L 4775.7222,1577.4286"
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:#dedede;stroke:#595959;stroke-width:15"
+   id="path197"
+   d="M 16330.282,1588.0686 L 17508.682,1587.4286 L 17508.752,1587.4286 C 17795.562,1587.4486 18056.302,1704.7786 18245.292,1893.7886 C 18434.262,2082.7586 18551.562,2343.4486 18551.602,2630.1986 L 18551.602,2630.3486 L 18551.602,8397.9186 L 18551.602,8397.9886 C 18551.582,8684.7986 18434.252,8945.5386 18245.252,9134.5286 C 18056.272,9323.4986 17795.582,9440.7986 17508.832,9440.8386 L 17508.682,9440.8386 L 1380.4822,9440.8386 L 1380.4122,9440.8386 C 1093.6122,9440.8186 832.86223,9323.4886 643.87223,9134.4886 C 454.92223,8945.5186 337.60223,8684.8186 337.56223,8398.0686 L 337.56223,8397.9186 L 337.56223,2630.3486 L 337.56223,2630.2786 C 337.58223,2343.4786 454.91223,2082.7286 643.92223,1893.7386 C 832.89223,1704.7786 1093.5822,1587.4686 1380.3322,1587.4286 L 1380.4822,1587.4286 L 13196.682,1588.0686 C 13206.422,1588.2686 13215.762,1589.6586 13223.442,1592.0686 L 13329.772,1626.9686 C 13346.362,1632.5786 13367.452,1635.5686 13389.132,1635.3986 L 16137.832,1635.3986 C 16159.512,1635.5686 16180.612,1632.5786 16197.202,1626.9686 L 16303.522,1592.0686 C 16311.202,1589.6586 16320.542,1588.2686 16330.282,1588.0686 L 16330.282,1588.0686 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:url(#radialGradient5033);fill-opacity:1"
+   id="path199"
+   d="M 362.56223,2630.3486 C 362.56223,2070.4886 820.62223,1612.4286 1380.4822,1612.4286 C 1940.3422,1612.4286 2398.4022,2070.4886 2398.4022,2630.3486 C 2398.4022,3190.2086 1940.3422,3648.2686 1380.4822,3648.2686 C 820.62223,3648.2686 362.56223,3190.2086 362.56223,2630.3486 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:url(#radialGradient5948);fill-opacity:1"
+   id="path5946"
+   d="M 18526.602,2630.3486 C 18526.602,2070.4886 18068.542,1612.4286 17508.682,1612.4286 C 16948.822,1612.4286 16490.762,2070.4886 16490.762,2630.3486 C 16490.762,3190.2086 16948.822,3648.2686 17508.682,3648.2686 C 18068.542,3648.2686 18526.602,3190.2086 18526.602,2630.3486 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:url(#radialGradient6012);fill-opacity:1"
+   id="path5962"
+   d="M 362.56183,8397.9699 C 362.56183,8957.8299 820.62183,9415.8899 1380.4818,9415.8899 C 1940.3418,9415.8899 2398.4018,8957.8299 2398.4018,8397.9699 C 2398.4018,7838.1104 1940.3418,7380.0504 1380.4818,7380.0504 C 820.62183,7380.0504 362.56183,7838.1104 362.56183,8397.9699 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:url(#radialGradient6009);fill-opacity:1"
+   id="path5964"
+   d="M 18526.602,8397.9699 C 18526.602,8957.8299 18068.542,9415.8899 17508.682,9415.8899 C 16948.822,9415.8899 16490.762,8957.8299 16490.762,8397.9699 C 16490.762,7838.1104 16948.822,7380.0504 17508.682,7380.0504 C 18068.542,7380.0504 18526.602,7838.1104 18526.602,8397.9699 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:url(#linearGradient7087);fill-opacity:1"
+   id="path308"
+   d="M 1288.4722,2096.1886 L 17600.672,2096.1886 L 17508.652,1612.4286 L 16264.252,1612.4286 L 16197.192,1634.4986 C 16180.832,1640.0786 16159.482,1643.0086 16137.622,1642.8586 L 13389.232,1642.8586 C 13367.432,1643.0086 13346.252,1640.0786 13329.532,1634.4986 L 13262.562,1612.4286 L 1380.4622,1612.4286 L 1288.4522,2096.1886 L 1288.4722,2096.1886 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:url(#linearGradient6006);fill-opacity:1"
+   id="path5966"
+   d="M 1288.4718,8932.1299 L 17600.672,8932.1299 L 17508.652,9415.8899 L 1380.4618,9415.8899 L 1288.4518,8932.1299 L 1288.4718,8932.1299 z "
+   sodipodi:nodetypes="cccccc"
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:url(#id12)"
+   id="path227"
+   d="M 18160.382,2668.0386 L 18526.602,2630.3486 L 18526.602,8397.9186 L 18160.382,8360.2886 L 18160.382,2668.0386 L 18160.382,2668.0386 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:url(#id13)"
+   id="path229"
+   d="M 362.56223,2630.3486 L 728.79223,2668.0386 L 728.79223,8360.2886 L 362.56223,8397.9186 L 362.56223,2630.3486 L 362.56223,2630.3486 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:url(#id7)"
+   id="path207"
+   d="M 17600.672,2070.0765 C 17908.502,2070.0765 18166.746,2354.0698 18166.746,2668.5898 L 18166.826,8360.2886 C 18166.826,8674.8086 17908.502,8977.3995 17600.672,8977.3995 L 1288.4722,8976.4523 C 980.64223,8976.4523 721.93231,8674.8086 721.93231,8360.2886 L 722.55594,2668.0386 C 722.55594,2353.5186 980.64223,2070.0765 1288.4722,2070.0765 L 17600.672,2070.0765 z "
+   sodipodi:nodetypes="ccccccccc"
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:#333;stroke:#0c0d0d;stroke-width:50"
+   id="path209"
+   d="M 15644.882,8105.9986 L 13317.962,8105.9986 C 12734.572,8105.9986 12257.202,7628.6586 12257.202,7045.2386 L 12257.202,3983.0086 C 12257.202,3399.5886 12734.542,2922.2486 13317.962,2922.2486 L 16380.192,2922.2486 C 16963.612,2922.2486 17440.952,3399.6186 17440.952,3983.0086 L 17440.952,6309.9986 C 17440.952,6394.2586 17373.082,6463.1886 17290.112,6463.1886 L 16850.132,6463.1886 C 16767.162,6463.1886 16699.292,6394.2586 16699.292,6309.9986 L 16699.272,3976.2986 C 16699.272,3804.5286 16558.712,3663.9386 16386.912,3663.9386 L 13311.232,3663.9386 C 13139.432,3663.9386 12998.872,3804.4986 12998.872,3976.2986 L 12998.872,7051.9786 C 12998.872,7223.7686 13139.452,7364.3386 13311.232,7364.3386 L 15644.882,7364.3386 C 15729.142,7364.3386 15798.072,7432.2086 15798.072,7515.1786 L 15798.072,7955.1586 C 15798.072,8038.1286 15729.142,8105.9986 15644.882,8105.9986 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:url(#id8);stroke:#666;stroke-width:25"
+   id="path211"
+   d="M 13317.982,8030.9986 L 15644.902,8030.9986 L 15645.052,8030.9986 C 15666.802,8030.9786 15686.492,8022.3186 15700.632,8008.3986 C 15714.472,7994.7686 15723.092,7975.9286 15723.092,7955.2286 L 15723.092,7955.1586 L 15723.092,7515.1786 L 15723.092,7515.0386 C 15723.082,7494.3786 15714.482,7475.5886 15700.682,7461.9886 C 15686.512,7448.0286 15666.782,7439.3486 15644.972,7439.3386 L 15644.902,7439.3386 L 13311.252,7439.3386 L 13311.102,7439.3386 C 13204.582,7439.2986 13107.772,7395.7486 13037.652,7325.6386 C 12967.492,7255.4886 12923.912,7158.6286 12923.892,7052.0486 L 12923.892,7051.9786 L 12923.892,3976.2986 L 12923.892,3976.1486 C 12923.932,3869.6186 12967.482,3772.8086 13037.592,3702.6886 C 13107.732,3632.5386 13204.602,3588.9586 13311.182,3588.9386 L 13311.252,3588.9386 L 16386.932,3588.9386 L 16387.082,3588.9386 C 16493.612,3588.9786 16590.422,3632.5386 16660.542,3702.6486 C 16730.712,3772.8086 16774.272,3869.6586 16774.292,3976.2286 L 16774.292,3976.2986 L 16774.312,6309.9986 L 16774.312,6310.1486 C 16774.332,6331.8986 16782.992,6351.5886 16796.912,6365.7286 C 16810.532,6379.5586 16829.372,6388.1886 16850.082,6388.1886 L 16850.152,6388.1886 L 17290.132,6388.1886 L 17290.272,6388.1886 C 17310.922,6388.1786 17329.722,6379.5886 17343.322,6365.7786 C 17357.282,6351.6086 17365.962,6331.8786 17365.972,6310.0686 L 17365.972,6309.9986 L 17365.972,3983.0086 L 17365.972,3982.8586 C 17365.942,3711.9586 17255.032,3465.5886 17076.372,3286.9086 C 16897.692,3108.2186 16651.262,2997.2586 16380.282,2997.2486 L 16380.212,2997.2486 L 13317.982,2997.2486 L 13317.832,2997.2486 C 13046.912,2997.2786 12800.532,3108.2086 12621.872,3286.8486 C 12443.172,3465.5386 12332.232,3711.9686 12332.222,3982.9386 L 12332.222,3983.0086 L 12332.222,7045.2386 L 12332.222,7045.3886 C 12332.252,7316.2986 12443.172,7562.6786 12621.842,7741.3486 C 12800.532,7920.0486 13046.952,8030.9886 13317.912,8030.9986 L 13317.982,8030.9986 L 13317.982,8030.9986 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:#76b9db"
+   id="path213"
+   d="M 14117.382,4450.1086 L 15580.732,4450.1086 L 15580.802,4450.1086 C 15672.012,4450.1386 15755.152,4487.6686 15815.572,4548.1186 C 15875.682,4608.2486 15913.022,4691.1486 15913.082,4782.3086 L 15913.082,4782.4586 L 15913.082,6245.8086 L 15913.082,6245.8786 C 15913.052,6337.0786 15875.532,6420.2186 15815.072,6480.6486 C 15754.942,6540.7586 15672.042,6578.0986 15580.882,6578.1586 L 15580.732,6578.1586 L 14117.382,6578.1586 L 14117.312,6578.1586 C 14026.102,6578.1286 13942.962,6540.5786 13882.542,6480.1486 C 13822.422,6420.0186 13785.092,6337.0986 13785.032,6245.9586 L 13785.032,6245.8086 L 13785.032,4782.4586 L 13785.032,4782.3886 C 13785.062,4691.1686 13822.612,4608.0386 13883.042,4547.6186 C 13943.172,4487.4986 14026.092,4450.1686 14117.232,4450.1086 L 14117.382,4450.1086 L 14117.382,4450.1086 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:url(#id9);stroke:#131516;stroke-width:35"
+   id="path215"
+   d="M 16430.182,6877.8486 L 17223.632,6877.8486 C 17343.182,6877.8486 17440.982,6975.6486 17440.982,7095.1986 L 17440.982,7888.6486 C 17440.982,8008.1986 17343.182,8105.9986 17223.632,8105.9986 L 16430.182,8105.9986 C 16310.632,8105.9986 16212.832,8008.1986 16212.832,7888.6486 L 16212.832,7095.1986 C 16212.832,6975.6486 16310.632,6877.8486 16430.182,6877.8486 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:#333;stroke:#0c0d0d;stroke-width:50"
+   id="path217"
+   d="M 16430.182,6877.8486 L 17223.632,6877.8486 C 17343.182,6877.8486 17440.982,6975.6486 17440.982,7095.1986 L 17440.982,7888.6486 C 17440.982,8008.1986 17343.182,8105.9986 17223.632,8105.9986 L 16430.182,8105.9986 C 16310.632,8105.9986 16212.832,8008.1986 16212.832,7888.6486 L 16212.832,7095.1986 C 16212.832,6975.6486 16310.632,6877.8486 16430.182,6877.8486 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:url(#id10);stroke:#666;stroke-width:25"
+   id="path219"
+   d="M 17223.582,6952.8486 L 16430.132,6952.8486 L 16429.982,6952.8486 C 16390.812,6952.8686 16355.192,6968.8986 16329.382,6994.6986 C 16303.732,7020.3386 16287.792,7055.8986 16287.782,7095.1286 L 16287.782,7095.1986 L 16287.782,7888.6486 L 16287.782,7888.7986 C 16287.802,7927.9686 16303.832,7963.5886 16329.632,7989.3986 C 16355.272,8015.0586 16390.832,8030.9886 16430.062,8030.9986 L 16430.132,8030.9986 L 17223.582,8030.9986 L 17223.732,8030.9986 C 17262.902,8030.9786 17298.532,8014.9386 17324.332,7989.1486 C 17349.992,7963.5086 17365.922,7927.9486 17365.932,7888.7186 L 17365.932,7888.6486 L 17365.932,7095.1986 L 17365.932,7095.0486 C 17365.912,7055.8786 17349.882,7020.2586 17324.082,6994.4486 C 17298.442,6968.7986 17262.882,6952.8586 17223.652,6952.8486 L 17223.582,6952.8486 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:none"
+   id="path221"
+   d="M 2305.9922,3318.9386 L 9486.7822,3318.9386 C 9629.6622,3318.9386 9746.5622,3435.8386 9746.5622,3578.7186 L 9746.5622,7449.5586 C 9746.5622,7592.4386 9629.6622,7709.3386 9486.7822,7709.3386 L 2305.9922,7709.3386 C 2163.1122,7709.3386 2046.2122,7592.4386 2046.2122,7449.5586 L 2046.2122,3578.7186 C 2046.2122,3435.8386 2163.1122,3318.9386 2305.9922,3318.9386 L 2305.9922,3318.9386 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:#d6dee8;stroke:#575757;stroke-width:50;stroke-linejoin:bevel"
+   id="path223"
+   d="M 9486.7822,3368.9386 L 2305.9922,3368.9386 L 2305.8422,3368.9386 C 2248.2122,3368.9686 2195.8022,3392.5586 2157.8022,3430.4886 L 2157.8922,3430.5786 C 2119.8622,3468.6086 2096.2222,3521.0486 2096.2122,3578.6486 L 2096.2122,3578.7186 L 2096.2122,7449.5586 L 2096.2122,7449.7086 C 2096.2422,7507.2586 2119.8522,7559.6486 2157.8522,7597.6586 C 2195.8822,7635.6886 2248.3222,7659.3286 2305.9222,7659.3386 L 2305.9922,7659.3386 L 9486.7822,7659.3386 L 9486.9322,7659.3386 C 9544.4722,7659.3086 9596.8722,7635.7086 9634.8822,7597.6986 C 9672.9122,7559.6686 9696.5522,7507.2386 9696.5622,7449.6286 L 9696.5622,7449.5586 L 9696.5622,3578.7186 L 9696.5622,3578.5686 C 9696.5322,3521.0186 9672.9322,3468.6286 9634.9222,3430.6186 C 9596.8922,3392.5886 9544.4622,3368.9486 9486.8522,3368.9386 L 9486.7822,3368.9386 L 9486.7822,3368.9386 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:#f3f3f1;stroke:#2a74f9;stroke-width:50"
+   id="path231"
+   d="M 15580.782,4590.1086 L 14117.432,4590.1086 L 14117.282,4590.1086 C 14064.442,4590.1386 14016.372,4611.7786 13981.532,4646.6086 C 13946.732,4681.3986 13925.092,4729.4786 13925.082,4782.3886 L 13925.082,4782.4586 L 13925.082,6245.8086 L 13925.082,6245.9586 C 13925.112,6298.8086 13946.752,6346.8686 13981.582,6381.7086 C 14016.382,6416.5186 14064.462,6438.1486 14117.362,6438.1586 L 14117.432,6438.1586 L 15580.782,6438.1586 L 15580.932,6438.1586 C 15633.782,6438.1286 15681.842,6416.4886 15716.682,6381.6586 C 15751.492,6346.8586 15773.122,6298.7786 15773.132,6245.8786 L 15773.132,6245.8086 L 15773.132,4782.4586 L 15773.132,4782.3086 C 15773.102,4729.4686 15751.462,4681.3986 15716.632,4646.5586 C 15681.842,4611.7586 15633.752,4590.1186 15580.852,4590.1086 L 15580.782,4590.1086 L 15580.782,4590.1086 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><g
+   id="g233"
+   transform="translate(-1102.918,709.0186)"
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300">
+   <defs
+   id="defs235">
+    <linearGradient
+   y2="5280.6401"
+   x2="9890.9297"
+   y1="4742.0801"
+   x1="9890.9297"
+   gradientUnits="userSpaceOnUse"
+   id="id14">
+     <stop
+   id="stop238"
+   stop-color="#EFB000"
+   offset="0" />
+     <stop
+   id="stop240"
+   stop-color="#A5732B"
+   offset="0.6" />
+     <stop
+   id="stop242"
+   stop-color="#492A28"
+   offset="1" />
+     <stop
+   id="stop244"
+   stop-color="#492A28"
+   offset="1" />
+    </linearGradient>
+   </defs>
+   <path
+   style="fill:#131516"
+   id="path246"
+   d="M 3217.1,5644.41 L 10774.5,5644.41 L 10774.5,3403.61 L 3217.1,3403.61 L 3217.1,5644.41 L 3217.1,5644.41 z " />
+   <path
+   style="fill:white"
+   id="path248"
+   d="M 3695.02,5514.65 C 3695.02,5483.14 3668.37,5457.68 3635.49,5457.68 C 3602.6,5457.68 3575.98,5483.14 3575.98,5514.65 C 3575.98,5546.17 3602.6,5571.68 3635.49,5571.68 C 3668.37,5571.68 3695.02,5546.17 3695.02,5514.65 z M 3881.96,5467.02 C 3905.94,5451.36 3937.7,5455.83 3956.38,5477.31 C 3975.22,5498.8 3975.22,5530.88 3956.38,5552.37 C 3937.7,5573.85 3905.94,5578.26 3881.96,5562.67 L 3881.96,5609.93 L 3850.39,5609.93 L 3850.39,5460.44 L 3881.96,5460.44 L 3881.96,5467.02 L 3881.96,5467.02 L 3881.96,5467.02 L 3881.96,5467.02 z M 4241.94,5514.65 C 4241.94,5483.14 4215.26,5457.68 4182.37,5457.68 C 4149.53,5457.68 4122.9,5483.14 4122.9,5514.65 C 4122.9,5546.17 4149.53,5571.68 4182.37,5571.68 C 4199.34,5571.68 4214.57,5565 4225.44,5554.07 L 4202.68,5533.17 L 4225.44,5554.07 L 4202.68,5533.17 C 4196.79,5539 4188.47,5542.13 4180.08,5541.5 C 4171.6,5540.75 4164.01,5536.45 4159.24,5529.72 L 4239.76,5529.72 C 4241.19,5525 4241.94,5519.91 4241.94,5514.65 L 4241.94,5514.65 L 4241.94,5514.65 L 4241.94,5514.65 z M 6218.61,5514.65 C 6218.61,5483.14 6191.99,5457.68 6159.14,5457.68 C 6126.26,5457.68 6099.63,5483.14 6099.63,5514.65 C 6099.63,5546.17 6126.26,5571.68 6159.14,5571.68 C 6176.13,5571.68 6191.36,5565 6202.17,5554.07 L 6179.37,5533.17 L 6202.17,5554.07 L 6179.37,5533.17 C 6173.58,5539 6165.3,5542.13 6156.87,5541.5 C 6148.43,5540.75 6140.7,5536.45 6136.03,5529.72 L 6216.49,5529.72 C 6217.93,5525 6218.61,5519.91 6218.61,5514.65 L 6218.61,5514.65 L 6218.61,5514.65 L 6218.61,5514.65 z M 7394.96,5514.65 C 7394.96,5483.14 7368.33,5457.68 7335.43,5457.68 C 7302.55,5457.68 7275.92,5483.14 7275.92,5514.65 C 7275.92,5546.17 7302.55,5571.68 7335.43,5571.68 C 7352.31,5571.68 7367.63,5565 7378.52,5554.07 L 7355.76,5533.17 L 7378.52,5554.07 L 7355.76,5533.17 C 7349.87,5539 7341.54,5542.13 7333.1,5541.5 C 7324.66,5540.75 7317.03,5536.45 7312.2,5529.72 L 7392.84,5529.72 C 7394.22,5525 7394.96,5519.91 7394.96,5514.65 L 7394.96,5514.65 L 7394.96,5514.65 L 7394.96,5514.65 z M 10401.09,5514.65 C 10401.09,5483.14 10374.46,5457.68 10341.63,5457.68 C 10308.69,5457.68 10282.05,5483.14 10282.05,5514.65 C 10282.05,5546.17 10308.69,5571.68 10341.63,5571.68 C 10358.55,5571.68 10373.87,5565 10384.76,5554.07 L 10361.94,5533.17 L 10384.76,5554.07 L 10361.94,5533.17 C 10356.11,5539 10347.83,5542.13 10339.34,5541.5 C 10330.9,5540.75 10323.21,5536.45 10318.44,5529.72 L 10399.08,5529.72 C 10400.35,5525 10401.09,5519.91 10401.09,5514.65 L 10401.09,5514.65 L 10401.09,5514.65 L 10401.09,5514.65 z M 4499.85,5506.28 C 4499.85,5487.97 4490.63,5471.31 4475.93,5462.99 C 4461.14,5454.71 4443.42,5456.24 4430.1,5467.02 L 4430.1,5460.44 L 4398.59,5460.44 L 4398.59,5569.3 L 4430.1,5569.3 L 4430.1,5506.28 C 4430.1,5496.03 4438.69,5487.91 4449.31,5487.91 C 4459.75,5487.91 4468.34,5496.03 4468.34,5506.28 L 4468.34,5569.3 L 4499.85,5569.3 L 4499.85,5506.28 L 4499.85,5506.28 z M 4955.81,5492.11 C 4955.81,5477.73 4944.4,5464.84 4927.27,5459.85 C 4910.24,5454.81 4891.03,5458.79 4879.15,5469.88 C 4867.38,5480.81 4865.58,5496.51 4874.43,5509.14 C 4879.04,5515.13 4885.46,5519.54 4892.79,5521.82 C 4901.21,5524.47 4909.81,5526.7 4918.4,5528.29 C 4925.56,5529.72 4929.29,5533 4927.21,5536.35 C 4925.15,5539.53 4917.83,5541.6 4910.24,5541.18 C 4902.49,5540.69 4896.87,5537.89 4896.87,5534.44 L 4896.87,5531.26 L 4865.36,5531.26 L 4865.36,5534.44 C 4865.36,5550.46 4878.09,5564.73 4897.09,5569.93 C 4916.02,5575.13 4937.02,5570.14 4949.34,5557.52 C 4961.64,5544.95 4962.64,5527.45 4951.61,5513.97 C 4945.3,5506.85 4936.6,5502.14 4926.95,5500.59 C 4919.26,5499.21 4911.78,5497.47 4904.35,5495.35 C 4900.21,5494.01 4899.21,5491.95 4901.7,5490.2 C 4904.29,5488.4 4909.81,5487.44 4915.18,5487.97 C 4920.58,5488.5 4924.3,5490.2 4924.3,5492.11 L 4924.3,5493.64 L 4955.81,5493.64 L 4955.81,5492.11 L 4955.81,5492.11 L 4955.81,5492.11 L 4955.81,5492.11 z M 5229.95,5514.65 C 5229.95,5483.14 5203.27,5457.68 5170.48,5457.68 C 5137.54,5457.68 5110.87,5483.14 5110.87,5514.65 C 5110.87,5546.17 5137.54,5571.68 5170.48,5571.68 C 5203.27,5571.68 5229.95,5546.17 5229.95,5514.65 z M 5386.07,5523.46 L 5386.07,5460.44 L 5417.58,5460.44 L 5417.58,5523.46 C 5417.58,5533.59 5426.18,5541.77 5436.73,5541.77 C 5447.35,5541.77 5455.94,5533.59 5455.94,5523.46 L 5455.94,5460.44 L 5487.45,5460.44 L 5487.45,5569.3 L 5455.94,5569.3 L 5455.94,5562.67 C 5442.58,5573.38 5424.86,5575.03 5410.11,5566.69 C 5395.36,5558.37 5386.07,5541.77 5386.07,5523.46 L 5386.07,5523.46 L 5386.07,5523.46 z M 5677.69,5467.02 L 5677.69,5460.44 L 5646.18,5460.44 L 5646.18,5569.3 L 5677.69,5569.3 L 5677.69,5514.65 C 5677.69,5507.49 5680.66,5500.8 5685.91,5495.72 C 5691.15,5490.62 5698.32,5487.91 5705.75,5487.91 L 5705.75,5457.83 C 5695.72,5458.42 5686.11,5461.56 5677.69,5467.02 L 5677.69,5467.02 z M 5955.07,5475.29 C 5944.2,5464.42 5928.92,5457.68 5912,5457.68 C 5879.11,5457.68 5852.47,5483.14 5852.47,5514.65 C 5852.47,5514.65 5852.47,5514.65 5852.47,5514.65 C 5852.47,5546.17 5879.11,5571.68 5912,5571.68 C 5928.92,5571.68 5944.2,5564.84 5955.07,5553.96 L 5932.31,5533.17 C 5927.17,5538.32 5920.01,5541.5 5912,5541.5 C 5896.5,5541.5 5883.98,5529.45 5883.98,5514.65 C 5883.98,5514.65 5883.98,5514.65 5883.98,5514.65 C 5883.98,5499.86 5896.5,5487.91 5912,5487.91 C 5920.01,5487.91 5927.17,5491.05 5932.31,5496.09 L 5955.07,5475.29 z M 9603.62,5514.6 L 9587.38,5460.44 L 9559.22,5460.44 L 9542.98,5514.6 L 9526.81,5460.44 L 9494.02,5460.44 L 9526.59,5569.3 L 9559.32,5569.3 L 9573.33,5522.78 L 9587.28,5569.3 L 9620.01,5569.3 L 9652.64,5460.44 L 9619.95,5460.44 L 9603.62,5514.6 M 8803.54,5425 L 8771.99,5425 L 8771.99,5455.24 L 8803.54,5455.24 L 8803.54,5425 M 8803.54,5460.44 L 8771.99,5460.44 L 8771.99,5569.3 L 8803.54,5569.3 L 8803.54,5460.44 M 8150.21,5514.87 L 8185.32,5569.3 L 8148.24,5569.3 L 8131.75,5543.62 L 8115.14,5569.3 L 8078.05,5569.3 L 8113.17,5514.87 L 8078.01,5460.44 L 8115.14,5460.44 L 8131.75,5486.22 L 8148.24,5460.44 L 8185.43,5460.44 L 8150.21,5514.87 M 7094.34,5460.44 L 7065.42,5505.22 L 7065.42,5425 L 7033.91,5425 L 7033.91,5569.3 L 7065.42,5569.3 L 7065.42,5523.84 L 7100.91,5569.3 L 7140.33,5569.3 L 7096.93,5513.81 L 7131.47,5460.44 L 7094.34,5460.44 M 6614.08,5425 L 6582.57,5425 L 6582.57,5455.24 L 6614.08,5455.24 L 6614.08,5425 M 6614.08,5574.54 L 6614.08,5460.44 L 6582.57,5460.44 L 6582.57,5574.54 C 6582.57,5577.41 6580.14,5579.7 6577.17,5579.7 L 6568.09,5579.7 L 6568.09,5609.93 L 6577.17,5609.93 C 6597.48,5609.93 6614.08,5594.02 6614.08,5574.54 M 7941.41,5514.65 C 7941.41,5483.14 7914.77,5457.68 7882,5457.68 C 7849.06,5457.68 7822.42,5483.14 7822.42,5514.65 C 7822.42,5546.17 7849.06,5571.68 7882,5571.68 C 7914.77,5571.68 7941.41,5546.17 7941.41,5514.65 z M 6843.68,5562.67 L 6843.68,5569.3 L 6875.19,5569.3 L 6875.19,5460.44 L 6843.68,5460.44 L 6843.68,5523.46 C 6843.68,5533.59 6835.09,5541.77 6824.48,5541.77 C 6813.88,5541.77 6805.28,5533.59 6805.28,5523.46 L 6805.28,5460.44 L 6773.77,5460.44 L 6773.77,5523.46 C 6773.77,5541.77 6783.1,5558.37 6797.85,5566.69 C 6812.64,5575.03 6830.36,5573.38 6843.68,5562.67 L 6843.68,5562.67 L 6843.68,5562.67 z M 7581.26,5467.02 L 7581.26,5425 L 7549.71,5425 L 7549.71,5569.3 L 7581.26,5569.3 L 7581.26,5562.67 C 7605.19,5578.26 7636.9,5573.85 7655.7,5552.37 C 7674.42,5530.88 7674.42,5498.8 7655.7,5477.31 C 7636.9,5455.83 7605.19,5451.36 7581.26,5467.02 L 7581.26,5467.02 L 7581.26,5467.02 L 7581.26,5467.02 z M 8615.65,5455.24 L 8589.56,5455.24 C 8588.81,5455.08 8588.12,5455.34 8587.64,5455.87 C 8587.06,5456.4 8586.89,5456.99 8586.95,5457.68 L 8586.95,5460.44 L 8586.95,5460.44 L 8601.27,5460.44 L 8601.27,5490.62 L 8586.95,5490.62 L 8586.95,5569.3 L 8555.44,5569.3 L 8555.44,5490.62 L 8541.06,5490.62 L 8541.06,5460.44 L 8555.44,5460.44 C 8555.44,5440.92 8571.88,5425 8592.42,5425 L 8615.65,5425 L 8615.65,5455.24 L 8615.65,5455.24 L 8615.65,5455.24 L 8615.65,5455.24 z M 9022.21,5457.83 L 9022.21,5487.91 C 9014.78,5487.91 9007.73,5490.62 9002.43,5495.72 C 8997.17,5500.8 8994.31,5507.49 8994.31,5514.65 L 8994.31,5569.3 L 8962.74,5569.3 L 8962.74,5460.44 L 8994.31,5460.44 L 8994.31,5467.02 C 9002.63,5461.56 9012.28,5458.42 9022.21,5457.83 L 9022.21,5457.83 L 9022.21,5457.83 L 9022.21,5457.83 z M 9207.08,5467.02 L 9207.08,5460.44 L 9175.47,5460.44 L 9175.47,5569.3 L 9207.08,5569.3 L 9207.08,5506.28 C 9207.08,5496.03 9215.57,5487.91 9226.18,5487.91 C 9236.78,5487.91 9245.38,5496.03 9245.38,5506.28 L 9245.38,5569.3 L 9276.89,5569.3 L 9276.89,5506.28 C 9276.89,5496.03 9285.48,5487.91 9296.05,5487.91 C 9306.65,5487.91 9315.24,5496.03 9315.24,5506.28 L 9315.24,5569.3 L 9346.76,5569.3 L 9346.76,5506.28 C 9346.76,5487.07 9335.04,5469.67 9316.79,5461.87 C 9298.54,5454.12 9277.16,5457.26 9262.25,5470.04 C 9246.81,5454.81 9223.85,5453.54 9207.08,5467.02 L 9207.08,5467.02 L 9207.08,5467.02 L 9207.08,5467.02 z M 9881.49,5467.02 L 9881.49,5460.44 L 9913,5460.44 L 9913,5569.3 L 9881.49,5569.3 L 9881.49,5562.67 C 9857.51,5578.26 9825.73,5573.85 9807.01,5552.37 C 9788.22,5530.88 9788.22,5498.8 9807.01,5477.31 C 9825.73,5455.83 9857.51,5451.36 9881.49,5467.02 L 9881.49,5467.02 L 9881.49,5467.02 L 9881.49,5467.02 z M 10135.64,5457.83 L 10135.64,5487.91 C 10128.22,5487.91 10121.06,5490.62 10115.8,5495.72 C 10110.6,5500.8 10107.62,5507.49 10107.62,5514.65 L 10107.62,5569.3 L 10076.11,5569.3 L 10076.11,5460.44 L 10107.62,5460.44 L 10107.62,5467.02 C 10115.9,5461.56 10125.67,5458.42 10135.64,5457.83 L 10135.64,5457.83 z " />
+   <path
+   style="fill:#131516"
+   id="path250"
+   d="M 3663.5,5514.65 C 3663.5,5499.86 3650.99,5487.91 3635.49,5487.91 C 3620.05,5487.91 3607.43,5499.86 3607.43,5514.65 C 3607.43,5529.51 3620.05,5541.55 3635.49,5541.55 C 3650.99,5541.55 3663.5,5529.51 3663.5,5514.65 z M 7312.2,5499.64 L 7358.62,5499.64 C 7353.42,5492.21 7344.72,5487.91 7335.43,5487.91 C 7326.1,5487.91 7317.46,5492.21 7312.2,5499.64 M 6136.03,5499.64 L 6182.39,5499.64 C 6177.08,5492.21 6168.44,5487.91 6159.2,5487.91 C 6149.86,5487.91 6141.17,5492.21 6136.03,5499.64 M 5198.44,5514.65 C 5198.44,5499.86 5185.92,5487.91 5170.48,5487.91 C 5155,5487.91 5142.38,5499.86 5142.38,5514.65 C 5142.38,5529.51 5155,5541.55 5170.48,5541.55 C 5185.92,5541.55 5198.44,5529.51 5198.44,5514.65 z M 7909.9,5514.65 C 7909.9,5499.86 7897.43,5487.91 7882,5487.91 C 7866.44,5487.91 7853.93,5499.86 7853.93,5514.65 C 7853.93,5529.51 7866.44,5541.55 7882,5541.55 C 7897.43,5541.55 7909.9,5529.51 7909.9,5514.65 z M 7637.33,5514.65 C 7637.33,5499.86 7624.76,5487.91 7609.28,5487.91 C 7593.78,5487.91 7581.22,5499.86 7581.22,5514.65 C 7581.22,5529.51 7593.78,5541.55 7609.28,5541.55 C 7624.76,5541.55 7637.33,5529.51 7637.33,5514.65 z M 3938.02,5514.97 C 3938.02,5500.12 3925.46,5488.19 3909.9,5488.19 C 3894.48,5488.19 3881.96,5500.12 3881.96,5514.97 C 3881.96,5529.77 3894.48,5541.77 3909.9,5541.77 C 3925.46,5541.77 3938.02,5529.77 3938.02,5514.97 z M 4159.24,5499.64 L 4205.54,5499.64 C 4200.4,5492.21 4191.65,5487.91 4182.37,5487.91 C 4173.13,5487.91 4164.44,5492.21 4159.24,5499.64 M 10318.44,5499.64 L 10364.86,5499.64 C 10359.55,5492.21 10350.95,5487.91 10341.63,5487.91 C 10332.33,5487.91 10323.7,5492.21 10318.44,5499.64 M 9881.49,5514.65 C 9881.49,5499.86 9868.91,5487.91 9853.47,5487.91 C 9837.99,5487.91 9825.46,5499.86 9825.46,5514.65 C 9825.46,5529.51 9837.99,5541.55 9853.47,5541.55 C 9868.91,5541.55 9881.49,5529.51 9881.49,5514.65 z " />
+   <path
+   style="fill:#efaf04"
+   id="path252"
+   d="M 3261.77,3455.92 L 10722.29,3455.92 L 10722.29,5359.28 L 3261.77,5359.28 L 3261.77,3455.92 L 3261.77,3455.92 L 3261.77,3455.92 L 3261.77,3455.92 z " />
+   <path
+   style="fill:url(#linearGradient7085)"
+   id="path254"
+   d="M 9125.24,5244.9 L 9125.24,5244.9 M 10702.2,4932.17 L 10722.25,4932.17 L 10722.25,4943.05 L 10713.66,4943.05 L 10713.66,4986.65 L 10702.2,4986.65 L 10702.2,4932.17 M 10645.28,4932.17 L 10679.38,4932.17 L 10679.38,4943.05 L 10645.28,4943.05 L 10645.28,4932.17 M 10645.28,4975.78 L 10679.38,4975.78 L 10679.38,4986.65 L 10645.28,4986.65 L 10645.28,4975.78 M 10565.64,4932.17 L 10565.64,4932.17 L 10565.64,4932.17 L 10565.64,4932.17 L 10565.64,4932.17 M 10588.46,4943.05 L 10599.76,4943.05 L 10599.76,4986.65 L 10588.46,4986.65 L 10588.46,4943.05 M 10599.76,4932.17 L 10611.22,4932.17 L 10611.22,4943.05 L 10599.76,4943.05 L 10599.76,4932.17 M 10611.22,4943.05 L 10622.56,4943.05 L 10622.56,4986.65 L 10611.22,4986.65 L 10611.22,4943.05 M 10565.64,4932.17 L 10588.46,4932.17 L 10588.46,4943.05 L 10577,4943.05 L 10577,4986.65 L 10565.64,4986.65 L 10565.64,4932.17 M 10542.88,4921.3 L 10554.3,4921.3 L 10554.3,4943.05 L 10542.88,4943.05 L 10542.88,4921.3 M 10542.88,4953.92 L 10554.3,4953.92 L 10554.3,4975.78 L 10542.88,4975.78 L 10542.88,4953.92 M 10451.86,4932.17 L 10463.26,4932.17 L 10463.26,4953.92 L 10451.86,4953.92 L 10451.86,4932.17 M 10370.48,4932.17 L 10381.73,4932.17 L 10381.73,4943.05 L 10370.48,4943.05 L 10370.48,4932.17 M 10336.32,4953.92 L 10347.67,4953.92 L 10347.67,4975.78 L 10336.32,4975.78 L 10336.32,4953.92 M 10292.56,4975.78 L 10336.32,4975.78 L 10336.32,4986.65 L 10292.56,4986.65 L 10292.56,4975.78 M 10246.98,4943.05 L 10258.39,4943.05 L 10258.39,4953.92 L 10246.98,4953.92 L 10246.98,4943.05 M 10235.64,4910.42 L 10269.74,4910.42 L 10269.74,4921.3 L 10235.64,4921.3 L 10235.64,4910.42 M 10235.64,4975.78 L 10269.74,4975.78 L 10269.74,4986.65 L 10235.64,4986.65 L 10235.64,4975.78 M 10178.76,4910.42 L 10201.47,4910.42 L 10201.47,4921.3 L 10178.76,4921.3 L 10178.76,4910.42 M 10167.36,4921.3 L 10178.76,4921.3 L 10178.76,4932.17 L 10167.36,4932.17 L 10167.36,4921.3 M 10201.47,4953.92 L 10212.92,4953.92 L 10212.92,4975.78 L 10201.47,4975.78 L 10201.47,4953.92 M 10508.84,4813.44 L 10554.3,4813.44 L 10554.3,4824.48 L 10508.84,4824.48 L 10508.84,4813.44 M 10497.38,4824.48 L 10508.84,4824.48 L 10508.84,4835.36 L 10497.38,4835.36 L 10497.38,4824.48 M 10508.84,4835.36 L 10542.88,4835.36 L 10542.88,4846.23 L 10508.84,4846.23 L 10508.84,4835.36 M 10542.88,4846.23 L 10554.3,4846.23 L 10554.3,4857.11 L 10542.88,4857.11 L 10542.88,4846.23 M 10497.38,4857.11 L 10542.88,4857.11 L 10542.88,4867.98 L 10497.38,4867.98 L 10497.38,4857.11 M 10565.64,4813.44 L 10577,4813.44 L 10577,4857.11 L 10565.64,4857.11 L 10565.64,4813.44 M 10577,4878.91 L 10611.22,4878.91 L 10611.22,4889.78 L 10577,4889.78 L 10577,4878.91 M 10633.98,4857.11 L 10679.38,4857.11 L 10679.38,4867.98 L 10633.98,4867.98 L 10633.98,4857.11 M 10679.38,4846.23 L 10690.84,4846.23 L 10690.84,4857.11 L 10679.38,4857.11 L 10679.38,4846.23 M 10645.28,4835.36 L 10679.38,4835.36 L 10679.38,4846.23 L 10645.28,4846.23 L 10645.28,4835.36 M 10633.98,4824.48 L 10645.28,4824.48 L 10645.28,4835.36 L 10633.98,4835.36 L 10633.98,4824.48 M 10645.28,4813.44 L 10690.84,4813.44 L 10690.84,4824.48 L 10645.28,4824.48 L 10645.28,4813.44 M 10508.84,5050.89 L 10554.3,5050.89 L 10554.3,5061.77 L 10508.84,5061.77 L 10508.84,5050.89 M 10497.38,5061.77 L 10508.84,5061.77 L 10508.84,5072.65 L 10497.38,5072.65 L 10497.38,5061.77 M 10508.84,5072.65 L 10542.88,5072.65 L 10542.88,5083.52 L 10508.84,5083.52 L 10508.84,5072.65 M 10542.88,5083.52 L 10554.3,5083.52 L 10554.3,5094.39 L 10542.88,5094.39 L 10542.88,5083.52 M 10497.38,5094.39 L 10542.88,5094.39 L 10542.88,5105.32 L 10497.38,5105.32 L 10497.38,5094.39 M 10223.91,5094.39 L 10269.47,5094.39 L 10269.47,5105.32 L 10223.91,5105.32 L 10223.91,5094.39 M 10269.47,5083.52 L 10280.77,5083.52 L 10280.77,5094.39 L 10269.47,5094.39 L 10269.47,5083.52 M 10235.27,5072.65 L 10269.47,5072.65 L 10269.47,5083.52 L 10235.27,5083.52 L 10235.27,5072.65 M 10223.91,5061.77 L 10235.27,5061.77 L 10235.27,5072.65 L 10223.91,5072.65 L 10223.91,5061.77 M 10235.27,5050.89 L 10280.77,5050.89 L 10280.77,5061.77 L 10235.27,5061.77 L 10235.27,5050.89 M 9893.32,5169.46 L 9938.82,5169.46 L 9938.82,5180.45 L 9893.32,5180.45 L 9893.32,5169.46 M 9882.02,5180.45 L 9893.32,5180.45 L 9893.32,5191.32 L 9882.02,5191.32 L 9882.02,5180.45 M 9893.32,5191.32 L 9927.42,5191.32 L 9927.42,5202.19 L 9893.32,5202.19 L 9893.32,5191.32 M 9927.42,5202.19 L 9938.82,5202.19 L 9938.82,5213.18 L 9927.42,5213.18 L 9927.42,5202.19 M 9882.02,5213.18 L 9927.42,5213.18 L 9927.42,5224.11 L 9882.02,5224.11 L 9882.02,5213.18 M 9126.14,5213.18 L 9171.64,5213.18 L 9171.64,5224.11 L 9126.14,5224.11 L 9126.14,5213.18 M 9171.64,5202.19 L 9183.06,5202.19 L 9183.06,5213.18 L 9171.64,5213.18 L 9171.64,5202.19 M 9137.54,5191.32 L 9171.64,5191.32 L 9171.64,5202.19 L 9137.54,5202.19 L 9137.54,5191.32 M 9126.14,5180.45 L 9137.54,5180.45 L 9137.54,5191.32 L 9126.14,5191.32 L 9126.14,5180.45 M 9137.54,5169.46 L 9183.06,5169.46 L 9183.06,5180.45 L 9137.54,5180.45 L 9137.54,5169.46 M 10360.82,5169.46 L 10383.64,5169.46 L 10383.64,5180.45 L 10372.24,5180.45 L 10372.24,5224.11 L 10360.82,5224.11 L 10360.82,5169.46 M 10406.4,5180.45 L 10417.74,5180.45 L 10417.74,5224.11 L 10406.4,5224.11 L 10406.4,5180.45 M 10395.04,5169.46 L 10406.4,5169.46 L 10406.4,5180.45 L 10395.04,5180.45 L 10395.04,5169.46 M 10383.64,5180.45 L 10395.04,5180.45 L 10395.04,5224.11 L 10383.64,5224.11 L 10383.64,5180.45 M 10360.82,5169.46 L 10360.82,5169.46 L 10360.82,5169.46 L 10360.82,5169.46 L 10360.82,5169.46 M 9264.54,5169.46 L 9264.54,5169.46 L 9264.54,5169.46 L 9264.54,5169.46 L 9264.54,5169.46 M 9287.29,5180.45 L 9298.64,5180.45 L 9298.64,5224.11 L 9287.29,5224.11 L 9287.29,5180.45 M 9298.64,5169.46 L 9310,5169.46 L 9310,5180.45 L 9298.64,5180.45 L 9298.64,5169.46 M 9310,5180.45 L 9321.46,5180.45 L 9321.46,5224.11 L 9310,5224.11 L 9310,5180.45 M 9264.54,5169.46 L 9287.29,5169.46 L 9287.29,5180.45 L 9275.88,5180.45 L 9275.88,5224.11 L 9264.54,5224.11 L 9264.54,5169.46 M 10611.22,4857.11 L 10611.22,4813.44 L 10622.56,4813.44 L 10622.56,4878.91 L 10611.22,4878.91 L 10611.22,4867.98 L 10577,4867.98 L 10577,4857.11 L 10611.22,4857.11 M 9721.12,5211.47 L 9721.12,5167.93 L 9732.53,5167.93 L 9732.53,5233.23 L 9721.12,5233.23 L 9721.12,5222.36 L 9686.95,5222.36 L 9686.95,5211.47 L 9721.12,5211.47 M 9686.95,5233.23 L 9721.12,5233.23 L 9721.12,5244.16 L 9686.95,5244.16 L 9686.95,5233.23 M 9675.61,5167.93 L 9686.95,5167.93 L 9686.95,5211.47 L 9675.61,5211.47 L 9675.61,5167.93 M 10633.98,4943.05 L 10645.28,4943.05 L 10645.28,4953.92 L 10679.38,4953.92 L 10679.38,4943.05 L 10690.84,4943.05 L 10690.84,4964.85 L 10645.28,4964.85 L 10645.28,4975.78 L 10633.98,4975.78 L 10633.98,4943.05 M 10429.2,5061.77 L 10440.46,5061.77 L 10440.46,5072.65 L 10474.66,5072.65 L 10474.66,5061.77 L 10486.02,5061.77 L 10486.02,5083.52 L 10440.46,5083.52 L 10440.46,5094.39 L 10429.2,5094.39 L 10429.2,5061.77 M 10440.46,5094.39 L 10474.66,5094.39 L 10474.66,5105.32 L 10440.46,5105.32 L 10440.46,5094.39 M 10440.46,5050.89 L 10474.66,5050.89 L 10474.66,5061.77 L 10440.46,5061.77 L 10440.46,5050.89 M 10167.09,5050.89 L 10201.15,5050.89 L 10201.15,5061.77 L 10167.09,5061.77 L 10167.09,5050.89 M 10167.09,5094.39 L 10201.15,5094.39 L 10201.15,5105.32 L 10167.09,5105.32 L 10167.09,5094.39 M 10155.63,5061.77 L 10167.09,5061.77 L 10167.09,5072.65 L 10201.15,5072.65 L 10201.15,5061.77 L 10212.55,5061.77 L 10212.55,5083.52 L 10167.09,5083.52 L 10167.09,5094.39 L 10155.63,5094.39 L 10155.63,5061.77 M 10565.64,5180.45 L 10577,5180.45 L 10577,5191.32 L 10611.22,5191.32 L 10611.22,5180.45 L 10622.56,5180.45 L 10622.56,5202.19 L 10577,5202.19 L 10577,5213.18 L 10565.64,5213.18 L 10565.64,5180.45 M 10577,5213.18 L 10611.22,5213.18 L 10611.22,5224.11 L 10577,5224.11 L 10577,5213.18 M 10577,5169.46 L 10611.22,5169.46 L 10611.22,5180.45 L 10577,5180.45 L 10577,5169.46 M 10713.66,5169.46 L 10722.25,5169.46 L 10722.25,5180.45 L 10713.66,5180.45 L 10713.66,5169.46 M 10713.66,5213.18 L 10722.25,5213.18 L 10722.25,5224.11 L 10713.66,5224.11 L 10713.66,5213.18 M 10702.2,5180.45 L 10713.66,5180.45 L 10713.66,5191.32 L 10722.25,5191.32 L 10722.25,5191.32 L 10722.25,5191.32 L 10722.25,5202.19 L 10713.66,5202.19 L 10713.66,5213.18 L 10702.2,5213.18 L 10702.2,5180.45 M 9070.91,5169.46 L 9105.13,5169.46 L 9105.13,5180.45 L 9070.91,5180.45 L 9070.91,5169.46 M 9070.91,5213.18 L 9105.13,5213.18 L 9105.13,5224.11 L 9070.91,5224.11 L 9070.91,5213.18 M 9059.61,5180.45 L 9070.91,5180.45 L 9070.91,5191.32 L 9105.13,5191.32 L 9105.13,5180.45 L 9116.47,5180.45 L 9116.47,5202.19 L 9070.91,5202.19 L 9070.91,5213.18 L 9059.61,5213.18 L 9059.61,5180.45 M 9205.7,5202.19 L 9228.46,5202.19 L 9228.46,5222.36 L 9205.7,5222.36 L 9205.7,5202.19 M 10577,5050.89 L 10611.22,5050.89 L 10611.22,5061.77 L 10577,5061.77 L 10577,5050.89 M 10565.64,5061.77 L 10577,5061.77 L 10577,5094.39 L 10565.64,5094.39 L 10565.64,5061.77 M 10577,5094.39 L 10611.22,5094.39 L 10611.22,5105.32 L 10577,5105.32 L 10577,5094.39 M 10611.22,5083.52 L 10622.56,5083.52 L 10622.56,5094.39 L 10611.22,5094.39 L 10611.22,5083.52 M 10645.28,5050.89 L 10679.38,5050.89 L 10679.38,5061.77 L 10645.28,5061.77 L 10645.28,5050.89 M 10633.98,5083.52 L 10645.28,5083.52 L 10645.28,5094.39 L 10633.98,5094.39 L 10633.98,5083.52 M 9720.21,5083.52 L 9731.47,5083.52 L 9731.47,5094.39 L 9720.21,5094.39 L 9720.21,5083.52 M 9686.05,5094.39 L 9720.21,5094.39 L 9720.21,5105.32 L 9686.05,5105.32 L 9686.05,5094.39 M 9674.65,5061.77 L 9686.05,5061.77 L 9686.05,5094.39 L 9674.65,5094.39 L 9674.65,5061.77 M 9686.05,5050.89 L 9720.21,5050.89 L 9720.21,5061.77 L 9686.05,5061.77 L 9686.05,5050.89 M 10315.3,5029.04 L 10326.76,5029.04 L 10326.76,5039.91 L 10315.3,5039.91 L 10315.3,5029.04 M 10383.64,5072.65 L 10395.04,5072.65 L 10395.04,5083.52 L 10383.64,5083.52 L 10383.64,5072.65 M 10041.91,5050.89 L 10064.65,5050.89 L 10064.65,5061.77 L 10041.91,5061.77 L 10041.91,5050.89 M 10064.65,5061.77 L 10075.95,5061.77 L 10075.95,5105.32 L 10064.65,5105.32 L 10064.65,5061.77 M 9754.27,5050.89 L 9786.63,5050.89 L 9786.63,5061.77 L 9754.27,5061.77 L 9754.27,5050.89 M 9742.93,5061.77 L 9754.27,5061.77 L 9754.27,5094.39 L 9742.93,5094.39 L 9742.93,5061.77 M 9754.27,5094.39 L 9786.63,5094.39 L 9786.63,5105.32 L 9754.27,5105.32 L 9754.27,5094.39 M 9786.63,5061.77 L 9798.09,5061.77 L 9798.09,5094.39 L 9786.63,5094.39 L 9786.63,5061.77 M 10335.36,5180.45 L 10346.66,5180.45 L 10346.66,5213.18 L 10335.36,5213.18 L 10335.36,5180.45 M 10302.9,5213.18 L 10335.36,5213.18 L 10335.36,5224.11 L 10302.9,5224.11 L 10302.9,5213.18 M 10291.5,5180.45 L 10302.9,5180.45 L 10302.9,5213.18 L 10291.5,5213.18 L 10291.5,5180.45 M 10302.9,5169.46 L 10335.36,5169.46 L 10335.36,5180.45 L 10302.9,5180.45 L 10302.9,5169.46 M 10019.09,5050.89 L 10030.49,5050.89 L 10030.49,5061.77 L 10041.91,5061.77 L 10041.91,5072.65 L 10030.49,5072.65 L 10030.49,5105.32 L 10019.09,5105.32 L 10019.09,5050.89 M 10702.2,5050.89 L 10713.66,5050.89 L 10713.66,5061.77 L 10722.25,5061.77 L 10722.25,5072.65 L 10713.66,5072.65 L 10713.66,5105.32 L 10702.2,5105.32 L 10702.2,5050.89 M 10144.29,5105.32 L 10132.93,5105.32 L 10132.93,5094.39 L 10121.53,5094.39 L 10121.53,5083.52 L 10132.93,5083.52 L 10132.93,5050.89 L 10144.29,5050.89 L 10144.29,5105.32 M 10098.71,5094.39 L 10087.41,5094.39 L 10087.41,5050.89 L 10098.71,5050.89 L 10098.71,5094.39 M 10121.53,5105.32 L 10098.71,5105.32 L 10098.71,5094.39 L 10121.53,5094.39 L 10121.53,5105.32 M 9814.27,5050.89 L 9825.73,5050.89 L 9825.73,5061.77 L 9837.09,5061.77 L 9837.09,5072.65 L 9825.73,5072.65 L 9825.73,5105.32 L 9814.27,5105.32 L 9814.27,5050.89 M 9859.83,5061.77 L 9871.25,5061.77 L 9871.25,5105.32 L 9859.83,5105.32 L 9859.83,5061.77 M 9837.09,5050.89 L 9859.83,5050.89 L 9859.83,5061.77 L 9837.09,5061.77 L 9837.09,5050.89 M 10177.8,5169.46 L 10200.52,5169.46 L 10200.52,5180.45 L 10177.8,5180.45 L 10177.8,5169.46 M 10200.52,5180.45 L 10211.86,5180.45 L 10211.86,5224.11 L 10200.52,5224.11 L 10200.52,5180.45 M 10155.06,5169.46 L 10166.35,5169.46 L 10166.35,5180.45 L 10177.8,5180.45 L 10177.8,5191.32 L 10166.35,5191.32 L 10166.35,5224.11 L 10155.06,5224.11 L 10155.06,5169.46 M 10531.58,5224.11 L 10508.84,5224.11 L 10508.84,5213.18 L 10531.58,5213.18 L 10531.58,5224.11 M 10508.84,5213.18 L 10497.38,5213.18 L 10497.38,5169.46 L 10508.84,5169.46 L 10508.84,5213.18 M 10554.3,5224.11 L 10542.88,5224.11 L 10542.88,5213.18 L 10531.58,5213.18 L 10531.58,5202.19 L 10542.88,5202.19 L 10542.88,5169.46 L 10554.3,5169.46 L 10554.3,5224.11 M 10690.84,5224.11 L 10679.38,5224.11 L 10679.38,5213.18 L 10668.08,5213.18 L 10668.08,5202.19 L 10679.38,5202.19 L 10679.38,5169.46 L 10690.84,5169.46 L 10690.84,5224.11 M 10645.28,5213.18 L 10633.98,5213.18 L 10633.98,5169.46 L 10645.28,5169.46 L 10645.28,5213.18 M 10668.08,5224.11 L 10645.28,5224.11 L 10645.28,5213.18 L 10668.08,5213.18 L 10668.08,5224.11 M 10679.38,5061.77 L 10690.84,5061.77 L 10690.84,5105.32 L 10645.28,5105.32 L 10645.28,5094.39 L 10679.38,5094.39 L 10679.38,5083.52 L 10645.28,5083.52 L 10645.28,5072.65 L 10679.38,5072.65 L 10679.38,5061.77 M 10132.24,5180.45 L 10143.64,5180.45 L 10143.64,5224.11 L 10098.14,5224.11 L 10098.14,5213.18 L 10132.24,5213.18 L 10132.24,5202.19 L 10098.14,5202.19 L 10098.14,5191.32 L 10132.24,5191.32 L 10132.24,5180.45 M 10086.68,5202.19 L 10098.14,5202.19 L 10098.14,5213.18 L 10086.68,5213.18 L 10086.68,5202.19 M 10098.14,5169.46 L 10132.24,5169.46 L 10132.24,5180.45 L 10098.14,5180.45 L 10098.14,5169.46 M 9618.73,5169.46 L 9652.89,5169.46 L 9652.89,5180.45 L 9618.73,5180.45 L 9618.73,5169.46 M 9607.33,5202.19 L 9618.73,5202.19 L 9618.73,5213.18 L 9607.33,5213.18 L 9607.33,5202.19 M 9652.89,5180.45 L 9664.15,5180.45 L 9664.15,5224.11 L 9618.73,5224.11 L 9618.73,5213.18 L 9652.89,5213.18 L 9652.89,5202.19 L 9618.73,5202.19 L 9618.73,5191.32 L 9652.89,5191.32 L 9652.89,5180.45 M 10542.88,4910.42 L 10497.38,4910.42 L 10497.38,4986.65 L 10542.88,4986.65 L 10542.88,4975.78 L 10508.84,4975.78 L 10508.84,4953.92 L 10542.88,4953.92 L 10542.88,4943.05 L 10508.84,4943.05 L 10508.84,4921.3 L 10542.88,4921.3 L 10542.88,4910.42 M 10429.2,4910.42 L 10429.2,4986.65 L 10440.46,4986.65 L 10440.46,4932.17 L 10451.86,4932.17 L 10451.86,4921.3 L 10440.46,4921.3 L 10440.46,4910.42 L 10429.2,4910.42 M 10486.02,4910.42 L 10486.02,4986.65 L 10474.66,4986.65 L 10474.66,4932.17 L 10463.26,4932.17 L 10463.26,4921.3 L 10474.66,4921.3 L 10474.66,4910.42 L 10486.02,4910.42 M 10393.19,4910.42 L 10404.54,4910.42 L 10404.54,4953.92 L 10415.94,4953.92 L 10415.94,4964.85 L 10404.54,4964.85 L 10404.54,4986.65 L 10393.19,4986.65 L 10393.19,4964.85 L 10359.08,4964.85 L 10359.08,4943.05 L 10370.48,4943.05 L 10370.48,4953.92 L 10393.19,4953.92 L 10393.19,4932.17 L 10381.73,4932.17 L 10381.73,4921.3 L 10393.19,4921.3 L 10393.19,4910.42 M 10292.56,4910.42 L 10292.56,4921.3 L 10324.92,4921.3 L 10324.92,4932.17 L 10336.32,4932.17 L 10336.32,4921.3 L 10347.67,4921.3 L 10347.67,4910.42 L 10292.56,4910.42 M 10324.92,4932.17 L 10313.56,4932.17 L 10313.56,4943.05 L 10302.1,4943.05 L 10302.1,4953.92 L 10336.32,4953.92 L 10336.32,4943.05 L 10324.92,4943.05 L 10324.92,4932.17 M 10224.18,4921.3 L 10224.18,4975.78 L 10235.64,4975.78 L 10235.64,4964.85 L 10246.98,4964.85 L 10246.98,4953.92 L 10235.64,4953.92 L 10235.64,4921.3 L 10224.18,4921.3 M 10269.74,4921.3 L 10269.74,4932.17 L 10258.39,4932.17 L 10258.39,4943.05 L 10269.74,4943.05 L 10269.74,4975.78 L 10281.14,4975.78 L 10281.14,4921.3 L 10269.74,4921.3 M 10156,4932.17 L 10156,4975.78 L 10167.36,4975.78 L 10167.36,4953.92 L 10201.47,4953.92 L 10201.47,4943.05 L 10167.36,4943.05 L 10167.36,4932.17 L 10156,4932.17 M 10167.36,4975.78 L 10201.47,4975.78 L 10201.47,4986.65 L 10167.36,4986.65 L 10167.36,4975.78 M 9435.19,5169.46 L 9423.84,5169.46 L 9423.84,5180.45 L 9412.38,5180.45 L 9412.38,5191.32 L 9446.64,5191.32 L 9446.64,5180.45 L 9435.19,5180.45 L 9435.19,5169.46 M 9402.77,5147.71 L 9402.77,5158.59 L 9435.19,5158.59 L 9435.19,5169.46 L 9446.64,5169.46 L 9446.64,5158.59 L 9457.9,5158.59 L 9457.9,5147.71 L 9402.77,5147.71 M 9402.77,5213.18 L 9446.64,5213.18 L 9446.64,5224.11 L 9402.77,5224.11 L 9402.77,5213.18 M 9446.64,5191.32 L 9457.9,5191.32 L 9457.9,5213.18 L 9446.64,5213.18 L 9446.64,5191.32 M 10360.82,5050.89 L 10360.82,5061.77 L 10395.04,5061.77 L 10395.04,5072.65 L 10406.4,5072.65 L 10406.4,5061.77 L 10417.74,5061.77 L 10417.74,5050.89 L 10360.82,5050.89 M 10372.24,5083.52 L 10383.64,5083.52 L 10383.64,5094.39 L 10417.74,5094.39 L 10417.74,5105.32 L 10360.82,5105.32 L 10360.82,5094.39 L 10372.24,5094.39 L 10372.24,5083.52 M 10304.02,5050.89 L 10326.76,5050.89 L 10326.76,5094.39 L 10338.06,5094.39 L 10338.06,5105.32 L 10304.02,5105.32 L 10304.02,5094.39 L 10315.3,5094.39 L 10315.3,5061.77 L 10304.02,5061.77 L 10304.02,5050.89 M 9962.27,5050.89 L 9984.99,5050.89 L 9984.99,5094.39 L 9996.33,5094.39 L 9996.33,5105.32 L 9962.27,5105.32 L 9962.27,5094.39 L 9973.53,5094.39 L 9973.53,5061.77 L 9962.27,5061.77 L 9962.27,5050.89 M 9973.53,5029.04 L 9984.99,5029.04 L 9984.99,5039.91 L 9973.53,5039.91 L 9973.53,5029.04 M 9836.5,5147.71 L 9847.8,5147.71 L 9847.8,5158.59 L 9836.5,5158.59 L 9836.5,5147.71 M 9825.04,5169.46 L 9847.8,5169.46 L 9847.8,5213.18 L 9859.2,5213.18 L 9859.2,5224.11 L 9825.04,5224.11 L 9825.04,5213.18 L 9836.5,5213.18 L 9836.5,5180.45 L 9825.04,5180.45 L 9825.04,5169.46 M 9928.17,5083.52 L 9939.47,5083.52 L 9939.47,5094.39 L 9928.17,5094.39 L 9928.17,5083.52 M 9916.71,5094.39 L 9928.17,5094.39 L 9928.17,5105.32 L 9916.71,5105.32 L 9916.71,5094.39 M 9905.35,5029.04 L 9916.71,5029.04 L 9916.71,5050.89 L 9928.17,5050.89 L 9928.17,5061.77 L 9916.71,5061.77 L 9916.71,5094.39 L 9905.35,5094.39 L 9905.35,5061.77 L 9893.89,5061.77 L 9893.89,5050.89 L 9905.35,5050.89 L 9905.35,5029.04 M 9972.99,5147.71 L 9984.29,5147.71 L 9984.29,5169.46 L 9995.74,5169.46 L 9995.74,5180.45 L 9984.29,5180.45 L 9984.29,5213.18 L 9972.99,5213.18 L 9972.99,5180.45 L 9961.53,5180.45 L 9961.53,5169.46 L 9972.99,5169.46 L 9972.99,5147.71 M 9984.29,5213.18 L 9995.74,5213.18 L 9995.74,5224.11 L 9984.29,5224.11 L 9984.29,5213.18 M 9995.74,5202.19 L 10007.05,5202.19 L 10007.05,5213.18 L 9995.74,5213.18 L 9995.74,5202.19 M 10018.46,5169.46 L 10029.86,5169.46 L 10029.86,5180.45 L 10041.26,5180.45 L 10041.26,5191.32 L 10029.86,5191.32 L 10029.86,5224.11 L 10018.46,5224.11 L 10018.46,5169.46 M 10063.96,5180.45 L 10075.42,5180.45 L 10075.42,5192.97 L 10063.96,5192.97 L 10063.96,5180.45 M 10041.26,5169.46 L 10063.96,5169.46 L 10063.96,5180.45 L 10041.26,5180.45 L 10041.26,5169.46 M 9755.28,5147.71 L 9776.34,5147.71 L 9776.34,5213.18 L 9787.65,5213.18 L 9787.65,5222.36 L 9755.28,5222.36 L 9755.28,5213.18 L 9766.58,5213.18 L 9766.58,5158.59 L 9755.28,5158.59 L 9755.28,5147.71 M 9552.16,5147.71 L 9573.22,5147.71 L 9573.22,5213.18 L 9584.52,5213.18 L 9584.52,5222.36 L 9552.16,5222.36 L 9552.16,5213.18 L 9563.56,5213.18 L 9563.56,5158.59 L 9552.16,5158.59 L 9552.16,5147.71 M 10234.68,5169.46 L 10257.44,5169.46 L 10257.44,5180.45 L 10234.68,5180.45 L 10234.68,5169.46 M 10223.22,5180.45 L 10234.68,5180.45 L 10234.68,5213.18 L 10223.22,5213.18 L 10223.22,5180.45 M 10257.44,5180.45 L 10268.78,5180.45 L 10268.78,5147.71 L 10280.2,5147.71 L 10280.2,5222.36 L 10234.68,5222.36 L 10234.68,5213.18 L 10268.78,5213.18 L 10268.78,5191.32 L 10257.44,5191.32 L 10257.44,5180.45 M 10429.2,5180.45 L 10440.46,5180.45 L 10440.46,5213.18 L 10429.2,5213.18 L 10429.2,5180.45 M 10440.46,5169.46 L 10463.26,5169.46 L 10463.26,5180.45 L 10440.46,5180.45 L 10440.46,5169.46 M 10463.26,5180.45 L 10474.66,5180.45 L 10474.66,5169.46 L 10486.02,5169.46 L 10486.02,5244.16 L 10474.66,5244.16 L 10474.66,5222.36 L 10440.46,5222.36 L 10440.46,5213.18 L 10474.66,5213.18 L 10474.66,5191.32 L 10463.26,5191.32 L 10463.26,5180.45 M 9516.35,5169.46 L 9493.59,5169.46 L 9493.59,5180.45 L 9516.35,5180.45 L 9516.35,5169.46 M 9493.59,5180.45 L 9482.19,5180.45 L 9482.19,5169.46 L 9470.79,5169.46 L 9470.79,5244.16 L 9482.19,5244.16 L 9482.19,5222.36 L 9516.35,5222.36 L 9516.35,5213.18 L 9482.19,5213.18 L 9482.19,5191.32 L 9493.59,5191.32 L 9493.59,5180.45 M 9527.71,5180.45 L 9516.35,5180.45 L 9516.35,5213.18 L 9527.71,5213.18 L 9527.71,5180.45 M 9389.68,5180.45 L 9378.27,5180.45 L 9378.27,5213.18 L 9389.68,5213.18 L 9389.68,5180.45 M 9355.51,5180.45 L 9344.21,5180.45 L 9344.21,5169.46 L 9332.75,5169.46 L 9332.75,5244.16 L 9344.21,5244.16 L 9344.21,5222.36 L 9378.27,5222.36 L 9378.27,5213.18 L 9344.21,5213.18 L 9344.21,5191.32 L 9355.51,5191.32 L 9355.51,5180.45 M 9378.27,5169.46 L 9355.51,5169.46 L 9355.51,5180.45 L 9378.27,5180.45 L 9378.27,5169.46 M 9125.24,5244.9 L 9125.24,5244.9 z " />
+   <path
+   style="fill:#131516"
+   id="path256"
+   d="M 5195.01,4002.86 C 5092.25,3574.69 4826.26,3556.07 4763.71,3556.07 L 4763.71,3531.09 C 4902.33,3531.09 5126.57,3625.88 5208,3951.29 C 5312.45,3626.57 5490.63,3539.37 5615.77,3537.76 C 5734.98,3536.23 5808.56,3562.86 5921.44,3619.09 L 5921.44,3568.37 L 6247.75,3568.37 L 6247.75,3525.52 L 6273.78,3525.52 L 6273.78,3568.37 L 6329.06,3568.37 L 6329.06,3593.31 L 6273.78,3593.31 L 6273.78,4205.56 L 6508.42,3637.65 L 6733.12,3637.65 L 6752.76,3593.31 L 6472.66,3593.31 L 6472.66,3568.37 L 6763.75,3568.37 L 6794.55,3498.77 L 6818.65,3508.54 L 6792.12,3568.37 L 6854.18,3568.37 L 6854.18,3593.31 L 6781.13,3593.31 L 6598.33,4006.62 L 6840.39,4006.62 L 6840.39,4316.32 C 7067.02,4209.53 7338.1,4287.89 7474.74,4497.01 C 7610.24,4296.9 7875.1,4217.18 8105.75,4306.93 L 8096.63,4292.77 L 8486.53,4292.77 L 8564.46,4413.41 L 8640.53,4295.52 C 8641.69,4293.72 8643.65,4292.77 8645.73,4292.77 L 8645.73,4292.77 C 8647.95,4292.77 8650.03,4293.93 8651.14,4295.74 C 8652.25,4297.64 8652.2,4299.94 8650.97,4301.78 L 8571.72,4424.59 L 8581.81,4440.3 L 8675.32,4295.52 C 8676.44,4293.72 8678.46,4292.77 8680.64,4292.77 L 8680.64,4292.77 C 8682.86,4292.77 8684.93,4293.93 8686.05,4295.74 C 8687.05,4297.64 8687.05,4299.94 8685.83,4301.78 L 8589.07,4451.59 L 8599.25,4467.35 L 8711.99,4292.77 L 9101.95,4292.77 L 8794.2,4769.2 L 8804.4,4784.91 L 9129.05,4282.16 L 8724.02,4282.16 C 8721.7,4282.16 8719.72,4281.04 8718.56,4279.14 C 8717.6,4277.33 8717.6,4275 8718.72,4273.14 L 8718.72,4273.14 C 8719.89,4271.39 8721.9,4270.43 8724.02,4270.43 L 9151.27,4270.43 L 8829.06,4769.2 L 9130.43,5235.88 C 9131.65,5237.63 9131.65,5239.96 9130.64,5241.82 C 9129.53,5243.67 9127.46,5244.9 9125.24,5244.9 C 9123.06,5244.9 9121.04,5243.84 9119.88,5242.14 L 8821.85,4780.45 L 8811.66,4796.21 L 9101.46,5244.9 L 8711.56,5244.9 L 8637.08,5129.57 L 8564.35,5242.14 C 8563.19,5243.84 8561.22,5244.9 8559.1,5244.9 L 8559.1,5244.9 C 8558.09,5244.9 8557.14,5244.69 8556.13,5244.26 C 8555.28,5244.69 8554.32,5244.9 8553.26,5244.9 C 8550.98,5244.9 8548.96,5243.67 8547.85,5241.82 C 8546.84,5239.96 8546.84,5237.63 8548.02,5235.88 L 8626.9,5113.86 L 8616.77,5098.1 L 8523.71,5242.14 C 8522.55,5243.84 8520.63,5244.9 8518.51,5244.9 C 8516.18,5244.9 8514.22,5243.67 8513.06,5241.82 C 8512,5239.96 8512.04,5237.63 8513.16,5235.88 L 8609.44,5086.86 L 8599.25,5071.1 L 8487.06,5244.9 L 8097.1,5244.9 L 8108.56,5227.23 C 7877.7,5318.64 7611.55,5239.55 7475.23,5039.02 C 7338.79,5248.56 7067.28,5325.31 6840.39,5218.38 L 6840.39,5244.9 L 6509.11,5244.9 L 6509.11,5242.51 L 6454.37,5242.51 L 6478.35,5307.18 L 6453.67,5315.46 L 6426.73,5242.51 L 6321.64,5242.51 L 6321.64,5217.47 L 6417.44,5217.47 L 6222.28,4689.95 L 6210.76,4716.84 L 6210.76,5244.9 L 5994.6,5244.9 L 5994.6,3637.65 L 6210.76,3637.65 L 6210.76,4358.17 L 6247.75,4268.84 L 6247.75,3593.31 L 5947.65,3593.31 L 5947.65,3666.57 C 5817.47,3582.75 5730.2,3562.86 5615.77,3562.86 C 5525.12,3562.86 5326.29,3626.04 5221.1,4002.86 L 5195.01,4002.86 L 5195.01,4002.86 L 5195.01,4002.86 L 5195.01,4002.86 z M 5663.04,5278.63 L 5251.07,5278.69 L 5251.07,5253.7 L 5532.44,5253.7 C 5318.01,5162.52 5224.6,4832.49 5224.6,4441.25 C 5224.6,3980.04 5354.36,3603.86 5659.33,3603.86 C 5799.48,3603.86 5879.06,3672.89 5947.65,3735.64 L 5947.65,3776.59 C 5947.65,3776.65 5947.65,3776.65 5947.65,3776.76 L 5947.65,4124.07 L 5924.36,4124.07 C 5873.92,4035.9 5780.92,3912.09 5685.05,3912.09 C 5525.12,3912.09 5446.03,4149.27 5448.04,4441.25 C 5446.03,4733.35 5525.12,4970.58 5685.05,4970.58 C 5780.92,4970.58 5873.92,4846.6 5924.36,4758.6 L 5947.65,4758.6 L 5947.65,5105.8 C 5947.65,5105.85 5947.65,5105.85 5947.65,5105.85 L 5947.65,5146.92 C 5879.69,5209.2 5800.87,5277.47 5663.04,5278.63 L 5663.04,5278.63 z M 4760.53,3603.86 C 5062.86,3603.86 5191.55,3998.77 5191.55,4441.25 C 5191.55,4883.78 5062.86,5278.69 4760.53,5278.69 C 4458.22,5278.69 4329.41,4902.46 4329.41,4441.25 C 4329.41,3980.04 4458.22,3603.86 4760.53,3603.86 L 4760.53,3603.86 z M 4007.89,3637.65 L 3614.28,3637.65 L 3614.28,4571.06 C 3616.71,4577.59 3619.3,4584.11 3621.81,4590.7 C 3639.53,4585.92 3657.82,4584.11 3676.12,4585.07 C 3711.93,4586.88 3744.19,4606.28 3761.37,4636.53 C 3776.86,4663.75 3784.29,4694.51 3782.76,4725.44 C 3782.11,4738.54 3778.5,4751.12 3772.24,4762.62 C 3756.98,4790.95 3733.42,4814.24 3704.35,4829.9 C 3714.21,4861.83 3723.55,4893.77 3732.57,4925.91 C 3749.64,4987.46 3757.66,5050.89 3756.39,5114.45 C 3756.12,5130.79 3752.35,5147.02 3745.52,5162.03 C 3738.36,5177.47 3726.04,5190.1 3710.4,5197.74 C 3699.1,5203.37 3685.93,5204.31 3673.85,5200.29 C 3661.8,5196.4 3651.93,5187.81 3646.52,5176.84 C 3640.22,5163.95 3637.24,5149.88 3637.61,5135.67 C 3637.77,5127.65 3641.81,5120.18 3648.49,5115.41 C 3656.97,5109.3 3667.31,5106.34 3677.87,5106.81 C 3684.77,5107.18 3690.92,5111.05 3694.06,5116.94 C 3697.08,5122.78 3696.65,5129.94 3692.78,5135.4 C 3688.01,5142.15 3681.01,5147.13 3672.84,5149.72 L 3675.59,5155.45 C 3676.97,5158.75 3679.89,5161.18 3683.44,5162.03 C 3686.99,5162.89 3690.76,5162.03 3693.47,5159.75 C 3707.1,5148.61 3715.54,5132.81 3717.07,5115.82 C 3718.99,5086.44 3718.4,5057.05 3715.11,5027.88 C 3705.51,4965.38 3691.35,4903.64 3672.57,4843.11 C 3667.8,4844.64 3662.82,4845.81 3657.98,4846.92 C 3643.5,4849.95 3628.91,4852.33 3614.28,4854.08 L 3614.28,5244.9 L 3877.66,5244.9 L 3877.66,5297.2 L 3903.76,5297.2 L 3903.76,5244.9 L 3959.88,5244.9 L 3959.88,5219.91 L 3903.76,5219.91 L 3903.76,4656.31 L 3929.05,4656.31 L 4158.97,5244.9 L 4411.48,5244.9 L 4434.28,5300.65 L 4458.63,5291.53 L 4435.93,5236.09 L 4514.66,5236.09 L 4514.66,5211 L 4425.69,5211 L 4153.77,4546.4 C 4253.81,4447.57 4311.28,4298.82 4311.28,4109.79 C 4311.28,3856.49 4239.66,3637.65 4007.89,3637.65 L 4007.89,3637.65 L 4007.89,3637.65 L 4007.89,3637.65 z M 3661.11,4807.83 C 3646.1,4813.77 3630.35,4817.7 3614.28,4819.7 L 3614.28,4677.21 C 3630.45,4720.45 3646.05,4763.8 3661.01,4807.4 C 3661.01,4807.55 3661.06,4807.67 3661.11,4807.83 C 3661.11,4807.83 3661.11,4807.83 3661.11,4807.83 C 3661.11,4807.83 3661.11,4807.83 3661.11,4807.83 C 3661.11,4807.83 3661.11,4807.83 3661.11,4807.83 M 3636.45,4629.42 C 3641.53,4628.04 3646.79,4626.92 3651.93,4625.96 C 3668.43,4623.06 3685.36,4626.92 3698.78,4636.53 C 3710.81,4645.23 3719.68,4657.53 3723.55,4671.6 C 3732.46,4702.99 3730.45,4736.21 3718.13,4766.39 C 3715.54,4772.71 3711.24,4778.34 3705.67,4782.63 C 3701.37,4785.91 3697.02,4788.99 3692.52,4791.91 C 3675.01,4737.37 3656.39,4683.21 3636.45,4629.42 M 3614.28,4819.7 C 3610.14,4820.19 3606,4820.5 3601.8,4820.72 C 3556.55,4823.1 3514.43,4798.49 3495.93,4758.86 C 3463.03,4688.51 3458.31,4609.05 3482.55,4535.53 C 3490.94,4509.74 3499.79,4484 3508.86,4458.44 C 3511.31,4451.28 3513.86,4444.33 3516.45,4437.17 C 3540.74,4492.44 3563.99,4548.14 3586.05,4604.28 C 3554.54,4620.51 3529.07,4645.7 3513.31,4676.47 C 3510.72,4681.51 3511.72,4687.61 3515.86,4691.65 C 3520.06,4695.73 3526.38,4696.79 3531.73,4694.46 C 3536.4,4691.28 3540.7,4687.61 3544.67,4683.63 C 3560.58,4666.66 3579.69,4652.71 3600.96,4642.42 C 3605.41,4654.04 3609.82,4665.6 3614.28,4677.21 L 3614.28,4571.06 C 3593.21,4517.38 3571.04,4464.07 3547.65,4411.29 C 3543.66,4402.52 3539.84,4393.88 3535.76,4385.13 C 3540.64,4372.4 3545.57,4359.51 3550.55,4346.72 C 3557.83,4328.58 3563.29,4309.79 3567.05,4290.6 C 3571.15,4269 3569.35,4246.67 3561.54,4225.87 C 3543.82,4178.6 3509.56,4138.65 3464.62,4112.77 C 3444.84,4101.41 3422.08,4095.8 3399,4096.59 C 3379.69,4097.23 3364.04,4111.93 3362.92,4130.38 C 3361.92,4147.15 3366,4163.86 3374.65,4178.5 C 3382.66,4192.02 3391.25,4205.23 3400.43,4218.02 C 3428.98,4257.54 3453.53,4299.39 3473.95,4343.22 C 3477.94,4351.86 3481.98,4360.51 3485.9,4369.1 C 3479.68,4385.5 3473.58,4401.95 3467.65,4418.45 C 3439.85,4494.89 3422.08,4574.36 3414.33,4654.98 C 3410.73,4693.08 3414.33,4731.48 3424.78,4768.31 C 3439.26,4818.91 3486.27,4854.72 3540.96,4856.94 C 3565.36,4857.8 3589.97,4856.94 3614.28,4854.08 L 3614.28,4819.7 M 3972.19,3570.71 L 3565.15,3570.71 L 3565.15,3509.98 L 3539.1,3509.98 L 3539.1,3570.71 L 3478.25,3570.71 L 3478.25,3595.8 L 3539.1,3595.8 L 3539.1,3874.63 L 3565.15,3874.63 L 3565.15,3595.8 L 3972.19,3595.8 L 3972.19,3570.71 z " />
+   <path
+   style="fill:#a9becd"
+   id="path258"
+   d="M 9033.24,4329.43 L 8733.36,4329.43 L 8599.25,4536.96 L 8465.2,4329.43 L 8165.27,4329.43 L 8221.55,4416.53 C 8107.13,4323.43 7953.71,4286.87 7807.15,4317.75 C 7660.57,4348.63 7537.35,4443.27 7474.05,4573.83 C 7417.45,4452.39 7310.83,4361.57 7181.92,4324.86 C 7052.96,4287.99 6914.45,4308.95 6802.15,4382.15 L 6802.15,4037.55 L 6547.35,4037.55 L 6547.35,5202.46 L 6802.15,5202.46 L 6802.15,5155.51 C 6914.61,5228.78 7053.54,5249.67 7182.55,5212.69 C 7311.61,5175.66 7418.25,5084.37 7474.64,4962.62 C 7538.51,5093.55 7662.96,5188.3 7810.64,5218.16 C 7958.28,5248.18 8112.01,5210.04 8225.85,5115.25 L 8165.85,5208.19 L 8465.73,5208.19 L 8599.25,5001.41 L 8732.89,5208.19 L 9032.77,5208.19 L 8749.23,4769.2 L 9033.24,4329.43 L 9033.24,4329.43 L 9033.24,4329.43 L 9033.24,4329.43 z " />
+   <path
+   style="fill:#131516"
+   id="path260"
+   d="M 7254.91,4767.56 C 7254.91,4647.82 7153.59,4550.75 7028.55,4550.75 C 6903.52,4550.75 6802.15,4647.82 6802.15,4767.56 C 6802.15,4887.35 6903.52,4984.42 7028.55,4984.42 C 7153.59,4984.42 7254.91,4887.35 7254.91,4767.56 z M 8377.25,4657.75 C 8396.3,4731.76 8395.82,4809.1 8375.93,4882.9 L 8449.29,4769.2 L 8377.25,4657.75 M 8136.73,4767.56 C 8136.73,4647.82 8035.36,4550.75 7910.32,4550.75 C 7785.29,4550.75 7683.86,4647.82 7683.86,4767.56 C 7683.86,4887.35 7785.29,4984.42 7910.32,4984.42 C 8035.36,4984.42 8136.73,4887.35 8136.73,4767.56 z " />
+   <path
+   style="fill:#efaf04"
+   id="path262"
+   d="M 3830.28,5219.91 L 3877.66,5219.91 L 3877.66,4656.31 L 3830.28,4656.31 L 3830.28,5219.91 M 3928.11,4301.1 C 4007.89,4301.1 4020.52,4204.07 4020.35,4137.54 C 4020.3,4071.08 4010.16,3998.87 3940.57,3998.87 L 3830.28,3998.87 L 3830.28,4366.51 L 3877.66,4366.51 L 3877.66,4301.1 L 3928.11,4301.1 L 3928.11,4301.1 z M 3928.11,4326.13 L 3903.76,4326.13 L 3903.76,4366.51 L 3905.45,4366.51 C 4083.48,4366.51 4083.48,4213.88 4083.48,4160.83 L 4083.48,4126.62 C 4083.48,4075.16 4083.05,3933.36 3933.25,3933.36 L 3830.28,3933.36 L 3830.28,3973.78 L 3928.11,3973.78 C 3978.98,3973.78 4047.15,3980.63 4047.15,4144.13 C 4047.15,4307.41 3978.61,4324.7 3928.11,4326.13 L 3928.11,4326.13 L 3928.11,4326.13 L 3928.11,4326.13 z M 3504.3,4321.74 C 3483.78,4282.48 3461.59,4244.17 3437.83,4206.72 C 3430.35,4194.83 3423.51,4182.58 3417.35,4169.95 C 3413.43,4161.69 3411.05,4152.82 3410.46,4143.7 C 3410.36,4141.79 3411.05,4139.93 3412.48,4138.5 C 3413.91,4137.07 3415.87,4136.38 3417.89,4136.38 C 3427.65,4136.65 3437.24,4139.34 3445.68,4144.23 C 3481.98,4165.02 3507.86,4199.09 3517.3,4238.45 C 3520.06,4249.9 3520.16,4261.95 3517.57,4273.41 C 3513.86,4289.74 3509.45,4305.77 3504.3,4321.74 L 3504.3,4321.74 M 7904.17,4947.77 L 7916.48,4947.77 C 8019.13,4944.49 8100.08,4863 8098.38,4764.7 C 8096.67,4666.34 8013.03,4587.35 7910.32,4587.35 C 7807.62,4587.35 7723.86,4666.34 7722.21,4764.7 C 7720.52,4863 7801.46,4944.49 7904.17,4947.77 z M 7022.4,4947.77 L 7034.71,4947.77 C 7137.3,4944.49 7218.36,4863 7216.67,4764.7 C 7214.92,4666.34 7131.26,4587.35 7028.55,4587.35 C 6925.85,4587.35 6842.15,4666.34 6840.39,4764.7 C 6838.76,4863 6919.75,4944.49 7022.4,4947.77 L 7022.4,4947.77 z M 6432.56,4381.21 L 6509.11,4570.75 L 6509.11,4208.27 L 6432.56,4381.21 M 6445.07,5217.47 L 6237.13,4655.15 L 6261.54,4598.28 L 6501.89,5217.47 L 6445.07,5217.47 M 4760.49,3906.62 C 4906.05,3906.62 4967.96,4158.71 4967.96,4441.25 C 4967.96,4723.91 4906.05,4976 4760.49,4976 C 4614.92,4976 4553.01,4735.78 4553.01,4441.25 C 4553.01,4146.78 4614.92,3906.62 4760.49,3906.62 L 4760.49,3906.62 L 4760.49,3906.62 z " />
+   <path
+   style="fill:#131516"
+   id="path264"
+   d="M 7904.06,4947.77 C 7908.15,4948.04 7912.34,4947.98 7916.42,4947.77 L 7916.42,4931.11 C 8009.57,4927.93 8082.78,4853.76 8081.09,4764.64 C 8079.33,4675.36 8003.26,4603.95 7910.12,4604.01 C 7907.88,4604.01 7906.02,4605.07 7904.92,4606.87 C 7903.8,4608.73 7903.8,4611.07 7904.92,4612.87 C 7906.02,4614.78 7907.88,4615.89 7910.16,4615.78 C 7967.45,4615.74 8020.45,4645.44 8048.52,4693.34 C 8076.58,4741.41 8075.36,4800.14 8045.38,4846.92 C 8015.46,4893.77 7961.41,4921.4 7904.06,4919.28 L 7904.06,4947.77 L 7904.06,4947.77 L 7904.06,4947.77 L 7904.06,4947.77 z M 7028.45,4902.95 C 7025.11,4902.95 7022.29,4900.18 7022.29,4896.95 C 7022.29,4893.65 7025.11,4891 7028.45,4891 C 7099.63,4891 7157.36,4835.73 7157.36,4767.56 C 7157.36,4699.44 7099.63,4644.27 7028.45,4644.27 C 7025.11,4644.27 7022.29,4641.52 7022.29,4638.32 C 7022.29,4635.1 7025.11,4632.34 7028.45,4632.34 C 7106.54,4632.34 7169.66,4692.97 7169.66,4767.56 C 7169.66,4842.3 7106.54,4902.95 7028.45,4902.95 L 7028.45,4902.95 z M 7910.27,4902.95 C 7906.92,4902.95 7904.06,4900.18 7904.06,4896.95 C 7904.06,4893.65 7906.92,4891 7910.27,4891 C 7981.4,4891 8039.07,4835.73 8039.07,4767.56 C 8039.07,4699.44 7981.4,4644.27 7910.27,4644.27 C 7906.92,4644.27 7904.06,4641.52 7904.06,4638.32 C 7904.06,4635.1 7906.92,4632.34 7910.27,4632.34 C 7988.25,4632.34 8051.38,4692.97 8051.38,4767.56 C 8051.38,4842.3 7988.25,4902.95 7910.27,4902.95 L 7910.27,4902.95 z M 7022.29,4947.77 C 7026.43,4947.92 7030.57,4947.92 7034.71,4947.77 L 7034.71,4931.11 C 7127.81,4927.93 7201.07,4853.76 7199.37,4764.64 C 7197.62,4675.36 7121.55,4603.95 7028.39,4604.01 C 7026.17,4604.01 7024.31,4605.07 7023.19,4606.87 C 7022.03,4608.73 7022.03,4611.07 7023.19,4612.87 C 7024.31,4614.78 7026.17,4615.89 7028.39,4615.78 C 7085.74,4615.74 7138.68,4645.44 7166.75,4693.34 C 7194.81,4741.41 7193.64,4800.14 7163.67,4846.92 C 7133.75,4893.77 7079.7,4921.4 7022.29,4919.28 L 7022.29,4947.77 L 7022.29,4947.77 L 7022.29,4947.77 L 7022.29,4947.77 z M 4760.43,4900.66 L 4760.43,4838.91 L 4734.38,4838.91 L 4734.38,4904.74 L 4734.38,4929.68 C 4875.6,4929.68 4917.14,4699.97 4918.08,4453.77 L 5512.76,4453.77 C 5514.08,4627.08 5553.87,4892.18 5671.96,4910.53 L 5671.96,4976 L 5698.06,4976 L 5698.06,4453.77 L 5802.13,4453.77 L 5802.13,4428.73 L 5698.06,4428.73 L 5698.06,4338.44 L 5671.96,4338.44 L 5671.96,4428.73 L 5539.02,4428.73 C 5541.82,4257.07 5591.85,4006.04 5684.95,4001.84 L 5684.95,3976.86 C 5562.93,3981.37 5515.35,4249.32 5512.8,4428.73 L 4918.04,4428.73 C 4916.34,4183.74 4875.02,3955.9 4734.38,3955.9 L 4734.38,3979.94 L 4734.38,4428.73 L 4654.44,4428.73 L 4654.44,4453.77 L 4734.38,4453.77 L 4734.38,4541.26 L 4760.43,4541.26 L 4760.43,4453.77 L 4891.93,4453.77 C 4890.61,4611.32 4869.87,4865.86 4760.43,4900.66 L 4760.43,4900.66 L 4760.43,4900.66 z " />
+   <path
+   style="fill:#efaf04"
+   id="path266"
+   d="M 5538.96,4453.77 C 5540.56,4617.8 5584,4862.67 5671.96,4884.96 L 5671.96,4453.77 L 5538.96,4453.77 z M 4891.99,4428.73 L 4760.53,4428.73 L 4760.53,3983.96 C 4869.34,4018.61 4891.19,4271.02 4891.99,4428.73 z " />
+  </g><g
+   id="g268"
+   transform="translate(-1102.918,709.0186)"
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300">
+   <path
+   style="fill:white"
+   id="path270"
+   d="M 6656.47,7483.42 L 6579.56,7483.42 L 6579.56,7521.8 C 6547.38,7497.61 6538.79,7483.42 6464.07,7483.42 C 6389.25,7483.42 6271.65,7569.49 6271.65,7675.82 C 6271.65,7781.98 6389.25,7868.24 6464.07,7868.24 C 6538.79,7868.24 6547.38,7853.85 6579.56,7829.7 L 6579.56,7868.24 L 6656.47,7868.24 L 6656.47,7483.42 z " />
+   <path
+   style="fill:#252425"
+   id="path272"
+   d="M 6464.07,7560.33 C 6527.86,7560.33 6579.56,7612.03 6579.56,7675.82 C 6579.56,7739.47 6527.86,7791.17 6464.07,7791.17 C 6400.37,7791.17 6348.67,7739.47 6348.67,7675.82 C 6348.67,7612.03 6400.37,7560.33 6464.07,7560.33 z " />
+   <path
+   style="fill:white"
+   id="path274"
+   d="M 6715.08,7483.42 L 6792.09,7483.42 L 6792.09,7521.8 C 6824.23,7497.61 6832.76,7483.42 6907.48,7483.42 C 6982.31,7483.42 7099.9,7569.49 7099.9,7675.82 L 7099.9,7868.24 L 7022.99,7868.24 L 7022.99,7675.82 C 7022.99,7612.03 6971.29,7560.33 6907.48,7560.33 C 6843.78,7560.33 6792.09,7612.03 6792.09,7675.82 L 6792.09,7868.24 L 6715.08,7868.24 L 6715.08,7483.42 z " />
+   <path
+   style="fill:white"
+   id="path276"
+   d="M 5963.76,7483.42 L 6194.74,7483.42 L 6194.74,7560.33 L 5963.76,7560.33 C 5942.55,7560.33 5925.23,7577.57 5925.23,7598.77 C 5925.23,7620.11 5942.55,7637.3 5963.76,7637.3 L 6117.64,7637.3 C 6181.47,7637.3 6233.17,7689 6233.17,7752.74 C 6233.17,7816.54 6181.47,7868.24 6117.64,7868.24 L 5886.79,7868.24 L 5886.79,7791.17 L 6117.64,7791.17 C 6138.98,7791.17 6156.21,7774.03 6156.21,7752.74 C 6156.21,7731.44 6138.98,7714.25 6117.64,7714.25 L 5963.76,7714.25 C 5900.01,7714.25 5848.31,7662.56 5848.31,7598.77 C 5848.31,7535.11 5900.01,7483.42 5963.76,7483.42 L 5963.76,7483.42 L 5963.76,7483.42 L 5963.76,7483.42 z " />
+   <path
+   style="fill:white"
+   id="path278"
+   d="M 7243.41,7483.42 L 7474.29,7483.42 L 7474.29,7560.33 L 7243.41,7560.33 C 7222.11,7560.33 7204.97,7577.57 7204.97,7598.77 C 7204.97,7620.11 7222.11,7637.3 7243.41,7637.3 L 7397.38,7637.3 C 7461.03,7637.3 7512.73,7689 7512.73,7752.74 C 7512.73,7816.54 7461.03,7868.24 7397.38,7868.24 L 7166.44,7868.24 L 7166.44,7791.17 L 7397.38,7791.17 C 7418.59,7791.17 7435.81,7774.03 7435.81,7752.74 C 7435.81,7731.44 7418.59,7714.25 7397.38,7714.25 L 7243.41,7714.25 C 7179.62,7714.25 7127.92,7662.56 7127.92,7598.77 C 7127.92,7535.11 7179.62,7483.42 7243.41,7483.42 L 7243.41,7483.42 L 7243.41,7483.42 L 7243.41,7483.42 z " />
+   <path
+   style="fill:white"
+   id="path280"
+   d="M 7917.76,7483.42 L 7840.81,7483.42 L 7840.81,7521.8 C 7808.54,7497.61 7800.13,7483.42 7725.32,7483.42 C 7650.6,7483.42 7532.9,7569.49 7532.9,7675.82 C 7532.9,7781.98 7650.6,7868.24 7725.32,7868.24 C 7800.13,7868.24 7808.54,7853.85 7840.81,7829.7 L 7840.81,7868.24 L 7917.76,7868.24 L 7917.76,7483.42 z " />
+   <path
+   style="fill:#2b2b2c"
+   id="path282"
+   d="M 7725.32,7560.33 C 7789.11,7560.33 7840.81,7612.03 7840.81,7675.82 C 7840.81,7739.47 7789.11,7791.17 7725.32,7791.17 C 7661.52,7791.17 7609.82,7739.47 7609.82,7675.82 C 7609.82,7612.03 7661.52,7560.33 7725.32,7560.33 z " />
+   <path
+   style="fill:white"
+   id="path284"
+   d="M 7964.05,7486.18 L 7964.05,7398 L 7932.58,7398 L 7932.58,7380.02 L 8016.87,7380.02 L 8016.87,7398 L 7985.49,7398 L 7985.49,7486.18 L 7964.05,7486.18 z " />
+   <path
+   style="fill:white"
+   id="path286"
+   d="M 8025.27,7486.18 L 8025.27,7380.02 L 8057.36,7380.02 L 8076.6,7452.41 L 8095.55,7380.02 L 8127.73,7380.02 L 8127.73,7486.18 L 8107.85,7486.18 L 8107.85,7402.53 L 8086.72,7486.18 L 8066.18,7486.18 L 8045.11,7402.53 L 8045.11,7486.18 L 8025.27,7486.18 z " />
+  </g><path
+   style="fill:#76b9db"
+   id="path288"
+   d="M 15245.782,6736.3086 L 14452.352,6736.3086 L 14452.352,6812.7586 L 15245.782,6812.7586 L 15245.782,6736.3086 L 15245.782,6736.3086 z M 15245.782,6869.9486 L 14849.072,6869.9486 L 14849.072,6946.3086 L 15245.782,6946.3086 L 15245.782,6869.9486 z M 15245.782,7003.5586 L 14849.072,7003.5586 L 14849.072,7079.9486 L 15245.782,7079.9486 L 15245.782,7003.5586 z M 15245.782,7137.2386 L 14849.072,7137.2386 L 14849.072,7213.5586 L 15245.782,7213.5586 L 15245.782,7137.2386 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:#76b9db"
+   id="path290"
+   d="M 13154.882,5637.1986 L 13154.882,5391.0686 L 13215.542,5391.0686 L 13215.542,5637.1986 L 13154.882,5637.1986 z M 13484.782,5567.4686 L 13484.782,5637.1986 L 13276.122,5536.3486 L 13276.122,5491.8686 L 13484.782,5391.0686 L 13484.782,5460.7486 L 13374.382,5514.0886 L 13484.782,5567.4686 z M 13701.402,5567.4686 L 13701.402,5637.1986 L 13492.872,5536.3486 L 13492.872,5491.8686 L 13701.402,5391.0686 L 13701.402,5460.7486 L 13591.002,5514.0886 L 13701.402,5567.4686 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:#76b9db"
+   id="path292"
+   d="M 16543.382,5391.0686 L 16543.382,5637.1986 L 16482.792,5637.1986 L 16482.792,5391.0686 L 16543.382,5391.0686 z M 16213.552,5460.7486 L 16213.552,5391.0686 L 16422.082,5491.8686 L 16422.082,5536.3486 L 16213.552,5637.1986 L 16213.552,5567.4686 L 16323.952,5514.0886 L 16213.552,5460.7486 z M 15996.792,5460.7486 L 15996.792,5391.0686 L 16205.422,5491.8686 L 16205.422,5536.3486 L 15996.792,5637.1986 L 15996.792,5567.4686 L 16107.192,5514.0886 L 15996.792,5460.7486 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:#76b9db"
+   id="path294"
+   d="M 14979.082,4216.2386 L 14979.082,3970.0586 L 14918.412,3970.0586 L 14918.412,4216.2386 L 14979.082,4216.2386 z M 14623.122,4146.4586 L 14623.122,4216.2386 L 14831.652,4115.3886 L 14831.652,4070.8586 L 14623.122,3970.0586 L 14623.122,4039.7886 L 14733.522,4093.1286 L 14623.122,4146.4586 L 14623.122,4146.4586 z M 15075.032,4216.2386 L 15075.032,3970.0586 L 15014.322,3970.0586 L 15014.322,4216.2386 L 15075.032,4216.2386 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:white"
+   id="path296"
+   d="M 16826.882,7709.1786 C 16935.282,7709.1786 17024.162,7620.2886 17024.162,7511.8986 C 17024.162,7454.2486 16999.852,7403.1386 16961.062,7367.6686 C 16916.792,7327.0986 16971.862,7262.7786 17020.252,7308.8686 C 17073.862,7359.9786 17107.372,7432.1186 17107.372,7511.8986 C 17107.372,7666.7286 16981.682,7792.3786 16826.882,7792.3786 C 16672.042,7792.3786 16546.482,7666.7286 16546.482,7511.8986 C 16546.482,7432.1186 16579.902,7359.9786 16633.542,7308.8686 C 16681.952,7262.7786 16737.052,7327.0986 16692.702,7367.6686 C 16653.942,7403.1386 16629.632,7454.2486 16629.632,7511.8986 C 16629.632,7620.2886 16718.572,7709.1786 16826.882,7709.1786 L 16826.882,7709.1786 L 16826.882,7709.1786 z M 16814.882,7191.4986 L 16838.882,7191.4986 C 16857.052,7191.4986 16871.762,7206.3786 16871.762,7224.5186 L 16871.762,7584.5986 C 16871.762,7602.7786 16857.052,7617.4986 16838.882,7617.4986 L 16814.882,7617.4986 C 16796.792,7617.4986 16781.902,7602.7786 16781.902,7584.5986 L 16781.902,7224.5186 C 16781.902,7206.3786 16796.792,7191.4986 16814.882,7191.4986 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><g
+   id="g298"
+   transform="translate(-1102.918,709.0186)"
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300">
+   <path
+   style="fill:#758e95"
+   id="path300"
+   d="M 17386.5,7919.7 L 17386.5,7691.78 L 17457.52,7691.78 L 17457.52,7710.37 C 17472.13,7697.02 17494.54,7690.41 17524.89,7690.41 C 17546.3,7690.41 17561.29,7693.94 17569.98,7700.9 C 17578.66,7707.98 17583.7,7713.79 17585.23,7718.47 C 17585.35,7718.24 17587.74,7715.73 17592.64,7710.94 C 17597.43,7706.14 17604.61,7701.81 17614.18,7697.83 C 17623.63,7693.94 17635.59,7691.66 17650.32,7691.1 C 17677.15,7691.1 17697.43,7696.68 17710.9,7707.75 C 17724.37,7718.92 17731.05,7733.41 17731.05,7751.2 L 17731.05,7919.7 L 17676.64,7919.7 L 17676.64,7756.8 C 17676.64,7736.26 17663.04,7726 17635.84,7726 C 17621.61,7726.92 17611.41,7731.58 17605.38,7740.03 C 17599.32,7748.59 17595.68,7755.55 17594.41,7760.9 L 17594.41,7919.7 L 17540.01,7919.7 L 17540.01,7756.8 C 17540.01,7748.01 17536.74,7740.6 17530.06,7734.79 C 17523.38,7728.97 17513.06,7726 17499.08,7726 C 17484.09,7727.37 17473.52,7732.5 17467.72,7741.28 C 17461.81,7750.18 17458.41,7757.37 17457.52,7762.96 L 17457.52,7919.7 L 17386.5,7919.7 L 17386.5,7919.7 L 17386.5,7919.7 z " />
+   <path
+   style="fill:#758e95"
+   id="path302"
+   d="M 17827.7,7817.1 C 17828.83,7829.07 17833.38,7844.24 17841.31,7862.61 C 17849.36,7880.97 17863.98,7890.56 17885.13,7891.47 C 17910.94,7891.47 17931.09,7888.51 17945.7,7882.57 C 17960.43,7876.64 17969.88,7871.62 17974.29,7867.63 L 17963.59,7907.22 C 17963.59,7909.6 17956.28,7912.69 17941.68,7916.46 C 17927.06,7920.33 17908.42,7922.28 17885.76,7922.28 C 17876.82,7922.28 17869.76,7922.05 17864.73,7921.7 C 17828.07,7919.3 17801.26,7909.72 17784.26,7893.07 C 17767.26,7876.41 17758.57,7849.6 17758.18,7812.87 C 17758.18,7770.78 17767.88,7739.86 17787.15,7720.24 C 17806.54,7700.62 17834.89,7690.7 17872.28,7690.36 C 17917.24,7690.36 17947.59,7701.08 17963.59,7722.42 C 17977.3,7740.21 17984.12,7764.16 17984.12,7794.39 C 17984.12,7800.1 17983.99,7804.89 17983.62,7808.77 C 17983.23,7812.76 17982.85,7815.5 17982.6,7817.1 L 17827.7,7817.1 L 17827.7,7817.1 L 17827.7,7817.1 L 17827.7,7817.1 z M 17879.22,7719.1 C 17844.84,7720.14 17827.7,7742.72 17827.7,7786.87 L 17937.26,7786.87 C 17937.26,7741.69 17917.87,7719.1 17879.22,7719.1 L 17879.22,7719.1 L 17879.22,7719.1 z " />
+   <path
+   style="fill:#758e95"
+   id="path304"
+   d="M 18223.8,7744.38 L 18223.8,7919.71 L 18170.91,7919.71 L 18170.91,7752.7 C 18170.91,7733.54 18154.79,7723.95 18122.55,7723.95 C 18106.81,7725.67 18095.6,7730 18088.68,7737.19 C 18081.87,7744.5 18077.85,7750.3 18076.46,7754.76 L 18076.46,7919.71 L 18005.45,7919.71 L 18005.45,7691.79 L 18076.46,7691.79 L 18076.46,7710.27 C 18077.47,7709.7 18080.73,7707.76 18086.54,7704.22 C 18092.21,7700.8 18100.38,7697.6 18110.83,7694.76 C 18121.41,7691.9 18133.51,7690.42 18147.49,7690.42 C 18173.69,7690.42 18192.95,7695.9 18205.29,7706.73 C 18217.63,7717.57 18223.8,7730.12 18223.8,7744.38 L 18223.8,7744.38 z " />
+   <path
+   style="fill:#758e95"
+   id="path306"
+   d="M 18325.8,7855.38 C 18325.8,7864.84 18329.7,7872.7 18337.39,7878.98 C 18345.07,7885.15 18354.51,7888.34 18365.84,7888.34 C 18384.48,7887.88 18397.83,7883.89 18405.89,7876.24 C 18413.82,7868.72 18418.61,7862.44 18420.25,7857.43 L 18420.25,7691.79 L 18473.13,7691.79 L 18473.13,7919.71 L 18420.25,7919.71 L 18420.25,7898.49 C 18415.46,7902.14 18405.01,7906.7 18389.01,7912.18 C 18373.02,7917.66 18350.97,7920.39 18322.91,7920.39 C 18302,7919.71 18285.38,7914.01 18273.17,7903.17 C 18260.95,7892.34 18254.78,7877.16 18254.78,7857.43 L 18254.78,7691.79 L 18325.8,7691.79 L 18325.8,7855.38 L 18325.8,7855.38 L 18325.8,7855.38 L 18325.8,7855.38 z " />
+  </g><path
+   style="fill:url(#id16)"
+   id="path310"
+   d="M 13384.882,1680.1486 L 16142.162,1680.1486 C 16182.782,1679.9286 16222.052,1674.2686 16253.732,1664.0686 L 16426.182,1607.4586 C 16446.762,1600.1086 16473.142,1595.8986 16500.682,1595.5686 L 16330.322,1595.5686 C 16320.582,1595.7686 16311.242,1597.1586 16303.562,1599.5686 L 16197.242,1634.4686 C 16180.652,1640.0786 16159.552,1643.0686 16137.872,1642.8986 L 13389.172,1642.8986 C 13367.492,1643.0686 13346.402,1640.0786 13329.812,1634.4686 L 13223.482,1599.5686 C 13215.802,1597.1586 13206.462,1595.7686 13196.722,1595.5686 L 13026.362,1595.5686 C 13053.912,1595.8986 13080.282,1600.1086 13100.862,1607.4586 L 13273.312,1664.0686 C 13304.992,1674.2686 13344.272,1679.9286 13384.882,1680.1486 z "
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:none;stroke:#dedede;stroke-width:16.5"
+   id="path312"
+   d="M 13026.382,1603.7686 C 13053.932,1604.0986 13080.302,1608.3086 13100.882,1615.6586 L 13273.332,1672.2686 C 13305.012,1682.4686 13344.292,1688.1286 13384.902,1688.3486 L 16142.182,1688.3486 C 16182.802,1688.1286 16222.072,1682.4686 16253.752,1672.2686 L 16426.202,1615.6586 C 16446.782,1608.3086 16473.162,1604.0986 16500.702,1603.7686"
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" />
+<g
+   inkscape:groupmode="layer"
+   id="layer1"
+   inkscape:label="text"><text
+   xml:space="preserve"
+   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:black;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Palatino Linotype"
+   x="783.48163"
+   y="1112.5474"
+   id="text6128"
+   sodipodi:linespacing="100%"
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300"><tspan
+     sodipodi:role="line"
+     id="tspan6130"
+     x="783.48163"
+     y="1112.5474"><tspan
+   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;font-family:Palatino Linotype"
+   id="tspan6132">Vo</tspan>lume down</tspan></text>
+
+<text
+   xml:space="preserve"
+   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:black;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Palatino Linotype"
+   x="6554.5337"
+   y="1112.5474"
+   id="text6136"
+   sodipodi:linespacing="100%"
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300"><tspan
+     sodipodi:role="line"
+     id="tspan6138"
+     x="6554.5337"
+     y="1112.5474"><tspan
+   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;font-family:Palatino Linotype"
+   id="tspan6140">Vo</tspan>lume up</tspan></text>
+
+<text
+   xml:space="preserve"
+   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:black;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Palatino Linotype"
+   x="5425.0386"
+   y="10451.979"
+   id="text6142"
+   sodipodi:linespacing="100%"
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300"><tspan
+     sodipodi:role="line"
+     id="tspan6144"
+     x="5425.0386"
+     y="10451.979">Hold</tspan></text>
+
+<text
+   xml:space="preserve"
+   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:black;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Palatino Linotype"
+   x="9137.9668"
+   y="10451.979"
+   id="text6148"
+   sodipodi:linespacing="100%"
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300"><tspan
+     sodipodi:role="line"
+     id="tspan6150"
+     x="9137.9668"
+     y="10451.979">Rec</tspan></text>
+
+<text
+   xml:space="preserve"
+   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:black;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Palatino Linotype"
+   x="14044.194"
+   y="10432.284"
+   id="text6154"
+   sodipodi:linespacing="100%"
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300"><tspan
+     sodipodi:role="line"
+     id="tspan6156"
+     x="14044.194"
+     y="10432.284">Submenu</tspan></text>
+
+<text
+   xml:space="preserve"
+   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:black;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Palatino Linotype"
+   x="19460.803"
+   y="10432.284"
+   id="text6158"
+   sodipodi:linespacing="100%"
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300"><tspan
+     sodipodi:role="line"
+     id="tspan6160"
+     x="19460.803"
+     y="10432.284">Power</tspan></text>
+
+<text
+   xml:space="preserve"
+   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:black;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Palatino Linotype"
+   x="11581.668"
+   y="1112.5474"
+   id="text6162"
+   sodipodi:linespacing="100%"
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300"><tspan
+     sodipodi:role="line"
+     id="tspan6164"
+     x="11581.668"
+     y="1112.5474">Left</tspan></text>
+
+<text
+   xml:space="preserve"
+   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:black;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Palatino Linotype"
+   x="14044.194"
+   y="1112.5474"
+   id="text6166"
+   sodipodi:linespacing="100%"
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300"><tspan
+     sodipodi:role="line"
+     id="tspan6168"
+     x="14044.194"
+     y="1112.5474">Play</tspan></text>
+
+<text
+   xml:space="preserve"
+   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:black;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Palatino Linotype"
+   x="19460.803"
+   y="4487.7939"
+   id="text6170"
+   sodipodi:linespacing="100%"
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300"><tspan
+     sodipodi:role="line"
+     id="tspan6172"
+     x="19460.803"
+     y="4487.7939">Right</tspan></text>
+
+<text
+   xml:space="preserve"
+   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:black;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Palatino Linotype"
+   x="19460.803"
+   y="7349.23"
+   id="text6174"
+   sodipodi:linespacing="100%"
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300"><tspan
+     sodipodi:role="line"
+     id="tspan6176"
+     x="19460.803"
+     y="7349.23">Select</tspan></text>
+
+<path
+   style="fill:none;fill-rule:evenodd;stroke:black;stroke-width:35.27777863;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+   d="M 12210.875,1358.9522 L 12742.639,5534.2838"
+   id="path6180"
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:none;fill-rule:evenodd;stroke:black;stroke-width:35.27777863;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+   d="M 15046.949,1358.9522 L 14889.389,3466.313"
+   id="path7067"
+   sodipodi:nodetypes="cc"
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:none;fill-rule:evenodd;stroke:black;stroke-width:35.27777863;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+   d="M 15263.594,9660.378 L 15106.034,7553.0172"
+   id="path7069"
+   sodipodi:nodetypes="cc"
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:none;fill-rule:evenodd;stroke:black;stroke-width:35.27777863;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+   d="M 19045.026,4224.569 L 16977.055,5130.5371"
+   id="path7071"
+   sodipodi:nodetypes="cc"
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:none;fill-rule:evenodd;stroke:black;stroke-width:35.27777863;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+   d="M 19045.026,7006.8393 L 14869.694,6140.261"
+   id="path7073"
+   sodipodi:nodetypes="cc"
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /><path
+   style="fill:none;fill-rule:evenodd;stroke:black;stroke-width:35.27777863;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+   d="M 19045.026,9645.964 L 16996.75,7656.773"
+   id="path7075"
+   sodipodi:nodetypes="cc"
+   inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansa - Piotr Jafiszow\c200\sansaC200.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300" /></g></svg>
