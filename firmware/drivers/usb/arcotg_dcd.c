@@ -488,13 +488,15 @@ static void reset_int(void)
 
     UDC_ENDPTFLUSH = ~0;
 
-    if ((UDC_PORTSC1 & (1 << 8)) == 0) {
+    if ((UDC_PORTSC1 & PORTSCX_PORT_RESET) == 0) {
         logf("TIMEOUT->port");
     }
 
-    UDC_USBSTS = (1 << 6);
+    /* clear USB Reset status bit */
+    UDC_USBSTS = USB_STS_RESET;
 
-    while ((UDC_USBSTS & (1 << 2)) == 0) { /* wait for port change */
+    /* wait for port change */
+    while ((UDC_USBSTS & USB_STS_PORT_CHANGE) == 0) {
         if (timer_expired(&t)) {
         logf("TIMEOUT->portchange");
         }
