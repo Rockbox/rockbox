@@ -1,0 +1,112 @@
+% $Id: e200.tex 14705 2007-09-14 22:31:37Z peter $ %
+\def\UseOption{e200}
+\edef\UseOption{\UseOption,HAVE_RB_BL_ON_DISK}
+\edef\UseOption{\UseOption,HAVE_LCD_BITMAP}
+\edef\UseOption{\UseOption,CONFIG_RTC}
+\edef\UseOption{\UseOption,SWCODEC}
+\edef\UseOption{\UseOption,SANSA_C200_PAD}
+\edef\UseOption{\UseOption,HAVE_LCD_COLOR}
+\edef\UseOption{\UseOption,sansa}
+
+\newcommand{\playerman}{Sansa}
+\newcommand{\playertype}{c200}
+\newcommand{\playerlongtype}{\playertype}
+\newcommand{\genericimg}{132x80x16}
+\newcommand{\specimg}{c200}
+%Used to name the player, e.g. ...to the \dap
+\newcommand{\dap}{player}
+%For use when referring to the player. E.g. the \daps\ capacity ...
+\newcommand{\daps}{player's}
+\newcommand{\firmwarefilename}{\fname{rockbox.c200}}
+\newcommand{\screenshotsize}{4cm}
+\newcommand{\disk}{flash storage}
+
+\newcommand{\ButtonLeft}{\btnfnt{Left}}
+\newcommand{\ButtonRight}{\btnfnt{Right}}
+\newcommand{\ButtonRec}{\btnfnt{Rec}}
+\newcommand{\ButtonUp}{\btnfnt{Play}}
+\newcommand{\ButtonDown}{\btnfnt{Submenu}}
+\newcommand{\ButtonSelect}{\btnfnt{Select}}
+\newcommand{\ButtonPower}{\btnfnt{Power}}
+\newcommand{\ButtonVolUp}{\btnfnt{Volume Up}}
+\newcommand{\ButtonVolDown}{\btnfnt{Volume Down}}
+\newcommand{\ButtonHold}{\btnfnt{Hold}}
+
+%Button actions, standard context
+\newcommand{\ActionStdPrev}{\ButtonDown}
+\newcommand{\ActionStdPrevRepeat}{Long \ButtonDown}
+\newcommand{\ActionStdNext}{\ButtonUp}
+\newcommand{\ActionStdNextRepeat}{Long \ButtonUp}
+\newcommand{\ActionStdCancel}{\ButtonLeft}
+\newcommand{\ActionStdContext}{\ButtonDown}
+\newcommand{\ActionStdQuickScreen}{Long \ButtonDown}
+\newcommand{\ActionStdMenu}{\ButtonPower}
+\newcommand{\ActionStdOk}{\ButtonSelect{} or \ButtonRight}
+\newcommand{\ActionStdRec}{Long \ButtonRec}
+
+%Button actions, wps context
+\newcommand{\ActionWpsPlay}{\ButtonUp}
+\newcommand{\ActionWpsSkipNext}{\ButtonRight}
+\newcommand{\ActionWpsSkipPrev}{\ButtonLeft}
+\newcommand{\ActionWpsSeekBack}{Long \ButtonLeft}
+\newcommand{\ActionWpsSeekFwd}{Long \ButtonRight}
+
+\newcommand{\ActionWpsStop}{Long \ButtonUp}
+\newcommand{\ActionWpsVolDown}{\ButtonVolDown}
+\newcommand{\ActionWpsVolUp}{\ButtonVolUp}
+
+\newcommand{\ActionWpsQuickScreen}{Long \ButtonDown}
+\newcommand{\ActionWpsMenu}{\ButtonPower}
+\newcommand{\ActionWpsContext}{\ButtonDown}
+\newcommand{\ActionWpsBrowse}{\ButtonSelect}
+
+\newcommand{\ActionWpsAbSetBNextDir}{\ButtonPower{} + \ButtonRight}
+\newcommand{\ActionWpsAbSetAPrevDir}{\ButtonPower{} + \ButtonLeft}
+\newcommand{\ActionWpsAbReset}{\ButtonPower{} + \ButtonUp}
+
+%Button actions, tree context
+\newcommand{\ActionTreeWps}{\ButtonUp}
+\newcommand{\ActionTreeStop}{Long \ButtonUp}
+\newcommand{\ActionTreeEnter}{\ButtonSelect{} or \ButtonRight}
+\newcommand{\ActionTreeParentDirectory}{\ButtonLeft}
+
+%Button actions, YesNo context
+\newcommand{\ActionYesNoAccept}{\ButtonSelect}
+
+%Button actions, Setting context
+\newcommand{\ActionSettingInc}{\ButtonUp}
+\newcommand{\ActionSettingDec}{\ButtonDown}
+
+%Button actions, Virtual Keyboard Context
+\newcommand{\ActionKbdLeft}{\ButtonLeft}
+\newcommand{\ActionKbdRight}{\ButtonRight}
+\newcommand{\ActionKbdSelect}{\ButtonSelect}
+\newcommand{\ActionKbdDone}{\ButtonUp}
+\newcommand{\ActionKbdAbort}{\ButtonPower}
+\newcommand{\ActionKbdUp}{\ButtonUp}
+\newcommand{\ActionKbdDown}{\ButtonDown}
+\newcommand{\ActionKbdCursorLeft}{\ButtonRec{} + \ButtonLeft}
+\newcommand{\ActionKbdCursorRight}{\ButtonRec{} + \ButtonRight}
+\newcommand{\ActionKbdBackSpace}{\ButtonDown}
+\newcommand{\ActionKbdPageFlip}{\ButtonRec{} + \ButtonSelect}
+
+%Button actions, Pitch Screen context
+\newcommand{\ActionPsToggleMode}{\ButtonRec}
+\newcommand{\ActionPsIncSmall}{\ButtonUp}
+\newcommand{\ActionPsIncBig}{Long \ButtonUp}
+\newcommand{\ActionPsDecSmall}{\ButtonDown}
+\newcommand{\ActionPsDecBig}{Long \ButtonDown}
+\newcommand{\ActionPsNudgeLeft}{\ButtonLeft}
+\newcommand{\ActionPsNudgeRight}{\ButtonRight}
+\newcommand{\ActionPsReset}{\ButtonSelect}
+\newcommand{\ActionPsExit}{\ButtonPower}
+
+%Button actions, Recording screen context
+\newcommand{\ActionRecPause}{\ButtonUp}
+\newcommand{\ActionRecExit}{\ButtonPower}
+\newcommand{\ActionRecNewfile}{\ButtonRec}
+\newcommand{\ActionRecMenu}{Long \ButtonDown}
+\newcommand{\ActionSettingsInc}{\ButtonRight}
+\newcommand{\ActionSettingsDec}{\ButtonLeft}
+
+\newcommand{\ActionQuickscreenExit}{\ButtonPower}
