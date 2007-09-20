@@ -220,6 +220,44 @@ struct pnx0101_timer {
 #define INTREQ_WEACTVLO 0x02000000
 #define INTREQ_ENABLE   0x00010000
 
+/* General purpose DMA */
+
+struct pnx0101_dma_channel {
+    unsigned long source;
+    unsigned long dest;
+    unsigned long length;
+    unsigned long config;
+    unsigned long enable;
+    unsigned long pad1;
+    unsigned long pad2;
+    unsigned long count;
+};
+
+#define DMACHANNEL ((volatile struct pnx0101_dma_channel *)0x80104800)
+
+struct pnx0101_dma {
+    unsigned long enable;
+    unsigned long stat;
+    unsigned long irqmask;
+    unsigned long softint;
+};
+
+#define DMA (*(volatile struct pnx0101_dma *)0x80104c00)
+
+struct pnx0101_audio {
+    unsigned long pad1;
+    unsigned long siocr;
+    unsigned long pad2;
+    unsigned long pad3;
+    unsigned long pad4;
+    unsigned long pad5;
+    unsigned long ddacctrl;
+    unsigned long ddacstat;
+    unsigned long ddacset;
+};
+
+#define AUDIO (*(volatile struct pnx0101_audio *)0x80200380)
+ 
 #endif /* ASM */
 
 #endif

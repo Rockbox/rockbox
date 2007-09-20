@@ -26,13 +26,12 @@ static struct
   unsigned char freq;
   unsigned char sys_mult;
   unsigned char sys_div;
-  unsigned char mem_conf[10];
 }
 perf_modes[3] ICONST_ATTR =
 {
-    {12, 4,  4, {2, 1, 1, 1, 1, 1, 1, 1, 1, 0}},
-    {48, 4,  1, {5, 4, 1, 4, 4, 1, 3, 3, 1, 0}},
-    {60, 5,  1, {6, 5, 1, 5, 5, 1, 4, 3, 1, 1}}
+    {12, 4, 4},
+    {48, 4, 1},
+    {60, 5, 1}
 };
 
 static int performance_mode, bus_divider;
@@ -89,11 +88,6 @@ static void cgu_connect_div_to_clock(int rel_div, int esr)
     CGU.clk_esr[esr] = (rel_div << 1) | 1;
 }
 
-static void cgu_disconnect_div_from_clock(int esr)
-{
-    CGU.clk_esr[esr] = 0;
-}
-
 static void cgu_enable_clock(int clock)
 {
     CGU.clk_pcr[clock] |= 1;
@@ -106,63 +100,43 @@ static void cgu_start_sel_stage_dividers(int bcr)
 
 /* Convert a pointer that points to IRAM (0x4xxxx) to a pointer that
    points to the uncached page (0x0xxxx) that is also mapped to IRAM. */
-static inline void *noncached(void *p) {
+static inline void *noncached(void *p)
+{
     return (void *)(((unsigned long)p) & 0xffff);
 }
 
-/* TODO: if it works, then comment it */
-static void do_set_mem_timings(int mode) ICODE_ATTR;
-static void do_set_mem_timings(int mode)
+/* To avoid SRAM accesses while changing memory controller settings we
+   run this routine from uncached copy of IRAM. All times are in CPU
+   cycles. At CPU frequencies lower than 60 MHz we could use faster
+   settings, but since DMA may access SRAM at any time, changing
+   memory timings together with CPU frequency would be tricky. */
+static void do_set_mem_timings(void) ICODE_ATTR;
+static void do_set_mem_timings(void)
 {
-    unsigned char *mem_conf = noncached(perf_modes[mode].mem_conf);
     int old_irq = set_irq_level(HIGHEST_IRQ_LEVEL);
     while ((EMC.status & 3) != 0);
     EMC.control = 5;
-    EMCSTATIC0.waitrd = mem_conf[0];
-    EMCSTATIC0.waitwr = mem_conf[1];
-    EMCSTATIC1.waitrd = mem_conf[3];
-    EMCSTATIC1.waitwr = mem_conf[4];
-    EMCSTATIC2.waitrd = mem_conf[6];
-    EMCSTATIC2.waitwr = mem_conf[7];
-    EMCSTATIC0.waitoen = mem_conf[2];
-    EMCSTATIC1.waitoen = mem_conf[5];
-    EMCSTATIC2.waitoen = mem_conf[8];
+    EMCSTATIC0.waitrd = 6;
+    EMCSTATIC0.waitwr = 5;
+    EMCSTATIC1.waitrd = 5;
+    EMCSTATIC1.waitwr = 4; /* OF uses 5 here */
+    EMCSTATIC2.waitrd = 4;
+    EMCSTATIC2.waitwr = 3;
+    EMCSTATIC0.waitoen = 1;
+    EMCSTATIC1.waitoen = 1;
+    EMCSTATIC2.waitoen = 1;
+    /* Enable write buffers for SRAM. */
 #ifndef DEBUG
-    EMCSTATIC1.config = mem_conf[9] ? 0x80081 : 0x81;
+    EMCSTATIC1.config = 0x80081;
 #endif
     EMC.control = 1;
     set_irq_level(old_irq);
 }
 
-static void emc_set_mem_timings(int mode) {
-    void (*f)(int) = noncached(do_set_mem_timings);
-    (*f)(mode);
-}
-
-/*
-static void do_enable_write_buffers(int on) ICODE_ATTR;
-static void do_enable_write_buffers(int on) {
-    int old_irq = set_irq_level(HIGHEST_IRQ_LEVEL);
-    while ((EMC.status & 3) != 0);
-    EMC.control = 5;
-    EMCSTATIC1.config = on ? 0x80081 : 0x81;
-    EMC.control = 1;
-    set_irq_level(old_irq);
-}
-
-void emc_enable_write_buffers(int on) {
-    void (*f)(int) = noncached(do_enable_write_buffers);
-    (*f)(on);
-}
-*/
-
-/* can it be replaced? */
-static void cgu_busy_wait(int n)
+static void emc_set_mem_timings(void)
 {
-    while (n > 0)
-    {
-        n--;
-    }
+    void (*f)(void) = noncached(do_set_mem_timings);
+    (*f)();
 }
 
 static void cgu_set_sys_mult(int i)
@@ -193,22 +167,10 @@ static void cgu_set_sys_mult(int i)
 static void pnx0101_set_performance_mode(int mode)
 {
     int old = performance_mode;
-    if (perf_modes[old].freq < perf_modes[mode].freq)
-    {
-        emc_set_mem_timings(mode);
-        if (perf_modes[old].sys_mult != perf_modes[mode].sys_mult)
-            cgu_set_sys_mult(perf_modes[mode].sys_mult);
-        if (perf_modes[old].sys_div != perf_modes[mode].sys_div)
-            cgu_configure_div(bus_divider, 1, perf_modes[mode].sys_div);
-    }
-    else if (perf_modes[old].freq > perf_modes[mode].freq)
-    {
-        if (perf_modes[old].sys_mult != perf_modes[mode].sys_mult)
-            cgu_set_sys_mult(perf_modes[mode].sys_mult);
-        if (perf_modes[old].sys_div != perf_modes[mode].sys_div)
-            cgu_configure_div(bus_divider, 1, perf_modes[mode].sys_div);
-        emc_set_mem_timings(mode);
-    }
+    if (perf_modes[old].sys_mult != perf_modes[mode].sys_mult)
+        cgu_set_sys_mult(perf_modes[mode].sys_mult);
+    if (perf_modes[old].sys_div != perf_modes[mode].sys_div)
+        cgu_configure_div(bus_divider, 1, perf_modes[mode].sys_div);
     performance_mode = mode;
 }
 
@@ -216,12 +178,9 @@ static void pnx0101_init_clocks(void)
 {
     bus_divider = PNX0101_FIRST_DIV_SYS + (CGU.clk_esr[0] >> 1);
     performance_mode = 0;
+    emc_set_mem_timings();
     pnx0101_set_performance_mode(2);
-/*
-#ifndef DEBUG
-    emc_enable_write_buffers(1);
-#endif
-*/
+
     cgu_set_sel_stage_input(PNX0101_SEL_STAGE_APB1,
                             PNX0101_MAIN_CLOCK_FAST);
     cgu_reset_sel_stage_clocks(PNX0101_FIRST_ESR_APB1, PNX0101_N_ESR_APB1,
@@ -285,7 +244,7 @@ static void undefined_int(void)
 
 void irq(void)
 {
-    int n;
+    unsigned long n;
     IRQ_READ(INTVECTOR[0], n)
     (*(interrupt_vector[n >> 3]))();
 }
@@ -323,7 +282,7 @@ void system_init(void)
     IRQ_WRITE_WAIT(INTPRIOMASK[1], 0, v == 0);
     */
 
-    for (i = 0; i < 0x1c; i++)
+    for (i = 1; i <= 0x1c; i++)
     {
         IRQ_WRITE_WAIT(INTREQ[i],
                        INTREQ_WEPRIO | INTREQ_WETARGET |
@@ -331,7 +290,7 @@ void system_init(void)
                        (v & 0x3010f) == 1);
         IRQ_WRITE_WAIT(INTREQ[i], INTREQ_WEENABLE, (v & 0x10000) == 0);
         IRQ_WRITE_WAIT(INTREQ[i], INTREQ_WEPRIO | 1, (v & 0xf) == 1);
-        interrupt_vector[i + 1] = undefined_int;
+        interrupt_vector[i] = undefined_int;
     }
     interrupt_vector[0] = undefined_int;
     pnx0101_init_clocks();
