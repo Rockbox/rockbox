@@ -5,9 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id: $
  *
- * Copyright (C) 2004 by Linus Nielsen Feltzing
+ * Copyright (C) 2007 by Karl Kurbjun
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,32 +16,41 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "config.h"
 
-#if CONFIG_CPU == SH7034
-#include "sh7034.h"
-#endif
-#if CONFIG_CPU == MCF5249
-#include "mcf5249.h"
-#endif
-#if CONFIG_CPU == MCF5250
-#include "mcf5250.h"
-#endif
-#if (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5022)
-#include "pp5020.h"
-#endif
-#if CONFIG_CPU == PP5002
-#include "pp5002.h"
-#endif
-#if CONFIG_CPU == PP5024
-#include "pp5024.h"
-#endif
-#if CONFIG_CPU == PNX0101
-#include "pnx0101.h"
-#endif
-#if CONFIG_CPU == S3C2440
-#include "s3c2440.h"
-#endif
-#if CONFIG_CPU == DM320
-#include "dm320.h"
-#endif
+#include "config.h"
+#include "cpu.h"
+#include "system.h"
+#include "button.h"
+#include "kernel.h"
+#include "backlight.h"
+#include "adc.h"
+#include "system.h"
+#include "backlight-target.h"
+
+static int const remote_buttons[] =
+{
+    BUTTON_NONE,        /* Headphones connected - remote disconnected */
+    BUTTON_RC_PLAY,
+    BUTTON_RC_DSP,
+    BUTTON_RC_REW,
+    BUTTON_RC_FF,
+    BUTTON_RC_VOL_UP,
+    BUTTON_RC_VOL_DOWN,
+    BUTTON_NONE,        /* Remote control attached - no buttons pressed */
+    BUTTON_NONE,        /* Nothing in the headphone socket */
+};
+
+void button_init_device(void)
+{
+    /* Power, Remote Play & Hold switch */
+}
+
+inline bool button_hold(void)
+{
+    return false;
+}
+
+int button_read_device(void)
+{
+    return 0;
+}

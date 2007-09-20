@@ -48,6 +48,7 @@
 #define PNX0101       101
 #define S3C2440      2440
 #define TMS320DSC25    25
+#define DM320         320
 
 /* CONFIG_KEYPAD */
 #define PLAYER_PAD          1
@@ -66,6 +67,7 @@
 #define SANSA_C200_PAD     14
 #define ELIO_TPJ1022_PAD   15
 #define ARCHOS_AV300_PAD   16
+#define MROBE500_PAD       17
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -97,6 +99,7 @@
 #define LCD_TPJ1022  15 /* as used by Tatung Elio TPJ-1022 */
 #define LCD_DSC25    16 /* as used by Archos AV300 */
 #define LCD_C200     17 /* as used by Sandisk Sansa c200 */
+#define LCD_MROBE500 18 /* as used by Olympus M:Robe 500i */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -197,6 +200,8 @@
 #include "config-c200.h"
 #elif defined(ELIO_TPJ1022)
 #include "config-tpj1022.h"
+#elif defined(MROBE_500)
+#include "config-mrobe500.h"
 #else
 /* no known platform */
 #endif
@@ -294,7 +299,7 @@
 
 /* define for all cpus from ARM family */
 #if defined(CPU_PP) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == S3C2440) \
-    || (CONFIG_CPU == TMS320DSC25)
+    || (CONFIG_CPU == TMS320DSC25) || (CONFIG_CPU == DM320)
 #define CPU_ARM
 #endif
 

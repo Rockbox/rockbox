@@ -33,9 +33,8 @@ start:
 
     msr    cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ */
 
-#ifndef BOOTLOADER
-
-#ifndef DEBUG
+#if !defined(BOOTLOADER) || (CONFIG_CPU == DM320)
+#if !defined(DEBUG)
     /* Copy exception handler code to address 0 */
     ldr    r2, =_vectorsstart
     ldr    r3, =_vectorsend
@@ -52,8 +51,11 @@ start:
     ldr    r0, =fiq_handler
     str    r0, [r1, #28]
 #endif
-    
-#ifndef STUB
+#endif
+
+#if !defined(BOOTLOADER)
+
+#if !defined(STUB)
     /* Zero out IBSS */
     ldr    r2, =_iedata
     ldr    r3, =_iend
@@ -98,6 +100,159 @@ start:
 /* Code for ARM bootloader targets other than iPod go here */
 
 #if CONFIG_CPU == S3C2440
+    /* Proper initialization pulled from 0x5070 */
+
+    /* BWSCON
+     *      Reserved 0
+     * Bank 0:
+     *      Bus width 10 (16 bit)
+     * Bank 1:
+     *      Buswidth 00 (8 bit)
+     *      Disable wait 0
+     *      Not using UB/LB 0
+     * Bank 2:
+     *      Buswidth 10 (32 bit)
+     *      Disable wait 0
+     *      Not using UB/LB 0
+     * Bank 3:
+     *      Buswidth 10 (32 bit)
+     *      Disable wait 0
+     *      Use UB/LB 1
+     * Bank 4:
+     *      Buswidth 10 (32 bit)
+     *      Disable wait 0
+     *      Use UB/LB 1
+     * Bank 5: 
+     *      Buswidth 00 (8 bit)
+     *      Disable wait 0
+     *      Not using UB/LB 0
+     * Bank 6:
+     *      Buswidth 10 (32 bit)
+     *      Disable wait 0
+     *      Not using UB/LB 0
+     * Bank 7:
+     *      Buswidth 00 (8 bit)
+     *      Disable wait 0
+     *      Not using UB/LB 0
+     */
+    ldr     r2,=0x01055102
+    mov     r1, #0x48000000
+    str     r2, [r1]
+
+    /* BANKCON0 
+     *      Pagemode: normal (1 data) 00
+     *      Pagemode access cycle: 2 clocks 00
+     *      Address hold: 2 clocks 10
+     *      Chip selection hold time: 1 clock 10
+     *      Access cycle: 8 clocks 101
+     *      Chip select setup time: 1 clock 01
+     *      Address setup time: 0 clock 00
+     */
+    ldr     r2,=0x00000D60
+    str     r2, [r1, #4]
+
+
+    /* BANKCON1 
+     *      Pagemode: normal (1 data) 00
+     *      Pagemode access cycle: 2 clocks 00
+     *      Address hold: 0 clocks 00
+     *      Chip selection hold time: 0 clock 00
+     *      Access cycle: 1 clocks 000
+     *      Chip select setup time: 0 clocks 00
+     *      Address setup time: 0 clocks 00
+     */
+    ldr     r2,=0x00000000
+    str     r2, [r1, #8]
+
+    /* BANKCON2 
+     *      Pagemode: normal (1 data) 00
+     *      Pagemode access cycle: 2 clocks 00
+     *      Address hold: 2 clocks 10
+     *      Chip selection hold time: 2 clocks 10
+     *      Access cycle: 14 clocks 111
+     *      Chip select setup time: 4 clocks 11
+     *      Address setup time: 0 clocks 00
+     */
+    ldr     r2,=0x00001FA0
+    str     r2, [r1, #0xC]
+
+    /* BANKCON3 */
+    ldr     r2,=0x00001D80
+    str     r2, [r1, #0x10]
+    /* BANKCON4 */
+    str     r2, [r1, #0x14]
+
+    /* BANKCON5 */
+    ldr     r2,=0x00000000
+    str     r2, [r1, #0x18]
+
+    /* BANKCON6/7
+     *      SCAN:   9 bit       01
+     *      Trcd:   3 clocks    01
+     *      Tcah:   0 clock     00
+     *      Tcoh:   0 clock     00
+     *      Tacc:   1 clock     000
+     *      Tcos:   0 clock     00
+     *      Tacs:   0 clock     00
+     *      MT:     Sync DRAM   11
+     */
+    ldr     r2,=0x00018005
+    str     r2, [r1, #0x1C]
+    /* BANKCON7 */
+    str     r2, [r1, #0x20]
+
+    /* REFRESH */
+    ldr     r2,=0x00980501
+    str     r2, [r1, #0x24]
+
+    /* BANKSIZE
+     *      BK76MAP: 32M/32M    000
+     *      Reserved: 0         0 (was 1)
+     *      SCLK_EN: always     1 (was 0)
+     *      SCKE_EN: disable    0
+     *      Reserved: 0         0
+     *      BURST_EN: enabled   1
+     */
+    ldr     r2,=0x00000090
+    str     r2, [r1, #0x28]
+
+    /* MRSRB6 */
+    ldr     r2,=0x00000030
+    str     r2, [r1, #0x2C]
+    /* MRSRB7 */
+    str     r2, [r1, #0x30]
+    
+#if 0
+    /* This next part I am not sure of the purpose */
+    
+    /* GPACON */
+    mov    r2,#0x01FFFCFF
+    str    r2,=0x56000000
+    
+    /* GPADAT */
+    mov    r2,#0x01FFFEFF
+    str    r2,=0x56000004
+
+    /* MRSRB6 */
+    mov    r2,#0x00000000
+    str    r2,=0x4800002C
+
+    /* GPADAT */
+    ldr     r2,=0x01FFFFFF
+    mov     r1, #0x56000000 
+    str     r2, [r1, #4]
+
+    /* MRSRB6 */
+    mov    r2,#0x00000030
+    str    r2,=0x4800002C
+
+    /* GPACON */
+    mov    r2,#0x01FFFFFF
+    str    r2,=0x56000000
+
+    /* End of the unknown */
+#endif
+
     /* get the high part of our execute address */
     ldr    r2, =0xffffff00
     and    r4, pc, r2
@@ -105,6 +260,28 @@ start:
     /* Copy bootloader to safe area - 0x31000000 */
     mov    r5, #0x30000000
     add    r5, r5, #0x1000000
+    ldr    r6, = _dataend
+    sub    r0, r6, r5       /* length of loader */
+    add    r0, r4, r0     /* r0 points to start of loader */
+1:
+    cmp    r5, r6
+    ldrcc  r2, [r4], #4
+    strcc  r2, [r5], #4
+    bcc    1b
+
+    ldr    pc, =start_loc    /* jump to the relocated start_loc:  */
+    
+start_loc:
+     bl main
+     
+#else
+    /* get the high part of our execute address */
+    ldr    r2, =0xffffff00
+    and    r4, pc, r2
+    
+    /* Copy bootloader to safe area - 0x01900000 */
+    mov    r5, #0x00900000
+    add    r5, r5, #0x01000000
     ldr    r6, = _dataend
     sub    r0, r6, r5       /* length of loader */
     add    r0, r4, r0     /* r0 points to start of loader */

@@ -22,6 +22,15 @@
 #define nop \
   asm volatile ("nop")
 
+//#define outw(v,a)       *(volatile unsigned short *)(a+PHY_IO_BASE) = (v)
+#ifndef outw
+#define outw(v,p)   (*((unsigned short*)(p + PHY_IO_BASE)) = v)
+#endif
+
+#ifndef inw
+#define inw(p)   (*((unsigned short*)(p + PHY_IO_BASE)))
+#endif
+
 /* This gets too complicated otherwise with all the ARM variation and would
    have conflicts with another system-target.h elsewhere so include a
    subheader from here. */

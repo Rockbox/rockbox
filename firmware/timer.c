@@ -208,7 +208,7 @@ static bool timer_set(long cycles, bool start)
         cycles_new = cycles;
 
     return true;
-#elif CONFIG_CPU == S3C2440
+#else
     return __TIMER_SET(cycles, start);
 #endif /* CONFIG_CPU */
 }
@@ -268,7 +268,7 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
     irq_set_int_handler(IRQ_TIMER1, TIMER1_ISR);
     irq_enable_int(IRQ_TIMER1);
     return true;
-#elif CONFIG_CPU == S3C2440
+#else
     return __TIMER_REGISTER(reg_prio, unregister_callback, cycles,
                             int_prio, timer_callback);
 #endif

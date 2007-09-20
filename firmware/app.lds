@@ -28,9 +28,13 @@ INPUT(target/sh/crt0.o)
 #define STUBOFFSET 0
 #endif
 
-#if CONFIG_CPU!=S3C2440
+#if CONFIG_CPU==S3C2440
+#include "s3c2440.h"
+#define DRAMSIZE (MEMORYSIZE * 0x100000) - 0x100 - PLUGINSIZE - STUBOFFSET - CODECSIZE - LCD_BUFFER_SIZE - TTB_SIZE
+#else
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGINSIZE - STUBOFFSET - CODECSIZE
 #endif
+
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300)
 #define DRAMORIG 0x31000000 + STUBOFFSET
 #define IRAMORIG 0x10000000
@@ -48,12 +52,14 @@ INPUT(target/sh/crt0.o)
 #define IRAMORIG 0x400000
 #define IRAMSIZE 0x7000
 #elif CONFIG_CPU==S3C2440
-#include "s3c2440.h"
-#define DRAMORIG (0x100 + STUBOFFSET)
-#define DRAMSIZE (MEMORYSIZE * 0x100000) - 0x100 - STUBOFFSET - LCD_BUFFER_SIZE - TTB_SIZE - PLUGINSIZE - CODECSIZE
+#define DRAMORIG 0x00000100 + STUBOFFSET
 #define IRAMORIG DRAMORIG
-#define IRAMSIZE 4K
+#define IRAMSIZE 0x1000
 #define IRAM DRAM
+#elif CONFIG_CPU==DM320
+#define DRAMORIG 0x00900000 + STUBOFFSET
+#define IRAMORIG 0x00000000
+#define IRAMSIZE 0x4000
 #else
 #define DRAMORIG 0x09000000 + STUBOFFSET
 #define IRAMORIG 0x0f000000
@@ -79,7 +85,7 @@ MEMORY
 
 SECTIONS
 {
-#ifndef CPU_ARM
+#if !defined(CPU_ARM)
     .vectors :
     {
         loadaddress = .;
@@ -136,7 +142,7 @@ SECTIONS
         *(.eh_frame)
     }
 
-#ifdef CPU_ARM
+#if defined(CPU_ARM)
     .vectors 0x0 :
     {
         _vectorsstart = .;

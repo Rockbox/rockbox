@@ -57,6 +57,12 @@ INPUT(target/sh/crt0.o)
 #define IRAMSIZE 4K
 #define FLASHORIG 0x0000000
 #define FLASHSIZE 1M
+#elif CONFIG_CPU == DM320
+#define DRAMORIG 0x00900000
+#define IRAMORIG 0x00000000
+#define IRAMSIZE 16K
+#define FLASHORIG 0x00100000
+#define FLASHSIZE 8M
 #elif CONFIG_CPU == PP5002
 #define DRAMORIG 0x28000000
 #define IRAMORIG 0x40000000
@@ -121,33 +127,94 @@ SECTIONS
 }
 #elif (CONFIG_CPU==S3C2440)
 {
-  . = DRAMORIG + 0x1000000;
-  .text : {
-    *(.init.text)
-    *(.text*)
-  }
-  .data : {
-    *(.icode)
-    *(.irodata)
-    *(.idata)
-    *(.data*)
-    _dataend = . ;
-   }
-  .stack :
-  {
-     *(.stack)
-     _stackbegin = .;
-     stackbegin = .;
-     . += 0x2000;
-     _stackend = .;
-     stackend = .;
-  }
-  .bss : {
-     _edata = .;
-     *(.bss*);
-     *(.ibss);
-     _end = .;
-   }
+    . = DRAMORIG + 0x1000000;
+
+    .text : {
+        *(.init.text)
+        *(.text*)
+    }
+
+    .data : {
+        *(.icode)
+        *(.irodata)
+        *(.idata)
+        *(.data*)
+        . = ALIGN(0x4);
+        _dataend = . ;
+     }
+
+    .stack :
+    {
+         *(.stack)
+         _stackbegin = .;
+         stackbegin = .;
+         . += 0x2000;
+         _stackend = .;
+         stackend = .;
+    }
+    .bss : {
+         _edata = .;
+         *(.bss*);
+         *(.ibss);
+         _end = .;
+     }
+}
+#elif (CONFIG_CPU==DM320)
+{
+    . = DRAMORIG + 0x1000000;
+
+    .vectors 0x0 :
+    {
+        _vectorsstart = .;
+        *(.vectors);
+        _vectorsend = .;
+    } AT> DRAM
+    _vectorscopy = LOADADDR(.vectors);
+
+    .text : {
+        *(.init.text)
+        *(.text*)
+        *(.glue_7)
+        *(.glue_7t)
+        . = ALIGN(0x4);
+    } > DRAM
+
+    .rodata :
+    {
+        *(.rodata)  /* problems without this, dunno why */
+        *(.rodata*)
+        *(.rodata.str1.1)
+        *(.rodata.str1.4)
+        . = ALIGN(0x4);
+
+        /* Pseudo-allocate the copies of the data sections */
+        _datacopy = .;
+    } > DRAM
+
+    .data : {
+        *(.icode)
+        *(.irodata)
+        *(.idata)
+        *(.data*)
+        . = ALIGN(0x4);
+        _dataend = . ;
+     } >DRAM
+
+    .stack :
+    {
+         *(.stack)
+         _stackbegin = .;
+         stackbegin = .;
+         . += 0x2000;
+         _stackend = .;
+         stackend = .;
+    } >DRAM
+    .bss : {
+         _edata = .;
+         *(.bss*);
+         *(.ibss);
+         _end = .;
+     }>DRAM
 }
 #else
 {
@@ -172,10 +239,10 @@ SECTIONS
         *(.idata)
         *(.data*)
         . = ALIGN(0x4);
-        _dataend = .;         
+        _dataend = .;
         . = ALIGN(0x10);  /* Maintain proper alignment for .text section */
     } > IRAM
-    
+
     /* TRICK ALERT! Newer versions of the linker don't allow output sections
        to overlap even if one of them is empty, so advance the location pointer
        "by hand" */

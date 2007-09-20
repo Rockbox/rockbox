@@ -465,7 +465,7 @@ void sound_set_volume(int value)
    || defined(HAVE_WM8721) || defined(HAVE_TLV320) || defined(HAVE_WM8751) \
    || defined(HAVE_AS3514)
     current_volume = value * 10;     /* tenth of dB */
-    set_prescaled_volume();                          
+    set_prescaled_volume();
 #elif CONFIG_CPU == PNX0101
     int tmp = (60 - value * 4) & 0xff;
     CODECVOL = tmp | (tmp << 8);

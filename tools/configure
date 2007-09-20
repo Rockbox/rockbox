@@ -618,8 +618,8 @@ cat <<EOF
  31) M5/M5L                                   51) Sansa e200R
                                               52) Sansa c200
 
- ==Tatung==
- 60) Elio TPJ-1022
+ ==Tatung==            ==Olympus==
+ 60) Elio TPJ-1022     70) M:Robe 500
 EOF
 
   buildfor=`input`;
@@ -1255,6 +1255,30 @@ EOF
     t_cpu="arm"
     t_manufacturer="s3c2440"
     t_model="gigabeat-fx"
+    ;;
+
+    70|mrobe500)
+    target_id=20
+    archos="mrobe500"
+    target="-DMROBE_500"
+    memory=64 # always
+    arm9tdmicc
+    tool="$rootdir/tools/scramble -add=giga"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.mrobe500"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins="no"
+    swcodec="yes"
+    toolset=$gigabeatbitmaptools
+    boottool="cp "
+    bootoutput="rockbox.mrboot"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="olympus"
+    t_model="mrobe-500"
     ;;
 
    50|e200)

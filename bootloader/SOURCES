@@ -17,6 +17,8 @@ tpj1022.c
 iaudio_x5.c
 #elif defined(IRIVER_H300_SERIES)
 iriver_h300.c
+#elif defined(MROBE_500)
+mrobe500.c
 #else
 main.c
 #endif

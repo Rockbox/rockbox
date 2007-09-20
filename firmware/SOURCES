@@ -588,6 +588,24 @@ target/arm/s3c2440/gigabeat-fx/pcm-meg-fx.c
 #endif /* SIMULATOR */
 #endif /* GIGABEAT_F */
 
+#ifdef MROBE_500
+#ifndef SIMULATOR
+target/arm/olympus/mrobe-500/adc-mr500.c
+target/arm/olympus/mrobe-500/ata-mr500.c
+target/arm/olympus/mrobe-500/backlight-mr500.c
+target/arm/olympus/mrobe-500/button-mr500.c
+target/arm/olympus/mrobe-500/kernel-mr500.c
+target/arm/olympus/mrobe-500/lcd-mr500.c
+target/arm/olympus/mrobe-500/power-mr500.c
+target/arm/olympus/mrobe-500/system-mr500.c
+target/arm/olympus/mrobe-500/timer-mr500.c
+target/arm/olympus/mrobe-500/usb-mr500.c
+#ifndef BOOTLOADER
+
+#endif
+#endif /* SIMULATOR */
+#endif /* MROBE_500 */
+
 #ifdef ELIO_TPJ1022
 #ifndef SIMULATOR
 target/arm/ata-as-arm.S

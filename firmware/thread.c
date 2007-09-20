@@ -105,7 +105,7 @@ static void remove_from_list(struct thread_entry **list,
                              struct thread_entry *thread) ICODE_ATTR;
 */
 
-void switch_thread(bool save_context, struct thread_entry **blocked_list) 
+void switch_thread(bool save_context, struct thread_entry **blocked_list)
     ICODE_ATTR;
 
 static inline void store_context(void* addr) __attribute__ ((always_inline));
@@ -195,6 +195,11 @@ static inline void core_sleep(void)
     CLKCON |= (1 << 2); /* set IDLE bit */
     for(i=0; i<10; i++); /* wait for IDLE */
     CLKCON &= ~(1 << 2); /* reset IDLE bit when wake up */
+}
+#else
+static inline void core_sleep(void)
+{
+
 }
 #endif
 

@@ -5,9 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id: $
  *
- * Copyright (C) 2004 by Linus Nielsen Feltzing
+ * Copyright (C) 2007 by Karl Kurbjun
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,32 +16,23 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "config.h"
+ 
+#ifndef _ADC_TARGET_H_
+#define _ADC_TARGET_H_
 
-#if CONFIG_CPU == SH7034
-#include "sh7034.h"
-#endif
-#if CONFIG_CPU == MCF5249
-#include "mcf5249.h"
-#endif
-#if CONFIG_CPU == MCF5250
-#include "mcf5250.h"
-#endif
-#if (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5022)
-#include "pp5020.h"
-#endif
-#if CONFIG_CPU == PP5002
-#include "pp5002.h"
-#endif
-#if CONFIG_CPU == PP5024
-#include "pp5024.h"
-#endif
-#if CONFIG_CPU == PNX0101
-#include "pnx0101.h"
-#endif
-#if CONFIG_CPU == S3C2440
-#include "s3c2440.h"
-#endif
-#if CONFIG_CPU == DM320
-#include "dm320.h"
+/* only two channels used by the Gigabeat */
+#define NUM_ADC_CHANNELS 2
+
+#define ADC_BATTERY     0
+#define ADC_HPREMOTE    1
+#define ADC_UNKNOWN_3   2
+#define ADC_UNKNOWN_4   3
+#define ADC_UNKNOWN_5   4
+#define ADC_UNKNOWN_6   5
+#define ADC_UNKNOWN_7   6
+#define ADC_UNKNOWN_8   7
+
+#define ADC_UNREG_POWER ADC_BATTERY /* For compatibility */
+#define ADC_READ_ERROR 0xFFFF
+
 #endif
