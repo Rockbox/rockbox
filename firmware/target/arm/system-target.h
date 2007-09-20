@@ -22,7 +22,7 @@
 
 #include "system-arm.h"
 
-#if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024)
+#ifdef CPU_PP
 /* TODO: This header is actually portalplayer specific, and should be
  * moved into an appropriate subdir (or even split in 2). */
 
@@ -91,6 +91,11 @@ static inline void flush_icache(void)
 }
 
 #endif /* CONFIG_CPU */
+#else /* CPU_CONFIG == DM320 */
+
+#define inw(p)   (*((unsigned short*)(p + PHY_IO_BASE)))
+#define outw(v,p)   (*((unsigned short*)(p + PHY_IO_BASE)) = v)
+
 #endif
 
 #endif /* SYSTEM_TARGET_H */
