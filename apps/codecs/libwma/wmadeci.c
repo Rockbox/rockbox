@@ -61,9 +61,6 @@ uint16_t *runtabarray[2], *levtabarray[2];                                      
 
 uint16_t runtab0[1336], runtab1[1336], levtab0[1336], levtab1[1336];                //these could be made smaller since only one can be 1336
 
-FFTComplex mdct_tmp[1] ;              /* dummy var */
-
-
 /*putting these in IRAM actually makes PP slower*/
 VLC_TYPE vlcbuf1[2550][2];
 VLC_TYPE vlcbuf2[2550][2];
@@ -512,7 +509,6 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
 
     mdct_init_global();
 
-    s->mdct_tmp = mdct_tmp; /* temporary storage for imdct */
     for(i = 0; i < s->nb_block_sizes; ++i)
     {
         ff_mdct_init(&s->mdct_ctx[i], s->frame_len_bits - i + 1, 1);
