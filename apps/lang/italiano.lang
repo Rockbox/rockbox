@@ -1377,44 +1377,44 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ORDER
-  desc: in playback settings screen
+  desc: DEPRECATED 
   user:
   <source>
-    *: "ID3 Tag Priority"
+    *: ""
   </source>
   <dest>
-    *: "Priorità info ID3"
+    *: ""
   </dest>
   <voice>
-    *: "Priorità ID3 tag"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_V1_FIRST
-  desc: in playback settings screen
+  desc: DEPRECATED 
   user:
   <source>
-    *: "V1 then V2"
+    *: ""
   </source>
   <dest>
-    *: "V1 poi V2"
+    *: ""
   </dest>
   <voice>
-    *: "Versione 1 poi Versione 2"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_V2_FIRST
-  desc: in playback settings screen
+  desc: DEPRECATED 
   user:
   <source>
-    *: "V2 then V1"
+    *: ""
   </source>
   <dest>
-    *: "V2 poi V1"
+    *: ""
   </dest>
   <voice>
-    *: "Versione 2 poi Versione 1"
+    *: ""
   </voice>
 </phrase>
 <phrase>
