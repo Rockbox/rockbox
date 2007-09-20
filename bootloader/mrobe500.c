@@ -17,7 +17,7 @@
  *
  ****************************************************************************/
  
- #include "inttypes.h"
+#include "inttypes.h"
 #include "string.h"
 #include "cpu.h"
 #include "system.h"
@@ -55,6 +55,7 @@ void main(void)
     uartSetup();
     lcd_init();
     font_init();
+ //   dm320_spi_init();
 
     lcd_setfont(FONT_SYSFIXED);
 
@@ -98,18 +99,20 @@ void main(void)
     printf("ATA");
     int count = 0, i = 0, c = 0;
     char data[64];
+    unsigned short out[] = {0x8000};
+    unsigned short in[2];
+    outw(inw(IO_GIO_DIR1)&~(1<<10), IO_GIO_DIR1); // set GIO26 to output
+    
     while(true)
     {
-        i = button_read_device();
-        c++;
-        if (i)
+        if (button_read_device() == BUTTON_POWER)
         {
-            c = 0;
-            __backlight_on();
-            printf("button: %x", i);
+            printf("reset");
+            outw(1<<10, IO_GIO_BITSET1);
         }
-        else if (c>50)
-            __backlight_off();
+     //   dm320_spi_block_transfer(0, out, 16, 16, in, 0);
+      //  printf("%x", in[0]);
+     
     }
 #if 0
     rc = ata_init();
