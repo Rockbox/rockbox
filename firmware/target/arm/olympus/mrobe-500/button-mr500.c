@@ -27,22 +27,11 @@
 #include "system.h"
 #include "backlight-target.h"
 
-static int const remote_buttons[] =
-{
-    BUTTON_NONE,        /* Headphones connected - remote disconnected */
-    BUTTON_RC_PLAY,
-    BUTTON_RC_DSP,
-    BUTTON_RC_REW,
-    BUTTON_RC_FF,
-    BUTTON_RC_VOL_UP,
-    BUTTON_RC_VOL_DOWN,
-    BUTTON_NONE,        /* Remote control attached - no buttons pressed */
-    BUTTON_NONE,        /* Nothing in the headphone socket */
-};
-
+#define BUTTON_TIMEOUT 50
 void button_init_device(void)
 {
-    /* Power, Remote Play & Hold switch */
+    /* GIO is the power button, set as input */
+    outw(inw(IO_GIO_DIR0)|0x01, IO_GIO_DIR0);
 }
 
 inline bool button_hold(void)
@@ -52,5 +41,51 @@ inline bool button_hold(void)
 
 int button_read_device(void)
 {
-    return 0;
+    char data[5], c;
+    int i = 0;
+    int btn = BUTTON_NONE, timeout = BUTTON_TIMEOUT;
+    
+    if ((inw(IO_GIO_BITSET0)&0x01) == 0)
+        btn |= BUTTON_POWER;
+        
+    uartHeartbeat();
+    while (timeout > 0)
+    {
+        c = uartPollch(BUTTON_TIMEOUT*100);
+        if (c > -1)
+        {
+            if (i && data[0] == 0xf4)
+            {
+                data[i++] = c;
+            }
+            else if (c == 0xf4)
+            {
+                data[0] = c;
+                i = 1;
+            }
+            
+            if (i == 5)
+            {
+                if (data[1]& (1<<7))
+                    btn |= BUTTON_RC_HEART;
+                if (data[1]& (1<<6))
+                    btn |= BUTTON_RC_MODE;
+                if (data[1]& (1<<5))
+                    btn |= BUTTON_RC_VOL_DOWN;
+                if (data[1]& (1<<4))
+                    btn |= BUTTON_RC_VOL_UP;
+                if (data[1]& (1<<3))
+                    btn |= BUTTON_RC_REW;
+                if (data[1]& (1<<2))
+                    btn |= BUTTON_RC_FF;
+                if (data[1]& (1<<1))
+                    btn |= BUTTON_RC_DOWN;
+                if (data[1]& (1<<0))
+                    btn |= BUTTON_RC_PLAY;
+                break;
+            }
+        }
+        timeout--;
+    }
+    return btn;
 }
