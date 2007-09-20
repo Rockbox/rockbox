@@ -2352,7 +2352,7 @@
     *: none
     recording: "Microphone"
     h100,h120,h300: "Internal Microphone"
-    *:   </source>
+  </source>
   <dest>
     *: none
     recording: "Mikrofon"
@@ -4283,8 +4283,9 @@
     e200,c200: "mSD:"
     ondio*: "MMC:"
   </source>
+  <dest>
     *: none
-    e200,c200:   <dest>
+    e200,c200: "mSD:"
     *: "MMC:"
   </dest>
   <voice>

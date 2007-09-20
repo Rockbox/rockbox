@@ -3472,6 +3472,7 @@
 </phrase>
 <phrase>
   id: LANG_MENU_SHOW_ID3_INFO
+  desc: Menu option to start tag viewer
   user:
   <source>
     *: "Show ID3 Info"
