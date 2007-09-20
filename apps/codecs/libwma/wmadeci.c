@@ -26,7 +26,7 @@
 #include <codecs/lib/codeclib.h>
 #include "asf.h"
 #include "wmadec.h"
-#include "wmafixed.c"
+#include "wmafixed.h"
 #include "bitstream.h"
 
 
@@ -115,8 +115,6 @@ typedef struct CoefVLCTable
 CoefVLCTable;
 
 static void wma_lsp_to_curve_init(WMADecodeContext *s, int frame_len);
-int fft_calc(FFTContext *s, FFTComplex *z);
-
 
 fixed32 coefsarray[MAX_CHANNELS][BLOCK_MAX_SIZE] IBSS_ATTR;
 
@@ -126,10 +124,6 @@ fixed32 stat0[2048], stat1[1024], stat2[512], stat3[256], stat4[128];    //these
 fixed32 *tcosarray[5], *tsinarray[5];
 fixed32 tcos0[1024], tcos1[512], tcos2[256], tcos3[128], tcos4[64];        //these are the sin and cos rotations used by the MDCT
 fixed32 tsin0[1024], tsin1[512], tsin2[256], tsin3[128], tsin4[64];
-
-FFTComplex *exparray[5];                                    //these are the fft lookup tables
-
-uint16_t *revarray[5];
 
 FFTComplex  exptab0[512] IBSS_ATTR;
 uint16_t revtab0[1024];
@@ -810,10 +804,6 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
     /*TODO:  figure out how to fold this up into one array*/
     tcosarray[0] = tcos0; tcosarray[1] = tcos1; tcosarray[2] = tcos2; tcosarray[3] = tcos3;tcosarray[4] = tcos4;
     tsinarray[0] = tsin0; tsinarray[1] = tsin1; tsinarray[2] = tsin2; tsinarray[3] = tsin3;tsinarray[4] = tsin4;
-
-      /*these are folded up now*/
-    exparray[0] = exptab0; //exparray[1] = exptab1; exparray[2] = exptab2; exparray[3] = exptab3; exparray[4] = exptab4;
-    revarray[0]=revtab0; //revarray[1]=revtab1; revarray[2]=revtab2; revarray[3]=revtab3; revarray[4]=revtab4;
 
     s->mdct_tmp = mdct_tmp; /* temporary storage for imdct */
     for(i = 0; i < s->nb_block_sizes; ++i)
