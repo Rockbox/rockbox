@@ -131,6 +131,9 @@ static unsigned int peeks_per_redraw[PEEKS_PER_DRAW_SIZE];
 static unsigned int ticks_per_redraw[TICKS_PER_DRAW_SIZE];
 #endif
 
+static void peak_meter_draw(struct screen *display, struct meter_scales *meter_scales,
+                            int x, int y, int width, int height);
+
 /* time out values for max */
 static const short peak_time_out[] = {
     0 * HZ, HZ / 5, 30, HZ / 2, HZ, 2 * HZ, 
@@ -149,7 +152,7 @@ static const long clip_time_out[] = {
 
 /* precalculated peak values that represent magical
    dBfs values. Used to draw the scale */
-static const int db_scale_src_values[DB_SCALE_SRC_VALUES_SIZE] = {
+static const short db_scale_src_values[DB_SCALE_SRC_VALUES_SIZE] = {
     32736, /*   0 db */
     22752, /* - 3 db */
     16640, /* - 6 db */
@@ -342,7 +345,7 @@ int peak_meter_db2sample(int db)
  * for dBfs: -9000 < newmin <= 0
  * for linear: 0 <= newmin <= 100
  */
-void peak_meter_set_min(int newmin) 
+static void peak_meter_set_min(int newmin) 
 {
     if (pm_use_dbfs) {
         peak_meter_range_min = peak_meter_db2sample(newmin);
@@ -392,7 +395,7 @@ int peak_meter_get_min(void)
  * for dBfs: -9000 < newmax <= 0
  * for linear: 0 <= newmax <= 100
  */
-void peak_meter_set_max(int newmax) 
+static void peak_meter_set_max(int newmax) 
 {
     if (pm_use_dbfs) {
         peak_meter_range_max = peak_meter_db2sample(newmax);
@@ -929,7 +932,7 @@ void peak_meter_screen(struct screen *display, int x, int y, int height)
  *                    width > 3
  * @param int height - The height of the peak meter. height > 3
  */
-void peak_meter_draw(struct screen *display, struct meter_scales *scales,
+static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
                          int x, int y, int width, int height) 
 {
     static int left_level = 0, right_level = 0;

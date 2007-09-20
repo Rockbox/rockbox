@@ -41,9 +41,7 @@ extern void peak_meter_init_times(int release, int hold, int clip_hold);
 #ifdef HAVE_AGC
 extern void peak_meter_get_peakhold(int *peak_left, int *peak_right);
 #endif
-extern void peak_meter_set_min(int newmin);
 extern int  peak_meter_get_min(void);
-extern void peak_meter_set_max(int newmax);
 extern int  peak_meter_get_max(void);
 extern void peak_meter_set_use_dbfs(bool use);
 extern bool peak_meter_get_use_dbfs(void);
@@ -98,7 +96,6 @@ struct meter_scales{
     long pm_peak_timeout_l;
     long pm_peak_timeout_r;
 };
-extern void peak_meter_draw(struct screen *display, struct meter_scales *meter_scales,
-                                int x, int y, int width, int height);
+
 extern void peak_meter_screen(struct screen *display, int x, int y, int height);
 #endif /* __PEAKMETER_H__ */
