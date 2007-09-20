@@ -85,7 +85,7 @@ static struct usb_config_descriptor storage_config_desc = {
     .bConfigurationValue =  1,
     .iConfiguration =       CONFIG_STR_ID,
     .bmAttributes =         USB_CONFIG_ATT_ONE | USB_CONFIG_ATT_SELFPOWER,
-    .bMaxPower =            1,
+    .bMaxPower =            250, /* 500mA in 2mA units */
 };
 
 static struct usb_interface_descriptor storage_interface_desc = {
@@ -162,12 +162,14 @@ struct usb_response res;
 /* helper functions */
 static int config_buf(uint8_t *buf, uint8_t type, unsigned index);
 static int set_config(int config);
+static int set_interface_alt_setting(int interface_alt_setting);
 
 struct device {
     struct usb_ep* in;
     struct usb_ep* out;
     struct usb_ep* intr;
     uint32_t used_config;
+    uint32_t used_interface_alt_setting;
     struct usb_descriptor_header** descriptors;
 };
 
@@ -291,9 +293,15 @@ int usb_storage_driver_request(struct usb_ctrlrequest* request)
             res.buf = &dev.used_config;
             break;
 
+        case USB_REQ_GET_INTERFACE:
+            logf("usb storage: get interface");
+            ret = 1;
+            res.buf = &dev.used_interface_alt_setting;
+            break;
+
         case USB_REQ_SET_INTERFACE:
             logf("usb storage: set interface");
-            ret = 0;
+            ret = set_interface_alt_setting(request->wValue);
             break;
         }
 
@@ -357,8 +365,6 @@ static int config_buf(uint8_t *buf, uint8_t type, unsigned index)
 
 static int set_config(int config)
 {
-    (void)config;
-
     /* enable endpoints */
     logf("setup %s", dev.in->name);
     ops->enable(dev.in, (struct usb_endpoint_descriptor*)dev.descriptors[1]);
@@ -368,6 +374,13 @@ static int set_config(int config)
     dev.used_config = config;
 
     /* setup buffers */
+
+    return 0;
+}
+
+static int set_interface_alt_setting(int interface_alt_setting)
+{
+    dev.used_interface_alt_setting = interface_alt_setting;
 
     return 0;
 }
