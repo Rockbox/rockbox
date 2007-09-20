@@ -198,8 +198,9 @@ void system_init(void)
 #ifndef BOOTLOADER
     if (CURRENT_CORE == CPU)
     {
-#ifdef SANSA_E200
+#if defined(SANSA_E200) || defined(SANSA_C200)
         /* Reset all devices */
+        outl(inl(0x60006008) | 0x20, 0x60006008);
         DEV_RS = 0x3bfffef8;
         outl(0xffffffff, 0x60006008);
         DEV_RS = 0;
