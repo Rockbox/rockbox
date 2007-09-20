@@ -160,7 +160,7 @@ PLUGIN_HEADER
 #define YOFS 6
 #define NUM_SCORES 10
 
-+/* use 10x10 tiles (Sansa c200) */
+/* use 10x10 tiles (Sansa c200) */
 #elif (LCD_HEIGHT == 80) && (LCD_WIDTH == 132)
 #define TILE_WIDTH 10
 #define TILE_HEIGHT 10
