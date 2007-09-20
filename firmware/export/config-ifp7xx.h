@@ -18,7 +18,7 @@
 /* #define HAVE_LCD_COLOR */
 
 /* define this if you would like tagcache to build on this target */
-#define HAVE_TAGCACHE
+/* #define HAVE_TAGCACHE */
 
 /* LCD dimensions */
 #define LCD_WIDTH  128
