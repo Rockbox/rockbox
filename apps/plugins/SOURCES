@@ -34,7 +34,9 @@ wavrecord.c
 #ifndef IRIVER_IFP7XX_SERIES       /* Temporarily disable plugins for iFP7xx */
 dice.c
 disktidy.c
+#ifndef SANSA_C200
 flipit.c
+#endif
 
 #ifdef HAVE_LCD_BITMAP             /* Not for the Player */
 maze.c
@@ -50,14 +52,16 @@ plasma.c
 
 blackjack.c
 bounce.c
+#ifndef SANSA_C200
 bubbles.c
+#endif
 
-#if (LCD_DEPTH >= 2) && !defined(IPOD_MINI) && !defined(IPOD_MINI2G) && !defined(IRIVER_H10_5GB)
+#if (LCD_WIDTH >= 160)
 invadrox.c
 #endif
 
-#if LCD_WIDTH != 128
-/* These need adjusting for the iRiver if'p screen */
+#if LCD_WIDTH != 128 && !defined SANSA_C200
+/* These need adjusting for the iRiver if'p and Sansa c200, small H10 screen */
 brickmania.c
 #endif
 calculator.c
@@ -65,14 +69,18 @@ chip8.c
 chopper.c
 demystify.c
 jewels.c
+#ifndef SANSA_C200
 minesweeper.c
+#endif
 oscilloscope.c
 pong.c
 sliding_puzzle.c
 snake.c
 snake2.c
 solitaire.c
+#ifndef SANSA_C200
 sokoban.c
+#endif
 star.c
 starfield.c
 #if CONFIG_LCD == LCD_SSD1815

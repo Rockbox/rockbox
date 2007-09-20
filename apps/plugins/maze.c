@@ -89,6 +89,9 @@ const struct button_mapping *plugin_contexts[]
 #if ( LCD_WIDTH == 112 )
 #define MAZE_WIDTH  16
 #define MAZE_HEIGHT 12
+#elif( LCD_WIDTH == 132 )
+#define MAZE_WIDTH  26
+#define MAZE_HEIGHT 16
 #else
 #define MAZE_WIDTH  32
 #define MAZE_HEIGHT 24

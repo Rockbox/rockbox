@@ -108,6 +108,14 @@ static const char default_game[9][9] =
 #define CELL_HEIGHT 6
 #define SMALL_BOARD
 
+#elif ((LCD_HEIGHT==80) && (LCD_WIDTH==132))
+/* C200, 9 cells @ 8x8 with 8 border lines */
+
+/* Internal dimensions of a cell */
+#define CELL_WIDTH  8
+#define CELL_HEIGHT 8
+#define SMALL_BOARD
+
 #elif (LCD_HEIGHT==110) && (LCD_WIDTH==138)
 /* iPod Mini - 138x110, 9 cells @ 10x10 with 14 border lines */
 

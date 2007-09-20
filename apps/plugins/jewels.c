@@ -95,7 +95,8 @@ PLUGIN_HEADER
 #define JEWELS_SELECT BUTTON_SELECT
 #define JEWELS_CANCEL BUTTON_POWER
 
-#elif CONFIG_KEYPAD == SANSA_E200_PAD
+#elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
+(CONFIG_KEYPAD == SANSA_C200_PAD)
 #define JEWELS_UP     BUTTON_UP
 #define JEWELS_DOWN   BUTTON_DOWN
 #define JEWELS_LEFT   BUTTON_LEFT
@@ -158,6 +159,13 @@ PLUGIN_HEADER
 #define TILE_HEIGHT 13
 #define YOFS 6
 #define NUM_SCORES 10
+
++/* use 10x10 tiles (Sansa c200) */
+#elif (LCD_HEIGHT == 80) && (LCD_WIDTH == 132)
+#define TILE_WIDTH 10
+#define TILE_HEIGHT 10
+#define YOFS 0
+#define NUM_SCORES 8
 
 /* use 10x8 tiles (iFP 700) */
 #elif (LCD_HEIGHT == 64) && (LCD_WIDTH == 128)
@@ -1480,7 +1488,8 @@ static int jewels_main(struct game_context* bj) {
                 rb->lcd_puts(0, 9, "SELECT to select");
                 rb->lcd_puts(0, 10, "Long SELECT to show menu");
                 rb->lcd_puts(0, 11, "POWER to cancel");
-#elif CONFIG_KEYPAD == SANSA_E200_PAD
+#elif CONFIG_KEYPAD == SANSA_E200_PAD \
+   || CONFIG_KEYPAD == SANSA_C200_PAD
                 rb->lcd_puts(0, 2, "Swap pairs of jewels to");
                 rb->lcd_puts(0, 3, "form connected segments");
                 rb->lcd_puts(0, 4, "of three or more of the");

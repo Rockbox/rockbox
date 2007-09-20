@@ -67,6 +67,14 @@ static struct plugin_api* rb;
 #define CELL_HEIGHT 6
 #define SMALL_BOARD
 
+#elif (LCD_HEIGHT==80) && (LCD_WIDTH==132)
+/* Sansa C200 - 132x80, 8 cells @ 9x9 with 9 border lines */
+
+/* Internal dimensions of a cell */
+#define CELL_WIDTH  8
+#define CELL_HEIGHT 8
+#define SMALL_BOARD
+
 #elif (LCD_HEIGHT==110) && (LCD_WIDTH==138)
 /* iPod Mini - 138x110, 8 cells @ 10x10 with 9 border lines */
 

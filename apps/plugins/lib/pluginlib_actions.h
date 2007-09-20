@@ -94,7 +94,8 @@ static const struct button_mapping generic_directions[] =
     || (CONFIG_KEYPAD == GIGABEAT_PAD)      \
     || (CONFIG_KEYPAD == RECORDER_PAD)      \
     || (CONFIG_KEYPAD == ARCHOS_AV300_PAD)  \
-    || (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD)
+    || (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD) \
+    || (CONFIG_KEYPAD == SANSA_C200_PAD)
     { PLA_UP,                BUTTON_UP,                  BUTTON_NONE},
     { PLA_DOWN,              BUTTON_DOWN,                BUTTON_NONE},
     { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
@@ -142,6 +143,7 @@ static const struct button_mapping generic_directions[] =
     { PLA_DOWN_REPEAT,       BUTTON_SCROLL_DOWN|BUTTON_REPEAT,  BUTTON_NONE},
     { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
     { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
+
 #else
     #error pluginlib_actions: Unsupported keypad
 #endif
@@ -191,14 +193,15 @@ static const struct button_mapping generic_left_right_fire[] =
     { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
     { PLA_FIRE,              BUTTON_PLAY,                BUTTON_NONE},
     { PLA_FIRE_REPEAT,       BUTTON_PLAY|BUTTON_REPEAT,  BUTTON_NONE},
-#elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
+#elif (CONFIG_KEYPAD == SANSA_C200_PAD) \
+    || (CONFIG_KEYPAD == ARCHOS_AV300_PAD)
     { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
     { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
     { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
     { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
     { PLA_FIRE,              BUTTON_SELECT,              BUTTON_NONE},
     { PLA_FIRE_REPEAT,       BUTTON_SELECT|BUTTON_REPEAT,BUTTON_NONE},
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD) 
+#elif (CONFIG_KEYPAD == SANSA_E200_PAD)
     { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
     { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
     { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
@@ -280,6 +283,12 @@ static const struct button_mapping generic_actions[] =
     {PLA_FIRE,          BUTTON_ON,          BUTTON_NONE},
     {PLA_FIRE_REPEAT,   BUTTON_ON|BUTTON_REPEAT,    BUTTON_NONE},
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
+    {PLA_QUIT,          BUTTON_POWER,       BUTTON_NONE},
+    {PLA_START,         BUTTON_UP,        BUTTON_NONE},
+    {PLA_MENU,          BUTTON_DOWN,        BUTTON_NONE},
+    {PLA_FIRE,          BUTTON_SELECT,      BUTTON_NONE},
+    {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
+#elif CONFIG_KEYPAD == SANSA_C200_PAD
     {PLA_QUIT,          BUTTON_POWER,       BUTTON_NONE},
     {PLA_START,         BUTTON_UP,        BUTTON_NONE},
     {PLA_MENU,          BUTTON_DOWN,        BUTTON_NONE},

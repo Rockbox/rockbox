@@ -269,19 +269,16 @@ static const struct button_mapping button_context_radio[]  = {
 static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_LEFT,         BUTTON_LEFT,                     BUTTON_NONE },
     { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,       BUTTON_NONE },
-    
     { ACTION_KBD_RIGHT,        BUTTON_RIGHT,                    BUTTON_NONE },
     { ACTION_KBD_RIGHT,        BUTTON_RIGHT|BUTTON_REPEAT,      BUTTON_NONE },
     
-    { ACTION_KBD_CURSOR_LEFT,  BUTTON_REC|BUTTON_LEFT,          BUTTON_NONE },
+    { ACTION_KBD_CURSOR_LEFT,  BUTTON_REC|BUTTON_LEFT,              BUTTON_NONE },
     { ACTION_KBD_CURSOR_LEFT,  BUTTON_REC|BUTTON_LEFT|BUTTON_REPEAT,BUTTON_NONE },
-    
-    { ACTION_KBD_CURSOR_RIGHT, BUTTON_REC|BUTTON_RIGHT,         BUTTON_NONE },
+    { ACTION_KBD_CURSOR_RIGHT, BUTTON_REC|BUTTON_RIGHT,              BUTTON_NONE },
     { ACTION_KBD_CURSOR_RIGHT, BUTTON_REC|BUTTON_RIGHT|BUTTON_REPEAT,BUTTON_NONE },
     
     { ACTION_KBD_UP,           BUTTON_UP,                       BUTTON_NONE },
     { ACTION_KBD_UP,           BUTTON_UP|BUTTON_REPEAT,         BUTTON_NONE },
-    
     { ACTION_KBD_DOWN,         BUTTON_DOWN,                     BUTTON_NONE },
     { ACTION_KBD_DOWN,         BUTTON_DOWN|BUTTON_REPEAT,       BUTTON_NONE },
     
@@ -291,7 +288,8 @@ static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_PAGE_FLIP,    BUTTON_REC|BUTTON_SELECT,        BUTTON_REC },
 
     { ACTION_KBD_SELECT,       BUTTON_SELECT,                   BUTTON_NONE },
-    { ACTION_KBD_DONE,         BUTTON_UP,                       BUTTON_NONE },
+    { ACTION_KBD_DONE,         BUTTON_VOL_UP,                   BUTTON_NONE },
+    { ACTION_KBD_DONE,         BUTTON_VOL_DOWN,                 BUTTON_NONE },
     { ACTION_KBD_ABORT,        BUTTON_POWER,                    BUTTON_NONE },
 
     LAST_ITEM_IN_LIST

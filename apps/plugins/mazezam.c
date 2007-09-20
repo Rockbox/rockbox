@@ -116,7 +116,8 @@ MEM_FUNCTION_WRAPPERS(rb);
 #define MAZEZAM_QUIT                BUTTON_POWER
 #define MAZEZAM_QUIT_KEYNAME        "[POWER]"
 
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD)
+#elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
+(CONFIG_KEYPAD == SANSA_C200_PAD)
 #define MAZEZAM_UP                  BUTTON_UP
 #define MAZEZAM_DOWN                BUTTON_DOWN
 #define MAZEZAM_LEFT                BUTTON_LEFT

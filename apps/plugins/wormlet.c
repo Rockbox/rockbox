@@ -148,7 +148,8 @@ PLUGIN_HEADER
 #define WORMS_TEXT "Left/Right"
 
 
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD)
+#elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
+(CONFIG_KEYPAD == SANSA_C200_PAD)
 
 #define BTN_DIR_UP BUTTON_UP
 #define BTN_DIR_DOWN BUTTON_DOWN
@@ -178,6 +179,11 @@ PLUGIN_HEADER
 #endif
 
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
+#define FOOD_SIZE 3
+#define ARGH_SIZE 4
+#define SPEED 14
+#define MAX_WORM_SEGMENTS 128
+#elif (LCD_WIDTH == 132) && (LCD_HEIGHT == 80)
 #define FOOD_SIZE 3
 #define ARGH_SIZE 4
 #define SPEED 14
