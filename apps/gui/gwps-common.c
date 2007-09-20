@@ -486,7 +486,7 @@ static void draw_progressbar(struct gui_wps *gwps, int line)
                            HORIZONTAL);
 
 #ifdef AB_REPEAT_ENABLE
-    if ( ab_repeat_mode_enabled() )
+    if ( ab_repeat_mode_enabled() && state->id3->length != 0 )
         ab_draw_markers(display, state->id3->length,
                         data->progress_start, data->progress_end, sb_y,
                         data->progress_height);
