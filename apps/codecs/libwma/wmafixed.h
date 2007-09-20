@@ -96,6 +96,8 @@ static inline int32_t fixmul32(int32_t x, int32_t y)
     );
     return x;
 }
+
+fixed32 fixmul32b(fixed32 x, fixed32 y);
 #else
 
 fixed32 fixmul32(fixed32 x, fixed32 y);
