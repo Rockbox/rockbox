@@ -128,7 +128,7 @@ int fft_calc_unscaled(FFTContext *s, FFTComplex *z)
     return 0;
 }
 
-int fft_init_global()
+int fft_init_global(void)
 {
     int i, n;
     fixed32 c1, s1, s2;

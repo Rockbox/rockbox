@@ -137,7 +137,7 @@ void ff_imdct_calc(MDCTContext *s,
     }
 }
 
-int mdct_init_global()
+int mdct_init_global(void)
 {
     int i,j,m;
     /* init MDCT */

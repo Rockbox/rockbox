@@ -19,5 +19,5 @@
 
 int ff_mdct_init(MDCTContext *s, int nbits, int inverse);
 void ff_imdct_calc(MDCTContext *s, fixed32 *output, fixed32 *input);
-int mdct_init_global();
+int mdct_init_global(void);
 
