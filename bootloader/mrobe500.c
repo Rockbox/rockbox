@@ -52,7 +52,7 @@ void main(void)
     adc_init();
     button_init();
     backlight_init();
-
+    uartSetup();
     lcd_init();
     font_init();
 
@@ -96,8 +96,20 @@ void main(void)
     #endif
 
     printf("ATA");
+    int count = 0, i = 0, c = 0;
+    char data[64];
     while(true)
     {
+        i = button_read_device();
+        c++;
+        if (i)
+        {
+            c = 0;
+            __backlight_on();
+            printf("button: %x", i);
+        }
+        else if (c>50)
+            __backlight_off();
     }
 #if 0
     rc = ata_init();

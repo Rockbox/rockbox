@@ -26,6 +26,7 @@
 #include "adc.h"
 #include "system.h"
 #include "backlight-target.h"
+#include "uart-target.h"
 
 #define BUTTON_TIMEOUT 50
 void button_init_device(void)

@@ -600,6 +600,7 @@ target/arm/olympus/mrobe-500/power-mr500.c
 target/arm/olympus/mrobe-500/system-mr500.c
 target/arm/olympus/mrobe-500/timer-mr500.c
 target/arm/olympus/mrobe-500/usb-mr500.c
+target/arm/olympus/mrobe-500/uart-mr500.c
 #ifndef BOOTLOADER
 
 #endif
