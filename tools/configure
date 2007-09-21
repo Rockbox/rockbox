@@ -1373,7 +1373,7 @@ EOF
     appextra="recorder:gui"
     archosrom=""
     flash=""
-    plugins=""
+    plugins="yes"
     swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v3 -model=c200 -type=RBBL"
     bootoutput="firmware.mi4"
