@@ -27,6 +27,7 @@
 #define FRAME ((short *) (0x4470000))
 
 #define PHY_IO_BASE 0x00030000
+#define DM320_REG(addr) (*(volatile unsigned short *)(PHY_IO_BASE + (addr)))
 
 /* Timer 0-3 */
 #define IO_TIMER0_TMMD            0x0000
@@ -58,20 +59,20 @@
 #define IO_TIMER3_TMCNT           0x018A
 
 /* Serial 0/1 */
-#define IO_SERIAL0_TX_DATA        0x0200
-#define IO_SERIAL0_RX_DATA        0x0202
-#define IO_SERIAL0_TX_ENABLE      0x0204
-#define IO_SERIAL0_MODE           0x0206
-#define IO_SERIAL0_DMA_TRIGGER    0x0208
-#define IO_SERIAL0_DMA_MODE       0x020A
-#define IO_SERIAL0_DMA_SDRAM_LOW  0x020C
-#define IO_SERIAL0_DMA_SDRAM_HI   0x020E
-#define IO_SERIAL0_DMA_STATUS     0x0210
+#define IO_SERIAL0_TX_DATA        DM320_REG(0x0200)
+#define IO_SERIAL0_RX_DATA        DM320_REG(0x0202)
+#define IO_SERIAL0_TX_ENABLE      DM320_REG(0x0204)
+#define IO_SERIAL0_MODE           DM320_REG(0x0206)
+#define IO_SERIAL0_DMA_TRIGGER    DM320_REG(0x0208)
+#define IO_SERIAL0_DMA_MODE       DM320_REG(0x020A)
+#define IO_SERIAL0_DMA_SDRAM_LOW  DM320_REG(0x020C)
+#define IO_SERIAL0_DMA_SDRAM_HI   DM320_REG(0x020E)
+#define IO_SERIAL0_DMA_STATUS     DM320_REG(0x0210)
 
-#define IO_SERIAL1_TX_DATA        0x0280
-#define IO_SERIAL1_RX_DATA        0x0282
-#define IO_SERIAL1_TX_ENABLE      0x0284
-#define IO_SERIAL1_MODE           0x0286
+#define IO_SERIAL1_TX_DATA        DM320_REG(0x0280)
+#define IO_SERIAL1_RX_DATA        DM320_REG(0x0282)
+#define IO_SERIAL1_TX_ENABLE      DM320_REG(0x0284)
+#define IO_SERIAL1_MODE           DM320_REG(0x0286)
 
 /* UART 0/1 */
 #define IO_UART0_DTRR             0x0300
@@ -383,31 +384,31 @@
 #define IO_VID_ENC_ATR0           0x0854
 
 /* Clock Controller */
-#define IO_CLK_PLLA               0x0880
-#define IO_CLK_PLLB               0x0882
-#define IO_CLK_SEL0               0x0884
-#define IO_CLK_SEL1               0x0886
-#define IO_CLK_SEL2               0x0888
-#define IO_CLK_DIV0               0x088A
-#define IO_CLK_DIV1               0x088C
-#define IO_CLK_DIV2               0x088E
-#define IO_CLK_DIV3               0x0890
-#define IO_CLK_DIV4               0x0892
-#define IO_CLK_BYP                0x0894
-#define IO_CLK_INV                0x0896
-#define IO_CLK_MOD0               0x0898
-#define IO_CLK_MOD1               0x089A
-#define IO_CLK_MOD2               0x089C
-#define IO_CLK_LPCTL0             0x089E
-#define IO_CLK_LPCTL1             0x08A0
-#define IO_CLK_OSEL               0x08A2
-#define IO_CLK_00DIV              0x08A4
-#define IO_CLK_O1DIV              0x08A6
-#define IO_CLK_02DIV              0x08A8
-#define IO_CLK_PWM0C              0x08AA
-#define IO_CLK_PWM0H              0x08AC
-#define IO_CLK_PWM1C              0x08AE
-#define IO_CLK_PWM1H              0x08B0
+#define IO_CLK_PLLA               DM320_REG(0x0880)
+#define IO_CLK_PLLB               DM320_REG(0x0882)
+#define IO_CLK_SEL0               DM320_REG(0x0884)
+#define IO_CLK_SEL1               DM320_REG(0x0886)
+#define IO_CLK_SEL2               DM320_REG(0x0888)
+#define IO_CLK_DIV0               DM320_REG(0x088A)
+#define IO_CLK_DIV1               DM320_REG(0x088C)
+#define IO_CLK_DIV2               DM320_REG(0x088E)
+#define IO_CLK_DIV3               DM320_REG(0x0890)
+#define IO_CLK_DIV4               DM320_REG(0x0892)
+#define IO_CLK_BYP                DM320_REG(0x0894)
+#define IO_CLK_INV                DM320_REG(0x0896)
+#define IO_CLK_MOD0               DM320_REG(0x0898)
+#define IO_CLK_MOD1               DM320_REG(0x089A)
+#define IO_CLK_MOD2               DM320_REG(0x089C)
+#define IO_CLK_LPCTL0             DM320_REG(0x089E)
+#define IO_CLK_LPCTL1             DM320_REG(0x08A0)
+#define IO_CLK_OSEL               DM320_REG(0x08A2)
+#define IO_CLK_00DIV              DM320_REG(0x08A4)
+#define IO_CLK_O1DIV              DM320_REG(0x08A6)
+#define IO_CLK_02DIV              DM320_REG(0x08A8)
+#define IO_CLK_PWM0C              DM320_REG(0x08AA)
+#define IO_CLK_PWM0H              DM320_REG(0x08AC)
+#define IO_CLK_PWM1C              DM320_REG(0x08AE)
+#define IO_CLK_PWM1H              DM320_REG(0x08B0)
 
 /* Bus Controller */
 #define IO_BUSC_ECR               0x0900
