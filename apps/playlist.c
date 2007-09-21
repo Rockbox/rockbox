@@ -2376,9 +2376,6 @@ int playlist_shuffle(int random_seed, int start_index)
             playlist->first_index = start_index;
         start_current = true;
     }
-
-    cond_talk_ids(LANG_WAIT);
-    gui_syncsplash(0, str(LANG_PLAYLIST_SHUFFLE));
     
     randomise_playlist(playlist, random_seed, start_current, true);
 
