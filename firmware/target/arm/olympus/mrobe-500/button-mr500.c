@@ -29,6 +29,11 @@
 #include "uart-target.h"
 
 #define BUTTON_TIMEOUT 50
+
+#define BUTTON_START_BYTE 0xF0
+#define BUTTON_START_BYTE2 0xF4 /* not sure why, but sometimes you get F0 or F4, */
+                                /* but always the same one for the session? */
+
 void button_init_device(void)
 {
     /* GIO is the power button, set as input */
@@ -43,6 +48,7 @@ inline bool button_hold(void)
 int button_read_device(void)
 {
     char data[5], c;
+    int val;
     int i = 0;
     int btn = BUTTON_NONE, timeout = BUTTON_TIMEOUT;
     
@@ -52,14 +58,16 @@ int button_read_device(void)
     uartHeartbeat();
     while (timeout > 0)
     {
-        c = uartPollch(BUTTON_TIMEOUT*100);
-        if (c > -1)
+        val = uartPollch(BUTTON_TIMEOUT*100);
+        if (val > -1)
         {
-            if (i && data[0] == 0xf4)
+            c = val&0xff;
+            if (i && (data[0] == BUTTON_START_BYTE || data[0] == BUTTON_START_BYTE2))
             {
                 data[i++] = c;
             }
-            else if (c == 0xf4)
+            else if (c == BUTTON_START_BYTE ||
+                     c == BUTTON_START_BYTE2)
             {
                 data[0] = c;
                 i = 1;
