@@ -26,5 +26,6 @@ void uartSetup(void);
 void uartPuts(const char *str);
 void uartGets(char *str, unsigned int size);
 int  uartPollch(unsigned int ticks);
+void uartHeartbeat(void);
 
 #endif

@@ -39,6 +39,7 @@
 #include "rbunicode.h"
 #include "usb.h"
 #include "spi-target.h"
+#include "uart-target.h"
 
 void main(void)
 {
