@@ -762,6 +762,7 @@ void RbUtilQt::uninstallBootloader(void)
 
     QString plattform = userSettings->value("platform").toString();
     BootloaderInstaller blinstaller(this);
+    blinstaller.setProxy(proxy());
     blinstaller.setMountPoint(userSettings->value("mountpoint").toString());
     blinstaller.setDevice(userSettings->value("platform").toString());
     blinstaller.setBootloaderMethod(devices->value(plattform + "/bootloadermethod").toString());
