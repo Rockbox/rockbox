@@ -1036,10 +1036,11 @@ static void ps_decorrelate(ps_info *ps, qmf_t X_left[38][64], qmf_t X_right[38][
     const complex_t *Phi_Fract_SubQmf;
     uint8_t temp_delay_ser[NO_ALLPASS_LINKS];
     real_t P_SmoothPeakDecayDiffNrg, nrg;
-    real_t P[32][34];
-    real_t G_TransientRatio[32][34] = {{0}};
+    static real_t P[32][34];
+    static real_t G_TransientRatio[32][34];
     complex_t inputLeft;
 
+    memset(&G_TransientRatio, 0, sizeof(G_TransientRatio));
 
     /* chose hybrid filterbank: 20 or 34 band case */
     if (ps->use34hybrid_bands)
@@ -1940,8 +1941,8 @@ ps_info *ps_init(uint8_t sr_index)
 /* main Parametric Stereo decoding function */
 uint8_t ps_decode(ps_info *ps, qmf_t X_left[38][64], qmf_t X_right[38][64])
 {
-    qmf_t X_hybrid_left[32][32];
-    qmf_t X_hybrid_right[32][32];
+    static qmf_t X_hybrid_left[32][32];
+    static qmf_t X_hybrid_right[32][32];
 
     memset(&X_hybrid_left,0,sizeof(X_hybrid_left));
     memset(&X_hybrid_right,0,sizeof(X_hybrid_right));

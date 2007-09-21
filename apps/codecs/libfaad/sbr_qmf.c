@@ -68,7 +68,7 @@ void sbr_qmf_analysis_32(sbr_info *sbr, qmfa_info *qmfa, const real_t *input,
 {
     ALIGN real_t u[64];
 #ifndef SBR_LOW_POWER
-    ALIGN real_t in_real[32], in_imag[32], out_real[32], out_imag[32];
+    static ALIGN real_t in_real[32], in_imag[32], out_real[32], out_imag[32];
 #else
     ALIGN real_t y[32];
 #endif
@@ -456,8 +456,8 @@ void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
 {
 //    ALIGN real_t x1[64], x2[64];
 #ifndef SBR_LOW_POWER
-    ALIGN real_t in_real1[32], in_imag1[32], out_real1[32], out_imag1[32];
-    ALIGN real_t in_real2[32], in_imag2[32], out_real2[32], out_imag2[32];
+    static ALIGN real_t in_real1[32], in_imag1[32], out_real1[32], out_imag1[32];
+    static ALIGN real_t in_real2[32], in_imag2[32], out_real2[32], out_imag2[32];
 #endif
     qmf_t * pX;
     real_t * pring_buffer_1, * pring_buffer_3;
