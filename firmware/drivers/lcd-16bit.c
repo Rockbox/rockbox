@@ -668,7 +668,8 @@ void lcd_bitmap(const fb_data *src, int x, int y, int width, int height)
     lcd_bitmap_part(src, 0, 0, width, x, y, width, height);
 }
 
-#if !defined(TOSHIBA_GIGABEAT_F) || defined(SIMULATOR)
+#if !defined(TOSHIBA_GIGABEAT_F) && !defined(TOSHIBA_GIGABEAT_S) \
+    || defined(SIMULATOR)
 /* Draw a partial native bitmap */
 void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
                                  int stride, int x, int y, int width,

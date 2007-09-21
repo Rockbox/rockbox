@@ -143,6 +143,8 @@ keymaps/keymap-player.c
 keymaps/keymap-x5.c
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
 keymaps/keymap-gigabeat.c
+#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
+keymaps/keymap-gigabeat-s.c
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 keymaps/keymap-h10.c
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD

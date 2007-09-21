@@ -615,7 +615,7 @@ cat <<EOF
 
  ==iAudio==            ==Toshiba==            ==SanDisk==
  30) X5/X5V/X5L        40) Gigabeat F         50) Sansa e200
- 31) M5/M5L                                   51) Sansa e200R
+ 31) M5/M5L            41) Gigabeat S         51) Sansa e200R
                                               52) Sansa c200
 
  ==Tatung==            ==Olympus==
@@ -1257,6 +1257,30 @@ EOF
     t_model="gigabeat-fx"
     ;;
 
+    41|gigabeats)
+    target_id=26
+    archos="gigabeats"
+    target="-DGIGABEAT_S"
+    memory=32 # always
+    arm9tdmicc
+    tool="$rootdir/tools/scramble -add=gigs"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.gigabeat"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins="yes"
+    codecs="libmad liba52 libffmpegFLAC libwma libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
+    toolset=$gigabeatbitmaptools
+    boottool="$rootdir/tools/scramble -gigabeats"
+    bootoutput="nk.bin"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="imx31"
+    t_model="gigabeat-s"
+    ;;
+
     70|mrobe500)
     target_id=20
     archos="mrobe500"
@@ -1349,7 +1373,7 @@ EOF
     appextra="recorder:gui"
     archosrom=""
     flash=""
-    plugins="yes"
+    plugins=""
     swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v3 -model=c200 -type=RBBL"
     bootoutput="firmware.mi4"
@@ -1387,7 +1411,7 @@ EOF
     t_manufacturer="tatung"
     t_model="tpj1022"
     ;;
-
+    
    *)
     echo "Please select a supported target platform!"
     exit

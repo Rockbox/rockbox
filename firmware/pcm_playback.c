@@ -50,7 +50,7 @@ void pcm_play_pause_unpause(void);
 
 /** Functions that require targeted implementation **/
 
-#if defined(CPU_COLDFIRE) || (CONFIG_CPU == S3C2440)
+#if defined(CPU_COLDFIRE) || (CONFIG_CPU == S3C2440) || (CONFIG_CPU == IMX31L)
 /* Implemented in target/... */
 #else
 /* dummy functions for those not actually supporting all this yet */

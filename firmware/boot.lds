@@ -69,6 +69,12 @@ INPUT(target/sh/crt0.o)
 #define IRAMSIZE 0x18000
 #define FLASHORIG 0x001f0000
 #define FLASHSIZE 2M
+#elif CONFIG_CPU == IMX31L
+#define DRAMORIG 0x80000000
+#define IRAMORIG 0x1FFFC000
+#define IRAMSIZE 16K
+#define FLASHORIG 0x0000000
+#define FLASHSIZE 1M
 #else
 #define DRAMORIG 0x09000000
 #define IRAMORIG 0x0f000000
@@ -77,7 +83,7 @@ INPUT(target/sh/crt0.o)
 #define FLASHSIZE 256K - ROM_START
 #endif
 
-#if !defined(CPU_PP) && (CONFIG_CPU!=S3C2440)
+#if !defined(CPU_PP) && (CONFIG_CPU!=S3C2440) && (CONFIG_CPU!=IMX31L)
 MEMORY
 {
    DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
@@ -215,6 +221,41 @@ SECTIONS
          *(.ibss);
          _end = .;
      }>DRAM
+}
+#elif (CONFIG_CPU==IMX31L)
+{
+  . = 0x88201000;
+  .vectors : 
+  {  
+    KEEP(*(.vectors*));
+    *(.vectors*);
+  }  
+  .text : {
+    *(.init.text)
+    *(.text*)
+  }
+  .data : {
+    *(.icode)
+    *(.irodata)
+    *(.idata)
+    *(.data*)
+    _dataend = . ;
+   }
+  .stack :
+  {
+     *(.stack)
+     _stackbegin = .;
+     stackbegin = .;
+     . += 0x2000;
+     _stackend = .;
+     stackend = .;
+  }
+  .bss : {
+     _edata = .;
+     *(.bss*);
+     *(.ibss);
+     _end = .;
+   }
 }
 #else
 {

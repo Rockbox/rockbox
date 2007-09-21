@@ -4,6 +4,9 @@ common.c
 ipod.c
 #elif defined(GIGABEAT_F)
 gigabeat.c
+#elif defined(GIGABEAT_S)
+gigabeat-s.c
+../firmware/target/arm/imx31/gigabeat-s/mmu-imx31.c
 #elif defined(IRIVER_H10) || defined(IRIVER_H10_5GB) || \
       defined(SANSA_E200) || defined(SANSA_C200)
 #ifdef E200R_INSTALLER

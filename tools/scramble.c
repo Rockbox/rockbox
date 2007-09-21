@@ -23,6 +23,7 @@
 #include <string.h>
 #include "iriver.h"
 #include "gigabeat.h"
+#include "gigabeats.h"
 #include "mi4.h"
 
 int iaudio_encode(char *iname, char *oname, char *idstring);
@@ -92,7 +93,8 @@ void usage(void)
            "\t-ipod3g ipod firmware partition format (3rd Gen)\n"
            "\t-ipod4g ipod firmware partition format (4th Gen, Mini, Nano, Photo/Color)\n"
            "\t-ipod5g ipod firmware partition format (5th Gen - aka Video)\n"
-           "\t-gigabeat Toshiba Gigabeat format\n"
+           "\t-gigabeat Toshiba Gigabeat F/X format\n"
+           "\t-gigabeats Toshiba Gigabeat S format\n"
            "\t-mi4v2  PortalPlayer .mi4 format (revision 010201)\n"
            "\t-mi4v3  PortalPlayer .mi4 format (revision 010301)\n"
            "\t-mi4r   Sandisk Rhapsody .mi4 format\n"
@@ -231,6 +233,8 @@ int main (int argc, char** argv)
             modelnum = 19;
         else if(!strcmp(&argv[1][5], "c200"))
             modelnum = 20;
+	     else if(!strcmp(&argv[1][5], "gigs"))
+            modelnum = 21;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;
@@ -252,6 +256,12 @@ int main (int argc, char** argv)
         iname = argv[2];
         oname = argv[3];
         gigabeat_code(iname, oname);
+        return 0;
+    }
+    else if(!strcmp(argv[1], "-gigabeats")) {
+        iname = argv[2];
+        oname = argv[3];
+        gigabeat_s_code(iname, oname);
         return 0;
     }
     else if(!strcmp(argv[1], "-iaudiox5")) {

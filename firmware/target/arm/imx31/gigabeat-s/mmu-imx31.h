@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2004 by Linus Nielsen Feltzing
+ * Copyright (C) 2006,2007 by Greg White
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,35 +16,20 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "config.h"
 
-#if CONFIG_CPU == SH7034
-#include "sh7034.h"
-#endif
-#if CONFIG_CPU == MCF5249
-#include "mcf5249.h"
-#endif
-#if CONFIG_CPU == MCF5250
-#include "mcf5250.h"
-#endif
-#if (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5022)
-#include "pp5020.h"
-#endif
-#if CONFIG_CPU == PP5002
-#include "pp5002.h"
-#endif
-#if CONFIG_CPU == PP5024
-#include "pp5024.h"
-#endif
-#if CONFIG_CPU == PNX0101
-#include "pnx0101.h"
-#endif
-#if CONFIG_CPU == S3C2440
-#include "s3c2440.h"
-#endif
-#if CONFIG_CPU == DM320
-#include "dm320.h"
-#endif
-#if CONFIG_CPU == IMX31L
-#include "imx31l.h"
-#endif
+/* Invalidate DCache for this range  */
+/* Will do write back */
+void invalidate_dcache_range(const void *base, unsigned int size);
+
+/* clean DCache for this range  */
+/* forces DCache writeback for the specified range */
+void clean_dcache_range(const void *base, unsigned int size);
+
+/* Dump DCache for this range  */
+/* Will *NOT* do write back */
+void dump_dcache_range(const void *base, unsigned int size);
+
+/* Cleans entire DCache */
+void clean_dcache(void);
+
+void memory_init(void);

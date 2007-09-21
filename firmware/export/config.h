@@ -30,6 +30,7 @@
 #define S1A0903X01 0x01 /* Samsung */
 #define TEA5767    0x02 /* Philips */
 #define LV24020LP  0x04 /* Sanyo */
+#define SI4700     0x08 /* Silicon Labs */
 
 /* CONFIG_CODEC */
 #define MAS3587F 3587
@@ -49,6 +50,7 @@
 #define S3C2440      2440
 #define TMS320DSC25    25
 #define DM320         320
+#define IMX31L         31
 
 /* CONFIG_KEYPAD */
 #define PLAYER_PAD          1
@@ -68,6 +70,7 @@
 #define ELIO_TPJ1022_PAD   15
 #define ARCHOS_AV300_PAD   16
 #define MROBE500_PAD       17
+#define GIGABEAT_S_PAD     18
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -118,6 +121,7 @@
 #define I2C_PNX0101  6 /* PNX0101 style */
 #define I2C_S3C2440  7
 #define I2C_PP5024   8 /* PP5024 style */
+#define I2C_IMX31L   9
 
 /* CONFIG_LED */
 #define LED_REAL     1 /* SW controlled LED (Archos recorders, player) */
@@ -135,6 +139,7 @@
 #define RTC_E8564    5 /* iriver H10 */
 #define RTC_AS3514   6 /* Sandisk Sansa e200 series */
 #define RTC_DS1339_DS3231   7 /* h1x0 RTC mod */
+#define RTC_IMX31L   8
 
 /* USB On-the-go */
 #define USBOTG_ISP1362 1362 /* iriver H300 */
@@ -186,6 +191,8 @@
 #include "config-ifp7xx.h"
 #elif defined(GIGABEAT_F)
 #include "config-gigabeat.h"
+#elif defined(GIGABEAT_S)
+#include "config-gigabeat-s.h"
 #elif defined(IPOD_MINI)
 #include "config-ipodmini.h"
 #elif defined(IPOD_MINI2G)
@@ -299,7 +306,8 @@
 
 /* define for all cpus from ARM family */
 #if defined(CPU_PP) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == S3C2440) \
-    || (CONFIG_CPU == TMS320DSC25) || (CONFIG_CPU == DM320)
+    || (CONFIG_CPU == TMS320DSC25) || (CONFIG_CPU == DM320) \
+    || (CONFIG_CPU == IMX31L)
 #define CPU_ARM
 #endif
 
