@@ -78,4 +78,4 @@ ipodvideo.c: bootloader-ipodvideo.ipod ipod2c
 
 
 clean:
-	rm -f ipodpatcher.exe ipodpatcher-mac ipodpatcher-i386 ipodpatcher-ppc ipodpatcher ipod2c *~ $(BOOTSRC) $(BOOT_H)
+	rm -f ipodpatcher.exe ipodpatcher-rc.o ipodpatcher-mac ipodpatcher-i386 ipodpatcher-ppc ipodpatcher ipod2c *~ $(BOOTSRC) $(BOOT_H)
