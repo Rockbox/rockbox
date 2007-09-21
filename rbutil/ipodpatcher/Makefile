@@ -21,6 +21,7 @@ endif
 
 NATIVECC = gcc
 CC = $(CROSS)gcc
+WINDRES = $(CROSS)windres
 
 SRC = main.c ipodpatcher.c fat32format.c parttypes.h arc4.c
 
@@ -30,9 +31,12 @@ ipodpatcher: $(SRC) ipodio-posix.c $(BOOTSRC)
 	gcc $(CFLAGS) -o ipodpatcher $(SRC) ipodio-posix.c $(BOOTSRC)
 	strip ipodpatcher
 
-ipodpatcher.exe: $(SRC) ipodio-win32.c $(BOOTSRC)
-	$(CC) $(CFLAGS) -o ipodpatcher.exe $(SRC) ipodio-win32.c $(BOOTSRC)
+ipodpatcher.exe: $(SRC) ipodio-win32.c ipodpatcher-rc.o $(BOOTSRC)
+	$(CC) $(CFLAGS) -o ipodpatcher.exe $(SRC) ipodio-win32.c ipodpatcher-rc.o $(BOOTSRC)
 	$(CROSS)strip ipodpatcher.exe
+
+ipodpatcher-rc.o: ipodpatcher.rc ipodpatcher.manifest
+	$(WINDRES) -i ipodpatcher.rc -o ipodpatcher-rc.o
 
 ipodpatcher-mac: ipodpatcher-i386 ipodpatcher-ppc
 	lipo -create ipodpatcher-ppc ipodpatcher-i386 -output ipodpatcher-mac
